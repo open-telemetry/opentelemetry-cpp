@@ -67,11 +67,11 @@ A PR is considered to be **ready to merge** when:
 * It has received two approvals from [Approvers](https://github.com/open-telemetry/community/blob/master/community-membership.md#approver)
   / [Maintainers](https://github.com/open-telemetry/community/blob/master/community-membership.md#maintainer)
   (at different companies).
-* Major feedbacks are resolved.
+* Major feedback items/points are resolved.
 * It has been open for review for at least one working day. This gives people
   reasonable time to review.
-* Trivial change (typo, cosmetic, doc, etc.) doesn't have to wait for one day.
-* Urgent fix can take exception as long as it has been actively communicated.
+* Trivial changes (typo, cosmetic, doc, etc.) don't have to wait for one day.
+* Urgent fixes can take exceptions as long as it has been actively communicated.
 
 Any Approver / Maintainer can merge the PR once it is **ready to merge**.
 
