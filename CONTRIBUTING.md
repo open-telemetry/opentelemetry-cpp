@@ -8,7 +8,7 @@ See the [public meeting notes](https://docs.google.com/document/d/1i1E4-_y4uJ083
 for a summary description of past meetings. To request edit access, join the
 meeting or get in touch on [Gitter](https://gitter.im/open-telemetry/opentelemetry-cpp).
 
-See to the [community membership document](https://github.com/open-telemetry/community/blob/master/community-membership.md)
+See the [community membership document](https://github.com/open-telemetry/community/blob/master/community-membership.md)
 on how to become a [**Member**](https://github.com/open-telemetry/community/blob/master/community-membership.md#member),
 [**Approver**](https://github.com/open-telemetry/community/blob/master/community-membership.md#approver)
 and [**Maintainer**](https://github.com/open-telemetry/community/blob/master/community-membership.md#maintainer).
@@ -59,7 +59,7 @@ Open a pull request against the main `opentelemetry-cpp` repo.
 
 * If the PR is not ready for review, please put `[WIP]` in the title, tag it
   as `work-in-progress`, or mark it as [`draft`](https://github.blog/2019-02-14-introducing-draft-pull-requests/).
-* Make sure CLA is signed and CI is clear.
+* Make sure [CLA](https://identity.linuxfoundation.org/projects/cncf) is signed and CI is clear.
 
 ### How to Get PRs Merged
 
