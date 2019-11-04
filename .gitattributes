@@ -1,0 +1,92 @@
+##### Source code #####
+
+## C++ and C source files
+*.c                     text diff=cpp
+*.h                     text diff=cpp
+*.cpp                   text diff=cpp
+*.cxx                   text diff=cpp
+*.hpp                   text diff=cpp
+
+## Python scripts
+*.py                    text eol=lf diff=python
+
+## Perl scripts/libraries/modules
+*.perl                  text eol=lf diff=perl
+*.pl                    text eol=lf diff=perl
+*.pm                    text eol=lf diff=perl
+
+## Shell scripts
+*.sh                    text eol=lf
+*.bash                  text eol=lf
+
+## Windows batch and PowerShell scripts
+*.bat                   text eol=crlf
+*.cmd                   text eol=crlf
+*.ps1                   text eol=crlf
+
+##### Other file types #####
+
+## Text files and documentation
+*.txt                   text
+README*                 text
+INSTALL*                text
+LICENSE*                text
+
+## Non-text documentation
+*.html                  text diff=html
+*.pdf                   binary
+*.rtf                   binary
+
+## Doxygen documentation configuration files
+Doxyfile                text
+*.dox                   text
+
+## Image files
+*.png                   binary
+*.PNG                   binary
+*.jpg                   binary
+*.JPG                   binary
+*.gif                   binary
+*.GIF                   binary
+*.bmp                   binary
+*.BMP                   binary
+*.ico                   binary
+*.ICO                   binary
+*.ppm                   binary
+*.pgm                   binary
+*.pbm                   binary
+*.xpm                   -text diff -merge
+
+## Vector graphics
+*.svg                   -text diff -merge
+
+## CMake files
+CMakeLists.txt          text eol=lf
+
+## Makefiles
+Makefile                text
+makefile                text
+GNUmakefile             text
+*.mk                    text
+
+## Various IDE project files, etc
+*.sln                   -text diff merge
+*.vcxproj               -text diff -merge
+*.vcxproj.filters       -text diff -merge
+*.props                 -text diff -merge
+*.pbxproj               -text diff -merge
+
+## Resource files and UI design descriptions
+*.rc                    text eol=crlf
+
+## Diff/patch files
+*.diff                  text diff -merge
+*.patch                 text diff -merge
+
+## XML and configuration
+*.xml                   text
+*.cfg                   text
+
+## Self-reference =)
+.gitignore              text
+.gitattributes          text
