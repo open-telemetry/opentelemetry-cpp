@@ -15,8 +15,8 @@ and [**Maintainer**](https://github.com/open-telemetry/community/blob/master/com
 
 ## Development
 
-OpenTelemetry C++ uses
-[Google C++ style](https://google.github.io/styleguide/cppguide.html).
+OpenTelemetry C++ uses the [Google naming
+convention](https://google.github.io/styleguide/cppguide.html#Naming).
 
 Code formatting will be enforced automatically via `clang-format`.
 
