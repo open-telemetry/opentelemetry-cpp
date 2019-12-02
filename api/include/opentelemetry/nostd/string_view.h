@@ -15,7 +15,7 @@ namespace nostd {
  */
 class string_view {
  public:
-  string_view() noexcept : data_(nullptr), length_(0) {}
+  string_view() noexcept : length_(0), data_(nullptr) {}
 
   string_view(const char* str) noexcept
       : length_(std::strlen(str)), data_(str) {}
