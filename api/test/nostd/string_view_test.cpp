@@ -47,5 +47,6 @@ TEST_CASE("string_view provides a back port of std::string_view") {
 
   SECTION("a string_view can be explicitly converted to an std::string") {
     std::string s = static_cast<std::string>(string_view{"abc"});
+    REQUIRE(s == "abc");
   }
 }
