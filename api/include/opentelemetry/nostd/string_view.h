@@ -43,8 +43,10 @@ class string_view {
   const char& operator[](std::size_t i) { return *(data() + i); }
 
  private:
-  size_t length_;     // Length of data pointed to by 'data_'
-  const char* data_;  // Pointer to external storage
+  // Note: uses the same binary layout as libstdc++'s std::string_view
+  // See https://github.com/gcc-mirror/gcc/blob/e0c554e4da7310df83bb1dcc7b8e6c4c9c5a2a4f/libstdc%2B%2B-v3/include/std/string_view#L466-L467
+  size_t length_;
+  const char* data_;
 };
 
 inline bool operator==(string_view lhs, string_view rhs) noexcept {
