@@ -4,6 +4,7 @@
 #include <cstring>
 #include <ostream>
 #include <string>
+#include <stdexcept>
 
 namespace opentelemetry {
 namespace nostd {
@@ -15,6 +16,8 @@ namespace nostd {
  */
 class string_view {
  public:
+  static constexpr std::size_t npos = std::string::npos;
+
   string_view() noexcept : length_(0), data_(nullptr) {}
 
   string_view(const char* str) noexcept
@@ -41,6 +44,14 @@ class string_view {
   const char* end() const noexcept { return data() + length(); }
 
   const char& operator[](std::size_t i) { return *(data() + i); }
+
+  string_view substr(std::size_t pos, std::size_t n = npos) const {
+    if (pos > length_) {
+      throw std::out_of_range{"opentelemetry::nostd::string_view"};
+    }
+    n = (std::min)(n, length_ - pos);
+    return string_view(data_ + pos, n);
+  }
 
  private:
   // Note: uses the same binary layout as libstdc++'s std::string_view

@@ -49,4 +49,15 @@ TEST_CASE("string_view provides a back port of std::string_view") {
     std::string s = static_cast<std::string>(string_view{"abc"});
     REQUIRE(s == "abc");
   }
+
+  SECTION("substr can be used to take a portion of a string_view") {
+    string_view s = "abc123";
+    REQUIRE(s.substr(3) == "123");
+    REQUIRE(s.substr(3, 2) == "12");
+  }
+
+  SECTION("substr throw if start from a position outside the range of the string_view") {
+    string_view s = "abc123";
+    REQUIRE_THROWS_AS(s.substr(10), std::out_of_range);
+  }
 }
