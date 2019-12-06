@@ -1,7 +1,7 @@
 cc_test(
     name = "string_view_test",
     srcs = [
-        "string_view_test.cpp",
+        "string_view_test.cc",
     ],
     deps = [
         "//api:api",

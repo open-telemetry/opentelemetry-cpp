@@ -7,6 +7,6 @@ cc_library(
     ],
     strip_include_prefix = "include",
     srcs = [
-        "catch2_main.cpp",
+        "src/catch2_main.cc",
     ],
 )

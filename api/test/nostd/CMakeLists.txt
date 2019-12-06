@@ -1,0 +1,4 @@
+add_executable(string_view_test string_view_test.cc)
+target_link_libraries(string_view_test catch2_with_main)
+target_link_libraries(string_view_test opentelemetry_api)
+add_test(NAME string_view_test COMMAND string_view_test)
