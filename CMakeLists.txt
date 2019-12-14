@@ -11,5 +11,4 @@ if (BUILD_TESTING)
   include_directories(SYSTEM ${GTEST_INCLUDE_DIRS})
 endif()
 
-add_subdirectory(3rd_party)
 add_subdirectory(api)

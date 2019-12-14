@@ -1,63 +1,62 @@
 #include "opentelemetry/nostd/string_view.h"
 
-#include "opentelemetry/3rd_party/catch.hpp"
+#include <gtest/gtest.h>
 
 using opentelemetry::nostd::string_view;
 
-TEST_CASE("string_view provides a back port of std::string_view") {
-  SECTION("A default-constructed string_view is empty.") {
-    string_view ref;
-    REQUIRE(nullptr == ref.data());
-    REQUIRE(0 == ref.length());
-  }
+TEST(StringViewTest, DefaultConstruction) {
+  string_view ref;
+  EXPECT_EQ(ref.data(), nullptr);
+  EXPECT_EQ(ref.length(), 0);
+}
 
-  SECTION("string_view can be initialized from a c-string.") {
-    const char* val = "hello world";
+TEST(StringViewTest, CStringInitialization) {
+  const char* val = "hello world";
 
-    string_view ref(val);
+  string_view ref(val);
 
-    REQUIRE(val == ref.data());
-    REQUIRE(std::strlen(val) == ref.length());
-  }
+  EXPECT_EQ(ref.data(), val);
+  EXPECT_EQ(ref.length(), std::strlen(val));
+}
 
-  SECTION("string_view can be initialized from an std::string.") {
-    const std::string val = "hello world";
+TEST(StringViewTest, StdStringInitialization) {
+  const std::string val = "hello world";
 
-    string_view ref(val);
+  string_view ref(val);
 
-    REQUIRE(val == ref.data());
-    REQUIRE(val.length() == ref.length());
-  }
+  EXPECT_EQ(ref.data(), val.data());
+  EXPECT_EQ(ref.length(), val.size());
+}
 
-  SECTION("A copied string_view points to the same data as its source.") {
-    const std::string val = "hello world";
+TEST(StringViewTest, Copy) {
+  const std::string val = "hello world";
 
-    string_view ref(val);
-    string_view cpy(ref);
+  string_view ref(val);
+  string_view cpy(ref);
 
-    REQUIRE(val == cpy.data());
-    REQUIRE(val.length() == cpy.length());
-  }
+  EXPECT_EQ(cpy.data(), val);
+  EXPECT_EQ(cpy.length(), val.length());
+  EXPECT_EQ(cpy, val);
+}
 
-  SECTION("operator[] can be used to access characters in a string_view") {
-    string_view s = "abc123";
-    REQUIRE(&s[0] == s.data());
-    REQUIRE(&s[1] == s.data() + 1);
-  }
+TEST(StringViewTest, Accessor) {
+  string_view s = "abc123";
+  EXPECT_EQ(s.data(), &s[0]);
+  EXPECT_EQ(s.data() + 1, &s[1]);
+}
 
-  SECTION("a string_view can be explicitly converted to an std::string") {
-    std::string s = static_cast<std::string>(string_view{"abc"});
-    REQUIRE(s == "abc");
-  }
+TEST(StringViewTest, ExplicitStdStringConversion) {
+  std::string s = static_cast<std::string>(string_view{"abc"});
+  EXPECT_EQ(s, "abc");
+}
 
-  SECTION("substr can be used to take a portion of a string_view") {
-    string_view s = "abc123";
-    REQUIRE(s.substr(3) == "123");
-    REQUIRE(s.substr(3, 2) == "12");
-  }
+TEST(StringViewTest, SubstrPortion) {
+  string_view s = "abc123";
+  EXPECT_EQ("123", s.substr(3));
+  EXPECT_EQ("12", s.substr(3, 2));
+}
 
-  SECTION("substr throw if start from a position outside the range of the string_view") {
-    string_view s = "abc123";
-    REQUIRE_THROWS_AS(s.substr(10), std::out_of_range);
-  }
+TEST(StringViewTest, SubstrOutOfRange) {
+  string_view s = "abc123";
+  EXPECT_THROW(s.substr(10), std::out_of_range);
 }
