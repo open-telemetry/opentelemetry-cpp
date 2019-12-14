@@ -6,5 +6,10 @@ set(CMAKE_CXX_STANDARD 11)
 
 include(CTest)
 
+if (BUILD_TESTING)
+  find_package(GTest REQUIRED)
+  include_directories(SYSTEM ${GTEST_INCLUDE_DIRS})
+endif()
+
 add_subdirectory(3rd_party)
 add_subdirectory(api)
