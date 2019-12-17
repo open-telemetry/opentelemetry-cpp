@@ -4,7 +4,7 @@ cc_test(
         "string_view_test.cc",
     ],
     deps = [
-        "//api:api",
+        "//api",
         "@com_google_googletest//:gtest_main",
     ],
 )

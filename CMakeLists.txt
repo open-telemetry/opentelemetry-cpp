@@ -8,7 +8,7 @@ include(CTest)
 
 find_package(Threads)
 
-if (BUILD_TESTING)
+if(BUILD_TESTING)
   find_package(GTest REQUIRED)
   include_directories(SYSTEM ${GTEST_INCLUDE_DIRS})
 endif()
