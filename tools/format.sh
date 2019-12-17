@@ -8,12 +8,18 @@ set -e
 
 FIND="find . -name .git -prune -o -name _deps -prune -o -name .build -prune -o"
 
+# GNU syntax.
+SED=(sed -i)
+if [[ "$(uname)" = "Darwin" ]]; then
+  SED=(sed -i "")
+fi
+
 # Correct common miscapitalizations.
-sed -i 's/Open[t]elemetry/OpenTelemetry/g' $($FIND -type f -print)
+"${SED[@]}" 's/Open[t]elemetry/OpenTelemetry/g' $($FIND -type f -print)
 # No CRLF line endings.
-sed -i 's/\r$//' $($FIND -type f -print)
+"${SED[@]}" 's/\r$//' $($FIND -type f -print)
 # No trailing spaces.
-sed -i 's/ \+$//' $($FIND -type f -print)
+"${SED[@]}" 's/ \+$//' $($FIND -type f -print)
 
 CMD=clang-format-8
 $CMD -version
