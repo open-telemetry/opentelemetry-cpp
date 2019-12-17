@@ -21,9 +21,16 @@ fi
 # No trailing spaces.
 "${SED[@]}" 's/ \+$//' $($FIND -type f -print)
 
-CMD=clang-format-8
-$CMD -version
-$CMD -i -style=file \
+# If not overridden, try to use clang-format-8 or clang-format.
+if [[ -z "$CLANG_FORMAT" ]]; then
+  CLANG_FORMAT=clang-format
+  if which clang-format-8 >/dev/null; then
+    CLANG_FORMAT=clang-format-8
+  fi
+fi
+
+$CLANG_FORMAT -version
+$CLANG_FORMAT -i -style=file \
   $($FIND -name '*.cc' -print -o -name '*.h' -print)
 
 if which cmake-format >/dev/null; then
