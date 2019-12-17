@@ -4,14 +4,16 @@
 
 using opentelemetry::nostd::string_view;
 
-TEST(StringViewTest, DefaultConstruction) {
+TEST(StringViewTest, DefaultConstruction)
+{
   string_view ref;
   EXPECT_EQ(ref.data(), nullptr);
   EXPECT_EQ(ref.length(), 0);
 }
 
-TEST(StringViewTest, CStringInitialization) {
-  const char* val = "hello world";
+TEST(StringViewTest, CStringInitialization)
+{
+  const char *val = "hello world";
 
   string_view ref(val);
 
@@ -19,7 +21,8 @@ TEST(StringViewTest, CStringInitialization) {
   EXPECT_EQ(ref.length(), std::strlen(val));
 }
 
-TEST(StringViewTest, StdStringInitialization) {
+TEST(StringViewTest, StdStringInitialization)
+{
   const std::string val = "hello world";
 
   string_view ref(val);
@@ -28,7 +31,8 @@ TEST(StringViewTest, StdStringInitialization) {
   EXPECT_EQ(ref.length(), val.size());
 }
 
-TEST(StringViewTest, Copy) {
+TEST(StringViewTest, Copy)
+{
   const std::string val = "hello world";
 
   string_view ref(val);
@@ -39,24 +43,28 @@ TEST(StringViewTest, Copy) {
   EXPECT_EQ(cpy, val);
 }
 
-TEST(StringViewTest, Accessor) {
+TEST(StringViewTest, Accessor)
+{
   string_view s = "abc123";
   EXPECT_EQ(s.data(), &s[0]);
   EXPECT_EQ(s.data() + 1, &s[1]);
 }
 
-TEST(StringViewTest, ExplicitStdStringConversion) {
+TEST(StringViewTest, ExplicitStdStringConversion)
+{
   std::string s = static_cast<std::string>(string_view{"abc"});
   EXPECT_EQ(s, "abc");
 }
 
-TEST(StringViewTest, SubstrPortion) {
+TEST(StringViewTest, SubstrPortion)
+{
   string_view s = "abc123";
   EXPECT_EQ("123", s.substr(3));
   EXPECT_EQ("12", s.substr(3, 2));
 }
 
-TEST(StringViewTest, SubstrOutOfRange) {
+TEST(StringViewTest, SubstrOutOfRange)
+{
   string_view s = "abc123";
   EXPECT_THROW(s.substr(10), std::out_of_range);
 }
