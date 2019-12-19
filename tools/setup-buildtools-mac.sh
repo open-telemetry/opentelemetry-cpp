@@ -5,7 +5,7 @@
 # control of the brew dirs. That causes the brew update to fail.
 # Temporarily allow the user to take over control of brew files.
 
-echo *** 
+echo ***
 echo *** You may need to enter your admin password to update the brew files:
 echo ***
 
