@@ -19,7 +19,7 @@ jobs:
       - image: ubuntu:18.04
     steps:
       - checkout
-      - run: ./ci/setup_build_environment.sh
+      - run: ./ci/setup_ci_environment.sh
       - run: ./ci/install_bazelisk.sh
       - run: ./ci/do_ci.sh bazel.test
 
