@@ -2,7 +2,7 @@
 
 set -e
 
-BUILD_IMAGE=opentelemetry-cpp-build
+BUILD_IMAGE=opentelemetry-cpp-build3
 docker image inspect "$BUILD_IMAGE" &> /dev/null || {
   docker build -t "$BUILD_IMAGE" ci
 }
