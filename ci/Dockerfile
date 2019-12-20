@@ -1,0 +1,9 @@
+FROM ubuntu:18.04
+
+WORKDIR /setup-ci
+
+ADD setup_ci_environment.sh /setup-ci
+ADD install_bazelisk.sh /setup-ci
+
+RUN /setup-ci/setup_ci_environment.sh \
+  && /setup-ci/install_bazelisk.sh
