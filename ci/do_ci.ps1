@@ -18,7 +18,12 @@ switch ($action) {
     if ($exit -ne 0) {
       exit $exit
     }
-    cmake --build . --target RUN_TESTS
+    cmake --build .
+    $exit = $LASTEXITCODE
+    if ($exit -ne 0) {
+      exit $exit
+    }
+    ctest -C Debug
     $exit = $LASTEXITCODE
     if ($exit -ne 0) {
       exit $exit
