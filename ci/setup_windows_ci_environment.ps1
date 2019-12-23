@@ -6,4 +6,4 @@ cd vcpkg
 $VCPKG_DIR=(Get-Item -Path ".\").FullName
 ./bootstrap-vcpkg.bat
 ./vcpkg integrate install
-./vcpkg install gtest:x64-windows-static
+./vcpkg install gtest:x64-windows
