@@ -12,9 +12,8 @@ switch ($action) {
   "cmake.test" {
     cd "$BUILD_DIR"
     cmake $SRC_DIR `
-          -DVCPKG_TARGET_TRIPLET=x64-windows-static `
-          "-DCMAKE_TOOLCHAIN_FILE=$VCPKG_DIR\scripts\buildsystems\vcpkg.cmake" `
-          -DBUILD_SHARED_LIBS=OFF
+          -DVCPKG_TARGET_TRIPLET=x64-windows `
+          "-DCMAKE_TOOLCHAIN_FILE=$VCPKG_DIR\scripts\buildsystems\vcpkg.cmake"
     $exit = $LASTEXITCODE
     if ($exit -ne 0) {
       exit $exit
