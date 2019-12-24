@@ -44,4 +44,5 @@ workflows:
   build_and_test:
     jobs:
       - cmake_test
+      - gcc_48_test
       - bazel_test
