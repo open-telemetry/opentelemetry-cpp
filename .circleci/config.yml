@@ -23,10 +23,7 @@ jobs:
       - run: ./ci/setup_ci_environment.sh
       - run: ./ci/setup_cmake.sh
       - run: ./ci/install_gcc48.sh
-      - run: CXX=/usr/bin/g++-4.8 ./ci/do_ci.sh cmake.test
-      - store_artifacts:
-          path: /build/Testing/Temporary/LastTest.log
-          destination: Test.log
+      - run: CXX=/usr/bin/g++-4.8 ./ci/do_ci.sh bazel.test
 
   bazel_test:
     resource_class: xlarge
