@@ -29,7 +29,7 @@ jobs:
       macos:
         xcode: "10.0.0"
     steps:
-      -checkout
+      - checkout
       - run: ./ci/install_osx_bazelisk.sh
       - run: ./ci/do_ci.sh bazel.test
 
