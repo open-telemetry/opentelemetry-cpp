@@ -11,7 +11,7 @@ jobs:
       - run: ./ci/setup_cmake.sh
       - run: ./ci/do_ci.sh cmake.test
       - store_artifacts:
-          path: /build/Testing/Temporary/LastTest.log
+          path: ~/build/Testing/Temporary/LastTest.log
           destination: Test.log
 
   bazel_test:
