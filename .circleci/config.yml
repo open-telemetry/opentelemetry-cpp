@@ -25,9 +25,8 @@ jobs:
       - run: ./ci/do_ci.sh bazel.test
 
   osx_test:
-    build:
-      macos:
-        xcode: "10.0.0"
+    macos:
+      xcode: "10.0.0"
     steps:
       - checkout
       - run: ./ci/install_osx_bazelisk.sh
