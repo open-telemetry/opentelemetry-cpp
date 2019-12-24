@@ -3,4 +3,4 @@
 set -e
 
 brew install bazelisk
-alias bazel="bazelisk"
+sudo ln -s /usr/local/bin/bazelisk /usr/local/bin/bazel
