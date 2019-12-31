@@ -24,7 +24,7 @@ class span {
  public:
    static constexpr size_t extent = Extent;
 
-   template <typename std::enable_if<Extent == 0> * = nullptr>
+   template <typename std::enable_if<Extent == 0>::type * = nullptr>
    span() noexcept : data_{nullptr}
    {}
 
@@ -38,20 +38,18 @@ class span {
      assert(std::distance(first, last) == Extent);
    }
 
-   template <size_t N>
+   template <size_t N, typename std::enable_if<Extent == N>::type* = nullptr>
    span(T (&array)[N]) noexcept : data_{array}
    {
      assert(N == Extent);
    }
 
-   template <size_t N>
+   template <size_t N, typename std::enable_if<Extent == N>::type* = nullptr>
    span(std::array<T, N>& array) noexcept : data_{array.data()} {
-     assert(N == Extent);
    }
 
-   template <size_t N>
+   template <size_t N, typename std::enable_if<Extent == N>::type* = nullptr>
    span(const std::array<T, N>& array) noexcept : data_{array.data()} {
-     assert(N == Extent);
    }
 
    bool empty() const noexcept { return Extent == 0; }
@@ -91,15 +89,6 @@ class span<T, dynamic_extent> {
    template <size_t N>
    span(T (&arr)[N]) noexcept : extent_{N}, data_{arr}
    {}
-
-   template <size_t N>
-   span(std::array<T, N>& array) noexcept : extent_{N}, data_{array.data()} {
-   }
-
-   template <size_t N>
-   span(const std::array<T, N> &array) noexcept : extent_{N}, data_{array.data()}
-   {
-   }
 
    bool empty() const noexcept { return extent_ == 0; }
 
