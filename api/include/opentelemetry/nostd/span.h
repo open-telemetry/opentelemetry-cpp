@@ -24,7 +24,11 @@ class span {
  public:
    static constexpr size_t extent = Extent;
 
-   template <typename std::enable_if<Extent == 0>::type * = nullptr>
+   // This arcane code is how we make default-construction result in an SFINAE error
+   // with C++11 when Extent != 0 as specified by the std::span API.
+   //
+   // See https://stackoverflow.com/a/10309720/4447365
+   template <bool B = Extent == 0, typename std::enable_if<B>::type * = nullptr>
    span() noexcept : data_{nullptr}
    {}
 
