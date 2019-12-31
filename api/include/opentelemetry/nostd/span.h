@@ -85,7 +85,7 @@ class span<T, dynamic_extent> {
    span(T *first, T *last) noexcept
        : extent_{static_cast<size_t>(std::distance(first, last))}, data_{first}
    {
-     assert(first < last);
+     assert(first <= last);
    }
 
    template <size_t N>
