@@ -19,6 +19,9 @@ constexpr size_t dynamic_extent = static_cast<size_t>(-1);
  * See https://en.cppreference.com/w/cpp/container/span for interface documentation.
  *
  * Note: This provides a subset of the methods available on std::span.
+ *
+ * Note: The std::span API specifies error cases to have undefined behavior, so this implementation
+ * choses to terminate or assert rather than throw exceptions.
  */
 template <class T, size_t Extent = dynamic_extent>
 class span {
@@ -60,6 +63,15 @@ class span {
    span(const std::array<T, N>& array) noexcept : data_{array.data()} {
    }
 
+   template <class U,
+             size_t N,
+             typename std::enable_if<
+                 N == Extent && std::is_convertible<U (*)[], T (*)[]>::value>::type * = nullptr>
+   span(const span<U, N> &other) noexcept : data_{other.data()}
+   {}
+
+   span(const span&) noexcept = default;
+
    bool empty() const noexcept { return Extent == 0; }
 
    T *data() const noexcept { return data_; }
@@ -95,8 +107,17 @@ class span<T, dynamic_extent> {
    }
 
    template <size_t N>
-   span(T (&arr)[N]) noexcept : extent_{N}, data_{arr}
+   span(T (&array)[N]) noexcept : extent_{N}, data_{array}
    {}
+
+   template <
+       class U,
+       size_t N,
+       typename std::enable_if<std::is_convertible<U (*)[], T (*)[]>::value>::type * = nullptr>
+   span(const span<U, N> &other) noexcept : extent_{other.size()}, data_{other.data()}
+   {}
+
+   span(const span&) noexcept = default;
 
    bool empty() const noexcept { return extent_ == 0; }
 
