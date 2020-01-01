@@ -15,7 +15,7 @@ auto IsSizeCallable(const T &t) -> decltype(opentelemetry::nostd::size(t), std::
 
 std::false_type IsSizeCallable(...);
 
-TEST(UilityTest, Data)
+TEST(UtilityTest, Data)
 {
   std::vector<int> v = {1, 2, 3};
   int array[3]       = {1, 2, 3};
@@ -28,7 +28,7 @@ TEST(UilityTest, Data)
   EXPECT_FALSE(decltype(IsDataCallable(x)){});
 }
 
-TEST(UilityTest, Size)
+TEST(UtilityTest, Size)
 {
   std::vector<int> v = {1, 2, 3};
   int array[3]       = {1, 2, 3};
