@@ -1,5 +1,6 @@
 #pragma once
 
+#include <exception>
 #include <cstddef>
 #include <iterator>
 #include <cassert>
@@ -33,19 +34,22 @@ class span {
    {}
 
    span(T* data, size_t count) noexcept : data_{data} {
-     assert(count == Extent);
+     if (count != Extent) {
+       std::terminate();
+     }
    }
 
-   span(T *first, T *last) noexcept
-       : data_{first}
+   span(T *first, T *last) noexcept : data_{first}
    {
-     assert(std::distance(first, last) == Extent);
+     if (std::distance(first, last) != Extent)
+     {
+       std::terminate();
+     }
    }
 
    template <size_t N, typename std::enable_if<Extent == N>::type* = nullptr>
    span(T (&array)[N]) noexcept : data_{array}
    {
-     assert(N == Extent);
    }
 
    template <size_t N, typename std::enable_if<Extent == N>::type* = nullptr>
