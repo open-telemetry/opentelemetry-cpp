@@ -3,9 +3,9 @@
 #include <algorithm>
 #include <array>
 #include <iterator>
+#include <list>
 #include <type_traits>
 #include <vector>
-#include <list>
 
 #include <gtest/gtest.h>
 
@@ -98,7 +98,8 @@ TEST(SpanTest, ArrayConstruction)
   EXPECT_FALSE((std::is_constructible<span<int, 2>, int(&)[3]>::value));
 }
 
-TEST(SpanTest, ContainerConstruction) {
+TEST(SpanTest, ContainerConstruction)
+{
   std::vector<int> v = {1, 2, 3};
 
   span<int> s1{v};
