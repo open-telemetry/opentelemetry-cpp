@@ -37,6 +37,20 @@ TEST(SpanTest, PointerCountConstruction)
   EXPECT_DEATH((span<int, 2>{array.data(), array.size()}), ".*");
 }
 
+TEST(SpanTest, RangeConstruction) {
+  int array[] = {1, 2, 3};
+
+  span<int> s1{std::begin(array), std::end(array)};
+  EXPECT_EQ(s1.data(), array);
+  EXPECT_EQ(s1.size(), 3);
+
+  span<int, 3> s2{std::begin(array), std::end(array)};
+  EXPECT_EQ(s2.data(), array);
+  EXPECT_EQ(s2.size(), 3);
+
+  EXPECT_DEATH((span<int, 2>{std::begin(array), std::end(array)}), ".*");
+}
+
 TEST(SpanTest, ArrayConstruction) {
   int array1[] = {1, 2, 3};
   std::array<int, 3> array2 = {1, 2, 3};
