@@ -81,9 +81,9 @@ TEST(SpanTest, ArrayConstruction)
   EXPECT_EQ(s1.data(), array1);
   EXPECT_EQ(s1.size(), 3);
 
-  /* span<int> s2{array1}; */
-  /* EXPECT_EQ(s2.data(), array2.data()); */
-  /* EXPECT_EQ(s2.size(), array2.size()); */
+  span<int> s2{array2};
+  EXPECT_EQ(s2.data(), array2.data());
+  EXPECT_EQ(s2.size(), array2.size());
 
   span<int, 3> s3{array1};
   EXPECT_EQ(s3.data(), array1);

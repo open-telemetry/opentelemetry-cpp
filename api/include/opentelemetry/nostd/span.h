@@ -7,6 +7,8 @@
 #include <array>
 #include <type_traits>
 
+#include "opentelemetry/nostd/utility.h"
+
 namespace opentelemetry
 {
 namespace nostd
@@ -109,6 +111,14 @@ class span<T, dynamic_extent> {
    template <size_t N>
    span(T (&array)[N]) noexcept : extent_{N}, data_{array}
    {}
+
+   template <size_t N>
+   span(std::array<T, N>& array) noexcept : extent_{N}, data_{array.data()} {
+   }
+
+   template <size_t N>
+   span(const std::array<T, N>& array) noexcept : extent_{N}, data_{array.data()} {
+   }
 
    template <
        class U,
