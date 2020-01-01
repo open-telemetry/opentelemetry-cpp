@@ -1,6 +1,8 @@
 #include "opentelemetry/nostd/span.h"
 
+#include <algorithm>
 #include <array>
+#include <iterator>
 #include <type_traits>
 
 #include <gtest/gtest.h>
@@ -22,7 +24,8 @@ TEST(SpanTest, DefaultConstruction)
   EXPECT_FALSE((std::is_default_constructible<span<int, 1>>::value));
 }
 
-TEST(SpanTest, Assignment) {
+TEST(SpanTest, Assignment)
+{
   std::array<int, 3> array1 = {1, 2, 3};
   std::array<int, 3> array2 = {1, 2, 3};
   span<int> s1{array1.data(), array1.size()};
@@ -54,7 +57,8 @@ TEST(SpanTest, PointerCountConstruction)
   EXPECT_DEATH((span<int, 2>{array.data(), array.size()}), ".*");
 }
 
-TEST(SpanTest, RangeConstruction) {
+TEST(SpanTest, RangeConstruction)
+{
   int array[] = {1, 2, 3};
 
   span<int> s1{std::begin(array), std::end(array)};
@@ -68,8 +72,9 @@ TEST(SpanTest, RangeConstruction) {
   EXPECT_DEATH((span<int, 2>{std::begin(array), std::end(array)}), ".*");
 }
 
-TEST(SpanTest, ArrayConstruction) {
-  int array1[] = {1, 2, 3};
+TEST(SpanTest, ArrayConstruction)
+{
+  int array1[]              = {1, 2, 3};
   std::array<int, 3> array2 = {1, 2, 3};
 
   span<int> s1{array1};
@@ -135,4 +140,17 @@ TEST(SpanTest, BracketOperator)
   span<int, 2> s2{array.data(), array.size()};
   EXPECT_EQ(s2[0], 1);
   EXPECT_EQ(s2[1], 2);
+}
+
+TEST(SpanTest, Iteration)
+{
+  std::array<int, 3> array = {1, 2, 3};
+
+  span<int> s1{array.data(), array.size()};
+  EXPECT_EQ(std::distance(s1.begin(), s1.end()), array.size());
+  EXPECT_TRUE(std::equal(s1.begin(), s1.end(), array.begin()));
+
+  span<int, 3> s2{array.data(), array.size()};
+  EXPECT_EQ(std::distance(s2.begin(), s2.end()), array.size());
+  EXPECT_TRUE(std::equal(s2.begin(), s2.end(), array.begin()));
 }
