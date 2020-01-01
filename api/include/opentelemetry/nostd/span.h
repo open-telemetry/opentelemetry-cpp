@@ -56,7 +56,7 @@ class span
 public:
   static constexpr size_t extent = Extent;
 
-  // This arcane code is how we make default-construction result in an SFINAE erro
+  // This arcane code is how we make default-construction result in an SFINAE error
   // with C++11 when Extent != 0 as specified by the std::span API.
   //
   // See https://stackoverflow.com/a/10309720/4447365
