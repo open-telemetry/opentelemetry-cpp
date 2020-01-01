@@ -33,5 +33,5 @@ TEST(SpanTest, PointerCountConstruction)
   EXPECT_EQ(s2.data(), array.data());
   EXPECT_EQ(s2.size(), array.size());
 
-  ASSERT_DEATH((span<int, 2>{array.data(), array.size()}), ".*");
+  EXPECT_DEATH((span<int, 2>{array.data(), array.size()}), ".*");
 }
