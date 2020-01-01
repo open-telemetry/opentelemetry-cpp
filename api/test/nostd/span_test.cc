@@ -4,6 +4,8 @@
 #include <array>
 #include <iterator>
 #include <type_traits>
+#include <vector>
+#include <list>
 
 #include <gtest/gtest.h>
 
@@ -94,6 +96,22 @@ TEST(SpanTest, ArrayConstruction)
   EXPECT_EQ(s4.size(), array2.size());
 
   EXPECT_FALSE((std::is_constructible<span<int, 2>, int(&)[3]>::value));
+}
+
+TEST(SpanTest, ContainerConstruction) {
+  std::vector<int> v = {1, 2, 3};
+
+  span<int> s1{v};
+  EXPECT_EQ(s1.data(), v.data());
+  EXPECT_EQ(s1.size(), v.size());
+
+  span<int, 3> s2{v};
+  EXPECT_EQ(s2.data(), v.data());
+  EXPECT_EQ(s2.size(), v.size());
+  EXPECT_DEATH((span<int, 2>{v}), ".*");
+
+  EXPECT_FALSE((std::is_constructible<span<int>, std::vector<double>>::value));
+  EXPECT_FALSE((std::is_constructible<span<int>, std::list<int>>::value));
 }
 
 TEST(SpanTest, OtherSpanConstruction)

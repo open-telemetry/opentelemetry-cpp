@@ -15,6 +15,30 @@ namespace nostd
 {
 constexpr size_t dynamic_extent = static_cast<size_t>(-1);
 
+template <class T, size_t Extent = dynamic_extent>
+class span;
+
+namespace detail {
+/**
+ * Helper class to resolve overloaded constructors
+ */
+template <class T>
+struct is_specialized_span_convertible : std::false_type
+{};
+
+template <class T, size_t N>
+struct is_specialized_span_convertible<std::array<T, N>> : std::true_type
+{};
+
+template <class T, size_t N>
+struct is_specialized_span_convertible<T[N]> : std::true_type
+{};
+
+template <class T, size_t Extent>
+struct is_specialized_span_convertible<span<T, Extent>> : std::true_type
+{};
+}  // namespace detail
+
 /**
  * Back port of std::span.
  *
@@ -25,7 +49,7 @@ constexpr size_t dynamic_extent = static_cast<size_t>(-1);
  * Note: The std::span API specifies error cases to have undefined behavior, so this implementation
  * chooses to terminate or assert rather than throw exceptions.
  */
-template <class T, size_t Extent = dynamic_extent>
+template <class T, size_t Extent>
 class span {
  public:
    static constexpr size_t extent = Extent;
@@ -63,6 +87,38 @@ class span {
 
    template <size_t N, typename std::enable_if<Extent == N>::type* = nullptr>
    span(const std::array<T, N>& array) noexcept : data_{array.data()} {
+   }
+
+   template <class C,
+             typename std::enable_if<
+                 !detail::is_specialized_span_convertible<C>::value &&
+                 std::is_convertible<typename std::remove_pointer<
+                                         decltype(nostd::data(std::declval<C &>()))>::type (*)[],
+                                     T (*)[]>::value &&
+                 std::is_convertible<decltype(nostd::size(std::declval<const C &>())),
+                                     size_t>::value>::type * = nullptr>
+   span(C &c) noexcept(noexcept(nostd::data(c), nostd::size(c))) : data_{nostd::data(c)}
+   {
+     if (nostd::size(c) != Extent)
+     {
+       std::terminate();
+     }
+   }
+
+   template <class C,
+             typename std::enable_if<
+                 !detail::is_specialized_span_convertible<C>::value &&
+                 std::is_convertible<typename std::remove_pointer<
+                                         decltype(nostd::data(std::declval<C &>()))>::type (*)[],
+                                     T (*)[]>::value &&
+                 std::is_convertible<decltype(nostd::size(std::declval<const C &>())),
+                                     size_t>::value>::type * = nullptr>
+   span(const C &c) noexcept(noexcept(nostd::data(c), nostd::size(c))) : data_{nostd::data(c)}
+   {
+     if (nostd::size(c) != Extent)
+     {
+       std::terminate();
+     }
    }
 
    template <class U,
@@ -119,6 +175,30 @@ class span<T, dynamic_extent> {
    template <size_t N>
    span(const std::array<T, N>& array) noexcept : extent_{N}, data_{array.data()} {
    }
+
+   template <class C,
+             typename std::enable_if<
+                 !detail::is_specialized_span_convertible<C>::value &&
+                 std::is_convertible<typename std::remove_pointer<
+                                         decltype(nostd::data(std::declval<C &>()))>::type (*)[],
+                                     T (*)[]>::value &&
+                 std::is_convertible<decltype(nostd::size(std::declval<const C &>())),
+                                     size_t>::value>::type * = nullptr>
+   span(C &c) noexcept(noexcept(nostd::data(c), nostd::size(c)))
+       : extent_{nostd::size(c)}, data_{nostd::data(c)}
+   {}
+
+   template <class C,
+             typename std::enable_if<
+                 !detail::is_specialized_span_convertible<C>::value &&
+                 std::is_convertible<typename std::remove_pointer<
+                                         decltype(nostd::data(std::declval<C &>()))>::type (*)[],
+                                     T (*)[]>::value &&
+                 std::is_convertible<decltype(nostd::size(std::declval<const C &>())),
+                                     size_t>::value>::type * = nullptr>
+   span(const C &c) noexcept(noexcept(nostd::data(c), nostd::size(c)))
+       : extent_{nostd::size(c)}, data_{nostd::data(c)}
+   {}
 
    template <
        class U,
