@@ -22,6 +22,23 @@ TEST(SpanTest, DefaultConstruction)
   EXPECT_FALSE((std::is_default_constructible<span<int, 1>>::value));
 }
 
+TEST(SpanTest, Assignment) {
+  std::array<int, 3> array1 = {1, 2, 3};
+  std::array<int, 3> array2 = {1, 2, 3};
+  span<int> s1{array1.data(), array1.size()};
+  span<int, 3> s2{array1.data(), array1.size()};
+
+  span<int> s3;
+  s3 = s1;
+  EXPECT_EQ(s3.data(), array1.data());
+  EXPECT_EQ(s3.size(), array1.size());
+
+  span<int, 3> s4{array2};
+  s4 = s2;
+  EXPECT_EQ(s4.data(), array1.data());
+  EXPECT_EQ(s4.size(), array1.size());
+}
+
 TEST(SpanTest, PointerCountConstruction)
 {
   std::array<int, 3> array = {1, 2, 3};
