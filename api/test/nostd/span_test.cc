@@ -7,7 +7,8 @@
 
 using opentelemetry::nostd::span;
 
-TEST(SpanTest, DefaultConstruction) {
+TEST(SpanTest, DefaultConstruction)
+{
   span<int> s1;
   EXPECT_EQ(s1.data(), nullptr);
   EXPECT_EQ(s1.size(), 0);
@@ -34,4 +35,17 @@ TEST(SpanTest, PointerCountConstruction)
   EXPECT_EQ(s2.size(), array.size());
 
   EXPECT_DEATH((span<int, 2>{array.data(), array.size()}), ".*");
+}
+
+TEST(SpanTest, BracketOperator)
+{
+  std::array<int, 2> array = {1, 2};
+
+  span<int> s1{array.data(), array.size()};
+  EXPECT_EQ(s1[0], 1);
+  EXPECT_EQ(s1[1], 2);
+
+  span<int, 2> s2{array.data(), array.size()};
+  EXPECT_EQ(s2[0], 1);
+  EXPECT_EQ(s2[1], 2);
 }
