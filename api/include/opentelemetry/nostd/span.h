@@ -112,7 +112,7 @@ public:
       class C,
       typename std::enable_if<!detail::is_specialized_span_convertible<C>::value &&
                               std::is_convertible<typename std::remove_pointer<decltype(nostd::data(
-                                                      std::declval<C &>()))>::type (*)[],
+                                                      std::declval<const C &>()))>::type (*)[],
                                                   T (*)[]>::value &&
                               std::is_convertible<decltype(nostd::size(std::declval<const C &>())),
                                                   size_t>::value>::type * = nullptr>
@@ -197,7 +197,7 @@ public:
       class C,
       typename std::enable_if<!detail::is_specialized_span_convertible<C>::value &&
                               std::is_convertible<typename std::remove_pointer<decltype(nostd::data(
-                                                      std::declval<C &>()))>::type (*)[],
+                                                      std::declval<const C &>()))>::type (*)[],
                                                   T (*)[]>::value &&
                               std::is_convertible<decltype(nostd::size(std::declval<const C &>())),
                                                   size_t>::value>::type * = nullptr>
