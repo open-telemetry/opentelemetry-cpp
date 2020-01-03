@@ -1,5 +1,8 @@
 version: 2.1
 
+orbs:
+  win: circleci/windows@1.0.0
+
 jobs:
   cmake_test:
     resource_class: xlarge
@@ -32,6 +35,14 @@ jobs:
       - run: ./ci/install_osx_bazelisk.sh
       - run: ./ci/do_ci.sh bazel.test
 
+  windows:
+    executor: win/vs2019
+    steps:
+      - checkout
+      - run: ./ci/setup_windows_cmake.ps1
+      - run: ./ci/setup_windows_ci_environment.ps1
+      - run: ./ci/do_ci.ps1 cmake.test
+
 workflows:
   version: 2
   build_and_test:
@@ -39,3 +50,4 @@ workflows:
       - cmake_test
       - bazel_test
       - osx_test
+      - windows
