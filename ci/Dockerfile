@@ -8,4 +8,5 @@ ADD install_bazelisk.sh /setup-ci
 
 RUN /setup-ci/setup_ci_environment.sh \
   && /setup-ci/setup_cmake.sh \
+  && /setup-ci/install_gcc48.sh \
   && /setup-ci/install_bazelisk.sh

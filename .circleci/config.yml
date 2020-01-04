@@ -17,6 +17,17 @@ jobs:
           path: ~/build/Testing/Temporary/LastTest.log
           destination: Test.log
 
+  gcc_48_test:
+    resource_class: xlarge
+    docker:
+      - image: ubuntu:18.04
+    steps:
+      - checkout
+      - run: ./ci/setup_ci_environment.sh
+      - run: ./ci/install_bazelisk.sh
+      - run: ./ci/install_gcc48.sh
+      - run: CC=/usr/bin/g++-4.8 ./ci/do_ci.sh bazel.test
+
   bazel_test:
     resource_class: xlarge
     docker:
@@ -48,6 +59,7 @@ workflows:
   build_and_test:
     jobs:
       - cmake_test
+      - gcc_48_test
       - bazel_test
       - osx_test
       - windows
