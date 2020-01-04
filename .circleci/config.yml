@@ -1,5 +1,8 @@
 version: 2.1
 
+orbs:
+  win: circleci/windows@1.0.0
+
 jobs:
   cmake_test:
     resource_class: xlarge
@@ -11,7 +14,7 @@ jobs:
       - run: ./ci/setup_cmake.sh
       - run: ./ci/do_ci.sh cmake.test
       - store_artifacts:
-          path: /build/Testing/Temporary/LastTest.log
+          path: ~/build/Testing/Temporary/LastTest.log
           destination: Test.log
 
   gcc_48_test:
@@ -35,6 +38,21 @@ jobs:
       - run: ./ci/install_bazelisk.sh
       - run: ./ci/do_ci.sh bazel.test
 
+  osx_test:
+    macos:
+      xcode: "11.0.0"
+    steps:
+      - checkout
+      - run: ./ci/install_osx_bazelisk.sh
+      - run: ./ci/do_ci.sh bazel.test
+
+  windows:
+    executor: win/vs2019
+    steps:
+      - checkout
+      - run: ./ci/setup_windows_cmake.ps1
+      - run: ./ci/setup_windows_ci_environment.ps1
+      - run: ./ci/do_ci.ps1 cmake.test
 
 workflows:
   version: 2
@@ -43,3 +61,5 @@ workflows:
       - cmake_test
       - gcc_48_test
       - bazel_test
+      - osx_test
+      - windows
