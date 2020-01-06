@@ -63,8 +63,10 @@ TEST(StringViewTest, SubstrPortion)
   EXPECT_EQ("12", s.substr(3, 2));
 }
 
+#if __EXCEPTIONS
 TEST(StringViewTest, SubstrOutOfRange)
 {
   string_view s = "abc123";
   EXPECT_THROW(s.substr(10), std::out_of_range);
 }
+#endif
