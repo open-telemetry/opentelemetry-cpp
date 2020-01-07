@@ -3,7 +3,7 @@
 set -e
 
 [ -z "${SRC_DIR}" ] && export SRC_DIR="`pwd`"
-[ -z "${BUILD_DIR}" ] && export BUILD_DIR=/build
+[ -z "${BUILD_DIR}" ] && export BUILD_DIR=$HOME/build
 mkdir -p "${BUILD_DIR}"
 [ -z "${PLUGIN_DIR}" ] && export PLUGIN_DIR=$HOME/plugin
 mkdir -p "${PLUGIN_DIR}"
