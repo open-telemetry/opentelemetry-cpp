@@ -15,6 +15,7 @@ TracerRegistry *TracerRegistry::getInstance()
   }
   return TracerRegistry::instance;
 }
+
 Tracer* const TracerRegistry::get(const std::string& name)
 {
   return get(name, "");
