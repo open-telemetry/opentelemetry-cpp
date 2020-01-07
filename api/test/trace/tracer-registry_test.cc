@@ -20,13 +20,3 @@ TEST(TracerRegistry, get){
   ASSERT_EQ(t1, t1);
   ASSERT_NE(t2, t3);
 }
-//
-//TEST(Tracer, SetCurrentSpan){
-//  auto t = new Tracer();
-//  auto s = t->start_span("test span");
-//  auto child = t->start_span("child");
-//  ASSERT_EQ(t->get_current_span(), child);
-//  ASSERT_EQ(child->get_parent_context(), s->get_context());
-//  t->set_current_span(s);
-//  ASSERT_EQ(t->get_current_span(), s);
-//}
