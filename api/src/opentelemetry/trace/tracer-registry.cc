@@ -23,7 +23,7 @@ Tracer* const TracerRegistry::get(const std::string& name, const std::string& ve
 {
   auto key = name + ":" + version;
   if (!tracers[key]) {
-    tracers[key] = std::make_unique<Tracer>();
+    tracers[key] = std::unique_ptr<Tracer>(new Tracer());
   }
   return tracers[key].get();
 }

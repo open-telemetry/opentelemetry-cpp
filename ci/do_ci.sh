@@ -8,7 +8,7 @@ mkdir -p "${BUILD_DIR}"
 [ -z "${PLUGIN_DIR}" ] && export PLUGIN_DIR=$HOME/plugin
 mkdir -p "${PLUGIN_DIR}"
 
-BAZEL_OPTIONS="--cxxopt=-std=c++14"
+BAZEL_OPTIONS=""
 BAZEL_TEST_OPTIONS="$BAZEL_OPTIONS --test_output=errors"
 
 if [[ "$1" == "cmake.test" ]]; then
