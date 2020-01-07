@@ -1,5 +1,5 @@
-#ifndef INCLUDE_OPEN_TELEMETRY_TRACE_TRACER_REGISTRY_H_
-#define INCLUDE_OPEN_TELEMETRY_TRACE_TRACER_REGISTRY_H_
+#pragma once
+
 #include <map>
 #include <memory>
 #include <string>
@@ -25,4 +25,3 @@ class TracerRegistry
 };
 }  // namespace trace
 }  // namespace opentelemetry
-#endif  // INCLUDE_OPEN_TELEMETRY_TRACE_TRACER_REGISTRY_H_
