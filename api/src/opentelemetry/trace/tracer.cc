@@ -4,6 +4,7 @@ namespace opentelemetry
 {
 namespace trace
 {
-Tracer::Tracer() {}
+Tracer::Tracer(const string_view& name, const string_view& version)
+    : name(name), version(version) {}
 }  // namespace trace
 }  // namespace opentelemetry

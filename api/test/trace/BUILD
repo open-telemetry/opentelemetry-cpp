@@ -50,10 +50,10 @@ cc_test(
 )
 
 cc_test(
-    name = "tracer-registry",
-    srcs = [
-        "tracer-registry_test.cc",
-    ],
+      name = "tracer-factory",
+      srcs = [
+          "tracer-factory_test.cc",
+      ],
     deps = [
         "//api",
         "@com_google_googletest//:gtest_main",
