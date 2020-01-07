@@ -18,7 +18,7 @@ class TracerRegistry
   Tracer* const get(const std::string&);
   Tracer* const get(const std::string&, const std::string&);
 
- private:
+private:
   TracerRegistry();
   static TracerRegistry* instance;
   std::map<const std::string, std::unique_ptr<Tracer>> tracers;
