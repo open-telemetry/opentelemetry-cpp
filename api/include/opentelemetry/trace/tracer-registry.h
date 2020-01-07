@@ -6,10 +6,13 @@
 
 #include "./tracer.h"
 
-namespace opentelemetry {
-namespace trace {
+namespace opentelemetry
+{
+namespace trace
+{
 class Tracer;
-class TracerRegistry {
+class TracerRegistry
+{
  public:
   static TracerRegistry* getInstance();
   Tracer* const get(const std::string&);
