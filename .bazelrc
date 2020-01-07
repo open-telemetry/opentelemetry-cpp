@@ -1,0 +1,8 @@
+# bazel configurations for running tests under sanitizers.
+# Based on https://github.com/bazelment/trunk/blob/master/tools/bazel.rc
+
+# --config=asan : Address Sanitizer.
+common:asan --copt -fsanitize=address
+common:asan --copt -DADDRESS_SANITIZER
+common:asan --linkopt -fsanitize=address
+common:asan --cc_output_directory_tag=asan
