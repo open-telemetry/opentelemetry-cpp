@@ -17,12 +17,12 @@ namespace trace
 class Tracer;
 class TracerFactory
 {
- public:
+public:
   static TracerFactory* getInstance();
   Tracer* const getTracer(const string_view&);
   Tracer* const getTracer(const string_view&, const string_view&);
 
- private:
+private:
   TracerFactory();
   static TracerFactory* instance;
   std::vector<std::unique_ptr<Tracer>> tracers;
