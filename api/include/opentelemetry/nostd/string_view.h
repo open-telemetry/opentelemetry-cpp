@@ -51,7 +51,11 @@ public:
   {
     if (pos > length_)
     {
+#if __EXCEPTIONS
       throw std::out_of_range{"opentelemetry::nostd::string_view"};
+#else
+      std::terminate();
+#endif
     }
     n = (std::min)(n, length_ - pos);
     return string_view(data_ + pos, n);
