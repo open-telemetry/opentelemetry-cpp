@@ -7,9 +7,7 @@ using opentelemetry::trace::Tracer;
 
 class TestFactory : public opentelemetry::trace::TracerFactory
 {
-  Tracer *const getTracer(const string_view &name) { return getTracer(name, ""); }
-
-  Tracer *const getTracer(const string_view &name, const string_view &version) { return nullptr; }
+  Tracer *const getTracer(const string_view &libraryName, const string_view &libraryVersion) override { return nullptr; }
 };
 
 TEST(Factory, getTracerFactoryDefault)

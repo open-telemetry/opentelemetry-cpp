@@ -10,9 +10,7 @@ namespace global
 
 class DefaultTracerFactory : public TracerFactory
 {
-  Tracer *const getTracer(const string_view &name) { return getTracer(name, ""); }
-
-  Tracer *const getTracer(const string_view &name, const string_view &version)
+  Tracer *const getTracer(const string_view &libraryName, const string_view &libraryVersion = "") override
   {
     // TODO: return a no-op tracer
     return nullptr;
