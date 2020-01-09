@@ -18,8 +18,8 @@ namespace trace
 class TracerFactory : public opentelemetry::trace::TracerFactory
 {
 public:
-  Tracer *const getTracer(const string_view &);
-  Tracer *const getTracer(const string_view &, const string_view &);
+  Tracer *const getTracer(const string_view &libraryName,
+                          const string_view &libraryVersion = "") override;
 
 private:
   std::vector<std::unique_ptr<Tracer>> tracers;

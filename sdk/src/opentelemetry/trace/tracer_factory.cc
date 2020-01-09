@@ -7,14 +7,10 @@ namespace sdk
 namespace trace
 {
 
-Tracer *const TracerFactory::getTracer(const string_view &name)
+Tracer *const TracerFactory::getTracer(const string_view &libraryName,
+                                       const string_view &libraryVersion)
 {
-  return getTracer(name, "");
-}
-
-Tracer *const TracerFactory::getTracer(const string_view &name, const string_view &version)
-{
-  tracers.emplace_back(new Tracer(name, version));
+  tracers.emplace_back(new Tracer(libraryName, libraryVersion));
   return tracers.back().get();
 }
 
