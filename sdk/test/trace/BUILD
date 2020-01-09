@@ -50,9 +50,9 @@ cc_test(
 )
 
 cc_test(
-      name = "tracer-factory",
+      name = "tracer_factory",
       srcs = [
-          "tracer-factory_test.cc",
+          "tracer_factory_test.cc",
       ],
     deps = [
         "//sdk",

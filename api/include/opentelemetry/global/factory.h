@@ -1,6 +1,6 @@
 #pragma once
 
-#include "opentelemetry/trace/tracer-factory.h"
+#include "opentelemetry/trace/tracer_factory.h"
 
 using opentelemetry::trace::TracerFactory;
 

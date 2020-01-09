@@ -1,4 +1,4 @@
-#include "opentelemetry/sdk/trace/tracer-factory.h"
+#include "opentelemetry/sdk/trace/tracer_factory.h"
 
 namespace opentelemetry
 {
