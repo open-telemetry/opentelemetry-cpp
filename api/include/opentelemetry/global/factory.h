@@ -12,10 +12,11 @@ namespace global
 class Factory
 {
 public:
-  static TracerFactory* getTracerFactory();
-  static void setTracerFactory(TracerFactory*);
+  static TracerFactory *getTracerFactory();
+  static void setTracerFactory(TracerFactory *);
+
 private:
-  static TracerFactory* tracerFactory;
+  static TracerFactory *tracerFactory;
 };
 
 }  // namespace global
