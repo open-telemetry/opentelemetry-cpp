@@ -55,7 +55,7 @@ cc_test(
           "tracer-factory_test.cc",
       ],
     deps = [
-        "//api",
+        "//sdk",
         "@com_google_googletest//:gtest_main",
     ],
 )

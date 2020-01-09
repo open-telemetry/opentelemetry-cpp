@@ -1,16 +1,11 @@
-#include "opentelemetry/trace/tracer-factory.h"
+#include "opentelemetry/sdk/trace/tracer-factory.h"
 
 #include <gtest/gtest.h>
 
-using opentelemetry::trace::TracerFactory;
-
-TEST(TracerFactory, Constructor){
-  auto t = TracerFactory::getInstance();
-  ASSERT_NE(t, nullptr);
-}
+using opentelemetry::sdk::trace::TracerFactory;
 
 TEST(TracerFactory, get){
-  auto tf = TracerFactory::getInstance();
+  auto tf = new TracerFactory();
   auto t1 = tf->getTracer("test");
   auto t2 = tf->getTracer("test");
   auto t3 = tf->getTracer("different");
