@@ -8,6 +8,7 @@ namespace opentelemetry
 {
 namespace global
 {
+
 class Factory
 {
 public:
@@ -16,5 +17,6 @@ public:
 private:
   static TracerFactory* tracerFactory;
 };
+
 }  // namespace global
 }  // namespace opentelemetry

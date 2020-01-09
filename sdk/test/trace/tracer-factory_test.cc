@@ -4,7 +4,8 @@
 
 using opentelemetry::sdk::trace::TracerFactory;
 
-TEST(TracerFactory, get){
+TEST(TracerFactory, getTracer)
+{
   auto tf = new TracerFactory();
   auto t1 = tf->getTracer("test");
   auto t2 = tf->getTracer("test");
@@ -12,6 +13,9 @@ TEST(TracerFactory, get){
   ASSERT_NE(t1, nullptr);
   ASSERT_NE(t2, nullptr);
   ASSERT_NE(t3, nullptr);
-  ASSERT_EQ(t1, t1);
+
+  // Should return a new instance each time
+  ASSERT_NE(t1, t2);
   ASSERT_NE(t2, t3);
+  ASSERT_NE(t1, t3);
 }

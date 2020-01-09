@@ -1,14 +1,13 @@
 #include "opentelemetry/global/factory.h"
-#include "opentelemetry/trace/tracer.h"
 
 using opentelemetry::trace::TracerFactory;
+using opentelemetry::trace::Tracer;
 
 namespace opentelemetry
 {
 namespace global
 {
 
-using opentelemetry::trace::Tracer;
 class DefaultTracerFactory : public TracerFactory
 {
   Tracer* const getTracer(const string_view& name)
@@ -18,6 +17,7 @@ class DefaultTracerFactory : public TracerFactory
 
   Tracer* const getTracer(const string_view& name, const string_view& version)
   {
+    // TODO: return a no-op tracer
     return nullptr;
   }
 };
