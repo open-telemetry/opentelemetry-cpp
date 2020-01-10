@@ -38,6 +38,11 @@ class unique_ptr {
      return *this;
    }
 
+   unique_ptr& operator=(nullptr_t) noexcept {
+     reset();
+     return *this;
+   }
+
    template <class U,
              typename std::enable_if<std::is_convertible<U *, T *>::value>::type * = nullptr>
    unique_ptr &operator=(unique_ptr<U> &&other) noexcept
