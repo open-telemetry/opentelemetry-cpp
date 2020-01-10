@@ -60,3 +60,20 @@ TEST(UniquePtrTest, Destruction) {
   unique_ptr<A>{new A{was_destructed}};
   EXPECT_TRUE(was_destructed);
 }
+
+TEST(UniquePtrTest, StdUniquePtrConversionOperator) {
+  auto value = new int{123};
+  unique_ptr<int> ptr1{value};
+  std::unique_ptr<int> ptr2{std::move(ptr1)};
+  EXPECT_EQ(ptr1.get(), nullptr);
+  EXPECT_EQ(ptr2.get(), value);
+
+  value = new int{456};
+  ptr1 = unique_ptr<int>{value};
+  ptr2 = std::move(ptr1);
+  EXPECT_EQ(ptr1.get(), nullptr);
+  EXPECT_EQ(ptr2.get(), value);
+
+  EXPECT_TRUE((std::is_assignable<std::unique_ptr<int>, unique_ptr<int>&&>::value));
+  EXPECT_TRUE(!(std::is_assignable<std::unique_ptr<int>, unique_ptr<int>&>::value));
+}

@@ -33,15 +33,41 @@ class unique_ptr {
 
    ~unique_ptr() { reset(); }
 
-   operator std::unique_ptr<T> &&() && noexcept { return std::unique_ptr<T>{release()}; }
+   unique_ptr& operator=(unique_ptr&& other) noexcept {
+     reset(other.release());
+     return *this;
+   }
 
-   operator bool() noexcept { return ptr_ != nullptr; }
+   template <class U,
+             typename std::enable_if<std::is_convertible<U *, T *>::value>::type * = nullptr>
+   unique_ptr &operator=(unique_ptr<U> &&other) noexcept
+   {
+     reset(other.release());
+     return *this;
+   }
 
-   T &operator*() const noexcept { return *ptr_; }
+  template <class U,
+            typename std::enable_if<std::is_convertible<U *, T *>::value>::type * = nullptr>
+  unique_ptr &operator=(std::unique_ptr<U> &&other) noexcept
+  {
+    reset(other.release());
+    return *this;
+  }
 
-   T* operator->() const noexcept { return get(); }
+   operator std::unique_ptr<T>() && noexcept {
+    return std::unique_ptr<T>{release()}; }
 
-   T* get() const noexcept { return ptr_; }
+   operator bool() noexcept {
+    return ptr_ != nullptr; }
+
+   T &operator*() const noexcept {
+    return *ptr_; }
+
+   T* operator->() const noexcept {
+    return get(); }
+
+   T* get() const noexcept {
+    return ptr_; }
 
    void reset(T* ptr = nullptr) noexcept {
      if (ptr_ != nullptr) {
