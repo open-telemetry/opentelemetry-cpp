@@ -13,8 +13,8 @@ namespace trace
 class TracerFactory
 {
 public:
-  virtual Tracer *const getTracer(const string_view &libraryName,
-                                  const string_view &libraryVersion) = 0;
+  virtual Tracer *const GetTracer(string_view library_name,
+                                  string_view library_version) = 0;
 };
 }  // namespace trace
 }  // namespace opentelemetry

@@ -10,27 +10,27 @@ namespace global
 
 class DefaultTracerFactory : public TracerFactory
 {
-  Tracer *const getTracer(const string_view &libraryName, const string_view &libraryVersion = "") override
+  Tracer *const GetTracer(string_view library_name, string_view library_version = "") override
   {
     // TODO: return a no-op tracer
     return nullptr;
   }
 };
 
-TracerFactory *Factory::tracerFactory = nullptr;
+TracerFactory *Factory::tracer_factory_ = nullptr;
 
-TracerFactory *Factory::getTracerFactory()
+TracerFactory *Factory::GetTracerFactory()
 {
-  if (!Factory::tracerFactory)
+  if (!Factory::tracer_factory_)
   {
-    Factory::tracerFactory = new DefaultTracerFactory();
+    Factory::tracer_factory_ = new DefaultTracerFactory();
   }
-  return Factory::tracerFactory;
+  return Factory::tracer_factory_;
 }
 
-void Factory::setTracerFactory(TracerFactory *tf)
+void Factory::SetTracerFactory(TracerFactory *tf)
 {
-  Factory::tracerFactory = tf;
+  Factory::tracer_factory_ = tf;
 }
 
 }  // namespace global

@@ -7,18 +7,18 @@ using opentelemetry::trace::Tracer;
 
 class TestFactory : public opentelemetry::trace::TracerFactory
 {
-  Tracer *const getTracer(const string_view &libraryName, const string_view &libraryVersion) override { return nullptr; }
+  Tracer *const GetTracer(string_view library_name, string_view library_version) override { return nullptr; }
 };
 
-TEST(Factory, getTracerFactoryDefault)
+TEST(Factory, GetTracerFactoryDefault)
 {
-  auto tf = Factory::getTracerFactory();
+  auto tf = Factory::GetTracerFactory();
   ASSERT_NE(tf, nullptr);
 }
 
-TEST(Factory, setTracerFactory)
+TEST(Factory, SetTracerFactory)
 {
   auto tf = new TestFactory();
-  Factory::setTracerFactory(tf);
-  ASSERT_EQ(Factory::getTracerFactory(), tf);
+  Factory::SetTracerFactory(tf);
+  ASSERT_EQ(Factory::GetTracerFactory(), tf);
 }
