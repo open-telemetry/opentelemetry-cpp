@@ -80,7 +80,7 @@ TEST(UniquePtrTest, StdUniquePtrConversionOperator) {
   EXPECT_EQ(ptr2.get(), value);
 
   EXPECT_TRUE((std::is_assignable<std::unique_ptr<int>, unique_ptr<int>&&>::value));
-  EXPECT_TRUE(!(std::is_assignable<std::unique_ptr<int>, unique_ptr<int>&>::value));
+  EXPECT_FALSE((std::is_assignable<std::unique_ptr<int>, unique_ptr<int>&>::value));
 }
 
 TEST(UniquePtrTest, BoolConversionOpertor) {
@@ -97,6 +97,17 @@ TEST(UniquePtrTest, PointerOperators) {
 
   EXPECT_EQ(&*ptr1, value);
   EXPECT_EQ(unique_ptr<B>{}->f(), 123);
+}
+
+TEST(UniquePtrTest, Reset) {
+  bool was_destructed1;
+  unique_ptr<A> ptr{new A{was_destructed1}};
+  bool was_destructed2;
+  ptr.reset(new A{was_destructed2});
+  EXPECT_TRUE(was_destructed1);
+  EXPECT_FALSE(was_destructed2);
+  ptr.reset();
+  EXPECT_TRUE(was_destructed2);
 }
 
 TEST(UniquePtrTest, Swap) {
