@@ -110,6 +110,14 @@ TEST(UniquePtrTest, Reset) {
   EXPECT_TRUE(was_destructed2);
 }
 
+TEST(UniquePtrTest, Release) {
+  auto value = new int{123};
+  unique_ptr<int> ptr{value};
+  EXPECT_EQ(ptr.release(), value);
+  EXPECT_EQ(ptr.get(), nullptr);
+  delete value;
+}
+
 TEST(UniquePtrTest, Swap) {
   auto value1 = new int{123};
   unique_ptr<int> ptr1{value1};
@@ -120,4 +128,19 @@ TEST(UniquePtrTest, Swap) {
 
   EXPECT_EQ(ptr1.get(), value2);
   EXPECT_EQ(ptr2.get(), value1);
+}
+
+TEST(UniquePtrTest, Comparison) {
+  unique_ptr<int> ptr1{new int{123}};
+  unique_ptr<int> ptr2{new int{456}};
+  unique_ptr<int> ptr3{};
+
+  EXPECT_EQ(ptr1, ptr1);
+  EXPECT_NE(ptr1, ptr2);
+
+  EXPECT_NE(ptr1, nullptr);
+  EXPECT_NE(nullptr, ptr1);
+
+  EXPECT_EQ(ptr3, nullptr);
+  EXPECT_EQ(nullptr, ptr3);
 }

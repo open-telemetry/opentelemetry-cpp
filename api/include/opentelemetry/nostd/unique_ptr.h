@@ -94,5 +94,35 @@ class unique_ptr {
  private:
    T* ptr_;
 };
+
+template <class T1, class T2>
+bool operator==(const unique_ptr<T1>& lhs, const unique_ptr<T2>& rhs) noexcept {
+  return lhs.get() == rhs.get();
+}
+
+template <class T>
+bool operator==(const unique_ptr<T>& lhs, nullptr_t) noexcept {
+  return lhs.get() == nullptr;
+}
+
+template <class T>
+bool operator==(nullptr_t, const unique_ptr<T>& rhs) noexcept {
+  return nullptr == rhs.get();
+}
+
+template <class T1, class T2>
+bool operator!=(const unique_ptr<T1>& lhs, const unique_ptr<T2>& rhs) noexcept {
+  return lhs.get() != rhs.get();
+}
+
+template <class T>
+bool operator!=(const unique_ptr<T>& lhs, nullptr_t) noexcept {
+  return lhs.get() != nullptr;
+}
+
+template <class T>
+bool operator!=(nullptr_t, const unique_ptr<T>& rhs) noexcept {
+  return nullptr != rhs.get();
+}
 }  // namespace nostd
 }  // namespace opentelemetry
