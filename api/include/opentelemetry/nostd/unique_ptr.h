@@ -62,7 +62,7 @@ class unique_ptr {
    operator std::unique_ptr<T>() && noexcept {
     return std::unique_ptr<T>{release()}; }
 
-   operator bool() noexcept {
+   operator bool() const noexcept {
     return ptr_ != nullptr; }
 
    T &operator*() const noexcept {

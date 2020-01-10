@@ -16,6 +16,11 @@ private:
   bool &destructed_;
 };
 
+class B {
+ public:
+   int f() const { return 123; }
+};
+
 TEST(UniquePtrTest, DefaultConstruction)
 {
   unique_ptr<int> ptr1;
@@ -76,4 +81,32 @@ TEST(UniquePtrTest, StdUniquePtrConversionOperator) {
 
   EXPECT_TRUE((std::is_assignable<std::unique_ptr<int>, unique_ptr<int>&&>::value));
   EXPECT_TRUE(!(std::is_assignable<std::unique_ptr<int>, unique_ptr<int>&>::value));
+}
+
+TEST(UniquePtrTest, BoolConversionOpertor) {
+  auto value = new int{123};
+  unique_ptr<int> ptr1{value};
+
+  EXPECT_TRUE(ptr1);
+  EXPECT_FALSE(unique_ptr<int>{});
+}
+
+TEST(UniquePtrTest, PointerOperators) {
+  auto value = new int{123};
+  unique_ptr<int> ptr1{value};
+
+  EXPECT_EQ(&*ptr1, value);
+  EXPECT_EQ(unique_ptr<B>{}->f(), 123);
+}
+
+TEST(UniquePtrTest, Swap) {
+  auto value1 = new int{123};
+  unique_ptr<int> ptr1{value1};
+
+  auto value2 = new int{456};
+  unique_ptr<int> ptr2{value2};
+  ptr1.swap(ptr2);
+
+  EXPECT_EQ(ptr1.get(), value2);
+  EXPECT_EQ(ptr2.get(), value1);
 }
