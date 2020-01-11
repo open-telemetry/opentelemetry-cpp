@@ -5,7 +5,7 @@ namespace opentelemetry
 namespace trace
 {
 /**
- * StartConfig provides options to set properties of span at the time of starting a new span.
+ * StartSpanOptions provides options to set properties of span at the time of starting a new span.
  */
 struct StartSpanOptions
 {};
