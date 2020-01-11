@@ -2,7 +2,6 @@
 
 #include "opentelemetry/trace/tracer.h"
 
-#include <iostream>
 #include <memory>
 
 namespace opentelemetry
