@@ -1,5 +1,6 @@
 #pragma once
 
+#include <cstddef>
 #include <memory>
 #include <type_traits>
 #include <utility>
@@ -19,7 +20,7 @@ class unique_ptr
 public:
   unique_ptr() noexcept : ptr_{nullptr} {}
 
-  unique_ptr(nullptr_t) noexcept : ptr_{nullptr} {}
+  unique_ptr(std::nullptr_t) noexcept : ptr_{nullptr} {}
 
   explicit unique_ptr(T *ptr) noexcept : ptr_{ptr} {}
 
@@ -43,7 +44,7 @@ public:
     return *this;
   }
 
-  unique_ptr &operator=(nullptr_t) noexcept
+  unique_ptr &operator=(std::nullptr_t) noexcept
   {
     reset();
     return *this;
@@ -104,13 +105,13 @@ bool operator==(const unique_ptr<T1> &lhs, const unique_ptr<T2> &rhs) noexcept
 }
 
 template <class T>
-bool operator==(const unique_ptr<T> &lhs, nullptr_t) noexcept
+bool operator==(const unique_ptr<T> &lhs, std::nullptr_t) noexcept
 {
   return lhs.get() == nullptr;
 }
 
 template <class T>
-bool operator==(nullptr_t, const unique_ptr<T> &rhs) noexcept
+bool operator==(std::nullptr_t, const unique_ptr<T> &rhs) noexcept
 {
   return nullptr == rhs.get();
 }
@@ -122,13 +123,13 @@ bool operator!=(const unique_ptr<T1> &lhs, const unique_ptr<T2> &rhs) noexcept
 }
 
 template <class T>
-bool operator!=(const unique_ptr<T> &lhs, nullptr_t) noexcept
+bool operator!=(const unique_ptr<T> &lhs, std::nullptr_t) noexcept
 {
   return lhs.get() != nullptr;
 }
 
 template <class T>
-bool operator!=(nullptr_t, const unique_ptr<T> &rhs) noexcept
+bool operator!=(std::nullptr_t, const unique_ptr<T> &rhs) noexcept
 {
   return nullptr != rhs.get();
 }
