@@ -17,6 +17,7 @@ class NoopSpan final : public Span
 public:
   explicit NoopSpan(const std::shared_ptr<Tracer>& tracer) noexcept : tracer_{tracer} {}
 
+  // Span
   Tracer &tracer() const noexcept override { return *tracer_; }
 
 private:
@@ -24,11 +25,12 @@ private:
 };
 
 /**
- * Noop implementation of tracer
+ * Noop implementation of Tracer
  */
 class NoopTracer final : public Tracer, public std::enable_shared_from_this<NoopTracer>
 {
 public:
+  // Tracer
   nostd::unique_ptr<Span> StartSpan(nostd::string_view name,
                                     const StartSpanOptions & /*options*/) noexcept override
   {
