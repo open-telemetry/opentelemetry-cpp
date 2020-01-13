@@ -12,14 +12,26 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#include <opentelemetry/nostd/span.h>
 #include <opentelemetry/trace/span_id.h>
 
 #include <cstdint>
 #include <iostream>
+#include <string>
+
+namespace
+{
+std::string ToHex(const opentelemetry::trace::SpanId &span)
+{
+  char buf[16];
+  span.ToHex(buf);
+  return std::string(buf, sizeof(buf));
+}
+}  // namespace
 
 int main()
 {
   constexpr uint8_t id[] = {1, 2, 3, 4, 0x50, 0x60, 0x70, 0x80};
   opentelemetry::trace::SpanId span_id(id);
-  std::cout << "Span ID: '" << span_id.ToHex() << "'\n";
+  std::cout << "Span ID: '" << ToHex(span_id) << "'\n";
 }

@@ -16,7 +16,8 @@
 
 #include <cstdint>
 #include <cstring>
-#include <string>
+
+#include "opentelemetry/nostd/span.h"
 
 namespace opentelemetry
 {
@@ -30,23 +31,34 @@ public:
   static constexpr int kSize = 8;
 
   // An invalid SpanId (all zeros).
-  SpanId() : rep_{0} {}
+  SpanId() noexcept : rep_{0} {}
 
-  // Creates a SpanId by copying the first kSize bytes from the buffer.
-  explicit SpanId(const uint8_t *buf) { memcpy(rep_, buf, kSize); }
+  // Creates a SpanId with the given ID.
+  explicit SpanId(nostd::span<const uint8_t, kSize> id) noexcept { memcpy(rep_, id.data(), kSize); }
 
-  // Returns a 16-char hex string of the SpanId value.
-  std::string ToHex() const
+  // Populates the buffer with the hex representation of the ID.
+  void ToHex(nostd::span<char, 2 * kSize> buffer) const noexcept
   {
     constexpr char kHex[] = "0123456789ABCDEF";
-    std::string s(kSize * 2, ' ');
     for (int i = 0; i < kSize; ++i)
     {
-      s[i * 2 + 0] = kHex[(rep_[i] >> 4) & 0xF];
-      s[i * 2 + 1] = kHex[(rep_[i] >> 0) & 0xF];
+      buffer[i * 2 + 0] = kHex[(rep_[i] >> 4) & 0xF];
+      buffer[i * 2 + 1] = kHex[(rep_[i] >> 0) & 0xF];
     }
-    return s;
   }
+
+  // Returns a nostd::span of the ID.
+  nostd::span<const uint8_t, kSize> Id() const noexcept { return rep_; }
+
+  bool operator==(const SpanId &that) const noexcept { return memcmp(rep_, that.rep_, kSize) == 0; }
+
+  bool operator!=(const SpanId &that) const noexcept { return !(*this == that); }
+
+  // Returns false if the SpanId is all zeros.
+  bool IsValid() const noexcept { return *this != SpanId(); }
+
+  // Copies the opaque SpanId data to a buffer.
+  void CopyTo(nostd::span<uint8_t, kSize> dest) const noexcept { memcpy(dest.data(), rep_, kSize); }
 
 private:
   uint8_t rep_[kSize];
