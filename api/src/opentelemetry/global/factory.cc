@@ -7,7 +7,6 @@ namespace opentelemetry
 {
 namespace global
 {
-
 class DefaultTracerFactory : public TracerFactory
 {
   Tracer *const GetTracer(string_view library_name, string_view library_version = "") override
@@ -30,8 +29,12 @@ TracerFactory *Factory::GetTracerFactory()
 
 void Factory::SetTracerFactory(TracerFactory *tf)
 {
+  if (Factory::tracer_factory_)
+  {
+    delete Factory::tracer_factory_;
+  }
+
   Factory::tracer_factory_ = tf;
 }
-
 }  // namespace global
 }  // namespace opentelemetry

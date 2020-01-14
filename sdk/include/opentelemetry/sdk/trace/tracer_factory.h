@@ -14,7 +14,6 @@ namespace sdk
 {
 namespace trace
 {
-
 class TracerFactory : public opentelemetry::trace::TracerFactory
 {
 public:
@@ -23,7 +22,6 @@ public:
 private:
   std::vector<std::unique_ptr<Tracer>> tracers_;
 };
-
 }  // namespace trace
 }  // namespace sdk
 }  // namespace opentelemetry
