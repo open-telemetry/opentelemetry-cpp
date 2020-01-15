@@ -21,10 +21,10 @@
 
 namespace
 {
-std::string ToHex(const opentelemetry::trace::SpanId &span)
+std::string Hex(const opentelemetry::trace::SpanId &span)
 {
   char buf[16];
-  span.ToHex(buf);
+  span.ToLowerBase16(buf);
   return std::string(buf, sizeof(buf));
 }
 }  // namespace
@@ -33,5 +33,5 @@ int main()
 {
   constexpr uint8_t id[] = {1, 2, 3, 4, 0x50, 0x60, 0x70, 0x80};
   opentelemetry::trace::SpanId span_id(id);
-  std::cout << "Span ID: '" << ToHex(span_id) << "'\n";
+  std::cout << "Span ID: '" << Hex(span_id) << "'\n";
 }
