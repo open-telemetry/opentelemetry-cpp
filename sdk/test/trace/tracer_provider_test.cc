@@ -1,12 +1,12 @@
-#include "opentelemetry/sdk/trace/tracer_factory.h"
+#include "opentelemetry/sdk/trace/tracer_provider.h"
 
 #include <gtest/gtest.h>
 
-using opentelemetry::sdk::trace::TracerFactory;
+using opentelemetry::sdk::trace::TracerProvider;
 
-TEST(TracerFactory, GetTracer)
+TEST(TracerProvider, GetTracer)
 {
-  auto tf = new TracerFactory();
+  auto tf = new TracerProvider();
   auto t1 = tf->GetTracer("test");
   auto t2 = tf->GetTracer("test");
   auto t3 = tf->GetTracer("different");

@@ -3,7 +3,7 @@
 #include <memory>
 #include <vector>
 
-#include "opentelemetry/trace/tracer_factory.h"
+#include "opentelemetry/trace/tracer_provider.h"
 
 using opentelemetry::nostd::string_view;
 using opentelemetry::trace::Tracer;
@@ -14,7 +14,7 @@ namespace sdk
 {
 namespace trace
 {
-class TracerFactory : public opentelemetry::trace::TracerFactory
+class TracerProvider : public opentelemetry::trace::TracerProvider
 {
 public:
   Tracer *const GetTracer(string_view library_name, string_view library_version = "") override;

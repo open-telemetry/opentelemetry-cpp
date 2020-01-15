@@ -1,11 +1,11 @@
-#include "opentelemetry/global/factory.h"
+#include "opentelemetry/global/provider.h"
 
 #include <gtest/gtest.h>
 
-using opentelemetry::global::Factory;
+using opentelemetry::global::Provider;
 using opentelemetry::trace::Tracer;
 
-class TestFactory : public opentelemetry::trace::TracerFactory
+class TestProvider : public opentelemetry::trace::TracerProvider
 {
   Tracer *const GetTracer(string_view library_name, string_view library_version) override
   {
@@ -13,15 +13,15 @@ class TestFactory : public opentelemetry::trace::TracerFactory
   }
 };
 
-TEST(Factory, GetTracerFactoryDefault)
+TEST(Provider, GetTracerProviderDefault)
 {
-  auto tf = Factory::GetTracerFactory();
+  auto tf = Provider::GetTracerProvider();
   ASSERT_NE(tf, nullptr);
 }
 
-TEST(Factory, SetTracerFactory)
+TEST(Provider, SetTracerProvider)
 {
-  auto tf = new TestFactory();
-  Factory::SetTracerFactory(tf);
-  ASSERT_EQ(Factory::GetTracerFactory(), tf);
+  auto tf = new TestProvider();
+  Provider::SetTracerProvider(tf);
+  ASSERT_EQ(Provider::GetTracerProvider(), tf);
 }

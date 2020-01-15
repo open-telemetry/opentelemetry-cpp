@@ -10,9 +10,10 @@ namespace opentelemetry
 {
 namespace trace
 {
-class TracerFactory
+class TracerProvider
 {
 public:
+  virtual ~TracerProvider()                                                              = default;
   virtual Tracer *const GetTracer(string_view library_name, string_view library_version) = 0;
 };
 }  // namespace trace
