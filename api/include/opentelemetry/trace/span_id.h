@@ -48,7 +48,10 @@ public:
   }
 
   // Returns a nostd::span of the ID.
-  nostd::span<const uint8_t, kSize> Id() const noexcept { return rep_; }
+  nostd::span<const uint8_t, kSize> Id() const noexcept
+  {
+    return nostd::span<const uint8_t, kSize>(rep_);
+  }
 
   bool operator==(const SpanId &that) const noexcept { return memcmp(rep_, that.rep_, kSize) == 0; }
 
