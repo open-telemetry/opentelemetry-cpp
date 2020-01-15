@@ -21,6 +21,9 @@ elif [[ "$1" == "bazel.test" ]]; then
   bazel build $BAZEL_OPTIONS -- //...
   bazel test $BAZEL_TEST_OPTIONS //...
   exit 0
+elif [[ "$1" == "bazel.asan" ]]; then
+  bazel test --config=asan $BAZEL_TEST_OPTIONS //...
+  exit 0
 else
   echo "Invalid do_ci.sh target, see ci/README.md for valid targets."
   exit 1
