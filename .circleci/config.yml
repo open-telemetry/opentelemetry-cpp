@@ -38,6 +38,16 @@ jobs:
       - run: ./ci/install_bazelisk.sh
       - run: ./ci/do_ci.sh bazel.test
 
+  bazel_asan:
+    resource_class: xlarge
+    docker:
+      - image: ubuntu:18.04
+    steps:
+      - checkout
+      - run: ./ci/setup_ci_environment.sh
+      - run: ./ci/install_bazelisk.sh
+      - run: ./ci/do_ci.sh bazel.asan
+
   osx_test:
     macos:
       xcode: "11.0.0"
@@ -61,5 +71,6 @@ workflows:
       - cmake_test
       - gcc_48_test
       - bazel_test
+      - bazel_asan
       - osx_test
       - windows
