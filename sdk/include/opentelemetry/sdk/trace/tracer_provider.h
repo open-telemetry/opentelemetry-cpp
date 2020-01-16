@@ -4,9 +4,10 @@
 #include <vector>
 
 #include "opentelemetry/trace/tracer_provider.h"
+#include "opentelemetry/sdk/trace/tracer.h"
 
 using opentelemetry::nostd::string_view;
-using opentelemetry::trace::Tracer;
+using opentelemetry::sdk::trace::Tracer;
 
 namespace opentelemetry
 {

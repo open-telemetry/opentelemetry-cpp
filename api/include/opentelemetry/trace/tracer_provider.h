@@ -1,8 +1,7 @@
 #pragma once
 
 #include "opentelemetry/nostd/string_view.h"
-
-#include "./tracer.h"
+#include "opentelemetry/trace/tracer.h"
 
 using opentelemetry::nostd::string_view;
 

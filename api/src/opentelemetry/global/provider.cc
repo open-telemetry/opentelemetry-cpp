@@ -1,19 +1,27 @@
 #include "opentelemetry/global/provider.h"
+#include "opentelemetry/trace/noop.h"
 
 using opentelemetry::trace::Tracer;
 using opentelemetry::trace::TracerProvider;
+using opentelemetry::trace::NoopTracer;
 
 namespace opentelemetry
 {
 namespace global
 {
-class DefaultTracerProvider : public TracerProvider
+
+class DefaultTracerProvider final : public TracerProvider
 {
-  Tracer *const GetTracer(string_view library_name, string_view library_version = "") override
+public:
+  explicit DefaultTracerProvider() : tracer_{new NoopTracer()}
+  {}
+
+  NoopTracer *const GetTracer(string_view library_name, string_view library_version = "") override
   {
-    // TODO: return a no-op trace
-    return nullptr;
+    return tracer_;
   }
+private:
+  NoopTracer *const tracer_;
 };
 
 TracerProvider *Provider::tracer_provider_ = nullptr;
