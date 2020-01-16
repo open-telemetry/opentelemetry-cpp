@@ -3,8 +3,8 @@
 #include <memory>
 #include <vector>
 
-#include "opentelemetry/trace/tracer_provider.h"
 #include "opentelemetry/sdk/trace/tracer.h"
+#include "opentelemetry/trace/tracer_provider.h"
 
 using opentelemetry::nostd::string_view;
 using opentelemetry::sdk::trace::Tracer;

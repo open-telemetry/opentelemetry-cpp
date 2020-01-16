@@ -6,7 +6,10 @@ namespace sdk
 {
 namespace trace
 {
-Tracer &Span::tracer() const noexcept { return *tracer_; }
+Tracer &Span::tracer() const noexcept
+{
+  return *tracer_;
+}
 }  // namespace trace
 }  // namespace sdk
 }  // namespace opentelemetry
