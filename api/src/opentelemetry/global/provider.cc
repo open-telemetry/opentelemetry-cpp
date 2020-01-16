@@ -14,6 +14,7 @@ class DefaultTracerProvider final : public TracerProvider
 {
 public:
   explicit DefaultTracerProvider() : tracer_{new NoopTracer()} {}
+  ~DefaultTracerProvider() { delete tracer_; }
 
   NoopTracer *const GetTracer(string_view library_name, string_view library_version = "") override
   {
@@ -25,6 +26,14 @@ private:
 };
 
 TracerProvider *Provider::tracer_provider_ = nullptr;
+
+Provider::~Provider()
+{
+  if (tracer_provider_)
+  {
+    delete tracer_provider_;
+  }
+}
 
 TracerProvider *Provider::GetTracerProvider()
 {

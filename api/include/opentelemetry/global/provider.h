@@ -11,6 +11,7 @@ namespace global
 class Provider
 {
 public:
+  ~Provider();
   static TracerProvider *GetTracerProvider();
   static void SetTracerProvider(TracerProvider *);
 

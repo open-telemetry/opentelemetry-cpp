@@ -6,10 +6,10 @@ using opentelemetry::sdk::trace::TracerProvider;
 
 TEST(TracerProvider, GetTracer)
 {
-  auto tf = new TracerProvider();
-  auto t1 = tf->GetTracer("test");
-  auto t2 = tf->GetTracer("test");
-  auto t3 = tf->GetTracer("different");
+  auto tf = TracerProvider();
+  auto t1 = tf.GetTracer("test");
+  auto t2 = tf.GetTracer("test");
+  auto t3 = tf.GetTracer("different");
   ASSERT_NE(t1, nullptr);
   ASSERT_NE(t2, nullptr);
   ASSERT_NE(t3, nullptr);

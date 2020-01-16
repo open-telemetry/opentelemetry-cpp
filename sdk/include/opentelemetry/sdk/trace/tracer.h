@@ -17,8 +17,8 @@ public:
       const opentelemetry::trace::StartSpanOptions &options = {}) noexcept override;
 
 private:
-  const nostd::string_view &name_;
-  const nostd::string_view &version_;
+  nostd::string_view name_;
+  nostd::string_view version_;
 };
 }  // namespace trace
 }  // namespace sdk
