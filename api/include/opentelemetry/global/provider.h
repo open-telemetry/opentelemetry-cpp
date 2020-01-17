@@ -1,9 +1,8 @@
 #pragma once
 
-#include <memory>
-
 #include "opentelemetry/trace/noop.h"
 #include "opentelemetry/trace/tracer_provider.h"
+#include "opentelemetry/nostd/unique_ptr.h"
 
 using opentelemetry::trace::NoopTracer;
 using opentelemetry::trace::TracerProvider;
@@ -35,9 +34,9 @@ public:
   static void SetTracerProvider(TracerProvider *tp) { getPtrRef().reset(tp); }
 
 private:
-  static std::unique_ptr<TracerProvider> &getPtrRef()
+  static nostd::unique_ptr<TracerProvider> &getPtrRef()
   {
-    static std::unique_ptr<TracerProvider> tracePtr(new DefaultTracerProvider());
+    static nostd::unique_ptr<TracerProvider> tracePtr(new DefaultTracerProvider());
     return tracePtr;
   }
 };
