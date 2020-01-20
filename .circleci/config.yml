@@ -82,5 +82,6 @@ workflows:
       - gcc_48_test
       - bazel_test
       - bazel_asan
+      - format
       - osx_test
       - windows
