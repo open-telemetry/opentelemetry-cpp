@@ -16,7 +16,7 @@ struct StartSpanOptions
   // If start_time is set, it should ideally provide both a system and steady timestamp.
   // Timestamps from the steady clock can be used to most accurately measure a span's duration,
   // while timestamps from the system clock can be used to most accurately place a span's time point
-  // relative to spans collected from across other computers.
+  // relative to other spans collected across the distributed system.
   core::Timestamp start_time;
 };
 
