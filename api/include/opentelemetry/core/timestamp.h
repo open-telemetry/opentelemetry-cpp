@@ -13,7 +13,7 @@ namespace core
 class Timestamp
 {
 public:
-  Timestamp() noexcept = default;
+  Timestamp() noexcept {}
 
   Timestamp(const std::chrono::system_clock::time_point &system_time_point,
             const std::chrono::steady_clock::time_point &steady_time_point) noexcept
