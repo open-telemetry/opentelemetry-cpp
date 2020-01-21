@@ -30,14 +30,35 @@ private:
 class Provider
 {
 public:
-  static TracerProvider *GetTracerProvider() { return getPtrRef().get(); }
-  static void SetTracerProvider(TracerProvider *tp) { getPtrRef().reset(tp); }
-
-private:
-  static nostd::unique_ptr<TracerProvider> &getPtrRef()
+  static TracerProvider *GetTracerProvider()
   {
-    static nostd::unique_ptr<TracerProvider> tracePtr(new DefaultTracerProvider());
-    return tracePtr;
+    auto ref_ptr = GetRefPtr();
+    auto ref = *ref_ptr;
+    if (!ref)
+    {
+      ref = new DefaultTracerProvider();
+      *ref_ptr = ref;
+    }
+
+    return ref;
+  }
+
+  static void SetTracerProvider(TracerProvider *tp)
+  {
+    auto ref_ptr = GetRefPtr();
+    auto ref = *ref_ptr;
+    if (ref)
+    {
+      delete ref;
+    }
+
+    *ref_ptr = tp;
+  }
+private:
+  static TracerProvider **GetRefPtr()
+  {
+    static TracerProvider *tp = nullptr;
+    return &tp;
   }
 };
 }  // namespace global

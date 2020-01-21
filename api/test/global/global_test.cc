@@ -17,7 +17,6 @@ TEST(Provider, GetTracerProviderDefault)
 {
   auto tf = Provider::GetTracerProvider();
   ASSERT_NE(tf, nullptr);
-  Provider::SetTracerProvider(nullptr);
 }
 
 TEST(Provider, SetTracerProvider)
@@ -25,5 +24,4 @@ TEST(Provider, SetTracerProvider)
   auto tf = new TestProvider();
   Provider::SetTracerProvider(tf);
   ASSERT_EQ(Provider::GetTracerProvider(), tf);
-  Provider::SetTracerProvider(nullptr);
 }
