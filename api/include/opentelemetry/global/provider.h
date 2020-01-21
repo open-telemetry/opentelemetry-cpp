@@ -9,8 +9,6 @@ using opentelemetry::trace::TracerProvider;
 
 namespace opentelemetry
 {
-namespace global
-{
 
 class DefaultTracerProvider final : public TracerProvider
 {
@@ -61,5 +59,4 @@ private:
     return &tp;
   }
 };
-}  // namespace global
 }  // namespace opentelemetry

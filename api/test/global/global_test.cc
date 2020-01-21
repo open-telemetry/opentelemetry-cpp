@@ -2,7 +2,7 @@
 
 #include <gtest/gtest.h>
 
-using opentelemetry::global::Provider;
+using opentelemetry::Provider;
 using opentelemetry::trace::Tracer;
 
 class TestProvider : public opentelemetry::trace::TracerProvider
