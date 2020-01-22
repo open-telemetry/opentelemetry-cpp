@@ -24,7 +24,16 @@ elif [[ "$1" == "bazel.test" ]]; then
 elif [[ "$1" == "bazel.asan" ]]; then
   bazel test --config=asan $BAZEL_TEST_OPTIONS //...
   exit 0
-else
-  echo "Invalid do_ci.sh target, see ci/README.md for valid targets."
-  exit 1
+elif [[ "$1" == "format" ]]; then
+  tools/format.sh
+  CHANGED="$(git ls-files --modified)"
+  if [[ ! -z "$CHANGED" ]]; then
+    echo "The following files have changes:"
+    echo "$CHANGED"
+    exit 1
+  fi
+  exit 0
 fi
+
+echo "Invalid do_ci.sh target, see ci/README.md for valid targets."
+exit 1
