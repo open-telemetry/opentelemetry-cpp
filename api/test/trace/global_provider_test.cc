@@ -1,4 +1,4 @@
-#include "opentelemetry/global/provider.h"
+#include "opentelemetry/trace/global_provider.h"
 
 #include <gtest/gtest.h>
 
