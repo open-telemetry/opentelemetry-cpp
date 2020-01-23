@@ -1,8 +1,8 @@
 #pragma once
 
+#include <algorithm>
 #include <chrono>
 #include <cstdint>
-#include <algorithm>
 
 namespace opentelemetry
 {
