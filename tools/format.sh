@@ -41,9 +41,15 @@ else
   echo "  pip install --user cmake_format"
 fi
 
-if which buildifier >/dev/null; then
-  echo "Running buildifier."
-  buildifier $($FIND -name WORKSPACE -print -o -name BUILD -print -o \
+if [[ -z "$BUILDIFIER" ]]; then
+  BUILDIFIER="$HOME/go/bin/buildifier"
+  if ! which "$BUILDIFIER" >/dev/null; then
+    BUILDIFIER=buildifier
+  fi
+fi
+if which "$BUILDIFIER" >/dev/null; then
+  echo "Running $BUILDIFIER"
+  "$BUILDIFIER" $($FIND -name WORKSPACE -print -o -name BUILD -print -o \
     -name '*.bzl' -print)
 else
   echo "Can't find buildifier. It can be installed with:"
