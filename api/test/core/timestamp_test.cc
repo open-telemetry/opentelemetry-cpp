@@ -7,7 +7,7 @@ using opentelemetry::core::Timestamp;
 template <class Timestamp>
 static bool AreNearlyEqual(const Timestamp &t1, const Timestamp &t2) noexcept
 {
-  return std::abs(std::chrono::duration_cast<std::chrono::microseconds>(t2 - t1).count()) < 2;
+  return std::abs(std::chrono::duration_cast<std::chrono::nanoseconds>(t2 - t1).count()) < 2;
 }
 
 TEST(TimestampTest, Construction)
@@ -34,4 +34,9 @@ TEST(TimestampTest, Construction)
   EXPECT_TRUE(t4.HasSteadyTimestamp());
   EXPECT_TRUE(AreNearlyEqual(now_system, t4.system_timestamp()));
   EXPECT_TRUE(AreNearlyEqual(now_steady, t4.steady_timestamp()));
+
+  auto big_delta = std::chrono::hours{24} * 365 * 200;
+  Timestamp t5{now_system - big_delta, now_steady - big_delta};
+  EXPECT_FALSE(t5.HasSystemTimestamp());
+  EXPECT_FALSE(t5.HasSteadyTimestamp());
 }
