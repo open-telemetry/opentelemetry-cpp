@@ -1,11 +1,15 @@
 #pragma once
 
+#include <mutex>
+
 #include "opentelemetry/trace/noop.h"
 #include "opentelemetry/trace/tracer_provider.h"
 #include "opentelemetry/nostd/unique_ptr.h"
 
 using opentelemetry::trace::NoopTracer;
 using opentelemetry::trace::TracerProvider;
+
+std::mutex provider_mutex;
 
 namespace opentelemetry
 {
@@ -30,6 +34,7 @@ class Provider
 public:
   static TracerProvider *GetTracerProvider()
   {
+    std::lock_guard<std::mutex> l(provider_mutex);
     auto ref_ptr = GetRefPtr();
     auto ref = *ref_ptr;
     if (!ref)
@@ -43,6 +48,7 @@ public:
 
   static void SetTracerProvider(TracerProvider *tp)
   {
+    std::lock_guard<std::mutex> l(provider_mutex);
     auto ref_ptr = GetRefPtr();
     auto ref = *ref_ptr;
     if (ref)
