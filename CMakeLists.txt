@@ -14,6 +14,7 @@ find_package(Threads)
 
 if(BUILD_TESTING)
   find_package(GTest REQUIRED)
+  find_package(benchmark REQUIRED)
   include_directories(SYSTEM ${GTEST_INCLUDE_DIRS})
 endif()
 

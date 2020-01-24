@@ -4,6 +4,7 @@ set -e
 
 apt-get install --no-install-recommends --no-install-suggests -y \
                 cmake \
+                libbenchmark-dev \
                 libgtest-dev
 
 # Follows these instructions for setting up gtest

@@ -9,6 +9,17 @@ cc_test(
     ],
 )
 
+cc_binary(
+    name = "span_id_benchmark",
+    srcs = [
+        "span_id_benchmark.cc",
+    ],
+    deps = [
+        "//api",
+        "@com_github_google_benchmark//:benchmark",
+    ],
+)
+
 cc_test(
     name = "span_id_test",
     srcs = [

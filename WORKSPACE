@@ -24,3 +24,12 @@ http_archive(
     strip_prefix = "googletest-release-1.10.0",
     urls = ["https://github.com/google/googletest/archive/release-1.10.0.tar.gz"],
 )
+
+# Google Benchmark library.
+# Only needed for benchmarks, not to build the OpenTelemetry library.
+http_archive(
+    name = "com_github_google_benchmark",
+    sha256 = "3c6a165b6ecc948967a1ead710d4a181d7b0fbcaa183ef7ea84604994966221a",
+    strip_prefix = "benchmark-1.5.0",
+    urls = ["https://github.com/google/benchmark/archive/v1.5.0.tar.gz"],
+)
