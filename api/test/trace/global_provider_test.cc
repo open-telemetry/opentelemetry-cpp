@@ -2,7 +2,7 @@
 
 #include <gtest/gtest.h>
 
-using opentelemetry::Provider;
+using opentelemetry::trace::Provider;
 using opentelemetry::trace::Tracer;
 
 class TestProvider : public opentelemetry::trace::TracerProvider
@@ -24,4 +24,5 @@ TEST(Provider, SetTracerProvider)
   auto tf = new TestProvider();
   Provider::SetTracerProvider(tf);
   ASSERT_EQ(Provider::GetTracerProvider(), tf);
+  Provider::SetTracerProvider(nullptr);
 }
