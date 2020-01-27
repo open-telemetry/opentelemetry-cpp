@@ -6,25 +6,27 @@
 #include "opentelemetry/trace/noop.h"
 #include "opentelemetry/trace/tracer_provider.h"
 
-using opentelemetry::trace::NoopTracer;
-using opentelemetry::trace::TracerProvider;
-
 namespace opentelemetry
 {
 namespace trace
 {
 
-class DefaultTracerProvider final : public TracerProvider
+class DefaultTracerProvider final : public opentelemetry::trace::TracerProvider
 {
 public:
-  NoopTracer *const GetTracer(string_view library_name, string_view library_version = "") override
+  opentelemetry::trace::NoopTracer *const GetTracer(
+      nostd::string_view library_name,
+      nostd::string_view library_version = "") override
   {
     return tracer_.get();
   }
 
 private:
-  DefaultTracerProvider() : tracer_{nostd::unique_ptr<NoopTracer>(new NoopTracer)} {}
-  nostd::unique_ptr<NoopTracer> tracer_;
+  DefaultTracerProvider()
+      : tracer_{nostd::unique_ptr<opentelemetry::trace::NoopTracer>(
+            new opentelemetry::trace::NoopTracer)}
+  {}
+  nostd::unique_ptr<opentelemetry::trace::NoopTracer> tracer_;
 
   friend class Provider;
 };
@@ -32,8 +34,10 @@ private:
 class Provider
 {
 public:
-public:
-  static TracerProvider *GetTracerProvider() { return Ptr()->load(std::memory_order_acquire); }
+  static opentelemetry::trace::TracerProvider *GetTracerProvider()
+  {
+    return Ptr()->load(std::memory_order_acquire);
+  }
 
   static void SetTracerProvider(TracerProvider *tp)
   {
@@ -45,12 +49,13 @@ public:
   }
 
 private:
-  static std::atomic<TracerProvider *> *Ptr()
+  static std::atomic<opentelemetry::trace::TracerProvider *> *Ptr()
   {
-    static std::atomic<TracerProvider *> *singleton =
-        new std::atomic<TracerProvider *>(new DefaultTracerProvider);
+    static std::atomic<opentelemetry::trace::TracerProvider *> *singleton =
+        new std::atomic<opentelemetry::trace::TracerProvider *>(new DefaultTracerProvider);
     return singleton;
   }
 };
+
 }  // namespace trace
 }  // namespace opentelemetry
