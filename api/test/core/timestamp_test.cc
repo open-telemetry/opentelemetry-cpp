@@ -2,7 +2,8 @@
 
 #include <gtest/gtest.h>
 
-using opentelemetry::core::Timestamp;
+using opentelemetry::core::SteadyTimestamp;
+using opentelemetry::core::SystemTimestamp;
 
 template <class Timestamp>
 static bool AreNearlyEqual(const Timestamp &t1, const Timestamp &t2) noexcept
@@ -10,33 +11,28 @@ static bool AreNearlyEqual(const Timestamp &t1, const Timestamp &t2) noexcept
   return std::abs(std::chrono::duration_cast<std::chrono::nanoseconds>(t2 - t1).count()) < 2;
 }
 
-TEST(TimestampTest, Construction)
+TEST(SystemTimestampTest, Construction)
 {
   auto now_system = std::chrono::system_clock::now();
+
+  SystemTimestamp t1;
+  EXPECT_EQ(t1.time_since_epoch(), std::chrono::nanoseconds{0});
+
+  SystemTimestamp t2{now_system};
+  EXPECT_TRUE(AreNearlyEqual(now_system, static_cast<std::chrono::system_clock::time_point>(t2)));
+  EXPECT_EQ(std::chrono::duration_cast<std::chrono::nanoseconds>(now_system.time_since_epoch()),
+            t2.time_since_epoch());
+}
+
+TEST(SteadyTimestampTest, Construction)
+{
   auto now_steady = std::chrono::steady_clock::now();
 
-  Timestamp t1;
-  EXPECT_FALSE(t1.HasSystemTimestamp());
-  EXPECT_FALSE(t1.HasSteadyTimestamp());
+  SteadyTimestamp t1;
+  EXPECT_EQ(t1.time_since_epoch(), std::chrono::nanoseconds{0});
 
-  Timestamp t2{now_system};
-  EXPECT_TRUE(t2.HasSystemTimestamp());
-  EXPECT_FALSE(t2.HasSteadyTimestamp());
-  EXPECT_TRUE(AreNearlyEqual(now_system, t2.system_timestamp()));
-
-  Timestamp t3{now_steady};
-  EXPECT_FALSE(t3.HasSystemTimestamp());
-  EXPECT_TRUE(t3.HasSteadyTimestamp());
-  EXPECT_TRUE(AreNearlyEqual(now_steady, t3.steady_timestamp()));
-
-  Timestamp t4{now_system, now_steady};
-  EXPECT_TRUE(t4.HasSystemTimestamp());
-  EXPECT_TRUE(t4.HasSteadyTimestamp());
-  EXPECT_TRUE(AreNearlyEqual(now_system, t4.system_timestamp()));
-  EXPECT_TRUE(AreNearlyEqual(now_steady, t4.steady_timestamp()));
-
-  auto big_delta = std::chrono::hours{24} * 365 * 200;
-  Timestamp t5{now_system - big_delta, now_steady - big_delta};
-  EXPECT_FALSE(t5.HasSystemTimestamp());
-  EXPECT_FALSE(t5.HasSteadyTimestamp());
+  SteadyTimestamp t2{now_steady};
+  EXPECT_TRUE(AreNearlyEqual(now_steady, static_cast<std::chrono::steady_clock::time_point>(t2)));
+  EXPECT_EQ(std::chrono::duration_cast<std::chrono::nanoseconds>(now_steady.time_since_epoch()),
+            t2.time_since_epoch());
 }
