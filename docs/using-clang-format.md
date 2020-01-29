@@ -21,6 +21,12 @@ Then run:
 At the moment the tool requires you to specify the path to file you want to format.
 Long-term goal is to integrate the [clang-format from Chromium](https://chromium.googlesource.com/chromium/src/+/master/docs/clang_format.md) to automatically format all source code files being changed.
 
+## Alternative
+
+Run: `tools/format.sh`
+
+Or, via Docker: `./ci/run_docker.sh ./ci/do_ci.sh format`
+
 ## Editor integrations
 
 For further guidance on editor integration, see these specific pages:

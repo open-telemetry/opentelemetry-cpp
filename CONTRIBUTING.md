@@ -18,7 +18,7 @@ and [**Maintainer**](https://github.com/open-telemetry/community/blob/master/com
 OpenTelemetry C++ uses the [Google naming
 convention](https://google.github.io/styleguide/cppguide.html#Naming).
 
-Code formatting will be enforced automatically via `clang-format`.
+Code is formatted automatically and enforced by CI.
 
 ## Pull Requests
 
@@ -33,30 +33,25 @@ To create a new PR, fork the project in GitHub and clone the upstream repo:
 $ git clone https://github.com/open-telemetry/opentelemetry-cpp.git
 ```
 
-Add your fork as an origin:
+Add your fork as a remote:
 
 ```sh
 $ git remote add fork https://github.com/YOUR_GITHUB_USERNAME/opentelemetry-cpp.git
 ```
-
-Build:
-
-TBD
-
-Test:
-
-TBD
 
 Check out a new branch, make modifications and push the branch to your fork:
 
 ```sh
 $ git checkout -b feature
 # edit files
+$ tools/format.sh
 $ git commit
 $ git push fork feature
 ```
 
 Open a pull request against the main `opentelemetry-cpp` repo.
+
+To run tests locally, please read the [CI instructions](ci/README.md).
 
 ### How to Receive Comments
 
@@ -77,7 +72,3 @@ A PR is considered to be **ready to merge** when:
 * Urgent fixes can take exceptions as long as it has been actively communicated.
 
 Any Approver / Maintainer can merge the PR once it is **ready to merge**.
-
-## Style Guide
-
-TBD
