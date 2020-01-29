@@ -6,7 +6,10 @@ namespace sdk
 {
 namespace trace
 {
-Tracer::Tracer(nostd::string_view name, nostd::string_view version) : name_{name}, version_{version}
+Tracer::Tracer(nostd::string_view name,
+               nostd::string_view version,
+               const opentelemetry::trace::TracerOptions &tracer_options)
+    : name_{name}, version_{version}
 {}
 
 nostd::unique_ptr<opentelemetry::trace::Span> Tracer::StartSpan(

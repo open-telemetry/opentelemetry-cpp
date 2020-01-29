@@ -8,7 +8,8 @@ using opentelemetry::trace::Tracer;
 class TestProvider : public opentelemetry::trace::TracerProvider
 {
   Tracer *const GetTracer(opentelemetry::nostd::string_view library_name,
-                          opentelemetry::nostd::string_view library_version) override
+                          opentelemetry::nostd::string_view library_version,
+                          const opentelemetry::trace::TracerOptions &tracer_options) override
   {
     return nullptr;
   }
