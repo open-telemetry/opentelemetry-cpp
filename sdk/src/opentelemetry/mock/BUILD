@@ -20,6 +20,7 @@ cc_library(
     srcs = [
         "factory_impl.h",
         "factory_impl.cc",
+        "hook.cc",
     ],
     deps = [
         ":tracer",
