@@ -24,6 +24,19 @@ elif [[ "$1" == "bazel.test" ]]; then
 elif [[ "$1" == "bazel.asan" ]]; then
   bazel test --config=asan $BAZEL_TEST_OPTIONS //...
   exit 0
+elif [[ "$1" == "benchmark" ]]; then
+  [ -z "${BENCHMARK_DIR}" ] && export BENCHMARK_DIR=$HOME/benchmark
+  bazel build $BAZEL_OPTIONS -c opt -- \
+    $(bazel query 'attr("tags", "benchmark_result", ...)')
+  echo ""
+  echo "Benchmark results in $BENCHMARK_DIR:"
+  (
+    cd bazel-bin
+    find . -name \*_result.txt -exec bash -c \
+      'echo "$@" && mkdir -p "$BENCHMARK_DIR/$(dirname "$@")" && \
+       cp "$@" "$BENCHMARK_DIR/$@" && chmod +w "$BENCHMARK_DIR/$@"' _ {} \;
+  )
+  exit 0
 elif [[ "$1" == "format" ]]; then
   tools/format.sh
   CHANGED="$(git ls-files --modified)"

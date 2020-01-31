@@ -1,3 +1,5 @@
+load("//bazel:otel_cc_benchmark.bzl", "otel_cc_benchmark")
+
 cc_test(
     name = "noop_test",
     srcs = [
@@ -9,15 +11,10 @@ cc_test(
     ],
 )
 
-cc_binary(
+otel_cc_benchmark(
     name = "span_id_benchmark",
-    srcs = [
-        "span_id_benchmark.cc",
-    ],
-    deps = [
-        "//api",
-        "@com_github_google_benchmark//:benchmark",
-    ],
+    srcs = ["span_id_benchmark.cc"],
+    deps = ["//api"],
 )
 
 cc_test(
