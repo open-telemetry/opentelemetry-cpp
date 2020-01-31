@@ -16,7 +16,7 @@ namespace plugin
 namespace detail
 {
 inline void CopyErrorMessage(nostd::string_view source,
-                             std::unique_ptr<char[]> destination) noexcept
+                             std::unique_ptr<char[]>& destination) noexcept
 {
   destination.reset(new char[source.size() + 1]);
   if (destination == nullptr)
@@ -33,18 +33,18 @@ class DynamicLibraryHandleUnix final : public DynamicLibraryHandle
 public:
   explicit DynamicLibraryHandleUnix(void *handle) noexcept : handle_{handle} {}
 
-  ~DynamicLibraryHandle() override { ::dlclose(handle_); }
+  ~DynamicLibraryHandleUnix() override { ::dlclose(handle_); }
 
 private:
   void *handle_;
 };
 
-inline std::unique_ptr<Factory> LoadFactory(nostd::string_view plugin,
+inline std::unique_ptr<Factory> LoadFactory(const char *plugin,
                                             std::unique_ptr<char[]> &error_message) noexcept
 {
   dlerror();  // Clear any existing error.
 
-  auto handle = dlopen(plugin, RTLD_NOW | RTLD_LOCAL);
+  auto handle = ::dlopen(plugin, RTLD_NOW | RTLD_LOCAL);
   if (handle == nullptr)
   {
     detail::CopyErrorMessage(dlerror(), error_message);
@@ -59,7 +59,7 @@ inline std::unique_ptr<Factory> LoadFactory(nostd::string_view plugin,
   }
 
   auto make_factory_impl =
-      reinterpret_cast<OpenTelemetryHook *>(::dlsym(handle, #OPENTELEMETRY_PLUGIN_HOOK));
+      reinterpret_cast<OpenTelemetryHook *>(::dlsym(handle, "OpenTelemetryMakeFactoryImpl"));
   if (make_factory_impl == nullptr)
   {
     detail::CopyErrorMessage(dlerror(), error_message);
