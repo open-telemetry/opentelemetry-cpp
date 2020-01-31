@@ -1,5 +1,5 @@
 cc_binary(
-    name = "plugin_example",
+    name = "load_plugin",
     srcs = [
         "main.cc",
     ],
