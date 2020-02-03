@@ -2,6 +2,10 @@
 
 #include <memory>
 
+#include "opentelemetry/plugin/factory.h"
+#include "opentelemetry/plugin/hook.h"
+#include "opentelemetry/version.h"
+
 namespace opentelemetry
 {
 namespace plugin
