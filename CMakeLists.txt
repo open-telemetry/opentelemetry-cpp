@@ -18,4 +18,6 @@ if(BUILD_TESTING)
   include_directories(SYSTEM ${GTEST_INCLUDE_DIRS})
 endif()
 
+include_directories(api/include)
 add_subdirectory(api)
+add_subdirectory(examples)
