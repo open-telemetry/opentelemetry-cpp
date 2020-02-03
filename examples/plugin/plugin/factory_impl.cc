@@ -22,9 +22,12 @@ public:
       opentelemetry::nostd::string_view tracer_config,
       opentelemetry::nostd::unique_ptr<char[]> &error_message) const noexcept override
   {
-    (void)tracer_config;
-    (void)error_message;
-    return nullptr;
+    std::shared_ptr<Tracer> tracer{new (std::nothrow) Tracer{""}};
+    if (tracer == nullptr) {
+      return nullptr;
+    }
+    return opentelemetry::nostd::unique_ptr<TracerHandle>{new (std::nothrow)
+                                                              TracerHandle{std::move(tracer)}};
   }
 };
 

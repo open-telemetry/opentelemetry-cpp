@@ -1,5 +1,7 @@
 #include "tracer.h"
 
+#include <iostream>
+
 namespace {
 class Span final : public opentelemetry::trace::Span {
  public:
@@ -7,7 +9,13 @@ class Span final : public opentelemetry::trace::Span {
         opentelemetry::nostd::string_view name,
         const opentelemetry::trace::StartSpanOptions &options) noexcept
        : tracer_{std::move(tracer)}, name_{name}
-   {}
+   {
+     std::cout << "StartSpan: " << name << "\n";
+   }
+
+   ~Span() {
+     std::cout << "~Span\n";
+   }
 
    // opentelemetry::trace::Span
    Tracer& tracer() const noexcept override { return *tracer_; }
@@ -24,9 +32,8 @@ Tracer::Tracer(opentelemetry::nostd::string_view output) {
 
 opentelemetry::nostd::unique_ptr<opentelemetry::trace::Span> Tracer::StartSpan(
     opentelemetry::nostd::string_view name,
-    const opentelemetry::trace::StartSpanOptions &options) noexcept try {
+    const opentelemetry::trace::StartSpanOptions &options) noexcept
+{
   return opentelemetry::nostd::unique_ptr<opentelemetry::trace::Span>{
       new (std::nothrow) Span{this->shared_from_this(), name, options}};
-} catch(const std::exception& /*e*/) {
-  return nullptr;
 }
