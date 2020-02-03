@@ -16,7 +16,7 @@ namespace plugin
 namespace detail
 {
 inline void CopyErrorMessage(nostd::string_view source,
-                             std::unique_ptr<char[]>& destination) noexcept
+                             std::unique_ptr<char[]> &destination) noexcept
 {
   destination.reset(new char[source.size() + 1]);
   if (destination == nullptr)
@@ -24,7 +24,7 @@ inline void CopyErrorMessage(nostd::string_view source,
     return;
   }
   auto iter = std::copy(source.begin(), source.end(), destination.get());
-  *iter = '\0';
+  *iter     = '\0';
 }
 }  // namespace detail
 

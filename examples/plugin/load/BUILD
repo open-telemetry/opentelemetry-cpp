@@ -3,10 +3,10 @@ cc_binary(
     srcs = [
         "main.cc",
     ],
-    deps = [
-        "//api",
-    ],
     linkopts = [
         "-ldl",
+    ],
+    deps = [
+        "//api",
     ],
 )

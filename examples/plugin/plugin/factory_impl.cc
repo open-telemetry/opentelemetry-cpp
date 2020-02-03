@@ -23,7 +23,8 @@ public:
       opentelemetry::nostd::unique_ptr<char[]> &error_message) const noexcept override
   {
     std::shared_ptr<Tracer> tracer{new (std::nothrow) Tracer{""}};
-    if (tracer == nullptr) {
+    if (tracer == nullptr)
+    {
       return nullptr;
     }
     return opentelemetry::nostd::unique_ptr<TracerHandle>{new (std::nothrow)
@@ -31,14 +32,14 @@ public:
   }
 };
 
-static opentelemetry::nostd::unique_ptr<
- opentelemetry::plugin::Factory::FactoryImpl> MakeFactoryImpl(
-     const opentelemetry::plugin::LoaderInfo& loader_info,
-     opentelemetry::nostd::unique_ptr<char[]>& error_message) noexcept {
-   (void)loader_info;
-   (void)error_message;
-   return opentelemetry::nostd::unique_ptr<opentelemetry::plugin::Factory::FactoryImpl>{
-       new (std::nothrow) FactoryImpl{}};
+static opentelemetry::nostd::unique_ptr<opentelemetry::plugin::Factory::FactoryImpl>
+MakeFactoryImpl(const opentelemetry::plugin::LoaderInfo &loader_info,
+                opentelemetry::nostd::unique_ptr<char[]> &error_message) noexcept
+{
+  (void)loader_info;
+  (void)error_message;
+  return opentelemetry::nostd::unique_ptr<opentelemetry::plugin::Factory::FactoryImpl>{
+      new (std::nothrow) FactoryImpl{}};
 }
 
-OPENTELEMETRY_DEFINE_PLUGIN_HOOK(MakeFactoryImpl);                                       
+OPENTELEMETRY_DEFINE_PLUGIN_HOOK(MakeFactoryImpl);

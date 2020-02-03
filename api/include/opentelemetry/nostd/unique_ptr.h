@@ -9,17 +9,20 @@ namespace opentelemetry
 {
 namespace nostd
 {
-namespace detail {
+namespace detail
+{
 template <class T>
-struct unique_ptr_element_type {
+struct unique_ptr_element_type
+{
   using type = T;
 };
 
 template <class T>
-struct unique_ptr_element_type<T[]> {
+struct unique_ptr_element_type<T[]>
+{
   using type = T;
 };
-} // namespace detail
+}  // namespace detail
 
 /**
  * Provide a simplified port of std::unique_ptr that has ABI stability.
@@ -31,7 +34,7 @@ class unique_ptr
 {
 public:
   using element_type = typename detail::unique_ptr_element_type<T>::type;
-  using pointer = element_type*;
+  using pointer      = element_type *;
 
   unique_ptr() noexcept : ptr_{nullptr} {}
 

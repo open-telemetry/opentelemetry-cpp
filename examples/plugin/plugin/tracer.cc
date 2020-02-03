@@ -2,31 +2,32 @@
 
 #include <iostream>
 
-namespace {
-class Span final : public opentelemetry::trace::Span {
- public:
-   Span(std::shared_ptr<Tracer> &&tracer,
-        opentelemetry::nostd::string_view name,
-        const opentelemetry::trace::StartSpanOptions &options) noexcept
-       : tracer_{std::move(tracer)}, name_{name}
-   {
-     std::cout << "StartSpan: " << name << "\n";
-   }
+namespace
+{
+class Span final : public opentelemetry::trace::Span
+{
+public:
+  Span(std::shared_ptr<Tracer> &&tracer,
+       opentelemetry::nostd::string_view name,
+       const opentelemetry::trace::StartSpanOptions &options) noexcept
+      : tracer_{std::move(tracer)}, name_{name}
+  {
+    std::cout << "StartSpan: " << name << "\n";
+  }
 
-   ~Span() {
-     std::cout << "~Span\n";
-   }
+  ~Span() { std::cout << "~Span\n"; }
 
-   // opentelemetry::trace::Span
-   Tracer& tracer() const noexcept override { return *tracer_; }
+  // opentelemetry::trace::Span
+  Tracer &tracer() const noexcept override { return *tracer_; }
 
- private:
+private:
   std::shared_ptr<Tracer> tracer_;
   std::string name_;
 };
-} // namespace
+}  // namespace
 
-Tracer::Tracer(opentelemetry::nostd::string_view output) {
+Tracer::Tracer(opentelemetry::nostd::string_view output)
+{
   (void)output;
 }
 
