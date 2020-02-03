@@ -40,6 +40,17 @@ cc_test(
 )
 
 cc_test(
+    name = "provider",
+    srcs = [
+        "provider_test.cc",
+    ],
+    deps = [
+        "//api",
+        "@com_google_googletest//:gtest_main",
+    ],
+)
+
+cc_test(
     name = "trace_id_test",
     srcs = [
         "trace_id_test.cc",

@@ -1,4 +1,4 @@
-#include "opentelemetry/trace/global_provider.h"
+#include "opentelemetry/trace/provider.h"
 
 #include <gtest/gtest.h>
 
@@ -18,17 +18,14 @@ class TestProvider : public opentelemetry::trace::TracerProvider
 TEST(Provider, GetTracerProviderDefault)
 {
   auto tf = Provider::GetTracerProvider();
-  ASSERT_NE(tf, nullptr);
+  EXPECT_NE(tf, nullptr);
 }
 
 TEST(Provider, SetTracerProvider)
 {
   auto tf = new TestProvider();
-  // Capture the default provider constructed in order to free it
+  // Capture the default provider constructed in order to replace it
   auto default_provider = Provider::SetTracerProvider(tf);
-  ASSERT_EQ(Provider::GetTracerProvider(), tf);
-  auto res = Provider::SetTracerProvider(nullptr);
-  ASSERT_EQ(tf, res);
-  delete res;
-  delete default_provider;
+  ASSERT_EQ(tf, Provider::GetTracerProvider());
+  delete Provider::SetTracerProvider(default_provider);
 }
