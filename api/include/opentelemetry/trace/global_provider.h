@@ -40,12 +40,9 @@ public:
     return Ptr()->load(std::memory_order_acquire);
   }
 
-  static void SetTracerProvider(TracerProvider *tp)
+  static TracerProvider *SetTracerProvider(TracerProvider *tp)
   {
-    if (auto old = Ptr()->exchange(tp, std::memory_order_release))
-    {
-      delete old;
-    }
+    return Ptr()->exchange(tp, std::memory_order_acq_rel);
   }
 
 private:

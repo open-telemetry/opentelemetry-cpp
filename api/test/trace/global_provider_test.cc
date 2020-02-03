@@ -24,7 +24,11 @@ TEST(Provider, GetTracerProviderDefault)
 TEST(Provider, SetTracerProvider)
 {
   auto tf = new TestProvider();
-  Provider::SetTracerProvider(tf);
+  // Capture the default provider constructed in order to free it
+  auto default_provider = Provider::SetTracerProvider(tf);
   ASSERT_EQ(Provider::GetTracerProvider(), tf);
-  Provider::SetTracerProvider(nullptr);
+  auto res = Provider::SetTracerProvider(nullptr);
+  ASSERT_EQ(tf, res);
+  delete res;
+  delete default_provider;
 }
