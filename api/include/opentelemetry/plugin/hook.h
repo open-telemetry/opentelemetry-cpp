@@ -32,6 +32,6 @@ namespace plugin
 {
 using OpenTelemetryHook =
     nostd::unique_ptr<Factory::FactoryImpl> (*)(const LoaderInfo &loader_info,
-                                                nostd::unique_ptr<char[]> &error_message) noexcept;
+                                                nostd::unique_ptr<char[]> &error_message);
 }  // namespace plugin
 }  // namespace opentelemetry
