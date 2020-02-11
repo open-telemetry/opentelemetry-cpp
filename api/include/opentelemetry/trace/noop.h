@@ -23,18 +23,18 @@ class NoopSpan final : public Span
 public:
   explicit NoopSpan(const std::shared_ptr<Tracer> &tracer) noexcept : tracer_{tracer} {}
 
-  void AddEvent(nostd::string_view name) override {}
+  void AddEvent(nostd::string_view name) noexcept override {}
 
-  void AddEvent(nostd::string_view name, core::SystemTimestamp timestamp) override {}
-  void AddEvent(nostd::string_view name, core::SteadyTimestamp timestamp) override {}
+  void AddEvent(nostd::string_view name, core::SystemTimestamp timestamp) noexcept override {}
+  void AddEvent(nostd::string_view name, core::SteadyTimestamp timestamp) noexcept override {}
 
-  void SetStatus(CanonicalCode code, nostd::string_view description) override {}
+  void SetStatus(CanonicalCode code, nostd::string_view description) noexcept override {}
 
-  void UpdateName(nostd::string_view name) override {}
+  void UpdateName(nostd::string_view name) noexcept override {}
 
-  void End() override {}
+  void End() noexcept override {}
 
-  bool IsRecording() const override { return false; }
+  bool IsRecording() const noexcept override { return false; }
 
   Tracer &tracer() const noexcept override { return *tracer_; }
 
@@ -43,7 +43,7 @@ private:
 };
 
 /**
- * No-op implementation of Tracer. This class should not be used directly.
+ * No-op implementation of Tracer.
  */
 class NoopTracer final : public Tracer, public std::enable_shared_from_this<NoopTracer>
 {

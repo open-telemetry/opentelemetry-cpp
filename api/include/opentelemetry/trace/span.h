@@ -73,39 +73,39 @@ public:
   // virtual void SetAttribute(nostd::string_view key, AttributeValue&& value) = 0;
 
   // Adds an event to the Span.
-  virtual void AddEvent(nostd::string_view name) = 0;
+  virtual void AddEvent(nostd::string_view name) noexcept = 0;
 
   // Adds an event to the Span, with a custom timestamp.
-  virtual void AddEvent(nostd::string_view name, core::SystemTimestamp timestamp) = 0;
-  virtual void AddEvent(nostd::string_view name, core::SteadyTimestamp timestamp) = 0;
+  virtual void AddEvent(nostd::string_view name, core::SystemTimestamp timestamp) noexcept = 0;
+  virtual void AddEvent(nostd::string_view name, core::SteadyTimestamp timestamp) noexcept = 0;
 
   // TODO
   // Adds an event to the Span, with a custom timestamp, and attributes.
   // virtual void AddEvent(nostd::string_view name, core::SteadyTimestamp
-  // timestamp, nostd::span<std::pair<nostd::string_view name, AttributeValue&&
-  // value>> attributes);
+  // timestamp, nostd::span<std::pair<nostd::string_view name, AttributeValue
+  // value>> attributes) noexcept = 0;
 
   // Sets the status of the span. The default status is OK. Only the value of the last call will be
   // recorded, and implementations are free to ignore previous calls.
-  virtual void SetStatus(CanonicalCode code, nostd::string_view description) = 0;
+  virtual void SetStatus(CanonicalCode code, nostd::string_view description) noexcept = 0;
 
   // Updates the name of the Span. If used, this will override the name provided
-  // during construction.
-  virtual void UpdateName(nostd::string_view name) = 0;
+  // during creation.
+  virtual void UpdateName(nostd::string_view name) noexcept = 0;
 
   // Mark the end of the Span. Only the timing of the first end call for a given {@code Span} will
   // be recorded, and implementations are free to ignore all further calls.
-  virtual void End() = 0;
+  virtual void End() noexcept = 0;
 
   // TODO
-  // virtual void End(EndSpanOptions&& opts) = 0;
+  // virtual void End(EndSpanOptions&& opts) noexcept = 0;
 
   // TODO
-  // SpanContext GetContext() const = 0;
+  // SpanContext GetContext() const noexcept = 0;
 
   // Returns true if this Span is recording tracing events (e.g. SetAttribute,
   // AddEvent).
-  virtual bool IsRecording() const = 0;
+  virtual bool IsRecording() const noexcept = 0;
 
   virtual Tracer &tracer() const noexcept = 0;
 };
