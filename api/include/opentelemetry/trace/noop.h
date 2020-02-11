@@ -28,6 +28,8 @@ public:
   void AddEvent(nostd::string_view name, core::SystemTimestamp timestamp) override {}
   void AddEvent(nostd::string_view name, core::SteadyTimestamp timestamp) override {}
 
+  void SetStatus(CanonicalCode code, nostd::string_view description) override {}
+
   void UpdateName(nostd::string_view name) override {}
 
   void End() override {}

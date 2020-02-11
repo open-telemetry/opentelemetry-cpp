@@ -4,6 +4,7 @@
 
 #include "opentelemetry/core/timestamp.h"
 #include "opentelemetry/nostd/string_view.h"
+#include "opentelemetry/trace/canonical_code.h"
 
 namespace opentelemetry
 {
@@ -84,10 +85,9 @@ public:
   // timestamp, nostd::span<std::pair<nostd::string_view name, AttributeValue&&
   // value>> attributes);
 
-  // TODO
   // Sets the status of the span. The default status is OK. Only the value of the last call will be
   // recorded, and implementations are free to ignore previous calls.
-  // virtual void SetStatus(Status status) = 0;
+  virtual void SetStatus(CanonicalCode code, nostd::string_view description) = 0;
 
   // Updates the name of the Span. If used, this will override the name provided
   // during construction.
