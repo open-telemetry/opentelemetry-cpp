@@ -1,7 +1,7 @@
 #pragma once
 
-#include "opentelemetry/plugin/factory.h"
 #include "opentelemetry/plugin/detail/loader_info.h"
+#include "opentelemetry/plugin/factory.h"
 
 #ifdef WIN32
 
