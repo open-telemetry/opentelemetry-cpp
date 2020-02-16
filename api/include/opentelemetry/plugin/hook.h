@@ -5,6 +5,14 @@
 
 #ifdef WIN32
 
+/**
+ * Cross-platform helper macro to declare the symbol used to load an OpenTelemetry implementation
+ * as a plugin.
+ *
+ * Note: The symbols use weak linkage so as to support using an OpenTelemetry both as a regular
+ * library and a dynamically loaded plugin. The weak linkage allows for multiple implementations to
+ * be linked in without getting multiple definition errors.
+ */
 #  define OPENTELEMETRY_DEFINE_PLUGIN_HOOK(X)                                            \
     extern "C" {                                                                         \
     extern __declspec(dllexport)                                                         \

@@ -6,6 +6,9 @@ namespace opentelemetry
 {
 namespace plugin
 {
+/**
+ * Manage the ownership of a dynamically loaded tracer.
+ */
 class TracerHandle
 {
 public:

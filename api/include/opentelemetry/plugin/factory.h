@@ -9,6 +9,9 @@ namespace opentelemetry
 {
 namespace plugin
 {
+/**
+ * Factory creates OpenTelemetry objects from configuration strings.
+ */
 class Factory final
 {
 public:
@@ -27,6 +30,12 @@ public:
       : library_handle_{std::move(library_handle)}, factory_impl_{std::move(factory_impl)}
   {}
 
+  /**
+   * Construct a tracer from a configuration string.
+   * @param tracer_config a representation of the tracer's config as a string.
+   * @param error_message on failure this will contain an error message.
+   * @return a Tracer on success or nullptr on failure.
+   */
   std::shared_ptr<Tracer> MakeTracer(nostd::string_view tracer_config,
                                      std::unique_ptr<char[]> &error_message) const noexcept
   {

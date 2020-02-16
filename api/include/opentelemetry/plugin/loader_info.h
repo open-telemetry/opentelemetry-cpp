@@ -7,6 +7,12 @@ namespace opentelemetry
 {
 namespace plugin
 {
+/**
+ * LoaderInfo describes the versioning of the loader.
+ *
+ * Plugins can check against this information and properly error out if they were built against an
+ * incompatible OpenTelemetry API.
+ */
 struct LoaderInfo
 {
   nostd::string_view opentelemetry_version     = OPENTELEMETRY_VERSION;
