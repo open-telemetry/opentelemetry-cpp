@@ -2,8 +2,8 @@
 
 #include <memory>
 
-#include "opentelemetry/plugin/dynamic_library_handle.h"
-#include "opentelemetry/plugin/tracer_handle.h"
+#include "opentelemetry/plugin/detail/dynamic_library_handle.h"
+#include "opentelemetry/plugin/detail/tracer_handle.h"
 #include "opentelemetry/trace/tracer.h"
 
 namespace opentelemetry
