@@ -91,6 +91,14 @@ jobs:
       - run: ./ci/setup_windows_ci_environment.ps1
       - run: ./ci/do_ci.ps1 cmake.test
 
+  windows_plugin_test:
+    executer: win/vs2019
+    steps:
+      - checkout
+      - run: ./ci/setup_windows_cmake.ps1
+      - run: ./ci/setup_windows_ci_environment.ps1
+      - run: ./ci/do_ci.ps1 cmake.build_example_plugin
+
 workflows:
   version: 2
   build_and_test:
@@ -103,3 +111,4 @@ workflows:
       - format
       - osx_test
       - windows
+      - windows_plugin_test
