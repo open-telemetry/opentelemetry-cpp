@@ -6,7 +6,7 @@ $action = $args[0]
 $SRC_DIR=(Get-Item -Path ".\").FullName
 mkdir build
 $BUILD_DIR="$SRC_DIR\build"
-$PLUGIN_DIR=$SRC_DIR\plugin
+$PLUGIN_DIR="$SRC_DIR\plugin"
 mkdir plugin
 
 $VCPKG_DIR="$SRC_DIR\vcpkg"
