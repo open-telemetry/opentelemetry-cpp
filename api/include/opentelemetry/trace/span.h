@@ -101,7 +101,7 @@ public:
   // virtual void End(EndSpanOptions&& opts) noexcept = 0;
 
   // TODO
-  // SpanContext GetContext() const noexcept = 0;
+  // SpanContext context() const noexcept = 0;
 
   // Returns true if this Span is recording tracing events (e.g. SetAttribute,
   // AddEvent).
