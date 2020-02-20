@@ -82,7 +82,7 @@ public:
   // TODO
   // Adds an event to the Span, with a custom timestamp, and attributes.
   // virtual void AddEvent(nostd::string_view name, core::SteadyTimestamp
-  // timestamp, nostd::span<std::pair<nostd::string_view name, AttributeValue
+  // timestamp, nostd::span<const std::pair<nostd::string_view name, AttributeValue
   // value>> attributes) noexcept = 0;
 
   // Sets the status of the span. The default status is OK. Only the value of the last call will be
