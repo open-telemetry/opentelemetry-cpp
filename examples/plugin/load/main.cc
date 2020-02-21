@@ -11,7 +11,7 @@ int main(int argc, char *argv[])
 {
   if (argc != 3)
   {
-    std::cerr << "Usage: load_plugin <plugin> <confg>\n";
+    std::cerr << "Usage: load_plugin <plugin> <config>\n";
     return -1;
   }
   std::unique_ptr<char[]> error_message;
