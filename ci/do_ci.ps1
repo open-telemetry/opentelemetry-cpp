@@ -46,7 +46,7 @@ switch ($action) {
     if ($exit -ne 0) {
       exit $exit
     }
-    cp examples\plugin\plugin\libexample_plugin.dll ${PLUGIN_DIR}
+    cp examples\plugin\plugin\Debug\example_plugin.dll ${PLUGIN_DIR}
   }
   default {
     echo "unknown action: $action"
