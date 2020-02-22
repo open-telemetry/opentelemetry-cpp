@@ -8,7 +8,7 @@ OpenTelemetry-cpp library.
 ### Binary vs Source Distribution
 
 The OpenTelemetry-cpp libraries (API and SDK) and any library that depends on
-them are expected to be distributed as either "source" or "binary" artefacts.
+them are expected to be distributed as either "source" or "binary" artifacts.
 This document defines these distribution models as:
 
 - **Source** - The source code is shipped as-is and can be built as desired
@@ -23,14 +23,14 @@ model.
 The library and its dependants can be distributed and bound (loaded) in multiple
 ways which are defined as follows:
 
-- **Static Linkage** - The library is distributed as a compiled artefact (`.a`
+- **Static Linkage** - The library is distributed as a compiled artifact (`.a`
 extension on Unix-like systems) which is linked and bound at compile-time.
 - **Dynamic Linkage with Early Binding** - The library is distributed as a
-compiled artefact (`.so` on Unix-like systems), and its binding is defined at
+compiled artifact (`.so` on Unix-like systems), and its binding is defined at
 compile-time. It is loaded by the dynamic linker when the application/library
 depending on it is started/loaded.
 - **Dynamic Linkage with Late Binding** - The library is distributed as a 
-compiled artefact (`.so` on Unix-like systems), only its interface is known at
+compiled artifact (`.so` on Unix-like systems), only its interface is known at
 compile-time. It is loaded dynamically (using `dlopen` on POSIX).
 
 *NOTE: A library may itself link in other libraries based on any of the above.*
@@ -41,7 +41,8 @@ The following components will be considered for analysing the impact of
 different binding models and the recommendations.
 
 - **OpenTelemetry Libraries** - The libraries produced from this project,
-the API library will contain some globals/singletons such as `TracerProvider`.
+the API library will contain a minimal implementation including some compiled
+globals/singletons such as `TracerProvider`.
 - **OpenTelemetry Instrumented Libraries** - A library that depends on the
 OpenTelemetry API library to generate telemetry.
 - **OpenTelemetry Implementations or Exporters** - A specific implementation of
