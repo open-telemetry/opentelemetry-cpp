@@ -29,7 +29,7 @@ extension on Unix-like systems) which is linked and bound at compile-time.
 compiled artifact (`.so` on Unix-like systems), and its binding is defined at
 compile-time. It is loaded by the dynamic linker when the application/library
 depending on it is started/loaded.
-- **Dynamic Linkage with Late Binding** - The library is distributed as a 
+- **Dynamic Linkage with Late Binding** - The library is distributed as a
 compiled artifact (`.so` on Unix-like systems), only its interface is known at
 compile-time. It is loaded dynamically (using `dlopen` on POSIX).
 
