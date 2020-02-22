@@ -98,6 +98,7 @@ jobs:
       - run: ./ci/setup_windows_cmake.ps1
       - run: ./ci/setup_windows_ci_environment.ps1
       - run: ./ci/do_ci.ps1 cmake.build_example_plugin
+      - run: ./ci/do_ci.ps1 cmake.test_example_plugin
 
 workflows:
   version: 2
