@@ -63,7 +63,7 @@ switch ($action) {
     if ($exit -ne 0) {
       exit $exit
     }
-    cmake --build load_plugin_example
+    cmake --build .
     $exit = $LASTEXITCODE
     if ($exit -ne 0) {
       exit $exit
