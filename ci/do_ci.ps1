@@ -4,10 +4,16 @@ trap { $host.SetShouldExit(1) }
 $action = $args[0]
 
 $SRC_DIR=(Get-Item -Path ".\").FullName
-mkdir build
+
+if (!(test-path build)) {
+  mkdir build
+}
 $BUILD_DIR="$SRC_DIR\build"
+
+if (!(test-path plugin)) {
+  mkdir plugin
+}
 $PLUGIN_DIR="$SRC_DIR\plugin"
-mkdir plugin
 
 $VCPKG_DIR="$SRC_DIR\vcpkg"
 
