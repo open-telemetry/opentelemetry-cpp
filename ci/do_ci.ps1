@@ -56,7 +56,6 @@ switch ($action) {
   }
   "cmake.test_example_plugin" {
     cd "$BUILD_DIR"
-    rm -rf *
     cmake $SRC_DIR `
           -DVCPKG_TARGET_TRIPLET=x64-windows `
           "-DCMAKE_TOOLCHAIN_FILE=$VCPKG_DIR\scripts\buildsystems\vcpkg.cmake"
