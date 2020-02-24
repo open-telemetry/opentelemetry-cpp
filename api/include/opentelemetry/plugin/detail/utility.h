@@ -11,7 +11,8 @@ namespace plugin
 {
 namespace detail
 {
-inline void CopyErrorMessage(const char *source, std::string &destination) noexcept try
+inline void CopyErrorMessage(const char *source, std::string &destination) noexcept
+try
 {
   if (source == nullptr)
   {
