@@ -1,6 +1,7 @@
 #pragma once
 
 #include <memory>
+#include <string>
 
 #include "opentelemetry/nostd/string_view.h"
 
@@ -10,17 +11,17 @@ namespace plugin
 {
 namespace detail
 {
-inline void CopyErrorMessage(nostd::string_view source,
-                             std::unique_ptr<char[]> &destination) noexcept
+inline void CopyErrorMessage(const char *source, std::string &destination) noexcept
+try
 {
-  destination.reset(new char[source.size() + 1]);
-  if (destination == nullptr)
+  if (source == nullptr)
   {
     return;
   }
-  auto iter = std::copy(source.begin(), source.end(), destination.get());
-  *iter     = '\0';
+  destination.assign(source);
 }
+catch (const std::bad_alloc &)
+{}
 }  // namespace detail
 }  // namespace plugin
 }  // namespace opentelemetry

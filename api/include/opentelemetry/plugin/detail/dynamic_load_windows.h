@@ -24,8 +24,7 @@ private:
   HINSTANCE handle_;
 };
 
-inline std::unique_ptr<Factory> LoadFactory(const char *plugin,
-                                            std::unique_ptr<char[]> &error_message) noexcept
+inline std::unique_ptr<Factory> LoadFactory(const char *plugin, std::string &error_message) noexcept
 {
   auto handle = ::LoadLibrary(plugin);
   if (handle == nullptr)
@@ -62,7 +61,7 @@ inline std::unique_ptr<Factory> LoadFactory(const char *plugin,
   auto factory_impl = (**make_factory_impl)(loader_info, plugin_error_message);
   if (factory_impl == nullptr)
   {
-    error_message = std::move(plugin_error_message);
+    CopyErrorMessage(plugin_error_message.get(), error_message);
     return nullptr;
   }
   return std::unique_ptr<Factory>{new (std::nothrow)
