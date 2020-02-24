@@ -60,7 +60,7 @@ inline std::unique_ptr<Factory> LoadFactory(const char *plugin, std::string &err
   auto factory_impl = (**make_factory_impl)(loader_info, plugin_error_message);
   if (factory_impl == nullptr)
   {
-    CopyErrorMessage(plugin_error_message.get(), error_message);
+    detail::CopyErrorMessage(plugin_error_message.get(), error_message);
     return nullptr;
   }
   return std::unique_ptr<Factory>{new (std::nothrow)
