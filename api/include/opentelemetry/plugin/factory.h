@@ -1,8 +1,8 @@
 #pragma once
-
 #include <memory>
 #include <string>
 
+#include "opentelemetry/plugin/detail/utility.h"
 #include "opentelemetry/plugin/tracer.h"
 
 namespace opentelemetry
@@ -37,13 +37,13 @@ public:
    * @return a Tracer on success or nullptr on failure.
    */
   std::shared_ptr<Tracer> MakeTracer(nostd::string_view tracer_config,
-                                     std::unique_ptr<char[]> &error_message) const noexcept
+                                     std::string &error_message) const noexcept
   {
     nostd::unique_ptr<char[]> plugin_error_message;
     auto tracer_handle = factory_impl_->MakeTracerHandle(tracer_config, plugin_error_message);
-    error_message      = std::move(plugin_error_message);
     if (tracer_handle == nullptr)
     {
+      detail::CopyErrorMessage(plugin_error_message.get(), error_message);
       return nullptr;
     }
     return std::shared_ptr<Tracer>{new (std::nothrow)
