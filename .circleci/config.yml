@@ -65,6 +65,19 @@ jobs:
       - run: ./ci/install_bazelisk.sh
       - run: ./ci/do_ci.sh bazel.asan
 
+  benchmark:
+    resource_class: xlarge
+    docker:
+      - image: ubuntu:18.04
+    steps:
+      - checkout
+      - run: ./ci/setup_ci_environment.sh
+      - run: ./ci/install_bazelisk.sh
+      - run: env BENCHMARK_DIR=/benchmark ./ci/do_ci.sh benchmark
+      - store_artifacts:
+          path: /benchmark
+          destination: benchmark
+
   format:
     resource_class: xlarge
     docker:
@@ -110,6 +123,7 @@ workflows:
       - bazel_test
       - bazel_asan
       - format
+      - benchmark
       - osx_test
       - windows
       - windows_plugin_test
