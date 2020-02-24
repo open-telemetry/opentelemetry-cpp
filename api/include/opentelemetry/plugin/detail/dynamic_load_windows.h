@@ -18,7 +18,7 @@ namespace plugin
 {
 namespace detail
 {
-inline std::string GetLastErrorMessage(std::string &error_message) noexcept
+inline void GetLastErrorMessage(std::string &error_message) noexcept
 {
   auto error_code = ::GetLastError();
   // See https://stackoverflow.com/a/455533/4447365
