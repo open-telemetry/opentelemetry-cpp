@@ -20,7 +20,8 @@ if [[ "$1" == "cmake.test" ]]; then
   make
   make test
   exit 0
-elif [[ "$1" == "cmake.build_example_plugin" ]]; then
+elif [[ "$1" == "cmake.test_example_plugin" ]]; then
+  # Build the plugin
   cd "${BUILD_DIR}"
   rm -rf *
   cat <<EOF > export.map
@@ -43,8 +44,8 @@ EOF
         "${SRC_DIR}"
   make example_plugin
   cp examples/plugin/plugin/libexample_plugin.so ${PLUGIN_DIR}
-  exit 0
-elif [[ "$1" == "cmake.test_example_plugin" ]]; then
+
+  # Verify we can load the plugin
   cd "${BUILD_DIR}"
   rm -rf *
   cmake -DCMAKE_BUILD_TYPE=Debug  \

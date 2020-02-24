@@ -68,6 +68,7 @@ switch ($action) {
     if ($exit -ne 0) {
       exit $exit
     }
+    cp examples\plugin\plugin\Debug\example_plugin.dll ${PLUGIN_DIR}
     $config = New-TemporaryFile
     examples/plugin/load/Debug/load_plugin_example.exe ${PLUGIN_DIR}/example_plugin.dll $config
     $exit = $LASTEXITCODE

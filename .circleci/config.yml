@@ -25,7 +25,6 @@ jobs:
       - checkout
       - run: ./ci/setup_ci_environment.sh
       - run: ./ci/setup_cmake.sh
-      - run: ./ci/do_ci.sh cmake.build_example_plugin
       - run: ./ci/do_ci.sh cmake.test_example_plugin
       - store_artifacts:
           path: ~/build/Testing/Temporary/LastTest.log
@@ -110,7 +109,6 @@ jobs:
       - checkout
       - run: ./ci/setup_windows_cmake.ps1
       - run: ./ci/setup_windows_ci_environment.ps1
-      - run: ./ci/do_ci.ps1 cmake.build_example_plugin
       - run: ./ci/do_ci.ps1 cmake.test_example_plugin
 
 workflows:
