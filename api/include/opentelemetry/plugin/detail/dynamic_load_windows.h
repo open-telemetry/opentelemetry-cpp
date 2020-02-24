@@ -7,12 +7,34 @@
 #include "opentelemetry/plugin/hook.h"
 #include "opentelemetry/version.h"
 
+#include <errhandlingapi.h>
+#include <winbase.h>
 #include <windows.h>
 
 namespace opentelemetry
 {
 namespace plugin
 {
+namespace detail
+{
+inline std::string GetLastErrorMessage(std::string &error_message) noexcept
+{
+  auto error_code = ::GetLastError();
+  // See https://stackoverflow.com/a/455533/4447365
+  LPTSTR error_text = nullptr;
+  auto size         = ::FormatMessage(
+      FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_IGNORE_INSERTS,
+      nullptr, error_code, MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
+      reinterpret_cast<LPTSTR>(&error_text), 0, nullptr);
+  if (size == 0)
+  {
+    return;
+  }
+  CopyErrorMessage(error_text, error_message);
+  ::LocalFree(error_text);
+}
+}  // namespace detail
+
 class DynamicLibraryHandleWindows final : public DynamicLibraryHandle
 {
 public:
@@ -29,8 +51,7 @@ inline std::unique_ptr<Factory> LoadFactory(const char *plugin, std::string &err
   auto handle = ::LoadLibrary(plugin);
   if (handle == nullptr)
   {
-    // TODO: Set error_message
-    detail::CopyErrorMessage("Failed to load plugin", error_message);
+    detail::GetLastErrorMessage(error_message);
     return nullptr;
   }
 
@@ -46,8 +67,7 @@ inline std::unique_ptr<Factory> LoadFactory(const char *plugin, std::string &err
       ::GetProcAddress(handle, "OpenTelemetryMakeFactoryImpl"));
   if (make_factory_impl == nullptr)
   {
-    // TODO: set error_message
-    detail::CopyErrorMessage("Failed find hook", error_message);
+    detail::GetLastErrorMessage(error_message);
     return nullptr;
   }
   if (*make_factory_impl == nullptr)
