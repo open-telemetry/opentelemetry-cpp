@@ -7,9 +7,10 @@
 #include "opentelemetry/plugin/hook.h"
 #include "opentelemetry/version.h"
 
+#include <windows.h>
+
 #include <errhandlingapi.h>
 #include <winbase.h>
-#include <windows.h>
 
 namespace opentelemetry
 {
