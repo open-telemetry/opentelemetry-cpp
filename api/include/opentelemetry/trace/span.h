@@ -46,16 +46,15 @@ class Tracer;
 
 /**
  * A Span represents a single operation within a Trace.
- *
- * Spans *must* be ended by calling End(). Merely deleting a Span does not end
- * it.
  */
 class Span
 {
 public:
   // Note that Spans should be created using the Tracer class. Please refer to
   // tracer.h for documentation.
-  Span()          = default;
+  Span() = default;
+
+  // The Span destructor End()s the Span, if it hasn't been ended already.
   virtual ~Span() = default;
 
   // Not copiable or movable.
@@ -93,7 +92,7 @@ public:
   // during creation.
   virtual void UpdateName(nostd::string_view name) noexcept = 0;
 
-  // Mark the end of the Span. Only the timing of the first end call for a given {@code Span} will
+  // Mark the end of the Span. Only the timing of the first End call for a given Span will
   // be recorded, and implementations are free to ignore all further calls.
   virtual void End() noexcept = 0;
 
