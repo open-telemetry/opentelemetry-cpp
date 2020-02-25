@@ -18,6 +18,28 @@ public:
   {}
 
   // trace::Span
+  void AddEvent(nostd::string_view name) noexcept override { span_->AddEvent(name); }
+
+  void AddEvent(nostd::string_view name, core::SystemTimestamp timestamp) noexcept override
+  {
+    span_->AddEvent(name, timestamp);
+  }
+  void AddEvent(nostd::string_view name, core::SteadyTimestamp timestamp) noexcept override
+  {
+    span_->AddEvent(name, timestamp);
+  }
+
+  void SetStatus(trace::CanonicalCode code, nostd::string_view description) noexcept override
+  {
+    span_->SetStatus(code, description);
+  }
+
+  void UpdateName(nostd::string_view name) noexcept override { span_->UpdateName(name); }
+
+  void End() noexcept override { span_->End(); }
+
+  bool IsRecording() const noexcept override { return span_->IsRecording(); }
+
   trace::Tracer &tracer() const noexcept override { return *tracer_; }
 
 private:

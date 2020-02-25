@@ -2,14 +2,18 @@
 
 #include <iostream>
 
+namespace nostd = opentelemetry::nostd;
+namespace core  = opentelemetry::core;
+namespace trace = opentelemetry::trace;
+
 namespace
 {
-class Span final : public opentelemetry::trace::Span
+class Span final : public trace::Span
 {
 public:
   Span(std::shared_ptr<Tracer> &&tracer,
-       opentelemetry::nostd::string_view name,
-       const opentelemetry::trace::StartSpanOptions &options) noexcept
+       nostd::string_view name,
+       const trace::StartSpanOptions &options) noexcept
       : tracer_{std::move(tracer)}, name_{name}
   {
     std::cout << "StartSpan: " << name << "\n";
@@ -18,6 +22,23 @@ public:
   ~Span() { std::cout << "~Span\n"; }
 
   // opentelemetry::trace::Span
+  void AddEvent(nostd::string_view /*name*/) noexcept override {}
+
+  void AddEvent(nostd::string_view /*name*/, core::SystemTimestamp /*timestamp*/) noexcept override
+  {}
+  void AddEvent(nostd::string_view /*name*/, core::SteadyTimestamp /*timestamp*/) noexcept override
+  {}
+
+  void SetStatus(trace::CanonicalCode /*code*/,
+                 nostd::string_view /*description*/) noexcept override
+  {}
+
+  void UpdateName(nostd::string_view /*name*/) noexcept override {}
+
+  void End() noexcept override {}
+
+  bool IsRecording() const noexcept override { return true; }
+
   Tracer &tracer() const noexcept override { return *tracer_; }
 
 private:
@@ -26,15 +47,11 @@ private:
 };
 }  // namespace
 
-Tracer::Tracer(opentelemetry::nostd::string_view output)
-{
-  (void)output;
-}
+Tracer::Tracer(nostd::string_view /*output*/) {}
 
-opentelemetry::nostd::unique_ptr<opentelemetry::trace::Span> Tracer::StartSpan(
-    opentelemetry::nostd::string_view name,
-    const opentelemetry::trace::StartSpanOptions &options) noexcept
+nostd::unique_ptr<trace::Span> Tracer::StartSpan(nostd::string_view name,
+                                                 const trace::StartSpanOptions &options) noexcept
 {
-  return opentelemetry::nostd::unique_ptr<opentelemetry::trace::Span>{
+  return nostd::unique_ptr<opentelemetry::trace::Span>{
       new (std::nothrow) Span{this->shared_from_this(), name, options}};
 }
