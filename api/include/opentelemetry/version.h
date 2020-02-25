@@ -1,0 +1,4 @@
+#pragma once
+
+#define OPENTELEMETRY_VERSION "0.0.1"
+#define OPENTELEMETRY_ABI_VERSION "0"

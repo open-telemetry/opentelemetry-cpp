@@ -17,6 +17,22 @@ jobs:
           path: ~/build/Testing/Temporary/LastTest.log
           destination: Test.log
 
+  plugin_test:
+    resource_class: xlarge
+    docker:
+      - image: ubuntu:18.04
+    steps:
+      - checkout
+      - run: ./ci/setup_ci_environment.sh
+      - run: ./ci/setup_cmake.sh
+      - run: ./ci/do_ci.sh cmake.test_example_plugin
+      - store_artifacts:
+          path: ~/build/Testing/Temporary/LastTest.log
+          destination: Test.log
+      - store_artifacts:
+          path: ~/plugin/libexample_plugin.so
+          destination: libexample_plugin_so
+
   gcc_48_test:
     resource_class: xlarge
     docker:
@@ -87,11 +103,20 @@ jobs:
       - run: ./ci/setup_windows_ci_environment.ps1
       - run: ./ci/do_ci.ps1 cmake.test
 
+  windows_plugin_test:
+    executor: win/vs2019
+    steps:
+      - checkout
+      - run: ./ci/setup_windows_cmake.ps1
+      - run: ./ci/setup_windows_ci_environment.ps1
+      - run: ./ci/do_ci.ps1 cmake.test_example_plugin
+
 workflows:
   version: 2
   build_and_test:
     jobs:
       - cmake_test
+      - plugin_test
       - gcc_48_test
       - bazel_test
       - bazel_asan
@@ -99,3 +124,4 @@ workflows:
       - benchmark
       - osx_test
       - windows
+      - windows_plugin_test
