@@ -9,30 +9,48 @@ namespace opentelemetry
 {
 namespace nostd
 {
+namespace detail
+{
+template <class T>
+struct unique_ptr_element_type
+{
+  using type = T;
+};
+
+template <class T>
+struct unique_ptr_element_type<T[]>
+{
+  using type = T;
+};
+}  // namespace detail
+
 /**
  * Provide a simplified port of std::unique_ptr that has ABI stability.
  *
- * Note: This implementation doesn't allow for a custom deleter or array specializations.
+ * Note: This implementation doesn't allow for a custom deleter.
  */
 template <class T>
 class unique_ptr
 {
 public:
+  using element_type = typename detail::unique_ptr_element_type<T>::type;
+  using pointer      = element_type *;
+
   unique_ptr() noexcept : ptr_{nullptr} {}
 
   unique_ptr(std::nullptr_t) noexcept : ptr_{nullptr} {}
 
-  explicit unique_ptr(T *ptr) noexcept : ptr_{ptr} {}
+  explicit unique_ptr(pointer ptr) noexcept : ptr_{ptr} {}
 
   unique_ptr(unique_ptr &&other) noexcept : ptr_{other.release()} {}
 
   template <class U,
-            typename std::enable_if<std::is_convertible<U *, T *>::value>::type * = nullptr>
+            typename std::enable_if<std::is_convertible<U *, pointer>::value>::type * = nullptr>
   unique_ptr(unique_ptr<U> &&other) noexcept : ptr_{other.release()}
   {}
 
   template <class U,
-            typename std::enable_if<std::is_convertible<U *, T *>::value>::type * = nullptr>
+            typename std::enable_if<std::is_convertible<U *, pointer>::value>::type * = nullptr>
   unique_ptr(std::unique_ptr<U> &&other) noexcept : ptr_{other.release()}
   {}
 
@@ -51,7 +69,7 @@ public:
   }
 
   template <class U,
-            typename std::enable_if<std::is_convertible<U *, T *>::value>::type * = nullptr>
+            typename std::enable_if<std::is_convertible<U *, pointer>::value>::type * = nullptr>
   unique_ptr &operator=(unique_ptr<U> &&other) noexcept
   {
     reset(other.release());
@@ -59,7 +77,7 @@ public:
   }
 
   template <class U,
-            typename std::enable_if<std::is_convertible<U *, T *>::value>::type * = nullptr>
+            typename std::enable_if<std::is_convertible<U *, pointer>::value>::type * = nullptr>
   unique_ptr &operator=(std::unique_ptr<U> &&other) noexcept
   {
     reset(other.release());
@@ -70,22 +88,22 @@ public:
 
   operator bool() const noexcept { return ptr_ != nullptr; }
 
-  T &operator*() const noexcept { return *ptr_; }
+  element_type &operator*() const noexcept { return *ptr_; }
 
-  T *operator->() const noexcept { return get(); }
+  pointer operator->() const noexcept { return get(); }
 
-  T *get() const noexcept { return ptr_; }
+  pointer get() const noexcept { return ptr_; }
 
-  void reset(T *ptr = nullptr) noexcept
+  void reset(pointer ptr = nullptr) noexcept
   {
     if (ptr_ != nullptr)
     {
-      delete ptr_;
+      this->delete_ptr();
     }
     ptr_ = ptr;
   }
 
-  T *release() noexcept
+  pointer release() noexcept
   {
     auto result = ptr_;
     ptr_        = nullptr;
@@ -95,7 +113,19 @@ public:
   void swap(unique_ptr &other) noexcept { std::swap(ptr_, other.ptr_); }
 
 private:
-  T *ptr_;
+  pointer ptr_;
+
+  void delete_ptr() noexcept
+  {
+    if (std::is_array<T>::value)
+    {
+      delete[] ptr_;
+    }
+    else
+    {
+      delete ptr_;
+    }
+  }
 };
 
 template <class T1, class T2>
