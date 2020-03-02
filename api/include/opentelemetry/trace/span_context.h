@@ -18,9 +18,9 @@
 //#include <cstring>
 
 #include "opentelemetry/nostd/unique_ptr.h"
-#include "opentelemetry/trace/trace_id.h"
 #include "opentelemetry/trace/span_id.h"
 #include "opentelemetry/trace/trace_flags.h"
+#include "opentelemetry/trace/trace_id.h"
 #include "opentelemetry/trace/trace_state.h"
 
 namespace opentelemetry
@@ -39,17 +39,15 @@ public:
 
   // TODO
   //
-  // static SpanContext Create(TraceId traceId, SpanId spanId, TraceFlags traceFlags, TraceState traceState);
-  // static SpanContext CreateFromRemoteParent(...);
+  // static SpanContext Create(TraceId traceId, SpanId spanId, TraceFlags traceFlags, TraceState
+  // traceState); static SpanContext CreateFromRemoteParent(...);
 
-  const TraceId& trace_id() const noexcept { return trace_id_; }
-  const SpanId& span_id() const noexcept { return span_id_; }
-  const TraceFlags& trace_flags() const noexcept { return trace_flags_; }
-  const TraceState& trace_state() const noexcept { return *trace_state_; }
+  const TraceId &trace_id() const noexcept { return trace_id_; }
+  const SpanId &span_id() const noexcept { return span_id_; }
+  const TraceFlags &trace_flags() const noexcept { return trace_flags_; }
+  const TraceState &trace_state() const noexcept { return *trace_state_; }
 
-  bool IsValid() const noexcept {
-    return trace_id_.IsValid() && span_id_.IsValid();
-  }
+  bool IsValid() const noexcept { return trace_id_.IsValid() && span_id_.IsValid(); }
 
   bool HasRemoteParent() const noexcept { return remote_parent_; }
 
