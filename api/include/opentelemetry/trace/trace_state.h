@@ -54,6 +54,8 @@ public:
   // An empty TraceState.
   TraceState() noexcept = default;
 
+  virtual ~TraceState() = default;
+
   // Returns false if no such key, otherwise returns true and populates value.
   virtual bool Get(nostd::string_view key, nostd::string_view* value) const noexcept { return false; }
 
@@ -84,6 +86,8 @@ public:
     }
     return true;
   }
+
+  // TODO: IsValidValue
 
   private:
   static bool IsNumberOrDigit(char c) {

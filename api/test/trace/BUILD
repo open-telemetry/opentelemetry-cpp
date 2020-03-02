@@ -18,6 +18,17 @@ otel_cc_benchmark(
 )
 
 cc_test(
+    name = "span_context_test",
+    srcs = [
+        "span_context_test.cc",
+    ],
+    deps = [
+        "//api",
+        "@com_google_googletest//:gtest_main",
+    ],
+)
+
+cc_test(
     name = "span_id_test",
     srcs = [
         "span_id_test.cc",
