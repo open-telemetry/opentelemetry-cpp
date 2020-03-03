@@ -19,6 +19,8 @@ public:
                 nostd::string_view name,
                 const trace_api::StartSpanOptions &options) noexcept;
 
+  ~Span() override;
+
   void AddEvent(nostd::string_view name) noexcept override;
 
   void AddEvent(nostd::string_view name, core::SystemTimestamp timestamp) noexcept override;

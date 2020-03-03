@@ -18,6 +18,10 @@ Span::Span(std::shared_ptr<Tracer> &&tracer,
   recordable_->SetName(name);
 }
 
+Span::~Span() {
+  End();
+}
+
 void Span::AddEvent(nostd::string_view name) noexcept
 {
   (void)name;
@@ -37,8 +41,12 @@ void Span::AddEvent(nostd::string_view name, core::SteadyTimestamp timestamp) no
 
 void Span::SetStatus(trace_api::CanonicalCode code, nostd::string_view description) noexcept
 {
-  (void)code;
-  (void)description;
+  std::lock_guard<std::mutex> lock_guard{mutex_};
+  if (recordable_ == nullptr)
+  {
+    return;
+  }
+  recordable_->SetStatus(code, description);
 }
 
 void Span::UpdateName(nostd::string_view name) noexcept

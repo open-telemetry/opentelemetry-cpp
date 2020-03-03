@@ -1,5 +1,7 @@
 #include "sdk/src/trace/tracer.h"
 
+#include "sdk/src/trace/span.h"
+
 namespace opentelemetry
 {
 namespace sdk
@@ -10,9 +12,8 @@ nostd::unique_ptr<trace_api::Span> Tracer::StartSpan(
     nostd::string_view name,
     const trace_api::StartSpanOptions &options) noexcept
 {
-  (void)name;
-  (void)options;
-  return nullptr;
+  return nostd::unique_ptr<trace_api::Span>{new (std::nothrow)
+                                                Span{this->shared_from_this(), name, options}};
 }
 }  // namespace trace
 }  // namespace sdk
