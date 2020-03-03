@@ -11,8 +11,11 @@ Span::Span(std::shared_ptr<Tracer> &&tracer,
            const trace_api::StartSpanOptions &options) noexcept
     : tracer_{std::move(tracer)}, recordable_{tracer_->recorder().MakeRecordable()}
 {
-  (void)name;
   (void)options;
+  if (recordable_ == nullptr) {
+    return;
+  }
+  recordable_->SetName(name);
 }
 
 void Span::AddEvent(nostd::string_view name) noexcept
@@ -40,10 +43,24 @@ void Span::SetStatus(trace_api::CanonicalCode code, nostd::string_view descripti
 
 void Span::UpdateName(nostd::string_view name) noexcept
 {
-  (void)name;
+  std::lock_guard<std::mutex> lock_guard{mutex_};
+  if (recordable_ == nullptr)
+  {
+    return;
+  }
+  recordable_->SetName(name);
 }
 
-void Span::End() noexcept {}
+void Span::End() noexcept
+{
+  std::lock_guard<std::mutex> lock_guard{mutex_};
+  if (recordable_ == nullptr)
+  {
+    return;
+  }
+  tracer_->recorder().Record(std::move(recordable_));
+  recordable_.reset();
+}
 
 bool Span::IsRecording() const noexcept
 {
