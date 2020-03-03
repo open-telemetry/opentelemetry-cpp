@@ -12,7 +12,9 @@ namespace plugin
 namespace detail
 {
 inline void CopyErrorMessage(const char *source, std::string &destination) noexcept
+#if __EXCEPTIONS
 try
+#endif
 {
   if (source == nullptr)
   {
@@ -20,8 +22,10 @@ try
   }
   destination.assign(source);
 }
+#if __EXCEPTIONS
 catch (const std::bad_alloc &)
 {}
+#endif
 }  // namespace detail
 }  // namespace plugin
 }  // namespace opentelemetry
