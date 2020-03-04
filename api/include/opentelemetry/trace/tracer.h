@@ -24,6 +24,12 @@ public:
    */
   virtual nostd::unique_ptr<Span> StartSpan(nostd::string_view name,
                                             const StartSpanOptions &options = {}) noexcept = 0;
+
+
+  virtual bool FlushWithMicroseconds(uint64_t timeout) noexcept = 0;
+
+
+  virtual bool CloseWithMicroseconds(uint64_t timeout) noexcept = 0;
 };
 }  // namespace trace
 }  // namespace opentelemetry
