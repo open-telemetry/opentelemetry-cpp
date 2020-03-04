@@ -1,7 +1,7 @@
 #pragma once
 
 #include "opentelemetry/trace/tracer.h"
-#include "sdk/src/trace/recorder.h"
+#include "src/trace/recorder.h"
 
 #include <memory>
 

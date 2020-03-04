@@ -2,7 +2,7 @@
 
 #include "opentelemetry/trace/trace_id.h"
 #include "opentelemetry/trace/span_id.h"
-#include "sdk/src/trace/recordable.h"
+#include "src/trace/recordable.h"
 
 namespace opentelemetry
 {

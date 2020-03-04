@@ -21,4 +21,5 @@ cc_library(
     deps = [
         "//api",
     ],
+    include_prefix = "src/trace",
 )

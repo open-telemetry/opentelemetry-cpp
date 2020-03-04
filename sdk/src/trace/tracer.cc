@@ -1,6 +1,6 @@
-#include "sdk/src/trace/tracer.h"
+#include "src/trace/tracer.h"
 
-#include "sdk/src/trace/span.h"
+#include "src/trace/span.h"
 
 namespace opentelemetry
 {
