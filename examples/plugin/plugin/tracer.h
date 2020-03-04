@@ -14,4 +14,8 @@ public:
   opentelemetry::nostd::unique_ptr<opentelemetry::trace::Span> StartSpan(
       opentelemetry::nostd::string_view name,
       const opentelemetry::trace::StartSpanOptions &options) noexcept override;
+
+  bool FlushWithMicroseconds(uint64_t /*timeout*/) noexcept override { return true; }
+
+  bool CloseWithMicroseconds(uint64_t /*timeout*/) noexcept override { return true; }
 };
