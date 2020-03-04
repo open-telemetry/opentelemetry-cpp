@@ -5,9 +5,12 @@
 
 #include <memory>
 
-namespace opentelemetry {
-namespace sdk {
-namespace trace {
+namespace opentelemetry
+{
+namespace sdk
+{
+namespace trace
+{
 class Tracer final : public trace_api::Tracer, public std::enable_shared_from_this<Tracer>
 {
 public:
@@ -23,6 +26,6 @@ public:
 private:
   std::unique_ptr<Recorder> recorder_;
 };
-} // namespace trace
-} // namespace sdk
-} // namespace opentelemetry
+}  // namespace trace
+}  // namespace sdk
+}  // namespace opentelemetry

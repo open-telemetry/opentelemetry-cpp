@@ -12,13 +12,15 @@ Span::Span(std::shared_ptr<Tracer> &&tracer,
     : tracer_{std::move(tracer)}, recordable_{tracer_->recorder().MakeRecordable()}
 {
   (void)options;
-  if (recordable_ == nullptr) {
+  if (recordable_ == nullptr)
+  {
     return;
   }
   recordable_->SetName(name);
 }
 
-Span::~Span() {
+Span::~Span()
+{
   End();
 }
 

@@ -16,10 +16,10 @@ package(default_visibility = ["//visibility:public"])
 
 cc_library(
     name = "trace",
-    hdrs = glob(["**/*.h"]),
     srcs = glob(["**/*.cc"]),
+    hdrs = glob(["**/*.h"]),
+    include_prefix = "src/trace",
     deps = [
         "//api",
     ],
-    include_prefix = "src/trace",
 )
