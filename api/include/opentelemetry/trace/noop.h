@@ -55,9 +55,9 @@ public:
     return nostd::unique_ptr<Span>{new (std::nothrow) NoopSpan{this->shared_from_this()}};
   }
 
-  bool FlushWithMicroseconds(uint64_t /*timeout*/) noexcept override { return true; }
+  void FlushWithMicroseconds(uint64_t /*timeout*/) noexcept override {}
 
-  bool CloseWithMicroseconds(uint64_t /*timeout*/) noexcept override { return true; }
+  void CloseWithMicroseconds(uint64_t /*timeout*/) noexcept override {}
 };
 }  // namespace trace
 }  // namespace opentelemetry

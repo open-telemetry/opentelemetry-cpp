@@ -33,13 +33,13 @@ public:
    * @return true if the flush was completed before the timeout
    */
   template <class Rep, class Period>
-  bool Flush(std::chrono::duration<Rep, Period> timeout) noexcept
+  void Flush(std::chrono::duration<Rep, Period> timeout) noexcept
   {
-    return this->FlushWithMicroseconds(
+    this->FlushWithMicroseconds(
         static_cast<uint64_t>(std::chrono::duration_cast<std::chrono::microseconds>(timeout)));
   }
 
-  virtual bool FlushWithMicroseconds(uint64_t timeout) noexcept = 0;
+  virtual void FlushWithMicroseconds(uint64_t timeout) noexcept = 0;
 
   /**
    * Flush any buffered spans and stop reporting spans.
@@ -47,13 +47,13 @@ public:
    * @return true if the flush was completed before the timeout
    */
   template <class Rep, class Period>
-  bool Close(std::chrono::duration<Rep, Period> timeout) noexcept
+  void Close(std::chrono::duration<Rep, Period> timeout) noexcept
   {
-    return this->CloseWithMicroseconds(
+    this->CloseWithMicroseconds(
         static_cast<uint64_t>(std::chrono::duration_cast<std::chrono::microseconds>(timeout)));
   }
 
-  virtual bool CloseWithMicroseconds(uint64_t timeout) noexcept = 0;
+  virtual void CloseWithMicroseconds(uint64_t timeout) noexcept = 0;
 };
 }  // namespace trace
 }  // namespace opentelemetry
