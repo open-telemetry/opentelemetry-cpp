@@ -43,7 +43,7 @@ void Span::AddEvent(nostd::string_view name, core::SteadyTimestamp timestamp) no
 
 void Span::SetStatus(trace_api::CanonicalCode code, nostd::string_view description) noexcept
 {
-  std::lock_guard<std::mutex> lock_guard{mutex_};
+  std::lock_guard<std::mutex> lock_guard{mu_};
   if (recordable_ == nullptr)
   {
     return;
@@ -53,7 +53,7 @@ void Span::SetStatus(trace_api::CanonicalCode code, nostd::string_view descripti
 
 void Span::UpdateName(nostd::string_view name) noexcept
 {
-  std::lock_guard<std::mutex> lock_guard{mutex_};
+  std::lock_guard<std::mutex> lock_guard{mu_};
   if (recordable_ == nullptr)
   {
     return;
@@ -63,7 +63,7 @@ void Span::UpdateName(nostd::string_view name) noexcept
 
 void Span::End() noexcept
 {
-  std::lock_guard<std::mutex> lock_guard{mutex_};
+  std::lock_guard<std::mutex> lock_guard{mu_};
   if (recordable_ == nullptr)
   {
     return;

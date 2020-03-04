@@ -38,7 +38,7 @@ public:
 
 private:
   std::shared_ptr<Tracer> tracer_;
-  mutable std::mutex mutex_;
+  mutable std::mutex mu_;
   std::unique_ptr<Recordable> recordable_;
 };
 }  // namespace trace
