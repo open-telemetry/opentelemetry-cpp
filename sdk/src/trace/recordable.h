@@ -6,24 +6,42 @@
 
 namespace opentelemetry
 {
-namespace sdk {
+namespace sdk
+{
 namespace trace
 {
 namespace trace_api = opentelemetry::trace;
 
+/**
+ * Maintains a representation of a span in a format that can be processed by a recroder.
+ */
 class Recordable
 {
 public:
   virtual ~Recordable() = default;
 
+  /**
+   * Add an event to a span.
+   * @param name the name of the event
+   * @param time_since_epoch the timestamp of the event
+   */
   virtual void AddEvent(nostd::string_view name,
                         std::chrono::nanoseconds time_since_epoch) noexcept = 0;
 
+  /**
+   * Set the status of the span.
+   * @param code the status code
+   * @param description a description of the status
+   */
   virtual void SetStatus(trace_api::CanonicalCode code,
                          nostd::string_view description) noexcept = 0;
 
+  /**
+   * Set the name of the span.
+   * @param name the name to set
+   */
   virtual void SetName(nostd::string_view name) noexcept = 0;
 };
 }  // namespace trace
-} // namespace sdk
+}  // namespace sdk
 }  // namespace opentelemetry
