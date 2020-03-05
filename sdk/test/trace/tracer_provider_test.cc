@@ -10,12 +10,12 @@ TEST(TracerProvider, GetTracer)
   auto t1 = tf.GetTracer("test");
   auto t2 = tf.GetTracer("test");
   auto t3 = tf.GetTracer("different");
-  ASSERT_NE(t1, nullptr);
-  ASSERT_NE(t2, nullptr);
-  ASSERT_NE(t3, nullptr);
+  ASSERT_NE(nullptr, t1);
+  ASSERT_NE(nullptr, t2);
+  ASSERT_NE(nullptr, t3);
 
   // Should return a new instance each time
-  ASSERT_NE(t1, t2);
+  ASSERT_EQ(t1, t2);
   ASSERT_NE(t1, t3);
   ASSERT_NE(t2, t3);
 }

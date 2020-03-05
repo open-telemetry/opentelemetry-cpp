@@ -7,11 +7,19 @@ namespace sdk
 namespace trace
 {
 Tracer *const TracerProvider::GetTracer(nostd::string_view library_name,
-                                        nostd::string_view library_version,
-                                        const opentelemetry::trace::TracerOptions &tracer_options)
+                                        nostd::string_view library_version)
 {
-  tracers_.emplace_back(new Tracer(library_name, library_version, tracer_options));
-  return tracers_.back().get();
+  std::pair<std::string, std::string> key =
+      std::pair<std::string, std::string>{library_name, library_version};
+
+  if (auto cached = tracers_[key])
+  {
+    return cached.get();
+  }
+
+  std::shared_ptr<Tracer> t = std::shared_ptr<Tracer>(new Tracer());
+  tracers_[key]             = t;
+  return t.get();
 }
 }  // namespace trace
 }  // namespace sdk

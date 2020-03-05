@@ -1,8 +1,8 @@
 #pragma once
 
-#include <atomic>
+#include <memory>
+#include <mutex>
 
-#include "opentelemetry/nostd/unique_ptr.h"
 #include "opentelemetry/trace/noop.h"
 #include "opentelemetry/trace/tracer_provider.h"
 
@@ -16,18 +16,17 @@ class DefaultTracerProvider final : public opentelemetry::trace::TracerProvider
 public:
   opentelemetry::trace::NoopTracer *const GetTracer(
       nostd::string_view library_name,
-      nostd::string_view library_version  = "",
-      const TracerOptions &tracer_options = {}) override
+      nostd::string_view library_version = "") override
   {
     return tracer_.get();
   }
 
 private:
   DefaultTracerProvider()
-      : tracer_{nostd::unique_ptr<opentelemetry::trace::NoopTracer>(
-            new opentelemetry::trace::NoopTracer)}
+      : tracer_{
+            std::shared_ptr<opentelemetry::trace::NoopTracer>(new opentelemetry::trace::NoopTracer)}
   {}
-  nostd::unique_ptr<opentelemetry::trace::NoopTracer> tracer_;
+  std::shared_ptr<opentelemetry::trace::NoopTracer> tracer_;
 
   friend class Provider;
 };
@@ -37,20 +36,29 @@ class Provider
 public:
   static opentelemetry::trace::TracerProvider *GetTracerProvider()
   {
-    return Ptr()->load(std::memory_order_acquire);
+    std::lock_guard<std::mutex> guard{*GetMutex()};
+    return *GetProvider();
   }
 
   static TracerProvider *SetTracerProvider(TracerProvider *tp)
   {
-    return Ptr()->exchange(tp, std::memory_order_acq_rel);
+    std::lock_guard<std::mutex> guard{*GetMutex()};
+    auto oldProvider = *GetProvider();
+    *GetProvider()   = tp;
+    return oldProvider;
   }
 
 private:
-  static std::atomic<opentelemetry::trace::TracerProvider *> *Ptr()
+  static std::mutex *GetMutex()
   {
-    static std::atomic<opentelemetry::trace::TracerProvider *> *singleton =
-        new std::atomic<opentelemetry::trace::TracerProvider *>(new DefaultTracerProvider);
-    return singleton;
+    static std::mutex *provider_mutex = new std::mutex;
+    return provider_mutex;
+  }
+
+  static opentelemetry::trace::TracerProvider **GetProvider()
+  {
+    static opentelemetry::trace::TracerProvider *provider = new DefaultTracerProvider;
+    return &provider;
   }
 };
 

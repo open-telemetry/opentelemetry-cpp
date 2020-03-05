@@ -1,7 +1,8 @@
 #pragma once
 
+#include <map>
 #include <memory>
-#include <vector>
+#include <string>
 
 #include "opentelemetry/sdk/trace/tracer.h"
 #include "opentelemetry/trace/tracer_provider.h"
@@ -16,11 +17,10 @@ class TracerProvider : public opentelemetry::trace::TracerProvider
 {
 public:
   Tracer *const GetTracer(nostd::string_view library_name,
-                          nostd::string_view library_version                        = "",
-                          const opentelemetry::trace::TracerOptions &tracer_options = {}) override;
+                          nostd::string_view library_version = "") override;
 
 private:
-  std::vector<std::shared_ptr<Tracer>> tracers_;
+  std::map<std::pair<std::string, std::string>, std::shared_ptr<Tracer>> tracers_;
 };
 }  // namespace trace
 }  // namespace sdk

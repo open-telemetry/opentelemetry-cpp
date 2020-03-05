@@ -40,7 +40,7 @@ cc_test(
 )
 
 cc_test(
-    name = "provider",
+    name = "provider_test",
     srcs = [
         "provider_test.cc",
     ],

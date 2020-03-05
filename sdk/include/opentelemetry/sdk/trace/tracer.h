@@ -11,17 +11,11 @@ namespace trace
 class Tracer : public opentelemetry::trace::Tracer
 {
 public:
-  explicit Tracer(nostd::string_view name,
-                  nostd::string_view version,
-                  const opentelemetry::trace::TracerOptions &tracer_options = {});
   nostd::unique_ptr<opentelemetry::trace::Span> StartSpan(
       nostd::string_view name,
       const opentelemetry::trace::StartSpanOptions &options = {}) noexcept override;
-
-private:
-  nostd::string_view name_;
-  nostd::string_view version_;
 };
+
 }  // namespace trace
 }  // namespace sdk
 }  // namespace opentelemetry

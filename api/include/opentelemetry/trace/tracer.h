@@ -8,9 +8,6 @@
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace trace
 {
-struct TracerOptions
-{};
-
 /**
  * Handles span creation and in-process context propagation.
  *
