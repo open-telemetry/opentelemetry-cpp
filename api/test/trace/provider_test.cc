@@ -17,7 +17,7 @@ class TestProvider : public opentelemetry::trace::TracerProvider
 TEST(Provider, GetTracerProviderDefault)
 {
   auto tf = Provider::GetTracerProvider();
-  EXPECT_NE(tf, nullptr);
+  EXPECT_NE(nullptr, tf);
 }
 
 TEST(Provider, SetTracerProvider)
