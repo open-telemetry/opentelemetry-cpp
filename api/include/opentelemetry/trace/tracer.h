@@ -30,7 +30,6 @@ public:
   /**
    * Flush any buffered spans.
    * @param timeout to complete the flush
-   * @return true if the flush was completed before the timeout
    */
   template <class Rep, class Period>
   void Flush(std::chrono::duration<Rep, Period> timeout) noexcept
@@ -44,7 +43,6 @@ public:
   /**
    * Flush any buffered spans and stop reporting spans.
    * @param timeout to complete the flush
-   * @return true if the flush was completed before the timeout
    */
   template <class Rep, class Period>
   void Close(std::chrono::duration<Rep, Period> timeout) noexcept
