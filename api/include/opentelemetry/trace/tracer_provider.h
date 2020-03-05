@@ -10,7 +10,7 @@ namespace trace
 class TracerProvider
 {
 public:
-  virtual ~TracerProvider()                                           = default;
+  virtual ~TracerProvider()                                                = default;
   virtual Tracer *const GetTracer(nostd::string_view library_name,
                                   nostd::string_view library_version = "") = 0;
 };

@@ -10,7 +10,7 @@ Tracer *const TracerProvider::GetTracer(nostd::string_view library_name,
                                         nostd::string_view library_version)
 {
   std::pair<std::string, std::string> key =
-      std::pair<std::string, std::string>{library_name, library_version};
+      std::pair<std::string, std::string>{std::string{library_name}, std::string{library_version}};
 
   if (auto cached = tracers_[key])
   {

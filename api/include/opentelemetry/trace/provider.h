@@ -14,9 +14,8 @@ namespace trace
 class DefaultTracerProvider final : public opentelemetry::trace::TracerProvider
 {
 public:
-  opentelemetry::trace::NoopTracer *const GetTracer(
-      nostd::string_view library_name,
-      nostd::string_view library_version) override
+  opentelemetry::trace::NoopTracer *const GetTracer(nostd::string_view library_name,
+                                                    nostd::string_view library_version) override
   {
     return tracer_.get();
   }
