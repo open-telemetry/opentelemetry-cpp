@@ -24,10 +24,6 @@ public:
   {
     span_->AddEvent(name, timestamp);
   }
-  void AddEvent(nostd::string_view name, core::SteadyTimestamp timestamp) noexcept override
-  {
-    span_->AddEvent(name, timestamp);
-  }
 
   void SetStatus(trace::CanonicalCode code, nostd::string_view description) noexcept override
   {

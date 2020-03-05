@@ -35,12 +35,6 @@ void Span::AddEvent(nostd::string_view name, core::SystemTimestamp timestamp) no
   (void)timestamp;
 }
 
-void Span::AddEvent(nostd::string_view name, core::SteadyTimestamp timestamp) noexcept
-{
-  (void)name;
-  (void)timestamp;
-}
-
 void Span::SetStatus(trace_api::CanonicalCode code, nostd::string_view description) noexcept
 {
   std::lock_guard<std::mutex> lock_guard{mu_};

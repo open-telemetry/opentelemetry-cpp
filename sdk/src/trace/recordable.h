@@ -23,10 +23,9 @@ public:
   /**
    * Add an event to a span.
    * @param name the name of the event
-   * @param time_since_epoch the timestamp of the event
+   * @param timestamp the timestamp of the event
    */
-  virtual void AddEvent(nostd::string_view name,
-                        std::chrono::nanoseconds time_since_epoch) noexcept = 0;
+  virtual void AddEvent(nostd::string_view name, core::SystemTimestamp timestamp) noexcept = 0;
 
   /**
    * Set the status of the span.
