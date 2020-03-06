@@ -68,7 +68,8 @@ void Span::End() noexcept
 
 bool Span::IsRecording() const noexcept
 {
-  return true;
+  std::lock_guard<std::mutex> lock_guard{mu_};
+  return recordable_ != nullptr;
 }
 }  // namespace trace
 }  // namespace sdk
