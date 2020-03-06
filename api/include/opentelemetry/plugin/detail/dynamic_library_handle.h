@@ -1,7 +1,8 @@
 #pragma once
 
-namespace opentelemetry
-{
+#include "opentelemetry/version.h"
+
+OPENTELEMETRY_BEGIN_NAMESPACE
 namespace plugin
 {
 /**
@@ -13,4 +14,4 @@ public:
   virtual ~DynamicLibraryHandle() = default;
 };
 }  // namespace plugin
-}  // namespace opentelemetry
+OPENTELEMETRY_END_NAMESPACE

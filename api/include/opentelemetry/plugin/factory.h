@@ -4,9 +4,9 @@
 
 #include "opentelemetry/plugin/detail/utility.h"
 #include "opentelemetry/plugin/tracer.h"
+#include "opentelemetry/version.h"
 
-namespace opentelemetry
-{
+OPENTELEMETRY_BEGIN_NAMESPACE
 namespace plugin
 {
 /**
@@ -58,4 +58,4 @@ private:
   std::unique_ptr<FactoryImpl> factory_impl_;
 };
 }  // namespace plugin
-}  // namespace opentelemetry
+OPENTELEMETRY_END_NAMESPACE

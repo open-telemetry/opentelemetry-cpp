@@ -6,8 +6,9 @@
 #include <stdexcept>
 #include <string>
 
-namespace opentelemetry
-{
+#include "opentelemetry/version.h"
+
+OPENTELEMETRY_BEGIN_NAMESPACE
 namespace nostd
 {
 /**
@@ -125,4 +126,4 @@ inline std::ostream &operator<<(std::ostream &os, string_view s)
   return os.write(s.data(), static_cast<std::streamsize>(s.length()));
 }
 }  // namespace nostd
-}  // namespace opentelemetry
+OPENTELEMETRY_END_NAMESPACE

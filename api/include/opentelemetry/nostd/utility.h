@@ -3,8 +3,9 @@
 #include <cstddef>
 #include <initializer_list>
 
-namespace opentelemetry
-{
+#include "opentelemetry/version.h"
+
+OPENTELEMETRY_BEGIN_NAMESPACE
 namespace nostd
 {
 /**
@@ -53,4 +54,4 @@ size_t size(T (&array)[N]) noexcept
   return N;
 }
 }  // namespace nostd
-}  // namespace opentelemetry
+OPENTELEMETRY_END_NAMESPACE
