@@ -52,4 +52,3 @@ cc_test(
         "@com_google_googletest//:gtest_main",
     ],
 )
-
