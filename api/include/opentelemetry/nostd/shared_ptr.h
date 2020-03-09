@@ -65,21 +65,10 @@ private:
 public:
   shared_ptr() noexcept { new (buffer_.data) shared_ptr_wrapper{}; }
 
-  explicit shared_ptr(pointer ptr) noexcept
+  explicit shared_ptr(pointer ptr)
   {
-#if __EXCEPTIONS
-    try
-#endif
-    {
-      std::shared_ptr<T> ptr_(ptr);
-      new (buffer_.data) shared_ptr_wrapper{std::move(ptr_)};
-    }
-#if __EXCEPTIONS
-    catch (const std::bad_alloc &)
-    {
-      new (buffer_.data) shared_ptr_wrapper{};
-    }
-#endif
+    std::shared_ptr<T> ptr_(ptr);
+    new (buffer_.data) shared_ptr_wrapper{std::move(ptr_)};
   }
 
   shared_ptr(std::shared_ptr<T> ptr) noexcept
