@@ -8,8 +8,9 @@
 #  include "opentelemetry/plugin/detail/dynamic_load_unix.h"
 #endif
 
-namespace opentelemetry
-{
+#include "opentelemetry/version.h"
+
+OPENTELEMETRY_BEGIN_NAMESPACE
 namespace plugin
 {
 /**
@@ -20,4 +21,4 @@ namespace plugin
  */
 std::unique_ptr<Factory> LoadFactory(const char *plugin, std::string &error_message) noexcept;
 }  // namespace plugin
-}  // namespace opentelemetry
+OPENTELEMETRY_END_NAMESPACE

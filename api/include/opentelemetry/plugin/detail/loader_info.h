@@ -3,8 +3,7 @@
 #include "opentelemetry/nostd/string_view.h"
 #include "opentelemetry/version.h"
 
-namespace opentelemetry
-{
+OPENTELEMETRY_BEGIN_NAMESPACE
 namespace plugin
 {
 /**
@@ -19,4 +18,4 @@ struct LoaderInfo
   nostd::string_view opentelemetry_abi_version = OPENTELEMETRY_ABI_VERSION;
 };
 }  // namespace plugin
-}  // namespace opentelemetry
+OPENTELEMETRY_END_NAMESPACE
