@@ -21,6 +21,18 @@ public:
   int f() const { return 123; }
 };
 
+class C
+{
+public:
+  virtual ~C() {}
+};
+
+class D : public C
+{
+public:
+  virtual ~D() {}
+};
+
 TEST(SharedPtrTest, DefaultConstruction)
 {
   shared_ptr<int> ptr1;
@@ -32,13 +44,13 @@ TEST(SharedPtrTest, DefaultConstruction)
 
 TEST(SharedPtrTest, ExplicitConstruction)
 {
-  auto value = new int{123};
-  shared_ptr<int> ptr1{value};
-  EXPECT_EQ(ptr1.get(), value);
+  auto c = new C();
+  shared_ptr<C> ptr1{c};
+  EXPECT_EQ(ptr1.get(), c);
 
-  auto array = new int[5];
-  shared_ptr<int[]> ptr2{array};
-  EXPECT_EQ(ptr2.get(), array);
+  auto d = new D();
+  shared_ptr<C> ptr2{d};
+  EXPECT_EQ(ptr2.get(), d);
 }
 
 TEST(SharedPtrTest, MoveConstruction)
@@ -73,6 +85,28 @@ TEST(SharedPtrTest, Destruction)
   bool was_destructed;
   shared_ptr<A>{new A{was_destructed}};
   EXPECT_TRUE(was_destructed);
+}
+
+TEST(SharedPtrTest, Assignment)
+{
+  auto value = new int{123};
+  shared_ptr<int> ptr1;
+
+  ptr1 = shared_ptr<int>(value);
+  EXPECT_EQ(ptr1.get(), value);
+
+  ptr1 = nullptr;
+  EXPECT_EQ(ptr1.get(), nullptr);
+
+  auto value2                = new int{234};
+  const shared_ptr<int> ptr2 = shared_ptr<int>(value2);
+  ptr1                       = ptr2;
+  EXPECT_EQ(ptr1.get(), value2);
+
+  auto value3 = new int{345};
+  std::shared_ptr<int> ptr3(value3);
+  ptr1 = ptr3;
+  EXPECT_EQ(ptr1.get(), value3);
 }
 
 TEST(SharedPtrTest, BoolConversionOpertor)
@@ -134,7 +168,7 @@ TEST(SharedPtrTest, Sort)
   auto nums2 = nums;
 
   std::sort(nums.begin(), nums.end(),
-            [](shared_ptr<const int> &a, shared_ptr<const int> &b) { return *a < *b; });
+            [](shared_ptr<const int> a, shared_ptr<const int> b) { return *a < *b; });
 
   EXPECT_NE(nums, nums2);
 

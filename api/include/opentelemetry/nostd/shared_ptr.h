@@ -6,21 +6,6 @@ namespace opentelemetry
 {
 namespace nostd
 {
-namespace detail
-{
-template <class T>
-struct shared_ptr_element_type
-{
-  using type = T;
-};
-
-template <class T>
-struct shared_ptr_element_type<T[]>
-{
-  using type = T;
-};
-}  // namespace detail
-
 /**
  * Provide a type-erased version of std::shared_ptr that has ABI stability.
  */
@@ -28,7 +13,7 @@ template <class T>
 class shared_ptr
 {
 public:
-  using element_type = typename detail::shared_ptr_element_type<T>::type;
+  using element_type = T;
   using pointer      = element_type *;
 
 private:
@@ -128,26 +113,10 @@ public:
     return *this;
   }
 
-  template <class U,
-            typename std::enable_if<std::is_convertible<U *, pointer>::value>::type * = nullptr>
-  shared_ptr &operator=(shared_ptr<U> &&other) noexcept
-  {
-    wrapper().~shared_ptr_wrapper();
-    other.wrapper().CopyTo(buffer_);
-    return *this;
-  }
-
   shared_ptr &operator=(const shared_ptr &other) noexcept
   {
     wrapper().~shared_ptr_wrapper();
     other.wrapper().CopyTo(buffer_);
-    return *this;
-  }
-
-  shared_ptr &operator=(std::shared_ptr<T> other) noexcept
-  {
-    wrapper().~shared_ptr_wrapper();
-    new (buffer_.data) shared_ptr_wrapper{std::move(other)};
     return *this;
   }
 
