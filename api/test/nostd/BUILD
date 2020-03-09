@@ -41,3 +41,15 @@ cc_test(
         "@com_google_googletest//:gtest_main",
     ],
 )
+
+cc_test(
+    name = "shared_ptr_test",
+    srcs = [
+        "shared_ptr_test.cc",
+    ],
+    deps = [
+        "//api",
+        "@com_google_googletest//:gtest_main",
+    ],
+)
+
