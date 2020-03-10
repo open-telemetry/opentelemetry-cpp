@@ -8,9 +8,26 @@ project(opentelemetry-cpp)
 
 set(CMAKE_CXX_STANDARD 11)
 
+option(WITH_OTPROTOCOL
+  "Whether to include the OpenTelemetry Protocol in the SDK" OFF)
+
+set(WITH_PROTOBUF OFF)
+if (WITH_OTPROTOCOL)
+  set(WITH_PROTOBUF ON)
+endif()
+
 include(CTest)
 
 find_package(Threads)
+
+if (WITH_PROTOBUF)
+  set(protobuf_MODULE_COMPATIBLE ON)
+  find_package(Protobuf CONFIG NAMES protobuf)
+  # Older versions of protobuf don't use cmake config files.
+  if (NOT protobuf_FOUND)
+    find_package(Protobuf REQUIRED)
+  endif()
+endif()
 
 if(BUILD_TESTING)
   find_package(GTest REQUIRED)
