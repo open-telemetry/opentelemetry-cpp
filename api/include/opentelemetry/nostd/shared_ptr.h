@@ -117,7 +117,13 @@ public:
 
   pointer get() const noexcept { return wrapper().Get(); }
 
-  void swap(shared_ptr &other) noexcept { std::swap(buffer_, other.buffer_); }
+  void swap(shared_ptr<T> &other) noexcept
+  {
+    shared_ptr<T> tmp{std::move(other)};
+
+    wrapper().MoveTo(other.buffer_);
+    tmp.wrapper().MoveTo(buffer_);
+  }
 
   template <typename U>
   friend class shared_ptr;
