@@ -2,8 +2,9 @@
 
 #include <memory>
 
-namespace opentelemetry
-{
+#include "opentelemetry/version.h"
+
+OPENTELEMETRY_BEGIN_NAMESPACE
 namespace nostd
 {
 /**
@@ -178,4 +179,4 @@ inline bool operator!=(std::nullptr_t, const shared_ptr<T> &rhs) noexcept
   return nullptr != rhs.get();
 }
 }  // namespace nostd
-}  // namespace opentelemetry
+OPENTELEMETRY_END_NAMESPACE
