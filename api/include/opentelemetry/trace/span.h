@@ -76,7 +76,6 @@ public:
 
   // Adds an event to the Span, with a custom timestamp.
   virtual void AddEvent(nostd::string_view name, core::SystemTimestamp timestamp) noexcept = 0;
-  virtual void AddEvent(nostd::string_view name, core::SteadyTimestamp timestamp) noexcept = 0;
 
   // TODO
   // Adds an event to the Span, with a custom timestamp, and attributes.
