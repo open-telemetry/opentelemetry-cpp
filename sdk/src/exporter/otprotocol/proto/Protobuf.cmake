@@ -44,3 +44,6 @@ add_library(opentelemetry_exporter_otprotocol_proto OBJECT
     ${COMMON_PB_CPP_FILE}
     ${RESOURCE_PB_CPP_FILE}
     ${TRACE_PB_CPP_FILE})
+if (BUILD_SHARED_LIBS)
+  set_property(TARGET opentelemetry_exporter_otprotocol_proto PROPERTY POSITION_INDEPENDENT_CODE ON)
+endif()
