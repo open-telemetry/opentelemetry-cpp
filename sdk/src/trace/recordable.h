@@ -3,9 +3,9 @@
 #include "opentelemetry/core/timestamp.h"
 #include "opentelemetry/nostd/string_view.h"
 #include "opentelemetry/trace/canonical_code.h"
+#include "opentelemetry/version.h"
 
-namespace opentelemetry
-{
+OPENTELEMETRY_BEGIN_NAMESPACE
 namespace sdk
 {
 namespace trace
@@ -43,4 +43,4 @@ public:
 };
 }  // namespace trace
 }  // namespace sdk
-}  // namespace opentelemetry
+OPENTELEMETRY_END_NAMESPACE

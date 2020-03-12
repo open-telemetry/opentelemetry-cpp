@@ -1,7 +1,8 @@
 #include "src/trace/span.h"
 
-namespace opentelemetry
-{
+#include "opentelemetry/version.h"
+
+OPENTELEMETRY_BEGIN_NAMESPACE
 namespace sdk
 {
 namespace trace
@@ -73,4 +74,4 @@ bool Span::IsRecording() const noexcept
 }
 }  // namespace trace
 }  // namespace sdk
-}  // namespace opentelemetry
+OPENTELEMETRY_END_NAMESPACE
