@@ -1,10 +1,10 @@
-set(PROTO_PATH "${CMAKE_SOURCE_DIR}/sdk/src/exporter/otprotocol/proto")
+set(PROTO_PATH "${CMAKE_SOURCE_DIR}/sdk/proto")
 
 set(COMMON_PROTO "${PROTO_PATH}/opentelemetry/proto/common/v1/common.proto")
 set(RESOURCE_PROTO "${PROTO_PATH}/opentelemetry/proto/resource/v1/resource.proto")
 set(TRACE_PROTO "${PROTO_PATH}/opentelemetry/proto/trace/v1/trace.proto")
 
-set(GENERATED_PROTOBUF_PATH "${CMAKE_BINARY_DIR}/generated/src/sdk/exporter/otprotocol")
+set(GENERATED_PROTOBUF_PATH "${CMAKE_BINARY_DIR}/generated/sdk/proto")
 
 file(MAKE_DIRECTORY "${GENERATED_PROTOBUF_PATH}")
 
@@ -37,13 +37,12 @@ add_custom_command(
     ${TRACE_PROTO}
 )
 
-include_directories(SYSTEM "${CMAKE_BINARY_DIR}/generated")
-include_directories(SYSTEM "${CMAKE_BINARY_DIR}/generated/src/sdk/exporter/otprotocol")
+include_directories(SYSTEM "${CMAKE_BINARY_DIR}/generated/sdk/proto")
 
-add_library(opentelemetry_exporter_otprotocol_proto OBJECT
+add_library(opentelemetry_proto OBJECT
     ${COMMON_PB_CPP_FILE}
     ${RESOURCE_PB_CPP_FILE}
     ${TRACE_PB_CPP_FILE})
 if (BUILD_SHARED_LIBS)
-  set_property(TARGET opentelemetry_exporter_otprotocol_proto PROPERTY POSITION_INDEPENDENT_CODE ON)
+  set_property(TARGET opentelemetry_proto PROPERTY POSITION_INDEPENDENT_CODE ON)
 endif()
