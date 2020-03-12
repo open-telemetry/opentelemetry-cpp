@@ -114,6 +114,7 @@ jobs:
       - run: ./ci/setup_windows_cmake.ps1
       - run: ./ci/setup_windows_ci_environment.ps1
       - run: ./ci/do_ci.ps1 cmake.test
+      - run: ./ci/do_ci.sh cmake.exporter.otprotocol.test
 
   windows_plugin_test:
     executor: win/vs2019
