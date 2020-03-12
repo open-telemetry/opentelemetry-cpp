@@ -16,11 +16,11 @@ package(default_visibility = ["//visibility:public"])
 
 cc_library(
     name = "recordable",
-    hdrs = [
-        "recordable.h",
-    ],
     srcs = [
         "recordable.cc",
+    ],
+    hdrs = [
+        "recordable.h",
     ],
     include_prefix = "src/exporter/otprotocol",
     deps = [

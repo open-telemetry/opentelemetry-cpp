@@ -1,4 +1,4 @@
-if (WITH_OTPROTOCOL)
+if(WITH_OTPROTOCOL)
   include(proto/opentelemetry/Protobuf.cmake)
 endif()
 

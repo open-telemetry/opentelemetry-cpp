@@ -34,9 +34,9 @@ protobuf_deps()
 
 new_git_repository(
     name = "com_github_opentelemetry_proto",
-    remote = "https://github.com/open-telemetry/opentelemetry-proto",
-    commit = "d496c80b353bc4a4f754ae686b59ca3c41de0946",
     build_file = "//bazel:opentelemetry_proto.BUILD",
+    commit = "d496c80b353bc4a4f754ae686b59ca3c41de0946",
+    remote = "https://github.com/open-telemetry/opentelemetry-proto",
 )
 
 # GoogleTest framework.

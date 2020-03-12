@@ -4,7 +4,7 @@ set -e
 
 [ -z "${PROTOBUF_VERSION}" ] && export PROTOBUF_VERSION="3.11.4"
 
-apt-get update 
+apt-get update
 apt-get install --no-install-recommends --no-install-suggests -y \
          curl
 

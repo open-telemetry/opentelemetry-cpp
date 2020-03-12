@@ -2,8 +2,8 @@
 
 #include "opentelemetry/trace/span_id.h"
 #include "opentelemetry/trace/trace_id.h"
-#include "src/trace/recordable.h"
 #include "opentelemetry/version.h"
+#include "src/trace/recordable.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace sdk
