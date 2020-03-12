@@ -21,6 +21,7 @@ public:
 
   ~Span() override;
 
+  // trace_api::Span
   void AddEvent(nostd::string_view name) noexcept override;
 
   void AddEvent(nostd::string_view name, core::SystemTimestamp timestamp) noexcept override;

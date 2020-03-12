@@ -14,6 +14,7 @@ namespace trace
 class Tracer final : public trace_api::Tracer, public std::enable_shared_from_this<Tracer>
 {
 public:
+  // Note: recorder must be non-null
   explicit Tracer(std::unique_ptr<Recorder> &&recorder) noexcept : recorder_{std::move(recorder)} {}
 
   Recorder &recorder() const noexcept { return *recorder_; }
