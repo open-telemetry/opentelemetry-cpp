@@ -6,7 +6,7 @@ set -e
 
 cd /
 wget https://github.com/google/protobuf/releases/download/v${PROTOBUF_VERSION}/protobuf-cpp-${PROTOBUF_VERSION}.tar.gz
-tar zxf --no-same-owner protobuf-cpp-${PROTOBUF_VERSION}.tar.gz
+tar zxf protobuf-cpp-${PROTOBUF_VERSION}.tar.gz --no-same-owner
 cd protobuf-${PROTOBUF_VERSION}
 ./configure
 make && make install
