@@ -8,4 +8,3 @@ $VCPKG_DIR=(Get-Item -Path ".\").FullName
 ./vcpkg integrate install
 ./vcpkg install benchmark:x64-windows
 ./vcpkg install gtest:x64-windows
-./vcpkg install protobuf:x64-windows
