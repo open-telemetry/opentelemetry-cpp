@@ -12,7 +12,9 @@ jobs:
       - checkout
       - run: ./ci/setup_ci_environment.sh
       - run: ./ci/setup_cmake.sh
+      - run: ./ci/install_protobuf.sh
       - run: ./ci/do_ci.sh cmake.test
+      - run: ./ci/do_ci.sh cmake.exporter.otprotocol.test
       - store_artifacts:
           path: ~/build/Testing/Temporary/LastTest.log
           destination: Test.log
