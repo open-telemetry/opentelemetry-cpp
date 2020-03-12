@@ -1,9 +1,9 @@
 #pragma once
 
 #include "opentelemetry/trace/tracer.h"
+#include "opentelemetry/version.h"
 
-namespace opentelemetry
-{
+OPENTELEMETRY_BEGIN_NAMESPACE
 namespace plugin
 {
 /**
@@ -17,4 +17,4 @@ public:
   virtual trace::Tracer &tracer() const noexcept = 0;
 };
 }  // namespace plugin
-}  // namespace opentelemetry
+OPENTELEMETRY_END_NAMESPACE

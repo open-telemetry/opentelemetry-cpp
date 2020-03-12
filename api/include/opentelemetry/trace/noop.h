@@ -8,11 +8,11 @@
 #include "opentelemetry/nostd/unique_ptr.h"
 #include "opentelemetry/trace/span.h"
 #include "opentelemetry/trace/tracer.h"
+#include "opentelemetry/version.h"
 
 #include <memory>
 
-namespace opentelemetry
-{
+OPENTELEMETRY_BEGIN_NAMESPACE
 namespace trace
 {
 /**
@@ -55,4 +55,4 @@ public:
   }
 };
 }  // namespace trace
-}  // namespace opentelemetry
+OPENTELEMETRY_END_NAMESPACE

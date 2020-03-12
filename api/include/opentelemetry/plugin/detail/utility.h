@@ -4,9 +4,9 @@
 #include <string>
 
 #include "opentelemetry/nostd/string_view.h"
+#include "opentelemetry/version.h"
 
-namespace opentelemetry
-{
+OPENTELEMETRY_BEGIN_NAMESPACE
 namespace plugin
 {
 namespace detail
@@ -28,4 +28,4 @@ catch (const std::bad_alloc &)
 #endif
 }  // namespace detail
 }  // namespace plugin
-}  // namespace opentelemetry
+OPENTELEMETRY_END_NAMESPACE

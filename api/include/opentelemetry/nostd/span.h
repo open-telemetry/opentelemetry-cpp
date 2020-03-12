@@ -8,9 +8,9 @@
 #include <type_traits>
 
 #include "opentelemetry/nostd/utility.h"
+#include "opentelemetry/version.h"
 
-namespace opentelemetry
-{
+OPENTELEMETRY_BEGIN_NAMESPACE
 namespace nostd
 {
 constexpr size_t dynamic_extent = static_cast<size_t>(-1);
@@ -237,4 +237,4 @@ private:
   T *data_;
 };
 }  // namespace nostd
-}  // namespace opentelemetry
+OPENTELEMETRY_END_NAMESPACE
