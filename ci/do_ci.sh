@@ -20,7 +20,7 @@ if [[ "$1" == "cmake.test" ]]; then
   make
   make test
   exit 0
-if [[ "$1" == "cmake.exporter.otprotocol.test" ]]; then
+elif [[ "$1" == "cmake.exporter.otprotocol.test" ]]; then
   cd "${BUILD_DIR}"
   rm -rf *
   cmake -DCMAKE_BUILD_TYPE=Debug  \
