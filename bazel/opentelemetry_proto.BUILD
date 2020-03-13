@@ -18,9 +18,9 @@ load("@rules_proto//proto:defs.bzl", "proto_library")
 
 proto_library(
     name = "common_proto",
-    srcs = glob([
+    srcs = [
       "opentelemetry/proto/common/v1/common.proto",
-    ]),
+    ],
 )
 
 cc_proto_library(
@@ -30,9 +30,9 @@ cc_proto_library(
 
 proto_library(
     name = "resource_proto",
-    srcs = glob([
+    srcs = [
       "opentelemetry/proto/resource/v1/resource.proto",
-    ]),
+    ],
     deps = [
       ":common_proto",
     ],
@@ -45,9 +45,9 @@ cc_proto_library(
 
 proto_library(
     name = "trace_proto",
-    srcs = glob([
+    srcs = [
       "opentelemetry/proto/trace/v1/trace.proto",
-    ]),
+    ],
     deps = [
       ":common_proto",
       ":resource_proto",
