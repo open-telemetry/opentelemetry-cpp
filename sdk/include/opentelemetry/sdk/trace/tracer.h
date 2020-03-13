@@ -2,8 +2,7 @@
 
 #include "opentelemetry/trace/tracer.h"
 
-namespace opentelemetry
-{
+OPENTELEMETRY_BEGIN_NAMESPACE
 namespace sdk
 {
 namespace trace
@@ -18,4 +17,4 @@ public:
 
 }  // namespace trace
 }  // namespace sdk
-}  // namespace opentelemetry
+OPENTELEMETRY_END_NAMESPACE

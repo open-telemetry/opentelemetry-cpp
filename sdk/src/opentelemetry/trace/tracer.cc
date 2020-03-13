@@ -1,7 +1,6 @@
 #include "opentelemetry/sdk/trace/tracer.h"
 
-namespace opentelemetry
-{
+OPENTELEMETRY_BEGIN_NAMESPACE
 namespace sdk
 {
 namespace trace
@@ -15,4 +14,4 @@ nostd::unique_ptr<opentelemetry::trace::Span> Tracer::StartSpan(
 }
 }  // namespace trace
 }  // namespace sdk
-}  // namespace opentelemetry
+OPENTELEMETRY_END_NAMESPACE

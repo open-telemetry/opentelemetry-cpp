@@ -1,7 +1,26 @@
+load("//bazel:otel_cc_benchmark.bzl", "otel_cc_benchmark")
+
 cc_test(
-    name = "string_view_test",
+    name = "noop_test",
     srcs = [
-        "string_view_test.cc",
+        "noop_test.cc",
+    ],
+    deps = [
+        "//api",
+        "@com_google_googletest//:gtest_main",
+    ],
+)
+
+otel_cc_benchmark(
+    name = "span_id_benchmark",
+    srcs = ["span_id_benchmark.cc"],
+    deps = ["//api"],
+)
+
+cc_test(
+    name = "provider_test",
+    srcs = [
+        "provider_test.cc",
     ],
     deps = [
         "//api",
@@ -10,9 +29,9 @@ cc_test(
 )
 
 cc_test(
-    name = "unique_ptr_test",
+    name = "span_id_test",
     srcs = [
-        "unique_ptr_test.cc",
+        "span_id_test.cc",
     ],
     deps = [
         "//api",
@@ -21,9 +40,9 @@ cc_test(
 )
 
 cc_test(
-    name = "utility_test",
+    name = "trace_flags_test",
     srcs = [
-        "utility_test.cc",
+        "trace_flags_test.cc",
     ],
     deps = [
         "//api",
@@ -32,20 +51,9 @@ cc_test(
 )
 
 cc_test(
-    name = "span_test",
+    name = "trace_id_test",
     srcs = [
-        "span_test.cc",
-    ],
-    deps = [
-        "//api",
-        "@com_google_googletest//:gtest_main",
-    ],
-)
-
-cc_test(
-    name = "shared_ptr_test",
-    srcs = [
-        "shared_ptr_test.cc",
+        "trace_id_test.cc",
     ],
     deps = [
         "//api",

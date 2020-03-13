@@ -1,7 +1,6 @@
 #include "opentelemetry/sdk/trace/tracer_provider.h"
 
-namespace opentelemetry
-{
+OPENTELEMETRY_BEGIN_NAMESPACE
 namespace sdk
 {
 namespace trace
@@ -23,4 +22,4 @@ Tracer *const TracerProvider::GetTracer(nostd::string_view library_name,
 }
 }  // namespace trace
 }  // namespace sdk
-}  // namespace opentelemetry
+OPENTELEMETRY_END_NAMESPACE
