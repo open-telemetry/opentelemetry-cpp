@@ -13,6 +13,8 @@ namespace trace
 {
 /**
  * Maintains a representation of a span in a format that can be processed by a recorder.
+ *
+ * This class is thread-compatible.
  */
 class Recordable
 {

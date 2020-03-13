@@ -1,5 +1,7 @@
 #include "src/trace/span.h"
 
+#include "opentelemetry/version.h"
+
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace sdk
 {
