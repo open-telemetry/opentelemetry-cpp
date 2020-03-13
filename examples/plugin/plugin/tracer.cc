@@ -26,8 +26,6 @@ public:
 
   void AddEvent(nostd::string_view /*name*/, core::SystemTimestamp /*timestamp*/) noexcept override
   {}
-  void AddEvent(nostd::string_view /*name*/, core::SteadyTimestamp /*timestamp*/) noexcept override
-  {}
 
   void SetStatus(trace::CanonicalCode /*code*/,
                  nostd::string_view /*description*/) noexcept override

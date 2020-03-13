@@ -26,7 +26,6 @@ public:
   void AddEvent(nostd::string_view name) noexcept override {}
 
   void AddEvent(nostd::string_view name, core::SystemTimestamp timestamp) noexcept override {}
-  void AddEvent(nostd::string_view name, core::SteadyTimestamp timestamp) noexcept override {}
 
   void SetStatus(CanonicalCode code, nostd::string_view description) noexcept override {}
 
