@@ -1,8 +1,8 @@
 #pragma once
 
-#include <memory>
-#include <mutex>
+#include <atomic>
 
+#include "opentelemetry/nostd/shared_ptr.h"
 #include "opentelemetry/trace/noop.h"
 #include "opentelemetry/trace/tracer_provider.h"
 
@@ -13,18 +13,18 @@ namespace trace
 class DefaultTracerProvider final : public opentelemetry::trace::TracerProvider
 {
 public:
-  opentelemetry::trace::NoopTracer *const GetTracer(nostd::string_view library_name,
+    nostd::shared_ptr<opentelemetry::trace::Tracer> GetTracer(nostd::string_view library_name,
                                                     nostd::string_view library_version) override
   {
-    return tracer_.get();
+    return nostd::shared_ptr<opentelemetry::trace::Tracer>(tracer_);
   }
 
 private:
   DefaultTracerProvider()
       : tracer_{
-            std::shared_ptr<opentelemetry::trace::NoopTracer>(new opentelemetry::trace::NoopTracer)}
+            nostd::shared_ptr<opentelemetry::trace::NoopTracer>(new opentelemetry::trace::NoopTracer)}
   {}
-  std::shared_ptr<opentelemetry::trace::NoopTracer> tracer_;
+  nostd::shared_ptr<opentelemetry::trace::Tracer> tracer_;
 
   friend class Provider;
 };
@@ -32,31 +32,38 @@ private:
 class Provider
 {
 public:
-  static opentelemetry::trace::TracerProvider *GetTracerProvider()
+  static nostd::shared_ptr<TracerProvider> GetTracerProvider() noexcept
   {
-    std::lock_guard<std::mutex> guard{*GetMutex()};
-    return *GetProvider();
+    nostd::shared_ptr<TracerProvider>* ptr = GetProvider().load();
+
+    if (nullptr == ptr) {
+      SetTracerProvider(nostd::shared_ptr<TracerProvider>(new DefaultTracerProvider));
+
+      ptr = GetProvider().load();
+    }
+
+    return nostd::shared_ptr<TracerProvider>(*ptr);
   }
 
-  static TracerProvider *SetTracerProvider(TracerProvider *tp)
+  static void SetTracerProvider(nostd::shared_ptr<TracerProvider> tp) noexcept
   {
-    std::lock_guard<std::mutex> guard{*GetMutex()};
-    auto oldProvider = *GetProvider();
-    *GetProvider()   = tp;
-    return oldProvider;
+    delete GetProvider().load();
+
+    GetProvider().exchange(new nostd::shared_ptr<TracerProvider>(tp), std::memory_order_acq_rel);
+  }
+
+  static void SetTracerProvider(std::nullptr_t) noexcept
+  {
+    delete GetProvider().load();
+
+    GetProvider().exchange(nullptr, std::memory_order_acq_rel);
   }
 
 private:
-  static std::mutex *GetMutex()
+  static std::atomic<nostd::shared_ptr<TracerProvider>*>& GetProvider() noexcept
   {
-    static std::mutex *provider_mutex = new std::mutex;
-    return provider_mutex;
-  }
-
-  static opentelemetry::trace::TracerProvider **GetProvider()
-  {
-    static opentelemetry::trace::TracerProvider *provider = new DefaultTracerProvider;
-    return &provider;
+    static std::atomic<nostd::shared_ptr<TracerProvider>*> provider(new nostd::shared_ptr<TracerProvider>(new DefaultTracerProvider));
+    return provider;
   }
 };
 

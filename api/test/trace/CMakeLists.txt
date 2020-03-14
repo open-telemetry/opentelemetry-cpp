@@ -1,4 +1,4 @@
-foreach(testname noop_test span_id_test trace_id_test trace_flags_test)
+foreach(testname noop_test provider_test span_id_test trace_id_test trace_flags_test)
   add_executable(${testname} "${testname}.cc")
   target_link_libraries(${testname} ${GTEST_BOTH_LIBRARIES}
                         ${CMAKE_THREAD_LIBS_INIT} opentelemetry_api)

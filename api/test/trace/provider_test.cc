@@ -1,16 +1,18 @@
+#include "opentelemetry/nostd/shared_ptr.h"
 #include "opentelemetry/trace/provider.h"
 
 #include <gtest/gtest.h>
 
 using opentelemetry::trace::Provider;
+using opentelemetry::trace::TracerProvider;
 using opentelemetry::trace::Tracer;
 
-class TestProvider : public opentelemetry::trace::TracerProvider
+class TestProvider : public TracerProvider
 {
-  Tracer *const GetTracer(opentelemetry::nostd::string_view library_name,
+    opentelemetry::nostd::shared_ptr<Tracer> GetTracer(opentelemetry::nostd::string_view library_name,
                           opentelemetry::nostd::string_view library_version) override
   {
-    return nullptr;
+    return opentelemetry::nostd::shared_ptr<Tracer>(nullptr);
   }
 };
 
@@ -22,9 +24,13 @@ TEST(Provider, GetTracerProviderDefault)
 
 TEST(Provider, SetTracerProvider)
 {
-  auto tf = new TestProvider();
+  auto tf = opentelemetry::nostd::shared_ptr<TracerProvider>(new TestProvider());
   // Capture the default provider constructed in order to replace it
-  auto default_provider = Provider::SetTracerProvider(tf);
+  Provider::SetTracerProvider(tf);
   ASSERT_EQ(tf, Provider::GetTracerProvider());
-  delete Provider::SetTracerProvider(default_provider);
+
+  Provider::SetTracerProvider(nullptr);
+  auto default_provider = Provider::GetTracerProvider();
+
+  Provider::SetTracerProvider(nullptr);
 }
