@@ -1,21 +1,20 @@
-#include "opentelemetry/sdk/trace/tracer_provider.h"
+#include "opentelemetry/sdk/trace/default_tracer_provider.h"
 
 #include <gtest/gtest.h>
 
-using opentelemetry::sdk::trace::TracerProvider;
+using opentelemetry::sdk::trace::DefaultTracerProvider;
 
 TEST(TracerProvider, GetTracer)
 {
-  /*auto tf = TracerProvider();
+  auto tf = DefaultTracerProvider();
   auto t1 = tf.GetTracer("test");
   auto t2 = tf.GetTracer("test");
-  auto t3 = tf.GetTracer("different");
+  auto t3 = tf.GetTracer("different", "1.0.0");
   ASSERT_NE(nullptr, t1);
   ASSERT_NE(nullptr, t2);
   ASSERT_NE(nullptr, t3);
 
   // Should return a new instance each time
   ASSERT_EQ(t1, t2);
-  ASSERT_NE(t1, t3);
-  ASSERT_NE(t2, t3);*/
+  ASSERT_EQ(t1, t3);
 }
