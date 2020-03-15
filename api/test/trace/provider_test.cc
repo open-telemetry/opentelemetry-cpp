@@ -26,12 +26,6 @@ TEST(Provider, GetTracerProviderDefault)
 TEST(Provider, SetTracerProvider)
 {
   auto tf = opentelemetry::nostd::shared_ptr<TracerProvider>(new TestProvider());
-  // Capture the default provider constructed in order to replace it
   Provider::SetTracerProvider(tf);
   ASSERT_EQ(tf, Provider::GetTracerProvider());
-
-  Provider::SetTracerProvider(nullptr);
-  auto default_provider = Provider::GetTracerProvider();
-
-  Provider::SetTracerProvider(nullptr);
 }

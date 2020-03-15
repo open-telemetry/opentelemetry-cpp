@@ -9,64 +9,50 @@
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace trace
 {
-
-class DefaultTracerProvider final : public opentelemetry::trace::TracerProvider
-{
-public:
-  nostd::shared_ptr<opentelemetry::trace::Tracer> GetTracer(
-      nostd::string_view library_name,
-      nostd::string_view library_version) override
-  {
-    return nostd::shared_ptr<opentelemetry::trace::Tracer>(tracer_);
-  }
-
-private:
-  DefaultTracerProvider()
-      : tracer_{nostd::shared_ptr<opentelemetry::trace::NoopTracer>(
-            new opentelemetry::trace::NoopTracer)}
-  {}
-  nostd::shared_ptr<opentelemetry::trace::Tracer> tracer_;
-
-  friend class Provider;
-};
-
+/**
+ * Stores the singleton global TracerProvider.
+ */
 class Provider
 {
 public:
+  /**
+   * Returns the singleton TracerProvider.
+   *
+   * By default, a no-op TracerProvider is returned. This will never return a
+   * nullptr TracerProvider.
+   */
   static nostd::shared_ptr<TracerProvider> GetTracerProvider() noexcept
   {
-    nostd::shared_ptr<TracerProvider> *ptr = GetProvider().load();
+    while (GetLock().test_and_set(std::memory_order_acquire))
+      ;
+    auto provider = nostd::shared_ptr<TracerProvider>(GetProvider());
+    GetLock().clear(std::memory_order_release);
 
-    if (nullptr == ptr)
-    {
-      SetTracerProvider(nostd::shared_ptr<TracerProvider>(new DefaultTracerProvider));
-
-      ptr = GetProvider().load();
-    }
-
-    return nostd::shared_ptr<TracerProvider>(*ptr);
+    return provider;
   }
 
+  /**
+   * Changes the singleton TracerProvider.
+   */
   static void SetTracerProvider(nostd::shared_ptr<TracerProvider> tp) noexcept
   {
-    delete GetProvider().load();
-
-    GetProvider().exchange(new nostd::shared_ptr<TracerProvider>(tp), std::memory_order_acq_rel);
-  }
-
-  static void SetTracerProvider(std::nullptr_t) noexcept
-  {
-    delete GetProvider().load();
-
-    GetProvider().exchange(nullptr, std::memory_order_acq_rel);
+    while (GetLock().test_and_set(std::memory_order_acquire))
+      ;
+    GetProvider() = tp;
+    GetLock().clear(std::memory_order_release);
   }
 
 private:
-  static std::atomic<nostd::shared_ptr<TracerProvider> *> &GetProvider() noexcept
+  static nostd::shared_ptr<TracerProvider> &GetProvider() noexcept
   {
-    static std::atomic<nostd::shared_ptr<TracerProvider> *> provider(
-        new nostd::shared_ptr<TracerProvider>(new DefaultTracerProvider));
+    static nostd::shared_ptr<TracerProvider> provider(new NoopTracerProvider);
     return provider;
+  }
+
+  static std::atomic_flag &GetLock() noexcept
+  {
+    static std::atomic_flag lock = ATOMIC_FLAG_INIT;
+    return lock;
   }
 };
 
