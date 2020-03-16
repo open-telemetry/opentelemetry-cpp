@@ -63,24 +63,16 @@ regarding this will be documented in [ABI Policy](abi-policy.md).
 
 ## Recommendations
 
-### 1. Avoid multiple singletons
+### 1. Link OpenTelemetry plugins for portability.
 
-Multiple singletons could be linked in and available at run-time. For example,
-if an instrumented library statically links in the OpenTelemetry API, and then
-the application that loads this library statically links in its own. The
-consequences of this would be that even if the application registers a specific
-implementation/exporter using a singleton, the library will not be able to use
-this, and will need to somehow have its own singleton set.
-
-- **OpenTelemetry Libraries**: Can be distributed for linkage with any of the
-three models.
-
-- **OpenTelemetry Instrumented Libraries**: Can be distributed for linkage with
-any of the three models but SHOULD NOT statically link the OpenTelemetry API.
-
-- **OpenTelemetry Implementations or Exporters**: Can be distributed for linkage
-with any of the three models but SHOULD NOT statically link the OpenTelemetry
-API.
+If you're a vendor and you wish to distribute an OpenTelemetry plugin (either a full implementation of the API or an exporter), you need to take precautions when linking your plugin to ensure it's portable. Here are some steps you should follow:
+1. Ensure you compile to target portable architectures (e.g. x86-64).
+1. Statically link most dependencies. You should statically both external dependencies and the standard C++ library. The exceptions are the standard C library and other low-level system libraries that need to be dynamically linked.
+1. Use an export map to avoid unwanted symbol resolution. When statically linking dependencies in a dynamic library,
+you need be careful to the symbol resolution for dependencies doesn't conflict with that of the app or other dynamic libraries.
+See this [StackOverflow post](https://stackoverflow.com/q/47841812/4447365) for more information.
+1. Re-map symbols from the standard C library to portable versions. If you want to plugin to work on systems with different
+versions of the standard C library, you need to link to portable symbols. See this [StackOverflow answer](https://stackoverflow.com/a/20065096/4447365) for how to do this.
 
 ## Example Scenarios
 
@@ -93,8 +85,20 @@ singletons.
 
 ### Dynamically linked binary executable
 
-TBD: As above but with dynamic linkage
+An application can link to the OpenTelemetry API but dyanamically load an implementation at runtime.
+Under this mode, an application can work with any vendor's implementation by using it as a plugin.
+
+For example, a C++ database server might add support for the OpenTelemetry API and exposes
+configuration options that let a user point to a vendor's plugin and load it with a JSON config.
+(With OpenTracing, Ceph explored a deployment scenario similar to this. See https://www.spinics.net/lists/ceph-devel/msg41007.html)
 
 ### Non OpenTelemetry aware application with OpenTelemetry capability library
 
-TBD: Nginx Case
+An application itself may not be OpenTelemetry-aware, but it can support OpenTelemetry via extensions.
+
+Examples:
+* The core NGINX application has no knowledge of tracing. However, through NGINX's dynamic module capability,
+tracing can be supported as a plugin. The [nginx-opentracing module](https://github.com/opentracing-contrib/nginx-opentracing), for instance, provides this type of extension and is used by projects such as Kubernete's [ingress controller](https://kubernetes.github.io/ingress-nginx/user-guide/third-party-addons/opentracing/).
+* The CPython binary also has no knowledge of OpenTelemetry, but C++ Python extension modules can be instrumented for OpenTelemetry.
+
+Additionally, hen multiple OpenTelemetry-aware extensions co-exist in the same application, the extensions should be able to coordinate and share context through the OpenTelemetry API's singletons.
