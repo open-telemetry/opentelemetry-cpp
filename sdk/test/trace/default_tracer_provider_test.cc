@@ -14,7 +14,7 @@ TEST(TracerProvider, GetTracer)
   ASSERT_NE(nullptr, t2);
   ASSERT_NE(nullptr, t3);
 
-  // Should return a new instance each time
+  // Should return the same instance each time.
   ASSERT_EQ(t1, t2);
   ASSERT_EQ(t1, t3);
 }

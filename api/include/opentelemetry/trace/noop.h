@@ -71,7 +71,7 @@ public:
       nostd::string_view library_name,
       nostd::string_view library_version) override
   {
-    return nostd::shared_ptr<opentelemetry::trace::Tracer>(tracer_);
+    return tracer_;
   }
 
 private:
