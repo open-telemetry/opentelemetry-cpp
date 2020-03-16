@@ -11,7 +11,7 @@ The OpenTelemetry-cpp libraries (API and SDK) and any library that depends on
 them are expected to be distributed as either "source" or "binary" artifacts.
 This document defines these distribution models as:
 
-- **Source** - The source code is shipped as-is and can be built as desired
+- **Source** - The source code is shipped as-is and can be built as desired.
 - **Binary** - The library and/or its dependants may be distributed as pre-built
 binaries which can be built using different toolchains or compilers.
 
