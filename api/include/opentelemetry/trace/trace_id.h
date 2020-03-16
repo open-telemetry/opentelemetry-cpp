@@ -18,9 +18,9 @@
 #include <cstring>
 
 #include "opentelemetry/nostd/span.h"
+#include "opentelemetry/version.h"
 
-namespace opentelemetry
-{
+OPENTELEMETRY_BEGIN_NAMESPACE
 namespace trace
 {
 
@@ -80,4 +80,4 @@ private:
 };
 
 }  // namespace trace
-}  // namespace opentelemetry
+OPENTELEMETRY_END_NAMESPACE

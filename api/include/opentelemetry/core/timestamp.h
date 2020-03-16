@@ -4,8 +4,9 @@
 #include <chrono>
 #include <cstdint>
 
-namespace opentelemetry
-{
+#include "opentelemetry/version.h"
+
+OPENTELEMETRY_BEGIN_NAMESPACE
 namespace core
 {
 /**
@@ -82,4 +83,4 @@ private:
   int64_t nanos_since_epoch_;
 };
 }  // namespace core
-}  // namespace opentelemetry
+OPENTELEMETRY_END_NAMESPACE

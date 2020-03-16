@@ -33,8 +33,12 @@ TEST(UniquePtrTest, DefaultConstruction)
 TEST(UniquePtrTest, ExplicitConstruction)
 {
   auto value = new int{123};
-  unique_ptr<int> ptr{value};
-  EXPECT_EQ(ptr.get(), value);
+  unique_ptr<int> ptr1{value};
+  EXPECT_EQ(ptr1.get(), value);
+
+  auto array = new int[5];
+  unique_ptr<int[]> ptr2{array};
+  EXPECT_EQ(ptr2.get(), array);
 }
 
 TEST(UniquePtrTest, MoveConstruction)

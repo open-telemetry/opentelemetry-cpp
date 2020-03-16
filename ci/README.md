@@ -3,7 +3,9 @@
 CI tests can be run on docker by invoking the script `./ci/run_docker.sh ./ci/do_ci.sh <TARGET>` where the targets are:
 
 * `cmake.test`: build cmake targets and run tests.
+* `cmake.test_example_plugin`: build and test an example OpenTelemetry plugin.
 * `bazel.test`: build bazel targets and run tests.
+* `bazel.noexcept`: build bazel targets and run tests with exceptions disabled.
 * `bazel.asan`: build bazel targets and run tests with AddressSanitizer.
 * `benchmark`: run all benchmarks.
 * `format`: use `tools/format.sh` to enforce text formatting.
