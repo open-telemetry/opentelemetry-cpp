@@ -48,7 +48,7 @@ different binding models and the recommendations.
 - **OpenTelemetry Implementations or Exporters** - A specific implementation of
   the OpenTelemetry API or the `exporters` may be provided externally (e.g.
   distributed by a vendor).
-- **Executable Binary** - The compiled binary that has `main()`, this also
+- **Binary Executable** - The compiled binary that has `main()`, this also
   includes interpreters such as Python which will be considered. This binary may
   itself instrument using OpenTelemetry or register a specific implementation.
 
@@ -76,9 +76,9 @@ follow:
    library and other low-level system libraries that need to be dynamically
    linked.
 1. Use an export map to avoid unwanted symbol resolution. When statically
-   linking dependencies in a dynamic library, you need be careful to the symbol
-   resolution for dependencies doesn't conflict with that of the app or other
-   dynamic libraries. See this
+   linking dependencies in a dynamic library, care should be taken to make sure
+   that symbol resolution for dependencies doesn't conflict with that of the app
+   or other dynamic libraries. See this
    [StackOverflow post](https://stackoverflow.com/q/47841812/4447365) for more
    information.
 1. Re-map symbols from the standard C library to portable versions. If you want
@@ -91,14 +91,14 @@ follow:
 
 ### Statically compiled binary executable
 
-Executable binaries can be distributed with static linkage for all libraries
+Binary executable can be distributed with static linkage ,for all libraries
 known at compile time. In this case the OpenTelemetry API Library can be linked
 in statically, guaranteeing that only a single symbol is exported for
 singletons.
 
 ### Dynamically linked binary executable
 
-An application can link to the OpenTelemetry API but dyanamically load an
+An application can link to the OpenTelemetry API but dynamically load an
 implementation at runtime. Under this mode, an application can work with any
 vendor's implementation by using it as a plugin.
 
@@ -116,14 +116,14 @@ OpenTelemetry via extensions.
 Examples:
 
 - The core NGINX application has no knowledge of tracing. However, through
-  NGINX's dynamic module capability, tracing can be supported as a plugin. The
-  [nginx-opentracing module](https://github.com/opentracing-contrib/nginx-opentracing),
-  for instance, provides this type of extension and is used by projects such as
-  Kubernete's
+  NGINX's dynamic module capability, tracing can be supported as a plugin. For
+  instance, the
+  [nginx-opentracing module](https://github.com/opentracing-contrib/nginx-opentracing)
+  provides this type of extension and is used by projects such as Kubernete's
   [ingress controller](https://kubernetes.github.io/ingress-nginx/user-guide/third-party-addons/opentracing/).
 - The CPython binary also has no knowledge of OpenTelemetry, but C++ Python
   extension modules can be instrumented for OpenTelemetry.
 
-Additionally, hen multiple OpenTelemetry-aware extensions co-exist in the same
+Additionally, when multiple OpenTelemetry-aware extensions co-exist in the same
 application, the extensions should be able to coordinate and share context
 through the OpenTelemetry API's singletons.
