@@ -39,6 +39,12 @@ new_git_repository(
     remote = "https://github.com/open-telemetry/opentelemetry-proto",
 )
 
+# new_local_repository(
+#     name = "com_github_opentelemetry_proto",
+#     build_file = "//bazel:opentelemetry_proto.BUILD",
+#     path = "sdk/proto/opentelemetry",
+# )
+
 # GoogleTest framework.
 # Only needed for tests, not to build the OpenTelemetry library.
 http_archive(
