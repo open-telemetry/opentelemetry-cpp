@@ -18,7 +18,6 @@ class Tracer
 {
 public:
   virtual ~Tracer() = default;
-
   /**
    * Starts a span.
    */
