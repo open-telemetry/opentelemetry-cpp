@@ -24,3 +24,27 @@ cc_library(
       "//api",
   ]
 )
+
+cc_library(
+  name = "circular_buffer_range",
+  hdrs = [
+      "circular_buffer_range.h",
+  ],
+  include_prefix = "src/common",
+  deps = [
+      "//api",
+  ]
+)
+
+cc_library(
+  name = "circular_buffer",
+  hdrs = [
+      "circular_buffer.h",
+  ],
+  include_prefix = "src/common",
+  deps = [
+      "//api",
+      ":atomic_unique_ptr",
+      ":circular_buffer_range",
+  ]
+)
