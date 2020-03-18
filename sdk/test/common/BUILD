@@ -1,3 +1,5 @@
+load("//bazel:otel_cc_benchmark.bzl", "otel_cc_benchmark")
+
 cc_test(
     name = "atomic_unique_ptr_test",
     srcs = [
@@ -28,5 +30,24 @@ cc_test(
     deps = [
         "//sdk/src/common:circular_buffer",
         "@com_google_googletest//:gtest_main",
+    ],
+)
+
+cc_library(
+    name = "baseline_circular_buffer",
+    hdrs = [
+        "baseline_circular_buffer.h",
+    ],
+    deps = [
+        "//api",
+    ],
+)
+
+otel_cc_benchmark(
+    name = "circular_buffer_benchmark",
+    srcs = ["circular_buffer_benchmark.cc"],
+    deps = [
+        "//sdk/src/common:circular_buffer",
+        ":baseline_circular_buffer",
     ],
 )
