@@ -38,6 +38,7 @@ cc_library(
     hdrs = [
         "baseline_circular_buffer.h",
     ],
+    include_prefix = "test/common",
     deps = [
         "//api",
     ],
