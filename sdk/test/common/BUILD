@@ -47,7 +47,7 @@ otel_cc_benchmark(
     name = "circular_buffer_benchmark",
     srcs = ["circular_buffer_benchmark.cc"],
     deps = [
-        "//sdk/src/common:circular_buffer",
         ":baseline_circular_buffer",
+        "//sdk/src/common:circular_buffer",
     ],
 )

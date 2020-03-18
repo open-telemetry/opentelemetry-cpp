@@ -8,8 +8,8 @@
 #include <thread>
 #include <vector>
 
-#include "src/common/circular_buffer.h"
 #include "sdk/test/common/baseline_circular_buffer.h"
+#include "src/common/circular_buffer.h"
 using opentelemetry::sdk::common::AtomicUniquePtr;
 using opentelemetry::sdk::common::CircularBuffer;
 using opentelemetry::sdk::common::CircularBufferRange;
@@ -20,21 +20,21 @@ const int N = 10000;
 //--------------------------------------------------------------------------------------------------
 // ConsumeBufferNumbers
 //--------------------------------------------------------------------------------------------------
-uint64_t ConsumeBufferNumbers(
-    BaselineCircularBuffer<uint64_t>& buffer) noexcept {
+uint64_t ConsumeBufferNumbers(BaselineCircularBuffer<uint64_t> &buffer) noexcept
+{
   uint64_t result = 0;
-  buffer.Consume([&](std::unique_ptr<uint64_t>&& x) {
+  buffer.Consume([&](std::unique_ptr<uint64_t> &&x) {
     result += *x;
     x.reset();
   });
   return result;
 }
 
-uint64_t ConsumeBufferNumbers(CircularBuffer<uint64_t>& buffer) noexcept {
+uint64_t ConsumeBufferNumbers(CircularBuffer<uint64_t> &buffer) noexcept
+{
   uint64_t result = 0;
   buffer.Consume(
-      buffer.size(), [&](CircularBufferRange<AtomicUniquePtr<uint64_t>> &
-                         range) noexcept {
+      buffer.size(), [&](CircularBufferRange<AtomicUniquePtr<uint64_t>> & range) noexcept {
         range.ForEach([&](AtomicUniquePtr<uint64_t> & ptr) noexcept {
           result += *ptr;
           ptr.Reset();
@@ -48,13 +48,15 @@ uint64_t ConsumeBufferNumbers(CircularBuffer<uint64_t>& buffer) noexcept {
 // GenerateNumbersForThread
 //--------------------------------------------------------------------------------------------------
 template <class Buffer>
-static void GenerateNumbersForThread(Buffer& buffer, int n,
-                                     std::atomic<uint64_t>& sum) noexcept {
+static void GenerateNumbersForThread(Buffer &buffer, int n, std::atomic<uint64_t> &sum) noexcept
+{
   thread_local std::mt19937_64 random_number_generator{std::random_device{}()};
-  for (int i = 0; i < n; ++i) {
+  for (int i = 0; i < n; ++i)
+  {
     auto x = random_number_generator();
     std::unique_ptr<uint64_t> element{new uint64_t{x}};
-    if (buffer.Add(element)) {
+    if (buffer.Add(element))
+    {
       sum += x;
     }
   }
@@ -64,15 +66,16 @@ static void GenerateNumbersForThread(Buffer& buffer, int n,
 // GenerateNumbers
 //--------------------------------------------------------------------------------------------------
 template <class Buffer>
-static uint64_t GenerateNumbers(Buffer& buffer, int num_threads,
-                                int n) noexcept {
+static uint64_t GenerateNumbers(Buffer &buffer, int num_threads, int n) noexcept
+{
   std::atomic<uint64_t> sum{0};
   std::vector<std::thread> threads(num_threads);
-  for (auto& thread : threads) {
-    thread = std::thread{GenerateNumbersForThread<Buffer>, std::ref(buffer), n,
-                         std::ref(sum)};
+  for (auto &thread : threads)
+  {
+    thread = std::thread{GenerateNumbersForThread<Buffer>, std::ref(buffer), n, std::ref(sum)};
   }
-  for (auto& thread : threads) {
+  for (auto &thread : threads)
+  {
     thread.join();
   }
   return sum;
@@ -82,9 +85,10 @@ static uint64_t GenerateNumbers(Buffer& buffer, int num_threads,
 // ConsumeNumbers
 //--------------------------------------------------------------------------------------------------
 template <class Buffer>
-static void ConsumeNumbers(Buffer& buffer, uint64_t& sum,
-                           std::atomic<bool>& finished) noexcept {
-  while (!finished) {
+static void ConsumeNumbers(Buffer &buffer, uint64_t &sum, std::atomic<bool> &finished) noexcept
+{
+  while (!finished)
+  {
     sum += ConsumeBufferNumbers(buffer);
   }
   sum += ConsumeBufferNumbers(buffer);
@@ -94,15 +98,17 @@ static void ConsumeNumbers(Buffer& buffer, uint64_t& sum,
 // RunSimulation
 //--------------------------------------------------------------------------------------------------
 template <class Buffer>
-static void RunSimulation(Buffer& buffer, int num_threads, int n) noexcept {
+static void RunSimulation(Buffer &buffer, int num_threads, int n) noexcept
+{
   std::atomic<bool> finished{false};
   uint64_t consumer_sum{0};
-  std::thread consumer_thread{ConsumeNumbers<Buffer>, std::ref(buffer),
-                              std::ref(consumer_sum), std::ref(finished)};
+  std::thread consumer_thread{ConsumeNumbers<Buffer>, std::ref(buffer), std::ref(consumer_sum),
+                              std::ref(finished)};
   uint64_t producer_sum = GenerateNumbers(buffer, num_threads, n);
-  finished = true;
+  finished              = true;
   consumer_thread.join();
-  if (consumer_sum != producer_sum) {
+  if (consumer_sum != producer_sum)
+  {
     std::cerr << "Sumulation failed: consumer_sum != producer_sum\n";
     std::terminate();
   }
@@ -111,12 +117,14 @@ static void RunSimulation(Buffer& buffer, int num_threads, int n) noexcept {
 //--------------------------------------------------------------------------------------------------
 // BM_BaselineBuffer
 //--------------------------------------------------------------------------------------------------
-static void BM_BaselineBuffer(benchmark::State& state) {
+static void BM_BaselineBuffer(benchmark::State &state)
+{
   const size_t max_elements = 500;
-  auto num_threads = state.range(0);
-  const int n = N / num_threads;
+  auto num_threads          = state.range(0);
+  const int n               = N / num_threads;
   BaselineCircularBuffer<uint64_t> buffer{max_elements};
-  for (auto _ : state) {
+  for (auto _ : state)
+  {
     RunSimulation(buffer, num_threads, n);
   }
 }
@@ -126,12 +134,14 @@ BENCHMARK(BM_BaselineBuffer)->Arg(1)->Arg(2)->Arg(4);
 //--------------------------------------------------------------------------------------------------
 // BM_LockFreeBuffer
 //--------------------------------------------------------------------------------------------------
-static void BM_LockFreeBuffer(benchmark::State& state) {
+static void BM_LockFreeBuffer(benchmark::State &state)
+{
   const size_t max_elements = 500;
-  auto num_threads = state.range(0);
-  const int n = N / num_threads;
+  auto num_threads          = state.range(0);
+  const int n               = N / num_threads;
   CircularBuffer<uint64_t> buffer{max_elements};
-  for (auto _ : state) {
+  for (auto _ : state)
+  {
     RunSimulation(buffer, num_threads, n);
   }
 }

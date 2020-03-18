@@ -9,20 +9,24 @@
 #include "opentelemetry/version.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
-namespace sdk {
-namespace common {
+namespace sdk
+{
+namespace common
+{
 /**
  * A non-owning view into a range of elements in a circular buffer.
  */
 template <class T>
-class CircularBufferRange {
- public:
+class CircularBufferRange
+{
+public:
   CircularBufferRange() noexcept = default;
 
   explicit CircularBufferRange(nostd::span<T> first) noexcept : first_{first} {}
 
   CircularBufferRange(nostd::span<T> first, nostd::span<T> second) noexcept
-    : first_{first}, second_{second} {}
+      : first_{first}, second_{second}
+  {}
 
   operator CircularBufferRange<const T>() const noexcept { return {first_, second_}; }
 
@@ -33,14 +37,19 @@ class CircularBufferRange {
    */
   template <class Callback>
   bool ForEach(Callback callback) const
-      noexcept(noexcept(std::declval<Callback>()(std::declval<T&>()))) {
-    for (auto& value : first_) {
-      if (!callback(value)) {
+      noexcept(noexcept(std::declval<Callback>()(std::declval<T &>())))
+  {
+    for (auto &value : first_)
+    {
+      if (!callback(value))
+      {
         return false;
       }
     }
-    for (auto& value : second_) {
-      if (!callback(value)) {
+    for (auto &value : second_)
+    {
+      if (!callback(value))
+      {
         return false;
       }
     }
@@ -72,10 +81,10 @@ class CircularBufferRange {
     return {first_, nostd::span<T>{second_.data(), n - first_.size()}};
   }
 
- private:
+private:
   nostd::span<T> first_;
   nostd::span<T> second_;
 };
-} // namespace common
-} // namespace sdk
+}  // namespace common
+}  // namespace sdk
 OPENTELEMETRY_END_NAMESPACE

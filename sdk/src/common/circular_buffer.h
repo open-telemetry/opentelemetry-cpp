@@ -9,27 +9,30 @@
 #include "src/common/circular_buffer_range.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
-namespace sdk {
-namespace common {
+namespace sdk
+{
+namespace common
+{
 /*
  * A lock-free circular buffer that supports multiple concurrent producers
  * and a single consumer.
  */
 template <class T>
-class CircularBuffer {
- public:
-   explicit CircularBuffer(size_t max_size)
-       : data_{new AtomicUniquePtr<T>[max_size + 1]}, capacity_{max_size + 1}
-   {}
+class CircularBuffer
+{
+public:
+  explicit CircularBuffer(size_t max_size)
+      : data_{new AtomicUniquePtr<T>[max_size + 1]}, capacity_{max_size + 1}
+  {}
 
-   /**
-    * @return a range of the elements in the circular buffer
-    *
-    * Note: This method must only be called from the consumer thread.
-    */
-   CircularBufferRange<const AtomicUniquePtr<T>> Peek() const noexcept
-   {
-     return const_cast<CircularBuffer *>(this)->PeekImpl();
+  /**
+   * @return a range of the elements in the circular buffer
+   *
+   * Note: This method must only be called from the consumer thread.
+   */
+  CircularBufferRange<const AtomicUniquePtr<T>> Peek() const noexcept
+  {
+    return const_cast<CircularBuffer *>(this)->PeekImpl();
   }
 
   /**
@@ -43,7 +46,8 @@ class CircularBuffer {
    * Note: This method must only be called from the consumer thread.
    */
   template <class Callback>
-  void Consume(size_t n, Callback callback) noexcept {
+  void Consume(size_t n, Callback callback) noexcept
+  {
     assert(n <= static_cast<size_t>(head_ - tail_));
     auto range = PeekImpl().Take(n);
     static_assert(noexcept(callback(range)), "callback not allowed to throw");
@@ -57,14 +61,14 @@ class CircularBuffer {
    *
    * Note: This method must only be called from the consumer thread.
    */
-  void Consume(size_t n) noexcept {
-    Consume(
-        n, [](CircularBufferRange<AtomicUniquePtr<T>> & range) noexcept {
-          range.ForEach([](AtomicUniquePtr<T> & ptr) noexcept {
-            ptr.Reset();
-            return true;
-          });
-        });
+  void Consume(size_t n) noexcept
+  {
+    Consume(n, [](CircularBufferRange<AtomicUniquePtr<T>> & range) noexcept {
+      range.ForEach([](AtomicUniquePtr<T> & ptr) noexcept {
+        ptr.Reset();
+        return true;
+      });
+    });
   }
 
   /**
@@ -72,8 +76,10 @@ class CircularBuffer {
    * @param ptr a pointer to the element to add
    * @return true if the element was successfully added; false, otherwise.
    */
-  bool Add(std::unique_ptr<T>& ptr) noexcept {
-    while (true) {
+  bool Add(std::unique_ptr<T> &ptr) noexcept
+  {
+    while (true)
+    {
       uint64_t tail = tail_;
       uint64_t head = head_;
 
@@ -84,12 +90,13 @@ class CircularBuffer {
       }
 
       uint64_t head_index = head % capacity_;
-      if (data_[head_index].SwapIfNull(ptr)) {
-        auto new_head = head + 1;
+      if (data_[head_index].SwapIfNull(ptr))
+      {
+        auto new_head      = head + 1;
         auto expected_head = head;
-        if (head_.compare_exchange_weak(expected_head, new_head,
-                                        std::memory_order_release,
-                                        std::memory_order_relaxed)) {
+        if (head_.compare_exchange_weak(expected_head, new_head, std::memory_order_release,
+                                        std::memory_order_relaxed))
+        {
           // free the swapped out value
           ptr.reset();
 
@@ -128,7 +135,8 @@ class CircularBuffer {
    * Note: this method will only return a correct snapshot of the size if called
    * from the consumer thread.
    */
-  size_t size() const noexcept {
+  size_t size() const noexcept
+  {
     uint64_t tail = tail_;
     uint64_t head = head_;
     assert(tail <= head);
@@ -145,7 +153,7 @@ class CircularBuffer {
    */
   uint64_t production_count() const noexcept { return head_; }
 
- private:
+private:
   std::unique_ptr<AtomicUniquePtr<T>[]> data_;
   size_t capacity_;
   std::atomic<uint64_t> head_{0};
@@ -169,6 +177,6 @@ class CircularBuffer {
             nostd::span<AtomicUniquePtr<T>>{data, head_index}};
   }
 };
-} // namespace common
-} // namespace sdk
+}  // namespace common
+}  // namespace sdk
 OPENTELEMETRY_END_NAMESPACE

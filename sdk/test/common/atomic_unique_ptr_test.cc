@@ -3,7 +3,8 @@
 #include <gtest/gtest.h>
 using opentelemetry::sdk::common::AtomicUniquePtr;
 
-TEST(AtomicUniquePtrTest, SwapIfNullWithNull) {
+TEST(AtomicUniquePtrTest, SwapIfNullWithNull)
+{
   AtomicUniquePtr<int> ptr;
   EXPECT_TRUE(ptr.IsNull());
 
