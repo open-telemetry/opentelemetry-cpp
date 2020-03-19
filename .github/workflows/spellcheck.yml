@@ -1,0 +1,29 @@
+name: spellcheck
+
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: check out code
+      uses: actions/checkout@v2
+
+    - name: install misspell
+      run: |
+        curl -L -o ./install-misspell.sh https://git.io/misspell
+        sh ./install-misspell.sh
+
+    - name: run misspell
+      run: |
+        ./bin/misspell -error ./**/*.h
+        ./bin/misspell -error ./**/*.cc
+        ./bin/misspell -error ./**/*.cmd
+        ./bin/misspell -error ./**/*.md
+        ./bin/misspell -error ./**/*.sh
+        ./bin/misspell -error ./**/*.txt
