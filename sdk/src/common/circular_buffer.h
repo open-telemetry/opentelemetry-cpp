@@ -38,7 +38,7 @@ public:
   /**
    * Consume elements from the circular buffer's tail.
    * @param n the number of elements to consume
-   * @param callback the callback to invoke with a AtomicUniquePtr to each
+   * @param callback the callback to invoke with an AtomicUniquePtr to each
    * consumed element.
    *
    * Note: The callback must set the passed AtomicUniquePtr to null.
