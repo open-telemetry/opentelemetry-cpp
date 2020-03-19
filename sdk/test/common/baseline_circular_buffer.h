@@ -30,7 +30,7 @@ public:
 
   bool Add(std::unique_ptr<T> &&element) noexcept
   {
-    std::lock_guard<std::mutex> lock_gaurd{mutex_};
+    std::lock_guard<std::mutex> lock_guard{mutex_};
     if (tail_ + data_.size() == head_)
     {
       return false;

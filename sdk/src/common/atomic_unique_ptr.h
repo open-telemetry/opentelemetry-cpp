@@ -59,7 +59,7 @@ public:
    * Atomically swap the pointer with another.
    * @param ptr the pointer to swap with
    */
-  void Swap(std::unique_ptr<T> &ptr) noexcept { ptr.reset(ptr_.exchange(ptr.release())); }
+  void Swap(std::unique_ptr<T> &other) noexcept { ptr.reset(ptr_.exchange(other.release())); }
 
   /**
    * Set the pointer to a new value and delete the current value if non-null.
