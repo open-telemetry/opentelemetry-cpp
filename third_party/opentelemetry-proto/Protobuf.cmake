@@ -1,10 +1,10 @@
-set(PROTO_PATH "${CMAKE_SOURCE_DIR}/sdk/proto")
+set(PROTO_PATH "${CMAKE_SOURCE_DIR}/third_party/opentelemetry-proto")
 
 set(COMMON_PROTO "${PROTO_PATH}/opentelemetry/proto/common/v1/common.proto")
 set(RESOURCE_PROTO "${PROTO_PATH}/opentelemetry/proto/resource/v1/resource.proto")
 set(TRACE_PROTO "${PROTO_PATH}/opentelemetry/proto/trace/v1/trace.proto")
 
-set(GENERATED_PROTOBUF_PATH "${CMAKE_BINARY_DIR}/generated/sdk/proto")
+set(GENERATED_PROTOBUF_PATH "${CMAKE_BINARY_DIR}/generated/third_party/opentelemetry-proto")
 
 file(MAKE_DIRECTORY "${GENERATED_PROTOBUF_PATH}")
 
@@ -37,7 +37,7 @@ add_custom_command(
     ${TRACE_PROTO}
 )
 
-include_directories(SYSTEM "${CMAKE_BINARY_DIR}/generated/sdk/proto")
+include_directories(SYSTEM "${CMAKE_BINARY_DIR}/generated/third_party/opentelemetry-proto")
 
 add_library(opentelemetry_proto OBJECT
     ${COMMON_PB_CPP_FILE}

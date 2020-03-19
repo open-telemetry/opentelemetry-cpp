@@ -32,18 +32,11 @@ load("@com_google_protobuf//:protobuf_deps.bzl", "protobuf_deps")
 
 protobuf_deps()
 
-new_git_repository(
+new_local_repository(
     name = "com_github_opentelemetry_proto",
     build_file = "//bazel:opentelemetry_proto.BUILD",
-    commit = "d496c80b353bc4a4f754ae686b59ca3c41de0946",
-    remote = "https://github.com/open-telemetry/opentelemetry-proto",
+    path = "third_party/opentelemetry-proto",
 )
-
-# new_local_repository(
-#     name = "com_github_opentelemetry_proto",
-#     build_file = "//bazel:opentelemetry_proto.BUILD",
-#     path = "sdk/proto/opentelemetry",
-# )
 
 # GoogleTest framework.
 # Only needed for tests, not to build the OpenTelemetry library.

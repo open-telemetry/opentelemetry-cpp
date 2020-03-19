@@ -29,6 +29,10 @@ if(WITH_PROTOBUF)
   endif()
 endif()
 
+if(WITH_OTPROTOCOL)
+  include(third_party/opentelemetry-proto/Protobuf.cmake)
+endif()
+
 if(BUILD_TESTING)
   find_package(GTest REQUIRED)
   find_package(benchmark REQUIRED)
