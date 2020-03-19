@@ -18,7 +18,7 @@ template <class T>
 class AtomicUniquePtr
 {
 public:
-  AtomicUniquePtr() noexcept = default;
+  AtomicUniquePtr() noexcept {}
 
   ~AtomicUniquePtr() noexcept { Reset(); }
 
