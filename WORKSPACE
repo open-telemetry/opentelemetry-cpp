@@ -15,7 +15,6 @@
 workspace(name = "io_opentelemetry_cpp")
 
 load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive")
-load("@bazel_tools//tools/build_defs/repo:git.bzl", "new_git_repository")
 
 # Uses older protobuf version because of
 # https://github.com/protocolbuffers/protobuf/issues/7179
