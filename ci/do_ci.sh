@@ -65,6 +65,9 @@ elif [[ "$1" == "bazel.noexcept" ]]; then
 elif [[ "$1" == "bazel.asan" ]]; then
   bazel test --config=asan $BAZEL_TEST_OPTIONS //...
   exit 0
+elif [[ "$1" == "bazel.tsan" ]]; then
+  bazel test --config=tsan $BAZEL_TEST_OPTIONS //...
+  exit 0
 elif [[ "$1" == "benchmark" ]]; then
   [ -z "${BENCHMARK_DIR}" ] && export BENCHMARK_DIR=$HOME/benchmark
   bazel build $BAZEL_OPTIONS -c opt -- \
