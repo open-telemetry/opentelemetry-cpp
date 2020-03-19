@@ -108,7 +108,8 @@ TEST(UniquePtrTest, PointerOperators)
   unique_ptr<int> ptr1{value};
 
   EXPECT_EQ(&*ptr1, value);
-  EXPECT_EQ(unique_ptr<B> {}->f(), 123);
+  EXPECT_EQ(
+      unique_ptr<B> {}->f(), 123);
 }
 
 TEST(UniquePtrTest, Reset)

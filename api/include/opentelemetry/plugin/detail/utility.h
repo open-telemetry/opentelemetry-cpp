@@ -13,7 +13,7 @@ namespace detail
 {
 inline void CopyErrorMessage(const char *source, std::string &destination) noexcept
 #if __EXCEPTIONS
-    try
+try
 #endif
 {
   if (source == nullptr)
