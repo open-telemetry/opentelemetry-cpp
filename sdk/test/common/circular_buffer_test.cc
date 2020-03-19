@@ -61,15 +61,16 @@ void RunNumberConsumer(CircularBuffer<uint32_t> &buffer,
       return;
     }
     auto n = std::uniform_int_distribution<size_t>{0, allotment.size()}(RandomNumberGenerator);
-    buffer.Consume(n, [&](CircularBufferRange<AtomicUniquePtr<uint32_t>> range) noexcept {
-      assert(range.size() == n);
-      range.ForEach([&](AtomicUniquePtr<uint32_t> & ptr) noexcept {
-        assert(!ptr.IsNull());
-        numbers.push_back(*ptr);
-        ptr.Reset();
-        return true;
-      });
-    });
+    buffer.Consume(
+        n, [&](CircularBufferRange<AtomicUniquePtr<uint32_t>> range) noexcept {
+          assert(range.size() == n);
+          range.ForEach([&](AtomicUniquePtr<uint32_t> & ptr) noexcept {
+            assert(!ptr.IsNull());
+            numbers.push_back(*ptr);
+            ptr.Reset();
+            return true;
+          });
+        });
   }
 }
 
@@ -122,13 +123,14 @@ TEST(CircularBufferTest, Consume)
     EXPECT_TRUE(buffer.Add(x));
   }
   int count = 0;
-  buffer.Consume(5, [&](CircularBufferRange<AtomicUniquePtr<int>> range) noexcept {
-    range.ForEach([&](AtomicUniquePtr<int> &ptr) {
-      EXPECT_EQ(*ptr, count++);
-      ptr.Reset();
-      return true;
-    });
-  });
+  buffer.Consume(
+      5, [&](CircularBufferRange<AtomicUniquePtr<int>> range) noexcept {
+        range.ForEach([&](AtomicUniquePtr<int> &ptr) {
+          EXPECT_EQ(*ptr, count++);
+          ptr.Reset();
+          return true;
+        });
+      });
   EXPECT_EQ(count, 5);
 }
 

@@ -8,8 +8,8 @@
 #include <thread>
 #include <vector>
 
-#include "test/common/baseline_circular_buffer.h"
 #include "src/common/circular_buffer.h"
+#include "test/common/baseline_circular_buffer.h"
 using opentelemetry::sdk::common::AtomicUniquePtr;
 using opentelemetry::sdk::common::CircularBuffer;
 using opentelemetry::sdk::common::CircularBufferRange;
@@ -17,10 +17,7 @@ using opentelemetry::testing::BaselineCircularBuffer;
 
 const int N = 10000;
 
-//--------------------------------------------------------------------------------------------------
-// ConsumeBufferNumbers
-//--------------------------------------------------------------------------------------------------
-uint64_t ConsumeBufferNumbers(BaselineCircularBuffer<uint64_t> &buffer) noexcept
+static uint64_t ConsumeBufferNumbers(BaselineCircularBuffer<uint64_t> &buffer) noexcept
 {
   uint64_t result = 0;
   buffer.Consume([&](std::unique_ptr<uint64_t> &&x) {
@@ -30,7 +27,7 @@ uint64_t ConsumeBufferNumbers(BaselineCircularBuffer<uint64_t> &buffer) noexcept
   return result;
 }
 
-uint64_t ConsumeBufferNumbers(CircularBuffer<uint64_t> &buffer) noexcept
+static uint64_t ConsumeBufferNumbers(CircularBuffer<uint64_t> &buffer) noexcept
 {
   uint64_t result = 0;
   buffer.Consume(
@@ -44,9 +41,6 @@ uint64_t ConsumeBufferNumbers(CircularBuffer<uint64_t> &buffer) noexcept
   return result;
 }
 
-//--------------------------------------------------------------------------------------------------
-// GenerateNumbersForThread
-//--------------------------------------------------------------------------------------------------
 template <class Buffer>
 static void GenerateNumbersForThread(Buffer &buffer, int n, std::atomic<uint64_t> &sum) noexcept
 {
@@ -62,9 +56,6 @@ static void GenerateNumbersForThread(Buffer &buffer, int n, std::atomic<uint64_t
   }
 }
 
-//--------------------------------------------------------------------------------------------------
-// GenerateNumbers
-//--------------------------------------------------------------------------------------------------
 template <class Buffer>
 static uint64_t GenerateNumbers(Buffer &buffer, int num_threads, int n) noexcept
 {
@@ -81,9 +72,6 @@ static uint64_t GenerateNumbers(Buffer &buffer, int num_threads, int n) noexcept
   return sum;
 }
 
-//--------------------------------------------------------------------------------------------------
-// ConsumeNumbers
-//--------------------------------------------------------------------------------------------------
 template <class Buffer>
 static void ConsumeNumbers(Buffer &buffer, uint64_t &sum, std::atomic<bool> &finished) noexcept
 {
@@ -94,9 +82,6 @@ static void ConsumeNumbers(Buffer &buffer, uint64_t &sum, std::atomic<bool> &fin
   sum += ConsumeBufferNumbers(buffer);
 }
 
-//--------------------------------------------------------------------------------------------------
-// RunSimulation
-//--------------------------------------------------------------------------------------------------
 template <class Buffer>
 static void RunSimulation(Buffer &buffer, int num_threads, int n) noexcept
 {
@@ -114,9 +99,6 @@ static void RunSimulation(Buffer &buffer, int num_threads, int n) noexcept
   }
 }
 
-//--------------------------------------------------------------------------------------------------
-// BM_BaselineBuffer
-//--------------------------------------------------------------------------------------------------
 static void BM_BaselineBuffer(benchmark::State &state)
 {
   const size_t max_elements = 500;
@@ -131,9 +113,6 @@ static void BM_BaselineBuffer(benchmark::State &state)
 
 BENCHMARK(BM_BaselineBuffer)->Arg(1)->Arg(2)->Arg(4);
 
-//--------------------------------------------------------------------------------------------------
-// BM_LockFreeBuffer
-//--------------------------------------------------------------------------------------------------
 static void BM_LockFreeBuffer(benchmark::State &state)
 {
   const size_t max_elements = 500;
@@ -148,7 +127,4 @@ static void BM_LockFreeBuffer(benchmark::State &state)
 
 BENCHMARK(BM_LockFreeBuffer)->Arg(1)->Arg(2)->Arg(4);
 
-//--------------------------------------------------------------------------------------------------
-// BENCHMARK_MAIN
-//--------------------------------------------------------------------------------------------------
 BENCHMARK_MAIN();

@@ -1,4 +1,5 @@
-foreach(testname atomic_unique_ptr_test circular_buffer_range_test circular_buffer_test)
+foreach(testname atomic_unique_ptr_test circular_buffer_range_test
+                 circular_buffer_test)
   add_executable(${testname} "${testname}.cc")
   target_link_libraries(${testname} ${GTEST_BOTH_LIBRARIES}
                         ${CMAKE_THREAD_LIBS_INIT} opentelemetry_trace)
