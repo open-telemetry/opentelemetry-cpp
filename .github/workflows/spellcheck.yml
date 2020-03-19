@@ -21,9 +21,4 @@ jobs:
 
     - name: run misspell
       run: |
-        ./bin/misspell -error ./**/*.h
-        ./bin/misspell -error ./**/*.cc
-        ./bin/misspell -error ./**/*.cmd
-        ./bin/misspell -error ./**/*.md
-        ./bin/misspell -error ./**/*.sh
-        ./bin/misspell -error ./**/*.txt
+        ./bin/misspell -error ./**/*
