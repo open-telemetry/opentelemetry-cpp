@@ -18,7 +18,7 @@ enum class ExportResult
   rSuccess = 0,
   // Exporting failed. The caller must not retry exporting the same batch; the
   // batch must be dropped.
-  rFailedNotRetryable
+  rFailure
 };
 /**
  * SpanExporter defines the interface that protocol-specific span exporters must
