@@ -2,6 +2,7 @@
 
 #include "opentelemetry/core/timestamp.h"
 #include "opentelemetry/nostd/string_view.h"
+#include "opentelemetry/sdk/trace/recordable.h"
 #include "opentelemetry/trace/canonical_code.h"
 #include "opentelemetry/trace/span_id.h"
 #include "opentelemetry/trace/trace_id.h"
@@ -14,11 +15,9 @@ namespace trace
 /**
  * SpanData is an immutable representation of all data collected by a span.
  */
-class SpanData
+class SpanData final : public Recordable
 {
 public:
-  virtual ~SpanData() = default;
-
   // The trace id for this span.
   virtual opentelemetry::trace::TraceId GetTraceId() const noexcept = 0;
 
