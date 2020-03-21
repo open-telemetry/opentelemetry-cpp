@@ -1,8 +1,8 @@
 #pragma once
 
-#include "opentelemetry/sdk/trace/recorder.h"
 #include "opentelemetry/trace/tracer.h"
 #include "opentelemetry/version.h"
+#include "src/trace/recorder.h"
 
 #include <memory>
 
