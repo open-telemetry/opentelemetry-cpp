@@ -19,25 +19,25 @@ class SpanData final : public Recordable
 {
 public:
   // The trace id for this span.
-  virtual opentelemetry::trace::TraceId GetTraceId() const noexcept = 0;
+  opentelemetry::trace::TraceId GetTraceId() const noexcept = 0;
 
   // The span id for this span.
-  virtual opentelemetry::trace::SpanId GetSpanId() const noexcept = 0;
+  opentelemetry::trace::SpanId GetSpanId() const noexcept = 0;
 
   // The span id for this span's parent.
-  virtual opentelemetry::trace::SpanId GetParentSpanId() const noexcept = 0;
+  opentelemetry::trace::SpanId GetParentSpanId() const noexcept = 0;
 
   // The name of this span.
-  virtual opentelemetry::nostd::string_view GetName() const noexcept = 0;
+  opentelemetry::nostd::string_view GetName() const noexcept = 0;
 
   // The status of this span.
-  virtual opentelemetry::trace::CanonicalCode GetStatus() const noexcept = 0;
+  opentelemetry::trace::CanonicalCode GetStatus() const noexcept = 0;
 
   // The start time of this span.
-  virtual opentelemetry::core::SystemTimestamp GetStartTime() const noexcept = 0;
+  opentelemetry::core::SystemTimestamp GetStartTime() const noexcept = 0;
 
   // The end time of this span.
-  virtual opentelemetry::core::SystemTimestamp GetEndTime() const noexcept = 0;
+  opentelemetry::core::SystemTimestamp GetEndTime() const noexcept = 0;
 };
 }  // namespace trace
 }  // namespace sdk

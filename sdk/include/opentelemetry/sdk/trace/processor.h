@@ -1,8 +1,7 @@
 #pragma once
 
-#include "opentelemetry/nostd/shared_ptr.h"
-#include "opentelemetry/nostd/span.h"
-#include "opentelemetry/sdk/trace/span_data.h"
+#include <chrono>
+#include "opentelemetry/sdk/trace/recordable.h"
 #include "opentelemetry/trace/span.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
@@ -26,13 +25,14 @@ public:
 
   // OnEnd is called when a span is ended.
   virtual void OnEnd(
-      nostd::shared_ptr<opentelemetry::sdk::trace::Recordable> &recordable) noexcept = 0;
+      std::shared_ptr<opentelemetry::sdk::trace::Recordable> &recordable) noexcept = 0;
 
   // Export all ended spans that have not yet been exported.
   //
   // Optionally a timeout can be specified. The default timeout of 0 means that
   // no timeout is applied.
-  virtual void ForceFlush(uint64_t timeout_ms = 0) noexcept = 0;
+  virtual void ForceFlush(
+      std::chrono::microseconds timeout = std::chrono::microseconds(0)) noexcept = 0;
 
   // Shut down the processor and do any cleanup required.
   virtual void Shutdown() noexcept = 0;
