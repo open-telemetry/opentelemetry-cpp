@@ -2,10 +2,6 @@
 
 set -e
 
-apt-get install -y software-properties-common
-add-apt-repository -y ppa:longsleep/golang-backports
-apt update
-
-apt install -y clang-format-8 python3-pip golang-go git
+apt install -y clang-format-8 python3-pip git curl
 pip3 install cmake_format==0.6.5
-go get github.com/bazelbuild/buildtools/buildifier
+curl -o /usr/local/bin/buildifier https://github.com/bazelbuild/buildtools/releases/tag/2.2.1/buildifier
