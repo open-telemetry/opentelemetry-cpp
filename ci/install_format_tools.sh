@@ -3,7 +3,7 @@
 set -e
 
 apt-get install -y software-properties-common
-add-apt-repository ppa:longsleep/golang-backports
+add-apt-repository -y ppa:longsleep/golang-backports
 apt update
 
 apt install -y clang-format-8 python3-pip golang-go git
