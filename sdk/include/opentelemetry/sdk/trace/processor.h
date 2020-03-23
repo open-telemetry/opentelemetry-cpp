@@ -29,7 +29,10 @@ public:
       nostd::shared_ptr<opentelemetry::sdk::trace::Recordable> &recordable) noexcept = 0;
 
   // Export all ended spans that have not yet been exported.
-  virtual void ForceFlush(uint64_t timeout_ms) noexcept = 0;
+  //
+  // Optionally a timeout can be specified. The default timeout of 0 means that
+  // no timeout is applied.
+  virtual void ForceFlush(uint64_t timeout_ms = 0) noexcept = 0;
 
   // Shut down the processor and do any cleanup required.
   virtual void Shutdown() noexcept = 0;

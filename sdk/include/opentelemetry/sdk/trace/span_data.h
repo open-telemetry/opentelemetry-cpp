@@ -33,10 +33,10 @@ public:
   // The status of this span.
   virtual opentelemetry::trace::CanonicalCode GetStatus() const noexcept = 0;
 
-  // The start epoch timestamp in nanos of this span.
+  // The start time of this span.
   virtual opentelemetry::core::SystemTimestamp GetStartTime() const noexcept = 0;
 
-  // The end epoch timestamp in nanos of this span.
+  // The end time of this span.
   virtual opentelemetry::core::SystemTimestamp GetEndTime() const noexcept = 0;
 };
 }  // namespace trace
