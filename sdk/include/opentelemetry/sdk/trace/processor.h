@@ -35,6 +35,10 @@ public:
       std::chrono::microseconds timeout = std::chrono::microseconds(0)) noexcept = 0;
 
   // Shut down the processor and do any cleanup required.
+  //
+  // Ended spans are exported before shutdown. After the call to Shutdown,
+  // subsequent calls to OnStart, OnEnd, ForceFlush or Shutdown will return
+  // immediately without doing anything.
   virtual void Shutdown() noexcept = 0;
 };
 }  // namespace trace

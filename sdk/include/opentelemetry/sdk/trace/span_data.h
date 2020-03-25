@@ -1,5 +1,6 @@
 #pragma once
 
+#include <chrono>
 #include "opentelemetry/core/timestamp.h"
 #include "opentelemetry/nostd/string_view.h"
 #include "opentelemetry/sdk/trace/recordable.h"
@@ -36,8 +37,8 @@ public:
   // The start time of this span.
   opentelemetry::core::SystemTimestamp GetStartTime() const noexcept = 0;
 
-  // The end time of this span.
-  opentelemetry::core::SystemTimestamp GetEndTime() const noexcept = 0;
+  // The duration of this span.
+  std::chrono::nanoseconds GetDuration() const noexcept = 0;
 };
 }  // namespace trace
 }  // namespace sdk
