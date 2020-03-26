@@ -25,7 +25,7 @@ public:
 
   // OnEnd is called when a span is ended.
   virtual void OnEnd(
-      std::shared_ptr<opentelemetry::sdk::trace::Recordable> &recordable) noexcept = 0;
+      std::unique_ptr<opentelemetry::sdk::trace::Recordable> &&recordable) noexcept = 0;
 
   // Export all ended spans that have not yet been exported.
   //
