@@ -5,9 +5,9 @@
 #include "opentelemetry/core/timestamp.h"
 #include "opentelemetry/nostd/string_view.h"
 #include "opentelemetry/trace/canonical_code.h"
+#include "opentelemetry/version.h"
 
-namespace opentelemetry
-{
+OPENTELEMETRY_BEGIN_NAMESPACE
 namespace trace
 {
 enum class SpanKind
@@ -76,7 +76,6 @@ public:
 
   // Adds an event to the Span, with a custom timestamp.
   virtual void AddEvent(nostd::string_view name, core::SystemTimestamp timestamp) noexcept = 0;
-  virtual void AddEvent(nostd::string_view name, core::SteadyTimestamp timestamp) noexcept = 0;
 
   // TODO
   // Adds an event to the Span, with a custom timestamp, and attributes.
@@ -109,4 +108,4 @@ public:
   virtual Tracer &tracer() const noexcept = 0;
 };
 }  // namespace trace
-}  // namespace opentelemetry
+OPENTELEMETRY_END_NAMESPACE

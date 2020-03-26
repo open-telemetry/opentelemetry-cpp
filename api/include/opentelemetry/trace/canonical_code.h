@@ -2,8 +2,9 @@
 
 #include <cstdint>
 
-namespace opentelemetry
-{
+#include "opentelemetry/version.h"
+
+OPENTELEMETRY_BEGIN_NAMESPACE
 namespace trace
 {
 enum class CanonicalCode : uint8_t
@@ -134,4 +135,4 @@ enum class CanonicalCode : uint8_t
 };
 
 }  // namespace trace
-}  // namespace opentelemetry
+OPENTELEMETRY_END_NAMESPACE

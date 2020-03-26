@@ -5,8 +5,9 @@
 #include <type_traits>
 #include <utility>
 
-namespace opentelemetry
-{
+#include "opentelemetry/version.h"
+
+OPENTELEMETRY_BEGIN_NAMESPACE
 namespace nostd
 {
 namespace detail
@@ -164,4 +165,4 @@ bool operator!=(std::nullptr_t, const unique_ptr<T> &rhs) noexcept
   return nullptr != rhs.get();
 }
 }  // namespace nostd
-}  // namespace opentelemetry
+OPENTELEMETRY_END_NAMESPACE

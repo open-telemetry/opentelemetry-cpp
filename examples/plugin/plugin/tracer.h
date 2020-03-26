@@ -15,7 +15,7 @@ public:
       opentelemetry::nostd::string_view name,
       const opentelemetry::trace::StartSpanOptions &options) noexcept override;
 
-  void FlushWithMicroseconds(uint64_t /*timeout*/) noexcept override {}
+  void ForceFlushWithMicroseconds(uint64_t /*timeout*/) noexcept override {}
 
   void CloseWithMicroseconds(uint64_t /*timeout*/) noexcept override {}
 };

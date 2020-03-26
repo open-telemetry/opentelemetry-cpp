@@ -8,11 +8,12 @@
 #include "opentelemetry/nostd/unique_ptr.h"
 #include "opentelemetry/trace/span.h"
 #include "opentelemetry/trace/tracer.h"
+#include "opentelemetry/trace/tracer_provider.h"
+#include "opentelemetry/version.h"
 
 #include <memory>
 
-namespace opentelemetry
-{
+OPENTELEMETRY_BEGIN_NAMESPACE
 namespace trace
 {
 /**
@@ -26,7 +27,6 @@ public:
   void AddEvent(nostd::string_view name) noexcept override {}
 
   void AddEvent(nostd::string_view name, core::SystemTimestamp timestamp) noexcept override {}
-  void AddEvent(nostd::string_view name, core::SteadyTimestamp timestamp) noexcept override {}
 
   void SetStatus(CanonicalCode code, nostd::string_view description) noexcept override {}
 
@@ -55,9 +55,31 @@ public:
     return nostd::unique_ptr<Span>{new (std::nothrow) NoopSpan{this->shared_from_this()}};
   }
 
-  void FlushWithMicroseconds(uint64_t /*timeout*/) noexcept override {}
+  void ForceFlushWithMicroseconds(uint64_t /*timeout*/) noexcept override {}
 
   void CloseWithMicroseconds(uint64_t /*timeout*/) noexcept override {}
 };
+
+/**
+ * No-op implementation of a TracerProvider.
+ */
+class NoopTracerProvider final : public opentelemetry::trace::TracerProvider
+{
+public:
+  NoopTracerProvider()
+      : tracer_{nostd::shared_ptr<opentelemetry::trace::NoopTracer>(
+            new opentelemetry::trace::NoopTracer)}
+  {}
+
+  nostd::shared_ptr<opentelemetry::trace::Tracer> GetTracer(
+      nostd::string_view library_name,
+      nostd::string_view library_version) override
+  {
+    return tracer_;
+  }
+
+private:
+  nostd::shared_ptr<opentelemetry::trace::Tracer> tracer_;
+};
 }  // namespace trace
-}  // namespace opentelemetry
+OPENTELEMETRY_END_NAMESPACE

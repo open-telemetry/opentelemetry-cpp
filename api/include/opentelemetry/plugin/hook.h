@@ -2,6 +2,7 @@
 
 #include "opentelemetry/plugin/detail/loader_info.h"
 #include "opentelemetry/plugin/factory.h"
+#include "opentelemetry/version.h"
 
 #ifdef WIN32
 
@@ -34,12 +35,11 @@
 
 #endif
 
-namespace opentelemetry
-{
+OPENTELEMETRY_BEGIN_NAMESPACE
 namespace plugin
 {
 using OpenTelemetryHook =
     nostd::unique_ptr<Factory::FactoryImpl> (*)(const LoaderInfo &loader_info,
                                                 nostd::unique_ptr<char[]> &error_message);
 }  // namespace plugin
-}  // namespace opentelemetry
+OPENTELEMETRY_END_NAMESPACE

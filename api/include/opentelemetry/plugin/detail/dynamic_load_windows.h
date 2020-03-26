@@ -12,8 +12,7 @@
 #include <errhandlingapi.h>
 #include <winbase.h>
 
-namespace opentelemetry
-{
+OPENTELEMETRY_BEGIN_NAMESPACE
 namespace plugin
 {
 namespace detail
@@ -89,4 +88,4 @@ inline std::unique_ptr<Factory> LoadFactory(const char *plugin, std::string &err
                                       Factory{std::move(library_handle), std::move(factory_impl)}};
 }
 }  // namespace plugin
-}  // namespace opentelemetry
+OPENTELEMETRY_END_NAMESPACE
