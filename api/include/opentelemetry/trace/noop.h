@@ -54,6 +54,10 @@ public:
   {
     return nostd::unique_ptr<Span>{new (std::nothrow) NoopSpan{this->shared_from_this()}};
   }
+
+  void ForceFlushWithMicroseconds(uint64_t /*timeout*/) noexcept override {}
+
+  void CloseWithMicroseconds(uint64_t /*timeout*/) noexcept override {}
 };
 
 /**

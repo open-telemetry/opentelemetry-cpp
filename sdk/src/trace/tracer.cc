@@ -15,6 +15,16 @@ nostd::unique_ptr<trace_api::Span> Tracer::StartSpan(
   return nostd::unique_ptr<trace_api::Span>{new (std::nothrow)
                                                 Span{this->shared_from_this(), name, options}};
 }
+
+void Tracer::ForceFlushWithMicroseconds(uint64_t timeout) noexcept
+{
+  (void)timeout;
+}
+
+void Tracer::CloseWithMicroseconds(uint64_t timeout) noexcept
+{
+  (void)timeout;
+}
 }  // namespace trace
 }  // namespace sdk
 OPENTELEMETRY_END_NAMESPACE

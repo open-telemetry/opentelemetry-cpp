@@ -5,6 +5,8 @@
 #include "opentelemetry/trace/span.h"
 #include "opentelemetry/version.h"
 
+#include <chrono>
+
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace trace
 {
@@ -23,6 +25,32 @@ public:
    */
   virtual nostd::unique_ptr<Span> StartSpan(nostd::string_view name,
                                             const StartSpanOptions &options = {}) noexcept = 0;
+
+  /**
+   * Force any buffered spans to flush.
+   * @param timeout to complete the flush
+   */
+  template <class Rep, class Period>
+  void ForceFlush(std::chrono::duration<Rep, Period> timeout) noexcept
+  {
+    this->ForceFlushWithMicroseconds(
+        static_cast<uint64_t>(std::chrono::duration_cast<std::chrono::microseconds>(timeout)));
+  }
+
+  virtual void ForceFlushWithMicroseconds(uint64_t timeout) noexcept = 0;
+
+  /**
+   * ForceFlush any buffered spans and stop reporting spans.
+   * @param timeout to complete the flush
+   */
+  template <class Rep, class Period>
+  void Close(std::chrono::duration<Rep, Period> timeout) noexcept
+  {
+    this->CloseWithMicroseconds(
+        static_cast<uint64_t>(std::chrono::duration_cast<std::chrono::microseconds>(timeout)));
+  }
+
+  virtual void CloseWithMicroseconds(uint64_t timeout) noexcept = 0;
 };
 }  // namespace trace
 OPENTELEMETRY_END_NAMESPACE
