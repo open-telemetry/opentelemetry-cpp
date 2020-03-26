@@ -6,3 +6,9 @@ common:asan --copt -fsanitize=address
 common:asan --copt -DADDRESS_SANITIZER
 common:asan --linkopt -fsanitize=address
 common:asan --cc_output_directory_tag=asan
+
+# --config=tsan : Thread Sanitizer.
+common:tsan --copt -fsanitize=thread
+common:tsan --copt -DTHREAD_SANITIZER
+common:tsan --linkopt -fsanitize=thread
+common:tsan --cc_output_directory_tag=tsan

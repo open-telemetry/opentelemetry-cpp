@@ -7,6 +7,7 @@ CI tests can be run on docker by invoking the script `./ci/run_docker.sh ./ci/do
 * `bazel.test`: build bazel targets and run tests.
 * `bazel.noexcept`: build bazel targets and run tests with exceptions disabled.
 * `bazel.asan`: build bazel targets and run tests with AddressSanitizer.
+* `bazel.tsan`: build bazel targets and run tests with ThreadSanitizer.
 * `benchmark`: run all benchmarks.
 * `format`: use `tools/format.sh` to enforce text formatting.
 

@@ -8,6 +8,7 @@
 #include "opentelemetry/nostd/unique_ptr.h"
 #include "opentelemetry/trace/span.h"
 #include "opentelemetry/trace/tracer.h"
+#include "opentelemetry/trace/tracer_provider.h"
 #include "opentelemetry/version.h"
 
 #include <memory>
@@ -53,6 +54,32 @@ public:
   {
     return nostd::unique_ptr<Span>{new (std::nothrow) NoopSpan{this->shared_from_this()}};
   }
+
+  void ForceFlushWithMicroseconds(uint64_t /*timeout*/) noexcept override {}
+
+  void CloseWithMicroseconds(uint64_t /*timeout*/) noexcept override {}
+};
+
+/**
+ * No-op implementation of a TracerProvider.
+ */
+class NoopTracerProvider final : public opentelemetry::trace::TracerProvider
+{
+public:
+  NoopTracerProvider()
+      : tracer_{nostd::shared_ptr<opentelemetry::trace::NoopTracer>(
+            new opentelemetry::trace::NoopTracer)}
+  {}
+
+  nostd::shared_ptr<opentelemetry::trace::Tracer> GetTracer(
+      nostd::string_view library_name,
+      nostd::string_view library_version) override
+  {
+    return tracer_;
+  }
+
+private:
+  nostd::shared_ptr<opentelemetry::trace::Tracer> tracer_;
 };
 }  // namespace trace
 OPENTELEMETRY_END_NAMESPACE

@@ -24,6 +24,10 @@ public:
       nostd::string_view name,
       const trace_api::StartSpanOptions &options = {}) noexcept override;
 
+  void ForceFlushWithMicroseconds(uint64_t timeout) noexcept override;
+
+  void CloseWithMicroseconds(uint64_t timeout) noexcept override;
+
 private:
   std::unique_ptr<Recorder> recorder_;
 };

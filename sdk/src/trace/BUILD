@@ -21,5 +21,6 @@ cc_library(
     include_prefix = "src/trace",
     deps = [
         "//api",
+        "//sdk:headers",
     ],
 )

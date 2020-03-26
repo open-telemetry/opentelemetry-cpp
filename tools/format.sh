@@ -39,6 +39,7 @@ if which cmake-format >/dev/null; then
 else
   echo "Can't find cmake-format. It can be installed with:"
   echo "  pip install --user cmake_format"
+  exit 1
 fi
 
 if [[ -z "$BUILDIFIER" ]]; then
@@ -54,4 +55,5 @@ if which "$BUILDIFIER" >/dev/null; then
 else
   echo "Can't find buildifier. It can be installed with:"
   echo "  go get github.com/bazelbuild/buildtools/buildifier"
+  exit 1
 fi

@@ -76,6 +76,16 @@ jobs:
       - run: ./ci/install_bazelisk.sh
       - run: ./ci/do_ci.sh bazel.asan
 
+  bazel_tsan:
+    resource_class: xlarge
+    docker:
+      - image: ubuntu:18.04
+    steps:
+      - checkout
+      - run: ./ci/setup_ci_environment.sh
+      - run: ./ci/install_bazelisk.sh
+      - run: ./ci/do_ci.sh bazel.tsan
+
   benchmark:
     resource_class: xlarge
     docker:
@@ -135,6 +145,7 @@ workflows:
       - bazel_test
       - bazel_noexcept
       - bazel_asan
+      - bazel_tsan
       - format
       - benchmark
       - osx_test
