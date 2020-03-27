@@ -17,4 +17,4 @@ int AtFork(void (*prepare)(), void (*parent)(), void (*child)()) noexcept
 }  // namespace platform
 }  // namespace common
 }  // namespace sdk
-OPENTELEMETRY_BEGIN_NAMESPACE
+OPENTELEMETRY_END_NAMESPACE
