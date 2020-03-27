@@ -16,14 +16,14 @@ package(default_visibility = ["//visibility:public"])
 
 cc_library(
     name = "fork",
-    hdrs = [
-        "fork.h",
-    ],
-    include_prefix = "src/common/platform",
     srcs = select({
         "//bazel:windows": ["fork_windows.cc"],
         "//conditions:default": ["fork_unix.cc"],
     }),
+    hdrs = [
+        "fork.h",
+    ],
+    include_prefix = "src/common/platform",
     deps = [
         "//api",
     ],

@@ -16,11 +16,11 @@ package(default_visibility = ["//visibility:public"])
 
 cc_library(
     name = "random",
+    srcs = ["random.cc"],
     hdrs = [
         "random.h",
     ],
     include_prefix = "src/common",
-    srcs = ["random.cc"],
     deps = [
         "//api",
         "//sdk/src/common/platform:fork",

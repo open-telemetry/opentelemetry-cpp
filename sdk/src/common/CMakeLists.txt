@@ -1,5 +1,5 @@
 set(COMMON_SRCS random.cc)
-if (WIN32)
+if(WIN32)
   list(APPEND COMMON_SRCS platform/fork_windows.cc)
 else()
   list(APPEND COMMON_SRCS platform/fork_unix.cc)
