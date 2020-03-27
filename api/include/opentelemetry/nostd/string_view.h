@@ -20,7 +20,7 @@ namespace nostd
 class string_view
 {
 public:
-  static const std::size_t npos = std::string::npos;
+  static constexpr std::size_t npos = static_cast<std::size_t>(-1);
 
   string_view() noexcept : length_(0), data_(nullptr) {}
 
