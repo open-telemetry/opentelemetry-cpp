@@ -16,7 +16,7 @@ namespace
 class TlsRandomNumberGenerator
 {
 public:
-  TlsRandomNumberGenerator()
+  TlsRandomNumberGenerator() noexcept
   {
     Seed();
     platform::AtFork(nullptr, nullptr, OnFork);
