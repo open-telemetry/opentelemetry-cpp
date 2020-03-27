@@ -5,6 +5,9 @@ $action = $args[0]
 
 $SRC_DIR=(Get-Item -Path ".\").FullName
 
+$BAZEL_OPTIONS=""
+$BAZEL_TEST_OPTIONS="$BAZEL_OPTIONS --test_output=errors"
+
 if (!(test-path build)) {
   mkdir build
 }
@@ -18,6 +21,18 @@ $PLUGIN_DIR="$SRC_DIR\plugin"
 $VCPKG_DIR="$SRC_DIR\vcpkg"
 
 switch ($action) {
+  "bazel.test" {
+    bazel build $BAZEL_OPTIONS //...
+    $exit = $LASTEXITCODE
+    if ($exit -ne 0) {
+      exit $exit
+    }
+    bazel test $BAZEL_TEST_OPTIONS //...
+    $exit = $LASTEXITCODE
+    if ($exit -ne 0) {
+      exit $exit
+    }
+  }
   "cmake.test" {
     cd "$BUILD_DIR"
     cmake $SRC_DIR `
