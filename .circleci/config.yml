@@ -120,9 +120,14 @@ jobs:
     steps:
       - checkout
       - run: ./ci/setup_windows_cmake.ps1
-      - run: ./ci/install_windows_bazelisk.ps1
       - run: ./ci/setup_windows_ci_environment.ps1
       - run: ./ci/do_ci.ps1 cmake.test
+
+  windows_bazel:
+    executor: win/vs2019
+    steps:
+      - checkout
+      - run: ./ci/install_windows_bazelisk.ps1
       - run: ./ci/do_ci.ps1 bazel.build
 
   windows_plugin_test:
@@ -148,4 +153,5 @@ workflows:
       - benchmark
       - osx_test
       - windows
+      - windows_bazel
       - windows_plugin_test
