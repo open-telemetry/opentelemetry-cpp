@@ -5,4 +5,4 @@ $BAZELISK_VERSION="1.3.0"
 $CWD=(Get-Item -Path ".\").FullName
 (new-object System.Net.WebClient). `
    DownloadFile("https://github.com/bazelbuild/bazelisk/releases/download/v$BAZELISK_VERSION/bazelisk-windows-amd64.exe",
-                "$C:\windows\system32\bazel.exe")
+                "C:\windows\system32\bazel.exe")
