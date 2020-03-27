@@ -22,10 +22,10 @@ public:
     platform::AtFork(nullptr, nullptr, OnFork);
   }
 
-  static std::mt19937_64 &engine() noexcept { return engine_; }
+  static FastRandomNumberGenerator &engine() noexcept { return engine_; }
 
 private:
-  static thread_local std::mt19937_64 engine_;
+  static thread_local FastRandomNumberGenerator engine_;
 
   static void OnFork() noexcept { Seed(); }
 
@@ -37,10 +37,10 @@ private:
   }
 };
 
-thread_local std::mt19937_64 TlsRandomNumberGenerator::engine_{};
+thread_local FastRandomNumberGenerator TlsRandomNumberGenerator::engine_{};
 }  // namespace
 
-std::mt19937_64 &GetRandomNumberGenerator() noexcept
+FastRandomNumberGenerator &GetRandomNumberGenerator() noexcept
 {
   static thread_local TlsRandomNumberGenerator random_number_generator{};
   return TlsRandomNumberGenerator::engine();

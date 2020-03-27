@@ -18,6 +18,7 @@ cc_library(
     name = "random",
     srcs = ["random.cc"],
     hdrs = [
+        "fast_random_number_generator.h",
         "random.h",
     ],
     include_prefix = "src/common",
