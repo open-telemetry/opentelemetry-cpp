@@ -4,7 +4,7 @@
 #include "opentelemetry/plugin/factory.h"
 #include "opentelemetry/version.h"
 
-#ifdef WIN32
+#ifdef _WIN32
 
 /**
  * Cross-platform helper macro to declare the symbol used to load an OpenTelemetry implementation

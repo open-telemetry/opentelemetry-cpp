@@ -2,7 +2,7 @@
 
 #include <string>
 
-#ifdef WIN32
+#ifdef _WIN32
 #  include "opentelemetry/plugin/detail/dynamic_load_windows.h"
 #else
 #  include "opentelemetry/plugin/detail/dynamic_load_unix.h"
