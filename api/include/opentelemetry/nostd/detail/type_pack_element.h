@@ -3,6 +3,7 @@
 #include <cstddef>
 #include <type_traits>
 
+#include "opentelemetry/nostd/utility.h"
 #include "opentelemetry/version.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
@@ -10,6 +11,15 @@ namespace nostd
 {
 namespace detail
 {
+template <std::size_t N>
+using size_constant = std::integral_constant<std::size_t, N>;
+
+template <std::size_t I, typename T>
+struct indexed_type : size_constant<I>
+{
+  using type = T;
+};
+
 template <std::size_t I, typename... Ts>
 struct type_pack_element_impl
 {

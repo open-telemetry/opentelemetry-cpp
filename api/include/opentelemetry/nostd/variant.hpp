@@ -1087,7 +1087,6 @@ namespace nostd
       using super::operator=;
 
       protected:
-#ifndef MPARK_GENERIC_LAMBDAS
       struct ctor {
         template <typename LhsAlt, typename RhsAlt>
         inline void operator()(LhsAlt &lhs_alt, RhsAlt &&rhs_alt) const {
@@ -1095,7 +1094,6 @@ namespace nostd
                                      lib::forward<RhsAlt>(rhs_alt).value);
         }
       };
-#endif
 
       template <std::size_t I, typename T, typename... Args>
       inline static T &construct_alt(alt<I, T> &a, Args &&... args) {
@@ -1110,14 +1108,7 @@ namespace nostd
         if (!rhs.valueless_by_exception()) {
           visitation::alt::visit_alt_at(
               rhs.index(),
-#ifdef MPARK_GENERIC_LAMBDAS
-              [](auto &lhs_alt, auto &&rhs_alt) {
-                constructor::construct_alt(
-                    lhs_alt, lib::forward<decltype(rhs_alt)>(rhs_alt).value);
-              }
-#else
               ctor{}
-#endif
               ,
               lhs,
               lib::forward<Rhs>(rhs));
