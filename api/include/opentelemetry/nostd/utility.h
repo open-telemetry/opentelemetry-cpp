@@ -91,10 +91,12 @@ struct index_sequence_push_back<index_sequence<Indexes...>, I> {
   using type = index_sequence<Indexes..., I>;
 };
 
+template <class T, size_t I>
+using index_sequence_push_back_t = typename index_sequence_push_back<T, I>::type;
+
 template <size_t N>
 struct make_index_sequence_impl {
-  using type = typename index_sequence_push_back<typename make_index_sequence_impl<N - 1>::type,
-                                                 N - 1>::type;
+  using type = index_sequence_push_back_t<typename make_index_sequence_impl<N - 1>::type, N - 1>;
 };
 
 template <>

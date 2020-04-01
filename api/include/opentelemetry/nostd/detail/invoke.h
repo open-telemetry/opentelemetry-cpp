@@ -4,10 +4,11 @@
 #include <utility>
 
 #include "opentelemetry/nostd/detail/decay.h"
+#include "opentelemetry/nostd/detail/void.h"
 #include "opentelemetry/version.h"
 
 #define MPARK_RETURN(...) \
-  noexcept(noexcept(__VA_ARGS__)) -> decltype(__VA_ARGS__) { return __VA_ARGS__; }
+  noexcept(noexcept(__VA_ARGS__))->decltype(__VA_ARGS__) { return __VA_ARGS__; }
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace nostd
@@ -96,7 +97,58 @@ inline constexpr auto invoke(R T::*f, Arg &&arg, Args &&... args)
 
 template <typename F, typename... Args>
 inline constexpr auto invoke(F &&f, Args &&... args)
-    MPARK_RETURN(detail::invoke(std::forward<F>(f), std::forward<Args>(args)...))
+    MPARK_RETURN(detail::invoke(std::forward<F>(f), std::forward<Args>(args)...));
+
+namespace detail
+{
+
+  template <typename Void, typename, typename...>
+  struct invoke_result
+  {};
+
+  template <typename F, typename... Args>
+  struct invoke_result<void_t<decltype(invoke(std::declval<F>(), std::declval<Args>()...))>,
+                       F,
+                       Args...>
+  {
+    using type = decltype(invoke(std::declval<F>(), std::declval<Args>()...));
+  };
+
+}  // namespace detail
+
+template <typename F, typename... Args>
+using invoke_result = detail::invoke_result<void, F, Args...>;
+
+template <typename F, typename... Args>
+using invoke_result_t = typename invoke_result<F, Args...>::type;
+
+namespace detail
+{
+
+template <typename Void, typename, typename...>
+struct is_invocable : std::false_type
+{};
+
+template <typename F, typename... Args>
+struct is_invocable<void_t<invoke_result_t<F, Args...>>, F, Args...> : std::true_type
+{};
+
+template <typename Void, typename, typename, typename...>
+struct is_invocable_r : std::false_type
+{};
+
+template <typename R, typename F, typename... Args>
+struct is_invocable_r<void_t<invoke_result_t<F, Args...>>, R, F, Args...>
+    : std::is_convertible<invoke_result_t<F, Args...>, R>
+{};
+
+}  // namespace detail
+
+template <typename F, typename... Args>
+using is_invocable = detail::is_invocable<void, F, Args...>;
+
+template <typename R, typename F, typename... Args>
+using is_invocable_r = detail::is_invocable_r<void, R, F, Args...>;
 }  // namespace nostd
 OPENTELEMETRY_END_NAMESPACE
 

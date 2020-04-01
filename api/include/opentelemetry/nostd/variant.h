@@ -3,6 +3,7 @@
 #include <array>
 #include <exception>
 
+#include "opentelemetry/nostd/detail/all.h"
 #include "opentelemetry/nostd/detail/common_trait.h"
 #include "opentelemetry/nostd/detail/find_index.h"
 #include "opentelemetry/nostd/detail/type_pack_element.h"
@@ -10,6 +11,7 @@
 #include "opentelemetry/nostd/detail/variant_fwd.h"
 #include "opentelemetry/nostd/detail/variant_size.h"
 #include "opentelemetry/nostd/utility.h"
+#include "opentelemetry/nostd/type_traits.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace nostd
@@ -132,18 +134,16 @@ struct base
     return elem;
   }
 
-#if 0
   template <typename T, std::size_t N, typename... Is>
-  inline static constexpr const lib::remove_all_extents_t<T> &at(const std::array<T, N> &elems,
-                                                                 std::size_t i,
-                                                                 Is... is) noexcept
+  inline static constexpr const remove_all_extents_t<T> &at(const std::array<T, N> &elems,
+                                                            std::size_t i,
+                                                            Is... is) noexcept
   {
     return at(elems[i], is...);
   }
 
   template <typename F, typename... Fs>
-  inline static constexpr lib::array<lib::decay_t<F>, sizeof...(Fs) + 1> make_farray(F &&f,
-                                                                                     Fs &&... fs)
+  inline static constexpr std::array<decay_t<F>, sizeof...(Fs) + 1> make_farray(F &&f, Fs &&... fs)
   {
     return {{std::forward<F>(f), std::forward<Fs>(fs)...}};
   }
@@ -157,7 +157,7 @@ struct base
     {
       using Expected = dispatch_result_t<F, Vs...>;
       using Actual   = decltype(
-          lib::invoke(std::forward<F>(f), access::base::get_alt<Is>(std::forward<Vs>(vs))...));
+          invoke(std::forward<F>(f), access::base::get_alt<Is>(std::forward<Vs>(vs))...));
       return visit_return_type_check<Expected, Actual>::invoke(
           std::forward<F>(f), access::base::get_alt<Is>(std::forward<Vs>(vs))...);
     }
@@ -166,24 +166,25 @@ struct base
     struct impl;
 
     template <std::size_t... Is>
-    struct impl<lib::index_sequence<Is...>>
+    struct impl<index_sequence<Is...>>
     {
       inline constexpr AUTO operator()() const AUTO_RETURN(&dispatch<Is...>)
     };
 
     template <typename Is, std::size_t... Js, typename... Ls>
-    struct impl<Is, lib::index_sequence<Js...>, Ls...>
+    struct impl<Is, index_sequence<Js...>, Ls...>
     {
       inline constexpr AUTO operator()() const
-          AUTO_RETURN(make_farray(impl<lib::push_back_t<Is, Js>, Ls...>{}()...))
+          AUTO_RETURN(make_farray(impl<detail::index_sequence_push_back_t<Is, Js>, Ls...>{}()...))
     };
   };
+
 
   template <typename F, typename... Vs>
   inline static constexpr AUTO make_fmatrix()
       AUTO_RETURN(typename make_fmatrix_impl<F, Vs...>::template impl<
-                  lib::index_sequence<>,
-                  lib::make_index_sequence<lib::decay_t<Vs>::size()>...>{}())
+                  index_sequence<>,
+                  make_index_sequence<decay_t<Vs>::size()>...>{}())
 
           template <typename F, typename... Vs>
           struct make_fdiagonal_impl
@@ -192,29 +193,30 @@ struct base
     inline static constexpr dispatch_result_t<F, Vs...> dispatch(F &&f, Vs &&... vs)
     {
       using Expected = dispatch_result_t<F, Vs...>;
-      using Actual   = decltype(
-          lib::invoke(std::forward<F>(f), access::base::get_alt<I>(std::forward<Vs>(vs))...));
+      using Actual =
+          decltype(invoke(std::forward<F>(f), access::base::get_alt<I>(std::forward<Vs>(vs))...));
       return visit_return_type_check<Expected, Actual>::invoke(
           std::forward<F>(f), access::base::get_alt<I>(std::forward<Vs>(vs))...);
     }
 
     template <std::size_t... Is>
-    inline static constexpr AUTO impl(lib::index_sequence<Is...>)
+    inline static constexpr AUTO impl(index_sequence<Is...>)
         AUTO_RETURN(make_farray(&dispatch<Is>...))
   };
 
   template <typename F, typename V, typename... Vs>
   inline static constexpr auto make_fdiagonal() -> decltype(
-      make_fdiagonal_impl<F, V, Vs...>::impl(lib::make_index_sequence<lib::decay_t<V>::size()>{}))
+      make_fdiagonal_impl<F, V, Vs...>::impl(make_index_sequence<decay_t<V>::size()>{}))
   {
-    static_assert(lib::all<(lib::decay_t<V>::size() == lib::decay_t<Vs>::size())...>::value,
+    static_assert(all<(decay_t<V>::size() == decay_t<Vs>::size())...>::value,
                   "all of the variants must be the same size.");
     return make_fdiagonal_impl<F, V, Vs...>::impl(
-        lib::make_index_sequence<lib::decay_t<V>::size()>{});
+        make_index_sequence<decay_t<V>::size()>{});
   }
 };
 
-#if !defined(MPARK_VARIANT_SWITCH_VISIT) && (!defined(_MSC_VER) || _MSC_VER >= 1910)
+
+#if !defined(_MSC_VER) || _MSC_VER >= 1910
 template <typename F, typename... Vs>
 using fmatrix_t = decltype(base::make_fmatrix<F, Vs...>());
 
@@ -264,7 +266,7 @@ private:
     template <typename... Values>
     inline static constexpr bool does_not_handle()
     {
-      return lib::is_invocable<Visitor, Values...>::value;
+      return is_invocable<Visitor, Values...>::value;
     }
   };
 
@@ -275,8 +277,8 @@ private:
                   "`visit` requires the visitor to be exhaustive.");
 
     inline static constexpr DECLTYPE_AUTO invoke(Visitor &&visitor, Values &&... values)
-        DECLTYPE_AUTO_RETURN(lib::invoke(std::forward<Visitor>(visitor),
-                                         std::forward<Values>(values)...))
+        DECLTYPE_AUTO_RETURN(invoke(std::forward<Visitor>(visitor),
+                                    std::forward<Values>(values)...))
   };
 
   template <typename Visitor>
@@ -317,7 +319,6 @@ private:
             DECLTYPE_AUTO_RETURN(visit_alt_at(index,
                                               make_value_visitor(std::forward<Visitor>(visitor)),
                                               std::forward<Vs>(vs)...))
-#endif
 };
 }  // namespace visitation
 }  // namespace detail
