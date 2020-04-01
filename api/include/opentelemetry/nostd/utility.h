@@ -2,12 +2,21 @@
 
 #include <cstddef>
 #include <initializer_list>
+#include <type_traits>
 
+#include "opentelemetry/nostd/detail/decay.h"
+#include "opentelemetry/nostd/detail/invoke.h"
 #include "opentelemetry/version.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace nostd
 {
+/**
+ * Back port of std::enable_if_t
+ */
+template <bool B, class T = void>
+using enable_if_t = typename std::enable_if<B, T>::value;
+
 /**
  * Back port of std::data
  *
@@ -102,5 +111,31 @@ using make_index_sequence = typename detail::make_index_sequence_impl<N>::type;
  */
 template <class... Ts>
 using index_sequence_for = make_index_sequence<sizeof...(Ts)>;
+
+/**
+ * Back port of std::in_place_t
+ */
+struct in_place_t
+{
+  explicit in_place_t() = default;
+};
+
+/**
+ * Back port of std::in_place_index_t
+ */
+template <std::size_t I>
+struct in_place_index_t
+{
+  explicit in_place_index_t() = default;
+};
+
+/**
+ * Back port of std::in_place_type_t
+ */
+template <typename T>
+struct in_place_type_t
+{
+  explicit in_place_type_t() = default;
+};
 }  // namespace nostd
 OPENTELEMETRY_END_NAMESPACE
