@@ -1,6 +1,6 @@
 #pragma once
 
-#include "opentelemetry/nostd/shared_ptr.h"
+#include <memory>
 #include "opentelemetry/nostd/span.h"
 #include "opentelemetry/sdk/trace/recordable.h"
 

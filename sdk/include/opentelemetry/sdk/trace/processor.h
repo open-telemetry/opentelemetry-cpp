@@ -3,7 +3,6 @@
 #include <chrono>
 #include <memory>
 #include "opentelemetry/sdk/trace/recordable.h"
-#include "opentelemetry/trace/span.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace sdk
