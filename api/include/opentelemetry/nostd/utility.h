@@ -64,6 +64,12 @@ size_t size(T (&array)[N]) noexcept
 }
 
 /**
+ * Back port of std::bool_constant
+ */
+template <bool B>
+using bool_constant = std::integral_constant<bool, B>;
+
+/**
  * Back port of std::integer_sequence
  */
 template <typename T, T... Is>

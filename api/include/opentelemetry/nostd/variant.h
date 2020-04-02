@@ -2,24 +2,23 @@
 
 #include <array>
 #include <exception>
+#include <limits>
 
 #include "opentelemetry/nostd/detail/all.h"
-#include "opentelemetry/nostd/detail/common_trait.h"
 #include "opentelemetry/nostd/detail/find_index.h"
+#include "opentelemetry/nostd/detail/recursive_union.h"
+#include "opentelemetry/nostd/detail/trait.h"
 #include "opentelemetry/nostd/detail/type_pack_element.h"
 #include "opentelemetry/nostd/detail/variant_alternative.h"
 #include "opentelemetry/nostd/detail/variant_fwd.h"
 #include "opentelemetry/nostd/detail/variant_size.h"
-#include "opentelemetry/nostd/utility.h"
 #include "opentelemetry/nostd/type_traits.h"
-
-OPENTELEMETRY_BEGIN_NAMESPACE
-namespace nostd
-{
+#include "opentelemetry/nostd/utility.h"
+#include "opentelemetry/version.h"
 
 #define AUTO auto
 #define AUTO_RETURN(...) \
-  -> decay_t<decltype(__VA_ARGS__)> { return __VA_ARGS__; }
+  ->decay_t<decltype(__VA_ARGS__)> { return __VA_ARGS__; }
 
 #define AUTO_REFREF auto
 #define AUTO_REFREF_RETURN(...)                                           \
@@ -32,6 +31,11 @@ namespace nostd
 #define DECLTYPE_AUTO auto
 #define DECLTYPE_AUTO_RETURN(...) \
   ->decltype(__VA_ARGS__) { return __VA_ARGS__; }
+
+OPENTELEMETRY_BEGIN_NAMESPACE
+namespace nostd
+{
+constexpr std::size_t variant_npos = static_cast<std::size_t>(-1);
 
 class bad_variant_access : public std::exception
 {
@@ -52,30 +56,6 @@ namespace detail
 {
 namespace access
 {
-
-struct recursive_union
-{
-  template <std::size_t I, bool Dummy = true>
-  struct get_alt_impl
-  {
-    template <typename V>
-    inline constexpr AUTO_REFREF operator()(V &&v) const
-        AUTO_REFREF_RETURN(get_alt_impl<I - 1>{}(std::forward<V>(v).tail_))
-  };
-
-  template <bool Dummy>
-  struct get_alt_impl<0, Dummy>
-  {
-    template <typename V>
-    inline constexpr AUTO_REFREF operator()(V &&v) const
-        AUTO_REFREF_RETURN(std::forward<V>(v).head_)
-  };
-
-  template <typename V, std::size_t I>
-  inline static constexpr AUTO_REFREF get_alt(V &&v, in_place_index_t<I>)
-      AUTO_REFREF_RETURN(get_alt_impl<I>{}(std::forward<V>(v)))
-};
-
 struct base
 {
   template <std::size_t I, typename V>
@@ -104,8 +84,8 @@ namespace visitation
 struct base
 {
   template <typename Visitor, typename... Vs>
-  using dispatch_result_t = decltype(
-      invoke(std::declval<Visitor>(), access::base::get_alt<0>(std::declval<Vs>())...));
+  using dispatch_result_t =
+      decltype(invoke(std::declval<Visitor>(), access::base::get_alt<0>(std::declval<Vs>())...));
 
   template <typename Expected>
   struct expected
@@ -156,8 +136,8 @@ struct base
     inline static constexpr dispatch_result_t<F, Vs...> dispatch(F &&f, Vs &&... vs)
     {
       using Expected = dispatch_result_t<F, Vs...>;
-      using Actual   = decltype(
-          invoke(std::forward<F>(f), access::base::get_alt<Is>(std::forward<Vs>(vs))...));
+      using Actual =
+          decltype(invoke(std::forward<F>(f), access::base::get_alt<Is>(std::forward<Vs>(vs))...));
       return visit_return_type_check<Expected, Actual>::invoke(
           std::forward<F>(f), access::base::get_alt<Is>(std::forward<Vs>(vs))...);
     }
@@ -179,15 +159,13 @@ struct base
     };
   };
 
-
   template <typename F, typename... Vs>
-  inline static constexpr AUTO make_fmatrix()
-      AUTO_RETURN(typename make_fmatrix_impl<F, Vs...>::template impl<
-                  index_sequence<>,
-                  make_index_sequence<decay_t<Vs>::size()>...>{}())
+  inline static constexpr AUTO make_fmatrix() AUTO_RETURN(
+      typename make_fmatrix_impl<F, Vs...>::
+          template impl<index_sequence<>, make_index_sequence<decay_t<Vs>::size()>...>{}())
 
-          template <typename F, typename... Vs>
-          struct make_fdiagonal_impl
+      template <typename F, typename... Vs>
+      struct make_fdiagonal_impl
   {
     template <std::size_t I>
     inline static constexpr dispatch_result_t<F, Vs...> dispatch(F &&f, Vs &&... vs)
@@ -205,16 +183,14 @@ struct base
   };
 
   template <typename F, typename V, typename... Vs>
-  inline static constexpr auto make_fdiagonal() -> decltype(
-      make_fdiagonal_impl<F, V, Vs...>::impl(make_index_sequence<decay_t<V>::size()>{}))
+  inline static constexpr auto make_fdiagonal()
+      -> decltype(make_fdiagonal_impl<F, V, Vs...>::impl(make_index_sequence<decay_t<V>::size()>{}))
   {
     static_assert(all<(decay_t<V>::size() == decay_t<Vs>::size())...>::value,
                   "all of the variants must be the same size.");
-    return make_fdiagonal_impl<F, V, Vs...>::impl(
-        make_index_sequence<decay_t<V>::size()>{});
+    return make_fdiagonal_impl<F, V, Vs...>::impl(make_index_sequence<decay_t<V>::size()>{});
   }
 };
-
 
 #if !defined(_MSC_VER) || _MSC_VER >= 1910
 template <typename F, typename... Vs>
@@ -321,7 +297,309 @@ private:
                                               std::forward<Vs>(vs)...))
 };
 }  // namespace visitation
+
+template <typename... Ts>
+using index_t = typename std::conditional<
+    sizeof...(Ts) < (std::numeric_limits<unsigned char>::max)(),
+    unsigned char,
+    typename std::conditional<sizeof...(Ts) < (std::numeric_limits<unsigned short>::max)(),
+                              unsigned short,
+                              unsigned int>::type>::type;
+
+template <Trait DestructibleTrait, typename... Ts>
+class base
+{
+public:
+  inline explicit constexpr base(valueless_t tag) noexcept
+      : data_(tag), index_(static_cast<index_t<Ts...>>(-1))
+  {}
+
+  template <std::size_t I, typename... Args>
+  inline explicit constexpr base(in_place_index_t<I>, Args &&... args)
+      : data_(in_place_index_t<I>{}, std::forward<Args>(args)...), index_(I)
+  {}
+
+  inline constexpr bool valueless_by_exception() const noexcept
+  {
+    return index_ == static_cast<index_t<Ts...>>(-1);
+  }
+
+  inline constexpr std::size_t index() const noexcept
+  {
+    return valueless_by_exception() ? variant_npos : index_;
+  }
+
+protected:
+  using data_t = recursive_union<DestructibleTrait, 0, Ts...>;
+
+  friend inline constexpr base &as_base(base &b) { return b; }
+  friend inline constexpr const base &as_base(const base &b) { return b; }
+  friend inline constexpr base &&as_base(base &&b) { return std::move(b); }
+  friend inline constexpr const base &&as_base(const base &&b) { return std::move(b); }
+
+  friend inline constexpr data_t &data(base &b) { return b.data_; }
+  friend inline constexpr const data_t &data(const base &b) { return b.data_; }
+  friend inline constexpr data_t &&data(base &&b) { return std::move(b).data_; }
+  friend inline constexpr const data_t &&data(const base &&b) { return std::move(b).data_; }
+
+  inline static constexpr std::size_t size() { return sizeof...(Ts); }
+
+  data_t data_;
+  index_t<Ts...> index_;
+
+  friend struct access::base;
+  friend struct visitation::base;
+};
+
+struct dtor
+{
+#ifdef _MSC_VER
+#  pragma warning(push)
+#  pragma warning(disable : 4100)
+#endif
+  template <typename Alt>
+  inline void operator()(Alt &alt) const noexcept
+  {
+    alt.~Alt();
+  }
+#ifdef _MSC_VER
+#  pragma warning(pop)
+#endif
+};
+
+template <typename Traits, Trait = Traits::destructible_trait>
+class destructor;
+
+#define MPARK_VARIANT_DESTRUCTOR(destructible_trait, definition, destroy)                      \
+  template <typename... Ts>                                                                    \
+  class destructor<traits<Ts...>, destructible_trait> : public base<destructible_trait, Ts...> \
+  {                                                                                            \
+    using super = base<destructible_trait, Ts...>;                                             \
+                                                                                               \
+  public:                                                                                      \
+    using super::super;                                                                        \
+    using super::operator=;                                                                    \
+                                                                                               \
+    destructor(const destructor &) = default;                                                  \
+    destructor(destructor &&)      = default;                                                  \
+    definition destructor &operator=(const destructor &) = default;                            \
+    destructor &operator=(destructor &&) = default;                                            \
+                                                                                               \
+  protected:                                                                                   \
+    destroy                                                                                    \
+  }
+
+MPARK_VARIANT_DESTRUCTOR(
+    Trait::TriviallyAvailable, ~destructor() = default;
+    , inline void destroy() noexcept { this->index_ = static_cast<index_t<Ts...>>(-1); });
+
+MPARK_VARIANT_DESTRUCTOR(
+    Trait::Available,
+    ~destructor() { destroy(); },
+    inline void destroy() noexcept {
+      if (!this->valueless_by_exception())
+      {
+        visitation::alt::visit_alt(dtor{}, *this);
+      }
+      this->index_ = static_cast<index_t<Ts...>>(-1);
+    });
+
+MPARK_VARIANT_DESTRUCTOR(Trait::Unavailable, ~destructor() = delete;
+                         , inline void destroy() noexcept  = delete;);
+
+#undef MPARK_VARIANT_DESTRUCTOR
+
+template <typename Traits>
+class constructor : public destructor<Traits>
+{
+  using super = destructor<Traits>;
+
+public:
+  using super::super;
+  using super::operator=;
+
+protected:
+  struct ctor
+  {
+    template <typename LhsAlt, typename RhsAlt>
+    inline void operator()(LhsAlt &lhs_alt, RhsAlt &&rhs_alt) const
+    {
+      constructor::construct_alt(lhs_alt, std::forward<RhsAlt>(rhs_alt).value);
+    }
+  };
+
+  template <std::size_t I, typename T, typename... Args>
+  inline static T &construct_alt(alt<I, T> &a, Args &&... args)
+  {
+    auto *result = ::new (static_cast<void *>(std::addressof(a)))
+        alt<I, T>(in_place_t{}, std::forward<Args>(args)...);
+    return result->value;
+  }
+
+  template <typename Rhs>
+  inline static void generic_construct(constructor &lhs, Rhs &&rhs)
+  {
+    lhs.destroy();
+    if (!rhs.valueless_by_exception())
+    {
+      visitation::alt::visit_alt_at(rhs.index(), ctor{}, lhs, std::forward<Rhs>(rhs));
+      lhs.index_ = rhs.index_;
+    }
+  }
+};
+
+template <typename Traits, Trait = Traits::move_constructible_trait>
+class move_constructor;
+
+#define MPARK_VARIANT_MOVE_CONSTRUCTOR(move_constructible_trait, definition) \
+  template <typename... Ts>                                                  \
+  class move_constructor<traits<Ts...>, move_constructible_trait>            \
+      : public constructor<traits<Ts...>>                                    \
+  {                                                                          \
+    using super = constructor<traits<Ts...>>;                                \
+                                                                             \
+  public:                                                                    \
+    using super::super;                                                      \
+    using super::operator=;                                                  \
+                                                                             \
+    move_constructor(const move_constructor &) = default;                    \
+    definition ~move_constructor()             = default;                    \
+    move_constructor &operator=(const move_constructor &) = default;         \
+    move_constructor &operator=(move_constructor &&) = default;              \
+  }
+
+MPARK_VARIANT_MOVE_CONSTRUCTOR(Trait::TriviallyAvailable,
+                               move_constructor(move_constructor &&that) = default;);
+
+MPARK_VARIANT_MOVE_CONSTRUCTOR(
+    Trait::Available,
+    move_constructor(move_constructor &&that) noexcept(
+        all<std::is_nothrow_move_constructible<Ts>::value...>::value)
+    : move_constructor(valueless_t{}) { this->generic_construct(*this, std::move(that)); });
+
+MPARK_VARIANT_MOVE_CONSTRUCTOR(Trait::Unavailable, move_constructor(move_constructor &&) = delete;);
+
+#undef MPARK_VARIANT_MOVE_CONSTRUCTOR
+
+    template <typename Traits, Trait = Traits::copy_constructible_trait>
+    class copy_constructor;
+
+#define MPARK_VARIANT_COPY_CONSTRUCTOR(copy_constructible_trait, definition) \
+  template <typename... Ts>                                                  \
+  class copy_constructor<traits<Ts...>, copy_constructible_trait>            \
+      : public move_constructor<traits<Ts...>>                               \
+  {                                                                          \
+    using super = move_constructor<traits<Ts...>>;                           \
+                                                                             \
+  public:                                                                    \
+    using super::super;                                                      \
+    using super::operator=;                                                  \
+                                                                             \
+    definition copy_constructor(copy_constructor &&) = default;              \
+    ~copy_constructor()                              = default;              \
+    copy_constructor &operator=(const copy_constructor &) = default;         \
+    copy_constructor &operator=(copy_constructor &&) = default;              \
+  }
+
+    MPARK_VARIANT_COPY_CONSTRUCTOR(
+        Trait::TriviallyAvailable,
+        copy_constructor(const copy_constructor &that) = default;);
+
+    MPARK_VARIANT_COPY_CONSTRUCTOR(
+        Trait::Available,
+        copy_constructor(const copy_constructor &that)
+            : copy_constructor(valueless_t{}) {
+          this->generic_construct(*this, that);
+        });
+
+    MPARK_VARIANT_COPY_CONSTRUCTOR(
+        Trait::Unavailable,
+        copy_constructor(const copy_constructor &) = delete;);
+
+#undef MPARK_VARIANT_COPY_CONSTRUCTOR
+
+    template <typename Traits>
+    class assignment : public copy_constructor<Traits> {
+      using super = copy_constructor<Traits>;
+
+      public:
+      using super::super;
+      using super::operator=;
+
+      template <std::size_t I, typename... Args>
+      inline /* auto & */ auto emplace(Args &&... args)
+          -> decltype(this->construct_alt(access::base::get_alt<I>(*this),
+                                          std::forward<Args>(args)...)) {
+        this->destroy();
+        auto &result = this->construct_alt(access::base::get_alt<I>(*this),
+                                           std::forward<Args>(args)...);
+        this->index_ = I;
+        return result;
+      }
+
+      protected:
+      template <typename That>
+      struct assigner {
+        template <typename ThisAlt, typename ThatAlt>
+        inline void operator()(ThisAlt &this_alt, ThatAlt &&that_alt) const {
+          self->assign_alt(this_alt, std::forward<ThatAlt>(that_alt).value);
+        }
+        assignment *self;
+      };
+
+      template <std::size_t I, typename T, typename Arg>
+      inline void assign_alt(alt<I, T> &a, Arg &&arg) {
+        if (this->index() == I) {
+#ifdef _MSC_VER
+#pragma warning(push)
+#pragma warning(disable : 4244)
+#endif
+          a.value = std::forward<Arg>(arg);
+#ifdef _MSC_VER
+#pragma warning(pop)
+#endif
+        } else {
+          struct {
+            void operator()(std::true_type) const {
+              this_->emplace<I>(std::forward<Arg>(arg_));
+            }
+            void operator()(std::false_type) const {
+              this_->emplace<I>(T(std::forward<Arg>(arg_)));
+            }
+            assignment *this_;
+            Arg &&arg_;
+          } impl{this, std::forward<Arg>(arg)};
+          impl(bool_constant < std::is_nothrow_constructible<T, Arg>::value ||
+               !std::is_nothrow_move_constructible<T>::value > {});
+        }
+      }
+
+      template <typename That>
+      inline void generic_assign(That &&that) {
+        if (this->valueless_by_exception() && that.valueless_by_exception()) {
+          // do nothing.
+        } else if (that.valueless_by_exception()) {
+          this->destroy();
+        } else {
+          visitation::alt::visit_alt_at(
+              that.index(),
+              assigner<That>{this}
+              ,
+              *this,
+              std::forward<That>(that));
+        }
+      }
+    };
 }  // namespace detail
 
 }  // namespace nostd
 OPENTELEMETRY_END_NAMESPACE
+
+#undef AUTO
+#undef AUTO_RETURN
+
+#undef AUTO_REFREF
+#undef AUTO_REFREF_RETURN
+
+#undef DECLTYPE_AUTO
+#undef DECLTYPE_AUTO_RETURN
