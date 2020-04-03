@@ -72,7 +72,7 @@ template <Trait DestructibleTrait, std::size_t Index>
 union recursive_union<DestructibleTrait, Index>
 {};
 
-#define MPARK_VARIANT_RECURSIVE_UNION(destructible_trait, destructor)               \
+#define OPENTELEMETRY_VARIANT_RECURSIVE_UNION(destructible_trait, destructor)               \
   template <std::size_t Index, typename T, typename... Ts>                          \
   union recursive_union<destructible_trait, Index, T, Ts...>                        \
   {                                                                                 \
@@ -106,11 +106,11 @@ union recursive_union<DestructibleTrait, Index>
     friend struct access::recursive_union;                                          \
   }
 
-MPARK_VARIANT_RECURSIVE_UNION(Trait::TriviallyAvailable, ~recursive_union() = default;);
-MPARK_VARIANT_RECURSIVE_UNION(Trait::Available, ~recursive_union(){});
-MPARK_VARIANT_RECURSIVE_UNION(Trait::Unavailable, ~recursive_union() = delete;);
+OPENTELEMETRY_VARIANT_RECURSIVE_UNION(Trait::TriviallyAvailable, ~recursive_union() = default;);
+OPENTELEMETRY_VARIANT_RECURSIVE_UNION(Trait::Available, ~recursive_union(){});
+OPENTELEMETRY_VARIANT_RECURSIVE_UNION(Trait::Unavailable, ~recursive_union() = delete;);
 
-#undef MPARK_VARIANT_RECURSIVE_UNION
+#undef OPENTELEMETRY_VARIANT_RECURSIVE_UNION
 }  // namespace detail
 }  // namespace nostd
 OPENTELEMETRY_END_NAMESPACE

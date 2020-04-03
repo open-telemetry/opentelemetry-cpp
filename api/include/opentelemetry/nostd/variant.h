@@ -372,7 +372,7 @@ struct dtor
 template <typename Traits, Trait = Traits::destructible_trait>
 class destructor;
 
-#define MPARK_VARIANT_DESTRUCTOR(destructible_trait, definition, destroy)                      \
+#define OPENTELEMETRY_VARIANT_DESTRUCTOR(destructible_trait, definition, destroy)                      \
   template <typename... Ts>                                                                    \
   class destructor<traits<Ts...>, destructible_trait> : public base<destructible_trait, Ts...> \
   {                                                                                            \
@@ -391,11 +391,11 @@ class destructor;
     destroy                                                                                    \
   }
 
-MPARK_VARIANT_DESTRUCTOR(
+OPENTELEMETRY_VARIANT_DESTRUCTOR(
     Trait::TriviallyAvailable, ~destructor() = default;
     , inline void destroy() noexcept { this->index_ = static_cast<index_t<Ts...>>(-1); });
 
-MPARK_VARIANT_DESTRUCTOR(
+OPENTELEMETRY_VARIANT_DESTRUCTOR(
     Trait::Available,
     ~destructor() { destroy(); },
     inline void destroy() noexcept {
@@ -406,10 +406,10 @@ MPARK_VARIANT_DESTRUCTOR(
       this->index_ = static_cast<index_t<Ts...>>(-1);
     });
 
-MPARK_VARIANT_DESTRUCTOR(Trait::Unavailable, ~destructor() = delete;
+OPENTELEMETRY_VARIANT_DESTRUCTOR(Trait::Unavailable, ~destructor() = delete;
                          , inline void destroy() noexcept  = delete;);
 
-#undef MPARK_VARIANT_DESTRUCTOR
+#undef OPENTELEMETRY_VARIANT_DESTRUCTOR
 
 template <typename Traits>
 class constructor : public destructor<Traits>
@@ -453,7 +453,7 @@ protected:
 template <typename Traits, Trait = Traits::move_constructible_trait>
 class move_constructor;
 
-#define MPARK_VARIANT_MOVE_CONSTRUCTOR(move_constructible_trait, definition) \
+#define OPENTELEMETRY_VARIANT_MOVE_CONSTRUCTOR(move_constructible_trait, definition) \
   template <typename... Ts>                                                  \
   class move_constructor<traits<Ts...>, move_constructible_trait>            \
       : public constructor<traits<Ts...>>                                    \
@@ -470,23 +470,23 @@ class move_constructor;
     move_constructor &operator=(move_constructor &&) = default;              \
   }
 
-MPARK_VARIANT_MOVE_CONSTRUCTOR(Trait::TriviallyAvailable,
+OPENTELEMETRY_VARIANT_MOVE_CONSTRUCTOR(Trait::TriviallyAvailable,
                                move_constructor(move_constructor &&that) = default;);
 
-MPARK_VARIANT_MOVE_CONSTRUCTOR(
+OPENTELEMETRY_VARIANT_MOVE_CONSTRUCTOR(
     Trait::Available,
     move_constructor(move_constructor &&that) noexcept(
         all<std::is_nothrow_move_constructible<Ts>::value...>::value)
     : move_constructor(valueless_t{}) { this->generic_construct(*this, std::move(that)); });
 
-MPARK_VARIANT_MOVE_CONSTRUCTOR(Trait::Unavailable, move_constructor(move_constructor &&) = delete;);
+OPENTELEMETRY_VARIANT_MOVE_CONSTRUCTOR(Trait::Unavailable, move_constructor(move_constructor &&) = delete;);
 
-#undef MPARK_VARIANT_MOVE_CONSTRUCTOR
+#undef OPENTELEMETRY_VARIANT_MOVE_CONSTRUCTOR
 
 template <typename Traits, Trait = Traits::copy_constructible_trait>
 class copy_constructor;
 
-#define MPARK_VARIANT_COPY_CONSTRUCTOR(copy_constructible_trait, definition) \
+#define OPENTELEMETRY_VARIANT_COPY_CONSTRUCTOR(copy_constructible_trait, definition) \
   template <typename... Ts>                                                  \
   class copy_constructor<traits<Ts...>, copy_constructible_trait>            \
       : public move_constructor<traits<Ts...>>                               \
@@ -503,17 +503,17 @@ class copy_constructor;
     copy_constructor &operator=(copy_constructor &&) = default;              \
   }
 
-MPARK_VARIANT_COPY_CONSTRUCTOR(Trait::TriviallyAvailable,
+OPENTELEMETRY_VARIANT_COPY_CONSTRUCTOR(Trait::TriviallyAvailable,
                                copy_constructor(const copy_constructor &that) = default;);
 
-MPARK_VARIANT_COPY_CONSTRUCTOR(
+OPENTELEMETRY_VARIANT_COPY_CONSTRUCTOR(
     Trait::Available, copy_constructor(const copy_constructor &that)
     : copy_constructor(valueless_t{}) { this->generic_construct(*this, that); });
 
-MPARK_VARIANT_COPY_CONSTRUCTOR(Trait::Unavailable,
+OPENTELEMETRY_VARIANT_COPY_CONSTRUCTOR(Trait::Unavailable,
                                copy_constructor(const copy_constructor &) = delete;);
 
-#undef MPARK_VARIANT_COPY_CONSTRUCTOR
+#undef OPENTELEMETRY_VARIANT_COPY_CONSTRUCTOR
 
 template <typename Traits>
 class assignment : public copy_constructor<Traits>
@@ -597,7 +597,7 @@ protected:
 template <typename Traits, Trait = Traits::move_assignable_trait>
 class move_assignment;
 
-#define MPARK_VARIANT_MOVE_ASSIGNMENT(move_assignable_trait, definition)                         \
+#define OPENTELEMETRY_VARIANT_MOVE_ASSIGNMENT(move_assignable_trait, definition)                         \
   template <typename... Ts>                                                                      \
   class move_assignment<traits<Ts...>, move_assignable_trait> : public assignment<traits<Ts...>> \
   {                                                                                              \
@@ -614,10 +614,10 @@ class move_assignment;
     definition                                                                                   \
   }
 
-MPARK_VARIANT_MOVE_ASSIGNMENT(Trait::TriviallyAvailable,
+OPENTELEMETRY_VARIANT_MOVE_ASSIGNMENT(Trait::TriviallyAvailable,
                               move_assignment &operator=(move_assignment &&that) = default;);
 
-MPARK_VARIANT_MOVE_ASSIGNMENT(
+OPENTELEMETRY_VARIANT_MOVE_ASSIGNMENT(
     Trait::Available,
     move_assignment &
     operator=(move_assignment &&that) noexcept(
@@ -627,15 +627,15 @@ MPARK_VARIANT_MOVE_ASSIGNMENT(
       return *this;
     });
 
-MPARK_VARIANT_MOVE_ASSIGNMENT(Trait::Unavailable,
+OPENTELEMETRY_VARIANT_MOVE_ASSIGNMENT(Trait::Unavailable,
                               move_assignment &operator=(move_assignment &&) = delete;);
 
-#undef MPARK_VARIANT_MOVE_ASSIGNMENT
+#undef OPENTELEMETRY_VARIANT_MOVE_ASSIGNMENT
 
 template <typename Traits, Trait = Traits::copy_assignable_trait>
 class copy_assignment;
 
-#define MPARK_VARIANT_COPY_ASSIGNMENT(copy_assignable_trait, definition) \
+#define OPENTELEMETRY_VARIANT_COPY_ASSIGNMENT(copy_assignable_trait, definition) \
   template <typename... Ts>                                              \
   class copy_assignment<traits<Ts...>, copy_assignable_trait>            \
       : public move_assignment<traits<Ts...>>                            \
@@ -652,10 +652,10 @@ class copy_assignment;
     definition copy_assignment &operator=(copy_assignment &&) = default; \
   }
 
-MPARK_VARIANT_COPY_ASSIGNMENT(Trait::TriviallyAvailable,
+OPENTELEMETRY_VARIANT_COPY_ASSIGNMENT(Trait::TriviallyAvailable,
                               copy_assignment &operator=(const copy_assignment &that) = default;);
 
-MPARK_VARIANT_COPY_ASSIGNMENT(
+OPENTELEMETRY_VARIANT_COPY_ASSIGNMENT(
     Trait::Available,
     copy_assignment &
     operator=(const copy_assignment &that) {
@@ -663,10 +663,10 @@ MPARK_VARIANT_COPY_ASSIGNMENT(
       return *this;
     });
 
-MPARK_VARIANT_COPY_ASSIGNMENT(Trait::Unavailable,
+OPENTELEMETRY_VARIANT_COPY_ASSIGNMENT(Trait::Unavailable,
                               copy_assignment &operator=(const copy_assignment &) = delete;);
 
-#undef MPARK_VARIANT_COPY_ASSIGNMENT
+#undef OPENTELEMETRY_VARIANT_COPY_ASSIGNMENT
 template <typename... Ts>
 class impl : public copy_assignment<traits<Ts...>>
 {

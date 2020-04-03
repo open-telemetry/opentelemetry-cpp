@@ -4,7 +4,7 @@
 
 #include "opentelemetry/version.h"
 
-#define MPARK_RETURN(...) \
+#define OPENTELEMETRY_RETURN(...) \
   noexcept(noexcept(__VA_ARGS__)) -> decltype(__VA_ARGS__) { return __VA_ARGS__; }
 
 OPENTELEMETRY_BEGIN_NAMESPACE
@@ -16,45 +16,45 @@ struct equal_to
 {
   template <typename Lhs, typename Rhs>
   inline constexpr auto operator()(Lhs &&lhs, Rhs &&rhs) const
-      MPARK_RETURN(std::forward<Lhs>(lhs) == std::forward<Rhs>(rhs))
+      OPENTELEMETRY_RETURN(std::forward<Lhs>(lhs) == std::forward<Rhs>(rhs))
 };
 
 struct not_equal_to
 {
   template <typename Lhs, typename Rhs>
   inline constexpr auto operator()(Lhs &&lhs, Rhs &&rhs) const
-      MPARK_RETURN(std::forward<Lhs>(lhs) != std::forward<Rhs>(rhs))
+      OPENTELEMETRY_RETURN(std::forward<Lhs>(lhs) != std::forward<Rhs>(rhs))
 };
 
 struct less
 {
   template <typename Lhs, typename Rhs>
   inline constexpr auto operator()(Lhs &&lhs, Rhs &&rhs) const
-      MPARK_RETURN(std::forward<Lhs>(lhs) < std::forward<Rhs>(rhs))
+      OPENTELEMETRY_RETURN(std::forward<Lhs>(lhs) < std::forward<Rhs>(rhs))
 };
 
 struct greater
 {
   template <typename Lhs, typename Rhs>
   inline constexpr auto operator()(Lhs &&lhs, Rhs &&rhs) const
-      MPARK_RETURN(std::forward<Lhs>(lhs) > std::forward<Rhs>(rhs))
+      OPENTELEMETRY_RETURN(std::forward<Lhs>(lhs) > std::forward<Rhs>(rhs))
 };
 
 struct less_equal
 {
   template <typename Lhs, typename Rhs>
   inline constexpr auto operator()(Lhs &&lhs, Rhs &&rhs) const
-      MPARK_RETURN(std::forward<Lhs>(lhs) <= std::forward<Rhs>(rhs))
+      OPENTELEMETRY_RETURN(std::forward<Lhs>(lhs) <= std::forward<Rhs>(rhs))
 };
 
 struct greater_equal
 {
   template <typename Lhs, typename Rhs>
   inline constexpr auto operator()(Lhs &&lhs, Rhs &&rhs) const
-      MPARK_RETURN(std::forward<Lhs>(lhs) >= std::forward<Rhs>(rhs))
+      OPENTELEMETRY_RETURN(std::forward<Lhs>(lhs) >= std::forward<Rhs>(rhs))
 };
 }  // namespace detail
 }  // namespace nostd
 OPENTELEMETRY_END_NAMESPACE
 
-#undef MPARK_RETURN
+#undef OPENTELEMETRY_RETURN
