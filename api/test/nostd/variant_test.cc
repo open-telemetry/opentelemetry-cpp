@@ -50,6 +50,20 @@ TEST(VariantTest, Get) {
 
 TEST(VariantTest, Comparison) {
   nostd::variant<int, float> v, w;
+  EXPECT_TRUE(v == w);
+  EXPECT_FALSE(v != w);
   v = 3.0f;
-  /* EXPECT_TRUE(v == w); */
+  EXPECT_TRUE(v != w);
+  EXPECT_FALSE(v == w);
+}
+
+TEST(VariantTest, Visit) {
+  nostd::variant<int, float> v;
+  struct {
+    int operator()(int) { return 0; }
+    int operator()(float) { return 1; }
+  } a;
+  EXPECT_EQ(nostd::visit(a, v), 0);
+  v = 2.0f;
+  EXPECT_EQ(nostd::visit(a, v), 1);
 }

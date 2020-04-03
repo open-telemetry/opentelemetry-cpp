@@ -76,7 +76,7 @@ struct Invoke<false /* pmo */, 2 /* otherwise */>
 };
 
 template <typename R, typename T, typename Arg, typename... Args>
-inline constexpr auto invoke(R T::*f, Arg &&arg, Args &&... args)
+inline constexpr auto invoke_impl(R T::*f, Arg &&arg, Args &&... args)
     MPARK_RETURN(Invoke<std::is_function<R>::value,
                         (std::is_base_of<T, decay_t<Arg>>::value
                              ? 0
@@ -88,7 +88,7 @@ inline constexpr auto invoke(R T::*f, Arg &&arg, Args &&... args)
 #  pragma warning(disable : 4100)
 #endif
         template <typename F, typename... Args>
-        inline constexpr auto invoke(F &&f, Args &&... args)
+        inline constexpr auto invoke_impl(F &&f, Args &&... args)
             MPARK_RETURN(std::forward<F>(f)(std::forward<Args>(args)...))
 #ifdef _MSC_VER
 #  pragma warning(pop)
@@ -97,7 +97,7 @@ inline constexpr auto invoke(R T::*f, Arg &&arg, Args &&... args)
 
 template <typename F, typename... Args>
 inline constexpr auto invoke(F &&f, Args &&... args)
-    MPARK_RETURN(detail::invoke(std::forward<F>(f), std::forward<Args>(args)...));
+    MPARK_RETURN(detail::invoke_impl(std::forward<F>(f), std::forward<Args>(args)...));
 
 namespace detail
 {

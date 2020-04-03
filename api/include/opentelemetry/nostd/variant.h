@@ -244,7 +244,7 @@ private:
     template <typename... Values>
     inline static constexpr bool does_not_handle()
     {
-      return is_invocable<Visitor, Values...>::value;
+      return nostd::is_invocable<Visitor, Values...>::value;
     }
   };
 
@@ -1234,13 +1234,13 @@ namespace detail
 template <std::size_t N>
 inline constexpr bool all_of_impl(const std::array<bool, N> &bs, std::size_t idx)
 {
-  return idx >= N || (bs[idx] && all_impl(bs, idx + 1));
+  return idx >= N || (bs[idx] && all_of_impl(bs, idx + 1));
 }
 
 template <std::size_t N>
 inline constexpr bool all_of(const std::array<bool, N> &bs)
 {
-  return all_impl(bs, 0);
+  return all_of_impl(bs, 0);
 }
 
 }  // namespace detail
