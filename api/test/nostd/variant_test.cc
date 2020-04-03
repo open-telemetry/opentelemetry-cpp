@@ -102,3 +102,15 @@ TEST(VariantTest, Destructor)
   }
   EXPECT_EQ(destroy_count, 1);
 }
+
+TEST(VariantTest, Conversion)
+{
+  nostd::variant<std::string> x("abc");
+  x = "def";
+  EXPECT_EQ(nostd::get<std::string>(x), "def");
+
+  nostd::variant<std::string, void const *> y("abc");
+  EXPECT_TRUE(nostd::holds_alternative<void const *>(y));
+  y = std::string{"xyz"};
+  EXPECT_TRUE(nostd::holds_alternative<std::string>(y));
+}
