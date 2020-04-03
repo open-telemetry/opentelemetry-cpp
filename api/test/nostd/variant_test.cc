@@ -97,7 +97,7 @@ TEST(VariantTest, Destructor)
   EXPECT_EQ(destroy_count, 1);
   {
     nostd::variant<int, DestroyCounter> w;
-    w = DestroyCounter{&destroy_count};
+    w             = DestroyCounter{&destroy_count};
     destroy_count = 0;
   }
   EXPECT_EQ(destroy_count, 1);

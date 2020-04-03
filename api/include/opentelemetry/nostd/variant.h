@@ -26,11 +26,9 @@
 #include "opentelemetry/nostd/utility.h"
 #include "opentelemetry/version.h"
 
-#define AUTO auto
 #define AUTO_RETURN(...) \
   ->decay_t<decltype(__VA_ARGS__)> { return __VA_ARGS__; }
 
-#define AUTO_REFREF auto
 #define AUTO_REFREF_RETURN(...)                                           \
   ->decltype((__VA_ARGS__))                                               \
   {                                                                       \
@@ -38,7 +36,6 @@
     return __VA_ARGS__;                                                   \
   }
 
-#define DECLTYPE_AUTO auto
 #define DECLTYPE_AUTO_RETURN(...) \
   ->decltype(__VA_ARGS__) { return __VA_ARGS__; }
 
@@ -69,7 +66,7 @@ namespace access
 struct base
 {
   template <std::size_t I, typename V>
-  inline static constexpr AUTO_REFREF get_alt(V &&v)
+  inline static constexpr auto get_alt(V &&v)
 #ifdef _MSC_VER
       AUTO_REFREF_RETURN(recursive_union::get_alt(std::forward<V>(v).data_, in_place_index_t<I>{}))
 #else
@@ -80,7 +77,7 @@ struct base
 struct variant
 {
   template <std::size_t I, typename V>
-  inline static constexpr AUTO_REFREF get_alt(V &&v)
+  inline static constexpr auto get_alt(V &&v)
       AUTO_REFREF_RETURN(base::get_alt<I>(std::forward<V>(v).impl_))
 };
 }  // namespace access
@@ -114,7 +111,7 @@ struct base
                   "`visit` requires the visitor to have a single return type");
 
     template <typename Visitor, typename... Alts>
-    inline static constexpr DECLTYPE_AUTO invoke(Visitor &&visitor, Alts &&... alts)
+    inline static constexpr auto invoke(Visitor &&visitor, Alts &&... alts)
         DECLTYPE_AUTO_RETURN(nostd::invoke(std::forward<Visitor>(visitor),
                                            std::forward<Alts>(alts)...))
   };
@@ -159,19 +156,19 @@ struct base
     template <std::size_t... Is>
     struct impl<index_sequence<Is...>>
     {
-      inline constexpr AUTO operator()() const AUTO_RETURN(&dispatch<Is...>)
+      inline constexpr auto operator()() const AUTO_RETURN(&dispatch<Is...>)
     };
 
     template <typename Is, std::size_t... Js, typename... Ls>
     struct impl<Is, index_sequence<Js...>, Ls...>
     {
-      inline constexpr AUTO operator()() const
+      inline constexpr auto operator()() const
           AUTO_RETURN(make_farray(impl<detail::index_sequence_push_back_t<Is, Js>, Ls...>{}()...))
     };
   };
 
   template <typename F, typename... Vs>
-  inline static constexpr AUTO make_fmatrix() AUTO_RETURN(
+  inline static constexpr auto make_fmatrix() AUTO_RETURN(
       typename make_fmatrix_impl<F, Vs...>::
           template impl<index_sequence<>, make_index_sequence<decay_t<Vs>::size()>...>{}())
 
@@ -189,7 +186,7 @@ struct base
     }
 
     template <std::size_t... Is>
-    inline static constexpr AUTO impl(index_sequence<Is...>)
+    inline static constexpr auto impl(index_sequence<Is...>)
         AUTO_RETURN(make_farray(&dispatch<Is>...))
   };
 
@@ -232,16 +229,15 @@ constexpr fdiagonal_t<F, Vs...> fdiagonal<F, Vs...>::value;
 struct alt
 {
   template <typename Visitor, typename... Vs>
-  inline static constexpr DECLTYPE_AUTO visit_alt(Visitor &&visitor, Vs &&... vs)
-      DECLTYPE_AUTO_RETURN(
-          base::at(base::make_fmatrix<Visitor &&, decltype(as_base(std::forward<Vs>(vs)))...>(),
-                   vs.index()...)(std::forward<Visitor>(visitor), as_base(std::forward<Vs>(vs))...))
+  inline static constexpr auto visit_alt(Visitor &&visitor, Vs &&... vs) DECLTYPE_AUTO_RETURN(
+      base::at(base::make_fmatrix<Visitor &&, decltype(as_base(std::forward<Vs>(vs)))...>(),
+               vs.index()...)(std::forward<Visitor>(visitor), as_base(std::forward<Vs>(vs))...))
 
-          template <typename Visitor, typename... Vs>
-          inline static constexpr DECLTYPE_AUTO
-      visit_alt_at(std::size_t index, Visitor &&visitor, Vs &&... vs) DECLTYPE_AUTO_RETURN(
-          base::at(base::make_fdiagonal<Visitor &&, decltype(as_base(std::forward<Vs>(vs)))...>(),
-                   index)(std::forward<Visitor>(visitor), as_base(std::forward<Vs>(vs))...))
+      template <typename Visitor, typename... Vs>
+      inline static constexpr auto visit_alt_at(std::size_t index, Visitor &&visitor, Vs &&... vs)
+          DECLTYPE_AUTO_RETURN(base::at(
+              base::make_fdiagonal<Visitor &&, decltype(as_base(std::forward<Vs>(vs)))...>(),
+              index)(std::forward<Visitor>(visitor), as_base(std::forward<Vs>(vs))...))
 };
 
 struct variant
@@ -263,7 +259,7 @@ private:
     static_assert(visitor<Visitor>::template does_not_handle<Values...>(),
                   "`visit` requires the visitor to be exhaustive.");
 
-    inline static constexpr DECLTYPE_AUTO invoke(Visitor &&visitor, Values &&... values)
+    inline static constexpr auto invoke(Visitor &&visitor, Values &&... values)
         DECLTYPE_AUTO_RETURN(nostd::invoke(std::forward<Visitor>(visitor),
                                            std::forward<Values>(values)...))
   };
@@ -274,38 +270,44 @@ private:
     Visitor &&visitor_;
 
     template <typename... Alts>
-    inline constexpr DECLTYPE_AUTO operator()(Alts &&... alts) const DECLTYPE_AUTO_RETURN(
+    inline constexpr auto operator()(Alts &&... alts) const DECLTYPE_AUTO_RETURN(
         visit_exhaustiveness_check<Visitor, decltype((std::forward<Alts>(alts).value))...>::invoke(
             std::forward<Visitor>(visitor_),
             std::forward<Alts>(alts).value...))
   };
 
   template <typename Visitor>
-  inline static constexpr AUTO make_value_visitor(Visitor &&visitor)
+  inline static constexpr auto make_value_visitor(Visitor &&visitor)
       AUTO_RETURN(value_visitor<Visitor>{std::forward<Visitor>(visitor)})
 
           public
       : template <typename Visitor, typename... Vs>
-        inline static constexpr DECLTYPE_AUTO visit_alt(Visitor &&visitor, Vs &&... vs)
+        inline static constexpr auto visit_alt(Visitor &&visitor, Vs &&... vs)
             DECLTYPE_AUTO_RETURN(alt::visit_alt(std::forward<Visitor>(visitor),
                                                 std::forward<Vs>(vs).impl_...))
 
                 template <typename Visitor, typename... Vs>
-                inline static constexpr DECLTYPE_AUTO
-        visit_alt_at(std::size_t index, Visitor &&visitor, Vs &&... vs) DECLTYPE_AUTO_RETURN(
-            alt::visit_alt_at(index, std::forward<Visitor>(visitor), std::forward<Vs>(vs).impl_...))
+                inline static constexpr auto visit_alt_at(std::size_t index,
+                                                          Visitor &&visitor,
+                                                          Vs &&... vs)
+                    DECLTYPE_AUTO_RETURN(alt::visit_alt_at(index,
+                                                           std::forward<Visitor>(visitor),
+                                                           std::forward<Vs>(vs).impl_...))
 
-            template <typename Visitor, typename... Vs>
-            inline static constexpr DECLTYPE_AUTO visit_value(Visitor &&visitor, Vs &&... vs)
-                DECLTYPE_AUTO_RETURN(visit_alt(make_value_visitor(std::forward<Visitor>(visitor)),
-                                               std::forward<Vs>(vs)...))
+                        template <typename Visitor, typename... Vs>
+                        inline static constexpr auto visit_value(Visitor &&visitor, Vs &&... vs)
+                            DECLTYPE_AUTO_RETURN(
+                                visit_alt(make_value_visitor(std::forward<Visitor>(visitor)),
+                                          std::forward<Vs>(vs)...))
 
-                    template <typename Visitor, typename... Vs>
-                    inline static constexpr DECLTYPE_AUTO
-        visit_value_at(std::size_t index, Visitor &&visitor, Vs &&... vs)
-            DECLTYPE_AUTO_RETURN(visit_alt_at(index,
-                                              make_value_visitor(std::forward<Visitor>(visitor)),
-                                              std::forward<Vs>(vs)...))
+                                template <typename Visitor, typename... Vs>
+                                inline static constexpr auto visit_value_at(std::size_t index,
+                                                                            Visitor &&visitor,
+                                                                            Vs &&... vs)
+                                    DECLTYPE_AUTO_RETURN(visit_alt_at(
+                                        index,
+                                        make_value_visitor(std::forward<Visitor>(visitor)),
+                                        std::forward<Vs>(vs)...))
 };
 }  // namespace visitation
 
@@ -1033,12 +1035,12 @@ struct generic_get_impl
 {
   constexpr generic_get_impl(int) noexcept {}
 
-  constexpr AUTO_REFREF operator()(V &&v) const
+  constexpr auto operator()(V &&v) const
       AUTO_REFREF_RETURN(access::variant::get_alt<I>(std::forward<V>(v)).value)
 };
 
 template <std::size_t I, typename V>
-inline constexpr AUTO_REFREF generic_get(V &&v) AUTO_REFREF_RETURN(generic_get_impl<I, V>(
+inline constexpr auto generic_get(V &&v) AUTO_REFREF_RETURN(generic_get_impl<I, V>(
     holds_alternative<I>(v) ? 0 : (throw_bad_variant_access(), 0))(std::forward<V>(v)))
 }  // namespace detail
 
@@ -1094,7 +1096,7 @@ namespace detail
 {
 
 template <std::size_t I, typename V>
-inline constexpr /* auto * */ AUTO generic_get_if(V *v) noexcept AUTO_RETURN(
+inline constexpr /* auto * */ auto generic_get_if(V *v) noexcept AUTO_RETURN(
     v &&holds_alternative<I>(*v) ? std::addressof(access::variant::get_alt<I>(*v).value) : nullptr)
 
 }  // namespace detail
@@ -1256,7 +1258,7 @@ inline constexpr bool all_of(const std::array<bool, N> &bs)
 }  // namespace detail
 
 template <typename Visitor, typename... Vs>
-inline constexpr DECLTYPE_AUTO visit(Visitor &&visitor, Vs &&... vs) DECLTYPE_AUTO_RETURN(
+inline constexpr auto visit(Visitor &&visitor, Vs &&... vs) DECLTYPE_AUTO_RETURN(
     (detail::all_of(std::array<bool, sizeof...(Vs)>{{!vs.valueless_by_exception()...}})
          ? (void)0
          : throw_bad_variant_access()),
@@ -1270,11 +1272,8 @@ inline auto swap(variant<Ts...> &lhs, variant<Ts...> &rhs) noexcept(noexcept(lhs
 }  // namespace nostd
 OPENTELEMETRY_END_NAMESPACE
 
-#undef AUTO
 #undef AUTO_RETURN
 
-#undef AUTO_REFREF
 #undef AUTO_REFREF_RETURN
 
-#undef DECLTYPE_AUTO
 #undef DECLTYPE_AUTO_RETURN
