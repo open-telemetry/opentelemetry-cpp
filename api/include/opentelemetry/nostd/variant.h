@@ -12,6 +12,7 @@
 #include "opentelemetry/nostd/detail/variant_alternative.h"
 #include "opentelemetry/nostd/detail/variant_fwd.h"
 #include "opentelemetry/nostd/detail/variant_size.h"
+#include "opentelemetry/nostd/detail/dependent_type.h"
 #include "opentelemetry/nostd/type_traits.h"
 #include "opentelemetry/nostd/utility.h"
 #include "opentelemetry/version.h"
@@ -831,6 +832,176 @@ template <typename T>
 struct is_in_place_type<in_place_type_t<T>> : std::true_type
 {};
 }  // namespace detail
+
+template <typename... Ts>
+class variant
+{
+  static_assert(0 < sizeof...(Ts), "variant must consist of at least one alternative.");
+
+  static_assert(detail::all<!std::is_array<Ts>::value...>::value,
+                "variant can not have an array type as an alternative.");
+
+  static_assert(detail::all<!std::is_reference<Ts>::value...>::value,
+                "variant can not have a reference type as an alternative.");
+
+  static_assert(detail::all<!std::is_void<Ts>::value...>::value,
+                "variant can not have a void type as an alternative.");
+
+public:
+  template <typename Front = detail::type_pack_element_t<0, Ts...>,
+            enable_if_t<std::is_default_constructible<Front>::value, int> = 0>
+  inline constexpr variant() noexcept(std::is_nothrow_default_constructible<Front>::value)
+      : impl_(in_place_index_t<0>{})
+  {}
+
+  variant(const variant &) = default;
+  variant(variant &&)      = default;
+
+  template <typename Arg,
+            typename Decayed                                                  = decay_t<Arg>,
+            enable_if_t<!std::is_same<Decayed, variant>::value, int>     = 0,
+            enable_if_t<!detail::is_in_place_index<Decayed>::value, int> = 0,
+            enable_if_t<!detail::is_in_place_type<Decayed>::value, int>  = 0,
+            std::size_t I = detail::best_match<Arg, Ts...>::value,
+            typename T    = detail::type_pack_element_t<I, Ts...>,
+            enable_if_t<std::is_constructible<T, Arg>::value, int> = 0>
+  inline constexpr variant(Arg &&arg) noexcept(std::is_nothrow_constructible<T, Arg>::value)
+      : impl_(in_place_index_t<I>{}, std::forward<Arg>(arg))
+  {}
+
+  template <std::size_t I,
+            typename... Args,
+            typename T = detail::type_pack_element_t<I, Ts...>,
+            enable_if_t<std::is_constructible<T, Args...>::value, int> = 0>
+  inline explicit constexpr variant(in_place_index_t<I>, Args &&... args) noexcept(
+      std::is_nothrow_constructible<T, Args...>::value)
+      : impl_(in_place_index_t<I>{}, std::forward<Args>(args)...)
+  {}
+
+  template <
+      std::size_t I,
+      typename Up,
+      typename... Args,
+      typename T = detail::type_pack_element_t<I, Ts...>,
+      enable_if_t<std::is_constructible<T, std::initializer_list<Up> &, Args...>::value, int> = 0>
+  inline explicit constexpr variant(
+      in_place_index_t<I>,
+      std::initializer_list<Up> il,
+      Args &&... args) noexcept(std::is_nothrow_constructible<T,
+                                                              std::initializer_list<Up> &,
+                                                              Args...>::value)
+      : impl_(in_place_index_t<I>{}, il, std::forward<Args>(args)...)
+  {}
+
+  template <typename T,
+            typename... Args,
+            std::size_t I = detail::find_index_sfinae<T, Ts...>::value,
+            enable_if_t<std::is_constructible<T, Args...>::value, int> = 0>
+  inline explicit constexpr variant(in_place_type_t<T>, Args &&... args) noexcept(
+      std::is_nothrow_constructible<T, Args...>::value)
+      : impl_(in_place_index_t<I>{}, std::forward<Args>(args)...)
+  {}
+
+  template <typename T,
+            typename Up,
+            typename... Args,
+            std::size_t I         = detail::find_index_sfinae<T, Ts...>::value,
+            enable_if_t<std::is_constructible<T, std::initializer_list<Up> &, Args...>::value,
+                             int> = 0>
+  inline explicit constexpr variant(
+      in_place_type_t<T>,
+      std::initializer_list<Up> il,
+      Args &&... args) noexcept(std::is_nothrow_constructible<T,
+                                                              std::initializer_list<Up> &,
+                                                              Args...>::value)
+      : impl_(in_place_index_t<I>{}, il, std::forward<Args>(args)...)
+  {}
+
+  ~variant() = default;
+
+  variant &operator=(const variant &) = default;
+  variant &operator=(variant &&) = default;
+
+  template <typename Arg,
+            enable_if_t<!std::is_same<decay_t<Arg>, variant>::value, int> = 0,
+            std::size_t I         = detail::best_match<Arg, Ts...>::value,
+            typename T            = detail::type_pack_element_t<I, Ts...>,
+            enable_if_t<(std::is_assignable<T &, Arg>::value &&
+                              std::is_constructible<T, Arg>::value),
+                             int> = 0>
+  inline variant &operator=(Arg &&arg) noexcept((std::is_nothrow_assignable<T &, Arg>::value &&
+                                                 std::is_nothrow_constructible<T, Arg>::value))
+  {
+    impl_.template assign<I>(std::forward<Arg>(arg));
+    return *this;
+  }
+
+  template <std::size_t I,
+            typename... Args,
+            typename T = detail::type_pack_element_t<I, Ts...>,
+            enable_if_t<std::is_constructible<T, Args...>::value, int> = 0>
+  inline T &emplace(Args &&... args)
+  {
+    return impl_.template emplace<I>(std::forward<Args>(args)...);
+  }
+
+  template <
+      std::size_t I,
+      typename Up,
+      typename... Args,
+      typename T = detail::type_pack_element_t<I, Ts...>,
+      enable_if_t<std::is_constructible<T, std::initializer_list<Up> &, Args...>::value, int> = 0>
+  inline T &emplace(std::initializer_list<Up> il, Args &&... args)
+  {
+    return impl_.template emplace<I>(il, std::forward<Args>(args)...);
+  }
+
+  template <typename T,
+            typename... Args,
+            std::size_t I = detail::find_index_sfinae<T, Ts...>::value,
+            enable_if_t<std::is_constructible<T, Args...>::value, int> = 0>
+  inline T &emplace(Args &&... args)
+  {
+    return impl_.template emplace<I>(std::forward<Args>(args)...);
+  }
+
+  template <typename T,
+            typename Up,
+            typename... Args,
+            std::size_t I         = detail::find_index_sfinae<T, Ts...>::value,
+            enable_if_t<std::is_constructible<T, std::initializer_list<Up> &, Args...>::value,
+                             int> = 0>
+  inline T &emplace(std::initializer_list<Up> il, Args &&... args)
+  {
+    return impl_.template emplace<I>(il, std::forward<Args>(args)...);
+  }
+
+  inline constexpr bool valueless_by_exception() const noexcept
+  {
+    return impl_.valueless_by_exception();
+  }
+
+  inline constexpr std::size_t index() const noexcept { return impl_.index(); }
+
+  template <bool Dummy = true,
+            enable_if_t<
+                detail::all<Dummy,
+                            (detail::dependent_type<std::is_move_constructible<Ts>, Dummy>::value &&
+                             detail::dependent_type<is_swappable<Ts>, Dummy>::value)...>::value,
+                int> = 0>
+  inline void swap(variant &that) noexcept(
+      detail::all<(std::is_nothrow_move_constructible<Ts>::value &&
+                   is_nothrow_swappable<Ts>::value)...>::value)
+  {
+    impl_.swap(that.impl_);
+  }
+
+private:
+  detail::impl<Ts...> impl_;
+
+  friend struct detail::access::variant;
+  friend struct detail::visitation::variant;
+};
 
 }  // namespace nostd
 OPENTELEMETRY_END_NAMESPACE
