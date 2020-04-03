@@ -3,6 +3,7 @@
 #include <array>
 #include <type_traits>
 
+#include "opentelemetry/config.h"
 #include "opentelemetry/nostd/detail/void.h"
 #include "opentelemetry/version.h"
 
@@ -107,5 +108,43 @@ struct is_nothrow_swappable<false, T> : std::false_type
 }  // namespace detail
 template <typename T>
 using is_nothrow_swappable = detail::swappable::is_nothrow_swappable<is_swappable<T>::value, T>;
+
+/**
+ * Back port of
+ *  std::is_trivialy_copy_constructible
+ *  std::is_trivialy_move_constructible
+ *  std::is_trivialy_copy_assignable
+ *  std::is_trivialy_move_assignable
+ */
+#ifdef OPENTELEMETRY_TRIVIALITY_TYPE_TRAITS
+using std::is_trivially_copy_assignable;
+using std::is_trivially_copy_constructible;
+using std::is_trivially_move_assignable;
+using std::is_trivially_move_constructible;
+#else
+template <typename T>
+struct is_trivially_copy_constructible
+{
+  static constexpr bool value = std::is_copy_constructible<T>::value && __has_trivial_copy(T);
+};
+
+template <typename T>
+struct is_trivially_move_constructible
+{
+  static constexpr bool value = __is_trivial(T);
+};
+
+template <typename T>
+struct is_trivially_copy_assignable
+{
+  static constexpr bool value = std::is_copy_assignable<T>::value && __has_trivial_assign(T);
+};
+
+template <typename T>
+struct is_trivially_move_assignable
+{
+  static constexpr bool value = __is_trivial(T);
+};
+#endif
 }  // namespace nostd
 OPENTELEMETRY_END_NAMESPACE

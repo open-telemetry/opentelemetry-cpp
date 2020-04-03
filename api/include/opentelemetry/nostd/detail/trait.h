@@ -2,6 +2,7 @@
 
 #include <type_traits>
 
+#include "opentelemetry/nostd/type_traits.h"
 #include "opentelemetry/version.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
@@ -49,19 +50,19 @@ inline constexpr Trait common_trait(Traits... ts)
 template <typename... Ts>
 struct traits
 {
-  static constexpr Trait copy_constructible_trait = common_trait(
-      trait<Ts, std::is_trivially_copy_constructible, std::is_copy_constructible>()...);
+  static constexpr Trait copy_constructible_trait =
+      common_trait(trait<Ts, is_trivially_copy_constructible, std::is_copy_constructible>()...);
 
-  static constexpr Trait move_constructible_trait = common_trait(
-      trait<Ts, std::is_trivially_move_constructible, std::is_move_constructible>()...);
+  static constexpr Trait move_constructible_trait =
+      common_trait(trait<Ts, is_trivially_move_constructible, std::is_move_constructible>()...);
 
   static constexpr Trait copy_assignable_trait =
       common_trait(copy_constructible_trait,
-                   trait<Ts, std::is_trivially_copy_assignable, std::is_copy_assignable>()...);
+                   trait<Ts, is_trivially_copy_assignable, std::is_copy_assignable>()...);
 
   static constexpr Trait move_assignable_trait =
       common_trait(move_constructible_trait,
-                   trait<Ts, std::is_trivially_move_assignable, std::is_move_assignable>()...);
+                   trait<Ts, is_trivially_move_assignable, std::is_move_assignable>()...);
 
   static constexpr Trait destructible_trait =
       common_trait(trait<Ts, std::is_trivially_destructible, std::is_destructible>()...);
