@@ -707,7 +707,7 @@ public:
         std::swap(lhs, rhs);
       }
       impl tmp(std::move(*rhs));
-#ifdef MPARK_EXCEPTIONS
+#if __EXCEPTIONS
       // EXTENSION: When the move construction of `lhs` into `rhs` throws
       // and `tmp` is nothrow move constructible then we move `tmp` back
       // into `rhs` and provide the strong exception safety guarantee.

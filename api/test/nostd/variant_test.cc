@@ -32,14 +32,24 @@ TEST(VariantAlternativeTest, GetVariantSize)
       (std::is_same<nostd::variant_alternative_t<1, const nostd::variant<int, double>>, const double>::value));
 }
 
-struct A {
-  int operator()(int) { return 1;}
-
-  char operator()(char) { return 'a';}
-};
-
 TEST(VariantTest, Get) {
   nostd::variant<int, float> v, w;
   v = 12;
   EXPECT_EQ(nostd::get<int>(v), 12);
+  EXPECT_EQ(nostd::get<0>(v), 12);
+  w = v;
+  EXPECT_EQ(nostd::get<int>(w), 12);
+  EXPECT_EQ(*nostd::get_if<int>(&v), 12);
+  EXPECT_EQ(nostd::get_if<float>(&v), nullptr);
+#if __EXCEPTIONS
+  EXPECT_THROW(nostd::get<float>(w), nostd::bad_variant_access);
+#else
+  EXPECT_DEATH({ nostd::get<float>(w); }, "");
+#endif
+}
+
+TEST(VariantTest, Comparison) {
+  nostd::variant<int, float> v, w;
+  v = 3.0f;
+  /* EXPECT_TRUE(v == w); */
 }
