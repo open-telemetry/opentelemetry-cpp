@@ -10,6 +10,12 @@ OPENTELEMETRY_BEGIN_NAMESPACE
 namespace nostd
 {
 /**
+ * Back port of std::add_pointer_t
+ */
+template< class T >
+using add_pointer_t = typename std::add_pointer<T>::type;
+
+/**
  * Back port of std::enable_if_t
  */
 template <bool B, class T = void>

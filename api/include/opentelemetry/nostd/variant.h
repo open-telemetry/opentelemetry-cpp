@@ -5,6 +5,8 @@
 #include <limits>
 
 #include "opentelemetry/nostd/detail/all.h"
+#include "opentelemetry/nostd/detail/functional.h"
+#include "opentelemetry/nostd/detail/dependent_type.h"
 #include "opentelemetry/nostd/detail/find_index.h"
 #include "opentelemetry/nostd/detail/recursive_union.h"
 #include "opentelemetry/nostd/detail/trait.h"
@@ -12,7 +14,6 @@
 #include "opentelemetry/nostd/detail/variant_alternative.h"
 #include "opentelemetry/nostd/detail/variant_fwd.h"
 #include "opentelemetry/nostd/detail/variant_size.h"
-#include "opentelemetry/nostd/detail/dependent_type.h"
 #include "opentelemetry/nostd/type_traits.h"
 #include "opentelemetry/nostd/utility.h"
 #include "opentelemetry/version.h"
@@ -712,13 +713,13 @@ public:
       // into `rhs` and provide the strong exception safety guarantee.
       try
       {
-        this->generic_construct(*rhs, lib::move(*lhs));
+        this->generic_construct(*rhs, std::move(*lhs));
       }
       catch (...)
       {
         if (tmp.move_nothrow())
         {
-          this->generic_construct(*rhs, lib::move(tmp));
+          this->generic_construct(*rhs, std::move(tmp));
         }
         throw;
       }
@@ -858,7 +859,7 @@ public:
   variant(variant &&)      = default;
 
   template <typename Arg,
-            typename Decayed                                                  = decay_t<Arg>,
+            typename Decayed                                             = decay_t<Arg>,
             enable_if_t<!std::is_same<Decayed, variant>::value, int>     = 0,
             enable_if_t<!detail::is_in_place_index<Decayed>::value, int> = 0,
             enable_if_t<!detail::is_in_place_type<Decayed>::value, int>  = 0,
@@ -902,12 +903,12 @@ public:
       : impl_(in_place_index_t<I>{}, std::forward<Args>(args)...)
   {}
 
-  template <typename T,
-            typename Up,
-            typename... Args,
-            std::size_t I         = detail::find_index_sfinae<T, Ts...>::value,
-            enable_if_t<std::is_constructible<T, std::initializer_list<Up> &, Args...>::value,
-                             int> = 0>
+  template <
+      typename T,
+      typename Up,
+      typename... Args,
+      std::size_t I = detail::find_index_sfinae<T, Ts...>::value,
+      enable_if_t<std::is_constructible<T, std::initializer_list<Up> &, Args...>::value, int> = 0>
   inline explicit constexpr variant(
       in_place_type_t<T>,
       std::initializer_list<Up> il,
@@ -922,13 +923,13 @@ public:
   variant &operator=(const variant &) = default;
   variant &operator=(variant &&) = default;
 
-  template <typename Arg,
-            enable_if_t<!std::is_same<decay_t<Arg>, variant>::value, int> = 0,
-            std::size_t I         = detail::best_match<Arg, Ts...>::value,
-            typename T            = detail::type_pack_element_t<I, Ts...>,
-            enable_if_t<(std::is_assignable<T &, Arg>::value &&
-                              std::is_constructible<T, Arg>::value),
-                             int> = 0>
+  template <
+      typename Arg,
+      enable_if_t<!std::is_same<decay_t<Arg>, variant>::value, int> = 0,
+      std::size_t I    = detail::best_match<Arg, Ts...>::value,
+      typename T       = detail::type_pack_element_t<I, Ts...>,
+      enable_if_t<(std::is_assignable<T &, Arg>::value && std::is_constructible<T, Arg>::value),
+                  int> = 0>
   inline variant &operator=(Arg &&arg) noexcept((std::is_nothrow_assignable<T &, Arg>::value &&
                                                  std::is_nothrow_constructible<T, Arg>::value))
   {
@@ -965,12 +966,12 @@ public:
     return impl_.template emplace<I>(std::forward<Args>(args)...);
   }
 
-  template <typename T,
-            typename Up,
-            typename... Args,
-            std::size_t I         = detail::find_index_sfinae<T, Ts...>::value,
-            enable_if_t<std::is_constructible<T, std::initializer_list<Up> &, Args...>::value,
-                             int> = 0>
+  template <
+      typename T,
+      typename Up,
+      typename... Args,
+      std::size_t I = detail::find_index_sfinae<T, Ts...>::value,
+      enable_if_t<std::is_constructible<T, std::initializer_list<Up> &, Args...>::value, int> = 0>
   inline T &emplace(std::initializer_list<Up> il, Args &&... args)
   {
     return impl_.template emplace<I>(il, std::forward<Args>(args)...);
@@ -1003,6 +1004,259 @@ private:
   friend struct detail::visitation::variant;
 };
 
+template <std::size_t I, typename... Ts>
+inline constexpr bool holds_alternative(const variant<Ts...> &v) noexcept
+{
+  return v.index() == I;
+}
+
+template <typename T, typename... Ts>
+inline constexpr bool holds_alternative(const variant<Ts...> &v) noexcept
+{
+  return holds_alternative<detail::find_index_checked<T, Ts...>::value>(v);
+}
+
+namespace detail
+{
+template <std::size_t I, typename V>
+struct generic_get_impl
+{
+  constexpr generic_get_impl(int) noexcept {}
+
+  constexpr AUTO_REFREF operator()(V &&v) const
+      AUTO_REFREF_RETURN(access::variant::get_alt<I>(std::forward<V>(v)).value)
+};
+
+template <std::size_t I, typename V>
+inline constexpr AUTO_REFREF generic_get(V &&v) AUTO_REFREF_RETURN(generic_get_impl<I, V>(
+    holds_alternative<I>(v) ? 0 : (throw_bad_variant_access(), 0))(std::forward<V>(v)))
+}  // namespace detail
+
+template <std::size_t I, typename... Ts>
+inline constexpr variant_alternative_t<I, variant<Ts...>> &get(variant<Ts...> &v)
+{
+  return detail::generic_get<I>(v);
+}
+
+template <std::size_t I, typename... Ts>
+inline constexpr variant_alternative_t<I, variant<Ts...>> &&get(variant<Ts...> &&v)
+{
+  return detail::generic_get<I>(std::move(v));
+}
+
+template <std::size_t I, typename... Ts>
+inline constexpr const variant_alternative_t<I, variant<Ts...>> &get(const variant<Ts...> &v)
+{
+  return detail::generic_get<I>(v);
+}
+
+template <std::size_t I, typename... Ts>
+inline constexpr const variant_alternative_t<I, variant<Ts...>> &&get(const variant<Ts...> &&v)
+{
+  return detail::generic_get<I>(std::move(v));
+}
+
+template <typename T, typename... Ts>
+inline constexpr T &get(variant<Ts...> &v)
+{
+  return get<detail::find_index_checked<T, Ts...>::value>(v);
+}
+
+template <typename T, typename... Ts>
+inline constexpr T &&get(variant<Ts...> &&v)
+{
+  return get<detail::find_index_checked<T, Ts...>::value>(std::move(v));
+}
+
+template <typename T, typename... Ts>
+inline constexpr const T &get(const variant<Ts...> &v)
+{
+  return get<detail::find_index_checked<T, Ts...>::value>(v);
+}
+
+template <typename T, typename... Ts>
+inline constexpr const T &&get(const variant<Ts...> &&v)
+{
+  return get<detail::find_index_checked<T, Ts...>::value>(std::move(v));
+}
+
+namespace detail
+{
+
+template <std::size_t I, typename V>
+inline constexpr /* auto * */ AUTO generic_get_if(V *v) noexcept AUTO_RETURN(
+    v &&holds_alternative<I>(*v) ? std::addressof(access::variant::get_alt<I>(*v).value) : nullptr)
+
+}  // namespace detail
+
+template <std::size_t I, typename... Ts>
+inline constexpr add_pointer_t<variant_alternative_t<I, variant<Ts...>>> get_if(
+    variant<Ts...> *v) noexcept
+{
+  return detail::generic_get_if<I>(v);
+}
+
+template <std::size_t I, typename... Ts>
+inline constexpr add_pointer_t<const variant_alternative_t<I, variant<Ts...>>> get_if(
+    const variant<Ts...> *v) noexcept
+{
+  return detail::generic_get_if<I>(v);
+}
+
+template <typename T, typename... Ts>
+inline constexpr add_pointer_t<T> get_if(variant<Ts...> *v) noexcept
+{
+  return get_if<detail::find_index_checked<T, Ts...>::value>(v);
+}
+
+template <typename T, typename... Ts>
+inline constexpr add_pointer_t<const T> get_if(const variant<Ts...> *v) noexcept
+{
+  return get_if<detail::find_index_checked<T, Ts...>::value>(v);
+}
+
+namespace detail
+{
+template <typename RelOp>
+struct convert_to_bool
+{
+  template <typename Lhs, typename Rhs>
+  inline constexpr bool operator()(Lhs &&lhs, Rhs &&rhs) const
+  {
+    static_assert(std::is_convertible<invoke_result_t<RelOp, Lhs, Rhs>, bool>::value,
+                  "relational operators must return a type"
+                  " implicitly convertible to bool");
+    return invoke(RelOp{}, std::forward<Lhs>(lhs), std::forward<Rhs>(rhs));
+  }
+};
+}  // namespace detail
+
+template <typename... Ts>
+inline constexpr bool operator==(const variant<Ts...> &lhs, const variant<Ts...> &rhs)
+{
+  using detail::visitation::variant;
+  using equal_to = detail::convert_to_bool<detail::equal_to>;
+  return lhs.index() == rhs.index() && (lhs.valueless_by_exception() ||
+                                        variant::visit_value_at(lhs.index(), equal_to{}, lhs, rhs));
+}
+
+template <typename... Ts>
+inline constexpr bool operator!=(const variant<Ts...> &lhs, const variant<Ts...> &rhs)
+{
+  using detail::visitation::variant;
+  using not_equal_to = detail::convert_to_bool<detail::not_equal_to>;
+  return lhs.index() != rhs.index() ||
+         (!lhs.valueless_by_exception() &&
+          variant::visit_value_at(lhs.index(), not_equal_to{}, lhs, rhs));
+}
+
+template <typename... Ts>
+inline constexpr bool operator<(const variant<Ts...> &lhs, const variant<Ts...> &rhs)
+{
+  using detail::visitation::variant;
+  using less = detail::convert_to_bool<detail::less>;
+  return !rhs.valueless_by_exception() &&
+         (lhs.valueless_by_exception() || lhs.index() < rhs.index() ||
+          (lhs.index() == rhs.index() && variant::visit_value_at(lhs.index(), less{}, lhs, rhs)));
+}
+
+template <typename... Ts>
+inline constexpr bool operator>(const variant<Ts...> &lhs, const variant<Ts...> &rhs)
+{
+  using detail::visitation::variant;
+  using greater = detail::convert_to_bool<detail::greater>;
+  return !lhs.valueless_by_exception() &&
+         (rhs.valueless_by_exception() || lhs.index() > rhs.index() ||
+          (lhs.index() == rhs.index() &&
+           variant::visit_value_at(lhs.index(), greater{}, lhs, rhs)));
+}
+
+template <typename... Ts>
+inline constexpr bool operator<=(const variant<Ts...> &lhs, const variant<Ts...> &rhs)
+{
+  using detail::visitation::variant;
+  using less_equal = detail::convert_to_bool<detail::less_equal>;
+  return lhs.valueless_by_exception() ||
+         (!rhs.valueless_by_exception() &&
+          (lhs.index() < rhs.index() ||
+           (lhs.index() == rhs.index() &&
+            variant::visit_value_at(lhs.index(), less_equal{}, lhs, rhs))));
+}
+
+template <typename... Ts>
+inline constexpr bool operator>=(const variant<Ts...> &lhs, const variant<Ts...> &rhs)
+{
+  using detail::visitation::variant;
+  using greater_equal = detail::convert_to_bool<detail::greater_equal>;
+  return rhs.valueless_by_exception() ||
+         (!lhs.valueless_by_exception() &&
+          (lhs.index() > rhs.index() ||
+           (lhs.index() == rhs.index() &&
+            variant::visit_value_at(lhs.index(), greater_equal{}, lhs, rhs))));
+}
+
+struct monostate
+{};
+
+inline constexpr bool operator<(monostate, monostate) noexcept
+{
+  return false;
+}
+
+inline constexpr bool operator>(monostate, monostate) noexcept
+{
+  return false;
+}
+
+inline constexpr bool operator<=(monostate, monostate) noexcept
+{
+  return true;
+}
+
+inline constexpr bool operator>=(monostate, monostate) noexcept
+{
+  return true;
+}
+
+inline constexpr bool operator==(monostate, monostate) noexcept
+{
+  return true;
+}
+
+inline constexpr bool operator!=(monostate, monostate) noexcept
+{
+  return false;
+}
+
+namespace detail
+{
+
+template <std::size_t N>
+inline constexpr bool all_of_impl(const std::array<bool, N> &bs, std::size_t idx)
+{
+  return idx >= N || (bs[idx] && all_impl(bs, idx + 1));
+}
+
+template <std::size_t N>
+inline constexpr bool all_of(const std::array<bool, N> &bs)
+{
+  return all_impl(bs, 0);
+}
+
+}  // namespace detail
+
+template <typename Visitor, typename... Vs>
+inline constexpr DECLTYPE_AUTO visit(Visitor &&visitor, Vs &&... vs) DECLTYPE_AUTO_RETURN(
+    (detail::all_of(std::array<bool, sizeof...(Vs)>{{!vs.valueless_by_exception()...}})
+         ? (void)0
+         : throw_bad_variant_access()),
+    detail::visitation::variant::visit_value(std::forward<Visitor>(visitor),
+                                             std::forward<Vs>(vs)...)) template <typename... Ts>
+inline auto swap(variant<Ts...> &lhs, variant<Ts...> &rhs) noexcept(noexcept(lhs.swap(rhs)))
+    -> decltype(lhs.swap(rhs))
+{
+  lhs.swap(rhs);
+}
 }  // namespace nostd
 OPENTELEMETRY_END_NAMESPACE
 
