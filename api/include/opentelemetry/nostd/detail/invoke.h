@@ -78,10 +78,10 @@ struct Invoke<false /* pmo */, 2 /* otherwise */>
 template <typename R, typename T, typename Arg, typename... Args>
 inline constexpr auto invoke_impl(R T::*f, Arg &&arg, Args &&... args)
     OPENTELEMETRY_RETURN(Invoke<std::is_function<R>::value,
-                        (std::is_base_of<T, decay_t<Arg>>::value
-                             ? 0
-                             : is_reference_wrapper<decay_t<Arg>>::value ? 1 : 2)>::
-                     invoke(f, std::forward<Arg>(arg), std::forward<Args>(args)...))
+                                (std::is_base_of<T, decay_t<Arg>>::value
+                                     ? 0
+                                     : is_reference_wrapper<decay_t<Arg>>::value ? 1 : 2)>::
+                             invoke(f, std::forward<Arg>(arg), std::forward<Args>(args)...))
 
 #ifdef _MSC_VER
 #  pragma warning(push)
@@ -102,17 +102,17 @@ inline constexpr auto invoke(F &&f, Args &&... args)
 namespace detail
 {
 
-  template <typename Void, typename, typename...>
-  struct invoke_result
-  {};
+template <typename Void, typename, typename...>
+struct invoke_result
+{};
 
-  template <typename F, typename... Args>
-  struct invoke_result<void_t<decltype(nostd::invoke(std::declval<F>(), std::declval<Args>()...))>,
-                       F,
-                       Args...>
-  {
-    using type = decltype(nostd::invoke(std::declval<F>(), std::declval<Args>()...));
-  };
+template <typename F, typename... Args>
+struct invoke_result<void_t<decltype(nostd::invoke(std::declval<F>(), std::declval<Args>()...))>,
+                     F,
+                     Args...>
+{
+  using type = decltype(nostd::invoke(std::declval<F>(), std::declval<Args>()...));
+};
 
 }  // namespace detail
 

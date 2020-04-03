@@ -15,4 +15,3 @@ struct dependent_type : T
 }  // namespace detail
 }  // namespace nostd
 OPENTELEMETRY_END_NAMESPACE
-

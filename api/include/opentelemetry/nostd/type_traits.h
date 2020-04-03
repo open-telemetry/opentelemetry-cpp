@@ -12,7 +12,7 @@ namespace nostd
 /**
  * Back port of std::add_pointer_t
  */
-template< class T >
+template <class T>
 using add_pointer_t = typename std::add_pointer<T>::type;
 
 /**
@@ -90,8 +90,10 @@ using detail::swappable::is_swappable;
 /**
  * Back port of std::is_swappable
  */
-namespace detail {
-namespace swappable {
+namespace detail
+{
+namespace swappable
+{
 template <bool IsSwappable, typename T>
 struct is_nothrow_swappable
 {
@@ -101,8 +103,8 @@ struct is_nothrow_swappable
 template <typename T>
 struct is_nothrow_swappable<false, T> : std::false_type
 {};
-} // namespace swappable
-} // namespace detail
+}  // namespace swappable
+}  // namespace detail
 template <typename T>
 using is_nothrow_swappable = detail::swappable::is_nothrow_swappable<is_swappable<T>::value, T>;
 }  // namespace nostd

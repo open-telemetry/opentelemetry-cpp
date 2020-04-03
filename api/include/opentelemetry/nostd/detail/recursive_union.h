@@ -1,7 +1,7 @@
 #pragma once
 
-#include <utility>
 #include <type_traits>
+#include <utility>
 
 #include "opentelemetry/nostd/detail/trait.h"
 #include "opentelemetry/nostd/detail/valueless.h"
@@ -36,15 +36,14 @@ struct recursive_union
   struct get_alt_impl<0, Dummy>
   {
     template <typename V>
-    inline constexpr auto operator()(V &&v) const
-        AUTO_REFREF_RETURN(std::forward<V>(v).head_)
+    inline constexpr auto operator()(V &&v) const AUTO_REFREF_RETURN(std::forward<V>(v).head_)
   };
 
   template <typename V, std::size_t I>
   inline static constexpr auto get_alt(V &&v, in_place_index_t<I>)
       AUTO_REFREF_RETURN(get_alt_impl<I>{}(std::forward<V>(v)))
 };
-} // namespace access
+}  // namespace access
 
 template <std::size_t Index, typename T>
 struct alt
@@ -72,7 +71,7 @@ template <Trait DestructibleTrait, std::size_t Index>
 union recursive_union<DestructibleTrait, Index>
 {};
 
-#define OPENTELEMETRY_VARIANT_RECURSIVE_UNION(destructible_trait, destructor)               \
+#define OPENTELEMETRY_VARIANT_RECURSIVE_UNION(destructible_trait, destructor)       \
   template <std::size_t Index, typename T, typename... Ts>                          \
   union recursive_union<destructible_trait, Index, T, Ts...>                        \
   {                                                                                 \

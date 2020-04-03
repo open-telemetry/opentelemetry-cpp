@@ -1,7 +1,7 @@
 #include "opentelemetry/nostd/variant.h"
 
-#include <type_traits>
 #include <string>
+#include <type_traits>
 
 #include <gtest/gtest.h>
 
@@ -35,12 +35,14 @@ TEST(VariantSizeTest, GetVariantSize)
 TEST(VariantAlternativeTest, GetVariantSize)
 {
   EXPECT_TRUE((std::is_same<nostd::variant_alternative_t<0, nostd::variant<int>>, int>::value));
-  EXPECT_TRUE((std::is_same<nostd::variant_alternative_t<1, nostd::variant<int, double>>, double>::value));
   EXPECT_TRUE(
-      (std::is_same<nostd::variant_alternative_t<1, const nostd::variant<int, double>>, const double>::value));
+      (std::is_same<nostd::variant_alternative_t<1, nostd::variant<int, double>>, double>::value));
+  EXPECT_TRUE((std::is_same<nostd::variant_alternative_t<1, const nostd::variant<int, double>>,
+                            const double>::value));
 }
 
-TEST(VariantTest, Get) {
+TEST(VariantTest, Get)
+{
   nostd::variant<int, float> v, w;
   v = 12;
   EXPECT_EQ(nostd::get<int>(v), 12);
@@ -56,7 +58,8 @@ TEST(VariantTest, Get) {
 #endif
 }
 
-TEST(VariantTest, Comparison) {
+TEST(VariantTest, Comparison)
+{
   nostd::variant<int, float> v, w;
   EXPECT_TRUE(v == w);
   EXPECT_FALSE(v != w);
@@ -65,9 +68,11 @@ TEST(VariantTest, Comparison) {
   EXPECT_FALSE(v == w);
 }
 
-TEST(VariantTest, Visit) {
+TEST(VariantTest, Visit)
+{
   nostd::variant<int, float> v;
-  struct {
+  struct
+  {
     int operator()(int) { return 0; }
     int operator()(float) { return 1; }
   } a;
@@ -76,11 +81,12 @@ TEST(VariantTest, Visit) {
   EXPECT_EQ(nostd::visit(a, v), 1);
 }
 
-TEST(VariantTest, Destructor) {
+TEST(VariantTest, Destructor)
+{
   nostd::variant<int, DestroyCounter> v;
   int destroy_count = 0;
-  v = DestroyCounter{&destroy_count};
-  destroy_count = 0;
-  v = 1;
+  v                 = DestroyCounter{&destroy_count};
+  destroy_count     = 0;
+  v                 = 1;
   EXPECT_EQ(destroy_count, 1);
 }

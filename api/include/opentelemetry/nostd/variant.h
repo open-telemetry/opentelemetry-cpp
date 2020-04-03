@@ -5,9 +5,9 @@
 #include <limits>
 
 #include "opentelemetry/nostd/detail/all.h"
-#include "opentelemetry/nostd/detail/functional.h"
 #include "opentelemetry/nostd/detail/dependent_type.h"
 #include "opentelemetry/nostd/detail/find_index.h"
+#include "opentelemetry/nostd/detail/functional.h"
 #include "opentelemetry/nostd/detail/recursive_union.h"
 #include "opentelemetry/nostd/detail/trait.h"
 #include "opentelemetry/nostd/detail/type_pack_element.h"
@@ -86,8 +86,8 @@ namespace visitation
 struct base
 {
   template <typename Visitor, typename... Vs>
-  using dispatch_result_t =
-      decltype(nostd::invoke(std::declval<Visitor>(), access::base::get_alt<0>(std::declval<Vs>())...));
+  using dispatch_result_t = decltype(
+      nostd::invoke(std::declval<Visitor>(), access::base::get_alt<0>(std::declval<Vs>())...));
 
   template <typename Expected>
   struct expected
@@ -107,7 +107,8 @@ struct base
 
     template <typename Visitor, typename... Alts>
     inline static constexpr DECLTYPE_AUTO invoke(Visitor &&visitor, Alts &&... alts)
-        DECLTYPE_AUTO_RETURN(nostd::invoke(std::forward<Visitor>(visitor), std::forward<Alts>(alts)...))
+        DECLTYPE_AUTO_RETURN(nostd::invoke(std::forward<Visitor>(visitor),
+                                           std::forward<Alts>(alts)...))
   };
 
   template <typename T>
@@ -138,8 +139,8 @@ struct base
     inline static constexpr dispatch_result_t<F, Vs...> dispatch(F &&f, Vs &&... vs)
     {
       using Expected = dispatch_result_t<F, Vs...>;
-      using Actual =
-          decltype(nostd::invoke(std::forward<F>(f), access::base::get_alt<Is>(std::forward<Vs>(vs))...));
+      using Actual   = decltype(
+          nostd::invoke(std::forward<F>(f), access::base::get_alt<Is>(std::forward<Vs>(vs))...));
       return visit_return_type_check<Expected, Actual>::invoke(
           std::forward<F>(f), access::base::get_alt<Is>(std::forward<Vs>(vs))...);
     }
@@ -173,8 +174,8 @@ struct base
     inline static constexpr dispatch_result_t<F, Vs...> dispatch(F &&f, Vs &&... vs)
     {
       using Expected = dispatch_result_t<F, Vs...>;
-      using Actual =
-          decltype(nostd::invoke(std::forward<F>(f), access::base::get_alt<I>(std::forward<Vs>(vs))...));
+      using Actual   = decltype(
+          nostd::invoke(std::forward<F>(f), access::base::get_alt<I>(std::forward<Vs>(vs))...));
       return visit_return_type_check<Expected, Actual>::invoke(
           std::forward<F>(f), access::base::get_alt<I>(std::forward<Vs>(vs))...);
     }
@@ -256,7 +257,7 @@ private:
 
     inline static constexpr DECLTYPE_AUTO invoke(Visitor &&visitor, Values &&... values)
         DECLTYPE_AUTO_RETURN(nostd::invoke(std::forward<Visitor>(visitor),
-                                    std::forward<Values>(values)...))
+                                           std::forward<Values>(values)...))
   };
 
   template <typename Visitor>
@@ -372,7 +373,7 @@ struct dtor
 template <typename Traits, Trait = Traits::destructible_trait>
 class destructor;
 
-#define OPENTELEMETRY_VARIANT_DESTRUCTOR(destructible_trait, definition, destroy)                      \
+#define OPENTELEMETRY_VARIANT_DESTRUCTOR(destructible_trait, definition, destroy)              \
   template <typename... Ts>                                                                    \
   class destructor<traits<Ts...>, destructible_trait> : public base<destructible_trait, Ts...> \
   {                                                                                            \
@@ -407,7 +408,7 @@ OPENTELEMETRY_VARIANT_DESTRUCTOR(
     });
 
 OPENTELEMETRY_VARIANT_DESTRUCTOR(Trait::Unavailable, ~destructor() = delete;
-                         , inline void destroy() noexcept  = delete;);
+                                 , inline void destroy() noexcept  = delete;);
 
 #undef OPENTELEMETRY_VARIANT_DESTRUCTOR
 
@@ -454,24 +455,24 @@ template <typename Traits, Trait = Traits::move_constructible_trait>
 class move_constructor;
 
 #define OPENTELEMETRY_VARIANT_MOVE_CONSTRUCTOR(move_constructible_trait, definition) \
-  template <typename... Ts>                                                  \
-  class move_constructor<traits<Ts...>, move_constructible_trait>            \
-      : public constructor<traits<Ts...>>                                    \
-  {                                                                          \
-    using super = constructor<traits<Ts...>>;                                \
-                                                                             \
-  public:                                                                    \
-    using super::super;                                                      \
-    using super::operator=;                                                  \
-                                                                             \
-    move_constructor(const move_constructor &) = default;                    \
-    definition ~move_constructor()             = default;                    \
-    move_constructor &operator=(const move_constructor &) = default;         \
-    move_constructor &operator=(move_constructor &&) = default;              \
+  template <typename... Ts>                                                          \
+  class move_constructor<traits<Ts...>, move_constructible_trait>                    \
+      : public constructor<traits<Ts...>>                                            \
+  {                                                                                  \
+    using super = constructor<traits<Ts...>>;                                        \
+                                                                                     \
+  public:                                                                            \
+    using super::super;                                                              \
+    using super::operator=;                                                          \
+                                                                                     \
+    move_constructor(const move_constructor &) = default;                            \
+    definition ~move_constructor()             = default;                            \
+    move_constructor &operator=(const move_constructor &) = default;                 \
+    move_constructor &operator=(move_constructor &&) = default;                      \
   }
 
 OPENTELEMETRY_VARIANT_MOVE_CONSTRUCTOR(Trait::TriviallyAvailable,
-                               move_constructor(move_constructor &&that) = default;);
+                                       move_constructor(move_constructor &&that) = default;);
 
 OPENTELEMETRY_VARIANT_MOVE_CONSTRUCTOR(
     Trait::Available,
@@ -479,7 +480,8 @@ OPENTELEMETRY_VARIANT_MOVE_CONSTRUCTOR(
         all<std::is_nothrow_move_constructible<Ts>::value...>::value)
     : move_constructor(valueless_t{}) { this->generic_construct(*this, std::move(that)); });
 
-OPENTELEMETRY_VARIANT_MOVE_CONSTRUCTOR(Trait::Unavailable, move_constructor(move_constructor &&) = delete;);
+OPENTELEMETRY_VARIANT_MOVE_CONSTRUCTOR(Trait::Unavailable,
+                                       move_constructor(move_constructor &&) = delete;);
 
 #undef OPENTELEMETRY_VARIANT_MOVE_CONSTRUCTOR
 
@@ -487,31 +489,31 @@ template <typename Traits, Trait = Traits::copy_constructible_trait>
 class copy_constructor;
 
 #define OPENTELEMETRY_VARIANT_COPY_CONSTRUCTOR(copy_constructible_trait, definition) \
-  template <typename... Ts>                                                  \
-  class copy_constructor<traits<Ts...>, copy_constructible_trait>            \
-      : public move_constructor<traits<Ts...>>                               \
-  {                                                                          \
-    using super = move_constructor<traits<Ts...>>;                           \
-                                                                             \
-  public:                                                                    \
-    using super::super;                                                      \
-    using super::operator=;                                                  \
-                                                                             \
-    definition copy_constructor(copy_constructor &&) = default;              \
-    ~copy_constructor()                              = default;              \
-    copy_constructor &operator=(const copy_constructor &) = default;         \
-    copy_constructor &operator=(copy_constructor &&) = default;              \
+  template <typename... Ts>                                                          \
+  class copy_constructor<traits<Ts...>, copy_constructible_trait>                    \
+      : public move_constructor<traits<Ts...>>                                       \
+  {                                                                                  \
+    using super = move_constructor<traits<Ts...>>;                                   \
+                                                                                     \
+  public:                                                                            \
+    using super::super;                                                              \
+    using super::operator=;                                                          \
+                                                                                     \
+    definition copy_constructor(copy_constructor &&) = default;                      \
+    ~copy_constructor()                              = default;                      \
+    copy_constructor &operator=(const copy_constructor &) = default;                 \
+    copy_constructor &operator=(copy_constructor &&) = default;                      \
   }
 
 OPENTELEMETRY_VARIANT_COPY_CONSTRUCTOR(Trait::TriviallyAvailable,
-                               copy_constructor(const copy_constructor &that) = default;);
+                                       copy_constructor(const copy_constructor &that) = default;);
 
 OPENTELEMETRY_VARIANT_COPY_CONSTRUCTOR(
     Trait::Available, copy_constructor(const copy_constructor &that)
     : copy_constructor(valueless_t{}) { this->generic_construct(*this, that); });
 
 OPENTELEMETRY_VARIANT_COPY_CONSTRUCTOR(Trait::Unavailable,
-                               copy_constructor(const copy_constructor &) = delete;);
+                                       copy_constructor(const copy_constructor &) = delete;);
 
 #undef OPENTELEMETRY_VARIANT_COPY_CONSTRUCTOR
 
@@ -597,7 +599,7 @@ protected:
 template <typename Traits, Trait = Traits::move_assignable_trait>
 class move_assignment;
 
-#define OPENTELEMETRY_VARIANT_MOVE_ASSIGNMENT(move_assignable_trait, definition)                         \
+#define OPENTELEMETRY_VARIANT_MOVE_ASSIGNMENT(move_assignable_trait, definition)                 \
   template <typename... Ts>                                                                      \
   class move_assignment<traits<Ts...>, move_assignable_trait> : public assignment<traits<Ts...>> \
   {                                                                                              \
@@ -614,8 +616,8 @@ class move_assignment;
     definition                                                                                   \
   }
 
-OPENTELEMETRY_VARIANT_MOVE_ASSIGNMENT(Trait::TriviallyAvailable,
-                              move_assignment &operator=(move_assignment &&that) = default;);
+OPENTELEMETRY_VARIANT_MOVE_ASSIGNMENT(
+    Trait::TriviallyAvailable, move_assignment &operator=(move_assignment &&that) = default;);
 
 OPENTELEMETRY_VARIANT_MOVE_ASSIGNMENT(
     Trait::Available,
@@ -628,7 +630,7 @@ OPENTELEMETRY_VARIANT_MOVE_ASSIGNMENT(
     });
 
 OPENTELEMETRY_VARIANT_MOVE_ASSIGNMENT(Trait::Unavailable,
-                              move_assignment &operator=(move_assignment &&) = delete;);
+                                      move_assignment &operator=(move_assignment &&) = delete;);
 
 #undef OPENTELEMETRY_VARIANT_MOVE_ASSIGNMENT
 
@@ -636,24 +638,24 @@ template <typename Traits, Trait = Traits::copy_assignable_trait>
 class copy_assignment;
 
 #define OPENTELEMETRY_VARIANT_COPY_ASSIGNMENT(copy_assignable_trait, definition) \
-  template <typename... Ts>                                              \
-  class copy_assignment<traits<Ts...>, copy_assignable_trait>            \
-      : public move_assignment<traits<Ts...>>                            \
-  {                                                                      \
-    using super = move_assignment<traits<Ts...>>;                        \
-                                                                         \
-  public:                                                                \
-    using super::super;                                                  \
-    using super::operator=;                                              \
-                                                                         \
-    copy_assignment(const copy_assignment &) = default;                  \
-    copy_assignment(copy_assignment &&)      = default;                  \
-    ~copy_assignment()                       = default;                  \
-    definition copy_assignment &operator=(copy_assignment &&) = default; \
+  template <typename... Ts>                                                      \
+  class copy_assignment<traits<Ts...>, copy_assignable_trait>                    \
+      : public move_assignment<traits<Ts...>>                                    \
+  {                                                                              \
+    using super = move_assignment<traits<Ts...>>;                                \
+                                                                                 \
+  public:                                                                        \
+    using super::super;                                                          \
+    using super::operator=;                                                      \
+                                                                                 \
+    copy_assignment(const copy_assignment &) = default;                          \
+    copy_assignment(copy_assignment &&)      = default;                          \
+    ~copy_assignment()                       = default;                          \
+    definition copy_assignment &operator=(copy_assignment &&) = default;         \
   }
 
-OPENTELEMETRY_VARIANT_COPY_ASSIGNMENT(Trait::TriviallyAvailable,
-                              copy_assignment &operator=(const copy_assignment &that) = default;);
+OPENTELEMETRY_VARIANT_COPY_ASSIGNMENT(
+    Trait::TriviallyAvailable, copy_assignment &operator=(const copy_assignment &that) = default;);
 
 OPENTELEMETRY_VARIANT_COPY_ASSIGNMENT(
     Trait::Available,
@@ -663,8 +665,8 @@ OPENTELEMETRY_VARIANT_COPY_ASSIGNMENT(
       return *this;
     });
 
-OPENTELEMETRY_VARIANT_COPY_ASSIGNMENT(Trait::Unavailable,
-                              copy_assignment &operator=(const copy_assignment &) = delete;);
+OPENTELEMETRY_VARIANT_COPY_ASSIGNMENT(
+    Trait::Unavailable, copy_assignment &operator=(const copy_assignment &) = delete;);
 
 #undef OPENTELEMETRY_VARIANT_COPY_ASSIGNMENT
 template <typename... Ts>

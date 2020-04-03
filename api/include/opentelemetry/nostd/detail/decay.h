@@ -7,7 +7,7 @@
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace nostd
 {
-template< class T >
+template <class T>
 using decay_t = typename std::decay<T>::type;
 }  // namespace nostd
 OPENTELEMETRY_END_NAMESPACE

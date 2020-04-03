@@ -82,12 +82,15 @@ using index_sequence = integer_sequence<std::size_t, Is...>;
 /**
  * Back port of std::make_index_sequence
  */
-namespace detail {
-template<class, size_t>
-struct index_sequence_push_back {};
+namespace detail
+{
+template <class, size_t>
+struct index_sequence_push_back
+{};
 
 template <size_t... Indexes, size_t I>
-struct index_sequence_push_back<index_sequence<Indexes...>, I> {
+struct index_sequence_push_back<index_sequence<Indexes...>, I>
+{
   using type = index_sequence<Indexes..., I>;
 };
 
@@ -95,15 +98,17 @@ template <class T, size_t I>
 using index_sequence_push_back_t = typename index_sequence_push_back<T, I>::type;
 
 template <size_t N>
-struct make_index_sequence_impl {
+struct make_index_sequence_impl
+{
   using type = index_sequence_push_back_t<typename make_index_sequence_impl<N - 1>::type, N - 1>;
 };
 
 template <>
-struct make_index_sequence_impl<0> {
+struct make_index_sequence_impl<0>
+{
   using type = index_sequence<>;
 };
-} // namespace detail
+}  // namespace detail
 
 template <size_t N>
 using make_index_sequence = typename detail::make_index_sequence_impl<N>::type;
