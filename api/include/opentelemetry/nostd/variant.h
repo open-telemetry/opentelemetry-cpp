@@ -87,7 +87,7 @@ struct base
 {
   template <typename Visitor, typename... Vs>
   using dispatch_result_t =
-      decltype(invoke(std::declval<Visitor>(), access::base::get_alt<0>(std::declval<Vs>())...));
+      decltype(nostd::invoke(std::declval<Visitor>(), access::base::get_alt<0>(std::declval<Vs>())...));
 
   template <typename Expected>
   struct expected
@@ -107,7 +107,7 @@ struct base
 
     template <typename Visitor, typename... Alts>
     inline static constexpr DECLTYPE_AUTO invoke(Visitor &&visitor, Alts &&... alts)
-        DECLTYPE_AUTO_RETURN(invoke(std::forward<Visitor>(visitor), std::forward<Alts>(alts)...))
+        DECLTYPE_AUTO_RETURN(nostd::invoke(std::forward<Visitor>(visitor), std::forward<Alts>(alts)...))
   };
 
   template <typename T>
@@ -139,7 +139,7 @@ struct base
     {
       using Expected = dispatch_result_t<F, Vs...>;
       using Actual =
-          decltype(invoke(std::forward<F>(f), access::base::get_alt<Is>(std::forward<Vs>(vs))...));
+          decltype(nostd::invoke(std::forward<F>(f), access::base::get_alt<Is>(std::forward<Vs>(vs))...));
       return visit_return_type_check<Expected, Actual>::invoke(
           std::forward<F>(f), access::base::get_alt<Is>(std::forward<Vs>(vs))...);
     }
@@ -174,7 +174,7 @@ struct base
     {
       using Expected = dispatch_result_t<F, Vs...>;
       using Actual =
-          decltype(invoke(std::forward<F>(f), access::base::get_alt<I>(std::forward<Vs>(vs))...));
+          decltype(nostd::invoke(std::forward<F>(f), access::base::get_alt<I>(std::forward<Vs>(vs))...));
       return visit_return_type_check<Expected, Actual>::invoke(
           std::forward<F>(f), access::base::get_alt<I>(std::forward<Vs>(vs))...);
     }
@@ -255,7 +255,7 @@ private:
                   "`visit` requires the visitor to be exhaustive.");
 
     inline static constexpr DECLTYPE_AUTO invoke(Visitor &&visitor, Values &&... values)
-        DECLTYPE_AUTO_RETURN(invoke(std::forward<Visitor>(visitor),
+        DECLTYPE_AUTO_RETURN(nostd::invoke(std::forward<Visitor>(visitor),
                                     std::forward<Values>(values)...))
   };
 
