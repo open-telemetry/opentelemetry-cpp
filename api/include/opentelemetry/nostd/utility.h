@@ -12,12 +12,6 @@ OPENTELEMETRY_BEGIN_NAMESPACE
 namespace nostd
 {
 /**
- * Back port of std::enable_if_t
- */
-template <bool B, class T = void>
-using enable_if_t = typename std::enable_if<B, T>::value;
-
-/**
  * Back port of std::data
  *
  * See https://en.cppreference.com/w/cpp/iterator/data

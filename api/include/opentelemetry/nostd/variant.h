@@ -481,8 +481,8 @@ MPARK_VARIANT_MOVE_CONSTRUCTOR(Trait::Unavailable, move_constructor(move_constru
 
 #undef MPARK_VARIANT_MOVE_CONSTRUCTOR
 
-    template <typename Traits, Trait = Traits::copy_constructible_trait>
-    class copy_constructor;
+template <typename Traits, Trait = Traits::copy_constructible_trait>
+class copy_constructor;
 
 #define MPARK_VARIANT_COPY_CONSTRUCTOR(copy_constructible_trait, definition) \
   template <typename... Ts>                                                  \
@@ -501,95 +501,335 @@ MPARK_VARIANT_MOVE_CONSTRUCTOR(Trait::Unavailable, move_constructor(move_constru
     copy_constructor &operator=(copy_constructor &&) = default;              \
   }
 
-    MPARK_VARIANT_COPY_CONSTRUCTOR(
-        Trait::TriviallyAvailable,
-        copy_constructor(const copy_constructor &that) = default;);
+MPARK_VARIANT_COPY_CONSTRUCTOR(Trait::TriviallyAvailable,
+                               copy_constructor(const copy_constructor &that) = default;);
 
-    MPARK_VARIANT_COPY_CONSTRUCTOR(
-        Trait::Available,
-        copy_constructor(const copy_constructor &that)
-            : copy_constructor(valueless_t{}) {
-          this->generic_construct(*this, that);
-        });
+MPARK_VARIANT_COPY_CONSTRUCTOR(
+    Trait::Available, copy_constructor(const copy_constructor &that)
+    : copy_constructor(valueless_t{}) { this->generic_construct(*this, that); });
 
-    MPARK_VARIANT_COPY_CONSTRUCTOR(
-        Trait::Unavailable,
-        copy_constructor(const copy_constructor &) = delete;);
+MPARK_VARIANT_COPY_CONSTRUCTOR(Trait::Unavailable,
+                               copy_constructor(const copy_constructor &) = delete;);
 
 #undef MPARK_VARIANT_COPY_CONSTRUCTOR
 
-    template <typename Traits>
-    class assignment : public copy_constructor<Traits> {
-      using super = copy_constructor<Traits>;
+template <typename Traits>
+class assignment : public copy_constructor<Traits>
+{
+  using super = copy_constructor<Traits>;
 
-      public:
-      using super::super;
-      using super::operator=;
+public:
+  using super::super;
+  using super::operator=;
 
-      template <std::size_t I, typename... Args>
-      inline /* auto & */ auto emplace(Args &&... args)
-          -> decltype(this->construct_alt(access::base::get_alt<I>(*this),
-                                          std::forward<Args>(args)...)) {
-        this->destroy();
-        auto &result = this->construct_alt(access::base::get_alt<I>(*this),
-                                           std::forward<Args>(args)...);
-        this->index_ = I;
-        return result;
-      }
+  template <std::size_t I, typename... Args>
+  inline /* auto & */ auto emplace(Args &&... args)
+      -> decltype(this->construct_alt(access::base::get_alt<I>(*this), std::forward<Args>(args)...))
+  {
+    this->destroy();
+    auto &result =
+        this->construct_alt(access::base::get_alt<I>(*this), std::forward<Args>(args)...);
+    this->index_ = I;
+    return result;
+  }
 
-      protected:
-      template <typename That>
-      struct assigner {
-        template <typename ThisAlt, typename ThatAlt>
-        inline void operator()(ThisAlt &this_alt, ThatAlt &&that_alt) const {
-          self->assign_alt(this_alt, std::forward<ThatAlt>(that_alt).value);
-        }
-        assignment *self;
-      };
+protected:
+  template <typename That>
+  struct assigner
+  {
+    template <typename ThisAlt, typename ThatAlt>
+    inline void operator()(ThisAlt &this_alt, ThatAlt &&that_alt) const
+    {
+      self->assign_alt(this_alt, std::forward<ThatAlt>(that_alt).value);
+    }
+    assignment *self;
+  };
 
-      template <std::size_t I, typename T, typename Arg>
-      inline void assign_alt(alt<I, T> &a, Arg &&arg) {
-        if (this->index() == I) {
+  template <std::size_t I, typename T, typename Arg>
+  inline void assign_alt(alt<I, T> &a, Arg &&arg)
+  {
+    if (this->index() == I)
+    {
 #ifdef _MSC_VER
-#pragma warning(push)
-#pragma warning(disable : 4244)
+#  pragma warning(push)
+#  pragma warning(disable : 4244)
 #endif
-          a.value = std::forward<Arg>(arg);
+      a.value = std::forward<Arg>(arg);
 #ifdef _MSC_VER
-#pragma warning(pop)
+#  pragma warning(pop)
 #endif
-        } else {
-          struct {
-            void operator()(std::true_type) const {
-              this_->emplace<I>(std::forward<Arg>(arg_));
-            }
-            void operator()(std::false_type) const {
-              this_->emplace<I>(T(std::forward<Arg>(arg_)));
-            }
-            assignment *this_;
-            Arg &&arg_;
-          } impl{this, std::forward<Arg>(arg)};
-          impl(bool_constant < std::is_nothrow_constructible<T, Arg>::value ||
-               !std::is_nothrow_move_constructible<T>::value > {});
-        }
-      }
+    }
+    else
+    {
+      struct
+      {
+        void operator()(std::true_type) const { this_->emplace<I>(std::forward<Arg>(arg_)); }
+        void operator()(std::false_type) const { this_->emplace<I>(T(std::forward<Arg>(arg_))); }
+        assignment *this_;
+        Arg &&arg_;
+      } impl{this, std::forward<Arg>(arg)};
+      impl(bool_constant < std::is_nothrow_constructible<T, Arg>::value ||
+           !std::is_nothrow_move_constructible<T>::value > {});
+    }
+  }
 
-      template <typename That>
-      inline void generic_assign(That &&that) {
-        if (this->valueless_by_exception() && that.valueless_by_exception()) {
-          // do nothing.
-        } else if (that.valueless_by_exception()) {
-          this->destroy();
-        } else {
-          visitation::alt::visit_alt_at(
-              that.index(),
-              assigner<That>{this}
-              ,
-              *this,
-              std::forward<That>(that));
-        }
+  template <typename That>
+  inline void generic_assign(That &&that)
+  {
+    if (this->valueless_by_exception() && that.valueless_by_exception())
+    {
+      // do nothing.
+    }
+    else if (that.valueless_by_exception())
+    {
+      this->destroy();
+    }
+    else
+    {
+      visitation::alt::visit_alt_at(that.index(), assigner<That>{this}, *this,
+                                    std::forward<That>(that));
+    }
+  }
+};
+
+template <typename Traits, Trait = Traits::move_assignable_trait>
+class move_assignment;
+
+#define MPARK_VARIANT_MOVE_ASSIGNMENT(move_assignable_trait, definition)                         \
+  template <typename... Ts>                                                                      \
+  class move_assignment<traits<Ts...>, move_assignable_trait> : public assignment<traits<Ts...>> \
+  {                                                                                              \
+    using super = assignment<traits<Ts...>>;                                                     \
+                                                                                                 \
+  public:                                                                                        \
+    using super::super;                                                                          \
+    using super::operator=;                                                                      \
+                                                                                                 \
+    move_assignment(const move_assignment &) = default;                                          \
+    move_assignment(move_assignment &&)      = default;                                          \
+    ~move_assignment()                       = default;                                          \
+    move_assignment &operator=(const move_assignment &) = default;                               \
+    definition                                                                                   \
+  }
+
+MPARK_VARIANT_MOVE_ASSIGNMENT(Trait::TriviallyAvailable,
+                              move_assignment &operator=(move_assignment &&that) = default;);
+
+MPARK_VARIANT_MOVE_ASSIGNMENT(
+    Trait::Available,
+    move_assignment &
+    operator=(move_assignment &&that) noexcept(
+        all<(std::is_nothrow_move_constructible<Ts>::value &&
+             std::is_nothrow_move_assignable<Ts>::value)...>::value) {
+      this->generic_assign(std::move(that));
+      return *this;
+    });
+
+MPARK_VARIANT_MOVE_ASSIGNMENT(Trait::Unavailable,
+                              move_assignment &operator=(move_assignment &&) = delete;);
+
+#undef MPARK_VARIANT_MOVE_ASSIGNMENT
+
+template <typename Traits, Trait = Traits::copy_assignable_trait>
+class copy_assignment;
+
+#define MPARK_VARIANT_COPY_ASSIGNMENT(copy_assignable_trait, definition) \
+  template <typename... Ts>                                              \
+  class copy_assignment<traits<Ts...>, copy_assignable_trait>            \
+      : public move_assignment<traits<Ts...>>                            \
+  {                                                                      \
+    using super = move_assignment<traits<Ts...>>;                        \
+                                                                         \
+  public:                                                                \
+    using super::super;                                                  \
+    using super::operator=;                                              \
+                                                                         \
+    copy_assignment(const copy_assignment &) = default;                  \
+    copy_assignment(copy_assignment &&)      = default;                  \
+    ~copy_assignment()                       = default;                  \
+    definition copy_assignment &operator=(copy_assignment &&) = default; \
+  }
+
+MPARK_VARIANT_COPY_ASSIGNMENT(Trait::TriviallyAvailable,
+                              copy_assignment &operator=(const copy_assignment &that) = default;);
+
+MPARK_VARIANT_COPY_ASSIGNMENT(
+    Trait::Available,
+    copy_assignment &
+    operator=(const copy_assignment &that) {
+      this->generic_assign(that);
+      return *this;
+    });
+
+MPARK_VARIANT_COPY_ASSIGNMENT(Trait::Unavailable,
+                              copy_assignment &operator=(const copy_assignment &) = delete;);
+
+#undef MPARK_VARIANT_COPY_ASSIGNMENT
+template <typename... Ts>
+class impl : public copy_assignment<traits<Ts...>>
+{
+  using super = copy_assignment<traits<Ts...>>;
+
+public:
+  using super::super;
+  using super::operator=;
+
+  impl(const impl &) = default;
+  impl(impl &&)      = default;
+  ~impl()            = default;
+  impl &operator=(const impl &) = default;
+  impl &operator=(impl &&) = default;
+
+  template <std::size_t I, typename Arg>
+  inline void assign(Arg &&arg)
+  {
+    this->assign_alt(access::base::get_alt<I>(*this), std::forward<Arg>(arg));
+  }
+
+  inline void swap(impl &that)
+  {
+    if (this->valueless_by_exception() && that.valueless_by_exception())
+    {
+      // do nothing.
+    }
+    else if (this->index() == that.index())
+    {
+      visitation::alt::visit_alt_at(this->index(), swapper{}, *this, that);
+    }
+    else
+    {
+      impl *lhs = this;
+      impl *rhs = std::addressof(that);
+      if (lhs->move_nothrow() && !rhs->move_nothrow())
+      {
+        std::swap(lhs, rhs);
       }
-    };
+      impl tmp(std::move(*rhs));
+#ifdef MPARK_EXCEPTIONS
+      // EXTENSION: When the move construction of `lhs` into `rhs` throws
+      // and `tmp` is nothrow move constructible then we move `tmp` back
+      // into `rhs` and provide the strong exception safety guarantee.
+      try
+      {
+        this->generic_construct(*rhs, lib::move(*lhs));
+      }
+      catch (...)
+      {
+        if (tmp.move_nothrow())
+        {
+          this->generic_construct(*rhs, lib::move(tmp));
+        }
+        throw;
+      }
+#else
+      this->generic_construct(*rhs, std::move(*lhs));
+#endif
+      this->generic_construct(*lhs, std::move(tmp));
+    }
+  }
+
+private:
+  struct swapper
+  {
+    template <typename ThisAlt, typename ThatAlt>
+    inline void operator()(ThisAlt &this_alt, ThatAlt &that_alt) const
+    {
+      using std::swap;
+      swap(this_alt.value, that_alt.value);
+    }
+  };
+
+  inline constexpr bool move_nothrow() const
+  {
+    return this->valueless_by_exception() ||
+           std::array<bool, sizeof...(Ts)>{
+               {std::is_nothrow_move_constructible<Ts>::value...}}[this->index()];
+  }
+};
+
+template <typename From, typename To>
+struct is_non_narrowing_convertible
+{
+  template <typename T>
+  static std::true_type test(T(&&)[1]);
+
+  template <typename T>
+  static auto impl(int) -> decltype(test<T>({std::declval<From>()}));
+
+  template <typename>
+  static auto impl(...) -> std::false_type;
+
+  static constexpr bool value = decltype(impl<To>(0))::value;
+};
+
+template <typename Arg,
+          std::size_t I,
+          typename T,
+          bool     = std::is_arithmetic<T>::value,
+          typename = void>
+struct overload_leaf
+{};
+
+template <typename Arg, std::size_t I, typename T>
+struct overload_leaf<Arg, I, T, false>
+{
+  using impl = size_constant<I> (*)(T);
+  operator impl() const { return nullptr; };
+};
+
+template <typename Arg, std::size_t I, typename T>
+struct overload_leaf<Arg,
+                     I,
+                     T,
+                     true
+#if defined(__clang__) || !defined(__GNUC__) || __GNUC__ >= 5
+                     ,
+                     enable_if_t<std::is_same<remove_cvref_t<T>, bool>::value
+                                     ? std::is_same<remove_cvref_t<Arg>, bool>::value
+                                     : is_non_narrowing_convertible<Arg, T>::value>
+#endif
+                     >
+{
+  using impl = size_constant<I> (*)(T);
+  operator impl() const { return nullptr; };
+};
+
+template <typename Arg, typename... Ts>
+struct overload_impl
+{
+private:
+  template <typename>
+  struct impl;
+
+  template <std::size_t... Is>
+  struct impl<index_sequence<Is...>> : overload_leaf<Arg, Is, Ts>...
+  {};
+
+public:
+  using type = impl<index_sequence_for<Ts...>>;
+};
+
+template <typename Arg, typename... Ts>
+using overload = typename overload_impl<Arg, Ts...>::type;
+
+template <typename Arg, typename... Ts>
+using best_match = invoke_result_t<overload<Arg, Ts...>, Arg>;
+
+template <typename T>
+struct is_in_place_index : std::false_type
+{};
+
+template <std::size_t I>
+struct is_in_place_index<in_place_index_t<I>> : std::true_type
+{};
+
+template <typename T>
+struct is_in_place_type : std::false_type
+{};
+
+template <typename T>
+struct is_in_place_type<in_place_type_t<T>> : std::true_type
+{};
 }  // namespace detail
 
 }  // namespace nostd
