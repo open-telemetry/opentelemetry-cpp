@@ -19,7 +19,7 @@ using add_pointer_t = typename std::add_pointer<T>::type;
  * Back port of std::enable_if_t
  */
 template <bool B, class T = void>
-using enable_if_t = typename std::enable_if<B, T>::value;
+using enable_if_t = typename std::enable_if<B, T>::type;
 
 /**
  * Back port of std::remove_const_t

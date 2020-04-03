@@ -107,11 +107,11 @@ namespace detail
   {};
 
   template <typename F, typename... Args>
-  struct invoke_result<void_t<decltype(invoke(std::declval<F>(), std::declval<Args>()...))>,
+  struct invoke_result<void_t<decltype(nostd::invoke(std::declval<F>(), std::declval<Args>()...))>,
                        F,
                        Args...>
   {
-    using type = decltype(invoke(std::declval<F>(), std::declval<Args>()...));
+    using type = decltype(nostd::invoke(std::declval<F>(), std::declval<Args>()...));
   };
 
 }  // namespace detail
