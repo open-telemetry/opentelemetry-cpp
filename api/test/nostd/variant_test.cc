@@ -66,6 +66,12 @@ TEST(VariantTest, Comparison)
   v = 3.0f;
   EXPECT_TRUE(v != w);
   EXPECT_FALSE(v == w);
+  v = 2;
+  w = 3;
+  EXPECT_TRUE(v != w);
+  EXPECT_FALSE(v == w);
+  EXPECT_TRUE(v < w);
+  EXPECT_FALSE(v > w);
 }
 
 TEST(VariantTest, Visit)
@@ -88,5 +94,11 @@ TEST(VariantTest, Destructor)
   v                 = DestroyCounter{&destroy_count};
   destroy_count     = 0;
   v                 = 1;
+  EXPECT_EQ(destroy_count, 1);
+  {
+    nostd::variant<int, DestroyCounter> w;
+    w = DestroyCounter{&destroy_count};
+    destroy_count = 0;
+  }
   EXPECT_EQ(destroy_count, 1);
 }
