@@ -1,13 +1,21 @@
 #include "opentelemetry/nostd/variant.h"
 
 #include <type_traits>
+#include <string>
 
 #include <gtest/gtest.h>
 
 namespace nostd = opentelemetry::nostd;
-/* using opentelemetry::nostd::variant; */
-/* using opentelemetry::nostd::variant_alternative_t; */
-/* using opentelemetry::nostd::variant_size; */
+
+class DestroyCounter
+{
+public:
+  explicit DestroyCounter(int *count) : count_{count} {}
+  ~DestroyCounter() { ++*count_; }
+
+private:
+  int *count_;
+};
 
 TEST(TypePackElementTest, IndexedType)
 {
@@ -66,4 +74,13 @@ TEST(VariantTest, Visit) {
   EXPECT_EQ(nostd::visit(a, v), 0);
   v = 2.0f;
   EXPECT_EQ(nostd::visit(a, v), 1);
+}
+
+TEST(VariantTest, Destructor) {
+  nostd::variant<int, DestroyCounter> v;
+  int destroy_count = 0;
+  v = DestroyCounter{&destroy_count};
+  destroy_count = 0;
+  v = 1;
+  EXPECT_EQ(destroy_count, 1);
 }
