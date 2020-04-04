@@ -20,6 +20,6 @@ void Recordable::SetName(nostd::string_view name) noexcept
 {
   span_.set_name(name.data(), name.size());
 }
-}  // namespace otprotocol
+}  // namespace otlp
 }  // namespace exporter
 OPENTELEMETRY_END_NAMESPACE

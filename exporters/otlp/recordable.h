@@ -1,7 +1,7 @@
 #pragma once
 
-#include "opentelemetry/sdk/trace/recordable.h"
 #include "opentelemetry/proto/trace/v1/trace.pb.h"
+#include "opentelemetry/sdk/trace/recordable.h"
 #include "opentelemetry/version.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
