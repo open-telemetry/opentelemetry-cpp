@@ -1,6 +1,34 @@
 load("//bazel:otel_cc_benchmark.bzl", "otel_cc_benchmark")
 
 cc_test(
+    name = "random_test",
+    srcs = [
+        "random_test.cc",
+    ],
+    deps = [
+        "//sdk/src/common:random",
+        "@com_google_googletest//:gtest_main",
+    ],
+)
+
+cc_test(
+    name = "fast_random_number_generator_test",
+    srcs = [
+        "fast_random_number_generator_test.cc",
+    ],
+    deps = [
+        "//sdk/src/common:random",
+        "@com_google_googletest//:gtest_main",
+    ],
+)
+
+otel_cc_benchmark(
+    name = "random_benchmark",
+    srcs = ["random_benchmark.cc"],
+    deps = ["//sdk/src/common:random"],
+)
+
+cc_test(
     name = "atomic_unique_ptr_test",
     srcs = [
         "atomic_unique_ptr_test.cc",
@@ -23,13 +51,12 @@ cc_test(
 )
 
 cc_test(
-    name = "circular_buffer_test",
+    name = "random_fork_test",
     srcs = [
-        "circular_buffer_test.cc",
+        "random_fork_test.cc",
     ],
     deps = [
-        "//sdk/src/common:circular_buffer",
-        "@com_google_googletest//:gtest_main",
+        "//sdk/src/common:random",
     ],
 )
 

@@ -26,6 +26,20 @@ cc_library(
 )
 
 cc_library(
+    name = "random",
+    srcs = ["random.cc"],
+    hdrs = [
+        "fast_random_number_generator.h",
+        "random.h",
+    ],
+    include_prefix = "src/common",
+    deps = [
+        "//api",
+        "//sdk/src/common/platform:fork",
+    ],
+)
+
+cc_library(
     name = "circular_buffer_range",
     hdrs = [
         "circular_buffer_range.h",

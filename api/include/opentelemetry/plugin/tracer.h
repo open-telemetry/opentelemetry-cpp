@@ -65,6 +65,16 @@ public:
                                               Span{this->shared_from_this(), std::move(span)}};
   }
 
+  void ForceFlushWithMicroseconds(uint64_t timeout) noexcept override
+  {
+    tracer_handle_->tracer().ForceFlushWithMicroseconds(timeout);
+  }
+
+  void CloseWithMicroseconds(uint64_t timeout) noexcept override
+  {
+    tracer_handle_->tracer().CloseWithMicroseconds(timeout);
+  }
+
 private:
   // Note: The order is important here.
   //
