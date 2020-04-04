@@ -24,11 +24,11 @@ cc_library(
         "fork.h",
     ],
     include_prefix = "src/common/platform",
-    deps = [
-        "//api",
-    ],
     linkopts = select({
         "//bazel:windows": [],
         "//conditions:default": ["-pthread"],
     }),
+    deps = [
+        "//api",
+    ],
 )
