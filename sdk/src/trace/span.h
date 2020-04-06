@@ -1,9 +1,9 @@
 #pragma once
 
+#include <mutex>
+
 #include "opentelemetry/version.h"
 #include "src/trace/tracer.h"
-
-#include <mutex>
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace sdk
