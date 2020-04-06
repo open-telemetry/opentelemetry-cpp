@@ -36,7 +36,7 @@ public:
   {
     std::shared_ptr<Recordable> recordable{std::move(span)};
     nostd::span<std::shared_ptr<Recordable>> s(&recordable, 1);
-    if (exporter_->Export(s) == ExportResult::rFailure)
+    if (exporter_->Export(s) == ExportResult::kFailure)
     {
       /* Once it is defined how the SDK does logging, an error should be
        * logged in this case. */

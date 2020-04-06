@@ -31,7 +31,7 @@ public:
         *span_received_ = true;
       }
     }
-    return ExportResult::rSuccess;
+    return ExportResult::kSuccess;
   }
 
   void Shutdown() noexcept { *shutdown_called_ = true; }

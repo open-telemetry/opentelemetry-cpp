@@ -17,12 +17,12 @@ enum class ExportResult
   /**
    * Batch was successfully exported.
    */
-  rSuccess = 0,
+  kSuccess = 0,
   /**
    * Exporting failed. The caller must not retry exporting the same batch; the
    * batch must be dropped.
    */
-  rFailure
+  kFailure
 };
 /**
  * SpanExporter defines the interface that protocol-specific span exporters must
