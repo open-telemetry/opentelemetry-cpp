@@ -12,24 +12,27 @@ namespace trace
  * The simple span processor passes finished recordables to the configured
  * SpanExporter, as soon as they are finished.
  *
- * OnEnd, ForceFlush and Shutdown are no-ops.
+ * OnEnd and ForceFlush are no-ops.
  */
-class SimpleSpanProcessor
+class SimpleSpanProcessor : public SpanProcessor
 {
 public:
   /**
    * Initialize a simple span processor.
    * @param exporter the exporter used by the span processor
    */
-  SimpleSpanProcessor(std::unique_ptr<SpanExporter> &&exporter) noexcept
+  explicit SimpleSpanProcessor(std::unique_ptr<SpanExporter> &&exporter) noexcept
       : exporter_(std::move(exporter))
   {}
 
-  std::unique_ptr<Recordable> MakeRecordable() noexcept { return exporter_->MakeRecordable(); }
+  std::unique_ptr<Recordable> MakeRecordable() noexcept override
+  {
+    return exporter_->MakeRecordable();
+  }
 
-  void OnStart(Recordable &span) noexcept {}
+  void OnStart(Recordable &span) noexcept override {}
 
-  void OnEnd(std::unique_ptr<Recordable> &&span) noexcept
+  void OnEnd(std::unique_ptr<Recordable> &&span) noexcept override
   {
     std::shared_ptr<Recordable> recordable{std::move(span)};
     nostd::span<std::shared_ptr<Recordable>> s(&recordable, 1);
@@ -40,9 +43,11 @@ public:
     }
   }
 
-  void ForceFlush(std::chrono::microseconds timeout = std::chrono::microseconds(0)) noexcept {}
+  void ForceFlush(
+      std::chrono::microseconds timeout = std::chrono::microseconds(0)) noexcept override
+  {}
 
-  void Shutdown() noexcept {}
+  void Shutdown() noexcept override { exporter_->Shutdown(); }
 
 private:
   std::unique_ptr<SpanExporter> exporter_;

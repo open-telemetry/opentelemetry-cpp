@@ -73,35 +73,38 @@ public:
    */
   std::chrono::nanoseconds GetDuration() const noexcept { return duration_; }
 
-  void SetTraceId(opentelemetry::trace::TraceId trace_id) noexcept { trace_id_ = trace_id; }
+  void SetTraceId(opentelemetry::trace::TraceId trace_id) noexcept override
+  {
+    trace_id_ = trace_id;
+  }
 
-  void SetSpanId(opentelemetry::trace::SpanId span_id) noexcept { span_id_ = span_id; }
+  void SetSpanId(opentelemetry::trace::SpanId span_id) noexcept override { span_id_ = span_id; }
 
-  void SetParentSpanId(opentelemetry::trace::SpanId parent_span_id) noexcept
+  void SetParentSpanId(opentelemetry::trace::SpanId parent_span_id) noexcept override
   {
     parent_span_id_ = parent_span_id;
   }
 
-  void AddEvent(nostd::string_view name, core::SystemTimestamp timestamp) noexcept
+  void AddEvent(nostd::string_view name, core::SystemTimestamp timestamp) noexcept override
   {
     (void)name;
     (void)timestamp;
   }
 
-  void SetStatus(trace_api::CanonicalCode code, nostd::string_view description) noexcept
+  void SetStatus(trace_api::CanonicalCode code, nostd::string_view description) noexcept override
   {
     status_code_ = code;
     status_desc_ = std::string(description);
   }
 
-  void SetName(nostd::string_view name) noexcept { name_ = std::string(name); }
+  void SetName(nostd::string_view name) noexcept override { name_ = std::string(name); }
 
-  void SetStartTime(opentelemetry::core::SystemTimestamp start_time) noexcept
+  void SetStartTime(opentelemetry::core::SystemTimestamp start_time) noexcept override
   {
     start_time_ = start_time;
   }
 
-  void SetDuration(std::chrono::nanoseconds duration) noexcept { duration_ = duration; }
+  void SetDuration(std::chrono::nanoseconds duration) noexcept override { duration_ = duration; }
 
 private:
   opentelemetry::trace::TraceId trace_id_;
