@@ -60,7 +60,7 @@ class function_ref<R(Args...)>
 public:
   template <
       class F,
-      typename std::enable_if<!std::is_same<function_ref, typename std::decay<F>::type>{},
+      typename std::enable_if<!std::is_same<function_ref, typename std::decay<F>::type>::value,
                               int>::type = 0,
       typename std::enable_if<std::is_convertible<typename std::result_of<F &(Args...)>::type, R>{},
                               int>::type = 0>
