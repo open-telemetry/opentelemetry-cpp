@@ -34,9 +34,8 @@ public:
 
   void OnEnd(std::unique_ptr<Recordable> &&span) noexcept override
   {
-    std::shared_ptr<Recordable> recordable{std::move(span)};
-    nostd::span<std::shared_ptr<Recordable>> s(&recordable, 1);
-    if (exporter_->Export(s) == ExportResult::kFailure)
+    nostd::span<std::unique_ptr<Recordable>> batch(&span, 1);
+    if (exporter_->Export(batch) == ExportResult::kFailure)
     {
       /* Once it is defined how the SDK does logging, an error should be
        * logged in this case. */
@@ -47,7 +46,10 @@ public:
       std::chrono::microseconds timeout = std::chrono::microseconds(0)) noexcept override
   {}
 
-  void Shutdown() noexcept override { exporter_->Shutdown(); }
+  void Shutdown(std::chrono::microseconds timeout = std::chrono::microseconds(0)) noexcept override
+  {
+    exporter_->Shutdown(timeout);
+  }
 
 private:
   std::unique_ptr<SpanExporter> exporter_;

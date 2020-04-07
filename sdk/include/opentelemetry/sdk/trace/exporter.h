@@ -45,15 +45,18 @@ public:
   /**
    * Exports a batch of span recordables. This method must not be called
    * concurrently for the same exporter instance.
-   * @param spans a span of shared pointers to span recordables
+   * @param spans a span of unique pointers to span recordables
    */
   virtual ExportResult Export(
-      nostd::span<std::shared_ptr<opentelemetry::sdk::trace::Recordable>> &spans) noexcept = 0;
+      nostd::span<std::unique_ptr<opentelemetry::sdk::trace::Recordable>> &spans) noexcept = 0;
 
   /**
    * Shut down the exporter.
+   * @param timeout an optional timeout, the default timeout of 0 means that no
+   * timeout is applied.
    */
-  virtual void Shutdown() noexcept = 0;
+  virtual void Shutdown(
+      std::chrono::microseconds timeout = std::chrono::microseconds(0)) noexcept = 0;
 };
 }  // namespace trace
 }  // namespace sdk

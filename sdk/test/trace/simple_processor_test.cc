@@ -17,24 +17,30 @@ public:
       : span_received_(span_received), shutdown_called_(shutdown_called)
   {}
 
-  std::unique_ptr<Recordable> MakeRecordable() noexcept
+  std::unique_ptr<Recordable> MakeRecordable() noexcept override
   {
     return std::unique_ptr<Recordable>(new SpanData);
   }
 
-  ExportResult Export(opentelemetry::nostd::span<std::shared_ptr<Recordable>> &spans) noexcept
+  ExportResult Export(
+      opentelemetry::nostd::span<std::unique_ptr<Recordable>> &spans) noexcept override
   {
-    for (auto span : spans)
+    for (auto span = spans.begin(); span != spans.end(); ++span)
     {
-      if (std::static_pointer_cast<SpanData>(span))
+      auto raw = span->release();
+      if (static_cast<SpanData *>(raw))
       {
         *span_received_ = true;
       }
+      delete raw;
     }
     return ExportResult::kSuccess;
   }
 
-  void Shutdown() noexcept { *shutdown_called_ = true; }
+  void Shutdown(std::chrono::microseconds timeout = std::chrono::microseconds(0)) noexcept override
+  {
+    *shutdown_called_ = true;
+  }
 
 private:
   std::shared_ptr<bool> span_received_;

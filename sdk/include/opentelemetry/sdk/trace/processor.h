@@ -52,8 +52,11 @@ public:
    * exported before shutdown. After the call to Shutdown, subsequent calls to
    * OnStart, OnEnd, ForceFlush or Shutdown will return immediately without
    * doing anything.
+   * @param timeout an optional timeout, the default timeout of 0 means that no
+   * timeout is applied.
    */
-  virtual void Shutdown() noexcept = 0;
+  virtual void Shutdown(
+      std::chrono::microseconds timeout = std::chrono::microseconds(0)) noexcept = 0;
 };
 }  // namespace trace
 }  // namespace sdk
