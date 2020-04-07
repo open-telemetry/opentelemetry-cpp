@@ -31,7 +31,8 @@ public:
 
   void AddEvent(nostd::string_view /*name*/,
                 core::SystemTimestamp /*timestamp*/,
-                const trace::KeyValueIterable &/*attributes*/) noexcept override {}
+                const trace::KeyValueIterable & /*attributes*/) noexcept override
+  {}
 
   void SetStatus(CanonicalCode /*code*/, nostd::string_view /*description*/) noexcept override {}
 

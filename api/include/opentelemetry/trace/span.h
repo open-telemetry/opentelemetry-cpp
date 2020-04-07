@@ -3,8 +3,8 @@
 #include <cstdint>
 
 #include "opentelemetry/core/timestamp.h"
-#include "opentelemetry/nostd/string_view.h"
 #include "opentelemetry/nostd/span.h"
+#include "opentelemetry/nostd/string_view.h"
 #include "opentelemetry/trace/canonical_code.h"
 #include "opentelemetry/trace/key_value_iterable_view.h"
 #include "opentelemetry/version.h"
@@ -97,8 +97,7 @@ public:
   }
 
   template <class T, nostd::enable_if_t<detail::is_key_value_iterable<T>::value> * = nullptr>
-  void AddEvent(nostd::string_view name,
-                const T &attributes) noexcept
+  void AddEvent(nostd::string_view name, const T &attributes) noexcept
   {
     this->AddEvent(name, std::chrono::system_clock::now(), KeyValueIterableView<T>{attributes});
   }

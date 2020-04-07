@@ -17,14 +17,14 @@ static std::map<std::string, trace::AttributeValue> TakeKeyValues(
   return result;
 }
 
-template <class T,
-          nostd::enable_if_t<trace::detail::is_key_value_iterable<T>::value> * = nullptr>
+template <class T, nostd::enable_if_t<trace::detail::is_key_value_iterable<T>::value> * = nullptr>
 static std::map<std::string, trace::AttributeValue> TakeKeyValues(const T &iterable)
 {
   return TakeKeyValues(trace::KeyValueIterableView<T>{iterable});
 }
 
-TEST(KeyValueIterableViewTest, is_key_value_iterable) {
+TEST(KeyValueIterableViewTest, is_key_value_iterable)
+{
   using M1 = std::map<std::string, std::string>;
   EXPECT_TRUE(bool{trace::detail::is_key_value_iterable<M1>::value});
 
@@ -34,12 +34,14 @@ TEST(KeyValueIterableViewTest, is_key_value_iterable) {
   using M3 = std::map<std::string, trace::AttributeValue>;
   EXPECT_TRUE(bool{trace::detail::is_key_value_iterable<M3>::value});
 
-  struct A {};
+  struct A
+  {};
   using M4 = std::map<std::string, A>;
   EXPECT_FALSE(bool{trace::detail::is_key_value_iterable<M4>::value});
 }
 
-TEST(KeyValueIterableViewTest, ForEachKeyValue) {
+TEST(KeyValueIterableViewTest, ForEachKeyValue)
+{
   std::map<std::string, std::string> m1 = {{"abc", "123"}, {"xyz", "456"}};
   EXPECT_EQ(TakeKeyValues(m1),
             (std::map<std::string, trace::AttributeValue>{{"abc", "123"}, {"xyz", "456"}}));
@@ -49,9 +51,10 @@ TEST(KeyValueIterableViewTest, ForEachKeyValue) {
             (std::map<std::string, trace::AttributeValue>{{"abc", 123}, {"xyz", 456}}));
 }
 
-TEST(KeyValueIterableViewTest, ForEachKeyValueWithExit) {
+TEST(KeyValueIterableViewTest, ForEachKeyValueWithExit)
+{
   using M = std::map<std::string, std::string>;
-  M m1 = {{"abc", "123"}, {"xyz", "456"}};
+  M m1    = {{"abc", "123"}, {"xyz", "456"}};
   trace::KeyValueIterableView<M> iterable{m1};
   int count = 0;
   auto exit = iterable.ForEachKeyValue([&count](nostd::string_view /*key*/,

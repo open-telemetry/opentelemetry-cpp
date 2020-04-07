@@ -1,7 +1,7 @@
 #include "opentelemetry/trace/noop.h"
 
-#include <memory>
 #include <map>
+#include <memory>
 #include <string>
 
 #include <gtest/gtest.h>

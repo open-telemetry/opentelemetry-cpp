@@ -33,9 +33,9 @@ template <class T>
 class KeyValueIterableView final : public KeyValueIterable
 {
   static_assert(detail::is_key_value_iterable<T>::value, "Must be a key-value iterable");
+
 public:
-  KeyValueIterableView(const T &container) noexcept : container_{&container}
-  {}
+  KeyValueIterableView(const T &container) noexcept : container_{&container} {}
 
   // KeyValueIterable
   bool ForEachKeyValue(nostd::function_ref<bool(nostd::string_view, AttributeValue)> callback) const
@@ -56,7 +56,7 @@ public:
   size_t size() const noexcept override { return nostd::size(*container_); }
 
 private:
-  const T* container_;
+  const T *container_;
 };
 }  // namespace trace
 OPENTELEMETRY_END_NAMESPACE
