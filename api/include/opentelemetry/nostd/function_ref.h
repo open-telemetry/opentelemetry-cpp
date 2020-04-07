@@ -62,8 +62,9 @@ public:
       class F,
       typename std::enable_if<!std::is_same<function_ref, typename std::decay<F>::type>::value,
                               int>::type = 0,
-      typename std::enable_if<std::is_convertible<typename std::result_of<F &(Args...)>::type, R>{},
-                              int>::type = 0>
+      typename std::enable_if<
+          std::is_convertible<typename std::result_of<F &(Args...)>::type, R>::value,
+          int>::type = 0>
   function_ref(F &&f)
   {
     BindTo(f);  // not forward
