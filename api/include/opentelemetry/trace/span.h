@@ -4,7 +4,9 @@
 
 #include "opentelemetry/core/timestamp.h"
 #include "opentelemetry/nostd/string_view.h"
+#include "opentelemetry/nostd/span.h"
 #include "opentelemetry/trace/canonical_code.h"
+#include "opentelemetry/trace/key_value_iterable_view.h"
 #include "opentelemetry/version.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
@@ -82,6 +84,43 @@ public:
   // virtual void AddEvent(nostd::string_view name, core::SteadyTimestamp
   // timestamp, nostd::span<const std::pair<nostd::string_view name, AttributeValue
   // value>> attributes) noexcept = 0;
+  virtual void AddEvent(nostd::string_view name,
+                        core::SystemTimestamp timestamp,
+                        const KeyValueIterable &attributes) noexcept = 0;
+
+  template <class T, nostd::enable_if_t<detail::is_key_value_iterable<T>::value> * = nullptr>
+  void AddEvent(nostd::string_view name,
+                core::SystemTimestamp timestamp,
+                const T &attributes) noexcept
+  {
+    this->AddEvent(name, timestamp, KeyValueIterableView<T>{attributes});
+  }
+
+  template <class T, nostd::enable_if_t<detail::is_key_value_iterable<T>::value> * = nullptr>
+  void AddEvent(nostd::string_view name,
+                const T &attributes) noexcept
+  {
+    this->AddEvent(name, std::chrono::system_clock::now(), KeyValueIterableView<T>{attributes});
+  }
+
+  void AddEvent(nostd::string_view name,
+                core::SystemTimestamp timestamp,
+                std::initializer_list<std::pair<nostd::string_view, trace::AttributeValue>>
+                    attributes) noexcept
+  {
+    this->AddEvent(name, timestamp,
+                   nostd::span<const std::pair<nostd::string_view, trace::AttributeValue>>{
+                       attributes.begin(), attributes.end()});
+  }
+
+  void AddEvent(nostd::string_view name,
+                std::initializer_list<std::pair<nostd::string_view, trace::AttributeValue>>
+                    attributes) noexcept
+  {
+    this->AddEvent(name, std::chrono::system_clock::now(),
+                   nostd::span<const std::pair<nostd::string_view, trace::AttributeValue>>{
+                       attributes.begin(), attributes.end()});
+  }
 
   // Sets the status of the span. The default status is OK. Only the value of the last call will be
   // recorded, and implementations are free to ignore previous calls.

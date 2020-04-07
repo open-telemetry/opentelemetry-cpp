@@ -25,6 +25,13 @@ public:
     span_->AddEvent(name, timestamp);
   }
 
+  void AddEvent(nostd::string_view name,
+                core::SystemTimestamp timestamp,
+                const trace::KeyValueIterable &attributes) noexcept override
+  {
+    span_->AddEvent(name, timestamp, attributes);
+  }
+
   void SetStatus(trace::CanonicalCode code, nostd::string_view description) noexcept override
   {
     span_->SetStatus(code, description);
