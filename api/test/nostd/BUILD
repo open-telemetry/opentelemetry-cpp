@@ -1,4 +1,15 @@
 cc_test(
+    name = "function_ref_test",
+    srcs = [
+        "function_ref_test.cc",
+    ],
+    deps = [
+        "//api",
+        "@com_google_googletest//:gtest_main",
+    ],
+)
+
+cc_test(
     name = "string_view_test",
     srcs = [
         "string_view_test.cc",
