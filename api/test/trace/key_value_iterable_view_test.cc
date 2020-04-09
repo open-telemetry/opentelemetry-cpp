@@ -11,7 +11,7 @@ static std::map<std::string, trace::AttributeValue> TakeKeyValues(
 {
   std::map<std::string, trace::AttributeValue> result;
   iterable.ForEachKeyValue([&](nostd::string_view key, trace::AttributeValue value) noexcept {
-    result.emplace(key, value);
+    result.emplace(std::string{key}, value);
     return true;
   });
   return result;

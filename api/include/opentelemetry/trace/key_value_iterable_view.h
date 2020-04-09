@@ -13,10 +13,14 @@ namespace trace
 {
 namespace detail
 {
+inline void take_key_value(nostd::string_view, AttributeValue) {
+}
+
 template <class T>
 auto is_key_value_iterable_impl(T iterable)
-    -> decltype(std::pair<nostd::string_view, AttributeValue>(std::begin(iterable)->first,
-                                                              std::begin(iterable)->second),
+    /* -> decltype(std::pair<nostd::string_view, AttributeValue>(std::begin(iterable)->first, */
+    /*                                                           std::begin(iterable)->second), */
+    -> decltype(take_key_value(std::begin(iterable)->first, std::begin(iterable)->second),
                 nostd::size(iterable),
                 std::true_type{});
 
@@ -35,7 +39,7 @@ class KeyValueIterableView final : public KeyValueIterable
   static_assert(detail::is_key_value_iterable<T>::value, "Must be a key-value iterable");
 
 public:
-  KeyValueIterableView(const T &container) noexcept : container_{&container} {}
+  explicit KeyValueIterableView(const T &container) noexcept : container_{&container} {}
 
   // KeyValueIterable
   bool ForEachKeyValue(nostd::function_ref<bool(nostd::string_view, AttributeValue)> callback) const
