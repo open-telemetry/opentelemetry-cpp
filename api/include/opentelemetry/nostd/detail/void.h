@@ -5,12 +5,14 @@
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace nostd
 {
-namespace detail {
+namespace detail
+{
 template <class...>
-struct voider {
+struct voider
+{
   using type = void;
 };
-} // namespace detail
+}  // namespace detail
 
 /**
  * Back port of std::void_t

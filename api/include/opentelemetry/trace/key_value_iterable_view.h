@@ -13,8 +13,7 @@ namespace trace
 {
 namespace detail
 {
-inline void take_key_value(nostd::string_view, AttributeValue) {
-}
+inline void take_key_value(nostd::string_view, AttributeValue) {}
 
 template <class T>
 auto is_key_value_iterable_impl(T iterable)
