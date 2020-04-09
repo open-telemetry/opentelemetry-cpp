@@ -16,6 +16,27 @@ workspace(name = "io_opentelemetry_cpp")
 
 load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive")
 
+# Uses older protobuf version because of
+# https://github.com/protocolbuffers/protobuf/issues/7179
+http_archive(
+    name = "com_google_protobuf",
+    sha256 = "b679cef31102ed8beddc39ecfd6368ee311cbee6f50742f13f21be7278781821",
+    strip_prefix = "protobuf-3.11.2",
+    urls = [
+        "https://github.com/protocolbuffers/protobuf/releases/download/v3.11.2/protobuf-all-3.11.2.tar.gz",
+    ],
+)
+
+load("@com_google_protobuf//:protobuf_deps.bzl", "protobuf_deps")
+
+protobuf_deps()
+
+new_local_repository(
+    name = "com_github_opentelemetry_proto",
+    build_file = "//bazel:opentelemetry_proto.BUILD",
+    path = "third_party/opentelemetry-proto",
+)
+
 # GoogleTest framework.
 # Only needed for tests, not to build the OpenTelemetry library.
 http_archive(
