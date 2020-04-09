@@ -20,12 +20,6 @@ class SpanData final : public Recordable
 {
 public:
   /**
-   * Initialized all span fields with default values. Time stamps and duration
-   * are initialized with 0, the status of the span is initialized with OK.
-   */
-  SpanData() noexcept : duration_(0), status_code_(opentelemetry::trace::CanonicalCode::OK) {}
-
-  /**
    * Get the trace id for this span
    * @return the trace id for this span
    */
@@ -73,15 +67,12 @@ public:
    */
   std::chrono::nanoseconds GetDuration() const noexcept { return duration_; }
 
-  void SetTraceId(opentelemetry::trace::TraceId trace_id) noexcept override
+  void SetIds(opentelemetry::trace::TraceId trace_id,
+              opentelemetry::trace::SpanId span_id,
+              opentelemetry::trace::SpanId parent_span_id) noexcept override
   {
-    trace_id_ = trace_id;
-  }
-
-  void SetSpanId(opentelemetry::trace::SpanId span_id) noexcept override { span_id_ = span_id; }
-
-  void SetParentSpanId(opentelemetry::trace::SpanId parent_span_id) noexcept override
-  {
+    trace_id_       = trace_id;
+    span_id_        = span_id;
     parent_span_id_ = parent_span_id;
   }
 
@@ -111,9 +102,9 @@ private:
   opentelemetry::trace::SpanId span_id_;
   opentelemetry::trace::SpanId parent_span_id_;
   core::SystemTimestamp start_time_;
-  std::chrono::nanoseconds duration_;
+  std::chrono::nanoseconds duration_{0};
   std::string name_;
-  opentelemetry::trace::CanonicalCode status_code_;
+  opentelemetry::trace::CanonicalCode status_code_{opentelemetry::trace::CanonicalCode::OK};
   std::string status_desc_;
 };
 }  // namespace trace

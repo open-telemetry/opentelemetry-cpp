@@ -30,9 +30,7 @@ TEST(SpanData, Set)
   opentelemetry::core::SystemTimestamp now(std::chrono::system_clock::now());
 
   SpanData data;
-  data.SetTraceId(trace_id);
-  data.SetSpanId(span_id);
-  data.SetParentSpanId(parent_span_id);
+  data.SetIds(trace_id, span_id, parent_span_id);
   data.SetName("span name");
   data.SetStatus(opentelemetry::trace::CanonicalCode::UNKNOWN, "description");
   data.SetStartTime(now);

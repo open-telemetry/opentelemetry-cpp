@@ -24,22 +24,14 @@ public:
   virtual ~Recordable() = default;
 
   /**
-   * Set a trace id for this span.
+   * Set a trace id, span id and parent span id for this span.
    * @param trace_id the trace id to set
-   */
-  virtual void SetTraceId(opentelemetry::trace::TraceId trace_id) noexcept = 0;
-
-  /**
-   * Set a span id for this span.
    * @param span_id the span id to set
-   */
-  virtual void SetSpanId(opentelemetry::trace::SpanId span_id) noexcept = 0;
-
-  /**
-   * Set a parent span id for this span.
    * @param parent_span_id the parent span id to set
    */
-  virtual void SetParentSpanId(opentelemetry::trace::SpanId parent_span_id) noexcept = 0;
+  virtual void SetIds(opentelemetry::trace::TraceId trace_id,
+                      opentelemetry::trace::SpanId span_id,
+                      opentelemetry::trace::SpanId parent_span_id) noexcept = 0;
 
   /**
    * Add an event to a span.
