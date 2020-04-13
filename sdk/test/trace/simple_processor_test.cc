@@ -25,15 +25,14 @@ public:
   ExportResult Export(
       opentelemetry::nostd::span<std::unique_ptr<Recordable>> &spans) noexcept override
   {
-    for (auto span = spans.begin(); span != spans.end(); ++span)
+    for (auto& span : spans)
     {
-      auto raw = span->release();
-      if (static_cast<SpanData *>(raw))
+      if (span != nullptr)
       {
         *span_received_ = true;
       }
-      delete raw;
     }
+
     return ExportResult::kSuccess;
   }
 
