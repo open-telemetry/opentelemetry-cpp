@@ -56,11 +56,11 @@ TEST(SimpleSpanProcessor, ToMockSpanExporter)
   auto recordable = processor.MakeRecordable();
 
   processor.OnStart(*recordable);
-  ASSERT_EQ(*span_received, false);
+  ASSERT_FALSE(*span_received);
 
   processor.OnEnd(std::move(recordable));
-  ASSERT_EQ(*span_received, true);
+  ASSERT_TRUE(*span_received);
 
   processor.Shutdown();
-  ASSERT_EQ(*shutdown_called, true);
+  ASSERT_TRUE(*shutdown_called);
 }
