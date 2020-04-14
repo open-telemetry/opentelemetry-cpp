@@ -24,4 +24,3 @@ cc_library(
         "@com_github_libevent_libevent//:libevent",
     ],
 )
-
