@@ -22,10 +22,14 @@ std::unique_ptr<Timer> Dispatcher::CreateTimer(TimerCallback callback) noexcept 
   return nullptr;
 }
 
-void Dispatcher::Exit() noexcept {}
+void Dispatcher::Exit() noexcept {
+  event_base_.LoopBreak();
+}
 
 
-void Dispatcher::Run() noexcept {}
+void Dispatcher::Run() noexcept {
+  event_base_.Dispatch();
+}
 } // namespace libevent
 }  // namespace event
 }  // namespace sdk

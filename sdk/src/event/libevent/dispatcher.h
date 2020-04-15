@@ -3,6 +3,8 @@
 #include "opentelemetry/sdk/event/dispatcher.h"
 #include "opentelemetry/version.h"
 
+#include "src/event/libevent/event_base.h"
+
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace sdk
 {
@@ -23,6 +25,8 @@ public:
   void Exit() noexcept override;
 
   void Run() noexcept override;
+private:
+  EventBase event_base_;
 };
 }  // namespace libevent
 }  // namespace event
