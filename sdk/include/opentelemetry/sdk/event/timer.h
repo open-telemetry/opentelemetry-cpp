@@ -15,8 +15,9 @@ class Timer {
  public:
    virtual ~Timer() = default;
 
-   virtual void EnableTimer(std::chrono::microseconds timeout,
-                            std::error_code &error_code) noexcept = 0;
+   virtual void EnableTimer(std::chrono::microseconds timeout) noexcept = 0;
+
+   virtual void DisableTimer() noexcept = 0;
 };
 } // namespace event
 } // namespace sdk
