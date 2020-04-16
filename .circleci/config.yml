@@ -13,6 +13,7 @@ jobs:
       - run: ./ci/setup_ci_environment.sh
       - run: ./ci/setup_cmake.sh
       - run: ./ci/install_protobuf.sh
+      - run: ./ci/install_libevent.sh
       - run: ./ci/do_ci.sh cmake.test
       - run: ./ci/do_ci.sh cmake.exporter.otprotocol.test
       - store_artifacts:
@@ -126,6 +127,7 @@ jobs:
       - run:
           command: ./ci/install_windows_protobuf.ps1
           no_output_timeout: 15m
+      - run: ./ci/install_windows_libevent.ps1
       - run: ./ci/do_ci.ps1 cmake.test
       - run: ./ci/do_ci.sh cmake.exporter.otprotocol.test
 
