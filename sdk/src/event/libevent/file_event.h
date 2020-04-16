@@ -14,20 +14,21 @@ namespace event
 {
 namespace libevent
 {
-class FileEvent final : public event::FileEvent {
- public:
-   using Callback = std::function<void(uint32_t)>;
+class FileEvent final : public event::FileEvent
+{
+public:
+  using Callback = std::function<void(uint32_t)>;
 
-   FileEvent(EventBase &event_base,
-             FileDescriptor file_descriptor,
-             uint32_t events,
-             Callback callback) noexcept;
+  FileEvent(EventBase &event_base,
+            FileDescriptor file_descriptor,
+            uint32_t events,
+            Callback callback) noexcept;
 
- private:
-   Event event_;
-   Callback callback_;
+private:
+  Event event_;
+  Callback callback_;
 
-   static void OnFileEvent(FileDescriptor file_descriptor, short what, void *context) noexcept;
+  static void OnFileEvent(FileDescriptor file_descriptor, short what, void *context) noexcept;
 };
 }  // namespace libevent
 }  // namespace event

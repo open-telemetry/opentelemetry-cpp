@@ -1,7 +1,7 @@
 # find LibEvent
 # an event notification library (http://libevent.org/)
 #
-# Usage: 
+# Usage:
 # LIBEVENT_INCLUDE_DIRS, where to find LibEvent headers
 # LIBEVENT_LIBRARIES, LibEvent libraries
 # Libevent_FOUND, If false, do not try to use libevent

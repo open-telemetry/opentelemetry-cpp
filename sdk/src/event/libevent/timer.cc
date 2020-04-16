@@ -15,11 +15,13 @@ Timer::Timer(EventBase &event_base, Callback callback) noexcept
   assert(callback_);
 }
 
-void Timer::EnableTimer(std::chrono::microseconds timeout) noexcept {
+void Timer::EnableTimer(std::chrono::microseconds timeout) noexcept
+{
   event_.Add(timeout);
 }
 
-void Timer::DisableTimer() noexcept {
+void Timer::DisableTimer() noexcept
+{
   event_.Delete();
 }
 

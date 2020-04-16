@@ -2,8 +2,8 @@ load("@rules_foreign_cc//tools/build_defs:cmake.bzl", "cmake_external")
 
 
 filegroup(
-    name = "srcs", 
-    srcs = glob(["**"]), 
+    name = "srcs",
+    srcs = glob(["**"]),
 )
 
 cmake_external(

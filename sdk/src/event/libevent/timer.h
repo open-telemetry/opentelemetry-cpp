@@ -14,23 +14,22 @@ namespace event
 {
 namespace libevent
 {
-class Timer final : public event::Timer {
- public:
-   using Callback = std::function<void()>;
+class Timer final : public event::Timer
+{
+public:
+  using Callback = std::function<void()>;
 
-   Timer(EventBase& event_base, Callback callback) noexcept;
+  Timer(EventBase &event_base, Callback callback) noexcept;
 
-   void EnableTimer(std::chrono::microseconds timeout) noexcept override;
+  void EnableTimer(std::chrono::microseconds timeout) noexcept override;
 
-   void DisableTimer() noexcept override;
+  void DisableTimer() noexcept override;
 
- private:
-   Event event_;
-   Callback callback_;
+private:
+  Event event_;
+  Callback callback_;
 
-   static void OnTimeout(FileDescriptor /*file_descriptor*/,
-                         short /*what*/,
-                         void *context) noexcept;
+  static void OnTimeout(FileDescriptor /*file_descriptor*/, short /*what*/, void *context) noexcept;
 };
 }  // namespace libevent
 }  // namespace event

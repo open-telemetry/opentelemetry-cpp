@@ -39,17 +39,17 @@ new_local_repository(
 
 http_archive(
     name = "bazel_skylib",
+    sha256 = "64ad2728ccdd2044216e4cec7815918b7bb3bb28c95b7e9d951f9d4eccb07625",
+    strip_prefix = "bazel-skylib-1.0.2",
     urls = [
         "https://github.com/bazelbuild/bazel-skylib/archive/1.0.2.zip",
     ],
-    sha256 = "64ad2728ccdd2044216e4cec7815918b7bb3bb28c95b7e9d951f9d4eccb07625",
-    strip_prefix = "bazel-skylib-1.0.2",
 )
 
 http_archive(
-   name = "rules_foreign_cc",
-   strip_prefix = "rules_foreign_cc-456425521973736ef346d93d3d6ba07d807047df",
-   url = "https://github.com/bazelbuild/rules_foreign_cc/archive/456425521973736ef346d93d3d6ba07d807047df.zip",
+    name = "rules_foreign_cc",
+    strip_prefix = "rules_foreign_cc-456425521973736ef346d93d3d6ba07d807047df",
+    url = "https://github.com/bazelbuild/rules_foreign_cc/archive/456425521973736ef346d93d3d6ba07d807047df.zip",
 )
 
 load("@rules_foreign_cc//:workspace_definitions.bzl", "rules_foreign_cc_dependencies")
@@ -59,12 +59,12 @@ rules_foreign_cc_dependencies([
 
 http_archive(
     name = "com_github_libevent_libevent",
-    urls = [
-        "https://github.com/libevent/libevent/archive/release-2.1.8-stable.zip"
-    ],
+    build_file = "//bazel:libevent.BUILD",
     sha256 = "70158101eab7ed44fd9cc34e7f247b3cae91a8e4490745d9d6eb7edc184e4d96",
     strip_prefix = "libevent-release-2.1.8-stable",
-    build_file = "//bazel:libevent.BUILD",
+    urls = [
+        "https://github.com/libevent/libevent/archive/release-2.1.8-stable.zip",
+    ],
 )
 
 # GoogleTest framework.

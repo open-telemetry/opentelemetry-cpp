@@ -25,6 +25,7 @@ public:
   void Exit() noexcept override;
 
   void Run() noexcept override;
+
 private:
   EventBase event_base_;
 };

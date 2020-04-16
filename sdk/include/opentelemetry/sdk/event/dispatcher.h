@@ -8,13 +8,16 @@
 #include "opentelemetry/version.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
-namespace sdk {
-namespace event {
+namespace sdk
+{
+namespace event
+{
 /**
  * Interface for managing asynchronous events.
  */
-class Dispatcher {
- public:
+class Dispatcher
+{
+public:
   virtual ~Dispatcher() = default;
 
   /**
@@ -45,6 +48,6 @@ class Dispatcher {
    */
   virtual void Run() noexcept = 0;
 };
-} // namespace event
-} // namespace sdk
+}  // namespace event
+}  // namespace sdk
 OPENTELEMETRY_END_NAMESPACE

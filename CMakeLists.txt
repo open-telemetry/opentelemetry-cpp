@@ -12,8 +12,7 @@ endif()
 
 option(WITH_OTPROTOCOL
        "Whether to include the OpenTelemetry Protocol in the SDK" OFF)
-option(WITH_LIBEVENT
-      "Build SDK with libevent support" ON)
+option(WITH_LIBEVENT "Build SDK with libevent support" ON)
 
 set(WITH_PROTOBUF OFF)
 if(WITH_OTPROTOCOL)

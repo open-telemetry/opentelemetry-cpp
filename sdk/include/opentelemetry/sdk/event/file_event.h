@@ -1,15 +1,17 @@
 #pragma once
 
 #include <chrono>
-#include <system_error>
 #include <cstdint>
 #include <functional>
+#include <system_error>
 
 #include "opentelemetry/version.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
-namespace sdk {
-namespace event {
+namespace sdk
+{
+namespace event
+{
 /**
  * Available events that can be monitored on a file descriptor.
  */
@@ -27,11 +29,11 @@ using FileReadyCallback = std::function<void(uint32_t)>;
  *
  * Note: Must be freed before the dipatcher is destructed
  */
-class FileEvent {
- public:
-   virtual ~FileEvent() = default;
-
+class FileEvent
+{
+public:
+  virtual ~FileEvent() = default;
 };
-} // namespace event
-} // namespace sdk
+}  // namespace event
+}  // namespace sdk
 OPENTELEMETRY_END_NAMESPACE
