@@ -16,11 +16,11 @@ class Dispatcher final : public event::Dispatcher
 {
 public:
   // Dispatcher
-  std::unique_ptr<FileEvent> CreateFileEvent(FileDescriptor file_descriptor,
-                                             FileReadyCallback callback,
-                                             uint32_t events) noexcept override;
+  std::unique_ptr<event::FileEvent> CreateFileEvent(FileDescriptor file_descriptor,
+                                                    FileReadyCallback callback,
+                                                    uint32_t events) noexcept override;
 
-  std::unique_ptr<Timer> CreateTimer(TimerCallback callback) noexcept override;
+  std::unique_ptr<event::Timer> CreateTimer(TimerCallback callback) noexcept override;
 
   void Exit() noexcept override;
 

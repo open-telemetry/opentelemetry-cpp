@@ -1,4 +1,5 @@
 #include "src/event/libevent/dispatcher.h"
+#include "src/event/libevent/timer.h"
 
 #include "event2/event.h"
 
@@ -17,9 +18,9 @@ std::unique_ptr<FileEvent> Dispatcher::CreateFileEvent(FileDescriptor file_descr
   return nullptr;
 }
 
-std::unique_ptr<Timer> Dispatcher::CreateTimer(TimerCallback callback) noexcept {
-  (void)callback;
-  return nullptr;
+std::unique_ptr<event::Timer> Dispatcher::CreateTimer(TimerCallback callback) noexcept
+{
+  return std::unique_ptr<event::Timer>{new (std::nothrow) Timer{event_base_, callback}};
 }
 
 void Dispatcher::Exit() noexcept {
