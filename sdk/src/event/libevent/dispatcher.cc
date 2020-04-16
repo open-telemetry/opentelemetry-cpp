@@ -1,5 +1,6 @@
 #include "src/event/libevent/dispatcher.h"
 #include "src/event/libevent/timer.h"
+#include "src/event/libevent/file_event.h"
 
 #include "event2/event.h"
 
@@ -8,14 +9,12 @@ namespace sdk
 {
 namespace event {
 namespace libevent {
-std::unique_ptr<FileEvent> Dispatcher::CreateFileEvent(FileDescriptor file_descriptor,
-                                                               FileReadyCallback callback,
-                                                               uint32_t events) noexcept
+std::unique_ptr<event::FileEvent> Dispatcher::CreateFileEvent(FileDescriptor file_descriptor,
+                                                              FileReadyCallback callback,
+                                                              uint32_t events) noexcept
 {
-  (void)file_descriptor;
-  (void)callback;
-  (void)events;
-  return nullptr;
+  return std::unique_ptr<event::FileEvent>{
+      new (std::nothrow) FileEvent{event_base_, file_descriptor, events, callback}};
 }
 
 std::unique_ptr<event::Timer> Dispatcher::CreateTimer(TimerCallback callback) noexcept

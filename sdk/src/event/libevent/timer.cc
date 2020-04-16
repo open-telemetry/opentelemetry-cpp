@@ -1,5 +1,7 @@
 #include "src/event/libevent/timer.h"
 
+#include <cassert>
+
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace sdk
 {
@@ -9,7 +11,9 @@ namespace libevent
 {
 Timer::Timer(EventBase &event_base, Callback callback) noexcept
     : event_{event_base, -1, OnTimeout, 0, this}, callback_{std::move(callback)}
-{}
+{
+  assert(callback_);
+}
 
 void Timer::EnableTimer(std::chrono::microseconds timeout) noexcept {
   event_.Add(timeout);
