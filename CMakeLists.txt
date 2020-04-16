@@ -12,11 +12,15 @@ endif()
 
 option(WITH_OTPROTOCOL
        "Whether to include the OpenTelemetry Protocol in the SDK" OFF)
+option(WITH_LIBEVENT
+      "Build SDK with libevent support" ON)
 
 set(WITH_PROTOBUF OFF)
 if(WITH_OTPROTOCOL)
   set(WITH_PROTOBUF ON)
 endif()
+
+set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake/Modules/")
 
 include(CTest)
 
@@ -40,6 +44,11 @@ endif()
 
 if(WITH_OTPROTOCOL)
   include(third_party/opentelemetry-proto/Protobuf.cmake)
+endif()
+
+if(WITH_LIBEVENT)
+  find_package(Libevent REQUIRED)
+  include_directories(SYSTEM ${LIBEVENT_INCLUDE_DIRS})
 endif()
 
 if(BUILD_TESTING)
