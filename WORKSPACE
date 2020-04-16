@@ -55,6 +55,7 @@ http_archive(
 load("@rules_foreign_cc//:workspace_definitions.bzl", "rules_foreign_cc_dependencies")
 
 rules_foreign_cc_dependencies([
+    "//bazel:built_cmake_toolchain",
 ])
 
 http_archive(
