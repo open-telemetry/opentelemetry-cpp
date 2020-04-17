@@ -18,8 +18,12 @@ cmake_external(
       "EVENT__DISABLE_TESTS": "on",
     },
     lib_source = ":srcs",
+    generate_crosstool_file = select({
+      "@io_opentelemetry_cpp//bazel:windows": True,
+      "//conditions:default": None,
+    }),
     static_libraries = select({
-      "@io_opentelemetry_cpp//bazel:windows": ["libevent.lib"],
+      "@io_opentelemetry_cpp//bazel:windows": None,
       "//conditions:default": ["libevent.a"],
     }),
     make_commands = select({
