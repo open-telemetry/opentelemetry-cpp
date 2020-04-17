@@ -18,7 +18,10 @@ cmake_external(
       "EVENT__DISABLE_TESTS": "on",
     },
     lib_source = ":srcs",
-    static_libraries = ["libevent.a"],
+    static_libraries = select({
+      "@io_opentelemetry_cpp//bazel:windows": ["libevent.lib"],
+      "//conditions:default": ["libevent.a"],
+    }),
     make_commands = select({
       "@io_opentelemetry_cpp//bazel:windows": ["MSBuild.exe INSTALL.vcxproj"],
       "//conditions:default" : None,
