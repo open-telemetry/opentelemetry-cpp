@@ -20,8 +20,8 @@ cmake_external(
     lib_source = ":srcs",
     static_libraries = ["libevent.a"],
     make_commands = select({
-      "//bazel:windows": None,
-      "//conditions:default" : ["MSBuild.exe INSTALL.vcxproj"]
+      "@io_opentelemetry_cpp//bazel:windows": ["MSBuild.exe INSTALL.vcxproj"],
+      "//conditions:default" : None,
     }),
     visibility = ["//visibility:public"],
 )
