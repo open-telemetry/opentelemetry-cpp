@@ -15,7 +15,7 @@ TEST(DispatcherTest, Timer)
   t1 = std::chrono::steady_clock::now();
   dispatcher.Run();
   auto duration = t2 - t1;
-  EXPECT_TRUE(duration >= std::chrono::milliseconds{10});
+  EXPECT_TRUE(duration > std::chrono::milliseconds{5});
   EXPECT_TRUE(duration < std::chrono::milliseconds{20});
 }
 
