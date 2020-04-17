@@ -23,7 +23,7 @@ cmake_external(
       "//conditions:default": None,
     }),
     static_libraries = select({
-      "@io_opentelemetry_cpp//bazel:windows": None,
+      "@io_opentelemetry_cpp//bazel:windows": ["event.lib"],
       "//conditions:default": ["libevent.a"],
     }),
     make_commands = select({
