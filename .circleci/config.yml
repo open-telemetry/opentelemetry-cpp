@@ -43,9 +43,10 @@ jobs:
     steps:
       - checkout
       - run: ./ci/setup_ci_environment.sh
+      - run: ./ci/setup_cmake.sh
       - run: ./ci/install_bazelisk.sh
       - run: ./ci/install_gcc48.sh
-      - run: CC=/usr/bin/gcc-4.8 ./ci/do_ci.sh bazel.legacy.test
+      - run: CC=/usr/bin/gcc-4.8 CXX=/usr/bin/g++-4.8 ./ci/do_ci.sh bazel.legacy.test
 
   bazel_test:
     resource_class: xlarge
@@ -54,6 +55,7 @@ jobs:
     steps:
       - checkout
       - run: ./ci/setup_ci_environment.sh
+      - run: ./ci/setup_cmake.sh
       - run: ./ci/install_bazelisk.sh
       - run: ./ci/do_ci.sh bazel.test
 
@@ -64,6 +66,7 @@ jobs:
     steps:
       - checkout
       - run: ./ci/setup_ci_environment.sh
+      - run: ./ci/setup_cmake.sh
       - run: ./ci/install_bazelisk.sh
       - run: ./ci/do_ci.sh bazel.noexcept
 
@@ -74,6 +77,7 @@ jobs:
     steps:
       - checkout
       - run: ./ci/setup_ci_environment.sh
+      - run: ./ci/setup_cmake.sh
       - run: ./ci/install_bazelisk.sh
       - run: ./ci/do_ci.sh bazel.asan
 
@@ -84,6 +88,7 @@ jobs:
     steps:
       - checkout
       - run: ./ci/setup_ci_environment.sh
+      - run: ./ci/setup_cmake.sh
       - run: ./ci/install_bazelisk.sh
       - run: ./ci/do_ci.sh bazel.tsan
 
@@ -94,6 +99,7 @@ jobs:
     steps:
       - checkout
       - run: ./ci/setup_ci_environment.sh
+      - run: ./ci/setup_cmake.sh
       - run: ./ci/install_bazelisk.sh
       - run: env BENCHMARK_DIR=/benchmark ./ci/do_ci.sh benchmark
       - store_artifacts:
@@ -115,6 +121,7 @@ jobs:
       xcode: "11.0.0"
     steps:
       - checkout
+      - run: ./ci/install_osx_cmake.sh
       - run: ./ci/install_osx_bazelisk.sh
       - run: ./ci/do_ci.sh bazel.test
 
@@ -135,6 +142,7 @@ jobs:
     executor: win/vs2019
     steps:
       - checkout
+      - run: ./ci/setup_windows_cmake.ps1
       - run: ./ci/install_windows_bazelisk.ps1
       - run: ./ci/do_ci.ps1 bazel.build
 

@@ -55,10 +55,6 @@ http_archive(
 load("@rules_foreign_cc//:workspace_definitions.bzl", "rules_foreign_cc_dependencies")
 
 rules_foreign_cc_dependencies([
-    "//bazel:built_cmake_toolchain_osx",
-    "//bazel:built_ninja_toolchain_osx",
-    "//bazel:built_cmake_toolchain_linux",
-    "//bazel:built_ninja_toolchain_linux",
 ])
 
 http_archive(
