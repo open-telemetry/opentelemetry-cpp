@@ -19,5 +19,9 @@ cmake_external(
     },
     lib_source = ":srcs",
     static_libraries = ["libevent.a"],
+    make_commands = select({
+      "//bazel:windows": None,
+      "//conditions:default" : ["MSBuild.exe INSTALL.vcxproj"]
+    }),
     visibility = ["//visibility:public"],
 )
