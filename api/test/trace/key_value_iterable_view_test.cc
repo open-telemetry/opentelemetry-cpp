@@ -6,19 +6,19 @@
 
 using namespace opentelemetry;
 
-static std::map<std::string, trace::AttributeValue> TakeKeyValues(
-    const trace::KeyValueIterable &iterable)
+static int TakeKeyValues(const trace::KeyValueIterable &iterable)
 {
   std::map<std::string, trace::AttributeValue> result;
+  int count = 0;
   iterable.ForEachKeyValue([&](nostd::string_view key, trace::AttributeValue value) noexcept {
-    result.emplace(std::string{key}, value);
+    ++count;
     return true;
   });
-  return result;
+  return count;
 }
 
 template <class T, nostd::enable_if_t<trace::detail::is_key_value_iterable<T>::value> * = nullptr>
-static std::map<std::string, trace::AttributeValue> TakeKeyValues(const T &iterable)
+static int TakeKeyValues(const T &iterable)
 {
   return TakeKeyValues(trace::KeyValueIterableView<T>{iterable});
 }
@@ -43,12 +43,10 @@ TEST(KeyValueIterableViewTest, is_key_value_iterable)
 TEST(KeyValueIterableViewTest, ForEachKeyValue)
 {
   std::map<std::string, std::string> m1 = {{"abc", "123"}, {"xyz", "456"}};
-  EXPECT_EQ(TakeKeyValues(m1),
-            (std::map<std::string, trace::AttributeValue>{{"abc", "123"}, {"xyz", "456"}}));
+  EXPECT_EQ(TakeKeyValues(m1), 2);
 
   std::vector<std::pair<std::string, int>> v1 = {{"abc", 123}, {"xyz", 456}};
-  EXPECT_EQ(TakeKeyValues(v1),
-            (std::map<std::string, trace::AttributeValue>{{"abc", 123}, {"xyz", 456}}));
+  EXPECT_EQ(TakeKeyValues(v1), 2);
 }
 
 TEST(KeyValueIterableViewTest, ForEachKeyValueWithExit)

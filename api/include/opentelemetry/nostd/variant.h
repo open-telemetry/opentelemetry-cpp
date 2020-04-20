@@ -1138,7 +1138,7 @@ struct convert_to_bool
     static_assert(std::is_convertible<invoke_result_t<RelOp, Lhs, Rhs>, bool>::value,
                   "relational operators must return a type"
                   " implicitly convertible to bool");
-    return invoke(RelOp{}, std::forward<Lhs>(lhs), std::forward<Rhs>(rhs));
+    return nostd::invoke(RelOp{}, std::forward<Lhs>(lhs), std::forward<Rhs>(rhs));
   }
 };
 }  // namespace detail
