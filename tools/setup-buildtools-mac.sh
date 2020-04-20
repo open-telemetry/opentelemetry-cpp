@@ -26,3 +26,4 @@ sudo chown -R $(whoami) /usr/local/etc/bash_completion.d /usr/local/include /usr
 brew install cmake
 brew install wget
 brew install clang-format
+brew install google-benchmark

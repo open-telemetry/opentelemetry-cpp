@@ -34,3 +34,6 @@
 
 # Bazel files
 /bazel-*
+
+# Output directory
+/out
