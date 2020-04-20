@@ -20,6 +20,16 @@ if [[ "$1" == "cmake.test" ]]; then
   make
   make test
   exit 0
+elif [[ "$1" == "cmake.exporter.otprotocol.test" ]]; then
+  cd "${BUILD_DIR}"
+  rm -rf *
+  cmake -DCMAKE_BUILD_TYPE=Debug  \
+        -DWITH_OTPROTOCOL=ON \
+        -DCMAKE_CXX_FLAGS="-Werror" \
+        "${SRC_DIR}"
+  make
+  make test
+  exit 0
 elif [[ "$1" == "cmake.test_example_plugin" ]]; then
   # Build the plugin
   cd "${BUILD_DIR}"
@@ -57,6 +67,10 @@ EOF
 elif [[ "$1" == "bazel.test" ]]; then
   bazel build $BAZEL_OPTIONS //...
   bazel test $BAZEL_TEST_OPTIONS //...
+  exit 0
+elif [[ "$1" == "bazel.legacy.test" ]]; then
+  bazel build $BAZEL_OPTIONS -- //... -//exporters/otlp/...
+  bazel test $BAZEL_TEST_OPTIONS -- //... -//exporters/otlp/...
   exit 0
 elif [[ "$1" == "bazel.noexcept" ]]; then
   bazel build --copt=-fno-exceptions $BAZEL_OPTIONS //...

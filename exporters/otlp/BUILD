@@ -15,20 +15,16 @@
 package(default_visibility = ["//visibility:public"])
 
 cc_library(
-    name = "fork",
-    srcs = select({
-        "//bazel:windows": ["fork_windows.cc"],
-        "//conditions:default": ["fork_unix.cc"],
-    }),
-    hdrs = [
-        "fork.h",
+    name = "recordable",
+    srcs = [
+        "recordable.cc",
     ],
-    include_prefix = "src/common/platform",
-    linkopts = select({
-        "//bazel:windows": [],
-        "//conditions:default": ["-pthread"],
-    }),
+    hdrs = [
+        "recordable.h",
+    ],
+    include_prefix = "exporters/otlp",
     deps = [
-        "//api",
+        "//sdk/src/trace",
+        "@com_github_opentelemetry_proto//:trace_proto_cc",
     ],
 )
