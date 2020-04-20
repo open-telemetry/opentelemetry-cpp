@@ -8,10 +8,9 @@
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace sdk
 {
+namespace trace_api = opentelemetry::trace;
 namespace trace
 {
-namespace trace_api = opentelemetry::trace;
-
 /**
  * Maintains a representation of a span in a format that can be processed by a recorder.
  *

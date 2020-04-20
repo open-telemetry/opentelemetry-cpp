@@ -22,6 +22,34 @@ cc_test(
     ],
 )
 
+otel_cc_benchmark(
+    name = "random_benchmark",
+    srcs = ["random_benchmark.cc"],
+    deps = ["//sdk/src/common:random"],
+)
+
+cc_test(
+    name = "atomic_unique_ptr_test",
+    srcs = [
+        "atomic_unique_ptr_test.cc",
+    ],
+    deps = [
+        "//sdk/src/common:atomic_unique_ptr",
+        "@com_google_googletest//:gtest_main",
+    ],
+)
+
+cc_test(
+    name = "circular_buffer_range_test",
+    srcs = [
+        "circular_buffer_range_test.cc",
+    ],
+    deps = [
+        "//sdk/src/common:circular_buffer_range",
+        "@com_google_googletest//:gtest_main",
+    ],
+)
+
 cc_test(
     name = "random_fork_test",
     srcs = [
@@ -29,12 +57,25 @@ cc_test(
     ],
     deps = [
         "//sdk/src/common:random",
-        "@com_google_googletest//:gtest_main",
+    ],
+)
+
+cc_library(
+    name = "baseline_circular_buffer",
+    hdrs = [
+        "baseline_circular_buffer.h",
+    ],
+    include_prefix = "test/common",
+    deps = [
+        "//api",
     ],
 )
 
 otel_cc_benchmark(
-    name = "random_benchmark",
-    srcs = ["random_benchmark.cc"],
-    deps = ["//sdk/src/common:random"],
+    name = "circular_buffer_benchmark",
+    srcs = ["circular_buffer_benchmark.cc"],
+    deps = [
+        ":baseline_circular_buffer",
+        "//sdk/src/common:circular_buffer",
+    ],
 )
