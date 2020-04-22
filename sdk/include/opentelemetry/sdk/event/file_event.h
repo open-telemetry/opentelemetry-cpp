@@ -1,6 +1,5 @@
 #pragma once
 
-#include <chrono>
 #include <cstdint>
 #include <functional>
 #include <system_error>
