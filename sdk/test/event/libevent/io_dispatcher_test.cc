@@ -1,14 +1,14 @@
-#include "src/event/libevent/dispatcher.h"
+#include "src/event/libevent/io_dispatcher.h"
 
 #include <chrono>
 
 #include <gtest/gtest.h>
 using opentelemetry::sdk::event::Timer;
-using opentelemetry::sdk::event::libevent::Dispatcher;
+using opentelemetry::sdk::event::libevent::IoDispatcher;
 
 TEST(DispatcherTest, Timer)
 {
-  Dispatcher dispatcher;
+  IoDispatcher dispatcher;
   std::chrono::steady_clock::time_point t1, t2;
   auto timer = dispatcher.CreateTimer([&] { t2 = std::chrono::steady_clock::now(); });
   timer->EnableTimer(std::chrono::milliseconds{100});
@@ -21,7 +21,7 @@ TEST(DispatcherTest, Timer)
 
 TEST(DispatcherTest, Exit)
 {
-  Dispatcher dispatcher;
+  IoDispatcher dispatcher;
   std::unique_ptr<Timer> timer;
   auto f = [&] {
     timer->EnableTimer(std::chrono::milliseconds{1});

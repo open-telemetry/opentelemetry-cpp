@@ -1,7 +1,7 @@
 cc_test(
-    name = "dispatcher_test",
+    name = "io_dispatcher_test",
     srcs = [
-        "dispatcher_test.cc",
+        "io_dispatcher_test.cc",
     ],
     linkstatic = 1,
     deps = [

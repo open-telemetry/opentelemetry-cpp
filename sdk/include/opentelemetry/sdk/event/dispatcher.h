@@ -21,17 +21,6 @@ public:
   virtual ~Dispatcher() = default;
 
   /**
-   * Create an event that triggers when a file descriptor becomes readable or writable.
-   * @param file_descriptor the file descriptor to monitor
-   * @param callback the callback to call when event triggers
-   * @param events the events to monitor
-   * @return a handle for the event
-   */
-  virtual std::unique_ptr<FileEvent> CreateFileEvent(FileDescriptor file_descriptor,
-                                                     FileReadyCallback callback,
-                                                     uint32_t events) noexcept = 0;
-
-  /**
    * Create a timer event.
    * @callback the callback to call when the event triggers
    * @return a handle for the timer

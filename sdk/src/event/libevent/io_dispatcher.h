@@ -1,6 +1,6 @@
 #pragma once
 
-#include "opentelemetry/sdk/event/dispatcher.h"
+#include "opentelemetry/sdk/event/io_dispatcher.h"
 #include "opentelemetry/version.h"
 
 #include "src/event/libevent/event_base.h"
@@ -12,7 +12,7 @@ namespace event
 {
 namespace libevent
 {
-class Dispatcher final : public event::Dispatcher
+class IoDispatcher final : public event::IoDispatcher
 {
 public:
   // Dispatcher

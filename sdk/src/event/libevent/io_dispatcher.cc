@@ -1,4 +1,4 @@
-#include "src/event/libevent/dispatcher.h"
+#include "src/event/libevent/io_dispatcher.h"
 #include "src/event/libevent/file_event.h"
 #include "src/event/libevent/timer.h"
 
@@ -11,25 +11,25 @@ namespace event
 {
 namespace libevent
 {
-std::unique_ptr<event::FileEvent> Dispatcher::CreateFileEvent(FileDescriptor file_descriptor,
-                                                              FileReadyCallback callback,
-                                                              uint32_t events) noexcept
+std::unique_ptr<event::FileEvent> IoDispatcher::CreateFileEvent(FileDescriptor file_descriptor,
+                                                                FileReadyCallback callback,
+                                                                uint32_t events) noexcept
 {
   return std::unique_ptr<event::FileEvent>{
       new (std::nothrow) FileEvent{event_base_, file_descriptor, events, callback}};
 }
 
-std::unique_ptr<event::Timer> Dispatcher::CreateTimer(TimerCallback callback) noexcept
+std::unique_ptr<event::Timer> IoDispatcher::CreateTimer(TimerCallback callback) noexcept
 {
   return std::unique_ptr<event::Timer>{new (std::nothrow) Timer{event_base_, callback}};
 }
 
-void Dispatcher::Exit() noexcept
+void IoDispatcher::Exit() noexcept
 {
   event_base_.LoopBreak();
 }
 
-void Dispatcher::Run() noexcept
+void IoDispatcher::Run() noexcept
 {
   event_base_.Dispatch();
 }
