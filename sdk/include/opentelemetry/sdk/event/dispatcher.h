@@ -33,7 +33,7 @@ public:
 
   /**
    * Create a timer event.
-   * @callback the callback to call when  the event triggers
+   * @callback the callback to call when the event triggers
    * @return a handle for the timer
    */
   virtual std::unique_ptr<Timer> CreateTimer(TimerCallback callback) noexcept = 0;
@@ -44,7 +44,7 @@ public:
   virtual void Exit() noexcept = 0;
 
   /**
-   * Run the event loop until.
+   * Run the event loop until all events have been processed or Exit is called.
    */
   virtual void Run() noexcept = 0;
 };
