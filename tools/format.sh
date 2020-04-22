@@ -50,8 +50,8 @@ if [[ -z "$BUILDIFIER" ]]; then
 fi
 if which "$BUILDIFIER" >/dev/null; then
   echo "Running $BUILDIFIER"
-  "$BUILDIFIER" $($FIND -name WORKSPACE -print -o -name BUILD -print -o \
-    -name '*.BUILD' -o -name '*.bzl' -print)
+  "$BUILDIFIER" $($FIND -name WORKSPACE -print -o -name BUILD -print -o -name '*.BUILD' -print -o \
+    -name '*.bzl' -print)
 else
   echo "Can't find buildifier. It can be installed with:"
   echo "  go get github.com/bazelbuild/buildtools/buildifier"
