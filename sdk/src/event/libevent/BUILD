@@ -15,7 +15,7 @@
 package(default_visibility = ["//visibility:public"])
 
 cc_library(
-    name = "libevent",
+    name = "io_dispatcher",
     srcs = glob(["**/*.cc"]),
     hdrs = glob(["**/*.h"]),
     include_prefix = "src/event/libevent",

@@ -5,7 +5,7 @@ cc_test(
     ],
     linkstatic = 1,
     deps = [
-        "//sdk/src/event/libevent",
+        "//sdk/src/event/libevent:io_dispatcher",
         "@com_google_googletest//:gtest_main",
     ],
 )
