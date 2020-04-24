@@ -21,6 +21,7 @@ public:
 
   Timer(EventBase &event_base, Callback callback) noexcept;
 
+  // event::Timer
   void EnableTimer(std::chrono::microseconds timeout) noexcept override;
 
   void DisableTimer() noexcept override;
