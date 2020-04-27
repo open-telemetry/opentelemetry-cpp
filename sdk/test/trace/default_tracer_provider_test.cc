@@ -6,7 +6,7 @@ using opentelemetry::sdk::trace::DefaultTracerProvider;
 
 TEST(TracerProvider, GetTracer)
 {
-  auto tf = DefaultTracerProvider();
+  auto tf = DefaultTracerProvider(nullptr);
   auto t1 = tf.GetTracer("test");
   auto t2 = tf.GetTracer("test");
   auto t3 = tf.GetTracer("different", "1.0.0");

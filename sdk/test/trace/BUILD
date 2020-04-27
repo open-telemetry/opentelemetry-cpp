@@ -30,3 +30,14 @@ cc_test(
         "@com_google_googletest//:gtest_main",
     ],
 )
+
+cc_test(
+    name = "tracer_test",
+    srcs = [
+        "tracer_test.cc",
+    ],
+    deps = [
+        "//sdk/src/trace",
+        "@com_google_googletest//:gtest_main",
+    ],
+)

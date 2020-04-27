@@ -6,8 +6,8 @@ namespace sdk
 {
 namespace trace
 {
-DefaultTracerProvider::DefaultTracerProvider() noexcept
-    : tracer_(new Tracer(std::unique_ptr<Recorder>(nullptr)))
+DefaultTracerProvider::DefaultTracerProvider(std::unique_ptr<SpanProcessor> &&processor) noexcept
+    : tracer_(new Tracer(std::move(processor)))
 {}
 
 opentelemetry::nostd::shared_ptr<opentelemetry::trace::Tracer> DefaultTracerProvider::GetTracer(
