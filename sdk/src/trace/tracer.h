@@ -1,8 +1,8 @@
 #pragma once
 
+#include "opentelemetry/sdk/trace/processor.h"
 #include "opentelemetry/trace/tracer.h"
 #include "opentelemetry/version.h"
-#include "opentelemetry/sdk/trace/processor.h"
 
 #include <memory>
 
@@ -15,7 +15,9 @@ class Tracer final : public trace_api::Tracer, public std::enable_shared_from_th
 {
 public:
   // Note: processor must be non-null
-  explicit Tracer(std::unique_ptr<SpanProcessor> &&processor) noexcept : processor_{std::move(processor)} {}
+  explicit Tracer(std::unique_ptr<SpanProcessor> &&processor) noexcept
+      : processor_{std::move(processor)}
+  {}
 
   SpanProcessor &processor() const noexcept { return *processor_; }
 

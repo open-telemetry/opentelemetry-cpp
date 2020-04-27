@@ -8,9 +8,9 @@ using namespace opentelemetry::sdk::trace;
 
 TEST(TracerProvider, GetTracer)
 {
-  SimpleSpanProcessor* processor_ptr = new SimpleSpanProcessor(nullptr);
+  SimpleSpanProcessor *processor_ptr = new SimpleSpanProcessor(nullptr);
   std::unique_ptr<SpanProcessor> processor(processor_ptr);
-  
+
   auto tf = DefaultTracerProvider(std::move(processor));
   auto t1 = tf.GetTracer("test");
   auto t2 = tf.GetTracer("test");
@@ -24,6 +24,6 @@ TEST(TracerProvider, GetTracer)
   ASSERT_EQ(t1, t3);
 
   // Should be an sdk::trace::Tracer with the processor attached.
-  auto sdkTracer = static_cast<Tracer*>(t1.get());
+  auto sdkTracer = static_cast<Tracer *>(t1.get());
   ASSERT_EQ(processor_ptr, &sdkTracer->processor());
 }

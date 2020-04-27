@@ -5,9 +5,9 @@
 #include <string>
 
 #include "opentelemetry/nostd/shared_ptr.h"
+#include "opentelemetry/sdk/trace/processor.h"
 #include "opentelemetry/trace/tracer.h"
 #include "opentelemetry/trace/tracer_provider.h"
-#include "opentelemetry/sdk/trace/processor.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace sdk

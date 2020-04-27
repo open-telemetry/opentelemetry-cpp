@@ -1,6 +1,6 @@
-#include "src/trace/simple_processor.h"
-#include "opentelemetry/sdk/trace/span_data.h"
 #include "src/trace/tracer.h"
+#include "opentelemetry/sdk/trace/span_data.h"
+#include "src/trace/simple_processor.h"
 
 #include <gtest/gtest.h>
 
@@ -24,12 +24,12 @@ public:
   ExportResult Export(
       opentelemetry::nostd::span<std::unique_ptr<Recordable>> &recordables) noexcept override
   {
-    for (auto &recordable: recordables)
+    for (auto &recordable : recordables)
     {
-      auto span = std::unique_ptr<SpanData>(static_cast<SpanData*>(recordable.release()));
+      auto span = std::unique_ptr<SpanData>(static_cast<SpanData *>(recordable.release()));
       if (span != nullptr)
       {
-	spans_received_->push_back(std::string(span->GetName()));
+        spans_received_->push_back(std::string(span->GetName()));
       }
     }
 
@@ -37,8 +37,7 @@ public:
   }
 
   void Shutdown(std::chrono::microseconds timeout = std::chrono::microseconds(0)) noexcept override
-  {
-  }
+  {}
 
 private:
   std::shared_ptr<std::vector<std::string>> spans_received_;
@@ -51,7 +50,7 @@ TEST(Tracer, ToMockSpanExporter)
   std::unique_ptr<SimpleSpanProcessor> processor(new SimpleSpanProcessor(std::move(exporter)));
   std::shared_ptr<Tracer> tracer(new Tracer(std::move(processor)));
 
-  auto span_first = tracer->StartSpan("span 1");
+  auto span_first  = tracer->StartSpan("span 1");
   auto span_second = tracer->StartSpan("span 2");
 
   ASSERT_EQ(0, spans_received->size());
