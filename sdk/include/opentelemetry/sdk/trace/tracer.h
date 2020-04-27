@@ -15,11 +15,13 @@ class Tracer final : public trace_api::Tracer, public std::enable_shared_from_th
 {
 public:
   // Note: processor must be non-null
-  explicit Tracer(std::unique_ptr<SpanProcessor> &&processor) noexcept
-      : processor_{std::move(processor)}
+  explicit Tracer(std::shared_ptr<SpanProcessor> processor) noexcept
+      : processor_{processor}
   {}
 
-  SpanProcessor &processor() const noexcept { return *processor_; }
+  void SetProcessor(std::shared_ptr<SpanProcessor> processor) noexcept;
+
+  SpanProcessor &GetProcessor() const noexcept;
 
   // trace_api::Tracer
   nostd::unique_ptr<trace_api::Span> StartSpan(
@@ -31,7 +33,7 @@ public:
   void CloseWithMicroseconds(uint64_t timeout) noexcept override;
 
 private:
-  std::unique_ptr<SpanProcessor> processor_;
+  std::shared_ptr<SpanProcessor> processor_;
 };
 }  // namespace trace
 }  // namespace sdk

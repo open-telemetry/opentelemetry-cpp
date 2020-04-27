@@ -1,4 +1,4 @@
-#include "src/trace/tracer.h"
+#include "opentelemetry/sdk/trace/tracer.h"
 #include "opentelemetry/sdk/trace/span_data.h"
 #include "src/trace/simple_processor.h"
 

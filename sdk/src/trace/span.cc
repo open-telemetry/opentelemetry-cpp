@@ -10,14 +10,14 @@ namespace trace
 Span::Span(std::shared_ptr<Tracer> &&tracer,
            nostd::string_view name,
            const trace_api::StartSpanOptions &options) noexcept
-    : tracer_{std::move(tracer)}, recordable_{tracer_->processor().MakeRecordable()}
+    : tracer_{std::move(tracer)}, recordable_{tracer_->GetProcessor().MakeRecordable()}
 {
   (void)options;
   if (recordable_ == nullptr)
   {
     return;
   }
-  tracer_->processor().OnStart(*recordable_);
+  tracer_->GetProcessor().OnStart(*recordable_);
   recordable_->SetName(name);
 }
 
@@ -64,7 +64,7 @@ void Span::End() noexcept
   {
     return;
   }
-  tracer_->processor().OnEnd(std::move(recordable_));
+  tracer_->GetProcessor().OnEnd(std::move(recordable_));
   recordable_.reset();
 }
 

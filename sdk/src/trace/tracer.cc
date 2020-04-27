@@ -1,4 +1,4 @@
-#include "src/trace/tracer.h"
+#include "opentelemetry/sdk/trace/tracer.h"
 
 #include "opentelemetry/version.h"
 #include "src/trace/span.h"
@@ -8,6 +8,14 @@ namespace sdk
 {
 namespace trace
 {
+void Tracer::SetProcessor(std::shared_ptr<SpanProcessor> processor) noexcept {
+    processor_ = processor;
+}
+
+SpanProcessor &Tracer::GetProcessor() const noexcept { 
+    return *processor_; 
+}
+
 nostd::unique_ptr<trace_api::Span> Tracer::StartSpan(
     nostd::string_view name,
     const trace_api::StartSpanOptions &options) noexcept

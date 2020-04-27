@@ -2,8 +2,8 @@
 
 #include <mutex>
 
+#include "opentelemetry/sdk/trace/tracer.h"
 #include "opentelemetry/version.h"
-#include "src/trace/tracer.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace sdk

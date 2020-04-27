@@ -1,4 +1,4 @@
-foreach(testname default_tracer_provider_test span_data_test
+foreach(testname tracer_provider_test span_data_test
                  simple_processor_test tracer_test)
   add_executable(${testname} "${testname}.cc")
   target_link_libraries(${testname} ${GTEST_BOTH_LIBRARIES}
