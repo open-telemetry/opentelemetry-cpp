@@ -18,7 +18,7 @@ class DefaultTracerProvider final : public opentelemetry::trace::TracerProvider
 {
 public:
   /**
-   * Construct a new tracer with a given processor.
+   * Construct a new tracer provider with a given processor.
    * @param processor The processor instance to be used for all tracers
    * obtained from this tracer provider.
    */
