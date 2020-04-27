@@ -17,13 +17,16 @@ namespace trace
 class DefaultTracerProvider final : public opentelemetry::trace::TracerProvider
 {
 public:
+  /**
+   * Construct a new tracer with a given processor.
+   * @param processor The processor instance to be used for all tracers
+   * obtained from this tracer provider.
+   */
   DefaultTracerProvider(std::unique_ptr<SpanProcessor> &&processor) noexcept;
 
   opentelemetry::nostd::shared_ptr<opentelemetry::trace::Tracer> GetTracer(
       nostd::string_view library_name,
       nostd::string_view library_version = "") noexcept override;
-
-  void AddProcessor(std::unique_ptr<SpanProcessor> &&processor) noexcept;
 
 private:
   opentelemetry::nostd::shared_ptr<opentelemetry::trace::Tracer> tracer_;
