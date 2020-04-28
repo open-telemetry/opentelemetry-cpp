@@ -15,9 +15,7 @@ class Tracer final : public trace_api::Tracer, public std::enable_shared_from_th
 {
 public:
   // Note: processor must be non-null
-  explicit Tracer(std::shared_ptr<SpanProcessor> processor) noexcept
-      : processor_{processor}
-  {}
+  explicit Tracer(std::shared_ptr<SpanProcessor> processor) noexcept : processor_{processor} {}
 
   void SetProcessor(std::shared_ptr<SpanProcessor> processor) noexcept;
 

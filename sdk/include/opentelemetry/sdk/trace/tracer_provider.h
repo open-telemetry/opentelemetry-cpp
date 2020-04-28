@@ -34,7 +34,7 @@ public:
    * Obtain the span processor associated with this tracer provider.
    * @return The span processor for this tracer provider.
    */
-  SpanProcessor& GetProcessor() const noexcept;
+  SpanProcessor &GetProcessor() const noexcept;
 
 private:
   opentelemetry::nostd::shared_ptr<opentelemetry::trace::Tracer> tracer_;

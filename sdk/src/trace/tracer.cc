@@ -8,12 +8,14 @@ namespace sdk
 {
 namespace trace
 {
-void Tracer::SetProcessor(std::shared_ptr<SpanProcessor> processor) noexcept {
-    processor_ = processor;
+void Tracer::SetProcessor(std::shared_ptr<SpanProcessor> processor) noexcept
+{
+  processor_ = processor;
 }
 
-SpanProcessor &Tracer::GetProcessor() const noexcept { 
-    return *processor_; 
+SpanProcessor &Tracer::GetProcessor() const noexcept
+{
+  return *processor_;
 }
 
 nostd::unique_ptr<trace_api::Span> Tracer::StartSpan(
