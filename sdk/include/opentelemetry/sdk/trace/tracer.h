@@ -14,14 +14,26 @@ namespace trace
 class Tracer final : public trace_api::Tracer, public std::enable_shared_from_this<Tracer>
 {
 public:
-  // Note: processor must be non-null
+  /**
+   * Initialize a new tracer.
+   * @param processor The span processor for this tracer. This must not be a
+   * nullptr.
+   */
   explicit Tracer(std::shared_ptr<SpanProcessor> processor) noexcept : processor_{processor} {}
 
+  /**
+   * Set the span processor associated with this tracer.
+   * @param processor The new span processor for this tracer. This must not be
+   * a nullptr.
+   */
   void SetProcessor(std::shared_ptr<SpanProcessor> processor) noexcept;
 
+  /**
+   * Obtain the span processor associated with this tracer.
+   * @return The span processor for this tracer.
+   */
   SpanProcessor &GetProcessor() const noexcept;
 
-  // trace_api::Tracer
   nostd::unique_ptr<trace_api::Span> StartSpan(
       nostd::string_view name,
       const trace_api::StartSpanOptions &options = {}) noexcept override;

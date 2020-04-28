@@ -20,11 +20,8 @@ void TracerProvider::SetProcessor(std::shared_ptr<SpanProcessor> processor) noex
 {
   processor_ = processor;
 
-  auto sdkTracer = dynamic_cast<Tracer *>(tracer_.get());
-  if (sdkTracer)
-  {
-    sdkTracer->SetProcessor(processor);
-  }
+  auto sdkTracer = static_cast<Tracer *>(tracer_.get());
+  sdkTracer->SetProcessor(processor);
 }
 
 SpanProcessor &TracerProvider::GetProcessor() const noexcept

@@ -18,6 +18,11 @@ namespace trace
 class TracerProvider final : public opentelemetry::trace::TracerProvider
 {
 public:
+  /**
+   * Initialize a new tracer provider.
+   * @param processor The span processor for this tracer provider. This must
+   * not be a nullptr.
+   */
   TracerProvider(std::shared_ptr<SpanProcessor> processor) noexcept;
 
   opentelemetry::nostd::shared_ptr<opentelemetry::trace::Tracer> GetTracer(
@@ -26,7 +31,8 @@ public:
 
   /**
    * Set the span processor associated with this tracer provider.
-   * @param processor The new span processor for this tracer provider.
+   * @param processor The new span processor for this tracer provider. This
+   * must not be a nullptr.
    */
   void SetProcessor(std::shared_ptr<SpanProcessor> processor) noexcept;
 
