@@ -22,7 +22,7 @@ public:
    * @param processor The span processor for this tracer provider. This must
    * not be a nullptr.
    */
-  TracerProvider(std::shared_ptr<SpanProcessor> processor) noexcept;
+  explicit TracerProvider(std::shared_ptr<SpanProcessor> processor) noexcept;
 
   opentelemetry::nostd::shared_ptr<opentelemetry::trace::Tracer> GetTracer(
       nostd::string_view library_name,

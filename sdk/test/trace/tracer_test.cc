@@ -47,8 +47,8 @@ TEST(Tracer, ToMockSpanExporter)
 {
   std::shared_ptr<std::vector<std::string>> spans_received(new std::vector<std::string>);
   std::unique_ptr<SpanExporter> exporter(new MockSpanExporter(spans_received));
-  std::unique_ptr<SimpleSpanProcessor> processor(new SimpleSpanProcessor(std::move(exporter)));
-  std::shared_ptr<Tracer> tracer(new Tracer(std::move(processor)));
+  std::shared_ptr<SimpleSpanProcessor> processor(new SimpleSpanProcessor(std::move(exporter)));
+  std::shared_ptr<Tracer> tracer(new Tracer(processor));
 
   auto span_first  = tracer->StartSpan("span 1");
   auto span_second = tracer->StartSpan("span 2");
