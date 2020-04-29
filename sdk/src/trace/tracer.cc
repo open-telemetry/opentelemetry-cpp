@@ -22,8 +22,9 @@ nostd::unique_ptr<trace_api::Span> Tracer::StartSpan(
     nostd::string_view name,
     const trace_api::StartSpanOptions &options) noexcept
 {
-  return nostd::unique_ptr<trace_api::Span>{
-      new (std::nothrow) Span{this->shared_from_this(), processor_, name, options}};
+  return nostd::unique_ptr<trace_api::Span>{new (std::nothrow) Span{
+      this->shared_from_this(), std::atomic_load_explicit(&processor_, std::memory_order_seq_cst),
+      name, options}};
 }
 
 void Tracer::ForceFlushWithMicroseconds(uint64_t timeout) noexcept
