@@ -42,8 +42,8 @@ public:
   SpanProcessor &GetProcessor() const noexcept;
 
 private:
-  opentelemetry::nostd::shared_ptr<opentelemetry::trace::Tracer> tracer_;
   std::shared_ptr<SpanProcessor> processor_;
+  opentelemetry::nostd::shared_ptr<opentelemetry::trace::Tracer> tracer_;
 };
 }  // namespace trace
 }  // namespace sdk

@@ -10,7 +10,7 @@ namespace trace
 {
 void Tracer::SetProcessor(std::shared_ptr<SpanProcessor> processor) noexcept
 {
-  std::atomic_store(&processor_, processor);
+  std::atomic_store_explicit(&processor_, processor, std::memory_order_seq_cst);
 }
 
 SpanProcessor &Tracer::GetProcessor() const noexcept
