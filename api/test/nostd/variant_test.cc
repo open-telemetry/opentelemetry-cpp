@@ -114,3 +114,9 @@ TEST(VariantTest, Conversion)
   y = std::string{"xyz"};
   EXPECT_TRUE(nostd::holds_alternative<std::string>(y));
 }
+
+TEST(VariantTest, Construction)
+{
+  nostd::variant<bool, std::string> v{"abc"};
+  EXPECT_EQ(v.index(), 1);
+}

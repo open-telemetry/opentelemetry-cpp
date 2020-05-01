@@ -795,14 +795,16 @@ template <typename Arg, std::size_t I, typename T>
 struct overload_leaf<Arg,
                      I,
                      T,
-                     true
-#if defined(__clang__) || !defined(__GNUC__) || __GNUC__ >= 5
-                     ,
+                     true,
                      enable_if_t<std::is_same<remove_cvref_t<T>, bool>::value
                                      ? std::is_same<remove_cvref_t<Arg>, bool>::value
-                                     : is_non_narrowing_convertible<Arg, T>::value>
+                                     :
+#if defined(__clang__) || !defined(__GNUC__) || __GNUC__ >= 5
+                                     is_non_narrowing_convertible<Arg, T>::value
+#else
+                                     std::is_convertible<Arg, T>::value
 #endif
-                     >
+                                 >>
 {
   using impl = size_constant<I> (*)(T);
   operator impl() const { return nullptr; };
