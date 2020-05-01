@@ -44,7 +44,7 @@ jobs:
       - run: ./ci/setup_ci_environment.sh
       - run: ./ci/install_bazelisk.sh
       - run: ./ci/install_gcc48.sh
-      - run: CC=/usr/bin/g++-4.8 ./ci/do_ci.sh bazel.legacy.test
+      - run: CC=/usr/bin/gcc-4.8 ./ci/do_ci.sh bazel.legacy.test
 
   bazel_test:
     resource_class: xlarge

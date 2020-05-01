@@ -21,6 +21,17 @@ cc_test(
 )
 
 cc_test(
+    name = "variant_test",
+    srcs = [
+        "variant_test.cc",
+    ],
+    deps = [
+        "//api",
+        "@com_google_googletest//:gtest_main",
+    ],
+)
+
+cc_test(
     name = "unique_ptr_test",
     srcs = [
         "unique_ptr_test.cc",
