@@ -10,12 +10,14 @@
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace trace
 {
-using AttributeValue = nostd::variant<int,
+using AttributeValue = nostd::variant<bool,
+                                      int,
                                       int64_t,
                                       unsigned int,
                                       uint64_t,
                                       double,
                                       nostd::string_view,
+                                      nostd::span<const bool>,
                                       nostd::span<const int>,
                                       nostd::span<const int64_t>,
                                       nostd::span<const unsigned int>,
