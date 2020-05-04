@@ -8,7 +8,7 @@ namespace event
 namespace async_timer
 {
 Timer::Timer(TimerCallback callback, Dispatcher &dispatcher) noexcept
-    : callback_{callback}, dispatcher_{dispatcher}, event_{dispatcher.events_.end()}
+    : callback_(callback), dispatcher_(dispatcher), event_(dispatcher.events_.end())
 {}
 
 Timer::~Timer()
