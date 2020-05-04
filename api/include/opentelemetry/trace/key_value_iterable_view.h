@@ -17,8 +17,6 @@ inline void take_key_value(nostd::string_view, AttributeValue) {}
 
 template <class T>
 auto is_key_value_iterable_impl(T iterable)
-    /* -> decltype(std::pair<nostd::string_view, AttributeValue>(std::begin(iterable)->first, */
-    /*                                                           std::begin(iterable)->second), */
     -> decltype(take_key_value(std::begin(iterable)->first, std::begin(iterable)->second),
                 nostd::size(iterable),
                 std::true_type{});
