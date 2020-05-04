@@ -1,5 +1,6 @@
 #pragma once
 
+#include "opentelemetry/sdk/common/atomic_shared_ptr.h"
 #include "opentelemetry/sdk/trace/processor.h"
 #include "opentelemetry/trace/tracer.h"
 #include "opentelemetry/version.h"
@@ -43,7 +44,7 @@ public:
   void CloseWithMicroseconds(uint64_t timeout) noexcept override;
 
 private:
-  std::shared_ptr<SpanProcessor> processor_;
+  opentelemetry::sdk::AtomicSharedPtr<SpanProcessor> processor_;
 };
 }  // namespace trace
 }  // namespace sdk
