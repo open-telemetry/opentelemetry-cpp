@@ -79,14 +79,15 @@ public:
   // Adds an event to the Span, with a custom timestamp.
   virtual void AddEvent(nostd::string_view name, core::SystemTimestamp timestamp) noexcept = 0;
 
-  // TODO
   // Adds an event to the Span, with a custom timestamp, and attributes.
-  // virtual void AddEvent(nostd::string_view name, core::SteadyTimestamp
-  // timestamp, nostd::span<const std::pair<nostd::string_view name, AttributeValue
-  // value>> attributes) noexcept = 0;
   virtual void AddEvent(nostd::string_view name,
                         core::SystemTimestamp timestamp,
                         const KeyValueIterable &attributes) noexcept = 0;
+
+  virtual void AddEvent(nostd::string_view name, const KeyValueIterable &attributes) noexcept
+  {
+    this->AddEvent(name, std::chrono::system_clock::now(), attributes);
+  }
 
   template <class T, nostd::enable_if_t<detail::is_key_value_iterable<T>::value> * = nullptr>
   void AddEvent(nostd::string_view name,
@@ -99,7 +100,7 @@ public:
   template <class T, nostd::enable_if_t<detail::is_key_value_iterable<T>::value> * = nullptr>
   void AddEvent(nostd::string_view name, const T &attributes) noexcept
   {
-    this->AddEvent(name, std::chrono::system_clock::now(), KeyValueIterableView<T>{attributes});
+    this->AddEvent(name, KeyValueIterableView<T>{attributes});
   }
 
   void AddEvent(nostd::string_view name,
