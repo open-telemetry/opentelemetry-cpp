@@ -33,7 +33,7 @@ public:
    * Obtain the span processor associated with this tracer.
    * @return The span processor for this tracer.
    */
-  SpanProcessor &GetProcessor() const noexcept;
+  std::shared_ptr<SpanProcessor> GetProcessor() const noexcept;
 
   nostd::unique_ptr<trace_api::Span> StartSpan(
       nostd::string_view name,

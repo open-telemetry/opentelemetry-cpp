@@ -39,10 +39,10 @@ public:
    * Obtain the span processor associated with this tracer provider.
    * @return The span processor for this tracer provider.
    */
-  SpanProcessor &GetProcessor() const noexcept;
+  std::shared_ptr<SpanProcessor> GetProcessor() const noexcept;
 
 private:
-  std::shared_ptr<SpanProcessor> processor_;
+  opentelemetry::sdk::AtomicSharedPtr<SpanProcessor> processor_;
   opentelemetry::nostd::shared_ptr<opentelemetry::trace::Tracer> tracer_;
 };
 }  // namespace trace

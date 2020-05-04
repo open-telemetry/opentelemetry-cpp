@@ -25,5 +25,5 @@ TEST(TracerProvider, GetTracer)
   // Should be an sdk::trace::Tracer with the processor attached.
   auto sdkTracer = dynamic_cast<Tracer *>(t1.get());
   ASSERT_NE(nullptr, sdkTracer);
-  ASSERT_EQ(processor.get(), &sdkTracer->GetProcessor());
+  ASSERT_EQ(processor, sdkTracer->GetProcessor());
 }

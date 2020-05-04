@@ -14,9 +14,9 @@ void Tracer::SetProcessor(std::shared_ptr<SpanProcessor> processor) noexcept
   processor_.store(processor);
 }
 
-SpanProcessor &Tracer::GetProcessor() const noexcept
+std::shared_ptr<SpanProcessor> Tracer::GetProcessor() const noexcept
 {
-  return *processor_.load();
+  return processor_.load();
 }
 
 nostd::unique_ptr<trace_api::Span> Tracer::StartSpan(

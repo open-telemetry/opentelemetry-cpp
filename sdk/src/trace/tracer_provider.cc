@@ -18,15 +18,15 @@ opentelemetry::nostd::shared_ptr<opentelemetry::trace::Tracer> TracerProvider::G
 
 void TracerProvider::SetProcessor(std::shared_ptr<SpanProcessor> processor) noexcept
 {
-  processor_ = processor;
+  processor_.store(processor);
 
   auto sdkTracer = static_cast<Tracer *>(tracer_.get());
   sdkTracer->SetProcessor(processor);
 }
 
-SpanProcessor &TracerProvider::GetProcessor() const noexcept
+std::shared_ptr<SpanProcessor> TracerProvider::GetProcessor() const noexcept
 {
-  return *processor_;
+  return processor_.load();
 }
 }  // namespace trace
 }  // namespace sdk
