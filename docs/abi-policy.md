@@ -14,6 +14,10 @@ consistent ABI (vtable layouts, for example, are specified by the
 can be used across compilers, but don't rely on the ABI stability of the
 C++ standard library classes.
 
+ABI stability is not provided by the interfaces the SDK provides as
+implementation hooks to vendor implementors, like exporters, processors,
+aggregators and propagators.
+
 These are some of the rules for where ABI stability is required.
 
 Note: This assumes export maps are used to properly control symbol resolution.
