@@ -123,7 +123,7 @@ jobs:
       - checkout
       - run: ./ci/setup_windows_cmake.ps1
       - run: ./ci/setup_windows_ci_environment.ps1
-      - run: 
+      - run:
           command: ./ci/install_windows_protobuf.ps1
           no_output_timeout: 15m
       - run: ./ci/do_ci.ps1 cmake.test
