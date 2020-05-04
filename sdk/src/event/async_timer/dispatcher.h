@@ -25,12 +25,12 @@ public:
   void Run() noexcept override;
 
 private:
-  struct Event {
+  struct Event
+  {
     TimerCallback callback;
-    Timer* timer;
+    Timer *timer;
   };
-  using EventIterator =
-      std::map<std::chrono::steady_clock::time_point, Event>::const_iterator;
+  using EventIterator = std::map<std::chrono::steady_clock::time_point, Event>::const_iterator;
 
   friend class Timer;
   bool running_{true};

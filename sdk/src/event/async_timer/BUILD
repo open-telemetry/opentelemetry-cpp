@@ -23,4 +23,3 @@ cc_library(
         "//sdk:headers",
     ],
 )
-

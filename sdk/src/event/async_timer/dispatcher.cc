@@ -16,15 +16,19 @@ std::unique_ptr<event::Timer> Dispatcher::CreateTimer(TimerCallback callback) no
   return std::unique_ptr<event::Timer>{new (std::nothrow) Timer{callback, *this}};
 }
 
-void Dispatcher::Exit() noexcept {
+void Dispatcher::Exit() noexcept
+{
   running_ = false;
 }
 
-void Dispatcher::Run() noexcept {
-  while (running_ && !events_.empty()) {
+void Dispatcher::Run() noexcept
+{
+  while (running_ && !events_.empty())
+  {
     auto next_event = events_.begin();
     std::this_thread::sleep_until(next_event->first);
-    if (next_event->second.callback) {
+    if (next_event->second.callback)
+    {
       next_event->second.callback();
     }
     next_event->second.timer->event_ = events_.end();
@@ -35,4 +39,3 @@ void Dispatcher::Run() noexcept {
 }  // namespace event
 }  // namespace sdk
 OPENTELEMETRY_END_NAMESPACE
-
