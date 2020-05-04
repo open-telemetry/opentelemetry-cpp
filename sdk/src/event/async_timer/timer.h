@@ -21,9 +21,10 @@ class Timer final : public event::Timer {
 
    void DisableTimer() noexcept override;
  private:
-  TimerCallback callback_;
-  Dispatcher& dispatcher_;
-  Dispatcher::EventIterator event_;
+   friend class Dispatcher;
+   TimerCallback callback_;
+   Dispatcher &dispatcher_;
+   Dispatcher::EventIterator event_;
 };
 } // namespace async_timer
 }  // namespace event

@@ -2,6 +2,8 @@
 
 #include <thread>
 
+#include "src/event/async_timer/timer.h"
+
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace sdk
 {
@@ -11,8 +13,7 @@ namespace async_timer
 {
 std::unique_ptr<event::Timer> Dispatcher::CreateTimer(TimerCallback callback) noexcept
 {
-  (void)callback;
-  return nullptr;
+  return std::unique_ptr<event::Timer>{new (std::nothrow) Timer{callback, *this}};
 }
 
 void Dispatcher::Exit() noexcept {
@@ -23,9 +24,10 @@ void Dispatcher::Run() noexcept {
   while (running_ && !events_.empty()) {
     auto next_event = events_.begin();
     std::this_thread::sleep_until(next_event->first);
-    if (next_event->second) {
-      next_event->second();
+    if (next_event->second.callback) {
+      next_event->second.callback();
     }
+    next_event->second.timer->event_ = events_.end();
     events_.erase(next_event);
   }
 }

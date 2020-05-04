@@ -21,7 +21,7 @@ void Timer::EnableTimer(std::chrono::microseconds timeout) noexcept
   this->DisableTimer();
   auto time_point = std::chrono::steady_clock::now() + timeout;
   // Note: terminates on std::bad_alloc
-  event_ = dispatcher_.events_.emplace(time_point, callback_);
+  event_ = dispatcher_.events_.emplace(time_point, Dispatcher::Event{callback_, this});
 }
 
 void Timer::DisableTimer() noexcept

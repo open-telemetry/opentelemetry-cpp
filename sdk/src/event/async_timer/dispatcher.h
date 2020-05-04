@@ -12,12 +12,11 @@ namespace event
 {
 namespace async_timer
 {
+class Timer;
+
 class Dispatcher final : public event::Dispatcher
 {
 public:
-  using EventIterator =
-      std::map<std::chrono::steady_clock::time_point, TimerCallback>::const_iterator;
-
   // event::Dispatcher
   std::unique_ptr<event::Timer> CreateTimer(TimerCallback callback) noexcept override;
 
@@ -26,9 +25,16 @@ public:
   void Run() noexcept override;
 
 private:
+  struct Event {
+    TimerCallback callback;
+    Timer* timer;
+  };
+  using EventIterator =
+      std::map<std::chrono::steady_clock::time_point, Event>::const_iterator;
+
   friend class Timer;
   bool running_{true};
-  std::multimap<std::chrono::steady_clock::time_point, TimerCallback> events_;
+  std::multimap<std::chrono::steady_clock::time_point, Event> events_;
 };
 }  // namespace async_timer
 }  // namespace event
