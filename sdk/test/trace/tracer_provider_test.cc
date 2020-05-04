@@ -10,7 +10,7 @@ TEST(TracerProvider, GetTracer)
 {
   std::shared_ptr<SpanProcessor> processor(new SimpleSpanProcessor(nullptr));
 
-  auto tf = TracerProvider(processor);
+  TracerProvider tf(processor);
   auto t1 = tf.GetTracer("test");
   auto t2 = tf.GetTracer("test");
   auto t3 = tf.GetTracer("different", "1.0.0");
