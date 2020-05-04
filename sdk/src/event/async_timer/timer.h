@@ -11,15 +11,19 @@ namespace sdk
 namespace event
 {
 namespace async_timer {
-class Timer final : event::Timer {
+class Timer final : public event::Timer {
  public:
-  explicit Timer(Dispatcher::EventIterator iterator) noexcept;
+   Timer(TimerCallback callback, Dispatcher &dispatcher) noexcept;
 
-  void EnableTimer(std::chrono::microseconds timeout) noexcept override;
+   ~Timer();
 
-  void DisableTimer() noexcept override;
+   void EnableTimer(std::chrono::microseconds timeout) noexcept override;
+
+   void DisableTimer() noexcept override;
  private:
-  Dispatcher::EventIterator iterator_;
+  TimerCallback callback_;
+  Dispatcher& dispatcher_;
+  Dispatcher::EventIterator event_;
 };
 } // namespace async_timer
 }  // namespace event

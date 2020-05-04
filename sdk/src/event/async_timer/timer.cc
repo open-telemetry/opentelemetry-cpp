@@ -7,14 +7,30 @@ namespace event
 {
 namespace async_timer
 {
-Timer::Timer(Dispatcher::EventIterator iterator) noexcept : iterator_{iterator} {}
+Timer::Timer(TimerCallback callback, Dispatcher &dispatcher) noexcept
+    : callback_{callback}, dispatcher_{dispatcher}, event_{dispatcher.events_.end()}
+{}
+
+Timer::~Timer()
+{
+  this->DisableTimer();
+}
 
 void Timer::EnableTimer(std::chrono::microseconds timeout) noexcept
 {
-  (void)timeout;
+  this->DisableTimer();
+  auto time_point = std::chrono::steady_clock::now() + timeout;
+  // Note: terminates on std::bad_alloc
+  event_ = dispatcher_.events_.emplace(time_point, callback_);
 }
 
-void Timer::DisableTimer() noexcept {}
+void Timer::DisableTimer() noexcept
+{
+  if (event_ != dispatcher_.events_.end())
+  {
+    dispatcher_.events_.erase(event_);
+  }
+}
 }  // namespace async_timer
 }  // namespace event
 }  // namespace sdk

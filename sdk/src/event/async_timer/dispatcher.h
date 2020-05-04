@@ -26,7 +26,9 @@ public:
   void Run() noexcept override;
 
 private:
-  std::map<std::chrono::steady_clock::time_point, TimerCallback> events_;
+  friend class Timer;
+  bool running_{true};
+  std::multimap<std::chrono::steady_clock::time_point, TimerCallback> events_;
 };
 }  // namespace async_timer
 }  // namespace event
