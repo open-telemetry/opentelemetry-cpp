@@ -2,6 +2,7 @@
 
 #include <atomic>
 #include <memory>
+#include <mutex>
 #include "opentelemetry/version.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
@@ -10,8 +11,8 @@ namespace sdk
 /**
  * A wrapper to provide atomic shared pointers.
  *
- * This wrapper relies on std::atomic for gcc 4.8 and C++20, while using
- * specializations of std::atomic_store and std::atomic_load in all other
+ * This wrapper relies on std::atomic for C++20, a mutex for gcc 4.8, and
+ * specializations of std::atomic_store and std::atomic_load for all other
  * instances.
  */
 #if __cplusplus > 201703L
@@ -36,21 +37,23 @@ template <class T>
 class AtomicSharedPtr
 {
 public:
-  explicit AtomicSharedPtr(std::shared_ptr<T> ptr) noexcept
-      : ptr_{new std::shared_ptr<T>(std::move(ptr))}
-  {}
-
-  ~AtomicSharedPtr() noexcept { delete ptr_.load(std::memory_order_acquire); }
+  explicit AtomicSharedPtr(std::shared_ptr<T> ptr) noexcept : ptr_{std::move(ptr)} {}
 
   void store(const std::shared_ptr<T> &other) noexcept
   {
-    delete ptr_.exchange(new std::shared_ptr<T>(other));
+    std::lock_guard<std::mutex> lock_guard{mu_};
+    ptr_ = other;
   }
 
-  std::shared_ptr<T> load() const noexcept { return *ptr_.load(std::memory_order_acquire); }
+  std::shared_ptr<T> load() const noexcept
+  {
+    std::lock_guard<std::mutex> lock_guard{mu_};
+    return ptr_;
+  }
 
 private:
-  std::atomic<std::shared_ptr<T> *> ptr_;
+  std::shared_ptr<T> ptr_;
+  mutable std::mutex mu_;
 };
 #else
 template <class T>
