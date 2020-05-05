@@ -44,7 +44,7 @@ public:
 
   void store(const std::shared_ptr<T> &other) noexcept
   {
-    ptr_.store(new std::shared_ptr<T>(other), std::memory_order_release);
+    delete ptr_.exchange(new std::shared_ptr<T>(other));
   }
 
   std::shared_ptr<T> load() const noexcept { return *ptr_.load(std::memory_order_acquire); }
