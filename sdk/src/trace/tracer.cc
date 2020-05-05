@@ -1,5 +1,6 @@
-#include "src/trace/tracer.h"
+#include "opentelemetry/sdk/trace/tracer.h"
 
+#include "opentelemetry/sdk/common/atomic_shared_ptr.h"
 #include "opentelemetry/version.h"
 #include "src/trace/span.h"
 
@@ -8,12 +9,22 @@ namespace sdk
 {
 namespace trace
 {
+void Tracer::SetProcessor(std::shared_ptr<SpanProcessor> processor) noexcept
+{
+  processor_.store(processor);
+}
+
+std::shared_ptr<SpanProcessor> Tracer::GetProcessor() const noexcept
+{
+  return processor_.load();
+}
+
 nostd::unique_ptr<trace_api::Span> Tracer::StartSpan(
     nostd::string_view name,
     const trace_api::StartSpanOptions &options) noexcept
 {
-  return nostd::unique_ptr<trace_api::Span>{new (std::nothrow)
-                                                Span{this->shared_from_this(), name, options}};
+  return nostd::unique_ptr<trace_api::Span>{
+      new (std::nothrow) Span{this->shared_from_this(), processor_.load(), name, options}};
 }
 
 void Tracer::ForceFlushWithMicroseconds(uint64_t timeout) noexcept
