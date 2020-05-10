@@ -22,6 +22,7 @@ using AttributeValue = nostd::variant<bool,
                                       nostd::span<const int64_t>,
                                       nostd::span<const unsigned int>,
                                       nostd::span<const uint64_t>,
+                                      nostd::span<const double>,
                                       nostd::span<const nostd::string_view>>;
 }  // namespace common
 OPENTELEMETRY_END_NAMESPACE
