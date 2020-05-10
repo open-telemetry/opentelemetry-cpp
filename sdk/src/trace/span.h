@@ -2,8 +2,8 @@
 
 #include <mutex>
 
+#include "opentelemetry/sdk/trace/tracer.h"
 #include "opentelemetry/version.h"
-#include "src/trace/tracer.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace sdk
@@ -16,6 +16,7 @@ class Span final : public trace_api::Span
 {
 public:
   explicit Span(std::shared_ptr<Tracer> &&tracer,
+                std::shared_ptr<SpanProcessor> processor,
                 nostd::string_view name,
                 const trace_api::StartSpanOptions &options) noexcept;
 
@@ -41,7 +42,8 @@ public:
   trace_api::Tracer &tracer() const noexcept override { return *tracer_; }
 
 private:
-  std::shared_ptr<Tracer> tracer_;
+  std::shared_ptr<trace_api::Tracer> tracer_;
+  std::shared_ptr<SpanProcessor> processor_;
   mutable std::mutex mu_;
   std::unique_ptr<Recordable> recordable_;
 };
