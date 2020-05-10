@@ -8,7 +8,7 @@
 #include "opentelemetry/version.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
-namespace trace
+namespace common
 {
 using AttributeValue = nostd::variant<bool,
                                       int,
@@ -23,5 +23,5 @@ using AttributeValue = nostd::variant<bool,
                                       nostd::span<const unsigned int>,
                                       nostd::span<const uint64_t>,
                                       nostd::span<const nostd::string_view>>;
-}  // namespace trace
+}  // namespace common
 OPENTELEMETRY_END_NAMESPACE

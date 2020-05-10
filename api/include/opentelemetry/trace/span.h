@@ -105,20 +105,20 @@ public:
 
   void AddEvent(nostd::string_view name,
                 core::SystemTimestamp timestamp,
-                std::initializer_list<std::pair<nostd::string_view, trace::AttributeValue>>
+                std::initializer_list<std::pair<nostd::string_view, common::AttributeValue>>
                     attributes) noexcept
   {
     this->AddEvent(name, timestamp,
-                   nostd::span<const std::pair<nostd::string_view, trace::AttributeValue>>{
+                   nostd::span<const std::pair<nostd::string_view, common::AttributeValue>>{
                        attributes.begin(), attributes.end()});
   }
 
   void AddEvent(nostd::string_view name,
-                std::initializer_list<std::pair<nostd::string_view, trace::AttributeValue>>
+                std::initializer_list<std::pair<nostd::string_view, common::AttributeValue>>
                     attributes) noexcept
   {
     this->AddEvent(name, std::chrono::system_clock::now(),
-                   nostd::span<const std::pair<nostd::string_view, trace::AttributeValue>>{
+                   nostd::span<const std::pair<nostd::string_view, common::AttributeValue>>{
                        attributes.begin(), attributes.end()});
   }
 

@@ -13,7 +13,7 @@ namespace trace
 {
 namespace detail
 {
-inline void take_key_value(nostd::string_view, AttributeValue) {}
+inline void take_key_value(nostd::string_view, common::AttributeValue) {}
 
 template <class T>
 auto is_key_value_iterable_impl(T iterable)
@@ -39,7 +39,8 @@ public:
   explicit KeyValueIterableView(const T &container) noexcept : container_{&container} {}
 
   // KeyValueIterable
-  bool ForEachKeyValue(nostd::function_ref<bool(nostd::string_view, AttributeValue)> callback) const
+  bool ForEachKeyValue(
+      nostd::function_ref<bool(nostd::string_view, common::AttributeValue)> callback) const
       noexcept override
   {
     auto iter = std::begin(*container_);

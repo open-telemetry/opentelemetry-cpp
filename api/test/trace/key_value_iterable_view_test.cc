@@ -8,9 +8,9 @@ using namespace opentelemetry;
 
 static int TakeKeyValues(const trace::KeyValueIterable &iterable)
 {
-  std::map<std::string, trace::AttributeValue> result;
+  std::map<std::string, common::AttributeValue> result;
   int count = 0;
-  iterable.ForEachKeyValue([&](nostd::string_view key, trace::AttributeValue value) noexcept {
+  iterable.ForEachKeyValue([&](nostd::string_view key, common::AttributeValue value) noexcept {
     ++count;
     return true;
   });
@@ -31,7 +31,7 @@ TEST(KeyValueIterableViewTest, is_key_value_iterable)
   using M2 = std::map<std::string, int>;
   EXPECT_TRUE(bool{trace::detail::is_key_value_iterable<M2>::value});
 
-  using M3 = std::map<std::string, trace::AttributeValue>;
+  using M3 = std::map<std::string, common::AttributeValue>;
   EXPECT_TRUE(bool{trace::detail::is_key_value_iterable<M3>::value});
 
   struct A
@@ -56,7 +56,7 @@ TEST(KeyValueIterableViewTest, ForEachKeyValueWithExit)
   trace::KeyValueIterableView<M> iterable{m1};
   int count = 0;
   auto exit = iterable.ForEachKeyValue([&count](nostd::string_view /*key*/,
-                                                trace::AttributeValue /*value*/) noexcept {
+                                                common::AttributeValue /*value*/) noexcept {
     ++count;
     return false;
   });

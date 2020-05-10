@@ -1,7 +1,7 @@
 #pragma once
 
+#include "opentelemetry/common/attribute_value.h"
 #include "opentelemetry/nostd/function_ref.h"
-#include "opentelemetry/trace/attribute_value.h"
 #include "opentelemetry/version.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
@@ -22,7 +22,8 @@ public:
    * @return true if every key-value pair was iterated over
    */
   virtual bool ForEachKeyValue(
-      nostd::function_ref<bool(nostd::string_view, AttributeValue)> callback) const noexcept = 0;
+      nostd::function_ref<bool(nostd::string_view, common::AttributeValue)> callback) const
+      noexcept = 0;
 
   /**
    * @return the number of key-value pairs
