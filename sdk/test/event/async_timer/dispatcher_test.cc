@@ -51,3 +51,20 @@ TEST(DispatcherTest, TimerOrder)
 
   EXPECT_EQ(order, (std::vector<int>{2, 1, 3}));
 }
+
+TEST(DispatcherTest, ReuseTimer)
+{
+  Dispatcher dispatcher;
+  std::vector<int> order;
+
+  auto t1 = dispatcher.CreateTimer([&] { order.push_back(1); });
+  t1->EnableTimer(std::chrono::milliseconds{5});
+
+  dispatcher.Run();
+
+  t1->EnableTimer(std::chrono::milliseconds{5});
+
+  dispatcher.Run();
+
+  EXPECT_EQ(order, (std::vector<int>{1, 1}));
+}
