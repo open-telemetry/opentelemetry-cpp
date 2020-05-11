@@ -14,6 +14,10 @@ namespace event
 {
 /**
  * Interface for managing asynchronous events.
+ *
+ * IoDispatcher enables an efficient design where SDKs use non-blocking sockets and a single
+ * background thread manages events by making successive calls to the OS's IO multiplexing polling
+ * function.
  */
 class Dispatcher
 {

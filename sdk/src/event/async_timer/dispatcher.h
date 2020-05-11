@@ -14,6 +14,12 @@ namespace async_timer
 {
 class Timer;
 
+/**
+ * Implements the timer portion of the dispatcher interface.
+ *
+ * SDKs that don't use asynchronous networking can use this Dispatcher to avoid requiring an
+ * external depency on an event library such as libevent.
+ */
 class Dispatcher final : public event::Dispatcher
 {
 public:

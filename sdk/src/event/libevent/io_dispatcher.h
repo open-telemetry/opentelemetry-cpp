@@ -15,9 +15,7 @@ namespace libevent
 /**
  * Manages asynchronous events on a file descriptor.
  *
- * IoDispatcher enables an efficient design where SDKs use non-blocking sockets and a single
- * background thread manages events by making successive calls to the OS's IO multiplexing polling
- * function.
+ * Built on top of libevent https://libevent.org/
  */
 class IoDispatcher final : public event::IoDispatcher
 {
