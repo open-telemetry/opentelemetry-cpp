@@ -1,6 +1,6 @@
 #include "opentelemetry/sdk/trace/tracer_provider.h"
+#include "opentelemetry/sdk/trace/simple_processor.h"
 #include "opentelemetry/sdk/trace/tracer.h"
-#include "src/trace/simple_processor.h"
 
 #include <gtest/gtest.h>
 
