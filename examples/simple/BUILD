@@ -20,6 +20,7 @@ cc_binary(
     deps = [
         ":foo_library",
         "//api",
+        "//examples/simple:foo_library",
         "//sdk/src/trace",
     ],
 )
