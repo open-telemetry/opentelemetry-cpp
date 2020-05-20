@@ -5,9 +5,10 @@
 // Using an exporter that simply dumps span data to stdout.
 #include "stdout_exporter.h"
 
-// This models a call to an external library that is instrumented with OT.
-extern void library();
+#include "foo_library/foo_library.h"
 
+namespace
+{
 void initTracer()
 {
   auto exporter  = std::unique_ptr<sdktrace::SpanExporter>(new StdoutExporter);
@@ -16,6 +17,7 @@ void initTracer()
   auto provider = nostd::shared_ptr<trace::TracerProvider>(new sdktrace::TracerProvider(processor));
   trace::Provider::SetTracerProvider(provider);
 }
+}  // namespace
 
 int main()
 {
@@ -23,5 +25,5 @@ int main()
   // tracer, thus being effectively deactivated.
   initTracer();
 
-  library();
+  foo_library();
 }

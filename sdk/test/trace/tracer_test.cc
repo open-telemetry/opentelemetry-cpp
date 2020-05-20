@@ -22,7 +22,7 @@ public:
   }
 
   ExportResult Export(
-      opentelemetry::nostd::span<std::unique_ptr<Recordable>> &recordables) noexcept override
+      const opentelemetry::nostd::span<std::unique_ptr<Recordable>> &recordables) noexcept override
   {
     for (auto &recordable : recordables)
     {

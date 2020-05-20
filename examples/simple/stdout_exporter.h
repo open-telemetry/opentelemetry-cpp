@@ -16,7 +16,8 @@ class StdoutExporter final : public sdktrace::SpanExporter
     return std::unique_ptr<sdktrace::Recordable>(new sdktrace::SpanData);
   }
 
-  sdktrace::ExportResult Export(nostd::span<std::unique_ptr<sdktrace::Recordable>> &spans) noexcept
+  sdktrace::ExportResult Export(
+      const nostd::span<std::unique_ptr<sdktrace::Recordable>> &spans) noexcept
   {
     for (auto &recordable : spans)
     {
@@ -33,15 +34,14 @@ class StdoutExporter final : public sdktrace::SpanExporter
         span->GetSpanId().ToLowerBase16(span_id);
         span->GetParentSpanId().ToLowerBase16(parent_span_id);
 
-        std::cout << "{" << std::endl
-                  << "  name          : " << span->GetName() << std::endl
-                  << "  trace_id      : " << std::string(trace_id, 32) << std::endl
-                  << "  span_id       : " << std::string(span_id, 16) << std::endl
-                  << "  parent_span_id: " << std::string(parent_span_id, 16) << std::endl
-                  << "  start         : " << span->GetStartTime().time_since_epoch().count()
-                  << std::endl
-                  << "  duration      : " << span->GetDuration().count() << std::endl
-                  << "}" << std::endl;
+        std::cout << "{"
+                  << "\n  name          : " << span->GetName()
+                  << "\n  trace_id      : " << std::string(trace_id, 32)
+                  << "\n  span_id       : " << std::string(span_id, 16)
+                  << "\n  parent_span_id: " << std::string(parent_span_id, 16)
+                  << "\n  start         : " << span->GetStartTime().time_since_epoch().count()
+                  << "\n  duration      : " << span->GetDuration().count() << "\n}"
+                  << "\n";
       }
     }
 
