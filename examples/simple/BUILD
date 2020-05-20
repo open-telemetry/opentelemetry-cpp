@@ -4,6 +4,7 @@ cc_library(
         "foo_library/foo_library.cc",
         "foo_library/foo_library.h",
     ],
+    linkstatic = True,
     deps = [
         "//api",
     ],
@@ -16,8 +17,8 @@ cc_binary(
         "stdout_exporter.h",
     ],
     deps = [
+        ":foo_library",
         "//api",
-        "//examples/simple:foo_library",
         "//sdk/src/trace",
     ],
 )
