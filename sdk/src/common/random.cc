@@ -56,12 +56,11 @@ uint64_t Random::GenerateRandom64() noexcept
 
 void Random::GenerateRandomBuffer(opentelemetry::nostd::span<uint8_t> buffer) noexcept
 {
-  auto &gen     = GetRandomNumberGenerator();
   auto buf_size = buffer.size();
 
   for (size_t i = 0; i < buf_size; i += sizeof(uint64_t))
   {
-    uint64_t value = gen();
+    uint64_t value = GenerateRandom64();
     if (i + sizeof(uint64_t) <= buf_size)
     {
       memcpy(&buffer[i], &value, sizeof(uint64_t));
