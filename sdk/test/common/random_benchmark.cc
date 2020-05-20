@@ -1,18 +1,19 @@
 #include "src/common/random.h"
 
-#include <benchmark/benchmark.h>
 #include <cstdint>
+#include <random>
+
+#include <benchmark/benchmark.h>
 
 namespace
 {
-using opentelemetry::sdk::common::GetRandomNumberGenerator;
+using opentelemetry::sdk::common::Random;
 
 void BM_RandomIdGeneration(benchmark::State &state)
 {
-  auto &generator = GetRandomNumberGenerator();
   while (state.KeepRunning())
   {
-    benchmark::DoNotOptimize(generator());
+    benchmark::DoNotOptimize(Random::GenerateRandom64());
   }
 }
 BENCHMARK(BM_RandomIdGeneration);

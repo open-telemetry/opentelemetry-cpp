@@ -11,14 +11,12 @@
 #  include <cstdio>
 #  include <cstdlib>
 #  include <iostream>
-using opentelemetry::sdk::common::GetRandomNumberGenerator;
+using opentelemetry::sdk::common::Random;
 
 static uint64_t *child_id;
 
 int main()
 {
-  auto &random_number_generator = GetRandomNumberGenerator();
-
   // Set up shared memory to communicate between parent and child processes.
   //
   // See https://stackoverflow.com/a/13274800/4447365
@@ -27,13 +25,13 @@ int main()
   *child_id = 0;
   if (fork() == 0)
   {
-    *child_id = random_number_generator();
+    *child_id = Random::GenerateRandom64();
     exit(EXIT_SUCCESS);
   }
   else
   {
     wait(nullptr);
-    auto parent_id     = random_number_generator();
+    auto parent_id     = Random::GenerateRandom64();
     auto child_id_copy = *child_id;
     munmap(static_cast<void *>(child_id), sizeof(*child_id));
     if (parent_id == child_id_copy)

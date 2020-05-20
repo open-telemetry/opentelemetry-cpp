@@ -1,6 +1,9 @@
 #include "src/common/random.h"
 
+#include <random>
+
 #include <gtest/gtest.h>
+
 using opentelemetry::sdk::common::FastRandomNumberGenerator;
 
 TEST(FastRandomNumberGeneratorTest, GenerateUniqueNumbers)
