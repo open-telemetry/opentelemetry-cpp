@@ -45,7 +45,7 @@ public:
   // Populates the buffer with the lowercase base16 representation of the ID.
   void ToLowerBase16(nostd::span<char, 2 * kSize> buffer) const noexcept
   {
-    constexpr char kHex[] = "0123456789ABCDEF";
+    constexpr char kHex[] = "0123456789abcdef";
     for (int i = 0; i < kSize; ++i)
     {
       buffer[i * 2 + 0] = kHex[(rep_[i] >> 4) & 0xF];

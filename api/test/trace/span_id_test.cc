@@ -34,6 +34,16 @@ TEST(SpanIdTest, ValidId)
   EXPECT_EQ(SpanId(buf), id);
 }
 
+TEST(SpanIdTest, LowercaseBase16)
+{
+  constexpr uint8_t buf[] = {1, 2, 0xaa, 0xbb, 0xcc, 0xdd, 0xee, 0xff};
+  SpanId id(buf);
+  EXPECT_TRUE(id.IsValid());
+  EXPECT_EQ("0102aabbccddeeff", Hex(id));
+  EXPECT_NE(SpanId(), id);
+  EXPECT_EQ(SpanId(buf), id);
+}
+
 TEST(SpanIdTest, CopyBytesTo)
 {
   constexpr uint8_t src[] = {1, 2, 3, 4, 5, 6, 7, 8};

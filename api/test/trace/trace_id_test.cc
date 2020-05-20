@@ -34,6 +34,16 @@ TEST(TraceIdTest, ValidId)
   EXPECT_EQ(TraceId(buf), id);
 }
 
+TEST(TraceIdTest, LowercaseBase16)
+{
+  constexpr uint8_t buf[] = {1, 2, 3, 4, 5, 6, 7, 8, 8, 7, 0xaa, 0xbb, 0xcc, 0xdd, 0xee, 0xff};
+  TraceId id(buf);
+  EXPECT_TRUE(id.IsValid());
+  EXPECT_EQ("01020304050607080807aabbccddeeff", Hex(id));
+  EXPECT_NE(TraceId(), id);
+  EXPECT_EQ(TraceId(buf), id);
+}
+
 TEST(TraceIdTest, CopyBytesTo)
 {
   constexpr uint8_t src[] = {1, 2, 3, 4, 5, 6, 7, 8, 8, 7, 6, 5, 4, 3, 2, 1};
