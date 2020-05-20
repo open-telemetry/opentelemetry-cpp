@@ -6,6 +6,7 @@ cc_library(
     hdrs = [
         "foo_library/foo_library.h",
     ],
+    linkstatic = True,
     deps = [
         "//api",
     ],
@@ -20,7 +21,6 @@ cc_binary(
     deps = [
         ":foo_library",
         "//api",
-        "//examples/simple:foo_library",
         "//sdk/src/trace",
     ],
 )
