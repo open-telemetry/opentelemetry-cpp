@@ -6,7 +6,6 @@ cc_library(
     hdrs = [
         "foo_library/foo_library.h",
     ],
-    linkstatic = True,
     deps = [
         "//api",
     ],
