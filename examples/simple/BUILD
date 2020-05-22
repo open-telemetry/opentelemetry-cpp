@@ -2,9 +2,10 @@ cc_library(
     name = "foo_library",
     srcs = [
         "foo_library/foo_library.cc",
+    ],
+    hdrs = [
         "foo_library/foo_library.h",
     ],
-    linkstatic = True,
     deps = [
         "//api",
     ],
