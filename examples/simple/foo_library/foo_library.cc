@@ -9,7 +9,7 @@ nostd::shared_ptr<trace::Tracer> get_tracer()
 {
   // Retrieve the global TraceProvider specific in main
   auto provider = trace::Provider::GetTracerProvider();
-  // Return a Tracer object 
+  // Return a Tracer object
   return provider->GetTracer("foo_library");
 }
 
