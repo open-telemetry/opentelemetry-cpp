@@ -44,7 +44,7 @@ jobs:
       - run: ./ci/setup_ci_environment.sh
       - run: ./ci/install_bazelisk.sh
       - run: ./ci/install_gcc48.sh
-      - run: CC=/usr/bin/g++-4.8 ./ci/do_ci.sh bazel.legacy.test
+      - run: CC=/usr/bin/gcc-4.8 ./ci/do_ci.sh bazel.legacy.test
 
   bazel_test:
     resource_class: xlarge
@@ -123,7 +123,9 @@ jobs:
       - checkout
       - run: ./ci/setup_windows_cmake.ps1
       - run: ./ci/setup_windows_ci_environment.ps1
-      - run: ./ci/install_windows_protobuf.ps1
+      - run:
+          command: ./ci/install_windows_protobuf.ps1
+          no_output_timeout: 15m
       - run: ./ci/do_ci.ps1 cmake.test
       - run: ./ci/do_ci.sh cmake.exporter.otprotocol.test
 

@@ -15,6 +15,17 @@
 package(default_visibility = ["//visibility:public"])
 
 cc_library(
+    name = "atomic_unique_ptr",
+    hdrs = [
+        "atomic_unique_ptr.h",
+    ],
+    include_prefix = "src/common",
+    deps = [
+        "//api",
+    ],
+)
+
+cc_library(
     name = "random",
     srcs = ["random.cc"],
     hdrs = [
@@ -25,5 +36,29 @@ cc_library(
     deps = [
         "//api",
         "//sdk/src/common/platform:fork",
+    ],
+)
+
+cc_library(
+    name = "circular_buffer_range",
+    hdrs = [
+        "circular_buffer_range.h",
+    ],
+    include_prefix = "src/common",
+    deps = [
+        "//api",
+    ],
+)
+
+cc_library(
+    name = "circular_buffer",
+    hdrs = [
+        "circular_buffer.h",
+    ],
+    include_prefix = "src/common",
+    deps = [
+        ":atomic_unique_ptr",
+        ":circular_buffer_range",
+        "//api",
     ],
 )

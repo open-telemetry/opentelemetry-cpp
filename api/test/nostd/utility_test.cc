@@ -39,3 +39,13 @@ TEST(UtilityTest, Size)
 
   EXPECT_FALSE(decltype(IsSizeCallable(x)){});
 }
+
+TEST(UtilityTest, MakeIndexSequence)
+{
+  EXPECT_TRUE((std::is_same<opentelemetry::nostd::make_index_sequence<0>,
+                            opentelemetry::nostd::index_sequence<>>::value));
+  EXPECT_TRUE((std::is_same<opentelemetry::nostd::make_index_sequence<1>,
+                            opentelemetry::nostd::index_sequence<0>>::value));
+  EXPECT_TRUE((std::is_same<opentelemetry::nostd::make_index_sequence<2>,
+                            opentelemetry::nostd::index_sequence<0, 1>>::value));
+}
