@@ -17,6 +17,9 @@
 #include <cstdio>
 #include <cstdlib>
 
+#include <map>
+#include <string_view>
+
 #include "ConsoleTracer.hpp"
 
 using namespace OPENTELEMETRY_NAMESPACE;
@@ -134,20 +137,18 @@ void test_events()
 
 void test_spans()
 {
-  TraceId trace_id;
-  SpanId span_id;
-
   ConsoleTracerProvider con;
   opentelemetry::core::SystemTimestamp now(std::chrono::system_clock::now());
 
   auto tracer = con.GetTracer("default", "1.0");
   auto span   = tracer->StartSpan("MySpan");
-  /*
-  span->AddEvent("MyEvent",
-      {
 
-      });
-   */
+  using M = std::map<std::string_view, std::string_view>;
+  M m = {{"key1", "one"}, {"key2", "two"}};
+  // trace::KeyValueIterableView<M> iterable{m};
+  // iterable.size();
+  span->AddEvent("MyEvent", m);
+
 }
 
 int main(int argc, char *argv[])

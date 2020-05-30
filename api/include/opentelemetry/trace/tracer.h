@@ -4,8 +4,8 @@
 
 #include "opentelemetry/version.h"
 
-#include "opentelemetry/common/stdtypes.h"
-
+#include "opentelemetry/common/stltypes.h"
+#include "opentelemetry/trace/span.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace trace

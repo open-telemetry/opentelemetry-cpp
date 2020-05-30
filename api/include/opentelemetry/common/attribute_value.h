@@ -3,7 +3,7 @@
 #include <cstdint>
 
 #include "opentelemetry/version.h"
-#include "opentelemetry/common/stdtypes.h"
+#include "opentelemetry/common/stltypes.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace common

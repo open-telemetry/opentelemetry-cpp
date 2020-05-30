@@ -72,19 +72,19 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LinkIncremental>true</LinkIncremental>
-    <IncludePath>$(SolutionDir)..\api\include;$(SolutionDir)..\third_party\ms-gsl\include;$(IncludePath)</IncludePath>
+    <IncludePath>$(SolutionDir)..\api\include;$(SolutionDir)..\sdk;$(SolutionDir)..\sdk\include;$(SolutionDir)..\third_party\ms-gsl\include;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <LinkIncremental>true</LinkIncremental>
-    <IncludePath>$(SolutionDir)..\api\include;$(SolutionDir)..\third_party\ms-gsl\include;$(IncludePath)</IncludePath>
+    <IncludePath>$(SolutionDir)..\api\include;$(SolutionDir)..\sdk;$(SolutionDir)..\sdk\include;$(SolutionDir)..\third_party\ms-gsl\include;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
-    <IncludePath>$(SolutionDir)..\api\include;$(SolutionDir)..\third_party\ms-gsl\include;$(IncludePath)</IncludePath>
+    <IncludePath>$(SolutionDir)..\api\include;$(SolutionDir)..\sdk;$(SolutionDir)..\sdk\include;$(SolutionDir)..\third_party\ms-gsl\include;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LinkIncremental>false</LinkIncremental>
-    <IncludePath>$(SolutionDir)..\api\include;$(SolutionDir)..\third_party\ms-gsl\include;$(IncludePath)</IncludePath>
+    <IncludePath>$(SolutionDir)..\api\include;$(SolutionDir)..\sdk;$(SolutionDir)..\sdk\include;$(SolutionDir)..\third_party\ms-gsl\include;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
@@ -156,6 +156,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="Span.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ConsoleTracer.hpp" />

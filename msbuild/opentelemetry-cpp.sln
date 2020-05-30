@@ -74,7 +74,7 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "common", "common", "{33CF4306-056E-4B97-A721-DBFD676143AA}"
 	ProjectSection(SolutionItems) = preProject
 		..\api\include\opentelemetry\common\attribute_value.h = ..\api\include\opentelemetry\common\attribute_value.h
-		..\api\include\opentelemetry\common\stdtypes.h = ..\api\include\opentelemetry\common\stdtypes.h
+		..\api\include\opentelemetry\common\stltypes.h = ..\api\include\opentelemetry\common\stltypes.h
 	EndProjectSection
 EndProject
 Global

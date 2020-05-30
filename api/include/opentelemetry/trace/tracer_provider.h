@@ -1,6 +1,6 @@
 #pragma once
 
-#include "opentelemetry/common/stdtypes.h"
+#include "opentelemetry/common/stltypes.h"
 #include "opentelemetry/trace/tracer.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE

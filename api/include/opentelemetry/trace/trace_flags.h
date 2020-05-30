@@ -17,7 +17,7 @@
 #include <cstdint>
 #include <cstring>
 
-#include "opentelemetry/common/stdtypes.h"
+#include "opentelemetry/common/stltypes.h"
 #include "opentelemetry/version.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE

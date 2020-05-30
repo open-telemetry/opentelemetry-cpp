@@ -44,11 +44,22 @@ namespace nostd
 
     using string_view = std::string_view;
 
+    /**
+     * Back port of std::size
+     *
+     * See https://en.cppreference.com/w/cpp/iterator/size
+     */
     template <class C>
-    constexpr auto size(const C &c) -> decltype(c.size());
+    auto size(const C &c) noexcept(noexcept(c.size())) -> decltype(c.size())
+    {
+      return c.size();
+    }
 
-    template <class T, std::size_t N>
-    constexpr std::size_t size(const T (&array)[N]) noexcept;
+    template <class T, size_t N>
+    size_t size(T (&array)[N]) noexcept
+    {
+      return N;
+    }
 
     template< bool B, class T = void >
     using enable_if_t = typename std::enable_if<B,T>::type;
