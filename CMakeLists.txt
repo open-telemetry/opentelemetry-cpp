@@ -8,6 +8,9 @@ project(opentelemetry-cpp)
 
 set(CMAKE_CXX_STANDARD 11)
 
+option(WITH_STL
+       "Whether to use Standard Library for C++latest features" OFF)
+
 option(WITH_OTPROTOCOL
        "Whether to include the OpenTelemetry Protocol in the SDK" OFF)
 

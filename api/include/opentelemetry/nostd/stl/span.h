@@ -7,7 +7,12 @@
 #include <iterator>
 #include <type_traits>
 
-#include "opentelemetry/nostd/utility.h"
+#ifndef HAVE_STDLIB_CPP
+#include "opentelemetry/nostd/stl/utility.h"
+#else
+#include <utility>
+#endif
+
 #include "opentelemetry/version.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE

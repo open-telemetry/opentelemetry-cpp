@@ -772,7 +772,99 @@ struct Property
   /// </summary>
   bool empty()
   {
-      return ((type == TYPE_STRING)&&(as_string!=nullptr)&&(as_string[0]==0)) || (type == TYPE_NONE);
+    return ((type == TYPE_STRING) && (as_string != nullptr) && (as_string[0] == 0)) ||
+           (type == TYPE_NONE);
+  }
+
+  /// <summary>Return a string representation of this value object</summary>
+  std::string to_string() const
+  {
+    std::string result;
+    switch (type)
+    {
+      case TYPE_STRING:
+        result = as_string;
+        break;
+      case TYPE_INT64:
+        result = std::to_string(as_int64);
+        break;
+      case TYPE_DOUBLE:
+        result = std::to_string(as_double);
+        break;
+      case TYPE_TIME:
+        // Note that we do not format time as time, we return it as raw number of .NET ticks
+        result = std::to_string(as_time.ticks);
+        break;
+      case TYPE_BOOLEAN:
+        result = ((as_bool) ? "true" : "false");
+        break;
+      case TYPE_UUID:
+        result = as_uuid.to_string();
+        break;
+
+#ifdef HAVE_COLLECTIONS
+      case TYPE_INT64_ARRAY: {
+        if (as_longArray != NULL)
+        {
+          stringstream ss;
+          for (int64_t element : *as_longArray)
+          {
+            ss << element;
+            ss << ",";
+          }
+          string s = ss.str();
+          result   = s.substr(0, s.length() - 1);  // get rid of the trailing space
+        }
+        break;
+      }
+      case TYPE_DOUBLE_ARRAY: {
+        if (as_doubleArray != NULL)
+        {
+          stringstream ss;
+          for (double element : *as_doubleArray)
+          {
+            ss << element;
+            ss << ",";
+          }
+          string s = ss.str();
+          result   = s.substr(0, s.length() - 1);  // get rid of the trailing space
+        }
+        break;
+      }
+      case TYPE_GUID_ARRAY: {
+        if (as_guidArray != NULL)
+        {
+          stringstream ss;
+          for (const auto &element : *as_guidArray)
+          {
+            ss << element.to_string();
+            ss << ",";
+          }
+          string s = ss.str();
+          result   = s.substr(0, s.length() - 1);  // get rid of the trailing space
+        }
+        break;
+      }
+      case TYPE_STRING_ARRAY: {
+        if (as_stringArray != NULL)
+        {
+          stringstream ss;
+          for (const auto &element : *as_stringArray)
+          {
+            ss << element;
+            ss << ",";
+          }
+          string s = ss.str();
+          result   = s.substr(0, s.length() - 1);  // get rid of the trailing space
+        }
+        break;
+      }
+#endif
+      default:
+        result = "";
+        break;
+    }
+    return result;
   }
 
   /// <summary>

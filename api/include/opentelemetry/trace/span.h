@@ -3,8 +3,7 @@
 #include <cstdint>
 
 #include "opentelemetry/core/timestamp.h"
-#include "opentelemetry/nostd/span.h"
-#include "opentelemetry/nostd/string_view.h"
+#include "opentelemetry/common/stdtypes.h"
 #include "opentelemetry/trace/canonical_code.h"
 #include "opentelemetry/trace/key_value_iterable_view.h"
 #include "opentelemetry/version.h"

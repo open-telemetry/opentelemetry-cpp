@@ -1,8 +1,10 @@
 #pragma once
 
+#include "opentelemetry/version.h"
+
+#include "opentelemetry/common/stdtypes.h"
 #include "opentelemetry/common/attribute_value.h"
 #include "opentelemetry/nostd/function_ref.h"
-#include "opentelemetry/version.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace trace

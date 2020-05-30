@@ -4,9 +4,10 @@
 #include <type_traits>
 #include <utility>
 
-#include "opentelemetry/nostd/utility.h"
-#include "opentelemetry/trace/key_value_iterable.h"
 #include "opentelemetry/version.h"
+
+#include "opentelemetry/common/stdtypes.h"
+#include "opentelemetry/trace/key_value_iterable.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace trace
