@@ -91,7 +91,7 @@ TEST(Tracer, StartSpan)
   ASSERT_LT(std::chrono::nanoseconds(0), span_data->GetDuration());
 }
 
-TEST(Tracer, StartSpanWithTime)
+TEST(Tracer, StartSpanWithOptions)
 {
   std::shared_ptr<std::vector<std::unique_ptr<SpanData>>> spans_received(
       new std::vector<std::unique_ptr<SpanData>>);

@@ -13,7 +13,7 @@ class Span final : public trace::Span
 public:
   Span(std::shared_ptr<Tracer> &&tracer,
        nostd::string_view name,
-       const trace::StartSpanOptions &options) noexcept
+       const trace::StartSpanOptions & /*options*/) noexcept
       : tracer_{std::move(tracer)}, name_{name}
   {
     std::cout << "StartSpan: " << name << "\n";
@@ -38,7 +38,7 @@ public:
 
   void UpdateName(nostd::string_view /*name*/) noexcept override {}
 
-  void End(const trace::EndSpanOptions &options) noexcept override {}
+  void End(const trace::EndSpanOptions & /*options*/) noexcept override {}
 
   bool IsRecording() const noexcept override { return true; }
 

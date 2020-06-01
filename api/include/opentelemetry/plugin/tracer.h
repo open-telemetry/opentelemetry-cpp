@@ -39,7 +39,7 @@ public:
 
   void UpdateName(nostd::string_view name) noexcept override { span_->UpdateName(name); }
 
-  void End(const trace::EndSpanOptions &options = {}) noexcept override { span_->End(); }
+  void End(const trace::EndSpanOptions &options = {}) noexcept override { span_->End(options); }
 
   bool IsRecording() const noexcept override { return span_->IsRecording(); }
 
