@@ -145,5 +145,15 @@ public:
 
   virtual Tracer &tracer() const noexcept = 0;
 };
+
+// TODO consider std::is_pointer to verify the template argument type
+template <class SpanType, class TracerType>
+nostd::unique_ptr<trace::Span> to_span_ptr(TracerType* objPtr,
+                                           nostd::string_view name,
+                                           const trace::StartSpanOptions &options)
+{
+  return nostd::unique_ptr<trace::Span>{new (std::nothrow) SpanType{*objPtr, name, options}};
+}
+
 }  // namespace trace
 OPENTELEMETRY_END_NAMESPACE
