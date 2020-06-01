@@ -30,50 +30,11 @@ using time_ticks      = event::time_ticks;
 using Property        = event::Property;
 using Attribute       = event::Attribute;
 
-class EventSpan : public Span
-{
-  Tracer &parentTracer;
+namespace trace = opentelemetry::trace;
 
-public:
-  EventSpan(Tracer &parent) : parentTracer(parent) {}
-
-  // Adds an event to the Span.
-  virtual void AddEvent(nostd::string_view name) noexcept {}
-
-  // Adds an event to the Span, with a custom timestamp.
-  virtual void AddEvent(nostd::string_view name, core::SystemTimestamp timestamp) noexcept {}
-
-  // Adds an event to the Span, with a custom timestamp, and attributes.
-  virtual void AddEvent(nostd::string_view name,
-                        core::SystemTimestamp timestamp,
-                        const KeyValueIterable &attributes) noexcept
-  {}
-
-  // TODO: allow EventProperties to interop with KeyValueIterableView<T>
-  virtual void AddEvent(nostd::string_view name, const EventProperties &attributes) noexcept {}
-
-  // Sets the status of the span. The default status is OK. Only the value of the last call will be
-  // recorded, and implementations are free to ignore previous calls.
-  virtual void SetStatus(CanonicalCode code, nostd::string_view description) noexcept {
-
-  };
-
-  // Updates the name of the Span. If used, this will override the name provided
-  // during creation.
-  virtual void UpdateName(nostd::string_view name) noexcept {}
-
-  // Mark the end of the Span. Only the timing of the first End call for a given Span will
-  // be recorded, and implementations are free to ignore all further calls.
-  virtual void End() noexcept {}
-
-  virtual bool IsRecording() const noexcept {}
-
-  virtual Tracer &tracer() const noexcept { return parentTracer; }
-};
-
-//
-// Print event in JSON format to console
-//
+/**
+ * Print event in JSON format to console
+ */
 void LogEvent(EventProperties &event)
 {
   printf("%s = \n", event.GetName().c_str());
@@ -101,6 +62,9 @@ void LogEvent(EventProperties &event)
   printf("}\n");
 };
 
+/**
+ * Logging API similar to Microsoft 1DS C++ SDK
+ */
 void test_events()
 {
   // Using initializer list to express a variant map
@@ -135,24 +99,62 @@ void test_events()
   LogEvent(myEvent3);
 }
 
+/**
+ * Transform from EventProperties to collection of variant (AttributeValue)
+ */
+void test_add_eventproperties_to_span(trace::Span& span)
+{
+  EventProperties myEvent( "MyProduct.MyEvent4", {{"key1", "value1"}});
+  auto name = myEvent.GetName();
+  span.AddEvent(nostd::string_view(name.c_str(), name.length()), myEvent);
+}
+
+/**
+ * OpenTelemetry Tracer and Span API
+ */
 void test_spans()
 {
-  ConsoleTracerProvider con;
+  console::TracerProvider con;
   opentelemetry::core::SystemTimestamp now(std::chrono::system_clock::now());
 
   auto tracer = con.GetTracer("default", "1.0");
   auto span   = tracer->StartSpan("MySpan");
 
   using M = std::map<std::string_view, std::string_view>;
-  M m = {{"key1", "one"}, {"key2", "two"}};
-  // trace::KeyValueIterableView<M> iterable{m};
-  // iterable.size();
-  span->AddEvent("MyEvent", m);
 
+  // add m1 to span 1
+  M m1 = {{"key1", "one"}, {"key2", "two"}};
+  span->AddEvent("MyProduct.MyEvent1", m1);
+
+  // add m2 to span 2
+  M m2     = {{"key1", "one"}, {"key2", "two"}};
+  span->AddEvent("MyProduct.MyEvent2", m2);
+
+#if 0
+  // add map to span using initializer_list
+  span->AddEvent("MyProduct.MyEvent3", {{"key1", "one"}, {"key2", "two"}});
+
+  // add EventProperties to span
+  test_add_eventproperties_to_span(*span);
+#endif
+
+  span->End();
+
+  // end tracing session
+  tracer->Close();
 }
 
 int main(int argc, char *argv[])
 {
+  printf("*** \n");
+  printf("*** test_events ...\n");
+  printf("*** \n");
   test_events();
+
+  printf("*** \n");
+  printf("*** test_spans  ...\n");
+  printf("*** \n");
+  test_spans();
+
   return 0;
 }

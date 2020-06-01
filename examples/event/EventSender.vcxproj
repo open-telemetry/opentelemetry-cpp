@@ -156,7 +156,6 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp" />
-    <ClCompile Include="Span.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ConsoleTracer.hpp" />
