@@ -47,6 +47,11 @@ public:
     return nanos_since_epoch_ == other.nanos_since_epoch_;
   }
 
+  bool operator!=(const SystemTimestamp &other) const noexcept
+  {
+    return nanos_since_epoch_ != other.nanos_since_epoch_;
+  }
+
 private:
   int64_t nanos_since_epoch_;
 };
@@ -87,6 +92,11 @@ public:
   bool operator==(const SteadyTimestamp &other) const noexcept
   {
     return nanos_since_epoch_ == other.nanos_since_epoch_;
+  }
+
+  bool operator!=(const SteadyTimestamp &other) const noexcept
+  {
+    return nanos_since_epoch_ != other.nanos_since_epoch_;
   }
 
 private:

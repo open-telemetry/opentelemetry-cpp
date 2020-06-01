@@ -13,7 +13,7 @@ using opentelemetry::core::SystemTimestamp;
 
 namespace
 {
-SystemTimestamp NowOrGiven(const SystemTimestamp &system)
+SystemTimestamp NowOr(const SystemTimestamp &system)
 {
   if (system == SystemTimestamp())
   {
@@ -25,7 +25,7 @@ SystemTimestamp NowOrGiven(const SystemTimestamp &system)
   }
 }
 
-SteadyTimestamp NowOrGiven(const SteadyTimestamp &steady)
+SteadyTimestamp NowOr(const SteadyTimestamp &steady)
 {
   if (steady == SteadyTimestamp())
   {
@@ -55,8 +55,8 @@ Span::Span(std::shared_ptr<Tracer> &&tracer,
   processor_->OnStart(*recordable_);
   recordable_->SetName(name);
 
-  recordable_->SetStartTime(NowOrGiven(options.start_system_time));
-  start_steady_time = NowOrGiven(options.start_steady_time);
+  recordable_->SetStartTime(NowOr(options.start_system_time));
+  start_steady_time = NowOr(options.start_steady_time);
 }
 
 Span::~Span()
@@ -112,9 +112,10 @@ void Span::End(const trace_api::EndSpanOptions &options) noexcept
     return;
   }
 
-  recordable_->SetDuration(
-      std::chrono::steady_clock::time_point(NowOrGiven(options.end_steady_time)) -
-      std::chrono::steady_clock::time_point(start_steady_time));
+  auto end_steady_time = NowOr(options.end_steady_time);
+  recordable_->SetDuration(std::chrono::steady_clock::time_point(end_steady_time) -
+                           std::chrono::steady_clock::time_point(start_steady_time));
+
   processor_->OnEnd(std::move(recordable_));
   recordable_.reset();
 }
