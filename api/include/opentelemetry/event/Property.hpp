@@ -105,7 +105,20 @@ struct Property
   Attributes attribs;
 
   /// <summary>
-  /// Variant object value - 128-bit wide
+  /// Variant object value - 128-bit wide.
+  /// Implementation requires C++11 and does not depend on nostd::variant.
+  ///
+  /// Allows to express the following types:
+  /// - string
+  /// - int64
+  /// - uint64
+  /// - double
+  /// - time (in ticks)
+  /// - bool
+  /// - UUID
+  /// - void ptr or object ptr
+  /// - collections (128-bit bitset, vector/array of primitive types
+  ///
   /// </summary>
   // clang-format off
   union
@@ -865,6 +878,37 @@ struct Property
         break;
     }
     return result;
+  }
+
+  common::AttributeValue value()
+  {
+    switch (type)
+    {
+      case TYPE_STRING:
+        return common::AttributeValue(as_string);
+        break;
+      case TYPE_INT64:
+        return common::AttributeValue(as_int64);
+        break;
+      case TYPE_DOUBLE:
+        return common::AttributeValue(as_double);
+        break;
+      case TYPE_TIME:
+        /* TODO: how do we support time type in OT? */
+        return common::AttributeValue(as_time.ticks);
+        break;
+      case TYPE_BOOLEAN:
+        return common::AttributeValue(as_bool);
+        break;
+      case TYPE_UUID:
+        /* TODO: this has to be supported as array<uint8_t> */
+        return common::AttributeValue(as_uuid.to_string());
+        break;
+      default:
+        /* TODO: add collections */
+        break;
+    }
+    return common::AttributeValue(false);
   }
 
   /// <summary>

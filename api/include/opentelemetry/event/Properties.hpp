@@ -2,6 +2,8 @@
 
 #include "opentelemetry/version.h"
 
+#include "opentelemetry/trace/key_value_iterable_view.h"
+
 #include "opentelemetry/event/Property.hpp"
 
 #include <cstdint>
@@ -18,7 +20,7 @@ static constexpr const char *defaultName = "unknown";
 /// <summary>
 /// The Properties class encapsulates event properties.
 /// </summary>
-class Properties
+class Properties : public trace::KeyValueIterable
 {
   std::string name;
   std::map<std::string, Property> m_props;
@@ -302,6 +304,26 @@ public:
   }
 
   virtual ~Properties() noexcept {};
+
+  virtual bool ForEachKeyValue(
+      nostd::function_ref<bool(nostd::string_view, common::AttributeValue)> callback) const
+      noexcept override
+  {
+    for (auto& kv : m_props)
+    {
+      callback(nostd::string_view(kv.first.c_str(), kv.first.length()), kv.second.as_string);
+    }
+    return true;
+  };
+
+  /**
+   * @return the number of key-value pairs
+   */
+  virtual size_t size() const noexcept override
+  {
+      return m_props.size();
+  }
+
 };
 
 }  // namespace event
