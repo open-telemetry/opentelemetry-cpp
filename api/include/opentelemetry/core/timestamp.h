@@ -42,6 +42,11 @@ public:
     return std::chrono::nanoseconds{nanos_since_epoch_};
   }
 
+  bool operator==(const SystemTimestamp &other) const noexcept
+  {
+    return nanos_since_epoch_ == other.nanos_since_epoch_;
+  }
+
 private:
   int64_t nanos_since_epoch_;
 };
@@ -77,6 +82,11 @@ public:
   std::chrono::nanoseconds time_since_epoch() const noexcept
   {
     return std::chrono::nanoseconds{nanos_since_epoch_};
+  }
+
+  bool operator==(const SteadyTimestamp &other) const noexcept
+  {
+    return nanos_since_epoch_ == other.nanos_since_epoch_;
   }
 
 private:

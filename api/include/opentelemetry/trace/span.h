@@ -44,6 +44,11 @@ struct StartSpanOptions
   SpanKind kind = SpanKind::kInternal;
 };
 
+struct EndSpanOptions
+{
+  core::SteadyTimestamp end_steady_time;
+};
+
 class Tracer;
 
 /**
@@ -132,10 +137,7 @@ public:
 
   // Mark the end of the Span. Only the timing of the first End call for a given Span will
   // be recorded, and implementations are free to ignore all further calls.
-  virtual void End() noexcept = 0;
-
-  // TODO
-  // virtual void End(EndSpanOptions&& opts) noexcept = 0;
+  virtual void End(const EndSpanOptions &options = {}) noexcept = 0;
 
   // TODO
   // SpanContext context() const noexcept = 0;
