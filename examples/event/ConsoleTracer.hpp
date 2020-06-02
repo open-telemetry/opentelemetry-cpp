@@ -24,7 +24,8 @@ namespace console
 
 std::string to_string(std::chrono::system_clock::time_point &tp)
 {
-  int64_t millis = std::chrono::duration_cast<std::chrono::milliseconds>(tp.time_since_epoch()).count();
+  int64_t millis =
+      std::chrono::duration_cast<std::chrono::milliseconds>(tp.time_since_epoch()).count();
   auto in_time_t = std::chrono::system_clock::to_time_t(tp);
   std::stringstream ss;
   ss << std::put_time(std::localtime(&in_time_t), "%Y-%m-%d %X");
@@ -60,7 +61,7 @@ public:
   virtual void CloseWithMicroseconds(uint64_t timeout) noexcept override {}
 
   // TODO: pass span
-  void LogEvent(nostd::string_view name,
+  void AddEvent(nostd::string_view name,
                 core::SystemTimestamp timestamp,
                 const trace::KeyValueIterable &attributes) noexcept
   {
@@ -72,20 +73,71 @@ public:
 
     attributes.ForEachKeyValue([&](nostd::string_view key, common::AttributeValue value) noexcept {
       std::cout << key << "=";
-      std::cout << std::get<nostd::string_view>(value);
+      switch (value.index())
+      {
+        case common::AttributeType::TYPE_BOOL:
+          std::cout << std::get<bool>(value);
+          break;
+        case common::AttributeType::TYPE_INT:
+          std::cout << std::get<int32_t>(value);
+          break;
+        case common::AttributeType::TYPE_INT64:
+          std::cout << std::get<int64_t>(value);
+          break;
+        case common::AttributeType::TYPE_UINT:
+          std::cout << std::get<uint32_t>(value);
+          break;
+        case common::AttributeType::TYPE_UINT64:
+          std::cout << std::get<uint64_t>(value);
+          break;
+        case common::AttributeType::TYPE_DOUBLE:
+          std::cout << std::get<double>(value);
+          break;
+        case common::AttributeType::TYPE_STRING:
+          std::cout << std::get<nostd::string_view>(value);
+          break;
+        case common::AttributeType::TYPE_CSTRING:
+          std::cout << std::get<const char *>(value);
+          break;
+#if 0
+        case common::AttributeType::TYPE_SPAN_BOOL:
+          std::cout << std::get<nostd::span<bool>>(value);
+          break;
+        case common::AttributeType::TYPE_SPAN_INT:
+          std::cout << std::get<nostd::span<int>>(value);
+          break;
+        case common::AttributeType::TYPE_SPAN_INT64:
+          std::cout << std::get<nostd::span<int64_t>>(value);
+          break;
+        case common::AttributeType::TYPE_SPAN_UINT:
+          std::cout << std::get<nostd::span<unsigned int>>(value);
+          break;
+        case common::AttributeType::TYPE_SPAN_UINT64:
+          std::cout << std::get<nostd::span<uint64_t>>(value);
+          break;
+        case common::AttributeType::TYPE_SPAN_DOUBLE:
+          std::cout << std::get<nostd::span<double>>(value);
+          break;
+        case common::AttributeType::TYPE_SPAN_STRING:
+          std::cout << std::get<nostd::span<nostd::string_view>>(value);
+          break;
+#endif
+        default:
+          /* TODO: unsupported type */
+          break;
+      }
       std::cout << " ";
       return true;
     });
 
     std::cout << std::endl;
-
   };
 
   // TODO: pass span
-  void LogEvent(nostd::string_view name, core::SystemTimestamp timestamp) noexcept {}
+  void AddEvent(nostd::string_view name, core::SystemTimestamp timestamp) noexcept {}
 
   // TODO: pass span
-  void LogEvent(nostd::string_view name) {}
+  void AddEvent(nostd::string_view name) {}
 };
 
 class Span : public trace::Span
@@ -103,18 +155,18 @@ public:
 
   ~Span() { End(); }
 
-  void AddEvent(nostd::string_view name) noexcept { owner.LogEvent(name); }
+  void AddEvent(nostd::string_view name) noexcept { owner.AddEvent(name); }
 
   void AddEvent(nostd::string_view name, core::SystemTimestamp timestamp) noexcept
   {
-    owner.LogEvent(name, timestamp);
+    owner.AddEvent(name, timestamp);
   }
 
   void AddEvent(nostd::string_view name,
                 core::SystemTimestamp timestamp,
                 const trace::KeyValueIterable &attributes) noexcept
   {
-    owner.LogEvent(name, timestamp, attributes);
+    owner.AddEvent(name, timestamp, attributes);
   }
 
   void SetStatus(trace::CanonicalCode code, nostd::string_view description) noexcept {}

@@ -100,16 +100,6 @@ void test_events()
 }
 
 /**
- * Transform from EventProperties to collection of variant (AttributeValue)
- */
-void test_add_eventproperties_to_span(trace::Span& span)
-{
-  EventProperties myEvent( "MyProduct.MyEvent4", {{"key1", "value1"}});
-  auto name = myEvent.GetName();
-  span.AddEvent(nostd::string_view(name.c_str(), name.length()), myEvent);
-}
-
-/**
  * OpenTelemetry Tracer and Span API
  */
 void test_spans()
@@ -130,13 +120,20 @@ void test_spans()
   M m2     = {{"key1", "one"}, {"key2", "two"}};
   span->AddEvent("MyProduct.MyEvent2", m2);
 
-#if 0
   // add map to span using initializer_list
-  span->AddEvent("MyProduct.MyEvent3", {{"key1", "one"}, {"key2", "two"}});
+  span->AddEvent("MyProduct.MyEvent3",
+      {
+          {"key1", "one"},
+          {"key2", "two"}
+      });
 
-  // add EventProperties to span
-  test_add_eventproperties_to_span(*span);
-#endif
+  // Transform from EventProperties to collection of variant (AttributeValue)
+  EventProperties myEvent("MyProduct.MyEvent4",
+      {
+          {"key1", "value1"}, {"intKey", 12345}, { "boolKey", true }
+      });
+  auto name = myEvent.GetName();
+  span->AddEvent(nostd::string_view(name.c_str(), name.length()), myEvent);
 
   span->End();
 
