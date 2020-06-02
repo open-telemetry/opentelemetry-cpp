@@ -311,7 +311,8 @@ public:
   {
     for (auto& kv : m_props)
     {
-      callback(nostd::string_view(kv.first.c_str(), kv.first.length()), kv.second.as_string);
+      common::AttributeValue v { kv.second.value() };
+      callback(nostd::string_view(kv.first.c_str(), kv.first.length()), v );
     }
     return true;
   };

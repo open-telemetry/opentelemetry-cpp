@@ -880,12 +880,15 @@ struct Property
     return result;
   }
 
-  common::AttributeValue value()
+  common::AttributeValue value() const
   {
     switch (type)
     {
       case TYPE_STRING:
-        return common::AttributeValue(as_string);
+        return common::AttributeValue(static_cast<const char*>(as_string));
+        break;
+      case TYPE_UINT64:
+        return common::AttributeValue(as_uint64);
         break;
       case TYPE_INT64:
         return common::AttributeValue(as_int64);
@@ -894,7 +897,7 @@ struct Property
         return common::AttributeValue(as_double);
         break;
       case TYPE_TIME:
-        /* TODO: how do we support time type in OT? */
+        /* TODO: how to support time types in OT? */
         return common::AttributeValue(as_time.ticks);
         break;
       case TYPE_BOOLEAN:
