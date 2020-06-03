@@ -1,33 +1,6 @@
 
 # Simple Trace Example
 
-This example sets up a tracer in the main application then makes several calls to a custom library instrumented with the <a href="https://github.com/open-telemetry/opentelemetry-cpp"> Open Telemetry SDK </a>. Specifically, it demonstrates the setup of fundamental Open Telemetry componenets such as Tracers, Tracer Providers and Spans.  The example also illustrates context propogation from parent spans to children spans and events.  All telemetry output is directed to stdout.
+In this example, an application in `main.cc` initializes and registers a tracer provider from the <a href="https://github.com/open-telemetry/opentelemetry-cpp"> Open Telemetry SDK </a>.  The application then calls a `foo_library` which has been manually instrumented using the <a href="https://github.com/open-telemetry/opentelemetry-cpp/tree/master/api"> OpenTelemetry API </a>.  Resulting telemetry is directed to stdout by through a custom exporter.
 
-## Build and Run
----
-
-<li> Install the latest bazel version by following the steps listed <a href="https://docs.bazel.build/versions/master/install.html">here</a> </li>
-
-<li> Clone or fork the Open Telemetry C++ repository: </li>
-
-```sh
-git clone https://github.com/open-telemetry/opentelemetry-cpp.git
-```
-
-<li> Build the example from the root of the opentelemetry-cpp directory using Bazel: </li>
-
-```sh
-cd opentelemetry-cpp/
-bazel build //examples/simple:example_simple
-```
-
-<li> Run the resulting executable to see telemetry from the application as it calls the instrumented library: </li>
-
-```sh
-bazel-bin/examples/simple/example_simple
-```
-
-## Useful Links
----
-<li><a href=""> Open Telemetry <a></li>
-<li><a href=""> Tracing SDK Specification <a></li>
+See <a href="https://github.com/open-telemetry/opentelemetry-cpp/blob/master/CONTRIBUTING.md"> CONTRIBUTING.md </a> for instructions on building and running the example.

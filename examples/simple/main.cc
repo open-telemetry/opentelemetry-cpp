@@ -11,16 +11,12 @@ namespace
 {
 void initTracer()
 {
-  // Specify the exporter: StdoutExporter in this case simply passes all output from the span
-  // processor to stdout
   auto exporter = std::unique_ptr<sdktrace::SpanExporter>(new StdoutExporter);
-  // Specify the Span Processor: SimpleSpanProcessor forwards all completed spans directly to the
-  // exporter
-  auto processor = std::shared_ptr<sdktrace::SpanProcessor>(new sdktrace::SimpleSpanProcessor(
-      std::move(exporter)));  // Create a Span Processor given the StdoutExporter defined earlier
-  // Initialize a trace provider with the Span Processor instance defined above
+  // Specify the Span Processor: SimpleSpanProcessor forwards spans directly to the exporter
+  auto processor = std::shared_ptr<sdktrace::SpanProcessor>(
+      new sdktrace::SimpleSpanProcessor(std::move(exporter)));
   auto provider = nostd::shared_ptr<trace::TracerProvider>(new sdktrace::TracerProvider(processor));
-  // Set global trace provider
+  // Set the global trace provider
   trace::Provider::SetTracerProvider(provider);
 }
 }  // namespace
