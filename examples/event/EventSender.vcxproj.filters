@@ -32,5 +32,8 @@
     <ClInclude Include="utils.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="CString.hpp">
+      <Filter>Source Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

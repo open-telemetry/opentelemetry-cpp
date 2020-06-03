@@ -17,6 +17,7 @@ using AttributeValue = nostd::variant<
                                       double,
                                       nostd::string_view,
                                       const char*,
+                                      nostd::span<const uint8_t>,
                                       nostd::span<const bool>,
                                       nostd::span<const int>,
                                       nostd::span<const int64_t>,
@@ -36,7 +37,7 @@ enum AttributeType
     TYPE_DOUBLE,
     TYPE_STRING,
     TYPE_CSTRING,
-
+    TYPE_SPAN_BYTE,
     TYPE_SPAN_BOOL,
     TYPE_SPAN_INT,
     TYPE_SPAN_INT64,

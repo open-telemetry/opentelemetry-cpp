@@ -903,10 +903,14 @@ struct Property
       case TYPE_BOOLEAN:
         return common::AttributeValue(as_bool);
         break;
-      case TYPE_UUID:
-        /* TODO: this has to be supported as array<uint8_t> */
-        return common::AttributeValue(as_uuid.to_string());
+      case TYPE_UUID: {
+        // FIXME: this is super-hacky
+        return common::AttributeValue(
+            nostd::span<uint8_t>(
+                (uint8_t*)((void*)&as_uuid),
+                (uint8_t*)((void*)&as_uuid)+16));
         break;
+      }
       default:
         /* TODO: add collections */
         break;

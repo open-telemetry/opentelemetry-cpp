@@ -137,7 +137,8 @@ void test_spans()
         "MyProduct.MyEvent4",
         {/* C-string */ {"key1", "value1"},
          /* int32_t  */ {"intKey", 12345},
-         /* bool     */ {"boolKey", static_cast<bool>(true)}
+         /* bool     */ {"boolKey", static_cast<bool>(true)},
+         /* GUID     */ {"guidKey1", UUID_t("00010203-0405-0607-0809-0A0B0C0D0E0F")}
         });
     auto name = myEvent.GetName();
     span->AddEvent(nostd::string_view(name.c_str(), name.length()), myEvent);
@@ -148,8 +149,14 @@ void test_spans()
   }
 }
 
+#include "CString.hpp"
+
 int main(int argc, char *argv[])
 {
+  //std::string_view hello{"hello!\n"};
+  //cstring hi(hello);
+  //std::cout << hi;
+
   test_events();
   test_spans();
   return 0;

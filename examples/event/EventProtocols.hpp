@@ -83,6 +83,22 @@ static void print_value(std::stringstream &ss,
       if (jsonTypes)
         ss << '"';
       break;
+    case common::AttributeType::TYPE_SPAN_BYTE: {
+      ss << '[';
+      // TODO: do we need to escape string value for JSON?
+      auto s    = std::get<nostd::span<const uint8_t>>(value);
+      size_t i  = 1;
+      size_t sz = s.size();
+      for (auto v : s)
+      {
+        ss << (unsigned)v;
+        if (i != sz)
+          ss << ',';
+        i++;
+      };
+      ss << ']';
+      break;
+    };
     default:
       /* TODO: unsupported type - add all other types here */
       break;
