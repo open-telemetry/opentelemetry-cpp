@@ -227,6 +227,19 @@ struct UUID
     return temp;
   }
 
+  GUID to_GUID()
+  {
+    GUID temp;
+    temp.Data1 = Data1;
+    temp.Data2 = Data2;
+    temp.Data3 = Data3;
+    for (size_t i = 0; i < 8; i++)
+    {
+      temp.Data4[i] = Data4[i];
+    }
+    return temp;
+  }
+
 #endif
 
   /// <summary>

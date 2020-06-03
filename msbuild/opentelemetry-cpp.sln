@@ -40,13 +40,6 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "nostd", "nostd", "{F37A41EA-8C41-4F3D-8F8A-7D8E25181E1F}"
 	ProjectSection(SolutionItems) = preProject
 		..\api\include\opentelemetry\nostd\function_ref.h = ..\api\include\opentelemetry\nostd\function_ref.h
-		..\api\include\opentelemetry\nostd\shared_ptr.h = ..\api\include\opentelemetry\nostd\shared_ptr.h
-		..\api\include\opentelemetry\nostd\span.h = ..\api\include\opentelemetry\nostd\span.h
-		..\api\include\opentelemetry\nostd\string_view.h = ..\api\include\opentelemetry\nostd\string_view.h
-		..\api\include\opentelemetry\nostd\type_traits.h = ..\api\include\opentelemetry\nostd\type_traits.h
-		..\api\include\opentelemetry\nostd\unique_ptr.h = ..\api\include\opentelemetry\nostd\unique_ptr.h
-		..\api\include\opentelemetry\nostd\utility.h = ..\api\include\opentelemetry\nostd\utility.h
-		..\api\include\opentelemetry\nostd\variant.h = ..\api\include\opentelemetry\nostd\variant.h
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "detail", "detail", "{C683BA13-1243-4B17-8BC8-FCE4CB60EDD8}"
@@ -75,6 +68,17 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "common", "common", "{33CF43
 	ProjectSection(SolutionItems) = preProject
 		..\api\include\opentelemetry\common\attribute_value.h = ..\api\include\opentelemetry\common\attribute_value.h
 		..\api\include\opentelemetry\common\stltypes.h = ..\api\include\opentelemetry\common\stltypes.h
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "stl", "stl", "{1E56C12E-30AB-4CEF-8D8D-92F944D3D452}"
+	ProjectSection(SolutionItems) = preProject
+		..\api\include\opentelemetry\nostd\stl\shared_ptr.h = ..\api\include\opentelemetry\nostd\stl\shared_ptr.h
+		..\api\include\opentelemetry\nostd\stl\span.h = ..\api\include\opentelemetry\nostd\stl\span.h
+		..\api\include\opentelemetry\nostd\stl\string_view.h = ..\api\include\opentelemetry\nostd\stl\string_view.h
+		..\api\include\opentelemetry\nostd\stl\type_traits.h = ..\api\include\opentelemetry\nostd\stl\type_traits.h
+		..\api\include\opentelemetry\nostd\stl\unique_ptr.h = ..\api\include\opentelemetry\nostd\stl\unique_ptr.h
+		..\api\include\opentelemetry\nostd\stl\utility.h = ..\api\include\opentelemetry\nostd\stl\utility.h
+		..\api\include\opentelemetry\nostd\stl\variant.h = ..\api\include\opentelemetry\nostd\stl\variant.h
 	EndProjectSection
 EndProject
 Global
@@ -117,6 +121,7 @@ Global
 		{C683BA13-1243-4B17-8BC8-FCE4CB60EDD8} = {F37A41EA-8C41-4F3D-8F8A-7D8E25181E1F}
 		{3CBC4AE2-10F0-4B32-8C86-FAB4B2F55B16} = {5B09FEFC-9830-4350-9D35-7F12391A71DA}
 		{33CF4306-056E-4B97-A721-DBFD676143AA} = {2B93FC6D-A7C5-43D4-984B-E60322931288}
+		{1E56C12E-30AB-4CEF-8D8D-92F944D3D452} = {F37A41EA-8C41-4F3D-8F8A-7D8E25181E1F}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {41302516-BF06-3364-9450-F0D8BA88F950}

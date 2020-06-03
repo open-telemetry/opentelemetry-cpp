@@ -20,7 +20,7 @@
 #include <map>
 #include <string_view>
 
-#include "ConsoleTracer.hpp"
+#include "StreamTracer.hpp"
 
 using namespace OPENTELEMETRY_NAMESPACE;
 
@@ -67,6 +67,8 @@ void LogEvent(EventProperties &event)
  */
 void test_events()
 {
+  printf("*** test_events ...\n");
+
   // Using initializer list to express a variant map
   EventProperties myEvent(
       // Define named event
@@ -99,59 +101,56 @@ void test_events()
   LogEvent(myEvent3);
 }
 
-/**
- * OpenTelemetry Tracer and Span API
- */
+using M = std::map<std::string_view, std::string_view>;
+
 void test_spans()
 {
-  console::TracerProvider con;
-  opentelemetry::core::SystemTimestamp now(std::chrono::system_clock::now());
 
-  auto tracer = con.GetTracer("default", "1.0");
-  auto span   = tracer->StartSpan("MySpan");
+  std::map<std::string, std::string> testParams = {
+      {"file", "trace.log"},
+      {"json", "trace.json"},
+      {"ETW", "{6D084BBF-6A96-44EF-83F4-0A77C9E34580}"},
+      {"CON", "1.0"},
+      {"DEBUG", "1.0"}
+  };
 
-  using M = std::map<std::string_view, std::string_view>;
+  for (auto &kv : testParams)
+  {
+    printf("*** Tracer(%s:%s)...\n", kv.first.c_str(), kv.second.c_str());
+    stream::TracerProvider tp;
+    auto tracer = tp.GetTracer(kv.first, kv.second);
+    auto span   = tracer->StartSpan("MySpan");
 
-  // add m1 to span 1
-  M m1 = {{"key1", "one"}, {"key2", "two"}};
-  span->AddEvent("MyProduct.MyEvent1", m1);
+    // add m1 to span 1
+    M m1 = {{"key1", "one"}, {"key2", "two"}};
+    span->AddEvent("MyProduct.MyEvent1", m1);
 
-  // add m2 to span 2
-  M m2     = {{"key1", "one"}, {"key2", "two"}};
-  span->AddEvent("MyProduct.MyEvent2", m2);
+    // add m2 to span 2
+    M m2 = {{"key1", "one"}, {"key2", "two"}};
+    span->AddEvent("MyProduct.MyEvent2", m2);
 
-  // add map to span using initializer_list
-  span->AddEvent("MyProduct.MyEvent3",
-      {
-          {"key1", "one"},
-          {"key2", "two"}
-      });
+    // add map to span using initializer_list
+    span->AddEvent("MyProduct.MyEvent3", {{"key1", "one"}, {"key2", "two"}});
 
-  // Transform from EventProperties to collection of variant (AttributeValue)
-  EventProperties myEvent("MyProduct.MyEvent4",
-      {
-          {"key1", "value1"}, {"intKey", 12345}, { "boolKey", true }
-      });
-  auto name = myEvent.GetName();
-  span->AddEvent(nostd::string_view(name.c_str(), name.length()), myEvent);
+    // Transform from EventProperties to collection of variant (AttributeValue)
+    EventProperties myEvent(
+        "MyProduct.MyEvent4",
+        {/* C-string */ {"key1", "value1"},
+         /* int32_t  */ {"intKey", 12345},
+         /* bool     */ {"boolKey", static_cast<bool>(true)}
+        });
+    auto name = myEvent.GetName();
+    span->AddEvent(nostd::string_view(name.c_str(), name.length()), myEvent);
 
-  span->End();
-
-  // end tracing session
-  tracer->Close();
+    span->End();
+    // end tracing session
+    tracer->Close();
+  }
 }
 
 int main(int argc, char *argv[])
 {
-  printf("*** \n");
-  printf("*** test_events ...\n");
-  printf("*** \n");
   test_events();
-
-  printf("*** \n");
-  printf("*** test_spans  ...\n");
-  printf("*** \n");
   test_spans();
-
   return 0;
 }
