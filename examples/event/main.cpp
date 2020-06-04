@@ -106,11 +106,18 @@ using M = std::map<std::string_view, std::string_view>;
 void test_spans()
 {
 
-  std::map<std::string, std::string> testParams = {
+  std::multimap<std::string, std::string> testParams = {
+      // Plain text key-value pairs logfile
       {"file", "trace.log"},
+      // JSON text file
       {"json", "trace.json"},
+      // JSON pipe listener (Windows)
+      {"json", "\\\\.\\pipe\\ETW-6d084bbf-6a96-44ef-83F4-0a77c9e34580"},
+      // ETW-XML listener (Windows)
       {"ETW", "{6D084BBF-6A96-44EF-83F4-0A77C9E34580}"},
+      // Console
       {"CON", "1.0"},
+      // OutputDebugString (Visual Studio Debug Output window)
       {"DEBUG", "1.0"}
   };
 
