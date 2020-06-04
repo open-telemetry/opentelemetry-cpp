@@ -156,7 +156,7 @@ void test_spans()
   }
 }
 
-#include "CString.hpp"
+// #include "CString.hpp"
 
 int main(int argc, char *argv[])
 {
