@@ -138,7 +138,7 @@ struct JsonConverter : EventConverter
        // TODO:
        // - decide on the best format for timestamp
        // - skip timestamp in low-latency agent-based env with sync events
-       << "\"ts\":\"" << OPENTELEMETRY_NAMESPACE::utils::to_string(tp) << "\","
+       << "\"time\":\"" << OPENTELEMETRY_NAMESPACE::utils::to_string(tp) << "\","
        // TODO:
        // - different schemas inside JSON may name event name field differently
        << "\"name\":"
@@ -183,7 +183,7 @@ struct PlainKVConverter : EventConverter
     auto &attributes                         = std::get<2>(data);
     std::stringstream ss;
 
-    ss << "ts=\"" << OPENTELEMETRY_NAMESPACE::utils::to_string(tp) << "\", ";
+    ss << "time=\"" << OPENTELEMETRY_NAMESPACE::utils::to_string(tp) << "\", ";
     ss << "name=" << "\"" << name << "\"";
     attributes.ForEachKeyValue([&](nostd::string_view key, common::AttributeValue value) noexcept {
       ss << ", ";
