@@ -16,14 +16,16 @@ namespace utils
 ///
 /// Convert from time_point to ISO string
 ///
-std::string to_string(std::chrono::system_clock::time_point &tp)
+static std::string to_string(std::chrono::system_clock::time_point &tp)
 {
   int64_t millis =
       std::chrono::duration_cast<std::chrono::milliseconds>(tp.time_since_epoch()).count();
   auto in_time_t = std::chrono::system_clock::to_time_t(tp);
   std::stringstream ss;
-  ss << std::put_time(std::localtime(&in_time_t), "%Y-%m-%d %X");
+  // TODO: this is expected to be UTC time
+  ss << std::put_time(std::localtime(&in_time_t), "%Y-%m-%dT%H:%M:%S");
   ss << "." << std::setfill('0') << std::setw(3) << (unsigned)(millis % 1000);
+  ss << "Z";
   return ss.str();
 }
 
