@@ -20,6 +20,33 @@ convention](https://google.github.io/styleguide/cppguide.html#Naming).
 
 Code is formatted automatically and enforced by CI.
 
+### Build and Run Code Examples
+
+Note: these instructions apply to examples configured with Bazel, see example-specific documentation for other build automation tools.
+
+Install the latest bazel version by following the steps listed <a href="https://docs.bazel.build/versions/master/install.html">here</a>
+
+Select an example of interest from the <a href="https://github.com/open-telemetry/opentelemetry-cpp/tree/master/examples"> examples folder </a>.  Inside each example directory is a `BUILD` file containing instructions for Bazel.  Find the binary name of your example by inspecting the contents of this `BUILD` file.
+
+Build the example from the root of the opentelemetry-cpp directory using Bazel.  Replace  `<binary name>` with the identifier found in the previous step:
+
+```sh
+bazel build //examples/<example directory name>:<binary name>
+```
+
+Run the resulting executable to see telemetry from the application as it calls the instrumented library: </li>
+
+```sh
+bazel-bin/examples/<example directory name>/<binary name>
+```
+
+For instance, building and running the `simple` example can be done as follows:
+
+```sh
+bazel build //examples/simple:example_simple
+bazel-bin/examples/simple/example_simple
+```
+
 ## Pull Requests
 
 ### How to Send Pull Requests
@@ -73,33 +100,6 @@ A PR is considered to be **ready to merge** when:
 
 Any Approver / Maintainer can merge the PR once it is **ready to merge**.
 
-## Build and Run Code Examples
-
-Note: these instructions apply to examples configured with Bazel, see example-specific documentation for other build automation tools.
-
-Install the latest bazel version by following the steps listed <a href="https://docs.bazel.build/versions/master/install.html">here</a>
-
-Select an example of interest from the <a href="https://github.com/open-telemetry/opentelemetry-cpp/tree/master/examples"> examples folder </a>.  Inside each example directory is a `BUILD` file containing instructions for Bazel.  Find the binary name of your example by inspecting the contents of this `BUILD` file.
-
-Build the example from the root of the opentelemetry-cpp directory using Bazel.  Replace  `<binary name>` with the identifier found in the previous step:
-
-```sh
-bazel build //examples/<example directory name>:<binary name>
-```
-
-Run the resulting executable to see telemetry from the application as it calls the instrumented library: </li>
-
-```sh
-bazel-bin/examples/<example directory name>/<binary name>
-```
-
-For instance, building and running the `simple` example can be done as follows:
-
-```sh
-bazel build //examples/simple:example_simple
-bazel-bin/examples/simple/example_simple
-```
-
 ## Useful Resources
 
 Hi! If you’re looking at this document, these resources will provide you the knowledge to get started as a newcomer to the Open Telemetry project. They will help you understand the Open Telemetry Project, its components, and specifically the C++ repository.
@@ -128,4 +128,4 @@ Hi! If you’re looking at this document, these resources will provide you the k
 * Take a look at this [Java SDK example.](https://github.com/open-telemetry/opentelemetry-java/tree/master/examples/sdk-usage) This shows a good use case of the SDK using stdout exporter.
 * Take a look at the [Java Jaeger example.](https://github.com/open-telemetry/opentelemetry-java/tree/master/examples/jaeger) This provides a brief introduction to the Jaeger exporter, its interface, and how to interact with the service.
 
-Please contribute! You’re welcome to add more information if you come across any helpful resources
+Please contribute! You’re welcome to add more information if you come across any helpful resources.
