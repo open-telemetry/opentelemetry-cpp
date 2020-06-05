@@ -1,7 +1,6 @@
 #pragma once
 
-#include <random>
-
+#include "opentelemetry/nostd/span.h"
 #include "opentelemetry/version.h"
 #include "src/common/fast_random_number_generator.h"
 
@@ -11,9 +10,29 @@ namespace sdk
 namespace common
 {
 /**
- * @return a seeded thread-local random number generator.
+ * Utility methods for creating random data, based on a seeded thread-local
+ * number generator.
  */
-FastRandomNumberGenerator &GetRandomNumberGenerator() noexcept;
+class Random
+{
+public:
+  /**
+   * @return an unsigned 64 bit random number
+   */
+  static uint64_t GenerateRandom64() noexcept;
+  /**
+   * Fill the passed span with random bytes.
+   *
+   * @param buffer A span of bytes.
+   */
+  static void GenerateRandomBuffer(opentelemetry::nostd::span<uint8_t> buffer) noexcept;
+
+private:
+  /**
+   * @return a seeded thread-local random number generator.
+   */
+  static FastRandomNumberGenerator &GetRandomNumberGenerator() noexcept;
+};
 }  // namespace common
 }  // namespace sdk
 OPENTELEMETRY_END_NAMESPACE
