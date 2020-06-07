@@ -3,8 +3,8 @@
 #include <cstdint>
 #include <cstdio>
 #include <cstdlib>
-
 #include <mutex>
+#include <unordered_map>
 
 #include <opentelemetry/trace/key_value_iterable_view.h>
 #include <opentelemetry/trace/span.h>
@@ -14,8 +14,8 @@
 
 #if 0
 // TODO: make it work with nostd implementation
-#include <opentelemetry/nostd/stl/shared_ptr.h>
-#include <opentelemetry/nostd/stl/unique_ptr.h>
+#  include <opentelemetry/nostd/stl/shared_ptr.h>
+#  include <opentelemetry/nostd/stl/unique_ptr.h>
 #endif
 
 #include <cstdint>
