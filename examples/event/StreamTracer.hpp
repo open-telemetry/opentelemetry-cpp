@@ -12,12 +12,18 @@
 #include <opentelemetry/trace/trace_id.h>
 #include <opentelemetry/trace/tracer_provider.h>
 
+#if 0
+// TODO: make it work with nostd implementation
+#include <opentelemetry/nostd/stl/shared_ptr.h>
+#include <opentelemetry/nostd/stl/unique_ptr.h>
+#endif
+
+#include <cstdint>
 #include <fstream>
 #include <iomanip>
 #include <iostream>
-#include <sstream>
 #include <memory>
-#include <cstdint>
+#include <sstream>
 
 #include "utils.hpp"
 
@@ -46,9 +52,9 @@ namespace stream
 /// </summary>
 enum class TraceStreamType
 {
-  ST_NULL,               // Cross-platform /dev/null or NUL
-  ST_File_Log,           // Cross-platform file - plain text k=v
-  ST_File_JSON,          // Cross-platform file - JSON
+  ST_NULL,       // Cross-platform /dev/null or NUL
+  ST_File_Log,   // Cross-platform file - plain text k=v
+  ST_File_JSON,  // Cross-platform file - JSON
 
   // Windows only:
   ST_OutputDebugString,  // OutputDebugString
@@ -56,10 +62,10 @@ enum class TraceStreamType
   ST_ETW_JSON,           // ETW API (JSON)
 
   // Unix only:
-  ST_SYSLOG,             // syslog            - *nix only
+  ST_SYSLOG,  // syslog            - *nix only
 
-  ST_CONSOLE,            // console (std::cout)
-  ST_USER,               // Custom
+  ST_CONSOLE,  // console (std::cout)
+  ST_USER,     // Custom
   ST_MAX
 };
 
@@ -84,7 +90,6 @@ protected:
   T buffer;
 
 public:
-
   /// <summary>
   /// Constructor that initializes custom stream buffer implementation
   /// </summary>
@@ -96,10 +101,7 @@ public:
   /// </summary>
   /// <param name="data">Tuple containing Event Data</param>
   /// <returns></returns>
-  virtual TraceStringStream<T> &operator<<(protocol::EventData data)
-  {
-      return *this;
-  }
+  virtual TraceStringStream<T> &operator<<(protocol::EventData data) { return *this; }
 };
 
 /// <summary>
@@ -108,7 +110,6 @@ public:
 class OutputDebugStringStreamBuffer : public TraceStreamBuffer
 {
 public:
-
   /// <summary>
   /// Pass UTF-8 string down to OutputDebugStringA
   /// </summary>
@@ -125,7 +126,6 @@ public:
     return 0;
 #endif
   }
-
 };
 
 /// <summary>
@@ -274,8 +274,7 @@ class Tracer : public trace::Tracer
       };
 
       case TraceStreamType::ST_File_Log:
-      case TraceStreamType::ST_File_JSON:
-      {
+      case TraceStreamType::ST_File_JSON: {
         // TODO: consider LogFileStream with automatic logs rotation
         auto s = new std::ofstream();
         s->open(filename, std::ios_base::out);
@@ -327,7 +326,6 @@ class Tracer : public trace::Tracer
   }
 
 public:
-
   /// <summary>
   /// Tracer constructor
   /// </summary>
@@ -349,14 +347,14 @@ public:
   /**
    * Q:
    *
-   * Is there a reason why we require unique_ptr here? In most cases the lifetime of a span should be
-   * managed by Tracer: every span has a parent tracer. Client code can hold a non-owning reference
-   * to Span. There could be multiple clients obtaining a reference to the same Span object as well.
-   * All clients must not use a Span if the Tracer is destroyed...
+   * Is there a reason why we require unique_ptr here? In most cases the lifetime of a span should
+   * be managed by Tracer: every span has a parent tracer. Client code can hold a non-owning
+   * reference to Span. There could be multiple clients obtaining a reference to the same Span
+   * object as well. All clients must not use a Span if the Tracer is destroyed...
    */
 
   /// <summary>
-  /// 
+  ///
   /// </summary>
   /// <param name="name">Span name</param>
   /// <param name="options">Span options</param>
@@ -373,10 +371,7 @@ public:
   /// </summary>
   /// <param name="timeout">Allow Tracer to drop data if timeout is reached</param>
   /// <returns>void</returns>
-  virtual void ForceFlushWithMicroseconds(uint64_t timeout) noexcept override
-  {
-
-  }
+  virtual void ForceFlushWithMicroseconds(uint64_t timeout) noexcept override {}
 
   /// <summary>
   /// Close tracer, spending up to given amount of microseconds to flush and close.
@@ -385,12 +380,12 @@ public:
   /// <returns></returns>
   virtual void CloseWithMicroseconds(uint64_t timeout) noexcept override
   {
-      sout.flush();
-      if (stream)
-      {
-          // TODO: do we need to perform extra actions to close it
-          // or should we assume that destructor takes care of it?
-      }
+    sout.flush();
+    if (stream)
+    {
+      // TODO: do we need to perform extra actions to close it
+      // or should we assume that destructor takes care of it?
+    }
   }
 
   /// <summary>
@@ -401,7 +396,8 @@ public:
   /// <param name="timestamp"></param>
   /// <param name="attributes"></param>
   /// <returns></returns>
-  void AddEvent(Span &span, nostd::string_view name,
+  void AddEvent(Span &span,
+                nostd::string_view name,
                 core::SystemTimestamp timestamp,
                 const trace::KeyValueIterable &attributes) noexcept
   {
@@ -433,7 +429,6 @@ public:
     sout << converter.convert(
         {name, std::chrono::system_clock::now(), trace::NullKeyValueIterable()});
   }
-
 };
 
 /// <summary>
@@ -443,14 +438,12 @@ class Span : public trace::Span
 {
 
 protected:
-
   /// <summary>
   /// Parent (Owner) Tracer of this Span
   /// </summary>
   Tracer &owner;
 
 public:
-
   /// <summary>
   /// Span constructor
   /// </summary>
@@ -464,20 +457,14 @@ public:
     (void)options;
   }
 
-  ~Span()
-  {
-      End();
-  }
+  ~Span() { End(); }
 
   /// <summary>
   /// Add named event with no attributes
   /// </summary>
   /// <param name="name"></param>
   /// <returns></returns>
-  void AddEvent(nostd::string_view name) noexcept
-  {
-      owner.AddEvent(*this, name);
-  }
+  void AddEvent(nostd::string_view name) noexcept { owner.AddEvent(*this, name); }
 
   /// <summary>
   /// Add named event with custom timestamp
@@ -512,7 +499,7 @@ public:
   /// <returns></returns>
   void SetStatus(trace::CanonicalCode code, nostd::string_view description) noexcept
   {
-      // TODO: not implemented
+    // TODO: not implemented
   }
 
   /// <summary>
@@ -522,7 +509,7 @@ public:
   /// <returns></returns>
   void UpdateName(nostd::string_view name) noexcept
   {
-      // TODO: not implemented
+    // TODO: not implemented
   }
 
   /// <summary>
@@ -531,7 +518,7 @@ public:
   /// <returns></returns>
   void End() noexcept
   {
-      // TODO: signal this to owner
+    // TODO: signal this to owner
   }
 
   /// <summary>
@@ -540,19 +527,15 @@ public:
   /// <returns></returns>
   bool IsRecording() const noexcept
   {
-      // TODO: not implemented
-      return true;
+    // TODO: not implemented
+    return true;
   }
 
   /// <summary>
   /// Get Owner tracer of this Span
   /// </summary>
   /// <returns></returns>
-  trace::Tracer &tracer() const noexcept
-  {
-      return this->owner;
-  };
-
+  trace::Tracer &tracer() const noexcept { return this->owner; };
 };
 
 /// <summary>
@@ -561,7 +544,6 @@ public:
 class TracerProvider : public trace::TracerProvider
 {
 public:
-
   /// <summary>
   /// Obtain a Tracer of given type (name) and supply extra argument arg2 to it.
   /// </summary>
@@ -574,22 +556,21 @@ public:
     TraceStreamType stype = TraceStreamType::ST_NULL;
     auto h                = utils::hashCode(name.data());
     // Map from string name to TraceStreamType
-    std::unordered_map<uint32_t, TraceStreamType> stypes =
-    {
-      {CONST_HASHCODE(console),   TraceStreamType::ST_CONSOLE},
-      {CONST_HASHCODE(CON),       TraceStreamType::ST_CONSOLE},
-      {CONST_HASHCODE(con),       TraceStreamType::ST_CONSOLE},
+    std::unordered_map<uint32_t, TraceStreamType> stypes = {
+        {CONST_HASHCODE(console), TraceStreamType::ST_CONSOLE},
+        {CONST_HASHCODE(CON), TraceStreamType::ST_CONSOLE},
+        {CONST_HASHCODE(con), TraceStreamType::ST_CONSOLE},
 #ifdef _WIN32
-      {CONST_HASHCODE(etw),       TraceStreamType::ST_ETW},
-      {CONST_HASHCODE(ETW),       TraceStreamType::ST_ETW},
-      {CONST_HASHCODE(debug),     TraceStreamType::ST_OutputDebugString},
-      {CONST_HASHCODE(DEBUG),     TraceStreamType::ST_OutputDebugString},
+        {CONST_HASHCODE(etw), TraceStreamType::ST_ETW},
+        {CONST_HASHCODE(ETW), TraceStreamType::ST_ETW},
+        {CONST_HASHCODE(debug), TraceStreamType::ST_OutputDebugString},
+        {CONST_HASHCODE(DEBUG), TraceStreamType::ST_OutputDebugString},
 #endif
-      {CONST_HASHCODE(NUL),       TraceStreamType::ST_NULL},
-      {CONST_HASHCODE(/dev/null), TraceStreamType::ST_NULL},
-      {CONST_HASHCODE(file),      TraceStreamType::ST_File_Log},
-      {CONST_HASHCODE(JSON),      TraceStreamType::ST_File_JSON},
-      {CONST_HASHCODE(json),      TraceStreamType::ST_File_JSON},
+        {CONST_HASHCODE(NUL), TraceStreamType::ST_NULL},
+        {CONST_HASHCODE(/ dev / null), TraceStreamType::ST_NULL},
+        {CONST_HASHCODE(file), TraceStreamType::ST_File_Log},
+        {CONST_HASHCODE(JSON), TraceStreamType::ST_File_JSON},
+        {CONST_HASHCODE(json), TraceStreamType::ST_File_JSON},
     };
     // TODO: add more types in here and allow user-registered streams
     auto it = stypes.find(h);

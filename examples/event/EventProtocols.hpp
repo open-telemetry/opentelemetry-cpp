@@ -12,10 +12,14 @@
 #include <opentelemetry/trace/trace_id.h>
 #include <opentelemetry/trace/tracer_provider.h>
 
-#include <cstdint>
+#if 0
+#include <opentelemetry/nostd/stl/string_view.h>
+#endif
+
 #include <iomanip>
 #include <iostream>
 #include <sstream>
+#include <tuple>
 
 #include "utils.hpp"
 
@@ -28,7 +32,8 @@ namespace protocol
 /// <summary>
 /// EventData type allows to aggregate Span name, Timestamp and Key-Value Attributes
 /// </summary>
-using EventData = std::tuple<nostd::string_view &, core::SystemTimestamp, const trace::KeyValueIterable &>;
+using EventData =
+    std::tuple<nostd::string_view &, core::SystemTimestamp, const trace::KeyValueIterable &>;
 
 /// <summary>
 /// Utility function to append AttributeValue string representation to stream
@@ -138,7 +143,8 @@ struct JsonConverter : EventConverter
        // TODO:
        // - decide on the best format for timestamp
        // - skip timestamp in low-latency agent-based env with sync events
-       << "\"time\":\"" << OPENTELEMETRY_NAMESPACE::utils::to_string(tp) << "\","
+       << "\"time\":\"" << OPENTELEMETRY_NAMESPACE::utils::to_string(tp)
+       << "\","
        // TODO:
        // - different schemas inside JSON may name event name field differently
        << "\"name\":"
@@ -151,8 +157,7 @@ struct JsonConverter : EventConverter
       size_t i = 1;
       // TODO: we need to do something with this iterator. It is not convenient.
       attributes.ForEachKeyValue(
-          [&](nostd::string_view key, common::AttributeValue value) noexcept
-          {
+          [&](nostd::string_view key, common::AttributeValue value) noexcept {
             ss << "\"" << key << "\":";
             print_value(ss, value, true);
             if (size != i)
@@ -167,7 +172,6 @@ struct JsonConverter : EventConverter
     ss << std::endl;
     return ss.str();
   }
-
 };
 
 ///
@@ -184,7 +188,8 @@ struct PlainKVConverter : EventConverter
     std::stringstream ss;
 
     ss << "time=\"" << OPENTELEMETRY_NAMESPACE::utils::to_string(tp) << "\", ";
-    ss << "name=" << "\"" << name << "\"";
+    ss << "name="
+       << "\"" << name << "\"";
     attributes.ForEachKeyValue([&](nostd::string_view key, common::AttributeValue value) noexcept {
       ss << ", ";
       ss << key << '=';
@@ -194,7 +199,6 @@ struct PlainKVConverter : EventConverter
     ss << std::endl;
     return ss.str();
   }
-
 };
 
 ///
@@ -242,13 +246,13 @@ struct ETWEventConverter : EventConverter
     if (s.length() % 2)
     {
       // padding
-      s+='\0';
+      s += '\0';
     }
     else
     {
       // NUL
-      s+='\0';
-      s+='\0';
+      s += '\0';
+      s += '\0';
     }
 
     return s;

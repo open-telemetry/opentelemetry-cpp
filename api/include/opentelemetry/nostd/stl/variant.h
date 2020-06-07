@@ -22,8 +22,8 @@
 #include "opentelemetry/nostd/detail/variant_alternative.h"
 #include "opentelemetry/nostd/detail/variant_fwd.h"
 #include "opentelemetry/nostd/detail/variant_size.h"
-#include "opentelemetry/nostd/type_traits.h"
-#include "opentelemetry/nostd/utility.h"
+#include "opentelemetry/nostd/stl/type_traits.h"
+#include "opentelemetry/nostd/stl/utility.h"
 #include "opentelemetry/version.h"
 
 #define AUTO_RETURN(...) \

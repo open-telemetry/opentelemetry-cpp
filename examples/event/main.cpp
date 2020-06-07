@@ -111,10 +111,14 @@ void test_spans()
       {"file", "trace.log"},
       // JSON text file
       {"json", "trace.json"},
+
+#ifdef _WIN32
       // JSON pipe listener (Windows)
       {"json", "\\\\.\\pipe\\ETW-6d084bbf-6a96-44ef-83F4-0a77c9e34580"},
       // ETW-XML listener (Windows)
       {"ETW", "{6D084BBF-6A96-44EF-83F4-0A77C9E34580}"},
+#endif
+
       // Console
       {"CON", "1.0"},
       // OutputDebugString (Visual Studio Debug Output window)
