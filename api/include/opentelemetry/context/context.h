@@ -1,19 +1,25 @@
 
-
+/*The context class provides a context identifier*/
 class Context{
   public:
+    
+    /*The identifier itself*/
     std::map<std::string, int> _ctx;
+   
+    /* Context: contructor 
+     * 
+     * Args: 
+     *  ctx: a map containing the context identifier
+     */
     Context(std::map<std::string, int> ctx);  
+    
+    /* Context operator[]: Prevents the modification of the identifier
+     *
+     * Args: none 
+     */
     Context operator[] (std::string i);    
 }
 
-Context::Context(std::map<std::string,int> ctx){
-  _ctx=ctx;
-}
-
-Context operator[](std::string){
-  throw "Value Error";  
-}
 
 
 
@@ -26,7 +32,7 @@ class RuntimeContext {
      * that can be used to reset to the previous Context.
      * 
      * Args:
-     *  context : the conext to set. 
+     *  context : the context to set. 
      */
     virtual int attach(RuntimeContext context);
     
