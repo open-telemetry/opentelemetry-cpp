@@ -1,5 +1,4 @@
-#ifndef CONTEXT_H_
-#define CONTEXT_H_
+#pragma once
 
 
 /*The context class provides a context identifier*/
