@@ -1,23 +1,24 @@
-#ifndef THREAD_LOCAL_CONTEXT_H_
-#define THREAD_LOCAL_CONTEXT_H_
+#ifndef CONTEXT_VARS_CONTEXT_H_
+#define CONTEXT_VARS_CONTEXT_H_
 
 #include "context.h"
-
 #include <string>
 
-/* An implementation of the runtime context that uses thread local storage*/
-class ThreadLocalRuntimeContext: public RuntimeContext(){  
+
+/* An implementation of the RuntimeContext interface which wraps 
+ * ContextVar under the hood */
+class ContextVarsRuntimeContext: public RuntimeContext{
 
   std::string _CONTEXT_KEY = "current_context";
-  
-  
 
-  /* ThreadLocalRuntimeContext: Default constructor to set the 
+
+  /* ContextVarsRuntimeContext: Default constructor to set the 
    * current context to the thread local context 
    * 
    * Args: None
    */
-  ThreadLocalRuntimeContext();
+  ContextVarsRuntimeContext();
+
 
   /* attach: Sets the current 'Context' object. Returns a token 
    * that can be used to reset to the previous Context.
@@ -25,24 +26,25 @@ class ThreadLocalRuntimeContext: public RuntimeContext(){
    * Args:
    *  context : the context to set. 
    */
-  Token attach(Context context)
+  Context attach(Context context);
+
 
   /* get_current: Return the current context.
    *
    * Args: None 
    */
-  Context get_current();  
-
-
+  Context get_current();
 
   /* detach: Resets the context to a previous value.
    * 
    * Args:
    *  token: A reference to a previous context
    */
-  void detach(Token token);
+  Token detach(Token token);
 
 };
 
 
-#endif  // THREAD_LOCAL_CONTEXT_H_
+
+#endif //CONTEXT_VARS_CONTEXT_H_
+
