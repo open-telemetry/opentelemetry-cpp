@@ -1,30 +1,27 @@
 #pragma once
 
+#include <map>
+#include <string>
+
+OPENTELEMETRY_BEGIN_NAMESPACE
+namespace context
+{
+
+
 /*The context class provides a context identifier*/
 class Context{
-  public:
-
+  private:
     /*The identifier itself*/
-    std::map<std::string, int> _ctx;
+    std::map<std::string, int> ctx_;
 
-    /* Context: contructor 
-     * 
-     * Args: 
-     *  ctx: a map containing the context identifier
+  public:
+    /* Context: contructor, creates a context object from a map
+     * of keys and identifiers
      */
     Context(std::map<std::string, int> ctx);  
 
-    /* Context operator[]: Prevents the modification of the identifier
-     *
-     * Args: none 
-     */
-    Context operator[] (std::string str);    
 };
 
-/* The token class provides:????*/
-class Token{
-  Token(); 
-};
 
 
 
@@ -34,38 +31,35 @@ class RuntimeContext {
   public:
 
 
+    /* The token class provides an identifier that is used by
+     * the attach and detach methods to keep track of context 
+     * objects.*/
+    class Token{
+      Token(); 
+    };
+
+
     /* RuntimeContext: A constructor that will set the current
      * context to the threading local.
-     * 
-     * Args: None.
      */
     RuntimeContext();
 
     /* attach: Sets the current 'Context' object. Returns a token 
      * that can be used to reset to the previous Context.
-     * 
-     * Args:
-     *  context : the context to set. 
      */
-    static Token attach(Context context);
+    static Token Attach(Context context);
 
 
     /* get_current: Return the current context.
-     *
-     * Args: None 
      */
-    static Context get_current();  
+    static Context getCurrent();  
 
 
     /* detach: Resets the context to a previous value.
-     * 
-     * Args:
-     *  token: A reference to a previous context
      */
-    static void detach(Token token);
+    static void Detach(Token token);
 
 
 };
 
-
-
+}
