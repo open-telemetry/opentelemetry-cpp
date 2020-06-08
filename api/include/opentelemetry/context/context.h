@@ -34,14 +34,14 @@ class RuntimeContext {
      * Args:
      *  context : the context to set. 
      */
-    virtual int attach(RuntimeContext context);
+    virtual int attach(Context context);
     
 
     /* get_current: Return the current context.
      *
      * Args: None 
      */
-    virtual RuntimeContext get_current();  
+    virtual Context get_current();  
 
 
     /* detach: Resets the context to a previous value.

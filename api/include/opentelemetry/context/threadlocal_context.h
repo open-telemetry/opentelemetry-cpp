@@ -11,7 +11,7 @@
 /* An implementation of the runtime context that uses thread local storage*/
 class ThreadLocalRuntimeContext :public RuntimeContext(){  
 
-  
+
 
 
   class Token{
@@ -31,7 +31,14 @@ class ThreadLocalRuntimeContext :public RuntimeContext(){
    * Args:
    *  context : the context to set. 
    */
-  attach(Context context)
+  Token attach(Context context)
+
+    /* get_current: Return the current context.
+     *
+     * Args: None 
+     */
+    Context get_current();  
+
 
 
   /* detach: Resets the context to a previous value.
