@@ -1,5 +1,4 @@
-#ifndef CONTEXT_VARS_CONTEXT_H_
-#define CONTEXT_VARS_CONTEXT_H_
+#pragma once
 
 #include "context.h"
 #include <string>
@@ -45,6 +44,4 @@ class ContextVarsRuntimeContext: public RuntimeContext{
 };
 
 
-
-#endif //CONTEXT_VARS_CONTEXT_H_
 

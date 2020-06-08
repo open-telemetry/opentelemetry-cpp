@@ -1,6 +1,4 @@
-#ifndef CONTEXT_H_
-#define CONTEXT_H_
-
+#pragma once
 
 /*The context class provides a context identifier*/
 class Context{
@@ -20,7 +18,7 @@ class Context{
      *
      * Args: none 
      */
-    Context operator[] (std::string i);    
+    Context operator[] (std::string str);    
 };
 
 /* The token class provides:????*/
@@ -56,10 +54,10 @@ class RuntimeContext {
      * Args:
      *  token: A reference to a previous context
      */
-    virtual void detach(int);
+    virtual void detach(Token token);
 
 
 };
 
 
-#endif //CONTEXT_H_
+

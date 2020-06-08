@@ -1,5 +1,4 @@
-#ifndef THREAD_LOCAL_CONTEXT_H_
-#define THREAD_LOCAL_CONTEXT_H_
+#pragma once
 
 #include "context.h"
 
@@ -44,5 +43,3 @@ class ThreadLocalRuntimeContext: public RuntimeContext(){
 
 };
 
-
-#endif  // THREAD_LOCAL_CONTEXT_H_
