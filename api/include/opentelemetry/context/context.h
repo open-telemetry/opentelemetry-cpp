@@ -52,7 +52,7 @@ class RuntimeContext {
 
     /* get_current: Return the current context.
      */
-    static Context getCurrent();  
+    static Context GetCurrent();  
 
 
     /* detach: Resets the context to a previous value.
