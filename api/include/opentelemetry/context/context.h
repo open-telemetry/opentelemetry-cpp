@@ -33,6 +33,14 @@ class Token{
 class RuntimeContext {
   public:
 
+
+    /* RuntimeContext: A constructor that will set the current
+     * context to the threading local.
+     * 
+     * Args: None.
+     */
+    RuntimeContext();
+
     /* attach: Sets the current 'Context' object. Returns a token 
      * that can be used to reset to the previous Context.
      * 
