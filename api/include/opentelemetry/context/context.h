@@ -39,14 +39,14 @@ class RuntimeContext {
      * Args:
      *  context : the context to set. 
      */
-    virtual int attach(Context context);
+    static Token attach(Context context);
 
 
     /* get_current: Return the current context.
      *
      * Args: None 
      */
-    virtual Context get_current();  
+    static Context get_current();  
 
 
     /* detach: Resets the context to a previous value.
@@ -54,7 +54,7 @@ class RuntimeContext {
      * Args:
      *  token: A reference to a previous context
      */
-    virtual void detach(Token token);
+    static void detach(Token token);
 
 
 };
