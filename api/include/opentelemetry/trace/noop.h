@@ -38,7 +38,7 @@ public:
 
   void UpdateName(nostd::string_view /*name*/) noexcept override {}
 
-  void End() noexcept override {}
+  void End(const EndSpanOptions &options = {}) noexcept override {}
 
   bool IsRecording() const noexcept override { return false; }
 
