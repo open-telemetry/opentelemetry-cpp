@@ -22,22 +22,18 @@ class Context{
 
 };
 
-
+/* The token class provides an identifier that is used by
+ * the RuntimeContext attach and detach methods to keep track of context 
+ * objects.*/
+class Token{
+  Token(); 
+};
 
 
 /* The RuntimeContext class provides a wrapper for 
  * propogating context through cpp*/
 class RuntimeContext {
   public:
-
-
-    /* The token class provides an identifier that is used by
-     * the attach and detach methods to keep track of context 
-     * objects.*/
-    class Token{
-      Token(); 
-    };
-
 
     /* RuntimeContext: A constructor that will set the current
      * context to the threading local.
