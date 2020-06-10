@@ -12,9 +12,7 @@
 #include <opentelemetry/trace/trace_id.h>
 #include <opentelemetry/trace/tracer_provider.h>
 
-#if 0
-#include <opentelemetry/nostd/stl/string_view.h>
-#endif
+#include <opentelemetry/common/stltypes.h>
 
 #include <iomanip>
 #include <iostream>
@@ -50,33 +48,33 @@ static void print_value(std::stringstream &ss,
     case common::AttributeType::TYPE_BOOL:
       if (jsonTypes)
       {
-        ss << (std::get<bool>(value) ? "true" : "false");
+        ss << (nostd::get<bool>(value) ? "true" : "false");
       }
       else
       {
-        ss << static_cast<unsigned>(std::get<bool>(value));
+        ss << static_cast<unsigned>(nostd::get<bool>(value));
       }
       break;
     case common::AttributeType::TYPE_INT:
-      ss << std::get<int32_t>(value);
+      ss << nostd::get<int32_t>(value);
       break;
     case common::AttributeType::TYPE_INT64:
-      ss << std::get<int64_t>(value);
+      ss << nostd::get<int64_t>(value);
       break;
     case common::AttributeType::TYPE_UINT:
-      ss << std::get<uint32_t>(value);
+      ss << nostd::get<uint32_t>(value);
       break;
     case common::AttributeType::TYPE_UINT64:
-      ss << std::get<uint64_t>(value);
+      ss << nostd::get<uint64_t>(value);
       break;
     case common::AttributeType::TYPE_DOUBLE:
-      ss << std::get<double>(value);
+      ss << nostd::get<double>(value);
       break;
     case common::AttributeType::TYPE_STRING:
       if (jsonTypes)
         ss << '"';
       // TODO: do we need to escape string value for JSON?
-      ss << std::get<nostd::string_view>(value);
+      ss << nostd::get<nostd::string_view>(value);
       if (jsonTypes)
         ss << '"';
       break;
@@ -84,14 +82,14 @@ static void print_value(std::stringstream &ss,
       if (jsonTypes)
         ss << '"';
       // TODO: do we need to escape string value for JSON?
-      ss << std::get<const char *>(value);
+      ss << nostd::get<const char *>(value);
       if (jsonTypes)
         ss << '"';
       break;
     case common::AttributeType::TYPE_SPAN_BYTE: {
       ss << '[';
       // TODO: do we need to escape string value for JSON?
-      auto s    = std::get<nostd::span<const uint8_t>>(value);
+      auto s    = nostd::get<nostd::span<const uint8_t>>(value);
       size_t i  = 1;
       size_t sz = s.size();
       for (auto v : s)

@@ -13,6 +13,7 @@ export CC=gcc-9
 #/usr/local/Cellar/gcc/9.3.0_1/bin/gcc-9
 export CXX=g++-9
 #/usr/local/Cellar/gcc/9.3.0_1/bin/g++-9
+rm -rf build
 mkdir -p build
 cd build
 cmake -DCMAKE_OSX_SYSROOT=/Library/Developer/CommandLineTools/SDKs/MacOSX10.15.sdk ..

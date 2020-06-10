@@ -154,7 +154,10 @@ public:
   /// Fastest method to ignore anything sent to stream is to set the badbit
   /// </summary>
   /// <returns>stream constructed with badbit set</returns>
-  NullStringStream() : TraceStringStream<NullStreamBuffer>() { setstate(std::ios_base::badbit); }
+  NullStringStream() : TraceStringStream<NullStreamBuffer>()
+  {
+    std::ios::setstate(std::ios_base::badbit);
+  }
 };
 
 #ifdef _WIN32
@@ -335,7 +338,7 @@ public:
   /// <returns>Tracer instance</returns>
   Tracer(trace::TracerProvider &parent,
          TraceStreamType streamType = TraceStreamType::ST_CONSOLE,
-         std::string_view arg2      = "")
+         nostd::string_view arg2    = "")
       : trace::Tracer(),
         provider(parent),
         stype(streamType),

@@ -11,7 +11,7 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O0 -ggdb -gdwarf-2 -std=c++2a")
 #set(CMAKE_C_FLAGS   "${CMAKE_C_FLAGS} -O0 -ggdb -gdwarf-2 -std=c1z")
 #set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O0 -ggdb -gdwarf-2 -std=c++17")
 
-add_definitions(-DHAVE_STDLIB_CPP -DHAVE_GSL)
+#add_definitions(-DHAVE_STDLIB_CPP -DHAVE_GSL)
 
 # MS Guidelines Support Library
 set(GSL_DIR ../../third_party/ms-gsl)

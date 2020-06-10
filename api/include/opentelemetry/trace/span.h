@@ -2,8 +2,8 @@
 
 #include <cstdint>
 
-#include "opentelemetry/core/timestamp.h"
 #include "opentelemetry/common/stltypes.h"
+#include "opentelemetry/core/timestamp.h"
 #include "opentelemetry/trace/canonical_code.h"
 #include "opentelemetry/trace/key_value_iterable_view.h"
 #include "opentelemetry/version.h"
@@ -148,7 +148,7 @@ public:
 
 // TODO consider std::is_pointer to verify the template argument type
 template <class SpanType, class TracerType>
-nostd::unique_ptr<trace::Span> to_span_ptr(TracerType* objPtr,
+nostd::unique_ptr<trace::Span> to_span_ptr(TracerType *objPtr,
                                            nostd::string_view name,
                                            const trace::StartSpanOptions &options)
 {

@@ -1,6 +1,8 @@
 #pragma once
 
 #include <memory>
+#include <utility>
+#include <cstdlib>
 
 #include "opentelemetry/version.h"
 

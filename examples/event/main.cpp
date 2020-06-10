@@ -101,7 +101,9 @@ void test_events()
   LogEvent(myEvent3);
 }
 
-using M = std::map<std::string_view, std::string_view>;
+// using M = std::map<std::string_view, std::string_view>;
+
+using M = std::map<nostd::string_view, nostd::string_view>;
 
 void test_spans()
 {
@@ -122,8 +124,7 @@ void test_spans()
       // Console
       {"CON", "1.0"},
       // OutputDebugString (Visual Studio Debug Output window)
-      {"DEBUG", "1.0"}
-  };
+      {"DEBUG", "1.0"}};
 
   for (auto &kv : testParams)
   {
@@ -149,8 +150,7 @@ void test_spans()
         {/* C-string */ {"key1", "value1"},
          /* int32_t  */ {"intKey", 12345},
          /* bool     */ {"boolKey", static_cast<bool>(true)},
-         /* GUID     */ {"guidKey1", UUID_t("00010203-0405-0607-0809-0A0B0C0D0E0F")}
-        });
+         /* GUID     */ {"guidKey1", UUID_t("00010203-0405-0607-0809-0A0B0C0D0E0F")}});
     auto name = myEvent.GetName();
     span->AddEvent(nostd::string_view(name.c_str(), name.length()), myEvent);
 
@@ -164,9 +164,9 @@ void test_spans()
 
 int main(int argc, char *argv[])
 {
-  //std::string_view hello{"hello!\n"};
-  //cstring hi(hello);
-  //std::cout << hi;
+  // std::string_view hello{"hello!\n"};
+  // cstring hi(hello);
+  // std::cout << hi;
 
   test_events();
   test_spans();
