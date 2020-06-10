@@ -1,6 +1,5 @@
 #pragma once
 
-
 #include <map>
 #include <string>
 #include <mutex>
@@ -13,21 +12,8 @@ namespace context
 
   std::mutex context_id_mutex;
 
-  /*The context class provides a context identifier*/
+  /*The context class provides a context identifier */
   class Context{
-
-    private:
-
-      /*The identifier itself*/
-      std::map<int, int> ctx_map_;
-
-      /*Used to track that last ContextKey identifier and create the next one */
-      static int last_key_identifier_;
-      
-      /* Context: A constructor that accepts a key/value map*/
-      Context(std::map<int,int> ctx_map){
-        ctx_map_ = ctx_map;
-      } 
 
     public:
 
@@ -44,13 +30,13 @@ namespace context
           int identifier_;
 
 
-          /* GetIdentifier: returns the identifier*/
+          /* GetIdentifier: returns the identifier */
           int GetIdentifier(){
             return identifier_;
           }
 
-          /* ContextKey: constructs a new ContextKey with the 
-           * passed in name and identifier.
+          /* Constructs a new ContextKey with the passed in name and 
+           * identifier.
            */
           ContextKey(std::string key_name, int identifier){
             key_name_ = key_name;
@@ -59,9 +45,8 @@ namespace context
 
         public:
           
-          /* ContextKey: Consructs a new ContextKey with the passed in name 
-           * and increments the identifier then assigns it to be the key's
-           * identifier.
+          /* Consructs a new ContextKey with the passed in name and increments
+           * the identifier then assigns it to be the key's identifier.
            */
           ContextKey(std::string key_name){
             key_name_ = key_name;
@@ -78,14 +63,13 @@ namespace context
       };
 
 
-      /* Context: contructor, creates a context object with no key/value pairs
-       */
+      /* Creates a context object with no key/value pairs */
       Context(){
         ctx_map_ = std::map<int,int> {};
 
       }
 
-      /* Context: contructor, creates a context object from a map
+      /* Contructor, creates a context object from a map
        * of keys and identifiers
        */
       Context(ContextKey key, int value){
@@ -93,7 +77,7 @@ namespace context
       } 
 
 
-      /* WriteValue: accepts a new key/value pair and then returns a new
+      /* Accepts a new key/value pair and then returns a new
        * context that contains both the original pairs and the new pair.
        */
       Context WriteValue(ContextKey key, int value){
@@ -104,14 +88,22 @@ namespace context
         return Context(temp_map);
       } 
 
+      /* Class comparator to see if the context maps are the same. */
+      bool operator == (const Context &context){
+        if(context.ctx_map_ == ctx_map_){
+          return true;
+        }
+        else{
+          return false;
+        }
+      }
 
-      /* GetValue: Returns the value associated with the passed in key
-       */
+      /* Returns the value associated with the passed in key */
       int GetValue(ContextKey key){
         return ctx_map_[key.GetIdentifier()];
       } 
 
-      /* CreateKey: Returns a ContextKey that has the passed in name and the
+      /* Returns a ContextKey that has the passed in name and the
        * next available identifier.*/
       ContextKey CreateKey(std::string key_name){
         int id;
@@ -127,6 +119,19 @@ namespace context
         return ContextKey(key_name,id); 
       } 
 
+    private:
+
+      /* The identifier itself */
+      std::map<int, int> ctx_map_;
+
+      /*Used to track that last ContextKey identifier and create the next one */
+      static int last_key_identifier_;
+      
+      /* A constructor that accepts a key/value map */
+      Context(std::map<int,int> ctx_map){
+        ctx_map_ = ctx_map;
+      } 
+
 
   };
 
@@ -134,53 +139,51 @@ namespace context
 
   /* The token class provides an identifier that is used by
    * the attach and detach methods to keep track of context 
-   * objects.*/
+   * objects. 
+   */
 
   class Token{
-    private:
-
-      Context ctx_;
 
     public:
       
-      /* Token: A constructor that sets the token's Context object to the
+      /* A constructor that sets the token's Context object to the
        * one that was passed in. 
        */
       Token(Context &ctx){
         ctx_ = ctx;  
       } 
 
-      /* GetContext: Returns the stored context object */
+      /* Returns the stored context object */
       Context GetContext(){
         return ctx_;
       }
 
+    private:
+
+      Context ctx_;
   };
 
 
   /* The RuntimeContext class provides a wrapper for 
-   * propogating context through cpp*/
+   * propogating context through cpp. */
   class RuntimeContext {
-    private:
-     
-      static thread_local Context context_;
 
     public:
 
 
+      /* A default constructor that will set the context to
+       * an empty context object.
+       */
       RuntimeContext(){
         context_ = Context();
       }
 
-
-      /* RuntimeContext: A constructor that will set the context as
-       * the passed in context.
-       */
+      /* A constructor that will set the context as the passed in context. */
       RuntimeContext(Context &context){ 
         context_ = context;
       }
 
-      /* attach: Sets the current 'Context' object. Returns a token 
+      /* Sets the current 'Context' object. Returns a token 
        * that can be used to reset to the previous Context.
        */
       Token Attach(Context &context){
@@ -193,21 +196,32 @@ namespace context
       }
 
 
-      /* GetCurrent: Return the current context.
-       */
+      /* Return the current context. */
       static Context GetCurrent(){
         Context context = context_;
         return context_;  
       }
 
 
-
-      /* Detach: Resets the context to a previous value stored in the 
-       * passed in token.
+      /* Resets the context to a previous value stored in the 
+       * passed in token. Returns zero if successful, -1 otherwise
        */
-      void Detach(Token &token){
-        context_ = token.GetContext();      
+      int Detach(Token &token){
+        
+        if(token.GetContext() == context_){
+
+          return -1;
+        }
+        
+        context_ = token.GetContext();
+         
+        return 0;     
       }
+
+
+    private:
+     
+      static thread_local Context context_;
 
   };
   

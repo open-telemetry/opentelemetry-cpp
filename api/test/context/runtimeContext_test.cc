@@ -49,8 +49,10 @@ TEST(runtimeContext_test, attach_detach_context)
   EXPECT_EQ(test_runtime.GetCurrent().GetValue(foo_key), 
             foo_context.GetValue(foo_key));  
 
-  test_runtime.Detach(test_token);  
+  int detach_result = test_runtime.Detach(test_token);  
 
+  EXPECT_EQ(detach_result, 0);  
+  
   EXPECT_EQ(test_runtime.GetCurrent().GetValue(test_key), 
             test_context.GetValue(test_key));  
   EXPECT_NE(test_runtime.GetCurrent().GetValue(foo_key), 
