@@ -43,7 +43,3 @@ TEST(Context_test, context_write_new_object)
   EXPECT_EQ(new_test_context.GetValue(foo_key), 1);
 }
 
-
-
-
-
