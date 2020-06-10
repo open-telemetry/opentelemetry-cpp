@@ -19,14 +19,14 @@ namespace context
     private:
 
       /*The identifier itself*/
-      std::map<int, int> ctx_;
+      std::map<int, int> ctx_map_;
 
       /*Used to track that last ContextKey identifier and create the next one */
       static int last_key_identifier_;
       
       /* Context: A constructor that accepts a key/value map*/
-      Context(std::map<int,int> ctx){
-        ctx_ = ctx;
+      Context(std::map<int,int> ctx_map){
+        ctx_map_ = ctx_map;
       } 
 
     public:
@@ -81,7 +81,7 @@ namespace context
       /* Context: contructor, creates a context object with no key/value pairs
        */
       Context(){
-        ctx_ = std::map<int,int> {};
+        ctx_map_ = std::map<int,int> {};
 
       }
 
@@ -89,7 +89,7 @@ namespace context
        * of keys and identifiers
        */
       Context(ContextKey key, int value){
-        ctx_[key.GetIdentifier()] = value;
+        ctx_map_[key.GetIdentifier()] = value;
       } 
 
 
@@ -97,7 +97,7 @@ namespace context
        * context that contains both the original pairs and the new pair.
        */
       Context WriteValue(ContextKey key, int value){
-        std::map<int, int> temp_map = ctx_;
+        std::map<int, int> temp_map = ctx_map_;
 
         temp_map[key.GetIdentifier()] = value;
 
@@ -108,7 +108,7 @@ namespace context
       /* GetValue: Returns the value associated with the passed in key
        */
       int GetValue(ContextKey key){
-        return ctx_[key.GetIdentifier()];
+        return ctx_map_[key.GetIdentifier()];
       } 
 
       /* CreateKey: Returns a ContextKey that has the passed in name and the
@@ -146,7 +146,7 @@ namespace context
       /* Token: A constructor that sets the token's Context object to the
        * one that was passed in. 
        */
-      Token(Context ctx){
+      Token(Context &ctx){
         ctx_ = ctx;  
       } 
 
@@ -178,7 +178,7 @@ namespace context
       /* RuntimeContext: A constructor that will set the context as
        * the passed in context.
        */
-      RuntimeContext(Context context){ 
+      RuntimeContext(Context &context){ 
 
         context_ = context;
       }
@@ -186,7 +186,7 @@ namespace context
       /* attach: Sets the current 'Context' object. Returns a token 
        * that can be used to reset to the previous Context.
        */
-      Token Attach(Context context){
+      Token Attach(Context &context){
 
         Token old_context_token = Token(context_);
 
@@ -208,7 +208,7 @@ namespace context
       /* Detach: Resets the context to a previous value stored in the 
        * passed in token.
        */
-      void Detach(Token token){
+      void Detach(Token &token){
         context_ = token.GetContext();      
       }
 
