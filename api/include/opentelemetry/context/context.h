@@ -168,18 +168,15 @@ namespace context
     public:
 
 
-      /* RuntimeContext: A default constructor that will set the context to
-       * an empty context object.
-       */
       RuntimeContext(){
         context_ = Context();
       }
+
 
       /* RuntimeContext: A constructor that will set the context as
        * the passed in context.
        */
       RuntimeContext(Context &context){ 
-
         context_ = context;
       }
 
@@ -193,7 +190,6 @@ namespace context
         context_ = context;
 
         return old_context_token;
-
       }
 
 
@@ -203,6 +199,7 @@ namespace context
         Context context = context_;
         return context_;  
       }
+
 
 
       /* Detach: Resets the context to a previous value stored in the 
