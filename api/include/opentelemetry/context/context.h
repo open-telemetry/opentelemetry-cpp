@@ -1,6 +1,5 @@
 #pragma once
 
-
 #include <map>
 #include <string>
 #include <mutex>
@@ -13,7 +12,7 @@ namespace context
 
   std::mutex context_id_mutex;
 
-  /*The context class provides a context identifier*/
+  /*The context class provides a context identifier */
   class Context{
 
     public:
@@ -31,7 +30,7 @@ namespace context
           int identifier_;
 
 
-          /* GetIdentifier: returns the identifier*/
+          /* GetIdentifier: returns the identifier */
           int GetIdentifier(){
             return identifier_;
           }
@@ -64,8 +63,7 @@ namespace context
       };
 
 
-      /* Creates a context object with no key/value pairs
-       */
+      /* Creates a context object with no key/value pairs */
       Context(){
         ctx_map_ = std::map<int,int> {};
 
@@ -90,6 +88,15 @@ namespace context
         return Context(temp_map);
       } 
 
+      /* Class comparator to see if the context maps are the same. */
+      bool operator == (const Context &context){
+        if(context.ctx_map_ == ctx_map_){
+          return true;
+        }
+        else{
+          return false;
+        }
+      }
 
       /* Returns the value associated with the passed in key */
       int GetValue(ContextKey key){
@@ -114,13 +121,13 @@ namespace context
 
     private:
 
-      /*The identifier itself*/
+      /* The identifier itself */
       std::map<int, int> ctx_map_;
 
       /*Used to track that last ContextKey identifier and create the next one */
       static int last_key_identifier_;
       
-      /* A constructor that accepts a key/value map*/
+      /* A constructor that accepts a key/value map */
       Context(std::map<int,int> ctx_map){
         ctx_map_ = ctx_map;
       } 
@@ -132,7 +139,8 @@ namespace context
 
   /* The token class provides an identifier that is used by
    * the attach and detach methods to keep track of context 
-   * objects.*/
+   * objects. 
+   */
 
   class Token{
 
@@ -157,7 +165,7 @@ namespace context
 
 
   /* The RuntimeContext class provides a wrapper for 
-   * propogating context through cpp*/
+   * propogating context through cpp. */
   class RuntimeContext {
 
     public:
@@ -170,7 +178,7 @@ namespace context
         context_ = Context();
       }
 
-      /* A constructor that will set the context as the passed in context.*/
+      /* A constructor that will set the context as the passed in context. */
       RuntimeContext(Context &context){ 
         context_ = context;
       }
@@ -188,8 +196,7 @@ namespace context
       }
 
 
-      /* Return the current context.
-       */
+      /* Return the current context. */
       static Context GetCurrent(){
         Context context = context_;
         return context_;  
@@ -197,10 +204,18 @@ namespace context
 
 
       /* Resets the context to a previous value stored in the 
-       * passed in token. 
+       * passed in token. Returns zero if successful, -1 otherwise
        */
       int Detach(Token &token){
-        context_ = token.GetContext();      
+        
+        if(token.GetContext() == context_){
+
+          return -1;
+        }
+        
+        context_ = token.GetContext();
+         
+        return 0;     
       }
 
 
