@@ -172,7 +172,6 @@ namespace context
 
       /* A constructor that will set the context as the passed in context.*/
       RuntimeContext(Context &context){ 
-
         context_ = context;
       }
 
@@ -186,7 +185,6 @@ namespace context
         context_ = context;
 
         return old_context_token;
-
       }
 
 
