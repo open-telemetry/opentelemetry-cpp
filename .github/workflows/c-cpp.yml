@@ -7,11 +7,9 @@ on:
     branches: [ master ]
 
 jobs:
-  
   cmake_test:
-    
+    name: Build with CMake, then run tests
     runs-on: ubuntu-latest
-    
     steps:
     - uses: actions/checkout@v2
     - name: setup
@@ -20,9 +18,8 @@ jobs:
       run: ./ci/do_ci.sh cmake.test
 
   plugin_test:
-    
+    name: Statically link a plugin library, then build using CMake
     runs-on: ubuntu-latest
-    
     steps:
     - uses: actions/checkout@v2
     - name: setup
@@ -31,9 +28,8 @@ jobs:
       run: ./ci/do_ci.sh cmake.test_example_plugin
   
   gcc_48_test:
-    
+    name: Build using legacy version of Bazel
     runs-on: ubuntu-latest
-    
     steps:
     - uses: actions/checkout@v2
     - name: setup
@@ -42,9 +38,8 @@ jobs:
       run: ./ci/do_ci.sh bazel.legacy.test
       
   bazel_test:
-    
+    name: Build with Bazel
     runs-on: ubuntu-latest
-    
     steps:
     - uses: actions/checkout@v2
     - name: setup
@@ -53,9 +48,8 @@ jobs:
       run: ./ci/do_ci.sh bazel.test
 
   bazel_noexcept:
-    
+    name: Build with Bazel with no-exceptions flag set
     runs-on: ubuntu-latest
-    
     steps:
     - uses: actions/checkout@v2
     - name: setup
@@ -64,9 +58,8 @@ jobs:
       run: ./ci/do_ci.sh bazel.noexcept
 
   bazel_asan:
-    
+    name: Build with Bazel with "asan" config
     runs-on: ubuntu-latest
-    
     steps:
     - uses: actions/checkout@v2
     - name: setup
@@ -75,9 +68,8 @@ jobs:
       run: ./ci/do_ci.sh bazel.asan
 
   bazel_tsan:
-    
+    name: Build with Bazel with "tsan" config
     runs-on: ubuntu-latest
-    
     steps:
     - uses: actions/checkout@v2
     - name: setup
@@ -86,9 +78,8 @@ jobs:
       run: ./ci/do_ci.sh bazel.tsan
 
   benchmark:
-    
+    name: Run benchmarks
     runs-on: ubuntu-latest
-    
     steps:
     - uses: actions/checkout@v2
     - name: setup
@@ -98,9 +89,8 @@ jobs:
 
 
   format:
-    
+    name: Run format tool
     runs-on: ubuntu-latest
-    
     steps:
     - uses: actions/checkout@v2
     - name: setup
@@ -109,18 +99,16 @@ jobs:
       run: ./ci/do_ci.sh bazel.test
 
   osx_test:
-    
+    name: Build with Bazel on MacOS runner
     runs-on: macos-latest
-    
     steps:
     - uses: actions/checkout@v2
     - name: run tests
       run: ./ci/do_ci.sh bazel.test
 
   windows:
-    
+    name: Build with CMake, run tests, then test exporter protocol on Windows runner
     runs-on: windows-2019
-    
     steps:
     - uses: actions/checkout@v2
     - name: setup
@@ -132,9 +120,8 @@ jobs:
       run: ./ci/do_ci.sh cmake.exporter.otprotocol.test
 
   windows_bazel:
-    
+    name: Build with Bazel on Windows runner
     runs-on: windows-2019
-    
     steps:
     - uses: actions/checkout@v2
     - name: setup
@@ -143,9 +130,8 @@ jobs:
       run: ./ci/do_ci.ps1 bazel.build
 
   windows_plugin_test:
-    
+    name: Statically link a plugin library, then build using CMake on Windows runner
     runs-on: windows-2019
-    
     steps:
     - uses: actions/checkout@v2
     - name: setup
