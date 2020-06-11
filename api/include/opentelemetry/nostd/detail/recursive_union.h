@@ -13,7 +13,7 @@
 
 #include "opentelemetry/nostd/detail/trait.h"
 #include "opentelemetry/nostd/detail/valueless.h"
-#include "opentelemetry/nostd/stl/utility.h"
+#include "opentelemetry/nostd/utility.h"
 #include "opentelemetry/version.h"
 
 #define AUTO_REFREF_RETURN(...)                                           \

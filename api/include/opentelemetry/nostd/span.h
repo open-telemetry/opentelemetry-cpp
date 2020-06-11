@@ -8,7 +8,7 @@
 #include <type_traits>
 
 #ifndef HAVE_STDLIB_CPP
-#include "opentelemetry/nostd/stl/utility.h"
+#include "opentelemetry/nostd/utility.h"
 #else
 #include <utility>
 #endif
