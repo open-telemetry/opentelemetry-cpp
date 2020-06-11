@@ -1,5 +1,5 @@
 #include "opentelemetry/trace/provider.h"
-#include "opentelemetry/nostd/shared_ptr.h"
+#include "opentelemetry/nostd/stltypes.h"
 
 #include <gtest/gtest.h>
 

@@ -2,7 +2,7 @@
 
 #include <atomic>
 
-#include "opentelemetry/nostd/shared_ptr.h"
+#include "opentelemetry/nostd/stltypes.h"
 #include "opentelemetry/trace/noop.h"
 #include "opentelemetry/trace/tracer_provider.h"
 

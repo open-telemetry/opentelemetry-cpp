@@ -10,9 +10,16 @@ set(CMAKE_CXX_STANDARD 11)
 
 option(WITH_STL
        "Whether to use Standard Library for C++latest features" OFF)
+
 if(WITH_STL)
-# We require at least C++17. C++20 is required to avoid using gsl::span
-set(CMAKE_CXX_STANDARD 17)
+# We require at least C++17. C++20 is optimal to avoid gsl::span
+add_definitions(-DHAVE_STDLIB_CPP -DHAVE_GSL)
+set(CMAKE_CXX_STANDARD 20)
+# Guidelines Support Library path
+set(GSL_DIR third_party/ms-gsl)
+include_directories(${GSL_DIR}/include)
+# TODO: use latest
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++2a")
 endif()
 
 option(WITH_OTPROTOCOL

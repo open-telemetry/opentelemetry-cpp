@@ -3,7 +3,7 @@
 #include <memory>
 #include <string>
 
-#include "opentelemetry/nostd/string_view.h"
+#include "opentelemetry/nostd/stltypes.h"
 #include "opentelemetry/version.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
