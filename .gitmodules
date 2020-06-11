@@ -7,3 +7,8 @@
 	path = "third_party/ms-gsl"
 	url = https://github.com/microsoft/GSL
 	branch = master
+
+[submodule "third_party/googletest"]
+	path = "third_party/googletest"
+	url = https://github.com/google/googletest
+	branch = master
