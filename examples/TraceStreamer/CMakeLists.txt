@@ -38,4 +38,4 @@ include_directories( . ${OPENTELEMETRY_API_DIR}/include /usr/include)
 add_executable(TraceStreamer main.cpp)
 source_group(" " REGULAR_EXPRESSION "")
 
-target_link_libraries(TraceStreamer ${CMAKE_THREAD_LIBS_INIT} ${PLATFORM_LIBS} dl)
+target_link_libraries(TraceStreamer ${CMAKE_THREAD_LIBS_INIT} ${PLATFORM_LIBS} ${CMAKE_DL_LIBS})
