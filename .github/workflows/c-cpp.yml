@@ -13,7 +13,9 @@ jobs:
     steps:
     - uses: actions/checkout@v2
     - name: setup
-      run: sudo ./ci/setup_cmake.sh ./ci/setup_ci_environment.sh
+      run: |
+        sudo ./ci/setup_cmake.sh 
+        sudo ./ci/setup_ci_environment.sh
     - name: run tests
       run: ./ci/do_ci.sh cmake.test
 
@@ -23,7 +25,9 @@ jobs:
     steps:
     - uses: actions/checkout@v2
     - name: setup
-      run: sudo ./ci/setup_cmake.sh ./ci/setup_ci_environment.sh
+      run: |
+        sudo ./ci/setup_cmake.sh 
+        sudo ./ci/setup_ci_environment.sh
     - name: run tests
       run: ./ci/do_ci.sh cmake.test_example_plugin
   
@@ -33,7 +37,10 @@ jobs:
     steps:
     - uses: actions/checkout@v2
     - name: setup
-      run: sudo ./ci/setup_ci_environment.sh ./ci/install_bazelisk.sh ./ci/install_gcc48.sh
+      run: |
+        sudo ./ci/setup_ci_environment.sh 
+        sudo ./ci/install_bazelisk.sh 
+        sudo ./ci/install_gcc48.sh
     - name: run tests
       run: ./ci/do_ci.sh bazel.legacy.test
       
@@ -43,7 +50,10 @@ jobs:
     steps:
     - uses: actions/checkout@v2
     - name: setup
-      run: sudo ./ci/setup_cmake.sh ./ci/setup_ci_environment.sh ./ci/install_bazelisk.sh
+      run: |
+        sudo ./ci/setup_cmake.sh 
+        sudo ./ci/setup_ci_environment.sh 
+        sudo ./ci/install_bazelisk.sh
     - name: run tests
       run: ./ci/do_ci.sh bazel.test
 
@@ -53,7 +63,10 @@ jobs:
     steps:
     - uses: actions/checkout@v2
     - name: setup
-      run: sudo ./ci/setup_cmake.sh ./ci/setup_ci_environment.sh ./ci/install_bazelisk.sh
+      run: |
+        sudo ./ci/setup_cmake.sh 
+        sudo ./ci/setup_ci_environment.sh 
+        sudo ./ci/install_bazelisk.sh
     - name: run tests
       run: ./ci/do_ci.sh bazel.noexcept
 
@@ -63,7 +76,10 @@ jobs:
     steps:
     - uses: actions/checkout@v2
     - name: setup
-      run: sudo ./ci/setup_cmake.sh ./ci/setup_ci_environment.sh ./ci/install_bazelisk.sh
+      run: |
+        sudo ./ci/setup_cmake.sh 
+        sudo ./ci/setup_ci_environment.sh 
+        sudo ./ci/install_bazelisk.sh
     - name: run tests
       run: ./ci/do_ci.sh bazel.asan
 
@@ -73,7 +89,10 @@ jobs:
     steps:
     - uses: actions/checkout@v2
     - name: setup
-      run: sudo ./ci/setup_cmake.sh ./ci/setup_ci_environment.sh ./ci/install_bazelisk.sh
+      run: |
+        sudo ./ci/setup_cmake.sh 
+        sudo ./ci/setup_ci_environment.sh 
+        sudo ./ci/install_bazelisk.sh
     - name: run tests
       run: ./ci/do_ci.sh bazel.tsan
 
@@ -83,7 +102,10 @@ jobs:
     steps:
     - uses: actions/checkout@v2
     - name: setup
-      run: sudo ./ci/setup_cmake.sh ./ci/setup_ci_environment.sh ./ci/install_bazelisk.sh
+      run: |
+        sudo ./ci/setup_cmake.sh 
+        sudo ./ci/setup_ci_environment.sh 
+        sudo ./ci/install_bazelisk.sh
     - name: run tests
       run: ./ci/do_ci.sh benchmark
 
@@ -112,7 +134,10 @@ jobs:
     steps:
     - uses: actions/checkout@v2
     - name: setup
-      run: ./ci/setup_windows_cmake.ps1 ./ci/setup_windows_ci_environment.ps1 ./ci/install_windows_protobuf.ps1
+      run: |
+        ./ci/setup_windows_cmake.ps1 
+        ./ci/setup_windows_ci_environment.ps1 
+        ./ci/install_windows_protobuf.ps1
       timeout-minutes: 15
     - name: run cmake test
       run: ./ci/do_ci.ps1 cmake.test
@@ -135,7 +160,9 @@ jobs:
     steps:
     - uses: actions/checkout@v2
     - name: setup
-      run: ./ci/setup_windows_cmake.ps1 ./ci/setup_windows_ci_environment.ps1
+      run: |
+        ./ci/setup_windows_cmake.ps1 
+        ./ci/setup_windows_ci_environment.ps1
     - name: run tests
       run: ./ci/do_ci.ps1 cmake.test_example_plugin
 
