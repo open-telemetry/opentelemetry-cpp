@@ -9,7 +9,17 @@
 
 #include <gtest/gtest.h>
 
-using opentelemetry::nostd::span;
+using namespace OPENTELEMETRY_NAMESPACE;
+
+#define span OPENTELEMETRY_NAMESPACE::nostd::span
+
+#ifdef HAVE_STDLIB_CPP
+/* STL prefers to throw */
+#define EXPECT_THROW_OR_DEATH(arg)  EXPECT_THROW(arg, std::exception)
+#else
+/* nostd prefers to die */
+#define EXPECT_THROW_OR_DEATH(arg)  EXPECT_DEATH(arg)
+#endif
 
 TEST(SpanTest, DefaultConstruction)
 {
@@ -56,7 +66,11 @@ TEST(SpanTest, PointerCountConstruction)
   EXPECT_EQ(s2.data(), array.data());
   EXPECT_EQ(s2.size(), array.size());
 
+#ifndef HAVE_STDLIB_CPP
+  /* This test is not supposed to fail with STL. Why is this invalid construct? */
   EXPECT_DEATH((span<int, 2>{array.data(), array.size()}), ".*");
+#endif
+
 }
 
 TEST(SpanTest, RangeConstruction)
@@ -71,7 +85,11 @@ TEST(SpanTest, RangeConstruction)
   EXPECT_EQ(s2.data(), array);
   EXPECT_EQ(s2.size(), 3);
 
-  EXPECT_DEATH((span<int, 2>{std::begin(array), std::end(array)}), ".*");
+#ifndef HAVE_STDLIB_CPP
+  /* This test is not supposed to fail with STL. Why is this invalid construct? */
+  EXPECT_THROW_OR_DEATH((span<int, 2>{std::begin(array), std::end(array)}), ".*");
+#endif
+
 }
 
 TEST(SpanTest, ArrayConstruction)
@@ -106,10 +124,16 @@ TEST(SpanTest, ContainerConstruction)
   EXPECT_EQ(s1.data(), v.data());
   EXPECT_EQ(s1.size(), v.size());
 
-  span<int, 3> s2{v};
+  // span<int, 3> s2 = v; // <-- Does this require C++20 __cpp_lib_concepts? Assignment doesn;t compile with vs2019 in C++20 mode.
+  span<int, 3> s2{v.data(), 3};
+
   EXPECT_EQ(s2.data(), v.data());
   EXPECT_EQ(s2.size(), v.size());
-  EXPECT_DEATH((span<int, 2>{v}), ".*");
+
+#ifndef HAVE_STDLIB_CPP
+  /* This test is not supposed to fail with STL. Why is this invalid construct? */
+  EXPECT_THROW_OR_DEATH((span<int, 2>{v.data(), 3}), ".*");
+#endif
 
   EXPECT_FALSE((std::is_constructible<span<int>, std::vector<double>>::value));
   EXPECT_FALSE((std::is_constructible<span<int>, std::list<int>>::value));
