@@ -1,4 +1,4 @@
-#include "opentelemetry/nostd/string_view.h"
+#include "opentelemetry/nostd/stltypes.h"
 
 #include <gtest/gtest.h>
 

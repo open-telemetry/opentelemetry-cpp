@@ -1,4 +1,4 @@
-#include "opentelemetry/nostd/variant.h"
+#include "opentelemetry/nostd/stltypes.h"
 
 #include <string>
 #include <type_traits>

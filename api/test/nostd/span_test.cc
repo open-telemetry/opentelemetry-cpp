@@ -1,4 +1,4 @@
-#include "opentelemetry/nostd/span.h"
+#include "opentelemetry/nostd/stltypes.h"
 
 #include <algorithm>
 #include <array>
