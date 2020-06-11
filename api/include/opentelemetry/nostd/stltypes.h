@@ -35,6 +35,7 @@
 #if !defined(HAVE_SPAN)
 
 # if defined(HAVE_GSL)
+#  include <type_traits>
 // Guidelines Support Library provides an implementation of std::span
 #  include <gsl/gsl>
 OPENTELEMETRY_BEGIN_NAMESPACE

@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.1.0)
 project(TraceStreamer)
 
-option(WITH_STL "Whether to use Standard Library for C++latest features" OFF)
+option(WITH_STL "Whether to use Standard Library for C++latest features" ON)
 
 message ("${CMAKE_CXX_COMPILER}")
 message ("${CMAKE_CXX_COMPILER_ID}")

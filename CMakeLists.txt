@@ -10,6 +10,10 @@ set(CMAKE_CXX_STANDARD 11)
 
 option(WITH_STL
        "Whether to use Standard Library for C++latest features" OFF)
+if(WITH_STL)
+# We require at least C++17. C++20 is required to avoid using gsl::span
+set(CMAKE_CXX_STANDARD 17)
+endif()
 
 option(WITH_OTPROTOCOL
        "Whether to include the OpenTelemetry Protocol in the SDK" OFF)

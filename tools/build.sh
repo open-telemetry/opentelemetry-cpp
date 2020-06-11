@@ -3,7 +3,8 @@
 export PATH=/usr/local/bin:$PATH
 
 DIR="$( cd "$(dirname "$0")" >/dev/null 2>&1 ; pwd -P )"
-cd $DIR/..
+WORKSPACE_ROOT=$DIR/..
+cd $WORKSPACE_ROOT
 echo "Current directory is `pwd`"
 
 export NOROOT=$NOROOT
@@ -20,9 +21,9 @@ export NOROOT=true
 fi
 
 if [ "$1" == "release" ] || [ "$2" == "release" ]; then
-BUILD_TYPE="Release"
+BUILD_TYPE="release"
 else
-BUILD_TYPE="Debug"
+BUILD_TYPE="debug"
 fi
 
 # Set target MacOS minver
@@ -49,13 +50,23 @@ if [ -f /usr/bin/clang ]; then
 echo "clang version: `clang --version`"
 fi
 
-# Install Google Test
+# TODO: do we need to build and install Google Test?
 # tools/build-gtest.sh
 
 #
-# Do the build
+# Do the build for both configurations: WITH_STL=OFF and WITH_STL=ON
 #
-mkdir -p out
-cd out
-cmake ..
-make
+declare -A build_config
+build_config[nostd]='-DWITH_STL:BOOL=OFF'
+build_config[stl]='-DWITH_STL:BOOL=ON'
+for i in "${!build_config[@]}"
+do
+  echo "Build configuration: $i"
+  cd $WORKSPACE_ROOT
+  OUTDIR=out.$i
+  mkdir -p $OUTDIR
+  cd $OUTDIR
+  BUILD_OPTIONS=${build_config[$i]}
+  cmake $BUILD_OPTIONS ..
+  make
+done
