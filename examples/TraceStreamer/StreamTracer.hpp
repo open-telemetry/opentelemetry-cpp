@@ -342,7 +342,7 @@ public:
   /// <returns>Tracer instance</returns>
   Tracer(trace::TracerProvider &parent,
          TraceStreamType streamType = TraceStreamType::ST_CONSOLE,
-         std::string_view arg2      = "")
+         nostd::string_view arg2      = "")
       : trace::Tracer(),
         provider(parent),
         stype(streamType),
