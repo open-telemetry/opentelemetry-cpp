@@ -63,7 +63,14 @@ public:
       typename std::enable_if<!std::is_same<function_ref, typename std::decay<F>::type>::value,
                               int>::type = 0,
       typename std::enable_if<
+#if (__cplusplus >= 201703L)
+          /* Visual C++ - make sure to build with /Zc:__cplusplus. Otherwise the macro will always contain 199711L.
+           * Ref: https://docs.microsoft.com/en-us/cpp/build/reference/zc-cplusplus?view=vs-2019
+           */
+          std::is_convertible<typename std::invoke_result<F, Args...>::type, R>::value,
+#else
           std::is_convertible<typename std::result_of<F &(Args...)>::type, R>::value,
+#endif
           int>::type = 0>
   function_ref(F &&f)
   {

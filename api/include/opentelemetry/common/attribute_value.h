@@ -3,13 +3,13 @@
 #include <cstdint>
 
 #include "opentelemetry/version.h"
-#include "opentelemetry/common/stltypes.h"
+
+#include "opentelemetry/nostd/stltypes.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace common
 {
-using AttributeValue = nostd::variant<
-                                      bool,
+using AttributeValue = nostd::variant<bool,
                                       int32_t,
                                       int64_t,
                                       uint32_t,
@@ -28,24 +28,22 @@ using AttributeValue = nostd::variant<
 
 enum AttributeType
 {
-
-    TYPE_BOOL,
-    TYPE_INT,
-    TYPE_INT64,
-    TYPE_UINT,
-    TYPE_UINT64,
-    TYPE_DOUBLE,
-    TYPE_STRING,
-    TYPE_CSTRING,
-    TYPE_SPAN_BYTE,
-    TYPE_SPAN_BOOL,
-    TYPE_SPAN_INT,
-    TYPE_SPAN_INT64,
-    TYPE_SPAN_UINT,
-    TYPE_SPAN_UINT64,
-    TYPE_SPAN_DOUBLE,
-    TYPE_SPAN_STRING
-
+  TYPE_BOOL,
+  TYPE_INT,
+  TYPE_INT64,
+  TYPE_UINT,
+  TYPE_UINT64,
+  TYPE_DOUBLE,
+  TYPE_STRING,
+  TYPE_CSTRING,
+  TYPE_SPAN_BYTE,
+  TYPE_SPAN_BOOL,
+  TYPE_SPAN_INT,
+  TYPE_SPAN_INT64,
+  TYPE_SPAN_UINT,
+  TYPE_SPAN_UINT64,
+  TYPE_SPAN_DOUBLE,
+  TYPE_SPAN_STRING
 };
 
 }  // namespace common

@@ -17,6 +17,4 @@ if(WITH_STL)
   message("Building with standard library types...")
 else()
   message("Building with nostd types...")
-  include_directories(api/include/opentelemetry/nostd)
 endif()
-	

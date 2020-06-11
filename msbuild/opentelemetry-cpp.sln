@@ -3,8 +3,6 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.30011.22
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "EventSender", "..\examples\event\EventSender.vcxproj", "{BD3142A5-092E-45D9-A0D8-F578AE1FA5A2}"
-EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "api", "api", "{BC2FA9AC-DCC9-44AD-B178-BBA568FC64CB}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "opentelemetry", "opentelemetry", "{2B93FC6D-A7C5-43D4-984B-E60322931288}"
@@ -15,10 +13,6 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "opentelemetry", "openteleme
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "event", "event", "{82459F33-7252-4924-A9EC-D45398F90E3C}"
 	ProjectSection(SolutionItems) = preProject
-		..\api\include\opentelemetry\event\Attributes.hpp = ..\api\include\opentelemetry\event\Attributes.hpp
-		..\api\include\opentelemetry\event\Properties.hpp = ..\api\include\opentelemetry\event\Properties.hpp
-		..\api\include\opentelemetry\event\Property.hpp = ..\api\include\opentelemetry\event\Property.hpp
-		..\api\include\opentelemetry\event\time_ticks.hpp = ..\api\include\opentelemetry\event\time_ticks.hpp
 		..\api\include\opentelemetry\event\UUID.hpp = ..\api\include\opentelemetry\event\UUID.hpp
 	EndProjectSection
 EndProject
@@ -40,6 +34,15 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "nostd", "nostd", "{F37A41EA-8C41-4F3D-8F8A-7D8E25181E1F}"
 	ProjectSection(SolutionItems) = preProject
 		..\api\include\opentelemetry\nostd\function_ref.h = ..\api\include\opentelemetry\nostd\function_ref.h
+		..\api\include\opentelemetry\nostd\nostd.h = ..\api\include\opentelemetry\nostd\nostd.h
+		..\api\include\opentelemetry\nostd\shared_ptr.h = ..\api\include\opentelemetry\nostd\shared_ptr.h
+		..\api\include\opentelemetry\nostd\span.h = ..\api\include\opentelemetry\nostd\span.h
+		..\api\include\opentelemetry\nostd\stltypes.h = ..\api\include\opentelemetry\nostd\stltypes.h
+		..\api\include\opentelemetry\nostd\string_view.h = ..\api\include\opentelemetry\nostd\string_view.h
+		..\api\include\opentelemetry\nostd\type_traits.h = ..\api\include\opentelemetry\nostd\type_traits.h
+		..\api\include\opentelemetry\nostd\unique_ptr.h = ..\api\include\opentelemetry\nostd\unique_ptr.h
+		..\api\include\opentelemetry\nostd\utility.h = ..\api\include\opentelemetry\nostd\utility.h
+		..\api\include\opentelemetry\nostd\variant.h = ..\api\include\opentelemetry\nostd\variant.h
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "detail", "detail", "{C683BA13-1243-4B17-8BC8-FCE4CB60EDD8}"
@@ -67,48 +70,26 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "common", "common", "{33CF4306-056E-4B97-A721-DBFD676143AA}"
 	ProjectSection(SolutionItems) = preProject
 		..\api\include\opentelemetry\common\attribute_value.h = ..\api\include\opentelemetry\common\attribute_value.h
-		..\api\include\opentelemetry\common\stltypes.h = ..\api\include\opentelemetry\common\stltypes.h
 	EndProjectSection
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "stl", "stl", "{1E56C12E-30AB-4CEF-8D8D-92F944D3D452}"
-	ProjectSection(SolutionItems) = preProject
-		..\api\include\opentelemetry\nostd\stl\shared_ptr.h = ..\api\include\opentelemetry\nostd\stl\shared_ptr.h
-		..\api\include\opentelemetry\nostd\stl\span.h = ..\api\include\opentelemetry\nostd\stl\span.h
-		..\api\include\opentelemetry\nostd\stl\string_view.h = ..\api\include\opentelemetry\nostd\stl\string_view.h
-		..\api\include\opentelemetry\nostd\stl\type_traits.h = ..\api\include\opentelemetry\nostd\stl\type_traits.h
-		..\api\include\opentelemetry\nostd\stl\unique_ptr.h = ..\api\include\opentelemetry\nostd\stl\unique_ptr.h
-		..\api\include\opentelemetry\nostd\stl\utility.h = ..\api\include\opentelemetry\nostd\stl\utility.h
-		..\api\include\opentelemetry\nostd\stl\variant.h = ..\api\include\opentelemetry\nostd\stl\variant.h
-	EndProjectSection
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "StreamTracer", "..\examples\TraceStreamer\TraceStreamer.vcxproj", "{6EC0D1B9-6589-45A4-9B7F-D5390F0CC5FC}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
 		Debug|x86 = Debug|x86
-		MinSizeRel|x64 = MinSizeRel|x64
-		MinSizeRel|x86 = MinSizeRel|x86
 		Release|x64 = Release|x64
 		Release|x86 = Release|x86
-		RelWithDebInfo|x64 = RelWithDebInfo|x64
-		RelWithDebInfo|x86 = RelWithDebInfo|x86
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{BD3142A5-092E-45D9-A0D8-F578AE1FA5A2}.Debug|x64.ActiveCfg = Debug|x64
-		{BD3142A5-092E-45D9-A0D8-F578AE1FA5A2}.Debug|x64.Build.0 = Debug|x64
-		{BD3142A5-092E-45D9-A0D8-F578AE1FA5A2}.Debug|x86.ActiveCfg = Debug|Win32
-		{BD3142A5-092E-45D9-A0D8-F578AE1FA5A2}.Debug|x86.Build.0 = Debug|Win32
-		{BD3142A5-092E-45D9-A0D8-F578AE1FA5A2}.MinSizeRel|x64.ActiveCfg = Release|x64
-		{BD3142A5-092E-45D9-A0D8-F578AE1FA5A2}.MinSizeRel|x64.Build.0 = Release|x64
-		{BD3142A5-092E-45D9-A0D8-F578AE1FA5A2}.MinSizeRel|x86.ActiveCfg = Release|Win32
-		{BD3142A5-092E-45D9-A0D8-F578AE1FA5A2}.MinSizeRel|x86.Build.0 = Release|Win32
-		{BD3142A5-092E-45D9-A0D8-F578AE1FA5A2}.Release|x64.ActiveCfg = Release|x64
-		{BD3142A5-092E-45D9-A0D8-F578AE1FA5A2}.Release|x64.Build.0 = Release|x64
-		{BD3142A5-092E-45D9-A0D8-F578AE1FA5A2}.Release|x86.ActiveCfg = Release|Win32
-		{BD3142A5-092E-45D9-A0D8-F578AE1FA5A2}.Release|x86.Build.0 = Release|Win32
-		{BD3142A5-092E-45D9-A0D8-F578AE1FA5A2}.RelWithDebInfo|x64.ActiveCfg = Release|x64
-		{BD3142A5-092E-45D9-A0D8-F578AE1FA5A2}.RelWithDebInfo|x64.Build.0 = Release|x64
-		{BD3142A5-092E-45D9-A0D8-F578AE1FA5A2}.RelWithDebInfo|x86.ActiveCfg = Release|Win32
-		{BD3142A5-092E-45D9-A0D8-F578AE1FA5A2}.RelWithDebInfo|x86.Build.0 = Release|Win32
+		{6EC0D1B9-6589-45A4-9B7F-D5390F0CC5FC}.Debug|x64.ActiveCfg = Debug|x64
+		{6EC0D1B9-6589-45A4-9B7F-D5390F0CC5FC}.Debug|x64.Build.0 = Debug|x64
+		{6EC0D1B9-6589-45A4-9B7F-D5390F0CC5FC}.Debug|x86.ActiveCfg = Debug|Win32
+		{6EC0D1B9-6589-45A4-9B7F-D5390F0CC5FC}.Debug|x86.Build.0 = Debug|Win32
+		{6EC0D1B9-6589-45A4-9B7F-D5390F0CC5FC}.Release|x64.ActiveCfg = Release|x64
+		{6EC0D1B9-6589-45A4-9B7F-D5390F0CC5FC}.Release|x64.Build.0 = Release|x64
+		{6EC0D1B9-6589-45A4-9B7F-D5390F0CC5FC}.Release|x86.ActiveCfg = Release|Win32
+		{6EC0D1B9-6589-45A4-9B7F-D5390F0CC5FC}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -121,7 +102,6 @@ Global
 		{C683BA13-1243-4B17-8BC8-FCE4CB60EDD8} = {F37A41EA-8C41-4F3D-8F8A-7D8E25181E1F}
 		{3CBC4AE2-10F0-4B32-8C86-FAB4B2F55B16} = {5B09FEFC-9830-4350-9D35-7F12391A71DA}
 		{33CF4306-056E-4B97-A721-DBFD676143AA} = {2B93FC6D-A7C5-43D4-984B-E60322931288}
-		{1E56C12E-30AB-4CEF-8D8D-92F944D3D452} = {F37A41EA-8C41-4F3D-8F8A-7D8E25181E1F}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {41302516-BF06-3364-9450-F0D8BA88F950}

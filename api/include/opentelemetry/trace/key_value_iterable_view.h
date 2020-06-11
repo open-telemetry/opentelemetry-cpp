@@ -6,7 +6,7 @@
 
 #include "opentelemetry/version.h"
 
-#include "opentelemetry/common/stltypes.h"
+#include "opentelemetry/nostd/stltypes.h"
 #include "opentelemetry/trace/key_value_iterable.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
@@ -14,7 +14,6 @@ namespace trace
 {
 namespace detail
 {
-
 inline void take_key_value(nostd::string_view, common::AttributeValue) {}
 
 template <class T>

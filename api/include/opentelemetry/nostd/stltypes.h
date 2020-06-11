@@ -1,0 +1,117 @@
+#pragma once
+
+#include "opentelemetry/version.h"
+
+#ifndef HAVE_STDLIB_CPP
+// OpenTelemetry backport of STL C++20 types
+# include <opentelemetry/nostd/nostd.h>
+
+#else
+// Standard library implementation requires at least C++17 compiler.
+// Older C++14 compilers may provide support for __has_include as a
+// conforming extension. 
+#if defined __has_include
+# if __has_include (<version>) // Check for __cpp_{feature}
+#  include <version>
+#  if defined(__cpp_lib_span)
+#   define HAVE_SPAN
+#  endif
+# endif
+# if __has_include (<span>) && !defined(HAVE_SPAN) // Check for span
+#  define HAVE_SPAN
+# endif
+# if !__has_include (<string_view>) // Check for string_view
+#  error "STL library does not support std::span. Possible solution:"                   \
+         " - #undef HAVE_STDLIB_CPP // to use OpenTelemetry nostd::string_view"
+# endif
+#endif
+
+#include <cstddef>
+#include <memory>
+#include <string_view>
+#include <utility>
+#include <variant>
+
+#if !defined(HAVE_SPAN)
+
+# if defined(HAVE_GSL)
+// Guidelines Support Library provides an implementation of std::span
+#  include <gsl/gsl>
+OPENTELEMETRY_BEGIN_NAMESPACE
+namespace nostd
+{
+template <class ElementType, std::size_t Extent = gsl::dynamic_extent>
+using span = gsl::span<ElementType, Extent>;
+}
+OPENTELEMETRY_END_NAMESPACE
+# else
+// No span implementation provided.
+#  error "STL library does not support std::span. Possible solutions:"                  \
+         " - #undef HAVE_STDLIB_CPP // to use OpenTelemetry nostd::span .. or      "    \
+         " - #define HAVE_GSL       // to use gsl::span                            "
+# endif
+
+#else // HAVE_SPAN
+// Using std::span (https://wg21.link/P0122R7) from Standard Library available in C++20 :
+// - GCC libstdc++ 10+
+// - Clang libc++ 7
+// - MSVC Standard Library 19.26*	
+// - Apple Clang 10.0.0*
+# include <span>
+OPENTELEMETRY_BEGIN_NAMESPACE
+namespace nostd
+{
+template <class ElementType, std::size_t Extent = std::dynamic_extent>
+using span = std::span<ElementType, Extent>;
+}
+OPENTELEMETRY_END_NAMESPACE
+#endif // of HAVE_SPAN
+
+OPENTELEMETRY_BEGIN_NAMESPACE
+// Standard Type aliases in nostd namespace
+namespace nostd
+{
+
+// nostd::variant<...>
+template <class... _Types>
+using variant = std::variant<_Types...>;
+
+// nostd::string_view
+using string_view = std::string_view;
+
+// nostd::size<T>
+template <class T>
+auto size(const T &c) noexcept(noexcept(c.size())) -> decltype(c.size())
+{
+  return c.size();
+}
+
+// nostd::size<T, N>
+template <class T, size_t N>
+size_t size(T (&array)[N]) noexcept
+{
+  return N;
+}
+
+// nostd::enable_if_t<...>
+template <bool B, class T = void>
+using enable_if_t = typename std::enable_if<B, T>::type;
+
+// nostd::unique_ptr<T...>
+template <class... _Types>
+using unique_ptr = std::unique_ptr<_Types...>;
+
+// nostd::shared_ptr<T...>
+template <class... _Types>
+using shared_ptr = std::shared_ptr<_Types...>;
+
+// nostd::get<T>
+template <class T>
+constexpr auto get = [](auto &&t) constexpr -> decltype(auto)
+{
+  return std::get<T>(std::forward<decltype(t)>(t));
+};
+
+} // namespace nostd
+OPENTELEMETRY_END_NAMESPACE
+#endif
