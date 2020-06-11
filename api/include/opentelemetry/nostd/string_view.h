@@ -68,13 +68,15 @@ public:
     return string_view(data_ + pos, n);
   }
 
+  /* Comparators are required for populating maps having nostd::string_view as key */
+
   int compare(string_view v) const noexcept
   {
-    size_type __rlen = std::min(size(), v.size());
-    int __retval     = Traits::compare(data(), v.data(), __rlen);
-    if (__retval == 0)
-      __retval = size() == v.size() ? 0 : (size() < v.size() ? -1 : 1);
-    return __retval;
+    size_type len = std::min(size(), v.size());
+    int result = Traits::compare(data(), v.data(), len);
+    if (result == 0)
+      result = size() == v.size() ? 0 : (size() < v.size() ? -1 : 1);
+    return result;
   };
 
   int compare(size_type pos1, size_type count1, string_view v) const
@@ -82,16 +84,15 @@ public:
     return substr(pos1, count1).compare(v);
   };
 
-  int compare(size_type pos1,
-              size_type count1,
-              string_view v,
-              size_type pos2,
-              size_type count2) const
+  int compare(size_type pos1, size_type count1, string_view v, size_type pos2, size_type count2) const
   {
     return substr(pos1, count1).compare(v.substr(pos2, count2));
   };
 
-  int compare(const char *s) const { return compare(string_view(s)); };
+  int compare(const char *s) const
+  {
+    return compare(string_view(s));
+  };
 
   int compare(size_type pos1, size_type count1, const char *s) const
   {
@@ -103,9 +104,15 @@ public:
     return substr(pos1, count1).compare(string_view(s, count2));
   };
 
-  bool operator<(const string_view __y) const noexcept { return compare(__y) < 0; }
+  bool operator<(const string_view v) const noexcept
+  {
+    return compare(v) < 0;
+  }
 
-  bool operator>(const string_view __y) const noexcept { return compare(__y) > 0; }
+  bool operator>(const string_view v) const noexcept
+  {
+    return compare(v) > 0;
+  }
 
 private:
   // Note: uses the same binary layout as libstdc++'s std::string_view
