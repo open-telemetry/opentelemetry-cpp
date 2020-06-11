@@ -23,7 +23,7 @@ void initTracer()
 
 int main()
 {
-  // Removing this line will leave OTel SDK initialized with the default noop
+  // Removing this line will leave OpenTelemetry SDK initialized with the default noop
   // tracer, thus being effectively deactivated.
   initTracer();
 
