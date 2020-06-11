@@ -15,7 +15,7 @@ namespace sdk
  * specializations of std::atomic_store and std::atomic_load for all other
  * instances.
  */
-#if __cplusplus > 201703L
+#if 0 /* __cplusplus > 201703L */
 template <class T>
 class AtomicSharedPtr
 {
