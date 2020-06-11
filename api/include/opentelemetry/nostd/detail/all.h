@@ -2,7 +2,7 @@
 
 #include <type_traits>
 
-#include "opentelemetry/common/stltypes.h"
+#include "opentelemetry/nostd/stltypes.h"
 #include "opentelemetry/version.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE

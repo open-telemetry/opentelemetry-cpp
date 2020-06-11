@@ -1,7 +1,7 @@
 #pragma once
 
 #include "opentelemetry/core/timestamp.h"
-#include "opentelemetry/common/stltypes.h"
+#include "opentelemetry/nostd/stltypes.h"
 #include "opentelemetry/trace/canonical_code.h"
 #include "opentelemetry/trace/span_id.h"
 #include "opentelemetry/trace/trace_id.h"

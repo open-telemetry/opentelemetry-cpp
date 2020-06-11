@@ -4,7 +4,7 @@
 // This file is part of the internal implementation of OpenTelemetry. Nothing in this file should be
 // used directly. Please refer to span.h and tracer.h for documentation on these interfaces.
 
-#include "opentelemetry/common/stltypes.h"
+#include "opentelemetry/nostd/stltypes.h"
 
 #include "opentelemetry/trace/span.h"
 #include "opentelemetry/trace/tracer.h"
