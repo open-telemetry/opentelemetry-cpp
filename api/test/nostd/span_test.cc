@@ -13,14 +13,6 @@ using namespace OPENTELEMETRY_NAMESPACE;
 
 #define span OPENTELEMETRY_NAMESPACE::nostd::span
 
-#ifdef HAVE_STDLIB_CPP
-/* STL prefers to throw */
-#define EXPECT_THROW_OR_DEATH(arg)  EXPECT_THROW(arg, std::exception)
-#else
-/* nostd prefers to die */
-#define EXPECT_THROW_OR_DEATH(arg)  EXPECT_DEATH(arg)
-#endif
-
 TEST(SpanTest, DefaultConstruction)
 {
   span<int> s1;
@@ -87,7 +79,7 @@ TEST(SpanTest, RangeConstruction)
 
 #ifndef HAVE_STDLIB_CPP
   /* This test is not supposed to fail with STL. Why is this invalid construct? */
-  EXPECT_THROW_OR_DEATH((span<int, 2>{std::begin(array), std::end(array)}), ".*");
+  EXPECT_DEATH((span<int, 2>{std::begin(array), std::end(array)}), ".*");
 #endif
 
 }
@@ -132,7 +124,7 @@ TEST(SpanTest, ContainerConstruction)
 
 #ifndef HAVE_STDLIB_CPP
   /* This test is not supposed to fail with STL. Why is this invalid construct? */
-  EXPECT_THROW_OR_DEATH((span<int, 2>{v.data(), 3}), ".*");
+  EXPECT_DEATH((span<int, 2>{v.data(), 3}), ".*");
 #endif
 
   EXPECT_FALSE((std::is_constructible<span<int>, std::vector<double>>::value));

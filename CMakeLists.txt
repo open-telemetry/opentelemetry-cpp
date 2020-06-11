@@ -12,14 +12,18 @@ option(WITH_STL
        "Whether to use Standard Library for C++latest features" OFF)
 
 if(WITH_STL)
-# We require at least C++17. C++20 is optimal to avoid gsl::span
-add_definitions(-DHAVE_STDLIB_CPP -DHAVE_GSL)
-set(CMAKE_CXX_STANDARD 20)
-# Guidelines Support Library path
-set(GSL_DIR third_party/ms-gsl)
-include_directories(${GSL_DIR}/include)
-# TODO: use latest
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++2a")
+  # We require at least C++17. C++20 is optimal to avoid gsl::span
+  add_definitions(-DHAVE_STDLIB_CPP -DHAVE_GSL)
+  # We ask for 20, but we may get C++17
+  set(CMAKE_CXX_STANDARD 20)
+  # Guidelines Support Library path
+  set(GSL_DIR third_party/ms-gsl)
+  include_directories(${GSL_DIR}/include)
+  if (CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /Zc:__cplusplus")
+  else()
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++2a")
+  endif()
 endif()
 
 option(WITH_OTPROTOCOL

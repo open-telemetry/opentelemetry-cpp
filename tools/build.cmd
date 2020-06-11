@@ -1,16 +1,26 @@
 @echo off
+REM Currently we require Visual Studio 2019 for C++20 build targeting Release/x64.
 REM
-REM Windows build by default uses Visual C++.
-REM TODO: add build-cmake-clang.cmd to build with clang
+REM TODO: allow specifying compiler version as argument.
 REM
+REM Supported versions for nostd build:
+REM - vs2015 (C++11)
+REM - vs2017 (C++14)
+REM - vs2019 (C++20)
+REM
+REM Supported versions for STL build:
+REM - vs2017 (C++14)
+REM - vs2019 (C++20)
+REM
+
+set VS_TOOLS_VERSION=vs2019
+set CMAKE_GEN="Visual Studio 16 2019"
+
 cd %~dp0
 setlocal enableextensions
 setlocal enabledelayedexpansion
 set ROOT=%~dp0\..
 set "VCPKG_CMAKE=%CD%/vcpkg/scripts/buildsystems/vcpkg.cmake"
-
-set VS_TOOLS_VERSION=vs2019
-set CMAKE_GEN="Visual Studio 16 2019"
 
 call "%~dp0\vcvars.cmd"
 
@@ -19,13 +29,22 @@ REM Use cmake
 REM ********************************************************************
 set "PATH=C:\Program Files\CMake\bin\;%PATH%"
 
-cd %ROOT%
-mkdir out
-cd out
+REM Build with nostd implementation
+set CONFIG=-DWITH_STL:BOOL=OFF
+set OUTDIR=%ROOT%\out.nostd
+call :build_config
 
-REM By default we generate the project for the older Visual Studio 2017 even if we have newer version installed
-cmake ../ -G %CMAKE_GEN% -DCMAKE_TOOLCHAIN_FILE=%VCPKG_CMAKE% -Ax64
+REM Build with STL implementation
+set CONFIG=-DWITH_STL:BOOL=ON
+set OUTDIR=%ROOT%\out.stl
+call :build_config
 
-set SOLUTION=%ROOT%\out\opentelemetry-cpp.sln
-REM msbuild %SOLUTION% /p:Configuration=Debug /p:Platform=x64
+exit /B %ERRORLEVEL% 
+
+:build_config
+mkdir %OUTDIR%
+cd %OUTDIR%
+cmake ../ -G %CMAKE_GEN% -DCMAKE_TOOLCHAIN_FILE=%VCPKG_CMAKE% -Ax64 %CONFIG%
+set SOLUTION=%OUTDIR%\opentelemetry-cpp.sln
 msbuild %SOLUTION% /p:Configuration=Release /p:Platform=x64
+exit /b 0
