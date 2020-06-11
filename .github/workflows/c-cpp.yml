@@ -118,7 +118,7 @@ jobs:
     - name: setup
       run: sudo ./ci/install_format_tools.sh
     - name: run tests
-      run: ./ci/do_ci.sh bazel.test
+      run: ./ci/do_ci.sh format
 
   osx_test:
     name: Build with Bazel on MacOS runner
