@@ -1,19 +1,17 @@
-REM
-REM TODO:
-REM
-REM tools\vcpkg\bootstrap-vcpkg.bat
-REM vcpkg integrate install
-REM
-REM Then use:
-REM   -DCMAKE_TOOLCHAIN_FILE=C:/work/opentelemetry-cpp/tools/vcpkg/scripts/buildsystems/vcpkg.cmake
-
 @echo off
+REM
+REM Windows build by default uses Visual C++.
+REM TODO: add build-cmake-clang.cmd to build with clang
+REM
 cd %~dp0
 setlocal enableextensions
 setlocal enabledelayedexpansion
 set ROOT=%~dp0\..
+set "VCPKG_CMAKE=%CD%/vcpkg/scripts/buildsystems/vcpkg.cmake"
 
-echo Auto-detecting Visual Studio version...
+set VS_TOOLS_VERSION=vs2019
+set CMAKE_GEN="Visual Studio 16 2019"
+
 call "%~dp0\vcvars.cmd"
 
 REM ********************************************************************
@@ -26,9 +24,8 @@ mkdir out
 cd out
 
 REM By default we generate the project for the older Visual Studio 2017 even if we have newer version installed
-cmake ../ -G "Visual Studio 15 2017 Win64" -DBUILD_TESTING=0 -DCMAKE_TOOLCHAIN_FILE=C:/work/opentelemetry-cpp/tools/vcpkg/scripts/buildsystems/vcpkg.cmake
+cmake ../ -G %CMAKE_GEN% -DCMAKE_TOOLCHAIN_FILE=%VCPKG_CMAKE% -Ax64
 
 set SOLUTION=%ROOT%\out\opentelemetry-cpp.sln
 REM msbuild %SOLUTION% /p:Configuration=Debug /p:Platform=x64
 msbuild %SOLUTION% /p:Configuration=Release /p:Platform=x64
-
