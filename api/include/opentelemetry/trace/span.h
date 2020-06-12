@@ -43,6 +43,15 @@ struct StartSpanOptions
   // Attributes
   SpanKind kind = SpanKind::kInternal;
 };
+/**
+ * StartEndOptions provides options to set properties of a Span when it is
+ * ended.
+ */
+struct EndSpanOptions
+{
+  // Optionally sets the end time of a Span.
+  core::SteadyTimestamp end_steady_time;
+};
 
 class Tracer;
 
@@ -130,12 +139,14 @@ public:
   // during creation.
   virtual void UpdateName(nostd::string_view name) noexcept = 0;
 
-  // Mark the end of the Span. Only the timing of the first End call for a given Span will
-  // be recorded, and implementations are free to ignore all further calls.
-  virtual void End() noexcept = 0;
-
-  // TODO
-  // virtual void End(EndSpanOptions&& opts) noexcept = 0;
+  /**
+   * Mark the end of the Span.
+   * Only the timing of the first End call for a given Span will be recorded,
+   * and implementations are free to ignore all further calls.
+   * @param options can be used to manually define span properties like the end
+   * timestamp
+   */
+  virtual void End(const EndSpanOptions &options = {}) noexcept = 0;
 
   // TODO
   // SpanContext context() const noexcept = 0;

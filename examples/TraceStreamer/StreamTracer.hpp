@@ -534,7 +534,7 @@ public:
   /// End Span
   /// </summary>
   /// <returns></returns>
-  void End() noexcept
+  void End(const trace::EndSpanOptions & = {}) noexcept
   {
       // TODO: signal this to owner
   }

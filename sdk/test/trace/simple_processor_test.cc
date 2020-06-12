@@ -1,4 +1,4 @@
-#include "src/trace/simple_processor.h"
+#include "opentelemetry/sdk/trace/simple_processor.h"
 #include "opentelemetry/nostd/stltypes.h"
 #include "opentelemetry/sdk/trace/span_data.h"
 
@@ -23,7 +23,7 @@ public:
   }
 
   ExportResult Export(
-      opentelemetry::nostd::span<std::unique_ptr<Recordable>> &spans) noexcept override
+      const opentelemetry::nostd::span<std::unique_ptr<Recordable>> &spans) noexcept override
   {
     for (auto &span : spans)
     {

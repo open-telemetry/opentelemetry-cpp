@@ -48,7 +48,8 @@ public:
    * @param spans a span of unique pointers to span recordables
    */
   virtual ExportResult Export(
-      nostd::span<std::unique_ptr<opentelemetry::sdk::trace::Recordable>> &spans) noexcept = 0;
+      const nostd::span<std::unique_ptr<opentelemetry::sdk::trace::Recordable>>
+          &spans) noexcept = 0;
 
   /**
    * Shut down the exporter.
