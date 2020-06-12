@@ -107,8 +107,14 @@ jobs:
         sudo ./ci/setup_ci_environment.sh
         sudo ./ci/install_bazelisk.sh
     - name: run tests
-      run: ./ci/do_ci.sh benchmark
-
+      run: |
+        env BENCHMARK_DIR=/benchmark
+        ./ci/do_ci.sh benchmark
+    - name: Upload benchmark results
+      uses: actions/upload-artifact@v2
+      with:
+        name: benchmark_reports
+        path: /home/runner/benchmark
 
   format:
     name: Run format tool
