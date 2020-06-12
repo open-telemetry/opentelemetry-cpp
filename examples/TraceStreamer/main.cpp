@@ -110,15 +110,15 @@ void test_spans()
   }
 }
 
-// #include "CString.hpp"
-
 int main(int argc, char *argv[])
 {
   test_spans();
 
+#ifdef HAVE_BENCHMARK
   // Run the benchmark
   ::benchmark::Initialize(&argc, argv);
   ::benchmark::RunSpecifiedBenchmarks();
+#endif
 
   return 0;
 }
