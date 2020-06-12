@@ -1,5 +1,7 @@
 name: C/C++ CI on Windows
 
+# Controls when the action will run. Triggers the workflow on push or pull request
+# events but only for the master branch
 on:
   push:
     branches:
@@ -12,14 +14,15 @@ on:
   schedule:
   - cron: 0 2 * * 1-5
 
+# A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
   build:
     name: Build on Windows ${{ matrix.arch }}-${{ matrix.config }}
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        arch: [Win32, x64]
-        config: [release, debug]
+        arch: [x64]
+        config: [release]
         os: [windows-2016, windows-2019]    
     steps:
     - name: Checkout
