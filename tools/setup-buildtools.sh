@@ -67,4 +67,4 @@ fi
 ## Change owner from root to current dir owner
 chown -R `stat . -c %u:%g` *
 
-./build-gtest.sh
+./tools/build-gtest.sh
