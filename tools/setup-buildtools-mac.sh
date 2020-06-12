@@ -27,3 +27,5 @@ brew install cmake
 brew install wget
 brew install clang-format
 brew install google-benchmark
+
+./tools/build-gtest.sh
