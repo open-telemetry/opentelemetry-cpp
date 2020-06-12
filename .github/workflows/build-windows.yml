@@ -25,12 +25,17 @@ jobs:
         config: [release]
         os: [windows-2016, windows-2019]    
     steps:
+
     - name: Checkout
       uses: actions/checkout@v2
+      with:
+        submodules: 'true'
+
     - name: Build
       run: |
         cd "$Env:GITHUB_WORKSPACE"
         .\tools\build.cmd ${{ matrix.config }}
+
     - name: Test
       run: |
         cd "$Env:GITHUB_WORKSPACE"

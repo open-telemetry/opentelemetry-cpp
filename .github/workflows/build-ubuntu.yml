@@ -22,11 +22,16 @@ jobs:
     strategy:
       matrix:
         config: [release]
-        os: [ubuntu-1604, ubuntu-1804, ubuntu-2004]    
+        os: [ubuntu-16.04, ubuntu-18.04, ubuntu-20.04]    
     steps:
+
     - name: Checkout
       uses: actions/checkout@v2
+      with:
+        submodules: 'true'
+
     - name: Build
       run: tools/build.sh ${{ matrix.config }}
+
     - name: Test
       run: ./tools/run-tests-all.sh
