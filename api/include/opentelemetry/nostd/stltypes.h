@@ -4,40 +4,41 @@
 
 #ifndef HAVE_STDLIB_CPP
 // OpenTelemetry backport of STL C++20 types
-# include <opentelemetry/nostd/nostd.h>
+#  include <opentelemetry/nostd/nostd.h>
 
 #else
 // Standard library implementation requires at least C++17 compiler.
 // Older C++14 compilers may provide support for __has_include as a
-// conforming extension. 
-#if defined __has_include
-# if __has_include (<version>) // Check for __cpp_{feature}
-#  include <version>
-#  if defined(__cpp_lib_span)
-#   define HAVE_SPAN
-#  endif
-# endif
-# if __has_include (<span>) && !defined(HAVE_SPAN) // Check for span
-#  define HAVE_SPAN
-# endif
-# if !__has_include (<string_view>) // Check for string_view
-#  error "STL library does not support std::span. Possible solution:"                   \
+// conforming extension.
+#  if defined __has_include
+#    if __has_include(<version>)  // Check for __cpp_{feature}
+#      include <version>
+#      if defined(__cpp_lib_span)
+#        define HAVE_SPAN
+#      endif
+#    endif
+#    if __has_include(<span>) && !defined(HAVE_SPAN)  // Check for span
+#      define HAVE_SPAN
+#    endif
+#    if !__has_include(<string_view>)  // Check for string_view
+#      error \
+          "STL library does not support std::span. Possible solution:"                   \
          " - #undef HAVE_STDLIB_CPP // to use OpenTelemetry nostd::string_view"
-# endif
-#endif
+#    endif
+#  endif
 
-#include <cstddef>
-#include <memory>
-#include <string_view>
-#include <utility>
-#include <variant>
+#  include <cstddef>
+#  include <memory>
+#  include <string_view>
+#  include <utility>
+#  include <variant>
 
-#if !defined(HAVE_SPAN)
+#  if !defined(HAVE_SPAN)
 
-# if defined(HAVE_GSL)
-#  include <type_traits>
+#    if defined(HAVE_GSL)
+#      include <type_traits>
 // Guidelines Support Library provides an implementation of std::span
-#  include <gsl/gsl>
+#      include <gsl/gsl>
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace nostd
 {
@@ -45,20 +46,21 @@ template <class ElementType, std::size_t Extent = gsl::dynamic_extent>
 using span = gsl::span<ElementType, Extent>;
 }
 OPENTELEMETRY_END_NAMESPACE
-# else
+#    else
 // No span implementation provided.
-#  error "STL library does not support std::span. Possible solutions:"                  \
+#      error \
+          "STL library does not support std::span. Possible solutions:"                  \
          " - #undef HAVE_STDLIB_CPP // to use OpenTelemetry nostd::span .. or      "    \
          " - #define HAVE_GSL       // to use gsl::span                            "
-# endif
+#    endif
 
-#else // HAVE_SPAN
+#  else  // HAVE_SPAN
 // Using std::span (https://wg21.link/P0122R7) from Standard Library available in C++20 :
 // - GCC libstdc++ 10+
 // - Clang libc++ 7
-// - MSVC Standard Library 19.26*	
+// - MSVC Standard Library 19.26*
 // - Apple Clang 10.0.0*
-# include <span>
+#    include <span>
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace nostd
 {
@@ -66,7 +68,7 @@ template <class ElementType, std::size_t Extent = std::dynamic_extent>
 using span = std::span<ElementType, Extent>;
 }
 OPENTELEMETRY_END_NAMESPACE
-#endif // of HAVE_SPAN
+#  endif  // of HAVE_SPAN
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 // Standard Type aliases in nostd namespace
@@ -106,13 +108,53 @@ using unique_ptr = std::unique_ptr<_Types...>;
 template <class... _Types>
 using shared_ptr = std::shared_ptr<_Types...>;
 
-// nostd::get<T>
+#  if defined(__APPLE__) && defined(_LIBCPP_USE_AVAILABILITY_APPLE)
+// Apple Platforms provide std::bad_variant_access only in newer versions of OS.
+// To keep API compatible with any version of OS - we are providing our own
+// implementation of nostd::bad_variant_access exception.
+#    if __EXCEPTIONS
+
+// nostd::bad_variant_access
+class bad_variant_access : public std::exception
+{
+public:
+  virtual const char *what() const noexcept override { return "bad_variant_access"; }
+};
+
+[[noreturn]] inline void throw_bad_variant_access()
+{
+  throw bad_variant_access{};
+}
+#    endif
+
+// nostd::get<...> for Apple Clang
+template <class T, class... Types>
+constexpr auto get = [](auto &&t) constexpr -> decltype(auto)
+{
+  auto result = std::get_if<T>(&std::forward<decltype(t)>(t));
+  if (result)
+  {
+    return *result;
+  }
+#    if __EXCEPTIONS
+  throw_bad_variant_access();
+#    else
+  std::terminate();
+  return result;
+#    endif
+};
+
+#  else
+
+// nostd::get<T> for other C++17 compatible compilers
 template <class T>
 constexpr auto get = [](auto &&t) constexpr -> decltype(auto)
 {
   return std::get<T>(std::forward<decltype(t)>(t));
 };
 
-} // namespace nostd
+#  endif
+
+}  // namespace nostd
 OPENTELEMETRY_END_NAMESPACE
 #endif

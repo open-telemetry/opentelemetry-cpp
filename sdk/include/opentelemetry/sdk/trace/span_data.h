@@ -1,12 +1,15 @@
 #pragma once
 
 #include <chrono>
+
 #include "opentelemetry/core/timestamp.h"
 #include "opentelemetry/nostd/stltypes.h"
 #include "opentelemetry/sdk/trace/recordable.h"
 #include "opentelemetry/trace/canonical_code.h"
 #include "opentelemetry/trace/span_id.h"
 #include "opentelemetry/trace/trace_id.h"
+
+#include <string>
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace sdk
@@ -88,7 +91,10 @@ public:
     status_desc_ = std::string(description);
   }
 
-  void SetName(nostd::string_view name) noexcept override { name_ = std::string(name); }
+  void SetName(nostd::string_view name) noexcept override
+  {
+    name_ = std::string(name.data(), name.length());
+  }
 
   void SetStartTime(opentelemetry::core::SystemTimestamp start_time) noexcept override
   {
