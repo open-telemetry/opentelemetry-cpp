@@ -1,0 +1,35 @@
+name: C/C++ CI on Windows
+
+on:
+  push:
+    branches:
+    - master
+    - build/*
+  pull_request:
+    branches:
+    - master
+    - build/*
+  schedule:
+  - cron: 0 2 * * 1-5
+
+jobs:
+  build:
+    name: Build on Windows ${{ matrix.arch }}-${{ matrix.config }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        arch: [Win32, x64]
+        config: [release, debug]
+        os: [windows-2016, windows-2019]    
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v2
+    - name: Build
+      env:
+      run: |
+        cd "$Env:GITHUB_WORKSPACE"
+        .\tools\build.cmd ${{ matrix.config }}
+    - name: Test
+      run: |
+        cd "$Env:GITHUB_WORKSPACE"
+        .\tools\run-tests-all.cmd

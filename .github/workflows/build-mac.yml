@@ -1,0 +1,34 @@
+name: C/C++ CI on Mac OS X
+
+on:
+  push:
+    branches:
+    - master
+    - build/*
+  pull_request:
+    branches:
+    - master
+    - build/*
+  schedule:
+  - cron: 0 2 * * 1-5
+
+jobs:
+  build:
+    name: Build on ${{ matrix.os }} ${{ matrix.config }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        config: [release]
+        os: [macOS-latest]
+    
+    steps:
+
+    - name: Checkout
+      uses: actions/checkout@v2
+
+    - name: Build
+      env:
+      run: tools/build.sh ${{ matrix.config }}
+
+    - name: Test
+      run: ./tools/run-tests-all.sh
