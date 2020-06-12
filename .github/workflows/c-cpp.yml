@@ -134,31 +134,20 @@ jobs:
     - name: run tests
       run: ./ci/do_ci.sh bazel.test
 
-  windows_cmake_test:
-    name: Build with CMake then run tests on Windows runner
+  windows:
+    name: Build with CMake, run CMake tests, test exporter protocol on Windows runner
     runs-on: windows-2019
     steps:
     - uses: actions/checkout@v2
     - name: setup
       run: |
-        .\ci\setup_windows_cmake.ps1
-        .\ci\setup_windows_ci_environment.ps1
+        ./ci/setup_windows_cmake.ps1
+        ./ci/setup_windows_ci_environment.ps1
+        ./ci/install_windows_protobuf.ps1
     - name: run cmake test
       run: ./ci/do_ci.ps1 cmake.test
-
-  windows_otprotocol_test:
-    name: Build with CMake, then test exporter protocol on Windows runner
-    runs-on: windows-2019
-    steps:
-    - uses: actions/checkout@v2
-    - name: setup
-      run: |
-        .\ci\setup_windows_cmake.ps1
-        .\ci\setup_windows_ci_environment.ps1
-        .\ci\install_windows_protobuf.ps1
-        timeout-minutes: 15
     - name: run otprotocol test
-      run: ./ci/do_ci.sh cmake.exporter.otprotocol.test
+      run: ./ci/do_ci.ps1 cmake.exporter.otprotocol.test
 
   windows_bazel:
     name: Build with Bazel on Windows runner
