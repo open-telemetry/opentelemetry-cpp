@@ -25,7 +25,7 @@ Meetings take place via [Zoom video conference](https://zoom.us/j/8203130519).
 
 Meeting notes are available as a public [Google doc](https://docs.google.com/document/d/1i1E4-_y4uJ083lCutKGDhkpi3n4_e774SBLi9hPLocw/edit?usp=sharing). For edit access, get in touch on [Gitter](https://gitter.im/open-telemetry/opentelemetry-cpp).
 
-Approvers ([@open-telemetry/dotnet-approvers](https://github.com/orgs/open-telemetry/teams/dotnet-approvers)):
+Approvers ([@open-telemetry/cpp-approvers](https://github.com/orgs/open-telemetry/teams/cpp-approvers)):
 
 - [Max Golovanov](https://github.com/maxgolov), Microsoft
 - [Johannes Tax](https://github.com/pyohannes), New Relic
@@ -35,7 +35,7 @@ Approvers ([@open-telemetry/dotnet-approvers](https://github.com/orgs/open-telem
 
 *Find more about the approver role in [community repository](https://github.com/open-telemetry/community/blob/master/community-membership.md#approver).*
 
-Maintainers ([@open-telemetry/dotnet-maintainers](https://github.com/orgs/open-telemetry/teams/dotnet-maintainers)):
+Maintainers ([@open-telemetry/cpp-maintainers](https://github.com/orgs/open-telemetry/teams/cpp-maintainers)):
 
 - [Emil Mikulic](https://github.com/g-easy), Google
 - [Reiley Yang](https://github.com/reyang), Microsoft
