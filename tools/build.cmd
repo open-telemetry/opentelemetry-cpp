@@ -13,13 +13,13 @@ REM - vs2017 (C++14)
 REM - vs2019 (C++20)
 REM
 
-set VS_TOOLS_VERSION=vs2019
-set CMAKE_GEN="Visual Studio 16 2019"
+if "%VS_TOOLS_VERSION%" == "" set "VS_TOOLS_VERSION=vs2019"
+if "%CMAKE_GEN%"        == "" set "CMAKE_GEN=Visual Studio 16 2019"
 
 cd %~dp0
 setlocal enableextensions
 setlocal enabledelayedexpansion
-set ROOT=%~dp0\..
+set "ROOT=%~dp0\.."
 set "VCPKG_CMAKE=%CD%/vcpkg/scripts/buildsystems/vcpkg.cmake"
 
 call "%~dp0\vcvars.cmd"
@@ -31,20 +31,21 @@ set "PATH=C:\Program Files\CMake\bin\;%PATH%"
 
 REM Build with nostd implementation
 set CONFIG=-DWITH_STL:BOOL=OFF
-set OUTDIR=%ROOT%\out.nostd
+set "OUTDIR=%ROOT%\out.nostd"
 call :build_config
 
 REM Build with STL implementation
 set CONFIG=-DWITH_STL:BOOL=ON
-set OUTDIR=%ROOT%\out.stl
+set "OUTDIR=%ROOT%\out.stl"
 call :build_config
 
 exit /B %ERRORLEVEL% 
 
 :build_config
-mkdir %OUTDIR%
-cd %OUTDIR%
-cmake ../ -G %CMAKE_GEN% -DCMAKE_TOOLCHAIN_FILE=%VCPKG_CMAKE% -Ax64 %CONFIG%
-set SOLUTION=%OUTDIR%\opentelemetry-cpp.sln
-msbuild %SOLUTION% /p:Configuration=Release /p:Platform=x64
+mkdir "%OUTDIR%"
+cd "%OUTDIR%"
+REM Optional platform specification parameter below: -Ax64
+cmake ../ -G "%CMAKE_GEN%" -DCMAKE_TOOLCHAIN_FILE="%VCPKG_CMAKE%" %CONFIG%
+set "SOLUTION=%OUTDIR%\opentelemetry-cpp.sln"
+msbuild "%SOLUTION%" /p:Configuration=Release /p:Platform=x64
 exit /b 0

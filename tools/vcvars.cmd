@@ -10,6 +10,7 @@ REM 4. Visual Studio 2019 Community
 REM 5. Visual Studio 2019 BuildTools
 REM
 
+REM 1st parameter - Visual Studio version
 if "%1" neq "" (
   goto %1
 )
@@ -61,7 +62,7 @@ REM vs2019 BuildTools
 set TOOLS_VS2019="%ProgramFiles(x86)%\Microsoft Visual Studio\2019\BuildTools\Common7\Tools\VsDevCmd.bat"
 if exist %TOOLS_VS2019% (
   echo Building with vs2019 BuildTools...
-  call %TOOLS_VS2017%
+  call %TOOLS_VS2019%
   goto tools_configured
 )
 

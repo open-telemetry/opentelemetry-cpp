@@ -4,4 +4,4 @@ call bootstrap-vcpkg.bat
 vcpkg integrate install
 vcpkg install gtest:x64-windows
 vcpkg install benchmark:x64-windows
-vcpkg install ms-gsl
+vcpkg install ms-gsl:x64-windows
