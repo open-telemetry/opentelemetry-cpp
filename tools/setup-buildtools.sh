@@ -59,9 +59,12 @@ apt-get install -qq libsqlite3-dev
 #apt install libsqlite3-dev
 apt-get install -qq wget
 apt-get install -qq clang-format
+apt-get install -qq gtest
 apt-get install -qq libgtest-dev
 apt-get install -qq libbenchmark-dev
 fi
 
 ## Change owner from root to current dir owner
 chown -R `stat . -c %u:%g` *
+
+./build-gtest.sh
