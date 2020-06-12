@@ -21,6 +21,7 @@ cmake -Dgtest_build_samples=OFF \
       -Dgmock_build_tests=OFF \
       -DCMAKE_CXX_FLAGS="-fPIC $CXX_FLAGS" \
       -DBUILD_IOS=$IOS_BUILD \
+      -DCMAKE_CXX_STANDARD=17 \
       ..
 make
 make install
