@@ -21,7 +21,7 @@ See [CONTRIBUTING.md](CONTRIBUTING.md)
 
 We meet weekly on Mondays at 3:00PM PT. Check the [OpenTelemetry community calendar](https://calendar.google.com/calendar/embed?src=google.com_b79e3e90j7bbsa2n2p5an5lf60%40group.calendar.google.com) for specific dates.
 
-Meetings take place via [Zoom video conference](https://zoom.us/j/8287234601).
+Meetings take place via [Zoom video conference](https://zoom.us/j/8203130519).
 
 Meeting notes are available as a public [Google doc](https://docs.google.com/document/d/1i1E4-_y4uJ083lCutKGDhkpi3n4_e774SBLi9hPLocw/edit?usp=sharing). For edit access, get in touch on [Gitter](https://gitter.im/open-telemetry/opentelemetry-cpp).
 
