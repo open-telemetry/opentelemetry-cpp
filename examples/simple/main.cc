@@ -23,10 +23,8 @@ void initTracer()
 
 int main()
 {
-  // Removing this line will leave OpenTelemetry SDK initialized with the default noop
-  // tracer, thus being effectively deactivated.
+  // Removing this line will leave the default noop TracerProvider in place.
   initTracer();
 
-  // Call the instrumented library
   foo_library();
 }
