@@ -22,16 +22,11 @@ jobs:
     strategy:
       matrix:
         config: [release]
-        os: [macOS-latest]
-    
+        os: [macOS-latest]    
     steps:
-
     - name: Checkout
       uses: actions/checkout@v2
-
     - name: Build
-      env:
       run: tools/build.sh ${{ matrix.config }}
-
     - name: Test
       run: ./tools/run-tests-all.sh

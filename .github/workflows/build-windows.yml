@@ -28,7 +28,6 @@ jobs:
     - name: Checkout
       uses: actions/checkout@v2
     - name: Build
-      env:
       run: |
         cd "$Env:GITHUB_WORKSPACE"
         .\tools\build.cmd ${{ matrix.config }}

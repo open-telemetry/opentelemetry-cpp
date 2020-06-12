@@ -27,7 +27,6 @@ jobs:
     - name: Checkout
       uses: actions/checkout@v2
     - name: Build
-      env:
       run: tools/build.sh ${{ matrix.config }}
     - name: Test
       run: ./tools/run-tests-all.sh
