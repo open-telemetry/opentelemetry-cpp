@@ -23,13 +23,18 @@ jobs:
       matrix:
         arch: [x64]
         config: [release]
-        os: [windows-2016, windows-2019]    
+        os: [windows-2019]
     steps:
 
     - name: Checkout
       uses: actions/checkout@v2
       with:
         submodules: 'true'
+
+    - name: Setup build tools
+      run: |
+        cd "$Env:GITHUB_WORKSPACE"
+        .\tools\setup-buildtools.cmd
 
     - name: Build
       run: |
