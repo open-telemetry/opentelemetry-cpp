@@ -56,17 +56,18 @@ fi
 #
 # Do the build for both configurations: WITH_STL=OFF and WITH_STL=ON
 #
-declare -A build_config
-build_config[nostd]='-DWITH_STL:BOOL=OFF'
-build_config[stl]='-DWITH_STL:BOOL=ON'
-for i in "${!build_config[@]}"
-do
-  echo "Build configuration: $i"
+function build_configuration {
+  BUILD_CONFIG=$1
+  BUILD_OPTIONS=$2
+
+  echo "Build configuration: $BUILD_CONFIG"
   cd $WORKSPACE_ROOT
-  OUTDIR=out.$i
+  OUTDIR=out.$BUILD_CONFIG
   mkdir -p $OUTDIR
   cd $OUTDIR
-  BUILD_OPTIONS=${build_config[$i]}
   cmake $BUILD_OPTIONS ..
   make
-done
+}
+
+build_configuration nostd '-DWITH_STL:BOOL=OFF'
+build_configuration stl   '-DWITH_STL:BOOL=ON'
