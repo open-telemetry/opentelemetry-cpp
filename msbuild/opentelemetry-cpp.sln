@@ -13,6 +13,10 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "opentelemetry", "openteleme
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "event", "event", "{82459F33-7252-4924-A9EC-D45398F90E3C}"
 	ProjectSection(SolutionItems) = preProject
+		..\api\include\opentelemetry\event\Attributes.hpp = ..\api\include\opentelemetry\event\Attributes.hpp
+		..\api\include\opentelemetry\event\Properties.hpp = ..\api\include\opentelemetry\event\Properties.hpp
+		..\api\include\opentelemetry\event\Property.hpp = ..\api\include\opentelemetry\event\Property.hpp
+		..\api\include\opentelemetry\event\time_ticks.hpp = ..\api\include\opentelemetry\event\time_ticks.hpp
 		..\api\include\opentelemetry\event\UUID.hpp = ..\api\include\opentelemetry\event\UUID.hpp
 	EndProjectSection
 EndProject
