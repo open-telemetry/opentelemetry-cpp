@@ -21,3 +21,15 @@ There are three important restrictions on binary compatibility:
 ### Exceptions
 
 - [__CxxFrameHandler4](https://devblogs.microsoft.com/cppblog/making-cpp-exception-handling-smaller-x64/) - static library built with Visual Studio 2019 wont link to executable compiled with Visual Studio 2017
+
+### Release vs Debug libraries on Windows
+
+- [\_SECURE_SCL](https://docs.microsoft.com/en-us/cpp/standard-library/secure-scl?view=vs-2019) - checked iterators (old)
+
+- [\_ITERATOR_DEBUG_LEVEL](https://docs.microsoft.com/en-us/cpp/standard-library/iterator-debug-level?view=vs-2019) - checked iterators (new)
+
+### Spectre Mitigation
+
+- [Runtime Libraries for Spectre Mitigation](https://docs.microsoft.com/en-us/cpp/build/reference/qspectre?view=vs-2019)
+
+- [New Spectre Mitigations in Visual Studio 2019](https://devblogs.microsoft.com/cppblog/more-spectre-mitigations-in-msvc/)
