@@ -20,7 +20,7 @@ jobs:
       run: ./ci/do_ci.sh cmake.test
 
   plugin_test:
-    name: Plugin -> CMake test
+    name: Plugin -> CMake
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
@@ -135,7 +135,7 @@ jobs:
       run: ./ci/do_ci.sh bazel.test
 
   windows:
-    name: CMake test -> exporter test
+    name: CMake -> exporter proto
     runs-on: windows-2019
     steps:
     - uses: actions/checkout@v2
@@ -160,7 +160,7 @@ jobs:
       run: ./ci/do_ci.ps1 bazel.build
 
   windows_plugin_test:
-    name: Plugin -> CMake test Windows
+    name: Plugin -> CMake Windows
     runs-on: windows-2019
     steps:
     - uses: actions/checkout@v2
