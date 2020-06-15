@@ -20,6 +20,11 @@ include(CTest)
 
 find_package(Threads)
 
+if(CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")
+  # Options for Visual C++ compiler
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /Zc:__cplusplus")
+endif()
+
 if(WITH_PROTOBUF)
   set(protobuf_MODULE_COMPATIBLE ON)
   find_package(Protobuf CONFIG NAMES protobuf)
