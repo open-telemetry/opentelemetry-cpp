@@ -69,5 +69,7 @@ if exist %TOOLS_VS2019% (
 echo WARNING:*********************************************
 echo WARNING: cannot auto-detect Visual Studio version !!!
 echo WARNING:*********************************************
+set TOOLS_VS_NOTFOUND=1
+exit /b 0
 
 :tools_configured

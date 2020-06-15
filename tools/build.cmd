@@ -16,36 +16,57 @@ REM
 if "%VS_TOOLS_VERSION%" == "" set "VS_TOOLS_VERSION=vs2019"
 if "%CMAKE_GEN%"        == "" set "CMAKE_GEN=Visual Studio 16 2019"
 
-cd %~dp0
+pushd %~dp0
 setlocal enableextensions
 setlocal enabledelayedexpansion
 set "ROOT=%~dp0\.."
-set "VCPKG_CMAKE=%CD%/vcpkg/scripts/buildsystems/vcpkg.cmake"
 
+REM Use preinstalled vcpkg if installed or use our local
+if "%VCPKG_INSTALLATION_ROOT%" neq "" (
+  set "VCPKG_CMAKE=%VCPKG_INSTALLATION_ROOT%\scripts\buildsystems\vcpkg.cmake"
+) else (
+  set "VCPKG_CMAKE=%CD%\vcpkg\scripts\buildsystems\vcpkg.cmake"
+)
+
+REM ********************************************************************
+REM Setup compiler environment
+REM ********************************************************************
 call "%~dp0\vcvars.cmd"
+
 
 REM ********************************************************************
 REM Use cmake
 REM ********************************************************************
-set "PATH=C:\Program Files\CMake\bin\;%PATH%"
+set "PATH=%PATH%;C:\Program Files\CMake\bin\"
 
+REM ********************************************************************
 REM Build with nostd implementation
+REM ********************************************************************
 set CONFIG=-DWITH_STL:BOOL=OFF
-set "OUTDIR=%ROOT%\out.nostd"
+set "OUTDIR=%ROOT%\out\%VS_TOOLS_VERSION%\nostd"
 call :build_config
 
+REM ********************************************************************
 REM Build with STL implementation
+REM ********************************************************************
 set CONFIG=-DWITH_STL:BOOL=ON
-set "OUTDIR=%ROOT%\out.stl"
+set "OUTDIR=%ROOT%\out\%VS_TOOLS_VERSION%\stl"
 call :build_config
 
-exit /B %ERRORLEVEL% 
+popd
+REM ********************************************************************
 
+
+REM ********************************************************************
+REM Function that allows to build given build configuration
+REM ********************************************************************
 :build_config
-mkdir "%OUTDIR%"
+REM TODO: consider rmdir for clean builds
+if not exist "%OUTDIR%" mkdir "%OUTDIR%"
 cd "%OUTDIR%"
 REM Optional platform specification parameter below: -Ax64
-cmake ../ -G "%CMAKE_GEN%" -DCMAKE_TOOLCHAIN_FILE="%VCPKG_CMAKE%" %CONFIG%
+cmake %ROOT% -G "%CMAKE_GEN%" -DCMAKE_TOOLCHAIN_FILE="%VCPKG_CMAKE%" %CONFIG%
 set "SOLUTION=%OUTDIR%\opentelemetry-cpp.sln"
+REM TODO: allow building [Release|Debug]x[Win32|x64|ARM|ARM64]
 msbuild "%SOLUTION%" /p:Configuration=Release /p:Platform=x64
 exit /b 0
