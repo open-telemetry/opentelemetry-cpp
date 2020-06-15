@@ -20,6 +20,16 @@ if [[ "$1" == "cmake.test" ]]; then
   make
   make test
   exit 0
+elif [[ "$1" == "cmake.c++20.test" ]]; then
+  cd "${BUILD_DIR}"
+  rm -rf *
+  cmake -DCMAKE_BUILD_TYPE=Debug  \
+        -DCMAKE_CXX_FLAGS="-Werror" \
+        -DCMAKE_CXX_STANDARD=20 \
+        "${SRC_DIR}"
+  make
+  make test
+  exit 0
 elif [[ "$1" == "cmake.exporter.otprotocol.test" ]]; then
   cd "${BUILD_DIR}"
   rm -rf *
