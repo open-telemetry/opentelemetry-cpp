@@ -35,7 +35,7 @@ public:
 
   void UpdateName(nostd::string_view name) noexcept override;
 
-  void End() noexcept override;
+  void End(const trace_api::EndSpanOptions &options = {}) noexcept override;
 
   bool IsRecording() const noexcept override;
 
@@ -46,6 +46,7 @@ private:
   std::shared_ptr<SpanProcessor> processor_;
   mutable std::mutex mu_;
   std::unique_ptr<Recordable> recordable_;
+  opentelemetry::core::SteadyTimestamp start_steady_time;
 };
 }  // namespace trace
 }  // namespace sdk

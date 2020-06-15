@@ -1,6 +1,9 @@
 #include "src/common/random.h"
 #include "src/common/platform/fork.h"
 
+#include <cstring>
+#include <random>
+
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace sdk
 {
@@ -40,10 +43,33 @@ private:
 thread_local FastRandomNumberGenerator TlsRandomNumberGenerator::engine_{};
 }  // namespace
 
-FastRandomNumberGenerator &GetRandomNumberGenerator() noexcept
+FastRandomNumberGenerator &Random::GetRandomNumberGenerator() noexcept
 {
   static thread_local TlsRandomNumberGenerator random_number_generator{};
   return TlsRandomNumberGenerator::engine();
+}
+
+uint64_t Random::GenerateRandom64() noexcept
+{
+  return GetRandomNumberGenerator()();
+}
+
+void Random::GenerateRandomBuffer(opentelemetry::nostd::span<uint8_t> buffer) noexcept
+{
+  auto buf_size = buffer.size();
+
+  for (size_t i = 0; i < buf_size; i += sizeof(uint64_t))
+  {
+    uint64_t value = GenerateRandom64();
+    if (i + sizeof(uint64_t) <= buf_size)
+    {
+      memcpy(&buffer[i], &value, sizeof(uint64_t));
+    }
+    else
+    {
+      memcpy(&buffer[i], &value, buf_size - i);
+    }
+  }
 }
 }  // namespace common
 }  // namespace sdk
