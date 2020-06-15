@@ -1,3 +1,10 @@
+![C/C++ CI on Windows 2016 (vs2017)](https://github.com/maxgolov/opentelemetry-cpp/workflows/C/C++%20CI%20on%20Windows%202016%20(vs2017)/badge.svg)
+![C/C++ CI on Windows 2019 (vs2019)](https://github.com/maxgolov/opentelemetry-cpp/workflows/C/C++%20CI%20on%20Windows%202019%20(vs2019)/badge.svg)
+
+![C/C++ CI on Ubuntu](https://github.com/maxgolov/opentelemetry-cpp/workflows/C/C++%20CI%20on%20Ubuntu/badge.svg)
+
+![C/C++ CI on Mac OS X](https://github.com/maxgolov/opentelemetry-cpp/workflows/C/C++%20CI%20on%20Mac%20OS%20X/badge.svg)
+
 # OpenTelemetry C/C++
 [![Gitter chat][gitter-image]][gitter-url]
 
