@@ -1,0 +1,47 @@
+name: C/C++ CI on Windows 2016 (vs2017)
+
+# Controls when the action will run. Triggers the workflow on push or pull request
+# events but only for the master branch
+on:
+  push:
+    branches:
+    - master
+    - build/*
+  pull_request:
+    branches:
+    - master
+    - build/*
+  schedule:
+  - cron: 0 2 * * 1-5
+
+# A workflow run is made up of one or more jobs that can run sequentially or in parallel
+jobs:
+  build:
+    name: Build on Windows ${{ matrix.arch }}-${{ matrix.config }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        arch: [x64]
+        config: [release]
+        os: [windows-2016]
+    steps:
+
+    - name: Checkout
+      uses: actions/checkout@v2
+      with:
+        submodules: 'true'
+
+    - name: Setup build tools
+      run: |
+        cd "$Env:GITHUB_WORKSPACE"
+        .\tools\setup-buildtools.cmd
+
+    - name: Build
+      run: |
+        cd "$Env:GITHUB_WORKSPACE"
+        .\tools\build-vs2017-x64.cmd ${{ matrix.config }}
+
+    - name: Test
+      run: |
+        cd "$Env:GITHUB_WORKSPACE"
+        .\tools\run-tests-all.cmd
