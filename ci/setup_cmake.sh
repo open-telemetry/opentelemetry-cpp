@@ -12,5 +12,5 @@ apt-get install --no-install-recommends --no-install-suggests -y \
 pushd /usr/src/gtest
 cmake CMakeLists.txt
 make
-cp *.a /usr/lib
+cp *.a /usr/lib || cp lib/*.a /usr/lib
 popd
