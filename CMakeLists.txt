@@ -22,6 +22,13 @@ include(CTest)
 
 find_package(Threads)
 
+if(CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")
+  # Options for Visual C++ compiler:
+  # /Zc:__cplusplus - report an updated value for recent C++ language standards.
+  # Without this option MSVC returns the value of __cplusplus="199711L"
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /Zc:__cplusplus")
+endif()
+
 if(WITH_PROTOBUF)
   set(protobuf_MODULE_COMPATIBLE ON)
   find_package(Protobuf CONFIG NAMES protobuf)
