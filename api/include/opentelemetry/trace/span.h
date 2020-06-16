@@ -37,7 +37,10 @@ struct StartSpanOptions
   core::SystemTimestamp start_system_time;
   core::SteadyTimestamp start_steady_time;
 
-  // Optionally set attributes at Span creation.
+  // Optionally set attributes at Span creation from the given key/value pairs..
+  //
+  // Attributes will be processed in order, previous attributes with the same
+  // key will be overwritten.
   nostd::span<std::pair<nostd::string_view, common::AttributeValue>> attributes;
 
   // TODO:

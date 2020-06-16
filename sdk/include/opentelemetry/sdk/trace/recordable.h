@@ -35,7 +35,7 @@ public:
                       opentelemetry::trace::SpanId parent_span_id) noexcept = 0;
 
   /**
-   * Add an attribute to a span.
+   * Set an attribute of a span.
    * @param name the name of the attribute
    * @param value the attribute value
    */
