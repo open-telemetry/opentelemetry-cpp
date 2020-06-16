@@ -122,7 +122,7 @@ TEST(Tracer, StartSpanWithOptionsAttributes)
 
   opentelemetry::trace::StartSpanOptions start;
   std::pair<nostd::string_view, common::AttributeValue> attributes[] = {
-      {"attr1", 314159}, {"attr2", false}, {"attr3", "string"}};
+      {"attr1", 314159}, {"attr2", false}, {"attr1", "string"}};
   start.attributes = attributes;
 
   tracer->StartSpan("span 1", start)->End();
@@ -130,8 +130,7 @@ TEST(Tracer, StartSpanWithOptionsAttributes)
   ASSERT_EQ(1, spans_received->size());
 
   auto &span_data = spans_received->at(0);
-  ASSERT_EQ(3, span_data->GetAttributes().size());
-  ASSERT_EQ(314159, nostd::get<int>(span_data->GetAttributes().at("attr1")));
+  ASSERT_EQ(2, span_data->GetAttributes().size());
+  ASSERT_EQ("string", nostd::get<nostd::string_view>(span_data->GetAttributes().at("attr1")));
   ASSERT_EQ(false, nostd::get<bool>(span_data->GetAttributes().at("attr2")));
-  ASSERT_EQ("string", nostd::get<nostd::string_view>(span_data->GetAttributes().at("attr3")));
 }
