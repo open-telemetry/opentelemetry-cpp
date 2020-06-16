@@ -37,12 +37,13 @@ struct StartSpanOptions
   core::SystemTimestamp start_system_time;
   core::SteadyTimestamp start_steady_time;
 
+  // Optionally set attributes at Span creation.
+  nostd::span<std::pair<nostd::string_view, common::AttributeValue>> attributes;
+
   // TODO:
   // Span(Context?) parent;
   // SpanContext remote_parent;
   // Links
-  // Attributes
-  nostd::span<std::pair<nostd::string_view, common::AttributeValue>> attributes;
   SpanKind kind = SpanKind::kInternal;
 };
 /**

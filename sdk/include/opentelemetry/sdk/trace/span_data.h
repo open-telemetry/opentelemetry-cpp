@@ -72,9 +72,9 @@ public:
    * Get the attributes for this span
    * @return the attributes for this span
    */
-  const std::unordered_map<std::string, common::AttributeValue>& GetAttributes() const noexcept
+  const std::unordered_map<std::string, common::AttributeValue> &GetAttributes() const noexcept
   {
-      return attributes_;
+    return attributes_;
   }
 
   void SetIds(opentelemetry::trace::TraceId trace_id,

@@ -2,9 +2,10 @@
 
 #include <iostream>
 
-namespace nostd = opentelemetry::nostd;
-namespace core  = opentelemetry::core;
-namespace trace = opentelemetry::trace;
+namespace nostd  = opentelemetry::nostd;
+namespace common = opentelemetry::common;
+namespace core   = opentelemetry::core;
+namespace trace  = opentelemetry::trace;
 
 namespace
 {
@@ -22,6 +23,10 @@ public:
   ~Span() { std::cout << "~Span\n"; }
 
   // opentelemetry::trace::Span
+  void SetAttribute(nostd::string_view /*name*/,
+                    common::AttributeValue && /*value*/) noexcept override
+  {}
+
   void AddEvent(nostd::string_view /*name*/) noexcept override {}
 
   void AddEvent(nostd::string_view /*name*/, core::SystemTimestamp /*timestamp*/) noexcept override

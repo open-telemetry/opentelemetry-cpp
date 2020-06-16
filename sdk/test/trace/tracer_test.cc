@@ -7,6 +7,8 @@
 using namespace opentelemetry::sdk::trace;
 using opentelemetry::core::SteadyTimestamp;
 using opentelemetry::core::SystemTimestamp;
+namespace nostd  = opentelemetry::nostd;
+namespace common = opentelemetry::common;
 
 /**
  * A mock exporter that switches a flag once a valid recordable was received.
@@ -23,8 +25,7 @@ public:
     return std::unique_ptr<Recordable>(new SpanData);
   }
 
-  ExportResult Export(
-      const opentelemetry::nostd::span<std::unique_ptr<Recordable>> &recordables) noexcept override
+  ExportResult Export(const nostd::span<std::unique_ptr<Recordable>> &recordables) noexcept override
   {
     for (auto &recordable : recordables)
     {
@@ -120,11 +121,8 @@ TEST(Tracer, StartSpanWithOptionsAttributes)
   auto tracer = initTracer(spans_received);
 
   opentelemetry::trace::StartSpanOptions start;
-  std::pair<opentelemetry::nostd::string_view, opentelemetry::common::AttributeValue> attributes[] = { 
-      {"attr1", 314159},
-      {"attr2", false}, 
-      {"attr3", "hi"} 
-  };
+  std::pair<nostd::string_view, common::AttributeValue> attributes[] = {
+      {"attr1", 314159}, {"attr2", false}, {"attr3", "string"}};
   start.attributes = attributes;
 
   tracer->StartSpan("span 1", start)->End();
@@ -133,7 +131,7 @@ TEST(Tracer, StartSpanWithOptionsAttributes)
 
   auto &span_data = spans_received->at(0);
   ASSERT_EQ(3, span_data->GetAttributes().size());
-  ASSERT_EQ(314159, opentelemetry::nostd::get<int>(span_data->GetAttributes().at("attr1")));
-  ASSERT_EQ(false, opentelemetry::nostd::get<bool>(span_data->GetAttributes().at("attr2")));
-  ASSERT_EQ("hi", opentelemetry::nostd::get<opentelemetry::nostd::string_view>(span_data->GetAttributes().at("attr3")));
+  ASSERT_EQ(314159, nostd::get<int>(span_data->GetAttributes().at("attr1")));
+  ASSERT_EQ(false, nostd::get<bool>(span_data->GetAttributes().at("attr2")));
+  ASSERT_EQ("string", nostd::get<nostd::string_view>(span_data->GetAttributes().at("attr3")));
 }
