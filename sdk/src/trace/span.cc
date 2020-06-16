@@ -72,6 +72,8 @@ Span::~Span()
 
 void Span::SetAttribute(nostd::string_view key, common::AttributeValue &&value) noexcept
 {
+  std::lock_guard<std::mutex> lock_guard{mu_};
+
   recordable_->SetAttribute(key, std::move(value));
 }
 
