@@ -1,6 +1,7 @@
 #pragma once
 
 #include <chrono>
+#include <map>
 #include "opentelemetry/core/timestamp.h"
 #include "opentelemetry/nostd/string_view.h"
 #include "opentelemetry/sdk/trace/recordable.h"
@@ -67,6 +68,15 @@ public:
    */
   std::chrono::nanoseconds GetDuration() const noexcept { return duration_; }
 
+  /**
+   * Get the duration for this span
+   * @return the duration for this span
+   */
+  const std::map<std::string, common::AttributeValue>& GetAttributes() const noexcept
+  {
+      return attributes_;
+  }
+
   void SetIds(opentelemetry::trace::TraceId trace_id,
               opentelemetry::trace::SpanId span_id,
               opentelemetry::trace::SpanId parent_span_id) noexcept override
@@ -78,8 +88,7 @@ public:
 
   void SetAttribute(nostd::string_view key, common::AttributeValue &&value) noexcept override
   {
-    (void)key;
-    (void)value;
+    attributes_[std::string(key)] = value;
   }
 
   void AddEvent(nostd::string_view name, core::SystemTimestamp timestamp) noexcept override
@@ -112,6 +121,7 @@ private:
   std::string name_;
   opentelemetry::trace::CanonicalCode status_code_{opentelemetry::trace::CanonicalCode::OK};
   std::string status_desc_;
+  std::map<std::string, common::AttributeValue> attributes_;
 };
 }  // namespace trace
 }  // namespace sdk
