@@ -6,7 +6,9 @@ cmake_policy(SET CMP0057 NEW)
 
 project(opentelemetry-cpp)
 
-set(CMAKE_CXX_STANDARD 11)
+if(NOT DEFINED CMAKE_CXX_STANDARD)
+  set(CMAKE_CXX_STANDARD 11)
+endif()
 
 option(WITH_OTPROTOCOL
        "Whether to include the OpenTelemetry Protocol in the SDK" OFF)
