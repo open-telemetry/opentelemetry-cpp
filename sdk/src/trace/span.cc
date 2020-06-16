@@ -64,6 +64,12 @@ Span::~Span()
   End();
 }
 
+void Span::SetAttribute(nostd::string_view key, common::AttributeValue &&value) noexcept
+{
+  (void)key;
+  (void)value;
+}
+
 void Span::AddEvent(nostd::string_view name) noexcept
 {
   (void)name;

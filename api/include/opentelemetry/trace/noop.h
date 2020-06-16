@@ -24,6 +24,10 @@ class NoopSpan final : public Span
 public:
   explicit NoopSpan(const std::shared_ptr<Tracer> &tracer) noexcept : tracer_{tracer} {}
 
+  void SetAttribute(nostd::string_view /*key*/,
+                    common::AttributeValue && /*value*/) noexcept override
+  {}
+
   void AddEvent(nostd::string_view /*name*/) noexcept override {}
 
   void AddEvent(nostd::string_view /*name*/, core::SystemTimestamp /*timestamp*/) noexcept override

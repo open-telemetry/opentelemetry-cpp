@@ -23,6 +23,7 @@ public:
   ~Span() override;
 
   // trace_api::Span
+  void SetAttribute(nostd::string_view key, common::AttributeValue &&value) noexcept override;
   void AddEvent(nostd::string_view name) noexcept override;
 
   void AddEvent(nostd::string_view name, core::SystemTimestamp timestamp) noexcept override;

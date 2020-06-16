@@ -76,6 +76,12 @@ public:
     parent_span_id_ = parent_span_id;
   }
 
+  void SetAttribute(nostd::string_view key, common::AttributeValue &&value) noexcept override
+  {
+    (void)key;
+    (void)value;
+  }
+
   void AddEvent(nostd::string_view name, core::SystemTimestamp timestamp) noexcept override
   {
     (void)name;

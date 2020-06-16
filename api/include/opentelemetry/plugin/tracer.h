@@ -18,6 +18,11 @@ public:
   {}
 
   // trace::Span
+  void SetAttribute(nostd::string_view name, common::AttributeValue &&value) noexcept override
+  {
+    span_->SetAttribute(name, std::move(value));
+  }
+
   void AddEvent(nostd::string_view name) noexcept override { span_->AddEvent(name); }
 
   void AddEvent(nostd::string_view name, core::SystemTimestamp timestamp) noexcept override
