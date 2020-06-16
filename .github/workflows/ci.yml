@@ -173,6 +173,7 @@ jobs:
 
   code_coverage:
     name: Code coverage report
+    runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
     - uses: codecov/codecov-action@v1
