@@ -114,6 +114,7 @@ elif [[ "$1" == "code.coverage" ]]; then
         "${SRC_DIR}"
   make
   make test
+  bash <(curl -s https://codecov.io/bash)
   exit 0
 fi
 
