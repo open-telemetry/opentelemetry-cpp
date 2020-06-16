@@ -91,7 +91,7 @@ TEST(Tracer, StartSpan)
   ASSERT_LT(std::chrono::nanoseconds(0), span_data->GetDuration());
 }
 
-TEST(Tracer, StartSpanWithOptions)
+TEST(Tracer, StartSpanWithOptionsTime)
 {
   std::shared_ptr<std::vector<std::unique_ptr<SpanData>>> spans_received(
       new std::vector<std::unique_ptr<SpanData>>);
@@ -111,4 +111,29 @@ TEST(Tracer, StartSpanWithOptions)
   auto &span_data = spans_received->at(0);
   ASSERT_EQ(std::chrono::nanoseconds(300), span_data->GetStartTime().time_since_epoch());
   ASSERT_EQ(std::chrono::nanoseconds(30), span_data->GetDuration());
+}
+
+TEST(Tracer, StartSpanWithOptionsAttributes)
+{
+  std::shared_ptr<std::vector<std::unique_ptr<SpanData>>> spans_received(
+      new std::vector<std::unique_ptr<SpanData>>);
+  auto tracer = initTracer(spans_received);
+
+  opentelemetry::trace::StartSpanOptions start;
+  std::pair<opentelemetry::nostd::string_view, opentelemetry::common::AttributeValue> attributes[] = { 
+      {"attr1", 314159},
+      {"attr2", false}, 
+      {"attr3", "hi"} 
+  };
+  start.attributes = attributes;
+
+  tracer->StartSpan("span 1", start)->End();
+
+  ASSERT_EQ(1, spans_received->size());
+
+  auto &span_data = spans_received->at(0);
+  ASSERT_EQ(3, span_data->GetAttributes().size());
+  ASSERT_EQ(314159, opentelemetry::nostd::get<int>(span_data->GetAttributes().at("attr1")));
+  ASSERT_EQ(false, opentelemetry::nostd::get<bool>(span_data->GetAttributes().at("attr2")));
+  ASSERT_EQ("hi", opentelemetry::nostd::get<opentelemetry::nostd::string_view>(span_data->GetAttributes().at("attr3")));
 }

@@ -55,6 +55,11 @@ Span::Span(std::shared_ptr<Tracer> &&tracer,
   processor_->OnStart(*recordable_);
   recordable_->SetName(name);
 
+  for (auto& attr : options.attributes) {
+      auto value = attr.second;
+      recordable_->SetAttribute(attr.first, std::move(value));
+  }
+
   recordable_->SetStartTime(NowOr(options.start_system_time));
   start_steady_time = NowOr(options.start_steady_time);
 }

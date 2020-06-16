@@ -42,6 +42,7 @@ struct StartSpanOptions
   // SpanContext remote_parent;
   // Links
   // Attributes
+  nostd::span<std::pair<nostd::string_view, common::AttributeValue>> attributes;
   SpanKind kind = SpanKind::kInternal;
 };
 /**
