@@ -172,8 +172,11 @@ jobs:
       run: ./ci/do_ci.ps1 cmake.test_example_plugin
 
   code_coverage:
-    name: Code coverage report
+    name: Code coverage
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
+    - name: run tests
+      run: ./ci/do_ci.sh code.coverage
+    - name: upload reports to codecov
     - uses: codecov/codecov-action@v1
