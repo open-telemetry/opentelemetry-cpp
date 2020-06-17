@@ -63,16 +63,13 @@ public:
 
 class SamplingResult
 {
-private:
+public:
   enum Decision
   {
     NOT_RECORD,
     RECORD,
     RECORD_AND_SAMPLE
   };
-
-public:
-  // TODO: add Decision enum
   virtual ~SamplingResult() = default;
   /**
    * Return sampling decision whether span should be sampled or not.
