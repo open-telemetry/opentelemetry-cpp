@@ -54,6 +54,8 @@ public:
 
 class SamplingResult
 {
+private:
+  enum Decision {NOT_RECORD, RECORD, RECORD_AND_SAMPLE};
 public:
   // TODO: add Decision enum
   virtual ~SamplingResult() = default;
@@ -62,7 +64,7 @@ public:
    *
    * @return TODO: Decision.
    */
-  virtual bool GetDecision();
+  virtual Decision GetDecision() const noexcept = 0;
 
   /**
    * Return attributes which will be attached to the span.
@@ -70,7 +72,7 @@ public:
    * @return attributes added to span. These attributes should be added to the span only for root
    *     span or when sampling decision isSampled() changes from false to true.
    */
-  virtual std::map<std::string, common::AttributeValue> GetAttributes();
+  virtual std::map<std::string, common::AttributeValue> GetAttributes() const noexcept = 0;
 };
 }  // namespace trace
 }  // namespace sdk
