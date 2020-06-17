@@ -180,5 +180,9 @@ jobs:
       run: |
         sudo ./ci/setup_cmake.sh
         sudo ./ci/setup_ci_environment.sh
-    - name: run tests and upload report
+    - name: run tests and generate report
       run: ./ci/do_ci.sh code.coverage
+    - name: upload report
+    - uses: codecov/codecov-action@v1
+      with:
+        file: coverage.info

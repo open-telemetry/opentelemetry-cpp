@@ -115,7 +115,6 @@ elif [[ "$1" == "code.coverage" ]]; then
   make
   make test
   lcov --directory . --capture --output-file coverage.info
-  bash <(curl -s https://codecov.io/bash) -e yaml=".github/.codecov.yaml" -f coverage.info
   exit 0
 fi
 
