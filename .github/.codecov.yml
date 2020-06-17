@@ -1,5 +1,6 @@
 codecov:
   require_ci_to_pass: yes
+  max_report_age: off
 
 coverage:
   precision: 2
@@ -18,4 +19,3 @@ comment:
   layout: "reach,diff,flags,tree"
   behavior: default
   require_changes: no
-
