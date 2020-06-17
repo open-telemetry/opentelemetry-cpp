@@ -114,7 +114,7 @@ elif [[ "$1" == "code.coverage" ]]; then
         "${SRC_DIR}"
   make
   make test
-  lcov --directory . --capture --output-file coverage.info
+  lcov --directory /home/runner --capture --output-file coverage.info
   exit 0
 fi
 
