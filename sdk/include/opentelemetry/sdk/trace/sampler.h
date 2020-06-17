@@ -2,6 +2,7 @@
 
 #include "opentelemetry/common/attribute_value.h"
 #include "opentelemetry/nostd/string_view.h"
+#include "opentelemetry/nostd/span.h"
 #include "opentelemetry/sdk/common/atomic_shared_ptr.h"
 #include "opentelemetry/trace/span.h"
 #include "opentelemetry/trace/trace_id.h"
@@ -48,7 +49,7 @@ public:
       trace_api::TraceId trace_id,
       nostd::string_view name,
       trace_api::SpanKind span_kind,
-      std::map<std::string, common::AttributeValue> attributes) noexcept = 0;
+      nostd::span<std::pair<nostd::string_view, common::AttributeValue>> attributes) noexcept = 0;
 
   /**
    * Returns the description of this {@code Sampler}. This may be displayed on debug pages or in the
@@ -88,7 +89,7 @@ public:
    * @return attributes added to span. These attributes should be added to the span only for root
    *     span or when sampling decision isSampled() changes from false to true.
    */
-  virtual std::map<std::string, common::AttributeValue> GetAttributes() const noexcept = 0;
+  virtual nostd::span<std::pair<nostd::string_view, common::AttributeValue>> GetAttributes() const noexcept = 0;
 };
 }  // namespace trace
 }  // namespace sdk
