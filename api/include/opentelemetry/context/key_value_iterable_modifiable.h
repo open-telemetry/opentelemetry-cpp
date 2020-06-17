@@ -14,25 +14,13 @@ namespace context
     template <class T>
     class KeyValueIterableModifiable final : public trace::KeyValueIterable
   {
-    //static_assert(trace::detail::is_key_value_iterable<T>::value, "Must be a key-value iterable");
 
     public:
       KeyValueIterableModifiable(T container) noexcept : container_{container} {}
 
       KeyValueIterableModifiable() = default;
-      // KeyValueIterable
-      void PrintKeys()
-      {
-        std::cout << "Printing Keys" << std::endl;
-        auto iter = std::begin(container_);
-        auto last = std::end(container_);
-        for (; iter != last; ++iter)
-        {
-          std::cout /*<< iter->first << " "*/ << iter->second << std::endl;
-        }
-        //        return true;
-      }
-      
+     
+     
       void Add(T container)
       {
           
@@ -65,25 +53,27 @@ namespace context
           
       
       }
-
+      
+      /* Returns the stored data. */
       T GetData(){
         return container_;
       }
 
-      // KeyValueIterable
       bool ForEachKeyValue(
           nostd::function_ref<bool(nostd::string_view, common::AttributeValue)> callback) const
         noexcept override
         {
+          //TODO
+          /*
           auto iter = std::begin(container_);
           auto last = std::end(container_);
           for (; iter != last; ++iter)
           {
-/*            if (!callback(iter->first, iter->second))
+            if (!callback(iter->first, iter->second))
             {
               return false;
-            }*/
-          }
+            }
+          }*/
           return true;
         }
 

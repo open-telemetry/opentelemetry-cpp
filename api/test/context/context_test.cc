@@ -1,10 +1,9 @@
-
 #include "opentelemetry/context/context.h"
-#include "opentelemetry/context/threadlocal_context.h"
 #include "opentelemetry/context/key_value_iterable_modifiable.h"
 #include "opentelemetry/nostd/string_view.h"
-
 #include "opentelemetry/common/attribute_value.h"
+#include "opentelemetry/context/runtime_context.h"
+#include "opentelemetry/context/threadlocal_context.h"
 
 #include <gtest/gtest.h>
 
@@ -16,11 +15,14 @@ using namespace opentelemetry;
  */
 TEST(Context_test, is_context_immutable)
 {
+  /*
   context::Key test_key = context::Key("test_key");
   context::Key other_key = context::Key("other_key");
   context::Key foo_key = context::Key("foo_key");
-  
+  */
   using M = std::map<context::Key*, common::AttributeValue>;
+  
+  context::Context<M> test_context = context::Context<M>(m1);
   
   M m1    = {{&test_key, "123"}, {&other_key, "456"}};
   M m2    = {{&foo_key, "000"}};
@@ -28,7 +30,6 @@ TEST(Context_test, is_context_immutable)
   //trace::KeyValueIterable iterable{m1}; 
   //trace::KeyValueIterableView<M> iterable_1{m1};
   
-  context::Context<M> test_context = context::Context<M>(m1);
   
   EXPECT_EQ(nostd::get<nostd::string_view>(test_context.GetValue(test_key)), "123");
   EXPECT_EQ(nostd::get<nostd::string_view>(test_context.GetValue(other_key)), "456");
@@ -43,6 +44,7 @@ TEST(Context_test, is_context_immutable)
 /* Tests whether the new Context Objects inherits the keys and values
  * of the original context object 
  */
+/*
 TEST(Context_test, context_write_new_object){
 
   context::Key test_key = context::Key("test_key");
@@ -65,7 +67,8 @@ TEST(Context_test, context_write_new_object){
   EXPECT_EQ(nostd::get<nostd::string_view>(foo_context.GetValue(other_key)), "456");
   EXPECT_EQ(nostd::get<nostd::string_view>(foo_context.GetValue(foo_key)), "000");
 }
-
+*/
+/*
 TEST(Context_test, thread_local_context){
   
   context::Key test_key = context::Key("test_key");
@@ -92,3 +95,4 @@ TEST(Context_test, thread_local_context){
   EXPECT_NE(nostd::get<nostd::string_view>(test_thread_context.GetCurrent().GetValue(test_key)), "123");
 
 }
+*/
