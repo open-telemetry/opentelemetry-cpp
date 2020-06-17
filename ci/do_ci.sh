@@ -115,7 +115,6 @@ elif [[ "$1" == "code.coverage" ]]; then
   make
   make test
   lcov --directory $PWD --capture --output-file coverage.info
-  echo $PWD
   exit 0
 fi
 
