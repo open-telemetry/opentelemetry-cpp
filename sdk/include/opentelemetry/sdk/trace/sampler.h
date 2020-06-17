@@ -35,7 +35,7 @@ public:
    * @since 0.1.0
    */
 
-  virtual Decision shouldSample(
+  virtual SamplingResult ShouldSample(
       trace_api::TraceId trace_id,
       std::string name,
       trace_api::SpanKind span_kind,
@@ -49,30 +49,29 @@ public:
    *
    * @return the description of this {@code Sampler}.
    */
-  virtual std::string getDescription();
+  virtual std::string GetDescription() const noexcept = 0;
 };
 
-class Decision
+class SamplingResult
 {
 public:
-  virtual ~Decision() = default;
+  // TODO: add Decision enum
+  virtual ~SamplingResult() = default;
   /**
    * Return sampling decision whether span should be sampled or not.
    *
-   * @return sampling decision.
+   * @return TODO: Decision.
    */
-  virtual bool isSampled();
+  virtual bool GetDecision();
 
   /**
-   * Return tags which will be attached to the span.
+   * Return attributes which will be attached to the span.
    *
    * @return attributes added to span. These attributes should be added to the span only for root
    *     span or when sampling decision isSampled() changes from false to true.
    */
-  virtual std::map<std::string, common::AttributeValue> getAttributes();
+  virtual std::map<std::string, common::AttributeValue> GetAttributes();
 };
-
-class
 }  // namespace trace
 }  // namespace sdk
 OPENTELEMETRY_END_NAMESPACE
