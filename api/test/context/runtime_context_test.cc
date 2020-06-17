@@ -1,53 +1,76 @@
 #include "opentelemetry/context/context.h"
+#include "opentelemetry/nostd/string_view.h"
+#include "opentelemetry/nostd/utility.h"
+#include "opentelemetry/context/key_value_iterable_modifiable.h"
 
 #include <gtest/gtest.h>
 
-namespace
-{
 
-using opentelemetry::context::Context;
-using opentelemetry::context::RuntimeContext;
+  using namespace opentelemetry/*::Context*/;
+  //using opentelemetry::context::RuntimeContext;
 
-/* Tests whether the runtimeContext object properly returns the current context
- */
-TEST(RuntimeContextTest, GetCurrentContext)
-{
+  /* Tests whether the runtimeContext object properly returns the current context
+   */
+  TEST(RuntimeContextTest, GetCurrentContext)
+  {
+    using M = std::map< context::Key* ,  nostd::string_view>;
 
-  Context::Key test_key = Context::Key("test_key");
-  Context test_context  = Context(test_key, 7);
+    context::Key test_key = context::Key("test_key");
+    
+    M m1    = {{&test_key, "123"}};
+    
+    context::KeyValueIterableModifiable<M> iterable_1{m1};
+  
+    context::Context<M> test_context = context::Context<M>(iterable_1);
+    
+    context::RuntimeContext<M> test_runtime;// = context::RuntimeContext<M>(test_context);
+    
+    test_runtime.Attach(test_context);
+    
+    test_context.GetValue(test_key);
+    
+    test_runtime.GetCurrent().GetValue(test_key);
+    
+    EXPECT_EQ(nostd::get<nostd::string_view>(test_runtime.GetCurrent().GetValue(test_key)), "123");
+    EXPECT_EQ( nostd::get<nostd::string_view>(test_runtime.GetCurrent().GetValue(test_key)), nostd::get<nostd::string_view>(test_context.GetValue(test_key)) );
+  }
 
-  RuntimeContext test_runtime = RuntimeContext(test_context);
+  /* Tests whether the runtimeContext object properly attaches and detaches
+   * the context object.
+   */
+  TEST(RuntimeContextTest, AttachDetachContext)
+  {
+  
+    using M = std::map< context::Key* ,  nostd::string_view>;
 
-  EXPECT_EQ(test_runtime.GetCurrent().GetValue(test_key), test_context.GetValue(test_key));
-}
-
-/* Tests whether the runtimeContext object properly attaches and detaches
- * the context object.
- */
-TEST(RuntimeContextTest, AttachDetachContext)
-{
-
-  Context::Key test_key = Context::Key("test_key");
-  Context test_context  = Context(test_key, 7);
-
-  RuntimeContext test_runtime = RuntimeContext(test_context);
-
-  Context::Key foo_key = Context::Key("foo_key");
-  Context foo_context  = Context(foo_key, 5);
-
-  EXPECT_EQ(test_runtime.GetCurrent().GetValue(test_key), test_context.GetValue(test_key));
-  EXPECT_NE(test_runtime.GetCurrent().GetValue(foo_key), foo_context.GetValue(foo_key));
-
-  RuntimeContext::Token test_token = test_runtime.Attach(foo_context);
-
-  EXPECT_NE(test_runtime.GetCurrent().GetValue(test_key), test_context.GetValue(test_key));
-  EXPECT_EQ(test_runtime.GetCurrent().GetValue(foo_key), foo_context.GetValue(foo_key));
-
-  int detach_result = test_runtime.Detach(test_token);
-
-  EXPECT_EQ(detach_result, 0);
-
-  EXPECT_EQ(test_runtime.GetCurrent().GetValue(test_key), test_context.GetValue(test_key));
-  EXPECT_NE(test_runtime.GetCurrent().GetValue(foo_key), foo_context.GetValue(foo_key));
-}
-}  // namespace
+    context::Key test_key = context::Key("test_key");
+    
+    context::Key foo_key = context::Key("foo_key");
+    
+    M m1    = {{&test_key, "123"}};
+    
+    M m2    = {{&foo_key, "534"}};
+    
+    context::KeyValueIterableModifiable<M> iterable_1{m1};
+  
+    context::Context<M> test_context = context::Context<M>(iterable_1);
+   
+    context::KeyValueIterableModifiable<M> iterable_2{m2};
+  
+    context::Context<M> foo_context = context::Context<M>(iterable_2);
+    
+    context::RuntimeContext<M> test_runtime;// = context::RuntimeContext<M>(test_context);
+    
+    test_runtime.Attach(test_context);
+     
+    EXPECT_EQ(nostd::get<nostd::string_view>(test_runtime.GetCurrent().GetValue(test_key)), "123");
+    EXPECT_EQ( nostd::get<nostd::string_view>(test_runtime.GetCurrent().GetValue(test_key)), nostd::get<nostd::string_view>(test_context.GetValue(test_key)) );
+  
+    context::RuntimeContext<M>::Token old_context = test_runtime.Attach(foo_context);
+    
+    EXPECT_EQ( nostd::get<nostd::string_view>(test_runtime.GetCurrent().GetValue(foo_key)), nostd::get<nostd::string_view>(foo_context.GetValue(foo_key)) );
+    
+    test_runtime.Detach(old_context);
+    
+    EXPECT_EQ( nostd::get<nostd::string_view>(test_runtime.GetCurrent().GetValue(test_key)), nostd::get<nostd::string_view>(test_context.GetValue(test_key)) );
+  }
