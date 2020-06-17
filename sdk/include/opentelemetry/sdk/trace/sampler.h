@@ -19,6 +19,38 @@ namespace sdk
 namespace trace
 {
 namespace trace_api = opentelemetry::trace;
+class SamplingResult
+{
+public:
+  /**
+   * NOT_RECORD - IsRecording() == false, 
+   *    span will not be recorded and all events and attributes will be dropped.
+   * RECORD - IsRecording() == true, but Sampled flag MUST NOT be set.
+   * RECORD_AND_SAMPLED - IsRecording() == true AND Sampled flag` MUST be set.
+   */
+  enum Decision
+  {
+    NOT_RECORD,
+    RECORD,
+    RECORD_AND_SAMPLE
+  };
+  virtual ~SamplingResult() = default;
+  /**
+   * Return sampling decision.
+   *
+   * @return Decision.
+   */
+  virtual Decision GetDecision() const noexcept = 0;
+
+  /**
+   * Return attributes which will be attached to the span.
+   *
+   * @return the immutable list of attributes added to span.
+   */
+  virtual nostd::span<std::pair<nostd::string_view, common::AttributeValue>> GetAttributes() const
+      noexcept = 0;
+};
+
 class Sampler
 {
 private:
@@ -44,12 +76,12 @@ public:
    * @since 0.1.0
    */
 
-  virtual SamplingResult ShouldSample(
-      std::shared_ptr<SpanContext> parent_context,
+  virtual std::shared_ptr<SamplingResult> ShouldSample(
+      const SpanContext* parent_context,
       trace_api::TraceId trace_id,
       nostd::string_view name,
       trace_api::SpanKind span_kind,
-      std::map<std::string, common::AttributeValue> attributes) noexcept = 0;
+      nostd::span<std::pair<nostd::string_view, common::AttributeValue>> attributes) noexcept = 0;
 
   /**
    * Returns the sampler name or short description with the configuration. 
@@ -58,32 +90,6 @@ public:
    * @return the description of this Sampler.
    */
   virtual std::string GetDescription() const noexcept = 0;
-};
-
-class SamplingResult
-{
-public:
-  enum Decision
-  {
-    NOT_RECORD,
-    RECORD,
-    RECORD_AND_SAMPLE
-  };
-  virtual ~SamplingResult() = default;
-  /**
-   * Return sampling decision.
-   *
-   * @return Decision.
-   */
-  virtual Decision GetDecision() const noexcept = 0;
-
-  /**
-   * Return attributes which will be attached to the span.
-   *
-   * @return the immutable list of attributes added to span.
-   */
-  virtual nostd::span<std::pair<nostd::string_view, common::AttributeValue>> GetAttributes() const
-      noexcept = 0;
 };
 }  // namespace trace
 }  // namespace sdk
