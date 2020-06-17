@@ -49,7 +49,7 @@ public:
       trace_api::TraceId trace_id,
       nostd::string_view name,
       trace_api::SpanKind span_kind,
-      std::map<std::string, common::AttributeValue> attributes) noexcept = 0;
+      nostd::span<std::pair<nostd::string_view, common::AttributeValue>> attributes) noexcept = 0;
 
   /**
    * Returns the sampler name or short description with the configuration. 
