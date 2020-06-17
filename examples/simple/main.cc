@@ -11,8 +11,7 @@ namespace
 {
 void initTracer()
 {
-  auto exporter = std::unique_ptr<sdktrace::SpanExporter>(new StdoutExporter);
-  // Specify the Span Processor: SimpleSpanProcessor forwards spans directly to the exporter
+  auto exporter  = std::unique_ptr<sdktrace::SpanExporter>(new StdoutExporter);
   auto processor = std::shared_ptr<sdktrace::SpanProcessor>(
       new sdktrace::SimpleSpanProcessor(std::move(exporter)));
   auto provider = nostd::shared_ptr<trace::TracerProvider>(new sdktrace::TracerProvider(processor));
