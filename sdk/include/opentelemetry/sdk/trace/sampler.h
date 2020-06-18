@@ -19,21 +19,21 @@ namespace sdk
 namespace trace
 {
 namespace trace_api = opentelemetry::trace;
+/**
+ * NOT_RECORD - IsRecording() == false, 
+ *    span will not be recorded and all events and attributes will be dropped.
+ * RECORD - IsRecording() == true, but Sampled flag MUST NOT be set.
+ * RECORD_AND_SAMPLED - IsRecording() == true AND Sampled flag` MUST be set.
+ */
+enum class Decision
+{
+  NOT_RECORD,
+  RECORD,
+  RECORD_AND_SAMPLE
+};
 class SamplingResult
 {
 public:
-  /**
-   * NOT_RECORD - IsRecording() == false, 
-   *    span will not be recorded and all events and attributes will be dropped.
-   * RECORD - IsRecording() == true, but Sampled flag MUST NOT be set.
-   * RECORD_AND_SAMPLED - IsRecording() == true AND Sampled flag` MUST be set.
-   */
-  enum Decision
-  {
-    NOT_RECORD,
-    RECORD,
-    RECORD_AND_SAMPLE
-  };
   virtual ~SamplingResult() = default;
   /**
    * Return sampling decision.
@@ -53,12 +53,10 @@ public:
 
 class Sampler
 {
-private:
+public:
   // Placeholder
   class SpanContext
   {};
-
-public:
   virtual ~Sampler() = default;
   /**
    * Called during Span creation to make a sampling decision.
