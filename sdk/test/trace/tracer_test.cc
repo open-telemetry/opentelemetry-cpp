@@ -121,7 +121,7 @@ TEST(Tracer, StartSpanWithOptionsAttributes)
   auto tracer = initTracer(spans_received);
 
   opentelemetry::trace::StartSpanOptions start;
-  std::pair<nostd::string_view, common::AttributeValue> attributes[] = {
+  common::AttributeKeyValue attributes[] = {
       {"attr1", 314159}, {"attr2", false}, {"attr1", "string"}};
   start.attributes = attributes;
 

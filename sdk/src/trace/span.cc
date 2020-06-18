@@ -57,8 +57,8 @@ Span::Span(std::shared_ptr<Tracer> &&tracer,
 
   for (auto &attr : options.attributes)
   {
-    auto value = attr.second;
-    recordable_->SetAttribute(attr.first, std::move(value));
+    auto value = attr.value;
+    recordable_->SetAttribute(attr.key, std::move(value));
   }
 
   recordable_->SetStartTime(NowOr(options.start_system_time));
