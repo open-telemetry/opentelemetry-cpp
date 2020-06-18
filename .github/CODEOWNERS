@@ -2,4 +2,4 @@
 # This file controls who is tagged for review for any given pull request.
 
 # For anything not explicitly taken by someone else:
-*       @g-easy @jmacd @maxgolov @pyohannes @reyang @rnburn @tigrannajaryan
+*       @open-telemetry/cpp-approvers

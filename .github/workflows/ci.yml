@@ -19,6 +19,18 @@ jobs:
     - name: run tests
       run: ./ci/do_ci.sh cmake.test
 
+  cmake_test_cxx20:
+    name: CMake C++20 test
+    runs-on: ubuntu-20.04
+    steps:
+    - uses: actions/checkout@v2
+    - name: setup
+      run: |
+        sudo ./ci/setup_ci_environment.sh
+        sudo ./ci/setup_cmake.sh
+    - name: run tests
+      run: ./ci/do_ci.sh cmake.c++20.test
+
   plugin_test:
     name: Plugin -> CMake
     runs-on: ubuntu-latest

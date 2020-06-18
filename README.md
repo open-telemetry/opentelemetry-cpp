@@ -29,9 +29,7 @@ Approvers ([@open-telemetry/cpp-approvers](https://github.com/orgs/open-telemetr
 
 - [Max Golovanov](https://github.com/maxgolov), Microsoft
 - [Johannes Tax](https://github.com/pyohannes), New Relic
-- [Josh MacDonald](https://github.com/jmacd), Lightstep
 - [Ryan Burn](https://github.com/rnburn), Lightstep
-- [Tigran Najaryan](https://github.com/tigrannajaryan), Splunk
 
 *Find more about the approver role in [community repository](https://github.com/open-telemetry/community/blob/master/community-membership.md#approver).*
 
