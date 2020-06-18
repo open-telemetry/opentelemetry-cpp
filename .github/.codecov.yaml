@@ -20,5 +20,9 @@ comment:
   behavior: default
   require_changes: no
 
+# Relative file path fixing.
+# CI file paths must match Git file paths.
+# This fix removes the "/home/runner/" prefix 
+# to coverage report file paths.
 fixes:
   - "/home/runner/::"
