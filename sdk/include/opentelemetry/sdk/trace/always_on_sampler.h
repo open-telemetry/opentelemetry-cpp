@@ -18,10 +18,6 @@ class AlwaysOnSampler final : public sdk::trace::Sampler
 {
 public:
   /**
-   * Default constructor
-   */
-  AlwaysOnSampler() noexcept {}
-  /**
    * Returned SamplingResult always has RECORD_AND_SAMPLED
    *    as the Decision
    */

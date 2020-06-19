@@ -8,8 +8,6 @@ namespace sdk
 {
 namespace trace
 {
-AlwaysOnSampler::AlwaysOnSampler() noexcept {}
-
 /**
  * Return RECORD_AND_SAMPLE and an empty set of attributes
  */
@@ -25,6 +23,11 @@ SamplingResult AlwaysOnSampler::ShouldSample(
     sdk::trace::Decision::RECORD_AND_SAMPLE,
         std::unique_ptr<nostd::span<AttributeKeyValue>>(new nostd::span<AttributeKeyValue>())
   };
+}
+
+std::string AlwaysOnSampler::GetDescription() const noexcept
+{
+  return std::string("AlwaysOnSampler");
 }
 }  // namespace trace
 }  // namespace sdk
