@@ -38,7 +38,7 @@ enum class Decision
  */
 struct AttributeKeyValue {
     nostd::string_view key;
-    AttributeValue value;
+    common::AttributeValue value;
 };
 
 struct SamplingResult
