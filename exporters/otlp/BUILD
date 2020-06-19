@@ -55,6 +55,8 @@ cc_binary(
         "//sdk/src/trace",
         "@com_github_opentelemetry_proto//:trace_proto_cc",
         "@com_github_opentelemetry_proto//:trace_service_proto_cc",
+
+        # For gRPC
         #"@com_github_opentelemetry_proto//:trace_service_grpc_cc",
         #"@com_github_grpc_grpc//:grpc++",
     ],

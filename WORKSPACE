@@ -71,10 +71,13 @@ new_local_repository(
 
 # bazel_version_repository(name = "upb_bazel_version")
 
+# Add skylib?
+#load("@bazel_skylib//:workspace.bzl", "bazel_skylib_workspace")
+#bazel_skylib_workspace()
 
-# Not mentioned in official docs... mentioned here https://github.com/grpc/grpc/issues/20511
-#load("@com_github_grpc_grpc//bazel:grpc_extra_deps.bzl", "grpc_extra_deps")
-#grpc_extra_deps()
+# # Not mentioned in official docs... mentioned here https://github.com/grpc/grpc/issues/20511
+# load("@com_github_grpc_grpc//bazel:grpc_extra_deps.bzl", "grpc_extra_deps")
+# grpc_extra_deps()
 
 
 # GoogleTest framework.
