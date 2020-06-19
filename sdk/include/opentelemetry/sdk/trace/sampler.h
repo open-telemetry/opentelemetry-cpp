@@ -54,7 +54,7 @@ public:
    *     the parentContext, unless this is a root span.
    * @param name the name of the new Span.
    * @param spanKind the trace_api::SpanKind of the Span.
-   * @param attributes TODO: list of AttributeValue with their keys.
+   * @param attributes list of AttributeValue with their keys.
    * @param links TODO: Collection of links that will be associated with the Span to be created.
    * @return sampling result whether span should be sampled or not.
    * @since 0.1.0
@@ -65,7 +65,7 @@ public:
       trace_api::TraceId trace_id,
       nostd::string_view name,
       trace_api::SpanKind span_kind,
-      nostd::span<common::AttributeKeyValue> attributes) noexcept = 0;
+      const nostd::span<common::AttributeKeyValue> &attributes) noexcept = 0;
 
   /**
    * Returns the sampler name or short description with the configuration.
