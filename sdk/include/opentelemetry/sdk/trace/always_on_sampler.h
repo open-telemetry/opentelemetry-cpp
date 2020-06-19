@@ -14,13 +14,6 @@ namespace sdk
 {
 namespace trace
 {
-class AlwaysOnSamplingResult final : public sdk::trace::SamplingResult
-{
-  Decision GetDecision() const noexcept override;
-  nostd::span<std::pair<nostd::string_view, common::AttributeValue>> GetAttributes() const
-      noexcept override;
-};
-
 class AlwaysOnSampler final : public sdk::trace::Sampler
 {
 public:
