@@ -25,22 +25,18 @@ public:
    * Returned SamplingResult always has RECORD_AND_SAMPLED
    *    as the Decision
    */
-  std::shared_ptr<SamplingResult> ShouldSample(
+  SamplingResult ShouldSample(
       const SpanContext *parent_context,
       trace_api::TraceId trace_id,
       nostd::string_view name,
       trace_api::SpanKind span_kind,
-      nostd::span<std::pair<nostd::string_view, common::AttributeValue>>
-          attributes) noexcept override;
+      const nostd::span<AttributeKeyValue> &attributes) noexcept override;
 
   /**
    * @return Description MUST be AlwaysOnSampler
    */
   std::string GetDescription() const noexcept override;
-
-private:
-  opentelemetry::sdk::AtomicSharedPtr<SamplingResult> sampling_result_;
-}
+};
 }  // namespace trace
 }  // namespace sdk
 OPENTELEMETRY_END_NAMESPACE

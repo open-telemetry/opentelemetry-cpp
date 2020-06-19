@@ -8,21 +8,24 @@ namespace sdk
 {
 namespace trace
 {
-AlwaysOnSamplingResult::Decision AlwaysOnSamplingResult::GetDecision() const noexcept
-{
-  return 
-}
+AlwaysOnSampler::AlwaysOnSampler() noexcept {}
 
-AlwaysOnSampler::AlwaysOnSampler() noexcept
-    : sampling_result_(std::shared_ptr<SamplingResult>(new SamplingResult))
-{}
-std::shared_ptr<SamplingResult> AlwaysOnSampler::ShouldSample(
+/**
+ * Return RECORD_AND_SAMPLE and an empty set of attributes
+ */
+SamplingResult AlwaysOnSampler::ShouldSample(
     const SpanContext *parent_context,
     trace_api::TraceId trace_id,
     nostd::string_view name,
     trace_api::SpanKind span_kind,
-    nostd::span<std::pair<nostd::string_view, common::AttributeValue>> attributes) noexcept
-{}
+    const nostd::span<AttributeKeyValue> &attributes) noexcept
+{
+  return
+  {
+    sdk::trace::Decision::RECORD_AND_SAMPLE,
+        std::unique_ptr<nostd::span<AttributeKeyValue>>(new nostd::span<AttributeKeyValue>())
+  };
+}
 }  // namespace trace
 }  // namespace sdk
 OPENTELEMETRY_END_NAMESPACE
