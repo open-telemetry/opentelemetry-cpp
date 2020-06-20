@@ -120,12 +120,12 @@ TEST(Tracer, StartSpanWithOptionsAttributes)
       new std::vector<std::unique_ptr<SpanData>>);
   auto tracer = initTracer(spans_received);
 
-  opentelemetry::trace::StartSpanOptions start;
+  opentelemetry::trace::StartSpanOptions opts;
   common::AttributeKeyValue attributes[] = {
       {"attr1", 314159}, {"attr2", false}, {"attr1", "string"}};
-  start.attributes = attributes;
+  opts.attributes = attributes;
 
-  tracer->StartSpan("span 1", start)->End();
+  tracer->StartSpan("span 1", opts)->End();
 
   ASSERT_EQ(1, spans_received->size());
 

@@ -28,9 +28,10 @@ using AttributeValue = nostd::variant<bool,
 /**
  * A key/value pair that can be used to set attributes.
  */
-struct AttributeKeyValue {
-    nostd::string_view key;
-    AttributeValue value;
+struct AttributeKeyValue
+{
+  nostd::string_view key;
+  AttributeValue value;
 };
 }  // namespace common
 OPENTELEMETRY_END_NAMESPACE
