@@ -41,7 +41,6 @@ struct StartSpanOptions
   //
   // Attributes will be processed in order, previous attributes with the same
   // key will be overwritten.
-  nostd::span<common::AttributeKeyValue> attributes;
 
   // TODO:
   // Span(Context?) parent;

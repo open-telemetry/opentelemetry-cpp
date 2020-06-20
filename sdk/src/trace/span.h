@@ -18,6 +18,7 @@ public:
   explicit Span(std::shared_ptr<Tracer> &&tracer,
                 std::shared_ptr<SpanProcessor> processor,
                 nostd::string_view name,
+					    nostd::span<common::AttributeKeyValue> attributes,
                 const trace_api::StartSpanOptions &options) noexcept;
 
   ~Span() override;

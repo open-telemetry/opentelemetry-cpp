@@ -24,6 +24,7 @@ public:
    * Starts a span.
    */
   virtual nostd::unique_ptr<Span> StartSpan(nostd::string_view name,
+					    nostd::span<common::AttributeKeyValue> attributes = {},
                                             const StartSpanOptions &options = {}) noexcept = 0;
 
   /**

@@ -66,9 +66,10 @@ public:
   // trace::Tracer
   nostd::unique_ptr<trace::Span> StartSpan(
       nostd::string_view name,
+					    nostd::span<common::AttributeKeyValue> attributes = {},
       const trace::StartSpanOptions &options = {}) noexcept override
   {
-    auto span = tracer_handle_->tracer().StartSpan(name, options);
+    auto span = tracer_handle_->tracer().StartSpan(name, attributes, options);
     if (span == nullptr)
     {
       return nullptr;

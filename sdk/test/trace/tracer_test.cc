@@ -105,7 +105,7 @@ TEST(Tracer, StartSpanWithOptionsTime)
   opentelemetry::trace::EndSpanOptions end;
   end.end_steady_time = SteadyTimestamp(std::chrono::nanoseconds(40));
 
-  tracer->StartSpan("span 1", start)->End(end);
+  tracer->StartSpan("span 1", {}, start)->End(end);
 
   ASSERT_EQ(1, spans_received->size());
 
@@ -120,12 +120,11 @@ TEST(Tracer, StartSpanWithOptionsAttributes)
       new std::vector<std::unique_ptr<SpanData>>);
   auto tracer = initTracer(spans_received);
 
-  opentelemetry::trace::StartSpanOptions opts;
-  common::AttributeKeyValue attributes[] = {
-      {"attr1", 314159}, {"attr2", false}, {"attr1", "string"}};
-  opts.attributes = attributes;
 
-  tracer->StartSpan("span 1", opts)->End();
+  {
+      common::AttributeKeyValue attrs[] = {{"attr1", 314159}, {"attr2", false}, {"attr1", "string"}};
+      tracer->StartSpan("span 1", attrs);
+  }
 
   ASSERT_EQ(1, spans_received->size());
 
