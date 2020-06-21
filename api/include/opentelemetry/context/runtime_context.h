@@ -7,7 +7,7 @@ namespace context
 {
 
   /* The RuntimeContext class provides a wrapper for 
-     * propogating context through cpp. */
+   * propogating context through cpp. */
   template<class M>
     class RuntimeContext
     {
@@ -29,7 +29,7 @@ namespace context
              */
             Token(Context<M> ctx) { ctx_ = ctx; }
 
-            /* Returns the stored context object */
+            /* Returns the stored context object. */
             Context<M> GetCtx() { return ctx_; }
         };
 
