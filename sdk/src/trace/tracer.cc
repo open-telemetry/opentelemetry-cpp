@@ -21,7 +21,7 @@ std::shared_ptr<SpanProcessor> Tracer::GetProcessor() const noexcept
 
 nostd::unique_ptr<trace_api::Span> Tracer::StartSpan(
     nostd::string_view name,
-					    nostd::span<common::AttributeKeyValue> attributes,
+					    nostd::span<const common::AttributeKeyValue> attributes,
     const trace_api::StartSpanOptions &options) noexcept
 {
   return nostd::unique_ptr<trace_api::Span>{

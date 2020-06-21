@@ -41,7 +41,7 @@ SteadyTimestamp NowOr(const SteadyTimestamp &steady)
 Span::Span(std::shared_ptr<Tracer> &&tracer,
            std::shared_ptr<SpanProcessor> processor,
            nostd::string_view name,
-					    nostd::span<common::AttributeKeyValue> attributes,
+					    nostd::span<const common::AttributeKeyValue> attributes,
            const trace_api::StartSpanOptions &options) noexcept
     : tracer_{std::move(tracer)},
       processor_{processor},
@@ -70,7 +70,7 @@ Span::~Span()
   End();
 }
 
-void Span::SetAttribute(nostd::string_view key, common::AttributeValue &&value) noexcept
+void Span::SetAttribute(nostd::string_view key, const common::AttributeValue &&value) noexcept
 {
   std::lock_guard<std::mutex> lock_guard{mu_};
 

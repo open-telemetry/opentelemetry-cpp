@@ -25,7 +25,7 @@ public:
   explicit NoopSpan(const std::shared_ptr<Tracer> &tracer) noexcept : tracer_{tracer} {}
 
   void SetAttribute(nostd::string_view /*key*/,
-                    common::AttributeValue && /*value*/) noexcept override
+                    const common::AttributeValue && /*value*/) noexcept override
   {}
 
   void AddEvent(nostd::string_view /*name*/) noexcept override {}
@@ -60,7 +60,7 @@ class NoopTracer final : public Tracer, public std::enable_shared_from_this<Noop
 public:
   // Tracer
   nostd::unique_ptr<Span> StartSpan(nostd::string_view /*name*/,
-					    nostd::span<common::AttributeKeyValue> /* attributes */,
+					    nostd::span<const common::AttributeKeyValue> /* attributes */,
                                     const StartSpanOptions & /*options*/) noexcept override
   {
     return nostd::unique_ptr<Span>{new (std::nothrow) NoopSpan{this->shared_from_this()}};

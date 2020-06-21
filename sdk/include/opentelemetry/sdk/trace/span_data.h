@@ -86,7 +86,7 @@ public:
     parent_span_id_ = parent_span_id;
   }
 
-  void SetAttribute(nostd::string_view key, common::AttributeValue &&value) noexcept override
+  void SetAttribute(nostd::string_view key, const common::AttributeValue &&value) noexcept override
   {
     attributes_[std::string(key)] = value;
   }

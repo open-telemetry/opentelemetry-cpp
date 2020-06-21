@@ -13,7 +13,7 @@ public:
   // opentelemetry::trace::Tracer
   opentelemetry::nostd::unique_ptr<opentelemetry::trace::Span> StartSpan(
       opentelemetry::nostd::string_view name,
-					    opentelemetry::nostd::span<opentelemetry::common::AttributeKeyValue> /* attributes */,
+					    opentelemetry::nostd::span<const opentelemetry::common::AttributeKeyValue> /* attributes */,
       const opentelemetry::trace::StartSpanOptions & /*options */) noexcept override;
 
   void ForceFlushWithMicroseconds(uint64_t /*timeout*/) noexcept override {}

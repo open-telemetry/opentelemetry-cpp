@@ -14,7 +14,7 @@ class Span final : public trace::Span
 public:
   Span(std::shared_ptr<Tracer> &&tracer,
        nostd::string_view name,
-					    nostd::span<common::AttributeKeyValue> /* attributes */,
+					    nostd::span<const common::AttributeKeyValue> /* attributes */,
        const trace::StartSpanOptions & /*options*/) noexcept
       : tracer_{std::move(tracer)}, name_{name}
   {
@@ -25,7 +25,7 @@ public:
 
   // opentelemetry::trace::Span
   void SetAttribute(nostd::string_view /*name*/,
-                    common::AttributeValue && /*value*/) noexcept override
+                    const common::AttributeValue && /*value*/) noexcept override
   {}
 
   void AddEvent(nostd::string_view /*name*/) noexcept override {}
@@ -59,7 +59,7 @@ private:
 Tracer::Tracer(nostd::string_view /*output*/) {}
 
 nostd::unique_ptr<trace::Span> Tracer::StartSpan(nostd::string_view name,
-					    nostd::span<common::AttributeKeyValue> attributes,
+					    nostd::span<const common::AttributeKeyValue> attributes,
                                                  const trace::StartSpanOptions &options) noexcept
 {
   return nostd::unique_ptr<opentelemetry::trace::Span>{
