@@ -5,7 +5,7 @@
 
 using namespace opentelemetry;
 
-TEST(Thread_Local_Context_Test, thread_local_context){
+TEST(ThreadLocalContextTest, ThreadLocalContext){
 
   using M = std::map< std::string, common::AttributeValue>;
 
