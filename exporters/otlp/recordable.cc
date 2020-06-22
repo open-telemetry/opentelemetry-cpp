@@ -20,6 +20,11 @@ void Recordable::SetName(nostd::string_view name) noexcept
 {
   span_.set_name(name.data(), name.size());
 }
+
+void Recordable::SetStartTime(opentelemetry::core::SystemTimestamp start_time) noexcept
+{
+  span_.set_start_time_unixnano(start_time.time_since_epoch());
+}
 }  // namespace otlp
 }  // namespace exporter
 OPENTELEMETRY_END_NAMESPACE
