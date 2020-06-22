@@ -126,14 +126,9 @@ TEST(Tracer, StartSpanWithAttributes)
     std::map<std::string, common::AttributeValue> m;
     m["attr3"] = 3.0;
     tracer->StartSpan("span 2", m);
-
-    char *local_value = new char[6];
-    local_value[0]    = '\0';
-    tracer->StartSpan("span 3", {{"attr4", local_value}});
-    delete local_value;
   }
 
-  ASSERT_EQ(3, spans_received->size());
+  ASSERT_EQ(2, spans_received->size());
 
   auto &span_data = spans_received->at(0);
   ASSERT_EQ(2, span_data->GetAttributes().size());
@@ -143,8 +138,4 @@ TEST(Tracer, StartSpanWithAttributes)
   auto &span_data2 = spans_received->at(1);
   ASSERT_EQ(1, span_data2->GetAttributes().size());
   ASSERT_EQ(3.0, nostd::get<double>(span_data2->GetAttributes().at("attr3")));
-
-  auto &span_data3 = spans_received->at(2);
-  ASSERT_EQ(1, span_data2->GetAttributes().size());
-  ASSERT_EQ("", nostd::get<nostd::string_view>(span_data2->GetAttributes().at("attr4")));
 }

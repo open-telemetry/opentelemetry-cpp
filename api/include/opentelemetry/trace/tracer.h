@@ -22,6 +22,11 @@ public:
   virtual ~Tracer() = default;
   /**
    * Starts a span.
+   *
+   * Optionally sets attributes at Span creation from the given key/value pairs.
+   *
+   * Attributes will be processed in order, previous attributes with the same
+   * key will be overwritten.
    */
   virtual nostd::unique_ptr<Span> StartSpan(nostd::string_view name,
                                             const KeyValueIterable &attributes,
