@@ -1,8 +1,6 @@
 #pragma once
 
 #include "opentelemetry/common/attribute_value.h"
-#include "opentelemetry/nostd/span.h"
-#include "opentelemetry/nostd/string_view.h"
 #include "opentelemetry/trace/span.h"
 #include "opentelemetry/trace/trace_id.h"
 #include "opentelemetry/version.h"
