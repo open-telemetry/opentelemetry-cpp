@@ -51,6 +51,7 @@ cc_binary(
     ],
     deps = [
         ":foo_library",
+        ":recordable",
         "//api",
         "//sdk/src/trace",
         "@com_github_opentelemetry_proto//:trace_proto_cc",

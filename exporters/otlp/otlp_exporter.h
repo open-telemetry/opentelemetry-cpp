@@ -6,6 +6,8 @@
 #include "opentelemetry/proto/collector/trace/v1/trace_service.pb.h"
 #include "opentelemetry/proto/collector/trace/v1/trace_service.grpc.pb.h"
 
+#include "recordable.h"
+
 #include <iostream>
 
 namespace trace    = opentelemetry::trace;
@@ -54,7 +56,7 @@ class OtlpExporter final : public sdktrace::SpanExporter
   void Shutdown(std::chrono::microseconds timeout = std::chrono::microseconds(0)) noexcept {}
 
 
-    //std::unique_ptr<
-      //opentelemetry::proto::collector::trace::v1::TraceService::StubInterface>
-      //trace_service_stub;
+  std::unique_ptr<
+      opentelemetry::proto::collector::trace::v1::TraceService::StubInterface>
+      trace_service_stub;
 };
