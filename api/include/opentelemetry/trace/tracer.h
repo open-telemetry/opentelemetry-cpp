@@ -24,28 +24,32 @@ public:
    * Starts a span.
    */
   virtual nostd::unique_ptr<Span> StartSpan(nostd::string_view name,
-					    const KeyValueIterable &attributes,
+                                            const KeyValueIterable &attributes,
                                             const StartSpanOptions &options = {}) noexcept = 0;
 
   nostd::unique_ptr<Span> StartSpan(nostd::string_view name,
-                                            const StartSpanOptions &options = {}) noexcept {
-      return this->StartSpan(name, {}, options);
+                                    const StartSpanOptions &options = {}) noexcept
+  {
+    return this->StartSpan(name, {}, options);
   }
 
   template <class T, nostd::enable_if_t<detail::is_key_value_iterable<T>::value> * = nullptr>
   nostd::unique_ptr<Span> StartSpan(nostd::string_view name,
-	  const T &attributes,
-                                            const StartSpanOptions &options = {}) noexcept {
-      return this->StartSpan(name, KeyValueIterableView<T>(attributes), options);
+                                    const T &attributes,
+                                    const StartSpanOptions &options = {}) noexcept
+  {
+    return this->StartSpan(name, KeyValueIterableView<T>(attributes), options);
   }
 
-  nostd::unique_ptr<Span> StartSpan(nostd::string_view name,
-                std::initializer_list<std::pair<nostd::string_view, common::AttributeValue>>
-                    attributes,
-                                            const StartSpanOptions &options = {}) noexcept {
-      return this->StartSpan(name, nostd::span<const std::pair<nostd::string_view, common::AttributeValue>>{
-                       attributes.begin(), attributes.end()},
-	      options);
+  nostd::unique_ptr<Span> StartSpan(
+      nostd::string_view name,
+      std::initializer_list<std::pair<nostd::string_view, common::AttributeValue>> attributes,
+      const StartSpanOptions &options = {}) noexcept
+  {
+    return this->StartSpan(name,
+                           nostd::span<const std::pair<nostd::string_view, common::AttributeValue>>{
+                               attributes.begin(), attributes.end()},
+                           options);
   }
 
   /**

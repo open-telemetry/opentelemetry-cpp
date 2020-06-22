@@ -41,7 +41,7 @@ SteadyTimestamp NowOr(const SteadyTimestamp &steady)
 Span::Span(std::shared_ptr<Tracer> &&tracer,
            std::shared_ptr<SpanProcessor> processor,
            nostd::string_view name,
-					    const trace_api::KeyValueIterable &attributes,
+           const trace_api::KeyValueIterable &attributes,
            const trace_api::StartSpanOptions &options) noexcept
     : tracer_{std::move(tracer)},
       processor_{processor},
@@ -59,7 +59,7 @@ Span::Span(std::shared_ptr<Tracer> &&tracer,
   attributes.ForEachKeyValue([&](nostd::string_view key, common::AttributeValue value) noexcept {
     recordable_->SetAttribute(key, std::move(value));
     return true;
-    });
+  });
 
   recordable_->SetStartTime(NowOr(options.start_system_time));
   start_steady_time = NowOr(options.start_steady_time);

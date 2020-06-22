@@ -60,7 +60,7 @@ class NoopTracer final : public Tracer, public std::enable_shared_from_this<Noop
 public:
   // Tracer
   nostd::unique_ptr<Span> StartSpan(nostd::string_view /*name*/,
-					    const KeyValueIterable & /*attributes*/,
+                                    const KeyValueIterable & /*attributes*/,
                                     const StartSpanOptions & /*options*/) noexcept override
   {
     return nostd::unique_ptr<Span>{new (std::nothrow) NoopSpan{this->shared_from_this()}};

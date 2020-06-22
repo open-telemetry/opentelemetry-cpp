@@ -120,18 +120,17 @@ TEST(Tracer, StartSpanWithAttributes)
       new std::vector<std::unique_ptr<SpanData>>);
   auto tracer = initTracer(spans_received);
 
-
   {
-      tracer->StartSpan("span 1", {{"attr1", 314159}, {"attr2", false}, {"attr1", "string"}});
+    tracer->StartSpan("span 1", {{"attr1", 314159}, {"attr2", false}, {"attr1", "string"}});
 
-      std::map<std::string, common::AttributeValue> m;
-      m["attr3"] = 3.0;
-      tracer->StartSpan("span 2", m);
+    std::map<std::string, common::AttributeValue> m;
+    m["attr3"] = 3.0;
+    tracer->StartSpan("span 2", m);
 
-      char* local_value = new char[6];
-      local_value[0] = '\0';
-      tracer->StartSpan("span 3", {{"attr4", local_value}});
-      delete local_value;
+    char *local_value = new char[6];
+    local_value[0]    = '\0';
+    tracer->StartSpan("span 3", {{"attr4", local_value}});
+    delete local_value;
   }
 
   ASSERT_EQ(3, spans_received->size());
