@@ -43,7 +43,7 @@ cc_library(
 )
 
 cc_binary(
-    name = "example_simple",
+    name = "otlp_exporter",
     srcs = [
         "main.cc",
         #"stdout_exporter.h",
@@ -57,8 +57,8 @@ cc_binary(
         "@com_github_opentelemetry_proto//:trace_service_proto_cc",
 
         # For gRPC
-        #"@com_github_opentelemetry_proto//:trace_service_grpc_cc",
-        #"@com_github_grpc_grpc//:grpc++",
+        "@com_github_opentelemetry_proto//:trace_service_grpc_cc",
+        "@com_github_grpc_grpc//:grpc++",
     ],
 )
 

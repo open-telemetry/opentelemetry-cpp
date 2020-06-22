@@ -16,7 +16,7 @@ package(default_visibility = ["//visibility:public"])
 
 load("@rules_proto//proto:defs.bzl", "proto_library")
 
-# load("@com_github_grpc_grpc//bazel:cc_grpc_library.bzl", "cc_grpc_library")
+load("@com_github_grpc_grpc//bazel:cc_grpc_library.bzl", "cc_grpc_library")
 
 proto_library(
     name = "common_proto",
@@ -78,9 +78,9 @@ cc_proto_library(
     deps = [":trace_service_proto"],
 )
 
-# cc_grpc_library(
-#     name = "trace_service_grpc_cc",
-#     srcs = [":trace_service_proto"],
-#     grpc_only = True,
-#     deps = [":trace_service_proto_cc"],
-# )
+cc_grpc_library(
+    name = "trace_service_grpc_cc",
+    srcs = [":trace_service_proto"],
+    grpc_only = True,
+    deps = [":trace_service_proto_cc"],
+)

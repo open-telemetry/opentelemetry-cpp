@@ -4,7 +4,7 @@
 #include "opentelemetry/sdk/trace/span_data.h"
 
 #include "opentelemetry/proto/collector/trace/v1/trace_service.pb.h"
-//#include "opentelemetry/proto/collector/trace/v1/trace_service.grpc.pb.h"
+#include "opentelemetry/proto/collector/trace/v1/trace_service.grpc.pb.h"
 
 #include <iostream>
 

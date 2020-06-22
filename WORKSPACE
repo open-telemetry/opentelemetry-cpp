@@ -16,6 +16,39 @@ workspace(name = "io_opentelemetry_cpp")
 
 load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive")
 
+# Load gRPC dependency
+# Note that this dependency needs to be loaded first due to
+# https://github.com/bazelbuild/bazel/issues/6664
+http_archive(
+    name = "com_github_grpc_grpc",
+    strip_prefix = "grpc-master",
+    urls = ["https://github.com/grpc/grpc/archive/master.tar.gz"],
+)
+
+load("@com_github_grpc_grpc//bazel:grpc_deps.bzl", "grpc_deps")
+
+grpc_deps()
+
+# grpc_deps() cannot load() its deps, this WORKSPACE has to do it.
+# See also: https://github.com/bazelbuild/bazel/issues/1943
+load(
+    "@build_bazel_rules_apple//apple:repositories.bzl",
+    "apple_rules_dependencies",
+)
+
+apple_rules_dependencies()
+
+load(
+    "@build_bazel_apple_support//lib:repositories.bzl",
+    "apple_support_dependencies",
+)
+
+apple_support_dependencies()
+
+load("@upb//bazel:repository_defs.bzl", "bazel_version_repository")
+
+bazel_version_repository(name = "upb_bazel_version")
+
 # Uses older protobuf version because of
 # https://github.com/protocolbuffers/protobuf/issues/7179
 http_archive(
@@ -36,49 +69,6 @@ new_local_repository(
     build_file = "//bazel:opentelemetry_proto.BUILD",
     path = "third_party/opentelemetry-proto",
 )
-
-
-##### gRPC Rules for Bazel
-##### See https://github.com/grpc/grpc/blob/master/src/cpp/README.md#make
-
-# http_archive(
-#     name = "com_github_grpc_grpc",
-#     strip_prefix = "grpc-master",
-#     urls = ["https://github.com/grpc/grpc/archive/master.tar.gz"],
-# )
-
-# load("@com_github_grpc_grpc//bazel:grpc_deps.bzl", "grpc_deps")
-
-# grpc_deps()
-
-# # grpc_deps() cannot load() its deps, this WORKSPACE has to do it.
-# # See also: https://github.com/bazelbuild/bazel/issues/1943
-# load(
-#     "@build_bazel_rules_apple//apple:repositories.bzl",
-#     "apple_rules_dependencies",
-# )
-
-# apple_rules_dependencies()
-
-# load(
-#     "@build_bazel_apple_support//lib:repositories.bzl",
-#     "apple_support_dependencies",
-# )
-
-# apple_support_dependencies()
-
-# load("@upb//bazel:repository_defs.bzl", "bazel_version_repository")
-
-# bazel_version_repository(name = "upb_bazel_version")
-
-# Add skylib?
-#load("@bazel_skylib//:workspace.bzl", "bazel_skylib_workspace")
-#bazel_skylib_workspace()
-
-# # Not mentioned in official docs... mentioned here https://github.com/grpc/grpc/issues/20511
-# load("@com_github_grpc_grpc//bazel:grpc_extra_deps.bzl", "grpc_extra_deps")
-# grpc_extra_deps()
-
 
 # GoogleTest framework.
 # Only needed for tests, not to build the OpenTelemetry library.
