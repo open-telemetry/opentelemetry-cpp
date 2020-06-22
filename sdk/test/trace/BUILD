@@ -41,3 +41,14 @@ cc_test(
         "@com_google_googletest//:gtest_main",
     ],
 )
+
+cc_test(
+    name = "always_on_sampler_test",
+    srcs = [
+        "always_on_sampler_test.cc",
+    ],
+    deps = [
+        "//sdk/src/trace",
+        "@com_google_googletest//:gtest_main",
+    ],
+)
