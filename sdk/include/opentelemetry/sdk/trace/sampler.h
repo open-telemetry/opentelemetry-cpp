@@ -52,8 +52,7 @@ class Sampler
 {
 public:
   // Placeholder
-  class SpanContext
-  {};
+  class SpanContext;
   virtual ~Sampler() = default;
   /**
    * Called during Span creation to make a sampling decision.
@@ -64,7 +63,7 @@ public:
    *     the parentContext, unless this is a root span.
    * @param name the name of the new Span.
    * @param spanKind the trace_api::SpanKind of the Span.
-   * @param attributes // TODO: Change AttributeKeyValue to common::AttributeKeyValue
+   * @param attributes TODO: Change AttributeKeyValue to common::AttributeKeyValue
    *     list of AttributeValue with their keys.
    * @param links TODO: Collection of links that will be associated with the Span to be created.
    * @return sampling result whether span should be sampled or not.
