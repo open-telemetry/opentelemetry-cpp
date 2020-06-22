@@ -10,20 +10,17 @@ class MockSpanContext
 
 TEST(AlwaysOffSampler, MockSpanContext)
 {
-	Sampler sampler(new AlwaysOffSampler());
+	AlwaysOffSampler sampler();
 
 	ASSERT_EQ("AlwaysOffSampler", sampler.GetDescription());
 
 	// Placeholder
-	MockSpanContext context(new MockSpanContext());
+	MockSpanContext context();
 
-	constexpr uint8_t buf[] = {1, 2, 3, 4, 5, 6, 7, 8, 8, 7, 6, 5, 4, 3, 2, 1}
-	opentelemetry::trace::TraceId trace_id(buf);
+	opentelemetry::trace::TraceId trace_id();
 
 	auto sampling_result = sampler.ShouldSample(
-		context, trace_id, "Test", SpanKind.kInternal, nostd::span());
-
-	ASSERT_NE(nullptr, sampling_result);
+		context, trace_id, "Test", SpanKind::kInternal, nostd::span());
 
 	auto decision = sampling_result.GetDecision();
 
