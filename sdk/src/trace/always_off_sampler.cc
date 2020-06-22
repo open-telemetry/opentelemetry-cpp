@@ -39,6 +39,6 @@ public:
   }
 
 private:
-  Decision decision_ = NOT_RECORD;
+  Decision decision_ = Decision::NOT_RECORD;
   nostd::span<AttributeKeyValue> attributes_ = nostd::span();
 };
