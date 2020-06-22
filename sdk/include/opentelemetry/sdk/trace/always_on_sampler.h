@@ -1,13 +1,6 @@
 #pragma once
 
-#include "opentelemetry/common/attribute_value.h"
-#include "opentelemetry/sdk/common/atomic_shared_ptr.h"
 #include "opentelemetry/sdk/trace/sampler.h"
-#include "opentelemetry/trace/span.h"
-#include "opentelemetry/trace/tracer.h"
-#include "opentelemetry/version.h"
-
-#include <memory>
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace sdk
