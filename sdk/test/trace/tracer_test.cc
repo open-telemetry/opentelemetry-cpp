@@ -105,7 +105,7 @@ TEST(Tracer, StartSpanWithOptionsTime)
   opentelemetry::trace::EndSpanOptions end;
   end.end_steady_time = SteadyTimestamp(std::chrono::nanoseconds(40));
 
-  tracer->StartSpan("span 1", {}, start)->End(end);
+  tracer->StartSpan("span 1", start)->End(end);
 
   ASSERT_EQ(1, spans_received->size());
 
