@@ -27,9 +27,14 @@ A `ValueRecorder` is commonly used to capture latency measurements. Latency meas
 
 
 
+
 The following diagrams illustrates the numerous components within the Metrics API and SDK as well as their relationships.
-[Image: image.png]This diagram highlights the specific interactions between the disparate SDK classes.
-[Image: image.png]
+
+![Data Diagram](./images/SdkDataDiagram.png)
+
+This diagram highlights the specific interactions between the disparate SDK classes.
+
+![Interaction Diagram](./images/SdkInteractionDiagram.png)
 
 ## **Meter Interface (`MeterProvider` Class)**
 
@@ -74,14 +79,14 @@ public:
   }
 
   /**
-   * Changes the singleton TracerProvider.
+   * Changes the singleton MeterProvider.
    *
    * Arguments:
    * newMeterProvider, the MeterProvider instance to be set as the new global provider
    */
   static void SetMeterProvider(nostd::shared_ptr<MeterProvider> newMeterProvider)
   {
-    GetProvider() = newMeterProvider;
+    // Set GetProvider() to the newMeterProvider passed in
   }
 
 private:
@@ -125,8 +130,7 @@ public:
 
 
 
-## **Metric Instruments (`Meter` Class)
-**
+## **Metric Instruments (`Meter` Class)**
 
 
 **Metric Events**
@@ -140,13 +144,11 @@ Metric instruments are primarily defined by their name.  Names MUST conform to t
 
 `Meter` instances MUST return an error when multiple instruments with the same name are registered
 
-**The meter implementation will throw an illegal argument exception if the user-passed `name` for a metric instrument either conflicts with the name of another metric instrument created from the same `meter` or violates the `name` syntax outlined above.
-**
+**The meter implementation will throw an illegal argument exception if the user-passed `name` for a metric instrument either conflicts with the name of another metric instrument created from the same `meter` or violates the `name` syntax outlined above.**
 
 Each distinctly named Meter (i.e. Meters derived from different instrumentation libraries) MUST create a new namespace for metric instruments descending from them.  Thus, the same instrument name can be used in an application provided they come from different Meter instances.
 
-**In order to achieve this, each instance of the `Meter` class will have a container storing all metric instruments that were created using that meter. This way, metric instruments created from different instantiations of the `Meter` class will never be compared to one another and will never result in an error.
-**
+**In order to achieve this, each instance of the `Meter` class will have a container storing all metric instruments that were created using that meter. This way, metric instruments created from different instantiations of the `Meter` class will never be compared to one another and will never result in an error.**
 
 This interface consists of a set of **instrument constructors**, and a **facility for capturing batches of measurements** in a semantically atomic way.
 
@@ -275,7 +277,8 @@ Metric instruments are created through instances of the `Meter` class and each t
 * Monotonicity: A monotonic instrument is an additive instrument, where the progression of each sum is non-decreasing. Monotonic instruments are useful for monitoring rate information
 
 The following instrument types will be supported:
-[Image: image.png]
+
+![Instrument List](./images/InstrumentsTable.png)
 ### Metric Event Data Model
 
 Each measurement taken by a Metric instrument is a Metric event which must contain the following information:
@@ -847,41 +850,41 @@ The following is a pseudo code implementation of a ‘simple’ Integrator. Josh
 
 ```
 class Integrator {
-`    AggregationSelector aggSelector
-`    Bool stateful
-`    Batch batch
-`    `
-`    Integrator (AggregationSelector _aggSelector, Bool _stateful) {`
-`        aggSelector = _aggSelector`
-`        stateful = _stateful`
-`    }
-`    `
-`    ``void`` ``Process``(``Record`` record``)`` ``{`
-`        `
-`        key ``=`` batchKey``(``record``)`
-`        `
-`        ``if`` ``(``this``.``batch``.``values``.``ok``)`` ``{`
-`            ``/* The call to Merge here only combines identical records. Required even`
-`            for a stateless Integrator because such identical records may arise in the`
-`            Meter implementation due to race conditions */`
-`            record``.``aggreagtor``.``Merge``(``record``.``Aggregator``(),`` record``.``Descriptor``())`
-`        ``}`
-`        `
-`        ``if``(``this``.``stateful``)`` ``{`
-`            ``/* If this integrator is stateful, create a copy of the Aggregator for `
-`            long-term storage. Otherwise the Meter implementation will checkpoint the`
-`            aggregator again, overwriting the long-lived state.*/`
-`            `
-`            temp ``=`` record``.``Aggregator``()`
-`            `
-`            ``// Essentially cloning data`
-`            agg ``=`` ``this``.``AggregatorFor``(``record``.``Descriptor``())`
-`            agg``.``Merge``(``temp``,``record``.``Descriptor``())`
-`        ``}`
-`        `
-`        ``this``.``batch``.``values``[``key``]`` ``=`` batchValue``(``agg``,``record``)`
-`        `
-`    ``}
+    AggregationSelector aggSelector
+    Bool stateful
+    Batch batch
+    
+    Integrator (AggregationSelector _aggSelector, Bool _stateful) {
+        aggSelector = _aggSelector
+        stateful = _stateful
+    }
+    
+    void Process(Record record) {
+        
+        key = batchKey(record)
+        
+        if (this.batch.values.ok) {
+            /* The call to Merge here only combines identical records. Required even
+            for a stateless Integrator because such identical records may arise in the
+            Meter implementation due to race conditions */
+            record.aggreagtor.Merge(record.Aggregator(), record.Descriptor())
+        }
+        
+        if(this.stateful) {
+            /* If this integrator is stateful, create a copy of the Aggregator for 
+            long-term storage. Otherwise the Meter implementation will checkpoint the
+            aggregator again, overwriting the long-lived state.*/
+            
+            temp = record.Aggregator()
+            
+            // Essentially cloning data`
+            agg = this.AggregatorFor(record.Descriptor())
+            agg.Merge(temp,record.Descriptor())
+        }
+        
+        this.batch.values[key] = batchValue(agg,record)
+        
+    }
     
     Checkpointset CheckpointSet() {
         return this.batch
@@ -907,7 +910,7 @@ class Integrator {
         return nullptr
     }
 
-}`
+}
 ```
 
 ## **Controller**
