@@ -1,233 +1,168 @@
 #pragma once
 
+#include <atomic>
+#include <iostream>
 #include <map>
-#include <string>
-#include <mutex>
+#include <sstream>
+#include <vector>
 
+#include "opentelemetry/common/attribute_value.h"
+#include "opentelemetry/nostd/string_view.h"
+#include "opentelemetry/nostd/utility.h"
+#include "opentelemetry/nostd/variant.h"
+#include "opentelemetry/trace/key_value_iterable.h"
+#include "opentelemetry/trace/key_value_iterable_view.h"
+#include "opentelemetry/trace/tracer.h"
 #include "opentelemetry/version.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace context
 {
 
-  std::mutex context_id_mutex;
+/* The context class provides a context identifier */
+template <class T>
+class Context
+{
 
-  /*The context class provides a context identifier */
-  class Context{
-
-    public:
-
-      /*The ContextKey class is used to obscure access from the 
-       * user to the context map. The identifier is used as a key 
-       * to the context map.
-       */
-      class ContextKey{
-        private:
-          friend class Context;  
-          
-          std::string key_name_;
-
-          int identifier_;
-
-
-          /* GetIdentifier: returns the identifier */
-          int GetIdentifier(){
-            return identifier_;
-          }
-
-          /* Constructs a new ContextKey with the passed in name and 
-           * identifier.
-           */
-          ContextKey(std::string key_name, int identifier){
-            key_name_ = key_name;
-            identifier_ = identifier;
-          }
-
-        public:
-          
-          /* Consructs a new ContextKey with the passed in name and increments
-           * the identifier then assigns it to be the key's identifier.
-           */
-          ContextKey(std::string key_name){
-            key_name_ = key_name;
-
-            context_id_mutex.lock();
-            
-            Context::last_key_identifier_++;
-
-            identifier_ = Context::last_key_identifier_;
-            
-            context_id_mutex.unlock();
-          }
-
-      };
-
-
-      /* Creates a context object with no key/value pairs */
-      Context(){
-        ctx_map_ = std::map<int,int> {};
-
-      }
-
-      /* Contructor, creates a context object from a map
-       * of keys and identifiers
-       */
-      Context(ContextKey key, int value){
-        ctx_map_[key.GetIdentifier()] = value;
-      } 
-
-
-      /* Accepts a new key/value pair and then returns a new
-       * context that contains both the original pairs and the new pair.
-       */
-      Context WriteValue(ContextKey key, int value){
-        std::map<int, int> temp_map = ctx_map_;
-
-        temp_map[key.GetIdentifier()] = value;
-
-        return Context(temp_map);
-      } 
-
-      /* Class comparator to see if the context maps are the same. */
-      bool operator == (const Context &context){
-        if(context.ctx_map_ == ctx_map_){
-          return true;
-        }
-        else{
-          return false;
-        }
-      }
-
-      /* Returns the value associated with the passed in key */
-      int GetValue(ContextKey key){
-        return ctx_map_[key.GetIdentifier()];
-      } 
-
-      /* Returns a ContextKey that has the passed in name and the
-       * next available identifier.*/
-      ContextKey CreateKey(std::string key_name){
-        int id;
-        
-        context_id_mutex.lock();
-        
-        last_key_identifier_++;
-        
-        id = last_key_identifier_;
-        
-        context_id_mutex.unlock();
-            
-        return ContextKey(key_name,id); 
-      } 
-
-    private:
-
-      /* The identifier itself */
-      std::map<int, int> ctx_map_;
-
-      /*Used to track that last ContextKey identifier and create the next one */
-      static int last_key_identifier_;
-      
-      /* A constructor that accepts a key/value map */
-      Context(std::map<int,int> ctx_map){
-        ctx_map_ = ctx_map;
-      } 
-
-
-  };
-
-
-
-  /* The token class provides an identifier that is used by
-   * the attach and detach methods to keep track of context 
-   * objects. 
+public:
+  /*The Key class is used to obscure access from the
+   * user to the context map. The identifier is used as a key
+   * to the context map.
    */
+  class Key
+  {
 
-  class Token{
+  public:
+    /*Returns the key's identifier*/
+    nostd::string_view GetIdentifier() { return nostd::string_view(identifier_); }
+    /*Returns the key's name */
+    nostd::string_view GetName() { return key_name_; }
 
-    public:
-      
-      /* A constructor that sets the token's Context object to the
-       * one that was passed in. 
-       */
-      Token(Context &ctx){
-        ctx_ = ctx;  
-      } 
+  private:
+    friend class Context;
 
-      /* Returns the stored context object */
-      Context GetContext(){
-        return ctx_;
-      }
+    /* Constructs a new Key with the passed in name. Sets the identifier as
+     * the address of this object. */
+    Key(nostd::string_view key_name) : key_name_{key_name}
+    {
+      std::stringstream ss;
+      ss << (void *)this;
+      nostd::string_view temp_view;
+      temp_view = ss.str();
 
-    private:
+      memcpy(identifier_, temp_view.data(), temp_view.size());
+    }
 
-      Context ctx_;
+    nostd::string_view key_name_;
+
+    char identifier_[50];
   };
 
+  /* Creates a key with the passed in name and returns it. */
+  Key CreateKey(nostd::string_view key_name) { return Key(key_name); }
 
-  /* The RuntimeContext class provides a wrapper for 
-   * propogating context through cpp. */
-  class RuntimeContext {
+  /* Contructor, creates a context object from a map of keys
+   * and identifiers.
+   */
+  Context(const T &attributes) : key_vals_(attributes)
+  {
+    /* Currently only used as a check, to ensure T is of the right type. */
+    trace::KeyValueIterableView<T> iterable = trace::KeyValueIterableView<T>(attributes);
+  }
 
-    public:
+  Context() {}
 
+  /* Accepts a new iterable and then returns a new  context that
+   * contains both the original pairs and the new pair.
+   */
+  Context WriteValues(T &attributes) noexcept
+  {
+    /* Currently only used as a check, to ensure T is of the right type. */
+    trace::KeyValueIterableView<T> iterable = trace::KeyValueIterableView<T>(attributes);
 
-      /* A default constructor that will set the context to
-       * an empty context object.
-       */
-      RuntimeContext(){
-        context_ = Context();
+    std::insert_iterator<T> back(attributes, std::begin(attributes));
+
+    for (auto iter = std::begin(key_vals_); iter != std::end(key_vals_); ++iter)
+    {
+      back = *iter;
+    }
+
+    return Context(attributes);
+  }
+
+  /* Returns the value associated with the passed in key */
+  common::AttributeValue GetValue(Key key)
+  {
+
+    for (auto iter = std::begin(key_vals_); iter != std::end(key_vals_); ++iter)
+    {
+      if (key.GetIdentifier() == iter->first)
+      {
+        return iter->second;
       }
+    }
 
-      /* A constructor that will set the context as the passed in context. */
-      RuntimeContext(Context &context){ 
-        context_ = context;
+    return "";
+  }
+
+  /* Iterates through the current and comparing context objects
+   * to check for equality, */
+  bool operator==(const Context &other)
+  {
+
+    /*Check for case where either both or one object has no contents. */
+    if (std::begin(other.key_vals_) == std::end(other.key_vals_))
+    {
+      if (std::begin(key_vals_) == std::end(key_vals_))
+      {
+        return true;
       }
-
-      /* Sets the current 'Context' object. Returns a token 
-       * that can be used to reset to the previous Context.
-       */
-      Token Attach(Context &context){
-
-        Token old_context_token = Token(context_);
-
-        context_ = context;
-
-        return old_context_token;
+      else
+      {
+        return false;
       }
+    }
 
+    if (std::begin(key_vals_) == std::end(key_vals_))
+    {
+      return false;
+    }
 
-      /* Return the current context. */
-      static Context GetCurrent(){
-        Context context = context_;
-        return context_;  
-      }
+    /*Compare the contexts*/
+    for (auto iter = std::begin(key_vals_); iter != std::end(key_vals_); ++iter)
+    {
+      int found = 0;
 
-
-      /* Resets the context to a previous value stored in the 
-       * passed in token. Returns zero if successful, -1 otherwise
-       */
-      int Detach(Token &token){
-        
-        if(token.GetContext() == context_){
-
-          return -1;
+      for (auto iter_other = std::begin(other.key_vals_); iter_other != std::end(other.key_vals_);
+           iter_other++)
+      {
+        if (iter->first == iter_other->first)
+        {
+          if (nostd::get<nostd::string_view>(iter->second) ==
+              nostd::get<nostd::string_view>(iter_other->second))
+          {
+            found = 1;
+            break;
+          }
         }
-        
-        context_ = token.GetContext();
-         
-        return 0;     
       }
 
+      if (found == 0)
+      {
+        return false;
+      }
+    }
 
-    private:
-     
-      static thread_local Context context_;
+    return true;
+  }
 
-  };
-  
-  thread_local Context RuntimeContext::context_ = Context();
-  int Context::last_key_identifier_ = 0;
+  /* Copy Constructors. */
+  Context(const Context &other) = default;
+  Context &operator=(const Context &other) = default;
 
+private:
+  T key_vals_;
+};
 
-}
+}  // namespace context
 OPENTELEMETRY_END_NAMESPACE

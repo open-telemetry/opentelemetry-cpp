@@ -12,14 +12,12 @@ cc_test(
 )
 
 cc_test(
-    name = "runtimeContext_test",
+    name = "thread_local_test",
     srcs = [
-        "runtimeContext_test.cc",
+        "thread_local_test.cc",
     ],
-    copts = ["-Wall","-std=c++17"],
     deps = [
         "//api",
         "@com_google_googletest//:gtest_main",
     ],
 )
-
