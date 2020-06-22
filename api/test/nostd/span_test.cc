@@ -245,7 +245,7 @@ TEST(SpanTest, PerfTests)
 {
   // Run all benchmarks
   int argc     = 0;
-  char *argv[] = {""};
-  ::benchmark::Initialize(&argc, argv);
+  const char *argv[] = {""};
+  ::benchmark::Initialize(&argc, (char **)(argv));
   ::benchmark::RunSpecifiedBenchmarks();
 }
