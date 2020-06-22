@@ -21,15 +21,15 @@ namespace context
         private:
           friend class ThreadLocalContext<M>;
 
-          Context<M> ctx_
-            ;
+          Context<M> context_;
+
           /* A constructor that sets the token's Context object to the
            * one that was passed in. 
            */ 
-          Token(Context<M> ctx) { ctx_ = ctx; }
+          Token(Context<M> &context) { context_ = context; }
 
-          /* Returns the stored context object */
-          Context<M> GetCtx() { return ctx_; }
+          /* Returns the stored context object. */
+          Context<M> GetContext() { return context_; }
       };
 
       /* Return the current context. */
@@ -40,15 +40,21 @@ namespace context
       /* Resets the context to a previous value stored in the 
        * passed in token. Returns zero if successful, -1 otherwise
        */ 
-      static int Detach(Token token){
-        GetInstance() = token.GetCtx();
+      static int Detach(Token &token){
+        
+        /* If the token context is the current context, return failure. */ 
+        if(token.GetContext() == GetCurrent()){
+          return 1;
+        }
+        
+        GetInstance() = token.GetContext();
         return 0;
       }
 
       /* Sets the current 'Context' object. Returns a token 
        * that can be used to reset to the previous Context.
        */ 
-      static Token Attach(Context<M> context){
+      static Token Attach(Context<M> &context){
         Token old_context = Token(GetInstance());
         GetInstance() = context;
         return old_context;

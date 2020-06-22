@@ -19,8 +19,6 @@ OPENTELEMETRY_BEGIN_NAMESPACE
 namespace context
 {
 
-
-
   /* The context class provides a context identifier */
   template<class T>
     class Context
@@ -37,34 +35,30 @@ namespace context
 
           public:
             /*Returns the key's identifier*/            
-            nostd::string_view GetIdentifier() {return nostd::string_view(str_data);}
+            nostd::string_view GetIdentifier() {return nostd::string_view(identifier_);}
             /*Returns the key's name */
-            nostd::string_view GetName() { return key_name_; }
+            nostd::string_view GetName() { return key_name_;}
 
           private:
-              friend class Context;
-            
+            friend class Context;
+
             /* Constructs a new Key with the passed in name. Sets the identifier as
              * the address of this object. */
             Key(nostd::string_view key_name) : key_name_{key_name}
-             {
+            {
               std::stringstream ss;
               ss << (void *)this;
-              nostd::string_view test_view = "test";
-              test_view = ss.str();
-              
-              memcpy(str_data, test_view.data(), test_view.size());
+              nostd::string_view temp_view;
+              temp_view = ss.str();
+
+              memcpy(identifier_, temp_view.data(), temp_view.size());
             }
 
-
             nostd::string_view key_name_;
-            
-            char str_data [50];
 
-            const nostd::string_view identifier_;
-
+            char identifier_ [50];
         };
-        
+
         /* Creates a key with the passed in name and returns it. */
         Key CreateKey(nostd::string_view key_name){
           return Key(key_name); 
@@ -73,8 +67,8 @@ namespace context
         /* Contructor, creates a context object from a map of keys 
          * and identifiers.
          */
-        Context(const T &attributes):  key_vals(attributes) { 
-          /*Currently only used as a check, to ensure T is of the right type */
+        Context(const T &attributes):  key_vals_(attributes) { 
+          /* Currently only used as a check, to ensure T is of the right type. */
           trace::KeyValueIterableView<T> iterable = trace::KeyValueIterableView<T>(attributes);
         }
 
@@ -86,26 +80,23 @@ namespace context
          */
         Context WriteValues(T &attributes) noexcept
         {
+          /* Currently only used as a check, to ensure T is of the right type. */
           trace::KeyValueIterableView<T> iterable = trace::KeyValueIterableView<T>(attributes);
-          
+
           std::insert_iterator<T> back (attributes, std::begin(attributes));
-          
-          auto iter = std::begin(key_vals);
-          auto last = std::end(key_vals);
-          for (; iter != last; ++iter)
+
+          for (auto iter = std::begin(key_vals_); iter != std::end(key_vals_); ++iter)
           {
             back = *iter;
           }
-          
+
           return Context(attributes);
         }
 
         /* Returns the value associated with the passed in key */
         common::AttributeValue GetValue(Key key) { 
-          auto iter = std::begin(key_vals);
-          auto last = std::end(key_vals);
-          
-          for (; iter != last; ++iter)
+
+          for (auto iter = std::begin(key_vals_); iter != std::end(key_vals_); ++iter)
           {
             if(key.GetIdentifier() == iter->first){
               return iter->second;
@@ -114,11 +105,56 @@ namespace context
 
           return "";
         }
+       
+        /* Iterates through the current and comparing context objects 
+         * to check for equality, */
+        bool operator== (const Context &other){
+          
+          /*Check for case where either both or one object has no contents. */
+          if(std::begin(other.key_vals_) == std::end(other.key_vals_)){
+            if(std::begin(key_vals_) == std::end(key_vals_)){
+              return true;
+            }
+            else{
+              return false;
+            }
+          }
+
+          if(std::begin(key_vals_) == std::end(key_vals_)){
+            return false;
+          }
+
+             
+          /*Compare the contexts*/       
+          for (auto iter = std::begin(key_vals_); iter != std::end(key_vals_); ++iter)
+          {
+            int found = 0;
+            
+            for(auto iter_other = std::begin(other.key_vals_); iter_other != std::end(other.key_vals_); iter_other++){
+                if(iter->first == iter_other->first){
+                 if(nostd::get<nostd::string_view>(iter->second) == nostd::get<nostd::string_view>(iter_other->second)){
+                    found = 1;
+                    break;
+                  }
+                } 
+            }
+            
+            if(found == 0){
+              return false;
+            }
+          }
+          
+          return true;
+        }
+
+        /* Copy Constructors. */
+        Context(const Context& other) = default;
+        Context& operator=(const Context& other) = default;
 
       private:
-        T key_vals;
+        T key_vals_;
 
     };
-    
+
 }  // namespace context
 OPENTELEMETRY_END_NAMESPACE

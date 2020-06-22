@@ -22,15 +22,15 @@ namespace context
           private:
             friend class RuntimeContext<M>;
 
-            Context<M> ctx_;
+            Context<M> context_;
 
             /* A constructor that sets the token's Context object to the
              * one that was passed in. 
              */
-            Token(Context<M> ctx) { ctx_ = ctx; }
+            Token(Context<M> &context) { context_ = context; }
 
             /* Returns the stored context object. */
-            Context<M> GetCtx() { return ctx_; }
+            Context<M> GetContext() { return context_; }
         };
 
         /* Return the current context. */
@@ -40,12 +40,12 @@ namespace context
          * that can be used to reset to the previous Context.
          */
 
-        Token Attach(Context<M> context);
+        Token Attach(Context<M> &context);
 
         /* Resets the context to a previous value stored in the 
          * passed in token. Returns zero if successful, -1 otherwise
          */
-        int Detach(Token token);
+        int Detach(Token &token);
     };
 
 

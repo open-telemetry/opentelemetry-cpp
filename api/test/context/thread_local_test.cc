@@ -5,7 +5,8 @@
 
 using namespace opentelemetry;
 
-TEST(ThreadLocalContextTest, ThreadLocalContext){
+/* Tests whether the ThreadLocalContext attaches and detaches as expected */
+TEST(ThreadLocalContextTest, ThreadLocalContextAttachDetach){
 
   using M = std::map< std::string, common::AttributeValue>;
 
@@ -22,6 +23,8 @@ TEST(ThreadLocalContextTest, ThreadLocalContext){
   context::ThreadLocalContext<M>::Token test_token = test_thread_context.Attach(foo_context);
 
   EXPECT_EQ(nostd::get<nostd::string_view>(test_thread_context.GetCurrent().GetValue(test_key)), "123");
+  
   EXPECT_EQ(test_thread_context.Detach(test_token), 0);
+  
   EXPECT_NE(nostd::get<nostd::string_view>(test_thread_context.GetCurrent().GetValue(test_key)), "123");
 }
