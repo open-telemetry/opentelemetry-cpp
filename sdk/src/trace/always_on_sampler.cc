@@ -27,7 +27,7 @@ SamplingResult AlwaysOnSampler::ShouldSample(
 
 std::string AlwaysOnSampler::GetDescription() const noexcept
 {
-  return "AlwaysOnSampler";
+  return std::string("AlwaysOnSampler");
 }
 }  // namespace trace
 }  // namespace sdk
