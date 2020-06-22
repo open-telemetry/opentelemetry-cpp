@@ -17,6 +17,7 @@ cc_test(
     deps = [
         "//api",
         "@com_google_googletest//:gtest_main",
+        "@com_github_google_benchmark//:benchmark",
     ],
 )
 
@@ -61,6 +62,7 @@ cc_test(
     deps = [
         "//api",
         "@com_google_googletest//:gtest_main",
+        "@com_github_google_benchmark//:benchmark",
     ],
 )
 
@@ -72,5 +74,6 @@ cc_test(
     deps = [
         "//api",
         "@com_google_googletest//:gtest_main",
+        "@com_github_google_benchmark//:benchmark",
     ],
 )
