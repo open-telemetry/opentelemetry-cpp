@@ -15,14 +15,14 @@ void initTracer()
   auto processor = std::shared_ptr<sdktrace::SpanProcessor>(
       new sdktrace::SimpleSpanProcessor(std::move(exporter)));
   auto provider = nostd::shared_ptr<trace::TracerProvider>(new sdktrace::TracerProvider(processor));
+  // Set the global trace provider
   trace::Provider::SetTracerProvider(provider);
 }
 }  // namespace
 
 int main()
 {
-  // Removing this line will leave OT initialized with the default noop
-  // tracer, thus being effectively deactivated.
+  // Removing this line will leave the default noop TracerProvider in place.
   initTracer();
 
   foo_library();

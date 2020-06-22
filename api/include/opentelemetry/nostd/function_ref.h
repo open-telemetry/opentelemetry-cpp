@@ -64,11 +64,10 @@ public:
                               int>::type = 0,
       typename std::enable_if<
 #if (__cplusplus >= 201703L)
-          /* Visual C++ - make sure to build with /Zc:__cplusplus. Otherwise the macro will always contain 199711L.
-           * Ref: https://docs.microsoft.com/en-us/cpp/build/reference/zc-cplusplus?view=vs-2019
-           */
+          // std::result_of deprecated in C++17, removed in C++20
           std::is_convertible<typename std::invoke_result<F, Args...>::type, R>::value,
 #else
+          // std::result_of since C++11
           std::is_convertible<typename std::result_of<F &(Args...)>::type, R>::value,
 #endif
           int>::type = 0>
