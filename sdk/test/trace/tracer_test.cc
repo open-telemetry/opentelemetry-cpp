@@ -48,12 +48,12 @@ private:
 
 namespace
 {
-std::shared_ptr<Tracer> initTracer(
+std::shared_ptr<opentelemetry::trace::Tracer> initTracer(
     std::shared_ptr<std::vector<std::unique_ptr<SpanData>>> &received)
 {
   std::unique_ptr<SpanExporter> exporter(new MockSpanExporter(received));
   std::shared_ptr<SimpleSpanProcessor> processor(new SimpleSpanProcessor(std::move(exporter)));
-  return std::shared_ptr<Tracer>(new Tracer(processor));
+  return std::shared_ptr<opentelemetry::trace::Tracer>(new Tracer(processor));
 }
 }  // namespace
 
@@ -114,7 +114,7 @@ TEST(Tracer, StartSpanWithOptionsTime)
   ASSERT_EQ(std::chrono::nanoseconds(30), span_data->GetDuration());
 }
 
-TEST(Tracer, StartSpanWithOptionsAttributes)
+TEST(Tracer, StartSpanWithAttributes)
 {
   std::shared_ptr<std::vector<std::unique_ptr<SpanData>>> spans_received(
       new std::vector<std::unique_ptr<SpanData>>);
@@ -122,14 +122,30 @@ TEST(Tracer, StartSpanWithOptionsAttributes)
 
 
   {
-      common::AttributeKeyValue attrs[] = {{"attr1", 314159}, {"attr2", false}, {"attr1", "string"}};
-      tracer->StartSpan("span 1", attrs);
+      tracer->StartSpan("span 1", {{"attr1", 314159}, {"attr2", false}, {"attr1", "string"}});
+
+      std::map<std::string, common::AttributeValue> m;
+      m["attr3"] = 3.0;
+      tracer->StartSpan("span 2", m);
+
+      char* local_value = new char[6];
+      local_value[0] = '\0';
+      tracer->StartSpan("span 3", {{"attr4", local_value}});
+      delete local_value;
   }
 
-  ASSERT_EQ(1, spans_received->size());
+  ASSERT_EQ(3, spans_received->size());
 
   auto &span_data = spans_received->at(0);
   ASSERT_EQ(2, span_data->GetAttributes().size());
   ASSERT_EQ("string", nostd::get<nostd::string_view>(span_data->GetAttributes().at("attr1")));
   ASSERT_EQ(false, nostd::get<bool>(span_data->GetAttributes().at("attr2")));
+
+  auto &span_data2 = spans_received->at(1);
+  ASSERT_EQ(1, span_data2->GetAttributes().size());
+  ASSERT_EQ(3.0, nostd::get<double>(span_data2->GetAttributes().at("attr3")));
+
+  auto &span_data3 = spans_received->at(2);
+  ASSERT_EQ(1, span_data2->GetAttributes().size());
+  ASSERT_EQ("", nostd::get<nostd::string_view>(span_data2->GetAttributes().at("attr4")));
 }

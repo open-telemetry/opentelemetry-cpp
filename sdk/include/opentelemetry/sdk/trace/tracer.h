@@ -37,7 +37,7 @@ public:
 
   nostd::unique_ptr<trace_api::Span> StartSpan(
       nostd::string_view name,
-					    nostd::span<const common::AttributeKeyValue> attributes = {},
+					    const trace_api::KeyValueIterable &attributes,
       const trace_api::StartSpanOptions &options = {}) noexcept override;
 
   void ForceFlushWithMicroseconds(uint64_t timeout) noexcept override;

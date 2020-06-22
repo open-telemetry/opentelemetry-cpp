@@ -1,4 +1,5 @@
 #include "opentelemetry/plugin/dynamic_load.h"
+#include "opentelemetry/trace/tracer.h"
 
 #include <cstring>
 #include <fstream>
