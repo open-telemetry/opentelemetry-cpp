@@ -2,6 +2,7 @@
 #include "opentelemetry/nostd/span.h"
 
 #include <gtest/gtest.h>
+#include <map>
 
 using namespace opentelemetry::sdk::trace;
 using namespace opentelemetry::nostd;
@@ -15,15 +16,18 @@ TEST(AlwaysOnSampler, ShouldSample)
 
   trace_api::TraceId trace_id_invalid;
   trace_api::TraceId trace_id_valid(buf);
+  std::map<int, int> key_value_container;
 
-  auto sampling_result = sampler.ShouldSample(nullptr, trace_id_invalid, "invalid trace id test",
-                                              trace_api::SpanKind::kServer, span<AttributeKeyValue>());
+  auto sampling_result = sampler.ShouldSample(
+      nullptr, trace_id_invalid, "invalid trace id test", trace_api::SpanKind::kServer,
+      trace_api::KeyValueIterableView<std::map<int, int>>(key_value_container));
 
   ASSERT_EQ(Decision::RECORD_AND_SAMPLE, sampling_result.decision);
   ASSERT_EQ(0, sampling_result.attributes->size());
 
-  sampling_result = sampler.ShouldSample(nullptr, trace_id_valid, "valid trace id test",
-                                              trace_api::SpanKind::kServer, span<AttributeKeyValue>());
+  sampling_result = sampler.ShouldSample(
+      nullptr, trace_id_valid, "valid trace id test", trace_api::SpanKind::kServer,
+      trace_api::KeyValueIterableView<std::map<int, int>>(key_value_container));
 
   ASSERT_EQ(Decision::RECORD_AND_SAMPLE, sampling_result.decision);
   ASSERT_EQ(nullptr, sampling_result.attributes);
