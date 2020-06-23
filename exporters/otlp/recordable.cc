@@ -44,9 +44,9 @@ void Recordable::SetStartTime(opentelemetry::core::SystemTimestamp start_time) n
   span_.set_start_time_unixnano(nano_unix_time);
 }
 
-void Recordable::SetDuration(std::chrono::nanoseconds duration) noexcept {
+void Recordable::SetDuration(std::chrono::nanoseconds duration) noexcept
+{
   uint64_t unix_duration = duration.count();
-
   uint64_t unix_end_time = span_.start_time_unixnano() + unix_duration;
   span_.set_end_time_unixnano(unix_end_time);
 }
