@@ -14,7 +14,7 @@ SamplingResult AlwaysOnSampler::ShouldSample(
     trace_api::TraceId trace_id,
     nostd::string_view name,
     trace_api::SpanKind span_kind,
-    const KeyValueIterable &attributes) noexcept
+    const trace_api::KeyValueIterable &attributes) noexcept
 {
   return{sdk::trace::Decision::RECORD_AND_SAMPLE, nullptr};
 }
