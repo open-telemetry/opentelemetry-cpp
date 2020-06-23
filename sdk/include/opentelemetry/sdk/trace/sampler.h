@@ -32,7 +32,7 @@ enum class Decision
 
 /**
  * The output of ShouldSample. 
- * it contains a sampling Decision and a set of span Attributes.
+ * It contains a sampling Decision and a set of Span Attributes.
  */
 struct SamplingResult
 {
@@ -42,7 +42,7 @@ struct SamplingResult
 };
 
 /**
- * Sampler interface allows users to create custom samplers which will return a sampling
+ * The Sampler interface allows users to create custom samplers which will return a
  * SamplingResult based on information that is typically available just before the Span was created.
  */
 class Sampler
