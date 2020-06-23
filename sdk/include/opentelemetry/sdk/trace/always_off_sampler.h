@@ -15,13 +15,11 @@ namespace trace_api = opentelemetry::trace;
 class AlwaysOffSampler : public Sampler
 {
 public:
-  explicit AlwaysOffSampler() noexcept;
-
   /**
    * @return Returns NOT_RECORD always
    */
   SamplingResult ShouldSample(
-    std::shared_ptr<SpanContext> parent_context,
+    const SpanContext *parent_context,
     trace_api::TraceId trace_id,
     nostd::string_view name,
     trace_api::SpanKind span_kind,
@@ -31,9 +29,6 @@ public:
    * @return Description MUST be AlwaysOffSampler
    */
   std::string GetDescription() const noexcept override;
-
-private:
-  SamplingResult sampling_result_;
 };
 }  // namespace trace
 }  // namespace sdk

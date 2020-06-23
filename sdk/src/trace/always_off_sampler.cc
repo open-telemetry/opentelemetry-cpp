@@ -7,38 +7,24 @@ namespace trace
 {
 namespace trace_api = opentelemetry::trace;
 
-AlwaysOffSampler::AlwaysOffSampler() noexcept
-  : sampling_result_(new AlwaysOffSamplingResultImpl()) {}
-
 SamplingResult AlwaysOffSampler::ShouldSample(
-    std::shared_ptr<SpanContext> parent_context,
+    const SpanContext *parent_context,
     trace_api::TraceId trace_id,
     nostd::string_view name,
     trace_api::SpanKind span_kind,
-    const nostd::span<AttributeKeyValue> &attributes) noexcept override
+    const nostd::span<AttributeKeyValue> &attributes) noexcept
   {
-    return sampling_result_;
+    return
+    {
+      Decision::NOT_RECORD,
+      std::unique_ptr<nostd::span<AttributeKeyValue>>(new nostd::span<AttributeKeyValue>())
+    };
   }
 
-std::string GetDescription() const noexcept override
+std::string AlwaysOffSampler::GetDescription() const noexcept
 {
   return "AlwaysOffSampler";
 }
-
-class AlwaysOffSamplingResultImpl : public SamplingResult
-{
-public:
-  Decision GetDecision() const noexcept override
-  {
-    return decision_;
-  }
-
-  nostd::span<AttributeKeyValue> GetAttributes() const noexcept override
-  {
-    return attributes_;
-  }
-
-private:
-  Decision decision_ = Decision::NOT_RECORD;
-  nostd::span<AttributeKeyValue> attributes_ = nostd::span();
-};
+}  // namespace trace
+}  // namespace sdk
+OPENTELEMETRY_END_NAMESPACE
