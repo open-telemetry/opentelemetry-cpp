@@ -26,7 +26,7 @@ TEST(AlwaysOnSampler, ShouldSample)
                                               trace_api::SpanKind::kServer, span<AttributeKeyValue>());
 
   ASSERT_EQ(Decision::RECORD_AND_SAMPLE, sampling_result.decision);
-  ASSERT_EQ(0, sampling_result.attributes->size());
+  ASSERT_EQ(nullptr, sampling_result.attributes);
 }
 
 TEST(AlwaysOnSampler, GetDescription)

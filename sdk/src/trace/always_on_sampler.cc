@@ -1,6 +1,4 @@
 #include "opentelemetry/sdk/trace/always_on_sampler.h"
-
-#include "opentelemetry/sdk/common/atomic_shared_ptr.h"
 #include "opentelemetry/version.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
@@ -16,13 +14,9 @@ SamplingResult AlwaysOnSampler::ShouldSample(
     trace_api::TraceId trace_id,
     nostd::string_view name,
     trace_api::SpanKind span_kind,
-    const nostd::span<AttributeKeyValue> &attributes) noexcept
+    const KeyValueIterable &attributes) noexcept
 {
-  return
-  {
-    sdk::trace::Decision::RECORD_AND_SAMPLE,
-        std::unique_ptr<nostd::span<AttributeKeyValue>>(new nostd::span<AttributeKeyValue>())
-  };
+  return{sdk::trace::Decision::RECORD_AND_SAMPLE, nullptr};
 }
 
 std::string AlwaysOnSampler::GetDescription() const noexcept

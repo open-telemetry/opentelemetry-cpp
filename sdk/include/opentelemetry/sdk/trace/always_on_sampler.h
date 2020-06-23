@@ -26,7 +26,7 @@ public:
       trace_api::TraceId trace_id,
       nostd::string_view name,
       trace_api::SpanKind span_kind,
-      const nostd::span<AttributeKeyValue> &attributes) noexcept override;
+      const KeyValueIterable &attributes) noexcept override;
 
   /**
    * @return Description MUST be AlwaysOnSampler
