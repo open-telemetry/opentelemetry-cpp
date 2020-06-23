@@ -37,7 +37,7 @@ enum class Decision
 struct SamplingResult
 {
   Decision decision;
-  // A set of span Attributes that will also be added to the Span
+  // A set of span Attributes that will also be added to the Span. Can be nullptr.
   std::unique_ptr<std::map<std::string, openelemetry::common::AttributeValue>> attributes;
 };
 
