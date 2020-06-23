@@ -1,32 +1,27 @@
 #include "opentelemetry/sdk/trace/always_off_sampler.h"
+#include "opentelemetry/nostd/span.h"
 
 #include <gtest/gtest.h>
 
 using namespace opentelemetry::sdk::trace;
+using namespace opentelemetry::nostd;
 
-// Placeholder
-class MockSpanContext
-{}
-
-TEST(AlwaysOffSampler, MockSpanContext)
+TEST(AlwaysOffSampler, ShouldSample)
 {
-	AlwaysOffSampler sampler();
+	AlwaysOffSampler sampler;
 
-	ASSERT_EQ("AlwaysOffSampler", sampler.GetDescription());
-
-	// Placeholder
-	MockSpanContext context();
-
-	opentelemetry::trace::TraceId trace_id();
+	opentelemetry::trace::TraceId trace_id;
 
 	auto sampling_result = sampler.ShouldSample(
-		context, trace_id, "Test", SpanKind::kInternal, nostd::span());
+		nullptr, trace_id, "Test", trace_api::SpanKind::kInternal, span<AttributeKeyValue>());
 
-	auto decision = sampling_result.GetDecision();
+	ASSERT_EQ(Decision::NOT_RECORD, sampling_result.decision);
+	ASSERT_EQ(0, sampling_result.attributes->size());
+}
 
-	ASSERT_EQ(Decision::NOT_RECORD, decision);
+TEST(AlwaysOffSampler, GetDescription)
+{
+	AlwaysOffSampler sampler;
 
-	auto attributes = sampling_result.GetAttributes();
-
-	ASSERT_EQ(nostd::span(), attributes);
+	ASSERT_EQ("AlwaysOffSampler", sampler.GetDescription());
 }
