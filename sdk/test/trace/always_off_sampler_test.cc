@@ -16,7 +16,7 @@ TEST(AlwaysOffSampler, ShouldSample)
 		nullptr, trace_id, "Test", trace_api::SpanKind::kInternal, span<AttributeKeyValue>());
 
 	ASSERT_EQ(Decision::NOT_RECORD, sampling_result.decision);
-	ASSERT_EQ(0, sampling_result.attributes->size());
+	ASSERT_EQ(nullptr, sampling_result.attributes);
 }
 
 TEST(AlwaysOffSampler, GetDescription)
