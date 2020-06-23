@@ -16,10 +16,13 @@ namespace trace
 {
 namespace trace_api = opentelemetry::trace;
 
+/**
+ * A sampling Decision for a Span to be created.  
+ */
 enum class Decision
 {
   // IsRecording() == false, span will not be recorded and all events and attributes will be
-  //      dropped.
+  // dropped.
   NOT_RECORD,
   // IsRecording() == true, but Sampled flag MUST NOT be set.
   RECORD,
@@ -27,6 +30,10 @@ enum class Decision
   RECORD_AND_SAMPLE
 };
 
+/**
+ * The output of ShouldSample. 
+ * it contains a sampling Decision and a set of span Attributes.
+ */
 struct SamplingResult
 {
   Decision decision;
@@ -34,6 +41,10 @@ struct SamplingResult
   std::unique_ptr<std::map<std::string, openelemetry::common::AttributeValue>> attributes;
 };
 
+/**
+ * Sampler interface allows users to create custom samplers which will return a sampling
+ * SamplingResult based on information that is typically available just before the Span was created.
+ */
 class Sampler
 {
 public:
@@ -49,8 +60,7 @@ public:
    *     the parentContext, unless this is a root span.
    * @param name the name of the new Span.
    * @param spanKind the trace_api::SpanKind of the Span.
-   * @param attributes TODO: Change AttributeKeyValue to common::AttributeKeyValue
-   *     list of AttributeValue with their keys.
+   * @param attributes list of AttributeValue with their keys.
    * @param links TODO: Collection of links that will be associated with the Span to be created.
    * @return sampling result whether span should be sampled or not.
    * @since 0.1.0
