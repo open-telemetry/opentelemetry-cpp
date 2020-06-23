@@ -14,11 +14,7 @@ SamplingResult AlwaysOffSampler::ShouldSample(
     trace_api::SpanKind span_kind,
     const nostd::span<AttributeKeyValue> &attributes) noexcept
   {
-    return
-    {
-      Decision::NOT_RECORD,
-      std::unique_ptr<nostd::span<AttributeKeyValue>>(new nostd::span<AttributeKeyValue>())
-    };
+    return { Decision::NOT_RECORD, nullptr };
   }
 
 std::string AlwaysOffSampler::GetDescription() const noexcept
