@@ -38,7 +38,7 @@ struct SamplingResult
 {
   Decision decision;
   // A set of span Attributes that will also be added to the Span. Can be nullptr.
-  std::unique_ptr<std::map<std::string, openelemetry::common::AttributeValue>> attributes;
+  std::unique_ptr<const std::map<std::string, opentelemetry::common::AttributeValue>> attributes;
 };
 
 /**
@@ -70,7 +70,7 @@ public:
                                       trace_api::TraceId trace_id,
                                       nostd::string_view name,
                                       trace_api::SpanKind span_kind,
-                                      const KeyValueIterable &attributes) noexcept = 0;
+                                      const trace_api::KeyValueIterable &attributes) noexcept = 0;
 
   /**
    * Returns the sampler name or short description with the configuration.
