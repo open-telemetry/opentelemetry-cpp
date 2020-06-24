@@ -12,7 +12,7 @@ SamplingResult AlwaysOffSampler::ShouldSample(
     trace_api::TraceId trace_id,
     nostd::string_view name,
     trace_api::SpanKind span_kind,
-    const nostd::span<AttributeKeyValue> &attributes) noexcept
+    const trace_api::KeyValueIterable &attributes) noexcept
   {
     return { Decision::NOT_RECORD, nullptr };
   }
