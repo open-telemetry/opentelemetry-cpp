@@ -8,7 +8,7 @@ namespace trace
 TracerProvider::TracerProvider(std::shared_ptr<SpanProcessor> processor) noexcept
     : processor_{processor},
       tracer_(new Tracer(std::move(processor))),
-      sampler_(std::make_shared<Sampler>(new AlwaysOnSampler()))
+      sampler_(std::make_shared<AlwaysOnSampler>())
 {}
 
 TracerProvider::TracerProvider(std::shared_ptr<SpanProcessor> processor,
