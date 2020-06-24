@@ -23,12 +23,18 @@ public:
     trace_api::TraceId trace_id,
     nostd::string_view name,
     trace_api::SpanKind span_kind,
-    const trace_api::KeyValueIterable &attributes) noexcept override;
+    const trace_api::KeyValueIterable &attributes) noexcept override
+  {
+    return { Decision::NOT_RECORD, nullptr };
+  }
   
   /**
    * @return Description MUST be AlwaysOffSampler
    */
-  std::string GetDescription() const noexcept override;
+  std::string GetDescription() const noexcept override
+  {
+    return "AlwaysOffSampler";
+  }
 };
 }  // namespace trace
 }  // namespace sdk
