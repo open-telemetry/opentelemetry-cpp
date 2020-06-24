@@ -1,5 +1,6 @@
 #pragma once
 
+#include "opentelemetry/common/attribute_value.h"
 #include "opentelemetry/core/timestamp.h"
 #include "opentelemetry/nostd/string_view.h"
 #include "opentelemetry/trace/canonical_code.h"
@@ -32,6 +33,14 @@ public:
   virtual void SetIds(opentelemetry::trace::TraceId trace_id,
                       opentelemetry::trace::SpanId span_id,
                       opentelemetry::trace::SpanId parent_span_id) noexcept = 0;
+
+  /**
+   * Set an attribute of a span.
+   * @param name the name of the attribute
+   * @param value the attribute value
+   */
+  virtual void SetAttribute(nostd::string_view key,
+                            const opentelemetry::common::AttributeValue &&value) noexcept = 0;
 
   /**
    * Add an event to a span.
