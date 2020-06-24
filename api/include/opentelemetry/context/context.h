@@ -20,7 +20,7 @@ namespace context
 {
 
 /* The context class provides a context identifier */
-template <class T>
+template <class T /*, nostd::enable_if_t<trace::detail::is_key_value_iterable<T>::value> * = nullptr*/>
 class Context
 {
 
@@ -66,8 +66,6 @@ public:
    */
   Context(const T &attributes) : key_vals_(attributes)
   {
-    /* Currently only used as a check, to ensure T is of the right type. */
-    trace::KeyValueIterableView<T> iterable = trace::KeyValueIterableView<T>(attributes);
   }
 
   Context() {}
@@ -77,8 +75,6 @@ public:
    */
   Context WriteValues(T &attributes) noexcept
   {
-    /* Currently only used as a check, to ensure T is of the right type. */
-    trace::KeyValueIterableView<T> iterable = trace::KeyValueIterableView<T>(attributes);
 
     std::insert_iterator<T> back(attributes, std::begin(attributes));
 

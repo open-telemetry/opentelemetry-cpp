@@ -1,10 +1,33 @@
 #include <cstdint>
 
 #include "opentelemetry/context/context.h"
+#include "opentelemetry/nostd/list.h"
+#include "opentelemetry/nostd/pair.h"
 
 #include <gtest/gtest.h>
 
 using namespace opentelemetry;
+
+TEST(ContextTest, ContextPairList){
+  
+  using M = nostd::list<nostd::pair<std::string,common::AttributeValue>>;
+  
+  context::Context<M> test_context = context::Context<M>();
+
+  context::Context<M>::Key test_key = test_context.CreateKey("test_key");
+  context::Context<M>::Key foo_key  = test_context.CreateKey("test_key");
+  
+  //EXPECT_EQ(nostd::get<nostd::string_view>(test_context.GetValue(1)), 2);
+  //M m1 = {{1,2},{3,4}};
+  M m1 = {{std::string(test_key.GetIdentifier()), "123"},
+    {std::string(foo_key.GetIdentifier()), "456"}};
+    
+  //context::Context<M> foo_context = test_context.WriteValues(m1);
+
+  //EXPECT_EQ(nostd::get<nostd::string_view>(foo_context.GetValue(test_key)), "123");
+  //EXPECT_EQ(nostd::get<nostd::string_view>(foo_context.GetValue(foo_key)), "456");
+}
+
 
 /* Test ensurs that the context object doe not change when you write to it */
 TEST(ContextTest, ContextImmutability)
@@ -16,7 +39,7 @@ TEST(ContextTest, ContextImmutability)
   context::Context<M>::Key foo_key  = test_context.CreateKey("test_key");
 
   M m1 = {{std::string(test_key.GetIdentifier()), "123"},
-          {std::string(foo_key.GetIdentifier()), "456"}};
+    {std::string(foo_key.GetIdentifier()), "456"}};
 
   context::Context<M> foo_context = test_context.WriteValues(m1);
 
@@ -38,7 +61,7 @@ TEST(ContextTest, ContextInheritance)
   context::Context<M>::Key other_key = test_context.CreateKey("other_key");
 
   M m1 = {{std::string(test_key.GetIdentifier()), "123"},
-          {std::string(foo_key.GetIdentifier()), "456"}};
+    {std::string(foo_key.GetIdentifier()), "456"}};
   M m2 = {{std::string(other_key.GetIdentifier()), "000"}};
 
   context::Context<M> foo_context   = test_context.WriteValues(m1);
@@ -62,7 +85,7 @@ TEST(ContextTest, ContextKeyOverwrite)
   context::Context<M>::Key other_key = test_context.CreateKey("other_key");
 
   M m1 = {{std::string(test_key.GetIdentifier()), "123"},
-          {std::string(foo_key.GetIdentifier()), "456"}};
+    {std::string(foo_key.GetIdentifier()), "456"}};
   M m2 = {{std::string(test_key.GetIdentifier()), "000"}};
 
   context::Context<M> foo_context   = test_context.WriteValues(m1);
@@ -84,7 +107,7 @@ TEST(ContextTest, ContextCopy)
   context::Context<M>::Key other_key = test_context.CreateKey("other_key");
 
   M m1 = {{std::string(test_key.GetIdentifier()), "123"},
-          {std::string(foo_key.GetIdentifier()), "456"}};
+    {std::string(foo_key.GetIdentifier()), "456"}};
   M m2 = {{std::string(other_key.GetIdentifier()), "000"}};
 
   context::Context<M> foo_context    = test_context.WriteValues(m1);
@@ -107,7 +130,7 @@ TEST(ContextTest, ContextCompare)
   context::Context<M>::Key other_key = test_context.CreateKey("other_key");
 
   M m1 = {{std::string(test_key.GetIdentifier()), "123"},
-          {std::string(foo_key.GetIdentifier()), "456"}};
+    {std::string(foo_key.GetIdentifier()), "456"}};
   M m2 = {{std::string(other_key.GetIdentifier()), "000"}};
 
   context::Context<M> foo_context    = test_context.WriteValues(m1);
