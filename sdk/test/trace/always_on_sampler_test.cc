@@ -16,14 +16,14 @@ TEST(AlwaysOnSampler, ShouldSample)
 
   trace_api::TraceId trace_id_invalid;
   trace_api::TraceId trace_id_valid(buf);
-  std::map<std::string, int> key_value_container;
+  std::map<std::string, int> key_value_container = {{"key", 0}};
 
   auto sampling_result = sampler.ShouldSample(
       nullptr, trace_id_invalid, "invalid trace id test", trace_api::SpanKind::kServer,
       trace_api::KeyValueIterableView<std::map<std::string, int>>(key_value_container));
 
   ASSERT_EQ(Decision::RECORD_AND_SAMPLE, sampling_result.decision);
-  ASSERT_EQ(0, sampling_result.attributes->size());
+  ASSERT_EQ(nullptr, sampling_result.attributes);
 
   sampling_result = sampler.ShouldSample(
       nullptr, trace_id_valid, "valid trace id test", trace_api::SpanKind::kServer,
