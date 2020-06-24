@@ -9,13 +9,14 @@ void Recordable::SetIds(trace::TraceId trace_id,
                         trace::SpanId span_id,
                         trace::SpanId parent_span_id) noexcept
 {
-  char trace_id_buff[32] = {0};
-  char span_id_buff[16] = {0};
-  char parent_span_id_buff[16] = {0};
+  const uint8_t* trace_id_data = trace_id.Id().data();
+  const char* trace_id_buff = (char*)trace_id_data;
 
-  trace_id.ToLowerBase16(trace_id_buff);
-  span_id.ToLowerBase16(span_id_buff);
-  parent_span_id.ToLowerBase16(parent_span_id_buff);
+  const uint8_t* span_id_data = span_id.Id().data();
+  const char* span_id_buff = (char*)span_id_data;
+
+  const uint8_t* parent_span_id_data = parent_span_id.Id().data();
+  const char* parent_span_id_buff = (char*)parent_span_id_data;
 
   span_.set_trace_id(trace_id_buff);
   span_.set_span_id(span_id_buff);
