@@ -13,6 +13,7 @@ CI tests can be run on docker by invoking the script `./ci/run_docker.sh ./ci/do
 * `bazel.tsan`: build bazel targets and run tests with ThreadSanitizer.
 * `benchmark`: run all benchmarks.
 * `format`: use `tools/format.sh` to enforce text formatting.
+* `code.coverage`: build cmake targets and run tests. Then upload coverage report to [codecov.io](https://codecov.io/).
 
 Additionally, `./ci/run_docker.sh` can be invoked with no arguments to get a docker shell where tests
 can be run manually.

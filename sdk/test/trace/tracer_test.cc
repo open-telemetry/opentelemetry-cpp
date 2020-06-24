@@ -7,6 +7,8 @@
 using namespace opentelemetry::sdk::trace;
 using opentelemetry::core::SteadyTimestamp;
 using opentelemetry::core::SystemTimestamp;
+namespace nostd  = opentelemetry::nostd;
+namespace common = opentelemetry::common;
 
 /**
  * A mock exporter that switches a flag once a valid recordable was received.
@@ -23,8 +25,7 @@ public:
     return std::unique_ptr<Recordable>(new SpanData);
   }
 
-  ExportResult Export(
-      const opentelemetry::nostd::span<std::unique_ptr<Recordable>> &recordables) noexcept override
+  ExportResult Export(const nostd::span<std::unique_ptr<Recordable>> &recordables) noexcept override
   {
     for (auto &recordable : recordables)
     {
@@ -47,12 +48,12 @@ private:
 
 namespace
 {
-std::shared_ptr<Tracer> initTracer(
+std::shared_ptr<opentelemetry::trace::Tracer> initTracer(
     std::shared_ptr<std::vector<std::unique_ptr<SpanData>>> &received)
 {
   std::unique_ptr<SpanExporter> exporter(new MockSpanExporter(received));
   std::shared_ptr<SimpleSpanProcessor> processor(new SimpleSpanProcessor(std::move(exporter)));
-  return std::shared_ptr<Tracer>(new Tracer(processor));
+  return std::shared_ptr<opentelemetry::trace::Tracer>(new Tracer(processor));
 }
 }  // namespace
 
@@ -91,7 +92,7 @@ TEST(Tracer, StartSpan)
   ASSERT_LT(std::chrono::nanoseconds(0), span_data->GetDuration());
 }
 
-TEST(Tracer, StartSpanWithOptions)
+TEST(Tracer, StartSpanWithOptionsTime)
 {
   std::shared_ptr<std::vector<std::unique_ptr<SpanData>>> spans_received(
       new std::vector<std::unique_ptr<SpanData>>);
@@ -111,4 +112,30 @@ TEST(Tracer, StartSpanWithOptions)
   auto &span_data = spans_received->at(0);
   ASSERT_EQ(std::chrono::nanoseconds(300), span_data->GetStartTime().time_since_epoch());
   ASSERT_EQ(std::chrono::nanoseconds(30), span_data->GetDuration());
+}
+
+TEST(Tracer, StartSpanWithAttributes)
+{
+  std::shared_ptr<std::vector<std::unique_ptr<SpanData>>> spans_received(
+      new std::vector<std::unique_ptr<SpanData>>);
+  auto tracer = initTracer(spans_received);
+
+  {
+    tracer->StartSpan("span 1", {{"attr1", 314159}, {"attr2", false}, {"attr1", "string"}});
+
+    std::map<std::string, common::AttributeValue> m;
+    m["attr3"] = 3.0;
+    tracer->StartSpan("span 2", m);
+  }
+
+  ASSERT_EQ(2, spans_received->size());
+
+  auto &span_data = spans_received->at(0);
+  ASSERT_EQ(2, span_data->GetAttributes().size());
+  ASSERT_EQ("string", nostd::get<nostd::string_view>(span_data->GetAttributes().at("attr1")));
+  ASSERT_EQ(false, nostd::get<bool>(span_data->GetAttributes().at("attr2")));
+
+  auto &span_data2 = spans_received->at(1);
+  ASSERT_EQ(1, span_data2->GetAttributes().size());
+  ASSERT_EQ(3.0, nostd::get<double>(span_data2->GetAttributes().at("attr3")));
 }
