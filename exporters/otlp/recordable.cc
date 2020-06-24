@@ -10,12 +10,11 @@ void Recordable::SetIds(trace::TraceId trace_id,
                         trace::SpanId parent_span_id) noexcept
 {
   const uint8_t* trace_id_data = trace_id.Id().data();
-  const char* trace_id_buff = (char*)trace_id_data;
-
   const uint8_t* span_id_data = span_id.Id().data();
-  const char* span_id_buff = (char*)span_id_data;
-
   const uint8_t* parent_span_id_data = parent_span_id.Id().data();
+
+  const char* trace_id_buff = (char*)trace_id_data;
+  const char* span_id_buff = (char*)span_id_data;
   const char* parent_span_id_buff = (char*)parent_span_id_data;
 
   span_.set_trace_id(trace_id_buff);
