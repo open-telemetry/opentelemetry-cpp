@@ -22,6 +22,13 @@ void Recordable::SetIds(trace::TraceId trace_id,
   span_.set_parent_span_id(parent_span_id_buff);
 }
 
+void SetAttribute(nostd::string_view key,
+                    const opentelemetry::common::AttributeValue &&value) noexcept
+{
+  (void)key;
+  (void)value;
+}
+
 void Recordable::AddEvent(nostd::string_view name, core::SystemTimestamp timestamp) noexcept
 {
   (void)name;
