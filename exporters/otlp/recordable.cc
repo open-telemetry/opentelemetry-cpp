@@ -7,7 +7,8 @@ namespace otlp
 {
 void Recordable::SetIds(trace::TraceId trace_id,
                         trace::SpanId span_id,
-                        trace::SpanId parent_span_id) noexcept {
+                        trace::SpanId parent_span_id) noexcept
+{
   char trace_id_buff[32] = {0};
   char span_id_buff[16] = {0};
   char parent_span_id_buff[16] = {0};
