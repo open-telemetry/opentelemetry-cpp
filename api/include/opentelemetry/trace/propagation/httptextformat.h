@@ -2,6 +2,7 @@
 
 #include <cstdint>
 #include "opentelemetry/context/context.h"
+#include "opentelemetry/nostd/string_view.h"
 #include "opentelemetry/version.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
@@ -10,8 +11,8 @@ namespace trace
 namespace propagation
 {
 
-virtual static Context SetSpanInContext(Span span, Context context = NULL)
-virtual static Span GetCurrentSpan(Context context = NULL)
+virtual static Context SetSpanInContext(Span span, Context &context = NULL)
+virtual static Span GetCurrentSpan(Context &context = NULL)
 
 template <typename T>
 class HTTPTextFormat {
@@ -21,10 +22,10 @@ class HTTPTextFormat {
      headers, and a getter and setter function for the extraction and
     injection of values, respectively.*/
     public:
-        using Setter = nostd::string_view(*)(nostd::string_view,nostd::string_view);
-        using Getter = void(*)(T&,nostd::string_view,nostd::string);
-        virtual Context extract(Setter get_from_carrier, const T &carrier, Context &context)
-        virtual void inject(Getter set_from_carrier, T &carrier, const Context &context)
+        using Getter = nostd::string_view(*)(nostd::string_view,nostd::string_view);
+        using Setter = void(*)(T&,nostd::string_view,nostd::string);
+        virtual Context extract(Getter get_from_carrier, const T &carrier, Context &context)
+        virtual void inject(Setter set_from_carrier, T &carrier, const Context &context)
 };
 }
 }
