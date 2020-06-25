@@ -17,7 +17,7 @@ namespace trace
 namespace trace_api = opentelemetry::trace;
 
 /**
- * A sampling Decision for a Span to be created.  
+ * A sampling Decision for a Span to be created.
  */
 enum class Decision
 {
@@ -31,7 +31,7 @@ enum class Decision
 };
 
 /**
- * The output of ShouldSample. 
+ * The output of ShouldSample.
  * It contains a sampling Decision and a set of Span Attributes.
  */
 struct SamplingResult
@@ -93,16 +93,15 @@ public:
       trace_api::TraceId trace_id,
       nostd::string_view name,
       trace_api::SpanKind span_kind,
-      const trace_api::KeyValueIterable &attributes) noexcept override {
-    return{sdk::trace::Decision::RECORD_AND_SAMPLE, nullptr};
+      const trace_api::KeyValueIterable &attributes) noexcept override
+  {
+    return {sdk::trace::Decision::RECORD_AND_SAMPLE, nullptr};
   }
 
   /**
    * @return Description MUST be AlwaysOnSampler
    */
-  inline std::string GetDescription() const noexcept override {
-    return "AlwaysOnSampler";
-  }
+  inline std::string GetDescription() const noexcept override { return "AlwaysOnSampler"; }
 };
 }  // namespace trace
 }  // namespace sdk

@@ -27,3 +27,35 @@ TEST(TracerProvider, GetTracer)
   ASSERT_NE(nullptr, sdkTracer);
   ASSERT_EQ(processor, sdkTracer->GetProcessor());
 }
+
+TEST(TracerProvider, GetSampler)
+{
+  std::shared_ptr<SpanProcessor> processor(new SimpleSpanProcessor(nullptr));
+
+  // Create a TracerProvicer with a default AlwaysOnSampler
+  TracerProvider tf(processor);
+  auto t1 = tf.GetSampler();
+  auto t2 = tf.GetSampler();
+  ASSERT_NE(nullptr, t1);
+  ASSERT_NE(nullptr, t2);
+
+  // Should return the same sampler each time.
+  ASSERT_EQ(t1, t2);
+
+  // Should be AlwaysOnSampler
+  ASSERT_EQ("AlwaysOnSampler", t2->GetDescription());
+}
+
+TEST(TracerProvider, SetSampler)
+{
+  std::shared_ptr<SpanProcessor> processor(new SimpleSpanProcessor(nullptr));
+
+  // Create a TracerProvicer with a default AlwaysOnSampler
+  TracerProvider tf(processor);
+
+  // Set the sampler to a new AlwaysOnSampler
+  tf.SetSampler(std::make_shared<AlwaysOnSampler>());
+  auto t1 = tf.GetSampler();
+
+  ASSERT_EQ("AlwaysOnSampler", t1->GetDescription());
+}
