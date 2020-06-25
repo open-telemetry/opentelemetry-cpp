@@ -1,18 +1,42 @@
 #include <vector>
 
+OPENTELEMETRY_BEGIN_NAMESPACE
 namespace trace
 {
 namespace propagation
 {
 namespace
 {
+// The HttpTraceContext provides methods to extract and inject
+// context into headers of HTTP requests with traces.
+// Example:
+//    HttpTraceContext.inject(setter,&carrier,&context);
+//    HttpTraceContext.extract(getter,&carrier,&context);
 class HttpTraceContext : public HTTPTextFormat
 {
+    public:
+        List<nostd::string_view> fields() {
+            static const auto* FIELDS = new std::vector<nostd::string_view>({TRACE_PARENT, TRACE_STATE});
+            return FIELDS;
+        }
+
+        void inject(Setter setter, T &carrier, const Context &context) override {
+            Span span = GetCurrentSpan(context);
+            if (span == null || !span.getContext().isValid()) {
+                // We don't have span.getContext() in span.h, should we just use span? As well as acquiring validity. (I do know how to implement them though)
+                return;
+            }
+            injectImpl(span.getContext(), carrier, setter); // span.getContext() function needed
+        }
+
+        Context extract(Getter getter, const T &carrier, Context &context) override {
+            SpanContext spanContext = extractImpl(carrier, getter);
+            return SetSpanInContext(trace.DefaultSpan(spanContext), context); // I actually need a default span class (implemented) here, I don't know who to ask for though. But both python and java version have default span classes though.
+        }
 
     private:
         static const nostd::string_view TRACE_PARENT = "traceparent";
         static const nostd::string_view TRACE_STATE = "tracestate";
-        static const std::vector<nostd::string_view> FIELDS = {TRACE_PARENT, TRACE_STATE)};
         static const int VERSION_BYTES = 2;
         static const int TRACE_ID_BYTES = 32;
         static const int PARENT_ID_BYTES = 16;
@@ -20,17 +44,17 @@ class HttpTraceContext : public HTTPTextFormat
         static const int TRACE_DELIMITER_BYTES = 3;
         static const int HEADER_SIZE = VERSION_BYTES + TRACE_ID_BYTES + PARENT_ID_BYTES + TRACE_FLAG_BYTES + TRACE_DELIMITER_BYTES;
 
-        static T checkNotNull(T arg, nostd::string_view errorMessage) {
+        static Context checkNotNull(Context &arg, nostd::string_view errorMessage) {
             if (arg == NULL) {
-                throw new NullPointerException(errorMessage);
+                throw new NullPointerException("error: null " + errorMessage);
             }
             return arg;
         }
 
-        static void injectImpl(Setter setter, T &carrier, const SpanContext spanContext) {
+        static void injectImpl(Setter setter, T &carrier, const SpanContext &spanContext) {
             char hex_string[HEADER_SIZE];
             sprintf(hex_string, "00-%032x-%016x-%02x",span_context.trace_id,span_context.span_id,span_context.trace_flags);
-            nostd::string_view traceparent_string(hex_string); // I don't know if the string view has a function that takes in an char array convert it to string though.
+            nostd::string_view traceparent_string = nostd::string_view(hex_string, HEADER_SIZE);
             setter(carrier, TRACE_PARENT, traceparent_string);
             if (spanContext.getTraceState()) {
                 nostd::string_view tracestate_string = formatTracestate(span_context.getTraceState()); // I need the definition for the type of TraceState(Dictionary or something else)
@@ -38,7 +62,7 @@ class HttpTraceContext : public HTTPTextFormat
             }
         }
 
-        static SpanContext extractContextFromTraceParent(nostd::string_view traceparent) {
+        static SpanContext extractContextFromTraceParent(nostd::string_view &traceparent) {
             bool isValid = traceparent.length() == HEADER_SIZE
                             && traceparent[VERSION_BYTES] == "-"
                             && traceparent[VERSION_BYTES+TRACE_ID_BYTES+1] == "-"
@@ -98,32 +122,8 @@ class HttpTraceContext : public HTTPTextFormat
               return contextFromParentHeader;
             }
         }
-    public:
-        List<String> fields() {
-            return FIELDS;
-        }
-
-        void inject(Setter setter, T &carrier, const Context &context) {
-            checkNotNull(context, "context");
-            checkNotNull(setter, "setter");
-
-            Span span = GetCurrentSpan(context);
-            if (span == null || !span.getContext().isValid()) {
-                // We don't have span.getContext() in span.h, should we just use span? As well as acquiring validity. (I do know how to implement them though)
-                return;
-            }
-            injectImpl(span.getContext(), carrier, setter); // span.getContext() function needed
-        }
-
-        Context extract(Getter get_from_carrier, const T &carrier, Context &context) {
-            checkNotNull(context, "context");
-            checkNotNull(carrier, "carrier");
-            checkNotNull(getter, "getter");
-
-            SpanContext spanContext = extractImpl(carrier, getter);
-            return SetSpanInContext(trace.DefaultSpan(spanContext), context); // I actually need a default span class (implemented) here, I don't know who to ask for though. But both python and java version have default span classes though.
-        }
 }
 }
 }
 }  // namespace trace
+OPENTELEMETRY_END_NAMESPACE

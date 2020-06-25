@@ -22,11 +22,18 @@ virtual static Span GetCurrentSpan(Context &context = NULL)
 template <typename T>
 class HTTPTextFormat {
     public:
+        // Rules that manages how context will be extracted from carrier.
         using Getter = nostd::string_view(*)(T &carrier, nostd::string_view trace_type);
+
+        // Rules that manages how context will be injected to carrier.
         using Setter = void(*)(T &carrier, nostd::string_view trace_type,nostd::string trace_description);
+
+        // Returns the context that is stored in the HTTP header carrier with self defined rules.
         virtual Context extract(Getter get_from_carrier, const T &carrier, Context &context) = 0;
+
+        // Sets the context for a HTTP header carrier with self defined rules.
         virtual void inject(Setter set_from_carrier, T &carrier, const Context &context) = 0;
 };
 }
-OPENTELEMETRY_END_NAMESPACE
+}
 OPENTELEMETRY_END_NAMESPACE
