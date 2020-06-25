@@ -126,4 +126,4 @@ class HttpTraceContext : public HTTPTextFormat
 }
 }
 }
-}
+}  // namespace trace
