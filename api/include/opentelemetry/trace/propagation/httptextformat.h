@@ -24,8 +24,8 @@ class HTTPTextFormat {
     public:
         using Getter = nostd::string_view(*)(T &carrier, nostd::string_view trace_type);
         using Setter = void(*)(T &carrier, nostd::string_view trace_type,nostd::string trace_description);
-        virtual Context extract(Getter get_from_carrier, const T &carrier, Context &context)
-        virtual void inject(Setter set_from_carrier, T &carrier, const Context &context)
+        virtual Context extract(Getter get_from_carrier, const T &carrier, Context &context) = 0;
+        virtual void inject(Setter set_from_carrier, T &carrier, const Context &context) = 0;
 };
 }
 OPENTELEMETRY_END_NAMESPACE
