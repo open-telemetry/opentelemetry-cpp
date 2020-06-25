@@ -44,10 +44,10 @@ public:
   }
 
   // Returns the first element.
-  T1 first() { return first_; }
+  T1 & first() { return first_; }
 
   // Returns the second element.
-  T2 second() { return second_; }
+  T2 & second() { return second_; }
 
 private:
   T1 first_;
