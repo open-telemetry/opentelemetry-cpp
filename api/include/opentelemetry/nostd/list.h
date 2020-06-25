@@ -153,15 +153,11 @@ public:
     // at the front.
     std::memcpy(temp + 1, data_, previous_size * sizeof(T));
 
-    // Save old array pointer for later deallocation.
-    T *old_data = data_;
+    delete[] data_;
 
     data_ = temp;
 
     data_[0] = element;
-
-    // Deallocate memory used by previous array.
-    delete[] old_data;
   };
 
   // Returns the last element and removes it from the list.
@@ -176,13 +172,9 @@ public:
     // Copy the original data.
     std::memcpy(temp, data_, size_ * sizeof(T));
 
-    // Save old array pointer for later deallocation.
-    T *old_data = data_;
+    delete[] data_;
 
     data_ = temp;
-
-    // Deallocate memory used by previous array.
-    delete[] old_data;
 
     return back_elem;
   }
@@ -198,13 +190,10 @@ public:
     // Copy the original data.
     std::memcpy(temp, data_ + 1, size_ * sizeof(T));
 
-    // Save old array pointer for later deallocation.
-    T *old_data = data_;
+    delete[] data_;
 
     data_ = temp;
 
-    // Deallocate memory used by previous array.
-    delete[] old_data;
 
     return front_elem;
   }
@@ -234,7 +223,7 @@ public:
       return false;
     }
   }
-  
+
   T &operator[](int index) { return data_[index]; }
 
 private:
