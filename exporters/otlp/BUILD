@@ -63,3 +63,11 @@ cc_binary(
     ],
 )
 
+cc_test(
+    name = "recordable_test",
+    srcs = ["recordable_test.cc"],
+    deps = [
+        ":recordable",
+        "@com_google_googletest//:gtest_main",
+    ],
+)

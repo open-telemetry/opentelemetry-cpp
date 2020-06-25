@@ -182,3 +182,19 @@ jobs:
         ./ci/setup_windows_ci_environment.ps1
     - name: run tests
       run: ./ci/do_ci.ps1 cmake.test_example_plugin
+
+  code_coverage:
+    name: Code coverage
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - name: setup
+      run: |
+        sudo ./ci/setup_cmake.sh
+        sudo ./ci/setup_ci_environment.sh
+    - name: run tests and generate report
+      run: ./ci/do_ci.sh code.coverage
+    - name: upload report
+      uses: codecov/codecov-action@v1
+      with:
+        file: /home/runner/build/coverage.info

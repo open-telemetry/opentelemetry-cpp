@@ -7,3 +7,4 @@ apt-get install --no-install-recommends --no-install-suggests -y \
                 ca-certificates \
                 wget \
                 git
+apt-get install -y lcov
