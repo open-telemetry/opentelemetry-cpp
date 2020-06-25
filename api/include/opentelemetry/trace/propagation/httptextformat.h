@@ -28,5 +28,5 @@ class HTTPTextFormat {
         virtual void inject(Setter set_from_carrier, T &carrier, const Context &context)
 };
 }
-}
+OPENTELEMETRY_END_NAMESPACE
 OPENTELEMETRY_END_NAMESPACE
