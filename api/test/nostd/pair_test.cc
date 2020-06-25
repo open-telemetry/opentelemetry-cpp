@@ -4,7 +4,7 @@
 
 using opentelemetry::nostd::pair;
 
-/* Tests constructing a pair object. */
+// Tests constructing a pair object.
 TEST(PairTest, BasicConstruction)
 {
   int val_1                = 1;

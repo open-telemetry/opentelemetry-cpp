@@ -7,9 +7,9 @@ OPENTELEMETRY_BEGIN_NAMESPACE
 namespace nostd
 {
 
-/* The nostd::pair class provides a data structure capable of hold
- * two values of different or the same types, and provides access to each.
- */
+// The nostd::pair class provides a data structure capable of hold
+// two values of different or the same types, and provides access to each.
+
 template <class T1, class T2>
 class pair
 {
@@ -20,7 +20,7 @@ public:
     second_ = T2();
   }
 
-  /* Constructs a pair object with the passed in first and second values. */
+  // Constructs a pair object with the passed in first and second values.
   pair(T1 first, T2 second)
   {
     first_  = first;
@@ -33,10 +33,20 @@ public:
     second_ = other_pair.second_;
   }
 
-  /* Returns the first element. */
+  bool operator==(const pair &other_pair)
+  {
+    if(first_ == other_pair.first_){
+      if(second_ == other_pair.second_){
+        return true;
+      }
+    }
+    return false;
+  }
+
+  // Returns the first element.
   T1 first() { return first_; }
 
-  /* Returns the second element. */
+  // Returns the second element.
   T2 second() { return second_; }
 
 private:
