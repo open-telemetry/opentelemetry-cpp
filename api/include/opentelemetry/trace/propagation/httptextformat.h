@@ -11,8 +11,8 @@ namespace trace
 namespace propagation
 {
 
-virtual static Context SetSpanInContext(Span span, Context &context = NULL)
-virtual static Span GetCurrentSpan(Context &context = NULL)
+virtual static Context SetSpanInContext(Span span, Context &context) = 0;
+virtual static Span GetCurrentSpan(Context &context) = 0;
 
 // The HTTPTextFormat class provides an interface that enables extracting and injecting
 // context into headers of HTTP requests. HTTP frameworks and clients
