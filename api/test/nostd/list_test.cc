@@ -6,9 +6,9 @@
 
 using opentelemetry::nostd::list;
 using opentelemetry::nostd::pair;
+
 // Tests that front() returns the first element and back()
 // returns the last element.
-
 TEST(ListTest, FrontBackReturnsProperElements)
 {
   list<int> int_list;
@@ -154,8 +154,8 @@ TEST(ListTest, AssignmentOperatorDoesNotChangeOriginal)
   second_list.pop_back();
   second_list.pop_back();
 
-  EXPECT_EQ(first_list == first_list_copy, true);
-  EXPECT_EQ(first_list == second_list, false);
+  EXPECT_TRUE(first_list == first_list_copy);
+  EXPECT_FALSE(first_list == second_list);
 }
 
 // Tests that two lists with the same contents return true when compared
@@ -166,8 +166,8 @@ TEST(ListTest, ComparisonOperatureReturnsTrueWithSameContents)
   list<int> second_list = {0, 1, 2, 3, 4};
   list<int> third_list  = {0, 1, 2, 3, 5};
 
-  EXPECT_EQ(first_list == second_list, true);
-  EXPECT_NE(first_list == third_list, false);
+  EXPECT_TRUE(first_list == second_list);
+  EXPECT_FALSE(first_list == third_list);
 }
 
 // Tests that constructing a list with one element populates the list object

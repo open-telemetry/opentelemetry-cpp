@@ -237,8 +237,8 @@ public:
     {
       return false;
     }
-
-    return (memcmp(data_, other_list.data_, size_) == 0);
+    
+    return (memcmp(data_, other_list.data_, size_*sizeof(T)) == 0);
   }
 
   T &operator[](int index) { return data_[index]; }
