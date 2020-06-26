@@ -37,19 +37,20 @@ class OtlpExporter final : public sdktrace::SpanExporter
       opentelemetry::proto::collector::trace::v1::TraceService::StubInterface>
       trace_service_stub;
 
-    opentelemetry::proto::trace::v1::ResourceSpans resource_spans;
+    opentelemetry::proto::trace::v1::ResourceSpans resource_span = request.add_resource_spans();
 
-    // trace_service_stub->Export(&context, request, &response);
 
     for (auto &recordable : spans) {
       auto rec = std::unique_ptr<otlpexporter::Recordable>(
           static_cast<otlpexporter::Recordable *>(recordable.release()));
 
-        //std::cout << "Name: " << rec->span().name() << std::endl;
+      //std::cout << "Name: " << rec->span().name() << std::endl;
 
-      //request.add_resource_spans();
-      //trace_service_stub->Export(&context, request, &response);
+      opentelemetry::proto::trace::v1::Span span = resource_spans.add_spans();
+      span->CopyFrom(rec->span());
     }
+
+    //trace_service_stub->Export(&context, request, &response);
 
     return sdktrace::ExportResult::kSuccess;
   }
