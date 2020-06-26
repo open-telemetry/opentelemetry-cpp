@@ -1,12 +1,8 @@
 #pragma once
 
 #include "opentelemetry/common/attribute_value.h"
-#include "opentelemetry/nostd/span.h"
-#include "opentelemetry/nostd/string_view.h"
-#include "opentelemetry/sdk/common/atomic_shared_ptr.h"
 #include "opentelemetry/trace/span.h"
 #include "opentelemetry/trace/trace_id.h"
-#include "opentelemetry/trace/tracer.h"
 #include "opentelemetry/version.h"
 
 #include <map>
@@ -19,28 +15,25 @@ namespace sdk
 namespace trace
 {
 namespace trace_api = opentelemetry::trace;
+
 /**
- * NOT_RECORD - IsRecording() == false,
- *    span will not be recorded and all events and attributes will be dropped.
- * RECORD - IsRecording() == true, but Sampled flag MUST NOT be set.
- * RECORD_AND_SAMPLED - IsRecording() == true AND Sampled flag` MUST be set.
+ * A sampling Decision for a Span to be created.  
  */
 enum class Decision
 {
+  // IsRecording() == false, span will not be recorded and all events and attributes will be
+  // dropped.
   NOT_RECORD,
+  // IsRecording() == true, but Sampled flag MUST NOT be set.
   RECORD,
+  // IsRecording() == true AND Sampled flag` MUST be set.
   RECORD_AND_SAMPLE
 };
 
 /**
- * A placeholder for common::AttributeKeyValue
- * A key/value pair that can be used to set attributes.
+ * The output of ShouldSample. 
+ * It contains a sampling Decision and a set of Span Attributes.
  */
-struct AttributeKeyValue {
-    nostd::string_view key;
-    common::AttributeValue value;
-};
-
 struct SamplingResult
 {
   Decision decision;
@@ -48,23 +41,26 @@ struct SamplingResult
   std::unique_ptr<const std::map<std::string, opentelemetry::common::AttributeValue>> attributes;
 };
 
+/**
+ * The Sampler interface allows users to create custom samplers which will return a
+ * SamplingResult based on information that is typically available just before the Span was created.
+ */
 class Sampler
 {
 public:
-  // Placeholder
+  // TODO: Remove this placeholder with real class
   class SpanContext;
   virtual ~Sampler() = default;
   /**
    * Called during Span creation to make a sampling decision.
    *
-   * @param parent_context TODO: a shared pointer of the SpanContext of a parent Span.
+   * @param parent_context a const pointer of the SpanContext of a parent Span.
    *     null if this is a root span.
    * @param trace_id the TraceId for the new Span. This will be identical to that in
    *     the parentContext, unless this is a root span.
    * @param name the name of the new Span.
    * @param spanKind the trace_api::SpanKind of the Span.
-   * @param attributes TODO: Change AttributeKeyValue to common::AttributeKeyValue
-   *     list of AttributeValue with their keys.
+   * @param attributes list of AttributeValue with their keys.
    * @param links TODO: Collection of links that will be associated with the Span to be created.
    * @return sampling result whether span should be sampled or not.
    * @since 0.1.0
