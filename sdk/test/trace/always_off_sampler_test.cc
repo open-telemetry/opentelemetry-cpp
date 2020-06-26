@@ -1,4 +1,4 @@
-#include "opentelemetry/sdk/trace/always_off_sampler.h"
+#include "opentelemetry/sdk/trace/samplers/always_off.h"
 
 #include <gtest/gtest.h>
 
