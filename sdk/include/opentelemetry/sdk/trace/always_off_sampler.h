@@ -19,11 +19,11 @@ public:
    * @return Returns NOT_RECORD always
    */
   SamplingResult ShouldSample(
-    const SpanContext *parent_context,
-    trace_api::TraceId trace_id,
-    nostd::string_view name,
-    trace_api::SpanKind span_kind,
-    const trace_api::KeyValueIterable &attributes) noexcept override
+    const SpanContext * /*parent_context*/,
+    trace_api::TraceId /*trace_id*/,
+    nostd::string_view /*name*/,
+    trace_api::SpanKind /*span_kind*/,
+    const trace_api::KeyValueIterable & /*attributes*/) noexcept override
   {
     return { Decision::NOT_RECORD, nullptr };
   }
