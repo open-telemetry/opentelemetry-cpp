@@ -1,0 +1,10 @@
+foreach(testname httptextformat_test)
+  add_executable(${testname} "${testname}.cc")
+  target_link_libraries(${testname} ${GTEST_BOTH_LIBRARIES}
+                        ${CMAKE_THREAD_LIBS_INIT} opentelemetry_api)
+  gtest_add_tests(TARGET ${testname} TEST_PREFIX trace. TEST_LIST ${testname})
+endforeach()
+
+add_executable(span_id_benchmark span_id_benchmark.cc)
+target_link_libraries(span_id_benchmark benchmark::benchmark
+                      ${CMAKE_THREAD_LIBS_INIT} opentelemetry_api)
