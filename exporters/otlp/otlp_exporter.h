@@ -10,6 +10,8 @@
 
 #include "recordable.h"
 
+#include <grpcpp/grpcpp.h>
+
 #include <iostream>
 
 namespace trace    = opentelemetry::trace;
@@ -36,21 +38,28 @@ class OtlpExporter final : public sdktrace::SpanExporter
     std::unique_ptr<
       opentelemetry::proto::collector::trace::v1::TraceService::StubInterface>
       trace_service_stub;
+    
+    const std::string address = "localhost:50051";
+    auto channel = grpc::CreateChannel(
+        address, grpc::InsecureChannelCredentials());
+    
+    trace_service_stub = \
+      opentelemetry::proto::collector::trace::v1::TraceService::NewStub(channel);
 
-    opentelemetry::proto::trace::v1::ResourceSpans resource_span = request.add_resource_spans();
+    opentelemetry::proto::trace::v1::ResourceSpans* resource_span = request.add_resource_spans();
 
 
     for (auto &recordable : spans) {
+      //std::cout << "Name: " << rec->span().name() << std::endl;
+
       auto rec = std::unique_ptr<otlpexporter::Recordable>(
           static_cast<otlpexporter::Recordable *>(recordable.release()));
 
-      //std::cout << "Name: " << rec->span().name() << std::endl;
-
-      opentelemetry::proto::trace::v1::Span span = resource_spans.add_spans();
+      opentelemetry::proto::trace::v1::Span* span = resource_span->add_spans();
       span->CopyFrom(rec->span());
     }
 
-    //trace_service_stub->Export(&context, request, &response);
+    trace_service_stub->Export(&context, request, &response);
 
     return sdktrace::ExportResult::kSuccess;
   }
