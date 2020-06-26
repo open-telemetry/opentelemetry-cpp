@@ -1,4 +1,9 @@
 #include <vector>
+#include "opentelemetry/trace/propagation/httptextformat.h"
+#include "opentelemetry/context/context.h"
+#include "opentelemetry/nostd/string_view.h"
+#include "opentelemetry/nostd/span.h"
+#include "opentelemetry/common/variant.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace trace
@@ -7,6 +12,28 @@ namespace propagation
 {
 namespace
 {
+
+static Context SetSpanInContext(common::AttributeValue span, Context &context) {
+    Context new_values = Context(context);
+    // I don't know if the SPAN_KEY is defined in the context.h.
+    // My point is that since each key when it is created is unique in terms of its id even though they may have the same name,
+    // it would make sense to define those keys in a single file only and had to be referenced by other files to store and retrieve values,
+    // otherwise I will not be able to access any fields, for example, "current-span" as CreateKey("current-span") will
+    // not work because the id is different when the value is put into despite the Key is also created from
+    // CreateKey("current-span").
+    // Don't know if I get the correct understanding there.
+    new_values.setValue(Context.SPAN_KEY,span);
+    return new_values;
+}
+
+static common::AttributeValue GetCurrentSpan(Context &context) {
+    common::AttributeValue span = get_value(Context.SPAN_KEY, context);
+    if (span == NULL) {
+        return NULL;
+    }
+    return span;
+}
+
 // The HttpTraceContext provides methods to extract and inject
 // context into headers of HTTP requests with traces.
 // Example:
@@ -21,8 +48,8 @@ class HttpTraceContext : public HTTPTextFormat
         }
 
         void inject(Setter setter, T &carrier, const Context &context) override {
-            Span span = GetCurrentSpan(context);
-            if (span == null || !span.getContext().isValid()) {
+            common::AttributeValue span = GetCurrentSpan(context);
+            if (span == NULL || !span.getContext().isValid()) {
                 // We don't have span.getContext() in span.h, should we just use span? As well as acquiring validity. (I do know how to implement them though)
                 return;
             }
