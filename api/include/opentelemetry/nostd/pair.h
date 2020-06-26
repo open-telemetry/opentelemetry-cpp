@@ -35,19 +35,14 @@ public:
 
   bool operator==(const pair &other_pair)
   {
-    if(first_ == other_pair.first_){
-      if(second_ == other_pair.second_){
-        return true;
-      }
-    }
-    return false;
+    return (first_ == other_pair.first_ && second_ == other_pair.second_);
   }
 
   // Returns the first element.
-  T1 & first() { return first_; }
+  T1 &first() { return first_; }
 
   // Returns the second element.
-  T2 & second() { return second_; }
+  T2 &second() { return second_; }
 
 private:
   T1 first_;
