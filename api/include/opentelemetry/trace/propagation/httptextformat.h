@@ -10,8 +10,9 @@ namespace trace
 {
 namespace propagation
 {
-
+// Set the span in the given context.
 virtual static Context SetSpanInContext(Span span, Context &context) = 0;
+// Retrieve the current span.
 virtual static Span GetCurrentSpan(Context &context) = 0;
 
 // The HTTPTextFormat class provides an interface that enables extracting and injecting
