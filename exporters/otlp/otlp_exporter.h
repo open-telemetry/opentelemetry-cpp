@@ -6,6 +6,8 @@
 #include "opentelemetry/proto/collector/trace/v1/trace_service.pb.h"
 #include "opentelemetry/proto/collector/trace/v1/trace_service.grpc.pb.h"
 
+#include "opentelemetry/proto/trace/v1/trace.pb.h"
+
 #include "recordable.h"
 
 #include <iostream>
@@ -25,14 +27,17 @@ class OtlpExporter final : public sdktrace::SpanExporter
   sdktrace::ExportResult Export(
       const nostd::span<std::unique_ptr<sdktrace::Recordable>> &spans) noexcept
   {
-    // grpc::ClientContext context;
+    std::cout << "Exporting" << std::endl;
+    grpc::ClientContext context;
 
-    // opentelemetry::proto::collector::trace::v1::ExportTraceServiceRequest request;
-    // opentelemetry::proto::collector::trace::v1::ExportTraceServiceResponse response;
+    opentelemetry::proto::collector::trace::v1::ExportTraceServiceRequest request;
+    opentelemetry::proto::collector::trace::v1::ExportTraceServiceResponse response;
 
-    // std::unique_ptr<
-    //   opentelemetry::proto::collector::trace::v1::TraceService::StubInterface>
-    //   trace_service_stub;
+    std::unique_ptr<
+      opentelemetry::proto::collector::trace::v1::TraceService::StubInterface>
+      trace_service_stub;
+
+    opentelemetry::proto::trace::v1::ResourceSpans resource_spans;
 
     // trace_service_stub->Export(&context, request, &response);
 
@@ -40,7 +45,10 @@ class OtlpExporter final : public sdktrace::SpanExporter
       auto rec = std::unique_ptr<otlpexporter::Recordable>(
           static_cast<otlpexporter::Recordable *>(recordable.release()));
 
-      std::cout << "Name: " << rec->span().name() << std::endl;
+        //std::cout << "Name: " << rec->span().name() << std::endl;
+
+      //request.add_resource_spans();
+      //trace_service_stub->Export(&context, request, &response);
     }
 
     return sdktrace::ExportResult::kSuccess;
