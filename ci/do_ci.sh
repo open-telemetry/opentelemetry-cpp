@@ -116,6 +116,16 @@ elif [[ "$1" == "format" ]]; then
     exit 1
   fi
   exit 0
+elif [[ "$1" == "code.coverage" ]]; then
+  cd "${BUILD_DIR}"
+  rm -rf *
+  cmake -DCMAKE_BUILD_TYPE=Debug  \
+        -DCMAKE_CXX_FLAGS="-Werror --coverage" \
+        "${SRC_DIR}"
+  make
+  make test
+  lcov --directory $PWD --capture --output-file coverage.info
+  exit 0
 fi
 
 echo "Invalid do_ci.sh target, see ci/README.md for valid targets."

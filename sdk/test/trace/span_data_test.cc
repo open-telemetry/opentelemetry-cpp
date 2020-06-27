@@ -1,4 +1,5 @@
 #include "opentelemetry/sdk/trace/span_data.h"
+#include "opentelemetry/nostd/variant.h"
 #include "opentelemetry/trace/span_id.h"
 #include "opentelemetry/trace/trace_id.h"
 
@@ -20,6 +21,7 @@ TEST(SpanData, DefaultValues)
   ASSERT_EQ(data.GetDescription(), "");
   ASSERT_EQ(data.GetStartTime().time_since_epoch(), std::chrono::nanoseconds(0));
   ASSERT_EQ(data.GetDuration(), std::chrono::nanoseconds(0));
+  ASSERT_EQ(data.GetAttributes().size(), 0);
 }
 
 TEST(SpanData, Set)
@@ -35,6 +37,7 @@ TEST(SpanData, Set)
   data.SetStatus(opentelemetry::trace::CanonicalCode::UNKNOWN, "description");
   data.SetStartTime(now);
   data.SetDuration(std::chrono::nanoseconds(1000000));
+  data.SetAttribute("attr1", 314159);
   data.AddEvent("event1", now);
 
   ASSERT_EQ(data.GetTraceId(), trace_id);
@@ -45,4 +48,5 @@ TEST(SpanData, Set)
   ASSERT_EQ(data.GetDescription(), "description");
   ASSERT_EQ(data.GetStartTime().time_since_epoch(), now.time_since_epoch());
   ASSERT_EQ(data.GetDuration(), std::chrono::nanoseconds(1000000));
+  ASSERT_EQ(opentelemetry::nostd::get<int>(data.GetAttributes().at("attr1")), 314159);
 }
