@@ -2,9 +2,10 @@
 
 #include <iostream>
 
-namespace nostd = opentelemetry::nostd;
-namespace core  = opentelemetry::core;
-namespace trace = opentelemetry::trace;
+namespace nostd  = opentelemetry::nostd;
+namespace common = opentelemetry::common;
+namespace core   = opentelemetry::core;
+namespace trace  = opentelemetry::trace;
 
 namespace
 {
@@ -13,6 +14,7 @@ class Span final : public trace::Span
 public:
   Span(std::shared_ptr<Tracer> &&tracer,
        nostd::string_view name,
+       const opentelemetry::trace::KeyValueIterable & /*attributes*/,
        const trace::StartSpanOptions & /*options*/) noexcept
       : tracer_{std::move(tracer)}, name_{name}
   {
@@ -22,6 +24,10 @@ public:
   ~Span() { std::cout << "~Span\n"; }
 
   // opentelemetry::trace::Span
+  void SetAttribute(nostd::string_view /*name*/,
+                    const common::AttributeValue && /*value*/) noexcept override
+  {}
+
   void AddEvent(nostd::string_view /*name*/) noexcept override {}
 
   void AddEvent(nostd::string_view /*name*/, core::SystemTimestamp /*timestamp*/) noexcept override
@@ -52,9 +58,11 @@ private:
 
 Tracer::Tracer(nostd::string_view /*output*/) {}
 
-nostd::unique_ptr<trace::Span> Tracer::StartSpan(nostd::string_view name,
-                                                 const trace::StartSpanOptions &options) noexcept
+nostd::unique_ptr<trace::Span> Tracer::StartSpan(
+    nostd::string_view name,
+    const opentelemetry::trace::KeyValueIterable &attributes,
+    const trace::StartSpanOptions &options) noexcept
 {
   return nostd::unique_ptr<opentelemetry::trace::Span>{
-      new (std::nothrow) Span{this->shared_from_this(), name, options}};
+      new (std::nothrow) Span{this->shared_from_this(), name, attributes, options}};
 }
