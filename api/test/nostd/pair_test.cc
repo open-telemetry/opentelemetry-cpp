@@ -29,11 +29,11 @@ TEST(PairTest, ComparisonSameValuesReturnTrue)
   pair<int, int> pair_1 = pair<int, int>(val_1, val_2);
   pair<int, int> pair_2 = pair<int, int>(val_1, val_2);
 
-  EXPECT_EQ(pair_1 == pair_2, true);
+  EXPECT_TRUE(pair_1 == pair_2);
 
   pair_1.first() = 8;
 
-  EXPECT_EQ(pair_1 == pair_2, false);
+  EXPECT_FALSE(pair_1 == pair_2);
 }
 
 // Tests that the assignment operator sets the values as one would expect.
@@ -48,12 +48,11 @@ TEST(PairTest, AssignmentBasic)
   int val_4             = 4;
   pair<int, int> pair_2 = pair<int, int>(val_3, val_4);
 
-  // EXPECT_EQ(pair_1 == pair_2, false);
-  EXPECT_EQ(pair_1, pair_2);
+  EXPECT_FALSE(pair_1 == pair_2);
 
   pair_1 = pair_2;
 
-  EXPECT_EQ(pair_1 == pair_2, true);
+  EXPECT_TRUE(pair_1 == pair_2);
   EXPECT_EQ(pair_1.first(), val_3);
   EXPECT_EQ(pair_1.second(), val_4);
 }

@@ -35,7 +35,7 @@ public:
 
   bool operator==(const pair &other_pair)
   {
-    return (first_ == other_pair.first_ && second_ == other_pair.second_);
+    return ((first_ == other_pair.first_) && (second_ == other_pair.second_));
   }
 
   // Returns the first element.
