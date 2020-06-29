@@ -80,29 +80,6 @@ public:
    */
   virtual std::string GetDescription() const noexcept = 0;
 };
-
-class AlwaysOnSampler final : public sdk::trace::Sampler
-{
-public:
-  /**
-   * Returned SamplingResult always has RECORD_AND_SAMPLED
-   *    as the Decision
-   */
-  inline SamplingResult ShouldSample(
-      const SpanContext *parent_context,
-      trace_api::TraceId trace_id,
-      nostd::string_view name,
-      trace_api::SpanKind span_kind,
-      const trace_api::KeyValueIterable &attributes) noexcept override
-  {
-    return {sdk::trace::Decision::RECORD_AND_SAMPLE, nullptr};
-  }
-
-  /**
-   * @return Description MUST be AlwaysOnSampler
-   */
-  inline std::string GetDescription() const noexcept override { return "AlwaysOnSampler"; }
-};
 }  // namespace trace
 }  // namespace sdk
 OPENTELEMETRY_END_NAMESPACE
