@@ -24,5 +24,14 @@ using AttributeValue = nostd::variant<bool,
                                       nostd::span<const uint64_t>,
                                       nostd::span<const double>,
                                       nostd::span<const nostd::string_view>>;
+
+/**
+ * A key/value pair that can be used to set attributes.
+ */
+struct AttributeKeyValue
+{
+  nostd::string_view key;
+  AttributeValue value;
+};
 }  // namespace common
 OPENTELEMETRY_END_NAMESPACE

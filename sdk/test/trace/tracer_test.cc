@@ -134,7 +134,7 @@ TEST(Tracer, StartSpanWithAttributes)
 
   auto &span_data = spans_received->at(0);
   ASSERT_EQ(2, span_data->GetAttributes().size());
-  ASSERT_EQ("string", nostd::get<nostd::string_view>(span_data->GetAttributes().at("attr1")));
+  ASSERT_EQ("string", nostd::get<std::string>(span_data->GetAttributes().at("attr1")));
   ASSERT_EQ(false, nostd::get<bool>(span_data->GetAttributes().at("attr2")));
 
   auto &span_data2 = spans_received->at(1);
@@ -142,6 +142,44 @@ TEST(Tracer, StartSpanWithAttributes)
   ASSERT_EQ(3.0, nostd::get<double>(span_data2->GetAttributes().at("attr3")));
 }
 
+TEST(Tracer, StartSpanWithAttributesCopy)
+{
+  std::shared_ptr<std::vector<std::unique_ptr<SpanData>>> spans_received(
+      new std::vector<std::unique_ptr<SpanData>>);
+  auto tracer = initTracer(spans_received);
+
+  {
+    std::unique_ptr<std::vector<int>> numbers(new std::vector<int>);
+    numbers->push_back(1);
+    numbers->push_back(2);
+    numbers->push_back(3);
+
+    std::string s1("a");
+    std::string s2("b");
+    std::string s3("c");
+    std::unique_ptr<std::array<nostd::string_view, 3>> strings(
+        new std::array<nostd::string_view, 3>{s1, s2, s3});
+    tracer->StartSpan("span 1",
+                      {{"attr1", *numbers}, {"attr2", nostd::span<nostd::string_view>(*strings)}});
+  }
+
+  ASSERT_EQ(1, spans_received->size());
+
+  auto &span_data = spans_received->at(0);
+  ASSERT_EQ(2, span_data->GetAttributes().size());
+
+  auto numbers = nostd::get<std::vector<int64_t>>(span_data->GetAttributes().at("attr1"));
+  ASSERT_EQ(3, numbers.size());
+  ASSERT_EQ(1, numbers[0]);
+  ASSERT_EQ(2, numbers[1]);
+  ASSERT_EQ(3, numbers[2]);
+
+  auto strings = nostd::get<std::vector<std::string>>(span_data->GetAttributes().at("attr2"));
+  ASSERT_EQ(3, strings.size());
+  ASSERT_EQ("a", strings[0]);
+  ASSERT_EQ("b", strings[1]);
+  ASSERT_EQ("c", strings[2]);
+}
 
 TEST(Tracer, GetSampler)
 {
@@ -159,3 +197,4 @@ TEST(Tracer, GetSampler)
   auto t2 = tracer_off->GetSampler();
   ASSERT_EQ("AlwaysOffSampler", t2->GetDescription());
 }
+
