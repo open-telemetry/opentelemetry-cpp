@@ -7,8 +7,11 @@
 #include "opentelemetry/nostd/shared_ptr.h"
 #include "opentelemetry/sdk/trace/processor.h"
 #include "opentelemetry/sdk/trace/sampler.h"
+#include "opentelemetry/sdk/trace/samplers/always_on.h"
+#include "opentelemetry/sdk/trace/samplers/always_off.h"
 #include "opentelemetry/sdk/trace/tracer.h"
 #include "opentelemetry/trace/tracer_provider.h"
+
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace sdk
@@ -48,6 +51,7 @@ public:
 
   /**
    * Set the sampler associated with this tracer provider.
+   * Also update the sampler pointer stored in the corrisponding tracer.
    * @param sampler The new sampler for this tracer provider. This
    * must not be a nullptr.
    */
