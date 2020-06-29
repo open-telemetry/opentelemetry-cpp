@@ -9,23 +9,14 @@ namespace nostd
 
 // The nostd::pair class provides a data structure capable of hold
 // two values of different or the same types, and provides access to each.
-
 template <class T1, class T2>
 class pair
 {
 public:
-  pair()
-  {
-    first_  = T1();
-    second_ = T2();
-  }
+  pair() {}
 
   // Constructs a pair object with the passed in first and second values.
-  pair(T1 first, T2 second)
-  {
-    first_  = first;
-    second_ = second;
-  }
+  pair(T1 first, T2 second) : first_(first), second_(second) {}
 
   void operator=(const pair &other_pair)
   {
@@ -48,5 +39,13 @@ private:
   T1 first_;
   T2 second_;
 };
+
+// Returns a pair with the passed in types and values
+template <class T1, class T2>
+pair<T1, T2> make_pair(T1 first, T2 second)
+{
+  return pair<T1, T2>(first, second);
+}
+
 }  // namespace nostd
 OPENTELEMETRY_END_NAMESPACE

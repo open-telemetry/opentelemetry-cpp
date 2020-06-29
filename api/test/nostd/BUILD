@@ -76,9 +76,9 @@ cc_test(
 )
 
 cc_test(
-    name = "list_test",
+    name = "vector_test",
     srcs = [
-        "list_test.cc",
+        "vector_test.cc",
     ],
     deps = [
         "//api",

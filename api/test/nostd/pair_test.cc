@@ -1,12 +1,13 @@
 #include "opentelemetry/nostd/pair.h"
-#include "opentelemetry/nostd/list.h"
+#include "opentelemetry/nostd/vector.h"
 
 #include <string>
 
 #include <gtest/gtest.h>
 
-using opentelemetry::nostd::list;
+using opentelemetry::nostd::make_pair;
 using opentelemetry::nostd::pair;
+using opentelemetry::nostd::vector;
 
 // Tests constructing a pair object.
 TEST(PairTest, BasicConstruction)
@@ -84,12 +85,21 @@ TEST(PairTest, AssignmentOtherObjectImmutable)
 // Tests that the pair class can accept containers
 TEST(PairTest, PairAcceptContainers)
 {
-  list<int> int_list      = {1, 2, 3, 4};
+  vector<int> int_vector  = {1, 2, 3, 4};
   std::string test_string = "test";
 
-  pair<list<int>, std::string> container_pair = pair<list<int>, std::string>(int_list, test_string);
+  pair<vector<int>, std::string> container_pair =
+      pair<vector<int>, std::string>(int_vector, test_string);
 
   EXPECT_EQ(container_pair.second(), test_string);
-  EXPECT_EQ(container_pair.first().front(), int_list.front());
-  EXPECT_EQ(container_pair.first().back(), int_list.back());
+  EXPECT_EQ(container_pair.first().front(), int_vector.front());
+  EXPECT_EQ(container_pair.first().back(), int_vector.back());
+}
+
+// Tests that the make pair function returns a pair with the passed in elements
+TEST(PairTest, MakePairReturnsPair)
+{
+  auto int_pair = make_pair<int, int>(1, 2);
+  EXPECT_EQ(int_pair.first(), 1);
+  EXPECT_EQ(int_pair.second(), 2);
 }
