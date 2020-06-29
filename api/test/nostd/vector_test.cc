@@ -2,7 +2,6 @@
 #include "opentelemetry/common/attribute_value.h"
 #include "opentelemetry/nostd/pair.h"
 
-#include <gmock/gmock.h>
 #include <gtest/gtest.h>
 
 using opentelemetry::common::AttributeValue;
