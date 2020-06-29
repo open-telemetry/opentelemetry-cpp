@@ -149,27 +149,3 @@ TEST(VectorTest, SingleElementConstruction)
 
   EXPECT_EQ(single_vector[0], 5);
 }
-
-TEST(VectorTest, SingleElementSharedPtr)
-{
-  vector<std::shared_ptr<int>> single_vector;
-  std::insert_iterator<vector<std::shared_ptr<int>>> back(single_vector, std::end(single_vector));
-
-  {
-    std::shared_ptr<int> i(new int(3));
-    *back = i;
-  }
-
-  EXPECT_EQ(*single_vector[0], 3);
-}
-
-TEST(VectorTest, StdCopyVector)
-{
-
-  vector<int> first_vector  = {0, 1, 2, 3, 4};
-  vector<int> second_vector = {5, 6, 7, 8, 9};
-  std::copy(first_vector.begin(), first_vector.end(), second_vector.begin());
-
-  EXPECT_EQ(second_vector.front(), 0);
-  EXPECT_EQ(second_vector.back(), 4);
-}
