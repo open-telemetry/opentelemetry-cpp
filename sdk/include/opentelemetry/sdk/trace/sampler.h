@@ -17,7 +17,7 @@ namespace trace
 namespace trace_api = opentelemetry::trace;
 
 /**
- * A sampling Decision for a Span to be created.  
+ * A sampling Decision for a Span to be created.
  */
 enum class Decision
 {
@@ -31,7 +31,7 @@ enum class Decision
 };
 
 /**
- * The output of ShouldSample. 
+ * The output of ShouldSample.
  * It contains a sampling Decision and a set of Span Attributes.
  */
 struct SamplingResult
