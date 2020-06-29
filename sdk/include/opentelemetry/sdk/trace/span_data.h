@@ -80,7 +80,7 @@ struct AttributeConverter
       copy.push_back(T(val));
     }
 
-    return SpanDataAttributeValue(copy);
+    return SpanDataAttributeValue(std::move(copy));
   }
 };
 
