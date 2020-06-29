@@ -154,11 +154,13 @@ TEST(Tracer, StartSpanWithAttributesCopy)
     numbers->push_back(2);
     numbers->push_back(3);
 
+    std::unique_ptr<std::vector<nostd::string_view>> strings(new std::vector<nostd::string_view>);
     std::string s1("a");
     std::string s2("b");
     std::string s3("c");
-    std::unique_ptr<std::array<nostd::string_view, 3>> strings(
-        new std::array<nostd::string_view, 3>{s1, s2, s3});
+    strings->push_back(s1);
+    strings->push_back(s2);
+    strings->push_back(s3);
     tracer->StartSpan("span 1",
                       {{"attr1", *numbers}, {"attr2", nostd::span<nostd::string_view>(*strings)}});
   }
