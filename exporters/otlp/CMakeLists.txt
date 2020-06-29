@@ -4,5 +4,6 @@ target_link_libraries(opentelemetry_exporter_otprotocol
 
 add_executable(recordable_test "recordable_test.cc")
 target_link_libraries(recordable_test ${GTEST_BOTH_LIBRARIES}
-                      ${CMAKE_THREAD_LIBS_INIT} opentelemetry_exporter_otprotocol)
+                      ${CMAKE_THREAD_LIBS_INIT} $<TARGET_OBJECTS:opentelemetry_proto>
+                      opentelemetry_exporter_otprotocol)
 gtest_add_tests(TARGET recordable_test TEST_PREFIX exporter. TEST_LIST recordable_test)
