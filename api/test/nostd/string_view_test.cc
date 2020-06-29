@@ -2,6 +2,8 @@
 
 #include <gtest/gtest.h>
 
+#include "map"
+
 using opentelemetry::nostd::string_view;
 
 TEST(StringViewTest, DefaultConstruction)
@@ -71,4 +73,32 @@ TEST(StringViewTest, SubstrOutOfRange)
 #else
   EXPECT_DEATH({ s.substr(10); }, "");
 #endif
+}
+
+TEST(StringViewTest, Compare)
+{
+  string_view s1 = "aaa";
+  string_view s2 = "bbb";
+  string_view s3 = "aaa";
+
+  // Equals
+  EXPECT_EQ(s1, s3);
+  EXPECT_EQ(s1, s1);
+
+  // Less then
+  EXPECT_LT(s1, s2);
+
+  // Greater then
+  EXPECT_GT(s2, s1);
+}
+
+TEST(StringViewTest, MapKeyOrdering)
+{
+  std::map<string_view, size_t> m = {{"bbb", 2}, {"aaa", 1}, {"ccc", 3}};
+  size_t i = 1;
+  for (const auto &kv : m)
+  {
+    EXPECT_EQ(kv.second, i);
+    i++;
+  }
 }
