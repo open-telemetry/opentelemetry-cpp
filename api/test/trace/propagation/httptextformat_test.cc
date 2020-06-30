@@ -8,32 +8,25 @@
 
 using opentelemetry::trace::propagation::HTTPTextFormat;
 
-nostd::string_view getter(std::map<char,int> &carrier, nostd::string_view trace_type = "traceparent") {
-    nostd::string_view res = "";
-    for (std::map<char,int>::iterator it=carrier.begin(); it!=carrier.end(); ++it) {
-        nostd::string_view key(it->first);
-        nostd::string_view value(it->second);
-        res += "("+key+","+value+")";
-    }
+nostd::string_view getter(std::map<std::string,std::string> &carrier, nostd::string_view trace_type = "traceparent") {
+    nostd::string_view res = carrier["version"]+"-"+carrier["trace-id"]+"-"+carrier["parent-id"]+"-"+carrier["trace-flags"];
     return res;
 }
 
 void setter(std::map<char,int> &carrier, nostd::string_view trace_type = "traceparent", nostd::string trace_description = "") {
     nostd::string_view str = "";
-    char key;
-    int value;
+    int s = 0;
     for (int i = 0; i < trace_description.length(); i++) {
-        if (trace_description[i]=='(') {
-        } else if (trace_description[i]==')') {
-            value = std::stoi(str);
-            str = "";
-            carrier[key] = value;
-        } else if (trace_description[i]==',') {
-            key = str[0];
+        if (trace_description[i]=='-') {
+            if (s == 0) carrier["version"] = str;
+            if (s == 1) carrier["trace-id"] = str;
+            if (s == 2) carrier["parent-id"] = str;
+            str.clear();
         } else {
-            str += nostd::string_view(trace_description[i]);
+            str.push_back(trace_description[i]);
         }
     }
+    carrier["trace-flags"] = str;
 }
 
 // I am not very sure how to make tests for httpformat_test as some functions output complex objects which cannot be
