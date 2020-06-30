@@ -42,14 +42,6 @@ public:
   std::shared_ptr<SpanProcessor> GetProcessor() const noexcept;
 
   /**
-   * Set the sampler associated with this tracer.
-   * This function does NOT update the corresponding TracerProvider (if any)
-   * @param sampler The new sampler for this tracer. This must not be
-   * a nullptr.
-   */
-  void SetSampler(std::shared_ptr<Sampler> sampler) noexcept;
-
-  /**
    * Obtain the sampler associated with this tracer.
    * @return The sampler for this tracer.
    */
@@ -66,7 +58,7 @@ public:
 
 private:
   opentelemetry::sdk::AtomicSharedPtr<SpanProcessor> processor_;
-  opentelemetry::sdk::AtomicSharedPtr<Sampler> sampler_;
+  const std::shared_ptr<Sampler> sampler_;
 };
 }  // namespace trace
 }  // namespace sdk

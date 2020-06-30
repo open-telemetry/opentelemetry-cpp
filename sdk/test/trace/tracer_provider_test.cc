@@ -45,26 +45,3 @@ TEST(TracerProvider, GetSampler)
   // Should be AlwaysOnSampler
   ASSERT_EQ("AlwaysOnSampler", t2->GetDescription());
 }
-
-TEST(TracerProvider, SetSampler)
-{
-  std::shared_ptr<SpanProcessor> processor(new SimpleSpanProcessor(nullptr));
-
-  // Create a TracerProvicer with a default AlwaysOnSampler.
-  TracerProvider tf(processor);
-
-  // Check current Tracer sampler.
-  auto tracer = tf.GetTracer("test");
-  auto sdkTracer = dynamic_cast<Tracer *>(tracer.get());
-  ASSERT_EQ("AlwaysOnSampler", sdkTracer->GetSampler()->GetDescription());
-
-  // Set the sampler to a new AlwaysOffSampler.
-  tf.SetSampler(std::make_shared<AlwaysOffSampler>());
-  auto t1 = tf.GetSampler();
-
-  // Check if the sampler in Tracer Provider has been updated.
-  ASSERT_EQ("AlwaysOffSampler", t1->GetDescription());
-
-  // Check if the sampler in Tracer has been updated.
-  ASSERT_EQ("AlwaysOffSampler", sdkTracer->GetSampler()->GetDescription());
-}

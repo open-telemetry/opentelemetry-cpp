@@ -50,14 +50,6 @@ public:
   void SetProcessor(std::shared_ptr<SpanProcessor> processor) noexcept;
 
   /**
-   * Set the sampler associated with this tracer provider.
-   * Also update the sampler pointer stored in the corrisponding tracer.
-   * @param sampler The new sampler for this tracer provider. This
-   * must not be a nullptr.
-   */
-  void SetSampler(std::shared_ptr<Sampler> sampler) noexcept;
-
-  /**
    * Obtain the span processor associated with this tracer provider.
    * @return The span processor for this tracer provider.
    */
@@ -72,7 +64,7 @@ public:
 private:
   opentelemetry::sdk::AtomicSharedPtr<SpanProcessor> processor_;
   std::shared_ptr<opentelemetry::trace::Tracer> tracer_;
-  opentelemetry::sdk::AtomicSharedPtr<Sampler> sampler_;
+  const std::shared_ptr<Sampler> sampler_;
 };
 }  // namespace trace
 }  // namespace sdk

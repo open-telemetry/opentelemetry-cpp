@@ -29,14 +29,6 @@ void TracerProvider::SetProcessor(std::shared_ptr<SpanProcessor> processor) noex
   sdkTracer->SetProcessor(processor);
 }
 
-void TracerProvider::SetSampler(std::shared_ptr<Sampler> sampler) noexcept
-{
-  sampler_.store(sampler);
-
-  auto sdkTracer = static_cast<Tracer *>(tracer_.get());
-  sdkTracer->SetSampler(sampler);
-}
-
 std::shared_ptr<SpanProcessor> TracerProvider::GetProcessor() const noexcept
 {
   return processor_.load();
@@ -44,7 +36,7 @@ std::shared_ptr<SpanProcessor> TracerProvider::GetProcessor() const noexcept
 
 std::shared_ptr<Sampler> TracerProvider::GetSampler() const noexcept
 {
-  return sampler_.load();
+  return sampler_;
 }
 }  // namespace trace
 }  // namespace sdk

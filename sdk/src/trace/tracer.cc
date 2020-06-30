@@ -27,14 +27,9 @@ std::shared_ptr<SpanProcessor> Tracer::GetProcessor() const noexcept
   return processor_.load();
 }
 
-void Tracer::SetSampler(std::shared_ptr<Sampler> sampler) noexcept
-{
-  sampler_.store(sampler);
-}
-
 std::shared_ptr<Sampler> Tracer::GetSampler() const noexcept
 {
-  return sampler_.load();
+  return sampler_;
 }
 
 nostd::unique_ptr<trace_api::Span> Tracer::StartSpan(
