@@ -79,7 +79,7 @@ cc_test(
     name = "probability_sampler_test",
     srcs = [
         "probability_sampler_test.cc",
-    ]
+    ],
     deps = [
         "//sdk/src/trace",
         "@com_google_googletest//:gtest_main",
