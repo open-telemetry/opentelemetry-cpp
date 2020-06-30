@@ -99,10 +99,17 @@ uint64_t ProbabilitySampler::CalculateThreshold(double probability) const noexce
 
 uint64_t ProbabilitySampler::CalculateThresholdFromBuffer(const trace_api::TraceId& trace_id) const noexcept
 {
-  nostd::span<const unsigned char, trace_id.kSize> buf = trace_id.Id();
-  uint64_t res = 0;
   // We only use the first 8 bytes of TraceId.
   static_assert(trace_id.kSize >= 8, "TraceID must be at least 8 bytes long.");
+
+  uint8_t buf[trace_api::TraceId::kSize];
+  
+  for (int i = 0; i < 8; ++i) {
+    buf[i] = trace_id.Id()[i];
+  }
+
+  uint64_t res = 0;
+  
   for (int i = 0; i < 8; ++i) {
     res |= (static_cast<uint64_t>(buf[i]) << (i * 8));
   }
