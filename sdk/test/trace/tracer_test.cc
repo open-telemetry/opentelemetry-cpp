@@ -139,3 +139,18 @@ TEST(Tracer, StartSpanWithAttributes)
   ASSERT_EQ(1, span_data2->GetAttributes().size());
   ASSERT_EQ(3.0, nostd::get<double>(span_data2->GetAttributes().at("attr3")));
 }
+
+
+TEST(Tracer, GetSampler)
+{
+  std::shared_ptr<SpanProcessor> processor(new SimpleSpanProcessor(nullptr));
+  std::shared_ptr<Tracer> tracer_on(new Tracer(std::move(processor)));
+
+  auto t1 = tracer_on->GetSampler();
+  ASSERT_EQ("AlwaysOnSampler", t1->GetDescription());
+
+  std::shared_ptr<Tracer> tracer_off(new Tracer(std::move(processor), std::make_shared<AlwaysOnSampler>()));
+
+  auto t2 = tracer_off->GetSampler();
+  ASSERT_EQ("AlwaysOnSampler", t2->GetDescription());
+}

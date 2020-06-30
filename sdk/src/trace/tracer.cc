@@ -9,10 +9,6 @@ namespace sdk
 {
 namespace trace
 {
-Tracer::Tracer(std::shared_ptr<SpanProcessor> processor) noexcept
-    : Tracer::Tracer(processor, std::make_shared<AlwaysOnSampler>())
-{}
-
 Tracer::Tracer(std::shared_ptr<SpanProcessor> processor, std::shared_ptr<Sampler> sampler) noexcept
     : processor_{processor}, sampler_{sampler}
 {}

@@ -23,10 +23,8 @@ public:
    * @param processor The span processor for this tracer. This must not be a
    * nullptr.
    */
-  explicit Tracer(std::shared_ptr<SpanProcessor> processor) noexcept;
-
   explicit Tracer(std::shared_ptr<SpanProcessor> processor,
-                  std::shared_ptr<Sampler> sampler) noexcept;
+                  std::shared_ptr<Sampler> sampler = std::make_shared<AlwaysOnSampler>()) noexcept;
 
   /**
    * Set the span processor associated with this tracer.
