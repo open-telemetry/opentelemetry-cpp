@@ -39,7 +39,7 @@ class OtlpExporter final : public sdktrace::SpanExporter
       opentelemetry::proto::collector::trace::v1::TraceService::StubInterface>
       trace_service_stub;
     
-    const std::string address = "localhost:50051";
+    const std::string address = "localhost:55678";
     auto channel = grpc::CreateChannel(
         address, grpc::InsecureChannelCredentials());
     
