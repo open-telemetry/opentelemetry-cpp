@@ -1,4 +1,6 @@
 #include <vector>
+#include <regex>
+#include <stdexcept>
 #include "opentelemetry/trace/propagation/httptextformat.h"
 #include "opentelemetry/context/context.h"
 #include "opentelemetry/nostd/string_view.h"
@@ -70,6 +72,9 @@ class HttpTraceContext : public HTTPTextFormat
         static const int TRACE_FLAG_BYTES = 2;
         static const int TRACE_DELIMITER_BYTES = 3;
         static const int HEADER_SIZE = VERSION_BYTES + TRACE_ID_BYTES + PARENT_ID_BYTES + TRACE_FLAG_BYTES + TRACE_DELIMITER_BYTES;
+        static const int TRACESTATE_MAX_MEMBERS = 32;
+        static const nostd::string_view TRACESTATE_KEY_VALUE_DELIMITER = "=";
+        static const std::regex TRACESTATE_ENTRY_DELIMITER_SPLIT_PATTERN("[ \t]*,[ \t]*");
 
         static Context checkNotNull(Context &arg, nostd::string_view errorMessage) {
             if (arg == NULL) {
@@ -80,11 +85,11 @@ class HttpTraceContext : public HTTPTextFormat
 
         static void injectImpl(Setter setter, T &carrier, const SpanContext &spanContext) {
             char hex_string[HEADER_SIZE];
-            sprintf(hex_string, "00-%032x-%016x-%02x",span_context.trace_id,span_context.span_id,span_context.trace_flags);
+            sprintf(hex_string, "00-%032x-%016x-%02x",spanContext.trace_id(),spanContext.span_id(),spanContext.trace_flags());
             nostd::string_view traceparent_string = nostd::string_view(hex_string, HEADER_SIZE);
             setter(carrier, TRACE_PARENT, traceparent_string);
             if (spanContext.getTraceState()) {
-                nostd::string_view tracestate_string = formatTracestate(span_context.getTraceState()); // I need the definition for the type of TraceState(Dictionary or something else)
+                nostd::string_view tracestate_string = formatTracestate(spanContext.getTraceState()); // I need the definition for the type of TraceState(Dictionary or something else). The trace state data structure will determine how I will able to join this together.
                 setter(carrier, TRACE_STATE, tracestate_string);
             }
         }
@@ -114,14 +119,36 @@ class HttpTraceContext : public HTTPTextFormat
         static TraceState extractTraceState(nostd::string_view traceStateHeader) {
             // TODO: implementation
             /** The question here is that how should I treat the trace state. Implementation will differ pretty much
-                depending on what is the data structure of TraceState
+                depending on what is the data structure of TraceState. Also this is based on the premise that
+                trace state exists and has a builder
             */
+            std::smatch listMembers;
+            TraceState.Builder traceStateBuilder = TraceState.builder();
+            regex_search(traceStateHeader,sm,TRACESTATE_ENTRY_DELIMITER_SPLIT_PATTERN); // I hope regex accepts string view
+            if (listMembers.size() <= TRACESTATE_MAX_MEMBERS) {
+                throw std::invalid_argument("TraceState has too many elements.");
+            }
+            for (int i = listMembers.size() - 1; i >= 0; i--) {
+                nostd::string_view listMember = listMembers[i];
+                int index = -1;
+                for (int j = 0; j < listMember.length(); j++) {
+                    if (listMember[j] == TRACESTATE_KEY_VALUE_DELIMITER) {
+                        index = j;
+                        break;
+                    }
+                }
+                if (index == -1) {
+                    throw std::invalid_argument("Invalid TraceState list-member format.");
+                }
+                traceStateBuilder.set(listMember.substring(0, index), listMember.substring(index + 1));
+            }
+            return traceStateBuilder.build();
         }
 
         static SpanContext extractImpl(Getter getter, T &carrier) {
             nostd::string_view traceParent = getter(carrier, TRACE_PARENT);
             if (traceParent == NULL) {
-              return SpanContext.getInvalid(); // I need support of this method from SpanContext definition which is currently unavailable it seems
+                return SpanContext.getInvalid(); // I need support of this method from SpanContext definition which is currently unavailable it seems
             }
 
             SpanContext contextFromParentHeader = extractContextFromTraceParent(traceParent);
@@ -145,8 +172,8 @@ class HttpTraceContext : public HTTPTextFormat
                     contextFromParentHeader.getTraceFlags(),
                     traceState);
             } catch (IllegalArgumentException e) {
-              std::cout<<"Unparseable tracestate header. Returning span context without state."<<std::endl;
-              return contextFromParentHeader;
+                std::cout<<"Unparseable tracestate header. Returning span context without state."<<std::endl;
+                return contextFromParentHeader;
             }
         }
 }
