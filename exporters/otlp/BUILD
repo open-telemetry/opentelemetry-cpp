@@ -47,8 +47,8 @@ cc_binary(
     name = "otlp_exporter",
     srcs = [
         "main.cc",
-        #"stdout_exporter.h",
         'otlp_exporter.h',
+        'otlp_exporter.cc',
     ],
     deps = [
         ":foo_library",
