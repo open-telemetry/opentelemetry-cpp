@@ -7,11 +7,10 @@
 #include "opentelemetry/nostd/shared_ptr.h"
 #include "opentelemetry/sdk/trace/processor.h"
 #include "opentelemetry/sdk/trace/sampler.h"
-#include "opentelemetry/sdk/trace/samplers/always_on.h"
 #include "opentelemetry/sdk/trace/samplers/always_off.h"
+#include "opentelemetry/sdk/trace/samplers/always_on.h"
 #include "opentelemetry/sdk/trace/tracer.h"
 #include "opentelemetry/trace/tracer_provider.h"
-
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace sdk
@@ -22,21 +21,15 @@ class TracerProvider final : public opentelemetry::trace::TracerProvider
 {
 public:
   /**
-   * Initialize a new tracer provider with a default AlwaysOn sampler.
-   * @param processor The span processor for this tracer provider. This must
-   * not be a nullptr.
-   */
-  explicit TracerProvider(std::shared_ptr<SpanProcessor> processor) noexcept;
-
-  /**
    * Initialize a new tracer provider with a specified sampler
    * @param processor The span processor for this tracer provider. This must
    * not be a nullptr.
    * @param sampler The sampler for this tracer provider. This must
    * not be a nullptr.
    */
-  explicit TracerProvider(std::shared_ptr<SpanProcessor> processor,
-                          std::shared_ptr<Sampler> sampler) noexcept;
+  explicit TracerProvider(
+      std::shared_ptr<SpanProcessor> processor,
+      std::shared_ptr<Sampler> sampler = std::make_shared<AlwaysOnSampler>()) noexcept;
 
   opentelemetry::nostd::shared_ptr<opentelemetry::trace::Tracer> GetTracer(
       nostd::string_view library_name,
