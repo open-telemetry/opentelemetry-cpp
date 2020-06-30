@@ -63,6 +63,7 @@ class OtlpExporter final : public sdktrace::SpanExporter
     trace_service_stub = protocollector::TraceService::NewStub(channel);
 
     prototrace::ResourceSpans* resource_span = request.add_resource_spans();
+    prototrace::InstrumentationLibrarySpans* instrumentation_lib = resource_span->add_instrumentation_library_spans();
 
     for (auto &recordable : spans) {
 
@@ -80,15 +81,19 @@ class OtlpExporter final : public sdktrace::SpanExporter
       // std::cout << "Span ID: " << rec->span().span_id() << std::endl;
       // std::cout << "Parent span ID: " << rec->span().parent_span_id() << std::endl;
 
-      prototrace::Span* span = resource_span->add_spans();
+      prototrace::Span* span = instrumentation_lib->add_spans();
+
       span->CopyFrom(rec->span());
     }
 
      grpc::Status status = trace_service_stub->Export(&context, request, &response);
 
     if(status.ok()){
+      std::cout << "Status OK" << std::endl;
       return sdktrace::ExportResult::kSuccess;
     }
+    std::cout << "ERROR " << status.error_code() << ": " << status.error_message()
+              << std::endl;
     return sdktrace::ExportResult::kFailure;
   }
 
