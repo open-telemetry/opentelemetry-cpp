@@ -9,16 +9,16 @@ namespace otlp
 {
 TEST(Recordable, SetIds)
 {
-  const opentelemetry::trace::TraceId trace_id(
-    std::array<const uint8_t, opentelemetry::trace::TraceId::kSize>(
+  const trace::TraceId trace_id(
+    std::array<const uint8_t, trace::TraceId::kSize>(
     {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1}));
 
-  const opentelemetry::trace::SpanId span_id(
-    std::array<const uint8_t, opentelemetry::trace::SpanId::kSize>(
+  const trace::SpanId span_id(
+    std::array<const uint8_t, trace::SpanId::kSize>(
     {0, 0, 0, 0, 0, 0, 0, 2}));
 
-  const opentelemetry::trace::SpanId parent_span_id(
-    std::array<const uint8_t, opentelemetry::trace::SpanId::kSize>(
+  const trace::SpanId parent_span_id(
+    std::array<const uint8_t, trace::SpanId::kSize>(
     {0, 0, 0, 0, 0, 0, 0, 3}));
 
   Recordable rec;
