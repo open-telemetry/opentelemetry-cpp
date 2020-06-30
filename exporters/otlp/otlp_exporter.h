@@ -15,10 +15,12 @@
 
 #include <iostream>
 
-namespace trace    = opentelemetry::trace;
-namespace nostd    = opentelemetry::nostd;
-namespace sdktrace = opentelemetry::sdk::trace;
 
+OPENTELEMETRY_BEGIN_NAMESPACE
+namespace exporter
+{
+namespace otlp
+{
 class OtlpExporter final : public opentelemetry::sdk::trace::SpanExporter
 {
   std::unique_ptr<opentelemetry::sdk::trace::Recordable> MakeRecordable() noexcept override;
@@ -28,3 +30,6 @@ class OtlpExporter final : public opentelemetry::sdk::trace::SpanExporter
 
   void Shutdown(std::chrono::microseconds timeout = std::chrono::microseconds(0)) noexcept override {};
 };
+}  // namespace otlp
+}  // namespace exporter
+OPENTELEMETRY_END_NAMESPACE

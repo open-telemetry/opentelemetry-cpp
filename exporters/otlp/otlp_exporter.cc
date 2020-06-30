@@ -1,8 +1,10 @@
 #include "otlp_exporter.h"
 
-namespace otlpexporter = opentelemetry::exporter::otlp;
-namespace protocollector = opentelemetry::proto::collector::trace::v1;
-namespace prototrace = opentelemetry::proto::trace::v1;
+OPENTELEMETRY_BEGIN_NAMESPACE
+namespace exporter
+{
+namespace otlp
+{
 
 trace::TraceId GenerateRandomTraceId()
 {
@@ -19,48 +21,42 @@ trace::SpanId GenerateRandomSpanId()
 }
 
 
-std::unique_ptr<sdktrace::Recordable> OtlpExporter::MakeRecordable() noexcept
+std::unique_ptr<sdk::trace::Recordable> OtlpExporter::MakeRecordable() noexcept
 {
-return std::unique_ptr<sdktrace::Recordable>(new otlpexporter::Recordable);
+return std::unique_ptr<sdk::trace::Recordable>(new Recordable);
 }
 
 
-sdktrace::ExportResult OtlpExporter::Export(
-    const nostd::span<std::unique_ptr<sdktrace::Recordable>> &spans) noexcept
+sdk::trace::ExportResult OtlpExporter::Export(
+    const nostd::span<std::unique_ptr<sdk::trace::Recordable>> &spans) noexcept
 {
   std::cout << "Exporting" << std::endl;
   grpc::ClientContext context;
 
-  protocollector::ExportTraceServiceRequest request;
-  protocollector::ExportTraceServiceResponse response;
+  proto::collector::trace::v1::ExportTraceServiceRequest request;
+  proto::collector::trace::v1::ExportTraceServiceResponse response;
 
-  std::unique_ptr<protocollector::TraceService::StubInterface> trace_service_stub;
+  std::unique_ptr<proto::collector::trace::v1::TraceService::StubInterface> trace_service_stub;
 
   const std::string address = "localhost:55678";
   auto channel = grpc::CreateChannel(address, grpc::InsecureChannelCredentials());
 
-  trace_service_stub = protocollector::TraceService::NewStub(channel);
+  trace_service_stub = proto::collector::trace::v1::TraceService::NewStub(channel);
 
-  prototrace::ResourceSpans* resource_span = request.add_resource_spans();
-  prototrace::InstrumentationLibrarySpans* instrumentation_lib = resource_span->add_instrumentation_library_spans();
+  proto::trace::v1::ResourceSpans* resource_span = request.add_resource_spans();
+  proto::trace::v1::InstrumentationLibrarySpans* instrumentation_lib = resource_span->add_instrumentation_library_spans();
 
   for (auto &recordable : spans) {
 
-    auto rec = std::unique_ptr<otlpexporter::Recordable>(
-        static_cast<otlpexporter::Recordable *>(recordable.release()));
+    auto rec = std::unique_ptr<Recordable>(
+        static_cast<Recordable *>(recordable.release()));
 
     std::cout << "Name: " << rec->span().name() << std::endl;
-    // std::cout << "Start time: " << rec->span().start_time_unixnano() << std::endl;
-    // std::cout << "End time: " << rec->span().end_time_unixnano() << std::endl;
 
     // Temporarily set IDs here until Span is updated to do it
     rec->SetIds(GenerateRandomTraceId(), GenerateRandomSpanId(), GenerateRandomSpanId());
 
-    // std::cout << "Trace ID: " << rec->span().trace_id() << std::endl;
-    // std::cout << "Span ID: " << rec->span().span_id() << std::endl;
-    // std::cout << "Parent span ID: " << rec->span().parent_span_id() << std::endl;
-
-    prototrace::Span* span = instrumentation_lib->add_spans();
+    proto::trace::v1::Span* span = instrumentation_lib->add_spans();
 
     span->CopyFrom(rec->span());
   }
@@ -69,9 +65,12 @@ sdktrace::ExportResult OtlpExporter::Export(
 
   if(status.ok()){
     std::cout << "Status OK" << std::endl;
-    return sdktrace::ExportResult::kSuccess;
+    return sdk::trace::ExportResult::kSuccess;
   }
   std::cout << "ERROR " << status.error_code() << ": " << status.error_message()
             << std::endl;
-  return sdktrace::ExportResult::kFailure;
+  return sdk::trace::ExportResult::kFailure;
 }
+}  // namespace otlp
+}  // namespace exporter
+OPENTELEMETRY_END_NAMESPACE

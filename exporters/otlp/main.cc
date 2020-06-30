@@ -8,12 +8,17 @@
 
 #include "foo_library/foo_library.h"
 
+namespace trace    = opentelemetry::trace;
+namespace nostd    = opentelemetry::nostd;
+namespace sdktrace = opentelemetry::sdk::trace;
+namespace exporter = opentelemetry::exporter;
+
 namespace
 {
 void initTracer()
 {
   //auto exporter  = std::unique_ptr<sdktrace::SpanExporter>(new StdoutExporter);
-  auto exporter  = std::unique_ptr<sdktrace::SpanExporter>(new OtlpExporter);
+  auto exporter  = std::unique_ptr<sdktrace::SpanExporter>(new exporter::otlp::OtlpExporter);
   auto processor = std::shared_ptr<sdktrace::SpanProcessor>(
       new sdktrace::SimpleSpanProcessor(std::move(exporter)));
   auto provider = nostd::shared_ptr<trace::TracerProvider>(new sdktrace::TracerProvider(processor));

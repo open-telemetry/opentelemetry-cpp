@@ -72,3 +72,12 @@ cc_test(
         "@com_google_googletest//:gtest_main",
     ],
 )
+
+cc_test(
+ name = "otlp_exporter_test",
+    srcs = ["otlp_exporter_test.cc"],
+    deps = [
+        ":otlp_exporter",
+        "@com_google_googletest//:gtest_main",
+    ],
+)
