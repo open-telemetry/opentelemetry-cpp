@@ -24,7 +24,7 @@ public:
   NoopInstrument(const std::shared_ptr<Meter> &meter) noexcept : meter_{meter} {}
 
 
-  Meter &meter() const noexcept override { return *meter_; }
+  Meter &meter() const noexcept { return *meter_; }
 
 private:
   std::shared_ptr<Meter> meter_;
@@ -47,8 +47,8 @@ class NoopMeterProvider final : public opentelemetry::meter::MeterProvider
 {
 public:
   NoopMeterProvider()
-      : meter_{nostd::shared_ptr<opentelemetry::meter::MeterProvider>(
-            new opentelemetry::meter::MeterProvider)}
+      : meter_{nostd::shared_ptr<opentelemetry::meter::NoopMeter>(
+            new opentelemetry::meter::NoopMeter)}
   {}
 
   nostd::shared_ptr<opentelemetry::meter::Meter> GetMeter(
