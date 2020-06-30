@@ -25,6 +25,7 @@ cc_library(
     include_prefix = "exporters/otlp",
     deps = [
         "//sdk/src/trace",
+        "//sdk/src/common:random",
         "@com_github_opentelemetry_proto//:trace_proto_cc",
     ],
 )
