@@ -1,5 +1,3 @@
-#pragma once
-
 #include "opentelemetry/sdk/trace/samplers/parent_or_else.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
@@ -28,11 +26,11 @@ SamplingResult ParentOrElseSampler::ShouldSample(
     // If parent exists:
     if (parent_context->sampled_flag)
     {
-      return { Decision::RECORD_AND_SAMPLED, nullptr }
+      return { Decision::RECORD_AND_SAMPLE, nullptr };
     }
     else
     {
-      return { Decision::NOT_RECORD, nullptr }
+      return { Decision::NOT_RECORD, nullptr };
     }
   }
 }
