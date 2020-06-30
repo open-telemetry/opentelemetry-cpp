@@ -1,3 +1,18 @@
+// Copyright 2020, Open Telemetry Authors
+// Copyright 2017, OpenCensus Authors
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
 #include "opentelemetry/sdk/trace/probability_sampler.h"
 
 #include <cmath>
@@ -10,8 +25,11 @@ namespace trace
 {
 namespace trace_api = opentelemetry::trace;
 
-ProbabilitySampler::ProbabilitySampler(double probability)
-  : threshold_(CalculateThreshold(probability)), probability_(probability) {}
+ProbabilitySampler::ProbabilitySampler(
+  double probability, bool defer_parent, SamplingBehavior sampling_behavior 
+)
+: threshold_(CalculateThreshold(probability)), probability_(probability),
+  defer_parent_(defer_parent), sampling_behavior_(sampling_behavior) {}
 
 SamplingResult ProbabilitySampler::ShouldSample(
   const SpanContext *parent_context,
@@ -20,10 +38,23 @@ SamplingResult ProbabilitySampler::ShouldSample(
   trace_api::SpanKind span_kind,
   const trace_api::KeyValueIterable &attributes) noexcept
 {
-  if (threshold_ == 0) return { Decision::NOT_RECORD, nullptr };
+  // Check if current Span should be sampled with current Sampling Behavior
+  if (sampling_behavior_ == SamplingBehavior::DETACHED_SPANS_ONLY
+      && parent_context != nullptr && !parent_context->is_remote) {
+    return { Decision::NOT_RECORD, nullptr };
+  }
 
-	if (parent_context == nullptr)
+  if (sampling_behavior_ == SamplingBehavior::ROOT_SPANS_ONLY
+      && parent_context != nullptr) {
+    return { Decision::NOT_RECORD, nullptr };
+  }
+
+  // Check if sampling decision should be defered to parent span, if applicable 
+	if (parent_context == nullptr || !defer_parent_)
   {
+    if (threshold_ == 0) return { Decision::NOT_RECORD, nullptr };
+
+    // Calculcate probability based decision based on trace_id and threshold
 	  if (CalculateThresholdFromBuffer(trace_id) <= threshold_)
     {
       return { Decision::RECORD_AND_SAMPLE, nullptr };
@@ -31,13 +62,10 @@ SamplingResult ProbabilitySampler::ShouldSample(
 	}
   else
   {
-    if (parent_context->is_recording && parent_context->sampled_flag)
+    // Return sampling decision based on parent span_context config
+    if (parent_context->sampled)
     {
       return { Decision::RECORD_AND_SAMPLE, nullptr };
-    }
-    else if (parent_context->is_recording)
-    {
-      return { Decision::RECORD, nullptr};
     }
 	}
 
