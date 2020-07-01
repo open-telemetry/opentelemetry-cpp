@@ -61,22 +61,37 @@ public:
                               SamplingBehavior sampling_behavior = SamplingBehavior::DETACHED_SPANS_ONLY);
 
   /**
-   * @return Returns NOT_RECORD always
+   * @return Returns either RECORD_AND_SAMPLE or NOT_RECORD based on current
+   * sampler configuration and provided parent_context / tracer_id. tracer_id
+   * is used as a pseudorandom value in conjunction with the predefined
+   * threshold to determine whether this trace should be sampled
    */
   SamplingResult ShouldSample(
     const SpanContext *parent_context,
     trace_api::TraceId trace_id,
-    nostd::string_view name,
-    trace_api::SpanKind span_kind,
-    const trace_api::KeyValueIterable &attributes) noexcept override;
+    nostd::string_view /*name*/,
+    trace_api::SpanKind /*span_kind*/,
+    const trace_api::KeyValueIterable & /*attributes*/) noexcept override;
 
   /**
    * @return Description MUST be ProbabilitySampler{0.000100}
    */
   std::string GetDescription() const noexcept override;
 
+  /**
+   * @param probability a required value top be converted to uint64_t. is
+   * bounded by 1 >= probability >= 0.
+   * @return Returns threshold value computed after converting probability to
+   * uint64_t datatype
+   */
   uint64_t CalculateThreshold(double probability) const noexcept;
 
+  /**
+   * @param trace_id a required value to be converted to uint64_t. trace_id must
+   * at least 8 bytes long
+   * @return Returns threshold value computed after converting trace_id to
+   * uint64_t datatype
+   */
   uint64_t CalculateThresholdFromBuffer(const trace_api::TraceId& trace_id) const noexcept;
 
   double GetProbability() const noexcept;

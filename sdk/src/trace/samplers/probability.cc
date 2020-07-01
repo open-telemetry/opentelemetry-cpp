@@ -72,9 +72,6 @@ SamplingResult ProbabilitySampler::ShouldSample(
   return { Decision::NOT_RECORD, nullptr };
 }
 
-/**
- * @return Description MUST be ProbabilitySampler{0.000100}
- */
 std::string ProbabilitySampler::GetDescription() const noexcept
 {
 	char buffer[30];
