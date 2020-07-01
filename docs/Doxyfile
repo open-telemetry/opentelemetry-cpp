@@ -1,13 +1,21 @@
+DOXYFILE_ENCODING      = UTF-8
+
 PROJECT_NAME           = "OpenTelemetry C++ API/SDK"
 
 FILE_PATTERNS          = *.h *.cc
-GENERATE_LATEX         = NO
-GRAPHICAL_HIERARCHY    = NO
-INPUT                  = ../README.md ../api/include ../sdk/include ../sdk/src
-RECURSIVE              = YES
-SHOW_FILES             = NO
-SHOW_INCLUDE_FILES     = NO
-SHOW_USED_FILES        = NO
-USE_MDFILE_AS_MAINPAGE = ../README.md
 
-DOXYFILE_ENCODING      = UTF-8
+GENERATE_LATEX         = NO
+
+GRAPHICAL_HIERARCHY    = NO
+
+INPUT                  = ../README.md ../api/include ../sdk/include ../sdk/src
+
+RECURSIVE              = YES
+
+SHOW_FILES             = NO
+
+SHOW_INCLUDE_FILES     = NO
+
+SHOW_USED_FILES        = NO
+
+USE_MDFILE_AS_MAINPAGE = ../README.md
