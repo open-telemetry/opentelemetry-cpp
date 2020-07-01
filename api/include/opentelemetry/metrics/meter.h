@@ -240,7 +240,6 @@ public:
       nostd::string_view unit,
       const bool enabled);
 
-private:
   /**
    * Utility method that allows users to atomically record measurements to a set of
    * Metric instruments with a common set of labels.
