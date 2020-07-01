@@ -28,8 +28,14 @@ namespace trace_api = opentelemetry::trace;
 ProbabilitySampler::ProbabilitySampler(
   double probability, bool defer_parent, SamplingBehavior sampling_behavior 
 )
-: threshold_(CalculateThreshold(probability)), probability_(probability),
+: threshold_(CalculateThreshold(probability)),
   defer_parent_(defer_parent), sampling_behavior_(sampling_behavior) {
+    if (probability > 1 || probability < 0) {
+      throws std::invalid_argument("Invalid value received for probability. Must fall within bounds [1, 0].")
+    }
+
+    probability_ = probability;
+
     char buffer[30];
     sprintf(buffer, "ProbabilitySampler{%.6f}", GetProbability());
     sampler_description_ = std::string(buffer);
@@ -83,8 +89,6 @@ std::string ProbabilitySampler::GetDescription() const noexcept
 
 uint64_t ProbabilitySampler::CalculateThreshold(double probability) const noexcept
 {
-  if (probability <= 0.0) return 0;
-  if (probability >= 1.0) return UINT64_MAX;
   // We can't directly return probability * UINT64_MAX.
   //
   // UINT64_MAX is (2^64)-1, but as a double rounds up to 2^64.
