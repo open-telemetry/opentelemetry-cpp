@@ -8,9 +8,6 @@ using opentelemetry::sdk::trace::SamplingBehavior;
 
 TEST(ProbabilitySampler, ShouldSampleWithoutContext)
 {
-	ProbabilitySampler s1(0.01);
-	ProbabilitySampler s2(0.01, false, SamplingBehavior::ALL_SPANS);
-	ProbabilitySampler s3(0.01, false, SamplingBehavior::ROOT_SPANS_ONLY);
 	opentelemetry::trace::TraceId invalid_trace_id;
 
 	opentelemetry::trace::SpanKind span_kind = opentelemetry::trace::SpanKind::kInternal;
@@ -21,6 +18,8 @@ TEST(ProbabilitySampler, ShouldSampleWithoutContext)
 
 	// [DEFAULT] SamplingBehavior::DETACHED_SPANS_ONLY
 
+	ProbabilitySampler s1(0.01);
+
 	auto sampling_result = s1.ShouldSample(nullptr, invalid_trace_id, "", span_kind, view);
 
 	ASSERT_EQ(Decision::RECORD_AND_SAMPLE, sampling_result.decision);
@@ -28,12 +27,16 @@ TEST(ProbabilitySampler, ShouldSampleWithoutContext)
 
 	// SamplingBehavior::ALL_SPANS
 
+	ProbabilitySampler s2(0.01, false, SamplingBehavior::ALL_SPANS);
+
 	sampling_result = s2.ShouldSample(nullptr, invalid_trace_id, "", span_kind, view);
 
 	ASSERT_EQ(Decision::RECORD_AND_SAMPLE, sampling_result.decision);
 	ASSERT_EQ(nullptr, sampling_result.attributes);
 
 	// SamplingBehavior::ROOT_SPANS_ONLY
+
+	ProbabilitySampler s3(0.01, false, SamplingBehavior::ROOT_SPANS_ONLY);
 
 	sampling_result = s3.ShouldSample(nullptr, invalid_trace_id, "", span_kind, view);
 
@@ -50,6 +53,8 @@ TEST(ProbabilitySampler, ShouldSampleWithoutContext)
 
 	ProbabilitySampler s4(0.123457);
 
+	// [DEFAULT] SamplingBehavior::DETACHED_SPANS_ONLY
+
 	sampling_result = s4.ShouldSample(nullptr, valid_trace_id, "", span_kind, view);
 
 	ASSERT_EQ(Decision::RECORD_AND_SAMPLE, sampling_result.decision);
@@ -58,10 +63,6 @@ TEST(ProbabilitySampler, ShouldSampleWithoutContext)
 
 TEST(ProbabilitySampler, ShouldSampleWithContextDeferParent)
 {
-	ProbabilitySampler s1(0.01, true);
-	ProbabilitySampler s2(0.01, true, SamplingBehavior::ALL_SPANS);
-	ProbabilitySampler s3(0.01, true, SamplingBehavior::ROOT_SPANS_ONLY);
-
 	opentelemetry::trace::TraceId trace_id;
 	opentelemetry::trace::SpanKind span_kind = opentelemetry::trace::SpanKind::kInternal;
 	opentelemetry::sdk::trace::Sampler::SpanContext c1(false, false);
@@ -74,6 +75,8 @@ TEST(ProbabilitySampler, ShouldSampleWithContextDeferParent)
 	opentelemetry::trace::KeyValueIterableView<M> view{m1};
 
 	// [DEFAULT] SamplingBehavior::DETACHED_SPANS_ONLY
+
+	ProbabilitySampler s1(0.01, true);
 
 	auto sampling_result = s1.ShouldSample(&c1, trace_id, "", span_kind, view);
 
@@ -97,6 +100,8 @@ TEST(ProbabilitySampler, ShouldSampleWithContextDeferParent)
 
 	// SamplingBehavior::ALL_SPANS
 
+	ProbabilitySampler s2(0.01, true, SamplingBehavior::ALL_SPANS);
+
 	sampling_result = s2.ShouldSample(&c1, trace_id, "", span_kind, view);
 
 	ASSERT_EQ(Decision::NOT_RECORD, sampling_result.decision);
@@ -118,6 +123,8 @@ TEST(ProbabilitySampler, ShouldSampleWithContextDeferParent)
 	ASSERT_EQ(nullptr, sampling_result.attributes);
 
 	// SamplingBehavior::ROOT_SPANS_ONLY
+
+	ProbabilitySampler s3(0.01, true, SamplingBehavior::ROOT_SPANS_ONLY);
 
 	sampling_result = s3.ShouldSample(&c1, trace_id, "", span_kind, view);
 
@@ -142,10 +149,6 @@ TEST(ProbabilitySampler, ShouldSampleWithContextDeferParent)
 
 TEST(ProbabilitySampler, ShouldSampleWithContextNoDeferParent)
 {
-	ProbabilitySampler s1(0.01, false);
-	ProbabilitySampler s2(0.01, false, SamplingBehavior::ALL_SPANS);
-	ProbabilitySampler s3(0.01, false, SamplingBehavior::ROOT_SPANS_ONLY);
-
 	opentelemetry::trace::TraceId trace_id;
 	opentelemetry::trace::SpanKind span_kind = opentelemetry::trace::SpanKind::kInternal;
 	opentelemetry::sdk::trace::Sampler::SpanContext c1(false, false);
@@ -158,6 +161,8 @@ TEST(ProbabilitySampler, ShouldSampleWithContextNoDeferParent)
 	opentelemetry::trace::KeyValueIterableView<M> view{m1};
 
 	// [DEFAULT] SamplingBehavior::DETACHED_SPANS_ONLY
+
+	ProbabilitySampler s1(0.01, false);
 
 	auto sampling_result = s1.ShouldSample(&c1, trace_id, "", span_kind, view);
 
@@ -181,6 +186,8 @@ TEST(ProbabilitySampler, ShouldSampleWithContextNoDeferParent)
 
 	// SamplingBehavior::ALL_SPANS
 
+	ProbabilitySampler s2(0.01, false, SamplingBehavior::ALL_SPANS);
+
 	sampling_result = s2.ShouldSample(&c1, trace_id, "", span_kind, view);
 
 	ASSERT_EQ(Decision::RECORD_AND_SAMPLE, sampling_result.decision);
@@ -202,6 +209,8 @@ TEST(ProbabilitySampler, ShouldSampleWithContextNoDeferParent)
 	ASSERT_EQ(nullptr, sampling_result.attributes);
 
 	// SamplingBehavior::ROOT_SPANS_ONLY
+
+	ProbabilitySampler s3(0.01, false, SamplingBehavior::ROOT_SPANS_ONLY);
 
 	sampling_result = s3.ShouldSample(&c1, trace_id, "", span_kind, view);
 
