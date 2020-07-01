@@ -72,8 +72,8 @@ public:
   double GetProbability() const noexcept;
 
 private:
-	const uint64_t threshold_;
-	const double probability_;
+  const uint64_t threshold_;
+  const double probability_;
   const bool defer_parent_;
   const SamplingBehavior sampling_behavior_;
 };
