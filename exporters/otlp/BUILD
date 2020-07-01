@@ -31,27 +31,12 @@ cc_library(
 )
 
 cc_library(
-    name = "foo_library",
-    srcs = [
-        "foo_library/foo_library.cc",
-    ],
-    hdrs = [
-        "foo_library/foo_library.h",
-    ],
-    deps = [
-        "//api",
-    ],
-)
-
-cc_binary(
     name = "otlp_exporter",
     srcs = [
-        "main.cc",
         'otlp_exporter.h',
         'otlp_exporter.cc',
     ],
     deps = [
-        ":foo_library",
         ":recordable",
         "//api",
         "//sdk/src/trace",

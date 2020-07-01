@@ -6,15 +6,12 @@
 
 #include "opentelemetry/proto/collector/trace/v1/trace_service.pb.h"
 #include "opentelemetry/proto/collector/trace/v1/trace_service.grpc.pb.h"
-
 #include "opentelemetry/proto/trace/v1/trace.pb.h"
 
 #include "recordable.h"
 
 #include <grpcpp/grpcpp.h>
-
 #include <iostream>
-
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace exporter
