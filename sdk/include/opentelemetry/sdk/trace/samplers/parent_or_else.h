@@ -10,12 +10,16 @@ namespace trace
 {
 namespace trace_api = opentelemetry::trace;
 
-// a placeholder class
+/**
+ * A placeholder class that stores the states of a span.
+ * Will be replaced by the real SpanContext class once it is implemented.
+ */
 class Sampler::SpanContext
 {
 public:
   inline explicit SpanContext(bool is_recording, bool sampled_flag)
-    : is_recording(is_recording), sampled_flag(sampled_flag) {}
+      : is_recording(is_recording), sampled_flag(sampled_flag)
+  {}
 
   bool is_recording;
   bool sampled_flag;
@@ -45,6 +49,7 @@ public:
 
 private:
   std::shared_ptr<Sampler> delegate_sampler_;
+  std::string description_;
 };
 }  // namespace trace
 }  // namespace sdk

@@ -6,7 +6,8 @@ namespace sdk
 namespace trace
 {
 ParentOrElseSampler::ParentOrElseSampler(std::shared_ptr<Sampler> delegate_sampler) noexcept
-    : delegate_sampler_(delegate_sampler)
+    : delegate_sampler_(delegate_sampler),
+      description_("ParentOrElse{" + delegate_sampler->GetDescription() + "}")
 {}
 
 SamplingResult ParentOrElseSampler::ShouldSample(
@@ -26,22 +27,18 @@ SamplingResult ParentOrElseSampler::ShouldSample(
     // If parent exists:
     if (parent_context->sampled_flag)
     {
-      return { Decision::RECORD_AND_SAMPLE, nullptr };
+      return {Decision::RECORD_AND_SAMPLE, nullptr};
     }
     else
     {
-      return { Decision::NOT_RECORD, nullptr };
+      return {Decision::NOT_RECORD, nullptr};
     }
   }
 }
 
 std::string ParentOrElseSampler::GetDescription() const noexcept
 {
-  // use += to concatenate string for speed
-  std::string description = "ParentOrElse{";
-  description += delegate_sampler_->GetDescription();
-  description += "}";
-  return description;
+  return description_;
 }
 }  // namespace trace
 }  // namespace sdk
