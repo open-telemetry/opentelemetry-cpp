@@ -4,7 +4,6 @@
 
 using opentelemetry::sdk::trace::ProbabilitySampler;
 using opentelemetry::sdk::trace::Decision;
-using opentelemetry::sdk::trace::SamplingBehavior;
 
 TEST(ProbabilitySampler, ShouldSampleWithoutContext)
 {
@@ -16,29 +15,9 @@ TEST(ProbabilitySampler, ShouldSampleWithoutContext)
 	M m1 = {{}};
 	opentelemetry::trace::KeyValueIterableView<M> view{m1};
 
-	// [DEFAULT] SamplingBehavior::DETACHED_SPANS_ONLY
-
 	ProbabilitySampler s1(0.01);
 
 	auto sampling_result = s1.ShouldSample(nullptr, invalid_trace_id, "", span_kind, view);
-
-	ASSERT_EQ(Decision::RECORD_AND_SAMPLE, sampling_result.decision);
-	ASSERT_EQ(nullptr, sampling_result.attributes);
-
-	// SamplingBehavior::ALL_SPANS
-
-	ProbabilitySampler s2(0.01, false, SamplingBehavior::ALL_SPANS);
-
-	sampling_result = s2.ShouldSample(nullptr, invalid_trace_id, "", span_kind, view);
-
-	ASSERT_EQ(Decision::RECORD_AND_SAMPLE, sampling_result.decision);
-	ASSERT_EQ(nullptr, sampling_result.attributes);
-
-	// SamplingBehavior::ROOT_SPANS_ONLY
-
-	ProbabilitySampler s3(0.01, false, SamplingBehavior::ROOT_SPANS_ONLY);
-
-	sampling_result = s3.ShouldSample(nullptr, invalid_trace_id, "", span_kind, view);
 
 	ASSERT_EQ(Decision::RECORD_AND_SAMPLE, sampling_result.decision);
 	ASSERT_EQ(nullptr, sampling_result.attributes);
@@ -51,32 +30,28 @@ TEST(ProbabilitySampler, ShouldSampleWithoutContext)
 	ASSERT_EQ(Decision::NOT_RECORD, sampling_result.decision);
 	ASSERT_EQ(nullptr, sampling_result.attributes);
 
-	ProbabilitySampler s4(0.123457);
+	ProbabilitySampler s2(0.123457);
 
-	// [DEFAULT] SamplingBehavior::DETACHED_SPANS_ONLY
-
-	sampling_result = s4.ShouldSample(nullptr, valid_trace_id, "", span_kind, view);
+	sampling_result = s2.ShouldSample(nullptr, valid_trace_id, "", span_kind, view);
 
 	ASSERT_EQ(Decision::RECORD_AND_SAMPLE, sampling_result.decision);
 	ASSERT_EQ(nullptr, sampling_result.attributes);
 }
 
-TEST(ProbabilitySampler, ShouldSampleWithContextDeferParent)
+TEST(ProbabilitySampler, ShouldSampleWithContext)
 {
 	opentelemetry::trace::TraceId trace_id;
 	opentelemetry::trace::SpanKind span_kind = opentelemetry::trace::SpanKind::kInternal;
 	opentelemetry::sdk::trace::Sampler::SpanContext c1(false, false);
 	opentelemetry::sdk::trace::Sampler::SpanContext c2(true, false);
-	opentelemetry::sdk::trace::Sampler::SpanContext c3(false, false);
-	opentelemetry::sdk::trace::Sampler::SpanContext c4(true, false);
+	opentelemetry::sdk::trace::Sampler::SpanContext c3(false, true);
+	opentelemetry::sdk::trace::Sampler::SpanContext c4(true, true);
 
 	using M = std::map<std::string, int>;
 	M m1 = {{}};
 	opentelemetry::trace::KeyValueIterableView<M> view{m1};
 
-	// [DEFAULT] SamplingBehavior::DETACHED_SPANS_ONLY
-
-	ProbabilitySampler s1(0.01, true);
+	ProbabilitySampler s1(0.01);
 
 	auto sampling_result = s1.ShouldSample(&c1, trace_id, "", span_kind, view);
 
@@ -85,151 +60,17 @@ TEST(ProbabilitySampler, ShouldSampleWithContextDeferParent)
 
 	sampling_result = s1.ShouldSample(&c2, trace_id, "", span_kind, view);
 
-	ASSERT_EQ(Decision::NOT_RECORD, sampling_result.decision);
+	ASSERT_EQ(Decision::RECORD_AND_SAMPLE, sampling_result.decision);
 	ASSERT_EQ(nullptr, sampling_result.attributes);
 
 	sampling_result = s1.ShouldSample(&c3, trace_id, "", span_kind, view);
 
-	ASSERT_EQ(Decision::NOT_RECORD, sampling_result.decision);
+	ASSERT_EQ(Decision::RECORD_AND_SAMPLE, sampling_result.decision);
 	ASSERT_EQ(nullptr, sampling_result.attributes);
 
 	sampling_result = s1.ShouldSample(&c4, trace_id, "", span_kind, view);
 
-	ASSERT_EQ(Decision::NOT_RECORD, sampling_result.decision);
-	ASSERT_EQ(nullptr, sampling_result.attributes);
-
-	// SamplingBehavior::ALL_SPANS
-
-	ProbabilitySampler s2(0.01, true, SamplingBehavior::ALL_SPANS);
-
-	sampling_result = s2.ShouldSample(&c1, trace_id, "", span_kind, view);
-
-	ASSERT_EQ(Decision::NOT_RECORD, sampling_result.decision);
-	ASSERT_EQ(nullptr, sampling_result.attributes);
-
-	sampling_result = s2.ShouldSample(&c2, trace_id, "", span_kind, view);
-
 	ASSERT_EQ(Decision::RECORD_AND_SAMPLE, sampling_result.decision);
-	ASSERT_EQ(nullptr, sampling_result.attributes);
-
-	sampling_result = s2.ShouldSample(&c3, trace_id, "", span_kind, view);
-
-	ASSERT_EQ(Decision::NOT_RECORD, sampling_result.decision);
-	ASSERT_EQ(nullptr, sampling_result.attributes);
-
-	sampling_result = s2.ShouldSample(&c4, trace_id, "", span_kind, view);
-
-	ASSERT_EQ(Decision::RECORD_AND_SAMPLE, sampling_result.decision);
-	ASSERT_EQ(nullptr, sampling_result.attributes);
-
-	// SamplingBehavior::ROOT_SPANS_ONLY
-
-	ProbabilitySampler s3(0.01, true, SamplingBehavior::ROOT_SPANS_ONLY);
-
-	sampling_result = s3.ShouldSample(&c1, trace_id, "", span_kind, view);
-
-	ASSERT_EQ(Decision::NOT_RECORD, sampling_result.decision);
-	ASSERT_EQ(nullptr, sampling_result.attributes);
-
-	sampling_result = s3.ShouldSample(&c2, trace_id, "", span_kind, view);
-
-	ASSERT_EQ(Decision::NOT_RECORD, sampling_result.decision);
-	ASSERT_EQ(nullptr, sampling_result.attributes);
-
-	sampling_result = s3.ShouldSample(&c3, trace_id, "", span_kind, view);
-
-	ASSERT_EQ(Decision::NOT_RECORD, sampling_result.decision);
-	ASSERT_EQ(nullptr, sampling_result.attributes);
-
-	sampling_result = s3.ShouldSample(&c4, trace_id, "", span_kind, view);
-
-	ASSERT_EQ(Decision::NOT_RECORD, sampling_result.decision);
-	ASSERT_EQ(nullptr, sampling_result.attributes);
-}
-
-TEST(ProbabilitySampler, ShouldSampleWithContextNoDeferParent)
-{
-	opentelemetry::trace::TraceId trace_id;
-	opentelemetry::trace::SpanKind span_kind = opentelemetry::trace::SpanKind::kInternal;
-	opentelemetry::sdk::trace::Sampler::SpanContext c1(false, false);
-	opentelemetry::sdk::trace::Sampler::SpanContext c2(true, false);
-	opentelemetry::sdk::trace::Sampler::SpanContext c3(false, false);
-	opentelemetry::sdk::trace::Sampler::SpanContext c4(true, false);
-
-	using M = std::map<std::string, int>;
-	M m1 = {{}};
-	opentelemetry::trace::KeyValueIterableView<M> view{m1};
-
-	// [DEFAULT] SamplingBehavior::DETACHED_SPANS_ONLY
-
-	ProbabilitySampler s1(0.01, false);
-
-	auto sampling_result = s1.ShouldSample(&c1, trace_id, "", span_kind, view);
-
-	ASSERT_EQ(Decision::NOT_RECORD, sampling_result.decision);
-	ASSERT_EQ(nullptr, sampling_result.attributes);
-
-	sampling_result = s1.ShouldSample(&c2, trace_id, "", span_kind, view);
-
-	ASSERT_EQ(Decision::NOT_RECORD, sampling_result.decision);
-	ASSERT_EQ(nullptr, sampling_result.attributes);
-
-	sampling_result = s1.ShouldSample(&c3, trace_id, "", span_kind, view);
-
-	ASSERT_EQ(Decision::NOT_RECORD, sampling_result.decision);
-	ASSERT_EQ(nullptr, sampling_result.attributes);
-
-	sampling_result = s1.ShouldSample(&c4, trace_id, "", span_kind, view);
-
-	ASSERT_EQ(Decision::NOT_RECORD, sampling_result.decision);
-	ASSERT_EQ(nullptr, sampling_result.attributes);
-
-	// SamplingBehavior::ALL_SPANS
-
-	ProbabilitySampler s2(0.01, false, SamplingBehavior::ALL_SPANS);
-
-	sampling_result = s2.ShouldSample(&c1, trace_id, "", span_kind, view);
-
-	ASSERT_EQ(Decision::RECORD_AND_SAMPLE, sampling_result.decision);
-	ASSERT_EQ(nullptr, sampling_result.attributes);
-
-	sampling_result = s2.ShouldSample(&c2, trace_id, "", span_kind, view);
-
-	ASSERT_EQ(Decision::RECORD_AND_SAMPLE, sampling_result.decision);
-	ASSERT_EQ(nullptr, sampling_result.attributes);
-
-	sampling_result = s2.ShouldSample(&c3, trace_id, "", span_kind, view);
-
-	ASSERT_EQ(Decision::RECORD_AND_SAMPLE, sampling_result.decision);
-	ASSERT_EQ(nullptr, sampling_result.attributes);
-
-	sampling_result = s2.ShouldSample(&c4, trace_id, "", span_kind, view);
-
-	ASSERT_EQ(Decision::RECORD_AND_SAMPLE, sampling_result.decision);
-	ASSERT_EQ(nullptr, sampling_result.attributes);
-
-	// SamplingBehavior::ROOT_SPANS_ONLY
-
-	ProbabilitySampler s3(0.01, false, SamplingBehavior::ROOT_SPANS_ONLY);
-
-	sampling_result = s3.ShouldSample(&c1, trace_id, "", span_kind, view);
-
-	ASSERT_EQ(Decision::NOT_RECORD, sampling_result.decision);
-	ASSERT_EQ(nullptr, sampling_result.attributes);
-
-	sampling_result = s3.ShouldSample(&c2, trace_id, "", span_kind, view);
-
-	ASSERT_EQ(Decision::NOT_RECORD, sampling_result.decision);
-	ASSERT_EQ(nullptr, sampling_result.attributes);
-
-	sampling_result = s3.ShouldSample(&c3, trace_id, "", span_kind, view);
-
-	ASSERT_EQ(Decision::NOT_RECORD, sampling_result.decision);
-	ASSERT_EQ(nullptr, sampling_result.attributes);
-
-	sampling_result = s3.ShouldSample(&c4, trace_id, "", span_kind, view);
-
-	ASSERT_EQ(Decision::NOT_RECORD, sampling_result.decision);
 	ASSERT_EQ(nullptr, sampling_result.attributes);
 }
 
@@ -244,12 +85,11 @@ TEST(ProbabilitySampler, GetDescription)
 	ProbabilitySampler s3(1.00);
 	ASSERT_EQ("ProbabilitySampler{1.000000}", s3.GetDescription());
 
-	ProbabilitySampler s4(3.00);
-	ASSERT_EQ("ProbabilitySampler{1.000000}", s4.GetDescription());
+	ProbabilitySampler s4(0.102030405);
+	ASSERT_EQ("ProbabilitySampler{0.102030}", s4.GetDescription());
 
-	ProbabilitySampler s5(-3.00);
-	ASSERT_EQ("ProbabilitySampler{0.000000}", s5.GetDescription());
-
-	ProbabilitySampler s6(0.102030405);
-	ASSERT_EQ("ProbabilitySampler{0.102030}", s6.GetDescription());
+	ASSERT_THROW(ProbabilitySampler(3.00), std::invalid_argument);
+	ASSERT_THROW(ProbabilitySampler(-3.00), std::invalid_argument);
+	ASSERT_THROW(ProbabilitySampler(1.000000001), std::invalid_argument);
+	ASSERT_THROW(ProbabilitySampler(-1.000000001), std::invalid_argument);
 }

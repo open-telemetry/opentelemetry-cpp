@@ -17,6 +17,7 @@
 
 #include <cmath>
 #include <cstdint>
+#include <stdexcept>
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace sdk
@@ -25,19 +26,15 @@ namespace trace
 {
 namespace trace_api = opentelemetry::trace;
 
-ProbabilitySampler::ProbabilitySampler(
-  double probability, bool defer_parent, SamplingBehavior sampling_behavior 
-)
-: threshold_(CalculateThreshold(probability)),
-  defer_parent_(defer_parent), sampling_behavior_(sampling_behavior) {
-    if (probability > 1 || probability < 0) {
-      throws std::invalid_argument("Invalid value received for probability. Must fall within bounds [1, 0].")
+ProbabilitySampler::ProbabilitySampler(double probability)
+: threshold_(CalculateThreshold(probability))
+{
+    if (probability > 1.0 || probability < 0) {
+      throw std::invalid_argument("Invalid value received for probability. Must fall within bounds [1, 0].");
     }
 
-    probability_ = probability;
-
     char buffer[30];
-    sprintf(buffer, "ProbabilitySampler{%.6f}", GetProbability());
+    sprintf(buffer, "ProbabilitySampler{%.6f}", probability);
     sampler_description_ = std::string(buffer);
   }
 
@@ -48,35 +45,19 @@ SamplingResult ProbabilitySampler::ShouldSample(
   trace_api::SpanKind span_kind,
   const trace_api::KeyValueIterable &attributes) noexcept
 {
-  // Check if current Span should be sampled with current Sampling Behavior
-  if (sampling_behavior_ == SamplingBehavior::DETACHED_SPANS_ONLY
-      && parent_context != nullptr && !parent_context->is_remote) {
-    return { Decision::NOT_RECORD, nullptr };
-  }
-
-  if (sampling_behavior_ == SamplingBehavior::ROOT_SPANS_ONLY
-      && parent_context != nullptr) {
-    return { Decision::NOT_RECORD, nullptr };
-  }
-
-  // Check if sampling decision should be defered to parent span, if applicable 
-  if (parent_context == nullptr || !defer_parent_)
-  {
-    if (threshold_ == 0) return { Decision::NOT_RECORD, nullptr };
-
-    // Calculcate probability based decision based on trace_id and threshold
-    if (CalculateThresholdFromBuffer(trace_id) <= threshold_)
-    {
+  if (parent_context && !parent_context->is_remote) {
+    if (parent_context->sampled) {
       return { Decision::RECORD_AND_SAMPLE, nullptr };
+    } else {
+      return { Decision::NOT_RECORD, nullptr };
     }
   }
-  else
+
+  if (threshold_ == 0) return { Decision::NOT_RECORD, nullptr };
+
+  if (CalculateThresholdFromBuffer(trace_id) <= threshold_)
   {
-    // Return sampling decision based on parent span_context config
-    if (parent_context->sampled)
-    {
-      return { Decision::RECORD_AND_SAMPLE, nullptr };
-    }
+    return { Decision::RECORD_AND_SAMPLE, nullptr };
   }
 
   return { Decision::NOT_RECORD, nullptr };
@@ -109,13 +90,6 @@ uint64_t ProbabilitySampler::CalculateThresholdFromBuffer(const trace_api::Trace
   std::memcpy(&res, &trace_id, 8);
   
   return res;
-}
-
-double ProbabilitySampler::GetProbability() const noexcept
-{
-  if (probability_ <= 0.0) return 0;
-  if (probability_ >= 1.0) return 1.0;
-  return probability_;
 }
 }  // namespace trace
 }  // namespace sdk

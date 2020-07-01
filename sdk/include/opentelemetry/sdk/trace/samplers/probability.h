@@ -23,23 +23,6 @@ namespace sdk
 namespace trace
 {
 namespace trace_api = opentelemetry::trace;
-
-/** The default behavior is to apply the sampling probability only for Spans
-  * that are root spans (no parent) and Spans with remote parent. However
-  * there should be configuration to change this to "root spans only",
-  * or "all spans".
-  */
-enum class SamplingBehavior
-{
-  // Root Spans (no parent) and Spans with a remote parent
-  DETACHED_SPANS_ONLY,
-  // Root Spans (no parent) only
-  ROOT_SPANS_ONLY,
-  // All Spans: Root Spans (no parent), Spans with a remote parent, and 
-  // Spans with a direct parent
-  ALL_SPANS
-};
-
 /**
  * The probability sampler, based on it's configuration, should either defer the
  * decision to sample to it's parent, or compute and return a decision based on
@@ -49,16 +32,11 @@ class ProbabilitySampler : public Sampler
 {
 public:
   /**
-   * @param probability a required value, 1 >= probability >= 0, that given any
+   * @param probability a required value, 1.0 >= probability >= 0.0, that given any
    * random trace_id, ShouldSample will return RECORD_AND_SAMPLE
-   * @param defer_parent an optional configuration setting, specifying whether
-   * this sampler should defer to it's parent in cases where there is a 
-   * parent SpanContext specified, and is not remote
-   * @param sampling_behavior an optional configuration setting, specifying
-   * what types of Spans should processed. all other types will return NOT_RECORD
+   * @throws invalid_argument if probability is out of bounds [0.0, 1.0]
    */
-  explicit ProbabilitySampler(double probability, bool defer_parent = true,
-                              SamplingBehavior sampling_behavior = SamplingBehavior::DETACHED_SPANS_ONLY);
+  explicit ProbabilitySampler(double probability);
 
   /**
    * @return Returns either RECORD_AND_SAMPLE or NOT_RECORD based on current
@@ -95,13 +73,8 @@ private:
    */
   uint64_t CalculateThresholdFromBuffer(const trace_api::TraceId& trace_id) const noexcept;
 
-  double GetProbability() const noexcept;
-
   std::string sampler_description_;
   const uint64_t threshold_;
-  const double probability_;
-  const bool defer_parent_;
-  const SamplingBehavior sampling_behavior_;
 };
 }  // namespace trace
 }  // namespace sdk
