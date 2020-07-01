@@ -1,7 +1,7 @@
 #include "opentelemetry/sdk/trace/tracer_provider.h"
-#include "opentelemetry/sdk/trace/simple_processor.h"
-#include "opentelemetry/sdk/trace/samplers/always_on.h"
 #include "opentelemetry/sdk/trace/samplers/always_off.h"
+#include "opentelemetry/sdk/trace/samplers/always_on.h"
+#include "opentelemetry/sdk/trace/simple_processor.h"
 #include "opentelemetry/sdk/trace/tracer.h"
 
 #include <gtest/gtest.h>
@@ -51,6 +51,6 @@ TEST(TracerProvider, GetSampler)
   std::shared_ptr<SpanProcessor> processor2(new SimpleSpanProcessor(nullptr));
   TracerProvider tf2(processor2, std::make_shared<AlwaysOffSampler>());
   auto t3 = tf2.GetSampler();
-  
+
   ASSERT_EQ("AlwaysOffSampler", t3->GetDescription());
 }

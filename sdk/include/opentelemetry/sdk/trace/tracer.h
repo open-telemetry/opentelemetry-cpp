@@ -2,9 +2,7 @@
 
 #include "opentelemetry/sdk/common/atomic_shared_ptr.h"
 #include "opentelemetry/sdk/trace/processor.h"
-#include "opentelemetry/sdk/trace/sampler.h"
 #include "opentelemetry/sdk/trace/samplers/always_on.h"
-#include "opentelemetry/sdk/trace/samplers/always_off.h"
 #include "opentelemetry/trace/tracer.h"
 #include "opentelemetry/version.h"
 
