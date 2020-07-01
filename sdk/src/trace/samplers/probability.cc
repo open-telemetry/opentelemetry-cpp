@@ -102,10 +102,8 @@ uint64_t ProbabilitySampler::CalculateThresholdFromBuffer(const trace_api::Trace
   static_assert(trace_api::TraceId::kSize >= 8, "TraceID must be at least 8 bytes long.");
 
   uint64_t res = 0;
+  std::memcpy(&res, &trace_id, 8);
   
-  for (int i = 0; i < 8; ++i) {
-    res |= (static_cast<uint64_t>(trace_id.Id()[i]) << (i * 8));
-  }
   return res;
 }
 
