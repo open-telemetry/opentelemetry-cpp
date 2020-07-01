@@ -12,7 +12,10 @@ public:
 
     BoundIntCounter() = default;
 
-    BoundIntCounter(nostd::string_view name, nostd::string_view description, nostd::string_view unit, bool enabled, BoundInstrumentKind kind);
+    BoundIntCounter(nostd::string_view name, 
+                    nostd::string_view description, 
+                    nostd::string_view unit, 
+                    bool enabled);
 
     /*
     * Add adds the value to the counter's sum. The labels are already linked   * to the instrument and are not specified. 
@@ -20,7 +23,7 @@ public:
     * @param value the numerical representation of the metric being captured
     * @param labels the set of labels, as key-value pairs
     */
-    void add(int value);
+    virtual void add(int value) {}
 
 };
 
@@ -30,7 +33,10 @@ public:
 
     IntCounter() = default;
 
-    IntCounter(nostd::string_view name, nostd::string_view description, nostd::string_view unit, bool enabled, InstrumentKind kind);
+    IntCounter(nostd::string_view name, 
+               nostd::string_view description, 
+               nostd::string_view unit, 
+               bool enabled);
 
     /*
     * Bind creates a bound instrument for this counter. The labels are
@@ -50,7 +56,7 @@ public:
     * @param value the numerical representation of the metric being captured
     * @param labels the set of labels, as key-value pairs
     */
-    void add(int value, nostd::string_view &labels);
+    virtual void add(int value, const nostd::string_view &labels) {}
 };
 
 class BoundDoubleCounter: public BoundSynchronousInstrument{ //override bind?
@@ -59,7 +65,10 @@ public:
 
     BoundDoubleCounter() = default;
 
-    BoundDoubleCounter(nostd::string_view name, nostd::string_view description, nostd::string_view unit, bool enabled, BoundInstrumentKind kind);
+    BoundDoubleCounter(nostd::string_view name, 
+                       nostd::string_view description, 
+                       nostd::string_view unit, 
+                       bool enabled);
 
     /*
     * Add adds the value to the counter's sum. The labels are already linked   * to the instrument and are not specified. 
@@ -67,7 +76,7 @@ public:
     * @param value the numerical representation of the metric being captured
     * @param labels the set of labels, as key-value pairs
     */
-    void add(int value);
+    virtual void add(double value){}
 
 };
 
@@ -77,7 +86,10 @@ public:
 
     DoubleCounter() = default;
 
-    DoubleCounter(nostd::string_view name, nostd::string_view description, nostd::string_view unit, bool enabled, InstrumentKind kind);
+    DoubleCounter(nostd::string_view name, 
+                  nostd::string_view description, 
+                  nostd::string_view unit, 
+                  bool enabled);
 
     /*
     * Bind creates a bound instrument for this counter. The labels are
@@ -97,7 +109,7 @@ public:
     * @param value the numerical representation of the metric being captured
     * @param labels the set of labels, as key-value pairs
     */
-    void add(int value, nostd::string_view &labels);
+    virtual void add(double value, const nostd::string_view &labels){}
 };
 
 class BoundIntUpDownCounter: public BoundSynchronousInstrument{ //override bind?
@@ -106,7 +118,10 @@ public:
 
     BoundIntUpDownCounter() = default;
 
-    BoundIntUpDownCounter(nostd::string_view name, nostd::string_view description, nostd::string_view unit, bool enabled, BoundInstrumentKind kind);
+    BoundIntUpDownCounter(nostd::string_view name, 
+                          nostd::string_view description, 
+                          nostd::string_view unit, 
+                          bool enabled);
 
     /*
     * Add adds the value to the counter's sum. The labels are already linked   * to the instrument and are not specified. 
@@ -114,7 +129,7 @@ public:
     * @param value the numerical representation of the metric being captured
     * @param labels the set of labels, as key-value pairs
     */
-    void add(int value);
+    virtual void add(int value) {}
 
 };
 
@@ -124,7 +139,10 @@ public:
 
     IntUpDownCounter() = default;
 
-    IntUpDownCounter(nostd::string_view name, nostd::string_view description, nostd::string_view unit, bool enabled, InstrumentKind kind);
+    IntUpDownCounter(nostd::string_view name, 
+                     nostd::string_view description, 
+                     nostd::string_view unit, 
+                     bool enabled);
 
     /*
     * Bind creates a bound instrument for this counter. The labels are
@@ -145,7 +163,7 @@ public:
     * @param value the numerical representation of the metric being captured
     * @param labels the set of labels, as key-value pairs
     */
-    void add(int value, nostd::string_view &labels);
+    virtual void add(int value, const nostd::string_view &labels){}
 };
 
 class BoundDoubleUpDownCounter: public BoundSynchronousInstrument{ //override bind?
@@ -154,7 +172,10 @@ public:
 
     BoundDoubleUpDownCounter() = default;
 
-    BoundDoubleUpDownCounter(nostd::string_view name, nostd::string_view description, nostd::string_view unit, bool enabled, BoundInstrumentKind kind);
+    BoundDoubleUpDownCounter(nostd::string_view name, 
+                             nostd::string_view description, 
+                             nostd::string_view unit, 
+                             bool enabled);
 
     /*
     * Add adds the value to the counter's sum. The labels are already linked   * to the instrument and are not specified. 
@@ -162,7 +183,7 @@ public:
     * @param value the numerical representation of the metric being captured
     * @param labels the set of labels, as key-value pairs
     */
-    void add(double value);
+    virtual void add(double value) {}
 
 };
 
@@ -172,7 +193,10 @@ public:
 
     DoubleUpDownCounter() = default;
 
-    DoubleUpDownCounter(nostd::string_view name, nostd::string_view description, nostd::string_view unit, bool enabled, InstrumentKind kind);
+    DoubleUpDownCounter(nostd::string_view name, 
+                        nostd::string_view description, 
+                        nostd::string_view unit, 
+                        bool enabled);
 
     /*
     * Bind creates a bound instrument for this counter. The labels are
@@ -193,7 +217,7 @@ public:
     * @param value the numerical representation of the metric being captured
     * @param labels the set of labels, as key-value pairs
     */
-    void add(double value, nostd::string_view &labels);
+    virtual void add(double value, const nostd::string_view &labels) {}
 };
 
 class BoundIntValueRecorder: public BoundSynchronousInstrument{ //override bind?
@@ -202,14 +226,17 @@ public:
 
     BoundIntValueRecorder() = default;
 
-    BoundIntValueRecorder(nostd::string_view name, nostd::string_view description, nostd::string_view unit, bool enabled, BoundInstrumentKind kind);
+    BoundIntValueRecorder(nostd::string_view name, 
+                          nostd::string_view description, 
+                          nostd::string_view unit, 
+                          bool enabled);
 
     /*
     * Records the value by summing it with previous measurements and checking  * previously stored minimum and maximum values. The labels associated with * new values are already linked to the instrument as it is bound.          * ValueRecorders can accept positive and negative values.
     * 
     * @param value the numerical representation of the metric being captured
     */
-    void record(int value);
+    virtual void record(int value) {}
 
 };
 
@@ -219,7 +246,10 @@ public:
 
     IntValueRecorder() = default;
 
-    IntValueRecorder(nostd::string_view name, nostd::string_view description, nostd::string_view unit, bool enabled, InstrumentKind kind);
+    IntValueRecorder(nostd::string_view name, 
+                     nostd::string_view description, 
+                     nostd::string_view unit, 
+                     bool enabled);
 
     /*
     * Bind creates a bound instrument for this counter. The labels are
@@ -240,7 +270,7 @@ public:
     * @param value the numerical representation of the metric being captured
     * @param labels the set of labels, as key-value pairs
     */
-    void record(int value, nostd::string_view &labels);
+    virtual void record(int value, const nostd::string_view &labels) {}
 };
 
 class BoundDoubleValueRecorder: public BoundSynchronousInstrument{ //override bind?
@@ -249,14 +279,17 @@ public:
 
     BoundDoubleValueRecorder() = default;
 
-    BoundDoubleValueRecorder(nostd::string_view name, nostd::string_view description, nostd::string_view unit, bool enabled, BoundInstrumentKind kind);
+    BoundDoubleValueRecorder(nostd::string_view name, 
+                             nostd::string_view description, 
+                             nostd::string_view unit, 
+                             bool enabled);
 
     /*
     * Records the value by summing it with previous measurements and checking  * previously stored minimum and maximum values. The labels associated with * new values are already linked to the instrument as it is bound.          * ValueRecorders can accept positive and negative values.
     * 
     * @param value the numerical representation of the metric being captured
     */
-    void record(double value);
+    virtual void record(double value) {}
 
 };
 
@@ -266,7 +299,10 @@ public:
 
     DoubleValueRecorder() = default;
 
-    DoubleValueRecorder(nostd::string_view name, nostd::string_view description, nostd::string_view unit, bool enabled, InstrumentKind kind);
+    DoubleValueRecorder(nostd::string_view name, 
+                        nostd::string_view description, 
+                        nostd::string_view unit, 
+                        bool enabled);
 
     /*
     * Bind creates a bound instrument for this counter. The labels are
@@ -287,7 +323,7 @@ public:
     * @param value the numerical representation of the metric being captured
     * @param labels the set of labels, as key-value pairs
     */
-    void record(double value, nostd::string_view &labels);
+    virtual void record(double value, const nostd::string_view &labels) {}
 };
 
 } // namespace

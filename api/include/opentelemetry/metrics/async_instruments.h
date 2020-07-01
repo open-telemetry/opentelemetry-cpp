@@ -1,23 +1,12 @@
 #pragma once
 
 #include "instrument.h"
+#include "observer_result.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace metrics
 {
 
-class ObserverResult {
-
-public:
-    ObserverResult() = default;
-
-    ObserverResult(AsynchronousInstrument *instrument):instrument_(instrument){}
-
-    void observe(nostd::variant<int, double> value, const nostd::string_view &labels){}
-
-private:
-    AsynchronousInstrument *instrument_;
-};
 
 class IntValueObserver: public AsynchronousInstrument{
 
@@ -25,20 +14,22 @@ public:
 
     IntValueObserver() = default;
 
-    IntValueObserver(nostd::string_view name, nostd::string_view description, nostd::string_view unit, bool enabled, void (*callback)(ObserverResult), InstrumentKind kind): callback_(callback) {}
+    IntValueObserver(nostd::string_view name, 
+                     nostd::string_view description, 
+                     nostd::string_view unit, 
+                     bool enabled, 
+                     void (*callback)(IntObserverResult)) {}
+                     // Again, I was going to call the asynchronous base 
+                     // constructor here, but do not think it is necessary
 
     /*
-    * Add adds the value to the counter's sum. The labels should contain
-    * the keys and values to be associated with this value.  Counters only     * accept positive valued updates.
+    * Updates the instruments aggregator with the new value. The labels should
+    * contain the keys and values to be associated with this value.  
     * 
     * @param value the numerical representation of the metric being captured
     * @param labels the set of labels, as key-value pairs
     */
-    void observe(int value, const std::string_view &labels){}
-
-private:
-    // Callback function which takes a pointer to an Asynchronous instrument (this) type which is stored in an observer result type and returns nothing.  This function calls the instrument's observe.
-    void (*callback_)(ObserverResult);
+    virtual void observe(int value, const nostd::string_view &labels) override{}
 
 };
 
@@ -48,20 +39,20 @@ public:
 
     DoubleValueObserver() = default;
 
-    DoubleValueObserver(nostd::string_view name, nostd::string_view description, nostd::string_view unit, bool enabled, void (*callback)(ObserverResult), InstrumentKind kind): callback_(callback) {}
+    DoubleValueObserver(nostd::string_view name, 
+                        nostd::string_view description, 
+                        nostd::string_view unit, 
+                        bool enabled, 
+                        void (*callback)(DoubleObserverResult)) {}
 
     /*
-    * Add adds the value to the counter's sum. The labels should contain
-    * the keys and values to be associated with this value.  Counters only     * accept positive valued updates.
+    * Updates the instruments aggregator with the new value. The labels should
+    * contain the keys and values to be associated with this value. 
     * 
     * @param value the numerical representation of the metric being captured
     * @param labels the set of labels, as key-value pairs
     */
-    void observe(double value, const std::string_view &labels){}
-
-private:
-    // Callback function which takes a pointer to an Asynchronous instrument (this) type which is stored in an observer result type and returns nothing.  This function calls the instrument's observe.
-    void (*callback_)(ObserverResult);
+    virtual void observe(double value, const nostd::string_view &labels) override {}
 
 };
 
@@ -71,7 +62,11 @@ public:
 
     IntSumObserver() = default;
 
-    IntSumObserver(nostd::string_view name, nostd::string_view description, nostd::string_view unit, bool enabled, void (*callback)(ObserverResult), InstrumentKind kind): callback_(callback) {}
+    IntSumObserver(nostd::string_view name, 
+                   nostd::string_view description, 
+                   nostd::string_view unit, 
+                   bool enabled, 
+                   void (*callback)(IntObserverResult)) {}
 
     /*
     * Add adds the value to the counter's sum. The labels should contain
@@ -80,11 +75,7 @@ public:
     * @param value the numerical representation of the metric being captured
     * @param labels the set of labels, as key-value pairs
     */
-    void observe(int value, const std::string_view &labels){}
-
-private:
-    // Callback function which takes a pointer to an Asynchronous instrument (this) type which is stored in an observer result type and returns nothing.  This function calls the instrument's observe.
-    void (*callback_)(ObserverResult);
+    virtual void observe(int value, const nostd::string_view &labels) override {}
 
 };
 
@@ -94,20 +85,13 @@ public:
 
     DoubleSumObserver() = default;
 
-    DoubleSumObserver(nostd::string_view name, nostd::string_view description, nostd::string_view unit, bool enabled, void (*callback)(ObserverResult), InstrumentKind kind): callback_(callback) {}
+    DoubleSumObserver(nostd::string_view name, 
+                      nostd::string_view description, 
+                      nostd::string_view unit, 
+                      bool enabled, 
+                      void (*callback)(DoubleObserverResult)) {}
 
-    /*
-    * Add adds the value to the counter's sum. The labels should contain
-    * the keys and values to be associated with this value.  Counters only     * accept positive valued updates.
-    * 
-    * @param value the numerical representation of the metric being captured
-    * @param labels the set of labels, as key-value pairs
-    */
-    void observe(double value, const std::string_view &labels){}
-
-private:
-    // Callback function which takes a pointer to an Asynchronous instrument (this) type which is stored in an observer result type and returns nothing.  This function calls the instrument's observe.
-    void (*callback_)(ObserverResult);
+    virtual void observe(double value, const nostd::string_view &labels) override {}
 
 };
 
@@ -117,20 +101,21 @@ public:
 
     IntUpDownSumObserver() = default;
 
-    IntUpDownSumObserver(nostd::string_view name, nostd::string_view description, nostd::string_view unit, bool enabled, void (*callback)(ObserverResult), InstrumentKind kind): callback_(callback) {}
+    IntUpDownSumObserver(nostd::string_view name, 
+                         nostd::string_view description, 
+                         nostd::string_view unit, 
+                         bool enabled, 
+                         void (*callback)(IntObserverResult)) {}
 
     /*
     * Add adds the value to the counter's sum. The labels should contain
-    * the keys and values to be associated with this value.  Counters only     * accept positive valued updates.
+    * the keys and values to be associated with this value.  UpDownCounters can
+    * accepts both positive and negative updates.
     * 
     * @param value the numerical representation of the metric being captured
     * @param labels the set of labels, as key-value pairs
     */
-    void observe(int value, const std::string_view &labels){}
-
-private:
-    // Callback function which takes a pointer to an Asynchronous instrument (this) type which is stored in an observer result type and returns nothing.  This function calls the instrument's observe.
-    void (*callback_)(ObserverResult);
+    virtual void observe(int value, const nostd::string_view &labels) override {}
 
 };
 
@@ -140,20 +125,14 @@ public:
 
     DoubleUpDownSumObserver() = default;
 
-    DoubleUpDownSumObserver(nostd::string_view name, nostd::string_view description, nostd::string_view unit, bool enabled, void (*callback)(ObserverResult), InstrumentKind kind): callback_(callback) {}
+    DoubleUpDownSumObserver(nostd::string_view name, 
+                            nostd::string_view description, 
+                            nostd::string_view unit, 
+                            bool enabled, 
+                            void (*callback)(DoubleObserverResult)) {}
 
-    /*
-    * Add adds the value to the counter's sum. The labels should contain
-    * the keys and values to be associated with this value.  Counters only     * accept positive valued updates.
-    * 
-    * @param value the numerical representation of the metric being captured
-    * @param labels the set of labels, as key-value pairs
-    */
-    void observe(double value, const std::string_view &labels){}
+    virtual void observe(double value, const nostd::string_view &labels) override {}
 
-private:
-    // Callback function which takes a pointer to an Asynchronous instrument (this) type which is stored in an observer result type and returns nothing.  This function calls the instrument's observe.
-    void (*callback_)(ObserverResult);
 
 };
 

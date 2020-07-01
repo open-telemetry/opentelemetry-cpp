@@ -47,7 +47,14 @@ class NoopIntValueObserver : public IntValueObserver {
 
 public:
 
-    NoopIntValueObserver(nostd::string_view name, nostd::string_view description, nostd::string_view unit, bool enabled, void (*callback)(ObserverResult), InstrumentKind kind): IntValueObserver(name,description,unit,enabled,callback,kind) {}
+    NoopIntValueObserver(nostd::string_view /*name*/, 
+                         nostd::string_view /*description*/, 
+                         nostd::string_view /*unit*/, 
+                         bool /*enabled*/, 
+                         void (*callback)(IntObserverResult)) {}
+                         // I was originally calling the base class constructor here as well
+                         // IntValueObserver(name,description, unit,...)
+                         // but do not think that's necessary for the API's noop
 
 };
 
@@ -55,7 +62,10 @@ class NoopDoubleValueObserver : public DoubleValueObserver {
 
 public:
 
-    NoopDoubleValueObserver(nostd::string_view name, nostd::string_view description, nostd::string_view unit, bool enabled, void (*callback)(ObserverResult), InstrumentKind kind): DoubleValueObserver(name,description,unit,enabled,callback,kind) {}
+    NoopDoubleValueObserver(nostd::string_view /*name*/, 
+                            nostd::string_view /*description*/, 
+                            nostd::string_view /*unit*/, 
+                            bool enabled, void (*callback)(DoubleObserverResult)) {}
 
 };
 
@@ -63,7 +73,11 @@ class NoopIntSumObserver : public IntSumObserver {
 
 public:
 
-    NoopIntSumObserver(nostd::string_view name, nostd::string_view description, nostd::string_view unit, bool enabled, void (*callback)(ObserverResult), InstrumentKind kind): IntSumObserver(name,description,unit,enabled,callback,kind) {}
+    NoopIntSumObserver(nostd::string_view /*name*/, 
+                       nostd::string_view /*description*/, 
+                       nostd::string_view /*unit*/, 
+                       bool /*enabled*/, 
+                       void (*callback)(IntObserverResult)) {}
 
 };
 
@@ -71,7 +85,11 @@ class NoopDoubleSumObserver : public DoubleSumObserver {
 
 public:
 
-    NoopDoubleSumObserver(nostd::string_view name, nostd::string_view description, nostd::string_view unit, bool enabled, void (*callback)(ObserverResult), InstrumentKind kind): DoubleSumObserver(name,description,unit,enabled,callback,kind) {}
+    NoopDoubleSumObserver(nostd::string_view /*name*/, 
+                          nostd::string_view /*description*/, 
+                          nostd::string_view /*unit*/, 
+                          bool /*enabled*/, 
+                          void (*callback)(DoubleObserverResult)) {}
 
 };
 
@@ -79,7 +97,11 @@ class NoopIntUpDownSumObserver : public IntUpDownSumObserver {
 
 public:
 
-    NoopIntUpDownSumObserver(nostd::string_view name, nostd::string_view description, nostd::string_view unit, bool enabled, void (*callback)(ObserverResult), InstrumentKind kind): IntUpDownSumObserver(name,description,unit,enabled,callback,kind) {}
+    NoopIntUpDownSumObserver(nostd::string_view /*name*/, 
+                             nostd::string_view /*description*/, 
+                             nostd::string_view /*unit*/, 
+                             bool /*enabled*/, 
+                             void (*callback)(IntObserverResult)) {}
 
 };
 
@@ -87,7 +109,10 @@ class NoopDoubleUpDownSumObserver : public DoubleUpDownSumObserver {
 
 public:
 
-    NoopDoubleUpDownSumObserver(nostd::string_view name, nostd::string_view description, nostd::string_view unit, bool enabled, void (*callback)(ObserverResult), InstrumentKind kind): DoubleUpDownSumObserver(name,description,unit,enabled,callback,kind) {}
+    NoopDoubleUpDownSumObserver(nostd::string_view /*name*/, 
+                                nostd::string_view /*description*/, nostd::string_view /*unit*/, 
+                                bool /*enabled*/, 
+                                void (*callback)(DoubleObserverResult)) {}
 
 };
 
@@ -97,11 +122,12 @@ public:
 
     BoundNoopIntCounter() = default;
 
-    BoundNoopIntCounter(nostd::string_view /*name*/, nostd::string_view /*description*/, nostd::string_view /*unit*/, bool /*enabled*/, BoundInstrumentKind /*kind*/){}
+    BoundNoopIntCounter(nostd::string_view /*name*/, 
+                        nostd::string_view /*description*/, 
+                        nostd::string_view /*unit*/, 
+                        bool /*enabled*/){}
 
     void add(int value){}
-
-
 };
 
 class NoopIntCounter : public IntCounter {
@@ -110,7 +136,10 @@ public:
 
     NoopIntCounter() =  default;
 
-    NoopIntCounter(nostd::string_view /*name*/, nostd::string_view /*description*/, nostd::string_view /*unit*/, bool /*enabled*/, InstrumentKind /*kind*/) {}
+    NoopIntCounter(nostd::string_view /*name*/, 
+                   nostd::string_view /*description*/, 
+                   nostd::string_view /*unit*/, 
+                   bool /*enabled*/) {}
     
 
     BoundNoopIntCounter bind(const nostd::string_view & /*labels*/){
@@ -128,7 +157,9 @@ public:
 
     BoundNoopDoubleCounter() = default;
 
-    BoundNoopDoubleCounter(nostd::string_view /*name*/, nostd::string_view /*description*/, nostd::string_view /*unit*/, bool /*enabled*/, BoundInstrumentKind /*kind*/){}
+    BoundNoopDoubleCounter(nostd::string_view /*name*/, 
+                           nostd::string_view /*description*/, nostd::string_view /*unit*/, 
+                           bool /*enabled*/){}
 
     void add(double value){}
 
@@ -140,7 +171,10 @@ public:
 
     NoopDoubleCounter()=default;
 
-    NoopDoubleCounter(nostd::string_view /*name*/, nostd::string_view /*description*/, nostd::string_view /*unit*/, bool /*enabled*/, InstrumentKind /*kind*/) {}
+    NoopDoubleCounter(nostd::string_view /*name*/, 
+                      nostd::string_view /*description*/, 
+                      nostd::string_view /*unit*/, 
+                      bool /*enabled*/) {}
     
 
     BoundNoopDoubleCounter bind(const nostd::string_view & /*labels*/){
@@ -157,7 +191,9 @@ public:
 
     BoundNoopIntUpDownCounter() = default;
 
-    BoundNoopIntUpDownCounter(nostd::string_view /*name*/, nostd::string_view /*description*/, nostd::string_view /*unit*/, bool /*enabled*/, BoundInstrumentKind /*kind*/){}
+    BoundNoopIntUpDownCounter(nostd::string_view /*name*/, 
+                              nostd::string_view /*description*/, nostd::string_view /*unit*/, 
+                              bool /*enabled*/) {}
 
     void add(int value){}
 
@@ -169,7 +205,10 @@ public:
 
     NoopIntUpDownCounter()=default;
 
-    NoopIntUpDownCounter(nostd::string_view /*name*/, nostd::string_view /*description*/, nostd::string_view /*unit*/, bool /*enabled*/, InstrumentKind /*kind*/) {}
+    NoopIntUpDownCounter(nostd::string_view /*name*/, 
+                         nostd::string_view /*description*/,
+                         nostd::string_view /*unit*/, 
+                         bool /*enabled*/) {}
     
 
     BoundNoopIntUpDownCounter bind(const nostd::string_view & /*labels*/){
@@ -179,13 +218,15 @@ public:
     void add(int value, const nostd::string_view & /*labels*/){}
 };
 
-class BoundNoopDoubleUpDownCounter : public DoubleUpDownCounter {
+class BoundNoopDoubleUpDownCounter : public BoundDoubleUpDownCounter {
 
 public:
 
     BoundNoopDoubleUpDownCounter() = default;
 
-    BoundNoopDoubleUpDownCounter(nostd::string_view /*name*/, nostd::string_view /*description*/, nostd::string_view /*unit*/, bool /*enabled*/, BoundInstrumentKind /*kind*/){}
+    BoundNoopDoubleUpDownCounter(nostd::string_view /*name*/,
+                                 nostd::string_view /*description*/, nostd::string_view /*unit*/, 
+                                 bool /*enabled*/){}
 
     void add(double value){}
 
@@ -197,7 +238,9 @@ public:
 
     NoopDoubleUpDownCounter()=default;
 
-    NoopDoubleUpDownCounter(nostd::string_view /*name*/, nostd::string_view /*description*/, nostd::string_view /*unit*/, bool /*enabled*/, InstrumentKind /*kind*/) {}
+    NoopDoubleUpDownCounter(nostd::string_view /*name*/, 
+                            nostd::string_view /*description*/, nostd::string_view /*unit*/, 
+                            bool /*enabled*/) {}
     
 
     BoundNoopIntUpDownCounter bind(const nostd::string_view & /*labels*/){
@@ -213,7 +256,9 @@ public:
 
     BoundNoopIntValueRecorder() = default;
 
-    BoundNoopIntValueRecorder(nostd::string_view /*name*/, nostd::string_view /*description*/, nostd::string_view /*unit*/, bool /*enabled*/, BoundInstrumentKind /*kind*/){}
+    BoundNoopIntValueRecorder(nostd::string_view /*name*/, 
+                              nostd::string_view /*description*/, nostd::string_view /*unit*/, 
+                              bool /*enabled*/){}
 
     void record(int value){}
 
@@ -225,7 +270,10 @@ public:
 
     NoopIntValueRecorder()=default;
 
-    NoopIntValueRecorder(nostd::string_view /*name*/, nostd::string_view /*description*/, nostd::string_view /*unit*/, bool /*enabled*/, InstrumentKind /*kind*/) {}
+    NoopIntValueRecorder(nostd::string_view /*name*/, 
+                         nostd::string_view /*description*/, 
+                         nostd::string_view /*unit*/, 
+                         bool /*enabled*/) {}
     
 
     BoundNoopIntValueRecorder bind(const nostd::string_view & /*labels*/){
@@ -241,9 +289,11 @@ public:
 
     BoundNoopDoubleValueRecorder() = default;
 
-    BoundNoopDoubleValueRecorder(nostd::string_view /*name*/, nostd::string_view /*description*/, nostd::string_view /*unit*/, bool /*enabled*/, BoundInstrumentKind /*kind*/){}
+    BoundNoopDoubleValueRecorder(nostd::string_view /*name*/, 
+                                 nostd::string_view /*description*/, nostd::string_view /*unit*/, 
+                                 bool /*enabled*/){}
 
-    void record(int value){}
+    void record(double value){}
 
 };
 
@@ -253,7 +303,9 @@ public:
 
     NoopDoubleValueRecorder()=default;
 
-    NoopDoubleValueRecorder(nostd::string_view /*name*/, nostd::string_view /*description*/, nostd::string_view /*unit*/, bool /*enabled*/, InstrumentKind /*kind*/) {}
+    NoopDoubleValueRecorder(nostd::string_view /*name*/, 
+                            nostd::string_view /*description*/, nostd::string_view /*unit*/, 
+                            bool /*enabled*/) {}
     
 
     BoundNoopDoubleValueRecorder bind(const nostd::string_view & /*labels*/){

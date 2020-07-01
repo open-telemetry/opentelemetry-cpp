@@ -7,6 +7,7 @@ OPENTELEMETRY_BEGIN_NAMESPACE
 namespace metrics
 {
 
+// Enum classes to help determine instrument types in other parts of the api
 enum class InstrumentKind
 {
   IntCounter,
@@ -23,6 +24,7 @@ enum class InstrumentKind
   DoubleUpDownSumObserver
 };
 
+// Fewer Bound types because Asynchronous instrument cannot bind
 enum class BoundInstrumentKind
 {
   BoundIntCounter,
@@ -33,9 +35,8 @@ enum class BoundInstrumentKind
   BoundDoubleValueRecorder
 };
 
-//Do not need the getters virtual because each base class should have access to them -- will not  be overriden.  
-// Also, I removed all private variables and will add them in when writing the SDK because I have more flexibility 
-// with types and they are not necessary for a minimal noop implementation.
+
+
 class Instrument {
 
 public:
@@ -56,31 +57,43 @@ public:
      * @param enabled determins if the metric is currently capturing data
      * @return Instrument type with the specified attirbutes
      */
-    Instrument(nostd::string_view name, nostd::string_view description, nostd::string_view unit, bool enabled);
+    Instrument(nostd::string_view name, 
+               nostd::string_view description, 
+               nostd::string_view unit, 
+               bool enabled);
 
     // Returns true if the instrument is enabled and collecting data
-    bool IsEnabled();
+    virtual bool IsEnabled() {
+      // False in default implementation
+      return false;
+    }
 
     // Return the instrument name
-    nostd::string_view GetName();
+    virtual nostd::string_view GetName(){
+      return nostd::string_view("");
+    }
 
     // Return the instrument description
-    nostd::string_view GetDescription();
+    virtual nostd::string_view GetDescription(){
+      return nostd::string_view("");
+    }
 
     // Return the insrument's units of measurement
-    nostd::string_view GetUnits();
+    virtual nostd::string_view GetUnits(){
+      return nostd::string_view("");
+    }
 
 };
 
-// Should this be a friend class so that it can access name, descripion, etc.
-// from the Instrument base class?
 class BoundSynchronousInstrument: public Instrument {
 
 public:
 
     BoundSynchronousInstrument() = default;
 
-    BoundSynchronousInstrument(nostd::string_view name, nostd::string_view description, nostd::string_view unit, bool enabled, BoundInstrumentKind kind);
+    BoundSynchronousInstrument(nostd::string_view name, 
+                               nostd::string_view description, nostd::string_view unit, 
+                               bool enabled, BoundInstrumentKind kind);
 
     /**
     * Frees the resources associated with this Bound Instrument.
@@ -89,35 +102,36 @@ public:
     * @param none
     * @return void
    */
-    void unbind() {}
+    virtual void unbind() {}
 
     /**
-    * Records a single synchronous metric event.  //Call to aggregator
+    * Records a single synchronous metric event; a call to the aggregator
     * Since this is a bound synchronous instrument, labels are not required in  * metric capture calls.
     *
     * @param value the numerical representation of the metric being captured
     * @return void
    */
-    void update(common::AttributeValue value) {} //don't want this virtual because the base boundsynchronousinstrument will call the aggregator in the sdk
+    virtual void update(nostd::variant<int,double> value) final {} //don't want this overriden because the base boundsynchronousinstrument will call the aggregator in the sdk
 };
 
 
-// Thinking ahead, I think I want to change this to a shared pointer so I can store pointers to instruments and the meter class has access to the ref counts
-
-class SynchronousInstrument: public Instrument {// need update virtual or not?
+class SynchronousInstrument: public Instrument {
 
 public:
 
     SynchronousInstrument() = default;
 
-    SynchronousInstrument(nostd::string_view name, nostd::string_view description, nostd::string_view unit, bool enabled, InstrumentKind kind);
+    SynchronousInstrument(nostd::string_view name, 
+                          nostd::string_view description, 
+                          nostd::string_view unit, bool enabled, 
+                          InstrumentKind kind);
 
     /**
     * Returns a Bound Instrument associated with the specified labels.         * Multiples requests with the same set of labels may return the same
     * Bound Instrument instance.
     *
-    * It is recommended that callers keep a reference to the Bound Instrument instead of always
-    * calling this method for every operation.
+    * It is recommended that callers keep a reference to the Bound Instrument
+    * instead of repeatedly calling this operation.
     *
     * @param labels the set of labels, as key-value pairs.
     * @return a Bound Instrument
@@ -130,19 +144,29 @@ public:
     * Records a single synchronous metric event. 
     * Since this is an unbound synchronous instrument, labels are required in  * metric capture calls.
     *
+    * update can be used in instruments with both add or record since it simply
+    * activated the aggregator
     *
     * @param labels the set of labels, as key-value pairs.
     * @param value the numerical representation of the metric being captured
     * @return void
    */
-    void update(common::AttributeValue value, nostd::string_view &labels){} //add or record
+    virtual void update(nostd::variant<int,double> value, nostd::string_view &labels) final {} 
 };
+
+class ObserverResult;
 
 class AsynchronousInstrument: public Instrument{
 
 public:
 
     AsynchronousInstrument() = default;
+
+    AsynchronousInstrument(nostd::string_view name, 
+                           nostd::string_view description, 
+                           nostd::string_view unit, 
+                           bool enabled, 
+                           void (*callback)(ObserverResult)) {}
 
     /**
      * Captures data by activating the callback function associated with the 
@@ -152,7 +176,14 @@ public:
      * @param none
      * @return none
      */
-    void observe();
+    virtual void observe(int value, const nostd::string_view & labels){}
+
+    virtual void observe(double value, const nostd::string_view & labels){}
+
+  private:
+
+    // Callback function which takes a pointer to an Asynchronous instrument (this) type which is stored in an observer result type and returns nothing.  This function calls the instrument's observe.
+    void (*callback_)(ObserverResult);
 };
 
 }

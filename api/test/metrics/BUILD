@@ -10,9 +10,9 @@ cc_test(
 )
 
 cc_test(
-    name = "int_counter",
+    name = "noop_instrument_test",
     srcs = [
-        "int_counter_test.cc",
+        "noop_instrument_test.cc",
     ],
     linkstatic = 1,
     deps = [
