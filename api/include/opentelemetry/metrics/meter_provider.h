@@ -8,7 +8,7 @@ OPENTELEMETRY_BEGIN_NAMESPACE
 namespace meter
 {
 /**
- * Creates new Tracer instances.
+ * Creates new Meter instances.
  */
 class MeterProvider
 {
@@ -16,9 +16,9 @@ public:
   virtual ~MeterProvider() = default;
   MeterProvider() = default;
   /**
-   * Gets or creates a named tracer instance.
+   * Gets or creates a named Meter instance.
    *
-   * Optionally a version can be passed to create a named and versioned tracer
+   * Optionally a version can be passed to create a named and versioned Meter
    * instance.
    */
    virtual nostd::shared_ptr<Meter> GetMeter(nostd::string_view library_name,

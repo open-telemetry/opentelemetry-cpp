@@ -1,8 +1,8 @@
 #pragma once
-// Please refer to provider.h for documentation on how to obtain a Tracer object.
+// Please refer to provider.h for documentation on how to obtain a Meter object.
 //
 // This file is part of the internal implementation of OpenTelemetry. Nothing in this file should be
-// used directly. Please refer to span.h and tracer.h for documentation on these interfaces.
+// used directly. Please refer to meter.h for documentation on these interfaces.
 
 #include "opentelemetry/nostd/string_view.h"
 #include "opentelemetry/nostd/unique_ptr.h"
@@ -16,7 +16,7 @@ OPENTELEMETRY_BEGIN_NAMESPACE
 namespace meter
 {
 /**
- * No-op implementation of Span. This class should not be used directly.
+ * No-op implementation of Instrument. This class should not be used directly.
  */
 class NoopInstrument
 {
@@ -31,7 +31,7 @@ private:
 };
 
 /**
- * No-op implementation of Tracer.
+ * No-op implementation of Meter.
  */
 class NoopMeter final : public Meter, public std::enable_shared_from_this<NoopMeter>
 {
@@ -41,7 +41,7 @@ public:
 };
 
 /**
- * No-op implementation of a TracerProvider.
+ * No-op implementation of a MeterProvider.
  */
 class NoopMeterProvider final : public opentelemetry::meter::MeterProvider
 {
