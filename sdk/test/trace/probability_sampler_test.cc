@@ -1,4 +1,4 @@
-#include "opentelemetry/sdk/trace/probability_sampler.h"
+#include "opentelemetry/sdk/trace/samplers/probability.h"
 
 #include <gtest/gtest.h>
 

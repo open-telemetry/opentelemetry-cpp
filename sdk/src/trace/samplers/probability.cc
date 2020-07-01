@@ -13,7 +13,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include "opentelemetry/sdk/trace/probability_sampler.h"
+#include "opentelemetry/sdk/trace/samplers/probability.h"
 
 #include <cmath>
 #include <cstdint>
