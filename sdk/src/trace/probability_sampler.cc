@@ -102,16 +102,10 @@ uint64_t ProbabilitySampler::CalculateThresholdFromBuffer(const trace_api::Trace
   // We only use the first 8 bytes of TraceId.
   static_assert(trace_api::TraceId::kSize >= 8, "TraceID must be at least 8 bytes long.");
 
-  uint8_t buf[trace_api::TraceId::kSize];
-  
-  for (int i = 0; i < 8; ++i) {
-    buf[i] = trace_id.Id()[i];
-  }
-
   uint64_t res = 0;
   
   for (int i = 0; i < 8; ++i) {
-    res |= (static_cast<uint64_t>(buf[i]) << (i * 8));
+    res |= (static_cast<uint64_t>(trace_id.Id()[i]) << (i * 8));
   }
   return res;
 }
