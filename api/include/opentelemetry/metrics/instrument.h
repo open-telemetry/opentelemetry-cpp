@@ -9,25 +9,33 @@ namespace metrics
 
 enum class InstrumentKind
 {
-  Counter,
-  UpDownCounter,
-  ValueRecorder,
-  ValueObserver,
-  SumObserver,
-  UpDownSumObserver
+  IntCounter,
+  IntUpDownCounter,
+  IntValueRecorder,
+  IntValueObserver,
+  IntSumObserver,
+  IntUpDownSumObserver,
+  DoubleCounter,
+  DoubleUpDownCounter,
+  DoubleValueRecorder,
+  DoubleValueObserver,
+  DoubleSumObserver,
+  DoubleUpDownSumObserver
 };
 
 enum class BoundInstrumentKind
 {
-  BoundCounter,
-  BoundUpDownCounter,
-  BoundValueRecorder,
-  BoundValueObserver,
-  BoundSumObserver,
-  BoundUpDownSumObserver
+  BoundIntCounter,
+  BoundIntUpDownCounter,
+  BoundIntValueRecorder,
+  BoundDoubleCounter,
+  BoundDoubleUpDownCounter,
+  BoundDoubleValueRecorder
 };
 
-//Do not need the getters virtual because each base class should have access to them -- will not  be overriden.  Also, I removed all private variables and will add them in when writing the SDK because I have more flexibility with types and they are not necessary for a minimal noop implementation.
+//Do not need the getters virtual because each base class should have access to them -- will not  be overriden.  
+// Also, I removed all private variables and will add them in when writing the SDK because I have more flexibility 
+// with types and they are not necessary for a minimal noop implementation.
 class Instrument {
 
 public:
@@ -64,14 +72,15 @@ public:
 
 };
 
-
+// Should this be a friend class so that it can access name, descripion, etc.
+// from the Instrument base class?
 class BoundSynchronousInstrument: public Instrument {
 
 public:
 
     BoundSynchronousInstrument() = default;
 
-    BoundSynchronousInstrument(nostd::string_view name, nostd::string_view description, nostd::string_view unit, bool enabled);
+    BoundSynchronousInstrument(nostd::string_view name, nostd::string_view description, nostd::string_view unit, bool enabled, BoundInstrumentKind kind);
 
     /**
     * Frees the resources associated with this Bound Instrument.
@@ -80,16 +89,16 @@ public:
     * @param none
     * @return void
    */
-    void unbind();
+    void unbind() {}
 
     /**
     * Records a single synchronous metric event.  //Call to aggregator
-    * Since this is a bound synchronous instrument, labels are notrequired in  * metric capture calls.
+    * Since this is a bound synchronous instrument, labels are not required in  * metric capture calls.
     *
     * @param value the numerical representation of the metric being captured
     * @return void
    */
-    void update(common::AttributeValue value); //don't want this virtual because the base boundsynchronousinstrument will call the aggregator in the sdk
+    void update(common::AttributeValue value) {} //don't want this virtual because the base boundsynchronousinstrument will call the aggregator in the sdk
 };
 
 
@@ -101,7 +110,7 @@ public:
 
     SynchronousInstrument() = default;
 
-    SynchronousInstrument(nostd::string_view name, nostd::string_view description, nostd::string_view unit, bool enabled);
+    SynchronousInstrument(nostd::string_view name, nostd::string_view description, nostd::string_view unit, bool enabled, InstrumentKind kind);
 
     /**
     * Returns a Bound Instrument associated with the specified labels.         * Multiples requests with the same set of labels may return the same
@@ -113,7 +122,9 @@ public:
     * @param labels the set of labels, as key-value pairs.
     * @return a Bound Instrument
    */
-    BoundSynchronousInstrument bind(nostd::string_view & labels);
+    BoundSynchronousInstrument bind(const nostd::string_view & labels) {
+      return BoundSynchronousInstrument();
+    }
 
     /**
     * Records a single synchronous metric event. 
@@ -124,7 +135,7 @@ public:
     * @param value the numerical representation of the metric being captured
     * @return void
    */
-    void update(common::AttributeValue value, nostd::string_view &labels); //add or record
+    void update(common::AttributeValue value, nostd::string_view &labels){} //add or record
 };
 
 class AsynchronousInstrument: public Instrument{

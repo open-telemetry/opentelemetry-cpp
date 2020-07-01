@@ -14,6 +14,7 @@ cc_test(
     srcs = [
         "int_counter_test.cc",
     ],
+    linkstatic = 1,
     deps = [
         "//api",
         "@com_google_googletest//:gtest_main",
