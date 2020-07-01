@@ -78,6 +78,7 @@ public:
    */
   std::string GetDescription() const noexcept override;
 
+private:
   /**
    * @param probability a required value top be converted to uint64_t. is
    * bounded by 1 >= probability >= 0.
@@ -96,7 +97,6 @@ public:
 
   double GetProbability() const noexcept;
 
-private:
   const uint64_t threshold_;
   const double probability_;
   const bool defer_parent_;
