@@ -50,16 +50,16 @@ SamplingResult ProbabilitySampler::ShouldSample(
   }
 
   // Check if sampling decision should be defered to parent span, if applicable 
-	if (parent_context == nullptr || !defer_parent_)
+  if (parent_context == nullptr || !defer_parent_)
   {
     if (threshold_ == 0) return { Decision::NOT_RECORD, nullptr };
 
     // Calculcate probability based decision based on trace_id and threshold
-	  if (CalculateThresholdFromBuffer(trace_id) <= threshold_)
+    if (CalculateThresholdFromBuffer(trace_id) <= threshold_)
     {
       return { Decision::RECORD_AND_SAMPLE, nullptr };
     }
-	}
+  }
   else
   {
     // Return sampling decision based on parent span_context config
@@ -67,15 +67,15 @@ SamplingResult ProbabilitySampler::ShouldSample(
     {
       return { Decision::RECORD_AND_SAMPLE, nullptr };
     }
-	}
+  }
 
   return { Decision::NOT_RECORD, nullptr };
 }
 
 std::string ProbabilitySampler::GetDescription() const noexcept
 {
-	char buffer[30];
-	sprintf(buffer, "ProbabilitySampler{%.6f}", GetProbability());
+  char buffer[30];
+  sprintf(buffer, "ProbabilitySampler{%.6f}", GetProbability());
   return std::string(buffer);
 }
 
