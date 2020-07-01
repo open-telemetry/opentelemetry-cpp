@@ -10,14 +10,37 @@ namespace exporter
 {
 namespace otlp
 {
+
+trace::TraceId GenerateRandomTraceId()
+{
+    uint8_t trace_id_buf[trace::TraceId::kSize];
+    opentelemetry::sdk::common::Random::GenerateRandomBuffer(trace_id_buf);
+    return trace::TraceId(trace_id_buf);
+}
+
+trace::SpanId GenerateRandomSpanId()
+{
+    uint8_t span_id_buf[trace::SpanId::kSize];
+    opentelemetry::sdk::common::Random::GenerateRandomBuffer(span_id_buf);
+    return trace::SpanId(span_id_buf);
+}
+
 TEST(OtlpExporter, ExportInternal)
 {
   auto exporter = std::unique_ptr<sdk::trace::SpanExporter>(new OtlpExporter);
-
   auto rec = exporter->MakeRecordable();
-  // Set span fields
+
+  // Name
   nostd::string_view name = "TestSpan";
   rec->SetName(name);
+  // IDs
+  rec->SetIds(GenerateRandomTraceId(), GenerateRandomSpanId(), GenerateRandomSpanId());
+  // Start time
+  core::SystemTimestamp start_timestamp(std::chrono::system_clock::now());
+  rec->SetStartTime(start_timestamp);
+  // Duration
+  std::chrono::nanoseconds duration(10);
+  rec->SetDuration(duration);
 
   nostd::span<std::unique_ptr<sdk::trace::Recordable>> recs(&rec, 1);
   auto result = exporter->Export(recs);

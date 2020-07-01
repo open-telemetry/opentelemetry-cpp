@@ -6,29 +6,13 @@ namespace exporter
 namespace otlp
 {
 
-trace::TraceId GenerateRandomTraceId()
-{
-    uint8_t trace_id_buf[trace::TraceId::kSize];
-    opentelemetry::sdk::common::Random::GenerateRandomBuffer(trace_id_buf);
-    return trace::TraceId(trace_id_buf);
-}
-
-trace::SpanId GenerateRandomSpanId()
-{
-    uint8_t span_id_buf[trace::SpanId::kSize];
-    opentelemetry::sdk::common::Random::GenerateRandomBuffer(span_id_buf);
-    return trace::SpanId(span_id_buf);
-}
-
-
 std::unique_ptr<sdk::trace::Recordable> OtlpExporter::MakeRecordable() noexcept
 {
 return std::unique_ptr<sdk::trace::Recordable>(new Recordable);
 }
 
-
 sdk::trace::ExportResult OtlpExporter::Export(
-    const nostd::span<std::unique_ptr<sdk::trace::Recordable>> &spans) noexcept
+  const nostd::span<std::unique_ptr<sdk::trace::Recordable>> &spans) noexcept
 {
   std::cout << "Exporting" << std::endl;
   grpc::ClientContext context;
@@ -52,9 +36,6 @@ sdk::trace::ExportResult OtlpExporter::Export(
         static_cast<Recordable *>(recordable.release()));
 
     std::cout << "Name: " << rec->span().name() << std::endl;
-
-    // Temporarily set IDs here until Span is updated to do it
-    rec->SetIds(GenerateRandomTraceId(), GenerateRandomSpanId(), GenerateRandomSpanId());
 
     proto::trace::v1::Span* span = instrumentation_lib->add_spans();
 
