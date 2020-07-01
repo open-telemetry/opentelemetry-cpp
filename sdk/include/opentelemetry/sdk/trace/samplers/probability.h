@@ -41,12 +41,22 @@ enum class SamplingBehavior
 };
 
 /**
- * The probability sampler ...
- *
+ * The probability sampler, based on it's configuration, should either defer the
+ * decision to sample to it's parent, or compute and return a decision based on
+ * the provided trace_id and probability.
  */
 class ProbabilitySampler : public Sampler
 {
 public:
+  /**
+   * @param probability a required value, 1 >= probability >= 0, that given any
+   * random trace_id, ShouldSample will return RECORD_AND_SAMPLE
+   * @param defer_parent an optional configuration setting, specifying whether
+   * this sampler should defer to it's parent in cases where there is a 
+   * parent SpanContext specified, and is not remote
+   * @param sampling_behavior an optional configuration setting, specifying
+   * what types of Spans should processed. all other types will return NOT_RECORD
+   */
   explicit ProbabilitySampler(double probability, bool defer_parent = true,
                               SamplingBehavior sampling_behavior = SamplingBehavior::DETACHED_SPANS_ONLY);
 
