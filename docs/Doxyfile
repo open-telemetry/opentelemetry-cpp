@@ -8,7 +8,7 @@ GENERATE_LATEX         = NO
 
 GRAPHICAL_HIERARCHY    = NO
 
-INPUT                  = ../README.md ../api/include ../sdk/include ../sdk/src
+INPUT                  = ../README.md ../CONTRIBUTING.md ../api/include ../sdk/include ../sdk/src
 
 RECURSIVE              = YES
 
