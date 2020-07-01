@@ -29,7 +29,11 @@ ProbabilitySampler::ProbabilitySampler(
   double probability, bool defer_parent, SamplingBehavior sampling_behavior 
 )
 : threshold_(CalculateThreshold(probability)), probability_(probability),
-  defer_parent_(defer_parent), sampling_behavior_(sampling_behavior) {}
+  defer_parent_(defer_parent), sampling_behavior_(sampling_behavior) {
+    char buffer[30];
+    sprintf(buffer, "ProbabilitySampler{%.6f}", GetProbability());
+    sampler_description_ = std::string(buffer);
+  }
 
 SamplingResult ProbabilitySampler::ShouldSample(
   const SpanContext *parent_context,
@@ -74,9 +78,7 @@ SamplingResult ProbabilitySampler::ShouldSample(
 
 std::string ProbabilitySampler::GetDescription() const noexcept
 {
-  char buffer[30];
-  sprintf(buffer, "ProbabilitySampler{%.6f}", GetProbability());
-  return std::string(buffer);
+  return sampler_description_;
 }
 
 uint64_t ProbabilitySampler::CalculateThreshold(double probability) const noexcept

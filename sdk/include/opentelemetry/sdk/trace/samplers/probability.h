@@ -97,6 +97,7 @@ private:
 
   double GetProbability() const noexcept;
 
+  std::string sampler_description_;
   const uint64_t threshold_;
   const double probability_;
   const bool defer_parent_;
