@@ -43,9 +43,9 @@ TEST_F(OtlpExporterTestPeer, ExportUnitTest)
   EXPECT_EQ(sdk::trace::ExportResult::kSuccess, result);
 
   // Test failed RPC
-  nostd::span<std::unique_ptr<sdk::trace::Recordable>> batch2(&recordable_2, 1);
+  nostd::span<std::unique_ptr<sdk::trace::Recordable>> batch_2(&recordable_2, 1);
   EXPECT_CALL(*mock_stub, Export(_,_,_)).Times(Exactly(1)).WillOnce(Return(grpc::Status::CANCELLED));
-  auto result = exporter->Export(batch_2);
+  result = exporter->Export(batch_2);
   EXPECT_EQ(sdk::trace::ExportResult::kFailure, result);
 }
 
