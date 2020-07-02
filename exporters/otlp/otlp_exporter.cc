@@ -60,13 +60,11 @@ sdk::trace::ExportResult OtlpExporter::Export(
 
   grpc::Status status = trace_service_stub_->Export(&context, request, &response);
 
-  if(status.ok()){
-    std::cout << "Status OK" << std::endl;
-    return sdk::trace::ExportResult::kSuccess;
+  if(!status.ok()){
+    std::cerr << "OTLP trace exporter: Export() failed\n";
+    return sdk::trace::ExportResult::kFailure;
   }
-  std::cout << "ERROR " << status.error_code() << ": " << status.error_message()
-            << std::endl;
-  return sdk::trace::ExportResult::kFailure;
+  return sdk::trace::ExportResult::kSuccess;
 }
 }  // namespace otlp
 }  // namespace exporter
