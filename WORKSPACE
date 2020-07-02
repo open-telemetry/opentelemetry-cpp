@@ -16,6 +16,31 @@ workspace(name = "io_opentelemetry_cpp")
 
 load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive")
 
+# Load gRPC dependency
+# Note that this dependency needs to be loaded first due to
+# https://github.com/bazelbuild/bazel/issues/6664
+http_archive(
+    name = "com_github_grpc_grpc",
+    sha256 = "d6af0859d3ae4693b1955e972aa2e590d6f4d44baaa82651467c6beea453e30e",
+    strip_prefix = "grpc-1.26.0-pre1",
+    urls = [
+        "https://github.com/grpc/grpc/archive/v1.26.0-pre1.tar.gz",
+    ],
+)
+
+load("@com_github_grpc_grpc//bazel:grpc_deps.bzl", "grpc_deps")
+
+grpc_deps()
+
+# Load extra gRPC dependencies due to https://github.com/grpc/grpc/issues/20511
+load("@com_github_grpc_grpc//bazel:grpc_extra_deps.bzl", "grpc_extra_deps")
+
+grpc_extra_deps()
+
+load("@upb//bazel:repository_defs.bzl", "bazel_version_repository")
+
+bazel_version_repository(name = "upb_bazel_version")
+
 # Uses older protobuf version because of
 # https://github.com/protocolbuffers/protobuf/issues/7179
 http_archive(
