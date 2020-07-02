@@ -2,24 +2,26 @@
 
 #include <map>
 #include <memory>
-#include <string>
 
 #include <gtest/gtest.h>
 
-using opentelemetry::meter::NoopMeter;
-using opentelemetry::meter::Meter;
+using opentelemetry::metrics::NoopMeter;
+using opentelemetry::metrics::Meter;
 
 TEST(NoopTest, UseNoopMeters)
 {
   std::unique_ptr<Meter> m{new NoopMeter{}};
 
-  auto intCounter = m->NewIntCounter("Test int counter", "For testing", "Unitless", true);
+  m->NewIntCounter("Test int counter", "For testing", "Unitless", true);
 
-  std::map<opentelemetry::metrics::InstrumentKind, double> batchValues1;
-  m->RecordBatch("", batchValues1);
+  using MAP = std::map<std::string, int>;
+  MAP batchValues1 = {{}};
+  opentelemetry::trace::KeyValueIterableView<MAP> view{batchValues1};
+  m->RecordBatch("abc", view);
 
-  std::vector<std::pair<std::string, double>> batchValues2;
-  m->RecordBatch("", batchValues2);
+  using VEC = std::vector<std::pair<std::string, int>>;
+  VEC batchValues2 = {};
+  opentelemetry::trace::KeyValueIterableView<VEC> view2{batchValues2};
+  m->RecordBatch("abc", view2);
 
-  m->RecordBatch("", {{"IntCounter", 1}, {opentelemetry::metrics::InstrumentKind::Counter, 1.0}});
 }
