@@ -4,6 +4,7 @@
 #include "opentelemetry/trace/provider.h"
 
 #include <gtest/gtest.h>
+// #include <gmock/gmock.h>
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace exporter
@@ -11,6 +12,16 @@ namespace exporter
 namespace otlp
 {
 
+// class MockOtlpExporter : public opentelemetry::sdk::trace::SpanExporter
+// {
+// public:
+// MOCK_METHOD(std::unique_ptr<Recordable>, MakeRecordable, (), (override));
+// MOCK_METHOD(sdk::trace::ExportResult, Export, (const nostd::span<std::unique_ptr<sdk::trace::Recordable>>
+//           &spans), (override));
+// MOCK_METHOD(std::unique_ptr<Recordable>, MakeRecordable, (), (override));
+// }
+
+// Helper functions
 trace::TraceId GenerateRandomTraceId()
 {
     uint8_t trace_id_buf[trace::TraceId::kSize];
@@ -30,15 +41,14 @@ TEST(OtlpExporter, ExportInternal)
   auto exporter = std::unique_ptr<sdk::trace::SpanExporter>(new OtlpExporter);
   auto rec = exporter->MakeRecordable();
 
-  // Name
-  nostd::string_view name = "TestSpan";
+  // Set up recordable
+  nostd::string_view name = "Test Span";
   rec->SetName(name);
-  // IDs
   rec->SetIds(GenerateRandomTraceId(), GenerateRandomSpanId(), GenerateRandomSpanId());
-  // Start time
+
   core::SystemTimestamp start_timestamp(std::chrono::system_clock::now());
   rec->SetStartTime(start_timestamp);
-  // Duration
+
   std::chrono::nanoseconds duration(10);
   rec->SetDuration(duration);
 

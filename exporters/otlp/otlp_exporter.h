@@ -20,12 +20,18 @@ namespace otlp
 {
 class OtlpExporter final : public opentelemetry::sdk::trace::SpanExporter
 {
-  std::unique_ptr<opentelemetry::sdk::trace::Recordable> MakeRecordable() noexcept override;
+public:
+  std::unique_ptr<sdk::trace::Recordable> MakeRecordable() noexcept override;
 
-  opentelemetry::sdk::trace::ExportResult Export(
-    const  opentelemetry::nostd::span<std::unique_ptr<opentelemetry::sdk::trace::Recordable>> &spans) noexcept override;
+  sdk::trace::ExportResult Export(
+    const nostd::span<std::unique_ptr<sdk::trace::Recordable>> &spans) noexcept override;
 
   void Shutdown(std::chrono::microseconds timeout = std::chrono::microseconds(0)) noexcept override {};
+
+private:
+  // Add span data from recordables to request
+  void PopulateRequest(const nostd::span<std::unique_ptr<sdk::trace::Recordable>> &spans,
+                       proto::collector::trace::v1::ExportTraceServiceRequest *request);
 };
 }  // namespace otlp
 }  // namespace exporter

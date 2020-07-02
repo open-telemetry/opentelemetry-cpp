@@ -61,8 +61,6 @@ cc_proto_library(
     deps = [":trace_proto"],
 )
 
-
-
 proto_library(
     name = "trace_service_proto",
     srcs = [
