@@ -57,101 +57,85 @@ public abstract class TraceState {
     }
 
   public:
-    // Builder class for {@link TraceState}.
+    // Builder class for TraceState.
     static const class Builder {
-      private const TraceState parent;
-      private std::vector<Entry> entries; // alternative?
+      private:
+        const TraceState parent;
+        std::vector<Entry> entries;
+        std::vector<Entry> EMPTY_ENTRIES;
+        // Needs to be in this class to avoid initialization deadlock because super class depends on
+        // subclass (the auto-value generate class).
+        static const TraceState EMPTY = create(EMPTY_ENTRIES);
 
-      // Needs to be in this class to avoid initialization deadlock because super class depends on
-      // subclass (the auto-value generate class).
-      private static const TraceState EMPTY = create(Collections.<Entry>emptyList());
-
-      private Builder(TraceState &parent) {
-        this.parent = parent;
-        this.entries = null;
-      }
-
-      /**
-       * Adds or updates the {@code Entry} that has the given {@code key} if it is present. The new
-       * {@code Entry} will always be added in the front of the list of entries.
-       *
-       * @param key the key for the {@code Entry} to be added.
-       * @param value the value for the {@code Entry} to be added.
-       * @return this.
-       * @since 0.1.0
-       */
-      public Builder set(nostd::string_view key, nostd::string_view value) {
-        // Initially create the Entry to validate input.
-        Entry entry = Entry.create(key, value);
-        if (entries == null) {
-          // Copy entries from the parent.
-          entries = new ArrayList<>(parent.getEntries());
+        Builder(TraceState &parent) {
+          this.parent = parent;
+          this.entries = NULL;
         }
-        for (int i = 0; i < entries.size(); i++) {
-          if (entries.get(i).getKey().equals(entry.getKey())) {
-            entries.remove(i);
-            // Exit now because the entries list cannot contain duplicates.
-            break;
+
+      public:
+        // Adds or updates the Entry that has the given key if it is present. The new
+        // Entry will always be added in the front of the list of entries.
+        Builder set(nostd::string_view &key, nostd::string_view &value) {
+          // Initially create the Entry to validate input.
+          Entry entry = Entry.create(key, value);
+          if (entries == NULL) {
+            // Copy entries from the parent.
+            entries = parent.getEntries();
           }
-        }
-        // Inserts the element at the front of this list.
-        entries.add(0, entry);
-        return this;
-      }
-
-      /**
-       * Removes the {@code Entry} that has the given {@code key} if it is present.
-       *
-       * @param key the key for the {@code Entry} to be removed.
-       * @return this.
-       * @since 0.1.0
-       */
-      public Builder remove(nostd::string_view key) {
-        Utils.checkNotNull(key, "key");
-        if (entries == null) {
-          // Copy entries from the parent.
-          entries = new ArrayList<>(parent.getEntries());
-        }
-        for (int i = 0; i < entries.size(); i++) {
-          if (entries.get(i).getKey().equals(key)) {
-            entries.remove(i);
-            // Exit now because the entries list cannot contain duplicates.
-            break;
+          for (int i = 0; i < entries.size(); i++) {
+            if (entries[i].getKey() == entry.getKey()) {
+              entries.erase(entries.begin()+i);
+              // Exit now because the entries list cannot contain duplicates.
+              break;
+            }
           }
+          // Inserts the element at the front of this list.
+          entries.insert(entries.begin(), entry);
+          return this;
         }
-        return this;
-      }
 
-      /**
-       * Builds a TraceState by adding the entries to the parent in front of the key-value pairs list
-       * and removing duplicate entries.
-       *
-       * @return a TraceState with the new entries.
-       * @since 0.1.0
-       */
-      public TraceState build() {
-        if (entries == null) {
-          return parent;
+        // Removes the Entry that has the given key if it is present.
+        Builder remove(nostd::string_view &key) {
+          if (entries == NULL) {
+            // Copy entries from the parent.
+            entries = parent.getEntries();
+          }
+          for (int i = 0; i < entries.size(); i++) {
+            if (entries[i].getKey() == key) {
+              entries.erase(entries.begin()+i);
+              // Exit now because the entries list cannot contain duplicates.
+              break;
+            }
+          }
+          return this;
         }
-        return TraceState.create(entries);
-      }
+
+        // Builds a TraceState by adding the entries to the parent in front of the key-value pairs list
+        // and removing duplicate entries.
+        TraceState build() {
+          if (entries == NULL) {
+            return parent;
+          }
+          return TraceState.create(entries);
+        }
     }
 
     // Immutable key-value pair for TraceState.
     public static class Entry {
       // Creates a new Entry for the TraceState.
-      public static Entry create(nostd::string_view &key, nostd::string_view &value) {
-        // Again what is this again I am not sure
-        return new AutoValue_TraceState_Entry(key, value);
-      }
+      public:
+        static Entry create(nostd::string_view &key, nostd::string_view &value) {
+          // Again what is this again I am not sure
+          return new AutoValue_TraceState_Entry(key, value);
+        }
 
-      // Returns the key.
-      virtual public nostd::string_view getKey() = 0;
+        // Returns the key.
+        virtual nostd::string_view getKey() = 0;
 
-      // Returns the value.
-      virtual public nostd::string_view getValue() = 0;
+        // Returns the value.
+        virtual nostd::string_view getValue() = 0;
 
-      Entry() {}
+        Entry() {}
     }
 
     // Returns the default TraceState with no entries.

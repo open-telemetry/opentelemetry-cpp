@@ -3,9 +3,10 @@
 #include <stdexcept>
 #include "opentelemetry/trace/propagation/httptextformat.h"
 #include "opentelemetry/trace/spancontext.h"
+#include "opentelemetry/trace/trace_state.h"
 #include "opentelemetry/context/context.h"
 #include "opentelemetry/nostd/string_view.h"
-#include "opentelemetry/nostd/span.h"
+#include "opentelemetry/trace/span.h"
 #include "opentelemetry/trace/default_span.cc"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
@@ -29,8 +30,8 @@ static Context SetSpanInContext(Span span, Context &context) {
     return new_values;
 }
 
-static common::AttributeValue GetCurrentSpan(Context &context) {
-    common::AttributeValue span = get_value(Context.SPAN_KEY, context);
+static Span GetCurrentSpan(Context &context) {
+    Span span = get_value(Context.SPAN_KEY, context);
     if (span == NULL) {
         return NULL;
     }

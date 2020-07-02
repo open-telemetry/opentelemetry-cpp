@@ -33,6 +33,13 @@ public class SpanContext:
             remote = is_remote;
         }
 
+        // Creates a new SpanContext that was propagated from a remote parent, with the given
+        // identifiers and options.
+        public static SpanContext createFromRemoteParent(TraceId traceId, SpanId spanId, TraceFlags traceFlags, TraceState traceState) {
+          // Question: what is AutoValue_spanContext, where is it defined?
+          return new AutoValue_SpanContext(traceId, spanId, traceFlags, traceState, /* remote=*/ true);
+        }
+
         static SpanContext getInvalid() {
             return INVALID;
         }

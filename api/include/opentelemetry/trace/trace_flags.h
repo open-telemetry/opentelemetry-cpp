@@ -46,6 +46,14 @@ public:
     buffer[1]             = kHex[(rep_ >> 0) & 0xF];
   }
 
+  // Creates TraceFlags from traceparent
+  static TraceFlags fromLowerBase16(nostd::string_view src, int srcOffset)
+  {
+    // I don't really know about what to do with this function
+    // The java implementation has this: return new TraceFlags(BigendianEncoding.byteFromBase16String(src, srcOffset));
+    // But I am not sure if this will suffice here and I don't know what is BigendianEncoding module as well.
+  }
+
   uint8_t flags() const noexcept { return rep_; }
 
   bool operator==(const TraceFlags &that) const noexcept { return rep_ == that.rep_; }
