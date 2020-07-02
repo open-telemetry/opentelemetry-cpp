@@ -37,6 +37,10 @@ load("@com_github_grpc_grpc//bazel:grpc_extra_deps.bzl", "grpc_extra_deps")
 
 grpc_extra_deps()
 
+load("@upb//bazel:repository_defs.bzl", "bazel_version_repository")
+
+bazel_version_repository(name = "upb_bazel_version")
+
 # Uses older protobuf version because of
 # https://github.com/protocolbuffers/protobuf/issues/7179
 http_archive(
