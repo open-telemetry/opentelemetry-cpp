@@ -66,8 +66,7 @@ public abstract class TraceState {
       // subclass (the auto-value generate class).
       private static const TraceState EMPTY = create(Collections.<Entry>emptyList());
 
-      private Builder(TraceState parent) {
-        Utils.checkNotNull(parent, "parent");
+      private Builder(TraceState &parent) {
         this.parent = parent;
         this.entries = null;
       }
@@ -81,7 +80,7 @@ public abstract class TraceState {
        * @return this.
        * @since 0.1.0
        */
-      public Builder set(String key, String value) {
+      public Builder set(nostd::string_view key, nostd::string_view value) {
         // Initially create the Entry to validate input.
         Entry entry = Entry.create(key, value);
         if (entries == null) {
@@ -107,7 +106,7 @@ public abstract class TraceState {
        * @return this.
        * @since 0.1.0
        */
-      public Builder remove(String key) {
+      public Builder remove(nostd::string_view key) {
         Utils.checkNotNull(key, "key");
         if (entries == null) {
           // Copy entries from the parent.
