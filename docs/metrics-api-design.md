@@ -172,17 +172,6 @@ public:
 //                                                                                //
 ////////////////////////////////////////////////////////////////////////////////////
   
-private:
-
- /*
-  * CollectAll
-  *
-  * Checkpoints all metric instruments created from this meter and returns a
-  * vector of records containing the name, labels, and values of each instrument.
-  *
-  */
-  virtual nostd::vector<Record> CollectAll() = 0;
-  
  /*
   * RecordBatch
   *
@@ -200,7 +189,7 @@ private:
   */ 
   virtual void RecordBatch(nostd::string_view labels, 
                            nostd::KeyValueIterable values) noexcept;
-  
+private:
   MeterProvider meterProvider_;
   InstrumentationInfo instrumentationInfo_;
 }
