@@ -7,7 +7,7 @@
 #include "opentelemetry/metrics/meter_provider.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
-namespace meter
+namespace metrics
 {
 /**
  * Stores the singleton global MeterProvider.
@@ -38,7 +38,7 @@ public:
   {
     while (GetLock().test_and_set(std::memory_order_acquire))
       ;
-    GetProvider() = tp;
+    GetProvider() = tp; //Ask what is actually happening
     GetLock().clear(std::memory_order_release);
   }
 
@@ -56,5 +56,5 @@ private:
   }
 };
 
-}  // namespace trace
+}  // namespace metrics
 OPENTELEMETRY_END_NAMESPACE

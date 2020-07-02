@@ -13,7 +13,7 @@
 #include <memory>
 
 OPENTELEMETRY_BEGIN_NAMESPACE
-namespace meter
+namespace metrics
 {
 /**
  * No-op implementation of Instrument. This class should not be used directly.
@@ -43,15 +43,15 @@ public:
 /**
  * No-op implementation of a MeterProvider.
  */
-class NoopMeterProvider final : public opentelemetry::meter::MeterProvider
+class NoopMeterProvider final : public opentelemetry::metrics::MeterProvider
 {
 public:
   NoopMeterProvider()
-      : meter_{nostd::shared_ptr<opentelemetry::meter::NoopMeter>(
-            new opentelemetry::meter::NoopMeter)}
+      : meter_{nostd::shared_ptr<opentelemetry::metrics::NoopMeter>(
+            new opentelemetry::metrics::NoopMeter)}
   {}
 
-  nostd::shared_ptr<opentelemetry::meter::Meter> GetMeter(
+  nostd::shared_ptr<opentelemetry::metrics::Meter> GetMeter(
       nostd::string_view library_name,
       nostd::string_view library_version) override
   {
@@ -59,7 +59,7 @@ public:
   }
 
 private:
-  nostd::shared_ptr<opentelemetry::meter::Meter> meter_;
+  nostd::shared_ptr<opentelemetry::metrics::Meter> meter_;
 };
-}  // namespace meter
+}  // namespace metrics
 OPENTELEMETRY_END_NAMESPACE

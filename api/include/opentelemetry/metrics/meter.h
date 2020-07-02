@@ -7,7 +7,7 @@
 #include <chrono>
 
 OPENTELEMETRY_BEGIN_NAMESPACE
-namespace meter
+namespace metrics
 {
 
 class Meter
@@ -17,5 +17,5 @@ public:
   Meter() = default;
 };
 
-}  // namespace trace
+}  // namespace metrics
 OPENTELEMETRY_END_NAMESPACE

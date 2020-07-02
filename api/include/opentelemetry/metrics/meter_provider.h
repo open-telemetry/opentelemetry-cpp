@@ -5,7 +5,7 @@
 #include "opentelemetry/metrics/meter.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
-namespace meter
+namespace metrics
 {
 /**
  * Creates new Meter instances.
@@ -24,5 +24,5 @@ public:
    virtual nostd::shared_ptr<Meter> GetMeter(nostd::string_view library_name,
                                               nostd::string_view library_version = "") = 0;
 };
-}  // namespace meter
+}  // namespace metrics
 OPENTELEMETRY_END_NAMESPACE
