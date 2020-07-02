@@ -9,28 +9,28 @@ namespace otlp
 {
 TEST(Recordable, SetIds)
 {
-  Recordable rec;
-
-  const uint8_t trace_id_buff[trace::TraceId::kSize]      = {0, 0, 0, 0, 0, 0, 0, 0,
-                                                        0, 0, 0, 0, 0, 0, 0, 1};
-  const uint8_t span_id_buff[trace::SpanId::kSize]        = {0, 0, 0, 0, 0, 0, 0, 2};
-  const uint8_t parent_span_id_buff[trace::SpanId::kSize] = {0, 0, 0, 0, 0, 0, 0, 3};
-
   const trace::TraceId trace_id(
-      nostd::span<const uint8_t, trace::TraceId::kSize>(trace_id_buff, trace::TraceId::kSize));
+    std::array<const uint8_t, trace::TraceId::kSize>(
+    {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1}));
+
   const trace::SpanId span_id(
-      nostd::span<const uint8_t, trace::SpanId::kSize>(span_id_buff, trace::SpanId::kSize));
+    std::array<const uint8_t, trace::SpanId::kSize>(
+    {0, 0, 0, 0, 0, 0, 0, 2}));
+
   const trace::SpanId parent_span_id(
-      nostd::span<const uint8_t, trace::SpanId::kSize>(parent_span_id_buff, trace::SpanId::kSize));
+    std::array<const uint8_t, trace::SpanId::kSize>(
+    {0, 0, 0, 0, 0, 0, 0, 3}));
+
+  Recordable rec;
 
   rec.SetIds(trace_id, span_id, parent_span_id);
 
   EXPECT_EQ(rec.span().trace_id(),
-            std::string(reinterpret_cast<const char *>(trace_id_buff), trace::TraceId::kSize));
+            std::string(reinterpret_cast<const char *>(trace_id.Id().data()), trace::TraceId::kSize));
   EXPECT_EQ(rec.span().span_id(),
-            std::string(reinterpret_cast<const char *>(span_id_buff), trace::SpanId::kSize));
+            std::string(reinterpret_cast<const char *>(span_id.Id().data()), trace::SpanId::kSize));
   EXPECT_EQ(rec.span().parent_span_id(),
-            std::string(reinterpret_cast<const char *>(parent_span_id_buff), trace::SpanId::kSize));
+            std::string(reinterpret_cast<const char *>(parent_span_id.Id().data()), trace::SpanId::kSize));
 }
 
 TEST(Recordable, SetName)
@@ -38,7 +38,7 @@ TEST(Recordable, SetName)
   Recordable rec;
   nostd::string_view name = "TestSpan";
   rec.SetName(name);
-  ASSERT_EQ(rec.span().name(), name);
+  EXPECT_EQ(rec.span().name(), name);
 }
 
 TEST(Recordable, SetStartTime)
@@ -51,7 +51,7 @@ TEST(Recordable, SetStartTime)
       std::chrono::duration_cast<std::chrono::nanoseconds>(start_time.time_since_epoch()).count();
 
   rec.SetStartTime(start_timestamp);
-  ASSERT_EQ(rec.span().start_time_unixnano(), unix_start);
+  EXPECT_EQ(rec.span().start_time_unix_nano(), unix_start);
 }
 
 TEST(Recordable, SetDuration)
@@ -66,7 +66,7 @@ TEST(Recordable, SetDuration)
   rec.SetStartTime(start_timestamp);
   rec.SetDuration(duration);
 
-  ASSERT_EQ(rec.span().end_time_unixnano(), unix_end);
+  EXPECT_EQ(rec.span().end_time_unix_nano(), unix_end);
 }
 }  // namespace otlp
 }  // namespace exporter
