@@ -6,10 +6,11 @@
 #include "opentelemetry/version.h"
 
 #include "opentelemetry/metrics/async_instruments.h"
+#include "opentelemetry/metrics/instrument.h"
 #include "opentelemetry/metrics/sync_instruments.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
-namespace meter
+namespace metrics
 {
 /**
  * Handles instrument creation and provides a facility for batch recording.
@@ -36,11 +37,15 @@ public:
    * @throws IllegalArgumentException if a different metric by the same name exists in this meter.
    * @throws IllegalArgumentException if the {@code name} does not match spec requirements.
    */
-  virtual opentelemetry::nostd::unique_ptr<metrics::DoubleCounter> NewDoubleCounter(
+  virtual opentelemetry::nostd::unique_ptr<DoubleCounter> NewDoubleCounter(
       nostd::string_view name,
       nostd::string_view description,
       nostd::string_view unit,
-      const bool enabled);
+      const bool enabled)
+  {
+    return opentelemetry::nostd::unique_ptr<DoubleCounter>{
+        new DoubleCounter(name, description, unit, enabled)};
+  }
 
   /**
    * Creates, adds to private metrics container, and returns an IntCounter with "name."
@@ -54,11 +59,14 @@ public:
    * @throws IllegalArgumentException if a different metric by the same name exists in this meter.
    * @throws IllegalArgumentException if the {@code name} does not match spec requirements.
    */
-  virtual opentelemetry::nostd::unique_ptr<metrics::IntCounter> NewIntCounter(
-      nostd::string_view name,
-      nostd::string_view description,
-      nostd::string_view unit,
-      const bool enabled);
+  virtual opentelemetry::nostd::unique_ptr<IntCounter> NewIntCounter(nostd::string_view name,
+                                                                     nostd::string_view description,
+                                                                     nostd::string_view unit,
+                                                                     const bool enabled)
+  {
+    return opentelemetry::nostd::unique_ptr<IntCounter>{
+        new IntCounter(name, description, unit, enabled)};
+  }
 
   /**
    * Creates, adds to private metrics container, and returns a DoubleUpDownCounter with "name."
@@ -72,11 +80,15 @@ public:
    * @throws IllegalArgumentException if a different metric by the same name exists in this meter.
    * @throws IllegalArgumentException if the {@code name} does not match spec requirements.
    */
-  virtual opentelemetry::nostd::unique_ptr<metrics::DoubleUpDownCounter> NewDoubleUpDownCounter(
+  virtual opentelemetry::nostd::unique_ptr<DoubleUpDownCounter> NewDoubleUpDownCounter(
       nostd::string_view name,
       nostd::string_view description,
       nostd::string_view unit,
-      const bool enabled);
+      const bool enabled)
+  {
+    return opentelemetry::nostd::unique_ptr<DoubleUpDownCounter>{
+        new DoubleUpDownCounter(name, description, unit, enabled)};
+  }
 
   /**
    * Creates, adds to private metrics container, and returns an IntUpDownCounter with "name."
@@ -94,7 +106,11 @@ public:
       nostd::string_view name,
       nostd::string_view description,
       nostd::string_view unit,
-      const bool enabled);
+      const bool enabled)
+  {
+    return opentelemetry::nostd::unique_ptr<IntUpDownCounter>{
+        new IntUpDownCounter(name, description, unit, enabled)};
+  }
 
   /**
    * Creates, adds to private metrics container, and returns a DoubleValueRecorder with "name."
@@ -112,7 +128,11 @@ public:
       nostd::string_view name,
       nostd::string_view description,
       nostd::string_view unit,
-      const bool enabled);
+      const bool enabled)
+  {
+    return opentelemetry::nostd::unique_ptr<DoubleValueRecorder>{
+        new DoubleValueRecorder(name, description, unit, enabled)};
+  }
 
   /**
    * Creates, adds to private metrics container, and returns an IntValueRecorder with "name."
@@ -130,7 +150,11 @@ public:
       nostd::string_view name,
       nostd::string_view description,
       nostd::string_view unit,
-      bool enabled);
+      bool enabled)
+  {
+    return opentelemetry::nostd::unique_ptr<IntValueRecorder>{
+        new IntValueRecorder(name, description, unit, enabled)};
+  }
 
   /**
    * Creates, adds to private metrics container, and returns a DoubleSumObserver with "name."
@@ -148,7 +172,12 @@ public:
       nostd::string_view name,
       nostd::string_view description,
       nostd::string_view unit,
-      const bool enabled);
+      const bool enabled,
+      void (*callback)(DoubleObserverResult))
+  {
+    return opentelemetry::nostd::unique_ptr<DoubleSumObserver>{
+        new DoubleSumObserver(name, description, unit, enabled, callback)};
+  }
 
   /**
    * Creates, adds to private metrics container, and returns an IntSumObserver with "name."
@@ -166,7 +195,12 @@ public:
       nostd::string_view name,
       nostd::string_view description,
       nostd::string_view unit,
-      const bool enabled);
+      const bool enabled,
+      void (*callback)(IntObserverResult))
+  {
+    return opentelemetry::nostd::unique_ptr<IntSumObserver>{
+        new IntSumObserver(name, description, unit, enabled, callback)};
+  }
 
   /**
    * Creates, adds to private metrics container, and returns a DoubleUpDownSumObserver with "name."
@@ -184,7 +218,12 @@ public:
   NewDoubleUpDownSumObserver(nostd::string_view name,
                              nostd::string_view description,
                              nostd::string_view unit,
-                             const bool enabled);
+                             const bool enabled,
+                             void (*callback)(DoubleObserverResult))
+  {
+    return opentelemetry::nostd::unique_ptr<DoubleUpDownSumObserver>{
+        new DoubleUpDownSumObserver(name, description, unit, enabled, callback)};
+  }
 
   /**
    * Creates, adds to private metrics container, and returns an IntUpDownSumObserver with "name."
@@ -202,7 +241,12 @@ public:
       nostd::string_view name,
       nostd::string_view description,
       nostd::string_view unit,
-      const bool enabled);
+      const bool enabled,
+      void (*callback)(IntObserverResult))
+  {
+    return opentelemetry::nostd::unique_ptr<IntUpDownSumObserver>{
+        new IntUpDownSumObserver(name, description, unit, enabled, callback)};
+  }
 
   /**
    * Creates, adds to private metrics container, and returns a DoubleValueObserver with "name."
@@ -220,7 +264,12 @@ public:
       nostd::string_view name,
       nostd::string_view description,
       nostd::string_view unit,
-      const bool enabled);
+      const bool enabled,
+      void (*callback)(DoubleObserverResult))
+  {
+    return opentelemetry::nostd::unique_ptr<DoubleValueObserver>{
+        new DoubleValueObserver(name, description, unit, enabled, callback)};
+  }
 
   /**
    * Creates, adds to private metrics container, and returns an IntValueObserver with "name."
@@ -238,7 +287,12 @@ public:
       nostd::string_view name,
       nostd::string_view description,
       nostd::string_view unit,
-      const bool enabled);
+      const bool enabled,
+      void (*callback)(IntObserverResult))
+  {
+    return opentelemetry::nostd::unique_ptr<IntValueObserver>{
+        new IntValueObserver(name, description, unit, enabled, callback)};
+  }
 
   /**
    * Utility method that allows users to atomically record measurements to a set of
@@ -251,7 +305,10 @@ public:
    *        the batch of the associated instrument type.
    */
   virtual void RecordBatch(nostd::string_view labels,
-                           const trace::KeyValueIterable &values) noexcept;
+                           const trace::KeyValueIterable &values) noexcept
+  {
+    // No-op
+  }
 };
-}  // namespace meter
+}  // namespace metrics
 OPENTELEMETRY_END_NAMESPACE
