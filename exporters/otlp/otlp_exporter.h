@@ -21,6 +21,8 @@ namespace otlp
 class OtlpExporter final : public opentelemetry::sdk::trace::SpanExporter
 {
 public:
+  OtlpExporter();
+
   std::unique_ptr<sdk::trace::Recordable> MakeRecordable() noexcept override;
 
   sdk::trace::ExportResult Export(
@@ -29,9 +31,12 @@ public:
   void Shutdown(std::chrono::microseconds timeout = std::chrono::microseconds(0)) noexcept override {};
 
 private:
-  // Add span data from recordables to request
-  void PopulateRequest(const nostd::span<std::unique_ptr<sdk::trace::Recordable>> &spans,
-                       proto::collector::trace::v1::ExportTraceServiceRequest *request);
+  // For testing
+  friend class OtlpExporterTestPeer;
+
+  std::unique_ptr<proto::collector::trace::v1::TraceService::StubInterface> trace_service_stub_;
+
+  OtlpExporter(std::unique_ptr<proto::collector::trace::v1::TraceService::StubInterface> stub);
 };
 }  // namespace otlp
 }  // namespace exporter

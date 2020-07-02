@@ -81,4 +81,5 @@ cc_grpc_library(
     srcs = [":trace_service_proto"],
     grpc_only = True,
     deps = [":trace_service_proto_cc"],
+    generate_mocks = True,
 )
