@@ -41,13 +41,13 @@ void Recordable::SetName(nostd::string_view name) noexcept
 void Recordable::SetStartTime(opentelemetry::core::SystemTimestamp start_time) noexcept
 {
   const uint64_t nano_unix_time = start_time.time_since_epoch().count();
-  span_.set_start_time_unixnano(nano_unix_time);
+  span_.set_start_time_unix_nano(nano_unix_time);
 }
 
 void Recordable::SetDuration(std::chrono::nanoseconds duration) noexcept
 {
-  const uint64_t unix_end_time = span_.start_time_unixnano() + duration.count();
-  span_.set_end_time_unixnano(unix_end_time);
+  const uint64_t unix_end_time = span_.start_time_unix_nano() + duration.count();
+  span_.set_end_time_unix_nano(unix_end_time);
 }
 }  // namespace otlp
 }  // namespace exporter

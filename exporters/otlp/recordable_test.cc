@@ -51,7 +51,7 @@ TEST(Recordable, SetStartTime)
       std::chrono::duration_cast<std::chrono::nanoseconds>(start_time.time_since_epoch()).count();
 
   rec.SetStartTime(start_timestamp);
-  EXPECT_EQ(rec.span().start_time_unixnano(), unix_start);
+  EXPECT_EQ(rec.span().start_time_unix_nano(), unix_start);
 }
 
 TEST(Recordable, SetDuration)
@@ -66,7 +66,7 @@ TEST(Recordable, SetDuration)
   rec.SetStartTime(start_timestamp);
   rec.SetDuration(duration);
 
-  EXPECT_EQ(rec.span().end_time_unixnano(), unix_end);
+  EXPECT_EQ(rec.span().end_time_unix_nano(), unix_end);
 }
 }  // namespace otlp
 }  // namespace exporter
