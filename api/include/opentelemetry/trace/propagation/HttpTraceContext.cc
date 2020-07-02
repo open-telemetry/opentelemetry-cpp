@@ -2,10 +2,11 @@
 #include <regex>
 #include <stdexcept>
 #include "opentelemetry/trace/propagation/httptextformat.h"
+#include "opentelemetry/trace/spancontext.h"
 #include "opentelemetry/context/context.h"
 #include "opentelemetry/nostd/string_view.h"
 #include "opentelemetry/nostd/span.h"
-#include "opentelemetry/common/variant.h"
+#include "opentelemetry/trace/default_span.cc"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace trace
@@ -15,7 +16,7 @@ namespace propagation
 namespace
 {
 
-static Context SetSpanInContext(common::AttributeValue span, Context &context) {
+static Context SetSpanInContext(Span span, Context &context) {
     Context new_values = Context(context);
     // I don't know if the SPAN_KEY is defined in the context.h.
     // My point is that since each key when it is created is unique in terms of its id even though they may have the same name,
@@ -55,12 +56,12 @@ class HttpTraceContext : public HTTPTextFormat
                 // We don't have span.getContext() in span.h, should we just use span? As well as acquiring validity. (I do know how to implement them though)
                 return;
             }
-            injectImpl(span.getContext(), carrier, setter); // span.getContext() function needed
+            injectImpl(setter, carrier, span.getContext());
         }
 
         Context extract(Getter getter, const T &carrier, Context &context) override {
             SpanContext spanContext = extractImpl(carrier, getter);
-            return SetSpanInContext(trace.DefaultSpan(spanContext), context); // I actually need a default span class (implemented) here, I don't know who to ask for though. But both python and java version have default span classes though.
+            return SetSpanInContext(trace.DefaultSpan(spanContext), context);
         }
 
     private:
@@ -105,7 +106,6 @@ class HttpTraceContext : public HTTPTextFormat
             }
 
             try {
-                // I am assuming that these functions are provided in those respective classes for this is the case in the Java version, despite the python version is using regular expression within this class.
                 TraceId traceId = TraceId.fromLowerBase16(traceparent, TRACE_ID_OFFSET);
                 SpanId spanId = SpanId.fromLowerBase16(traceparent, SPAN_ID_OFFSET);
                 TraceFlags traceFlags = TraceFlags.fromLowerBase16(traceparent, TRACE_OPTION_OFFSET);
@@ -148,12 +148,11 @@ class HttpTraceContext : public HTTPTextFormat
         static SpanContext extractImpl(Getter getter, T &carrier) {
             nostd::string_view traceParent = getter(carrier, TRACE_PARENT);
             if (traceParent == NULL) {
-                return SpanContext.getInvalid(); // I need support of this method from SpanContext definition which is currently unavailable it seems
+                return SpanContext.getInvalid();
             }
 
             SpanContext contextFromParentHeader = extractContextFromTraceParent(traceParent);
             if (!contextFromParentHeader.isValid()) {
-                // Again, I still need the support of this method from context.
                 return contextFromParentHeader;
             }
 
