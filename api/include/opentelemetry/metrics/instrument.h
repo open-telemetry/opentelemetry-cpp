@@ -24,7 +24,7 @@ enum class InstrumentKind
   DoubleUpDownSumObserver
 };
 
-// Fewer Bound types because Asynchronous instrument cannot bind
+// Fewer Bound types because Asynchronous instruments cannot bind
 enum class BoundInstrumentKind
 {
   BoundIntCounter,
@@ -53,8 +53,8 @@ public:
      * 
      * @param name is the identifier of the instrumenting library
      * @param description explains what the metric captures
-     * @param unit specified the data type held in the instrument
-     * @param enabled determins if the metric is currently capturing data
+     * @param unit specifies the data type held in the instrument
+     * @param enabled determines if the metric is currently capturing data
      * @return Instrument type with the specified attirbutes
      */
     Instrument(nostd::string_view name, 
@@ -93,7 +93,7 @@ public:
 
     BoundSynchronousInstrument(nostd::string_view name, 
                                nostd::string_view description, nostd::string_view unit, 
-                               bool enabled, BoundInstrumentKind kind);
+                               bool enabled){}
 
     /**
     * Frees the resources associated with this Bound Instrument.
@@ -108,7 +108,7 @@ public:
     * Records a single synchronous metric event; a call to the aggregator
     * Since this is a bound synchronous instrument, labels are not required in  * metric capture calls.
     *
-    * @param value the numerical representation of the metric being captured
+    * @param value is the numerical representation of the metric being captured
     * @return void
    */
     virtual void update(nostd::variant<int,double> value) final {} //don't want this overriden because the base boundsynchronousinstrument will call the aggregator in the sdk
@@ -123,8 +123,7 @@ public:
 
     SynchronousInstrument(nostd::string_view name, 
                           nostd::string_view description, 
-                          nostd::string_view unit, bool enabled, 
-                          InstrumentKind kind);
+                          nostd::string_view unit, bool enabled);
 
     /**
     * Returns a Bound Instrument associated with the specified labels.         * Multiples requests with the same set of labels may return the same
@@ -133,7 +132,7 @@ public:
     * It is recommended that callers keep a reference to the Bound Instrument
     * instead of repeatedly calling this operation.
     *
-    * @param labels the set of labels, as key-value pairs.
+    * @param labels the set of labels, as key-value pairs
     * @return a Bound Instrument
    */
     BoundSynchronousInstrument bind(const nostd::string_view & labels) {
@@ -147,8 +146,8 @@ public:
     * update can be used in instruments with both add or record since it simply
     * activated the aggregator
     *
-    * @param labels the set of labels, as key-value pairs.
-    * @param value the numerical representation of the metric being captured
+    * @param labels the set of labels, as key-value pairs
+    * @param value is the numerical representation of the metric being captured
     * @return void
    */
     virtual void update(nostd::variant<int,double> value, nostd::string_view &labels) final {} 
@@ -166,14 +165,14 @@ public:
                            nostd::string_view description, 
                            nostd::string_view unit, 
                            bool enabled, 
-                           void (*callback)(ObserverResult)) {}
+                           void (callback)(ObserverResult)) {}
 
     /**
      * Captures data by activating the callback function associated with the 
      * instrument and storing its return value.  Callbacks for asychronous 
      * instruments are defined during construction.
      * 
-     * @param none
+     * @param value is the numerical representation of the metric being captured
      * @return none
      */
     virtual void observe(int value, const nostd::string_view & labels){}

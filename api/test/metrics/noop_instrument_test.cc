@@ -1,4 +1,3 @@
-
 #include "opentelemetry/metrics/noop.h"
 #include <cstring>
 #include <string>

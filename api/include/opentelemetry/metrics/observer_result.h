@@ -1,24 +1,26 @@
 #pragma once
 
 #include "instrument.h"
+#include "opentelemetry/nostd/shared_ptr.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace metrics
 {
 
 /** 
-* ObserverResult class is necessary for batch recording.  Callback functions
-* to asynchronous instruments are also designed to accept a single 
-* ObserverResult object and update using its pointer to the instrument itself.
+* ObserverResult class is necessary for the callback recording asynchronous
+* instrument use.  Callback functions asynchronous instruments are designed to
+* accept a single ObserverResult object and update using its pointer to the
+* instrument itself.
 */
 class ObserverResult {
 
 public:
     ObserverResult() = default;
 
-    ObserverResult(AsynchronousInstrument *instrument):instrument_(instrument){}
+    ObserverResult(nostd::shared_ptr<AsynchronousInstrument> instrument):instrument_(instrument){}
 
-    AsynchronousInstrument *instrument_;
+    nostd::shared_ptr<AsynchronousInstrument> instrument_;
 };
 
 class IntObserverResult: public ObserverResult {
@@ -27,7 +29,7 @@ public:
 
     IntObserverResult() = default;
 
-    IntObserverResult(AsynchronousInstrument *instrument):
+    IntObserverResult(nostd::shared_ptr<AsynchronousInstrument> instrument):
                                                 ObserverResult(instrument){}
 
     void observe(int value, const nostd::string_view &labels){
@@ -42,7 +44,7 @@ public:
 
     DoubleObserverResult() = default;
     
-    DoubleObserverResult(AsynchronousInstrument *instrument):
+    DoubleObserverResult(nostd::shared_ptr<AsynchronousInstrument> instrument):
                                                 ObserverResult(instrument){}
 
     void observe(double value, const nostd::string_view &labels){

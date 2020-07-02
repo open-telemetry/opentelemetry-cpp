@@ -26,7 +26,7 @@ public:
     * Updates the instruments aggregator with the new value. The labels should
     * contain the keys and values to be associated with this value.  
     * 
-    * @param value the numerical representation of the metric being captured
+    * @param value is the numerical representation of the metric being captured
     * @param labels the set of labels, as key-value pairs
     */
     virtual void observe(int value, const nostd::string_view &labels) override{}
@@ -45,13 +45,6 @@ public:
                         bool enabled, 
                         void (*callback)(DoubleObserverResult)) {}
 
-    /*
-    * Updates the instruments aggregator with the new value. The labels should
-    * contain the keys and values to be associated with this value. 
-    * 
-    * @param value the numerical representation of the metric being captured
-    * @param labels the set of labels, as key-value pairs
-    */
     virtual void observe(double value, const nostd::string_view &labels) override {}
 
 };
@@ -72,7 +65,7 @@ public:
     * Add adds the value to the counter's sum. The labels should contain
     * the keys and values to be associated with this value.  Counters only     * accept positive valued updates.
     * 
-    * @param value the numerical representation of the metric being captured
+    * @param value is the numerical representation of the metric being captured
     * @param labels the set of labels, as key-value pairs
     */
     virtual void observe(int value, const nostd::string_view &labels) override {}
@@ -107,14 +100,6 @@ public:
                          bool enabled, 
                          void (*callback)(IntObserverResult)) {}
 
-    /*
-    * Add adds the value to the counter's sum. The labels should contain
-    * the keys and values to be associated with this value.  UpDownCounters can
-    * accepts both positive and negative updates.
-    * 
-    * @param value the numerical representation of the metric being captured
-    * @param labels the set of labels, as key-value pairs
-    */
     virtual void observe(int value, const nostd::string_view &labels) override {}
 
 };

@@ -52,9 +52,6 @@ public:
                          nostd::string_view /*unit*/, 
                          bool /*enabled*/, 
                          void (*callback)(IntObserverResult)) {}
-                         // I was originally calling the base class constructor here as well
-                         // IntValueObserver(name,description, unit,...)
-                         // but do not think that's necessary for the API's noop
 
 };
 
