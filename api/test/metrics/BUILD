@@ -1,7 +1,7 @@
 cc_test(
-    name = "noop_test_metrics",
+    name = "noop_metrics_test",
     srcs = [
-        "noop_test_metrics.cc",
+        "noop_metrics_test.cc",
     ],
     deps = [
         "//api",
