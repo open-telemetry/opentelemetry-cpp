@@ -1,3 +1,13 @@
+#pragma once
+
+#include "opentelemetry/metrics/meter.h"
+#include "opentelemetry/nostd/string_view.h"
+#include "opentelemetry/nostd/unique_ptr.h"
+#include "opentelemetry/trace/key_value_iterable_view.h"
+
+OPENTELEMETRY_BEGIN_NAMESPACE
+namespace metrics
+{
 /**
  * No-op implementation of Meter. This class should not be used directly.
  */
