@@ -1,8 +1,8 @@
 #include "otlp_exporter.h"
+#include "opentelemetry/proto/collector/trace/v1/trace_service_mock.grpc.pb.h"
 #include "opentelemetry/sdk/trace/simple_processor.h"
 #include "opentelemetry/sdk/trace/tracer_provider.h"
 #include "opentelemetry/trace/provider.h"
-#include "opentelemetry/proto/collector/trace/v1/trace_service_mock.grpc.pb.h"
 
 #include <gtest/gtest.h>
 
@@ -17,11 +17,10 @@ namespace otlp
 class OtlpExporterTestPeer : public ::testing::Test
 {
 public:
-  std::unique_ptr<OtlpExporter> GetExporter(
-    proto::collector::trace::v1::TraceService::StubInterface* mock_stub)
+  std::unique_ptr<sdk::trace::SpanExporter> GetExporter(
+      std::unique_ptr<proto::collector::trace::v1::TraceService::StubInterface> &stub_interface)
   {
-    return std::unique_ptr<OtlpExporter>(
-      new OtlpExporter(std::unique_ptr<proto::collector::trace::v1::TraceService::StubInterface>(mock_stub)));
+    return std::unique_ptr<sdk::trace::SpanExporter>(new OtlpExporter(std::move(stub_interface)));
   }
 };
 
@@ -29,7 +28,9 @@ public:
 TEST_F(OtlpExporterTestPeer, ExportUnitTest)
 {
   auto mock_stub = new proto::collector::trace::v1::MockTraceServiceStub();
-  auto exporter = std::shared_ptr<sdk::trace::SpanExporter>(GetExporter(mock_stub));
+  std::unique_ptr<proto::collector::trace::v1::TraceService::StubInterface> stub_interface(
+      mock_stub);
+  auto exporter = GetExporter(stub_interface);
 
   auto recordable_1 = exporter->MakeRecordable();
   recordable_1->SetName("Test span 1");
@@ -38,13 +39,15 @@ TEST_F(OtlpExporterTestPeer, ExportUnitTest)
 
   // Test successful RPC
   nostd::span<std::unique_ptr<sdk::trace::Recordable>> batch_1(&recordable_1, 1);
-  EXPECT_CALL(*mock_stub, Export(_,_,_)).Times(Exactly(1)).WillOnce(Return(grpc::Status::OK));
+  EXPECT_CALL(*mock_stub, Export(_, _, _)).Times(Exactly(1)).WillOnce(Return(grpc::Status::OK));
   auto result = exporter->Export(batch_1);
   EXPECT_EQ(sdk::trace::ExportResult::kSuccess, result);
 
   // Test failed RPC
   nostd::span<std::unique_ptr<sdk::trace::Recordable>> batch_2(&recordable_2, 1);
-  EXPECT_CALL(*mock_stub, Export(_,_,_)).Times(Exactly(1)).WillOnce(Return(grpc::Status::CANCELLED));
+  EXPECT_CALL(*mock_stub, Export(_, _, _))
+      .Times(Exactly(1))
+      .WillOnce(Return(grpc::Status::CANCELLED));
   result = exporter->Export(batch_2);
   EXPECT_EQ(sdk::trace::ExportResult::kFailure, result);
 }
@@ -53,19 +56,23 @@ TEST_F(OtlpExporterTestPeer, ExportUnitTest)
 TEST_F(OtlpExporterTestPeer, ExportIntegrationTest)
 {
   auto mock_stub = new proto::collector::trace::v1::MockTraceServiceStub();
-  auto exporter = std::unique_ptr<sdk::trace::SpanExporter>(GetExporter(mock_stub));
+  std::unique_ptr<proto::collector::trace::v1::TraceService::StubInterface> stub_interface(
+      mock_stub);
+
+  auto exporter = GetExporter(stub_interface);
 
   auto processor = std::shared_ptr<sdk::trace::SpanProcessor>(
-    new sdk::trace::SimpleSpanProcessor(std::move(exporter)));
-  auto provider = nostd::shared_ptr<trace::TracerProvider>(new sdk::trace::TracerProvider(processor));
-  trace::Provider::SetTracerProvider(provider);
+      new sdk::trace::SimpleSpanProcessor(std::move(exporter)));
+  auto provider =
+      nostd::shared_ptr<trace::TracerProvider>(new sdk::trace::TracerProvider(processor));
+  auto tracer = provider->GetTracer("test");
 
-  nostd::shared_ptr<trace::Tracer> tracer = provider->GetTracer("test");
-
-  EXPECT_CALL(*mock_stub, Export(_,_,_)).Times(AtLeast(1)).WillRepeatedly(Return(grpc::Status::OK));
+  EXPECT_CALL(*mock_stub, Export(_, _, _))
+      .Times(AtLeast(1))
+      .WillRepeatedly(Return(grpc::Status::OK));
 
   auto parent_span = tracer->StartSpan("Test parent span");
-  auto child_span = tracer->StartSpan("Test child span");
+  auto child_span  = tracer->StartSpan("Test child span");
   child_span->End();
   parent_span->End();
 }
