@@ -21,9 +21,13 @@
 
 using namespace OPENTELEMETRY_NAMESPACE;
 
-namespace nostd  = OPENTELEMETRY_NAMESPACE::nostd;
-namespace common = OPENTELEMETRY_NAMESPACE::common;
-
+/// <summary>
+/// Print AttributeValue that contains nostd::span<T>
+/// </summary>
+/// <typeparam name="T">One of primitive OT protocol types</typeparam>
+/// <param name="ss">Output stringstream</param>
+/// <param name="value">AttributeValue</param>
+/// <param name="jsonTypes">Whether to apply JSON-style formatting</param>
 template <typename T>
 static void print_array(std::stringstream &ss, common::AttributeValue &value, bool jsonTypes = false)
 {
@@ -42,12 +46,12 @@ static void print_array(std::stringstream &ss, common::AttributeValue &value, bo
   ss << ']';
 };
 
-    /// <summary>
+/// <summary>
 /// Utility function to append AttributeValue string representation to stream
 /// </summary>
 /// <param name="ss">Output stringstream</param>
-/// <param name="value">Value to append</param>
-/// <param name="jsonTypes">Whether to apply JSON-style quotes</param>
+/// <param name="value">AttributeValue/param>
+/// <param name="jsonTypes">Whether to apply JSON-style formatting</param>
 static void print_value(std::stringstream &ss,
                         common::AttributeValue &value,
                         bool jsonTypes = false)
