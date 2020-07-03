@@ -25,7 +25,6 @@ cc_library(
     include_prefix = "exporters/otlp",
     deps = [
         "//sdk/src/trace",
-        "//sdk/src/common:random",
         "@com_github_opentelemetry_proto//:trace_proto_cc",
     ],
 )
@@ -38,7 +37,6 @@ cc_library(
     ],
     deps = [
         ":recordable",
-        "//api",
         "//sdk/src/trace",
         "@com_github_opentelemetry_proto//:trace_proto_cc",
         "@com_github_opentelemetry_proto//:trace_service_proto_cc",
@@ -63,6 +61,7 @@ cc_test(
     srcs = ["otlp_exporter_test.cc"],
     deps = [
         ":otlp_exporter",
+        "//api",
         "@com_google_googletest//:gtest_main",
     ],
 )

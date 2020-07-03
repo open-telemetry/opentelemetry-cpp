@@ -10,23 +10,28 @@ const std::string KCollectorAddress = "localhost:55678";
 
 // ----------------------------- Helper functions ------------------------------
 
-// Add span protobufs contained in recordables to request
+/**
+ * Add span protobufs contained in recordables to request.
+ * @param spans the spans to export
+ * @param request the current request
+ */
 void PopulateRequest(const nostd::span<std::unique_ptr<sdk::trace::Recordable>> &spans,
                      proto::collector::trace::v1::ExportTraceServiceRequest *request)
 {
-  auto resource_span = request->add_resource_spans();
+  auto resource_span       = request->add_resource_spans();
   auto instrumentation_lib = resource_span->add_instrumentation_library_spans();
 
-  for (auto &recordable : spans) {
-    auto rec = std::unique_ptr<Recordable>(
-      static_cast<Recordable *>(recordable.release()));
+  for (auto &recordable : spans)
+  {
+    auto rec = std::unique_ptr<Recordable>(static_cast<Recordable *>(recordable.release()));
 
-    proto::trace::v1::Span* span = instrumentation_lib->add_spans();
-    span->CopyFrom(rec->span());
+    *instrumentation_lib->add_spans() = std::move(rec->span());
   }
 }
 
-// Establish connection to OpenTelemetry Collector
+/**
+ * Create service stub to communicate with the OpenTelemetry Collector.
+ */
 std::unique_ptr<proto::collector::trace::v1::TraceService::Stub> MakeServiceStub()
 {
   auto channel = grpc::CreateChannel(KCollectorAddress, grpc::InsecureChannelCredentials());
@@ -35,11 +40,12 @@ std::unique_ptr<proto::collector::trace::v1::TraceService::Stub> MakeServiceStub
 
 // -------------------------------- Contructors --------------------------------
 
-OtlpExporter::OtlpExporter(): OtlpExporter(MakeServiceStub()) {}
+OtlpExporter::OtlpExporter() : OtlpExporter(MakeServiceStub()) {}
 
 OtlpExporter::OtlpExporter(
-  std::unique_ptr<proto::collector::trace::v1::TraceService::StubInterface> stub):
-    trace_service_stub_(std::move(stub)) {}
+    std::unique_ptr<proto::collector::trace::v1::TraceService::StubInterface> stub)
+    : trace_service_stub_(std::move(stub))
+{}
 
 // ----------------------------- Exporter methods ------------------------------
 
@@ -49,7 +55,7 @@ std::unique_ptr<sdk::trace::Recordable> OtlpExporter::MakeRecordable() noexcept
 }
 
 sdk::trace::ExportResult OtlpExporter::Export(
-  const nostd::span<std::unique_ptr<sdk::trace::Recordable>> &spans) noexcept
+    const nostd::span<std::unique_ptr<sdk::trace::Recordable>> &spans) noexcept
 {
   proto::collector::trace::v1::ExportTraceServiceRequest request;
 
@@ -60,7 +66,8 @@ sdk::trace::ExportResult OtlpExporter::Export(
 
   grpc::Status status = trace_service_stub_->Export(&context, request, &response);
 
-  if(!status.ok()){
+  if (!status.ok())
+  {
     std::cerr << "OTLP trace exporter: Export() failed\n";
     return sdk::trace::ExportResult::kFailure;
   }
