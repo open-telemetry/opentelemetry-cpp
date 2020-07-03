@@ -1,7 +1,7 @@
 #pragma once
 
 #include "opentelemetry/nostd/string_view.h"
-#include "opentelemetry/nostd/unique_ptr.h"
+#include "opentelemetry/nostd/shared_ptr.h"
 #include "opentelemetry/trace/key_value_iterable_view.h"
 #include "opentelemetry/version.h"
 
@@ -25,6 +25,14 @@ class Meter
 public:
   virtual ~Meter() = default;
 
+  //////////////////////////////
+  //                          //
+  // Change pointer type to   //
+  // SynchronousInstrument or //
+  // AsynchronousInstrument?  //
+  //                          //
+  //////////////////////////////
+
   /**
    * Creates, adds to private metrics container, and returns a DoubleCounter with "name."
    *
@@ -32,18 +40,18 @@ public:
    * @param description a brief description of what the DoubleCounter is used for.
    * @param unit the unit of metric values following https://unitsofmeasure.org/ucum.html.
    * @param enabled a boolean value that turns on or off the metric instrument.
-   * @return a unique pointer to the created DoubleCounter.
+   * @return a shared pointer to the created DoubleCounter.
    * @throws NullPointerException if {@code name} is null
    * @throws IllegalArgumentException if a different metric by the same name exists in this meter.
    * @throws IllegalArgumentException if the {@code name} does not match spec requirements.
    */
-  virtual opentelemetry::nostd::unique_ptr<DoubleCounter> NewDoubleCounter(
+  virtual opentelemetry::nostd::shared_ptr<SynchronousInstrument> NewDoubleCounter(
       nostd::string_view name,
       nostd::string_view description,
       nostd::string_view unit,
       const bool enabled)
   {
-    return opentelemetry::nostd::unique_ptr<DoubleCounter>{
+    return opentelemetry::nostd::shared_ptr<SynchronousInstrument>{
         new DoubleCounter(name, description, unit, enabled)};
   }
 
@@ -54,17 +62,17 @@ public:
    * @param description a brief description of what the IntCounter is used for.
    * @param unit the unit of metric values following https://unitsofmeasure.org/ucum.html.
    * @param enabled a boolean value that turns on or off the metric instrument.
-   * @return a unique pointer to the created IntCounter.
+   * @return a shared pointer to the created IntCounter.
    * @throws NullPointerException if {@code name} is null
    * @throws IllegalArgumentException if a different metric by the same name exists in this meter.
    * @throws IllegalArgumentException if the {@code name} does not match spec requirements.
    */
-  virtual opentelemetry::nostd::unique_ptr<IntCounter> NewIntCounter(nostd::string_view name,
+  virtual opentelemetry::nostd::shared_ptr<SynchronousInstrument> NewIntCounter(nostd::string_view name,
                                                                      nostd::string_view description,
                                                                      nostd::string_view unit,
                                                                      const bool enabled)
   {
-    return opentelemetry::nostd::unique_ptr<IntCounter>{
+    return opentelemetry::nostd::shared_ptr<SynchronousInstrument>{
         new IntCounter(name, description, unit, enabled)};
   }
 
@@ -75,18 +83,18 @@ public:
    * @param description a brief description of what the DoubleUpDownCounter is used for.
    * @param unit the unit of metric values following https://unitsofmeasure.org/ucum.html.
    * @param enabled a boolean value that turns on or off the metric instrument.
-   * @return a unique pointer to the created DoubleUpDownCounter.
+   * @return a shared pointer to the created DoubleUpDownCounter.
    * @throws NullPointerException if {@code name} is null
    * @throws IllegalArgumentException if a different metric by the same name exists in this meter.
    * @throws IllegalArgumentException if the {@code name} does not match spec requirements.
    */
-  virtual opentelemetry::nostd::unique_ptr<DoubleUpDownCounter> NewDoubleUpDownCounter(
+  virtual opentelemetry::nostd::shared_ptr<SynchronousInstrument> NewDoubleUpDownCounter(
       nostd::string_view name,
       nostd::string_view description,
       nostd::string_view unit,
       const bool enabled)
   {
-    return opentelemetry::nostd::unique_ptr<DoubleUpDownCounter>{
+    return opentelemetry::nostd::shared_ptr<SynchronousInstrument>{
         new DoubleUpDownCounter(name, description, unit, enabled)};
   }
 
@@ -97,18 +105,18 @@ public:
    * @param description a brief description of what the IntUpDownCounter is used for.
    * @param unit the unit of metric values following https://unitsofmeasure.org/ucum.html.
    * @param enabled a boolean value that turns on or off the metric instrument.
-   * @return a unique pointer to the created IntUpDownCounter.
+   * @return a shared pointer to the created IntUpDownCounter.
    * @throws NullPointerException if {@code name} is null
    * @throws IllegalArgumentException if a different metric by the same name exists in this meter.
    * @throws IllegalArgumentException if the {@code name} does not match spec requirements.
    */
-  virtual opentelemetry::nostd::unique_ptr<metrics::IntUpDownCounter> NewIntUpDownCounter(
+  virtual opentelemetry::nostd::shared_ptr<SynchronousInstrument> NewIntUpDownCounter(
       nostd::string_view name,
       nostd::string_view description,
       nostd::string_view unit,
       const bool enabled)
   {
-    return opentelemetry::nostd::unique_ptr<IntUpDownCounter>{
+    return opentelemetry::nostd::shared_ptr<SynchronousInstrument>{
         new IntUpDownCounter(name, description, unit, enabled)};
   }
 
@@ -119,18 +127,18 @@ public:
    * @param description a brief description of what the DoubleValueRecorder is used for.
    * @param unit the unit of metric values following https://unitsofmeasure.org/ucum.html.
    * @param enabled a boolean value that turns on or off the metric instrument.
-   * @return a unique pointer to the created DoubleValueRecorder.
+   * @return a shared pointer to the created DoubleValueRecorder.
    * @throws NullPointerException if {@code name} is null
    * @throws IllegalArgumentException if a different metric by the same name exists in this meter.
    * @throws IllegalArgumentException if the {@code name} does not match spec requirements.
    */
-  virtual opentelemetry::nostd::unique_ptr<metrics::DoubleValueRecorder> NewDoubleValueRecorder(
+  virtual opentelemetry::nostd::shared_ptr<SynchronousInstrument> NewDoubleValueRecorder(
       nostd::string_view name,
       nostd::string_view description,
       nostd::string_view unit,
       const bool enabled)
   {
-    return opentelemetry::nostd::unique_ptr<DoubleValueRecorder>{
+    return opentelemetry::nostd::shared_ptr<SynchronousInstrument>{
         new DoubleValueRecorder(name, description, unit, enabled)};
   }
 
@@ -141,18 +149,18 @@ public:
    * @param description a brief description of what the IntValueRecorder is used for.
    * @param unit the unit of metric values following https://unitsofmeasure.org/ucum.html.
    * @param enabled a boolean value that turns on or off the metric instrument.
-   * @return a unique pointer to the created IntValueRecorder.
+   * @return a shared pointer to the created IntValueRecorder.
    * @throws NullPointerException if {@code name} is null
    * @throws IllegalArgumentException if a different metric by the same name exists in this meter.
    * @throws IllegalArgumentException if the {@code name} does not match spec requirements.
    */
-  virtual opentelemetry::nostd::unique_ptr<metrics::IntValueRecorder> NewIntValueRecorder(
+  virtual opentelemetry::nostd::shared_ptr<SynchronousInstrument> NewIntValueRecorder(
       nostd::string_view name,
       nostd::string_view description,
       nostd::string_view unit,
       bool enabled)
   {
-    return opentelemetry::nostd::unique_ptr<IntValueRecorder>{
+    return opentelemetry::nostd::shared_ptr<SynchronousInstrument>{
         new IntValueRecorder(name, description, unit, enabled)};
   }
 
@@ -163,19 +171,19 @@ public:
    * @param description a brief description of what the DoubleSumObserver is used for.
    * @param unit the unit of metric values following https://unitsofmeasure.org/ucum.html.
    * @param enabled a boolean value that turns on or off the metric instrument.
-   * @return a unique pointer to the created DoubleSumObserver.
+   * @return a shared pointer to the created DoubleSumObserver.
    * @throws NullPointerException if {@code name} is null
    * @throws IllegalArgumentException if a different metric by the same name exists in this meter.
    * @throws IllegalArgumentException if the {@code name} does not match spec requirements.
    */
-  virtual opentelemetry::nostd::unique_ptr<metrics::DoubleSumObserver> NewDoubleSumObserver(
+  virtual opentelemetry::nostd::shared_ptr<AsynchronousInstrument> NewDoubleSumObserver(
       nostd::string_view name,
       nostd::string_view description,
       nostd::string_view unit,
       const bool enabled,
       void (*callback)(DoubleObserverResult))
   {
-    return opentelemetry::nostd::unique_ptr<DoubleSumObserver>{
+    return opentelemetry::nostd::shared_ptr<AsynchronousInstrument>{
         new DoubleSumObserver(name, description, unit, enabled, callback)};
   }
 
@@ -186,19 +194,19 @@ public:
    * @param description a brief description of what the IntSumObserver is used for.
    * @param unit the unit of metric values following https://unitsofmeasure.org/ucum.html.
    * @param enabled a boolean value that turns on or off the metric instrument.
-   * @return a unique pointer to the created DoubleCounter.
+   * @return a shared pointer to the created DoubleCounter.
    * @throws NullPointerException if {@code name} is null
    * @throws IllegalArgumentException if a different metric by the same name exists in this meter.
    * @throws IllegalArgumentException if the {@code name} does not match spec requirements.
    */
-  virtual opentelemetry::nostd::unique_ptr<metrics::IntSumObserver> NewIntSumObserver(
+  virtual opentelemetry::nostd::shared_ptr<AsynchronousInstrument> NewIntSumObserver(
       nostd::string_view name,
       nostd::string_view description,
       nostd::string_view unit,
       const bool enabled,
       void (*callback)(IntObserverResult))
   {
-    return opentelemetry::nostd::unique_ptr<IntSumObserver>{
+    return opentelemetry::nostd::shared_ptr<AsynchronousInstrument>{
         new IntSumObserver(name, description, unit, enabled, callback)};
   }
 
@@ -209,19 +217,19 @@ public:
    * @param description a brief description of what the DoubleUpDownSumObserver is used for.
    * @param unit the unit of metric values following https://unitsofmeasure.org/ucum.html.
    * @param enabled a boolean value that turns on or off the metric instrument.
-   * @return a unique pointer to the created DoubleUpDownSumObserver.
+   * @return a shared pointer to the created DoubleUpDownSumObserver.
    * @throws NullPointerException if {@code name} is null
    * @throws IllegalArgumentException if a different metric by the same name exists in this meter.
    * @throws IllegalArgumentException if the {@code name} does not match spec requirements.
    */
-  virtual opentelemetry::nostd::unique_ptr<metrics::DoubleUpDownSumObserver>
+  virtual opentelemetry::nostd::shared_ptr<AsynchronousInstrument>
   NewDoubleUpDownSumObserver(nostd::string_view name,
                              nostd::string_view description,
                              nostd::string_view unit,
                              const bool enabled,
                              void (*callback)(DoubleObserverResult))
   {
-    return opentelemetry::nostd::unique_ptr<DoubleUpDownSumObserver>{
+    return opentelemetry::nostd::shared_ptr<AsynchronousInstrument>{
         new DoubleUpDownSumObserver(name, description, unit, enabled, callback)};
   }
 
@@ -232,19 +240,19 @@ public:
    * @param description a brief description of what the IntUpDownSumObserver is used for.
    * @param unit the unit of metric values following https://unitsofmeasure.org/ucum.html.
    * @param enabled a boolean value that turns on or off the metric instrument.
-   * @return a unique pointer to the created IntUpDownSumObserver.
+   * @return a shared pointer to the created IntUpDownSumObserver.
    * @throws NullPointerException if {@code name} is null
    * @throws IllegalArgumentException if a different metric by the same name exists in this meter.
    * @throws IllegalArgumentException if the {@code name} does not match spec requirements.
    */
-  virtual opentelemetry::nostd::unique_ptr<metrics::IntUpDownSumObserver> NewIntUpDownSumObserver(
+  virtual opentelemetry::nostd::shared_ptr<AsynchronousInstrument> NewIntUpDownSumObserver(
       nostd::string_view name,
       nostd::string_view description,
       nostd::string_view unit,
       const bool enabled,
       void (*callback)(IntObserverResult))
   {
-    return opentelemetry::nostd::unique_ptr<IntUpDownSumObserver>{
+    return opentelemetry::nostd::shared_ptr<AsynchronousInstrument>{
         new IntUpDownSumObserver(name, description, unit, enabled, callback)};
   }
 
@@ -255,19 +263,19 @@ public:
    * @param description a brief description of what the DoubleValueObserver is used for.
    * @param unit the unit of metric values following https://unitsofmeasure.org/ucum.html.
    * @param enabled a boolean value that turns on or off the metric instrument.
-   * @return a unique pointer to the created DoubleValueObserver.
+   * @return a shared pointer to the created DoubleValueObserver.
    * @throws NullPointerException if {@code name} is null
    * @throws IllegalArgumentException if a different metric by the same name exists in this meter.
    * @throws IllegalArgumentException if the {@code name} does not match spec requirements.
    */
-  virtual opentelemetry::nostd::unique_ptr<metrics::DoubleValueObserver> NewDoubleValueObserver(
+  virtual opentelemetry::nostd::shared_ptr<AsynchronousInstrument> NewDoubleValueObserver(
       nostd::string_view name,
       nostd::string_view description,
       nostd::string_view unit,
       const bool enabled,
       void (*callback)(DoubleObserverResult))
   {
-    return opentelemetry::nostd::unique_ptr<DoubleValueObserver>{
+    return opentelemetry::nostd::shared_ptr<AsynchronousInstrument>{
         new DoubleValueObserver(name, description, unit, enabled, callback)};
   }
 
@@ -278,19 +286,19 @@ public:
    * @param description a brief description of what the IntValueObserver is used for.
    * @param unit the unit of metric values following https://unitsofmeasure.org/ucum.html.
    * @param enabled a boolean value that turns on or off the metric instrument.
-   * @return a unique pointer to the created IntValueObserver.
+   * @return a shared pointer to the created IntValueObserver.
    * @throws NullPointerException if {@code name} is null
    * @throws IllegalArgumentException if a different metric by the same name exists in this meter.
    * @throws IllegalArgumentException if the {@code name} does not match spec requirements.
    */
-  virtual opentelemetry::nostd::unique_ptr<metrics::IntValueObserver> NewIntValueObserver(
+  virtual opentelemetry::nostd::shared_ptr<AsynchronousInstrument> NewIntValueObserver(
       nostd::string_view name,
       nostd::string_view description,
       nostd::string_view unit,
       const bool enabled,
       void (*callback)(IntObserverResult))
   {
-    return opentelemetry::nostd::unique_ptr<IntValueObserver>{
+    return opentelemetry::nostd::shared_ptr<AsynchronousInstrument>{
         new IntValueObserver(name, description, unit, enabled, callback)};
   }
 
