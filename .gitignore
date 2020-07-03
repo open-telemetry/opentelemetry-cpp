@@ -34,3 +34,9 @@
 
 # Bazel files
 /bazel-*
+
+# cmake output directory
+/out
+
+# Build tools
+/tools/vcpkg

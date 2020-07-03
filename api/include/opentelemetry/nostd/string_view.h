@@ -177,3 +177,17 @@ inline std::ostream &operator<<(std::ostream &os, string_view s)
 }
 }  // namespace nostd
 OPENTELEMETRY_END_NAMESPACE
+
+namespace std {
+  template <>
+  struct hash<OPENTELEMETRY_NAMESPACE::nostd::string_view>
+  {
+    std::size_t operator()(const OPENTELEMETRY_NAMESPACE::nostd::string_view& k) const
+    {
+        // TODO: for C++17 that has native support for std::basic_string_view it would
+        // be more performance-efficient to provide a zero-copy hash.
+        auto s = std::string(k.data(), k.size());
+        return std::hash<std::string>{}(s);
+    }
+  };
+}
