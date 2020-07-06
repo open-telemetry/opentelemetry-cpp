@@ -22,9 +22,7 @@ LatencyBoundaryName TracezDataAggregator::GetLatencyBoundary(opentelemetry::sdk:
   auto recordable_duration = recordable->GetDuration();
   for(int boundary = 0; boundary < kNumberOfLatencyBoundaries-1; boundary++)
   {
-    auto lower_limit = kLatencyBoundaries[boundary];
-    auto upper_limit = kLatencyBoundaries[boundary+1];
-    if(lower_limit <= recordable_duration && recordable_duration < upper_limit)return (LatencyBoundaryName)boundary;
+    if(kLatencyBoundaries[boundary] <= recordable_duration && recordable_duration < kLatencyBoundaries[boundary+1])return (LatencyBoundaryName)boundary;
   }
   return LatencyBoundaryName::k100SecondToMax;
 }
