@@ -51,7 +51,7 @@ TEST(ProbabilitySampler, ShouldSampleWithContext)
 	M m1 = {{}};
 	opentelemetry::trace::KeyValueIterableView<M> view{m1};
 
-	ProbabilitySampler s1(0.01);
+ 	ProbabilitySampler s1(0.01);
 
 	auto sampling_result = s1.ShouldSample(&c1, trace_id, "", span_kind, view);
 
@@ -88,8 +88,15 @@ TEST(ProbabilitySampler, GetDescription)
 	ProbabilitySampler s4(0.102030405);
 	ASSERT_EQ("ProbabilitySampler{0.102030}", s4.GetDescription());
 
-	ASSERT_THROW(ProbabilitySampler(3.00), std::invalid_argument);
-	ASSERT_THROW(ProbabilitySampler(-3.00), std::invalid_argument);
-	ASSERT_THROW(ProbabilitySampler(1.000000001), std::invalid_argument);
-	ASSERT_THROW(ProbabilitySampler(-1.000000001), std::invalid_argument);
+	ProbabilitySampler s5(3.00);
+	ASSERT_EQ("ProbabilitySampler{1.000000}", s5.GetDescription());
+
+	ProbabilitySampler s6(-3.00);
+	ASSERT_EQ("ProbabilitySampler{0.000000}", s6.GetDescription());
+
+	ProbabilitySampler s7(1.00000000001);
+	ASSERT_EQ("ProbabilitySampler{1.000000}", s7.GetDescription());
+
+	ProbabilitySampler s8(-1.00000000001);
+	ASSERT_EQ("ProbabilitySampler{0.000000}", s8.GetDescription());
 }
