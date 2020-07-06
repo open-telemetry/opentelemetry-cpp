@@ -54,8 +54,8 @@ struct AggregatedInformation{
   {
     running_spans_ = 0;
     error_spans_ = 0;
-    latency_sample_spans_.resize(kNumberOfLatencyBoundaries);
-    span_count_per_latency_bucket_.resize(kNumberOfLatencyBoundaries,0);
+    latency_sample_spans_.resize(kLatencyBoundaries.size());
+    span_count_per_latency_bucket_.resize(kLatencyBoundaries.size(),0);
   } 
 };
 

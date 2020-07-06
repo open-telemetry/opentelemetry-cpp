@@ -45,10 +45,6 @@ const std::vector<std::chrono::nanoseconds> kLatencyBoundaries = {
     std::chrono::nanoseconds(std::chrono::seconds(100)),
   };
 
-/*
- * Number of latency boundaries
- */
-const int kNumberOfLatencyBoundaries = 9;
 
 }  // namespace zpages
 }  // namespace ext

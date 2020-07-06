@@ -20,7 +20,7 @@ const std::map<std::string, std::unique_ptr<AggregatedInformation>>& TracezDataA
 LatencyBoundaryName TracezDataAggregator::GetLatencyBoundary(opentelemetry::sdk::trace::Recordable* recordable)
 {
   auto recordable_duration = recordable->GetDuration();
-  for(int boundary = 0; boundary < kNumberOfLatencyBoundaries-1; boundary++)
+  for(unsigned int boundary = 0; boundary < kLatencyBoundaries.size()-1; boundary++)
   {
     if(kLatencyBoundaries[boundary] <= recordable_duration && recordable_duration < kLatencyBoundaries[boundary+1])return (LatencyBoundaryName)boundary;
   }
