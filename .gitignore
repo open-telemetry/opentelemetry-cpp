@@ -34,8 +34,3 @@
 
 # Bazel files
 /bazel-*
-/.idea/
-/.idea/.gitignore
-/.idea/modules.xml
-/.idea/opentelemetry-cpp.iml
-/.idea/vcs.xml
