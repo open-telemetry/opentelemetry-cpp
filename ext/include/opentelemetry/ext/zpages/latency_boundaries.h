@@ -17,7 +17,7 @@ namespace zpages
  * Latency_Boundary_Name enum is used to index into the Latency_Boundaries vector that is declared later on,
  * using this enum lets you access the Latecy_Boundary at each index without using magic numbers
  */
-typedef enum LatencyBoundaryName
+enum LatencyBoundaryName
 {
   k0MicroTo10Micro = 0,
   k10MicroTo100Micro,
@@ -28,7 +28,7 @@ typedef enum LatencyBoundaryName
   k1SecondTo10Second,
   k10SecondTo100Second,
   k100SecondToMax
-} LatencyBoundaryName;
+};
 
 /**
  * kLatency_Boundaries constant that contains the 9 latency boundaries and enables them to be iterated over
