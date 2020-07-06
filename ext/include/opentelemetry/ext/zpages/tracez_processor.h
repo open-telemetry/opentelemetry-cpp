@@ -56,11 +56,15 @@ class TracezSpanProcessor : public opentelemetry::sdk::trace::SpanProcessor {
 
   /**
    * Returns a reference to running_spans
+   * @return currently running spans when the function is called
    */
   std::unordered_set<opentelemetry::sdk::trace::Recordable*>& GetRunningSpans() noexcept;
 
   /**
-   * Returns completed_spans, which is then cleared
+   * Returns completed_spans, which is then cleared to make room for new
+   * completed spans
+   * @return newly completed spans, which is defined by spans that completed
+   * after the last call of this function
    */
   std::vector<std::unique_ptr<opentelemetry::sdk::trace::Recordable>> GetCompletedSpans() noexcept;
 
