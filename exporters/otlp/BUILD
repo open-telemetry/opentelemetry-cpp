@@ -32,8 +32,10 @@ cc_library(
 cc_library(
     name = "otlp_exporter",
     srcs = [
-        'otlp_exporter.h',
         'otlp_exporter.cc',
+    ],
+    hdrs = [
+        'otlp_exporter.h',
     ],
     deps = [
         ":recordable",

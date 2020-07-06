@@ -6,7 +6,7 @@ namespace exporter
 namespace otlp
 {
 
-const std::string KCollectorAddress = "localhost:55678";
+const std::string kCollectorAddress = "localhost:55678";
 
 // ----------------------------- Helper functions ------------------------------
 
@@ -33,7 +33,7 @@ void PopulateRequest(const nostd::span<std::unique_ptr<sdk::trace::Recordable>> 
  */
 std::unique_ptr<proto::collector::trace::v1::TraceService::Stub> MakeServiceStub()
 {
-  auto channel = grpc::CreateChannel(KCollectorAddress, grpc::InsecureChannelCredentials());
+  auto channel = grpc::CreateChannel(kCollectorAddress, grpc::InsecureChannelCredentials());
   return proto::collector::trace::v1::TraceService::NewStub(channel);
 }
 
