@@ -7,6 +7,8 @@
 #include <unordered_map>
 #include <vector>
 
+using std::chrono::nanoseconds;
+
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace ext
 {
@@ -34,15 +36,15 @@ enum LatencyBoundaryName
  * kLatency_Boundaries constant that contains the 9 latency boundaries and enables them to be iterated over
  */
 const std::vector<std::chrono::nanoseconds> kLatencyBoundaries = {
-    std::chrono::nanoseconds(0),
-    std::chrono::nanoseconds(std::chrono::microseconds(10)),
-    std::chrono::nanoseconds(std::chrono::microseconds(100)), 
-    std::chrono::nanoseconds(std::chrono::milliseconds(1)),
-    std::chrono::nanoseconds(std::chrono::milliseconds(10)),
-    std::chrono::nanoseconds(std::chrono::milliseconds(100)),
-    std::chrono::nanoseconds(std::chrono::seconds(1)), 
-    std::chrono::nanoseconds(std::chrono::seconds(10)),
-    std::chrono::nanoseconds(std::chrono::seconds(100)),
+    nanoseconds(0),
+    nanoseconds(std::chrono::microseconds(10)),
+    nanoseconds(std::chrono::microseconds(100)), 
+    nanoseconds(std::chrono::milliseconds(1)),
+    nanoseconds(std::chrono::milliseconds(10)),
+    nanoseconds(std::chrono::milliseconds(100)),
+    nanoseconds(std::chrono::seconds(1)), 
+    nanoseconds(std::chrono::seconds(10)),
+    nanoseconds(std::chrono::seconds(100)),
   };
 
 

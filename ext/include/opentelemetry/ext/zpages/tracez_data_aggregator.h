@@ -6,6 +6,7 @@
 #include <unordered_set>
 #include <vector>
 #include <list>
+#include <memory>
 
 // include files
 #include "opentelemetry/ext/zpages/tracez_processor.h"
@@ -31,31 +32,31 @@ const int kMaxNumberOfSampleSpans = 5;
  */
 struct AggregatedInformation{
   
-  int running_spans_; 
-  int error_spans_;
+  int num_running_spans; 
+  int num_error_spans;
   
   /** 
    * latency_sample_spans_ is a vector of lists, each index of the vector corresponds to a latency boundary(of which there are 9).
    * The list in each index stores the sample spans for that latency boundary.
    */
-  std::vector<std::list<std::unique_ptr<opentelemetry::sdk::trace::Recordable>>> latency_sample_spans_;
+  std::vector<std::list<std::unique_ptr<opentelemetry::sdk::trace::Recordable>>> latency_sample_spans;
   
   /**
-   * error_sample_spans_ is a list that stores the error saamples for a span name.
+   * error_sample_spans_ is a list that stores the error samples for a span name.
    */
-  std::list<std::unique_ptr<opentelemetry::sdk::trace::Recordable>> error_sample_spans_;
+  std::list<std::unique_ptr<opentelemetry::sdk::trace::Recordable>> error_sample_spans;
   
   /**
    * span_count_per_latency_bucket_ is a vector that stores the count of spans for each of the 9 latency buckets.
    */
-  std::vector<int> span_count_per_latency_bucket_;
+  std::vector<int> span_count_per_latency_bucket;
   
   AggregatedInformation()
   {
-    running_spans_ = 0;
-    error_spans_ = 0;
-    latency_sample_spans_.resize(kLatencyBoundaries.size());
-    span_count_per_latency_bucket_.resize(kLatencyBoundaries.size(),0);
+    num_running_spans = 0;
+    num_error_spans = 0;
+    latency_sample_spans.resize(kLatencyBoundaries.size());
+    span_count_per_latency_bucket.resize(kLatencyBoundaries.size(),0);
   } 
 };
 
@@ -113,13 +114,13 @@ private:
    * AggregateStatusOKSpans is the function called to update the data of spans with status code OK.
    * @param ok_span is the span who's data is to be collected
    */
-  void AggregateStatusOKSpans(std::unique_ptr<opentelemetry::sdk::trace::Recordable>& ok_span);
+  void AggregateStatusOKSpan(std::unique_ptr<opentelemetry::sdk::trace::Recordable>& ok_span);
   
   /** 
    * AggregateStatusErrorSpans is the function that is called to collect the information of error spans
    * @param error_span is the error span who's data is to be collected
    */
-  void AggregateStatusErrorSpans(std::unique_ptr<opentelemetry::sdk::trace::Recordable>& error_span);
+  void AggregateStatusErrorSpan(std::unique_ptr<opentelemetry::sdk::trace::Recordable>& error_span);
 };
 
 }  // namespace zpages

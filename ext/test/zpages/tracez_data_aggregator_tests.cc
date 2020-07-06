@@ -58,7 +58,7 @@ TEST(TracezDataAggregator, SingleRunningSpan)
   auto span_first  = tracer->StartSpan("span 1");
   const std::map<std::string, std::unique_ptr<AggregatedInformation>>& data = tracez_data_aggregator->GetAggregatedData();
   ASSERT_TRUE(data.find("span 1") != data.end());
-  ASSERT_EQ(data.at("span 1").get()->running_spans_, 1); 
+  ASSERT_EQ(data.at("span 1")->num_running_spans, 1); 
 }
 
 TEST(TracezDataAggregator, MultipleRunningSpansWithSameName)
@@ -77,7 +77,7 @@ TEST(TracezDataAggregator, MultipleRunningSpansWithSameName)
   
   const std::map<std::string, std::unique_ptr<AggregatedInformation>>& data = tracez_data_aggregator->GetAggregatedData();
   ASSERT_TRUE(data.find("span 1") != data.end());
-  ASSERT_EQ(data.at("span 1").get()->running_spans_, 3); 
+  ASSERT_EQ(data.at("span 1")->num_running_spans, 3); 
 }
 
 TEST(TracezDataAggregator, MultipleRunningSpansWithDifferentNames)
@@ -97,13 +97,13 @@ TEST(TracezDataAggregator, MultipleRunningSpansWithDifferentNames)
   
   const std::map<std::string, std::unique_ptr<AggregatedInformation>>& data = tracez_data_aggregator->GetAggregatedData();
   ASSERT_TRUE(data.find("span 1") != data.end());
-  ASSERT_EQ(data.at("span 1").get()->running_spans_, 1); 
+  ASSERT_EQ(data.at("span 1")->num_running_spans, 1); 
   
   ASSERT_TRUE(data.find("span 2") != data.end());
-  ASSERT_EQ(data.at("span 2").get()->running_spans_, 1); 
+  ASSERT_EQ(data.at("span 2")->num_running_spans, 1); 
   
   ASSERT_TRUE(data.find("span 3") != data.end());
-  ASSERT_EQ(data.at("span 3").get()->running_spans_, 2); 
+  ASSERT_EQ(data.at("span 3")->num_running_spans, 2); 
 }
 
 
@@ -128,8 +128,8 @@ TEST(TraceZDataAggregator, SingleErrorSpan)
   const std::map<std::string, std::unique_ptr<AggregatedInformation>>& data = tracez_data_aggregator->GetAggregatedData();
   ASSERT_TRUE(data.find("span 1") != data.end());
   ASSERT_EQ(data.size(),1);
-  ASSERT_EQ(data.at("span 1").get()->error_spans_, 1); 
-  ASSERT_EQ(data.at("span 1").get()->error_sample_spans_.front().get()->GetDescription(), "span cancelled");
+  ASSERT_EQ(data.at("span 1")->num_error_spans, 1); 
+  ASSERT_EQ(data.at("span 1")->error_sample_spans.front()->GetDescription(), "span cancelled");
 }
 
 TEST(TraceZDataAggregator, MultipleErrorSpanSameName)
@@ -148,10 +148,10 @@ TEST(TraceZDataAggregator, MultipleErrorSpanSameName)
   const std::map<std::string, std::unique_ptr<AggregatedInformation>>& data = tracez_data_aggregator->GetAggregatedData();
   ASSERT_TRUE(data.find("span 1") != data.end());
   ASSERT_EQ(data.size(),1);
-  ASSERT_EQ(data.at("span 1").get()->error_spans_, 2); 
-  ASSERT_EQ(data.at("span 1").get()->error_sample_spans_.size(), 2);
-  ASSERT_EQ(data.at("span 1").get()->error_sample_spans_.begin()->get()->GetDescription(), "span cancelled");
-  ASSERT_EQ(std::next(data.at("span 1").get()->error_sample_spans_.begin())->get()->GetDescription(), "span unknown");
+  ASSERT_EQ(data.at("span 1")->num_error_spans, 2); 
+  ASSERT_EQ(data.at("span 1")->error_sample_spans.size(), 2);
+  ASSERT_EQ(data.at("span 1")->error_sample_spans.begin()->get()->GetDescription(), "span cancelled");
+  ASSERT_EQ(std::next(data.at("span 1")->error_sample_spans.begin())->get()->GetDescription(), "span unknown");
 }
 
 TEST(TraceZDataAggregator, MultipleErrorSpanDifferentName)
@@ -174,12 +174,12 @@ TEST(TraceZDataAggregator, MultipleErrorSpanDifferentName)
   ASSERT_TRUE(data.find("span 2") != data.end());
   ASSERT_TRUE(data.find("span 3") != data.end());
   
-  ASSERT_EQ(data.at("span 1").get()->error_spans_, 1); 
-  ASSERT_EQ(data.at("span 1").get()->error_sample_spans_.begin()->get()->GetDescription(), "span cancelled");
-  ASSERT_EQ(data.at("span 2").get()->error_spans_, 1); 
-  ASSERT_EQ(data.at("span 2").get()->error_sample_spans_.begin()->get()->GetDescription(), "span unknown");
-  ASSERT_EQ(data.at("span 3").get()->error_spans_, 1); 
-  ASSERT_EQ(data.at("span 3").get()->error_sample_spans_.begin()->get()->GetDescription(), "span argument invalid");
+  ASSERT_EQ(data.at("span 1")->num_error_spans, 1); 
+  ASSERT_EQ(data.at("span 1")->error_sample_spans.begin()->get()->GetDescription(), "span cancelled");
+  ASSERT_EQ(data.at("span 2")->num_error_spans, 1); 
+  ASSERT_EQ(data.at("span 2")->error_sample_spans.begin()->get()->GetDescription(), "span unknown");
+  ASSERT_EQ(data.at("span 3")->num_error_spans, 1); 
+  ASSERT_EQ(data.at("span 3")->error_sample_spans.begin()->get()->GetDescription(), "span argument invalid");
 }
 
 TEST(TraceZDataAggregator, ErrorSpansAtCapacity)
@@ -202,10 +202,10 @@ TEST(TraceZDataAggregator, ErrorSpansAtCapacity)
   const std::map<std::string, std::unique_ptr<AggregatedInformation>>& data = tracez_data_aggregator->GetAggregatedData();
   ASSERT_EQ(data.size(),1);
   ASSERT_TRUE(data.find("span 1") != data.end());
-  ASSERT_EQ(data.at("span 1").get()->error_spans_, 6);
-  ASSERT_EQ(data.at("span 1").get()->error_sample_spans_.size(), 5);
+  ASSERT_EQ(data.at("span 1")->num_error_spans, 6);
+  ASSERT_EQ(data.at("span 1")->error_sample_spans.size(), 5);
   
-  auto error_sample = data.at("span 1").get()->error_sample_spans_.begin();
+  auto error_sample = data.at("span 1")->error_sample_spans.begin();
   ASSERT_EQ(error_sample->get()->GetDescription(), "span unknown");
   error_sample = std::next(error_sample);
   ASSERT_EQ(error_sample->get()->GetDescription(), "span invalid");
@@ -237,9 +237,9 @@ TEST(TraceZDataAggregator, SingleCompletedSpan)
   
   const std::map<std::string, std::unique_ptr<AggregatedInformation>>& data = tracez_data_aggregator->GetAggregatedData();
   ASSERT_TRUE(data.find("span 1") != data.end());
-  ASSERT_EQ(data.at("span 1").get()->span_count_per_latency_bucket_[0], 1); 
-  ASSERT_EQ(data.at("span 1").get()->latency_sample_spans_[0].size(),1);
-  ASSERT_EQ(data.at("span 1").get()->latency_sample_spans_[0].front()->GetDuration(),std::chrono::nanoseconds(30));
+  ASSERT_EQ(data.at("span 1")->span_count_per_latency_bucket[0], 1); 
+  ASSERT_EQ(data.at("span 1")->latency_sample_spans[0].size(),1);
+  ASSERT_EQ(data.at("span 1")->latency_sample_spans[0].front()->GetDuration(),std::chrono::nanoseconds(30));
 }
 
 
@@ -273,12 +273,12 @@ TEST(TraceZDataAggregator, MultipleCompletedSpanSameName)
   
   const std::map<std::string, std::unique_ptr<AggregatedInformation>>& data = tracez_data_aggregator->GetAggregatedData();
   ASSERT_TRUE(data.find("span 1") != data.end());
-  ASSERT_EQ(data.at("span 1").get()->span_count_per_latency_bucket_[0], 2); 
-  ASSERT_EQ(data.at("span 1").get()->latency_sample_spans_[0].size(),2);
-  ASSERT_EQ(data.at("span 1").get()->span_count_per_latency_bucket_[1], 1); 
-  ASSERT_EQ(data.at("span 1").get()->latency_sample_spans_[1].size(),1);
-  ASSERT_EQ(data.at("span 1").get()->latency_sample_spans_[0].front()->GetDuration(),std::chrono::nanoseconds(30));
-  ASSERT_EQ(data.at("span 1").get()->latency_sample_spans_[1].front()->GetDuration(),std::chrono::nanoseconds(10000));
+  ASSERT_EQ(data.at("span 1")->span_count_per_latency_bucket[0], 2); 
+  ASSERT_EQ(data.at("span 1")->latency_sample_spans[0].size(),2);
+  ASSERT_EQ(data.at("span 1")->span_count_per_latency_bucket[1], 1); 
+  ASSERT_EQ(data.at("span 1")->latency_sample_spans[1].size(),1);
+  ASSERT_EQ(data.at("span 1")->latency_sample_spans[0].front()->GetDuration(),std::chrono::nanoseconds(30));
+  ASSERT_EQ(data.at("span 1")->latency_sample_spans[1].front()->GetDuration(),std::chrono::nanoseconds(10000));
 }
 
 
