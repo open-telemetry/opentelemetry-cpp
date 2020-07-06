@@ -1,0 +1,1 @@
+add_library(opentelemetry_trace tracez_processer.cc)
