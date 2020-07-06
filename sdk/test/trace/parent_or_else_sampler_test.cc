@@ -11,9 +11,7 @@ using opentelemetry::sdk::trace::ParentOrElseSampler;
 
 TEST(ParentOrElseSampler, ShouldSample)
 {
-  // Initialize a sampler with a AlwaysOffSampler as its delegateSampler
   ParentOrElseSampler sampler_off(std::make_shared<AlwaysOffSampler>());
-  // Initialize a sampler with a AlwaysOnSampler as its delegateSampler
   ParentOrElseSampler sampler_on(std::make_shared<AlwaysOnSampler>());
 
   // Set up parameters
@@ -27,23 +25,26 @@ TEST(ParentOrElseSampler, ShouldSample)
 
   // Case 1: Parent doesn't exist. Return result of delegateSampler()
   auto sampling_result = sampler_off.ShouldSample(nullptr, trace_id, "", span_kind, view);
+  auto sampling_result2 = sampler_on.ShouldSample(nullptr, trace_id, "", span_kind, view);
 
   ASSERT_EQ(Decision::NOT_RECORD, sampling_result.decision);
+  ASSERT_EQ(Decision::RECORD_AND_SAMPLE, sampling_result2.decision);
 
   // Case 2: Parent exists and SampledFlag is true
-  auto sampling_result2 =
+  auto sampling_result3 =
       sampler_off.ShouldSample(&parent_context_sampled, trace_id, "", span_kind, view);
-  ASSERT_EQ(Decision::RECORD_AND_SAMPLE, sampling_result2.decision);
+  ASSERT_EQ(Decision::RECORD_AND_SAMPLE, sampling_result3.decision);
 
   // Case 3: Parent exists and SampledFlag is false
-  auto sampling_result3 =
+  auto sampling_result4 =
       sampler_on.ShouldSample(&parent_context_nonsampled, trace_id, "", span_kind, view);
-  ASSERT_EQ(Decision::RECORD_AND_SAMPLE, sampling_result2.decision);
+  ASSERT_EQ(Decision::NOT_RECORD, sampling_result4.decision);
 }
 
 TEST(ParentOrElseSampler, GetDescription)
 {
   ParentOrElseSampler sampler(std::make_shared<AlwaysOffSampler>());
-
   ASSERT_EQ("ParentOrElse{AlwaysOffSampler}", sampler.GetDescription());
+  ParentOrElseSampler sampler2(std::make_shared<AlwaysOnSampler>());
+  ASSERT_EQ("ParentOrElse{AlwaysOnSampler}", sampler2.GetDescription());
 }
