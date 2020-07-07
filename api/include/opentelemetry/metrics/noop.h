@@ -1,13 +1,3 @@
-#pragma once
-
-#include "opentelemetry/metrics/meter.h"
-#include "opentelemetry/nostd/string_view.h"
-#include "opentelemetry/nostd/unique_ptr.h"
-#include "opentelemetry/trace/key_value_iterable_view.h"
-
-OPENTELEMETRY_BEGIN_NAMESPACE
-namespace metrics
-{
 /**
  * No-op implementation of Meter. This class should not be used directly.
  */
@@ -16,21 +6,24 @@ class NoopMeter : public Meter
 public:
   NoopMeter() = default;
 
-  opentelemetry::nostd::shared_ptr<SynchronousInstrument> NewDoubleCounter(nostd::string_view name,
-                                                                   nostd::string_view description,
-                                                                   nostd::string_view unit,
-                                                                   const bool enabled) override
+  opentelemetry::nostd::shared_ptr<SynchronousInstrument> NewDoubleCounter(
+      nostd::string_view name,
+      nostd::string_view description,
+      nostd::string_view unit,
+      const bool enabled) override
   {
     return nostd::shared_ptr<SynchronousInstrument>{
         new NoopDoubleCounter(name, description, unit, enabled)};
   }
 
-  opentelemetry::nostd::shared_ptr<SynchronousInstrument> NewIntCounter(nostd::string_view name,
-                                                             nostd::string_view description,
-                                                             nostd::string_view unit,
-                                                             const bool enabled) override
+  opentelemetry::nostd::shared_ptr<SynchronousInstrument> NewIntCounter(
+      nostd::string_view name,
+      nostd::string_view description,
+      nostd::string_view unit,
+      const bool enabled) override
   {
-    return nostd::shared_ptr<SynchronousInstrument>{new NoopIntCounter(name, description, unit, enabled)};
+    return nostd::shared_ptr<SynchronousInstrument>{
+        new NoopIntCounter(name, description, unit, enabled)};
   }
 
   opentelemetry::nostd::shared_ptr<SynchronousInstrument> NewDoubleUpDownCounter(
@@ -128,11 +121,11 @@ public:
         new NoopDoubleValueObserver(name, description, unit, enabled, callback)};
   }
 
-  void RecordBatch(nostd::string_view /*labels*/,
-                   const trace::KeyValueIterable & /*values*/) noexcept override
+  void RecordBatch(
+      nostd::string_view labels,
+      const nostd::span<std::pair<nostd::shared_ptr<SynchronousInstrument>,
+          nostd::variant<int, double>>> values) noexcept override
   {
     // No-op
   }
 };
-}  // namespace metrics
-OPENTELEMETRY_END_NAMESPACE
