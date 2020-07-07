@@ -225,9 +225,10 @@ private:
 # record.h
 
 struct Record {
-   MetricKind metricKind;
+  MetricKind metricKind;
   string name;
   string labels;
+  string description;
   std::variant<vector<int>, vector<double>> value; // Various values
                                                    // held by different aggregators.
 }
