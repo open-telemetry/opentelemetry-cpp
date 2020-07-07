@@ -11,13 +11,13 @@ TracezDataAggregator::TracezDataAggregator(std::shared_ptr<TracezSpanProcessor> 
   tracez_span_processor_ = span_processor;
 }
 
-const std::map<std::string, std::unique_ptr<AggregatedInformation>>& TracezDataAggregator::GetAggregatedData()
+const std::map<std::string, std::unique_ptr<AggregatedSpanData>>& TracezDataAggregator::GetAggregatedData()
 {
   AggregateSpans();
   return aggregated_data_;
 }
 
-LatencyBoundaryName TracezDataAggregator::GetLatencyBoundary(opentelemetry::sdk::trace::Recordable* recordable)
+LatencyBoundaryName TracezDataAggregator::GetLatencyBoundary(Recordable* recordable)
 {
   auto recordable_duration = recordable->GetDuration();
   for(unsigned int boundary = 0; boundary < kLatencyBoundaries.size()-1; boundary++)
@@ -27,7 +27,7 @@ LatencyBoundaryName TracezDataAggregator::GetLatencyBoundary(opentelemetry::sdk:
   return LatencyBoundaryName::k100SecondToMax;
 }
 
-void TracezDataAggregator::AggregateStatusOKSpan(std::unique_ptr<opentelemetry::sdk::trace::Recordable>& ok_span)
+void TracezDataAggregator::AggregateStatusOKSpan(std::unique_ptr<Recordable>& ok_span)
 {
   LatencyBoundaryName boundary_name = GetLatencyBoundary(ok_span.get());
   std::string span_name = ok_span->GetName().data();
@@ -42,7 +42,7 @@ void TracezDataAggregator::AggregateStatusOKSpan(std::unique_ptr<opentelemetry::
   aggregated_data_[span_name]->span_count_per_latency_bucket[boundary_name]++;
 }
 
-void TracezDataAggregator::AggregateStatusErrorSpan(std::unique_ptr<opentelemetry::sdk::trace::Recordable>& error_span)
+void TracezDataAggregator::AggregateStatusErrorSpan(std::unique_ptr<Recordable>& error_span)
 {
   std::string span_name = error_span->GetName().data();
   
@@ -56,7 +56,7 @@ void TracezDataAggregator::AggregateStatusErrorSpan(std::unique_ptr<opentelemetr
   aggregated_data_[span_name]->num_error_spans++;
 }
 
-void TracezDataAggregator::AggregateCompletedSpans(std::vector<std::unique_ptr<opentelemetry::sdk::trace::Recordable>>& completed_spans)
+void TracezDataAggregator::AggregateCompletedSpans(std::vector<std::unique_ptr<Recordable>>& completed_spans)
 { 
   for(auto& span: completed_spans)
   {
@@ -64,18 +64,18 @@ void TracezDataAggregator::AggregateCompletedSpans(std::vector<std::unique_ptr<o
     
     if(aggregated_data_.find(span_name) == aggregated_data_.end())
     {
-      aggregated_data_[span_name] = std::unique_ptr<AggregatedInformation>(new AggregatedInformation);
+      aggregated_data_[span_name] = std::unique_ptr<AggregatedSpanData>(new AggregatedSpanData);
     }
     
     //running spans are calculated from scratch later
     aggregated_data_[span_name] -> num_running_spans = 0;
     
-    if(span->GetStatus() == opentelemetry::trace::CanonicalCode::OK)AggregateStatusOKSpan(span);
+    if(span->GetStatus() == CanonicalCode::OK)AggregateStatusOKSpan(span);
     else AggregateStatusErrorSpan(span);
   }
 }
 
-void TracezDataAggregator::AggregateRunningSpans(std::unordered_set<opentelemetry::sdk::trace::Recordable*>& running_spans)
+void TracezDataAggregator::AggregateRunningSpans(std::unordered_set<Recordable*>& running_spans)
 {
   std::unordered_set<std::string> cache;
   for(auto& span: running_spans)
@@ -84,9 +84,11 @@ void TracezDataAggregator::AggregateRunningSpans(std::unordered_set<opentelemetr
  
     if(aggregated_data_.find(span_name) == aggregated_data_.end())
     {
-      aggregated_data_[span_name] = std::unique_ptr<AggregatedInformation>(new AggregatedInformation);
+      aggregated_data_[span_name] = std::unique_ptr<AggregatedSpanData>(new AggregatedSpanData);
     }
     
+    //If it's the first time this span name is seen, set the count to 0 to avoid double counting
+    //from previous aggregated data.
     if(cache.find(span_name) == cache.end())
     {
       aggregated_data_[span_name] -> num_running_spans = 0;

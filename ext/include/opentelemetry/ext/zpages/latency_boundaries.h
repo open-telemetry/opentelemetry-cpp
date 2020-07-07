@@ -2,10 +2,7 @@
 
 // include libraries
 #include <chrono>
-#include <climits>
-#include <string>
-#include <unordered_map>
-#include <vector>
+#include <array>
 
 using std::chrono::nanoseconds;
 using std::chrono::microseconds;
@@ -19,8 +16,26 @@ namespace zpages
 {
 
 /**
- * LatencyBoundaryName enum is used to index into the Latency_Boundaries vector that is declared later on,
- * using this enum lets you access the latency boundary at each index without using magic numbers
+ * kLatencyBoundaries is a constant array that contains the 9 latency boundaries and enables them to be iterated over
+ * Each value in the array represents the lower limit(inclusive) of the boundary(in nano seconds) and the upper limit(exclusive)
+ * of the boundary is the lower limit of the next one. The upper limit of the last boundary is INF.
+ */
+const std::array<nanoseconds,9> kLatencyBoundaries = {
+  nanoseconds(0),
+  nanoseconds(microseconds(10)),
+  nanoseconds(microseconds(100)), 
+  nanoseconds(milliseconds(1)),
+  nanoseconds(milliseconds(10)),
+  nanoseconds(milliseconds(100)),
+  nanoseconds(seconds(1)), 
+  nanoseconds(seconds(10)),
+  nanoseconds(seconds(100)),
+};
+
+
+/**
+ * LatencyBoundaryName enum is used to index into the kLatencyBoundaries container.
+ * Using this enum lets you access the latency boundary at each index without using magic numbers
  */
 enum LatencyBoundaryName
 {
@@ -34,25 +49,6 @@ enum LatencyBoundaryName
   k10SecondTo100Second,
   k100SecondToMax
 };
-
-/**
- * kLatencyBoundaries is a constant array that contains the 9 latency boundaries and enables them to be iterated over
- * Each value in the array represents the lower limit(inclusive) of the boundary(in nano seconds) and the upper limit(exclusive)
- * of the boundary is the lower limit of the next one. The upper limit of the last boundary is INF.
- */
-const std::array<std::chrono::nanoseconds,9> kLatencyBoundaries = {
-  nanoseconds(0),
-  nanoseconds(microseconds(10)),
-  nanoseconds(microseconds(100)), 
-  nanoseconds(milliseconds(1)),
-  nanoseconds(milliseconds(10)),
-  nanoseconds(milliseconds(100)),
-  nanoseconds(seconds(1)), 
-  nanoseconds(seconds(10)),
-  nanoseconds(seconds(100)),
-};
-
-
 
 }  // namespace zpages
 }  // namespace ext
