@@ -2,9 +2,9 @@
 
 #include <atomic>
 
-#include "opentelemetry/nostd/shared_ptr.h"
-#include "opentelemetry/metrics/noop.h"
 #include "opentelemetry/metrics/meter_provider.h"
+#include "opentelemetry/metrics/noop.h"
+#include "opentelemetry/nostd/shared_ptr.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace metrics
@@ -38,7 +38,7 @@ public:
   {
     while (GetLock().test_and_set(std::memory_order_acquire))
       ;
-    GetProvider() = tp; //Ask what is actually happening
+    GetProvider() = tp;  // Ask what is actually happening
     GetLock().clear(std::memory_order_release);
   }
 

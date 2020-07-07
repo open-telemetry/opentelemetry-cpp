@@ -3,9 +3,9 @@
 
 #include <gtest/gtest.h>
 
-using opentelemetry::metrics::Provider;
 using opentelemetry::metrics::Meter;
 using opentelemetry::metrics::MeterProvider;
+using opentelemetry::metrics::Provider;
 
 class TestProvider : public MeterProvider
 {
@@ -35,7 +35,8 @@ TEST(Provider, MultipleMeterProviders)
   auto tf = opentelemetry::nostd::shared_ptr<MeterProvider>(new TestProvider());
   Provider::SetMeterProvider(tf);
   auto tf2 = opentelemetry::nostd::shared_ptr<MeterProvider>(new TestProvider());
+  Provider::SetMeterProvider(tf2);
 
-  ASSERT_NE(tf,tf2);
-  ASSERT_NE(Provider::GetMeterProvider(), tf2);
+  ASSERT_NE(tf, tf2);
+  ASSERT_NE(Provider::GetMeterProvider(), tf);
 }
