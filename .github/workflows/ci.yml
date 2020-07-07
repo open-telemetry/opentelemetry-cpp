@@ -164,7 +164,8 @@ jobs:
         ./ci/setup_windows_cmake.ps1
         ./ci/setup_windows_ci_environment.ps1
         ./ci/install_windows_protobuf.ps1
-        ./ci/install_windows_libevent.ps1
+    - name: setup libevent
+      run: ./ci/install_windows_libevent.ps1
     - name: run cmake test
       run: ./ci/do_ci.ps1 cmake.test
     - name: run otprotocol test
