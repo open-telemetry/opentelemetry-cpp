@@ -1,4 +1,8 @@
 #include "otlp_exporter.h"
+#include "recordable.h"
+
+#include <grpcpp/grpcpp.h>
+#include <iostream>
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace exporter
@@ -67,7 +71,7 @@ sdk::trace::ExportResult OtlpExporter::Export(
 
   if (!status.ok())
   {
-    std::cerr << "OTLP trace exporter: Export() failed\n";
+    std::cerr << "[OTLP Exporter] Export() failed: " << status.error_message() << std::endl;
     return sdk::trace::ExportResult::kFailure;
   }
   return sdk::trace::ExportResult::kSuccess;
