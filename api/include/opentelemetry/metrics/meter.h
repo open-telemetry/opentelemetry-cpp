@@ -166,6 +166,7 @@ public:
    * @param description a brief description of what the DoubleSumObserver is used for.
    * @param unit the unit of metric values following https://unitsofmeasure.org/ucum.html.
    * @param enabled a boolean value that turns on or off the metric instrument.
+   * @param callback the function to be observed by the instrument.
    * @return a shared pointer to the created DoubleSumObserver.
    * @throws NullPointerException if {@code name} is null
    * @throws IllegalArgumentException if a different metric by the same name exists in this meter.
@@ -189,6 +190,7 @@ public:
    * @param description a brief description of what the IntSumObserver is used for.
    * @param unit the unit of metric values following https://unitsofmeasure.org/ucum.html.
    * @param enabled a boolean value that turns on or off the metric instrument.
+   * @param callback the function to be observed by the instrument.
    * @return a shared pointer to the created DoubleCounter.
    * @throws NullPointerException if {@code name} is null
    * @throws IllegalArgumentException if a different metric by the same name exists in this meter.
@@ -212,6 +214,7 @@ public:
    * @param description a brief description of what the DoubleUpDownSumObserver is used for.
    * @param unit the unit of metric values following https://unitsofmeasure.org/ucum.html.
    * @param enabled a boolean value that turns on or off the metric instrument.
+   * @param callback the function to be observed by the instrument.
    * @return a shared pointer to the created DoubleUpDownSumObserver.
    * @throws NullPointerException if {@code name} is null
    * @throws IllegalArgumentException if a different metric by the same name exists in this meter.
@@ -235,6 +238,7 @@ public:
    * @param description a brief description of what the IntUpDownSumObserver is used for.
    * @param unit the unit of metric values following https://unitsofmeasure.org/ucum.html.
    * @param enabled a boolean value that turns on or off the metric instrument.
+   * @param callback the function to be observed by the instrument.
    * @return a shared pointer to the created IntUpDownSumObserver.
    * @throws NullPointerException if {@code name} is null
    * @throws IllegalArgumentException if a different metric by the same name exists in this meter.
@@ -258,6 +262,7 @@ public:
    * @param description a brief description of what the DoubleValueObserver is used for.
    * @param unit the unit of metric values following https://unitsofmeasure.org/ucum.html.
    * @param enabled a boolean value that turns on or off the metric instrument.
+   * @param callback the function to be observed by the instrument.
    * @return a shared pointer to the created DoubleValueObserver.
    * @throws NullPointerException if {@code name} is null
    * @throws IllegalArgumentException if a different metric by the same name exists in this meter.
@@ -281,6 +286,7 @@ public:
    * @param description a brief description of what the IntValueObserver is used for.
    * @param unit the unit of metric values following https://unitsofmeasure.org/ucum.html.
    * @param enabled a boolean value that turns on or off the metric instrument.
+   * @param callback the function to be observed by the instrument.
    * @return a shared pointer to the created IntValueObserver.
    * @throws NullPointerException if {@code name} is null
    * @throws IllegalArgumentException if a different metric by the same name exists in this meter.
@@ -301,11 +307,9 @@ public:
    * Utility method that allows users to atomically record measurements to a set of
    * Metric instruments with a common set of labels.
    *
-   * @param labels The set of labels to associate with this recorder.
-   * @param values A KeyValueIterable where the key is a string containing the name
-   *        of metric instruments such as "IntCounter" or "DoubleUpDownSumObserver"
-   *        and the value is the value to be recorded to all metric instruments in
-   *        the batch of the associated instrument type.
+   * @param labels the set of labels to associate with this recorder.
+   * @param values a span of pairs where the first element of the pair is a metric instrument
+   * to record to, and the second element is the value to update that instrument with.
    */
   virtual void RecordBatch(
       const trace::KeyValueIterable &labels,
