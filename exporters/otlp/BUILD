@@ -28,3 +28,12 @@ cc_library(
         "@com_github_opentelemetry_proto//:trace_proto_cc",
     ],
 )
+
+cc_test(
+    name = "recordable_test",
+    srcs = ["recordable_test.cc"],
+    deps = [
+        ":recordable",
+        "@com_google_googletest//:gtest_main",
+    ],
+)
