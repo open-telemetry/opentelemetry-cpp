@@ -161,7 +161,6 @@ jobs:
     - uses: actions/checkout@v2
     - name: setup
       run: |
-        ./ci/setup_windows_cmake.ps1
         ./ci/setup_windows_ci_environment.ps1
         ./ci/install_windows_protobuf.ps1
     - name: setup libevent
@@ -176,10 +175,6 @@ jobs:
     runs-on: windows-2019
     steps:
     - uses: actions/checkout@v2
-    - name: setup
-      run: |
-        ./ci/setup_windows_cmake.ps1
-        ./ci/install_windows_bazelisk.ps1
     - name: run tests
       run: ./ci/do_ci.ps1 bazel.build
 
@@ -189,9 +184,7 @@ jobs:
     steps:
     - uses: actions/checkout@v2
     - name: setup
-      run: |
-        ./ci/setup_windows_cmake.ps1
-        ./ci/setup_windows_ci_environment.ps1
+      run: ./ci/setup_windows_ci_environment.ps1
     - name: run tests
       run: ./ci/do_ci.ps1 cmake.test_example_plugin
 
@@ -204,6 +197,7 @@ jobs:
       run: |
         sudo ./ci/setup_cmake.sh
         sudo ./ci/setup_ci_environment.sh
+        sudo ./ci/install_libevent.sh
     - name: run tests and generate report
       run: ./ci/do_ci.sh code.coverage
     - name: upload report
