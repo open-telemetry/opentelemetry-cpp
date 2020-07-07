@@ -1,3 +1,5 @@
+OPENTELEMETRY_BEGIN_NAMESPACE
+namespace metrics {
 /**
  * No-op implementation of Meter. This class should not be used directly.
  */
@@ -5,6 +7,8 @@ class NoopMeter : public Meter
 {
 public:
   NoopMeter() = default;
+
+  // All NewInstrument functions return a shared_ptr to a no-op form of that instrument.
 
   opentelemetry::nostd::shared_ptr<SynchronousInstrument> NewDoubleCounter(
       nostd::string_view name,
@@ -122,10 +126,12 @@ public:
   }
 
   void RecordBatch(
-      nostd::string_view labels,
+      const trace::KeyValueIterable &labels,
       const nostd::span<std::pair<nostd::shared_ptr<SynchronousInstrument>,
           nostd::variant<int, double>>> values) noexcept override
   {
     // No-op
   }
 };
+}  // namespace metrics
+OPENTELEMETRY_END_NAMESPACE
