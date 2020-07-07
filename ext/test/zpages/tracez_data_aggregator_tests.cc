@@ -45,6 +45,20 @@ class MockSpanExporter final : public SpanExporter {
   std::shared_ptr<bool> shutdown_called_;
 };
 
+TEST(TracezDataAggregator, NoSpans)
+{
+  std::shared_ptr<bool> span_received(new bool(false));
+  std::shared_ptr<bool> shutdown_called(new bool(false));
+  std::unique_ptr<SpanExporter> exporter(new MockSpanExporter(span_received, shutdown_called));
+  std::shared_ptr<TracezSpanProcessor> processor(new TracezSpanProcessor(std::move(exporter)));
+
+  auto tracer = std::shared_ptr<opentelemetry::trace::Tracer>(new Tracer(processor));
+  auto tracez_data_aggregator (new TracezDataAggregator(processor));
+  
+  const std::map<std::string, std::unique_ptr<AggregatedInformation>>& data = tracez_data_aggregator->GetAggregatedData();
+  ASSERT_EQ(data.size(), 0); 
+}
+
 TEST(TracezDataAggregator, SingleRunningSpan)
 {
   std::shared_ptr<bool> span_received(new bool(false));
@@ -57,6 +71,7 @@ TEST(TracezDataAggregator, SingleRunningSpan)
   
   auto span_first  = tracer->StartSpan("span 1");
   const std::map<std::string, std::unique_ptr<AggregatedInformation>>& data = tracez_data_aggregator->GetAggregatedData();
+  ASSERT_EQ(data.size(),1);
   ASSERT_TRUE(data.find("span 1") != data.end());
   ASSERT_EQ(data.at("span 1")->num_running_spans, 1); 
 }
@@ -76,6 +91,7 @@ TEST(TracezDataAggregator, MultipleRunningSpansWithSameName)
   auto span_third  = tracer->StartSpan("span 1");
   
   const std::map<std::string, std::unique_ptr<AggregatedInformation>>& data = tracez_data_aggregator->GetAggregatedData();
+  ASSERT_EQ(data.size(),1);
   ASSERT_TRUE(data.find("span 1") != data.end());
   ASSERT_EQ(data.at("span 1")->num_running_spans, 3); 
 }
@@ -96,6 +112,7 @@ TEST(TracezDataAggregator, MultipleRunningSpansWithDifferentNames)
   auto span_fourth  = tracer->StartSpan("span 3");
   
   const std::map<std::string, std::unique_ptr<AggregatedInformation>>& data = tracez_data_aggregator->GetAggregatedData();
+  ASSERT_EQ(data.size(),3);
   ASSERT_TRUE(data.find("span 1") != data.end());
   ASSERT_EQ(data.at("span 1")->num_running_spans, 1); 
   
@@ -126,6 +143,7 @@ TEST(TraceZDataAggregator, SingleErrorSpan)
   tracer->StartSpan("span 1", start)->SetStatus(opentelemetry::trace::CanonicalCode::CANCELLED,"span cancelled");
   
   const std::map<std::string, std::unique_ptr<AggregatedInformation>>& data = tracez_data_aggregator->GetAggregatedData();
+  ASSERT_EQ(data.size(),1);
   ASSERT_TRUE(data.find("span 1") != data.end());
   ASSERT_EQ(data.size(),1);
   ASSERT_EQ(data.at("span 1")->num_error_spans, 1); 
@@ -146,6 +164,7 @@ TEST(TraceZDataAggregator, MultipleErrorSpanSameName)
   tracer->StartSpan("span 1")->SetStatus(opentelemetry::trace::CanonicalCode::UNKNOWN,"span unknown");
   
   const std::map<std::string, std::unique_ptr<AggregatedInformation>>& data = tracez_data_aggregator->GetAggregatedData();
+  ASSERT_EQ(data.size(),1);
   ASSERT_TRUE(data.find("span 1") != data.end());
   ASSERT_EQ(data.size(),1);
   ASSERT_EQ(data.at("span 1")->num_error_spans, 2); 
@@ -236,7 +255,9 @@ TEST(TraceZDataAggregator, SingleCompletedSpan)
   tracer->StartSpan("span 1", start)->End(end);
   
   const std::map<std::string, std::unique_ptr<AggregatedInformation>>& data = tracez_data_aggregator->GetAggregatedData();
+  ASSERT_EQ(data.size(), 1);
   ASSERT_TRUE(data.find("span 1") != data.end());
+  ASSERT_EQ(data.at("span 1")->num_running_spans, 0); 
   ASSERT_EQ(data.at("span 1")->span_count_per_latency_bucket[0], 1); 
   ASSERT_EQ(data.at("span 1")->latency_sample_spans[0].size(),1);
   ASSERT_EQ(data.at("span 1")->latency_sample_spans[0].front()->GetDuration(),std::chrono::nanoseconds(30));
