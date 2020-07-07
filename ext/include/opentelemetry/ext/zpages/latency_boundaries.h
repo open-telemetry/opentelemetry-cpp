@@ -8,6 +8,9 @@
 #include <vector>
 
 using std::chrono::nanoseconds;
+using std::chrono::microseconds;
+using std::chrono::milliseconds;
+using std::chrono::seconds;
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace ext
@@ -16,12 +19,12 @@ namespace zpages
 {
 
 /**
- * Latency_Boundary_Name enum is used to index into the Latency_Boundaries vector that is declared later on,
- * using this enum lets you access the Latecy_Boundary at each index without using magic numbers
+ * LatencyBoundaryName enum is used to index into the Latency_Boundaries vector that is declared later on,
+ * using this enum lets you access the latency boundary at each index without using magic numbers
  */
 enum LatencyBoundaryName
 {
-  k0MicroTo10Micro = 0,
+  k0MicroTo10Micro,
   k10MicroTo100Micro,
   k100MicroTo1Milli,
   k1MilliTo10Milli,
@@ -33,19 +36,21 @@ enum LatencyBoundaryName
 };
 
 /**
- * kLatency_Boundaries constant that contains the 9 latency boundaries and enables them to be iterated over
+ * kLatencyBoundaries is a constant array that contains the 9 latency boundaries and enables them to be iterated over
+ * Each value in the array represents the lower limit(inclusive) of the boundary(in nano seconds) and the upper limit(exclusive)
+ * of the boundary is the lower limit of the next one. The upper limit of the last boundary is INF.
  */
 const std::array<std::chrono::nanoseconds,9> kLatencyBoundaries = {
-    nanoseconds(0),
-    nanoseconds(std::chrono::microseconds(10)),
-    nanoseconds(std::chrono::microseconds(100)), 
-    nanoseconds(std::chrono::milliseconds(1)),
-    nanoseconds(std::chrono::milliseconds(10)),
-    nanoseconds(std::chrono::milliseconds(100)),
-    nanoseconds(std::chrono::seconds(1)), 
-    nanoseconds(std::chrono::seconds(10)),
-    nanoseconds(std::chrono::seconds(100)),
-  };
+  nanoseconds(0),
+  nanoseconds(microseconds(10)),
+  nanoseconds(microseconds(100)), 
+  nanoseconds(milliseconds(1)),
+  nanoseconds(milliseconds(10)),
+  nanoseconds(milliseconds(100)),
+  nanoseconds(seconds(1)), 
+  nanoseconds(seconds(10)),
+  nanoseconds(seconds(100)),
+};
 
 
 
