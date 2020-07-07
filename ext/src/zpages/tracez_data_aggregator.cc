@@ -11,7 +11,7 @@ TracezDataAggregator::TracezDataAggregator(std::shared_ptr<TracezSpanProcessor> 
   tracez_span_processor_ = span_processor;
 }
 
-const std::map<std::string, std::unique_ptr<AggregatedInformation>>& TracezDataAggregator:: GetAggregatedData()
+const std::map<std::string, std::unique_ptr<AggregatedInformation>>& TracezDataAggregator::GetAggregatedData()
 {
   AggregateSpans();
   return aggregated_data_;
