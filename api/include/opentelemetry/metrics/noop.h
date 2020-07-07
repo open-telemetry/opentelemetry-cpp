@@ -12,6 +12,10 @@
 
 #include <memory>
 
+/*
+  Stubbed out NoopMeter and NoopInstrument. Will replace with other PR implementation
+*/
+
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace metrics
 {

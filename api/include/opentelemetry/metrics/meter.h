@@ -6,6 +6,10 @@
 
 #include <chrono>
 
+/*
+  Stubbed out Meter Class. Will replace with other PR implementation
+*/
+
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace metrics
 {
