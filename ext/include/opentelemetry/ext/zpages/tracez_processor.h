@@ -77,6 +77,7 @@ class TracezSpanProcessor : public opentelemetry::sdk::trace::SpanProcessor {
       std::chrono::microseconds timeout = std::chrono::microseconds(0)) noexcept override
   {
     if (shutdown_signal_received_) return;
+    // TODO: figure out how to export to data aggregator when this is called?
   }
   /**
    * Shut down the processor and do any cleanup required. Ended spans are
@@ -88,7 +89,7 @@ class TracezSpanProcessor : public opentelemetry::sdk::trace::SpanProcessor {
    */
   void Shutdown(std::chrono::microseconds timeout = std::chrono::microseconds(0)) noexcept override
   {
-    shutdown_signal_received_ = true;
+    shutdown_signal_received_ = true; // TODO: what cleanup do we need?
   }
 
  private:
