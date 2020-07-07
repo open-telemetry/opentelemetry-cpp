@@ -13,11 +13,12 @@ namespace zpages {
      if (exporter_->Export(batch) == opentelemetry::sdk::trace::ExportResult::kFailure) {
        std::cerr << "Error batching span\n";
      }
-
-     auto completed_span = running_spans_.find(span.get());
-     if (completed_span != running_spans_.end()) {
-       running_spans_.erase(completed_span);
-       completed_spans_.push_back(std::move(span));
+     else if (span != nullptr) {
+       auto completed_span = running_spans_.find(span.get());
+       if (completed_span != running_spans_.end()) {
+         running_spans_.erase(completed_span);
+         completed_spans_.push_back(std::move(span));
+       }
      }
   }
 
