@@ -308,7 +308,7 @@ public:
    *        the batch of the associated instrument type.
    */
   virtual void RecordBatch(
-      nostd::string_view labels,
+      const trace::KeyValueIterable &labels,
       const nostd::span<std::pair<nostd::shared_ptr<SynchronousInstrument>,
           nostd::variant<int, double>>> values) noexcept
   {
