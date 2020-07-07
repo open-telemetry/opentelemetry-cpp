@@ -1,2 +1,5 @@
-add_subdirectory(plugin)
-add_subdirectory(simple)
+if(WITH_SDK)
+  add_subdirectory(simple)
+else()
+  add_subdirectory(plugin)
+endif()
