@@ -12,44 +12,9 @@ namespace nostd  = opentelemetry::nostd;
 namespace common = opentelemetry::common;
 using opentelemetry::core::SteadyTimestamp;
 
-/**
- * A mock exporter that switches a flag once a valid recordable was received.
- */
-class MockSpanExporter final : public SpanExporter {
- public:
-  MockSpanExporter(std::shared_ptr<bool> span_received,
-                   std::shared_ptr<bool> shutdown_called) noexcept
-      : span_received_(span_received), shutdown_called_(shutdown_called) {}
-
-  std::unique_ptr<Recordable> MakeRecordable() noexcept override {
-    return std::unique_ptr<Recordable>(new SpanData);
-  }
-
-  ExportResult Export(
-      const opentelemetry::nostd::span<std::unique_ptr<Recordable>> &spans) noexcept override {
-    for (auto &span : spans) {
-      if (span != nullptr) {
-        *span_received_ = true;
-      }
-    }
-
-    return ExportResult::kSuccess;
-  }
-
-  void Shutdown(std::chrono::microseconds timeout = std::chrono::microseconds(0)) noexcept override {
-    *shutdown_called_ = true;
-  }
-
- private:
-  std::shared_ptr<bool> span_received_;
-  std::shared_ptr<bool> shutdown_called_;
-};
 
 TEST(TracezDataAggregator, NoSpans)
 {
-  std::shared_ptr<bool> span_received(new bool(false));
-  std::shared_ptr<bool> shutdown_called(new bool(false));
-  std::unique_ptr<SpanExporter> exporter(new MockSpanExporter(span_received, shutdown_called));
   std::shared_ptr<TracezSpanProcessor> processor(new TracezSpanProcessor());
 
   auto tracer = std::shared_ptr<opentelemetry::trace::Tracer>(new Tracer(processor));
@@ -61,9 +26,6 @@ TEST(TracezDataAggregator, NoSpans)
 
 TEST(TracezDataAggregator, SingleRunningSpan)
 {
-  std::shared_ptr<bool> span_received(new bool(false));
-  std::shared_ptr<bool> shutdown_called(new bool(false));
-  std::unique_ptr<SpanExporter> exporter(new MockSpanExporter(span_received, shutdown_called));
   std::shared_ptr<TracezSpanProcessor> processor(new TracezSpanProcessor());
 
   auto tracer = std::shared_ptr<opentelemetry::trace::Tracer>(new Tracer(processor));
@@ -78,9 +40,6 @@ TEST(TracezDataAggregator, SingleRunningSpan)
 
 TEST(TracezDataAggregator, MultipleRunningSpansWithSameName)
 {
-  std::shared_ptr<bool> span_received(new bool(false));
-  std::shared_ptr<bool> shutdown_called(new bool(false));
-  std::unique_ptr<SpanExporter> exporter(new MockSpanExporter(span_received, shutdown_called));
   std::shared_ptr<TracezSpanProcessor> processor(new TracezSpanProcessor());
 
   auto tracer = std::shared_ptr<opentelemetry::trace::Tracer>(new Tracer(processor));
@@ -98,9 +57,6 @@ TEST(TracezDataAggregator, MultipleRunningSpansWithSameName)
 
 TEST(TracezDataAggregator, MultipleRunningSpansWithDifferentNames)
 {
-  std::shared_ptr<bool> span_received(new bool(false));
-  std::shared_ptr<bool> shutdown_called(new bool(false));
-  std::unique_ptr<SpanExporter> exporter(new MockSpanExporter(span_received, shutdown_called));
   std::shared_ptr<TracezSpanProcessor> processor(new TracezSpanProcessor());
 
   auto tracer = std::shared_ptr<opentelemetry::trace::Tracer>(new Tracer(processor));
@@ -125,9 +81,6 @@ TEST(TracezDataAggregator, MultipleRunningSpansWithDifferentNames)
 
 TEST(TraceZDataAggregator, AdditionToRunningSpans)
 {
-  std::shared_ptr<bool> span_received(new bool(false));
-  std::shared_ptr<bool> shutdown_called(new bool(false));
-  std::unique_ptr<SpanExporter> exporter(new MockSpanExporter(span_received, shutdown_called));
   std::shared_ptr<TracezSpanProcessor> processor(new TracezSpanProcessor());
 
   auto tracer = std::shared_ptr<opentelemetry::trace::Tracer>(new Tracer(processor));
@@ -151,9 +104,6 @@ TEST(TraceZDataAggregator, AdditionToRunningSpans)
 
 TEST(TraceZDataAggregator, SingleErrorSpan)
 {
-  std::shared_ptr<bool> span_received(new bool(false));
-  std::shared_ptr<bool> shutdown_called(new bool(false));
-  std::unique_ptr<SpanExporter> exporter(new MockSpanExporter(span_received, shutdown_called));
   std::shared_ptr<TracezSpanProcessor> processor(new TracezSpanProcessor());
 
   auto tracer = std::shared_ptr<opentelemetry::trace::Tracer>(new Tracer(processor));
@@ -177,9 +127,6 @@ TEST(TraceZDataAggregator, SingleErrorSpan)
 
 TEST(TraceZDataAggregator, MultipleErrorSpanSameName)
 {
-  std::shared_ptr<bool> span_received(new bool(false));
-  std::shared_ptr<bool> shutdown_called(new bool(false));
-  std::unique_ptr<SpanExporter> exporter(new MockSpanExporter(span_received, shutdown_called));
   std::shared_ptr<TracezSpanProcessor> processor(new TracezSpanProcessor());
 
   auto tracer = std::shared_ptr<opentelemetry::trace::Tracer>(new Tracer(processor));
@@ -200,9 +147,6 @@ TEST(TraceZDataAggregator, MultipleErrorSpanSameName)
 
 TEST(TraceZDataAggregator, MultipleErrorSpanDifferentName)
 {
-  std::shared_ptr<bool> span_received(new bool(false));
-  std::shared_ptr<bool> shutdown_called(new bool(false));
-  std::unique_ptr<SpanExporter> exporter(new MockSpanExporter(span_received, shutdown_called));
   std::shared_ptr<TracezSpanProcessor> processor(new TracezSpanProcessor());
 
   auto tracer = std::shared_ptr<opentelemetry::trace::Tracer>(new Tracer(processor));
@@ -228,9 +172,6 @@ TEST(TraceZDataAggregator, MultipleErrorSpanDifferentName)
 
 TEST(TraceZDataAggregator, ErrorSpansAtCapacity)
 {
-  std::shared_ptr<bool> span_received(new bool(false));
-  std::shared_ptr<bool> shutdown_called(new bool(false));
-  std::unique_ptr<SpanExporter> exporter(new MockSpanExporter(span_received, shutdown_called));
   std::shared_ptr<TracezSpanProcessor> processor(new TracezSpanProcessor());
 
   auto tracer = std::shared_ptr<opentelemetry::trace::Tracer>(new Tracer(processor));
@@ -263,9 +204,6 @@ TEST(TraceZDataAggregator, ErrorSpansAtCapacity)
 
 TEST(TraceZDataAggregator, SingleCompletedSpan)
 {
-  std::shared_ptr<bool> span_received(new bool(false));
-  std::shared_ptr<bool> shutdown_called(new bool(false));
-  std::unique_ptr<SpanExporter> exporter(new MockSpanExporter(span_received, shutdown_called));
   std::shared_ptr<TracezSpanProcessor> processor(new TracezSpanProcessor());
 
   auto tracer = std::shared_ptr<opentelemetry::trace::Tracer>(new Tracer(processor));
@@ -291,9 +229,6 @@ TEST(TraceZDataAggregator, SingleCompletedSpan)
 
 TEST(TraceZDataAggregator, MultipleCompletedSpanSameName)
 {
-  std::shared_ptr<bool> span_received(new bool(false));
-  std::shared_ptr<bool> shutdown_called(new bool(false));
-  std::unique_ptr<SpanExporter> exporter(new MockSpanExporter(span_received, shutdown_called));
   std::shared_ptr<TracezSpanProcessor> processor(new TracezSpanProcessor());
 
   auto tracer = std::shared_ptr<opentelemetry::trace::Tracer>(new Tracer(processor));
@@ -331,9 +266,6 @@ TEST(TraceZDataAggregator, MultipleCompletedSpanSameName)
 
 TEST(TraceZDataAggregator, RunningAndCompletedSpan)
 {
-  std::shared_ptr<bool> span_received(new bool(false));
-  std::shared_ptr<bool> shutdown_called(new bool(false));
-  std::unique_ptr<SpanExporter> exporter(new MockSpanExporter(span_received, shutdown_called));
   std::shared_ptr<TracezSpanProcessor> processor(new TracezSpanProcessor());
 
   auto tracer = std::shared_ptr<opentelemetry::trace::Tracer>(new Tracer(processor));
