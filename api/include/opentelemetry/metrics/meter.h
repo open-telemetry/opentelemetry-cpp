@@ -1,7 +1,9 @@
 #pragma once
 
-#include "opentelemetry/nostd/string_view.h"
 #include "opentelemetry/nostd/shared_ptr.h"
+#include "opentelemetry/nostd/span.h"
+#include "opentelemetry/nostd/string_view.h"
+#include "opentelemetry/nostd/variant.h"
 #include "opentelemetry/trace/key_value_iterable_view.h"
 #include "opentelemetry/version.h"
 
@@ -24,14 +26,6 @@ class Meter
 {
 public:
   virtual ~Meter() = default;
-
-  //////////////////////////////
-  //                          //
-  // Change pointer type to   //
-  // SynchronousInstrument or //
-  // AsynchronousInstrument?  //
-  //                          //
-  //////////////////////////////
 
   /**
    * Creates, adds to private metrics container, and returns a DoubleCounter with "name."
@@ -67,10 +61,11 @@ public:
    * @throws IllegalArgumentException if a different metric by the same name exists in this meter.
    * @throws IllegalArgumentException if the {@code name} does not match spec requirements.
    */
-  virtual opentelemetry::nostd::shared_ptr<SynchronousInstrument> NewIntCounter(nostd::string_view name,
-                                                                     nostd::string_view description,
-                                                                     nostd::string_view unit,
-                                                                     const bool enabled)
+  virtual opentelemetry::nostd::shared_ptr<SynchronousInstrument> NewIntCounter(
+      nostd::string_view name,
+      nostd::string_view description,
+      nostd::string_view unit,
+      const bool enabled)
   {
     return opentelemetry::nostd::shared_ptr<SynchronousInstrument>{
         new IntCounter(name, description, unit, enabled)};
@@ -222,12 +217,12 @@ public:
    * @throws IllegalArgumentException if a different metric by the same name exists in this meter.
    * @throws IllegalArgumentException if the {@code name} does not match spec requirements.
    */
-  virtual opentelemetry::nostd::shared_ptr<AsynchronousInstrument>
-  NewDoubleUpDownSumObserver(nostd::string_view name,
-                             nostd::string_view description,
-                             nostd::string_view unit,
-                             const bool enabled,
-                             void (*callback)(DoubleObserverResult))
+  virtual opentelemetry::nostd::shared_ptr<AsynchronousInstrument> NewDoubleUpDownSumObserver(
+      nostd::string_view name,
+      nostd::string_view description,
+      nostd::string_view unit,
+      const bool enabled,
+      void (*callback)(DoubleObserverResult))
   {
     return opentelemetry::nostd::shared_ptr<AsynchronousInstrument>{
         new DoubleUpDownSumObserver(name, description, unit, enabled, callback)};
@@ -312,8 +307,10 @@ public:
    *        and the value is the value to be recorded to all metric instruments in
    *        the batch of the associated instrument type.
    */
-  virtual void RecordBatch(nostd::string_view labels,
-                           const trace::KeyValueIterable &values) noexcept
+  virtual void RecordBatch(
+      nostd::string_view labels,
+      const nostd::span<std::pair<nostd::shared_ptr<SynchronousInstrument>,
+          nostd::variant<int, double>>> values) noexcept
   {
     // No-op
   }
