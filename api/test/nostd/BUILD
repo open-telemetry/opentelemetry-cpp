@@ -74,25 +74,3 @@ cc_test(
         "@com_google_googletest//:gtest_main",
     ],
 )
-
-cc_test(
-    name = "list_test",
-    srcs = [
-        "list_test.cc",
-    ],
-    deps = [
-        "//api",
-        "@com_google_googletest//:gtest_main",
-    ],
-)
-
-cc_test(
-    name = "pair_test",
-    srcs = [
-        "pair_test.cc",
-    ],
-    deps = [
-        "//api",
-        "@com_google_googletest//:gtest_main",
-    ],
-)
