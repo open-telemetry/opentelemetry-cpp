@@ -364,6 +364,39 @@ TEST(TracezSpanProcessor, MultipleSpansRightContainerOuterStored) {
   ASSERT_EQ(completed.size(), 5);
 }
 
+/*
+ * Test if a single span moves from running to completed at expected times.
+ * Only new completed spans are stored.
+*/
+TEST(TracezSpanProcessor, OneSpanRightContainerNewOnly) {
+  auto processor = MakeProcessor();
+  auto tracer = std::shared_ptr<opentelemetry::trace::Tracer>(new Tracer(processor));
+  auto running = processor->GetRunningSpans();
+  auto completed = processor->GetCompletedSpans();
+
+  std::vector<std::string> span_name = { "span" };
+
+  auto span = tracer->StartSpan(span_name[0]);
+  UpdateSpans(processor, completed, running, true);
+
+  ASSERT_TRUE(ContainsNames(span_name, running, true));
+  ASSERT_EQ(running.size(), 1);
+  ASSERT_EQ(completed.size(), 0);
+
+  span->End();
+  UpdateSpans(processor, completed, running, true);
+
+  ASSERT_TRUE(ContainsNames(span_name, completed, true));
+  ASSERT_EQ(running.size(), 0);
+  ASSERT_EQ(completed.size(), 1);
+
+  UpdateSpans(processor, completed, running, true);
+
+  ASSERT_TRUE(ContainsNames(span_name, completed, true));
+  ASSERT_EQ(running.size(), 0);
+  ASSERT_EQ(completed.size(), 0);
+
+}
 
 /*
  * Test if multiple spans move from running to completed at expected times,
@@ -415,6 +448,12 @@ TEST(TracezSpanProcessor, MultipleSpansRightContainerMiddleNewOnly) {
   ASSERT_TRUE(ContainsNames(span_names, completed, 4)); // s
   ASSERT_EQ(running.size(), 0);
   ASSERT_EQ(completed.size(), 2);
+
+  UpdateSpans(processor, completed, running, true);
+
+  ASSERT_TRUE(ContainsNames(span_names, completed, true));
+  ASSERT_EQ(running.size(), 0);
+  ASSERT_EQ(completed.size(), 0);
 }
 
 
@@ -458,6 +497,12 @@ TEST(TracezSpanProcessor, MultipleSpansRightContainerOuterNewOnly) {
   ASSERT_TRUE(ContainsNames(span_names, completed, 1, 4, true)); // s2 s1 s1
   ASSERT_EQ(running.size(), 0);
   ASSERT_EQ(completed.size(), 3);
+
+  UpdateSpans(processor, completed, running, true);
+
+  ASSERT_TRUE(ContainsNames(span_names, completed, true));
+  ASSERT_EQ(running.size(), 0);
+  ASSERT_EQ(completed.size(), 0);
 }
 
 
