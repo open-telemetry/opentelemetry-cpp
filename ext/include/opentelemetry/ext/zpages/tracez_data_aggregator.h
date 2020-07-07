@@ -102,12 +102,12 @@ private:
   /** 
    * AggregateCompletedSpans is the function that is called to update the aggregated data of newly completed spans
    */
-  void AggregateCompletedSpans();
+  void AggregateCompletedSpans(std::vector<std::unique_ptr<opentelemetry::sdk::trace::Recordable>>& completed_spans);
   
   /**
    * AggregateRunningSpans aggregates the data for running spans.
    */
-  void AggregateRunningSpans();
+  void AggregateRunningSpans(std::unordered_set<opentelemetry::sdk::trace::Recordable*>& running_spans);
   
   
   /** 

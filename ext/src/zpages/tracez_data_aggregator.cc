@@ -56,10 +56,8 @@ void TracezDataAggregator::AggregateStatusErrorSpan(std::unique_ptr<opentelemetr
   aggregated_data_[span_name]->num_error_spans++;
 }
 
-void TracezDataAggregator::AggregateCompletedSpans()
-{
-  auto completed_spans = tracez_span_processor_->GetCompletedSpans();
-  
+void TracezDataAggregator::AggregateCompletedSpans(std::vector<std::unique_ptr<opentelemetry::sdk::trace::Recordable>>& completed_spans)
+{ 
   for(auto& span: completed_spans)
   {
     std::string span_name = span->GetName().data();
@@ -77,9 +75,8 @@ void TracezDataAggregator::AggregateCompletedSpans()
   }
 }
 
-void TracezDataAggregator::AggregateRunningSpans()
+void TracezDataAggregator::AggregateRunningSpans(std::unordered_set<opentelemetry::sdk::trace::Recordable*>& running_spans)
 {
-  auto running_spans = tracez_span_processor_->GetRunningSpans();
   std::unordered_set<std::string> cache;
   for(auto& span: running_spans)
   {
@@ -102,8 +99,9 @@ void TracezDataAggregator::AggregateRunningSpans()
 
 void TracezDataAggregator::AggregateSpans()
 {
-  AggregateCompletedSpans();
-  AggregateRunningSpans();
+  auto span_snapshot = tracez_span_processor_->GetSpanSnapshot();
+  AggregateCompletedSpans(span_snapshot.completed);
+  AggregateRunningSpans(span_snapshot.running);
 }
 
 
