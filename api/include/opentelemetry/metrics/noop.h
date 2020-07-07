@@ -4,10 +4,10 @@
 // This file is part of the internal implementation of OpenTelemetry. Nothing in this file should be
 // used directly. Please refer to meter.h for documentation on these interfaces.
 
-#include "opentelemetry/nostd/string_view.h"
-#include "opentelemetry/nostd/unique_ptr.h"
 #include "opentelemetry/metrics/meter.h"
 #include "opentelemetry/metrics/meter_provider.h"
+#include "opentelemetry/nostd/string_view.h"
+#include "opentelemetry/nostd/unique_ptr.h"
 #include "opentelemetry/version.h"
 
 #include <memory>
@@ -23,7 +23,6 @@ class NoopInstrument
 public:
   NoopInstrument(const std::shared_ptr<Meter> &meter) noexcept : meter_{meter} {}
 
-
   Meter &meter() const noexcept { return *meter_; }
 
 private:
@@ -36,8 +35,7 @@ private:
 class NoopMeter final : public Meter, public std::enable_shared_from_this<NoopMeter>
 {
 public:
-    NoopMeter() = default;
-
+  NoopMeter() = default;
 };
 
 /**

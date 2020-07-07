@@ -14,7 +14,7 @@ class Meter
 {
 public:
   virtual ~Meter() = default;
-  Meter() = default;
+  Meter()          = default;
 };
 
 }  // namespace metrics
