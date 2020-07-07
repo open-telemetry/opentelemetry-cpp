@@ -6,7 +6,6 @@
 #include <unordered_set>
 #include <vector>
 #include <list>
-#include <memory>
 
 // include files
 #include "opentelemetry/ext/zpages/tracez_processor.h"
