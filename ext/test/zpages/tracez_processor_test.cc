@@ -9,48 +9,13 @@
 using namespace opentelemetry::sdk::trace;
 using namespace opentelemetry::ext::zpages;
 
-/**
- * A mock exporter that switches a flag once a valid recordable was received.
- */
-class MockSpanExporter final : public SpanExporter {
- public:
-  MockSpanExporter(std::shared_ptr<bool> span_received,
-                   std::shared_ptr<bool> shutdown_called) noexcept
-      : span_received_(span_received), shutdown_called_(shutdown_called) {}
-
-  std::unique_ptr<Recordable> MakeRecordable() noexcept override {
-    return std::unique_ptr<Recordable>(new SpanData);
-  }
-
-  ExportResult Export(
-      const opentelemetry::nostd::span<std::unique_ptr<Recordable>> &spans) noexcept override {
-    for (auto &span : spans) {
-      if (span != nullptr) {
-        *span_received_ = true;
-      }
-    }
-
-    return ExportResult::kSuccess;
-  }
-
-  void Shutdown(std::chrono::microseconds timeout = std::chrono::microseconds(0)) noexcept override {
-    *shutdown_called_ = true;
-  }
-
- private:
-  std::shared_ptr<bool> span_received_;
-  std::shared_ptr<bool> shutdown_called_;
-};
 
 /*
  * Helper function to create a processor when the type of exporter doesn't
  * matter
  */
 std::shared_ptr<TracezSpanProcessor> MakeProcessor() {
-  std::shared_ptr<bool> span_received(new bool(false));
-  std::shared_ptr<bool> shutdown_called(new bool(false));
-  std::unique_ptr<SpanExporter> exporter(new MockSpanExporter(span_received, shutdown_called));
-  std::shared_ptr<TracezSpanProcessor> processor(new TracezSpanProcessor(std::move(exporter)));
+  std::shared_ptr<TracezSpanProcessor> processor(new TracezSpanProcessor());
   return processor;
 }
 
@@ -63,18 +28,17 @@ void UpdateSpans(std::shared_ptr<TracezSpanProcessor>& processor,
     std::vector<std::unique_ptr<opentelemetry::sdk::trace::Recordable>>& completed,
     std::unordered_set<opentelemetry::sdk::trace::Recordable*>& running,
     bool store_only_new_completed = false) {
-
-  running = processor->GetRunningSpans();
-  auto temp = processor->GetCompletedSpans();
+  auto spans = processor->GetSpanSnapshot();
+  running = spans.running;
   if (store_only_new_completed) {
     completed.clear();
-    completed = std::move(temp);
+    completed = std::move(spans.completed);
   }
   else {
-    std::move(temp.begin(), temp.end(),
+    std::move(spans.completed.begin(), spans.completed.end(),
             std::inserter(completed, completed.end()));
   }
-  temp.clear();
+  spans.completed.clear();
 
 }
 
@@ -159,36 +123,17 @@ bool ContainsNames(const std::vector<std::string>& names,
 
 }
 
-/*
- * Test if the TraceZ processor correctly batches and exports spans
- */
-TEST(TracezSpanProcessor, ToMockSpanExporter) {
-  std::shared_ptr<bool> span_received(new bool(false));
-  std::shared_ptr<bool> shutdown_called(new bool(false));
-  std::unique_ptr<SpanExporter> exporter(new MockSpanExporter(span_received, shutdown_called));
-  TracezSpanProcessor processor(std::move(exporter));
-
-  auto recordable = processor.MakeRecordable();
-
-  processor.OnStart(*recordable);
-  ASSERT_FALSE(*span_received);
-
-  processor.OnEnd(std::move(recordable));
-  ASSERT_TRUE(*span_received);
-
-  processor.Shutdown();
-  ASSERT_TRUE(*shutdown_called);
-}
-
 
 /*
  * Test if both span containers are empty when no spans exist or are added
  */
 TEST(TracezSpanProcessor, NoSpans) {
   auto processor = MakeProcessor();
+  auto spans = processor->GetSpanSnapshot();
+  auto recordable = processor->MakeRecordable();
 
-  ASSERT_EQ(processor->GetRunningSpans().size(), 0);
-  ASSERT_EQ(processor->GetCompletedSpans().size(), 0);
+  ASSERT_EQ(spans.running.size(), 0);
+  ASSERT_EQ(spans.running.size(), 0);
 
 }
 
@@ -200,8 +145,9 @@ TEST(TracezSpanProcessor, NoSpans) {
 TEST(TracezSpanProcessor, OneSpanRightContainerStored) {
   auto processor = MakeProcessor();
   auto tracer = std::shared_ptr<opentelemetry::trace::Tracer>(new Tracer(processor));
-  auto running = processor->GetRunningSpans();
-  auto completed = processor->GetCompletedSpans();
+  auto spans = processor->GetSpanSnapshot();
+  auto running = spans.running;
+  auto completed = std::move(spans.completed);
 
   std::vector<std::string> span_name = { "span" };
 
@@ -230,8 +176,9 @@ TEST(TracezSpanProcessor, OneSpanRightContainerStored) {
 TEST(TracezSpanProcessor, MultipleSpansRightContainerStored) {
   auto processor = MakeProcessor();
   auto tracer = std::shared_ptr<opentelemetry::trace::Tracer>(new Tracer(processor));
-  auto running = processor->GetRunningSpans();
-  auto completed = processor->GetCompletedSpans();
+  auto spans = processor->GetSpanSnapshot();
+  auto running = spans.running;
+  auto completed = std::move(spans.completed);
 
   ASSERT_EQ(running.size(), 0);
   ASSERT_EQ(completed.size(), 0);
@@ -265,8 +212,9 @@ TEST(TracezSpanProcessor, MultipleSpansRightContainerStored) {
 TEST(TracezSpanProcessor, MultipleSpansRightContainerMiddleStored) {
   auto processor = MakeProcessor();
   auto tracer = std::shared_ptr<opentelemetry::trace::Tracer>(new Tracer(processor));
-  auto running = processor->GetRunningSpans();
-  auto completed = processor->GetCompletedSpans();
+  auto spans = processor->GetSpanSnapshot();
+  auto running = spans.running;
+  auto completed = std::move(spans.completed);
 
   std::vector<std::string> span_names = {"s0", "s2", "s1", "s1", "s"};
 
@@ -328,8 +276,9 @@ TEST(TracezSpanProcessor, MultipleSpansRightContainerMiddleStored) {
 TEST(TracezSpanProcessor, MultipleSpansRightContainerOuterStored) {
   auto processor = MakeProcessor();
   auto tracer = std::shared_ptr<opentelemetry::trace::Tracer>(new Tracer(processor));
-  auto running = processor->GetRunningSpans();
-  auto completed = processor->GetCompletedSpans();
+  auto spans = processor->GetSpanSnapshot();
+  auto running = spans.running;
+  auto completed = std::move(spans.completed);
 
   std::vector<std::string> span_names = {"s0", "s2", "s1", "s1", "s"};
 
@@ -371,8 +320,9 @@ TEST(TracezSpanProcessor, MultipleSpansRightContainerOuterStored) {
 TEST(TracezSpanProcessor, OneSpanRightContainerNewOnly) {
   auto processor = MakeProcessor();
   auto tracer = std::shared_ptr<opentelemetry::trace::Tracer>(new Tracer(processor));
-  auto running = processor->GetRunningSpans();
-  auto completed = processor->GetCompletedSpans();
+  auto spans = processor->GetSpanSnapshot();
+  auto running = spans.running;
+  auto completed = std::move(spans.completed);
 
   std::vector<std::string> span_name = { "span" };
 
@@ -405,8 +355,9 @@ TEST(TracezSpanProcessor, OneSpanRightContainerNewOnly) {
 TEST(TracezSpanProcessor, MultipleSpansRightContainerMiddleNewOnly) {
   auto processor = MakeProcessor();
   auto tracer = std::shared_ptr<opentelemetry::trace::Tracer>(new Tracer(processor));
-  auto running = processor->GetRunningSpans();
-  auto completed = processor->GetCompletedSpans();
+  auto spans = processor->GetSpanSnapshot();
+  auto running = spans.running;
+  auto completed = std::move(spans.completed);
 
   std::vector<std::string> span_names = {"s0", "s2", "s1", "s1", "s"};
 
@@ -464,8 +415,9 @@ TEST(TracezSpanProcessor, MultipleSpansRightContainerMiddleNewOnly) {
 TEST(TracezSpanProcessor, MultipleSpansRightContainerOuterNewOnly) {
   auto processor = MakeProcessor();
   auto tracer = std::shared_ptr<opentelemetry::trace::Tracer>(new Tracer(processor));
-  auto running = processor->GetRunningSpans();
-  auto completed = processor->GetCompletedSpans();
+  auto spans = processor->GetSpanSnapshot();
+  auto running = spans.running;
+  auto completed = std::move(spans.completed);
 
   std::vector<std::string> span_names = {"s0", "s2", "s1", "s1", "s"};
 
