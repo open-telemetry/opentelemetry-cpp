@@ -30,7 +30,7 @@ TEST(DispatcherTest, ResetTimer)
   dispatcher.Run();
   auto duration = t2 - t1;
   EXPECT_TRUE(duration > std::chrono::milliseconds{50});
-  EXPECT_TRUE(duration < std::chrono::milliseconds{200});
+  EXPECT_TRUE(duration < std::chrono::milliseconds{300});
 }
 
 TEST(DispatcherTest, TimerOrder)
