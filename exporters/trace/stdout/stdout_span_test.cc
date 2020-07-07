@@ -16,7 +16,6 @@
 namespace trace    = opentelemetry::trace;
 namespace nostd    = opentelemetry::nostd;
 namespace sdktrace = opentelemetry::sdk::trace;
-using opentelemetry::sdk::trace::SpanData;
 
 TEST(StdoutSpanExporter, Shutdown)
 {
@@ -49,7 +48,6 @@ TEST(StdoutSpanExporter, PrintDefaultSpan)
       new sdktrace::SimpleSpanProcessor(std::move(exporter)));
 
   auto recordable = processor->MakeRecordable();
-  recordable->SetName("Test Span");
 
   // This can be an ofstream as well or any other ostream
   std::stringstream buffer;
@@ -64,7 +62,7 @@ TEST(StdoutSpanExporter, PrintDefaultSpan)
 
   const char* expectedOutput =
  "{\n"
-  "  name          : Test Span\n"
+  "  name          : \n"
   "  trace_id      : 00000000000000000000000000000000\n"
   "  span_id       : 0000000000000000\n"
   "  parent_span_id: 0000000000000000\n"
