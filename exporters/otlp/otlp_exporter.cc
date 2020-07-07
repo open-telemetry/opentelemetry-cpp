@@ -71,7 +71,7 @@ sdk::trace::ExportResult OtlpExporter::Export(
 
   if (!status.ok())
   {
-    std::cerr << "[OTLP Exporter] Export() failed: " << status.error_message() << std::endl;
+    std::cerr << "[OTLP Exporter] Export() failed: " << status.error_message() << "\n";
     return sdk::trace::ExportResult::kFailure;
   }
   return sdk::trace::ExportResult::kSuccess;
