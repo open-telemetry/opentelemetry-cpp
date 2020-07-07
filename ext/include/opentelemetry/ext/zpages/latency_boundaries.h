@@ -35,7 +35,7 @@ enum LatencyBoundaryName
 /**
  * kLatency_Boundaries constant that contains the 9 latency boundaries and enables them to be iterated over
  */
-const std::vector<std::chrono::nanoseconds> kLatencyBoundaries = {
+const std::array<std::chrono::nanoseconds,9> kLatencyBoundaries = {
     nanoseconds(0),
     nanoseconds(std::chrono::microseconds(10)),
     nanoseconds(std::chrono::microseconds(100)), 
@@ -46,6 +46,7 @@ const std::vector<std::chrono::nanoseconds> kLatencyBoundaries = {
     nanoseconds(std::chrono::seconds(10)),
     nanoseconds(std::chrono::seconds(100)),
   };
+
 
 
 }  // namespace zpages

@@ -293,6 +293,7 @@ TEST(TraceZDataAggregator, MultipleCompletedSpanSameName)
   tracer->StartSpan("span 1", start)->End(end);
   
   const std::map<std::string, std::unique_ptr<AggregatedInformation>>& data = tracez_data_aggregator->GetAggregatedData();
+  ASSERT_EQ(data.size(),1);
   ASSERT_TRUE(data.find("span 1") != data.end());
   ASSERT_EQ(data.at("span 1")->span_count_per_latency_bucket[0], 2); 
   ASSERT_EQ(data.at("span 1")->latency_sample_spans[0].size(),2);
@@ -302,4 +303,41 @@ TEST(TraceZDataAggregator, MultipleCompletedSpanSameName)
   ASSERT_EQ(data.at("span 1")->latency_sample_spans[1].front()->GetDuration(),std::chrono::nanoseconds(10000));
 }
 
+
+TEST(TraceZDataAggregator, RunningAndCompletedSpan)
+{
+  std::shared_ptr<bool> span_received(new bool(false));
+  std::shared_ptr<bool> shutdown_called(new bool(false));
+  std::unique_ptr<SpanExporter> exporter(new MockSpanExporter(span_received, shutdown_called));
+  std::shared_ptr<TracezSpanProcessor> processor(new TracezSpanProcessor(std::move(exporter)));
+
+  auto tracer = std::shared_ptr<opentelemetry::trace::Tracer>(new Tracer(processor));
+  auto tracez_data_aggregator (new TracezDataAggregator(processor));
+
+  opentelemetry::trace::StartSpanOptions start;
+  start.start_steady_time = SteadyTimestamp(std::chrono::nanoseconds(5));
+  
+  auto span_first  = tracer->StartSpan("span 1",start);
+  
+  start.start_steady_time = SteadyTimestamp(std::chrono::nanoseconds(10));
+
+  opentelemetry::trace::EndSpanOptions end;
+  end.end_steady_time = SteadyTimestamp(std::chrono::nanoseconds(40));
+
+  tracer->StartSpan("span 1", start)->End(end);
+  
+  const std::map<std::string, std::unique_ptr<AggregatedInformation>>& data = tracez_data_aggregator->GetAggregatedData();
+  ASSERT_EQ(data.size(),1);
+  ASSERT_TRUE(data.find("span 1") != data.end());
+  ASSERT_EQ(data.at("span 1")->span_count_per_latency_bucket[0], 1); 
+  ASSERT_EQ(data.at("span 1")->latency_sample_spans[0].front()->GetDuration(),std::chrono::nanoseconds(30));
+  ASSERT_EQ(data.at("span 1")->num_running_spans,1);
+  
+  span_first->End(end);
+  const std::map<std::string, std::unique_ptr<AggregatedInformation>>& data2 = tracez_data_aggregator->GetAggregatedData();
+  ASSERT_EQ(data2.size(),1);
+  ASSERT_TRUE(data2.find("span 1") != data2.end());
+  ASSERT_EQ(data2.at("span 1")->span_count_per_latency_bucket[0], 2); 
+  ASSERT_EQ(data2.at("span 1")->num_running_spans,0);
+}
 

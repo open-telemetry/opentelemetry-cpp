@@ -5,7 +5,9 @@
 #include <map>
 #include <unordered_set>
 #include <vector>
+#include <array>
 #include <list>
+#include <iostream>
 
 // include files
 #include "opentelemetry/ext/zpages/tracez_processor.h"
@@ -35,27 +37,26 @@ struct AggregatedInformation{
   int num_error_spans;
   
   /** 
-   * latency_sample_spans_ is a vector of lists, each index of the vector corresponds to a latency boundary(of which there are 9).
+   * latency_sample_spans is a vector of lists, each index of the vector corresponds to a latency boundary(of which there are 9).
    * The list in each index stores the sample spans for that latency boundary.
    */
-  std::vector<std::list<std::unique_ptr<opentelemetry::sdk::trace::Recordable>>> latency_sample_spans;
+  std::array<std::list<std::unique_ptr<opentelemetry::sdk::trace::Recordable>>,kLatencyBoundaries.size()> latency_sample_spans;
   
   /**
-   * error_sample_spans_ is a list that stores the error samples for a span name.
+   * error_sample_spans is a list that stores the error samples for a span name.
    */
   std::list<std::unique_ptr<opentelemetry::sdk::trace::Recordable>> error_sample_spans;
   
   /**
-   * span_count_per_latency_bucket_ is a vector that stores the count of spans for each of the 9 latency buckets.
+   * span_count_per_latency_bucket is a vector that stores the count of spans for each of the 9 latency buckets.
    */
-  std::vector<int> span_count_per_latency_bucket;
+  std::array<int,kLatencyBoundaries.size()>span_count_per_latency_bucket;
   
   AggregatedInformation()
   {
     num_running_spans = 0;
     num_error_spans = 0;
-    latency_sample_spans.resize(kLatencyBoundaries.size());
-    span_count_per_latency_bucket.resize(kLatencyBoundaries.size(),0);
+    span_count_per_latency_bucket.fill(0);
   } 
 };
 
