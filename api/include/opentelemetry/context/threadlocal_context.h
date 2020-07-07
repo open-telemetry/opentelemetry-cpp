@@ -5,11 +5,11 @@
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace context
 {
+
 /* The ThreadLocalContext class is a derived class from RuntimeContext and
  * provides a wrapper for
  * propogating context through cpp thread locally. */
-template <class M>
-class ThreadLocalContext : public RuntimeContext<M>
+class ThreadLocalContext : public RuntimeContext
 {
 public:
   /* The token class provides an identifier that is used by
@@ -19,21 +19,21 @@ public:
   class Token
   {
   private:
-    friend class ThreadLocalContext<M>;
+    friend class ThreadLocalContext;
 
-    Context<M> context_;
+    Context context_;
 
     /* A constructor that sets the token's Context object to the
      * one that was passed in.
      */
-    Token(Context<M> &context) { context_ = context; }
+    Token(Context &context) { context_ = context; }
 
     /* Returns the stored context object. */
-    Context<M> GetContext() { return context_; }
+    Context GetContext() { return context_; }
   };
 
   /* Return the current context. */
-  static Context<M> GetCurrent() { return GetInstance(); }
+  static Context GetCurrent() { return GetInstance(); }
 
   /* Resets the context to a previous value stored in the
    * passed in token. Returns zero if successful, -1 otherwise
@@ -54,7 +54,7 @@ public:
   /* Sets the current 'Context' object. Returns a token
    * that can be used to reset to the previous Context.
    */
-  static Token Attach(Context<M> &context)
+  static Token Attach(Context &context)
   {
     Token old_context = Token(GetInstance());
     GetInstance()     = context;
@@ -63,9 +63,9 @@ public:
 
 private:
   /* Provides storage and access to the thread_local context object */
-  static Context<M> &GetInstance()
+  static Context &GetInstance()
   {
-    static thread_local Context<M> instance;
+    static thread_local Context instance;
     return instance;
   }
 };

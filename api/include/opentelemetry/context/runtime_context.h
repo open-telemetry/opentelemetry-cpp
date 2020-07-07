@@ -8,7 +8,6 @@ namespace context
 
 /* The RuntimeContext class provides a wrapper for
  * propogating context through cpp. */
-template <class M>
 class RuntimeContext
 {
 public:
@@ -19,27 +18,27 @@ public:
   class Token
   {
   private:
-    friend class RuntimeContext<M>;
+    friend class RuntimeContext;
 
-    Context<M> context_;
+    Context context_;
 
     /* A constructor that sets the token's Context object to the
      * one that was passed in.
      */
-    Token(Context<M> &context) { context_ = context; }
+    Token(Context &context) { context_ = context; }
 
     /* Returns the stored context object. */
-    Context<M> GetContext() { return context_; }
+    Context GetContext() { return context_; }
   };
 
   /* Return the current context. */
-  Context<M> GetCurrent();
+  Context GetCurrent();
 
   /* Sets the current 'Context' object. Returns a token
    * that can be used to reset to the previous Context.
    */
 
-  Token Attach(Context<M> &context);
+  Token Attach(Context &context);
 
   /* Resets the context to a previous value stored in the
    * passed in token. Returns zero if successful, -1 otherwise
