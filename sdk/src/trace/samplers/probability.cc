@@ -19,13 +19,57 @@
 #include <cstdint>
 #include <stdexcept>
 
+namespace trace_api = opentelemetry::trace;
+
+namespace
+{
+  /**
+   * Converts a probability in [0, 1] to a threshold in [0, UINT64_MAX]
+   *
+   * @param probability a required value top be converted to uint64_t. is
+   * bounded by 1 >= probability >= 0.
+   * @return Returns threshold value computed after converting probability to
+   * uint64_t datatype
+   */
+  uint64_t CalculateThreshold(double probability) noexcept
+  {
+    if (probability <= 0.0) return 0; 
+    if (probability >= 1.0) return UINT64_MAX;
+    
+    // We can't directly return probability * UINT64_MAX.
+    //
+    // UINT64_MAX is (2^64)-1, but as a double rounds up to 2^64.
+    // For probabilities >= 1-(2^-54), the product wraps to zero!
+    // Instead, calculate the high and low 32 bits separately.
+    const double product = UINT32_MAX * probability;
+    double hi_bits, lo_bits = ldexp(modf(product, &hi_bits), 32) + product;
+    return (static_cast<uint64_t>(hi_bits) << 32) +
+           static_cast<uint64_t>(lo_bits);
+  }
+
+  /**
+   * @param trace_id a required value to be converted to uint64_t. trace_id must
+   * at least 8 bytes long
+   * @return Returns threshold value computed after converting trace_id to
+   * uint64_t datatype
+   */
+  uint64_t CalculateThresholdFromBuffer(const trace_api::TraceId& trace_id) noexcept
+  {
+    // We only use the first 8 bytes of TraceId.
+    static_assert(trace_api::TraceId::kSize >= 8, "TraceID must be at least 8 bytes long.");
+
+    uint64_t res = 0;
+    std::memcpy(&res, &trace_id, 8);
+    
+    return res;
+  }
+} // namespace
+
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace sdk
 {
 namespace trace
 {
-namespace trace_api = opentelemetry::trace;
-
 ProbabilitySampler::ProbabilitySampler(double probability)
 : threshold_(CalculateThreshold(probability))
 {
@@ -62,33 +106,6 @@ SamplingResult ProbabilitySampler::ShouldSample(
 std::string ProbabilitySampler::GetDescription() const noexcept
 {
   return sampler_description_;
-}
-
-uint64_t ProbabilitySampler::CalculateThreshold(double probability) const noexcept
-{
-  if (probability <= 0.0) return 0; 
-  if (probability >= 1.0) return UINT64_MAX;
-  
-  // We can't directly return probability * UINT64_MAX.
-  //
-  // UINT64_MAX is (2^64)-1, but as a double rounds up to 2^64.
-  // For probabilities >= 1-(2^-54), the product wraps to zero!
-  // Instead, calculate the high and low 32 bits separately.
-  const double product = UINT32_MAX * probability;
-  double hi_bits, lo_bits = ldexp(modf(product, &hi_bits), 32) + product;
-  return (static_cast<uint64_t>(hi_bits) << 32) +
-         static_cast<uint64_t>(lo_bits);
-}
-
-uint64_t ProbabilitySampler::CalculateThresholdFromBuffer(const trace_api::TraceId& trace_id) const noexcept
-{
-  // We only use the first 8 bytes of TraceId.
-  static_assert(trace_api::TraceId::kSize >= 8, "TraceID must be at least 8 bytes long.");
-
-  uint64_t res = 0;
-  std::memcpy(&res, &trace_id, 8);
-  
-  return res;
 }
 }  // namespace trace
 }  // namespace sdk
