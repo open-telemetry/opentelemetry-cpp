@@ -1,6 +1,8 @@
 #include "opentelemetry/sdk/trace/samplers/probability.h"
 
 #include <gtest/gtest.h>
+#include <cstdlib>
+#include <ctime>
 
 using opentelemetry::sdk::trace::ProbabilitySampler;
 using opentelemetry::sdk::trace::Decision;
@@ -22,7 +24,7 @@ TEST(ProbabilitySampler, ShouldSampleWithoutContext)
 	ASSERT_EQ(Decision::RECORD_AND_SAMPLE, sampling_result.decision);
 	ASSERT_EQ(nullptr, sampling_result.attributes);
 
-	constexpr uint8_t buf[] = {1, 2, 3, 4, 5, 6, 7, 8, 8, 7, 6, 5, 4, 3, 2, 1};
+	constexpr uint8_t buf[] = {0, 0, 0, 0, 0, 0, 0, 0x80, 0, 0, 0, 0, 0, 0, 0, 0};
 	opentelemetry::trace::TraceId valid_trace_id(buf);
 
 	sampling_result = s1.ShouldSample(nullptr, valid_trace_id, "", span_kind, view);
@@ -30,9 +32,23 @@ TEST(ProbabilitySampler, ShouldSampleWithoutContext)
 	ASSERT_EQ(Decision::NOT_RECORD, sampling_result.decision);
 	ASSERT_EQ(nullptr, sampling_result.attributes);
 
-	ProbabilitySampler s2(0.123457);
+	ProbabilitySampler s2(0.50000001);
 
 	sampling_result = s2.ShouldSample(nullptr, valid_trace_id, "", span_kind, view);
+
+	ASSERT_EQ(Decision::RECORD_AND_SAMPLE, sampling_result.decision);
+	ASSERT_EQ(nullptr, sampling_result.attributes);
+
+	ProbabilitySampler s3(0.49999999);
+
+	sampling_result = s3.ShouldSample(nullptr, valid_trace_id, "", span_kind, view);
+
+	ASSERT_EQ(Decision::NOT_RECORD, sampling_result.decision);
+	ASSERT_EQ(nullptr, sampling_result.attributes);
+
+	ProbabilitySampler s4(0.50000000);
+
+	sampling_result = s4.ShouldSample(nullptr, valid_trace_id, "", span_kind, view);
 
 	ASSERT_EQ(Decision::RECORD_AND_SAMPLE, sampling_result.decision);
 	ASSERT_EQ(nullptr, sampling_result.attributes);
@@ -74,6 +90,152 @@ TEST(ProbabilitySampler, ShouldSampleWithContext)
 	ASSERT_EQ(nullptr, sampling_result.attributes);
 }
 
+TEST(ProbabilitySampler, ProbabilitySamplerHalf)
+{
+	double probability = 0.001;
+	int iterations = 100000, expected_count = iterations * probability,
+		actual_count = 0, variance = 1000;
+
+	opentelemetry::sdk::trace::Sampler::SpanContext c(true, true);
+	ProbabilitySampler s(probability);
+	opentelemetry::trace::SpanKind span_kind = opentelemetry::trace::SpanKind::kInternal;
+
+	using M = std::map<std::string, int>;
+	M m1 = {{}};
+	opentelemetry::trace::KeyValueIterableView<M> view{m1};
+
+	srand(time(0));
+
+	for (int i = 0; i < iterations; ++i)
+	{
+		uint8_t buf[16];
+		for (int j = 0; j < 16; ++j)
+		{
+			buf[j] = (std::rand() % 255) + 1;
+		}
+
+		opentelemetry::trace::TraceId trace_id(buf);
+
+		uint64_t r = 0;
+		std::memcpy(&r, &trace_id, 8);
+
+		if (s.ShouldSample(&c, trace_id, "", span_kind, view).decision == Decision::RECORD_AND_SAMPLE)
+		{ ++actual_count; }
+	}
+
+	ASSERT_TRUE(actual_count < (expected_count + variance));
+	ASSERT_TRUE(actual_count > (expected_count - variance));
+}
+
+TEST(ProbabilitySampler, ProbabilitySamplerOnePercent)
+{
+	double probability = 0.01;
+	int iterations = 100000, expected_count = iterations * probability,
+		actual_count = 0, variance = 1000;
+
+	opentelemetry::sdk::trace::Sampler::SpanContext c(true, true);
+	ProbabilitySampler s(probability);
+	opentelemetry::trace::SpanKind span_kind = opentelemetry::trace::SpanKind::kInternal;
+
+	using M = std::map<std::string, int>;
+	M m1 = {{}};
+	opentelemetry::trace::KeyValueIterableView<M> view{m1};
+
+	srand(time(0));
+
+	for (int i = 0; i < iterations; ++i)
+	{
+		uint8_t buf[16];
+		for (int j = 0; j < 16; ++j)
+		{
+			buf[j] = (std::rand() % 255) + 1;
+		}
+
+		opentelemetry::trace::TraceId trace_id(buf);
+
+		uint64_t r = 0;
+		std::memcpy(&r, &trace_id, 8);
+
+		if (s.ShouldSample(&c, trace_id, "", span_kind, view).decision == Decision::RECORD_AND_SAMPLE)
+		{ ++actual_count; }
+	}
+
+	ASSERT_TRUE(actual_count < (expected_count + variance));
+	ASSERT_TRUE(actual_count > (expected_count - variance));
+}
+
+TEST(ProbabilitySampler, ProbabilitySamplerAll)
+{
+	double probability = 1.0;
+	int iterations = 100000, expected_count = iterations * probability,
+		actual_count = 0;
+
+	opentelemetry::sdk::trace::Sampler::SpanContext c(true, true);
+	ProbabilitySampler s(probability);
+	opentelemetry::trace::SpanKind span_kind = opentelemetry::trace::SpanKind::kInternal;
+
+	using M = std::map<std::string, int>;
+	M m1 = {{}};
+	opentelemetry::trace::KeyValueIterableView<M> view{m1};
+
+	srand(time(0));
+
+	for (int i = 0; i < iterations; ++i)
+	{
+		uint8_t buf[16];
+		for (int j = 0; j < 16; ++j)
+		{
+			buf[j] = (std::rand() % 255) + 1;
+		}
+
+		opentelemetry::trace::TraceId trace_id(buf);
+
+		uint64_t r = 0;
+		std::memcpy(&r, &trace_id, 8);
+
+		if (s.ShouldSample(&c, trace_id, "", span_kind, view).decision == Decision::RECORD_AND_SAMPLE)
+		{ ++actual_count; }
+	}
+
+	ASSERT_EQ(actual_count, expected_count);
+}
+
+TEST(ProbabilitySampler, ProbabilitySamplerNone)
+{
+	double probability = 0.0;
+	int iterations = 100000, expected_count = iterations * probability,
+		actual_count = 0;
+
+	opentelemetry::sdk::trace::Sampler::SpanContext c(true, true);
+	ProbabilitySampler s(probability);
+	opentelemetry::trace::SpanKind span_kind = opentelemetry::trace::SpanKind::kInternal;
+
+	using M = std::map<std::string, int>;
+	M m1 = {{}};
+	opentelemetry::trace::KeyValueIterableView<M> view{m1};
+
+	srand(time(0));
+
+	for (int i = 0; i < iterations; ++i)
+	{
+		uint8_t buf[16];
+		for (int j = 0; j < 16; ++j)
+		{
+			buf[j] = (std::rand() % 255) + 1;
+		}
+
+		opentelemetry::trace::TraceId trace_id(buf);
+
+		uint64_t r = 0;
+		std::memcpy(&r, &trace_id, 8);
+
+		if (s.ShouldSample(&c, trace_id, "", span_kind, view).decision == Decision::RECORD_AND_SAMPLE)
+		{ ++actual_count; }
+	}
+
+	ASSERT_EQ(actual_count, expected_count);
+}
+
 TEST(ProbabilitySampler, GetDescription)
 {
 	ProbabilitySampler s1(0.01);
@@ -99,4 +261,7 @@ TEST(ProbabilitySampler, GetDescription)
 
 	ProbabilitySampler s8(-1.00000000001);
 	ASSERT_EQ("ProbabilitySampler{0.000000}", s8.GetDescription());
+
+	ProbabilitySampler s9(0.50);
+	ASSERT_EQ("ProbabilitySampler{0.500000}", s9.GetDescription());
 }
