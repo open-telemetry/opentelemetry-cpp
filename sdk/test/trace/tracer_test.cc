@@ -90,6 +90,7 @@ TEST(Tracer, ToMockSpanExporter)
 
 TEST(Tracer, StartSpan)
 {
+  // create a tracer with default AlwaysOn sampler.
   std::shared_ptr<std::vector<std::unique_ptr<SpanData>>> spans_received_1(
       new std::vector<std::unique_ptr<SpanData>>);
   auto tracer_on = initTracer(spans_received_1);
@@ -104,10 +105,13 @@ TEST(Tracer, StartSpan)
 
   std::shared_ptr<std::vector<std::unique_ptr<SpanData>>> spans_received_2(
       new std::vector<std::unique_ptr<SpanData>>);
+  // create a tracer with a custom AlwaysOff sampler.
   auto tracer_off = initTracer(spans_received_2, std::make_shared<AlwaysOffSampler>());
 
+  // This span will not be recorded.
   tracer_off->StartSpan("span 2")->End();
 
+  // The span doesn't write any span data because the sampling decision is alway NOT_RECORD.
   ASSERT_EQ(0, spans_received_2->size());
 }
 
