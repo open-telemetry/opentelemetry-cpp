@@ -28,8 +28,21 @@ sdktrace::ExportResult StdoutSpanExporter::Export(
       auto span = std::unique_ptr<sdktrace::SpanData>(
           static_cast<sdktrace::SpanData *>(recordable.release()));
 
+      auto start = std::chrono::steady_clock::now();
+          
       if (span != nullptr)
       {
+        auto current = std::chrono::steady_clock::now();
+
+        /*
+          Timeout for export() if export has been blocking for 30000 milliseconds, export will return failure
+        */
+
+        if(std::chrono::duration_cast<std::chrono::milliseconds>(current - start).count() > 30000)
+        {
+          return sdktrace::ExportResult::kFailure;
+        }
+
         char trace_id[32]       = {0};
         char span_id[16]        = {0};
         char parent_span_id[16] = {0};
@@ -44,7 +57,11 @@ sdktrace::ExportResult StdoutSpanExporter::Export(
                   << "\n  span_id       : " << std::string(span_id, 16)
                   << "\n  parent_span_id: " << std::string(parent_span_id, 16)
                   << "\n  start         : " << span->GetStartTime().time_since_epoch().count()
-                  << "\n  duration      : " << span->GetDuration().count() << "\n}"
+                  << "\n  duration      : " << span->GetDuration().count()
+                  << "\n  description   : " << span->GetDescription() 
+                //<< "\n  status        : " << span->GetStatus() 
+                //<< "\n  attributes    : " << span->GetAttributes()
+                  << "\n}"
                   << "\n";
       }
     }

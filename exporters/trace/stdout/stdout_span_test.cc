@@ -68,6 +68,7 @@ TEST(StdoutSpanExporter, PrintDefaultSpan)
   "  parent_span_id: 0000000000000000\n"
   "  start         : 0\n"
   "  duration      : 0\n"
+  "  description   : \n"
   "}\n"; 
   ASSERT_EQ(buffer.str(),expectedOutput);
 }
@@ -108,6 +109,7 @@ TEST(StdoutSpanExporter, PrintChangedSpan)
   "  parent_span_id: 0000000000000000\n"
   "  start         : " + start + "\n"
   "  duration      : " + duration + "\n"
+  "  description   : \n"
   "}\n"; 
   ASSERT_EQ(stdoutOutput.str(),expectedOutput);
 }
