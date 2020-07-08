@@ -83,9 +83,9 @@ ProbabilitySampler::ProbabilitySampler(double probability)
 SamplingResult ProbabilitySampler::ShouldSample(
   const SpanContext *parent_context,
   trace_api::TraceId trace_id,
-  nostd::string_view name,
-  trace_api::SpanKind span_kind,
-  const trace_api::KeyValueIterable &attributes) noexcept
+  nostd::string_view /*name*/,
+  trace_api::SpanKind /*span_kind*/,
+  const trace_api::KeyValueIterable & /*attributes*/) noexcept
 {
   if (parent_context && !parent_context->is_remote) {
     if (parent_context->sampled) {
