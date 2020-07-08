@@ -27,7 +27,7 @@ public:
    * @param value is the numerical representation of the metric being captured
    * @param labels the set of labels, as key-value pairs
    */
-  virtual void observe(int value, const nostd::string_view &labels) {}
+  virtual void observe(int value, const trace::KeyValueIterable &labels) {}
 };
 
 class DoubleValueObserver : public AsynchronousInstrument
@@ -43,7 +43,7 @@ public:
                       void (*callback)(ObserverResult))
   {}
 
-  virtual void observe(double value, const nostd::string_view &labels) {}
+  virtual void observe(double value, const trace::KeyValueIterable &labels) {}
 };
 
 class IntSumObserver : public AsynchronousInstrument
@@ -67,7 +67,7 @@ public:
    * @param value is the numerical representation of the metric being captured
    * @param labels the set of labels, as key-value pairs
    */
-  virtual void observe(int value, const nostd::string_view &labels) {}
+  virtual void observe(int value, const trace::KeyValueIterable &labels) {}
 };
 
 class DoubleSumObserver : public AsynchronousInstrument
@@ -83,7 +83,7 @@ public:
                     void (*callback)(ObserverResult))
   {}
 
-  virtual void observe(double value, const nostd::string_view &labels) {}
+  virtual void observe(double value, const trace::KeyValueIterable &labels) {}
 };
 
 class IntUpDownSumObserver : public AsynchronousInstrument
@@ -99,7 +99,7 @@ public:
                        void (*callback)(ObserverResult))
   {}
 
-  virtual void observe(int value, const nostd::string_view &labels) {}
+  virtual void observe(int value, const trace::KeyValueIterable &labels) {}
 };
 
 class DoubleUpDownSumObserver : public AsynchronousInstrument
@@ -115,7 +115,7 @@ public:
                           void (*callback)(ObserverResult))
   {}
 
-  virtual void observe(double value, const nostd::string_view &labels) {}
+  virtual void observe(double value, const trace::KeyValueIterable &labels) {}
 };
 
 }  // namespace metrics

@@ -3,6 +3,7 @@
 #include "opentelemetry/common/attribute_value.h"
 #include "opentelemetry/nostd/shared_ptr.h"
 #include "opentelemetry/nostd/string_view.h"
+#include "opentelemetry/trace/key_value_iterable_view.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace metrics
@@ -134,7 +135,7 @@ public:
    * @param labels the set of labels, as key-value pairs
    * @return a Bound Instrument
    */
-  nostd::shared_ptr<BoundSynchronousInstrument> bind(const nostd::string_view &labels)
+  nostd::shared_ptr<BoundSynchronousInstrument> bind(const trace::KeyValueIterable &labels)
   {
     return nostd::shared_ptr<BoundSynchronousInstrument>(new BoundSynchronousInstrument());
   }
@@ -151,7 +152,7 @@ public:
    * @param value is the numerical representation of the metric being captured
    * @return void
    */
-  virtual void update(nostd::variant<int, double> value, const nostd::string_view &labels) final {}
+  virtual void update(nostd::variant<int, double> value, const trace::KeyValueIterable &labels) final {}
 };
 
 class ObserverResult;
@@ -177,7 +178,7 @@ public:
    * @param value is the numerical representation of the metric being captured
    * @return none
    */
-  virtual void update(nostd::variant<int, double> value, const nostd::string_view &labels) final {}
+  virtual void update(nostd::variant<int, double> value, const trace::KeyValueIterable &labels) final {}
 
 protected:
   // Callback function which takes a pointer to an Asynchronous instrument (this) type which is

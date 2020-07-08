@@ -21,7 +21,7 @@ public:
 
   ObserverResult(nostd::shared_ptr<AsynchronousInstrument> instrument) : instrument_(instrument) {}
 
-  void observe(nostd::variant<int, double> value, const nostd::string_view &labels)
+  void observe(nostd::variant<int, double> value, const trace::KeyValueIterable &labels)
   {
     instrument_->update(value, labels);
   }

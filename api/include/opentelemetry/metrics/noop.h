@@ -142,12 +142,12 @@ public:
                  bool /*enabled*/)
   {}
 
-  nostd::shared_ptr<BoundNoopIntCounter> bind(const nostd::string_view & /*labels*/)
+  nostd::shared_ptr<BoundNoopIntCounter> bind(const trace::KeyValueIterable & /*labels*/)
   {
     return nostd::shared_ptr<BoundNoopIntCounter>(new BoundNoopIntCounter());
   }
 
-  virtual void add(int value, const nostd::string_view & /*labels*/) override {}
+  virtual void add(int value, const trace::KeyValueIterable & /*labels*/) override {}
 };
 
 class BoundNoopDoubleCounter : public BoundDoubleCounter
@@ -177,12 +177,12 @@ public:
                     bool /*enabled*/)
   {}
 
-  nostd::shared_ptr<BoundNoopDoubleCounter> bind(const nostd::string_view & /*labels*/)
+  nostd::shared_ptr<BoundNoopDoubleCounter> bind(const trace::KeyValueIterable & /*labels*/)
   {
     return nostd::shared_ptr<BoundNoopDoubleCounter>(new BoundNoopDoubleCounter());
   }
 
-  virtual void add(double value, const nostd::string_view & /*labels*/) override {}
+  virtual void add(double value, const trace::KeyValueIterable & /*labels*/) override {}
 };
 
 class BoundNoopIntUpDownCounter : public BoundIntUpDownCounter
@@ -212,12 +212,12 @@ public:
                        bool /*enabled*/)
   {}
 
-  nostd::shared_ptr<BoundNoopIntUpDownCounter> bind(const nostd::string_view & /*labels*/)
+  nostd::shared_ptr<BoundNoopIntUpDownCounter> bind(const trace::KeyValueIterable & /*labels*/)
   {
     return nostd::shared_ptr<BoundNoopIntUpDownCounter>(new BoundNoopIntUpDownCounter());
   }
 
-  virtual void add(int value, const nostd::string_view & /*labels*/) override {}
+  virtual void add(int value, const trace::KeyValueIterable & /*labels*/) override {}
 };
 
 class BoundNoopDoubleUpDownCounter : public BoundDoubleUpDownCounter
@@ -247,12 +247,12 @@ public:
                           bool /*enabled*/)
   {}
 
-  nostd::shared_ptr<BoundNoopDoubleUpDownCounter> bind(const nostd::string_view & /*labels*/)
+  nostd::shared_ptr<BoundNoopDoubleUpDownCounter> bind(const trace::KeyValueIterable & /*labels*/)
   {
     return nostd::shared_ptr<BoundNoopDoubleUpDownCounter>(new BoundNoopDoubleUpDownCounter());
   }
 
-  virtual void add(double value, const nostd::string_view & /*labels*/) override {}
+  virtual void add(double value, const trace::KeyValueIterable & /*labels*/) override {}
 };
 
 class BoundNoopIntValueRecorder : public BoundIntValueRecorder
@@ -282,12 +282,12 @@ public:
                        bool /*enabled*/)
   {}
 
-  nostd::shared_ptr<BoundNoopIntValueRecorder> bind(const nostd::string_view & /*labels*/)
+  nostd::shared_ptr<BoundNoopIntValueRecorder> bind(const trace::KeyValueIterable & /*labels*/)
   {
     return nostd::shared_ptr<BoundNoopIntValueRecorder>(new BoundNoopIntValueRecorder());
   }
 
-  virtual void record(int value, const nostd::string_view & /*labels*/) override {}
+  virtual void record(int value, const trace::KeyValueIterable & /*labels*/) override {}
 };
 
 class BoundNoopDoubleValueRecorder : public BoundDoubleValueRecorder
@@ -317,12 +317,12 @@ public:
                           bool /*enabled*/)
   {}
 
-  nostd::shared_ptr<BoundNoopDoubleValueRecorder> bind(const nostd::string_view & /*labels*/)
+  nostd::shared_ptr<BoundNoopDoubleValueRecorder> bind(const trace::KeyValueIterable & /*labels*/)
   {
     return nostd::shared_ptr<BoundNoopDoubleValueRecorder>(new BoundNoopDoubleValueRecorder());
   }
 
-  virtual void record(double value, const nostd::string_view & /*labels*/) override {}
+  virtual void record(double value, const trace::KeyValueIterable & /*labels*/) override {}
 };
 
 } // namespace metrics 
