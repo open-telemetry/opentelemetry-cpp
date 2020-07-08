@@ -27,13 +27,13 @@ public:
   {
     return { Decision::NOT_RECORD, nullptr };
   }
-
+  
   /**
    * @return Description MUST be AlwaysOffSampler
    */
   std::string GetDescription() const noexcept override
-  { 
-    return "AlwaysOffSampler"; 
+  {
+    return "AlwaysOffSampler";
   }
 };
 }  // namespace trace
