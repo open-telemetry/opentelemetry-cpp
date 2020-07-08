@@ -58,6 +58,8 @@ public:
 
 private:
   /**
+   * Converts a probability in [0, 1] to a threshold in [0, UINT64_MAX]
+   *
    * @param probability a required value top be converted to uint64_t. is
    * bounded by 1 >= probability >= 0.
    * @return Returns threshold value computed after converting probability to
