@@ -20,9 +20,9 @@ const std::map<std::string, std::unique_ptr<AggregatedSpanData>>& TracezDataAggr
 LatencyBoundaryName TracezDataAggregator::GetLatencyBoundary(Recordable* recordable)
 {
   auto recordable_duration = recordable->GetDuration();
-  for(unsigned int boundary = 0; boundary < kLatencyBoundaries.size()-1; boundary++)
+  for(LatencyBoundaryName boundary = LatencyBoundaryName::k0MicroTo10Micro; boundary != LatencyBoundaryName::k100SecondToMax; ++boundary)
   {
-    if(recordable_duration < kLatencyBoundaries[boundary+1])return (LatencyBoundaryName)boundary;
+    if(recordable_duration < kLatencyBoundaries[boundary+1])return boundary;
   }
   return LatencyBoundaryName::k100SecondToMax;
 }

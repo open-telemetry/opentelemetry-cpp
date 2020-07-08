@@ -50,6 +50,16 @@ enum LatencyBoundaryName
   k100SecondToMax
 };
 
+/** Overlaoding ++ operator for easy iteration **/
+LatencyBoundaryName& operator ++ (LatencyBoundaryName& latencyBoundaryName)
+{
+    if (latencyBoundaryName == LatencyBoundaryName::k100SecondToMax) {
+        throw std::out_of_range("for E& operator ++ (E&)");
+    }
+    latencyBoundaryName = LatencyBoundaryName(static_cast<std::underlying_type<LatencyBoundaryName>::type>(latencyBoundaryName) + 1);
+    return latencyBoundaryName;
+}
+
 }  // namespace zpages
 }  // namespace ext
 OPENTELEMETRY_END_NAMESPACE
