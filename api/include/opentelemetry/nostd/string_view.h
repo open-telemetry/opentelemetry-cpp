@@ -71,7 +71,7 @@ public:
   int compare(string_view v) const noexcept
   {
     size_type len = std::min(size(), v.size());
-    int result    = Traits::compare(data(), v.data(), len);
+    int result = Traits::compare(data(), v.data(), len);
     if (result == 0)
       result = size() == v.size() ? 0 : (size() < v.size() ? -1 : 1);
     return result;
@@ -82,16 +82,15 @@ public:
     return substr(pos1, count1).compare(v);
   };
 
-  int compare(size_type pos1,
-              size_type count1,
-              string_view v,
-              size_type pos2,
-              size_type count2) const
+  int compare(size_type pos1, size_type count1, string_view v, size_type pos2, size_type count2) const
   {
     return substr(pos1, count1).compare(v.substr(pos2, count2));
   };
 
-  int compare(const char *s) const { return compare(string_view(s)); };
+  int compare(const char *s) const
+  {
+    return compare(string_view(s));
+  };
 
   int compare(size_type pos1, size_type count1, const char *s) const
   {
@@ -103,9 +102,15 @@ public:
     return substr(pos1, count1).compare(string_view(s, count2));
   };
 
-  bool operator<(const string_view v) const noexcept { return compare(v) < 0; }
+  bool operator<(const string_view v) const noexcept
+  {
+    return compare(v) < 0;
+  }
 
-  bool operator>(const string_view v) const noexcept { return compare(v) > 0; }
+  bool operator>(const string_view v) const noexcept
+  {
+    return compare(v) > 0;
+  }
 
 private:
   // Note: uses the same binary layout as libstdc++'s std::string_view
