@@ -60,8 +60,10 @@ namespace
 
     uint64_t res = 0;
     std::memcpy(&res, &trace_id, 8);
-    
-    return res;
+
+    double probability = (double) res / UINT64_MAX;
+
+    return CalculateThreshold(probability);
   }
 } // namespace
 
