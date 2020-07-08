@@ -29,11 +29,39 @@ cc_library(
     ],
 )
 
+cc_library(
+    name = "otlp_exporter",
+    srcs = [
+        'otlp_exporter.cc',
+    ],
+    hdrs = [
+        'otlp_exporter.h',
+    ],
+    deps = [
+        ":recordable",
+        "//sdk/src/trace",
+
+        # For gRPC
+        "@com_github_opentelemetry_proto//:trace_service_grpc_cc",
+        "@com_github_grpc_grpc//:grpc++",
+    ],
+)
+
 cc_test(
     name = "recordable_test",
     srcs = ["recordable_test.cc"],
     deps = [
         ":recordable",
+        "@com_google_googletest//:gtest_main",
+    ],
+)
+
+cc_test(
+ name = "otlp_exporter_test",
+    srcs = ["otlp_exporter_test.cc"],
+    deps = [
+        ":otlp_exporter",
+        "//api",
         "@com_google_googletest//:gtest_main",
     ],
 )
