@@ -25,51 +25,66 @@ TEST(NoopTest, UseNoopMeters)
 {
   std::unique_ptr<Meter> m{new NoopMeter{}};
 
+  // Test instrument constructors
   auto t1 = m->NewIntCounter("Test int counter", "For testing", "Unitless", true);
   auto t2 = m->NewIntCounter("Test int counter", "For testing", "Unitless", true);
-  auto t3 = m->NewDoubleCounter("Test int counter", "For testing", "Unitless", true);
-  m->NewIntUpDownCounter("Test int counter", "For testing", "Unitless", true);
-  m->NewDoubleUpDownCounter("Test int counter", "For testing", "Unitless", true);
-  m->NewIntValueRecorder("Test int counter", "For testing", "Unitless", true);
-  m->NewDoubleValueRecorder("Test int counter", "For testing", "Unitless", true);
+  auto t3 = m->NewDoubleCounter("Test double counter", "For testing", "Unitless", true);
+  m->NewIntUpDownCounter("Test intud counter", "For testing", "Unitless", true);
+  m->NewDoubleUpDownCounter("Test doubleud counter", "For testing", "Unitless", true);
+  m->NewIntValueRecorder("Test int recorder", "For testing", "Unitless", true);
+  m->NewDoubleValueRecorder("Test double recorder", "For testing", "Unitless", true);
 
   auto alpha =
-      m->NewIntSumObserver("Test int counter", "For testing", "Unitless", true, &IntCallback);
+      m->NewIntSumObserver("Test int sum obs", "For testing", "Unitless", true,
+                           &IntCallback);
   auto beta =
-      m->NewDoubleSumObserver("Test int counter", "For testing", "Unitless", true, &DoubleCallback);
+      m->NewDoubleSumObserver("Test double sum obs", "For testing", "Unitless", true,
+                              &DoubleCallback);
   auto gamma =
-      m->NewIntUpDownSumObserver("Test int counter", "For testing", "Unitless", true, &IntCallback);
-  auto delta = m->NewDoubleUpDownSumObserver("Test int counter", "For testing", "Unitless", true,
+      m->NewIntUpDownSumObserver("Test intud sum obs", "For testing", "Unitless", true,
+                                 &IntCallback);
+  auto delta =
+    m->NewDoubleUpDownSumObserver("Test doubleud sum obs", "For testing", "Unitless", true,
                                              &DoubleCallback);
   auto epsilon =
-      m->NewIntValueObserver("Test int counter", "For testing", "Unitless", true, &IntCallback);
-  auto zeta = m->NewDoubleValueObserver("Test int counter", "For testing", "Unitless", true,
+      m->NewIntValueObserver("Test int val obs", "For testing", "Unitless", true,
+                             &IntCallback);
+  auto zeta =
+    m->NewDoubleValueObserver("Test double val obs", "For testing", "Unitless", true,
                                         &DoubleCallback);
 
-  alpha->observe(1, "key:value");
-  beta->observe(1.0, "key:value");
-  gamma->observe(1, "key:value");
-  delta->observe(1.0, "key:value");
-  epsilon->observe(1, "key:value");
-  zeta->observe(1.0, "key:value");
-
+  // Two instruments with the same characteristic should NOT be equal.
+  // Note: In actual (non-noop) implementations of the Meter class, creating two
+  // instruments with the same name is disallowed.
   ASSERT_NE(t1, t2);
 
+  // Test BatchRecord
+  // This is awkward to use because BatchRecord takes a KeyValueIterable and nostd::span of
+  // std::pairs as arguments.
+  // This is to adhere to ABI stability.
   using M =
   std::pair<nostd::shared_ptr<metrics::SynchronousInstrument>, nostd::variant<int, double>>;
+  
+  // (t1, 1)
   M t1_pair;
-  nostd::shared_ptr<metrics::SynchronousInstrument> tmp = t1;
-  t1_pair.first                                         = tmp;
-  t1_pair.second                                        = 1;
+  t1_pair.first = t1;
+  t1_pair.second = 1;
 
+  // (t3, 2.0)
   M t3_pair;
-  nostd::shared_ptr<metrics::SynchronousInstrument> tmp2 = t3;
-  t3_pair.first                                          = tmp2;
-  t3_pair.second                                         = 2.0;
+  t3_pair.first = t3;
+  t3_pair.second = 2.0;
 
+  // Create a std::array and use that array to create a span.
   std::array<M, 2> arr{t1_pair, t3_pair};
   nostd::span<M> span(arr);
 
-  m->RecordBatch("key: value", span);
+  using N = std::map<std::string, std::string>;
+  
+  // Create a std::map and use that map to create a KeyValueIterableView
+  N mp = {{"key", "value"}};
+  opentelemetry::trace::KeyValueIterableView<N> view{mp};
+  
+  m->RecordBatch(view, span);
 }
 OPENTELEMETRY_END_NAMESPACE
