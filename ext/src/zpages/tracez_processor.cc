@@ -12,7 +12,7 @@ namespace zpages {
   void TracezSpanProcessor::OnEnd(std::unique_ptr<opentelemetry::sdk::trace::Recordable> &&span) noexcept {
      if (shutdown_signal_received_ || span == nullptr) return;
      auto completed_span = spans_.running.find(span.get());
-     if (completed_span != spans_.running.end() && completed_span != nullptr) {
+     if (completed_span != spans_.running.end()) {
        spans_.running.erase(completed_span);
        spans_.completed.push_back(std::move(span));
      }

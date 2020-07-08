@@ -1,4 +1,3 @@
-add_library(opentelemetry_zpages tracez_processer.cc)
+add_library(opentelemetry_zpages tracez_processor.cc)
 
-target_link_libraries(opentelemetry_zpages ${CMAKE_THREAD_LIBS_INIT}
-	opentelemetry_trace)
+target_link_libraries(opentelemetry_zpages ${CMAKE_THREAD_LIBS_INIT} opentelemetry_api opentelemetry_trace)
