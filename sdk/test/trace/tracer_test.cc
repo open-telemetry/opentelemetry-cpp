@@ -54,7 +54,7 @@ std::shared_ptr<opentelemetry::trace::Tracer> initTracer(
     std::shared_ptr<std::vector<std::unique_ptr<SpanData>>> &received)
 {
   std::unique_ptr<SpanExporter> exporter(new MockSpanExporter(received));
-  std::shared_ptr<SimpleSpanProcessor> processor(new SimpleSpanProcessor(std::move(exporter)));
+  auto processor = std::make_shared<SimpleSpanProcessor>(std::move(exporter));
   return std::shared_ptr<opentelemetry::trace::Tracer>(new Tracer(processor));
 }
 
@@ -63,7 +63,7 @@ std::shared_ptr<opentelemetry::trace::Tracer> initTracer(
     std::shared_ptr<Sampler> sampler)
 {
   std::unique_ptr<SpanExporter> exporter(new MockSpanExporter(received));
-  std::shared_ptr<SimpleSpanProcessor> processor(new SimpleSpanProcessor(std::move(exporter)));
+  auto processor = std::make_shared<SimpleSpanProcessor>(std::move(exporter));
   return std::shared_ptr<opentelemetry::trace::Tracer>(new Tracer(processor, sampler));
 }
 }  // namespace
