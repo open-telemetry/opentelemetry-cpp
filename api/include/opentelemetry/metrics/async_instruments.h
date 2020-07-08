@@ -7,119 +7,116 @@ OPENTELEMETRY_BEGIN_NAMESPACE
 namespace metrics
 {
 
-
-class IntValueObserver: public AsynchronousInstrument{
-
-public:
-
-    IntValueObserver() = default;
-
-    IntValueObserver(nostd::string_view name, 
-                     nostd::string_view description, 
-                     nostd::string_view unit, 
-                     bool enabled, 
-                     void (*callback)(IntObserverResult)) {}
-                     // Again, I was going to call the asynchronous base 
-                     // constructor here, but do not think it is necessary
-
-    /*
-    * Updates the instruments aggregator with the new value. The labels should
-    * contain the keys and values to be associated with this value.  
-    * 
-    * @param value is the numerical representation of the metric being captured
-    * @param labels the set of labels, as key-value pairs
-    */
-    virtual void observe(int value, const nostd::string_view &labels) override{}
-
-};
-
-class DoubleValueObserver: public AsynchronousInstrument{
+class IntValueObserver : public AsynchronousInstrument
+{
 
 public:
+  IntValueObserver() = default;
 
-    DoubleValueObserver() = default;
+  IntValueObserver(nostd::string_view name,
+                   nostd::string_view description,
+                   nostd::string_view unit,
+                   bool enabled,
+                   void (*callback)(ObserverResult))
+  {}
 
-    DoubleValueObserver(nostd::string_view name, 
-                        nostd::string_view description, 
-                        nostd::string_view unit, 
-                        bool enabled, 
-                        void (*callback)(DoubleObserverResult)) {}
-
-    virtual void observe(double value, const nostd::string_view &labels) override {}
-
+  /*
+   * Updates the instruments aggregator with the new value. The labels should
+   * contain the keys and values to be associated with this value.
+   *
+   * @param value is the numerical representation of the metric being captured
+   * @param labels the set of labels, as key-value pairs
+   */
+  virtual void observe(int value, const nostd::string_view &labels) {}
 };
 
-class IntSumObserver: public AsynchronousInstrument{
+class DoubleValueObserver : public AsynchronousInstrument
+{
 
 public:
+  DoubleValueObserver() = default;
 
-    IntSumObserver() = default;
+  DoubleValueObserver(nostd::string_view name,
+                      nostd::string_view description,
+                      nostd::string_view unit,
+                      bool enabled,
+                      void (*callback)(ObserverResult))
+  {}
 
-    IntSumObserver(nostd::string_view name, 
-                   nostd::string_view description, 
-                   nostd::string_view unit, 
-                   bool enabled, 
-                   void (*callback)(IntObserverResult)) {}
-
-    /*
-    * Add adds the value to the counter's sum. The labels should contain
-    * the keys and values to be associated with this value.  Counters only     * accept positive valued updates.
-    * 
-    * @param value is the numerical representation of the metric being captured
-    * @param labels the set of labels, as key-value pairs
-    */
-    virtual void observe(int value, const nostd::string_view &labels) override {}
-
+  virtual void observe(double value, const nostd::string_view &labels) {}
 };
 
-class DoubleSumObserver: public AsynchronousInstrument{
+class IntSumObserver : public AsynchronousInstrument
+{
 
 public:
+  IntSumObserver() = default;
 
-    DoubleSumObserver() = default;
+  IntSumObserver(nostd::string_view name,
+                 nostd::string_view description,
+                 nostd::string_view unit,
+                 bool enabled,
+                 void (*callback)(ObserverResult))
+  {}
 
-    DoubleSumObserver(nostd::string_view name, 
-                      nostd::string_view description, 
-                      nostd::string_view unit, 
-                      bool enabled, 
-                      void (*callback)(DoubleObserverResult)) {}
-
-    virtual void observe(double value, const nostd::string_view &labels) override {}
-
+  /*
+   * Add adds the value to the counter's sum. The labels should contain
+   * the keys and values to be associated with this value.  Counters only     * accept positive
+   * valued updates.
+   *
+   * @param value is the numerical representation of the metric being captured
+   * @param labels the set of labels, as key-value pairs
+   */
+  virtual void observe(int value, const nostd::string_view &labels) {}
 };
 
-class IntUpDownSumObserver: public AsynchronousInstrument{
+class DoubleSumObserver : public AsynchronousInstrument
+{
 
 public:
+  DoubleSumObserver() = default;
 
-    IntUpDownSumObserver() = default;
+  DoubleSumObserver(nostd::string_view name,
+                    nostd::string_view description,
+                    nostd::string_view unit,
+                    bool enabled,
+                    void (*callback)(ObserverResult))
+  {}
 
-    IntUpDownSumObserver(nostd::string_view name, 
-                         nostd::string_view description, 
-                         nostd::string_view unit, 
-                         bool enabled, 
-                         void (*callback)(IntObserverResult)) {}
-
-    virtual void observe(int value, const nostd::string_view &labels) override {}
-
+  virtual void observe(double value, const nostd::string_view &labels) {}
 };
 
-class DoubleUpDownSumObserver: public AsynchronousInstrument{
+class IntUpDownSumObserver : public AsynchronousInstrument
+{
 
 public:
+  IntUpDownSumObserver() = default;
 
-    DoubleUpDownSumObserver() = default;
+  IntUpDownSumObserver(nostd::string_view name,
+                       nostd::string_view description,
+                       nostd::string_view unit,
+                       bool enabled,
+                       void (*callback)(ObserverResult))
+  {}
 
-    DoubleUpDownSumObserver(nostd::string_view name, 
-                            nostd::string_view description, 
-                            nostd::string_view unit, 
-                            bool enabled, 
-                            void (*callback)(DoubleObserverResult)) {}
-
-    virtual void observe(double value, const nostd::string_view &labels) override {}
-
-
+  virtual void observe(int value, const nostd::string_view &labels) {}
 };
 
-} // namespace
+class DoubleUpDownSumObserver : public AsynchronousInstrument
+{
+
+public:
+  DoubleUpDownSumObserver() = default;
+
+  DoubleUpDownSumObserver(nostd::string_view name,
+                          nostd::string_view description,
+                          nostd::string_view unit,
+                          bool enabled,
+                          void (*callback)(ObserverResult))
+  {}
+
+  virtual void observe(double value, const nostd::string_view &labels) {}
+};
+
+}  // namespace metrics
 OPENTELEMETRY_END_NAMESPACE

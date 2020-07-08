@@ -43,273 +43,286 @@ private:
   nostd::shared_ptr<opentelemetry::metrics::Meter> meter_;
 };
 
-class NoopIntValueObserver : public IntValueObserver {
+class NoopIntValueObserver : public IntValueObserver
+{
 
 public:
-
-    NoopIntValueObserver(nostd::string_view /*name*/, 
-                         nostd::string_view /*description*/, 
-                         nostd::string_view /*unit*/, 
-                         bool /*enabled*/, 
-                         void (*callback)(IntObserverResult)) {}
-
+  NoopIntValueObserver(nostd::string_view /*name*/,
+                       nostd::string_view /*description*/,
+                       nostd::string_view /*unit*/,
+                       bool /*enabled*/,
+                       void (*callback)(ObserverResult))
+  {}
 };
 
-class NoopDoubleValueObserver : public DoubleValueObserver {
+class NoopDoubleValueObserver : public DoubleValueObserver
+{
 
 public:
-
-    NoopDoubleValueObserver(nostd::string_view /*name*/, 
-                            nostd::string_view /*description*/, 
-                            nostd::string_view /*unit*/, 
-                            bool enabled, void (*callback)(DoubleObserverResult)) {}
-
+  NoopDoubleValueObserver(nostd::string_view /*name*/,
+                          nostd::string_view /*description*/,
+                          nostd::string_view /*unit*/,
+                          bool enabled,
+                          void (*callback)(ObserverResult))
+  {}
 };
 
-class NoopIntSumObserver : public IntSumObserver {
+class NoopIntSumObserver : public IntSumObserver
+{
 
 public:
-
-    NoopIntSumObserver(nostd::string_view /*name*/, 
-                       nostd::string_view /*description*/, 
-                       nostd::string_view /*unit*/, 
-                       bool /*enabled*/, 
-                       void (*callback)(IntObserverResult)) {}
-
+  NoopIntSumObserver(nostd::string_view /*name*/,
+                     nostd::string_view /*description*/,
+                     nostd::string_view /*unit*/,
+                     bool /*enabled*/,
+                     void (*callback)(ObserverResult))
+  {}
 };
 
-class NoopDoubleSumObserver : public DoubleSumObserver {
+class NoopDoubleSumObserver : public DoubleSumObserver
+{
 
 public:
-
-    NoopDoubleSumObserver(nostd::string_view /*name*/, 
-                          nostd::string_view /*description*/, 
-                          nostd::string_view /*unit*/, 
-                          bool /*enabled*/, 
-                          void (*callback)(DoubleObserverResult)) {}
-
+  NoopDoubleSumObserver(nostd::string_view /*name*/,
+                        nostd::string_view /*description*/,
+                        nostd::string_view /*unit*/,
+                        bool /*enabled*/,
+                        void (*callback)(ObserverResult))
+  {}
 };
 
-class NoopIntUpDownSumObserver : public IntUpDownSumObserver {
+class NoopIntUpDownSumObserver : public IntUpDownSumObserver
+{
 
 public:
-
-    NoopIntUpDownSumObserver(nostd::string_view /*name*/, 
-                             nostd::string_view /*description*/, 
-                             nostd::string_view /*unit*/, 
-                             bool /*enabled*/, 
-                             void (*callback)(IntObserverResult)) {}
-
+  NoopIntUpDownSumObserver(nostd::string_view /*name*/,
+                           nostd::string_view /*description*/,
+                           nostd::string_view /*unit*/,
+                           bool /*enabled*/,
+                           void (*callback)(ObserverResult))
+  {}
 };
 
-class NoopDoubleUpDownSumObserver : public DoubleUpDownSumObserver {
+class NoopDoubleUpDownSumObserver : public DoubleUpDownSumObserver
+{
 
 public:
-
-    NoopDoubleUpDownSumObserver(nostd::string_view /*name*/, 
-                                nostd::string_view /*description*/, nostd::string_view /*unit*/, 
-                                bool /*enabled*/, 
-                                void (*callback)(DoubleObserverResult)) {}
-
+  NoopDoubleUpDownSumObserver(nostd::string_view /*name*/,
+                              nostd::string_view /*description*/,
+                              nostd::string_view /*unit*/,
+                              bool /*enabled*/,
+                              void (*callback)(ObserverResult))
+  {}
 };
 
-class BoundNoopIntCounter : public BoundIntCounter {
+class BoundNoopIntCounter : public BoundIntCounter
+{
 
 public:
+  BoundNoopIntCounter() = default;
 
-    BoundNoopIntCounter() = default;
+  BoundNoopIntCounter(nostd::string_view /*name*/,
+                      nostd::string_view /*description*/,
+                      nostd::string_view /*unit*/,
+                      bool /*enabled*/)
+  {}
 
-    BoundNoopIntCounter(nostd::string_view /*name*/, 
-                        nostd::string_view /*description*/, 
-                        nostd::string_view /*unit*/, 
-                        bool /*enabled*/){}
-
-    void add(int value){}
+  virtual void add(int value) override {}
 };
 
-class NoopIntCounter : public IntCounter {
+class NoopIntCounter : public IntCounter
+{
 
 public:
+  NoopIntCounter() = default;
 
-    NoopIntCounter() =  default;
+  NoopIntCounter(nostd::string_view /*name*/,
+                 nostd::string_view /*description*/,
+                 nostd::string_view /*unit*/,
+                 bool /*enabled*/)
+  {}
 
-    NoopIntCounter(nostd::string_view /*name*/, 
-                   nostd::string_view /*description*/, 
-                   nostd::string_view /*unit*/, 
-                   bool /*enabled*/) {}
-    
+  nostd::shared_ptr<BoundNoopIntCounter> bind(const nostd::string_view & /*labels*/)
+  {
+    return nostd::shared_ptr<BoundNoopIntCounter>(new BoundNoopIntCounter());
+  }
 
-    BoundNoopIntCounter bind(const nostd::string_view & /*labels*/){
-        return BoundNoopIntCounter();
-    }
-
-    void add(int value, const nostd::string_view & /*labels*/){}
-
+  virtual void add(int value, const nostd::string_view & /*labels*/) override {}
 };
 
-
-class BoundNoopDoubleCounter : public BoundDoubleCounter {
-
-public:
-
-    BoundNoopDoubleCounter() = default;
-
-    BoundNoopDoubleCounter(nostd::string_view /*name*/, 
-                           nostd::string_view /*description*/, nostd::string_view /*unit*/, 
-                           bool /*enabled*/){}
-
-    void add(double value){}
-
-};
-
-class NoopDoubleCounter : public DoubleCounter {
+class BoundNoopDoubleCounter : public BoundDoubleCounter
+{
 
 public:
+  BoundNoopDoubleCounter() = default;
 
-    NoopDoubleCounter()=default;
-
-    NoopDoubleCounter(nostd::string_view /*name*/, 
-                      nostd::string_view /*description*/, 
-                      nostd::string_view /*unit*/, 
-                      bool /*enabled*/) {}
-    
-
-    BoundNoopDoubleCounter bind(const nostd::string_view & /*labels*/){
-        return BoundNoopDoubleCounter();
-    }
-
-    void add(double value, const nostd::string_view & /*labels*/){}
-
-};
-
-class BoundNoopIntUpDownCounter : public BoundIntUpDownCounter {
-
-public:
-
-    BoundNoopIntUpDownCounter() = default;
-
-    BoundNoopIntUpDownCounter(nostd::string_view /*name*/, 
-                              nostd::string_view /*description*/, nostd::string_view /*unit*/, 
-                              bool /*enabled*/) {}
-
-    void add(int value){}
-
-};
-
-class NoopIntUpDownCounter : public IntUpDownCounter {
-
-public:
-
-    NoopIntUpDownCounter()=default;
-
-    NoopIntUpDownCounter(nostd::string_view /*name*/, 
+  BoundNoopDoubleCounter(nostd::string_view /*name*/,
                          nostd::string_view /*description*/,
-                         nostd::string_view /*unit*/, 
-                         bool /*enabled*/) {}
-    
+                         nostd::string_view /*unit*/,
+                         bool /*enabled*/)
+  {}
 
-    BoundNoopIntUpDownCounter bind(const nostd::string_view & /*labels*/){
-        return BoundNoopIntUpDownCounter();
-    }
-
-    void add(int value, const nostd::string_view & /*labels*/){}
+  virtual void add(double value) override {}
 };
 
-class BoundNoopDoubleUpDownCounter : public BoundDoubleUpDownCounter {
+class NoopDoubleCounter : public DoubleCounter
+{
 
 public:
+  NoopDoubleCounter() = default;
 
-    BoundNoopDoubleUpDownCounter() = default;
+  NoopDoubleCounter(nostd::string_view /*name*/,
+                    nostd::string_view /*description*/,
+                    nostd::string_view /*unit*/,
+                    bool /*enabled*/)
+  {}
 
-    BoundNoopDoubleUpDownCounter(nostd::string_view /*name*/,
-                                 nostd::string_view /*description*/, nostd::string_view /*unit*/, 
-                                 bool /*enabled*/){}
+  nostd::shared_ptr<BoundNoopDoubleCounter> bind(const nostd::string_view & /*labels*/)
+  {
+    return nostd::shared_ptr<BoundNoopDoubleCounter>(new BoundNoopDoubleCounter());
+  }
 
-    void add(double value){}
-
+  virtual void add(double value, const nostd::string_view & /*labels*/) override {}
 };
 
-class NoopDoubleUpDownCounter : public DoubleUpDownCounter {
+class BoundNoopIntUpDownCounter : public BoundIntUpDownCounter
+{
 
 public:
+  BoundNoopIntUpDownCounter() = default;
 
-    NoopDoubleUpDownCounter()=default;
+  BoundNoopIntUpDownCounter(nostd::string_view /*name*/,
+                            nostd::string_view /*description*/,
+                            nostd::string_view /*unit*/,
+                            bool /*enabled*/)
+  {}
 
-    NoopDoubleUpDownCounter(nostd::string_view /*name*/, 
-                            nostd::string_view /*description*/, nostd::string_view /*unit*/, 
-                            bool /*enabled*/) {}
-    
-
-    BoundNoopIntUpDownCounter bind(const nostd::string_view & /*labels*/){
-        return BoundNoopIntUpDownCounter();
-    }
-
-    void add(double value, const nostd::string_view & /*labels*/){}
+  virtual void add(int value) override {}
 };
 
-class BoundNoopIntValueRecorder : public BoundIntValueRecorder {
+class NoopIntUpDownCounter : public IntUpDownCounter
+{
 
 public:
+  NoopIntUpDownCounter() = default;
 
-    BoundNoopIntValueRecorder() = default;
+  NoopIntUpDownCounter(nostd::string_view /*name*/,
+                       nostd::string_view /*description*/,
+                       nostd::string_view /*unit*/,
+                       bool /*enabled*/)
+  {}
 
-    BoundNoopIntValueRecorder(nostd::string_view /*name*/, 
-                              nostd::string_view /*description*/, nostd::string_view /*unit*/, 
-                              bool /*enabled*/){}
+  nostd::shared_ptr<BoundNoopIntUpDownCounter> bind(const nostd::string_view & /*labels*/)
+  {
+    return nostd::shared_ptr<BoundNoopIntUpDownCounter>(new BoundNoopIntUpDownCounter());
+  }
 
-    void record(int value){}
-
+  virtual void add(int value, const nostd::string_view & /*labels*/) override {}
 };
 
-class NoopIntValueRecorder : public IntValueRecorder {
+class BoundNoopDoubleUpDownCounter : public BoundDoubleUpDownCounter
+{
 
 public:
+  BoundNoopDoubleUpDownCounter() = default;
 
-    NoopIntValueRecorder()=default;
+  BoundNoopDoubleUpDownCounter(nostd::string_view /*name*/,
+                               nostd::string_view /*description*/,
+                               nostd::string_view /*unit*/,
+                               bool /*enabled*/)
+  {}
 
-    NoopIntValueRecorder(nostd::string_view /*name*/, 
-                         nostd::string_view /*description*/, 
-                         nostd::string_view /*unit*/, 
-                         bool /*enabled*/) {}
-    
-
-    BoundNoopIntValueRecorder bind(const nostd::string_view & /*labels*/){
-        return BoundNoopIntValueRecorder();
-    }
-
-    void record(int value, const nostd::string_view & /*labels*/){}
+  virtual void add(double value) override {}
 };
 
-class BoundNoopDoubleValueRecorder : public BoundDoubleValueRecorder {
+class NoopDoubleUpDownCounter : public DoubleUpDownCounter
+{
 
 public:
+  NoopDoubleUpDownCounter() = default;
 
-    BoundNoopDoubleValueRecorder() = default;
+  NoopDoubleUpDownCounter(nostd::string_view /*name*/,
+                          nostd::string_view /*description*/,
+                          nostd::string_view /*unit*/,
+                          bool /*enabled*/)
+  {}
 
-    BoundNoopDoubleValueRecorder(nostd::string_view /*name*/, 
-                                 nostd::string_view /*description*/, nostd::string_view /*unit*/, 
-                                 bool /*enabled*/){}
+  nostd::shared_ptr<BoundNoopDoubleUpDownCounter> bind(const nostd::string_view & /*labels*/)
+  {
+    return nostd::shared_ptr<BoundNoopDoubleUpDownCounter>(new BoundNoopDoubleUpDownCounter());
+  }
 
-    void record(double value){}
-
+  virtual void add(double value, const nostd::string_view & /*labels*/) override {}
 };
 
-class NoopDoubleValueRecorder : public DoubleValueRecorder {
+class BoundNoopIntValueRecorder : public BoundIntValueRecorder
+{
 
 public:
+  BoundNoopIntValueRecorder() = default;
 
-    NoopDoubleValueRecorder()=default;
+  BoundNoopIntValueRecorder(nostd::string_view /*name*/,
+                            nostd::string_view /*description*/,
+                            nostd::string_view /*unit*/,
+                            bool /*enabled*/)
+  {}
 
-    NoopDoubleValueRecorder(nostd::string_view /*name*/, 
-                            nostd::string_view /*description*/, nostd::string_view /*unit*/, 
-                            bool /*enabled*/) {}
-    
+  virtual void record(int value) override {}
+};
 
-    BoundNoopDoubleValueRecorder bind(const nostd::string_view & /*labels*/){
-        return BoundNoopDoubleValueRecorder();
-    }
+class NoopIntValueRecorder : public IntValueRecorder
+{
 
-    void record(double value, const nostd::string_view & /*labels*/){}
+public:
+  NoopIntValueRecorder() = default;
+
+  NoopIntValueRecorder(nostd::string_view /*name*/,
+                       nostd::string_view /*description*/,
+                       nostd::string_view /*unit*/,
+                       bool /*enabled*/)
+  {}
+
+  nostd::shared_ptr<BoundNoopIntValueRecorder> bind(const nostd::string_view & /*labels*/)
+  {
+    return nostd::shared_ptr<BoundNoopIntValueRecorder>(new BoundNoopIntValueRecorder());
+  }
+
+  virtual void record(int value, const nostd::string_view & /*labels*/) override {}
+};
+
+class BoundNoopDoubleValueRecorder : public BoundDoubleValueRecorder
+{
+
+public:
+  BoundNoopDoubleValueRecorder() = default;
+
+  BoundNoopDoubleValueRecorder(nostd::string_view /*name*/,
+                               nostd::string_view /*description*/,
+                               nostd::string_view /*unit*/,
+                               bool /*enabled*/)
+  {}
+
+  virtual void record(double value) override {}
+};
+
+class NoopDoubleValueRecorder : public DoubleValueRecorder
+{
+
+public:
+  NoopDoubleValueRecorder() = default;
+
+  NoopDoubleValueRecorder(nostd::string_view /*name*/,
+                          nostd::string_view /*description*/,
+                          nostd::string_view /*unit*/,
+                          bool /*enabled*/)
+  {}
+
+  nostd::shared_ptr<BoundNoopDoubleValueRecorder> bind(const nostd::string_view & /*labels*/)
+  {
+    return nostd::shared_ptr<BoundNoopDoubleValueRecorder>(new BoundNoopDoubleValueRecorder());
+  }
+
+  virtual void record(double value, const nostd::string_view & /*labels*/) override {}
 };
 
 } // namespace metrics 
