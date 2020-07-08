@@ -33,8 +33,20 @@ nostd::unique_ptr<trace_api::Span> Tracer::StartSpan(
     const trace_api::KeyValueIterable &attributes,
     const trace_api::StartSpanOptions &options) noexcept
 {
-  return nostd::unique_ptr<trace_api::Span>{new (std::nothrow) Span{
-      this->shared_from_this(), processor_.load(), name, attributes, options}};
+  // TODO: replace nullptr with parent context in span context
+  auto decision =
+      sampler_->ShouldSample(nullptr, trace_api::TraceId(), name, options.kind, attributes)
+          .decision;
+  if (decision == Decision::NOT_RECORD)
+  {
+    return nostd::unique_ptr<trace_api::Span>{new (std::nothrow)
+                                                  trace_api::NoopSpan{this->shared_from_this()}};
+  }
+  else
+  {
+    return nostd::unique_ptr<trace_api::Span>{new (std::nothrow) Span{
+        this->shared_from_this(), processor_.load(), name, attributes, options}};
+  }
 }
 
 void Tracer::ForceFlushWithMicroseconds(uint64_t timeout) noexcept

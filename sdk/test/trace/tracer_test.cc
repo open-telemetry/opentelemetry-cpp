@@ -57,6 +57,15 @@ std::shared_ptr<opentelemetry::trace::Tracer> initTracer(
   std::shared_ptr<SimpleSpanProcessor> processor(new SimpleSpanProcessor(std::move(exporter)));
   return std::shared_ptr<opentelemetry::trace::Tracer>(new Tracer(processor));
 }
+
+std::shared_ptr<opentelemetry::trace::Tracer> initTracer(
+    std::shared_ptr<std::vector<std::unique_ptr<SpanData>>> &received,
+    std::shared_ptr<Sampler> sampler)
+{
+  std::unique_ptr<SpanExporter> exporter(new MockSpanExporter(received));
+  std::shared_ptr<SimpleSpanProcessor> processor(new SimpleSpanProcessor(std::move(exporter)));
+  return std::shared_ptr<opentelemetry::trace::Tracer>(new Tracer(processor, sampler));
+}
 }  // namespace
 
 TEST(Tracer, ToMockSpanExporter)
@@ -81,17 +90,25 @@ TEST(Tracer, ToMockSpanExporter)
 
 TEST(Tracer, StartSpan)
 {
-  std::shared_ptr<std::vector<std::unique_ptr<SpanData>>> spans_received(
+  std::shared_ptr<std::vector<std::unique_ptr<SpanData>>> spans_received_1(
       new std::vector<std::unique_ptr<SpanData>>);
-  auto tracer = initTracer(spans_received);
+  auto tracer_on = initTracer(spans_received_1);
 
-  tracer->StartSpan("span 1")->End();
+  tracer_on->StartSpan("span 1")->End();
 
-  ASSERT_EQ(1, spans_received->size());
+  ASSERT_EQ(1, spans_received_1->size());
 
-  auto &span_data = spans_received->at(0);
+  auto &span_data = spans_received_1->at(0);
   ASSERT_LT(std::chrono::nanoseconds(0), span_data->GetStartTime().time_since_epoch());
   ASSERT_LT(std::chrono::nanoseconds(0), span_data->GetDuration());
+
+  std::shared_ptr<std::vector<std::unique_ptr<SpanData>>> spans_received_2(
+      new std::vector<std::unique_ptr<SpanData>>);
+  auto tracer_off = initTracer(spans_received_2, std::make_shared<AlwaysOffSampler>());
+
+  tracer_off->StartSpan("span 2")->End();
+
+  ASSERT_EQ(0, spans_received_2->size());
 }
 
 TEST(Tracer, StartSpanWithOptionsTime)
