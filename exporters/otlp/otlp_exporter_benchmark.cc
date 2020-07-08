@@ -8,6 +8,8 @@ namespace exporter
 namespace otlp
 {
 
+const int kBatchSize = 200;
+
 const trace::TraceId kTraceId(std::array<const uint8_t, trace::TraceId::kSize>(
     {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1}));
 const trace::SpanId kSpanId(std::array<const uint8_t, trace::SpanId::kSize>(
@@ -64,8 +66,6 @@ void BM_OtlpExporterFullSpans(benchmark::State &state)
 
   auto exporter = testpeer->GetExporter(stub_interface);
 
-  const int kBatchSize = 200;
-
   while (state.KeepRunning())
   {
     std::unique_ptr<sdk::trace::Recordable> batch_arr[kBatchSize];
@@ -79,7 +79,7 @@ void BM_OtlpExporterFullSpans(benchmark::State &state)
       recordable->SetStartTime(core::SystemTimestamp(std::chrono::system_clock::now()));
       recordable->SetDuration(std::chrono::nanoseconds(10));
 
-      batch_arr[i] = std::unique_ptr<sdk::trace::Recordable>(recordable.release());
+      batch_arr[i] = std::move(recordable);
     }
     nostd::span<std::unique_ptr<sdk::trace::Recordable>> batch(batch_arr, kBatchSize);
 
@@ -99,8 +99,6 @@ void BM_OtlpExporterEmptySpans(benchmark::State &state)
 
   auto exporter = testpeer->GetExporter(stub_interface);
 
-  const int kBatchSize = 200;
-
   while (state.KeepRunning())
   {
     std::unique_ptr<sdk::trace::Recordable> batch_arr[kBatchSize];
@@ -108,7 +106,7 @@ void BM_OtlpExporterEmptySpans(benchmark::State &state)
     for (int i = 0; i < kBatchSize; i++)
     {
       auto recordable = exporter->MakeRecordable();
-      batch_arr[i] = std::unique_ptr<sdk::trace::Recordable>(recordable.release());
+      batch_arr[i] = std::move(recordable);
     }
     nostd::span<std::unique_ptr<sdk::trace::Recordable>> batch(batch_arr, kBatchSize);
 
