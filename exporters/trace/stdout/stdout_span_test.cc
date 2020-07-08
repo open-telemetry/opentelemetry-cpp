@@ -34,8 +34,10 @@ TEST(StdoutSpanExporter, Shutdown)
 
   // Redirect cout to our stringstream buffer or any other ostream
   std::cout.rdbuf(buffer.rdbuf());
+
   processor->Shutdown();
   processor->OnEnd(std::move(recordable));
+
   std::cout.rdbuf(sbuf);
 
   ASSERT_EQ(buffer.str(),"");
@@ -57,7 +59,9 @@ TEST(StdoutSpanExporter, PrintDefaultSpan)
 
   // Redirect cout to our stringstream buffer or any other ostream
   std::cout.rdbuf(buffer.rdbuf());
+
   processor->OnEnd(std::move(recordable));
+
   std::cout.rdbuf(sbuf);
 
   const char* expectedOutput =
@@ -80,11 +84,12 @@ TEST(StdoutSpanExporter, PrintChangedSpan)
       new sdktrace::SimpleSpanProcessor(std::move(exporter)));
 
   auto recordable = processor->MakeRecordable();
+
   recordable->SetName("Test Span");
   opentelemetry::core::SystemTimestamp now(std::chrono::system_clock::now());
 
   recordable->SetStartTime(now);
-  recordable->SetDuration(std::chrono::microseconds(100));
+  recordable->SetDuration(std::chrono::nanoseconds(100));
 
   // This can be an ofstream as well or any other ostream
   std::stringstream stdoutOutput;
@@ -98,7 +103,7 @@ TEST(StdoutSpanExporter, PrintChangedSpan)
   std::cout.rdbuf(sbuf);
 
   std::string start = std::to_string(now.time_since_epoch().count());
-  std::string duration = std::to_string(100*1000);
+  std::string duration = std::to_string(100);
   // optionaly:
 
   std::string expectedOutput =

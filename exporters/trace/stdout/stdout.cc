@@ -23,25 +23,25 @@ sdktrace::ExportResult StdoutSpanExporter::Export(
         return sdktrace::ExportResult::kFailure;
     }
 
+    auto start = std::chrono::steady_clock::now();
+
     for (auto &recordable : spans)
     {
       auto span = std::unique_ptr<sdktrace::SpanData>(
           static_cast<sdktrace::SpanData *>(recordable.release()));
 
-      auto start = std::chrono::steady_clock::now();
-          
+      /*
+          Timeout for export() if export has been blocking for 30000 milliseconds, export will return failure
+      */
+      auto current = std::chrono::steady_clock::now();
+
+      if(std::chrono::duration_cast<std::chrono::milliseconds>(current - start).count() > 30000)
+      {
+        return sdktrace::ExportResult::kFailure;
+      }
+
       if (span != nullptr)
       {
-        auto current = std::chrono::steady_clock::now();
-
-        /*
-          Timeout for export() if export has been blocking for 30000 milliseconds, export will return failure
-        */
-
-        if(std::chrono::duration_cast<std::chrono::milliseconds>(current - start).count() > 30000)
-        {
-          return sdktrace::ExportResult::kFailure;
-        }
 
         char trace_id[32]       = {0};
         char span_id[16]        = {0};
@@ -59,7 +59,7 @@ sdktrace::ExportResult StdoutSpanExporter::Export(
                   << "\n  start         : " << span->GetStartTime().time_since_epoch().count()
                   << "\n  duration      : " << span->GetDuration().count()
                   << "\n  description   : " << span->GetDescription() 
-                //<< "\n  status        : " << span->GetStatus() 
+                  << "\n  status        : " << int(span->GetStatus())
                 //<< "\n  attributes    : " << span->GetAttributes()
                   << "\n}"
                   << "\n";
@@ -71,7 +71,7 @@ sdktrace::ExportResult StdoutSpanExporter::Export(
 
 void StdoutSpanExporter::Shutdown(std::chrono::microseconds timeout) noexcept 
 {
-    isShutdown_ = true;
+  isShutdown_ = true;
 }
 
 } // namespace trace
