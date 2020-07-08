@@ -29,11 +29,9 @@ namespace trace_api = opentelemetry::trace;
 ProbabilitySampler::ProbabilitySampler(double probability)
 : threshold_(CalculateThreshold(probability))
 {
-    char buffer[30];
     if (probability > 1.0) probability = 1.0;
     if (probability < 0.0) probability = 0.0;
-    sprintf(buffer, "ProbabilitySampler{%.6f}", probability);
-    sampler_description_ = std::string(buffer);
+    sampler_description_ = "ProbabilitySampler{" + std::to_string(probability) + "}";
   }
 
 SamplingResult ProbabilitySampler::ShouldSample(
