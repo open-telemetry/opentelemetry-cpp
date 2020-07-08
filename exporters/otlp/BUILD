@@ -17,7 +17,7 @@ package(default_visibility = ["//visibility:public"])
 cc_library(
     name = "recordable",
     srcs = [
-        "recordable.cc",
+        "internal/recordable.cc",
     ],
     hdrs = [
         "recordable.h",
@@ -32,11 +32,12 @@ cc_library(
 cc_library(
     name = "otlp_exporter",
     srcs = [
-        'otlp_exporter.cc',
+        'internal/otlp_exporter.cc',
     ],
     hdrs = [
         'otlp_exporter.h',
     ],
+    include_prefix = "exporters/otlp",
     deps = [
         ":recordable",
         "//sdk/src/trace",
@@ -49,7 +50,7 @@ cc_library(
 
 cc_test(
     name = "recordable_test",
-    srcs = ["recordable_test.cc"],
+    srcs = ["internal/recordable_test.cc"],
     deps = [
         ":recordable",
         "@com_google_googletest//:gtest_main",
@@ -58,7 +59,7 @@ cc_test(
 
 cc_test(
  name = "otlp_exporter_test",
-    srcs = ["otlp_exporter_test.cc"],
+    srcs = ["internal/otlp_exporter_test.cc"],
     deps = [
         ":otlp_exporter",
         "//api",
