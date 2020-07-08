@@ -75,7 +75,7 @@ void BM_OtlpExporterFullSpans(benchmark::State &state)
       auto recordable = exporter->MakeRecordable();
 
       recordable->SetIds(kTraceId, kSpanId, kParentSpanId);
-      recordable->SetName("Span " + i);
+      recordable->SetName("TestSpan");
       recordable->SetStartTime(core::SystemTimestamp(std::chrono::system_clock::now()));
       recordable->SetDuration(std::chrono::nanoseconds(10));
 
