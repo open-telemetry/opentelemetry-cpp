@@ -25,7 +25,7 @@ public:
 
   // opentelemetry::trace::Span
   void SetAttribute(nostd::string_view /*name*/,
-                    const common::AttributeValue && /*value*/) noexcept override
+                    const common::AttributeValue & /*value*/) noexcept override
   {}
 
   void AddEvent(nostd::string_view /*name*/) noexcept override {}
