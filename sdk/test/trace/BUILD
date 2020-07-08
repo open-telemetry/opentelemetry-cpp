@@ -82,6 +82,7 @@ cc_test(
     ],
     deps = [
         "//sdk/src/trace",
+        "//sdk/src/common:random",
         "@com_google_googletest//:gtest_main",
     ],
 )
