@@ -24,6 +24,7 @@ public:
   bool is_recording;
   bool sampled_flag;
 };
+
 /**
  * The parent or else sampler is a composite sampler. ParentOrElse(delegateSampler) either respects
  * the parent span's sampling decision or delegates to delegateSampler for root spans.
