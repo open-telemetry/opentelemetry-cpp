@@ -142,7 +142,7 @@ TEST(TracezDataAggregator, MultipleRunningSpans)
   }
   
   const std::map<std::string, std::unique_ptr<AggregatedSpanData>>& data = tracez_data_aggregator->GetAggregatedData();
-  ASSERT_EQ(data.size(),3);
+  ASSERT_EQ(data.size(),running_span_name_to_count.size());
   
   //Check to see if the running span counts were updated correctly
   for(auto span_name: running_span_name_to_count)
@@ -172,9 +172,9 @@ TEST(TraceZDataAggregator, MultipleCompletedSpan)
   
   // Start spans with span name and the corresponding durations in one of the 9 latency buckets
   std::unordered_map<std::string, std::vector<std::vector<nanoseconds>>> span_name_to_duration({
-    {span_name1, {{nanoseconds(0),nanoseconds(9999)},{},{},{},{},{},{},{},{}}},
-    {span_name2, {{},{nanoseconds(10000), nanoseconds(99999)}, {nanoseconds(100000)}, {}, {}, {}, {}, {}, {}}},
-    {span_name3, {{}, {}, {}, {nanoseconds(1000000), nanoseconds(9999999)}, {}, {}, {}, {}, {nanoseconds(9999999999999)}}}
+    {span_name1, {{nanoseconds(10),nanoseconds(4600)},{},{},{},{},{},{},{},{}}},
+    {span_name2, {{},{nanoseconds(38888), nanoseconds(98768)}, {nanoseconds(983251)}, {}, {}, {}, {}, {}, {}}},
+    {span_name3, {{}, {}, {}, {nanoseconds(1234567), nanoseconds(1234567)}, {}, {}, {}, {}, {nanoseconds(9999999999999)}}}
   });
   opentelemetry::trace::StartSpanOptions start;
   opentelemetry::trace::EndSpanOptions end;
@@ -198,7 +198,6 @@ TEST(TraceZDataAggregator, MultipleCompletedSpan)
   {
     ASSERT_TRUE(data.find(span.first) != data.end());
     auto& aggregated_data = data.at(span.first);
-    
     //Check if latency samples are in correct boundaries
     for(LatencyBoundaryName boundary = LatencyBoundaryName::k0MicroTo10Micro; boundary != LatencyBoundaryName::k100SecondToMax; ++boundary)
     {
