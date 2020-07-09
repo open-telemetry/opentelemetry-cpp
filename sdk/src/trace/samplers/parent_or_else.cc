@@ -22,18 +22,14 @@ SamplingResult ParentOrElseSampler::ShouldSample(
     // If no parent (root span) exists returns the result of the delegateSampler
     return delegate_sampler_->ShouldSample(parent_context, trace_id, name, span_kind, attributes);
   }
-  else
+  
+  // If parent exists:
+  if (parent_context->sampled_flag)
   {
-    // If parent exists:
-    if (parent_context->sampled_flag)
-    {
-      return {Decision::RECORD_AND_SAMPLE, nullptr};
-    }
-    else
-    {
-      return {Decision::NOT_RECORD, nullptr};
-    }
+    return {Decision::RECORD_AND_SAMPLE, nullptr};
   }
+
+  return {Decision::NOT_RECORD, nullptr};
 }
 
 std::string ParentOrElseSampler::GetDescription() const noexcept
