@@ -59,7 +59,7 @@ sdktrace::ExportResult StdoutSpanExporter::Export(
                   << "\n  start         : " << span->GetStartTime().time_since_epoch().count()
                   << "\n  duration      : " << span->GetDuration().count()
                   << "\n  description   : " << span->GetDescription() 
-                  << "\n  status        : " << int(span->GetStatus())
+                  << "\n  status        : " << statusMap[int(span->GetStatus())]
                 //<< "\n  attributes    : " << span->GetAttributes()
                   << "\n}"
                   << "\n";
