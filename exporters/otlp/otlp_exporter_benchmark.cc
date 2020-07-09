@@ -93,6 +93,7 @@ void CreateDenseSpans(std::array<std::unique_ptr<sdk::trace::Recordable>, kBatch
   for (int i = 0; i < kBatchSize; i++)
   {
     auto recordable = std::unique_ptr<sdk::trace::Recordable>(new Recordable);
+
     recordable->SetIds(kTraceId, kSpanId, kParentSpanId);
     recordable->SetName("TestSpan");
     recordable->SetStartTime(core::SystemTimestamp(std::chrono::system_clock::now()));
@@ -101,15 +102,7 @@ void CreateDenseSpans(std::array<std::unique_ptr<sdk::trace::Recordable>, kBatch
     for (int i = 0; i < kNumAttributes; i++)
     {
       recordable->SetAttribute("int_key_" + i, static_cast<int64_t>(i));
-    }
-
-    for (int i = 0; i < kNumAttributes; i++)
-    {
       recordable->SetAttribute("str_key_" + i, "string_val_" + i);
-    }
-
-    for (int i = 0; i < kNumAttributes; i++)
-    {
       recordable->SetAttribute("bool_key_" + i, true);
     }
 
