@@ -235,7 +235,7 @@ TEST(TraceZDataAggregator, MultipleErrorSpans)
   std::unordered_map<std::string, std::vector<std::string>> span_name_to_error({
     {span_name1, {"span 1 error"}},
     {span_name2, {"span 2 error 1", "span 2 error 2"}},
-    {span_name3, {"span 3 error 1", "span 3 error 2", "span 3 error 3"}}
+    {span_name3, {"span 3 error 1", "span 3 error 2", "span 3 error 3", "span 3 error 4", "span 3 error 5"}}
   });
   
   //Start spans with the error messages based on the map
@@ -245,7 +245,7 @@ TEST(TraceZDataAggregator, MultipleErrorSpans)
   }
 
   const std::map<std::string, std::unique_ptr<AggregatedSpanData>>& data = tracez_data_aggregator->GetAggregatedData();
-  ASSERT_EQ(data.size(),3);
+  ASSERT_EQ(data.size(),span_name_to_error.size());
   
   //Check if error spans were updated correctly for the different span names
   for(auto& span_error: span_name_to_error)
