@@ -23,35 +23,26 @@ const trace::SpanId kParentSpanId(std::array<const uint8_t, trace::SpanId::kSize
 // Create a fake service stub to avoid dependency on gmock
 class FakeServiceStub : public proto::collector::trace::v1::TraceService::StubInterface
 {
-  grpc::Status Export(grpc::ClientContext *context,
-                      const proto::collector::trace::v1::ExportTraceServiceRequest &request,
-                      proto::collector::trace::v1::ExportTraceServiceResponse *response) override
+  grpc::Status Export(grpc::ClientContext *,
+                      const proto::collector::trace::v1::ExportTraceServiceRequest &,
+                      proto::collector::trace::v1::ExportTraceServiceResponse *) override
   {
-    (void)context;
-    (void)request;
-    (void)response;
     return grpc::Status::OK;
   }
 
   grpc::ClientAsyncResponseReaderInterface<proto::collector::trace::v1::ExportTraceServiceResponse>
-      *AsyncExportRaw(grpc::ClientContext *context,
-                      const proto::collector::trace::v1::ExportTraceServiceRequest &request,
-                      grpc::CompletionQueue *cq) override
+      *AsyncExportRaw(grpc::ClientContext *,
+                      const proto::collector::trace::v1::ExportTraceServiceRequest &,
+                      grpc::CompletionQueue *) override
   {
-    (void)context;
-    (void)request;
-    (void)cq;
     return nullptr;
   }
 
   grpc::ClientAsyncResponseReaderInterface<proto::collector::trace::v1::ExportTraceServiceResponse>
-      *PrepareAsyncExportRaw(grpc::ClientContext *context,
-                             const proto::collector::trace::v1::ExportTraceServiceRequest &request,
-                             grpc::CompletionQueue *cq) override
+      *PrepareAsyncExportRaw(grpc::ClientContext *,
+                             const proto::collector::trace::v1::ExportTraceServiceRequest &,
+                             grpc::CompletionQueue *) override
   {
-    (void)context;
-    (void)request;
-    (void)cq;
     return nullptr;
   }
 };
