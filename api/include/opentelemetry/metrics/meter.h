@@ -28,7 +28,8 @@ public:
   virtual ~Meter() = default;
 
   /**
-   * Creates, adds to private metrics container, and returns a DoubleCounter with "name."
+   * Creates a DoubleCounter with the passed characteristics and returns a shared_ptr to that
+   * DoubleCounter.
    *
    * @param name the name of the new DoubleCounter.
    * @param description a brief description of what the DoubleCounter is used for.
@@ -50,7 +51,8 @@ public:
   }
 
   /**
-   * Creates, adds to private metrics container, and returns an IntCounter with "name."
+   * Creates an IntCounter with the passed characteristics and returns a shared_ptr to that
+   * IntCounter.
    *
    * @param name the name of the new IntCounter.
    * @param description a brief description of what the IntCounter is used for.
@@ -72,7 +74,8 @@ public:
   }
 
   /**
-   * Creates, adds to private metrics container, and returns a DoubleUpDownCounter with "name."
+   * Creates a DoubleUpDownCounter with the passed characteristics and returns a shared_ptr to that
+   * DoubleUpDownCounter.
    *
    * @param name the name of the new DoubleUpDownCounter.
    * @param description a brief description of what the DoubleUpDownCounter is used for.
@@ -94,7 +97,8 @@ public:
   }
 
   /**
-   * Creates, adds to private metrics container, and returns an IntUpDownCounter with "name."
+   * Creates an IntUpDownCounter with the passed characteristics and returns a shared_ptr to that
+   * IntUpDownCounter.
    *
    * @param name the name of the new IntUpDownCounter.
    * @param description a brief description of what the IntUpDownCounter is used for.
@@ -116,7 +120,8 @@ public:
   }
 
   /**
-   * Creates, adds to private metrics container, and returns a DoubleValueRecorder with "name."
+   * Creates a DoubleValueRecorder with the passed characteristics and returns a shared_ptr to that
+   * DoubleValueRecorder.
    *
    * @param name the name of the new DoubleValueRecorder.
    * @param description a brief description of what the DoubleValueRecorder is used for.
@@ -138,7 +143,8 @@ public:
   }
 
   /**
-   * Creates, adds to private metrics container, and returns an IntValueRecorder with "name."
+   * Creates an IntValueRecorder with the passed characteristics and returns a shared_ptr to that
+   * IntValueRecoder.
    *
    * @param name the name of the new IntValueRecorder.
    * @param description a brief description of what the IntValueRecorder is used for.
@@ -160,7 +166,8 @@ public:
   }
 
   /**
-   * Creates, adds to private metrics container, and returns a DoubleSumObserver with "name."
+   * Creates a DoubleSumObserver with the passed characteristics and returns a shared_ptr to that
+   * DoubleSumObserver.
    *
    * @param name the name of the new DoubleSumObserver.
    * @param description a brief description of what the DoubleSumObserver is used for.
@@ -184,7 +191,8 @@ public:
   }
 
   /**
-   * Creates, adds to private metrics container, and returns an IntSumObserver with "name."
+   * Creates a IntSumObserver with the passed characteristics and returns a shared_ptr to that
+   * IntSumObserver.
    *
    * @param name the name of the new IntSumObserver.
    * @param description a brief description of what the IntSumObserver is used for.
@@ -208,7 +216,8 @@ public:
   }
 
   /**
-   * Creates, adds to private metrics container, and returns a DoubleUpDownSumObserver with "name."
+   * Creates a DoubleUpDownSumObserver with the passed characteristics and returns a shared_ptr to 
+   * that DoubleUpDowNSumObserver.
    *
    * @param name the name of the new DoubleUpDownSumObserver.
    * @param description a brief description of what the DoubleUpDownSumObserver is used for.
@@ -232,7 +241,8 @@ public:
   }
 
   /**
-   * Creates, adds to private metrics container, and returns an IntUpDownSumObserver with "name."
+   * Creates a IntUpDownSumObserver with the passed characteristics and returns a shared_ptr to that
+   * IntUpDownSumObserver.
    *
    * @param name the name of the new IntUpDownSumObserver.
    * @param description a brief description of what the IntUpDownSumObserver is used for.
@@ -256,7 +266,8 @@ public:
   }
 
   /**
-   * Creates, adds to private metrics container, and returns a DoubleValueObserver with "name."
+   * Creates a DoubleValueObserver with the passed characteristics and returns a shared_ptr to that
+   * DoubleValueObserver.
    *
    * @param name the name of the new DoubleValueObserver.
    * @param description a brief description of what the DoubleValueObserver is used for.
@@ -280,7 +291,8 @@ public:
   }
 
   /**
-   * Creates, adds to private metrics container, and returns an IntValueObserver with "name."
+   * Creates an IntValueObserver with the passed characteristics and returns a shared_ptr to that
+   * IntValueObserver.
    *
    * @param name the name of the new IntValueObserver.
    * @param description a brief description of what the IntValueObserver is used for.
