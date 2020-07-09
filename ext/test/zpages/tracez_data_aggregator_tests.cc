@@ -374,8 +374,8 @@ TEST(TraceZDataAggregator, ErrorSampleSpansOverCapacity)
   
   // Check if error spans are updated according to spans started
   auto& aggregated_data = data.at(span_name1);
-  ASSERT_EQ(aggregated_data->num_error_spans, 6);
-  ASSERT_EQ(aggregated_data->error_sample_spans.size(), 5);
+  ASSERT_EQ(aggregated_data->num_error_spans, (int)span_error_descriptions.size());
+  ASSERT_EQ(aggregated_data->error_sample_spans.size(), kMaxNumberOfSampleSpans);
 
   // Check if the latest 5 error spans exist out of the total 6 that were introduced
   auto error_sample = aggregated_data->error_sample_spans.begin();
