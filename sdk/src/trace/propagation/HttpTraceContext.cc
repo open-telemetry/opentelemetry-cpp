@@ -75,7 +75,6 @@ class HttpTraceContext : public HTTPTextFormat
         static const int HEADER_SIZE = VERSION_BYTES + TRACE_ID_BYTES + PARENT_ID_BYTES + TRACE_FLAG_BYTES + TRACE_DELIMITER_BYTES;
         static const int TRACESTATE_MAX_MEMBERS = 32;
         static const nostd::string_view TRACESTATE_KEY_VALUE_DELIMITER = "=";
-        static const std::regex TRACESTATE_ENTRY_DELIMITER_SPLIT_PATTERN("[ \t]*,[ \t]*");
         static const int HEADER_ELEMENT_LENGTHS[4] = {2,32,16,2};
 
         static void injectImpl(Setter setter, T &carrier, const SpanContext &spanContext) {
