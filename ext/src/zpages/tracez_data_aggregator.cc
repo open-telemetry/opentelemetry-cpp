@@ -102,6 +102,21 @@ void TracezDataAggregator::AggregateRunningSpans(std::unordered_set<Recordable*>
 void TracezDataAggregator::AggregateSpans()
 {
   auto span_snapshot = tracez_span_processor_->GetSpanSnapshot();
+  /**
+   * The following functions must be called in this particular order.
+   * Running spans are calculated from scratch every time this function is called ie. assuming
+   * all running spans are zero initially. 
+   * All spans present in the aggregated data can be set to 0 before these functions
+   * are called but that would take an additional linear step.
+   * To avoid paying this price, some work is done in aggergate completed spans to ensure that 
+   * going into aggregate running spans all the span names in completed spans have a running span value of 0.
+   * This is possible to do because if running spans with the same name exists it will be aggregated in the 
+   * AggregateRunningSpans function call that follows.
+   * Additionally if it's the first time we are seeing a running span in AggregateRunningSpans, we set it to 0
+   * to avoid double counting the running span if it already existed in the aggregation from the previous call to
+   * this function. See tests AdditionToRunningSpans and RemovalOfRunningSpanWhenCompleted to see an example
+   * of where this is used.
+   **/
   AggregateCompletedSpans(span_snapshot.completed);
   AggregateRunningSpans(span_snapshot.running);
 }
