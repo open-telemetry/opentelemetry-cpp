@@ -429,7 +429,7 @@ TEST(TraceZDataAggregator, CompletedSampleSpansOverCapacity)
   auto& aggregated_data = data.at(span_name1);
   
   //Check the count of completed spans in the buckets and the samples stored
-  ASSERT_EQ(aggregated_data->latency_sample_spans[LatencyBoundaryName::k0MicroTo10Micro].size(), 5);
+  ASSERT_EQ(aggregated_data->latency_sample_spans[LatencyBoundaryName::k0MicroTo10Micro].size(), kMaxNumberOfSampleSpans);
   ASSERT_EQ(aggregated_data->span_count_per_latency_bucket[LatencyBoundaryName::k0MicroTo10Micro],timestamps.size());
   
   auto latency_sample = aggregated_data->latency_sample_spans[LatencyBoundaryName::k0MicroTo10Micro].begin();
@@ -446,6 +446,83 @@ TEST(TraceZDataAggregator, CompletedSampleSpansOverCapacity)
       ASSERT_EQ(aggregated_data->span_count_per_latency_bucket[boundary], 0);
       ASSERT_EQ(aggregated_data->latency_sample_spans[boundary].size(),0);
   }
+  ASSERT_EQ(aggregated_data->num_running_spans, 0);
+  ASSERT_EQ(aggregated_data->num_error_spans, 0);
+  ASSERT_EQ(aggregated_data->error_sample_spans.size(), 0);
+}
+
+/** Test to see if the span names are in alphabetical order **/
+TEST(TraceZDataAggregator, SpanNameInAlphabeticalOrder)
+{
+  //Setup
+  std::shared_ptr<TracezSpanProcessor> processor(new TracezSpanProcessor());
+  auto tracer = std::shared_ptr<opentelemetry::trace::Tracer>(new Tracer(processor));
+  auto tracez_data_aggregator (new TracezDataAggregator(processor));
+  
+  std::vector<std::string> span_names = {span_name1,span_name2,span_name3};
+  
+  auto span_first = tracer->StartSpan(span_name2);
+  tracer->StartSpan(span_name1)->End();
+  tracer->StartSpan(span_name3)->SetStatus(opentelemetry::trace::CanonicalCode::CANCELLED,"span cancelled");
+  
+  //Get data and check if span name exists in aggregation
+  const std::map<std::string, std::unique_ptr<AggregatedSpanData>>& data = tracez_data_aggregator->GetAggregatedData();
+  ASSERT_EQ(data.size(),span_names.size());
+  
+  int span_names_idx = 0;
+  for(auto& spans: data)
+  {
+    ASSERT_EQ(spans.first, span_names[span_names_idx]);
+    span_names_idx++;
+  }
+}
+
+/** Test to check if the span latencies with duration at the edge of boundaries fall in the correct bucket **/
+TEST(TraceZDataAggregator, EdgeSpanLatenciesFallInCorrectBoundaries)
+{
+  //Setup
+  std::shared_ptr<TracezSpanProcessor> processor(new TracezSpanProcessor());
+  auto tracer = std::shared_ptr<opentelemetry::trace::Tracer>(new Tracer(processor));
+  auto tracez_data_aggregator (new TracezDataAggregator(processor));
+  
+  opentelemetry::trace::StartSpanOptions start;
+  opentelemetry::trace::EndSpanOptions end;
+  
+  //Start and end 6 spans with the same name that fall into the first latency bucket
+  std::vector<nanoseconds> durations = {
+    nanoseconds(0),
+    nanoseconds(10000),
+    nanoseconds(100000),
+    nanoseconds(1000000),
+    nanoseconds(10000000),
+    nanoseconds(100000000),
+    nanoseconds(1000000000),
+    nanoseconds(10000000000),
+    nanoseconds(100000000000)
+  };
+  for(auto duration: durations)
+  {
+    start.start_steady_time = SteadyTimestamp(nanoseconds(1));
+    end.end_steady_time = SteadyTimestamp(nanoseconds(duration.count()+1));
+    tracer->StartSpan(span_name1, start)->End(end);
+  }
+  
+  //Get data and check if span name exists in aggregation
+  const std::map<std::string, std::unique_ptr<AggregatedSpanData>>& data = tracez_data_aggregator->GetAggregatedData();
+  ASSERT_EQ(data.size(),1);
+  ASSERT_TRUE(data.find(span_name1) != data.end());
+
+  auto& aggregated_data = data.at(span_name1);
+  //Check if the latency boundary is updated correctly
+  for(LatencyBoundaryName boundary = LatencyBoundaryName::k0MicroTo10Micro; boundary != LatencyBoundaryName::k100SecondToMax; ++boundary)
+  {
+      ASSERT_EQ(aggregated_data->span_count_per_latency_bucket[boundary], 1);
+      ASSERT_EQ(aggregated_data->latency_sample_spans[boundary].size(), 1);
+      ASSERT_EQ(aggregated_data->latency_sample_spans[boundary].front().get()->GetDuration().count(), durations[boundary].count());
+  }
+  
+  //Make sure all other information is unchanged
+  for(LatencyBoundaryName boundary = LatencyBoundaryName::k10MicroTo100Micro; boundary != LatencyBoundaryName::k100SecondToMax; ++boundary)
   ASSERT_EQ(aggregated_data->num_running_spans, 0);
   ASSERT_EQ(aggregated_data->num_error_spans, 0);
   ASSERT_EQ(aggregated_data->error_sample_spans.size(), 0);
