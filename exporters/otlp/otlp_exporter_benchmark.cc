@@ -8,7 +8,8 @@ namespace exporter
 namespace otlp
 {
 
-const int kBatchSize = 200;
+const int kBatchSize     = 200;
+const int kNumAttributes = 5;
 
 const trace::TraceId kTraceId(std::array<const uint8_t, trace::TraceId::kSize>(
     {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1}));
@@ -17,24 +18,16 @@ const trace::SpanId kSpanId(std::array<const uint8_t, trace::SpanId::kSize>(
 const trace::SpanId kParentSpanId(std::array<const uint8_t, trace::SpanId::kSize>(
     {0, 0, 0, 0, 0, 0, 0, 3}));
 
-// OtlpExporterTestPeer is a friend class of OtlpExporter
-class OtlpExporterTestPeer
-{
-public:
-  std::unique_ptr<sdk::trace::SpanExporter> GetExporter(
-      std::unique_ptr<proto::collector::trace::v1::TraceService::StubInterface> &stub_interface)
-  {
-    return std::unique_ptr<sdk::trace::SpanExporter>(
-        new exporter::otlp::OtlpExporter(std::move(stub_interface)));
-  }
-};
-
+// Create a fake service stub to avoid dependency on gmock
 class FakeServiceStub : public proto::collector::trace::v1::TraceService::StubInterface
 {
   grpc::Status Export(grpc::ClientContext *context,
                       const proto::collector::trace::v1::ExportTraceServiceRequest &request,
                       proto::collector::trace::v1::ExportTraceServiceResponse *response) override
   {
+    (void)context;
+    (void)request;
+    (void)response;
     return grpc::Status::OK;
   }
 
@@ -43,7 +36,10 @@ class FakeServiceStub : public proto::collector::trace::v1::TraceService::StubIn
                       const proto::collector::trace::v1::ExportTraceServiceRequest &request,
                       grpc::CompletionQueue *cq) override
   {
-    return NULL;
+    (void)context;
+    (void)request;
+    (void)cq;
+    return nullptr;
   }
 
   grpc::ClientAsyncResponseReaderInterface<proto::collector::trace::v1::ExportTraceServiceResponse>
@@ -51,20 +47,54 @@ class FakeServiceStub : public proto::collector::trace::v1::TraceService::StubIn
                              const proto::collector::trace::v1::ExportTraceServiceRequest &request,
                              grpc::CompletionQueue *cq) override
   {
-    return NULL;
+    (void)context;
+    (void)request;
+    (void)cq;
+    return nullptr;
   }
 };
 
-// Benchmark Export() with span fields filled
-void BM_OtlpExporterFullSpans(benchmark::State &state)
+// OtlpExporterTestPeer is a friend class of OtlpExporter
+class OtlpExporterTestPeer
+{
+public:
+  std::unique_ptr<sdk::trace::SpanExporter> GetExporter()
+  {
+    auto mock_stub = new FakeServiceStub();
+    std::unique_ptr<proto::collector::trace::v1::TraceService::StubInterface> stub_interface(
+        mock_stub);
+    return std::unique_ptr<sdk::trace::SpanExporter>(
+        new exporter::otlp::OtlpExporter(std::move(stub_interface)));
+  }
+};
+
+// Benchmark Export() with empty spans
+void BM_OtlpExporterEmptySpans(benchmark::State &state)
 {
   std::unique_ptr<OtlpExporterTestPeer> testpeer(new OtlpExporterTestPeer());
+  auto exporter = testpeer->GetExporter();
 
-  auto mock_stub = new FakeServiceStub();
-  std::unique_ptr<proto::collector::trace::v1::TraceService::StubInterface> stub_interface(
-      mock_stub);
+  while (state.KeepRunning())
+  {
+    std::unique_ptr<sdk::trace::Recordable> batch_arr[kBatchSize];
 
-  auto exporter = testpeer->GetExporter(stub_interface);
+    for (int i = 0; i < kBatchSize; i++)
+    {
+      auto recordable = exporter->MakeRecordable();
+      batch_arr[i]    = std::move(recordable);
+    }
+    nostd::span<std::unique_ptr<sdk::trace::Recordable>> batch(batch_arr, kBatchSize);
+
+    exporter->Export(batch);
+  }
+}
+BENCHMARK(BM_OtlpExporterEmptySpans);
+
+// Benchmark Export() with some span fields filled
+void BM_OtlpExporterSparseSpans(benchmark::State &state)
+{
+  std::unique_ptr<OtlpExporterTestPeer> testpeer(new OtlpExporterTestPeer());
+  auto exporter = testpeer->GetExporter();
 
   while (state.KeepRunning())
   {
@@ -86,18 +116,14 @@ void BM_OtlpExporterFullSpans(benchmark::State &state)
     exporter->Export(batch);
   }
 }
-BENCHMARK(BM_OtlpExporterFullSpans);
+BENCHMARK(BM_OtlpExporterSparseSpans);
 
-// Benchmark Export() with empty spans
-void BM_OtlpExporterEmptySpans(benchmark::State &state)
+// Benchmark Export() with all span fields filled
+
+void BM_OtlpExporterDenseSpans(benchmark::State &state)
 {
   std::unique_ptr<OtlpExporterTestPeer> testpeer(new OtlpExporterTestPeer());
-
-  auto mock_stub = new FakeServiceStub();
-  std::unique_ptr<proto::collector::trace::v1::TraceService::StubInterface> stub_interface(
-      mock_stub);
-
-  auto exporter = testpeer->GetExporter(stub_interface);
+  auto exporter = testpeer->GetExporter();
 
   while (state.KeepRunning())
   {
@@ -106,6 +132,27 @@ void BM_OtlpExporterEmptySpans(benchmark::State &state)
     for (int i = 0; i < kBatchSize; i++)
     {
       auto recordable = exporter->MakeRecordable();
+
+      recordable->SetIds(kTraceId, kSpanId, kParentSpanId);
+      recordable->SetName("TestSpan");
+      recordable->SetStartTime(core::SystemTimestamp(std::chrono::system_clock::now()));
+      recordable->SetDuration(std::chrono::nanoseconds(10));
+
+      for (int i = 0; i < kNumAttributes; ++i)
+      {
+        recordable->SetAttribute("int_key_" + i, static_cast<int64_t>(i));
+      }
+
+      for (int i = 0; i < kNumAttributes; ++i)
+      {
+        recordable->SetAttribute("str_key_" + i, "string_val_" + std::to_string(i));
+      }
+
+      for (int i = 0; i < kNumAttributes; ++i)
+      {
+        recordable->SetAttribute("bool_key_" + i, true);
+      }
+
       batch_arr[i] = std::move(recordable);
     }
     nostd::span<std::unique_ptr<sdk::trace::Recordable>> batch(batch_arr, kBatchSize);
@@ -113,7 +160,7 @@ void BM_OtlpExporterEmptySpans(benchmark::State &state)
     exporter->Export(batch);
   }
 }
-BENCHMARK(BM_OtlpExporterEmptySpans);
+BENCHMARK(BM_OtlpExporterDenseSpans);
 
 }  // namespace otlp
 }  // namespace exporter
