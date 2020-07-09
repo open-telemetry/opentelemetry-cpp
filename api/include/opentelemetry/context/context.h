@@ -46,15 +46,15 @@ public:
   // Contructor, creates a context object from a map of keys
   // and identifiers.
   template <class T, nostd::enable_if_t<trace::detail::is_key_value_iterable<T>::value> * = nullptr>
-  Context(const T &attributes)
+  Context(const T values)
   {}
 
   // Accepts a new iterable and then returns a new  context that
   // contains both the original pairs and the new pair.
   template <class T, nostd::enable_if_t<trace::detail::is_key_value_iterable<T>::value> * = nullptr>
-  Context WriteValues(T &attributes) noexcept
+  Context WriteValues(T &values) noexcept
   {
-    return Context(attributes);
+    return Context(values);
   }
 
   // Returns the value associated with the passed in key.
