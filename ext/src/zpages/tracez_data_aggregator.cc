@@ -77,7 +77,7 @@ void TracezDataAggregator::AggregateCompletedSpans(std::vector<std::unique_ptr<R
 
 void TracezDataAggregator::AggregateRunningSpans(std::unordered_set<Recordable*>& running_spans)
 {
-  std::unordered_set<std::string> cache;
+  std::unordered_set<std::string> seen_span_names;
   for(auto& span: running_spans)
   {
     std::string span_name = span->GetName().data();
@@ -89,10 +89,10 @@ void TracezDataAggregator::AggregateRunningSpans(std::unordered_set<Recordable*>
     
     //If it's the first time this span name is seen, set the count to 0 to avoid double counting
     //from previous aggregated data.
-    if(cache.find(span_name) == cache.end())
+    if(seen_span_names.find(span_name) == seen_span_names.end())
     {
       aggregated_data_[span_name] -> num_running_spans = 0;
-      cache.insert(span_name);
+      seen_span_names.insert(span_name);
     }
     aggregated_data_[span_name] -> num_running_spans++;
   }

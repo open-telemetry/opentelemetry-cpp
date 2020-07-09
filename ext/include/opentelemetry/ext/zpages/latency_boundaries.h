@@ -14,7 +14,6 @@ namespace ext
 {
 namespace zpages
 {
-
 /**
  * kLatencyBoundaries is a constant array that contains the 9 latency boundaries and enables them to be iterated over
  * Each value in the array represents the lower limit(inclusive) of the boundary(in nano seconds) and the upper limit(exclusive)
@@ -31,7 +30,6 @@ const std::array<nanoseconds,9> kLatencyBoundaries = {
   nanoseconds(seconds(10)),
   nanoseconds(seconds(100)),
 };
-
 
 /**
  * LatencyBoundaryName enum is used to index into the kLatencyBoundaries container.

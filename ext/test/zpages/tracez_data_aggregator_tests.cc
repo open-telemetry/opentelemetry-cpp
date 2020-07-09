@@ -347,12 +347,12 @@ TEST(TraceZDataAggregator, CompletedSampleSpansOverCapacity)
   
   //Start and end 6 spans with the same name that fall into the first latency bucket
   std::vector<std::pair<nanoseconds,nanoseconds>> timestamps = {
-    make_pair(nanoseconds(1),nanoseconds(1)),
-    make_pair(nanoseconds(1),nanoseconds(2)),
-    make_pair(nanoseconds(1),nanoseconds(3)),
-    make_pair(nanoseconds(1),nanoseconds(4)),
-    make_pair(nanoseconds(1),nanoseconds(5)),
-    make_pair(nanoseconds(1),nanoseconds(6))
+    make_pair(nanoseconds(10),nanoseconds(100)),
+    make_pair(nanoseconds(1),nanoseconds(10000)),
+    make_pair(nanoseconds(1000),nanoseconds(3000)),
+    make_pair(nanoseconds(12),nanoseconds(12)),
+    make_pair(nanoseconds(10),nanoseconds(5000)),
+    make_pair(nanoseconds(10),nanoseconds(60))
   };
   for(auto timestamp: timestamps)
   {
@@ -369,7 +369,7 @@ TEST(TraceZDataAggregator, CompletedSampleSpansOverCapacity)
   auto& aggregated_data = data.at(span_name1);
   
   ASSERT_EQ(aggregated_data->latency_sample_spans[LatencyBoundaryName::k0MicroTo10Micro].size(), 5);
-  ASSERT_EQ(aggregated_data->span_count_per_latency_bucket[LatencyBoundaryName::k0MicroTo10Micro],6);
+  ASSERT_EQ(aggregated_data->span_count_per_latency_bucket[LatencyBoundaryName::k0MicroTo10Micro],timestamps.size());
   auto latency_sample = aggregated_data->latency_sample_spans[LatencyBoundaryName::k0MicroTo10Micro].begin();
   for(unsigned int idx = 1; idx < timestamps.size(); idx++)
   {
@@ -391,41 +391,60 @@ TEST(TraceZDataAggregator, CompletedSampleSpansOverCapacity)
   
 }
 
-
-
 TEST(TraceZDataAggregator, MultipleCompletedSpan)
 {
+  //Setup
   std::shared_ptr<TracezSpanProcessor> processor(new TracezSpanProcessor());
-
   auto tracer = std::shared_ptr<opentelemetry::trace::Tracer>(new Tracer(processor));
   auto tracez_data_aggregator (new TracezDataAggregator(processor));
   
+  // Start spans with span name and the corresponding durations in one of the 9 latency buckets
+  std::unordered_map<std::string, std::vector<std::vector<nanoseconds>>> span_name_to_duration({
+    {span_name1, {{nanoseconds(0),nanoseconds(9999)},{},{},{},{},{},{},{},{}}},
+    {span_name2, {{},{nanoseconds(10000), nanoseconds(99999)}, {nanoseconds(100000)}, {}, {}, {}, {}, {}, {}}},
+    {span_name3, {{}, {}, {}, {nanoseconds(1000000), nanoseconds(9999999)}, {}, {}, {}, {}, {nanoseconds(9999999999999)}}}
+  });
   opentelemetry::trace::StartSpanOptions start;
-  start.start_steady_time = SteadyTimestamp(std::chrono::nanoseconds(10));
-
   opentelemetry::trace::EndSpanOptions end;
-  end.end_steady_time = SteadyTimestamp(std::chrono::nanoseconds(40));
-
-  tracer->StartSpan("span 1", start)->End(end);
-  
-  start.start_steady_time = SteadyTimestamp(std::chrono::nanoseconds(1));
-  end.end_steady_time = SteadyTimestamp(std::chrono::nanoseconds(100));
-  
-  tracer->StartSpan("span 1", start)->End(end);
-  
-  start.start_steady_time = SteadyTimestamp(std::chrono::nanoseconds(1));
-  end.end_steady_time = SteadyTimestamp(std::chrono::nanoseconds(10001));
-  
-  tracer->StartSpan("span 1", start)->End(end);
-  
+  for(auto& span: span_name_to_duration)
+  {
+    for(auto& buckets: span.second)
+    {
+      for(auto& duration: buckets)
+      {
+        long long int end_time = duration.count()+1;
+        start.start_steady_time = SteadyTimestamp(std::chrono::nanoseconds(1));
+        end.end_steady_time = SteadyTimestamp(std::chrono::nanoseconds(end_time));
+        tracer->StartSpan(span.first, start)->End(end);
+      }
+    }
+  }
   const std::map<std::string, std::unique_ptr<AggregatedSpanData>>& data = tracez_data_aggregator->GetAggregatedData();
-  ASSERT_EQ(data.size(),1);
-  ASSERT_TRUE(data.find("span 1") != data.end());
-  ASSERT_EQ(data.at("span 1")->span_count_per_latency_bucket[0], 2); 
-  ASSERT_EQ(data.at("span 1")->latency_sample_spans[0].size(),2);
-  ASSERT_EQ(data.at("span 1")->span_count_per_latency_bucket[1], 1); 
-  ASSERT_EQ(data.at("span 1")->latency_sample_spans[1].size(),1);
-  ASSERT_EQ(data.at("span 1")->latency_sample_spans[0].front()->GetDuration(),std::chrono::nanoseconds(30));
-  ASSERT_EQ(data.at("span 1")->latency_sample_spans[1].front()->GetDuration(),std::chrono::nanoseconds(10000));
+  ASSERT_EQ(data.size(),span_name_to_duration.size());
+  
+  for(auto& span: span_name_to_duration)
+  {
+    ASSERT_TRUE(data.find(span.first) != data.end());
+    auto& aggregated_data = data.at(span.first);
+    
+    //Check if latency samples are in correct boundaries
+    for(LatencyBoundaryName boundary = LatencyBoundaryName::k0MicroTo10Micro; boundary != LatencyBoundaryName::k100SecondToMax; ++boundary)
+    {
+        ASSERT_EQ(aggregated_data->span_count_per_latency_bucket[boundary], span.second[boundary].size());
+        ASSERT_EQ(aggregated_data->latency_sample_spans[boundary].size(),span.second[boundary].size());
+        
+        auto latency_sample = aggregated_data->latency_sample_spans[boundary].begin();
+        for(unsigned int idx = 0 ; idx < span.second[boundary].size(); idx++)
+        {
+          ASSERT_EQ(span.second[boundary][idx],latency_sample->get()->GetDuration());
+          latency_sample = std::next(latency_sample);
+        }
+    }
+    
+    //Check if nothing else is affected
+    ASSERT_TRUE(aggregated_data->error_sample_spans.empty());
+    ASSERT_EQ(aggregated_data->num_running_spans,0);
+    ASSERT_EQ(aggregated_data->num_error_spans,0);
+  }
 }
 
