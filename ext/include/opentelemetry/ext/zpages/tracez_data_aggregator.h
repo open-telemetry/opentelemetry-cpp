@@ -38,6 +38,7 @@ struct AggregatedSpanData{
   int num_running_spans; 
   int num_error_spans;
   
+  
   /** 
    * latency_sample_spans is an array of lists, each index of the array corresponds to a latency boundary(of which there are 9).
    * The list in each index stores the sample spans for that latency boundary.
@@ -48,6 +49,11 @@ struct AggregatedSpanData{
    * error_sample_spans is a list that stores the error samples for a span name.
    */
   std::list<std::unique_ptr<Recordable>> error_sample_spans;
+  
+  /**
+   * running_sample_spans is a list that stores the running span samples for a span name.
+   */
+  std::list<Recordable*> running_sample_spans;
   
   /**
    * span_count_per_latency_bucket is a array that stores the count of spans for each of the 9 latency buckets.

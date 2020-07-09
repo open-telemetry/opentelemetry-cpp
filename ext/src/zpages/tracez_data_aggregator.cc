@@ -69,6 +69,7 @@ void TracezDataAggregator::AggregateCompletedSpans(std::vector<std::unique_ptr<R
     
     //running spans are calculated from scratch later
     aggregated_data_[span_name] -> num_running_spans = 0;
+    aggregated_data_[span_name] -> running_sample_spans.clear();
     
     if(span->GetStatus() == CanonicalCode::OK)AggregateStatusOKSpan(span);
     else AggregateStatusErrorSpan(span);
@@ -92,8 +93,15 @@ void TracezDataAggregator::AggregateRunningSpans(std::unordered_set<Recordable*>
     if(seen_span_names.find(span_name) == seen_span_names.end())
     {
       aggregated_data_[span_name] -> num_running_spans = 0;
+      aggregated_data_[span_name] -> running_sample_spans.clear();
       seen_span_names.insert(span_name);
     }
+    
+    if(aggregated_data_[span_name]->running_sample_spans.size() == kMaxNumberOfSampleSpans)
+    {
+      aggregated_data_[span_name]->running_sample_spans.pop_front();
+    }
+    aggregated_data_[span_name]-> running_sample_spans.push_back(span);
     aggregated_data_[span_name] -> num_running_spans++;
   }
 }
