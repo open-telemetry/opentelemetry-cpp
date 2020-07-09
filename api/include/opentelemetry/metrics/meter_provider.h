@@ -14,7 +14,6 @@ class MeterProvider
 {
 public:
   virtual ~MeterProvider() = default;
-  MeterProvider()          = default;
   /**
    * Gets or creates a named Meter instance.
    *

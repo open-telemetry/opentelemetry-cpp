@@ -12,36 +12,9 @@
 
 #include <memory>
 
-/*
-  Stubbed out NoopMeter and NoopInstrument. Will replace with other PR implementation
-*/
-
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace metrics
 {
-/**
- * No-op implementation of Instrument. This class should not be used directly.
- */
-class NoopInstrument
-{
-public:
-  NoopInstrument(const std::shared_ptr<Meter> &meter) noexcept : meter_{meter} {}
-
-  Meter &meter() const noexcept { return *meter_; }
-
-private:
-  std::shared_ptr<Meter> meter_;
-};
-
-/**
- * No-op implementation of Meter.
- */
-class NoopMeter final : public Meter, public std::enable_shared_from_this<NoopMeter>
-{
-public:
-  NoopMeter() = default;
-};
-
 /**
  * No-op implementation of a MeterProvider.
  */
