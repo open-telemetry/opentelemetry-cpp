@@ -33,13 +33,6 @@ public class SpanContext:
             remote = is_remote;
         }
 
-        // Creates a new SpanContext that was propagated from a remote parent, with the given
-        // identifiers and options.
-        public static SpanContext createFromRemoteParent(TraceId traceId, SpanId spanId, TraceFlags traceFlags, TraceState traceState) {
-          // Question: what is AutoValue_spanContext, where is it defined?
-          return new AutoValue_SpanContext(traceId, spanId, traceFlags, traceState, /* remote=*/ true);
-        }
-
         static SpanContext getInvalid() {
             return INVALID;
         }
@@ -48,7 +41,7 @@ public class SpanContext:
             // Get whether this `SpanContext` is valid.
             // A `SpanContext` is said to be invalid if its trace ID or span ID is
             // invalid (i.e. ``0``).
-            return traceId != INVALID_TRACE_ID && self.span_id != INVALID_SPAN_ID;
+            return traceId != INVALID_TRACE_ID && spanId != INVALID_SPAN_ID;
         }
 
         TraceId getTraceId() {
@@ -66,5 +59,9 @@ public class SpanContext:
         TraceState getTraceState() {
             return traceState;
         }
+
+    private:
+        static const nostd::string_view INVALID_SPAN_ID = SpanId.fromLowerBase16("0000000000000000");
+        static const nostd::string_view INVALID_TRACE_ID = TraceId.fromLowerBase16("00000000000000000000000000000000");
 }
 OPENTELEMETRY_END_NAMESPACE

@@ -54,13 +54,9 @@ public:
   }
 
   // Creates a SpanId from traceparent
-  static TraceId fromLowerBase16(nostd::string_view src, int srcOffset)
+  static TraceId fromLowerBase16(nostd::string_view src)
   {
-    // I don't really know about what to do with this function
-    // The java implementation has this:  return new TraceId(
-    //                                             BigendianEncoding.longFromBase16String(src, srcOffset),
-    //                                             BigendianEncoding.longFromBase16String(src, srcOffset + BigendianEncoding.LONG_BASE16));
-    // But I am not sure if this will suffice here and I don't know what is BigendianEncoding module as well.
+    return TraceId(nostd::span(src,src.size()));
   }
 
   // Returns a nostd::span of the ID.

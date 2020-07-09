@@ -1,5 +1,6 @@
-#include <vector>
+#pragma once
 #include "opentelemetry/nostd/string_view.h"
+#include "opentelemetry/nostd/span.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace trace {
@@ -10,59 +11,21 @@ public abstract class TraceState {
     static const int MAX_KEY_VALUE_PAIRS = 32;
     static const TraceState DEFAULT = TraceState.builder().build();
 
-    static TraceState create(std::vector<Entry> entries) {
-      // I don't know what exactly this is and how to replace this
-      return new AutoValue_TraceState(Collections.unmodifiableList(entries));
+    static TraceState create(nostd::span<Entry> entries) {
+      return TraceState(entries);
     }
-
-    // Value is opaque string up to 256 characters printable ASCII RFC0020 characters (i.e., the range
-    // 0x20 to 0x7E) except comma , and =.
-    static bool validateValue(nostd::string_view value) {
-      if (value.length() > VALUE_MAX_SIZE || value[value.length() - 1] == ' ' /* '\u0020' */) {
-        return false;
-      }
-      for (int i = 0; i < value.length(); i++) {
-        char c = value[i];
-        if (c == ',' || c == '=' || c < ' ' /* '\u0020' */ || c > '~' /* '\u007E' */) {
-          return false;
-        }
-      }
-      return true;
+    TraceState(nostd::span<Entry> entries) {
+        this.entries = entries;
     }
-
-    static bool isNumberOrDigit(char ch) {
-      return (ch >= 'a' && ch <= 'z') || (ch >= '0' && ch <= '9');
-    }
-
-    // Key is opaque string up to 256 characters printable. It MUST begin with a lowercase letter, and
-    // can only contain lowercase letters a-z, digits 0-9, underscores _, dashes -, asterisks *, and
-    // forward slashes /.  For multi-tenant vendor scenarios, an at sign (@) can be used to prefix the
-    // vendor name.
-    // todo: benchmark this implementation
-    static bool validateKey(nostd::string_view key) {
-      if (key.length() > KEY_MAX_SIZE || key.isEmpty() || !isNumberOrDigit(key[0]))) {
-        return false;
-      }
-      int atSeenCount = 0;
-      for (int i = 1; i < key.length(); i++) {
-        char c = key[i];
-        if (!isNumberOrDigit(c) && c != '_' && c != '-' && c != '@' && c != '*' && c != '/') {
-          return false;
-        }
-        if ((c == '@') && (++atSeenCount > 1)) {
-          return false;
-        }
-      }
-      return true;
-    }
+    nostd::span<Entry> entries;
 
   public:
     // Builder class for TraceState.
     static const class Builder {
       private:
         const TraceState parent;
-        std::vector<Entry> entries;
-        std::vector<Entry> EMPTY_ENTRIES;
+        nostd::span<Entry> entries;
+        const nostd::span<Entry> EMPTY_ENTRIES;
         // Needs to be in this class to avoid initialization deadlock because super class depends on
         // subclass (the auto-value generate class).
         static const TraceState EMPTY = create(EMPTY_ENTRIES);
@@ -121,7 +84,7 @@ public abstract class TraceState {
     }
 
     // Immutable key-value pair for TraceState.
-    public static class Entry {
+    static class Entry {
       // Creates a new Entry for the TraceState.
       public:
         static Entry create(nostd::string_view &key, nostd::string_view &value) {
@@ -155,7 +118,7 @@ public abstract class TraceState {
     }
 
     // Returns a list view of the mappings contained in this TraceState.
-    virtual std::vector<Entry> getEntries() = 0;
+    virtual nostd::span<Entry> getEntries() = 0;
 
     // Returns a Builder based on an empty TraceState.
     static Builder builder() {

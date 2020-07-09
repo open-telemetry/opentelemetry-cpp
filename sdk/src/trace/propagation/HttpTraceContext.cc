@@ -1,13 +1,12 @@
 #include <vector>
-#include <regex>
-#include <stdexcept>
+#include <exception>
 #include "opentelemetry/trace/propagation/httptextformat.h"
 #include "opentelemetry/trace/spancontext.h"
 #include "opentelemetry/trace/trace_state.h"
 #include "opentelemetry/context/context.h"
 #include "opentelemetry/nostd/string_view.h"
 #include "opentelemetry/trace/span.h"
-#include "opentelemetry/trace/default_span.cc"
+#include "opentelemetry/trace/default_span.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace trace
@@ -77,13 +76,7 @@ class HttpTraceContext : public HTTPTextFormat
         static const int TRACESTATE_MAX_MEMBERS = 32;
         static const nostd::string_view TRACESTATE_KEY_VALUE_DELIMITER = "=";
         static const std::regex TRACESTATE_ENTRY_DELIMITER_SPLIT_PATTERN("[ \t]*,[ \t]*");
-
-        static Context checkNotNull(Context &arg, nostd::string_view errorMessage) {
-            if (arg == NULL) {
-                throw new NullPointerException("error: null " + errorMessage);
-            }
-            return arg;
-        }
+        static const int HEADER_ELEMENT_LENGTHS[4] = {2,32,16,2};
 
         static void injectImpl(Setter setter, T &carrier, const SpanContext &spanContext) {
             char hex_string[HEADER_SIZE];
@@ -107,41 +100,99 @@ class HttpTraceContext : public HTTPTextFormat
             }
 
             try {
-                TraceId traceId = TraceId.fromLowerBase16(traceparent, TRACE_ID_OFFSET);
-                SpanId spanId = SpanId.fromLowerBase16(traceparent, SPAN_ID_OFFSET);
-                TraceFlags traceFlags = TraceFlags.fromLowerBase16(traceparent, TRACE_OPTION_OFFSET);
+                nostd::string_view version;
+                nostd::string_view traceid;
+                nostd::string_view spanid;
+                nostd::string_view traceflags;
+                int eltNum = 0;
+                int countdown = HEADER_ELEMENT_LENGTHS[eltNum];
+                int startPos = -1;
+                for (int i = 0; i < traceparent.length(); i++) {
+                    if (traceparent[i]=='\t') continue;
+                    else if (traceparent[i]=='-') {
+                        if (countdown==0) {
+                            if (eltNum == 0) {
+                                version = traceparent.substr(startPos,HEADER_ELEMENT_LENGTHS[eltNum]);
+                            } else if (eltNum == 1) {
+                                traceid = traceparent.substr(startPos,HEADER_ELEMENT_LENGTHS[eltNum]);
+                            } else if (eltNum == 2) {
+                                spanid = traceparent.substr(startPos,HEADER_ELEMENT_LENGTHS[eltNum]);
+                            } else {
+                                throw; // Impossible to have more than 4 elements in parent header
+                            }
+                            countdown = HEADER_ELEMENT_LENGTHS[++eltNum];
+                            startPos = -1;
+                        } else {
+                            throw;
+                        }
+                    } else if ((traceparent[i]>='a'&&traceparent[i]<='f')||(traceparent[i]>='0'&&traceparent[i]<='9')) {
+                        if (startPos == -1) startPos = i;
+                        countdown--;
+                    } else {
+                        throw;
+                    }
+                }
+                traceflags = traceparent.substr(startPos,HEADER_ELEMENT_LENGTHS[eltNum]);
+
+                if (trace_id == "00000000000000000000000000000000" || span_id == "0000000000000000") {
+                    return trace.set_span_in_context(trace.INVALID_SPAN, context);
+                }
+                if (version == "ff") {
+                    return trace.set_span_in_context(trace.INVALID_SPAN, context);
+                }
+
+                TraceId traceId = TraceId.fromLowerBase16(traceid);
+                SpanId spanId = SpanId.fromLowerBase16(spanid);
+                TraceFlags traceFlags = TraceFlags.fromLowerBase16(traceflags);
                 return SpanContext.createFromRemoteParent(traceId, spanId, traceFlags, TRACE_STATE_DEFAULT);
-            } catch (IllegalArgumentException e) {
+            } catch (std::exception& e) {
                 std::cout<<"Unparseable traceparent header. Returning INVALID span context."<<std::endl;
                 return SpanContext.getInvalid();
             }
         }
 
-        static TraceState extractTraceState(nostd::string_view traceStateHeader) {
-            // TODO: implementation
-            /** The question here is that how should I treat the trace state. Implementation will differ pretty much
-                depending on what is the data structure of TraceState. Also this is based on the premise that
-                trace state exists and has a builder
-            */
-            std::smatch listMembers;
-            TraceState.Builder traceStateBuilder = TraceState.builder();
-            regex_search(traceStateHeader,sm,TRACESTATE_ENTRY_DELIMITER_SPLIT_PATTERN); // I hope regex accepts string view
-            if (listMembers.size() <= TRACESTATE_MAX_MEMBERS) {
-                throw std::invalid_argument("TraceState has too many elements.");
+        static void setTraceStateBuilder(TraceState.Builder &traceStateBuilder, nostd::string_view &listMember) {
+            int index = -1;
+            for (int j = 0; j < listMember.length(); j++) {
+                if (listMember[j] == TRACESTATE_KEY_VALUE_DELIMITER) {
+                    index = j;
+                    break;
+                }
             }
-            for (int i = listMembers.size() - 1; i >= 0; i--) {
-                nostd::string_view listMember = listMembers[i];
-                int index = -1;
-                for (int j = 0; j < listMember.length(); j++) {
-                    if (listMember[j] == TRACESTATE_KEY_VALUE_DELIMITER) {
-                        index = j;
-                        break;
-                    }
+            if (index == -1) {
+                throw std::invalid_argument("Invalid TraceState list-member format.");
+            }
+            traceStateBuilder.set(listMember.substring(0, index), listMember.substring(index + 1));
+        }
+
+        static TraceState extractTraceState(nostd::string_view &traceStateHeader) {
+            TraceState.Builder traceStateBuilder = TraceState.builder();
+            int startPos = -1;
+            int endPos = -1;
+            int elementNum = 0;
+            nostd::string_view listMember;
+            for (int i = 0; i < traceStateHeader.length(); i++) {
+                if (traceStateHeader[i]=='\t') continue;
+                else if (traceStateHeader[i]==',') {
+                    if (startPos == -1 && endPos == -1) continue;
+                    elementNum++;
+                    listMember = traceStateHeader.substr(startPos,endPos-startPos+1);
+                    setTraceStateBuilder(traceStateBuilder,listMember);
+                    endPos = -1;
+                    startPos = -1;
+                } else {
+                    endPos = i;
+                    if (startPos==-1) startPos = i;
                 }
-                if (index == -1) {
-                    throw std::invalid_argument("Invalid TraceState list-member format.");
-                }
-                traceStateBuilder.set(listMember.substring(0, index), listMember.substring(index + 1));
+            }
+            if (startPos!=-1 && endPos!=-1) {
+                listMember = traceStateHeader.substr(startPos,endPos-startPos+1);
+                setTraceStateBuilder(traceStateBuilder,listMember);
+                elementNum++;
+            }
+
+            if (elementNum <= TRACESTATE_MAX_MEMBERS) {
+                throw std::invalid_argument("TraceState has too many elements.");
             }
             return traceStateBuilder.build();
         }
@@ -163,17 +214,22 @@ class HttpTraceContext : public HTTPTextFormat
             }
 
             try {
-                // Again, the trace state problem, should I treat it like a string or dictionary or an encapsuled class? This is not defined in current files
                 TraceState traceState = extractTraceState(traceStateHeader);
                 // Need getter support from SpanContext
-                return SpanContext.createFromRemoteParent(
+                return SpanContext(
                     contextFromParentHeader.getTraceId(),
                     contextFromParentHeader.getSpanId(),
+                    true,
                     contextFromParentHeader.getTraceFlags(),
                     traceState);
-            } catch (IllegalArgumentException e) {
+            } catch (std::exception& e) {
                 std::cout<<"Unparseable tracestate header. Returning span context without state."<<std::endl;
-                return contextFromParentHeader;
+                return SpanContext(
+                    contextFromParentHeader.getTraceId(),
+                    contextFromParentHeader.getSpanId(),
+                    true,
+                    contextFromParentHeader.getTraceFlags(),
+                    TraceState.builder().build());
             }
         }
 }
