@@ -1,7 +1,7 @@
 #include "opentelemetry/sdk/trace/tracer.h"
-#include "opentelemetry/sdk/trace/simple_processor.h"
-#include "opentelemetry/sdk/trace/samplers/always_on.h"
 #include "opentelemetry/sdk/trace/samplers/always_off.h"
+#include "opentelemetry/sdk/trace/samplers/always_on.h"
+#include "opentelemetry/sdk/trace/simple_processor.h"
 #include "opentelemetry/sdk/trace/span_data.h"
 
 #include <gtest/gtest.h>
@@ -126,13 +126,15 @@ TEST(Tracer, StartSpanWithAttributes)
   tracer->StartSpan("span 1", {{"attr1", "string"},
                                {"attr2", false},
                                {"attr1", 314159},
-                               {"attr3", (int64_t)-20},
-                               {"attr4", (uint64_t)20},
-                               {"attr5", 3.1},
-                               {"attr6", "string"}});
+                               {"attr3", (unsigned int)314159},
+                               {"attr4", (int64_t)-20},
+                               {"attr5", (uint64_t)20},
+                               {"attr6", 3.1},
+                               {"attr7", "string"}});
 
   // Start a span with all supported array attribute types.
   int listInt[]                       = {1, 2, 3};
+  unsigned int listUInt[]             = {1, 2, 3};
   int64_t listInt64[]                 = {1, -2, 3};
   uint64_t listUInt64[]               = {1, 2, 3};
   double listDouble[]                 = {1.1, 2.1, 3.1};
@@ -140,38 +142,42 @@ TEST(Tracer, StartSpanWithAttributes)
   nostd::string_view listStringView[] = {"a", "b"};
   std::map<std::string, common::AttributeValue> m;
   m["attr1"] = nostd::span<int>(listInt);
-  m["attr2"] = nostd::span<int64_t>(listInt64);
-  m["attr3"] = nostd::span<uint64_t>(listUInt64);
-  m["attr4"] = nostd::span<double>(listDouble);
-  m["attr5"] = nostd::span<bool>(listBool);
-  m["attr6"] = nostd::span<nostd::string_view>(listStringView);
+  m["attr2"] = nostd::span<unsigned int>(listUInt);
+  m["attr3"] = nostd::span<int64_t>(listInt64);
+  m["attr4"] = nostd::span<uint64_t>(listUInt64);
+  m["attr5"] = nostd::span<double>(listDouble);
+  m["attr6"] = nostd::span<bool>(listBool);
+  m["attr7"] = nostd::span<nostd::string_view>(listStringView);
   tracer->StartSpan("span 2", m);
 
   ASSERT_EQ(2, spans_received->size());
 
   auto &span_data = spans_received->at(0);
-  ASSERT_EQ(6, span_data->GetAttributes().size());
+  ASSERT_EQ(7, span_data->GetAttributes().size());
   ASSERT_EQ(314159, nostd::get<int64_t>(span_data->GetAttributes().at("attr1")));
   ASSERT_EQ(false, nostd::get<bool>(span_data->GetAttributes().at("attr2")));
-  ASSERT_EQ(-20, nostd::get<int64_t>(span_data->GetAttributes().at("attr3")));
-  ASSERT_EQ(20, nostd::get<uint64_t>(span_data->GetAttributes().at("attr4")));
-  ASSERT_EQ(3.1, nostd::get<double>(span_data->GetAttributes().at("attr5")));
-  ASSERT_EQ("string", nostd::get<std::string>(span_data->GetAttributes().at("attr6")));
+  ASSERT_EQ(314159, nostd::get<uint64_t>(span_data->GetAttributes().at("attr3")));
+  ASSERT_EQ(-20, nostd::get<int64_t>(span_data->GetAttributes().at("attr4")));
+  ASSERT_EQ(20, nostd::get<uint64_t>(span_data->GetAttributes().at("attr5")));
+  ASSERT_EQ(3.1, nostd::get<double>(span_data->GetAttributes().at("attr6")));
+  ASSERT_EQ("string", nostd::get<std::string>(span_data->GetAttributes().at("attr7")));
 
   auto &span_data2 = spans_received->at(1);
-  ASSERT_EQ(6, span_data2->GetAttributes().size());
+  ASSERT_EQ(7, span_data2->GetAttributes().size());
   ASSERT_EQ(std::vector<int64_t>({1, 2, 3}),
             nostd::get<std::vector<int64_t>>(span_data2->GetAttributes().at("attr1")));
-  ASSERT_EQ(std::vector<int64_t>({1, -2, 3}),
-            nostd::get<std::vector<int64_t>>(span_data2->GetAttributes().at("attr2")));
   ASSERT_EQ(std::vector<uint64_t>({1, 2, 3}),
-            nostd::get<std::vector<uint64_t>>(span_data2->GetAttributes().at("attr3")));
+            nostd::get<std::vector<uint64_t>>(span_data2->GetAttributes().at("attr2")));
+  ASSERT_EQ(std::vector<int64_t>({1, -2, 3}),
+            nostd::get<std::vector<int64_t>>(span_data2->GetAttributes().at("attr3")));
+  ASSERT_EQ(std::vector<uint64_t>({1, 2, 3}),
+            nostd::get<std::vector<uint64_t>>(span_data2->GetAttributes().at("attr4")));
   ASSERT_EQ(std::vector<double>({1.1, 2.1, 3.1}),
-            nostd::get<std::vector<double>>(span_data2->GetAttributes().at("attr4")));
+            nostd::get<std::vector<double>>(span_data2->GetAttributes().at("attr5")));
   ASSERT_EQ(std::vector<bool>({true, false}),
-            nostd::get<std::vector<bool>>(span_data2->GetAttributes().at("attr5")));
+            nostd::get<std::vector<bool>>(span_data2->GetAttributes().at("attr6")));
   ASSERT_EQ(std::vector<std::string>({"a", "b"}),
-            nostd::get<std::vector<std::string>>(span_data2->GetAttributes().at("attr6")));
+            nostd::get<std::vector<std::string>>(span_data2->GetAttributes().at("attr7")));
 }
 
 TEST(Tracer, StartSpanWithAttributesCopy)
@@ -226,9 +232,9 @@ TEST(Tracer, GetSampler)
 
   // Create a Tracer with a AlwaysOffSampler
   std::shared_ptr<SpanProcessor> processor_2(new SimpleSpanProcessor(nullptr));
-  std::shared_ptr<Tracer> tracer_off(new Tracer(std::move(processor_2), std::make_shared<AlwaysOffSampler>()));
+  std::shared_ptr<Tracer> tracer_off(
+      new Tracer(std::move(processor_2), std::make_shared<AlwaysOffSampler>()));
 
   auto t2 = tracer_off->GetSampler();
   ASSERT_EQ("AlwaysOffSampler", t2->GetDescription());
 }
-
