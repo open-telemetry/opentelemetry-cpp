@@ -49,7 +49,7 @@ public:
   Context(const T values)
   {}
 
-  // Accepts a new iterable and then returns a new  context that
+  // Accepts a new iterable and then returns a new context that
   // contains both the original pairs and the new pair.
   template <class T, nostd::enable_if_t<trace::detail::is_key_value_iterable<T>::value> * = nullptr>
   Context WriteValues(T &values) noexcept
