@@ -44,14 +44,14 @@ TEST(NoopTest, UseNoopMeters)
       m->NewIntUpDownSumObserver("Test intud sum obs", "For testing", "Unitless", true,
                                  &IntCallback);
   auto delta =
-    m->NewDoubleUpDownSumObserver("Test doubleud sum obs", "For testing", "Unitless", true,
-                                             &DoubleCallback);
+      m->NewDoubleUpDownSumObserver("Test doubleud sum obs", "For testing", "Unitless", true,
+                                    &DoubleCallback);
   auto epsilon =
       m->NewIntValueObserver("Test int val obs", "For testing", "Unitless", true,
                              &IntCallback);
   auto zeta =
-    m->NewDoubleValueObserver("Test double val obs", "For testing", "Unitless", true,
-                                        &DoubleCallback);
+      m->NewDoubleValueObserver("Test double val obs", "For testing", "Unitless", true,
+                                &DoubleCallback);
 
   // Two instruments with the same characteristic should NOT be equal.
   // Note: In actual (non-noop) implementations of the Meter class, creating two
@@ -64,7 +64,7 @@ TEST(NoopTest, UseNoopMeters)
   // This is to adhere to ABI stability.
   using M =
   std::pair<nostd::shared_ptr<metrics::SynchronousInstrument>, nostd::variant<int, double>>;
-  
+
   // (t1, 1)
   M t1_pair;
   t1_pair.first = t1;
@@ -79,12 +79,13 @@ TEST(NoopTest, UseNoopMeters)
   std::array<M, 2> arr{t1_pair, t3_pair};
   nostd::span<M> span(arr);
 
-  using N = std::map<std::string, std::string>;
-  
-  // Create a std::map and use that map to create a KeyValueIterableView
+  using N = std::map<std::string, common::AttributeValue>;
+
   N mp = {{"key", "value"}};
-  opentelemetry::trace::KeyValueIterableView<N> view{mp};
-  
-  m->RecordBatch(view, span);
+
+  // Test all versions of RecordBatch
+  m->RecordBatch(mp, span);
+  m->RecordBatch({{"Key", "Value"}}, span);
+  m->RecordBatch({{"Key", "Value"}}, {{t1, 1}, {t3, 2.0}});
 }
 OPENTELEMETRY_END_NAMESPACE
