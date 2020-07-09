@@ -34,18 +34,28 @@ nostd::unique_ptr<trace_api::Span> Tracer::StartSpan(
     const trace_api::StartSpanOptions &options) noexcept
 {
   // TODO: replace nullptr with parent context in span context
-  auto decision =
-      sampler_->ShouldSample(nullptr, trace_api::TraceId(), name, options.kind, attributes)
-          .decision;
-  if (decision == Decision::NOT_RECORD)
+  auto sampling_result =
+      sampler_->ShouldSample(nullptr, trace_api::TraceId(), name, options.kind, attributes);
+  if (sampling_result.decision == Decision::NOT_RECORD)
   {
     return nostd::unique_ptr<trace_api::Span>{new (std::nothrow)
                                                   trace_api::NoopSpan{this->shared_from_this()}};
   }
   else
   {
-    return nostd::unique_ptr<trace_api::Span>{new (std::nothrow) Span{
+    auto span = nostd::unique_ptr<trace_api::Span>{new (std::nothrow) Span{
         this->shared_from_this(), processor_.load(), name, attributes, options}};
+
+    // if sampling result is not nullptr, add attributes to the span.
+    if (sampling_result.attributes)
+    {
+      for (auto kv : *sampling_result.attributes)
+      {
+        span->SetAttribute(kv.first, std::move(kv.second));
+      }
+    }
+
+    return span;
   }
 }
 
