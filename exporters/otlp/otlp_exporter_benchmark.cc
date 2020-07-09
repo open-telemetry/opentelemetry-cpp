@@ -107,17 +107,17 @@ void CreateDenseSpans(std::array<std::unique_ptr<sdk::trace::Recordable>, kBatch
     recordable->SetStartTime(core::SystemTimestamp(std::chrono::system_clock::now()));
     recordable->SetDuration(std::chrono::nanoseconds(10));
 
-    for (int i = 0; i < kNumAttributes; ++i)
+    for (int i = 0; i < kNumAttributes; i++)
     {
       recordable->SetAttribute("int_key_" + i, static_cast<int64_t>(i));
     }
 
-    for (int i = 0; i < kNumAttributes; ++i)
+    for (int i = 0; i < kNumAttributes; i++)
     {
-      recordable->SetAttribute("str_key_" + i, "string_val_" + std::to_string(i));
+      recordable->SetAttribute("str_key_" + i, "string_val_" + i);
     }
 
-    for (int i = 0; i < kNumAttributes; ++i)
+    for (int i = 0; i < kNumAttributes; i++)
     {
       recordable->SetAttribute("bool_key_" + i, true);
     }
