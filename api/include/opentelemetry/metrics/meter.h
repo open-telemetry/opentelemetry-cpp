@@ -318,6 +318,61 @@ public:
   {
     // No-op
   }
+
+  /**
+   * Utility method that allows users to atomically record measurements to a set of
+   * Metric instruments with a common set of labels.
+   *
+   * This overloads the BatchRecord function to allow {@code labels} to be of type std::map.
+   *
+   * @param labels the set of labels to associate with this recorder.
+   * @param values a span of pairs where the first element of the pair is a metric instrument
+   * to record to, and the second element is the value to update that instrument with.
+   */
+  template <class T, nostd::enable_if_t<trace::detail::is_key_value_iterable<T>::value> * = nullptr>
+  void RecordBatch(
+      const T &labels,
+      const nostd::span<std::pair<nostd::shared_ptr<SynchronousInstrument>,
+          nostd::variant<int, double>>> values) noexcept
+  {
+    // No-op
+  }
+
+  /**
+   * Utility method that allows users to atomically record measurements to a set of
+   * Metric instruments with a common set of labels.
+   *
+   * This overloads the BatchRecord function to allow {@code labels} to be of type initializer list.
+   *
+   * @param labels the set of labels to associate with this recorder.
+   * @param values a span of pairs where the first element of the pair is a metric instrument
+   * to record to, and the second element is the value to update that instrument with.
+   */
+  void RecordBatch(
+      std::initializer_list<std::pair<nostd::string_view, nostd::string_view>> labels,
+      const nostd::span<std::pair<nostd::shared_ptr<SynchronousInstrument>,
+          nostd::variant<int, double>>> values) noexcept
+  {
+    // No-op
+  }
+
+  /**
+   * Utility method that allows users to atomically record measurements to a set of
+   * Metric instruments with a common set of labels.
+   *
+   * This overloads the BatchRecord function to allow {@code labels} and {@code values}
+   * to be of type initializer list.
+   *
+   * @param labels the set of labels to associate with this recorder.
+   * @param values a span of pairs where the first element of the pair is a metric instrument
+   * to record to, and the second element is the value to update that instrument with.
+   */
+  void RecordBatch(
+      std::initializer_list<std::pair<nostd::string_view, nostd::string_view>> labels,
+      std::initializer_list<std::pair<nostd::shared_ptr<SynchronousInstrument>, nostd::variant<int, double>>>) noexcept
+  {
+    // No-op
+  }
 };
 }  // namespace metrics
 OPENTELEMETRY_END_NAMESPACE
