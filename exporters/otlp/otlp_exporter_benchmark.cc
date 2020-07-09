@@ -118,7 +118,7 @@ void BM_OtlpExporterEmptySpans(benchmark::State &state)
   std::unique_ptr<OtlpExporterTestPeer> testpeer(new OtlpExporterTestPeer());
   auto exporter = testpeer->GetExporter();
 
-  while (state.KeepRunning())
+  for (auto _ : state)
   {
     std::array<std::unique_ptr<sdk::trace::Recordable>, kBatchSize> recordables;
     CreateEmptySpans(recordables);
@@ -133,7 +133,7 @@ void BM_OtlpExporterSparseSpans(benchmark::State &state)
   std::unique_ptr<OtlpExporterTestPeer> testpeer(new OtlpExporterTestPeer());
   auto exporter = testpeer->GetExporter();
 
-  while (state.KeepRunning())
+  for (auto _ : state)
   {
     std::array<std::unique_ptr<sdk::trace::Recordable>, kBatchSize> recordables;
     CreateSparseSpans(recordables);
@@ -148,7 +148,7 @@ void BM_OtlpExporterDenseSpans(benchmark::State &state)
   std::unique_ptr<OtlpExporterTestPeer> testpeer(new OtlpExporterTestPeer());
   auto exporter = testpeer->GetExporter();
 
-  while (state.KeepRunning())
+  for (auto _ : state)
   {
     std::array<std::unique_ptr<sdk::trace::Recordable>, kBatchSize> recordables;
     CreateDenseSpans(recordables);
