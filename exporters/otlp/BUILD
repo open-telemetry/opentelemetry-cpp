@@ -71,7 +71,7 @@ cc_test(
 
 otel_cc_benchmark(
     name = "otlp_exporter_benchmark",
-    srcs = ["otlp_exporter_benchmark.cc"],
+    srcs = ["internal/otlp_exporter_benchmark.cc"],
     deps = [
         ":otlp_exporter",
     ],
