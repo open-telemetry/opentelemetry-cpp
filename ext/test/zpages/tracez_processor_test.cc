@@ -135,8 +135,8 @@ TEST(TracezSpanProcessor, NoSpans) {
   auto spans = processor->GetSpanSnapshot();
   auto recordable = processor->MakeRecordable();
 
-  ASSERT_EQ(spans.running.size(), 0);
-  ASSERT_EQ(spans.completed.size(), 0);
+  EXPECT_EQ(spans.running.size(), 0);
+  EXPECT_EQ(spans.completed.size(), 0);
 }
 
 
@@ -157,16 +157,16 @@ TEST(TracezSpanProcessor, OneSpanCumulative) {
   auto span = tracer->StartSpan(span_name[0]);
   UpdateSpans(processor, completed, running);
 
-  ASSERT_TRUE(ContainsNames(span_name, running));
-  ASSERT_EQ(running.size(), 1);
-  ASSERT_EQ(completed.size(), 0);
+  EXPECT_TRUE(ContainsNames(span_name, running));
+  EXPECT_EQ(running.size(), 1);
+  EXPECT_EQ(completed.size(), 0);
 
   span->End();
   UpdateSpans(processor, completed, running);
 
-  ASSERT_TRUE(ContainsNames(span_name, completed));
-  ASSERT_EQ(running.size(), 0);
-  ASSERT_EQ(completed.size(), 1);
+  EXPECT_TRUE(ContainsNames(span_name, completed));
+  EXPECT_EQ(running.size(), 0);
+  EXPECT_EQ(completed.size(), 1);
 }
 
 
@@ -183,8 +183,8 @@ TEST(TracezSpanProcessor, MultipleSpansCumulative) {
   auto running = spans.running;
   auto completed = std::move(spans.completed);
 
-  ASSERT_EQ(running.size(), 0);
-  ASSERT_EQ(completed.size(), 0);
+  EXPECT_EQ(running.size(), 0);
+  EXPECT_EQ(completed.size(), 0);
 
   std::vector<std::string> span_names = {"s1", "s2", "s3", "s1"};
 
@@ -193,17 +193,17 @@ TEST(TracezSpanProcessor, MultipleSpansCumulative) {
   for (const auto &name : span_names) span_vars.push_back(tracer->StartSpan(name));
   UpdateSpans(processor, completed, running);
 
-  ASSERT_TRUE(ContainsNames(span_names, running)); // s1 s2 s3 s1
-  ASSERT_EQ(running.size(), span_names.size());
-  ASSERT_EQ(completed.size(), 0);
+  EXPECT_TRUE(ContainsNames(span_names, running)); // s1 s2 s3 s1
+  EXPECT_EQ(running.size(), span_names.size());
+  EXPECT_EQ(completed.size(), 0);
 
   // End all spans
   for (auto &span : span_vars) span->End();
   UpdateSpans(processor, completed, running);
 
-  ASSERT_TRUE(ContainsNames(span_names, completed)); // s1 s2 s3 s1
-  ASSERT_EQ(running.size(), 0);
-  ASSERT_EQ(completed.size(), span_names.size());
+  EXPECT_TRUE(ContainsNames(span_names, completed)); // s1 s2 s3 s1
+  EXPECT_EQ(running.size(), 0);
+  EXPECT_EQ(completed.size(), span_names.size());
 }
 
 
@@ -226,50 +226,50 @@ TEST(TracezSpanProcessor, MultipleSpansMiddleSplitCumulative) {
   for (const auto &name : span_names) span_vars.push_back(tracer->StartSpan(name));
   UpdateSpans(processor, completed, running);
 
-  ASSERT_TRUE(ContainsNames(span_names, running)); // s0 s2 s1 s1 s
-  ASSERT_EQ(running.size(), span_names.size());
-  ASSERT_EQ(completed.size(), 0);
+  EXPECT_TRUE(ContainsNames(span_names, running)); // s0 s2 s1 s1 s
+  EXPECT_EQ(running.size(), span_names.size());
+  EXPECT_EQ(completed.size(), 0);
 
   // End 4th span
   span_vars[3]->End();
   UpdateSpans(processor, completed, running);
 
-  ASSERT_TRUE(ContainsNames(span_names, running, 0, 3)); // s0 s2 s1
-  ASSERT_TRUE(ContainsNames(span_names, running, 4)); // + s
-  ASSERT_TRUE(ContainsNames(span_names, completed, 3, 4)); // s1
-  ASSERT_EQ(running.size(), 4);
-  ASSERT_EQ(completed.size(), 1);
+  EXPECT_TRUE(ContainsNames(span_names, running, 0, 3)); // s0 s2 s1
+  EXPECT_TRUE(ContainsNames(span_names, running, 4)); // + s
+  EXPECT_TRUE(ContainsNames(span_names, completed, 3, 4)); // s1
+  EXPECT_EQ(running.size(), 4);
+  EXPECT_EQ(completed.size(), 1);
 
   // End 2nd span
   span_vars[1]->End();
   UpdateSpans(processor, completed, running);
 
-  ASSERT_TRUE(ContainsNames(span_names, running, 0, 1)); // s0
-  ASSERT_TRUE(ContainsNames(span_names, running, 2, 3)); // + s1
-  ASSERT_TRUE(ContainsNames(span_names, running, 4)); // + s
-  ASSERT_TRUE(ContainsNames(span_names, completed, 1, 2)); // s2
-  ASSERT_TRUE(ContainsNames(span_names, completed, 3, 4)); // s1
-  ASSERT_EQ(running.size(), 3);
-  ASSERT_EQ(completed.size(), 2);
+  EXPECT_TRUE(ContainsNames(span_names, running, 0, 1)); // s0
+  EXPECT_TRUE(ContainsNames(span_names, running, 2, 3)); // + s1
+  EXPECT_TRUE(ContainsNames(span_names, running, 4)); // + s
+  EXPECT_TRUE(ContainsNames(span_names, completed, 1, 2)); // s2
+  EXPECT_TRUE(ContainsNames(span_names, completed, 3, 4)); // s1
+  EXPECT_EQ(running.size(), 3);
+  EXPECT_EQ(completed.size(), 2);
 
   // End 3rd span (last middle span)
   span_vars[2]->End();
   UpdateSpans(processor, completed, running);
 
-  ASSERT_TRUE(ContainsNames(span_names, running, 0, 1)); // s0
-  ASSERT_TRUE(ContainsNames(span_names, running, 4)); // + s
-  ASSERT_TRUE(ContainsNames(span_names, completed, 1, 4)); // s2 s1 s1
-  ASSERT_EQ(running.size(), 2);
-  ASSERT_EQ(completed.size(), 3);
+  EXPECT_TRUE(ContainsNames(span_names, running, 0, 1)); // s0
+  EXPECT_TRUE(ContainsNames(span_names, running, 4)); // + s
+  EXPECT_TRUE(ContainsNames(span_names, completed, 1, 4)); // s2 s1 s1
+  EXPECT_EQ(running.size(), 2);
+  EXPECT_EQ(completed.size(), 3);
 
   // End remaining Spans
   span_vars[0]->End();
   span_vars[4]->End();
   UpdateSpans(processor, completed, running);
 
-  ASSERT_TRUE(ContainsNames(span_names, completed)); // s0 s2 s1 s1 s
-  ASSERT_EQ(running.size(), 0);
-  ASSERT_EQ(completed.size(), 5);
+  EXPECT_TRUE(ContainsNames(span_names, completed)); // s0 s2 s1 s1 s
+  EXPECT_EQ(running.size(), 0);
+  EXPECT_EQ(completed.size(), 5);
 }
 
 
@@ -295,28 +295,28 @@ TEST(TracezSpanProcessor, MultipleSpansOuterSplitCumulative) {
   span_vars[4]->End();
   UpdateSpans(processor, completed, running);
 
-  ASSERT_TRUE(ContainsNames(span_names, running, 0, 4)); // s0 s2 s1 s1
-  ASSERT_TRUE(ContainsNames(span_names, completed, 4)); // s
-  ASSERT_EQ(running.size(), 4);
-  ASSERT_EQ(completed.size(), 1);
+  EXPECT_TRUE(ContainsNames(span_names, running, 0, 4)); // s0 s2 s1 s1
+  EXPECT_TRUE(ContainsNames(span_names, completed, 4)); // s
+  EXPECT_EQ(running.size(), 4);
+  EXPECT_EQ(completed.size(), 1);
 
   // End first span
   span_vars[0]->End();
   UpdateSpans(processor, completed, running);
 
-  ASSERT_TRUE(ContainsNames(span_names, running, 1, 4)); // s2 s1 s1
-  ASSERT_TRUE(ContainsNames(span_names, completed, 0, 1)); // s0
-  ASSERT_TRUE(ContainsNames(span_names, completed, 4)); // s
-  ASSERT_EQ(running.size(), 3);
-  ASSERT_EQ(completed.size(), 2);
+  EXPECT_TRUE(ContainsNames(span_names, running, 1, 4)); // s2 s1 s1
+  EXPECT_TRUE(ContainsNames(span_names, completed, 0, 1)); // s0
+  EXPECT_TRUE(ContainsNames(span_names, completed, 4)); // s
+  EXPECT_EQ(running.size(), 3);
+  EXPECT_EQ(completed.size(), 2);
 
   // End remaining Spans
   for (int i = 1; i < 4; i++) span_vars[i]->End();
   UpdateSpans(processor, completed, running);
 
-  ASSERT_TRUE(ContainsNames(span_names, completed)); // s0 s2 s1 s1 s
-  ASSERT_EQ(running.size(), 0);
-  ASSERT_EQ(completed.size(), 5);
+  EXPECT_TRUE(ContainsNames(span_names, completed)); // s0 s2 s1 s1 s
+  EXPECT_EQ(running.size(), 0);
+  EXPECT_EQ(completed.size(), 5);
 }
 
 /*
@@ -336,21 +336,21 @@ TEST(TracezSpanProcessor, OneSpanNewOnly) {
   auto span = tracer->StartSpan(span_name[0]);
   UpdateSpans(processor, completed, running, true);
 
-  ASSERT_TRUE(ContainsNames(span_name, running, 0, 1, true));
-  ASSERT_EQ(running.size(), 1);
-  ASSERT_EQ(completed.size(), 0);
+  EXPECT_TRUE(ContainsNames(span_name, running, 0, 1, true));
+  EXPECT_EQ(running.size(), 1);
+  EXPECT_EQ(completed.size(), 0);
 
   span->End();
   UpdateSpans(processor, completed, running, true);
 
-  ASSERT_TRUE(ContainsNames(span_name, completed, 0, 1, true));
-  ASSERT_EQ(running.size(), 0);
-  ASSERT_EQ(completed.size(), 1);
+  EXPECT_TRUE(ContainsNames(span_name, completed, 0, 1, true));
+  EXPECT_EQ(running.size(), 0);
+  EXPECT_EQ(completed.size(), 1);
 
   UpdateSpans(processor, completed, running, true);
 
-  ASSERT_EQ(running.size(), 0);
-  ASSERT_EQ(completed.size(), 0);
+  EXPECT_EQ(running.size(), 0);
+  EXPECT_EQ(completed.size(), 0);
 }
 
 /*
@@ -372,45 +372,45 @@ TEST(TracezSpanProcessor, MultipleSpansMiddleSplitNewOnly) {
   for (const auto &name : span_names) span_vars.push_back(tracer->StartSpan(name));
   UpdateSpans(processor, completed, running);
 
-  ASSERT_TRUE(ContainsNames(span_names, running, 0, 5, true)); // s0 s2 s1 s1 s
-  ASSERT_EQ(running.size(), span_names.size());
-  ASSERT_EQ(completed.size(), 0);
+  EXPECT_TRUE(ContainsNames(span_names, running, 0, 5, true)); // s0 s2 s1 s1 s
+  EXPECT_EQ(running.size(), span_names.size());
+  EXPECT_EQ(completed.size(), 0);
 
   // End 4th span
   span_vars[3]->End();
   UpdateSpans(processor, completed, running, true);
 
-  ASSERT_TRUE(ContainsNames(span_names, running, 0, 3)); // s0 s2 s1
-  ASSERT_TRUE(ContainsNames(span_names, running, 4)); // + s
-  ASSERT_TRUE(ContainsNames(span_names, completed, 3, 4, true)); // s1
-  ASSERT_EQ(running.size(), 4);
-  ASSERT_EQ(completed.size(), 1);
+  EXPECT_TRUE(ContainsNames(span_names, running, 0, 3)); // s0 s2 s1
+  EXPECT_TRUE(ContainsNames(span_names, running, 4)); // + s
+  EXPECT_TRUE(ContainsNames(span_names, completed, 3, 4, true)); // s1
+  EXPECT_EQ(running.size(), 4);
+  EXPECT_EQ(completed.size(), 1);
 
   // End 2nd and 3rd span
   span_vars[1]->End();
   span_vars[2]->End();
   UpdateSpans(processor, completed, running, true);
 
-  ASSERT_TRUE(ContainsNames(span_names, running, 0, 1)); // s0
-  ASSERT_TRUE(ContainsNames(span_names, running, 4)); // + s
-  ASSERT_TRUE(ContainsNames(span_names, completed, 1, 3, true)); // s2 s1
-  ASSERT_EQ(running.size(), 2);
-  ASSERT_EQ(completed.size(), 2);
+  EXPECT_TRUE(ContainsNames(span_names, running, 0, 1)); // s0
+  EXPECT_TRUE(ContainsNames(span_names, running, 4)); // + s
+  EXPECT_TRUE(ContainsNames(span_names, completed, 1, 3, true)); // s2 s1
+  EXPECT_EQ(running.size(), 2);
+  EXPECT_EQ(completed.size(), 2);
 
   // End remaining Spans
   span_vars[0]->End();
   span_vars[4]->End();
   UpdateSpans(processor, completed, running, true);
 
-  ASSERT_TRUE(ContainsNames(span_names, completed, 0, 1)); // s0
-  ASSERT_TRUE(ContainsNames(span_names, completed, 4)); // s
-  ASSERT_EQ(running.size(), 0);
-  ASSERT_EQ(completed.size(), 2);
+  EXPECT_TRUE(ContainsNames(span_names, completed, 0, 1)); // s0
+  EXPECT_TRUE(ContainsNames(span_names, completed, 4)); // s
+  EXPECT_EQ(running.size(), 0);
+  EXPECT_EQ(completed.size(), 2);
 
   UpdateSpans(processor, completed, running, true);
 
-  ASSERT_EQ(running.size(), 0);
-  ASSERT_EQ(completed.size(), 0);
+  EXPECT_EQ(running.size(), 0);
+  EXPECT_EQ(completed.size(), 0);
 }
 
 
@@ -436,32 +436,32 @@ TEST(TracezSpanProcessor, MultipleSpansOuterSplitNewOnly) {
   span_vars[4]->End();
   UpdateSpans(processor, completed, running, true);
 
-  ASSERT_TRUE(ContainsNames(span_names, running, 0, 4, true)); // s0 s2 s1 s1
-  ASSERT_TRUE(ContainsNames(span_names, completed, 4, 5, true)); // s
-  ASSERT_EQ(running.size(), 4);
-  ASSERT_EQ(completed.size(), 1);
+  EXPECT_TRUE(ContainsNames(span_names, running, 0, 4, true)); // s0 s2 s1 s1
+  EXPECT_TRUE(ContainsNames(span_names, completed, 4, 5, true)); // s
+  EXPECT_EQ(running.size(), 4);
+  EXPECT_EQ(completed.size(), 1);
 
   // End first span
   span_vars[0]->End();
   UpdateSpans(processor, completed, running, true);
 
-  ASSERT_TRUE(ContainsNames(span_names, running, 1, 4, true)); // s2 s1 s1
-  ASSERT_TRUE(ContainsNames(span_names, completed, 0, 1, true)); // s0
-  ASSERT_EQ(running.size(), 3);
-  ASSERT_EQ(completed.size(), 1);
+  EXPECT_TRUE(ContainsNames(span_names, running, 1, 4, true)); // s2 s1 s1
+  EXPECT_TRUE(ContainsNames(span_names, completed, 0, 1, true)); // s0
+  EXPECT_EQ(running.size(), 3);
+  EXPECT_EQ(completed.size(), 1);
 
   // End remaining middle pans
   for (int i = 1; i < 4; i++) span_vars[i]->End();
   UpdateSpans(processor, completed, running, true);
 
-  ASSERT_TRUE(ContainsNames(span_names, completed, 1, 4, true)); // s2 s1 s1
-  ASSERT_EQ(running.size(), 0);
-  ASSERT_EQ(completed.size(), 3);
+  EXPECT_TRUE(ContainsNames(span_names, completed, 1, 4, true)); // s2 s1 s1
+  EXPECT_EQ(running.size(), 0);
+  EXPECT_EQ(completed.size(), 3);
 
   UpdateSpans(processor, completed, running, true);
 
-  ASSERT_EQ(running.size(), 0);
-  ASSERT_EQ(completed.size(), 0);
+  EXPECT_EQ(running.size(), 0);
+  EXPECT_EQ(completed.size(), 0);
 }
 
 
@@ -514,8 +514,8 @@ TEST(TracezSpanProcessor, ShutdownNoSleep) {
   processor->ForceFlush();
 
   UpdateSpans(processor, completed, running);
-  ASSERT_EQ(running.size(), 0);
-  ASSERT_EQ(completed.size(), 0);
+  EXPECT_EQ(running.size(), 0);
+  EXPECT_EQ(completed.size(), 0);
 
   EXPECT_TRUE(AreAlmostEqual(goal_time, GetTime()));
 }
@@ -540,8 +540,8 @@ TEST(TracezSpanProcessor, ShutdownSleep) {
   processor->ForceFlush(sleep_amount);
 
   UpdateSpans(processor, completed, running);
-  ASSERT_EQ(running.size(), 0);
-  ASSERT_EQ(completed.size(), 0);
+  EXPECT_EQ(running.size(), 0);
+  EXPECT_EQ(completed.size(), 0);
 
   EXPECT_TRUE(AreAlmostEqual(goal_time, GetTime()));
 }
