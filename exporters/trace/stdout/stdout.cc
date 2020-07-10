@@ -60,8 +60,9 @@ sdktrace::ExportResult StdoutSpanExporter::Export(
                   << "\n  duration      : " << span->GetDuration().count()
                   << "\n  description   : " << span->GetDescription() 
                   << "\n  status        : " << statusMap[int(span->GetStatus())]
-                //<< "\n  attributes    : " << span->GetAttributes()
-                  << "\n}"
+                  << "\n  attributes    : ";
+                  printKeys(span->GetAttributes());
+        std::cout << "\n}"
                   << "\n";
       }
     }

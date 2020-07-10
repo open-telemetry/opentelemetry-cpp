@@ -74,6 +74,7 @@ TEST(StdoutSpanExporter, PrintDefaultSpan)
   "  duration      : 0\n"
   "  description   : \n"
   "  status        : OK\n"
+  "  attributes    : \n"
   "}\n"; 
   ASSERT_EQ(buffer.str(),expectedOutput);
 }
@@ -92,6 +93,10 @@ TEST(StdoutSpanExporter, PrintChangedSpan)
   recordable->SetStartTime(now);
   recordable->SetDuration(std::chrono::nanoseconds(100));
   recordable->SetStatus(opentelemetry::trace::CanonicalCode::UNIMPLEMENTED,"Test Description");
+
+  recordable->SetAttribute("attr1", 314159);
+  recordable->SetAttribute("attr2", false);
+  recordable->SetAttribute("attr3", "string");
 
   // This can be an ofstream as well or any other ostream
   std::stringstream stdoutOutput;
@@ -118,6 +123,7 @@ TEST(StdoutSpanExporter, PrintChangedSpan)
   "  duration      : " + duration + "\n"
   "  description   : Test Description\n"
   "  status        : UNIMPLEMENTED\n"
+  "  attributes    : attr1: 314159 attr3: \"string\" attr2: false \n"
   "}\n"; 
   ASSERT_EQ(stdoutOutput.str(),expectedOutput);
 }
