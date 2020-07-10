@@ -16,7 +16,7 @@ void Recordable::SetIds(trace::TraceId trace_id,
 }
 
 void Recordable::SetAttribute(nostd::string_view key,
-                              const opentelemetry::common::AttributeValue &&value) noexcept
+                              const opentelemetry::common::AttributeValue &value) noexcept
 {
   (void)key;
   (void)value;
