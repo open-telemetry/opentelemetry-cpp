@@ -25,7 +25,7 @@ The StdoutExporter will only be implementing a Push Exporter framework.
 * Scalability
     * The Exporter must be able to operate on sizeable systems with predictable overhead growth.  A key requirement of this is that the library does not consume unbounded memory resource. 
 * Security
-    * While authorization is required in protocol-specific exporters for third-party platforms, the StdoutExporter has no authentication since there is no third-party to communicate with.
+    * Stdout exporter should only be used for development and testing purpose, where security and privacy is less a concern as it doesn't communicate to external systems.
 
 ## SpanExporter
 
