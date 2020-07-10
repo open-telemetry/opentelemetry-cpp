@@ -8,6 +8,8 @@ namespace sdk
 namespace trace
 {
 namespace trace_api = opentelemetry::trace;
+namespace trace_sdk = opentelemetry::sdk::trace;
+
 /**
  * The always off sampler always returns NOT_RECORD, effectively disabling
  * tracing functionality.
@@ -19,7 +21,7 @@ public:
    * @return Returns NOT_RECORD always
    */
   SamplingResult ShouldSample(
-    const SpanContext * /*parent_context*/,
+    const trace_sdk::SpanContext * /*parent_context*/,
     trace_api::TraceId /*trace_id*/,
     nostd::string_view /*name*/,
     trace_api::SpanKind /*span_kind*/,

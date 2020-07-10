@@ -4,6 +4,7 @@
 #include "opentelemetry/trace/span.h"
 #include "opentelemetry/trace/trace_id.h"
 #include "opentelemetry/version.h"
+#include "opentelemetry/sdk/trace/span_context.h"
 
 #include <map>
 #include <memory>
@@ -15,6 +16,7 @@ namespace sdk
 namespace trace
 {
 namespace trace_api = opentelemetry::trace;
+namespace trace_sdk = opentelemetry::sdk::trace;
 
 /**
  * A sampling Decision for a Span to be created.
@@ -48,8 +50,6 @@ struct SamplingResult
 class Sampler
 {
 public:
-  // TODO: Remove this placeholder with real class
-  class SpanContext;
   virtual ~Sampler() = default;
   /**
    * Called during Span creation to make a sampling decision.
@@ -66,7 +66,7 @@ public:
    * @since 0.1.0
    */
 
-  virtual SamplingResult ShouldSample(const SpanContext *parent_context,
+  virtual SamplingResult ShouldSample(const trace_sdk::SpanContext *parent_context,
                                       trace_api::TraceId trace_id,
                                       nostd::string_view name,
                                       trace_api::SpanKind span_kind,

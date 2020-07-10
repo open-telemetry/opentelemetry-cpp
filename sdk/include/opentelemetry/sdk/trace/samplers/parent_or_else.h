@@ -9,21 +9,7 @@ namespace sdk
 namespace trace
 {
 namespace trace_api = opentelemetry::trace;
-
-/**
- * A placeholder class that stores the states of a span.
- * Will be replaced by the real SpanContext class once it is implemented.
- */
-class Sampler::SpanContext
-{
-public:
-  inline explicit SpanContext(bool is_recording, bool sampled_flag)
-      : is_recording(is_recording), sampled_flag(sampled_flag)
-  {}
-
-  bool is_recording;
-  bool sampled_flag;
-};
+namespace trace_sdk = opentelemetry::sdk::trace;
 
 /**
  * The parent or else sampler is a composite sampler. ParentOrElse(delegateSampler) either respects
@@ -37,7 +23,7 @@ public:
    * delegateSampler for root spans
    * @return Returns NOT_RECORD always
    */
-  SamplingResult ShouldSample(const SpanContext * parent_context,
+  SamplingResult ShouldSample(const trace_sdk::SpanContext * parent_context,
                               trace_api::TraceId trace_id,
                               nostd::string_view name,
                               trace_api::SpanKind span_kind,
