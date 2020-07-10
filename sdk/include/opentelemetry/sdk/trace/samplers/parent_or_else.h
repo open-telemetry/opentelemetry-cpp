@@ -9,7 +9,6 @@ namespace sdk
 namespace trace
 {
 namespace trace_api = opentelemetry::trace;
-namespace trace_sdk = opentelemetry::sdk::trace;
 
 /**
  * The parent or else sampler is a composite sampler. ParentOrElse(delegateSampler) either respects
@@ -23,7 +22,7 @@ public:
    * delegateSampler for root spans
    * @return Returns NOT_RECORD always
    */
-  SamplingResult ShouldSample(const trace_sdk::SpanContext * parent_context,
+  SamplingResult ShouldSample(const trace_api::SpanContext * parent_context,
                               trace_api::TraceId trace_id,
                               nostd::string_view name,
                               trace_api::SpanKind span_kind,

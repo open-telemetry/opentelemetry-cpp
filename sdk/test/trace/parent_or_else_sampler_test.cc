@@ -8,7 +8,7 @@ using opentelemetry::sdk::trace::AlwaysOffSampler;
 using opentelemetry::sdk::trace::AlwaysOnSampler;
 using opentelemetry::sdk::trace::Decision;
 using opentelemetry::sdk::trace::ParentOrElseSampler;
-using opentelemetry::sdk::trace::SpanContext;
+using opentelemetry::trace::SpanContext;
 
 TEST(ParentOrElseSampler, ShouldSample)
 {

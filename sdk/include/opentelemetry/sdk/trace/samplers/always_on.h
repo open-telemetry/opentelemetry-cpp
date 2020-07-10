@@ -8,7 +8,6 @@ namespace sdk
 namespace trace
 {
 namespace trace_api = opentelemetry::trace;
-namespace trace_sdk = opentelemetry::sdk::trace;
 
 /**
  * The always on sampler is a default sampler which always return Decision::RECORD_AND_SAMPLE
@@ -19,7 +18,7 @@ public:
   /**
    * @return Always return Decision RECORD_AND_SAMPLE
    */
-  inline SamplingResult ShouldSample(const trace_sdk::SpanContext * /*parent_context*/,
+  inline SamplingResult ShouldSample(const trace_api::SpanContext * /*parent_context*/,
                               trace_api::TraceId /*trace_id*/,
                               nostd::string_view /*name*/,
                               trace_api::SpanKind /*span_kind*/,
