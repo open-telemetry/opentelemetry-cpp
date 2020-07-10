@@ -10,6 +10,7 @@ namespace otlp
 
 const int kBatchSize     = 200;
 const int kNumAttributes = 5;
+const int kNumIterations = 1000;
 
 const trace::TraceId kTraceId(std::array<const uint8_t, trace::TraceId::kSize>(
     {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1}));
@@ -118,7 +119,7 @@ void BM_OtlpExporterEmptySpans(benchmark::State &state)
   std::unique_ptr<OtlpExporterTestPeer> testpeer(new OtlpExporterTestPeer());
   auto exporter = testpeer->GetExporter();
 
-  for (auto _ : state)
+  while(state.KeepRunningBatch(kNumIterations))
   {
     std::array<std::unique_ptr<sdk::trace::Recordable>, kBatchSize> recordables;
     CreateEmptySpans(recordables);
@@ -133,7 +134,7 @@ void BM_OtlpExporterSparseSpans(benchmark::State &state)
   std::unique_ptr<OtlpExporterTestPeer> testpeer(new OtlpExporterTestPeer());
   auto exporter = testpeer->GetExporter();
 
-  for (auto _ : state)
+  while(state.KeepRunningBatch(kNumIterations))
   {
     std::array<std::unique_ptr<sdk::trace::Recordable>, kBatchSize> recordables;
     CreateSparseSpans(recordables);
@@ -148,7 +149,7 @@ void BM_OtlpExporterDenseSpans(benchmark::State &state)
   std::unique_ptr<OtlpExporterTestPeer> testpeer(new OtlpExporterTestPeer());
   auto exporter = testpeer->GetExporter();
 
-  for (auto _ : state)
+  while(state.KeepRunningBatch(kNumIterations))
   {
     std::array<std::unique_ptr<sdk::trace::Recordable>, kBatchSize> recordables;
     CreateDenseSpans(recordables);
