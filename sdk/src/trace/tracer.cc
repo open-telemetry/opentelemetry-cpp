@@ -49,9 +49,9 @@ nostd::unique_ptr<trace_api::Span> Tracer::StartSpan(
     // if the attributes is not nullptr, add attributes to the span.
     if (sampling_result.attributes)
     {
-      for (auto kv : *sampling_result.attributes)
+      for (auto &kv : *sampling_result.attributes)
       {
-        span->SetAttribute(kv.first, std::move(kv.second));
+        span->SetAttribute(kv.first, kv.second);
       }
     }
 
