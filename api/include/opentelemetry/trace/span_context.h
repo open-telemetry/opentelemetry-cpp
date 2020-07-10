@@ -19,8 +19,7 @@
 #include "opentelemetry/trace/trace_flags.h"
 #include "opentelemetry/trace/trace_id.h"
 
-namespace opentelemetry
-{
+OPENTELEMETRY_BEGIN_NAMESPACE
 namespace trace
 {
 namespace trace_api = opentelemetry::trace;
@@ -51,4 +50,4 @@ private:
   const bool remote_parent_ = false;
 };
 }  // namespace trace
-}  // namespace opentelemetry
+OPENTELEMETRY_END_NAMESPACE
