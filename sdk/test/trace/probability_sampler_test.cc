@@ -11,6 +11,18 @@ using opentelemetry::sdk::common::Random;
 
 namespace
 {
+	/*
+	 * Helper function for running probability sampler tests.
+	 * Given a span context, sampler, and number of iterations this function
+	 * will return the number of RECORD_AND_SAMPLE decision based on randomly 
+	 * generated traces.
+	 *
+	 * @param context a required valid span context
+	 * @param sampler a required valid sampler
+	 * @param iterations a requried number specifying the number of times to
+	 * generate a random trace_id and check if it should sample using the provided
+	 * provider and context
+	 */
 	int RunShouldSampleCountDecision(
 		opentelemetry::sdk::trace::Sampler::SpanContext& context,
 		ProbabilitySampler& sampler, int iterations)
