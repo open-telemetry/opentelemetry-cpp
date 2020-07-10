@@ -16,8 +16,7 @@ using namespace opentelemetry::ext::zpages;
 /*
  * Returns whether the times given are nearly the same
  */
-bool AreAlmostEqual(std::chrono::microseconds t1,
-                    std::chrono::microseconds t2) {
+bool AreAlmostEqual(std::chrono::microseconds t1, std::chrono::microseconds t2) {
   return t1 - t2 <= std::chrono::microseconds(0);
 }
 
@@ -31,12 +30,12 @@ std::chrono::microseconds GetTime(std::chrono::microseconds timeout = std::chron
 
 
 /*
- * Helper function uses the current processor tov update spans contained in completed_spans
- * and running_spans. completed acts contains all spans, unless marked otherwise
+ * Helper function uses the current processor to update spans contained in completed_spans
+ * and running_spans. completed_spans contains all spans (cumulative), unless marked otherwise
  */
 void UpdateSpans(std::shared_ptr<TracezSpanProcessor>& processor,
-    std::vector<std::unique_ptr<opentelemetry::sdk::trace::Recordable>>& completed,
-    std::unordered_set<opentelemetry::sdk::trace::Recordable*>& running,
+    std::vector<std::unique_ptr<opentelemetry::sdk::trace::SpanData>>& completed,
+    std::unordered_set<opentelemetry::sdk::trace::SpanData*>& running,
     bool store_only_new_completed = false) {
   auto spans = processor->GetSpanSnapshot();
   running = spans.running;
@@ -61,10 +60,9 @@ void UpdateSpans(std::shared_ptr<TracezSpanProcessor>& processor,
  * If 1-1 correspondance marked, return true if completed has all names in same frequency, no more or less
  */
 bool ContainsNames(const std::vector<std::string>& names,
-    std::unordered_set<opentelemetry::sdk::trace::Recordable*>& running,
+    std::unordered_set<opentelemetry::sdk::trace::SpanData*>& running,
     unsigned int name_start = 0, unsigned int name_end = 0,
     bool one_to_one_correspondence = false) {
-  /* TEMPORARILY COMMENTED OUT WHILE RECORDABLE HAS NO GetName() FUNCTION
   if (name_end == 0) name_end = names.size();
 
   unsigned int num_names = name_end - name_start;
@@ -87,7 +85,7 @@ bool ContainsNames(const std::vector<std::string>& names,
   }
 
   for (auto &&b : is_contained) if (!b) return false;
-  */
+
   return true;
 
 }
@@ -102,10 +100,9 @@ bool ContainsNames(const std::vector<std::string>& names,
  * If 1-1 correspondance marked, return true if completed has all names in same frequency, no more or less
  */
 bool ContainsNames(const std::vector<std::string>& names,
-    std::vector<std::unique_ptr<opentelemetry::sdk::trace::Recordable>>& completed,
+    std::vector<std::unique_ptr<opentelemetry::sdk::trace::SpanData>>& completed,
     unsigned int name_start = 0, unsigned int name_end = 0,
     bool one_to_one_correspondence = false) {
-  /* TEMPORARILY COMMENTED OUT WHILE RECORDABLE HAS NO GetName() FUNCTION
 
   if (name_end == 0) name_end = names.size();
 
@@ -127,7 +124,7 @@ bool ContainsNames(const std::vector<std::string>& names,
   }
 
   for (auto &&b : is_contained) if (!b) return false;
-  */
+
   return true;
 
 }
@@ -421,7 +418,6 @@ TEST(TracezSpanProcessor, MultipleSpansMiddleSplitNewOnly) {
 
   UpdateSpans(processor, completed, running, true);
 
-  ASSERT_TRUE(ContainsNames(span_names, completed, true));
   ASSERT_EQ(running.size(), 0);
   ASSERT_EQ(completed.size(), 0);
 }
@@ -473,7 +469,6 @@ TEST(TracezSpanProcessor, MultipleSpansOuterSplitNewOnly) {
 
   UpdateSpans(processor, completed, running, true);
 
-  ASSERT_TRUE(ContainsNames(span_names, completed, true));
   ASSERT_EQ(running.size(), 0);
   ASSERT_EQ(completed.size(), 0);
 }
@@ -535,7 +530,7 @@ TEST(TracezSpanProcessor, ShutdownNoSleep) {
 
 
 /*
- * Test if shutdown works with no duration set
+ * Test if shutdown works with short duration set
 */
 TEST(TracezSpanProcessor, ShutdownSleep) {
   std::shared_ptr<TracezSpanProcessor> processor(new TracezSpanProcessor());
@@ -550,7 +545,7 @@ TEST(TracezSpanProcessor, ShutdownSleep) {
 
   auto span = tracer->StartSpan("span");
   span->End();
-  processor->ForceFlush();
+  processor->ForceFlush(sleep_amount);
 
   UpdateSpans(processor, completed, running);
   ASSERT_EQ(running.size(), 0);

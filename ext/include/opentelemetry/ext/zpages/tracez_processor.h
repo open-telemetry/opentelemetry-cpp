@@ -27,8 +27,8 @@ class TracezSpanProcessor : public opentelemetry::sdk::trace::SpanProcessor {
  public:
 
   struct CollectedSpans {
-    std::unordered_set<opentelemetry::sdk::trace::Recordable*> running;
-    std::vector<std::unique_ptr<opentelemetry::sdk::trace::Recordable>> completed;
+    std::unordered_set<opentelemetry::sdk::trace::SpanData*> running;
+    std::vector<std::unique_ptr<opentelemetry::sdk::trace::SpanData>> completed;
   };
 
   /**
