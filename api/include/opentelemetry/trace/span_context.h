@@ -34,18 +34,12 @@ public:
   SpanContext(bool sampled_flag, bool has_remote_parent) :
     trace_flags_(trace_api::TraceFlags((uint8_t) sampled_flag)), remote_parent_(has_remote_parent) {};
 
-  const trace_api::TraceId &trace_id() const noexcept { return trace_id_; }
-  const trace_api::SpanId &span_id() const noexcept { return span_id_; }
   const trace_api::TraceFlags &trace_flags() const noexcept { return trace_flags_; }
-
-  bool IsValid() const noexcept { return trace_id_.IsValid() && span_id_.IsValid(); }
 
   bool IsSampled() const noexcept { return trace_flags_.IsSampled(); }
   bool HasRemoteParent() const noexcept { return remote_parent_; }
 
 private:
-  const trace_api::TraceId trace_id_;
-  const trace_api::SpanId span_id_;
   const trace_api::TraceFlags trace_flags_;
   const bool remote_parent_ = false;
 };
