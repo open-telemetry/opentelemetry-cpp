@@ -9,37 +9,42 @@
 using namespace opentelemetry::sdk::trace;
 using namespace opentelemetry::ext::zpages;
 
+//////////////////////////////////// TEST HELPER FUNCTIONS ///////////////////
 
 /*
- * Helper function to create a processor when the type of exporter doesn't
- * matter
+ * Returns whether the times given are nearly the same
  */
-std::shared_ptr<TracezSpanProcessor> MakeProcessor() {
-  std::shared_ptr<TracezSpanProcessor> processor(new TracezSpanProcessor());
-  return processor;
+bool AreAlmostEqual(std::chrono::microseconds t1, std::chrono::microseconds t2) {
+  return t1 - t2 <= std::chrono::microseconds(0);
+}
+
+/*
+ * Returns current time + timeout in microseconds
+ */
+std::chrono::microseconds GetTime(std::chrono::microseconds timeout = std::chrono::microseconds(0)) {
+  auto duration = std::chrono::system_clock::now().time_since_epoch();
+  return std::chrono::duration_cast<std::chrono::microseconds>(duration) + timeout;
 }
 
 
 /*
- * Helper function uses the current processor tov update spans contained in completed_spans
- * and running_spans. completed acts contains all spans, unless marked otherwise
+ * Helper function uses the current processor to update spans contained in completed_spans
+ * and running_spans. completed_spans contains all spans (cumulative), unless marked otherwise
  */
 void UpdateSpans(std::shared_ptr<TracezSpanProcessor>& processor,
-    std::vector<std::unique_ptr<opentelemetry::sdk::trace::Recordable>>& completed,
-    std::unordered_set<opentelemetry::sdk::trace::Recordable*>& running,
+    std::vector<std::unique_ptr<opentelemetry::sdk::trace::SpanData>>& completed,
+    std::unordered_set<opentelemetry::sdk::trace::SpanData*>& running,
     bool store_only_new_completed = false) {
   auto spans = processor->GetSpanSnapshot();
   running = spans.running;
   if (store_only_new_completed) {
     completed.clear();
     completed = std::move(spans.completed);
-  }
-  else {
+  } else {
     std::move(spans.completed.begin(), spans.completed.end(),
             std::inserter(completed, completed.end()));
   }
   spans.completed.clear();
-
 }
 
 
@@ -52,10 +57,9 @@ void UpdateSpans(std::shared_ptr<TracezSpanProcessor>& processor,
  * If 1-1 correspondance marked, return true if completed has all names in same frequency, no more or less
  */
 bool ContainsNames(const std::vector<std::string>& names,
-    std::unordered_set<opentelemetry::sdk::trace::Recordable*>& running,
+    std::unordered_set<opentelemetry::sdk::trace::SpanData*>& running,
     unsigned int name_start = 0, unsigned int name_end = 0,
     bool one_to_one_correspondence = false) {
-  /* TEMPORARILY COMMENTED OUT WHILE RECORDABLE HAS NO GetName() FUNCTION
   if (name_end == 0) name_end = names.size();
 
   unsigned int num_names = name_end - name_start;
@@ -78,9 +82,8 @@ bool ContainsNames(const std::vector<std::string>& names,
   }
 
   for (auto &&b : is_contained) if (!b) return false;
-  */
-  return true;
 
+  return true;
 }
 
 
@@ -93,10 +96,9 @@ bool ContainsNames(const std::vector<std::string>& names,
  * If 1-1 correspondance marked, return true if completed has all names in same frequency, no more or less
  */
 bool ContainsNames(const std::vector<std::string>& names,
-    std::vector<std::unique_ptr<opentelemetry::sdk::trace::Recordable>>& completed,
+    std::vector<std::unique_ptr<opentelemetry::sdk::trace::SpanData>>& completed,
     unsigned int name_start = 0, unsigned int name_end = 0,
     bool one_to_one_correspondence = false) {
-  /* TEMPORARILY COMMENTED OUT WHILE RECORDABLE HAS NO GetName() FUNCTION
 
   if (name_end == 0) name_end = names.size();
 
@@ -118,32 +120,33 @@ bool ContainsNames(const std::vector<std::string>& names,
   }
 
   for (auto &&b : is_contained) if (!b) return false;
-  */
-  return true;
 
+  return true;
 }
 
+///////////////////////////////////////// TESTS //////////////////////////
 
 /*
- * Test if both span containers are empty when no spans exist or are added
+ * Test if both span containers are empty when no spans exist or are added.
+ * Ensures no rogue spans appear in the containers somehow.
  */
 TEST(TracezSpanProcessor, NoSpans) {
-  auto processor = MakeProcessor();
+  std::shared_ptr<TracezSpanProcessor> processor(new TracezSpanProcessor());
   auto spans = processor->GetSpanSnapshot();
   auto recordable = processor->MakeRecordable();
 
   ASSERT_EQ(spans.running.size(), 0);
-  ASSERT_EQ(spans.running.size(), 0);
-
+  ASSERT_EQ(spans.completed.size(), 0);
 }
 
 
 /*
  * Test if a single span moves from running to completed at expected times.
- * All completed spans are stored.
+ * All completed spans are stored. Ensures basic functionality and that accumulation
+ * can happen
 */
-TEST(TracezSpanProcessor, OneSpanRightContainerStored) {
-  auto processor = MakeProcessor();
+TEST(TracezSpanProcessor, OneSpanCumulative) {
+  std::shared_ptr<TracezSpanProcessor> processor(new TracezSpanProcessor());
   auto tracer = std::shared_ptr<opentelemetry::trace::Tracer>(new Tracer(processor));
   auto spans = processor->GetSpanSnapshot();
   auto running = spans.running;
@@ -164,17 +167,17 @@ TEST(TracezSpanProcessor, OneSpanRightContainerStored) {
   ASSERT_TRUE(ContainsNames(span_name, completed));
   ASSERT_EQ(running.size(), 0);
   ASSERT_EQ(completed.size(), 1);
-
 }
 
 
 /*
  * Test if multiple spans move from running to completed at  expected times. Check if
- * all are in a container, either running/completed during checks.
+ * all are in a container, either running/completed during checks. Ensures basic functionality
+ * and that accumulation can happen for many spans
  * All completed spans are stored.
 */
-TEST(TracezSpanProcessor, MultipleSpansRightContainerStored) {
-  auto processor = MakeProcessor();
+TEST(TracezSpanProcessor, MultipleSpansCumulative) {
+  std::shared_ptr<TracezSpanProcessor> processor(new TracezSpanProcessor());
   auto tracer = std::shared_ptr<opentelemetry::trace::Tracer>(new Tracer(processor));
   auto spans = processor->GetSpanSnapshot();
   auto running = spans.running;
@@ -201,16 +204,17 @@ TEST(TracezSpanProcessor, MultipleSpansRightContainerStored) {
   ASSERT_TRUE(ContainsNames(span_names, completed)); // s1 s2 s3 s1
   ASSERT_EQ(running.size(), 0);
   ASSERT_EQ(completed.size(), span_names.size());
-
 }
 
 
 /*
  * Test if multiple spans move from running to completed at expected times,
- * running/completed spans are split. Middle spans end first. All completed spans are stored.
+ * running/completed spans are split. Middle spans end first. Ensures basic functionality
+ * and that accumulation can happen for many spans even spans that start and end non-
+ * sequentially. All completed spans are stored.
 */
-TEST(TracezSpanProcessor, MultipleSpansRightContainerMiddleStored) {
-  auto processor = MakeProcessor();
+TEST(TracezSpanProcessor, MultipleSpansMiddleSplitCumulative) {
+  std::shared_ptr<TracezSpanProcessor> processor(new TracezSpanProcessor());
   auto tracer = std::shared_ptr<opentelemetry::trace::Tracer>(new Tracer(processor));
   auto spans = processor->GetSpanSnapshot();
   auto running = spans.running;
@@ -271,10 +275,12 @@ TEST(TracezSpanProcessor, MultipleSpansRightContainerMiddleStored) {
 
 /*
  * Test if multiple spans move from running to completed at expected times,
- * running/completed spans are split. All completed spans are stored.
+ * running/completed spans are split.  Ensures basic functionality and that
+ * accumulation can happen for many spans even spans that start and end non-
+ * sequentially. All completed spans are stored.
 */
-TEST(TracezSpanProcessor, MultipleSpansRightContainerOuterStored) {
-  auto processor = MakeProcessor();
+TEST(TracezSpanProcessor, MultipleSpansOuterSplitCumulative) {
+  std::shared_ptr<TracezSpanProcessor> processor(new TracezSpanProcessor());
   auto tracer = std::shared_ptr<opentelemetry::trace::Tracer>(new Tracer(processor));
   auto spans = processor->GetSpanSnapshot();
   auto running = spans.running;
@@ -315,10 +321,11 @@ TEST(TracezSpanProcessor, MultipleSpansRightContainerOuterStored) {
 
 /*
  * Test if a single span moves from running to completed at expected times.
- * Only new completed spans are stored.
+ * Ensure correct behavior even when spans are discarded. Only new completed
+ * spans are stored.
 */
-TEST(TracezSpanProcessor, OneSpanRightContainerNewOnly) {
-  auto processor = MakeProcessor();
+TEST(TracezSpanProcessor, OneSpanNewOnly) {
+  std::shared_ptr<TracezSpanProcessor> processor(new TracezSpanProcessor());
   auto tracer = std::shared_ptr<opentelemetry::trace::Tracer>(new Tracer(processor));
   auto spans = processor->GetSpanSnapshot();
   auto running = spans.running;
@@ -329,31 +336,31 @@ TEST(TracezSpanProcessor, OneSpanRightContainerNewOnly) {
   auto span = tracer->StartSpan(span_name[0]);
   UpdateSpans(processor, completed, running, true);
 
-  ASSERT_TRUE(ContainsNames(span_name, running, true));
+  ASSERT_TRUE(ContainsNames(span_name, running, 0, 1, true));
   ASSERT_EQ(running.size(), 1);
   ASSERT_EQ(completed.size(), 0);
 
   span->End();
   UpdateSpans(processor, completed, running, true);
 
-  ASSERT_TRUE(ContainsNames(span_name, completed, true));
+  ASSERT_TRUE(ContainsNames(span_name, completed, 0, 1, true));
   ASSERT_EQ(running.size(), 0);
   ASSERT_EQ(completed.size(), 1);
 
   UpdateSpans(processor, completed, running, true);
 
-  ASSERT_TRUE(ContainsNames(span_name, completed, true));
   ASSERT_EQ(running.size(), 0);
   ASSERT_EQ(completed.size(), 0);
-
 }
 
 /*
  * Test if multiple spans move from running to completed at expected times,
- * running/completed spans are split. Middle spans end first. Only new completed spans are stored.
-*/
-TEST(TracezSpanProcessor, MultipleSpansRightContainerMiddleNewOnly) {
-  auto processor = MakeProcessor();
+ * running/completed spans are split. Middle spans end first. Ensure correct
+ * behavior even when multiple spans are discarded, even when span starting and
+ * ending is non-sequential. Only new completed spans are stored.
+ */
+TEST(TracezSpanProcessor, MultipleSpansMiddleSplitNewOnly) {
+  std::shared_ptr<TracezSpanProcessor> processor(new TracezSpanProcessor());
   auto tracer = std::shared_ptr<opentelemetry::trace::Tracer>(new Tracer(processor));
   auto spans = processor->GetSpanSnapshot();
   auto running = spans.running;
@@ -365,7 +372,7 @@ TEST(TracezSpanProcessor, MultipleSpansRightContainerMiddleNewOnly) {
   for (const auto &name : span_names) span_vars.push_back(tracer->StartSpan(name));
   UpdateSpans(processor, completed, running);
 
-  ASSERT_TRUE(ContainsNames(span_names, running, true)); // s0 s2 s1 s1 s
+  ASSERT_TRUE(ContainsNames(span_names, running, 0, 5, true)); // s0 s2 s1 s1 s
   ASSERT_EQ(running.size(), span_names.size());
   ASSERT_EQ(completed.size(), 0);
 
@@ -402,18 +409,19 @@ TEST(TracezSpanProcessor, MultipleSpansRightContainerMiddleNewOnly) {
 
   UpdateSpans(processor, completed, running, true);
 
-  ASSERT_TRUE(ContainsNames(span_names, completed, true));
   ASSERT_EQ(running.size(), 0);
   ASSERT_EQ(completed.size(), 0);
 }
 
 
 /*
- * Test if multiple spans move from running to completed  at expected times,
- * running/completed spans are split. Only new completed spans are stored.
+ * Test if multiple spans move from running to completed at expected times,
+ * running/completed spans are split. Ensure correct behavior even when
+ * multiple spans are discarded, even when span starting and ending is
+ * non-sequential. Only new completed spans are stored.
 */
-TEST(TracezSpanProcessor, MultipleSpansRightContainerOuterNewOnly) {
-  auto processor = MakeProcessor();
+TEST(TracezSpanProcessor, MultipleSpansOuterSplitNewOnly) {
+  std::shared_ptr<TracezSpanProcessor> processor(new TracezSpanProcessor());
   auto tracer = std::shared_ptr<opentelemetry::trace::Tracer>(new Tracer(processor));
   auto spans = processor->GetSpanSnapshot();
   auto running = spans.running;
@@ -452,9 +460,88 @@ TEST(TracezSpanProcessor, MultipleSpansRightContainerOuterNewOnly) {
 
   UpdateSpans(processor, completed, running, true);
 
-  ASSERT_TRUE(ContainsNames(span_names, completed, true));
   ASSERT_EQ(running.size(), 0);
   ASSERT_EQ(completed.size(), 0);
 }
 
 
+// TODO: add tests for checking if spans are accurate when getting snapshots,
+// like when a span completes mid getter call later on using threads
+
+/*
+ * Test if flush sleeps for approximately the correct duration when none is set.
+*/
+TEST(TracezSpanProcessor, ForceFlushNoSleep) {
+  std::shared_ptr<TracezSpanProcessor> processor(new TracezSpanProcessor());
+  auto goal_time = GetTime();
+  processor->ForceFlush();
+
+  EXPECT_TRUE(AreAlmostEqual(goal_time, GetTime()));
+}
+
+
+/*
+ * Test if flush sleeps for approximately the correct duration when short
+ * duration is set.
+*/
+TEST(TracezSpanProcessor, ForceFlushSleep) {
+  std::shared_ptr<TracezSpanProcessor> processor(new TracezSpanProcessor());
+  auto sleep_amount = std::chrono::microseconds(100);
+  auto goal_time = GetTime(sleep_amount);
+  processor->ForceFlush(sleep_amount);
+
+  EXPECT_TRUE(AreAlmostEqual(goal_time, GetTime()));
+}
+
+
+/*
+ * Test if shutdown works with no duration set
+*/
+TEST(TracezSpanProcessor, ShutdownNoSleep) {
+  std::shared_ptr<TracezSpanProcessor> processor(new TracezSpanProcessor());
+  auto tracer = std::shared_ptr<opentelemetry::trace::Tracer>(new Tracer(processor));
+  auto spans = processor->GetSpanSnapshot();
+  auto running = spans.running;
+  auto completed = std::move(spans.completed);
+
+  // Shutdown
+  auto goal_time = GetTime();
+  processor->Shutdown();
+
+  // Nothing should happen, functions return immediately
+  auto span = tracer->StartSpan("span");
+  span->End();
+  processor->ForceFlush();
+
+  UpdateSpans(processor, completed, running);
+  ASSERT_EQ(running.size(), 0);
+  ASSERT_EQ(completed.size(), 0);
+
+  EXPECT_TRUE(AreAlmostEqual(goal_time, GetTime()));
+}
+
+
+/*
+ * Test if shutdown works with short duration set
+*/
+TEST(TracezSpanProcessor, ShutdownSleep) {
+  std::shared_ptr<TracezSpanProcessor> processor(new TracezSpanProcessor());
+  auto tracer = std::shared_ptr<opentelemetry::trace::Tracer>(new Tracer(processor));
+  auto spans = processor->GetSpanSnapshot();
+  auto running = spans.running;
+  auto completed = std::move(spans.completed);
+
+  auto sleep_amount = std::chrono::microseconds(100);
+  auto goal_time = GetTime(sleep_amount);
+  processor->Shutdown(sleep_amount);
+
+  auto span = tracer->StartSpan("span");
+  span->End();
+  processor->ForceFlush(sleep_amount);
+
+  UpdateSpans(processor, completed, running);
+  ASSERT_EQ(running.size(), 0);
+  ASSERT_EQ(completed.size(), 0);
+
+  EXPECT_TRUE(AreAlmostEqual(goal_time, GetTime()));
+}

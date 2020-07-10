@@ -10,12 +10,12 @@
 
 // include files
 #include "opentelemetry/ext/zpages/tracez_processor.h"
-#include "opentelemetry/sdk/trace/recordable.h"
+#include "opentelemetry/sdk/trace/span_data.h"
 #include "opentelemetry/ext/zpages/latency_boundaries.h"
 #include "opentelemetry/nostd/string_view.h"
 #include "opentelemetry/trace/canonical_code.h"
 
-using opentelemetry::sdk::trace::Recordable;
+using opentelemetry::sdk::trace::SpanData;
 using opentelemetry::trace::CanonicalCode;
 
 
@@ -43,17 +43,17 @@ struct AggregatedSpanData{
    * latency_sample_spans is an array of lists, each index of the array corresponds to a latency boundary(of which there are 9).
    * The list in each index stores the sample spans for that latency boundary.
    */
-  std::array<std::list<std::unique_ptr<Recordable>>,kLatencyBoundaries.size()> latency_sample_spans;
+  std::array<std::list<std::unique_ptr<SpanData>>,kLatencyBoundaries.size()> latency_sample_spans;
   
   /**
    * error_sample_spans is a list that stores the error samples for a span name.
    */
-  std::list<std::unique_ptr<Recordable>> error_sample_spans;
+  std::list<std::unique_ptr<SpanData>> error_sample_spans;
   
   /**
    * running_sample_spans is a list that stores the running span samples for a span name.
    */
-  std::list<Recordable*> running_sample_spans;
+  std::list<SpanData*> running_sample_spans;
   
   /**
    * span_count_per_latency_bucket is a array that stores the count of spans for each of the 9 latency buckets.
@@ -76,6 +76,7 @@ class TracezDataAggregator
 {
 public:
   TracezDataAggregator(std::shared_ptr<TracezSpanProcessor> spanProcessor);
+  ~TracezDataAggregator();
 
   /** 
    * GetAggregatedData gets the aggregated span information
@@ -105,7 +106,7 @@ private:
    * AggregateCompletedSpans is the function that is called to update the aggregated data of newly completed spans
    * @param completed_spans is the newly completed spans.
    */
-  void AggregateCompletedSpans(std::vector<std::unique_ptr<Recordable>>& completed_spans);
+  void AggregateCompletedSpans(std::vector<std::unique_ptr<SpanData>>& completed_spans);
   
   /**
    * AggregateRunningSpans aggregates the data for running spans. This function is stateless, it calculates
@@ -113,26 +114,26 @@ private:
    * way to tell if a span was completed since the last call to this function.
    * @param running_spans is the running spans to be aggregated.
    */
-  void AggregateRunningSpans(std::unordered_set<Recordable*>& running_spans);
+  void AggregateRunningSpans(std::unordered_set<SpanData*>& running_spans);
   
   /** 
    * AggregateStatusOKSpans is the function called to update the data of spans with status code OK.
    * @param ok_span is the span who's data is to be aggregated
    */
-  void AggregateStatusOKSpan(std::unique_ptr<Recordable>& ok_span);
+  void AggregateStatusOKSpan(std::unique_ptr<SpanData>& ok_span);
   
   /** 
    * AggregateStatusErrorSpans is the function that is called to collect the information of error spans
    * @param error_span is the error span who's data is to be aggregated
    */
-  void AggregateStatusErrorSpan(std::unique_ptr<Recordable>& error_span);
+  void AggregateStatusErrorSpan(std::unique_ptr<SpanData>& error_span);
 
   /**
-   * GetLatencyBoundary returns the latency boundary to which the latency of the given recordable belongs to
-   * @ param recordable is the recordable for which the latency boundary is to be found
-   * @ returns LatencyBoundaryName is the name of the latency boundary that the recordable belongs to
+   * GetLatencyBoundary returns the latency boundary to which the latency of the given SpanData belongs to
+   * @ param SpanData is the SpanData for which the latency boundary is to be found
+   * @ returns LatencyBoundaryName is the name of the latency boundary that the SpanData belongs to
    */
-  LatencyBoundaryName GetLatencyBoundary(Recordable* recordable);
+  LatencyBoundaryName GetLatencyBoundary(SpanData* SpanData);
   
 };
 

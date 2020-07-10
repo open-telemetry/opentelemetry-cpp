@@ -17,17 +17,17 @@ const std::map<std::string, std::unique_ptr<AggregatedSpanData>>& TracezDataAggr
   return aggregated_data_;
 }
 
-LatencyBoundaryName TracezDataAggregator::GetLatencyBoundary(Recordable* recordable)
+LatencyBoundaryName TracezDataAggregator::GetLatencyBoundary(SpanData* span_data)
 {
-  auto recordable_duration = recordable->GetDuration();
+  auto span_data_duration = span_data->GetDuration();
   for(LatencyBoundaryName boundary = LatencyBoundaryName::k0MicroTo10Micro; boundary != LatencyBoundaryName::k100SecondToMax; ++boundary)
   {
-    if(recordable_duration < kLatencyBoundaries[boundary+1])return boundary;
+    if(span_data_duration < kLatencyBoundaries[boundary+1])return boundary;
   }
   return LatencyBoundaryName::k100SecondToMax;
 }
 
-void TracezDataAggregator::AggregateStatusOKSpan(std::unique_ptr<Recordable>& ok_span)
+void TracezDataAggregator::AggregateStatusOKSpan(std::unique_ptr<SpanData>& ok_span)
 {
   LatencyBoundaryName boundary_name = GetLatencyBoundary(ok_span.get());
   std::string span_name = ok_span->GetName().data();
@@ -42,7 +42,7 @@ void TracezDataAggregator::AggregateStatusOKSpan(std::unique_ptr<Recordable>& ok
   aggregated_data_[span_name]->span_count_per_latency_bucket[boundary_name]++;
 }
 
-void TracezDataAggregator::AggregateStatusErrorSpan(std::unique_ptr<Recordable>& error_span)
+void TracezDataAggregator::AggregateStatusErrorSpan(std::unique_ptr<SpanData>& error_span)
 {
   std::string span_name = error_span->GetName().data();
   
@@ -56,7 +56,7 @@ void TracezDataAggregator::AggregateStatusErrorSpan(std::unique_ptr<Recordable>&
   aggregated_data_[span_name]->num_error_spans++;
 }
 
-void TracezDataAggregator::AggregateCompletedSpans(std::vector<std::unique_ptr<Recordable>>& completed_spans)
+void TracezDataAggregator::AggregateCompletedSpans(std::vector<std::unique_ptr<SpanData>>& completed_spans)
 { 
   for(auto& span: completed_spans)
   {
@@ -76,7 +76,7 @@ void TracezDataAggregator::AggregateCompletedSpans(std::vector<std::unique_ptr<R
   }
 }
 
-void TracezDataAggregator::AggregateRunningSpans(std::unordered_set<Recordable*>& running_spans)
+void TracezDataAggregator::AggregateRunningSpans(std::unordered_set<SpanData*>& running_spans)
 {
   std::unordered_set<std::string> seen_span_names;
   for(auto& span: running_spans)

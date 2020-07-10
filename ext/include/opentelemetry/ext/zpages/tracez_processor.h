@@ -5,6 +5,7 @@
 #include <unordered_set>
 #include <vector>
 #include <utility>
+#include <thread>
 #include <iostream>
 
 #include "opentelemetry/sdk/trace/recordable.h"
@@ -18,27 +19,25 @@ namespace ext
 namespace zpages
 {
 /**
- * The span processor passes finished recordables to an exporter and is
- * used by the Data Aggregator to store spans before aggregating for TraceZ.
+ * The span processor passes finished recordables to be used by the
+ * Data Aggregator to store spans before aggregating for TraceZ.
  *
  */
 class TracezSpanProcessor : public opentelemetry::sdk::trace::SpanProcessor {
  public:
 
   struct CollectedSpans {
-    std::unordered_set<opentelemetry::sdk::trace::Recordable*> running;
-    std::vector<std::unique_ptr<opentelemetry::sdk::trace::Recordable>> completed;
+    std::unordered_set<opentelemetry::sdk::trace::SpanData*> running;
+    std::vector<std::unique_ptr<opentelemetry::sdk::trace::SpanData>> completed;
   };
 
   /**
    * Initialize a span processor.
-   * @param exporter the exporter used by the span processor. Here, the purpose
-   * is still being discussed
    */
   explicit TracezSpanProcessor() noexcept {}
 
   /**
-   * Create a span recordable using the associated exporter.
+   * Create a span recordable
    * @return a newly initialized recordable
    */
   std::unique_ptr<opentelemetry::sdk::trace::Recordable> MakeRecordable() noexcept override
@@ -62,14 +61,16 @@ class TracezSpanProcessor : public opentelemetry::sdk::trace::SpanProcessor {
   /**
    * Returns a snapshot of all spans stored. This snapshot has a copy of the
    * stored running_spans and gives ownership of completed spans. Stored
-   * completed_spans are cleared from the processor
+   * completed_spans are cleared from the processor. Currently, copy-on-write
+   * is utilized where possible to minimize contention, but locks may be added
+   * in the future.
    * @return snapshot of all currently running spans and newly completed spans
    * at the time that the function is called
    */
   CollectedSpans GetSpanSnapshot() noexcept;
 
   /**
-   * Export all ended spans that have not yet been exported.
+   * Send all ended spans that have not yet been sent.
    * @param timeout an optional timeout, the default timeout of 0 means that no
    * timeout is applied.
    */
@@ -77,11 +78,12 @@ class TracezSpanProcessor : public opentelemetry::sdk::trace::SpanProcessor {
       std::chrono::microseconds timeout = std::chrono::microseconds(0)) noexcept override
   {
     if (shutdown_signal_received_) return;
-    // TODO: figure out how to export to data aggregator when this is called?
+    std::this_thread::sleep_for(timeout);
+    // TODO: possibly send completed spans to data aggregator when called
   }
   /**
    * Shut down the processor and do any cleanup required. Ended spans are
-   * exported before shutdown. After the call to Shutdown, subsequent calls to
+   * send before shutdown. After the call to Shutdown, subsequent calls to
    * OnStart, OnEnd, ForceFlush or Shutdown will return immediately without
    * doing anything.
    * @param timeout an optional timeout, the default timeout of 0 means that no
@@ -89,7 +91,8 @@ class TracezSpanProcessor : public opentelemetry::sdk::trace::SpanProcessor {
    */
   void Shutdown(std::chrono::microseconds timeout = std::chrono::microseconds(0)) noexcept override
   {
-    shutdown_signal_received_ = true; // TODO: what cleanup do we need?
+    ForceFlush(timeout);
+    shutdown_signal_received_ = true;
   }
 
  private:
