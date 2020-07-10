@@ -20,7 +20,7 @@ const std::map<std::string, std::unique_ptr<AggregatedSpanData>>& TracezDataAggr
 LatencyBoundaryName TracezDataAggregator::GetLatencyBoundary(SpanData* span_data)
 {
   auto span_data_duration = span_data->GetDuration();
-  for(LatencyBoundaryName boundary = LatencyBoundaryName::k0MicroTo10Micro; boundary != LatencyBoundaryName::k100SecondToMax; ++boundary)
+  for(auto boundary = LatencyBoundaryName::k0MicroTo10Micro; boundary != LatencyBoundaryName::k100SecondToMax; ++boundary)
   {
     if(span_data_duration < kLatencyBoundaries[boundary+1])return boundary;
   }
@@ -29,7 +29,7 @@ LatencyBoundaryName TracezDataAggregator::GetLatencyBoundary(SpanData* span_data
 
 void TracezDataAggregator::AggregateStatusOKSpan(std::unique_ptr<SpanData>& ok_span)
 {
-  LatencyBoundaryName boundary_name = GetLatencyBoundary(ok_span.get());
+  auto boundary_name = GetLatencyBoundary(ok_span.get());
   std::string span_name = ok_span->GetName().data();
   
   //If the sample span storage is at capacity, remove the span that was inserted earliest and free up memory

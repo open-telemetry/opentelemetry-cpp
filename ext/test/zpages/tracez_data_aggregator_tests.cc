@@ -16,6 +16,18 @@ const std::string span_name1 = "span 1";
 const std::string span_name2 = "span 2";
 const std::string span_name3 = "span 3";
 
+class TracezDataAggregatorTest : public ::testing::Test {
+ protected:
+  void SetUp() override {
+    std::shared_ptr<TracezSpanProcessor> processor(new TracezSpanProcessor());
+    tracer = std::shared_ptr<opentelemetry::trace::Tracer>(new Tracer(processor));
+    tracez_data_aggregator = std::unique_ptr<TracezDataAggregator>(new TracezDataAggregator(processor));
+  }
+  
+  std::unique_ptr<TracezDataAggregator> tracez_data_aggregator;
+  std::shared_ptr<opentelemetry::trace::Tracer> tracer;
+};
+
 /**
  * Helper function to check if the counts of running, error and latency spans match what is expected
  */
@@ -32,7 +44,7 @@ void VerifySpanCountsInAggregatedSpanData(const std::string& span_name, const st
   EXPECT_EQ(aggregated_data -> error_sample_spans.size(), std::min(num_error_spans,kMaxNumberOfSampleSpans))
   << " Count of running spans incorrect for " << span_name << "\n";
   
-  for(LatencyBoundaryName boundary = LatencyBoundaryName::k0MicroTo10Micro; boundary != LatencyBoundaryName::k100SecondToMax; ++boundary)
+  for(auto boundary = LatencyBoundaryName::k0MicroTo10Micro; boundary != LatencyBoundaryName::k100SecondToMax; ++boundary)
   {
       EXPECT_EQ(aggregated_data->span_count_per_latency_bucket[boundary], span_count_per_latency_bucket[boundary])
       << " Count of completed spans in latency boundary " << boundary << " incorrect for " << span_name << "\n";
@@ -42,25 +54,15 @@ void VerifySpanCountsInAggregatedSpanData(const std::string& span_name, const st
 }
 
 /** Test to check if data aggregator works as expected when there are no spans **/
-TEST(TracezDataAggregator, NoSpans)
+TEST_F(TracezDataAggregatorTest, NoSpans)
 {
-  //Setup
-  std::shared_ptr<TracezSpanProcessor> processor(new TracezSpanProcessor());
-  auto tracer = std::shared_ptr<opentelemetry::trace::Tracer>(new Tracer(processor));
-  auto tracez_data_aggregator (new TracezDataAggregator(processor));
-  
   const std::map<std::string, std::unique_ptr<AggregatedSpanData>>& data = tracez_data_aggregator->GetAggregatedData();
   ASSERT_EQ(data.size(), 0); 
 }
 
 /** Test to check if data aggregator works as expected when there are is exactly a single running span **/
-TEST(TracezDataAggregator, SingleRunningSpan)
+TEST_F(TracezDataAggregatorTest, SingleRunningSpan)
 {
-  //Setup
-  std::shared_ptr<TracezSpanProcessor> processor(new TracezSpanProcessor());
-  auto tracer = std::shared_ptr<opentelemetry::trace::Tracer>(new Tracer(processor));
-  auto tracez_data_aggregator (new TracezDataAggregator(processor));
-  
   //Start the span get the data
   auto span_first  = tracer->StartSpan(span_name1);
   const std::map<std::string, std::unique_ptr<AggregatedSpanData>>& data = tracez_data_aggregator->GetAggregatedData();
@@ -75,13 +77,8 @@ TEST(TracezDataAggregator, SingleRunningSpan)
 }
 
 /** Test to check if data aggregator works as expected when there is exactly one completed span **/
-TEST(TracezDataAggregator, SingleCompletedSpan)
+TEST_F(TracezDataAggregatorTest, SingleCompletedSpan)
 {
-  //Setup
-  std::shared_ptr<TracezSpanProcessor> processor(new TracezSpanProcessor());
-  auto tracer = std::shared_ptr<opentelemetry::trace::Tracer>(new Tracer(processor));
-  auto tracez_data_aggregator (new TracezDataAggregator(processor));
-  
   //Start and end the span at a specified times
   opentelemetry::trace::StartSpanOptions start;
   start.start_steady_time = SteadyTimestamp(nanoseconds(10));
@@ -104,13 +101,8 @@ TEST(TracezDataAggregator, SingleCompletedSpan)
 }
 
 /** Test to check if data aggregator works as expected when there is exactly one error span **/
-TEST(TracezDataAggregator, SingleErrorSpan)
+TEST_F(TracezDataAggregatorTest, SingleErrorSpan)
 {
-  //Setup
-  std::shared_ptr<TracezSpanProcessor> processor(new TracezSpanProcessor());
-  auto tracer = std::shared_ptr<opentelemetry::trace::Tracer>(new Tracer(processor));
-  auto tracez_data_aggregator (new TracezDataAggregator(processor));
-  
   // Start and end a single error span
   tracer->StartSpan(span_name1)->SetStatus(opentelemetry::trace::CanonicalCode::CANCELLED,"span cancelled");
   const std::map<std::string, std::unique_ptr<AggregatedSpanData>>& data = tracez_data_aggregator->GetAggregatedData();
@@ -128,14 +120,10 @@ TEST(TracezDataAggregator, SingleErrorSpan)
   ASSERT_EQ(aggregated_data -> error_sample_spans.front()->GetName(), span_name1);  
 }
 
+
 /** Test to check if multiple running spans behaves as expected**/ 
-TEST(TracezDataAggregator, MultipleRunningSpans)
+TEST_F(TracezDataAggregatorTest, MultipleRunningSpans)
 {
-  //Setup
-  std::shared_ptr<TracezSpanProcessor> processor(new TracezSpanProcessor());
-  auto tracer = std::shared_ptr<opentelemetry::trace::Tracer>(new Tracer(processor));
-  auto tracez_data_aggregator (new TracezDataAggregator(processor));
-  
   //A container that maps a span name to the number of spans to start with that span name
   std::unordered_map<std::string, int> running_span_name_to_count({
     {span_name1, 1},
@@ -151,8 +139,6 @@ TEST(TracezDataAggregator, MultipleRunningSpans)
   
   const std::map<std::string, std::unique_ptr<AggregatedSpanData>>& data = tracez_data_aggregator->GetAggregatedData();
   ASSERT_EQ(data.size(),running_span_name_to_count.size());
-  
-  
   
   //Check to see if the running span counts were updated correctly
   for(auto& span_name: running_span_name_to_count)
@@ -171,13 +157,8 @@ TEST(TracezDataAggregator, MultipleRunningSpans)
 }
 
 /** Test to check if multiple completed spans updates the aggregated data correctly **/
-TEST(TracezDataAggregator, MultipleCompletedSpan)
+TEST_F(TracezDataAggregatorTest, MultipleCompletedSpan)
 {
-  //Setup
-  std::shared_ptr<TracezSpanProcessor> processor(new TracezSpanProcessor());
-  auto tracer = std::shared_ptr<opentelemetry::trace::Tracer>(new Tracer(processor));
-  auto tracez_data_aggregator (new TracezDataAggregator(processor));
-  
   // Start spans with span name and the corresponding durations in one of the 9 latency buckets
   const std::unordered_map<std::string, std::vector<std::vector<nanoseconds>>> span_name_to_duration({
     {span_name1, {{nanoseconds(10),nanoseconds(4600)},{},{},{},{},{},{},{},{}}},
@@ -193,8 +174,8 @@ TEST(TracezDataAggregator, MultipleCompletedSpan)
       for(auto& duration: buckets)
       {
         long long int end_time = duration.count()+1;
-        start.start_steady_time = SteadyTimestamp(std::chrono::nanoseconds(1));
-        end.end_steady_time = SteadyTimestamp(std::chrono::nanoseconds(end_time));
+        start.start_steady_time = SteadyTimestamp(nanoseconds(1));
+        end.end_steady_time = SteadyTimestamp(nanoseconds(end_time));
         tracer->StartSpan(span.first, start)->End(end);
       }
     }
@@ -212,7 +193,7 @@ TEST(TracezDataAggregator, MultipleCompletedSpan)
      {(int)span.second[0].size(),(int)span.second[1].size(),(int)span.second[2].size(),(int)span.second[3].size(),(int)span.second[4].size(),(int)span.second[5].size()
      ,(int)span.second[6].size(),(int)span.second[7].size(),(int)span.second[8].size()});
     
-    for(LatencyBoundaryName boundary = LatencyBoundaryName::k0MicroTo10Micro; boundary != LatencyBoundaryName::k100SecondToMax; ++boundary)
+    for(auto boundary = LatencyBoundaryName::k0MicroTo10Micro; boundary != LatencyBoundaryName::k100SecondToMax; ++boundary)
     {
         ASSERT_EQ(aggregated_data->latency_sample_spans[boundary].size(),span.second[boundary].size());
         
@@ -231,12 +212,8 @@ TEST(TracezDataAggregator, MultipleCompletedSpan)
  * This test checks to see if the aggregated data is updated correctly when there are multiple error spans.
  * It checks both the count of error spans and the error samples
  */ 
-TEST(TracezDataAggregator, MultipleErrorSpans)
+TEST_F(TracezDataAggregatorTest, MultipleErrorSpans)
 {
-  std::shared_ptr<TracezSpanProcessor> processor(new TracezSpanProcessor());
-  auto tracer = std::shared_ptr<opentelemetry::trace::Tracer>(new Tracer(processor));
-  auto tracez_data_aggregator (new TracezDataAggregator(processor));
-  
   //Container to store the span names --> error messges for the span name
   std::unordered_map<std::string, std::vector<std::string>> span_name_to_error({
     {span_name1, {"span 1 error"}},
@@ -277,13 +254,8 @@ TEST(TracezDataAggregator, MultipleErrorSpans)
 }
 
 /** This test checks to see that there is no double counting of running spans when get aggregated data is called twice**/
-TEST(TracezDataAggregator, AdditionToRunningSpans)
+TEST_F(TracezDataAggregatorTest, AdditionToRunningSpans)
 {
-  //Setup
-  std::shared_ptr<TracezSpanProcessor> processor(new TracezSpanProcessor());
-  auto tracer = std::shared_ptr<opentelemetry::trace::Tracer>(new Tracer(processor));
-  auto tracez_data_aggregator (new TracezDataAggregator(processor));
-  
   //Start a span and check the data
   auto span_first = tracer->StartSpan(span_name1);
   const std::map<std::string, std::unique_ptr<AggregatedSpanData>>& temp_data = tracez_data_aggregator->GetAggregatedData();
@@ -308,17 +280,12 @@ TEST(TracezDataAggregator, AdditionToRunningSpans)
 }
 
 /** This test checks to see that once a running span is completed it the aggregated data is updated correctly **/
-TEST(TracezDataAggregator, RemovalOfRunningSpanWhenCompleted)
+TEST_F(TracezDataAggregatorTest, RemovalOfRunningSpanWhenCompleted)
 {
-  //Setup
-  std::shared_ptr<TracezSpanProcessor> processor(new TracezSpanProcessor());
-  auto tracer = std::shared_ptr<opentelemetry::trace::Tracer>(new Tracer(processor));
-  auto tracez_data_aggregator (new TracezDataAggregator(processor));
-
   opentelemetry::trace::StartSpanOptions start;
-  start.start_steady_time = SteadyTimestamp(std::chrono::nanoseconds(10));
+  start.start_steady_time = SteadyTimestamp(nanoseconds(10));
   opentelemetry::trace::EndSpanOptions end;
-  end.end_steady_time = SteadyTimestamp(std::chrono::nanoseconds(40));
+  end.end_steady_time = SteadyTimestamp(nanoseconds(40));
   
   //Start a span and make sure data is updated
   auto span_first = tracer->StartSpan(span_name1,start);
@@ -337,20 +304,15 @@ TEST(TracezDataAggregator, RemovalOfRunningSpanWhenCompleted)
   auto& aggregated_data = data.at(span_name1);
   VerifySpanCountsInAggregatedSpanData(span_name1, aggregated_data, 0, 0, {1,0,0,0,0,0,0,0,0});
   ASSERT_EQ(aggregated_data->latency_sample_spans[LatencyBoundaryName::k0MicroTo10Micro].size(),1);
-  ASSERT_EQ(aggregated_data->latency_sample_spans[LatencyBoundaryName::k0MicroTo10Micro].front()->GetDuration(),std::chrono::nanoseconds(30));
+  ASSERT_EQ(aggregated_data->latency_sample_spans[LatencyBoundaryName::k0MicroTo10Micro].front()->GetDuration(),nanoseconds(30));
 }
 
 /** 
  * This test checks to see that the maximum number of running samples(5) for a bucket is not exceeded.
  * If there are more spans than this for a single bucket it removes the earliest span that was recieved
  */
-TEST(TracezDataAggregator, RunningSampleSpansOverCapacity)
+TEST_F(TracezDataAggregatorTest, RunningSampleSpansOverCapacity)
 {
-  //Setup
-  std::shared_ptr<TracezSpanProcessor> processor(new TracezSpanProcessor());
-  auto tracer = std::shared_ptr<opentelemetry::trace::Tracer>(new Tracer(processor));
-  auto tracez_data_aggregator (new TracezDataAggregator(processor));
-  
   int num_running_spans = 6;
   // Start and store spans based on the above map
   std::vector<nostd::unique_ptr<Span>> running_span_container;
@@ -374,13 +336,8 @@ TEST(TracezDataAggregator, RunningSampleSpansOverCapacity)
  * This test checks to see that the maximum number of error samples(5) for a bucket is not exceeded.
  * If there are more spans than this for a single bucket it removes the earliest span that was recieved
  */
-TEST(TracezDataAggregator, ErrorSampleSpansOverCapacity)
+TEST_F(TracezDataAggregatorTest, ErrorSampleSpansOverCapacity)
 {
-  //Setup
-  std::shared_ptr<TracezSpanProcessor> processor(new TracezSpanProcessor());
-  auto tracer = std::shared_ptr<opentelemetry::trace::Tracer>(new Tracer(processor));
-  auto tracez_data_aggregator (new TracezDataAggregator(processor));
-  
   //Create error spans with the descriptions in the vector
   std::vector<std::string> span_error_descriptions = {"error span 1","error span 2","error span 3","error span 4","error span 5","error span 6"};
   for(auto span_error_description: span_error_descriptions) tracer->StartSpan(span_name1)->SetStatus(opentelemetry::trace::CanonicalCode::CANCELLED,span_error_description);
@@ -409,13 +366,8 @@ TEST(TracezDataAggregator, ErrorSampleSpansOverCapacity)
  * This test checks to see that the maximum number of latency samples(5) for a bucket is not exceeded.
  * If there are more spans than this for a single bucket it removes the earliest span that was recieved
  */
-TEST(TracezDataAggregator, CompletedSampleSpansOverCapacity)
+TEST_F(TracezDataAggregatorTest, CompletedSampleSpansOverCapacity)
 {
-  //Setup
-  std::shared_ptr<TracezSpanProcessor> processor(new TracezSpanProcessor());
-  auto tracer = std::shared_ptr<opentelemetry::trace::Tracer>(new Tracer(processor));
-  auto tracez_data_aggregator (new TracezDataAggregator(processor));
-  
   opentelemetry::trace::StartSpanOptions start;
   opentelemetry::trace::EndSpanOptions end;
   
@@ -456,13 +408,8 @@ TEST(TracezDataAggregator, CompletedSampleSpansOverCapacity)
 }
 
 /** Test to see if the span names are in alphabetical order **/
-TEST(TracezDataAggregator, SpanNameInAlphabeticalOrder)
+TEST_F(TracezDataAggregatorTest, SpanNameInAlphabeticalOrder)
 {
-  //Setup
-  std::shared_ptr<TracezSpanProcessor> processor(new TracezSpanProcessor());
-  auto tracer = std::shared_ptr<opentelemetry::trace::Tracer>(new Tracer(processor));
-  auto tracez_data_aggregator (new TracezDataAggregator(processor));
-  
   std::vector<std::string> span_names = {span_name1,span_name2,span_name3};
   
   auto span_first = tracer->StartSpan(span_name2);
@@ -482,13 +429,8 @@ TEST(TracezDataAggregator, SpanNameInAlphabeticalOrder)
 }
 
 /** Test to check if the span latencies with duration at the edge of boundaries fall in the correct bucket **/
-TEST(TracezDataAggregator, EdgeSpanLatenciesFallInCorrectBoundaries)
+TEST_F(TracezDataAggregatorTest, EdgeSpanLatenciesFallInCorrectBoundaries)
 {
-  //Setup
-  std::shared_ptr<TracezSpanProcessor> processor(new TracezSpanProcessor());
-  auto tracer = std::shared_ptr<opentelemetry::trace::Tracer>(new Tracer(processor));
-  auto tracez_data_aggregator (new TracezDataAggregator(processor));
-  
   opentelemetry::trace::StartSpanOptions start;
   opentelemetry::trace::EndSpanOptions end;
   
@@ -519,20 +461,16 @@ TEST(TracezDataAggregator, EdgeSpanLatenciesFallInCorrectBoundaries)
   auto& aggregated_data = data.at(span_name1);
   VerifySpanCountsInAggregatedSpanData(span_name1, aggregated_data, 0, 0, {1,1,1,1,1,1,1,1,1});
   //Check if the latency boundary is updated correctly
-  for(LatencyBoundaryName boundary = LatencyBoundaryName::k0MicroTo10Micro; boundary != LatencyBoundaryName::k100SecondToMax; ++boundary)
+  for(auto boundary = LatencyBoundaryName::k0MicroTo10Micro; boundary != LatencyBoundaryName::k100SecondToMax; ++boundary)
   {
       ASSERT_EQ(aggregated_data->latency_sample_spans[boundary].size(), 1);
       ASSERT_EQ(aggregated_data->latency_sample_spans[boundary].front().get()->GetDuration().count(), durations[boundary].count());
   }
 }
 
-TEST(TracezDataAggregator, NoChangeInBetweenCallsToAggregator)
+/** This test makes sure that the data is consistent when there are multiple calls to the data aggegator with no change in data **/
+TEST_F(TracezDataAggregatorTest, NoChangeInBetweenCallsToAggregator)
 {
-  //Setup
-  std::shared_ptr<TracezSpanProcessor> processor(new TracezSpanProcessor());
-  auto tracer = std::shared_ptr<opentelemetry::trace::Tracer>(new Tracer(processor));
-  auto tracez_data_aggregator (new TracezDataAggregator(processor));
-  
   opentelemetry::trace::StartSpanOptions start;
   start.start_steady_time = SteadyTimestamp(nanoseconds(1));
   

@@ -76,7 +76,6 @@ class TracezDataAggregator
 {
 public:
   TracezDataAggregator(std::shared_ptr<TracezSpanProcessor> spanProcessor);
-  ~TracezDataAggregator();
 
   /** 
    * GetAggregatedData gets the aggregated span information
