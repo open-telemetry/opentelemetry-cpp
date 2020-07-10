@@ -9,9 +9,7 @@
 using namespace opentelemetry::sdk::trace;
 using namespace opentelemetry::ext::zpages;
 
-
-// TODO: add tests for checking if spans are accurate when getting snapshots,
-// like when a span completes mid getter call
+//////////////////////////////////// TEST HELPER FUNCTIONS ///////////////////
 
 /*
  * Returns whether the times given are nearly the same
@@ -47,7 +45,6 @@ void UpdateSpans(std::shared_ptr<TracezSpanProcessor>& processor,
             std::inserter(completed, completed.end()));
   }
   spans.completed.clear();
-
 }
 
 
@@ -87,7 +84,6 @@ bool ContainsNames(const std::vector<std::string>& names,
   for (auto &&b : is_contained) if (!b) return false;
 
   return true;
-
 }
 
 
@@ -126,9 +122,9 @@ bool ContainsNames(const std::vector<std::string>& names,
   for (auto &&b : is_contained) if (!b) return false;
 
   return true;
-
 }
 
+///////////////////////////////////////// TESTS //////////////////////////
 
 /*
  * Test if both span containers are empty when no spans exist or are added.
@@ -141,7 +137,6 @@ TEST(TracezSpanProcessor, NoSpans) {
 
   ASSERT_EQ(spans.running.size(), 0);
   ASSERT_EQ(spans.completed.size(), 0);
-
 }
 
 
@@ -172,7 +167,6 @@ TEST(TracezSpanProcessor, OneSpanCumulative) {
   ASSERT_TRUE(ContainsNames(span_name, completed));
   ASSERT_EQ(running.size(), 0);
   ASSERT_EQ(completed.size(), 1);
-
 }
 
 
@@ -210,7 +204,6 @@ TEST(TracezSpanProcessor, MultipleSpansCumulative) {
   ASSERT_TRUE(ContainsNames(span_names, completed)); // s1 s2 s3 s1
   ASSERT_EQ(running.size(), 0);
   ASSERT_EQ(completed.size(), span_names.size());
-
 }
 
 
@@ -343,23 +336,21 @@ TEST(TracezSpanProcessor, OneSpanNewOnly) {
   auto span = tracer->StartSpan(span_name[0]);
   UpdateSpans(processor, completed, running, true);
 
-  ASSERT_TRUE(ContainsNames(span_name, running, true));
+  ASSERT_TRUE(ContainsNames(span_name, running, 0, 1, true));
   ASSERT_EQ(running.size(), 1);
   ASSERT_EQ(completed.size(), 0);
 
   span->End();
   UpdateSpans(processor, completed, running, true);
 
-  ASSERT_TRUE(ContainsNames(span_name, completed, true));
+  ASSERT_TRUE(ContainsNames(span_name, completed, 0, 1, true));
   ASSERT_EQ(running.size(), 0);
   ASSERT_EQ(completed.size(), 1);
 
   UpdateSpans(processor, completed, running, true);
 
-  ASSERT_TRUE(ContainsNames(span_name, completed, true));
   ASSERT_EQ(running.size(), 0);
   ASSERT_EQ(completed.size(), 0);
-
 }
 
 /*
@@ -381,7 +372,7 @@ TEST(TracezSpanProcessor, MultipleSpansMiddleSplitNewOnly) {
   for (const auto &name : span_names) span_vars.push_back(tracer->StartSpan(name));
   UpdateSpans(processor, completed, running);
 
-  ASSERT_TRUE(ContainsNames(span_names, running, true)); // s0 s2 s1 s1 s
+  ASSERT_TRUE(ContainsNames(span_names, running, 0, 5, true)); // s0 s2 s1 s1 s
   ASSERT_EQ(running.size(), span_names.size());
   ASSERT_EQ(completed.size(), 0);
 
@@ -474,6 +465,9 @@ TEST(TracezSpanProcessor, MultipleSpansOuterSplitNewOnly) {
 }
 
 
+// TODO: add tests for checking if spans are accurate when getting snapshots,
+// like when a span completes mid getter call later on using threads
+
 /*
  * Test if flush sleeps for approximately the correct duration when none is set.
 */
@@ -483,7 +477,6 @@ TEST(TracezSpanProcessor, ForceFlushNoSleep) {
   processor->ForceFlush();
 
   EXPECT_TRUE(AreAlmostEqual(goal_time, GetTime()));
-
 }
 
 
@@ -498,7 +491,6 @@ TEST(TracezSpanProcessor, ForceFlushSleep) {
   processor->ForceFlush(sleep_amount);
 
   EXPECT_TRUE(AreAlmostEqual(goal_time, GetTime()));
-
 }
 
 

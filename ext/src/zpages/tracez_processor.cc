@@ -16,8 +16,7 @@ namespace zpages {
      if (completed_span_it != spans_.running.end()) {
        spans_.running.erase(completed_span_it);
        spans_.completed.push_back(
-           std::unique_ptr<opentelemetry::sdk::trace::SpanData>(
-               completed_span_raw));
+           std::unique_ptr<opentelemetry::sdk::trace::SpanData>(completed_span_raw));
      }
   }
 
