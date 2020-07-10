@@ -46,7 +46,7 @@ Exports a batch of telemetry data. Protocol exporters that will implement this f
 
 Export() will never be called concurrently for the same exporter instance. Export() can be called again only after the current call returns.
 
-Export() must not block indefinitely, there must be a reasonable upper limit after which the call must time out with an error result (`Failure`).  `exporterTimeoutMillis` - how long the export can run before it is cancelled. The default value is `30000`.
+Export() must not block indefinitely. We can rely on printing to stdout is reasonably performant and doesn't block.
 
 The specification states: Any retry logic that is required by the exporter is the responsibility of the exporter. The default SDK SHOULD NOT implement retry logic, as the required logic is likely to depend heavily on the specific protocol and backend the spans are being sent to.
 
@@ -74,9 +74,7 @@ public:
     sdktrace::ExportResult Export(
         const nostd::span<std::unique_ptr<sdktrace::Recordable>> &spans) noexcept
     {
-    
-        Time startTime = time.now();
-    
+        
         if(isShutdown)
         {
             return sdktrace::ExportResult::kFailure;
@@ -109,10 +107,7 @@ public:
                           << "\n  attributes    : " << span->GetAttributes() << "\n}"
                           << "\n";
             }
-            
-            if(time.now() - startTime > 30s) {
-                return sdktrace::ExportResut::kFailure;
-            }
+
         }
     
         return sdktrace::ExportResult::kSuccess;
@@ -140,7 +135,7 @@ Exports a batch of telemetry data. Protocol exporters that will implement this f
 
 Export() will never be called concurrently for the same exporter instance. Export() can be called again only after the current call returns.
 
-Export() must not block indefinitely, there must be a reasonable upper limit after which the call must time out with an error result (`Failure`).  `exporterTimeoutMillis` - how long the export can run before it is cancelled. The default value is `30000`.
+Export() must not block indefinitely. We can rely on printing to stdout is reasonably performant and doesn't block.
 
 The specification states: Any retry logic that is required by the exporter is the responsibility of the exporter. The default SDK SHOULD NOT implement retry logic, as the required logic is likely to depend heavily on the specific protocol and backend the spans are being sent to.
 
@@ -167,9 +162,7 @@ public:
     sdkmeter::ExportResult Export(
         const Collection<Record> batch) noexcept
     {
-    
-        Time startTime = time.now();
-        
+            
         if(isShutdown)
         {
             return sdktrace::ExportResult::kFailure;
@@ -194,10 +187,7 @@ public:
                 // Counter, Gauge, MinMaxSumCount, Sketch, Histogram,
                 // and Exact Aggreagtors        
             }
-            
-            if(time.now() - startTime > 30s) {
-                return sdktrace::ExportResult::kFailure;
-            }
+
         }
     
         return sdkmeter::ExportResult::kSuccess;
