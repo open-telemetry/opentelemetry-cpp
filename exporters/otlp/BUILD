@@ -14,6 +14,8 @@
 
 package(default_visibility = ["//visibility:public"])
 
+load("//bazel:otel_cc_benchmark.bzl", "otel_cc_benchmark")
+
 cc_library(
     name = "recordable",
     srcs = [
@@ -63,5 +65,13 @@ cc_test(
         ":otlp_exporter",
         "//api",
         "@com_google_googletest//:gtest_main",
+    ],
+)
+
+otel_cc_benchmark(
+    name = "otlp_exporter_benchmark",
+    srcs = ["otlp_exporter_benchmark.cc"],
+    deps = [
+        ":otlp_exporter",
     ],
 )
