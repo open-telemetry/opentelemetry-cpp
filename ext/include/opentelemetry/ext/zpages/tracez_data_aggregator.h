@@ -143,8 +143,9 @@ private:
   /**
    * InsertIntoSampleSpanList is a helper function that is called to insert 
    * a given span into a sample span list. A function is used for insertion
-   * because before insertion into list the size of the list must be checked 
-   * and modified if needed.
+   * because before list size is to be maintained at a preset number.
+   * @param sample_spans the sample span list into which span is to be inserted
+   * @param span_data the span_data to be inserted into list
    */
   void InsertIntoSampleSpanList(
     std::list<std::unique_ptr<SpanData>>& sample_spans,

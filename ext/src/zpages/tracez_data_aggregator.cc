@@ -29,6 +29,10 @@ void TracezDataAggregator::InsertIntoSampleSpanList(
     std::list<std::unique_ptr<SpanData>>& sample_spans,
     std::unique_ptr<SpanData> &span_data){
   
+  /** 
+   * Check to see if the sample span list size exceeds the set limit, if it does
+   * free up memory and remove the earliest inserted sample before appending
+   */ 
   if (sample_spans.size() == kMaxNumberOfSampleSpans){
     sample_spans.front().reset();
     sample_spans.pop_front();
