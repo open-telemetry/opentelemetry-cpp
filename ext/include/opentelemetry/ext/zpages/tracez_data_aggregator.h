@@ -26,7 +26,8 @@ namespace zpages
 {
 
 /**
- * kMaxNumberOfSampleSpans is the maximum number of error and latency sample spans stored at any given time.
+ * kMaxNumberOfSampleSpans is the maximum number of error and latency sample spans stored at 
+ * any given time.
  */
 const int kMaxNumberOfSampleSpans = 5;
 

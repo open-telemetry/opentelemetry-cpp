@@ -1,12 +1,12 @@
 #pragma once
 
 // include libraries
-#include <chrono>
 #include <array>
+#include <chrono>
 
-using std::chrono::nanoseconds;
 using std::chrono::microseconds;
 using std::chrono::milliseconds;
+using std::chrono::nanoseconds;
 using std::chrono::seconds;
 
 OPENTELEMETRY_BEGIN_NAMESPACE
@@ -15,20 +15,21 @@ namespace ext
 namespace zpages
 {
 /**
- * kLatencyBoundaries is a constant array that contains the 9 latency boundaries and enables them to be iterated over
- * Each value in the array represents the lower limit(inclusive) of the boundary(in nano seconds) and the upper limit(exclusive)
- * of the boundary is the lower limit of the next one. The upper limit of the last boundary is INF.
+ * kLatencyBoundaries is a constant array that contains the 9 latency boundaries and enables them to
+ * be iterated over Each value in the array represents the lower limit(inclusive) of the boundary(in
+ * nano seconds) and the upper limit(exclusive) of the boundary is the lower limit of the next one.
+ * The upper limit of the last boundary is INF.
  */
-const std::array<nanoseconds,9> kLatencyBoundaries = {
-  nanoseconds(0),
-  nanoseconds(microseconds(10)),
-  nanoseconds(microseconds(100)), 
-  nanoseconds(milliseconds(1)),
-  nanoseconds(milliseconds(10)),
-  nanoseconds(milliseconds(100)),
-  nanoseconds(seconds(1)), 
-  nanoseconds(seconds(10)),
-  nanoseconds(seconds(100)),
+const std::array<nanoseconds, 9> kLatencyBoundaries = {
+    nanoseconds(0),
+    nanoseconds(microseconds(10)),
+    nanoseconds(microseconds(100)),
+    nanoseconds(milliseconds(1)),
+    nanoseconds(milliseconds(10)),
+    nanoseconds(milliseconds(100)),
+    nanoseconds(seconds(1)),
+    nanoseconds(seconds(10)),
+    nanoseconds(seconds(100)),
 };
 
 /**
@@ -49,13 +50,15 @@ enum LatencyBoundaryName
 };
 
 /** Overlaoding ++ operator for easy iteration **/
-LatencyBoundaryName& operator ++ (LatencyBoundaryName& latencyBoundaryName)
+LatencyBoundaryName &operator++(LatencyBoundaryName &latencyBoundaryName)
 {
-    if (latencyBoundaryName == LatencyBoundaryName::k100SecondToMax) {
-        throw std::out_of_range("for E& operator ++ (E&)");
-    }
-    latencyBoundaryName = LatencyBoundaryName(static_cast<std::underlying_type<LatencyBoundaryName>::type>(latencyBoundaryName) + 1);
-    return latencyBoundaryName;
+  if (latencyBoundaryName == LatencyBoundaryName::k100SecondToMax)
+  {
+    throw std::out_of_range("for E& operator ++ (E&)");
+  }
+  latencyBoundaryName = LatencyBoundaryName(
+      static_cast<std::underlying_type<LatencyBoundaryName>::type>(latencyBoundaryName) + 1);
+  return latencyBoundaryName;
 }
 
 }  // namespace zpages
