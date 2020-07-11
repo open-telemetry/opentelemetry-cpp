@@ -6,35 +6,6 @@ OPENTELEMETRY_BEGIN_NAMESPACE
 namespace trace {
 template<class T, nostd::enable_if_t<detail::is_key_value_iterable<T>::value> * = nullptr>
 public abstract class TraceState {
-  private:
-    static const int kKeyMaxSize = 256;
-    static const int kValueMaxSize = 256;
-    static const int kMaxKeyValuePairs = 32;
-    static const TraceState kDefault = TraceState.builder().build();
-
-    KeyValueIterable entries_;
-    TraceState(KeyValueIterable entries) = default; // I am not sure how default works, but just from observation of other classes
-
-    TraceState(T &entries) {
-        return TraceState(KeyValueIterableView<T>(entries));
-    }
-
-    virtual static TraceState Create(KeyValueIterable entries) = 0;
-
-    static TraceState Create(T &entries) {
-        return Create(KeyValueIterableView<T>(entries));
-    }
-
-// To Reviewer: deleted after switching to KeyValueIterable
-//    static TraceState Create(nostd::span<Entry> entries) {
-//      return TraceState(entries);
-//    }
-//    TraceState(Entry[] entries) {
-//        entries_ = entries;
-//    }
-//    Entry entries_[kMaxKeyValuePairs];
-//    int size;
-
   public:
     // Builder class for TraceState.
     static const class Builder {
@@ -171,6 +142,37 @@ public abstract class TraceState {
     }
 
     TraceState() {}
+
+  private:
+    static const int kKeyMaxSize = 256;
+    static const int kValueMaxSize = 256;
+    static const int kMaxKeyValuePairs = 32;
+    static const TraceState kDefault = TraceState.builder().build();
+
+    KeyValueIterable entries_;
+    TraceState(KeyValueIterable entries) = default; // I am not sure how default works, but just from observation of other classes
+
+    TraceState(T &entries) {
+        return TraceState(KeyValueIterableView<T>(entries));
+    }
+
+    virtual static TraceState Create(KeyValueIterable entries) = 0;
+
+    static TraceState Create(T &entries) {
+        return Create(KeyValueIterableView<T>(entries));
+    }
+
+// To Reviewer: deleted after switching to KeyValueIterable
+//    static TraceState Create(nostd::span<Entry> entries) {
+//      return TraceState(entries);
+//    }
+//    TraceState(Entry[] entries) {
+//        entries_ = entries;
+//    }
+//    Entry entries_[kMaxKeyValuePairs];
+//    int size;
+
+
 }
 }
 OPENTELEMETRY_END_NAMESPACE

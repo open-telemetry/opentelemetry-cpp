@@ -153,9 +153,9 @@ class HttpTraceContext : public HTTPTextFormat
                     return trace.SetSpanInContext(trace::DefaultSpan.GetInvalid(), context);
                 }
 
-                TraceId trace_id_obj = TraceId.FromLowerBase16(trace_id);
-                SpanId span_id_obj = SpanId.FromLowerBase16(span_id);
-                TraceFlags trace_flags_obj = TraceFlags.FromLowerBase16(trace_flags);
+                TraceId trace_id_obj = TraceId(nostd::span(trace_id,trace_id.length()));
+                SpanId span_id_obj = SpanId(nostd::span(span_id,span_id.length()));
+                TraceFlags trace_flags_obj = TraceFlags(nostd::span(trace_flags,trace_flags.length()));
                 return SpanContext(trace_id_obj, span_id_obj, true, trace_flags_obj, trace::TraceState.GetDefault());
             } catch (std::exception& e) {
                 std::cout<<"Unparseable trace_parent header. Returning INVALID span context."<<std::endl;

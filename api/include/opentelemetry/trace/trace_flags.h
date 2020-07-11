@@ -46,12 +46,6 @@ public:
     buffer[1]             = kHex[(rep_ >> 0) & 0xF];
   }
 
-  // Creates TraceFlags from traceparent
-  static TraceFlags FromLowerBase16(nostd::string_view src)
-  {
-    return TraceFlags(nostd::span(src,2));
-  }
-
   uint8_t flags() const noexcept { return rep_; }
 
   bool operator==(const TraceFlags &that) const noexcept { return rep_ == that.rep_; }
