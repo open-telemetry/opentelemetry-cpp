@@ -42,7 +42,7 @@ void TracezDataAggregator::InsertIntoSampleSpanList(
 
 void TracezDataAggregator::AggregateStatusOKSpan(
     std::unique_ptr<SpanData> &ok_span){
-  auto boundary_name    = FindLatencyBoundary(ok_span.get());
+  auto boundary_name = FindLatencyBoundary(ok_span.get());
   auto& tracez_data = aggregated_tracez_data_.at(ok_span->GetName().data());
   InsertIntoSampleSpanList(tracez_data->sample_latency_spans[boundary_name],ok_span);
   tracez_data->completed_span_count_per_latency_bucket[boundary_name]++;
@@ -59,11 +59,11 @@ void TracezDataAggregator::AggregateCompletedSpans(
     std::vector<std::unique_ptr<SpanData>> &completed_spans){
   for (auto &span : completed_spans){
     std::string span_name = span->GetName().data();
-
+    
     if (aggregated_tracez_data_.find(span_name) == aggregated_tracez_data_.end()){
       aggregated_tracez_data_[span_name] = std::unique_ptr<TracezSpanData>(new TracezSpanData);
     }
-
+    
     // running spans are calculated from scratch later
     aggregated_tracez_data_[span_name]->running_span_count = 0;
     aggregated_tracez_data_[span_name]->sample_running_spans.clear();
