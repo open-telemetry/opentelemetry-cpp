@@ -1,7 +1,7 @@
 cc_test(
     name = "tracez_data_aggregator_tests",
     srcs = [
-        "tracez_data_aggregator_tests.cc",
+        "tracez_data_aggregator_test.cc",
     ],
     deps = [
         "//sdk/src/trace",

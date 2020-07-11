@@ -35,20 +35,20 @@ void VerifySpanCountsInAggregatedSpanData(const std::string& span_name, const st
 {
   EXPECT_EQ(aggregated_data -> num_running_spans, num_running_spans) << " Count of running spans incorrect for " << span_name << "\n";
   
-  EXPECT_EQ(aggregated_data -> running_sample_spans.size(), std::min(num_running_spans,kMaxNumberOfSampleSpans))
+  ASSERT_EQ(aggregated_data -> running_sample_spans.size(), std::min(num_running_spans,kMaxNumberOfSampleSpans))
   << " Size of sample running spans incorrect for " << span_name << "\n";
   
   EXPECT_EQ(aggregated_data -> num_error_spans, num_error_spans)
   << " Count of error spans incorrect for " << span_name << "\n";
   
-  EXPECT_EQ(aggregated_data -> error_sample_spans.size(), std::min(num_error_spans,kMaxNumberOfSampleSpans))
+  ASSERT_EQ(aggregated_data -> error_sample_spans.size(), std::min(num_error_spans,kMaxNumberOfSampleSpans))
   << " Count of running spans incorrect for " << span_name << "\n";
   
   for(auto boundary = LatencyBoundaryName::k0MicroTo10Micro; boundary != LatencyBoundaryName::k100SecondToMax; ++boundary)
   {
       EXPECT_EQ(aggregated_data->span_count_per_latency_bucket[boundary], span_count_per_latency_bucket[boundary])
       << " Count of completed spans in latency boundary " << boundary << " incorrect for " << span_name << "\n";
-      EXPECT_EQ((int)aggregated_data->latency_sample_spans[boundary].size(), std::min((int)span_count_per_latency_bucket[boundary],kMaxNumberOfSampleSpans))
+      ASSERT_EQ((int)aggregated_data->latency_sample_spans[boundary].size(), std::min((int)span_count_per_latency_bucket[boundary],kMaxNumberOfSampleSpans))
       << " Count of sample completed spans in latency boundary " << boundary << " incorrect for " << span_name << "\n";;
   }
 }
