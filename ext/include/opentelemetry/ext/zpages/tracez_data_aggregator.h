@@ -1,14 +1,15 @@
 #pragma once
 
-// include libraries
+
 #include <string>
 #include <map>
 #include <unordered_set>
 #include <vector>
 #include <array>
 #include <list>
+#include <cinttypes>
 
-// include files
+
 #include "opentelemetry/ext/zpages/tracez_processor.h"
 #include "opentelemetry/sdk/trace/span_data.h"
 #include "opentelemetry/ext/zpages/latency_boundaries.h"
@@ -20,120 +21,148 @@ using opentelemetry::trace::CanonicalCode;
 
 
 OPENTELEMETRY_BEGIN_NAMESPACE
-namespace ext
-{
-namespace zpages
-{
+namespace ext{
+namespace zpages{
 
 /**
- * kMaxNumberOfSampleSpans is the maximum number of error and latency sample spans stored at 
- * any given time.
+ * kMaxNumberOfSampleSpans is the maximum number of running, completed or error
+ * sample spans stored at any given time for a given span name. 
+ * This limit is defined to reduce memory usage
  */
 const int kMaxNumberOfSampleSpans = 5;
 
 /**
- * AggregatedInformation is the aggregated span information that is stored for each span name. 
+ * TracezSpanData is the aggregated span information that is stored for 
+ * each span name. 
  */
-struct AggregatedSpanData{
-  
-  int num_running_spans; 
-  int num_error_spans;
-  
+struct TracezSpanData{
   
   /** 
-   * latency_sample_spans is an array of lists, each index of the array corresponds to a latency boundary(of which there are 9).
+   * TODO: At this time the maximum count is unknown but a larger data type 
+   * might have to be used in the future to store these counts to avoid overflow
+   */
+  unsigned int running_span_count; 
+  unsigned int error_span_count;
+  
+  /**
+   * completed_span_count_per_latency_bucket is an array that stores the count 
+   * of spans for each of the 9 latency buckets.
+   */
+  std::array<unsigned int,kLatencyBoundaries.size()>completed_span_count_per_latency_bucket;
+  
+  /** 
+   * sample_latency_spans is an array of lists, each index of the array 
+   * corresponds to a latency boundary(of which there are 9).
    * The list in each index stores the sample spans for that latency boundary.
    */
-  std::array<std::list<std::unique_ptr<SpanData>>,kLatencyBoundaries.size()> latency_sample_spans;
+  std::array<std::list<std::unique_ptr<SpanData>>,kLatencyBoundaries.size()> sample_latency_spans;
   
   /**
-   * error_sample_spans is a list that stores the error samples for a span name.
+   * sample_error_spans is a list that stores the error samples for a span name.
    */
-  std::list<std::unique_ptr<SpanData>> error_sample_spans;
+  std::list<std::unique_ptr<SpanData>> sample_error_spans;
   
   /**
-   * running_sample_spans is a list that stores the running span samples for a span name.
+   * sample_running_spans is a list that stores the running span samples for a 
+   * span name.
    */
-  std::list<SpanData*> running_sample_spans;
-  
-  /**
-   * span_count_per_latency_bucket is a array that stores the count of spans for each of the 9 latency buckets.
-   */
-  std::array<int,kLatencyBoundaries.size()>span_count_per_latency_bucket;
-  
-  AggregatedSpanData()
-  {
-    num_running_spans = 0;
-    num_error_spans = 0;
-    span_count_per_latency_bucket.fill(0);
+  std::list<SpanData*> sample_running_spans;
+
+  TracezSpanData(){
+    running_span_count = 0;
+    error_span_count = 0;
+    completed_span_count_per_latency_bucket.fill(0);
   } 
 };
 
 /**
- * TracezDataAggregator class is responsible for collecting raw data and converting it to useful information that can be made available to 
- * display for the tracez zpages.
+ * TracezDataAggregator class is responsible for collecting raw data and 
+ * converting it to useful information that can be made available to 
+ * display on the tracez zpage.
  */
-class TracezDataAggregator
-{
+class TracezDataAggregator{
 public:
   TracezDataAggregator(std::shared_ptr<TracezSpanProcessor> spanProcessor);
 
   /** 
-   * GetAggregatedData gets the aggregated span information
-   * @returns a map with the span name as key and the aggregated information for the span name as value.
+   * GetAggregatedTracezData aggregates data and returns the the updated data.
+   * @returns a map with the span name as key and the tracez span data as value.
    */
-  const std::map<std::string, std::unique_ptr<AggregatedSpanData>>& GetAggregatedData();
+  const std::map<std::string, std::unique_ptr<TracezSpanData>>& GetAggregatedTracezData();
   
   
 private:
-  std::shared_ptr<TracezSpanProcessor> tracez_span_processor_;
-  
-  /**
-   * Tree map with key being the name of the span and value being an array of size 9(number of latency boundaries), 
-   * with each index value representing number of spans with a particular name and latency boundary. 
-   * A hash map is not used because the span names need to be displayed in sorted order
-   */
-  std::map<std::string, std::unique_ptr<AggregatedSpanData>> aggregated_data_;
-  
-  
+
   /** 
-   * AggregateSpans is the function that is called to update the aggregated data with newly
-   * completed and running span information
+   * AggregateSpans is the function that is called to update the aggregated data
+   * with newly completed and running span data
    */
   void AggregateSpans();
   
   /** 
-   * AggregateCompletedSpans is the function that is called to update the aggregated data of newly completed spans
-   * @param completed_spans is the newly completed spans.
+   * AggregateCompletedSpans is the function that is called to update the 
+   * aggregated data of newly completed spans
+   * @param completed_spans are the newly completed spans.
    */
-  void AggregateCompletedSpans(std::vector<std::unique_ptr<SpanData>>& completed_spans);
+  void AggregateCompletedSpans(std::vector<std::unique_ptr<SpanData>>& 
+  completed_spans);
   
   /**
-   * AggregateRunningSpans aggregates the data for running spans. This function is stateless, it calculates
-   * running spans from the very beggining. A stateless approach is used because there is no straightforward 
-   * way to tell if a span was completed since the last call to this function.
+   * AggregateRunningSpans aggregates the data for running spans. This function 
+   * is stateless, it calculates running spans from the very beggining. 
+   * A stateless approach is used because there is no straightforward way to 
+   * tell if or which span was completed since the last call to this function.
    * @param running_spans is the running spans to be aggregated.
    */
   void AggregateRunningSpans(std::unordered_set<SpanData*>& running_spans);
   
   /** 
-   * AggregateStatusOKSpans is the function called to update the data of spans with status code OK.
+   * AggregateStatusOKSpans is the function called to update the data of spans 
+   * with status code OK.
    * @param ok_span is the span who's data is to be aggregated
    */
   void AggregateStatusOKSpan(std::unique_ptr<SpanData>& ok_span);
   
   /** 
-   * AggregateStatusErrorSpans is the function that is called to collect the information of error spans
+   * AggregateStatusErrorSpans is the function that is called to update the 
+   * data of error spans
    * @param error_span is the error span who's data is to be aggregated
    */
   void AggregateStatusErrorSpan(std::unique_ptr<SpanData>& error_span);
 
   /**
-   * GetLatencyBoundary returns the latency boundary to which the latency of the given SpanData belongs to
-   * @ param SpanData is the SpanData for which the latency boundary is to be found
-   * @ returns LatencyBoundaryName is the name of the latency boundary that the SpanData belongs to
+   * FindLatencyBoundary returns the latency boundary to which the duration of 
+   * the given span_data belongs to
+   * @ param span_data is the SpanData whose duration for which the latency boundary
+   * is to be found
+   * @ returns enum LatencyBoundary is the name of the latency boundary 
+   * that the span_data belongs to
    */
-  LatencyBoundaryName GetLatencyBoundary(SpanData* SpanData);
+  LatencyBoundary FindLatencyBoundary(SpanData* span_data);
+  
+  /**
+   * InsertIntoSampleSpanList is a helper function that is called to insert 
+   * a given span into a sample span list. A function is used for insertion
+   * because before insertion into list the size of the list must be checked 
+   * and modified if needed.
+   */
+  void InsertIntoSampleSpanList(
+    std::list<std::unique_ptr<SpanData>>& sample_spans,
+    std::unique_ptr<SpanData> &span_data);
+    
+  /** Instance of span processor used to collect raw data **/
+  std::shared_ptr<TracezSpanProcessor> tracez_span_processor_;
+  
+  /**
+   * Tree map with key being the name of the span and value being a unique ptr
+   * that stores the tracez span data for the given span name
+   * A tree map is preferred to a hash map because the the data structure is
+   * to be ordered in alphabetical order of span name.
+   * TODO : A possible memory concern if there are too many unique 
+   * span names, one solution could be to implement a LRU cache that trims the 
+   * DS based on frequency of usage of a span name.
+   */
+  std::map<std::string, std::unique_ptr<TracezSpanData>> aggregated_tracez_data_;
   
 };
 

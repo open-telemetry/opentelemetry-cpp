@@ -1,82 +1,68 @@
 #include "opentelemetry/ext/zpages/tracez_data_aggregator.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
-namespace ext
-{
-namespace zpages
-{
+namespace ext{
+namespace zpages{
 
-TracezDataAggregator::TracezDataAggregator(std::shared_ptr<TracezSpanProcessor> span_processor)
-{
+TracezDataAggregator::TracezDataAggregator(
+    std::shared_ptr<TracezSpanProcessor> span_processor){
   tracez_span_processor_ = span_processor;
 }
 
-const std::map<std::string, std::unique_ptr<AggregatedSpanData>>
-    &TracezDataAggregator::GetAggregatedData()
-{
+const std::map<std::string, std::unique_ptr<TracezSpanData>>
+    &TracezDataAggregator::GetAggregatedTracezData(){
   AggregateSpans();
-  return aggregated_data_;
+  return aggregated_tracez_data_;
 }
 
-LatencyBoundaryName TracezDataAggregator::GetLatencyBoundary(SpanData *span_data)
-{
+LatencyBoundary TracezDataAggregator::FindLatencyBoundary(SpanData *span_data){
   auto span_data_duration = span_data->GetDuration();
-  for (auto boundary = LatencyBoundaryName::k0MicroTo10Micro;
-       boundary != LatencyBoundaryName::k100SecondToMax; ++boundary)
-  {
+  for (auto boundary = LatencyBoundary::k0MicroTo10Micro;
+       boundary != LatencyBoundary::k100SecondToMax; ++boundary){
     if (span_data_duration < kLatencyBoundaries[boundary + 1])
       return boundary;
   }
-  return LatencyBoundaryName::k100SecondToMax;
+  return LatencyBoundary::k100SecondToMax;
 }
 
-void TracezDataAggregator::AggregateStatusOKSpan(std::unique_ptr<SpanData> &ok_span)
-{
-  auto boundary_name    = GetLatencyBoundary(ok_span.get());
-  std::string span_name = ok_span->GetName().data();
-
-  // If the sample span storage is at capacity, remove the span that was inserted earliest and free
-  // up memory
-  if (aggregated_data_[span_name]->latency_sample_spans[boundary_name].size() ==
-      kMaxNumberOfSampleSpans)
-  {
-    aggregated_data_[span_name]->latency_sample_spans[boundary_name].front().reset();
-    aggregated_data_[span_name]->latency_sample_spans[boundary_name].pop_front();
+void TracezDataAggregator::InsertIntoSampleSpanList(
+    std::list<std::unique_ptr<SpanData>>& sample_spans,
+    std::unique_ptr<SpanData> &span_data){
+  
+  if (sample_spans.size() == kMaxNumberOfSampleSpans){
+    sample_spans.front().reset();
+    sample_spans.pop_front();
   }
-  aggregated_data_[span_name]->latency_sample_spans[boundary_name].push_back(std::move(ok_span));
-  aggregated_data_[span_name]->span_count_per_latency_bucket[boundary_name]++;
+  sample_spans.push_back(std::move(span_data));
 }
 
-void TracezDataAggregator::AggregateStatusErrorSpan(std::unique_ptr<SpanData> &error_span)
-{
-  std::string span_name = error_span->GetName().data();
+void TracezDataAggregator::AggregateStatusOKSpan(
+    std::unique_ptr<SpanData> &ok_span){
+  auto boundary_name    = FindLatencyBoundary(ok_span.get());
+  auto& tracez_data = aggregated_tracez_data_.at(ok_span->GetName().data());
+  InsertIntoSampleSpanList(tracez_data->sample_latency_spans[boundary_name],ok_span);
+  tracez_data->completed_span_count_per_latency_bucket[boundary_name]++;
+}
 
-  // If the error samples storage is at capacity, remove the span that was inserted earliest and
-  // free up memory
-  if (aggregated_data_[span_name]->error_sample_spans.size() == kMaxNumberOfSampleSpans)
-  {
-    aggregated_data_[span_name]->error_sample_spans.front().reset();
-    aggregated_data_[span_name]->error_sample_spans.pop_front();
-  }
-  aggregated_data_[span_name]->error_sample_spans.push_back(std::move(error_span));
-  aggregated_data_[span_name]->num_error_spans++;
+void TracezDataAggregator::AggregateStatusErrorSpan(
+    std::unique_ptr<SpanData> &error_span){
+  auto& tracez_data = aggregated_tracez_data_.at(error_span->GetName().data());
+  InsertIntoSampleSpanList(tracez_data->sample_error_spans,error_span);
+  tracez_data->error_span_count++;
 }
 
 void TracezDataAggregator::AggregateCompletedSpans(
-    std::vector<std::unique_ptr<SpanData>> &completed_spans)
-{
-  for (auto &span : completed_spans)
-  {
+    std::vector<std::unique_ptr<SpanData>> &completed_spans){
+  for (auto &span : completed_spans){
     std::string span_name = span->GetName().data();
 
-    if (aggregated_data_.find(span_name) == aggregated_data_.end())
-    {
-      aggregated_data_[span_name] = std::unique_ptr<AggregatedSpanData>(new AggregatedSpanData);
+    if (aggregated_tracez_data_.find(span_name) == aggregated_tracez_data_.end()){
+      aggregated_tracez_data_[span_name] = std::unique_ptr<TracezSpanData>(new TracezSpanData);
     }
 
     // running spans are calculated from scratch later
-    aggregated_data_[span_name]->num_running_spans = 0;
-    aggregated_data_[span_name]->running_sample_spans.clear();
+    aggregated_tracez_data_[span_name]->running_span_count = 0;
+    aggregated_tracez_data_[span_name]->sample_running_spans.clear();
 
     if (span->GetStatus() == CanonicalCode::OK)
       AggregateStatusOKSpan(span);
@@ -85,38 +71,33 @@ void TracezDataAggregator::AggregateCompletedSpans(
   }
 }
 
-void TracezDataAggregator::AggregateRunningSpans(std::unordered_set<SpanData *> &running_spans)
-{
+void TracezDataAggregator::AggregateRunningSpans(
+    std::unordered_set<SpanData *> &running_spans){
   std::unordered_set<std::string> seen_span_names;
-  for (auto &span : running_spans)
-  {
+  for (auto &span : running_spans){
     std::string span_name = span->GetName().data();
 
-    if (aggregated_data_.find(span_name) == aggregated_data_.end())
-    {
-      aggregated_data_[span_name] = std::unique_ptr<AggregatedSpanData>(new AggregatedSpanData);
+    if (aggregated_tracez_data_.find(span_name) == aggregated_tracez_data_.end()){
+      aggregated_tracez_data_[span_name] = std::unique_ptr<TracezSpanData>(new TracezSpanData);
     }
 
     // If it's the first time this span name is seen, set the count to 0 to avoid double counting
     // from previous aggregated data.
-    if (seen_span_names.find(span_name) == seen_span_names.end())
-    {
-      aggregated_data_[span_name]->num_running_spans = 0;
-      aggregated_data_[span_name]->running_sample_spans.clear();
+    if (seen_span_names.find(span_name) == seen_span_names.end()){
+      aggregated_tracez_data_[span_name]->running_span_count = 0;
+      aggregated_tracez_data_[span_name]->sample_running_spans.clear();
       seen_span_names.insert(span_name);
     }
 
-    if (aggregated_data_[span_name]->running_sample_spans.size() == kMaxNumberOfSampleSpans)
-    {
-      aggregated_data_[span_name]->running_sample_spans.pop_front();
+    if (aggregated_tracez_data_[span_name]->sample_running_spans.size() == kMaxNumberOfSampleSpans){
+      aggregated_tracez_data_[span_name]->sample_running_spans.pop_front();
     }
-    aggregated_data_[span_name]->running_sample_spans.push_back(span);
-    aggregated_data_[span_name]->num_running_spans++;
+    aggregated_tracez_data_[span_name]->sample_running_spans.push_back(span);
+    aggregated_tracez_data_[span_name]->running_span_count++;
   }
 }
 
-void TracezDataAggregator::AggregateSpans()
-{
+void TracezDataAggregator::AggregateSpans(){
   auto span_snapshot = tracez_span_processor_->GetSpanSnapshot();
   /**
    * The following functions must be called in this particular order.

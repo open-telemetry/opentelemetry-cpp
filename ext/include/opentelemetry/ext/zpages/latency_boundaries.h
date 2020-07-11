@@ -10,14 +10,15 @@ using std::chrono::nanoseconds;
 using std::chrono::seconds;
 
 OPENTELEMETRY_BEGIN_NAMESPACE
-namespace ext
-{
-namespace zpages
-{
+namespace ext{
+namespace zpages{
 /**
- * kLatencyBoundaries is a constant array that contains the 9 latency boundaries and enables them to
- * be iterated over Each value in the array represents the lower limit(inclusive) of the boundary(in
- * nano seconds) and the upper limit(exclusive) of the boundary is the lower limit of the next one.
+ * kLatencyBoundaries is a constant array that contains the 9 latency boundaries
+ * and enables them to
+ * be iterated over Each value in the array represents the lower limit(inclusive)
+ * of the boundary(in nano seconds) and the upper limit(exclusive) of the 
+ * boundary is the 
+ * lower limit of the next one.
  * The upper limit of the last boundary is INF.
  */
 const std::array<nanoseconds, 9> kLatencyBoundaries = {
@@ -33,11 +34,11 @@ const std::array<nanoseconds, 9> kLatencyBoundaries = {
 };
 
 /**
- * LatencyBoundaryName enum is used to index into the kLatencyBoundaries container.
- * Using this enum lets you access the latency boundary at each index without using magic numbers
+ * LatencyBoundary enum is used to index into the kLatencyBoundaries container.
+ * Using this enum lets you access the latency boundary at each index without 
+ * using magic numbers
  */
-enum LatencyBoundaryName
-{
+enum LatencyBoundary{
   k0MicroTo10Micro,
   k10MicroTo100Micro,
   k100MicroTo1Milli,
@@ -50,15 +51,14 @@ enum LatencyBoundaryName
 };
 
 /** Overlaoding ++ operator for easy iteration **/
-LatencyBoundaryName &operator++(LatencyBoundaryName &latencyBoundaryName)
-{
-  if (latencyBoundaryName == LatencyBoundaryName::k100SecondToMax)
-  {
-    throw std::out_of_range("for E& operator ++ (E&)");
+LatencyBoundary &operator++(LatencyBoundary &latencyBoundary){
+  if (latencyBoundary == LatencyBoundary::k100SecondToMax){
+    throw std::out_of_range("for LatencyBoundary& operator ++");
   }
-  latencyBoundaryName = LatencyBoundaryName(
-      static_cast<std::underlying_type<LatencyBoundaryName>::type>(latencyBoundaryName) + 1);
-  return latencyBoundaryName;
+  latencyBoundary = LatencyBoundary(
+      static_cast<std::underlying_type<LatencyBoundary>::type>
+      (latencyBoundary) + 1);
+  return latencyBoundary;
 }
 
 }  // namespace zpages

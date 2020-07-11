@@ -34,36 +34,36 @@ protected:
 /**
  * Helper function to check if the counts of running, error and latency spans match what is expected
  */
-void VerifySpanCountsInAggregatedSpanData(
+void VerifySpanCountsInTracezSpanData(
     const std::string &span_name,
-    const std::unique_ptr<AggregatedSpanData> &aggregated_data,
-    int num_running_spans,
-    int num_error_spans,
-    std::array<int, kLatencyBoundaries.size()> span_count_per_latency_bucket)
+    const std::unique_ptr<TracezSpanData> &aggregated_data,
+    int running_span_count,
+    int error_span_count,
+    std::array<int, kLatencyBoundaries.size()> completed_span_count_per_latency_bucket)
 {
-  EXPECT_EQ(aggregated_data->num_running_spans, num_running_spans)
+  EXPECT_EQ(aggregated_data->running_span_count, running_span_count)
       << " Count of running spans incorrect for " << span_name << "\n";
 
-  ASSERT_EQ(aggregated_data->running_sample_spans.size(),
-            std::min(num_running_spans, kMaxNumberOfSampleSpans))
+  ASSERT_EQ(aggregated_data->sample_running_spans.size(),
+            std::min(running_span_count, kMaxNumberOfSampleSpans))
       << " Size of sample running spans incorrect for " << span_name << "\n";
 
-  EXPECT_EQ(aggregated_data->num_error_spans, num_error_spans)
+  EXPECT_EQ(aggregated_data->error_span_count, error_span_count)
       << " Count of error spans incorrect for " << span_name << "\n";
 
-  ASSERT_EQ(aggregated_data->error_sample_spans.size(),
-            std::min(num_error_spans, kMaxNumberOfSampleSpans))
+  ASSERT_EQ(aggregated_data->sample_error_spans.size(),
+            std::min(error_span_count, kMaxNumberOfSampleSpans))
       << " Count of running spans incorrect for " << span_name << "\n";
 
-  for (auto boundary = LatencyBoundaryName::k0MicroTo10Micro;
-       boundary != LatencyBoundaryName::k100SecondToMax; ++boundary)
+  for (auto boundary = LatencyBoundary::k0MicroTo10Micro;
+       boundary != LatencyBoundary::k100SecondToMax; ++boundary)
   {
-    EXPECT_EQ(aggregated_data->span_count_per_latency_bucket[boundary],
-              span_count_per_latency_bucket[boundary])
+    EXPECT_EQ(aggregated_data->completed_span_count_per_latency_bucket[boundary],
+              completed_span_count_per_latency_bucket[boundary])
         << " Count of completed spans in latency boundary " << boundary << " incorrect for "
         << span_name << "\n";
-    ASSERT_EQ((int)aggregated_data->latency_sample_spans[boundary].size(),
-              std::min((int)span_count_per_latency_bucket[boundary], kMaxNumberOfSampleSpans))
+    ASSERT_EQ((int)aggregated_data->sample_latency_spans[boundary].size(),
+              std::min((int)completed_span_count_per_latency_bucket[boundary], kMaxNumberOfSampleSpans))
         << " Count of sample completed spans in latency boundary " << boundary << " incorrect for "
         << span_name << "\n";
     ;
@@ -73,8 +73,8 @@ void VerifySpanCountsInAggregatedSpanData(
 /** Test to check if data aggregator works as expected when there are no spans **/
 TEST_F(TracezDataAggregatorTest, NoSpans)
 {
-  const std::map<std::string, std::unique_ptr<AggregatedSpanData>> &data =
-      tracez_data_aggregator->GetAggregatedData();
+  const auto &data =
+      tracez_data_aggregator->GetAggregatedTracezData();
   ASSERT_EQ(data.size(), 0);
 }
 
@@ -84,17 +84,17 @@ TEST_F(TracezDataAggregatorTest, SingleRunningSpan)
 {
   // Start the span get the data
   auto span_first = tracer->StartSpan(span_name1);
-  const std::map<std::string, std::unique_ptr<AggregatedSpanData>> &data =
-      tracez_data_aggregator->GetAggregatedData();
+  const auto &data =
+      tracez_data_aggregator->GetAggregatedTracezData();
 
   // Check the size and to see if the running span count is accurate
   ASSERT_EQ(data.size(), 1);
   ASSERT_TRUE(data.find(span_name1) != data.end());
   auto &aggregated_data = data.at(span_name1);
-  VerifySpanCountsInAggregatedSpanData(span_name1, aggregated_data, 1, 0,
+  VerifySpanCountsInTracezSpanData(span_name1, aggregated_data, 1, 0,
                                        {0, 0, 0, 0, 0, 0, 0, 0, 0});
-  ASSERT_EQ(aggregated_data->running_sample_spans.size(), 1);
-  ASSERT_EQ(aggregated_data->running_sample_spans.front()->GetName(), span_name1);
+  ASSERT_EQ(aggregated_data->sample_running_spans.size(), 1);
+  ASSERT_EQ(aggregated_data->sample_running_spans.front()->GetName(), span_name1);
 }
 
 /** Test to check if data aggregator works as expected when there is exactly one completed span **/
@@ -108,19 +108,19 @@ TEST_F(TracezDataAggregatorTest, SingleCompletedSpan)
   tracer->StartSpan(span_name1, start)->End(end);
 
   // Get the data and make sure span name exists in the data
-  const std::map<std::string, std::unique_ptr<AggregatedSpanData>> &data =
-      tracez_data_aggregator->GetAggregatedData();
+  const auto  &data =
+      tracez_data_aggregator->GetAggregatedTracezData();
   ASSERT_EQ(data.size(), 1);
   ASSERT_TRUE(data.find(span_name1) != data.end());
   auto &aggregated_data = data.at(span_name1);
 
   // Make sure counts of spans are in order
-  VerifySpanCountsInAggregatedSpanData(span_name1, aggregated_data, 0, 0,
+  VerifySpanCountsInTracezSpanData(span_name1, aggregated_data, 0, 0,
                                        {1, 0, 0, 0, 0, 0, 0, 0, 0});
 
   // Check if the span is correctly updated in the first boundary
-  ASSERT_EQ(aggregated_data->latency_sample_spans[LatencyBoundaryName::k0MicroTo10Micro].size(), 1);
-  ASSERT_EQ(aggregated_data->latency_sample_spans[LatencyBoundaryName::k0MicroTo10Micro]
+  ASSERT_EQ(aggregated_data->sample_latency_spans[LatencyBoundary::k0MicroTo10Micro].size(), 1);
+  ASSERT_EQ(aggregated_data->sample_latency_spans[LatencyBoundary::k0MicroTo10Micro]
                 .front()
                 ->GetDuration(),
             nanoseconds(30));
@@ -132,8 +132,8 @@ TEST_F(TracezDataAggregatorTest, SingleErrorSpan)
   // Start and end a single error span
   tracer->StartSpan(span_name1)
       ->SetStatus(opentelemetry::trace::CanonicalCode::CANCELLED, "span cancelled");
-  const std::map<std::string, std::unique_ptr<AggregatedSpanData>> &data =
-      tracez_data_aggregator->GetAggregatedData();
+  const auto  &data =
+      tracez_data_aggregator->GetAggregatedTracezData();
 
   // Check to see if span name can be found in aggregation
   ASSERT_EQ(data.size(), 1);
@@ -141,13 +141,13 @@ TEST_F(TracezDataAggregatorTest, SingleErrorSpan)
   auto &aggregated_data = data.at(span_name1);
 
   // Make sure counts of spans are in order
-  VerifySpanCountsInAggregatedSpanData(span_name1, aggregated_data, 0, 1,
+  VerifySpanCountsInTracezSpanData(span_name1, aggregated_data, 0, 1,
                                        {0, 0, 0, 0, 0, 0, 0, 0, 0});
 
   // Check to see if error span that is introduced updates the required fields, check size before
   // checking the span
-  ASSERT_EQ(aggregated_data->error_sample_spans.size(), 1);
-  ASSERT_EQ(aggregated_data->error_sample_spans.front()->GetName(), span_name1);
+  ASSERT_EQ(aggregated_data->sample_error_spans.size(), 1);
+  ASSERT_EQ(aggregated_data->sample_error_spans.front()->GetName(), span_name1);
 }
 
 /** Test to check if multiple running spans behaves as expected**/
@@ -167,8 +167,8 @@ TEST_F(TracezDataAggregatorTest, MultipleRunningSpans)
       running_span_container.push_back(tracer->StartSpan(span_name.first));
   }
 
-  const std::map<std::string, std::unique_ptr<AggregatedSpanData>> &data =
-      tracez_data_aggregator->GetAggregatedData();
+  const auto  &data =
+      tracez_data_aggregator->GetAggregatedTracezData();
   ASSERT_EQ(data.size(), running_span_name_to_count.size());
 
   // Check to see if the running span counts were updated correctly
@@ -177,11 +177,11 @@ TEST_F(TracezDataAggregatorTest, MultipleRunningSpans)
     ASSERT_TRUE(data.find(span_name.first) != data.end());
 
     // Make sure counts of spans are in order
-    VerifySpanCountsInAggregatedSpanData(span_name.first, data.at(span_name.first),
+    VerifySpanCountsInTracezSpanData(span_name.first, data.at(span_name.first),
                                          span_name.second, 0, {0, 0, 0, 0, 0, 0, 0, 0, 0});
 
-    ASSERT_EQ(data.at(span_name.first)->running_sample_spans.size(), span_name.second);
-    for (auto &span_sample : data.at(span_name.first)->running_sample_spans)
+    ASSERT_EQ(data.at(span_name.first)->sample_running_spans.size(), span_name.second);
+    for (auto &span_sample : data.at(span_name.first)->sample_running_spans)
     {
       ASSERT_EQ(span_sample->GetName(), span_name.first);
     }
@@ -230,8 +230,8 @@ TEST_F(TracezDataAggregatorTest, MultipleCompletedSpan)
       }
     }
   }
-  const std::map<std::string, std::unique_ptr<AggregatedSpanData>> &data =
-      tracez_data_aggregator->GetAggregatedData();
+  const auto  &data =
+      tracez_data_aggregator->GetAggregatedTracezData();
   ASSERT_EQ(data.size(), span_name_to_duration.size());
 
   for (auto &span : span_name_to_duration)
@@ -240,19 +240,19 @@ TEST_F(TracezDataAggregatorTest, MultipleCompletedSpan)
     auto &aggregated_data = data.at(span.first);
 
     // Make sure counts of spans are in order
-    VerifySpanCountsInAggregatedSpanData(
+    VerifySpanCountsInTracezSpanData(
         span.first, aggregated_data, 0, 0,
         {(int)span.second[0].size(), (int)span.second[1].size(), (int)span.second[2].size(),
          (int)span.second[3].size(), (int)span.second[4].size(), (int)span.second[5].size(),
          (int)span.second[6].size(), (int)span.second[7].size(), (int)span.second[8].size()});
 
-    for (auto boundary = LatencyBoundaryName::k0MicroTo10Micro;
-         boundary != LatencyBoundaryName::k100SecondToMax; ++boundary)
+    for (auto boundary = LatencyBoundary::k0MicroTo10Micro;
+         boundary != LatencyBoundary::k100SecondToMax; ++boundary)
     {
-      ASSERT_EQ(aggregated_data->latency_sample_spans[boundary].size(),
+      ASSERT_EQ(aggregated_data->sample_latency_spans[boundary].size(),
                 span.second[boundary].size());
 
-      auto latency_sample = aggregated_data->latency_sample_spans[boundary].begin();
+      auto latency_sample = aggregated_data->sample_latency_spans[boundary].begin();
       for (unsigned int idx = 0; idx < span.second[boundary].size(); idx++)
       {
         ASSERT_EQ(span.second[boundary][idx], latency_sample->get()->GetDuration());
@@ -284,8 +284,8 @@ TEST_F(TracezDataAggregatorTest, MultipleErrorSpans)
           ->SetStatus(opentelemetry::trace::CanonicalCode::CANCELLED, error_desc);
   }
 
-  const std::map<std::string, std::unique_ptr<AggregatedSpanData>> &data =
-      tracez_data_aggregator->GetAggregatedData();
+  const auto  &data =
+      tracez_data_aggregator->GetAggregatedTracezData();
   ASSERT_EQ(data.size(), span_name_to_error.size());
 
   // Check if error spans were updated correctly for the different span names
@@ -298,13 +298,13 @@ TEST_F(TracezDataAggregatorTest, MultipleErrorSpans)
     auto &aggregated_data = data.at(span_error.first);
 
     // Make sure counts of spans are in order
-    VerifySpanCountsInAggregatedSpanData(span_error.first, aggregated_data, 0,
+    VerifySpanCountsInTracezSpanData(span_error.first, aggregated_data, 0,
                                          (int)span_error.second.size(),
                                          {0, 0, 0, 0, 0, 0, 0, 0, 0});
-    ASSERT_EQ(aggregated_data->num_error_spans, (int)span_error.second.size());
-    ASSERT_EQ(aggregated_data->error_sample_spans.size(), span_error.second.size());
+    ASSERT_EQ(aggregated_data->error_span_count, (int)span_error.second.size());
+    ASSERT_EQ(aggregated_data->sample_error_spans.size(), span_error.second.size());
 
-    auto error_sample = aggregated_data->error_sample_spans.begin();
+    auto error_sample = aggregated_data->sample_error_spans.begin();
     for (unsigned int idx = 0; idx < span_error.second.size(); idx++)
     {
       ASSERT_EQ(span_error.second[idx], error_sample->get()->GetDescription());
@@ -319,26 +319,26 @@ TEST_F(TracezDataAggregatorTest, AdditionToRunningSpans)
 {
   // Start a span and check the data
   auto span_first = tracer->StartSpan(span_name1);
-  const std::map<std::string, std::unique_ptr<AggregatedSpanData>> &temp_data =
-      tracez_data_aggregator->GetAggregatedData();
+  const auto  &temp_data =
+      tracez_data_aggregator->GetAggregatedTracezData();
   ASSERT_EQ(temp_data.size(), 1);
   ASSERT_TRUE(temp_data.find(span_name1) != temp_data.end());
-  VerifySpanCountsInAggregatedSpanData(span_name1, temp_data.at(span_name1), 1, 0,
+  VerifySpanCountsInTracezSpanData(span_name1, temp_data.at(span_name1), 1, 0,
                                        {0, 0, 0, 0, 0, 0, 0, 0, 0});
 
   // Start another span and check to see if there is no double counting of spans
   auto span_second = tracer->StartSpan(span_name1);
-  const std::map<std::string, std::unique_ptr<AggregatedSpanData>> &data =
-      tracez_data_aggregator->GetAggregatedData();
+  const auto  &data =
+      tracez_data_aggregator->GetAggregatedTracezData();
 
   ASSERT_EQ(data.size(), 1);
   ASSERT_TRUE(data.find(span_name1) != data.end());
   auto &aggregated_data = data.at(span_name1);
-  VerifySpanCountsInAggregatedSpanData(span_name1, aggregated_data, 2, 0,
+  VerifySpanCountsInTracezSpanData(span_name1, aggregated_data, 2, 0,
                                        {0, 0, 0, 0, 0, 0, 0, 0, 0});
 
-  ASSERT_EQ(aggregated_data->running_sample_spans.size(), 2);
-  for (auto &sample_span : aggregated_data->running_sample_spans)
+  ASSERT_EQ(aggregated_data->sample_running_spans.size(), 2);
+  for (auto &sample_span : aggregated_data->sample_running_spans)
   {
     ASSERT_EQ(sample_span->GetName(), span_name1);
   }
@@ -355,27 +355,27 @@ TEST_F(TracezDataAggregatorTest, RemovalOfRunningSpanWhenCompleted)
 
   // Start a span and make sure data is updated
   auto span_first = tracer->StartSpan(span_name1, start);
-  const std::map<std::string, std::unique_ptr<AggregatedSpanData>> &temp_data =
-      tracez_data_aggregator->GetAggregatedData();
+  const auto  &temp_data =
+      tracez_data_aggregator->GetAggregatedTracezData();
   ASSERT_EQ(temp_data.size(), 1);
   ASSERT_TRUE(temp_data.find(span_name1) != temp_data.end());
-  VerifySpanCountsInAggregatedSpanData(span_name1, temp_data.at(span_name1), 1, 0,
+  VerifySpanCountsInTracezSpanData(span_name1, temp_data.at(span_name1), 1, 0,
                                        {0, 0, 0, 0, 0, 0, 0, 0, 0});
 
   // End the span and make sure running span is removed and completed span is updated, there should
   // be only one completed span
   span_first->End(end);
-  const std::map<std::string, std::unique_ptr<AggregatedSpanData>> &data =
-      tracez_data_aggregator->GetAggregatedData();
+  const auto  &data =
+      tracez_data_aggregator->GetAggregatedTracezData();
   ASSERT_EQ(data.size(), 1);
   ASSERT_TRUE(data.find(span_name1) != data.end());
 
   // Check if completed span fields are correctly updated
   auto &aggregated_data = data.at(span_name1);
-  VerifySpanCountsInAggregatedSpanData(span_name1, aggregated_data, 0, 0,
+  VerifySpanCountsInTracezSpanData(span_name1, aggregated_data, 0, 0,
                                        {1, 0, 0, 0, 0, 0, 0, 0, 0});
-  ASSERT_EQ(aggregated_data->latency_sample_spans[LatencyBoundaryName::k0MicroTo10Micro].size(), 1);
-  ASSERT_EQ(aggregated_data->latency_sample_spans[LatencyBoundaryName::k0MicroTo10Micro]
+  ASSERT_EQ(aggregated_data->sample_latency_spans[LatencyBoundary::k0MicroTo10Micro].size(), 1);
+  ASSERT_EQ(aggregated_data->sample_latency_spans[LatencyBoundary::k0MicroTo10Micro]
                 .front()
                 ->GetDuration(),
             nanoseconds(30));
@@ -388,24 +388,24 @@ TEST_F(TracezDataAggregatorTest, RemovalOfRunningSpanWhenCompleted)
  */
 TEST_F(TracezDataAggregatorTest, RunningSampleSpansOverCapacity)
 {
-  int num_running_spans = 6;
+  int running_span_count = 6;
   // Start and store spans based on the above map
   std::vector<nostd::unique_ptr<Span>> running_span_container;
-  for (int count = 0; count < num_running_spans; count++)
+  for (int count = 0; count < running_span_count; count++)
     running_span_container.push_back(tracer->StartSpan(span_name1));
 
   // Fetch data and check if span name is spresent
-  const std::map<std::string, std::unique_ptr<AggregatedSpanData>> &data =
-      tracez_data_aggregator->GetAggregatedData();
+  const auto  &data =
+      tracez_data_aggregator->GetAggregatedTracezData();
   ASSERT_EQ(data.size(), 1);
   ASSERT_TRUE(data.find(span_name1) != data.end());
 
   // Check if error spans are updated according to spans started
   auto &aggregated_data = data.at(span_name1);
-  VerifySpanCountsInAggregatedSpanData(span_name1, aggregated_data, 6, 0,
+  VerifySpanCountsInTracezSpanData(span_name1, aggregated_data, 6, 0,
                                        {0, 0, 0, 0, 0, 0, 0, 0, 0});
 
-  ASSERT_EQ(aggregated_data->running_sample_spans.size(), kMaxNumberOfSampleSpans);
+  ASSERT_EQ(aggregated_data->sample_running_spans.size(), kMaxNumberOfSampleSpans);
 }
 
 /**
@@ -424,20 +424,20 @@ TEST_F(TracezDataAggregatorTest, ErrorSampleSpansOverCapacity)
         ->SetStatus(opentelemetry::trace::CanonicalCode::CANCELLED, span_error_description);
 
   // Fetch data and check if span name is spresent
-  const std::map<std::string, std::unique_ptr<AggregatedSpanData>> &data =
-      tracez_data_aggregator->GetAggregatedData();
+  const auto  &data =
+      tracez_data_aggregator->GetAggregatedTracezData();
   ASSERT_EQ(data.size(), 1);
   ASSERT_TRUE(data.find(span_name1) != data.end());
 
   // Check if error spans are updated according to spans started
   auto &aggregated_data = data.at(span_name1);
-  VerifySpanCountsInAggregatedSpanData(span_name1, aggregated_data, 0,
+  VerifySpanCountsInTracezSpanData(span_name1, aggregated_data, 0,
                                        (int)span_error_descriptions.size(),
                                        {0, 0, 0, 0, 0, 0, 0, 0, 0});
 
-  ASSERT_EQ(aggregated_data->error_sample_spans.size(), kMaxNumberOfSampleSpans);
+  ASSERT_EQ(aggregated_data->sample_error_spans.size(), kMaxNumberOfSampleSpans);
   // Check if the latest 5 error spans exist out of the total 6 that were introduced
-  auto error_sample = aggregated_data->error_sample_spans.begin();
+  auto error_sample = aggregated_data->sample_error_spans.begin();
   for (unsigned int idx = 1; idx < span_error_descriptions.size(); idx++)
   {
     ASSERT_EQ(error_sample->get()->GetDescription(), span_error_descriptions[idx]);
@@ -471,20 +471,20 @@ TEST_F(TracezDataAggregatorTest, CompletedSampleSpansOverCapacity)
   }
 
   // Get data and check if span name exists in aggregation
-  const std::map<std::string, std::unique_ptr<AggregatedSpanData>> &data =
-      tracez_data_aggregator->GetAggregatedData();
+  const auto  &data =
+      tracez_data_aggregator->GetAggregatedTracezData();
   ASSERT_EQ(data.size(), 1);
   ASSERT_TRUE(data.find(span_name1) != data.end());
 
   auto &aggregated_data = data.at(span_name1);
-  VerifySpanCountsInAggregatedSpanData(span_name1, aggregated_data, 0, 0,
+  VerifySpanCountsInTracezSpanData(span_name1, aggregated_data, 0, 0,
                                        {(int)timestamps.size(), 0, 0, 0, 0, 0, 0, 0, 0});
 
   // Check the count of completed spans in the buckets and the samples stored
-  ASSERT_EQ(aggregated_data->latency_sample_spans[LatencyBoundaryName::k0MicroTo10Micro].size(),
+  ASSERT_EQ(aggregated_data->sample_latency_spans[LatencyBoundary::k0MicroTo10Micro].size(),
             kMaxNumberOfSampleSpans);
   auto latency_sample =
-      aggregated_data->latency_sample_spans[LatencyBoundaryName::k0MicroTo10Micro].begin();
+      aggregated_data->sample_latency_spans[LatencyBoundary::k0MicroTo10Micro].begin();
 
   // idx starts from 1 and not 0 because there are 6 completed spans in the same bucket the and the
   // first one is removed
@@ -507,8 +507,8 @@ TEST_F(TracezDataAggregatorTest, SpanNameInAlphabeticalOrder)
       ->SetStatus(opentelemetry::trace::CanonicalCode::CANCELLED, "span cancelled");
 
   // Get data and check if span name exists in aggregation
-  const std::map<std::string, std::unique_ptr<AggregatedSpanData>> &data =
-      tracez_data_aggregator->GetAggregatedData();
+  const auto  &data =
+      tracez_data_aggregator->GetAggregatedTracezData();
   ASSERT_EQ(data.size(), span_names.size());
 
   int span_names_idx = 0;
@@ -539,20 +539,20 @@ TEST_F(TracezDataAggregatorTest, EdgeSpanLatenciesFallInCorrectBoundaries)
   }
 
   // Get data and check if span name exists in aggregation
-  const std::map<std::string, std::unique_ptr<AggregatedSpanData>> &data =
-      tracez_data_aggregator->GetAggregatedData();
+  const auto  &data =
+      tracez_data_aggregator->GetAggregatedTracezData();
   ASSERT_EQ(data.size(), 1);
   ASSERT_TRUE(data.find(span_name1) != data.end());
 
   auto &aggregated_data = data.at(span_name1);
-  VerifySpanCountsInAggregatedSpanData(span_name1, aggregated_data, 0, 0,
+  VerifySpanCountsInTracezSpanData(span_name1, aggregated_data, 0, 0,
                                        {1, 1, 1, 1, 1, 1, 1, 1, 1});
   // Check if the latency boundary is updated correctly
-  for (auto boundary = LatencyBoundaryName::k0MicroTo10Micro;
-       boundary != LatencyBoundaryName::k100SecondToMax; ++boundary)
+  for (auto boundary = LatencyBoundary::k0MicroTo10Micro;
+       boundary != LatencyBoundary::k100SecondToMax; ++boundary)
   {
-    ASSERT_EQ(aggregated_data->latency_sample_spans[boundary].size(), 1);
-    ASSERT_EQ(aggregated_data->latency_sample_spans[boundary].front().get()->GetDuration().count(),
+    ASSERT_EQ(aggregated_data->sample_latency_spans[boundary].size(), 1);
+    ASSERT_EQ(aggregated_data->sample_latency_spans[boundary].front().get()->GetDuration().count(),
               durations[boundary].count());
   }
 }
@@ -573,35 +573,35 @@ TEST_F(TracezDataAggregatorTest, NoChangeInBetweenCallsToAggregator)
       ->SetStatus(opentelemetry::trace::CanonicalCode::CANCELLED, "span cancelled");
 
   // Get data and check if span name exists in aggregation
-  const std::map<std::string, std::unique_ptr<AggregatedSpanData>> &data =
-      tracez_data_aggregator->GetAggregatedData();
+  const auto  &data =
+      tracez_data_aggregator->GetAggregatedTracezData();
   ASSERT_EQ(data.size(), 3);
 
   ASSERT_TRUE(data.find(span_name1) != data.end());
-  VerifySpanCountsInAggregatedSpanData(span_name1, data.at(span_name1), 0, 0,
+  VerifySpanCountsInTracezSpanData(span_name1, data.at(span_name1), 0, 0,
                                        {1, 0, 0, 0, 0, 0, 0, 0, 0});
 
   ASSERT_TRUE(data.find(span_name2) != data.end());
-  VerifySpanCountsInAggregatedSpanData(span_name2, data.at(span_name2), 1, 0,
+  VerifySpanCountsInTracezSpanData(span_name2, data.at(span_name2), 1, 0,
                                        {0, 0, 0, 0, 0, 0, 0, 0, 0});
 
   ASSERT_TRUE(data.find(span_name3) != data.end());
-  VerifySpanCountsInAggregatedSpanData(span_name3, data.at(span_name3), 0, 1,
+  VerifySpanCountsInTracezSpanData(span_name3, data.at(span_name3), 0, 1,
                                        {0, 0, 0, 0, 0, 0, 0, 0, 0});
 
-  const std::map<std::string, std::unique_ptr<AggregatedSpanData>> &data2 =
-      tracez_data_aggregator->GetAggregatedData();
+  const auto  &data2 =
+      tracez_data_aggregator->GetAggregatedTracezData();
   ASSERT_EQ(data2.size(), 3);
 
   ASSERT_TRUE(data2.find(span_name1) != data2.end());
-  VerifySpanCountsInAggregatedSpanData(span_name1, data2.at(span_name1), 0, 0,
+  VerifySpanCountsInTracezSpanData(span_name1, data2.at(span_name1), 0, 0,
                                        {1, 0, 0, 0, 0, 0, 0, 0, 0});
 
   ASSERT_TRUE(data2.find(span_name2) != data2.end());
-  VerifySpanCountsInAggregatedSpanData(span_name2, data2.at(span_name2), 1, 0,
+  VerifySpanCountsInTracezSpanData(span_name2, data2.at(span_name2), 1, 0,
                                        {0, 0, 0, 0, 0, 0, 0, 0, 0});
 
   ASSERT_TRUE(data2.find(span_name3) != data2.end());
-  VerifySpanCountsInAggregatedSpanData(span_name3, data2.at(span_name3), 0, 1,
+  VerifySpanCountsInTracezSpanData(span_name3, data2.at(span_name3), 0, 1,
                                        {0, 0, 0, 0, 0, 0, 0, 0, 0});
 }
