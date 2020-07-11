@@ -47,7 +47,7 @@ public:
   }
 
   // Creates TraceFlags from traceparent
-  static TraceFlags fromLowerBase16(nostd::string_view src)
+  static TraceFlags FromLowerBase16(nostd::string_view src)
   {
     return TraceFlags(nostd::span(src,2));
   }

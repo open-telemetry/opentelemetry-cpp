@@ -13,55 +13,55 @@ OPENTELEMETRY_BEGIN_NAMESPACE
 namespace trace
 {
 
-public class SpanContext:
+public class SpanContext final:
     // The state of a Span to propagate between processes.
     // This class includes the immutable attributes of a :class:`.Span` that must
     // be propagated to a span's children and across process boundaries.
     public:
-        TraceId traceId;
-        SpanId spanId;
-        bool remote;
-        TraceFlags traceFlags;
-        TraceState traceState;
-        static SpanContext INVALID = SpanContext(TraceId.getInvalid(),SpanId.getInvalid(),false,TraceFlags.getDefault(),TraceState.getDefault());
+        TraceId trace_id_;
+        SpanId span_id_;
+        bool remote_;
+        TraceFlags trace_flags_;
+        TraceState trace_state_;
+        static const SpanContext kInvalid = SpanContext(TraceId.getInvalid(),SpanId.getInvalid(),false,TraceFlags.getDefault(),TraceState.getDefault());
 
-        SpanContext(TraceId trace_id, SpanId span_id, bool is_remote, TraceFlags &trace_flags, TraceState &trace_state) {
-            traceId = trace_id;
-            spanId = span_id;
-            traceFlags = trace_flags;
-            traceState = trace_state;
-            remote = is_remote;
+        SpanContext(TraceId trace_id, SpanId span_id, bool is_remote_, TraceFlags &trace_flags, TraceState &trace_state) {
+            trace_id_ = trace_id;
+            span_id_ = span_id;
+            trace_flags_ = trace_flags;
+            trace_state_ = trace_state;
+            remote_ = is_remote_;
         }
 
-        static SpanContext getInvalid() {
-            return INVALID;
+        static SpanContext GetInvalid() {
+            return kInvalid;
         }
 
-        bool isValid() {
+        bool IsValid() {
             // Get whether this `SpanContext` is valid.
             // A `SpanContext` is said to be invalid if its trace ID or span ID is
             // invalid (i.e. ``0``).
-            return traceId != INVALID_TRACE_ID && spanId != INVALID_SPAN_ID;
+            return trace_id_ != kInvalid_TRACE_ID && span_id_ != kInvalid_SPAN_ID;
         }
 
-        TraceId getTraceId() {
-            return traceId;
+        TraceId GetTraceId() {
+            return trace_id_;
         }
 
-        SpanId getSpanId() {
-            return spanId;
+        SpanId GetSpanId() {
+            return span_id_;
         }
 
-        TraceFlags getTraceFlags() {
-            return traceFlags;
+        TraceFlags GetTraceFlags() {
+            return trace_flags_;
         }
 
-        TraceState getTraceState() {
-            return traceState;
+        TraceState GetTraceState() {
+            return trace_state_;
         }
 
     private:
-        static const nostd::string_view INVALID_SPAN_ID = SpanId.fromLowerBase16("0000000000000000");
-        static const nostd::string_view INVALID_TRACE_ID = TraceId.fromLowerBase16("00000000000000000000000000000000");
+        static const nostd::string_view kInvalid_SPAN_ID = SpanId.fromLowerBase16("0000000000000000");
+        static const nostd::string_view kInvalid_TRACE_ID = TraceId.fromLowerBase16("00000000000000000000000000000000");
 }
 OPENTELEMETRY_END_NAMESPACE

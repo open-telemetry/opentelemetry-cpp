@@ -54,7 +54,7 @@ public:
   }
 
   // Creates a SpanId from traceparent
-  static TraceId fromLowerBase16(nostd::string_view src)
+  static TraceId FromLowerBase16(nostd::string_view src)
   {
     return TraceId(nostd::span(src,src.size()));
   }

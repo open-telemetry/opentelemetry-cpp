@@ -1,128 +1,173 @@
 #pragma once
 #include "opentelemetry/nostd/string_view.h"
-#include "opentelemetry/nostd/span.h"
+#include <map>
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace trace {
+template<class T, nostd::enable_if_t<detail::is_key_value_iterable<T>::value> * = nullptr>
 public abstract class TraceState {
   private:
-    static const int KEY_MAX_SIZE = 256;
-    static const int VALUE_MAX_SIZE = 256;
-    static const int MAX_KEY_VALUE_PAIRS = 32;
-    static const TraceState DEFAULT = TraceState.builder().build();
+    static const int kKeyMaxSize = 256;
+    static const int kValueMaxSize = 256;
+    static const int kMaxKeyValuePairs = 32;
+    static const TraceState kDefault = TraceState.builder().build();
 
-    static TraceState create(nostd::span<Entry> entries) {
-      return TraceState(entries);
+    KeyValueIterable entries_;
+    TraceState(KeyValueIterable entries) = default; // I am not sure how default works, but just from observation of other classes
+
+    TraceState(T &entries) {
+        return TraceState(KeyValueIterableView<T>(entries));
     }
-    TraceState(nostd::span<Entry> entries) {
-        this.entries = entries;
+
+    virtual static TraceState Create(KeyValueIterable entries) = 0;
+
+    static TraceState Create(T &entries) {
+        return Create(KeyValueIterableView<T>(entries));
     }
-    nostd::span<Entry> entries;
+
+// To Reviewer: deleted after switching to KeyValueIterable
+//    static TraceState Create(nostd::span<Entry> entries) {
+//      return TraceState(entries);
+//    }
+//    TraceState(Entry[] entries) {
+//        entries_ = entries;
+//    }
+//    Entry entries_[kMaxKeyValuePairs];
+//    int size;
 
   public:
     // Builder class for TraceState.
     static const class Builder {
       private:
-        const TraceState parent;
-        nostd::span<Entry> entries;
-        const nostd::span<Entry> EMPTY_ENTRIES;
+        const TraceState parent_;
+        KeyValueIterable entries_;
+        const KeyValueIterable kEmptyEntries;
+//        Entry entries_[kMaxKeyValuePairs];
+//        const Entry kEmptyEntries[kMaxKeyValuePairs];
         // Needs to be in this class to avoid initialization deadlock because super class depends on
         // subclass (the auto-value generate class).
-        static const TraceState EMPTY = create(EMPTY_ENTRIES);
+        static const TraceState kEmpty = Create(kEmptyEntries);
+//        int size = 0;
 
         Builder(TraceState &parent) {
-          this.parent = parent;
-          this.entries = NULL;
+          parent_ = parent;
         }
 
       public:
         // Adds or updates the Entry that has the given key if it is present. The new
         // Entry will always be added in the front of the list of entries.
-        Builder set(nostd::string_view &key, nostd::string_view &value) {
+        Builder Set(nostd::string_view &key, nostd::string_view &value) {
           // Initially create the Entry to validate input.
-          Entry entry = Entry.create(key, value);
-          if (entries == NULL) {
+//          Entry entry = Entry.Create(key, value);
+          if (size == 0) {
             // Copy entries from the parent.
-            entries = parent.getEntries();
+            entries_ = parent_.GetEntries();
+//            for (Entry entry : parent.GetEntries()) {
+//                entries_[size] = entry;
+//                size++;
+//            }
           }
-          for (int i = 0; i < entries.size(); i++) {
-            if (entries[i].getKey() == entry.getKey()) {
-              entries.erase(entries.begin()+i);
-              // Exit now because the entries list cannot contain duplicates.
-              break;
-            }
-          }
+          entries_.ForEachKeyValue([&](nostd::string_view k, nostd::string_view &v) {
+            if (k == key) v = value; // Is this what we should do to use KeyValueIterable here?
+          });
+//          int pos = -1;
+//          for (int i = 0; i < size; i++) {
+//            if (entries[i].GetKey() == entry.GetKey()) {
+//              size--;
+//              pos = i;
+//              // Exit now because the entries list cannot contain duplicates.
+//              break;
+//            }
+//          }
+//          size++;
           // Inserts the element at the front of this list.
-          entries.insert(entries.begin(), entry);
+//          if (pos != -1) entries_[pos] = entry;
+//          else entries_[size - 1] = entry;
           return this;
         }
 
         // Removes the Entry that has the given key if it is present.
-        Builder remove(nostd::string_view &key) {
-          if (entries == NULL) {
+        Builder Remove(nostd::string_view &key) {
+          if (size == 0) {
             // Copy entries from the parent.
-            entries = parent.getEntries();
+            entries_ = parent_.GetEntries();
+//            for (Entry entry : parent.GetEntries()) {
+//              entries_[size] = entry;
+//              size++;
+//            }
           }
-          for (int i = 0; i < entries.size(); i++) {
-            if (entries[i].getKey() == key) {
-              entries.erase(entries.begin()+i);
-              // Exit now because the entries list cannot contain duplicates.
-              break;
-            }
-          }
+          entries_.ForEachKeyValue([&](nostd::string_view k, nostd::string_view &v) {
+            if (k == key) v = value; // How do we remove a key-val pair here?
+          });
+//          for (int i = 0; i < size(); i++) {
+//            if (entries[i] == NULL) continue;
+//            if (entries[i].GetKey() == key) {
+//              entries[i] = NULL;
+//              size--;
+//              // Exit now because the entries list cannot contain duplicates.
+//              break;
+//            }
+//          }
           return this;
         }
 
         // Builds a TraceState by adding the entries to the parent in front of the key-value pairs list
         // and removing duplicate entries.
-        TraceState build() {
+        TraceState Build() {
           if (entries == NULL) {
             return parent;
           }
-          return TraceState.create(entries);
+          return TraceState.Create(entries);
         }
     }
-
-    // Immutable key-value pair for TraceState.
-    static class Entry {
-      // Creates a new Entry for the TraceState.
-      public:
-        static Entry create(nostd::string_view &key, nostd::string_view &value) {
-          // Again what is this again I am not sure
-          return new AutoValue_TraceState_Entry(key, value);
-        }
-
-        // Returns the key.
-        virtual nostd::string_view getKey() = 0;
-
-        // Returns the value.
-        virtual nostd::string_view getValue() = 0;
-
-        Entry() {}
-    }
+// To Reviewer: Removed because no longer needed after switching to KeyValueIterable
+//    // Immutable key-value pair for TraceState.
+//    static class Entry {
+//      // Creates a new Entry for the TraceState.
+//      public:
+//        static Entry Create(nostd::string_view &key, nostd::string_view &value) {
+//          // Again what is this again I am not sure
+//          return Entry();
+//        }
+//
+//        // Returns the key.
+//        virtual nostd::string_view GetKey() = 0;
+//
+//        // Returns the value.
+//        virtual nostd::string_view GetValue() = 0;
+//
+//        Entry() {}
+//      private:
+//        const nostd::string_view key_;
+//        const nostd::string_view value_;
+//    }
 
     // Returns the default TraceState with no entries.
-    static TraceState getDefault() {
-      return DEFAULT;
+    static TraceState GetDefault() {
+      return kDefault;
     }
 
     // Returns the value to which the specified key is mapped, or null if this map contains no mapping
     // for the key.
-    nostd::string_view get(nostd::string_view key) {
-      for (Entry entry : getEntries()) {
-        if (entry.getKey() == key)) {
-          return entry.getValue();
-        }
-      }
+    nostd::string_view Get(nostd::string_view key) {
+      GetEntries().ForEachKeyValue([&key](nostd::string_view k, nostd::v){
+        if (key == k) return v;
+      });
+//  For reviewer: Below is the original code I had, which is directly translated from the Java implementation
+//      for (Entry entry : GetEntries()) {
+//        if (entry.GetKey() == key)) {
+//          return entry.GetValue();
+//        }
+//      }
       return NULL;
     }
 
     // Returns a list view of the mappings contained in this TraceState.
-    virtual nostd::span<Entry> getEntries() = 0;
+    virtual KeyValueIterable GetEntries() = 0;
 
     // Returns a Builder based on an empty TraceState.
-    static Builder builder() {
-      return Builder(Builder.EMPTY);
+    static Builder Builder() {
+      return Builder(Builder.kEmpty);
     }
 
     TraceState() {}

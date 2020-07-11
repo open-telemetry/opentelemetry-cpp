@@ -3,6 +3,7 @@
 #include "opentelemetry/trace/spancontext.h"
 #include "opentelemetry/trace/canonical_code.h"
 #include "opentelemetry/common/attribute_value.h"
+#include "opentelemetry/trace/span.h"
 
 #define pass
 OPENTELEMETRY_BEGIN_NAMESPACE
@@ -10,16 +11,16 @@ namespace trace {
 public const class DefaultSpan : Span {
   public:
     // Returns an invalid span.
-    static DefaultSpan getInvalid() {
-        return INVALID;
+    static DefaultSpan GetInvalid() {
+        return kInvalid;
     }
 
     // Creates an instance of this class with spancontext.
-    static DefaultSpan create(SpanContext spanContext) {
+    static DefaultSpan Create(SpanContext spanContext) {
       return DefaultSpan(spanContext);
     }
 
-    static DefaultSpan createRandom() {
+    static DefaultSpan CreateRandom() {
       return DefaultSpan(
         SpanContext(
           TraceId.generateRandomId(),
@@ -31,44 +32,44 @@ public const class DefaultSpan : Span {
       );
     }
 
-    SpanContext getContext() {
-        return spanContext;
+    SpanContext GetContext() {
+        return span_context_;
     }
 
-    bool isRecordingEvents() {
+    bool IsRecordingEvents() {
         return false;
     }
     
-    void setAttribute(nostd::string_view key, common::AttributeValue value) {
+    void SetAttribute(nostd::string_view key, common::AttributeValue value) {
       pass;
     }
 
-    void addEvent(nostd::string_view name, common::Attributes attributes, int timestamp) {
+    void AddEvent(nostd::string_view name, common::Attributes attributes, int timestamp) {
       pass;
     }
     
-    void setStatus(CanonicalCode status) {
+    void SetStatus(CanonicalCode status) {
       pass;
     }
   
-    void updateName(nostd::string_view name) {
+    void UpdateName(nostd::string_view name) {
       pass;
     }
 
-    void end(int endTime) {
+    void End(trace::EndSpanOptions end_time) {
       pass;
     }
 
-    nostd::string_view toString() {
+    nostd::string_view ToString() {
       return "DefaultSpan";
     }
 
     DefaultSpan(SpanContext spanContext) {
-       this.spanContext = spanContext;
+       this.span_context_ = spanContext;
     }
 
   private:
-    static const DefaultSpan INVALID = new DefaultSpan(SpanContext.getInvalid());
-    const SpanContext spanContext;
+    static const DefaultSpan kInvalid = new DefaultSpan(SpanContext.getInvalid());
+    const SpanContext span_context_;
 }
 }
