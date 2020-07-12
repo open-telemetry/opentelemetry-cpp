@@ -7,7 +7,7 @@
 #include <vector>
 #include <array>
 #include <list>
-#include <cinttypes>
+#include <mutex>
 
 
 #include "opentelemetry/ext/zpages/tracez_processor.h"
@@ -27,7 +27,7 @@ namespace zpages{
 /**
  * kMaxNumberOfSampleSpans is the maximum number of running, completed or error
  * sample spans stored at any given time for a given span name. 
- * This limit is defined to reduce memory usage
+ * This limit is introduced to reduce memory usage by trimming sample spans stored.
  */
 const int kMaxNumberOfSampleSpans = 5;
 
@@ -76,7 +76,7 @@ struct TracezSpanData{
 };
 
 /**
- * TracezDataAggregator class is responsible for collecting raw data and 
+ * TracezDataAggregator object is responsible for collecting raw data and 
  * converting it to useful information that can be made available to 
  * display on the tracez zpage.
  */
@@ -101,7 +101,7 @@ private:
   
   /** 
    * AggregateCompletedSpans is the function that is called to update the 
-   * aggregated data of newly completed spans
+   * aggregation with the data of newly completed spans.
    * @param completed_spans are the newly completed spans.
    */
   void AggregateCompletedSpans(std::vector<std::unique_ptr<SpanData>>& 
@@ -109,7 +109,7 @@ private:
   
   /**
    * AggregateRunningSpans aggregates the data for running spans. This function 
-   * is stateless, it calculates running spans from the very beggining. 
+   * is stateless, it calculates running spans from scratch everytime. 
    * A stateless approach is used because there is no straightforward way to 
    * tell if or which span was completed since the last call to this function.
    * @param running_spans is the running spans to be aggregated.
@@ -135,15 +135,14 @@ private:
    * the given span_data belongs to
    * @ param span_data is the SpanData whose duration for which the latency boundary
    * is to be found
-   * @ returns enum LatencyBoundary is the name of the latency boundary 
-   * that the span_data belongs to
+   * @ returns LatencyBoundary is the latency boundary that the span_data belongs to
    */
   LatencyBoundary FindLatencyBoundary(SpanData* span_data);
   
   /**
    * InsertIntoSampleSpanList is a helper function that is called to insert 
    * a given span into a sample span list. A function is used for insertion
-   * because before list size is to be maintained at a preset number.
+   * because before list size is to be limited at a set maximum.
    * @param sample_spans the sample span list into which span is to be inserted
    * @param span_data the span_data to be inserted into list
    */
@@ -157,13 +156,14 @@ private:
   /**
    * Tree map with key being the name of the span and value being a unique ptr
    * that stores the tracez span data for the given span name
-   * A tree map is preferred to a hash map because the the data structure is
-   * to be ordered in alphabetical order of span name.
+   * A tree map is preferred to a hash map because the the data is to be ordered
+   * in alphabetical order of span name.
    * TODO : A possible memory concern if there are too many unique 
    * span names, one solution could be to implement a LRU cache that trims the 
    * DS based on frequency of usage of a span name.
    */
   std::map<std::string, std::unique_ptr<TracezSpanData>> aggregated_tracez_data_;
+  mutable std::mutex mu_;
   
 };
 

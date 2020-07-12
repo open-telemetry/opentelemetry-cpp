@@ -11,6 +11,10 @@ TracezDataAggregator::TracezDataAggregator(
 
 const std::map<std::string, std::unique_ptr<TracezSpanData>>
     &TracezDataAggregator::GetAggregatedTracezData(){
+  //Aggregate span data before returning the new information. 
+  //The aggregation could also be periodically updated as an alternative
+  
+  std::lock_guard<std::mutex> lock_guard{mu_};
   AggregateSpans();
   return aggregated_tracez_data_;
 }
@@ -42,6 +46,7 @@ void TracezDataAggregator::InsertIntoSampleSpanList(
 
 void TracezDataAggregator::AggregateStatusOKSpan(
     std::unique_ptr<SpanData> &ok_span){
+  //Find and update boundary of aggregated data that span belongs
   auto boundary_name = FindLatencyBoundary(ok_span.get());
   auto& tracez_data = aggregated_tracez_data_.at(ok_span->GetName().data());
   InsertIntoSampleSpanList(tracez_data->sample_latency_spans[boundary_name],ok_span);
@@ -64,7 +69,7 @@ void TracezDataAggregator::AggregateCompletedSpans(
       aggregated_tracez_data_[span_name] = std::unique_ptr<TracezSpanData>(new TracezSpanData);
     }
     
-    // running spans are calculated from scratch later
+    // running spans are calculated from scratch set them to 0 now and recalculate them later
     aggregated_tracez_data_[span_name]->running_span_count = 0;
     aggregated_tracez_data_[span_name]->sample_running_spans.clear();
 
@@ -85,14 +90,15 @@ void TracezDataAggregator::AggregateRunningSpans(
       aggregated_tracez_data_[span_name] = std::unique_ptr<TracezSpanData>(new TracezSpanData);
     }
 
-    // If it's the first time this span name is seen, set the count to 0 to avoid double counting
-    // from previous aggregated data.
+    // If it's the first time this span name is seen, reset its information 
+    // to avoid double counting from previous aggregated data. (described below)
     if (seen_span_names.find(span_name) == seen_span_names.end()){
       aggregated_tracez_data_[span_name]->running_span_count = 0;
       aggregated_tracez_data_[span_name]->sample_running_spans.clear();
       seen_span_names.insert(span_name);
     }
 
+    // Maintain maximum size of sample running spans list
     if (aggregated_tracez_data_[span_name]->sample_running_spans.size() == kMaxNumberOfSampleSpans){
       aggregated_tracez_data_[span_name]->sample_running_spans.pop_front();
     }
@@ -105,18 +111,23 @@ void TracezDataAggregator::AggregateSpans(){
   auto span_snapshot = tracez_span_processor_->GetSpanSnapshot();
   /**
    * The following functions must be called in this particular order.
-   * Running spans are calculated from scratch every time this function is called ie. assuming
-   * all running spans are zero initially.
-   * All spans present in the aggregated data can be set to 0 before these functions
-   * are called but that would take an additional linear step.
-   * To avoid paying this price, some work is done in aggergate completed spans to ensure that
-   * going into aggregate running spans all the span names in completed spans have a running span
-   *value of 0. This is possible to do because if running spans with the same name exists it will be
-   *aggregated in the AggregateRunningSpans function call that follows. Additionally if it's the
-   *first time we are seeing a running span in AggregateRunningSpans, we set it to 0 to avoid double
-   *counting the running span if it already existed in the aggregation from the previous call to
+   * Calculation of running spans is stateless and does not rely on previous 
+   * storage ie. everytime this function is called running span information
+   * for every span name is assumed to be 0.
+   *
+   * All running span information present in the aggregated data can be set to 0
+   * before these functions are called but that would take an additional linear step.
+   *
+   * To avoid paying this price, some work is done in aggergate completed spans 
+   * to ensure that going into aggregate running spans all the span names
+   * seen in completed spans have thier running span information reset.
+   *
+   * This is possible to do because if running spans with the same name exists it will be
+   * aggregated in the AggregateRunningSpans function call that follows. Additionally if it's the
+   * first time we are seeing a running span in AggregateRunningSpans, we set it to 0 to avoid double
+   * counting the running span if it already existed in the aggregation from the previous call to
    * this function. See tests AdditionToRunningSpans and RemovalOfRunningSpanWhenCompleted to see an
-   *example of where this is used.
+   * example of where this is used.
    **/
   AggregateCompletedSpans(span_snapshot.completed);
   AggregateRunningSpans(span_snapshot.running);

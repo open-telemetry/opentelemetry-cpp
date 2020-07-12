@@ -1,6 +1,5 @@
 #pragma once
 
-// include libraries
 #include <array>
 #include <chrono>
 
@@ -13,12 +12,10 @@ OPENTELEMETRY_BEGIN_NAMESPACE
 namespace ext{
 namespace zpages{
 /**
- * kLatencyBoundaries is a constant array that contains the 9 latency boundaries
- * and enables them to
- * be iterated over Each value in the array represents the lower limit(inclusive)
+ * kLatencyBoundaries is a constant array that contains the 9 latency boundaries.
+ * Each value in the array represents the lower limit(inclusive)
  * of the boundary(in nano seconds) and the upper limit(exclusive) of the 
- * boundary is the 
- * lower limit of the next one.
+ * boundary is the lower limit of the next one.
  * The upper limit of the last boundary is INF.
  */
 const std::array<nanoseconds, 9> kLatencyBoundaries = {
