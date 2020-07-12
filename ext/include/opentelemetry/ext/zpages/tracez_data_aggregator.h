@@ -1,6 +1,5 @@
 #pragma once
 
-
 #include <string>
 #include <map>
 #include <unordered_set>
@@ -8,7 +7,6 @@
 #include <array>
 #include <list>
 #include <mutex>
-
 
 #include "opentelemetry/ext/zpages/tracez_processor.h"
 #include "opentelemetry/sdk/trace/span_data.h"
@@ -32,8 +30,8 @@ namespace zpages{
 const int kMaxNumberOfSampleSpans = 5;
 
 /**
- * TracezSpanData is the aggregated span information that is stored for 
- * each span name. 
+ * TracezSpanData is the span data to be displayed for tracez zpagesthat is 
+ * stored for each span name. 
  */
 struct TracezSpanData{
   
@@ -138,20 +136,21 @@ private:
    * the given span_data belongs to
    * @ param span_data is the SpanData whose duration for which the latency boundary
    * is to be found
-   * @ returns LatencyBoundary is the latency boundary that the span_data belongs to
+   * @ returns LatencyBoundary is the latency boundary that the duration belongs to
    */
   LatencyBoundary FindLatencyBoundary(SpanData* span_data);
   
   /**
    * InsertIntoSampleSpanList is a helper function that is called to insert 
    * a given span into a sample span list. A function is used for insertion
-   * because before list size is to be limited at a set maximum.
+   * because list size is to be limited at a set maximum.
    * @param sample_spans the sample span list into which span is to be inserted
    * @param span_data the span_data to be inserted into list
    */
+  template <typename T>
   void InsertIntoSampleSpanList(
-    std::list<std::unique_ptr<SpanData>>& sample_spans,
-    std::unique_ptr<SpanData> &span_data);
+      std::list<T>& sample_spans,
+      T &span_data);
     
   /** Instance of span processor used to collect raw data **/
   std::shared_ptr<TracezSpanProcessor> tracez_span_processor_;

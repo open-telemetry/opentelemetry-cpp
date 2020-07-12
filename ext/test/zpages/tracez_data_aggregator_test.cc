@@ -41,6 +41,8 @@ void VerifySpanCountsInTracezSpanData(
     int error_span_count,
     std::array<int, kLatencyBoundaries.size()> completed_span_count_per_latency_bucket)
 {
+  // Asserts are needed to check the size of the container because they may need 
+  // to be checked and if size checks fail it must be stopped
   EXPECT_EQ(aggregated_data->running_span_count, running_span_count)
       << " Count of running spans incorrect for " << span_name << "\n";
 
@@ -78,19 +80,21 @@ TEST_F(TracezDataAggregatorTest, NoSpans)
   ASSERT_EQ(data.size(), 0);
 }
 
-/** Test to check if data aggregator works as expected when there are is exactly a single running
- * span **/
+/** Test to check if data aggregator works as expected when there are 
+ * is exactly a single running span **/
 TEST_F(TracezDataAggregatorTest, SingleRunningSpan)
 {
   // Start the span get the data
   auto span_first = tracer->StartSpan(span_name1);
   const auto &data =
       tracez_data_aggregator->GetAggregatedTracezData();
-
-  // Check the size and to see if the running span count is accurate
+  
+  //Check to see if span name exists
   ASSERT_EQ(data.size(), 1);
   ASSERT_TRUE(data.find(span_name1) != data.end());
   auto &aggregated_data = data.at(span_name1);
+  
+  //Verify the data for the span name
   VerifySpanCountsInTracezSpanData(span_name1, aggregated_data, 1, 0,
                                        {0, 0, 0, 0, 0, 0, 0, 0, 0});
   ASSERT_EQ(aggregated_data->sample_running_spans.front()->GetName(), span_name1);
@@ -142,8 +146,7 @@ TEST_F(TracezDataAggregatorTest, SingleErrorSpan)
   VerifySpanCountsInTracezSpanData(span_name1, aggregated_data, 0, 1,
                                        {0, 0, 0, 0, 0, 0, 0, 0, 0});
 
-  // Check to see if error span that is introduced updates the required fields, check size before
-  // checking the span
+  // Check the value of the error span introduced
   ASSERT_EQ(aggregated_data->sample_error_spans.front()->GetName(), span_name1);
 }
 
