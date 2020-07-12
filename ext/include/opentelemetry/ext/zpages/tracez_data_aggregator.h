@@ -108,10 +108,13 @@ private:
   completed_spans);
   
   /**
-   * AggregateRunningSpans aggregates the data for running spans. This function 
-   * is stateless, it calculates running spans from scratch everytime. 
-   * A stateless approach is used because there is no straightforward way to 
-   * tell if or which span was completed since the last call to this function.
+   * AggregateRunningSpans aggregates the data for all running spans recieved
+   * from the span processor. Running spans are not cleared by the span processor
+   * and multiple calls to this function may contain running spans for which data
+   * has already been collected in a previous call. 
+   * There seems to be no trivial to way to know if it is a new or old running
+   * span so at every call to this function the available running span data is 
+   * reset and recalcuated.
    * @param running_spans is the running spans to be aggregated.
    */
   void AggregateRunningSpans(std::unordered_set<SpanData*>& running_spans);

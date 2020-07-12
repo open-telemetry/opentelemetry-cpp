@@ -69,7 +69,14 @@ void TracezDataAggregator::AggregateCompletedSpans(
       aggregated_tracez_data_[span_name] = std::unique_ptr<TracezSpanData>(new TracezSpanData);
     }
     
-    // running spans are calculated from scratch set them to 0 now and recalculate them later
+    /**
+     * Running span information is reset for every completed span, if there
+     * exists running spans with the same span name it will be recalculated in 
+     * the function call to aggregate running spans.
+     * This is done because if a running span is moved to completed span and 
+     * there exists no span names with the same name as the moved span
+     * the running span data for that span will never be reset.
+     */
     aggregated_tracez_data_[span_name]->running_span_count = 0;
     aggregated_tracez_data_[span_name]->sample_running_spans.clear();
 
@@ -90,8 +97,10 @@ void TracezDataAggregator::AggregateRunningSpans(
       aggregated_tracez_data_[span_name] = std::unique_ptr<TracezSpanData>(new TracezSpanData);
     }
 
-    // If it's the first time this span name is seen, reset its information 
-    // to avoid double counting from previous aggregated data. (described below)
+    /** 
+     * If it's the first time this span name is seen, reset its information 
+     * to avoid double counting from previous aggregated data.
+     */ 
     if (seen_span_names.find(span_name) == seen_span_names.end()){
       aggregated_tracez_data_[span_name]->running_span_count = 0;
       aggregated_tracez_data_[span_name]->sample_running_spans.clear();
@@ -111,22 +120,26 @@ void TracezDataAggregator::AggregateSpans(){
   auto span_snapshot = tracez_span_processor_->GetSpanSnapshot();
   /**
    * The following functions must be called in this particular order.
-   * Calculation of running spans is stateless and does not rely on previous 
-   * storage ie. everytime this function is called running span information
-   * for every span name is assumed to be 0.
+   * Span data for running spans is recalculated at every call to this function.
+   * This recalculation is done because unlike completed spans, the function may
+   * recieve running spans for which data has already been completed. There is seems
+   * to be no trivial way of telling which of these running spans recieved are 
+   * duplicates from a previous call and recalculation is done to avoid double 
+   * counting of the data of these spans.
    *
-   * All running span information present in the aggregated data can be set to 0
-   * before these functions are called but that would take an additional linear step.
+   * In the function call to aggregate completed span data, the running span data
+   * for all completed span names is reset.
+   * In the following function call to aggregate running spans the running span
+   * information is recalculated.
+   * If the order of this function calls are reversed then the running span data 
+   * for all completed spans will be reset and never recalculated.
    *
-   * To avoid paying this price, some work is done in aggergate completed spans 
-   * to ensure that going into aggregate running spans all the span names
-   * seen in completed spans have thier running span information reset.
+   * An alternative to this approach would be to go through the entire aggregation
+   * and reset all running span data before calls to these function but using the 
+   * above mentioned approach(which is essentially the same) the extra linear 
+   * step is avoided.
    *
-   * This is possible to do because if running spans with the same name exists it will be
-   * aggregated in the AggregateRunningSpans function call that follows. Additionally if it's the
-   * first time we are seeing a running span in AggregateRunningSpans, we set it to 0 to avoid double
-   * counting the running span if it already existed in the aggregation from the previous call to
-   * this function. See tests AdditionToRunningSpans and RemovalOfRunningSpanWhenCompleted to see an
+   * See tests AdditionToRunningSpans and RemovalOfRunningSpanWhenCompleted to see an
    * example of where this is used.
    **/
   AggregateCompletedSpans(span_snapshot.completed);
