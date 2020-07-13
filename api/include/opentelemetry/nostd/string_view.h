@@ -1,6 +1,7 @@
 #pragma once
 
 #include <algorithm>
+#include <cstddef>
 #include <cstring>
 #include <ostream>
 #include <stdexcept>
@@ -11,6 +12,9 @@
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace nostd
 {
+
+using Traits = std::char_traits<char>;
+
 /**
  * Back port of std::string_view to work with pre-cpp-17 compilers.
  *
@@ -20,7 +24,9 @@ namespace nostd
 class string_view
 {
 public:
-  static constexpr std::size_t npos = static_cast<std::size_t>(-1);
+  typedef std::size_t size_type;
+
+  static constexpr size_type npos = static_cast<size_type>(-1);
 
   string_view() noexcept : length_(0), data_(nullptr) {}
 
@@ -30,7 +36,7 @@ public:
       : length_(str.length()), data_(str.c_str())
   {}
 
-  string_view(const char *str, size_t len) noexcept : length_(len), data_(str) {}
+  string_view(const char *str, size_type len) noexcept : length_(len), data_(str) {}
 
   explicit operator std::string() const { return {data_, length_}; }
 
@@ -38,17 +44,17 @@ public:
 
   bool empty() const noexcept { return length_ == 0; }
 
-  size_t length() const noexcept { return length_; }
+  size_type length() const noexcept { return length_; }
 
-  size_t size() const noexcept { return length_; }
+  size_type size() const noexcept { return length_; }
 
   const char *begin() const noexcept { return data(); }
 
   const char *end() const noexcept { return data() + length(); }
 
-  const char &operator[](std::size_t i) { return *(data() + i); }
+  const char &operator[](size_type i) { return *(data() + i); }
 
-  string_view substr(std::size_t pos, std::size_t n = npos) const
+  string_view substr(size_type pos, size_type n = npos) const
   {
     if (pos > length_)
     {
@@ -62,11 +68,55 @@ public:
     return string_view(data_ + pos, n);
   }
 
+  int compare(string_view v) const noexcept
+  {
+    size_type len = std::min(size(), v.size());
+    int result = Traits::compare(data(), v.data(), len);
+    if (result == 0)
+      result = size() == v.size() ? 0 : (size() < v.size() ? -1 : 1);
+    return result;
+  };
+
+  int compare(size_type pos1, size_type count1, string_view v) const
+  {
+    return substr(pos1, count1).compare(v);
+  };
+
+  int compare(size_type pos1, size_type count1, string_view v, size_type pos2, size_type count2) const
+  {
+    return substr(pos1, count1).compare(v.substr(pos2, count2));
+  };
+
+  int compare(const char *s) const
+  {
+    return compare(string_view(s));
+  };
+
+  int compare(size_type pos1, size_type count1, const char *s) const
+  {
+    return substr(pos1, count1).compare(string_view(s));
+  };
+
+  int compare(size_type pos1, size_type count1, const char *s, size_type count2) const
+  {
+    return substr(pos1, count1).compare(string_view(s, count2));
+  };
+
+  bool operator<(const string_view v) const noexcept
+  {
+    return compare(v) < 0;
+  }
+
+  bool operator>(const string_view v) const noexcept
+  {
+    return compare(v) > 0;
+  }
+
 private:
   // Note: uses the same binary layout as libstdc++'s std::string_view
   // See
   // https://github.com/gcc-mirror/gcc/blob/e0c554e4da7310df83bb1dcc7b8e6c4c9c5a2a4f/libstdc%2B%2B-v3/include/std/string_view#L466-L467
-  size_t length_;
+  size_type length_;
   const char *data_;
 };
 

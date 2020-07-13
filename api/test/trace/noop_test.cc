@@ -25,4 +25,6 @@ TEST(NoopTest, UseNoopTracers)
 
   std::vector<std::pair<std::string, std::vector<int>>> attributes3;
   s1->AddEvent("abc", attributes3);
+
+  s1->SetAttribute("abc", 4);
 }

@@ -14,6 +14,8 @@
 
 package(default_visibility = ["//visibility:public"])
 
+load("//bazel:otel_cc_benchmark.bzl", "otel_cc_benchmark")
+
 cc_library(
     name = "recordable",
     srcs = [
@@ -26,5 +28,50 @@ cc_library(
     deps = [
         "//sdk/src/trace",
         "@com_github_opentelemetry_proto//:trace_proto_cc",
+    ],
+)
+
+cc_library(
+    name = "otlp_exporter",
+    srcs = [
+        'otlp_exporter.cc',
+    ],
+    hdrs = [
+        'otlp_exporter.h',
+    ],
+    deps = [
+        ":recordable",
+        "//sdk/src/trace",
+
+        # For gRPC
+        "@com_github_opentelemetry_proto//:trace_service_grpc_cc",
+        "@com_github_grpc_grpc//:grpc++",
+    ],
+)
+
+cc_test(
+    name = "recordable_test",
+    srcs = ["recordable_test.cc"],
+    deps = [
+        ":recordable",
+        "@com_google_googletest//:gtest_main",
+    ],
+)
+
+cc_test(
+ name = "otlp_exporter_test",
+    srcs = ["otlp_exporter_test.cc"],
+    deps = [
+        ":otlp_exporter",
+        "//api",
+        "@com_google_googletest//:gtest_main",
+    ],
+)
+
+otel_cc_benchmark(
+    name = "otlp_exporter_benchmark",
+    srcs = ["otlp_exporter_benchmark.cc"],
+    deps = [
+        ":otlp_exporter",
     ],
 )
