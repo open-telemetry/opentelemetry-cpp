@@ -68,34 +68,25 @@ class TracezSpanProcessor : public opentelemetry::sdk::trace::SpanProcessor {
   CollectedSpans GetSpanSnapshot() noexcept;
 
   /*
-   * For now, does nothing but sleep for the specified time. In the future, it
+   * For now, does nothing. In the future, it
    * may send all ended spans that have not yet been sent to the aggregator.
    * @param timeout an optional timeout, the default timeout of 0 means that no
-   * timeout is applied.
+   * timeout is applied. Currently, timeout does nothing.
    */
   void ForceFlush(
-      std::chrono::microseconds timeout = std::chrono::microseconds(0)) noexcept override
-  {
-    if (shutdown_signal_received_) return;
-    std::this_thread::sleep_for(timeout);
-  }
+      std::chrono::microseconds timeout = std::chrono::microseconds(0)) noexcept override {}
 
   /*
-   * Shut down the processor and do any cleanup required through ForceFlush.
+   * Shut down the processor and do any cleanup required, which is none.
    * After the call to Shutdown, subsequent calls to OnStart, OnEnd, ForceFlush
    * or Shutdown will return immediately without doing anything.
    * @param timeout an optional timeout, the default timeout of 0 means that no
-   * timeout is applied.
+   * timeout is applied. Currently, timeout does nothing.
    */
-  void Shutdown(std::chrono::microseconds timeout = std::chrono::microseconds(0)) noexcept override
-  {
-    ForceFlush(timeout);
-    shutdown_signal_received_ = true;
-  }
+  void Shutdown(std::chrono::microseconds timeout = std::chrono::microseconds(0)) noexcept override {}
 
  private:
   CollectedSpans spans_;
-  bool shutdown_signal_received_ = false;
 };
 }  // namespace zpages
 }  // namespace ext

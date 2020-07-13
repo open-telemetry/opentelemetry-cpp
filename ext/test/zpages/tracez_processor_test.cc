@@ -9,23 +9,7 @@
 using namespace opentelemetry::sdk::trace;
 using namespace opentelemetry::ext::zpages;
 
-//////////////////////////////////// TEST HELPER FUNCTIONS ///////////////////
-
-/*
- * Returns whether the times given are nearly the same
- */
-bool AreAlmostEqual(std::chrono::microseconds t1, std::chrono::microseconds t2) {
-  return t1 - t2 <= std::chrono::microseconds(0);
-}
-
-/*
- * Returns current time + timeout in microseconds
- */
-std::chrono::microseconds GetTime(std::chrono::microseconds timeout = std::chrono::microseconds(0)) {
-  auto duration = std::chrono::system_clock::now().time_since_epoch();
-  return std::chrono::duration_cast<std::chrono::microseconds>(duration) + timeout;
-}
-
+//////////////////////////////////// TEST HELPER FUNCTIONS //////////////////////////////
 
 /*
  * Helper function uses the current processor to update spans contained in completed_spans
@@ -54,7 +38,8 @@ void UpdateSpans(std::shared_ptr<TracezSpanProcessor>& processor,
  *
  * If no start value is given, start at index 0
  * If no end value is given, end at name vector end
- * If 1-1 correspondance marked, return true if completed has all names in same frequency, no more or less
+ * If 1-1 correspondance marked, return true if completed has all names in same frequency,
+ * no more or less
  */
 bool ContainsNames(const std::vector<std::string>& names,
     std::unordered_set<opentelemetry::sdk::trace::SpanData*>& running,
@@ -93,7 +78,8 @@ bool ContainsNames(const std::vector<std::string>& names,
  *
  * If no start value is given, start at index 0
  * If no end value is given, end at name vector end
- * If 1-1 correspondance marked, return true if completed has all names in same frequency, no more or less
+ * If 1-1 correspondance marked, return true if completed has all names in same frequency,
+ * no more or less
  */
 bool ContainsNames(const std::vector<std::string>& names,
     std::vector<std::unique_ptr<opentelemetry::sdk::trace::SpanData>>& completed,
@@ -124,7 +110,7 @@ bool ContainsNames(const std::vector<std::string>& names,
   return true;
 }
 
-///////////////////////////////////////// TESTS //////////////////////////
+///////////////////////////////////////// TESTS ///////////////////////////////////
 
 /*
  * Test if both span containers are empty when no spans exist or are added.
@@ -468,81 +454,4 @@ TEST(TracezSpanProcessor, MultipleSpansOuterSplitNewOnly) {
 // TODO: add tests for checking if spans are accurate when getting snapshots,
 // like when a span completes mid getter call later on using threads
 
-/*
- * Test if flush sleeps for approximately the correct duration when none is set.
-*/
-TEST(TracezSpanProcessor, ForceFlushNoSleep) {
-  std::shared_ptr<TracezSpanProcessor> processor(new TracezSpanProcessor());
-  auto goal_time = GetTime();
-  processor->ForceFlush();
-
-  EXPECT_TRUE(AreAlmostEqual(goal_time, GetTime()));
-}
-
-
-/*
- * Test if flush sleeps for approximately the correct duration when short
- * duration is set.
-*/
-TEST(TracezSpanProcessor, ForceFlushSleep) {
-  std::shared_ptr<TracezSpanProcessor> processor(new TracezSpanProcessor());
-  auto sleep_amount = std::chrono::microseconds(100);
-  auto goal_time = GetTime(sleep_amount);
-  processor->ForceFlush(sleep_amount);
-
-  EXPECT_TRUE(AreAlmostEqual(goal_time, GetTime()));
-}
-
-
-/*
- * Test if shutdown works with no duration set
-*/
-TEST(TracezSpanProcessor, ShutdownNoSleep) {
-  std::shared_ptr<TracezSpanProcessor> processor(new TracezSpanProcessor());
-  auto tracer = std::shared_ptr<opentelemetry::trace::Tracer>(new Tracer(processor));
-  auto spans = processor->GetSpanSnapshot();
-  auto running = spans.running;
-  auto completed = std::move(spans.completed);
-
-  // Shutdown
-  auto goal_time = GetTime();
-  processor->Shutdown();
-
-  // Nothing should happen, functions return immediately
-  auto span = tracer->StartSpan("span");
-  span->End();
-  processor->ForceFlush();
-
-  UpdateSpans(processor, completed, running);
-  EXPECT_EQ(running.size(), 0);
-  EXPECT_EQ(completed.size(), 0);
-
-  EXPECT_TRUE(AreAlmostEqual(goal_time, GetTime()));
-}
-
-
-/*
- * Test if shutdown works with short duration set
-*/
-TEST(TracezSpanProcessor, ShutdownSleep) {
-  std::shared_ptr<TracezSpanProcessor> processor(new TracezSpanProcessor());
-  auto tracer = std::shared_ptr<opentelemetry::trace::Tracer>(new Tracer(processor));
-  auto spans = processor->GetSpanSnapshot();
-  auto running = spans.running;
-  auto completed = std::move(spans.completed);
-
-  auto sleep_amount = std::chrono::microseconds(100);
-  auto goal_time = GetTime(sleep_amount);
-  processor->Shutdown(sleep_amount);
-
-  auto span = tracer->StartSpan("span");
-  span->End();
-  processor->ForceFlush(sleep_amount);
-
-  UpdateSpans(processor, completed, running);
-  EXPECT_EQ(running.size(), 0);
-  EXPECT_EQ(completed.size(), 0);
-
-  EXPECT_TRUE(AreAlmostEqual(goal_time, GetTime()));
-}
 
