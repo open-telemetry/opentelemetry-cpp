@@ -8,6 +8,7 @@
 using opentelemetry::sdk::common::Random;
 using opentelemetry::sdk::trace::Decision;
 using opentelemetry::sdk::trace::ProbabilitySampler;
+using opentelemetry::trace::SpanContext;
 
 namespace
 {
@@ -23,7 +24,7 @@ namespace
  * generate a random trace_id and check if it should sample using the provided
  * provider and context
  */
-int RunShouldSampleCountDecision(opentelemetry::sdk::trace::Sampler::SpanContext &context,
+int RunShouldSampleCountDecision(SpanContext &context,
                                  ProbabilitySampler &sampler,
                                  int iterations)
 {
@@ -106,10 +107,10 @@ TEST(ProbabilitySampler, ShouldSampleWithContext)
 {
   opentelemetry::trace::TraceId trace_id;
   opentelemetry::trace::SpanKind span_kind = opentelemetry::trace::SpanKind::kInternal;
-  opentelemetry::sdk::trace::Sampler::SpanContext c1(false, false);
-  opentelemetry::sdk::trace::Sampler::SpanContext c2(true, false);
-  opentelemetry::sdk::trace::Sampler::SpanContext c3(false, true);
-  opentelemetry::sdk::trace::Sampler::SpanContext c4(true, true);
+  SpanContext c1(false, false);
+  SpanContext c2(true, false);
+  SpanContext c3(false, true);
+  SpanContext c4(true, true);
 
   using M = std::map<std::string, int>;
   M m1    = {{}};
@@ -143,7 +144,7 @@ TEST(ProbabilitySampler, ProbabilitySamplerHalf)
   double probability = 0.5;
   int iterations = 100000, expected_count = iterations * probability, variance = iterations * 0.01;
 
-  opentelemetry::sdk::trace::Sampler::SpanContext c(true, true);
+  SpanContext c(true, true);
   ProbabilitySampler s(probability);
 
   int actual_count = RunShouldSampleCountDecision(c, s, iterations);
@@ -157,7 +158,7 @@ TEST(ProbabilitySampler, ProbabilitySamplerOnePercent)
   double probability = 0.01;
   int iterations = 100000, expected_count = iterations * probability, variance = iterations * 0.01;
 
-  opentelemetry::sdk::trace::Sampler::SpanContext c(true, true);
+  SpanContext c(true, true);
   ProbabilitySampler s(probability);
 
   int actual_count = RunShouldSampleCountDecision(c, s, iterations);
@@ -171,7 +172,7 @@ TEST(ProbabilitySampler, ProbabilitySamplerAll)
   double probability = 1.0;
   int iterations = 100000, expected_count = iterations * probability;
 
-  opentelemetry::sdk::trace::Sampler::SpanContext c(true, true);
+  SpanContext c(true, true);
   ProbabilitySampler s(probability);
 
   int actual_count = RunShouldSampleCountDecision(c, s, iterations);
@@ -184,7 +185,7 @@ TEST(ProbabilitySampler, ProbabilitySamplerNone)
   double probability = 0.0;
   int iterations = 100000, expected_count = iterations * probability;
 
-  opentelemetry::sdk::trace::Sampler::SpanContext c(true, true);
+  SpanContext c(true, true);
   ProbabilitySampler s(probability);
 
   int actual_count = RunShouldSampleCountDecision(c, s, iterations);
