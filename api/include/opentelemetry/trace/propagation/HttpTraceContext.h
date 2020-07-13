@@ -17,16 +17,11 @@ namespace propagation
 namespace
 {
 
+static nostd::string_view span_key = "current-span";
+
 static Context SetSpanInContext(Span &span, Context &context) {
     Context new_values = Context(context);
-    // I don't know if the SPAN_KEY is defined in the context.h.
-    // My point is that since each key when it is created is unique in terms of its id even though they may have the same name,
-    // it would make sense to define those keys in a single file only and had to be referenced by other files to store and retrieve values,
-    // otherwise I will not be able to access any fields, for example, "current-span" as CreateKey("current-span") will
-    // not work because the id is different when the value is put into despite the Key is also created from
-    // CreateKey("current-span").
-    // Don't know if I get the correct understanding there.
-    new_values.setValue(Context.SPAN_KEY,span);
+    new_values.SetValue(span_key,span);
     return new_values;
 }
 
@@ -68,21 +63,20 @@ class HttpTraceContext : public HTTPTextFormat
     private:
         static const nostd::string_view kTraceParent = "traceparent";
         static const nostd::string_view kTraceState = "tracestate";
-        static const int kVersionBytes = 2;
-        static const int kTraceIdBytes = 32;
-        static const int kParentIdBytes = 16;
-        static const int kTraceFlagBytes = 2;
-        static const int kTraceDelimiterBytes = 3;
-        static const int kHeaderSize = kVersionBytes + kTraceIdBytes + kParentIdBytes + kTraceFlagBytes + kTraceDelimiterBytes;
+// Parameters no longer needed because the toString functions are resolved else where
+//        static const int kVersionBytes = 2;
+//        static const int kTraceIdBytes = 32;
+//        static const int kParentIdBytes = 16;
+//        static const int kTraceFlagBytes = 2;
+//        static const int kTraceDelimiterBytes = 3;
+//        static const int kHeaderSize = kVersionBytes + kTraceIdBytes + kParentIdBytes + kTraceFlagBytes + kTraceDelimiterBytes;
         static const int kTraceStateMaxMembers = 32;
         static const nostd::string_view kTraceStateKeyValueDelimiter = "=";
         static const int kHeaderElementLengths[4] = {2,32,16,2};
 
         // TODO: need review on hex_string because trace ids are objects not string_views
         static void InjectImpl(Setter setter, T &carrier, const SpanContext &span_context) {
-            char hex_string[kHeaderSize];
-            sprintf(hex_string, "00-%032x-%016x-%02x",span_context.GetTraceId(),span_context.GetSpanId(),span_context.GetTraceFlags());
-            nostd::string_view trace_parent = nostd::string_view(hex_string, kHeaderSize);
+            nostd::string_view trace_parent = SpanContextToString(SpanContext &span_context);
             setter(carrier, kTraceParent, trace_parent);
             if (span_context.GetTraceState() != NULL) {
                 nostd::string_view trace_state = FormatTracestate(span_context.GetTraceState()); // I need the definition for the type of TraceState(Dictionary or something else). The trace state data structure will determine how I will able to join this together.
@@ -99,6 +93,24 @@ class HttpTraceContext : public HTTPTextFormat
                 if (i != entries.size()-1) res += ",";
             });
             return res;
+        }
+
+        static nostd::string SpanContextToString(SpanContext &span_context) {
+            nostd::span<char,TraceId.kSize*2> trace_id = span_context.GetTraceId();
+            nostd::span<char,SpanId.kSize*2> span_id = span_context.GetSpanId();
+            nostd::span<char,2> trace_flags = span_context.GetTraceFlags();
+            nostd::string_view hex_string = "00-";
+            for (nostd::span<char,TraceId.kSize*2>::iterator it = trace_id.begin(); it != trace_id.end(); it++) {
+                hex_string += nostd::string_view(it,1);
+            }
+            hex_string += "-";
+            for (nostd::span<char,SpanId.kSize*2>::iterator it = span_id.begin(); it != span_id.end(); it++) {
+                hex_string += nostd::string_view(it,1);
+            }
+            hex_string += "-";
+            for (nostd::span<char,2>::iterator it = trace_flags.begin(); it != trace_flags.end(); it++) {
+                hex_string += nostd::string_view(it,1);
+            }
         }
 
         static SpanContext ExtractContextFromTraceParent(nostd::string_view &trace_parent) {
