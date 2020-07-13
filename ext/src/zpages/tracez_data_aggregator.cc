@@ -11,9 +11,9 @@ TracezDataAggregator::TracezDataAggregator(
 
 const std::map<std::string, std::unique_ptr<TracezSpanData>>
     &TracezDataAggregator::GetAggregatedTracezData(){
+  
   //Aggregate span data before returning the new information. 
   //The aggregation could also be periodically updated as an alternative
-  
   std::lock_guard<std::mutex> lock_guard{mu_};
   AggregateSpans();
   return aggregated_tracez_data_;
@@ -23,8 +23,7 @@ LatencyBoundary TracezDataAggregator::FindLatencyBoundary(SpanData *span_data){
   auto span_data_duration = span_data->GetDuration();
   for (auto boundary = LatencyBoundary::k0MicroTo10Micro;
        boundary != LatencyBoundary::k100SecondToMax; ++boundary){
-    if (span_data_duration < kLatencyBoundaries[boundary + 1])
-      return boundary;
+    if (span_data_duration < kLatencyBoundaries[boundary + 1]) return boundary;
   }
   return LatencyBoundary::k100SecondToMax;
 }
@@ -66,7 +65,8 @@ void TracezDataAggregator::AggregateCompletedSpans(
     std::string span_name = span->GetName().data();
     
     if (aggregated_tracez_data_.find(span_name) == aggregated_tracez_data_.end()){
-      aggregated_tracez_data_[span_name] = std::unique_ptr<TracezSpanData>(new TracezSpanData);
+      aggregated_tracez_data_[span_name] =
+      std::unique_ptr<TracezSpanData>(new TracezSpanData);
     }
     
     /**
@@ -94,7 +94,8 @@ void TracezDataAggregator::AggregateRunningSpans(
     std::string span_name = span->GetName().data();
 
     if (aggregated_tracez_data_.find(span_name) == aggregated_tracez_data_.end()){
-      aggregated_tracez_data_[span_name] = std::unique_ptr<TracezSpanData>(new TracezSpanData);
+      aggregated_tracez_data_[span_name] = 
+      std::unique_ptr<TracezSpanData>(new TracezSpanData);
     }
 
     /** 
@@ -108,7 +109,8 @@ void TracezDataAggregator::AggregateRunningSpans(
     }
 
     // Maintain maximum size of sample running spans list
-    if (aggregated_tracez_data_[span_name]->sample_running_spans.size() == kMaxNumberOfSampleSpans){
+    if (aggregated_tracez_data_[span_name]->sample_running_spans.size() 
+        == kMaxNumberOfSampleSpans){
       aggregated_tracez_data_[span_name]->sample_running_spans.pop_front();
     }
     aggregated_tracez_data_[span_name]->sample_running_spans.push_back(span);
@@ -122,7 +124,7 @@ void TracezDataAggregator::AggregateSpans(){
    * The following functions must be called in this particular order.
    * Span data for running spans is recalculated at every call to this function.
    * This recalculation is done because unlike completed spans, the function may
-   * recieve running spans for which data has already been completed. There is seems
+   * recieve running spans for which data has already been collected. There seems
    * to be no trivial way of telling which of these running spans recieved are 
    * duplicates from a previous call and recalculation is done to avoid double 
    * counting of the data of these spans.
@@ -139,8 +141,8 @@ void TracezDataAggregator::AggregateSpans(){
    * above mentioned approach(which is essentially the same) the extra linear 
    * step is avoided.
    *
-   * See tests AdditionToRunningSpans and RemovalOfRunningSpanWhenCompleted to see an
-   * example of where this is used.
+   * See tests AdditionToRunningSpans and RemovalOfRunningSpanWhenCompleted to 
+   * see an example of where this is used.
    **/
   AggregateCompletedSpans(span_snapshot.completed);
   AggregateRunningSpans(span_snapshot.running);

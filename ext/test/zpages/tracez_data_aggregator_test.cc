@@ -16,6 +16,7 @@ const std::string span_name1 = "span 1";
 const std::string span_name2 = "span 2";
 const std::string span_name3 = "span 3";
 
+/** Test fixture for setting up the data aggregator and tracer for each test **/
 class TracezDataAggregatorTest : public ::testing::Test
 {
 protected:
@@ -59,19 +60,21 @@ void VerifySpanCountsInTracezSpanData(
       << " Count of running spans incorrect for " << span_name << "\n";
 
   for (auto boundary = LatencyBoundary::k0MicroTo10Micro;
-       boundary != LatencyBoundary::k100SecondToMax; ++boundary)
-  {
+       boundary != LatencyBoundary::k100SecondToMax; ++boundary){
     EXPECT_EQ(aggregated_data->completed_span_count_per_latency_bucket[boundary],
               completed_span_count_per_latency_bucket[boundary])
         << " Count of completed spans in latency boundary " << boundary 
         << " incorrect for " << span_name << "\n";
     ASSERT_EQ((int)aggregated_data->sample_latency_spans[boundary].size(),
-              std::min((int)completed_span_count_per_latency_bucket[boundary], kMaxNumberOfSampleSpans))
+              std::min((int)completed_span_count_per_latency_bucket[boundary], 
+              kMaxNumberOfSampleSpans))
         << " Count of sample completed spans in latency boundary " << boundary 
         << " incorrect for " << span_name << "\n";
     ;
   }
 }
+
+/**************************** No Span Test ************************************/ 
 
 /** Test to check if data aggregator works as expected when there are no spans **/
 TEST_F(TracezDataAggregatorTest, NoSpans)
@@ -80,6 +83,8 @@ TEST_F(TracezDataAggregatorTest, NoSpans)
       tracez_data_aggregator->GetAggregatedTracezData();
   ASSERT_EQ(data.size(), 0);
 }
+
+/*********************** Single span tests ************************************/ 
 
 /** Test to check if data aggregator works as expected when there are 
  * is exactly a single running span **/
@@ -101,7 +106,8 @@ TEST_F(TracezDataAggregatorTest, SingleRunningSpan)
   ASSERT_EQ(aggregated_data->sample_running_spans.front()->GetName(), span_name1);
 }
 
-/** Test to check if data aggregator works as expected when there is exactly one completed span **/
+/** Test to check if data aggregator works as expected when there is exactly one
+ * completed span **/
 TEST_F(TracezDataAggregatorTest, SingleCompletedSpan)
 {
   // Start and end the span at a specified times
@@ -129,7 +135,8 @@ TEST_F(TracezDataAggregatorTest, SingleCompletedSpan)
             nanoseconds(30));
 }
 
-/** Test to check if data aggregator works as expected when there is exactly one error span **/
+/** Test to check if data aggregator works as expected when there is exactly 
+ * one error span **/
 TEST_F(TracezDataAggregatorTest, SingleErrorSpan)
 {
   // Start and end a single error span
@@ -150,6 +157,8 @@ TEST_F(TracezDataAggregatorTest, SingleErrorSpan)
   // Check the value of the error span introduced
   ASSERT_EQ(aggregated_data->sample_error_spans.front()->GetName(), span_name1);
 }
+
+/************************* Multiple span tests ********************************/ 
 
 /** Test to check if multiple running spans behaves as expected**/
 TEST_F(TracezDataAggregatorTest, MultipleRunningSpans)
@@ -310,72 +319,7 @@ TEST_F(TracezDataAggregatorTest, MultipleErrorSpans)
   }
 }
 
-/** This test checks to see that there is no double counting of running spans when get aggregated
- * data is called twice**/
-TEST_F(TracezDataAggregatorTest, AdditionToRunningSpans)
-{
-  // Start a span and check the data
-  auto span_first = tracer->StartSpan(span_name1);
-  const auto  &temp_data =
-      tracez_data_aggregator->GetAggregatedTracezData();
-  ASSERT_EQ(temp_data.size(), 1);
-  ASSERT_TRUE(temp_data.find(span_name1) != temp_data.end());
-  VerifySpanCountsInTracezSpanData(span_name1, temp_data.at(span_name1), 1, 0,
-                                       {0, 0, 0, 0, 0, 0, 0, 0, 0});
-
-  // Start another span and check to see if there is no double counting of spans
-  auto span_second = tracer->StartSpan(span_name1);
-  const auto  &data =
-      tracez_data_aggregator->GetAggregatedTracezData();
-
-  ASSERT_EQ(data.size(), 1);
-  ASSERT_TRUE(data.find(span_name1) != data.end());
-  auto &aggregated_data = data.at(span_name1);
-  VerifySpanCountsInTracezSpanData(span_name1, aggregated_data, 2, 0,
-                                       {0, 0, 0, 0, 0, 0, 0, 0, 0});
-
-  for (auto &sample_span : aggregated_data->sample_running_spans)
-  {
-    ASSERT_EQ(sample_span->GetName(), span_name1);
-  }
-}
-
-/** This test checks to see that once a running span is completed it the aggregated data is updated
- * correctly **/
-TEST_F(TracezDataAggregatorTest, RemovalOfRunningSpanWhenCompleted)
-{
-  opentelemetry::trace::StartSpanOptions start;
-  start.start_steady_time = SteadyTimestamp(nanoseconds(10));
-  opentelemetry::trace::EndSpanOptions end;
-  end.end_steady_time = SteadyTimestamp(nanoseconds(40));
-
-  // Start a span and make sure data is updated
-  auto span_first = tracer->StartSpan(span_name1, start);
-  const auto  &temp_data =
-      tracez_data_aggregator->GetAggregatedTracezData();
-  ASSERT_EQ(temp_data.size(), 1);
-  ASSERT_TRUE(temp_data.find(span_name1) != temp_data.end());
-  VerifySpanCountsInTracezSpanData(span_name1, temp_data.at(span_name1), 1, 0,
-                                       {0, 0, 0, 0, 0, 0, 0, 0, 0});
-  ASSERT_EQ(temp_data.at(span_name1)->sample_running_spans.front()->GetName(), span_name1);
-  // End the span and make sure running span is removed and completed span is updated, there should
-  // be only one completed span
-  span_first->End(end);
-  ASSERT_EQ(temp_data.at(span_name1)->sample_running_spans.front()->GetName(), span_name1);
-  const auto  &data =
-      tracez_data_aggregator->GetAggregatedTracezData();
-  ASSERT_EQ(data.size(), 1);
-  ASSERT_TRUE(data.find(span_name1) != data.end());
-
-  // Check if completed span fields are correctly updated
-  auto &aggregated_data = data.at(span_name1);
-  VerifySpanCountsInTracezSpanData(span_name1, aggregated_data, 0, 0,
-                                       {1, 0, 0, 0, 0, 0, 0, 0, 0});
-  ASSERT_EQ(aggregated_data->sample_latency_spans[LatencyBoundary::k0MicroTo10Micro]
-                .front()
-                ->GetDuration(),
-            nanoseconds(30));
-}
+/******************** Sample spans over capacity tests ************************/ 
 
 /**
  * This test checks to see that the maximum number of running samples(5) for a bucket is not
@@ -512,6 +456,76 @@ TEST_F(TracezDataAggregatorTest, SpanNameInAlphabeticalOrder)
   }
 }
 
+/** This test checks to see that there is no double counting of running spans when get aggregated
+ * data is called twice**/
+TEST_F(TracezDataAggregatorTest, AdditionToRunningSpans)
+{
+  // Start a span and check the data
+  auto span_first = tracer->StartSpan(span_name1);
+  const auto  &temp_data =
+      tracez_data_aggregator->GetAggregatedTracezData();
+  ASSERT_EQ(temp_data.size(), 1);
+  ASSERT_TRUE(temp_data.find(span_name1) != temp_data.end());
+  VerifySpanCountsInTracezSpanData(span_name1, temp_data.at(span_name1), 1, 0,
+                                       {0, 0, 0, 0, 0, 0, 0, 0, 0});
+
+  // Start another span and check to see if there is no double counting of spans
+  auto span_second = tracer->StartSpan(span_name1);
+  const auto  &data =
+      tracez_data_aggregator->GetAggregatedTracezData();
+
+  ASSERT_EQ(data.size(), 1);
+  ASSERT_TRUE(data.find(span_name1) != data.end());
+  auto &aggregated_data = data.at(span_name1);
+  VerifySpanCountsInTracezSpanData(span_name1, aggregated_data, 2, 0,
+                                       {0, 0, 0, 0, 0, 0, 0, 0, 0});
+
+  for (auto &sample_span : aggregated_data->sample_running_spans)
+  {
+    ASSERT_EQ(sample_span->GetName(), span_name1);
+  }
+}
+
+/************************* Miscellaneous tests ********************************/ 
+
+/** This test checks to see that once a running span is completed it the aggregated data is updated
+ * correctly **/
+TEST_F(TracezDataAggregatorTest, RemovalOfRunningSpanWhenCompleted)
+{
+  opentelemetry::trace::StartSpanOptions start;
+  start.start_steady_time = SteadyTimestamp(nanoseconds(10));
+  opentelemetry::trace::EndSpanOptions end;
+  end.end_steady_time = SteadyTimestamp(nanoseconds(40));
+
+  // Start a span and make sure data is updated
+  auto span_first = tracer->StartSpan(span_name1, start);
+  const auto  &temp_data =
+      tracez_data_aggregator->GetAggregatedTracezData();
+  ASSERT_EQ(temp_data.size(), 1);
+  ASSERT_TRUE(temp_data.find(span_name1) != temp_data.end());
+  VerifySpanCountsInTracezSpanData(span_name1, temp_data.at(span_name1), 1, 0,
+                                       {0, 0, 0, 0, 0, 0, 0, 0, 0});
+  ASSERT_EQ(temp_data.at(span_name1)->sample_running_spans.front()->GetName(), span_name1);
+  // End the span and make sure running span is removed and completed span is updated, there should
+  // be only one completed span
+  span_first->End(end);
+  ASSERT_EQ(temp_data.at(span_name1)->sample_running_spans.front()->GetName(), span_name1);
+  const auto  &data =
+      tracez_data_aggregator->GetAggregatedTracezData();
+  ASSERT_EQ(data.size(), 1);
+  ASSERT_TRUE(data.find(span_name1) != data.end());
+
+  // Check if completed span fields are correctly updated
+  auto &aggregated_data = data.at(span_name1);
+  VerifySpanCountsInTracezSpanData(span_name1, aggregated_data, 0, 0,
+                                       {1, 0, 0, 0, 0, 0, 0, 0, 0});
+  ASSERT_EQ(aggregated_data->sample_latency_spans[LatencyBoundary::k0MicroTo10Micro]
+                .front()
+                ->GetDuration(),
+            nanoseconds(30));
+}
+
+
 /** Test to check if the span latencies with duration at the edge of boundaries fall in the correct
  * bucket **/
 TEST_F(TracezDataAggregatorTest, EdgeSpanLatenciesFallInCorrectBoundaries)
@@ -549,8 +563,8 @@ TEST_F(TracezDataAggregatorTest, EdgeSpanLatenciesFallInCorrectBoundaries)
   }
 }
 
-/** This test makes sure that the data is consistent when there are multiple calls to the data
- * aggegator with no change in data **/
+/** This test makes sure that the data is consistent when there are multiple calls 
+ * to the data aggegator with no change in data **/
 TEST_F(TracezDataAggregatorTest, NoChangeInBetweenCallsToAggregator)
 {
   opentelemetry::trace::StartSpanOptions start;
