@@ -30,7 +30,7 @@ namespace zpages{
 const int kMaxNumberOfSampleSpans = 5;
 
 /**
- * TracezSpanData is the span data to be displayed for tracez zpagesthat is 
+ * TracezSpanData is the span data to be displayed for tracez zpages that is 
  * stored for each span name. 
  */
 struct TracezSpanData{

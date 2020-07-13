@@ -32,7 +32,8 @@ protected:
 };
 
 /**
- * Helper function to check if the counts of running, error and latency spans match what is expected
+ * Helper function to check if the counts of running, error and latency spans 
+ * match what is expected
  */
 void VerifySpanCountsInTracezSpanData(
     const std::string &span_name,
@@ -62,12 +63,12 @@ void VerifySpanCountsInTracezSpanData(
   {
     EXPECT_EQ(aggregated_data->completed_span_count_per_latency_bucket[boundary],
               completed_span_count_per_latency_bucket[boundary])
-        << " Count of completed spans in latency boundary " << boundary << " incorrect for "
-        << span_name << "\n";
+        << " Count of completed spans in latency boundary " << boundary 
+        << " incorrect for " << span_name << "\n";
     ASSERT_EQ((int)aggregated_data->sample_latency_spans[boundary].size(),
               std::min((int)completed_span_count_per_latency_bucket[boundary], kMaxNumberOfSampleSpans))
-        << " Count of sample completed spans in latency boundary " << boundary << " incorrect for "
-        << span_name << "\n";
+        << " Count of sample completed spans in latency boundary " << boundary 
+        << " incorrect for " << span_name << "\n";
     ;
   }
 }
