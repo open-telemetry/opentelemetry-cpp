@@ -105,6 +105,7 @@ private:
   static void print_array(std::stringstream &ss, common::AttributeValue &value, bool jsonTypes = false)
   {
     ss << '[';
+    // TODO: jsonTypes for bool?
     // TODO: do we need to escape string value for JSON?
     auto s    = nostd::get<nostd::span<const T>>(value);
     size_t i  = 1;

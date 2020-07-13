@@ -98,6 +98,13 @@ TEST(StdoutSpanExporter, PrintChangedSpan)
   recordable->SetAttribute("attr2", false);
   recordable->SetAttribute("attr3", "string");
 
+  std::array<int, 3> array1 = {1, 2, 3};
+  opentelemetry::nostd::span<int> span1{array1.data(), array1.size()};  
+  recordable->SetAttribute("attr4", span1);
+
+  std::array<bool, 3> array2 = {false, true, false};
+  opentelemetry::nostd::span<bool> span2{array2.data(), array2.size()};  
+  recordable->SetAttribute("attr5", span2);
   // This can be an ofstream as well or any other ostream
   std::stringstream stdoutOutput;
 
@@ -123,7 +130,7 @@ TEST(StdoutSpanExporter, PrintChangedSpan)
   "  duration      : " + duration + "\n"
   "  description   : Test Description\n"
   "  status        : UNIMPLEMENTED\n"
-  "  attributes    : attr1: 314159 attr3: \"string\" attr2: false \n"
+  "  attributes    : attr1: 314159 attr3: \"string\" attr5: [0,1,0] attr2: false attr4: [1,2,3] \n"
   "}\n"; 
   ASSERT_EQ(stdoutOutput.str(),expectedOutput);
 }
