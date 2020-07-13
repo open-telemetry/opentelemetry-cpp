@@ -117,8 +117,6 @@ TEST(StdoutSpanExporter, PrintChangedSpan)
   std::cout.rdbuf(sbuf);
 
   std::string start = std::to_string(now.time_since_epoch().count());
-  std::string duration = std::to_string(100);
-  // optionaly:
 
   std::string expectedOutput =
  "{\n"
@@ -127,7 +125,7 @@ TEST(StdoutSpanExporter, PrintChangedSpan)
   "  span_id       : 0000000000000000\n"
   "  parent_span_id: 0000000000000000\n"
   "  start         : " + start + "\n"
-  "  duration      : " + duration + "\n"
+  "  duration      : 100\n"
   "  description   : Test Description\n"
   "  status        : UNIMPLEMENTED\n"
   "  attributes    : attr1: 314159 attr3: \"string\" attr5: [0,1,0] attr2: false attr4: [1,2,3] \n"
