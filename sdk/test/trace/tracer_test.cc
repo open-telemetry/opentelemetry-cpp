@@ -1,4 +1,6 @@
 #include "opentelemetry/sdk/trace/tracer.h"
+#include "opentelemetry/sdk/trace/samplers/always_off.h"
+#include "opentelemetry/sdk/trace/samplers/always_on.h"
 #include "opentelemetry/sdk/trace/simple_processor.h"
 #include "opentelemetry/sdk/trace/span_data.h"
 
@@ -138,4 +140,38 @@ TEST(Tracer, StartSpanWithAttributes)
   auto &span_data2 = spans_received->at(1);
   ASSERT_EQ(1, span_data2->GetAttributes().size());
   ASSERT_EQ(3.0, nostd::get<double>(span_data2->GetAttributes().at("attr3")));
+}
+
+TEST(Tracer, GetSampler)
+{
+  // Create a Tracer with a default AlwaysOnSampler
+  std::shared_ptr<SpanProcessor> processor_1(new SimpleSpanProcessor(nullptr));
+  std::shared_ptr<Tracer> tracer_on(new Tracer(std::move(processor_1)));
+
+  auto t1 = tracer_on->GetSampler();
+  ASSERT_EQ("AlwaysOnSampler", t1->GetDescription());
+
+  // Create a Tracer with a AlwaysOffSampler
+  std::shared_ptr<SpanProcessor> processor_2(new SimpleSpanProcessor(nullptr));
+  std::shared_ptr<Tracer> tracer_off(
+      new Tracer(std::move(processor_2), std::make_shared<AlwaysOffSampler>()));
+
+  auto t2 = tracer_off->GetSampler();
+  ASSERT_EQ("AlwaysOffSampler", t2->GetDescription());
+}
+
+TEST(Tracer, SpanSetAttribute)
+{
+  std::shared_ptr<std::vector<std::unique_ptr<SpanData>>> spans_received(
+      new std::vector<std::unique_ptr<SpanData>>);
+  auto tracer = initTracer(spans_received);
+
+  auto span = tracer->StartSpan("span 1");
+
+  span->SetAttribute("abc", 3.1);
+
+  span->End();
+  ASSERT_EQ(1, spans_received->size());
+  auto &span_data = spans_received->at(0);
+  ASSERT_EQ(3.1, nostd::get<double>(span_data->GetAttributes().at("abc")));
 }

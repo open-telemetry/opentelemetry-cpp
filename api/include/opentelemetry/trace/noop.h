@@ -25,7 +25,7 @@ public:
   explicit NoopSpan(const std::shared_ptr<Tracer> &tracer) noexcept : tracer_{tracer} {}
 
   void SetAttribute(nostd::string_view /*key*/,
-                    const common::AttributeValue && /*value*/) noexcept override
+                    const common::AttributeValue & /*value*/) noexcept override
   {}
 
   void AddEvent(nostd::string_view /*name*/) noexcept override {}

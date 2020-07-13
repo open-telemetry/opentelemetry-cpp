@@ -40,7 +40,7 @@ public:
    * @param value the attribute value
    */
   virtual void SetAttribute(nostd::string_view key,
-                            const opentelemetry::common::AttributeValue &&value) noexcept = 0;
+                            const opentelemetry::common::AttributeValue &value) noexcept = 0;
 
   /**
    * Add an event to a span.
