@@ -38,6 +38,7 @@
 namespace nostd    = opentelemetry::nostd;
 namespace sdktrace = opentelemetry::sdk::trace;
 
+// AttributeType to help with printing attributes
 enum AttributeType
 {
   TYPE_BOOL,
@@ -73,6 +74,8 @@ public:
 
 private:
   bool isShutdown_ = false;
+
+  // Mapping status number to the string from api/include/opentelemetry/trace/canonical_code.h
   std::map<int, std::string> statusMap {
     {0, "OK"},
     {1, "CANCELLED"},
@@ -93,6 +96,10 @@ private:
     {16,"UNAUTHENTICATED"}
   };
 
+  /*
+    print_array and print_value are used to print out the value of an attribute within a span. These values
+    are held in a variant which makes the process of printing them much more complicated.
+  */
 
   template <typename T>
   static void print_array(std::stringstream &ss, common::AttributeValue &value, bool jsonTypes = false)
@@ -182,7 +189,7 @@ private:
     {
       std::stringstream ss;
       std::cout << kv.first << ": ";
-      print_value(ss, kv.second,true);
+      print_value(ss, kv.second, true);
 
       std::cout << ss.str() << " ";
     }
