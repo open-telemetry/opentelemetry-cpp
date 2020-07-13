@@ -5,6 +5,7 @@
 #include "opentelemetry/nostd/string_view.h"
 #include "opentelemetry/trace/key_value_iterable_view.h"
 
+#include <iostream>
 #include <map>
 
 OPENTELEMETRY_BEGIN_NAMESPACE
@@ -37,8 +38,18 @@ public:
   template <class T>
   Context SetValue(nostd::string_view key, T &value) noexcept
   {
-    std::map<std::string, context::ContextValue> context_map_copy = context_map_;
-    context_map_copy[std::string(key)]                            = value;
+    std::map<std::string, context::ContextValue> context_map_copy;
+    trace::KeyValueIterableView<std::map<std::string, context::ContextValue>> context_map_iterable{
+        context_map_};
+
+    context_map_iterable.ForEachKeyValue([&](nostd::string_view key,
+                                             context::ContextValue value) noexcept {
+      context_map_copy[std::string(key)] = value;
+      return true;
+    });
+
+    context_map_copy[std::string(key)] = value;
+
     return Context(context_map_copy);
   }
 
@@ -47,7 +58,16 @@ public:
   template <class T, nostd::enable_if_t<trace::detail::is_key_value_iterable<T>::value> * = nullptr>
   Context SetValues(T &keys_and_values) noexcept
   {
-    std::map<std::string, context::ContextValue> context_map_copy = context_map_;
+    std::map<std::string, context::ContextValue> context_map_copy;
+    trace::KeyValueIterableView<std::map<std::string, context::ContextValue>> context_map_iterable{
+        context_map_};
+
+    context_map_iterable.ForEachKeyValue([&](nostd::string_view key,
+                                             context::ContextValue value) noexcept {
+      context_map_copy[std::string(key)] = value;
+      return true;
+    });
+
     trace::KeyValueIterableView<T> iterable{keys_and_values};
 
     iterable.ForEachKeyValue([&](nostd::string_view key, context::ContextValue value) noexcept {
