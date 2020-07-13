@@ -32,7 +32,6 @@ namespace context
               context_map_[std::string(key)] = value;
               return true;
               }); 
-  
         }
 
       // Accepts a key and a value and then returns a new context that
