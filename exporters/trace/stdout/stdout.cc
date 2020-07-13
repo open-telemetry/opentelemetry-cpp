@@ -10,6 +10,11 @@ namespace exporter
 {
 namespace trace
 {
+StdoutSpanExporter::StdoutSpanExporter(std::ostream &sout,
+                                      bool isShutdown) noexcept
+                                    : sout_{sout},
+                                      isShutdown_{isShutdown} {}
+
 std::unique_ptr<sdktrace::Recordable> StdoutSpanExporter::MakeRecordable() noexcept 
 {
     return std::unique_ptr<sdktrace::Recordable>(new sdktrace::SpanData);

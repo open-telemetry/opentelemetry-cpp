@@ -40,6 +40,9 @@ namespace trace
 class StdoutSpanExporter final : public sdktrace::SpanExporter
 {
 public:
+    explicit StdoutSpanExporter(std::ostream &sout = std::cout,
+                                bool isShutdown = false) noexcept;
+
   std::unique_ptr<sdktrace::Recordable> MakeRecordable() noexcept override;
 
   sdktrace::ExportResult Export(
@@ -48,7 +51,8 @@ public:
   void Shutdown(std::chrono::microseconds timeout = std::chrono::microseconds(0)) noexcept override;
 
 private:
-  bool isShutdown_ = false;
+  std::ostream &sout_;
+  bool isShutdown_;
 
   // Mapping status number to the string from api/include/opentelemetry/trace/canonical_code.h
   std::map<int, std::string> statusMap {
