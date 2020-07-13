@@ -28,7 +28,7 @@ public:
     return {Decision::RECORD_AND_SAMPLE,
             nostd::unique_ptr<const std::map<std::string, opentelemetry::common::AttributeValue>>(
                 new const std::map<std::string, opentelemetry::common::AttributeValue>(
-                    {{"abc", 123}, {"def", 456}}))};
+                    {{"sampling_attr1", 123}, {"sampling_attr2", "string"}}))};
   }
 
   std::string GetDescription() const noexcept override { return "MockSampler"; }
@@ -196,9 +196,12 @@ TEST(Tracer, StartSpanWithAttributes)
     tracer_mock->StartSpan("span 3", {{"attr1", 314159}, {"attr2", false}});
   }
   auto &span_data3 = spans_received_2->at(0);
-  // It has a total of four attributes: two from StartSpan and two from the sampler.
+  // Span 3 has a total of four attributes: two from StartSpan and two from the sampler.
   ASSERT_EQ(4, span_data3->GetAttributes().size());
-
+  ASSERT_EQ(314159, nostd::get<int>(span_data3->GetAttributes().at("attr1")));
+  ASSERT_EQ(false, nostd::get<bool>(span_data3->GetAttributes().at("attr2")));
+  ASSERT_EQ(123, nostd::get<int>(span_data3->GetAttributes().at("sampling_attr1")));
+  ASSERT_EQ("string", nostd::get<nostd::string_view>(span_data3->GetAttributes().at("sampling_attr2")));
 }
 
 TEST(Tracer, GetSampler)
