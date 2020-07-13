@@ -5,27 +5,12 @@
 
 #include <gtest/gtest.h>
 #include <iostream>
+#include <thread>
 
 using namespace opentelemetry::sdk::trace;
 using namespace opentelemetry::ext::zpages;
 
-//////////////////////////////////// TEST HELPER FUNCTIONS ///////////////////
-
-/*
- * Returns whether the times given are nearly the same
- */
-bool AreAlmostEqual(std::chrono::microseconds t1, std::chrono::microseconds t2) {
-  return t1 - t2 <= std::chrono::microseconds(0);
-}
-
-/*
- * Returns current time + timeout in microseconds
- */
-std::chrono::microseconds GetTime(std::chrono::microseconds timeout = std::chrono::microseconds(0)) {
-  auto duration = std::chrono::system_clock::now().time_since_epoch();
-  return std::chrono::duration_cast<std::chrono::microseconds>(duration) + timeout;
-}
-
+//////////////////////////////////// TEST HELPER FUNCTIONS //////////////////////////////
 
 /*
  * Helper function uses the current processor to update spans contained in completed_spans
@@ -54,7 +39,8 @@ void UpdateSpans(std::shared_ptr<TracezSpanProcessor>& processor,
  *
  * If no start value is given, start at index 0
  * If no end value is given, end at name vector end
- * If 1-1 correspondance marked, return true if completed has all names in same frequency, no more or less
+ * If 1-1 correspondance marked, return true if completed has all names in same frequency,
+ * no more or less
  */
 bool ContainsNames(const std::vector<std::string>& names,
     std::unordered_set<opentelemetry::sdk::trace::SpanData*>& running,
@@ -93,7 +79,8 @@ bool ContainsNames(const std::vector<std::string>& names,
  *
  * If no start value is given, start at index 0
  * If no end value is given, end at name vector end
- * If 1-1 correspondance marked, return true if completed has all names in same frequency, no more or less
+ * If 1-1 correspondance marked, return true if completed has all names in same frequency,
+ * no more or less
  */
 bool ContainsNames(const std::vector<std::string>& names,
     std::vector<std::unique_ptr<opentelemetry::sdk::trace::SpanData>>& completed,
@@ -124,7 +111,42 @@ bool ContainsNames(const std::vector<std::string>& names,
   return true;
 }
 
-///////////////////////////////////////// TESTS //////////////////////////
+
+/*
+ * Helper function calls GetSpanSnapshot() i times and does nothing with it
+ * otherwise. Used for testing thread safety
+ */
+void GetManySnapshots(std::shared_ptr<TracezSpanProcessor>& processor, int i) {
+  for (; i > 0; i--) processor->GetSpanSnapshot();
+}
+
+
+/*
+ * Helper function that creates i spans, which are added into the passed
+ * in vector. Used for testing thread safety
+ */
+void StartManySpans(std::vector<opentelemetry::nostd::unique_ptr<opentelemetry::trace::Span>> &spans,
+                    std::shared_ptr<opentelemetry::trace::Tracer> tracer, int i) {
+  for (; i > 0; i--) spans.push_back(tracer->StartSpan("span"));
+}
+
+/*
+ * Helper function that ends all spans in the passed in span vector, checking
+ * i times. Used for testing thread safety
+ */
+void EndAllSpans(std::vector<opentelemetry::nostd::unique_ptr<opentelemetry::trace::Span>> &spans,
+                 int i) {
+  unsigned int count = 0;
+  for (; i > 0; i--) {
+    for (unsigned int j = count; j < spans.size(); j++) {
+      spans[j]->End();
+    }
+    count = spans.size();
+  }
+}
+
+
+///////////////////////////////////////// TESTS ///////////////////////////////////
 
 /*
  * Test if both span containers are empty when no spans exist or are added.
@@ -135,8 +157,8 @@ TEST(TracezSpanProcessor, NoSpans) {
   auto spans = processor->GetSpanSnapshot();
   auto recordable = processor->MakeRecordable();
 
-  ASSERT_EQ(spans.running.size(), 0);
-  ASSERT_EQ(spans.completed.size(), 0);
+  EXPECT_EQ(spans.running.size(), 0);
+  EXPECT_EQ(spans.completed.size(), 0);
 }
 
 
@@ -157,16 +179,16 @@ TEST(TracezSpanProcessor, OneSpanCumulative) {
   auto span = tracer->StartSpan(span_name[0]);
   UpdateSpans(processor, completed, running);
 
-  ASSERT_TRUE(ContainsNames(span_name, running));
-  ASSERT_EQ(running.size(), 1);
-  ASSERT_EQ(completed.size(), 0);
+  EXPECT_TRUE(ContainsNames(span_name, running));
+  EXPECT_EQ(running.size(), 1);
+  EXPECT_EQ(completed.size(), 0);
 
   span->End();
   UpdateSpans(processor, completed, running);
 
-  ASSERT_TRUE(ContainsNames(span_name, completed));
-  ASSERT_EQ(running.size(), 0);
-  ASSERT_EQ(completed.size(), 1);
+  EXPECT_TRUE(ContainsNames(span_name, completed));
+  EXPECT_EQ(running.size(), 0);
+  EXPECT_EQ(completed.size(), 1);
 }
 
 
@@ -183,8 +205,8 @@ TEST(TracezSpanProcessor, MultipleSpansCumulative) {
   auto running = spans.running;
   auto completed = std::move(spans.completed);
 
-  ASSERT_EQ(running.size(), 0);
-  ASSERT_EQ(completed.size(), 0);
+  EXPECT_EQ(running.size(), 0);
+  EXPECT_EQ(completed.size(), 0);
 
   std::vector<std::string> span_names = {"s1", "s2", "s3", "s1"};
 
@@ -193,17 +215,17 @@ TEST(TracezSpanProcessor, MultipleSpansCumulative) {
   for (const auto &name : span_names) span_vars.push_back(tracer->StartSpan(name));
   UpdateSpans(processor, completed, running);
 
-  ASSERT_TRUE(ContainsNames(span_names, running)); // s1 s2 s3 s1
-  ASSERT_EQ(running.size(), span_names.size());
-  ASSERT_EQ(completed.size(), 0);
+  EXPECT_TRUE(ContainsNames(span_names, running)); // s1 s2 s3 s1
+  EXPECT_EQ(running.size(), span_names.size());
+  EXPECT_EQ(completed.size(), 0);
 
   // End all spans
   for (auto &span : span_vars) span->End();
   UpdateSpans(processor, completed, running);
 
-  ASSERT_TRUE(ContainsNames(span_names, completed)); // s1 s2 s3 s1
-  ASSERT_EQ(running.size(), 0);
-  ASSERT_EQ(completed.size(), span_names.size());
+  EXPECT_TRUE(ContainsNames(span_names, completed)); // s1 s2 s3 s1
+  EXPECT_EQ(running.size(), 0);
+  EXPECT_EQ(completed.size(), span_names.size());
 }
 
 
@@ -226,50 +248,50 @@ TEST(TracezSpanProcessor, MultipleSpansMiddleSplitCumulative) {
   for (const auto &name : span_names) span_vars.push_back(tracer->StartSpan(name));
   UpdateSpans(processor, completed, running);
 
-  ASSERT_TRUE(ContainsNames(span_names, running)); // s0 s2 s1 s1 s
-  ASSERT_EQ(running.size(), span_names.size());
-  ASSERT_EQ(completed.size(), 0);
+  EXPECT_TRUE(ContainsNames(span_names, running)); // s0 s2 s1 s1 s
+  EXPECT_EQ(running.size(), span_names.size());
+  EXPECT_EQ(completed.size(), 0);
 
   // End 4th span
   span_vars[3]->End();
   UpdateSpans(processor, completed, running);
 
-  ASSERT_TRUE(ContainsNames(span_names, running, 0, 3)); // s0 s2 s1
-  ASSERT_TRUE(ContainsNames(span_names, running, 4)); // + s
-  ASSERT_TRUE(ContainsNames(span_names, completed, 3, 4)); // s1
-  ASSERT_EQ(running.size(), 4);
-  ASSERT_EQ(completed.size(), 1);
+  EXPECT_TRUE(ContainsNames(span_names, running, 0, 3)); // s0 s2 s1
+  EXPECT_TRUE(ContainsNames(span_names, running, 4)); // + s
+  EXPECT_TRUE(ContainsNames(span_names, completed, 3, 4)); // s1
+  EXPECT_EQ(running.size(), 4);
+  EXPECT_EQ(completed.size(), 1);
 
   // End 2nd span
   span_vars[1]->End();
   UpdateSpans(processor, completed, running);
 
-  ASSERT_TRUE(ContainsNames(span_names, running, 0, 1)); // s0
-  ASSERT_TRUE(ContainsNames(span_names, running, 2, 3)); // + s1
-  ASSERT_TRUE(ContainsNames(span_names, running, 4)); // + s
-  ASSERT_TRUE(ContainsNames(span_names, completed, 1, 2)); // s2
-  ASSERT_TRUE(ContainsNames(span_names, completed, 3, 4)); // s1
-  ASSERT_EQ(running.size(), 3);
-  ASSERT_EQ(completed.size(), 2);
+  EXPECT_TRUE(ContainsNames(span_names, running, 0, 1)); // s0
+  EXPECT_TRUE(ContainsNames(span_names, running, 2, 3)); // + s1
+  EXPECT_TRUE(ContainsNames(span_names, running, 4)); // + s
+  EXPECT_TRUE(ContainsNames(span_names, completed, 1, 2)); // s2
+  EXPECT_TRUE(ContainsNames(span_names, completed, 3, 4)); // s1
+  EXPECT_EQ(running.size(), 3);
+  EXPECT_EQ(completed.size(), 2);
 
   // End 3rd span (last middle span)
   span_vars[2]->End();
   UpdateSpans(processor, completed, running);
 
-  ASSERT_TRUE(ContainsNames(span_names, running, 0, 1)); // s0
-  ASSERT_TRUE(ContainsNames(span_names, running, 4)); // + s
-  ASSERT_TRUE(ContainsNames(span_names, completed, 1, 4)); // s2 s1 s1
-  ASSERT_EQ(running.size(), 2);
-  ASSERT_EQ(completed.size(), 3);
+  EXPECT_TRUE(ContainsNames(span_names, running, 0, 1)); // s0
+  EXPECT_TRUE(ContainsNames(span_names, running, 4)); // + s
+  EXPECT_TRUE(ContainsNames(span_names, completed, 1, 4)); // s2 s1 s1
+  EXPECT_EQ(running.size(), 2);
+  EXPECT_EQ(completed.size(), 3);
 
   // End remaining Spans
   span_vars[0]->End();
   span_vars[4]->End();
   UpdateSpans(processor, completed, running);
 
-  ASSERT_TRUE(ContainsNames(span_names, completed)); // s0 s2 s1 s1 s
-  ASSERT_EQ(running.size(), 0);
-  ASSERT_EQ(completed.size(), 5);
+  EXPECT_TRUE(ContainsNames(span_names, completed)); // s0 s2 s1 s1 s
+  EXPECT_EQ(running.size(), 0);
+  EXPECT_EQ(completed.size(), 5);
 }
 
 
@@ -295,28 +317,28 @@ TEST(TracezSpanProcessor, MultipleSpansOuterSplitCumulative) {
   span_vars[4]->End();
   UpdateSpans(processor, completed, running);
 
-  ASSERT_TRUE(ContainsNames(span_names, running, 0, 4)); // s0 s2 s1 s1
-  ASSERT_TRUE(ContainsNames(span_names, completed, 4)); // s
-  ASSERT_EQ(running.size(), 4);
-  ASSERT_EQ(completed.size(), 1);
+  EXPECT_TRUE(ContainsNames(span_names, running, 0, 4)); // s0 s2 s1 s1
+  EXPECT_TRUE(ContainsNames(span_names, completed, 4)); // s
+  EXPECT_EQ(running.size(), 4);
+  EXPECT_EQ(completed.size(), 1);
 
   // End first span
   span_vars[0]->End();
   UpdateSpans(processor, completed, running);
 
-  ASSERT_TRUE(ContainsNames(span_names, running, 1, 4)); // s2 s1 s1
-  ASSERT_TRUE(ContainsNames(span_names, completed, 0, 1)); // s0
-  ASSERT_TRUE(ContainsNames(span_names, completed, 4)); // s
-  ASSERT_EQ(running.size(), 3);
-  ASSERT_EQ(completed.size(), 2);
+  EXPECT_TRUE(ContainsNames(span_names, running, 1, 4)); // s2 s1 s1
+  EXPECT_TRUE(ContainsNames(span_names, completed, 0, 1)); // s0
+  EXPECT_TRUE(ContainsNames(span_names, completed, 4)); // s
+  EXPECT_EQ(running.size(), 3);
+  EXPECT_EQ(completed.size(), 2);
 
   // End remaining Spans
   for (int i = 1; i < 4; i++) span_vars[i]->End();
   UpdateSpans(processor, completed, running);
 
-  ASSERT_TRUE(ContainsNames(span_names, completed)); // s0 s2 s1 s1 s
-  ASSERT_EQ(running.size(), 0);
-  ASSERT_EQ(completed.size(), 5);
+  EXPECT_TRUE(ContainsNames(span_names, completed)); // s0 s2 s1 s1 s
+  EXPECT_EQ(running.size(), 0);
+  EXPECT_EQ(completed.size(), 5);
 }
 
 /*
@@ -336,21 +358,21 @@ TEST(TracezSpanProcessor, OneSpanNewOnly) {
   auto span = tracer->StartSpan(span_name[0]);
   UpdateSpans(processor, completed, running, true);
 
-  ASSERT_TRUE(ContainsNames(span_name, running, 0, 1, true));
-  ASSERT_EQ(running.size(), 1);
-  ASSERT_EQ(completed.size(), 0);
+  EXPECT_TRUE(ContainsNames(span_name, running, 0, 1, true));
+  EXPECT_EQ(running.size(), 1);
+  EXPECT_EQ(completed.size(), 0);
 
   span->End();
   UpdateSpans(processor, completed, running, true);
 
-  ASSERT_TRUE(ContainsNames(span_name, completed, 0, 1, true));
-  ASSERT_EQ(running.size(), 0);
-  ASSERT_EQ(completed.size(), 1);
+  EXPECT_TRUE(ContainsNames(span_name, completed, 0, 1, true));
+  EXPECT_EQ(running.size(), 0);
+  EXPECT_EQ(completed.size(), 1);
 
   UpdateSpans(processor, completed, running, true);
 
-  ASSERT_EQ(running.size(), 0);
-  ASSERT_EQ(completed.size(), 0);
+  EXPECT_EQ(running.size(), 0);
+  EXPECT_EQ(completed.size(), 0);
 }
 
 /*
@@ -372,45 +394,45 @@ TEST(TracezSpanProcessor, MultipleSpansMiddleSplitNewOnly) {
   for (const auto &name : span_names) span_vars.push_back(tracer->StartSpan(name));
   UpdateSpans(processor, completed, running);
 
-  ASSERT_TRUE(ContainsNames(span_names, running, 0, 5, true)); // s0 s2 s1 s1 s
-  ASSERT_EQ(running.size(), span_names.size());
-  ASSERT_EQ(completed.size(), 0);
+  EXPECT_TRUE(ContainsNames(span_names, running, 0, 5, true)); // s0 s2 s1 s1 s
+  EXPECT_EQ(running.size(), span_names.size());
+  EXPECT_EQ(completed.size(), 0);
 
   // End 4th span
   span_vars[3]->End();
   UpdateSpans(processor, completed, running, true);
 
-  ASSERT_TRUE(ContainsNames(span_names, running, 0, 3)); // s0 s2 s1
-  ASSERT_TRUE(ContainsNames(span_names, running, 4)); // + s
-  ASSERT_TRUE(ContainsNames(span_names, completed, 3, 4, true)); // s1
-  ASSERT_EQ(running.size(), 4);
-  ASSERT_EQ(completed.size(), 1);
+  EXPECT_TRUE(ContainsNames(span_names, running, 0, 3)); // s0 s2 s1
+  EXPECT_TRUE(ContainsNames(span_names, running, 4)); // + s
+  EXPECT_TRUE(ContainsNames(span_names, completed, 3, 4, true)); // s1
+  EXPECT_EQ(running.size(), 4);
+  EXPECT_EQ(completed.size(), 1);
 
   // End 2nd and 3rd span
   span_vars[1]->End();
   span_vars[2]->End();
   UpdateSpans(processor, completed, running, true);
 
-  ASSERT_TRUE(ContainsNames(span_names, running, 0, 1)); // s0
-  ASSERT_TRUE(ContainsNames(span_names, running, 4)); // + s
-  ASSERT_TRUE(ContainsNames(span_names, completed, 1, 3, true)); // s2 s1
-  ASSERT_EQ(running.size(), 2);
-  ASSERT_EQ(completed.size(), 2);
+  EXPECT_TRUE(ContainsNames(span_names, running, 0, 1)); // s0
+  EXPECT_TRUE(ContainsNames(span_names, running, 4)); // + s
+  EXPECT_TRUE(ContainsNames(span_names, completed, 1, 3, true)); // s2 s1
+  EXPECT_EQ(running.size(), 2);
+  EXPECT_EQ(completed.size(), 2);
 
   // End remaining Spans
   span_vars[0]->End();
   span_vars[4]->End();
   UpdateSpans(processor, completed, running, true);
 
-  ASSERT_TRUE(ContainsNames(span_names, completed, 0, 1)); // s0
-  ASSERT_TRUE(ContainsNames(span_names, completed, 4)); // s
-  ASSERT_EQ(running.size(), 0);
-  ASSERT_EQ(completed.size(), 2);
+  EXPECT_TRUE(ContainsNames(span_names, completed, 0, 1)); // s0
+  EXPECT_TRUE(ContainsNames(span_names, completed, 4)); // s
+  EXPECT_EQ(running.size(), 0);
+  EXPECT_EQ(completed.size(), 2);
 
   UpdateSpans(processor, completed, running, true);
 
-  ASSERT_EQ(running.size(), 0);
-  ASSERT_EQ(completed.size(), 0);
+  EXPECT_EQ(running.size(), 0);
+  EXPECT_EQ(completed.size(), 0);
 }
 
 
@@ -436,112 +458,170 @@ TEST(TracezSpanProcessor, MultipleSpansOuterSplitNewOnly) {
   span_vars[4]->End();
   UpdateSpans(processor, completed, running, true);
 
-  ASSERT_TRUE(ContainsNames(span_names, running, 0, 4, true)); // s0 s2 s1 s1
-  ASSERT_TRUE(ContainsNames(span_names, completed, 4, 5, true)); // s
-  ASSERT_EQ(running.size(), 4);
-  ASSERT_EQ(completed.size(), 1);
+  EXPECT_TRUE(ContainsNames(span_names, running, 0, 4, true)); // s0 s2 s1 s1
+  EXPECT_TRUE(ContainsNames(span_names, completed, 4, 5, true)); // s
+  EXPECT_EQ(running.size(), 4);
+  EXPECT_EQ(completed.size(), 1);
 
   // End first span
   span_vars[0]->End();
   UpdateSpans(processor, completed, running, true);
 
-  ASSERT_TRUE(ContainsNames(span_names, running, 1, 4, true)); // s2 s1 s1
-  ASSERT_TRUE(ContainsNames(span_names, completed, 0, 1, true)); // s0
-  ASSERT_EQ(running.size(), 3);
-  ASSERT_EQ(completed.size(), 1);
+  EXPECT_TRUE(ContainsNames(span_names, running, 1, 4, true)); // s2 s1 s1
+  EXPECT_TRUE(ContainsNames(span_names, completed, 0, 1, true)); // s0
+  EXPECT_EQ(running.size(), 3);
+  EXPECT_EQ(completed.size(), 1);
 
   // End remaining middle pans
   for (int i = 1; i < 4; i++) span_vars[i]->End();
   UpdateSpans(processor, completed, running, true);
 
-  ASSERT_TRUE(ContainsNames(span_names, completed, 1, 4, true)); // s2 s1 s1
-  ASSERT_EQ(running.size(), 0);
-  ASSERT_EQ(completed.size(), 3);
+  EXPECT_TRUE(ContainsNames(span_names, completed, 1, 4, true)); // s2 s1 s1
+  EXPECT_EQ(running.size(), 0);
+  EXPECT_EQ(completed.size(), 3);
 
   UpdateSpans(processor, completed, running, true);
 
-  ASSERT_EQ(running.size(), 0);
-  ASSERT_EQ(completed.size(), 0);
-}
-
-
-// TODO: add tests for checking if spans are accurate when getting snapshots,
-// like when a span completes mid getter call later on using threads
-
-/*
- * Test if flush sleeps for approximately the correct duration when none is set.
-*/
-TEST(TracezSpanProcessor, ForceFlushNoSleep) {
-  std::shared_ptr<TracezSpanProcessor> processor(new TracezSpanProcessor());
-  auto goal_time = GetTime();
-  processor->ForceFlush();
-
-  EXPECT_TRUE(AreAlmostEqual(goal_time, GetTime()));
+  EXPECT_EQ(running.size(), 0);
+  EXPECT_EQ(completed.size(), 0);
 }
 
 
 /*
- * Test if flush sleeps for approximately the correct duration when short
- * duration is set.
-*/
-TEST(TracezSpanProcessor, ForceFlushSleep) {
-  std::shared_ptr<TracezSpanProcessor> processor(new TracezSpanProcessor());
-  auto sleep_amount = std::chrono::microseconds(100);
-  auto goal_time = GetTime(sleep_amount);
-  processor->ForceFlush(sleep_amount);
-
-  EXPECT_TRUE(AreAlmostEqual(goal_time, GetTime()));
-}
-
-
-/*
- * Test if shutdown works with no duration set
-*/
-TEST(TracezSpanProcessor, ShutdownNoSleep) {
+ * Test if thread safety is compromised and errors are thrown when many spans
+ * start at the same time. Test is not failed if no errors occur.
+ */
+TEST(TracezSpanProcessor, RunningThreadSafety) {
   std::shared_ptr<TracezSpanProcessor> processor(new TracezSpanProcessor());
   auto tracer = std::shared_ptr<opentelemetry::trace::Tracer>(new Tracer(processor));
-  auto spans = processor->GetSpanSnapshot();
-  auto running = spans.running;
-  auto completed = std::move(spans.completed);
+  std::vector<opentelemetry::nostd::unique_ptr<opentelemetry::trace::Span>> spans;
 
-  // Shutdown
-  auto goal_time = GetTime();
-  processor->Shutdown();
+  std::thread start1(StartManySpans, std::ref(spans), tracer, 5);
+  std::thread start2(StartManySpans, std::ref(spans), tracer, 5);
 
-  // Nothing should happen, functions return immediately
-  auto span = tracer->StartSpan("span");
-  span->End();
-  processor->ForceFlush();
+  start1.join();
+  start2.join();
 
-  UpdateSpans(processor, completed, running);
-  ASSERT_EQ(running.size(), 0);
-  ASSERT_EQ(completed.size(), 0);
-
-  EXPECT_TRUE(AreAlmostEqual(goal_time, GetTime()));
+  EndAllSpans(spans, 1);
 }
 
 
 /*
- * Test if shutdown works with short duration set
-*/
-TEST(TracezSpanProcessor, ShutdownSleep) {
+ * Test if thread safety is compromised and errors are thrown when many spans
+ * end at the same time. Test is not failed if no errors occur.
+ */
+TEST(TracezSpanProcessor, CompletedThreadSafety) {
   std::shared_ptr<TracezSpanProcessor> processor(new TracezSpanProcessor());
   auto tracer = std::shared_ptr<opentelemetry::trace::Tracer>(new Tracer(processor));
-  auto spans = processor->GetSpanSnapshot();
-  auto running = spans.running;
-  auto completed = std::move(spans.completed);
+  std::vector<opentelemetry::nostd::unique_ptr<opentelemetry::trace::Span>> spans;
 
-  auto sleep_amount = std::chrono::microseconds(100);
-  auto goal_time = GetTime(sleep_amount);
-  processor->Shutdown(sleep_amount);
+  StartManySpans(spans, tracer, 10);
 
-  auto span = tracer->StartSpan("span");
-  span->End();
-  processor->ForceFlush(sleep_amount);
+  std::thread end1(EndAllSpans, std::ref(spans), 5);
+  std::thread end2(EndAllSpans, std::ref(spans), 5);
 
-  UpdateSpans(processor, completed, running);
-  ASSERT_EQ(running.size(), 0);
-  ASSERT_EQ(completed.size(), 0);
+  end1.join();
+  end2.join();
+}
 
-  EXPECT_TRUE(AreAlmostEqual(goal_time, GetTime()));
+
+/*
+ * Test if thread safety is compromised and errors are thrown when many
+ * snapshots are grabbed at the same time. Test is not failed if no
+ * errors occur.
+ */
+TEST(TracezSpanProcessor, SnapshotThreadSafety) {
+  std::shared_ptr<TracezSpanProcessor> processor(new TracezSpanProcessor());
+  auto tracer = std::shared_ptr<opentelemetry::trace::Tracer>(new Tracer(processor));
+  std::vector<opentelemetry::nostd::unique_ptr<opentelemetry::trace::Span>> spans;
+
+  std::thread snap1(GetManySnapshots, std::ref(processor), 5);
+  std::thread snap2(GetManySnapshots, std::ref(processor), 5);
+
+  snap1.join();
+  snap2.join();
+
+  StartManySpans(spans, tracer, 10);
+
+  std::thread snap3(GetManySnapshots, std::ref(processor), 5);
+  std::thread snap4(GetManySnapshots, std::ref(processor), 5);
+
+  snap3.join();
+  snap4.join();
+
+  EndAllSpans(spans, 1);
+}
+
+
+/*
+ * Test if thread safety is compromised and errors are thrown when many spans
+ * start while others are ending. Test is not failed if no errors occur.
+ */
+TEST(TracezSpanProcessor, RunningCompletedThreadSafety) {
+  std::shared_ptr<TracezSpanProcessor> processor(new TracezSpanProcessor());
+  auto tracer = std::shared_ptr<opentelemetry::trace::Tracer>(new Tracer(processor));
+  std::vector<opentelemetry::nostd::unique_ptr<opentelemetry::trace::Span>> spans;
+
+  std::thread start(StartManySpans, std::ref(spans), tracer, 10);
+  std::thread end(EndAllSpans, std::ref(spans), 10);
+
+  start.join();
+  end.join();
+}
+
+
+/*
+ * Test if thread safety is compromised and errors are thrown when many spans
+ * start while snapshots are being grabbed. Test is not failed if no errors occur.
+ */
+TEST(TracezSpanProcessor, RunningSnapshotThreadSafety) {
+  std::shared_ptr<TracezSpanProcessor> processor(new TracezSpanProcessor());
+  auto tracer = std::shared_ptr<opentelemetry::trace::Tracer>(new Tracer(processor));
+  std::vector<opentelemetry::nostd::unique_ptr<opentelemetry::trace::Span>> spans;
+
+  std::thread start(StartManySpans, std::ref(spans), tracer, 10);
+  std::thread snapshots(GetManySnapshots, std::ref(processor), 10);
+
+  start.join();
+  snapshots.join();
+
+}
+
+
+/*
+ * Test if thread safety is compromised and errors are thrown when all spans
+ * end while snapshotd are being grabbed. Test is not failed if no errors occur.
+ */
+TEST(TracezSpanProcessor, SnapshotCompletedThreadSafety) {
+  std::shared_ptr<TracezSpanProcessor> processor(new TracezSpanProcessor());
+  auto tracer = std::shared_ptr<opentelemetry::trace::Tracer>(new Tracer(processor));
+  std::vector<opentelemetry::nostd::unique_ptr<opentelemetry::trace::Span>> spans;
+
+  StartManySpans(spans, tracer, 10);
+
+  std::thread snapshots(GetManySnapshots, std::ref(processor), 10);
+  std::thread end(EndAllSpans, std::ref(spans), 1);
+
+  snapshots.join();
+  end.join();
+
+}
+
+
+/*
+ * Test if thread safety is compromised and errors are thrown when many spans
+ * start and end while snapshots are being grabbed. Test is not failed if no errors occur.
+ */
+TEST(TracezSpanProcessor, RunningSnapshotCompletedThreadSafety) {
+  std::shared_ptr<TracezSpanProcessor> processor(new TracezSpanProcessor());
+  auto tracer = std::shared_ptr<opentelemetry::trace::Tracer>(new Tracer(processor));
+  std::vector<opentelemetry::nostd::unique_ptr<opentelemetry::trace::Span>> spans;
+
+  std::thread start(StartManySpans, std::ref(spans), tracer, 10);
+  std::thread snapshots(GetManySnapshots, std::ref(processor), 10);
+  std::thread end(EndAllSpans, std::ref(spans), 10);
+
+  start.join();
+  snapshots.join();
+  end.join();
 }
