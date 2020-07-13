@@ -30,16 +30,6 @@ sdktrace::ExportResult StdoutSpanExporter::Export(
       auto span = std::unique_ptr<sdktrace::SpanData>(
           static_cast<sdktrace::SpanData *>(recordable.release()));
 
-      /*
-          Timeout for export() if export has been blocking for 30000 milliseconds, export will return failure
-      */
-      auto current = std::chrono::steady_clock::now();
-
-      if(std::chrono::duration_cast<std::chrono::milliseconds>(current - start).count() > 30000)
-      {
-        return sdktrace::ExportResult::kFailure;
-      }
-
       if (span != nullptr)
       {
 
