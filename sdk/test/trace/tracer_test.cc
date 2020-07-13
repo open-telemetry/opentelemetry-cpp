@@ -110,31 +110,34 @@ TEST(Tracer, ToMockSpanExporter)
   ASSERT_EQ("span 1", spans_received->at(1)->GetName());
 }
 
-TEST(Tracer, StartSpan)
+TEST(Tracer, StartSpanSampleOn)
 {
   // create a tracer with default AlwaysOn sampler.
-  std::shared_ptr<std::vector<std::unique_ptr<SpanData>>> spans_received_1(
+  std::shared_ptr<std::vector<std::unique_ptr<SpanData>>> spans_received(
       new std::vector<std::unique_ptr<SpanData>>);
-  auto tracer_on = initTracer(spans_received_1);
+  auto tracer_on = initTracer(spans_received);
 
   tracer_on->StartSpan("span 1")->End();
 
-  ASSERT_EQ(1, spans_received_1->size());
+  ASSERT_EQ(1, spans_received->size());
 
-  auto &span_data = spans_received_1->at(0);
+  auto &span_data = spans_received->at(0);
   ASSERT_LT(std::chrono::nanoseconds(0), span_data->GetStartTime().time_since_epoch());
   ASSERT_LT(std::chrono::nanoseconds(0), span_data->GetDuration());
+}
 
-  std::shared_ptr<std::vector<std::unique_ptr<SpanData>>> spans_received_2(
+TEST(Tracer, StartSpanSampleOff)
+{
+  std::shared_ptr<std::vector<std::unique_ptr<SpanData>>> spans_received(
       new std::vector<std::unique_ptr<SpanData>>);
   // create a tracer with a custom AlwaysOff sampler.
-  auto tracer_off = initTracer(spans_received_2, std::make_shared<AlwaysOffSampler>());
+  auto tracer_off = initTracer(spans_received, std::make_shared<AlwaysOffSampler>());
 
   // This span will not be recorded.
   tracer_off->StartSpan("span 2")->End();
 
   // The span doesn't write any span data because the sampling decision is alway NOT_RECORD.
-  ASSERT_EQ(0, spans_received_2->size());
+  ASSERT_EQ(0, spans_received->size());
 }
 
 TEST(Tracer, StartSpanWithOptionsTime)
