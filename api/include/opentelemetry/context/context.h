@@ -24,7 +24,7 @@ namespace context
       // Contructor, creates a context object from a map of keys
       // and identifiers.
       template <class T, nostd::enable_if_t<trace::detail::is_key_value_iterable<T>::value> * = nullptr>
-        Context(const T keys_and_values)
+        Context(const T &keys_and_values)
         {
           trace::KeyValueIterableView<T> iterable{keys_and_values};
           iterable.ForEachKeyValue([&](nostd::string_view key, context::ContextValue value) noexcept {
