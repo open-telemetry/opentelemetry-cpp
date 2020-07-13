@@ -8,6 +8,7 @@ namespace zpages {
     spans_.running.insert(static_cast<opentelemetry::sdk::trace::SpanData*>(&span));
   }
 
+  // TODO: Add thread safety measures
   void TracezSpanProcessor::OnEnd(std::unique_ptr<opentelemetry::sdk::trace::Recordable> &&span) noexcept {
      if (span == nullptr) return;
      auto span_raw = static_cast<opentelemetry::sdk::trace::SpanData*>(span.get());
@@ -21,6 +22,7 @@ namespace zpages {
   }
 
 
+  // TODO: Add thread safety measures
   TracezSpanProcessor::CollectedSpans TracezSpanProcessor::GetSpanSnapshot() noexcept {
     CollectedSpans snapshot;
     snapshot.running = spans_.running;
