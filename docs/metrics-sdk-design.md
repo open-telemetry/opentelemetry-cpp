@@ -127,13 +127,14 @@ public:
   *       (https://unitsofmeasure.org/ucum.html).
   *
   */ 
-  nostd::unique_ptr<DoubleCounter> NewDoubleCounter(nostd::string_view name, 
+  nostd::shared_ptr<DoubleCounter> NewDoubleCounter(nostd::string_view name, 
                                                     nostd::string_view description,
                                                     nostd::string_view unit, 
                                                     nostd::string_view enabled) {
     DoubleCounter doubleCounter = DoubleCounter(name, description, unit, enabled);
-    metrics.push(doubleCounter);
-    return unique_ptr<DoubleCounter>(doubleCounter); 
+    ptr = shared_ptr<DoubleCounter>(doubleCounter)
+    metrics.push(ptr);
+    return ptr; 
   }
   
  /*
@@ -154,8 +155,9 @@ public:
                                                nostd::string_view unit,
                                                nostd::string_view enabled) {
     IntCounter intCounter = IntCounter(name, description, unit, enabled);
-    metrics.push(intCounter);
-    return unique_ptr<IntCounter>(intCounter);
+    ptr = unique_ptr<IntCounter>(intCounter)
+    metrics.push(ptr);
+    return ptr;
   }
   
 ////////////////////////////////////////////////////////////////////////////////////
@@ -176,19 +178,19 @@ private:
   * last collection period.
   *
   */
-  std::vector<Record> Collect() {
-    // mutex lock
+  void Collect() {
     std::vector<Record> records;
+    metrics_lock_.lock();
     for instr in metrics_:
-      if instr has not received an update: // Checked by timestamp
-        to_remove.push(instr);
+      if instr is not enabled:
+        continue
       else:
-         records.push(instr.checkpoint()); // Use each instrument's aggregator
-                                          // to checkpoint the metric.
-    for instr in to_remove:
-      instr.release();
-    // mutex unlock
-    return records; // TODO: Go straight from accumulator to processor
+        for bound_instr in instr.BoundInstruments:
+          records.push_back(Record(instr->name, instr->description,
+                                   bound_instr->labels,
+                                   bound_instr->GetAggregator()->Checkpoint());
+    metrics_lock_.unlock();
+    processor_.process(records);
   }
   
  /*
@@ -213,11 +215,12 @@ private:
                                                 // to the instrument.
   }
   
-  std::vector<shared_ptr<Metric>> metrics_; // A vector to store instruments created
-                                            // from this Meter.
+  std::vector<shared_ptr<Instrument>> metrics_; // A vector to store instruments created
+                                                // from this Meter.
+  std::mutex metrics_lock_;
   unique_ptr<MeterProvider> meterProvider_;
   InstrumentationInfo instrumentationInfo_;
-  Processor processor;
+  Processor processor_;
 };
 ```
 
@@ -245,7 +248,7 @@ The SDK implementation of the `Meter` class will contain a function called `coll
 
 **Cons of this implementation:**
 
-* Different constructors for the different metric instruments means a lot of duplicated code. We could use templates but that will cause issues when exporting due to the requirement to adhere to the OT protocol.
+* Different constructors for the different metric instruments means a lot of duplicated code. We could use templates but we believe that may cause issues when exporting due to the requirement to adhere to the OT protocol. However, **this is still under consideration.**
 * Storing the metric instruments in the Meter class means that if we have multiple meters, metric instruments are stored in various objects. Using an instrument registry that maps meters to metric instruments resolves this.
 
 **The SDK implementation of the `Meter` class will act as the Accumulator mentioned in the SDK specification.**
@@ -262,7 +265,7 @@ Each instrument must have enough information to meaningfully attach its measured
 * description (string) — Short description of what this instrument is capturing.
 * value_type (string or enum) — Determines whether the value tracked is an int64 or double.
 * meter (Meter) — The Meter instance from which this instrument was derived.
-* label_keys (wstring) — A string representing the labels associated with the Bound Instruments.
+* label_keys (KeyValueIterable) — A nostd class acting as map from nostd::string_view to nostd::string_view.
 * enabled (boolean) — Determines whether the instrument is currently collecting data.
 * bound_instruments (key value container) — Contains the bound instruments derived from this instrument.
 
@@ -281,7 +284,7 @@ Each measurement taken by a Metric instrument is a Metric event which must conta
 
 A key:value mapping of some kind MUST be supported as annotation each metric event. Labels must be represented the same way throughout the API (i.e. using the same idiomatic data structure) and duplicates are dealt with by taking the last value mapping.
 
-Since label sets will often need to be compared, we have chosen to implement labels as a string data type.
+Due to the requirement to maintain ABI stability we have chosen to implement labels as type KeyValueIterable. Though, due to performance reasons, we may convert to std::string internally.
 
 ### Implementation
 
