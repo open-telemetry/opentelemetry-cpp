@@ -20,7 +20,7 @@ pull requests to the HTTP server exposed by the exporter and scrapes metrics dat
 This section introduces the components within the Prometheus exporter as well as their relationships, and the data flow between OpenTelemetry 
 and Prometheus from both users’ perspective and inside the OpenTelemetry.
 
-![image](./images/DataPath.png)
+![image](./images/Prom-DataPath.png)
 
 This diagram is re-used from [Metrics API/SDK C++ Design Document](https://github.com/open-telemetry/opentelemetry-cpp/pull/145). It shows the role of an Exporter in the data pipeline. The `export()` 
 function in Exporter is called by the Controller after pre-processing.
@@ -28,7 +28,7 @@ function in Exporter is called by the Controller after pre-processing.
 Since we only focus on the Exporter in this design, the following diagram de-emphasizes the components before the Controller and emphasizes more 
 on the components interacting with Prometheus Exporter directly.
 
-![image](./images/WholeDataFlow.png)
+![image](./images/Prom-WholeDataFlow.png)
 
 ### In the OpenTelemetry scope:
 - Other OpenTelemetry components collect and handle metrics data and interacts with Meter. Meter gets metrics data from those components.
@@ -101,11 +101,11 @@ exporter, translate the data to Prometheus data structure, and serve the data. I
 
 Here we include a UML class diagram inside the exporter to show the dependencies among the classes.
 
-![image](./images/UML.png)
+![image](./images/Prom-UML.png)
 
 We also include a diagram to illustrate flow of data within the exporter.
 
-![image](./images/ExporterDataFlow.png)
+![image](./images/Prom-ExporterDataFlow.png)
 
 ### `MetricsExporter` Class (Interface)
 This class is an interface that defines all basic behaviors of an exporter. In C++, there is already a similar class for exporting tracing spans, 
