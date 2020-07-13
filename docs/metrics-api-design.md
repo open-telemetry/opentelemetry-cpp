@@ -140,7 +140,7 @@ public:
   * enabled, a boolean that turns on or off collection.
   *
   */ 
-  virtual nostd::unique_ptr<DoubleCounter> 
+  virtual nostd::shared_ptr<DoubleCounter> 
                             NewDoubleCounter(nostd::string_view name, 
                             nostd::string_view description,
                             nostd::string_view unit, 
@@ -160,7 +160,7 @@ public:
   * enabled, a boolean that turns on or off collection.
   *
   */ 
-  virtual nostd::unique_ptr<LongCounter> NewIntCounter(nostd::string_view name,
+  virtual nostd::shared_ptr<LongCounter> NewIntCounter(nostd::string_view name,
                                                        nostd::string_view description,
                                                        nostd::string_view unit,
                                                        nostd::string_view enabled);
