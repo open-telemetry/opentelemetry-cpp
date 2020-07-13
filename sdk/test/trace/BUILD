@@ -43,9 +43,31 @@ cc_test(
 )
 
 cc_test(
-    name = "sampler_test",
+    name = "always_on_sampler_test",
     srcs = [
-        "sampler_test.cc",
+        "always_on_sampler_test.cc",
+    ],
+    deps = [
+        "//sdk/src/trace",
+        "@com_google_googletest//:gtest_main",
+    ],
+)
+
+cc_test(
+    name = "always_off_sampler_test",
+    srcs = [
+        "always_off_sampler_test.cc",
+    ],
+    deps = [
+        "//sdk/src/trace",
+        "@com_google_googletest//:gtest_main",
+    ],
+)
+
+cc_test(
+    name = "parent_or_else_sampler_test",
+    srcs = [
+        "parent_or_else_sampler_test.cc",
     ],
     deps = [
         "//sdk/src/trace",
