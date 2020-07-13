@@ -52,19 +52,19 @@ TEST(StdoutSpanExporter, PrintDefaultSpan)
   auto recordable = processor->MakeRecordable();
 
   // This can be an ofstream as well or any other ostream
-  std::stringstream buffer;
+  std::stringstream stdoutOutput;
 
   // Save cout's buffer here
   std::streambuf *sbuf = std::cout.rdbuf();
 
   // Redirect cout to our stringstream buffer or any other ostream
-  std::cout.rdbuf(buffer.rdbuf());
+  std::cout.rdbuf(stdoutOutput.rdbuf());
 
   processor->OnEnd(std::move(recordable));
 
   std::cout.rdbuf(sbuf);
 
-  const char* expectedOutput =
+  std::string expectedOutput =
  "{\n"
   "  name          : \n"
   "  trace_id      : 00000000000000000000000000000000\n"
@@ -76,7 +76,7 @@ TEST(StdoutSpanExporter, PrintDefaultSpan)
   "  status        : OK\n"
   "  attributes    : \n"
   "}\n"; 
-  ASSERT_EQ(buffer.str(),expectedOutput);
+  ASSERT_EQ(stdoutOutput.str(),expectedOutput);
 }
 
 TEST(StdoutSpanExporter, PrintChangedSpan)
@@ -105,15 +105,18 @@ TEST(StdoutSpanExporter, PrintChangedSpan)
   std::array<bool, 3> array2 = {false, true, false};
   opentelemetry::nostd::span<bool> span2{array2.data(), array2.size()};  
   recordable->SetAttribute("attr5", span2);
-  // This can be an ofstream as well or any other ostream
+
+  // Create stringstream to redirect to
   std::stringstream stdoutOutput;
 
   // Save cout's buffer here
   std::streambuf *sbuf = std::cout.rdbuf();
 
-  // Redirect cout to our stringstream buffer or any other ostream
+  // Redirect cout to our stringstream buffer
   std::cout.rdbuf(stdoutOutput.rdbuf());
+
   processor->OnEnd(std::move(recordable));
+
   std::cout.rdbuf(sbuf);
 
   std::string start = std::to_string(now.time_since_epoch().count());
