@@ -186,6 +186,9 @@ private:
 
       std::cout << ss.str() << " ";
     }
+
+    std::cout << "\n}"
+              << "\n";
   }
   
 };
