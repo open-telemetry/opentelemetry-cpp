@@ -187,8 +187,8 @@ public:
   *         the batch of the associated instrument type.
   *
   */ 
-  virtual void RecordBatch(nostd::string_view labels, 
-                           nostd::KeyValueIterable values) noexcept;
+  virtual void RecordBatch(nostd::KeyValueIterable labels, 
+                           nostd::span<pair(SynchronousInstrument, variant<int, double>), values) noexcept;
 private:
   MeterProvider meterProvider_;
   InstrumentationInfo instrumentationInfo_;
@@ -211,7 +211,7 @@ Each instrument must have enough information to meaningfully attach its measured
 * description (string) — Short description of what this instrument is capturing.
 * value_type (string or enum) — Determines whether the value tracked is an int64 or double.
 * meter (Meter) — The Meter instance from which this instrument was derived.
-* label_keys (wstring) — A wstring representing the labels associated with the Bound Instruments.
+* label_keys (KeyValueIterable) — A nostd class acting as a map from nostd::string_view to nostd::string_view
 * enabled (boolean) — Determines whether the instrument is currently collecting data.
 * bound_instruments (key value container) — Contains the bound instruments derived from this instrument.
 
@@ -239,7 +239,7 @@ Each measurement taken by a Metric instrument is a Metric event which must conta
 
 A key:value mapping of some kind MUST be supported as annotation each metric event.  Labels must be represented the same way throughout the API (i.e. using the same idiomatic data structure) and duplicates are dealt with by taking the last value mapping.
 
-**Since label sets will often need to be compared, we have chosen to implement labels as a string data type.**
+**To maintain ABI stability, we have chosen to implement this as a KeyValueIterable type. However, due to performance concerns, we may convert to a std::string internally.**
 
 **Calling Conventions**
 
@@ -348,7 +348,7 @@ public:
     * @param labels the set of labels, as key-value pairs.
     * @return a Bound Instrument
    */
-    BoundSynchronousInstrument bind(nostd::string_view & labels);
+    BoundSynchronousInstrument bind(nostd::KeyValueIterable labels);
     /**
     * Records a single synchronous metric event. 
     * Since this is an unbound synchronous instrument, labels are required in  * metric capture calls.
@@ -358,7 +358,7 @@ public:
     * @param value the numerical representation of the metric being captured
     * @return void
    */
-    void update(common::AttributeValue value, nostd::string_view &labels); //add or record
+    void update(common::AttributeValue value, nostd::KeyValueIterable labels); //add or record
 };
 class BoundSynchronousInstrument: public Instrument {
 
@@ -422,7 +422,7 @@ public:
     * @param value the numerical representation of the metric being captured
     * @param labels the set of labels, as key-value pairs
     */
-    void add(int value);
+    void add(int value, nostd::KeyValueIterable labels);
 
     void unbind();
 };
@@ -442,7 +442,7 @@ public:
     * @param labels the set of labels, as key-value pairs.
     * @return a BoundIntCounter tied to the specified labels
     */ 
-    BoundIntCounter bind(nostd::string_view &labels);
+    BoundIntCounter bind(nostd::KeyValueIterable labels);
 
     /*
     * Add adds the value to the counter's sum by sending to aggregator. The labels should contain
@@ -451,7 +451,7 @@ public:
     * @param value the numerical representation of the metric being captured
     * @param labels the set of labels, as key-value pairs
     */
-    void add(int value, std::string_view &labels);
+    void add(int value, nostd::KeyValueIterable labels);
 };
 
 class IntValueObserver: public AsynchronousInstrument{
