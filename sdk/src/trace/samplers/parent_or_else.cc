@@ -11,7 +11,7 @@ ParentOrElseSampler::ParentOrElseSampler(std::shared_ptr<Sampler> delegate_sampl
 {}
 
 SamplingResult ParentOrElseSampler::ShouldSample(
-    const SpanContext *parent_context,
+    const trace_api::SpanContext *parent_context,
     trace_api::TraceId trace_id,
     nostd::string_view name,
     trace_api::SpanKind span_kind,
@@ -24,7 +24,7 @@ SamplingResult ParentOrElseSampler::ShouldSample(
   }
   
   // If parent exists:
-  if (parent_context->sampled_flag)
+  if (parent_context->IsSampled())
   {
     return {Decision::RECORD_AND_SAMPLE, nullptr};
   }
