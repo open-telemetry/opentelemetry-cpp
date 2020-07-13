@@ -18,7 +18,7 @@ set(CMAKE_OSX_SYSROOT ${CMAKE_OSX_SYSROOT} CACHE PATH "..." FORCE)
 
 if(WITH_STL)
   set(CMAKE_CXX_STANDARD 20)
-  add_definitions(-DHAVE_STDLIB_CPP -DHAVE_GSL)
+  add_definitions(-DHAVE_CPP_STDLIB -DHAVE_GSL)
   # Guidelines Support Library path
   set(GSL_DIR ../../third_party/ms-gsl)
   include_directories(${GSL_DIR}/include)

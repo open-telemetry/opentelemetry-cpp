@@ -61,7 +61,7 @@ TEST(SpanTest, PointerCountConstruction)
   EXPECT_EQ(s2.data(), array.data());
   EXPECT_EQ(s2.size(), array.size());
 
-#ifndef HAVE_STDLIB_CPP
+#ifndef HAVE_CPP_STDLIB
   /* This test is not supposed to fail with STL. Why is this invalid construct? */
   EXPECT_DEATH((span<int, 2>{array.data(), array.size()}), ".*");
 #endif
@@ -80,7 +80,7 @@ TEST(SpanTest, RangeConstruction)
   EXPECT_EQ(s2.data(), array);
   EXPECT_EQ(s2.size(), 3);
 
-#ifndef HAVE_STDLIB_CPP
+#ifndef HAVE_CPP_STDLIB
   /* This test is not supposed to fail with STL. Why is this invalid construct? */
   EXPECT_DEATH((span<int, 2>{std::begin(array), std::end(array)}), ".*");
 #endif
@@ -125,7 +125,7 @@ TEST(SpanTest, ContainerConstruction)
   EXPECT_EQ(s2.data(), v.data());
   EXPECT_EQ(s2.size(), v.size());
 
-#ifndef HAVE_STDLIB_CPP
+#ifndef HAVE_CPP_STDLIB
   /* This test is not supposed to fail with STL. Why is this invalid construct? */
   EXPECT_DEATH((span<int, 2>{v.data(), 3}), ".*");
 #endif

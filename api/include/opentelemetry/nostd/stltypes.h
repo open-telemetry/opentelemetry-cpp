@@ -2,7 +2,7 @@
 
 #include "opentelemetry/version.h"
 
-#ifndef HAVE_STDLIB_CPP
+#ifndef HAVE_CPP_STDLIB
 // OpenTelemetry backport of STL C++20 types
 #  include <opentelemetry/nostd/nostd.h>
 
@@ -23,7 +23,7 @@
 #    if !__has_include(<string_view>)  // Check for string_view
 #      error \
           "STL library does not support std::span. Possible solution:"                   \
-         " - #undef HAVE_STDLIB_CPP // to use OpenTelemetry nostd::string_view"
+         " - #undef HAVE_CPP_STDLIB // to use OpenTelemetry nostd::string_view"
 #    endif
 #  endif
 
@@ -50,7 +50,7 @@ OPENTELEMETRY_END_NAMESPACE
 // No span implementation provided.
 #      error \
           "STL library does not support std::span. Possible solutions:"                  \
-         " - #undef HAVE_STDLIB_CPP // to use OpenTelemetry nostd::span .. or      "    \
+         " - #undef HAVE_CPP_STDLIB // to use OpenTelemetry nostd::span .. or      "    \
          " - #define HAVE_GSL       // to use gsl::span                            "
 #    endif
 

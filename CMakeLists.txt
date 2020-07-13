@@ -15,7 +15,7 @@ option(WITH_STL
 
 if(WITH_STL)
   # We require at least C++17. C++20 is optimal to avoid gsl::span
-  add_definitions(-DHAVE_STDLIB_CPP -DHAVE_GSL)
+  add_definitions(-DHAVE_CPP_STDLIB -DHAVE_GSL)
   # We ask for 20, but we may get C++17
   set(CMAKE_CXX_STANDARD 20)
   # Guidelines Support Library path

@@ -25,7 +25,7 @@
     <RootNamespace>exampleevent</RootNamespace>
     <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
     <OpenTelemetrySDKPath>$(MSBuildProjectDirectory)\..\..\</OpenTelemetrySDKPath>
-    <ProjectName>StreamTracer</ProjectName>
+    <ProjectName>nostd_usage</ProjectName>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
@@ -162,12 +162,6 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp" />
-  </ItemGroup>
-  <ItemGroup>
-    <ClInclude Include="ETWStringStream.hpp" />
-    <ClInclude Include="EventProtocols.hpp" />
-    <ClInclude Include="StreamTracer.hpp" />
-    <ClInclude Include="utils.hpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

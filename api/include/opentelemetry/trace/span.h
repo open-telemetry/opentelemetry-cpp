@@ -40,7 +40,6 @@ struct StartSpanOptions
   // Span(Context?) parent;
   // SpanContext remote_parent;
   // Links
-  // Attributes
   SpanKind kind = SpanKind::kInternal;
 };
 /**
@@ -74,13 +73,10 @@ public:
   Span &operator=(const Span &) = delete;
   Span &operator=(Span &&) = delete;
 
-  // TODO
   // Sets an attribute on the Span. If the Span previously contained a mapping for
   // the key, the old value is replaced.
-  //
-  // If an empty string is used as the value, the attribute will be silently
-  // dropped. Note: this behavior could change in the future.
-  // virtual void SetAttribute(nostd::string_view key, AttributeValue&& value) = 0;
+  virtual void SetAttribute(nostd::string_view key,
+                            const common::AttributeValue &&value) noexcept = 0;
 
   // Adds an event to the Span.
   virtual void AddEvent(nostd::string_view name) noexcept = 0;

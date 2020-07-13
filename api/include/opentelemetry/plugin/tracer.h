@@ -18,6 +18,11 @@ public:
   {}
 
   // trace::Span
+  void SetAttribute(nostd::string_view name, const common::AttributeValue &&value) noexcept override
+  {
+    span_->SetAttribute(name, std::move(value));
+  }
+
   void AddEvent(nostd::string_view name) noexcept override { span_->AddEvent(name); }
 
   void AddEvent(nostd::string_view name, core::SystemTimestamp timestamp) noexcept override
@@ -61,9 +66,10 @@ public:
   // trace::Tracer
   nostd::unique_ptr<trace::Span> StartSpan(
       nostd::string_view name,
+      const trace::KeyValueIterable &attributes,
       const trace::StartSpanOptions &options = {}) noexcept override
   {
-    auto span = tracer_handle_->tracer().StartSpan(name, options);
+    auto span = tracer_handle_->tracer().StartSpan(name, attributes, options);
     if (span == nullptr)
     {
       return nullptr;
