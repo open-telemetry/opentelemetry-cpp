@@ -5,7 +5,6 @@
 #include "opentelemetry/nostd/string_view.h"
 #include "opentelemetry/trace/key_value_iterable_view.h"
 
-#include <unordered_map>
 #include <map>
 
 OPENTELEMETRY_BEGIN_NAMESPACE
