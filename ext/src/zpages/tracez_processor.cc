@@ -4,6 +4,7 @@ OPENTELEMETRY_BEGIN_NAMESPACE
 namespace ext {
 namespace zpages {
 
+  // TODO: Add thread safety measures
   void TracezSpanProcessor::OnStart(opentelemetry::sdk::trace::Recordable &span) noexcept {
     spans_.running.insert(static_cast<opentelemetry::sdk::trace::SpanData*>(&span));
   }
