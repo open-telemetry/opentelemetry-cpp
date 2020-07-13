@@ -18,8 +18,9 @@ void Recordable::SetIds(trace::TraceId trace_id,
 void Recordable::SetAttribute(nostd::string_view key,
                               const opentelemetry::common::AttributeValue &value) noexcept
 {
-  (void)key;
-  (void)value;
+  auto attribute = span_.add_attributes();
+  attribute->set_key(key.data(), key.size());
+  //span_.add_attributes(attribute);
 }
 
 void Recordable::AddEvent(nostd::string_view name, core::SystemTimestamp timestamp) noexcept
@@ -29,8 +30,8 @@ void Recordable::AddEvent(nostd::string_view name, core::SystemTimestamp timesta
 
 void Recordable::SetStatus(trace::CanonicalCode code, nostd::string_view description) noexcept
 {
-  (void)code;
-  (void)description;
+  span_.mutable_status()->set_code(opentelemetry::proto::trace::v1::Status_StatusCode(code));
+  span_.mutable_status()->set_message(description.data(), description.size());
 }
 
 void Recordable::SetName(nostd::string_view name) noexcept

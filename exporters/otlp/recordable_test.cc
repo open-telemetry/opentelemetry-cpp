@@ -9,28 +9,26 @@ namespace otlp
 {
 TEST(Recordable, SetIds)
 {
-  const trace::TraceId trace_id(
-    std::array<const uint8_t, trace::TraceId::kSize>(
-    {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1}));
+  const trace::TraceId trace_id(std::array<const uint8_t, trace::TraceId::kSize>(
+      {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1}));
 
   const trace::SpanId span_id(
-    std::array<const uint8_t, trace::SpanId::kSize>(
-    {0, 0, 0, 0, 0, 0, 0, 2}));
+      std::array<const uint8_t, trace::SpanId::kSize>({0, 0, 0, 0, 0, 0, 0, 2}));
 
   const trace::SpanId parent_span_id(
-    std::array<const uint8_t, trace::SpanId::kSize>(
-    {0, 0, 0, 0, 0, 0, 0, 3}));
+      std::array<const uint8_t, trace::SpanId::kSize>({0, 0, 0, 0, 0, 0, 0, 3}));
 
   Recordable rec;
 
   rec.SetIds(trace_id, span_id, parent_span_id);
 
-  EXPECT_EQ(rec.span().trace_id(),
-            std::string(reinterpret_cast<const char *>(trace_id.Id().data()), trace::TraceId::kSize));
+  EXPECT_EQ(rec.span().trace_id(), std::string(reinterpret_cast<const char *>(trace_id.Id().data()),
+                                               trace::TraceId::kSize));
   EXPECT_EQ(rec.span().span_id(),
             std::string(reinterpret_cast<const char *>(span_id.Id().data()), trace::SpanId::kSize));
   EXPECT_EQ(rec.span().parent_span_id(),
-            std::string(reinterpret_cast<const char *>(parent_span_id.Id().data()), trace::SpanId::kSize));
+            std::string(reinterpret_cast<const char *>(parent_span_id.Id().data()),
+                        trace::SpanId::kSize));
 }
 
 TEST(Recordable, SetName)
@@ -67,6 +65,17 @@ TEST(Recordable, SetDuration)
   rec.SetDuration(duration);
 
   EXPECT_EQ(rec.span().end_time_unix_nano(), unix_end);
+}
+
+TEST(Recordable, SetStatus)
+{
+  Recordable rec;
+  trace::CanonicalCode code(trace::CanonicalCode::OK);
+  nostd::string_view description = "For test";
+  rec.SetStatus(code, description);
+
+  EXPECT_EQ(rec.span().status().code(), opentelemetry::proto::trace::v1::Status_StatusCode(code));
+  EXPECT_EQ(rec.span().status().message(), description);
 }
 }  // namespace otlp
 }  // namespace exporter
