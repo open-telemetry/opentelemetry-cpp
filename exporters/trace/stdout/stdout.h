@@ -176,7 +176,7 @@ private:
     }
   }
 
-  void printKeys(std::unordered_map<std::string, common::AttributeValue> map)
+  void printAttributes(std::unordered_map<std::string, common::AttributeValue> map)
   {
     for(auto kv : map)
     {

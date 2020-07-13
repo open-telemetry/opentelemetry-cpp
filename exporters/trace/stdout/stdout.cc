@@ -51,7 +51,7 @@ sdktrace::ExportResult StdoutSpanExporter::Export(
                   << "\n  description   : " << span->GetDescription() 
                   << "\n  status        : " << statusMap[int(span->GetStatus())]
                   << "\n  attributes    : ";
-                  printKeys(span->GetAttributes());
+                  printAttributes(span->GetAttributes());
       }
     }
 
