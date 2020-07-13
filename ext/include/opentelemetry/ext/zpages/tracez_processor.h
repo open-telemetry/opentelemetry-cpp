@@ -6,6 +6,7 @@
 #include <vector>
 #include <utility>
 #include <thread>
+#include <mutex>
 
 #include "opentelemetry/sdk/trace/recordable.h"
 #include "opentelemetry/sdk/trace/span_data.h"
@@ -86,6 +87,7 @@ class TracezSpanProcessor : public opentelemetry::sdk::trace::SpanProcessor {
   void Shutdown(std::chrono::microseconds timeout = std::chrono::microseconds(0)) noexcept override {}
 
  private:
+  mutable std::mutex mtx_;
   CollectedSpans spans_;
 };
 }  // namespace zpages

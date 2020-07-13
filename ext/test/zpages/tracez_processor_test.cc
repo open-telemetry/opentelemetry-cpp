@@ -5,6 +5,7 @@
 
 #include <gtest/gtest.h>
 #include <iostream>
+#include <thread>
 
 using namespace opentelemetry::sdk::trace;
 using namespace opentelemetry::ext::zpages;
@@ -109,6 +110,41 @@ bool ContainsNames(const std::vector<std::string>& names,
 
   return true;
 }
+
+
+/*
+ * Helper function calls GetSpanSnapshot() i times and does nothing with it
+ * otherwise. Used for testing thread safety
+ */
+void GetManySnapshots(std::shared_ptr<TracezSpanProcessor>& processor, int i) {
+  for (; i > 0; i--) processor->GetSpanSnapshot();
+}
+
+
+/*
+ * Helper function that creates i spans, which are added into the passed
+ * in vector. Used for testing thread safety
+ */
+void StartManySpans(std::vector<opentelemetry::nostd::unique_ptr<opentelemetry::trace::Span>> &spans,
+                    std::shared_ptr<opentelemetry::trace::Tracer> tracer, int i) {
+  for (; i > 0; i--) spans.push_back(tracer->StartSpan("span"));
+}
+
+/*
+ * Helper function that ends all spans in the passed in span vector, checking
+ * i times. Used for testing thread safety
+ */
+void EndAllSpans(std::vector<opentelemetry::nostd::unique_ptr<opentelemetry::trace::Span>> &spans,
+                 int i) {
+  unsigned int count = 0;
+  for (; i > 0; i--) {
+    for (unsigned int j = count; j < spans.size(); j++) {
+      spans[j]->End();
+    }
+    count = spans.size();
+  }
+}
+
 
 ///////////////////////////////////////// TESTS ///////////////////////////////////
 
@@ -451,7 +487,143 @@ TEST(TracezSpanProcessor, MultipleSpansOuterSplitNewOnly) {
 }
 
 
-// TODO: add tests for checking if spans are accurate when getting snapshots,
-// like when a span completes mid getter call later on using threads
+/*
+ * Test if thread safety is compromised and errors are thrown when many spans
+ * start at the same time. Test is not failed if no errors occur.
+ */
+TEST(TracezSpanProcessor, RunningThreadSafety) {
+  std::shared_ptr<TracezSpanProcessor> processor(new TracezSpanProcessor());
+  auto tracer = std::shared_ptr<opentelemetry::trace::Tracer>(new Tracer(processor));
+  std::vector<opentelemetry::nostd::unique_ptr<opentelemetry::trace::Span>> spans;
+
+  std::thread start1(StartManySpans, std::ref(spans), tracer, 5);
+  std::thread start2(StartManySpans, std::ref(spans), tracer, 5);
+
+  start1.join();
+  start2.join();
+
+  EndAllSpans(spans, 1);
+}
+
+
+/*
+ * Test if thread safety is compromised and errors are thrown when many spans
+ * end at the same time. Test is not failed if no errors occur.
+ */
+TEST(TracezSpanProcessor, CompletedThreadSafety) {
+  std::shared_ptr<TracezSpanProcessor> processor(new TracezSpanProcessor());
+  auto tracer = std::shared_ptr<opentelemetry::trace::Tracer>(new Tracer(processor));
+  std::vector<opentelemetry::nostd::unique_ptr<opentelemetry::trace::Span>> spans;
+
+  StartManySpans(spans, tracer, 10);
+
+  std::thread end1(EndAllSpans, std::ref(spans), 5);
+  std::thread end2(EndAllSpans, std::ref(spans), 5);
+
+  end1.join();
+  end2.join();
+}
+
+
+/*
+ * Test if thread safety is compromised and errors are thrown when many
+ * snapshots are grabbed at the same time. Test is not failed if no
+ * errors occur.
+ */
+TEST(TracezSpanProcessor, SnapshotThreadSafety) {
+  std::shared_ptr<TracezSpanProcessor> processor(new TracezSpanProcessor());
+  auto tracer = std::shared_ptr<opentelemetry::trace::Tracer>(new Tracer(processor));
+  std::vector<opentelemetry::nostd::unique_ptr<opentelemetry::trace::Span>> spans;
+
+  std::thread snap1(GetManySnapshots, std::ref(processor), 5);
+  std::thread snap2(GetManySnapshots, std::ref(processor), 5);
+
+  snap1.join();
+  snap2.join();
+
+  StartManySpans(spans, tracer, 10);
+
+  std::thread snap3(GetManySnapshots, std::ref(processor), 5);
+  std::thread snap4(GetManySnapshots, std::ref(processor), 5);
+
+  snap3.join();
+  snap4.join();
+
+  EndAllSpans(spans, 1);
+}
+
+
+/*
+ * Test if thread safety is compromised and errors are thrown when many spans
+ * start while others are ending. Test is not failed if no errors occur.
+ */
+TEST(TracezSpanProcessor, RunningCompletedThreadSafety) {
+  std::shared_ptr<TracezSpanProcessor> processor(new TracezSpanProcessor());
+  auto tracer = std::shared_ptr<opentelemetry::trace::Tracer>(new Tracer(processor));
+  std::vector<opentelemetry::nostd::unique_ptr<opentelemetry::trace::Span>> spans;
+
+  std::thread start(StartManySpans, std::ref(spans), tracer, 10);
+  std::thread end(EndAllSpans, std::ref(spans), 10);
+
+  start.join();
+  end.join();
+}
+
+
+/*
+ * Test if thread safety is compromised and errors are thrown when many spans
+ * start while snapshots are being grabbed. Test is not failed if no errors occur.
+ */
+TEST(TracezSpanProcessor, RunningSnapshotThreadSafety) {
+  std::shared_ptr<TracezSpanProcessor> processor(new TracezSpanProcessor());
+  auto tracer = std::shared_ptr<opentelemetry::trace::Tracer>(new Tracer(processor));
+  std::vector<opentelemetry::nostd::unique_ptr<opentelemetry::trace::Span>> spans;
+
+  std::thread start(StartManySpans, std::ref(spans), tracer, 10);
+  std::thread snapshots(GetManySnapshots, std::ref(processor), 10);
+
+  start.join();
+  snapshots.join();
+
+}
+
+
+/*
+ * Test if thread safety is compromised and errors are thrown when all spans
+ * end while snapshotd are being grabbed. Test is not failed if no errors occur.
+ */
+TEST(TracezSpanProcessor, SnapshotCompletedThreadSafety) {
+  std::shared_ptr<TracezSpanProcessor> processor(new TracezSpanProcessor());
+  auto tracer = std::shared_ptr<opentelemetry::trace::Tracer>(new Tracer(processor));
+  std::vector<opentelemetry::nostd::unique_ptr<opentelemetry::trace::Span>> spans;
+
+  StartManySpans(spans, tracer, 10);
+
+  std::thread snapshots(GetManySnapshots, std::ref(processor), 10);
+  std::thread end(EndAllSpans, std::ref(spans), 1);
+
+  snapshots.join();
+  end.join();
+
+}
+
+
+/*
+ * Test if thread safety is compromised and errors are thrown when many spans
+ * start and end while snapshots are being grabbed. Test is not failed if no errors occur.
+ */
+TEST(TracezSpanProcessor, RunningSnapshotCompletedThreadSafety) {
+  std::shared_ptr<TracezSpanProcessor> processor(new TracezSpanProcessor());
+  auto tracer = std::shared_ptr<opentelemetry::trace::Tracer>(new Tracer(processor));
+  std::vector<opentelemetry::nostd::unique_ptr<opentelemetry::trace::Span>> spans;
+
+  std::thread start(StartManySpans, std::ref(spans), tracer, 10);
+  std::thread snapshots(GetManySnapshots, std::ref(processor), 10);
+  std::thread end(EndAllSpans, std::ref(spans), 10);
+
+  start.join();
+  snapshots.join();
+  end.join();
+}
 
 
