@@ -11,6 +11,7 @@ using opentelemetry::core::SteadyTimestamp;
 using opentelemetry::core::SystemTimestamp;
 namespace nostd  = opentelemetry::nostd;
 namespace common = opentelemetry::common;
+using opentelemetry::trace::SpanContext;
 
 /**
  * A mock sampler that returns non-empty sampling results attributes.
