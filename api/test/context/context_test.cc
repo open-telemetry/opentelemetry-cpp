@@ -6,58 +6,54 @@
 
 using namespace opentelemetry;
 
-// Tests that the context default constructor does not cause a crash
-TEST(ContextTest, ContextDefaultConstructorCrash)
-{
-  context::Context context_test = context::Context();
-}
 
-// Tests that the context constructor does not cause a crash when a map
-// is provided.
-TEST(ContextTest, ContextIterableConstructorCrash)
+// Tests that the context constructor accepts an std::map
+TEST(ContextTest, ContextIterableAcceptsMap)
 {
-  std::map<std::string, std::string> map_test = {{"test_key", "123"}};
+  std::map<std::string, context::ContextValue> map_test = {{"test_key", "123"}};
   context::Context context_test               = context::Context(map_test);
 }
 
-// Tests that the WriteValues method does not crash
-TEST(ContextTest, ContextWriteValuesCrash)
+// Tests that the GetValue method returns the expected value
+TEST(ContextTest, ContextGetValueReturnsExpectedValue)
 {
-  std::map<std::string, std::string> map_test       = {{"test_key", "123"}};
-  std::map<std::string, std::string> map_test_write = {{"foo_key", "456"}};
+  std::map<std::string, std::string> map_test       = {{"test_key", "123"},{"foo_key", "456"}};
+  
   context::Context context_test                     = context::Context(map_test);
-  context_test.WriteValues(map_test_write);
+  EXPECT_EQ(nostd::get<nostd::string_view>(context_test.GetValue("test_key")), "123");
+  EXPECT_EQ(nostd::get<nostd::string_view>(context_test.GetValue("foo_key")), "456");
 }
 
-// Tests that the CreateKey method does not crash
-TEST(ContextTest, ContextCreateKeyCrash)
+// Tests that the SetValues method accepts an std::map
+TEST(ContextTest, ContextSetValuesAcceptsMap)
 {
-  context::Context context_test;
-  context::Context::Key test_key = context_test.CreateKey("key_name");
-}
-
-// Tests that the GetValue method does not crash
-TEST(ContextTest, ContextGetValueCrash)
-{
-  std::map<std::string, std::string> map_test       = {{"test_key", "123"}};
-  std::map<std::string, std::string> map_test_write = {{"foo_key", "456"}};
+  std::map<std::string, context::ContextValue> map_test       = {{"test_key", "123"}};
+  std::map<std::string, context::ContextValue> map_test_write = {{"foo_key", "456"}};
   context::Context context_test                     = context::Context(map_test);
-  context::Context::Key test_key                    = context_test.CreateKey("key_name");
-  EXPECT_EQ(nostd::get<int>(context_test.GetValue(test_key)), 0);
+  context::Context foo_test = context_test.SetValues(map_test_write);
+  EXPECT_EQ(nostd::get<nostd::string_view>(foo_test.GetValue("test_key")), "123");
+  EXPECT_EQ(nostd::get<nostd::string_view>(foo_test.GetValue("foo_key")), "456");
 }
 
-// Tests that the Context::Key GetIdentifier method does not crash
-TEST(ContextTest, ContextKeyGetIdentifierCrash)
+// Tests that the SetValues method accepts a nostd::string_view and 
+// context::ContextValue
+TEST(ContextTest, ContextSetValuesAcceptsStringViewContextValue)
 {
-  context::Context context_test;
-  context::Context::Key test_key = context_test.CreateKey("key_name");
-  EXPECT_EQ(test_key.GetIdentifier(), "");
+  nostd::string_view string_view_test = "string_view";
+  context::ContextValue context_value_test = "123";
+  context::Context context_test                     = context::Context();
+  context::Context foo_test = context_test.SetValue(string_view_test, context_value_test);
+  EXPECT_EQ(nostd::get<nostd::string_view>(foo_test.GetValue(string_view_test)), "123");
 }
 
-// Tests that the Context::Key GetName method does not crash
-TEST(ContextTest, ContextKeyGetNameCrash)
+// Tests that the original context does not change when a value is 
+// written to it
+TEST(ContextTest, ContextImmutability)
 {
-  context::Context context_test;
-  context::Context::Key test_key = context_test.CreateKey("key_name");
-  EXPECT_EQ(test_key.GetName(), "");
+  std::map<std::string, context::ContextValue> map_test = {{"test_key", "123"}};
+  context::Context context_test               = context::Context(map_test);
+
+  context::Context context_foo               = context_test.SetValue("foo_key", "456");
+  
+  EXPECT_THROW(nostd::get<nostd::string_view>(context_test.GetValue("foo_key")), nostd::bad_variant_access);
 }
