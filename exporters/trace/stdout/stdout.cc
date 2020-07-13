@@ -23,8 +23,6 @@ sdktrace::ExportResult StdoutSpanExporter::Export(
         return sdktrace::ExportResult::kFailure;
     }
 
-    auto start = std::chrono::steady_clock::now();
-
     for (auto &recordable : spans)
     {
       auto span = std::unique_ptr<sdktrace::SpanData>(
