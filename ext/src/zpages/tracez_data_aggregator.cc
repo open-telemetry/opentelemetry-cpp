@@ -13,6 +13,7 @@ const std::map<std::string, std::unique_ptr<TracezSpanData>>
     &TracezDataAggregator::GetAggregatedTracezData(){
   //Aggregate span data before returning the new information. 
   //The aggregation could also be periodically updated as an alternative
+  
   std::lock_guard<std::mutex> lock_guard{mu_};
   AggregateSpans();
   return aggregated_tracez_data_;
@@ -28,15 +29,16 @@ LatencyBoundary TracezDataAggregator::FindLatencyBoundary(SpanData *span_data){
   return LatencyBoundary::k100SecondToMax;
 }
 
-template <typename T>
 void TracezDataAggregator::InsertIntoSampleSpanList(
-    std::list<T>& sample_spans,
-    T &span_data){
+    std::list<std::unique_ptr<SpanData>>& sample_spans,
+    std::unique_ptr<SpanData> &span_data){
+  
   /** 
    * Check to see if the sample span list size exceeds the set limit, if it does
    * free up memory and remove the earliest inserted sample before appending
    */ 
   if (sample_spans.size() == kMaxNumberOfSampleSpans){
+    sample_spans.front().reset();
     sample_spans.pop_front();
   }
   sample_spans.push_back(std::move(span_data));
@@ -88,26 +90,29 @@ void TracezDataAggregator::AggregateCompletedSpans(
 void TracezDataAggregator::AggregateRunningSpans(
     std::unordered_set<SpanData *> &running_spans){
   std::unordered_set<std::string> seen_span_names;
-  for (auto span : running_spans){
+  for (auto &span : running_spans){
     std::string span_name = span->GetName().data();
 
     if (aggregated_tracez_data_.find(span_name) == aggregated_tracez_data_.end()){
       aggregated_tracez_data_[span_name] = std::unique_ptr<TracezSpanData>(new TracezSpanData);
     }
-    auto &tracez_data = aggregated_tracez_data_[span_name];
+
     /** 
      * If it's the first time this span name is seen, reset its information 
      * to avoid double counting from previous aggregated data.
      */ 
     if (seen_span_names.find(span_name) == seen_span_names.end()){
-      tracez_data->running_span_count = 0;
-      tracez_data->sample_running_spans.clear();
+      aggregated_tracez_data_[span_name]->running_span_count = 0;
+      aggregated_tracez_data_[span_name]->sample_running_spans.clear();
       seen_span_names.insert(span_name);
     }
 
     // Maintain maximum size of sample running spans list
-     InsertIntoSampleSpanList(tracez_data->sample_running_spans,span);
-    tracez_data->running_span_count++;
+    if (aggregated_tracez_data_[span_name]->sample_running_spans.size() == kMaxNumberOfSampleSpans){
+      aggregated_tracez_data_[span_name]->sample_running_spans.pop_front();
+    }
+    aggregated_tracez_data_[span_name]->sample_running_spans.push_back(span);
+    aggregated_tracez_data_[span_name]->running_span_count++;
   }
 }
 

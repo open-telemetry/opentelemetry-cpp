@@ -356,10 +356,11 @@ TEST_F(TracezDataAggregatorTest, RemovalOfRunningSpanWhenCompleted)
   ASSERT_TRUE(temp_data.find(span_name1) != temp_data.end());
   VerifySpanCountsInTracezSpanData(span_name1, temp_data.at(span_name1), 1, 0,
                                        {0, 0, 0, 0, 0, 0, 0, 0, 0});
-
+  ASSERT_EQ(temp_data.at(span_name1)->sample_running_spans.front()->GetName(), span_name1);
   // End the span and make sure running span is removed and completed span is updated, there should
   // be only one completed span
   span_first->End(end);
+  ASSERT_EQ(temp_data.at(span_name1)->sample_running_spans.front()->GetName(), span_name1);
   const auto  &data =
       tracez_data_aggregator->GetAggregatedTracezData();
   ASSERT_EQ(data.size(), 1);
@@ -369,7 +370,6 @@ TEST_F(TracezDataAggregatorTest, RemovalOfRunningSpanWhenCompleted)
   auto &aggregated_data = data.at(span_name1);
   VerifySpanCountsInTracezSpanData(span_name1, aggregated_data, 0, 0,
                                        {1, 0, 0, 0, 0, 0, 0, 0, 0});
-
   ASSERT_EQ(aggregated_data->sample_latency_spans[LatencyBoundary::k0MicroTo10Micro]
                 .front()
                 ->GetDuration(),

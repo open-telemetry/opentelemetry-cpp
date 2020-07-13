@@ -147,10 +147,9 @@ private:
    * @param sample_spans the sample span list into which span is to be inserted
    * @param span_data the span_data to be inserted into list
    */
-  template <typename T>
   void InsertIntoSampleSpanList(
-      std::list<T>& sample_spans,
-      T &span_data);
+      std::list<std::unique_ptr<SpanData>>& sample_spans,
+      std::unique_ptr<SpanData> &span_data);
     
   /** Instance of span processor used to collect raw data **/
   std::shared_ptr<TracezSpanProcessor> tracez_span_processor_;
