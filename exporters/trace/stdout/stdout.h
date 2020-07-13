@@ -81,7 +81,7 @@ private:
   */
 
   template <typename T>
-  static void print_array(std::stringstream &ss, common::AttributeValue &value, bool jsonTypes = false)
+  static void print_array(std::ostream &ss, common::AttributeValue &value, bool jsonTypes = false)
   {
     ss << '[';
     // TODO: jsonTypes for bool?
@@ -99,7 +99,7 @@ private:
     ss << ']';
   };
 
-  static void print_value(std::stringstream &ss,
+  static void print_value(std::ostream &ss,
                           common::AttributeValue &value,
                           bool jsonTypes = false)
   {
@@ -163,19 +163,19 @@ private:
     }
   }
 
-  void printAttributes(std::unordered_map<std::string, common::AttributeValue> map)
+  void printAttributes(std::ostream &ss,
+                       std::unordered_map<std::string, common::AttributeValue> map)
   {
     for(auto kv : map)
     {
-      std::stringstream ss;
-      std::cout << kv.first << ": ";
+      ss << kv.first << ": ";
       print_value(ss, kv.second, true);
 
-      std::cout << ss.str() << " ";
+      ss << " ";
     }
 
-    std::cout << "\n}"
-              << "\n";
+    ss  << "\n}"
+        << "\n";
   }
   
 };

@@ -44,17 +44,17 @@ sdktrace::ExportResult StdoutSpanExporter::Export(
         span->GetSpanId().ToLowerBase16(span_id);
         span->GetParentSpanId().ToLowerBase16(parent_span_id);
 
-        std::cout << "{"
-                  << "\n  name          : " << span->GetName()
-                  << "\n  trace_id      : " << std::string(trace_id, 32)
-                  << "\n  span_id       : " << std::string(span_id, 16)
-                  << "\n  parent_span_id: " << std::string(parent_span_id, 16)
-                  << "\n  start         : " << span->GetStartTime().time_since_epoch().count()
-                  << "\n  duration      : " << span->GetDuration().count()
-                  << "\n  description   : " << span->GetDescription() 
-                  << "\n  status        : " << statusMap[int(span->GetStatus())]
-                  << "\n  attributes    : ";
-                  printAttributes(span->GetAttributes());
+        sout_ << "{"
+              << "\n  name          : " << span->GetName()
+              << "\n  trace_id      : " << std::string(trace_id, 32)
+              << "\n  span_id       : " << std::string(span_id, 16)
+              << "\n  parent_span_id: " << std::string(parent_span_id, 16)
+              << "\n  start         : " << span->GetStartTime().time_since_epoch().count()
+              << "\n  duration      : " << span->GetDuration().count()
+              << "\n  description   : " << span->GetDescription() 
+              << "\n  status        : " << statusMap[int(span->GetStatus())]
+              << "\n  attributes    : ";
+              printAttributes(sout_, span->GetAttributes());
       }
     }
 
