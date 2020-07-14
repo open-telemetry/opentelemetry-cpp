@@ -24,7 +24,7 @@ TracezDataAggregator::TracezDataAggregator(
 }
 
 TracezDataAggregator::~TracezDataAggregator(){
-  //Notify and end the thread so object can be destroyed
+  //Notify and join the thread so object can be destroyed
   if( execute_.load(std::memory_order_acquire) ) {
     execute_.store(false, std::memory_order_release);
     cv_.notify_one();
@@ -34,6 +34,7 @@ TracezDataAggregator::~TracezDataAggregator(){
 
 const std::map<std::string, std::unique_ptr<TracezSpanData>>
     &TracezDataAggregator::GetAggregatedTracezData(){
+  std::unique_lock<std::mutex> lock(mtx_);
   return aggregated_tracez_data_;
 }
 
