@@ -1,12 +1,12 @@
 package(default_visibility = ["//visibility:public"])
 
 cc_library(
-    name = "stdout",
+    name = "stream_span",
     srcs = [
-        "stdout.cc",
+        "stream.cc",
     ],
     hdrs = [
-        "stdout.h",
+        "stream.h",
     ],
     deps = [
         "//sdk/src/trace",
@@ -14,10 +14,10 @@ cc_library(
 )
 
 cc_test(
-    name = "stdout_span_test",
-    srcs = ["stdout_span_test.cc"],
+    name = "stream_span_test",
+    srcs = ["stream_span_test.cc"],
     deps = [
-        ":stdout",
+        ":stream_span",
         "@com_google_googletest//:gtest_main",
     ],
 )

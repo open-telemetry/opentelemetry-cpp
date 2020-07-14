@@ -37,10 +37,10 @@ namespace exporter
 {
 namespace trace
 {
-class StdoutSpanExporter final : public sdktrace::SpanExporter
+class StreamSpanExporter final : public sdktrace::SpanExporter
 {
 public:
-    explicit StdoutSpanExporter(std::ostream &sout = std::cout,
+    explicit StreamSpanExporter(std::ostream &sout = std::cout,
                                 bool isShutdown = false) noexcept;
 
   std::unique_ptr<sdktrace::Recordable> MakeRecordable() noexcept override;

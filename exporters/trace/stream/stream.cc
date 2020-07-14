@@ -1,4 +1,4 @@
-#include "exporters/trace/stdout/stdout.h"
+#include "exporters/trace/stream/stream.h"
 
 #include <iostream>
 
@@ -10,17 +10,17 @@ namespace exporter
 {
 namespace trace
 {
-StdoutSpanExporter::StdoutSpanExporter(std::ostream &sout,
+StreamSpanExporter::StreamSpanExporter(std::ostream &sout,
                                       bool isShutdown) noexcept
                                     : sout_{sout},
                                       isShutdown_{isShutdown} {}
 
-std::unique_ptr<sdktrace::Recordable> StdoutSpanExporter::MakeRecordable() noexcept 
+std::unique_ptr<sdktrace::Recordable> StreamSpanExporter::MakeRecordable() noexcept 
 {
     return std::unique_ptr<sdktrace::Recordable>(new sdktrace::SpanData);
 }
 
-sdktrace::ExportResult StdoutSpanExporter::Export(
+sdktrace::ExportResult StreamSpanExporter::Export(
     const nostd::span<std::unique_ptr<sdktrace::Recordable>> &spans) noexcept
 {
     if(isShutdown_)
@@ -61,7 +61,7 @@ sdktrace::ExportResult StdoutSpanExporter::Export(
     return sdktrace::ExportResult::kSuccess;
 }
 
-void StdoutSpanExporter::Shutdown(std::chrono::microseconds timeout) noexcept 
+void StreamSpanExporter::Shutdown(std::chrono::microseconds timeout) noexcept 
 {
   isShutdown_ = true;
 }
