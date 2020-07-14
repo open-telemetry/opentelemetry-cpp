@@ -2,7 +2,9 @@
 
 #include "opentelemetry/sdk/common/atomic_shared_ptr.h"
 #include "opentelemetry/sdk/trace/processor.h"
+#include "opentelemetry/sdk/trace/samplers/always_on.h"
 #include "opentelemetry/trace/tracer.h"
+#include "opentelemetry/trace/noop.h"
 #include "opentelemetry/version.h"
 
 #include <memory>
@@ -20,7 +22,8 @@ public:
    * @param processor The span processor for this tracer. This must not be a
    * nullptr.
    */
-  explicit Tracer(std::shared_ptr<SpanProcessor> processor) noexcept : processor_{processor} {}
+  explicit Tracer(std::shared_ptr<SpanProcessor> processor,
+                  std::shared_ptr<Sampler> sampler = std::make_shared<AlwaysOnSampler>()) noexcept;
 
   /**
    * Set the span processor associated with this tracer.
@@ -35,6 +38,12 @@ public:
    */
   std::shared_ptr<SpanProcessor> GetProcessor() const noexcept;
 
+  /**
+   * Obtain the sampler associated with this tracer.
+   * @return The sampler for this tracer.
+   */
+  std::shared_ptr<Sampler> GetSampler() const noexcept;
+
   nostd::unique_ptr<trace_api::Span> StartSpan(
       nostd::string_view name,
       const trace_api::KeyValueIterable &attributes,
@@ -46,6 +55,7 @@ public:
 
 private:
   opentelemetry::sdk::AtomicSharedPtr<SpanProcessor> processor_;
+  const std::shared_ptr<Sampler> sampler_;
 };
 }  // namespace trace
 }  // namespace sdk

@@ -1,9 +1,9 @@
 # OpenTelemetry C++
 
-[![Gitter chat][gitter-image]][gitter-url]
-
-[gitter-image]: https://badges.gitter.im/open-telemetry/opentelemetry-cpp.svg
-[gitter-url]: https://gitter.im/open-telemetry/opentelemetry-cpp?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge
+[![Gitter chat](https://badges.gitter.im/open-telemetry/opentelemetry-cpp.svg)](https://gitter.im/open-telemetry/opentelemetry-cpp?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+[![codecov.io](https://codecov.io/gh/open-telemetry/opentelemetry-cpp/branch/master/graphs/badge.svg?)](https://codecov.io/gh/open-telemetry/opentelemetry-cpp/)
+[![Build Status](https://action-badges.now.sh/open-telemetry/opentelemetry-cpp)](https://github.com/open-telemetry/opentelemetry-cpp/actions)
+[![Release](https://img.shields.io/github/v/release/open-telemetry/opentelemetry-cpp?include_prereleases&style=)](https://github.com/open-telemetry/opentelemetry-cpp/releases/)
 
 The C++ [OpenTelemetry](https://opentelemetry.io/) client.
 

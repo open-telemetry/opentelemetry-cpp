@@ -18,9 +18,9 @@ public:
   {}
 
   // trace::Span
-  void SetAttribute(nostd::string_view name, const common::AttributeValue &&value) noexcept override
+  void SetAttribute(nostd::string_view name, const common::AttributeValue &value) noexcept override
   {
-    span_->SetAttribute(name, std::move(value));
+    span_->SetAttribute(name, value);
   }
 
   void AddEvent(nostd::string_view name) noexcept override { span_->AddEvent(name); }
