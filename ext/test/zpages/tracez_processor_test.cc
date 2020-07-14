@@ -452,6 +452,23 @@ TEST_F(TracezProcessor, MultipleSpansOuterSplitNewOnly) {
 
 
 /*
+ * Test for ForceFlush and Shutdown code coverage, which do nothing.
+ */
+TEST_F(TracezProcessor, FlushShutdown) {
+  auto pre_running_sz = running.size();
+  auto pre_completed_sz = completed.size();
+
+  processor->ForceFlush();
+  processor->Shutdown();
+
+  UpdateSpans(processor, completed, running);
+  
+  EXPECT_EQ(pre_running_sz, running.size());
+  EXPECT_EQ(pre_completed_sz, completed.size());
+}
+
+
+/*
  * Test for thread safety when many spans start at the same time.
  */
 TEST_F(TracezProcessor, RunningThreadSafety) {
