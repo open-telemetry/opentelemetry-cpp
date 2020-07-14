@@ -3,6 +3,7 @@
 CI tests can be run on docker by invoking the script `./ci/run_docker.sh ./ci/do_ci.sh <TARGET>` where the targets are:
 
 * `cmake.test`: build cmake targets and run tests.
+* `cmake.c++20.test`: build cmake targets with the C++20 standard and run tests.
 * `cmake.test_example_plugin`: build and test an example OpenTelemetry plugin.
 * `cmake.exporter.otprotocol.test`: build and test the otprotocol exporter
 * `bazel.test`: build bazel targets and run tests.
@@ -12,6 +13,7 @@ CI tests can be run on docker by invoking the script `./ci/run_docker.sh ./ci/do
 * `bazel.tsan`: build bazel targets and run tests with ThreadSanitizer.
 * `benchmark`: run all benchmarks.
 * `format`: use `tools/format.sh` to enforce text formatting.
+* `code.coverage`: build cmake targets and run tests. Then upload coverage report to [codecov.io](https://codecov.io/).
 
 Additionally, `./ci/run_docker.sh` can be invoked with no arguments to get a docker shell where tests
 can be run manually.
