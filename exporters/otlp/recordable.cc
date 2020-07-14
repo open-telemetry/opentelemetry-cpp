@@ -21,16 +21,32 @@ void Recordable::SetAttribute(nostd::string_view key,
   auto attribute = span_.add_attributes();
   attribute->set_key(key.data(), key.size());
 
-  if (nostd::holds_alternative<bool>(value)) {
+  if (nostd::holds_alternative<bool>(value))
+  {
     attribute->mutable_value()->set_bool_value(nostd::get<bool>(value));
   }
-  else if (nostd::holds_alternative<int>(value)) {
+  else if (nostd::holds_alternative<int>(value))
+  {
     attribute->mutable_value()->set_int_value(nostd::get<int>(value));
   }
-  else if (nostd::holds_alternative<double>(value)) {
+  else if (nostd::holds_alternative<int64_t>(value))
+  {
+    attribute->mutable_value()->set_int_value(nostd::get<int64_t>(value));
+  }
+  else if (nostd::holds_alternative<unsigned int>(value))
+  {
+    attribute->mutable_value()->set_int_value(nostd::get<unsigned int>(value));
+  }
+  else if (nostd::holds_alternative<uint64_t>(value))
+  {
+    attribute->mutable_value()->set_int_value(nostd::get<uint64_t>(value));
+  }
+  else if (nostd::holds_alternative<double>(value))
+  {
     attribute->mutable_value()->set_double_value(nostd::get<double>(value));
   }
-  else if (nostd::holds_alternative<nostd::string_view>(value)) {
+  else if (nostd::holds_alternative<nostd::string_view>(value))
+  {
     attribute->mutable_value()->set_string_value(nostd::get<nostd::string_view>(value).data(),
                                                  nostd::get<nostd::string_view>(value).size());
   }
@@ -48,6 +64,27 @@ void Recordable::SetAttribute(nostd::string_view key,
       attribute->mutable_value()->mutable_array_value()->add_values()->set_int_value(val);
     }
   }
+  else if (nostd::holds_alternative<nostd::span<const int64_t>>(value))
+  {
+    for (auto &val : nostd::get<nostd::span<const int64_t>>(value))
+    {
+      attribute->mutable_value()->mutable_array_value()->add_values()->set_int_value(val);
+    }
+  }
+  else if (nostd::holds_alternative<nostd::span<const unsigned int>>(value))
+  {
+    for (auto &val : nostd::get<nostd::span<const unsigned int>>(value))
+    {
+      attribute->mutable_value()->mutable_array_value()->add_values()->set_int_value(val);
+    }
+  }
+  else if (nostd::holds_alternative<nostd::span<const uint64_t>>(value))
+  {
+    for (auto &val : nostd::get<nostd::span<const uint64_t>>(value))
+    {
+      attribute->mutable_value()->mutable_array_value()->add_values()->set_int_value(val);
+    }
+  }
   else if (nostd::holds_alternative<nostd::span<const double>>(value))
   {
     for (auto &val : nostd::get<nostd::span<const double>>(value))
@@ -59,7 +96,8 @@ void Recordable::SetAttribute(nostd::string_view key,
   {
     for (auto &val : nostd::get<nostd::span<const nostd::string_view>>(value))
     {
-      attribute->mutable_value()->mutable_array_value()->add_values()->set_string_value(val.data(), val.size());
+      attribute->mutable_value()->mutable_array_value()->add_values()->set_string_value(val.data(),
+                                                                                        val.size());
     }
   }
 }
