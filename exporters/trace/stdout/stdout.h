@@ -169,13 +169,11 @@ private:
     for(auto kv : map)
     {
       ss << kv.first << ": ";
-      print_value(ss, kv.second, true);
-
+      print_value(ss, kv.second);
       ss << " ";
     }
 
-    ss  << "\n}"
-        << "\n";
+    ss << "\n}\n";
   }
   
 };
