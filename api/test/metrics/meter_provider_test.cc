@@ -37,6 +37,5 @@ TEST(Provider, MultipleMeterProviders)
   auto tf2 = opentelemetry::nostd::shared_ptr<MeterProvider>(new TestProvider());
   Provider::SetMeterProvider(tf2);
 
-  ASSERT_NE(tf, tf2);
   ASSERT_NE(Provider::GetMeterProvider(), tf);
 }

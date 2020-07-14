@@ -18,6 +18,8 @@ namespace metrics
 /**
  * No-op implementation of a MeterProvider.
  */
+class NoopMeter final : public Meter, public std::enable_shared_from_this<NoopMeter> {};
+
 class NoopMeterProvider final : public opentelemetry::metrics::MeterProvider
 {
 public:
