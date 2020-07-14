@@ -101,14 +101,6 @@ TEST(StreamSpanExporter, PrintChangedSpanCout)
   recordable->SetAttribute("attr2", false);
   recordable->SetAttribute("attr3", "string");
 
-  std::array<int, 3> array1 = {1, 2, 3};
-  opentelemetry::nostd::span<int> span1{array1.data(), array1.size()};  
-  recordable->SetAttribute("attr4", span1);
-
-  std::array<bool, 3> array2 = {false, true, false};
-  opentelemetry::nostd::span<bool> span2{array2.data(), array2.size()};  
-  recordable->SetAttribute("attr5", span2);
-
   // Create stringstream to redirect to
   std::stringstream stdoutOutput;
 
@@ -134,7 +126,7 @@ TEST(StreamSpanExporter, PrintChangedSpanCout)
   "  duration      : 100\n"
   "  description   : Test Description\n"
   "  status        : UNIMPLEMENTED\n"
-  "  attributes    : attr1: 314159 attr3: string attr5: [0,1,0] attr2: 0 attr4: [1,2,3] \n"
+  "  attributes    : attr1: 314159 attr3: string attr2: 0 \n"
   "}\n"; 
   ASSERT_EQ(stdoutOutput.str(),expectedOutput);
 }
@@ -155,17 +147,9 @@ TEST(StreamSpanExporter, PrintChangedSpanCerr)
   recordable->SetDuration(std::chrono::nanoseconds(100));
   recordable->SetStatus(opentelemetry::trace::CanonicalCode::UNIMPLEMENTED,"Test Description");
 
-  recordable->SetAttribute("attr1", 314159);
-  recordable->SetAttribute("attr2", false);
-  recordable->SetAttribute("attr3", "string");
-
-  std::array<int, 3> array1 = {1, 2, 3};
-  opentelemetry::nostd::span<int> span1{array1.data(), array1.size()};  
-  recordable->SetAttribute("attr4", span1);
-
   std::array<bool, 3> array2 = {false, true, false};
   opentelemetry::nostd::span<bool> span2{array2.data(), array2.size()};  
-  recordable->SetAttribute("attr5", span2);
+  recordable->SetAttribute("attr1", span2);
 
   // Create stringstream to redirect to
   std::stringstream stdcerrOutput;
@@ -192,7 +176,7 @@ TEST(StreamSpanExporter, PrintChangedSpanCerr)
   "  duration      : 100\n"
   "  description   : Test Description\n"
   "  status        : UNIMPLEMENTED\n"
-  "  attributes    : attr1: 314159 attr3: string attr5: [0,1,0] attr2: 0 attr4: [1,2,3] \n"
+  "  attributes    : attr1: [0,1,0] \n"
   "}\n"; 
   ASSERT_EQ(stdcerrOutput.str(),expectedOutput);
 }
@@ -213,17 +197,9 @@ TEST(StreamSpanExporter, PrintChangedSpanClog)
   recordable->SetDuration(std::chrono::nanoseconds(100));
   recordable->SetStatus(opentelemetry::trace::CanonicalCode::UNIMPLEMENTED,"Test Description");
 
-  recordable->SetAttribute("attr1", 314159);
-  recordable->SetAttribute("attr2", false);
-  recordable->SetAttribute("attr3", "string");
-
   std::array<int, 3> array1 = {1, 2, 3};
   opentelemetry::nostd::span<int> span1{array1.data(), array1.size()};  
-  recordable->SetAttribute("attr4", span1);
-
-  std::array<bool, 3> array2 = {false, true, false};
-  opentelemetry::nostd::span<bool> span2{array2.data(), array2.size()};  
-  recordable->SetAttribute("attr5", span2);
+  recordable->SetAttribute("attr1", span1);
 
   // Create stringstream to redirect to
   std::stringstream stdclogOutput;
@@ -250,7 +226,7 @@ TEST(StreamSpanExporter, PrintChangedSpanClog)
   "  duration      : 100\n"
   "  description   : Test Description\n"
   "  status        : UNIMPLEMENTED\n"
-  "  attributes    : attr1: 314159 attr3: string attr5: [0,1,0] attr2: 0 attr4: [1,2,3] \n"
+  "  attributes    : attr1: [1,2,3] \n"
   "}\n"; 
   ASSERT_EQ(stdclogOutput.str(),expectedOutput);
 }
