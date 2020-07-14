@@ -8,7 +8,6 @@
 #include <list>
 #include <mutex>
 #include <atomic>
-#include <iostream>
 #include <condition_variable>
 
 #include "opentelemetry/ext/zpages/tracez_processor.h"
