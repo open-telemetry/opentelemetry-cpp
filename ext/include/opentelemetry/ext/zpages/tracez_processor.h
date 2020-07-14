@@ -1,7 +1,5 @@
 #pragma once
 
-#include "opentelemetry/sdk/trace/processor.h"
-
 #include <utility>
 #include <mutex>
 #include <memory>
@@ -9,6 +7,7 @@
 #include <unordered_set>
 #include <vector>
 
+#include "opentelemetry/sdk/trace/processor.h"
 #include "opentelemetry/sdk/trace/recordable.h"
 #include "opentelemetry/sdk/trace/span_data.h"
 
