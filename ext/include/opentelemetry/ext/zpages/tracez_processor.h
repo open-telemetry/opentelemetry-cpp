@@ -1,17 +1,16 @@
 #pragma once
 
-#include <chrono>
+#include "opentelemetry/sdk/trace/processor.h"
+
+#include <utility>
+#include <mutex>
 #include <memory>
+#include <chrono>
 #include <unordered_set>
 #include <vector>
-#include <utility>
-#include <thread>
-#include <mutex>
 
 #include "opentelemetry/sdk/trace/recordable.h"
 #include "opentelemetry/sdk/trace/span_data.h"
-#include "opentelemetry/sdk/trace/exporter.h"
-#include "opentelemetry/sdk/trace/processor.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace ext
