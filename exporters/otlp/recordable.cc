@@ -21,74 +21,46 @@ void Recordable::SetAttribute(nostd::string_view key,
   auto attribute = span_.add_attributes();
   attribute->set_key(key.data(), key.size());
 
-  // Cases correspond to nostd::variant in AttributeValue
-  switch (value.index())
+  if (nostd::holds_alternative<bool>(value)) {
+    attribute->mutable_value()->set_bool_value(nostd::get<bool>(value));
+  }
+  else if (nostd::holds_alternative<int>(value)) {
+    attribute->mutable_value()->set_int_value(nostd::get<int>(value));
+  }
+  else if (nostd::holds_alternative<double>(value)) {
+    attribute->mutable_value()->set_double_value(nostd::get<double>(value));
+  }
+  else if (nostd::holds_alternative<nostd::string_view>(value)) {
+    attribute->mutable_value()->set_string_value(nostd::get<nostd::string_view>(value).data(),
+                                                 nostd::get<nostd::string_view>(value).size());
+  }
+  else if (nostd::holds_alternative<nostd::span<const bool>>(value))
   {
-    case 0:
-      attribute->mutable_value()->set_bool_value(nostd::get<bool>(value));
-      break;
-    case 1:
-      attribute->mutable_value()->set_int_value(nostd::get<int>(value));
-      break;
-    case 2:
-      attribute->mutable_value()->set_int_value(nostd::get<int64_t>(value));
-      break;
-    case 3:
-      attribute->mutable_value()->set_int_value(nostd::get<unsigned int>(value));
-      break;
-    case 4:
-      attribute->mutable_value()->set_int_value(nostd::get<uint64_t>(value));
-      break;
-    case 5:
-      attribute->mutable_value()->set_double_value(nostd::get<double>(value));
-      break;
-    case 6:
-      attribute->mutable_value()->set_string_value(nostd::get<nostd::string_view>(value).data(),
-                                                   nostd::get<nostd::string_view>(value).size());
-      break;
-    case 7:
-      for (auto &val : nostd::get<nostd::span<const bool>>(value))
-      {
-        attribute->mutable_value()->mutable_array_value()->add_values()->set_bool_value(val);
-      }
-      break;
-    case 8:
-      for (auto &val : nostd::get<nostd::span<const int>>(value))
-      {
-        attribute->mutable_value()->mutable_array_value()->add_values()->set_int_value(val);
-      }
-      break;
-    case 9:
-      for (auto &val : nostd::get<nostd::span<const int64_t>>(value))
-      {
-        attribute->mutable_value()->mutable_array_value()->add_values()->set_int_value(val);
-      }
-      break;
-    case 10:
-      for (auto &val : nostd::get<nostd::span<const unsigned int>>(value))
-      {
-        attribute->mutable_value()->mutable_array_value()->add_values()->set_int_value(val);
-      }
-      break;
-    case 11:
-      for (auto &val : nostd::get<nostd::span<const uint64_t>>(value))
-      {
-        attribute->mutable_value()->mutable_array_value()->add_values()->set_int_value(val);
-      }
-      break;
-    case 12:
-      for (auto &val : nostd::get<nostd::span<const double>>(value))
-      {
-        attribute->mutable_value()->mutable_array_value()->add_values()->set_double_value(val);
-      }
-      break;
-    case 13:
-      for (auto &val : nostd::get<nostd::span<const nostd::string_view>>(value))
-      {
-        attribute->mutable_value()->mutable_array_value()->add_values()->set_string_value(
-            val.data(), val.size());
-      }
-      break;
+    for (auto &val : nostd::get<nostd::span<const bool>>(value))
+    {
+      attribute->mutable_value()->mutable_array_value()->add_values()->set_bool_value(val);
+    }
+  }
+  else if (nostd::holds_alternative<nostd::span<const int>>(value))
+  {
+    for (auto &val : nostd::get<nostd::span<const int>>(value))
+    {
+      attribute->mutable_value()->mutable_array_value()->add_values()->set_int_value(val);
+    }
+  }
+  else if (nostd::holds_alternative<nostd::span<const double>>(value))
+  {
+    for (auto &val : nostd::get<nostd::span<const double>>(value))
+    {
+      attribute->mutable_value()->mutable_array_value()->add_values()->set_double_value(val);
+    }
+  }
+  else if (nostd::holds_alternative<nostd::span<const nostd::string_view>>(value))
+  {
+    for (auto &val : nostd::get<nostd::span<const nostd::string_view>>(value))
+    {
+      attribute->mutable_value()->mutable_array_value()->add_values()->set_string_value(val.data(), val.size());
+    }
   }
 }
 
