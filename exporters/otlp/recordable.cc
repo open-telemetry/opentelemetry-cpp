@@ -20,7 +20,20 @@ void Recordable::SetAttribute(nostd::string_view key,
 {
   auto attribute = span_.add_attributes();
   attribute->set_key(key.data(), key.size());
-  //span_.add_attributes(attribute);
+  //std::cout << std::to_string(value.index());
+
+  switch (value.index())
+  {
+    case 0:  // bool
+      attribute->mutable_value()->set_bool_value(nostd::get<bool>(value));
+    // case 1: // int
+    //   std::cout << "hi" << std::endl;
+    //   attribute->mutable_value()->set_int_value(nostd::get<int>(value));
+    // case 5: // double
+    //   attribute->mutable_value()->set_double_value(nostd::get<double>(value));
+    // case 6: // string
+    //   attribute->mutable_value()->set_string_value(nostd::get<string_view>(value).data(), nostd::get<string_view>(value).size());
+  }
 }
 
 void Recordable::AddEvent(nostd::string_view name, core::SystemTimestamp timestamp) noexcept

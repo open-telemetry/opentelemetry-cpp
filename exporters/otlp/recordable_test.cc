@@ -77,6 +77,21 @@ TEST(Recordable, SetStatus)
   EXPECT_EQ(rec.span().status().code(), opentelemetry::proto::trace::v1::Status_StatusCode(code));
   EXPECT_EQ(rec.span().status().message(), description);
 }
+
+TEST(Recordable, SetAtrribute)
+{
+  Recordable rec;
+  common::AttributeValue bool_val(true);
+  rec.SetAttribute("bool_attr", bool_val);
+
+  // int i = 1;
+  // common::AttributeValue int_val(i);
+  // rec.SetAttribute("int_attr", int_val);
+  // std::cout << "Here" << std::endl;
+
+  EXPECT_EQ(rec.span().attributes(0).value().bool_value(), nostd::get<bool>(bool_val));
+  //EXPECT_EQ(rec.span().attributes(1).value().int_value(), nostd::get<int>(int_val));
+}
 }  // namespace otlp
 }  // namespace exporter
 OPENTELEMETRY_END_NAMESPACE
