@@ -22,9 +22,9 @@ cc_library(
         "internal/recordable.cc",
     ],
     hdrs = [
-        "recordable.h",
+        "include/opentelemetry/exporters/otlp/recordable.h",
     ],
-    include_prefix = "exporters/otlp",
+    strip_include_prefix = "include",
     deps = [
         "//sdk/src/trace",
         "@com_github_opentelemetry_proto//:trace_proto_cc",
@@ -37,9 +37,9 @@ cc_library(
         'internal/otlp_exporter.cc',
     ],
     hdrs = [
-        'otlp_exporter.h',
+        'include/opentelemetry/exporters/otlp/otlp_exporter.h',
     ],
-    include_prefix = "exporters/otlp",
+    strip_include_prefix = "include",
     deps = [
         ":recordable",
         "//sdk/src/trace",
