@@ -16,6 +16,7 @@ const std::string span_name1 = "span 1";
 const std::string span_name2 = "span 2";
 const std::string span_name3 = "span 3";
 
+
 /** Test fixture for setting up the data aggregator and tracer for each test **/
 class TracezDataAggregatorTest : public ::testing::Test
 {
@@ -92,9 +93,9 @@ TEST_F(TracezDataAggregatorTest, SingleRunningSpan)
 {
   // Start the span get the data
   auto span_first = tracer->StartSpan(span_name1);
+  std::this_thread::sleep_for(std::chrono::seconds(1));
   const auto &data =
       tracez_data_aggregator->GetAggregatedTracezData();
-  
   //Check to see if span name exists
   ASSERT_EQ(data.size(), 1);
   ASSERT_TRUE(data.find(span_name1) != data.end());
@@ -117,6 +118,7 @@ TEST_F(TracezDataAggregatorTest, SingleCompletedSpan)
   end.end_steady_time = SteadyTimestamp(nanoseconds(40));
   tracer->StartSpan(span_name1, start)->End(end);
 
+  std::this_thread::sleep_for(std::chrono::seconds(1));;
   // Get the data and make sure span name exists in the data
   const auto  &data =
       tracez_data_aggregator->GetAggregatedTracezData();
@@ -142,6 +144,7 @@ TEST_F(TracezDataAggregatorTest, SingleErrorSpan)
   // Start and end a single error span
   tracer->StartSpan(span_name1)
       ->SetStatus(opentelemetry::trace::CanonicalCode::CANCELLED, "span cancelled");
+  std::this_thread::sleep_for(std::chrono::seconds(1));;
   const auto  &data =
       tracez_data_aggregator->GetAggregatedTracezData();
 
@@ -169,6 +172,7 @@ TEST_F(TracezDataAggregatorTest, MultipleRunningSpans)
       {span_name2, 2},
       {span_name3, 3},
   });
+  
   // Start and store spans based on the above map
   std::vector<nostd::unique_ptr<Span>> running_span_container;
   for (auto span_name : running_span_name_to_count)
@@ -176,7 +180,7 @@ TEST_F(TracezDataAggregatorTest, MultipleRunningSpans)
     for (int count = 0; count < span_name.second; count++)
       running_span_container.push_back(tracer->StartSpan(span_name.first));
   }
-
+  std::this_thread::sleep_for(std::chrono::seconds(1));;
   const auto  &data =
       tracez_data_aggregator->GetAggregatedTracezData();
   ASSERT_EQ(data.size(), running_span_name_to_count.size());
@@ -239,6 +243,7 @@ TEST_F(TracezDataAggregatorTest, MultipleCompletedSpan)
       }
     }
   }
+  std::this_thread::sleep_for(std::chrono::seconds(1));;
   const auto  &data =
       tracez_data_aggregator->GetAggregatedTracezData();
   ASSERT_EQ(data.size(), span_name_to_duration.size());
@@ -247,7 +252,6 @@ TEST_F(TracezDataAggregatorTest, MultipleCompletedSpan)
   {
     ASSERT_TRUE(data.find(span.first) != data.end());
     auto &aggregated_data = data.at(span.first);
-
     // Make sure counts of spans are in order
     VerifySpanCountsInTracezSpanData(
         span.first, aggregated_data, 0, 0,
@@ -290,7 +294,7 @@ TEST_F(TracezDataAggregatorTest, MultipleErrorSpans)
       tracer->StartSpan(span_error.first)
           ->SetStatus(opentelemetry::trace::CanonicalCode::CANCELLED, error_desc);
   }
-
+  std::this_thread::sleep_for(std::chrono::seconds(1));;
   const auto  &data =
       tracez_data_aggregator->GetAggregatedTracezData();
   ASSERT_EQ(data.size(), span_name_to_error.size());
@@ -333,7 +337,8 @@ TEST_F(TracezDataAggregatorTest, RunningSampleSpansOverCapacity)
   std::vector<nostd::unique_ptr<Span>> running_span_container;
   for (int count = 0; count < running_span_count; count++)
     running_span_container.push_back(tracer->StartSpan(span_name1));
-
+    
+  std::this_thread::sleep_for(std::chrono::seconds(1));;
   // Fetch data and check if span name is spresent
   const auto  &data =
       tracez_data_aggregator->GetAggregatedTracezData();
@@ -363,12 +368,14 @@ TEST_F(TracezDataAggregatorTest, ErrorSampleSpansOverCapacity)
     tracer->StartSpan(span_name1)
         ->SetStatus(opentelemetry::trace::CanonicalCode::CANCELLED, span_error_description);
 
+  std::this_thread::sleep_for(std::chrono::seconds(1));;
   // Fetch data and check if span name is spresent
   const auto  &data =
       tracez_data_aggregator->GetAggregatedTracezData();
   ASSERT_EQ(data.size(), 1);
   ASSERT_TRUE(data.find(span_name1) != data.end());
 
+  std::this_thread::sleep_for(std::chrono::seconds(1));;
   // Check if error spans are updated according to spans started
   auto &aggregated_data = data.at(span_name1);
   VerifySpanCountsInTracezSpanData(span_name1, aggregated_data, 0,
@@ -408,13 +415,15 @@ TEST_F(TracezDataAggregatorTest, CompletedSampleSpansOverCapacity)
     end.end_steady_time     = SteadyTimestamp(timestamp.second);
     tracer->StartSpan(span_name1, start)->End(end);
   }
-
+  
+  std::this_thread::sleep_for(std::chrono::seconds(1));;
   // Get data and check if span name exists in aggregation
   const auto  &data =
       tracez_data_aggregator->GetAggregatedTracezData();
   ASSERT_EQ(data.size(), 1);
   ASSERT_TRUE(data.find(span_name1) != data.end());
-
+  
+  std::this_thread::sleep_for(std::chrono::seconds(1));;
   auto &aggregated_data = data.at(span_name1);
   VerifySpanCountsInTracezSpanData(span_name1, aggregated_data, 0, 0,
                                        {(int)timestamps.size(), 0, 0, 0, 0, 0, 0, 0, 0});
@@ -442,7 +451,7 @@ TEST_F(TracezDataAggregatorTest, SpanNameInAlphabeticalOrder)
   tracer->StartSpan(span_name1)->End();
   tracer->StartSpan(span_name3)
       ->SetStatus(opentelemetry::trace::CanonicalCode::CANCELLED, "span cancelled");
-
+  std::this_thread::sleep_for(std::chrono::seconds(1));;
   // Get data and check if span name exists in aggregation
   const auto  &data =
       tracez_data_aggregator->GetAggregatedTracezData();
@@ -462,6 +471,7 @@ TEST_F(TracezDataAggregatorTest, AdditionToRunningSpans)
 {
   // Start a span and check the data
   auto span_first = tracer->StartSpan(span_name1);
+  std::this_thread::sleep_for(std::chrono::seconds(1));;
   const auto  &temp_data =
       tracez_data_aggregator->GetAggregatedTracezData();
   ASSERT_EQ(temp_data.size(), 1);
@@ -471,6 +481,7 @@ TEST_F(TracezDataAggregatorTest, AdditionToRunningSpans)
 
   // Start another span and check to see if there is no double counting of spans
   auto span_second = tracer->StartSpan(span_name1);
+  std::this_thread::sleep_for(std::chrono::seconds(1));;
   const auto  &data =
       tracez_data_aggregator->GetAggregatedTracezData();
 
@@ -497,8 +508,10 @@ TEST_F(TracezDataAggregatorTest, RemovalOfRunningSpanWhenCompleted)
   opentelemetry::trace::EndSpanOptions end;
   end.end_steady_time = SteadyTimestamp(nanoseconds(40));
 
+  
   // Start a span and make sure data is updated
   auto span_first = tracer->StartSpan(span_name1, start);
+  std::this_thread::sleep_for(std::chrono::seconds(1));;
   const auto  &temp_data =
       tracez_data_aggregator->GetAggregatedTracezData();
   ASSERT_EQ(temp_data.size(), 1);
@@ -510,6 +523,7 @@ TEST_F(TracezDataAggregatorTest, RemovalOfRunningSpanWhenCompleted)
   // be only one completed span
   span_first->End(end);
   ASSERT_EQ(temp_data.at(span_name1)->sample_running_spans.front()->GetName(), span_name1);
+  std::this_thread::sleep_for(std::chrono::seconds(1));;
   const auto  &data =
       tracez_data_aggregator->GetAggregatedTracezData();
   ASSERT_EQ(data.size(), 1);
@@ -544,13 +558,14 @@ TEST_F(TracezDataAggregatorTest, EdgeSpanLatenciesFallInCorrectBoundaries)
     end.end_steady_time     = SteadyTimestamp(nanoseconds(duration.count() + 1));
     tracer->StartSpan(span_name1, start)->End(end);
   }
-
+  std::this_thread::sleep_for(std::chrono::seconds(1));;
   // Get data and check if span name exists in aggregation
   const auto  &data =
       tracez_data_aggregator->GetAggregatedTracezData();
   ASSERT_EQ(data.size(), 1);
   ASSERT_TRUE(data.find(span_name1) != data.end());
 
+  std::this_thread::sleep_for(std::chrono::seconds(1));;
   auto &aggregated_data = data.at(span_name1);
   VerifySpanCountsInTracezSpanData(span_name1, aggregated_data, 0, 0,
                                        {1, 1, 1, 1, 1, 1, 1, 1, 1});
@@ -578,6 +593,7 @@ TEST_F(TracezDataAggregatorTest, NoChangeInBetweenCallsToAggregator)
   tracer->StartSpan(span_name3)
       ->SetStatus(opentelemetry::trace::CanonicalCode::CANCELLED, "span cancelled");
 
+  std::this_thread::sleep_for(std::chrono::seconds(1));;
   // Get data and check if span name exists in aggregation
   const auto  &data =
       tracez_data_aggregator->GetAggregatedTracezData();
@@ -594,7 +610,7 @@ TEST_F(TracezDataAggregatorTest, NoChangeInBetweenCallsToAggregator)
   ASSERT_TRUE(data.find(span_name3) != data.end());
   VerifySpanCountsInTracezSpanData(span_name3, data.at(span_name3), 0, 1,
                                        {0, 0, 0, 0, 0, 0, 0, 0, 0});
-
+  std::this_thread::sleep_for(std::chrono::seconds(1));;
   const auto  &data2 =
       tracez_data_aggregator->GetAggregatedTracezData();
   ASSERT_EQ(data2.size(), 3);

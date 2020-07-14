@@ -4,18 +4,36 @@ OPENTELEMETRY_BEGIN_NAMESPACE
 namespace ext{
 namespace zpages{
 
+    
 TracezDataAggregator::TracezDataAggregator(
-    std::shared_ptr<TracezSpanProcessor> span_processor){
+    std::shared_ptr<TracezSpanProcessor> span_processor,
+    long update_interval_in_milliseconds){
+  
   tracez_span_processor_ = span_processor;
+  
+  //Start a thread that calls AggregateSpans periodically or till notified.
+  execute_.store(true, std::memory_order_release);
+  aggregate_spans_thread_ = std::thread([this,update_interval_in_milliseconds]()
+  {
+      while (execute_.load(std::memory_order_acquire)) {
+          std::unique_lock<std::mutex> lock(mtx_);
+          AggregateSpans();                   
+          cv_.wait_for(lock,milliseconds(update_interval_in_milliseconds));
+      }
+  });
+}
+
+TracezDataAggregator::~TracezDataAggregator(){
+  //Notify and end the thread so object can be destroyed
+  if( execute_.load(std::memory_order_acquire) ) {
+    execute_.store(false, std::memory_order_release);
+    cv_.notify_one();
+    aggregate_spans_thread_.join();
+  };
 }
 
 const std::map<std::string, std::unique_ptr<TracezSpanData>>
     &TracezDataAggregator::GetAggregatedTracezData(){
-  
-  //Aggregate span data before returning the new information. 
-  //The aggregation could also be periodically updated as an alternative
-  std::lock_guard<std::mutex> lock_guard{mu_};
-  AggregateSpans();
   return aggregated_tracez_data_;
 }
 

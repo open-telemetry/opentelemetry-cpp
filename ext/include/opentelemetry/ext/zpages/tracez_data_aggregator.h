@@ -7,6 +7,9 @@
 #include <array>
 #include <list>
 #include <mutex>
+#include <atomic>
+#include <iostream>
+#include <condition_variable>
 
 #include "opentelemetry/ext/zpages/tracez_processor.h"
 #include "opentelemetry/sdk/trace/span_data.h"
@@ -77,11 +80,25 @@ struct TracezSpanData{
  * TracezDataAggregator object is responsible for collecting raw data and 
  * converting it to useful information that can be made available to 
  * display on the tracez zpage.
+ *
+ * NOTE: This class is not thread safe and is only expected to be called by a
+ * single thread from the HTTP server
  */
 class TracezDataAggregator{
 public:
-  TracezDataAggregator(std::shared_ptr<TracezSpanProcessor> spanProcessor);
-
+  /** 
+   * Constructor runs a thread that calls a function to aggregate span data
+   * at regular intervals.
+   * @param span_processor is the tracez span processor to be set
+   * @param update_interval_in_milliseconds the time duration for updating the 
+   * aggregated data.
+   */
+  TracezDataAggregator(std::shared_ptr<TracezSpanProcessor> span_processor,
+     long update_interval_in_milliseconds = 100);
+  
+  /** Ends the thread set up in the constructor and destroys the object **/
+  ~TracezDataAggregator();
+  
   /** 
    * GetAggregatedTracezData aggregates data and returns the the updated data.
    * @returns a map with the span name as key and the tracez span data as value.
@@ -90,7 +107,6 @@ public:
   
   
 private:
-
   /** 
    * AggregateSpans is the function that is called to update the aggregated data
    * with newly completed and running span data
@@ -164,7 +180,17 @@ private:
    * DS based on frequency of usage of a span name.
    */
   std::map<std::string, std::unique_ptr<TracezSpanData>> aggregated_tracez_data_;
-  mutable std::mutex mu_;
+  
+  /** A boolean that is set to true in the constructor and false in the 
+   * destructor to start and end execution of aggregate spans **/ 
+  std::atomic<bool> execute_;
+  /** Thread that executes aggregate spans at regurlar intervals during this 
+  objects lifetime**/
+  std::thread aggregate_spans_thread_;
+  /** Condition variable that notifies the thread when object is about to be
+  destroyed **/
+  std::condition_variable cv_;
+  std::mutex mtx_;
   
 };
 
