@@ -57,7 +57,7 @@ TEST(ContextTest, ContextImmutability)
   EXPECT_THROW(nostd::get<nostd::string_view>(context_test.GetValue("foo_key")),
                nostd::bad_variant_access);
 #else
-  EXPECT_DEATH({nostd::get<nostd::string_view>(context_test.GetValue("foo_key"))}, "");
+  EXPECT_DEATH({ nostd::get<nostd::string_view>(context_test.GetValue("foo_key")); }, "");
 #endif
 }
 
