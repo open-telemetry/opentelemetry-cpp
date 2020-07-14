@@ -7,6 +7,7 @@
 
 #include <iostream>
 #include <map>
+#include <atomic>
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace context
@@ -19,7 +20,9 @@ class Context
 {
 
 public:
-  Context() = default;
+  Context(){
+    context_id_ = GetNextAvailableId(); 
+  }
 
   // Contructor, creates a context object from a map of keys
   // and identifiers.
@@ -31,6 +34,7 @@ public:
       context_map_[std::string(key)] = value;
       return true;
     });
+    context_id_ = GetNextAvailableId(); 
   }
 
   // Accepts a key and a value and then returns a new context that
@@ -84,9 +88,25 @@ public:
   // Copy Constructors.
   Context(const Context &other) = default;
   Context &operator=(const Context &other) = default;
+  
+  // Comparison operator.
+  bool operator==(const Context &other){
+    return (other.context_id_ == context_id_); 
+  }
 
 private:
   std::map<std::string, context::ContextValue> context_map_;
+
+  int context_id_; 
+
+  static int GetNextAvailableId(){
+    return next_id_++; 
+  }
+
+  static std::atomic<int> next_id_;
+
 };
+
+std::atomic<int> Context::next_id_{0};
 }  // namespace context
 OPENTELEMETRY_END_NAMESPACE

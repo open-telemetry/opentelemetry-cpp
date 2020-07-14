@@ -37,6 +37,11 @@ namespace context
       static int Detach(Token &token)
       {
         // If the token context is the current context, return failure.
+        if (token.GetContext() == GetCurrent())
+        {
+          return 1;
+        }
+
         GetInstance() = token.GetContext();
         return 0;
       }
