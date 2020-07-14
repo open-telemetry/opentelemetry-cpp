@@ -84,13 +84,19 @@ TEST(Recordable, SetAtrribute)
   common::AttributeValue bool_val(true);
   rec.SetAttribute("bool_attr", bool_val);
 
-  // int i = 1;
-  // common::AttributeValue int_val(i);
-  // rec.SetAttribute("int_attr", int_val);
-  // std::cout << "Here" << std::endl;
+  common::AttributeValue int_val(22);
+  rec.SetAttribute("int_attr", int_val);
+
+  common::AttributeValue double_val(3.3);
+  rec.SetAttribute("double_attr", double_val);
+
+  common::AttributeValue str_val(nostd::string_view("Test"));
+  rec.SetAttribute("str_attr", str_val);
 
   EXPECT_EQ(rec.span().attributes(0).value().bool_value(), nostd::get<bool>(bool_val));
-  //EXPECT_EQ(rec.span().attributes(1).value().int_value(), nostd::get<int>(int_val));
+  EXPECT_EQ(rec.span().attributes(1).value().int_value(), nostd::get<int>(int_val));
+  EXPECT_EQ(rec.span().attributes(2).value().double_value(), nostd::get<double>(double_val));
+  EXPECT_EQ(rec.span().attributes(3).value().string_value(), nostd::get<nostd::string_view>(str_val).data());
 }
 }  // namespace otlp
 }  // namespace exporter

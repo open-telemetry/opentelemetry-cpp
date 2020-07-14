@@ -20,19 +20,32 @@ void Recordable::SetAttribute(nostd::string_view key,
 {
   auto attribute = span_.add_attributes();
   attribute->set_key(key.data(), key.size());
-  //std::cout << std::to_string(value.index());
 
+  // Cases correspond to AttributeValue nostd::variant
   switch (value.index())
   {
-    case 0:  // bool
+    case 0:
       attribute->mutable_value()->set_bool_value(nostd::get<bool>(value));
-    // case 1: // int
-    //   std::cout << "hi" << std::endl;
-    //   attribute->mutable_value()->set_int_value(nostd::get<int>(value));
-    // case 5: // double
-    //   attribute->mutable_value()->set_double_value(nostd::get<double>(value));
-    // case 6: // string
-    //   attribute->mutable_value()->set_string_value(nostd::get<string_view>(value).data(), nostd::get<string_view>(value).size());
+      break;
+    case 1:
+      attribute->mutable_value()->set_int_value(nostd::get<int>(value));
+      break;
+    case 2:
+      attribute->mutable_value()->set_int_value(nostd::get<int64_t>(value));
+      break;
+    case 3:
+      attribute->mutable_value()->set_int_value(nostd::get<unsigned int>(value));
+      break;
+    case 4:
+      attribute->mutable_value()->set_int_value(nostd::get<uint64_t>(value));
+      break;
+    case 5:
+      attribute->mutable_value()->set_double_value(nostd::get<double>(value));
+      break;
+    case 6:
+      attribute->mutable_value()->set_string_value(nostd::get<nostd::string_view>(value).data(),
+                                                   nostd::get<nostd::string_view>(value).size());
+      break;
   }
 }
 
