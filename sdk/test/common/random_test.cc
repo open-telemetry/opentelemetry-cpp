@@ -20,7 +20,7 @@ TEST(RandomTest, GenerateRandomBuffer)
   EXPECT_FALSE(std::equal(std::begin(buf1), std::end(buf1), std::begin(buf2)));
 
   // Edge cases.
-  for (auto size : {1, 7, 8, 9, 16, 17})
+  for (auto size : {7, 8, 9, 16, 17})
   {
     std::vector<uint8_t> buf1(size);
     std::vector<uint8_t> buf2(size);
