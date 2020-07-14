@@ -1,11 +1,11 @@
 #pragma once
 
-#include <utility>
-#include <mutex>
-#include <memory>
 #include <chrono>
+#include <memory>
+#include <mutex>
 #include <unordered_set>
 #include <vector>
+#include <utility>
 
 #include "opentelemetry/sdk/trace/processor.h"
 #include "opentelemetry/sdk/trace/recordable.h"
