@@ -78,7 +78,7 @@ TEST(Recordable, SetStatus)
   EXPECT_EQ(rec.span().status().message(), description);
 }
 
-TEST(Recordable, SetAtrribute)
+TEST(Recordable, SetSingleAtrribute)
 {
   Recordable rec;
   common::AttributeValue bool_val(true);
@@ -97,6 +97,18 @@ TEST(Recordable, SetAtrribute)
   EXPECT_EQ(rec.span().attributes(1).value().int_value(), nostd::get<int>(int_val));
   EXPECT_EQ(rec.span().attributes(2).value().double_value(), nostd::get<double>(double_val));
   EXPECT_EQ(rec.span().attributes(3).value().string_value(), nostd::get<nostd::string_view>(str_val).data());
+}
+
+TEST(Recordable, SetArrayAtrributes)
+{
+  Recordable rec;
+  bool bool_arr[2] = {true, false};
+  nostd::span<const bool> bool_span(bool_arr);
+  common::AttributeValue array_bool_val(bool_span);
+  rec.SetAttribute("array_bool_val", array_bool_val);
+
+  EXPECT_EQ(rec.span().attributes(0).value().array_value().values(0).bool_value(), bool_span[0]);
+  EXPECT_EQ(rec.span().attributes(0).value().array_value().values(1).bool_value(), bool_span[1]);
 }
 }  // namespace otlp
 }  // namespace exporter

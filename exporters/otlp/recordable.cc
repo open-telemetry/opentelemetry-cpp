@@ -21,7 +21,7 @@ void Recordable::SetAttribute(nostd::string_view key,
   auto attribute = span_.add_attributes();
   attribute->set_key(key.data(), key.size());
 
-  // Cases correspond to AttributeValue nostd::variant
+  // Cases correspond to nostd::variant in AttributeValue
   switch (value.index())
   {
     case 0:
@@ -45,6 +45,49 @@ void Recordable::SetAttribute(nostd::string_view key,
     case 6:
       attribute->mutable_value()->set_string_value(nostd::get<nostd::string_view>(value).data(),
                                                    nostd::get<nostd::string_view>(value).size());
+      break;
+    case 7:
+      for (auto &val : nostd::get<nostd::span<const bool>>(value))
+      {
+        attribute->mutable_value()->mutable_array_value()->add_values()->set_bool_value(val);
+      }
+      break;
+    case 8:
+      for (auto &val : nostd::get<nostd::span<const int>>(value))
+      {
+        attribute->mutable_value()->mutable_array_value()->add_values()->set_int_value(val);
+      }
+      break;
+    case 9:
+      for (auto &val : nostd::get<nostd::span<const int64_t>>(value))
+      {
+        attribute->mutable_value()->mutable_array_value()->add_values()->set_int_value(val);
+      }
+      break;
+    case 10:
+      for (auto &val : nostd::get<nostd::span<const unsigned int>>(value))
+      {
+        attribute->mutable_value()->mutable_array_value()->add_values()->set_int_value(val);
+      }
+      break;
+    case 11:
+      for (auto &val : nostd::get<nostd::span<const uint64_t>>(value))
+      {
+        attribute->mutable_value()->mutable_array_value()->add_values()->set_int_value(val);
+      }
+      break;
+    case 12:
+      for (auto &val : nostd::get<nostd::span<const double>>(value))
+      {
+        attribute->mutable_value()->mutable_array_value()->add_values()->set_double_value(val);
+      }
+      break;
+    case 13:
+      for (auto &val : nostd::get<nostd::span<const nostd::string_view>>(value))
+      {
+        attribute->mutable_value()->mutable_array_value()->add_values()->set_string_value(
+            val.data(), val.size());
+      }
       break;
   }
 }
