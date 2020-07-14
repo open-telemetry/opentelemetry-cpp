@@ -36,8 +36,6 @@ int RunShouldSampleCountDecision(SpanContext &context,
   M m1    = {{}};
   opentelemetry::trace::KeyValueIterableView<M> view{m1};
 
-  srand(time(0));
-
   for (int i = 0; i < iterations; ++i)
   {
     uint8_t buf[16] = {0};
