@@ -53,9 +53,12 @@ TEST(ContextTest, ContextImmutability)
   context::Context context_test                         = context::Context(map_test);
 
   context::Context context_foo = context_test.SetValue("foo_key", "456");
-
+#if __EXCEPTIONS
   EXPECT_THROW(nostd::get<nostd::string_view>(context_test.GetValue("foo_key")),
                nostd::bad_variant_access);
+#else
+  EXPECT_DEATH({nostd::get<nostd::string_view>(context_test.GetValue("foo_key"))}, "");
+#endif
 }
 
 // Tests that writing the same to a context overwrites the original value.
