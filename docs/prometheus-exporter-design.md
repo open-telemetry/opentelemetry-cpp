@@ -17,7 +17,7 @@ Prometheus is a system monitoring and alerting toolkit that collects metrics dat
 pull requests to the HTTP server exposed by the exporter and scrapes metrics data on a regular interval.
 
 ## Components
-This section introduces the components within the Prometheus exporter as well as their relationships, and the data flow between OpenTelemetry 
+This section introduces the components within the Prometheus Exporter as well as their relationships, and the data flow between OpenTelemetry 
 and Prometheus from both users’ perspective and inside the OpenTelemetry.
 
 ![image](./images/Prom-DataPath.png)
@@ -94,9 +94,9 @@ the Controller, and is associated with other components in the data pipeline.
 
 ## Classes Design
 In Prometheus Exporter, we plan to have five classes. `MetricsExporter` is an interface that determines the basic behaviors for an exporter. `ReturnCodes` is a class 
-that enumerates all possible status codes of the `export()` function in the MetricsExporter. `PrometheusExporter` is an implementation of `MetricsExporter` interface 
+that enumerates all possible status codes of the `export()` function in the `MetricsExporter`. `PrometheusExporter` is an implementation of `MetricsExporter` interface 
 in the context of Prometheus. `PrometheusCollector` class is where the export job is done. When a Prometheus pull request comes, it collects all metric data from the 
-exporter, translate the data to Prometheus data structure, and serve the data. In order to make the `PrometheusCollector` class clean, we have another class called 
+exporter, translates the data to Prometheus data structure, and serves the data. In order to make the `PrometheusCollector` class clean, we have another class called 
 `PrometheusExporterUtils` that contains all helper methods required by `PrometheusCollector`.
 
 Here we include a UML class diagram inside the exporter to show the dependencies among the classes.
@@ -137,14 +137,19 @@ public:
 This class is an implementation of the `MetricsExporter` interface and exports Prometheus metrics data. Functions in this class should be called 
 by the Controller in our data pipeline.
 
-#### Export the metric record data
+#### Export the Metric Record Data
 `export()` function should be implemented to export the metrics data. When this function is called, it adds the input batch of metric `Record`s to 
 a data structure called `metricsToCollect` in the `PrometheusCollector` (will be introduced later).
 - **Parameters**: A batch of metric `Records` to export
 - **Returns**: ReturnCodes, see [ReturnCodes](#returncodes-class) class
 
-#### Shut down the exporter
+#### Shutdown the Exporter
 `shutdown()` function should be implemented to shutdown the exporter. The detailed behavior is not determined yet.
+
+#### Proposed Design & Implementation
+`export()` function cannot throw exceptions, because it is called by the Controller and we don't know Controller's behavior when there is 
+an exception thrown from `export()`. Instead, we will translate all error cases into different `ReturnCodes`, return to function caller and
+inform them the export status.
 ```C++
 /*
  * Prometheus metric exporter for OpenTelemetry.
@@ -246,6 +251,9 @@ This concept is implemented in the Java, Python and Go SDKs. Hence we assume tha
 Here is the proposed C++ version Prometheus collector.
 - `Collectable` is the base collector class that can be registered to registry in C++ client;
 - `MetricFamily` is the class to hold metrics data that conforms to Prometheus data format in C++ client.
+
+`Collect()` function cannot throw any exceptions, because it's called by Prometheus client. We don't know the behavior of Prometheus client
+if there is an exception from `Collect()` method. If there are errors when collecting some data entry, we will just ignore that entry.
 ```C++
 /**
  * Prometheus Collector Class
@@ -488,6 +496,9 @@ with `_` because of different naming rules between OpenTelemetry and Prometheus.
 - **Return**: A string that has all invalid characters in Prometheus replaced to `_`.
 
 ### Proposed Design & Implementation
+`sanitizeNames()` is an internal helper function called by `translateToPrometheus()`, and there may be other helper functions as we
+develop. When having some errors like bad input and illegal name result, `sanitizeNames()` can throw an exception, and `translateToPrometheus()`
+catchs and handles this exception, ignores this data entry and process next one.
 ```C++
 /**
  * Prometheus Collector Class
