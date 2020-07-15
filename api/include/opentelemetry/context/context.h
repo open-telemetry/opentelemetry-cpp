@@ -1,7 +1,6 @@
 #pragma once
 
 #include <atomic>
-#include <iostream>
 
 #include "opentelemetry/context/context_value.h"
 #include "opentelemetry/nostd/string_view.h"
