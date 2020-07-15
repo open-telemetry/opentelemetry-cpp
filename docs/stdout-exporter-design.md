@@ -21,7 +21,7 @@ The StreamExporter will only be implementing a Push Exporter framework.
 * Reliability
     * The Exporter should be reliable; data exported should always be accounted for. The data will either all be successfully exported to the destination server, or in the case of failure, the data is dropped. `Export` will always return failure or success to notify the user of the result.
     * Thread Safety
-        * Export() should never be called concurrently. This is handled by the controller in the StreamMetricsExporter.
+        * The StreamExporter can be called simultaneously, however we do not handle this in the Exporter. Synchronization should be done at a lower level.
 * Scalability
     * The Exporter must be able to operate on sizeable systems with predictable overhead growth.  A key requirement of this is that the library does not consume unbounded memory resource. 
 * Security
@@ -43,8 +43,6 @@ The specification states: exporter must support two functions: Export and Shutdo
 ### `Export(span of recordables)`
 
 Exports a batch of telemetry data. Protocol exporters that will implement this function are typically expected to serialize and transmit the data to the destination.
-
-Export() will never be called concurrently for the same exporter instance. Export() can be called again only after the current call returns.
 
 Export() must not block indefinitely. We can rely on printing to an ostream is reasonably performant and doesn't block.
 
@@ -132,8 +130,6 @@ Exports a batch of telemetry data. Protocol exporters that will implement this f
 ![SDK Data Path](./images/DataPath.png)
 
 ### `Export(batch of Records)`
-
-Export() will never be called concurrently for the same exporter instance. Export() can be called again only after the current call returns.
 
 Export() must not block indefinitely. We can rely on printing to an ostream is reasonably performant and doesn't block.
 
