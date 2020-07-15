@@ -1,18 +1,10 @@
 #pragma once
 
 #include <atomic>
-#include <iostream>
-#include <sstream>
 
-#include "opentelemetry/common/attribute_value.h"
 #include "opentelemetry/context/context_value.h"
 #include "opentelemetry/nostd/string_view.h"
-#include "opentelemetry/nostd/utility.h"
-#include "opentelemetry/nostd/variant.h"
-#include "opentelemetry/trace/key_value_iterable.h"
 #include "opentelemetry/trace/key_value_iterable_view.h"
-#include "opentelemetry/trace/tracer.h"
-#include "opentelemetry/version.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace context
