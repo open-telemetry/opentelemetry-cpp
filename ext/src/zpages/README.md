@@ -1,7 +1,6 @@
 # zPages
-> Last updated 7/13/20
 
-# Table of Contents
+## Table of Contents
 - [Summary](#summary)
   - [TraceZ](#tracez)
   - [RPCz](#rpcz)

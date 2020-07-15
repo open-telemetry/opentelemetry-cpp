@@ -1,11 +1,12 @@
 #include "opentelemetry/ext/zpages/tracez_processor.h"
+
+#include <gtest/gtest.h>
+
+#include <thread>
+
 #include "opentelemetry/nostd/span.h"
 #include "opentelemetry/sdk/trace/span_data.h"
 #include "opentelemetry/sdk/trace/tracer.h"
-
-#include <gtest/gtest.h>
-#include <iostream>
-#include <thread>
 
 using namespace opentelemetry::sdk::trace;
 using namespace opentelemetry::ext::zpages;
@@ -130,20 +131,44 @@ void StartManySpans(std::vector<opentelemetry::nostd::unique_ptr<opentelemetry::
   for (; i > 0; i--) spans.push_back(tracer->StartSpan("span"));
 }
 
+
 /*
- * Helper function that ends all spans in the passed in span vector, checking
- * i times. Used for testing thread safety
+ * Helper function that ends all spans in the passed in span vector. Used
+ * for testing thread safety
  */
-void EndAllSpans(std::vector<opentelemetry::nostd::unique_ptr<opentelemetry::trace::Span>> &spans,
-                 int i) {
-  unsigned int count = 0;
-  for (; i > 0; i--) {
-    for (unsigned int j = count; j < spans.size(); j++) {
-      spans[j]->End();
-    }
-    count = spans.size();
-  }
+void EndAllSpans(std::vector<opentelemetry::nostd::unique_ptr<opentelemetry::trace::Span>> &spans) {
+  for (auto &span : spans) span->End();
 }
+
+
+//////////////////////////////// TEST FIXTURE //////////////////////////////////////
+
+/*
+ * Reduce code duplication by having single area with shared setup code
+ */
+class TracezProcessor : public ::testing::Test {
+ protected:
+  void SetUp() override {
+    processor = std::shared_ptr<TracezSpanProcessor>(new TracezSpanProcessor());
+    tracer = std::shared_ptr<opentelemetry::trace::Tracer>(new Tracer(processor));
+    auto spans = processor->GetSpanSnapshot();
+    running = spans.running;
+    completed = std::move(spans.completed);
+
+    span_names = {"s0", "s2", "s1", "s1", "s"};
+
+  }
+
+  std::shared_ptr<TracezSpanProcessor> processor;
+  std::shared_ptr<opentelemetry::trace::Tracer> tracer;
+
+  std::unordered_set<opentelemetry::sdk::trace::SpanData*> running;
+  std::vector<std::unique_ptr<opentelemetry::sdk::trace::SpanData>> completed;
+
+  std::vector<std::string> span_names;
+  std::vector<opentelemetry::nostd::unique_ptr<opentelemetry::trace::Span>> span_vars;
+
+};
 
 
 ///////////////////////////////////////// TESTS ///////////////////////////////////
@@ -152,13 +177,11 @@ void EndAllSpans(std::vector<opentelemetry::nostd::unique_ptr<opentelemetry::tra
  * Test if both span containers are empty when no spans exist or are added.
  * Ensures no rogue spans appear in the containers somehow.
  */
-TEST(TracezSpanProcessor, NoSpans) {
-  std::shared_ptr<TracezSpanProcessor> processor(new TracezSpanProcessor());
-  auto spans = processor->GetSpanSnapshot();
+TEST_F(TracezProcessor, NoSpans) {
   auto recordable = processor->MakeRecordable();
 
-  EXPECT_EQ(spans.running.size(), 0);
-  EXPECT_EQ(spans.completed.size(), 0);
+  EXPECT_EQ(running.size(), 0);
+  EXPECT_EQ(completed.size(), 0);
 }
 
 
@@ -167,26 +190,18 @@ TEST(TracezSpanProcessor, NoSpans) {
  * All completed spans are stored. Ensures basic functionality and that accumulation
  * can happen
 */
-TEST(TracezSpanProcessor, OneSpanCumulative) {
-  std::shared_ptr<TracezSpanProcessor> processor(new TracezSpanProcessor());
-  auto tracer = std::shared_ptr<opentelemetry::trace::Tracer>(new Tracer(processor));
-  auto spans = processor->GetSpanSnapshot();
-  auto running = spans.running;
-  auto completed = std::move(spans.completed);
-
-  std::vector<std::string> span_name = { "span" };
-
-  auto span = tracer->StartSpan(span_name[0]);
+TEST_F(TracezProcessor, OneSpanCumulative) {
+  auto span = tracer->StartSpan(span_names[0]);
   UpdateSpans(processor, completed, running);
 
-  EXPECT_TRUE(ContainsNames(span_name, running));
+  EXPECT_TRUE(ContainsNames(span_names, running, 0, 1, true));
   EXPECT_EQ(running.size(), 1);
   EXPECT_EQ(completed.size(), 0);
 
   span->End();
   UpdateSpans(processor, completed, running);
 
-  EXPECT_TRUE(ContainsNames(span_name, completed));
+  EXPECT_TRUE(ContainsNames(span_names, completed, 0, 1, true));
   EXPECT_EQ(running.size(), 0);
   EXPECT_EQ(completed.size(), 1);
 }
@@ -198,24 +213,15 @@ TEST(TracezSpanProcessor, OneSpanCumulative) {
  * and that accumulation can happen for many spans
  * All completed spans are stored.
 */
-TEST(TracezSpanProcessor, MultipleSpansCumulative) {
-  std::shared_ptr<TracezSpanProcessor> processor(new TracezSpanProcessor());
-  auto tracer = std::shared_ptr<opentelemetry::trace::Tracer>(new Tracer(processor));
-  auto spans = processor->GetSpanSnapshot();
-  auto running = spans.running;
-  auto completed = std::move(spans.completed);
-
+TEST_F(TracezProcessor, MultipleSpansCumulative) {
   EXPECT_EQ(running.size(), 0);
   EXPECT_EQ(completed.size(), 0);
 
-  std::vector<std::string> span_names = {"s1", "s2", "s3", "s1"};
-
   // Start and store spans using span_names
-  std::vector<opentelemetry::nostd::unique_ptr<opentelemetry::trace::Span>> span_vars;
   for (const auto &name : span_names) span_vars.push_back(tracer->StartSpan(name));
   UpdateSpans(processor, completed, running);
 
-  EXPECT_TRUE(ContainsNames(span_names, running)); // s1 s2 s3 s1
+  EXPECT_TRUE(ContainsNames(span_names, running)); // s0 s2 s1 s1 s
   EXPECT_EQ(running.size(), span_names.size());
   EXPECT_EQ(completed.size(), 0);
 
@@ -223,7 +229,7 @@ TEST(TracezSpanProcessor, MultipleSpansCumulative) {
   for (auto &span : span_vars) span->End();
   UpdateSpans(processor, completed, running);
 
-  EXPECT_TRUE(ContainsNames(span_names, completed)); // s1 s2 s3 s1
+  EXPECT_TRUE(ContainsNames(span_names, completed)); // s0 s2 s1 s1 s
   EXPECT_EQ(running.size(), 0);
   EXPECT_EQ(completed.size(), span_names.size());
 }
@@ -235,16 +241,7 @@ TEST(TracezSpanProcessor, MultipleSpansCumulative) {
  * and that accumulation can happen for many spans even spans that start and end non-
  * sequentially. All completed spans are stored.
 */
-TEST(TracezSpanProcessor, MultipleSpansMiddleSplitCumulative) {
-  std::shared_ptr<TracezSpanProcessor> processor(new TracezSpanProcessor());
-  auto tracer = std::shared_ptr<opentelemetry::trace::Tracer>(new Tracer(processor));
-  auto spans = processor->GetSpanSnapshot();
-  auto running = spans.running;
-  auto completed = std::move(spans.completed);
-
-  std::vector<std::string> span_names = {"s0", "s2", "s1", "s1", "s"};
-
-  std::vector<opentelemetry::nostd::unique_ptr<opentelemetry::trace::Span>> span_vars;
+TEST_F(TracezProcessor, MultipleSpansMiddleSplitCumulative) {
   for (const auto &name : span_names) span_vars.push_back(tracer->StartSpan(name));
   UpdateSpans(processor, completed, running);
 
@@ -301,16 +298,7 @@ TEST(TracezSpanProcessor, MultipleSpansMiddleSplitCumulative) {
  * accumulation can happen for many spans even spans that start and end non-
  * sequentially. All completed spans are stored.
 */
-TEST(TracezSpanProcessor, MultipleSpansOuterSplitCumulative) {
-  std::shared_ptr<TracezSpanProcessor> processor(new TracezSpanProcessor());
-  auto tracer = std::shared_ptr<opentelemetry::trace::Tracer>(new Tracer(processor));
-  auto spans = processor->GetSpanSnapshot();
-  auto running = spans.running;
-  auto completed = std::move(spans.completed);
-
-  std::vector<std::string> span_names = {"s0", "s2", "s1", "s1", "s"};
-
-  std::vector<opentelemetry::nostd::unique_ptr<opentelemetry::trace::Span>> span_vars;
+TEST_F(TracezProcessor, MultipleSpansOuterSplitCumulative) {
   for (const auto &name : span_names) span_vars.push_back(tracer->StartSpan(name));
 
   // End last span
@@ -341,31 +329,24 @@ TEST(TracezSpanProcessor, MultipleSpansOuterSplitCumulative) {
   EXPECT_EQ(completed.size(), 5);
 }
 
+
 /*
  * Test if a single span moves from running to completed at expected times.
  * Ensure correct behavior even when spans are discarded. Only new completed
  * spans are stored.
 */
-TEST(TracezSpanProcessor, OneSpanNewOnly) {
-  std::shared_ptr<TracezSpanProcessor> processor(new TracezSpanProcessor());
-  auto tracer = std::shared_ptr<opentelemetry::trace::Tracer>(new Tracer(processor));
-  auto spans = processor->GetSpanSnapshot();
-  auto running = spans.running;
-  auto completed = std::move(spans.completed);
-
-  std::vector<std::string> span_name = { "span" };
-
-  auto span = tracer->StartSpan(span_name[0]);
+TEST_F(TracezProcessor, OneSpanNewOnly) {
+  auto span = tracer->StartSpan(span_names[0]);
   UpdateSpans(processor, completed, running, true);
 
-  EXPECT_TRUE(ContainsNames(span_name, running, 0, 1, true));
+  EXPECT_TRUE(ContainsNames(span_names, running, 0, 1, true));
   EXPECT_EQ(running.size(), 1);
   EXPECT_EQ(completed.size(), 0);
 
   span->End();
   UpdateSpans(processor, completed, running, true);
 
-  EXPECT_TRUE(ContainsNames(span_name, completed, 0, 1, true));
+  EXPECT_TRUE(ContainsNames(span_names, completed, 0, 1, true));
   EXPECT_EQ(running.size(), 0);
   EXPECT_EQ(completed.size(), 1);
 
@@ -375,22 +356,14 @@ TEST(TracezSpanProcessor, OneSpanNewOnly) {
   EXPECT_EQ(completed.size(), 0);
 }
 
+
 /*
  * Test if multiple spans move from running to completed at expected times,
  * running/completed spans are split. Middle spans end first. Ensure correct
  * behavior even when multiple spans are discarded, even when span starting and
  * ending is non-sequential. Only new completed spans are stored.
  */
-TEST(TracezSpanProcessor, MultipleSpansMiddleSplitNewOnly) {
-  std::shared_ptr<TracezSpanProcessor> processor(new TracezSpanProcessor());
-  auto tracer = std::shared_ptr<opentelemetry::trace::Tracer>(new Tracer(processor));
-  auto spans = processor->GetSpanSnapshot();
-  auto running = spans.running;
-  auto completed = std::move(spans.completed);
-
-  std::vector<std::string> span_names = {"s0", "s2", "s1", "s1", "s"};
-
-  std::vector<opentelemetry::nostd::unique_ptr<opentelemetry::trace::Span>> span_vars;
+TEST_F(TracezProcessor, MultipleSpansMiddleSplitNewOnly) {
   for (const auto &name : span_names) span_vars.push_back(tracer->StartSpan(name));
   UpdateSpans(processor, completed, running);
 
@@ -442,16 +415,7 @@ TEST(TracezSpanProcessor, MultipleSpansMiddleSplitNewOnly) {
  * multiple spans are discarded, even when span starting and ending is
  * non-sequential. Only new completed spans are stored.
 */
-TEST(TracezSpanProcessor, MultipleSpansOuterSplitNewOnly) {
-  std::shared_ptr<TracezSpanProcessor> processor(new TracezSpanProcessor());
-  auto tracer = std::shared_ptr<opentelemetry::trace::Tracer>(new Tracer(processor));
-  auto spans = processor->GetSpanSnapshot();
-  auto running = spans.running;
-  auto completed = std::move(spans.completed);
-
-  std::vector<std::string> span_names = {"s0", "s2", "s1", "s1", "s"};
-
-  std::vector<opentelemetry::nostd::unique_ptr<opentelemetry::trace::Span>> span_vars;
+TEST_F(TracezProcessor, MultipleSpansOuterSplitNewOnly) {
   for (const auto &name : span_names) span_vars.push_back(tracer->StartSpan(name));
 
   // End last span
@@ -472,7 +436,7 @@ TEST(TracezSpanProcessor, MultipleSpansOuterSplitNewOnly) {
   EXPECT_EQ(running.size(), 3);
   EXPECT_EQ(completed.size(), 1);
 
-  // End remaining middle pans
+  // End remaining middle spans
   for (int i = 1; i < 4; i++) span_vars[i]->End();
   UpdateSpans(processor, completed, running, true);
 
@@ -488,37 +452,48 @@ TEST(TracezSpanProcessor, MultipleSpansOuterSplitNewOnly) {
 
 
 /*
- * Test if thread safety is compromised and errors are thrown when many spans
- * start at the same time. Test is not failed if no errors occur.
+ * Test for ForceFlush and Shutdown code coverage, which do nothing.
  */
-TEST(TracezSpanProcessor, RunningThreadSafety) {
-  std::shared_ptr<TracezSpanProcessor> processor(new TracezSpanProcessor());
-  auto tracer = std::shared_ptr<opentelemetry::trace::Tracer>(new Tracer(processor));
-  std::vector<opentelemetry::nostd::unique_ptr<opentelemetry::trace::Span>> spans;
+TEST_F(TracezProcessor, FlushShutdown) {
+  auto pre_running_sz = running.size();
+  auto pre_completed_sz = completed.size();
 
-  std::thread start1(StartManySpans, std::ref(spans), tracer, 5);
-  std::thread start2(StartManySpans, std::ref(spans), tracer, 5);
+  processor->ForceFlush();
+  processor->Shutdown();
 
-  start1.join();
-  start2.join();
-
-  EndAllSpans(spans, 1);
+  UpdateSpans(processor, completed, running);
+  
+  EXPECT_EQ(pre_running_sz, running.size());
+  EXPECT_EQ(pre_completed_sz, completed.size());
 }
 
 
 /*
- * Test if thread safety is compromised and errors are thrown when many spans
- * end at the same time. Test is not failed if no errors occur.
+ * Test for thread safety when many spans start at the same time.
  */
-TEST(TracezSpanProcessor, CompletedThreadSafety) {
-  std::shared_ptr<TracezSpanProcessor> processor(new TracezSpanProcessor());
-  auto tracer = std::shared_ptr<opentelemetry::trace::Tracer>(new Tracer(processor));
-  std::vector<opentelemetry::nostd::unique_ptr<opentelemetry::trace::Span>> spans;
+TEST_F(TracezProcessor, RunningThreadSafety) {
+  std::vector<opentelemetry::nostd::unique_ptr<opentelemetry::trace::Span>> spans1;
+  std::vector<opentelemetry::nostd::unique_ptr<opentelemetry::trace::Span>> spans2;
 
-  StartManySpans(spans, tracer, 10);
+  std::thread start1(StartManySpans, std::ref(spans1), tracer, 5);
+  std::thread start2(StartManySpans, std::ref(spans2), tracer, 5);
 
-  std::thread end1(EndAllSpans, std::ref(spans), 5);
-  std::thread end2(EndAllSpans, std::ref(spans), 5);
+  start1.join();
+  start2.join();
+}
+
+
+/*
+ * Test for thread safety when many spans end at the same time
+ */
+TEST_F(TracezProcessor, CompletedThreadSafety) {
+  std::vector<opentelemetry::nostd::unique_ptr<opentelemetry::trace::Span>> spans1;
+  std::vector<opentelemetry::nostd::unique_ptr<opentelemetry::trace::Span>> spans2;
+  StartManySpans(spans1, tracer, 5);
+  StartManySpans(spans2, tracer, 5);
+
+  std::thread end1(EndAllSpans, std::ref(spans1));
+  std::thread end2(EndAllSpans, std::ref(spans2));
 
   end1.join();
   end2.join();
@@ -526,13 +501,9 @@ TEST(TracezSpanProcessor, CompletedThreadSafety) {
 
 
 /*
- * Test if thread safety is compromised and errors are thrown when many
- * snapshots are grabbed at the same time. Test is not failed if no
- * errors occur.
+ * Test for thread safety when many snapshots are grabbed at the same time.
  */
-TEST(TracezSpanProcessor, SnapshotThreadSafety) {
-  std::shared_ptr<TracezSpanProcessor> processor(new TracezSpanProcessor());
-  auto tracer = std::shared_ptr<opentelemetry::trace::Tracer>(new Tracer(processor));
+TEST_F(TracezProcessor, SnapshotThreadSafety) {
   std::vector<opentelemetry::nostd::unique_ptr<opentelemetry::trace::Span>> spans;
 
   std::thread snap1(GetManySnapshots, std::ref(processor), 5);
@@ -541,29 +512,26 @@ TEST(TracezSpanProcessor, SnapshotThreadSafety) {
   snap1.join();
   snap2.join();
 
-  StartManySpans(spans, tracer, 10);
+  StartManySpans(spans, tracer, 5);
 
   std::thread snap3(GetManySnapshots, std::ref(processor), 5);
   std::thread snap4(GetManySnapshots, std::ref(processor), 5);
 
   snap3.join();
   snap4.join();
-
-  EndAllSpans(spans, 1);
 }
 
 
 /*
- * Test if thread safety is compromised and errors are thrown when many spans
- * start while others are ending. Test is not failed if no errors occur.
+ * Test for thread safety when many spans start while others are ending.
  */
-TEST(TracezSpanProcessor, RunningCompletedThreadSafety) {
-  std::shared_ptr<TracezSpanProcessor> processor(new TracezSpanProcessor());
-  auto tracer = std::shared_ptr<opentelemetry::trace::Tracer>(new Tracer(processor));
-  std::vector<opentelemetry::nostd::unique_ptr<opentelemetry::trace::Span>> spans;
+TEST_F(TracezProcessor, RunningCompletedThreadSafety) {
+  std::vector<opentelemetry::nostd::unique_ptr<opentelemetry::trace::Span>> spans1;
+  std::vector<opentelemetry::nostd::unique_ptr<opentelemetry::trace::Span>> spans2;
+  StartManySpans(spans1, tracer, 5);
 
-  std::thread start(StartManySpans, std::ref(spans), tracer, 10);
-  std::thread end(EndAllSpans, std::ref(spans), 10);
+  std::thread start(StartManySpans, std::ref(spans2), tracer, 5);
+  std::thread end(EndAllSpans, std::ref(spans1));
 
   start.join();
   end.join();
@@ -571,55 +539,45 @@ TEST(TracezSpanProcessor, RunningCompletedThreadSafety) {
 
 
 /*
- * Test if thread safety is compromised and errors are thrown when many spans
- * start while snapshots are being grabbed. Test is not failed if no errors occur.
+ * Test for thread safety when many span start while snapshots are being grabbed.
  */
-TEST(TracezSpanProcessor, RunningSnapshotThreadSafety) {
-  std::shared_ptr<TracezSpanProcessor> processor(new TracezSpanProcessor());
-  auto tracer = std::shared_ptr<opentelemetry::trace::Tracer>(new Tracer(processor));
+TEST_F(TracezProcessor, RunningSnapshotThreadSafety) {
   std::vector<opentelemetry::nostd::unique_ptr<opentelemetry::trace::Span>> spans;
 
-  std::thread start(StartManySpans, std::ref(spans), tracer, 10);
-  std::thread snapshots(GetManySnapshots, std::ref(processor), 10);
+  std::thread start(StartManySpans, std::ref(spans), tracer, 5);
+  std::thread snapshots(GetManySnapshots, std::ref(processor), 5);
 
   start.join();
   snapshots.join();
-
 }
 
 
 /*
- * Test if thread safety is compromised and errors are thrown when all spans
- * end while snapshotd are being grabbed. Test is not failed if no errors occur.
+ * Test for thread safety when many spans end while snapshots are being grabbed.
  */
-TEST(TracezSpanProcessor, SnapshotCompletedThreadSafety) {
-  std::shared_ptr<TracezSpanProcessor> processor(new TracezSpanProcessor());
-  auto tracer = std::shared_ptr<opentelemetry::trace::Tracer>(new Tracer(processor));
+TEST_F(TracezProcessor, SnapshotCompletedThreadSafety) {
   std::vector<opentelemetry::nostd::unique_ptr<opentelemetry::trace::Span>> spans;
+  StartManySpans(spans, tracer, 5);
 
-  StartManySpans(spans, tracer, 10);
-
-  std::thread snapshots(GetManySnapshots, std::ref(processor), 10);
-  std::thread end(EndAllSpans, std::ref(spans), 1);
+  std::thread snapshots(GetManySnapshots, std::ref(processor), 5);
+  std::thread end(EndAllSpans, std::ref(spans));
 
   snapshots.join();
   end.join();
-
 }
 
 
 /*
- * Test if thread safety is compromised and errors are thrown when many spans
- * start and end while snapshots are being grabbed. Test is not failed if no errors occur.
+ * Test for thread safety when many spans start and end while snapshots are being grabbed.
  */
-TEST(TracezSpanProcessor, RunningSnapshotCompletedThreadSafety) {
-  std::shared_ptr<TracezSpanProcessor> processor(new TracezSpanProcessor());
-  auto tracer = std::shared_ptr<opentelemetry::trace::Tracer>(new Tracer(processor));
-  std::vector<opentelemetry::nostd::unique_ptr<opentelemetry::trace::Span>> spans;
+TEST_F(TracezProcessor, RunningSnapshotCompletedThreadSafety) {
+  std::vector<opentelemetry::nostd::unique_ptr<opentelemetry::trace::Span>> spans1;
+  std::vector<opentelemetry::nostd::unique_ptr<opentelemetry::trace::Span>> spans2;
+  StartManySpans(spans1, tracer, 5);
 
-  std::thread start(StartManySpans, std::ref(spans), tracer, 10);
-  std::thread snapshots(GetManySnapshots, std::ref(processor), 10);
-  std::thread end(EndAllSpans, std::ref(spans), 10);
+  std::thread start(StartManySpans, std::ref(spans2), tracer, 5);
+  std::thread snapshots(GetManySnapshots, std::ref(processor), 5);
+  std::thread end(EndAllSpans, std::ref(spans1));
 
   start.join();
   snapshots.join();

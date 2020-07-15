@@ -2,16 +2,14 @@
 
 #include <chrono>
 #include <memory>
+#include <mutex>
 #include <unordered_set>
 #include <vector>
 #include <utility>
-#include <thread>
-#include <mutex>
 
+#include "opentelemetry/sdk/trace/processor.h"
 #include "opentelemetry/sdk/trace/recordable.h"
 #include "opentelemetry/sdk/trace/span_data.h"
-#include "opentelemetry/sdk/trace/exporter.h"
-#include "opentelemetry/sdk/trace/processor.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace ext
