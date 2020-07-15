@@ -8,8 +8,6 @@
 #include <opentelemetry/nostd/nostd.h>
 #include <opentelemetry/version.h>
 
-#include <opentelemetry/nostd/type_traits.h>
-
 #include <opentelemetry/common/attribute_value.h>
 #include <opentelemetry/trace/key_value_iterable_view.h>
 
