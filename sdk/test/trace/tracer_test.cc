@@ -2,6 +2,7 @@
 #include "opentelemetry/sdk/trace/samplers/always_off.h"
 #include "opentelemetry/sdk/trace/samplers/always_on.h"
 #include "opentelemetry/sdk/trace/samplers/parent_or_else.h"
+#include "opentelemetry/sdk/trace/samplers/probability.h"
 #include "opentelemetry/sdk/trace/simple_processor.h"
 #include "opentelemetry/sdk/trace/span_data.h"
 
@@ -227,31 +228,103 @@ TEST(Tracer, GetSampler)
 
 TEST(Tracer, ComprehensiveTest)
 {
-  // Create tracers with AlwaysOn, AlwaysOff, Parent-or-else, and Probablity samplers
+  // Create tracers with AlwaysOn, AlwaysOff, Parent-or-else, and Probability samplers.
   std::shared_ptr<std::vector<std::unique_ptr<SpanData>>> spans_received_on(
       new std::vector<std::unique_ptr<SpanData>>);
   std::shared_ptr<std::vector<std::unique_ptr<SpanData>>> spans_received_off(
       new std::vector<std::unique_ptr<SpanData>>);
   std::shared_ptr<std::vector<std::unique_ptr<SpanData>>> spans_received_parent_on(
       new std::vector<std::unique_ptr<SpanData>>);
-  auto tracer_on     = initTracer(spans_received_on);
-  auto tracer_off    = initTracer(spans_received_off, std::make_shared<AlwaysOffSampler>());
+  std::shared_ptr<std::vector<std::unique_ptr<SpanData>>> spans_received_probability_on(
+      new std::vector<std::unique_ptr<SpanData>>);
+  std::shared_ptr<std::vector<std::unique_ptr<SpanData>>> spans_received_probability_off(
+      new std::vector<std::unique_ptr<SpanData>>);
+  auto tracer_on  = initTracer(spans_received_on);
+  auto tracer_off = initTracer(spans_received_off, std::make_shared<AlwaysOffSampler>());
   // Current ShouldSample always pass an empty ParentContext,
-  // so this sampler will work as an AlwaysOnSampler 
-  auto tracer_parent_on = initTracer(
-      spans_received_parent_on, std::make_shared<ParentOrElseSampler>(std::make_shared<AlwaysOnSampler>()));
+  // so this sampler will work as an AlwaysOnSampler.
+  auto tracer_parent_on =
+      initTracer(spans_received_parent_on,
+                 std::make_shared<ParentOrElseSampler>(std::make_shared<AlwaysOnSampler>()));
+  // Current ShouldSample uses an invalid TraceId.
+  // This sampler always return RECORD_AND_SAMPLE at probability 0.01
+  auto tracer_probability_on =
+      initTracer(spans_received_probability_on, std::make_shared<ProbabilitySampler>(0.01));
+  // This sampler always return NOT_SAMPLE at probability 0
+  auto tracer_probability_off =
+      initTracer(spans_received_probability_off, std::make_shared<ProbabilitySampler>(0));
 
+  // Testing AlwaysOn sampler.
   // Create two spans for each tracer. Check the exported result.
-  auto span = tracer_on->StartSpan("span 1");
+  auto span_on_1 = tracer_on->StartSpan("span with AlwaysOn sampler 1");
+  auto span_on_2 = tracer_on->StartSpan("span with AlwaysOn sampler 2");
 
-  span->SetAttribute("abc", 3.1);
+  span_on_1->SetAttribute("attr1", 3.1);
 
-  span->End();
-  ASSERT_EQ(1, spans_received_on->size());
-  auto &span_data_on = spans_received_on->at(0);
-  ASSERT_EQ(3.1, nostd::get<double>(span_data_on->GetAttributes().at("abc")));
-  ASSERT_LT(std::chrono::nanoseconds(0), span_data_on->GetStartTime().time_since_epoch());
-  ASSERT_LT(std::chrono::nanoseconds(0), span_data_on->GetDuration());
+  span_on_2->End();
+  span_on_1->End();
+  ASSERT_EQ(2, spans_received_on->size());
+  auto &span_data_on_1 = spans_received_on->at(1);  // span 2 ends first.
+  auto &span_data_on_2 = spans_received_on->at(0);
+  ASSERT_EQ(3.1, nostd::get<double>(span_data_on_1->GetAttributes().at("attr1")));
+  ASSERT_LT(std::chrono::nanoseconds(0), span_data_on_1->GetStartTime().time_since_epoch());
+  ASSERT_LT(std::chrono::nanoseconds(0), span_data_on_1->GetDuration());
+  ASSERT_LT(std::chrono::nanoseconds(0), span_data_on_2->GetStartTime().time_since_epoch());
+  ASSERT_LT(std::chrono::nanoseconds(0), span_data_on_2->GetDuration());
 
-  // ASSERT_EQ(0, spans_received->size());
+  // Testing AlwaysOff sampler
+  auto span_off_1 = tracer_off->StartSpan("span with AlwaysOff sampler 1");
+  auto span_off_2 = tracer_off->StartSpan("span with AlwaysOff sampler 2");
+
+  span_off_1->SetAttribute("attr1", 3.1);  // Not recorded.
+
+  span_off_2->End();
+  span_off_1->End();
+
+  // The tracer export nothing with an AlwaysOff sampler
+  ASSERT_EQ(0, spans_received_off->size());
+
+  // Testing AlwaysOff sampler
+  auto span_parent_on_1 = tracer_parent_on->StartSpan("span with Parent-or-else sampler 1");
+  auto span_parent_on_2 = tracer_parent_on->StartSpan("span with Parent-or-else sampler 2");
+
+  span_parent_on_1->SetAttribute("attr1", 3.1);
+
+  span_parent_on_2->End();
+  span_parent_on_1->End();
+  ASSERT_EQ(2, spans_received_parent_on->size());
+  auto &span_data_parent_on_1 = spans_received_parent_on->at(1); 
+  auto &span_data_parent_on_2 = spans_received_parent_on->at(0);
+  ASSERT_EQ(3.1, nostd::get<double>(span_data_parent_on_1->GetAttributes().at("attr1")));
+  ASSERT_LT(std::chrono::nanoseconds(0), span_data_parent_on_1->GetStartTime().time_since_epoch());
+  ASSERT_LT(std::chrono::nanoseconds(0), span_data_parent_on_1->GetDuration());
+  ASSERT_LT(std::chrono::nanoseconds(0), span_data_parent_on_2->GetStartTime().time_since_epoch());
+  ASSERT_LT(std::chrono::nanoseconds(0), span_data_parent_on_2->GetDuration());
+
+  // Testing Probablity sampler
+  auto span_probability_on_1 = tracer_probability_on->StartSpan("span with Probability on sampler 1");
+  auto span_probability_on_2 = tracer_probability_on->StartSpan("span with Probability on sampler 2");
+
+  span_probability_on_1->SetAttribute("attr1", 3.1);
+
+  span_probability_on_2->End();
+  span_probability_on_1->End();
+  ASSERT_EQ(2, spans_received_probability_on->size());
+  auto &span_data_probability_on_1 = spans_received_probability_on->at(1); 
+  auto &span_data_probability_on_2 = spans_received_probability_on->at(0);
+  ASSERT_EQ(3.1, nostd::get<double>(span_data_probability_on_1->GetAttributes().at("attr1")));
+  ASSERT_LT(std::chrono::nanoseconds(0), span_data_probability_on_1->GetStartTime().time_since_epoch());
+  ASSERT_LT(std::chrono::nanoseconds(0), span_data_probability_on_1->GetDuration());
+  ASSERT_LT(std::chrono::nanoseconds(0), span_data_probability_on_2->GetStartTime().time_since_epoch());
+  ASSERT_LT(std::chrono::nanoseconds(0), span_data_probability_on_2->GetDuration());
+
+  // Testing Probablity sampler
+  auto span_probability_off_1 = tracer_probability_off->StartSpan("span with Probability off sampler 1");
+  auto span_probability_off_2 = tracer_probability_off->StartSpan("span with Probability off sampler 2");
+
+  span_probability_off_1->SetAttribute("attr1", 3.1);
+
+  span_probability_off_2->End();
+  span_probability_off_1->End();
+  ASSERT_EQ(0, spans_received_probability_off->size());
 }
