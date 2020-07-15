@@ -21,59 +21,8 @@ namespace context
 
     public:
 
-      // A linked list to contain the keys and values of this context node 
-      class DataList {
-        private:
-          friend class Context;
 
-          DataList *next_;
-
-          char key_[50];
-
-          ContextValue value_;
-          
-          DataList(){
-            next_ = nullptr;
-          }
-
-          // Builds a data list off of a key and value iterable and returns the head 
-          template <class T , nostd::enable_if_t<trace::detail::is_key_value_iterable<T>::value> * = nullptr>
-            DataList(const T &keys_and_vals){
-              auto iter = std::begin(keys_and_vals);
-
-              // Create list head 
-              strcpy(key_, nostd::string_view(iter->first).data());
-              value_ = iter->second;
-              next_ = nullptr;
-              ++iter;
-
-              DataList *previous_node = this;
-              // Iterate over the keys and values iterable and add nodes
-              for (; iter != std::end(keys_and_vals); ++iter)
-              {
-                DataList *node = new DataList();
-                node->next_ = nullptr;
-                strcpy(node->key_, nostd::string_view(iter->first).data());
-                node->value_ = iter->second;
-                previous_node->next_ = node;
-                previous_node = node;
-              }
-            }  
-
-          // Builds a data list with just a key and value, so it will just be the head
-          // and returns that head. 
-          DataList(nostd::string_view key, ContextValue value){
-            DataList *head = new DataList;
-            strcpy(key_, key.data());
-            value_ = value;
-            next_ = nullptr;
-          }
-      };
-
-      Context(){
-        next_ = nullptr;
-        head_ = nullptr;
-      }
+      Context() = default;
 
       // Creates a context object from a map of keys and identifiers, this will
       // be the head of the context object linked list.
@@ -81,7 +30,6 @@ namespace context
         Context(const T &keys_and_values)  
         {
           head_ = new DataList(keys_and_values);
-          next_ = nullptr;
         }
 
       // Creates a context object from a key and value, this will be the head
@@ -89,7 +37,6 @@ namespace context
       Context(nostd::string_view key, ContextValue value)  
       {
         head_ = new DataList(key, value);
-        next_ = nullptr;
       }
 
       // Accepts a new iterable and then returns a new context that
@@ -110,24 +57,15 @@ namespace context
       // Returns the value associated with the passed in key.
       common::AttributeValue GetValue(nostd::string_view key)
       {
-        Context *context_trace = this;
-
         //Iterate through the context nodes
-        while(context_trace != NULL){
-          DataList *data_trace = context_trace->head_;
-
+        for(Context *context = this; context != nullptr; context = context->next_){
           //Iterate through the internal data nodes
-          while(data_trace != NULL){
-            if(strncmp(key.data(), data_trace->key_, 50) == 0){
-              return data_trace->value_;
+          for(DataList *data = context->head_; data != nullptr; data = data->next_){
+            if(strncmp(key.data(), data->key_, data->key_length_) == 0){
+              return data->value_;
             }
-
-            data_trace = data_trace->next_;
           }
-
-          context_trace = context_trace->next_;
         }
-
         return "";
       }
 
@@ -141,59 +79,109 @@ namespace context
           return false; 
         }
 
-        DataList *trace = head_;
-        DataList *other_trace = other.head_;
+        DataList *other_data = other.head_;
 
         // Iterate through the lists and compare the keys
         // TODO should also compare the values but the nostd::variant
         // seems to not have a comparison operator
-        while(trace != NULL){
-
-          if(other_trace == NULL){
+        for(DataList *data = head_; data != nullptr; data = data->next_){
+          if(other_data == nullptr){
             return false;
           }
 
-          if((trace->key_ != other_trace->key_)){
+          if((data->key_ != other_data->key_)){
             return false;
           }
 
-          trace = trace->next_;
-          other_trace = other_trace->next_;
+          data = data->next_;
+          other_data = other_data->next_;
         }
 
         return true;
       }
 
-      Context(const Context &other) = delete;
+      Context(const Context &other) = default;
 
       Context &operator=(const Context &other) = delete;
-      
+
       ~Context(){
-        DataList *trace = head_;
-       
-        while(trace != nullptr){
-          DataList * next = trace->next_;
-          delete trace;
-          trace = next;
+        for(DataList* data = head_; data != nullptr;){
+          DataList * next = data->next_;
+          delete data;
+          data = next;
         }
-        
       }
 
     private:
 
-      // Head of the list which holds the keys and values of this context 
-      DataList *head_;
 
-      // Pointer to the next context object in the context list
-      Context *next_;
+      // A linked list to contain the keys and values of this context node 
+      class DataList {
+        public:
+
+          DataList *next_;
+
+          char *key_;
+
+          int key_length_;
+
+          ContextValue value_;
+
+          DataList(){
+            next_ = nullptr;
+          }
+
+          // Builds a data list off of a key and value iterable and returns the head 
+          template <class T , nostd::enable_if_t<trace::detail::is_key_value_iterable<T>::value> * = nullptr>
+            DataList(const T &keys_and_vals){
+              auto iter = std::begin(keys_and_vals);
+
+              // Create list head 
+              key_ = new char[nostd::string_view(iter->first).size()];
+              key_length_ =  nostd::string_view(iter->first).size();
+              strncpy(key_, nostd::string_view(iter->first).data(), nostd::string_view(iter->first).size());
+              value_ = iter->second;
+              next_ = nullptr;
+              ++iter;
+
+              DataList *previous_node = this;
+              // Iterate over the keys and values iterable and add nodes
+              for (; iter != std::end(keys_and_vals); ++iter)
+              {
+                DataList *node = new DataList();
+                node->next_ = nullptr;
+                node->key_ = new char[nostd::string_view(iter->first).size()];
+                node->key_length_ = nostd::string_view(iter->first).size();
+                strncpy(node->key_, nostd::string_view(iter->first).data(), nostd::string_view(iter->first).size());
+                node->value_ = iter->second;
+                previous_node->next_ = node;
+                previous_node = node;
+              }
+            }  
+
+          // Builds a data list with just a key and value, so it will just be the head
+          // and returns that head. 
+          DataList(nostd::string_view key, ContextValue value){
+            DataList *head = new DataList;
+            key_ = new char[nostd::string_view(key).size()];
+            key_length_ =  nostd::string_view(key).size();
+            strncpy(key_, nostd::string_view(key).data(), nostd::string_view(key).size());
+            value_ = value;
+            next_ = nullptr;
+          }
+
+          ~DataList(){
+            delete [] key_; 
+          }
+      };
 
       // Creates a context object from a map of keys and identifiers, an internal 
       // contructor only, will always create a node within the list, not at the 
       // head.
       template <class T , nostd::enable_if_t<trace::detail::is_key_value_iterable<T>::value> * = nullptr>
-        Context(const T &attributes, Context* next_node)  
+        Context(const T &keys_and_vals, Context* next_node)  
         {
-          head_ = new DataList(attributes);
+          head_ = new DataList(keys_and_vals);
           next_ = next_node;
         }
 
@@ -205,6 +193,12 @@ namespace context
         head_ = new DataList(key, value);
         next_ = next_node;
       }
+
+      // Head of the list which holds the keys and values of this context 
+      DataList *head_ = nullptr;
+
+      // Pointer to the next context object in the context list
+      Context *next_ = nullptr;
   };
 
 }  // namespace context
