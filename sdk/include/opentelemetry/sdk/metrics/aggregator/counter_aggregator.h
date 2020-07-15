@@ -18,7 +18,7 @@ namespace metrics
 {
 
 template<class T>
-class CounterAggregator : public Aggregator<T>
+class CounterAggregator final : public Aggregator<T>
 {
     
 public:

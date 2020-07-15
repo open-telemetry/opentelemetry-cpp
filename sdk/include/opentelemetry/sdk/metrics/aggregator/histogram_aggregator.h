@@ -17,7 +17,7 @@ namespace sdk
 namespace metrics
 {
 template<class T>
-class HistogramAggregator : public Aggregator<T>
+class HistogramAggregator final : public Aggregator<T>
 {
     
 public:
