@@ -1,4 +1,4 @@
-# StdoutExporter Design
+# StreamExporter Design
 
 In strongly typed languages typically there will be 2 separate `Exporter` interfaces, one that accepts spans from a tracer (SpanExporter) and one that accepts metrics (MetricsExporter)
 
@@ -6,26 +6,26 @@ The exporter SHOULD be called with a checkpoint of finished (possibly dimensiona
 
 ## Use Cases
 
-Monitoring and alerting systems commonly use the data provided through metric events or tracers, after applying various aggregations and converting into various exposition format. After getting the data, the systems need to be able to see the data. The StdoutExporter will be used here to print data through Stdout, this is seen as a simple exporter where the user doesn’t have the burden of implementing or setting up a protocol dependent exporter.
+Monitoring and alerting systems commonly use the data provided through metric events or tracers, after applying various aggregations and converting into various exposition format. After getting the data, the systems need to be able to see the data. The StreamExporter will be used here to print data through an ostream, this is seen as a simple exporter where the user doesn’t have the burden of implementing or setting up a protocol dependent exporter.
 
-The StdoutExporter will also be used as a debugging tool for the Metrics API/SDK and Tracing API/SDK which are currently work in progress projects. This exporter will allow contributors to easily diagnose problems when working on the project.
+The StreamExporter will also be used as a debugging tool for the Metrics API/SDK and Tracing API/SDK which are currently work in progress projects. This exporter will allow contributors to easily diagnose problems when working on the project.
 
 ## Push vs Pull Exporter
 
-There are two different versions of exporters: Push and Pull. A Push Exporter pushes the data outwards towards a system, in the case of the StdoutExporter it prints data into Stdout. A Pull Exporter exposes data to some endpoint for another system to grab the data. 
+There are two different versions of exporters: Push and Pull. A Push Exporter pushes the data outwards towards a system, in the case of the StreamExporter it sends its data into an ostream. A Pull Exporter exposes data to some endpoint for another system to grab the data. 
 
-The StdoutExporter will only be implementing a Push Exporter framework.
+The StreamExporter will only be implementing a Push Exporter framework.
 
 ## Design Tenets
 
 * Reliability
     * The Exporter should be reliable; data exported should always be accounted for. The data will either all be successfully exported to the destination server, or in the case of failure, the data is dropped. `Export` will always return failure or success to notify the user of the result.
     * Thread Safety
-        * Export() should never be called concurrently. This is handled by the controller in the StdoutMetricsExporter.
+        * Export() should never be called concurrently. This is handled by the controller in the StreamMetricsExporter.
 * Scalability
     * The Exporter must be able to operate on sizeable systems with predictable overhead growth.  A key requirement of this is that the library does not consume unbounded memory resource. 
 * Security
-    * Stdout exporter should only be used for development and testing purpose, where security and privacy is less a concern as it doesn't communicate to external systems.
+    * StreamExporter should only be used for development and testing purpose, where security and privacy is less a concern as it doesn't communicate to external systems.
 
 ## SpanExporter
 
@@ -46,7 +46,7 @@ Exports a batch of telemetry data. Protocol exporters that will implement this f
 
 Export() will never be called concurrently for the same exporter instance. Export() can be called again only after the current call returns.
 
-Export() must not block indefinitely. We can rely on printing to stdout is reasonably performant and doesn't block.
+Export() must not block indefinitely. We can rely on printing to an ostream is reasonably performant and doesn't block.
 
 The specification states: Any retry logic that is required by the exporter is the responsibility of the exporter. The default SDK SHOULD NOT implement retry logic, as the required logic is likely to depend heavily on the specific protocol and backend the spans are being sent to.
 
@@ -58,10 +58,10 @@ Shuts down the exporter. Called when SDK is shut down. This is an opportunity fo
 
 `Shutdown` should not block indefinitely (e.g. if it attempts to flush the data and the destination is unavailable). Language library authors can decide if they want to make the shutdown timeout configurable.
 
-In the StdoutExporter there is no cleanup to be done, so there is no need to use the timeout within the `Shutdown` function as it will never be blocking. 
+In the StreamExporter there is no cleanup to be done, so there is no need to use the timeout within the `Shutdown` function as it will never be blocking. 
 
 ```
-class StdoutSpanExporter final : public sdktrace::SpanExporter
+class StreamSpanExporter final : public sdktrace::SpanExporter
 {
 
 private: 
@@ -125,7 +125,7 @@ public:
 
 ## MetricsExporter
 
-The MetricsExporter has the same requirements as the SpanExporter. The exporter will go through the different metric instruments and print the value stored in their aggregators to stdout, for simplicity only Counter is shown here, but all aggregators will be implemented. Counter, Gauge, MinMaxSumCount, Sketch, Histogram and Exact Aggregators will be supported.
+The MetricsExporter has the same requirements as the SpanExporter. The exporter will go through the different metric instruments and send the value stored in their aggregators to an ostream, for simplicity only Counter is shown here, but all aggregators will be implemented. Counter, Gauge, MinMaxSumCount, Sketch, Histogram and Exact Aggregators will be supported.
 
 Exports a batch of telemetry data. Protocol exporters that will implement this function are typically expected to serialize and transmit the data to the destination.
 
@@ -135,7 +135,7 @@ Exports a batch of telemetry data. Protocol exporters that will implement this f
 
 Export() will never be called concurrently for the same exporter instance. Export() can be called again only after the current call returns.
 
-Export() must not block indefinitely. We can rely on printing to stdout is reasonably performant and doesn't block.
+Export() must not block indefinitely. We can rely on printing to an ostream is reasonably performant and doesn't block.
 
 The specification states: Any retry logic that is required by the exporter is the responsibility of the exporter. The default SDK SHOULD NOT implement retry logic, as the required logic is likely to depend heavily on the specific protocol and backend the spans are being sent to.
 
@@ -149,10 +149,10 @@ Shuts down the exporter. Called when SDK is shut down. This is an opportunity fo
 
 `Shutdown` should not block indefinitely (e.g. if it attempts to flush the data and the destination is unavailable). Language library authors can decide if they want to make the shutdown timeout configurable.
 
-In the StdoutExporter there is no cleanup to be done, so there is no need to use the timeout within the `Shutdown` function as it will never be blocking.
+In the StreamExporter there is no cleanup to be done, so there is no need to use the timeout within the `Shutdown` function as it will never be blocking.
 
 ```
-class StdoutMetricsExporter final : public sdkmeter::MetricsExporter
+class StreamMetricsExporter final : public sdkmeter::MetricsExporter
 {
 
 private: 
@@ -204,10 +204,8 @@ public:
 
 In this project, we will follow the TDD rules, and write enough functional unit tests before implementing production code. We will design exhaustive test cases for normal and abnormal inputs, and tests for edge cases.
 
-In terms of test framework, as is described in the [Metrics API/SDK design document](https://quip-amazon.com/UBXyAuqRzkIj/Metrics-APISDK-C-Design-Document-External), the StdoutExporter will use [Googletest](https://github.com/google/googletest) framework because it provides test coverage reports, and it also integrate code coverage tools such as [codecov.io](http://codecov.io/) in the project. There are already many reference tests such as MockExporter tests written in GoogleTest, making it a clear choice to stick with it as the testing framework. A required coverage target of 90% will help to ensure that our code is fully tested.
+In terms of test framework, as is described in the [Metrics API/SDK design document](https://quip-amazon.com/UBXyAuqRzkIj/Metrics-APISDK-C-Design-Document-External), the StreamExporter will use [Googletest](https://github.com/google/googletest) framework because it provides test coverage reports, and it also integrate code coverage tools such as [codecov.io](http://codecov.io/) in the project. There are already many reference tests such as MockExporter tests written in GoogleTest, making it a clear choice to stick with it as the testing framework. A required coverage target of 90% will help to ensure that our code is fully tested.
 
 ## Future Features
 
-* Ability to switch between Stdout / Stderr
 * Serialize data to another format (json)
-* Make timeout configurable
