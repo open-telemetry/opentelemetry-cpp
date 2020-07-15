@@ -24,7 +24,7 @@ public:
    * @param sampler The sampler for this tracer provider. This must
    * not be a nullptr.
    */
-  explicit MeterProvider() noexcept;
+  explicit MeterProvider(std::shared_ptr<Controller> controller) noexcept;
 
   opentelemetry::nostd::shared_ptr<opentelemetry::metrics::Meter> GetMeter(
       nostd::string_view library_name,

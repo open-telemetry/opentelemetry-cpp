@@ -1,4 +1,4 @@
-#include "opentelemetry/sdk/metrics/metrics_provider.h"
+#include "opentelemetry/sdk/metrics/meter_provider.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace sdk
@@ -23,7 +23,7 @@ void MeterProvider::SetController(std::shared_ptr<Controller> controller) noexce
   // TODO: Set controller in Meter once the stub has been replaced
 }
 
-std::shared_ptr<SpanProcessor> MeterProvider::GetController() const noexcept
+std::shared_ptr<Controller> MeterProvider::GetController() const noexcept
 {
   return controller_.load();
 }
