@@ -165,10 +165,10 @@ TEST(Tracer, StartSpanWithOptionsTime)
 
 TEST(Tracer, StartSpanWithAttributes)
 {
-  std::shared_ptr<std::vector<std::unique_ptr<SpanData>>> spans_received_1(
+  std::shared_ptr<std::vector<std::unique_ptr<SpanData>>> spans_received(
       new std::vector<std::unique_ptr<SpanData>>);
   // The default tracer has empty sampling result attribute
-  auto tracer_default = initTracer(spans_received_1);
+  auto tracer = initTracer(spans_received);
 
   // Start a span with all supported scalar attribute types.
   tracer->StartSpan("span 1", {{"attr1", "string"},
@@ -198,7 +198,7 @@ TEST(Tracer, StartSpanWithAttributes)
   m["attr7"] = nostd::span<nostd::string_view>(listStringView);
   tracer->StartSpan("span 2", m);
 
-  ASSERT_EQ(2, spans_received_1->size());
+  ASSERT_EQ(2, spans_received->size());
 
   auto &span_data = spans_received->at(0);
   ASSERT_EQ(7, span_data->GetAttributes().size());
