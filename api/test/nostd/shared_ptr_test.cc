@@ -1,9 +1,7 @@
 #include "opentelemetry/nostd/nostd.h"
 
 #include <gtest/gtest.h>
-
 #include <algorithm>
-
 #include <benchmark/benchmark.h>
 
 using opentelemetry::nostd::shared_ptr;

@@ -1,12 +1,10 @@
 #pragma once
 
-#include <chrono>
-
+#include "opentelemetry/nostd/nostd.h"
+#include "opentelemetry/trace/span.h"
 #include "opentelemetry/version.h"
 
-#include "opentelemetry/nostd/nostd.h"
-
-#include "opentelemetry/trace/span.h"
+#include <chrono>
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace trace
