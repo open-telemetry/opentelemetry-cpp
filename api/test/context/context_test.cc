@@ -1,138 +1,100 @@
-#include <cstdint>
-
 #include "opentelemetry/context/context.h"
-#include "opentelemetry/nostd/list.h"
-#include "opentelemetry/nostd/pair.h"
+
+#include <map>
 
 #include <gtest/gtest.h>
 
 using namespace opentelemetry;
 
-// Test ensurs that the context object doe not change when you write to it 
-TEST(ContextTest, Common)
+// Tests that the context constructor accepts an std::map.
+TEST(ContextTest, ContextIterableAcceptsMap)
 {
-  using M                          = std::map<std::string, common::AttributeValue>;
-  context::Context::Key test_key = context::Context::CreateKey("test_key");
-  context::Context::Key foo_key  = context::Context::CreateKey("test_key");
-
-  M m1 = {{std::string(test_key.GetIdentifier()), "123"},
-    {std::string(foo_key.GetIdentifier()), "456"}};
-
-  context::Context test_context = context::Context();
-  context::Context foo_context = test_context.WriteValues(m1);
-
-  EXPECT_NE(nostd::get<nostd::string_view>(test_context.GetValue(test_key)), "123");
-  EXPECT_NE(nostd::get<nostd::string_view>(test_context.GetValue(foo_key)), "456");
+  std::map<std::string, context::ContextValue> map_test = {{"test_key", "123"}};
+  context::Context context_test                         = context::Context(map_test);
 }
 
-// Tests whether that a  Context Object can return a value that was
+// Tests that the GetValue method returns the expected value.
+TEST(ContextTest, ContextGetValueReturnsExpectedValue)
+{
+  std::map<std::string, std::string> map_test = {{"test_key", "123"}, {"foo_key", "456"}};
+
+  context::Context context_test = context::Context(map_test);
+  EXPECT_EQ(nostd::get<nostd::string_view>(context_test.GetValue("test_key")), "123");
+  EXPECT_EQ(nostd::get<nostd::string_view>(context_test.GetValue("foo_key")), "456");
+}
+
+// Tests that the SetValues method accepts an std::map.
+TEST(ContextTest, ContextSetValuesAcceptsMap)
+{
+  std::map<std::string, context::ContextValue> map_test       = {{"test_key", "123"}};
+  std::map<std::string, context::ContextValue> map_test_write = {{"foo_key", "456"}};
+  context::Context context_test                               = context::Context(map_test);
+  context::Context* foo_test = context_test.SetValues(map_test_write);
+  EXPECT_EQ(nostd::get<nostd::string_view>(foo_test->GetValue("test_key")), "123");
+  EXPECT_EQ(nostd::get<nostd::string_view>(foo_test->GetValue("foo_key")), "456");
+}
+
+// Tests that the SetValues method accepts a nostd::string_view and
+// context::ContextValue.
+TEST(ContextTest, ContextSetValuesAcceptsStringViewContextValue)
+{
+  nostd::string_view string_view_test      = "string_view";
+  context::ContextValue context_value_test = "123";
+  context::Context context_test            = context::Context();
+  context::Context* context_foo = context_test.SetValue(string_view_test, context_value_test);
+  EXPECT_EQ(nostd::get<nostd::string_view>(context_foo->GetValue(string_view_test)), "123");
+}
+
+// Tests that the original context does not change when a value is
 // written to it.
-TEST(ContextTest, ContextGetWrittenValue)
+TEST(ContextTest, ContextImmutability)
 {
+  std::map<std::string, context::ContextValue> map_test = {{"test_key", "123"}};
+  context::Context context_test                         = context::Context(map_test);
 
-  using M                          = std::map<std::string, common::AttributeValue>;
-  context::Context test_context = context::Context();
-
-  context::Context::Key test_key  = test_context.CreateKey("test_key");
-  context::Context::Key foo_key   = test_context.CreateKey("foo_key");
-
-  M m1 = {{std::string(test_key.GetIdentifier()), "123"},
-    {std::string(foo_key.GetIdentifier()), "456"}};
-
-  context::Context foo_context   = test_context.WriteValues(m1);
-
-  EXPECT_EQ(nostd::get<nostd::string_view>(foo_context.GetValue(test_key)), "123");
-  EXPECT_EQ(nostd::get<nostd::string_view>(foo_context.GetValue(foo_key)), "456");
+  context::Context* context_foo = context_test.SetValue("foo_key", "456");
+  
+  EXPECT_NE(nostd::get<nostd::string_view>(context_test.GetValue("foo_key")),
+      "456");
 }
 
-// Tests whether the new Context Objects inherits the keys and values
+// Tests that writing the same to a context overwrites the original value.
+TEST(ContextTest, ContextKeyOverwrite)
+{
+  std::map<std::string, context::ContextValue> map_test = {{"test_key", "123"}};
+  context::Context context_test                         = context::Context(map_test);
+  context::Context* context_foo                          = context_test.SetValue("test_key", "456");
+
+  EXPECT_EQ(nostd::get<nostd::string_view>(context_foo->GetValue("test_key")), "456");
+}
+
+// Tests that the new Context Objects inherits the keys and values
 // of the original context object.
 TEST(ContextTest, ContextInheritance)
 {
-
-  using M                          = std::map<std::string, common::AttributeValue>;
+  using M                       = std::map<std::string, context::ContextValue>;
   context::Context test_context = context::Context();
 
-  context::Context::Key test_key  = test_context.CreateKey("test_key");
-  context::Context::Key foo_key   = test_context.CreateKey("foo_key");
-  context::Context::Key other_key = test_context.CreateKey("other_key");
+  M m1 = {{"test_key", "123"}, {"foo_key", "456"}};
+  M m2 = {{"other_key", "789"}};
 
-  M m1 = {{std::string(test_key.GetIdentifier()), "123"},
-    {std::string(foo_key.GetIdentifier()), "456"}};
-  M m2 = {{std::string(other_key.GetIdentifier()), "000"}};
+  context::Context* foo_context   = test_context.SetValues(m1);
+  context::Context* other_context = foo_context->SetValues(m2);
 
-  context::Context foo_context   = test_context.WriteValues(m1);
-  context::Context other_context = foo_context.WriteValues(m2);
-
-  EXPECT_EQ(nostd::get<nostd::string_view>(other_context.GetValue(test_key)), "123");
-  EXPECT_EQ(nostd::get<nostd::string_view>(other_context.GetValue(foo_key)), "456");
+  EXPECT_EQ(nostd::get<nostd::string_view>(other_context->GetValue("test_key")), "123");
+  EXPECT_EQ(nostd::get<nostd::string_view>(other_context->GetValue("foo_key")), "456");
 }
 
-// Tests that when you add a key value pair where the key is already in
-// existance, they key is overwritten.
-TEST(ContextTest, ContextKeyOverwrite)
+// Tests that copying a context copies the key value pairs as expected.
+TEST(ContextTest, ContextCopyOperator)
 {
+  std::map<std::string, std::string> test_map = {
+    {"test_key", "123"}, {"foo_key", "456"}, {"other_key", "789"}};
 
-  using M                          = std::map<std::string, common::AttributeValue>;
-  context::Context test_context = context::Context();
+  context::Context test_context   = context::Context(test_map);
+  context::Context copied_context = test_context;
 
-  context::Context::Key test_key  = test_context.CreateKey("test_key");
-  context::Context::Key foo_key   = test_context.CreateKey("foo_key");
-  context::Context::Key other_key = test_context.CreateKey("other_key");
-
-  M m1 = {{std::string(test_key.GetIdentifier()), "123"},
-    {std::string(foo_key.GetIdentifier()), "456"}};
-  M m2 = {{std::string(test_key.GetIdentifier()), "000"}};
-
-  context::Context foo_context   = test_context.WriteValues(m1);
-  context::Context other_context = foo_context.WriteValues(m2);
-
-  EXPECT_EQ(nostd::get<nostd::string_view>(other_context.GetValue(test_key)), "000");
-  EXPECT_NE(nostd::get<nostd::string_view>(other_context.GetValue(test_key)), "123");
-}
-
-// Tests that copying a context copies the key value pairs properly.
-TEST(ContextTest, ContextCopy)
-{
-
-  using M                          = std::map<std::string, common::AttributeValue>;
-  context::Context test_context = context::Context();
-
-  context::Context::Key test_key  = test_context.CreateKey("test_key");
-  context::Context::Key foo_key   = test_context.CreateKey("foo_key");
-  context::Context::Key other_key = test_context.CreateKey("other_key");
-
-  M m1 = {{std::string(test_key.GetIdentifier()), "123"},
-    {std::string(foo_key.GetIdentifier()), "456"}};
-  M m2 = {{std::string(other_key.GetIdentifier()), "000"}};
-
-  context::Context foo_context    = test_context.WriteValues(m1);
-  context::Context other_context  = foo_context.WriteValues(m2);
-  context::Context copied_context = other_context;
-
-  EXPECT_EQ(nostd::get<nostd::string_view>(copied_context.GetValue(test_key)), "123");
-  EXPECT_EQ(nostd::get<nostd::string_view>(copied_context.GetValue(foo_key)), "456");
-}
-
-// Tests that the comparison compares properly.
-TEST(ContextTest, ContextCompare)
-{
-
-  using M                          = std::map<std::string, common::AttributeValue>;
-  context::Context test_context = context::Context();
-
-  context::Context::Key test_key  = test_context.CreateKey("test_key");
-  context::Context::Key foo_key   = test_context.CreateKey("foo_key");
-  context::Context::Key other_key = test_context.CreateKey("other_key");
-
-  M m1 = {{std::string(test_key.GetIdentifier()), "123"},
-    {std::string(foo_key.GetIdentifier()), "456"}};
-  M m2 = {{std::string(other_key.GetIdentifier()), "000"}};
-
-  context::Context foo_context    = test_context.WriteValues(m1);
-  context::Context other_context  = foo_context.WriteValues(m2);
-  context::Context copied_context = other_context;
-  
-  EXPECT_TRUE(copied_context == other_context);
-  EXPECT_FALSE(copied_context == foo_context);
+  EXPECT_EQ(nostd::get<nostd::string_view>(copied_context.GetValue("test_key")), "123");
+  EXPECT_EQ(nostd::get<nostd::string_view>(copied_context.GetValue("foo_key")), "456");
+  EXPECT_EQ(nostd::get<nostd::string_view>(copied_context.GetValue("other_key")), "789");
 }
