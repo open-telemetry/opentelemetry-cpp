@@ -52,7 +52,7 @@ cc_library(
 
 cc_test(
     name = "recordable_test",
-    srcs = ["src/recordable_test.cc"],
+    srcs = ["test/recordable_test.cc"],
     deps = [
         ":recordable",
         "@com_google_googletest//:gtest_main",
@@ -61,7 +61,7 @@ cc_test(
 
 cc_test(
  name = "otlp_exporter_test",
-    srcs = ["src/otlp_exporter_test.cc"],
+    srcs = ["test/otlp_exporter_test.cc"],
     deps = [
         ":otlp_exporter",
         "//api",
@@ -71,7 +71,7 @@ cc_test(
 
 otel_cc_benchmark(
     name = "otlp_exporter_benchmark",
-    srcs = ["src/otlp_exporter_benchmark.cc"],
+    srcs = ["test/otlp_exporter_benchmark.cc"],
     deps = [
         ":otlp_exporter",
     ],
