@@ -34,7 +34,7 @@ TEST(Recordable, SetIds)
 TEST(Recordable, SetName)
 {
   Recordable rec;
-  nostd::string_view name = "TestSpan";
+  nostd::string_view name = "Test Span";
   rec.SetName(name);
   EXPECT_EQ(rec.span().name(), name);
 }
@@ -78,43 +78,10 @@ TEST(Recordable, SetStatus)
   EXPECT_EQ(rec.span().status().message(), description);
 }
 
-TEST(Recordable, SetSingleAtrribute)
-{
-  Recordable rec;
-  common::AttributeValue bool_val(true);
-  rec.SetAttribute("bool_attr", bool_val);
-
-  common::AttributeValue int_val(22);
-  rec.SetAttribute("int_attr", int_val);
-
-  common::AttributeValue double_val(3.3);
-  rec.SetAttribute("double_attr", double_val);
-
-  common::AttributeValue str_val(nostd::string_view("Test"));
-  rec.SetAttribute("str_attr", str_val);
-
-  EXPECT_EQ(rec.span().attributes(0).value().bool_value(), nostd::get<bool>(bool_val));
-  EXPECT_EQ(rec.span().attributes(1).value().int_value(), nostd::get<int>(int_val));
-  EXPECT_EQ(rec.span().attributes(2).value().double_value(), nostd::get<double>(double_val));
-  EXPECT_EQ(rec.span().attributes(3).value().string_value(), nostd::get<nostd::string_view>(str_val).data());
-}
-
-TEST(Recordable, SetArrayAtrributes)
-{
-  Recordable rec;
-  bool bool_arr[2] = {true, false};
-  nostd::span<const bool> bool_span(bool_arr);
-  common::AttributeValue array_bool_val(bool_span);
-  rec.SetAttribute("array_bool_val", array_bool_val);
-
-  EXPECT_EQ(rec.span().attributes(0).value().array_value().values(0).bool_value(), bool_span[0]);
-  EXPECT_EQ(rec.span().attributes(0).value().array_value().values(1).bool_value(), bool_span[1]);
-}
-
 TEST(Recordable, AddEvents)
 {
   Recordable rec;
-  nostd::string_view name = "Test event";
+  nostd::string_view name = "Test Event";
 
   std::chrono::system_clock::time_point event_time = std::chrono::system_clock::now();
   core::SystemTimestamp event_timestamp(event_time);
@@ -126,6 +93,94 @@ TEST(Recordable, AddEvents)
 
   EXPECT_EQ(rec.span().events(0).name(), name);
   EXPECT_EQ(rec.span().events(0).time_unix_nano(), unix_event_time);
+}
+
+// Test non-int single types. Int single types are tested using templates (see IntAttributeTest)
+TEST(Recordable, SetSingleAtrribute)
+{
+  Recordable rec;
+  common::AttributeValue bool_val(true);
+  rec.SetAttribute("bool_attr", bool_val);
+
+  common::AttributeValue double_val(3.3);
+  rec.SetAttribute("double_attr", double_val);
+
+  common::AttributeValue str_val(nostd::string_view("Test"));
+  rec.SetAttribute("str_attr", str_val);
+
+  EXPECT_EQ(rec.span().attributes(0).value().bool_value(), nostd::get<bool>(bool_val));
+  EXPECT_EQ(rec.span().attributes(1).value().double_value(), nostd::get<double>(double_val));
+  EXPECT_EQ(rec.span().attributes(2).value().string_value(),
+            nostd::get<nostd::string_view>(str_val).data());
+}
+
+// Test non-int array types. Int array types are tested using templates (see IntAttributeTest)
+TEST(Recordable, SetArrayAtrribute)
+{
+  Recordable rec;
+  const int kArraySize = 3;
+
+  bool bool_arr[kArraySize] = {true, false, true};
+  nostd::span<const bool> bool_span(bool_arr);
+  rec.SetAttribute("bool_arr_attr", common::AttributeValue(bool_span));
+
+  double double_arr[kArraySize] = {22.3, 33.4, 44.5};
+  nostd::span<const double> double_span(double_arr);
+  rec.SetAttribute("double_arr_attr", common::AttributeValue(double_span));
+
+  nostd::string_view str_arr[kArraySize] = {"Hello", "World", "Test"};
+  nostd::span<const nostd::string_view> str_span(str_arr);
+  rec.SetAttribute("str_arr_attr", common::AttributeValue(str_span));
+
+  for (int i = 0; i < kArraySize; i++)
+  {
+    EXPECT_EQ(rec.span().attributes(0).value().array_value().values(i).bool_value(), bool_span[i]);
+    EXPECT_EQ(rec.span().attributes(1).value().array_value().values(i).double_value(),
+              double_span[i]);
+    EXPECT_EQ(rec.span().attributes(2).value().array_value().values(i).string_value(), str_span[i]);
+  }
+}
+
+/**
+ * AttributeValue can contain different int types, such as int, int64_t,
+ * unsigned int, and uint64_t. To avoid writing test cases for each, we can
+ * use a template approach to test all int types.
+ */
+template <typename T>
+struct IntAttributeTest : public testing::Test
+{
+  using IntParamType = T;
+};
+
+using IntTypes = testing::Types<int, int64_t, unsigned int, uint64_t>;
+TYPED_TEST_CASE(IntAttributeTest, IntTypes);
+
+TYPED_TEST(IntAttributeTest, SetIntSingleAttribute)
+{
+  using IntType = typename TestFixture::IntParamType;
+  IntType i     = 2;
+  common::AttributeValue int_val(i);
+
+  Recordable rec;
+  rec.SetAttribute("int_attr", int_val);
+  EXPECT_EQ(rec.span().attributes(0).value().int_value(), nostd::get<IntType>(int_val));
+}
+
+TYPED_TEST(IntAttributeTest, SetIntArrayAttribute)
+{
+  using IntType = typename TestFixture::IntParamType;
+
+  const int kArraySize        = 3;
+  IntType int_arr[kArraySize] = {4, 5, 6};
+  nostd::span<const IntType> int_span(int_arr);
+
+  Recordable rec;
+  rec.SetAttribute("int_arr_attr", common::AttributeValue(int_span));
+
+  for (int i = 0; i < kArraySize; i++)
+  {
+    EXPECT_EQ(rec.span().attributes(0).value().array_value().values(i).int_value(), int_span[i]);
+  }
 }
 }  // namespace otlp
 }  // namespace exporter
