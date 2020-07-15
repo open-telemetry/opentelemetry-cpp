@@ -32,7 +32,6 @@ namespace zpages {
  */
 const int kMaxNumberOfSampleSpans = 5;
 
-
 /**
  * TracezSpanData is the span data to be displayed for tracez zpages that is
  * stored for each span name.
@@ -104,7 +103,7 @@ class TracezDataAggregator {
    * GetAggregatedTracezData aggregates data and returns the the updated data.
    * @returns a map with the span name as key and the tracez span data as value.
    */
-  const std::map<std::string, std::unique_ptr<TracezSpanData>>
+  std::map<std::string, std::unique_ptr<TracezSpanData>>
   GetAggregatedTracezData();
 
  private:

@@ -30,40 +30,44 @@ TracezDataAggregator::~TracezDataAggregator() {
   };
 }
 
-const std::map<std::string, std::unique_ptr<TracezSpanData>>
-    TracezDataAggregator::GetAggregatedTracezData() {
+std::map<std::string, std::unique_ptr<TracezSpanData>>
+TracezDataAggregator::GetAggregatedTracezData() {
   std::unique_lock<std::mutex> lock(mtx_);
-  std::map<std::string, std::unique_ptr<TracezSpanData>> aggregated_tracez_data_cpy;
-  
-  for(auto& name_to_data: aggregated_tracez_data_)
-  {
+
+  /** NOTE: At the moment a copy of the aggregated data is returned from this
+   * getter to avoid concurrency issues. When it becomes more clear what type of
+   * object is needed by the zPage HTTP server (most likely a JSON),
+   * this function should be changed accordingily.
+   **/
+  std::map<std::string, std::unique_ptr<TracezSpanData>>
+      aggregated_tracez_data_cpy;
+  for (auto &name_to_data : aggregated_tracez_data_) {
     std::string span_name = name_to_data.first;
     aggregated_tracez_data_cpy[span_name] =
-          std::unique_ptr<TracezSpanData>(new TracezSpanData);
-    auto& data_cpy = aggregated_tracez_data_cpy[span_name];
-    auto& data = name_to_data.second;
+        std::unique_ptr<TracezSpanData>(new TracezSpanData);
+    auto &data_cpy = aggregated_tracez_data_cpy[span_name];
+    auto &data = name_to_data.second;
     data_cpy->running_span_count = data->running_span_count;
     data_cpy->error_span_count = data->error_span_count;
-    data_cpy->completed_span_count_per_latency_bucket = data->completed_span_count_per_latency_bucket;
-    
-    auto& error_list_cpy = data_cpy->sample_error_spans;
-    for(auto& span: data->sample_error_spans)
-    {
+    data_cpy->completed_span_count_per_latency_bucket =
+        data->completed_span_count_per_latency_bucket;
+
+    auto &error_list_cpy = data_cpy->sample_error_spans;
+    for (auto &span : data->sample_error_spans) {
       auto span_data = std::unique_ptr<SpanData>(new SpanData(*span));
       error_list_cpy.push_back(std::move(span_data));
     }
-    
+
     for (auto boundary = LatencyBoundary::k0MicroTo10Micro;
-       boundary != LatencyBoundary::k100SecondToMax; ++boundary) {
-    
-      auto& completed_list_cpy = data_cpy->sample_latency_spans[boundary];
-      for(auto& span: data->sample_latency_spans[boundary]){
+         boundary != LatencyBoundary::k100SecondToMax; ++boundary) {
+      auto &completed_list_cpy = data_cpy->sample_latency_spans[boundary];
+      for (auto &span : data->sample_latency_spans[boundary]) {
         auto span_data = std::unique_ptr<SpanData>(new SpanData(*span));
         completed_list_cpy.push_back(std::move(span_data));
       }
     }
-    
-    data_cpy->sample_running_spans = data->sample_running_spans; 
+
+    data_cpy->sample_running_spans = data->sample_running_spans;
   }
   return aggregated_tracez_data_cpy;
 }
