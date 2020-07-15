@@ -19,7 +19,7 @@ public:
               trace::SpanId parent_span_id) noexcept override;
 
   void SetAttribute(nostd::string_view key,
-                    const opentelemetry::common::AttributeValue &&value) noexcept override;
+                    const opentelemetry::common::AttributeValue &value) noexcept override;
 
   void AddEvent(nostd::string_view name, core::SystemTimestamp timestamp) noexcept override;
 
