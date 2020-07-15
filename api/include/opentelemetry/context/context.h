@@ -98,10 +98,50 @@ namespace context
 
         return true;
       }
+      
+      // Copy constructor links to the same next node but copies the other's
+      // data list into a new linked list
+      Context(const Context &other){
+        next_ = other.next_;
+        head_ = new DataList; 
+        DataList *data = head_;
+        // Copy the other data into a new linked list
+        for(DataList* other_data = other.head_; other_data != nullptr; other_data = other_data->next_){
+          if(other_data->next_ != nullptr){
+            data->next_ = new DataList;
+          }
+          else{
+            data->next_ = nullptr ; 
+          }
+          data->key_length_ = other_data->key_length_;
+          data->key_ = new char[data->key_length_];
+          memcpy(data->key_, other_data->key_, data->key_length_);
+          data->value_ = other_data->value_;
+          data = data->next_;
+        }
+      }
 
-      Context(const Context &other) = default;
-
-      Context &operator=(const Context &other) = delete;
+      // Assignment constructor links to the same next node but copies the other's
+      // data list into a new linked list
+      Context &operator=(const Context &other) {
+        next_ = other.next_;
+        head_ = new DataList; 
+        DataList *data = head_;
+        // Copy the other data into a new linked list
+        for(DataList* other_data = other.head_; other_data != nullptr; other_data = other_data->next_){
+          if(other_data->next_ != nullptr){
+            data->next_ = new DataList;
+          }
+          else{
+            data->next_ = nullptr ; 
+          }
+          data->key_length_ = other_data->key_length_;
+          data->key_ = new char[data->key_length_];
+          memcpy(data->key_, other_data->key_, data->key_length_);
+          data->value_ = other_data->value_;
+          data = data->next_; 
+        }
+      }
 
       ~Context(){
         for(DataList* data = head_; data != nullptr;){
