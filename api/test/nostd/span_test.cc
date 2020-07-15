@@ -1,4 +1,4 @@
-#include "opentelemetry/nostd/stltypes.h"
+#include "opentelemetry/nostd/nostd.h"
 
 #include <benchmark/benchmark.h>
 #include <cstdint>

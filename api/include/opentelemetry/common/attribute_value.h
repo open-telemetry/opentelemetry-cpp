@@ -4,7 +4,7 @@
 
 #include "opentelemetry/version.h"
 
-#include "opentelemetry/nostd/stltypes.h"
+#include "opentelemetry/nostd/nostd.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace common

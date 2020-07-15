@@ -2,7 +2,7 @@
 
 #include "opentelemetry/version.h"
 
-#include "opentelemetry/nostd/stltypes.h"
+#include "opentelemetry/nostd/nostd.h"
 #include "opentelemetry/nostd/function_ref.h"
 
 #include "opentelemetry/common/attribute_value.h"

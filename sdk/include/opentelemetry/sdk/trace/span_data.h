@@ -3,7 +3,7 @@
 #include <chrono>
 #include <unordered_map>
 #include "opentelemetry/core/timestamp.h"
-#include "opentelemetry/nostd/stltypes.h"
+#include "opentelemetry/nostd/nostd.h"
 #include "opentelemetry/sdk/trace/recordable.h"
 #include "opentelemetry/trace/canonical_code.h"
 #include "opentelemetry/trace/span_id.h"

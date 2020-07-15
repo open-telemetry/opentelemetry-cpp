@@ -1,6 +1,6 @@
 #pragma once
 
-#include "opentelemetry/nostd/stltypes.h"
+#include "opentelemetry/nostd/nostd.h"
 
 #include "opentelemetry/trace/tracer.h"
 

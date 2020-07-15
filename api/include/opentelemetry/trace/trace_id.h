@@ -17,7 +17,7 @@
 #include <cstdint>
 #include <cstring>
 
-#include "opentelemetry/nostd/stltypes.h"
+#include "opentelemetry/nostd/nostd.h"
 
 #include "opentelemetry/version.h"
 

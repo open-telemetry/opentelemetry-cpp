@@ -12,7 +12,7 @@
 #include <opentelemetry/trace/trace_id.h>
 #include <opentelemetry/trace/tracer_provider.h>
 
-#include <opentelemetry/nostd/stltypes.h>
+#include <opentelemetry/nostd/nostd.h>
 
 #include <iomanip>
 #include <iostream>

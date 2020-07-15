@@ -11,5 +11,6 @@
 #include "opentelemetry/nostd/utility.h"
 #include "opentelemetry/nostd/variant.h"
 #else
-// TODO: provide an option to override the nostd implementation
+// Standard Library implementation
+#include "stltypes.h"
 #endif

@@ -368,10 +368,23 @@ public:
   /// <returns>Span</returns>
   virtual nostd::unique_ptr<trace::Span> StartSpan(
       nostd::string_view name,
+      const trace::KeyValueIterable &attributes,
       const trace::StartSpanOptions &options = {}) noexcept override
   {
+    // TODO: support attributes
     return trace::to_span_ptr<Span, Tracer>(this, name, options);
+  };
+
+/*
+  nostd::unique_ptr<trace::Span> StartSpan(
+      nostd::string_view name,
+      std::initializer_list<std::pair<nostd::string_view, common::AttributeValue>> attributes,
+      const trace::StartSpanOptions &options = {}) noexcept override
+  {
+      // TODO: support attributes
+      return trace::to_span_ptr<Span, Tracer>(this, name, options);
   }
+*/
 
   /// <summary>
   /// Force flush data to Tracer, spending up to given amount of microseconds to flush.
@@ -479,7 +492,7 @@ public:
   /// </summary>
   /// <param name="name"></param>
   /// <returns></returns>
-  void AddEvent(nostd::string_view name) noexcept
+  virtual void AddEvent(nostd::string_view name) noexcept override
   {
       owner.AddEvent(*this, name);
   }
@@ -490,7 +503,7 @@ public:
   /// <param name="name"></param>
   /// <param name="timestamp"></param>
   /// <returns></returns>
-  void AddEvent(nostd::string_view name, core::SystemTimestamp timestamp) noexcept
+  virtual void AddEvent(nostd::string_view name, core::SystemTimestamp timestamp) noexcept override
   {
     owner.AddEvent(*this, name, timestamp);
   }
@@ -504,7 +517,7 @@ public:
   /// <returns></returns>
   void AddEvent(nostd::string_view name,
                 core::SystemTimestamp timestamp,
-                const trace::KeyValueIterable &attributes) noexcept
+                const trace::KeyValueIterable &attributes) noexcept override
   {
     owner.AddEvent(*this, name, timestamp, attributes);
   }
@@ -515,17 +528,25 @@ public:
   /// <param name="code"></param>
   /// <param name="description"></param>
   /// <returns></returns>
-  void SetStatus(trace::CanonicalCode code, nostd::string_view description) noexcept
+  virtual void SetStatus(trace::CanonicalCode code, nostd::string_view description) noexcept override
   {
       // TODO: not implemented
   }
+
+  // Sets an attribute on the Span. If the Span previously contained a mapping for
+  // the key, the old value is replaced.
+  virtual void SetAttribute(nostd::string_view key,
+                            const common::AttributeValue &value) noexcept override
+  {
+      // TODO: not implemented
+  };
 
   /// <summary>
   /// Update Span name
   /// </summary>
   /// <param name="name"></param>
   /// <returns></returns>
-  void UpdateName(nostd::string_view name) noexcept
+  virtual void UpdateName(nostd::string_view name) noexcept override
   {
       // TODO: not implemented
   }
@@ -534,7 +555,7 @@ public:
   /// End Span
   /// </summary>
   /// <returns></returns>
-  void End(const trace::EndSpanOptions & = {}) noexcept
+  virtual void End(const trace::EndSpanOptions & = {}) noexcept override
   {
       // TODO: signal this to owner
   }
@@ -543,7 +564,7 @@ public:
   /// Check if Span is recording data
   /// </summary>
   /// <returns></returns>
-  bool IsRecording() const noexcept
+  virtual bool IsRecording() const noexcept override
   {
       // TODO: not implemented
       return true;

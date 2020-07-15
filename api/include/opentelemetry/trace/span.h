@@ -2,7 +2,7 @@
 
 #include <cstdint>
 
-#include "opentelemetry/nostd/stltypes.h"
+#include "opentelemetry/nostd/nostd.h"
 
 #include "opentelemetry/core/timestamp.h"
 #include "opentelemetry/trace/canonical_code.h"
