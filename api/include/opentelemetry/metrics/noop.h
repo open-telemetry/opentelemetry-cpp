@@ -3,134 +3,73 @@ namespace metrics {
 /**
  * No-op implementation of Meter. This class should not be used directly.
  */
-class NoopMeter : public Meter
+template <class T>
+class NoopMeter : public Meter<T>
 {
 public:
   NoopMeter() = default;
 
-  // All NewInstrument functions return a shared_ptr to a no-op form of that instrument.
-
-  opentelemetry::nostd::shared_ptr<SynchronousInstrument> NewDoubleCounter(
+  nostd::shared_ptr<SynchronousInstrument<T>> NewCounter(
       nostd::string_view name,
       nostd::string_view description,
       nostd::string_view unit,
       const bool enabled) override
   {
-    return nostd::shared_ptr<SynchronousInstrument>{
-        new NoopDoubleCounter(name, description, unit, enabled)};
+    return nostd::shared_ptr<SynchronousInstrument<T>>{
+        new NoopCounter<T>(name, description, unit, enabled)};
   }
 
-  opentelemetry::nostd::shared_ptr<SynchronousInstrument> NewIntCounter(
+  nostd::shared_ptr<SynchronousInstrument<T>> NewUpDownCounter(
       nostd::string_view name,
       nostd::string_view description,
       nostd::string_view unit,
       const bool enabled) override
   {
-    return nostd::shared_ptr<SynchronousInstrument>{
-        new NoopIntCounter(name, description, unit, enabled)};
+    return nostd::shared_ptr<SynchronousInstrument<T>>{
+        new NoopUpDownCounter<T>(name, description, unit, enabled)};
   }
 
-  opentelemetry::nostd::shared_ptr<SynchronousInstrument> NewDoubleUpDownCounter(
+  nostd::shared_ptr<SynchronousInstrument<T>> NewValueRecorder(
       nostd::string_view name,
       nostd::string_view description,
       nostd::string_view unit,
       const bool enabled) override
   {
-    return nostd::shared_ptr<SynchronousInstrument>{
-        new NoopDoubleUpDownCounter(name, description, unit, enabled)};
+    return nostd::shared_ptr<SynchronousInstrument<T>>{
+        new NoopValueRecorder<T>(name, description, unit, enabled)};
   }
 
-  opentelemetry::nostd::shared_ptr<SynchronousInstrument> NewIntUpDownCounter(
-      nostd::string_view name,
-      nostd::string_view description,
-      nostd::string_view unit,
-      const bool enabled) override
-  {
-    return nostd::shared_ptr<SynchronousInstrument>{
-        new NoopIntUpDownCounter(name, description, unit, enabled)};
-  }
-
-  opentelemetry::nostd::shared_ptr<SynchronousInstrument> NewDoubleValueRecorder(
-      nostd::string_view name,
-      nostd::string_view description,
-      nostd::string_view unit,
-      const bool enabled) override
-  {
-    return nostd::shared_ptr<SynchronousInstrument>{
-        new NoopDoubleValueRecorder(name, description, unit, enabled)};
-  }
-
-  opentelemetry::nostd::shared_ptr<SynchronousInstrument> NewIntValueRecorder(
-      nostd::string_view name,
-      nostd::string_view description,
-      nostd::string_view unit,
-      const bool enabled) override
-  {
-    return nostd::shared_ptr<SynchronousInstrument>{
-        new NoopIntValueRecorder(name, description, unit, enabled)};
-  }
-
-  opentelemetry::nostd::shared_ptr<AsynchronousInstrument> NewDoubleSumObserver(
+  nostd::shared_ptr<AsynchronousInstrument<T>> NewSumObserver(
       nostd::string_view name,
       nostd::string_view description,
       nostd::string_view unit,
       const bool enabled,
-      void (*callback)(DoubleObserverResult)) override
+      void (*callback)(ObserverResult<T>)) override
   {
-    return nostd::shared_ptr<AsynchronousInstrument>{
-        new NoopDoubleSumObserver(name, description, unit, enabled, callback)};
+    return nostd::shared_ptr<AsynchronousInstrument<T>>{
+        new NoopSumObserver<T>(name, description, unit, enabled, callback)};
   }
 
-  opentelemetry::nostd::shared_ptr<AsynchronousInstrument> NewIntSumObserver(
+  nostd::shared_ptr<AsynchronousInstrument<T>> NewUpDownSumObserver(
       nostd::string_view name,
       nostd::string_view description,
       nostd::string_view unit,
       const bool enabled,
-      void (*callback)(IntObserverResult)) override
+      void (*callback)(ObserverResult<T>)) override
   {
-    return nostd::shared_ptr<AsynchronousInstrument>{
-        new NoopIntSumObserver(name, description, unit, enabled, callback)};
+    return nostd::shared_ptr<AsynchronousInstrument<T>>{
+        new NoopUpDownSumObserver<T>(name, description, unit, enabled, callback)};
   }
 
-  opentelemetry::nostd::shared_ptr<AsynchronousInstrument> NewDoubleUpDownSumObserver(
+  nostd::shared_ptr<AsynchronousInstrument<T>> NewValueObserver(
       nostd::string_view name,
       nostd::string_view description,
       nostd::string_view unit,
       const bool enabled,
-      void (*callback)(DoubleObserverResult)) override
+      void (*callback)(ObserverResult<T>)) override
   {
-    return nostd::shared_ptr<AsynchronousInstrument>{
-        new NoopDoubleUpDownSumObserver(name, description, unit, enabled, callback)};
-  }
-
-  opentelemetry::nostd::shared_ptr<AsynchronousInstrument> NewIntUpDownSumObserver(
-      nostd::string_view name,
-      nostd::string_view description,
-      nostd::string_view unit,
-      const bool enabled,
-      void (*callback)(IntObserverResult)) override
-  {
-    return nostd::shared_ptr<AsynchronousInstrument>{
-        new NoopIntUpDownSumObserver(name, description, unit, enabled, callback)};
-  }
-
-  opentelemetry::nostd::shared_ptr<AsynchronousInstrument> NewDoubleValueObserver(
-      nostd::string_view name,
-      nostd::string_view description,
-      nostd::string_view unit,
-      const bool enabled,
-      void (*callback)(DoubleObserverResult)) override
-  {
-    return nostd::shared_ptr<AsynchronousInstrument>{
-        new NoopDoubleValueObserver(name, description, unit, enabled, callback)};
-  }
-
-  void RecordBatch(
-      const trace::KeyValueIterable &labels,
-      const nostd::span<std::pair<nostd::shared_ptr<SynchronousInstrument>,
-          nostd::variant<int, double>>> values) noexcept override
-  {
-    // No-op
+    return nostd::shared_ptr<AsynchronousInstrument<T>>{
+        new NoopValueObserver<T>(name, description, unit, enabled, callback)};
   }
 };
 }  // namespace metrics
