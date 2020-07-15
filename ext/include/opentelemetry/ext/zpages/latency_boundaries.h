@@ -3,20 +3,22 @@
 #include <array>
 #include <chrono>
 
+#include "opentelemetry/version.h"
+
 using std::chrono::microseconds;
 using std::chrono::milliseconds;
 using std::chrono::nanoseconds;
 using std::chrono::seconds;
 
 OPENTELEMETRY_BEGIN_NAMESPACE
-namespace ext{
-namespace zpages{
+namespace ext {
+namespace zpages {
 /**
- * kLatencyBoundaries is a constant array that contains the 9 latency boundaries.
- * Each value in the array represents the lower limit(inclusive)
- * of the boundary(in nano seconds) and the upper limit(exclusive) of the 
- * boundary is the lower limit of the next one.
- * The upper limit of the last boundary is INF.
+ * kLatencyBoundaries is a constant array that contains the 9 latency
+ * boundaries. Each value in the array represents the lower limit(inclusive) of
+ * the boundary(in nano seconds) and the upper limit(exclusive) of the boundary
+ * is the lower limit of the next one. The upper limit of the last boundary is
+ * INF.
  */
 const std::array<nanoseconds, 9> kLatencyBoundaries = {
     nanoseconds(0),
@@ -32,10 +34,10 @@ const std::array<nanoseconds, 9> kLatencyBoundaries = {
 
 /**
  * LatencyBoundary enum is used to index into the kLatencyBoundaries container.
- * Using this enum lets you access the latency boundary at each index without 
+ * Using this enum lets you access the latency boundary at each index without
  * using magic numbers
  */
-enum LatencyBoundary{
+enum LatencyBoundary {
   k0MicroTo10Micro,
   k10MicroTo100Micro,
   k100MicroTo1Milli,
@@ -48,13 +50,14 @@ enum LatencyBoundary{
 };
 
 /** Overlaoding ++ operator for easy iteration **/
-inline LatencyBoundary &operator++(LatencyBoundary &latencyBoundary){
-  if (latencyBoundary == LatencyBoundary::k100SecondToMax){
+inline LatencyBoundary &operator++(LatencyBoundary &latencyBoundary) {
+  if (latencyBoundary == LatencyBoundary::k100SecondToMax) {
     throw std::out_of_range("for LatencyBoundary& operator ++");
   }
-  latencyBoundary = LatencyBoundary(
-      static_cast<std::underlying_type<LatencyBoundary>::type>
-      (latencyBoundary) + 1);
+  latencyBoundary =
+      LatencyBoundary(static_cast<std::underlying_type<LatencyBoundary>::type>(
+                          latencyBoundary) +
+                      1);
   return latencyBoundary;
 }
 
