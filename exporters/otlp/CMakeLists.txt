@@ -1,8 +1,10 @@
-add_library(opentelemetry_exporter_otprotocol internal/recordable.cc)
+include_directories(include)
+
+add_library(opentelemetry_exporter_otprotocol src/recordable.cc)
 target_link_libraries(opentelemetry_exporter_otprotocol
                       $<TARGET_OBJECTS:opentelemetry_proto>)
 
-add_executable(recordable_test internal/recordable_test.cc)
+add_executable(recordable_test src/recordable_test.cc)
 target_link_libraries(recordable_test
                       ${GTEST_BOTH_LIBRARIES}
                       ${CMAKE_THREAD_LIBS_INIT}
