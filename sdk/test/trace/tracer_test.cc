@@ -11,6 +11,29 @@ using opentelemetry::core::SteadyTimestamp;
 using opentelemetry::core::SystemTimestamp;
 namespace nostd  = opentelemetry::nostd;
 namespace common = opentelemetry::common;
+using opentelemetry::trace::SpanContext;
+
+/**
+ * A mock sampler that returns non-empty sampling results attributes.
+ */
+class MockSampler final : public Sampler
+{
+public:
+  SamplingResult ShouldSample(const SpanContext * /*parent_context*/,
+                              trace_api::TraceId /*trace_id*/,
+                              nostd::string_view /*name*/,
+                              trace_api::SpanKind /*span_kind*/,
+                              const trace_api::KeyValueIterable & /*attributes*/) noexcept override
+  {
+    // Return two pairs of attributes. These attributes should be added to the span attributes
+    return {Decision::RECORD_AND_SAMPLE,
+            nostd::unique_ptr<const std::map<std::string, opentelemetry::common::AttributeValue>>(
+                new const std::map<std::string, opentelemetry::common::AttributeValue>(
+                    {{"sampling_attr1", 123}, {"sampling_attr2", "string"}}))};
+  }
+
+  std::string GetDescription() const noexcept override { return "MockSampler"; }
+};
 
 /**
  * A mock exporter that switches a flag once a valid recordable was received.
@@ -54,8 +77,17 @@ std::shared_ptr<opentelemetry::trace::Tracer> initTracer(
     std::shared_ptr<std::vector<std::unique_ptr<SpanData>>> &received)
 {
   std::unique_ptr<SpanExporter> exporter(new MockSpanExporter(received));
-  std::shared_ptr<SimpleSpanProcessor> processor(new SimpleSpanProcessor(std::move(exporter)));
+  auto processor = std::make_shared<SimpleSpanProcessor>(std::move(exporter));
   return std::shared_ptr<opentelemetry::trace::Tracer>(new Tracer(processor));
+}
+
+std::shared_ptr<opentelemetry::trace::Tracer> initTracer(
+    std::shared_ptr<std::vector<std::unique_ptr<SpanData>>> &received,
+    std::shared_ptr<Sampler> sampler)
+{
+  std::unique_ptr<SpanExporter> exporter(new MockSpanExporter(received));
+  auto processor = std::make_shared<SimpleSpanProcessor>(std::move(exporter));
+  return std::shared_ptr<opentelemetry::trace::Tracer>(new Tracer(processor, sampler));
 }
 }  // namespace
 
@@ -79,19 +111,34 @@ TEST(Tracer, ToMockSpanExporter)
   ASSERT_EQ("span 1", spans_received->at(1)->GetName());
 }
 
-TEST(Tracer, StartSpan)
+TEST(Tracer, StartSpanSampleOn)
 {
+  // create a tracer with default AlwaysOn sampler.
   std::shared_ptr<std::vector<std::unique_ptr<SpanData>>> spans_received(
       new std::vector<std::unique_ptr<SpanData>>);
-  auto tracer = initTracer(spans_received);
+  auto tracer_on = initTracer(spans_received);
 
-  tracer->StartSpan("span 1")->End();
+  tracer_on->StartSpan("span 1")->End();
 
   ASSERT_EQ(1, spans_received->size());
 
   auto &span_data = spans_received->at(0);
   ASSERT_LT(std::chrono::nanoseconds(0), span_data->GetStartTime().time_since_epoch());
   ASSERT_LT(std::chrono::nanoseconds(0), span_data->GetDuration());
+}
+
+TEST(Tracer, StartSpanSampleOff)
+{
+  std::shared_ptr<std::vector<std::unique_ptr<SpanData>>> spans_received(
+      new std::vector<std::unique_ptr<SpanData>>);
+  // create a tracer with a custom AlwaysOff sampler.
+  auto tracer_off = initTracer(spans_received, std::make_shared<AlwaysOffSampler>());
+
+  // This span will not be recorded.
+  tracer_off->StartSpan("span 2")->End();
+
+  // The span doesn't write any span data because the sampling decision is alway NOT_RECORD.
+  ASSERT_EQ(0, spans_received->size());
 }
 
 TEST(Tracer, StartSpanWithOptionsTime)
@@ -118,28 +165,44 @@ TEST(Tracer, StartSpanWithOptionsTime)
 
 TEST(Tracer, StartSpanWithAttributes)
 {
-  std::shared_ptr<std::vector<std::unique_ptr<SpanData>>> spans_received(
+  std::shared_ptr<std::vector<std::unique_ptr<SpanData>>> spans_received_1(
       new std::vector<std::unique_ptr<SpanData>>);
-  auto tracer = initTracer(spans_received);
+  // The default tracer has empty sampling result attribute
+  auto tracer_default = initTracer(spans_received_1);
 
   {
-    tracer->StartSpan("span 1", {{"attr1", 314159}, {"attr2", false}, {"attr1", "string"}});
+    tracer_default->StartSpan("span 1", {{"attr1", 314159}, {"attr2", false}, {"attr1", "string"}});
 
     std::map<std::string, common::AttributeValue> m;
     m["attr3"] = 3.0;
-    tracer->StartSpan("span 2", m);
+    tracer_default->StartSpan("span 2", m);
   }
 
-  ASSERT_EQ(2, spans_received->size());
+  ASSERT_EQ(2, spans_received_1->size());
 
-  auto &span_data = spans_received->at(0);
+  auto &span_data = spans_received_1->at(0);
   ASSERT_EQ(2, span_data->GetAttributes().size());
   ASSERT_EQ("string", nostd::get<nostd::string_view>(span_data->GetAttributes().at("attr1")));
   ASSERT_EQ(false, nostd::get<bool>(span_data->GetAttributes().at("attr2")));
 
-  auto &span_data2 = spans_received->at(1);
+  auto &span_data2 = spans_received_1->at(1);
   ASSERT_EQ(1, span_data2->GetAttributes().size());
   ASSERT_EQ(3.0, nostd::get<double>(span_data2->GetAttributes().at("attr3")));
+
+  std::shared_ptr<std::vector<std::unique_ptr<SpanData>>> spans_received_2(
+      new std::vector<std::unique_ptr<SpanData>>);
+  // The default tracer has two elements in the sampling result attribute
+  auto tracer_mock = initTracer(spans_received_2, std::make_shared<MockSampler>());
+  {
+    tracer_mock->StartSpan("span 3", {{"attr1", 314159}, {"attr2", false}});
+  }
+  auto &span_data3 = spans_received_2->at(0);
+  // Span 3 has a total of four attributes: two from StartSpan and two from the sampler.
+  ASSERT_EQ(4, span_data3->GetAttributes().size());
+  ASSERT_EQ(314159, nostd::get<int>(span_data3->GetAttributes().at("attr1")));
+  ASSERT_EQ(false, nostd::get<bool>(span_data3->GetAttributes().at("attr2")));
+  ASSERT_EQ(123, nostd::get<int>(span_data3->GetAttributes().at("sampling_attr1")));
+  ASSERT_EQ("string", nostd::get<nostd::string_view>(span_data3->GetAttributes().at("sampling_attr2")));
 }
 
 TEST(Tracer, GetSampler)

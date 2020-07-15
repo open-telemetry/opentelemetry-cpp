@@ -8,6 +8,7 @@ using opentelemetry::sdk::trace::AlwaysOffSampler;
 using opentelemetry::sdk::trace::AlwaysOnSampler;
 using opentelemetry::sdk::trace::Decision;
 using opentelemetry::sdk::trace::ParentOrElseSampler;
+using opentelemetry::trace::SpanContext;
 
 TEST(ParentOrElseSampler, ShouldSample)
 {
@@ -20,8 +21,8 @@ TEST(ParentOrElseSampler, ShouldSample)
   using M = std::map<std::string, int>;
   M m1 = {{}};
   opentelemetry::trace::KeyValueIterableView<M> view{m1};
-  opentelemetry::sdk::trace::Sampler::SpanContext parent_context_sampled(true, true);
-  opentelemetry::sdk::trace::Sampler::SpanContext parent_context_nonsampled(true, false);
+  SpanContext parent_context_sampled(true, false);
+  SpanContext parent_context_nonsampled(false, false);
 
   // Case 1: Parent doesn't exist. Return result of delegateSampler()
   auto sampling_result = sampler_off.ShouldSample(nullptr, trace_id, "", span_kind, view);

@@ -1,6 +1,7 @@
+#include "opentelemetry/exporters/otlp/otlp_exporter.h"
+#include "opentelemetry/exporters/otlp/recordable.h"
+
 #include <benchmark/benchmark.h>
-#include "otlp_exporter.h"
-#include "recordable.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace exporter
