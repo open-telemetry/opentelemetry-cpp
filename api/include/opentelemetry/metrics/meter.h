@@ -22,109 +22,56 @@ namespace metrics
  * measurements from all instruments.
  *
  */
+//TODO: FIGURE OUT HOW TO LET THE USER CREATE METRIC INSTRUMENTS OF VARIOUS TYPES
+template<typename T>
 class Meter
 {
 public:
   virtual ~Meter() = default;
 
   /**
-   * Creates a DoubleCounter with the passed characteristics and returns a shared_ptr to that
-   * DoubleCounter.
+   * Creates a Counter with the passed characteristics and returns a shared_ptr to that Counter.
    *
-   * @param name the name of the new DoubleCounter.
-   * @param description a brief description of what the DoubleCounter is used for.
+   * @param name the name of the new Counter.
+   * @param description a brief description of what the Counter is used for.
    * @param unit the unit of metric values following https://unitsofmeasure.org/ucum.html.
    * @param enabled a boolean value that turns on or off the metric instrument.
-   * @return a shared pointer to the created DoubleCounter.
+   * @return a shared pointer to the created Counter.
    * @throws NullPointerException if {@code name} is null
    * @throws IllegalArgumentException if a different metric by the same name exists in this meter.
    * @throws IllegalArgumentException if the {@code name} does not match spec requirements.
    */
-  virtual opentelemetry::nostd::shared_ptr<SynchronousInstrument> NewDoubleCounter(
+  virtual opentelemetry::nostd::shared_ptr<SynchronousInstrument<T>> NewCounter(
       nostd::string_view name,
       nostd::string_view description,
       nostd::string_view unit,
-      const bool enabled)
-  {
-    return opentelemetry::nostd::shared_ptr<SynchronousInstrument>{
-        new DoubleCounter(name, description, unit, enabled)};
-  }
+      const bool enabled) = 0;
 
   /**
-   * Creates an IntCounter with the passed characteristics and returns a shared_ptr to that
-   * IntCounter.
+   * Creates an UpDownCounter with the passed characteristics and returns a shared_ptr to that
+   * UpDownCounter.
    *
-   * @param name the name of the new IntCounter.
-   * @param description a brief description of what the IntCounter is used for.
+   * @param name the name of the new UpDownCounter.
+   * @param description a brief description of what the UpDownCounter is used for.
    * @param unit the unit of metric values following https://unitsofmeasure.org/ucum.html.
    * @param enabled a boolean value that turns on or off the metric instrument.
-   * @return a shared pointer to the created IntCounter.
+   * @return a shared pointer to the created UpDownCounter.
    * @throws NullPointerException if {@code name} is null
    * @throws IllegalArgumentException if a different metric by the same name exists in this meter.
    * @throws IllegalArgumentException if the {@code name} does not match spec requirements.
    */
-  virtual opentelemetry::nostd::shared_ptr<SynchronousInstrument> NewIntCounter(
+  virtual opentelemetry::nostd::shared_ptr<SynchronousInstrument<T>> NewUpDownCounter(
       nostd::string_view name,
       nostd::string_view description,
       nostd::string_view unit,
-      const bool enabled)
-  {
-    return opentelemetry::nostd::shared_ptr<SynchronousInstrument>{
-        new IntCounter(name, description, unit, enabled)};
-  }
+      const bool enabled) = 0;
 
   /**
-   * Creates a DoubleUpDownCounter with the passed characteristics and returns a shared_ptr to that
-   * DoubleUpDownCounter.
+   * Creates a ValueRecorder with the passed characteristics and returns a shared_ptr to that
+   * ValueRecorder.
    *
-   * @param name the name of the new DoubleUpDownCounter.
-   * @param description a brief description of what the DoubleUpDownCounter is used for.
-   * @param unit the unit of metric values following https://unitsofmeasure.org/ucum.html.
-   * @param enabled a boolean value that turns on or off the metric instrument.
-   * @return a shared pointer to the created DoubleUpDownCounter.
-   * @throws NullPointerException if {@code name} is null
-   * @throws IllegalArgumentException if a different metric by the same name exists in this meter.
-   * @throws IllegalArgumentException if the {@code name} does not match spec requirements.
-   */
-  virtual opentelemetry::nostd::shared_ptr<SynchronousInstrument> NewDoubleUpDownCounter(
-      nostd::string_view name,
-      nostd::string_view description,
-      nostd::string_view unit,
-      const bool enabled)
-  {
-    return opentelemetry::nostd::shared_ptr<SynchronousInstrument>{
-        new DoubleUpDownCounter(name, description, unit, enabled)};
-  }
-
-  /**
-   * Creates an IntUpDownCounter with the passed characteristics and returns a shared_ptr to that
-   * IntUpDownCounter.
-   *
-   * @param name the name of the new IntUpDownCounter.
-   * @param description a brief description of what the IntUpDownCounter is used for.
-   * @param unit the unit of metric values following https://unitsofmeasure.org/ucum.html.
-   * @param enabled a boolean value that turns on or off the metric instrument.
-   * @return a shared pointer to the created IntUpDownCounter.
-   * @throws NullPointerException if {@code name} is null
-   * @throws IllegalArgumentException if a different metric by the same name exists in this meter.
-   * @throws IllegalArgumentException if the {@code name} does not match spec requirements.
-   */
-  virtual opentelemetry::nostd::shared_ptr<SynchronousInstrument> NewIntUpDownCounter(
-      nostd::string_view name,
-      nostd::string_view description,
-      nostd::string_view unit,
-      const bool enabled)
-  {
-    return opentelemetry::nostd::shared_ptr<SynchronousInstrument>{
-        new IntUpDownCounter(name, description, unit, enabled)};
-  }
-
-  /**
-   * Creates a DoubleValueRecorder with the passed characteristics and returns a shared_ptr to that
-   * DoubleValueRecorder.
-   *
-   * @param name the name of the new DoubleValueRecorder.
-   * @param description a brief description of what the DoubleValueRecorder is used for.
+   * @param name the name of the new ValueRecorder.
+   * @param description a brief description of what the ValueRecorder is used for.
    * @param unit the unit of metric values following https://unitsofmeasure.org/ucum.html.
    * @param enabled a boolean value that turns on or off the metric instrument.
    * @return a shared pointer to the created DoubleValueRecorder.
@@ -132,192 +79,78 @@ public:
    * @throws IllegalArgumentException if a different metric by the same name exists in this meter.
    * @throws IllegalArgumentException if the {@code name} does not match spec requirements.
    */
-  virtual opentelemetry::nostd::shared_ptr<SynchronousInstrument> NewDoubleValueRecorder(
+  virtual opentelemetry::nostd::shared_ptr<SynchronousInstrument<T>> NewValueRecorder(
       nostd::string_view name,
       nostd::string_view description,
       nostd::string_view unit,
-      const bool enabled)
-  {
-    return opentelemetry::nostd::shared_ptr<SynchronousInstrument>{
-        new DoubleValueRecorder(name, description, unit, enabled)};
-  }
+      const bool enabled) = 0;
 
   /**
-   * Creates an IntValueRecorder with the passed characteristics and returns a shared_ptr to that
-   * IntValueRecoder.
+   * Creates a SumObserver with the passed characteristics and returns a shared_ptr to that
+   * SumObserver.
    *
-   * @param name the name of the new IntValueRecorder.
-   * @param description a brief description of what the IntValueRecorder is used for.
-   * @param unit the unit of metric values following https://unitsofmeasure.org/ucum.html.
-   * @param enabled a boolean value that turns on or off the metric instrument.
-   * @return a shared pointer to the created IntValueRecorder.
-   * @throws NullPointerException if {@code name} is null
-   * @throws IllegalArgumentException if a different metric by the same name exists in this meter.
-   * @throws IllegalArgumentException if the {@code name} does not match spec requirements.
-   */
-  virtual opentelemetry::nostd::shared_ptr<SynchronousInstrument> NewIntValueRecorder(
-      nostd::string_view name,
-      nostd::string_view description,
-      nostd::string_view unit,
-      bool enabled)
-  {
-    return opentelemetry::nostd::shared_ptr<SynchronousInstrument>{
-        new IntValueRecorder(name, description, unit, enabled)};
-  }
-
-  /**
-   * Creates a DoubleSumObserver with the passed characteristics and returns a shared_ptr to that
-   * DoubleSumObserver.
-   *
-   * @param name the name of the new DoubleSumObserver.
-   * @param description a brief description of what the DoubleSumObserver is used for.
+   * @param name the name of the new SumObserver.
+   * @param description a brief description of what the SumObserver is used for.
    * @param unit the unit of metric values following https://unitsofmeasure.org/ucum.html.
    * @param enabled a boolean value that turns on or off the metric instrument.
    * @param callback the function to be observed by the instrument.
-   * @return a shared pointer to the created DoubleSumObserver.
+   * @return a shared pointer to the created SumObserver.
    * @throws NullPointerException if {@code name} is null
    * @throws IllegalArgumentException if a different metric by the same name exists in this meter.
    * @throws IllegalArgumentException if the {@code name} does not match spec requirements.
    */
-  virtual opentelemetry::nostd::shared_ptr<AsynchronousInstrument> NewDoubleSumObserver(
+  virtual opentelemetry::nostd::shared_ptr<AsynchronousInstrument<T>> NewSumObserver(
       nostd::string_view name,
       nostd::string_view description,
       nostd::string_view unit,
       const bool enabled,
-      void (*callback)(DoubleObserverResult))
-  {
-    return opentelemetry::nostd::shared_ptr<AsynchronousInstrument>{
-        new DoubleSumObserver(name, description, unit, enabled, callback)};
-  }
+      void (*callback)(ObserverResult<T>)) = 0;
 
   /**
-   * Creates a IntSumObserver with the passed characteristics and returns a shared_ptr to that
-   * IntSumObserver.
+   * Creates an UpDownSumObserver with the passed characteristics and returns a shared_ptr to
+   * that UpDowNSumObserver.
    *
-   * @param name the name of the new IntSumObserver.
-   * @param description a brief description of what the IntSumObserver is used for.
+   * @param name the name of the new UpDownSumObserver.
+   * @param description a brief description of what the UpDownSumObserver is used for.
    * @param unit the unit of metric values following https://unitsofmeasure.org/ucum.html.
    * @param enabled a boolean value that turns on or off the metric instrument.
    * @param callback the function to be observed by the instrument.
-   * @return a shared pointer to the created DoubleCounter.
+   * @return a shared pointer to the created UpDownSumObserver.
    * @throws NullPointerException if {@code name} is null
    * @throws IllegalArgumentException if a different metric by the same name exists in this meter.
    * @throws IllegalArgumentException if the {@code name} does not match spec requirements.
    */
-  virtual opentelemetry::nostd::shared_ptr<AsynchronousInstrument> NewIntSumObserver(
+  virtual opentelemetry::nostd::shared_ptr<AsynchronousInstrument<T>> NewUpDownSumObserver(
       nostd::string_view name,
       nostd::string_view description,
       nostd::string_view unit,
       const bool enabled,
-      void (*callback)(IntObserverResult))
-  {
-    return opentelemetry::nostd::shared_ptr<AsynchronousInstrument>{
-        new IntSumObserver(name, description, unit, enabled, callback)};
-  }
+      void (*callback)(ObserverResult<T>)) = 0;
 
   /**
-   * Creates a DoubleUpDownSumObserver with the passed characteristics and returns a shared_ptr to 
-   * that DoubleUpDowNSumObserver.
+   * Creates a ValueObserver with the passed characteristics and returns a shared_ptr to that
+   * ValueObserver.
    *
-   * @param name the name of the new DoubleUpDownSumObserver.
-   * @param description a brief description of what the DoubleUpDownSumObserver is used for.
+   * @param name the name of the new ValueObserver.
+   * @param description a brief description of what the ValueObserver is used for.
    * @param unit the unit of metric values following https://unitsofmeasure.org/ucum.html.
    * @param enabled a boolean value that turns on or off the metric instrument.
    * @param callback the function to be observed by the instrument.
-   * @return a shared pointer to the created DoubleUpDownSumObserver.
+   * @return a shared pointer to the created ValueObserver.
    * @throws NullPointerException if {@code name} is null
    * @throws IllegalArgumentException if a different metric by the same name exists in this meter.
    * @throws IllegalArgumentException if the {@code name} does not match spec requirements.
    */
-  virtual opentelemetry::nostd::shared_ptr<AsynchronousInstrument> NewDoubleUpDownSumObserver(
+  virtual opentelemetry::nostd::shared_ptr<AsynchronousInstrument<T>> NewValueObserver(
       nostd::string_view name,
       nostd::string_view description,
       nostd::string_view unit,
       const bool enabled,
-      void (*callback)(DoubleObserverResult))
-  {
-    return opentelemetry::nostd::shared_ptr<AsynchronousInstrument>{
-        new DoubleUpDownSumObserver(name, description, unit, enabled, callback)};
-  }
-
-  /**
-   * Creates a IntUpDownSumObserver with the passed characteristics and returns a shared_ptr to that
-   * IntUpDownSumObserver.
-   *
-   * @param name the name of the new IntUpDownSumObserver.
-   * @param description a brief description of what the IntUpDownSumObserver is used for.
-   * @param unit the unit of metric values following https://unitsofmeasure.org/ucum.html.
-   * @param enabled a boolean value that turns on or off the metric instrument.
-   * @param callback the function to be observed by the instrument.
-   * @return a shared pointer to the created IntUpDownSumObserver.
-   * @throws NullPointerException if {@code name} is null
-   * @throws IllegalArgumentException if a different metric by the same name exists in this meter.
-   * @throws IllegalArgumentException if the {@code name} does not match spec requirements.
-   */
-  virtual opentelemetry::nostd::shared_ptr<AsynchronousInstrument> NewIntUpDownSumObserver(
-      nostd::string_view name,
-      nostd::string_view description,
-      nostd::string_view unit,
-      const bool enabled,
-      void (*callback)(IntObserverResult))
-  {
-    return opentelemetry::nostd::shared_ptr<AsynchronousInstrument>{
-        new IntUpDownSumObserver(name, description, unit, enabled, callback)};
-  }
-
-  /**
-   * Creates a DoubleValueObserver with the passed characteristics and returns a shared_ptr to that
-   * DoubleValueObserver.
-   *
-   * @param name the name of the new DoubleValueObserver.
-   * @param description a brief description of what the DoubleValueObserver is used for.
-   * @param unit the unit of metric values following https://unitsofmeasure.org/ucum.html.
-   * @param enabled a boolean value that turns on or off the metric instrument.
-   * @param callback the function to be observed by the instrument.
-   * @return a shared pointer to the created DoubleValueObserver.
-   * @throws NullPointerException if {@code name} is null
-   * @throws IllegalArgumentException if a different metric by the same name exists in this meter.
-   * @throws IllegalArgumentException if the {@code name} does not match spec requirements.
-   */
-  virtual opentelemetry::nostd::shared_ptr<AsynchronousInstrument> NewDoubleValueObserver(
-      nostd::string_view name,
-      nostd::string_view description,
-      nostd::string_view unit,
-      const bool enabled,
-      void (*callback)(DoubleObserverResult))
-  {
-    return opentelemetry::nostd::shared_ptr<AsynchronousInstrument>{
-        new DoubleValueObserver(name, description, unit, enabled, callback)};
-  }
-
-  /**
-   * Creates an IntValueObserver with the passed characteristics and returns a shared_ptr to that
-   * IntValueObserver.
-   *
-   * @param name the name of the new IntValueObserver.
-   * @param description a brief description of what the IntValueObserver is used for.
-   * @param unit the unit of metric values following https://unitsofmeasure.org/ucum.html.
-   * @param enabled a boolean value that turns on or off the metric instrument.
-   * @param callback the function to be observed by the instrument.
-   * @return a shared pointer to the created IntValueObserver.
-   * @throws NullPointerException if {@code name} is null
-   * @throws IllegalArgumentException if a different metric by the same name exists in this meter.
-   * @throws IllegalArgumentException if the {@code name} does not match spec requirements.
-   */
-  virtual opentelemetry::nostd::shared_ptr<AsynchronousInstrument> NewIntValueObserver(
-      nostd::string_view name,
-      nostd::string_view description,
-      nostd::string_view unit,
-      const bool enabled,
-      void (*callback)(IntObserverResult))
-  {
-    return opentelemetry::nostd::shared_ptr<AsynchronousInstrument>{
-        new IntValueObserver(name, description, unit, enabled, callback)};
-  }
+      void (*callback)(ObserverResult<T>)) = 0;
 
   /**
    * Utility method that allows users to atomically record measurements to a set of
-   * Metric instruments with a common set of labels.
+   * synchronous metric instruments with a common set of labels.
    *
    * @param labels the set of labels to associate with this recorder.
    * @param values a span of pairs where the first element of the pair is a metric instrument
@@ -325,63 +158,44 @@ public:
    */
   virtual void RecordBatch(
       const trace::KeyValueIterable &labels,
-      const nostd::span<std::pair<nostd::shared_ptr<SynchronousInstrument>,
-          nostd::variant<int, double>>> values) noexcept
+      const nostd::span<std::pair<nostd::shared_ptr<SynchronousInstrument<T>>,
+          T>> values) noexcept
   {
     // No-op
   }
 
   /**
    * Utility method that allows users to atomically record measurements to a set of
-   * Metric instruments with a common set of labels.
-   *
-   * This overloads the BatchRecord function to allow {@code labels} to be of type std::map.
-   *
-   * @param labels the set of labels to associate with this recorder.
-   * @param values a span of pairs where the first element of the pair is a metric instrument
-   * to record to, and the second element is the value to update that instrument with.
-   */
-  template <class T, nostd::enable_if_t<trace::detail::is_key_value_iterable<T>::value> * = nullptr>
-  void RecordBatch(
-      const T &labels,
-      const nostd::span<std::pair<nostd::shared_ptr<SynchronousInstrument>,
-          nostd::variant<int, double>>> values) noexcept
-  {
-    // No-op
-  }
-
-  /**
-   * Utility method that allows users to atomically record measurements to a set of
-   * Metric instruments with a common set of labels.
+   * synchronous metric instruments with a common set of labels.
    *
    * This overloads the BatchRecord function to allow {@code labels} to be of type initializer list.
    *
-   * @param labels the set of labels to associate with this recorder.
+   * @param labels an initializer list holding labels to associate with this recording.
    * @param values a span of pairs where the first element of the pair is a metric instrument
    * to record to, and the second element is the value to update that instrument with.
    */
   void RecordBatch(
       std::initializer_list<std::pair<nostd::string_view, nostd::string_view>> labels,
-      const nostd::span<std::pair<nostd::shared_ptr<SynchronousInstrument>,
-          nostd::variant<int, double>>> values) noexcept
+      const nostd::span<std::pair<nostd::shared_ptr<SynchronousInstrument<T>>,
+          T>> values) noexcept
   {
     // No-op
   }
 
   /**
    * Utility method that allows users to atomically record measurements to a set of
-   * Metric instruments with a common set of labels.
+   * synchronous metric instruments with a common set of labels.
    *
    * This overloads the BatchRecord function to allow {@code labels} and {@code values}
    * to be of type initializer list.
    *
-   * @param labels the set of labels to associate with this recorder.
-   * @param values a span of pairs where the first element of the pair is a metric instrument
-   * to record to, and the second element is the value to update that instrument with.
+   * @param labels an initializer list of pairs holding labels to associate with this recording.
+   * @param values an initializer list of pairs holding ptrs to instruments and the value to record
+   * to that respective instrument.
    */
   void RecordBatch(
       std::initializer_list<std::pair<nostd::string_view, nostd::string_view>> labels,
-      std::initializer_list<std::pair<nostd::shared_ptr<SynchronousInstrument>, nostd::variant<int, double>>>) noexcept
+      std::initializer_list<std::pair<nostd::shared_ptr<SynchronousInstrument<T>>, T>>) noexcept
   {
     // No-op
   }
