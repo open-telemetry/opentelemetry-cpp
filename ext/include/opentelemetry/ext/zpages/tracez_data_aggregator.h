@@ -80,8 +80,7 @@ struct TracezSpanData{
  * converting it to useful information that can be made available to 
  * display on the tracez zpage.
  *
- * NOTE: This class is not thread safe and is only expected to be called by a
- * single thread from the HTTP server
+ * NOTE: This class is only expected to be called by the HTTP server.
  */
 class TracezDataAggregator{
 public:
@@ -93,7 +92,7 @@ public:
    * aggregated data.
    */
   TracezDataAggregator(std::shared_ptr<TracezSpanProcessor> span_processor,
-     long update_interval_in_milliseconds = 100);
+     long update_interval_in_milliseconds = 10);
   
   /** Ends the thread set up in the constructor and destroys the object **/
   ~TracezDataAggregator();
