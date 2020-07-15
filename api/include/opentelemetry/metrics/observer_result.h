@@ -13,21 +13,17 @@ namespace metrics
  * accept a single ObserverResult object and update using its pointer to the
  * instrument itself.
  */
+
+template <class T>
 class ObserverResult
 {
 
 public:
   ObserverResult() = default;
 
-  ObserverResult(nostd::shared_ptr<AsynchronousInstrument> instrument) : instrument_(instrument) {}
+  ObserverResult(nostd::shared_ptr<AsynchronousInstrument<T>> instrument) {}
 
-  void observe(nostd::variant<int, double> value, const trace::KeyValueIterable &labels)
-  {
-    instrument_->update(value, labels);
-  }
-
-private:
-  nostd::shared_ptr<AsynchronousInstrument> instrument_;
+  virtual void observe(T value, const trace::KeyValueIterable &labels) {}
 };
 
 }  // namespace metrics

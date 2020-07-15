@@ -7,17 +7,18 @@ OPENTELEMETRY_BEGIN_NAMESPACE
 namespace metrics
 {
 
-class IntValueObserver : public AsynchronousInstrument
+template <class T>
+class ValueObserver : public AsynchronousInstrument<T>
 {
 
 public:
-  IntValueObserver() = default;
+  ValueObserver() = default;
 
-  IntValueObserver(nostd::string_view name,
-                   nostd::string_view description,
-                   nostd::string_view unit,
-                   bool enabled,
-                   void (*callback)(ObserverResult))
+  ValueObserver(nostd::string_view name,
+                nostd::string_view description,
+                nostd::string_view unit,
+                bool enabled,
+                void (*callback)(ObserverResult<T>))
   {}
 
   /*
@@ -27,36 +28,21 @@ public:
    * @param value is the numerical representation of the metric being captured
    * @param labels the set of labels, as key-value pairs
    */
-  virtual void observe(int value, const trace::KeyValueIterable &labels) {}
+  virtual void observe(T value, const trace::KeyValueIterable &labels) {}
 };
 
-class DoubleValueObserver : public AsynchronousInstrument
+template <class T>
+class SumObserver : public AsynchronousInstrument<T>
 {
 
 public:
-  DoubleValueObserver() = default;
+  SumObserver() = default;
 
-  DoubleValueObserver(nostd::string_view name,
-                      nostd::string_view description,
-                      nostd::string_view unit,
-                      bool enabled,
-                      void (*callback)(ObserverResult))
-  {}
-
-  virtual void observe(double value, const trace::KeyValueIterable &labels) {}
-};
-
-class IntSumObserver : public AsynchronousInstrument
-{
-
-public:
-  IntSumObserver() = default;
-
-  IntSumObserver(nostd::string_view name,
-                 nostd::string_view description,
-                 nostd::string_view unit,
-                 bool enabled,
-                 void (*callback)(ObserverResult))
+  SumObserver(nostd::string_view name,
+              nostd::string_view description,
+              nostd::string_view unit,
+              bool enabled,
+              void (*callback)(ObserverResult<T>))
   {}
 
   /*
@@ -67,55 +53,24 @@ public:
    * @param value is the numerical representation of the metric being captured
    * @param labels the set of labels, as key-value pairs
    */
-  virtual void observe(int value, const trace::KeyValueIterable &labels) {}
+  virtual void observe(T value, const trace::KeyValueIterable &labels) {}
 };
 
-class DoubleSumObserver : public AsynchronousInstrument
+template <class T>
+class UpDownSumObserver : public AsynchronousInstrument<T>
 {
 
 public:
-  DoubleSumObserver() = default;
+  UpDownSumObserver() = default;
 
-  DoubleSumObserver(nostd::string_view name,
+  UpDownSumObserver(nostd::string_view name,
                     nostd::string_view description,
                     nostd::string_view unit,
                     bool enabled,
-                    void (*callback)(ObserverResult))
-  {}
-
-  virtual void observe(double value, const trace::KeyValueIterable &labels) {}
-};
-
-class IntUpDownSumObserver : public AsynchronousInstrument
-{
-
-public:
-  IntUpDownSumObserver() = default;
-
-  IntUpDownSumObserver(nostd::string_view name,
-                       nostd::string_view description,
-                       nostd::string_view unit,
-                       bool enabled,
-                       void (*callback)(ObserverResult))
+                    void (*callback)(ObserverResult<T>))
   {}
 
   virtual void observe(int value, const trace::KeyValueIterable &labels) {}
-};
-
-class DoubleUpDownSumObserver : public AsynchronousInstrument
-{
-
-public:
-  DoubleUpDownSumObserver() = default;
-
-  DoubleUpDownSumObserver(nostd::string_view name,
-                          nostd::string_view description,
-                          nostd::string_view unit,
-                          bool enabled,
-                          void (*callback)(ObserverResult))
-  {}
-
-  virtual void observe(double value, const trace::KeyValueIterable &labels) {}
 };
 
 }  // namespace metrics

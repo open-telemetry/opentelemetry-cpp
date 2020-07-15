@@ -63,24 +63,21 @@ public:
   {}
 
   // Returns true if the instrument is enabled and collecting data
-  virtual bool IsEnabled()
-  {
-    // False in default implementation
-    return false;
-  }
+  virtual bool IsEnabled() = 0;
 
   // Return the instrument name
-  virtual nostd::string_view GetName() { return nostd::string_view(""); }
+  virtual nostd::string_view GetName() = 0;
 
   // Return the instrument description
-  virtual nostd::string_view GetDescription() { return nostd::string_view(""); }
+  virtual nostd::string_view GetDescription() = 0;
 
   // Return the insrument's units of measurement
-  virtual nostd::string_view GetUnits() { return nostd::string_view(""); }
+  virtual nostd::string_view GetUnits() = 0;
 
   virtual ~Instrument() = default;
 };
 
+template <class T>
 class BoundSynchronousInstrument : public Instrument
 {
 
@@ -90,8 +87,7 @@ public:
   BoundSynchronousInstrument(nostd::string_view name,
                              nostd::string_view description,
                              nostd::string_view unit,
-                             bool enabled)
-  {}
+                             bool enabled);
 
   /**
    * Frees the resources associated with this Bound Instrument.
@@ -100,7 +96,7 @@ public:
    * @param none
    * @return void
    */
-  virtual void unbind() {}
+  virtual void unbind() final {}
 
   /**
    * Records a single synchronous metric event; a call to the aggregator
@@ -110,9 +106,10 @@ public:
    * @param value is the numerical representation of the metric being captured
    * @return void
    */
-  virtual void update(nostd::variant<int, double> value) final {}
+  virtual void update(T value) final {}
 };
 
+template <class T>
 class SynchronousInstrument : public Instrument
 {
 
@@ -135,10 +132,7 @@ public:
    * @param labels the set of labels, as key-value pairs
    * @return a Bound Instrument
    */
-  nostd::shared_ptr<BoundSynchronousInstrument> bind(const trace::KeyValueIterable &labels)
-  {
-    return nostd::shared_ptr<BoundSynchronousInstrument>(new BoundSynchronousInstrument());
-  }
+  nostd::shared_ptr<BoundSynchronousInstrument<T>> bind(const trace::KeyValueIterable &labels);
 
   /**
    * Records a single synchronous metric event.
@@ -152,11 +146,13 @@ public:
    * @param value is the numerical representation of the metric being captured
    * @return void
    */
-  virtual void update(nostd::variant<int, double> value, const trace::KeyValueIterable &labels) final {}
+  virtual void update(T value, const trace::KeyValueIterable &labels) final {}
 };
 
+template <class T>
 class ObserverResult;
 
+template <class T>
 class AsynchronousInstrument : public Instrument
 {
 
@@ -167,24 +163,24 @@ public:
                          nostd::string_view description,
                          nostd::string_view unit,
                          bool enabled,
-                         void(callback)(ObserverResult))
+                         void(callback)(ObserverResult<T>))
   {}
 
   /**
    * Captures data by activating the callback function associated with the
-   * instrument and storing its return value.  Callbacks for asychronous
+   * instrument and storing its return value.  Callbacks for asynchronous
    * instruments are defined during construction.
    *
    * @param value is the numerical representation of the metric being captured
    * @return none
    */
-  virtual void update(nostd::variant<int, double> value, const trace::KeyValueIterable &labels) final {}
+  virtual void update(T value, const trace::KeyValueIterable &labels) final {}
 
 protected:
   // Callback function which takes a pointer to an Asynchronous instrument (this) type which is
   // stored in an observer result type and returns nothing.  This function calls the instrument's
   // observe.
-  void (*callback_)(ObserverResult);
+  void (*callback_)(ObserverResult<T>);
 };
 
 }  // namespace metrics
