@@ -244,7 +244,6 @@ TEST(Tracer, SpanSetAttribute)
 
 TEST(Tracer, TestAlwaysOnSampler)
 {
-  // Create tracers with AlwaysOn, AlwaysOff, Parent-or-else, and Probability samplers.
   std::shared_ptr<std::vector<std::unique_ptr<SpanData>>> spans_received_on(
       new std::vector<std::unique_ptr<SpanData>>);
   
