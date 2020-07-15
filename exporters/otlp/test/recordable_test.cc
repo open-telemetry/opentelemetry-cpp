@@ -1,4 +1,4 @@
-#include "exporters/otlp/recordable.h"
+#include "opentelemetry/exporters/otlp/recordable.h"
 
 #include <gtest/gtest.h>
 
