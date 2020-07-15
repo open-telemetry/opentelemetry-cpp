@@ -119,7 +119,6 @@ TEST(SpanTest, ContainerConstruction)
   EXPECT_EQ(s1.data(), v.data());
   EXPECT_EQ(s1.size(), v.size());
 
-  // span<int, 3> s2 = v; // <-- Does this require C++20 __cpp_lib_concepts? Assignment doesn;t compile with vs2019 in C++20 mode.
   span<int, 3> s2{v.data(), 3};
 
   EXPECT_EQ(s2.data(), v.data());
