@@ -6,3 +6,7 @@ foreach(testname tracer_provider_test span_data_test simple_processor_test
                         ${CMAKE_THREAD_LIBS_INIT} opentelemetry_common opentelemetry_trace)
   gtest_add_tests(TARGET ${testname} TEST_PREFIX trace. TEST_LIST ${testname})
 endforeach()
+
+add_executable(sampler_benchmark sampler_benchmark.cc)
+target_link_libraries(sampler_benchmark benchmark::benchmark
+                      ${CMAKE_THREAD_LIBS_INIT} opentelemetry_trace)
