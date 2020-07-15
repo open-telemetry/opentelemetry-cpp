@@ -18,10 +18,8 @@ class MeterProvider final : public opentelemetry::metrics::MeterProvider
 {
 public:
   /**
-   * Initialize a new tracer provider with a specified sampler
-   * @param processor The span processor for this tracer provider. This must
-   * not be a nullptr.
-   * @param sampler The sampler for this tracer provider. This must
+   * Initialize a new meter provider with a specified controller
+   * @param controller The controller for this meter provider. This must
    * not be a nullptr.
    */
   explicit MeterProvider(std::shared_ptr<Controller> controller) noexcept;
@@ -31,15 +29,15 @@ public:
       nostd::string_view library_version = "") noexcept override;
 
   /**
-   * Set the span processor associated with this tracer provider.
-   * @param processor The new span processor for this tracer provider. This
+   * Set the controller associated with this meter provider.
+   * @param controller The new controller for this meter provider. This
    * must not be a nullptr.
    */
   void SetController(std::shared_ptr<Controller> controller) noexcept;
 
   /**
-   * Obtain the span processor associated with this tracer provider.
-   * @return The span processor for this tracer provider.
+   * Obtain the controller associated with this meter provider.
+   * @return The span processor for this meter provider.
    */
   std::shared_ptr<Controller> GetController() const noexcept;
 
