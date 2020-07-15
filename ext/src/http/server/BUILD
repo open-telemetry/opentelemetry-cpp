@@ -6,11 +6,10 @@ cc_binary(
         "main.cpp"
     ],
     linkopts = select({
-    #    "//bazel:windows": [],
+        "//bazel:windows": [],
         "//conditions:default": ["-pthread"],
     }),
     deps = [
         "//ext:headers",
-#        "@github_nlohmann_json//:json",
     ],
 )
