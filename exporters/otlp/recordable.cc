@@ -104,7 +104,9 @@ void Recordable::SetAttribute(nostd::string_view key,
 
 void Recordable::AddEvent(nostd::string_view name, core::SystemTimestamp timestamp) noexcept
 {
-  (void)name;
+  auto event = span_.add_events();
+  event->set_name(name.data(), name.size());
+  event->set_time_unix_nano(timestamp.time_since_epoch().count());
 }
 
 void Recordable::SetStatus(trace::CanonicalCode code, nostd::string_view description) noexcept
@@ -120,8 +122,7 @@ void Recordable::SetName(nostd::string_view name) noexcept
 
 void Recordable::SetStartTime(opentelemetry::core::SystemTimestamp start_time) noexcept
 {
-  const uint64_t nano_unix_time = start_time.time_since_epoch().count();
-  span_.set_start_time_unix_nano(nano_unix_time);
+  span_.set_start_time_unix_nano(start_time.time_since_epoch().count());
 }
 
 void Recordable::SetDuration(std::chrono::nanoseconds duration) noexcept

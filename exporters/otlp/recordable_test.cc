@@ -110,6 +110,23 @@ TEST(Recordable, SetArrayAtrributes)
   EXPECT_EQ(rec.span().attributes(0).value().array_value().values(0).bool_value(), bool_span[0]);
   EXPECT_EQ(rec.span().attributes(0).value().array_value().values(1).bool_value(), bool_span[1]);
 }
+
+TEST(Recordable, AddEvents)
+{
+  Recordable rec;
+  nostd::string_view name = "Test event";
+
+  std::chrono::system_clock::time_point event_time = std::chrono::system_clock::now();
+  core::SystemTimestamp event_timestamp(event_time);
+
+  rec.AddEvent(name, event_timestamp);
+
+  uint64_t unix_event_time =
+      std::chrono::duration_cast<std::chrono::nanoseconds>(event_time.time_since_epoch()).count();
+
+  EXPECT_EQ(rec.span().events(0).name(), name);
+  EXPECT_EQ(rec.span().events(0).time_unix_nano(), unix_event_time);
+}
 }  // namespace otlp
 }  // namespace exporter
 OPENTELEMETRY_END_NAMESPACE
