@@ -16,6 +16,7 @@ using opentelemetry::sdk::trace::ProbabilitySampler;
 using opentelemetry::sdk::trace::Decision;
 using opentelemetry::trace::SpanContext;
 
+// NOOP sampler constructor used as a baseline to compare with other samplers
 void BM_AlwaysOffSamplerConstruction(benchmark::State &state)
 {
 	while (state.KeepRunning())
@@ -25,6 +26,7 @@ void BM_AlwaysOffSamplerConstruction(benchmark::State &state)
 }
 BENCHMARK(BM_AlwaysOffSamplerConstruction);
 
+// NOOP sampler constructor used as a baseline to compare with other samplers
 void BM_AlwaysOnSamplerConstruction(benchmark::State &state)
 {
 	while (state.KeepRunning())
@@ -52,6 +54,7 @@ void BM_ProbabilitySamplerConstruction(benchmark::State &state)
 }
 BENCHMARK(BM_ProbabilitySamplerConstruction);
 
+// NOOP sampler used as a baseline to compare with other samplers
 void BM_AlwaysOffSamplerShouldSample(benchmark::State &state)
 {
 	AlwaysOffSampler sampler;
@@ -70,6 +73,7 @@ void BM_AlwaysOffSamplerShouldSample(benchmark::State &state)
 }
 BENCHMARK(BM_AlwaysOffSamplerShouldSample);
 
+// NOOP sampler used as a baseline to compare with other samplers
 void BM_AlwaysOnSamplerShouldSample(benchmark::State &state)
 {
 	AlwaysOnSampler sampler;
