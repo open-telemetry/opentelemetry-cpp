@@ -42,12 +42,15 @@ esac
 echo > $FILE
 fi
 
+# TODO: fix compiler-version reporting
 if [ -f /usr/bin/gcc ]; then
 echo "gcc   version: `gcc --version`"
+COMPILER_NAME=gcc-`gcc -dumpversion`
 fi
 
 if [ -f /usr/bin/clang ]; then
 echo "clang version: `clang --version`"
+COMPILER_NAME=clang-`clang -dumpversion`
 fi
 
 # TODO: do we need to build and install Google Test?
@@ -62,10 +65,10 @@ function build_configuration {
 
   echo "Build configuration: $BUILD_CONFIG"
   cd $WORKSPACE_ROOT
-  OUTDIR=out.$BUILD_CONFIG
+  OUTDIR=out/$COMPILER_NAME/$BUILD_CONFIG
   mkdir -p $OUTDIR
+  cmake -B $OUTDIR $BUILD_OPTIONS
   cd $OUTDIR
-  cmake $BUILD_OPTIONS ..
   make
 }
 
