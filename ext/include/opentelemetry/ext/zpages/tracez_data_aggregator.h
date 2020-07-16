@@ -82,11 +82,11 @@ struct TracezData {
  * converting it to useful information that can be made available to
  * display on the tracez zpage.
  *
- * When this object is created it starts a thread that calls a function 
+ * When this object is created it starts a thread that calls a function
  * periodically to update the aggregated data with new spans.
  *
  * The only exposed function is a getter that returns a copy of the aggregated
- * data when requested. This function is ensured to be called in sequence to the 
+ * data when requested. This function is ensured to be called in sequence to the
  * aggregate spans function which is called periodically.
  *
  * TODO: Consider a singleton pattern for this class, not sure if multiple
@@ -101,7 +101,7 @@ class TracezDataAggregator {
    * @param update_interval the time duration for updating the aggregated data.
    */
   TracezDataAggregator(std::shared_ptr<TracezSpanProcessor> span_processor,
-                        milliseconds update_interval = milliseconds(10));
+                       milliseconds update_interval = milliseconds(10));
 
   /** Ends the thread set up in the constructor and destroys the object **/
   ~TracezDataAggregator();
@@ -200,7 +200,6 @@ class TracezDataAggregator {
   /** Condition variable that notifies the thread when object is about to be
   destroyed **/
   std::condition_variable cv_;
- 
 };
 
 }  // namespace zpages
