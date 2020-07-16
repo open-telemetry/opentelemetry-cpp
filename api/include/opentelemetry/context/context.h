@@ -57,9 +57,9 @@ namespace context
       common::AttributeValue GetValue(nostd::string_view key)
       {
         //Iterate through the context nodes
-        for(Context *context = this; context != nullptr; context = context->next_){
+        for(Context* context = this; context != nullptr; context = context->next_){
           //Iterate through the internal data nodes
-          for(DataList *data = context->head_; data != nullptr; data = data->next_){
+          for(DataList* data = context->head_; data != nullptr; data = data->next_){
             if(strncmp(key.data(), data->key_, data->key_length_) == 0){
               return data->value_;
             }
@@ -78,12 +78,12 @@ namespace context
           return false; 
         }
 
-        DataList *other_data = other.head_;
+        DataList* other_data = other.head_;
 
         // Iterate through the lists and compare the keys
         // TODO should also compare the values but the nostd::variant
         // seems to not have a comparison operator
-        for(DataList *data = head_; data != nullptr; data = data->next_){
+        for(DataList* data = head_; data != nullptr; data = data->next_){
           if(other_data == nullptr){
             return false;
           }
@@ -104,7 +104,7 @@ namespace context
       Context(const Context &other){
         next_ = other.next_;
         head_ = new DataList; 
-        DataList *data = head_;
+        DataList* data = head_;
         // Copy the other data into a new linked list
         for(DataList* other_data = other.head_; other_data != nullptr; other_data = other_data->next_){
           if(other_data->next_ != nullptr){
@@ -126,7 +126,7 @@ namespace context
       Context &operator=(const Context &other) {
         next_ = other.next_;
         head_ = new DataList; 
-        DataList *data = head_;
+        DataList* data = head_;
         // Copy the other data into a new linked list
         for(DataList* other_data = other.head_; other_data != nullptr; other_data = other_data->next_){
           if(other_data->next_ != nullptr){
@@ -145,7 +145,7 @@ namespace context
 
       ~Context(){
         for(DataList* data = head_; data != nullptr;){
-          DataList * next = data->next_;
+          DataList* next = data->next_;
           delete data;
           data = next;
         }
@@ -158,9 +158,9 @@ namespace context
       class DataList {
         public:
 
-          DataList *next_;
+          DataList* next_;
 
-          char *key_;
+          char* key_;
 
           int key_length_;
 
@@ -183,11 +183,11 @@ namespace context
               next_ = nullptr;
               ++iter;
 
-              DataList *previous_node = this;
+              DataList* previous_node = this;
               // Iterate over the keys and values iterable and add nodes
               for (; iter != std::end(keys_and_vals); ++iter)
               {
-                DataList *node = new DataList();
+                DataList* node = new DataList();
                 node->next_ = nullptr;
                 node->key_ = new char[nostd::string_view(iter->first).size()];
                 node->key_length_ = nostd::string_view(iter->first).size();
@@ -201,7 +201,7 @@ namespace context
           // Builds a data list with just a key and value, so it will just be the head
           // and returns that head. 
           DataList(nostd::string_view key, ContextValue value){
-            DataList *head = new DataList;
+            DataList* head = new DataList;
             key_ = new char[nostd::string_view(key).size()];
             key_length_ =  nostd::string_view(key).size();
             strncpy(key_, nostd::string_view(key).data(), nostd::string_view(key).size());
@@ -234,10 +234,10 @@ namespace context
       }
 
       // Head of the list which holds the keys and values of this context 
-      DataList *head_ = nullptr;
+      DataList* head_ = nullptr;
 
       // Pointer to the next context object in the context list
-      Context *next_ = nullptr;
+      Context* next_ = nullptr;
   };
 
 }  // namespace context

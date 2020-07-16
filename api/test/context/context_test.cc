@@ -5,7 +5,7 @@
 #include <gtest/gtest.h>
 
 using namespace opentelemetry;
-/*
+
 // Tests that the context constructor accepts an std::map.
 TEST(ContextTest, ContextIterableAcceptsMap)
 {
@@ -83,7 +83,7 @@ TEST(ContextTest, ContextInheritance)
   EXPECT_EQ(nostd::get<nostd::string_view>(other_context->GetValue("test_key")), "123");
   EXPECT_EQ(nostd::get<nostd::string_view>(other_context->GetValue("foo_key")), "456");
 }
-*/
+
 // Tests that copying a context copies the key value pairs as expected.
 TEST(ContextTest, ContextCopyOperator)
 {
@@ -92,9 +92,9 @@ TEST(ContextTest, ContextCopyOperator)
 
   context::Context test_context   = context::Context(test_map);
   context::Context copied_context = test_context;
-/*
+
   EXPECT_EQ(nostd::get<nostd::string_view>(copied_context.GetValue("test_key")), "123");
   EXPECT_EQ(nostd::get<nostd::string_view>(copied_context.GetValue("foo_key")), "456");
   EXPECT_EQ(nostd::get<nostd::string_view>(copied_context.GetValue("other_key")), "789");
-*/
+
 }
