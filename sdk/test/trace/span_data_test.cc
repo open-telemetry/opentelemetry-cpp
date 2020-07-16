@@ -48,5 +48,5 @@ TEST(SpanData, Set)
   ASSERT_EQ(data.GetDescription(), "description");
   ASSERT_EQ(data.GetStartTime().time_since_epoch(), now.time_since_epoch());
   ASSERT_EQ(data.GetDuration(), std::chrono::nanoseconds(1000000));
-  ASSERT_EQ(opentelemetry::nostd::get<int>(data.GetAttributes().at("attr1")), 314159);
+  ASSERT_EQ(opentelemetry::nostd::get<int64_t>(data.GetAttributes().at("attr1")), 314159);
 }
