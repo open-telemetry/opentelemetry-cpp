@@ -60,7 +60,7 @@ namespace context
         for(Context* context = this; context != nullptr; context = context->next_){
           //Iterate through the internal data nodes
           for(DataList* data = context->head_; data != nullptr; data = data->next_){
-            if(strncmp(key.data(), data->key_, data->key_length_) == 0){
+            if(key.length() == data->key_length_ && strncmp(key.data(), data->key_, data->key_length_) == 0){
               return data->value_;
             }
           }
