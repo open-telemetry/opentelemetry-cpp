@@ -8,3 +8,4 @@ foreach(testname tracez_processor_test tracez_data_aggregator_test)
     TEST_PREFIX ext.
     TEST_LIST ${testname})
 endforeach()
+

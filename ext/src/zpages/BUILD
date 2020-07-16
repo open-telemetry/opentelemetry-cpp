@@ -21,7 +21,7 @@ cc_library(
     include_prefix = "ext/zpages",
     deps = [
         "//api",
-        "//ext:headers",
         "//sdk:headers",
+        "//ext:headers",
     ],
 )

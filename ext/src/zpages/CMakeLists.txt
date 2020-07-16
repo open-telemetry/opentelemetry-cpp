@@ -8,3 +8,4 @@ target_include_directories(opentelemetry_zpages PUBLIC ../../include)
 
 target_link_libraries(opentelemetry_zpages opentelemetry_api
                       opentelemetry_trace)
+
