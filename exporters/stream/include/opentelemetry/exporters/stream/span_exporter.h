@@ -11,16 +11,6 @@
 
 namespace nostd    = opentelemetry::nostd;
 namespace sdktrace = opentelemetry::sdk::trace;
-using SpanDataAttributeValue = nostd::variant<bool,
-                                              int64_t,
-                                              uint64_t,
-                                              double,
-                                              std::string,
-                                              std::vector<bool>,
-                                              std::vector<int64_t>,
-                                              std::vector<uint64_t>,
-                                              std::vector<double>,
-                                              std::vector<std::string>>;
 
 // AttributeType to help with printing attributes
 enum AttributeType
@@ -95,7 +85,7 @@ private:
   */
 
   template <typename T>
-  void print_array(SpanDataAttributeValue &value, bool jsonTypes = false)
+  void print_array(sdktrace::SpanDataAttributeValue &value, bool jsonTypes = false)
   {
     sout_ << '[';
     // TODO: jsonTypes for bool?
@@ -113,7 +103,7 @@ private:
     sout_ << ']';
   }
 
-  void print_value(SpanDataAttributeValue &value,
+  void print_value(sdktrace::SpanDataAttributeValue &value,
                           bool jsonTypes = false)
   {
     switch (value.index())
@@ -164,7 +154,7 @@ private:
     }
   }
 
-  void printAttributes(std::unordered_map<std::string, SpanDataAttributeValue> map)
+  void printAttributes(std::unordered_map<std::string, sdktrace::SpanDataAttributeValue> map)
   {
     for(auto kv : map)
     {
