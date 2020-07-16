@@ -99,17 +99,25 @@ TEST(Recordable, AddEvents)
 TEST(Recordable, SetSingleAtrribute)
 {
   Recordable rec;
+  nostd::string_view bool_key = "bool_attr";
   common::AttributeValue bool_val(true);
-  rec.SetAttribute("bool_attr", bool_val);
+  rec.SetAttribute(bool_key, bool_val);
 
+  nostd::string_view double_key = "double_attr";
   common::AttributeValue double_val(3.3);
-  rec.SetAttribute("double_attr", double_val);
+  rec.SetAttribute(double_key, double_val);
 
+  nostd::string_view str_key = "str_attr";
   common::AttributeValue str_val(nostd::string_view("Test"));
-  rec.SetAttribute("str_attr", str_val);
+  rec.SetAttribute(str_key, str_val);
 
+  EXPECT_EQ(rec.span().attributes(0).key(), bool_key);
   EXPECT_EQ(rec.span().attributes(0).value().bool_value(), nostd::get<bool>(bool_val));
+
+  EXPECT_EQ(rec.span().attributes(1).key(), double_key);
   EXPECT_EQ(rec.span().attributes(1).value().double_value(), nostd::get<double>(double_val));
+
+  EXPECT_EQ(rec.span().attributes(2).key(), str_key);
   EXPECT_EQ(rec.span().attributes(2).value().string_value(),
             nostd::get<nostd::string_view>(str_val).data());
 }
@@ -122,15 +130,15 @@ TEST(Recordable, SetArrayAtrribute)
 
   bool bool_arr[kArraySize] = {true, false, true};
   nostd::span<const bool> bool_span(bool_arr);
-  rec.SetAttribute("bool_arr_attr", common::AttributeValue(bool_span));
+  rec.SetAttribute("bool_arr_attr", bool_span);
 
   double double_arr[kArraySize] = {22.3, 33.4, 44.5};
   nostd::span<const double> double_span(double_arr);
-  rec.SetAttribute("double_arr_attr", common::AttributeValue(double_span));
+  rec.SetAttribute("double_arr_attr", double_span);
 
   nostd::string_view str_arr[kArraySize] = {"Hello", "World", "Test"};
   nostd::span<const nostd::string_view> str_span(str_arr);
-  rec.SetAttribute("str_arr_attr", common::AttributeValue(str_span));
+  rec.SetAttribute("str_arr_attr", str_span);
 
   for (int i = 0; i < kArraySize; i++)
   {
@@ -175,7 +183,7 @@ TYPED_TEST(IntAttributeTest, SetIntArrayAttribute)
   nostd::span<const IntType> int_span(int_arr);
 
   Recordable rec;
-  rec.SetAttribute("int_arr_attr", common::AttributeValue(int_span));
+  rec.SetAttribute("int_arr_attr", int_span);
 
   for (int i = 0; i < kArraySize; i++)
   {

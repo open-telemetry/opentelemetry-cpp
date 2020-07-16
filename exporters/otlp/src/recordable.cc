@@ -5,6 +5,9 @@ namespace exporter
 {
 namespace otlp
 {
+
+const int kAttributeValueSize = 14;
+
 void Recordable::SetIds(trace::TraceId trace_id,
                         trace::SpanId span_id,
                         trace::SpanId parent_span_id) noexcept
@@ -18,7 +21,12 @@ void Recordable::SetIds(trace::TraceId trace_id,
 void Recordable::SetAttribute(nostd::string_view key,
                               const opentelemetry::common::AttributeValue &value) noexcept
 {
-  auto attribute = span_.add_attributes();
+  // Assert size of variant to ensure that this method gets updated if the variant
+  // definition changes
+  static_assert(nostd::variant_size<opentelemetry::common::AttributeValue>::value ==
+                kAttributeValueSize);
+
+  auto *attribute = span_.add_attributes();
   attribute->set_key(key.data(), key.size());
 
   if (nostd::holds_alternative<bool>(value))
@@ -52,49 +60,49 @@ void Recordable::SetAttribute(nostd::string_view key,
   }
   else if (nostd::holds_alternative<nostd::span<const bool>>(value))
   {
-    for (auto &val : nostd::get<nostd::span<const bool>>(value))
+    for (const auto &val : nostd::get<nostd::span<const bool>>(value))
     {
       attribute->mutable_value()->mutable_array_value()->add_values()->set_bool_value(val);
     }
   }
   else if (nostd::holds_alternative<nostd::span<const int>>(value))
   {
-    for (auto &val : nostd::get<nostd::span<const int>>(value))
+    for (const auto &val : nostd::get<nostd::span<const int>>(value))
     {
       attribute->mutable_value()->mutable_array_value()->add_values()->set_int_value(val);
     }
   }
   else if (nostd::holds_alternative<nostd::span<const int64_t>>(value))
   {
-    for (auto &val : nostd::get<nostd::span<const int64_t>>(value))
+    for (const auto &val : nostd::get<nostd::span<const int64_t>>(value))
     {
       attribute->mutable_value()->mutable_array_value()->add_values()->set_int_value(val);
     }
   }
   else if (nostd::holds_alternative<nostd::span<const unsigned int>>(value))
   {
-    for (auto &val : nostd::get<nostd::span<const unsigned int>>(value))
+    for (const auto &val : nostd::get<nostd::span<const unsigned int>>(value))
     {
       attribute->mutable_value()->mutable_array_value()->add_values()->set_int_value(val);
     }
   }
   else if (nostd::holds_alternative<nostd::span<const uint64_t>>(value))
   {
-    for (auto &val : nostd::get<nostd::span<const uint64_t>>(value))
+    for (const auto &val : nostd::get<nostd::span<const uint64_t>>(value))
     {
       attribute->mutable_value()->mutable_array_value()->add_values()->set_int_value(val);
     }
   }
   else if (nostd::holds_alternative<nostd::span<const double>>(value))
   {
-    for (auto &val : nostd::get<nostd::span<const double>>(value))
+    for (const auto &val : nostd::get<nostd::span<const double>>(value))
     {
       attribute->mutable_value()->mutable_array_value()->add_values()->set_double_value(val);
     }
   }
   else if (nostd::holds_alternative<nostd::span<const nostd::string_view>>(value))
   {
-    for (auto &val : nostd::get<nostd::span<const nostd::string_view>>(value))
+    for (const auto &val : nostd::get<nostd::span<const nostd::string_view>>(value))
     {
       attribute->mutable_value()->mutable_array_value()->add_values()->set_string_value(val.data(),
                                                                                         val.size());
@@ -104,7 +112,7 @@ void Recordable::SetAttribute(nostd::string_view key,
 
 void Recordable::AddEvent(nostd::string_view name, core::SystemTimestamp timestamp) noexcept
 {
-  auto event = span_.add_events();
+  auto *event = span_.add_events();
   event->set_name(name.data(), name.size());
   event->set_time_unix_nano(timestamp.time_since_epoch().count());
 }
