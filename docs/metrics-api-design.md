@@ -127,7 +127,7 @@ public:
 /////////////////////////Metric Instrument Constructors////////////////////////////  
   
  /*
-  * New Double Counter
+  * New Int Counter
   *
   * Function that creates and returns a Counter metric instrument with value
   * type double.
@@ -140,38 +140,28 @@ public:
   * enabled, a boolean that turns on or off collection.
   *
   */ 
-  virtual nostd::shared_ptr<DoubleCounter> 
-                            NewDoubleCounter(nostd::string_view name, 
+  virtual nostd::shared_ptr<Counter<int>> 
+                            NewIntCounter(nostd::string_view name, 
                             nostd::string_view description,
                             nostd::string_view unit, 
-                            nostd::string_view enabled);
+                            nostd::string_view enabled) = 0;
+                            
+  template<typename T, nostd::enable_if_t<std::is_same<T, int>::value, int> = 0>
+  nostd::shared_ptr<SynchronousInstrument<T>> NewCounter(nostd::string_view name,
+                                                         nostd::string_view description,
+                                                         nostd::string_view unit,
+                                                         const bool enabled)
+  {
+    return NewIntCounter(name, description, unit, enabled);
+  }
   
- /*
-  * New int Counter
-  *
-  * Function that creates and returns a Counter metric instrument with value
-  * type int.
-  *
-  * Arguments:
-  * name, the name of the metric instrument (must conform to the above syntax).
-  * description, a brief, readable description of the metric instrument.
-  * unit, the unit of metric values following the UCUM convention
-  *       (https://unitsofmeasure.org/ucum.html).
-  * enabled, a boolean that turns on or off collection.
-  *
-  */ 
-  virtual nostd::shared_ptr<LongCounter> NewIntCounter(nostd::string_view name,
-                                                       nostd::string_view description,
-                                                       nostd::string_view unit,
-                                                       nostd::string_view enabled);
   
 ////////////////////////////////////////////////////////////////////////////////////
 //                                                                                //
-//                     Repeat above two functions for all                         //
-//                     six (five other) metric instruments.                       //
+//              Repeat above functions for short, int, float, and                 //
+//              double type versions of all 6 metric instruments.                 //
 //                                                                                //
-////////////////////////////////////////////////////////////////////////////////////
-  
+////////////////////////////////////////////////////////////////////////////////////  
  /*
   * RecordBatch
   *
@@ -181,14 +171,28 @@ public:
   *
   * Arugments:
   * labels, labels associated with all measurements in the batch.
-  * values, a KeyValueIterable where the key is a string containing the name
-  *         of metric instruments such as "IntCounter" or "DoubleUpDownSumObserver"
-  *         and the value is the value to be recorded to all metric instruments in 
-  *         the batch of the associated instrument type.
+  * instruments, a span of pointers to instruments to record to.
+  * values, a synchronized span of values to record to those instruments.
   *
   */ 
-  virtual void RecordBatch(nostd::KeyValueIterable labels, 
-                           nostd::span<pair(SynchronousInstrument, variant<int, double>), values) noexcept;
+  virtual void RecordIntBatch(nostd::KeyValueIterable labels, 
+                           nostd::span<shared_ptr<SynchronousInstrument<int>>> instruments,
+                           nostd::span<int> values) noexcept;
+ 
+ /*
+  * Overloaded RecordBatch function which takes initializer lists of pairs.
+  * Provided to improve ease-of-use of the BatchRecord function.
+  *
+  */
+  template<typename T, nostd::enable_if_t<std::is_same<T, int>::value, int> = 0>
+  void RecordBatch(std::initializer_list<std::pair<nostd::string_view, nostd::string_view>> labels,
+                   std::initializer_list<std::pair<nostd::shared_ptr<SynchronousInstrument<int>>,
+                   int>> values)
+  {
+    // Translate parameters
+    // return RecordIntBatch(@ translated_params );
+  }
+
 private:
   MeterProvider meterProvider_;
   InstrumentationInfo instrumentationInfo_;
