@@ -81,7 +81,7 @@ private:
   */
 
   template <typename T>
-  void print_array(common::AttributeValue &value, bool jsonTypes = false)
+  void print_array(common::AttributeValue & value, bool jsonTypes = false)
   {
     sout_ << '[';
     // TODO: jsonTypes for bool?
@@ -97,7 +97,7 @@ private:
       i++;
     };
     sout_ << ']';
-  };
+  }
 
   void print_value(common::AttributeValue &value,
                           bool jsonTypes = false)
