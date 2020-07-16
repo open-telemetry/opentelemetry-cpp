@@ -1,0 +1,23 @@
+load("//bazel:otel_cc_benchmark.bzl", "otel_cc_benchmark")
+
+cc_test(
+    name = "context_test",
+    srcs = [
+    "context_test.cc",
+    ],
+    deps = [
+    "//api",
+    "@com_google_googletest//:gtest_main",
+    ],
+    )
+
+cc_test(
+    name = "thread_local_test",
+    srcs = [
+    "thread_local_test.cc",
+    ],
+    deps = [
+    "//api",
+    "@com_google_googletest//:gtest_main",
+    ],
+    )
