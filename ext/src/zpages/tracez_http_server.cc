@@ -63,10 +63,8 @@ bool file_get_contents(string filename, std::vector<char>& result)
     return false;
 };
 
-string mime_content_type(string filename)
-{
-    static map<string, string> mimeTypes =
-    {
+string mime_content_type(string filename) {
+    static map<string, string> mimeTypes = {
         {"css",  "text/css"},
         {"png",  "image/png"},
         {"js",   "text/javascript"},
@@ -80,32 +78,25 @@ string mime_content_type(string filename)
 
     std::string ext = filename.substr(filename.find_last_of(".") + 1);
     auto result = mimeTypes[ext];
-    if (result == "")
-    {
-        result = CONTENT_TYPE_TEXT;
-    };
+    if (result == "") result = CONTENT_TYPE_TEXT;
+
     return result;
 };
 
-int main(int argc, char* argv[])
-{
+int main(int argc, char* argv[]) {
     atomic<uint32_t> reqCount{0};
 
     HttpServer server("localhost", 32000);
 
     // Initialize callback function from lambda
     HttpRequestCallback cb{[&](HttpRequest const& req, HttpResponse& resp) {
-        static std::atomic<size_t> baseId{10000};
-        if (req.uri == "/status.json")
-        {
+        if (req.uri == "/status.json") {
             resp.headers[CONTENT_TYPE] = "application/json";
             json j = json::array();
-            for (size_t i = 0; i < 3; i++)
-            {
-                baseId++;
+            for (size_t i = 0; i < 3; i++) {
                 j[i] = {
                     {"type", "span"},
-                    {"id", baseId.load()},
+                    {"id", i},
                     {"status", "started"}
                 };
             }
@@ -114,17 +105,8 @@ int main(int argc, char* argv[])
             return 200;
         };
 
-        // Simple plain text response
-        if (req.uri.substr(0, 8) == "/simple/")
-        {
-            resp.headers[CONTENT_TYPE] = CONTENT_TYPE_TEXT;
-            resp.body = "It works!";
-            return atoi(req.uri.substr(8).c_str());
-        }
-
         // Echo back the contents of what we received in HTTP POST
-        if (req.uri == "/echo/")
-        {
+        if (req.uri == "/echo/") {
             auto it = req.headers.find(CONTENT_TYPE);
             resp.headers[CONTENT_TYPE] = (it != req.headers.end()) ? it->second : CONTENT_TYPE_BIN;
             resp.body = req.content;
@@ -132,8 +114,7 @@ int main(int argc, char* argv[])
         }
 
         // Simple counter that tracks requests processed
-        if (req.uri.substr(0, 7) == "/count/")
-        {
+        if (req.uri.substr(0, 7) == "/count/") {
             reqCount++;
             resp.headers[CONTENT_TYPE] = CONTENT_TYPE_TEXT;
             resp.message = "200 OK";
@@ -145,7 +126,6 @@ int main(int argc, char* argv[])
     }};
 
     server["/status.json"] = cb;
-    server["/simple/"] = cb;
     server["/echo/"] = cb;
     server["/count/"] = cb;
 
