@@ -12,10 +12,10 @@ TEST(TracerProvider, GetTracer)
 {
   std::shared_ptr<SpanProcessor> processor(new SimpleSpanProcessor(nullptr));
 
-  TracerProvider tf(processor);
-  auto t1 = tf.GetTracer("test");
-  auto t2 = tf.GetTracer("test");
-  auto t3 = tf.GetTracer("different", "1.0.0");
+  TracerProvider tf1(processor);
+  auto t1 = tf1.GetTracer("test");
+  auto t2 = tf1.GetTracer("test");
+  auto t3 = tf1.GetTracer("different", "1.0.0");
   ASSERT_NE(nullptr, t1);
   ASSERT_NE(nullptr, t2);
   ASSERT_NE(nullptr, t3);
@@ -25,9 +25,14 @@ TEST(TracerProvider, GetTracer)
   ASSERT_EQ(t1, t3);
 
   // Should be an sdk::trace::Tracer with the processor attached.
-  auto sdkTracer = dynamic_cast<Tracer *>(t1.get());
-  ASSERT_NE(nullptr, sdkTracer);
-  ASSERT_EQ(processor, sdkTracer->GetProcessor());
+  auto sdkTracer1 = dynamic_cast<Tracer *>(t1.get());
+  ASSERT_NE(nullptr, sdkTracer1);
+  ASSERT_EQ(processor, sdkTracer1->GetProcessor());
+  ASSERT_EQ("AlwaysOnSampler", sdkTracer1->GetSampler()->GetDescription());
+
+  TracerProvider tf2(processor, std::make_shared<AlwaysOffSampler>());
+  auto sdkTracer2 = dynamic_cast<Tracer *>(tf2.GetTracer("test").get());
+  ASSERT_EQ("AlwaysOffSampler", sdkTracer2->GetSampler()->GetDescription());
 }
 
 TEST(TracerProvider, GetSampler)
