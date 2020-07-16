@@ -105,20 +105,18 @@ public:
   *
   */
   explicit Meter(MeterProvider meterProvider, 
-                 InstrumentationInfo instrumentationInfo,
-                 Processor processor) {
+                 InstrumentationInfo instrumentationInfo) {
     meterProvider_(meterProvider);
     instrumentationInfo_(instrumentationInfo);
-    processor_(processor);
   }
   
 /////////////////////////Metric Instrument Constructors////////////////////////////  
   
  /*
-  * New Double Counter
+  * New Int Counter
   *
   * Function that creates and returns a Counter metric instrument with value
-  * type double.
+  * type int.
   *
   * Arguments:
   * name, the name of the metric instrument (must conform to the above syntax).
@@ -127,21 +125,21 @@ public:
   *       (https://unitsofmeasure.org/ucum.html).
   *
   */ 
-  nostd::shared_ptr<DoubleCounter> NewDoubleCounter(nostd::string_view name, 
-                                                    nostd::string_view description,
-                                                    nostd::string_view unit, 
-                                                    nostd::string_view enabled) {
-    DoubleCounter doubleCounter = DoubleCounter(name, description, unit, enabled);
-    ptr = shared_ptr<DoubleCounter>(doubleCounter)
-    metrics.push(ptr);
+  nostd::shared_ptr<Counter<int>> NewintCounter(nostd::string_view name, 
+                                                nostd::string_view description,
+                                                nostd::string_view unit, 
+                                                nostd::string_view enabled) {
+    auto intCounter = Counter<int>(name, description, unit, enabled);
+    ptr = shared_ptr<DoubleCounter>(intCounter)
+    int_metrics_.insert(name, ptr);
     return ptr; 
   }
   
  /*
-  * New Int Counter
+  * New float Counter
   *
   * Function that creates and returns a Counter metric instrument with value
-  * type long.
+  * type float.
   *
   * Arguments:
   * name, the name of the metric instrument (must conform to the above syntax).
@@ -150,20 +148,21 @@ public:
   *       (https://unitsofmeasure.org/ucum.html).
   *
   */ 
-  nostd::unique_ptr<LongCounter> NewIntCounter(nostd::string_view name,
-                                               nostd::string_view description,
-                                               nostd::string_view unit,
-                                               nostd::string_view enabled) {
-    IntCounter intCounter = IntCounter(name, description, unit, enabled);
-    ptr = unique_ptr<IntCounter>(intCounter)
-    metrics.push(ptr);
+  nostd::unique_ptr<Counter<float>> NewFloatCounter(nostd::string_view name,
+                                                    nostd::string_view description,
+                                                    nostd::string_view unit,
+                                                    nostd::string_view enabled) {
+    auto floatCounter = Counter<float>(name, description, unit, enabled);
+    ptr = unique_ptr<Counter<Float>>(floatCounter)
+    float_metrics_.insert(name, ptr);
     return ptr;
   }
   
 ////////////////////////////////////////////////////////////////////////////////////
 //                                                                                //
 //                     Repeat above two functions for all                         //
-//                     six (five other) metric instruments.                       //
+//                     six (five other) metric instruments                        //
+//                     of types short, int, float, and double.                    //
 //                                                                                //
 ////////////////////////////////////////////////////////////////////////////////////
   
@@ -178,10 +177,10 @@ private:
   * last collection period.
   *
   */
-  void Collect() {
+  std::vector<Record> Collect() {
     std::vector<Record> records;
     metrics_lock_.lock();
-    for instr in metrics_:
+    for instr in ALL_metrics_:
       if instr is not enabled:
         continue
       else:
@@ -190,7 +189,7 @@ private:
                                    bound_instr->labels,
                                    bound_instr->GetAggregator()->Checkpoint());
     metrics_lock_.unlock();
-    processor_.process(records);
+    return records;
   }
   
  /*
@@ -215,12 +214,19 @@ private:
                                                 // to the instrument.
   }
   
-  std::vector<shared_ptr<Instrument>> metrics_; // A vector to store instruments created
-                                                // from this Meter.
+  std::map<nostd::string_view, shared_ptr<SynchronousInstrument<short>>> short_metrics_;
+  std::map<nostd::string_view, shared_ptr<SynchronousInstrument<short>>> int_metrics_;
+  std::map<nostd::string_view, shared_ptr<SynchronousInstrument<short>>> float_metrics_;
+  std::map<nostd::string_view, shared_ptr<SynchronousInstrument<short>>> double_metrics_;
+  
+  std::map<nostd::string_view, shared_ptr<AsynchronousInstrument<short>>> short_observers_;
+  std::map<nostd::string_view, shared_ptr<AsynchronousInstrument<short>>> int_observers_;
+  std::map<nostd::string_view, shared_ptr<AsynchronousInstrument<short>>> float_observers_;
+  std::map<nostd::string_view, shared_ptr<AsynchronousInstrument<short>>> double_observers_;
+  
   std::mutex metrics_lock_;
   unique_ptr<MeterProvider> meterProvider_;
   InstrumentationInfo instrumentationInfo_;
-  Processor processor_;
 };
 ```
 
@@ -243,13 +249,14 @@ The SDK implementation of the `Meter` class will contain a function called `coll
 
 **Pros of this implementation:**
 
-* Different constructors for the various metric instruments and types allows us to forego passing the metric type and value type along with the instrument through the data pipeline.
+* Different constructors and overloaded template calls to those constructors for the various metric instruments allows us to forego much of the code duplication involved in supporting various types.
 * Storing the metric instruments created from this meter directly in the meter object itself allows us to implement the collect_all method without creating a new class that contains the meter state and instrument registry.
 
 **Cons of this implementation:**
 
-* Different constructors for the different metric instruments means a lot of duplicated code. We could use templates but we believe that may cause issues when exporting due to the requirement to adhere to the OT protocol. However, **this is still under consideration.**
-* Storing the metric instruments in the Meter class means that if we have multiple meters, metric instruments are stored in various objects. Using an instrument registry that maps meters to metric instruments resolves this.
+* Different constructors for the different metric instruments means less duplicated code but still a lot.
+* Storing the metric instruments in the Meter class means that if we have multiple meters, metric instruments are stored in various objects. Using an instrument registry that maps meters to metric instruments resolves this. However, we have designed our SDK to only support one Meter instance.
+* Storing 8 maps in the meter class is costly. However, we believe that this is ok because these maps will only need to be created once, at the instantiation of the meter class. **We believe that these maps will not slow down the pipeline in any meaningful way**
 
 **The SDK implementation of the `Meter` class will act as the Accumulator mentioned in the SDK specification.**
 
