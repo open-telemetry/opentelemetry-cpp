@@ -65,8 +65,14 @@ TEST(GaugeAggregator, BadMerge)
   // two aggregators of different numeric types together.
   auto agg1 = new GaugeAggregator<int>(opentelemetry::metrics::BoundInstrumentKind::BoundIntCounter);
   auto agg2 = new GaugeAggregator<int>(opentelemetry::metrics::BoundInstrumentKind::BoundIntValueRecorder);
-
+  
+  agg1->update(1);
+  agg2->update(2);
   agg1->merge(*agg2);
+
+  // Verify that the aggregators did NOT merge
+  std::vector<int> correct{1};
+  ASSERT_EQ(agg1->get_values(), correct);
 }
 
 TEST(GaugeAggregator, Types)
