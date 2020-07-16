@@ -10,10 +10,8 @@ namespace exporter
 {
 namespace trace
 {
-StreamSpanExporter::StreamSpanExporter(std::ostream &sout,
-                                      bool isShutdown) noexcept
-                                    : sout_{sout},
-                                      isShutdown_{isShutdown} {}
+StreamSpanExporter::StreamSpanExporter(std::ostream &sout) noexcept
+                                    : sout_{sout} {}
 
 std::unique_ptr<sdktrace::Recordable> StreamSpanExporter::MakeRecordable() noexcept 
 {

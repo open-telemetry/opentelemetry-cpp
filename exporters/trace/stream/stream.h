@@ -37,11 +37,20 @@ namespace exporter
 {
 namespace trace
 {
+
+/**
+ * The StreamSpanExporter exports span data through an ostream
+*/
 class StreamSpanExporter final : public sdktrace::SpanExporter
 {
 public:
-    explicit StreamSpanExporter(std::ostream &sout = std::cout,
-                                bool isShutdown = false) noexcept;
+
+/**
+ * Create a StreamSpanExporter. This constructor takes in a reference to an ostream that the
+ * export() function will send span data into.
+ * The default ostream is set to stdout
+ */
+  explicit StreamSpanExporter(std::ostream &sout = std::cout) noexcept;
 
   std::unique_ptr<sdktrace::Recordable> MakeRecordable() noexcept override;
 
@@ -52,7 +61,7 @@ public:
 
 private:
   std::ostream &sout_;
-  bool isShutdown_;
+  bool isShutdown_ = false;
 
   // Mapping status number to the string from api/include/opentelemetry/trace/canonical_code.h
   std::map<int, std::string> statusMap {
