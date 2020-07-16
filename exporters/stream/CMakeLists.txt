@@ -1,7 +1,6 @@
 include_directories(include)
 
 add_library(opentelemetry_exporter_stream_span src/span_exporter.cc)
-target_link_libraries(opentelemetry_exporter_stream_span)
 
 add_executable(stream_span_test test/stream_span_test.cc)
 target_link_libraries(stream_span_test
