@@ -583,3 +583,4 @@ TEST_F(TracezProcessor, RunningSnapshotCompletedThreadSafety) {
   snapshots.join();
   end.join();
 }
+
