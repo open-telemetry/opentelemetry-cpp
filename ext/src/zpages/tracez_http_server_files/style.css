@@ -1,0 +1,50 @@
+body {
+  color: #252525;
+  text-align: center;
+  font-family: monospace, sans-serif;
+  word-break: break-all;
+  font-size: .9em
+}
+
+table {
+  font-family: monospace, sans-serif;
+  border-collapse: collapse;
+  font-size: 1.05em;
+  width: 100%;
+}
+
+td, th {
+  word-break: break-word;
+  border: 1px solid #eee;
+  padding: 6px;
+  text-align: center;
+}
+
+#records_table th, #records_table tr {
+  border-top: none;
+}
+
+#header th, #header tr {
+  border-bottom: none;
+}
+
+tr:nth-child(even) {
+  background-color: #eee;
+}
+
+.sm {
+  width: 7%;
+}
+
+.md {
+  width: 23%;
+}
+
+.lg {
+  width: 63%;
+}
+
+img {
+  width: 50%;
+  max-width: 500px;
+}

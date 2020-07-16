@@ -1,30 +1,63 @@
 <!doctype html>
 <html>
   <head>
-    <title>Hello, C++ Web Server!</title>
-
-<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
-
-<script>
-$(document).ready(function(){
-  $("button").click(function(){
-    $.ajax({url: "/status.json", success: function(response) {
-      $.each(response, function(i, item) {
-        $('<tr>').html(
-          "<td>" + response[i].type + "</td><td>" + response[i].id + "</td><td>" + response[i].status + "</td>").appendTo('#records_table');
-      });
-    }});
-  });
-});
-</script>
-
+    <title>zPages TraceZ</title>
+    <script src="script.js"></script>
+    <link href="style.css" rel="stylesheet">
   </head>
   <body>
-    <div align="center">
-      <img width="640" height="240" src="images/opentelemetry.png" />
-      <p class="sample">Hello, C++ Web Server!</p>
-      <table id="records_table"></table>
-      <button>Click here to refresh</button>
-    </div>
+    <img src="images/opentelemetry.png" />
+    <h1>zPages TraceZ</h1>
+
+    <button onclick="loadTracezTable()">Add Spans</button>
+    <br><br>
+
+    <table id="headers">
+      <colgroup>
+        <col class="md">
+        <col class="sm">
+        <col class="sm">
+        <col class="lg">
+      </colgroup>
+      <tr>
+        <th>Span Name</th>
+        <th>Error Samples</th>
+        <th>Running</th>
+        <th>Latency Samples</th>
+      </tr>
+    </table>
+    <table id="records_table">
+      <!-- Sizing for Latency Headers -->
+      <colgroup>
+        <col class="md">
+        <col class="sm">
+        <col class="sm">
+        <col class="sm">
+        <col class="sm">
+        <col class="sm">
+        <col class="sm">
+        <col class="sm">
+        <col class="sm">
+        <col class="sm">
+        <col class="sm">
+        <col class="sm">
+      </colgroup>
+      <tr>
+        <!-- Latency Bucket Numbers -->
+        <th></th>
+        <th></th>
+        <th></th>
+        <th>>0s</th>
+        <th>>10μs</th>
+        <th>>100μs</th>
+        <th>>1ms</th>
+        <th>>10ms</th>
+        <th>>100ms</th>
+        <th>>1s</th>
+        <th>>10s</th>
+        <th>>10m0s</th>
+      </tr>
+      <!-- spans are appended here -->
+    </table>
   </body>
 </html>
