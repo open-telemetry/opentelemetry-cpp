@@ -201,7 +201,7 @@ private:
 
 ### **Meter API Class Design Considerations**
 
-According to the specification, both signed integer and floating point value types must be supported.  This implementation will use int64 and double types. Though int64 is more memory intensive than a standard int32, logs can easily measure quantities exceeding 2 billion. Different constructors are used for the different metric instruments and even for different value types due to C++ being a strongly typed language. This is identical to Java’s implementation of the meter class. Python gets around this by passing the value type and metric type to a single function called `create_metric`. A C++ implementation in this way would require the use of templates which would greatly increase the complexity of the code while offering only small benefits to users.
+According to the specification, both signed integer and floating point value types must be supported.  This implementation will use short, int, float, and double types. Different constructors are used for the different metric instruments and even for different value types due to C++ being a strongly typed language. This is similar to Java’s implementation of the meter class. Python gets around this by passing the value type and metric type to a single function called `create_metric`.
 
 ## **Instrument Types (`Metric` Class)**
 
@@ -335,6 +335,7 @@ public:
 ```
 
 ```
+template <class T>
 class SynchronousInstrument: public Instrument {
 public:
     SynchronousInstrument() = default;
@@ -362,8 +363,9 @@ public:
     * @param value the numerical representation of the metric being captured
     * @return void
    */
-    void update(common::AttributeValue value, nostd::KeyValueIterable labels); //add or record
+    void update(T value, nostd::KeyValueIterable labels); //add or record
 };
+template <class T>
 class BoundSynchronousInstrument: public Instrument {
 
 public:
@@ -389,9 +391,10 @@ public:
     * @param value the numerical representation of the metric being captured
     * @return void
    */
-    void update(common::AttributeValue value); //add or record
+    void update(T value); //add or record
 };
 
+template <class T>
 class AsynchronousInstrument: public Instrument{
 
 public:
@@ -412,13 +415,14 @@ public:
 The Counter below is an example of one Metric instrument.  It is important to note that in the Counter’s add function, it binds the labels to the instrument before calling add, then unbinds.  Therefore all interactions with the aggregator take place through bound instruments and by extension, the BaseBoundInstrument Class.
 
 ```
-lass BoundIntCounter: public BoundSynchronousInstrument{ //override bind?
+template <class T>
+class BoundCounter: public BoundSynchronousInstrument{ //override bind?
 
 public:
 
-    BoundIntCounter() = default;
+    BoundCounter() = default;
 
-    BoundIntCounter(nostd::string_view name, nostd::string_view description, nostd::string_view unit, bool enabled);
+    BoundCounter(nostd::string_view name, nostd::string_view description, nostd::string_view unit, bool enabled);
 
     /*
     * Add adds the value to the counter's sum. The labels are already linked   * to the instrument and are not specified. 
@@ -426,18 +430,19 @@ public:
     * @param value the numerical representation of the metric being captured
     * @param labels the set of labels, as key-value pairs
     */
-    void add(int value, nostd::KeyValueIterable labels);
+    void add(T value, nostd::KeyValueIterable labels);
 
     void unbind();
 };
 
-class IntCounter: public SynchronousInstrument{
+template <class T>
+class Counter: public SynchronousInstrument{
 
 public:
 
-    IntCounter() = default;
+    Counter() = default;
 
-    IntCounter(nostd::string_view name, nostd::string_view description, nostd::string_view unit, bool enabled);
+    Counter(nostd::string_view name, nostd::string_view description, nostd::string_view unit, bool enabled);
 
     /*
     * Bind creates a bound instrument for this counter. The labels are
@@ -446,7 +451,7 @@ public:
     * @param labels the set of labels, as key-value pairs.
     * @return a BoundIntCounter tied to the specified labels
     */ 
-    BoundIntCounter bind(nostd::KeyValueIterable labels);
+    BoundCounter bind(nostd::KeyValueIterable labels);
 
     /*
     * Add adds the value to the counter's sum by sending to aggregator. The labels should contain
@@ -455,10 +460,11 @@ public:
     * @param value the numerical representation of the metric being captured
     * @param labels the set of labels, as key-value pairs
     */
-    void add(int value, nostd::KeyValueIterable labels);
+    void add(T value, nostd::KeyValueIterable labels);
 };
 
-class IntValueObserver: public AsynchronousInstrument{
+template <class T>
+class ValueObserver: public AsynchronousInstrument{
 public:
     /*
     * Add adds the value to the counter's sum. The labels should contain
@@ -467,7 +473,7 @@ public:
     * @param value the numerical representation of the metric being captured
     * @param labels the set of labels, as key-value pairs
     */
-    void observe(int value, std::string_view &labels) override;
+    void observe(T value, KeyValueIterable &labels) override;
 private:
     // Callback function which takes a pointer to an Asynchronous instrument (this) 
     // type which is stored in an observer result type and returns nothing.  
@@ -478,35 +484,26 @@ private:
 
 ```
 // The above Counter and BoundCounter are examples of 1 metric instrument.  
-// The remaining 5 will also be implemented in a similar fashion. With Int and 
-// Double for each metric instrument
+// The remaining 5 will also be implemented in a similar fashion.
 
-class IntUpDownCounter: public SynchronousInstrument;
-class DoubleUpDownCounter: public SynchronousInstrument;
+class UpDownCounter: public SynchronousInstrument;
+class BoundUpDownCounter: public BoundSynchronousInstrument;
 
-class IntValueRecorder: public SynchronousInstrument;
-class DoubleValueRecorder: public SynchronousInstrument;
+class ValueRecorder: public SynchronousInstrument;
+class BoundValueRecorder: public BoundSynchronousInstrument;
 
-class IntSumObserver: public AsynchronousInstrument;
-class DoubleSumObserver: public AsynchronousInstrument;
+class SumObserver: public AsynchronousInstrument;
+class BoundSumObserver: public AsynchronousInstrument;
 
-class IntUpDownSumObserver: public AsynchronousInstrument;
-class DoubleUpDownSumObserver: public AsynchronousInstrument;
+class UpDownSumObserver: public AsynchronousInstrument;
+class BoundUpDownSumObserver: public AsynchronousInstrument;
 
-class IntValueObserver: public AsynchronousInstrument;
-class DoubleValueObserver: public AynchronousInstrument;
-
-
-
-class BoundIntUpDownCounter: public BoundSynchronousInstrument;
-class BoundDoubleUpDownCounter: public BoundSynchronousInstrument;
-
-class BoundIntValueRecorder: public BoundSynchronousInstrument;
-class BoundDoubleValueRecorder: public BoundSynchronousInstrument;
+class ValueObserver: public AsynchronousInstrument;
+class BoundValueObserver: public AsynchronousInstrument;
 ```
 
 ### **Metric Class Design Considerations**:
 
 OpenTelemetry requires several types of metric instruments with very similar core usage, but slightly different tracking schemes.  As such, a base Metric class defines the necessary functions for each instrument leaving the implementation for the specific instrument type.  Each instrument then inherits from this base class making the necessary modifications.  In order to facilitate efficient aggregation of labeled data, a complementary BoundInstrument class is included which attaches the same set of labels to each capture.  Knowing that all data in an instrument has the same labels enhances the efficiency of any post-collection calculations as there is no need for filtering or separation.  In the above code examples, a Counter instrument is shown but all 6 mandated by the specification will be supported.
 
-A base BoundInstrument class also serves as the foundation for more specific bound instruments.  It also facilitates the practice of reference counting which can determine when an instrument is unused and can improve memory optimization as inactive instruments can be removed for performance.
+A base BoundInstrument class also serves as the foundation for more specific bound instruments.  It also facilitates the practice of reference counting which can determine when an instrument is unused and can improve memory optimization as inactive bound instruments can be removed for performance.
