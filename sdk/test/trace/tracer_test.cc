@@ -167,45 +167,108 @@ TEST(Tracer, StartSpanWithOptionsTime)
 
 TEST(Tracer, StartSpanWithAttributes)
 {
-  std::shared_ptr<std::vector<std::unique_ptr<SpanData>>> spans_received_1(
+  std::shared_ptr<std::vector<std::unique_ptr<SpanData>>> spans_received(
       new std::vector<std::unique_ptr<SpanData>>);
   // The default tracer has empty sampling result attribute
-  auto tracer_default = initTracer(spans_received_1);
+  auto tracer = initTracer(spans_received);
 
-  {
-    tracer_default->StartSpan("span 1", {{"attr1", 314159}, {"attr2", false}, {"attr1", "string"}});
+  // Start a span with all supported scalar attribute types.
+  tracer->StartSpan("span 1", {{"attr1", "string"},
+                               {"attr2", false},
+                               {"attr1", 314159},
+                               {"attr3", (unsigned int)314159},
+                               {"attr4", (int64_t)-20},
+                               {"attr5", (uint64_t)20},
+                               {"attr6", 3.1},
+                               {"attr7", "string"}});
 
-    std::map<std::string, common::AttributeValue> m;
-    m["attr3"] = 3.0;
-    tracer_default->StartSpan("span 2", m);
-  }
+  // Start a span with all supported array attribute types.
+  int listInt[]                       = {1, 2, 3};
+  unsigned int listUInt[]             = {1, 2, 3};
+  int64_t listInt64[]                 = {1, -2, 3};
+  uint64_t listUInt64[]               = {1, 2, 3};
+  double listDouble[]                 = {1.1, 2.1, 3.1};
+  bool listBool[]                     = {true, false};
+  nostd::string_view listStringView[] = {"a", "b"};
+  std::map<std::string, common::AttributeValue> m;
+  m["attr1"] = nostd::span<int>(listInt);
+  m["attr2"] = nostd::span<unsigned int>(listUInt);
+  m["attr3"] = nostd::span<int64_t>(listInt64);
+  m["attr4"] = nostd::span<uint64_t>(listUInt64);
+  m["attr5"] = nostd::span<double>(listDouble);
+  m["attr6"] = nostd::span<bool>(listBool);
+  m["attr7"] = nostd::span<nostd::string_view>(listStringView);
+  tracer->StartSpan("span 2", m);
 
-  ASSERT_EQ(2, spans_received_1->size());
+  ASSERT_EQ(2, spans_received->size());
 
-  auto &span_data = spans_received_1->at(0);
-  ASSERT_EQ(2, span_data->GetAttributes().size());
-  ASSERT_EQ("string", nostd::get<nostd::string_view>(span_data->GetAttributes().at("attr1")));
+  auto &span_data = spans_received->at(0);
+  ASSERT_EQ(7, span_data->GetAttributes().size());
+  ASSERT_EQ(314159, nostd::get<int64_t>(span_data->GetAttributes().at("attr1")));
   ASSERT_EQ(false, nostd::get<bool>(span_data->GetAttributes().at("attr2")));
+  ASSERT_EQ(314159, nostd::get<uint64_t>(span_data->GetAttributes().at("attr3")));
+  ASSERT_EQ(-20, nostd::get<int64_t>(span_data->GetAttributes().at("attr4")));
+  ASSERT_EQ(20, nostd::get<uint64_t>(span_data->GetAttributes().at("attr5")));
+  ASSERT_EQ(3.1, nostd::get<double>(span_data->GetAttributes().at("attr6")));
+  ASSERT_EQ("string", nostd::get<std::string>(span_data->GetAttributes().at("attr7")));
 
-  auto &span_data2 = spans_received_1->at(1);
-  ASSERT_EQ(1, span_data2->GetAttributes().size());
-  ASSERT_EQ(3.0, nostd::get<double>(span_data2->GetAttributes().at("attr3")));
+  auto &span_data2 = spans_received->at(1);
+  ASSERT_EQ(7, span_data2->GetAttributes().size());
+  ASSERT_EQ(std::vector<int64_t>({1, 2, 3}),
+            nostd::get<std::vector<int64_t>>(span_data2->GetAttributes().at("attr1")));
+  ASSERT_EQ(std::vector<uint64_t>({1, 2, 3}),
+            nostd::get<std::vector<uint64_t>>(span_data2->GetAttributes().at("attr2")));
+  ASSERT_EQ(std::vector<int64_t>({1, -2, 3}),
+            nostd::get<std::vector<int64_t>>(span_data2->GetAttributes().at("attr3")));
+  ASSERT_EQ(std::vector<uint64_t>({1, 2, 3}),
+            nostd::get<std::vector<uint64_t>>(span_data2->GetAttributes().at("attr4")));
+  ASSERT_EQ(std::vector<double>({1.1, 2.1, 3.1}),
+            nostd::get<std::vector<double>>(span_data2->GetAttributes().at("attr5")));
+  ASSERT_EQ(std::vector<bool>({true, false}),
+            nostd::get<std::vector<bool>>(span_data2->GetAttributes().at("attr6")));
+  ASSERT_EQ(std::vector<std::string>({"a", "b"}),
+            nostd::get<std::vector<std::string>>(span_data2->GetAttributes().at("attr7")));
+}
 
-  std::shared_ptr<std::vector<std::unique_ptr<SpanData>>> spans_received_2(
+TEST(Tracer, StartSpanWithAttributesCopy)
+{
+  std::shared_ptr<std::vector<std::unique_ptr<SpanData>>> spans_received(
       new std::vector<std::unique_ptr<SpanData>>);
-  // The default tracer has two elements in the sampling result attribute
-  auto tracer_mock = initTracer(spans_received_2, std::make_shared<MockSampler>());
+  auto tracer = initTracer(spans_received);
+
   {
-    tracer_mock->StartSpan("span 3", {{"attr1", 314159}, {"attr2", false}});
+    std::unique_ptr<std::vector<int>> numbers(new std::vector<int>);
+    numbers->push_back(1);
+    numbers->push_back(2);
+    numbers->push_back(3);
+
+    std::unique_ptr<std::vector<nostd::string_view>> strings(new std::vector<nostd::string_view>);
+    std::string s1("a");
+    std::string s2("b");
+    std::string s3("c");
+    strings->push_back(s1);
+    strings->push_back(s2);
+    strings->push_back(s3);
+    tracer->StartSpan("span 1",
+                      {{"attr1", *numbers}, {"attr2", nostd::span<nostd::string_view>(*strings)}});
   }
-  auto &span_data3 = spans_received_2->at(0);
-  // Span 3 has a total of four attributes: two from StartSpan and two from the sampler.
-  ASSERT_EQ(4, span_data3->GetAttributes().size());
-  ASSERT_EQ(314159, nostd::get<int>(span_data3->GetAttributes().at("attr1")));
-  ASSERT_EQ(false, nostd::get<bool>(span_data3->GetAttributes().at("attr2")));
-  ASSERT_EQ(123, nostd::get<int>(span_data3->GetAttributes().at("sampling_attr1")));
-  ASSERT_EQ("string",
-            nostd::get<nostd::string_view>(span_data3->GetAttributes().at("sampling_attr2")));
+
+  ASSERT_EQ(1, spans_received->size());
+
+  auto &span_data = spans_received->at(0);
+  ASSERT_EQ(2, span_data->GetAttributes().size());
+
+  auto numbers = nostd::get<std::vector<int64_t>>(span_data->GetAttributes().at("attr1"));
+  ASSERT_EQ(3, numbers.size());
+  ASSERT_EQ(1, numbers[0]);
+  ASSERT_EQ(2, numbers[1]);
+  ASSERT_EQ(3, numbers[2]);
+
+  auto strings = nostd::get<std::vector<std::string>>(span_data->GetAttributes().at("attr2"));
+  ASSERT_EQ(3, strings.size());
+  ASSERT_EQ("a", strings[0]);
+  ASSERT_EQ("b", strings[1]);
+  ASSERT_EQ("c", strings[2]);
 }
 
 TEST(Tracer, GetSampler)
