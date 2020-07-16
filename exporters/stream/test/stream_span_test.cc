@@ -97,9 +97,7 @@ TEST(StreamSpanExporter, PrintChangedSpanCout)
   recordable->SetDuration(std::chrono::nanoseconds(100));
   recordable->SetStatus(opentelemetry::trace::CanonicalCode::UNIMPLEMENTED,"Test Description");
 
-  recordable->SetAttribute("attr1", 314159);
-  recordable->SetAttribute("attr2", false);
-  recordable->SetAttribute("attr3", "string");
+  recordable->SetAttribute("attr1", "string");
 
   // Create stringstream to redirect to
   std::stringstream stdoutOutput;
@@ -126,7 +124,7 @@ TEST(StreamSpanExporter, PrintChangedSpanCout)
   "  duration      : 100\n"
   "  description   : Test Description\n"
   "  status        : UNIMPLEMENTED\n"
-  "  attributes    : attr1: 314159 attr3: string attr2: 0 \n"
+  "  attributes    : attr1: string \n"
   "}\n"; 
   ASSERT_EQ(stdoutOutput.str(),expectedOutput);
 }
