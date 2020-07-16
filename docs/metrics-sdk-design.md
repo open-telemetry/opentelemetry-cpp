@@ -233,14 +233,52 @@ private:
 ```
 # record.h
 
-struct Record {
-  MetricKind metricKind;
-  string name;
-  string labels;
-  string description;
-  std::variant<vector<int>, vector<double>> value; // Various values
-                                                   // held by different aggregators.
-}
+
+/*
+ * This class is used to pass checkpointed values from the Meter
+ * class, to the processor, to the exporter. This class is not
+ * templated but instead uses variants in order to avoid needing
+ * to template the exporters.
+ *
+ */
+class Record
+{
+public:
+  explicit Record(std::string name, std::string description,
+                  metrics_api::BoundInstrumentKind instrumentKind,
+                  std::map<std::string, std::string> labels,
+                  std::variant<std::vector<short>, std::vector<int>, std::vector<float>, std::vector<double>> value,
+                  core::SystemTimestamp timestamp = core::SystemTimestamp(std::chrono::system_clock::now()))
+  {
+    name_ = name;
+    description_ = description;
+    instrumentKind_ = instrumentKind;
+    labels_ = labels;
+    value_ = value;
+    timestamp_ = timestamp;
+  }
+
+  template<typename T>
+  void SetValue(std::vector<T> value)
+  {
+    value_ = value;
+  }
+
+  string GetName() {return name_;}
+  sstring GetDescription() {return description_;}
+  BoundInstrumentKind GetInstrumentKind() {return instrumentKind_;}
+  map<string, string> GetLabels() {return labels_;}
+  variant<vector<short>, vector<int>, vector<float>, vector<double>> GetValue() {return value_;}
+  cSystemTimestamp GetTimestamp() {return timestamp_;}
+
+private:
+  string name_;
+  string description_;
+  BoundInstrumentKind instrumentKind_;
+  map<string, string> labels_;
+  variant<vector<short>, vector<int>, vector<float>, vector<double>> value_;
+  cSystemTimestamp timestamp_;
+};
 ```
 
 Metric instruments created from this Meter class will be stored in a map (or another, similar container [needs to be nostd]) called “metrics.” This is identical to the Python implementation and makes sense because the SDK implementation of the `Meter` class should have a function titled `collect_all()` that collects metrics for every instrument created from this meter. In contrast, Java’s implementation has a `MeterSharedState` class that contains a registry (hash map) of all metric instruments spawned from this meter. However, since each `Meter` has its own unique instruments it is easier to store the instruments in the meter itself.
