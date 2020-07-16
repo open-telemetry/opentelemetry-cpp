@@ -54,7 +54,7 @@ sdktrace::ExportResult StreamSpanExporter::Export(
               << "\n  description   : " << span->GetDescription() 
               << "\n  status        : " << statusMap[int(span->GetStatus())]
               << "\n  attributes    : ";
-              printAttributes(sout_, span->GetAttributes());
+              printAttributes(span->GetAttributes());
       }
     }
 

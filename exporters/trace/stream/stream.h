@@ -81,9 +81,9 @@ private:
   */
 
   template <typename T>
-  static void print_array(std::ostream &ss, common::AttributeValue &value, bool jsonTypes = false)
+  void print_array(common::AttributeValue &value, bool jsonTypes = false)
   {
-    ss << '[';
+    sout_ << '[';
     // TODO: jsonTypes for bool?
     // TODO: do we need to escape string value for JSON?
     auto s    = nostd::get<nostd::span<const T>>(value);
@@ -91,16 +91,15 @@ private:
     size_t sz = s.size();
     for (auto v : s)
     {
-      ss << v; // TODO: nostd::string_view type needs quotes!
+      sout_ << v; // TODO: nostd::string_view type needs quotes!
       if (i != sz)
-        ss << ',';
+        sout_ << ',';
       i++;
     };
-    ss << ']';
+    sout_ << ']';
   };
 
-  static void print_value(std::ostream &ss,
-                          common::AttributeValue &value,
+  void print_value(common::AttributeValue &value,
                           bool jsonTypes = false)
   {
     switch (value.index())
@@ -108,72 +107,71 @@ private:
       case AttributeType::TYPE_BOOL:
         if (jsonTypes)
         {
-          ss << (nostd::get<bool>(value) ? "true" : "false");
+          sout_ << (nostd::get<bool>(value) ? "true" : "false");
         }
         else
         {
-          ss << static_cast<unsigned>(nostd::get<bool>(value));
+          sout_ << static_cast<unsigned>(nostd::get<bool>(value));
         }
         break;
       case AttributeType::TYPE_INT:
-        ss << nostd::get<int>(value);
+        sout_ << nostd::get<int>(value);
         break;
       case AttributeType::TYPE_INT64:
-        ss << nostd::get<int64_t>(value);
+        sout_ << nostd::get<int64_t>(value);
         break;
       case AttributeType::TYPE_UINT:
-        ss << nostd::get<unsigned int>(value);
+        sout_ << nostd::get<unsigned int>(value);
         break;
       case AttributeType::TYPE_UINT64:
-        ss << nostd::get<uint64_t>(value);
+        sout_ << nostd::get<uint64_t>(value);
         break;
       case AttributeType::TYPE_DOUBLE:
-        ss << nostd::get<double>(value);
+        sout_ << nostd::get<double>(value);
         break;
       case AttributeType::TYPE_STRING:
         if (jsonTypes)
-          ss << '"';
+          sout_ << '"';
         // TODO: do we need to escape string value for JSON?
-        ss << nostd::get<nostd::string_view>(value);
+        sout_ << nostd::get<nostd::string_view>(value);
         if (jsonTypes)
-          ss << '"';
+          sout_ << '"';
         break;
       case AttributeType::TYPE_SPAN_BOOL:
-        print_array<bool>(ss, value, jsonTypes);
+        print_array<bool>(value, jsonTypes);
         break;
       case AttributeType::TYPE_SPAN_INT:
-        print_array<int>(ss, value, jsonTypes);
+        print_array<int>(value, jsonTypes);
         break;
       case AttributeType::TYPE_SPAN_INT64:
-        print_array<int64_t>(ss, value, jsonTypes);
+        print_array<int64_t>(value, jsonTypes);
         break;
       case AttributeType::TYPE_SPAN_UINT:
-        print_array<unsigned int>(ss, value, jsonTypes);
+        print_array<unsigned int>(value, jsonTypes);
         break;
       case AttributeType::TYPE_SPAN_UINT64:
-        print_array<uint64_t>(ss, value, jsonTypes);
+        print_array<uint64_t>(value, jsonTypes);
         break;
       case AttributeType::TYPE_SPAN_DOUBLE:
-        print_array<double>(ss, value, jsonTypes);
+        print_array<double>(value, jsonTypes);
         break;
       case AttributeType::TYPE_SPAN_STRING:
         // TODO: print_array doesn't provide the proper quotes
-        print_array<nostd::string_view>(ss, value, jsonTypes);
+        print_array<nostd::string_view>(value, jsonTypes);
         break;
     }
   }
 
-  void printAttributes(std::ostream &ss,
-                       std::unordered_map<std::string, common::AttributeValue> map)
+  void printAttributes(std::unordered_map<std::string, common::AttributeValue> map)
   {
     for(auto kv : map)
     {
-      ss << kv.first << ": ";
-      print_value(ss, kv.second);
-      ss << " ";
+      sout_ << kv.first << ": ";
+      print_value(kv.second);
+      sout_ << " ";
     }
 
-    ss << "\n}\n";
+    sout_ << "\n}\n";
   }
   
 };
