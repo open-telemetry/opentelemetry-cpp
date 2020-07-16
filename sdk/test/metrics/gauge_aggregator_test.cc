@@ -82,7 +82,7 @@ TEST(GaugeAggregator, Types)
   auto agg_int = new GaugeAggregator<int>(opentelemetry::metrics::BoundInstrumentKind::BoundIntCounter);
   auto agg_long = new GaugeAggregator<long>(opentelemetry::metrics::BoundInstrumentKind::BoundIntCounter);
   auto agg_float = new GaugeAggregator<float>(opentelemetry::metrics::BoundInstrumentKind::BoundIntCounter);
-  auto agg_double = new GaugeAggregator<int>(opentelemetry::metrics::BoundInstrumentKind::BoundIntCounter);
+  auto agg_double = new GaugeAggregator<double>(opentelemetry::metrics::BoundInstrumentKind::BoundIntCounter);
 
   for (int i = 1; i <= 10; ++i)
   {
