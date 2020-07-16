@@ -114,23 +114,6 @@ int main(int argc, char* argv[])
             return 200;
         };
 
-        // Simple plain text response
-        if (req.uri.substr(0, 8) == "/simple/")
-        {
-            resp.headers[CONTENT_TYPE] = CONTENT_TYPE_TEXT;
-            resp.body = "It works!";
-            return atoi(req.uri.substr(8).c_str());
-        }
-
-        // Echo back the contents of what we received in HTTP POST
-        if (req.uri == "/echo/")
-        {
-            auto it = req.headers.find(CONTENT_TYPE);
-            resp.headers[CONTENT_TYPE] = (it != req.headers.end()) ? it->second : CONTENT_TYPE_BIN;
-            resp.body = req.content;
-            return 200;
-        }
-
         // Simple counter that tracks requests processed
         if (req.uri.substr(0, 7) == "/count/")
         {
@@ -145,8 +128,6 @@ int main(int argc, char* argv[])
     }};
 
     server["/status.json"] = cb;
-    server["/simple/"] = cb;
-    server["/echo/"] = cb;
     server["/count/"] = cb;
 
     HttpRequestCallback fileSystemCb{[&](HttpRequest const& req, HttpResponse& resp) {
