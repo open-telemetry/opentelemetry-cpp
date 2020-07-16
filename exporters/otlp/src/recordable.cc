@@ -23,8 +23,9 @@ void Recordable::SetAttribute(nostd::string_view key,
 {
   // Assert size of variant to ensure that this method gets updated if the variant
   // definition changes
-  static_assert(nostd::variant_size<opentelemetry::common::AttributeValue>::value ==
-                kAttributeValueSize);
+  static_assert(
+      nostd::variant_size<opentelemetry::common::AttributeValue>::value == kAttributeValueSize,
+      "AttributeValue contains unknown type");
 
   auto *attribute = span_.add_attributes();
   attribute->set_key(key.data(), key.size());
