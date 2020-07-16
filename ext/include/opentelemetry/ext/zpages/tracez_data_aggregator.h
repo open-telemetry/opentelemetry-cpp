@@ -88,24 +88,26 @@ struct TracezData {
  * The only exposed function is a getter that returns a copy of the aggregated
  * data when requested. This function is ensured to be called in sequence to the 
  * aggregate spans function which is called periodically.
+ *
+ * TODO: Consider a singleton pattern for this class, not sure if multiple
+ * instances of this class should exist.
  */
 class TracezDataAggregator {
  public:
   /**
-   * Constructor runs a thread that calls a function to aggregate span data
+   * Constructor creates a thread that calls a function to aggregate span data
    * at regular intervals.
    * @param span_processor is the tracez span processor to be set
-   * @param update_interval_in_milliseconds the time duration for updating the
-   * aggregated data.
+   * @param update_interval the time duration for updating the aggregated data.
    */
   TracezDataAggregator(std::shared_ptr<TracezSpanProcessor> span_processor,
-                       long update_interval_in_milliseconds = 10);
+                        milliseconds update_interval = milliseconds(10));
 
   /** Ends the thread set up in the constructor and destroys the object **/
   ~TracezDataAggregator();
 
   /**
-   * GetAggregatedTracezData aggregates data and returns the updated data.
+   * GetAggregatedTracezData returns a copy of the updated data.
    * @returns a map with the span name as key and the tracez span data as value.
    */
   std::map<std::string, TracezData> GetAggregatedTracezData();
@@ -132,7 +134,7 @@ class TracezDataAggregator {
    * which data has already been collected in a previous call. There seems to be
    * no trivial to way to know if it is a new or old running span so at every
    * call to this function the available running span data is reset and
-   * recalcuated.
+   * recalcuated, this is done so that no extra time is taken.
    * @param running_spans is the running spans to be aggregated.
    */
   void AggregateRunningSpans(std::unordered_set<SpanData*>& running_spans);
@@ -152,7 +154,7 @@ class TracezDataAggregator {
   void AggregateStatusErrorSpan(std::unique_ptr<SpanData>& error_span);
 
   /**
-   * FindLatencyBoundary returns the latency boundary to which the duration of
+   * FindLatencyBoundary finds the latency boundary to which the duration of
    * the given span_data belongs to
    * @ param span_data is the SpanData whose duration for which the latency
    * boundary is to be found
@@ -184,6 +186,7 @@ class TracezDataAggregator {
    * span names, one solution could be to implement a LRU cache that trims the
    * DS based on frequency of usage of a span name.
    */
+  std::mutex mtx_;
   std::map<std::string, TracezData> aggregated_tracez_data_;
 
   /** A boolean that is set to true in the constructor and false in the
@@ -197,7 +200,7 @@ class TracezDataAggregator {
   /** Condition variable that notifies the thread when object is about to be
   destroyed **/
   std::condition_variable cv_;
-  std::mutex mtx_;
+ 
 };
 
 }  // namespace zpages

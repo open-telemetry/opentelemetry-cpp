@@ -6,17 +6,17 @@ namespace zpages {
 
 TracezDataAggregator::TracezDataAggregator(
     std::shared_ptr<TracezSpanProcessor> span_processor,
-    long update_interval_in_milliseconds) {
+    milliseconds update_interval) {
   tracez_span_processor_ = span_processor;
 
   // Start a thread that calls AggregateSpans periodically or till notified.
   execute_.store(true, std::memory_order_release);
   aggregate_spans_thread_ =
-      std::thread([this, update_interval_in_milliseconds]() {
+      std::thread([this, update_interval]() {
         while (execute_.load(std::memory_order_acquire)) {
           std::unique_lock<std::mutex> lock(mtx_);
           AggregateSpans();
-          cv_.wait_for(lock, milliseconds(update_interval_in_milliseconds));
+          cv_.wait_for(lock, update_interval);
         }
       });
 }
@@ -35,9 +35,9 @@ TracezDataAggregator::GetAggregatedTracezData() {
   std::unique_lock<std::mutex> lock(mtx_);
   /** 
    * TODO: At the moment a copy of the aggregated data is returned from this
-   * getter to avoid simplify things and avoid concurrency issues. When it 
+   * getter to simplify things and avoid concurrency issues. When it 
    * becomes more clear what type of object is needed by the zPage HTTP server 
-   * (most likely a JSON), this function will be changed accordingily.
+   * (most likely a JSON), this function may be changed accordingily.
    **/
   std::map<std::string, TracezData> aggregated_tracez_data_cpy 
     = aggregated_tracez_data_;
@@ -71,6 +71,8 @@ void TracezDataAggregator::AggregateStatusOKSpan(
     std::unique_ptr<SpanData> &ok_span) {
   // Find and update boundary of aggregated data that span belongs
   auto boundary_name = FindLatencyBoundary(ok_span.get());
+  
+  // Get the data for name in aggrgation and update count and sample spans
   auto &tracez_data = aggregated_tracez_data_.at(ok_span->GetName().data());
   InsertIntoSampleSpanList(tracez_data.sample_latency_spans[boundary_name],
                            ok_span);
@@ -79,6 +81,8 @@ void TracezDataAggregator::AggregateStatusOKSpan(
 
 void TracezDataAggregator::AggregateStatusErrorSpan(
     std::unique_ptr<SpanData> &error_span) {
+    
+  // Get data for name in aggregation and update count and sample spans
   auto &tracez_data = aggregated_tracez_data_.at(error_span->GetName().data());
   InsertIntoSampleSpanList(tracez_data.sample_error_spans, error_span);
   tracez_data.error_span_count++;
@@ -86,6 +90,7 @@ void TracezDataAggregator::AggregateStatusErrorSpan(
 
 void TracezDataAggregator::AggregateCompletedSpans(
     std::vector<std::unique_ptr<SpanData>> &completed_spans) {
+  
   for (auto &span : completed_spans) {
     std::string span_name = span->GetName().data();
 
@@ -99,7 +104,7 @@ void TracezDataAggregator::AggregateCompletedSpans(
      * exists running spans with the same span name it will be recalculated in
      * the function call to aggregate running spans.
      * This is done because if a running span is moved to completed span and
-     * there exists no span names with the same name as the moved span
+     * there exists no running spans with the same name as the moved span
      * the running span data for that span will never be reset.
      */
     aggregated_tracez_data_[span_name].running_span_count = 0;
@@ -115,8 +120,10 @@ void TracezDataAggregator::AggregateCompletedSpans(
 void TracezDataAggregator::AggregateRunningSpans(
     std::unordered_set<SpanData *> &running_spans) {
   std::unordered_set<std::string> seen_span_names;
+  
   for (auto &span : running_spans) {
     std::string span_name = span->GetName().data();
+    
     if (aggregated_tracez_data_.find(span_name) ==
         aggregated_tracez_data_.end()) {
       aggregated_tracez_data_[span_name] = TracezData();
