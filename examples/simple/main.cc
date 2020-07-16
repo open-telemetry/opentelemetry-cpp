@@ -3,8 +3,7 @@
 #include "opentelemetry/trace/provider.h"
 
 // Using an exporter that simply dumps span data to stdout.
-#include "exporters/trace/stream/stream.h"
-
+#include "opentelemetry/exporters/stream/span_exporter.h"
 #include "foo_library/foo_library.h"
 
 namespace

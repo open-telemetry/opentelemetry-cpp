@@ -1,13 +1,14 @@
 package(default_visibility = ["//visibility:public"])
 
 cc_library(
-    name = "stream_span",
+    name = "stream_span_exporter",
     srcs = [
-        "stream.cc",
+        "src/span_exporter.cc",
     ],
     hdrs = [
-        "stream.h",
+        "include/opentelemetry/exporters/stream/span_exporter.h",
     ],
+    strip_include_prefix = "include",
     deps = [
         "//sdk/src/trace",
     ],
@@ -15,9 +16,9 @@ cc_library(
 
 cc_test(
     name = "stream_span_test",
-    srcs = ["stream_span_test.cc"],
+    srcs = ["test/stream_span_test.cc"],
     deps = [
-        ":stream_span",
+        ":stream_span_exporter",
         "@com_google_googletest//:gtest_main",
     ],
 )
