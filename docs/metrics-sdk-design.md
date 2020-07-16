@@ -398,24 +398,33 @@ public:
     *
     */
     virtual void Merge(Aggregator other);
+    
+    /*
+     * Getters
+     *
+     */
+     virtual std::vector<T> get_value() {return current_;}
+     virtual std::vector<T> get_checkpoint() {return checkpoint_;}
+     virtual core::SystemTimeStamp get_timestamp() {return last_update_timestamp_;}
        
 private:
-    nostd::vector<Record> current_;
-    nostd::vector<Record> checkpoint_;
-    system::timestamp last_update_timestamp_;
+    std::vector<T> current_;
+    std::vector<T> checkpoint_;
+    core::Systemtimestamp last_update_timestamp_;
 
 };
 ```
 
 ```
 # counter_aggregator.cc
-class CounterAggregator : public Aggregator {
+template <class T>
+class CounterAggregator : public Aggregator<T> {
 
 public:
     explicit CounterAggregator(): current(0), checkpoint(0), 
                                   last_update_timestamp(nullptr){}
 
-    void Update(<T> value) {
+    void Update(T value) {
       // thread lock
       // current += value
       this->last_update_timestamp = time_ns()
