@@ -114,8 +114,18 @@ TEST(MinMaxSumCountAggregator, BadMerge)
   // two aggregators of different numeric types together.
   auto agg1 = new MinMaxSumCountAggregator<int>(opentelemetry::metrics::BoundInstrumentKind::BoundIntCounter);
   auto agg2 = new MinMaxSumCountAggregator<int>(opentelemetry::metrics::BoundInstrumentKind::BoundIntValueRecorder);
+  
+  agg1->update(1);
+  agg2->update(2);
 
   agg1->merge(*agg2);
+  
+  // Verify that the values did NOT merge
+  auto value_set = agg1->get_values();
+  ASSERT_EQ(value[0], 1); // min
+  ASSERT_EQ(value[0], 1); // max
+  ASSERT_EQ(value[0], 1); // sum
+  ASSERT_EQ(value[0], 1); // count
 }
 
 TEST(MinMaxSumCountAggregator, Types)
