@@ -56,13 +56,13 @@ struct TracezData {
    * corresponds to a latency boundary(of which there are 9).
    * The list in each index stores the sample spans for that latency boundary.
    */
-  std::array<std::list<std::unique_ptr<SpanData>>, kLatencyBoundaries.size()>
+  std::array<std::list<std::shared_ptr<SpanData>>, kLatencyBoundaries.size()>
       sample_latency_spans;
 
   /**
    * sample_error_spans is a list that stores the error samples for a span name.
    */
-  std::list<std::unique_ptr<SpanData>> sample_error_spans;
+  std::list<std::shared_ptr<SpanData>> sample_error_spans;
 
   /**
    * sample_running_spans is a list that stores the running span samples for a
@@ -169,7 +169,7 @@ class TracezDataAggregator {
    * @param span_data the span_data to be inserted into list
    */
   void InsertIntoSampleSpanList(
-      std::list<std::unique_ptr<SpanData>>& sample_spans,
+      std::list<std::shared_ptr<SpanData>>& sample_spans,
       std::unique_ptr<SpanData>& span_data);
 
   /** Instance of span processor used to collect raw data **/

@@ -18,7 +18,7 @@ const std::string span_name2 = "span 2";
 const std::string span_name3 = "span 3";
 
 /**
- * NOTE: Due to the absence of way to simulate the passing of time in the
+ * TODO: Due to the absence of way to simulate the passing of time in the
  * testing framework, synthetic delays had to be added in the tests to get the
  * object in question to perform correctly. Later on if something like this is
  * added the tests should be modified accordingly so that there is no external

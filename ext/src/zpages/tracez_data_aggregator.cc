@@ -34,41 +34,13 @@ std::map<std::string, TracezData>
 TracezDataAggregator::GetAggregatedTracezData() {
   std::unique_lock<std::mutex> lock(mtx_);
   /** 
-   * NOTE: At the moment a copy of the aggregated data is returned from this
+   * TODO: At the moment a copy of the aggregated data is returned from this
    * getter to avoid simplify things and avoid concurrency issues. When it 
    * becomes more clear what type of object is needed by the zPage HTTP server 
-   * (most likely a JSON), this function will be changed accordingily. If it is 
-   * decided that a copy will be returned then unique ptrs will be changed to 
-   * shared.
+   * (most likely a JSON), this function will be changed accordingily.
    **/
-  std::map<std::string, TracezData> aggregated_tracez_data_cpy;
-  for (auto &name_to_data : aggregated_tracez_data_) {
-    std::string span_name = name_to_data.first;
-    aggregated_tracez_data_cpy[span_name] = TracezData();
-    auto &data_cpy = aggregated_tracez_data_cpy[span_name];
-    auto &data = name_to_data.second;
-    data_cpy.running_span_count = data.running_span_count;
-    data_cpy.error_span_count = data.error_span_count;
-    data_cpy.completed_span_count_per_latency_bucket =
-        data.completed_span_count_per_latency_bucket;
-
-    auto &error_list_cpy = data_cpy.sample_error_spans;
-    for (auto &span : data.sample_error_spans) {
-      auto span_data = std::unique_ptr<SpanData>(new SpanData(*span));
-      error_list_cpy.push_back(std::move(span_data));
-    }
-
-    for (auto boundary = LatencyBoundary::k0MicroTo10Micro;
-         boundary != LatencyBoundary::k100SecondToMax; ++boundary) {
-      auto &completed_list_cpy = data_cpy.sample_latency_spans[boundary];
-      for (auto &span : data.sample_latency_spans[boundary]) {
-        auto span_data = std::unique_ptr<SpanData>(new SpanData(*span));
-        completed_list_cpy.push_back(std::move(span_data));
-      }
-    }
-
-    data_cpy.sample_running_spans = data.sample_running_spans;
-  }
+  std::map<std::string, TracezData> aggregated_tracez_data_cpy 
+    = aggregated_tracez_data_;
   return aggregated_tracez_data_cpy;
 }
 
@@ -82,7 +54,7 @@ LatencyBoundary TracezDataAggregator::FindLatencyBoundary(SpanData *span_data) {
 }
 
 void TracezDataAggregator::InsertIntoSampleSpanList(
-    std::list<std::unique_ptr<SpanData>> &sample_spans,
+    std::list<std::shared_ptr<SpanData>> &sample_spans,
     std::unique_ptr<SpanData> &span_data) {
   /**
    * Check to see if the sample span list size exceeds the set limit, if it does
