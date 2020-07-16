@@ -105,11 +105,10 @@ class TracezDataAggregator {
   ~TracezDataAggregator();
 
   /**
-   * GetAggregatedTracezData aggregates data and returns the the updated data.
+   * GetAggregatedTracezData aggregates data and returns the updated data.
    * @returns a map with the span name as key and the tracez span data as value.
    */
-  std::map<std::string, std::unique_ptr<TracezData>>
-  GetAggregatedTracezData();
+  std::map<std::string, TracezData> GetAggregatedTracezData();
 
  private:
   /**
@@ -185,8 +184,7 @@ class TracezDataAggregator {
    * span names, one solution could be to implement a LRU cache that trims the
    * DS based on frequency of usage of a span name.
    */
-  std::map<std::string, std::unique_ptr<TracezData>>
-      aggregated_tracez_data_;
+  std::map<std::string, TracezData> aggregated_tracez_data_;
 
   /** A boolean that is set to true in the constructor and false in the
    * destructor to start and end execution of aggregate spans **/

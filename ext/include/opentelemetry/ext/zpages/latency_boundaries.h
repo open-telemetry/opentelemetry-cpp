@@ -49,7 +49,7 @@ enum LatencyBoundary {
   k100SecondToMax
 };
 
-/** Overlaoding ++ operator for easy iteration **/
+/** Overloading ++ operator for easy iteration **/
 inline LatencyBoundary &operator++(LatencyBoundary &latencyBoundary) {
   if (latencyBoundary == LatencyBoundary::k100SecondToMax) {
     throw std::out_of_range("for LatencyBoundary& operator ++");
