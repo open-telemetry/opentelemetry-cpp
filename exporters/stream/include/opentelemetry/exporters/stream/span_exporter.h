@@ -3,7 +3,6 @@
 #include "opentelemetry/sdk/trace/exporter.h"
 #include "opentelemetry/sdk/trace/span_data.h"
 #include "opentelemetry/nostd/type_traits.h"
-#include "opentelemetry/common/attribute_value.h"
 #include <opentelemetry/version.h>
 
 #include <sstream>
@@ -12,24 +11,30 @@
 
 namespace nostd    = opentelemetry::nostd;
 namespace sdktrace = opentelemetry::sdk::trace;
+using SpanDataAttributeValue = nostd::variant<bool,
+                                              int64_t,
+                                              uint64_t,
+                                              double,
+                                              std::string,
+                                              std::vector<bool>,
+                                              std::vector<int64_t>,
+                                              std::vector<uint64_t>,
+                                              std::vector<double>,
+                                              std::vector<std::string>>;
 
 // AttributeType to help with printing attributes
 enum AttributeType
 {
   TYPE_BOOL,
-  TYPE_INT,
   TYPE_INT64,
-  TYPE_UINT,
   TYPE_UINT64,
   TYPE_DOUBLE,
   TYPE_STRING,
-  TYPE_SPAN_BOOL,
-  TYPE_SPAN_INT,
-  TYPE_SPAN_INT64,
-  TYPE_SPAN_UINT,
-  TYPE_SPAN_UINT64,
-  TYPE_SPAN_DOUBLE,
-  TYPE_SPAN_STRING
+  TYPE_VECTOR_BOOL,
+  TYPE_VECTOR_INT64,
+  TYPE_VECTOR_UINT64,
+  TYPE_VECTOR_DOUBLE,
+  TYPE_VECTOR_STRING
 };
 
 OPENTELEMETRY_BEGIN_NAMESPACE
@@ -90,12 +95,12 @@ private:
   */
 
   template <typename T>
-  void print_array(common::AttributeValue & value, bool jsonTypes = false)
+  void print_array(SpanDataAttributeValue &value, bool jsonTypes = false)
   {
     sout_ << '[';
     // TODO: jsonTypes for bool?
     // TODO: do we need to escape string value for JSON?
-    auto s    = nostd::get<nostd::span<const T>>(value);
+    auto s    = nostd::get<std::vector<T>>(value);
     size_t i  = 1;
     size_t sz = s.size();
     for (auto v : s)
@@ -108,7 +113,7 @@ private:
     sout_ << ']';
   }
 
-  void print_value(common::AttributeValue &value,
+  void print_value(SpanDataAttributeValue &value,
                           bool jsonTypes = false)
   {
     switch (value.index())
@@ -123,14 +128,8 @@ private:
           sout_ << static_cast<unsigned>(nostd::get<bool>(value));
         }
         break;
-      case AttributeType::TYPE_INT:
-        sout_ << nostd::get<int>(value);
-        break;
       case AttributeType::TYPE_INT64:
         sout_ << nostd::get<int64_t>(value);
-        break;
-      case AttributeType::TYPE_UINT:
-        sout_ << nostd::get<unsigned int>(value);
         break;
       case AttributeType::TYPE_UINT64:
         sout_ << nostd::get<uint64_t>(value);
@@ -142,36 +141,30 @@ private:
         if (jsonTypes)
           sout_ << '"';
         // TODO: do we need to escape string value for JSON?
-        sout_ << nostd::get<nostd::string_view>(value);
+        sout_ << nostd::get<std::string>(value);
         if (jsonTypes)
           sout_ << '"';
         break;
-      case AttributeType::TYPE_SPAN_BOOL:
+      case AttributeType::TYPE_VECTOR_BOOL:
         print_array<bool>(value, jsonTypes);
         break;
-      case AttributeType::TYPE_SPAN_INT:
-        print_array<int>(value, jsonTypes);
-        break;
-      case AttributeType::TYPE_SPAN_INT64:
+      case AttributeType::TYPE_VECTOR_INT64:
         print_array<int64_t>(value, jsonTypes);
         break;
-      case AttributeType::TYPE_SPAN_UINT:
-        print_array<unsigned int>(value, jsonTypes);
-        break;
-      case AttributeType::TYPE_SPAN_UINT64:
+      case AttributeType::TYPE_VECTOR_UINT64:
         print_array<uint64_t>(value, jsonTypes);
         break;
-      case AttributeType::TYPE_SPAN_DOUBLE:
+      case AttributeType::TYPE_VECTOR_DOUBLE:
         print_array<double>(value, jsonTypes);
         break;
-      case AttributeType::TYPE_SPAN_STRING:
+      case AttributeType::TYPE_VECTOR_STRING:
         // TODO: print_array doesn't provide the proper quotes
-        print_array<nostd::string_view>(value, jsonTypes);
+        print_array<std::string>(value, jsonTypes);
         break;
     }
   }
 
-  void printAttributes(const std::unordered_map<std::string, common::AttributeValue> map)
+  void printAttributes(std::unordered_map<std::string, SpanDataAttributeValue> map)
   {
     for(auto kv : map)
     {

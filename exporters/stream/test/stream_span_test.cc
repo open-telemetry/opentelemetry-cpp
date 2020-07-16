@@ -6,7 +6,7 @@
 
 #include "opentelemetry/sdk/trace/exporter.h"
 
-#include "exporters/trace/stream/stream.h"
+#include "opentelemetry/exporters/stream/span_exporter.h"
 
 
 #include <iostream>
