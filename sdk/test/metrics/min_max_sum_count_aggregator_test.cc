@@ -122,10 +122,10 @@ TEST(MinMaxSumCountAggregator, BadMerge)
   
   // Verify that the values did NOT merge
   auto value_set = agg1->get_values();
-  ASSERT_EQ(value[0], 1); // min
-  ASSERT_EQ(value[0], 1); // max
-  ASSERT_EQ(value[0], 1); // sum
-  ASSERT_EQ(value[0], 1); // count
+  ASSERT_EQ(value_set[0], 1); // min
+  ASSERT_EQ(value_set[1], 1); // max
+  ASSERT_EQ(value_set[2], 1); // sum
+  ASSERT_EQ(value_set[3], 1); // count
 }
 
 TEST(MinMaxSumCountAggregator, Types)
@@ -135,7 +135,7 @@ TEST(MinMaxSumCountAggregator, Types)
   auto agg_int = new MinMaxSumCountAggregator<int>(opentelemetry::metrics::BoundInstrumentKind::BoundIntCounter);
   auto agg_long = new MinMaxSumCountAggregator<long>(opentelemetry::metrics::BoundInstrumentKind::BoundIntCounter);
   auto agg_float = new MinMaxSumCountAggregator<float>(opentelemetry::metrics::BoundInstrumentKind::BoundIntCounter);
-  auto agg_double = new MinMaxSumCountAggregator<int>(opentelemetry::metrics::BoundInstrumentKind::BoundIntCounter);
+  auto agg_double = new MinMaxSumCountAggregator<double>(opentelemetry::metrics::BoundInstrumentKind::BoundIntCounter);
 
   for (int i = 1; i <= 10; ++i)
   {
