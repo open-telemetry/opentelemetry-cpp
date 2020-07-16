@@ -17,11 +17,11 @@ namespace context
       class Token;
 
       // Return the current context.
-      Context GetCurrent();
+      Context* GetCurrent();
 
       // Sets the current 'Context' object. Returns a token
       // that can be used to reset to the previous Context.
-      Token Attach(Context &context);
+      Token Attach(Context* context);
 
       // Resets the context to a previous value stored in the
       // passed in token. Returns zero if successful, -1 otherwise
