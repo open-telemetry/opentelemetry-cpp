@@ -1,0 +1,30 @@
+<!doctype html>
+<html>
+  <head>
+    <title>Hello, C++ Web Server!</title>
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+
+<script>
+$(document).ready(function(){
+  $("button").click(function(){
+    $.ajax({url: "/status.json", success: function(response) {
+      $.each(response, function(i, item) {
+        $('<tr>').html(
+          "<td>" + response[i].type + "</td><td>" + response[i].id + "</td><td>" + response[i].status + "</td>").appendTo('#records_table');
+      });
+    }});
+  });
+});
+</script>
+
+  </head>
+  <body>
+    <div align="center">
+      <img width="640" height="240" src="images/opentelemetry.png" />
+      <p class="sample">Hello, C++ Web Server!</p>
+      <table id="records_table"></table>
+      <button>Click here to refresh</button>
+    </div>
+  </body>
+</html>

@@ -25,3 +25,17 @@ cc_library(
         "//ext:headers",
     ],
 )
+
+cc_binary(
+    name = "zpages_http_server",
+    srcs = [
+        "tracez_http_server.cc"
+    ],
+    linkopts = select({
+        "//bazel:windows": [],
+        "//conditions:default": ["-pthread"],
+    }),
+    deps = [
+        "//ext:headers",
+    ],
+)
