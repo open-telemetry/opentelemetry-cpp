@@ -43,17 +43,14 @@ class TracezSpanProcessor : public opentelemetry::sdk::trace::SpanProcessor {
   }
 
   /*
-   * OnStart is called when a span starts; the Recordable is cast to SpanData and added to
-   * running_spans. TODO: Speed up the processor, other through lock-free circular buff or
-   * slim proxy layer shim
+   * OnStart is called when a span starts; the recordable is cast to span_data and added to running_spans.
    * @param span a recordable for a span that was just started
    */
   void OnStart(opentelemetry::sdk::trace::Recordable &span) noexcept override;
 
   /*
-   * OnEnd is called when a span ends; span is converted from Recordable to SpanData, then
-   * moved from running_spans to completed_spans. TODO: Speed up the processor, other through
-   * lock-free circular buff or slim proxy layer shim
+   * OnEnd is called when a span ends; that span_data is moved from running_spans to
+   * completed_spans
    * @param span a recordable for a span that was ended
    */
   void OnEnd(std::unique_ptr<opentelemetry::sdk::trace::Recordable> &&span) noexcept override;
@@ -62,18 +59,16 @@ class TracezSpanProcessor : public opentelemetry::sdk::trace::SpanProcessor {
    * Returns a snapshot of all spans stored. This snapshot has a copy of the
    * stored running_spans and gives ownership of completed spans to the caller.
    * Stored completed_spans are cleared from the processor. Currently,
-   * copy-on-write is utilized where possible to minimize contention and locks
-   * are added.
-   * TODO: Speed up the processor, other through lock-free circular buff or slim
-   * proxy layer shim
+   * copy-on-write is utilized where possible to minimize contention, but locks
+   * may be added in the future.
    * @return snapshot of all currently running spans and newly completed spans
    * (spans never sent while complete) at the time that the function is called
    */
   CollectedSpans GetSpanSnapshot() noexcept;
 
   /*
-   * For now, does nothing. In the future, it may send all ended spans that have
-   * not yet been sent to the aggregator.
+   * For now, does nothing. In the future, it
+   * may send all ended spans that have not yet been sent to the aggregator.
    * @param timeout an optional timeout, the default timeout of 0 means that no
    * timeout is applied. Currently, timeout does nothing.
    */
@@ -96,3 +91,4 @@ class TracezSpanProcessor : public opentelemetry::sdk::trace::SpanProcessor {
 }  // namespace zpages
 }  // namespace ext
 OPENTELEMETRY_END_NAMESPACE
+
