@@ -91,4 +91,3 @@ class TracezSpanProcessor : public opentelemetry::sdk::trace::SpanProcessor {
 }  // namespace zpages
 }  // namespace ext
 OPENTELEMETRY_END_NAMESPACE
-
