@@ -30,21 +30,23 @@ TracezDataAggregator::~TracezDataAggregator() {
   };
 }
 
-std::map<std::string, std::unique_ptr<TracezSpanData>>
+std::map<std::string, std::unique_ptr<TracezData>>
 TracezDataAggregator::GetAggregatedTracezData() {
   std::unique_lock<std::mutex> lock(mtx_);
-
-  /** NOTE: At the moment a copy of the aggregated data is returned from this
-   * getter to avoid concurrency issues. When it becomes more clear what type of
-   * object is needed by the zPage HTTP server (most likely a JSON),
-   * this function should be changed accordingily.
+  /** 
+   * NOTE: At the moment a copy of the aggregated data is returned from this
+   * getter to avoid simplify things and avoid concurrency issues. When it 
+   * becomes more clear what type of object is needed by the zPage HTTP server 
+   * (most likely a JSON), this function will be changed accordingily. If it is 
+   * decided that a copy will be returned then unique ptrs will be changed to 
+   * shared.
    **/
-  std::map<std::string, std::unique_ptr<TracezSpanData>>
+  std::map<std::string, std::unique_ptr<TracezData>>
       aggregated_tracez_data_cpy;
   for (auto &name_to_data : aggregated_tracez_data_) {
     std::string span_name = name_to_data.first;
     aggregated_tracez_data_cpy[span_name] =
-        std::unique_ptr<TracezSpanData>(new TracezSpanData);
+        std::unique_ptr<TracezData>(new TracezData);
     auto &data_cpy = aggregated_tracez_data_cpy[span_name];
     auto &data = name_to_data.second;
     data_cpy->running_span_count = data->running_span_count;
@@ -120,7 +122,7 @@ void TracezDataAggregator::AggregateCompletedSpans(
     if (aggregated_tracez_data_.find(span_name) ==
         aggregated_tracez_data_.end()) {
       aggregated_tracez_data_[span_name] =
-          std::unique_ptr<TracezSpanData>(new TracezSpanData);
+          std::unique_ptr<TracezData>(new TracezData);
     }
 
     /**
@@ -146,11 +148,10 @@ void TracezDataAggregator::AggregateRunningSpans(
   std::unordered_set<std::string> seen_span_names;
   for (auto &span : running_spans) {
     std::string span_name = span->GetName().data();
-
     if (aggregated_tracez_data_.find(span_name) ==
         aggregated_tracez_data_.end()) {
       aggregated_tracez_data_[span_name] =
-          std::unique_ptr<TracezSpanData>(new TracezSpanData);
+          std::unique_ptr<TracezData>(new TracezData);
     }
 
     /**

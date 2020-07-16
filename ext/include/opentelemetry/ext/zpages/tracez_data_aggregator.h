@@ -33,10 +33,10 @@ namespace zpages {
 const int kMaxNumberOfSampleSpans = 5;
 
 /**
- * TracezSpanData is the span data to be displayed for tracez zpages that is
+ * TracezData is the span data to be displayed for tracez zpages that is
  * stored for each span name.
  */
-struct TracezSpanData {
+struct TracezData {
   /**
    * TODO: At this time the maximum count is unknown but a larger data type
    * might have to be used in the future to store these counts to avoid overflow
@@ -70,7 +70,7 @@ struct TracezSpanData {
    */
   std::list<SpanData*> sample_running_spans;
 
-  TracezSpanData() {
+  TracezData() {
     running_span_count = 0;
     error_span_count = 0;
     completed_span_count_per_latency_bucket.fill(0);
@@ -82,7 +82,12 @@ struct TracezSpanData {
  * converting it to useful information that can be made available to
  * display on the tracez zpage.
  *
- * NOTE: This class is only expected to be called by the HTTP server.
+ * When this object is created it starts a thread that calls a function 
+ * periodically to update the aggregated data with new spans.
+ *
+ * The only exposed function is a getter that returns a copy of the aggregated
+ * data when requested. This function is ensured to be called in sequence to the 
+ * aggregate spans function which is called periodically.
  */
 class TracezDataAggregator {
  public:
@@ -103,7 +108,7 @@ class TracezDataAggregator {
    * GetAggregatedTracezData aggregates data and returns the the updated data.
    * @returns a map with the span name as key and the tracez span data as value.
    */
-  std::map<std::string, std::unique_ptr<TracezSpanData>>
+  std::map<std::string, std::unique_ptr<TracezData>>
   GetAggregatedTracezData();
 
  private:
@@ -180,7 +185,7 @@ class TracezDataAggregator {
    * span names, one solution could be to implement a LRU cache that trims the
    * DS based on frequency of usage of a span name.
    */
-  std::map<std::string, std::unique_ptr<TracezSpanData>>
+  std::map<std::string, std::unique_ptr<TracezData>>
       aggregated_tracez_data_;
 
   /** A boolean that is set to true in the constructor and false in the
