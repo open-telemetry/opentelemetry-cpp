@@ -20,7 +20,7 @@
 #include <vector>
 #include <algorithm>
 
-#include "opentelemetry/ext/http/server/json.hpp"
+#include "nlohmann/json.hpp"
 
 using json = nlohmann::json;
 
@@ -35,7 +35,7 @@ namespace HTTP_SERVER_NS
 {
 };
 
-#include "opentelemetry/ext/http/server/HttpServer.hpp"
+#include "opentelemetry/ext/http/server/HttpServer.h"
 
 using namespace HTTP_SERVER_NS;
 using namespace std;

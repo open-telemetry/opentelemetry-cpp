@@ -23,6 +23,7 @@ cc_library(
         "//api",
         "//sdk:headers",
         "//ext:headers",
+        "@github_nlohmann_json//:json",
     ],
 )
 
@@ -37,5 +38,6 @@ cc_binary(
     }),
     deps = [
         "//ext:headers",
+        "@github_nlohmann_json//:json",
     ],
 )

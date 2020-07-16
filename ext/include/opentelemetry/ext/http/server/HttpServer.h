@@ -18,7 +18,7 @@
 #include <list>
 #include <map>
 
-#include "SocketTools.hpp"
+#include "SocketTools.h"
 
 #ifdef HAVE_HTTP_DEBUG
 #  ifdef LOG_TRACE
