@@ -3,6 +3,7 @@
 #include <map>
 #include "opentelemetry/core/timestamp.h"
 #include "opentelemetry/nostd/variant.h"
+#include <string>
 
 
 OPENTELEMETRY_BEGIN_NAMESPACE
@@ -27,12 +28,6 @@ public:
     labels_ = labels;
     value_ = value;
     timestamp_ = timestamp;
-  }
-
-  template<typename T>
-  void SetValue(std::vector<T> value)
-  {
-    value_ = value;
   }
 
   std::string GetName() {return name_;}

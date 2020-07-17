@@ -2,6 +2,7 @@
 
 #include <memory>
 #include "opentelemetry/version.h"
+#include "record.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace sdk
