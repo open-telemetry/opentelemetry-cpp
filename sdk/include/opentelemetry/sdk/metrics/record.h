@@ -1,14 +1,11 @@
 #pragma once
 
-#include <map>
 #include "opentelemetry/core/timestamp.h"
-#include <string>
+#include "opentelemetry/nostd/variant.h"
 #include <vector>
-
+#include <string>
 
 OPENTELEMETRY_BEGIN_NAMESPACE
-
-//namespace metrics_api = opentelemetry::metrics;
 
 namespace sdk
 {
@@ -19,7 +16,7 @@ class Record
 public:
   explicit Record(std::string name, std::string description,
                   std::string labels,
-                  std::vector<int> value,
+                  nostd::variant<std::vector<short>, std::vector<int>, std::vector<float>, std::vector<double>> value,
                   core::SystemTimestamp timestamp = core::SystemTimestamp(std::chrono::system_clock::now()))
   {
     name_ = name;
@@ -28,22 +25,26 @@ public:
     value_ = value;
     timestamp_ = timestamp;
   }
- 
+
+  template<typename T>
+  void SetValue(std::vector<T> value)
+  {
+    value_ = value;
+  }
+
   std::string GetName() {return name_;}
   std::string GetDescription() {return description_;}
   std::string GetLabels() {return labels_;}
-  std::vector<int> GetValue() {return value_;}
+  nostd::variant<std::vector<short>, std::vector<int>, std::vector<float>, std::vector<double>> GetValue() {return value_;}
   core::SystemTimestamp GetTimestamp() {return timestamp_;}
 
 private:
   std::string name_;
   std::string description_;
   std::string labels_;
-  std::vector<int> value_;
+  nostd::variant<std::vector<short>, std::vector<int>, std::vector<float>, std::vector<double>> value_;
   core::SystemTimestamp timestamp_;
 };
-
 } // namespace metrics
 } // namespace sdk
-
 OPENTELEMETRY_END_NAMESPACE
