@@ -84,6 +84,52 @@ OPENTELEMETRY_BEGIN_NAMESPACE
 namespace nostd
 {
 
+//
+// Back port of std::data
+//
+// See https://en.cppreference.com/w/cpp/iterator/data
+//
+template <class C>
+auto data(C &c) noexcept(noexcept(c.data())) -> decltype(c.data())
+{
+  return c.data();
+}
+
+template <class C>
+auto data(const C &c) noexcept(noexcept(c.data())) -> decltype(c.data())
+{
+  return c.data();
+}
+
+template <class T, size_t N>
+T *data(T (&array)[N]) noexcept
+{
+  return array;
+}
+
+template <class E>
+const E *data(std::initializer_list<E> list) noexcept
+{
+  return list.begin();
+}
+
+//
+// Back port of std::size
+//
+// See https://en.cppreference.com/w/cpp/iterator/size
+//
+template <class C>
+auto size(const C &c) noexcept(noexcept(c.size())) -> decltype(c.size())
+{
+  return c.size();
+}
+
+template <class T, size_t N>
+size_t size(T (&array)[N]) noexcept
+{
+  return N;
+}
+
 // nostd::variant<...>
 template <class... _Types>
 using variant = std::variant<_Types...>;
@@ -91,19 +137,6 @@ using variant = std::variant<_Types...>;
 // nostd::string_view
 using string_view = std::string_view;
 
-// nostd::size<T>
-template <class T>
-auto size(const T &c) noexcept(noexcept(c.size())) -> decltype(c.size())
-{
-  return c.size();
-}
-
-// nostd::size<T, N>
-template <class T, size_t N>
-size_t size(T (&array)[N]) noexcept
-{
-  return N;
-}
 
 // nostd::enable_if_t<...>
 template <bool B, class T = void>
@@ -162,7 +195,33 @@ constexpr auto get = [](auto &&t) constexpr -> decltype(auto)
   return std::get<T>(std::forward<decltype(t)>(t));
 };
 
-#  endif
+template <class _Callable, class... _Variants>
+constexpr auto visit(_Callable &&_Obj, _Variants &&... _Args)
+{
+  return std::visit<_Callable, _Variants...>(
+      static_cast<_Callable &&>(_Obj),
+      static_cast<_Variants &&>(_Args)...);
+};
+
+/*
+# if _HAS_CXX20
+template <class _Ret, class _Callable, class... _Variants>
+constexpr _Ret visit(_Callable &&_Obj, _Variants &&... _Args)
+{
+  return std::visit<_Ret, _Callable, _Variants...>(
+      static_cast<_Callable &&>(_Obj),
+      static_cast<_Variants &&>(_Args)...);
+};
+# endif
+*/
+
+template<std::size_t N>
+using make_index_sequence = std::make_index_sequence<N>;
+
+template<std::size_t... Ints>
+using index_sequence = std::index_sequence<Ints...>;
+
+#endif
 
 }  // namespace nostd
 OPENTELEMETRY_END_NAMESPACE

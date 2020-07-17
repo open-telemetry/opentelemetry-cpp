@@ -22,13 +22,6 @@ yum -y install devtoolset-7-valgrind
 
 yum-config-manager --enable rhel-server-rhscl-7-rpms
 
-#if [ `gcc --version | grep 7` == "" ]; then
-#echo "*********************************************************"
-#echo "*** Please make sure you start the build with gcc-7   ***"
-#echo "*** > scl enable devtoolset-7 ./build.sh              ***"
-#echo "*********************************************************"
-#exit 3
-#fi
 
 if [ `cmake --version | grep 3` == "" ]; then
 yum -y remove cmake

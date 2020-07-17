@@ -16,6 +16,7 @@
 #include <sstream>
 #include <unordered_map>
 #include <vector>
+#include <array>
 
 using namespace OPENTELEMETRY_NAMESPACE;
 
