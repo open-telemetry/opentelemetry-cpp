@@ -22,6 +22,6 @@ cc_library(
     deps = [
         "//api",
         "//sdk:headers",
-        "//ext:headers",
+        "//ext:zpages",
     ],
 )

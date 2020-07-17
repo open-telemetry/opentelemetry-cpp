@@ -1,5 +1,5 @@
 cc_test(
-    name = "tracez_processor_tests",
+    name = "tracez_processor_test",
     srcs = [
         "tracez_processor_test.cc",
     ],
