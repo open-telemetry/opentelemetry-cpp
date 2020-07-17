@@ -5,6 +5,16 @@
 #include <vector>
 #include <string>
 
+enum AggregatorKind
+{
+  Counter = 0,
+  MinMaxSumCount = 1,
+  Gauge = 2,
+  Sketch = 3,
+  Histogram = 4,
+  Exact = 5,
+};
+
 OPENTELEMETRY_BEGIN_NAMESPACE
 
 namespace sdk
@@ -17,13 +27,15 @@ public:
   explicit Record(std::string name, std::string description,
                   std::string labels,
                   nostd::variant<std::vector<short>, std::vector<int>, std::vector<float>, std::vector<double>> value,
-                  core::SystemTimestamp timestamp = core::SystemTimestamp(std::chrono::system_clock::now()))
+                  core::SystemTimestamp timestamp = core::SystemTimestamp(std::chrono::system_clock::now()),
+                  AggregatorKind aggkind = AggregatorKind::Counter)
   {
     name_ = name;
     description_ = description;
     labels_ = labels;
     value_ = value;
     timestamp_ = timestamp;
+    aggkind_ = aggkind;
   }
 
   template<typename T>
@@ -37,6 +49,7 @@ public:
   std::string GetLabels() {return labels_;}
   nostd::variant<std::vector<short>, std::vector<int>, std::vector<float>, std::vector<double>> GetValue() {return value_;}
   core::SystemTimestamp GetTimestamp() {return timestamp_;}
+  AggregatorKind GetAggKind() {return aggkind_;}
 
 private:
   std::string name_;
@@ -44,6 +57,7 @@ private:
   std::string labels_;
   nostd::variant<std::vector<short>, std::vector<int>, std::vector<float>, std::vector<double>> value_;
   core::SystemTimestamp timestamp_;
+  AggregatorKind aggkind_;
 };
 } // namespace metrics
 } // namespace sdk
