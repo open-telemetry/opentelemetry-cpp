@@ -538,6 +538,8 @@ TEST_F(TracezDataAggregatorTest, RemovalOfRunningSpanWhenCompleted) {
   // End the span and make sure running span is removed and completed span is
   // updated, there should be only one completed span
   span_first->End(end);
+  ASSERT_EQ(data.at(span_name1).sample_running_spans.front()->GetName(),
+            span_name1);
   std::this_thread::sleep_for(milliseconds(500));
   data = tracez_data_aggregator->GetAggregatedTracezData();
 
