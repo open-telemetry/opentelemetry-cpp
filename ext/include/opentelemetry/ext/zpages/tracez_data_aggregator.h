@@ -128,13 +128,13 @@ class TracezDataAggregator {
       std::vector<std::unique_ptr<SpanData>>& completed_spans);
 
   /**
-   * AggregateRunningSpans aggregates the data for all running spans recieved
+   * AggregateRunningSpans aggregates the data for all running spans received
    * from the span processor. Running spans are not cleared by the span
    * processor and multiple calls to this function may contain running spans for
    * which data has already been collected in a previous call. There seems to be
    * no trivial to way to know if it is a new or old running span so at every
    * call to this function the available running span data is reset and
-   * recalcuated, this is done so that no extra time is taken.
+   * recalculated, this is done so that no extra time is taken.
    * @param running_spans is the running spans to be aggregated.
    */
   void AggregateRunningSpans(std::unordered_set<SpanData*>& running_spans);
