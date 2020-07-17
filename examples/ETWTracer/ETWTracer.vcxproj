@@ -20,12 +20,12 @@
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>16.0</VCProjectVersion>
-    <ProjectGuid>{6EC0D1B9-6589-45A4-9B7F-D5390F0CC5FC}</ProjectGuid>
+    <ProjectGuid>{6EC0D1B9-6589-45A4-9B7F-D5390D0CC5FC}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
     <RootNamespace>exampleevent</RootNamespace>
     <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
     <OpenTelemetrySDKPath>$(MSBuildProjectDirectory)\..\..\</OpenTelemetrySDKPath>
-    <ProjectName>StreamTracer</ProjectName>
+    <ProjectName>ETWTracer</ProjectName>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
@@ -164,10 +164,15 @@
     <ClCompile Include="main.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="ETWStringStream.hpp" />
-    <ClInclude Include="EventProtocols.hpp" />
-    <ClInclude Include="StreamTracer.hpp" />
+    <ClInclude Include="ETWProvider.hpp" />
+    <ClInclude Include="ETWTracer.hpp" />
+    <ClInclude Include="TraceLoggingDynamic.h" />
     <ClInclude Include="utils.hpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="PipeListener.cmd" />
+    <None Include="PipeListener.ps1" />
+    <None Include="README.md" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

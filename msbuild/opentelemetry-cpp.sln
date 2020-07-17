@@ -78,6 +78,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "common", "common", "{33CF43
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "StreamTracer", "..\examples\TraceStreamer\TraceStreamer.vcxproj", "{6EC0D1B9-6589-45A4-9B7F-D5390F0CC5FC}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ETWTracer", "..\examples\ETWTracer\ETWTracer.vcxproj", "{6EC0D1B9-6589-45A4-9B7F-D5390D0CC5FC}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -94,6 +96,14 @@ Global
 		{6EC0D1B9-6589-45A4-9B7F-D5390F0CC5FC}.Release|x64.Build.0 = Release|x64
 		{6EC0D1B9-6589-45A4-9B7F-D5390F0CC5FC}.Release|x86.ActiveCfg = Release|Win32
 		{6EC0D1B9-6589-45A4-9B7F-D5390F0CC5FC}.Release|x86.Build.0 = Release|Win32
+		{6EC0D1B9-6589-45A4-9B7F-D5390D0CC5FC}.Debug|x64.ActiveCfg = Debug|x64
+		{6EC0D1B9-6589-45A4-9B7F-D5390D0CC5FC}.Debug|x64.Build.0 = Debug|x64
+		{6EC0D1B9-6589-45A4-9B7F-D5390D0CC5FC}.Debug|x86.ActiveCfg = Debug|Win32
+		{6EC0D1B9-6589-45A4-9B7F-D5390D0CC5FC}.Debug|x86.Build.0 = Debug|Win32
+		{6EC0D1B9-6589-45A4-9B7F-D5390D0CC5FC}.Release|x64.ActiveCfg = Release|x64
+		{6EC0D1B9-6589-45A4-9B7F-D5390D0CC5FC}.Release|x64.Build.0 = Release|x64
+		{6EC0D1B9-6589-45A4-9B7F-D5390D0CC5FC}.Release|x86.ActiveCfg = Release|Win32
+		{6EC0D1B9-6589-45A4-9B7F-D5390D0CC5FC}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

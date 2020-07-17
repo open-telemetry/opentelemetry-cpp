@@ -12,8 +12,9 @@
 #include <opentelemetry/event/UUID.hpp>
 
 #ifdef _WIN32
-#  include "Windows.h"
+#  include <Windows.h>
 #  include <evntprov.h>
+#  include <wincrypt.h>
 #  pragma comment(lib, "Advapi32.lib")
 #  pragma comment(lib, "Rpcrt4.lib")
 #endif
