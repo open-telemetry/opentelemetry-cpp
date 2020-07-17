@@ -19,12 +19,12 @@ load("//bazel:otel_cc_benchmark.bzl", "otel_cc_benchmark")
 cc_library(
     name = "recordable",
     srcs = [
-        "recordable.cc",
+        "src/recordable.cc",
     ],
     hdrs = [
-        "recordable.h",
+        "include/opentelemetry/exporters/otlp/recordable.h",
     ],
-    include_prefix = "exporters/otlp",
+    strip_include_prefix = "include",
     deps = [
         "//sdk/src/trace",
         "@com_github_opentelemetry_proto//:trace_proto_cc",
@@ -34,11 +34,12 @@ cc_library(
 cc_library(
     name = "otlp_exporter",
     srcs = [
-        'otlp_exporter.cc',
+        'src/otlp_exporter.cc',
     ],
     hdrs = [
-        'otlp_exporter.h',
+        'include/opentelemetry/exporters/otlp/otlp_exporter.h',
     ],
+    strip_include_prefix = "include",
     deps = [
         ":recordable",
         "//sdk/src/trace",
@@ -51,7 +52,7 @@ cc_library(
 
 cc_test(
     name = "recordable_test",
-    srcs = ["recordable_test.cc"],
+    srcs = ["test/recordable_test.cc"],
     deps = [
         ":recordable",
         "@com_google_googletest//:gtest_main",
@@ -60,7 +61,7 @@ cc_test(
 
 cc_test(
  name = "otlp_exporter_test",
-    srcs = ["otlp_exporter_test.cc"],
+    srcs = ["test/otlp_exporter_test.cc"],
     deps = [
         ":otlp_exporter",
         "//api",
@@ -70,7 +71,7 @@ cc_test(
 
 otel_cc_benchmark(
     name = "otlp_exporter_benchmark",
-    srcs = ["otlp_exporter_benchmark.cc"],
+    srcs = ["test/otlp_exporter_benchmark.cc"],
     deps = [
         ":otlp_exporter",
     ],
