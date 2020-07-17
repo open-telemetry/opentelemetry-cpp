@@ -16,16 +16,15 @@ public const class DefaultSpan : Span {
     }
 
     // Creates an instance of this class with spancontext.
-    static DefaultSpan Create(SpanContext spanContext) {
-      return DefaultSpan(spanContext);
+    static DefaultSpan Create(SpanContext span_context) {
+      return DefaultSpan(span_context);
     }
 
     static DefaultSpan CreateRandom() {
       return DefaultSpan(
-        SpanContext(
+        SpanContext.Create(
           TraceId.generateRandomId(),
           SpanId.generateRandomId(),
-          false,
           TraceFlags.getDefault(),
           TraceState.getDefault()
         )
@@ -56,7 +55,7 @@ public const class DefaultSpan : Span {
       pass;
     }
 
-    void End(trace::EndSpanOptions end_time) {
+    void End(EndSpanOptions end_time) {
       pass;
     }
 
@@ -69,7 +68,7 @@ public const class DefaultSpan : Span {
     }
 
   private:
-    static const DefaultSpan kInvalid = new DefaultSpan(SpanContext.getInvalid());
+    static const DefaultSpan kInvalid = new DefaultSpan(SpanContext.GetInvalid());
     const SpanContext span_context_;
 }
 }
