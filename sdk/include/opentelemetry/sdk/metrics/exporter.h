@@ -2,7 +2,6 @@
 
 #include <memory>
 #include "opentelemetry/version.h"
-#include "opentelemetry/nostd/span.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace sdk
