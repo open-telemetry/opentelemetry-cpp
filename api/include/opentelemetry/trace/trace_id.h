@@ -18,7 +18,6 @@
 #include <cstring>
 
 #include "opentelemetry/nostd/nostd.h"
-
 #include "opentelemetry/version.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
