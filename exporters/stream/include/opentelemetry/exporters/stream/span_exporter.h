@@ -80,22 +80,20 @@ private:
   };
 
   /*
-    print_array and print_value are used to print out the value of an attribute within a span. These values
+    print_array and print_value are used to print out the value of an attribute within a vector. These values
     are held in a variant which makes the process of printing them much more complicated.
   */
 
   template <typename T>
-  void print_array(sdktrace::SpanDataAttributeValue &value, bool jsonTypes = false)
+  void print_array(sdktrace::SpanDataAttributeValue &value)
   {
     sout_ << '[';
-    // TODO: jsonTypes for bool?
-    // TODO: do we need to escape string value for JSON?
     auto s    = nostd::get<std::vector<T>>(value);
     size_t i  = 1;
     size_t sz = s.size();
     for (auto v : s)
     {
-      sout_ << v; // TODO: nostd::string_view type needs quotes!
+      sout_ << v; 
       if (i != sz)
         sout_ << ',';
       i++;
@@ -103,54 +101,47 @@ private:
     sout_ << ']';
   }
 
-  void print_value(sdktrace::SpanDataAttributeValue &value,
-                          bool jsonTypes = false)
+  void print_value(sdktrace::SpanDataAttributeValue &value)
   {
-    switch (value.index())
+    if(nostd::holds_alternative<bool>(value))
     {
-      case AttributeType::TYPE_BOOL:
-        if (jsonTypes)
-        {
-          sout_ << (nostd::get<bool>(value) ? "true" : "false");
-        }
-        else
-        {
-          sout_ << static_cast<unsigned>(nostd::get<bool>(value));
-        }
-        break;
-      case AttributeType::TYPE_INT64:
-        sout_ << nostd::get<int64_t>(value);
-        break;
-      case AttributeType::TYPE_UINT64:
-        sout_ << nostd::get<uint64_t>(value);
-        break;
-      case AttributeType::TYPE_DOUBLE:
-        sout_ << nostd::get<double>(value);
-        break;
-      case AttributeType::TYPE_STRING:
-        if (jsonTypes)
-          sout_ << '"';
-        // TODO: do we need to escape string value for JSON?
-        sout_ << nostd::get<std::string>(value);
-        if (jsonTypes)
-          sout_ << '"';
-        break;
-      case AttributeType::TYPE_VECTOR_BOOL:
-        print_array<bool>(value, jsonTypes);
-        break;
-      case AttributeType::TYPE_VECTOR_INT64:
-        print_array<int64_t>(value, jsonTypes);
-        break;
-      case AttributeType::TYPE_VECTOR_UINT64:
-        print_array<uint64_t>(value, jsonTypes);
-        break;
-      case AttributeType::TYPE_VECTOR_DOUBLE:
-        print_array<double>(value, jsonTypes);
-        break;
-      case AttributeType::TYPE_VECTOR_STRING:
-        // TODO: print_array doesn't provide the proper quotes
-        print_array<std::string>(value, jsonTypes);
-        break;
+      sout_ << nostd::get<bool>(value);
+    }
+    else if(nostd::holds_alternative<int64_t>(value))
+    {
+      sout_ << nostd::get<int64_t>(value);
+    }
+    else if(nostd::holds_alternative<uint64_t>(value))
+    {
+      sout_ << nostd::get<uint64_t>(value);
+    }
+    else if(nostd::holds_alternative<double>(value))
+    {
+      sout_ << nostd::get<double>(value);
+    }
+    else if(nostd::holds_alternative<std::string>(value))
+    {
+      sout_ << nostd::get<std::string>(value);
+    }
+    else if(nostd::holds_alternative<std::vector<bool>>(value))
+    {
+      print_array<bool>(value);
+    }
+    else if(nostd::holds_alternative<std::vector<int64_t>>(value))
+    {
+      print_array<int64_t>(value);
+    }
+    else if(nostd::holds_alternative<std::vector<uint64_t>>(value))
+    {
+      print_array<uint64_t>(value);
+    }
+    else if(nostd::holds_alternative<std::vector<double>>(value))
+    {
+      print_array<double>(value);
+    }
+    else if(nostd::holds_alternative<std::vector<std::string>>(value))
+    {
+      print_array<std::string>(value);
     }
   }
 
