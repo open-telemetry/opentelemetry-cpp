@@ -52,6 +52,21 @@ private:
   std::shared_ptr<std::vector<std::unique_ptr<SpanData>>> spans_received_;
 };
 
+void BenchmarkShouldSampler(Sampler &sampler, benchmark::State &state)
+{
+	opentelemetry::trace::TraceId trace_id;
+	opentelemetry::trace::SpanKind span_kind = opentelemetry::trace::SpanKind::kInternal;
+
+	using M = std::map<std::string, int>;
+	M m1 = {{}};
+	opentelemetry::trace::KeyValueIterableView<M> view{m1};
+
+	while (state.KeepRunning())
+	{
+		benchmark::DoNotOptimize(sampler.ShouldSample(nullptr, trace_id, "", span_kind, view));
+	}
+}
+
 namespace
 {
 // Sampler constructor used as a baseline to compare with other samplers
