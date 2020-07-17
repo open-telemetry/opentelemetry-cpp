@@ -53,17 +53,16 @@ LatencyBoundary TracezDataAggregator::FindLatencyBoundary(SpanData *span_data) {
 }
 
 void TracezDataAggregator::InsertIntoSampleSpanList(
-    std::list<std::shared_ptr<SpanData>> &sample_spans,
+    std::list<SampleSpanData> &sample_spans,
     std::unique_ptr<SpanData> &span_data) {
   /**
    * Check to see if the sample span list size exceeds the set limit, if it does
    * free up memory and remove the earliest inserted sample before appending
    */
   if (sample_spans.size() == kMaxNumberOfSampleSpans) {
-    sample_spans.front().reset();
     sample_spans.pop_front();
   }
-  sample_spans.push_back(std::move(span_data));
+  sample_spans.push_back(SampleSpanData(*span_data.get()));
 }
 
 void TracezDataAggregator::AggregateStatusOKSpan(
@@ -141,7 +140,7 @@ void TracezDataAggregator::AggregateRunningSpans(
         kMaxNumberOfSampleSpans) {
       aggregated_tracez_data_[span_name].sample_running_spans.pop_front();
     }
-    aggregated_tracez_data_[span_name].sample_running_spans.push_back(span);
+    aggregated_tracez_data_[span_name].sample_running_spans.push_back(SampleSpanData(*span));
     aggregated_tracez_data_[span_name].running_span_count++;
   }
 }
