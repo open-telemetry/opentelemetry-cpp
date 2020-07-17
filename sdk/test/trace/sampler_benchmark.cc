@@ -202,7 +202,7 @@ void BM_SpanCreation(benchmark::State &state)
 	{
 		auto span_off_1 = tracer_off->StartSpan("span with AlwaysOn sampler");
 
-		span_off_1->SetAttribute("attr1", 3.1);  // Not recorded.
+		span_off_1->SetAttribute("attr1", 3.1);
 
 		span_off_1->End();
 	}
