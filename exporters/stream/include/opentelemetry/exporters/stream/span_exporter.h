@@ -12,21 +12,6 @@
 namespace nostd    = opentelemetry::nostd;
 namespace sdktrace = opentelemetry::sdk::trace;
 
-// AttributeType to help with printing attributes
-enum AttributeType
-{
-  TYPE_BOOL,
-  TYPE_INT64,
-  TYPE_UINT64,
-  TYPE_DOUBLE,
-  TYPE_STRING,
-  TYPE_VECTOR_BOOL,
-  TYPE_VECTOR_INT64,
-  TYPE_VECTOR_UINT64,
-  TYPE_VECTOR_DOUBLE,
-  TYPE_VECTOR_STRING
-};
-
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace exporter
 {
