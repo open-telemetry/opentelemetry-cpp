@@ -121,7 +121,7 @@ public:
      * Exports a batch of Metric Records. The behavior will be decided in the 
      * implementation.
      */
-    ReturnCodes export(Collection<Record> records);
+    ReturnCodes export(Collection<Record> &records);
     
     /**
      * Shut down the exporter.
@@ -158,7 +158,7 @@ class PrometheusExporter : public MetricsExporter {
     /**
      * Constructor. 
      */
-    PrometheusExporter(Exposer exposer) {
+    PrometheusExporter(Exposer &exposer) {
         // 1. Initialize and set a PrometheusCollector
         // 2. Register this collector (collectable) to exposer
     }
@@ -166,7 +166,7 @@ class PrometheusExporter : public MetricsExporter {
     /*
      * Implement the export function in the interface
      */
-    ReturnCodes export(Collection<Record> records) {
+    ReturnCodes export(Collection<Record> &records) {
         if (!this.isShutdown) {
             // 1. Add the input records to the data stucture inside the collector.
             // 2. Return ExportResult
@@ -188,7 +188,7 @@ class PrometheusExporter : public MetricsExporter {
     /*
      * Set the Prometheus collector with the parameter.
      */ 
-    void setCollector(PrometheusCollector collector) {
+    void setCollector(PrometheusCollector &collector) {
     
     }
     
@@ -263,7 +263,7 @@ public:
     /**
      * Default Constructor
      */
-    PrometheusCollector() {
+    PrometheusCollector(int maxCollectionSize = 2048) {
         // Initialize the collection for metrics to export
         // in this class with default capacity
     }
@@ -285,7 +285,7 @@ public:
      *
      * This function may also need a lock.
      */
-    void addMetricData(Collection<Record> records) {
+    void addMetricData(Collection<Record> &records) {
         // 1. The Controller calls export() function to send 
         //    processed metrics data,
         // 2. export() function then calls this function to add
@@ -298,14 +298,25 @@ public:
     Collection<Record> getCollection() {
     
     }
+    /**
+     * Gets the maximum size of the collection.
+     */
+    int getMaxCollectionSize() {
+
+    }
  
 private:
     /*
      * Collection of metrics data from the export() function,
      * and to be export to user when they send a pull request.
      */
-    Collection<Record> metricsToCollect;
-    
+    Collection<Record> *metricsToCollect;
+
+    /**
+     * Maximum size of the metricsToCollect collection.
+     */
+    int maxCollectionSize;
+
     /*
      * Lock when operating the collection
      */
