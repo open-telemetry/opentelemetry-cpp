@@ -21,5 +21,4 @@ TEST(MeterProvider, GetMeter)
   ASSERT_EQ(t1, t2);
   ASSERT_EQ(t1, t3);
 
-  // TODO: Test that controller is stored correctly in Meter once stub is replaced
 }
