@@ -9,7 +9,7 @@ namespace sdkmetrics = opentelemetry::sdk::metrics;
 
 namespace exporter
 {
-namespace trace
+namespace metrics
 {
 
 /**

@@ -3,7 +3,7 @@
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace exporter
 {
-namespace trace
+namespace metrics
 {
 StreamMetricsExporter::StreamMetricsExporter(std::ostream &sout) noexcept
                                     : sout_{sout} {}
@@ -21,6 +21,6 @@ void StreamMetricsExporter::Shutdown(std::chrono::microseconds timeout) noexcept
   isShutdown_ = true;
 }
 
-} // namespace trace
+} // namespace metrics
 } // namespace exporter
 OPENTELEMETRY_END_NAMESPACE
