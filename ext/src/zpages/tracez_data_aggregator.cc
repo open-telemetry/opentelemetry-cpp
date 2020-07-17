@@ -45,9 +45,9 @@ TracezDataAggregator::GetAggregatedTracezData() {
 
 LatencyBoundary TracezDataAggregator::FindLatencyBoundary(SpanData *span_data) {
   auto span_data_duration = span_data->GetDuration();
-  for (unsigned int boundary = 0; boundary < kLatencyBoundaries.size(); ++boundary) {
-    if (span_data_duration < kLatencyBoundaries[boundary + 1]) 
-      return (LatencyBoundary)boundary;
+  for (auto boundary = LatencyBoundary::k0MicroTo10Micro;
+       boundary != LatencyBoundary::k100SecondToMax; ++boundary) {
+    if (span_data_duration < kLatencyBoundaries[boundary + 1]) return boundary;
   }
   return LatencyBoundary::k100SecondToMax;
 }

@@ -53,7 +53,6 @@ Span::Span(std::shared_ptr<Tracer> &&tracer,
   {
     return;
   }
-  processor_->OnStart(*recordable_);
   recordable_->SetName(name);
 
   attributes.ForEachKeyValue([&](nostd::string_view key, common::AttributeValue value) noexcept {
@@ -63,6 +62,7 @@ Span::Span(std::shared_ptr<Tracer> &&tracer,
 
   recordable_->SetStartTime(NowOr(options.start_system_time));
   start_steady_time = NowOr(options.start_steady_time);
+  processor_->OnStart(*recordable_);
 }
 
 Span::~Span()

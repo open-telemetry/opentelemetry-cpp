@@ -65,7 +65,8 @@ void VerifySpanCountsInTracezData(
             std::min<unsigned int>(error_span_count, kMaxNumberOfSampleSpans))
       << " Count of running spans incorrect for " << span_name << "\n";
 
-  for (unsigned int boundary = 0; boundary < kLatencyBoundaries.size(); ++boundary) {
+  for (auto boundary = LatencyBoundary::k0MicroTo10Micro;
+       boundary != LatencyBoundary::k100SecondToMax; ++boundary) {
     EXPECT_EQ(aggregated_data.completed_span_count_per_latency_bucket[boundary],
               completed_span_count_per_latency_bucket[boundary])
         << " Count of completed spans in latency boundary " << boundary
@@ -281,7 +282,8 @@ TEST_F(TracezDataAggregatorTest, MultipleCompletedSpan) {
                                   (unsigned int)span.second[7].size(),
                                   (unsigned int)span.second[8].size()});
 
-    for (unsigned int boundary = 0; boundary < kLatencyBoundaries.size(); ++boundary)  {
+    for (auto boundary = LatencyBoundary::k0MicroTo10Micro;
+         boundary != LatencyBoundary::k100SecondToMax; ++boundary) {
       ASSERT_EQ(aggregated_data.sample_latency_spans[boundary].size(),
                 span.second[boundary].size());
       auto latency_sample =
@@ -584,7 +586,8 @@ TEST_F(TracezDataAggregatorTest, EdgeSpanLatenciesFallInCorrectBoundaries) {
                                {1, 1, 1, 1, 1, 1, 1, 1, 1});
 
   // Check if the latency boundary is updated correctly
-  for (unsigned int boundary = 0; boundary < kLatencyBoundaries.size(); ++boundary) {
+  for (auto boundary = LatencyBoundary::k0MicroTo10Micro;
+       boundary != LatencyBoundary::k100SecondToMax; ++boundary) {
     ASSERT_EQ(aggregated_data.sample_latency_spans[boundary]
                   .front()
                   .get()
