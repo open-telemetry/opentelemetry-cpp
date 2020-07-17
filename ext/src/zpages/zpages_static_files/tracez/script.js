@@ -2,11 +2,11 @@ window.onload = loadTracezTable;
 
 const spanRow = span => "<tr><td>"
   + span.type + " " + span.id
-  + "</td><td>"
-  + String(Math.floor(Math.random() * 150))
-  + "</td><td>"
-  + String(Math.floor(Math.random() * 150))
-  + "</td><td>"
+  + "</td><td><a href=''>"
+  + String(Math.floor(Math.random() * 6))
+  + "</a></td><td><a href=''>"
+  + String(Math.floor(Math.random() * 6))
+  + "</a></td><td>"
   + String(Math.floor(Math.random() * 150))
   + "</td><td>"
   + String(Math.floor(Math.random() * 150))
