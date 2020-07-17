@@ -1,4 +1,5 @@
 #include "opentelemetry/sdk/trace/tracer.h"
+#include "opentelemetry/sdk/trace/sampler.h"
 #include "opentelemetry/sdk/trace/samplers/always_off.h"
 #include "opentelemetry/sdk/trace/samplers/always_on.h"
 #include "opentelemetry/sdk/trace/samplers/parent_or_else.h"
@@ -73,6 +74,21 @@ private:
   std::shared_ptr<std::vector<std::unique_ptr<SpanData>>> spans_received_;
 };
 
+void BenchmarkShouldSampler(Sampler &sampler, benchmark::State &state)
+{
+	opentelemetry::trace::TraceId trace_id;
+	opentelemetry::trace::SpanKind span_kind = opentelemetry::trace::SpanKind::kInternal;
+
+	using M = std::map<std::string, int>;
+	M m1 = {{}};
+	opentelemetry::trace::KeyValueIterableView<M> view{m1};
+
+	while (state.KeepRunning())
+	{
+		benchmark::DoNotOptimize(sampler.ShouldSample(nullptr, trace_id, "", span_kind, view));
+	}
+}
+
 namespace
 {
 
@@ -119,17 +135,7 @@ void BM_AlwaysOffSamplerShouldSample(benchmark::State &state)
 {
 	AlwaysOffSampler sampler;
 
-	opentelemetry::trace::TraceId trace_id;
-	opentelemetry::trace::SpanKind span_kind = opentelemetry::trace::SpanKind::kInternal;
-
-	using M = std::map<std::string, int>;
-	M m1 = {{}};
-	opentelemetry::trace::KeyValueIterableView<M> view{m1};
-
-	while (state.KeepRunning())
-	{
-		benchmark::DoNotOptimize(sampler.ShouldSample(nullptr, trace_id, "", span_kind, view));
-	}
+	BenchmarkShouldSampler(sampler, state);
 }
 BENCHMARK(BM_AlwaysOffSamplerShouldSample);
 
@@ -138,17 +144,7 @@ void BM_AlwaysOnSamplerShouldSample(benchmark::State &state)
 {
 	AlwaysOnSampler sampler;
 
-	opentelemetry::trace::TraceId trace_id;
-	opentelemetry::trace::SpanKind span_kind = opentelemetry::trace::SpanKind::kInternal;
-
-	using M = std::map<std::string, int>;
-	M m1 = {{}};
-	opentelemetry::trace::KeyValueIterableView<M> view{m1};
-
-	while (state.KeepRunning())
-	{
-		benchmark::DoNotOptimize(sampler.ShouldSample(nullptr, trace_id, "", span_kind, view));
-	}
+	BenchmarkShouldSampler(sampler, state);
 }
 BENCHMARK(BM_AlwaysOnSamplerShouldSample);
 
@@ -156,17 +152,7 @@ void BM_ParentOrElseSamplerShouldSample(benchmark::State &state)
 {
 	ParentOrElseSampler sampler(std::make_shared<AlwaysOnSampler>());
 
-	opentelemetry::trace::TraceId trace_id;
-	opentelemetry::trace::SpanKind span_kind = opentelemetry::trace::SpanKind::kInternal;
-
-	using M = std::map<std::string, int>;
-	M m1 = {{}};
-	opentelemetry::trace::KeyValueIterableView<M> view{m1};
-
-	while (state.KeepRunning())
-	{
-		benchmark::DoNotOptimize(sampler.ShouldSample(nullptr, trace_id, "", span_kind, view));
-	}
+	BenchmarkShouldSampler(sampler, state);
 }
 BENCHMARK(BM_ParentOrElseSamplerShouldSample);
 
@@ -174,17 +160,7 @@ void BM_ProbabilitySamplerShouldSample(benchmark::State &state)
 {
 	ProbabilitySampler sampler(0.01);
 
-	opentelemetry::trace::TraceId trace_id;
-	opentelemetry::trace::SpanKind span_kind = opentelemetry::trace::SpanKind::kInternal;
-
-	using M = std::map<std::string, int>;
-	M m1 = {{}};
-	opentelemetry::trace::KeyValueIterableView<M> view{m1};
-
-	while (state.KeepRunning())
-	{
-		benchmark::DoNotOptimize(sampler.ShouldSample(nullptr, trace_id, "", span_kind, view));
-	}
+	BenchmarkShouldSampler(sampler, state);
 }
 BENCHMARK(BM_ProbabilitySamplerShouldSample);
 
