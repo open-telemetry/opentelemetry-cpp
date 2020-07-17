@@ -89,7 +89,7 @@ public:
         return false;
       }
 
-      if ((data->key_ != other_data->key_))
+      if (data->key_ != other_data->key_)
       {
         return false;
       }
