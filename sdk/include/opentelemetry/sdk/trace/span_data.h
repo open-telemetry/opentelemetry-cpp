@@ -85,6 +85,22 @@ struct AttributeConverter
 };
 
 /**
+ * Class for storing events in SpanData
+ */
+class SpanDataEvent
+{
+public:
+  SpanDataEvent(nostd::string_view name, core::SystemTimestamp timestamp)
+  {
+    name_      = name;
+    timestamp_ = timestamp;
+  }
+
+  nostd::string_view name_;
+  core::SystemTimestamp timestamp_;
+};
+
+/**
  * SpanData is a representation of all data collected by a span.
  */
 class SpanData final : public Recordable
@@ -147,6 +163,12 @@ public:
     return attributes_;
   }
 
+  /**
+   * Get the events associated with this span
+   * @return the events associated with this span
+   */
+  std::vector<SpanDataEvent> GetEvents() const noexcept { return events_; }
+
   void SetIds(opentelemetry::trace::TraceId trace_id,
               opentelemetry::trace::SpanId span_id,
               opentelemetry::trace::SpanId parent_span_id) noexcept override
@@ -163,8 +185,7 @@ public:
 
   void AddEvent(nostd::string_view name, core::SystemTimestamp timestamp) noexcept override
   {
-    (void)name;
-    (void)timestamp;
+    events_.push_back(SpanDataEvent(name, timestamp));
   }
 
   void SetStatus(trace_api::CanonicalCode code, nostd::string_view description) noexcept override
@@ -192,6 +213,7 @@ private:
   opentelemetry::trace::CanonicalCode status_code_{opentelemetry::trace::CanonicalCode::OK};
   std::string status_desc_;
   std::unordered_map<std::string, SpanDataAttributeValue> attributes_;
+  std::vector<SpanDataEvent> events_;
   AttributeConverter converter_;
 };
 }  // namespace trace
