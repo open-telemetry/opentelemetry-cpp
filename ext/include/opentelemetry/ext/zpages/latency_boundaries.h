@@ -53,7 +53,8 @@ enum LatencyBoundary {
 inline LatencyBoundary &operator++(LatencyBoundary &latencyBoundary) {
   latencyBoundary =
       LatencyBoundary(static_cast<std::underlying_type<LatencyBoundary>::type>(
-                          latencyBoundary) + 1);
+                          latencyBoundary) +
+                      1);
   return latencyBoundary;
 }
 

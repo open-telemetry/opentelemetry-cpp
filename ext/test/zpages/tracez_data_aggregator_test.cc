@@ -23,6 +23,8 @@ const std::string span_name3 = "span 3";
  * object in question to perform correctly. Later on if something like this is
  * added the tests should be modified accordingly so that there is no external
  * dependency.
+ * Additionally later on it would be better check for the span id(when set) 
+ * rather than span name.
  */
 
 /** Test fixture for setting up the data aggregator and tracer for each test **/
@@ -109,8 +111,7 @@ TEST_F(TracezDataAggregatorTest, SingleRunningSpan) {
                                {0, 0, 0, 0, 0, 0, 0, 0, 0});
 
   ASSERT_EQ(aggregated_data.sample_running_spans.size(), 1);
-  ASSERT_EQ(aggregated_data.sample_running_spans.front().span_name,
-            span_name1);
+  ASSERT_EQ(aggregated_data.sample_running_spans.front().span_name, span_name1);
 }
 
 /** Test to check if data aggregator works as expected when there is exactly one
@@ -407,8 +408,7 @@ TEST_F(TracezDataAggregatorTest, ErrorSampleSpansOverCapacity) {
   // introduced
   auto error_sample = aggregated_data.sample_error_spans.begin();
   for (unsigned int idx = 1; idx < span_error_descriptions.size(); idx++) {
-    ASSERT_EQ(error_sample->description,
-              span_error_descriptions[idx]);
+    ASSERT_EQ(error_sample->description, span_error_descriptions[idx]);
     error_sample = std::next(error_sample);
   }
 }
@@ -459,7 +459,8 @@ TEST_F(TracezDataAggregatorTest, CompletedSampleSpansOverCapacity) {
   // bucket the and the first one is removed
   for (unsigned int idx = 1; idx < timestamps.size(); idx++) {
     ASSERT_EQ(latency_sample->duration,
-              std::to_string(timestamps[idx].second.count() - timestamps[idx].first.count()));
+              std::to_string(timestamps[idx].second.count() -
+                             timestamps[idx].first.count()));
     latency_sample = std::next(latency_sample);
   }
 }
@@ -552,7 +553,8 @@ TEST_F(TracezDataAggregatorTest, RemovalOfRunningSpanWhenCompleted) {
                                {1, 0, 0, 0, 0, 0, 0, 0, 0});
   ASSERT_EQ(
       aggregated_data.sample_latency_spans[LatencyBoundary::k0MicroTo10Micro]
-          .front().duration,
+          .front()
+          .duration,
       "30");
 }
 
@@ -589,9 +591,7 @@ TEST_F(TracezDataAggregatorTest, EdgeSpanLatenciesFallInCorrectBoundaries) {
   // Check if the latency boundary is updated correctly
   for (auto boundary = LatencyBoundary::k0MicroTo10Micro;
        boundary != LatencyBoundary::k100SecondToMax; ++boundary) {
-    ASSERT_EQ(aggregated_data.sample_latency_spans[boundary]
-                  .front()
-                  .duration,
+    ASSERT_EQ(aggregated_data.sample_latency_spans[boundary].front().duration,
               std::to_string(durations[boundary].count()));
   }
 }

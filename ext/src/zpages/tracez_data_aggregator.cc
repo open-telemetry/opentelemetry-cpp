@@ -21,7 +21,7 @@ TracezDataAggregator::TracezDataAggregator(
 }
 
 TracezDataAggregator::~TracezDataAggregator() {
-  // Notify and join the thread so object can be destroyed
+  // Notify and join the thread so object can be destroyed without wait for wake
   if (execute_.load(std::memory_order_acquire)) {
     execute_.store(false, std::memory_order_release);
     cv_.notify_one();
@@ -32,15 +32,7 @@ TracezDataAggregator::~TracezDataAggregator() {
 std::map<std::string, TracezData>
 TracezDataAggregator::GetAggregatedTracezData() {
   std::unique_lock<std::mutex> lock(mtx_);
-  /**
-   * TODO: At the moment a copy of the aggregated data is returned from this
-   * getter to simplify things and avoid concurrency issues. When it
-   * becomes more clear what type of object is needed by the zPage HTTP server
-   * (most likely a JSON), this function may be changed accordingily.
-   **/
-  std::map<std::string, TracezData> aggregated_tracez_data_cpy =
-      aggregated_tracez_data_;
-  return aggregated_tracez_data_cpy;
+  return aggregated_tracez_data_;
 }
 
 LatencyBoundary TracezDataAggregator::FindLatencyBoundary(SpanData *span_data) {
@@ -53,8 +45,7 @@ LatencyBoundary TracezDataAggregator::FindLatencyBoundary(SpanData *span_data) {
 }
 
 void TracezDataAggregator::InsertIntoSampleSpanList(
-    std::list<SampleSpanData> &sample_spans,
-    std::unique_ptr<SpanData> &span_data) {
+    std::list<SampleSpanData> &sample_spans, SpanData &span_data) {
   /**
    * Check to see if the sample span list size exceeds the set limit, if it does
    * free up memory and remove the earliest inserted sample before appending
@@ -62,7 +53,14 @@ void TracezDataAggregator::InsertIntoSampleSpanList(
   if (sample_spans.size() == kMaxNumberOfSampleSpans) {
     sample_spans.pop_front();
   }
-  sample_spans.push_back(SampleSpanData(*span_data.get()));
+  sample_spans.push_back(SampleSpanData(span_data));
+}
+
+void TracezDataAggregator::ClearRunningSpanData() {
+  for (auto &tracez_data : aggregated_tracez_data_) {
+    tracez_data.second.running_span_count = 0;
+    tracez_data.second.sample_running_spans.clear();
+  }
 }
 
 void TracezDataAggregator::AggregateStatusOKSpan(
@@ -73,7 +71,7 @@ void TracezDataAggregator::AggregateStatusOKSpan(
   // Get the data for name in aggrgation and update count and sample spans
   auto &tracez_data = aggregated_tracez_data_.at(ok_span->GetName().data());
   InsertIntoSampleSpanList(tracez_data.sample_latency_spans[boundary_name],
-                           ok_span);
+                           *ok_span.get());
   tracez_data.completed_span_count_per_latency_bucket[boundary_name]++;
 }
 
@@ -81,95 +79,68 @@ void TracezDataAggregator::AggregateStatusErrorSpan(
     std::unique_ptr<SpanData> &error_span) {
   // Get data for name in aggregation and update count and sample spans
   auto &tracez_data = aggregated_tracez_data_.at(error_span->GetName().data());
-  InsertIntoSampleSpanList(tracez_data.sample_error_spans, error_span);
+  InsertIntoSampleSpanList(tracez_data.sample_error_spans, *error_span.get());
   tracez_data.error_span_count++;
 }
 
 void TracezDataAggregator::AggregateCompletedSpans(
     std::vector<std::unique_ptr<SpanData>> &completed_spans) {
-  for (auto &span : completed_spans) {
-    std::string span_name = span->GetName().data();
+  for (auto &completed_span : completed_spans) {
+    std::string span_name = completed_span->GetName().data();
 
     if (aggregated_tracez_data_.find(span_name) ==
         aggregated_tracez_data_.end()) {
       aggregated_tracez_data_[span_name] = TracezData();
     }
 
-    /**
-     * Running span information is reset for every completed span, if there
-     * exists running spans with the same span name it will be recalculated in
-     * the function call to aggregate running spans.
-     * This is done because if a running span is moved to completed span and
-     * there exists no running spans with the same name as the moved span
-     * the running span data for that span will never be reset.
-     */
-    aggregated_tracez_data_[span_name].running_span_count = 0;
-    aggregated_tracez_data_[span_name].sample_running_spans.clear();
-
-    if (span->GetStatus() == CanonicalCode::OK)
-      AggregateStatusOKSpan(span);
+    if (completed_span->GetStatus() == CanonicalCode::OK)
+      AggregateStatusOKSpan(completed_span);
     else
-      AggregateStatusErrorSpan(span);
+      AggregateStatusErrorSpan(completed_span);
   }
 }
 
 void TracezDataAggregator::AggregateRunningSpans(
     std::unordered_set<SpanData *> &running_spans) {
-  std::unordered_set<std::string> seen_span_names;
-
-  for (auto &span : running_spans) {
-    std::string span_name = span->GetName().data();
+  for (auto &running_span : running_spans) {
+    std::string span_name = running_span->GetName().data();
 
     if (aggregated_tracez_data_.find(span_name) ==
         aggregated_tracez_data_.end()) {
       aggregated_tracez_data_[span_name] = TracezData();
     }
-
-    /**
-     * If it's the first time this span name is seen, reset its information
-     * to avoid double counting from previous aggregated data.
-     */
-    if (seen_span_names.find(span_name) == seen_span_names.end()) {
-      aggregated_tracez_data_[span_name].running_span_count = 0;
-      aggregated_tracez_data_[span_name].sample_running_spans.clear();
-      seen_span_names.insert(span_name);
-    }
-
-    // Maintain maximum size of sample running spans list
-    if (aggregated_tracez_data_[span_name].sample_running_spans.size() ==
-        kMaxNumberOfSampleSpans) {
-      aggregated_tracez_data_[span_name].sample_running_spans.pop_front();
-    }
-    aggregated_tracez_data_[span_name].sample_running_spans.push_back(SampleSpanData(*span));
-    aggregated_tracez_data_[span_name].running_span_count++;
+    
+    auto &tracez_data = aggregated_tracez_data_[span_name];
+    InsertIntoSampleSpanList(tracez_data.sample_running_spans, *running_span);
+    tracez_data.running_span_count++;
   }
 }
 
 void TracezDataAggregator::AggregateSpans() {
   auto span_snapshot = tracez_span_processor_->GetSpanSnapshot();
   /**
-   * The following functions must be called in this particular order.
-   * Span data for running spans is recalculated at every call to this function.
-   * This recalculation is done because unlike completed spans, the function may
-   * recieve running spans for which data has already been collected. There
-   *seems to be no trivial way of telling which of these running spans recieved
-   *are duplicates from a previous call and recalculation is done to avoid
-   *double counting of the data of these spans.
+   * TODO: At this time in the project, there is no way of uniquely identifying
+   * a SpanData(their id's are not being set yet).
+   * If in the future this is added then clearing of running spans will not bee
+   * required.
+   * For now this step of clearing and recalculating running span data is
+   * required because it is unkown which spans have moved from running to
+   * completed since the previous call. Additionally, the span name can change
+   * for spans while they are running.
    *
-   * In the function call to aggregate completed span data, the running span
-   *data for all completed span names is reset. In the following function call
-   *to aggregate running spans the running span information is recalculated. If
-   *the order of this function calls are reversed then the running span data for
-   *all completed spans will be reset and never recalculated.
+   * A better approach for identifying moved spans would have been to map
+   * span id to span name, find these span names in the aggregated data and then
+   * delete only this information for running span data as opposed to clearing
+   * all running span data. However this cannot be done at this time because,
+   * unique identifiers to span data have not been added yet.
    *
-   * An alternative to this approach would be to go through the entire
-   *aggregation and reset all running span data before calls to these function
-   *but using the above mentioned approach(which is essentially the same) the
-   *extra linear step is avoided.
-   *
-   * See tests AdditionToRunningSpans and RemovalOfRunningSpanWhenCompleted to
-   * see an example of where this is used.
+   * A few things to note:
+   * i) Duplicate running spans may be recieved from the span processor in one
+   *    multiple successive calls to this function.
+   * ii) Only the newly completed spans are recieved by this function.
+   *     Completed spans will not be seen more than once
    **/
+  ClearRunningSpanData();
   AggregateCompletedSpans(span_snapshot.completed);
   AggregateRunningSpans(span_snapshot.running);
 }

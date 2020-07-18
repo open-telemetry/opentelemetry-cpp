@@ -9,15 +9,14 @@
 #include <string>
 #include <thread>
 #include <unordered_set>
-#include <vector>
 
 #include "opentelemetry/ext/zpages/latency_boundaries.h"
+#include "opentelemetry/ext/zpages/tracez_data.h"
 #include "opentelemetry/ext/zpages/tracez_processor.h"
+#include "opentelemetry/nostd/span.h"
 #include "opentelemetry/nostd/string_view.h"
 #include "opentelemetry/sdk/trace/span_data.h"
-#include "opentelemetry/nostd/span.h"
 #include "opentelemetry/trace/canonical_code.h"
-#include "opentelemetry/ext/zpages/tracez_data.h"
 
 using opentelemetry::trace::CanonicalCode;
 
@@ -78,10 +77,12 @@ class TracezDataAggregator {
    * AggregateRunningSpans aggregates the data for all running spans received
    * from the span processor. Running spans are not cleared by the span
    * processor and multiple calls to this function may contain running spans for
-   * which data has already been collected in a previous call. There seems to be
+   * which data has already been collected in a previous call. Additionally, 
+   * span names can change while span is running and there seems to be
    * no trivial to way to know if it is a new or old running span so at every
    * call to this function the available running span data is reset and
-   * recalculated, this is done so that no extra time is taken.
+   * recalculated. At this time there is no unique way to identify a SpanData
+   * object once this is done, there might be some better ways to do this.
    * @param running_spans is the running spans to be aggregated.
    */
   void AggregateRunningSpans(std::unordered_set<SpanData*>& running_spans);
@@ -101,6 +102,14 @@ class TracezDataAggregator {
   void AggregateStatusErrorSpan(std::unique_ptr<SpanData>& error_span);
 
   /**
+   * ClearRunningSpanData is a function that is used to clear all running span
+   * at the beginning of a call to AggregateSpan data.
+   * Running span data has to be cleared before aggregation because running
+   * span data is recalculated at every call to AggregateSpans.
+   */
+  void ClearRunningSpanData();
+
+  /**
    * FindLatencyBoundary finds the latency boundary to which the duration of
    * the given span_data belongs to
    * @ param span_data is the SpanData whose duration for which the latency
@@ -117,9 +126,8 @@ class TracezDataAggregator {
    * @param sample_spans the sample span list into which span is to be inserted
    * @param span_data the span_data to be inserted into list
    */
-  void InsertIntoSampleSpanList(
-      std::list<SampleSpanData>& sample_spans,
-      std::unique_ptr<SpanData>& span_data);
+  void InsertIntoSampleSpanList(std::list<SampleSpanData>& sample_spans,
+                                SpanData& span_data);
 
   /** Instance of span processor used to collect raw data **/
   std::shared_ptr<TracezSpanProcessor> tracez_span_processor_;
@@ -133,15 +141,15 @@ class TracezDataAggregator {
    * span names, one solution could be to implement a LRU cache that trims the
    * DS based on frequency of usage of a span name.
    */
-  std::mutex mtx_;
   std::map<std::string, TracezData> aggregated_tracez_data_;
-
+  std::mutex mtx_;
+  
   /** A boolean that is set to true in the constructor and false in the
    * destructor to start and end execution of aggregate spans **/
   std::atomic<bool> execute_;
 
   /** Thread that executes aggregate spans at regurlar intervals during this
-  objects lifetime**/
+  object's lifetime**/
   std::thread aggregate_spans_thread_;
 
   /** Condition variable that notifies the thread when object is about to be
