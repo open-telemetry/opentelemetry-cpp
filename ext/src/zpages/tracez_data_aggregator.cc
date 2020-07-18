@@ -57,9 +57,23 @@ void TracezDataAggregator::InsertIntoSampleSpanList(
 }
 
 void TracezDataAggregator::ClearRunningSpanData() {
-  for (auto &tracez_data : aggregated_tracez_data_) {
-    tracez_data.second.running_span_count = 0;
-    tracez_data.second.sample_running_spans.clear();
+  auto it = aggregated_tracez_data_.begin();
+  while (it != aggregated_tracez_data_.end()) {
+    it->second.running_span_count = 0;
+    it->second.sample_running_spans.clear();
+
+    // Check if any data exists in the struct, if not delete entry
+    bool is_completed_span_count_zero = true;
+    for (const auto &completed_span_count :
+         it->second.completed_span_count_per_latency_bucket) {
+      if (completed_span_count > 0) is_completed_span_count_zero = false;
+    }
+
+    if (it->second.error_span_count == 0 && is_completed_span_count_zero) {
+      it = aggregated_tracez_data_.erase(it);
+    } else {
+      ++it;
+    }
   }
 }
 
@@ -109,9 +123,10 @@ void TracezDataAggregator::AggregateRunningSpans(
         aggregated_tracez_data_.end()) {
       aggregated_tracez_data_[span_name] = TracezData();
     }
-    
+
     auto &tracez_data = aggregated_tracez_data_[span_name];
-    InsertIntoSampleSpanList(tracez_data.sample_running_spans, *running_span);
+    InsertIntoSampleSpanList(
+        aggregated_tracez_data_[span_name].sample_running_spans, *running_span);
     tracez_data.running_span_count++;
   }
 }

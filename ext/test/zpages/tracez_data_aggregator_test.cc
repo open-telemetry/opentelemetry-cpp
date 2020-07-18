@@ -539,9 +539,13 @@ TEST_F(TracezDataAggregatorTest, RemovalOfRunningSpanWhenCompleted) {
   // End the span and make sure running span is removed and completed span is
   // updated, there should be only one completed span
   span_first->End(end);
+  std::this_thread::sleep_for(milliseconds(500));
+  
+  //Make sure sample span still exists before next aggregation
+  ASSERT_TRUE(data.find(span_name1) != data.end());
   ASSERT_EQ(data.at(span_name1).sample_running_spans.front().span_name,
             span_name1);
-  std::this_thread::sleep_for(milliseconds(500));
+  
   data = tracez_data_aggregator->GetAggregatedTracezData();
 
   ASSERT_EQ(data.size(), 1);
@@ -557,6 +561,54 @@ TEST_F(TracezDataAggregatorTest, RemovalOfRunningSpanWhenCompleted) {
           .duration,
       "30");
 }
+
+TEST_F(TracezDataAggregatorTest, RunningSpanChangesNameBeforeCompletion)
+{
+  opentelemetry::trace::StartSpanOptions start;
+  start.start_steady_time = SteadyTimestamp(nanoseconds(10));
+  opentelemetry::trace::EndSpanOptions end;
+  end.end_steady_time = SteadyTimestamp(nanoseconds(40));
+
+  // Start a span and make sure data is updated
+  auto span_first = tracer->StartSpan(span_name1, start);
+  std::this_thread::sleep_for(milliseconds(500));
+  auto data = tracez_data_aggregator->GetAggregatedTracezData();
+  ASSERT_EQ(data.size(), 1);
+  ASSERT_TRUE(data.find(span_name1) != data.end());
+  VerifySpanCountsInTracezData(span_name1, data.at(span_name1), 1, 0,
+                               {0, 0, 0, 0, 0, 0, 0, 0, 0});
+  ASSERT_EQ(data.at(span_name1).sample_running_spans.front().span_name,
+            span_name1);
+  
+  // End the span and make sure running span is removed and completed span is
+  // updated, there should be only one completed span
+  span_first->UpdateName(span_name2);
+  span_first->End(end);
+  
+  //Check if sample span is present before fetching updated data
+  std::this_thread::sleep_for(milliseconds(500));
+  ASSERT_TRUE(data.find(span_name1) != data.end());
+  ASSERT_EQ(data.at(span_name1).sample_running_spans.front().span_name,
+            span_name1);
+  
+  
+  data = tracez_data_aggregator->GetAggregatedTracezData();
+
+  ASSERT_EQ(data.size(), 1);
+  ASSERT_TRUE(data.find(span_name2) != data.end());
+
+  // Check if completed span fields are correctly updated
+  auto &aggregated_data = data.at(span_name2);
+  VerifySpanCountsInTracezData(span_name2, aggregated_data, 0, 0,
+                               {1, 0, 0, 0, 0, 0, 0, 0, 0});
+  ASSERT_EQ(
+      aggregated_data.sample_latency_spans[LatencyBoundary::k0MicroTo10Micro]
+          .front()
+          .duration,
+      "30");
+  
+}
+
 
 /** Test to check if the span latencies with duration at the edge of boundaries
  * fall in the correct bucket **/

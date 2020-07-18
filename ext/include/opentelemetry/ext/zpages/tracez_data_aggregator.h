@@ -83,6 +83,10 @@ class TracezDataAggregator {
    * call to this function the available running span data is reset and
    * recalculated. At this time there is no unique way to identify a SpanData
    * object once this is done, there might be some better ways to do this.
+   * TODO : SpanProcessor is never notified when a span name is changed while it
+   * is running and that is propogated to the data aggregator. The running span
+   * name if changed while it is running will not be updated in the data
+   * aggregator till the span is completed.
    * @param running_spans is the running spans to be aggregated.
    */
   void AggregateRunningSpans(std::unordered_set<SpanData*>& running_spans);
