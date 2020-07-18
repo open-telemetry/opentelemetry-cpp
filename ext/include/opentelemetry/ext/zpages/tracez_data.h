@@ -48,7 +48,7 @@ struct SampleSpanData {
   std::string parent_id;
   std::string description;
   std::string duration;
-  SampleSpanData(SpanData &span_data) {
+  SampleSpanData(SpanData span_data) {
     span_name = span_data.GetName().data();
     span_id = std::string(
         reinterpret_cast<const char *>(span_data.GetSpanId().Id().data()));
