@@ -56,11 +56,7 @@ namespace context
       Context SetValue(nostd::string_view key, ContextValue value) noexcept
       {
           Context context = Context(key, value);
-          nostd::shared_ptr<DataList> last_node; 
-          for(nostd::shared_ptr<DataList> data = context.head_; data != nullptr; data = data->next_){
-            last_node = data;
-          }
-          last_node->next_ = head_;
+          context.head_->next_ = head_;
           return context;
       }
       
