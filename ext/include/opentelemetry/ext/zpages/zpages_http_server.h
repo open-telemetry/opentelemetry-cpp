@@ -27,8 +27,6 @@ namespace zpages
 class zPagesHttpServer : public HTTP_SERVER_NS::HttpServer {
  public:
   bool FileGetSuccess (std::string filename, std::vector<char>& result) {
-    // WIRE TO CORRECT PATH WITH TRACEZ
-    // ADD DEFAILT ZPAGE FILE INDEX, which points to types of zpages
     #ifdef _WIN32
     std::replace(filename.begin(), filename.end(), '/', '\\');
     #endif
@@ -55,6 +53,7 @@ class zPagesHttpServer : public HTTP_SERVER_NS::HttpServer {
         : testing::CONTENT_TYPE_TEXT;
   };
 
+  // For serving index.html files
   bool IsExtension(const std::string& s) {
     for (auto& c : s) {
       if (c == '.') return true;
@@ -62,6 +61,8 @@ class zPagesHttpServer : public HTTP_SERVER_NS::HttpServer {
     return false;
   }
 
+  // Ensure that file, file/, file/index.html and
+  // file.png and file.png/ are all served the same
   std::string GetFileName(std::string S) {
     if (S.back() == '/') {
       auto temp = S.substr(0, S.size() - 1);
@@ -98,8 +99,10 @@ class zPagesHttpServer : public HTTP_SERVER_NS::HttpServer {
 
   void InitializeTracezEndpoints(zPagesHttpServer& server) {
     for (auto &s : tracez_handler_->GetEndpoints()) server[s] = tracez_handler_->ServeJsonCb;
-    server["/"] = ServeFile;
+  }
 
+  void InitializeFileEndpoint() {
+    server["/"] = ServeFile;
   }
 
   zPagesHttpServer(std::string serverHost, int port = 30000) : HttpServer() {
