@@ -248,6 +248,7 @@ private:
   Context(const T &keys_and_values)
   {
     head_ = new DataList(keys_and_values);
+    next_ = nostd::shared_ptr<Context>{nullptr};
   }
 
   // Creates a context object from a key and value, this will be the head
