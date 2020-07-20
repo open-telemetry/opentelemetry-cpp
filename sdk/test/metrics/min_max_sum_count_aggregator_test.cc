@@ -113,7 +113,7 @@ TEST(MinMaxSumCountAggregator, BadMerge)
   // This verifies that we encounter and error when we try to merge
   // two aggregators of different numeric types together.
   auto agg1 = new MinMaxSumCountAggregator<int>(opentelemetry::metrics::InstrumentKind::IntCounter);
-  auto agg2 = new MinMaxSumCountAggregator<int>(opentelemetry::metrics::InstrumentKind::IntCounter);
+  auto agg2 = new MinMaxSumCountAggregator<int>(opentelemetry::metrics::InstrumentKind::DoubleCounter);
 
   agg1->update(1);
   agg2->update(2);
