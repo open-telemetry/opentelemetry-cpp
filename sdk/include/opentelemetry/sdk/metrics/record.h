@@ -1,9 +1,10 @@
 #pragma once
 
+#include "opentelemetry/metrics/instrument.h"
+#include "opentelemetry/sdk/metrics/aggregator/aggregator.h"
 #include "opentelemetry/core/timestamp.h"
 #include "opentelemetry/nostd/variant.h"
 #include <vector>
-#include <string>
 
 enum AggregatorKind
 {
@@ -23,19 +24,23 @@ namespace metrics
 {
 class Record
 {
+  using RecordValue = nostd::variant<std::vector<short>,
+                                     std::vector<int>,
+                                     std::vector<float>,
+                                     std::vector<double>>;
 public:
   explicit Record(std::string name, std::string description,
+                  AggregatorKind aggregatorKind,
                   std::string labels,
-                  nostd::variant<std::vector<short>, std::vector<int>, std::vector<float>, std::vector<double>> value,
-                  core::SystemTimestamp timestamp = core::SystemTimestamp(std::chrono::system_clock::now()),
-                  AggregatorKind aggkind = AggregatorKind::Counter)
+                  RecordValue value,
+                  core::SystemTimestamp timestamp = core::SystemTimestamp(std::chrono::system_clock::now()))
   {
     name_ = name;
     description_ = description;
+    aggregatorKind_ = aggregatorKind;
     labels_ = labels;
     value_ = value;
     timestamp_ = timestamp;
-    aggkind_ = aggkind;
   }
 
   template<typename T>
@@ -46,18 +51,18 @@ public:
 
   std::string GetName() {return name_;}
   std::string GetDescription() {return description_;}
+  AggregatorKind GetAggregatorKind() {return aggregatorKind_;}
   std::string GetLabels() {return labels_;}
-  nostd::variant<std::vector<short>, std::vector<int>, std::vector<float>, std::vector<double>> GetValue() {return value_;}
+  RecordValue GetValue() {return value_;}
   core::SystemTimestamp GetTimestamp() {return timestamp_;}
-  AggregatorKind GetAggKind() {return aggkind_;}
 
 private:
   std::string name_;
   std::string description_;
+  AggregatorKind aggregatorKind_;
   std::string labels_;
   nostd::variant<std::vector<short>, std::vector<int>, std::vector<float>, std::vector<double>> value_;
   core::SystemTimestamp timestamp_;
-  AggregatorKind aggkind_;
 };
 } // namespace metrics
 } // namespace sdk
