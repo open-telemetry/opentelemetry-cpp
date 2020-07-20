@@ -90,17 +90,15 @@ struct AttributeConverter
 class SpanDataEvent
 {
 public:
-  SpanDataEvent(nostd::string_view name, core::SystemTimestamp timestamp)
-  {
-    name_      = name;
-    timestamp_ = timestamp;
-  }
+  SpanDataEvent(std::string name, core::SystemTimestamp timestamp)
+      : name_(name), timestamp_(timestamp)
+  {}
 
   /**
    * Get the name for this event
    * @return the name for this event
    */
-  nostd::string_view GetName() const noexcept { return name_; }
+  std::string GetName() const noexcept { return name_; }
 
   /**
    * Get the timestamp for this event
@@ -109,7 +107,7 @@ public:
   core::SystemTimestamp GetTimestamp() const noexcept { return timestamp_; }
 
 private:
-  nostd::string_view name_;
+  std::string name_;
   core::SystemTimestamp timestamp_;
 };
 
@@ -198,7 +196,7 @@ public:
 
   void AddEvent(nostd::string_view name, core::SystemTimestamp timestamp) noexcept override
   {
-    events_.push_back(SpanDataEvent(name, timestamp));
+    events_.push_back(SpanDataEvent(std::string(name), timestamp));
   }
 
   void SetStatus(trace_api::CanonicalCode code, nostd::string_view description) noexcept override
