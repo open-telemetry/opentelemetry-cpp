@@ -3,8 +3,8 @@
 #include <atomic>
 
 #include "opentelemetry/context/context_value.h"
-#include "opentelemetry/nostd/string_view.h"
 #include "opentelemetry/nostd/shared_ptr.h"
+#include "opentelemetry/nostd/string_view.h"
 #include "opentelemetry/trace/key_value_iterable_view.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
@@ -20,23 +20,24 @@ class Context
 {
 
 public:
-  
-  nostd::shared_ptr<Context>* context_ptr_;
-  
+  nostd::shared_ptr<Context> *context_ptr_;
+
   // Creates a new context by calling a constructor with the passed in
   // keyValueIterable and returns a shared_ptr pointing to it.
   template <class T, nostd::enable_if_t<trace::detail::is_key_value_iterable<T>::value> * = nullptr>
-  static nostd::shared_ptr<Context> CreateContext( T &keys_and_values){
-    nostd::shared_ptr<Context> temp = nostd::shared_ptr<Context>{ new Context(keys_and_values)};
-    temp->context_ptr_ = &temp;
+  static nostd::shared_ptr<Context> CreateContext(T &keys_and_values)
+  {
+    nostd::shared_ptr<Context> temp = nostd::shared_ptr<Context>{new Context(keys_and_values)};
+    temp->context_ptr_              = &temp;
     return temp;
   }
 
   // Creates a new context by calling a constructor with the passed in
   // key and value and returns a shared_ptr pointing to it.
-  static nostd::shared_ptr<Context> CreateContext(nostd::string_view key, ContextValue value){
-    nostd::shared_ptr<Context> temp = nostd::shared_ptr<Context>{ new Context(key, value)};
-    temp->context_ptr_ = &temp;
+  static nostd::shared_ptr<Context> CreateContext(nostd::string_view key, ContextValue value)
+  {
+    nostd::shared_ptr<Context> temp = nostd::shared_ptr<Context>{new Context(key, value)};
+    temp->context_ptr_              = &temp;
     return temp;
   }
 
@@ -45,8 +46,8 @@ public:
   template <class T, nostd::enable_if_t<trace::detail::is_key_value_iterable<T>::value> * = nullptr>
   nostd::shared_ptr<Context> SetValues(T &values) noexcept
   {
-    nostd::shared_ptr<Context> temp = nostd::shared_ptr<Context>{ new Context(values)};
-    temp->context_ptr_ = &temp;
+    nostd::shared_ptr<Context> temp = nostd::shared_ptr<Context>{new Context(values)};
+    temp->context_ptr_              = &temp;
     temp->SetNext(*context_ptr_);
     return temp;
   }
@@ -56,7 +57,7 @@ public:
   nostd::shared_ptr<Context> SetValue(nostd::string_view key, ContextValue value) noexcept
   {
     nostd::shared_ptr<Context> context = nostd::shared_ptr<Context>{new Context(key, value)};
-    context->context_ptr_ = &context;
+    context->context_ptr_              = &context;
     context->SetNext(*context_ptr_);
     return context;
   }
@@ -75,7 +76,6 @@ public:
           return data->value_;
         }
       }
-      
     }
     return "";
   }
@@ -111,7 +111,7 @@ public:
     }
     return true;
   }
-  
+
   // Copy constructor links to the same next node but copies the other's
   // data list into a new linked list
   Context(const Context &other)
@@ -175,14 +175,11 @@ public:
   }
 
   // Used to set the next node in the list
-  void SetNext(nostd::shared_ptr<Context> next){
-    next_ = next; 
-  }
+  void SetNext(nostd::shared_ptr<Context> next) { next_ = next; }
 
 private:
-  
   Context() = default;
-  
+
   // A linked list to contain the keys and values of this context node
   class DataList
   {
@@ -231,8 +228,8 @@ private:
     // and returns that head.
     DataList(nostd::string_view key, ContextValue value)
     {
-      key_           = new char[nostd::string_view(key).size()];
-      key_length_    = nostd::string_view(key).size();
+      key_        = new char[nostd::string_view(key).size()];
+      key_length_ = nostd::string_view(key).size();
       strncpy(key_, nostd::string_view(key).data(), nostd::string_view(key).size());
       value_ = value;
       next_  = nullptr;
@@ -252,7 +249,7 @@ private:
   // Creates a context object from a key and value, this will be the head
   // of the context object linked list.
   Context(nostd::string_view key, ContextValue value) { head_ = new DataList(key, value); }
-  
+
   // Head of the list which holds the keys and values of this context
   DataList *head_ = nullptr;
 
