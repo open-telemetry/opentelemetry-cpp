@@ -3,6 +3,7 @@
 #include "opentelemetry/core/timestamp.h"
 #include "opentelemetry/nostd/variant.h"
 #include <vector>
+#include <string>
 
 enum AggregatorKind
 {
@@ -20,12 +21,14 @@ namespace sdk
 {
 namespace metrics
 {
+  
+using RecordValue = nostd::variant<std::vector<short>,
+                                    std::vector<int>,
+                                    std::vector<float>,
+                                    std::vector<double>>;
+                                    
 class Record
 {
-  using RecordValue = nostd::variant<std::vector<short>,
-                                     std::vector<int>,
-                                     std::vector<float>,
-                                     std::vector<double>>;
 public:
   explicit Record(std::string name, std::string description,
                   AggregatorKind aggregatorKind,
