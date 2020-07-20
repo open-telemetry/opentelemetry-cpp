@@ -2,24 +2,17 @@
 
 #include <fstream>
 #include <iostream>
-#include <mutex>
 #include <string>
-#include <vector>
-#include <algorithm>
-
-#include "nlohmann/json.hpp"
-
-using json = nlohmann::json;
+#include <chrono>
 
 #include "opentelemetry/ext/zpages/zpages_http_server.h"
 #include "opentelemetry/ext/http/server/HttpServer.h"
 
 void runServer() {
   ext::zpages::zPagesHttpServer server("localhost", 32000);
-  std::cout << "Hi...\n";
   server.start();
-  std::cin.get();
-  std::cout << "<ENTER> to stop...\n";
+  // Keeps zPages server up indefinitely
+  while (1) std::this_thread::sleep_for(std::chrono::hours(10));
   server.stop();
 }
 
@@ -31,6 +24,5 @@ int main(int argc, char* argv[]) {
   zPagesRun().detach();
   std::cout << "Presss <ENTER> to stop...\n";
   std::cin.get();
-  std::cout << "Server stopped.\n";
 }
 
