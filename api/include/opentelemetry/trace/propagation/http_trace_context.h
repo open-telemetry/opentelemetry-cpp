@@ -32,8 +32,8 @@ namespace
 
 static nostd::string_view span_key = "current-span";
 
-static context::Context SetSpanInContext(Span &span, Context &context) {
-    Context new_values = Context(context);
+static context::Context SetSpanInContext(Span &span, context::Context &context) {
+    context::Context new_values = context::Context(context);
     new_values.SetValue(span_key,span);
     return new_values;
 }
@@ -60,7 +60,7 @@ class HttpTraceContext : public HTTPTextFormat<T>
             return kFields;
         }
 
-        void Inject(Setter setter, T &carrier, const Context &context) override {
+        void Inject(Setter setter, T &carrier, const context::Context &context) override {
             common::AttributeValue span = GetCurrentSpan(context);
             if (span == NULL || !span.GetContext().IsValid()) {
                 // We don't have span.getContext() in span.h, should we just use span? As well as acquiring validity. (I do know how to implement them though)
@@ -69,7 +69,7 @@ class HttpTraceContext : public HTTPTextFormat<T>
             InjectImpl(setter, carrier, span.GetContext());
         }
 
-        Context Extract(Getter getter, const T &carrier, Context &context) override {
+        context::Context Extract(Getter getter, const T &carrier, context::Context &context) override {
             SpanContext span_context = ExtractImpl(carrier, getter);
             return SetSpanInContext(trace.DefaultSpan(span_context), context);
         }
