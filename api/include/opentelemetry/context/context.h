@@ -71,9 +71,12 @@ public:
       // Iterate through the internal data nodes
       for (DataList *data = context->head_; data != nullptr; data = data->next_)
       {
-        if (strncmp(key.data(), data->key_, data->key_length_) == 0)
+        if (key.size() == data->key_length_)
         {
-          return data->value_;
+          if (memcmp(key.data(), data->key_, data->key_length_) == 0)
+          {
+            return data->value_;
+          }
         }
       }
     }
@@ -203,7 +206,8 @@ private:
       // Create list head
       key_        = new char[nostd::string_view(iter->first).size()];
       key_length_ = nostd::string_view(iter->first).size();
-      strncpy(key_, nostd::string_view(iter->first).data(), nostd::string_view(iter->first).size());
+      memcpy(key_, nostd::string_view(iter->first).data(),
+             nostd::string_view(iter->first).size() * sizeof(char));
       value_ = iter->second;
       next_  = nullptr;
       ++iter;
@@ -216,8 +220,8 @@ private:
         node->next_       = nullptr;
         node->key_        = new char[nostd::string_view(iter->first).size()];
         node->key_length_ = nostd::string_view(iter->first).size();
-        strncpy(node->key_, nostd::string_view(iter->first).data(),
-                nostd::string_view(iter->first).size());
+        memcpy(node->key_, nostd::string_view(iter->first).data(),
+               nostd::string_view(iter->first).size() * sizeof(char));
         node->value_         = iter->second;
         previous_node->next_ = node;
         previous_node        = node;
@@ -230,7 +234,7 @@ private:
     {
       key_        = new char[nostd::string_view(key).size()];
       key_length_ = nostd::string_view(key).size();
-      strncpy(key_, nostd::string_view(key).data(), nostd::string_view(key).size());
+      memcpy(key_, nostd::string_view(key).data(), nostd::string_view(key).size() * sizeof(char));
       value_ = value;
       next_  = nullptr;
     }
