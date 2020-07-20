@@ -4,6 +4,7 @@
 
 #include "opentelemetry/context/context_value.h"
 #include "opentelemetry/nostd/string_view.h"
+#include "opentelemetry/nostd/shared_ptr.h"
 #include "opentelemetry/trace/key_value_iterable_view.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
@@ -19,40 +20,52 @@ class Context
 {
 
 public:
-  Context() = default;
-
-  // Creates a context object from a map of keys and identifiers, this will
-  // be the head of the context object linked list.
+  
+  nostd::shared_ptr<Context>* context_ptr_;
+  
+  // Creates a new context by calling a constructor with the passed in
+  // keyValueIterable and returns a shared_ptr pointing to it.
   template <class T, nostd::enable_if_t<trace::detail::is_key_value_iterable<T>::value> * = nullptr>
-  Context(const T &keys_and_values)
-  {
-    head_ = new DataList(keys_and_values);
+  static nostd::shared_ptr<Context> CreateContext( T &keys_and_values){
+    nostd::shared_ptr<Context> temp = nostd::shared_ptr<Context>{ new Context(keys_and_values)};
+    temp->context_ptr_ = &temp;
+    return temp;
   }
 
-  // Creates a context object from a key and value, this will be the head
-  // of the context object linked list.
-  Context(nostd::string_view key, ContextValue value) { head_ = new DataList(key, value); }
+  // Creates a new context by calling a constructor with the passed in
+  // key and value and returns a shared_ptr pointing to it.
+  static nostd::shared_ptr<Context> CreateContext(nostd::string_view key, ContextValue value){
+    nostd::shared_ptr<Context> temp = nostd::shared_ptr<Context>{ new Context(key, value)};
+    temp->context_ptr_ = &temp;
+    return temp;
+  }
 
   // Accepts a new iterable and then returns a new context that
   // contains the new key and value data.
   template <class T, nostd::enable_if_t<trace::detail::is_key_value_iterable<T>::value> * = nullptr>
-  Context *SetValues(T &values) noexcept
+  nostd::shared_ptr<Context> SetValues(T &values) noexcept
   {
-    return new Context(values, this);
+    nostd::shared_ptr<Context> temp = nostd::shared_ptr<Context>{ new Context(values)};
+    temp->context_ptr_ = &temp;
+    temp->SetNext(*context_ptr_);
+    return temp;
   }
 
   // Accepts a new iterable and then returns a new context that
   // contains the new key and value data.
-  Context *SetValue(nostd::string_view key, ContextValue value) noexcept
+  nostd::shared_ptr<Context> SetValue(nostd::string_view key, ContextValue value) noexcept
   {
-    return new Context(key, value, this);
+    nostd::shared_ptr<Context> context = nostd::shared_ptr<Context>{new Context(key, value)};
+    context->context_ptr_ = &context;
+    context->SetNext(*context_ptr_);
+    return context;
   }
 
   // Returns the value associated with the passed in key.
   context::ContextValue GetValue(nostd::string_view key)
   {
     // Iterate through the context nodes
-    for (Context *context = this; context != nullptr; context = context->next_)
+    for (auto context = *context_ptr_; context != nullptr; context = context->next_)
     {
       // Iterate through the internal data nodes
       for (DataList *data = context->head_; data != nullptr; data = data->next_)
@@ -62,6 +75,7 @@ public:
           return data->value_;
         }
       }
+      
     }
     return "";
   }
@@ -88,19 +102,16 @@ public:
       {
         return false;
       }
-
       if (data->key_ != other_data->key_)
       {
         return false;
       }
-
       data       = data->next_;
       other_data = other_data->next_;
     }
-
     return true;
   }
-
+  
   // Copy constructor links to the same next node but copies the other's
   // data list into a new linked list
   Context(const Context &other)
@@ -163,7 +174,15 @@ public:
     }
   }
 
+  // Used to set the next node in the list
+  void SetNext(nostd::shared_ptr<Context> next){
+    next_ = next; 
+  }
+
 private:
+  
+  Context() = default;
+  
   // A linked list to contain the keys and values of this context node
   class DataList
   {
@@ -184,7 +203,6 @@ private:
     DataList(const T &keys_and_vals)
     {
       auto iter = std::begin(keys_and_vals);
-
       // Create list head
       key_        = new char[nostd::string_view(iter->first).size()];
       key_length_ = nostd::string_view(iter->first).size();
@@ -213,7 +231,6 @@ private:
     // and returns that head.
     DataList(nostd::string_view key, ContextValue value)
     {
-      DataList *head = new DataList;
       key_           = new char[nostd::string_view(key).size()];
       key_length_    = nostd::string_view(key).size();
       strncpy(key_, nostd::string_view(key).data(), nostd::string_view(key).size());
@@ -224,31 +241,23 @@ private:
     ~DataList() { delete[] key_; }
   };
 
-  // Creates a context object from a map of keys and identifiers, an internal
-  // contructor only, will always create a node within the list, not at the
-  // head.
+  // Creates a context object from a map of keys and identifiers, this will
+  // be the head of the context object linked list.
   template <class T, nostd::enable_if_t<trace::detail::is_key_value_iterable<T>::value> * = nullptr>
-  Context(const T &keys_and_vals, Context *next_node)
+  Context(const T &keys_and_values)
   {
-    head_ = new DataList(keys_and_vals);
-    next_ = next_node;
+    head_ = new DataList(keys_and_values);
   }
 
-  // Creates a context object from a key and value. An internal
-  // contructor only, will always create a node within the list, not at the
-  // head.
-  Context(nostd::string_view key, ContextValue value, Context *next_node)
-  {
-    head_ = new DataList(key, value);
-    next_ = next_node;
-  }
-
+  // Creates a context object from a key and value, this will be the head
+  // of the context object linked list.
+  Context(nostd::string_view key, ContextValue value) { head_ = new DataList(key, value); }
+  
   // Head of the list which holds the keys and values of this context
   DataList *head_ = nullptr;
 
   // Pointer to the next context object in the context list
-  Context *next_ = nullptr;
+  nostd::shared_ptr<Context> next_;
 };
-
 }  // namespace context
 OPENTELEMETRY_END_NAMESPACE
