@@ -99,10 +99,8 @@ class zPagesHttpServer : public HTTP_SERVER_NS::HttpServer {
 
   void InitializeTracezEndpoints(zPagesHttpServer& server) {
     for (auto &s : tracez_handler_->GetEndpoints()) server[s] = tracez_handler_->ServeJsonCb;
-  }
-
-  void InitializeFileEndpoint() {
     server["/"] = ServeFile;
+
   }
 
   zPagesHttpServer(std::string serverHost, int port = 30000) : HttpServer() {
