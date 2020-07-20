@@ -30,22 +30,6 @@ namespace propagation
 namespace
 {
 
-static nostd::string_view span_key = "current-span";
-
-static context::Context SetSpanInContext(Span &span, context::Context &context) {
-    context::Context new_values = context::Context(context);
-    new_values.SetValue(span_key,span);
-    return new_values;
-}
-
-static Span GetCurrentSpan(Context &context) {
-    Span span = context.GetValue(Context.kSpanKey);
-    if (span == NULL) {
-        return NULL;
-    }
-    return span;
-}
-
 // The HttpTraceContext provides methods to extract and inject
 // context into headers of HTTP requests with traces.
 // Example:
@@ -72,6 +56,22 @@ class HttpTraceContext : public HTTPTextFormat<T>
         context::Context Extract(Getter getter, const T &carrier, context::Context &context) override {
             SpanContext span_context = ExtractImpl(carrier, getter);
             return SetSpanInContext(trace.DefaultSpan(span_context), context);
+        }
+
+        static nostd::string_view span_key = "current-span";
+
+        static context::Context SetSpanInContext(Span &span, context::Context &context) {
+            context::Context new_values = context::Context(context);
+            new_values.SetValue(span_key,span);
+            return new_values;
+        }
+
+        static Span GetCurrentSpan(Context &context) {
+            Span span = context.GetValue(Context.kSpanKey);
+            if (span == NULL) {
+                return NULL;
+            }
+            return span;
         }
 
     private:

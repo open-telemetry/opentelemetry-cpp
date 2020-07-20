@@ -11,11 +11,6 @@ namespace trace
 namespace propagation
 {
 
-// Set the span in the given context.
-virtual static context::Context SetSpanInContext(Span span, Context &context) = 0;
-// Retrieve the current span.
-virtual static Span GetCurrentSpan(Context &context) = 0;
-
 // The HTTPTextFormat class provides an interface that enables extracting and injecting
 // context into headers of HTTP requests. HTTP frameworks and clients
 // can integrate with HTTPTextFormat by providing the object containing the
@@ -35,6 +30,11 @@ class HTTPTextFormat {
 
         // Sets the context for a HTTP header carrier with self defined rules.
         virtual void Inject(Setter set_from_carrier, T &carrier, const context::Context &context) = 0;
+
+        // Set the span in the given context.
+        virtual static context::Context SetSpanInContext(Span span, Context &context) = 0;
+        // Retrieve the current span.
+        virtual static Span GetCurrentSpan(Context &context) = 0;
 };
 }
 }
