@@ -148,10 +148,12 @@ class ThreadsafeSpanData final : public opentelemetry::sdk::trace::Recordable {
   }
 
   void SetDuration(std::chrono::nanoseconds duration) noexcept override {
+    std::unique_lock<std::mutex> lock(mutex_);
     duration_ = duration;
   }
 
  private:
+  mutable std::mutex mutex_;
   opentelemetry::trace::TraceId trace_id_;
   opentelemetry::trace::SpanId span_id_;
   opentelemetry::trace::SpanId parent_span_id_;
@@ -163,7 +165,6 @@ class ThreadsafeSpanData final : public opentelemetry::sdk::trace::Recordable {
   std::string status_desc_;
   std::unordered_map<std::string, SpanDataAttributeValue> attributes_;
   AttributeConverter converter_;
-  mutable std::mutex mutex_;
 };
 }  // namespace zpages
 }  // namespace ext
