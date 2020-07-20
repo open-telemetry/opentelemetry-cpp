@@ -60,7 +60,7 @@ class HttpTraceContext : public HTTPTextFormat<T>
 
         static nostd::string_view span_key = "current-span";
 
-        static context::Context SetSpanInContext(Span &span, context::Context &context) {
+        static context::Context SetSpanInContext(trace::Span &span, context::Context &context) {
             context::Context new_values = context::Context(context);
             new_values.SetValue(span_key,span);
             return new_values;
@@ -90,7 +90,7 @@ class HttpTraceContext : public HTTPTextFormat<T>
 
         // TODO: need review on hex_string because trace ids are objects not string_views
         static void InjectImpl(Setter setter, T &carrier, const trace::SpanContext &span_context) {
-            nostd::string_view trace_parent = trace::SpanContextToString(SpanContext &span_context);
+            nostd::string_view trace_parent = trace::SpanContextToString(trace::SpanContext &span_context);
             setter(carrier, kTraceParent, trace_parent);
             if (span_context.trace_state() != NULL) {
                 nostd::string_view trace_state = FormatTracestate(span_context.trace_state());
@@ -114,7 +114,7 @@ class HttpTraceContext : public HTTPTextFormat<T>
             return res;
         }
 
-        static nostd::string trace::SpanContextToString(SpanContext &span_context) {
+        static nostd::string trace::SpanContextToString(trace::SpanContext &span_context) {
             nostd::span<char> trace_id = span_context.trace_id();
             nostd::span<char> span_id = span_context.span_id();
             nostd::span<char> trace_flags = span_context.trace_flags();
