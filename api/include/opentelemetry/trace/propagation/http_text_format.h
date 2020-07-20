@@ -26,7 +26,7 @@ class HTTPTextFormat {
         using Setter = void(*)(T &carrier, nostd::string_view trace_type,nostd::string_view trace_description);
 
         // Returns the context that is stored in the HTTP header carrier with self defined rules.
-        virtual Context Extract(Getter get_from_carrier, const T &carrier, context::Context &context) = 0;
+        virtual context::Context Extract(Getter get_from_carrier, const T &carrier, context::Context &context) = 0;
 
         // Sets the context for a HTTP header carrier with self defined rules.
         virtual void Inject(Setter set_from_carrier, T &carrier, const context::Context &context) = 0;
