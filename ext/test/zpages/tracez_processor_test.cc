@@ -18,8 +18,8 @@ using namespace opentelemetry::ext::zpages;
  * and running_spans. completed_spans contains all spans (cumulative), unless marked otherwise
  */
 void UpdateSpans(std::shared_ptr<TracezSpanProcessor>& processor,
-    std::vector<std::unique_ptr<opentelemetry::sdk::trace::SpanData>>& completed,
-    std::unordered_set<opentelemetry::sdk::trace::SpanData*>& running,
+    std::vector<std::unique_ptr<opentelemetry::ext::zpages::ThreadsafeSpanData>>& completed,
+    std::unordered_set<opentelemetry::ext::zpages::ThreadsafeSpanData*>& running,
     bool store_only_new_completed = false) {
   auto spans = processor->GetSpanSnapshot();
   running = spans.running;
@@ -44,7 +44,7 @@ void UpdateSpans(std::shared_ptr<TracezSpanProcessor>& processor,
  * no more or less
  */
 bool ContainsNames(const std::vector<std::string>& names,
-    std::unordered_set<opentelemetry::sdk::trace::SpanData*>& running,
+    std::unordered_set<opentelemetry::ext::zpages::ThreadsafeSpanData*>& running,
     unsigned int name_start = 0, unsigned int name_end = 0,
     bool one_to_one_correspondence = false) {
   if (name_end == 0) name_end = names.size();
@@ -84,7 +84,7 @@ bool ContainsNames(const std::vector<std::string>& names,
  * no more or less
  */
 bool ContainsNames(const std::vector<std::string>& names,
-    std::vector<std::unique_ptr<opentelemetry::sdk::trace::SpanData>>& completed,
+    std::vector<std::unique_ptr<opentelemetry::ext::zpages::ThreadsafeSpanData>>& completed,
     unsigned int name_start = 0, unsigned int name_end = 0,
     bool one_to_one_correspondence = false) {
 
@@ -162,8 +162,8 @@ class TracezProcessor : public ::testing::Test {
   std::shared_ptr<TracezSpanProcessor> processor;
   std::shared_ptr<opentelemetry::trace::Tracer> tracer;
 
-  std::unordered_set<opentelemetry::sdk::trace::SpanData*> running;
-  std::vector<std::unique_ptr<opentelemetry::sdk::trace::SpanData>> completed;
+  std::unordered_set<opentelemetry::ext::zpages::ThreadsafeSpanData*> running;
+  std::vector<std::unique_ptr<opentelemetry::ext::zpages::ThreadsafeSpanData>> completed;
 
   std::vector<std::string> span_names;
   std::vector<opentelemetry::nostd::unique_ptr<opentelemetry::trace::Span>> span_vars;

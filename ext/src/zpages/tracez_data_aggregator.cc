@@ -35,7 +35,7 @@ TracezDataAggregator::GetAggregatedTracezData() {
   return aggregated_tracez_data_;
 }
 
-LatencyBoundary TracezDataAggregator::FindLatencyBoundary(SpanData *span_data) {
+LatencyBoundary TracezDataAggregator::FindLatencyBoundary(ThreadsafeSpanData *span_data) {
   auto span_data_duration = span_data->GetDuration();
   for (auto boundary = LatencyBoundary::k0MicroTo10Micro;
        boundary != LatencyBoundary::k100SecondToMax; ++boundary) {
@@ -45,7 +45,7 @@ LatencyBoundary TracezDataAggregator::FindLatencyBoundary(SpanData *span_data) {
 }
 
 void TracezDataAggregator::InsertIntoSampleSpanList(
-    std::list<SampleSpanData> &sample_spans, SpanData &span_data) {
+    std::list<SampleSpanData> &sample_spans, ThreadsafeSpanData &span_data) {
   /**
    * Check to see if the sample span list size exceeds the set limit, if it does
    * free up memory and remove the earliest inserted sample before appending
@@ -78,7 +78,7 @@ void TracezDataAggregator::ClearRunningSpanData() {
 }
 
 void TracezDataAggregator::AggregateStatusOKSpan(
-    std::unique_ptr<SpanData> &ok_span) {
+    std::unique_ptr<ThreadsafeSpanData> &ok_span) {
   // Find and update boundary of aggregated data that span belongs
   auto boundary_name = FindLatencyBoundary(ok_span.get());
 
@@ -90,7 +90,7 @@ void TracezDataAggregator::AggregateStatusOKSpan(
 }
 
 void TracezDataAggregator::AggregateStatusErrorSpan(
-    std::unique_ptr<SpanData> &error_span) {
+    std::unique_ptr<ThreadsafeSpanData> &error_span) {
   // Get data for name in aggregation and update count and sample spans
   auto &tracez_data = aggregated_tracez_data_.at(error_span->GetName().data());
   InsertIntoSampleSpanList(tracez_data.sample_error_spans, *error_span.get());
@@ -98,7 +98,7 @@ void TracezDataAggregator::AggregateStatusErrorSpan(
 }
 
 void TracezDataAggregator::AggregateCompletedSpans(
-    std::vector<std::unique_ptr<SpanData>> &completed_spans) {
+    std::vector<std::unique_ptr<ThreadsafeSpanData>> &completed_spans) {
   for (auto &completed_span : completed_spans) {
     std::string span_name = completed_span->GetName().data();
 
@@ -115,7 +115,7 @@ void TracezDataAggregator::AggregateCompletedSpans(
 }
 
 void TracezDataAggregator::AggregateRunningSpans(
-    std::unordered_set<SpanData *> &running_spans) {
+    std::unordered_set<ThreadsafeSpanData *> &running_spans) {
   for (auto &running_span : running_spans) {
     std::string span_name = running_span->GetName().data();
 
@@ -135,7 +135,7 @@ void TracezDataAggregator::AggregateSpans() {
   auto span_snapshot = tracez_span_processor_->GetSpanSnapshot();
   /**
    * TODO: At this time in the project, there is no way of uniquely identifying
-   * a SpanData(their id's are not being set yet).
+   * a ThreadsafeSpanData(their id's are not being set yet).
    * If in the future this is added then clearing of running spans will not bee
    * required.
    * For now this step of clearing and recalculating running span data is

@@ -71,7 +71,7 @@ class TracezDataAggregator {
    * @param completed_spans are the newly completed spans.
    */
   void AggregateCompletedSpans(
-      std::vector<std::unique_ptr<SpanData>>& completed_spans);
+      std::vector<std::unique_ptr<ThreadsafeSpanData>>& completed_spans);
 
   /**
    * AggregateRunningSpans aggregates the data for all running spans received
@@ -81,7 +81,7 @@ class TracezDataAggregator {
    * span names can change while span is running and there seems to be
    * no trivial to way to know if it is a new or old running span so at every
    * call to this function the available running span data is reset and
-   * recalculated. At this time there is no unique way to identify a SpanData
+   * recalculated. At this time there is no unique way to identify a ThreadsafeSpanData
    * object once this is done, there might be some better ways to do this.
    * TODO : SpanProcessor is never notified when a span name is changed while it
    * is running and that is propogated to the data aggregator. The running span
@@ -89,21 +89,21 @@ class TracezDataAggregator {
    * aggregator till the span is completed.
    * @param running_spans is the running spans to be aggregated.
    */
-  void AggregateRunningSpans(std::unordered_set<SpanData*>& running_spans);
+  void AggregateRunningSpans(std::unordered_set<ThreadsafeSpanData*>& running_spans);
 
   /**
    * AggregateStatusOKSpans is the function called to update the data of spans
    * with status code OK.
    * @param ok_span is the span who's data is to be aggregated
    */
-  void AggregateStatusOKSpan(std::unique_ptr<SpanData>& ok_span);
+  void AggregateStatusOKSpan(std::unique_ptr<ThreadsafeSpanData>& ok_span);
 
   /**
    * AggregateStatusErrorSpans is the function that is called to update the
    * data of error spans
    * @param error_span is the error span who's data is to be aggregated
    */
-  void AggregateStatusErrorSpan(std::unique_ptr<SpanData>& error_span);
+  void AggregateStatusErrorSpan(std::unique_ptr<ThreadsafeSpanData>& error_span);
 
   /**
    * ClearRunningSpanData is a function that is used to clear all running span
@@ -116,12 +116,12 @@ class TracezDataAggregator {
   /**
    * FindLatencyBoundary finds the latency boundary to which the duration of
    * the given span_data belongs to
-   * @ param span_data is the SpanData whose duration for which the latency
+   * @ param span_data is the ThreadsafeSpanData whose duration for which the latency
    * boundary is to be found
    * @ returns LatencyBoundary is the latency boundary that the duration belongs
    * to
    */
-  LatencyBoundary FindLatencyBoundary(SpanData* span_data);
+  LatencyBoundary FindLatencyBoundary(ThreadsafeSpanData* span_data);
 
   /**
    * InsertIntoSampleSpanList is a helper function that is called to insert
@@ -131,7 +131,7 @@ class TracezDataAggregator {
    * @param span_data the span_data to be inserted into list
    */
   void InsertIntoSampleSpanList(std::list<SampleSpanData>& sample_spans,
-                                SpanData& span_data);
+                                ThreadsafeSpanData& span_data);
 
   /** Instance of span processor used to collect raw data **/
   std::shared_ptr<TracezSpanProcessor> tracez_span_processor_;
