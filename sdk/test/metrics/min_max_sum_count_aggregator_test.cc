@@ -9,7 +9,7 @@ TEST(MinMaxSumCountAggregator, Update)
 {
   // This tests that the aggregator updates the maintained value correctly
   // after a call to the update() function.
-  auto agg = new MinMaxSumCountAggregator<int>(opentelemetry::metrics::BoundInstrumentKind::BoundIntCounter);
+  auto agg = new MinMaxSumCountAggregator<int>(opentelemetry::metrics::InstrumentKind::IntCounter);
   auto value_set = agg->get_values();
   ASSERT_EQ(value_set[0], 0);
   ASSERT_EQ(value_set[1], 0);
@@ -33,7 +33,7 @@ TEST(MinMaxSumCountAggregator, FirstUpdate)
 {
   // This tests that the aggregator appropriately maintains the min and
   // max values after a single update call.
-  auto agg = new MinMaxSumCountAggregator<int>(opentelemetry::metrics::BoundInstrumentKind::BoundIntCounter);
+  auto agg = new MinMaxSumCountAggregator<int>(opentelemetry::metrics::InstrumentKind::IntCounter);
   agg->update(1);
   auto value_set = agg->get_values();
   ASSERT_EQ(value_set[0], 1); // min
@@ -47,7 +47,7 @@ TEST(MinMaxSumCountAggregator, Checkpoint)
   // This test verifies that the default checkpoint is set correctly
   // and that the checkpoint values update correctly after a call
   // to the checkpoint() function.
-  auto agg = new MinMaxSumCountAggregator<int>(opentelemetry::metrics::BoundInstrumentKind::BoundIntCounter);
+  auto agg = new MinMaxSumCountAggregator<int>(opentelemetry::metrics::InstrumentKind::IntCounter);
 
   // Verify that the default checkpoint is set correctly.
   auto checkpoint_set = agg->get_checkpoint();
@@ -83,8 +83,8 @@ TEST(MinMaxSumCountAggregator, Merge)
 {
   // This tests that the values_ vector is updated correctly after
   // two aggregators are merged together.
-  auto agg1 = new MinMaxSumCountAggregator<int>(opentelemetry::metrics::BoundInstrumentKind::BoundIntCounter);
-  auto agg2 = new MinMaxSumCountAggregator<int>(opentelemetry::metrics::BoundInstrumentKind::BoundIntCounter);
+  auto agg1 = new MinMaxSumCountAggregator<int>(opentelemetry::metrics::InstrumentKind::IntCounter);
+  auto agg2 = new MinMaxSumCountAggregator<int>(opentelemetry::metrics::InstrumentKind::IntCounter);
 
   // 1 + 2 + 3 + ... + 10 = 55
   for (int i = 1; i <= 10; ++i)
@@ -112,30 +112,30 @@ TEST(MinMaxSumCountAggregator, BadMerge)
 {
   // This verifies that we encounter and error when we try to merge
   // two aggregators of different numeric types together.
-  auto agg1 = new MinMaxSumCountAggregator<int>(opentelemetry::metrics::BoundInstrumentKind::BoundIntCounter);
-  auto agg2 = new MinMaxSumCountAggregator<int>(opentelemetry::metrics::BoundInstrumentKind::BoundIntValueRecorder);
-  
+  auto agg1 = new MinMaxSumCountAggregator<int>(opentelemetry::metrics::InstrumentKind::IntCounter);
+  auto agg2 = new MinMaxSumCountAggregator<int>(opentelemetry::metrics::InstrumentKind::IntCounter);
+
   agg1->update(1);
   agg2->update(2);
 
   agg1->merge(*agg2);
-  
+
   // Verify that the values did NOT merge
   auto value_set = agg1->get_values();
   ASSERT_EQ(value_set[0], 1); // min
-  ASSERT_EQ(value_set[1], 1); // max
-  ASSERT_EQ(value_set[2], 1); // sum
-  ASSERT_EQ(value_set[3], 1); // count
+  ASSERT_EQ(value_set[0], 1); // max
+  ASSERT_EQ(value_set[0], 1); // sum
+  ASSERT_EQ(value_set[0], 1); // count
 }
 
 TEST(MinMaxSumCountAggregator, Types)
 {
   // This test verifies that we do not encounter any errors when
   // using various numeric types.
-  auto agg_int = new MinMaxSumCountAggregator<int>(opentelemetry::metrics::BoundInstrumentKind::BoundIntCounter);
-  auto agg_long = new MinMaxSumCountAggregator<long>(opentelemetry::metrics::BoundInstrumentKind::BoundIntCounter);
-  auto agg_float = new MinMaxSumCountAggregator<float>(opentelemetry::metrics::BoundInstrumentKind::BoundIntCounter);
-  auto agg_double = new MinMaxSumCountAggregator<double>(opentelemetry::metrics::BoundInstrumentKind::BoundIntCounter);
+  auto agg_int = new MinMaxSumCountAggregator<int>(opentelemetry::metrics::InstrumentKind::IntCounter);
+  auto agg_long = new MinMaxSumCountAggregator<long>(opentelemetry::metrics::InstrumentKind::IntCounter);
+  auto agg_float = new MinMaxSumCountAggregator<float>(opentelemetry::metrics::InstrumentKind::IntCounter);
+  auto agg_double = new MinMaxSumCountAggregator<double>(opentelemetry::metrics::InstrumentKind::IntCounter);
 
   for (int i = 1; i <= 10; ++i)
   {
@@ -187,7 +187,7 @@ TEST(MinMaxSumCountAggregator, Concurrency)
 {
   // This test checks that the aggregator updates appropriately
   // when called in a multi-threaded context.
-  auto agg = new MinMaxSumCountAggregator<int>(opentelemetry::metrics::BoundInstrumentKind::BoundIntCounter);
+  auto agg = new MinMaxSumCountAggregator<int>(opentelemetry::metrics::InstrumentKind::IntCounter);
 
   std::thread first(&callback, std::ref(*agg));
   std::thread second(&callback, std::ref(*agg));
