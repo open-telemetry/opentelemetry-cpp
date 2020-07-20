@@ -124,3 +124,44 @@ TEST(StreamMetricsExporter, PrintGauge)
 
   ASSERT_EQ(stdoutOutput.str(),expectedOutput);
 }
+
+TEST(StreamMetricsExporter, PrintExact)
+{
+  auto exporter = std::unique_ptr<sdkmetrics::MetricsExporter> (new
+      opentelemetry::exporter::metrics::StreamMetricsExporter);
+  
+  std::vector<float> vec;
+  for(float i = 0; i < 10; i++)
+  {
+    vec.push_back(i);
+  }
+
+  opentelemetry::core::SystemTimestamp time = opentelemetry::core::SystemTimestamp(std::chrono::system_clock::now());
+  auto record = sdkmetrics::Record("name", "description", AggregatorKind::Exact, "labels", vec, time);
+
+  std::vector<sdkmetrics::Record> records;
+  records.push_back(record);
+
+  // Create stringstream to redirect to
+  std::stringstream stdoutOutput;
+
+  // Save cout's buffer here
+  std::streambuf *sbuf = std::cout.rdbuf();
+
+  // Redirect cout to our stringstream buffer
+  std::cout.rdbuf(stdoutOutput.rdbuf());
+
+  exporter->Export(records);
+
+  std::cout.rdbuf(sbuf);
+
+  std::string expectedOutput = 
+  "{\n"
+  "  name        : name\n"
+  "  description : description\n"
+  "  labels      : labels\n"
+  "  values      : [0,1,2,3,4,5,6,7,8,9]\n"
+  "}\n"; 
+
+  ASSERT_EQ(stdoutOutput.str(),expectedOutput);
+}

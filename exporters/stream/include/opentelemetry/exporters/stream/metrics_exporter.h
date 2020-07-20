@@ -85,7 +85,8 @@ void PrintVector(sdkmetrics::RecordValue value, AggregatorKind aggKind)
   }
   else if(aggKind == AggregatorKind::Exact)
   {
-    sout_ << "Values        : ";
+    sout_ << "\n  values      : ";
+    sout_ <<'[';
     int i = 1;
     for (auto v : vec)
      {
