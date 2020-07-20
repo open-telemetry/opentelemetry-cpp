@@ -167,12 +167,6 @@ void BM_SpanCreation(benchmark::State &state)
 {
   BenchmarkSpanCreation(std::move(std::make_shared<AlwaysOnSampler>()), state);
 }
-
-// Test to measure performance for span creation
-void BM_SpanCreation(benchmark::State &state)
-{
-	BenchmarkSpanCreation(std::move(std::make_shared<AlwaysOnSampler>()), state);
-}
 BENCHMARK(BM_SpanCreation);
 
 // Test to measure performance overhead for no-op span creation
