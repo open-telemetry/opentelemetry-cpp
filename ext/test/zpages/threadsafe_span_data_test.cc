@@ -3,9 +3,8 @@
 #include "opentelemetry/trace/span_id.h"
 #include "opentelemetry/trace/trace_id.h"
 
-#include <thread>
 #include <gtest/gtest.h>
-
+#include <thread>
 
 using opentelemetry::sdk::trace::AttributeConverter;
 using opentelemetry::sdk::trace::SpanDataAttributeValue;
@@ -54,4 +53,3 @@ TEST(ThreadsafeSpanData, Set)
   ASSERT_EQ(data.GetDuration(), std::chrono::nanoseconds(1000000));
   ASSERT_EQ(opentelemetry::nostd::get<int64_t>(data.GetAttributes().at("attr1")), 314159);
 }
-

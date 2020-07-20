@@ -170,3 +170,4 @@ class ThreadsafeSpanData final : public opentelemetry::sdk::trace::Recordable {
 };
 }  // namespace zpages
 }  // namespace ext
+OPENTELEMETRY_END_NAMESPACE
