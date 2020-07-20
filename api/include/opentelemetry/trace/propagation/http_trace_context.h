@@ -32,7 +32,7 @@ namespace
 
 static nostd::string_view span_key = "current-span";
 
-static Context SetSpanInContext(Span &span, Context &context) {
+static context::Context SetSpanInContext(Span &span, Context &context) {
     Context new_values = Context(context);
     new_values.SetValue(span_key,span);
     return new_values;
