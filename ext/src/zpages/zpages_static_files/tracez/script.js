@@ -1,30 +1,30 @@
 window.onload = loadTracezTable;
 
 const spanRow = span => "<tr><td>"
-  + span.type + " " + span.id
+  + span.name
   + "</td><td><a href=''>"
   + String(Math.floor(Math.random() * 6))
   + "</a></td><td><a href=''>"
   + String(Math.floor(Math.random() * 6))
-  + "</a></td><td>"
+  + "</a></td><td><a href=''>"
   + String(Math.floor(Math.random() * 150))
-  + "</td><td>"
+  + "</a></td><td><a href=''>"
   + String(Math.floor(Math.random() * 150))
-  + "</td><td>"
+  + "</a></td><td><a href=''>"
   + String(Math.floor(Math.random() * 150))
-  + "</td><td>"
+  + "</a></td><td><a href=''>"
   + String(Math.floor(Math.random() * 150))
-  + "</td><td>"
+  + "</a></td><td><a href=''>"
   + String(Math.floor(Math.random() * 150))
-  + "</td><td>"
+  + "</a></td><td><a href=''>"
   + String(Math.floor(Math.random() * 150))
-  + "</td><td>"
+  + "</a></td><td><a href=''>"
   + String(Math.floor(Math.random() * 150))
-  + "</td><td>"
+  + "</a></td><td><a href=''>"
   + String(Math.floor(Math.random() * 150))
-  + "</td><td>"
+  + "</a></td><td><a href=''>"
   + String(Math.floor(Math.random() * 150))
-  + "</td></tr>";
+  + "</a></td></tr>";
 
 
 function loadTracezTable () {
