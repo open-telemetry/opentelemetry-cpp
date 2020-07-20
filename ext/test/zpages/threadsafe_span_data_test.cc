@@ -3,8 +3,9 @@
 #include "opentelemetry/trace/span_id.h"
 #include "opentelemetry/trace/trace_id.h"
 
-#include <gtest/gtest.h>
 #include <thread>
+#include <gtest/gtest.h>
+
 
 using opentelemetry::sdk::trace::AttributeConverter;
 using opentelemetry::sdk::trace::SpanDataAttributeValue;
