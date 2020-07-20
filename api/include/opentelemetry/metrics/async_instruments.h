@@ -15,10 +15,10 @@ public:
   ValueObserver() = default;
 
   ValueObserver(nostd::string_view name,
-                nostd::string_view description,
-                nostd::string_view unit,
-                bool enabled,
-                void (*callback)(ObserverResult<T>))
+                   nostd::string_view description,
+                   nostd::string_view unit,
+                   bool enabled,
+                   void (*callback)(ObserverResult<T>))
   {}
 
   /*
@@ -39,10 +39,10 @@ public:
   SumObserver() = default;
 
   SumObserver(nostd::string_view name,
-              nostd::string_view description,
-              nostd::string_view unit,
-              bool enabled,
-              void (*callback)(ObserverResult<T>))
+                 nostd::string_view description,
+                 nostd::string_view unit,
+                 bool enabled,
+                 void (*callback)(ObserverResult<T>))
   {}
 
   /*
@@ -64,10 +64,10 @@ public:
   UpDownSumObserver() = default;
 
   UpDownSumObserver(nostd::string_view name,
-                    nostd::string_view description,
-                    nostd::string_view unit,
-                    bool enabled,
-                    void (*callback)(ObserverResult<T>))
+                       nostd::string_view description,
+                       nostd::string_view unit,
+                       bool enabled,
+                       void (*callback)(ObserverResult<T>))
   {}
 
   virtual void observe(int value, const trace::KeyValueIterable &labels) {}

@@ -14,9 +14,9 @@ public:
   BoundCounter() = default;
 
   BoundCounter(nostd::string_view name,
-               nostd::string_view description,
-               nostd::string_view unit,
-               bool enabled);
+                  nostd::string_view description,
+                  nostd::string_view unit,
+                  bool enabled);
 
   /*
    * Add adds the value to the counter's sum. The labels are already linked   * to the instrument
@@ -36,9 +36,9 @@ public:
   Counter() = default;
 
   Counter(nostd::string_view name,
-          nostd::string_view description,
-          nostd::string_view unit,
-          bool enabled);
+             nostd::string_view description,
+             nostd::string_view unit,
+             bool enabled);
 
   /*
    * Bind creates a bound instrument for this counter. The labels are
@@ -68,9 +68,9 @@ public:
   BoundUpDownCounter() = default;
 
   BoundUpDownCounter(nostd::string_view name,
-                     nostd::string_view description,
-                     nostd::string_view unit,
-                     bool enabled);
+                        nostd::string_view description,
+                        nostd::string_view unit,
+                        bool enabled);
 
   /*
    * Add adds the value to the counter's sum. The labels are already linked to * the instrument and
@@ -90,9 +90,9 @@ public:
   UpDownCounter() = default;
 
   UpDownCounter(nostd::string_view name,
-                nostd::string_view description,
-                nostd::string_view unit,
-                bool enabled);
+                   nostd::string_view description,
+                   nostd::string_view unit,
+                   bool enabled);
 
   nostd::shared_ptr<BoundUpDownCounter<T>> bind(const trace::KeyValueIterable &labels);
   //{
@@ -118,9 +118,9 @@ public:
   BoundValueRecorder() = default;
 
   BoundValueRecorder(nostd::string_view name,
-                     nostd::string_view description,
-                     nostd::string_view unit,
-                     bool enabled);
+                        nostd::string_view description,
+                        nostd::string_view unit,
+                        bool enabled);
 
   /*
    * Records the value by summing it with previous measurements and checking  * previously stored
@@ -132,6 +132,7 @@ public:
   virtual void record(T value) = 0;
 };
 
+
 template <class T>
 class ValueRecorder : public SynchronousInstrument<T>
 {
@@ -140,9 +141,9 @@ public:
   ValueRecorder() = default;
 
   ValueRecorder(nostd::string_view name,
-                nostd::string_view description,
-                nostd::string_view unit,
-                bool enabled);
+                   nostd::string_view description,
+                   nostd::string_view unit,
+                   bool enabled);
 
   nostd::shared_ptr<BoundValueRecorder<T>> bind(const trace::KeyValueIterable &labels);
   //{

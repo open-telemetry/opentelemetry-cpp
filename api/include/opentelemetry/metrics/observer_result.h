@@ -24,6 +24,7 @@ public:
   ObserverResult(nostd::shared_ptr<AsynchronousInstrument<T>> instrument) {}
 
   virtual void observe(T value, const trace::KeyValueIterable &labels) {}
+
 };
 
 }  // namespace metrics

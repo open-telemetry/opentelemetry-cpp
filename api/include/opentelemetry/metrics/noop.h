@@ -49,20 +49,29 @@ class NoopValueObserver : public ValueObserver<T>
 
 public:
   NoopValueObserver(nostd::string_view /*name*/,
-                    nostd::string_view /*description*/,
-                    nostd::string_view /*unit*/,
-                    bool /*enabled*/,
-                    void (*callback)(ObserverResult<T>))
-  {}
+                       nostd::string_view /*description*/,
+                       nostd::string_view /*unit*/,
+                       bool /*enabled*/,
+                       void (*callback)(ObserverResult<T>)) {}
 
-  virtual bool IsEnabled() override { return false; }
+  virtual bool IsEnabled() override {
+    return false;
+  }
 
-  virtual nostd::string_view GetName() override { return nostd::string_view(""); }
+  virtual nostd::string_view GetName() override {
+    return nostd::string_view("");
+  }
 
-  virtual nostd::string_view GetDescription() override { return nostd::string_view(""); }
+  virtual nostd::string_view GetDescription() override {
+    return nostd::string_view("");
+  }
 
-  virtual nostd::string_view GetUnits() override { return nostd::string_view(""); }
+  virtual nostd::string_view GetUnits() override {
+    return nostd::string_view("");
+  }
+
 };
+
 
 template <class T>
 class NoopSumObserver : public SumObserver<T>
@@ -70,20 +79,29 @@ class NoopSumObserver : public SumObserver<T>
 
 public:
   NoopSumObserver(nostd::string_view /*name*/,
-                  nostd::string_view /*description*/,
-                  nostd::string_view /*unit*/,
-                  bool /*enabled*/,
-                  void (*callback)(ObserverResult<T>))
+                     nostd::string_view /*description*/,
+                     nostd::string_view /*unit*/,
+                     bool /*enabled*/,
+                     void (*callback)(ObserverResult<T>))
   {}
 
-  virtual bool IsEnabled() override { return false; }
+  virtual bool IsEnabled() override {
+    return false;
+  }
 
-  virtual nostd::string_view GetName() override { return nostd::string_view(""); }
+  virtual nostd::string_view GetName() override {
+    return nostd::string_view("");
+  }
 
-  virtual nostd::string_view GetDescription() override { return nostd::string_view(""); }
+  virtual nostd::string_view GetDescription() override {
+    return nostd::string_view("");
+  }
 
-  virtual nostd::string_view GetUnits() override { return nostd::string_view(""); }
+  virtual nostd::string_view GetUnits() override {
+    return nostd::string_view("");
+  }
 };
+
 
 template <class T>
 class NoopUpDownSumObserver : public UpDownSumObserver<T>
@@ -91,20 +109,29 @@ class NoopUpDownSumObserver : public UpDownSumObserver<T>
 
 public:
   NoopUpDownSumObserver(nostd::string_view /*name*/,
-                        nostd::string_view /*description*/,
-                        nostd::string_view /*unit*/,
-                        bool /*enabled*/,
-                        void (*callback)(ObserverResult<T>))
+                           nostd::string_view /*description*/,
+                           nostd::string_view /*unit*/,
+                           bool /*enabled*/,
+                           void (*callback)(ObserverResult<T>))
   {}
 
-  virtual bool IsEnabled() override { return false; }
+  virtual bool IsEnabled() override {
+    return false;
+  }
 
-  virtual nostd::string_view GetName() override { return nostd::string_view(""); }
+  virtual nostd::string_view GetName() override {
+    return nostd::string_view("");
+  }
 
-  virtual nostd::string_view GetDescription() override { return nostd::string_view(""); }
+  virtual nostd::string_view GetDescription() override {
+    return nostd::string_view("");
+  }
 
-  virtual nostd::string_view GetUnits() override { return nostd::string_view(""); }
+  virtual nostd::string_view GetUnits() override {
+    return nostd::string_view("");
+  }
 };
+
 
 template <class T>
 class BoundNoopCounter : public BoundCounter<T>
@@ -114,20 +141,29 @@ public:
   BoundNoopCounter() = default;
 
   BoundNoopCounter(nostd::string_view /*name*/,
-                   nostd::string_view /*description*/,
-                   nostd::string_view /*unit*/,
-                   bool /*enabled*/)
+                      nostd::string_view /*description*/,
+                      nostd::string_view /*unit*/,
+                      bool /*enabled*/)
   {}
 
   virtual void add(T value) override {}
 
-  virtual bool IsEnabled() override { return false; }
+  virtual bool IsEnabled() override {
+    return false;
+  }
 
-  virtual nostd::string_view GetName() override { return nostd::string_view(""); }
+  virtual nostd::string_view GetName() override {
+    return nostd::string_view("");
+  }
 
-  virtual nostd::string_view GetDescription() override { return nostd::string_view(""); }
+  virtual nostd::string_view GetDescription() override {
+    return nostd::string_view("");
+  }
 
-  virtual nostd::string_view GetUnits() override { return nostd::string_view(""); }
+  virtual nostd::string_view GetUnits() override {
+    return nostd::string_view("");
+  }
+
 };
 
 template <class T>
@@ -138,9 +174,9 @@ public:
   NoopCounter() = default;
 
   NoopCounter(nostd::string_view /*name*/,
-              nostd::string_view /*description*/,
-              nostd::string_view /*unit*/,
-              bool /*enabled*/)
+                 nostd::string_view /*description*/,
+                 nostd::string_view /*unit*/,
+                 bool /*enabled*/)
   {}
 
   nostd::shared_ptr<BoundNoopCounter<T>> bind(const trace::KeyValueIterable & /*labels*/)
@@ -150,13 +186,22 @@ public:
 
   virtual void add(T value, const trace::KeyValueIterable & /*labels*/) override {}
 
-  virtual bool IsEnabled() override { return false; }
+  virtual bool IsEnabled() override {
+    return false;
+  }
 
-  virtual nostd::string_view GetName() override { return nostd::string_view(""); }
+  virtual nostd::string_view GetName() override {
+    return nostd::string_view("");
+  }
 
-  virtual nostd::string_view GetDescription() override { return nostd::string_view(""); }
+  virtual nostd::string_view GetDescription() override {
+    return nostd::string_view("");
+  }
 
-  virtual nostd::string_view GetUnits() override { return nostd::string_view(""); }
+  virtual nostd::string_view GetUnits() override {
+    return nostd::string_view("");
+  }
+
 };
 
 template <class T>
@@ -167,20 +212,29 @@ public:
   BoundNoopUpDownCounter() = default;
 
   BoundNoopUpDownCounter(nostd::string_view /*name*/,
-                         nostd::string_view /*description*/,
-                         nostd::string_view /*unit*/,
-                         bool /*enabled*/)
+                            nostd::string_view /*description*/,
+                            nostd::string_view /*unit*/,
+                            bool /*enabled*/)
   {}
 
   virtual void add(T value) override {}
 
-  virtual bool IsEnabled() override { return false; }
+  virtual bool IsEnabled() override {
+    return false;
+  }
 
-  virtual nostd::string_view GetName() override { return nostd::string_view(""); }
+  virtual nostd::string_view GetName() override {
+    return nostd::string_view("");
+  }
 
-  virtual nostd::string_view GetDescription() override { return nostd::string_view(""); }
+  virtual nostd::string_view GetDescription() override {
+    return nostd::string_view("");
+  }
 
-  virtual nostd::string_view GetUnits() override { return nostd::string_view(""); }
+  virtual nostd::string_view GetUnits() override {
+    return nostd::string_view("");
+  }
+
 };
 
 template <class T>
@@ -191,9 +245,9 @@ public:
   NoopUpDownCounter() = default;
 
   NoopUpDownCounter(nostd::string_view /*name*/,
-                    nostd::string_view /*description*/,
-                    nostd::string_view /*unit*/,
-                    bool /*enabled*/)
+                       nostd::string_view /*description*/,
+                       nostd::string_view /*unit*/,
+                       bool /*enabled*/)
   {}
 
   nostd::shared_ptr<BoundNoopUpDownCounter<T>> bind(const trace::KeyValueIterable & /*labels*/)
@@ -203,14 +257,23 @@ public:
 
   virtual void add(T value, const trace::KeyValueIterable & /*labels*/) override {}
 
-  virtual bool IsEnabled() override { return false; }
+  virtual bool IsEnabled() override {
+    return false;
+  }
 
-  virtual nostd::string_view GetName() override { return nostd::string_view(""); }
+  virtual nostd::string_view GetName() override {
+    return nostd::string_view("");
+  }
 
-  virtual nostd::string_view GetDescription() override { return nostd::string_view(""); }
+  virtual nostd::string_view GetDescription() override {
+    return nostd::string_view("");
+  }
 
-  virtual nostd::string_view GetUnits() override { return nostd::string_view(""); }
+  virtual nostd::string_view GetUnits() override {
+    return nostd::string_view("");
+  }
 };
+
 
 template <class T>
 class BoundNoopValueRecorder : public BoundValueRecorder<T>
@@ -220,20 +283,28 @@ public:
   BoundNoopValueRecorder() = default;
 
   BoundNoopValueRecorder(nostd::string_view /*name*/,
-                         nostd::string_view /*description*/,
-                         nostd::string_view /*unit*/,
-                         bool /*enabled*/)
+                            nostd::string_view /*description*/,
+                            nostd::string_view /*unit*/,
+                            bool /*enabled*/)
   {}
 
   virtual void record(T value) override {}
 
-  virtual bool IsEnabled() override { return false; }
+  virtual bool IsEnabled() override {
+    return false;
+  }
 
-  virtual nostd::string_view GetName() override { return nostd::string_view(""); }
+  virtual nostd::string_view GetName() override {
+    return nostd::string_view("");
+  }
 
-  virtual nostd::string_view GetDescription() override { return nostd::string_view(""); }
+  virtual nostd::string_view GetDescription() override {
+    return nostd::string_view("");
+  }
 
-  virtual nostd::string_view GetUnits() override { return nostd::string_view(""); }
+  virtual nostd::string_view GetUnits() override {
+    return nostd::string_view("");
+  }
 };
 
 template <class T>
@@ -244,9 +315,9 @@ public:
   NoopValueRecorder() = default;
 
   NoopValueRecorder(nostd::string_view /*name*/,
-                    nostd::string_view /*description*/,
-                    nostd::string_view /*unit*/,
-                    bool /*enabled*/)
+                       nostd::string_view /*description*/,
+                       nostd::string_view /*unit*/,
+                       bool /*enabled*/)
   {}
 
   nostd::shared_ptr<BoundNoopValueRecorder<T>> bind(const trace::KeyValueIterable & /*labels*/)
@@ -256,13 +327,21 @@ public:
 
   virtual void record(T value, const trace::KeyValueIterable & /*labels*/) override {}
 
-  virtual bool IsEnabled() override { return false; }
+  virtual bool IsEnabled() override {
+    return false;
+  }
 
-  virtual nostd::string_view GetName() override { return nostd::string_view(""); }
+  virtual nostd::string_view GetName() override {
+    return nostd::string_view("");
+  }
 
-  virtual nostd::string_view GetDescription() override { return nostd::string_view(""); }
+  virtual nostd::string_view GetDescription() override {
+    return nostd::string_view("");
+  }
 
-  virtual nostd::string_view GetUnits() override { return nostd::string_view(""); }
+  virtual nostd::string_view GetUnits() override {
+    return nostd::string_view("");
+  }
 };
 
 

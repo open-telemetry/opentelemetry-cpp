@@ -12,29 +12,12 @@ namespace metrics
 // Enum classes to help determine instrument types in other parts of the API
 enum class InstrumentKind
 {
-  IntCounter,
-  IntUpDownCounter,
-  IntValueRecorder,
-  IntValueObserver,
-  IntSumObserver,
-  IntUpDownSumObserver,
-  DoubleCounter,
-  DoubleUpDownCounter,
-  DoubleValueRecorder,
-  DoubleValueObserver,
-  DoubleSumObserver,
-  DoubleUpDownSumObserver
-};
-
-// Fewer Bound types because Asynchronous instruments cannot bind
-enum class BoundInstrumentKind
-{
-  BoundIntCounter,
-  BoundIntUpDownCounter,
-  BoundIntValueRecorder,
-  BoundDoubleCounter,
-  BoundDoubleUpDownCounter,
-  BoundDoubleValueRecorder
+  Counter = 0,
+  UpDownCounter = 1,
+  ValueRecorder = 2,
+  ValueObserver = 3,
+  SumObserver = 4,
+  UpDownSumObserver = 5,
 };
 
 class Instrument
