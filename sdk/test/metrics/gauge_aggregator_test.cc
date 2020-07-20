@@ -9,7 +9,7 @@ TEST(GaugeAggregator, Update)
 {
   // This tests that the aggregator updates the maintained value correctly
   // after a call to the update() function.
-  auto agg = new GaugeAggregator<int>(opentelemetry::metrics::BoundInstrumentKind::BoundIntCounter);
+  auto agg = new GaugeAggregator<int>(opentelemetry::metrics::InstrumentKind::IntCounter);
 
   // Verify default value
   ASSERT_EQ(agg->get_values()[0], 0);
@@ -31,7 +31,7 @@ TEST(GaugeAggregator, Checkpoint)
   // This tests that the aggregator correctly updates the
   // checkpoint_ value after a call to update() followed
   // by a call to checkpoint().
-  auto agg = new GaugeAggregator<int>(opentelemetry::metrics::BoundInstrumentKind::BoundIntCounter);
+  auto agg = new GaugeAggregator<int>(opentelemetry::metrics::InstrumentKind::IntCounter);
 
   // Verify default checkpoint, before updates
   ASSERT_EQ(agg->get_checkpoint()[0], 0);
@@ -47,8 +47,8 @@ TEST(GaugeAggregator, Merge)
 {
   // This tests that the values_ vector is updated correctly after
   // two aggregators are merged together.
-  auto agg1 = new GaugeAggregator<int>(opentelemetry::metrics::BoundInstrumentKind::BoundIntCounter);
-  auto agg2 = new GaugeAggregator<int>(opentelemetry::metrics::BoundInstrumentKind::BoundIntCounter);
+  auto agg1 = new GaugeAggregator<int>(opentelemetry::metrics::InstrumentKind::IntCounter);
+  auto agg2 = new GaugeAggregator<int>(opentelemetry::metrics::InstrumentKind::IntCounter);
 
   agg1->update(1);
   agg2->update(2);
@@ -63,9 +63,9 @@ TEST(GaugeAggregator, BadMerge)
 {
   // This verifies that we encounter and error when we try to merge
   // two aggregators of different numeric types together.
-  auto agg1 = new GaugeAggregator<int>(opentelemetry::metrics::BoundInstrumentKind::BoundIntCounter);
-  auto agg2 = new GaugeAggregator<int>(opentelemetry::metrics::BoundInstrumentKind::BoundIntValueRecorder);
-  
+  auto agg1 = new GaugeAggregator<int>(opentelemetry::metrics::InstrumentKind::IntCounter);
+  auto agg2 = new GaugeAggregator<int>(opentelemetry::metrics::InstrumentKind::IntCounter);
+
   agg1->update(1);
   agg2->update(2);
   agg1->merge(*agg2);
@@ -79,10 +79,10 @@ TEST(GaugeAggregator, Types)
 {
   // This test verifies that we do not encounter any errors when
   // using various numeric types.
-  auto agg_int = new GaugeAggregator<int>(opentelemetry::metrics::BoundInstrumentKind::BoundIntCounter);
-  auto agg_long = new GaugeAggregator<long>(opentelemetry::metrics::BoundInstrumentKind::BoundIntCounter);
-  auto agg_float = new GaugeAggregator<float>(opentelemetry::metrics::BoundInstrumentKind::BoundIntCounter);
-  auto agg_double = new GaugeAggregator<double>(opentelemetry::metrics::BoundInstrumentKind::BoundIntCounter);
+  auto agg_int = new GaugeAggregator<int>(opentelemetry::metrics::InstrumentKind::IntCounter);
+  auto agg_long = new GaugeAggregator<long>(opentelemetry::metrics::InstrumentKind::IntCounter);
+  auto agg_float = new GaugeAggregator<float>(opentelemetry::metrics::InstrumentKind::IntCounter);
+  auto agg_double = new GaugeAggregator<double>(opentelemetry::metrics::InstrumentKind::IntCounter);
 
   for (int i = 1; i <= 10; ++i)
   {
@@ -114,7 +114,7 @@ TEST(GaugeAggregator, Concurrency)
 {
   // This test checks that the aggregator updates appropriately
   // when called in a multi-threaded context.
-  auto agg = new GaugeAggregator<int>(opentelemetry::metrics::BoundInstrumentKind::BoundIntCounter);
+  auto agg = new GaugeAggregator<int>(opentelemetry::metrics::InstrumentKind::IntCounter);
 
   std::thread first(&callback, std::ref(*agg));
   std::thread second(&callback, std::ref(*agg));
