@@ -6,15 +6,23 @@
 #include "opentelemetry/nostd/string_view.h"
 #include "opentelemetry/nostd/variant.h"
 #include "opentelemetry/version.h"
-#include "opentelemetry/trace/span_context.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace context
 {
-using ContextValue = nostd::variant<int64_t,
+using ContextValue = nostd::variant<bool,
+                                    int,
+                                    int64_t,
+                                    unsigned int,
                                     uint64_t,
                                     double,
-                                    nostd::span<trace::SpanContext>,
-                                    nostd::span<nostd::unique_ptr<char[]>>>;
+                                    nostd::string_view,
+                                    nostd::span<const bool>,
+                                    nostd::span<const int>,
+                                    nostd::span<const int64_t>,
+                                    nostd::span<const unsigned int>,
+                                    nostd::span<const uint64_t>,
+                                    nostd::span<const double>,
+                                    nostd::span<const nostd::string_view>>;
 }  // namespace context
 OPENTELEMETRY_END_NAMESPACE
