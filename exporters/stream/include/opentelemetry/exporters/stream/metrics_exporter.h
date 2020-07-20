@@ -29,8 +29,6 @@ explicit StreamMetricsExporter(std::ostream &sout = std::cout) noexcept;
 sdkmetrics::ExportResult Export(
     const std::vector<sdkmetrics::Record> &records) noexcept override;
 
-void Shutdown(std::chrono::microseconds timeout = std::chrono::microseconds(0)) noexcept;
-
 private:
 std::ostream &sout_;
 bool isShutdown_ = false;
@@ -63,19 +61,19 @@ void PrintVector(sdkmetrics::RecordValue value, AggregatorKind aggKind)
 
   if(aggKind == AggregatorKind::Counter)
   {
-    sout_ << "\n Sum         : " << vec[0];
+    sout_ << "\n  sum         : " << vec[0];
   }
   else if(aggKind == AggregatorKind::MinMaxSumCount)
   {
-    sout_ << "\n Min         : " << vec[0]
-          << "\n Max         : " << vec[1]
-          << "\n Sum         : " << vec[2]
-          << "\n Count       : " << vec[3];
+    sout_ << "\n  min         : " << vec[0]
+          << "\n  max         : " << vec[1]
+          << "\n  sum         : " << vec[2]
+          << "\n  count       : " << vec[3];
     
   }
   else if(aggKind == AggregatorKind::Gauge)
   {
-    sout_ << "\n Last Value   : " << vec[0];
+    sout_ << "\n  last value  : " << vec[0];
   }
   else if(aggKind == AggregatorKind::Sketch)
   {
