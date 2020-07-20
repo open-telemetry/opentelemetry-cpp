@@ -10,6 +10,7 @@
 #include "opentelemetry/sdk/trace/recordable.h"
 #include "opentelemetry/trace/canonical_code.h"
 #include "opentelemetry/trace/span.h"
+#include "opentelemetry/sdk/trace/span_data.h"
 #include "opentelemetry/trace/span_id.h"
 #include "opentelemetry/trace/trace_id.h"
 
@@ -20,6 +21,7 @@ namespace trace_api = opentelemetry::trace;
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace ext {
 namespace zpages {
+
 /**
  * This class is a threadsafe version of span data used for zpages in OT
  */
@@ -30,7 +32,7 @@ class ThreadsafeSpanData final : public opentelemetry::sdk::trace::Recordable {
    * @return the trace id for this span
    */
   opentelemetry::trace::TraceId GetTraceId() const noexcept {
-    std::unique_lock<std::mutex> lock(mutex_);
+    std::lock_guard<std::mutex> lock(mutex_);
     return trace_id_;
   }
 
@@ -39,7 +41,7 @@ class ThreadsafeSpanData final : public opentelemetry::sdk::trace::Recordable {
    * @return the span id for this span
    */
   opentelemetry::trace::SpanId GetSpanId() const noexcept {
-    std::unique_lock<std::mutex> lock(mutex_);
+    std::lock_guard<std::mutex> lock(mutex_);
     return span_id_;
   }
 
@@ -48,7 +50,7 @@ class ThreadsafeSpanData final : public opentelemetry::sdk::trace::Recordable {
    * @return the span id for this span's parent
    */
   opentelemetry::trace::SpanId GetParentSpanId() const noexcept {
-    std::unique_lock<std::mutex> lock(mutex_);
+    std::lock_guard<std::mutex> lock(mutex_);
     return parent_span_id_;
   }
 
@@ -57,7 +59,7 @@ class ThreadsafeSpanData final : public opentelemetry::sdk::trace::Recordable {
    * @return the name for this span
    */
   opentelemetry::nostd::string_view GetName() const noexcept {
-    std::unique_lock<std::mutex> lock(mutex_);
+    std::lock_guard<std::mutex> lock(mutex_);
     return name_;
   }
 
@@ -66,7 +68,7 @@ class ThreadsafeSpanData final : public opentelemetry::sdk::trace::Recordable {
    * @return the status for this span
    */
   opentelemetry::trace::CanonicalCode GetStatus() const noexcept {
-    std::unique_lock<std::mutex> lock(mutex_);
+    std::lock_guard<std::mutex> lock(mutex_);
     return status_code_;
   }
 
@@ -75,7 +77,7 @@ class ThreadsafeSpanData final : public opentelemetry::sdk::trace::Recordable {
    * @return the description of the the status of this span
    */
   opentelemetry::nostd::string_view GetDescription() const noexcept {
-    std::unique_lock<std::mutex> lock(mutex_);
+    std::lock_guard<std::mutex> lock(mutex_);
     return status_desc_;
   }
 
@@ -84,7 +86,7 @@ class ThreadsafeSpanData final : public opentelemetry::sdk::trace::Recordable {
    * @return the start time for this span
    */
   opentelemetry::core::SystemTimestamp GetStartTime() const noexcept {
-    std::unique_lock<std::mutex> lock(mutex_);
+    std::lock_guard<std::mutex> lock(mutex_);
     return start_time_;
   }
 
@@ -93,7 +95,7 @@ class ThreadsafeSpanData final : public opentelemetry::sdk::trace::Recordable {
    * @return the duration for this span
    */
   std::chrono::nanoseconds GetDuration() const noexcept {
-    std::unique_lock<std::mutex> lock(mutex_);
+    std::lock_guard<std::mutex> lock(mutex_);
     return duration_;
   }
 
@@ -103,14 +105,14 @@ class ThreadsafeSpanData final : public opentelemetry::sdk::trace::Recordable {
    */
   const std::unordered_map<std::string, SpanDataAttributeValue> &GetAttributes()
       const noexcept {
-    std::unique_lock<std::mutex> lock(mutex_);
+    std::lock_guard<std::mutex> lock(mutex_);
     return attributes_;
   }
 
   void SetIds(opentelemetry::trace::TraceId trace_id,
               opentelemetry::trace::SpanId span_id,
               opentelemetry::trace::SpanId parent_span_id) noexcept override {
-    std::unique_lock<std::mutex> lock(mutex_);
+    std::lock_guard<std::mutex> lock(mutex_);
     trace_id_ = trace_id;
     span_id_ = span_id;
     parent_span_id_ = parent_span_id;
@@ -118,37 +120,37 @@ class ThreadsafeSpanData final : public opentelemetry::sdk::trace::Recordable {
 
   void SetAttribute(nostd::string_view key,
                     const common::AttributeValue &value) noexcept override {
-    std::unique_lock<std::mutex> lock(mutex_);
+    std::lock_guard<std::mutex> lock(mutex_);
     attributes_[std::string(key)] = nostd::visit(converter_, value);
   }
 
   void AddEvent(nostd::string_view name,
                 core::SystemTimestamp timestamp) noexcept override {
-    std::unique_lock<std::mutex> lock(mutex_);
+    std::lock_guard<std::mutex> lock(mutex_);
     (void)name;
     (void)timestamp;
   }
 
   void SetStatus(trace_api::CanonicalCode code,
                  nostd::string_view description) noexcept override {
-    std::unique_lock<std::mutex> lock(mutex_);
+    std::lock_guard<std::mutex> lock(mutex_);
     status_code_ = code;
     status_desc_ = std::string(description);
   }
 
   void SetName(nostd::string_view name) noexcept override {
-    std::unique_lock<std::mutex> lock(mutex_);
+    std::lock_guard<std::mutex> lock(mutex_);
     name_ = std::string(name);
   }
 
   void SetStartTime(
       opentelemetry::core::SystemTimestamp start_time) noexcept override {
-    std::unique_lock<std::mutex> lock(mutex_);
+    std::lock_guard<std::mutex> lock(mutex_);
     start_time_ = start_time;
   }
 
   void SetDuration(std::chrono::nanoseconds duration) noexcept override {
-    std::unique_lock<std::mutex> lock(mutex_);
+    std::lock_guard<std::mutex> lock(mutex_);
     duration_ = duration;
   }
 
