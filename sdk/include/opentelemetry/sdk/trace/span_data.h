@@ -85,7 +85,7 @@ struct AttributeConverter
 };
 
 /**
- * Class for storing events in SpanData
+ * Class for storing events in SpanData.
  */
 class SpanDataEvent
 {
@@ -96,6 +96,19 @@ public:
     timestamp_ = timestamp;
   }
 
+  /**
+   * Get the name for this event
+   * @return the name for this event
+   */
+  nostd::string_view GetName() const noexcept { return name_; }
+
+  /**
+   * Get the timestamp for this event
+   * @return the timestamp for this event
+   */
+  core::SystemTimestamp GetTimestamp() const noexcept { return timestamp_; }
+
+private:
   nostd::string_view name_;
   core::SystemTimestamp timestamp_;
 };
