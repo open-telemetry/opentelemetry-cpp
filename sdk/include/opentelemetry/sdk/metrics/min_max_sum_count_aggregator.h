@@ -1,13 +1,13 @@
 #pragma once
 
-#include "opentelemetry/version.h"
 #include "opentelemetry/metrics/instrument.h"
 #include "opentelemetry/sdk/metrics/aggregator/aggregator.h"
+#include "opentelemetry/version.h"
 
+#include <memory>
+#include <mutex>
 #include <variant>
 #include <vector>
-#include <mutex>
-#include <memory>
 
 namespace metrics_api = opentelemetry::metrics;
 
@@ -16,6 +16,10 @@ namespace sdk
 {
 namespace metrics
 {
+const int MinValueIndex = 0;
+const int MaxValueIndex = 1;
+const int SumValueIndex = 2;
+const int CountValueIndex = 3;
 /**
  * This aggregator stores and maintains a vector of
  * type T where the contents in the vector are made
@@ -29,12 +33,13 @@ template<class T>
 class MinMaxSumCountAggregator : public Aggregator<T>
 {
 public:
-  explicit MinMaxSumCountAggregator(metrics_api::BoundInstrumentKind kind)
+  explicit MinMaxSumCountAggregator(metrics_api::InstrumentKind kind)
   {
     static_assert(std::is_arithmetic<T>::value, "Not an arithmetic type");
     this->kind_ = kind;
-    this->values_ = std::vector<T>(4, 0); // {min, max, sum count}
+    this->values_ = std::vector<T>(4, 0); // {min, max, sum, count}
     this->checkpoint_ = this->values_;
+    this->agg_kind_ = AggregatorKind::MinMaxSumCount;
   }
 
   /**
@@ -46,13 +51,13 @@ public:
   {
     this->mu_.lock();
 
-    if (this->values_[3] == 0 || val < this->values_[0]) // set min
-      this->values_[0] = val;
-    if (this->values_[3] == 0 || val > this->values_[1]) // set max
-      this->values_[1] = val;
+    if (this->values_[CountValueIndex] == 0 || val < this->values_[MinValueIndex]) // set min
+      this->values_[MinValueIndex] = val;
+    if (this->values_[CountValueIndex] == 0 || val > this->values_[MaxValueIndex]) // set max
+      this->values_[MaxValueIndex] = val;
 
-    this->values_[2] += val; // compute sum
-    this->values_[3]++; // increment count
+    this->values_[SumValueIndex] += val; // compute sum
+    this->values_[CountValueIndex]++; // increment count
 
     this->mu_.unlock();
   }
@@ -67,10 +72,10 @@ public:
     this->mu_.lock();
     this->checkpoint_ = this->values_;
     // Reset the values
-    this->values_[0] = 0;
-    this->values_[1] = 0;
-    this->values_[2] = 0;
-    this->values_[3] = 0;
+    this->values_[MinValueIndex] = 0;
+    this->values_[MaxValueIndex] = 0;
+    this->values_[SumValueIndex] = 0;
+    this->values_[CountValueIndex] = 0;
     this->mu_.unlock();
   }
 
@@ -85,15 +90,15 @@ public:
     {
       this->mu_.lock();
       // set min
-      if (other.values_[0] < this->values_[0])
-        this->values_[0] = other.values_[0];
+      if (other.values_[MinValueIndex] < this->values_[MinValueIndex])
+        this->values_[MinValueIndex] = other.values_[MinValueIndex];
       // set max
-      if (other.values_[1] > this->values_[1])
-        this->values_[1] = other.values_[1];
+      if (other.values_[MaxValueIndex] > this->values_[MaxValueIndex])
+        this->values_[MaxValueIndex] = other.values_[MaxValueIndex];
       // set sum
-      this->values_[2] += other.values_[2];
+      this->values_[SumValueIndex] += other.values_[SumValueIndex];
       // set count
-      this->values_[3] += other.values_[3];
+      this->values_[CountValueIndex] += other.values_[CountValueIndex];
       this->mu_.unlock();
     }
     else
@@ -122,7 +127,6 @@ public:
   {
     return this->values_;
   }
-
 };
 }
 }
