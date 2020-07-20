@@ -140,7 +140,7 @@ public:
 
   // Assignment constructor links to the same next node but copies the other's
   // data list into a new linked list
-  Context &operator=(const Context &other)
+  void &operator=(const Context &other)
   {
     next_          = other.next_;
     head_          = new DataList;
