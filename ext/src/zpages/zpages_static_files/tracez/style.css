@@ -15,21 +15,41 @@ table {
 
 td, th {
   word-break: break-word;
-  border: 1px solid #eee;
+  border: 1px solid #f5f5f5;
   padding: 6px;
   text-align: center;
 }
 
-#records_table th, #records_table tr {
+#overview_table th, #overview_table tr {
   border-top: none;
 }
 
-#header th, #header tr {
+#headers th, #headers tr {
   border-bottom: none;
+}
+
+
+:hover {
+  transition-duration: .15s;
 }
 
 tr:nth-child(even) {
   background-color: #eee;
+}
+
+
+td:hover, a:hover {
+  background-color: #eee;
+}
+
+a {
+  color: #4b5fab;
+  text-decoration: none;
+}
+
+th {
+  background-color: white;
+  color: #252525;
 }
 
 .sm {
