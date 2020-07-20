@@ -1,7 +1,6 @@
 #pragma once
 
 #include <atomic>
-#include <iostream>
 
 #include "opentelemetry/context/context_value.h"
 #include "opentelemetry/nostd/shared_ptr.h"
@@ -13,32 +12,36 @@ namespace context
 {
 
   // The context class provides a context identifier. Is built as a linked list
-  // of DataList node
+  // of DataList nodes and each context holds a shared_ptr to a place within 
+  // the list that determines which keys and values it has access to. All that
+  // come before and none that come after.
   class Context
   {
 
     public:
 
       // Creates a context object from a map of keys and identifiers, this will
-      // be the head of the context object linked list.
+      // hold a shared_ptr to the head of the DataList linked list 
       template <class T, nostd::enable_if_t<trace::detail::is_key_value_iterable<T>::value> * = nullptr>
         Context(const T &keys_and_values)
         {
           head_ = nostd::shared_ptr<DataList>{new DataList(keys_and_values)};
         }
       
+      // Creates a context object from a key and value, this will
+      // hold a shared_ptr to the head of the DataList linked list 
         Context(nostd::string_view key, ContextValue value)
         {
           head_ = nostd::shared_ptr<DataList>{new DataList(key, value)};
         }
 
       // Accepts a new iterable and then returns a new context that
-      // contains the new key and value data.
+      // contains the new key and value data. It attaches the
+      // exisiting list to the end of the new list.
       template <class T, nostd::enable_if_t<trace::detail::is_key_value_iterable<T>::value> * = nullptr>
         Context SetValues(T &values) noexcept
         {
           Context context = Context(values);
-
           nostd::shared_ptr<DataList> last_node; 
           for(nostd::shared_ptr<DataList> data = context.head_; data != nullptr; data = data->next_){
             last_node = data;
@@ -48,7 +51,8 @@ namespace context
         }
       
       // Accepts a new iterable and then returns a new context that
-      // contains the new key and value data.
+      // contains the new key and value data. It attaches the
+      // exisiting list to the end of the new list.
       Context SetValue(nostd::string_view key, ContextValue value) noexcept
       {
           Context context = Context(key, value);
@@ -63,7 +67,6 @@ namespace context
       // Returns the value associated with the passed in key.
       context::ContextValue GetValue(nostd::string_view key)
       {
-
           for (nostd::shared_ptr<DataList> data = head_; data != nullptr; data = data->next_)
           {
             if (key.size() == data->key_length_)
