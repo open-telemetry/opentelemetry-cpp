@@ -32,9 +32,9 @@ class HTTPTextFormat {
         virtual void Inject(Setter set_from_carrier, T &carrier, const context::Context &context) = 0;
 
         // Set the span in the given context.
-        virtual static context::Context SetSpanInContext(Span span, Context &context) = 0;
+        virtual static context::Context SetSpanInContext(Span span, context::Context &context) = 0;
         // Retrieve the current span.
-        virtual static Span GetCurrentSpan(Context &context) = 0;
+        virtual static Span GetCurrentSpan(context::Context &context) = 0;
 };
 }
 }
