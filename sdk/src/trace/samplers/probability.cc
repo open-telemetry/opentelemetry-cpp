@@ -105,7 +105,7 @@ SamplingResult ProbabilitySampler::ShouldSample(
   return { Decision::NOT_RECORD, nullptr };
 }
 
-std::string ProbabilitySampler::GetDescription() const noexcept
+nostd::string_view ProbabilitySampler::GetDescription() const noexcept
 {
   return sampler_description_;
 }

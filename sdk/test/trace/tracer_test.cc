@@ -32,7 +32,7 @@ public:
                     {{"sampling_attr1", 123}, {"sampling_attr2", "string"}}))};
   }
 
-  std::string GetDescription() const noexcept override { return "MockSampler"; }
+  nostd::string_view GetDescription() const noexcept override { return "MockSampler"; }
 };
 
 /**

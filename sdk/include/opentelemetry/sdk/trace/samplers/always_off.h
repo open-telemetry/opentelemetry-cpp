@@ -17,6 +17,10 @@ class AlwaysOffSampler : public Sampler
 {
 public:
   /**
+   * The constructor sets the description to "AlwaysOffSampler".
+   */
+  AlwaysOffSampler(): description_("AlwaysOffSampler") {}
+  /**
    * @return Returns NOT_RECORD always
    */
   SamplingResult ShouldSample(
@@ -32,10 +36,13 @@ public:
   /**
    * @return Description MUST be AlwaysOffSampler
    */
-  std::string GetDescription() const noexcept override
+  nostd::string_view GetDescription() const noexcept override
   {
-    return "AlwaysOffSampler";
+    return description_;
   }
+
+private:
+  std::string description_;
 };
 }  // namespace trace
 }  // namespace sdk

@@ -16,6 +16,10 @@ class AlwaysOnSampler : public Sampler
 {
 public:
   /**
+   * The constructor sets the description to "AlwaysOnSampler".
+   */
+  AlwaysOnSampler(): description_("AlwaysOnSampler") {}
+  /**
    * @return Always return Decision RECORD_AND_SAMPLE
    */
   inline SamplingResult ShouldSample(const trace_api::SpanContext * /*parent_context*/,
@@ -30,7 +34,10 @@ public:
   /**
    * @return Description MUST be AlwaysOnSampler
    */
-  inline std::string GetDescription() const noexcept override { return "AlwaysOnSampler"; }
+  inline nostd::string_view GetDescription() const noexcept override { return description_; }
+
+private:
+  std::string description_;
 };
 }  // namespace trace
 }  // namespace sdk
