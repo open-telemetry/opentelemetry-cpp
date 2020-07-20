@@ -21,36 +21,16 @@ sdkmetrics::ExportResult StreamMetricsExporter::Export(
   {    
     AggregatorKind aggKind = record.GetAggregatorKind();
 
-    if(aggKind == AggregatorKind::Counter)
+    sout_ << "{"
+          << "\n name        : " << record.GetName()
+          << "\n description : " << record.GetDescription()
+          << "\n labels      : " << record.GetLabels();
+          PrintVariant(record.GetValue(), aggKind);    
+
+    if(aggKind == AggregatorKind::Gauge)
     {
-      sout_ << "{"
-            << "\n name        : " << record.GetName()
-            << "\n description : " << record.GetDescription()
-            << "\n labels      : " << record.GetLabels();
-            PrintVariant(record.GetValue(), AggregatorKind::Counter);
-
+      sout_ << "\n timestamp   : " << record.GetTimestamp();
     }
-    else if(aggKind == AggregatorKind::MinMaxSumCount)
-    {
-
-    }
-    else if(aggKind == AggregatorKind::Gauge)
-    {
-
-    }
-    else if(aggKind == AggregatorKind::Sketch)
-    {
-
-    }
-    else if(aggKind == AggregatorKind::Histogram)
-    {
-
-    }
-    else if(aggKind == AggregatorKind::Exact)
-    {
-
-    }
-
 
   }
 
