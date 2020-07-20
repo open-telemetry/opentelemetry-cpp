@@ -358,7 +358,7 @@ TEST(Tracer, TestParentOrElseSampler)
   span_parent_on_2->End();
   span_parent_on_1->End();
   ASSERT_EQ(2, spans_received_parent_on->size());
-  ASSERT_EQ("span 2", spans_received_parent_on->at(0)->GetName());  // span 2 ends first.
+  ASSERT_EQ("span 2", spans_received_parent_on->at(0)->GetName());
   ASSERT_EQ("span 1", spans_received_parent_on->at(1)->GetName());
 
   std::shared_ptr<std::vector<std::unique_ptr<SpanData>>> spans_received_parent_off(
