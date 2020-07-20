@@ -1,4 +1,4 @@
-foreach(testname httptextformat_test)
+foreach(testname http_text_format_test)
   add_executable(${testname} "${testname}.cc")
   target_link_libraries(${testname} ${GTEST_BOTH_LIBRARIES}
                         ${CMAKE_THREAD_LIBS_INIT} opentelemetry_api)
