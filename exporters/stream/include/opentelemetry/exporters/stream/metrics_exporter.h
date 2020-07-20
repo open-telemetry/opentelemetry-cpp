@@ -32,10 +32,10 @@ sdkmetrics::ExportResult Export(
 void Shutdown(std::chrono::microseconds timeout = std::chrono::microseconds(0)) noexcept;
 
 private:
-
 std::ostream &sout_;
 bool isShutdown_ = false;
-
 };
-}}
+
+}
+}
 OPENTELEMETRY_END_NAMESPACE
