@@ -24,7 +24,7 @@ sdkmetrics::ExportResult StreamMetricsExporter::Export(
 
     if(aggKind == AggregatorKind::Gauge)
     {
-      sout_ << "\n timestamp   : " << record.GetTimestamp().time_since_epoch().count();
+      sout_ << "\n  timestamp   : " << record.GetTimestamp().time_since_epoch().count();
     }
     
     sout_ << "\n}\n";
