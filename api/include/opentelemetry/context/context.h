@@ -65,6 +65,7 @@ public:
   // Returns the value associated with the passed in key.
   context::ContextValue GetValue(nostd::string_view key)
   {
+/*
     // Iterate through the context nodes
     for (auto context = *context_ptr_; context != nullptr; context = context->next_)
     {
@@ -80,6 +81,7 @@ public:
         }
       }
     }
+    */
     return "";
   }
 

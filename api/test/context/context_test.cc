@@ -19,7 +19,7 @@ TEST(ContextTest, ContextGetValueReturnsExpectedValue)
   std::map<std::string, std::string> map_test = {{"test_key", "123"}, {"foo_key", "456"}};
 
   nostd::shared_ptr<context::Context> test_context = context::Context::CreateContext(map_test);
-
+  nostd::get<nostd::string_view>(test_context->GetValue("test_key"));
   //  EXPECT_EQ(nostd::get<nostd::string_view>(test_context->GetValue("test_key")), "123");
   //  EXPECT_EQ(nostd::get<nostd::string_view>(test_context->GetValue("foo_key")), "456");
 }
