@@ -13,10 +13,7 @@ namespace context
 {
 
   // The context class provides a context identifier. Is built as a linked list
-  // of context nodes which each have access to the nodes before it, but not
-  // after. So each time a write is performed a new context is added to the list.
-  // Within each context node there is another linked list which holds the key
-  // and value data for each node.
+  // of DataList node
   class Context
   {
 
@@ -41,7 +38,12 @@ namespace context
         Context SetValues(T &values) noexcept
         {
           Context context = Context(values);
-          context.head_->down_ = head_;
+
+          nostd::shared_ptr<DataList> last_node; 
+          for(nostd::shared_ptr<DataList> data = context.head_; data != nullptr; data = data->next_){
+            last_node = data;
+          }
+          last_node->next_ = head_;
           return context;
         }
       
@@ -50,7 +52,11 @@ namespace context
       Context SetValue(nostd::string_view key, ContextValue value) noexcept
       {
           Context context = Context(key, value);
-          context.head_->down_ = head_;
+          nostd::shared_ptr<DataList> last_node; 
+          for(nostd::shared_ptr<DataList> data = context.head_; data != nullptr; data = data->next_){
+            last_node = data;
+          }
+          last_node->next_ = head_;
           return context;
       }
       
@@ -58,9 +64,7 @@ namespace context
       context::ContextValue GetValue(nostd::string_view key)
       {
 
-        DataList * head = &*head_;
-        for(DataList* down = &*(head->down_); head != nullptr; down = &*(head->down_)){
-          for (DataList* data = head; data != nullptr; data = data->next_)
+          for (nostd::shared_ptr<DataList> data = head_; data != nullptr; data = data->next_)
           {
             if (key.size() == data->key_length_)
             {
@@ -70,11 +74,6 @@ namespace context
               }
             }
           }
-          head = down;
-          if(head == nullptr){
-            break;
-          } 
-        }
         return "";
       }
    
@@ -85,9 +84,7 @@ namespace context
     class DataList
     {
       public:
-        DataList *next_;
-
-        nostd::shared_ptr<DataList> down_;
+        nostd::shared_ptr<DataList> next_;
 
         char *key_;
 
@@ -109,24 +106,22 @@ namespace context
                      memcpy(key_, nostd::string_view(iter->first).data(),
                          nostd::string_view(iter->first).size() * sizeof(char));
                      value_ = iter->second;
-                     next_  = nullptr;
-                     down_ = nostd::shared_ptr<DataList>{nullptr};
+                     next_  = nostd::shared_ptr<DataList>{nullptr};
                      ++iter;
 
-                     DataList *previous_node = this;
+                     DataList* previous_node = this;
                      // Iterate over the keys and values iterable and add nodes
                      for (; iter != std::end(keys_and_vals); ++iter)
                      {
-                       DataList *node    = new DataList();
-                       node->next_       = nullptr;
-                       node->down_ = nostd::shared_ptr<DataList>{nullptr};
+                       nostd::shared_ptr<DataList> node    = nostd::shared_ptr<DataList>{new DataList()};
+                       node->next_       = nostd::shared_ptr<DataList>{nullptr};
                        node->key_        = new char[nostd::string_view(iter->first).size()];
                        node->key_length_ = nostd::string_view(iter->first).size();
                        memcpy(node->key_, nostd::string_view(iter->first).data(),
                            nostd::string_view(iter->first).size() * sizeof(char));
                        node->value_         = iter->second;
                        previous_node->next_ = node;
-                       previous_node        = node;
+                       previous_node        = &*node;
                      }
                    }
 
@@ -138,13 +133,11 @@ namespace context
           key_length_ = nostd::string_view(key).size();
           memcpy(key_, nostd::string_view(key).data(), nostd::string_view(key).size() * sizeof(char));
           value_ = value;
-          next_  = nullptr;
-          down_ = nostd::shared_ptr<DataList>{nullptr};
+          next_  = nostd::shared_ptr<DataList>{nullptr};
         }
 
         ~DataList() { 
           delete[] key_;
-          delete next_;
          }
     };
 
