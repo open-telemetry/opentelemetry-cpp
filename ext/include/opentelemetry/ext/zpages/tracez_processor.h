@@ -10,6 +10,7 @@
 #include "opentelemetry/sdk/trace/processor.h"
 #include "opentelemetry/sdk/trace/recordable.h"
 #include "opentelemetry/sdk/trace/span_data.h"
+#include "opentelemetry/ext/zpages/threadsafe_span_data.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace ext
