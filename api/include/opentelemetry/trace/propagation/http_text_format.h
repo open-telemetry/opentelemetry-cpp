@@ -34,7 +34,7 @@ class HTTPTextFormat {
         // Set the span in the given context.
         virtual static context::Context SetSpanInContext(Span span, context::Context &context) = 0;
         // Retrieve the current span.
-        virtual static Span GetCurrentSpan(context::Context &context) = 0;
+        virtual static trace::Span GetCurrentSpan(context::Context &context) = 0;
 };
 }
 }

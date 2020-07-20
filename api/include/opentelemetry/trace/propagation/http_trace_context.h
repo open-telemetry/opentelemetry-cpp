@@ -54,7 +54,7 @@ class HttpTraceContext : public HTTPTextFormat<T>
         }
 
         context::Context Extract(Getter getter, const T &carrier, context::Context &context) override {
-            SpanContext span_context = ExtractImpl(carrier, getter);
+            trace::SpanContext span_context = ExtractImpl(carrier, getter);
             return SetSpanInContext(trace.DefaultSpan(span_context), context);
         }
 
@@ -66,8 +66,8 @@ class HttpTraceContext : public HTTPTextFormat<T>
             return new_values;
         }
 
-        static Span GetCurrentSpan(Context &context) {
-            Span span = context.GetValue(Context.kSpanKey);
+        static trace::Span GetCurrentSpan(Context &context) {
+            trace::Span span = context.GetValue(Context.kSpanKey);
             if (span == NULL) {
                 return NULL;
             }
@@ -89,8 +89,8 @@ class HttpTraceContext : public HTTPTextFormat<T>
         static const int kHeaderElementLengths[4] = {2,32,16,2};
 
         // TODO: need review on hex_string because trace ids are objects not string_views
-        static void InjectImpl(Setter setter, T &carrier, const SpanContext &span_context) {
-            nostd::string_view trace_parent = SpanContextToString(SpanContext &span_context);
+        static void InjectImpl(Setter setter, T &carrier, const trace::SpanContext &span_context) {
+            nostd::string_view trace_parent = trace::SpanContextToString(SpanContext &span_context);
             setter(carrier, kTraceParent, trace_parent);
             if (span_context.trace_state() != NULL) {
                 nostd::string_view trace_state = FormatTracestate(span_context.trace_state());
@@ -114,7 +114,7 @@ class HttpTraceContext : public HTTPTextFormat<T>
             return res;
         }
 
-        static nostd::string SpanContextToString(SpanContext &span_context) {
+        static nostd::string trace::SpanContextToString(SpanContext &span_context) {
             nostd::span<char> trace_id = span_context.trace_id();
             nostd::span<char> span_id = span_context.span_id();
             nostd::span<char> trace_flags = span_context.trace_flags();
@@ -133,14 +133,14 @@ class HttpTraceContext : public HTTPTextFormat<T>
             return hex_string;
         }
 
-        static SpanContext ExtractContextFromTraceParent(nostd::string_view &trace_parent) {
+        static trace::SpanContext ExtractContextFromTraceParent(nostd::string_view &trace_parent) {
             bool is_valid = trace_parent.length() == kHeaderSize
                             && trace_parent[kVersionBytes] == "-"
                             && trace_parent[kVersionBytes+kTraceIdBytes+1] == "-"
                             && trace_parent[kVersionBytes+kTraceIdBytes+kParentIdBytes+2] == "-";
             if (!is_valid) {
                 std::cout<<"Unparseable trace_parent header. Returning INVALID span context."<<std::endl;
-                return SpanContext();
+                return trace::SpanContext();
             }
 
             try {
@@ -186,12 +186,12 @@ class HttpTraceContext : public HTTPTextFormat<T>
                 }
 
                 TraceId trace_id_obj = TraceId(nostd::span(trace_id,trace_id.length()));
-                SpanId span_id_obj = SpanId(nostd::span(span_id,span_id.length()));
+                trace::SpanId span_id_obj = trace::SpanId(nostd::span(span_id,span_id.length()));
                 TraceFlags trace_flags_obj = TraceFlags(nostd::span(trace_flags,trace_flags.length()));
-                return SpanContext.CreateFromRemoteParent(trace_id_obj, span_id_obj, trace_flags_obj, TraceState());
+                return trace::SpanContext.CreateFromRemoteParent(trace_id_obj, span_id_obj, trace_flags_obj, TraceState());
             } catch (std::exception& e) {
                 std::cout<<"Unparseable trace_parent header. Returning INVALID span context."<<std::endl;
-                return SpanContext();
+                return trace::SpanContext();
             }
         }
 
@@ -241,13 +241,13 @@ class HttpTraceContext : public HTTPTextFormat<T>
             return trace_state_builder.Build();
         }
 
-        static SpanContext ExtractImpl(Getter getter, T &carrier) {
+        static trace::SpanContext ExtractImpl(Getter getter, T &carrier) {
             nostd::string_view trace_parent = getter(carrier, kTraceParent);
             if (trace_parent == NULL) {
-                return SpanContext();
+                return trace::SpanContext();
             }
 
-            SpanContext context_from_parent_header = ExtractContextFromTraceParent(trace_parent);
+            trace::SpanContext context_from_parent_header = ExtractContextFromTraceParent(trace_parent);
             if (!context_from_parent_header.IsValid()) {
                 return context_from_parent_header;
             }
@@ -259,15 +259,15 @@ class HttpTraceContext : public HTTPTextFormat<T>
 
             try {
                 TraceState trace_state = ExtractTraceState(trace_state_header);
-                // Need getter support from SpanContext
-                return SpanContext.CreateFromRemoteParent(
+                // Need getter support from trace::SpanContext
+                return trace::SpanContext.CreateFromRemoteParent(
                     context_from_parent_header.GetTraceId(),
                     context_from_parent_header.GetSpanId(),
                     context_from_parent_header.GetTraceFlags(),
                     trace_state);
             } catch (std::exception& e) {
                 std::cout<<"Unparseable tracestate header. Returning span context without state."<<std::endl;
-                return SpanContext.CreateFromRemoteParent(
+                return trace::SpanContext.CreateFromRemoteParent(
                     context_from_parent_header.GetTraceId(),
                     context_from_parent_header.GetSpanId(),
                     context_from_parent_header.GetTraceFlags(),
