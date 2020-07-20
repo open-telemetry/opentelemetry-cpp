@@ -23,7 +23,7 @@ namespace ext
 namespace zpages
 {
 /**
- * SpanData is a representation of all data collected by a span.
+ * This class is a threadsafe version of span data used for zpages in OT
  */
 class ThreadsafeSpanData final : public opentelemetry::sdk::trace::Recordable
 {
