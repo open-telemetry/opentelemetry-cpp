@@ -188,7 +188,7 @@ private:
 
     char *key_;
 
-    int key_length_;
+    size_t key_length_;
 
     ContextValue value_;
 
