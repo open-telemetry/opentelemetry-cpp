@@ -64,7 +64,7 @@ TEST(GaugeAggregator, BadMerge)
   // This verifies that we encounter and error when we try to merge
   // two aggregators of different numeric types together.
   auto agg1 = new GaugeAggregator<int>(opentelemetry::metrics::InstrumentKind::IntCounter);
-  auto agg2 = new GaugeAggregator<int>(opentelemetry::metrics::InstrumentKind::IntCounter);
+  auto agg2 = new GaugeAggregator<int>(opentelemetry::metrics::InstrumentKind::DoubleCounter);
 
   agg1->update(1);
   agg2->update(2);
