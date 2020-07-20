@@ -36,6 +36,7 @@ public:
     this->kind_ = kind;
     this->values_ = std::vector<T>(1, 0);
     this->checkpoint_ = this->values_;
+    this->agg_kind_ = AggregatorKind::Gauge;
     current_timestamp_ = core::SystemTimestamp(std::chrono::system_clock::now());
   }
 
