@@ -1,6 +1,6 @@
 #include "opentelemetry/trace/propagation/httptextformat.h"
 #include "opentelemetry/trace/propagation/HttpTraceContext.h"
-#include "opentelemetry/context/Context.h"
+#include "opentelemetry/context/context.h"
 #include "opentelemetry/trace/span.h"
 #include "opentelemetry/trace/default_span.h"
 #include "opentelemetry/trace/span_context.h"
