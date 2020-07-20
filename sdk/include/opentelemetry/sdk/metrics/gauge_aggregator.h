@@ -1,14 +1,14 @@
 #pragma once
 
-#include "opentelemetry/version.h"
+#include "opentelemetry/core/timestamp.h"
 #include "opentelemetry/metrics/instrument.h"
 #include "opentelemetry/sdk/metrics/aggregator/aggregator.h"
-#include "opentelemetry/core/timestamp.h"
+#include "opentelemetry/version.h"
 
+#include <memory>
+#include <mutex>
 #include <variant>
 #include <vector>
-#include <mutex>
-#include <memory>
 
 namespace metrics_api = opentelemetry::metrics;
 
@@ -30,13 +30,13 @@ template<class T>
 class GaugeAggregator : public Aggregator<T>
 {
 public:
-  explicit GaugeAggregator<T>(metrics_api::BoundInstrumentKind kind)
+  explicit GaugeAggregator<T>(metrics_api::InstrumentKind kind)
   {
     static_assert(std::is_arithmetic<T>::value, "Not an arithmetic type");
     this->kind_ = kind;
     this->values_ = std::vector<T>(1, 0);
     this->checkpoint_ = this->values_;
-    cur_timestamp = core::SystemTimestamp(std::chrono::system_clock::now());
+    current_timestamp_ = core::SystemTimestamp(std::chrono::system_clock::now());
   }
 
   /**
@@ -48,7 +48,7 @@ public:
   {
     this->mu_.lock();
     this->values_[0] = val;
-    cur_timestamp = core::SystemTimestamp(std::chrono::system_clock::now());
+    current_timestamp_ = core::SystemTimestamp(std::chrono::system_clock::now());
     this->mu_.unlock();
   }
 
@@ -67,8 +67,8 @@ public:
 
     // Reset the values to default
     this->values_[0] = 0;
-    checkpoint_timestamp = cur_timestamp;
-    cur_timestamp = core::SystemTimestamp(std::chrono::system_clock::now());
+    checkpoint_timestamp_ = current_timestamp_;
+    current_timestamp_ = core::SystemTimestamp(std::chrono::system_clock::now());
 
     this->mu_.unlock();
   }
@@ -84,7 +84,7 @@ public:
     {
       this->mu_.lock();
       this->values_[0] = other.values_[0];
-      cur_timestamp = core::SystemTimestamp(std::chrono::system_clock::now());
+      current_timestamp_ = core::SystemTimestamp(std::chrono::system_clock::now());
       this->mu_.unlock();
     }
     else
@@ -107,7 +107,7 @@ public:
    */
   core::SystemTimestamp get_checkpoint_timestamp()
   {
-    return checkpoint_timestamp;
+    return checkpoint_timestamp_;
   }
 
   /**
@@ -123,12 +123,12 @@ public:
    */
   core::SystemTimestamp get_timestamp()
   {
-    return cur_timestamp;
+    return current_timestamp_;
   }
 
 private:
-  core::SystemTimestamp cur_timestamp;
-  core::SystemTimestamp checkpoint_timestamp;
+  core::SystemTimestamp current_timestamp_;
+  core::SystemTimestamp checkpoint_timestamp_;
 };
 }
 }
