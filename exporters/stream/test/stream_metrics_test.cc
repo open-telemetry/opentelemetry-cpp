@@ -12,7 +12,8 @@ TEST(StreamMetricsExporter, PrintCounter)
   auto exporter = std::unique_ptr<sdkmetrics::MetricsExporter> (new
       opentelemetry::exporter::metrics::StreamMetricsExporter);
   
-  std::vector<int> vec (1,5);
+  std::vector<double> vec;
+  vec.push_back(5.5);
   auto record = sdkmetrics::Record("name", "description", AggregatorKind::Counter, "labels", vec);
 
   std::vector<sdkmetrics::Record> records;
@@ -36,7 +37,7 @@ TEST(StreamMetricsExporter, PrintCounter)
   "  name        : name\n"
   "  description : description\n"
   "  labels      : labels\n"
-  "  sum         : 5\n"
+  "  sum         : 5.5\n"
   "}\n"; 
 
   ASSERT_EQ(stdoutOutput.str(),expectedOutput);
@@ -90,8 +91,8 @@ TEST(StreamMetricsExporter, PrintGauge)
   auto exporter = std::unique_ptr<sdkmetrics::MetricsExporter> (new
       opentelemetry::exporter::metrics::StreamMetricsExporter);
   
-  std::vector<int> vec;
-  vec.push_back(9);
+  std::vector<short> vec;
+  vec.push_back((short)9);
 
   opentelemetry::core::SystemTimestamp time = opentelemetry::core::SystemTimestamp(std::chrono::system_clock::now());
   auto record = sdkmetrics::Record("name", "description", AggregatorKind::Gauge, "labels", vec, time);
