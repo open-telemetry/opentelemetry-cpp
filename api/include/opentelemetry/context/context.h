@@ -65,10 +65,11 @@ public:
   // Returns the value associated with the passed in key.
   context::ContextValue GetValue(nostd::string_view key)
   {
-/*
+
     // Iterate through the context nodes
     for (auto context = *context_ptr_; context != nullptr; context = context->next_)
     {
+      /*
       // Iterate through the internal data nodes
       for (DataList *data = context->head_; data != nullptr; data = data->next_)
       {
@@ -79,9 +80,9 @@ public:
             return data->value_;
           }
         }
-      }
+      }*/
     }
-    */
+    
     return "";
   }
 
