@@ -17,28 +17,6 @@ namespace common = opentelemetry::common;
 using opentelemetry::trace::SpanContext;
 
 /**
- * A mock sampler that returns non-empty sampling results attributes.
- */
-class MockSampler final : public Sampler
-{
-public:
-  SamplingResult ShouldSample(const SpanContext * /*parent_context*/,
-                              trace_api::TraceId /*trace_id*/,
-                              nostd::string_view /*name*/,
-                              trace_api::SpanKind /*span_kind*/,
-                              const trace_api::KeyValueIterable & /*attributes*/) noexcept override
-  {
-    // Return two pairs of attributes. These attributes should be added to the span attributes
-    return {Decision::RECORD_AND_SAMPLE,
-            nostd::unique_ptr<const std::map<std::string, opentelemetry::common::AttributeValue>>(
-                new const std::map<std::string, opentelemetry::common::AttributeValue>(
-                    {{"sampling_attr1", 123}, {"sampling_attr2", "string"}}))};
-  }
-
-  std::string GetDescription() const noexcept override { return "MockSampler"; }
-};
-
-/**
  * A mock exporter that switches a flag once a valid recordable was received.
  */
 class MockSpanExporter final : public SpanExporter
@@ -74,24 +52,8 @@ private:
   std::shared_ptr<std::vector<std::unique_ptr<SpanData>>> spans_received_;
 };
 
-void BenchmarkShouldSampler(Sampler &sampler, benchmark::State &state)
-{
-	opentelemetry::trace::TraceId trace_id;
-	opentelemetry::trace::SpanKind span_kind = opentelemetry::trace::SpanKind::kInternal;
-
-	using M = std::map<std::string, int>;
-	M m1 = {{}};
-	opentelemetry::trace::KeyValueIterableView<M> view{m1};
-
-	while (state.KeepRunning())
-	{
-		benchmark::DoNotOptimize(sampler.ShouldSample(nullptr, trace_id, "", span_kind, view));
-	}
-}
-
 namespace
 {
-
 // Sampler constructor used as a baseline to compare with other samplers
 void BM_AlwaysOffSamplerConstruction(benchmark::State &state)
 {
@@ -130,6 +92,22 @@ void BM_ProbabilitySamplerConstruction(benchmark::State &state)
 }
 BENCHMARK(BM_ProbabilitySamplerConstruction);
 
+// Sampler Helper Function
+void BenchmarkShouldSampler(Sampler &sampler, benchmark::State &state)
+{
+	opentelemetry::trace::TraceId trace_id;
+	opentelemetry::trace::SpanKind span_kind = opentelemetry::trace::SpanKind::kInternal;
+
+	using M = std::map<std::string, int>;
+	M m1 = {{}};
+	opentelemetry::trace::KeyValueIterableView<M> view{m1};
+
+	while (state.KeepRunning())
+	{
+		benchmark::DoNotOptimize(sampler.ShouldSample(nullptr, trace_id, "", span_kind, view));
+	}
+}
+
 // Sampler used as a baseline to compare with other samplers
 void BM_AlwaysOffSamplerShouldSample(benchmark::State &state)
 {
@@ -164,48 +142,39 @@ void BM_ProbabilitySamplerShouldSample(benchmark::State &state)
 }
 BENCHMARK(BM_ProbabilitySamplerShouldSample);
 
-// Test to measure performance for span creation
-void BM_SpanCreation(benchmark::State &state)
+// Sampler Helper Function
+void BenchmarkSpanCreation(std::shared_ptr<Sampler> sampler, benchmark::State &state)
 {
-	std::shared_ptr<std::vector<std::unique_ptr<SpanData>>> spans_received_off(
+	std::shared_ptr<std::vector<std::unique_ptr<SpanData>>> spans_received(
 		new std::vector<std::unique_ptr<SpanData>>);
 
-	std::unique_ptr<SpanExporter> exporter(new MockSpanExporter(spans_received_off));
+	std::unique_ptr<SpanExporter> exporter(new MockSpanExporter(spans_received));
 	auto processor = std::make_shared<SimpleSpanProcessor>(std::move(exporter));
-	auto tracer_off = std::shared_ptr<opentelemetry::trace::Tracer>(new Tracer(processor, std::make_shared<AlwaysOnSampler>()));
+	auto tracer = std::shared_ptr<opentelemetry::trace::Tracer>(new Tracer(processor, sampler));
 
 	while (state.KeepRunning())
 	{
-		auto span_off_1 = tracer_off->StartSpan("span with AlwaysOn sampler");
+		auto span = tracer->StartSpan("span");
 
-		span_off_1->SetAttribute("attr1", 3.1);
+		span->SetAttribute("attr1", 3.1);
 
-		span_off_1->End();
+		span->End();
 	}
+}
+
+// Test to measure performance for span creation
+void BM_SpanCreation(benchmark::State &state)
+{
+	BenchmarkSpanCreation(std::move(std::make_shared<AlwaysOnSampler>()), state);
 }
 BENCHMARK(BM_SpanCreation);
 
 // Test to measure performance overhead for no-op span creation
 void BM_NoopSpanCreation(benchmark::State &state)
 {
-	std::shared_ptr<std::vector<std::unique_ptr<SpanData>>> spans_received_off(
-		new std::vector<std::unique_ptr<SpanData>>);
-
-	std::unique_ptr<SpanExporter> exporter(new MockSpanExporter(spans_received_off));
-	auto processor = std::make_shared<SimpleSpanProcessor>(std::move(exporter));
-	auto tracer_off = std::shared_ptr<opentelemetry::trace::Tracer>(new Tracer(processor, std::make_shared<AlwaysOffSampler>()));
-
-	while (state.KeepRunning())
-	{
-		auto span_off_1 = tracer_off->StartSpan("span with AlwaysOff sampler");
-
-		span_off_1->SetAttribute("attr1", 3.1);  // Not recorded.
-
-		span_off_1->End();
-	}
+	BenchmarkSpanCreation(std::move(std::make_shared<AlwaysOffSampler>()), state);
 }
 BENCHMARK(BM_NoopSpanCreation);
-
 
 } // namespace
 BENCHMARK_MAIN();
