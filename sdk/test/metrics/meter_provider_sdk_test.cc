@@ -7,9 +7,7 @@ using namespace opentelemetry::sdk::metrics;
 
 TEST(MeterProvider, GetMeter)
 {
-  std::shared_ptr<Controller> controller(new Controller);
-
-  MeterProvider tf(controller);
+  MeterProvider tf;
   auto t1 = tf.GetMeter("test");
   auto t2 = tf.GetMeter("test");
   auto t3 = tf.GetMeter("different", "1.0.0");
