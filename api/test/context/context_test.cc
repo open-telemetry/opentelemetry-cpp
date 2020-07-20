@@ -10,18 +10,17 @@ using namespace opentelemetry;
 TEST(ContextTest, ContextIterableAcceptsMap)
 {
   std::map<std::string, context::ContextValue> map_test = {{"test_key", "123"}};
-  context::Context test_context      = context::Context(map_test);
+  context::Context test_context                         = context::Context(map_test);
 }
 
 // Tests that the GetValue method returns the expected value.
 TEST(ContextTest, ContextGetValueReturnsExpectedValue)
 {
   std::map<std::string, std::string> map_test = {{"test_key", "123"}, {"foo_key", "456"}};
-  context::Context test_context = context::Context(map_test);
+  context::Context test_context               = context::Context(map_test);
   EXPECT_EQ(nostd::get<nostd::string_view>(test_context.GetValue("test_key")), "123");
   EXPECT_EQ(nostd::get<nostd::string_view>(test_context.GetValue("foo_key")), "456");
 }
-
 
 // Tests that the SetValues method accepts an std::map.
 TEST(ContextTest, ContextSetValuesAcceptsMap)
@@ -30,8 +29,8 @@ TEST(ContextTest, ContextSetValuesAcceptsMap)
   std::map<std::string, context::ContextValue> map_test_write = {{"foo_key", "456"}};
 
   context::Context test_context = context::Context(map_test);
-  context::Context foo_context     = test_context.SetValues(map_test_write);
-  
+  context::Context foo_context  = test_context.SetValues(map_test_write);
+
   EXPECT_EQ(nostd::get<nostd::string_view>(foo_context.GetValue("test_key")), "123");
   EXPECT_EQ(nostd::get<nostd::string_view>(foo_context.GetValue("foo_key")), "456");
 }
@@ -43,10 +42,8 @@ TEST(ContextTest, ContextSetValuesAcceptsStringViewContextValue)
   nostd::string_view string_view_test      = "string_view";
   context::ContextValue context_value_test = "123";
 
-  context::Context test_context =
-      context::Context(string_view_test, context_value_test);
-  context::Context foo_context =
-      test_context.SetValue(string_view_test, context_value_test);
+  context::Context test_context = context::Context(string_view_test, context_value_test);
+  context::Context foo_context  = test_context.SetValue(string_view_test, context_value_test);
 
   EXPECT_EQ(nostd::get<nostd::string_view>(foo_context.GetValue(string_view_test)), "123");
 }
@@ -74,7 +71,6 @@ TEST(ContextTest, ContextKeyOverwrite)
 
   EXPECT_EQ(nostd::get<nostd::string_view>(context_foo.GetValue("test_key")), "456");
 }
-
 
 // Tests that the new Context Objects inherits the keys and values
 // of the original context object.
