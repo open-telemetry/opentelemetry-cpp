@@ -13,7 +13,7 @@
 // limitations under the License.
 
 #include <exception>
-#include "opentelemetry/trace/propagation/httptextformat.h"
+#include "opentelemetry/trace/propagation/http_text_format.h"
 #include "opentelemetry/trace/span_context.h"
 #include "opentelemetry/trace/trace_state.h"
 #include "opentelemetry/trace/key_value_iterable.h"
