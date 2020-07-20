@@ -83,7 +83,7 @@ public:
   /// <returns></returns>
   bool is_registered(const std::string &providerId)
   {
-    std::lock_guard lock(m_providerMapLock);
+    std::lock_guard<std::mutex> lock(m_providerMapLock);
     auto it = providers().find(providerId);
     if (it != providers().end())
     {
@@ -102,7 +102,7 @@ public:
   /// <returns></returns>
   Handle &open(const std::string &providerId)
   {
-    std::lock_guard lock(m_providerMapLock);
+    std::lock_guard<std::mutex> lock(m_providerMapLock);
 
     // Check and return if provider is already registered
     auto it = providers().find(providerId);
@@ -118,7 +118,7 @@ public:
     auto &data = providers()[providerId];
     data.providerMetaVector.clear();
 
-    event::UUID guid = (providerId.starts_with("{")) ? event::UUID(providerId.c_str())
+    event::UUID guid = (providerId.rfind("{", 0)==0) ? event::UUID(providerId.c_str())
                                                      :                  // It's a ProviderGUID
                            utils::GetProviderGuid(providerId.c_str());  // It's a ProviderName
 
@@ -157,7 +157,7 @@ public:
   /// <returns></returns>
   unsigned long close(Handle data)
   {
-    std::lock_guard lock(m_providerMapLock);
+    std::lock_guard<std::mutex> lock(m_providerMapLock);
 
     auto m = providers();
     auto it = m.begin();
@@ -197,7 +197,7 @@ public:
     tld::EventDataBuilder<std::vector<BYTE>> dbuilder(byteDataVector);
 
     const std::string EVENT_NAME = "name";
-    auto eventName               = std::get<const char *>(eventData[EVENT_NAME]);
+    auto eventName               = nostd::get<const char *>(eventData[EVENT_NAME]);
 
     builder.Begin(eventName, eventTags);
 
