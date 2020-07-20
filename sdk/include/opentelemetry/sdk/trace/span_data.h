@@ -180,7 +180,7 @@ public:
    * Get the events associated with this span
    * @return the events associated with this span
    */
-  std::vector<SpanDataEvent> GetEvents() const noexcept { return events_; }
+  const std::vector<SpanDataEvent> &GetEvents() const noexcept { return events_; }
 
   void SetIds(opentelemetry::trace::TraceId trace_id,
               opentelemetry::trace::SpanId span_id,
