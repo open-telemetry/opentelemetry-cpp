@@ -1,8 +1,6 @@
 #pragma once
 
-#include "opentelemetry/sdk/common/atomic_shared_ptr.h"
 #include "opentelemetry/metrics/meter.h"
-#include "opentelemetry/metrics/noop.h"
 #include "opentelemetry/version.h"
 
 #include <memory>

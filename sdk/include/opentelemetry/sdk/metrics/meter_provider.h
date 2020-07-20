@@ -1,12 +1,10 @@
 #pragma once
 
-#include <map>
-#include <memory>
-#include <string>
-
 #include "opentelemetry/nostd/shared_ptr.h"
 #include "opentelemetry/sdk/metrics/meter.h"
 #include "opentelemetry/metrics/meter_provider.h"
+
+#include <memory>
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace sdk
@@ -17,9 +15,7 @@ class MeterProvider final : public opentelemetry::metrics::MeterProvider
 {
 public:
   /**
-   * Initialize a new meter provider with a specified controller
-   * @param controller The controller for this meter provider. This must
-   * not be a nullptr.
+   * Initialize a new meter provider
    */
   explicit MeterProvider() noexcept;
 
