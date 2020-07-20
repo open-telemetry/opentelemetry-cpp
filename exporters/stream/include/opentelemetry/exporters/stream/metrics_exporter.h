@@ -34,8 +34,33 @@ void Shutdown(std::chrono::microseconds timeout = std::chrono::microseconds(0)) 
 private:
 std::ostream &sout_;
 bool isShutdown_ = false;
-};
+
+void PrintVariant(sdkmetrics::RecordValue value, AggregatorKind aggKind)
+{
+  if(nostd::holds_alternative<std::vector<short>>(value))
+  {
+    PrintVector<std::vector<short>>(value,aggKind);
+  }
+  else if(nostd::holds_alternative<std::vector<int>>(value))
+  {
+    PrintVector<std::vector<int>>(value,aggKind);
+  }
+  else if(nostd::holds_alternative<std::vector<double>>(value))
+  {
+    PrintVector<std::vector<double>>(value,aggKind);
+  }
+  else if(nostd::holds_alternative<std::vector<float>>(value))
+  {
+    PrintVector<std::vector<float>>(value,aggKind);
+  }
+}
+
+template <typename T>
+void PrintVector(sdkmetrics::RecordValue value, AggregatorKind aggKind)
+{
 
 }
-}
+
+};
+}}
 OPENTELEMETRY_END_NAMESPACE

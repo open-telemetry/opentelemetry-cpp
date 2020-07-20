@@ -18,14 +18,8 @@ sdkmetrics::ExportResult StreamMetricsExporter::Export(
   }
 
   for(sdkmetrics::Record record : records)
-  {
-    // Get the value out of the record.value_ variant
-    nostd::variant<std::vector<short>,
-                   std::vector<int>,
-                   std::vector<float>, 
-                   std::vector<double>> record_variant = record.GetValue();
-    
-    AggregatorKind aggKind = record.GetAggKind();
+  {    
+    AggregatorKind aggKind = record.GetAggregatorKind();
 
     if(aggKind == AggregatorKind::Counter)
     {
@@ -33,9 +27,10 @@ sdkmetrics::ExportResult StreamMetricsExporter::Export(
             << "\n name        : " << record.GetName()
             << "\n description : " << record.GetDescription()
             << "\n labels      : " << record.GetLabels();
+            PrintVariant(record.GetValue(), AggregatorKind::Counter);
 
     }
-    else if(aggKind == AggregatorKind::Exact)
+    else if(aggKind == AggregatorKind::MinMaxSumCount)
     {
 
     }
@@ -43,15 +38,15 @@ sdkmetrics::ExportResult StreamMetricsExporter::Export(
     {
 
     }
+    else if(aggKind == AggregatorKind::Sketch)
+    {
+
+    }
     else if(aggKind == AggregatorKind::Histogram)
     {
 
     }
-    else if(aggKind == AggregatorKind::MinMaxSumCount)
-    {
-
-    }
-    else if(aggKind == AggregatorKind::Sketch)
+    else if(aggKind == AggregatorKind::Exact)
     {
 
     }
