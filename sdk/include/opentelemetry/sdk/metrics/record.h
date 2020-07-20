@@ -1,7 +1,5 @@
 #pragma once
 
-#include "opentelemetry/metrics/instrument.h"
-#include "opentelemetry/sdk/metrics/aggregator/aggregator.h"
 #include "opentelemetry/core/timestamp.h"
 #include "opentelemetry/nostd/variant.h"
 #include <vector>
