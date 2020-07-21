@@ -34,7 +34,7 @@ class SpanContext final
 public:
   // An invalid SpanContext.
   SpanContext() noexcept : trace_state_(new TraceState) {}
-  SpanContext(SpanContext&& ctx) : trace_id_(ctx.trace_id()), span_id_(ctx.span_id()), trace_flags_(ctx.trace_flags()), trace_state_(&ctx.trace_state()) {}
+  SpanContext(SpanContext&& ctx) : trace_id_(ctx.trace_id()), span_id_(ctx.span_id()), trace_flags_(ctx.trace_flags()), trace_state_(nostd::unique_ptr(&(ctx.trace_state()))) {}
   // TODO
   //
   // static SpanContext Create(TraceId traceId, SpanId spanId, TraceFlags traceFlags, TraceState
