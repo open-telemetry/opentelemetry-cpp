@@ -13,18 +13,18 @@ namespace metrics
 {
 
 /**
- * The StreamMetricsExporter exports record data through an ostream
+ * The OStreamMetricsExporter exports record data through an ostream
  */
-class StreamMetricsExporter final : public sdkmetrics::MetricsExporter
+class OStreamMetricsExporter final : public sdkmetrics::MetricsExporter
 {
 public:
 
 /**
- * Create a StreamMetricsExporter. This constructor takes in a reference to an ostream that the
+ * Create an OStreamMetricsExporter. This constructor takes in a reference to an ostream that the
  * export() function will send span data into.
  * The default ostream is set to stdout
  */
-explicit StreamMetricsExporter(std::ostream &sout = std::cout) noexcept;
+explicit OStreamMetricsExporter(std::ostream &sout = std::cout) noexcept;
 
 sdkmetrics::ExportResult Export(
     const std::vector<sdkmetrics::Record> &records) noexcept override;

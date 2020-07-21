@@ -1,5 +1,5 @@
 #include "opentelemetry/sdk/metrics/exporter.h"
-#include "opentelemetry/exporters/stream/metrics_exporter.h"
+#include "opentelemetry/exporters/ostream/metrics_exporter.h"
 #include "opentelemetry/sdk/metrics/record.h"
 
 #include <iostream>
@@ -7,10 +7,10 @@
 
 namespace sdkmetrics = opentelemetry::sdk::metrics;
 
-TEST(StreamMetricsExporter, PrintCounter)
+TEST(OStreamMetricsExporter, PrintCounter)
 {
   auto exporter = std::unique_ptr<sdkmetrics::MetricsExporter> (new
-      opentelemetry::exporter::metrics::StreamMetricsExporter);
+      opentelemetry::exporter::metrics::OStreamMetricsExporter);
   
   std::vector<double> vec;
   vec.push_back(5.5);
@@ -43,10 +43,10 @@ TEST(StreamMetricsExporter, PrintCounter)
   ASSERT_EQ(stdoutOutput.str(),expectedOutput);
 }
 
-TEST(StreamMetricsExporter, PrintMinMaxSumCount)
+TEST(OStreamMetricsExporter, PrintMinMaxSumCount)
 {
   auto exporter = std::unique_ptr<sdkmetrics::MetricsExporter> (new
-      opentelemetry::exporter::metrics::StreamMetricsExporter);
+      opentelemetry::exporter::metrics::OStreamMetricsExporter);
   
   std::vector<int> vec;
   vec.push_back(1);
@@ -86,10 +86,10 @@ TEST(StreamMetricsExporter, PrintMinMaxSumCount)
   ASSERT_EQ(stdoutOutput.str(),expectedOutput);
 }
 
-TEST(StreamMetricsExporter, PrintGauge)
+TEST(OStreamMetricsExporter, PrintGauge)
 {
   auto exporter = std::unique_ptr<sdkmetrics::MetricsExporter> (new
-      opentelemetry::exporter::metrics::StreamMetricsExporter);
+      opentelemetry::exporter::metrics::OStreamMetricsExporter);
   
   std::vector<short> vec;
   vec.push_back((short)9);
@@ -125,10 +125,10 @@ TEST(StreamMetricsExporter, PrintGauge)
   ASSERT_EQ(stdoutOutput.str(),expectedOutput);
 }
 
-TEST(StreamMetricsExporter, PrintExact)
+TEST(OStreamMetricsExporter, PrintExact)
 {
   auto exporter = std::unique_ptr<sdkmetrics::MetricsExporter> (new
-      opentelemetry::exporter::metrics::StreamMetricsExporter);
+      opentelemetry::exporter::metrics::OStreamMetricsExporter);
   
   std::vector<float> vec;
   for(float i = 0; i < 10; i++)

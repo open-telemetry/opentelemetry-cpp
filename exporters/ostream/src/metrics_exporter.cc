@@ -1,14 +1,14 @@
-#include "opentelemetry/exporters/stream/metrics_exporter.h"
+#include "opentelemetry/exporters/ostream/metrics_exporter.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace exporter
 {
 namespace metrics
 {
-StreamMetricsExporter::StreamMetricsExporter(std::ostream &sout) noexcept
+OStreamMetricsExporter::OStreamMetricsExporter(std::ostream &sout) noexcept
                                     : sout_{sout} {}
 
-sdkmetrics::ExportResult StreamMetricsExporter::Export(
+sdkmetrics::ExportResult OStreamMetricsExporter::Export(
   const std::vector<sdkmetrics::Record> &records) noexcept
 {
 
