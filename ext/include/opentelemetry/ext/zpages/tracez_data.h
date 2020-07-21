@@ -69,8 +69,8 @@ struct SampleSpanData {
   std::string trace_id;
   std::string parent_id;
   std::string description;
-  long int duration;
-  long int start_time;
+  unsigned long long int duration;
+  unsigned long long int start_time;
   std::string status_code;
   SampleSpanData(SpanData span_data) {
     span_name = span_data.GetName().data();
