@@ -8,56 +8,36 @@
   <body>
     <img src="/images/opentelemetry.png" />
     <h1>zPages TraceZ</h1>
-
-    <button onclick="loadTracezTable()">Add Spans</button>
+    <h4>Last Updated:<br><span id="lastUpdate"></span></h4>
+    <button onclick="add()">Add Spans</button>
+    <button onclick="err()">Error test</button>
+    <button onclick="run()">Running test</button>
+    <button onclick="buck()">Bucket test</button>
     <br><br>
-
-    <table id="headers">
-      <colgroup>
-        <col class="md">
-        <col class="sm">
-        <col class="sm">
-        <col class="lg">
-      </colgroup>
-      <tr>
-        <th>Span Name</th>
-        <th>Error Samples</th>
-        <th>Running</th>
-        <th>Latency Samples</th>
-      </tr>
-    </table>
-    <table id="overview_table">
-      <!-- Sizing for Latency Headers -->
-      <colgroup>
-        <col class="md">
-        <col class="sm">
-        <col class="sm">
-        <col class="sm">
-        <col class="sm">
-        <col class="sm">
-        <col class="sm">
-        <col class="sm">
-        <col class="sm">
-        <col class="sm">
-        <col class="sm">
-        <col class="sm">
-      </colgroup>
-      <tr>
-        <!-- Latency Bucket Numbers -->
-        <th></th>
-        <th></th>
-        <th></th>
-        <th>>0s</th>
-        <th>>10&#181s</th>
-        <th>>100&#181s</th>
-        <th>>1ms</th>
-        <th>>10ms</th>
-        <th>>100ms</th>
-        <th>>1s</th>
-        <th>>10s</th>
-        <th>>100ms</th>
-      </tr>
-      <!-- spans are appended here -->
-    </table>
+    <div class="table-wrap">
+      <table id="headers">
+        <colgroup>
+          <col class="md">
+          <col class="sm">
+          <col class="sm">
+          <col class="lg">
+        </colgroup>
+        <tr>
+          <th>Span Name</th>
+          <th>Error Samples</th>
+          <th>Running</th>
+          <th>Latency Samples</th>
+        </tr>
+      </table>
+      <table id="overview_table">
+      </table>
+    </div>
+    <br>
+    <hr>
+    <span id="name_type_detail_table_header"></span>
+    <div class="table-wrap">
+      <table id="name_type_detail_table">
+      </table>
+    </div>
   </body>
 </html>
