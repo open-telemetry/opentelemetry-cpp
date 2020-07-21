@@ -121,12 +121,10 @@ void Recordable::AddEvent(nostd::string_view name,
   // TODO: handle attributes
 }
 
-void Recordable::AddLink(opentelemetry::trace::TraceId trace_id,
-                         opentelemetry::trace::SpanId span_id,
+void Recordable::AddLink(opentelemetry::trace::SpanContext span_context,
                          const trace::KeyValueIterable &attributes) noexcept
 {
-  (void)trace_id;
-  (void)span_id;
+  (void)span_context;
   (void)attributes;
 }
 

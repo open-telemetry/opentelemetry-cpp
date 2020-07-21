@@ -194,20 +194,22 @@ public:
     attributes_[std::string(key)] = nostd::visit(converter_, value);
   }
 
-  void AddEvent(nostd::string_view name,
-                core::SystemTimestamp timestamp,
-                const trace_api::KeyValueIterable &attributes) noexcept override
+  void AddEvent(
+      nostd::string_view name,
+      core::SystemTimestamp timestamp = core::SystemTimestamp(std::chrono::system_clock::now()),
+      const trace_api::KeyValueIterable &attributes =
+          trace_api::KeyValueIterableView<std::map<std::string, int>>({})) noexcept override
   {
     events_.push_back(SpanDataEvent(std::string(name), timestamp));
     // TODO: handle attributes
   }
 
-  void AddLink(opentelemetry::trace::TraceId trace_id,
-               opentelemetry::trace::SpanId span_id,
-               const opentelemetry::trace::KeyValueIterable &attributes) noexcept override
+  void AddLink(
+      opentelemetry::trace::SpanContext span_context,
+      const trace_api::KeyValueIterable &attributes =
+          trace_api::KeyValueIterableView<std::map<std::string, int>>({})) noexcept override
   {
-    (void)trace_id;
-    (void)span_id;
+    (void)span_context;
     (void)attributes;
   }
 
