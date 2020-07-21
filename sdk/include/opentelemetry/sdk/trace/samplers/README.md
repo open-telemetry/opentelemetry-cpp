@@ -25,7 +25,7 @@ SamplingResult ShouldSample(const trace_api::SpanContext *parent_context,
 ```
 
 #### sdk::trace::ParentOrElseSampler
-In `ShouldSample()` function, the sampler called `parent_context->IsSampled()` to check the `SampledFlag` of its parent context. It might need to be updated if the `IsSampled()` changes.
+In `ShouldSample()` function, the sampler calls `parent_context->IsSampled()` to check the `SampledFlag` of its parent context. It might need to be updated if the `IsSampled()` changes.
 
 #### sdk::trace::ProbabilitySampler
 
@@ -33,13 +33,17 @@ In `ShouldSample()` function, the sampler called `parent_context->IsSampled()` t
 ### Constructing a sampler
 Because we want to reuse a sampler whenever possible, it is a common practice to allocate a sampler dynamically using `std::make_share()`:
 ```
-// Creating an AlwaysOn sampler pointer.
-std::shared_ptr<Sampler> always_on_sampler = std::make_shared<AlwaysOnSampler>()
+// Creating an AlwaysOn sampler.
+std::shared_ptr<Sampler> always_on_sampler = std::make_shared<AlwaysOnSampler>();
 
-// Creating an AlwaysOff sampler pointer.
-std::shared_ptr<Sampler> always_on_sampler = std::make_shared<AlwaysOffSampler>()
+// Creating an AlwaysOff sampler.
+std::shared_ptr<Sampler> always_on_sampler = std::make_shared<AlwaysOffSampler>();
 
 // Creating a parent-or-else sampler with an AlwaysOn delegate sampler.
-std::shared_ptr<Sampler> parent_or_else_sampler = std::make_shared<ParentOrElseSampler>(always_on_sampler)
+std::shared_ptr<Sampler> parent_or_else_sampler = std::make_shared<ParentOrElseSampler>(always_on_sampler);
+
+// Creating a tracer object with parent-or-else sampler
+std::shared_ptr<opentelemetry::trace::Tracer> tracer = 
+  std::shared_ptr<opentelemetry::trace::Tracer>(new Tracer(processor, sampler));
 
 ```
