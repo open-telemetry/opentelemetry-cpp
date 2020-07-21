@@ -34,8 +34,8 @@ class SpanContext final
 public:
   // An invalid SpanContext.
   SpanContext() noexcept : trace_state_(new TraceState) {}
-  SpanContext::SpanContext(SpanContext&&) = default;
-  SpanContext::SpanContext(const SpanContext&) = default;
+  SpanContext(SpanContext&&) = default;
+  SpanContext(const SpanContext&) = default;
   // TODO
   //
   // static SpanContext Create(TraceId traceId, SpanId spanId, TraceFlags traceFlags, TraceState
