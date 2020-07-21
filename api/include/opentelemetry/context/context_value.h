@@ -7,7 +7,6 @@
 #include "opentelemetry/nostd/unique_ptr.h"
 #include "opentelemetry/nostd/variant.h"
 //#include "opentelemetry/trace/span_context.h"
-#include "opentelemetry/trace/key_value_iterable_view.h"
 #include "opentelemetry/version.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE

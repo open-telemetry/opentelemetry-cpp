@@ -41,7 +41,7 @@ TEST(ContextTest, ContextSetValuesAcceptsMap)
 TEST(ContextTest, ContextSetValuesAcceptsStringViewContextValue)
 {
   nostd::string_view string_view_test      = "string_view";
-  context::ContextValue context_value_test = 123;
+  context::ContextValue context_value_test = (int64_t)123;
 
   context::Context test_context = context::Context(string_view_test, context_value_test);
   context::Context foo_context  = test_context.SetValue(string_view_test, context_value_test);
@@ -56,7 +56,7 @@ TEST(ContextTest, ContextImmutability)
   std::map<std::string, context::ContextValue> map_test = {{"test_key", (int64_t)123}};
 
   context::Context context_test = context::Context(map_test);
-  context::Context context_foo  = context_test.SetValue("foo_key", 456);
+  context::Context context_foo  = context_test.SetValue("foo_key", (int64_t)456);
 
   EXPECT_NE(nostd::get<int64_t>(context_test.GetValue("foo_key")), 456);
 }
