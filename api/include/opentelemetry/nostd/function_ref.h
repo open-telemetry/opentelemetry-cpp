@@ -63,7 +63,13 @@ public:
       typename std::enable_if<!std::is_same<function_ref, typename std::decay<F>::type>::value,
                               int>::type = 0,
       typename std::enable_if<
+#if (__cplusplus >= 201703L)
+          // std::result_of deprecated in C++17, removed in C++20
+          std::is_convertible<typename std::invoke_result<F, Args...>::type, R>::value,
+#else
+          // std::result_of since C++11
           std::is_convertible<typename std::result_of<F &(Args...)>::type, R>::value,
+#endif
           int>::type = 0>
   function_ref(F &&f)
   {

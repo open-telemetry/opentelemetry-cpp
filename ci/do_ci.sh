@@ -20,6 +20,16 @@ if [[ "$1" == "cmake.test" ]]; then
   make
   make test
   exit 0
+elif [[ "$1" == "cmake.c++20.test" ]]; then
+  cd "${BUILD_DIR}"
+  rm -rf *
+  cmake -DCMAKE_BUILD_TYPE=Debug  \
+        -DCMAKE_CXX_FLAGS="-Werror" \
+        -DCMAKE_CXX_STANDARD=20 \
+        "${SRC_DIR}"
+  make
+  make test
+  exit 0
 elif [[ "$1" == "cmake.exporter.otprotocol.test" ]]; then
   cd "${BUILD_DIR}"
   rm -rf *
@@ -97,12 +107,24 @@ elif [[ "$1" == "benchmark" ]]; then
   exit 0
 elif [[ "$1" == "format" ]]; then
   tools/format.sh
+  # normalize file endings according to .gitattributes
+  git add --renormalize .
   CHANGED="$(git ls-files --modified)"
   if [[ ! -z "$CHANGED" ]]; then
     echo "The following files have changes:"
     echo "$CHANGED"
     exit 1
   fi
+  exit 0
+elif [[ "$1" == "code.coverage" ]]; then
+  cd "${BUILD_DIR}"
+  rm -rf *
+  cmake -DCMAKE_BUILD_TYPE=Debug  \
+        -DCMAKE_CXX_FLAGS="-Werror --coverage" \
+        "${SRC_DIR}"
+  make
+  make test
+  lcov --directory $PWD --capture --output-file coverage.info
   exit 0
 fi
 

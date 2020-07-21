@@ -43,7 +43,7 @@ public:
 
 private:
   opentelemetry::sdk::AtomicSharedPtr<SpanProcessor> processor_;
-  opentelemetry::nostd::shared_ptr<opentelemetry::trace::Tracer> tracer_;
+  std::shared_ptr<opentelemetry::trace::Tracer> tracer_;
 };
 }  // namespace trace
 }  // namespace sdk

@@ -6,7 +6,9 @@ cmake_policy(SET CMP0057 NEW)
 
 project(opentelemetry-cpp)
 
-set(CMAKE_CXX_STANDARD 11)
+if(NOT DEFINED CMAKE_CXX_STANDARD)
+  set(CMAKE_CXX_STANDARD 11)
+endif()
 
 option(WITH_OTPROTOCOL
        "Whether to include the OpenTelemetry Protocol in the SDK" OFF)
@@ -19,6 +21,13 @@ endif()
 include(CTest)
 
 find_package(Threads)
+
+if(CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")
+  # Options for Visual C++ compiler: /Zc:__cplusplus - report an updated value
+  # for recent C++ language standards. Without this option MSVC returns the
+  # value of __cplusplus="199711L"
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /Zc:__cplusplus")
+endif()
 
 if(WITH_PROTOBUF)
   set(protobuf_MODULE_COMPATIBLE ON)

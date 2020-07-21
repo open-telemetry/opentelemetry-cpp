@@ -18,11 +18,14 @@ public:
   explicit Span(std::shared_ptr<Tracer> &&tracer,
                 std::shared_ptr<SpanProcessor> processor,
                 nostd::string_view name,
+                const trace_api::KeyValueIterable &attributes,
                 const trace_api::StartSpanOptions &options) noexcept;
 
   ~Span() override;
 
   // trace_api::Span
+  void SetAttribute(nostd::string_view key, const common::AttributeValue &&value) noexcept override;
+
   void AddEvent(nostd::string_view name) noexcept override;
 
   void AddEvent(nostd::string_view name, core::SystemTimestamp timestamp) noexcept override;
@@ -35,7 +38,7 @@ public:
 
   void UpdateName(nostd::string_view name) noexcept override;
 
-  void End() noexcept override;
+  void End(const trace_api::EndSpanOptions &options = {}) noexcept override;
 
   bool IsRecording() const noexcept override;
 
@@ -46,6 +49,7 @@ private:
   std::shared_ptr<SpanProcessor> processor_;
   mutable std::mutex mu_;
   std::unique_ptr<Recordable> recordable_;
+  opentelemetry::core::SteadyTimestamp start_steady_time;
 };
 }  // namespace trace
 }  // namespace sdk
