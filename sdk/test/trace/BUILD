@@ -83,8 +83,8 @@ cc_test(
         "probability_sampler_test.cc",
     ],
     deps = [
-        "//sdk/src/trace",
         "//sdk/src/common:random",
+        "//sdk/src/trace",
         "@com_google_googletest//:gtest_main",
     ],
 )
