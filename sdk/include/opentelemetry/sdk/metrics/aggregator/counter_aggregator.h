@@ -7,7 +7,6 @@
 #include <variant>
 #include <vector>
 #include <mutex>
-#include <memory>
 
 namespace metrics_api = opentelemetry::metrics;
 
@@ -22,11 +21,12 @@ class CounterAggregator final : public Aggregator<T>
 {
     
 public:
-    CounterAggregator(metrics_api::BoundInstrumentKind kind)
+    CounterAggregator(metrics_api::InstrumentKind kind)
     {
         this->kind_ = kind;
         this->values_     = std::vector<T>(1, 0);
         this->checkpoint_ = std::vector<T>(1, 0);
+        this->agg_kind_ = AggregatorKind::Counter;
     }
     
     /**
@@ -64,15 +64,13 @@ public:
      */
     void merge(CounterAggregator other)
     {
-        if (this->kind_ == other.kind_)
-        {
+        if (this->agg_kind_ == other.agg_kind_) {
             this->mu_.lock();
-            this->values_[0] += other.values_[0];  // atomic operation afaik
+            this->values_[0] += other.values_[0];
             this->mu_.unlock();
         }
-        else
-        {
-            //AggregatorMismatch Exception
+        else {
+            throw std::invalid_argument("Aggregators of different types cannot be merged.");
         }
     }
     
@@ -88,12 +86,13 @@ public:
     }
     
     /**
-     * Returns the instrument kind which this aggregator is associated with
+     * Returns the current values
      *
      * @param none
-     * @return the BoundInstrumentKind of the aggregator's owner
+     * @return the present aggregator values
      */
-    std::vector<T> get_values() override{
+    std::vector<T> get_values() override
+    {
         return this->values_;
     }
     
