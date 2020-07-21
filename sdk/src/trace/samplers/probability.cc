@@ -77,7 +77,7 @@ ProbabilitySampler::ProbabilitySampler(double probability)
 {
     if (probability > 1.0) probability = 1.0;
     if (probability < 0.0) probability = 0.0;
-    sampler_description_ = "ProbabilitySampler{" + std::to_string(probability) + "}";
+    description_ = "ProbabilitySampler{" + std::to_string(probability) + "}";
   }
 
 SamplingResult ProbabilitySampler::ShouldSample(
@@ -107,7 +107,7 @@ SamplingResult ProbabilitySampler::ShouldSample(
 
 nostd::string_view ProbabilitySampler::GetDescription() const noexcept
 {
-  return sampler_description_;
+  return description_;
 }
 }  // namespace trace
 }  // namespace sdk

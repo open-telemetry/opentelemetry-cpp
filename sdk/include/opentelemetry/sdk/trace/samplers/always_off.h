@@ -17,32 +17,21 @@ class AlwaysOffSampler : public Sampler
 {
 public:
   /**
-   * The constructor sets the description to "AlwaysOffSampler".
-   */
-  AlwaysOffSampler(): description_("AlwaysOffSampler") {}
-  /**
    * @return Returns NOT_RECORD always
    */
-  SamplingResult ShouldSample(
-    const trace_api::SpanContext * /*parent_context*/,
-    trace_api::TraceId /*trace_id*/,
-    nostd::string_view /*name*/,
-    trace_api::SpanKind /*span_kind*/,
-    const trace_api::KeyValueIterable & /*attributes*/) noexcept override
+  SamplingResult ShouldSample(const trace_api::SpanContext * /*parent_context*/,
+                              trace_api::TraceId /*trace_id*/,
+                              nostd::string_view /*name*/,
+                              trace_api::SpanKind /*span_kind*/,
+                              const trace_api::KeyValueIterable & /*attributes*/) noexcept override
   {
-    return { Decision::NOT_RECORD, nullptr };
+    return {Decision::NOT_RECORD, nullptr};
   }
-  
+
   /**
    * @return Description MUST be AlwaysOffSampler
    */
-  nostd::string_view GetDescription() const noexcept override
-  {
-    return description_;
-  }
-
-private:
-  std::string description_;
+  nostd::string_view GetDescription() const noexcept override { return "AlwaysOffSampler"; }
 };
 }  // namespace trace
 }  // namespace sdk

@@ -42,7 +42,7 @@ public:
   nostd::string_view GetDescription() const noexcept override;
 
 private:
-  std::string sampler_description_;
+  std::string description_;
   const uint64_t threshold_;
 };
 }  // namespace trace
