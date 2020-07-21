@@ -34,8 +34,8 @@ class SpanContext final
 public:
   // An invalid SpanContext.
   SpanContext() noexcept : trace_state_(new TraceState) {}
-  SpanContext(SpanContext&&) = default;
-  SpanContext(const SpanContext&) = default;
+  SpanContext(SpanContext&&) {};
+  SpanContext(const SpanContext&) {};
   // TODO
   //
   // static SpanContext Create(TraceId traceId, SpanId spanId, TraceFlags traceFlags, TraceState
@@ -56,7 +56,7 @@ private:
   const TraceId trace_id_;
   const SpanId span_id_;
   const TraceFlags trace_flags_;
-  const nostd::unique_ptr<TraceState> trace_state_;  // Never nullptr.
+  const TraceState trace_state_;  // Never nullptr.
   const bool remote_parent_ = false;
 };
 
