@@ -41,3 +41,48 @@ cc_test(
         "@com_google_googletest//:gtest_main",
     ],
 )
+
+cc_test(
+    name = "always_on_sampler_test",
+    srcs = [
+        "always_on_sampler_test.cc",
+    ],
+    deps = [
+        "//sdk/src/trace",
+        "@com_google_googletest//:gtest_main",
+    ],
+)
+
+cc_test(
+    name = "always_off_sampler_test",
+    srcs = [
+        "always_off_sampler_test.cc",
+    ],
+    deps = [
+        "//sdk/src/trace",
+        "@com_google_googletest//:gtest_main",
+    ],
+)
+
+cc_test(
+    name = "parent_or_else_sampler_test",
+    srcs = [
+        "parent_or_else_sampler_test.cc",
+    ],
+    deps = [
+        "//sdk/src/trace",
+        "@com_google_googletest//:gtest_main",
+    ],
+)
+
+cc_test(
+    name = "probability_sampler_test",
+    srcs = [
+        "probability_sampler_test.cc",
+    ],
+    deps = [
+        "//sdk/src/trace",
+        "//sdk/src/common:random",
+        "@com_google_googletest//:gtest_main",
+    ],
+)

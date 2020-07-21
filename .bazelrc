@@ -1,6 +1,9 @@
 # bazel configurations for running tests under sanitizers.
 # Based on https://github.com/bazelment/trunk/blob/master/tools/bazel.rc
 
+# Needed by gRPC to build on some platforms.
+build --copt -DGRPC_BAZEL_BUILD
+
 # --config=asan : Address Sanitizer.
 common:asan --copt -fsanitize=address
 common:asan --copt -DADDRESS_SANITIZER
