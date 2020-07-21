@@ -60,13 +60,13 @@ class HttpTraceContext : public HTTPTextFormat<T>
 
         static nostd::string_view span_key = "current-span";
 
-        static context::Context SetSpanInContext(trace::Span &span, context::Context &context) {
+        context::Context SetSpanInContext(trace::Span &span, context::Context &context) {
             context::Context new_values = context::Context(context);
             new_values.SetValue(span_key,span);
             return new_values;
         }
 
-        static trace::Span GetCurrentSpan(Context &context) {
+        trace::Span GetCurrentSpan(Context &context) {
             trace::Span span = context.GetValue(Context.kSpanKey);
             if (span == NULL) {
                 return NULL;
