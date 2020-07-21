@@ -25,7 +25,7 @@
 
 namespace opentelemetry
 {
-namespace
+namespace trace
 {
 // SpanContext contains the state that must propagate to child Spans and across
 // process boundaries. It contains the identifiers TraceId and SpanId,
@@ -41,10 +41,10 @@ public:
   // static SpanContext Create(TraceId traceId, SpanId spanId, TraceFlags traceFlags, TraceState
   // traceState); static SpanContext CreateFromRemoteParent(...);
 
-  const trace::TraceId &trace_id() const noexcept { return trace_id_; }
-  const trace::SpanId &span_id() const noexcept { return span_id_; }
-  const trace::TraceFlags &trace_flags() const noexcept { return trace_flags_; }
-  const trace::TraceState &trace_state() const noexcept { return *trace_state_; }
+  const TraceId &trace_id() const noexcept { return trace_id_; }
+  const SpanId &span_id() const noexcept { return span_id_; }
+  const TraceFlags &trace_flags() const noexcept { return trace_flags_; }
+  const TraceState &trace_state() const noexcept { return *trace_state_; }
 
   bool IsValid() const noexcept { return trace_id_.IsValid() && span_id_.IsValid(); }
 
@@ -53,9 +53,9 @@ public:
   static SpanContext GetInvalid() { return SpanContext(); }
 
 private:
-  const trace::TraceId trace_id_;
-  const trace::SpanId span_id_;
-  const trace::TraceFlags trace_flags_;
+  const TraceId trace_id_;
+  const SpanId span_id_;
+  const TraceFlags trace_flags_;
   const nostd::unique_ptr<TraceState> trace_state_;  // Never nullptr.
   const bool remote_parent_ = false;
 };
