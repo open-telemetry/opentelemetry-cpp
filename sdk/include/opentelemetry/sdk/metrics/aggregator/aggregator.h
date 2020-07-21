@@ -1,12 +1,12 @@
 #pragma once
 
-#include "opentelemetry/version.h"
+#include <mutex>
 #include "opentelemetry/metrics/instrument.h"
-
+#include "opentelemetry/version.h"
 #include <variant>
 #include <vector>
-#include <mutex>
-#include <memory>
+
+
 
 namespace metrics_api = opentelemetry::metrics;
 
@@ -15,6 +15,17 @@ namespace sdk
 {
 namespace metrics
 {
+
+enum class AggregatorKind
+{
+  Counter = 0,
+  MinMaxSumCount = 1,
+  Gauge = 2,
+  Sketch = 3,
+  Histogram = 4,
+  Exact = 5,
+};
+
 /*
  * Performs calculations necessary to combine updates from instruments into an
  * insightful value.
@@ -29,7 +40,7 @@ public:
     Aggregator() = default;
     
     /**
-     * Recieves a captured value from the instrument and applies it to the current aggregator value.
+     * Receives a captured value from the instrument and applies it to the current aggregator value.
      *
      * @param val, the raw value used in aggregation
      * @return none
@@ -53,7 +64,7 @@ public:
      * @param other, the aggregator with merge with
      * @return none
      */
-    void merge(std::shared_ptr<Aggregator> other);
+    void merge(Aggregator * other);
     
     /**
      * Returns the checkpointed value
@@ -75,26 +86,40 @@ public:
     * Returns the instrument kind which this aggregator is associated with
     *
     * @param none
-    * @return the BoundInstrumentKind of the aggregator's owner
+    * @return the InstrumentKind of the aggregator's owner
     */
-    virtual opentelemetry::metrics::BoundInstrumentKind get_kind()
+    virtual opentelemetry::metrics::InstrumentKind get_instrument_kind() final
     {
         return kind_;
     }
     
+    /**
+    * Returns the type of this aggregator
+    *
+    * @param none
+    * @return the AggregatorKind of this instrument
+    */
+    virtual AggregatorKind get_aggregator_kind() final
+    {
+        return agg_kind_;
+    }
+    
     // Custom copy constructor to handle the mutex
-    Aggregator(const Aggregator &cp) {
+    Aggregator(const Aggregator &cp)
+    {
         values_ = cp.values_;
         checkpoint_ = cp.checkpoint_;
         kind_ = cp.kind_;
+        agg_kind_ = cp.agg_kind_;
         // use default initialized mutex as they cannot be copied
     }
     
 protected:
     std::vector<T> values_;
     std::vector<T> checkpoint_;
-    opentelemetry::metrics::BoundInstrumentKind kind_;
+    opentelemetry::metrics::InstrumentKind kind_;
     std::mutex mu_;
+    AggregatorKind agg_kind_;
     
 };
 

@@ -14,7 +14,7 @@ namespace metrics
 
 TEST(CounterAggregator, NoUpdates)
 {
-    CounterAggregator<int> alpha(metrics_api::BoundInstrumentKind::BoundIntCounter);
+    CounterAggregator<int> alpha(metrics_api::InstrumentKind::Counter);
     
     EXPECT_EQ(alpha.get_checkpoint().size(), 1);
     EXPECT_EQ(alpha.get_checkpoint()[0], 0);
@@ -26,8 +26,8 @@ TEST(CounterAggregator, NoUpdates)
 
 TEST(CounterAggregator, Update)
 {
-    CounterAggregator<int> alpha(metrics_api::BoundInstrumentKind::BoundIntCounter);
-    CounterAggregator<int> beta(metrics_api::BoundInstrumentKind::BoundIntCounter);
+    CounterAggregator<int> alpha(metrics_api::InstrumentKind::Counter);
+    CounterAggregator<int> beta(metrics_api::InstrumentKind::Counter);
     
     for (int i = 0; i<123456; i++){
         alpha.update(1);
@@ -63,7 +63,7 @@ void incrementingCallback(Aggregator<int> & agg)
 }
 
 TEST(CounterAggregator, Concurrency){
-    CounterAggregator<int> alpha(metrics_api::BoundInstrumentKind::BoundIntCounter);
+    CounterAggregator<int> alpha(metrics_api::InstrumentKind::Counter);
     
     // spawn new threads that initiate the callback
     std::thread first (incrementingCallback, std::ref(alpha));
@@ -81,8 +81,8 @@ TEST(CounterAggregator, Concurrency){
 
 TEST(CounterAggregator, Merge)
 {
-    CounterAggregator<int> alpha(metrics_api::BoundInstrumentKind::BoundIntCounter);
-    CounterAggregator<int> beta(metrics_api::BoundInstrumentKind::BoundIntCounter);
+    CounterAggregator<int> alpha(metrics_api::InstrumentKind::Counter);
+    CounterAggregator<int> beta(metrics_api::InstrumentKind::Counter);
     
     alpha.merge(beta);
     
