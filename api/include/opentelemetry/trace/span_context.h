@@ -33,7 +33,7 @@ class SpanContext final
 {
 public:
   // An invalid SpanContext.
-  SpanContext() noexcept : trace_state_(new TraceState) {}
+  SpanContext() noexcept : trace_state_(new TraceState()) {}
 
   // TODO
   //
