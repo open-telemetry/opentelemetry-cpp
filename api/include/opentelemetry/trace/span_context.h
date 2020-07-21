@@ -23,7 +23,8 @@
 #include "opentelemetry/trace/trace_id.h"
 #include "opentelemetry/trace/trace_state.h"
 
-OPENTELEMETRY_BEGIN_NAMESPACE
+namespace opentelemetry
+{
 namespace trace
 {
 // SpanContext contains the state that must propagate to child Spans and across
@@ -40,10 +41,10 @@ public:
   // static SpanContext Create(TraceId traceId, SpanId spanId, TraceFlags traceFlags, TraceState
   // traceState); static SpanContext CreateFromRemoteParent(...);
 
-  const TraceId &trace_id() const noexcept { return trace_id_; }
-  const SpanId &span_id() const noexcept { return span_id_; }
-  const TraceFlags &trace_flags() const noexcept { return trace_flags_; }
-  const TraceState &trace_state() const noexcept { return *trace_state_; }
+  const opentelemetry::trace::TraceId &trace_id() const noexcept { return trace_id_; }
+  const opentelemetry::trace::SpanId &span_id() const noexcept { return span_id_; }
+  const opentelemetry::trace::TraceFlags &trace_flags() const noexcept { return trace_flags_; }
+  const opentelemetry::trace::TraceState &trace_state() const noexcept { return *trace_state_; }
 
   bool IsValid() const noexcept { return trace_id_.IsValid() && span_id_.IsValid(); }
 
@@ -52,12 +53,12 @@ public:
   static SpanContext GetInvalid() { return SpanContext(); }
 
 private:
-  const TraceId trace_id_;
-  const SpanId span_id_;
-  const TraceFlags trace_flags_;
-  const nostd::unique_ptr<TraceState> trace_state_;  // Never nullptr.
+  const opentelemetry::trace::TraceId trace_id_;
+  const opentelemetry::trace::SpanId span_id_;
+  const opentelemetry::trace::TraceFlags trace_flags_;
+  const nostd::unique_ptr<opentelemetry::trace::TraceState> trace_state_;  // Never nullptr.
   const bool remote_parent_ = false;
 };
 
 }  // namespace trace
-OPENTELEMETRY_END_NAMESPACE // namespace opentelemetry
+}  // namespace opentelemetry
