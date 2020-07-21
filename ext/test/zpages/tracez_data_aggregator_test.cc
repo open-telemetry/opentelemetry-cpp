@@ -144,7 +144,7 @@ TEST_F(TracezDataAggregatorTest, SingleCompletedSpan) {
       aggregated_data.sample_latency_spans[LatencyBoundary::k0MicroTo10Micro]
           .front()
           .duration,
-      "30");
+      30);
 }
 
 /** Test to check if data aggregator works as expected when there is exactly
@@ -290,7 +290,7 @@ TEST_F(TracezDataAggregatorTest, MultipleCompletedSpan) {
       auto latency_sample =
           aggregated_data.sample_latency_spans[boundary].begin();
       for (unsigned int idx = 0; idx < span.second[boundary].size(); idx++) {
-        ASSERT_EQ(std::to_string(span.second[boundary][idx].count()),
+        ASSERT_EQ(span.second[boundary][idx].count(),
                   latency_sample->duration);
         latency_sample = std::next(latency_sample);
       }
@@ -459,8 +459,7 @@ TEST_F(TracezDataAggregatorTest, CompletedSampleSpansOverCapacity) {
   // bucket the and the first one is removed
   for (unsigned int idx = 1; idx < timestamps.size(); idx++) {
     ASSERT_EQ(latency_sample->duration,
-              std::to_string(timestamps[idx].second.count() -
-                             timestamps[idx].first.count()));
+              timestamps[idx].second.count() - timestamps[idx].first.count());
     latency_sample = std::next(latency_sample);
   }
 }
@@ -559,7 +558,7 @@ TEST_F(TracezDataAggregatorTest, RemovalOfRunningSpanWhenCompleted) {
       aggregated_data.sample_latency_spans[LatencyBoundary::k0MicroTo10Micro]
           .front()
           .duration,
-      "30");
+      30);
 }
 
 TEST_F(TracezDataAggregatorTest, RunningSpanChangesNameBeforeCompletion)
@@ -605,7 +604,7 @@ TEST_F(TracezDataAggregatorTest, RunningSpanChangesNameBeforeCompletion)
       aggregated_data.sample_latency_spans[LatencyBoundary::k0MicroTo10Micro]
           .front()
           .duration,
-      "30");
+      30);
   
 }
 
@@ -644,7 +643,7 @@ TEST_F(TracezDataAggregatorTest, EdgeSpanLatenciesFallInCorrectBoundaries) {
   for (auto boundary = LatencyBoundary::k0MicroTo10Micro;
        boundary != LatencyBoundary::k100SecondToMax; ++boundary) {
     ASSERT_EQ(aggregated_data.sample_latency_spans[boundary].front().duration,
-              std::to_string(durations[boundary].count()));
+              durations[boundary].count());
   }
 }
 

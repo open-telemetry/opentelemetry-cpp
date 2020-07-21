@@ -69,7 +69,8 @@ struct SampleSpanData {
   std::string trace_id;
   std::string parent_id;
   std::string description;
-  std::string duration;
+  long int duration;
+  long int start_time;
   std::string status_code;
   SampleSpanData(SpanData span_data) {
     span_name = span_data.GetName().data();
@@ -80,7 +81,8 @@ struct SampleSpanData {
     parent_id = std::string(reinterpret_cast<const char *>(
         span_data.GetParentSpanId().Id().data()));
     description = span_data.GetDescription().data();
-    duration = std::to_string(span_data.GetDuration().count());
+    duration = span_data.GetDuration().count();
+    start_time = span_data.GetStartTime().time_since_epoch().count();
     status_code = kStatusCodeToString[(int)span_data.GetStatus()];
   }
 };
