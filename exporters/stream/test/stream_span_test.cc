@@ -53,6 +53,13 @@ TEST(StreamSpanExporter, PrintDefaultSpan)
 
   auto recordable = processor->MakeRecordable();
 
+  constexpr uint8_t trace_id_buf[] = {1, 2, 3, 4, 5, 6, 7, 8,1, 2, 3, 4, 5, 6, 7, 8};
+  opentelemetry::trace::TraceId t_id(trace_id_buf);
+  constexpr uint8_t span_id_buf[] = {1, 2, 3, 4, 5, 6, 7, 8};
+  opentelemetry::trace::SpanId s_id(span_id_buf);
+
+  recordable->SetIds(t_id, s_id, s_id);
+
   // Create stringstream to redirect to
   std::stringstream stdoutOutput;
 
@@ -69,9 +76,9 @@ TEST(StreamSpanExporter, PrintDefaultSpan)
   std::string expectedOutput =
  "{\n"
   "  name          : \n"
-  "  trace_id      : 00000000000000000000000000000000\n"
-  "  span_id       : 0000000000000000\n"
-  "  parent_span_id: 0000000000000000\n"
+  "  trace_id      : 01020304050607080102030405060708\n"
+  "  span_id       : 0102030405060708\n"
+  "  parent_span_id: 0102030405060708\n"
   "  start         : 0\n"
   "  duration      : 0\n"
   "  description   : \n"
@@ -92,6 +99,13 @@ TEST(StreamSpanExporter, PrintChangedSpanCout)
 
   recordable->SetName("Test Span");
   opentelemetry::core::SystemTimestamp now(std::chrono::system_clock::now());
+
+  constexpr uint8_t trace_id_buf[] = {1, 2, 3, 4, 5, 6, 7, 8,1, 2, 3, 4, 5, 6, 7, 8};
+  opentelemetry::trace::TraceId t_id(trace_id_buf);
+  constexpr uint8_t span_id_buf[] = {1, 2, 3, 4, 5, 6, 7, 8};
+  opentelemetry::trace::SpanId s_id(span_id_buf);
+
+  recordable->SetIds(t_id, s_id, s_id);
 
   recordable->SetStartTime(now);
   recordable->SetDuration(std::chrono::nanoseconds(100));
@@ -117,9 +131,9 @@ TEST(StreamSpanExporter, PrintChangedSpanCout)
   std::string expectedOutput =
  "{\n"
   "  name          : Test Span\n"
-  "  trace_id      : 00000000000000000000000000000000\n"
-  "  span_id       : 0000000000000000\n"
-  "  parent_span_id: 0000000000000000\n"
+  "  trace_id      : 01020304050607080102030405060708\n"
+  "  span_id       : 0102030405060708\n"
+  "  parent_span_id: 0102030405060708\n"
   "  start         : " + start + "\n"
   "  duration      : 100\n"
   "  description   : Test Description\n"
@@ -139,6 +153,14 @@ TEST(StreamSpanExporter, PrintChangedSpanCerr)
   auto recordable = processor->MakeRecordable();
 
   recordable->SetName("Test Span");
+  
+  constexpr uint8_t trace_id_buf[] = {1, 2, 3, 4, 5, 6, 7, 8,1, 2, 3, 4, 5, 6, 7, 8};
+  opentelemetry::trace::TraceId t_id(trace_id_buf);
+  constexpr uint8_t span_id_buf[] = {1, 2, 3, 4, 5, 6, 7, 8};
+  opentelemetry::trace::SpanId s_id(span_id_buf);
+
+  recordable->SetIds(t_id, s_id, s_id);
+
   opentelemetry::core::SystemTimestamp now(std::chrono::system_clock::now());
 
   recordable->SetStartTime(now);
@@ -167,9 +189,9 @@ TEST(StreamSpanExporter, PrintChangedSpanCerr)
   std::string expectedOutput =
  "{\n"
   "  name          : Test Span\n"
-  "  trace_id      : 00000000000000000000000000000000\n"
-  "  span_id       : 0000000000000000\n"
-  "  parent_span_id: 0000000000000000\n"
+  "  trace_id      : 01020304050607080102030405060708\n"
+  "  span_id       : 0102030405060708\n"
+  "  parent_span_id: 0102030405060708\n"
   "  start         : " + start + "\n"
   "  duration      : 100\n"
   "  description   : Test Description\n"
@@ -189,6 +211,13 @@ TEST(StreamSpanExporter, PrintChangedSpanClog)
   auto recordable = processor->MakeRecordable();
 
   recordable->SetName("Test Span");
+
+  constexpr uint8_t trace_id_buf[] = {1, 2, 3, 4, 5, 6, 7, 8,1, 2, 3, 4, 5, 6, 7, 8};
+  opentelemetry::trace::TraceId t_id(trace_id_buf);
+  constexpr uint8_t span_id_buf[] = {1, 2, 3, 4, 5, 6, 7, 8};
+  opentelemetry::trace::SpanId s_id(span_id_buf);
+
+  recordable->SetIds(t_id, s_id, s_id);
   opentelemetry::core::SystemTimestamp now(std::chrono::system_clock::now());
 
   recordable->SetStartTime(now);
@@ -217,9 +246,9 @@ TEST(StreamSpanExporter, PrintChangedSpanClog)
   std::string expectedOutput =
  "{\n"
   "  name          : Test Span\n"
-  "  trace_id      : 00000000000000000000000000000000\n"
-  "  span_id       : 0000000000000000\n"
-  "  parent_span_id: 0000000000000000\n"
+  "  trace_id      : 01020304050607080102030405060708\n"
+  "  span_id       : 0102030405060708\n"
+  "  parent_span_id: 0102030405060708\n"
   "  start         : " + start + "\n"
   "  duration      : 100\n"
   "  description   : Test Description\n"
