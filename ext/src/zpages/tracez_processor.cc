@@ -10,15 +10,16 @@ namespace zpages {
   }
 
   void TracezSpanProcessor::OnEnd(std::unique_ptr<opentelemetry::sdk::trace::Recordable> &&span) noexcept {
-    if (span == nullptr) return;
     auto span_raw = static_cast<opentelemetry::sdk::trace::SpanData*>(span.get());
     std::lock_guard<std::mutex> lock(mtx_);
     auto span_it = spans_.running.find(span_raw);
     if (span_it != spans_.running.end()) {
       spans_.running.erase(span_it);
-      spans_.completed.push_back(
-          std::unique_ptr<opentelemetry::sdk::trace::SpanData>(
-              static_cast<opentelemetry::sdk::trace::SpanData*>(span.release())));
+      if (span_raw != nullptr) {
+        spans_.completed.push_back(
+            std::unique_ptr<opentelemetry::sdk::trace::SpanData>(
+                static_cast<opentelemetry::sdk::trace::SpanData*>(span.release())));
+      }
     }
   }
 
