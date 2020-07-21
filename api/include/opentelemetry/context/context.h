@@ -40,13 +40,13 @@ public:
   template <class T>
   Context SetValues(T &values) noexcept
   {
-    Context context = Context(values);
-    nostd::shared_ptr<DataList> last_node;
-    for (nostd::shared_ptr<DataList> data = context.head_; data != nullptr; data = data->next_)
+    Context context                   = Context(values);
+    nostd::shared_ptr<DataList> &last = context.head_;
+    while (last->next_ != nullptr)
     {
-      last_node = data;
+      last = last->next_;
     }
-    last_node->next_ = head_;
+    last->next_ = head_;
     return context;
   }
 
@@ -61,9 +61,9 @@ public:
   }
 
   // Returns the value associated with the passed in key.
-  context::ContextValue GetValue(nostd::string_view key)
+  context::ContextValue GetValue(const nostd::string_view key) noexcept
   {
-    for (DataList *data = &*head_; data != nullptr; data = &*(data->next_))
+    for (DataList *data = head_.get(); data != nullptr; data = data->next_.get())
     {
       if (key.size() == data->key_length_)
       {
@@ -77,9 +77,9 @@ public:
   }
 
   // Checks for key and returns true if found
-  bool HasKey(nostd::string_view key)
+  bool HasKey(const nostd::string_view key) noexcept
   {
-    for (nostd::shared_ptr<DataList> data = head_; data != nullptr; data = data->next_)
+    for (DataList *data = head_.get(); data != nullptr; data = data->next_.get())
     {
       if (key.size() == data->key_length_)
       {
@@ -111,37 +111,22 @@ private:
 
     // Builds a data list off of a key and value iterable and returns the head
     template <class T>
-    DataList(const T &keys_and_vals)
+    DataList(const T &keys_and_vals) : key_{nullptr}
     {
-      if (std::begin(keys_and_vals) != std::end(keys_and_vals))
+      bool first = true;
+      auto *node = this;
+      for (auto &iter : keys_and_vals)
       {
-        auto iter = std::begin(keys_and_vals);
-        // Create list head
-        key_        = new char[nostd::string_view(iter->first).size()];
-        key_length_ = nostd::string_view(iter->first).size();
-        memcpy(key_, nostd::string_view(iter->first).data(),
-               nostd::string_view(iter->first).size() * sizeof(char));
-        value_ = iter->second;
-        next_  = nostd::shared_ptr<DataList>{nullptr};
-        ++iter;
-
-        DataList *previous_node = this;
-        // Iterate over the keys and values iterable and add nodes
-        for (; iter != std::end(keys_and_vals); ++iter)
+        if (first)
         {
-          nostd::shared_ptr<DataList> node = nostd::shared_ptr<DataList>{new DataList()};
-          node->key_                       = new char[nostd::string_view(iter->first).size()];
-          node->key_length_                = nostd::string_view(iter->first).size();
-          memcpy(node->key_, nostd::string_view(iter->first).data(),
-                 nostd::string_view(iter->first).size() * sizeof(char));
-          node->value_         = iter->second;
-          previous_node->next_ = node;
-          previous_node        = &*node;
+          *node = std::move(DataList(iter.first, iter.second));
+          first = false;
         }
-      }
-      else
-      {
-        key_ = nullptr;
+        else
+        {
+          node->next_ = nostd::shared_ptr<DataList>(new DataList(iter.first, iter.second));
+          node        = node->next_.get();
+        }
       }
     }
 
@@ -149,11 +134,23 @@ private:
     // and returns that head.
     DataList(nostd::string_view key, ContextValue value)
     {
-      key_        = new char[nostd::string_view(key).size()];
+      key_        = new char[key.size()];
       key_length_ = key.size();
       memcpy(key_, key.data(), key.size() * sizeof(char));
       value_ = value;
       next_  = nostd::shared_ptr<DataList>{nullptr};
+    }
+
+    DataList &operator=(DataList &&other)
+    {
+      key_length_ = other.key_length_;
+      value_      = std::move(other.value_);
+      next_       = std::move(other.next_);
+
+      key_       = other.key_;
+      other.key_ = nullptr;
+
+      return *this;
     }
 
     ~DataList()
