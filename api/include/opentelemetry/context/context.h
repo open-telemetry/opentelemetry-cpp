@@ -4,6 +4,7 @@
 #include "opentelemetry/context/context_value.h"
 #include "opentelemetry/nostd/string_view.h"
 #include "opentelemetry/trace/key_value_iterable_view.h"
+#include "opentelemetry/trace/span_context.h"
 
 #include <iostream>
 #include <map>
