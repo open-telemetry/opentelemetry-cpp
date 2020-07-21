@@ -21,7 +21,7 @@ class Context
 public:
   // Creates a context object from a map of keys and identifiers, this will
   // hold a shared_ptr to the head of the DataList linked list
-  template <class T, nostd::enable_if_t<trace::detail::is_key_value_iterable<T>::value> * = nullptr>
+  template <class T>
   Context(const T &keys_and_values)
   {
     head_ = nostd::shared_ptr<DataList>{new DataList(keys_and_values)};
@@ -37,7 +37,7 @@ public:
   // Accepts a new iterable and then returns a new context that
   // contains the new key and value data. It attaches the
   // exisiting list to the end of the new list.
-  template <class T, nostd::enable_if_t<trace::detail::is_key_value_iterable<T>::value> * = nullptr>
+  template <class T>
   Context SetValues(T &values) noexcept
   {
     Context context = Context(values);
@@ -73,7 +73,23 @@ public:
         }
       }
     }
-    return "";
+    return (int64_t)0;
+  }
+
+  // Checks for key and returns true if found
+  bool HasKey(nostd::string_view key)
+  {
+    for (nostd::shared_ptr<DataList> data = head_; data != nullptr; data = data->next_)
+    {
+      if (key.size() == data->key_length_)
+      {
+        if (memcmp(key.data(), data->key_, data->key_length_) == 0)
+        {
+          return true;
+        }
+      }
+    }
+    return false;
   }
 
 private:
@@ -94,33 +110,38 @@ private:
     DataList() { next_ = nullptr; }
 
     // Builds a data list off of a key and value iterable and returns the head
-    template <class T,
-              nostd::enable_if_t<trace::detail::is_key_value_iterable<T>::value> * = nullptr>
+    template <class T>
     DataList(const T &keys_and_vals)
     {
-      auto iter = std::begin(keys_and_vals);
-      // Create list head
-      key_        = new char[nostd::string_view(iter->first).size()];
-      key_length_ = nostd::string_view(iter->first).size();
-      memcpy(key_, nostd::string_view(iter->first).data(),
-             nostd::string_view(iter->first).size() * sizeof(char));
-      value_ = iter->second;
-      next_  = nostd::shared_ptr<DataList>{nullptr};
-      ++iter;
-
-      DataList *previous_node = this;
-      // Iterate over the keys and values iterable and add nodes
-      for (; iter != std::end(keys_and_vals); ++iter)
+      if (std::begin(keys_and_vals) != std::end(keys_and_vals))
       {
-        nostd::shared_ptr<DataList> node = nostd::shared_ptr<DataList>{new DataList()};
-        node->next_                      = nostd::shared_ptr<DataList>{nullptr};
-        node->key_                       = new char[nostd::string_view(iter->first).size()];
-        node->key_length_                = nostd::string_view(iter->first).size();
-        memcpy(node->key_, nostd::string_view(iter->first).data(),
+        auto iter = std::begin(keys_and_vals);
+        // Create list head
+        key_        = new char[nostd::string_view(iter->first).size()];
+        key_length_ = nostd::string_view(iter->first).size();
+        memcpy(key_, nostd::string_view(iter->first).data(),
                nostd::string_view(iter->first).size() * sizeof(char));
-        node->value_         = iter->second;
-        previous_node->next_ = node;
-        previous_node        = &*node;
+        value_ = iter->second;
+        next_  = nostd::shared_ptr<DataList>{nullptr};
+        ++iter;
+
+        DataList *previous_node = this;
+        // Iterate over the keys and values iterable and add nodes
+        for (; iter != std::end(keys_and_vals); ++iter)
+        {
+          nostd::shared_ptr<DataList> node = nostd::shared_ptr<DataList>{new DataList()};
+          node->key_                       = new char[nostd::string_view(iter->first).size()];
+          node->key_length_                = nostd::string_view(iter->first).size();
+          memcpy(node->key_, nostd::string_view(iter->first).data(),
+                 nostd::string_view(iter->first).size() * sizeof(char));
+          node->value_         = iter->second;
+          previous_node->next_ = node;
+          previous_node        = &*node;
+        }
+      }
+      else
+      {
+        key_ = nullptr;
       }
     }
 
@@ -129,13 +150,19 @@ private:
     DataList(nostd::string_view key, ContextValue value)
     {
       key_        = new char[nostd::string_view(key).size()];
-      key_length_ = nostd::string_view(key).size();
-      memcpy(key_, nostd::string_view(key).data(), nostd::string_view(key).size() * sizeof(char));
+      key_length_ = key.size();
+      memcpy(key_, key.data(), key.size() * sizeof(char));
       value_ = value;
       next_  = nostd::shared_ptr<DataList>{nullptr};
     }
 
-    ~DataList() { delete[] key_; }
+    ~DataList()
+    {
+      if (key_ != nullptr)
+      {
+        delete[] key_;
+      }
+    }
   };
 
   // Head of the list which holds the keys and values of this context
