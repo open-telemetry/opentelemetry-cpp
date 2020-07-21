@@ -6,6 +6,7 @@
 #include "opentelemetry/trace/canonical_code.h"
 #include "opentelemetry/trace/span_id.h"
 #include "opentelemetry/trace/trace_id.h"
+#include "opentelemetry/trace/key_value_iterable.h"
 #include "opentelemetry/version.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
@@ -46,8 +47,11 @@ public:
    * Add an event to a span.
    * @param name the name of the event
    * @param timestamp the timestamp of the event
+   * @param attributes the attributes associated with the event
    */
-  virtual void AddEvent(nostd::string_view name, core::SystemTimestamp timestamp) noexcept = 0;
+  virtual void AddEvent(nostd::string_view name,
+                        core::SystemTimestamp timestamp,
+                        const trace_api::KeyValueIterable &attributes) noexcept = 0;
 
   /**
    * Set the status of the span.

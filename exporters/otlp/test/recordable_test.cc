@@ -1,4 +1,5 @@
 #include "opentelemetry/exporters/otlp/recordable.h"
+#include "opentelemetry/trace/key_value_iterable_view.h"
 
 #include <gtest/gtest.h>
 
@@ -86,7 +87,7 @@ TEST(Recordable, AddEvents)
   std::chrono::system_clock::time_point event_time = std::chrono::system_clock::now();
   core::SystemTimestamp event_timestamp(event_time);
 
-  rec.AddEvent(name, event_timestamp);
+  rec.AddEvent(name, event_timestamp, trace::KeyValueIterableView<std::map<std::string, int>>({}));
 
   uint64_t unix_event_time =
       std::chrono::duration_cast<std::chrono::nanoseconds>(event_time.time_since_epoch()).count();

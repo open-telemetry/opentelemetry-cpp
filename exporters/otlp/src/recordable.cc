@@ -111,7 +111,9 @@ void Recordable::SetAttribute(nostd::string_view key,
   }
 }
 
-void Recordable::AddEvent(nostd::string_view name, core::SystemTimestamp timestamp) noexcept
+void Recordable::AddEvent(nostd::string_view name,
+                          core::SystemTimestamp timestamp,
+                          const trace::KeyValueIterable &attributes) noexcept
 {
   auto *event = span_.add_events();
   event->set_name(name.data(), name.size());
