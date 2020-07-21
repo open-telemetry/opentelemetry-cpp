@@ -121,6 +121,15 @@ void Recordable::AddEvent(nostd::string_view name,
   // TODO: handle attributes
 }
 
+void Recordable::AddLink(opentelemetry::trace::TraceId trace_id,
+                         opentelemetry::trace::SpanId span_id,
+                         const trace::KeyValueIterable &attributes) noexcept
+{
+  (void)trace_id;
+  (void)span_id;
+  (void)attributes;
+}
+
 void Recordable::SetStatus(trace::CanonicalCode code, nostd::string_view description) noexcept
 {
   span_.mutable_status()->set_code(opentelemetry::proto::trace::v1::Status_StatusCode(code));

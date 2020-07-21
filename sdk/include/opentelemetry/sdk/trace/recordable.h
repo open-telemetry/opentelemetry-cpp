@@ -4,9 +4,9 @@
 #include "opentelemetry/core/timestamp.h"
 #include "opentelemetry/nostd/string_view.h"
 #include "opentelemetry/trace/canonical_code.h"
+#include "opentelemetry/trace/key_value_iterable.h"
 #include "opentelemetry/trace/span_id.h"
 #include "opentelemetry/trace/trace_id.h"
-#include "opentelemetry/trace/key_value_iterable.h"
 #include "opentelemetry/version.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
@@ -52,6 +52,16 @@ public:
   virtual void AddEvent(nostd::string_view name,
                         core::SystemTimestamp timestamp,
                         const trace_api::KeyValueIterable &attributes) noexcept = 0;
+
+  /**
+   * Add a link to a span.
+   * @param trace_id the trace id of the linked span
+   * @param span_id the span id of the linked span
+   * @param attributes the attributes associated with the link
+   */
+  virtual void AddLink(opentelemetry::trace::TraceId trace_id,
+                       opentelemetry::trace::SpanId span_id,
+                       const trace_api::KeyValueIterable &attributes) noexcept = 0;
 
   /**
    * Set the status of the span.

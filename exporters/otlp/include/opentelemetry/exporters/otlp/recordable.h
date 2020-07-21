@@ -25,6 +25,10 @@ public:
                 core::SystemTimestamp timestamp,
                 const trace::KeyValueIterable &attributes) noexcept override;
 
+  void AddLink(opentelemetry::trace::TraceId trace_id,
+               opentelemetry::trace::SpanId span_id,
+               const trace::KeyValueIterable &attributes) noexcept override;
+
   void SetStatus(trace::CanonicalCode code, nostd::string_view description) noexcept override;
 
   void SetName(nostd::string_view name) noexcept override;

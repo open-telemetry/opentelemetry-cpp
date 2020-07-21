@@ -202,6 +202,15 @@ public:
     // TODO: handle attributes
   }
 
+  void AddLink(opentelemetry::trace::TraceId trace_id,
+               opentelemetry::trace::SpanId span_id,
+               const opentelemetry::trace::KeyValueIterable &attributes) noexcept override
+  {
+    (void)trace_id;
+    (void)span_id;
+    (void)attributes;
+  }
+
   void SetStatus(trace_api::CanonicalCode code, nostd::string_view description) noexcept override
   {
     status_code_ = code;
