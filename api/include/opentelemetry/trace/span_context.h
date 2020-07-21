@@ -56,7 +56,7 @@ private:
   const TraceId trace_id_;
   const SpanId span_id_;
   const TraceFlags trace_flags_;
-  const TraceState trace_state_;  // Never nullptr.
+  const nostd::unique_ptr<TraceState> trace_state_;  // Never nullptr.
   const bool remote_parent_ = false;
 };
 
