@@ -63,7 +63,7 @@ public:
   // Returns the value associated with the passed in key.
   context::ContextValue GetValue(nostd::string_view key)
   {
-    for (nostd::shared_ptr<DataList> data = head_; data != nullptr; data = data->next_)
+    for (DataList *data = &*head_; data != nullptr; data = &*(data->next_))
     {
       if (key.size() == data->key_length_)
       {
