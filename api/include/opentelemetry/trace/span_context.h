@@ -23,8 +23,7 @@
 #include "opentelemetry/trace/trace_id.h"
 #include "opentelemetry/trace/trace_state.h"
 
-namespace opentelemetry
-{
+OPENTELEMETRY_BEGIN_NAMESPACE
 namespace trace
 {
 // SpanContext contains the state that must propagate to child Spans and across
@@ -61,4 +60,4 @@ private:
 };
 
 }  // namespace trace
-}  // namespace opentelemetry
+OPENTELEMETRY_END_NAMESPACE // namespace opentelemetry
