@@ -1,4 +1,4 @@
-#include "opentelemetry/exporters/stream/span_exporter.h"
+#include "opentelemetry/exporters/ostream/span_exporter.h"
 
 #include <iostream>
 
@@ -10,15 +10,15 @@ namespace exporter
 {
 namespace trace
 {
-StreamSpanExporter::StreamSpanExporter(std::ostream &sout) noexcept
+OStreamSpanExporter::OStreamSpanExporter(std::ostream &sout) noexcept
                                     : sout_{sout} {}
 
-std::unique_ptr<sdktrace::Recordable> StreamSpanExporter::MakeRecordable() noexcept 
+std::unique_ptr<sdktrace::Recordable> OStreamSpanExporter::MakeRecordable() noexcept 
 {
     return std::unique_ptr<sdktrace::Recordable>(new sdktrace::SpanData);
 }
 
-sdktrace::ExportResult StreamSpanExporter::Export(
+sdktrace::ExportResult OStreamSpanExporter::Export(
     const nostd::span<std::unique_ptr<sdktrace::Recordable>> &spans) noexcept
 {
     if(isShutdown_)
@@ -59,7 +59,7 @@ sdktrace::ExportResult StreamSpanExporter::Export(
     return sdktrace::ExportResult::kSuccess;
 }
 
-void StreamSpanExporter::Shutdown(std::chrono::microseconds timeout) noexcept 
+void OStreamSpanExporter::Shutdown(std::chrono::microseconds timeout) noexcept 
 {
   isShutdown_ = true;
 }

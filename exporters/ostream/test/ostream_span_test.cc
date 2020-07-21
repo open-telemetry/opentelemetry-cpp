@@ -6,7 +6,7 @@
 
 #include "opentelemetry/sdk/trace/exporter.h"
 
-#include "opentelemetry/exporters/stream/span_exporter.h"
+#include "opentelemetry/exporters/ostream/span_exporter.h"
 
 
 #include <iostream>
@@ -17,10 +17,10 @@ namespace trace    = opentelemetry::trace;
 namespace nostd    = opentelemetry::nostd;
 namespace sdktrace = opentelemetry::sdk::trace;
 
-// Testing Shutdown functionality of StreamSpanExporter, should expect no data to be sent to Stream
-TEST(StreamSpanExporter, Shutdown)
+// Testing Shutdown functionality of OStreamSpanExporter, should expect no data to be sent to Stream
+TEST(OStreamSpanExporter, Shutdown)
 {
-  auto exporter  = std::unique_ptr<sdktrace::SpanExporter>(new opentelemetry::exporter::trace::StreamSpanExporter);
+  auto exporter  = std::unique_ptr<sdktrace::SpanExporter>(new opentelemetry::exporter::trace::OStreamSpanExporter);
   auto processor = std::shared_ptr<sdktrace::SpanProcessor>(
       new sdktrace::SimpleSpanProcessor(std::move(exporter)));
 
@@ -45,9 +45,9 @@ TEST(StreamSpanExporter, Shutdown)
 }
 
 // Testing what a default span that is not changed will print out, either all 0's or empty values
-TEST(StreamSpanExporter, PrintDefaultSpan)
+TEST(OStreamSpanExporter, PrintDefaultSpan)
 {
-  auto exporter  = std::unique_ptr<sdktrace::SpanExporter>(new opentelemetry::exporter::trace::StreamSpanExporter);
+  auto exporter  = std::unique_ptr<sdktrace::SpanExporter>(new opentelemetry::exporter::trace::OStreamSpanExporter);
   auto processor = std::shared_ptr<sdktrace::SpanProcessor>(
       new sdktrace::SimpleSpanProcessor(std::move(exporter)));
 
@@ -89,9 +89,9 @@ TEST(StreamSpanExporter, PrintDefaultSpan)
 }
 
 // Testing if the changes we make to a span will carry over through the exporter
-TEST(StreamSpanExporter, PrintChangedSpanCout)
+TEST(OStreamSpanExporter, PrintChangedSpanCout)
 {
-  auto exporter  = std::unique_ptr<sdktrace::SpanExporter>(new opentelemetry::exporter::trace::StreamSpanExporter);
+  auto exporter  = std::unique_ptr<sdktrace::SpanExporter>(new opentelemetry::exporter::trace::OStreamSpanExporter);
   auto processor = std::shared_ptr<sdktrace::SpanProcessor>(
       new sdktrace::SimpleSpanProcessor(std::move(exporter)));
 
@@ -144,9 +144,9 @@ TEST(StreamSpanExporter, PrintChangedSpanCout)
 }
 
 // PrintChangedSpan to std::cerr
-TEST(StreamSpanExporter, PrintChangedSpanCerr)
+TEST(OStreamSpanExporter, PrintChangedSpanCerr)
 {
-  auto exporter  = std::unique_ptr<sdktrace::SpanExporter>(new opentelemetry::exporter::trace::StreamSpanExporter(std::cerr));
+  auto exporter  = std::unique_ptr<sdktrace::SpanExporter>(new opentelemetry::exporter::trace::OStreamSpanExporter(std::cerr));
   auto processor = std::shared_ptr<sdktrace::SpanProcessor>(
       new sdktrace::SimpleSpanProcessor(std::move(exporter)));
 
@@ -202,9 +202,9 @@ TEST(StreamSpanExporter, PrintChangedSpanCerr)
 }
 
 // PrintChangedSpan to std::clog
-TEST(StreamSpanExporter, PrintChangedSpanClog)
+TEST(OStreamSpanExporter, PrintChangedSpanClog)
 {
-  auto exporter  = std::unique_ptr<sdktrace::SpanExporter>(new opentelemetry::exporter::trace::StreamSpanExporter(std::clog));
+  auto exporter  = std::unique_ptr<sdktrace::SpanExporter>(new opentelemetry::exporter::trace::OStreamSpanExporter(std::clog));
   auto processor = std::shared_ptr<sdktrace::SpanProcessor>(
       new sdktrace::SimpleSpanProcessor(std::move(exporter)));
 

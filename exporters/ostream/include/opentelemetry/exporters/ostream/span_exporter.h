@@ -19,18 +19,18 @@ namespace trace
 {
 
 /**
- * The StreamSpanExporter exports span data through an ostream
+ * The OStreamSpanExporter exports span data through an ostream
 */
-class StreamSpanExporter final : public sdktrace::SpanExporter
+class OStreamSpanExporter final : public sdktrace::SpanExporter
 {
 public:
 
 /**
- * Create a StreamSpanExporter. This constructor takes in a reference to an ostream that the
+ * Create a OStreamSpanExporter. This constructor takes in a reference to an ostream that the
  * export() function will send span data into.
  * The default ostream is set to stdout
  */
-  explicit StreamSpanExporter(std::ostream &sout = std::cout) noexcept;
+  explicit OStreamSpanExporter(std::ostream &sout = std::cout) noexcept;
 
   std::unique_ptr<sdktrace::Recordable> MakeRecordable() noexcept override;
 
