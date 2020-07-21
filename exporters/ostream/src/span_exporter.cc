@@ -53,6 +53,7 @@ sdktrace::ExportResult OStreamSpanExporter::Export(
               << "\n  status        : " << statusMap[int(span->GetStatus())]
               << "\n  attributes    : ";
               printAttributes(span->GetAttributes());
+        sout_ << "\n}\n";
       }
     }
 

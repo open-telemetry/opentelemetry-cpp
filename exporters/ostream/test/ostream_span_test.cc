@@ -138,7 +138,7 @@ TEST(OStreamSpanExporter, PrintChangedSpanCout)
   "  duration      : 100\n"
   "  description   : Test Description\n"
   "  status        : UNIMPLEMENTED\n"
-  "  attributes    : attr1: string \n"
+  "  attributes    : attr1: string\n"
   "}\n"; 
   ASSERT_EQ(stdoutOutput.str(),expectedOutput);
 }
@@ -196,7 +196,7 @@ TEST(OStreamSpanExporter, PrintChangedSpanCerr)
   "  duration      : 100\n"
   "  description   : Test Description\n"
   "  status        : UNIMPLEMENTED\n"
-  "  attributes    : attr1: [0,1,0] \n"
+  "  attributes    : attr1: [0,1,0]\n"
   "}\n"; 
   ASSERT_EQ(stdcerrOutput.str(),expectedOutput);
 }
@@ -253,7 +253,7 @@ TEST(OStreamSpanExporter, PrintChangedSpanClog)
   "  duration      : 100\n"
   "  description   : Test Description\n"
   "  status        : UNIMPLEMENTED\n"
-  "  attributes    : attr1: [1,2,3] \n"
+  "  attributes    : attr1: [1,2,3]\n"
   "}\n"; 
   ASSERT_EQ(stdclogOutput.str(),expectedOutput);
 }

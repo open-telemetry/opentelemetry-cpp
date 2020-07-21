@@ -3,11 +3,11 @@
 #include "opentelemetry/sdk/trace/exporter.h"
 #include "opentelemetry/sdk/trace/span_data.h"
 #include "opentelemetry/nostd/type_traits.h"
-#include <opentelemetry/version.h>
+#include "opentelemetry/version.h"
 
-#include <sstream>
 #include <iostream>
 #include <map>
+#include <sstream>
 
 namespace nostd    = opentelemetry::nostd;
 namespace sdktrace = opentelemetry::sdk::trace;
@@ -26,7 +26,7 @@ class OStreamSpanExporter final : public sdktrace::SpanExporter
 public:
 
 /**
- * Create a OStreamSpanExporter. This constructor takes in a reference to an ostream that the
+ * Create an OStreamSpanExporter. This constructor takes in a reference to an ostream that the
  * export() function will send span data into.
  * The default ostream is set to stdout
  */
@@ -45,23 +45,23 @@ private:
 
   // Mapping status number to the string from api/include/opentelemetry/trace/canonical_code.h
   std::map<int, std::string> statusMap {
-    {0, "OK"},
-    {1, "CANCELLED"},
-    {2, "UNKNOWN"},
-    {3, "INVALID_ARGUMENT"},
-    {4, "DEADLINE_EXCEEDED"},
-    {5, "NOT_FOUND"},
-    {6, "ALREADY_EXISTS"},
-    {7, "PERMISSION_DENIED"},
-    {8, "RESOURCE_EXHAUSTED"},
-    {9, "FAILED_PRECONDITION"},
-    {10,"ABORTED"},
-    {11,"OUT_OF_RANGE"},
-    {12,"UNIMPLEMENTED"},
-    {13,"INTERNAL"},
-    {14,"UNAVAILABLE"},
-    {15,"DATA_LOSS"},
-    {16,"UNAUTHENTICATED"}
+    {0,  "OK"},
+    {1,  "CANCELLED"},
+    {2,  "UNKNOWN"},
+    {3,  "INVALID_ARGUMENT"},
+    {4,  "DEADLINE_EXCEEDED"},
+    {5,  "NOT_FOUND"},
+    {6,  "ALREADY_EXISTS"},
+    {7,  "PERMISSION_DENIED"},
+    {8,  "RESOURCE_EXHAUSTED"},
+    {9,  "FAILED_PRECONDITION"},
+    {10, "ABORTED"},
+    {11, "OUT_OF_RANGE"},
+    {12, "UNIMPLEMENTED"},
+    {13, "INTERNAL"},
+    {14, "UNAVAILABLE"},
+    {15, "DATA_LOSS"},
+    {16, "UNAUTHENTICATED"}
   };
 
   /*
@@ -132,14 +132,18 @@ private:
 
   void printAttributes(std::unordered_map<std::string, sdktrace::SpanDataAttributeValue> map)
   {
+    int size = map.size();
+    int num = 1;
     for(auto kv : map)
     {
       sout_ << kv.first << ": ";
       print_value(kv.second);
-      sout_ << " ";
+
+      if (num != size)
+        sout_ << ", ";
+      num++;
     }
 
-    sout_ << "\n}\n";
   }
   
 };
