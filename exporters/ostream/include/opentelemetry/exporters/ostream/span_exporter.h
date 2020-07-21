@@ -133,15 +133,15 @@ private:
   void printAttributes(std::unordered_map<std::string, sdktrace::SpanDataAttributeValue> map)
   {
     int size = map.size();
-    int num = 1;
+    int i = 1;
     for(auto kv : map)
     {
       sout_ << kv.first << ": ";
       print_value(kv.second);
 
-      if (num != size)
+      if (i != size)
         sout_ << ", ";
-      num++;
+      i++;
     }
 
   }
