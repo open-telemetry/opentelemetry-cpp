@@ -6,6 +6,7 @@
 #include <string>
 #include <vector>
 #include <algorithm>
+#include <memory>
 #include <unordered_map>
 
 
@@ -15,8 +16,10 @@
 #include "nlohmann/json.hpp"
 #include "opentelemetry/ext/http/server/HttpServer.h"
 #include "opentelemetry/ext/zpages/tracez_handler.h"
+#include "opentelemetry/ext/zpages/tracez_data_aggregator.h"
 
 using json = nlohmann::json;
+using namespace opentelemetry::ext::zpages;
 
 namespace ext
 {
@@ -103,14 +106,14 @@ class zPagesHttpServer : public HTTP_SERVER_NS::HttpServer {
 
   }
 
-  zPagesHttpServer(std::string serverHost, int port = 30000) : HttpServer() {
+  zPagesHttpServer(std::string serverHost, std::shared_ptr<TracezSpanProcessor> processor, int port = 30000) : HttpServer() {
     std::ostringstream os;
     os << serverHost << ":" << port;
     setServerName(os.str());
     addListeningPort(port);
-
+    
     tracez_handler_ = std::unique_ptr<ext::zpages::TracezHandler>(
-        new ext::zpages::TracezHandler());
+        new ext::zpages::TracezHandler(processor));
     InitializeTracezEndpoints(*this);
   };
 

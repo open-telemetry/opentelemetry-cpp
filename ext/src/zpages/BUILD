@@ -37,7 +37,9 @@ cc_binary(
         "//conditions:default": ["-pthread"],
     }),
     deps = [
-        "//ext:headers",
+        "//api",
+        "//sdk/src/trace",
+        "//ext/src/zpages",
         "@github_nlohmann_json//:json",
     ],
 )
