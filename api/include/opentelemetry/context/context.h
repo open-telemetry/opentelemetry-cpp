@@ -1,11 +1,8 @@
 #pragma once
 
-#include <atomic>
-
 #include "opentelemetry/context/context_value.h"
 #include "opentelemetry/nostd/shared_ptr.h"
 #include "opentelemetry/nostd/string_view.h"
-#include "opentelemetry/trace/key_value_iterable_view.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace context
