@@ -73,17 +73,6 @@ class DefaultSpan: public Span {
       return DefaultSpan(span_context);
     }
 
-    static DefaultSpan CreateRandom() {
-      return DefaultSpan(
-//        SpanContext::Create(
-//          TraceId::generateRandomId(),
-//          SpanId::generateRandomId(),
-//          TraceFlags::getDefault(),
-//          TraceState::getDefault()
-//        )
-      );
-    }
-
   private:
     SpanContext span_context_;
 };
