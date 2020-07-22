@@ -8,8 +8,9 @@ namespace exporter
 namespace mock
 {
 MockSpanExporter::MockSpanExporter(
-    std::shared_ptr<std::vector<std::unique_ptr<sdk::trace::SpanData>>> spans_received)
-    : spans_received_(spans_received)
+    std::shared_ptr<std::vector<std::unique_ptr<sdk::trace::SpanData>>> spans_received,
+    std::shared_ptr<bool> shutdown_called)
+    : spans_received_(spans_received), shutdown_called_(shutdown_called)
 {}
 
 std::unique_ptr<sdk::trace::Recordable> MockSpanExporter::MakeRecordable() noexcept
@@ -30,6 +31,11 @@ sdk::trace::ExportResult MockSpanExporter::Export(
   }
 
   return sdk::trace::ExportResult::kSuccess;
+}
+
+void MockSpanExporter::Shutdown(std::chrono::microseconds timeout) noexcept
+{
+  *shutdown_called_ = true;
 }
 }  // namespace mock
 }  // namespace exporter

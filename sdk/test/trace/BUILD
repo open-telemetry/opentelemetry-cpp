@@ -30,6 +30,7 @@ cc_test(
     deps = [
         "//sdk/src/trace",
         "@com_google_googletest//:gtest_main",
+        "//exporters/mock:mock_span_exporter"
     ],
 )
 
@@ -52,6 +53,7 @@ cc_test(
     deps = [
         "//sdk/src/trace",
         "@com_google_googletest//:gtest_main",
+        "//exporters/mock:mock_span_exporter"
     ],
 )
 
