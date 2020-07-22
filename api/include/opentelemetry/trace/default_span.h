@@ -31,40 +31,40 @@ class DefaultSpan: Span {
       );
     }
 
-    SpanContext GetContext() {
+    SpanContext GetContext() noexcept {
         return span_context_;
     }
 
-    bool IsRecording() {
+    bool IsRecording() noexcept {
         return false;
     }
     
-    void SetAttribute(nostd::string_view key, common::AttributeValue value) {
+    void SetAttribute(nostd::string_view key, common::AttributeValue value) noexcept {
       pass;
     }
 
-    void AddEvent(nostd::string_view name) { pass; }
+    void AddEvent(nostd::string_view name) noexcept { pass; }
 
-    void AddEvent(nostd::string_view name, core::SystemTimestamp timestamp) { pass; }
+    void AddEvent(nostd::string_view name, core::SystemTimestamp timestamp) noexcept { pass; }
 
     void AddEvent(nostd::string_view name,
                           core::SystemTimestamp timestamp,
-                          const KeyValueIterable &attributes) { pass; }
+                          const KeyValueIterable &attributes) noexcept { pass; }
 
-    void AddEvent(nostd::string_view name, const KeyValueIterable &attributes)
+    void AddEvent(nostd::string_view name, const KeyValueIterable &attributes) noexcept
     {
       this->AddEvent(name, std::chrono::system_clock::now(), attributes);
     }
     
-    void SetStatus(CanonicalCode status, nostd::string_view description) {
+    void SetStatus(CanonicalCode status, nostd::string_view description) noexcept {
       pass;
     }
   
-    void UpdateName(nostd::string_view name) {
+    void UpdateName(nostd::string_view name) noexcept {
       pass;
     }
 
-    void End(const EndSpanOptions &options = {}) {
+    void End(const EndSpanOptions &options = {}) noexcept {
       pass;
     }
 
@@ -76,9 +76,7 @@ class DefaultSpan: Span {
        this.span_context_ = spanContext;
     }
 
-    ~DefaultSpan() = default;
-
-    Tracer &tracer() {
+    Tracer &tracer() const noexcept {
        return NULL; // Invalid tracer
     }
 
