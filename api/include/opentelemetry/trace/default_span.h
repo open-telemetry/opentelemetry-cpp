@@ -12,7 +12,8 @@ class DefaultSpan: public Span {
   public:
     // Returns an invalid span.
     static DefaultSpan GetInvalid() {
-        return kInvalid;
+        DefaultSpan invalid = DefaultSpan(SpanContext::GetInvalid());
+        return invalid;
     }
 
     trace::SpanContext GetContext() const noexcept {
@@ -81,7 +82,6 @@ class DefaultSpan: public Span {
     }
 
   private:
-    static const DefaultSpan kInvalid = DefaultSpan(SpanContext::GetInvalid());
     SpanContext span_context_;
 };
 }
