@@ -36,7 +36,7 @@ namespace
 //    HttpTraceContext.inject(setter,&carrier,&context);
 //    HttpTraceContext.extract(getter,&carrier,&context);
 template <typename T>
-class HttpTraceContext : public trace::propagation::HTTPTextFormat<T>
+class HttpTraceContext : public HTTPTextFormat
 {
     public:
         List<nostd::string_view> Fields() {
