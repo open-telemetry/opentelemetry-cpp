@@ -56,7 +56,7 @@ class DefaultSpan: Span {
       return "DefaultSpan";
     }
 
-    DefaultSpan(SpanContext& span_context) {
+    DefaultSpan(const SpanContext& span_context) {
        this->span_context_ = span_context;
     }
 
