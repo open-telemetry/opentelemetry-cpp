@@ -16,7 +16,7 @@ class DefaultSpan: Span {
     }
 
     // Creates an instance of this class with spancontext.
-    static DefaultSpan Create(SpanContext&& span_context) {
+    static DefaultSpan Create(SpanContext span_context) {
       return DefaultSpan(span_context);
     }
 
