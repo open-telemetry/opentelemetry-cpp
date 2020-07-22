@@ -8,7 +8,7 @@
 #define pass
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace trace {
-public const class DefaultSpan : Span {
+public class DefaultSpan: Span {
   public:
     // Returns an invalid span.
     static DefaultSpan GetInvalid() {
