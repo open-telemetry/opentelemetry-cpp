@@ -61,6 +61,10 @@ class DefaultSpan: public Span {
        this->span_context_ = span_context;
     }
 
+    DefaultSpan(SpanContext&& span_context) {
+       this->span_context_ = span_context;
+    }
+
 //    Tracer &tracer() const noexcept {
 //       return Tracer(); // Invalid tracer
 //    }
