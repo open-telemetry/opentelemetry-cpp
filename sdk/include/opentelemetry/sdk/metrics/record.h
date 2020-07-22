@@ -1,69 +1,44 @@
 #pragma once
 
-#include "opentelemetry/core/timestamp.h"
+#include "opentelemetry/metrics/instrument.h"
 #include "opentelemetry/nostd/variant.h"
-#include <vector>
-#include <string>
-
-enum AggregatorKind
-{
-  Counter = 0,
-  MinMaxSumCount = 1,
-  Gauge = 2,
-  Sketch = 3,
-  Histogram = 4,
-  Exact = 5,
-};
+#include "opentelemetry/sdk/metrics/aggregator/aggregator.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
+
+namespace metrics_api = opentelemetry::metrics;
 
 namespace sdk
 {
 namespace metrics
 {
-  
-using RecordValue = nostd::variant<std::vector<short>,
-                                    std::vector<int>,
-                                    std::vector<float>,
-                                    std::vector<double>>;
-                                    
+using AggregatorVariant = nostd::variant<std::unique_ptr<Aggregator<short>>,
+                                         std::unique_ptr<Aggregator<int>>,
+                                         std::unique_ptr<Aggregator<float>>,
+                                         std::unique_ptr<Aggregator<double>>>;
 class Record
 {
 public:
   explicit Record(std::string name, std::string description,
-                  AggregatorKind aggregatorKind,
                   std::string labels,
-                  RecordValue value,
-                  core::SystemTimestamp timestamp = core::SystemTimestamp(std::chrono::system_clock::now()))
+                  AggregatorVariant aggregator)
   {
     name_ = name;
     description_ = description;
-    aggregatorKind_ = aggregatorKind;
     labels_ = labels;
-    value_ = value;
-    timestamp_ = timestamp;
-  }
-
-  template<typename T>
-  void SetValue(std::vector<T> value)
-  {
-    value_ = value;
+    aggregator_ = std::move(aggregator);
   }
 
   std::string GetName() {return name_;}
   std::string GetDescription() {return description_;}
-  AggregatorKind GetAggregatorKind() {return aggregatorKind_;}
   std::string GetLabels() {return labels_;}
-  RecordValue GetValue() {return value_;}
-  core::SystemTimestamp GetTimestamp() {return timestamp_;}
+  AggregatorVariant GetAggregator() {return std::move(aggregator_);}
 
 private:
   std::string name_;
   std::string description_;
-  AggregatorKind aggregatorKind_;
   std::string labels_;
-  nostd::variant<std::vector<short>, std::vector<int>, std::vector<float>, std::vector<double>> value_;
-  core::SystemTimestamp timestamp_;
+  AggregatorVariant aggregator_;
 };
 } // namespace metrics
 } // namespace sdk
