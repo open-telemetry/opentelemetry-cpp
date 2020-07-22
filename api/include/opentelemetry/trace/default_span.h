@@ -60,9 +60,9 @@ class DefaultSpan: Span {
        this->span_context_ = span_context;
     }
 
-    Tracer &tracer() const noexcept {
-       return Tracer(); // Invalid tracer
-    }
+//    Tracer &tracer() const noexcept {
+//       return Tracer(); // Invalid tracer
+//    }
 
     // Creates an instance of this class with spancontext.
     static DefaultSpan Create(SpanContext span_context) {
