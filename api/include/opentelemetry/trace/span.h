@@ -54,7 +54,7 @@ struct EndSpanOptions
   core::SteadyTimestamp end_steady_time;
 };
 
-//class Tracer;
+class Tracer;
 
 /**
  * A Span represents a single operation within a Trace.
