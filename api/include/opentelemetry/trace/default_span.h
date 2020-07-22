@@ -12,7 +12,7 @@ class DefaultSpan: public Span {
   public:
     // Returns an invalid span.
     static DefaultSpan GetInvalid() {
-        DefaultSpan = SpanContext();
+        DefaultSpan invalid = SpanContext();
 //        DefaultSpan invalid = DefaultSpan(SpanContext::GetInvalid());
         return invalid;
     }
