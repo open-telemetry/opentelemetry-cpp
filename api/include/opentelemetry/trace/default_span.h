@@ -76,6 +76,10 @@ class DefaultSpan: Span {
        this.span_context_ = spanContext;
     }
 
+    Tracer &tracer() {
+       return NULL; // Invalid tracer
+    }
+
   private:
     static const DefaultSpan kInvalid = new DefaultSpan(SpanContext::GetInvalid());
     const SpanContext span_context_;
