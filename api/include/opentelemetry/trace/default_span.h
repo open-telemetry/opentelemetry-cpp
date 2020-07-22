@@ -35,7 +35,7 @@ class DefaultSpan: Span {
         return span_context_;
     }
 
-    bool IsRecordingEvents() {
+    bool IsRecording() {
         return false;
     }
     
@@ -43,11 +43,20 @@ class DefaultSpan: Span {
       pass;
     }
 
-    void AddEvent(nostd::string_view name, nostd::span<common::AttributeValue> attributes, int timestamp) {
-      pass;
+    void AddEvent(nostd::string_view name) { pass; }
+
+    void AddEvent(nostd::string_view name, core::SystemTimestamp timestamp) { pass; }
+
+    void AddEvent(nostd::string_view name,
+                          core::SystemTimestamp timestamp,
+                          const KeyValueIterable &attributes) { pass; }
+
+    void AddEvent(nostd::string_view name, const KeyValueIterable &attributes)
+    {
+      this->AddEvent(name, std::chrono::system_clock::now(), attributes);
     }
     
-    void SetStatus(CanonicalCode status) {
+    void SetStatus(CanonicalCode status, nostd::string_view description) {
       pass;
     }
   
@@ -55,7 +64,7 @@ class DefaultSpan: Span {
       pass;
     }
 
-    void End(EndSpanOptions end_time) {
+    void End(const EndSpanOptions &options = {}) {
       pass;
     }
 
@@ -66,9 +75,6 @@ class DefaultSpan: Span {
     DefaultSpan(SpanContext spanContext) {
        this.span_context_ = spanContext;
     }
-
-    DefaultSpan(const DefaultSpan &) = delete;
-    DefaultSpan(DefaultSpan &&)      = delete;
 
   private:
     static const DefaultSpan kInvalid = new DefaultSpan(SpanContext::GetInvalid());
