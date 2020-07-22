@@ -66,12 +66,12 @@ class HttpTraceContext : public HTTPTextFormat<T>
             return new_values;
         }
 
-        trace::Span GetCurrentSpan(Context &context) {
+        trace::Span* GetCurrentSpan(Context &context) {
             trace::Span span = context.GetValue(Context.kSpanKey);
             if (span == NULL) {
                 return NULL;
             }
-            return span;
+            return &span;
         }
 
     private:
