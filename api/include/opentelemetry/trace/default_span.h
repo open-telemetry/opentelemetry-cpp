@@ -43,7 +43,7 @@ class DefaultSpan: Span {
       pass;
     }
 
-    void AddEvent(nostd::string_view name, common::Attributes attributes, int timestamp) {
+    void AddEvent(nostd::string_view name, nostd::span<common::AttributeValue> attributes, int timestamp) {
       pass;
     }
     
