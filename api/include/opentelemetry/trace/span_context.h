@@ -42,7 +42,7 @@ public:
 //     //span_id_(ctx.span_id()), trace_flags_(ctx.trace_flags()), trace_state_(new TraceState())
 //    return *this;
 //  }
-  SpanContext &operator=(SpanContext &&ctx) {
+  SpanContext &operator=(SpanContext &&ctx) const {
     trace_id_ = ctx.trace_id();
     return *this;
   }
