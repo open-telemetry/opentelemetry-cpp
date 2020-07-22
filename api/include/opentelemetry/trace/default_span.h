@@ -56,7 +56,7 @@ class DefaultSpan: Span {
       return "DefaultSpan";
     }
 
-    DefaultSpan(SpanContext spanContext) const {
+    DefaultSpan(SpanContext spanContext) {
        this->span_context_ = spanContext;
     }
 
@@ -82,6 +82,6 @@ class DefaultSpan: Span {
 
   private:
     static const DefaultSpan kInvalid = DefaultSpan(SpanContext::GetInvalid());
-    const SpanContext span_context_;
+    SpanContext span_context_;
 };
 }
