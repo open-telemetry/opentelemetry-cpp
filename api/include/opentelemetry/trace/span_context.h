@@ -37,7 +37,11 @@ public:
   SpanContext(SpanContext&& ctx) : trace_id_(ctx.trace_id()), span_id_(ctx.span_id()), trace_flags_(ctx.trace_flags()), trace_state_(new TraceState()) {}
   SpanContext(const SpanContext& ctx) : trace_id_(ctx.trace_id()), span_id_(ctx.span_id()), trace_flags_(ctx.trace_flags()), trace_state_(new TraceState()) {}
 
-  SpanContext &operator=(const SpanContext &ctx) : trace_id_(ctx.trace_id()), span_id_(ctx.span_id()), trace_flags_(ctx.trace_flags()), trace_state_(new TraceState()) {return *this;}
+  SpanContext &operator=(const SpanContext &ctx) {
+    trace_id_ = ctx.trace_id());
+     //span_id_(ctx.span_id()), trace_flags_(ctx.trace_flags()), trace_state_(new TraceState())
+    return *this;
+  }
   SpanContext &operator=(SpanContext &&ctx) : trace_id_(ctx.trace_id()), span_id_(ctx.span_id()), trace_flags_(ctx.trace_flags()), trace_state_(new TraceState()) {return *this;}
   // TODO
   //
