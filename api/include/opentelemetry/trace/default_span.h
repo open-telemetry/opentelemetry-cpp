@@ -10,13 +10,14 @@ OPENTELEMETRY_BEGIN_NAMESPACE
 namespace trace {
 class DefaultSpan: public Span {
   public:
-    // Returns an invalid span.
-    static DefaultSpan GetInvalid() {
-        return DefaultSpan(SpanContext::GetInvalid());
-    }
 
     trace::SpanContext GetContext() const noexcept {
         return span_context_;
+    }
+
+    // Returns an invalid span.
+    static DefaultSpan GetInvalid() {
+        return DefaultSpan(SpanContext::GetInvalid());
     }
 
     bool IsRecording() const noexcept {
