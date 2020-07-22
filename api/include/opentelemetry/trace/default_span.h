@@ -57,7 +57,7 @@ class DefaultSpan: Span {
     }
 
     DefaultSpan(SpanContext spanContext) {
-       this.span_context_ = spanContext;
+       this->span_context_ = spanContext;
     }
 
     Tracer &tracer() const noexcept {
