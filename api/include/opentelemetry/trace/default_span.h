@@ -85,3 +85,4 @@ class DefaultSpan: public Span {
     SpanContext span_context_;
 };
 }
+OPENTELEMETRY_END_NAMESPACE
