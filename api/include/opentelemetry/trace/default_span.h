@@ -67,6 +67,9 @@ class DefaultSpan: Span {
        this.span_context_ = spanContext;
     }
 
+    DefaultSpan(const DefaultSpan &) = delete;
+    DefaultSpan(DefaultSpan &&)      = delete;
+
   private:
     static const DefaultSpan kInvalid = new DefaultSpan(SpanContext::GetInvalid());
     const SpanContext span_context_;
