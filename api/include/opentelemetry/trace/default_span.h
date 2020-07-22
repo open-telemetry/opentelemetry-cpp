@@ -11,7 +11,7 @@ namespace trace {
 class DefaultSpan: public Span {
   public:
     // Returns an invalid span.
-    static DefaultSpan GetInvalid() {
+    static DefaultSpan &GetInvalid() {
         return DefaultSpan(SpanContext::GetInvalid());
     }
 
