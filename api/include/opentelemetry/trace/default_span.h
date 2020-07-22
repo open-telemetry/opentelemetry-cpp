@@ -64,10 +64,24 @@ class DefaultSpan: Span {
        return NULL; // Invalid tracer
     }
 
+    // Creates an instance of this class with spancontext.
+    static DefaultSpan Create(SpanContext span_context) {
+      return DefaultSpan(span_context);
+    }
 
+    static DefaultSpan CreateRandom() {
+      return DefaultSpan(
+        SpanContext.Create(
+          TraceId.generateRandomId(),
+          SpanId.generateRandomId(),
+          TraceFlags.getDefault(),
+          TraceState.getDefault()
+        )
+      );
+    }
 
   private:
-    static const DefaultSpan kInvalid = new DefaultSpan(SpanContext::GetInvalid());
+    static const DefaultSpan kInvalid = DefaultSpan(SpanContext::GetInvalid());
     const SpanContext span_context_;
 };
 }
