@@ -28,25 +28,25 @@ public:
    * Attributes will be processed in order, previous attributes with the same
    * key will be overwritten.
    */
-  virtual nostd::unique_ptr<Span> StartSpan(nostd::string_view name,
+  virtual nostd::unique_ptr<trace::Span> StartSpan(nostd::string_view name,
                                             const KeyValueIterable &attributes,
                                             const StartSpanOptions &options = {}) noexcept = 0;
 
-  nostd::unique_ptr<Span> StartSpan(nostd::string_view name,
+  nostd::unique_ptr<trace::Span> StartSpan(nostd::string_view name,
                                     const StartSpanOptions &options = {}) noexcept
   {
     return this->StartSpan(name, {}, options);
   }
 
   template <class T, nostd::enable_if_t<detail::is_key_value_iterable<T>::value> * = nullptr>
-  nostd::unique_ptr<Span> StartSpan(nostd::string_view name,
+  nostd::unique_ptr<trace::Span> StartSpan(nostd::string_view name,
                                     const T &attributes,
                                     const StartSpanOptions &options = {}) noexcept
   {
     return this->StartSpan(name, KeyValueIterableView<T>(attributes), options);
   }
 
-  nostd::unique_ptr<Span> StartSpan(
+  nostd::unique_ptr<trace::Span> StartSpan(
       nostd::string_view name,
       std::initializer_list<std::pair<nostd::string_view, common::AttributeValue>> attributes,
       const StartSpanOptions &options = {}) noexcept
