@@ -31,15 +31,15 @@ class DefaultSpan: Span {
       );
     }
 
-    SpanContext GetContext() noexcept {
+    SpanContext GetContext() const noexcept {
         return span_context_;
     }
 
-    bool IsRecording() noexcept {
+    bool IsRecording() const noexcept {
         return false;
     }
-    
-    void SetAttribute(nostd::string_view key, common::AttributeValue value) noexcept {
+
+    void SetAttribute(nostd::string_view key, const common::AttributeValue &&value) noexcept {
       pass;
     }
 
