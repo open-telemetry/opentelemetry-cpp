@@ -60,9 +60,9 @@ class HttpTraceContext : public HTTPTextFormat<T>
 
         static nostd::string_view span_key = "current-span";
 
-        context::Context SetSpanInContext(trace::Span &span, context::Context &context) {
+        context::Context SetSpanInContext(trace::Span *span, context::Context &context) {
             context::Context new_values = context::Context(context);
-            new_values.SetValue(span_key,span);
+            new_values.SetValue(span_key,*span);
             return new_values;
         }
 
