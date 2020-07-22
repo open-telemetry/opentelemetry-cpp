@@ -61,7 +61,6 @@ class DefaultSpan: public Span {
     }
 
     // movable and copiable
-    DefaultSpan() = default;
     DefaultSpan(DefaultSpan&& spn) : span_context_(spn.GetContext()) {}
     DefaultSpan(const DefaultSpan& spn) : span_context_(spn.GetContext()) {}
 
