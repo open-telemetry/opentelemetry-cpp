@@ -6,51 +6,14 @@
 #include "opentelemetry/sdk/trace/simple_processor.h"
 #include "opentelemetry/sdk/trace/span_data.h"
 #include "opentelemetry/sdk/trace/tracer.h"
+#include "opentelemetry/exporters/mock/mock_span_exporter.h"
 
 #include <cstdint>
 
 #include <benchmark/benchmark.h>
 
 using namespace opentelemetry::sdk::trace;
-namespace nostd  = opentelemetry::nostd;
-namespace common = opentelemetry::common;
-using opentelemetry::trace::SpanContext;
-
-/**
- * A mock exporter that switches a flag once a valid recordable was received.
- */
-class MockSpanExporter final : public SpanExporter
-{
-public:
-  MockSpanExporter(std::shared_ptr<std::vector<std::unique_ptr<SpanData>>> spans_received) noexcept
-      : spans_received_(spans_received)
-  {}
-
-  std::unique_ptr<Recordable> MakeRecordable() noexcept override
-  {
-    return std::unique_ptr<Recordable>(new SpanData);
-  }
-
-  ExportResult Export(const nostd::span<std::unique_ptr<Recordable>> &recordables) noexcept override
-  {
-    for (auto &recordable : recordables)
-    {
-      auto span = std::unique_ptr<SpanData>(static_cast<SpanData *>(recordable.release()));
-      if (span != nullptr)
-      {
-        spans_received_->push_back(std::move(span));
-      }
-    }
-
-    return ExportResult::kSuccess;
-  }
-
-  void Shutdown(std::chrono::microseconds timeout = std::chrono::microseconds(0)) noexcept override
-  {}
-
-private:
-  std::shared_ptr<std::vector<std::unique_ptr<SpanData>>> spans_received_;
-};
+using opentelemetry::exporter::mock::MockSpanExporter;
 
 namespace
 {

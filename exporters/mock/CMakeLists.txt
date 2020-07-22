@@ -1,0 +1,3 @@
+include_directories(include)
+
+add_library(opentelemetry_exporter_mock_span src/mock_span_exporter.cc)

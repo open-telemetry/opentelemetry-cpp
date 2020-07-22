@@ -114,5 +114,8 @@ cc_test(
 otel_cc_benchmark(
     name = "sampler_benchmark",
     srcs = ["sampler_benchmark.cc"],
-    deps = ["//sdk/src/trace"],
+    deps = [
+        "//sdk/src/trace",
+        "//exporters/mock:mock_span_exporter"
+    ],
 )
