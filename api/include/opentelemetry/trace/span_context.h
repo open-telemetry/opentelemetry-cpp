@@ -39,10 +39,6 @@ public:
 
   SpanContext &operator=(SpanContext &&ctx) {
     if (this != &ctx) {
-        delete trace_id_;
-        delete span_id_;
-        delete trace_flags_;
-        delete trace_state_;
         trace_id_ = ctx.trace_id();
         span_id_ = ctx.span_id();
         trace_flags_ = ctx.trace_flags();
