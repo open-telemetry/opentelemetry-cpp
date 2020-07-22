@@ -118,3 +118,22 @@ TEST(ContextTest, ContextHasKey)
   EXPECT_TRUE(context_test.HasKey("test_key"));
   EXPECT_FALSE(context_test.HasKey("foo_key"));
 }
+
+// Tests that a copied context returns true when compared
+TEST(ContextTest, ContextCopyCompare)
+{
+  std::map<std::string, context::ContextValue> map_test = {{"test_key", (int64_t)123}};
+  context::Context context_test                         = context::Context(map_test);
+  context::Context copied_test                          = context_test;
+  EXPECT_TRUE(context_test == copied_test);
+}
+
+// Tests that two differently constructed contexts return false when compared
+TEST(ContextTest, ContextDiffCompare)
+{
+  std::map<std::string, context::ContextValue> map_test = {{"test_key", (int64_t)123}};
+  std::map<std::string, context::ContextValue> map_foo  = {{"foo_key", (int64_t)123}};
+  context::Context context_test                         = context::Context(map_test);
+  context::Context foo_test                             = context::Context(map_foo);
+  EXPECT_FALSE(context_test == foo_test);
+}
