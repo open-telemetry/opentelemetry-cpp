@@ -76,6 +76,8 @@ class DefaultSpan: Span {
        this.span_context_ = spanContext;
     }
 
+    ~DefaultSpan() = default;
+
     Tracer &tracer() {
        return NULL; // Invalid tracer
     }
