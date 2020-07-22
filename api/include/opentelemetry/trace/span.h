@@ -69,10 +69,10 @@ public:
   virtual ~Span() = default;
 
   // Not copiable or movable.
-  Span(const Span &) = default;
-  Span(Span &&)      = default;
-  Span &operator=(const Span &) = default;
-  Span &operator=(Span &&) = default;
+  Span(const Span &) = delete;
+  Span(Span &&)      = delete;
+  Span &operator=(const Span &) = delete;
+  Span &operator=(Span &&) = delete;
 
   // Sets an attribute on the Span. If the Span previously contained a mapping for
   // the key, the old value is replaced.
