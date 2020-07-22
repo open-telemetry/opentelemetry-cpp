@@ -15,22 +15,6 @@ class DefaultSpan: Span {
         return kInvalid;
     }
 
-    // Creates an instance of this class with spancontext.
-    static DefaultSpan Create(SpanContext span_context) {
-      return DefaultSpan(span_context);
-    }
-
-    static DefaultSpan CreateRandom() {
-      return DefaultSpan(
-        SpanContext.Create(
-          TraceId.generateRandomId(),
-          SpanId.generateRandomId(),
-          TraceFlags.getDefault(),
-          TraceState.getDefault()
-        )
-      );
-    }
-
     SpanContext GetContext() const noexcept {
         return span_context_;
     }
@@ -78,6 +62,22 @@ class DefaultSpan: Span {
 
     Tracer &tracer() const noexcept {
        return NULL; // Invalid tracer
+    }
+
+    // Creates an instance of this class with spancontext.
+    static DefaultSpan Create(SpanContext span_context) {
+      return DefaultSpan(span_context);
+    }
+
+    static DefaultSpan CreateRandom() {
+      return DefaultSpan(
+        SpanContext.Create(
+          TraceId.generateRandomId(),
+          SpanId.generateRandomId(),
+          TraceFlags.getDefault(),
+          TraceState.getDefault()
+        )
+      );
     }
 
   private:
