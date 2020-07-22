@@ -15,7 +15,7 @@ class DefaultSpan: public Span {
         return kInvalid;
     }
 
-    SpanContext GetContext() const noexcept {
+    trace::SpanContext GetContext() const noexcept {
         return span_context_;
     }
 
