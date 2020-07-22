@@ -71,17 +71,17 @@ class DefaultSpan: Span {
 
     static DefaultSpan CreateRandom() {
       return DefaultSpan(
-        SpanContext.Create(
-          TraceId.generateRandomId(),
-          SpanId.generateRandomId(),
-          TraceFlags.getDefault(),
-          TraceState.getDefault()
-        )
+//        SpanContext::Create(
+//          TraceId::generateRandomId(),
+//          SpanId::generateRandomId(),
+//          TraceFlags::getDefault(),
+//          TraceState::getDefault()
+//        )
       );
     }
 
   private:
-    static const DefaultSpan kInvalid;
+    static const DefaultSpan kInvalid = DefaultSpan(SpanContext::GetInvalid());
     SpanContext span_context_;
 };
 }
