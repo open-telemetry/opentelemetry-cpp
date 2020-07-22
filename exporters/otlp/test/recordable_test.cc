@@ -86,7 +86,7 @@ TEST(Recordable, AddEvents)
   std::chrono::system_clock::time_point event_time = std::chrono::system_clock::now();
   core::SystemTimestamp event_timestamp(event_time);
 
-  rec.AddEvent(name, event_timestamp);
+  rec.sdk::trace::Recordable::AddEvent(name, event_timestamp);
 
   uint64_t unix_event_time =
       std::chrono::duration_cast<std::chrono::nanoseconds>(event_time.time_since_epoch()).count();

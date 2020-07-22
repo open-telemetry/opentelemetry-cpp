@@ -53,21 +53,46 @@ public:
    * @param timestamp the timestamp of the event
    * @param attributes the attributes associated with the event
    */
-  virtual void AddEvent(
-      nostd::string_view name,
-      core::SystemTimestamp timestamp = core::SystemTimestamp(std::chrono::system_clock::now()),
-      const trace_api::KeyValueIterable &attributes =
-          trace_api::KeyValueIterableView<std::map<std::string, int>>({})) noexcept = 0;
+  virtual void AddEvent(nostd::string_view name,
+                        core::SystemTimestamp timestamp,
+                        const trace_api::KeyValueIterable &attributes) noexcept = 0;
+
+  /**
+   * Add an event to a span with default timestamp and attributes.
+   * @param name the name of the event
+   */
+  void AddEvent(nostd::string_view name)
+  {
+    AddEvent(name, core::SystemTimestamp(std::chrono::system_clock::now()),
+             trace_api::KeyValueIterableView<std::map<std::string, int>>({}));
+  }
+
+  /**
+   * Add an event to a span with default (empty) attributes.
+   * @param name the name of the event
+   * @param name the timestamp of the event
+   */
+  void AddEvent(nostd::string_view name, core::SystemTimestamp timestamp)
+  {
+    AddEvent(name, timestamp, trace_api::KeyValueIterableView<std::map<std::string, int>>({}));
+  }
 
   /**
    * Add a link to a span.
    * @param span_context the span context of the linked span
    * @param attributes the attributes associated with the link
    */
-  virtual void AddLink(
-      opentelemetry::trace::SpanContext span_context,
-      const trace_api::KeyValueIterable &attributes =
-          trace_api::KeyValueIterableView<std::map<std::string, int>>({})) noexcept = 0;
+  virtual void AddLink(opentelemetry::trace::SpanContext span_context,
+                       const trace_api::KeyValueIterable &attributes) noexcept = 0;
+
+  /**
+   * Add a link to a span with default (empty) attributes.
+   * @param span_context the span context of the linked span
+   */
+  void AddLink(opentelemetry::trace::SpanContext span_context)
+  {
+    AddLink(span_context, trace_api::KeyValueIterableView<std::map<std::string, int>>({}));
+  }
 
   /**
    * Set the status of the span.
