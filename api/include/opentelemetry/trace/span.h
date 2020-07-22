@@ -153,7 +153,7 @@ public:
   // AddEvent).
   virtual bool IsRecording() const noexcept = 0;
 
-  virtual trace::Tracer &tracer() const noexcept = 0;
+  virtual Tracer &tracer() const noexcept = 0;
 };
 
 class Tracer {
