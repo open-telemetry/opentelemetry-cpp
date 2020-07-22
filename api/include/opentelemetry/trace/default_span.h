@@ -57,17 +57,13 @@ class DefaultSpan: public Span {
       return "DefaultSpan";
     }
 
-//    DefaultSpan(SpanContext span_context) {
-//       this->span_context_ = span_context;
-//    }
-
-    DefaultSpan(SpanContext&& span_context) {
+    DefaultSpan(SpanContext span_context) {
        this->span_context_ = span_context;
     }
 
-//    Tracer &tracer() const noexcept {
-//       return Tracer(); // Invalid tracer
-//    }
+    trace::Tracer &tracer() const noexcept {
+       return trace::Tracer(); // Invalid tracer
+    }
 
     // Creates an instance of this class with spancontext.
     static DefaultSpan Create(SpanContext span_context) {

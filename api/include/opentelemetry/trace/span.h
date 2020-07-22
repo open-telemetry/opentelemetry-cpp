@@ -8,6 +8,7 @@
 #include "opentelemetry/nostd/string_view.h"
 #include "opentelemetry/trace/canonical_code.h"
 #include "opentelemetry/trace/key_value_iterable_view.h"
+#include "opentelemetry/trace/tracer.h"
 #include "opentelemetry/version.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
@@ -53,7 +54,7 @@ struct EndSpanOptions
   core::SteadyTimestamp end_steady_time;
 };
 
-class Tracer;
+//class Tracer;
 
 /**
  * A Span represents a single operation within a Trace.
@@ -152,7 +153,7 @@ public:
   // AddEvent).
   virtual bool IsRecording() const noexcept = 0;
 
-//  virtual Tracer &tracer() const noexcept = 0;
+  virtual trace::Tracer &tracer() const noexcept = 0;
 };
 }  // namespace trace
 OPENTELEMETRY_END_NAMESPACE
