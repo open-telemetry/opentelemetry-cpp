@@ -23,7 +23,8 @@ sdk::trace::ExportResult MockSpanExporter::Export(
 {
   for (auto &recordable : recordables)
   {
-    auto span = std::unique_ptr<sdk::trace::SpanData>(static_cast<sdk::trace::SpanData *>(recordable.release()));
+    auto span = std::unique_ptr<sdk::trace::SpanData>(
+        static_cast<sdk::trace::SpanData *>(recordable.release()));
     if (span != nullptr)
     {
       spans_received_->push_back(std::move(span));

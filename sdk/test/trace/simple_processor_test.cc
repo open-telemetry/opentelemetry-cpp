@@ -1,7 +1,7 @@
 #include "opentelemetry/sdk/trace/simple_processor.h"
+#include "opentelemetry/exporters/mock/mock_span_exporter.h"
 #include "opentelemetry/nostd/span.h"
 #include "opentelemetry/sdk/trace/span_data.h"
-#include "opentelemetry/exporters/mock/mock_span_exporter.h"
 
 #include <gtest/gtest.h>
 

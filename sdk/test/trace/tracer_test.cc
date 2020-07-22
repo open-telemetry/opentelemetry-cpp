@@ -1,22 +1,20 @@
 #include "opentelemetry/sdk/trace/tracer.h"
+#include "opentelemetry/exporters/mock/mock_span_exporter.h"
 #include "opentelemetry/sdk/trace/samplers/always_off.h"
 #include "opentelemetry/sdk/trace/samplers/always_on.h"
 #include "opentelemetry/sdk/trace/samplers/parent_or_else.h"
 #include "opentelemetry/sdk/trace/simple_processor.h"
 #include "opentelemetry/sdk/trace/span_data.h"
-#include "opentelemetry/exporters/mock/mock_span_exporter.h"
 
 #include <gtest/gtest.h>
 
 using namespace opentelemetry::sdk::trace;
 using opentelemetry::core::SteadyTimestamp;
 using opentelemetry::core::SystemTimestamp;
-namespace nostd   = opentelemetry::nostd;
-namespace common  = opentelemetry::common;
-namespace context = opentelemetry::context;
-namespace trace   = opentelemetry::trace;
-using opentelemetry::trace::SpanContext;
+namespace nostd  = opentelemetry::nostd;
+namespace common = opentelemetry::common;
 using opentelemetry::exporter::mock::MockSpanExporter;
+using opentelemetry::trace::SpanContext;
 
 /**
  * A mock sampler that returns non-empty sampling results attributes.
