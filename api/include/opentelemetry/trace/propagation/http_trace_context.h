@@ -179,10 +179,10 @@ class HttpTraceContext : public HTTPTextFormat
                 trace_flags = trace_parent.substr(start_pos,kHeaderElementLengths[elt_num]);
 
                 if (trace_id == "00000000000000000000000000000000" || span_id == "0000000000000000") {
-                    return trace.SetSpanInContext(trace::DefaultSpan.GetInvalid(), context);
+                    return SetSpanInContext(trace::DefaultSpan.GetInvalid(), context);
                 }
                 if (version == "ff") {
-                    return trace.SetSpanInContext(trace::DefaultSpan.GetInvalid(), context);
+                    return SetSpanInContext(trace::DefaultSpan.GetInvalid(), context);
                 }
 
                 TraceId trace_id_obj = TraceId(nostd::span(trace_id,trace_id.length()));
