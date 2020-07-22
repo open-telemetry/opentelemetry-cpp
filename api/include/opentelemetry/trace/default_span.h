@@ -81,7 +81,7 @@ class DefaultSpan: Span {
     }
 
   private:
-    const DefaultSpan kInvalid = DefaultSpan(SpanContext::GetInvalid());
+    static const DefaultSpan kInvalid;
     SpanContext span_context_;
 };
 }
