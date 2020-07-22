@@ -60,7 +60,9 @@ class DefaultSpan: public Span {
        this->span_context_ = span_context;
     }
 
+    // movable and copiable
     DefaultSpan(DefaultSpan&& spn) : span_context_(spn.GetContext()) {}
+    DefaultSpan(const DefaultSpan& spn) : span_context_(spn.GetContext()) {}
 
     trace::Tracer &tracer() const noexcept {
        return trace::Tracer(); // Invalid tracer
