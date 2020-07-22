@@ -51,7 +51,7 @@ public:
   // static SpanContext Create(TraceId traceId, SpanId spanId, TraceFlags traceFlags, TraceState
   // traceState); static SpanContext CreateFromRemoteParent(...);
 
-  TraceId &trace_id() const noexcept { return trace_id_; }
+  TraceId &trace_id() noexcept { return trace_id_; }
   const SpanId &span_id() const noexcept { return span_id_; }
   const TraceFlags &trace_flags() const noexcept { return trace_flags_; }
   const TraceState &trace_state() const noexcept { return *trace_state_; }
