@@ -92,8 +92,15 @@ private:
 
     /**
      * Exports all ended spans to the configured exporter.
+     * 
+     * @param buffer - The buffer with ended spans to export
+     * @param was_force_flush_called - A  flag to check if the current export is the result
+     *                                 of a call to ForceFlush method. If true, then we have to
+     *                                 notify the main thread to wake it up in the ForceFlush 
+     *                                 method.
      */
-    void Export();
+    void Export(std::unique_ptr<common::CircularBuffer<Recordable>>& buffer,
+                const bool was_for_flush_called);
 
     /**
      * Called when Shutdown() is invoked. Completely drains the queue of all its ended spans and passes them 
@@ -101,9 +108,18 @@ private:
      */
     void DrainQueue();
 
-    /* This acts as a marker and is added to the buffer for when the ForceFlush method is called. While 
-       consuming spans from the buffer, if this token is also processed, we notify the ForceFlush method.*/ 
-    std::unique_ptr<Recordable> FORCE_FLUSH_TOKEN = std::unique_ptr<Recordable>(nullptr);
+    /**
+     * Consumes and copies the appropriate amount of spans from the buffer_ 
+     * to a copy buffer which is then exported. This helps unblock all producers
+     * and increases the overall synchronization performance.
+     * 
+     * @param was_force_flush_called - A flag to check if the current export is the result
+     *                                 of a call to ForceFlush method. If true, we consume 
+     *                                 and copy the entire buffer_ to the copy buffer. Otherwise,
+     *                                 we calculate the appropriate size to export.
+     * @return A unique pointer to the copy buffer
+     */
+    std::unique_ptr<common::CircularBuffer<Recordable>> CopySpans(const bool was_force_flush_called);
 
     /* The configured backend exporter */
     std::unique_ptr<SpanExporter> exporter_;
@@ -124,7 +140,7 @@ private:
     std::unique_ptr<common::CircularBuffer<Recordable>> buffer_;
 
     /* Important boolean flags to handle the workflow of the processor */
-    bool is_shutdown_{false}, is_force_flush_{false};
+    bool is_shutdown_{false}, is_force_flush_{false}, is_force_flush_notified_{false};
 };   
 
 } // trace

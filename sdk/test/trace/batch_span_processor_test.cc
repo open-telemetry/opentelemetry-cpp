@@ -50,9 +50,7 @@ public:
 
 private:
     std::shared_ptr<std::vector<std::unique_ptr<sdk::trace::SpanData>>> spans_received_;
-
     std::shared_ptr<bool> is_shutdown_;
-
     // Meant exclusively to test force flush timeout
     const std::chrono::milliseconds export_delay_;
 };
@@ -126,15 +124,6 @@ TEST_F(BatchSpanProcessorTestPeer, TestShutdown)
         batch_processor->OnEnd(std::move(test_spans->at(i)));
     }
 
-    // Wait a bit to add spans to the buffer and for the background worker
-    // thread of the batch processor to wait on a condition variable.
-    // Helps in proper preemption of the worker thread.
-    // NOTE: If this delay is not added, it's possible for Shutdown() to notify the
-    //       worker thread even before it starts waiting, causing it to sleep for
-    //       the entire 'schedule_delay_millis' timeout
-    // TODO: Discuss this
-    std::this_thread::sleep_for(std::chrono::milliseconds(10));
-
     batch_processor->Shutdown();
 
     EXPECT_EQ(num_spans, spans_received->size());
@@ -153,17 +142,13 @@ TEST_F(BatchSpanProcessorTestPeer, TestForceFlush)
         new std::vector<std::unique_ptr<sdk::trace::SpanData>>);
 
     auto batch_processor = GetMockProcessor(spans_received, is_shutdown);
-    const int num_spans = 3;
+    const int num_spans = 2048;
 
     auto test_spans = GetTestSpans(batch_processor, num_spans);
 
     for(int i = 0; i < num_spans; ++i){
         batch_processor->OnEnd(std::move(test_spans->at(i)));
     }
-
-    // Wait a bit here too for the same reasons as mentioned in the previous test (TestShutdown)
-    // Helps in proper preemption of the worker thread
-    std::this_thread::sleep_for(std::chrono::milliseconds(10));
 
     // force flush
     batch_processor->ForceFlush(std::chrono::milliseconds(100));
@@ -180,28 +165,23 @@ TEST_F(BatchSpanProcessorTestPeer, TestForceFlush)
         batch_processor->OnEnd(std::move(more_test_spans->at(i)));
     }
 
-    std::this_thread::sleep_for(std::chrono::milliseconds(10));
     batch_processor->ForceFlush(std::chrono::milliseconds(100));
 
     EXPECT_EQ(num_spans*2, spans_received->size());
     for(int i = 0; i < num_spans; ++i)
     {
-        EXPECT_EQ("Span " + i%3, spans_received->at(i)->GetName());
+        EXPECT_EQ("Span " + i%num_spans, spans_received->at(i)->GetName());
     } 
-    // Wait a bit here so that the worker thread can go back to waiting on condition
-    // variable and the shutdown() method can subsequently wake the worker thread
-    // TODO: Discuss this
-    std::this_thread::sleep_for(std::chrono::milliseconds(10));
 }
 
-// TODO : Discuss and revise this function (maybe force_flush can return a bool)
+// TODO : Discuss and revise this test (maybe ForceFlush can return a bool)
 TEST_F(BatchSpanProcessorTestPeer, TestForceFlushTimeout)
 {
     std::shared_ptr<bool> is_shutdown(new bool(false));
     std::shared_ptr<std::vector<std::unique_ptr<sdk::trace::SpanData>>> spans_received(
         new std::vector<std::unique_ptr<sdk::trace::SpanData>>);
 
-    const std::chrono::milliseconds export_delay(300);
+    const std::chrono::milliseconds export_delay(400);
     const int num_spans = 3;
 
     auto batch_processor = GetMockProcessor(spans_received, is_shutdown, export_delay);
@@ -212,21 +192,10 @@ TEST_F(BatchSpanProcessorTestPeer, TestForceFlushTimeout)
         batch_processor->OnEnd(std::move(test_spans->at(i)));
     }
 
-    // Helps in proper preemption of the worker thread
-    // TODO: Discuss this
-    std::this_thread::sleep_for(std::chrono::milliseconds(10));
-
     // force flush
-    batch_processor->ForceFlush(std::chrono::milliseconds(100));
+    batch_processor->ForceFlush(std::chrono::milliseconds(300));
 
-    // NOTE: It is also possible that some but not all spans were exported
-    // TODO: Discuss this 
-    EXPECT_EQ(0, spans_received->size());
-
-    // Wait a bit here so that the worker thread can go back to waiting on condition
-    // variable and the shutdown() method can subsequently wake up the worker thread
-    // TODO: Discuss this
-    std::this_thread::sleep_for(std::chrono::milliseconds(200));
+    // TODO: Discuss what to expect here. I am not so sure on this.
 }
 
 TEST_F(BatchSpanProcessorTestPeer, TestManySpansLoss)
@@ -247,20 +216,11 @@ TEST_F(BatchSpanProcessorTestPeer, TestManySpansLoss)
         batch_processor->OnEnd(std::move(test_spans->at(i)));
     }
 
-    // Helps in proper preemption of the worker thread
-    // TODO: Discuss this
-    std::this_thread::sleep_for(std::chrono::milliseconds(10));
-
     // force flush
     batch_processor->ForceFlush(std::chrono::milliseconds(100));
 
 
     EXPECT_GE(max_queue_size, spans_received->size());
-
-    // Wait a bit here so that the worker thread can go back to waiting on condition
-    // variable and the shutdown() method can subsequently wake up the worker thread
-    // TODO: Discuss this
-    std::this_thread::sleep_for(std::chrono::milliseconds(10));
 }
 
 TEST_F(BatchSpanProcessorTestPeer, TestManySpansLossLess)
@@ -281,10 +241,6 @@ TEST_F(BatchSpanProcessorTestPeer, TestManySpansLossLess)
         batch_processor->OnEnd(std::move(test_spans->at(i)));
     }
 
-    // Helps in proper preemption of the worker thread
-    // TODO: Discuss this
-    std::this_thread::sleep_for(std::chrono::milliseconds(10));
-
     // force flush
     batch_processor->ForceFlush(std::chrono::milliseconds(100));
 
@@ -294,11 +250,6 @@ TEST_F(BatchSpanProcessorTestPeer, TestManySpansLossLess)
     {
         EXPECT_EQ("Span " + i, spans_received->at(i)->GetName());
     }
-
-    // Wait a bit here so that the worker thread can go back to waiting on condition
-    // variable and the shutdown() method can subsequently wake up the worker thread
-    // TODO: Discuss this
-    std::this_thread::sleep_for(std::chrono::milliseconds(10));
 }
 
 TEST_F(BatchSpanProcessorTestPeer, TestScheduleDelayMillis)
@@ -334,11 +285,6 @@ TEST_F(BatchSpanProcessorTestPeer, TestScheduleDelayMillis)
     {
         EXPECT_EQ("Span " + i, spans_received->at(i)->GetName());
     }
-
-    // Wait a bit here so that the worker thread can go back to waiting on condition
-    // variable and the shutdown() method can subsequently wake up the worker thread
-    // TODO: Discuss this
-    std::this_thread::sleep_for(std::chrono::milliseconds(10));
 }
 
 OPENTELEMETRY_END_NAMESPACE
