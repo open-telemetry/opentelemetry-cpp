@@ -110,7 +110,7 @@ class HttpTraceContext : public HTTPTextFormat<T> {
             return res;
         }
 
-        static nostd::string trace::SpanContextToString(trace::SpanContext &span_context) {
+        static nostd::string_view trace::SpanContextToString(trace::SpanContext &span_context) {
             nostd::span<char> trace_id = span_context.trace_id();
             nostd::span<char> span_id = span_context.span_id();
             nostd::span<char> trace_flags = span_context.trace_flags();
