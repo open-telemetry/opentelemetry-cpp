@@ -195,19 +195,19 @@ class HttpTraceContext : public HTTPTextFormat<T> {
             }
         }
 
-        static void SetTraceStateBuilder(TraceState.Builder &trace_state_builder, nostd::string_view &list_member) {
-            int index = -1;
-            for (int j = 0; j < list_member.length(); j++) {
-                if (list_member[j] == kTraceStateKeyValueDelimiter) {
-                    index = j;
-                    break;
-                }
-            }
-            if (index == -1) {
-                throw std::invalid_argument("Invalid TraceState list-member format.");
-            }
-            trace_state_builder.Set(list_member.substr(0, index), list_member.substr(index + 1));
-        }
+//        static void SetTraceStateBuilder(TraceState.Builder &trace_state_builder, nostd::string_view &list_member) {
+//            int index = -1;
+//            for (int j = 0; j < list_member.length(); j++) {
+//                if (list_member[j] == kTraceStateKeyValueDelimiter) {
+//                    index = j;
+//                    break;
+//                }
+//            }
+//            if (index == -1) {
+//                throw std::invalid_argument("Invalid TraceState list-member format.");
+//            }
+//            trace_state_builder.Set(list_member.substr(0, index), list_member.substr(index + 1));
+//        }
 
         static TraceState ExtractTraceState(nostd::string_view &trace_state_header) {
             TraceState.Builder trace_state_builder = TraceState.builder();
@@ -221,7 +221,7 @@ class HttpTraceContext : public HTTPTextFormat<T> {
                     if (start_pos == -1 && end_pos == -1) continue;
                     element_num++;
                     list_member = trace_state_header.substr(start_pos,end_pos-start_pos+1);
-                    SetTraceStateBuilder(trace_state_builder,list_member); // TODO: work around (std::map? return nullptr?)
+//                    SetTraceStateBuilder(trace_state_builder,list_member); // TODO: work around (std::map? return nullptr?)
                     end_pos = -1;
                     start_pos = -1;
                 } else {
@@ -231,7 +231,7 @@ class HttpTraceContext : public HTTPTextFormat<T> {
             }
             if (start_pos!=-1 && end_pos!=-1) {
                 list_member = trace_state_header.substr(start_pos,end_pos-start_pos+1);
-                SetTraceStateBuilder(trace_state_builder,list_member);
+//                SetTraceStateBuilder(trace_state_builder,list_member);
                 element_num++;
             }
 
