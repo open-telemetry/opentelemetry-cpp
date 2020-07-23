@@ -4,7 +4,7 @@
 #include "opentelemetry/trace/canonical_code.h"
 #include "opentelemetry/common/attribute_value.h"
 #include "opentelemetry/trace/span.h"
-#include "opentelemetry/trace/tracer.h"
+//#include "opentelemetry/trace/tracer.h"
 
 #define pass
 OPENTELEMETRY_BEGIN_NAMESPACE
@@ -65,9 +65,9 @@ class DefaultSpan: public Span {
     DefaultSpan(DefaultSpan&& spn) : span_context_(spn.GetContext()) {}
     DefaultSpan(const DefaultSpan& spn) : span_context_(spn.GetContext()) {}
 
-    trace::Tracer &tracer() const noexcept {
-       return trace::Tracer(); // Invalid tracer
-    }
+//    trace::Tracer &tracer() const noexcept {
+//       return trace::Tracer(); // Invalid tracer
+//    }
 
     // Creates an instance of this class with spancontext.
     static DefaultSpan Create(SpanContext span_context) {

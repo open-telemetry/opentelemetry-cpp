@@ -32,10 +32,10 @@ public:
    */
   virtual nostd::unique_ptr<Span> StartSpan(nostd::string_view name,
                                             const KeyValueIterable &attributes,
-                                            const trace::StartSpanOptions &options = {}) noexcept = 0;
+                                            const StartSpanOptions &options = {}) noexcept = 0;
 
   nostd::unique_ptr<Span> StartSpan(nostd::string_view name,
-                                    const trace::StartSpanOptions &options = {}) noexcept
+                                    const StartSpanOptions &options = {}) noexcept
   {
     return this->StartSpan(name, {}, options);
   }
@@ -43,7 +43,7 @@ public:
   template <class T, nostd::enable_if_t<detail::is_key_value_iterable<T>::value> * = nullptr>
   nostd::unique_ptr<Span> StartSpan(nostd::string_view name,
                                     const T &attributes,
-                                    const trace::StartSpanOptions &options = {}) noexcept
+                                    const StartSpanOptions &options = {}) noexcept
   {
     return this->StartSpan(name, KeyValueIterableView<T>(attributes), options);
   }
@@ -51,7 +51,7 @@ public:
   nostd::unique_ptr<Span> StartSpan(
       nostd::string_view name,
       std::initializer_list<std::pair<nostd::string_view, common::AttributeValue>> attributes,
-      const trace::StartSpanOptions &options = {}) noexcept
+      const StartSpanOptions &options = {}) noexcept
   {
     return this->StartSpan(name,
                            nostd::span<const std::pair<nostd::string_view, common::AttributeValue>>{
