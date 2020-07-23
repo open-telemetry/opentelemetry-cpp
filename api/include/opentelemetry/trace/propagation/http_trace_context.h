@@ -20,7 +20,7 @@
 #include "opentelemetry/context/context.h"
 #include "opentelemetry/nostd/string_view.h"
 //#include "opentelemetry/trace/span.h"
-#include "opentelemetry/trace/default_span.h"
+//#include "opentelemetry/trace/default_span.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace trace
