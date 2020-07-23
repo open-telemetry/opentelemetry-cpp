@@ -39,10 +39,11 @@ template <typename T>
 class HttpTraceContext : public HTTPTextFormat
 {
     public:
-        List<nostd::string_view> Fields() {
-            static const auto* kFields = new std::vector<nostd::string_view>({kTraceParent, kTraceState});
-            return kFields;
-        }
+        // Rules that manages how context will be extracted from carrier.
+        using Getter = nostd::string_view(*)(T &carrier, nostd::string_view trace_type);
+
+        // Rules that manages how context will be injected to carrier.
+        using Setter = void(*)(T &carrier, nostd::string_view trace_type,nostd::string_view trace_description);
 
         void Inject(Setter setter, T &carrier, const context::Context &context) override {
             common::AttributeValue span = GetCurrentSpan(context);
