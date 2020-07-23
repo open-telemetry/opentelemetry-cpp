@@ -3,7 +3,7 @@
 #include <cstdint>
 #include "opentelemetry/context/context.h"
 #include "opentelemetry/nostd/string_view.h"
-#include "opentelemetry/trace/span.h"
+//#include "opentelemetry/trace/span.h"
 #include "opentelemetry/version.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
@@ -32,10 +32,10 @@ class HTTPTextFormat {
         // Sets the context for a HTTP header carrier with self defined rules.
         virtual void Inject(Setter set_from_carrier, T &carrier, const context::Context &context) = 0;
 
-        // Set the span in the given context.
-        virtual context::Context SetSpanInContext(trace::Span* span, context::Context &context) = 0;
-        // Retrieve the current span.
-        virtual trace::Span* GetCurrentSpan(context::Context &context) = 0;
+//        // Set the span in the given context.
+//        virtual context::Context SetSpanInContext(trace::Span* span, context::Context &context) = 0;
+//        // Retrieve the current span.
+//        virtual trace::Span* GetCurrentSpan(context::Context &context) = 0;
 };
 }
 }

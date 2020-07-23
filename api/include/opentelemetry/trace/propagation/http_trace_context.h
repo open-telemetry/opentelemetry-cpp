@@ -19,7 +19,7 @@
 #include "opentelemetry/trace/key_value_iterable.h"
 #include "opentelemetry/context/context.h"
 #include "opentelemetry/nostd/string_view.h"
-#include "opentelemetry/trace/span.h"
+//#include "opentelemetry/trace/span.h"
 #include "opentelemetry/trace/default_span.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
@@ -56,20 +56,20 @@ class HttpTraceContext : public HTTPTextFormat<T> {
             return SetSpanInContext(trace.DefaultSpan(span_context), context);
         }
 
-        context::Context SetSpanInContext(trace::Span &span, context::Context &context) {
-            nostd::string_view span_key = "current-span";
-            context::Context new_values = context::Context(context);
-            new_values.SetValue(span_key,span);
-            return new_values;
-        }
-
-        trace::Span GetCurrentSpan(Context &context) {
-            trace::Span span = context.GetValue(Context.kSpanKey);
-//            if (span == NULL) {
-//                return NULL;
-//            }
-            return span;
-        }
+//        context::Context SetSpanInContext(trace::Span &span, context::Context &context) {
+//            nostd::string_view span_key = "current-span";
+//            context::Context new_values = context::Context(context);
+//            new_values.SetValue(span_key,span);
+//            return new_values;
+//        }
+//
+//        trace::Span GetCurrentSpan(Context &context) {
+//            trace::Span span = context.GetValue(Context.kSpanKey);
+////            if (span == NULL) {
+////                return NULL;
+////            }
+//            return span;
+//        }
 
     private:
         inline static const nostd::string_view kTraceParent = "traceparent";
