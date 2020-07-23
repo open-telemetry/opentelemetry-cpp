@@ -34,19 +34,19 @@ class SpanContext final
 public:
   // An invalid SpanContext.
   SpanContext() noexcept : trace_state_(new TraceState) {}
-  SpanContext(SpanContext&& ctx) : trace_id_(ctx.trace_id()), span_id_(ctx.span_id()), trace_flags_(ctx.trace_flags()), trace_state_(new TraceState()) {}
+  SpanContext(SpanContext&& ctx) : trace_id_(ctx.trace_id()), span_id_(ctx.span_id()), trace_flags_(ctx.trace_flags()), trace_state_(std::move(ctx.trace_state_)) {}
   SpanContext(const SpanContext& ctx) : trace_id_(ctx.trace_id()), span_id_(ctx.span_id()), trace_flags_(ctx.trace_flags()), trace_state_(new TraceState()) {}
 
   SpanContext &operator=(const SpanContext &ctx) {
-    trace_id_ = ctx.trace_id();
-    span_id_ = ctx.span_id();
-    trace_flags_ = ctx.trace_flags();
+    trace_id_ = ctx.trace_id_;
+    span_id_ = ctx.span_id_;
+    trace_flags_ = ctx.trace_flags_;
     trace_state_ = new TraceState();
   };
   SpanContext &operator=(SpanContext &&ctx) {
-    trace_id_ = ctx.trace_id();
-    span_id_ = ctx.span_id();
-    trace_flags_ = ctx.trace_flags();
+    trace_id_ = ctx.trace_id_;
+    span_id_ = ctx.span_id_;
+    trace_flags_ = ctx.trace_flags_;
     trace_state_ = new TraceState();
   };
   // TODO
@@ -66,11 +66,11 @@ public:
   static SpanContext GetInvalid() { return SpanContext(); }
 
 private:
-  const TraceId trace_id_;
-  const SpanId span_id_;
-  const TraceFlags trace_flags_;
-  const nostd::unique_ptr<TraceState> trace_state_;  // Never nullptr.
-  const bool remote_parent_ = false;
+  TraceId trace_id_;
+  SpanId span_id_;
+  TraceFlags trace_flags_;
+  nostd::unique_ptr<TraceState> trace_state_;  // Never nullptr.
+  bool remote_parent_ = false;
 };
 
 }  // namespace trace
