@@ -36,8 +36,7 @@ namespace
 //    HttpTraceContext.inject(setter,&carrier,&context);
 //    HttpTraceContext.extract(getter,&carrier,&context);
 template <typename T>
-class HttpTraceContext : public trace::propagation::HTTPTextFormat
-{
+class HttpTraceContext : public trace::propagation::HTTPTextFormat {
     public:
         // Rules that manages how context will be extracted from carrier.
         using Getter = nostd::string_view(*)(T &carrier, nostd::string_view trace_type);
