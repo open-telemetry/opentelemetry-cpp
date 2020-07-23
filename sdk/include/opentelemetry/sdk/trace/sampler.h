@@ -77,7 +77,7 @@ public:
    *
    * @return the description of this Sampler.
    */
-  virtual std::string GetDescription() const noexcept = 0;
+  virtual nostd::string_view GetDescription() const noexcept = 0;
 };
 }  // namespace trace
 }  // namespace sdk

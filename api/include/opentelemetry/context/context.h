@@ -118,7 +118,7 @@ private:
       {
         if (first)
         {
-          *node = std::move(DataList(iter.first, iter.second));
+          *node = DataList(iter.first, iter.second);
           first = false;
         }
         else
