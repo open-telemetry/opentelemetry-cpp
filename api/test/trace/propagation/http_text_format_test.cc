@@ -21,7 +21,7 @@ static nostd::string_view Getter(std::map<nostd::string_view,nostd::string_view>
 }
 
 static void Setter(std::map<nostd::string_view,nostd::string_view> &carrier, nostd::string_view trace_type = "traceparent", nostd::string trace_description = "") {
-    carrier[trace_type] = str;
+    carrier[trace_type] = trace_description;
 }
 
 static trace::propagation::HttpTraceContext<std::map<nostd::string_view,nostd:string_view> format = trace::propagation::HttpTraceContext();
