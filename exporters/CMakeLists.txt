@@ -2,6 +2,7 @@ if(WITH_OTPROTOCOL)
   add_subdirectory(otlp)
 endif()
 
+add_subdirectory(mock)
 add_subdirectory(ostream)
 
 if(WITH_PROMETHEUS)
