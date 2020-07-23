@@ -15,27 +15,27 @@
 
 using namespace opentelemetry;
 
-static nostd::string_view Getter(const std::map<nostd::string_view,nostd::string_view> &carrier, nostd::string_view trace_type = "traceparent") {
-    std::map<nostd::string_view,nostd::string_view> c = carrier;
+static nostd::string_view Getter(const std::map<nostd::string_view,std::string> &carrier, nostd::string_view trace_type = "traceparent") {
+    std::map<nostd::string_view,std::string> c = carrier;
     nostd::string_view res = c[trace_type];
     return res;
 }
 
-static void Setter(std::map<nostd::string_view,nostd::string_view> &carrier, nostd::string_view trace_type = "traceparent", nostd::string_view trace_description = "") {
+static void Setter(std::map<nostd::string_view,std::string> &carrier, nostd::string_view trace_type = "traceparent", std::string trace_description = "") {
     carrier[trace_type] = trace_description;
 }
 
-static trace::propagation::HttpTraceContext<std::map<nostd::string_view,nostd::string_view>> format = trace::propagation::HttpTraceContext<std::map<nostd::string_view,nostd::string_view>>();
+static trace::propagation::HttpTraceContext<std::map<nostd::string_view,std::string>> format = trace::propagation::HttpTraceContext<std::map<nostd::string_view,std::string>>();
 
 static nostd::string_view trace_id = "12345678901234567890123456789012";
 static nostd::string_view span_id = "1234567890123456";
 
 TEST(HTTPTextFormatTest, NoSpanTest)
 {
-    const std::map<nostd::string_view,nostd::string_view> carrier = {};
+    const std::map<nostd::string_view,std::string> carrier = {};
     context::Context ctx1 = context::Context();
     context::Context ctx2 = format.Extract(Getter,carrier,ctx1);
-    std::map<nostd::string_view,nostd::string_view> c2 = {};
+    std::map<nostd::string_view,std::string> c2 = {};
     format.Inject(Setter,c2,ctx2);
     EXPECT_EQ(carrier.size(),c2.size());
 }
