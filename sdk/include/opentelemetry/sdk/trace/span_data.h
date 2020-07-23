@@ -85,6 +85,33 @@ struct AttributeConverter
 };
 
 /**
+ * Class for storing events in SpanData.
+ */
+class SpanDataEvent
+{
+public:
+  SpanDataEvent(std::string name, core::SystemTimestamp timestamp)
+      : name_(name), timestamp_(timestamp)
+  {}
+
+  /**
+   * Get the name for this event
+   * @return the name for this event
+   */
+  std::string GetName() const noexcept { return name_; }
+
+  /**
+   * Get the timestamp for this event
+   * @return the timestamp for this event
+   */
+  core::SystemTimestamp GetTimestamp() const noexcept { return timestamp_; }
+
+private:
+  std::string name_;
+  core::SystemTimestamp timestamp_;
+};
+
+/**
  * SpanData is a representation of all data collected by a span.
  */
 class SpanData final : public Recordable
@@ -147,6 +174,12 @@ public:
     return attributes_;
   }
 
+  /**
+   * Get the events associated with this span
+   * @return the events associated with this span
+   */
+  const std::vector<SpanDataEvent> &GetEvents() const noexcept { return events_; }
+
   void SetIds(opentelemetry::trace::TraceId trace_id,
               opentelemetry::trace::SpanId span_id,
               opentelemetry::trace::SpanId parent_span_id) noexcept override
@@ -161,10 +194,23 @@ public:
     attributes_[std::string(key)] = nostd::visit(converter_, value);
   }
 
-  void AddEvent(nostd::string_view name, core::SystemTimestamp timestamp) noexcept override
+  void AddEvent(
+      nostd::string_view name,
+      core::SystemTimestamp timestamp = core::SystemTimestamp(std::chrono::system_clock::now()),
+      const trace_api::KeyValueIterable &attributes =
+          trace_api::KeyValueIterableView<std::map<std::string, int>>({})) noexcept override
   {
-    (void)name;
-    (void)timestamp;
+    events_.push_back(SpanDataEvent(std::string(name), timestamp));
+    // TODO: handle attributes
+  }
+
+  void AddLink(
+      opentelemetry::trace::SpanContext span_context,
+      const trace_api::KeyValueIterable &attributes =
+          trace_api::KeyValueIterableView<std::map<std::string, int>>({})) noexcept override
+  {
+    (void)span_context;
+    (void)attributes;
   }
 
   void SetStatus(trace_api::CanonicalCode code, nostd::string_view description) noexcept override
@@ -192,6 +238,7 @@ private:
   opentelemetry::trace::CanonicalCode status_code_{opentelemetry::trace::CanonicalCode::OK};
   std::string status_desc_;
   std::unordered_map<std::string, SpanDataAttributeValue> attributes_;
+  std::vector<SpanDataEvent> events_;
   AttributeConverter converter_;
 };
 }  // namespace trace

@@ -15,14 +15,12 @@
 package(default_visibility = ["//visibility:public"])
 
 cc_library(
-    name = "zpages",
+    name = "metrics",
     srcs = glob(["**/*.cc"]),
     hdrs = glob(["**/*.h"]),
-    include_prefix = "ext/zpages",
+    include_prefix = "src/metrics",
     deps = [
         "//api",
         "//sdk:headers",
-        "//ext:headers",
-        "@github_nlohmann_json//:json",
     ],
 )

@@ -39,10 +39,10 @@ public:
   /**
    * @return Description MUST be ProbabilitySampler{0.000100}
    */
-  std::string GetDescription() const noexcept override;
+  nostd::string_view GetDescription() const noexcept override;
 
 private:
-  std::string sampler_description_;
+  std::string description_;
   const uint64_t threshold_;
 };
 }  // namespace trace

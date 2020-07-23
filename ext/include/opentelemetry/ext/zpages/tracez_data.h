@@ -23,27 +23,6 @@ OPENTELEMETRY_BEGIN_NAMESPACE
 namespace ext {
 namespace zpages {
 
-/** Convinient data structure for converting status code enum to string **/
-const std::array<std::string,17> kStatusCodeToString = {
-  "OK",
-  "CANCELLED",
-  "UNKNOWN",
-  "INVALID_ARGUMENT",
-  "DEADLINE_EXCEEDED",
-  "NOT_FOUND",
-  "ALREADY_EXISTS",
-  "PERMISSION_DENIED",
-  "RESOURCE_EXHAUSTED",
-  "FAILED_PRECONDITION",
-  "ABORTED",
-  "OUT_OF_RANGE",
-  "UNIMPLEMENTED",
-  "INTERNAL",
-  "UNAVAILABLE",
-  "DATA_LOSS",
-  "UNAUTHENTICATED",
-};
-
 /**
  * kMaxNumberOfSampleSpans is the maximum number of running, completed or error
  * sample spans stored at any given time for a given span name.
@@ -70,10 +49,10 @@ struct SampleSpanData {
   std::string trace_id;
   std::string parent_id;
   std::string description;
-  long int duration;
-  long int start_time;
-  std::string status_code;
-  SampleSpanData(ThreadsafeSpanData &span_data) {
+  unsigned long long int duration;
+  unsigned long long int start_time;
+  unsigned short status_code;
+  SampleSpanData(SpanData span_data) {
     span_name = span_data.GetName().data();
     span_id = std::string(
         reinterpret_cast<const char *>(span_data.GetSpanId().Id().data()));
@@ -84,7 +63,7 @@ struct SampleSpanData {
     description = span_data.GetDescription().data();
     duration = span_data.GetDuration().count();
     start_time = span_data.GetStartTime().time_since_epoch().count();
-    status_code = kStatusCodeToString[(int)span_data.GetStatus()];
+    status_code = (unsigned short)span_data.GetStatus();
   }
 };
 
