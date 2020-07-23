@@ -27,7 +27,18 @@ namespace trace
 {
 namespace propagation
 {
-
+static const nostd::string_view kTraceParent = "traceparent";
+static const nostd::string_view kTraceState = "tracestate";
+// Parameters no longer needed because the toString functions are resolved else where
+//        static const int kVersionBytes = 2;
+//        static const int kTraceIdBytes = 32;
+//        static const int kParentIdBytes = 16;
+//        static const int kTraceFlagBytes = 2;
+//        static const int kTraceDelimiterBytes = 3;
+//        static const int kHeaderSize = kVersionBytes + kTraceIdBytes + kParentIdBytes + kTraceFlagBytes + kTraceDelimiterBytes;
+static const int kTraceStateMaxMembers = 32;
+static const nostd::string_view kTraceStateKeyValueDelimiter = "=";
+static const int kHeaderElementLengths[4] = {2,32,16,2};
 // The HttpTraceContext provides methods to extract and inject
 // context into headers of HTTP requests with traces.
 // Example:
@@ -72,18 +83,6 @@ class HttpTraceContext : public HTTPTextFormat<T> {
 //        }
 
     private:
-        static const nostd::string_view kTraceParent = "traceparent";
-        static const nostd::string_view kTraceState = "tracestate";
-// Parameters no longer needed because the toString functions are resolved else where
-//        static const int kVersionBytes = 2;
-//        static const int kTraceIdBytes = 32;
-//        static const int kParentIdBytes = 16;
-//        static const int kTraceFlagBytes = 2;
-//        static const int kTraceDelimiterBytes = 3;
-//        static const int kHeaderSize = kVersionBytes + kTraceIdBytes + kParentIdBytes + kTraceFlagBytes + kTraceDelimiterBytes;
-        static const int kTraceStateMaxMembers = 32;
-        static const nostd::string_view kTraceStateKeyValueDelimiter = "=";
-        static const int kHeaderElementLengths[4] = {2,32,16,2};
 
         // TODO: need review on hex_string because trace ids are objects not string_views
         static void InjectImpl(Setter setter, T &carrier, const trace::SpanContext &span_context) {
