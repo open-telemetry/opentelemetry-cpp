@@ -22,6 +22,7 @@ TEST(SpanData, DefaultValues)
   ASSERT_EQ(data.GetStartTime().time_since_epoch(), std::chrono::nanoseconds(0));
   ASSERT_EQ(data.GetDuration(), std::chrono::nanoseconds(0));
   ASSERT_EQ(data.GetAttributes().size(), 0);
+  ASSERT_EQ(data.GetEvents().size(), 0);
 }
 
 TEST(SpanData, Set)
@@ -49,4 +50,6 @@ TEST(SpanData, Set)
   ASSERT_EQ(data.GetStartTime().time_since_epoch(), now.time_since_epoch());
   ASSERT_EQ(data.GetDuration(), std::chrono::nanoseconds(1000000));
   ASSERT_EQ(opentelemetry::nostd::get<int64_t>(data.GetAttributes().at("attr1")), 314159);
+  ASSERT_EQ(data.GetEvents().at(0).GetName(), "event1");
+  ASSERT_EQ(data.GetEvents().at(0).GetTimestamp(), now);
 }
