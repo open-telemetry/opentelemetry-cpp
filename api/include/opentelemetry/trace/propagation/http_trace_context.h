@@ -243,7 +243,7 @@ class HttpTraceContext : public HTTPTextFormat<T> {
 //            return trace_state_builder.Build();
         }
 
-        static trace::SpanContext ExtractImpl(Getter getter, T &carrier) {
+        static trace::SpanContext ExtractImpl(Getter getter, const T &carrier) {
             nostd::string_view trace_parent = getter(carrier, kTraceParent);
             if (trace_parent == NULL) {
                 return trace::SpanContext();
