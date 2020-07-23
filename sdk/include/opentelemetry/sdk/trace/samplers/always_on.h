@@ -30,7 +30,7 @@ public:
   /**
    * @return Description MUST be AlwaysOnSampler
    */
-  inline std::string GetDescription() const noexcept override { return "AlwaysOnSampler"; }
+  inline nostd::string_view GetDescription() const noexcept override { return "AlwaysOnSampler"; }
 };
 }  // namespace trace
 }  // namespace sdk
