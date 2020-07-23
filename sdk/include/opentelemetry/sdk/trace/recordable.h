@@ -2,6 +2,7 @@
 
 #include "opentelemetry/common/attribute_value.h"
 #include "opentelemetry/core/timestamp.h"
+#include "opentelemetry/nostd/shared_ptr.h"
 #include "opentelemetry/nostd/string_view.h"
 #include "opentelemetry/trace/canonical_code.h"
 #include "opentelemetry/trace/key_value_iterable.h"
@@ -64,7 +65,7 @@ public:
   void AddEvent(nostd::string_view name)
   {
     AddEvent(name, core::SystemTimestamp(std::chrono::system_clock::now()),
-             trace_api::KeyValueIterableView<std::map<std::string, int>>({}));
+             *GetDefaultAttributes());
   }
 
   /**
@@ -74,7 +75,7 @@ public:
    */
   void AddEvent(nostd::string_view name, core::SystemTimestamp timestamp)
   {
-    AddEvent(name, timestamp, trace_api::KeyValueIterableView<std::map<std::string, int>>({}));
+    AddEvent(name, timestamp, *GetDefaultAttributes());
   }
 
   /**
@@ -91,7 +92,7 @@ public:
    */
   void AddLink(opentelemetry::trace::SpanContext span_context)
   {
-    AddLink(span_context, trace_api::KeyValueIterableView<std::map<std::string, int>>({}));
+    AddLink(span_context, *GetDefaultAttributes());
   }
 
   /**
@@ -119,6 +120,19 @@ public:
    * @param duration the duration to set
    */
   virtual void SetDuration(std::chrono::nanoseconds duration) noexcept = 0;
+
+private:
+  /**
+   * Maintain a static empty map that represents default attributes.
+   * Avoid constructing a new empty map everytime a call is made with default attributes.
+   */
+  static const nostd::shared_ptr<trace_api::KeyValueIterableView<std::map<std::string, int>>>
+      &GetDefaultAttributes() noexcept
+  {
+    static const nostd::shared_ptr<trace_api::KeyValueIterableView<std::map<std::string, int>>>
+        kDefaultAttributes({});
+    return kDefaultAttributes;
+  }
 };
 }  // namespace trace
 }  // namespace sdk
