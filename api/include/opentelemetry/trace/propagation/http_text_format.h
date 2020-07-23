@@ -21,7 +21,7 @@ template <typename T>
 class HTTPTextFormat {
     public:
         // Rules that manages how context will be extracted from carrier.
-        using Getter = nostd::string_view(*)(T &carrier, nostd::string_view trace_type);
+        using Getter = nostd::string_view(*)(const T &carrier, nostd::string_view trace_type);
 
         // Rules that manages how context will be injected to carrier.
         using Setter = void(*)(T &carrier, nostd::string_view trace_type,nostd::string_view trace_description);
