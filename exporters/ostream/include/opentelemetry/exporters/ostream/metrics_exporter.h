@@ -2,6 +2,7 @@
  
 #include "opentelemetry/sdk/metrics/record.h"
 #include "opentelemetry/sdk/metrics/exporter.h"
+#include "opentelemetry/sdk/metrics/aggregator/gauge_aggregator.h"
 #include <iostream>
 
 OPENTELEMETRY_BEGIN_NAMESPACE
@@ -34,7 +35,7 @@ std::ostream &sout_;
 
 
 template <typename T>
-void PrintVector(sdkmetrics::AggregatorVariant value)
+void PrintAggregatorVariant(sdkmetrics::AggregatorVariant value)
 {
   auto agg = nostd::get<std::shared_ptr<sdkmetrics::Aggregator<T>>>(value);
   auto aggKind = agg->get_aggregator_kind();
@@ -51,28 +52,20 @@ void PrintVector(sdkmetrics::AggregatorVariant value)
           << "\n  sum         : " << mmsc[2]
           << "\n  count       : " << mmsc[3];
   }
-}
+  else if(aggKind == sdkmetrics::AggregatorKind::Gauge)
+  {
+    // Since Aggregator doesn't have GaugeAggregator specific functions, we need to cast to GaugeAggregator
+    std::shared_ptr<opentelemetry::sdk::metrics::GaugeAggregator<T>> temp_gauge;
+    temp_gauge = std::dynamic_pointer_cast<opentelemetry::sdk::metrics::GaugeAggregator<T>>(agg);
+    auto timestamp = temp_gauge->get_checkpoint_timestamp();
 
+    sout_ << "\n  last value  : " << temp_gauge->get_checkpoint()[0]
+          << "\n  timestamp   : " << std::to_string(timestamp.time_since_epoch().count());
+  }
+  else if(aggKind == sdkmetrics::AggregatorKind::Exact)
+  {
 
-void GetAggType(sdkmetrics::AggregatorVariant value)
-{
-  if(nostd::holds_alternative<std::shared_ptr<sdkmetrics::Aggregator<int>>>(value))
-  {
-    PrintVector<int>(value);
   }
-  else if(nostd::holds_alternative<std::shared_ptr<sdkmetrics::Aggregator<short>>>(value))
-  {
-    PrintVector<short>(value);
-  }
-  else if(nostd::holds_alternative<std::shared_ptr<sdkmetrics::Aggregator<double>>>(value))
-  {
-    PrintVector<double>(value);
-  }
-  else if(nostd::holds_alternative<std::shared_ptr<sdkmetrics::Aggregator<float>>>(value))
-  {
-    PrintVector<float>(value);
-  }
-
 }
 
 };
