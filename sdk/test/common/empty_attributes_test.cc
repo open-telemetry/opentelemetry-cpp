@@ -4,5 +4,5 @@
 
 TEST(EmptyAttributesTest, EmptyTest)
 {
-  EXPECT_EQ((opentelemetry::sdk::GetEmptyAttributes()).size(), 0);
+  EXPECT_EQ(opentelemetry::sdk::GetEmptyAttributes().size(), 0);
 }
