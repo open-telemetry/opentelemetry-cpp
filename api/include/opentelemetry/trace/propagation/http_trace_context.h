@@ -274,7 +274,7 @@ class HttpTraceContext : public trace::propagation::HTTPTextFormat {
                     TraceState.Builder().Build());
             }
         }
-}
+};
 }
 }
 }  // namespace trace
