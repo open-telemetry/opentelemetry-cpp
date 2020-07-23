@@ -32,7 +32,7 @@ static nostd::string_view span_id = "1234567890123456";
 TEST(HTTPTextFormatTest, NoSpanTest)
 {
     std::map<nostd::string_view,nostd::string_view> carrier = {};
-    context::Context ctx = format.Extract(Getter,carrier,context::Context());
+    context::Context ctx = format.Extract(Getter,carrier,const context::Context());
     std::map<nostd::string_view,nostd::string_view> c2 = {};
     format.Inject(Setter,c2,ctx);
     EXPECT_EQ(carrier.size(),c2.size());
