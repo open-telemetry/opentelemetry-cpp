@@ -1,3 +1,5 @@
+load("//bazel:otel_cc_benchmark.bzl", "otel_cc_benchmark")
+
 cc_test(
     name = "tracer_provider_test",
     srcs = [
@@ -81,8 +83,14 @@ cc_test(
         "probability_sampler_test.cc",
     ],
     deps = [
-        "//sdk/src/trace",
         "//sdk/src/common:random",
+        "//sdk/src/trace",
         "@com_google_googletest//:gtest_main",
     ],
+)
+
+otel_cc_benchmark(
+    name = "sampler_benchmark",
+    srcs = ["sampler_benchmark.cc"],
+    deps = ["//sdk/src/trace"],
 )
