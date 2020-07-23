@@ -26,20 +26,3 @@ cc_library(
         "@github_nlohmann_json//:json",
     ],
 )
-
-cc_binary(
-    name = "zpages_http_server",
-    srcs = [
-        "tracez_http_server.cc"
-    ],
-    linkopts = select({
-        "//bazel:windows": [],
-        "//conditions:default": ["-pthread"],
-    }),
-    deps = [
-        "//api",
-        "//sdk/src/trace",
-        "//ext/src/zpages",
-        "@github_nlohmann_json//:json",
-    ],
-)
