@@ -185,7 +185,7 @@ class HttpTraceContext : public HTTPTextFormat<T> {
 //                    return SetSpanInContext(trace::DefaultSpan.GetInvalid(), context);
                 }
 
-                nostd::span<char> s1{trace_id,16};
+                nostd::span<char> s1{trace_id.begin(),16};
                 TraceId trace_id_obj = TraceId(s1);
                 trace::SpanId span_id_obj = trace::SpanId(nostd::span<char>{span_id,span_id.length()});
                 TraceFlags trace_flags_obj = TraceFlags(nostd::span<char>{trace_flags,trace_flags.length()});
