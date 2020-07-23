@@ -1,6 +1,7 @@
 #include "opentelemetry/sdk/trace/tracer.h"
 #include "opentelemetry/sdk/trace/samplers/always_off.h"
 #include "opentelemetry/sdk/trace/samplers/always_on.h"
+#include "opentelemetry/sdk/trace/samplers/parent_or_else.h"
 #include "opentelemetry/sdk/trace/simple_processor.h"
 #include "opentelemetry/sdk/trace/span_data.h"
 
@@ -32,7 +33,7 @@ public:
                     {{"sampling_attr1", 123}, {"sampling_attr2", "string"}}))};
   }
 
-  std::string GetDescription() const noexcept override { return "MockSampler"; }
+  nostd::string_view GetDescription() const noexcept override { return "MockSampler"; }
 };
 
 /**
@@ -301,4 +302,80 @@ TEST(Tracer, SpanSetAttribute)
   ASSERT_EQ(1, spans_received->size());
   auto &span_data = spans_received->at(0);
   ASSERT_EQ(3.1, nostd::get<double>(span_data->GetAttributes().at("abc")));
+}
+
+TEST(Tracer, TestAlwaysOnSampler)
+{
+  std::shared_ptr<std::vector<std::unique_ptr<SpanData>>> spans_received(
+      new std::vector<std::unique_ptr<SpanData>>);
+
+  auto tracer_on = initTracer(spans_received);
+
+  // Testing AlwaysOn sampler.
+  // Create two spans for each tracer. Check the exported result.
+  auto span_on_1 = tracer_on->StartSpan("span 1");
+  auto span_on_2 = tracer_on->StartSpan("span 2");
+  span_on_2->End();
+  span_on_1->End();
+  ASSERT_EQ(2, spans_received->size());
+  ASSERT_EQ("span 2", spans_received->at(0)->GetName());  // span 2 ends first.
+  ASSERT_EQ("span 1", spans_received->at(1)->GetName());
+}
+
+TEST(Tracer, TestAlwaysOffSampler)
+{
+  std::shared_ptr<std::vector<std::unique_ptr<SpanData>>> spans_received_off(
+      new std::vector<std::unique_ptr<SpanData>>);
+  auto tracer_off = initTracer(spans_received_off, std::make_shared<AlwaysOffSampler>());
+  auto span_off_1 = tracer_off->StartSpan("span 1");
+  auto span_off_2 = tracer_off->StartSpan("span 2");
+
+  span_off_1->SetAttribute("attr1", 3.1);  // Not recorded.
+
+  span_off_2->End();
+  span_off_1->End();
+
+  // The tracer export nothing with an AlwaysOff sampler
+  ASSERT_EQ(0, spans_received_off->size());
+}
+
+TEST(Tracer, TestParentOrElseSampler)
+{
+  std::shared_ptr<std::vector<std::unique_ptr<SpanData>>> spans_received_parent_on(
+      new std::vector<std::unique_ptr<SpanData>>);
+
+  // Current ShouldSample always pass an empty ParentContext,
+  // so this sampler will work as an AlwaysOnSampler.
+  auto tracer_parent_on =
+      initTracer(spans_received_parent_on,
+                 std::make_shared<ParentOrElseSampler>(std::make_shared<AlwaysOnSampler>()));
+
+  auto span_parent_on_1 = tracer_parent_on->StartSpan("span 1");
+  auto span_parent_on_2 = tracer_parent_on->StartSpan("span 2");
+
+  span_parent_on_1->SetAttribute("attr1", 3.1);
+
+  span_parent_on_2->End();
+  span_parent_on_1->End();
+  ASSERT_EQ(2, spans_received_parent_on->size());
+  ASSERT_EQ("span 2", spans_received_parent_on->at(0)->GetName());
+  ASSERT_EQ("span 1", spans_received_parent_on->at(1)->GetName());
+
+  std::shared_ptr<std::vector<std::unique_ptr<SpanData>>> spans_received_parent_off(
+      new std::vector<std::unique_ptr<SpanData>>);
+
+  // Current ShouldSample always pass an empty ParentContext,
+  // so this sampler will work as an AlwaysOnSampler.
+  auto tracer_parent_off =
+      initTracer(spans_received_parent_off,
+                 std::make_shared<ParentOrElseSampler>(std::make_shared<AlwaysOffSampler>()));
+
+  auto span_parent_off_1 = tracer_parent_off->StartSpan("span 1");
+  auto span_parent_off_2 = tracer_parent_off->StartSpan("span 2");
+
+  span_parent_off_1->SetAttribute("attr1", 3.1);
+
+  span_parent_off_1->End();
+  span_parent_off_2->End();
+  ASSERT_EQ(0, spans_received_parent_off->size());
 }

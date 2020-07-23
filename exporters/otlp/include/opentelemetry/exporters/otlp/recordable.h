@@ -21,7 +21,16 @@ public:
   void SetAttribute(nostd::string_view key,
                     const opentelemetry::common::AttributeValue &value) noexcept override;
 
-  void AddEvent(nostd::string_view name, core::SystemTimestamp timestamp) noexcept override;
+  void AddEvent(
+      nostd::string_view name,
+      core::SystemTimestamp timestamp = core::SystemTimestamp(std::chrono::system_clock::now()),
+      const trace::KeyValueIterable &attributes =
+          trace::KeyValueIterableView<std::map<std::string, int>>({})) noexcept override;
+
+  void AddLink(
+      opentelemetry::trace::SpanContext span_context,
+      const trace::KeyValueIterable &attributes =
+          trace::KeyValueIterableView<std::map<std::string, int>>({})) noexcept override;
 
   void SetStatus(trace::CanonicalCode code, nostd::string_view description) noexcept override;
 
