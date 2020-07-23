@@ -117,17 +117,17 @@ class HttpTraceContext : public HTTPTextFormat<T> {
             nostd::span<char> span_id = span_context.span_id();
             nostd::span<char> trace_flags = span_context.trace_flags();
             nostd::string_view hex_string = "00-"; // TODO: ask in gitter about string addition
-            for (auto it : trace_id) {
-                hex_string += nostd::string_view(it,1);
-            }
-            hex_string += "-";
-            for (auto it = span_id.begin(); it != span_id.end(); it++) {
-                hex_string += nostd::string_view(it,1);
-            }
-            hex_string += "-";
-            for (auto it = trace_flags.begin(); it != trace_flags.end(); it++) {
-                hex_string += nostd::string_view(it,1);
-            }
+//            for (auto it : trace_id) {
+//                hex_string += nostd::string_view(it,1);
+//            }
+//            hex_string += "-";
+//            for (auto it : span_id) {
+//                hex_string += nostd::string_view(it,1);
+//            }
+//            hex_string += "-";
+//            for (auto it : trace_flags) {
+//                hex_string += nostd::string_view(it,1);
+//            }
             return hex_string;
         }
 
