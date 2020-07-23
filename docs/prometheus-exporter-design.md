@@ -158,9 +158,10 @@ class PrometheusExporter : public MetricsExporter {
     /**
      * Constructor. 
      */
-    PrometheusExporter(Exposer &exposer) {
+    PrometheusExporter(std::string &address) {
         // 1. Initialize and set a PrometheusCollector
-        // 2. Register this collector (collectable) to exposer
+        // 2. Register the exporter to an exposer at the given address
+        // 3. Binds to a PrometheusCollector instance
     }
 
     /*
@@ -183,13 +184,6 @@ class PrometheusExporter : public MetricsExporter {
         // Behavior not determined yet.
         // Do something like unregister the collector, some gc...
         this.isShutdown = true;
-    }
-    
-    /*
-     * Set the Prometheus collector with the parameter.
-     */ 
-    void setCollector(PrometheusCollector &collector) {
-    
     }
     
     /*
@@ -576,16 +570,17 @@ prometheus::Exposer exposer("127.0.0.1:8080");
 exposer.RegisterCollectable(exporter);
 ```
 
-In our OpenTelemetry version, the demo program could be
+In our OpenTelemetry version, the equivalent could be
 ```C++
-// create an http server running on port 8080
-prometheus::Exposer exposer{"127.0.0.1:8080"};
+// name the address+port the server will be running on
+std::string address = "127.0.0.1:8080";
 
 // create an exporter and register the collector in it to exposer
 // Inside the PrometheusExporter constructor:
 // 1. Initialize a PrometheusCollector
-// 2. Register the collector to exposer
-auto exporter = PrometheusExporter(exposer);
+// 2. Initialize an exposer
+// 3. Register the collector to exposer
+auto exporter = PrometheusExporter(address);
 ```
 
 Consider the existing, working OpenCensus project, and the drawbacks of supporting an HTTP server in our exporter manually, we recommend **NOT** 
