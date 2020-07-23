@@ -72,8 +72,8 @@ class HttpTraceContext : public HTTPTextFormat<T> {
 //        }
 
     private:
-        inline static const nostd::string_view kTraceParent = "traceparent";
-        inline static const nostd::string_view kTraceState = "tracestate";
+        static const nostd::string_view kTraceParent = "traceparent";
+        static const nostd::string_view kTraceState = "tracestate";
 // Parameters no longer needed because the toString functions are resolved else where
 //        static const int kVersionBytes = 2;
 //        static const int kTraceIdBytes = 32;
