@@ -58,9 +58,8 @@ class HttpTraceContext : trace::propagation::HTTPTextFormat {
             return SetSpanInContext(trace.DefaultSpan(span_context), context);
         }
 
-        inline static nostd::string_view span_key = "current-span";
-
         context::Context SetSpanInContext(trace::Span *span, context::Context &context) {
+            nostd::string_view span_key = "current-span";
             context::Context new_values = context::Context(context);
             new_values.SetValue(span_key,*span);
             return new_values;
