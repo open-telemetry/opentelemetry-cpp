@@ -27,78 +27,52 @@ public:
 explicit OStreamMetricsExporter(std::ostream &sout = std::cout) noexcept;
 
 sdkmetrics::ExportResult Export(
-    const std::vector<sdkmetrics::Record> &records) noexcept override;
+    std::vector<sdkmetrics::Record> &records) noexcept override;
 
 private:
 std::ostream &sout_;
-bool isShutdown_ = false;
 
-void PrintVariant(sdkmetrics::RecordValue value, AggregatorKind aggKind)
+
+template <typename T>
+void PrintVector(sdkmetrics::AggregatorVariant value)
 {
-  if(nostd::holds_alternative<std::vector<short>>(value))
+  auto agg = nostd::get<std::shared_ptr<sdkmetrics::Aggregator<T>>>(value);
+  auto aggKind = agg->get_aggregator_kind();
+
+  if(aggKind == sdkmetrics::AggregatorKind::Counter)
   {
-    PrintVector<short>(value,aggKind);
+    sout_ << "\n  sum         : " << agg->get_checkpoint()[0];
   }
-  else if(nostd::holds_alternative<std::vector<int>>(value))
+  else if(aggKind == sdkmetrics::AggregatorKind::MinMaxSumCount)
   {
-    PrintVector<int>(value,aggKind);
-  }
-  else if(nostd::holds_alternative<std::vector<double>>(value))
-  {
-    PrintVector<double>(value,aggKind);
-  }
-  else if(nostd::holds_alternative<std::vector<float>>(value))
-  {
-    PrintVector<float>(value,aggKind);
+    auto mmsc = agg->get_checkpoint();
+    sout_ << "\n  min         : " << mmsc[0];
   }
 }
 
-template <typename T>
-void PrintVector(sdkmetrics::RecordValue value, AggregatorKind aggKind)
+
+void GetAggType(sdkmetrics::AggregatorVariant value)
 {
-  auto vec = nostd::get<std::vector<T>>(value);
-  int size = vec.size();
+  if(nostd::holds_alternative<std::shared_ptr<sdkmetrics::Aggregator<int>>>(value))
+  {
+    PrintVector<int>(value);
+  }
+  else if(nostd::holds_alternative<std::shared_ptr<sdkmetrics::Aggregator<short>>>(value))
+  {
+    PrintVector<short>(value);
+  }
+  else if(nostd::holds_alternative<std::shared_ptr<sdkmetrics::Aggregator<double>>>(value))
+  {
+    PrintVector<double>(value);
+  }
+  else if(nostd::holds_alternative<std::shared_ptr<sdkmetrics::Aggregator<float>>>(value))
+  {
+    PrintVector<float>(value);
+  }
 
-  if(aggKind == AggregatorKind::Counter)
-  {
-    sout_ << "\n  sum         : " << vec[0];
-  }
-  else if(aggKind == AggregatorKind::MinMaxSumCount)
-  {
-    sout_ << "\n  min         : " << vec[0]
-          << "\n  max         : " << vec[1]
-          << "\n  sum         : " << vec[2]
-          << "\n  count       : " << vec[3];
-    
-  }
-  else if(aggKind == AggregatorKind::Gauge)
-  {
-    sout_ << "\n  last value  : " << vec[0];
-  }
-  else if(aggKind == AggregatorKind::Sketch)
-  {
-
-  }
-  else if(aggKind == AggregatorKind::Histogram)
-  {
-
-  }
-  else if(aggKind == AggregatorKind::Exact)
-  {
-    sout_ << "\n  values      : ";
-    sout_ <<'[';
-    int i = 1;
-    for (auto v : vec)
-     {
-       sout_ << v; 
-       if (i != size)
-         sout_ << ',';
-       i++;
-     };
-     sout_ << ']';
-  }
 }
 
 };
-}}
+}
+}
 OPENTELEMETRY_END_NAMESPACE

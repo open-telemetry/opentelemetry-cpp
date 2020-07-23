@@ -5,31 +5,23 @@ namespace exporter
 {
 namespace metrics
 {
+
 OStreamMetricsExporter::OStreamMetricsExporter(std::ostream &sout) noexcept
                                     : sout_{sout} {}
 
 sdkmetrics::ExportResult OStreamMetricsExporter::Export(
-  const std::vector<sdkmetrics::Record> &records) noexcept
+  std::vector<sdk::metrics::Record> &records) noexcept
 {
-
-  for(sdkmetrics::Record record : records)
-  {    
-    AggregatorKind aggKind = record.GetAggregatorKind();
-
+  for(auto record : records)
+  {
     sout_ << "{"
           << "\n  name        : " << record.GetName()
           << "\n  description : " << record.GetDescription()
           << "\n  labels      : " << record.GetLabels();
-          PrintVariant(record.GetValue(), aggKind);    
-
-    if(aggKind == AggregatorKind::Gauge)
-    {
-      sout_ << "\n  timestamp   : " << record.GetTimestamp().time_since_epoch().count();
-    }
-    
+          GetAggType(record.GetAggregator());
     sout_ << "\n}\n";
+     
   }
-
   return sdkmetrics::ExportResult::kSuccess;
 }
 
