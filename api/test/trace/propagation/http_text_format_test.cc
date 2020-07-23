@@ -37,7 +37,7 @@ TEST(HTTPTextFormatTest, NoSpanTest)
     context::Context ctx2 = format.Extract(Getter,carrier,ctx1);
     std::map<std::string,std::string> c2 = {};
     format.Inject(Setter,c2,ctx2);
-    EXPECT_NQ(carrier.size(),c2.size());
+    EXPECT_NE(carrier.size(),c2.size());
 }
 
 //TEST(HTTPTextFormatTest, NoTraceParentHeader)
