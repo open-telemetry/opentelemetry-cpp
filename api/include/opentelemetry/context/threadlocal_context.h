@@ -1,5 +1,6 @@
 #pragma once
 
+#include "opentelemetry/context/context.h"
 #include "opentelemetry/context/runtime_context.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
@@ -37,7 +38,7 @@ public:
   Token InternalAttach(Context *context) override
   {
     stack_.Push(context);
-    Token old_context = Token(context);
+    Token old_context = CreateToken(context);
     return old_context;
   }
 

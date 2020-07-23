@@ -17,14 +17,14 @@ public:
   public:
     bool operator==(const Context &other) { return (*context_ == other); }
 
+  private:
+    friend class RuntimeContext;
+
     // A constructor that sets the token's Context object to the
     // one that was passed in.
     Token(Context *context) { context_ = context; }
 
     Token() = default;
-
-  private:
-    friend class RuntimeContext;
 
     Context *context_;
 
@@ -35,24 +35,28 @@ public:
   // Return the current context.
   static Context *GetCurrent() { return context_handler_->InternalGetCurrent(); }
 
-  // Dummy method to be overriden by derived class implementation
-  virtual Context *InternalGetCurrent() { return nullptr; }
-
   // Sets the current 'Context' object. Returns a token
   // that can be used to reset to the previous Context.
   static Token Attach(Context *context) { return context_handler_->InternalAttach(context); }
-
-  // Dummy method to be overriden by derived class implementation
-  virtual Token InternalAttach(Context *context) { return Token(); }
 
   // Resets the context to a previous value stored in the
   // passed in token. Returns true if successful, false otherwise
   static bool Detach(Token &token) { return context_handler_->InternalDetach(token); }
 
+  static RuntimeContext *context_handler_;
+
+protected:
+  // Provides a token with the passed in context
+  Token CreateToken(Context *context) { return Token(context); }
+
+  // Dummy method to be overriden by derived class implementation
+  virtual Context *InternalGetCurrent() { return nullptr; }
+
+  // Dummy method to be overriden by derived class implementation
+  virtual Token InternalAttach(Context *context) { return Token(); }
+
   // Dummy method to be overriden by derived class implementation
   virtual bool InternalDetach(Token &token) { return false; }
-
-  static RuntimeContext *context_handler_;
 };
 }  // namespace context
 OPENTELEMETRY_END_NAMESPACE
