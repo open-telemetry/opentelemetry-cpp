@@ -3,6 +3,7 @@
 #include "opentelemetry/trace/span_context.h"
 #include "opentelemetry/trace/canonical_code.h"
 #include "opentelemetry/common/attribute_value.h"
+#include "opentelemetry/trace/tracer.h"
 #include "opentelemetry/trace/span.h"
 
 #define pass
