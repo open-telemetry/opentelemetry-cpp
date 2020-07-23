@@ -41,14 +41,14 @@ public:
     trace_id_ = ctx.trace_id_;
     span_id_ = ctx.span_id_;
     trace_flags_ = ctx.trace_flags_;
-    trace_state_ = new TraceState();
+    trace_state_.reset(new TraceState());
   };
   SpanContext &operator=(SpanContext &&ctx) {
     trace_id_ = ctx.trace_id_;
     span_id_ = ctx.span_id_;
     trace_flags_ = ctx.trace_flags_;
-    trace_state_ = new TraceState();
-  };
+    trace_state_.reset(new TraceState());
+   };
   // TODO
   //
   // static SpanContext Create(TraceId traceId, SpanId spanId, TraceFlags traceFlags, TraceState
