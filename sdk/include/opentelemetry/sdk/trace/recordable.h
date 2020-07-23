@@ -70,7 +70,7 @@ public:
   /**
    * Add an event to a span with default (empty) attributes.
    * @param name the name of the event
-   * @param name the timestamp of the event
+   * @param timestamp the timestamp of the event
    */
   void AddEvent(nostd::string_view name, core::SystemTimestamp timestamp)
   {
