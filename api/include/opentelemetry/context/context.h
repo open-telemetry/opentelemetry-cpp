@@ -16,8 +16,6 @@ class Context
 {
 
 public:
-  Context() = default;
-
   // Creates a context object from a map of keys and identifiers, this will
   // hold a shared_ptr to the head of the DataList linked list
   template <class T>
@@ -94,6 +92,8 @@ public:
   bool operator==(const Context &other) { return (head_ == other.head_); }
 
 private:
+  Context() = default;
+
   // A linked list to contain the keys and values of this context node
   class DataList
   {

@@ -1,31 +1,30 @@
 #pragma once
 
-#include "context.h"
+#include "opentelemetry/context/context.h"
+#include "opentelemetry/context/context_config.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace context
 {
 
-// The RuntimeContext class provides a wrapper for
-// propogating context through cpp.
 class RuntimeContext
 {
 public:
-  // The token class provides an identifier that is used by
-  // the attach and detach methods to keep track of context
-  // objects.
-  class Token;
-
   // Return the current context.
-  Context *GetCurrent();
+  static Context *GetCurrent() { return context_handler_.GetCurrent(); }
 
   // Sets the current 'Context' object. Returns a token
   // that can be used to reset to the previous Context.
-  Token Attach(Context *context);
+  static ContextToken Attach(Context *context) { return context_handler_.Attach(context); }
 
   // Resets the context to a previous value stored in the
-  // passed in token. Returns zero if successful, -1 otherwise
-  int Detach(Token &token);
+  // passed in token. Returns true if successful, false otherwise
+  static bool Detach(ContextToken &token) { return context_handler_.Detach(token); }
+
+  static ContextType context_handler_;
 };
+
+ContextType RuntimeContext::context_handler_ = ContextType();
+
 }  // namespace context
 OPENTELEMETRY_END_NAMESPACE

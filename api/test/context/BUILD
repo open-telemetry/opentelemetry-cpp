@@ -12,9 +12,9 @@ cc_test(
 )
 
 cc_test(
-    name = "threadlocal_context_test",
+    name = "runtime_context_test",
     srcs = [
-        "threadlocal_context_test.cc",
+        "runtime_context_test.cc",
     ],
     deps = [
         "//api",
