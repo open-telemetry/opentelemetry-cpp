@@ -17,9 +17,9 @@ namespace trace
 {   
 
 BatchSpanProcessor::BatchSpanProcessor(std::unique_ptr<SpanExporter>&& exporter,
-                                       const int max_queue_size,
-                                       const int schedule_delay_millis,
-                                       const int max_export_batch_size)
+                                       const size_t max_queue_size,
+                                       const std::chrono::milliseconds schedule_delay_millis,
+                                       const size_t max_export_batch_size)
        :exporter_(std::move(exporter)),
         max_queue_size_(max_queue_size), 
         schedule_delay_millis_(schedule_delay_millis),
@@ -52,20 +52,17 @@ void BatchSpanProcessor::OnEnd(std::unique_ptr<Recordable> &&span) noexcept
 
     std::unique_lock<std::mutex> lk(cv_m_);
 
-    if(static_cast<int>(buffer_->size()) >= max_queue_size_){
+    if(buffer_->Add(span) == false)
+    {
         // TODO: glog that spans will likely be dropped
     }
 
-    buffer_->Add(span);
-
     // If the queue gets at least half full a preemptive notification is 
     // sent to the worker thread to start a new export cycle.
-    if(static_cast<int>(buffer_->size()) >= max_queue_size_ / 2){
+    if(buffer_->size() >= max_queue_size_ / 2){
         // signal the worker thread
         cv_.notify_one();
     }
-
-    lk.unlock();
 }
 
 void BatchSpanProcessor::ForceFlush(std::chrono::microseconds timeout) noexcept 
@@ -118,7 +115,7 @@ void BatchSpanProcessor::ForceFlush(std::chrono::microseconds timeout) noexcept
 }
 
 void BatchSpanProcessor::DoBackgroundWork(){
-    int timeout = schedule_delay_millis_;
+    auto timeout = schedule_delay_millis_;
 
     while (true)
     {
@@ -126,7 +123,7 @@ void BatchSpanProcessor::DoBackgroundWork(){
 
         // If we already have max_export_batch_size_ spans in the buffer, better to export them
         // now
-        if (static_cast<int>(buffer_->size()) < max_export_batch_size_)
+        if (buffer_->size() < max_export_batch_size_)
         {
             // In case of spurious wake up, we export only if we have atleast one span
             // in the batch. This is acceptable because batching is a best mechanism 
@@ -170,7 +167,7 @@ void BatchSpanProcessor::DoBackgroundWork(){
         auto end = std::chrono::steady_clock::now(); 
         auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(end - start);
 
-        timeout = schedule_delay_millis_ - duration.count();
+        timeout = schedule_delay_millis_ - duration;
     }
 }
 
@@ -215,17 +212,15 @@ std::unique_ptr<common::CircularBuffer<Recordable>> BatchSpanProcessor::CopySpan
         new common::CircularBuffer<Recordable>(max_queue_size_)
     );
 
-    // Get the appropriate size.
-    const int buffer_size = static_cast<int>(buffer_->size());
-
     if(was_force_flush_called == true)
     {
         buffer_.swap(buffer_copy);
     }
     else
     {
-        const int num_spans_to_export = buffer_size >= max_export_batch_size_ ? 
-                                                max_export_batch_size_ : buffer_size;
+        // Get the appropriate size
+        const size_t num_spans_to_export = buffer_->size() >= max_export_batch_size_ ? 
+                                                max_export_batch_size_ : buffer_->size();
 
         buffer_->Consume(
             num_spans_to_export, [&](CircularBufferRange<AtomicUniquePtr<Recordable>> range) noexcept {
@@ -243,7 +238,7 @@ std::unique_ptr<common::CircularBuffer<Recordable>> BatchSpanProcessor::CopySpan
 
 void BatchSpanProcessor::DrainQueue()
 {
-    while(static_cast<int>(buffer_->size()) > 0) Export(buffer_, false);
+    while(buffer_->empty() == false) Export(buffer_, false);
 }
 
 void BatchSpanProcessor::Shutdown(std::chrono::microseconds timeout) noexcept 

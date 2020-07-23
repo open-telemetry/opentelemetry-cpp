@@ -19,7 +19,7 @@ namespace trace
 {   
 
 /**
- * This is an implementation of the SpanProcessor which create batches of finished spans and passes 
+ * This is an implementation of the SpanProcessor which creates batches of finished spans and passes 
  * the export-friendly span data representations to the configured SpanExporter.
  */
 class BatchSpanProcessor : public SpanProcessor 
@@ -35,9 +35,9 @@ public:
      * @param max_export_batch_size - The maximum batch size of every export. It must be smaller or equal to max_queue_size
      */
     explicit BatchSpanProcessor(std::unique_ptr<SpanExporter>&& exporter,
-                                const int max_queue_size = 2048,
-                                const int schedule_delay_millis = 5000,
-                                const int max_export_batch_size = 512);
+                                const size_t max_queue_size = 2048,
+                                const std::chrono::milliseconds schedule_delay_millis = std::chrono::milliseconds(5000),
+                                const size_t max_export_batch_size = 512);
 
     /**
      * Requests a Recordable(Span) from the configured exporter.
@@ -94,7 +94,7 @@ private:
      * Exports all ended spans to the configured exporter.
      * 
      * @param buffer - The buffer with ended spans to export
-     * @param was_force_flush_called - A  flag to check if the current export is the result
+     * @param was_force_flush_called - A flag to check if the current export is the result
      *                                 of a call to ForceFlush method. If true, then we have to
      *                                 notify the main thread to wake it up in the ForceFlush 
      *                                 method.
@@ -128,9 +128,9 @@ private:
     std::unique_ptr<std::thread> worker_thread_;
 
     /* Configurable parameters as per the official specs */
-    const int schedule_delay_millis_;
-    const int max_queue_size_;
-    const int max_export_batch_size_;
+    const std::chrono::milliseconds schedule_delay_millis_;
+    const size_t max_queue_size_;
+    const size_t max_export_batch_size_;
 
     /* Synchronization primitives */
     std::condition_variable cv_, force_flush_cv_;
