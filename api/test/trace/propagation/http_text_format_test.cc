@@ -29,14 +29,21 @@ static trace::propagation::HttpTraceContext<std::map<nostd::string_view,nostd:st
 static nostd::string_view trace_id = "12345678901234567890123456789012";
 static nostd::string_view span_id = "1234567890123456";
 
-TEST(HTTPTextFormatTest, NoTraceParentHeader)
+TEST(HTTPTextFormatTest, NoSpanTest)
 {
-    // When trace context headers are not present, a new SpanContext
-    // should be created.
     std::map<nostd::string_view,nostd::string_view> carrier = {};
-    trace::Span span = trace::propagation::GetCurrentSpan(format.Extract(Getter, carrier, Context()));
-    EXPECT_TRUE(span.GetContext() != NULL);
+    std::map<nostd::string_view,nostd::string_view> c2 = format.Extract(Getter,c2,format.Inject(Setter,carrier,Context()),Context());
+    EXPECT_EQ(carrier,c2);
 }
+
+//TEST(HTTPTextFormatTest, NoTraceParentHeader)
+//{
+//    // When trace context headers are not present, a new SpanContext
+//    // should be created.
+//    std::map<nostd::string_view,nostd::string_view> carrier = {};
+//    trace::Span span = trace::propagation::GetCurrentSpan(format.Extract(Getter, carrier, Context()));
+//    EXPECT_TRUE(span.GetContext() != NULL);
+//}
 
 //TEST(HTTPTextFormatTest, HeadersWithTraceState)
 //{
