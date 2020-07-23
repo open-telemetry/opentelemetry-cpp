@@ -33,7 +33,7 @@ TEST(HTTPTextFormatTest, NoSpanTest)
 {
     std::map<nostd::string_view,nostd::string_view> carrier = {};
     format.Inject(Setter,carrier,context::Context());
-    const context::Context c1 = context::Context();
+    context::Context c1 = context::Context();
     std::map<nostd::string_view,nostd::string_view> c2 = format.Extract(Getter,carrier,c1);
     EXPECT_EQ(carrier.size(),c2.size());
 }
