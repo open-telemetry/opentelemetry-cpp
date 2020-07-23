@@ -93,6 +93,7 @@ TEST(Recordable, AddEvents)
 
   EXPECT_EQ(rec.span().events(0).name(), name);
   EXPECT_EQ(rec.span().events(0).time_unix_nano(), unix_event_time);
+  EXPECT_EQ(rec.span().events(0).attributes().size(), 0);
 }
 
 // Test non-int single types. Int single types are tested using templates (see IntAttributeTest)
