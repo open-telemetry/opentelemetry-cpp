@@ -2,6 +2,7 @@
 #include "opentelemetry/exporters/ostream/metrics_exporter.h"
 #include "opentelemetry/sdk/metrics/record.h"
 #include "opentelemetry/sdk/metrics/aggregator/counter_aggregator.h"
+#include "opentelemetry/sdk/metrics/aggregator/min_max_sum_count_aggregator.h"
 
 
 #include <iostream>
@@ -51,22 +52,22 @@ TEST(OStreamMetricsExporter, PrintCounter)
   ASSERT_EQ(stdoutOutput.str(),expectedOutput);
 }
 
-/*
+
 TEST(OStreamMetricsExporter, PrintMinMaxSumCount)
 {
   auto exporter = std::unique_ptr<sdkmetrics::MetricsExporter> (new
       opentelemetry::exporter::metrics::OStreamMetricsExporter);
   
-  std::vector<int> vec;
-  vec.push_back(1);
-  vec.push_back(2);
-  vec.push_back(3);
-  vec.push_back(2);
+  auto aggregator = std::shared_ptr<opentelemetry::sdk::metrics::Aggregator<int>> (new
+      opentelemetry::sdk::metrics::MinMaxSumCountAggregator<int>(metrics_api::InstrumentKind::IntCounter));
+  
+  aggregator->update(1);
+  aggregator->update(2);
+  aggregator->checkpoint();
 
-  auto record = sdkmetrics::Record("name", "description", AggregatorKind::MinMaxSumCount, "labels", vec);
-
+  sdkmetrics::Record r("name", "description", "labels", aggregator);
   std::vector<sdkmetrics::Record> records;
-  records.push_back(record);
+  records.push_back(r);
 
   // Create stringstream to redirect to
   std::stringstream stdoutOutput;
@@ -94,7 +95,7 @@ TEST(OStreamMetricsExporter, PrintMinMaxSumCount)
 
   ASSERT_EQ(stdoutOutput.str(),expectedOutput);
 }
-
+/*
 TEST(OStreamMetricsExporter, PrintGauge)
 {
   auto exporter = std::unique_ptr<sdkmetrics::MetricsExporter> (new

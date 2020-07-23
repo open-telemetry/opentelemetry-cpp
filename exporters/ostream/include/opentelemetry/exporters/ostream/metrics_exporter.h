@@ -46,7 +46,10 @@ void PrintVector(sdkmetrics::AggregatorVariant value)
   else if(aggKind == sdkmetrics::AggregatorKind::MinMaxSumCount)
   {
     auto mmsc = agg->get_checkpoint();
-    sout_ << "\n  min         : " << mmsc[0];
+    sout_ << "\n  min         : " << mmsc[0]
+          << "\n  max         : " << mmsc[1]
+          << "\n  sum         : " << mmsc[2]
+          << "\n  count       : " << mmsc[3];
   }
 }
 
