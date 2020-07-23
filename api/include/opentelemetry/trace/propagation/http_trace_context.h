@@ -149,7 +149,7 @@ class HttpTraceContext : public HTTPTextFormat<T> {
                 int elt_num = 0;
                 int countdown = kHeaderElementLengths[elt_num];
                 int start_pos = -1;
-                for (int i = 0; i < trace_parent.size(); i++) {
+                for (int i = 0; i < int(trace_parent.size()); i++) {
                     if (trace_parent[i]=='\t') continue;
                     else if (trace_parent[i]=='-') {
                         if (countdown==0) {
