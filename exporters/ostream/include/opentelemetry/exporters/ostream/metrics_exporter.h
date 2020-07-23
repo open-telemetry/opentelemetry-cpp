@@ -4,6 +4,7 @@
 #include "opentelemetry/sdk/metrics/exporter.h"
 #include "opentelemetry/sdk/metrics/aggregator/gauge_aggregator.h"
 #include "opentelemetry/sdk/metrics/aggregator/exact_aggregator.h"
+#include "opentelemetry/sdk/metrics/aggregator/histogram_aggregator.h"
 #include <iostream>
 
 OPENTELEMETRY_BEGIN_NAMESPACE
@@ -84,6 +85,7 @@ void PrintAggregatorVariant(sdkmetrics::AggregatorVariant value)
     }
     sout_ << ']';
 
+    // TODO: Find better way to print quantiles
     if(temp_exact->get_quant_estimation())
     {
       sout_ << "\n  quantiles   : "
@@ -93,6 +95,40 @@ void PrintAggregatorVariant(sdkmetrics::AggregatorVariant value)
             << ".75: " << temp_exact->quantile(.75) << ", "
             << "1: "   << temp_exact->quantile(1) << ']';
     }
+  }
+  else if(aggKind == sdkmetrics::AggregatorKind::Histogram)
+  {
+    std::shared_ptr<opentelemetry::sdk::metrics::HistogramAggregator<T>> temp_hist;
+    temp_hist = std::dynamic_pointer_cast<opentelemetry::sdk::metrics::HistogramAggregator<T>>(agg); 
+
+    auto boundaries = temp_hist->get_boundaries();
+    auto counts = temp_hist->get_counts();
+
+    int boundaries_size = boundaries.size();
+    int counts_size = counts.size();
+
+    sout_ << "\n  buckets     : "
+          << '[';
+
+    for(int i = 0; i < boundaries_size; i++)
+    {
+      sout_ << boundaries[i];
+
+      if(i != boundaries_size-1)
+        sout_ << ", ";
+    }
+    sout_ << ']';
+
+    sout_ << "\n  counts      : "
+          << '[';
+    for(int i = 0; i < counts_size; i++)
+    {
+      sout_ << counts[i];
+
+      if(i != counts_size-1)
+        sout_ << ", ";
+    }
+    sout_ << ']';
   }
 }
 

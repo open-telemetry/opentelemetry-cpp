@@ -190,3 +190,50 @@ TEST(OStreamMetricsExporter, PrintExact)
   ASSERT_EQ(stdoutOutput.str(),expectedOutput);
 }
 
+TEST(OStreamMetricsExporter, PrintHistogram)
+{
+  auto exporter = std::unique_ptr<sdkmetrics::MetricsExporter> (new
+      opentelemetry::exporter::metrics::OStreamMetricsExporter);
+  
+  std::vector<double> boundaries{10,20,30,40,50};
+  auto aggregator = std::shared_ptr<opentelemetry::sdk::metrics::Aggregator<int>> (new
+      opentelemetry::sdk::metrics::HistogramAggregator<int>(metrics_api::InstrumentKind::IntCounter,boundaries));
+  
+  for(int i = 0; i < 60; i++)
+  {
+    aggregator->update(i);
+  }
+  aggregator->checkpoint();
+
+  sdkmetrics::Record r("name", "description", "labels", aggregator);
+  std::vector<sdkmetrics::Record> records;
+  records.push_back(r);
+
+  // Since Aggregator doesn't have GaugeAggregator specific functions, we need to cast to GaugeAggregator
+  std::shared_ptr<opentelemetry::sdk::metrics::HistogramAggregator<int>> foo;
+  foo = std::dynamic_pointer_cast<opentelemetry::sdk::metrics::HistogramAggregator<int>>(aggregator);
+
+  // Create stringstream to redirect to
+  std::stringstream stdoutOutput;
+
+  // Save cout's buffer here
+  std::streambuf *sbuf = std::cout.rdbuf();
+
+  // Redirect cout to our stringstream buffer
+  std::cout.rdbuf(stdoutOutput.rdbuf());
+
+  exporter->Export(records);
+
+  std::cout.rdbuf(sbuf);
+
+  std::string expectedOutput = 
+  "{\n"
+  "  name        : name\n"
+  "  description : description\n"
+  "  labels      : labels\n"
+  "  buckets     : [10, 20, 30, 40, 50]\n"
+  "  counts      : [10, 10, 10, 10, 10, 10]\n"
+  "}\n"; 
+
+  ASSERT_EQ(stdoutOutput.str(),expectedOutput);
+}
