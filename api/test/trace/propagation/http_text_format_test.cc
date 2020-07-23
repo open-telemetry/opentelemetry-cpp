@@ -20,7 +20,7 @@ static nostd::string_view Getter(std::map<std::string,std::string> &carrier, nos
     return res;
 }
 
-static void Setter(std::map<std::string,std::string> &carrier, nostd::string_view trace_type = "traceparent", nostd::string trace_description = "") {
+static void Setter(std::map<nostd::string_view,std::string> &carrier, nostd::string_view trace_type = "traceparent", nostd::string trace_description = "") {
     carrier[trace_type] = str;
 }
 
