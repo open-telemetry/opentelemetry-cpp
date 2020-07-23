@@ -16,6 +16,7 @@
 
 using opentelemetry::sdk::trace::AttributeConverter;
 using opentelemetry::sdk::trace::SpanDataAttributeValue;
+using opentelemetry::sdk::trace::SpanDataEvent;
 namespace trace_api = opentelemetry::trace;
 
 OPENTELEMETRY_BEGIN_NAMESPACE
@@ -103,7 +104,7 @@ class ThreadsafeSpanData final : public opentelemetry::sdk::trace::Recordable {
    * Get the attributes for this span
    * @return the attributes for this span
    */
-  const std::unordered_map<std::string, SpanDataAttributeValue> &GetAttributes()
+  const std::unordered_map<std::string, SpanDataAttributeValue> GetAttributes()
       const noexcept {
     std::lock_guard<std::mutex> lock(mutex_);
     return attributes_;
@@ -122,13 +123,6 @@ class ThreadsafeSpanData final : public opentelemetry::sdk::trace::Recordable {
                     const common::AttributeValue &value) noexcept override {
     std::lock_guard<std::mutex> lock(mutex_);
     attributes_[std::string(key)] = nostd::visit(converter_, value);
-  }
-
-  void AddEvent(nostd::string_view name,
-                core::SystemTimestamp timestamp) noexcept override {
-    std::lock_guard<std::mutex> lock(mutex_);
-    (void)name;
-    (void)timestamp;
   }
 
   void SetStatus(trace_api::CanonicalCode code,
@@ -153,6 +147,27 @@ class ThreadsafeSpanData final : public opentelemetry::sdk::trace::Recordable {
     std::lock_guard<std::mutex> lock(mutex_);
     duration_ = duration;
   }
+  
+  void AddLink(
+      opentelemetry::trace::SpanContext span_context,
+      const trace_api::KeyValueIterable &attributes =
+          trace_api::KeyValueIterableView<std::map<std::string, int>>({})) noexcept override
+  {
+    std::lock_guard<std::mutex> lock(mutex_);
+    (void)span_context;
+    (void)attributes;
+  }
+  
+  void AddEvent(
+      nostd::string_view name,
+      core::SystemTimestamp timestamp = core::SystemTimestamp(std::chrono::system_clock::now()),
+      const trace_api::KeyValueIterable &attributes =
+          trace_api::KeyValueIterableView<std::map<std::string, int>>({})) noexcept override
+  {
+    std::lock_guard<std::mutex> lock(mutex_);
+    events_.push_back(SpanDataEvent(std::string(name), timestamp));
+    // TODO: handle attributes
+  }
 
  private:
   mutable std::mutex mutex_;
@@ -166,6 +181,7 @@ class ThreadsafeSpanData final : public opentelemetry::sdk::trace::Recordable {
       opentelemetry::trace::CanonicalCode::OK};
   std::string status_desc_;
   std::unordered_map<std::string, SpanDataAttributeValue> attributes_;
+  std::vector<SpanDataEvent> events_;
   AttributeConverter converter_;
 };
 }  // namespace zpages

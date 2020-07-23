@@ -52,7 +52,7 @@ struct SampleSpanData {
   unsigned long long int duration;
   unsigned long long int start_time;
   unsigned short status_code;
-  SampleSpanData(SpanData span_data) {
+  SampleSpanData(ThreadsafeSpanData &span_data) {
     span_name = span_data.GetName().data();
     span_id = std::string(
         reinterpret_cast<const char *>(span_data.GetSpanId().Id().data()));

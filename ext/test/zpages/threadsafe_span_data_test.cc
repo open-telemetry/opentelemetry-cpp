@@ -53,15 +53,3 @@ TEST(ThreadsafeSpanData, Set)
   ASSERT_EQ(data.GetDuration(), std::chrono::nanoseconds(1000000));
   ASSERT_EQ(opentelemetry::nostd::get<int64_t>(data.GetAttributes().at("attr1")), 314159);
 }
-
-TEST(ThreadsafeSpanData, ThreadSafety)
-{
-  opentelemetry::trace::TraceId trace_id;
-  opentelemetry::trace::SpanId span_id;
-  opentelemetry::trace::SpanId parent_span_id;
-
-  ThreadsafeSpanData data;
-  
-  std::thread set_ids(&ThreadsafeSpanData::SetIds, &data, trace_id, span_id, parent_span_id);
-  set_ids.join();
-}

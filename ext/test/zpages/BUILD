@@ -10,7 +10,6 @@ cc_test(
     ],
 )
 
-
 cc_test(
     name = "tracez_data_aggregator_tests",
     srcs = [
