@@ -18,6 +18,8 @@ namespace trace
  */
 class Span;
 
+struct StartSpanOptions;
+
 class Tracer
 {
 public:
