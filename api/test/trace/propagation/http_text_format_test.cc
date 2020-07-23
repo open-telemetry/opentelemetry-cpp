@@ -15,12 +15,12 @@
 
 using namespace opentelemetry;
 
-static nostd::string_view Getter(std::map<std::string,std::string> &carrier, nostd::string_view trace_type = "traceparent") {
+static nostd::string_view Getter(std::map<nostd::string_view,nostd::string_view> &carrier, nostd::string_view trace_type = "traceparent") {
     nostd::string_view res = carrier[trace_type];
     return res;
 }
 
-static void Setter(std::map<nostd::string_view,std::string> &carrier, nostd::string_view trace_type = "traceparent", nostd::string trace_description = "") {
+static void Setter(std::map<nostd::string_view,nostd::string_view> &carrier, nostd::string_view trace_type = "traceparent", nostd::string trace_description = "") {
     carrier[trace_type] = str;
 }
 
