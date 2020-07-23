@@ -37,21 +37,12 @@ public:
   SpanContext(SpanContext&& ctx) : trace_id_(ctx.trace_id()), span_id_(ctx.span_id()), trace_flags_(ctx.trace_flags()), trace_state_(new TraceState()) {}
   SpanContext(const SpanContext& ctx) : trace_id_(ctx.trace_id()), span_id_(ctx.span_id()), trace_flags_(ctx.trace_flags()), trace_state_(new TraceState()) {}
 
-//  SpanContext &operator=(const SpanContext &ctx) {
-//    trace_id_ = ctx.trace_id();
-//     //span_id_(ctx.span_id()), trace_flags_(ctx.trace_flags()), trace_state_(new TraceState())
-//    return *this;
-//  }
-  SpanContext &operator=(SpanContext &&ctx) {
-    trace_id_ = ctx.trace_id();
-    return *this;
-  }
   // TODO
   //
   // static SpanContext Create(TraceId traceId, SpanId spanId, TraceFlags traceFlags, TraceState
   // traceState); static SpanContext CreateFromRemoteParent(...);
 
-  TraceId &trace_id() noexcept { return trace_id_; }
+  const TraceId &trace_id() const noexcept { return trace_id_; }
   const SpanId &span_id() const noexcept { return span_id_; }
   const TraceFlags &trace_flags() const noexcept { return trace_flags_; }
   const TraceState &trace_state() const noexcept { return *trace_state_; }
@@ -63,7 +54,7 @@ public:
   static SpanContext GetInvalid() { return SpanContext(); }
 
 private:
-  TraceId trace_id_;
+  const TraceId trace_id_;
   const SpanId span_id_;
   const TraceFlags trace_flags_;
   const nostd::unique_ptr<TraceState> trace_state_;  // Never nullptr.
