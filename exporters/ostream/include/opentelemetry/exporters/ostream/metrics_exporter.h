@@ -130,6 +130,10 @@ void PrintAggregatorVariant(sdkmetrics::AggregatorVariant value)
     }
     sout_ << ']';
   }
+  else if(aggKind == sdkmetrics::AggregatorKind::Sketch)
+  {
+    // TODO: Waiting for Sketch to be finished
+  }
 }
 
 };
