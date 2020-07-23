@@ -218,7 +218,7 @@ class HttpTraceContext : public HTTPTextFormat<T> {
             int end_pos = -1;
             int element_num = 0;
             nostd::string_view list_member;
-            for (int i = 0; i < trace_state_header.length(); i++) {
+            for (int i = 0; i < int(trace_state_header.length()); i++) {
                 if (trace_state_header[i]=='\t') continue;
                 else if (trace_state_header[i]==',') {
                     if (start_pos == -1 && end_pos == -1) continue;
