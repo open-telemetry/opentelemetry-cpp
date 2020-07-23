@@ -36,7 +36,7 @@ namespace
 //    HttpTraceContext.inject(setter,&carrier,&context);
 //    HttpTraceContext.extract(getter,&carrier,&context);
 template <typename T>
-class HttpTraceContext : HTTPTextFormat
+class HttpTraceContext : public trace::propagation::HTTPTextFormat
 {
     public:
         // Rules that manages how context will be extracted from carrier.
