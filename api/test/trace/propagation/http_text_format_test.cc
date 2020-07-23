@@ -24,7 +24,7 @@ static void Setter(std::map<nostd::string_view,nostd::string_view> &carrier, nos
     carrier[trace_type] = trace_description;
 }
 
-static trace::propagation::HttpTraceContext<std::map<nostd::string_view,nostd::string_view>> format = trace::propagation::HttpTraceContext();
+static trace::propagation::HttpTraceContext<std::map<nostd::string_view,nostd::string_view>> format = trace::propagation::HttpTraceContext<std::map<nostd::string_view,nostd::string_view>>();
 
 static nostd::string_view trace_id = "12345678901234567890123456789012";
 static nostd::string_view span_id = "1234567890123456";
