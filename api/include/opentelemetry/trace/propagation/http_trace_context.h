@@ -96,21 +96,21 @@ class HttpTraceContext : public HTTPTextFormat<T> {
 //            }
         }
 
-        static nostd::string_view FormatTracestate(TraceState trace_state) {
-            nostd::string_view res = nostd::string_view("");
-            nostd::span<Entry *> entries = trace_state.entries();
-            int i = 0;
-            for (nostd::span<Entry *>::iterator it = entries.begin(); it != entries.end(); it++) {
-                res += it->key() + "=" + it->value();
-                if (i != entries.size()-1) res += ",";
-            }
-//            entries.ForEachKeyValue([&res,&i](nostd::string_view key, nostd::string_view value) { // Is this usage correct?
-//                i++;
-//                res += key + "=" + value;
+//        static nostd::string_view FormatTracestate(TraceState trace_state) {
+//            nostd::string_view res = nostd::string_view("");
+//            nostd::span<Entry *> entries = trace_state.entries();
+//            int i = 0;
+//            for (nostd::span<Entry *>::iterator it = entries.begin(); it != entries.end(); it++) {
+//                res += it->key() + "=" + it->value();
 //                if (i != entries.size()-1) res += ",";
-//            });
-            return res;
-        }
+//            }
+////            entries.ForEachKeyValue([&res,&i](nostd::string_view key, nostd::string_view value) { // Is this usage correct?
+////                i++;
+////                res += key + "=" + value;
+////                if (i != entries.size()-1) res += ",";
+////            });
+//            return res;
+//        }
 
         static nostd::string_view SpanContextToString(trace::SpanContext &span_context) {
             nostd::span<char> trace_id = span_context.trace_id();
