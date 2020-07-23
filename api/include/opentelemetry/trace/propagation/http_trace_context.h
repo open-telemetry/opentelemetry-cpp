@@ -27,8 +27,6 @@ namespace trace
 {
 namespace propagation
 {
-namespace
-{
 
 // The HttpTraceContext provides methods to extract and inject
 // context into headers of HTTP requests with traces.
@@ -274,7 +272,6 @@ class HttpTraceContext : public HTTPTextFormat {
             }
         }
 };
-}
 }
 }  // namespace trace
 OPENTELEMETRY_END_NAMESPACE
