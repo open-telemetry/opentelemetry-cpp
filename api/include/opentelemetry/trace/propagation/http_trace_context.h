@@ -211,7 +211,7 @@ class HttpTraceContext : public HTTPTextFormat<T> {
 //        }
 
         static TraceState ExtractTraceState(nostd::string_view &trace_state_header) {
-            TraceState.Builder trace_state_builder = TraceState.builder();
+         //   TraceState.Builder trace_state_builder = TraceState.builder();
             int start_pos = -1;
             int end_pos = -1;
             int element_num = 0;
@@ -239,7 +239,8 @@ class HttpTraceContext : public HTTPTextFormat<T> {
             if (element_num <= kTraceStateMaxMembers) {
                 throw std::invalid_argument("TraceState has too many elements.");
             }
-            return trace_state_builder.Build();
+            return TraceState();
+//            return trace_state_builder.Build();
         }
 
         static trace::SpanContext ExtractImpl(Getter getter, T &carrier) {
