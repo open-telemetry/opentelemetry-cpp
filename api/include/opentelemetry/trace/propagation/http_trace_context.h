@@ -64,7 +64,7 @@ class HttpTraceContext : public HTTPTextFormat<T> {
 
         context::Context Extract(Getter getter, const T &carrier, context::Context &context) override {
             trace::SpanContext span_context = ExtractImpl(carrier, getter);
-            return Context();
+            return context::Context();
 //            return SetSpanInContext(trace.DefaultSpan(span_context), context);
         }
 
