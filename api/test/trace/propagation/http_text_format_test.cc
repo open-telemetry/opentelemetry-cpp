@@ -13,7 +13,7 @@
 
 #include <gtest/gtest.h>
 
-namespace opentelemetry;
+using namespace opentelemetry;
 
 static nostd::string_view Getter(std::map<std::string,std::string> &carrier, nostd::string_view trace_type = "traceparent") {
     nostd::string_view res = carrier[trace_type];
