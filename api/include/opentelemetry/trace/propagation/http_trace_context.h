@@ -54,7 +54,7 @@ class HttpTraceContext : public HTTPTextFormat<T> {
         using Setter = void(*)(T &carrier, nostd::string_view trace_type,nostd::string_view trace_description);
 
         void Inject(Setter setter, T &carrier, const context::Context &context) override {
-            common::AttributeValue span = GetCurrentSpan(context);
+//            common::AttributeValue span = GetCurrentSpan(context);
             if (span == NULL || !span.GetContext().IsValid()) {
                 // We don't have span.getContext() in span.h, should we just use span? As well as acquiring validity. (I do know how to implement them though)
                 return;
@@ -64,7 +64,8 @@ class HttpTraceContext : public HTTPTextFormat<T> {
 
         context::Context Extract(Getter getter, const T &carrier, context::Context &context) override {
             trace::SpanContext span_context = ExtractImpl(carrier, getter);
-            return SetSpanInContext(trace.DefaultSpan(span_context), context);
+            return Context();
+//            return SetSpanInContext(trace.DefaultSpan(span_context), context);
         }
 
 //        context::Context SetSpanInContext(trace::Span &span, context::Context &context) {
@@ -85,13 +86,14 @@ class HttpTraceContext : public HTTPTextFormat<T> {
     private:
 
         // TODO: need review on hex_string because trace ids are objects not string_views
-        static void InjectImpl(Setter setter, T &carrier, const trace::SpanContext &span_context) {
-            nostd::string_view trace_parent = trace::SpanContextToString(trace::SpanContext &span_context);
-            setter(carrier, kTraceParent, trace_parent);
-            if (span_context.trace_state() != NULL) {
-                nostd::string_view trace_state = FormatTracestate(span_context.trace_state());
-                setter(carrier, kTraceState, trace_state);
-            }
+        static void InjectImpl(Setter setter, T &carrier) {
+//        static void InjectImpl(Setter setter, T &carrier, const trace::SpanContext &span_context) {
+//            nostd::string_view trace_parent = trace::SpanContextToString(trace::SpanContext &span_context);
+//            setter(carrier, kTraceParent, trace_parent);
+//            if (span_context.trace_state() != NULL) {
+//                nostd::string_view trace_state = FormatTracestate(span_context.trace_state());
+//                setter(carrier, kTraceState, trace_state);
+//            }
         }
 
         static nostd::string_view FormatTracestate(TraceState trace_state) {
@@ -110,7 +112,7 @@ class HttpTraceContext : public HTTPTextFormat<T> {
             return res;
         }
 
-        static nostd::string_view trace::SpanContextToString(trace::SpanContext &span_context) {
+        static nostd::string_view SpanContextToString(trace::SpanContext &span_context) {
             nostd::span<char> trace_id = span_context.trace_id();
             nostd::span<char> span_id = span_context.span_id();
             nostd::span<char> trace_flags = span_context.trace_flags();
@@ -217,7 +219,7 @@ class HttpTraceContext : public HTTPTextFormat<T> {
                     if (start_pos == -1 && end_pos == -1) continue;
                     element_num++;
                     list_member = trace_state_header.substr(start_pos,end_pos-start_pos+1);
-                    SetTraceStateBuilder(trace_state_builder,list_member);
+                    SetTraceStateBuilder(trace_state_builder,list_member); // TODO: work around (std::map? return nullptr?)
                     end_pos = -1;
                     start_pos = -1;
                 } else {
