@@ -12,9 +12,9 @@ namespace sdk
 static const opentelemetry::trace::KeyValueIterableView<std::map<std::string, int>>
     &GetEmptyAttributes() noexcept
 {
-  static const std::map<std::string, int>* map = new std::map<std::string, int>;
+  static const std::map<std::string, int> map;
   static const opentelemetry::trace::KeyValueIterableView<std::map<std::string, int>>
-      kEmptyAttributes(*map);
+      kEmptyAttributes(map);
   return kEmptyAttributes;
 }
 }  // namespace sdk
