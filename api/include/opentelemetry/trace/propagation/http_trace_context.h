@@ -255,25 +255,27 @@ class HttpTraceContext : public HTTPTextFormat<T> {
             }
 
             nostd::string_view trace_state_header = getter(carrier, kTraceState);
-            if (trace_state_header == NULL || trace_state_header.isEmpty()) {
+            if (trace_state_header == NULL || trace_state_header.empty()) {
                 return context_from_parent_header;
             }
 
             try {
                 TraceState trace_state = ExtractTraceState(trace_state_header);
                 // Need getter support from trace::SpanContext
-                return trace::SpanContext.CreateFromRemoteParent(
-                    context_from_parent_header.GetTraceId(),
-                    context_from_parent_header.GetSpanId(),
-                    context_from_parent_header.GetTraceFlags(),
-                    trace_state);
+                return trace::SpanContext();
+//                return trace::SpanContext.CreateFromRemoteParent(
+//                    context_from_parent_header.GetTraceId(),
+//                    context_from_parent_header.GetSpanId(),
+//                    context_from_parent_header.GetTraceFlags(),
+//                    trace_state);
             } catch (std::exception& e) {
                 std::cout<<"Unparseable tracestate header. Returning span context without state."<<std::endl;
-                return trace::SpanContext.CreateFromRemoteParent(
-                    context_from_parent_header.GetTraceId(),
-                    context_from_parent_header.GetSpanId(),
-                    context_from_parent_header.GetTraceFlags(),
-                    TraceState.Builder().Build());
+                return trace::SpanContext();
+//                return trace::SpanContext.CreateFromRemoteParent(
+//                    context_from_parent_header.GetTraceId(),
+//                    context_from_parent_header.GetSpanId(),
+//                    context_from_parent_header.GetTraceFlags(),
+//                    TraceState.Builder().Build());
             }
         }
 };
