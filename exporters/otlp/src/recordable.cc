@@ -125,7 +125,11 @@ void Recordable::AddEvent(nostd::string_view name,
   auto *event = span_.add_events();
   event->set_name(name.data(), name.size());
   event->set_time_unix_nano(timestamp.time_since_epoch().count());
-  // TODO: handle attributes
+
+  attributes.ForEachKeyValue([&](nostd::string_view key, common::AttributeValue value) noexcept {
+    PopulateAttribute(event->add_attributes(), key, value);
+    return true;
+  });
 }
 
 void Recordable::AddLink(opentelemetry::trace::SpanContext span_context,
