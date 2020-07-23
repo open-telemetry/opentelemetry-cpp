@@ -30,12 +30,12 @@ namespace propagation
 static const nostd::string_view kTraceParent = "traceparent";
 static const nostd::string_view kTraceState = "tracestate";
 // Parameters no longer needed because the toString functions are resolved else where
-//        static const int kVersionBytes = 2;
-//        static const int kTraceIdBytes = 32;
-//        static const int kParentIdBytes = 16;
-//        static const int kTraceFlagBytes = 2;
-//        static const int kTraceDelimiterBytes = 3;
-//        static const int kHeaderSize = kVersionBytes + kTraceIdBytes + kParentIdBytes + kTraceFlagBytes + kTraceDelimiterBytes;
+static const int kVersionBytes = 2;
+static const int kTraceIdBytes = 32;
+static const int kParentIdBytes = 16;
+static const int kTraceFlagBytes = 2;
+static const int kTraceDelimiterBytes = 3;
+static const int kHeaderSize = kVersionBytes + kTraceIdBytes + kParentIdBytes + kTraceFlagBytes + kTraceDelimiterBytes;
 static const int kTraceStateMaxMembers = 32;
 static const nostd::string_view kTraceStateKeyValueDelimiter = "=";
 static const int kHeaderElementLengths[4] = {2,32,16,2};
@@ -116,7 +116,7 @@ class HttpTraceContext : public HTTPTextFormat<T> {
             nostd::span<char> trace_id = span_context.trace_id();
             nostd::span<char> span_id = span_context.span_id();
             nostd::span<char> trace_flags = span_context.trace_flags();
-            nostd::string_view hex_string = "00-";
+            nostd::string_view hex_string = "00-"; // TODO: ask in gitter about string addition
             for (auto it : trace_id) {
                 hex_string += nostd::string_view(it,1);
             }
