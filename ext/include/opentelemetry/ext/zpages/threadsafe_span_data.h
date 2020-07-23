@@ -103,7 +103,7 @@ class ThreadsafeSpanData final : public opentelemetry::sdk::trace::Recordable {
    * Get the attributes for this span
    * @return the attributes for this span
    */
-  const std::unordered_map<std::string, SpanDataAttributeValue> &GetAttributes()
+  const std::unordered_map<std::string, SpanDataAttributeValue> GetAttributes()
       const noexcept {
     std::lock_guard<std::mutex> lock(mutex_);
     return attributes_;
