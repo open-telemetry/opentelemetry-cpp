@@ -3,6 +3,8 @@
 #include "opentelemetry/sdk/metrics/record.h"
 #include "opentelemetry/sdk/metrics/aggregator/counter_aggregator.h"
 #include "opentelemetry/sdk/metrics/aggregator/min_max_sum_count_aggregator.h"
+#include "opentelemetry/sdk/metrics/aggregator/gauge_aggregator.h"
+#include "opentelemetry/sdk/metrics/aggregator/exact_aggregator.h"
 
 
 #include <iostream>
@@ -95,20 +97,26 @@ TEST(OStreamMetricsExporter, PrintMinMaxSumCount)
 
   ASSERT_EQ(stdoutOutput.str(),expectedOutput);
 }
-/*
+
 TEST(OStreamMetricsExporter, PrintGauge)
 {
   auto exporter = std::unique_ptr<sdkmetrics::MetricsExporter> (new
       opentelemetry::exporter::metrics::OStreamMetricsExporter);
   
-  std::vector<short> vec;
-  vec.push_back((short)9);
+  auto aggregator = std::shared_ptr<opentelemetry::sdk::metrics::Aggregator<short>> (new
+      opentelemetry::sdk::metrics::GaugeAggregator<short>(metrics_api::InstrumentKind::IntCounter));
+  
+  aggregator->update(1);
+  aggregator->update(9);
+  aggregator->checkpoint();
 
-  opentelemetry::core::SystemTimestamp time = opentelemetry::core::SystemTimestamp(std::chrono::system_clock::now());
-  auto record = sdkmetrics::Record("name", "description", AggregatorKind::Gauge, "labels", vec, time);
-
+  sdkmetrics::Record r("name", "description", "labels", aggregator);
   std::vector<sdkmetrics::Record> records;
-  records.push_back(record);
+  records.push_back(r);
+
+  // Since Aggregator doesn't have GaugeAggregator specific functions, we need to cast to GaugeAggregator
+  std::shared_ptr<opentelemetry::sdk::metrics::GaugeAggregator<short>> foo;
+  foo = std::dynamic_pointer_cast<opentelemetry::sdk::metrics::GaugeAggregator<short>>(aggregator);
 
   // Create stringstream to redirect to
   std::stringstream stdoutOutput;
@@ -129,7 +137,7 @@ TEST(OStreamMetricsExporter, PrintGauge)
   "  description : description\n"
   "  labels      : labels\n"
   "  last value  : 9\n"
-  "  timestamp   : " + std::to_string(time.time_since_epoch().count()) + "\n"
+  "  timestamp   : " + std::to_string(foo->get_checkpoint_timestamp().time_since_epoch().count()) + "\n"
   "}\n"; 
 
   ASSERT_EQ(stdoutOutput.str(),expectedOutput);
@@ -140,17 +148,22 @@ TEST(OStreamMetricsExporter, PrintExact)
   auto exporter = std::unique_ptr<sdkmetrics::MetricsExporter> (new
       opentelemetry::exporter::metrics::OStreamMetricsExporter);
   
-  std::vector<float> vec;
-  for(float i = 0; i < 10; i++)
+  auto aggregator = std::shared_ptr<opentelemetry::sdk::metrics::Aggregator<int>> (new
+      opentelemetry::sdk::metrics::ExactAggregator<int>(metrics_api::InstrumentKind::IntCounter,true));
+  
+  for(int i = 0; i < 10; i++)
   {
-    vec.push_back(i);
+    aggregator->update(i);
   }
+  aggregator->checkpoint();
 
-  opentelemetry::core::SystemTimestamp time = opentelemetry::core::SystemTimestamp(std::chrono::system_clock::now());
-  auto record = sdkmetrics::Record("name", "description", AggregatorKind::Exact, "labels", vec, time);
-
+  sdkmetrics::Record r("name", "description", "labels", aggregator);
   std::vector<sdkmetrics::Record> records;
-  records.push_back(record);
+  records.push_back(r);
+
+  // Since Aggregator doesn't have GaugeAggregator specific functions, we need to cast to GaugeAggregator
+  std::shared_ptr<opentelemetry::sdk::metrics::ExactAggregator<int>> foo;
+  foo = std::dynamic_pointer_cast<opentelemetry::sdk::metrics::ExactAggregator<int>>(aggregator);
 
   // Create stringstream to redirect to
   std::stringstream stdoutOutput;
@@ -171,8 +184,9 @@ TEST(OStreamMetricsExporter, PrintExact)
   "  description : description\n"
   "  labels      : labels\n"
   "  values      : [0,1,2,3,4,5,6,7,8,9]\n"
+  "  quantiles   : [0: 0, .25: 3, .50: 5, .75: 7, 1: 9]\n"
   "}\n"; 
 
   ASSERT_EQ(stdoutOutput.str(),expectedOutput);
 }
-*/
+

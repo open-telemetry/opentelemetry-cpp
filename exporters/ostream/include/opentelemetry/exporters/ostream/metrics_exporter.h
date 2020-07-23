@@ -3,6 +3,7 @@
 #include "opentelemetry/sdk/metrics/record.h"
 #include "opentelemetry/sdk/metrics/exporter.h"
 #include "opentelemetry/sdk/metrics/aggregator/gauge_aggregator.h"
+#include "opentelemetry/sdk/metrics/aggregator/exact_aggregator.h"
 #include <iostream>
 
 OPENTELEMETRY_BEGIN_NAMESPACE
@@ -64,7 +65,34 @@ void PrintAggregatorVariant(sdkmetrics::AggregatorVariant value)
   }
   else if(aggKind == sdkmetrics::AggregatorKind::Exact)
   {
+    std::shared_ptr<opentelemetry::sdk::metrics::ExactAggregator<T>> temp_exact;
+    temp_exact = std::dynamic_pointer_cast<opentelemetry::sdk::metrics::ExactAggregator<T>>(agg);
 
+    auto vec = temp_exact->get_checkpoint();
+    int size = vec.size();
+    int i = 1;
+
+    sout_ << "\n  values      : "
+          <<'[';
+
+    for(auto val : vec)
+    {
+      sout_ << val;
+      if(i != size)
+        sout_ << ',';
+      i++;
+    }
+    sout_ << ']';
+
+    if(temp_exact->get_quant_estimation())
+    {
+      sout_ << "\n  quantiles   : "
+            << "[0: "  << temp_exact->quantile(0) << ", "
+            << ".25: " << temp_exact->quantile(.25) << ", "
+            << ".50: " << temp_exact->quantile(.50) << ", "
+            << ".75: " << temp_exact->quantile(.75) << ", "
+            << "1: "   << temp_exact->quantile(1) << ']';
+    }
   }
 }
 
