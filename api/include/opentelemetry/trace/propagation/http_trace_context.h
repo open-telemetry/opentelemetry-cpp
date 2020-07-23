@@ -184,10 +184,12 @@ class HttpTraceContext : public HTTPTextFormat<T> {
                       return trace::SpanContext();
 //                    return SetSpanInContext(trace::DefaultSpan.GetInvalid(), context);
                 }
-
-                TraceId trace_id_obj = TraceId(nostd::span<char>{trace_id.begin(),trace_id.length()});
-                trace::SpanId span_id_obj = trace::SpanId(nostd::span<char>{span_id.begin(),span_id.length()});
-                TraceFlags trace_flags_obj = TraceFlags(nostd::span<char>{trace_flags.begin(),trace_flags.length()});
+                nostd::span<char> tid{trace_id.begin(),trace_id.length()};
+                nostd::span<char> sid{span_id.begin(),span_id.length()};
+                nostd::span<char> tfg{trace_flags.begin(),trace_flags.length()};
+                TraceId trace_id_obj = TraceId(tid);
+                SpanId span_id_obj = SpanId(sid);
+                TraceFlags trace_flags_obj = TraceFlags(tfg);
                 return trace::SpanContext();
 //                return trace::SpanContext.CreateFromRemoteParent(trace_id_obj, span_id_obj, trace_flags_obj, TraceState());
             } catch (std::exception& e) {
