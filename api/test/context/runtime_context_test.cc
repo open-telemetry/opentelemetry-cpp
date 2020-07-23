@@ -1,4 +1,4 @@
-#include "opentelemetry/context/runtime_context.h"
+#include "opentelemetry/context/threadlocal_context.h"
 
 #include <gtest/gtest.h>
 
@@ -9,7 +9,7 @@ TEST(RuntimeContextTest, GetCurrent)
 {
   std::map<std::string, context::ContextValue> map_test = {{"test_key", (int64_t)123}};
   context::Context test_context                         = context::Context(map_test);
-  context::ContextToken old_context = context::RuntimeContext::Attach(&test_context);
+  context::RuntimeContext::Token old_context = context::RuntimeContext::Attach(&test_context);
   EXPECT_TRUE(*context::RuntimeContext::GetCurrent() == test_context);
   context::RuntimeContext::Detach(old_context);
 }
@@ -21,8 +21,9 @@ TEST(RuntimeContextTest, Detach)
   context::Context test_context                         = context::Context(map_test);
   context::Context foo_context                          = context::Context(map_test);
 
-  context::ContextToken test_context_token = context::RuntimeContext::Attach(&test_context);
-  context::ContextToken foo_context_token  = context::RuntimeContext::Attach(&foo_context);
+  context::RuntimeContext::Token test_context_token =
+      context::RuntimeContext::Attach(&test_context);
+  context::RuntimeContext::Token foo_context_token = context::RuntimeContext::Attach(&foo_context);
 
   context::RuntimeContext::Detach(foo_context_token);
   EXPECT_TRUE(*context::RuntimeContext::GetCurrent() == test_context);
@@ -35,8 +36,9 @@ TEST(RuntimeContextTest, DetachWrongContext)
   std::map<std::string, context::ContextValue> map_test = {{"test_key", (int64_t)123}};
   context::Context test_context                         = context::Context(map_test);
   context::Context foo_context                          = context::Context(map_test);
-  context::ContextToken test_context_token = context::RuntimeContext::Attach(&test_context);
-  context::ContextToken foo_context_token  = context::RuntimeContext::Attach(&foo_context);
+  context::RuntimeContext::Token test_context_token =
+      context::RuntimeContext::Attach(&test_context);
+  context::RuntimeContext::Token foo_context_token = context::RuntimeContext::Attach(&foo_context);
   EXPECT_FALSE(context::RuntimeContext::Detach(test_context_token));
   context::RuntimeContext::Detach(foo_context_token);
   context::RuntimeContext::Detach(test_context_token);
@@ -49,9 +51,11 @@ TEST(RuntimeContextTest, ThreeAttachDetach)
   context::Context test_context                         = context::Context(map_test);
   context::Context foo_context                          = context::Context(map_test);
   context::Context other_context                        = context::Context(map_test);
-  context::ContextToken test_context_token  = context::RuntimeContext::Attach(&test_context);
-  context::ContextToken foo_context_token   = context::RuntimeContext::Attach(&foo_context);
-  context::ContextToken other_context_token = context::RuntimeContext::Attach(&other_context);
+  context::RuntimeContext::Token test_context_token =
+      context::RuntimeContext::Attach(&test_context);
+  context::RuntimeContext::Token foo_context_token = context::RuntimeContext::Attach(&foo_context);
+  context::RuntimeContext::Token other_context_token =
+      context::RuntimeContext::Attach(&other_context);
 
   EXPECT_TRUE(context::RuntimeContext::Detach(other_context_token));
   EXPECT_TRUE(context::RuntimeContext::Detach(foo_context_token));

@@ -5,40 +5,25 @@
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace context
 {
+
 // The ThreadLocalContext class is a derived class from RuntimeContext and
 // provides a wrapper for propogating context through cpp thread locally.
-class ThreadLocalContext
+// This file must be included to use the RuntimeContext class if another
+// implementation has not been registered.
+class ThreadLocalContext : public RuntimeContext
 {
 public:
-  ThreadLocalContext() {}
-
-  // The token class provides an identifier that is used by
-  // the attach and detach methods to keep track of context
-  // objects.
-  class Token
-  {
-  private:
-    friend class ThreadLocalContext;
-
-    Context *context_;
-
-    // A constructor that sets the token's Context object to the
-    // one that was passed in.
-    Token(Context *context) { context_ = context; }
-
-    // Returns the stored context object.
-    Context *GetContext() { return context_; }
-  };
+  ThreadLocalContext() = default;
 
   // Return the current context.
-  Context *GetCurrent() { return stack_.Top(); }
+  Context *InternalGetCurrent() override { return stack_.Top(); }
 
   // Resets the context to a previous value stored in the
   // passed in token. Returns true if successful, false otherwise
-  bool Detach(Token &token)
+  bool InternalDetach(Token &token) override
   {
 
-    if (!(token.GetContext() == stack_.Top()))
+    if (!(token == *stack_.Top()))
     {
       return false;
     }
@@ -49,7 +34,7 @@ public:
 
   // Sets the current 'Context' object. Returns a token
   // that can be used to reset to the previous Context.
-  Token Attach(Context *context)
+  Token InternalAttach(Context *context) override
   {
     stack_.Push(context);
     Token old_context = Token(context);
@@ -128,5 +113,7 @@ private:
 };
 thread_local ThreadLocalContext::Stack ThreadLocalContext::stack_ = ThreadLocalContext::Stack();
 
+// Registers the ThreadLocalContext as the context handler for the RuntimeContext
+RuntimeContext *RuntimeContext::context_handler_ = new ThreadLocalContext();
 }  // namespace context
 OPENTELEMETRY_END_NAMESPACE
