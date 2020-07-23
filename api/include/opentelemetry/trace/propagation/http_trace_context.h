@@ -149,7 +149,7 @@ class HttpTraceContext : public HTTPTextFormat<T> {
                 int elt_num = 0;
                 int countdown = kHeaderElementLengths[elt_num];
                 int start_pos = -1;
-                for (int i = 0; i < trace_parent.length(); i++) {
+                for (int i = 0; i < trace_parent.size(); i++) {
                     if (trace_parent[i]=='\t') continue;
                     else if (trace_parent[i]=='-') {
                         if (countdown==0) {
@@ -185,9 +185,9 @@ class HttpTraceContext : public HTTPTextFormat<T> {
 //                    return SetSpanInContext(trace::DefaultSpan.GetInvalid(), context);
                 }
 
-                TraceId trace_id_obj = TraceId(nostd::span<char>(trace_id,trace_id.length()));
-                trace::SpanId span_id_obj = trace::SpanId(nostd::span<char>(span_id,span_id.length()));
-                TraceFlags trace_flags_obj = TraceFlags(nostd::span<char>(trace_flags,trace_flags.length()));
+                TraceId trace_id_obj = TraceId(nostd::span<char>{trace_id,trace_id.length()});
+                trace::SpanId span_id_obj = trace::SpanId(nostd::span<char>{span_id,span_id.length()});
+                TraceFlags trace_flags_obj = TraceFlags(nostd::span<char>{trace_flags,trace_flags.length()});
                 return trace::SpanContext();
 //                return trace::SpanContext.CreateFromRemoteParent(trace_id_obj, span_id_obj, trace_flags_obj, TraceState());
             } catch (std::exception& e) {
