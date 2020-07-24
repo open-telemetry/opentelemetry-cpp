@@ -38,7 +38,7 @@ TEST(HTTPTextFormatTest, NoSpanTest)
     trace::SpanContext* span_context = new trace::SpanContext();
     nostd::shared_ptr<trace::SpanContext> spc{span_context};
     context::Context ctx1 = context::Context("current-span",spc);
-//    context::Context ctx2 = format.Extract(Getter,carrier,ctx1);
+    context::Context ctx2 = format.Extract(Getter,carrier,ctx1);
 //    std::map<std::string,std::string> c2 = {};
 //    format.Inject(Setter,c2,ctx2);
 //    EXPECT_EQ(carrier.size(),c2.size());
