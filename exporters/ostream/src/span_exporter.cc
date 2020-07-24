@@ -11,7 +11,7 @@ namespace exporter
 namespace trace
 {
 OStreamSpanExporter::OStreamSpanExporter(std::ostream &sout) noexcept
-                                    : sout_{sout} {}
+                                    : sout_(sout) {}
 
 std::unique_ptr<sdktrace::Recordable> OStreamSpanExporter::MakeRecordable() noexcept 
 {
