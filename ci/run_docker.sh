@@ -2,18 +2,18 @@
 
 set -e
 
-BUILD_IMAGE=opentelemetry-cpp-build
-BUILD_IMAGE2=opentelemetry-cpp-build2
-docker image inspect "$BUILD_IMAGE" &> /dev/null || {
-  docker build -t "$BUILD_IMAGE" ci
-}
-docker image inspect "$BUILD_IMAGE2" &> /dev/null || {
-  docker build -t "$BUILD_IMAGE2" ci/cpp20
-}
+BUILD_IMAGE=opentelemetry-cpp-build6
+BUILD_IMAGEcpp20=opentelemetry-cpp20-build6
 
-if [ $2 == cmake.c++20.test ]; then
-  docker run -v "$PWD":/src -w /src -it "$BUILD_IMAGE2" "$@"
+if [[ $2 == cmake.c++20.test ]]; then
+  docker image inspect "$BUILD_IMAGEcpp20" &> /dev/null || {
+    docker build -t "$BUILD_IMAGEcpp20" ci/cpp20
+  }
+  docker run -v "$PWD":/src -w /src -it "$BUILD_IMAGEcpp20" "$@"
 else
+  docker image inspect "$BUILD_IMAGE" &> /dev/null || {
+    docker build -t "$BUILD_IMAGE" ci
+  }
   if [[ $# -ge 1 ]]; then
     docker run -v "$PWD":/src -w /src -it "$BUILD_IMAGE" "$@"
   else

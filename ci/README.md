@@ -16,4 +16,7 @@ CI tests can be run on docker by invoking the script `./ci/run_docker.sh ./ci/do
 * `code.coverage`: build cmake targets and run tests. Then upload coverage report to [codecov.io](https://codecov.io/).
 
 Additionally, `./ci/run_docker.sh` can be invoked with no arguments to get a docker shell where tests
-can be run manually.
+can be run manually, except for `cmake.c++20.test`.
+
+Note that `cmake.c++20.test` can only run in a Ubuntu version 20+ container, as earlier versions of Ubuntu do not support C++20 or g++-10.
+To run said test, you must run it in the specified Ubuntu 20.04 container by invoking `./ci/run_docker.sh ./ci/do_ci.sh cmake.c++20.test`.
