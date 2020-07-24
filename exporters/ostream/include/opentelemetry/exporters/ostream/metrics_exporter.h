@@ -17,7 +17,7 @@ namespace metrics
 
 /**
  * The OStreamMetricsExporter exports record data through an ostream
- */
+ */ 
 class OStreamMetricsExporter final : public sdkmetrics::MetricsExporter
 {
 public:

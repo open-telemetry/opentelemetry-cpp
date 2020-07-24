@@ -20,7 +20,7 @@ TEST(OStreamMetricsExporter, PrintCounter)
   
 
   auto aggregator = std::shared_ptr<opentelemetry::sdk::metrics::Aggregator<double>> (new
-      opentelemetry::sdk::metrics::CounterAggregator<double>(metrics_api::InstrumentKind::IntCounter));
+      opentelemetry::sdk::metrics::CounterAggregator<double>(metrics_api::InstrumentKind::DoubleCounter));
   
   aggregator->update(5.5);
   aggregator->checkpoint();
