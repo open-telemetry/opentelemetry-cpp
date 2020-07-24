@@ -1,4 +1,4 @@
-#include "opentelemetry/exporters/mock/mock_span_exporter.h"
+#include "opentelemetry/exporters/memory/in_memory_span_exporter.h"
 #include "opentelemetry/sdk/trace/sampler.h"
 #include "opentelemetry/sdk/trace/samplers/always_off.h"
 #include "opentelemetry/sdk/trace/samplers/always_on.h"
@@ -13,7 +13,7 @@
 #include <benchmark/benchmark.h>
 
 using namespace opentelemetry::sdk::trace;
-using opentelemetry::exporter::mock::MockSpanExporter;
+using opentelemetry::exporter::memory::InMemorySpanExporter;
 
 namespace
 {
@@ -111,7 +111,7 @@ void BenchmarkSpanCreation(std::shared_ptr<Sampler> sampler, benchmark::State &s
   std::shared_ptr<std::vector<std::unique_ptr<SpanData>>> spans_received(
       new std::vector<std::unique_ptr<SpanData>>);
 
-  std::unique_ptr<SpanExporter> exporter(new MockSpanExporter(spans_received));
+  std::unique_ptr<SpanExporter> exporter(new InMemorySpanExporter(spans_received));
   auto processor = std::make_shared<SimpleSpanProcessor>(std::move(exporter));
   auto tracer    = std::shared_ptr<opentelemetry::trace::Tracer>(new Tracer(processor, sampler));
 

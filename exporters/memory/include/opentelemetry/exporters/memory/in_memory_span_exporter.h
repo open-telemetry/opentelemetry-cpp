@@ -6,15 +6,15 @@
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace exporter
 {
-namespace mock
+namespace memory
 {
 /**
  * A mock exporter that switches a flag once a valid recordable was received.
  */
-class MockSpanExporter final : public opentelemetry::sdk::trace::SpanExporter
+class InMemorySpanExporter final : public opentelemetry::sdk::trace::SpanExporter
 {
 public:
-  MockSpanExporter(
+  InMemorySpanExporter(
       std::shared_ptr<std::vector<std::unique_ptr<sdk::trace::SpanData>>> spans_received,
       std::shared_ptr<bool> shutdown_called = std::shared_ptr<bool>(new bool(false)));
 
@@ -29,6 +29,6 @@ private:
   std::shared_ptr<std::vector<std::unique_ptr<sdk::trace::SpanData>>> spans_received_;
   std::shared_ptr<bool> shutdown_called_;
 };
-}  // namespace mock
+}  // namespace memory
 }  // namespace exporter
 OPENTELEMETRY_END_NAMESPACE

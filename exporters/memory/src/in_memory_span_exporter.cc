@@ -1,24 +1,24 @@
-#include "opentelemetry/exporters/mock/mock_span_exporter.h"
+#include "opentelemetry/exporters/memory/in_memory_span_exporter.h"
 
 #include <iostream>
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace exporter
 {
-namespace mock
+namespace memory
 {
-MockSpanExporter::MockSpanExporter(
+InMemorySpanExporter::InMemorySpanExporter(
     std::shared_ptr<std::vector<std::unique_ptr<sdk::trace::SpanData>>> spans_received,
     std::shared_ptr<bool> shutdown_called)
     : spans_received_(spans_received), shutdown_called_(shutdown_called)
 {}
 
-std::unique_ptr<sdk::trace::Recordable> MockSpanExporter::MakeRecordable() noexcept
+std::unique_ptr<sdk::trace::Recordable> InMemorySpanExporter::MakeRecordable() noexcept
 {
   return std::unique_ptr<sdk::trace::Recordable>(new sdk::trace::SpanData);
 }
 
-sdk::trace::ExportResult MockSpanExporter::Export(
+sdk::trace::ExportResult InMemorySpanExporter::Export(
     const nostd::span<std::unique_ptr<sdk::trace::Recordable>> &recordables) noexcept
 {
   for (auto &recordable : recordables)
@@ -34,10 +34,10 @@ sdk::trace::ExportResult MockSpanExporter::Export(
   return sdk::trace::ExportResult::kSuccess;
 }
 
-void MockSpanExporter::Shutdown(std::chrono::microseconds timeout) noexcept
+void InMemorySpanExporter::Shutdown(std::chrono::microseconds timeout) noexcept
 {
   *shutdown_called_ = true;
 }
-}  // namespace mock
+}  // namespace memory
 }  // namespace exporter
 OPENTELEMETRY_END_NAMESPACE

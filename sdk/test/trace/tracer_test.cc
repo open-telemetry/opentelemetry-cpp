@@ -1,5 +1,5 @@
 #include "opentelemetry/sdk/trace/tracer.h"
-#include "opentelemetry/exporters/mock/mock_span_exporter.h"
+#include "opentelemetry/exporters/memory/in_memory_span_exporter.h"
 #include "opentelemetry/sdk/trace/samplers/always_off.h"
 #include "opentelemetry/sdk/trace/samplers/always_on.h"
 #include "opentelemetry/sdk/trace/samplers/parent_or_else.h"
@@ -13,7 +13,7 @@ using opentelemetry::core::SteadyTimestamp;
 using opentelemetry::core::SystemTimestamp;
 namespace nostd  = opentelemetry::nostd;
 namespace common = opentelemetry::common;
-using opentelemetry::exporter::mock::MockSpanExporter;
+using opentelemetry::exporter::memory::InMemorySpanExporter;
 using opentelemetry::trace::SpanContext;
 
 /**
@@ -44,7 +44,7 @@ namespace
 std::shared_ptr<opentelemetry::trace::Tracer> initTracer(
     std::shared_ptr<std::vector<std::unique_ptr<SpanData>>> &received)
 {
-  std::unique_ptr<SpanExporter> exporter(new MockSpanExporter(received));
+  std::unique_ptr<SpanExporter> exporter(new InMemorySpanExporter(received));
   auto processor = std::make_shared<SimpleSpanProcessor>(std::move(exporter));
   return std::shared_ptr<opentelemetry::trace::Tracer>(new Tracer(processor));
 }
@@ -53,13 +53,13 @@ std::shared_ptr<opentelemetry::trace::Tracer> initTracer(
     std::shared_ptr<std::vector<std::unique_ptr<SpanData>>> &received,
     std::shared_ptr<Sampler> sampler)
 {
-  std::unique_ptr<SpanExporter> exporter(new MockSpanExporter(received));
+  std::unique_ptr<SpanExporter> exporter(new InMemorySpanExporter(received));
   auto processor = std::make_shared<SimpleSpanProcessor>(std::move(exporter));
   return std::shared_ptr<opentelemetry::trace::Tracer>(new Tracer(processor, sampler));
 }
 }  // namespace
 
-TEST(Tracer, ToMockSpanExporter)
+TEST(Tracer, ToInMemorySpanExporter)
 {
   std::shared_ptr<std::vector<std::unique_ptr<SpanData>>> spans_received(
       new std::vector<std::unique_ptr<SpanData>>);

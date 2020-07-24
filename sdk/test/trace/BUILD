@@ -28,7 +28,7 @@ cc_test(
         "simple_processor_test.cc",
     ],
     deps = [
-        "//exporters/mock:mock_span_exporter",
+        "//exporters/memory:in_memory_span_exporter",
         "//sdk/src/trace",
         "@com_google_googletest//:gtest_main",
     ],
@@ -51,7 +51,7 @@ cc_test(
         "tracer_test.cc",
     ],
     deps = [
-        "//exporters/mock:mock_span_exporter",
+        "//exporters/memory:in_memory_span_exporter",
         "//sdk/src/trace",
         "@com_google_googletest//:gtest_main",
     ],
@@ -117,7 +117,7 @@ otel_cc_benchmark(
     name = "sampler_benchmark",
     srcs = ["sampler_benchmark.cc"],
     deps = [
-        "//exporters/mock:mock_span_exporter",
+        "//exporters/memory:in_memory_span_exporter",
         "//sdk/src/trace",
     ],
 )
