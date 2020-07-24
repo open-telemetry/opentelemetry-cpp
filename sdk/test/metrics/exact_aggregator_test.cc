@@ -161,9 +161,9 @@ TEST(ExactAggregatorQuant, Quantile)
     agg->update(i);
   }
   agg->checkpoint();
-  ASSERT_EQ(agg->quantile(.25), 42);
-  ASSERT_EQ(agg->quantile(0.5), 163);
-  ASSERT_EQ(agg->quantile(0.75), 272);
+  ASSERT_EQ(agg->get_quantiles(.25), 42);
+  ASSERT_EQ(agg->get_quantiles(0.5), 163);
+  ASSERT_EQ(agg->get_quantiles(0.75), 272);
 }
 
 TEST(ExactAggregatorInOrder, Quantile)
@@ -178,7 +178,7 @@ TEST(ExactAggregatorInOrder, Quantile)
     agg->update(i);
   }
   agg->checkpoint();
-  ASSERT_THROW(agg->quantile(0.5), std::domain_error);
+  ASSERT_THROW(agg->get_quantiles(0.5), std::domain_error);
 }
 
 void callback(ExactAggregator<int> &agg)
