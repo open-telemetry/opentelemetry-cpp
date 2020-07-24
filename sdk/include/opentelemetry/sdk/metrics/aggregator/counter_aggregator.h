@@ -80,7 +80,7 @@ public:
      * @param none
      * @return the value of the checkpoint
      */
-    std::vector<T> get_checkpoint() override
+    virtual std::vector<T> get_checkpoint() override
     {
         return this->checkpoint_;
     }
@@ -91,7 +91,7 @@ public:
      * @param none
      * @return the present aggregator values
      */
-    std::vector<T> get_values() override
+    virtual std::vector<T> get_values() override
     {
         return this->values_;
     }
