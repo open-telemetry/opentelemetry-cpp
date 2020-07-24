@@ -6,6 +6,8 @@
 #include "opentelemetry/trace/span_context.h"
 #include "opentelemetry/nostd/string_view.h"
 #include "opentelemetry/nostd/span.h"
+#include "opentelemetry/nostd/shared_ptr.h"
+
 
 #include <map>
 #include <memory>
@@ -34,12 +36,12 @@ TEST(HTTPTextFormatTest, NoSpanTest)
 {
     const std::map<std::string,std::string> carrier = {};
     trace::SpanContext span_context = trace::SpanContext();
-//    nostd::shared_ptr<trace::SpanContext> spc{&span_context};
-//    context::Context ctx1 = context::Context("current-span",spc);
-//    context::Context ctx2 = format.Extract(Getter,carrier,ctx1);
-//    std::map<std::string,std::string> c2 = {};
-//    format.Inject(Setter,c2,ctx2);
-//    EXPECT_EQ(carrier.size(),c2.size());
+    nostd::shared_ptr<trace::SpanContext> spc{&span_context};
+    context::Context ctx1 = context::Context("current-span",spc);
+    context::Context ctx2 = format.Extract(Getter,carrier,ctx1);
+    std::map<std::string,std::string> c2 = {};
+    format.Inject(Setter,c2,ctx2);
+    EXPECT_EQ(carrier.size(),c2.size());
 }
 
 //TEST(HTTPTextFormatTest, NoTraceParentHeader)
