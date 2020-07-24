@@ -40,6 +40,8 @@ public:
     current_timestamp_ = core::SystemTimestamp(std::chrono::system_clock::now());
   }
 
+  ~GaugeAggregator() = default;
+
   /**
    * Receives a captured value from the instrument and applies it to the current aggregator value.
    *
@@ -106,7 +108,7 @@ public:
   /**
    * @return the latest checkpointed timestamp
    */
-  core::SystemTimestamp get_checkpoint_timestamp()
+  core::SystemTimestamp get_checkpoint_timestamp() override
   {
     return checkpoint_timestamp_;
   }
