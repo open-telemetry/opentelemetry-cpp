@@ -21,6 +21,7 @@ if [[ "$1" == "cmake.test" ]]; then
   make test
   exit 0
 elif [[ "$1" == "cmake.c++20.test" ]]; then
+  echo "${BUILD_DIR}"
   cd "${BUILD_DIR}"
   rm -rf *
   cmake -DCMAKE_BUILD_TYPE=Debug  \
