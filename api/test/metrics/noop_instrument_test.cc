@@ -75,8 +75,8 @@ TEST(Counter, DefaultConstruction)
 
   alpha.bind(labelkv);
 
-  auto gamma = alpha.bind(labelkv);
-  auto delta = beta.bind(labelkv);
+  auto gamma = alpha.bindNoopCounter(labelkv);
+  auto delta = beta.bindNoopCounter(labelkv);
 
   gamma->unbind();
   delta->unbind();
@@ -93,8 +93,8 @@ TEST(Counter, Add)
   alpha.add(1, labelkv);
   beta.add(1.5, labelkv);
 
-  auto gamma = alpha.bind(labelkv);
-  auto delta = beta.bind(labelkv);
+  auto gamma = alpha.bindNoopCounter(labelkv);
+  auto delta = beta.bindNoopCounter(labelkv);
 
   gamma->add(1);
   delta->add(1.5);
@@ -113,8 +113,8 @@ TEST(UpDownCounter, DefaultConstruction)
 
   alpha.bind(labelkv);
 
-  auto gamma = alpha.bind(labelkv);
-  auto delta = beta.bind(labelkv);
+  auto gamma = alpha.bindNoopUpDownCounter(labelkv);
+  auto delta = beta.bindNoopUpDownCounter(labelkv);
 
   gamma->unbind();
   delta->unbind();
@@ -131,8 +131,8 @@ TEST(UpDownCounter, Add)
   alpha.add(1, labelkv);
   beta.add(1.5, labelkv);
 
-  auto gamma = alpha.bind(labelkv);
-  auto delta = beta.bind(labelkv);
+  auto gamma = alpha.bindNoopUpDownCounter(labelkv);
+  auto delta = beta.bindNoopUpDownCounter(labelkv);
 
   gamma->add(1);
   delta->add(1.0);
@@ -153,8 +153,8 @@ TEST(ValueRecorder, DefaultConstruction)
 
   alpha.bind(labelkv);
 
-  auto gamma = alpha.bind(labelkv);
-  auto delta = beta.bind(labelkv);
+  auto gamma = alpha.bindNoopValueRecorder(labelkv);
+  auto delta = beta.bindNoopValueRecorder(labelkv);
 
   gamma->unbind();
   delta->unbind();
@@ -171,8 +171,8 @@ TEST(ValueRecorder, Record)
   alpha.record(1, labelkv);
   beta.record(1.5, labelkv);
 
-  auto gamma = alpha.bind(labelkv);
-  auto delta = beta.bind(labelkv);
+  auto gamma = alpha.bindNoopValueRecorder(labelkv);
+  auto delta = beta.bindNoopValueRecorder(labelkv);
 
   gamma->record(1);
   delta->record(1.5);

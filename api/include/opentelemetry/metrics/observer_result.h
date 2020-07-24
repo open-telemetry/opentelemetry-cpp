@@ -21,9 +21,14 @@ class ObserverResult
 public:
   ObserverResult() = default;
 
-  ObserverResult(nostd::shared_ptr<AsynchronousInstrument<T>> instrument) {}
+  ObserverResult(AsynchronousInstrument<T> * instrument): instrument_(instrument) {}
 
-  virtual void observe(T value, const trace::KeyValueIterable &labels) {}
+  virtual void observe(T value, const trace::KeyValueIterable &labels) {
+      instrument_->observe(value, labels);
+  }
+    
+private:
+    AsynchronousInstrument<T> * instrument_;
 
 };
 
