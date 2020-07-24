@@ -19,7 +19,7 @@
 #include "opentelemetry/trace/key_value_iterable.h"
 #include "opentelemetry/context/context.h"
 #include "opentelemetry/nostd/string_view.h"
-//#include "opentelemetry/trace/span.h"
+#include "opentelemetry/trace/span.h"
 //#include "opentelemetry/trace/default_span.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
@@ -138,7 +138,7 @@ class HttpTraceContext : public HTTPTextFormat<T> {
                             && trace_parent[kVersionBytes+kTraceIdBytes+1] == '-'
                             && trace_parent[kVersionBytes+kTraceIdBytes+kParentIdBytes+2] == '-';
             if (!is_valid) {
-                std::cout<<"Unparseable trace_parent header. Returning INVALID span context."<<std::endl;
+//                std::cout<<"Unparseable trace_parent header. Returning INVALID span context."<<std::endl;
                 return trace::SpanContext();
             }
 
@@ -194,7 +194,7 @@ class HttpTraceContext : public HTTPTextFormat<T> {
                 return trace::SpanContext();
 //                return trace::SpanContext.CreateFromRemoteParent(trace_id_obj, span_id_obj, trace_flags_obj, TraceState());
             } catch (std::exception& e) {
-                std::cout<<"Unparseable trace_parent header. Returning INVALID span context."<<std::endl;
+//                std::cout<<"Unparseable trace_parent header. Returning INVALID span context."<<std::endl;
                 return trace::SpanContext();
             }
         }
@@ -272,7 +272,7 @@ class HttpTraceContext : public HTTPTextFormat<T> {
 //                    context_from_parent_header.GetTraceFlags(),
 //                    trace_state);
             } catch (std::exception& e) {
-                std::cout<<"Unparseable tracestate header. Returning span context without state."<<std::endl;
+//                std::cout<<"Unparseable tracestate header. Returning span context without state."<<std::endl;
                 return trace::SpanContext();
 //                return trace::SpanContext.CreateFromRemoteParent(
 //                    context_from_parent_header.GetTraceId(),
