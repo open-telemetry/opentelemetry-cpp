@@ -7,7 +7,7 @@ namespace trace
 {
 ParentOrElseSampler::ParentOrElseSampler(std::shared_ptr<Sampler> delegate_sampler) noexcept
     : delegate_sampler_(delegate_sampler),
-      description_("ParentOrElse{" + delegate_sampler->GetDescription() + "}")
+      description_("ParentOrElse{" + std::string{delegate_sampler->GetDescription()} + "}")
 {}
 
 SamplingResult ParentOrElseSampler::ShouldSample(
@@ -32,7 +32,7 @@ SamplingResult ParentOrElseSampler::ShouldSample(
   return {Decision::NOT_RECORD, nullptr};
 }
 
-std::string ParentOrElseSampler::GetDescription() const noexcept
+nostd::string_view ParentOrElseSampler::GetDescription() const noexcept
 {
   return description_;
 }

@@ -89,6 +89,8 @@ public:
     return false;
   }
 
+  bool operator==(const Context &other) { return (head_ == other.head_); }
+
 private:
   Context() = default;
 
@@ -116,7 +118,7 @@ private:
       {
         if (first)
         {
-          *node = std::move(DataList(iter.first, iter.second));
+          *node = DataList(iter.first, iter.second);
           first = false;
         }
         else

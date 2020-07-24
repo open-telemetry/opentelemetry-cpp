@@ -111,11 +111,21 @@ void Recordable::SetAttribute(nostd::string_view key,
   }
 }
 
-void Recordable::AddEvent(nostd::string_view name, core::SystemTimestamp timestamp) noexcept
+void Recordable::AddEvent(nostd::string_view name,
+                          core::SystemTimestamp timestamp,
+                          const trace::KeyValueIterable &attributes) noexcept
 {
   auto *event = span_.add_events();
   event->set_name(name.data(), name.size());
   event->set_time_unix_nano(timestamp.time_since_epoch().count());
+  // TODO: handle attributes
+}
+
+void Recordable::AddLink(opentelemetry::trace::SpanContext span_context,
+                         const trace::KeyValueIterable &attributes) noexcept
+{
+  (void)span_context;
+  (void)attributes;
 }
 
 void Recordable::SetStatus(trace::CanonicalCode code, nostd::string_view description) noexcept
