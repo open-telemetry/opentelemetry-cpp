@@ -189,7 +189,7 @@ class PrometheusExporter : public MetricsExporter {
     /*
      * Get the Prometheus collector.
      */
-    PrometheusCollector getCollector() {
+    PrometheusCollector *getCollector() {
     
     }
 
@@ -209,7 +209,12 @@ private:
     /*
      * PrometheusCollector instance
      */
-    PrometheusCollector collector;
+    PrometheusCollector *collector;
+
+    /**
+     * Exposer instance
+     */
+    Exposer *exposer;
 }
 ```
 
