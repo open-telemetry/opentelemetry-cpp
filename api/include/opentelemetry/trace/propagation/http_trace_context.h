@@ -54,12 +54,13 @@ class HttpTraceContext : public HTTPTextFormat<T> {
         using Setter = void(*)(T &carrier, nostd::string_view trace_type,nostd::string_view trace_description);
 
         void Inject(Setter setter, T &carrier, const context::Context &context) override {
-//            common::AttributeValue span = GetCurrentSpan(context);
+//            trace::Span span = GetCurrentSpan(context);
 //            if (span == NULL || !span.GetContext().IsValid()) {
 //                // We don't have span.getContext() in span.h, should we just use span? As well as acquiring validity. (I do know how to implement them though)
 //                return;
 //            }
 //            InjectImpl(setter, carrier, span.GetContext());
+              InjectImpl(setter, carrier, SpanContext());
         }
 
         context::Context Extract(Getter getter, const T &carrier, context::Context &context) override {
@@ -88,7 +89,7 @@ class HttpTraceContext : public HTTPTextFormat<T> {
         // TODO: need review on hex_string because trace ids are objects not string_views
 //        static void InjectImpl(Setter setter, T &carrier) {
         static void InjectImpl(Setter setter, T &carrier, const trace::SpanContext &span_context) {
-//            nostd::string_view trace_parent = trace::SpanContextToString(trace::SpanContext &span_context);
+//            nostd::string_view trace_parent = SpanContextToString(trace::SpanContext &span_context);
 //            setter(carrier, kTraceParent, trace_parent);
 //            if (span_context.trace_state() != NULL) {
 //                nostd::string_view trace_state = FormatTracestate(span_context.trace_state());
