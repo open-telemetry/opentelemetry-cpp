@@ -7,7 +7,6 @@
 #include <vector>
 
 
-
 namespace metrics_api = opentelemetry::metrics;
 
 OPENTELEMETRY_BEGIN_NAMESPACE
@@ -18,12 +17,12 @@ namespace metrics
 
 enum class AggregatorKind
 {
-  Counter = 0,
-  MinMaxSumCount = 1,
-  Gauge = 2,
-  Sketch = 3,
-  Histogram = 4,
-  Exact = 5,
+    Counter = 0,
+    MinMaxSumCount = 1,
+    Gauge = 2,
+    Sketch = 3,
+    Histogram = 4,
+    Exact = 5,
 };
 
 /*
@@ -38,6 +37,8 @@ class Aggregator
 public:
     
     Aggregator() = default;
+    
+    virtual ~Aggregator() = default;
     
     /**
      * Receives a captured value from the instrument and applies it to the current aggregator value.
@@ -83,25 +84,41 @@ public:
     virtual std::vector<T> get_values() = 0;
     
     /**
-    * Returns the instrument kind which this aggregator is associated with
-    *
-    * @param none
-    * @return the InstrumentKind of the aggregator's owner
-    */
+     * Returns the instrument kind which this aggregator is associated with
+     *
+     * @param none
+     * @return the InstrumentKind of the aggregator's owner
+     */
     virtual opentelemetry::metrics::InstrumentKind get_instrument_kind() final
     {
         return kind_;
     }
     
     /**
-    * Returns the type of this aggregator
-    *
-    * @param none
-    * @return the AggregatorKind of this instrument
-    */
+     * Returns the type of this aggregator
+     *
+     * @param none
+     * @return the AggregatorKind of this instrument
+     */
     virtual AggregatorKind get_aggregator_kind() final
     {
         return agg_kind_;
+    }
+    
+    virtual std::vector<double> get_boundaries() {
+        return std::vector<double>();
+    }
+    
+    virtual std::vector<int> get_counts() {
+        return std::vector<int>();
+    }
+    
+    virtual bool get_quant_estimation () {
+        return false;
+    }
+    
+    virtual T get_quantiles(double q) {
+        return values_[0];
     }
     
     // Custom copy constructor to handle the mutex

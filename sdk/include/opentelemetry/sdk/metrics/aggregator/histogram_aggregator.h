@@ -152,9 +152,9 @@ public:
      * @param none
      * @return the aggregator boundaries
      */
-    std::vector<double> get_boundaries()
+    virtual std::vector<double> get_boundaries() override
     {
-        return bucketCounts_;
+        return boundaries_;
     }
     
     /**
@@ -163,9 +163,20 @@ public:
      * @param none
      * @return the aggregator bucket counts
      */
-    std::vector<int> get_counts()
+    virtual std::vector<int> get_counts() override
     {
         return bucketCounts_;
+    }
+    
+    HistogramAggregator(const HistogramAggregator &cp)
+    {
+        this->values_ = cp.values_;
+        this->checkpoint_ = cp.checkpoint_;
+        this->kind_ = cp.kind_;
+        this->agg_kind_ = cp.agg_kind_;
+        boundaries_ = cp.boundaries_;
+        bucketCounts_ = cp.bucketCounts_;
+        // use default initialized mutex as they cannot be copied
     }
     
 private:
