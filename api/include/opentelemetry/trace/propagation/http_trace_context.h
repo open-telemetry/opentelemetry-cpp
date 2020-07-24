@@ -65,16 +65,16 @@ class HttpTraceContext : public HTTPTextFormat<T> {
 
         context::Context Extract(Getter getter, const T &carrier, context::Context &context) override {
             trace::SpanContext span_context = ExtractImpl(getter,carrier);
-//            return context::Context();
-            return SetSpanInContext(trace.DefaultSpan(span_context), context);
+            nostd::string_view span_key = "current-span";
+            return context.SetValue(span_key,span_context);
+//            return SetSpanInContext(trace.DefaultSpan(span_context), context);
         }
 
-        context::Context SetSpanInContext(trace::Span &span, context::Context &context) {
-            nostd::string_view span_key = "current-span";
-            context::Context new_values = context::Context(context);
-            new_values.SetValue(span_key,span);
-            return new_values;
-        }
+//        context::Context SetSpanInContext(trace::Span &span, context::Context &context) {
+//            nostd::string_view span_key = "current-span";
+//            context::Context new_values = context.SetValue(span_key,span);
+//            return new_values;
+//        }
 //
 //        trace::Span GetCurrentSpan(Context &context) {
 //            trace::Span span = context.GetValue(Context.kSpanKey);
