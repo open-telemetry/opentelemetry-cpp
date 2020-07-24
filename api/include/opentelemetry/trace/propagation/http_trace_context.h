@@ -60,7 +60,6 @@ class HttpTraceContext : public HTTPTextFormat<T> {
 //                return;
 //            }
 //            InjectImpl(setter, carrier, span.GetContext());
-throw;
               InjectImpl(setter, carrier, SpanContext());
         }
 

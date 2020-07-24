@@ -1,93 +1,166 @@
 #pragma once
 
-#include "opentelemetry/common/attribute_value.h"
 #include "opentelemetry/context/context_value.h"
+#include "opentelemetry/nostd/shared_ptr.h"
 #include "opentelemetry/nostd/string_view.h"
-#include "opentelemetry/trace/key_value_iterable_view.h"
-#include "opentelemetry/trace/span_context.h"
-
-#include <iostream>
-#include <map>
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace context
 {
 
-// The context class provides a context identifier.
-// This is a dummy class that is meant to be overridden,
-// the methods return default values.
+// The context class provides a context identifier. Is built as a linked list
+// of DataList nodes and each context holds a shared_ptr to a place within
+// the list that determines which keys and values it has access to. All that
+// come before and none that come after.
 class Context
 {
 
 public:
-  Context() = default;
-
-  // Contructor, creates a context object from a map of keys
-  // and identifiers.
-  template <class T, nostd::enable_if_t<trace::detail::is_key_value_iterable<T>::value> * = nullptr>
+  // Creates a context object from a map of keys and identifiers, this will
+  // hold a shared_ptr to the head of the DataList linked list
+  template <class T>
   Context(const T &keys_and_values)
   {
-    trace::KeyValueIterableView<T> iterable{keys_and_values};
-    iterable.ForEachKeyValue([&](nostd::string_view key, context::ContextValue value) noexcept {
-      context_map_[std::string(key)] = value;
-      return true;
-    });
+    head_ = nostd::shared_ptr<DataList>{new DataList(keys_and_values)};
   }
 
-  // Accepts a key and a value and then returns a new context that
-  // contains both the original pairs and the new pair.
-  template <class T>
-  Context SetValue(nostd::string_view key, T &value) noexcept
+  // Creates a context object from a key and value, this will
+  // hold a shared_ptr to the head of the DataList linked list
+  Context(nostd::string_view key, ContextValue value)
   {
-    std::map<std::string, context::ContextValue> context_map_copy;
-    trace::KeyValueIterableView<std::map<std::string, context::ContextValue>> context_map_iterable{
-        context_map_};
-
-    context_map_iterable.ForEachKeyValue([&](nostd::string_view key,
-                                             context::ContextValue value) noexcept {
-      context_map_copy[std::string(key)] = value;
-      return true;
-    });
-
-    context_map_copy[std::string(key)] = value;
-
-    return Context(context_map_copy);
+    head_ = nostd::shared_ptr<DataList>{new DataList(key, value)};
   }
 
   // Accepts a new iterable and then returns a new context that
-  // contains both the original pairs and the new pair.
-  template <class T, nostd::enable_if_t<trace::detail::is_key_value_iterable<T>::value> * = nullptr>
-  Context SetValues(T &keys_and_values) noexcept
+  // contains the new key and value data. It attaches the
+  // exisiting list to the end of the new list.
+  template <class T>
+  Context SetValues(T &values) noexcept
   {
-    std::map<std::string, context::ContextValue> context_map_copy;
-    trace::KeyValueIterableView<std::map<std::string, context::ContextValue>> context_map_iterable{
-        context_map_};
+    Context context                   = Context(values);
+    nostd::shared_ptr<DataList> &last = context.head_;
+    while (last->next_ != nullptr)
+    {
+      last = last->next_;
+    }
+    last->next_ = head_;
+    return context;
+  }
 
-    context_map_iterable.ForEachKeyValue([&](nostd::string_view key,
-                                             context::ContextValue value) noexcept {
-      context_map_copy[std::string(key)] = value;
-      return true;
-    });
-
-    trace::KeyValueIterableView<T> iterable{keys_and_values};
-
-    iterable.ForEachKeyValue([&](nostd::string_view key, context::ContextValue value) noexcept {
-      context_map_copy[std::string(key)] = value;
-      return true;
-    });
-
-    return Context(context_map_copy);
+  // Accepts a new iterable and then returns a new context that
+  // contains the new key and value data. It attaches the
+  // exisiting list to the end of the new list.
+  Context SetValue(nostd::string_view key, ContextValue value) noexcept
+  {
+    Context context      = Context(key, value);
+    context.head_->next_ = head_;
+    return context;
   }
 
   // Returns the value associated with the passed in key.
-  context::ContextValue GetValue(nostd::string_view key) { return context_map_[std::string(key)]; }
+  context::ContextValue GetValue(const nostd::string_view key) noexcept
+  {
+    for (DataList *data = head_.get(); data != nullptr; data = data->next_.get())
+    {
+      if (key.size() == data->key_length_)
+      {
+        if (memcmp(key.data(), data->key_, data->key_length_) == 0)
+        {
+          return data->value_;
+        }
+      }
+    }
+    return (int64_t)0;
+  }
 
-  // Copy Constructors.
-  Context(const Context &other) = default;
-  Context &operator=(const Context &other) = default;
+  // Checks for key and returns true if found
+  bool HasKey(const nostd::string_view key) noexcept
+  {
+    for (DataList *data = head_.get(); data != nullptr; data = data->next_.get())
+    {
+      if (key.size() == data->key_length_)
+      {
+        if (memcmp(key.data(), data->key_, data->key_length_) == 0)
+        {
+          return true;
+        }
+      }
+    }
+    return false;
+  }
 
 private:
-  std::map<std::string, context::ContextValue> context_map_;
+  Context() = default;
+
+  // A linked list to contain the keys and values of this context node
+  class DataList
+  {
+  public:
+    nostd::shared_ptr<DataList> next_;
+
+    char *key_;
+
+    size_t key_length_;
+
+    ContextValue value_;
+
+    DataList() { next_ = nullptr; }
+
+    // Builds a data list off of a key and value iterable and returns the head
+    template <class T>
+    DataList(const T &keys_and_vals) : key_{nullptr}
+    {
+      bool first = true;
+      auto *node = this;
+      for (auto &iter : keys_and_vals)
+      {
+        if (first)
+        {
+          *node = DataList(iter.first, iter.second);
+          first = false;
+        }
+        else
+        {
+          node->next_ = nostd::shared_ptr<DataList>(new DataList(iter.first, iter.second));
+          node        = node->next_.get();
+        }
+      }
+    }
+
+    // Builds a data list with just a key and value, so it will just be the head
+    // and returns that head.
+    DataList(nostd::string_view key, ContextValue value)
+    {
+      key_        = new char[key.size()];
+      key_length_ = key.size();
+      memcpy(key_, key.data(), key.size() * sizeof(char));
+      value_ = value;
+      next_  = nostd::shared_ptr<DataList>{nullptr};
+    }
+
+    DataList &operator=(DataList &&other)
+    {
+      key_length_ = other.key_length_;
+      value_      = std::move(other.value_);
+      next_       = std::move(other.next_);
+
+      key_       = other.key_;
+      other.key_ = nullptr;
+
+      return *this;
+    }
+
+    ~DataList()
+    {
+      if (key_ != nullptr)
+      {
+        delete[] key_;
+      }
+    }
+  };
+
+  // Head of the list which holds the keys and values of this context
+  nostd::shared_ptr<DataList> head_;
 };
 }  // namespace context
 OPENTELEMETRY_END_NAMESPACE
