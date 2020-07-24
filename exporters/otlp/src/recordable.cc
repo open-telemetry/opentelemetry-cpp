@@ -135,8 +135,12 @@ void Recordable::AddEvent(nostd::string_view name,
 void Recordable::AddLink(opentelemetry::trace::SpanContext span_context,
                          const trace::KeyValueIterable &attributes) noexcept
 {
-  (void)span_context;
-  (void)attributes;
+  auto *link = span_.add_links();
+  attributes.ForEachKeyValue([&](nostd::string_view key, common::AttributeValue value) noexcept {
+    PopulateAttribute(link->add_attributes(), key, value);
+    return true;
+  });
+  // TODO: Populate trace_id, span_id and trace_state when these are supported by SpanContext
 }
 
 void Recordable::SetStatus(trace::CanonicalCode code, nostd::string_view description) noexcept

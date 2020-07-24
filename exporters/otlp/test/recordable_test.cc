@@ -78,7 +78,7 @@ TEST(Recordable, SetStatus)
   EXPECT_EQ(rec.span().status().message(), description);
 }
 
-TEST(Recordable, AddEvents)
+TEST(Recordable, AddEventsWithDefaults)
 {
   Recordable rec;
   nostd::string_view name = "Test Event";
@@ -93,6 +93,22 @@ TEST(Recordable, AddEvents)
 
   EXPECT_EQ(rec.span().events(0).name(), name);
   EXPECT_EQ(rec.span().events(0).time_unix_nano(), unix_event_time);
+}
+
+TEST(Recordable, AddEventsWithAttributes)
+{
+  Recordable rec;
+  const int kNumAttributes = 2;
+
+  std::map<std::string, int> attributes = {{"attr1", 4}, {"attr2", 7}};
+
+  rec.AddEvent("Test Event", std::chrono::system_clock::now(),
+               trace::KeyValueIterableView<std::map<std::string, int>>(attributes));
+
+  EXPECT_EQ(rec.span().events(0).attributes(0).key(), "attr1");
+  EXPECT_EQ(rec.span().events(0).attributes(1).key(), "attr2");
+  EXPECT_EQ(rec.span().events(0).attributes(0).value().int_value(), 4);
+  EXPECT_EQ(rec.span().events(0).attributes(1).value().int_value(), 7);
 }
 
 // Test non-int single types. Int single types are tested using templates (see IntAttributeTest)
