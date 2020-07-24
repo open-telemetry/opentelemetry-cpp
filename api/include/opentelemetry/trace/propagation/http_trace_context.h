@@ -138,7 +138,6 @@ class HttpTraceContext : public HTTPTextFormat<T> {
                             && trace_parent[kVersionBytes+kTraceIdBytes+kParentIdBytes+2] == '-';
             if (!is_valid) {
                 std::cout<<"Unparseable trace_parent header. Returning INVALID span context."<<std::endl;
-                throw;
                 return trace::SpanContext();
             }
 
@@ -248,6 +247,7 @@ class HttpTraceContext : public HTTPTextFormat<T> {
 
         static trace::SpanContext ExtractImpl(Getter getter, const T &carrier) {
             nostd::string_view trace_parent = getter(carrier, kTraceParent);
+            throw;
             if (trace_parent == "") {
                 return trace::SpanContext();
             }
