@@ -17,6 +17,8 @@ public:
   public:
     bool operator==(const Context &other) { return (*context_ == other); }
 
+    ~Token() { Detach(*this); }
+
   private:
     friend class RuntimeContext;
 

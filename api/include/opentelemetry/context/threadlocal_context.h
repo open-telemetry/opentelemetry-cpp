@@ -23,12 +23,14 @@ public:
   // passed in token. Returns true if successful, false otherwise
   bool InternalDetach(Token &token) override
   {
-
+    if (stack_.Top() == nullptr)
+    {
+      return false;
+    }
     if (!(token == *stack_.Top()))
     {
       return false;
     }
-
     stack_.Pop();
     return true;
   }
