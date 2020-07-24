@@ -63,7 +63,7 @@ class HttpTraceContext : public HTTPTextFormat<T> {
         }
 
         context::Context Extract(Getter getter, const T &carrier, context::Context &context) override {
-//            trace::SpanContext span_context = ExtractImpl(getter,carrier);
+            trace::SpanContext span_context = ExtractImpl(getter,carrier);
             return context::Context();
 //            return SetSpanInContext(trace.DefaultSpan(span_context), context);
         }
@@ -247,6 +247,7 @@ class HttpTraceContext : public HTTPTextFormat<T> {
 
         static trace::SpanContext ExtractImpl(Getter getter, const T &carrier) {
             nostd::string_view trace_parent = getter(carrier, kTraceParent);
+            return trace::SpanContext();
             if (trace_parent == NULL) {
                 return trace::SpanContext();
             }
