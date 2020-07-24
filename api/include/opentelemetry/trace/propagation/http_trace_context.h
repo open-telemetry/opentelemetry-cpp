@@ -250,11 +250,11 @@ class HttpTraceContext : public HTTPTextFormat<T> {
             if (trace_parent == "") {
                 return trace::SpanContext();
             }
-            return trace::SpanContext();
             trace::SpanContext context_from_parent_header = ExtractContextFromTraceParent(trace_parent);
             if (!context_from_parent_header.IsValid()) {
                 return context_from_parent_header;
             }
+            return trace::SpanContext();
 
             nostd::string_view trace_state_header = getter(carrier, kTraceState);
             if (trace_state_header == NULL || trace_state_header.empty()) {
