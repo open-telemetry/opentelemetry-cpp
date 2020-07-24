@@ -35,8 +35,8 @@ static nostd::string_view span_id = "1234567890123456";
 TEST(HTTPTextFormatTest, NoSpanTest)
 {
     const std::map<std::string,std::string> carrier = {};
-    trace::SpanContext span_context = trace::SpanContext();
-    nostd::shared_ptr<trace::SpanContext> spc{&span_context};
+    trace::SpanContext* span_context = new trace::SpanContext();
+    nostd::shared_ptr<trace::SpanContext> spc{span_context};
 //    context::Context ctx1 = context::Context("current-span",spc);
 //    context::Context ctx2 = format.Extract(Getter,carrier,ctx1);
 //    std::map<std::string,std::string> c2 = {};
