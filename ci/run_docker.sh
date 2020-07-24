@@ -2,8 +2,8 @@
 
 set -e
 
-BUILD_IMAGE=opentelemetry-cpp-build6
-BUILD_IMAGEcpp20=opentelemetry-cpp20-build6
+BUILD_IMAGE=opentelemetry-cpp-build
+BUILD_IMAGEcpp20=opentelemetry-cpp20-build
 
 if [[ $2 == cmake.c++20.test ]]; then
   docker image inspect "$BUILD_IMAGEcpp20" &> /dev/null || {
