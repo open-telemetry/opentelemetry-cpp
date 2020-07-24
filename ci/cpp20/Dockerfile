@@ -10,7 +10,7 @@ ENV DEBIAN_FRONTEND noninteractive
 ENV DEBCONF_NONINTERACTIVE_SEEN true
 
 RUN echo "tzdata tzdata/Areas select US" > /tmp/preseed.txt; \
-    echo "tzdata tzdata/Zones/Europe select Chicago" >> /tmp/preseed.txt; \
+    echo "tzdata tzdata/Zones/US select Chicago" >> /tmp/preseed.txt; \
     debconf-set-selections /tmp/preseed.txt && \
     apt-get update && \
     apt-get install -y tzdata
