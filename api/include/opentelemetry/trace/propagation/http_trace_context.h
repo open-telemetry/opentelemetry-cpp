@@ -79,7 +79,7 @@ class HttpTraceContext : public HTTPTextFormat<T> {
 //        }
 //
         trace::SpanContext GetCurrentSpanContext(const context::Context &context) {
-            nostd::string_view span_key = "current-span";
+            const nostd::string_view span_key = "current-span";
             nostd::shared_ptr<trace::SpanContext> span_context = context.GetValue(span_key);
 //            if (span == NULL) {
 //                return NULL;
