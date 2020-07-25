@@ -55,7 +55,7 @@ class HttpTraceContext : public HTTPTextFormat<T> {
         using Setter = void(*)(T &carrier, nostd::string_view trace_type,nostd::string_view trace_description);
 
         void Inject(Setter setter, T &carrier, const context::Context &context) override {
-            trace::SpanContext span_context = GetCurrentSpanContext(context::Context(context));
+            trace::SpanContext span_context = GetCurrentSpanContext(context);
 //            if (span == NULL || !span.GetContext().IsValid()) {
 //                // We don't have span.getContext() in span.h, should we just use span? As well as acquiring validity. (I do know how to implement them though)
 //                return;
@@ -78,7 +78,7 @@ class HttpTraceContext : public HTTPTextFormat<T> {
 //            return new_values;
 //        }
 //
-        trace::SpanContext GetCurrentSpanContext(context::Context &context) {
+        trace::SpanContext GetCurrentSpanContext(const context::Context &context) {
             nostd::string_view span_key = "current-span";
             nostd::shared_ptr<trace::SpanContext> span_context = context.GetValue(span_key);
 //            if (span == NULL) {
