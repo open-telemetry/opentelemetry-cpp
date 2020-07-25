@@ -61,7 +61,7 @@ class HttpTraceContext : public HTTPTextFormat<T> {
 //                return;
 //            }
 //            InjectImpl(setter, carrier, span.GetContext());
-              InjectImpl(setter, carrier, SpanContext());
+              InjectImpl(setter, carrier, span_context);
         }
 
         context::Context Extract(Getter getter, const T &carrier, context::Context &context) override {
@@ -80,7 +80,7 @@ class HttpTraceContext : public HTTPTextFormat<T> {
 //
         trace::SpanContext GetCurrentSpanContext(const context::Context &context) {
             const nostd::string_view span_key = "current-span";
-            nostd::shared_ptr<trace::SpanContext> span_context = nostd::shared_ptr<trace::SpanContext>(context.GetValue(span_key));
+            nostd::shared_ptr<trace::SpanContext> span_context = context.GetValue("current_span");
 //            if (span == NULL) {
 //                return NULL;
 //            }
