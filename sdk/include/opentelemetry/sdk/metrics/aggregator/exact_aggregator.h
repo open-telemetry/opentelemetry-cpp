@@ -148,6 +148,12 @@ public:
   {
     return this->values_;
   }
+  
+  bool get_quant_estimation() override
+  {
+    return quant_estimation_;
+  }
+  
 private:
   bool quant_estimation_; // Used to switch between in-order and quantile estimation modes
 };
