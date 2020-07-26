@@ -229,6 +229,31 @@ inline std::string KvToString(const trace::KeyValueIterable &kv) noexcept
     return ss.str();
 }
 
+inline std::string KvToString(const trace::KeyValueIterable &kv) noexcept
+{
+    std::stringstream ss;
+    ss << "{";
+    size_t size = kv.size();
+    if (size)
+    {
+        size_t i = 1;
+        // TODO: we need to do something with this iterator. It is not very convenient.
+        // Having range-based for loop would've been nicer
+        kv.ForEachKeyValue([&](nostd::string_view key, common::AttributeValue value) noexcept {
+            ss << "\"" << key << "\":";
+            print_value(ss, value, true);
+            if (size != i)
+            {
+                ss << ",";
+            }
+            i++;
+            return true;
+        });
+    };
+    ss << "}";
+    return ss.str();
+}
+
 } // namespace metrics
 } // namespace sdk
 OPENTELEMETRY_END_NAMESPACE
