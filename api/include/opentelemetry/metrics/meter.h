@@ -273,64 +273,20 @@ public:
       nostd::span<const nostd::shared_ptr<SynchronousInstrument<short>>> instruments,
       nostd::span<const short> values) noexcept = 0;
 
-  void RecordShortBatch(std::initializer_list<std::pair<nostd::string_view, nostd::string_view>> labels,
-                        std::initializer_list<nostd::shared_ptr<SynchronousInstrument<short>>> instruments,
-                        std::initializer_list<short> values)
-  {
-    opentelemetry::trace::KeyValueIterableView<std::initializer_list<std::pair<nostd::string_view, nostd::string_view>>> labelskv{labels};
-
-    RecordShortBatch(labelskv,
-                     nostd::span<const nostd::shared_ptr<SynchronousInstrument<short>>> {instruments.begin(), instruments.end()},
-                     nostd::span<const short> {values.begin(), values.end()});
-  }
-
   virtual void RecordIntBatch(
       const trace::KeyValueIterable &labels,
       nostd::span<const nostd::shared_ptr<SynchronousInstrument<int>>> instruments,
       nostd::span<const int> values) noexcept = 0;
-
-  void RecordIntBatch(std::initializer_list<std::pair<nostd::string_view, nostd::string_view>> labels,
-                      std::initializer_list<nostd::shared_ptr<SynchronousInstrument<int>>> instruments,
-                      std::initializer_list<int> values)
-  {
-    opentelemetry::trace::KeyValueIterableView<std::initializer_list<std::pair<nostd::string_view, nostd::string_view>>> labelskv{labels};
-
-    RecordIntBatch(labelskv,
-                   nostd::span<const nostd::shared_ptr<SynchronousInstrument<int>>> {instruments.begin(), instruments.end()},
-                   nostd::span<const int> {values.begin(), values.end()});
-  }
 
   virtual void RecordFloatBatch(
       const trace::KeyValueIterable &labels,
       nostd::span<const nostd::shared_ptr<SynchronousInstrument<float>>> instruments,
       nostd::span<const float> values) noexcept = 0;
 
-  void RecordFloatBatch(std::initializer_list<std::pair<nostd::string_view, nostd::string_view>> labels,
-                        std::initializer_list<nostd::shared_ptr<SynchronousInstrument<float>>> instruments,
-                        std::initializer_list<float> values)
-  {
-    opentelemetry::trace::KeyValueIterableView<std::initializer_list<std::pair<nostd::string_view, nostd::string_view>>> labelskv{labels};
-
-    RecordFloatBatch(labelskv,
-                     nostd::span<const nostd::shared_ptr<SynchronousInstrument<float>>> {instruments.begin(), instruments.end()},
-                     nostd::span<const float> {values.begin(), values.end()});
-  }
-
   virtual void RecordDoubleBatch(
       const trace::KeyValueIterable &labels,
       nostd::span<const nostd::shared_ptr<SynchronousInstrument<double>>> instruments,
       nostd::span<const double> values) noexcept = 0;
-
-  void RecordDoubleBatch(std::initializer_list<std::pair<nostd::string_view, nostd::string_view>> labels,
-                         std::initializer_list<nostd::shared_ptr<SynchronousInstrument<double>>> instruments,
-                         std::initializer_list<double> values)
-  {
-    opentelemetry::trace::KeyValueIterableView<std::initializer_list<std::pair<nostd::string_view, nostd::string_view>>> labelskv{labels};
-
-    RecordDoubleBatch(labelskv,
-                      nostd::span<const nostd::shared_ptr<SynchronousInstrument<double>>> {instruments.begin(), instruments.end()},
-                      nostd::span<const double> {values.begin(), values.end()});
-  }
 
 };
 }  // namespace metrics
