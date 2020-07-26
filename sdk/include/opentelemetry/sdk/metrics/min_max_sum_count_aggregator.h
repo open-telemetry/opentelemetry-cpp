@@ -42,6 +42,17 @@ public:
     this->agg_kind_ = AggregatorKind::MinMaxSumCount;
   }
 
+  ~MinMaxSumCountAggregator() = default;
+
+  MinMaxSumCountAggregator(const MinMaxSumCountAggregator &cp)
+  {
+    this->values_ = cp.values_;
+    this->checkpoint_ = cp.checkpoint_;
+    this->kind_ = cp.kind_;
+    this->agg_kind_ = cp.agg_kind_;
+    // use default initialized mutex as they cannot be copied
+  }
+
   /**
    * Receives a captured value from the instrument and applies it to the current aggregator value.
    *
