@@ -45,6 +45,16 @@ public:
 
   ~ExactAggregator() = default;
 
+  ExactAggregator(const ExactAggregator &cp)
+  {
+    this->values_ = cp.values_;
+    this->checkpoint_ = cp.checkpoint_;
+    this->kind_ = cp.kind_;
+    this->agg_kind_ = cp.agg_kind_;
+    quant_estimation_ = cp.quant_estimation_;
+    // use default initialized mutex as they cannot be copied
+  }
+
   /**
    * Receives a captured value from the instrument and adds it to the values_ vector.
    *
