@@ -167,6 +167,7 @@ class HttpTraceContext : public HTTPTextFormat<T> {
 //                std::cout<<"Unparseable trace_parent header. Returning INVALID span context."<<std::endl;
                 return trace::SpanContext();
             }
+            throw;
             return trace::SpanContext();
             try {
                 nostd::string_view version;
