@@ -507,24 +507,40 @@ void Meter::CollectMetrics(std::vector<Record> &records)
   metrics_lock_.lock();
   for (const auto &pair : short_metrics_)
   {
+    if (!pair.second->IsEnabled())
+    {
+      continue;
+    }
     auto cast_ptr = nostd::dynamic_pointer_cast<SynchronousInstrument<short>>(pair.second);
     std::vector<Record> new_records = cast_ptr->GetRecords();
     records.insert(records.begin(), new_records.begin(), new_records.end());
   }
   for (const auto &pair : int_metrics_)
   {
+    if (!pair.second->IsEnabled())
+    {
+      continue;
+    }
     auto cast_ptr = nostd::dynamic_pointer_cast<SynchronousInstrument<int>>(pair.second);
     std::vector<Record> new_records = cast_ptr->GetRecords();
     records.insert(records.begin(), new_records.begin(), new_records.end());
   }
   for (const auto &pair : float_metrics_)
   {
+    if (!pair.second->IsEnabled())
+    {
+      continue;
+    }
     auto cast_ptr = nostd::dynamic_pointer_cast<SynchronousInstrument<float>>(pair.second);
     std::vector<Record> new_records = cast_ptr->GetRecords();
     records.insert(records.begin(), new_records.begin(), new_records.end());
   }
   for (const auto &pair : double_metrics_)
   {
+    if (!pair.second->IsEnabled())
+    {
+      continue;
+    }
     auto cast_ptr = nostd::dynamic_pointer_cast<SynchronousInstrument<double>>(pair.second);
     std::vector<Record> new_records = cast_ptr->GetRecords();
     records.insert(records.begin(), new_records.begin(), new_records.end());
@@ -537,26 +553,41 @@ void Meter::CollectObservers(std::vector<Record> &records)
   observers_lock_.lock();
   for (const auto &pair : short_observers_)
   {
-    // Must cast to sdk::SynchronousInstrument to have access to GetRecords() function
-    auto cast_ptr = nostd::dynamic_pointer_cast<AsynchronousInstrument<short>>(pair.second);
+    if (!pair.second->IsEnabled())
+    {
+      continue;
+    }
+    auto cast_ptr = std::dynamic_pointer_cast<AsynchronousInstrument<short>>(pair.second);
     std::vector<Record> new_records = cast_ptr->GetRecords();
     records.insert(records.begin(), new_records.begin(), new_records.end());
   }
   for (const auto &pair : int_observers_)
   {
-    auto cast_ptr = nostd::dynamic_pointer_cast<AsynchronousInstrument<int>>(pair.second);
+    if (!pair.second->IsEnabled())
+    {
+      continue;
+    }
+    auto cast_ptr = std::dynamic_pointer_cast<AsynchronousInstrument<int>>(pair.second);
     std::vector<Record> new_records = cast_ptr->GetRecords();
     records.insert(records.begin(), new_records.begin(), new_records.end());
   }
   for (const auto &pair : float_observers_)
   {
-    auto cast_ptr = nostd::dynamic_pointer_cast<AsynchronousInstrument<float>>(pair.second);
+    if (!pair.second->IsEnabled())
+    {
+      continue;
+    }
+    auto cast_ptr = std::dynamic_pointer_cast<AsynchronousInstrument<float>>(pair.second);
     std::vector<Record> new_records = cast_ptr->GetRecords();
     records.insert(records.begin(), new_records.begin(), new_records.end());
   }
   for (const auto &pair : double_observers_)
   {
-    auto cast_ptr = nostd::dynamic_pointer_cast<AsynchronousInstrument<double>>(pair.second);
+    if (!pair.second->IsEnabled())
+    {
+      continue;
+    }
+    auto cast_ptr = std::dynamic_pointer_cast<AsynchronousInstrument<double>>(pair.second);
     std::vector<Record> new_records = cast_ptr->GetRecords();
     records.insert(records.begin(), new_records.begin(), new_records.end());
   }
