@@ -57,12 +57,15 @@ class HttpTraceContext : public HTTPTextFormat<T> {
 
         void Inject(Setter setter, T &carrier, const context::Context &context) override {
             trace::SpanContext span_context = GetCurrentSpanContext(context);
+            if (!span_context.IsValid()) {
+                return;
+            }
 //            if (span == NULL || !span.GetContext().IsValid()) {
 //                // We don't have span.getContext() in span.h, should we just use span? As well as acquiring validity. (I do know how to implement them though)
 //                return;
 //            }
 //            InjectImpl(setter, carrier, span.GetContext());
-              InjectImpl(setter, carrier, span_context);
+            InjectImpl(setter, carrier, span_context);
         }
 
         context::Context Extract(Getter getter, const T &carrier, context::Context &context) override {
