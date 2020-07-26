@@ -129,7 +129,7 @@ class HttpTraceContext : public HTTPTextFormat<T> {
 //        }
 
         static nostd::string_view SpanContextToString(const trace::SpanContext &span_context) {
-            trace::TraceId trace_id = span_context.trace_id();
+            nostd::span<const uint8_t,trace::TraceId.kSize> trace_id = span_context.trace_id().Id();
 //            nostd::span<char> span_id = span_context.span_id();
 //            nostd::span<char> trace_flags = span_context.trace_flags();
             nostd::string_view hex_string = "00-"; // TODO: ask in gitter about string addition
