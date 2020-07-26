@@ -237,6 +237,26 @@ TEST(Meter, RecordBatch)
   ASSERT_EQ(double_agg->get_checkpoint()[0], 1.0);
 }
 
+TEST(Meter, DisableCollectSync)
+{
+  auto m = new Meter("Test");
+  std::map<std::string, std::string> labels = {{"Key", "Value"}};
+  auto labelkv = opentelemetry::trace::KeyValueIterableView<decltype(labels)>{labels};
+  auto c = m->NewShortCounter("c", "", "", false);
+  c->add(1, labelkv);
+  ASSERT_EQ(m->Collect().size(), 0);
+}
+
+TEST(Meter, DisableCollectAsync)
+{
+  auto m = new Meter("Test");
+  std::map<std::string, std::string> labels = {{"Key", "Value"}};
+  auto labelkv = opentelemetry::trace::KeyValueIterableView<decltype(labels)>{labels};
+  auto c = m->NewShortValueObserver("c", "", "", false, &ShortCallback);
+  c->observe(1, labelkv);
+  ASSERT_EQ(m->Collect().size(), 0);
+}
+
 TEST(MeterStringUtil, IsValid)
 {
   auto m = new Meter("Test");
