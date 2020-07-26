@@ -13,6 +13,7 @@
 // limitations under the License.
 
 #include <string>
+#include <map>
 #include <iostream>
 #include <exception>
 #include "opentelemetry/trace/propagation/http_text_format.h"
