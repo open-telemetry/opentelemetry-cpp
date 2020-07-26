@@ -3,34 +3,36 @@
 #include "opentelemetry/metrics/instrument.h"
 #include "opentelemetry/nostd/variant.h"
 #include "opentelemetry/sdk/metrics/aggregator/aggregator.h"
+#include "opentelemetry/nostd/shared_ptr.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
+
+namespace metrics_api = opentelemetry::metrics;
 
 namespace sdk
 {
 namespace metrics
 {
-using AggregatorVariant = nostd::variant<std::shared_ptr<Aggregator<short>>,
-                                         std::shared_ptr<Aggregator<int>>,
-                                         std::shared_ptr<Aggregator<float>>,
-                                         std::shared_ptr<Aggregator<double>>>;
+using AggregatorVariant = nostd::variant<nostd::shared_ptr<Aggregator<short>>,
+                                         nostd::shared_ptr<Aggregator<int>>,
+                                         nostd::shared_ptr<Aggregator<float>>,
+                                         nostd::shared_ptr<Aggregator<double>>>;
 class Record
 {
 public:
-  explicit Record(std::string name, std::string description,
-                  std::string labels,
-                  AggregatorVariant aggregator)
+  explicit Record(nostd::string_view name, nostd::string_view description,
+                  std::string labels, AggregatorVariant aggregator)
   {
-    name_ = name;
-    description_ = description;
+    name_ = std::string(name);
+    description_ = std::string(description);
     labels_ = labels;
-    aggregator_ = std::move(aggregator);
+    aggregator_ = aggregator;
   }
 
   std::string GetName() {return name_;}
   std::string GetDescription() {return description_;}
   std::string GetLabels() {return labels_;}
-  AggregatorVariant GetAggregator() {return std::move(aggregator_);}
+  AggregatorVariant GetAggregator() {return aggregator_;}
 
 private:
   std::string name_;

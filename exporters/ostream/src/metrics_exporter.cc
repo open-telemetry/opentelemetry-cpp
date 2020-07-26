@@ -20,19 +20,19 @@ sdkmetrics::ExportResult OStreamMetricsExporter::Export(
           << "\n  labels      : " << record.GetLabels();
   
     auto aggregator = record.GetAggregator();
-    if(nostd::holds_alternative<std::shared_ptr<sdkmetrics::Aggregator<int>>>(aggregator))
+    if(nostd::holds_alternative<nostd::shared_ptr<sdkmetrics::Aggregator<int>>>(aggregator))
     {
       PrintAggregatorVariant<int>(aggregator);
     }
-    else if(nostd::holds_alternative<std::shared_ptr<sdkmetrics::Aggregator<short>>>(aggregator))
+    else if(nostd::holds_alternative<nostd::shared_ptr<sdkmetrics::Aggregator<short>>>(aggregator))
     {
       PrintAggregatorVariant<short>(aggregator);
     }
-    else if(nostd::holds_alternative<std::shared_ptr<sdkmetrics::Aggregator<double>>>(aggregator))
+    else if(nostd::holds_alternative<nostd::shared_ptr<sdkmetrics::Aggregator<double>>>(aggregator))
     {
       PrintAggregatorVariant<double>(aggregator);
     }
-    else if(nostd::holds_alternative<std::shared_ptr<sdkmetrics::Aggregator<float>>>(aggregator))
+    else if(nostd::holds_alternative<nostd::shared_ptr<sdkmetrics::Aggregator<float>>>(aggregator))
     {
       PrintAggregatorVariant<float>(aggregator);
     }

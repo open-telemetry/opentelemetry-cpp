@@ -12,6 +12,7 @@
 
 namespace sdkmetrics = opentelemetry::sdk::metrics;
 namespace metrics_api = opentelemetry::metrics;
+namespace nostd = opentelemetry::nostd;
 
 TEST(OStreamMetricsExporter, PrintCounter)
 {
@@ -19,7 +20,7 @@ TEST(OStreamMetricsExporter, PrintCounter)
       opentelemetry::exporter::metrics::OStreamMetricsExporter);
   
 
-  auto aggregator = std::shared_ptr<opentelemetry::sdk::metrics::Aggregator<double>> (new
+  auto aggregator = nostd::shared_ptr<opentelemetry::sdk::metrics::Aggregator<double>> (new
       opentelemetry::sdk::metrics::CounterAggregator<double>(metrics_api::InstrumentKind::Counter));
   
   aggregator->update(5.5);
@@ -60,7 +61,7 @@ TEST(OStreamMetricsExporter, PrintMinMaxSumCount)
   auto exporter = std::unique_ptr<sdkmetrics::MetricsExporter> (new
       opentelemetry::exporter::metrics::OStreamMetricsExporter);
   
-  auto aggregator = std::shared_ptr<opentelemetry::sdk::metrics::Aggregator<int>> (new
+  auto aggregator = nostd::shared_ptr<opentelemetry::sdk::metrics::Aggregator<int>> (new
       opentelemetry::sdk::metrics::MinMaxSumCountAggregator<int>(metrics_api::InstrumentKind::Counter));
   
   aggregator->update(1);
@@ -103,7 +104,7 @@ TEST(OStreamMetricsExporter, PrintGauge)
   auto exporter = std::unique_ptr<sdkmetrics::MetricsExporter> (new
       opentelemetry::exporter::metrics::OStreamMetricsExporter);
   
-  auto aggregator = std::shared_ptr<opentelemetry::sdk::metrics::Aggregator<short>> (new
+  auto aggregator = nostd::shared_ptr<opentelemetry::sdk::metrics::Aggregator<short>> (new
       opentelemetry::sdk::metrics::GaugeAggregator<short>(metrics_api::InstrumentKind::Counter));
   
   aggregator->update(1);
@@ -113,10 +114,6 @@ TEST(OStreamMetricsExporter, PrintGauge)
   sdkmetrics::Record r("name", "description", "labels", aggregator);
   std::vector<sdkmetrics::Record> records;
   records.push_back(r);
-
-  // Since Aggregator doesn't have GaugeAggregator specific functions, we need to cast to GaugeAggregator
-  std::shared_ptr<opentelemetry::sdk::metrics::GaugeAggregator<short>> foo;
-  foo = std::dynamic_pointer_cast<opentelemetry::sdk::metrics::GaugeAggregator<short>>(aggregator);
 
   // Create stringstream to redirect to
   std::stringstream stdoutOutput;
@@ -137,7 +134,7 @@ TEST(OStreamMetricsExporter, PrintGauge)
   "  description : description\n"
   "  labels      : labels\n"
   "  last value  : 9\n"
-  "  timestamp   : " + std::to_string(foo->get_checkpoint_timestamp().time_since_epoch().count()) + "\n"
+  "  timestamp   : " + std::to_string(aggregator->get_checkpoint_timestamp().time_since_epoch().count()) + "\n"
   "}\n"; 
 
   ASSERT_EQ(stdoutOutput.str(),expectedOutput);
@@ -148,10 +145,10 @@ TEST(OStreamMetricsExporter, PrintExact)
   auto exporter = std::unique_ptr<sdkmetrics::MetricsExporter> (new
       opentelemetry::exporter::metrics::OStreamMetricsExporter);
   
-  auto aggregator = std::shared_ptr<opentelemetry::sdk::metrics::Aggregator<int>> (new
+  auto aggregator = nostd::shared_ptr<opentelemetry::sdk::metrics::Aggregator<int>> (new
       opentelemetry::sdk::metrics::ExactAggregator<int>(metrics_api::InstrumentKind::Counter,true));
 
-  auto aggregator2 = std::shared_ptr<opentelemetry::sdk::metrics::Aggregator<int>> (new
+  auto aggregator2 = nostd::shared_ptr<opentelemetry::sdk::metrics::Aggregator<int>> (new
       opentelemetry::sdk::metrics::ExactAggregator<int>(metrics_api::InstrumentKind::Counter,false));
   
   for(int i = 0; i < 10; i++)
@@ -204,7 +201,7 @@ TEST(OStreamMetricsExporter, PrintHistogram)
       opentelemetry::exporter::metrics::OStreamMetricsExporter);
   
   std::vector<double> boundaries{10,20,30,40,50};
-  auto aggregator = std::shared_ptr<opentelemetry::sdk::metrics::Aggregator<int>> (new
+  auto aggregator = nostd::shared_ptr<opentelemetry::sdk::metrics::Aggregator<int>> (new
       opentelemetry::sdk::metrics::HistogramAggregator<int>(metrics_api::InstrumentKind::Counter,boundaries));
   
   for(int i = 0; i < 60; i++)
@@ -216,10 +213,6 @@ TEST(OStreamMetricsExporter, PrintHistogram)
   sdkmetrics::Record r("name", "description", "labels", aggregator);
   std::vector<sdkmetrics::Record> records;
   records.push_back(r);
-
-  // Since Aggregator doesn't have GaugeAggregator specific functions, we need to cast to GaugeAggregator
-  std::shared_ptr<opentelemetry::sdk::metrics::HistogramAggregator<int>> foo;
-  foo = std::dynamic_pointer_cast<opentelemetry::sdk::metrics::HistogramAggregator<int>>(aggregator);
 
   // Create stringstream to redirect to
   std::stringstream stdoutOutput;
