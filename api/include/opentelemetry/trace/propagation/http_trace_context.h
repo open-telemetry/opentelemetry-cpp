@@ -86,7 +86,7 @@ class HttpTraceContext : public HTTPTextFormat<T> {
 //            if (span_context == nullptr) {
 //                return trace::SpanContext();
 //            }
-            return *span_context.get();
+            return *(span_context.get());
         }
 //        trace::Span GetCurrentSpan(Context &context) {
 //            trace::Span span = context.GetValue(Context.kSpanKey);
