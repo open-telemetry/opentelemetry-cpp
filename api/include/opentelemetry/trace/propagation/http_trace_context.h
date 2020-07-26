@@ -59,7 +59,6 @@ class HttpTraceContext : public HTTPTextFormat<T> {
         void Inject(Setter setter, T &carrier, const context::Context &context) override {
             trace::SpanContext span_context = GetCurrentSpanContext(context);
             if (!span_context.IsValid()) {
-                throw;
                 return;
             }
 //            if (span == NULL || !span.GetContext().IsValid()) {
