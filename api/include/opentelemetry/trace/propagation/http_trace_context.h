@@ -13,6 +13,7 @@
 // limitations under the License.
 
 #include <string>
+#include <iostream>
 #include <exception>
 #include "opentelemetry/trace/propagation/http_text_format.h"
 #include "opentelemetry/trace/span_context.h"
@@ -160,9 +161,10 @@ class HttpTraceContext : public HTTPTextFormat<T> {
 
         static trace::SpanContext ExtractContextFromTraceParent(nostd::string_view &trace_parent) {
             bool is_valid = trace_parent.length() == kHeaderSize
-                            && trace_parent[kVersionBytes] == '4';
+                            && trace_parent[kVersionBytes] == '-';
 //                            && trace_parent[kVersionBytes+kTraceIdBytes+1] == '-'
 //                            && trace_parent[kVersionBytes+kTraceIdBytes+kParentIdBytes+2] == '-';
+            std::cout<<traceparent<<std::endl;
             if (!is_valid) {
 //                std::cout<<"Unparseable trace_parent header. Returning INVALID span context."<<std::endl;
                 throw;
