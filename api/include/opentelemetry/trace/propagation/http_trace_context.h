@@ -159,12 +159,8 @@ class HttpTraceContext : public HTTPTextFormat<T> {
         }
 
         static trace::SpanContext ExtractContextFromTraceParent(nostd::string_view &trace_parent) {
-            bool is_valid = trace_parent.length() == kHeaderSize
-                            && trace_parent[kVersionBytes] == '-'
-                            && trace_parent[kVersionBytes+kTraceIdBytes+1] == '-'
-                            && trace_parent[kVersionBytes+kTraceIdBytes+kParentIdBytes+2] == '-';
+            bool is_valid = trace_parent.length() == kHeaderSize;
             if (!is_valid) {
-                throw;
 //                std::cout<<"Unparseable trace_parent header. Returning INVALID span context."<<std::endl;
                 return trace::SpanContext();
             }
