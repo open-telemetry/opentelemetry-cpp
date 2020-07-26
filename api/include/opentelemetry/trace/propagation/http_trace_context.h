@@ -106,7 +106,7 @@ class HttpTraceContext : public HTTPTextFormat<T> {
 //        static void InjectImpl(Setter setter, T &carrier) {
         static void InjectImpl(Setter setter, T &carrier, const trace::SpanContext &span_context) {
             nostd::string_view trace_parent = SpanContextToString(span_context);
-//            setter(carrier, kTraceParent, trace_parent);
+            setter(carrier, kTraceParent, trace_parent);
 //            if (span_context.trace_state() != NULL) {
 //                nostd::string_view trace_state = FormatTracestate(span_context.trace_state());
 //                setter(carrier, kTraceState, trace_state);
