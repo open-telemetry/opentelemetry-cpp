@@ -1,48 +1,34 @@
 #pragma once
 
 #include "opentelemetry/common/attribute_value.h"
+#include "opentelemetry/nostd/shared_ptr.h"
 #include "opentelemetry/nostd/string_view.h"
+#include "opentelemetry/trace/key_value_iterable_view.h"
+#include <iostream>
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace metrics
 {
 
-// Enum classes to help determine instrument types in other parts of the api
+// Enum classes to help determine instrument types in other parts of the API
 enum class InstrumentKind
 {
-  IntCounter,
-  IntUpDownCounter,
-  IntValueRecorder,
-  IntValueObserver,
-  IntSumObserver,
-  IntUpDownSumObserver,
-  DoubleCounter,
-  DoubleUpDownCounter,
-  DoubleValueRecorder,
-  DoubleValueObserver,
-  DoubleSumObserver,
-  DoubleUpDownSumObserver
-};
-
-// Fewer Bound types because Asynchronous instruments cannot bind
-enum class BoundInstrumentKind
-{
-  BoundIntCounter,
-  BoundIntUpDownCounter,
-  BoundIntValueRecorder,
-  BoundDoubleCounter,
-  BoundDoubleUpDownCounter,
-  BoundDoubleValueRecorder
+  Counter = 0,
+  UpDownCounter = 1,
+  ValueRecorder = 2,
+  ValueObserver = 3,
+  SumObserver = 4,
+  UpDownSumObserver = 5,
 };
 
 class Instrument
 {
-
+  
 public:
   // Note that Instruments should be created using the Meter class.
   // Please refer to meter.h for documentation.
   Instrument() = default;
-
+  
   /**
    * Base class constructor for all other instrument types.  Whether or not
    * an instrument is synchronous or bound, it requires a name, description,
@@ -55,39 +41,41 @@ public:
    * @return Instrument type with the specified attirbutes
    */
   Instrument(nostd::string_view name,
-             nostd::string_view description,
-             nostd::string_view unit,
-             bool enabled);
-
+              nostd::string_view description,
+              nostd::string_view unit,
+              bool enabled)
+  {}
+  
   // Returns true if the instrument is enabled and collecting data
-  virtual bool IsEnabled()
-  {
-    // False in default implementation
-    return false;
-  }
-
+  virtual bool IsEnabled() = 0;
+  
   // Return the instrument name
-  virtual nostd::string_view GetName() { return nostd::string_view(""); }
-
+  virtual nostd::string_view GetName() = 0;
+  
   // Return the instrument description
-  virtual nostd::string_view GetDescription() { return nostd::string_view(""); }
-
+  virtual nostd::string_view GetDescription() = 0;
+  
   // Return the insrument's units of measurement
-  virtual nostd::string_view GetUnits() { return nostd::string_view(""); }
+  virtual nostd::string_view GetUnits() = 0;
+  
+  // Return the intrument's kind
+  virtual InstrumentKind GetKind() = 0;
+  
+  virtual ~Instrument() = default;
 };
 
-class BoundSynchronousInstrument : public Instrument
+template <class T>
+class BoundSynchronousInstrument : virtual public Instrument
 {
-
+  
 public:
   BoundSynchronousInstrument() = default;
-
+  
   BoundSynchronousInstrument(nostd::string_view name,
-                             nostd::string_view description,
-                             nostd::string_view unit,
-                             bool enabled)
-  {}
-
+                              nostd::string_view description,
+                              nostd::string_view unit,
+                              bool enabled);
+  
   /**
    * Frees the resources associated with this Bound Instrument.
    * The Metric from which this instrument was created is not impacted.
@@ -96,7 +84,24 @@ public:
    * @return void
    */
   virtual void unbind() {}
-
+  
+  /**
+   * Incremements the reference count of this bound object when a new instance is
+   * either created or the same instance is returned as a result of binding
+   *
+   * @param none
+   * @return void
+   */
+  virtual void inc_ref () {}
+  
+  /**
+   * Return the object's current reference count.  This information is used to remove
+   * stale objects from instrument registries. 
+   */
+  virtual int get_ref() {
+      return 0;
+  }
+  
   /**
    * Records a single synchronous metric event; a call to the aggregator
    * Since this is a bound synchronous instrument, labels are not required in  * metric capture
@@ -105,22 +110,22 @@ public:
    * @param value is the numerical representation of the metric being captured
    * @return void
    */
-  virtual void update(nostd::variant<int, double> value) final {
-  }  // don't want this overriden because the base boundsynchronousinstrument will call the
-     // aggregator in the sdk
+  virtual void update(T value) {}
 };
 
-class SynchronousInstrument : public Instrument
+template <class T>
+class SynchronousInstrument : virtual public Instrument
 {
-
+  
 public:
   SynchronousInstrument() = default;
-
+  
   SynchronousInstrument(nostd::string_view name,
                         nostd::string_view description,
                         nostd::string_view unit,
-                        bool enabled);
-
+                        bool enabled)
+  { }
+  
   /**
    * Returns a Bound Instrument associated with the specified labels.         * Multiples requests
    * with the same set of labels may return the same Bound Instrument instance.
@@ -131,11 +136,10 @@ public:
    * @param labels the set of labels, as key-value pairs
    * @return a Bound Instrument
    */
-  BoundSynchronousInstrument bind(const nostd::string_view &labels)
-  {
-    return BoundSynchronousInstrument();
+  virtual nostd::shared_ptr<BoundSynchronousInstrument<T>> bind(const trace::KeyValueIterable &labels) {
+      return nostd::shared_ptr<BoundSynchronousInstrument<T>>();
   }
-
+  
   /**
    * Records a single synchronous metric event.
    * Since this is an unbound synchronous instrument, labels are required in  * metric capture
@@ -148,41 +152,52 @@ public:
    * @param value is the numerical representation of the metric being captured
    * @return void
    */
-  virtual void update(nostd::variant<int, double> value, nostd::string_view &labels) final {}
+  virtual void update(T value, const trace::KeyValueIterable &labels) = 0;
 };
 
+template <class T>
 class ObserverResult;
 
-class AsynchronousInstrument : public Instrument
+template <class T>
+class AsynchronousInstrument : virtual public Instrument
 {
-
+  
 public:
   AsynchronousInstrument() = default;
-
+  
   AsynchronousInstrument(nostd::string_view name,
-                         nostd::string_view description,
-                         nostd::string_view unit,
-                         bool enabled,
-                         void(callback)(ObserverResult))
+                          nostd::string_view description,
+                          nostd::string_view unit,
+                          bool enabled,
+                          void(callback)(ObserverResult<T>))
   {}
-
+  
   /**
-   * Captures data by activating the callback function associated with the
-   * instrument and storing its return value.  Callbacks for asychronous
-   * instruments are defined during construction.
+   * Captures data through a manual call rather than the automatic collection process instituted
+   * in the run function.  Asynchronous instruments are generally expected to obtain data from
+   * their callbacks rather than direct calls.  This function is used by the callback to store data.
    *
    * @param value is the numerical representation of the metric being captured
+   * @param labels is the numerical representation of the metric being captured
    * @return none
    */
-  virtual void observe(int value, const nostd::string_view &labels) {}
-
-  virtual void observe(double value, const nostd::string_view &labels) {}
-
-private:
+  virtual void observe (T value, const trace::KeyValueIterable &labels) = 0;
+  
+  /**
+  * Captures data by activating the callback function associated with the
+  * instrument and storing its return value.  Callbacks for asynchronous
+  * instruments are defined during construction.
+  *
+  * @param none
+  * @return none
+  */
+  virtual void run() = 0;
+  
+protected:
   // Callback function which takes a pointer to an Asynchronous instrument (this) type which is
   // stored in an observer result type and returns nothing.  This function calls the instrument's
   // observe.
-  void (*callback_)(ObserverResult);
+  void (*callback_)(ObserverResult<T>);
 };
 
 }  // namespace metrics

@@ -1,7 +1,7 @@
 #pragma once
 
 #include "opentelemetry/core/timestamp.h"
-#include "opentelemetry/sdk/metrics/instrument.h"
+#include "opentelemetry/metrics/instrument.h"
 #include "opentelemetry/sdk/metrics/aggregator/aggregator.h"
 #include "opentelemetry/version.h"
 
@@ -106,7 +106,7 @@ public:
   /**
    * @return the latest checkpointed timestamp
    */
-  core::SystemTimestamp get_checkpoint_timestamp()
+  core::SystemTimestamp get_checkpoint_timestamp() override
   {
     return checkpoint_timestamp_;
   }

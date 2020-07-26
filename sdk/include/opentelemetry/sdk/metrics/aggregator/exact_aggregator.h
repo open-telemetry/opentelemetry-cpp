@@ -1,6 +1,6 @@
 #pragma once
 
-#include "opentelemetry/sdk/metrics/instrument.h"
+#include "opentelemetry/metrics/instrument.h"
 #include "opentelemetry/sdk/metrics/aggregator/aggregator.h"
 #include "opentelemetry/version.h"
 
@@ -42,6 +42,8 @@ public:
     this->agg_kind_ = AggregatorKind::Exact;
     quant_estimation_ = quant_estimation;
   }
+
+  ~ExactAggregator() = default;
 
   /**
    * Receives a captured value from the instrument and adds it to the values_ vector.
@@ -98,7 +100,7 @@ public:
    * @param q the quantile to estimate. 0 <= q <= 1
    * @return the nearest value in the vector to the exact quantile.
    */
-  T quantile(float q)
+  T get_quantiles(double q) override
   {
     if (!quant_estimation_)
     {
@@ -136,11 +138,12 @@ public:
   {
     return this->values_;
   }
-  
-  bool get_quant_estimation()
+
+  bool get_quant_estimation() override
   {
     return quant_estimation_;
   }
+  
 private:
   bool quant_estimation_; // Used to switch between in-order and quantile estimation modes
 };

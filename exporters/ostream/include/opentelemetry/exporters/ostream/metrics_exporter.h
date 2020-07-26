@@ -56,53 +56,48 @@ void PrintAggregatorVariant(sdkmetrics::AggregatorVariant value)
   }
   else if(aggKind == sdkmetrics::AggregatorKind::Gauge)
   {
-    // Since Aggregator doesn't have GaugeAggregator specific functions, we need to cast to GaugeAggregator
-    std::shared_ptr<opentelemetry::sdk::metrics::GaugeAggregator<T>> temp_gauge;
-    temp_gauge = std::dynamic_pointer_cast<opentelemetry::sdk::metrics::GaugeAggregator<T>>(agg);
-    auto timestamp = temp_gauge->get_checkpoint_timestamp();
+    auto timestamp = agg->get_checkpoint_timestamp();
 
-    sout_ << "\n  last value  : " << temp_gauge->get_checkpoint()[0]
+    sout_ << "\n  last value  : " << agg->get_checkpoint()[0]
           << "\n  timestamp   : " << std::to_string(timestamp.time_since_epoch().count());
   }
   else if(aggKind == sdkmetrics::AggregatorKind::Exact)
   {
-    std::shared_ptr<opentelemetry::sdk::metrics::ExactAggregator<T>> temp_exact;
-    temp_exact = std::dynamic_pointer_cast<opentelemetry::sdk::metrics::ExactAggregator<T>>(agg);
-
-    auto vec = temp_exact->get_checkpoint();
-    int size = vec.size();
-    int i = 1;
-
-    sout_ << "\n  values      : "
-          <<'[';
-
-    for(auto val : vec)
-    {
-      sout_ << val;
-      if(i != size)
-        sout_ << ',';
-      i++;
-    }
-    sout_ << ']';
-
     // TODO: Find better way to print quantiles
-    if(temp_exact->get_quant_estimation())
+    if(agg->get_quant_estimation())
     {
       sout_ << "\n  quantiles   : "
-            << "[0: "  << temp_exact->quantile(0) << ", "
-            << ".25: " << temp_exact->quantile(.25) << ", "
-            << ".50: " << temp_exact->quantile(.50) << ", "
-            << ".75: " << temp_exact->quantile(.75) << ", "
-            << "1: "   << temp_exact->quantile(1) << ']';
+            << "[0: "  << agg->get_quantiles(0) << ", "
+            << ".25: " << agg->get_quantiles(.25) << ", "
+            << ".50: " << agg->get_quantiles(.50) << ", "
+            << ".75: " << agg->get_quantiles(.75) << ", "
+            << "1: "   << agg->get_quantiles(1) << ']';
     }
+    else
+    {
+      auto vec = agg->get_checkpoint();
+      int size = vec.size();
+      int i = 1;
+
+      sout_ << "\n  values      : "
+            <<'[';
+
+      for(auto val : vec)
+      {
+        sout_ << val;
+        if(i != size)
+          sout_ << ", ";
+        i++;
+      }
+      sout_ << ']';
+    }
+
+
   }
   else if(aggKind == sdkmetrics::AggregatorKind::Histogram)
   {
-    std::shared_ptr<opentelemetry::sdk::metrics::HistogramAggregator<T>> temp_hist;
-    temp_hist = std::dynamic_pointer_cast<opentelemetry::sdk::metrics::HistogramAggregator<T>>(agg); 
-
-    auto boundaries = temp_hist->get_boundaries();
-    auto counts = temp_hist->get_counts();
+    auto boundaries = agg->get_boundaries();
+    auto counts = agg->get_counts();
 
     int boundaries_size = boundaries.size();
     int counts_size = counts.size();

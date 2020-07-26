@@ -2,7 +2,7 @@
 
 #include <algorithm>
 #include <mutex>
-#include "opentelemetry/sdk/metrics/instrument.h"
+#include "opentelemetry/metrics/instrument.h"
 #include "opentelemetry/version.h"
 #include "opentelemetry/sdk/metrics/aggregator/aggregator.h"
 #include <stdexcept>
@@ -152,7 +152,7 @@ public:
      * @param none
      * @return the aggregator boundaries
      */
-    std::vector<double> get_boundaries()
+    std::vector<double> get_boundaries() override
     {
         return boundaries_;
     }
@@ -163,7 +163,7 @@ public:
      * @param none
      * @return the aggregator bucket counts
      */
-    std::vector<int> get_counts()
+    std::vector<int> get_counts() override
     {
         return bucketCounts_;
     }
