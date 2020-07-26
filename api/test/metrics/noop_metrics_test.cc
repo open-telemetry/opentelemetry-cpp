@@ -1,6 +1,7 @@
 #include <gtest/gtest.h>
 #include "opentelemetry/metrics/noop.h"
 #include "opentelemetry/metrics/observer_result.h"
+#include "opentelemetry/metrics/sync_instruments.h"
 
 #include <memory>
 
@@ -40,16 +41,57 @@ TEST(NoopMeter, RecordBatch)
 
   std::unique_ptr<Meter> m{std::unique_ptr<Meter>(new NoopMeter{})};
 
+  std::map<std::string, std::string> labels = {{"Key", "Value"}};
+  auto labelkv = opentelemetry::trace::KeyValueIterableView<decltype(labels)>{labels};
+
   auto s = m->NewShortCounter("Test short counter", "For testing", "Unitless", true);
-  m->RecordShortBatch({{"Key", "Value"}}, {s}, {1});
+
+  nostd::shared_ptr<opentelemetry::metrics::SynchronousInstrument<short>>
+      sinstr_arr[] =
+          {nostd::shared_ptr<opentelemetry::metrics::SynchronousInstrument<short>>(s.get())};
+  short svalues_arr[] = {1};
+
+  nostd::span<const nostd::shared_ptr<opentelemetry::metrics::SynchronousInstrument<short>>> sinstrs
+      {sinstr_arr};
+  nostd::span<const short, 1> svalues {svalues_arr};
+
+  m->RecordShortBatch(labelkv, sinstrs, svalues);
 
   auto i = m->NewIntCounter("Test int counter", "For testing", "Unitless", true);
-  m->RecordIntBatch({{"Key", "Value"}}, {i}, {1});
+
+  nostd::shared_ptr<opentelemetry::metrics::SynchronousInstrument<int>>
+      iinstr_arr[] =
+          {nostd::shared_ptr<opentelemetry::metrics::SynchronousInstrument<int>>(i.get())};
+  int ivalues_arr[] = {1};
+
+  nostd::span<const nostd::shared_ptr<opentelemetry::metrics::SynchronousInstrument<int>>> iinstrs
+      {iinstr_arr};
+  nostd::span<const int, 1> ivalues {ivalues_arr};
+  m->RecordIntBatch(labelkv, iinstrs, ivalues);
 
   auto f = m->NewFloatCounter("Test int counter", "For testing", "Unitless", true);
-  m->RecordFloatBatch({{"Key", "Value"}}, {f}, {1});
+
+  nostd::shared_ptr<opentelemetry::metrics::SynchronousInstrument<float>>
+      finstr_arr[] =
+          {nostd::shared_ptr<opentelemetry::metrics::SynchronousInstrument<float>>(f.get())};
+  float fvalues_arr[] = {1.0};
+
+  nostd::span<const nostd::shared_ptr<opentelemetry::metrics::SynchronousInstrument<float>>>
+      finstrs {finstr_arr};
+  nostd::span<const float, 1> fvalues {fvalues_arr};
+  m->RecordFloatBatch(labelkv, finstrs, fvalues);
 
   auto d = m->NewDoubleCounter("Test int counter", "For testing", "Unitless", true);
-  m->RecordDoubleBatch({{"Key", "Value"}}, {d}, {1});
+
+  nostd::shared_ptr<opentelemetry::metrics::SynchronousInstrument<double>>
+      dinstr_arr[] =
+          {nostd::shared_ptr<opentelemetry::metrics::SynchronousInstrument<double>>(d.get())};
+  double dvalues_arr[] = {1.0};
+
+  nostd::span<const nostd::shared_ptr<opentelemetry::metrics::SynchronousInstrument<double>>>
+      dinstrs {dinstr_arr};
+  nostd::span<const double, 1> dvalues {dvalues_arr};
+  m->RecordDoubleBatch(labelkv, dinstrs, dvalues);
+
 }
 OPENTELEMETRY_END_NAMESPACE
