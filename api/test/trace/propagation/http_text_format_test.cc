@@ -25,7 +25,6 @@ static nostd::string_view Getter(const std::map<std::string,std::string> &carrie
 
 static void Setter(std::map<std::string,std::string> &carrier, nostd::string_view trace_type = "traceparent", nostd::string_view trace_description = "") {
     carrier[std::string(trace_type)] = std::string(trace_description);
-    throw;
 }
 
 static trace::propagation::HttpTraceContext<std::map<std::string,std::string>> format = trace::propagation::HttpTraceContext<std::map<std::string,std::string>>();
