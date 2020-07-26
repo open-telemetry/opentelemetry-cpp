@@ -1,6 +1,7 @@
 #pragma once
 
 #include <mutex>
+#include "opentelemetry/core/timestamp.h"
 #include "opentelemetry/metrics/instrument.h"
 #include "opentelemetry/version.h"
 #include <variant>
@@ -105,20 +106,29 @@ public:
         return agg_kind_;
     }
     
+    // virtual function to be overriden for the Histogram Aggregator
     virtual std::vector<double> get_boundaries() {
         return std::vector<double>();
     }
     
+    // virtual function to be overriden for the Histogram Aggregator
     virtual std::vector<int> get_counts() {
         return std::vector<int>();
     }
     
+    // virtual function to be overriden for Exact and Sketch Aggregators
     virtual bool get_quant_estimation () {
         return false;
     }
     
+    // virtual function to be overriden for Exact and Sketch Aggregators
     virtual T get_quantiles(double q) {
         return values_[0];
+    }
+    
+    // virtual function to be overriden for Gauge Aggregator
+    virtual core::SystemTimestamp get_checkpoint_timestamp() {
+        return core::SystemTimestamp();
     }
     
     // Custom copy constructor to handle the mutex
