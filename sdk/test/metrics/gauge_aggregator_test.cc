@@ -48,7 +48,7 @@ TEST(GaugeAggregator, Merge)
   // This tests that the values_ vector is updated correctly after
   // two aggregators are merged together.
   auto agg1 = new GaugeAggregator<int>(opentelemetry::metrics::InstrumentKind::Counter);
-  auto agg2 = new GaugeAggregator<int>(opentelemetry::metrics::InstrumentKind::ValueRecorder);
+  auto agg2 = new GaugeAggregator<int>(opentelemetry::metrics::InstrumentKind::Counter);
 
   agg1->update(1);
   agg2->update(2);
