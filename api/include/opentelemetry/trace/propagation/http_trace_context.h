@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#include <string>
 #include <exception>
 #include "opentelemetry/trace/propagation/http_text_format.h"
 #include "opentelemetry/trace/span_context.h"
@@ -132,7 +133,17 @@ class HttpTraceContext : public HTTPTextFormat<T> {
             nostd::span<const uint8_t> trace_id = span_context.trace_id().Id();
             nostd::span<const uint8_t> span_id = span_context.span_id().Id();
             uint8_t trace_flags = span_context.trace_flags().flags();
-            nostd::string_view hex_string = "00-"; // TODO: ask in gitter about string addition
+//            nostd::string_view hex_string = "00-"; // TODO: ask in gitter about string addition
+            // Note: This is only temporary replacement for appendable string
+            std::string hex_string = "00-";
+            for (auto it : trace_id) {
+                hex_string += std::string(it,1);
+            }
+            hex_string += "-";
+            for (auto it : span_id) {
+                hex_string += std::string(it,1);
+            }
+            hex_string += "-" + trace_flags;
 //            for (auto it : trace_id) {
 //                hex_string += nostd::string_view(it,1);
 //            }
@@ -144,7 +155,7 @@ class HttpTraceContext : public HTTPTextFormat<T> {
 //            for (auto it : trace_flags) {
 //                hex_string += nostd::string_view(it,1);
 //            }
-            return hex_string;
+            return nostd::string_view(hex_string);
         }
 
         static trace::SpanContext ExtractContextFromTraceParent(nostd::string_view &trace_parent) {
