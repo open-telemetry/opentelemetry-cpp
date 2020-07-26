@@ -325,6 +325,8 @@ Due to the requirement to maintain ABI stability we have chosen to implement lab
 
 A base Metric class defines the constructor and binding functions which each metric instrument will need. Once an instrument is bound, it becomes a BoundInstrument which extends the BaseBoundInstrument class. The BaseBoundInstrument is what communicates with the aggregator and performs the actual updating of values. An enum helps to organize the numerous types of metric instruments that will be supported.
 
+The only addition to the SDK metric instrument classes from their API counterparts is the function GetRecords() and the private variables std::map<std::string, BoundSynchronousInstrument> to hold bound instruments and Aggregator<T> to hold the instrument's aggregator.
+
 **For more information about the implementation of metric instruments, refer to the Metrics API Design document.**
 
 # Metrics SDK Data Path Implementation
