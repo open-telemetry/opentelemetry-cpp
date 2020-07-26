@@ -196,8 +196,8 @@ TEST(Meter, RecordBatch)
 
   m->RecordShortBatch(labelkv, sinstrs, svalues);
   std::vector<Record> res = m->Collect();
-  auto agg_var = res[0].GetAggregator();
-  auto short_agg = opentelemetry::nostd::get<0>(agg_var);
+  auto short_agg_var = res[0].GetAggregator();
+  auto short_agg = opentelemetry::nostd::get<0>(short_agg_var);
   ASSERT_EQ(short_agg->get_checkpoint()[0], 1);
 
   nostd::shared_ptr<metrics_api::SynchronousInstrument<int>> iinstr_arr[] = {icounter};
@@ -208,8 +208,8 @@ TEST(Meter, RecordBatch)
 
   m->RecordIntBatch(labelkv, iinstrs, ivalues);
   res = m->Collect();
-  agg_var = res[1].GetAggregator();
-  auto int_agg = opentelemetry::nostd::get<1>(agg_var);
+  auto int_agg_var = res[0].GetAggregator();
+  auto int_agg = opentelemetry::nostd::get<1>(int_agg_var);
   ASSERT_EQ(int_agg->get_checkpoint()[0], 1);
 
   nostd::shared_ptr<metrics_api::SynchronousInstrument<float>> finstr_arr[] = {fcounter};
@@ -220,8 +220,8 @@ TEST(Meter, RecordBatch)
 
   m->RecordFloatBatch(labelkv, finstrs, fvalues);
   res = m->Collect();
-  agg_var = res[2].GetAggregator();
-  auto float_agg = opentelemetry::nostd::get<2>(agg_var);
+  auto float_agg_var = res[0].GetAggregator();
+  auto float_agg = opentelemetry::nostd::get<2>(float_agg_var);
   ASSERT_EQ(float_agg->get_checkpoint()[0], 1.0);
 
   nostd::shared_ptr<metrics_api::SynchronousInstrument<double>> dinstr_arr[] = {dcounter};
@@ -232,8 +232,8 @@ TEST(Meter, RecordBatch)
 
   m->RecordDoubleBatch(labelkv, dinstrs, dvalues);
   res = m->Collect();
-  agg_var = res[3].GetAggregator();
-  auto double_agg = opentelemetry::nostd::get<3>(agg_var);
+  auto double_agg_var = res[0].GetAggregator();
+  auto double_agg = opentelemetry::nostd::get<3>(double_agg_var);
   ASSERT_EQ(double_agg->get_checkpoint()[0], 1.0);
 }
 
