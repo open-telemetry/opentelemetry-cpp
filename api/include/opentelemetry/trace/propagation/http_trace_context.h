@@ -276,6 +276,7 @@ class HttpTraceContext : public HTTPTextFormat<T> {
 
         static trace::SpanContext ExtractImpl(Getter getter, const T &carrier) {
             nostd::string_view trace_parent = getter(carrier, kTraceParent);
+            std::cout<<trace_parent<<std::endl;
             if (trace_parent == "") {
                 return trace::SpanContext();
             }
