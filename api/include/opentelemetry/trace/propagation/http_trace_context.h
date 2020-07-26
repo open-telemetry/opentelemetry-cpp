@@ -164,7 +164,7 @@ class HttpTraceContext : public HTTPTextFormat<T> {
                             && trace_parent[kVersionBytes] == '-';
 //                            && trace_parent[kVersionBytes+kTraceIdBytes+1] == '-'
 //                            && trace_parent[kVersionBytes+kTraceIdBytes+kParentIdBytes+2] == '-';
-            std::cout<<trace_parent[kVersionBytes]<<std::endl;
+            std::cout<<trace_parent[kVersionBytes+kTraceIdBytes+kParentIdBytes+2]<<std::endl;
             if (!is_valid) {
 //                std::cout<<"Unparseable trace_parent header. Returning INVALID span context."<<std::endl;
                 throw;
