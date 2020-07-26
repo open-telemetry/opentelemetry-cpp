@@ -129,9 +129,9 @@ class HttpTraceContext : public HTTPTextFormat<T> {
 //        }
 
         static nostd::string_view SpanContextToString(const trace::SpanContext &span_context) {
-            nostd::span<char> trace_id = span_context.trace_id();
-            nostd::span<char> span_id = span_context.span_id();
-            nostd::span<char> trace_flags = span_context.trace_flags();
+//            nostd::span<char> trace_id = span_context.trace_id();
+//            nostd::span<char> span_id = span_context.span_id();
+//            nostd::span<char> trace_flags = span_context.trace_flags();
             nostd::string_view hex_string = "00-"; // TODO: ask in gitter about string addition
 //            for (auto it : trace_id) {
 //                hex_string += nostd::string_view(it,1);
