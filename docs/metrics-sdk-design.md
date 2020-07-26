@@ -125,12 +125,12 @@ public:
   *       (https://unitsofmeasure.org/ucum.html).
   *
   */ 
-  nostd::shared_ptr<Counter<int>> NewintCounter(nostd::string_view name, 
+  nostd::shared_ptr<Counter<int>> NewIntCounter(nostd::string_view name, 
                                                 nostd::string_view description,
                                                 nostd::string_view unit, 
                                                 nostd::string_view enabled) {
     auto intCounter = Counter<int>(name, description, unit, enabled);
-    ptr = shared_ptr<DoubleCounter>(intCounter)
+    ptr = shared_ptr<Counter<int>>(intCounter)
     int_metrics_.insert(name, ptr);
     return ptr; 
   }
@@ -169,7 +169,7 @@ public:
 private:
 
  /*
-  * Collect All (THREADSAFE)
+  * Collect (THREADSAFE)
   *
   * Checkpoints all metric instruments created from this meter and returns a
   * vector of records containing the name, labels, and values of each instrument.
@@ -246,38 +246,28 @@ class Record
 public:
   explicit Record(std::string name, std::string description,
                   metrics_api::BoundInstrumentKind instrumentKind,
-                  std::map<std::string, std::string> labels,
-                  std::variant<std::vector<short>, std::vector<int>, std::vector<float>, std::vector<double>> value,
-                  core::SystemTimestamp timestamp = core::SystemTimestamp(std::chrono::system_clock::now()))
+                  std::string labels,
+                  nostd::variant<Aggregator<short>, Aggregator<int>, Aggregator<float>, Aggregator<Double>> agg)
   {
     name_ = name;
     description_ = description;
     instrumentKind_ = instrumentKind;
     labels_ = labels;
-    value_ = value;
-    timestamp_ = timestamp;
-  }
-
-  template<typename T>
-  void SetValue(std::vector<T> value)
-  {
-    value_ = value;
+    aggregator_ = aggregator; 
   }
 
   string GetName() {return name_;}
-  sstring GetDescription() {return description_;}
+  string GetDescription() {return description_;}
   BoundInstrumentKind GetInstrumentKind() {return instrumentKind_;}
-  map<string, string> GetLabels() {return labels_;}
-  variant<vector<short>, vector<int>, vector<float>, vector<double>> GetValue() {return value_;}
-  cSystemTimestamp GetTimestamp() {return timestamp_;}
+  string GetLabels() {return labels_;}
+  nostd::variant<Aggregator<short>, Aggregator<int>, Aggregator<float>, Aggregator<Double>> GetAggregator() {return aggregator_;}
 
 private:
   string name_;
   string description_;
   BoundInstrumentKind instrumentKind_;
-  map<string, string> labels_;
-  variant<vector<short>, vector<int>, vector<float>, vector<double>> value_;
-  cSystemTimestamp timestamp_;
+  string labels_;
+  nostd::variant<Aggregator<short>, Aggregator<int>, Aggregator<float>, Aggregator<Double>> aggregator_;
 };
 ```
 
