@@ -1,7 +1,7 @@
 #pragma once
 
 #include "opentelemetry/version.h"
-#include "opentelemetry/sdk/metrics/instrument.h"
+#include "opentelemetry/metrics/instrument.h"
 #include "opentelemetry/sdk/metrics/aggregator/aggregator.h"
 
 #include <variant>

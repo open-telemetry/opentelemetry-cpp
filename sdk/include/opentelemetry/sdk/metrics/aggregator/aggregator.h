@@ -1,7 +1,7 @@
 #pragma once
 
 #include <mutex>
-#include "opentelemetry/sdk/metrics/instrument.h"
+#include "opentelemetry/metrics/instrument.h"
 #include "opentelemetry/version.h"
 #include <variant>
 #include <vector>
