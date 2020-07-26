@@ -140,7 +140,9 @@ private:
     std::unique_ptr<common::CircularBuffer<Recordable>> buffer_;
 
     /* Important boolean flags to handle the workflow of the processor */
-    bool is_shutdown_{false}, is_force_flush_{false}, is_force_flush_notified_{false};
+    volatile bool is_shutdown_{false}; 
+    volatile bool is_force_flush_{false}; 
+    volatile bool is_force_flush_notified_{false};
 };   
 
 } // trace

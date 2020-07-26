@@ -80,7 +80,6 @@ void BatchSpanProcessor::ForceFlush(std::chrono::microseconds timeout) noexcept
     while(is_force_flush_ == true && timeout_left.count() > 0) {
         auto start = std::chrono::steady_clock::now();
         cv_.notify_one();
-        std::this_thread::sleep_for(std::chrono::nanoseconds(50));
         auto end = std::chrono::steady_clock::now();
         timeout_left -= std::chrono::duration_cast<std::chrono::microseconds>(end-start);
     }
@@ -266,5 +265,4 @@ BatchSpanProcessor::~BatchSpanProcessor(){
 } // trace
 } // sdk
 OPENTELEMETRY_END_NAMESPACE
-
 

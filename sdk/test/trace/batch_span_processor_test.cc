@@ -107,7 +107,7 @@ public:
         for(int i = 0; i < num_spans; ++i)
         {
             test_spans->push_back(processor->MakeRecordable());
-            static_cast<sdk::trace::SpanData*>(test_spans->at(i).get())->SetName("Span " + i);
+            static_cast<sdk::trace::SpanData*>(test_spans->at(i).get())->SetName("Span " + std::to_string(i));
         }   
 
         return test_spans;
@@ -150,7 +150,7 @@ TEST_F(BatchSpanProcessorTestPeer, TestShutdown)
     EXPECT_EQ(num_spans, spans_received->size());
     for(int i = 0; i < num_spans; ++i)
     {
-        EXPECT_EQ("Span " + i, spans_received->at(i)->GetName());
+        EXPECT_EQ("Span " + std::to_string(i), spans_received->at(i)->GetName());
     }
    
     EXPECT_TRUE(*is_shutdown);
@@ -177,7 +177,7 @@ TEST_F(BatchSpanProcessorTestPeer, TestForceFlush)
     EXPECT_EQ(num_spans, spans_received->size());
     for(int i = 0; i < num_spans; ++i)
     {
-        EXPECT_EQ("Span " + i, spans_received->at(i)->GetName());
+        EXPECT_EQ("Span " + std::to_string(i), spans_received->at(i)->GetName());
     } 
 
     // Create some more spans to make sure that the processor still works
@@ -191,7 +191,7 @@ TEST_F(BatchSpanProcessorTestPeer, TestForceFlush)
     EXPECT_EQ(num_spans*2, spans_received->size());
     for(int i = 0; i < num_spans; ++i)
     {
-        EXPECT_EQ("Span " + i%num_spans, spans_received->at(i)->GetName());
+        EXPECT_EQ("Span " + std::to_string(i%num_spans), spans_received->at(i)->GetName());
     } 
 }
 
@@ -268,7 +268,7 @@ TEST_F(BatchSpanProcessorTestPeer, TestManySpansLossLess)
     EXPECT_EQ(num_spans, spans_received->size());
     for(int i = 0; i < num_spans; ++i)
     {
-        EXPECT_EQ("Span " + i, spans_received->at(i)->GetName());
+        EXPECT_EQ("Span " + std::to_string(i), spans_received->at(i)->GetName());
     }
 }
 
@@ -304,8 +304,9 @@ TEST_F(BatchSpanProcessorTestPeer, TestScheduleDelayMillis)
     EXPECT_EQ(max_export_batch_size, spans_received->size());
     for(size_t i = 0; i < max_export_batch_size; ++i)
     {
-        EXPECT_EQ("Span " + i, spans_received->at(i)->GetName());
+        EXPECT_EQ("Span " + std::to_string(i), spans_received->at(i)->GetName());
     }
 }
 
 OPENTELEMETRY_END_NAMESPACE
+
