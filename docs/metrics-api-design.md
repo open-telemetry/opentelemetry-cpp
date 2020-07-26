@@ -127,10 +127,9 @@ public:
 /////////////////////////Metric Instrument Constructors////////////////////////////  
   
  /*
-  * New Int Counter
+  * New Counter
   *
-  * Function that creates and returns a Counter metric instrument with value
-  * type double.
+  * Function that creates and returns a Counter metric instruent
   *
   * Arguments:
   * name, the name of the metric instrument (must conform to the above syntax).
@@ -139,21 +138,27 @@ public:
   *       (https://unitsofmeasure.org/ucum.html).
   * enabled, a boolean that turns on or off collection.
   *
-  */ 
+  */
+  virtual nostd::shared_ptr<Counter<short>> 
+                            NewShortCounter(nostd::string_view name, 
+                            nostd::string_view description,
+                            nostd::string_view unit, 
+                            nostd::string_view enabled) = 0;
   virtual nostd::shared_ptr<Counter<int>> 
                             NewIntCounter(nostd::string_view name, 
                             nostd::string_view description,
                             nostd::string_view unit, 
                             nostd::string_view enabled) = 0;
-                            
-  template<typename T, nostd::enable_if_t<std::is_same<T, int>::value, int> = 0>
-  nostd::shared_ptr<SynchronousInstrument<T>> NewCounter(nostd::string_view name,
-                                                         nostd::string_view description,
-                                                         nostd::string_view unit,
-                                                         const bool enabled)
-  {
-    return NewIntCounter(name, description, unit, enabled);
-  }
+  virtual nostd::shared_ptr<Counter<float>> 
+                            NewFloatCounter(nostd::string_view name, 
+                            nostd::string_view description,
+                            nostd::string_view unit, 
+                            nostd::string_view enabled) = 0;
+  virtual nostd::shared_ptr<Counter<double>> 
+                            NewDoubleCounter(nostd::string_view name, 
+                            nostd::string_view description,
+                            nostd::string_view unit, 
+                            nostd::string_view enabled) = 0;
   
   
 ////////////////////////////////////////////////////////////////////////////////////
@@ -271,16 +276,6 @@ enum class MetricKind
   ValueObserver,
 };
 
-enum class BoundMetricKind
-{
-  BoundCounter,
-  BoundUpDownCounter,
-  BoundValueRecorder,
-  BoundSumObserver,
-  BoundUpDownSumObserver,
-  BoundValueObserver,
-};
-
  /*
   * Instrument
   *
@@ -330,6 +325,9 @@ public:
 
     // Return the insrument's units of measurement
     nostd::string_view GetUnits();
+    
+    // Return the kind of the instrument e.g. Counter
+    InstrumentKind GetKind();
 
 };
 ```
