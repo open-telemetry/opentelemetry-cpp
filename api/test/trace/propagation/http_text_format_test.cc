@@ -19,7 +19,6 @@ using namespace opentelemetry;
 
 static nostd::string_view Getter(const std::map<std::string,std::string> &carrier, nostd::string_view trace_type = "traceparent") {
     std::map<std::string,std::string> c = carrier;
-    if (c[std::string(trace_type)]=="") throw;
     nostd::string_view res = nostd::string_view(c[std::string(trace_type)]);
     return res;
 }
@@ -35,7 +34,7 @@ static nostd::string_view span_id = "1234567890123456";
 
 TEST(HTTPTextFormatTest, NoSpanTest)
 {
-    const std::map<std::string,std::string> carrier = {{"current-span","00-4bf92f3577b34da6a3ce929d0e0e4736-00f067aa0ba902b7-01"}};
+    const std::map<std::string,std::string> carrier = {{"traceparent","00-4bf92f3577b34da6a3ce929d0e0e4736-00f067aa0ba902b7-01"}};
     nostd::shared_ptr<trace::SpanContext> spc{new trace::SpanContext()};
     context::Context ctx1 = context::Context("current-span",spc);
     context::Context ctx2 = format.Extract(Getter,carrier,ctx1);
