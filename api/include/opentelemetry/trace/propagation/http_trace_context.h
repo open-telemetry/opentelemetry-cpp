@@ -284,6 +284,7 @@ class HttpTraceContext : public HTTPTextFormat<T> {
             }
             trace::SpanContext context_from_parent_header = ExtractContextFromTraceParent(trace_parent);
             if (!context_from_parent_header.IsValid()) {
+                throw;
                 return context_from_parent_header;
             }
 
