@@ -104,7 +104,7 @@ class HttpTraceContext : public HTTPTextFormat<T> {
         // TODO: need review on hex_string because trace ids are objects not string_views
 //        static void InjectImpl(Setter setter, T &carrier) {
         static void InjectImpl(Setter setter, T &carrier, const trace::SpanContext &span_context) {
-            nostd::string_view trace_parent = SpanContextToString(trace::SpanContext(span_context));
+            nostd::string_view trace_parent = SpanContextToString(span_context);
 //            setter(carrier, kTraceParent, trace_parent);
 //            if (span_context.trace_state() != NULL) {
 //                nostd::string_view trace_state = FormatTracestate(span_context.trace_state());
@@ -128,7 +128,7 @@ class HttpTraceContext : public HTTPTextFormat<T> {
 //            return res;
 //        }
 
-        static nostd::string_view SpanContextToString(trace::SpanContext &span_context) {
+        static nostd::string_view SpanContextToString(const trace::SpanContext &span_context) {
             nostd::span<char> trace_id = span_context.trace_id();
             nostd::span<char> span_id = span_context.span_id();
             nostd::span<char> trace_flags = span_context.trace_flags();
