@@ -1,20 +1,20 @@
 #pragma once
 
+#include <iostream>
+#include <map>
+#include <memory>
 #include "opentelemetry/metrics/instrument.h"
 #include "opentelemetry/sdk/metrics/aggregator/aggregator.h"
 #include "opentelemetry/sdk/metrics/record.h"
 #include "opentelemetry/version.h"
-
-#include <iostream>
-#include <map>
-#include <memory>
 #include <sstream>
 #include <string>
 #include <unordered_map>
 #include <vector>
 
+
 namespace metrics_api = opentelemetry::metrics;
-namespace trace_api   = opentelemetry::trace;
+namespace trace_api = opentelemetry::trace;
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace sdk
@@ -237,6 +237,47 @@ inline std::string KvToString(const trace::KeyValueIterable &kv) noexcept
   return ss.str();
 }
 
-}  // namespace metrics
-}  // namespace sdk
+template <class T>
+class AsynchronousInstrument : public Instrument, virtual public metrics_api::AsynchronousInstrument<T> {
+    
+public:
+    AsynchronousInstrument() = default;
+    
+    AsynchronousInstrument(nostd::string_view name,
+                           nostd::string_view description,
+                           nostd::string_view unit,
+                           bool enabled,
+                           void (*callback)(metrics_api::ObserverResult<T>),
+                           metrics_api::InstrumentKind kind):
+    Instrument(name, description, unit, enabled, kind)
+    {
+        this->callback_ = callback;
+    }
+    
+    /**
+     * Captures data through a manual call rather than the automatic collection process instituted
+     * in the run function.  Asynchronous instruments are generally expected to obtain data from
+     * their callbacks rather than direct calls.  This function is used by the callback to store data.
+     *
+     * @param value is the numerical representation of the metric being captured
+     * @param labels is the numerical representation of the metric being captured
+     * @return none
+     */
+    virtual void observe(T value, const trace::KeyValueIterable &labels) override = 0;
+    
+    virtual std::vector<Record> GetRecords() = 0;
+    
+    /**
+     * Captures data by activating the callback function associated with the
+     * instrument and storing its return value.  Callbacks for asynchronous
+     * instruments are defined during construction.
+     *
+     * @param none
+     * @return none
+     */
+    virtual void run() override = 0;
+};
+
+} // namespace metrics
+} // namespace sdk
 OPENTELEMETRY_END_NAMESPACE
