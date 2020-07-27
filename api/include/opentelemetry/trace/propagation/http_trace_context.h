@@ -220,6 +220,7 @@ class HttpTraceContext : public HTTPTextFormat<T> {
 
                 uint8_t td[int(trace_id.size())];
                 uint8_t buf[16] = {1, 2, 3, 4, 5, 6, 7, 8, 8, 7, 6, 5, 4, 3, 2, 1};
+                td = buf;
                 size_t i = 0;
                 for (; tid != trace_id.end(); ++tid, ++i)
                 {
