@@ -109,16 +109,16 @@ public:
   // An empty TraceState.
   TraceState() noexcept = default;
 
-  virtual ~TraceState() = default;
+  ~TraceState() = default;
 
   // Returns false if no such key, otherwise returns true and populates value.
-  virtual bool Get(nostd::string_view key, nostd::string_view *value) const noexcept
+  bool Get(nostd::string_view key, nostd::string_view *value) noexcept
   {
     return tmp_map[key] == *value;
   }
 
   // Returns true if there are no keys.
-  virtual bool empty() const noexcept { return tmp_map.size()==0; }
+  bool empty() const noexcept { return tmp_map.size()==0; }
 
   // Returns a span of all the entries. The TraceState object must outlive the span.
 //  virtual nostd::span<Entry *> entries() const noexcept { return {}; }
