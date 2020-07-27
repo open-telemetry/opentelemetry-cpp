@@ -286,6 +286,7 @@ class HttpTraceContext : public HTTPTextFormat<T> {
                     if (start_pos == -1 && end_pos == -1) continue;
                     element_num++;
                     list_member = trace_state_header.substr(start_pos,end_pos-start_pos+1);
+                    std::cout<<list_member<<std::endl;
 //                    SetTraceStateBuilder(trace_state_builder,list_member); // TODO: work around (std::map? return nullptr?)
                     end_pos = -1;
                     start_pos = -1;
@@ -312,7 +313,6 @@ class HttpTraceContext : public HTTPTextFormat<T> {
             // TODO: ask host why trace_parent's first 8 characters are incorrect
             std::map<std::string,std::string> c = carrier;
             trace_parent = nostd::string_view(c[std::string(kTraceParent)]);
-            std::cout<<trace_parent<<std::endl;
             if (trace_parent == "") {
                 return trace::SpanContext();
             }
@@ -325,7 +325,6 @@ class HttpTraceContext : public HTTPTextFormat<T> {
             if (trace_state_header == "" || trace_state_header.empty()) {
                 return context_from_parent_header;
             }
-            std::cout<<"non empty trace state"<<std::endl;
 
             try {
                 TraceState trace_state = ExtractTraceState(trace_state_header);
