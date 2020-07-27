@@ -226,6 +226,7 @@ class HttpTraceContext : public HTTPTextFormat<T> {
                 }
 //                nostd::span<char> sid{span_id.begin(),span_id.length()};
 //                nostd::span<char> tfg{trace_flags.begin(),trace_flags.length()};
+                std::cout<<buf<<std::endl;
                 TraceId trace_id_obj = TraceId(buf);
 //                SpanId span_id_obj = SpanId(span_id);
 //                TraceFlags trace_flags_obj = TraceFlags(trace_flags);
