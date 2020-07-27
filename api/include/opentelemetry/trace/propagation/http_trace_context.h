@@ -304,7 +304,7 @@ class HttpTraceContext : public HTTPTextFormat<T> {
                 list_member = trace_state_header.substr(start_pos,end_pos-start_pos+1);
                 AddNewMember(trace_state,list_member);
 //                SetTraceStateBuilder(trace_state_builder,list_member);
-                std::cout<<"member added"<<std::endl;
+                std::cout<<"member added!!!"<<std::endl;
                 element_num++;
             }
 
