@@ -123,7 +123,12 @@ private:
 inline bool operator==(string_view lhs, string_view rhs) noexcept
 {
   return lhs.length() == rhs.length() &&
+#if _MSC_VER == 1900
+         // Avoid SCL error in Visual Studio 2015
+         (std::memcmp(lhs.data(), rhs.data(), lhs.length()) == 0);
+#else
          std::equal(lhs.data(), lhs.data() + lhs.length(), rhs.data());
+#endif
 }
 
 inline bool operator==(string_view lhs, const std::string &rhs) noexcept

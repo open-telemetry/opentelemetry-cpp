@@ -6,6 +6,8 @@
   <ItemGroup>
     <ClInclude Include="utils.hpp" />
     <ClInclude Include="ETWTracer.hpp" />
+    <ClInclude Include="ETWProvider.hpp" />
+    <ClInclude Include="TraceLoggingDynamic.h" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="scripts">

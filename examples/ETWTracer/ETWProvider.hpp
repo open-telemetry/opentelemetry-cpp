@@ -14,8 +14,8 @@
 
 #pragma once
 
-#if defined __has_include
-#  if __has_include("TraceLoggingDynamic.h")
+// #if defined __has_include
+// #  if __has_include("TraceLoggingDynamic.h")
 
 #define HAVE_ETW_PROVIDER
 
@@ -71,7 +71,7 @@ public:
   /// </summary>
   struct Handle
   {
-    ULONGLONG providerHandle;
+    uint64_t providerHandle;
     std::vector<BYTE> providerMetaVector;
     GUID providerGuid;
   };
@@ -343,5 +343,5 @@ protected:
 
 OPENTELEMETRY_END_NAMESPACE
 
-#  endif
-#endif
+// #  endif
+// #endif
