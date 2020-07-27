@@ -123,6 +123,7 @@ class HttpTraceContext : public HTTPTextFormat<T> {
                 if (it != entries.begin()) res += ",";
                 res += it->first + "=" + it->second;
             }
+            std::cout<<"Formated TraceState: "<<res<<std::endl;
             return res;
         }
 
