@@ -144,8 +144,11 @@ class HttpTraceContext : public HTTPTextFormat<T> {
 //        }
 
         static nostd::string_view SpanContextToString(const trace::SpanContext &span_context) {
+            std::cout<<1<<std::endl;
             nostd::span<char,32> trace_id = nostd::span<char,32>(nullptr,32);
+            std::cout<<2<<std::endl;
             TraceId(span_context.trace_id()).ToLowerBase16(trace_id);
+            std::cout<<3<<std::endl;
             nostd::span<const uint8_t> span_id = span_context.span_id().Id();
             uint8_t trace_flags = span_context.trace_flags().flags();
 //            nostd::string_view hex_string = "00-"; // TODO: ask in gitter about string addition
@@ -352,7 +355,6 @@ class HttpTraceContext : public HTTPTextFormat<T> {
 
             try {
                 TraceState trace_state = ExtractTraceState(trace_state_header);
-                std::cout<<"reached here?"<<std::endl;
                 return trace::SpanContext(
                     context_from_parent_header.trace_id(),
                     context_from_parent_header.span_id(),
