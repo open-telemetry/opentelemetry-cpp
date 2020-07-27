@@ -204,7 +204,6 @@ class HttpTraceContext : public HTTPTextFormat<T> {
                     }
                 }
                 trace_flags = trace_parent.substr(start_pos,kHeaderElementLengths[elt_num]);
-                std::cout<<version<<" "<<trace_id<<" "<<span_id<<" "<<trace_flags<<std::endl;
 
                 if (trace_id == "00000000000000000000000000000000" || span_id == "0000000000000000") {
                       return trace::SpanContext();
@@ -226,7 +225,7 @@ class HttpTraceContext : public HTTPTextFormat<T> {
             }
         }
 
-        static TraceId GenerateTraceIdFromBuf(nostd::string_view trace_id) {
+        static TraceId GenerateTraceIdFromString(nostd::string_view trace_id) {
             const char* tid = trace_id.begin();
             uint8_t buf[16];
             for (int i = 0; i < 32; i++)
@@ -241,7 +240,7 @@ class HttpTraceContext : public HTTPTextFormat<T> {
             return TraceId(buf);
         }
 
-        static SpanId GenerateSpanIdFromBuf(nostd::string_view span_id) {
+        static SpanId GenerateSpanIdFromString(nostd::string_view span_id) {
             const char* sid = span_id.begin();
             uint8_t buf[8];
             for (int i = 0; i < 16; i++)
@@ -256,6 +255,11 @@ class HttpTraceContext : public HTTPTextFormat<T> {
             return SpanId(buf);
         }
 
+        static TraceFlags GenerateTraceFlagsFromString(nostd::string_view trace_flags) {
+            uint8_t buf;
+            buf = (uint8_t)(trace_flags[0])*16+(uint8_t)(trace_flags[1]);
+            return SpanId(buf);
+        }
 //        static void SetTraceStateBuilder(TraceState.Builder &trace_state_builder, nostd::string_view &list_member) {
 //            int index = -1;
 //            for (int j = 0; j < list_member.length(); j++) {
