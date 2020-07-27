@@ -213,7 +213,7 @@ class HttpTraceContext : public HTTPTextFormat<T> {
                       return trace::SpanContext();
 //                    return SetSpanInContext(trace::DefaultSpan.GetInvalid(), context);
                 }
-                nostd::span<char> tid{trace_id.begin()};
+                nostd::span<char> tid;
 //                nostd::span<char> sid{span_id.begin(),span_id.length()};
 //                nostd::span<char> tfg{trace_flags.begin(),trace_flags.length()};
 //                TraceId trace_id_obj = TraceId(tid);
