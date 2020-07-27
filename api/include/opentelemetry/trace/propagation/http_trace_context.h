@@ -218,7 +218,8 @@ class HttpTraceContext : public HTTPTextFormat<T> {
                 TraceId trace_id_obj = TraceId(tid);
                 SpanId span_id_obj = SpanId(sid);
                 TraceFlags trace_flags_obj = TraceFlags(tfg);
-                return trace::SpanContext(trace_id_obj,span_id_obj,trace_flags_obj,std::map<std::string,std::string>(),true);
+                return trace::SpanContext();
+//                return trace::SpanContext(trace_id_obj,span_id_obj,trace_flags_obj,std::map<std::string,std::string>(),true);
 //                return trace::SpanContext.CreateFromRemoteParent(trace_id_obj, span_id_obj, trace_flags_obj, TraceState());
             } catch (std::exception& e) {
 //                std::cout<<"Unparseable trace_parent header. Returning INVALID span context."<<std::endl;
