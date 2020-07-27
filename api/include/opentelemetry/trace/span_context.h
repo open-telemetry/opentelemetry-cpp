@@ -35,7 +35,7 @@ class SpanContext final
 public:
   // An invalid SpanContext.
   SpanContext() noexcept : trace_state_(new TraceState) {}
-  SpanContext(TraceId trace_id, SpanId span_id, TraceFlags trace_flags, nostd::unique_ptr<TraceState> trace_state, bool is_remote) noexcept {
+  SpanContext(TraceId trace_id, SpanId span_id, TraceFlags trace_flags, bool is_remote) noexcept {
     trace_id_ = trace_id;
     span_id_ = span_id;
     trace_flags_ = trace_flags;
