@@ -214,8 +214,8 @@ class HttpTraceContext : public HTTPTextFormat<T> {
                       return trace::SpanContext();
 //                    return SetSpanInContext(trace::DefaultSpan.GetInvalid(), context);
                 }
-                std::array<int, 3> array = {1, 2, 3};
-                nostd::span<int> s1{array.data(), array.size()};
+                std::array<char, 3> array = {'1', '2', '3'};
+                nostd::span<char> s1{array.data(), array.size()};
 //                nostd::span<char> tid{trace_id.data(),trace_id.size()};
 //                nostd::span<char> sid{span_id.begin(),span_id.length()};
 //                nostd::span<char> tfg{trace_flags.begin(),trace_flags.length()};
