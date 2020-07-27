@@ -218,7 +218,7 @@ class HttpTraceContext : public HTTPTextFormat<T> {
 //                nostd::span<char> s1{array.data(), array.size()};
                 const char* tid = trace_id.begin();
 
-                uint8_t buf[16];
+                uint8_t buf[17];
                 size_t i = 0;
                 for (; tid != trace_id.end(); ++tid, ++i)
                 {
