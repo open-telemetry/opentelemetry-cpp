@@ -358,6 +358,7 @@ class HttpTraceContext : public HTTPTextFormat<T> {
 //                    trace_state
 //                );
             } catch (std::exception& e) {
+                std::cout<<"exception occured!"<<std::endl;
 //                std::cout<<"Unparseable tracestate header. Returning span context without state."<<std::endl;
                 return context_from_parent_header;
 //                return trace::SpanContext.CreateFromRemoteParent(
