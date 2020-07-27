@@ -258,7 +258,7 @@ class HttpTraceContext : public HTTPTextFormat<T> {
         static TraceFlags GenerateTraceFlagsFromString(nostd::string_view trace_flags) {
             uint8_t buf;
             buf = (uint8_t)(trace_flags[0])*16+(uint8_t)(trace_flags[1]);
-            return SpanId(buf);
+            return TraceFlags(buf);
         }
 //        static void SetTraceStateBuilder(TraceState.Builder &trace_state_builder, nostd::string_view &list_member) {
 //            int index = -1;
