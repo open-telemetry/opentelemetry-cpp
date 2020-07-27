@@ -298,6 +298,7 @@ class HttpTraceContext : public HTTPTextFormat<T> {
             if (start_pos!=-1 && end_pos!=-1) {
                 list_member = trace_state_header.substr(start_pos,end_pos-start_pos+1);
 //                SetTraceStateBuilder(trace_state_builder,list_member);
+                std::cout<<list_member<<std::endl;
                 element_num++;
             }
 
