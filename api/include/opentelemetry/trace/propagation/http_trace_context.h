@@ -26,6 +26,7 @@
 #include "opentelemetry/trace/span.h"
 #include "opentelemetry/nostd/shared_ptr.h"
 #include "opentelemetry/nostd/variant.h"
+#include "opentelemetry/nostd/span.h"
 //#include "opentelemetry/trace/default_span.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
@@ -143,9 +144,7 @@ class HttpTraceContext : public HTTPTextFormat<T> {
 //        }
 
         static nostd::string_view SpanContextToString(const trace::SpanContext &span_context) {
-
-            nostd::span<int, 0> s2;
-            nostd::span<char,16> trace_id;
+            nostd::span<char,32> trace_id;
             TraceId(span_context.trace_id()).ToLowerBase16(trace_id);
             nostd::span<const uint8_t> span_id = span_context.span_id().Id();
             uint8_t trace_flags = span_context.trace_flags().flags();
