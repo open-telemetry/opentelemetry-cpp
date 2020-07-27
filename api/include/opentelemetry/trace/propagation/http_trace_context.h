@@ -179,7 +179,7 @@ class HttpTraceContext : public HTTPTextFormat<T> {
             return nostd::string_view(hex_string);
         }
 
-        static trace::SpanContext ExtractContextFromTraceParent(nostd::string_view &trace_parent) {
+        static trace::SpanContext ExtractContextFromTraceParent(nostd::string_view trace_parent) {
             bool is_valid = trace_parent.length() == kHeaderSize
                             && trace_parent[kVersionBytes] == '-'
                             && trace_parent[kVersionBytes+kTraceIdBytes+1] == '-'
