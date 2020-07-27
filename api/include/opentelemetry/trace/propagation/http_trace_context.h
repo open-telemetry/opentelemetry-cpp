@@ -342,7 +342,6 @@ class HttpTraceContext : public HTTPTextFormat<T> {
             std::string trace_parent = std::string(getter(carrier, kTraceParent));
             std::cout<<trace_parent<<std::endl;
             // TODO: ask host why trace_parent's first 8 characters are incorrect
-//            std::map<std::string,std::string> c = carrier;
 //            trace_parent = nostd::string_view(c[std::string(kTraceParent)]);
             if (trace_parent == "") {
                 return trace::SpanContext();
@@ -353,7 +352,9 @@ class HttpTraceContext : public HTTPTextFormat<T> {
             }
 
             nostd::string_view trace_state_header = getter(carrier, kTraceState);
-            trace_state_header = nostd::string_view(c[std::string(kTraceState)]);
+//            auto it = carrier.find(std::string(kTraceState));
+//            if (it==carrier.end())
+//            trace_state_header = nostd::string_view(carrier.find());
             if (trace_state_header == "" || trace_state_header.empty()) {
                 return context_from_parent_header;
             }
