@@ -153,16 +153,16 @@ class HttpTraceContext : public HTTPTextFormat<T> {
 //            nostd::string_view hex_string = "00-"; // TODO: ask in gitter about string addition
             // Note: This is only temporary replacement for appendable string
             std::string hex_string = "00-";
-            for (auto it : trace_id) {
-                hex_string += std::string(it,1);
+            for (int i = 0; i < 32; i++) {
+                hex_string += trace_id[i];
             }
             hex_string += "-";
-            for (auto it : span_id) {
-                hex_string += std::string(it,1);
+            for (int i = 0; i < 16; i++) {
+                hex_string += span_id[i];
             }
             hex_string += "-";
-            for (auto it : trace_flags) {
-               hex_string += std::string(it,1);
+            for (int i = 0; i < 2; i++) {
+               hex_string += trace_flags[i];
             }
             std::cout<<"Extraction:::: "<<hex_string<<std::endl;
 //            for (auto it : trace_id) {
