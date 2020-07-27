@@ -146,10 +146,10 @@ class HttpTraceContext : public HTTPTextFormat<T> {
             {
                 if (i%2==0) {
                     buf[i/2] = CharToInt(*tid)*16;
-                    std::cout<<CharToInt(*tid)<<std::endl;
+                    std::cout<<int(CharToInt(*tid))<<std::endl;
                 } else {
                     buf[i/2] += CharToInt(*tid);
-                    std::cout<<CharToInt(*tid)<<std::endl;
+                    std::cout<<int(CharToInt(*tid))<<std::endl;
                 }
                 tid++;
             }
@@ -168,7 +168,7 @@ class HttpTraceContext : public HTTPTextFormat<T> {
                 }
                 sid++;
             }
-            std::cout<<buf<<std::endl;
+//            std::cout<<buf<<std::endl;
             return SpanId(buf);
         }
 
