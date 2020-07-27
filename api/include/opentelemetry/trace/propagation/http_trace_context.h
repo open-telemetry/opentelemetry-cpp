@@ -216,7 +216,7 @@ class HttpTraceContext : public HTTPTextFormat<T> {
                 }
 
                 TraceId trace_id_obj = GenerateTraceIdFromBuf(trace_id);
-//                SpanId span_id_obj = SpanId(span_id);
+                SpanId span_id_obj = GenerateSpanIdFromBuf(span_id);
 //                TraceFlags trace_flags_obj = TraceFlags(trace_flags);
                 return trace::SpanContext();
 //                return trace::SpanContext.CreateFromRemoteParent(trace_id_obj, span_id_obj, trace_flags_obj, TraceState());
@@ -239,6 +239,21 @@ class HttpTraceContext : public HTTPTextFormat<T> {
                 tid++;
             }
             return TraceId(buf);
+        }
+
+        static TraceId GenerateSpanIdFromBuf(nostd::string_view span_id) {
+            const char* sid = span_id.begin();
+            uint8_t buf[8];
+            for (int i = 0; i < 16; i++)
+            {
+                if (i%2==0) {
+                    buf[i/2] = (uint8_t)(*sid)*16;
+                } else {
+                    buf[i/2] += (uint8_t)(*sid);
+                }
+                sid++;
+            }
+            return SpanId(buf);
         }
 
 //        static void SetTraceStateBuilder(TraceState.Builder &trace_state_builder, nostd::string_view &list_member) {
