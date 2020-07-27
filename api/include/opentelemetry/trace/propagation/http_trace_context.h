@@ -76,6 +76,13 @@ class HttpTraceContext : public HTTPTextFormat<T> {
             trace::SpanContext span_context = ExtractImpl(getter,carrier);
             nostd::string_view span_key = "current-span";
             nostd::shared_ptr<trace::SpanContext> spc{new trace::SpanContext(span_context)};
+            std::map<nostd::string_view,nostd::string_view> entries = span_context.trace_state().entries();
+            std::string res = "";
+            for (std::map<nostd::string_view,nostd::string_view>::iterator it = entries.begin(); it != entries.end(); it++) {
+                if (it != entries.begin()) res += ",";
+                res += std::string(it->first) + "=" + std::string(it->second);
+            }
+            std::cout<<"Formated TraceState: "<<res<<std::endl;
             return context.SetValue(span_key,spc);
 //            return SetSpanInContext(trace.DefaultSpan(span_context), context);
         }
@@ -123,7 +130,6 @@ class HttpTraceContext : public HTTPTextFormat<T> {
                 if (it != entries.begin()) res += ",";
                 res += std::string(it->first) + "=" + std::string(it->second);
             }
-            std::cout<<"Formated TraceState: "<<res<<std::endl;
             return res;
         }
 
