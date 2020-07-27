@@ -39,7 +39,7 @@ public:
     trace_id_ = trace_id;
     span_id_ = span_id;
     trace_flags_ = trace_flags;
-    trace_state_ = trace_state;
+    trace_state_.reset(new TraceState);
     remote_parent_ = is_remote;
   }
   SpanContext(SpanContext&& ctx) : trace_id_(ctx.trace_id()), span_id_(ctx.span_id()), trace_flags_(ctx.trace_flags()), trace_state_(std::move(ctx.trace_state_)) {}
