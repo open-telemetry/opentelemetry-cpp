@@ -17,17 +17,13 @@ public:
   ThreadLocalContext() = default;
 
   // Return the current context.
-  Context *InternalGetCurrent() override { return stack_.Top(); }
+  Context InternalGetCurrent() override { return stack_.Top(); }
 
   // Resets the context to a previous value stored in the
   // passed in token. Returns true if successful, false otherwise
   bool InternalDetach(Token &token) override
   {
-    if (stack_.Top() == nullptr)
-    {
-      return false;
-    }
-    if (!(token == *stack_.Top()))
+    if (!(token == stack_.Top()))
     {
       return false;
     }
@@ -37,7 +33,7 @@ public:
 
   // Sets the current 'Context' object. Returns a token
   // that can be used to reset to the previous Context.
-  Token InternalAttach(Context *context) override
+  Token InternalAttach(Context context) override
   {
     stack_.Push(context);
     Token old_context = CreateToken(context);
@@ -57,31 +53,31 @@ private:
       base_     = nullptr;
     }
 
-    // Pops the top Context* off the stack and returns it.
-    Context *Pop()
+    // Pops the top Context off the stack and returns it.
+    Context Pop()
     {
       if (size_ <= 0)
       {
-        return nullptr;
+        return Context();
       }
       int index = size_ - 1;
       size_--;
       return base_[index];
     }
 
-    // Returns the Context* at the top of the stack.
-    Context *Top()
+    // Returns the Context at the top of the stack.
+    Context Top()
     {
       if (size_ <= 0)
       {
-        return nullptr;
+        return Context();
       }
       return base_[size_ - 1];
     }
 
     // Pushes the passed in context pointer to the top of the stack
     // and resizes if necessary.
-    void Push(Context *context)
+    void Push(Context context)
     {
       size_++;
       if (size_ > capacity_)
@@ -99,17 +95,23 @@ private:
       {
         new_capacity = 2;
       }
-      Context **temp = new Context *[new_capacity];
-      memcpy(temp, base_, sizeof(Context *) * old_size);
-      delete[] base_;
+      Context *temp = new Context[new_capacity];
+      if (base_ != nullptr)
+      {
+        for (auto i = 0; i <= old_size; i++)
+        {
+          temp[i] = base_[i];
+        }
+        delete[] base_;
+      }
       base_ = temp;
     }
 
     ~Stack() { delete[] base_; }
 
-    int size_;
-    int capacity_;
-    Context **base_;
+    size_t size_;
+    size_t capacity_;
+    Context *base_;
   };
 
   static thread_local Stack stack_;
