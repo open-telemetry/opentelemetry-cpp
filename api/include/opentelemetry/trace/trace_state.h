@@ -119,6 +119,11 @@ public:
     return tmp_map[key] == *value;
   }
 
+  void Set(nostd::string_view key, nostd::string_view *value) noexcept
+  {
+    tmp_map[key] = *value;
+  }
+
   // Returns true if there are no keys.
   bool empty() const noexcept { return tmp_map.size()==0; }
 

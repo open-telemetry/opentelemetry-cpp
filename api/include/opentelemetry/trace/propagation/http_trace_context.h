@@ -276,6 +276,7 @@ class HttpTraceContext : public HTTPTextFormat<T> {
 
         static TraceState ExtractTraceState(nostd::string_view &trace_state_header) {
          //   TraceState.Builder trace_state_builder = TraceState.builder();
+            TraceState trace_state = TraceState();
             int start_pos = -1;
             int end_pos = -1;
             int element_num = 0;
@@ -286,7 +287,7 @@ class HttpTraceContext : public HTTPTextFormat<T> {
                     if (start_pos == -1 && end_pos == -1) continue;
                     element_num++;
                     list_member = trace_state_header.substr(start_pos,end_pos-start_pos+1);
-                    std::cout<<list_member<<std::endl;
+                    AddNewMember(trace_state,list_member);
 //                    SetTraceStateBuilder(trace_state_builder,list_member); // TODO: work around (std::map? return nullptr?)
                     end_pos = -1;
                     start_pos = -1;
@@ -297,16 +298,25 @@ class HttpTraceContext : public HTTPTextFormat<T> {
             }
             if (start_pos!=-1 && end_pos!=-1) {
                 list_member = trace_state_header.substr(start_pos,end_pos-start_pos+1);
+                AddNewMember(trace_state,list_member);
 //                SetTraceStateBuilder(trace_state_builder,list_member);
-                std::cout<<list_member<<std::endl;
                 element_num++;
             }
 
             if (element_num <= kTraceStateMaxMembers) {
                 throw std::invalid_argument("TraceState has too many elements.");
             }
-            return TraceState();
+            return trace_state;
 //            return trace_state_builder.Build();
+        }
+
+        static void AddNewMember(TraceState &trace_state, nostd::string_view member) {
+            for (int i = 0; i < member.length(); i++) {
+                if (member[i] == '=') {
+                    trace_state.Set(member.substr(0,i-1),member.substr(i+1));
+                    return;
+                }
+            }
         }
 
         static trace::SpanContext ExtractImpl(Getter getter, const T &carrier) {
