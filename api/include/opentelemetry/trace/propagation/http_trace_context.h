@@ -219,7 +219,7 @@ class HttpTraceContext : public HTTPTextFormat<T> {
                 const char* tid = trace_id.begin();
 
                 uint8_t td[trace_id.size()];
-                uint8_t buf[] = {1, 2, 3, 4, 5, 6, 7, 8, 8, 7, 6, 5, 4, 3, 2, 1};
+                uint8_t buf[] = {1, 2, 3, 4, 5, 6, 7, 11, 8, 7, 6, 5, 4, 3, 2, 1};
                 size_t i = 0;
                 for (; tid != trace_id.end(); ++tid, ++i)
                 {
