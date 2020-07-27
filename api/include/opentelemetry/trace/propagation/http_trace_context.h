@@ -313,7 +313,8 @@ class HttpTraceContext : public HTTPTextFormat<T> {
         static void AddNewMember(TraceState &trace_state, nostd::string_view member) {
             for (int i = 0; i < member.length(); i++) {
                 if (member[i] == '=') {
-                    trace_state.Set(member.substr(0,i-1),member.substr(i+1));
+                    std::cout<<member.substr(0,i)<<" "<<member.substr(i+1,member.length()-i-1)<<std::endl;
+                    trace_state.Set(member.substr(0,i),member.substr(i+1,member.length()-i-1));
                     return;
                 }
             }
