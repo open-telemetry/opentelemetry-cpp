@@ -218,17 +218,16 @@ class HttpTraceContext : public HTTPTextFormat<T> {
 //                nostd::span<char> s1{array.data(), array.size()};
                 const char* tid = trace_id.begin();
 
-                uint8_t td[trace_id.size()+1];
+                uint8_t td[trace_id.size()];
 
                 size_t i = 0;
                 for (; tid != trace_id.end(); ++tid, ++i)
                 {
                     td[i] = (uint8_t)(*tid);
                 }
-                uint8_t sss[] = {1, 2, 3, 4, 5, 6, 7, 8, 8, 7, 6, 5, 4, 3, 2, 1};
 //                nostd::span<char> sid{span_id.begin(),span_id.length()};
 //                nostd::span<char> tfg{trace_flags.begin(),trace_flags.length()};
-                TraceId trace_id_obj = TraceId(sss);
+                TraceId trace_id_obj = TraceId(td);
 //                SpanId span_id_obj = SpanId(span_id);
 //                TraceFlags trace_flags_obj = TraceFlags(trace_flags);
                 return trace::SpanContext();
