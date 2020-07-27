@@ -318,10 +318,9 @@ class HttpTraceContext : public HTTPTextFormat<T> {
             }
             trace::SpanContext context_from_parent_header = ExtractContextFromTraceParent(trace_parent);
             if (!context_from_parent_header.IsValid()) {
-                throw;
                 return context_from_parent_header;
             }
-
+            throw;
             nostd::string_view trace_state_header = getter(carrier, kTraceState);
             if (trace_state_header == "" || trace_state_header.empty()) {
                 return context_from_parent_header;
