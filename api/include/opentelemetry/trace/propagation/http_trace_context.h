@@ -308,7 +308,7 @@ class HttpTraceContext : public HTTPTextFormat<T> {
                 element_num++;
             }
 
-            if (element_num <= kTraceStateMaxMembers) {
+            if (element_num >= kTraceStateMaxMembers) {
                 throw std::invalid_argument("TraceState has too many elements.");
             }
             std::cout<<"trace state returned"<<std::endl;
