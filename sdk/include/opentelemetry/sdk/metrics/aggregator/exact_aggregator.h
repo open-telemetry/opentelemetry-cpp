@@ -115,12 +115,20 @@ public:
     if (!quant_estimation_)
     {
       // Log error
-      throw std::domain_error("Exact aggregator is not in quantile estimation mode!");
+      #if __EXCEPTIONS
+        throw std::domain_error("Exact aggregator is not in quantile estimation mode!");
+      #else
+        std::terminate();
+      #endif
     }
     if (this->checkpoint_.size() == 0 || q < 0 || q > 1)
     {
       // Log error
-      throw std::invalid_argument("Arg 'q' must be between 0 and 1, inclusive");
+      #if __EXCEPTIONS
+        throw std::invalid_argument("Arg 'q' must be between 0 and 1, inclusive");
+      #else
+        std::terminate();
+      #endif
     }
     else if (q == 0 || this->checkpoint_.size() == 1)
     {
@@ -148,12 +156,12 @@ public:
   {
     return this->values_;
   }
-  
+
   bool get_quant_estimation() override
   {
     return quant_estimation_;
   }
-  
+
 private:
   bool quant_estimation_; // Used to switch between in-order and quantile estimation modes
 };
