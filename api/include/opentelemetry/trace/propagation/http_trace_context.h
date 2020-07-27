@@ -270,6 +270,7 @@ class HttpTraceContext : public HTTPTextFormat<T> {
                 }
                 sid++;
             }
+            std::cout<<buf<<std::endl;
             return SpanId(buf);
         }
 
