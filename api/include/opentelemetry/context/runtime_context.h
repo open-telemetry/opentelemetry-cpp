@@ -60,8 +60,7 @@ public:
     {
       temp_context = *context;
     }
-    Context written_context = temp_context.SetValue(key, value);
-    return written_context;
+    return temp_context.SetValue(key, value);
   }
 
   // Returns the value associated with the passed in key and either the
