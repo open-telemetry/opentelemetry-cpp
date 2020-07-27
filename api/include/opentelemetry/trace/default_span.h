@@ -1,62 +1,55 @@
 #pragma once
 #include "opentelemetry/trace/span.h"
-#include "opentelemetry/trace/spancontext.h"
+#include "opentelemetry/trace/span_context.h"
 #include "opentelemetry/trace/canonical_code.h"
 #include "opentelemetry/common/attribute_value.h"
 #include "opentelemetry/trace/span.h"
+//#include "opentelemetry/trace/tracer.h"
 
 #define pass
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace trace {
-public const class DefaultSpan : Span {
+class DefaultSpan: public Span {
   public:
     // Returns an invalid span.
     static DefaultSpan GetInvalid() {
-        return kInvalid;
+        return DefaultSpan(SpanContext::GetInvalid());
     }
 
-    // Creates an instance of this class with spancontext.
-    static DefaultSpan Create(SpanContext spanContext) {
-      return DefaultSpan(spanContext);
-    }
-
-    static DefaultSpan CreateRandom() {
-      return DefaultSpan(
-        SpanContext(
-          TraceId.generateRandomId(),
-          SpanId.generateRandomId(),
-          false,
-          TraceFlags.getDefault(),
-          TraceState.getDefault()
-        )
-      );
-    }
-
-    SpanContext GetContext() {
+    trace::SpanContext GetContext() const noexcept {
         return span_context_;
     }
 
-    bool IsRecordingEvents() {
+    bool IsRecording() const noexcept {
         return false;
     }
-    
-    void SetAttribute(nostd::string_view key, common::AttributeValue value) {
+
+    void SetAttribute(nostd::string_view key, const common::AttributeValue &&value) noexcept {
       pass;
     }
 
-    void AddEvent(nostd::string_view name, common::Attributes attributes, int timestamp) {
-      pass;
+    void AddEvent(nostd::string_view name) noexcept { pass; }
+
+    void AddEvent(nostd::string_view name, core::SystemTimestamp timestamp) noexcept { pass; }
+
+    void AddEvent(nostd::string_view name,
+                          core::SystemTimestamp timestamp,
+                          const KeyValueIterable &attributes) noexcept { pass; }
+
+    void AddEvent(nostd::string_view name, const KeyValueIterable &attributes) noexcept
+    {
+      this->AddEvent(name, std::chrono::system_clock::now(), attributes);
     }
     
-    void SetStatus(CanonicalCode status) {
+    void SetStatus(CanonicalCode status, nostd::string_view description) noexcept {
       pass;
     }
   
-    void UpdateName(nostd::string_view name) {
+    void UpdateName(nostd::string_view name) noexcept {
       pass;
     }
 
-    void End(trace::EndSpanOptions end_time) {
+    void End(const EndSpanOptions &options = {}) noexcept {
       pass;
     }
 
@@ -64,12 +57,25 @@ public const class DefaultSpan : Span {
       return "DefaultSpan";
     }
 
-    DefaultSpan(SpanContext spanContext) {
-       this.span_context_ = spanContext;
+    DefaultSpan(SpanContext span_context) {
+       this->span_context_ = span_context;
+    }
+
+    // movable and copiable
+    DefaultSpan(DefaultSpan&& spn) : span_context_(spn.GetContext()) {}
+    DefaultSpan(const DefaultSpan& spn) : span_context_(spn.GetContext()) {}
+
+//    trace::Tracer &tracer() const noexcept {
+//       return trace::Tracer(); // Invalid tracer
+//    }
+
+    // Creates an instance of this class with spancontext.
+    static DefaultSpan Create(SpanContext span_context) {
+      return DefaultSpan(span_context);
     }
 
   private:
-    static const DefaultSpan kInvalid = new DefaultSpan(SpanContext.getInvalid());
-    const SpanContext span_context_;
+    SpanContext span_context_;
+};
 }
-}
+OPENTELEMETRY_END_NAMESPACE
