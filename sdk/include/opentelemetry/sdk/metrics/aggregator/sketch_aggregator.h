@@ -1,15 +1,14 @@
 #pragma once
 
 #include <algorithm>
+#include <cmath>
+#include <map>
 #include <mutex>
 #include "opentelemetry/metrics/instrument.h"
 #include "opentelemetry/version.h"
 #include "opentelemetry/sdk/metrics/aggregator/aggregator.h"
-#include <stdexcept>
-#include <variant>
 #include <vector>
-#include <map>
-#include <cmath>
+#include <stdexcept>
 
 namespace metrics_api = opentelemetry::metrics;
 
