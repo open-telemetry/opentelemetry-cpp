@@ -111,8 +111,13 @@ public:
   static constexpr int kMaxKeyValuePairs = 32;
   // An empty TraceState.
   TraceState() noexcept = default;
-  TraceState(TraceState && trace_state) {
+  TraceState(TraceState &&trace_state) {
     tmp_map = trace_state.tmp_map;
+    return *this;
+  }
+  TraceState(const TraceState &trace_state) {
+    tmp_map = trace_state.tmp_map;
+    return *this;
   }
 
   ~TraceState() = default;
@@ -164,6 +169,7 @@ public:
   // TODO: IsValidValue
 
 private:
+
   static bool IsNumberOrDigit(char c) { return (c >= 'a' && c <= 'z') || (c >= '0' && c <= '9'); }
 };
 
