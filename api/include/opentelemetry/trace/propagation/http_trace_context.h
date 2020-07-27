@@ -291,6 +291,7 @@ class HttpTraceContext : public HTTPTextFormat<T> {
                     element_num++;
                     list_member = trace_state_header.substr(start_pos,end_pos-start_pos+1);
                     AddNewMember(trace_state,list_member);
+                    std::cout<<"member added"<<std::endl;
 //                    SetTraceStateBuilder(trace_state_builder,list_member); // TODO: work around (std::map? return nullptr?)
                     end_pos = -1;
                     start_pos = -1;
@@ -303,12 +304,14 @@ class HttpTraceContext : public HTTPTextFormat<T> {
                 list_member = trace_state_header.substr(start_pos,end_pos-start_pos+1);
                 AddNewMember(trace_state,list_member);
 //                SetTraceStateBuilder(trace_state_builder,list_member);
+                std::cout<<"member added"<<std::endl;
                 element_num++;
             }
 
             if (element_num <= kTraceStateMaxMembers) {
                 throw std::invalid_argument("TraceState has too many elements.");
             }
+            std::cout<<"trace state returned"<<std::endl;
             return trace_state;
 //            return trace_state_builder.Build();
         }
