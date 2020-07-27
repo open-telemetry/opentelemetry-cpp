@@ -47,9 +47,9 @@ public:
 
   static RuntimeContext *context_handler_;
 
-  // Sets the Key and Value into the passed in context or if the context* is null,
-  // the RuntimeContext.
-  static Context SetValue(nostd::string_view key, ContextValue value, Context *context)
+  // Sets the Key and Value into the passed in context or if a context is not
+  // passed in, the RuntimeContext.
+  static Context SetValue(nostd::string_view key, ContextValue value, Context *context = nullptr)
   {
     Context temp_context;
     if (context == nullptr)
@@ -64,8 +64,8 @@ public:
   }
 
   // Returns the value associated with the passed in key and either the
-  // passed in context* or the runtime context if the context* is null.
-  static ContextValue GetValue(nostd::string_view key, Context *context)
+  // passed in context* or the runtime context if a context is not passed in.
+  static ContextValue GetValue(nostd::string_view key, Context *context = nullptr)
   {
     Context temp_context;
     if (context == nullptr)
