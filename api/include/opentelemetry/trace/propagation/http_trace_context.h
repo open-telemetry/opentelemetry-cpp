@@ -146,8 +146,10 @@ class HttpTraceContext : public HTTPTextFormat<T> {
             {
                 if (i%2==0) {
                     buf[i/2] = CharToInt(*tid)*16;
+                    std::cout<<CharToInt(*tid)<<std::endl;
                 } else {
                     buf[i/2] += CharToInt(*tid);
+                    std::cout<<CharToInt(*tid)<<std::endl;
                 }
                 tid++;
             }
@@ -172,7 +174,7 @@ class HttpTraceContext : public HTTPTextFormat<T> {
 
         static TraceFlags GenerateTraceFlagsFromString(nostd::string_view trace_flags) {
             uint8_t buf;
-            buf = CharToInt(trace_flags[0])*16+CharToInt(trace_flags[1]-);
+            buf = CharToInt(trace_flags[0])*16+CharToInt(trace_flags[1]);
             return TraceFlags(buf);
         }
     private:
