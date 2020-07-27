@@ -15,6 +15,7 @@
 #include <string>
 #include <map>
 #include <iostream>
+#include <array>
 #include <exception>
 #include "opentelemetry/trace/propagation/http_text_format.h"
 #include "opentelemetry/trace/span_context.h"
@@ -213,7 +214,9 @@ class HttpTraceContext : public HTTPTextFormat<T> {
                       return trace::SpanContext();
 //                    return SetSpanInContext(trace::DefaultSpan.GetInvalid(), context);
                 }
-                nostd::span<char> tid{trace_id.data(),trace_id.size()};
+                std::array<int, 3> array = {1, 2, 3};
+                span<int> s1{array.data(), array.size()};
+//                nostd::span<char> tid{trace_id.data(),trace_id.size()};
 //                nostd::span<char> sid{span_id.begin(),span_id.length()};
 //                nostd::span<char> tfg{trace_flags.begin(),trace_flags.length()};
 //                TraceId trace_id_obj = TraceId(tid);
