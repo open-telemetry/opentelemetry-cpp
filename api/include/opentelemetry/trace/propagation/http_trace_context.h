@@ -217,7 +217,7 @@ class HttpTraceContext : public HTTPTextFormat<T> {
 //                std::array<char, 3> array = {'1', '2', '3'};
 //                nostd::span<char> s1{array.data(), array.size()};
 //                const char* tid = trace_id.begin();
-                const char* tid = "01020304050607080807aabbccddeeff";
+                const char* tid = "01020304050607080807060504030201";
                 uint8_t buf[16];
                 for (int i = 0; i < 32; i++)
                 {
