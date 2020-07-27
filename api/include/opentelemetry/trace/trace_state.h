@@ -113,11 +113,9 @@ public:
   TraceState() noexcept = default;
   TraceState(TraceState &&trace_state) {
     tmp_map = trace_state.tmp_map;
-    return *this;
   }
   TraceState(const TraceState &trace_state) {
     tmp_map = trace_state.tmp_map;
-    return *this;
   }
 
   ~TraceState() = default;
