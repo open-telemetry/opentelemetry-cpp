@@ -135,6 +135,7 @@ public:
   bool empty() const noexcept { return tmp_map.size()==0; }
 
   // Returns a span of all the entries. The TraceState object must outlive the span.
+  std::map<nostd::string_view,nostd::string_view> entries() noexcept { return tmp_map; }
 //  virtual nostd::span<Entry *> entries() const noexcept { return {}; }
 
   // Key is opaque string up to 256 characters printable. It MUST begin with a lowercase letter, and

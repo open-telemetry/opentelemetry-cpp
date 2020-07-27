@@ -111,12 +111,19 @@ class HttpTraceContext : public HTTPTextFormat<T> {
             nostd::string_view trace_parent = SpanContextToString(span_context);
             setter(carrier, kTraceParent, trace_parent);
             if (!span_context.trace_state().empty()) {
-                std::cout<<"non-empty trace state"<<std::endl;
-//                nostd::string_view trace_state = FormatTracestate(span_context.trace_state());
-//                setter(carrier, kTraceState, trace_state);
-            } else {
-                std::cout<<"empty trace state"<<std::endl;
+                nostd::string_view trace_state = FormatTracestate(span_context.trace_state());
+                setter(carrier, kTraceState, trace_state);
             }
+        }
+
+        static nostd::string_view FormatTracestate(TraceState trace_state) {
+            std::string res = "";
+            std::map<nostd::string_view,nostd::string_view> entries = trace_state.entries();
+            for (std::map<nostd::string_view,nostd::string_view>::iterator it = entries.begin(); it != entries.end(); it++) {
+                if (it != entries.begin()) res += ",";
+                res += it->first + "=" + it->second;
+            }
+            return res;
         }
 
 //        static nostd::string_view FormatTracestate(TraceState trace_state) {
@@ -291,7 +298,6 @@ class HttpTraceContext : public HTTPTextFormat<T> {
                     element_num++;
                     list_member = trace_state_header.substr(start_pos,end_pos-start_pos+1);
                     AddNewMember(trace_state,list_member);
-                    std::cout<<"member added"<<std::endl;
 //                    SetTraceStateBuilder(trace_state_builder,list_member); // TODO: work around (std::map? return nullptr?)
                     end_pos = -1;
                     start_pos = -1;
@@ -304,14 +310,12 @@ class HttpTraceContext : public HTTPTextFormat<T> {
                 list_member = trace_state_header.substr(start_pos,end_pos-start_pos+1);
                 AddNewMember(trace_state,list_member);
 //                SetTraceStateBuilder(trace_state_builder,list_member);
-                std::cout<<"member added!!!"<<std::endl;
                 element_num++;
             }
 
             if (element_num >= kTraceStateMaxMembers) {
                 throw std::invalid_argument("TraceState has too many elements.");
             }
-            std::cout<<"trace state returned"<<std::endl;
             return trace_state;
 //            return trace_state_builder.Build();
         }
@@ -319,7 +323,6 @@ class HttpTraceContext : public HTTPTextFormat<T> {
         static void AddNewMember(TraceState &trace_state, nostd::string_view member) {
             for (int i = 0; i < int(member.length()); i++) {
                 if (member[i] == '=') {
-                    std::cout<<member.substr(0,i)<<" "<<member.substr(i+1,member.length()-i-1)<<std::endl;
                     trace_state.Set(member.substr(0,i),member.substr(i+1,member.length()-i-1));
                     return;
                 }
@@ -362,7 +365,6 @@ class HttpTraceContext : public HTTPTextFormat<T> {
 //                    trace_state
 //                );
             } catch (std::exception& e) {
-                std::cout<<"exception occured!"<<std::endl;
 //                std::cout<<"Unparseable tracestate header. Returning span context without state."<<std::endl;
                 return context_from_parent_header;
 //                return trace::SpanContext.CreateFromRemoteParent(
