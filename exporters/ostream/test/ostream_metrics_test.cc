@@ -352,7 +352,7 @@ TEST(OStreamMetricsExporter, PrintMinMaxSumCountDouble)
   ASSERT_EQ(stdoutOutput.str(),expectedOutput);
 }
 
-TEST(OStreamMetricsExporter, PrintGauge)
+TEST(OStreamMetricsExporter, PrintGaugeShort)
 {
   auto exporter = std::unique_ptr<sdkmetrics::MetricsExporter> (new
       opentelemetry::exporter::metrics::OStreamMetricsExporter);
@@ -387,6 +387,129 @@ TEST(OStreamMetricsExporter, PrintGauge)
   "  description : description\n"
   "  labels      : labels\n"
   "  last value  : 9\n"
+  "  timestamp   : " + std::to_string(aggregator->get_checkpoint_timestamp().time_since_epoch().count()) + "\n"
+  "}\n"; 
+
+  ASSERT_EQ(stdoutOutput.str(),expectedOutput);
+}
+
+TEST(OStreamMetricsExporter, PrintGaugeInt)
+{
+  auto exporter = std::unique_ptr<sdkmetrics::MetricsExporter> (new
+      opentelemetry::exporter::metrics::OStreamMetricsExporter);
+  
+  auto aggregator = nostd::shared_ptr<opentelemetry::sdk::metrics::Aggregator<int>> (new
+      opentelemetry::sdk::metrics::GaugeAggregator<int>(metrics_api::InstrumentKind::Counter));
+  
+  aggregator->update(1);
+  aggregator->update(9);
+  aggregator->checkpoint();
+
+  sdkmetrics::Record r("name", "description", "labels", aggregator);
+  std::vector<sdkmetrics::Record> records;
+  records.push_back(r);
+
+  // Create stringstream to redirect to
+  std::stringstream stdoutOutput;
+
+  // Save cout's buffer here
+  std::streambuf *sbuf = std::cout.rdbuf();
+
+  // Redirect cout to our stringstream buffer
+  std::cout.rdbuf(stdoutOutput.rdbuf());
+
+  exporter->Export(records);
+
+  std::cout.rdbuf(sbuf);
+
+  std::string expectedOutput = 
+  "{\n"
+  "  name        : name\n"
+  "  description : description\n"
+  "  labels      : labels\n"
+  "  last value  : 9\n"
+  "  timestamp   : " + std::to_string(aggregator->get_checkpoint_timestamp().time_since_epoch().count()) + "\n"
+  "}\n"; 
+
+  ASSERT_EQ(stdoutOutput.str(),expectedOutput);
+}
+
+TEST(OStreamMetricsExporter, PrintGaugeFloat)
+{
+  auto exporter = std::unique_ptr<sdkmetrics::MetricsExporter> (new
+      opentelemetry::exporter::metrics::OStreamMetricsExporter);
+  
+  auto aggregator = nostd::shared_ptr<opentelemetry::sdk::metrics::Aggregator<float>> (new
+      opentelemetry::sdk::metrics::GaugeAggregator<float>(metrics_api::InstrumentKind::Counter));
+  
+  aggregator->update(1.1);
+  aggregator->update(9.5);
+  aggregator->checkpoint();
+
+  sdkmetrics::Record r("name", "description", "labels", aggregator);
+  std::vector<sdkmetrics::Record> records;
+  records.push_back(r);
+
+  // Create stringstream to redirect to
+  std::stringstream stdoutOutput;
+
+  // Save cout's buffer here
+  std::streambuf *sbuf = std::cout.rdbuf();
+
+  // Redirect cout to our stringstream buffer
+  std::cout.rdbuf(stdoutOutput.rdbuf());
+
+  exporter->Export(records);
+
+  std::cout.rdbuf(sbuf);
+
+  std::string expectedOutput = 
+  "{\n"
+  "  name        : name\n"
+  "  description : description\n"
+  "  labels      : labels\n"
+  "  last value  : 9.5\n"
+  "  timestamp   : " + std::to_string(aggregator->get_checkpoint_timestamp().time_since_epoch().count()) + "\n"
+  "}\n"; 
+
+  ASSERT_EQ(stdoutOutput.str(),expectedOutput);
+}
+
+TEST(OStreamMetricsExporter, PrintGaugeDouble)
+{
+  auto exporter = std::unique_ptr<sdkmetrics::MetricsExporter> (new
+      opentelemetry::exporter::metrics::OStreamMetricsExporter);
+  
+  auto aggregator = nostd::shared_ptr<opentelemetry::sdk::metrics::Aggregator<double>> (new
+      opentelemetry::sdk::metrics::GaugeAggregator<double>(metrics_api::InstrumentKind::Counter));
+  
+  aggregator->update(1.3);
+  aggregator->update(9.5);
+  aggregator->checkpoint();
+
+  sdkmetrics::Record r("name", "description", "labels", aggregator);
+  std::vector<sdkmetrics::Record> records;
+  records.push_back(r);
+
+  // Create stringstream to redirect to
+  std::stringstream stdoutOutput;
+
+  // Save cout's buffer here
+  std::streambuf *sbuf = std::cout.rdbuf();
+
+  // Redirect cout to our stringstream buffer
+  std::cout.rdbuf(stdoutOutput.rdbuf());
+
+  exporter->Export(records);
+
+  std::cout.rdbuf(sbuf);
+
+  std::string expectedOutput = 
+  "{\n"
+  "  name        : name\n"
+  "  description : description\n"
+  "  labels      : labels\n"
+  "  last value  : 9.5\n"
   "  timestamp   : " + std::to_string(aggregator->get_checkpoint_timestamp().time_since_epoch().count()) + "\n"
   "}\n"; 
 
