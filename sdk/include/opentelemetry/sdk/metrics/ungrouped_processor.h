@@ -52,9 +52,7 @@ public:
 
     std::string batch_key = "/name/" + name + "/description/" + description + "/labels/" + label + "/instrument/" + instrument; 
 
-    auto find_string_key = batch_map_.find(batch_key);
-
-    if(find_string_key != batch_map_.end())
+    if(batch_map_.find(batch_key) != batch_map_.end())
     {
       auto batch_value = batch_map_[batch_key];
       
@@ -68,7 +66,7 @@ public:
 
         agg->merge(agg2);
 
-        aggregator_reference_short = nostd::shared_ptr<sdkmetrics::Aggregator<short>>(agg);
+        batch_map_[batch_key] = nostd::shared_ptr<sdkmetrics::Aggregator<short>>(agg);
       }
       else if(nostd::holds_alternative<nostd::shared_ptr<sdkmetrics::Aggregator<int>>>(aggregator))
       {
