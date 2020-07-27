@@ -557,7 +557,7 @@ void Meter::CollectObservers(std::vector<Record> &records)
     {
       continue;
     }
-    auto cast_ptr = std::dynamic_pointer_cast<AsynchronousInstrument<short>>(pair.second);
+    auto cast_ptr = nostd::dynamic_pointer_cast<AsynchronousInstrument<short>>(pair.second);
     std::vector<Record> new_records = cast_ptr->GetRecords();
     records.insert(records.begin(), new_records.begin(), new_records.end());
   }
@@ -567,7 +567,7 @@ void Meter::CollectObservers(std::vector<Record> &records)
     {
       continue;
     }
-    auto cast_ptr = std::dynamic_pointer_cast<AsynchronousInstrument<int>>(pair.second);
+    auto cast_ptr = nostd::dynamic_pointer_cast<AsynchronousInstrument<int>>(pair.second);
     std::vector<Record> new_records = cast_ptr->GetRecords();
     records.insert(records.begin(), new_records.begin(), new_records.end());
   }
@@ -577,7 +577,7 @@ void Meter::CollectObservers(std::vector<Record> &records)
     {
       continue;
     }
-    auto cast_ptr = std::dynamic_pointer_cast<AsynchronousInstrument<float>>(pair.second);
+    auto cast_ptr = nostd::dynamic_pointer_cast<AsynchronousInstrument<float>>(pair.second);
     std::vector<Record> new_records = cast_ptr->GetRecords();
     records.insert(records.begin(), new_records.begin(), new_records.end());
   }
@@ -587,7 +587,7 @@ void Meter::CollectObservers(std::vector<Record> &records)
     {
       continue;
     }
-    auto cast_ptr = std::dynamic_pointer_cast<AsynchronousInstrument<double>>(pair.second);
+    auto cast_ptr = nostd::dynamic_pointer_cast<AsynchronousInstrument<double>>(pair.second);
     std::vector<Record> new_records = cast_ptr->GetRecords();
     records.insert(records.begin(), new_records.begin(), new_records.end());
   }
