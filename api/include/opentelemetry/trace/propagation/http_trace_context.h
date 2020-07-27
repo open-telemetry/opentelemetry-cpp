@@ -214,24 +214,8 @@ class HttpTraceContext : public HTTPTextFormat<T> {
                       return trace::SpanContext();
 //                    return SetSpanInContext(trace::DefaultSpan.GetInvalid(), context);
                 }
-//                std::array<char, 3> array = {'1', '2', '3'};
-//                nostd::span<char> s1{array.data(), array.size()};
-//                const char* tid = trace_id.begin();
-                const char* tid = "01020304050607080807060504030201";
-                uint8_t buf[16];
-                for (int i = 0; i < 32; i++)
-                {
-                    if (i%2==0) {
-                        buf[i/2] = (uint8_t)(*tid)*16;
-                    } else {
-                        buf[i/2] += (uint8_t)(*tid);
-                    }
-                    tid++;
-                }
-//                nostd::span<char> sid{span_id.begin(),span_id.length()};
-//                nostd::span<char> tfg{trace_flags.begin(),trace_flags.length()};
-                std::cout<<buf<<std::endl;
-                TraceId trace_id_obj = TraceId(buf);
+
+                TraceId trace_id_obj = GenerateTraceIdFromBuf(trace_id);
 //                SpanId span_id_obj = SpanId(span_id);
 //                TraceFlags trace_flags_obj = TraceFlags(trace_flags);
                 return trace::SpanContext();
@@ -240,6 +224,21 @@ class HttpTraceContext : public HTTPTextFormat<T> {
 //                std::cout<<"Unparseable trace_parent header. Returning INVALID span context."<<std::endl;
                 return trace::SpanContext();
             }
+        }
+
+        static TraceId GenerateTraceIdFromBuf(nostd::string_view trace_id) {
+            const char* tid = trace_id.begin();
+            uint8_t buf[16];
+            for (int i = 0; i < 32; i++)
+            {
+                if (i%2==0) {
+                    buf[i/2] = (uint8_t)(*tid)*16;
+                } else {
+                    buf[i/2] += (uint8_t)(*tid);
+                }
+                tid++;
+            }
+            return TraceId(buf);
         }
 
 //        static void SetTraceStateBuilder(TraceState.Builder &trace_state_builder, nostd::string_view &list_member) {
