@@ -203,6 +203,7 @@ class HttpTraceContext : public HTTPTextFormat<T> {
                     }
                 }
                 trace_flags = trace_parent.substr(start_pos,kHeaderElementLengths[elt_num]);
+                std::cout<<version<<" "<<trace_id<<" "<<span_id<<" "<<trace_flags<<std::endl;
 
                 if (trace_id == "00000000000000000000000000000000" || span_id == "0000000000000000") {
                       return trace::SpanContext();
@@ -212,14 +213,13 @@ class HttpTraceContext : public HTTPTextFormat<T> {
                       return trace::SpanContext();
 //                    return SetSpanInContext(trace::DefaultSpan.GetInvalid(), context);
                 }
-                nostd::span<char> tid{trace_id.begin(),trace_id.length()};
-                nostd::span<char> sid{span_id.begin(),span_id.length()};
-                nostd::span<char> tfg{trace_flags.begin(),trace_flags.length()};
-                TraceId trace_id_obj = TraceId(tid);
-                SpanId span_id_obj = SpanId(sid);
-                TraceFlags trace_flags_obj = TraceFlags(tfg);
+//                nostd::span<char> tid{trace_id.begin(),trace_id.length()};
+//                nostd::span<char> sid{span_id.begin(),span_id.length()};
+//                nostd::span<char> tfg{trace_flags.begin(),trace_flags.length()};
+//                TraceId trace_id_obj = TraceId(tid);
+//                SpanId span_id_obj = SpanId(sid);
+//                TraceFlags trace_flags_obj = TraceFlags(tfg);
                 return trace::SpanContext();
-//                return trace::SpanContext(trace_id_obj,span_id_obj,trace_flags_obj,std::map<std::string,std::string>(),true);
 //                return trace::SpanContext.CreateFromRemoteParent(trace_id_obj, span_id_obj, trace_flags_obj, TraceState());
             } catch (std::exception& e) {
 //                std::cout<<"Unparseable trace_parent header. Returning INVALID span context."<<std::endl;
