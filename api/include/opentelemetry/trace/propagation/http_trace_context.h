@@ -217,7 +217,7 @@ class HttpTraceContext : public HTTPTextFormat<T> {
                 TraceId trace_id_obj = GenerateTraceIdFromString(trace_id);
                 SpanId span_id_obj = GenerateSpanIdFromString(span_id);
                 TraceFlags trace_flags_obj = GenerateTraceFlagsFromString(trace_flags);
-                return trace::SpanContext(trace_id_obj,span_id_obj,trace_flags_obj,true);
+                return trace::SpanContext(trace_id_obj,span_id_obj,trace_flags_obj,TraceState(),true);
 //                return trace::SpanContext.CreateFromRemoteParent(trace_id_obj, span_id_obj, trace_flags_obj, TraceState());
             } catch (std::exception& e) {
 //                std::cout<<"Unparseable trace_parent header. Returning INVALID span context."<<std::endl;
@@ -341,16 +341,22 @@ class HttpTraceContext : public HTTPTextFormat<T> {
 
             try {
                 TraceState trace_state = ExtractTraceState(trace_state_header);
-                // Need getter support from trace::SpanContext
-                return trace::SpanContext();
+                return trace::SpanContext(
+                    context_from_parent_header.GetTraceId(),
+                    context_from_parent_header.GetSpanId(),
+                    context_from_parent_header.GetTraceFlags(),
+                    trace_state,
+                    true
+                );
 //                return trace::SpanContext.CreateFromRemoteParent(
 //                    context_from_parent_header.GetTraceId(),
 //                    context_from_parent_header.GetSpanId(),
 //                    context_from_parent_header.GetTraceFlags(),
-//                    trace_state);
+//                    trace_state
+//                );
             } catch (std::exception& e) {
 //                std::cout<<"Unparseable tracestate header. Returning span context without state."<<std::endl;
-                return trace::SpanContext();
+                return context_from_parent_header;
 //                return trace::SpanContext.CreateFromRemoteParent(
 //                    context_from_parent_header.GetTraceId(),
 //                    context_from_parent_header.GetSpanId(),
