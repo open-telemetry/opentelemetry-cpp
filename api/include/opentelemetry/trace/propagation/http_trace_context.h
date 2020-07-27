@@ -147,10 +147,10 @@ class HttpTraceContext : public HTTPTextFormat<T> {
 
                 if (i%2==0) {
                     buf[i/2] = ((uint8_t)((*tid)-'0'))*16;
-                    std::cout<<((uint8_t)((*tid)-'0'))*16<<std::endl;
+//                    std::cout<<((uint8_t)((*tid)-'0'))*16<<std::endl;
                 } else {
-                    buf[i/2] += (uint8_t)(*tid);
-                    std::cout<<(uint8_t)(*tid)<<std::endl;
+                    buf[i/2] += (uint8_t)((*tid)-'0');
+//                    std::cout<<(uint8_t)(*tid)<<std::endl;
                 }
                 tid++;
             }
@@ -163,9 +163,9 @@ class HttpTraceContext : public HTTPTextFormat<T> {
             for (int i = 0; i < 16; i++)
             {
                 if (i%2==0) {
-                    buf[i/2] = (uint8_t)(*sid)*16;
+                    buf[i/2] = ((uint8_t)((*sid)-'0'))*16;
                 } else {
-                    buf[i/2] += (uint8_t)(*sid);
+                    buf[i/2] += (uint8_t)((*tid)-'0');
                 }
                 sid++;
             }
@@ -175,7 +175,7 @@ class HttpTraceContext : public HTTPTextFormat<T> {
 
         static TraceFlags GenerateTraceFlagsFromString(nostd::string_view trace_flags) {
             uint8_t buf;
-            buf = (uint8_t)(trace_flags[0])*16+(uint8_t)(trace_flags[1]);
+            buf = (uint8_t)(trace_flags[0]-'0')*16+(uint8_t)(trace_flags[1]-'0');
             return TraceFlags(buf);
         }
     private:
