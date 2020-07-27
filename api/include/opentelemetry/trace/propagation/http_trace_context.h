@@ -76,11 +76,6 @@ class HttpTraceContext : public HTTPTextFormat<T> {
             trace::SpanContext span_context = ExtractImpl(getter,carrier);
             nostd::string_view span_key = "current-span";
             nostd::shared_ptr<trace::SpanContext> spc{new trace::SpanContext(span_context)};
-            if (!GetCurrentSpanContext(context.SetValue(span_key,spc)).trace_state().empty()) {
-                std::cout<<"extract side: non-empty trace state"<<std::endl;
-            } else {
-                std::cout<<"extract side: empty trace state"<<std::endl;
-            }
             return context.SetValue(span_key,spc);
 //            return SetSpanInContext(trace.DefaultSpan(span_context), context);
         }
