@@ -114,9 +114,9 @@ public:
   ~TraceState() = default;
 
   // Returns false if no such key, otherwise returns true and populates value.
-  bool Get(nostd::string_view key, nostd::string_view *value) noexcept
+  bool Get(nostd::string_view key, nostd::string_view value) noexcept
   {
-    return tmp_map[key] == *value;
+    return tmp_map[key] == value;
   }
 
   void Set(nostd::string_view key, nostd::string_view value) noexcept
