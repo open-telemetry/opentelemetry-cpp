@@ -71,10 +71,6 @@ TEST(HTTPTextFormatTest, NoSpanTest)
     nostd::shared_ptr<trace::SpanContext> spc{new trace::SpanContext()};
     context::Context ctx1 = context::Context("current-span",spc);
     context::Context ctx2 = format.Extract(Getter,carrier,ctx1);
-
-    nostd::shared_ptr<trace::SpanContext> span_context = nostd::get<nostd::shared_ptr<trace::SpanContext>>(ctx2.GetValue("current-span"));
-    trace::propagation::HttpTraceContext<std::map<std::string,std::string>>::SpanContextToString(*span_context);
-
     std::map<std::string,std::string> c2 = {};
     format.Inject(Setter,c2,ctx2);
     EXPECT_EQ(carrier.size(),c2.size());
