@@ -138,6 +138,43 @@ class HttpTraceContext : public HTTPTextFormat<T> {
 //            }
             return nostd::string_view(hex_string);
         }
+
+        static TraceId GenerateTraceIdFromString(nostd::string_view trace_id) {
+            const char* tid = trace_id.begin();
+            uint8_t buf[16];
+            for (int i = 0; i < 32; i++)
+            {
+                if (i%2==0) {
+                    buf[i/2] = (uint8_t)(*tid)*16;
+                } else {
+                    buf[i/2] += (uint8_t)(*tid);
+                }
+                tid++;
+            }
+            return TraceId(buf);
+        }
+
+        static SpanId GenerateSpanIdFromString(nostd::string_view span_id) {
+            const char* sid = span_id.begin();
+            uint8_t buf[8];
+            for (int i = 0; i < 16; i++)
+            {
+                if (i%2==0) {
+                    buf[i/2] = (uint8_t)(*sid)*16;
+                } else {
+                    buf[i/2] += (uint8_t)(*sid);
+                }
+                sid++;
+            }
+            std::cout<<buf<<std::endl;
+            return SpanId(buf);
+        }
+
+        static TraceFlags GenerateTraceFlagsFromString(nostd::string_view trace_flags) {
+            uint8_t buf;
+            buf = (uint8_t)(trace_flags[0])*16+(uint8_t)(trace_flags[1]);
+            return TraceFlags(buf);
+        }
     private:
 
         // TODO: need review on hex_string because trace ids are objects not string_views
@@ -245,42 +282,7 @@ class HttpTraceContext : public HTTPTextFormat<T> {
             }
         }
 
-        static TraceId GenerateTraceIdFromString(nostd::string_view trace_id) {
-            const char* tid = trace_id.begin();
-            uint8_t buf[16];
-            for (int i = 0; i < 32; i++)
-            {
-                if (i%2==0) {
-                    buf[i/2] = (uint8_t)(*tid)*16;
-                } else {
-                    buf[i/2] += (uint8_t)(*tid);
-                }
-                tid++;
-            }
-            return TraceId(buf);
-        }
 
-        static SpanId GenerateSpanIdFromString(nostd::string_view span_id) {
-            const char* sid = span_id.begin();
-            uint8_t buf[8];
-            for (int i = 0; i < 16; i++)
-            {
-                if (i%2==0) {
-                    buf[i/2] = (uint8_t)(*sid)*16;
-                } else {
-                    buf[i/2] += (uint8_t)(*sid);
-                }
-                sid++;
-            }
-            std::cout<<buf<<std::endl;
-            return SpanId(buf);
-        }
-
-        static TraceFlags GenerateTraceFlagsFromString(nostd::string_view trace_flags) {
-            uint8_t buf;
-            buf = (uint8_t)(trace_flags[0])*16+(uint8_t)(trace_flags[1]);
-            return TraceFlags(buf);
-        }
 //        static void SetTraceStateBuilder(TraceState.Builder &trace_state_builder, nostd::string_view &list_member) {
 //            int index = -1;
 //            for (int j = 0; j < list_member.length(); j++) {

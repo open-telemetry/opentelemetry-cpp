@@ -31,6 +31,24 @@ static trace::propagation::HttpTraceContext<std::map<std::string,std::string>> f
 static nostd::string_view trace_id = "12345678901234567890123456789012";
 static nostd::string_view span_id = "1234567890123456";
 
+TEST(HTTPTextFormatTest, TraceIdBufferGeneration)
+{
+    constexpr uint8_t buf[] = {1, 2, 3, 4, 5, 6, 7, 8, 8, 7, 6, 5, 4, 3, 2, 1};
+    TraceId id(buf);
+    EXPECT_EQ(GenerateTraceIdFromString("01020304050607080807060504030201"),id);
+//    GenerateSpanIdFromString("0102030405060708");
+//    GenerateTraceFlagsFromString("01");
+}
+
+//TEST(HTTPTextFormatTest, TEST1)
+//{
+//    nostd::shared_ptr<trace::SpanContext> spc(new trace::SpanContext(
+//        trace::propagation::HttpTraceContext<std::map<std::string,std::string>>::TraceId(GenerateTraceIdFromString("")),
+//        trace::propagation::HttpTraceContext<std::map<std::string,std::string>>::SpanId(GenerateSpanIdFromString("")),
+//        trace::propagation::HttpTraceContext<std::map<std::string,std::string>>::TraceFlags(GenerateTraceFlagsFromString("")),
+//        ));
+//}
+
 TEST(HTTPTextFormatTest, NoSpanTest)
 {
     const std::map<std::string,std::string> carrier = {{"traceparent","00-4bf92f3577b34da6a3ce929d0e0e4736-0102030405060708-01"},{"tracestate","congo=congosSecondPosition,rojo=rojosFirstPosition"}};
