@@ -144,6 +144,7 @@ class HttpTraceContext : public HTTPTextFormat<T> {
             uint8_t buf[16];
             for (int i = 0; i < 32; i++)
             {
+                std::cout<<(uint8_t)(*tid)<<std::endl;
                 if (i%2==0) {
                     buf[i/2] = (uint8_t)(*tid)*16;
                 } else {
