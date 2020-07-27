@@ -160,7 +160,7 @@ class HttpTraceContext : public HTTPTextFormat<T> {
             for (auto it : span_id) {
                 hex_string += std::string(it,1);
             }
-            hex_string += "-" + trace_flags;
+            hex_string += "-";
             for (auto it : trace_flags) {
                hex_string += std::string(it,1);
             }
