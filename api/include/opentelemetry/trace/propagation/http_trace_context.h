@@ -165,7 +165,7 @@ class HttpTraceContext : public HTTPTextFormat<T> {
                 if (i%2==0) {
                     buf[i/2] = ((uint8_t)((*sid)-'0'))*16;
                 } else {
-                    buf[i/2] += (uint8_t)((*tid)-'0');
+                    buf[i/2] += (uint8_t)((*sid)-'0');
                 }
                 sid++;
             }
