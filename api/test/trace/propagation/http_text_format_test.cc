@@ -35,9 +35,9 @@ static nostd::string_view span_id = "1234567890123456";
 using map_http_trace_context = trace::propagation::HttpTraceContext<std::map<std::string,std::string>>;
 TEST(HTTPTextFormatTest, TraceIdBufferGeneration)
 {
-    constexpr uint8_t buf[] = {1, 2, 3, 4, 5, 6, 7, 8, 8, 7, 6, 5, 4, 3, 2, 1};
+    constexpr uint8_t buf[] = {1, 2, 3, 4, 5, 6, 7, 8, 8, 7, 0xaa, 0xbb, 0xcc, 0xdd, 0xee, 0xff};
     trace::TraceId id(buf);
-    EXPECT_EQ(map_http_trace_context::GenerateTraceIdFromString("01020304050607080807060504030201"),id);
+    EXPECT_EQ(map_http_trace_context::GenerateTraceIdFromString("01020304050607080807aabbccddeeff"),id);
 //    GenerateSpanIdFromString("0102030405060708");
 //    GenerateTraceFlagsFromString("01");
 }
