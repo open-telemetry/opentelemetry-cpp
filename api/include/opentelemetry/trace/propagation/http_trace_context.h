@@ -214,14 +214,14 @@ class HttpTraceContext : public HTTPTextFormat<T> {
                       return trace::SpanContext();
 //                    return SetSpanInContext(trace::DefaultSpan.GetInvalid(), context);
                 }
-                std::array<char, 3> array = {'1', '2', '3'};
-                nostd::span<char> s1{array.data(), array.size()};
-                nostd::span<char> tid{trace_id.data(),trace_id.size()};
+//                std::array<char, 3> array = {'1', '2', '3'};
+//                nostd::span<char> s1{array.data(), array.size()};
+//                nostd::span<char> tid{trace_id.data(),trace_id.size()};
 //                nostd::span<char> sid{span_id.begin(),span_id.length()};
 //                nostd::span<char> tfg{trace_flags.begin(),trace_flags.length()};
-//                TraceId trace_id_obj = TraceId(tid);
-//                SpanId span_id_obj = SpanId(sid);
-//                TraceFlags trace_flags_obj = TraceFlags(tfg);
+                TraceId trace_id_obj = TraceId(trace_id);
+//                SpanId span_id_obj = SpanId(span_id);
+//                TraceFlags trace_flags_obj = TraceFlags(trace_flags);
                 return trace::SpanContext();
 //                return trace::SpanContext.CreateFromRemoteParent(trace_id_obj, span_id_obj, trace_flags_obj, TraceState());
             } catch (std::exception& e) {
