@@ -344,6 +344,7 @@ class HttpTraceContext : public HTTPTextFormat<T> {
 
             try {
                 TraceState trace_state = ExtractTraceState(trace_state_header);
+                std::cout<<"reached here?"<<std::endl;
                 return trace::SpanContext(
                     context_from_parent_header.trace_id(),
                     context_from_parent_header.span_id(),
