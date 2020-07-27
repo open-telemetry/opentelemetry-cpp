@@ -9,7 +9,8 @@ namespace exporter
 namespace memory
 {
 /**
- * A mock exporter that switches a flag once a valid recordable was received.
+ * A in memory exporter that switches a flag once a valid recordable was received
+ * and keeps track of all received spans in memory.
  */
 class InMemorySpanExporter final : public opentelemetry::sdk::trace::SpanExporter
 {
