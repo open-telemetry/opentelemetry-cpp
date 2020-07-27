@@ -6,15 +6,18 @@ OPENTELEMETRY_BEGIN_NAMESPACE
 namespace sdk
 {
 /**
- * Maintain a static empty map that represents empty (default) attributes.
- * Helps to avoid constructing a new empty map everytime a call is made with default attributes.
+ * Maintain a static empty array of pairs that represents empty (default) attributes.
+ * This helps to avoid constructing a new empty container every time a call is made
+ * with default attributes.
  */
-static const opentelemetry::trace::KeyValueIterableView<std::map<std::string, int>>
+static const opentelemetry::trace::KeyValueIterableView<std::array<std::pair<std::string, int>, 0>>
     &GetEmptyAttributes() noexcept
 {
-  static const std::map<std::string, int> map;
-  static const opentelemetry::trace::KeyValueIterableView<std::map<std::string, int>>
-      kEmptyAttributes(map);
+  static constexpr std::array<std::pair<std::string, int>, 0> array;
+  static const opentelemetry::trace::KeyValueIterableView<
+      std::array<std::pair<std::string, int>, 0>>
+      kEmptyAttributes(array);
+
   return kEmptyAttributes;
 }
 }  // namespace sdk
