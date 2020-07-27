@@ -322,6 +322,7 @@ class HttpTraceContext : public HTTPTextFormat<T> {
             }
 
             nostd::string_view trace_state_header = getter(carrier, kTraceState);
+            trace_state_header = nostd::string_view(c[std::string(kTraceState)]);
             if (trace_state_header == "" || trace_state_header.empty()) {
                 return context_from_parent_header;
             }
