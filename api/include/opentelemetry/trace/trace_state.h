@@ -105,7 +105,9 @@ class TraceState
 
 // TODO: Later change this back to normal, now I am using map to bypass this
 public:
-
+  static constexpr int kKeyMaxSize       = 256;
+  static constexpr int kValueMaxSize     = 256;
+  static constexpr int kMaxKeyValuePairs = 32;
   // An empty TraceState.
   TraceState() noexcept = default;
 
