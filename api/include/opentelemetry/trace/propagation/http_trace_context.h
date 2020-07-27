@@ -144,7 +144,7 @@ class HttpTraceContext : public HTTPTextFormat<T> {
 
         static nostd::string_view SpanContextToString(const trace::SpanContext &span_context) {
             int8_t trace_id[32];
-            SpanContext(span_context.trace_id()).ToLowerBase16(trace_id);
+            TraceId(span_context.trace_id()).ToLowerBase16(trace_id);
             nostd::span<const uint8_t> span_id = span_context.span_id().Id();
             uint8_t trace_flags = span_context.trace_flags().flags();
 //            nostd::string_view hex_string = "00-"; // TODO: ask in gitter about string addition
