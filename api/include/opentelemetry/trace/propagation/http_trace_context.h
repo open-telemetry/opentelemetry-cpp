@@ -76,14 +76,6 @@ class HttpTraceContext : public HTTPTextFormat<T> {
             trace::SpanContext span_context = ExtractImpl(getter,carrier);
             nostd::string_view span_key = "current-span";
             nostd::shared_ptr<trace::SpanContext> spc{new trace::SpanContext(span_context)};
-
-            std::map<nostd::string_view,nostd::string_view> entries = TraceState(span_context.trace_state()).entries();
-            std::string res = "";
-            for (std::map<nostd::string_view,nostd::string_view>::iterator it = entries.begin(); it != entries.end(); it++) {
-                if (it != entries.begin()) res += ",";
-                res += std::string(it->first) + "=" + std::string(it->second);
-            }
-            std::cout<<"Formated TraceState: "<<res<<std::endl;
             return context.SetValue(span_key,spc);
 //            return SetSpanInContext(trace.DefaultSpan(span_context), context);
         }
@@ -151,7 +143,8 @@ class HttpTraceContext : public HTTPTextFormat<T> {
 //        }
 
         static nostd::string_view SpanContextToString(const trace::SpanContext &span_context) {
-            nostd::span<const uint8_t> trace_id = span_context.trace_id().Id();
+            uint8_t trace_id[32];
+            span_context.trace_id().ToLowerBase16(trace_id);
             nostd::span<const uint8_t> span_id = span_context.span_id().Id();
             uint8_t trace_flags = span_context.trace_flags().flags();
 //            nostd::string_view hex_string = "00-"; // TODO: ask in gitter about string addition
