@@ -146,10 +146,10 @@ class HttpTraceContext : public HTTPTextFormat<T> {
             {
                 if (i%2==0) {
                     buf[i/2] = CharToInt(*tid)*16;
-                    std::cout<<int(CharToInt(*tid))<<std::endl;
+//                    std::cout<<int(CharToInt(*tid))<<std::endl;
                 } else {
                     buf[i/2] += CharToInt(*tid);
-                    std::cout<<int(CharToInt(*tid))<<std::endl;
+//                    std::cout<<int(CharToInt(*tid))<<std::endl;
                 }
                 tid++;
             }
@@ -359,8 +359,8 @@ class HttpTraceContext : public HTTPTextFormat<T> {
             nostd::string_view trace_parent = getter(carrier, kTraceParent);
             std::cout<<trace_parent<<std::endl;
             // TODO: ask host why trace_parent's first 8 characters are incorrect
-            std::map<std::string,std::string> c = carrier;
-            trace_parent = nostd::string_view(c[std::string(kTraceParent)]);
+//            std::map<std::string,std::string> c = carrier;
+//            trace_parent = nostd::string_view(c[std::string(kTraceParent)]);
             if (trace_parent == "") {
                 return trace::SpanContext();
             }
@@ -370,7 +370,7 @@ class HttpTraceContext : public HTTPTextFormat<T> {
             }
 
             nostd::string_view trace_state_header = getter(carrier, kTraceState);
-            trace_state_header = nostd::string_view(c[std::string(kTraceState)]);
+            trace_state_header = nostd::string_view(carrier[std::string(kTraceState)]);
 
             if (trace_state_header == "" || trace_state_header.empty()) {
                 return context_from_parent_header;
