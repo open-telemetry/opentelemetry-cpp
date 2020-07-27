@@ -121,7 +121,7 @@ public:
 
   void Set(nostd::string_view key, nostd::string_view value) noexcept
   {
-    tmp_map[key] = *value;
+    tmp_map[key] = value;
   }
 
   // Returns true if there are no keys.
