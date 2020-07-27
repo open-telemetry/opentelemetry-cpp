@@ -162,6 +162,9 @@ class HttpTraceContext : public HTTPTextFormat<T> {
                 hex_string += std::string(it,1);
             }
             hex_string += "-" + trace_flags;
+            for (auto it : trace_flags) {
+               hex_string += std::string(it,1);
+            }
 //            for (auto it : trace_id) {
 //                hex_string += nostd::string_view(it,1);
 //            }
