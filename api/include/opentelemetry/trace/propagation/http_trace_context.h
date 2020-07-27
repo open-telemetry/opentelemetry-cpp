@@ -221,9 +221,9 @@ class HttpTraceContext : public HTTPTextFormat<T> {
                 uint8_t* td = new uint8_t[trace_id.size()+1];
 
                 size_t i = 0;
-                for (; beg != trace_id.end(); ++beg, ++i)
+                for (; tid != trace_id.end(); ++tid, ++i)
                 {
-                    td[i] = (uint8_t)(*beg);
+                    td[i] = (uint8_t)(*tid);
                 }
 //                nostd::span<char> sid{span_id.begin(),span_id.length()};
 //                nostd::span<char> tfg{trace_flags.begin(),trace_flags.length()};
