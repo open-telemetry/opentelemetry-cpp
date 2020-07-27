@@ -17,6 +17,8 @@
 //#include <cstdint>
 //#include <cstring>
 #include <iostream>
+#include <map>
+#include <string>
 #include "opentelemetry/nostd/unique_ptr.h"
 #include "opentelemetry/trace/span_id.h"
 #include "opentelemetry/trace/trace_flags.h"
@@ -34,11 +36,13 @@ class SpanContext final
 public:
   // An invalid SpanContext.
   SpanContext() noexcept : trace_state_(new TraceState) {}
-  SpanContext(TraceId trace_id, SpanId span_id, TraceFlags trace_flags, TraceState trace_state) noexcept {
+  SpanContext(TraceId trace_id, SpanId span_id, TraceFlags trace_flags, std::map<std::string,std::string> trace_state, bool is_remote) noexcept {
     trace_id_ = trace_id;
     span_id_ = span_id;
     trace_flags_ = trace_flags;
-    trace_state_ = trace_state;
+    nostd::unique_ptr<std::map<std::string,std::string>> ts{new std::map<std::string,std::string>(trace_state)};
+    trace_state_ = ts;
+    remote_parent_ = is_remote;
   }
   SpanContext(SpanContext&& ctx) : trace_id_(ctx.trace_id()), span_id_(ctx.span_id()), trace_flags_(ctx.trace_flags()), trace_state_(std::move(ctx.trace_state_)) {}
   SpanContext(const SpanContext& ctx) : trace_id_(ctx.trace_id()), span_id_(ctx.span_id()), trace_flags_(ctx.trace_flags()), trace_state_(new TraceState()) {}
@@ -65,7 +69,8 @@ public:
   const TraceId &trace_id() const noexcept { return trace_id_; }
   const SpanId &span_id() const noexcept { return span_id_; }
   const TraceFlags &trace_flags() const noexcept { return trace_flags_; }
-  const TraceState &trace_state() const noexcept { return *trace_state_; }
+  const nostd::unique_ptr<std::map<std::string,std::string>> &trace_state() const noexcept { return *trace_state_; }
+//  const TraceState &trace_state() const noexcept { return *trace_state_; }
 
   bool IsValid() const noexcept {
     if (!trace_id_.IsValid()) std::cout<<"trace id invalid"<<std::endl;
@@ -81,7 +86,8 @@ private:
   TraceId trace_id_;
   SpanId span_id_;
   TraceFlags trace_flags_;
-  nostd::unique_ptr<TraceState> trace_state_;  // Never nullptr.
+  nostd::unique_ptr<std::map<std::string,std::string>> trace_state; // TODO: in the future replace this with implemented TraceState
+//  nostd::unique_ptr<TraceState> trace_state_;  // Never nullptr.
   bool remote_parent_ = false;
 };
 
