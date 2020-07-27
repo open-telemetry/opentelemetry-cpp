@@ -181,11 +181,11 @@ class HttpTraceContext : public HTTPTextFormat<T> {
 
         static uint8_t CharToInt(char c) {
             if (c >= '0' && c <= '9') {
-                return (uint8_t)(c - '0');
+                return (int)(c - '0');
             } else if (c >= 'a' && c <= 'f') {
-                return (uint8_t)(c - 'a' + 10);
+                return (int)(c - 'a' + 10);
             } else if (c >= 'A' && c <= 'F') {
-                return (uint8_t)(c - 'A' + 10);
+                return (int)(c - 'A' + 10);
             } else {
                 return 0;
             }
