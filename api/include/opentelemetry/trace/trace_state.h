@@ -105,11 +105,15 @@ class TraceState
 
 // TODO: Later change this back to normal, now I am using map to bypass this
 public:
+  std::map<nostd::string_view,nostd::string_view> tmp_map;
   static constexpr int kKeyMaxSize       = 256;
   static constexpr int kValueMaxSize     = 256;
   static constexpr int kMaxKeyValuePairs = 32;
   // An empty TraceState.
   TraceState() noexcept = default;
+  TraceState(TraceState && trace_state) {
+    tmp_map = trace_state.tmp_map;
+  }
 
   ~TraceState() = default;
 
@@ -160,7 +164,6 @@ public:
   // TODO: IsValidValue
 
 private:
-  std::map<nostd::string_view,nostd::string_view> tmp_map;
   static bool IsNumberOrDigit(char c) { return (c >= 'a' && c <= 'z') || (c >= '0' && c <= '9'); }
 };
 
