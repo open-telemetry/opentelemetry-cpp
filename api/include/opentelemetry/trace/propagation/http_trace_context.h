@@ -146,7 +146,6 @@ class HttpTraceContext : public HTTPTextFormat<T> {
         static nostd::string_view SpanContextToString(const trace::SpanContext &span_context) {
             char trace_id[32];
             TraceId(span_context.trace_id()).ToLowerBase16(trace_id);
-            std::cout<<"Extraction:::: "<<trace_id<<std::endl;
             char span_id[16];
             SpanId(span_context.span_id()).ToLowerBase16(span_id);
             char trace_flags[2];
@@ -165,6 +164,7 @@ class HttpTraceContext : public HTTPTextFormat<T> {
             for (auto it : trace_flags) {
                hex_string += std::string(it,1);
             }
+            std::cout<<"Extraction:::: "<<hex_string<<std::endl;
 //            for (auto it : trace_id) {
 //                hex_string += nostd::string_view(it,1);
 //            }
