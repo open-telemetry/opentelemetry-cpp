@@ -128,6 +128,34 @@ void PrintAggregatorVariant(sdkmetrics::AggregatorVariant value)
   else if(aggKind == sdkmetrics::AggregatorKind::Sketch)
   {
     // TODO: Waiting for Sketch to be finished
+    auto boundaries = agg->get_boundaries();
+    auto counts = agg->get_counts();
+
+    int boundaries_size = boundaries.size();
+    int counts_size = counts.size();
+
+    sout_ << "\n  buckets     : "
+          << '[';
+
+    for(int i = 0; i < boundaries_size; i++)
+    {
+      sout_ << boundaries[i];
+
+      if(i != boundaries_size-1)
+        sout_ << ", ";
+    }
+    sout_ << ']';
+
+    sout_ << "\n  counts      : "
+          << '[';
+    for(int i = 0; i < counts_size; i++)
+    {
+      sout_ << counts[i];
+
+      if(i != counts_size-1)
+        sout_ << ", ";
+    }
+    sout_ << ']';
   }
 }
 

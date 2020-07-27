@@ -5,6 +5,7 @@
 #include "opentelemetry/sdk/metrics/aggregator/min_max_sum_count_aggregator.h"
 #include "opentelemetry/sdk/metrics/aggregator/gauge_aggregator.h"
 #include "opentelemetry/sdk/metrics/aggregator/exact_aggregator.h"
+#include "opentelemetry/sdk/metrics/aggregator/sketch_aggregator.h"
 
 
 #include <iostream>
@@ -234,6 +235,50 @@ TEST(OStreamMetricsExporter, PrintHistogram)
   "  labels      : labels\n"
   "  buckets     : [10, 20, 30, 40, 50]\n"
   "  counts      : [10, 10, 10, 10, 10, 10]\n"
+  "}\n"; 
+
+  ASSERT_EQ(stdoutOutput.str(),expectedOutput);
+}
+
+TEST(OStreamMetricsExporter, PrintSketch)
+{
+  auto exporter = std::unique_ptr<sdkmetrics::MetricsExporter> (new
+      opentelemetry::exporter::metrics::OStreamMetricsExporter);
+  
+  std::vector<double> boundaries{1,3,5,7,9};
+  auto aggregator = nostd::shared_ptr<opentelemetry::sdk::metrics::Aggregator<int>> (new
+      opentelemetry::sdk::metrics::SketchAggregator<int>(metrics_api::InstrumentKind::Counter, .000005));
+  
+  for(int i = 0; i < 10; i++)
+  {
+    aggregator->update(i);
+  }
+  aggregator->checkpoint();
+
+  sdkmetrics::Record r("name", "description", "labels", aggregator);
+  std::vector<sdkmetrics::Record> records;
+  records.push_back(r);
+
+  // Create stringstream to redirect to
+  std::stringstream stdoutOutput;
+
+  // Save cout's buffer here
+  std::streambuf *sbuf = std::cout.rdbuf();
+
+  // Redirect cout to our stringstream buffer
+  std::cout.rdbuf(stdoutOutput.rdbuf());
+
+  exporter->Export(records);
+
+  std::cout.rdbuf(sbuf);
+
+  std::string expectedOutput = 
+  "{\n"
+  "  name        : name\n"
+  "  description : description\n"
+  "  labels      : labels\n"
+  "  buckets     : [0, 0.999995, 2, 3.00001, 4, 4.99999, 5.99997, 7.00003, 8.00003, 9]\n"
+  "  counts      : [1, 1, 1, 1, 1, 1, 1, 1, 1, 1]\n"
   "}\n"; 
 
   ASSERT_EQ(stdoutOutput.str(),expectedOutput);
