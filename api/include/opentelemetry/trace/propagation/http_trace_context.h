@@ -103,46 +103,6 @@ class HttpTraceContext : public HTTPTextFormat<T> {
 ////            }
 //            return span;
 //        }
-
-    private:
-
-        // TODO: need review on hex_string because trace ids are objects not string_views
-//        static void InjectImpl(Setter setter, T &carrier) {
-        static void InjectImpl(Setter setter, T &carrier, const trace::SpanContext &span_context) {
-            nostd::string_view trace_parent = SpanContextToString(span_context);
-            setter(carrier, kTraceParent, trace_parent);
-            if (!span_context.trace_state().empty()) {
-                nostd::string_view trace_state = FormatTracestate(span_context.trace_state());
-                setter(carrier, kTraceState, trace_state);
-            }
-        }
-
-        static nostd::string_view FormatTracestate(TraceState trace_state) {
-            std::string res = "";
-            std::map<nostd::string_view,nostd::string_view> entries = trace_state.entries();
-            for (std::map<nostd::string_view,nostd::string_view>::iterator it = entries.begin(); it != entries.end(); it++) {
-                if (it != entries.begin()) res += ",";
-                res += std::string(it->first) + "=" + std::string(it->second);
-            }
-            return res;
-        }
-
-//        static nostd::string_view FormatTracestate(TraceState trace_state) {
-//            nostd::string_view res = nostd::string_view("");
-//            nostd::span<Entry *> entries = trace_state.entries();
-//            int i = 0;
-//            for (nostd::span<Entry *>::iterator it = entries.begin(); it != entries.end(); it++) {
-//                res += it->key() + "=" + it->value();
-//                if (i != entries.size()-1) res += ",";
-//            }
-////            entries.ForEachKeyValue([&res,&i](nostd::string_view key, nostd::string_view value) { // Is this usage correct?
-////                i++;
-////                res += key + "=" + value;
-////                if (i != entries.size()-1) res += ",";
-////            });
-//            return res;
-//        }
-
         static nostd::string_view SpanContextToString(const trace::SpanContext &span_context) {
             char trace_id[32];
             TraceId(span_context.trace_id()).ToLowerBase16(trace_id);
@@ -178,6 +138,48 @@ class HttpTraceContext : public HTTPTextFormat<T> {
 //            }
             return nostd::string_view(hex_string);
         }
+    private:
+
+        // TODO: need review on hex_string because trace ids are objects not string_views
+//        static void InjectImpl(Setter setter, T &carrier) {
+        static void InjectImpl(Setter setter, T &carrier, const trace::SpanContext &span_context) {
+            nostd::string_view trace_parent = SpanContextToString(span_context);
+            setter(carrier, kTraceParent, trace_parent);
+//            carrier[std::string(kTraceParent)] = std::string(trace_parent);
+            if (!span_context.trace_state().empty()) {
+                nostd::string_view trace_state = FormatTracestate(span_context.trace_state());
+                setter(carrier, kTraceState, trace_state);
+//                carrier[std::string(kTraceState)] = std::string(trace_state);
+            }
+        }
+
+        static nostd::string_view FormatTracestate(TraceState trace_state) {
+            std::string res = "";
+            std::map<nostd::string_view,nostd::string_view> entries = trace_state.entries();
+            for (std::map<nostd::string_view,nostd::string_view>::iterator it = entries.begin(); it != entries.end(); it++) {
+                if (it != entries.begin()) res += ",";
+                res += std::string(it->first) + "=" + std::string(it->second);
+            }
+            return res;
+        }
+
+//        static nostd::string_view FormatTracestate(TraceState trace_state) {
+//            nostd::string_view res = nostd::string_view("");
+//            nostd::span<Entry *> entries = trace_state.entries();
+//            int i = 0;
+//            for (nostd::span<Entry *>::iterator it = entries.begin(); it != entries.end(); it++) {
+//                res += it->key() + "=" + it->value();
+//                if (i != entries.size()-1) res += ",";
+//            }
+////            entries.ForEachKeyValue([&res,&i](nostd::string_view key, nostd::string_view value) { // Is this usage correct?
+////                i++;
+////                res += key + "=" + value;
+////                if (i != entries.size()-1) res += ",";
+////            });
+//            return res;
+//        }
+
+
 
         static trace::SpanContext ExtractContextFromTraceParent(nostd::string_view trace_parent) {
             bool is_valid = trace_parent.length() == kHeaderSize
