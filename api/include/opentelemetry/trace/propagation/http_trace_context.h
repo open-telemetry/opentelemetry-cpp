@@ -111,9 +111,11 @@ class HttpTraceContext : public HTTPTextFormat<T> {
             nostd::string_view trace_parent = SpanContextToString(span_context);
             setter(carrier, kTraceParent, trace_parent);
             if (!span_context.trace_state().empty()) {
-                throw;
+                std::cout<<"non-empty trace state"<<std::endl;
 //                nostd::string_view trace_state = FormatTracestate(span_context.trace_state());
 //                setter(carrier, kTraceState, trace_state);
+            } else {
+                std::cout<<"empty trace state"<<std::endl;
             }
         }
 
