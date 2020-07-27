@@ -225,9 +225,10 @@ class HttpTraceContext : public HTTPTextFormat<T> {
                 {
                     td[i] = (uint8_t)(*tid);
                 }
+                uint8_t sss[] = {1, 2, 3, 4, 5, 6, 7, 8, 8, 7, 6, 5, 4, 3, 2, 1};
 //                nostd::span<char> sid{span_id.begin(),span_id.length()};
 //                nostd::span<char> tfg{trace_flags.begin(),trace_flags.length()};
-                TraceId trace_id_obj = TraceId(td);
+                TraceId trace_id_obj = TraceId(sss);
 //                SpanId span_id_obj = SpanId(span_id);
 //                TraceFlags trace_flags_obj = TraceFlags(trace_flags);
                 return trace::SpanContext();
