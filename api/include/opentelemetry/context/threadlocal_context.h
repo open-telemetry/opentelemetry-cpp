@@ -120,5 +120,6 @@ thread_local ThreadLocalContext::Stack ThreadLocalContext::stack_ = ThreadLocalC
 
 // Registers the ThreadLocalContext as the context handler for the RuntimeContext
 RuntimeContext *RuntimeContext::context_handler_ = new ThreadLocalContext();
+// RuntimeContext::LoadRuntimeContext();
 }  // namespace context
 OPENTELEMETRY_END_NAMESPACE

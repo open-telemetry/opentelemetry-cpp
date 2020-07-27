@@ -47,6 +47,39 @@ public:
 
   static RuntimeContext *context_handler_;
 
+  // Sets the Key and Value into the passed in context or if the context* is null,
+  // the RuntimeContext.
+  static Context SetValue(nostd::string_view key, ContextValue value, Context *context)
+  {
+    Context temp_context;
+    if (context == nullptr)
+    {
+      temp_context = GetCurrent();
+    }
+    else
+    {
+      temp_context = *context;
+    }
+    Context written_context = temp_context.SetValue(key, value);
+    return written_context;
+  }
+
+  // Returns the value associated with the passed in key and either the
+  // passed in context* or the runtime context if the context* is null.
+  static ContextValue GetValue(nostd::string_view key, Context *context)
+  {
+    Context temp_context;
+    if (context == nullptr)
+    {
+      temp_context = GetCurrent();
+    }
+    else
+    {
+      temp_context = *context;
+    }
+    return temp_context.GetValue(key);
+  }
+
 protected:
   // Provides a token with the passed in context
   Token CreateToken(Context context) { return Token(context); }
