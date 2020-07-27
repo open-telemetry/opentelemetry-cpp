@@ -180,7 +180,50 @@ TEST(OStreamMetricsExporter, PrintCounterFloat)
 }
 
 
-TEST(OStreamMetricsExporter, PrintMinMaxSumCount)
+TEST(OStreamMetricsExporter, PrintMinMaxSumCountShort)
+{
+  auto exporter = std::unique_ptr<sdkmetrics::MetricsExporter> (new
+      opentelemetry::exporter::metrics::OStreamMetricsExporter);
+  
+  auto aggregator = nostd::shared_ptr<opentelemetry::sdk::metrics::Aggregator<short>> (new
+      opentelemetry::sdk::metrics::MinMaxSumCountAggregator<short>(metrics_api::InstrumentKind::Counter));
+  
+  aggregator->update(1);
+  aggregator->update(2);
+  aggregator->checkpoint();
+
+  sdkmetrics::Record r("name", "description", "labels", aggregator);
+  std::vector<sdkmetrics::Record> records;
+  records.push_back(r);
+
+  // Create stringstream to redirect to
+  std::stringstream stdoutOutput;
+
+  // Save cout's buffer here
+  std::streambuf *sbuf = std::cout.rdbuf();
+
+  // Redirect cout to our stringstream buffer
+  std::cout.rdbuf(stdoutOutput.rdbuf());
+
+  exporter->Export(records);
+
+  std::cout.rdbuf(sbuf);
+
+  std::string expectedOutput = 
+  "{\n"
+  "  name        : name\n"
+  "  description : description\n"
+  "  labels      : labels\n"
+  "  min         : 1\n"
+  "  max         : 2\n"
+  "  sum         : 3\n"
+  "  count       : 2\n"
+  "}\n"; 
+
+  ASSERT_EQ(stdoutOutput.str(),expectedOutput);
+}
+
+TEST(OStreamMetricsExporter, PrintMinMaxSumCountInt)
 {
   auto exporter = std::unique_ptr<sdkmetrics::MetricsExporter> (new
       opentelemetry::exporter::metrics::OStreamMetricsExporter);
@@ -217,6 +260,92 @@ TEST(OStreamMetricsExporter, PrintMinMaxSumCount)
   "  min         : 1\n"
   "  max         : 2\n"
   "  sum         : 3\n"
+  "  count       : 2\n"
+  "}\n"; 
+
+  ASSERT_EQ(stdoutOutput.str(),expectedOutput);
+}
+
+TEST(OStreamMetricsExporter, PrintMinMaxSumCountFloat)
+{
+  auto exporter = std::unique_ptr<sdkmetrics::MetricsExporter> (new
+      opentelemetry::exporter::metrics::OStreamMetricsExporter);
+  
+  auto aggregator = nostd::shared_ptr<opentelemetry::sdk::metrics::Aggregator<float>> (new
+      opentelemetry::sdk::metrics::MinMaxSumCountAggregator<float>(metrics_api::InstrumentKind::Counter));
+  
+  aggregator->update(1.1);
+  aggregator->update(2.2);
+  aggregator->checkpoint();
+
+  sdkmetrics::Record r("name", "description", "labels", aggregator);
+  std::vector<sdkmetrics::Record> records;
+  records.push_back(r);
+
+  // Create stringstream to redirect to
+  std::stringstream stdoutOutput;
+
+  // Save cout's buffer here
+  std::streambuf *sbuf = std::cout.rdbuf();
+
+  // Redirect cout to our stringstream buffer
+  std::cout.rdbuf(stdoutOutput.rdbuf());
+
+  exporter->Export(records);
+
+  std::cout.rdbuf(sbuf);
+
+  std::string expectedOutput = 
+  "{\n"
+  "  name        : name\n"
+  "  description : description\n"
+  "  labels      : labels\n"
+  "  min         : 1.1\n"
+  "  max         : 2.2\n"
+  "  sum         : 3.3\n"
+  "  count       : 2\n"
+  "}\n"; 
+
+  ASSERT_EQ(stdoutOutput.str(),expectedOutput);
+}
+
+TEST(OStreamMetricsExporter, PrintMinMaxSumCountDouble)
+{
+  auto exporter = std::unique_ptr<sdkmetrics::MetricsExporter> (new
+      opentelemetry::exporter::metrics::OStreamMetricsExporter);
+  
+  auto aggregator = nostd::shared_ptr<opentelemetry::sdk::metrics::Aggregator<double>> (new
+      opentelemetry::sdk::metrics::MinMaxSumCountAggregator<double>(metrics_api::InstrumentKind::Counter));
+  
+  aggregator->update(111.2);
+  aggregator->update(2.5);
+  aggregator->checkpoint();
+
+  sdkmetrics::Record r("name", "description", "labels", aggregator);
+  std::vector<sdkmetrics::Record> records;
+  records.push_back(r);
+
+  // Create stringstream to redirect to
+  std::stringstream stdoutOutput;
+
+  // Save cout's buffer here
+  std::streambuf *sbuf = std::cout.rdbuf();
+
+  // Redirect cout to our stringstream buffer
+  std::cout.rdbuf(stdoutOutput.rdbuf());
+
+  exporter->Export(records);
+
+  std::cout.rdbuf(sbuf);
+
+  std::string expectedOutput = 
+  "{\n"
+  "  name        : name\n"
+  "  description : description\n"
+  "  labels      : labels\n"
+  "  min         : 2.5\n"
+  "  max         : 111.2\n"
+  "  sum         : 113.7\n"
   "  count       : 2\n"
   "}\n"; 
 
