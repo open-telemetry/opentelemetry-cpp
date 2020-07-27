@@ -241,7 +241,7 @@ class HttpTraceContext : public HTTPTextFormat<T> {
             return TraceId(buf);
         }
 
-        static TraceId GenerateSpanIdFromBuf(nostd::string_view span_id) {
+        static SpanId GenerateSpanIdFromBuf(nostd::string_view span_id) {
             const char* sid = span_id.begin();
             uint8_t buf[8];
             for (int i = 0; i < 16; i++)
