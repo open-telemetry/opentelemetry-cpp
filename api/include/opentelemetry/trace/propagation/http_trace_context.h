@@ -145,7 +145,7 @@ class HttpTraceContext : public HTTPTextFormat<T> {
         static nostd::string_view SpanContextToString(const trace::SpanContext &span_context) {
 
             nostd::span<int, 0> s2;
-            nostd::span<char,16> trace_id;
+            nostd::span<char,2*16> trace_id;
             TraceId(span_context.trace_id()).ToLowerBase16(trace_id);
             nostd::span<const uint8_t> span_id = span_context.span_id().Id();
             uint8_t trace_flags = span_context.trace_flags().flags();
