@@ -144,13 +144,10 @@ class HttpTraceContext : public HTTPTextFormat<T> {
             uint8_t buf[16];
             for (int i = 0; i < 32; i++)
             {
-
                 if (i%2==0) {
-                    buf[i/2] = ((uint8_t)((*tid)-'0'))*16;
-//                    std::cout<<((uint8_t)((*tid)-'0'))*16<<std::endl;
+                    buf[i/2] = CharToInt(*tid)*16;
                 } else {
-                    buf[i/2] += (uint8_t)((*tid)-'0');
-//                    std::cout<<(uint8_t)(*tid)<<std::endl;
+                    buf[i/2] += CharToInt(*tid);
                 }
                 tid++;
             }
@@ -163,9 +160,9 @@ class HttpTraceContext : public HTTPTextFormat<T> {
             for (int i = 0; i < 16; i++)
             {
                 if (i%2==0) {
-                    buf[i/2] = ((uint8_t)((*sid)-'0'))*16;
+                    buf[i/2] = CharToInt(*sid)*16;
                 } else {
-                    buf[i/2] += (uint8_t)((*sid)-'0');
+                    buf[i/2] += CharToInt(*sid);
                 }
                 sid++;
             }
@@ -175,11 +172,22 @@ class HttpTraceContext : public HTTPTextFormat<T> {
 
         static TraceFlags GenerateTraceFlagsFromString(nostd::string_view trace_flags) {
             uint8_t buf;
-            buf = (uint8_t)(trace_flags[0]-'0')*16+(uint8_t)(trace_flags[1]-'0');
+            buf = CharToInt(trace_flags[0])*16+CharToInt(trace_flags[1]-);
             return TraceFlags(buf);
         }
     private:
 
+        static uint8_t CharToInt(char c) {
+            if (c >= '0' && c <= '9') {
+                return c - '0';
+            } else if (c >= 'a' && c <= 'f') {
+                return c - 'a' + 10;
+            } else if (c >= 'A' && c <= 'f') {
+                return c - 'A' + 10;
+            } else {
+                return 0;
+            }
+        }
         // TODO: need review on hex_string because trace ids are objects not string_views
 //        static void InjectImpl(Setter setter, T &carrier) {
         static void InjectImpl(Setter setter, T &carrier, const trace::SpanContext &span_context) {
