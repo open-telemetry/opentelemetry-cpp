@@ -31,7 +31,7 @@ public:
   /**
    * @return Description MUST be ParentOrElse{delegate_sampler_.getDescription()}
    */
-  std::string GetDescription() const noexcept override;
+  nostd::string_view GetDescription() const noexcept override;
 
 private:
   const std::shared_ptr<Sampler> delegate_sampler_;
