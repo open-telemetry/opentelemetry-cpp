@@ -5,9 +5,13 @@
 build --copt -DGRPC_BAZEL_BUILD
 
 # --config=asan : Address Sanitizer.
-common:asan --copt -fsanitize=address
 common:asan --copt -DADDRESS_SANITIZER
-common:asan --linkopt -fsanitize=address
+common:asan --copt -fsanitize=address,bool,builtin,float-cast-overflow,integer-divide-by-zero,null,return,returns-nonnull-attribute,shift-exponent,signed-integer-overflow,unreachable,vla-bound
+common:asan --copt -fsanitize-address-use-after-scope
+common:asan --copt -fno-sanitize-recover=all
+common:asan --linkopt -fsanitize=address,bool,builtin,float-cast-overflow,integer-divide-by-zero,null,return,returns-nonnull-attribute,shift-exponent,signed-integer-overflow,unreachable,vla-bound
+common:asan --linkopt -fsanitize-address-use-after-scope
+common:asan --linkopt -fno-sanitize-recover=all
 common:asan --cc_output_directory_tag=asan
 
 # --config=tsan : Thread Sanitizer.
