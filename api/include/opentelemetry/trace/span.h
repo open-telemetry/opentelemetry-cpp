@@ -75,7 +75,6 @@ public:
   Span &operator=(const Span &) = delete;
   Span &operator=(Span &&) = delete;
 
-private:
   // Sets an attribute on the Span. If the Span previously contained a mapping for
   // the key, the old value is replaced.
   virtual void SetAttribute(nostd::string_view key,
