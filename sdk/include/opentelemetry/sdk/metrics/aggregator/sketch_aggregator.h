@@ -48,6 +48,7 @@ public:
         this->values_   = std::vector<T>(2, 0); // Sum in [0], Count in [1]
         this->checkpoint_ = std::vector<T>(2, 0);
         max_buckets_ = max_buckets;
+        error_bound_ = error_bound;
         gamma = (1+error_bound)/(1-error_bound);
     }
     
