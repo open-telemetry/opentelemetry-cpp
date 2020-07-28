@@ -171,7 +171,7 @@ class HttpTraceContext : public HTTPTextFormat<T> {
 
         static nostd::string_view FormatTracestate(const TraceState &trace_state) {
             std::string res = "";
-            std::map<nostd::string_view,nostd::string_view> entries = std::map<nostd::string_view,nostd::string_view>(trace_state.entries());
+            const std::map<nostd::string_view,nostd::string_view> entries = trace_state.entries();
             for (std::map<nostd::string_view,nostd::string_view>::iterator it = entries.begin(); it != entries.end(); it++) {
                 if (it != entries.begin()) res += ",";
                 res += std::string(it->first) + "=" + std::string(it->second);
