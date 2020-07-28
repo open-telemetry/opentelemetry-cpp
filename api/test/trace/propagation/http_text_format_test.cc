@@ -78,14 +78,16 @@ TEST(HTTPTextFormatTest, NoSpanTest)
     EXPECT_EQ(carrier.size(),c2.size());
 }
 
-//TEST(HTTPTextFormatTest, NoTraceParentHeader)
-//{
-//    // When trace context headers are not present, a new SpanContext
-//    // should be created.
-//    std::map<nostd::string_view,nostd::string_view> carrier = {};
-//    trace::Span span = trace::propagation::GetCurrentSpan(format.Extract(Getter, carrier, Context()));
-//    EXPECT_TRUE(span.GetContext() != NULL);
-//}
+TEST(HTTPTextFormatTest, NoTraceParentHeader)
+{
+    // When trace context headers are not present, a new SpanContext
+    // should be created.
+    const std::map<std::string,std::string> carrier = {};
+    nostd::shared_ptr<trace::Span> sp{new trace::DefaultSpan()};
+    context::Context ctx1 = context::Context("current-span",sp);
+    trace::Span* span = trace::propagation::GetCurrentSpan(format.Extract(Getter, carrier, ctx1));
+//    EXPECT_TRUE(span->GetContext() != NULL);
+}
 
 //TEST(HTTPTextFormatTest, HeadersWithTraceState)
 //{
