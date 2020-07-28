@@ -62,6 +62,10 @@ class HttpTraceContext : public HTTPTextFormat<T> {
 
         void Inject(Setter setter, T &carrier, const context::Context &context) override {
             trace::SpanContext span_context = GetCurrentSpan(context)->GetContext();
+            for (std::map<nostd::string_view,nostd::string_view>::iterator it = span_context.trace_state().tmp_map.begin();
+                it != span_context.trace_state().tmp_map.end(); it++) {
+                std::cout<<it->first<<" "<<it->second<<std::endl;
+            }
             if (!span_context.IsValid()) {
                 return;
             }
@@ -153,7 +157,7 @@ class HttpTraceContext : public HTTPTextFormat<T> {
             }
         }
 
-        static void InjectImpl(Setter setter, T &carrier, const trace::SpanContext span_context) {
+        static void InjectImpl(Setter setter, T &carrier, const trace::SpanContext &span_context) {
             nostd::string_view trace_parent = SpanContextToString(span_context);
             setter(carrier, kTraceParent, trace_parent);
             carrier[std::string(kTraceParent)] = std::string(trace_parent);
