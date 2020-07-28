@@ -86,7 +86,10 @@ TEST(HTTPTextFormatTest, NoTraceParentHeader)
     nostd::shared_ptr<trace::Span> sp{new trace::DefaultSpan()};
     context::Context ctx1 = context::Context("current-span",sp);
     trace::Span* span = map_http_trace_context::GetCurrentSpan(format.Extract(Getter, carrier, ctx1));
-    EXPECT_EQ(span->GetContext(),trace::SpanContext());
+    EXPECT_EQ(span->GetContext().trace_id(),trace::SpanContext().trace_id());
+    EXPECT_EQ(span->GetContext().span_id(),trace::SpanContext().span_id());
+    EXPECT_EQ(span->GetContext().trace_flags(),trace::SpanContext().trace_flags());
+    EXPECT_EQ(span->GetContext().trace_state(),trace::SpanContext().trace_state());
 }
 
 //TEST(HTTPTextFormatTest, HeadersWithTraceState)
