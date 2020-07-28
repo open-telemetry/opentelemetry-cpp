@@ -73,6 +73,7 @@ TEST(HTTPTextFormatTest, NoSpanTest)
     context::Context ctx2 = format.Extract(Getter,carrier,ctx1);
     std::map<std::string,std::string> c2 = {};
     format.Inject(Setter,c2,ctx2);
+    std::cout<<c2["tracestate"]<<std::endl;
     EXPECT_EQ(carrier.size(),c2.size());
 }
 
