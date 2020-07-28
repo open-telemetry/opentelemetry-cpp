@@ -27,7 +27,7 @@
 #include "opentelemetry/nostd/shared_ptr.h"
 #include "opentelemetry/nostd/variant.h"
 #include "opentelemetry/nostd/span.h"
-//#include "opentelemetry/trace/default_span.h"
+#include "opentelemetry/trace/default_span.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace trace
@@ -75,7 +75,7 @@ class HttpTraceContext : public HTTPTextFormat<T> {
         context::Context Extract(Getter getter, const T &carrier, context::Context &context) override {
             trace::SpanContext span_context = ExtractImpl(getter,carrier);
             nostd::string_view span_key = "current-span";
-            nostd::shared_ptr<trace::Span> sp{new trace::Span(span_context)};
+            nostd::shared_ptr<trace::Span> sp{new trace::DefaultSpan(span_context)};
             return context.SetValue(span_key,sp);
         }
 
