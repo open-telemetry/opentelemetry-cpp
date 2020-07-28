@@ -168,7 +168,7 @@ class HttpTraceContext : public HTTPTextFormat<T> {
             }
         }
 
-        static nostd::string_view FormatTracestate(TraceState &trace_state) {
+        static nostd::string_view FormatTracestate(TraceState trace_state) {
             std::string res = "";
             std::map<nostd::string_view,nostd::string_view> entries = trace_state.entries();
             for (std::map<nostd::string_view,nostd::string_view>::iterator it = entries.begin(); it != entries.end(); it++) {
@@ -179,7 +179,7 @@ class HttpTraceContext : public HTTPTextFormat<T> {
 //                it != trace_state.tmp_map.end(); it++) {
 //                std::cout<<it->first<<" "<<it->second<<std::endl;
 //            }
-            return res;
+            return nostd::string_view(res);
         }
 
         static trace::SpanContext ExtractContextFromTraceParent(nostd::string_view trace_parent) {
