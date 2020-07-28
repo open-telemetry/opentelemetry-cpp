@@ -75,13 +75,13 @@ class HttpTraceContext : public HTTPTextFormat<T> {
 
         context::Context Extract(Getter getter, const T &carrier, context::Context &context) override {
             trace::SpanContext span_context = ExtractImpl(getter,carrier);
-            if (span_context.trace_state().tmp_map.size()==0) {
+            nostd::string_view span_key = "current-span";
+            nostd::shared_ptr<trace::Span> sp{new trace::Span(span_context)};
+            if ((sp.get()->trace_state()).tmp_map.size()==0) {
                 std::cout<<"empty trace state"<<std::endl;
             } else {
                 std::cout<<"non-empty trace state"<<std::endl;
             }
-            nostd::string_view span_key = "current-span";
-            nostd::shared_ptr<trace::Span> sp{new trace::Span(span_context)};
             return context.SetValue(span_key,sp);
         }
 
