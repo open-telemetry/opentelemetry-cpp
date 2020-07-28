@@ -31,7 +31,7 @@ public:
      */
     HistogramAggregator(metrics_api::InstrumentKind kind, std::vector<double> boundaries)
     {
-        if (!std::is_sorted(boundaries.begin(),boundaries.end())){
+        if (!std::is_sorted(boundaries.begin(), boundaries.end())){
 #if __EXCEPTIONS
             throw std::invalid_argument("Histogram boundaries must be monotonic.");
 #else
