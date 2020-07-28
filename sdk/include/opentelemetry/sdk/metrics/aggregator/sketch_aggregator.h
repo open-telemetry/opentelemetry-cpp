@@ -201,7 +201,7 @@ public:
     * @param none
     * @return the error bound specified during construction
     */
-    virtual double get_error_bound(double q) override {
+    virtual double get_error_bound() override {
         return error_bound_;
     }
 
@@ -211,7 +211,7 @@ public:
     * @param none
     * @return the maximum allowed buckets
     */
-    virtual size_t get_max_buckets(double q) override {
+    virtual size_t get_max_buckets() override {
         return max_buckets_;
     }
     
