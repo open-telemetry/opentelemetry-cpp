@@ -14,14 +14,14 @@ namespace context
 class ThreadLocalContext : public RuntimeContext
 {
 public:
-  ThreadLocalContext() = default;
+  ThreadLocalContext() noexcept = default;
 
   // Return the current context.
-  Context InternalGetCurrent() override { return stack_.Top(); }
+  Context InternalGetCurrent() noexcept override { return stack_.Top(); }
 
   // Resets the context to a previous value stored in the
   // passed in token. Returns true if successful, false otherwise
-  bool InternalDetach(Token &token) override
+  bool InternalDetach(Token &token) noexcept override
   {
     if (!(token == stack_.Top()))
     {
@@ -33,7 +33,7 @@ public:
 
   // Sets the current 'Context' object. Returns a token
   // that can be used to reset to the previous Context.
-  Token InternalAttach(Context context) override
+  Token InternalAttach(Context context) noexcept override
   {
     stack_.Push(context);
     Token old_context = CreateToken(context);
@@ -46,15 +46,10 @@ private:
   {
     friend class ThreadLocalContext;
 
-    Stack()
-    {
-      size_     = 0;
-      capacity_ = 0;
-      base_     = nullptr;
-    }
+    Stack() noexcept : size_(0), capacity_(0), base_(nullptr){};
 
     // Pops the top Context off the stack and returns it.
-    Context Pop()
+    Context Pop() noexcept
     {
       if (size_ <= 0)
       {
@@ -66,7 +61,7 @@ private:
     }
 
     // Returns the Context at the top of the stack.
-    Context Top()
+    Context Top() noexcept const
     {
       if (size_ <= 0)
       {
@@ -77,7 +72,7 @@ private:
 
     // Pushes the passed in context pointer to the top of the stack
     // and resizes if necessary.
-    void Push(Context context)
+    void Push(Context context) noexcept
     {
       size_++;
       if (size_ > capacity_)
@@ -88,7 +83,7 @@ private:
     }
 
     // Reallocates the storage array to the pass in new capacity size.
-    void Resize(int new_capacity)
+    void Resize(int new_capacity) noexcept
     {
       int old_size = size_ - 1;
       if (new_capacity == 0)
@@ -98,16 +93,13 @@ private:
       Context *temp = new Context[new_capacity];
       if (base_ != nullptr)
       {
-        for (auto i = 0; i <= old_size; i++)
-        {
-          temp[i] = base_[i];
-        }
+        std::copy(base_, base_ + old_size, temp);
         delete[] base_;
       }
       base_ = temp;
     }
 
-    ~Stack() { delete[] base_; }
+    ~Stack() noexcept { delete[] base_; }
 
     size_t size_;
     size_t capacity_;
