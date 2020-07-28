@@ -61,7 +61,8 @@ class HttpTraceContext : public HTTPTextFormat<T> {
         using Setter = void(*)(T &carrier, nostd::string_view trace_type,nostd::string_view trace_description);
 
         void Inject(Setter setter, T &carrier, const context::Context &context) override {
-            trace::SpanContext span_context = GetCurrentSpanContext(context);
+            trace::Span span = GetCurrentSpan(context);
+            trace::SpanContext span_context = span.GetContext();
             if (!span_context.IsValid()) {
                 return;
             }
@@ -71,16 +72,16 @@ class HttpTraceContext : public HTTPTextFormat<T> {
         context::Context Extract(Getter getter, const T &carrier, context::Context &context) override {
             trace::SpanContext span_context = ExtractImpl(getter,carrier);
             nostd::string_view span_key = "current-span";
-            nostd::shared_ptr<trace::SpanContext> spc{new trace::SpanContext(span_context)};
-            return context.SetValue(span_key,spc);
+            nostd::shared_ptr<trace::Span> sp{new trace::Span(span)};
+            sp.get()->SetContext(span_context);
+            return context.SetValue(span_key,sp);
         }
 
-        trace::SpanContext GetCurrentSpanContext(const context::Context &context) {
+        trace::SpanContext GetCurrentSpan(const context::Context &context) {
             const nostd::string_view span_key = "current-span";
             context::Context ctx(context);
-            nostd::shared_ptr<trace::SpanContext> span_context = nostd::get<nostd::shared_ptr<trace::SpanContext>>(ctx.GetValue(span_key));
-
-            return *(span_context.get());
+            nostd::shared_ptr<trace::Span> span = nostd::get<nostd::shared_ptr<trace::Span>>(ctx.GetValue(span_key));
+            return *(span.get());
         }
 
         static nostd::string_view SpanContextToString(const trace::SpanContext &span_context) {

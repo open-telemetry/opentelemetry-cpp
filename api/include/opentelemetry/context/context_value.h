@@ -13,6 +13,6 @@ OPENTELEMETRY_BEGIN_NAMESPACE
 namespace context
 {
 using ContextValue =
-    nostd::variant<bool, int64_t, uint64_t, double, nostd::shared_ptr<trace::SpanContext>>;
+    nostd::variant<bool, int64_t, uint64_t, double, nostd::shared_ptr<trace::SpanContext>, nostd::shared_ptr<trace::Span>>;
 }  // namespace context
 OPENTELEMETRY_END_NAMESPACE
