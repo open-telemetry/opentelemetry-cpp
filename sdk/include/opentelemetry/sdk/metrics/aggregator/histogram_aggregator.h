@@ -6,7 +6,6 @@
 #include "opentelemetry/version.h"
 #include "opentelemetry/sdk/metrics/aggregator/aggregator.h"
 #include <stdexcept>
-#include <variant>
 #include <vector>
 
 namespace metrics_api = opentelemetry::metrics;
