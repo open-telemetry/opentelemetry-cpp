@@ -16,6 +16,7 @@
 
 //#include <cstdint>
 //#include <cstring>
+#include <exception>
 #include "opentelemetry/nostd/unique_ptr.h"
 #include "opentelemetry/trace/span_id.h"
 #include "opentelemetry/trace/trace_flags.h"
@@ -66,15 +67,15 @@ public:
     try {
         this->trace_id();
         return false;
-    }
+    } catch (std::exception& e)
     try {
         this->span_id();
         return false;
-    }
+    } catch (std::exception& e)
     try {
         this->trace_flags();
         return false;
-    }
+    } catch (std::exception& e)
     return true;
   }
 
