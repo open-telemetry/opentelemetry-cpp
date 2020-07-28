@@ -266,11 +266,6 @@ class HttpTraceContext : public HTTPTextFormat<T> {
             if (element_num >= kTraceStateMaxMembers) {
                 throw std::invalid_argument("TraceState has too many elements.");
             }
-            if (trace_state.tmp_map.size()==0) {
-                std::cout<<"empty trace state"<<std::endl;
-            } else {
-                std::cout<<"non-empty trace state"<<std::endl;
-            }
             return trace_state;
         }
 
@@ -317,7 +312,7 @@ class HttpTraceContext : public HTTPTextFormat<T> {
 //                    trace_state
 //                );
             } catch (std::exception& e) {
-//                std::cout<<"Unparseable tracestate header. Returning span context without state."<<std::endl;
+                std::cout<<"Unparseable tracestate header. Returning span context without state."<<std::endl;
                 return context_from_parent_header;
 //                return trace::SpanContext.CreateFromRemoteParent(
 //                    context_from_parent_header.GetTraceId(),
