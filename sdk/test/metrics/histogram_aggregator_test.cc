@@ -133,6 +133,8 @@ TEST(Histogram, Concurrency){
     EXPECT_EQ(alpha.get_counts(), beta.get_counts());
 }
 
+#if __EXCEPTIONS
+
 TEST(Histogram, Errors){
     std::vector<double> boundaries{2,4,6,8,10,12};
     std::vector<double> boundaries2{1,4,6,8,10,12};
@@ -145,6 +147,7 @@ TEST(Histogram, Errors){
     EXPECT_ANY_THROW(beta.merge(gamma));
 }
 
+#endif
 
 }  // namespace sdk
 }  // namespace metrics

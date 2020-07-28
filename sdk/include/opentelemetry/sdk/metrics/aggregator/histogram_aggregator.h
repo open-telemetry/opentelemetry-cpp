@@ -32,7 +32,11 @@ public:
     HistogramAggregator(metrics_api::InstrumentKind kind, std::vector<double> boundaries)
     {
         if (!std::is_sorted(boundaries.begin(),boundaries.end())){
+#if __EXCEPTIONS
             throw std::invalid_argument("Histogram boundaries must be monotonic.");
+#else
+            std::terminate();
+#endif
         }
         this->kind_ = kind;
         this->agg_kind_ = AggregatorKind::Histogram;
@@ -40,6 +44,7 @@ public:
         this->values_     = std::vector<T>(2, 0);
         this->checkpoint_ = std::vector<T>(2, 0);
         bucketCounts_ = std::vector<int>(boundaries_.size() + 1, 0);
+        bucketCounts_ckpt_ = std::vector<int>(boundaries_.size() + 1, 0);
     }
     
     /**
@@ -58,7 +63,7 @@ public:
     void update(T val) override
     {
         int bucketID = boundaries_.size();
-        for (int i = 0; i < boundaries_.size(); i++)
+        for (size_t i = 0; i < boundaries_.size(); i++)
         {
             if (val < boundaries_[i]) // concurrent read is thread-safe
             {
@@ -88,8 +93,10 @@ public:
     void checkpoint() override
     {
         this->checkpoint_ = this->values_;
-        this->values_[0]=0;
-        this->values_[1]=0;
+        this->values_[0] = 0;
+        this->values_[1] = 0;
+        bucketCounts_ckpt_ = bucketCounts_;
+        std::fill(bucketCounts_.begin(), bucketCounts_.end(), 0);
     }
     
     /**
@@ -107,18 +114,27 @@ public:
         
         // Ensure that incorrect types are not merged
         if (this->agg_kind_ != other.agg_kind_){
+#if __EXCEPTIONS
             throw std::invalid_argument("Aggregators of different types cannot be merged.");
+#else
+            std::terminate();
+#endif
         // Reject histogram merges with differing boundary vectors
         } else if (other.boundaries_ != this->boundaries_){
+#if __EXCEPTIONS
             throw std::invalid_argument("Histogram boundaries do not match.");
+#else
+            std::terminate();
+#endif
         }
         
         this->values_[0] += other.values_[0];
         this->values_[1] += other.values_[1];
         
-        for (int i = 0; i < bucketCounts_.size(); i++)
+        for (size_t i = 0; i < bucketCounts_.size(); i++)
         {
             bucketCounts_[i] += other.bucketCounts_[i];
+            bucketCounts_ckpt_[i] += other.bucketCounts_ckpt_[i];
         }
         this->mu_.unlock();
     }
@@ -164,7 +180,7 @@ public:
      */
     virtual std::vector<int> get_counts() override
     {
-        return bucketCounts_;
+        return bucketCounts_ckpt_;
     }
     
     HistogramAggregator(const HistogramAggregator &cp)
@@ -175,12 +191,14 @@ public:
         this->agg_kind_ = cp.agg_kind_;
         boundaries_ = cp.boundaries_;
         bucketCounts_ = cp.bucketCounts_;
+        bucketCounts_ckpt_ = cp.bucketCounts_ckpt_;
         // use default initialized mutex as they cannot be copied
     }
     
 private:
     std::vector<double> boundaries_;
     std::vector<int> bucketCounts_;
+    std::vector<int> bucketCounts_ckpt_;
 };
 
 }
