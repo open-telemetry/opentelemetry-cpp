@@ -29,12 +29,11 @@ public:
    * is used as a pseudorandom value in conjunction with the predefined
    * threshold to determine whether this trace should be sampled
    */
-  SamplingResult ShouldSample(
-    const trace_api::SpanContext *parent_context,
-    trace_api::TraceId trace_id,
-    nostd::string_view /*name*/,
-    trace_api::SpanKind /*span_kind*/,
-    const trace_api::KeyValueIterable & /*attributes*/) noexcept override;
+  SamplingResult ShouldSample(const trace_api::SpanContext *parent_context,
+                              trace_api::TraceId trace_id,
+                              nostd::string_view /*name*/,
+                              trace_api::SpanKind /*span_kind*/,
+                              const trace_api::KeyValueIterable & /*attributes*/) noexcept override;
 
   /**
    * @return Description MUST be ProbabilitySampler{0.000100}

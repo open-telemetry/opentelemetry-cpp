@@ -23,7 +23,7 @@ http_archive(
     name = "com_github_grpc_grpc",
     strip_prefix = "grpc-1.28.0",
     urls = [
-         "https://github.com/grpc/grpc/archive/v1.28.0.tar.gz",
+        "https://github.com/grpc/grpc/archive/v1.28.0.tar.gz",
     ],
 )
 
@@ -81,9 +81,9 @@ http_archive(
 
 http_archive(
     name = "github_nlohmann_json",
+    build_file = "//third_party:nlohmann_json.BUILD",
     sha256 = "69cc88207ce91347ea530b227ff0776db82dcb8de6704e1a3d74f4841bc651cf",
     urls = [
         "https://github.com/nlohmann/json/releases/download/v3.6.1/include.zip",
     ],
-    build_file = "//third_party:nlohmann_json.BUILD",
 )
