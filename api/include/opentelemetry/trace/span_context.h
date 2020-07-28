@@ -63,7 +63,7 @@ public:
   // static SpanContext Create(TraceId traceId, SpanId spanId, TraceFlags traceFlags, TraceState
   // traceState); static SpanContext CreateFromRemoteParent(...);
 
-  bool IsEmpty() const noexcept {
+  bool IsEmpty() {
     try {
         this->trace_id();
         return false;
