@@ -160,11 +160,9 @@ class HttpTraceContext : public HTTPTextFormat<T> {
         static void InjectImpl(Setter setter, T &carrier, const trace::SpanContext &span_context) {
             SpanContextToString(span_context, carrier, setter);
 
-            carrier[std::string(kTraceParent)] = std::string(trace_parent);
             if (!span_context.trace_state().empty()) {
                 nostd::string_view trace_state = FormatTracestate(span_context.trace_state());
                 setter(carrier, kTraceState, trace_state);
-                carrier[std::string(kTraceState)] = std::string(trace_state);
             }
         }
 
