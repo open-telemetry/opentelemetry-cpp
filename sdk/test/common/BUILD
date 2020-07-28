@@ -79,3 +79,15 @@ otel_cc_benchmark(
         "//sdk/src/common:circular_buffer",
     ],
 )
+
+cc_test(
+    name = "empty_attributes_test",
+    srcs = [
+        "empty_attributes_test.cc",
+    ],
+    deps = [
+        "//api",
+        "//sdk:headers",
+        "@com_google_googletest//:gtest_main",
+    ],
+)
