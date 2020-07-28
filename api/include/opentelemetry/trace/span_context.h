@@ -49,14 +49,14 @@ public:
     trace_id_ = ctx.trace_id_;
     span_id_ = ctx.span_id_;
     trace_flags_ = ctx.trace_flags_;
-    trace_state_.reset(new TraceState());
+    trace_state_.reset(new TraceState(*(ctx.trace_state_.get())));
     return *this;
   };
   SpanContext &operator=(SpanContext &&ctx) {
     trace_id_ = ctx.trace_id_;
     span_id_ = ctx.span_id_;
     trace_flags_ = ctx.trace_flags_;
-    trace_state_.reset(new TraceState());
+    trace_state_.reset(new TraceState(*(ctx.trace_state_.get())));
     return *this;
    };
   // TODO
