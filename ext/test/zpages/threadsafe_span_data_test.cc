@@ -1,17 +1,20 @@
-#include "opentelemetry/sdk/trace/span_data.h"
+#include "opentelemetry/ext/zpages/threadsafe_span_data.h"
 #include "opentelemetry/nostd/variant.h"
 #include "opentelemetry/trace/span_id.h"
 #include "opentelemetry/trace/trace_id.h"
 
 #include <gtest/gtest.h>
+#include <thread>
 
-using opentelemetry::sdk::trace::SpanData;
+using opentelemetry::sdk::trace::AttributeConverter;
+using opentelemetry::sdk::trace::SpanDataAttributeValue;
+using opentelemetry::ext::zpages::ThreadsafeSpanData;
 
-TEST(SpanData, DefaultValues)
+TEST(ThreadsafeSpanData, DefaultValues)
 {
   opentelemetry::trace::TraceId zero_trace_id;
   opentelemetry::trace::SpanId zero_span_id;
-  SpanData data;
+  ThreadsafeSpanData data;
 
   ASSERT_EQ(data.GetTraceId(), zero_trace_id);
   ASSERT_EQ(data.GetSpanId(), zero_span_id);
@@ -22,24 +25,23 @@ TEST(SpanData, DefaultValues)
   ASSERT_EQ(data.GetStartTime().time_since_epoch(), std::chrono::nanoseconds(0));
   ASSERT_EQ(data.GetDuration(), std::chrono::nanoseconds(0));
   ASSERT_EQ(data.GetAttributes().size(), 0);
-  ASSERT_EQ(data.GetEvents().size(), 0);
 }
 
-TEST(SpanData, Set)
+TEST(ThreadsafeSpanData, Set)
 {
   opentelemetry::trace::TraceId trace_id;
   opentelemetry::trace::SpanId span_id;
   opentelemetry::trace::SpanId parent_span_id;
   opentelemetry::core::SystemTimestamp now(std::chrono::system_clock::now());
 
-  SpanData data;
+  ThreadsafeSpanData data;
   data.SetIds(trace_id, span_id, parent_span_id);
   data.SetName("span name");
   data.SetStatus(opentelemetry::trace::CanonicalCode::UNKNOWN, "description");
   data.SetStartTime(now);
   data.SetDuration(std::chrono::nanoseconds(1000000));
   data.SetAttribute("attr1", 314159);
-  data.opentelemetry::sdk::trace::Recordable::AddEvent("event1", now);
+  data.AddEvent("event1", now);
 
   ASSERT_EQ(data.GetTraceId(), trace_id);
   ASSERT_EQ(data.GetSpanId(), span_id);
@@ -50,6 +52,4 @@ TEST(SpanData, Set)
   ASSERT_EQ(data.GetStartTime().time_since_epoch(), now.time_since_epoch());
   ASSERT_EQ(data.GetDuration(), std::chrono::nanoseconds(1000000));
   ASSERT_EQ(opentelemetry::nostd::get<int64_t>(data.GetAttributes().at("attr1")), 314159);
-  ASSERT_EQ(data.GetEvents().at(0).GetName(), "event1");
-  ASSERT_EQ(data.GetEvents().at(0).GetTimestamp(), now);
 }

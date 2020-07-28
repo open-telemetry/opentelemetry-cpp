@@ -1,9 +1,9 @@
 load("//bazel:otel_cc_benchmark.bzl", "otel_cc_benchmark")
 
 cc_test(
-    name = "meter_provider_test",
+    name = "context_test",
     srcs = [
-        "meter_provider_test.cc",
+        "context_test.cc",
     ],
     deps = [
         "//api",
@@ -12,11 +12,10 @@ cc_test(
 )
 
 cc_test(
-    name = "noop_instrument_test",
+    name = "runtime_context_test",
     srcs = [
-        "noop_instrument_test.cc",
+        "runtime_context_test.cc",
     ],
-    linkstatic = 1,
     deps = [
         "//api",
         "@com_google_googletest//:gtest_main",
