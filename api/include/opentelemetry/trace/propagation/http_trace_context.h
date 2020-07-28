@@ -159,21 +159,22 @@ class HttpTraceContext : public HTTPTextFormat<T> {
 
         static void InjectImpl(Setter setter, T &carrier, const trace::SpanContext &span_context) {
             nostd::string_view trace_parent = SpanContextToString(span_context);
+            std::cout<<trace_parent<<std::endl;
             setter(carrier, kTraceParent, trace_parent);
             carrier[std::string(kTraceParent)] = std::string(trace_parent);
             if (!span_context.trace_state().empty()) {
-                nostd::string_view trace_state = FormatTracestate(span_context);
+                nostd::string_view trace_state = FormatTracestate(span_context.trace_state());
                 std::cout<<trace_state<<std::endl;
                 setter(carrier, kTraceState, trace_state);
                 carrier[std::string(kTraceState)] = std::string(trace_state);
             }
         }
 
-        static nostd::string_view FormatTracestate(const trace::SpanContext &span_context) {
+        static nostd::string_view FormatTracestate(TraceState trace_state) {
             std::string res = "";
-            std::map<nostd::string_view,nostd::string_view> entries = span_context.trace_state().entries();
-            for (std::map<nostd::string_view,nostd::string_view>::const_iterator it = span_context.trace_state().entries().begin(); it != entries.end(); it++) {
-                if (it != span_context.trace_state().entries().begin()) res += ",";
+            std::map<nostd::string_view,nostd::string_view> entries = trace_state.entries();
+            for (std::map<nostd::string_view,nostd::string_view>::const_iterator it = entries.begin(); it != entries.end(); it++) {
+                if (it != entries.begin()) res += ",";
                 res += std::string(it->first) + "=" + std::string(it->second);
             }
             std::cout<<res<<std::endl;
@@ -290,7 +291,6 @@ class HttpTraceContext : public HTTPTextFormat<T> {
 
         static trace::SpanContext ExtractImpl(Getter getter, const T &carrier) {
             nostd::string_view trace_parent = getter(carrier, kTraceParent);
-            std::cout<<trace_parent<<std::endl;
             if (trace_parent == "") {
                 return trace::SpanContext();
             }
