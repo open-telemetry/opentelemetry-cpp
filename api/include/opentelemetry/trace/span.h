@@ -75,6 +75,19 @@ public:
   Span &operator=(const Span &) = delete;
   Span &operator=(Span &&) = delete;
 
+  // The methods field of span context below are work-around, not the official implementation
+  Span(SpanContext span_context) {
+    span_context_ = span_context;
+  }
+  const trace::SpanContext GetContext() {
+    return span_context_;
+  }
+
+  void SetContext(trace::SpanContext span_context) noexcept {
+    span_context_ = span_context;
+  }
+private:
+  trace::SpanContext span_context_;
 //  // Sets an attribute on the Span. If the Span previously contained a mapping for
 //  // the key, the old value is replaced.
 //  virtual void SetAttribute(nostd::string_view key,

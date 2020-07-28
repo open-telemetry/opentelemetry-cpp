@@ -61,7 +61,11 @@ class HttpTraceContext : public HTTPTextFormat<T> {
         using Setter = void(*)(T &carrier, nostd::string_view trace_type,nostd::string_view trace_description);
 
         void Inject(Setter setter, T &carrier, const context::Context &context) override {
-            trace::SpanContext span_context = GetCurrentSpanContext(context);
+            trace::SpanContext span_context = GetCurrentSpan(context)->GetContext();
+//            for (std::map<nostd::string_view,nostd::string_view>::iterator it = TraceState(span_context.trace_state()).tmp_map.begin();
+//                it != TraceState(span_context.trace_state()).tmp_map.end(); it++) {
+//                std::cout<<it->first<<" "<<it->second<<std::endl;
+//            }
             if (!span_context.IsValid()) {
                 return;
             }
@@ -71,19 +75,18 @@ class HttpTraceContext : public HTTPTextFormat<T> {
         context::Context Extract(Getter getter, const T &carrier, context::Context &context) override {
             trace::SpanContext span_context = ExtractImpl(getter,carrier);
             nostd::string_view span_key = "current-span";
-            nostd::shared_ptr<trace::SpanContext> spc{new trace::SpanContext(span_context)};
-            return context.SetValue(span_key,spc);
+            nostd::shared_ptr<trace::Span> sp{new trace::Span(span_context)};
+            return context.SetValue(span_key,sp);
         }
 
-        trace::SpanContext GetCurrentSpanContext(const context::Context &context) {
+        trace::Span* GetCurrentSpan(const context::Context &context) {
             const nostd::string_view span_key = "current-span";
             context::Context ctx(context);
-            nostd::shared_ptr<trace::SpanContext> span_context = nostd::get<nostd::shared_ptr<trace::SpanContext>>(ctx.GetValue(span_key));
-
-            return *(span_context.get());
+            nostd::shared_ptr<trace::Span> span = nostd::get<nostd::shared_ptr<trace::Span>>(ctx.GetValue(span_key));
+            return (span.get());
         }
 
-        static nostd::string_view SpanContextToString(const trace::SpanContext &span_context) {
+        static void SpanContextToString(const trace::SpanContext &span_context, T &carrier, Setter setter) {
             char trace_id[32];
             TraceId(span_context.trace_id()).ToLowerBase16(trace_id);
             char span_id[16];
@@ -103,7 +106,7 @@ class HttpTraceContext : public HTTPTextFormat<T> {
             for (int i = 0; i < 2; i++) {
                hex_string += trace_flags[i];
             }
-            return nostd::string_view(hex_string);
+            setter(carrier, kTraceParent, hex_string);
         }
 
         static TraceId GenerateTraceIdFromString(nostd::string_view trace_id) {
@@ -141,6 +144,17 @@ class HttpTraceContext : public HTTPTextFormat<T> {
             buf = CharToInt(trace_flags[0])*16+CharToInt(trace_flags[1]);
             return TraceFlags(buf);
         }
+
+        static nostd::string_view FormatTracestate(TraceState trace_state, T &carrier, Setter setter) {
+            std::string trace_state_string = "";
+            std::map<nostd::string_view,nostd::string_view> entries = trace_state.entries();
+            for (std::map<nostd::string_view,nostd::string_view>::const_iterator it = entries.begin(); it != entries.end(); it++) {
+                if (it != entries.begin()) trace_state_string += ",";
+                trace_state_string += std::string(it->first) + "=" + std::string(it->second);
+            }
+            setter(carrier, kTraceState, trace_state_string);
+        }
+
     private:
         static uint8_t CharToInt(char c) {
             if (c >= '0' && c <= '9') {
@@ -155,24 +169,10 @@ class HttpTraceContext : public HTTPTextFormat<T> {
         }
 
         static void InjectImpl(Setter setter, T &carrier, const trace::SpanContext &span_context) {
-            nostd::string_view trace_parent = SpanContextToString(span_context);
-            setter(carrier, kTraceParent, trace_parent);
-            carrier[std::string(kTraceParent)] = std::string(trace_parent);
+            SpanContextToString(span_context, carrier, setter);
             if (!span_context.trace_state().empty()) {
-                nostd::string_view trace_state = FormatTracestate(span_context.trace_state());
-                setter(carrier, kTraceState, trace_state);
-                carrier[std::string(kTraceState)] = std::string(trace_state);
+                FormatTracestate(span_context.trace_state(), carrier, setter);
             }
-        }
-
-        static nostd::string_view FormatTracestate(TraceState trace_state) {
-            std::string res = "";
-            std::map<nostd::string_view,nostd::string_view> entries = trace_state.entries();
-            for (std::map<nostd::string_view,nostd::string_view>::iterator it = entries.begin(); it != entries.end(); it++) {
-                if (it != entries.begin()) res += ",";
-                res += std::string(it->first) + "=" + std::string(it->second);
-            }
-            return res;
         }
 
         static trace::SpanContext ExtractContextFromTraceParent(nostd::string_view trace_parent) {
@@ -281,7 +281,6 @@ class HttpTraceContext : public HTTPTextFormat<T> {
 
         static trace::SpanContext ExtractImpl(Getter getter, const T &carrier) {
             nostd::string_view trace_parent = getter(carrier, kTraceParent);
-            std::cout<<trace_parent<<std::endl;
             if (trace_parent == "") {
                 return trace::SpanContext();
             }
@@ -313,7 +312,7 @@ class HttpTraceContext : public HTTPTextFormat<T> {
 //                    trace_state
 //                );
             } catch (std::exception& e) {
-//                std::cout<<"Unparseable tracestate header. Returning span context without state."<<std::endl;
+                std::cout<<"Unparseable tracestate header. Returning span context without state."<<std::endl;
                 return context_from_parent_header;
 //                return trace::SpanContext.CreateFromRemoteParent(
 //                    context_from_parent_header.GetTraceId(),

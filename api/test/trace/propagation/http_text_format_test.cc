@@ -1,7 +1,7 @@
 #include "opentelemetry/trace/propagation/http_text_format.h"
 #include "opentelemetry/trace/propagation/http_trace_context.h"
 #include "opentelemetry/context/context.h"
-//#include "opentelemetry/trace/span.h"
+#include "opentelemetry/trace/span.h"
 #include "opentelemetry/trace/default_span.h"
 #include "opentelemetry/trace/span_context.h"
 #include "opentelemetry/nostd/string_view.h"
@@ -68,11 +68,13 @@ TEST(HTTPTextFormatTest, TraceFlagsBufferGeneration)
 TEST(HTTPTextFormatTest, NoSpanTest)
 {
     const std::map<std::string,std::string> carrier = {{"traceparent","00-4bf92f3577b34da6a3ce929d0e0e4736-0102030405060708-01"},{"tracestate","congo=congosSecondPosition,rojo=rojosFirstPosition"}};
-    nostd::shared_ptr<trace::SpanContext> spc{new trace::SpanContext()};
-    context::Context ctx1 = context::Context("current-span",spc);
+    nostd::shared_ptr<trace::Span> sp{new trace::Span()};
+    context::Context ctx1 = context::Context("current-span",sp);
     context::Context ctx2 = format.Extract(Getter,carrier,ctx1);
     std::map<std::string,std::string> c2 = {};
     format.Inject(Setter,c2,ctx2);
+    EXPECT_EQ(std::string(c2["traceparent"]),"00-4bf92f3577b34da6a3ce929d0e0e4736-0102030405060708-01");
+    EXPECT_EQ(std::string(c2["tracestate"]),"congo=congosSecondPosition,rojo=rojosFirstPosition");
     EXPECT_EQ(carrier.size(),c2.size());
 }
 
