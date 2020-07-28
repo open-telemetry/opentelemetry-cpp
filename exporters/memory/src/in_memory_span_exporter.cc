@@ -7,12 +7,6 @@ namespace exporter
 {
 namespace memory
 {
-InMemorySpanExporter::InMemorySpanExporter(
-    std::shared_ptr<std::vector<std::unique_ptr<sdk::trace::SpanData>>> spans_received,
-    std::shared_ptr<bool> shutdown_called)
-    : spans_received_(spans_received), shutdown_called_(shutdown_called)
-{}
-
 std::unique_ptr<sdk::trace::Recordable> InMemorySpanExporter::MakeRecordable() noexcept
 {
   return std::unique_ptr<sdk::trace::Recordable>(new sdk::trace::SpanData);
@@ -27,16 +21,16 @@ sdk::trace::ExportResult InMemorySpanExporter::Export(
         static_cast<sdk::trace::SpanData *>(recordable.release()));
     if (span != nullptr)
     {
-      spans_received_->push_back(std::move(span));
+      span_data_.Add(std::move(span));
     }
   }
 
   return sdk::trace::ExportResult::kSuccess;
 }
 
-void InMemorySpanExporter::Shutdown(std::chrono::microseconds timeout) noexcept
+std::vector<sdk::trace::SpanData> InMemorySpanExporter::GetData() noexcept
 {
-  *shutdown_called_ = true;
+  return span_data_.GetSpans();
 }
 }  // namespace memory
 }  // namespace exporter
