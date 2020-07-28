@@ -15,6 +15,7 @@
 #pragma once
 
 #include <cstdint>
+#include <iostream>
 #include <cstring>
 
 #include "opentelemetry/nostd/span.h"
@@ -61,6 +62,7 @@ public:
 
   bool operator==(const TraceId &that) const noexcept
   {
+    std::cout<<"comparing"<<std::endl;
     return memcmp(rep_, that.rep_, kSize) == 0;
   }
 
