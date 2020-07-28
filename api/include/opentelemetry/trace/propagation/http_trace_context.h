@@ -175,6 +175,7 @@ class HttpTraceContext : public HTTPTextFormat<T> {
                 if (it != entries.begin()) res += ",";
                 res += std::string(it->first) + "=" + std::string(it->second);
             }
+            std::cout<<res<<std::endl;
 //            for (std::map<nostd::string_view,nostd::string_view>::iterator it = trace_state.tmp_map.begin();
 //                it != trace_state.tmp_map.end(); it++) {
 //                std::cout<<it->first<<" "<<it->second<<std::endl;
