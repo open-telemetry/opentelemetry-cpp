@@ -158,7 +158,6 @@ class HttpTraceContext : public HTTPTextFormat<T> {
             setter(carrier, kTraceParent, trace_parent);
             carrier[std::string(kTraceParent)] = std::string(trace_parent);
             if (!span_context.trace_state().empty()) {
-                std::cout<<"trace state not empty"<<std::endl;
                 nostd::string_view trace_state = FormatTracestate(span_context.trace_state());
                 setter(carrier, kTraceState, trace_state);
                 carrier[std::string(kTraceState)] = std::string(trace_state);
@@ -266,6 +265,11 @@ class HttpTraceContext : public HTTPTextFormat<T> {
 
             if (element_num >= kTraceStateMaxMembers) {
                 throw std::invalid_argument("TraceState has too many elements.");
+            }
+            if (trace_state.tmp_map.size()==0) {
+                std::cout<<"empty trace state"<<std::endl;
+            } else {
+                std::cout<<"non-empty trace state"<<std::endl;
             }
             return trace_state;
         }
