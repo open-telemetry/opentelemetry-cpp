@@ -63,8 +63,8 @@ class HttpTraceContext : public HTTPTextFormat<T> {
         void Inject(Setter setter, T &carrier, const context::Context &context) override {
             trace::SpanContext span_context = GetCurrentSpan(context)->GetContext();
 
-            char buf[16];
-            span_context.span_id().ToLowerBase16(buf);
+            char buf[32];
+            span_context.trace_id().ToLowerBase16(buf);
             std::cout<<std::string(buf, sizeof(buf))<<std::endl;
 
             if (!span_context.IsValid()) {
