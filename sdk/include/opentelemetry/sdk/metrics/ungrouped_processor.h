@@ -5,6 +5,10 @@
 #include "opentelemetry/sdk/metrics/record.h"
 #include "opentelemetry/sdk/metrics/aggregator/counter_aggregator.h"
 #include "opentelemetry/sdk/metrics/aggregator/min_max_sum_count_aggregator.h"
+#include "opentelemetry/sdk/metrics/aggregator/exact_aggregator.h"
+#include "opentelemetry/sdk/metrics/aggregator/gauge_aggregator.h"
+#include "opentelemetry/sdk/metrics/aggregator/histogram_aggregator.h"
+#include "opentelemetry/sdk/metrics/aggregator/sketch_aggregator.h"
 #include <map>
 
 OPENTELEMETRY_BEGIN_NAMESPACE
@@ -22,6 +26,9 @@ public:
     stateful_ = stateful;
   }
 
+  /**
+   * CheckpointSelf will return a vector of records to be exported. This function will go through agg
+   **/
   std::vector<sdkmetrics::Record> CheckpointSelf() noexcept
   {
     std::vector<sdkmetrics::Record> metric_records;
@@ -45,6 +52,10 @@ public:
     return metric_records;
   }
 
+  /**
+   * Once Process is called, FinishCollection() should also be called. In the case of a non stateful processor
+   * the map will be reset.
+   **/
   void FinishedCollection() noexcept
   {
     if(!stateful_)
@@ -63,7 +74,10 @@ public:
 
     std::string batch_key = "/name/" + name + "/description/" + description + "/labels/" + label + "/instrument/" + instrument; 
 
-    // If we have already seen this instrument labelset pair, we merge with the aggregator we have seen and return
+    /**
+     * If we have already seen this aggregator then we will merge it with the copy that exists in the batch_map_
+     * The call to merge here combines only identical records (same key)
+     **/
     if(batch_map_.find(batch_key) != batch_map_.end())
     {
       auto batch_value = batch_map_[batch_key];
@@ -77,8 +91,6 @@ public:
         auto agg_short = aggregator_reference_short.get();
 
         batch_short->merge(agg_short);
-
-        // batch_map_[batch_key] = nostd::shared_ptr<sdkmetrics::Aggregator<short>>(agg);
       }
       else if(nostd::holds_alternative<nostd::shared_ptr<sdkmetrics::Aggregator<int>>>(aggregator))
       {
@@ -112,13 +124,17 @@ public:
       }
       return;
     }
-    // If the processor is stateful and we haven't since this aggregator before
+    /**
+     * If the processor is stateful and this aggregator has not be seen by the processor yet.
+     * We create a copy of this aggregator, merge it with the aggregator from the given record.
+     * Then set this copied aggregator with the batch_key in the batch_map_
+     **/
     if(stateful_)
     {      
       if(nostd::holds_alternative<nostd::shared_ptr<sdkmetrics::Aggregator<short>>>(aggregator))
       {
-        auto aggregator_short = aggregator_for<short>(get_instrument(aggregator));
         auto record_agg_short = nostd::get<nostd::shared_ptr<sdkmetrics::Aggregator<short>>>(aggregator);
+        auto aggregator_short = aggregator_copy<short>(record_agg_short);
 
         auto agg_short_raw = aggregator_short.get();
         auto agg_record_raw = record_agg_short.get();
@@ -129,8 +145,8 @@ public:
       }
       else if(nostd::holds_alternative<nostd::shared_ptr<sdkmetrics::Aggregator<int>>>(aggregator))
       {
-        auto aggregator_int = aggregator_for<int>(get_instrument(aggregator));
         auto record_agg_int = nostd::get<nostd::shared_ptr<sdkmetrics::Aggregator<int>>>(aggregator);
+        auto aggregator_int = aggregator_copy<int>(record_agg_int);
 
         auto agg_int_raw = aggregator_int.get();
         auto record_agg_int_raw = record_agg_int.get();
@@ -141,8 +157,8 @@ public:
       }
       else if(nostd::holds_alternative<nostd::shared_ptr<sdkmetrics::Aggregator<float>>>(aggregator))
       {
-        auto aggregator_float = aggregator_for<float>(get_instrument(aggregator));
         auto record_agg_float = nostd::get<nostd::shared_ptr<sdkmetrics::Aggregator<float>>>(aggregator);
+        auto aggregator_float = aggregator_copy<float>(record_agg_float);
 
         auto agg_float_raw = aggregator_float.get();
         auto record_agg_float_raw = record_agg_float.get();
@@ -153,8 +169,8 @@ public:
       }
       else if(nostd::holds_alternative<nostd::shared_ptr<sdkmetrics::Aggregator<double>>>(aggregator))
       {
-        auto aggregator_double = aggregator_for<double>(get_instrument(aggregator));
         auto record_agg_double = nostd::get<nostd::shared_ptr<sdkmetrics::Aggregator<double>>>(aggregator);
+        auto aggregator_double = aggregator_copy<double>(record_agg_double);
 
         auto agg_double_raw = aggregator_double.get();
         auto record_agg_double_raw = record_agg_double.get();
@@ -164,7 +180,12 @@ public:
         batch_map_[batch_key] = aggregator_double;    
       }
     }
-    else {
+    else 
+    {
+      /**
+       * If the processor is not stateful, we don't need to create a copy of the aggregator, since the map will be
+       * reset from FinishedCollection().
+       **/
       batch_map_[batch_key] = aggregator;
     }
 
@@ -196,6 +217,41 @@ private:
   }
 
   template <typename T>
+  nostd::shared_ptr<sdkmetrics::Aggregator<T>> aggregator_copy(nostd::shared_ptr<sdkmetrics::Aggregator<T>> aggregator)
+  {
+    auto ins_kind = aggregator->get_instrument_kind();
+    auto agg_kind = aggregator->get_aggregator_kind();
+
+    if(agg_kind == sdkmetrics::AggregatorKind::Counter)
+    {
+      return nostd::shared_ptr<sdkmetrics::Aggregator<T>>(new sdkmetrics::CounterAggregator<T>(ins_kind));
+    }
+    else if(agg_kind == sdkmetrics::AggregatorKind::MinMaxSumCount)
+    {
+      return nostd::shared_ptr<sdkmetrics::Aggregator<T>>(new sdkmetrics::MinMaxSumCountAggregator<T>(ins_kind));
+    }
+    else if(agg_kind == sdkmetrics::AggregatorKind::Gauge)
+    {
+      return nostd::shared_ptr<sdkmetrics::Aggregator<T>>(new sdkmetrics::GaugeAggregator<T>(ins_kind));
+    }
+    else if(agg_kind == sdkmetrics::AggregatorKind::Sketch)
+    {
+      return nostd::shared_ptr<sdkmetrics::Aggregator<T>>(new sdkmetrics::SketchAggregator<T>(ins_kind, 
+                                                          aggregator->get_error_bound(), aggregator->get_max_buckets()));
+    }
+    else if(agg_kind == sdkmetrics::AggregatorKind::Histogram)
+    {
+      return nostd::shared_ptr<sdkmetrics::Aggregator<T>>(new sdkmetrics::HistogramAggregator<T>(ins_kind, aggregator->get_boundaries()));
+    }
+    else if(agg_kind == sdkmetrics::AggregatorKind::Exact)
+    {
+      return nostd::shared_ptr<sdkmetrics::Aggregator<T>>(new sdkmetrics::ExactAggregator<T>(ins_kind, aggregator->get_quant_estimation()));
+    }
+
+    return nostd::shared_ptr<sdkmetrics::Aggregator<T>>(new sdkmetrics::CounterAggregator<T>(ins_kind));
+  };
+
+  template <typename T>
   nostd::shared_ptr<sdkmetrics::Aggregator<T>> aggregator_for(metrics_api::InstrumentKind ins_kind)
   {
     if(ins_kind == metrics_api::InstrumentKind::Counter)
@@ -224,7 +280,7 @@ private:
     }
 
     return nostd::shared_ptr<sdkmetrics::Aggregator<T>>(new sdkmetrics::CounterAggregator<T>(ins_kind));
-  }
+  };
 
   std::map<metrics_api::InstrumentKind, std::string> ins_to_string {
     {metrics_api::InstrumentKind::Counter,           "Counter"},
@@ -235,14 +291,6 @@ private:
     {metrics_api::InstrumentKind::ValueRecorder,     "ValueRecorder"}
   };
 
-  std::map<std::string, metrics_api::InstrumentKind> string_to_ins {
-    {"Counter",           metrics_api::InstrumentKind::Counter},
-    {"UpDownCounter",     metrics_api::InstrumentKind::UpDownCounter},
-    {"SumObserver",       metrics_api::InstrumentKind::SumObserver},
-    {"UpDownSumObserver", metrics_api::InstrumentKind::UpDownSumObserver},
-    {"ValueObserver",     metrics_api::InstrumentKind::ValueObserver},
-    {"ValueRecorder",     metrics_api::InstrumentKind::ValueRecorder}
-  };
 };
 }
 }
