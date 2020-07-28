@@ -79,7 +79,7 @@ public:
   Span(SpanContext span_context) {
     span_context_ = span_context;
   }
-  trace::SpanContext GetContext() noexcept {
+  const trace::SpanContext GetContext() {
     return span_context_;
   }
 
