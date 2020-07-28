@@ -12,7 +12,7 @@ cc_library(
     deps = [
         "//sdk/src/metrics",
     ],
- )
+)
 
 cc_test(
     name = "ostream_metrics_test",
@@ -22,7 +22,8 @@ cc_test(
         "@com_google_googletest//:gtest_main",
     ],
  )
- cc_library(
+
+cc_library(
     name = "ostream_span_exporter",
     srcs = [
         "src/span_exporter.cc",
