@@ -61,8 +61,7 @@ class HttpTraceContext : public HTTPTextFormat<T> {
         using Setter = void(*)(T &carrier, nostd::string_view trace_type,nostd::string_view trace_description);
 
         void Inject(Setter setter, T &carrier, const context::Context &context) override {
-            trace::Span span = GetCurrentSpan(context);
-            trace::SpanContext span_context = span.GetContext();
+            trace::SpanContext span_context = GetCurrentSpan(context).GetContext();
             if (!span_context.IsValid()) {
                 return;
             }
