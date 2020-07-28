@@ -100,6 +100,7 @@ public:
     if (this->kind_ == other.kind_)
     {
       this->mu_.lock();
+      // First merge values
       // set min
       if (other.values_[MinValueIndex] < this->values_[MinValueIndex])
         this->values_[MinValueIndex] = other.values_[MinValueIndex];
@@ -110,6 +111,18 @@ public:
       this->values_[SumValueIndex] += other.values_[SumValueIndex];
       // set count
       this->values_[CountValueIndex] += other.values_[CountValueIndex];
+
+      // Now merge checkpoints
+      if (other.checkpoint_[MinValueIndex] < this->checkpoint_[MinValueIndex])
+        this->checkpoint_[MinValueIndex] = other.checkpoint_[MinValueIndex];
+      // set max
+      if (other.checkpoint_[MaxValueIndex] > this->checkpoint_[MaxValueIndex])
+        this->checkpoint_[MaxValueIndex] = other.checkpoint_[MaxValueIndex];
+      // set sum
+      this->checkpoint_[SumValueIndex] += other.checkpoint_[SumValueIndex];
+      // set count
+      this->checkpoint_[CountValueIndex] += other.checkpoint_[CountValueIndex];
+
       this->mu_.unlock();
     }
     else
