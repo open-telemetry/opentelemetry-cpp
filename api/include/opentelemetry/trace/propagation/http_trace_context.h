@@ -74,9 +74,6 @@ class HttpTraceContext : public HTTPTextFormat<T> {
                 it != TraceState(span_context.trace_state()).tmp_map.end(); it++) {
                 std::cout<<it->first<<" "<<it->second<<std::endl;
             }
-            if (!span_context.IsValid()) {
-                return;
-            }
         }
 
         context::Context Extract(Getter getter, const T &carrier, context::Context &context) override {
