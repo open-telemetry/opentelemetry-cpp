@@ -63,22 +63,6 @@ public:
   // static SpanContext Create(TraceId traceId, SpanId spanId, TraceFlags traceFlags, TraceState
   // traceState); static SpanContext CreateFromRemoteParent(...);
 
-  bool IsEmpty() const noexcept {
-    try {
-        this->trace_id();
-        return false;
-    } catch (std::exception& e) {}
-    try {
-        this->span_id();
-        return false;
-    } catch (std::exception& e) {}
-    try {
-        this->trace_flags();
-        return false;
-    } catch (std::exception& e) {}
-    return true;
-  }
-
   const TraceId &trace_id() const noexcept { return trace_id_; }
   const SpanId &span_id() const noexcept { return span_id_; }
   const TraceFlags &trace_flags() const noexcept { return trace_flags_; }
