@@ -87,40 +87,29 @@ public:
         auto batch_value_reference_short = nostd::get<nostd::shared_ptr<sdkmetrics::Aggregator<short>>>(batch_value);
         auto aggregator_reference_short = nostd::get<nostd::shared_ptr<sdkmetrics::Aggregator<short>>>(aggregator);
 
-        auto batch_short = batch_value_reference_short.get();
-        auto agg_short = aggregator_reference_short.get();
-
-        batch_short->merge(agg_short);
+        merge_aggregators<short>(batch_value_reference_short, aggregator_reference_short);
       }
       else if(nostd::holds_alternative<nostd::shared_ptr<sdkmetrics::Aggregator<int>>>(aggregator))
       {
         auto batch_value_reference_int = nostd::get<nostd::shared_ptr<sdkmetrics::Aggregator<int>>>(batch_value);
         auto aggregator_reference_int = nostd::get<nostd::shared_ptr<sdkmetrics::Aggregator<int>>>(aggregator);
 
-        auto batch_int = batch_value_reference_int.get();
-        auto agg_int = aggregator_reference_int.get();
-
-        batch_int->merge(agg_int);
+        merge_aggregators<int>(batch_value_reference_int, aggregator_reference_int);
       }
       else if(nostd::holds_alternative<nostd::shared_ptr<sdkmetrics::Aggregator<float>>>(aggregator))
       {
         auto batch_value_reference_float = nostd::get<nostd::shared_ptr<sdkmetrics::Aggregator<float>>>(batch_value);
         auto aggregator_reference_float = nostd::get<nostd::shared_ptr<sdkmetrics::Aggregator<float>>>(aggregator);
 
-        auto batch_float = batch_value_reference_float.get();
-        auto agg_float = aggregator_reference_float.get();
+        merge_aggregators<float>(batch_value_reference_float, aggregator_reference_float);
 
-        batch_float->merge(agg_float);
       }
       else if(nostd::holds_alternative<nostd::shared_ptr<sdkmetrics::Aggregator<double>>>(aggregator))
       {
         auto batch_value_reference_double = nostd::get<nostd::shared_ptr<sdkmetrics::Aggregator<double>>>(batch_value);
         auto aggregator_reference_double = nostd::get<nostd::shared_ptr<sdkmetrics::Aggregator<double>>>(aggregator);
 
-        auto batch_double = batch_value_reference_double.get();
-        auto agg_double = aggregator_reference_double.get();
-
-        batch_double->merge(agg_double);
+        merge_aggregators<double>(batch_value_reference_double, aggregator_reference_double);
       }
       return;
     }
@@ -281,6 +270,91 @@ private:
 
     return nostd::shared_ptr<sdkmetrics::Aggregator<T>>(new sdkmetrics::CounterAggregator<T>(ins_kind));
   };
+
+  template <typename T>
+  void merge_aggregators(nostd::shared_ptr<sdkmetrics::Aggregator<T>> batch_agg, 
+                         nostd::shared_ptr<sdkmetrics::Aggregator<T>> record_agg)
+  {
+    auto agg_kind = batch_agg->get_aggregator_kind();
+    if(agg_kind == sdkmetrics::AggregatorKind::Counter)
+    {
+      nostd::shared_ptr<sdkmetrics::CounterAggregator<T>> temp_batch_agg = 
+        nostd::dynamic_pointer_cast<sdkmetrics::CounterAggregator<T>> (batch_agg);
+
+      nostd::shared_ptr<sdkmetrics::CounterAggregator<T>> temp_record_agg = 
+        nostd::dynamic_pointer_cast<sdkmetrics::CounterAggregator<T>> (record_agg);
+
+      auto temp_batch_agg_raw = temp_batch_agg.get();
+      auto temp_record_agg_raw = temp_record_agg.get();
+      
+      temp_batch_agg_raw->merge(*temp_record_agg_raw);
+    }
+    else if(agg_kind == sdkmetrics::AggregatorKind::MinMaxSumCount)
+    {
+      nostd::shared_ptr<sdkmetrics::MinMaxSumCountAggregator<T>> temp_batch_agg = 
+        nostd::dynamic_pointer_cast<sdkmetrics::MinMaxSumCountAggregator<T>> (batch_agg);
+
+      nostd::shared_ptr<sdkmetrics::MinMaxSumCountAggregator<T>> temp_record_agg = 
+        nostd::dynamic_pointer_cast<sdkmetrics::MinMaxSumCountAggregator<T>> (record_agg);
+
+      auto temp_batch_agg_raw = temp_batch_agg.get();
+      auto temp_record_agg_raw = temp_record_agg.get();
+      
+      temp_batch_agg_raw->merge(*temp_record_agg_raw);
+    }
+    else if(agg_kind == sdkmetrics::AggregatorKind::Gauge)
+    {
+      nostd::shared_ptr<sdkmetrics::GaugeAggregator<T>> temp_batch_agg = 
+        nostd::dynamic_pointer_cast<sdkmetrics::GaugeAggregator<T>> (batch_agg);
+
+      nostd::shared_ptr<sdkmetrics::GaugeAggregator<T>> temp_record_agg = 
+        nostd::dynamic_pointer_cast<sdkmetrics::GaugeAggregator<T>> (record_agg);
+
+      auto temp_batch_agg_raw = temp_batch_agg.get();
+      auto temp_record_agg_raw = temp_record_agg.get();
+      
+      temp_batch_agg_raw->merge(*temp_record_agg_raw);
+    }
+    else if(agg_kind == sdkmetrics::AggregatorKind::Sketch)
+    {
+      nostd::shared_ptr<sdkmetrics::SketchAggregator<T>> temp_batch_agg = 
+        nostd::dynamic_pointer_cast<sdkmetrics::SketchAggregator<T>> (batch_agg);
+
+      nostd::shared_ptr<sdkmetrics::SketchAggregator<T>> temp_record_agg = 
+        nostd::dynamic_pointer_cast<sdkmetrics::SketchAggregator<T>> (record_agg);
+
+      auto temp_batch_agg_raw = temp_batch_agg.get();
+      auto temp_record_agg_raw = temp_record_agg.get();
+      
+      temp_batch_agg_raw->merge(*temp_record_agg_raw);
+    }
+    else if(agg_kind == sdkmetrics::AggregatorKind::Histogram)
+    {
+      nostd::shared_ptr<sdkmetrics::HistogramAggregator<T>> temp_batch_agg = 
+        nostd::dynamic_pointer_cast<sdkmetrics::HistogramAggregator<T>> (batch_agg);
+
+      nostd::shared_ptr<sdkmetrics::HistogramAggregator<T>> temp_record_agg = 
+        nostd::dynamic_pointer_cast<sdkmetrics::HistogramAggregator<T>> (record_agg);
+
+      auto temp_batch_agg_raw = temp_batch_agg.get();
+      auto temp_record_agg_raw = temp_record_agg.get();
+      
+      temp_batch_agg_raw->merge(*temp_record_agg_raw);
+    }
+    else if(agg_kind == sdkmetrics::AggregatorKind::Exact)
+    {
+      nostd::shared_ptr<sdkmetrics::ExactAggregator<T>> temp_batch_agg = 
+        nostd::dynamic_pointer_cast<sdkmetrics::ExactAggregator<T>> (batch_agg);
+
+      nostd::shared_ptr<sdkmetrics::ExactAggregator<T>> temp_record_agg = 
+        nostd::dynamic_pointer_cast<sdkmetrics::ExactAggregator<T>> (record_agg);
+
+      auto temp_batch_agg_raw = temp_batch_agg.get();
+      auto temp_record_agg_raw = temp_record_agg.get();
+      
+      temp_batch_agg_raw->merge(*temp_record_agg_raw);
+    }
+  }
 
   std::map<metrics_api::InstrumentKind, std::string> ins_to_string {
     {metrics_api::InstrumentKind::Counter,           "Counter"},
