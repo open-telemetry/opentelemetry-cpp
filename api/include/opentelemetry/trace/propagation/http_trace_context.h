@@ -86,7 +86,7 @@ class HttpTraceContext : public HTTPTextFormat<T> {
             return (span.get());
         }
 
-        static nostd::string_view SpanContextToString(const trace::SpanContext &span_context) {
+        static void SpanContextToString(const trace::SpanContext &span_context, T &carrier, Setter setter) {
             char trace_id[32];
             TraceId(span_context.trace_id()).ToLowerBase16(trace_id);
             char span_id[16];
@@ -106,7 +106,7 @@ class HttpTraceContext : public HTTPTextFormat<T> {
             for (int i = 0; i < 2; i++) {
                hex_string += trace_flags[i];
             }
-            return nostd::string_view(hex_string);
+            setter(carrier, kTraceParent, hex_string);
         }
 
         static TraceId GenerateTraceIdFromString(nostd::string_view trace_id) {
@@ -158,13 +158,11 @@ class HttpTraceContext : public HTTPTextFormat<T> {
         }
 
         static void InjectImpl(Setter setter, T &carrier, const trace::SpanContext &span_context) {
-            nostd::string_view trace_parent = SpanContextToString(span_context);
-            std::cout<<trace_parent<<std::endl;
-            setter(carrier, kTraceParent, trace_parent);
+            SpanContextToString(span_context, carrier, setter);
+
             carrier[std::string(kTraceParent)] = std::string(trace_parent);
             if (!span_context.trace_state().empty()) {
                 nostd::string_view trace_state = FormatTracestate(span_context.trace_state());
-                std::cout<<trace_state<<std::endl;
                 setter(carrier, kTraceState, trace_state);
                 carrier[std::string(kTraceState)] = std::string(trace_state);
             }
