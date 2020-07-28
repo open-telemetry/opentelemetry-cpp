@@ -94,7 +94,10 @@ public:
     if (this->kind_ == other.kind_)
     {
       this->mu_.lock();
+      // First merge values
       this->values_.insert(this->values_.end(), other.values_.begin(), other.values_.end());
+      // Now merge checkpoints
+      this->checkpoint_.insert(this->checkpoint_.end(), other.checkpoint_.begin(), other.checkpoint_.end());
       this->mu_.unlock();
     }
     else
