@@ -82,7 +82,11 @@ public:
      */
     int get_quantiles(double q) override {
         if (q < 0 or q > 1){
+#if __EXCEPTIONS
             throw std::invalid_argument("Quantile values must fall between 0 and 1");
+#else
+            std::terminate();
+#endif
         }
         auto iter = checkpoint_raw_.begin();
         int idx = iter->first;
@@ -127,9 +131,17 @@ public:
     {
         this-> mu_.lock();
         if (gamma != other.gamma){
+#if __EXCEPTIONS
             throw std::invalid_argument("Aggregators must have identical error tolerance");
+#else
+            std::terminate();
+#endif
         } else if (max_buckets_ != other.max_buckets_) {
+#if __EXCEPTIONS
             throw std::invalid_argument("Aggregators must have the same maximum bucket allowance");
+#else
+            std::terminate();
+#endif
         }
         
         this->values_[0]+=other.values_[0];

@@ -207,6 +207,8 @@ TEST(Sketch, Concurrency){
     EXPECT_EQ(alpha.get_boundaries(), beta.get_boundaries());
 }
 
+#if __EXCEPTIONS
+            
 TEST(Sketch, Errors){
 
     SketchAggregator<int> tol1(metrics_api::InstrumentKind::ValueRecorder, .000005);
@@ -220,6 +222,7 @@ TEST(Sketch, Errors){
     EXPECT_ANY_THROW(tol1.get_quantiles(1.000001));
 }
 
+#endif
 
 }  // namespace sdk
 }  // namespace metrics
