@@ -61,7 +61,7 @@ private:
     }
 
     // Returns the Context at the top of the stack.
-    Context Top() noexcept const
+    Context Top() const noexcept
     {
       if (size_ <= 0)
       {
