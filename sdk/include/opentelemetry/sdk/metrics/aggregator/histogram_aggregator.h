@@ -52,7 +52,7 @@ public:
      *
      * Depending on the use case, a linear search or binary search based implementation may be preferred.
      * In uniformly distributed datasets, linear search outperforms binary search until 512 buckets.  However,
-     * if the distribution is strongly skewed right ( for example server latency where most values may be <10ms
+     * if the distribution is strongly skewed right (for example server latency where most values may be <10ms
      * but the range is from 0 - 1000 ms), a linear search could be superior even with more than 500 buckets as
      * almost all values inserted would be at the beginning of the boundaries array and thus found more quickly
      * through linear search.
