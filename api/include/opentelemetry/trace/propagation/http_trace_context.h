@@ -180,7 +180,7 @@ class HttpTraceContext : public HTTPTextFormat<T> {
 //                it != trace_state.tmp_map.end(); it++) {
 //                std::cout<<it->first<<" "<<it->second<<std::endl;
 //            }
-            return nostd::string_view(res);
+            return std::string(res);
         }
 
         static trace::SpanContext ExtractContextFromTraceParent(nostd::string_view trace_parent) {
