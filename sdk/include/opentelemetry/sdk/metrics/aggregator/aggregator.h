@@ -4,7 +4,6 @@
 #include "opentelemetry/metrics/instrument.h"
 #include "opentelemetry/version.h"
 #include "opentelemetry/core/timestamp.h"
-#include <variant>
 #include <vector>
 
 
