@@ -86,7 +86,7 @@ class HttpTraceContext : public HTTPTextFormat<T> {
             return (span.get());
         }
 
-        static void SpanContextToString(const trace::SpanContext &span_context, T &carrier, Setter setter) {
+        static void InjectTraceParent(const trace::SpanContext &span_context, T &carrier, Setter setter) {
             char trace_id[32];
             TraceId(span_context.trace_id()).ToLowerBase16(trace_id);
             char span_id[16];
@@ -145,7 +145,7 @@ class HttpTraceContext : public HTTPTextFormat<T> {
             return TraceFlags(buf);
         }
 
-        static nostd::string_view FormatTracestate(TraceState trace_state, T &carrier, Setter setter) {
+        static void InjectTraceState(TraceState trace_state, T &carrier, Setter setter) {
             std::string trace_state_string = "";
             std::map<nostd::string_view,nostd::string_view> entries = trace_state.entries();
             for (std::map<nostd::string_view,nostd::string_view>::const_iterator it = entries.begin(); it != entries.end(); it++) {
@@ -169,9 +169,9 @@ class HttpTraceContext : public HTTPTextFormat<T> {
         }
 
         static void InjectImpl(Setter setter, T &carrier, const trace::SpanContext &span_context) {
-            SpanContextToString(span_context, carrier, setter);
+            InjectTraceParent(span_context, carrier, setter);
             if (!span_context.trace_state().empty()) {
-                FormatTracestate(span_context.trace_state(), carrier, setter);
+                InjectTraceState(span_context.trace_state(), carrier, setter);
             }
         }
 
