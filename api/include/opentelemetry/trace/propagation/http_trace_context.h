@@ -144,6 +144,17 @@ class HttpTraceContext : public HTTPTextFormat<T> {
             buf = CharToInt(trace_flags[0])*16+CharToInt(trace_flags[1]);
             return TraceFlags(buf);
         }
+
+        static nostd::string_view FormatTracestate(TraceState trace_state, T &carrier, Setter setter) {
+            std::string trace_state = "";
+            std::map<nostd::string_view,nostd::string_view> entries = trace_state.entries();
+            for (std::map<nostd::string_view,nostd::string_view>::const_iterator it = entries.begin(); it != entries.end(); it++) {
+                if (it != entries.begin()) res += ",";
+                trace_state += std::string(it->first) + "=" + std::string(it->second);
+            }
+            setter(carrier, kTraceState, trace_state);
+        }
+
     private:
         static uint8_t CharToInt(char c) {
             if (c >= '0' && c <= '9') {
@@ -159,26 +170,9 @@ class HttpTraceContext : public HTTPTextFormat<T> {
 
         static void InjectImpl(Setter setter, T &carrier, const trace::SpanContext &span_context) {
             SpanContextToString(span_context, carrier, setter);
-            std::cout<<"setteee"<<carrier["traceparent"]<<std::endl;
             if (!span_context.trace_state().empty()) {
-                nostd::string_view trace_state = FormatTracestate(span_context.trace_state());
-                setter(carrier, kTraceState, trace_state);
+                FormatTracestate(span_context.trace_state(), carrier, setter);
             }
-        }
-
-        static nostd::string_view FormatTracestate(TraceState trace_state) {
-            std::string res = "";
-            std::map<nostd::string_view,nostd::string_view> entries = trace_state.entries();
-            for (std::map<nostd::string_view,nostd::string_view>::const_iterator it = entries.begin(); it != entries.end(); it++) {
-                if (it != entries.begin()) res += ",";
-                res += std::string(it->first) + "=" + std::string(it->second);
-            }
-            std::cout<<res<<std::endl;
-//            for (std::map<nostd::string_view,nostd::string_view>::iterator it = trace_state.tmp_map.begin();
-//                it != trace_state.tmp_map.end(); it++) {
-//                std::cout<<it->first<<" "<<it->second<<std::endl;
-//            }
-            return nostd::string_view(res);
         }
 
         static trace::SpanContext ExtractContextFromTraceParent(nostd::string_view trace_parent) {
