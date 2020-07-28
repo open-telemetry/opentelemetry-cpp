@@ -162,15 +162,14 @@ class HttpTraceContext : public HTTPTextFormat<T> {
             setter(carrier, kTraceParent, trace_parent);
             carrier[std::string(kTraceParent)] = std::string(trace_parent);
             if (!span_context.trace_state().empty()) {
-                nostd::string_view trace_state;
-                FormatTracestate(span_context.trace_state(),trace_state);
+                nostd::string_view trace_state = FormatTracestate(span_context.trace_state());
                 std::cout<<trace_state<<std::endl;
                 setter(carrier, kTraceState, trace_state);
                 carrier[std::string(kTraceState)] = std::string(trace_state);
             }
         }
 
-        static nostd::string_view FormatTracestate(TraceState trace_state, nostd::string_view &str) {
+        static nostd::string_view FormatTracestate(const TraceState &trace_state) {
             std::string res = "";
             std::map<nostd::string_view,nostd::string_view> entries = trace_state.entries();
             for (std::map<nostd::string_view,nostd::string_view>::iterator it = entries.begin(); it != entries.end(); it++) {
@@ -182,8 +181,7 @@ class HttpTraceContext : public HTTPTextFormat<T> {
 //                it != trace_state.tmp_map.end(); it++) {
 //                std::cout<<it->first<<" "<<it->second<<std::endl;
 //            }
-            str = res;
-            return std::string(res);
+            return res;
         }
 
         static trace::SpanContext ExtractContextFromTraceParent(nostd::string_view trace_parent) {
