@@ -80,7 +80,7 @@ public:
      *
      * @param q, the quantile to calculate (for example 0.5 is equivelant to the 50th percentile)
      */
-    int get_quantiles(double q) override {
+    virtual T get_quantiles(double q) override {
         if (q < 0 or q > 1){
 #if __EXCEPTIONS
             throw std::invalid_argument("Quantile values must fall between 0 and 1");
@@ -196,6 +196,26 @@ public:
     }
     
     /**
+    * Returns the error bound
+    *
+    * @param none
+    * @return the error bound specified during construction
+    */
+    virtual double get_error_bound(double q) override {
+        return error_bound_;
+    }
+
+    /**
+    * Returns the maximum allowed buckets
+    *
+    * @param none
+    * @return the maximum allowed buckets
+    */
+    virtual size_t get_max_buckets(double q) override {
+        return max_buckets_;
+    }
+    
+    /**
      * Returns the count of each value tracked by this sketch aggregator.  These are returned
      * in the same order as the indices returned by the get_boundaries function.
      *
@@ -212,6 +232,7 @@ public:
     
 private:
     double gamma;
+    double error_bound_;
     size_t max_buckets_;
     std::map<int,int> raw_;
     std::map<int,int> checkpoint_raw_;
