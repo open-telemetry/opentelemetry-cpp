@@ -126,12 +126,12 @@ public:
     }
     
     // virtual function to be overriden for Sketch Aggregator
-    virtual double get_error_bound(double q) {
+    virtual double get_error_bound() {
         return 0;
     }
     
     // virtual function to be overriden for Sketch Aggregator
-    virtual double get_max_buckets(double q) {
+    virtual size_t get_max_buckets() {
         return 0;
     }
     
