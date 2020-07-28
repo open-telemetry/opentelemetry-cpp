@@ -102,7 +102,6 @@ class HttpTraceContext : public HTTPTextFormat<T> {
             for (int i = 0; i < 2; i++) {
                hex_string += trace_flags[i];
             }
-            std::cout<<hex_string<<std::endl;
             setter(carrier, kTraceParent, hex_string);
         }
 
