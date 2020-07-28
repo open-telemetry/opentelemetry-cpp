@@ -78,7 +78,7 @@ TEST(Recordable, SetStatus)
   EXPECT_EQ(rec.span().status().message(), description);
 }
 
-TEST(Recordable, AddEvents)
+TEST(Recordable, AddEventDefault)
 {
   Recordable rec;
   nostd::string_view name = "Test Event";
@@ -93,6 +93,45 @@ TEST(Recordable, AddEvents)
 
   EXPECT_EQ(rec.span().events(0).name(), name);
   EXPECT_EQ(rec.span().events(0).time_unix_nano(), unix_event_time);
+  EXPECT_EQ(rec.span().events(0).attributes().size(), 0);
+}
+
+TEST(Recordable, AddEventWithAttributes)
+{
+  Recordable rec;
+  const int kNumAttributes              = 3;
+  std::string keys[kNumAttributes]      = {"attr1", "attr2", "attr3"};
+  int values[kNumAttributes]            = {4, 7, 23};
+  std::map<std::string, int> attributes = {
+      {keys[0], values[0]}, {keys[1], values[1]}, {keys[2], values[2]}};
+
+  rec.AddEvent("Test Event", std::chrono::system_clock::now(),
+               trace::KeyValueIterableView<std::map<std::string, int>>(attributes));
+
+  for (int i = 0; i < kNumAttributes; i++)
+  {
+    EXPECT_EQ(rec.span().events(0).attributes(i).key(), keys[i]);
+    EXPECT_EQ(rec.span().events(0).attributes(i).value().int_value(), values[i]);
+  }
+}
+
+TEST(Recordable, AddLink)
+{
+  Recordable rec;
+  const int kNumAttributes              = 3;
+  std::string keys[kNumAttributes]      = {"attr1", "attr2", "attr3"};
+  int values[kNumAttributes]            = {5, 12, 40};
+  std::map<std::string, int> attributes = {
+      {keys[0], values[0]}, {keys[1], values[1]}, {keys[2], values[2]}};
+
+  rec.AddLink(trace::SpanContext(false, false),
+              trace::KeyValueIterableView<std::map<std::string, int>>(attributes));
+
+  for (int i = 0; i < kNumAttributes; i++)
+  {
+    EXPECT_EQ(rec.span().links(0).attributes(i).key(), keys[i]);
+    EXPECT_EQ(rec.span().links(0).attributes(i).value().int_value(), values[i]);
+  }
 }
 
 // Test non-int single types. Int single types are tested using templates (see IntAttributeTest)
