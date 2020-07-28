@@ -20,7 +20,6 @@ public:
   explicit UngroupedMetricsProcessor(bool stateful)
   {
     stateful_ = stateful;
-
   }
 
   std::vector<sdkmetrics::Record> CheckpointSelf() noexcept
@@ -29,7 +28,18 @@ public:
     
     for(auto iter : batch_map_)
     {
+      std::string key = iter.first;
+      std::size_t description_index = key.find("/description/");
+      std::size_t labels_index = key.find("/labels/");
+      std::size_t instrument_index = key.find("/instrument/");
 
+      std::string name = key.substr(6, description_index - 6);
+      std::string description = key.substr(description_index + 13, labels_index - description_index - 13);
+      std::string labels = key.substr(labels_index + 8, instrument_index - labels_index - 8);
+      
+      sdkmetrics::Record r{name, description, labels, iter.second};
+
+      metric_records.push_back(r);
     }
 
     return metric_records;
