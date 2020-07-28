@@ -62,7 +62,7 @@ public:
 
   bool operator==(const TraceId &that) const noexcept
   {
-    std::cout<<"comparing"<<std::endl;
+    std::cout<<"comparing: "<<memcmp(rep_, that.rep_, kSize) == 0<<std::endl;
     return memcmp(rep_, that.rep_, kSize) == 0;
   }
 
