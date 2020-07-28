@@ -85,7 +85,7 @@ TEST(HTTPTextFormatTest, NoTraceParentHeader)
     const std::map<std::string,std::string> carrier = {};
     nostd::shared_ptr<trace::Span> sp{new trace::DefaultSpan()};
     context::Context ctx1 = context::Context("current-span",sp);
-    trace::Span* span = trace::propagation::GetCurrentSpan(format.Extract(Getter, carrier, ctx1));
+    trace::Span* span = trace::propagation::HttpTraceContext::GetCurrentSpan(format.Extract(Getter, carrier, ctx1));
 //    EXPECT_TRUE(span->GetContext() != NULL);
 }
 
