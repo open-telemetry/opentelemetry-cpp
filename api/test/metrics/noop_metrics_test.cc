@@ -10,6 +10,8 @@ OPENTELEMETRY_BEGIN_NAMESPACE
 using opentelemetry::metrics::Meter;
 using opentelemetry::metrics::NoopMeter;
 
+namespace metrics_api = opentelemetry::metrics;
+
 void Callback(opentelemetry::metrics::ObserverResult<int> result)
 {
   std::map<std::string, std::string> labels = {{"key", "value"}};
@@ -27,11 +29,11 @@ TEST(NoopTest, CreateInstruments)
   m->NewIntValueRecorder("Test recorder", "For testing", "Unitless", true);
 
   m->NewIntSumObserver("Test sum obs", "For testing", "Unitless", true,
-                           &Callback);
+                       &Callback);
   m->NewIntUpDownSumObserver("Test udsum obs", "For testing", "Unitless", true,
-                                 &Callback);
-  m->NewIntValueObserver("Test val obs", "For testing", "Unitless", true,
                              &Callback);
+  m->NewIntValueObserver("Test val obs", "For testing", "Unitless", true,
+                         &Callback);
 }
 
 TEST(NoopMeter, RecordBatch)
@@ -46,19 +48,27 @@ TEST(NoopMeter, RecordBatch)
 
   auto s = m->NewShortCounter("Test short counter", "For testing", "Unitless", true);
 
-  m->RecordShortBatch({{"Key", "Value"}}, {s}, {1});
+  m->RecordShortBatch({{"Key", "Value"}},
+                      {nostd::dynamic_pointer_cast<metrics_api::SynchronousInstrument<short>>(s)},
+                      {1});
 
   auto i = m->NewIntCounter("Test int counter", "For testing", "Unitless", true);
 
-  m->RecordIntBatch({{"Key", "Value"}}, {i}, {1});
+  m->RecordIntBatch({{"Key", "Value"}},
+                    {nostd::dynamic_pointer_cast<metrics_api::SynchronousInstrument<int>>(i)},
+                    {1});
 
   auto f = m->NewFloatCounter("Test int counter", "For testing", "Unitless", true);
 
-  m->RecordFloatBatch({{"Key," "Value"}}, {f}, {1.0});
+  m->RecordFloatBatch({{"Key", "Value"}},
+                      {nostd::dynamic_pointer_cast<metrics_api::SynchronousInstrument<float>>(f)},
+                      {1.0});
 
   auto d = m->NewDoubleCounter("Test int counter", "For testing", "Unitless", true);
 
-  m->RecordDoubleBatch({{"Key", "Value"}}, {d}, {1.0});
+  m->RecordDoubleBatch({{"Key", "Value"}},
+                       {nostd::dynamic_pointer_cast<metrics_api::SynchronousInstrument<double>>(d)},
+                       {1});
 
 }
 OPENTELEMETRY_END_NAMESPACE
