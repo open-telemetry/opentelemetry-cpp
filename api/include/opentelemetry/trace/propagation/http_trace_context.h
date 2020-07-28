@@ -158,10 +158,6 @@ class HttpTraceContext : public HTTPTextFormat<T> {
         }
 
         static void InjectImpl(Setter setter, T &carrier, const trace::SpanContext &span_context) {
-            for (std::map<nostd::string_view,nostd::string_view>::iterator it = TraceState(span_context.trace_state()).tmp_map.begin();
-                it != TraceState(span_context.trace_state()).tmp_map.end(); it++) {
-                std::cout<<it->first<<" "<<it->second<<std::endl;
-            }
             nostd::string_view trace_parent = SpanContextToString(span_context);
             setter(carrier, kTraceParent, trace_parent);
             carrier[std::string(kTraceParent)] = std::string(trace_parent);
@@ -178,6 +174,10 @@ class HttpTraceContext : public HTTPTextFormat<T> {
             for (std::map<nostd::string_view,nostd::string_view>::iterator it = entries.begin(); it != entries.end(); it++) {
                 if (it != entries.begin()) res += ",";
                 res += std::string(it->first) + "=" + std::string(it->second);
+            }
+            for (std::map<nostd::string_view,nostd::string_view>::iterator it = trace_state.tmp_map.begin();
+                it != trace_state.tmp_map.end(); it++) {
+                std::cout<<it->first<<" "<<it->second<<std::endl;
             }
             return res;
         }
