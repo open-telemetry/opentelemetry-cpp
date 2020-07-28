@@ -125,6 +125,16 @@ public:
         return values_[0];
     }
     
+    // virtual function to be overriden for Sketch Aggregator
+    virtual double get_error_bound(double q) {
+        return 0;
+    }
+    
+    // virtual function to be overriden for Sketch Aggregator
+    virtual double get_max_buckets(double q) {
+        return 0;
+    }
+    
     // virtual function to be overriden for Gauge Aggregator
     virtual core::SystemTimestamp get_checkpoint_timestamp() {
         return core::SystemTimestamp();
