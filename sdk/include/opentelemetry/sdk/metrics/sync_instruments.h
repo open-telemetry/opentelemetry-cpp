@@ -29,8 +29,8 @@ public:
                     nostd::string_view unit,
                     bool enabled):
                     BoundSynchronousInstrument<T>(name, description, unit, enabled,
-                                                   metrics_api::InstrumentKind::Counter,nostd::shared_ptr<Aggregator<T>>(new
-                                                   CounterAggregator<T>(metrics_api::InstrumentKind::Counter))) // Aggregator is chosen here
+                                                  metrics_api::InstrumentKind::Counter,
+                                                  nostd::shared_ptr<Aggregator<T>>(new CounterAggregator<T>(metrics_api::InstrumentKind::Counter))) // Aggregator is chosen here
     {}
 
     /*
@@ -40,7 +40,8 @@ public:
      * @param value the numerical representation of the metric being captured
      * @param labels the set of labels, as key-value pairs
      */
-    virtual void add(T value) override {
+    virtual void add(T value) override
+    {
         this->mu_.lock();
         if (value < 0){
             throw std::invalid_argument("Counter instrument updates must be non-negative.");
@@ -145,7 +146,7 @@ public:
     {}
 
     /*
-     * Add adds the value to the counter's sum. The labels are already linked   * to the instrument
+     * Add adds the value to the counter's sum. The labels are already linked to the instrument
      * and are not specified.
      *
      * @param value the numerical representation of the metric being captured
@@ -181,11 +182,11 @@ public:
      */
     nostd::shared_ptr<metrics_api::BoundUpDownCounter<T>> bindUpDownCounter(const trace::KeyValueIterable &labels) override
     {
-        std::string labelset = KvToString(labels); // COULD CUSTOM HASH THIS INSTEAD FOR PERFORMANCE
+        std::string labelset = KvToString(labels);
         if (boundInstruments_.find(labelset) == boundInstruments_.end())
         {
             auto sp1 = nostd::shared_ptr<metrics_api::BoundUpDownCounter<T>>(new BoundUpDownCounter<T>(this->name_, this->description_, this->unit_, this->enabled_));
-            boundInstruments_[labelset]=sp1;  // perhaps use emplace
+            boundInstruments_[labelset]=sp1;
             return sp1;
         }
         else
@@ -197,8 +198,8 @@ public:
 
     /*
      * Add adds the value to the counter's sum. The labels should contain
-     * the keys and values to be associated with this value.  Counters only     * accept positive
-     * valued updates.
+     * the keys and values to be associated with this value. Counters only
+     * accept positive valued updates.
      *
      * @param value the numerical representation of the metric being captured
      * @param labels the set of labels, as key-value pairs
@@ -241,7 +242,7 @@ public:
                           nostd::string_view unit,
                           bool enabled): BoundSynchronousInstrument<T>(name, description, unit, enabled,
                                                                        metrics_api::InstrumentKind::ValueRecorder,
-                                                                       nostd::shared_ptr<Aggregator<T>>(new MinMaxSumCountAggregator<T>(metrics_api::InstrumentKind::ValueRecorder))) // Aggregator is chosen here
+                                                                       nostd::shared_ptr<Aggregator<T>>(new MinMaxSumCountAggregator<T>(metrics_api::InstrumentKind::ValueRecorder)))
     {}
 
     /*
@@ -256,6 +257,7 @@ public:
         this->update(value);
         this->mu_.unlock();
     }
+    
 };
 
 template <class T>
@@ -281,11 +283,11 @@ public:
      */
     nostd::shared_ptr<metrics_api::BoundValueRecorder<T>> bindValueRecorder(const trace::KeyValueIterable &labels) override
     {
-        std::string labelset = KvToString(labels); // COULD CUSTOM HASH THIS INSTEAD FOR PERFORMANCE
+        std::string labelset = KvToString(labels);
         if (boundInstruments_.find(labelset) == boundInstruments_.end())
         {
             auto sp1 = nostd::shared_ptr<metrics_api::BoundValueRecorder<T>>(new BoundValueRecorder<T>(this->name_, this->description_, this->unit_, this->enabled_));
-            boundInstruments_[labelset]=sp1;  // perhaps use emplace
+            boundInstruments_[labelset]=sp1;
             return sp1;
         }
         else
@@ -297,8 +299,8 @@ public:
 
     /*
      * Add adds the value to the counter's sum. The labels should contain
-     * the keys and values to be associated with this value.  Counters only     * accept positive
-     * valued updates.
+     * the keys and values to be associated with this value.  Counters only
+     * accept positive valued updates.
      *
      * @param value the numerical representation of the metric being captured
      * @param labels the set of labels, as key-value pairs

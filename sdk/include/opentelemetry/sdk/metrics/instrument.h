@@ -32,12 +32,11 @@ public:
                nostd::string_view description,
                nostd::string_view unit,
                bool enabled,
-               metrics_api::InstrumentKind kind): name_(name), description_(description), unit_(unit), enabled_(enabled), kind_(kind) {}
+               metrics_api::InstrumentKind kind): name_(name), description_(description), unit_(unit), enabled_(enabled), kind_(kind)
+    {}
     
     // Returns true if the instrument is enabled and collecting data
-    virtual bool IsEnabled() override {
-        return enabled_;
-    }
+    virtual bool IsEnabled() override { return enabled_; }
     
     // Return the instrument name
     virtual nostd::string_view GetName() override { return name_; }
@@ -73,7 +72,9 @@ public:
                                metrics_api::InstrumentKind kind,
                                nostd::shared_ptr<Aggregator<T>> agg)
     :Instrument(name, description, unit, enabled, kind), agg_(agg)
-    { this->inc_ref(); } // increase reference count when instantiated
+    {
+        this->inc_ref(); // increase reference count when instantiated
+    }
     
     /**
      * Frees the resources associated with this Bound Instrument.
@@ -102,14 +103,15 @@ public:
     virtual int get_ref() override { return ref_; }
     
     /**
-     * Records a single synchronous metric event; a call to the aggregator
-     * Since this is a bound synchronous instrument, labels are not required in  * metric capture
-     * calls.
+     * Records a single synchronous metric event via a call to the aggregator.
+     * Since this is a bound synchronous instrument, labels are not required in
+     * metric capture calls.
      *
      * @param value is the numerical representation of the metric being captured
      * @return void
      */
-    virtual void update(T value) override {
+    virtual void update(T value) override
+    {
         this->mu_.lock();
         agg_->update(value);
         this->mu_.unlock();
@@ -139,11 +141,12 @@ public:
                           nostd::string_view description,
                           nostd::string_view unit,
                           bool enabled,
-                          metrics_api::InstrumentKind kind):Instrument(name,description,unit,enabled,kind)
+                          metrics_api::InstrumentKind kind)
+    :Instrument(name,description,unit,enabled,kind)
     {}
     
     /**
-     * Returns a Bound Instrument associated with the specified labels.         * Multiples requests
+     * Returns a Bound Instrument associated with the specified labels. Multiples requests
      * with the same set of labels may return the same Bound Instrument instance.
      *
      * It is recommended that callers keep a reference to the Bound Instrument
@@ -152,7 +155,8 @@ public:
      * @param labels the set of labels, as key-value pairs
      * @return a Bound Instrument
      */
-    virtual nostd::shared_ptr<metrics_api::BoundSynchronousInstrument<T>> bind(const trace::KeyValueIterable &labels) override {
+    virtual nostd::shared_ptr<metrics_api::BoundSynchronousInstrument<T>> bind(const trace::KeyValueIterable &labels) override
+    {
         return nostd::shared_ptr<BoundSynchronousInstrument<T>>();
     }
     
@@ -190,13 +194,14 @@ inline void print_value(std::stringstream &ss,
 };
 
 // Utility function which converts maps to strings for better performance
-inline std::string mapToString(const std::map<std::string,std::string> & conv){
+inline std::string mapToString(const std::map<std::string, std::string> & conv)
+{
     std::stringstream ss;
-    ss <<"{ ";
+    ss << "{ ";
     for (auto i:conv){
-        ss <<i.first <<':' <<i.second <<',';
+        ss << i.first << ':' << i.second << ',';
     }
-    ss <<"}";
+    ss << "}";
     return ss.str();
 }
 
@@ -208,8 +213,6 @@ inline std::string KvToString(const trace::KeyValueIterable &kv) noexcept
     if (size)
     {
         size_t i = 1;
-        // TODO: we need to do something with this iterator. It is not very convenient.
-        // Having range-based for loop would've been nicer
         kv.ForEachKeyValue([&](nostd::string_view key, common::AttributeValue value) noexcept {
             ss << "\"" << key << "\":";
             print_value(ss, value, true);
