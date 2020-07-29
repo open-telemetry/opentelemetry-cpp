@@ -79,9 +79,9 @@ TEST(GaugeAggregator, Types)
 {
   // This test verifies that we do not encounter any errors when
   // using various numeric types.
-  auto agg_int = new GaugeAggregator<int>(opentelemetry::metrics::InstrumentKind::Counter);
-  auto agg_long = new GaugeAggregator<long>(opentelemetry::metrics::InstrumentKind::Counter);
-  auto agg_float = new GaugeAggregator<float>(opentelemetry::metrics::InstrumentKind::Counter);
+  auto agg_int    = new GaugeAggregator<int>(opentelemetry::metrics::InstrumentKind::Counter);
+  auto agg_long   = new GaugeAggregator<long>(opentelemetry::metrics::InstrumentKind::Counter);
+  auto agg_float  = new GaugeAggregator<float>(opentelemetry::metrics::InstrumentKind::Counter);
   auto agg_double = new GaugeAggregator<double>(opentelemetry::metrics::InstrumentKind::Counter);
 
   for (int i = 1; i <= 10; ++i)
