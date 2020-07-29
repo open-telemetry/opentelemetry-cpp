@@ -37,7 +37,10 @@ std::unique_ptr<Recordable> BatchSpanProcessor::MakeRecordable() noexcept
 void BatchSpanProcessor::OnStart(Recordable &span) noexcept
 {
   // no-op
+<<<<<<< HEAD
   (void)span;
+=======
+>>>>>>> 2fd66ce... Fix Format issue
 }
 
 void BatchSpanProcessor::OnEnd(std::unique_ptr<Recordable> &&span) noexcept
