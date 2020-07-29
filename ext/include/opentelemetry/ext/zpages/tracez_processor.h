@@ -9,7 +9,7 @@
 
 #include "opentelemetry/sdk/trace/processor.h"
 #include "opentelemetry/sdk/trace/recordable.h"
-#include "opentelemetry/sdk/trace/span_data.h"
+#include "opentelemetry/ext/zpages/threadsafe_span_data.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace ext
@@ -24,8 +24,8 @@ class TracezSpanProcessor : public opentelemetry::sdk::trace::SpanProcessor {
  public:
 
   struct CollectedSpans {
-    std::unordered_set<opentelemetry::sdk::trace::SpanData*> running;
-    std::vector<std::unique_ptr<opentelemetry::sdk::trace::SpanData>> completed;
+    std::unordered_set<ThreadsafeSpanData*> running;
+    std::vector<std::unique_ptr<ThreadsafeSpanData>> completed;
   };
 
   /*
@@ -39,7 +39,7 @@ class TracezSpanProcessor : public opentelemetry::sdk::trace::SpanProcessor {
    */
   std::unique_ptr<opentelemetry::sdk::trace::Recordable> MakeRecordable() noexcept override
   {
-    return std::unique_ptr<opentelemetry::sdk::trace::Recordable>(new opentelemetry::sdk::trace::SpanData);
+    return std::unique_ptr<opentelemetry::sdk::trace::Recordable>(new ThreadsafeSpanData);
   }
 
   /*

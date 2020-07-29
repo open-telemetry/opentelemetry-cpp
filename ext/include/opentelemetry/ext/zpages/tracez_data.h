@@ -12,8 +12,9 @@
 #include "opentelemetry/trace/span_id.h"
 #include "opentelemetry/trace/trace_id.h"
 #include "opentelemetry/version.h"
+#include "opentelemetry/ext/zpages/threadsafe_span_data.h"
 
-using opentelemetry::sdk::trace::SpanData;
+using opentelemetry::ext::zpages::ThreadsafeSpanData;
 using opentelemetry::trace::CanonicalCode;
 using opentelemetry::trace::SpanId;
 using opentelemetry::trace::TraceId;
@@ -29,42 +30,6 @@ namespace zpages {
  * stored.
  */
 const int kMaxNumberOfSampleSpans = 5;
-
-/**
- * SampleSpanData is a structure that stores some of the relevant span
- * information for sample spans. The structure copies over data from SpanData
- * and stores it as strings so it can readily be rendered on the frontend or
- * converted to JSON.
- * Defining this structure also eliminates the dependency on SpanData of
- * running spans which is owned by span and access to which may cause race
- * conditions.
- * TODO: At this time SpanData that is passed into this struct's constructor
- * does not have many attributes like span_id etc, so a lot of field's in the
- * struct will be empty.
- */
-struct SampleSpanData {
-  std::string span_name;
-  std::string span_id;
-  std::string trace_id;
-  std::string parent_id;
-  std::string description;
-  unsigned long long int duration;
-  unsigned long long int start_time;
-  unsigned short status_code;
-  SampleSpanData(SpanData span_data) {
-    span_name = span_data.GetName().data();
-    span_id = std::string(
-        reinterpret_cast<const char *>(span_data.GetSpanId().Id().data()));
-    trace_id = std::string(
-        reinterpret_cast<const char *>(span_data.GetTraceId().Id().data()));
-    parent_id = std::string(reinterpret_cast<const char *>(
-        span_data.GetParentSpanId().Id().data()));
-    description = span_data.GetDescription().data();
-    duration = span_data.GetDuration().count();
-    start_time = span_data.GetStartTime().time_since_epoch().count();
-    status_code = (unsigned short)span_data.GetStatus();
-  }
-};
 
 /**
  * TracezData is the data to be displayed for tracez zpages that is stored for
@@ -90,19 +55,19 @@ struct TracezData {
    * corresponds to a latency boundary(of which there are 9).
    * The list in each index stores the sample spans for that latency boundary.
    */
-  std::array<std::list<SampleSpanData>, kLatencyBoundaries.size()>
+  std::array<std::list<ThreadsafeSpanData>, kLatencyBoundaries.size()>
       sample_latency_spans;
 
   /**
    * sample_error_spans is a list that stores the error samples for a span name.
    */
-  std::list<SampleSpanData> sample_error_spans;
+  std::list<ThreadsafeSpanData> sample_error_spans;
 
   /**
    * sample_running_spans is a list that stores the running span samples for a
    * span name.
    */
-  std::list<SampleSpanData> sample_running_spans;
+  std::list<ThreadsafeSpanData> sample_running_spans;
 
   TracezData() {
     running_span_count = 0;
