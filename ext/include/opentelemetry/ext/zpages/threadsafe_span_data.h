@@ -169,7 +169,7 @@ class ThreadsafeSpanData final : public opentelemetry::sdk::trace::Recordable {
     // TODO: handle attributes
   }
 
-  ThreadsafeSpanData(){};
+  ThreadsafeSpanData(){}
   ThreadsafeSpanData(const ThreadsafeSpanData &threadsafe_span_data) : ThreadsafeSpanData(
       threadsafe_span_data, std::lock_guard<std::mutex>(threadsafe_span_data.mutex_))
   {}
