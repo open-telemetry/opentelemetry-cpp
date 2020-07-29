@@ -220,24 +220,22 @@ TEST(HTTPTextFormatTest, TraceStateHeaderWithTrailingComma)
     EXPECT_TRUE(trace_state.Get("foo", "1"));
 }
 
-//TEST(HTTPTextFormatTest, TraceStateKeys)
-//{
-//    // Test for valid key patterns in the tracestate
-//    nostd::string_view trace_state_value = "1a-2f@foo=bar1,1a-_*/2b@foo=bar2,foo=bar3,foo-_*/bar=bar4";
-//    std::map<nostd::string_view,nostd:string_view> carrier = { {"traceparent", "00-12345678901234567890123456789012-1234567890123456-00"},
-//                                                               {"tracestate", tracestate_value} };
-//    trace::Span span = trace::propagation::GetCurrentSpan(
-//        format.Extract(
-//            Getter,
-//            carrier,
-//            Context()
-//        )
-//    );
-//    EXPECT_EQ(span.GetContext().trace_state()["1a-2f@foo"], "bar1");
-//    EXPECT_EQ(span.GetContext().trace_state()["1a-_*/2b@foo"], "bar2");
-//    EXPECT_EQ(span.GetContext().trace_state()["foo"], "bar3");
-//    EXPECT_EQ(span.GetContext().trace_state()["foo-_*/bar"], "bar4");
-//}
+TEST(HTTPTextFormatTest, TraceStateKeys)
+{
+    // Test for valid key patterns in the tracestate
+    std::string trace_state_value = "1a-2f@foo=bar1,1a-_*/2b@foo=bar2,foo=bar3,foo-_*/bar=bar4";
+    const std::map<std::string,std::string> carrier = { {"traceparent", "00-12345678901234567890123456789012-1234567890123456-00"},
+                                                               {"tracestate", tracestate_value} };
+    nostd::shared_ptr<trace::Span> sp{new trace::DefaultSpan()};
+    context::Context ctx1 = context::Context("current-span",sp);
+    context::Context ctx2 = format.Extract(Getter,carrier,ctx1);
+    trace::Span* span = map_http_trace_context::GetCurrentSpan(ctx2);
+    trace::TraceState trace_state = span->GetContext().trace_state();
+    EXPECT_EQ(trace_state.Get("1a-2f@foo", "bar1"));
+    EXPECT_EQ(trace_state.Get("1a-_*/2b@foo", "bar2"));
+    EXPECT_EQ(trace_state("foo", "bar3"));
+    EXPECT_EQ(trace_state("foo-_*/bar", "bar4"));
+}
 
 
 // Dilapidated Tests:
