@@ -13,7 +13,8 @@ namespace memory
 {
 InMemorySpanData::InMemorySpanData()
 {
-  spans_received_ = std::move(new CircularBuffer<sdk::trace::SpanData>(MAX_BUFFER_SIZE));
+  CircularBuffer<sdk::trace::SpanData> buffer{MAX_BUFFER_SIZE};
+  spans_received_ = buffer;
 }
 
 void InMemorySpanData::Add(std::unique_ptr<sdk::trace::SpanData> data) noexcept
