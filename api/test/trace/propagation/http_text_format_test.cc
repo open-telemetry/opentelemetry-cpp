@@ -210,16 +210,13 @@ TEST(HTTPTextFormatTest, PropagateInvalidContext)
 TEST(HTTPTextFormatTest, TraceStateHeaderWithTrailingComma)
 {
     // Do not propagate invalid trace context.
-    std::map<nostd::string_view,nostd:string_view> carrier = { {"traceparent", "00-12345678901234567890123456789012-1234567890123456-00"},
+    const std::map<std::string,std::string> carrier = { {"traceparent", "00-12345678901234567890123456789012-1234567890123456-00"},
                                                                {"tracestate", "foo=1,"} };
-    trace::Span span = trace::propagation::GetCurrentSpan(
-        format.Extract(
-            Getter,
-            carrier,
-            Context()
-        )
-    );
-    EXPECT_EQ(span.GetContext().trace_state()["foo"], "1");
+    nostd::shared_ptr<trace::Span> sp{new trace::DefaultSpan()};
+    context::Context ctx1 = context::Context("current-span",sp);
+    context::Context ctx2 = format.Extract(Getter,carrier,ctx1);
+    trace::Span* span = map_http_trace_context::GetCurrentSpan(ctx2);
+    EXPECT_TRUE(span->GetContext().trace_state().Get("foo", "1"));
 }
 
 //TEST(HTTPTextFormatTest, TraceStateKeys)
