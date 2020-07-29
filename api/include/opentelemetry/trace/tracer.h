@@ -20,7 +20,7 @@ class Span;
 
 struct StartSpanOptions;
 
-class Tracer final
+class Tracer
 {
 public:
     Tracer() = default;
