@@ -231,10 +231,10 @@ TEST(HTTPTextFormatTest, TraceStateKeys)
     context::Context ctx2 = format.Extract(Getter,carrier,ctx1);
     trace::Span* span = map_http_trace_context::GetCurrentSpan(ctx2);
     trace::TraceState trace_state = span->GetContext().trace_state();
-    EXPECT_EQ(trace_state.Get("1a-2f@foo", "bar1"));
-    EXPECT_EQ(trace_state.Get("1a-_*/2b@foo", "bar2"));
-    EXPECT_EQ(trace_state("foo", "bar3"));
-    EXPECT_EQ(trace_state("foo-_*/bar", "bar4"));
+    EXPECT_TRUE(trace_state.Get("1a-2f@foo", "bar1"));
+    EXPECT_TRUE(trace_state.Get("1a-_*/2b@foo", "bar2"));
+    EXPECT_TRUE(trace_state("foo", "bar3"));
+    EXPECT_TRUE(trace_state("foo-_*/bar", "bar4"));
 }
 
 
