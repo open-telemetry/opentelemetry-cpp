@@ -55,6 +55,8 @@ jobs:
         sudo ./ci/install_gcc48.sh
     - name: run tests
       run: ./ci/do_ci.sh bazel.legacy.test
+      env:
+        CC: /usr/bin/gcc-4.8
 
   bazel_test:
     name: Bazel

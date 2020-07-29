@@ -18,11 +18,12 @@ public:
   /**
    * @return Always return Decision RECORD_AND_SAMPLE
    */
-  inline SamplingResult ShouldSample(const trace_api::SpanContext * /*parent_context*/,
-                              trace_api::TraceId /*trace_id*/,
-                              nostd::string_view /*name*/,
-                              trace_api::SpanKind /*span_kind*/,
-                              const trace_api::KeyValueIterable & /*attributes*/) noexcept override
+  inline SamplingResult ShouldSample(
+      const trace_api::SpanContext * /*parent_context*/,
+      trace_api::TraceId /*trace_id*/,
+      nostd::string_view /*name*/,
+      trace_api::SpanKind /*span_kind*/,
+      const trace_api::KeyValueIterable & /*attributes*/) noexcept override
   {
     return {Decision::RECORD_AND_SAMPLE, nullptr};
   }
@@ -30,7 +31,7 @@ public:
   /**
    * @return Description MUST be AlwaysOnSampler
    */
-  inline std::string GetDescription() const noexcept override { return "AlwaysOnSampler"; }
+  inline nostd::string_view GetDescription() const noexcept override { return "AlwaysOnSampler"; }
 };
 }  // namespace trace
 }  // namespace sdk

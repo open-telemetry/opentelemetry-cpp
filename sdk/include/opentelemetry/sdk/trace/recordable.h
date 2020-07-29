@@ -3,10 +3,15 @@
 #include "opentelemetry/common/attribute_value.h"
 #include "opentelemetry/core/timestamp.h"
 #include "opentelemetry/nostd/string_view.h"
+#include "opentelemetry/sdk/common/empty_attributes.h"
 #include "opentelemetry/trace/canonical_code.h"
+#include "opentelemetry/trace/key_value_iterable.h"
+#include "opentelemetry/trace/span_context.h"
 #include "opentelemetry/trace/span_id.h"
 #include "opentelemetry/trace/trace_id.h"
 #include "opentelemetry/version.h"
+
+#include <map>
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace sdk
@@ -46,8 +51,48 @@ public:
    * Add an event to a span.
    * @param name the name of the event
    * @param timestamp the timestamp of the event
+   * @param attributes the attributes associated with the event
    */
-  virtual void AddEvent(nostd::string_view name, core::SystemTimestamp timestamp) noexcept = 0;
+  virtual void AddEvent(nostd::string_view name,
+                        core::SystemTimestamp timestamp,
+                        const trace_api::KeyValueIterable &attributes) noexcept = 0;
+
+  /**
+   * Add an event to a span with default timestamp and attributes.
+   * @param name the name of the event
+   */
+  void AddEvent(nostd::string_view name)
+  {
+    AddEvent(name, core::SystemTimestamp(std::chrono::system_clock::now()),
+             opentelemetry::sdk::GetEmptyAttributes());
+  }
+
+  /**
+   * Add an event to a span with default (empty) attributes.
+   * @param name the name of the event
+   * @param timestamp the timestamp of the event
+   */
+  void AddEvent(nostd::string_view name, core::SystemTimestamp timestamp)
+  {
+    AddEvent(name, timestamp, opentelemetry::sdk::GetEmptyAttributes());
+  }
+
+  /**
+   * Add a link to a span.
+   * @param span_context the span context of the linked span
+   * @param attributes the attributes associated with the link
+   */
+  virtual void AddLink(opentelemetry::trace::SpanContext span_context,
+                       const trace_api::KeyValueIterable &attributes) noexcept = 0;
+
+  /**
+   * Add a link to a span with default (empty) attributes.
+   * @param span_context the span context of the linked span
+   */
+  void AddLink(opentelemetry::trace::SpanContext span_context)
+  {
+    AddLink(span_context, opentelemetry::sdk::GetEmptyAttributes());
+  }
 
   /**
    * Set the status of the span.

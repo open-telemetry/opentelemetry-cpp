@@ -1,4 +1,4 @@
-foreach(testname  gauge_aggregator_test min_max_sum_count_aggregator_test)
+foreach(testname meter_provider_sdk_test gauge_aggregator_test min_max_sum_count_aggregator_test)
     add_executable(${testname} "${testname}.cc")
     target_link_libraries(${testname} ${GTEST_BOTH_LIBRARIES}
             ${CMAKE_THREAD_LIBS_INIT} opentelemetry_metrics)
