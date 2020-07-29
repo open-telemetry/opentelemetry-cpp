@@ -225,7 +225,7 @@ TEST(HTTPTextFormatTest, TraceStateKeys)
     // Test for valid key patterns in the tracestate
     std::string trace_state_value = "1a-2f@foo=bar1,1a-_*/2b@foo=bar2,foo=bar3,foo-_*/bar=bar4";
     const std::map<std::string,std::string> carrier = { {"traceparent", "00-12345678901234567890123456789012-1234567890123456-00"},
-                                                               {"tracestate", tracestate_value} };
+                                                               {"tracestate", trace_state_value} };
     nostd::shared_ptr<trace::Span> sp{new trace::DefaultSpan()};
     context::Context ctx1 = context::Context("current-span",sp);
     context::Context ctx2 = format.Extract(Getter,carrier,ctx1);
