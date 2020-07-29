@@ -68,7 +68,8 @@ class DefaultSpan: public Span {
     DefaultSpan(const DefaultSpan& spn) : span_context_(spn.GetContext()) {}
 
     trace::Tracer &tracer() const noexcept {
-       return trace::Tracer(); // Invalid tracer
+      trace::Tracer tracer = trace::Tracer();
+      return tracer; // Invalid tracer
     }
 
     // Creates an instance of this class with spancontext.
