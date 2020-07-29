@@ -24,7 +24,7 @@ class DefaultSpan: public Span {
         return false;
     }
 
-    void SetAttribute(nostd::string_view key, const common::AttributeValue &&value) noexcept {
+    void SetAttribute(nostd::string_view key, const common::AttributeValue &value) noexcept {
       pass;
     }
 
