@@ -56,7 +56,7 @@ TEST(HTTPTextFormatTest, TraceFlagsBufferGeneration)
     EXPECT_EQ(map_http_trace_context::GenerateTraceFlagsFromString("00"),flags);
 }
 
-TEST(HTTPTextFormatTest, GeneralTest)
+TEST(HTTPTextFormatTest, HeadersWithTraceState)
 {
     const std::map<std::string,std::string> carrier = {{"traceparent","00-4bf92f3577b34da6a3ce929d0e0e4736-0102030405060708-01"},{"tracestate","congo=congosSecondPosition,rojo=rojosFirstPosition"}};
     nostd::shared_ptr<trace::Span> sp{new trace::DefaultSpan()};
@@ -84,54 +84,6 @@ TEST(HTTPTextFormatTest, NoTraceParentHeader)
     EXPECT_EQ(span->GetContext().trace_state(),trace::SpanContext().trace_state());
 }
 
-//TEST(HTTPTextFormatTest, HeadersWithTraceState)
-//{
-//    // When there is a trace parent and trace state header, data from
-//    // both should be added to the SpanContext.
-//    nostd::string_view trace_parent_value = "00-"+ trace_id + "-" + span_id + "-00";
-//    nostd::string_view trace_state_value = "foo=1,bar=2,baz=3";
-//    std::map<nostd::string_view,nostd:string_view> carrier = { {"traceparent", trace_parent_value},
-//                                                              {"tracestate", trace_state_value} };
-//    trace::SpanContext span_context = trace::propagation::GetCurrentSpan(
-//        format.Extract(
-//            Getter,
-//            carrier,
-//            Context()
-//        )
-//    ).GetContext();
-//    EXPECT_EQ(span_context.trace_id(), TraceId(nostd::span(trace_id,trace_id.length())));
-//    EXPECT_EQ(span_context.span_id(), SpanId(nostd::span(span_id,span_id.length())));
-//    EXPECT_EQ(span_context.trace_state(), {"foo": "1", "bar": "2", "baz": "3"}); // I am not certain how to create a trace state from map yet. Meeting with host hopefully to solve this
-//    EXPECT_TRUE(span_context.HasRemoteParent());
-//    std::map<nostd::string_view,nostd::string_view> carrier = {};
-//    Span span = trace.DefaultSpan(span_context);
-//
-//    context::Context ctx = trace.SetSpanInContext(span,context::Context());
-//    format.Inject(Setter, carrier, ctx);
-//    EXPECT_EQ(carrier["traceparent"], traceparent_value);
-//    int count = 0;
-//    int start = -1;
-//    int end = -1;
-//    nostd::string_view trace_state_string = carrier["tracestate"];
-//    for (int i = 0; i <= trace_state_string.length(); i++) {
-//        if (trace_state_string[i] == ',' || i == trace_state_string.length()) {
-//            count++;
-//            nostd::string_view str = trace_state_string.substr(start,end);
-//            start = -1;
-//            end = -1;
-//            EXPECT_TRUE(str == "foo=1" || str == "bar=2" || str == "baz=3");
-//        } else {
-//            if (trace_state_string[i] != ' ' && start == -1) {
-//                start = i;
-//            }
-//            if (trace_state_string[i] != ' ') {
-//                end = i;
-//            }
-//        }
-//    }
-//    EXPECT_EQ(count, 3);
-//}
-//
 TEST(HTTPTextFormatTest, InvalidTraceId)
 {
     // If the trace id is invalid, we must ignore the full trace parent header,
@@ -236,41 +188,3 @@ TEST(HTTPTextFormatTest, TraceStateKeys)
     EXPECT_TRUE(trace_state.Get("foo", "bar3"));
     EXPECT_TRUE(trace_state.Get("foo-_*/bar", "bar4"));
 }
-
-
-// Dilapidated Tests:
-//// I am not very sure how to make tests for httpformat_test as some functions output complex objects which cannot be
-//// compared with some hard coded answers.
-//TEST(HTTPTextFormatTest, DefaultConstructionNoCrash)
-//{
-//    HTTPTextFormat httptextformat = HTTPTextFormat();
-//}
-//
-//TEST(HTTPTextFormatTest, ExtractNoCrush)
-//{
-//    HTTPTextFormat httptextformat = HTTPTextFormat();
-//    Context ctx = Context();
-//    std::map<char,int> carrier;
-//    extract(getter, carrier, ctx);
-//}
-//
-//TEST(HTTPTextFormatTest, InjectNoCrush)
-//{
-//    HTTPTextFormat httptextformat = HTTPTextFormat();
-//    Context ctx = Context();
-//    std::map<char,int> carrier = {{'1',1},{'2',2},{'3',3}};
-//    inject(setter, carrier, ctx);
-//}
-//
-//// In this test we want to see the after injecting a header's information into a context,
-//// when we extract it it will give use back the same information for the header info.
-//TEST(HTTPTextFormatTest, CompositeOperations)
-//{
-//    HTTPTextFormat httptextformat = HTTPTextFormat();
-//    Context ctx = Context();
-//    std::map<char,int> carrier = {{'1',1},{'2',2},{'3',3}};
-//    inject(setter, carrier, ctx);
-//    std::map<char,int> res;
-//    extract(getter, res, ctx);
-//    EXPECT_EQ(res, carrier);
-//}
