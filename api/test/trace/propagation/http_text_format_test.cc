@@ -154,7 +154,7 @@ TEST(HTTPTextFormatTest, InvalidParentId)
     // If the parent id is invalid, we must ignore the full trace parent
     // header.
     // Also ignore any trace state.
-    const std::map<nostd::string_view,nostd::string_view> carrier = { {"traceparent", "00-00000000000000000000000000000000-0000000000000000-00"},
+    const std::map<std::string,std::string> carrier = { {"traceparent", "00-00000000000000000000000000000000-0000000000000000-00"},
                                                                {"tracestate", "foo=1,bar=2,foo=3"} };
     nostd::shared_ptr<trace::Span> sp{new trace::DefaultSpan()};
     context::Context ctx1 = context::Context("current-span",sp);
