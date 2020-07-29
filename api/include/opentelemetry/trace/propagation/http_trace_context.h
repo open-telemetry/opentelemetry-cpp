@@ -36,15 +36,13 @@ namespace propagation
 {
 static const nostd::string_view kTraceParent = "traceparent";
 static const nostd::string_view kTraceState = "tracestate";
-// Parameters no longer needed because the toString functions are resolved else where
 static const int kVersionBytes = 2;
 static const int kTraceIdBytes = 32;
-static const int kParentIdBytes = 16;
+static const int kSpanIdBytes = 16;
 static const int kTraceFlagBytes = 2;
 static const int kTraceDelimiterBytes = 3;
-static const int kHeaderSize = kVersionBytes + kTraceIdBytes + kParentIdBytes + kTraceFlagBytes + kTraceDelimiterBytes;
+static const int kHeaderSize = kVersionBytes + kTraceIdBytes + kSpanIdBytes + kTraceFlagBytes + kTraceDelimiterBytes;
 static const int kTraceStateMaxMembers = 32;
-static const nostd::string_view kTraceStateKeyValueDelimiter = "=";
 static const int kHeaderElementLengths[4] = {2,32,16,2};
 // The HttpTraceContext provides methods to extract and inject
 // context into headers of HTTP requests with traces.
@@ -175,7 +173,11 @@ class HttpTraceContext : public HTTPTextFormat<T> {
             bool is_valid = trace_parent.length() == kHeaderSize
                             && trace_parent[kVersionBytes] == '-'
                             && trace_parent[kVersionBytes+kTraceIdBytes+1] == '-'
+<<<<<<< Updated upstream
                             && trace_parent[kVersionBytes+kTraceIdBytes+kParentIdBytes+2] == '-';
+=======
+                            && trace_parent[kVersionBytes+kTraceIdBytes+kSpanIdBytes+2] == '-';
+>>>>>>> Stashed changes
             if (!is_valid) {
                 std::cout<<"Unparseable trace_parent header. Returning INVALID span context."<<std::endl;
                 return SpanContext();
@@ -286,7 +288,10 @@ class HttpTraceContext : public HTTPTextFormat<T> {
             }
 
             nostd::string_view trace_state_header = getter(carrier, kTraceState);
+<<<<<<< Updated upstream
 //            trace_state_header = nostd::string_view(carrier[std::string(kTraceState)]);
+=======
+>>>>>>> Stashed changes
 
             if (trace_state_header == "" || trace_state_header.empty()) {
                 return context_from_parent_header;
