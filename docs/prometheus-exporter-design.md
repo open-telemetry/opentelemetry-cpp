@@ -121,7 +121,7 @@ public:
      * Exports a batch of Metric Records. The behavior will be decided in the 
      * implementation.
      */
-    ReturnCodes export(Collection<Record> records);
+    ReturnCodes export(Collection<Record> &records);
     
     /**
      * Shut down the exporter.
@@ -167,7 +167,7 @@ class PrometheusExporter : public MetricsExporter {
     /*
      * Implement the export function in the interface
      */
-    ReturnCodes export(Collection<Record> records) {
+    ReturnCodes export(Collection<Record> &records) {
         if (!this.isShutdown) {
             // 1. Add the input records to the data stucture inside the collector.
             // 2. Return ExportResult
@@ -284,7 +284,7 @@ public:
      *
      * This function may also need a lock.
      */
-    void addMetricData(Collection<Record> records) {
+    void addMetricData(Collection<Record> &records) {
         // 1. The Controller calls export() function to send 
         //    processed metrics data,
         // 2. export() function then calls this function to add
