@@ -67,6 +67,7 @@ class DefaultSpan: public Span {
     DefaultSpan(DefaultSpan&& spn) : span_context_(spn.GetContext()) {}
     DefaultSpan(const DefaultSpan& spn) : span_context_(spn.GetContext()) {}
 
+    // This is an invalid implementation
     trace::Tracer &tracer() const noexcept {
       trace::Tracer tracer = trace::Tracer();
       return tracer; // Invalid tracer
