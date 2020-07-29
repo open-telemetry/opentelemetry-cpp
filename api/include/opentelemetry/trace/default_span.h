@@ -67,9 +67,9 @@ class DefaultSpan: public Span {
     DefaultSpan(DefaultSpan&& spn) : span_context_(spn.GetContext()) {}
     DefaultSpan(const DefaultSpan& spn) : span_context_(spn.GetContext()) {}
 
-//    trace::Tracer &tracer() const noexcept {
-//       return trace::Tracer(); // Invalid tracer
-//    }
+    trace::Tracer &tracer() noexcept {
+      return tracer_; // Invalid tracer
+    }
 
     // Creates an instance of this class with spancontext.
     static DefaultSpan Create(SpanContext span_context) {
@@ -78,6 +78,7 @@ class DefaultSpan: public Span {
 
   private:
     SpanContext span_context_;
+    trace::Tracer tracer_;
 };
 }
 OPENTELEMETRY_END_NAMESPACE

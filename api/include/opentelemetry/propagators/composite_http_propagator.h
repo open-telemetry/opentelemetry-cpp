@@ -26,6 +26,12 @@ namespace propagators
     template <typename T>
     class CompositeHTTPPropagator(trace::propagation::HTTPTextFormat<T>) {
         public:
+            // Rules that manages how context will be extracted from carrier.
+            using Getter = nostd::string_view(*)(const T &carrier, nostd::string_view trace_type);
+
+            // Rules that manages how context will be injected to carrier.
+            using Setter = void(*)(T &carrier, nostd::string_view trace_type,nostd::string_view trace_description);
+
             // Initializes a Composite Http Propagator with given propagators
             CompositeHTTPPropagator(nostd::span<trace::propagation::HTTPTextFormat> &propagators) {
                 this.propagators_ = propagators;
