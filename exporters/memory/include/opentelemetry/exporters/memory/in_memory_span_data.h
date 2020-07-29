@@ -20,9 +20,9 @@ namespace memory
 class InMemorySpanData final
 {
 public:
-  void Add(std::unique_ptr<sdk::trace::SpanData> data) noexcept {}
+  void Add(std::unique_ptr<sdk::trace::SpanData> data) noexcept;
 
-  std::vector<sdk::trace::SpanData> GetSpans() noexcept {}
+  std::vector<sdk::trace::SpanData> GetSpans() noexcept;
 
 private:
   CircularBuffer<sdk::trace::SpanData> spans_received_;
