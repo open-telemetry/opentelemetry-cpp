@@ -186,8 +186,24 @@ class ThreadsafeSpanData final : public opentelemetry::sdk::trace::Recordable {
   }
 
   ThreadsafeSpanData(){};
+  ThreadsafeSpanData(const ThreadsafeSpanData &threadsafe_span_data) : ThreadsafeSpanData(
+      threadsafe_span_data, std::lock_guard<std::mutex>(threadsafe_span_data.mutex_))
+  {}
 
  private:
+  ThreadsafeSpanData(const ThreadsafeSpanData &threadsafe_span_data, const std::lock_guard<std::mutex> &)
+   :trace_id_(threadsafe_span_data.trace_id_),
+    span_id_(threadsafe_span_data.span_id_),
+    parent_span_id_(threadsafe_span_data.parent_span_id_),
+    start_time_(threadsafe_span_data.start_time_),
+    duration_(threadsafe_span_data.duration_),
+    name_(threadsafe_span_data.name_),
+    status_code_(threadsafe_span_data.status_code_),
+    status_desc_(threadsafe_span_data.status_desc_),
+    attributes_(threadsafe_span_data.attributes_),
+    events_(threadsafe_span_data.events_),
+    converter_(threadsafe_span_data.converter_){}
+    
   mutable std::mutex mutex_;
   opentelemetry::trace::TraceId trace_id_;
   opentelemetry::trace::SpanId span_id_;
