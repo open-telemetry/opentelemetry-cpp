@@ -21,15 +21,15 @@ class ObserverResult
 public:
   ObserverResult() = default;
 
-  ObserverResult(AsynchronousInstrument<T> * instrument): instrument_(instrument) {}
+  ObserverResult(AsynchronousInstrument<T> *instrument) : instrument_(instrument) {}
 
-  virtual void observe(T value, const trace::KeyValueIterable &labels) {
-      instrument_->observe(value, labels);
+  virtual void observe(T value, const trace::KeyValueIterable &labels)
+  {
+    instrument_->observe(value, labels);
   }
-    
-private:
-    AsynchronousInstrument<T> * instrument_;
 
+private:
+  AsynchronousInstrument<T> *instrument_;
 };
 
 }  // namespace metrics
