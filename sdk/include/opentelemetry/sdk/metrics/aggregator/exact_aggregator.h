@@ -30,16 +30,16 @@ namespace metrics
  *
  * @tparam T the type of values stored in this aggregator.
  */
-template<class T>
+template <class T>
 class ExactAggregator : public Aggregator<T>
 {
 public:
   ExactAggregator(metrics_api::InstrumentKind kind, bool quant_estimation = false)
   {
     static_assert(std::is_arithmetic<T>::value, "Not an arithmetic type");
-    this->kind_ = kind;
+    this->kind_       = kind;
     this->checkpoint_ = this->values_;
-    this->agg_kind_ = AggregatorKind::Exact;
+    this->agg_kind_   = AggregatorKind::Exact;
     quant_estimation_ = quant_estimation;
   }
 
@@ -47,10 +47,10 @@ public:
 
   ExactAggregator(const ExactAggregator &cp)
   {
-    this->values_ = cp.values_;
+    this->values_     = cp.values_;
     this->checkpoint_ = cp.checkpoint_;
-    this->kind_ = cp.kind_;
-    this->agg_kind_ = cp.agg_kind_;
+    this->kind_       = cp.kind_;
+    this->agg_kind_   = cp.agg_kind_;
     quant_estimation_ = cp.quant_estimation_;
     // use default initialized mutex as they cannot be copied
   }
@@ -97,7 +97,8 @@ public:
       // First merge values
       this->values_.insert(this->values_.end(), other.values_.begin(), other.values_.end());
       // Now merge checkpoints
-      this->checkpoint_.insert(this->checkpoint_.end(), other.checkpoint_.begin(), other.checkpoint_.end());
+      this->checkpoint_.insert(this->checkpoint_.end(), other.checkpoint_.begin(),
+                               other.checkpoint_.end());
       this->mu_.unlock();
     }
     else
@@ -117,21 +118,21 @@ public:
   {
     if (!quant_estimation_)
     {
-      // Log error
-      #if __EXCEPTIONS
-        throw std::domain_error("Exact aggregator is not in quantile estimation mode!");
-      #else
-        std::terminate();
-      #endif
+// Log error
+#if __EXCEPTIONS
+      throw std::domain_error("Exact aggregator is not in quantile estimation mode!");
+#else
+      std::terminate();
+#endif
     }
     if (this->checkpoint_.size() == 0 || q < 0 || q > 1)
     {
-      // Log error
-      #if __EXCEPTIONS
-        throw std::invalid_argument("Arg 'q' must be between 0 and 1, inclusive");
-      #else
-        std::terminate();
-      #endif
+// Log error
+#if __EXCEPTIONS
+      throw std::invalid_argument("Arg 'q' must be between 0 and 1, inclusive");
+#else
+      std::terminate();
+#endif
     }
     else if (q == 0 || this->checkpoint_.size() == 1)
     {
@@ -144,30 +145,21 @@ public:
     else
     {
       float position = float(this->checkpoint_.size() - 1) * q;
-      int ceiling = ceil(position);
+      int ceiling    = ceil(position);
       return this->checkpoint_[ceiling];
     }
   }
 
   //////////////////////////ACCESSOR FUNCTIONS//////////////////////////
-  std::vector<T> get_checkpoint() override
-  {
-    return this->checkpoint_;
-  }
+  std::vector<T> get_checkpoint() override { return this->checkpoint_; }
 
-  std::vector<T> get_values() override
-  {
-    return this->values_;
-  }
+  std::vector<T> get_values() override { return this->values_; }
 
-  bool get_quant_estimation() override
-  {
-    return quant_estimation_;
-  }
+  bool get_quant_estimation() override { return quant_estimation_; }
 
 private:
-  bool quant_estimation_; // Used to switch between in-order and quantile estimation modes
+  bool quant_estimation_;  // Used to switch between in-order and quantile estimation modes
 };
-}
-}
+}  // namespace metrics
+}  // namespace sdk
 OPENTELEMETRY_END_NAMESPACE

@@ -76,9 +76,9 @@ TEST(ExactAggregatorOrdered, Types)
 {
   // This test verifies that we do not encounter any errors when
   // using various numeric types.
-  auto agg_int = new ExactAggregator<int>(opentelemetry::metrics::InstrumentKind::Counter);
-  auto agg_long = new ExactAggregator<long>(opentelemetry::metrics::InstrumentKind::Counter);
-  auto agg_float = new ExactAggregator<float>(opentelemetry::metrics::InstrumentKind::Counter);
+  auto agg_int    = new ExactAggregator<int>(opentelemetry::metrics::InstrumentKind::Counter);
+  auto agg_long   = new ExactAggregator<long>(opentelemetry::metrics::InstrumentKind::Counter);
+  auto agg_float  = new ExactAggregator<float>(opentelemetry::metrics::InstrumentKind::Counter);
   auto agg_double = new ExactAggregator<double>(opentelemetry::metrics::InstrumentKind::Counter);
 
   for (int i = 1; i <= 5; ++i)
@@ -141,12 +141,13 @@ TEST(ExactAggregatorQuant, Checkpoint)
   agg->update(-1);
 
   // The vector MUST be sorted when checkpointed
-  correct.push_back(-1); correct.push_back(0); correct.push_back(1);
+  correct.push_back(-1);
+  correct.push_back(0);
+  correct.push_back(1);
   agg->checkpoint();
 
   ASSERT_EQ(agg->get_checkpoint(), correct);
 }
-
 
 TEST(ExactAggregatorQuant, Quantile)
 {
@@ -155,7 +156,7 @@ TEST(ExactAggregatorQuant, Quantile)
 
   auto agg = new ExactAggregator<int>(opentelemetry::metrics::InstrumentKind::Counter, true);
 
-  std::vector<int> tmp {3, 9, 42, 57, 163, 210, 272, 300};
+  std::vector<int> tmp{3, 9, 42, 57, 163, 210, 272, 300};
   for (int i : tmp)
   {
     agg->update(i);
@@ -172,7 +173,7 @@ TEST(ExactAggregatorInOrder, Quantile)
   // an exception will be thrown if they call the quantile() function.
   auto agg = new ExactAggregator<int>(opentelemetry::metrics::InstrumentKind::Counter);
 
-  std::vector<int> tmp {3, 9, 42, 57, 163, 210, 272, 300};
+  std::vector<int> tmp{3, 9, 42, 57, 163, 210, 272, 300};
   for (int i : tmp)
   {
     agg->update(i);
