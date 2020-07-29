@@ -15,10 +15,10 @@ const int kNumIterations = 1000;
 
 const trace::TraceId kTraceId(std::array<const uint8_t, trace::TraceId::kSize>(
     {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1}));
-const trace::SpanId kSpanId(std::array<const uint8_t, trace::SpanId::kSize>(
-    {0, 0, 0, 0, 0, 0, 0, 2}));
-const trace::SpanId kParentSpanId(std::array<const uint8_t, trace::SpanId::kSize>(
-    {0, 0, 0, 0, 0, 0, 0, 3}));
+const trace::SpanId kSpanId(std::array<const uint8_t, trace::SpanId::kSize>({0, 0, 0, 0, 0, 0, 0,
+                                                                             2}));
+const trace::SpanId kParentSpanId(std::array<const uint8_t, trace::SpanId::kSize>({0, 0, 0, 0, 0, 0,
+                                                                                   0, 3}));
 
 // ----------------------- Helper classes and functions ------------------------
 
@@ -120,7 +120,7 @@ void BM_OtlpExporterEmptySpans(benchmark::State &state)
   std::unique_ptr<OtlpExporterTestPeer> testpeer(new OtlpExporterTestPeer());
   auto exporter = testpeer->GetExporter();
 
-  while(state.KeepRunningBatch(kNumIterations))
+  while (state.KeepRunningBatch(kNumIterations))
   {
     std::array<std::unique_ptr<sdk::trace::Recordable>, kBatchSize> recordables;
     CreateEmptySpans(recordables);
@@ -135,7 +135,7 @@ void BM_OtlpExporterSparseSpans(benchmark::State &state)
   std::unique_ptr<OtlpExporterTestPeer> testpeer(new OtlpExporterTestPeer());
   auto exporter = testpeer->GetExporter();
 
-  while(state.KeepRunningBatch(kNumIterations))
+  while (state.KeepRunningBatch(kNumIterations))
   {
     std::array<std::unique_ptr<sdk::trace::Recordable>, kBatchSize> recordables;
     CreateSparseSpans(recordables);
@@ -150,7 +150,7 @@ void BM_OtlpExporterDenseSpans(benchmark::State &state)
   std::unique_ptr<OtlpExporterTestPeer> testpeer(new OtlpExporterTestPeer());
   auto exporter = testpeer->GetExporter();
 
-  while(state.KeepRunningBatch(kNumIterations))
+  while (state.KeepRunningBatch(kNumIterations))
   {
     std::array<std::unique_ptr<sdk::trace::Recordable>, kBatchSize> recordables;
     CreateDenseSpans(recordables);

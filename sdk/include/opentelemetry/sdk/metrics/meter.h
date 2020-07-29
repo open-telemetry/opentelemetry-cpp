@@ -13,8 +13,7 @@ namespace metrics
 class Meter final : public opentelemetry::metrics::Meter, public std::enable_shared_from_this<Meter>
 {
 public:
-
 };
-}  // namespace trace
+}  // namespace metrics
 }  // namespace sdk
 OPENTELEMETRY_END_NAMESPACE
