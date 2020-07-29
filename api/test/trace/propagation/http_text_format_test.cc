@@ -195,16 +195,18 @@ TEST(HTTPTextFormatTest, FormatNotSupported)
     EXPECT_EQ(span->GetContext().trace_flags(),trace::SpanContext().trace_flags());
     EXPECT_EQ(span->GetContext().trace_state(),trace::SpanContext().trace_state());
 }
-//
-//TEST(HTTPTextFormatTest, PropagateInvalidContext)
-//{
-//    // Do not propagate invalid trace context.
-//    std::map<nostd::string_view,nostd:string_view> carrier = {};
-//    context::Context ctx = trace::propagation::SetSpanInContext(trace::DefaultSpan.GetInvalid());
-//    format.Inject(Setter, carrier, ctx);
-//    EXPECT_TRUE(carrier.count("traceparent") == 0);
-//}
-//
+
+TEST(HTTPTextFormatTest, PropagateInvalidContext)
+{
+    // Do not propagate invalid trace context.
+    std::map<std::string,std:string> carrier = {};
+    nostd::shared_ptr<trace::Span> sp{new trace::DefaultSpan(trace::SpanContext.GetInvalid())};
+
+    context::Context ctx{sp};
+    format.Inject(Setter, carrier, ctx);
+    EXPECT_TRUE(carrier.count("traceparent") == 0);
+}
+
 //TEST(HTTPTextFormatTest, TraceStateHeaderWithTrailingComma)
 //{
 //    // Do not propagate invalid trace context.
