@@ -199,7 +199,7 @@ TEST(HTTPTextFormatTest, FormatNotSupported)
 TEST(HTTPTextFormatTest, PropagateInvalidContext)
 {
     // Do not propagate invalid trace context.
-    std::map<std::string,std:string> carrier = {};
+    std::map<std::string,std::string> carrier = {};
     nostd::shared_ptr<trace::Span> sp{new trace::DefaultSpan(trace::SpanContext.GetInvalid())};
 
     context::Context ctx{sp};
