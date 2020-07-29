@@ -1,5 +1,12 @@
-foreach(testname key_value_iterable_view_test noop_test provider_test
-                 span_id_test trace_id_test trace_flags_test span_context_test)
+foreach(
+  testname
+  key_value_iterable_view_test
+  noop_test
+  provider_test
+  span_id_test
+  trace_id_test
+  trace_flags_test
+  span_context_test)
   add_executable(${testname} "${testname}.cc")
   target_link_libraries(${testname} ${GTEST_BOTH_LIBRARIES}
                         ${CMAKE_THREAD_LIBS_INIT} opentelemetry_api)
