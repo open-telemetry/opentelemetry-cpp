@@ -22,6 +22,8 @@ struct StartSpanOptions;
 
 class Tracer
 {
+public:
+    Tracer() = default;
 //public:
 //  virtual ~Tracer() = default;
 //  /**
