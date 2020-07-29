@@ -20,6 +20,8 @@ namespace memory
 class InMemorySpanData final
 {
 public:
+  InMemorySpanData();
+
   void Add(std::unique_ptr<sdk::trace::SpanData> data) noexcept;
 
   std::vector<sdk::trace::SpanData> GetSpans() noexcept;

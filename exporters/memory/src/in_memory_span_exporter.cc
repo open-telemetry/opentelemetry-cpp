@@ -7,6 +7,9 @@ namespace exporter
 {
 namespace memory
 {
+InMemorySpanExporter::InMemorySpanExporter()
+{}
+
 std::unique_ptr<sdk::trace::Recordable> InMemorySpanExporter::MakeRecordable() noexcept
 {
   return std::unique_ptr<sdk::trace::Recordable>(new sdk::trace::SpanData);
