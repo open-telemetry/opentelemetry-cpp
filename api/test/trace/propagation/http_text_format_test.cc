@@ -207,21 +207,21 @@ TEST(HTTPTextFormatTest, PropagateInvalidContext)
     EXPECT_TRUE(carrier.count("traceparent") == 0);
 }
 
-//TEST(HTTPTextFormatTest, TraceStateHeaderWithTrailingComma)
-//{
-//    // Do not propagate invalid trace context.
-//    std::map<nostd::string_view,nostd:string_view> carrier = { {"traceparent", "00-12345678901234567890123456789012-1234567890123456-00"},
-//                                                               {"tracestate", "foo=1,"} };
-//    trace::Span span = trace::propagation::GetCurrentSpan(
-//        format.Extract(
-//            Getter,
-//            carrier,
-//            Context()
-//        )
-//    );
-//    EXPECT_EQ(span.GetContext().trace_state()["foo"], "1");
-//}
-//
+TEST(HTTPTextFormatTest, TraceStateHeaderWithTrailingComma)
+{
+    // Do not propagate invalid trace context.
+    std::map<nostd::string_view,nostd:string_view> carrier = { {"traceparent", "00-12345678901234567890123456789012-1234567890123456-00"},
+                                                               {"tracestate", "foo=1,"} };
+    trace::Span span = trace::propagation::GetCurrentSpan(
+        format.Extract(
+            Getter,
+            carrier,
+            Context()
+        )
+    );
+    EXPECT_EQ(span.GetContext().trace_state()["foo"], "1");
+}
+
 //TEST(HTTPTextFormatTest, TraceStateKeys)
 //{
 //    // Test for valid key patterns in the tracestate

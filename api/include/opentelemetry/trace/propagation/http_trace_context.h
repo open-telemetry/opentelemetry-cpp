@@ -246,7 +246,7 @@ class HttpTraceContext : public HTTPTextFormat<T> {
                     if (start_pos == -1 && end_pos == -1) continue;
                     element_num++;
                     list_member = trace_state_header.substr(start_pos,end_pos-start_pos+1);
-                    AddNewMember(trace_state,list_member);
+                    if (list_member!="") AddNewMember(trace_state,list_member);
                     end_pos = -1;
                     start_pos = -1;
                 } else {
@@ -256,7 +256,7 @@ class HttpTraceContext : public HTTPTextFormat<T> {
             }
             if (start_pos!=-1 && end_pos!=-1) {
                 list_member = trace_state_header.substr(start_pos,end_pos-start_pos+1);
-                AddNewMember(trace_state,list_member);
+                if (list_member!="") AddNewMember(trace_state,list_member);
                 element_num++;
             }
 
