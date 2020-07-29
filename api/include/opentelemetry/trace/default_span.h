@@ -78,7 +78,7 @@ class DefaultSpan: public Span {
 
   private:
     SpanContext span_context_;
-    trace::Tracer tracer_;
+    const trace::Tracer tracer_;
 };
 }
 OPENTELEMETRY_END_NAMESPACE
