@@ -10,12 +10,7 @@ using opentelemetry::exporter::memory::InMemorySpanExporter;
 
 TEST(SimpleSpanProcessor, ToInMemorySpanExporter)
 {
-  std::shared_ptr<bool> shutdown_called(new bool(false));
-
-  std::shared_ptr<std::vector<std::unique_ptr<SpanData>>> spans_received(
-      new std::vector<std::unique_ptr<SpanData>>);
-
-  std::unique_ptr<SpanExporter> exporter(new InMemorySpanExporter(spans_received, shutdown_called));
+  std::unique_ptr<SpanExporter> exporter(new InMemorySpanExporter());
   SimpleSpanProcessor processor(std::move(exporter));
 
   auto recordable = processor.MakeRecordable();

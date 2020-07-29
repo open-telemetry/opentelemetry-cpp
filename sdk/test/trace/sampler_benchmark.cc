@@ -108,10 +108,7 @@ BENCHMARK(BM_ProbabilitySamplerShouldSample);
 // Sampler Helper Function
 void BenchmarkSpanCreation(std::shared_ptr<Sampler> sampler, benchmark::State &state)
 {
-  std::shared_ptr<std::vector<std::unique_ptr<SpanData>>> spans_received(
-      new std::vector<std::unique_ptr<SpanData>>);
-
-  std::unique_ptr<SpanExporter> exporter(new InMemorySpanExporter(spans_received));
+  std::unique_ptr<SpanExporter> exporter(new InMemorySpanExporter());
   auto processor = std::make_shared<SimpleSpanProcessor>(std::move(exporter));
   auto tracer    = std::shared_ptr<opentelemetry::trace::Tracer>(new Tracer(processor, sampler));
 
