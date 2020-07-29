@@ -188,7 +188,7 @@ TEST(HTTPTextFormatTest, FormatNotSupported)
     nostd::shared_ptr<trace::Span> sp{new trace::DefaultSpan()};
     context::Context ctx1 = context::Context("current-span",sp);
     context::Context ctx2 = format.Extract(Getter,carrier,ctx1);
-    trace::Span span = map_http_trace_context::GetCurrentSpan(ctx2);
+    trace::Span* span = map_http_trace_context::GetCurrentSpan(ctx2);
     EXPECT_FALSE(span->GetContext().IsValid());
     EXPECT_EQ(span->GetContext().trace_id(),trace::SpanContext().trace_id());
     EXPECT_EQ(span->GetContext().span_id(),trace::SpanContext().span_id());
