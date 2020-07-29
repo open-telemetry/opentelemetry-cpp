@@ -154,7 +154,7 @@ public:
   // AddEvent).
   virtual bool IsRecording() const noexcept = 0;
 
-  virtual trace::Tracer &tracer() noexcept = 0;
+  virtual trace::Tracer &tracer() const noexcept = 0;
 };
 }  // namespace trace
 OPENTELEMETRY_END_NAMESPACE
