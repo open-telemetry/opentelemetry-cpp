@@ -56,19 +56,10 @@ TEST(HTTPTextFormatTest, TraceFlagsBufferGeneration)
     EXPECT_EQ(map_http_trace_context::GenerateTraceFlagsFromString("00"),flags);
 }
 
-//TEST(HTTPTextFormatTest, TEST1)
-//{
-//    nostd::shared_ptr<trace::SpanContext> spc(new trace::SpanContext(
-//        trace::propagation::HttpTraceContext<std::map<std::string,std::string>>::TraceId(GenerateTraceIdFromString("")),
-//        trace::propagation::HttpTraceContext<std::map<std::string,std::string>>::SpanId(GenerateSpanIdFromString("")),
-//        trace::propagation::HttpTraceContext<std::map<std::string,std::string>>::TraceFlags(GenerateTraceFlagsFromString("")),
-//        ));
-//}
-
-TEST(HTTPTextFormatTest, NoSpanTest)
+TEST(HTTPTextFormatTest, GeneralTest)
 {
     const std::map<std::string,std::string> carrier = {{"traceparent","00-4bf92f3577b34da6a3ce929d0e0e4736-0102030405060708-01"},{"tracestate","congo=congosSecondPosition,rojo=rojosFirstPosition"}};
-    nostd::shared_ptr<trace::Span> sp{new trace::Span()};
+    nostd::shared_ptr<trace::Span> sp{new trace::DefaultSpan()};
     context::Context ctx1 = context::Context("current-span",sp);
     context::Context ctx2 = format.Extract(Getter,carrier,ctx1);
     std::map<std::string,std::string> c2 = {};
@@ -78,14 +69,20 @@ TEST(HTTPTextFormatTest, NoSpanTest)
     EXPECT_EQ(carrier.size(),c2.size());
 }
 
-//TEST(HTTPTextFormatTest, NoTraceParentHeader)
-//{
-//    // When trace context headers are not present, a new SpanContext
-//    // should be created.
-//    std::map<nostd::string_view,nostd::string_view> carrier = {};
-//    trace::Span span = trace::propagation::GetCurrentSpan(format.Extract(Getter, carrier, Context()));
-//    EXPECT_TRUE(span.GetContext() != NULL);
-//}
+TEST(HTTPTextFormatTest, NoTraceParentHeader)
+{
+    // When trace context headers are not present, a new SpanContext
+    // should be created.
+    const std::map<std::string,std::string> carrier = {};
+    nostd::shared_ptr<trace::Span> sp{new trace::DefaultSpan()};
+    context::Context ctx1 = context::Context("current-span",sp);
+    context::Context ctx2 = format.Extract(Getter, carrier, ctx1);
+    trace::Span* span = map_http_trace_context::GetCurrentSpan(ctx2);
+    EXPECT_EQ(span->GetContext().trace_id(),trace::SpanContext().trace_id());
+    EXPECT_EQ(span->GetContext().span_id(),trace::SpanContext().span_id());
+    EXPECT_EQ(span->GetContext().trace_flags(),trace::SpanContext().trace_flags());
+    EXPECT_EQ(span->GetContext().trace_state(),trace::SpanContext().trace_state());
+}
 
 //TEST(HTTPTextFormatTest, HeadersWithTraceState)
 //{
@@ -135,113 +132,110 @@ TEST(HTTPTextFormatTest, NoSpanTest)
 //    EXPECT_EQ(count, 3);
 //}
 //
-//TEST(HTTPTextFormatTest, InvalidTraceId)
-//{
-//    // If the trace id is invalid, we must ignore the full trace parent header,
-//    // and return a random, valid trace.
-//    // Also ignore any trace state.
-//    std::map<nostd::string_view,nostd:string_view> carrier = { {"traceparent", "00-00000000000000000000000000000000-1234567890123456-00"},
-//                                                               {"tracestate", "foo=1,bar=2,foo=3"} };
-//    trace::Span span = trace::propagation::GetCurrentSpan(
-//        format.Extract(
-//            Getter,
-//            carrier,
-//            Context();
-//        )
-//    );
-//    EXPECT_EQ(span.GetContext(), trace::SpanContext.GetInvalid());
-//}
-//
-//TEST(HTTPTextFormatTest, InvalidParentId)
-//{
-//    // If the parent id is invalid, we must ignore the full trace parent
-//    // header.
-//    // Also ignore any trace state.
-//    std::map<nostd::string_view,nostd:string_view> carrier = { {"traceparent", "00-00000000000000000000000000000000-0000000000000000-00"},
-//                                                               {"tracestate", "foo=1,bar=2,foo=3"} };
-//    trace::Span span = trace::propagation::GetCurrentSpan(
-//        format.Extract(
-//            Getter,
-//            carrier,
-//            Context()
-//        )
-//    );
-//    EXPECT_EQ(span.GetContext(), trace::SpanContext.GetInvalid());
-//}
-//
-//TEST(HTTPTextFormatTest, NoSendEmptyTraceState)
-//{
-//    // If the trace state is empty, do not set the header.
-//    std::map<nostd::string_view,nostd:string_view> carrier = {};
-//    trace::Span span = trace::DefaultSpan(
-//        trace::SpanContext.Create(TraceId(nostd::span(trace_id,trace_id.length())),
-//                                  SpanId(nostd::span(span_id,span_id.length())),
-//                                  TraceFlags(nostd::span("00",2)), TraceState());
-//    );
-//    context::Context ctx = trace::propagation::SetSpanInContext(span);
-//    format.Inject(Setter, carrier, ctx);
-//    EXPECT_TRUE(carrier.count("traceparent") > 0);
-//    EXPECT_FALSE(carrier.count("tracestate") > 0);
-//}
-//
-//TEST(HTTPTextFormatTest, FormatNotSupported)
-//{
-//    // If the trace parent does not adhere to the supported format, discard it and
-//    // create a new trace context.
-//    std::map<nostd::string_view,nostd:string_view> carrier = { {"traceparent", "00-12345678901234567890123456789012-1234567890123456-00-residue"},
-//                                                               {"tracestate", "foo=1,bar=2,foo=3"} };
-//    span = trace.get_current_span(
-//        format.Extract(
-//            get_as_list,
-//            carrier,
-//            Context()
-//        )
-//    );
-//    EXPECT_EQ(span.GetContext(), trace::SpanContext.GetInvalid());
-//}
-//
-//TEST(HTTPTextFormatTest, PropagateInvalidContext)
-//{
-//    // Do not propagate invalid trace context.
-//    std::map<nostd::string_view,nostd:string_view> carrier = {};
-//    context::Context ctx = trace::propagation::SetSpanInContext(trace::DefaultSpan.GetInvalid());
-//    format.Inject(Setter, carrier, ctx);
-//    EXPECT_TRUE(carrier.count("traceparent") == 0);
-//}
-//
-//TEST(HTTPTextFormatTest, TraceStateHeaderWithTrailingComma)
-//{
-//    // Do not propagate invalid trace context.
-//    std::map<nostd::string_view,nostd:string_view> carrier = { {"traceparent", "00-12345678901234567890123456789012-1234567890123456-00"},
-//                                                               {"tracestate", "foo=1,"} };
-//    trace::Span span = trace::propagation::GetCurrentSpan(
-//        format.Extract(
-//            Getter,
-//            carrier,
-//            Context()
-//        )
-//    );
-//    EXPECT_EQ(span.GetContext().trace_state()["foo"], "1");
-//}
-//
-//TEST(HTTPTextFormatTest, TraceStateKeys)
-//{
-//    // Test for valid key patterns in the tracestate
-//    nostd::string_view trace_state_value = "1a-2f@foo=bar1,1a-_*/2b@foo=bar2,foo=bar3,foo-_*/bar=bar4";
-//    std::map<nostd::string_view,nostd:string_view> carrier = { {"traceparent", "00-12345678901234567890123456789012-1234567890123456-00"},
-//                                                               {"tracestate", tracestate_value} };
-//    trace::Span span = trace::propagation::GetCurrentSpan(
-//        format.Extract(
-//            Getter,
-//            carrier,
-//            Context()
-//        )
-//    );
-//    EXPECT_EQ(span.GetContext().trace_state()["1a-2f@foo"], "bar1");
-//    EXPECT_EQ(span.GetContext().trace_state()["1a-_*/2b@foo"], "bar2");
-//    EXPECT_EQ(span.GetContext().trace_state()["foo"], "bar3");
-//    EXPECT_EQ(span.GetContext().trace_state()["foo-_*/bar"], "bar4");
-//}
+TEST(HTTPTextFormatTest, InvalidTraceId)
+{
+    // If the trace id is invalid, we must ignore the full trace parent header,
+    // and return a random, valid trace.
+    // Also ignore any trace state.
+    const std::map<std::string,std::string> carrier = { {"traceparent", "00-00000000000000000000000000000000-1234567890123456-00"},
+                                                               {"tracestate", "foo=1,bar=2,foo=3"} };
+    nostd::shared_ptr<trace::Span> sp{new trace::DefaultSpan()};
+    context::Context ctx1 = context::Context("current-span",sp);
+    context::Context ctx2 = format.Extract(Getter, carrier, ctx1);
+    trace::Span* span = map_http_trace_context::GetCurrentSpan(ctx2);
+    EXPECT_EQ(span->GetContext().trace_id(),trace::SpanContext().trace_id());
+    EXPECT_EQ(span->GetContext().span_id(),trace::SpanContext().span_id());
+    EXPECT_EQ(span->GetContext().trace_flags(),trace::SpanContext().trace_flags());
+    EXPECT_EQ(span->GetContext().trace_state(),trace::SpanContext().trace_state());
+}
+
+TEST(HTTPTextFormatTest, InvalidParentId)
+{
+    // If the parent id is invalid, we must ignore the full trace parent
+    // header.
+    // Also ignore any trace state.
+    const std::map<std::string,std::string> carrier = { {"traceparent", "00-00000000000000000000000000000000-0000000000000000-00"},
+                                                               {"tracestate", "foo=1,bar=2,foo=3"} };
+    nostd::shared_ptr<trace::Span> sp{new trace::DefaultSpan()};
+    context::Context ctx1 = context::Context("current-span",sp);
+    context::Context ctx2 = format.Extract(Getter, carrier, ctx1);
+    trace::Span* span = map_http_trace_context::GetCurrentSpan(ctx2);
+    EXPECT_EQ(span->GetContext().trace_id(),trace::SpanContext().trace_id());
+    EXPECT_EQ(span->GetContext().span_id(),trace::SpanContext().span_id());
+    EXPECT_EQ(span->GetContext().trace_flags(),trace::SpanContext().trace_flags());
+    EXPECT_EQ(span->GetContext().trace_state(),trace::SpanContext().trace_state());
+}
+
+TEST(HTTPTextFormatTest, NoSendEmptyTraceState)
+{
+    // If the trace state is empty, do not set the header.
+    const std::map<std::string,std::string> carrier = {{"traceparent","00-4bf92f3577b34da6a3ce929d0e0e4736-0102030405060708-01"}};
+    nostd::shared_ptr<trace::Span> sp{new trace::DefaultSpan()};
+    context::Context ctx1 = context::Context("current-span",sp);
+    context::Context ctx2 = format.Extract(Getter,carrier,ctx1);
+    std::map<std::string,std::string> c2 = {};
+    format.Inject(Setter,c2,ctx2);
+    EXPECT_TRUE(carrier.count("traceparent") > 0);
+    EXPECT_FALSE(carrier.count("tracestate") > 0);
+}
+
+TEST(HTTPTextFormatTest, FormatNotSupported)
+{
+    // If the trace parent does not adhere to the supported format, discard it and
+    // create a new trace context.
+    const std::map<std::string,std::string> carrier = { {"traceparent", "00-12345678901234567890123456789012-1234567890123456-00-residue"},
+                                                               {"tracestate", "foo=1,bar=2,foo=3"} };
+    nostd::shared_ptr<trace::Span> sp{new trace::DefaultSpan()};
+    context::Context ctx1 = context::Context("current-span",sp);
+    context::Context ctx2 = format.Extract(Getter,carrier,ctx1);
+    trace::Span* span = map_http_trace_context::GetCurrentSpan(ctx2);
+    EXPECT_FALSE(span->GetContext().IsValid());
+    EXPECT_EQ(span->GetContext().trace_id(),trace::SpanContext().trace_id());
+    EXPECT_EQ(span->GetContext().span_id(),trace::SpanContext().span_id());
+    EXPECT_EQ(span->GetContext().trace_flags(),trace::SpanContext().trace_flags());
+    EXPECT_EQ(span->GetContext().trace_state(),trace::SpanContext().trace_state());
+}
+
+TEST(HTTPTextFormatTest, PropagateInvalidContext)
+{
+    // Do not propagate invalid trace context.
+    std::map<std::string,std::string> carrier = {};
+    nostd::shared_ptr<trace::Span> sp{new trace::DefaultSpan(trace::SpanContext::GetInvalid())};
+
+    context::Context ctx{"current-span",sp};
+    format.Inject(Setter, carrier, ctx);
+    EXPECT_TRUE(carrier.count("traceparent") == 0);
+}
+
+TEST(HTTPTextFormatTest, TraceStateHeaderWithTrailingComma)
+{
+    // Do not propagate invalid trace context.
+    const std::map<std::string,std::string> carrier = { {"traceparent", "00-12345678901234567890123456789012-1234567890123456-00"},
+                                                               {"tracestate", "foo=1,"} };
+    nostd::shared_ptr<trace::Span> sp{new trace::DefaultSpan()};
+    context::Context ctx1 = context::Context("current-span",sp);
+    context::Context ctx2 = format.Extract(Getter,carrier,ctx1);
+    trace::Span* span = map_http_trace_context::GetCurrentSpan(ctx2);
+    trace::TraceState trace_state = span->GetContext().trace_state();
+    EXPECT_TRUE(trace_state.Get("foo", "1"));
+}
+
+TEST(HTTPTextFormatTest, TraceStateKeys)
+{
+    // Test for valid key patterns in the tracestate
+    std::string trace_state_value = "1a-2f@foo=bar1,1a-_*/2b@foo=bar2,foo=bar3,foo-_*/bar=bar4";
+    const std::map<std::string,std::string> carrier = { {"traceparent", "00-12345678901234567890123456789012-1234567890123456-00"},
+                                                               {"tracestate", trace_state_value} };
+    nostd::shared_ptr<trace::Span> sp{new trace::DefaultSpan()};
+    context::Context ctx1 = context::Context("current-span",sp);
+    context::Context ctx2 = format.Extract(Getter,carrier,ctx1);
+    trace::Span* span = map_http_trace_context::GetCurrentSpan(ctx2);
+    trace::TraceState trace_state = span->GetContext().trace_state();
+    EXPECT_TRUE(trace_state.Get("1a-2f@foo", "bar1"));
+    EXPECT_TRUE(trace_state.Get("1a-_*/2b@foo", "bar2"));
+    EXPECT_TRUE(trace_state.Get("foo", "bar3"));
+    EXPECT_TRUE(trace_state.Get("foo-_*/bar", "bar4"));
+}
 
 
 // Dilapidated Tests:

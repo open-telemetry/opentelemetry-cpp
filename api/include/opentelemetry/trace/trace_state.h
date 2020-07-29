@@ -131,6 +131,8 @@ public:
     tmp_map[key] = value;
   }
 
+  bool operator==(const TraceState &that) const noexcept { return tmp_map == that.tmp_map; }
+
   // Returns true if there are no keys.
   bool empty() const noexcept { return tmp_map.size()==0; }
 

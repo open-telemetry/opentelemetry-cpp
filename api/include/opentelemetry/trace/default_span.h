@@ -57,6 +57,8 @@ class DefaultSpan: public Span {
       return "DefaultSpan";
     }
 
+    DefaultSpan() = default;
+
     DefaultSpan(SpanContext span_context) {
        this->span_context_ = span_context;
     }

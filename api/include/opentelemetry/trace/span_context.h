@@ -16,8 +16,7 @@
 
 //#include <cstdint>
 //#include <cstring>
-#include <iostream>
-#include <map>
+#include <exception>
 #include "opentelemetry/nostd/unique_ptr.h"
 #include "opentelemetry/trace/span_id.h"
 #include "opentelemetry/trace/trace_flags.h"
