@@ -102,10 +102,10 @@ public:
       this->mu_.lock();
       // First merge values
       // set min
-      if (other.values_[MinValueIndex] < this->values_[MinValueIndex])
+      if (this->values_[CountValueIndex] == 0 || other.values_[MinValueIndex] < this->values_[MinValueIndex])
         this->values_[MinValueIndex] = other.values_[MinValueIndex];
       // set max
-      if (other.values_[MaxValueIndex] > this->values_[MaxValueIndex])
+      if (this->values_[CountValueIndex] == 0 || other.values_[MaxValueIndex] > this->values_[MaxValueIndex])
         this->values_[MaxValueIndex] = other.values_[MaxValueIndex];
       // set sum
       this->values_[SumValueIndex] += other.values_[SumValueIndex];
@@ -113,10 +113,10 @@ public:
       this->values_[CountValueIndex] += other.values_[CountValueIndex];
 
       // Now merge checkpoints
-      if (other.checkpoint_[MinValueIndex] < this->checkpoint_[MinValueIndex])
+      if (this->checkpoint_[CountValueIndex] == 0 || other.checkpoint_[MinValueIndex] < this->checkpoint_[MinValueIndex])
         this->checkpoint_[MinValueIndex] = other.checkpoint_[MinValueIndex];
       // set max
-      if (other.checkpoint_[MaxValueIndex] > this->checkpoint_[MaxValueIndex])
+      if (this->checkpoint_[CountValueIndex] == 0 || other.checkpoint_[MaxValueIndex] > this->checkpoint_[MaxValueIndex])
         this->checkpoint_[MaxValueIndex] = other.checkpoint_[MaxValueIndex];
       // set sum
       this->checkpoint_[SumValueIndex] += other.checkpoint_[SumValueIndex];
