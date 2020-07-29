@@ -202,7 +202,7 @@ TEST(HTTPTextFormatTest, PropagateInvalidContext)
     std::map<std::string,std::string> carrier = {};
     nostd::shared_ptr<trace::Span> sp{new trace::DefaultSpan(trace::SpanContext::GetInvalid())};
 
-    context::Context ctx{sp};
+    context::Context ctx{"current-span",sp};
     format.Inject(Setter, carrier, ctx);
     EXPECT_TRUE(carrier.count("traceparent") == 0);
 }
