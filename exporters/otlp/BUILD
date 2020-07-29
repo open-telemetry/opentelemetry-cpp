@@ -34,10 +34,10 @@ cc_library(
 cc_library(
     name = "otlp_exporter",
     srcs = [
-        'src/otlp_exporter.cc',
+        "src/otlp_exporter.cc",
     ],
     hdrs = [
-        'include/opentelemetry/exporters/otlp/otlp_exporter.h',
+        "include/opentelemetry/exporters/otlp/otlp_exporter.h",
     ],
     strip_include_prefix = "include",
     deps = [
@@ -60,7 +60,7 @@ cc_test(
 )
 
 cc_test(
- name = "otlp_exporter_test",
+    name = "otlp_exporter_test",
     srcs = ["test/otlp_exporter_test.cc"],
     deps = [
         ":otlp_exporter",

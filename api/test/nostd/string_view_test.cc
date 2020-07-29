@@ -95,7 +95,7 @@ TEST(StringViewTest, Compare)
 TEST(StringViewTest, MapKeyOrdering)
 {
   std::map<string_view, size_t> m = {{"bbb", 2}, {"aaa", 1}, {"ccc", 3}};
-  size_t i = 1;
+  size_t i                        = 1;
   for (const auto &kv : m)
   {
     EXPECT_EQ(kv.second, i);

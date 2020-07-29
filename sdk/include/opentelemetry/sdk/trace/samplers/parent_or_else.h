@@ -22,11 +22,11 @@ public:
    * delegateSampler for root spans
    * @return Returns NOT_RECORD always
    */
-  SamplingResult ShouldSample(const trace_api::SpanContext * parent_context,
+  SamplingResult ShouldSample(const trace_api::SpanContext *parent_context,
                               trace_api::TraceId trace_id,
                               nostd::string_view name,
                               trace_api::SpanKind span_kind,
-                              const trace_api::KeyValueIterable & attributes) noexcept override;
+                              const trace_api::KeyValueIterable &attributes) noexcept override;
 
   /**
    * @return Description MUST be ParentOrElse{delegate_sampler_.getDescription()}

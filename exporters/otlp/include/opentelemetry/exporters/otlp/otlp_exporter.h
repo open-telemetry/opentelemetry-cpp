@@ -1,7 +1,7 @@
 #pragma once
 
-#include "opentelemetry/sdk/trace/exporter.h"
 #include "opentelemetry/proto/collector/trace/v1/trace_service.grpc.pb.h"
+#include "opentelemetry/sdk/trace/exporter.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace exporter
@@ -31,14 +31,15 @@ public:
    * @param spans a span of unique pointers to span recordables
    */
   sdk::trace::ExportResult Export(
-    const nostd::span<std::unique_ptr<sdk::trace::Recordable>> &spans) noexcept override;
+      const nostd::span<std::unique_ptr<sdk::trace::Recordable>> &spans) noexcept override;
 
   /**
    * Shut down the exporter.
    * @param timeout an optional timeout, the default timeout of 0 means that no
    * timeout is applied.
    */
-  void Shutdown(std::chrono::microseconds timeout = std::chrono::microseconds(0)) noexcept override {};
+  void Shutdown(
+      std::chrono::microseconds timeout = std::chrono::microseconds(0)) noexcept override{};
 
 private:
   // For testing
@@ -48,10 +49,10 @@ private:
   std::unique_ptr<proto::collector::trace::v1::TraceService::StubInterface> trace_service_stub_;
 
   /**
-  * Create an OtlpExporter using the specified service stub.
-  * Only tests can call this constructor directly.
-  * @param stub the service stub to be used for exporting
-  */
+   * Create an OtlpExporter using the specified service stub.
+   * Only tests can call this constructor directly.
+   * @param stub the service stub to be used for exporting
+   */
   OtlpExporter(std::unique_ptr<proto::collector::trace::v1::TraceService::StubInterface> stub);
 };
 }  // namespace otlp
