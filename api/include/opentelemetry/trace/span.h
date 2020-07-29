@@ -78,7 +78,7 @@ public:
   // Sets an attribute on the Span. If the Span previously contained a mapping for
   // the key, the old value is replaced.
   virtual void SetAttribute(nostd::string_view key,
-                            const common::AttributeValue &&value) noexcept = 0;
+                            const common::AttributeValue &value) noexcept = 0;
 
   // Adds an event to the Span.
   virtual void AddEvent(nostd::string_view name) noexcept = 0;

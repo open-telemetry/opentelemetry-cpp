@@ -53,16 +53,16 @@ Span::Span(std::shared_ptr<Tracer> &&tracer,
   {
     return;
   }
-  processor_->OnStart(*recordable_);
   recordable_->SetName(name);
 
   attributes.ForEachKeyValue([&](nostd::string_view key, common::AttributeValue value) noexcept {
-    recordable_->SetAttribute(key, std::move(value));
+    recordable_->SetAttribute(key, value);
     return true;
   });
 
   recordable_->SetStartTime(NowOr(options.start_system_time));
   start_steady_time = NowOr(options.start_steady_time);
+  processor_->OnStart(*recordable_);
 }
 
 Span::~Span()
@@ -70,11 +70,11 @@ Span::~Span()
   End();
 }
 
-void Span::SetAttribute(nostd::string_view key, const common::AttributeValue &&value) noexcept
+void Span::SetAttribute(nostd::string_view key, const common::AttributeValue &value) noexcept
 {
   std::lock_guard<std::mutex> lock_guard{mu_};
 
-  recordable_->SetAttribute(key, std::move(value));
+  recordable_->SetAttribute(key, value);
 }
 
 void Span::AddEvent(nostd::string_view name) noexcept
