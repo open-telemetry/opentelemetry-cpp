@@ -183,7 +183,7 @@ TEST(HTTPTextFormatTest, FormatNotSupported)
 {
     // If the trace parent does not adhere to the supported format, discard it and
     // create a new trace context.
-    const std::map<std::string,std:string> carrier = { {"traceparent", "00-12345678901234567890123456789012-1234567890123456-00-residue"},
+    const std::map<std::string,std::string> carrier = { {"traceparent", "00-12345678901234567890123456789012-1234567890123456-00-residue"},
                                                                {"tracestate", "foo=1,bar=2,foo=3"} };
     nostd::shared_ptr<trace::Span> sp{new trace::DefaultSpan()};
     context::Context ctx1 = context::Context("current-span",sp);
