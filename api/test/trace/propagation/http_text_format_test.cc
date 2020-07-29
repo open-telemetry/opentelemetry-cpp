@@ -216,7 +216,8 @@ TEST(HTTPTextFormatTest, TraceStateHeaderWithTrailingComma)
     context::Context ctx1 = context::Context("current-span",sp);
     context::Context ctx2 = format.Extract(Getter,carrier,ctx1);
     trace::Span* span = map_http_trace_context::GetCurrentSpan(ctx2);
-    EXPECT_TRUE(span->GetContext().trace_state().Get("foo", "1"));
+    TraceState trace_state = span->GetContext().trace_state();
+    EXPECT_TRUE(trace_state.Get("foo", "1"));
 }
 
 //TEST(HTTPTextFormatTest, TraceStateKeys)
