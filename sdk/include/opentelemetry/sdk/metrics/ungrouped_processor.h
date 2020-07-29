@@ -27,7 +27,8 @@ public:
   }
 
   /**
-   * CheckpointSelf will return a vector of records to be exported. This function will go through agg
+   * CheckpointSelf will return a vector of records to be exported. This function will go through aggregators
+   * that have been sent through process() and return them as a vector of records.
    **/
   std::vector<sdkmetrics::Record> CheckpointSelf() noexcept
   {
@@ -125,10 +126,7 @@ public:
         auto record_agg_short = nostd::get<nostd::shared_ptr<sdkmetrics::Aggregator<short>>>(aggregator);
         auto aggregator_short = aggregator_copy<short>(record_agg_short);
 
-        auto agg_short_raw = aggregator_short.get();
-        auto agg_record_raw = record_agg_short.get();
-
-        agg_short_raw->merge(agg_record_raw);
+        merge_aggregators<short>(aggregator_short, record_agg_short);
 
         batch_map_[batch_key] = aggregator_short;
       }
@@ -137,10 +135,7 @@ public:
         auto record_agg_int = nostd::get<nostd::shared_ptr<sdkmetrics::Aggregator<int>>>(aggregator);
         auto aggregator_int = aggregator_copy<int>(record_agg_int);
 
-        auto agg_int_raw = aggregator_int.get();
-        auto record_agg_int_raw = record_agg_int.get();
-
-        agg_int_raw->merge(record_agg_int_raw);
+        merge_aggregators<int>(aggregator_int, record_agg_int);
 
         batch_map_[batch_key] = aggregator_int;      
       }
@@ -149,10 +144,7 @@ public:
         auto record_agg_float = nostd::get<nostd::shared_ptr<sdkmetrics::Aggregator<float>>>(aggregator);
         auto aggregator_float = aggregator_copy<float>(record_agg_float);
 
-        auto agg_float_raw = aggregator_float.get();
-        auto record_agg_float_raw = record_agg_float.get();
-
-        agg_float_raw->merge(record_agg_float_raw);
+        merge_aggregators<float>(aggregator_float, record_agg_float);
 
         batch_map_[batch_key] = aggregator_float;  
       }
@@ -161,10 +153,7 @@ public:
         auto record_agg_double = nostd::get<nostd::shared_ptr<sdkmetrics::Aggregator<double>>>(aggregator);
         auto aggregator_double = aggregator_copy<double>(record_agg_double);
 
-        auto agg_double_raw = aggregator_double.get();
-        auto record_agg_double_raw = record_agg_double.get();
-
-        agg_double_raw->merge(record_agg_double_raw);
+        merge_aggregators<double>(aggregator_double, record_agg_double);
 
         batch_map_[batch_key] = aggregator_double;    
       }
@@ -278,81 +267,81 @@ private:
     auto agg_kind = batch_agg->get_aggregator_kind();
     if(agg_kind == sdkmetrics::AggregatorKind::Counter)
     {
-      nostd::shared_ptr<sdkmetrics::CounterAggregator<T>> temp_batch_agg = 
+      nostd::shared_ptr<sdkmetrics::CounterAggregator<T>> temp_batch_agg_counter = 
         nostd::dynamic_pointer_cast<sdkmetrics::CounterAggregator<T>> (batch_agg);
 
-      nostd::shared_ptr<sdkmetrics::CounterAggregator<T>> temp_record_agg = 
+      nostd::shared_ptr<sdkmetrics::CounterAggregator<T>> temp_record_agg_counter = 
         nostd::dynamic_pointer_cast<sdkmetrics::CounterAggregator<T>> (record_agg);
 
-      auto temp_batch_agg_raw = temp_batch_agg.get();
-      auto temp_record_agg_raw = temp_record_agg.get();
+      auto temp_batch_agg_raw_counter = temp_batch_agg_counter.get();
+      auto temp_record_agg_raw_counter = temp_record_agg_counter.get();
       
-      temp_batch_agg_raw->merge(*temp_record_agg_raw);
+      temp_batch_agg_raw_counter->merge(*temp_record_agg_raw_counter);
     }
     else if(agg_kind == sdkmetrics::AggregatorKind::MinMaxSumCount)
     {
-      nostd::shared_ptr<sdkmetrics::MinMaxSumCountAggregator<T>> temp_batch_agg = 
+      nostd::shared_ptr<sdkmetrics::MinMaxSumCountAggregator<T>> temp_batch_agg_mmsc = 
         nostd::dynamic_pointer_cast<sdkmetrics::MinMaxSumCountAggregator<T>> (batch_agg);
 
-      nostd::shared_ptr<sdkmetrics::MinMaxSumCountAggregator<T>> temp_record_agg = 
+      nostd::shared_ptr<sdkmetrics::MinMaxSumCountAggregator<T>> temp_record_agg_mmsc = 
         nostd::dynamic_pointer_cast<sdkmetrics::MinMaxSumCountAggregator<T>> (record_agg);
 
-      auto temp_batch_agg_raw = temp_batch_agg.get();
-      auto temp_record_agg_raw = temp_record_agg.get();
+      auto temp_batch_agg_raw_mmsc = temp_batch_agg_mmsc.get();
+      auto temp_record_agg_raw_mmsc = temp_record_agg_mmsc.get();
       
-      temp_batch_agg_raw->merge(*temp_record_agg_raw);
+      temp_batch_agg_raw_mmsc->merge(*temp_record_agg_raw_mmsc);
     }
     else if(agg_kind == sdkmetrics::AggregatorKind::Gauge)
     {
-      nostd::shared_ptr<sdkmetrics::GaugeAggregator<T>> temp_batch_agg = 
+      nostd::shared_ptr<sdkmetrics::GaugeAggregator<T>> temp_batch_agg_gauge = 
         nostd::dynamic_pointer_cast<sdkmetrics::GaugeAggregator<T>> (batch_agg);
 
-      nostd::shared_ptr<sdkmetrics::GaugeAggregator<T>> temp_record_agg = 
+      nostd::shared_ptr<sdkmetrics::GaugeAggregator<T>> temp_record_agg_gauge = 
         nostd::dynamic_pointer_cast<sdkmetrics::GaugeAggregator<T>> (record_agg);
 
-      auto temp_batch_agg_raw = temp_batch_agg.get();
-      auto temp_record_agg_raw = temp_record_agg.get();
+      auto temp_batch_agg_raw_gauge = temp_batch_agg_gauge.get();
+      auto temp_record_agg_raw_gauge = temp_record_agg_gauge.get();
       
-      temp_batch_agg_raw->merge(*temp_record_agg_raw);
+      temp_batch_agg_raw_gauge->merge(*temp_record_agg_raw_gauge);
     }
     else if(agg_kind == sdkmetrics::AggregatorKind::Sketch)
     {
-      nostd::shared_ptr<sdkmetrics::SketchAggregator<T>> temp_batch_agg = 
+      nostd::shared_ptr<sdkmetrics::SketchAggregator<T>> temp_batch_agg_sketch = 
         nostd::dynamic_pointer_cast<sdkmetrics::SketchAggregator<T>> (batch_agg);
 
-      nostd::shared_ptr<sdkmetrics::SketchAggregator<T>> temp_record_agg = 
+      nostd::shared_ptr<sdkmetrics::SketchAggregator<T>> temp_record_agg_sketch = 
         nostd::dynamic_pointer_cast<sdkmetrics::SketchAggregator<T>> (record_agg);
 
-      auto temp_batch_agg_raw = temp_batch_agg.get();
-      auto temp_record_agg_raw = temp_record_agg.get();
+      auto temp_batch_agg_raw_sketch = temp_batch_agg_sketch.get();
+      auto temp_record_agg_raw_sketch = temp_record_agg_sketch.get();
       
-      temp_batch_agg_raw->merge(*temp_record_agg_raw);
+      temp_batch_agg_raw_sketch->merge(*temp_record_agg_raw_sketch);
     }
     else if(agg_kind == sdkmetrics::AggregatorKind::Histogram)
     {
-      nostd::shared_ptr<sdkmetrics::HistogramAggregator<T>> temp_batch_agg = 
+      nostd::shared_ptr<sdkmetrics::HistogramAggregator<T>> temp_batch_agg_histogram = 
         nostd::dynamic_pointer_cast<sdkmetrics::HistogramAggregator<T>> (batch_agg);
 
-      nostd::shared_ptr<sdkmetrics::HistogramAggregator<T>> temp_record_agg = 
+      nostd::shared_ptr<sdkmetrics::HistogramAggregator<T>> temp_record_agg_histogram = 
         nostd::dynamic_pointer_cast<sdkmetrics::HistogramAggregator<T>> (record_agg);
 
-      auto temp_batch_agg_raw = temp_batch_agg.get();
-      auto temp_record_agg_raw = temp_record_agg.get();
+      auto temp_batch_agg_raw_histogram = temp_batch_agg_histogram.get();
+      auto temp_record_agg_raw_histogram = temp_record_agg_histogram.get();
       
-      temp_batch_agg_raw->merge(*temp_record_agg_raw);
+      temp_batch_agg_raw_histogram->merge(*temp_record_agg_raw_histogram);
     }
     else if(agg_kind == sdkmetrics::AggregatorKind::Exact)
     {
-      nostd::shared_ptr<sdkmetrics::ExactAggregator<T>> temp_batch_agg = 
+      nostd::shared_ptr<sdkmetrics::ExactAggregator<T>> temp_batch_agg_exact = 
         nostd::dynamic_pointer_cast<sdkmetrics::ExactAggregator<T>> (batch_agg);
 
-      nostd::shared_ptr<sdkmetrics::ExactAggregator<T>> temp_record_agg = 
+      nostd::shared_ptr<sdkmetrics::ExactAggregator<T>> temp_record_agg_exact = 
         nostd::dynamic_pointer_cast<sdkmetrics::ExactAggregator<T>> (record_agg);
 
-      auto temp_batch_agg_raw = temp_batch_agg.get();
-      auto temp_record_agg_raw = temp_record_agg.get();
+      auto temp_batch_agg_raw_exact = temp_batch_agg_exact.get();
+      auto temp_record_agg_raw_exact = temp_record_agg_exact.get();
       
-      temp_batch_agg_raw->merge(*temp_record_agg_raw);
+      temp_batch_agg_raw_exact->merge(*temp_record_agg_raw_exact);
     }
   }
 
