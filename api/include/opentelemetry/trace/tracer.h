@@ -1,27 +1,27 @@
-//#pragma once
-//
-//#include "opentelemetry/nostd/string_view.h"
-//#include "opentelemetry/nostd/unique_ptr.h"
-//#include "opentelemetry/trace/span.h"
-//#include "opentelemetry/version.h"
-//
-//#include <chrono>
-//
-//OPENTELEMETRY_BEGIN_NAMESPACE
-//namespace trace
-//{
-///**
-// * Handles span creation and in-process context propagation.
-// *
-// * This class provides methods for manipulating the context, creating spans, and controlling spans'
-// * lifecycles.
-// */
-//class Span;
-//
-//struct StartSpanOptions;
-//
-//class Tracer
-//{
+#pragma once
+
+#include "opentelemetry/nostd/string_view.h"
+#include "opentelemetry/nostd/unique_ptr.h"
+#include "opentelemetry/trace/span.h"
+#include "opentelemetry/version.h"
+
+#include <chrono>
+
+OPENTELEMETRY_BEGIN_NAMESPACE
+namespace trace
+{
+/**
+ * Handles span creation and in-process context propagation.
+ *
+ * This class provides methods for manipulating the context, creating spans, and controlling spans'
+ * lifecycles.
+ */
+class Span;
+
+struct StartSpanOptions;
+
+class Tracer
+{
 //public:
 //  virtual ~Tracer() = default;
 //  /**
@@ -86,6 +86,6 @@
 //  }
 //
 //  virtual void CloseWithMicroseconds(uint64_t timeout) noexcept = 0;
-//};
-//}  // namespace trace
-//OPENTELEMETRY_END_NAMESPACE
+};
+}  // namespace trace
+OPENTELEMETRY_END_NAMESPACE
