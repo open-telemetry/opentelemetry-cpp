@@ -23,18 +23,17 @@ nostd::shared_ptr<metrics_api::Counter<short>> Meter::NewShortCounter(
   return ptr;
 }
 
-nostd::shared_ptr<metrics_api::Counter<int>> Meter::NewIntCounter(
-    nostd::string_view name,
-    nostd::string_view description,
-    nostd::string_view unit,
-    const bool enabled)
+nostd::shared_ptr<metrics_api::Counter<int>> Meter::NewIntCounter(nostd::string_view name,
+                                                                  nostd::string_view description,
+                                                                  nostd::string_view unit,
+                                                                  const bool enabled)
 {
   if (!IsValidName(name) || NameAlreadyUsed(name))
   {
     throw std::invalid_argument("Invalid Name");
   }
   auto counter = new Counter<int>(name, description, unit, enabled);
-  auto ptr = nostd::shared_ptr<metrics_api::Counter<int>>(counter);
+  auto ptr     = nostd::shared_ptr<metrics_api::Counter<int>>(counter);
   metrics_lock_.lock();
   int_metrics_.insert(std::make_pair(std::string(name), ptr));
   metrics_lock_.unlock();
@@ -235,7 +234,7 @@ nostd::shared_ptr<metrics_api::SumObserver<short>> Meter::NewShortSumObserver(
   auto sumobs = new SumObserver<short>(name, description, unit, enabled, callback);
   auto ptr    = nostd::shared_ptr<metrics_api::SumObserver<short>>(sumobs);
   observers_lock_.lock();
-  short_observers_.insert(std::make_pair(std::string(name),ptr));
+  short_observers_.insert(std::make_pair(std::string(name), ptr));
   observers_lock_.unlock();
   return ptr;
 }
@@ -632,6 +631,6 @@ bool Meter::NameAlreadyUsed(nostd::string_view name)
   else
     return false;
 }
-}
-}
+}  // namespace metrics
+}  // namespace sdk
 OPENTELEMETRY_END_NAMESPACE

@@ -1,8 +1,8 @@
 #include "opentelemetry/metrics/meter.h"
 #include "opentelemetry/nostd/shared_ptr.h"
-#include "opentelemetry/sdk/metrics/record.h"
-#include "opentelemetry/sdk/metrics/instrument.h"
 #include "opentelemetry/sdk/metrics/async_instruments.h"
+#include "opentelemetry/sdk/metrics/instrument.h"
+#include "opentelemetry/sdk/metrics/record.h"
 #include "opentelemetry/sdk/metrics/sync_instruments.h"
 
 #include <map>
@@ -19,7 +19,7 @@ class Meter : public metrics_api::Meter
 public:
   explicit Meter(std::string library_name, std::string library_version = "")
   {
-    library_name_ = library_name;
+    library_name_    = library_name;
     library_version_ = library_version;
   }
 
@@ -35,29 +35,25 @@ public:
    * @throws IllegalArgumentException if a different metric by the same name exists in this meter.
    * @throws IllegalArgumentException if the {@code name} does not match spec requirements.
    */
-  nostd::shared_ptr<metrics_api::Counter<short>> NewShortCounter(
-      nostd::string_view name,
-      nostd::string_view description,
-      nostd::string_view unit,
-      const bool enabled) override;
+  nostd::shared_ptr<metrics_api::Counter<short>> NewShortCounter(nostd::string_view name,
+                                                                 nostd::string_view description,
+                                                                 nostd::string_view unit,
+                                                                 const bool enabled) override;
 
-  nostd::shared_ptr<metrics_api::Counter<int>> NewIntCounter(
-      nostd::string_view name,
-      nostd::string_view description,
-      nostd::string_view unit,
-      const bool enabled) override;
+  nostd::shared_ptr<metrics_api::Counter<int>> NewIntCounter(nostd::string_view name,
+                                                             nostd::string_view description,
+                                                             nostd::string_view unit,
+                                                             const bool enabled) override;
 
-  nostd::shared_ptr<metrics_api::Counter<float>> NewFloatCounter(
-      nostd::string_view name,
-      nostd::string_view description,
-      nostd::string_view unit,
-      const bool enabled) override;
+  nostd::shared_ptr<metrics_api::Counter<float>> NewFloatCounter(nostd::string_view name,
+                                                                 nostd::string_view description,
+                                                                 nostd::string_view unit,
+                                                                 const bool enabled) override;
 
-  nostd::shared_ptr<metrics_api::Counter<double>> NewDoubleCounter(
-      nostd::string_view name,
-      nostd::string_view description,
-      nostd::string_view unit,
-      const bool enabled) override;
+  nostd::shared_ptr<metrics_api::Counter<double>> NewDoubleCounter(nostd::string_view name,
+                                                                   nostd::string_view description,
+                                                                   nostd::string_view unit,
+                                                                   const bool enabled) override;
 
   /**
    * Creates an UpDownCounter with the passed characteristics and returns a shared_ptr to that
@@ -296,7 +292,6 @@ public:
   std::vector<Record> Collect() noexcept;
 
 private:
-
   /**
    * A private function that creates records from all synchronous instruments created from
    * this meter.
@@ -340,15 +335,21 @@ private:
    * Additionally, when creating a new instrument, the meter must check if an instrument of the same
    * name already exists.
    */
-  std::map<std::string, nostd::shared_ptr<metrics_api::SynchronousInstrument<short>>> short_metrics_;
+  std::map<std::string, nostd::shared_ptr<metrics_api::SynchronousInstrument<short>>>
+      short_metrics_;
   std::map<std::string, nostd::shared_ptr<metrics_api::SynchronousInstrument<int>>> int_metrics_;
-  std::map<std::string, nostd::shared_ptr<metrics_api::SynchronousInstrument<float>>> float_metrics_;
-  std::map<std::string, nostd::shared_ptr<metrics_api::SynchronousInstrument<double>>> double_metrics_;
+  std::map<std::string, nostd::shared_ptr<metrics_api::SynchronousInstrument<float>>>
+      float_metrics_;
+  std::map<std::string, nostd::shared_ptr<metrics_api::SynchronousInstrument<double>>>
+      double_metrics_;
 
-  std::map<std::string, nostd::shared_ptr<metrics_api::AsynchronousInstrument<short>>> short_observers_;
+  std::map<std::string, nostd::shared_ptr<metrics_api::AsynchronousInstrument<short>>>
+      short_observers_;
   std::map<std::string, nostd::shared_ptr<metrics_api::AsynchronousInstrument<int>>> int_observers_;
-  std::map<std::string, nostd::shared_ptr<metrics_api::AsynchronousInstrument<float>>> float_observers_;
-  std::map<std::string, nostd::shared_ptr<metrics_api::AsynchronousInstrument<double>>> double_observers_;
+  std::map<std::string, nostd::shared_ptr<metrics_api::AsynchronousInstrument<float>>>
+      float_observers_;
+  std::map<std::string, nostd::shared_ptr<metrics_api::AsynchronousInstrument<double>>>
+      double_observers_;
 
   std::string library_name_;
   std::string library_version_;
@@ -357,6 +358,6 @@ private:
   std::mutex observers_lock_;
 };
 
-}
-}
+}  // namespace metrics
+}  // namespace sdk
 OPENTELEMETRY_END_NAMESPACE
