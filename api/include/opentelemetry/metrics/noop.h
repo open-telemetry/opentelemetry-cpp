@@ -1,5 +1,6 @@
 OPENTELEMETRY_BEGIN_NAMESPACE
-namespace metrics {
+namespace metrics
+{
 /**
  * No-op implementation of Meter. This class should not be used directly.
  */
@@ -18,40 +19,39 @@ public:
    * @param enabled a boolean that turns the metric instrument on and off.
    * @return
    */
-  opentelemetry::nostd::shared_ptr<Counter<short>>  NewShortCounter(
-      nostd::string_view name,
-      nostd::string_view description,
-      nostd::string_view unit,
-      const bool enabled) override
+  opentelemetry::nostd::shared_ptr<Counter<short>> NewShortCounter(nostd::string_view name,
+                                                                   nostd::string_view description,
+                                                                   nostd::string_view unit,
+                                                                   const bool enabled) override
   {
-    return nostd::shared_ptr<Counter<short>>{ new NoopCounter<short>(name, description, unit, enabled)};
+    return nostd::shared_ptr<Counter<short>>{
+        new NoopCounter<short>(name, description, unit, enabled)};
   }
 
-  opentelemetry::nostd::shared_ptr<Counter<int>> NewIntCounter(
-      nostd::string_view name,
-      nostd::string_view description,
-      nostd::string_view unit,
-      const bool enabled) override
+  opentelemetry::nostd::shared_ptr<Counter<int>> NewIntCounter(nostd::string_view name,
+                                                               nostd::string_view description,
+                                                               nostd::string_view unit,
+                                                               const bool enabled) override
   {
-    return nostd::shared_ptr<Counter<int>>{ new NoopCounter<int>(name, description, unit, enabled)};
+    return nostd::shared_ptr<Counter<int>>{new NoopCounter<int>(name, description, unit, enabled)};
   }
 
-  opentelemetry::nostd::shared_ptr<Counter<float>> NewFloatCounter(
-      nostd::string_view name,
-      nostd::string_view description,
-      nostd::string_view unit,
-      const bool enabled) override
+  opentelemetry::nostd::shared_ptr<Counter<float>> NewFloatCounter(nostd::string_view name,
+                                                                   nostd::string_view description,
+                                                                   nostd::string_view unit,
+                                                                   const bool enabled) override
   {
-    return nostd::shared_ptr<Counter<float>>{ new NoopCounter<float>(name, description, unit, enabled)};
+    return nostd::shared_ptr<Counter<float>>{
+        new NoopCounter<float>(name, description, unit, enabled)};
   }
 
-  opentelemetry::nostd::shared_ptr<Counter<double>> NewDoubleCounter(
-      nostd::string_view name,
-      nostd::string_view description,
-      nostd::string_view unit,
-      const bool enabled) override
+  opentelemetry::nostd::shared_ptr<Counter<double>> NewDoubleCounter(nostd::string_view name,
+                                                                     nostd::string_view description,
+                                                                     nostd::string_view unit,
+                                                                     const bool enabled) override
   {
-    return nostd::shared_ptr<Counter<double>>{ new NoopCounter<double>(name, description, unit, enabled)};
+    return nostd::shared_ptr<Counter<double>>{
+        new NoopCounter<double>(name, description, unit, enabled)};
   }
 
   /**
@@ -70,7 +70,8 @@ public:
       nostd::string_view unit,
       const bool enabled) override
   {
-    return nostd::shared_ptr<UpDownCounter<short>>{new NoopUpDownCounter<short>(name, description, unit, enabled)};
+    return nostd::shared_ptr<UpDownCounter<short>>{
+        new NoopUpDownCounter<short>(name, description, unit, enabled)};
   }
 
   opentelemetry::nostd::shared_ptr<UpDownCounter<int>> NewIntUpDownCounter(
@@ -79,7 +80,8 @@ public:
       nostd::string_view unit,
       const bool enabled) override
   {
-    return nostd::shared_ptr<UpDownCounter<int>>{new NoopUpDownCounter<int>(name, description, unit, enabled)};
+    return nostd::shared_ptr<UpDownCounter<int>>{
+        new NoopUpDownCounter<int>(name, description, unit, enabled)};
   }
 
   opentelemetry::nostd::shared_ptr<UpDownCounter<float>> NewFloatUpDownCounter(
@@ -88,7 +90,8 @@ public:
       nostd::string_view unit,
       const bool enabled) override
   {
-    return nostd::shared_ptr<UpDownCounter<float>>{new NoopUpDownCounter<float>(name, description, unit, enabled)};
+    return nostd::shared_ptr<UpDownCounter<float>>{
+        new NoopUpDownCounter<float>(name, description, unit, enabled)};
   }
 
   opentelemetry::nostd::shared_ptr<UpDownCounter<double>> NewDoubleUpDownCounter(
@@ -97,7 +100,8 @@ public:
       nostd::string_view unit,
       const bool enabled) override
   {
-    return nostd::shared_ptr<UpDownCounter<double>>{new NoopUpDownCounter<double>(name, description, unit, enabled)};
+    return nostd::shared_ptr<UpDownCounter<double>>{
+        new NoopUpDownCounter<double>(name, description, unit, enabled)};
   }
 
   /**
@@ -116,7 +120,8 @@ public:
       nostd::string_view unit,
       const bool enabled) override
   {
-    return nostd::shared_ptr<ValueRecorder<short>>{ new NoopValueRecorder<short>(name, description, unit, enabled)};
+    return nostd::shared_ptr<ValueRecorder<short>>{
+        new NoopValueRecorder<short>(name, description, unit, enabled)};
   }
 
   opentelemetry::nostd::shared_ptr<ValueRecorder<int>> NewIntValueRecorder(
@@ -125,7 +130,8 @@ public:
       nostd::string_view unit,
       const bool enabled) override
   {
-    return nostd::shared_ptr<ValueRecorder<int>>{ new NoopValueRecorder<int>(name, description, unit, enabled)};
+    return nostd::shared_ptr<ValueRecorder<int>>{
+        new NoopValueRecorder<int>(name, description, unit, enabled)};
   }
 
   opentelemetry::nostd::shared_ptr<ValueRecorder<float>> NewFloatValueRecorder(
@@ -134,7 +140,8 @@ public:
       nostd::string_view unit,
       const bool enabled) override
   {
-    return nostd::shared_ptr<ValueRecorder<float>>{ new NoopValueRecorder<float>(name, description, unit, enabled)};
+    return nostd::shared_ptr<ValueRecorder<float>>{
+        new NoopValueRecorder<float>(name, description, unit, enabled)};
   }
 
   opentelemetry::nostd::shared_ptr<ValueRecorder<double>> NewDoubleValueRecorder(
@@ -143,7 +150,8 @@ public:
       nostd::string_view unit,
       const bool enabled) override
   {
-    return nostd::shared_ptr<ValueRecorder<double>>{ new NoopValueRecorder<double>(name, description, unit, enabled)};
+    return nostd::shared_ptr<ValueRecorder<double>>{
+        new NoopValueRecorder<double>(name, description, unit, enabled)};
   }
 
   /**
@@ -163,7 +171,8 @@ public:
       const bool enabled,
       void (*callback)(ObserverResult<short>)) override
   {
-    return nostd::shared_ptr<SumObserver<short>>{ new NoopSumObserver<short>(name, description, unit, enabled, callback)};
+    return nostd::shared_ptr<SumObserver<short>>{
+        new NoopSumObserver<short>(name, description, unit, enabled, callback)};
   }
 
   opentelemetry::nostd::shared_ptr<SumObserver<int>> NewIntSumObserver(
@@ -173,7 +182,8 @@ public:
       const bool enabled,
       void (*callback)(ObserverResult<int>)) override
   {
-    return nostd::shared_ptr<SumObserver<int>>{ new NoopSumObserver<int>(name, description, unit, enabled, callback)};
+    return nostd::shared_ptr<SumObserver<int>>{
+        new NoopSumObserver<int>(name, description, unit, enabled, callback)};
   }
 
   opentelemetry::nostd::shared_ptr<SumObserver<float>> NewFloatSumObserver(
@@ -183,7 +193,8 @@ public:
       const bool enabled,
       void (*callback)(ObserverResult<float>)) override
   {
-    return nostd::shared_ptr<SumObserver<float>>{ new NoopSumObserver<float>(name, description, unit, enabled, callback)};
+    return nostd::shared_ptr<SumObserver<float>>{
+        new NoopSumObserver<float>(name, description, unit, enabled, callback)};
   }
 
   opentelemetry::nostd::shared_ptr<SumObserver<double>> NewDoubleSumObserver(
@@ -193,7 +204,8 @@ public:
       const bool enabled,
       void (*callback)(ObserverResult<double>)) override
   {
-    return nostd::shared_ptr<SumObserver<double>>{ new NoopSumObserver<double>(name, description, unit, enabled, callback)};
+    return nostd::shared_ptr<SumObserver<double>>{
+        new NoopSumObserver<double>(name, description, unit, enabled, callback)};
   }
 
   /**
@@ -213,7 +225,8 @@ public:
       const bool enabled,
       void (*callback)(ObserverResult<short>)) override
   {
-    return nostd::shared_ptr<UpDownSumObserver<short>>{ new NoopUpDownSumObserver<short>(name, description, unit, enabled, callback)};
+    return nostd::shared_ptr<UpDownSumObserver<short>>{
+        new NoopUpDownSumObserver<short>(name, description, unit, enabled, callback)};
   }
 
   opentelemetry::nostd::shared_ptr<UpDownSumObserver<int>> NewIntUpDownSumObserver(
@@ -223,7 +236,8 @@ public:
       const bool enabled,
       void (*callback)(ObserverResult<int>)) override
   {
-    return nostd::shared_ptr<UpDownSumObserver<int>>{ new NoopUpDownSumObserver<int>(name, description, unit, enabled, callback)};
+    return nostd::shared_ptr<UpDownSumObserver<int>>{
+        new NoopUpDownSumObserver<int>(name, description, unit, enabled, callback)};
   }
 
   opentelemetry::nostd::shared_ptr<UpDownSumObserver<float>> NewFloatUpDownSumObserver(
@@ -233,7 +247,8 @@ public:
       const bool enabled,
       void (*callback)(ObserverResult<float>)) override
   {
-    return nostd::shared_ptr<UpDownSumObserver<float>>{ new NoopUpDownSumObserver<float>(name, description, unit, enabled, callback)};
+    return nostd::shared_ptr<UpDownSumObserver<float>>{
+        new NoopUpDownSumObserver<float>(name, description, unit, enabled, callback)};
   }
 
   opentelemetry::nostd::shared_ptr<UpDownSumObserver<double>> NewDoubleUpDownSumObserver(
@@ -243,7 +258,8 @@ public:
       const bool enabled,
       void (*callback)(ObserverResult<double>)) override
   {
-    return nostd::shared_ptr<UpDownSumObserver<double>>{ new NoopUpDownSumObserver<double>(name, description, unit, enabled, callback)};
+    return nostd::shared_ptr<UpDownSumObserver<double>>{
+        new NoopUpDownSumObserver<double>(name, description, unit, enabled, callback)};
   }
 
   /**
@@ -263,7 +279,8 @@ public:
       const bool enabled,
       void (*callback)(ObserverResult<short>)) override
   {
-    return nostd::shared_ptr<ValueObserver<short>>{ new NoopValueObserver<short>(name, description, unit, enabled, callback)};
+    return nostd::shared_ptr<ValueObserver<short>>{
+        new NoopValueObserver<short>(name, description, unit, enabled, callback)};
   }
 
   opentelemetry::nostd::shared_ptr<ValueObserver<int>> NewIntValueObserver(
@@ -273,7 +290,8 @@ public:
       const bool enabled,
       void (*callback)(ObserverResult<int>)) override
   {
-    return nostd::shared_ptr<ValueObserver<int>>{ new NoopValueObserver<int>(name, description, unit, enabled, callback)};
+    return nostd::shared_ptr<ValueObserver<int>>{
+        new NoopValueObserver<int>(name, description, unit, enabled, callback)};
   }
 
   opentelemetry::nostd::shared_ptr<ValueObserver<float>> NewFloatValueObserver(
@@ -283,7 +301,8 @@ public:
       const bool enabled,
       void (*callback)(ObserverResult<float>)) override
   {
-    return nostd::shared_ptr<ValueObserver<float>>{ new NoopValueObserver<float>(name, description, unit, enabled, callback)};
+    return nostd::shared_ptr<ValueObserver<float>>{
+        new NoopValueObserver<float>(name, description, unit, enabled, callback)};
   }
 
   opentelemetry::nostd::shared_ptr<ValueObserver<double>> NewDoubleValueObserver(
@@ -293,7 +312,8 @@ public:
       const bool enabled,
       void (*callback)(ObserverResult<double>)) override
   {
-    return nostd::shared_ptr<ValueObserver<double>>{ new NoopValueObserver<double>(name, description, unit, enabled, callback)};
+    return nostd::shared_ptr<ValueObserver<double>>{
+        new NoopValueObserver<double>(name, description, unit, enabled, callback)};
   }
 
   /**
@@ -313,10 +333,9 @@ public:
     // No-op
   }
 
-  void RecordIntBatch(
-      const trace::KeyValueIterable &labels,
-      nostd::span<const nostd::shared_ptr<SynchronousInstrument<int>>> instruments,
-      nostd::span<const int> values) noexcept override
+  void RecordIntBatch(const trace::KeyValueIterable &labels,
+                      nostd::span<const nostd::shared_ptr<SynchronousInstrument<int>>> instruments,
+                      nostd::span<const int> values) noexcept override
   {
     // No-op
   }

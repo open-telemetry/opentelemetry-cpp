@@ -28,12 +28,9 @@ TEST(NoopTest, CreateInstruments)
   m->NewIntUpDownCounter("Test ud counter", "For testing", "Unitless", true);
   m->NewIntValueRecorder("Test recorder", "For testing", "Unitless", true);
 
-  m->NewIntSumObserver("Test sum obs", "For testing", "Unitless", true,
-                       &Callback);
-  m->NewIntUpDownSumObserver("Test udsum obs", "For testing", "Unitless", true,
-                             &Callback);
-  m->NewIntValueObserver("Test val obs", "For testing", "Unitless", true,
-                         &Callback);
+  m->NewIntSumObserver("Test sum obs", "For testing", "Unitless", true, &Callback);
+  m->NewIntUpDownSumObserver("Test udsum obs", "For testing", "Unitless", true, &Callback);
+  m->NewIntValueObserver("Test val obs", "For testing", "Unitless", true, &Callback);
 }
 
 TEST(NoopMeter, RecordBatch)
@@ -55,8 +52,7 @@ TEST(NoopMeter, RecordBatch)
   auto i = m->NewIntCounter("Test int counter", "For testing", "Unitless", true);
 
   m->RecordIntBatch({{"Key", "Value"}},
-                    {nostd::dynamic_pointer_cast<metrics_api::SynchronousInstrument<int>>(i)},
-                    {1});
+                    {nostd::dynamic_pointer_cast<metrics_api::SynchronousInstrument<int>>(i)}, {1});
 
   auto f = m->NewFloatCounter("Test int counter", "For testing", "Unitless", true);
 
@@ -69,6 +65,5 @@ TEST(NoopMeter, RecordBatch)
   m->RecordDoubleBatch({{"Key", "Value"}},
                        {nostd::dynamic_pointer_cast<metrics_api::SynchronousInstrument<double>>(d)},
                        {1});
-
 }
 OPENTELEMETRY_END_NAMESPACE
