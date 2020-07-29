@@ -44,7 +44,6 @@ static const int kTraceFlagBytes = 2;
 static const int kTraceDelimiterBytes = 3;
 static const int kHeaderSize = kVersionBytes + kTraceIdBytes + kParentIdBytes + kTraceFlagBytes + kTraceDelimiterBytes;
 static const int kTraceStateMaxMembers = 32;
-static const nostd::string_view kTraceStateKeyValueDelimiter = "=";
 static const int kHeaderElementLengths[4] = {2,32,16,2};
 // The HttpTraceContext provides methods to extract and inject
 // context into headers of HTTP requests with traces.
