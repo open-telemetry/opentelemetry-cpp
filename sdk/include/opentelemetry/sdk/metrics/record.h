@@ -1,9 +1,9 @@
 #pragma once
 
+#include <memory>
 #include "opentelemetry/metrics/instrument.h"
 #include "opentelemetry/nostd/variant.h"
 #include "opentelemetry/sdk/metrics/aggregator/aggregator.h"
-#include "opentelemetry/nostd/shared_ptr.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 
@@ -13,10 +13,10 @@ namespace sdk
 {
 namespace metrics
 {
-using AggregatorVariant = nostd::variant<nostd::shared_ptr<Aggregator<short>>,
-                                         nostd::shared_ptr<Aggregator<int>>,
-                                         nostd::shared_ptr<Aggregator<float>>,
-                                         nostd::shared_ptr<Aggregator<double>>>;
+using AggregatorVariant = nostd::variant<std::shared_ptr<Aggregator<short>>,
+                                         std::shared_ptr<Aggregator<int>>,
+                                         std::shared_ptr<Aggregator<float>>,
+                                         std::shared_ptr<Aggregator<double>>>;
 class Record
 {
 public:
