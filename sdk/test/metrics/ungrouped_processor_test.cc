@@ -95,6 +95,105 @@ TEST(UngroupedMetricsProcessor, UngroupedProcessorKeepsRecordInformationStateles
 
 }
 
+TEST(UngroupedMetricsProcessor, UngroupedProcessorKeepsRecordInformationStatefulShort)
+{
+  auto processor = std::unique_ptr<sdkmetrics::MetricsProcessor> (new
+       opentelemetry::sdk::metrics::UngroupedMetricsProcessor(true)); 
+
+  auto aggregator = nostd::shared_ptr<opentelemetry::sdk::metrics::Aggregator<short>> (new
+       opentelemetry::sdk::metrics::CounterAggregator<short>(metrics_api::InstrumentKind::Counter));
+
+  aggregator->update(5);
+  aggregator->checkpoint();
+
+  sdkmetrics::Record r("name", "description", "labels", aggregator);
+
+  processor->process(r);
+  
+  std::vector<sdkmetrics::Record> checkpoint = processor->CheckpointSelf();
+  ASSERT_EQ(checkpoint[0].GetName(), "name");
+  ASSERT_EQ(checkpoint[0].GetLabels(), "labels");
+  ASSERT_EQ(checkpoint[0].GetDescription(), "description");
+  ASSERT_EQ(nostd::get<nostd::shared_ptr<sdkmetrics::Aggregator<short>>>(checkpoint[0].GetAggregator())->get_checkpoint(), aggregator->get_checkpoint());
+
+  short prev_checkpoint = aggregator->get_checkpoint()[0];
+  aggregator->update(4);
+  aggregator->checkpoint();
+
+  processor->process(r);
+
+  std::vector<sdkmetrics::Record> checkpoint2 = processor->CheckpointSelf();
+  ASSERT_EQ(checkpoint2.size(), 1);
+  ASSERT_EQ(nostd::get<nostd::shared_ptr<sdkmetrics::Aggregator<short>>>(checkpoint[0].GetAggregator())->get_checkpoint()[0], aggregator->get_checkpoint()[0] + prev_checkpoint);
+
+}
+
+TEST(UngroupedMetricsProcessor, UngroupedProcessorKeepsRecordInformationStatefulInt)
+{
+  auto processor = std::unique_ptr<sdkmetrics::MetricsProcessor> (new
+       opentelemetry::sdk::metrics::UngroupedMetricsProcessor(true)); 
+
+  auto aggregator = nostd::shared_ptr<opentelemetry::sdk::metrics::Aggregator<int>> (new
+       opentelemetry::sdk::metrics::CounterAggregator<int>(metrics_api::InstrumentKind::Counter));
+
+  aggregator->update(5);
+  aggregator->checkpoint();
+
+  sdkmetrics::Record r("name", "description", "labels", aggregator);
+
+  processor->process(r);
+  
+  std::vector<sdkmetrics::Record> checkpoint = processor->CheckpointSelf();
+  ASSERT_EQ(checkpoint[0].GetName(), "name");
+  ASSERT_EQ(checkpoint[0].GetLabels(), "labels");
+  ASSERT_EQ(checkpoint[0].GetDescription(), "description");
+  ASSERT_EQ(nostd::get<nostd::shared_ptr<sdkmetrics::Aggregator<int>>>(checkpoint[0].GetAggregator())->get_checkpoint(), aggregator->get_checkpoint());
+
+  int prev_checkpoint = aggregator->get_checkpoint()[0];
+  aggregator->update(4);
+  aggregator->checkpoint();
+
+  processor->process(r);
+
+  std::vector<sdkmetrics::Record> checkpoint2 = processor->CheckpointSelf();
+  ASSERT_EQ(checkpoint2.size(), 1);
+  ASSERT_EQ(nostd::get<nostd::shared_ptr<sdkmetrics::Aggregator<int>>>(checkpoint[0].GetAggregator())->get_checkpoint()[0], aggregator->get_checkpoint()[0] + prev_checkpoint);
+
+}
+
+TEST(UngroupedMetricsProcessor, UngroupedProcessorKeepsRecordInformationStatefulFloat)
+{
+  auto processor = std::unique_ptr<sdkmetrics::MetricsProcessor> (new
+       opentelemetry::sdk::metrics::UngroupedMetricsProcessor(true)); 
+
+  auto aggregator = nostd::shared_ptr<opentelemetry::sdk::metrics::Aggregator<float>> (new
+       opentelemetry::sdk::metrics::CounterAggregator<float>(metrics_api::InstrumentKind::Counter));
+
+  aggregator->update(5.5);
+  aggregator->checkpoint();
+
+  sdkmetrics::Record r("name", "description", "labels", aggregator);
+
+  processor->process(r);
+  
+  std::vector<sdkmetrics::Record> checkpoint = processor->CheckpointSelf();
+  ASSERT_EQ(checkpoint[0].GetName(), "name");
+  ASSERT_EQ(checkpoint[0].GetLabels(), "labels");
+  ASSERT_EQ(checkpoint[0].GetDescription(), "description");
+  ASSERT_EQ(nostd::get<nostd::shared_ptr<sdkmetrics::Aggregator<float>>>(checkpoint[0].GetAggregator())->get_checkpoint(), aggregator->get_checkpoint());
+
+  float prev_checkpoint = aggregator->get_checkpoint()[0];
+  aggregator->update(5.4);
+  aggregator->checkpoint();
+
+  processor->process(r);
+
+  std::vector<sdkmetrics::Record> checkpoint2 = processor->CheckpointSelf();
+  ASSERT_EQ(checkpoint2.size(), 1);
+  ASSERT_EQ(nostd::get<nostd::shared_ptr<sdkmetrics::Aggregator<float>>>(checkpoint[0].GetAggregator())->get_checkpoint()[0], aggregator->get_checkpoint()[0] + prev_checkpoint);
+
+}
+
 TEST(UngroupedMetricsProcessor, UngroupedProcessorKeepsRecordInformationStatefulDouble)
 {
   auto processor = std::unique_ptr<sdkmetrics::MetricsProcessor> (new
