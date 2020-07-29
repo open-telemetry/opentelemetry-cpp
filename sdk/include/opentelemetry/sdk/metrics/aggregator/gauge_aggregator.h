@@ -96,7 +96,10 @@ public:
     if (this->kind_ == other.kind_)
     {
       this->mu_.lock();
+      // First merge values
       this->values_[0] = other.values_[0];
+      // Now merge checkpoints
+      this->checkpoint_[0] = other.checkpoint_[0];
       current_timestamp_ = core::SystemTimestamp(std::chrono::system_clock::now());
       this->mu_.unlock();
     }

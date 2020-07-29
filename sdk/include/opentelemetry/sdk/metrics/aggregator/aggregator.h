@@ -65,7 +65,7 @@
       * @param other, the aggregator with merge with
       * @return none
       */
-     void merge(Aggregator * other);
+     void merge(Aggregator* other);
 
       /**
       * Returns the checkpointed value
@@ -162,4 +162,4 @@
   }  // namespace metrics
  }  // namespace sdk
  OPENTELEMETRY_END_NAMESPACE
- 
+
