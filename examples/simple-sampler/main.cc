@@ -11,13 +11,13 @@
 
 #include "foo_library/foo_library.h"
 
-#include <memory>
 #include <iostream>
+#include <memory>
 
-using opentelemetry::sdk::trace::Sampler;
-using opentelemetry::sdk::trace::AlwaysOnSampler;
 using opentelemetry::sdk::trace::AlwaysOffSampler;
+using opentelemetry::sdk::trace::AlwaysOnSampler;
 using opentelemetry::sdk::trace::ParentOrElseSampler;
+using opentelemetry::sdk::trace::Sampler;
 
 namespace
 {
