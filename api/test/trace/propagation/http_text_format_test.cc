@@ -74,9 +74,7 @@ TEST(HTTPTextFormatTest, NoTraceParentHeader)
     // When trace context headers are not present, a new SpanContext
     // should be created.
     const std::map<std::string,std::string> carrier = {};
-    nostd::shared_ptr<trace::Span> sp{new trace::DefaultSpan()};
-    context::Context ctx1 = context::Context("current-span",sp);
-    context::Context ctx2 = format.Extract(Getter, carrier, ctx1);
+    context::Context ctx = format.Extract(Getter, carrier, context::Context("current-span",     nostd::shared_ptr<trace::Span>(new trace::DefaultSpan()));
     trace::Span* span = map_http_trace_context::GetCurrentSpan(ctx2);
     EXPECT_EQ(span->GetContext().trace_id(),trace::SpanContext().trace_id());
     EXPECT_EQ(span->GetContext().span_id(),trace::SpanContext().span_id());
