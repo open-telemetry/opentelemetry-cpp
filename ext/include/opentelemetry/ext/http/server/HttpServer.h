@@ -736,7 +736,7 @@ protected:
         {
           LOG_TRACE("HttpServer: [%s] using handler for %s", conn.request.client.c_str(),
                     handler.first.c_str());
-          auto callback = handler.second;
+          // auto callback = handler.second; // Bazel gets mad at this unused var, uncomment when using
           int result    = handler.second->onHttpRequest(conn.request, conn.response);
           if (result != 0)
           {
