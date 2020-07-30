@@ -83,12 +83,16 @@ public:
      */
     virtual T get_quantiles(double q) override {
         if (q < 0 or q > 1){
+#if __EXCEPTIONS
             throw std::invalid_argument("Quantile values must fall between 0 and 1");
+#else
+            std::terminate();
+#endif
         }
         auto iter = checkpoint_raw_.begin();
         int idx = iter->first;
         int count = iter->second;
-        
+
         // will iterator ever reach the end, think it is a possibility
         while (count < (q * (this->checkpoint_[1]-1)) && iter != checkpoint_raw_.end()){
             iter++;
