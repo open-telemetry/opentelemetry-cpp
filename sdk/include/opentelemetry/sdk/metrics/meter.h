@@ -1,8 +1,8 @@
 #include "opentelemetry/metrics/meter.h"
 #include "opentelemetry/nostd/shared_ptr.h"
-#include "opentelemetry/sdk/metrics/record.h"
-#include "opentelemetry/sdk/metrics/instrument.h"
 #include "opentelemetry/sdk/metrics/async_instruments.h"
+#include "opentelemetry/sdk/metrics/instrument.h"
+#include "opentelemetry/sdk/metrics/record.h"
 #include "opentelemetry/sdk/metrics/sync_instruments.h"
 
 #include <map>
@@ -356,7 +356,6 @@ private:
   std::mutex metrics_lock_;
   std::mutex observers_lock_;
 };
-
-}
-}
+}  // namespace metrics
+}  // namespace sdk
 OPENTELEMETRY_END_NAMESPACE

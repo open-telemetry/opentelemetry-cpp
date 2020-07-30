@@ -24,9 +24,7 @@ namespace
  * generate a random trace_id and check if it should sample using the provided
  * provider and context
  */
-int RunShouldSampleCountDecision(SpanContext &context,
-                                 ProbabilitySampler &sampler,
-                                 int iterations)
+int RunShouldSampleCountDecision(SpanContext &context, ProbabilitySampler &sampler, int iterations)
 {
   int actual_count = 0;
 

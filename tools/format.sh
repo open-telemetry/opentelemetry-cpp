@@ -16,8 +16,9 @@ fi
 
 # Correct common miscapitalizations.
 "${SED[@]}" 's/Open[t]elemetry/OpenTelemetry/g' $($FIND -type f -print)
-# No CRLF line endings.
-"${SED[@]}" 's/\r$//' $($FIND -type f -print)
+# No CRLF line endings, except Windows files.
+"${SED[@]}" 's/\r$//' $($FIND -name '*.ps1' -prune -o \
+  -name '*.cmd' -prune -o -type f -print)
 # No trailing spaces.
 "${SED[@]}" 's/ \+$//' $($FIND -type f -print)
 
