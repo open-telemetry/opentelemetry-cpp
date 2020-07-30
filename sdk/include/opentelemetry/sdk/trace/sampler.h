@@ -2,9 +2,9 @@
 
 #include "opentelemetry/common/attribute_value.h"
 #include "opentelemetry/trace/span.h"
+#include "opentelemetry/trace/span_context.h"
 #include "opentelemetry/trace/trace_id.h"
 #include "opentelemetry/version.h"
-#include "opentelemetry/trace/span_context.h"
 
 #include <map>
 #include <memory>
@@ -77,7 +77,7 @@ public:
    *
    * @return the description of this Sampler.
    */
-  virtual std::string GetDescription() const noexcept = 0;
+  virtual nostd::string_view GetDescription() const noexcept = 0;
 };
 }  // namespace trace
 }  // namespace sdk

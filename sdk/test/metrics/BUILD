@@ -10,9 +10,9 @@ cc_test(
 )
 
 cc_test(
-    name = "ungrouped_processor_test",
+    name = "counter_aggregator_test",
     srcs = [
-        "ungrouped_processor_test.cc",
+        "counter_aggregator_test.cc",
     ],
     deps = [
         "//sdk/src/metrics",
@@ -20,3 +20,24 @@ cc_test(
     ],
 )
 
+cc_test(
+    name = "histogram_aggregator_test",
+    srcs = [
+        "histogram_aggregator_test.cc",
+    ],
+    deps = [
+        "//sdk/src/metrics",
+        "@com_google_googletest//:gtest_main",
+    ],
+)
+
+cc_test(
+     name = "ungrouped_processor_test",
+     srcs = [
+         "ungrouped_processor_test.cc",
+     ],
+     deps = [
+         "//sdk/src/metrics",
+         "@com_google_googletest//:gtest_main",
+     ],
+ )
