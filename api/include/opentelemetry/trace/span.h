@@ -2,7 +2,6 @@
 
 #include <cstdint>
 
-#include "opentelemetry/trace/tracer.h"
 #include "opentelemetry/common/attribute_value.h"
 #include "opentelemetry/core/timestamp.h"
 #include "opentelemetry/nostd/span.h"
