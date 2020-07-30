@@ -3,17 +3,19 @@
 #include "opentelemetry/trace/provider.h"
 
 // Using an exporter that simply dumps span data to stdout.
-#include "opentelemetry/exporters/ostream/span_exporter.h"
 #include "foo_library/foo_library.h"
+#include "opentelemetry/exporters/ostream/span_exporter.h"
 
 namespace
 {
 void initTracer()
 {
-  auto exporter  = std::unique_ptr<sdktrace::SpanExporter>(new opentelemetry::exporter::trace::OStreamSpanExporter);
+  auto exporter = std::unique_ptr<sdktrace::SpanExporter>(
+      new opentelemetry::exporter::trace::OStreamSpanExporter);
   auto processor = std::shared_ptr<sdktrace::SpanProcessor>(
       new sdktrace::SimpleSpanProcessor(std::move(exporter)));
-  auto provider = nostd::shared_ptr<opentelemetry::trace::TracerProvider>(new sdktrace::TracerProvider(processor));
+  auto provider = nostd::shared_ptr<opentelemetry::trace::TracerProvider>(
+      new sdktrace::TracerProvider(processor));
   // Set the global trace provider
   opentelemetry::trace::Provider::SetTracerProvider(provider);
 }
