@@ -24,7 +24,7 @@ namespace propagators
     // CompositeHTTPPropagator provides a mechanism for combining multiple
     // propagators into a single one.
     template <typename T>
-    class CompositeHTTPPropagator : public trace::propagation::HTTPTextFormat<T>
+    class CompositeHTTPPropagator : public trace::propagation::HTTPTextFormat<T> {
         public:
             // Rules that manages how context will be extracted from carrier.
             using Getter = nostd::string_view(*)(const T &carrier, nostd::string_view trace_type);

@@ -36,7 +36,6 @@ namespace propagation
 {
 static const nostd::string_view kTraceParent = "traceparent";
 static const nostd::string_view kTraceState = "tracestate";
-// Parameters no longer needed because the toString functions are resolved else where
 static const int kVersionBytes = 2;
 static const int kTraceIdBytes = 32;
 static const int kParentIdBytes = 16;
@@ -174,7 +173,7 @@ class HttpTraceContext : public HTTPTextFormat<T> {
             bool is_valid = trace_parent.length() == kHeaderSize
                             && trace_parent[kVersionBytes] == '-'
                             && trace_parent[kVersionBytes+kTraceIdBytes+1] == '-'
-                            && trace_parent[kVersionBytes+kTraceIdBytes+kParentIdBytes+2] == '-';
+                            && trace_parent[kVersionBytes+kTraceIdBytes+kSpanIdBytes+2] == '-';
             if (!is_valid) {
                 std::cout<<"Unparseable trace_parent header. Returning INVALID span context."<<std::endl;
                 return SpanContext();
@@ -285,7 +284,6 @@ class HttpTraceContext : public HTTPTextFormat<T> {
             }
 
             nostd::string_view trace_state_header = getter(carrier, kTraceState);
-//            trace_state_header = nostd::string_view(carrier[std::string(kTraceState)]);
 
             if (trace_state_header == "" || trace_state_header.empty()) {
                 return context_from_parent_header;
@@ -300,22 +298,21 @@ class HttpTraceContext : public HTTPTextFormat<T> {
                     trace_state,
                     true
                 );
-//                return SpanContext.CreateFromRemoteParent(
-//                    context_from_parent_header.GetTraceId(),
-//                    context_from_parent_header.GetSpanId(),
-//                    context_from_parent_header.GetTraceFlags(),
-//                    trace_state
-//                );
             } catch (std::exception& e) {
                 std::cout<<"Unparseable tracestate header. Returning span context without state."<<std::endl;
                 return context_from_parent_header;
-//                return SpanContext.CreateFromRemoteParent(
-//                    context_from_parent_header.GetTraceId(),
-//                    context_from_parent_header.GetSpanId(),
-//                    context_from_parent_header.GetTraceFlags(),
-//                    TraceState.Builder().Build());
             }
         }
+        const nostd::string_view kTraceParent = "traceparent";
+        const nostd::string_view kTraceState = "tracestate";
+        const int kVersionBytes = 2;
+        const int kTraceIdBytes = 32;
+        const int kSpanIdBytes = 16;
+        const int kTraceFlagBytes = 2;
+        const int kTraceDelimiterBytes = 3;
+        const int kHeaderSize = kVersionBytes + kTraceIdBytes + kSpanIdBytes + kTraceFlagBytes + kTraceDelimiterBytes;
+        const int kTraceStateMaxMembers = 32;
+        const int kHeaderElementLengths[4] = {2,32,16,2};
 };
 }
 }  // namespace trace
