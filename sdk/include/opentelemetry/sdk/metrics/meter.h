@@ -13,7 +13,8 @@ namespace metrics
 namespace metrics_api = opentelemetry::metrics;
 class Meter final : public metrics_api::Meter, public std::enable_shared_from_this<Meter>
 {
-explicit Meter(std::string library_name, std::string library_version = "")
+public:
+  explicit Meter(std::string library_name, std::string library_version = "")
   {
     library_name_ = library_name;
     library_version_ = library_version;
@@ -195,6 +196,9 @@ explicit Meter(std::string library_name, std::string library_version = "")
       const trace::KeyValueIterable &labels,
       nostd::span<metrics_api::SynchronousInstrument<double>*> instruments,
       nostd::span<const double> values) noexcept override {}
+private:
+  std::string library_name_;
+  std::string library_version_;
 };
 }  // namespace metrics
 }  // namespace sdk
