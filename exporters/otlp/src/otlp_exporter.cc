@@ -1,5 +1,5 @@
-#include "otlp_exporter.h"
-#include "recordable.h"
+#include "opentelemetry/exporters/otlp/otlp_exporter.h"
+#include "opentelemetry/exporters/otlp/recordable.h"
 
 #include <grpcpp/grpcpp.h>
 #include <iostream>
