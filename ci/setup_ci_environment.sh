@@ -6,6 +6,5 @@ apt-get install --no-install-recommends --no-install-suggests -y \
                 build-essential \
                 ca-certificates \
                 wget \
-                git \
-                g++-10
+                git
 apt-get install -y lcov
