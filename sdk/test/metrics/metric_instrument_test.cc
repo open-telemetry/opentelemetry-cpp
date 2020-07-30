@@ -57,8 +57,8 @@ TEST(Counter, Binding)
     auto eta = alpha.bindCounter(labelkv3);
     
     EXPECT_EQ (beta->get_ref(), 1);
-    EXPECT_EQ(gamma->get_ref(),3);
-    EXPECT_EQ(eta->get_ref(),2);
+    EXPECT_EQ(gamma->get_ref(), 3);
+    EXPECT_EQ(eta->get_ref(), 2);
     
     delta->unbind();
     gamma->unbind();
@@ -92,8 +92,8 @@ TEST(Counter, getAggsandnewupdate)
     auto eta = alpha.bindCounter(labelkv3);
     
     EXPECT_EQ (beta->get_ref(), 1);
-    EXPECT_EQ(gamma->get_ref(),3);
-    EXPECT_EQ(eta->get_ref(),2);
+    EXPECT_EQ(gamma->get_ref(), 3);
+    EXPECT_EQ(eta->get_ref(), 2);
     
     delta->unbind();
     gamma->unbind();
