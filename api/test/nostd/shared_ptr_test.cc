@@ -124,7 +124,8 @@ TEST(SharedPtrTest, PointerOperators)
   shared_ptr<int> ptr1{value};
 
   EXPECT_EQ(&*ptr1, value);
-  EXPECT_EQ(nullptr, (shared_ptr<B> {}).get());
+  EXPECT_EQ(
+      shared_ptr<B> { new B }->f(), 123);
 }
 
 TEST(SharedPtrTest, Swap)
