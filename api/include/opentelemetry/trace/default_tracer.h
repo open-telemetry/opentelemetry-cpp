@@ -1,4 +1,7 @@
 #pragma once
+#include "opentelemetry/trace/tracer.h"
+#include "opentelemetry/nostd/unique_ptr.h"
+#include "opentelemetry/trace/default_span.h"
 
 #define pass
 class DefaultTracer : public Tracer {
