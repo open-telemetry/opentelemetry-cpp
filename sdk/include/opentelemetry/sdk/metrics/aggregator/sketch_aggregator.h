@@ -93,7 +93,6 @@ public:
         int idx = iter->first;
         int count = iter->second;
         
-        // will iterator ever reach the end, think it is a possibility
         while (count < (q * (this->checkpoint_[1]-1)) && iter != checkpoint_raw_.end()){
             iter++;
             idx = iter->first;
@@ -147,6 +146,8 @@ public:
         
         this->values_[0]+=other.values_[0];
         this->values_[1]+=other.values_[1];
+        this->checkpoint_[0]+=other.checkpoint_[0];
+        this->checkpoint_[1]+=other.checkpoint_[1];
         auto other_iter = other.raw_.begin();
         while (other_iter != other.raw_.end()){
             raw_[other_iter->first] += other_iter->second;
@@ -156,6 +157,16 @@ public:
                 raw_[raw_.begin()->first]+=minidxval;
             }
             other_iter++;
+        }
+        auto other_ckpt_iter = other.checkpoint_raw_.begin();
+        while (other_ckpt_iter != other.checkpoint_raw_.end()){
+            checkpoint_raw_[other_ckpt_iter->first] += other_ckpt_iter->second;
+            if (checkpoint_raw_.size() > max_buckets_){
+                int minidx = checkpoint_raw_.begin()->first, minidxval = checkpoint_raw_.begin()->second;
+                checkpoint_raw_.erase(minidx);
+                checkpoint_raw_[checkpoint_raw_.begin()->first]+=minidxval;
+            }
+            other_ckpt_iter++;
         }
         this-> mu_.unlock();
     }
