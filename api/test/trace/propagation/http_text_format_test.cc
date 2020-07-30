@@ -40,8 +40,7 @@ TEST(HTTPTextFormatTest, TraceIdBufferGeneration)
 {
     constexpr uint8_t buf[] = {1, 2, 3, 4, 5, 6, 7, 8, 8, 7, 0xaa, 0xbb, 0xcc, 0xdd, 0xee, 0xff};
     trace::TraceId id(buf);
-    EXPECT_EQ(MapHttpTraceContext::GenerateTraceIdFromString("01020304050607080807aabbccddeeff"),
-                trace::TraceId({1, 2, 3, 4, 5, 6, 7, 8, 8, 7, 0xaa, 0xbb, 0xcc, 0xdd, 0xee, 0xff}));
+    EXPECT_EQ(MapHttpTraceContext::GenerateTraceIdFromString("01020304050607080807aabbccddeeff"),id);
 }
 
 TEST(HTTPTextFormatTest, SpanIdBufferGeneration)
