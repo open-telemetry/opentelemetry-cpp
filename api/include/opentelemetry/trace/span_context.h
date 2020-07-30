@@ -73,7 +73,7 @@ public:
   static SpanContext GetInvalid() { return SpanContext(); }
 
   nostd::unique_ptr<Span> test() {
-    return nostd::unique_ptr<Span>();
+    return nostd::unique_ptr<Span>(new Span());
   }
 
 private:
