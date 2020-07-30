@@ -41,7 +41,7 @@ private:
   template <typename T>
   void PrintAggregatorVariant(sdkmetrics::AggregatorVariant value)
   {
-    auto agg     = nostd::get<nostd::shared_ptr<sdkmetrics::Aggregator<T>>>(value);
+    auto agg     = nostd::get<std::shared_ptr<sdkmetrics::Aggregator<T>>>(value);
     auto aggKind = agg->get_aggregator_kind();
 
     if (aggKind == sdkmetrics::AggregatorKind::Counter)

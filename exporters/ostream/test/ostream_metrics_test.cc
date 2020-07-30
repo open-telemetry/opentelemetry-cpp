@@ -19,7 +19,7 @@ TEST(OStreamMetricsExporter, PrintCounter)
   auto exporter = std::unique_ptr<sdkmetrics::MetricsExporter>(
       new opentelemetry::exporter::metrics::OStreamMetricsExporter);
 
-  auto aggregator = nostd::shared_ptr<opentelemetry::sdk::metrics::Aggregator<double>>(
+  auto aggregator = std::shared_ptr<opentelemetry::sdk::metrics::Aggregator<double>>(
       new opentelemetry::sdk::metrics::CounterAggregator<double>(
           metrics_api::InstrumentKind::Counter));
 
@@ -59,7 +59,7 @@ TEST(OStreamMetricsExporter, PrintMinMaxSumCount)
   auto exporter = std::unique_ptr<sdkmetrics::MetricsExporter>(
       new opentelemetry::exporter::metrics::OStreamMetricsExporter);
 
-  auto aggregator = nostd::shared_ptr<opentelemetry::sdk::metrics::Aggregator<int>>(
+  auto aggregator = std::shared_ptr<opentelemetry::sdk::metrics::Aggregator<int>>(
       new opentelemetry::sdk::metrics::MinMaxSumCountAggregator<int>(
           metrics_api::InstrumentKind::Counter));
 
@@ -103,7 +103,7 @@ TEST(OStreamMetricsExporter, PrintGauge)
   auto exporter = std::unique_ptr<sdkmetrics::MetricsExporter>(
       new opentelemetry::exporter::metrics::OStreamMetricsExporter);
 
-  auto aggregator = nostd::shared_ptr<opentelemetry::sdk::metrics::Aggregator<short>>(
+  auto aggregator = std::shared_ptr<opentelemetry::sdk::metrics::Aggregator<short>>(
       new opentelemetry::sdk::metrics::GaugeAggregator<short>(
           metrics_api::InstrumentKind::Counter));
 
@@ -147,11 +147,11 @@ TEST(OStreamMetricsExporter, PrintExact)
   auto exporter = std::unique_ptr<sdkmetrics::MetricsExporter>(
       new opentelemetry::exporter::metrics::OStreamMetricsExporter);
 
-  auto aggregator = nostd::shared_ptr<opentelemetry::sdk::metrics::Aggregator<short>>(
+  auto aggregator = std::shared_ptr<opentelemetry::sdk::metrics::Aggregator<short>>(
       new opentelemetry::sdk::metrics::ExactAggregator<short>(metrics_api::InstrumentKind::Counter,
                                                               true));
 
-  auto aggregator2 = nostd::shared_ptr<opentelemetry::sdk::metrics::Aggregator<short>>(
+  auto aggregator2 = std::shared_ptr<opentelemetry::sdk::metrics::Aggregator<short>>(
       new opentelemetry::sdk::metrics::ExactAggregator<short>(metrics_api::InstrumentKind::Counter,
                                                               false));
 
@@ -205,7 +205,7 @@ TEST(OStreamMetricsExporter, PrintHistogram)
       new opentelemetry::exporter::metrics::OStreamMetricsExporter);
 
   std::vector<double> boundaries{10, 20, 30, 40, 50};
-  auto aggregator = nostd::shared_ptr<opentelemetry::sdk::metrics::Aggregator<float>>(
+  auto aggregator = std::shared_ptr<opentelemetry::sdk::metrics::Aggregator<float>>(
       new opentelemetry::sdk::metrics::HistogramAggregator<float>(
           metrics_api::InstrumentKind::Counter, boundaries));
 
@@ -250,7 +250,7 @@ TEST(OStreamMetricsExporter, PrintSketch)
       new opentelemetry::exporter::metrics::OStreamMetricsExporter);
 
   std::vector<double> boundaries{1, 3, 5, 7, 9};
-  auto aggregator = nostd::shared_ptr<opentelemetry::sdk::metrics::Aggregator<int>>(
+  auto aggregator = std::shared_ptr<opentelemetry::sdk::metrics::Aggregator<int>>(
       new opentelemetry::sdk::metrics::SketchAggregator<int>(metrics_api::InstrumentKind::Counter,
                                                              .000005));
 
