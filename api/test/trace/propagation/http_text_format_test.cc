@@ -45,14 +45,12 @@ TEST(HTTPTextFormatTest, TraceIdBufferGeneration)
 TEST(HTTPTextFormatTest, SpanIdBufferGeneration)
 {
     constexpr uint8_t buf[] = {1, 2, 0xaa, 0xbb, 0xcc, 0xdd, 0xee, 0xff};
-    trace::SpanId id(buf);
-    EXPECT_EQ(MapHttpTraceContext::GenerateSpanIdFromString("0102aabbccddeeff"),id);
+    EXPECT_EQ(MapHttpTraceContext::GenerateSpanIdFromString("0102aabbccddeeff"),trace::SpanId(buf));
 }
 
 TEST(HTTPTextFormatTest, TraceFlagsBufferGeneration)
 {
-    trace::TraceFlags flags;
-    EXPECT_EQ(MapHttpTraceContext::GenerateTraceFlagsFromString("00"),flags);
+    EXPECT_EQ(MapHttpTraceContext::GenerateTraceFlagsFromString("00"),trace::TraceFlags());
 }
 
 TEST(HTTPTextFormatTest, HeadersWithTraceState)
