@@ -34,6 +34,6 @@ public:
   {
     pass;
   }
-}
+};
 }
 OPENTELEMETRY_END_NAMESPACE
