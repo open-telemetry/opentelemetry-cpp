@@ -1,5 +1,3 @@
-#include "opentelemetry/trace/propagation/http_text_format.h"
-#include "opentelemetry/trace/propagation/http_trace_context.h"
 #include "opentelemetry/context/context.h"
 #include "opentelemetry/trace/tracer.h"
 #include "opentelemetry/trace/span.h"
@@ -16,6 +14,10 @@
 #include <string>
 
 #include <gtest/gtest.h>
+
+#include "opentelemetry/trace/default_span.h"
+#include "opentelemetry/trace/propagation/http_text_format.h"
+#include "opentelemetry/trace/propagation/http_trace_context.h"
 
 using namespace opentelemetry;
 
