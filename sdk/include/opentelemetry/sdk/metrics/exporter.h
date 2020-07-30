@@ -1,8 +1,8 @@
 #pragma once
 
 #include <memory>
-#include "opentelemetry/version.h"
 #include "opentelemetry/sdk/metrics/record.h"
+#include "opentelemetry/version.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace sdk
@@ -45,7 +45,6 @@ public:
    * The Shutdown function can be implemented within exporters that wish to have one,
    * but will not be enforced through this header
    */
-
 };
 }  // namespace metrics
 }  // namespace sdk

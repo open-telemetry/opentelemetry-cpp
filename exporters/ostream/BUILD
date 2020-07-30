@@ -21,7 +21,7 @@ cc_test(
         ":ostream_metrics_exporter",
         "@com_google_googletest//:gtest_main",
     ],
- )
+)
 
 cc_library(
     name = "ostream_span_exporter",
