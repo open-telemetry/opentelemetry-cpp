@@ -82,7 +82,7 @@ public:
      * @param q, the quantile to calculate (for example 0.5 is equivelant to the 50th percentile)
      */
     virtual T get_quantiles(double q) override {
-        if (q < 0 or q > 1){
+        if (q < 0 || q > 1){
 #if __EXCEPTIONS
             throw std::invalid_argument("Quantile values must fall between 0 and 1");
 #else
@@ -132,9 +132,17 @@ public:
     {
         this-> mu_.lock();
         if (gamma != other.gamma){
+#if __EXCEPTIONS
             throw std::invalid_argument("Aggregators must have identical error tolerance");
+#else
+            std::terminate();
+#endif
         } else if (max_buckets_ != other.max_buckets_) {
+#if __EXCEPTIONS
             throw std::invalid_argument("Aggregators must have the same maximum bucket allowance");
+#else
+            std::terminate();
+#endif
         }
         
         this->values_[0]+=other.values_[0];
