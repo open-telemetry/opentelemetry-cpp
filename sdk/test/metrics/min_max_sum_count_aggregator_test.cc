@@ -23,10 +23,10 @@ TEST(MinMaxSumCountAggregator, Update)
   }
 
   value_set = agg.get_values();
-  ASSERT_EQ(value_set[0], 1); // min
-  ASSERT_EQ(value_set[1], 10); // max
-  ASSERT_EQ(value_set[2], 55); // sum
-  ASSERT_EQ(value_set[3], 10); // count
+  ASSERT_EQ(value_set[0], 1);   // min
+  ASSERT_EQ(value_set[1], 10);  // max
+  ASSERT_EQ(value_set[2], 55);  // sum
+  ASSERT_EQ(value_set[3], 10);  // count
 }
 
 TEST(MinMaxSumCountAggregator, FirstUpdate)
@@ -36,10 +36,10 @@ TEST(MinMaxSumCountAggregator, FirstUpdate)
   MinMaxSumCountAggregator<int> agg(opentelemetry::metrics::InstrumentKind::Counter);
   agg.update(1);
   auto value_set = agg.get_values();
-  ASSERT_EQ(value_set[0], 1); // min
-  ASSERT_EQ(value_set[1], 1); // max
-  ASSERT_EQ(value_set[2], 1); // sum
-  ASSERT_EQ(value_set[3], 1); // count
+  ASSERT_EQ(value_set[0], 1);  // min
+  ASSERT_EQ(value_set[1], 1);  // max
+  ASSERT_EQ(value_set[2], 1);  // sum
+  ASSERT_EQ(value_set[3], 1);  // count
 }
 
 TEST(MinMaxSumCountAggregator, Checkpoint)
@@ -51,10 +51,10 @@ TEST(MinMaxSumCountAggregator, Checkpoint)
 
   // Verify that the default checkpoint is set correctly.
   auto checkpoint_set = agg.get_checkpoint();
-  ASSERT_EQ(checkpoint_set[0], 0); // min
-  ASSERT_EQ(checkpoint_set[1], 0); // max
-  ASSERT_EQ(checkpoint_set[2], 0); // sum
-  ASSERT_EQ(checkpoint_set[3], 0); // count
+  ASSERT_EQ(checkpoint_set[0], 0);  // min
+  ASSERT_EQ(checkpoint_set[1], 0);  // max
+  ASSERT_EQ(checkpoint_set[2], 0);  // sum
+  ASSERT_EQ(checkpoint_set[3], 0);  // count
 
   // 1 + 2 + 3 + ... + 10 = 55
   for (int i = 1; i <= 10; ++i)
@@ -66,17 +66,17 @@ TEST(MinMaxSumCountAggregator, Checkpoint)
 
   // Verify that the checkpoint values were updated.
   checkpoint_set = agg.get_checkpoint();
-  ASSERT_EQ(checkpoint_set[0], 1); // min
-  ASSERT_EQ(checkpoint_set[1], 10); // max
-  ASSERT_EQ(checkpoint_set[2], 55); // sum
-  ASSERT_EQ(checkpoint_set[3], 10); // count
+  ASSERT_EQ(checkpoint_set[0], 1);   // min
+  ASSERT_EQ(checkpoint_set[1], 10);  // max
+  ASSERT_EQ(checkpoint_set[2], 55);  // sum
+  ASSERT_EQ(checkpoint_set[3], 10);  // count
 
   // Verify that the current values were reset to the default state.
   auto value_set = agg.get_values();
-  ASSERT_EQ(value_set[0], 0); // min
-  ASSERT_EQ(value_set[1], 0); // max
-  ASSERT_EQ(value_set[2], 0); // sum
-  ASSERT_EQ(value_set[3], 0); // count
+  ASSERT_EQ(value_set[0], 0);  // min
+  ASSERT_EQ(value_set[1], 0);  // max
+  ASSERT_EQ(value_set[2], 0);  // sum
+  ASSERT_EQ(value_set[3], 0);  // count
 }
 
 TEST(MinMaxSumCountAggregator, Merge)
@@ -102,10 +102,10 @@ TEST(MinMaxSumCountAggregator, Merge)
 
   // Verify that the current values were changed by the merge.
   auto value_set = agg1.get_values();
-  ASSERT_EQ(value_set[0], 1); // min
-  ASSERT_EQ(value_set[1], 20); // max
-  ASSERT_EQ(value_set[2], 265); // sum
-  ASSERT_EQ(value_set[3], 30); // count
+  ASSERT_EQ(value_set[0], 1);    // min
+  ASSERT_EQ(value_set[1], 20);   // max
+  ASSERT_EQ(value_set[2], 265);  // sum
+  ASSERT_EQ(value_set[3], 30);   // count
 }
 
 TEST(MinMaxSumCountAggregator, BadMerge)
@@ -122,10 +122,10 @@ TEST(MinMaxSumCountAggregator, BadMerge)
 
   // Verify that the values did NOT merge
   auto value_set = agg1.get_values();
-  ASSERT_EQ(value_set[0], 1); // min
-  ASSERT_EQ(value_set[0], 1); // max
-  ASSERT_EQ(value_set[0], 1); // sum
-  ASSERT_EQ(value_set[0], 1); // count
+  ASSERT_EQ(value_set[0], 1);  // min
+  ASSERT_EQ(value_set[0], 1);  // max
+  ASSERT_EQ(value_set[0], 1);  // sum
+  ASSERT_EQ(value_set[0], 1);  // count
 }
 
 TEST(MinMaxSumCountAggregator, Types)
@@ -150,28 +150,28 @@ TEST(MinMaxSumCountAggregator, Types)
   }
 
   auto value_set = agg_int.get_values();
-  ASSERT_EQ(value_set[0], 1); // min
-  ASSERT_EQ(value_set[1], 10); // max
-  ASSERT_EQ(value_set[2], 55); // sum
-  ASSERT_EQ(value_set[3], 10); // count
+  ASSERT_EQ(value_set[0], 1);   // min
+  ASSERT_EQ(value_set[1], 10);  // max
+  ASSERT_EQ(value_set[2], 55);  // sum
+  ASSERT_EQ(value_set[3], 10);  // count
 
   auto value_set2 = agg_long.get_values();
-  ASSERT_EQ(value_set[0], 1); // min
-  ASSERT_EQ(value_set[1], 10); // max
-  ASSERT_EQ(value_set[2], 55); // sum
-  ASSERT_EQ(value_set[3], 10); // count
+  ASSERT_EQ(value_set[0], 1);   // min
+  ASSERT_EQ(value_set[1], 10);  // max
+  ASSERT_EQ(value_set[2], 55);  // sum
+  ASSERT_EQ(value_set[3], 10);  // count
 
   auto value_set3 = agg_float.get_values();
-  ASSERT_EQ(value_set[0], 1.0); // min
-  ASSERT_EQ(value_set[1], 10.0); // max
-  ASSERT_EQ(value_set[2], 55.0); // sum
-  ASSERT_EQ(value_set[3], 10); // count
+  ASSERT_EQ(value_set[0], 1.0);   // min
+  ASSERT_EQ(value_set[1], 10.0);  // max
+  ASSERT_EQ(value_set[2], 55.0);  // sum
+  ASSERT_EQ(value_set[3], 10);    // count
 
   auto value_set4 = agg_double.get_values();
-  ASSERT_EQ(value_set[0], 1.0); // min
-  ASSERT_EQ(value_set[1], 10.0); // max
-  ASSERT_EQ(value_set[2], 55.0); // sum
-  ASSERT_EQ(value_set[3], 10); // count
+  ASSERT_EQ(value_set[0], 1.0);   // min
+  ASSERT_EQ(value_set[1], 10.0);  // max
+  ASSERT_EQ(value_set[2], 55.0);  // sum
+  ASSERT_EQ(value_set[3], 10);    // count
 }
 
 static void callback(MinMaxSumCountAggregator<int> &agg)
