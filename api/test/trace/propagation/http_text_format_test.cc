@@ -70,8 +70,7 @@ TEST(HTTPTextFormatTest, NoTraceParentHeader)
     // When trace context headers are not present, a new SpanContext
     // should be created.
     const std::map<std::string,std::string> carrier = {};
-    nostd::shared_ptr<trace::Span> sp{new trace::DefaultSpan()};
-    context::Context ctx1 = context::Context("current-span",sp);
+    context::Context ctx1 = context::Context("current-span",nostd::shared_ptr<trace::Span>(new trace::DefaultSpan()));
     context::Context ctx2 = format.Extract(Getter, carrier, ctx1);
     trace::Span* span = MapHttpTraceContext::GetCurrentSpan(ctx2);
     EXPECT_EQ(span->GetContext().trace_id(),trace::SpanContext().trace_id());
@@ -87,8 +86,7 @@ TEST(HTTPTextFormatTest, InvalidTraceId)
     // Also ignore any trace state.
     const std::map<std::string,std::string> carrier = { {"traceparent", "00-00000000000000000000000000000000-1234567890123456-00"},
                                                                {"tracestate", "foo=1,bar=2,foo=3"} };
-    nostd::shared_ptr<trace::Span> sp{new trace::DefaultSpan()};
-    context::Context ctx1 = context::Context("current-span",sp);
+    context::Context ctx1 = context::Context("current-span",nostd::shared_ptr<trace::Span>(new trace::DefaultSpan()));
     context::Context ctx2 = format.Extract(Getter, carrier, ctx1);
     trace::Span* span = MapHttpTraceContext::GetCurrentSpan(ctx2);
     EXPECT_EQ(span->GetContext().trace_id(),trace::SpanContext().trace_id());
@@ -104,8 +102,7 @@ TEST(HTTPTextFormatTest, InvalidParentId)
     // Also ignore any trace state.
     const std::map<std::string,std::string> carrier = { {"traceparent", "00-00000000000000000000000000000000-0000000000000000-00"},
                                                                {"tracestate", "foo=1,bar=2,foo=3"} };
-    nostd::shared_ptr<trace::Span> sp{new trace::DefaultSpan()};
-    context::Context ctx1 = context::Context("current-span",sp);
+    context::Context ctx1 = context::Context("current-span",nostd::shared_ptr<trace::Span>(new trace::DefaultSpan()));
     context::Context ctx2 = format.Extract(Getter, carrier, ctx1);
     trace::Span* span = MapHttpTraceContext::GetCurrentSpan(ctx2);
     EXPECT_EQ(span->GetContext().trace_id(),trace::SpanContext().trace_id());
@@ -118,8 +115,7 @@ TEST(HTTPTextFormatTest, NoSendEmptyTraceState)
 {
     // If the trace state is empty, do not set the header.
     const std::map<std::string,std::string> carrier = {{"traceparent","00-4bf92f3577b34da6a3ce929d0e0e4736-0102030405060708-01"}};
-    nostd::shared_ptr<trace::Span> sp{new trace::DefaultSpan()};
-    context::Context ctx1 = context::Context("current-span",sp);
+    context::Context ctx1 = context::Context("current-span",nostd::shared_ptr<trace::Span>(new trace::DefaultSpan()));
     context::Context ctx2 = format.Extract(Getter,carrier,ctx1);
     std::map<std::string,std::string> c2 = {};
     format.Inject(Setter,c2,ctx2);
@@ -133,8 +129,7 @@ TEST(HTTPTextFormatTest, FormatNotSupported)
     // create a new trace context.
     const std::map<std::string,std::string> carrier = { {"traceparent", "00-12345678901234567890123456789012-1234567890123456-00-residue"},
                                                                {"tracestate", "foo=1,bar=2,foo=3"} };
-    nostd::shared_ptr<trace::Span> sp{new trace::DefaultSpan()};
-    context::Context ctx1 = context::Context("current-span",sp);
+    context::Context ctx1 = context::Context("current-span",nostd::shared_ptr<trace::Span>(new trace::DefaultSpan()));
     context::Context ctx2 = format.Extract(Getter,carrier,ctx1);
     trace::Span* span = MapHttpTraceContext::GetCurrentSpan(ctx2);
     EXPECT_FALSE(span->GetContext().IsValid());
@@ -148,9 +143,7 @@ TEST(HTTPTextFormatTest, PropagateInvalidContext)
 {
     // Do not propagate invalid trace context.
     std::map<std::string,std::string> carrier = {};
-    nostd::shared_ptr<trace::Span> sp{new trace::DefaultSpan(trace::SpanContext::GetInvalid())};
-
-    context::Context ctx{"current-span",sp};
+    context::Context ctx{"current-span",nostd::shared_ptr<trace::Span>(new trace::DefaultSpan(trace::SpanContext::GetInvalid()))};
     format.Inject(Setter, carrier, ctx);
     EXPECT_TRUE(carrier.count("traceparent") == 0);
 }
@@ -160,8 +153,7 @@ TEST(HTTPTextFormatTest, TraceStateHeaderWithTrailingComma)
     // Do not propagate invalid trace context.
     const std::map<std::string,std::string> carrier = { {"traceparent", "00-12345678901234567890123456789012-1234567890123456-00"},
                                                                {"tracestate", "foo=1,"} };
-    nostd::shared_ptr<trace::Span> sp{new trace::DefaultSpan()};
-    context::Context ctx1 = context::Context("current-span",sp);
+    context::Context ctx1 = context::Context("current-span",nostd::shared_ptr<trace::Span>(new trace::DefaultSpan()));
     context::Context ctx2 = format.Extract(Getter,carrier,ctx1);
     trace::Span* span = MapHttpTraceContext::GetCurrentSpan(ctx2);
     trace::TraceState trace_state = span->GetContext().trace_state();
@@ -174,8 +166,7 @@ TEST(HTTPTextFormatTest, TraceStateKeys)
     std::string trace_state_value = "1a-2f@foo=bar1,1a-_*/2b@foo=bar2,foo=bar3,foo-_*/bar=bar4";
     const std::map<std::string,std::string> carrier = { {"traceparent", "00-12345678901234567890123456789012-1234567890123456-00"},
                                                                {"tracestate", trace_state_value} };
-    nostd::shared_ptr<trace::Span> sp{new trace::DefaultSpan()};
-    context::Context ctx1 = context::Context("current-span",sp);
+    context::Context ctx1 = context::Context("current-span",nostd::shared_ptr<trace::Span>(new trace::DefaultSpan()));
     context::Context ctx2 = format.Extract(Getter,carrier,ctx1);
     trace::Span* span = MapHttpTraceContext::GetCurrentSpan(ctx2);
     trace::TraceState trace_state = span->GetContext().trace_state();
