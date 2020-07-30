@@ -30,7 +30,7 @@ public:
                     bool enabled):
                     BoundSynchronousInstrument<T>(name, description, unit, enabled,
                                                   metrics_api::InstrumentKind::Counter,
-                                                  nostd::shared_ptr<Aggregator<T>>(new CounterAggregator<T>(metrics_api::InstrumentKind::Counter))) // Aggregator is chosen here
+                                                  std::shared_ptr<Aggregator<T>>(new CounterAggregator<T>(metrics_api::InstrumentKind::Counter))) // Aggregator is chosen here
     {}
 
     /*
@@ -142,7 +142,7 @@ public:
                           bool enabled):
                           BoundSynchronousInstrument<T>(name, description, unit, enabled,
                                                         metrics_api::InstrumentKind::UpDownCounter,
-                                                        nostd::shared_ptr<Aggregator<T>>(new CounterAggregator<T>(metrics_api::InstrumentKind::UpDownCounter)))
+                                                        std::shared_ptr<Aggregator<T>>(new CounterAggregator<T>(metrics_api::InstrumentKind::UpDownCounter)))
     {}
 
     /*
@@ -242,7 +242,7 @@ public:
                           nostd::string_view unit,
                           bool enabled): BoundSynchronousInstrument<T>(name, description, unit, enabled,
                                                                        metrics_api::InstrumentKind::ValueRecorder,
-                                                                       nostd::shared_ptr<Aggregator<T>>(new MinMaxSumCountAggregator<T>(metrics_api::InstrumentKind::ValueRecorder)))
+                                                                       std::shared_ptr<Aggregator<T>>(new MinMaxSumCountAggregator<T>(metrics_api::InstrumentKind::ValueRecorder)))
     {}
 
     /*
