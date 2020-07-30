@@ -1,5 +1,4 @@
 #include "opentelemetry/sdk/metrics/meter.h"
-
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace sdk
 {
@@ -16,28 +15,29 @@ nostd::shared_ptr<metrics_api::Counter<short>> Meter::NewShortCounter(
     throw std::invalid_argument("Invalid Name");
   }
   auto counter = new Counter<short>(name, description, unit, enabled);
-  auto ptr     = nostd::shared_ptr<metrics_api::Counter<short>>(counter);
+  auto ptr     = std::shared_ptr<metrics_api::Counter<short>>(counter);
   metrics_lock_.lock();
   short_metrics_.insert(std::make_pair(std::string(name), ptr));
   metrics_lock_.unlock();
-  return ptr;
+  return nostd::shared_ptr<metrics_api::Counter<short>>(ptr);
 }
 
-nostd::shared_ptr<metrics_api::Counter<int>> Meter::NewIntCounter(nostd::string_view name,
-                                                                  nostd::string_view description,
-                                                                  nostd::string_view unit,
-                                                                  const bool enabled)
+nostd::shared_ptr<metrics_api::Counter<int>> Meter::NewIntCounter(
+    nostd::string_view name,
+    nostd::string_view description,
+    nostd::string_view unit,
+    const bool enabled)
 {
   if (!IsValidName(name) || NameAlreadyUsed(name))
   {
     throw std::invalid_argument("Invalid Name");
   }
   auto counter = new Counter<int>(name, description, unit, enabled);
-  auto ptr     = nostd::shared_ptr<metrics_api::Counter<int>>(counter);
+  auto ptr = std::shared_ptr<metrics_api::Counter<int>>(counter);
   metrics_lock_.lock();
   int_metrics_.insert(std::make_pair(std::string(name), ptr));
   metrics_lock_.unlock();
-  return ptr;
+  return nostd::shared_ptr<metrics_api::Counter<int>>(ptr);
 }
 
 nostd::shared_ptr<metrics_api::Counter<float>> Meter::NewFloatCounter(
@@ -51,11 +51,11 @@ nostd::shared_ptr<metrics_api::Counter<float>> Meter::NewFloatCounter(
     throw std::invalid_argument("Invalid Name");
   }
   auto counter = new Counter<float>(name, description, unit, enabled);
-  auto ptr     = nostd::shared_ptr<metrics_api::Counter<float>>(counter);
+  auto ptr     = std::shared_ptr<metrics_api::Counter<float>>(counter);
   metrics_lock_.lock();
   float_metrics_.insert(std::make_pair(std::string(name), ptr));
   metrics_lock_.unlock();
-  return ptr;
+  return nostd::shared_ptr<metrics_api::Counter<float>>(ptr);
 }
 
 nostd::shared_ptr<metrics_api::Counter<double>> Meter::NewDoubleCounter(
@@ -69,11 +69,11 @@ nostd::shared_ptr<metrics_api::Counter<double>> Meter::NewDoubleCounter(
     throw std::invalid_argument("Invalid Name");
   }
   auto counter = new Counter<double>(name, description, unit, enabled);
-  auto ptr     = nostd::shared_ptr<metrics_api::Counter<double>>(counter);
+  auto ptr     = std::shared_ptr<metrics_api::Counter<double>>(counter);
   metrics_lock_.lock();
   double_metrics_.insert(std::make_pair(std::string(name), ptr));
   metrics_lock_.unlock();
-  return ptr;
+  return nostd::shared_ptr<metrics_api::Counter<double>>(ptr);
 }
 
 nostd::shared_ptr<metrics_api::UpDownCounter<short>> Meter::NewShortUpDownCounter(
@@ -87,11 +87,11 @@ nostd::shared_ptr<metrics_api::UpDownCounter<short>> Meter::NewShortUpDownCounte
     throw std::invalid_argument("Invalid Name");
   }
   auto udcounter = new UpDownCounter<short>(name, description, unit, enabled);
-  auto ptr       = nostd::shared_ptr<metrics_api::UpDownCounter<short>>(udcounter);
+  auto ptr       = std::shared_ptr<metrics_api::UpDownCounter<short>>(udcounter);
   metrics_lock_.lock();
   short_metrics_.insert(std::make_pair(std::string(name), ptr));
   metrics_lock_.unlock();
-  return ptr;
+  return nostd::shared_ptr<metrics_api::UpDownCounter<short>>(ptr);
 }
 
 nostd::shared_ptr<metrics_api::UpDownCounter<int>> Meter::NewIntUpDownCounter(
@@ -105,11 +105,11 @@ nostd::shared_ptr<metrics_api::UpDownCounter<int>> Meter::NewIntUpDownCounter(
     throw std::invalid_argument("Invalid Name");
   }
   auto udcounter = new UpDownCounter<int>(name, description, unit, enabled);
-  auto ptr       = nostd::shared_ptr<metrics_api::UpDownCounter<int>>(udcounter);
+  auto ptr       = std::shared_ptr<metrics_api::UpDownCounter<int>>(udcounter);
   metrics_lock_.lock();
   int_metrics_.insert(std::make_pair(std::string(name), ptr));
   metrics_lock_.unlock();
-  return ptr;
+  return nostd::shared_ptr<metrics_api::UpDownCounter<int>>(ptr);
 }
 
 nostd::shared_ptr<metrics_api::UpDownCounter<float>> Meter::NewFloatUpDownCounter(
@@ -123,11 +123,11 @@ nostd::shared_ptr<metrics_api::UpDownCounter<float>> Meter::NewFloatUpDownCounte
     throw std::invalid_argument("Invalid Name");
   }
   auto udcounter = new UpDownCounter<float>(name, description, unit, enabled);
-  auto ptr       = nostd::shared_ptr<metrics_api::UpDownCounter<float>>(udcounter);
+  auto ptr       = std::shared_ptr<metrics_api::UpDownCounter<float>>(udcounter);
   metrics_lock_.lock();
   float_metrics_.insert(std::make_pair(std::string(name), ptr));
   metrics_lock_.unlock();
-  return ptr;
+  return nostd::shared_ptr<metrics_api::UpDownCounter<float>>(ptr);
 }
 
 nostd::shared_ptr<metrics_api::UpDownCounter<double>> Meter::NewDoubleUpDownCounter(
@@ -141,11 +141,11 @@ nostd::shared_ptr<metrics_api::UpDownCounter<double>> Meter::NewDoubleUpDownCoun
     throw std::invalid_argument("Invalid Name");
   }
   auto udcounter = new UpDownCounter<double>(name, description, unit, enabled);
-  auto ptr       = nostd::shared_ptr<metrics_api::UpDownCounter<double>>(udcounter);
+  auto ptr       = std::shared_ptr<metrics_api::UpDownCounter<double>>(udcounter);
   metrics_lock_.lock();
   double_metrics_.insert(std::make_pair(std::string(name), ptr));
   metrics_lock_.unlock();
-  return ptr;
+  return nostd::shared_ptr<metrics_api::UpDownCounter<double>>(ptr);
 }
 
 nostd::shared_ptr<metrics_api::ValueRecorder<short>> Meter::NewShortValueRecorder(
@@ -159,11 +159,11 @@ nostd::shared_ptr<metrics_api::ValueRecorder<short>> Meter::NewShortValueRecorde
     throw std::invalid_argument("Invalid Name");
   }
   auto recorder = new ValueRecorder<short>(name, description, unit, enabled);
-  auto ptr      = nostd::shared_ptr<metrics_api::ValueRecorder<short>>(recorder);
+  auto ptr      = std::shared_ptr<metrics_api::ValueRecorder<short>>(recorder);
   metrics_lock_.lock();
   short_metrics_.insert(std::make_pair(std::string(name), ptr));
   metrics_lock_.unlock();
-  return ptr;
+  return nostd::shared_ptr<metrics_api::ValueRecorder<short>>(ptr);
 }
 
 nostd::shared_ptr<metrics_api::ValueRecorder<int>> Meter::NewIntValueRecorder(
@@ -177,11 +177,11 @@ nostd::shared_ptr<metrics_api::ValueRecorder<int>> Meter::NewIntValueRecorder(
     throw std::invalid_argument("Invalid Name");
   }
   auto recorder = new ValueRecorder<int>(name, description, unit, enabled);
-  auto ptr      = nostd::shared_ptr<metrics_api::ValueRecorder<int>>(recorder);
+  auto ptr      = std::shared_ptr<metrics_api::ValueRecorder<int>>(recorder);
   metrics_lock_.lock();
   int_metrics_.insert(std::make_pair(std::string(name), ptr));
   metrics_lock_.unlock();
-  return ptr;
+  return nostd::shared_ptr<metrics_api::ValueRecorder<int>>(ptr);
 }
 
 nostd::shared_ptr<metrics_api::ValueRecorder<float>> Meter::NewFloatValueRecorder(
@@ -195,11 +195,11 @@ nostd::shared_ptr<metrics_api::ValueRecorder<float>> Meter::NewFloatValueRecorde
     throw std::invalid_argument("Invalid Name");
   }
   auto recorder = new ValueRecorder<float>(name, description, unit, enabled);
-  auto ptr      = nostd::shared_ptr<metrics_api::ValueRecorder<float>>(recorder);
+  auto ptr      = std::shared_ptr<metrics_api::ValueRecorder<float>>(recorder);
   metrics_lock_.lock();
   float_metrics_.insert(std::make_pair(std::string(name), ptr));
   metrics_lock_.unlock();
-  return ptr;
+  return nostd::shared_ptr<metrics_api::ValueRecorder<float>>(ptr);
 }
 
 nostd::shared_ptr<metrics_api::ValueRecorder<double>> Meter::NewDoubleValueRecorder(
@@ -213,11 +213,11 @@ nostd::shared_ptr<metrics_api::ValueRecorder<double>> Meter::NewDoubleValueRecor
     throw std::invalid_argument("Invalid Name");
   }
   auto recorder = new ValueRecorder<double>(name, description, unit, enabled);
-  auto ptr      = nostd::shared_ptr<metrics_api::ValueRecorder<double>>(recorder);
+  auto ptr      = std::shared_ptr<metrics_api::ValueRecorder<double>>(recorder);
   metrics_lock_.lock();
   double_metrics_.insert(std::make_pair(std::string(name), ptr));
   metrics_lock_.unlock();
-  return ptr;
+  return nostd::shared_ptr<metrics_api::ValueRecorder<double>>(ptr);
 }
 
 nostd::shared_ptr<metrics_api::SumObserver<short>> Meter::NewShortSumObserver(
@@ -232,11 +232,11 @@ nostd::shared_ptr<metrics_api::SumObserver<short>> Meter::NewShortSumObserver(
     throw std::invalid_argument("Invalid Name");
   }
   auto sumobs = new SumObserver<short>(name, description, unit, enabled, callback);
-  auto ptr    = nostd::shared_ptr<metrics_api::SumObserver<short>>(sumobs);
+  auto ptr    = std::shared_ptr<metrics_api::SumObserver<short>>(sumobs);
   observers_lock_.lock();
   short_observers_.insert(std::make_pair(std::string(name), ptr));
   observers_lock_.unlock();
-  return ptr;
+  return nostd::shared_ptr<metrics_api::SumObserver<short>>(ptr);
 }
 
 nostd::shared_ptr<metrics_api::SumObserver<int>> Meter::NewIntSumObserver(
@@ -251,11 +251,11 @@ nostd::shared_ptr<metrics_api::SumObserver<int>> Meter::NewIntSumObserver(
     throw std::invalid_argument("Invalid Name");
   }
   auto sumobs = new SumObserver<int>(name, description, unit, enabled, callback);
-  auto ptr    = nostd::shared_ptr<metrics_api::SumObserver<int>>(sumobs);
+  auto ptr    = std::shared_ptr<metrics_api::SumObserver<int>>(sumobs);
   observers_lock_.lock();
   int_observers_.insert(std::make_pair(std::string(name), ptr));
   observers_lock_.unlock();
-  return ptr;
+  return nostd::shared_ptr<metrics_api::SumObserver<int>>(ptr);
 }
 
 nostd::shared_ptr<metrics_api::SumObserver<float>> Meter::NewFloatSumObserver(
@@ -270,11 +270,11 @@ nostd::shared_ptr<metrics_api::SumObserver<float>> Meter::NewFloatSumObserver(
     throw std::invalid_argument("Invalid Name");
   }
   auto sumobs = new SumObserver<float>(name, description, unit, enabled, callback);
-  auto ptr    = nostd::shared_ptr<metrics_api::SumObserver<float>>(sumobs);
+  auto ptr    = std::shared_ptr<metrics_api::SumObserver<float>>(sumobs);
   observers_lock_.lock();
   float_observers_.insert(std::make_pair(std::string(name), ptr));
   observers_lock_.unlock();
-  return ptr;
+  return nostd::shared_ptr<metrics_api::SumObserver<float>>(ptr);
 }
 
 nostd::shared_ptr<metrics_api::SumObserver<double>> Meter::NewDoubleSumObserver(
@@ -289,11 +289,11 @@ nostd::shared_ptr<metrics_api::SumObserver<double>> Meter::NewDoubleSumObserver(
     throw std::invalid_argument("Invalid Name");
   }
   auto sumobs = new SumObserver<double>(name, description, unit, enabled, callback);
-  auto ptr    = nostd::shared_ptr<metrics_api::SumObserver<double>>(sumobs);
+  auto ptr    = std::shared_ptr<metrics_api::SumObserver<double>>(sumobs);
   observers_lock_.lock();
   double_observers_.insert(std::make_pair(std::string(name), ptr));
   observers_lock_.unlock();
-  return ptr;
+  return nostd::shared_ptr<metrics_api::SumObserver<double>>(ptr);
 }
 
 nostd::shared_ptr<metrics_api::UpDownSumObserver<short>> Meter::NewShortUpDownSumObserver(
@@ -308,11 +308,11 @@ nostd::shared_ptr<metrics_api::UpDownSumObserver<short>> Meter::NewShortUpDownSu
     throw std::invalid_argument("Invalid Name");
   }
   auto sumobs = new UpDownSumObserver<short>(name, description, unit, enabled, callback);
-  auto ptr    = nostd::shared_ptr<metrics_api::UpDownSumObserver<short>>(sumobs);
+  auto ptr    = std::shared_ptr<metrics_api::UpDownSumObserver<short>>(sumobs);
   observers_lock_.lock();
   short_observers_.insert(std::make_pair(std::string(name), ptr));
   observers_lock_.unlock();
-  return ptr;
+  return nostd::shared_ptr<metrics_api::UpDownSumObserver<short>>(ptr);
 }
 
 nostd::shared_ptr<metrics_api::UpDownSumObserver<int>> Meter::NewIntUpDownSumObserver(
@@ -327,11 +327,11 @@ nostd::shared_ptr<metrics_api::UpDownSumObserver<int>> Meter::NewIntUpDownSumObs
     throw std::invalid_argument("Invalid Name");
   }
   auto sumobs = new UpDownSumObserver<int>(name, description, unit, enabled, callback);
-  auto ptr    = nostd::shared_ptr<metrics_api::UpDownSumObserver<int>>(sumobs);
+  auto ptr    = std::shared_ptr<metrics_api::UpDownSumObserver<int>>(sumobs);
   observers_lock_.lock();
   int_observers_.insert(std::make_pair(std::string(name), ptr));
   observers_lock_.unlock();
-  return ptr;
+  return nostd::shared_ptr<metrics_api::UpDownSumObserver<int>>(ptr);
 }
 
 nostd::shared_ptr<metrics_api::UpDownSumObserver<float>> Meter::NewFloatUpDownSumObserver(
@@ -346,11 +346,11 @@ nostd::shared_ptr<metrics_api::UpDownSumObserver<float>> Meter::NewFloatUpDownSu
     throw std::invalid_argument("Invalid Name");
   }
   auto sumobs = new UpDownSumObserver<float>(name, description, unit, enabled, callback);
-  auto ptr    = nostd::shared_ptr<metrics_api::UpDownSumObserver<float>>(sumobs);
+  auto ptr    = std::shared_ptr<metrics_api::UpDownSumObserver<float>>(sumobs);
   observers_lock_.lock();
   float_observers_.insert(std::make_pair(std::string(name), ptr));
   observers_lock_.unlock();
-  return ptr;
+  return nostd::shared_ptr<metrics_api::UpDownSumObserver<float>>(ptr);
 }
 
 nostd::shared_ptr<metrics_api::UpDownSumObserver<double>> Meter::NewDoubleUpDownSumObserver(
@@ -365,11 +365,11 @@ nostd::shared_ptr<metrics_api::UpDownSumObserver<double>> Meter::NewDoubleUpDown
     throw std::invalid_argument("Invalid Name");
   }
   auto sumobs = new UpDownSumObserver<double>(name, description, unit, enabled, callback);
-  auto ptr    = nostd::shared_ptr<metrics_api::UpDownSumObserver<double>>(sumobs);
+  auto ptr    = std::shared_ptr<metrics_api::UpDownSumObserver<double>>(sumobs);
   observers_lock_.lock();
   double_observers_.insert(std::make_pair(std::string(name), ptr));
   observers_lock_.unlock();
-  return ptr;
+  return nostd::shared_ptr<metrics_api::UpDownSumObserver<double>>(ptr);
 }
 
 nostd::shared_ptr<metrics_api::ValueObserver<short>> Meter::NewShortValueObserver(
@@ -384,11 +384,11 @@ nostd::shared_ptr<metrics_api::ValueObserver<short>> Meter::NewShortValueObserve
     throw std::invalid_argument("Invalid Name");
   }
   auto sumobs = new ValueObserver<short>(name, description, unit, enabled, callback);
-  auto ptr    = nostd::shared_ptr<metrics_api::ValueObserver<short>>(sumobs);
+  auto ptr    = std::shared_ptr<metrics_api::ValueObserver<short>>(sumobs);
   observers_lock_.lock();
   short_observers_.insert(std::make_pair(std::string(name), ptr));
   observers_lock_.unlock();
-  return ptr;
+  return nostd::shared_ptr<metrics_api::ValueObserver<short>>(ptr);
 }
 
 nostd::shared_ptr<metrics_api::ValueObserver<int>> Meter::NewIntValueObserver(
@@ -403,11 +403,11 @@ nostd::shared_ptr<metrics_api::ValueObserver<int>> Meter::NewIntValueObserver(
     throw std::invalid_argument("Invalid Name");
   }
   auto sumobs = new ValueObserver<int>(name, description, unit, enabled, callback);
-  auto ptr    = nostd::shared_ptr<metrics_api::ValueObserver<int>>(sumobs);
+  auto ptr    = std::shared_ptr<metrics_api::ValueObserver<int>>(sumobs);
   observers_lock_.lock();
   int_observers_.insert(std::make_pair(std::string(name), ptr));
   observers_lock_.unlock();
-  return ptr;
+  return nostd::shared_ptr<metrics_api::ValueObserver<int>>(ptr);
 }
 
 nostd::shared_ptr<metrics_api::ValueObserver<float>> Meter::NewFloatValueObserver(
@@ -422,11 +422,11 @@ nostd::shared_ptr<metrics_api::ValueObserver<float>> Meter::NewFloatValueObserve
     throw std::invalid_argument("Invalid Name");
   }
   auto sumobs = new ValueObserver<float>(name, description, unit, enabled, callback);
-  auto ptr    = nostd::shared_ptr<metrics_api::ValueObserver<float>>(sumobs);
+  auto ptr    = std::shared_ptr<metrics_api::ValueObserver<float>>(sumobs);
   observers_lock_.lock();
   float_observers_.insert(std::make_pair(std::string(name), ptr));
   observers_lock_.unlock();
-  return ptr;
+  return nostd::shared_ptr<metrics_api::ValueObserver<float>>(ptr);
 }
 
 nostd::shared_ptr<metrics_api::ValueObserver<double>> Meter::NewDoubleValueObserver(
@@ -441,11 +441,11 @@ nostd::shared_ptr<metrics_api::ValueObserver<double>> Meter::NewDoubleValueObser
     throw std::invalid_argument("Invalid Name");
   }
   auto sumobs = new ValueObserver<double>(name, description, unit, enabled, callback);
-  auto ptr    = nostd::shared_ptr<metrics_api::ValueObserver<double>>(sumobs);
+  auto ptr    = std::shared_ptr<metrics_api::ValueObserver<double>>(sumobs);
   observers_lock_.lock();
   double_observers_.insert(std::make_pair(std::string(name), ptr));
   observers_lock_.unlock();
-  return ptr;
+  return nostd::shared_ptr<metrics_api::ValueObserver<double>>(ptr);
 }
 
 void Meter::RecordShortBatch(
@@ -510,7 +510,7 @@ void Meter::CollectMetrics(std::vector<Record> &records)
     {
       continue;
     }
-    auto cast_ptr = nostd::dynamic_pointer_cast<SynchronousInstrument<short>>(pair.second);
+    auto cast_ptr = std::dynamic_pointer_cast<SynchronousInstrument<short>>(pair.second);
     std::vector<Record> new_records = cast_ptr->GetRecords();
     records.insert(records.begin(), new_records.begin(), new_records.end());
   }
@@ -520,7 +520,7 @@ void Meter::CollectMetrics(std::vector<Record> &records)
     {
       continue;
     }
-    auto cast_ptr = nostd::dynamic_pointer_cast<SynchronousInstrument<int>>(pair.second);
+    auto cast_ptr = std::dynamic_pointer_cast<SynchronousInstrument<int>>(pair.second);
     std::vector<Record> new_records = cast_ptr->GetRecords();
     records.insert(records.begin(), new_records.begin(), new_records.end());
   }
@@ -530,7 +530,7 @@ void Meter::CollectMetrics(std::vector<Record> &records)
     {
       continue;
     }
-    auto cast_ptr = nostd::dynamic_pointer_cast<SynchronousInstrument<float>>(pair.second);
+    auto cast_ptr = std::dynamic_pointer_cast<SynchronousInstrument<float>>(pair.second);
     std::vector<Record> new_records = cast_ptr->GetRecords();
     records.insert(records.begin(), new_records.begin(), new_records.end());
   }
@@ -540,7 +540,7 @@ void Meter::CollectMetrics(std::vector<Record> &records)
     {
       continue;
     }
-    auto cast_ptr = nostd::dynamic_pointer_cast<SynchronousInstrument<double>>(pair.second);
+    auto cast_ptr = std::dynamic_pointer_cast<SynchronousInstrument<double>>(pair.second);
     std::vector<Record> new_records = cast_ptr->GetRecords();
     records.insert(records.begin(), new_records.begin(), new_records.end());
   }
@@ -556,7 +556,7 @@ void Meter::CollectObservers(std::vector<Record> &records)
     {
       continue;
     }
-    auto cast_ptr = nostd::dynamic_pointer_cast<AsynchronousInstrument<short>>(pair.second);
+    auto cast_ptr = std::dynamic_pointer_cast<AsynchronousInstrument<short>>(pair.second);
     std::vector<Record> new_records = cast_ptr->GetRecords();
     records.insert(records.begin(), new_records.begin(), new_records.end());
   }
@@ -566,7 +566,7 @@ void Meter::CollectObservers(std::vector<Record> &records)
     {
       continue;
     }
-    auto cast_ptr = nostd::dynamic_pointer_cast<AsynchronousInstrument<int>>(pair.second);
+    auto cast_ptr = std::dynamic_pointer_cast<AsynchronousInstrument<int>>(pair.second);
     std::vector<Record> new_records = cast_ptr->GetRecords();
     records.insert(records.begin(), new_records.begin(), new_records.end());
   }
@@ -576,7 +576,7 @@ void Meter::CollectObservers(std::vector<Record> &records)
     {
       continue;
     }
-    auto cast_ptr = nostd::dynamic_pointer_cast<AsynchronousInstrument<float>>(pair.second);
+    auto cast_ptr = std::dynamic_pointer_cast<AsynchronousInstrument<float>>(pair.second);
     std::vector<Record> new_records = cast_ptr->GetRecords();
     records.insert(records.begin(), new_records.begin(), new_records.end());
   }
@@ -586,7 +586,7 @@ void Meter::CollectObservers(std::vector<Record> &records)
     {
       continue;
     }
-    auto cast_ptr = nostd::dynamic_pointer_cast<AsynchronousInstrument<double>>(pair.second);
+    auto cast_ptr = std::dynamic_pointer_cast<AsynchronousInstrument<double>>(pair.second);
     std::vector<Record> new_records = cast_ptr->GetRecords();
     records.insert(records.begin(), new_records.begin(), new_records.end());
   }
@@ -631,6 +631,6 @@ bool Meter::NameAlreadyUsed(nostd::string_view name)
   else
     return false;
 }
-}  // namespace metrics
-}  // namespace sdk
+}
+}
 OPENTELEMETRY_END_NAMESPACE
