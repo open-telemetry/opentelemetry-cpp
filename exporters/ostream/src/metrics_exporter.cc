@@ -20,6 +20,11 @@ sdkmetrics::ExportResult OStreamMetricsExporter::Export(
           << "\n  labels      : " << record.GetLabels();
   
     auto aggregator = record.GetAggregator();
+
+    /**
+     * Unpack the AggregatorVariant from the record so we can pass the data type to
+     * PrintAggregatorVariant to unpack the Aggregator from the variant.
+     */
     if(nostd::holds_alternative<nostd::shared_ptr<sdkmetrics::Aggregator<int>>>(aggregator))
     {
       PrintAggregatorVariant<int>(aggregator);

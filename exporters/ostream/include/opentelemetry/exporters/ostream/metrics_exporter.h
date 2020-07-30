@@ -35,7 +35,11 @@ sdkmetrics::ExportResult Export(
 private:
 std::ostream &sout_;
 
-
+/**
+ * Send specific data from the given AggregatorVariant based on what AggregatorKind
+ * it is holding. Each Aggregator holds data differently, so each have their own
+ * custom printing.
+ */
 template <typename T>
 void PrintAggregatorVariant(sdkmetrics::AggregatorVariant value)
 {
@@ -91,8 +95,6 @@ void PrintAggregatorVariant(sdkmetrics::AggregatorVariant value)
       }
       sout_ << ']';
     }
-
-
   }
   else if(aggKind == sdkmetrics::AggregatorKind::Histogram)
   {
@@ -127,7 +129,6 @@ void PrintAggregatorVariant(sdkmetrics::AggregatorVariant value)
   }
   else if(aggKind == sdkmetrics::AggregatorKind::Sketch)
   {
-    // TODO: Waiting for Sketch to be finished
     auto boundaries = agg->get_boundaries();
     auto counts = agg->get_counts();
 
