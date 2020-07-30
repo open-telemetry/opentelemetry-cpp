@@ -4,6 +4,7 @@
 #include "opentelemetry/trace/canonical_code.h"
 #include "opentelemetry/common/attribute_value.h"
 #include "opentelemetry/trace/span.h"
+#include "opentelemetry/trace/default_trace.h"
 
 #define pass
 OPENTELEMETRY_BEGIN_NAMESPACE
