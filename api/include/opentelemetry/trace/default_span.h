@@ -8,6 +8,7 @@
 #define pass
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace trace {
+class DefaultTracer;
 class DefaultSpan: public Span {
   public:
     // Returns an invalid span.
