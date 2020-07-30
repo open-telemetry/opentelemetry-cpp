@@ -1,11 +1,12 @@
 #pragma once
 #include "opentelemetry/trace/tracer.h"
 #include "opentelemetry/nostd/unique_ptr.h"
-#include "opentelemetry/trace/default_span.h"
+//#include "opentelemetry/trace/default_span.h"
 
 #define pass
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace trace {
+class DefaultSpan;
 class DefaultTracer: public Tracer {
 public:
   ~DefaultTracer() = default;
