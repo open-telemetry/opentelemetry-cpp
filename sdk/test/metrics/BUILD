@@ -1,4 +1,16 @@
 cc_test(
+    name = "controller_test",
+    srcs = [
+        "controller_test.cc",
+    ],
+    deps = [
+        "//sdk/src/metrics",
+	"//exporters/ostream:ostream_metrics_exporter",
+        "@com_google_googletest//:gtest_main",
+    ],
+)
+
+cc_test(
     name = "gauge_aggregator_test",
     srcs = [
         "gauge_aggregator_test.cc",
