@@ -450,7 +450,7 @@ nostd::shared_ptr<metrics_api::ValueObserver<double>> Meter::NewDoubleValueObser
 
 void Meter::RecordShortBatch(
     const trace::KeyValueIterable &labels,
-    nostd::span<const nostd::shared_ptr<metrics_api::SynchronousInstrument<short>>> instruments,
+    nostd::span<metrics_api::SynchronousInstrument<short>*> instruments,
     nostd::span<const short> values) noexcept
 {
   for (int i = 0; i < instruments.size(); ++i)
@@ -461,7 +461,7 @@ void Meter::RecordShortBatch(
 
 void Meter::RecordIntBatch(
     const trace::KeyValueIterable &labels,
-    nostd::span<const nostd::shared_ptr<metrics_api::SynchronousInstrument<int>>> instruments,
+    nostd::span<metrics_api::SynchronousInstrument<int>*> instruments,
     nostd::span<const int> values) noexcept
 {
   for (int i = 0; i < instruments.size(); ++i)
@@ -472,7 +472,7 @@ void Meter::RecordIntBatch(
 
 void Meter::RecordFloatBatch(
     const trace::KeyValueIterable &labels,
-    nostd::span<const nostd::shared_ptr<metrics_api::SynchronousInstrument<float>>> instruments,
+    nostd::span<metrics_api::SynchronousInstrument<float>*> instruments,
     nostd::span<const float> values) noexcept
 {
   for (int i = 0; i < instruments.size(); ++i)
@@ -483,7 +483,7 @@ void Meter::RecordFloatBatch(
 
 void Meter::RecordDoubleBatch(
     const trace::KeyValueIterable &labels,
-    nostd::span<const nostd::shared_ptr<metrics_api::SynchronousInstrument<double>>> instruments,
+    nostd::span<metrics_api::SynchronousInstrument<double>*> instruments,
     nostd::span<const double> values) noexcept
 {
   for (int i = 0; i < instruments.size(); ++i)
