@@ -36,29 +36,25 @@ public:
    * @throws IllegalArgumentException if a different metric by the same name exists in this meter.
    * @throws IllegalArgumentException if the {@code name} does not match spec requirements.
    */
-  virtual nostd::shared_ptr<Counter<short>>  NewShortCounter(
-      nostd::string_view name,
-      nostd::string_view description,
-      nostd::string_view unit,
-      const bool enabled) = 0;
+  virtual nostd::shared_ptr<Counter<short>> NewShortCounter(nostd::string_view name,
+                                                            nostd::string_view description,
+                                                            nostd::string_view unit,
+                                                            const bool enabled) = 0;
 
-  virtual nostd::shared_ptr<Counter<int>> NewIntCounter(
-      nostd::string_view name,
-      nostd::string_view description,
-      nostd::string_view unit,
-      const bool enabled) = 0;
+  virtual nostd::shared_ptr<Counter<int>> NewIntCounter(nostd::string_view name,
+                                                        nostd::string_view description,
+                                                        nostd::string_view unit,
+                                                        const bool enabled) = 0;
 
-  virtual nostd::shared_ptr<Counter<float>> NewFloatCounter(
-      nostd::string_view name,
-      nostd::string_view description,
-      nostd::string_view unit,
-      const bool enabled) = 0;
+  virtual nostd::shared_ptr<Counter<float>> NewFloatCounter(nostd::string_view name,
+                                                            nostd::string_view description,
+                                                            nostd::string_view unit,
+                                                            const bool enabled) = 0;
 
-  virtual nostd::shared_ptr<Counter<double>> NewDoubleCounter(
-      nostd::string_view name,
-      nostd::string_view description,
-      nostd::string_view unit,
-      const bool enabled) = 0;
+  virtual nostd::shared_ptr<Counter<double>> NewDoubleCounter(nostd::string_view name,
+                                                              nostd::string_view description,
+                                                              nostd::string_view unit,
+                                                              const bool enabled) = 0;
 
   /**
    * Creates an UpDownCounter with the passed characteristics and returns a shared_ptr to that
@@ -79,11 +75,10 @@ public:
       nostd::string_view unit,
       const bool enabled) = 0;
 
-  virtual nostd::shared_ptr<UpDownCounter<int>> NewIntUpDownCounter(
-      nostd::string_view name,
-      nostd::string_view description,
-      nostd::string_view unit,
-      const bool enabled) = 0;
+  virtual nostd::shared_ptr<UpDownCounter<int>> NewIntUpDownCounter(nostd::string_view name,
+                                                                    nostd::string_view description,
+                                                                    nostd::string_view unit,
+                                                                    const bool enabled) = 0;
 
   virtual nostd::shared_ptr<UpDownCounter<float>> NewFloatUpDownCounter(
       nostd::string_view name,
@@ -116,11 +111,10 @@ public:
       nostd::string_view unit,
       const bool enabled) = 0;
 
-  virtual nostd::shared_ptr<ValueRecorder<int>> NewIntValueRecorder(
-      nostd::string_view name,
-      nostd::string_view description,
-      nostd::string_view unit,
-      const bool enabled) = 0;
+  virtual nostd::shared_ptr<ValueRecorder<int>> NewIntValueRecorder(nostd::string_view name,
+                                                                    nostd::string_view description,
+                                                                    nostd::string_view unit,
+                                                                    const bool enabled) = 0;
 
   virtual nostd::shared_ptr<ValueRecorder<float>> NewFloatValueRecorder(
       nostd::string_view name,
@@ -269,27 +263,21 @@ public:
    * @param values a span of values to record to the instruments in the corresponding
    * position in the instruments span.
    */
-  virtual void RecordShortBatch(
-      const trace::KeyValueIterable &labels,
-      nostd::span<SynchronousInstrument<short>*> instruments,
-      nostd::span<const short> values) noexcept = 0;
+  virtual void RecordShortBatch(const trace::KeyValueIterable &labels,
+                                nostd::span<SynchronousInstrument<short> *> instruments,
+                                nostd::span<const short> values) noexcept = 0;
 
-  virtual void RecordIntBatch(
-      const trace::KeyValueIterable &labels,
-      nostd::span<SynchronousInstrument<int>*> instruments,
-      nostd::span<const int> values) noexcept = 0;
+  virtual void RecordIntBatch(const trace::KeyValueIterable &labels,
+                              nostd::span<SynchronousInstrument<int> *> instruments,
+                              nostd::span<const int> values) noexcept = 0;
 
-  virtual void RecordFloatBatch(
-      const trace::KeyValueIterable &labels,
-      nostd::span<SynchronousInstrument<float>*> instruments,
-      nostd::span<const float> values) noexcept = 0;
+  virtual void RecordFloatBatch(const trace::KeyValueIterable &labels,
+                                nostd::span<SynchronousInstrument<float> *> instruments,
+                                nostd::span<const float> values) noexcept = 0;
 
-  virtual void RecordDoubleBatch(
-      const trace::KeyValueIterable &labels,
-      nostd::span<SynchronousInstrument<double>*> instruments,
-      nostd::span<const double> values) noexcept = 0;
-
-
+  virtual void RecordDoubleBatch(const trace::KeyValueIterable &labels,
+                                 nostd::span<SynchronousInstrument<double> *> instruments,
+                                 nostd::span<const double> values) noexcept = 0;
 };
 }  // namespace metrics
 OPENTELEMETRY_END_NAMESPACE
