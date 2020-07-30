@@ -7,11 +7,11 @@ namespace trace
 {
 ParentOrElseSampler::ParentOrElseSampler(std::shared_ptr<Sampler> delegate_sampler) noexcept
     : delegate_sampler_(delegate_sampler),
-      description_("ParentOrElse{" + delegate_sampler->GetDescription() + "}")
+      description_("ParentOrElse{" + std::string{delegate_sampler->GetDescription()} + "}")
 {}
 
 SamplingResult ParentOrElseSampler::ShouldSample(
-    const SpanContext *parent_context,
+    const trace_api::SpanContext *parent_context,
     trace_api::TraceId trace_id,
     nostd::string_view name,
     trace_api::SpanKind span_kind,
@@ -22,9 +22,9 @@ SamplingResult ParentOrElseSampler::ShouldSample(
     // If no parent (root span) exists returns the result of the delegateSampler
     return delegate_sampler_->ShouldSample(parent_context, trace_id, name, span_kind, attributes);
   }
-  
+
   // If parent exists:
-  if (parent_context->sampled_flag)
+  if (parent_context->IsSampled())
   {
     return {Decision::RECORD_AND_SAMPLE, nullptr};
   }
@@ -32,7 +32,7 @@ SamplingResult ParentOrElseSampler::ShouldSample(
   return {Decision::NOT_RECORD, nullptr};
 }
 
-std::string ParentOrElseSampler::GetDescription() const noexcept
+nostd::string_view ParentOrElseSampler::GetDescription() const noexcept
 {
   return description_;
 }

@@ -2,6 +2,7 @@
 
 #include "opentelemetry/common/attribute_value.h"
 #include "opentelemetry/trace/span.h"
+#include "opentelemetry/trace/span_context.h"
 #include "opentelemetry/trace/trace_id.h"
 #include "opentelemetry/version.h"
 
@@ -48,8 +49,6 @@ struct SamplingResult
 class Sampler
 {
 public:
-  // TODO: Remove this placeholder with real class
-  class SpanContext;
   virtual ~Sampler() = default;
   /**
    * Called during Span creation to make a sampling decision.
@@ -66,7 +65,7 @@ public:
    * @since 0.1.0
    */
 
-  virtual SamplingResult ShouldSample(const SpanContext *parent_context,
+  virtual SamplingResult ShouldSample(const trace_api::SpanContext *parent_context,
                                       trace_api::TraceId trace_id,
                                       nostd::string_view name,
                                       trace_api::SpanKind span_kind,
@@ -78,7 +77,7 @@ public:
    *
    * @return the description of this Sampler.
    */
-  virtual std::string GetDescription() const noexcept = 0;
+  virtual nostd::string_view GetDescription() const noexcept = 0;
 };
 }  // namespace trace
 }  // namespace sdk
