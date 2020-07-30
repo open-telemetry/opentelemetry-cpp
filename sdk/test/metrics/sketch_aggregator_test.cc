@@ -89,8 +89,11 @@ TEST(Sketch, QuantileSmall){
     alpha.checkpoint();
     std::sort(vals1.begin(),vals1.end());
 
+    std::cerr <<abs(alpha.get_quantiles(.25) - vals1[2048*.25 - 1]) <<std::endl;
     EXPECT_TRUE(abs(alpha.get_quantiles(.25) - vals1[2048*.25 - 1]) <= 1);
+    std::cerr <<abs(alpha.get_quantiles(.50) - vals1[2048*.50 - 1]) <<std::endl;
     EXPECT_TRUE(abs(alpha.get_quantiles(.50) - vals1[2048*.50 - 1]) <= 1);
+    std::cerr <<abs(alpha.get_quantiles(.75) - vals1[2048*.75 - 1]) <<std::endl;
     EXPECT_TRUE(abs(alpha.get_quantiles(.75) - vals1[2048*.75 - 1]) <= 1);
 }
 
