@@ -34,7 +34,16 @@ namespace trace
 {
 namespace propagation
 {
-
+static const nostd::string_view kTraceParent = "traceparent";
+static const nostd::string_view kTraceState = "tracestate";
+static const int kVersionBytes = 2;
+static const int kTraceIdBytes = 32;
+static const int kSpanIdBytes = 16;
+static const int kTraceFlagBytes = 2;
+static const int kTraceDelimiterBytes = 3;
+static const int kHeaderSize = kVersionBytes + kTraceIdBytes + kSpanIdBytes + kTraceFlagBytes + kTraceDelimiterBytes;
+static const int kTraceStateMaxMembers = 32;
+static const int kHeaderElementLengths[4] = {2,32,16,2};
 
 // The HttpTraceContext provides methods to extract and inject
 // context into headers of HTTP requests with traces.
@@ -295,16 +304,6 @@ class HttpTraceContext : public HTTPTextFormat<T> {
                 return context_from_parent_header;
             }
         }
-        const nostd::string_view kTraceParent = "traceparent";
-        const nostd::string_view kTraceState = "tracestate";
-        const int kVersionBytes = 2;
-        const int kTraceIdBytes = 32;
-        const int kSpanIdBytes = 16;
-        const int kTraceFlagBytes = 2;
-        const int kTraceDelimiterBytes = 3;
-        const int kHeaderSize = kVersionBytes + kTraceIdBytes + kSpanIdBytes + kTraceFlagBytes + kTraceDelimiterBytes;
-        const int kTraceStateMaxMembers = 32;
-        const int kHeaderElementLengths[4] = {2,32,16,2};
 };
 }
 }  // namespace trace
