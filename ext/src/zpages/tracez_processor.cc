@@ -22,16 +22,15 @@ namespace zpages {
     }
   }
 
-
-  TracezSpanProcessor::CollectedSpans TracezSpanProcessor::GetSpanSnapshot() noexcept {
+  TracezSpanProcessor::CollectedSpans TracezSpanProcessor::GetSpanSnapshot() noexcept
+  {
     CollectedSpans snapshot;
     std::lock_guard<std::mutex> lock(mtx_);
-    snapshot.running = spans_.running;
+    snapshot.running   = spans_.running;
     snapshot.completed = std::move(spans_.completed);
     spans_.completed.clear();
     return snapshot;
   }
-
 
 }  // namespace zpages
 }  // namespace ext

@@ -4,8 +4,8 @@
 #include <memory>
 #include <mutex>
 #include <unordered_set>
-#include <vector>
 #include <utility>
+#include <vector>
 
 #include "opentelemetry/sdk/trace/processor.h"
 #include "opentelemetry/sdk/trace/recordable.h"
@@ -43,7 +43,8 @@ class TracezSpanProcessor : public opentelemetry::sdk::trace::SpanProcessor {
   }
 
   /*
-   * OnStart is called when a span starts; the recordable is cast to span_data and added to running_spans.
+   * OnStart is called when a span starts; the recordable is cast to span_data and added to
+   * running_spans.
    * @param span a recordable for a span that was just started
    */
   void OnStart(opentelemetry::sdk::trace::Recordable &span) noexcept override;
@@ -73,7 +74,8 @@ class TracezSpanProcessor : public opentelemetry::sdk::trace::SpanProcessor {
    * timeout is applied. Currently, timeout does nothing.
    */
   void ForceFlush(
-      std::chrono::microseconds timeout = std::chrono::microseconds(0)) noexcept override {}
+      std::chrono::microseconds timeout = std::chrono::microseconds(0)) noexcept override
+  {}
 
   /*
    * Shut down the processor and do any cleanup required, which is none.
@@ -82,9 +84,10 @@ class TracezSpanProcessor : public opentelemetry::sdk::trace::SpanProcessor {
    * @param timeout an optional timeout, the default timeout of 0 means that no
    * timeout is applied. Currently, timeout does nothing.
    */
-  void Shutdown(std::chrono::microseconds timeout = std::chrono::microseconds(0)) noexcept override {}
+  void Shutdown(std::chrono::microseconds timeout = std::chrono::microseconds(0)) noexcept override
+  {}
 
- private:
+private:
   mutable std::mutex mtx_;
   CollectedSpans spans_;
 };

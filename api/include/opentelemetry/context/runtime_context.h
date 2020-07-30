@@ -47,6 +47,46 @@ public:
 
   static RuntimeContext *context_handler_;
 
+  // Sets the Key and Value into the passed in context or if a context is not
+  // passed in, the RuntimeContext.
+  // Should be used to SetValues to the current RuntimeContext, is essentially
+  // equivalent to RuntimeContext::GetCurrent().SetValue(key,value). Keep in
+  // mind that the current RuntimeContext will not be changed, and the new
+  // context will be returned.
+  static Context SetValue(nostd::string_view key,
+                          ContextValue value,
+                          Context *context = nullptr) noexcept
+  {
+    Context temp_context;
+    if (context == nullptr)
+    {
+      temp_context = GetCurrent();
+    }
+    else
+    {
+      temp_context = *context;
+    }
+    return temp_context.SetValue(key, value);
+  }
+
+  // Returns the value associated with the passed in key and either the
+  // passed in context* or the runtime context if a context is not passed in.
+  // Should be used to get values from the current RuntimeContext, is
+  // essentially equivalent to RuntimeContext::GetCurrent().GetValue(key).
+  static ContextValue GetValue(nostd::string_view key, Context *context = nullptr) noexcept
+  {
+    Context temp_context;
+    if (context == nullptr)
+    {
+      temp_context = GetCurrent();
+    }
+    else
+    {
+      temp_context = *context;
+    }
+    return temp_context.GetValue(key);
+  }
+
 protected:
   // Provides a token with the passed in context
   Token CreateToken(Context context) noexcept { return Token(context); }
