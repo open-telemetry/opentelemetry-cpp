@@ -336,6 +336,7 @@ TEST(UngroupedMetricsProcessor, UngroupedProcessorKeepsRecordInformationStateful
   ASSERT_EQ(checkpoint[0].GetLabels(), "labels");
   ASSERT_EQ(checkpoint[0].GetDescription(), "description");
   ASSERT_EQ(nostd::get<std::shared_ptr<sdkmetrics::Aggregator<double>>>(checkpoint[0].GetAggregator())->get_checkpoint(), aggregator->get_checkpoint());
+  
 
 }
 
@@ -392,6 +393,8 @@ TEST(UngroupedMetricsProcessor, UngroupedProcessorKeepsRecordInformationStateful
   ASSERT_EQ(checkpoint[0].GetLabels(), "labels");
   ASSERT_EQ(checkpoint[0].GetDescription(), "description");
   ASSERT_EQ(nostd::get<std::shared_ptr<sdkmetrics::Aggregator<double>>>(checkpoint[0].GetAggregator())->get_checkpoint(), aggregator->get_checkpoint());
+  
+  std::vector<double> cumulative_checkpoint = aggregator->get_checkpoint();
 
   aggregator->update(5.4);
   aggregator->checkpoint();
@@ -399,6 +402,49 @@ TEST(UngroupedMetricsProcessor, UngroupedProcessorKeepsRecordInformationStateful
   processor->process(r);
 
   std::vector<sdkmetrics::Record> checkpoint2 = processor->CheckpointSelf();
+  for(int i = 0; i < aggregator->get_checkpoint().size(); i++)
+  {
+    cumulative_checkpoint.push_back(aggregator->get_checkpoint()[i]);
+  }
   ASSERT_EQ(checkpoint2.size(), 1);
-  ASSERT_EQ(nostd::get<std::shared_ptr<sdkmetrics::Aggregator<double>>>(checkpoint[0].GetAggregator())->get_checkpoint(), aggregator->get_checkpoint());
+  ASSERT_EQ(nostd::get<std::shared_ptr<sdkmetrics::Aggregator<double>>>(checkpoint[0].GetAggregator())->get_checkpoint(), cumulative_checkpoint);
+}
+
+TEST(UngroupedMetricsProcessor, UngroupedProcessorKeepsRecordInformationStatefulHistogram)
+{
+  auto processor = std::unique_ptr<sdkmetrics::MetricsProcessor> (new
+       opentelemetry::sdk::metrics::UngroupedMetricsProcessor(true)); 
+
+  std::vector<double> boundaries{10,20,30,40,50};
+  auto aggregator = std::shared_ptr<opentelemetry::sdk::metrics::Aggregator<int>> (new
+       opentelemetry::sdk::metrics::HistogramAggregator<int>(metrics_api::InstrumentKind::Counter,boundaries));
+
+  for(int i = 0; i < 60; i++)
+  {
+    aggregator->update(i);
+  }
+  aggregator->checkpoint();
+
+  sdkmetrics::Record r("name", "description", "labels", aggregator);
+
+  processor->process(r);
+  
+  std::vector<sdkmetrics::Record> checkpoint = processor->CheckpointSelf();
+  ASSERT_EQ(checkpoint[0].GetName(), "name");
+  ASSERT_EQ(checkpoint[0].GetLabels(), "labels");
+  ASSERT_EQ(checkpoint[0].GetDescription(), "description");
+  ASSERT_EQ(nostd::get<std::shared_ptr<sdkmetrics::Aggregator<int>>>(checkpoint[0].GetAggregator())->get_boundaries(), aggregator->get_boundaries());
+  ASSERT_EQ(nostd::get<std::shared_ptr<sdkmetrics::Aggregator<int>>>(checkpoint[0].GetAggregator())->get_counts(), aggregator->get_counts());
+
+  for(int i = 0; i < 60; i++)
+  {
+    aggregator->update(i);
+  }
+  aggregator->checkpoint();
+
+  processor->process(r);
+
+  std::vector<sdkmetrics::Record> checkpoint2 = processor->CheckpointSelf();
+  ASSERT_EQ(checkpoint2.size(), 1);
+  ASSERT_EQ(nostd::get<std::shared_ptr<sdkmetrics::Aggregator<int>>>(checkpoint[0].GetAggregator())->get_boundaries(), aggregator->get_boundaries());
 }
