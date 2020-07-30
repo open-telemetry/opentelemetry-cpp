@@ -55,7 +55,7 @@ struct EndSpanOptions
 };
 
 class Tracer;
-class DefaultTracer;
+class DefaultTracer : public Tracer;
 /**
  * A Span represents a single operation within a Trace.
  */
