@@ -4,7 +4,9 @@
 #include "opentelemetry/trace/default_span.h"
 
 #define pass
-class DefaultTracer : public Tracer {
+OPENTELEMETRY_BEGIN_NAMESPACE
+namespace trace {
+class DefaultTracer: public Tracer {
 public:
   ~Tracer() = default;
 
@@ -33,3 +35,5 @@ public:
     pass;
   }
 }
+}
+OPENTELEMETRY_END_NAMESPACE
