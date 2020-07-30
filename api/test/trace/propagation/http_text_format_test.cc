@@ -56,7 +56,7 @@ TEST(HTTPTextFormatTest, TraceFlagsBufferGeneration)
 TEST(HTTPTextFormatTest, HeadersWithTraceState)
 {
     const std::map<std::string,std::string> carrier = {{"traceparent","00-4bf92f3577b34da6a3ce929d0e0e4736-0102030405060708-01"},{"tracestate","congo=congosSecondPosition,rojo=rojosFirstPosition"}};
-    nostd::shared_ptr<trace::Span> sp{new trace::DefaultSpan()};
+    context::Context ctx1 = context::Context("current-span",nostd::shared_ptr<trace::Span>(new trace::DefaultSpan()));
     context::Context ctx2 = format.Extract(Getter,carrier,context::Context("current-span",sp));
     std::map<std::string,std::string> c2 = {};
     format.Inject(Setter,c2,ctx2);
