@@ -4,6 +4,7 @@
 #include "opentelemetry/nostd/shared_ptr.h"
 #include "opentelemetry/sdk/metrics/meter.h"
 
+#include <string>
 #include <memory>
 
 OPENTELEMETRY_BEGIN_NAMESPACE
@@ -17,7 +18,7 @@ public:
   /**
    * Initialize a new meter provider
    */
-  explicit MeterProvider() noexcept;
+  explicit MeterProvider(std::string library_name = "", std::string library_version = "") noexcept;
 
   opentelemetry::nostd::shared_ptr<opentelemetry::metrics::Meter> GetMeter(
       nostd::string_view library_name,
