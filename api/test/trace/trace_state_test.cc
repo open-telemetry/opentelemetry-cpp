@@ -10,8 +10,8 @@ using opentelemetry::trace::TraceState;
 TEST(TraceStateTest, DefaultConstruction)
 {
   TraceState s;
-  EXPECT_FALSE(s.Get("key", nullptr));
-  EXPECT_TRUE(s.empty());
-  EXPECT_EQ(0, s.entries().size());
+  EXPECT_FALSE(s.Get("missing_key", "value"));
+  EXPECT_TRUE(s.Empty());
+  EXPECT_EQ(0, s.Entries().size());
 }
 }  // namespace
