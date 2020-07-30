@@ -179,7 +179,10 @@ TEST(ExactAggregatorInOrder, Quantile)
     agg.update(i);
   }
   agg.checkpoint();
+#if __EXCEPTIONS
   ASSERT_THROW(agg.get_quantiles(0.5), std::domain_error);
+#else
+#endif
 }
 
 void callback(ExactAggregator<int> &agg)
