@@ -44,110 +44,113 @@ private:
     auto agg     = nostd::get<std::shared_ptr<sdkmetrics::Aggregator<T>>>(value);
     auto aggKind = agg->get_aggregator_kind();
 
-    if (aggKind == sdkmetrics::AggregatorKind::Counter)
+    if(agg != nullptr) 
     {
-      sout_ << "\n  sum         : " << agg->get_checkpoint()[0];
-    }
-    else if (aggKind == sdkmetrics::AggregatorKind::MinMaxSumCount)
-    {
-      auto mmsc = agg->get_checkpoint();
-      sout_ << "\n  min         : " << mmsc[0] << "\n  max         : " << mmsc[1]
-            << "\n  sum         : " << mmsc[2] << "\n  count       : " << mmsc[3];
-    }
-    else if (aggKind == sdkmetrics::AggregatorKind::Gauge)
-    {
-      auto timestamp = agg->get_checkpoint_timestamp();
-
-      sout_ << "\n  last value  : " << agg->get_checkpoint()[0]
-            << "\n  timestamp   : " << std::to_string(timestamp.time_since_epoch().count());
-    }
-    else if (aggKind == sdkmetrics::AggregatorKind::Exact)
-    {
-      // TODO: Find better way to print quantiles
-      if (agg->get_quant_estimation())
+      if (aggKind == sdkmetrics::AggregatorKind::Counter)
       {
-        sout_ << "\n  quantiles   : "
-              << "[0: " << agg->get_quantiles(0) << ", "
-              << ".25: " << agg->get_quantiles(.25) << ", "
-              << ".50: " << agg->get_quantiles(.50) << ", "
-              << ".75: " << agg->get_quantiles(.75) << ", "
-              << "1: " << agg->get_quantiles(1) << ']';
+        sout_ << "\n  sum         : " << agg->get_checkpoint()[0];
       }
-      else
+      else if (aggKind == sdkmetrics::AggregatorKind::MinMaxSumCount)
       {
-        auto vec = agg->get_checkpoint();
-        int size = vec.size();
-        int i    = 1;
+        auto mmsc = agg->get_checkpoint();
+        sout_ << "\n  min         : " << mmsc[0] << "\n  max         : " << mmsc[1]
+              << "\n  sum         : " << mmsc[2] << "\n  count       : " << mmsc[3];
+      }
+      else if (aggKind == sdkmetrics::AggregatorKind::Gauge)
+      {
+        auto timestamp = agg->get_checkpoint_timestamp();
 
-        sout_ << "\n  values      : " << '[';
-
-        for (auto val : vec)
+        sout_ << "\n  last value  : " << agg->get_checkpoint()[0]
+              << "\n  timestamp   : " << std::to_string(timestamp.time_since_epoch().count());
+      }
+      else if (aggKind == sdkmetrics::AggregatorKind::Exact)
+      {
+        // TODO: Find better way to print quantiles
+        if (agg->get_quant_estimation())
         {
-          sout_ << val;
-          if (i != size)
+          sout_ << "\n  quantiles   : "
+                << "[0: " << agg->get_quantiles(0) << ", "
+                << ".25: " << agg->get_quantiles(.25) << ", "
+                << ".50: " << agg->get_quantiles(.50) << ", "
+                << ".75: " << agg->get_quantiles(.75) << ", "
+                << "1: " << agg->get_quantiles(1) << ']';
+        }
+        else
+        {
+          auto vec = agg->get_checkpoint();
+          int size = vec.size();
+          int i    = 1;
+
+          sout_ << "\n  values      : " << '[';
+
+          for (auto val : vec)
+          {
+            sout_ << val;
+            if (i != size)
+              sout_ << ", ";
+            i++;
+          }
+          sout_ << ']';
+        }
+      }
+      else if (aggKind == sdkmetrics::AggregatorKind::Histogram)
+      {
+        auto boundaries = agg->get_boundaries();
+        auto counts     = agg->get_counts();
+
+        int boundaries_size = boundaries.size();
+        int counts_size     = counts.size();
+
+        sout_ << "\n  buckets     : " << '[';
+
+        for (int i = 0; i < boundaries_size; i++)
+        {
+          sout_ << boundaries[i];
+
+          if (i != boundaries_size - 1)
             sout_ << ", ";
-          i++;
+        }
+        sout_ << ']';
+
+        sout_ << "\n  counts      : " << '[';
+        for (int i = 0; i < counts_size; i++)
+        {
+          sout_ << counts[i];
+
+          if (i != counts_size - 1)
+            sout_ << ", ";
         }
         sout_ << ']';
       }
-    }
-    else if (aggKind == sdkmetrics::AggregatorKind::Histogram)
-    {
-      auto boundaries = agg->get_boundaries();
-      auto counts     = agg->get_counts();
-
-      int boundaries_size = boundaries.size();
-      int counts_size     = counts.size();
-
-      sout_ << "\n  buckets     : " << '[';
-
-      for (int i = 0; i < boundaries_size; i++)
+      else if (aggKind == sdkmetrics::AggregatorKind::Sketch)
       {
-        sout_ << boundaries[i];
+        auto boundaries = agg->get_boundaries();
+        auto counts     = agg->get_counts();
 
-        if (i != boundaries_size - 1)
-          sout_ << ", ";
+        int boundaries_size = boundaries.size();
+        int counts_size     = counts.size();
+
+        sout_ << "\n  buckets     : " << '[';
+
+        for (int i = 0; i < boundaries_size; i++)
+        {
+          sout_ << boundaries[i];
+
+          if (i != boundaries_size - 1)
+            sout_ << ", ";
+        }
+        sout_ << ']';
+
+        sout_ << "\n  counts      : " << '[';
+        for (int i = 0; i < counts_size; i++)
+        {
+          sout_ << counts[i];
+
+          if (i != counts_size - 1)
+            sout_ << ", ";
+        }
+        sout_ << ']';
       }
-      sout_ << ']';
-
-      sout_ << "\n  counts      : " << '[';
-      for (int i = 0; i < counts_size; i++)
-      {
-        sout_ << counts[i];
-
-        if (i != counts_size - 1)
-          sout_ << ", ";
-      }
-      sout_ << ']';
-    }
-    else if (aggKind == sdkmetrics::AggregatorKind::Sketch)
-    {
-      auto boundaries = agg->get_boundaries();
-      auto counts     = agg->get_counts();
-
-      int boundaries_size = boundaries.size();
-      int counts_size     = counts.size();
-
-      sout_ << "\n  buckets     : " << '[';
-
-      for (int i = 0; i < boundaries_size; i++)
-      {
-        sout_ << boundaries[i];
-
-        if (i != boundaries_size - 1)
-          sout_ << ", ";
-      }
-      sout_ << ']';
-
-      sout_ << "\n  counts      : " << '[';
-      for (int i = 0; i < counts_size; i++)
-      {
-        sout_ << counts[i];
-
-        if (i != counts_size - 1)
-          sout_ << ", ";
-      }
-      sout_ << ']';
     }
   }
 };
