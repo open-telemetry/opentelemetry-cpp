@@ -6,7 +6,7 @@
 #include <unordered_map>
 #include <vector>
 
-#include "opentelemetry/ext/http/server/HttpServer.h"
+#include "opentelemetry/ext/http/server/http_server.h"
 
 namespace HTTP_SERVER_NS {
 
