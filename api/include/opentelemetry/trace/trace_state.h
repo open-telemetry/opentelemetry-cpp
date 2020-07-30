@@ -53,11 +53,11 @@ public:
   public:
     Entry() noexcept = default;
 
-    // Creates an Entry for a key-value pair.
+    // Creates an Entry for a given key-value pair.
     Entry(nostd::string_view key, nostd::string_view value) noexcept;
 
-    char *GetKey();
-    char *GetValue();
+    const char *GetKey();
+    const char *GetValue();
 
   private:
     // Store key and value as raw char pointers to avoid using std::string.
