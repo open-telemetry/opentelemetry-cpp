@@ -1,4 +1,5 @@
 #include <gtest/gtest.h>
+#include "opentelemetry/metrics/instrument.h"
 #include "opentelemetry/metrics/noop.h"
 #include "opentelemetry/metrics/observer_result.h"
 #include "opentelemetry/metrics/sync_instruments.h"
@@ -28,9 +29,12 @@ TEST(NoopTest, CreateInstruments)
   m->NewIntUpDownCounter("Test ud counter", "For testing", "Unitless", true);
   m->NewIntValueRecorder("Test recorder", "For testing", "Unitless", true);
 
-  m->NewIntSumObserver("Test sum obs", "For testing", "Unitless", true, &Callback);
-  m->NewIntUpDownSumObserver("Test udsum obs", "For testing", "Unitless", true, &Callback);
-  m->NewIntValueObserver("Test val obs", "For testing", "Unitless", true, &Callback);
+  m->NewIntSumObserver("Test sum obs", "For testing", "Unitless", true,
+                       &Callback);
+  m->NewIntUpDownSumObserver("Test udsum obs", "For testing", "Unitless", true,
+                             &Callback);
+  m->NewIntValueObserver("Test val obs", "For testing", "Unitless", true,
+                         &Callback);
 }
 
 TEST(NoopMeter, RecordBatch)
@@ -45,25 +49,35 @@ TEST(NoopMeter, RecordBatch)
 
   auto s = m->NewShortCounter("Test short counter", "For testing", "Unitless", true);
 
-  m->RecordShortBatch({{"Key", "Value"}},
-                      {nostd::dynamic_pointer_cast<metrics_api::SynchronousInstrument<short>>(s)},
-                      {1});
+  std::array<metrics::SynchronousInstrument<short>*, 1> siarr{s.get()};
+  std::array<short, 1> svarr{1};
+  nostd::span<metrics::SynchronousInstrument<short>*> ssp{siarr};
+  nostd::span<short> sval {svarr};
+  m->RecordShortBatch(labelkv, ssp, sval);
 
   auto i = m->NewIntCounter("Test int counter", "For testing", "Unitless", true);
 
-  m->RecordIntBatch({{"Key", "Value"}},
-                    {nostd::dynamic_pointer_cast<metrics_api::SynchronousInstrument<int>>(i)}, {1});
+  std::array<metrics::SynchronousInstrument<int>*, 1> iiarr{i.get()};
+  std::array<int, 1> ivarr{1};
+  nostd::span<metrics::SynchronousInstrument<int>*> isp{iiarr};
+  nostd::span<int> ival {ivarr};
+  m->RecordIntBatch(labelkv, isp, ival);
 
   auto f = m->NewFloatCounter("Test int counter", "For testing", "Unitless", true);
 
-  m->RecordFloatBatch({{"Key", "Value"}},
-                      {nostd::dynamic_pointer_cast<metrics_api::SynchronousInstrument<float>>(f)},
-                      {1.0});
+  std::array<metrics::SynchronousInstrument<float>*, 1> fiarr{f.get()};
+  std::array<float, 1> fvarr{1.0f};
+  nostd::span<metrics::SynchronousInstrument<float>*> fsp{fiarr};
+  nostd::span<float> fval {fvarr};
+  m->RecordFloatBatch(labelkv, fsp, fval);
 
   auto d = m->NewDoubleCounter("Test int counter", "For testing", "Unitless", true);
 
-  m->RecordDoubleBatch({{"Key", "Value"}},
-                       {nostd::dynamic_pointer_cast<metrics_api::SynchronousInstrument<double>>(d)},
-                       {1});
+  std::array<metrics::SynchronousInstrument<double>*, 1> diarr{d.get()};
+  std::array<double, 1> dvarr{1.0f};
+  nostd::span<metrics::SynchronousInstrument<double>*> dsp{diarr};
+  nostd::span<double> dval {dvarr};
+  m->RecordDoubleBatch(labelkv, dsp, dval);
+
 }
 OPENTELEMETRY_END_NAMESPACE
