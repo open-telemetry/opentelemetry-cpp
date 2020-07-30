@@ -17,6 +17,7 @@ namespace trace
  * lifecycles.
  */
 class Span;
+class KeyValueIterable;
 struct StartSpanOptions;
 
 class Tracer
