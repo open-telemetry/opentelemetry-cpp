@@ -7,6 +7,9 @@
 
 #include <chrono>
 
+class Span;
+struct StartSpanOptions;
+
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace trace
 {
