@@ -66,7 +66,8 @@ protected:
 public:
   HttpRequestCallback(){};
 
-  HttpRequestCallback &operator=(HttpRequestCallback other) {
+  HttpRequestCallback &operator=(HttpRequestCallback other)
+  {
     callback = other.callback;
     return *this;
   };
@@ -145,7 +146,7 @@ protected:
 
     HttpRequestHandler &operator=(std::pair<std::string, HttpRequestCallback *> other)
     {
-      first = other.first;
+      first  = other.first;
       second = other.second;
       return (*this);
     };
@@ -236,22 +237,16 @@ public:
     return m_handlers.back();
   }
 
-  HttpServer &operator+=( std::pair<const std::string &, HttpRequestCallback&> other)
+  HttpServer &operator+=(std::pair<const std::string &, HttpRequestCallback &> other)
   {
     LOG_INFO("HttpServer: Added handler for %s", other.first.c_str());
     m_handlers.push_back(HttpRequestHandler(other.first, &other.second));
     return (*this);
   };
 
-  void start()
-  {
-      m_reactor.start();
-  }
+  void start() { m_reactor.start(); }
 
-  void stop()
-  {
-      m_reactor.stop();
-  }
+  void stop() { m_reactor.stop(); }
 
 protected:
   virtual void onSocketAcceptable(SocketTools::Socket socket) override
@@ -739,8 +734,9 @@ protected:
         {
           LOG_TRACE("HttpServer: [%s] using handler for %s", conn.request.client.c_str(),
                     handler.first.c_str());
-          // auto callback = handler.second; // Bazel gets mad at this unused var, uncomment when using
-          int result    = handler.second->onHttpRequest(conn.request, conn.response);
+          // auto callback = handler.second; // Bazel gets mad at this unused var, uncomment when
+          // using
+          int result = handler.second->onHttpRequest(conn.request, conn.response);
           if (result != 0)
           {
             conn.response.code = result;
@@ -781,7 +777,6 @@ protected:
   }
 
 public:
-
   static char const *getDefaultResponseMessage(int code)
   {
     switch (code)
@@ -895,4 +890,3 @@ public:
 };
 
 }  // namespace HTTP_SERVER_NS
-
