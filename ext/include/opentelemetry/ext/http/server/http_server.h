@@ -66,7 +66,10 @@ protected:
 public:
   HttpRequestCallback(){};
 
-  HttpRequestCallback &operator=(HttpRequestCallback other) { callback = other.callback; };
+  HttpRequestCallback &operator=(HttpRequestCallback other) {
+    callback = other.callback;
+    return *this;
+  };
 
   HttpRequestCallback(CallbackFunction func) : callback(func){};
 
