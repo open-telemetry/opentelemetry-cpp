@@ -19,7 +19,7 @@ class Meter : public metrics_api::Meter
 public:
   explicit Meter(std::string library_name, std::string library_version = "")
   {
-    library_name_ = library_name;
+    library_name_    = library_name;
     library_version_ = library_version;
   }
 
@@ -35,29 +35,25 @@ public:
    * @throws IllegalArgumentException if a different metric by the same name exists in this meter.
    * @throws IllegalArgumentException if the {@code name} does not match spec requirements.
    */
-  nostd::shared_ptr<metrics_api::Counter<short>> NewShortCounter(
-      nostd::string_view name,
-      nostd::string_view description,
-      nostd::string_view unit,
-      const bool enabled) override;
+  nostd::shared_ptr<metrics_api::Counter<short>> NewShortCounter(nostd::string_view name,
+                                                                 nostd::string_view description,
+                                                                 nostd::string_view unit,
+                                                                 const bool enabled) override;
 
-  nostd::shared_ptr<metrics_api::Counter<int>> NewIntCounter(
-      nostd::string_view name,
-      nostd::string_view description,
-      nostd::string_view unit,
-      const bool enabled) override;
+  nostd::shared_ptr<metrics_api::Counter<int>> NewIntCounter(nostd::string_view name,
+                                                             nostd::string_view description,
+                                                             nostd::string_view unit,
+                                                             const bool enabled) override;
 
-  nostd::shared_ptr<metrics_api::Counter<float>> NewFloatCounter(
-      nostd::string_view name,
-      nostd::string_view description,
-      nostd::string_view unit,
-      const bool enabled) override;
+  nostd::shared_ptr<metrics_api::Counter<float>> NewFloatCounter(nostd::string_view name,
+                                                                 nostd::string_view description,
+                                                                 nostd::string_view unit,
+                                                                 const bool enabled) override;
 
-  nostd::shared_ptr<metrics_api::Counter<double>> NewDoubleCounter(
-      nostd::string_view name,
-      nostd::string_view description,
-      nostd::string_view unit,
-      const bool enabled) override;
+  nostd::shared_ptr<metrics_api::Counter<double>> NewDoubleCounter(nostd::string_view name,
+                                                                   nostd::string_view description,
+                                                                   nostd::string_view unit,
+                                                                   const bool enabled) override;
 
   /**
    * Creates an UpDownCounter with the passed characteristics and returns a shared_ptr to that
@@ -267,25 +263,21 @@ public:
    * @param values a span of pairs where the first element of the pair is a metric instrument
    * to record to, and the second element is the value to update that instrument with.
    */
-  void RecordShortBatch(
-      const trace::KeyValueIterable &labels,
-      nostd::span<metrics_api::SynchronousInstrument<short>*> instruments,
-      nostd::span<const short> values) noexcept override;
+  void RecordShortBatch(const trace::KeyValueIterable &labels,
+                        nostd::span<metrics_api::SynchronousInstrument<short> *> instruments,
+                        nostd::span<const short> values) noexcept override;
 
-  void RecordIntBatch(
-      const trace::KeyValueIterable &labels,
-      nostd::span<metrics_api::SynchronousInstrument<int>*> instruments,
-      nostd::span<const int> values) noexcept override;
+  void RecordIntBatch(const trace::KeyValueIterable &labels,
+                      nostd::span<metrics_api::SynchronousInstrument<int> *> instruments,
+                      nostd::span<const int> values) noexcept override;
 
-  void RecordFloatBatch(
-      const trace::KeyValueIterable &labels,
-      nostd::span<metrics_api::SynchronousInstrument<float>*> instruments,
-      nostd::span<const float> values) noexcept override;
+  void RecordFloatBatch(const trace::KeyValueIterable &labels,
+                        nostd::span<metrics_api::SynchronousInstrument<float> *> instruments,
+                        nostd::span<const float> values) noexcept override;
 
-  void RecordDoubleBatch(
-      const trace::KeyValueIterable &labels,
-      nostd::span<metrics_api::SynchronousInstrument<double>*> instruments,
-      nostd::span<const double> values) noexcept override;
+  void RecordDoubleBatch(const trace::KeyValueIterable &labels,
+                         nostd::span<metrics_api::SynchronousInstrument<double> *> instruments,
+                         nostd::span<const double> values) noexcept override;
 
   /**
    * An SDK-only function that checkpoints the aggregators of all instruments created from
@@ -296,7 +288,6 @@ public:
   std::vector<Record> Collect() noexcept;
 
 private:
-
   /**
    * A private function that creates records from all synchronous instruments created from
    * this meter.
@@ -343,12 +334,16 @@ private:
   std::map<std::string, std::shared_ptr<metrics_api::SynchronousInstrument<short>>> short_metrics_;
   std::map<std::string, std::shared_ptr<metrics_api::SynchronousInstrument<int>>> int_metrics_;
   std::map<std::string, std::shared_ptr<metrics_api::SynchronousInstrument<float>>> float_metrics_;
-  std::map<std::string, std::shared_ptr<metrics_api::SynchronousInstrument<double>>> double_metrics_;
+  std::map<std::string, std::shared_ptr<metrics_api::SynchronousInstrument<double>>>
+      double_metrics_;
 
-  std::map<std::string, std::shared_ptr<metrics_api::AsynchronousInstrument<short>>> short_observers_;
+  std::map<std::string, std::shared_ptr<metrics_api::AsynchronousInstrument<short>>>
+      short_observers_;
   std::map<std::string, std::shared_ptr<metrics_api::AsynchronousInstrument<int>>> int_observers_;
-  std::map<std::string, std::shared_ptr<metrics_api::AsynchronousInstrument<float>>> float_observers_;
-  std::map<std::string, std::shared_ptr<metrics_api::AsynchronousInstrument<double>>> double_observers_;
+  std::map<std::string, std::shared_ptr<metrics_api::AsynchronousInstrument<float>>>
+      float_observers_;
+  std::map<std::string, std::shared_ptr<metrics_api::AsynchronousInstrument<double>>>
+      double_observers_;
 
   std::string library_name_;
   std::string library_version_;
