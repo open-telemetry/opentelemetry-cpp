@@ -39,8 +39,7 @@ using MapHttpTraceContext = trace::propagation::HttpTraceContext<std::map<std::s
 TEST(HTTPTextFormatTest, TraceIdBufferGeneration)
 {
     constexpr uint8_t buf[] = {1, 2, 3, 4, 5, 6, 7, 8, 8, 7, 0xaa, 0xbb, 0xcc, 0xdd, 0xee, 0xff};
-    trace::TraceId id(buf);
-    EXPECT_EQ(MapHttpTraceContext::GenerateTraceIdFromString("01020304050607080807aabbccddeeff"),id);
+    EXPECT_EQ(MapHttpTraceContext::GenerateTraceIdFromString("01020304050607080807aabbccddeeff"),trace::TraceId(buf));
 }
 
 TEST(HTTPTextFormatTest, SpanIdBufferGeneration)
