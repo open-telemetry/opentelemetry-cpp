@@ -369,7 +369,7 @@ TEST(UngroupedMetricsProcessor, UngroupedProcessorKeepsRecordInformationStateful
 
   std::vector<sdkmetrics::Record> checkpoint2 = processor->CheckpointSelf();
   ASSERT_EQ(checkpoint2.size(), 1);
-  ASSERT_EQ(nostd::get<std::shared_ptr<sdkmetrics::Aggregator<double>>>(checkpoint[0].GetAggregator())->get_checkpoint(), aggregator->get_checkpoint());
+  ASSERT_EQ(nostd::get<std::shared_ptr<sdkmetrics::Aggregator<double>>>(checkpoint2[0].GetAggregator())->get_checkpoint(), aggregator->get_checkpoint());
 }
 
 TEST(UngroupedMetricsProcessor, UngroupedProcessorKeepsRecordInformationStatefulExact)
@@ -407,7 +407,7 @@ TEST(UngroupedMetricsProcessor, UngroupedProcessorKeepsRecordInformationStateful
     cumulative_checkpoint.push_back(aggregator->get_checkpoint()[i]);
   }
   ASSERT_EQ(checkpoint2.size(), 1);
-  ASSERT_EQ(nostd::get<std::shared_ptr<sdkmetrics::Aggregator<double>>>(checkpoint[0].GetAggregator())->get_checkpoint(), cumulative_checkpoint);
+  ASSERT_EQ(nostd::get<std::shared_ptr<sdkmetrics::Aggregator<double>>>(checkpoint2[0].GetAggregator())->get_checkpoint(), cumulative_checkpoint);
 }
 
 TEST(UngroupedMetricsProcessor, UngroupedProcessorKeepsRecordInformationStatefulHistogram)
@@ -435,6 +435,7 @@ TEST(UngroupedMetricsProcessor, UngroupedProcessorKeepsRecordInformationStateful
   ASSERT_EQ(checkpoint[0].GetDescription(), "description");
   ASSERT_EQ(nostd::get<std::shared_ptr<sdkmetrics::Aggregator<int>>>(checkpoint[0].GetAggregator())->get_boundaries(), aggregator->get_boundaries());
   ASSERT_EQ(nostd::get<std::shared_ptr<sdkmetrics::Aggregator<int>>>(checkpoint[0].GetAggregator())->get_counts(), aggregator->get_counts());
+  std::vector<int> prev_counts = aggregator->get_counts();
 
   for(int i = 0; i < 60; i++)
   {
@@ -445,6 +446,15 @@ TEST(UngroupedMetricsProcessor, UngroupedProcessorKeepsRecordInformationStateful
   processor->process(r);
 
   std::vector<sdkmetrics::Record> checkpoint2 = processor->CheckpointSelf();
+  std::vector<int> new_counts = aggregator->get_counts();
+  
+  for(int i = 0; i < new_counts.size(); i++) {
+    new_counts[i] += prev_counts[i];
+  }
   ASSERT_EQ(checkpoint2.size(), 1);
-  ASSERT_EQ(nostd::get<std::shared_ptr<sdkmetrics::Aggregator<int>>>(checkpoint[0].GetAggregator())->get_boundaries(), aggregator->get_boundaries());
+  ASSERT_EQ(checkpoint2[0].GetName(), "name");
+  ASSERT_EQ(checkpoint2[0].GetLabels(), "labels");
+  ASSERT_EQ(checkpoint2[0].GetDescription(), "description");
+  ASSERT_EQ(nostd::get<std::shared_ptr<sdkmetrics::Aggregator<int>>>(checkpoint2[0].GetAggregator())->get_boundaries(), aggregator->get_boundaries());
+  ASSERT_EQ(nostd::get<std::shared_ptr<sdkmetrics::Aggregator<int>>>(checkpoint2[0].GetAggregator())->get_counts(), new_counts);
 }
