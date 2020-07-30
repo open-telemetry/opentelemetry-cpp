@@ -19,6 +19,7 @@
 
 #include "opentelemetry/nostd/span.h"
 #include "opentelemetry/nostd/string_view.h"
+#include "opentelemetry/nostd/unique_ptr.h"
 
 namespace opentelemetry
 {
@@ -50,8 +51,11 @@ public:
   class Entry
   {
   public:
+    Entry() noexcept = default;
+
     // Creates an Entry for a key-value pair.
-    Entry(nostd::string_view key, nostd::string_view value);
+    Entry(nostd::string_view key, nostd::string_view value) noexcept;
+
     char *GetKey();
     char *GetValue();
 
@@ -61,8 +65,8 @@ public:
     const char *value_;
   };
 
-   // An empty TraceState.
-  TraceState() noexcept = default;
+  // An empty TraceState.
+  TraceState() noexcept : entries_(new Entry[kMaxKeyValuePairs]), num_entries_(0) {}
 
   // Returns false if no such key, otherwise returns true and populates value.
   bool Get(nostd::string_view key, nostd::string_view value) const noexcept { return false; }
@@ -83,7 +87,11 @@ public:
   static bool IsValidValue(nostd::string_view value);
 
 private:
-  //Entry entries_[kMaxKeyValuePairs];
+  // Store entries in a C-style array to avoid using std::array or std::vector.
+  nostd::unique_ptr<Entry[]> entries_;
+
+  // Maintain the number of entries in entries_. Must be in the range [0, kMaxKeyValuePairs].
+  int num_entries_;
 };
 
 }  // namespace trace
