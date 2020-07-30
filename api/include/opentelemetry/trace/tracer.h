@@ -16,6 +16,9 @@ namespace trace
  * This class provides methods for manipulating the context, creating spans, and controlling spans'
  * lifecycles.
  */
+class Span;
+struct StartSpanOptions;
+
 class Tracer
 {
 public:
@@ -30,10 +33,10 @@ public:
    */
   virtual Span* StartSpan(nostd::string_view name,
                                             const KeyValueIterable &attributes,
-                                            const StartSpanOptions &options = {}) noexcept = 0;
+                                            const StartSpanOptions &options) noexcept = 0;
 
   Span* StartSpan(nostd::string_view name,
-                                    const StartSpanOptions &options = {}) noexcept
+                                    const StartSpanOptions &options) noexcept
   {
     return this->StartSpan(name, {}, options);
   }
