@@ -61,6 +61,7 @@ EOF
         -DCMAKE_CXX_FLAGS="-Werror" \
         -DCMAKE_EXE_LINKER_FLAGS="$LINKER_FLAGS" \
         -DCMAKE_SHARED_LINKER_FLAGS="$LINKER_FLAGS" \
+        -DWITH_SDK=OFF \
         "${SRC_DIR}"
   make example_plugin
   cp examples/plugin/plugin/libexample_plugin.so ${PLUGIN_DIR}
@@ -70,6 +71,7 @@ EOF
   rm -rf *
   cmake -DCMAKE_BUILD_TYPE=Debug  \
         -DCMAKE_CXX_FLAGS="-Werror" \
+        -DWITH_SDK=OFF \
         "${SRC_DIR}"
   make load_plugin_example
   examples/plugin/load/load_plugin_example ${PLUGIN_DIR}/libexample_plugin.so /dev/null

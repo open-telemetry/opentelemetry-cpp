@@ -10,13 +10,17 @@ if(NOT DEFINED CMAKE_CXX_STANDARD)
   set(CMAKE_CXX_STANDARD 11)
 endif()
 
+option(WITH_SDK "Whether to build the SDK or just the API" ON)
 option(WITH_OTPROTOCOL
        "Whether to include the OpenTelemetry Protocol in the SDK" OFF)
+option(WITH_LIBEVENT "Build SDK with libevent support" ON)
 
 set(WITH_PROTOBUF OFF)
 if(WITH_OTPROTOCOL)
   set(WITH_PROTOBUF ON)
 endif()
+
+set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake/Modules/")
 
 include(CTest)
 
@@ -29,7 +33,7 @@ if(CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")
   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /Zc:__cplusplus")
 endif()
 
-if(WITH_PROTOBUF)
+if(WITH_SDK AND WITH_PROTOBUF)
   set(protobuf_MODULE_COMPATIBLE ON)
   find_package(Protobuf CONFIG NAMES protobuf)
   # Older versions of protobuf don't use cmake config files.
@@ -38,8 +42,13 @@ if(WITH_PROTOBUF)
   endif()
 endif()
 
-if(WITH_OTPROTOCOL)
+if(WITH_SDK AND WITH_OTPROTOCOL)
   include(third_party/opentelemetry-proto/Protobuf.cmake)
+endif()
+
+if(WITH_SDK AND WITH_LIBEVENT)
+  find_package(Libevent REQUIRED)
+  include_directories(SYSTEM ${LIBEVENT_INCLUDE_DIRS})
 endif()
 
 if(BUILD_TESTING)
@@ -48,12 +57,14 @@ if(BUILD_TESTING)
   include_directories(SYSTEM ${GTEST_INCLUDE_DIRS})
 endif()
 
+include_directories(.)
 include_directories(api/include)
 add_subdirectory(api)
-include_directories(sdk/include)
-include_directories(sdk)
-add_subdirectory(sdk)
-include_directories(.)
-add_subdirectory(exporters)
+if(WITH_SDK)
+  include_directories(sdk/include)
+  include_directories(sdk)
+  add_subdirectory(sdk)
+  add_subdirectory(exporters)
+endif()
 add_subdirectory(examples)
 add_subdirectory(ext)
