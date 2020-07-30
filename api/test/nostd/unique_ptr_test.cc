@@ -108,7 +108,7 @@ TEST(UniquePtrTest, PointerOperators)
   unique_ptr<int> ptr1{value};
 
   EXPECT_EQ(&*ptr1, value);
-  EXPECT_EQ(nullptr, (unique_ptr<B> {}).get());
+   EXPECT_EQ(nullptr, (unique_ptr<B> {}).get());
 }
 
 TEST(UniquePtrTest, Reset)
