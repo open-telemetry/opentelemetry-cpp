@@ -44,6 +44,7 @@ static const int kTraceDelimiterBytes = 3;
 static const int kHeaderSize = kVersionBytes + kTraceIdBytes + kSpanIdBytes + kTraceFlagBytes + kTraceDelimiterBytes;
 static const int kTraceStateMaxMembers = 32;
 static const int kHeaderElementLengths[4] = {2,32,16,2};
+
 // The HttpTraceContext provides methods to extract and inject
 // context into headers of HTTP requests with traces.
 // Example:
@@ -298,20 +299,9 @@ class HttpTraceContext : public HTTPTextFormat<T> {
                     trace_state,
                     true
                 );
-//                return SpanContext.CreateFromRemoteParent(
-//                    context_from_parent_header.GetTraceId(),
-//                    context_from_parent_header.GetSpanId(),
-//                    context_from_parent_header.GetTraceFlags(),
-//                    trace_state
-//                );
             } catch (std::exception& e) {
                 std::cout<<"Unparseable tracestate header. Returning span context without state."<<std::endl;
                 return context_from_parent_header;
-//                return SpanContext.CreateFromRemoteParent(
-//                    context_from_parent_header.GetTraceId(),
-//                    context_from_parent_header.GetSpanId(),
-//                    context_from_parent_header.GetTraceFlags(),
-//                    TraceState.Builder().Build());
             }
         }
 };

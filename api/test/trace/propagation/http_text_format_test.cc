@@ -32,28 +32,27 @@ static void Setter(std::map<std::string,std::string> &carrier, nostd::string_vie
 
 static trace::propagation::HttpTraceContext<std::map<std::string,std::string>> format = trace::propagation::HttpTraceContext<std::map<std::string,std::string>>();
 
-static nostd::string_view trace_id = "12345678901234567890123456789012";
-static nostd::string_view span_id = "1234567890123456";
+static const nostd::string_view trace_id = "12345678901234567890123456789012";
+static const nostd::string_view span_id = "1234567890123456";
 
-using map_http_trace_context = trace::propagation::HttpTraceContext<std::map<std::string,std::string>>;
+using MapHttpTraceContext = trace::propagation::HttpTraceContext<std::map<std::string,std::string>>;
 TEST(HTTPTextFormatTest, TraceIdBufferGeneration)
 {
-    constexpr uint8_t buf[] = {1, 2, 3, 4, 5, 6, 7, 8, 8, 7, 0xaa, 0xbb, 0xcc, 0xdd, 0xee, 0xff};
-    trace::TraceId id(buf);
-    EXPECT_EQ(map_http_trace_context::GenerateTraceIdFromString("01020304050607080807aabbccddeeff"),id);
+    EXPECT_EQ(MapHttpTraceContext::GenerateTraceIdFromString("01020304050607080807aabbccddeeff"),
+                trace::TraceId({1, 2, 3, 4, 5, 6, 7, 8, 8, 7, 0xaa, 0xbb, 0xcc, 0xdd, 0xee, 0xff}));
 }
 
 TEST(HTTPTextFormatTest, SpanIdBufferGeneration)
 {
     constexpr uint8_t buf[] = {1, 2, 0xaa, 0xbb, 0xcc, 0xdd, 0xee, 0xff};
     trace::SpanId id(buf);
-    EXPECT_EQ(map_http_trace_context::GenerateSpanIdFromString("0102aabbccddeeff"),id);
+    EXPECT_EQ(MapHttpTraceContext::GenerateSpanIdFromString("0102aabbccddeeff"),id);
 }
 
 TEST(HTTPTextFormatTest, TraceFlagsBufferGeneration)
 {
     trace::TraceFlags flags;
-    EXPECT_EQ(map_http_trace_context::GenerateTraceFlagsFromString("00"),flags);
+    EXPECT_EQ(MapHttpTraceContext::GenerateTraceFlagsFromString("00"),flags);
 }
 
 TEST(HTTPTextFormatTest, HeadersWithTraceState)
@@ -77,7 +76,7 @@ TEST(HTTPTextFormatTest, NoTraceParentHeader)
     nostd::shared_ptr<trace::Span> sp{new trace::DefaultSpan()};
     context::Context ctx1 = context::Context("current-span",sp);
     context::Context ctx2 = format.Extract(Getter, carrier, ctx1);
-    trace::Span* span = map_http_trace_context::GetCurrentSpan(ctx2);
+    trace::Span* span = MapHttpTraceContext::GetCurrentSpan(ctx2);
     EXPECT_EQ(span->GetContext().trace_id(),trace::SpanContext().trace_id());
     EXPECT_EQ(span->GetContext().span_id(),trace::SpanContext().span_id());
     EXPECT_EQ(span->GetContext().trace_flags(),trace::SpanContext().trace_flags());
@@ -94,7 +93,7 @@ TEST(HTTPTextFormatTest, InvalidTraceId)
     nostd::shared_ptr<trace::Span> sp{new trace::DefaultSpan()};
     context::Context ctx1 = context::Context("current-span",sp);
     context::Context ctx2 = format.Extract(Getter, carrier, ctx1);
-    trace::Span* span = map_http_trace_context::GetCurrentSpan(ctx2);
+    trace::Span* span = MapHttpTraceContext::GetCurrentSpan(ctx2);
     EXPECT_EQ(span->GetContext().trace_id(),trace::SpanContext().trace_id());
     EXPECT_EQ(span->GetContext().span_id(),trace::SpanContext().span_id());
     EXPECT_EQ(span->GetContext().trace_flags(),trace::SpanContext().trace_flags());
@@ -111,7 +110,7 @@ TEST(HTTPTextFormatTest, InvalidParentId)
     nostd::shared_ptr<trace::Span> sp{new trace::DefaultSpan()};
     context::Context ctx1 = context::Context("current-span",sp);
     context::Context ctx2 = format.Extract(Getter, carrier, ctx1);
-    trace::Span* span = map_http_trace_context::GetCurrentSpan(ctx2);
+    trace::Span* span = MapHttpTraceContext::GetCurrentSpan(ctx2);
     EXPECT_EQ(span->GetContext().trace_id(),trace::SpanContext().trace_id());
     EXPECT_EQ(span->GetContext().span_id(),trace::SpanContext().span_id());
     EXPECT_EQ(span->GetContext().trace_flags(),trace::SpanContext().trace_flags());
@@ -140,7 +139,7 @@ TEST(HTTPTextFormatTest, FormatNotSupported)
     nostd::shared_ptr<trace::Span> sp{new trace::DefaultSpan()};
     context::Context ctx1 = context::Context("current-span",sp);
     context::Context ctx2 = format.Extract(Getter,carrier,ctx1);
-    trace::Span* span = map_http_trace_context::GetCurrentSpan(ctx2);
+    trace::Span* span = MapHttpTraceContext::GetCurrentSpan(ctx2);
     EXPECT_FALSE(span->GetContext().IsValid());
     EXPECT_EQ(span->GetContext().trace_id(),trace::SpanContext().trace_id());
     EXPECT_EQ(span->GetContext().span_id(),trace::SpanContext().span_id());
@@ -167,7 +166,7 @@ TEST(HTTPTextFormatTest, TraceStateHeaderWithTrailingComma)
     nostd::shared_ptr<trace::Span> sp{new trace::DefaultSpan()};
     context::Context ctx1 = context::Context("current-span",sp);
     context::Context ctx2 = format.Extract(Getter,carrier,ctx1);
-    trace::Span* span = map_http_trace_context::GetCurrentSpan(ctx2);
+    trace::Span* span = MapHttpTraceContext::GetCurrentSpan(ctx2);
     trace::TraceState trace_state = span->GetContext().trace_state();
     EXPECT_TRUE(trace_state.Get("foo", "1"));
 }
@@ -181,7 +180,7 @@ TEST(HTTPTextFormatTest, TraceStateKeys)
     nostd::shared_ptr<trace::Span> sp{new trace::DefaultSpan()};
     context::Context ctx1 = context::Context("current-span",sp);
     context::Context ctx2 = format.Extract(Getter,carrier,ctx1);
-    trace::Span* span = map_http_trace_context::GetCurrentSpan(ctx2);
+    trace::Span* span = MapHttpTraceContext::GetCurrentSpan(ctx2);
     trace::TraceState trace_state = span->GetContext().trace_state();
     EXPECT_TRUE(trace_state.Get("1a-2f@foo", "bar1"));
     EXPECT_TRUE(trace_state.Get("1a-_*/2b@foo", "bar2"));
