@@ -32,8 +32,7 @@ sdkmetrics::ExportResult OStreamMetricsExporter::Export(
     {
       PrintAggregatorVariant<short>(aggregator);
     }
-    else if (nostd::holds_alternative<std::shared_ptr<sdkmetrics::Aggregator<double>>>(
-                 aggregator))
+    else if (nostd::holds_alternative<std::shared_ptr<sdkmetrics::Aggregator<double>>>(aggregator))
     {
       PrintAggregatorVariant<double>(aggregator);
     }
