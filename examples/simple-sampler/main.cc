@@ -14,12 +14,14 @@
 #include <memory>
 #include <iostream>
 
-// This is the 
-using namespace opentelemetry::sdk::trace;
+using opentelemetry::sdk::trace::Sampler;
+using opentelemetry::sdk::trace::AlwaysOnSampler;
+using opentelemetry::sdk::trace::AlwaysOffSampler;
+using opentelemetry::sdk::trace::ParentOrElseSampler;
 
 namespace
 {
-void initTracer(std::shared_ptr<Sampler> sampler)
+void InitTracer(std::shared_ptr<Sampler> sampler)
 {
   auto exporter  = std::unique_ptr<sdktrace::SpanExporter>(new StdoutExporter);
   auto processor = std::shared_ptr<sdktrace::SpanProcessor>(
@@ -42,14 +44,14 @@ int main()
 
   std::cout << "Testing AlwaysOn Sampler...\n";
   // Set the sampler to AlwaysOn
-  initTracer(always_on_sampler);
+  InitTracer(always_on_sampler);
 
   // The Tracer records every span
   foo_library();
 
   std::cout << "\nTesting AlwaysOff Sampler...\n";
   // Set the sampler to AlwaysOn
-  initTracer(always_off_sampler);
+  InitTracer(always_off_sampler);
 
   // The Tracer records nothing
   foo_library();

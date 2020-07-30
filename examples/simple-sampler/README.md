@@ -1,7 +1,7 @@
 
 # Built-in sampler example
 The built-in samplers includes `AlwaysOn`, `AlwaysOff`, `Probability` and `ParentOrElse` samplers. For high-level design, please check out the [OpenTelemetry specification](https://github.com/open-telemetry/opentelemetry-specification/blob/master/specification/trace/sdk.md#built-in-samplers).
-In this page, you will go through a sample example to learn how to use a sampler in the `TracerProvider`.
+In this page, you will go through an example to learn how to use a sampler in the `TracerProvider`.
 
 ## Getting started
 1. Make sure you are at `examples\simple-sampler`
