@@ -17,7 +17,6 @@
 #include <iostream>
 #include <array>
 #include <exception>
-#include "opentelemetry/trace/propagation/http_text_format.h"
 #include "opentelemetry/trace/span_context.h"
 #include "opentelemetry/trace/trace_state.h"
 #include "opentelemetry/trace/key_value_iterable.h"
@@ -27,6 +26,7 @@
 #include "opentelemetry/nostd/shared_ptr.h"
 #include "opentelemetry/nostd/variant.h"
 #include "opentelemetry/nostd/span.h"
+#include "opentelemetry/trace/propagation/http_text_format.h"
 #include "opentelemetry/trace/default_span.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
