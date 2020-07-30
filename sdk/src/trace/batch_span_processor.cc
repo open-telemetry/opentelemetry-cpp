@@ -37,10 +37,7 @@ std::unique_ptr<Recordable> BatchSpanProcessor::MakeRecordable() noexcept
 void BatchSpanProcessor::OnStart(Recordable &span) noexcept
 {
   // no-op
-<<<<<<< HEAD
   (void)span;
-=======
->>>>>>> 2fd66ce... Fix Format issue
 }
 
 void BatchSpanProcessor::OnEnd(std::unique_ptr<Recordable> &&span) noexcept
@@ -185,15 +182,15 @@ void BatchSpanProcessor::Export(std::unique_ptr<common::CircularBuffer<Recordabl
 {
   std::vector<std::unique_ptr<Recordable>> spans_arr;
 
-  buffer->Consume(buffer->size(),
-                  [&](CircularBufferRange<AtomicUniquePtr<Recordable>> range) noexcept {
-                    range.ForEach([&](AtomicUniquePtr<Recordable> &ptr) {
-                      std::unique_ptr<Recordable> swap_ptr = std::unique_ptr<Recordable>(nullptr);
-                      ptr.Swap(swap_ptr);
-                      spans_arr.push_back(std::unique_ptr<Recordable>(swap_ptr.release()));
-                      return true;
-                    });
-                  });
+  buffer->Consume(
+      buffer->size(), [&](CircularBufferRange<AtomicUniquePtr<Recordable>> range) noexcept {
+        range.ForEach([&](AtomicUniquePtr<Recordable> &ptr) {
+          std::unique_ptr<Recordable> swap_ptr = std::unique_ptr<Recordable>(nullptr);
+          ptr.Swap(swap_ptr);
+          spans_arr.push_back(std::unique_ptr<Recordable>(swap_ptr.release()));
+          return true;
+        });
+      });
 
   exporter_->Export(nostd::span<std::unique_ptr<Recordable>>(spans_arr.data(), spans_arr.size()));
 
