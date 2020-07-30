@@ -1,12 +1,12 @@
 #pragma once
-#include "opentelemetry/version.h"
 #include "opentelemetry/metrics/instrument.h"
-#include "opentelemetry/sdk/metrics/record.h"
 #include "opentelemetry/nostd/string_view.h"
+#include "opentelemetry/sdk/metrics/record.h"
+#include "opentelemetry/version.h"
 
-#include <unordered_map>
-#include <string>
 #include <iostream>
+#include <string>
+#include <unordered_map>
 
 namespace sdkmetrics = opentelemetry::sdk::metrics;
 
@@ -29,7 +29,7 @@ public:
   virtual void process(sdkmetrics::Record record) noexcept = 0;
 };
 
-}
-}
+}  // namespace metrics
+}  // namespace sdk
 
 OPENTELEMETRY_END_NAMESPACE
