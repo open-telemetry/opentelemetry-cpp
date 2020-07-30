@@ -7,7 +7,6 @@
 #include <cmath>
 #include <memory>
 #include <mutex>
-#include <variant>
 #include <vector>
 
 namespace metrics_api = opentelemetry::metrics;
