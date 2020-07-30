@@ -19,7 +19,6 @@
 #include "opentelemetry/trace/trace_flags.h"
 #include "opentelemetry/trace/trace_id.h"
 #include "opentelemetry/trace/trace_state.h"
-#include "opentelemetry/trace/span.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace trace
@@ -71,10 +70,6 @@ public:
   bool HasRemoteParent() const noexcept { return remote_parent_; }
 
   static SpanContext GetInvalid() { return SpanContext(); }
-
-  nostd::unique_ptr<Span> test() {
-    return nostd::unique_ptr<Span>(new Span());
-  }
 
 private:
   TraceId trace_id_;
