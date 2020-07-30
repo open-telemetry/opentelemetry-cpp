@@ -8,7 +8,7 @@ OPENTELEMETRY_BEGIN_NAMESPACE
 namespace trace {
 class DefaultTracer: public Tracer {
 public:
-  ~Tracer() = default;
+  ~DefaultTracer() = default;
 
   /**
    * Starts a span.
