@@ -3,8 +3,8 @@
 #include "opentelemetry/metrics/meter.h"
 #include "opentelemetry/version.h"
 
-#include <string>
 #include <memory>
+#include <string>
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace sdk
@@ -19,6 +19,7 @@ public:
     library_name_    = library_name;
     library_version_ = library_version;
   }
+
 private:
   std::string library_name_;
   std::string library_version_;
