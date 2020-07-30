@@ -8,7 +8,6 @@
 #define pass
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace trace {
-class DefaultTracer;
 class DefaultSpan: public Span {
   public:
     // Returns an invalid span.
@@ -68,7 +67,8 @@ class DefaultSpan: public Span {
     DefaultSpan(const DefaultSpan& spn) : span_context_(spn.GetContext()) {}
 
     trace::Tracer &tracer() const noexcept {
-      return DefaultTracer();
+      DefaultTracer dft = DefaultTracer();
+      return dft;
     }
 
   private:
