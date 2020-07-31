@@ -1,22 +1,16 @@
 #pragma once
 
+#include "opentelemetry/sdk/common/circular_buffer.h"
 #include "opentelemetry/sdk/trace/exporter.h"
 #include "opentelemetry/sdk/trace/processor.h"
 
+#include <atomic>
 #include <condition_variable>
 #include <thread>
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace sdk
 {
-
-/* Forward declaration of the Circular Buffer to avoid pulling in external dependencies in
- * //sdk:headers */
-namespace common
-{
-template <class T>
-class CircularBuffer;
-}
 
 namespace trace
 {
@@ -54,6 +48,7 @@ public:
 
   /**
    * Called when a span is started.
+   *
    * NOTE: This method is a no-op.
    *
    * @param span - The span that just started
@@ -70,19 +65,19 @@ public:
   /**
    * Export all ended spans that have not been exported yet.
    *
-   * @param timeout - An optional timeout. A default timeout of 0 means no timeout.
+   * NOTE: Timeout functionality not supported yet.
    */
   void ForceFlush(
-      std::chrono::microseconds timeout = std::chrono::microseconds(0)) noexcept override;
+      std::chrono::microseconds timeout = std::chrono::milliseconds(0)) noexcept override;
 
   /**
    * Shuts down the processor and does any cleanup required. Completely drains the buffer/queue of
    * all its ended spans and passes them to the exporter. Any subsequent calls to OnStart, OnEnd,
    * ForceFlush or Shutdown will return immediately without doing anything.
    *
-   * @param timeout - An optional timeout. A default timeout of 0 means no timeout.
+   * NOTE: Timeout functionality not supported yet.
    */
-  void Shutdown(std::chrono::microseconds timeout = std::chrono::microseconds(0)) noexcept override;
+  void Shutdown(std::chrono::microseconds timeout = std::chrono::milliseconds(0)) noexcept override;
 
   /**
    * Class destructor which invokes the Shutdown() method. The Shutdown() method is supposed to be
@@ -101,14 +96,12 @@ private:
   /**
    * Exports all ended spans to the configured exporter.
    *
-   * @param buffer - The buffer with ended spans to export
    * @param was_force_flush_called - A flag to check if the current export is the result
    *                                 of a call to ForceFlush method. If true, then we have to
    *                                 notify the main thread to wake it up in the ForceFlush
    *                                 method.
    */
-  void Export(std::unique_ptr<common::CircularBuffer<Recordable>> &buffer,
-              const bool was_for_flush_called);
+  void Export(const bool was_for_flush_called);
 
   /**
    * Called when Shutdown() is invoked. Completely drains the queue of all its ended spans and
@@ -116,24 +109,11 @@ private:
    */
   void DrainQueue();
 
-  /**
-   * Consumes and copies the appropriate amount of spans from the buffer_
-   * to a copy buffer which is then exported. This helps unblock all producers
-   * and increases the overall synchronization performance.
-   *
-   * @param was_force_flush_called - A flag to check if the current export is the result
-   *                                 of a call to ForceFlush method. If true, we consume
-   *                                 and copy the entire buffer_ to the copy buffer. Otherwise,
-   *                                 we calculate the appropriate size to export.
-   * @return A unique pointer to the copy buffer
-   */
-  std::unique_ptr<common::CircularBuffer<Recordable>> CopySpans(const bool was_force_flush_called);
-
   /* The configured backend exporter */
   std::unique_ptr<SpanExporter> exporter_;
 
   /* The background worker thread */
-  std::unique_ptr<std::thread> worker_thread_;
+  std::thread worker_thread_;
 
   /* Configurable parameters as per the official specs */
   const std::chrono::milliseconds schedule_delay_millis_;
@@ -148,9 +128,9 @@ private:
   std::unique_ptr<common::CircularBuffer<Recordable>> buffer_;
 
   /* Important boolean flags to handle the workflow of the processor */
-  volatile bool is_shutdown_{false};
-  volatile bool is_force_flush_{false};
-  volatile bool is_force_flush_notified_{false};
+  std::atomic<bool> is_shutdown_{false};
+  std::atomic<bool> is_force_flush_{false};
+  std::atomic<bool> is_force_flush_notified_{false};
 };
 
 }  // namespace trace

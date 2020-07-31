@@ -22,6 +22,5 @@ cc_library(
     deps = [
         "//api",
         "//sdk:headers",
-        "//sdk/src/common:circular_buffer",
     ],
 )
