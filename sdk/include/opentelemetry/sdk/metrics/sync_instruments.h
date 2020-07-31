@@ -1,56 +1,64 @@
 #pragma once
 
-#include "opentelemetry/sdk/metrics/instrument.h"
+#include <map>
+#include <memory>
+#include <sstream>
+#include <stdexcept>
+#include <vector>
+#include "opentelemetry/metrics/sync_instruments.h"
 #include "opentelemetry/sdk/metrics/aggregator/counter_aggregator.h"
 #include "opentelemetry/sdk/metrics/aggregator/min_max_sum_count_aggregator.h"
-#include "opentelemetry/metrics/sync_instruments.h"
-#include <stdexcept>
-#include <map>
-#include <sstream>
-#include <vector>
-#include <memory>
+#include "opentelemetry/sdk/metrics/instrument.h"
 
 namespace metrics_api = opentelemetry::metrics;
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace sdk
 {
-namespace metrics 
+namespace metrics
 {
 
 template <class T>
-class BoundCounter final: public BoundSynchronousInstrument<T>, public metrics_api::BoundCounter<T> {
+class BoundCounter final : public BoundSynchronousInstrument<T>, public metrics_api::BoundCounter<T>
+{
 
 public:
-    BoundCounter() = default;
+  BoundCounter() = default;
 
-    BoundCounter(nostd::string_view name,
-                    nostd::string_view description,
-                    nostd::string_view unit,
-                    bool enabled):
-                    BoundSynchronousInstrument<T>(name, description, unit, enabled,
-                                                  metrics_api::InstrumentKind::Counter,
-                                                  std::shared_ptr<Aggregator<T>>(new CounterAggregator<T>(metrics_api::InstrumentKind::Counter))) // Aggregator is chosen here
-    {}
+  BoundCounter(nostd::string_view name,
+               nostd::string_view description,
+               nostd::string_view unit,
+               bool enabled)
+      : BoundSynchronousInstrument<T>(
+            name,
+            description,
+            unit,
+            enabled,
+            metrics_api::InstrumentKind::Counter,
+            std::shared_ptr<Aggregator<T>>(new CounterAggregator<T>(
+                metrics_api::InstrumentKind::Counter)))  // Aggregator is chosen here
+  {}
 
-    /*
-     * Add adds the value to the counter's sum. The labels are already linked to the instrument
-     * and are not specified.
-     *
-     * @param value the numerical representation of the metric being captured
-     * @param labels the set of labels, as key-value pairs
-     */
-    virtual void add(T value) override
+  /*
+   * Add adds the value to the counter's sum. The labels are already linked to the instrument
+   * and are not specified.
+   *
+   * @param value the numerical representation of the metric being captured
+   * @param labels the set of labels, as key-value pairs
+   */
+  virtual void add(T value) override
+  {
+    this->mu_.lock();
+    if (value < 0)
     {
-        this->mu_.lock();
-        if (value < 0){
-            throw std::invalid_argument("Counter instrument updates must be non-negative.");
-        } else {
-            this->update(value);
-        }
-        this->mu_.unlock();
+      throw std::invalid_argument("Counter instrument updates must be non-negative.");
     }
-
+    else
+    {
+      this->update(value);
+    }
+    this->mu_.unlock();
+  }
 };
 
 template <class T>
@@ -58,112 +66,132 @@ class Counter final : public SynchronousInstrument<T>, public metrics_api::Count
 {
 
 public:
+  Counter() = default;
 
-    Counter() = default;
+  Counter(nostd::string_view name,
+          nostd::string_view description,
+          nostd::string_view unit,
+          bool enabled)
+      : SynchronousInstrument<T>(name,
+                                 description,
+                                 unit,
+                                 enabled,
+                                 metrics_api::InstrumentKind::Counter)
+  {}
 
-    Counter(nostd::string_view name,
-               nostd::string_view description,
-               nostd::string_view unit,
-               bool enabled):
-               SynchronousInstrument<T>(name, description, unit, enabled, metrics_api::InstrumentKind::Counter)
-    {}
+  /*
+   * Bind creates a bound instrument for this counter. The labels are
+   * associated with values recorded via subsequent calls to Record.
+   *
+   * @param labels the set of labels, as key-value pairs.
+   * @return a BoundCounter tied to the specified labels
+   */
 
-    /*
-     * Bind creates a bound instrument for this counter. The labels are
-     * associated with values recorded via subsequent calls to Record.
-     *
-     * @param labels the set of labels, as key-value pairs.
-     * @return a BoundCounter tied to the specified labels
-     */
-    
-    virtual nostd::shared_ptr<metrics_api::BoundCounter<T>> bindCounter(const trace::KeyValueIterable &labels) override {
-        std::string labelset = KvToString(labels);
-        if (boundInstruments_.find(labelset) == boundInstruments_.end())
-        {
-            auto sp1 = nostd::shared_ptr<metrics_api::BoundCounter<T>>(new BoundCounter<T>(this->name_, this->description_, this->unit_, this->enabled_));
-            boundInstruments_[labelset]=sp1;
-            return sp1;
-        }
-        else
-        {
-            boundInstruments_[labelset]->inc_ref();
-            return boundInstruments_[labelset];
-        }
+  virtual nostd::shared_ptr<metrics_api::BoundCounter<T>> bindCounter(
+      const trace::KeyValueIterable &labels) override
+  {
+    std::string labelset = KvToString(labels);
+    if (boundInstruments_.find(labelset) == boundInstruments_.end())
+    {
+      auto sp1 = nostd::shared_ptr<metrics_api::BoundCounter<T>>(
+          new BoundCounter<T>(this->name_, this->description_, this->unit_, this->enabled_));
+      boundInstruments_[labelset] = sp1;
+      return sp1;
     }
-    
-    /*
-    * Add adds the value to the counter's sum. The labels should contain
-    * the keys and values to be associated with this value.  Counters only
-    * accept positive valued updates.
-    *
-    * @param value the numerical representation of the metric being captured
-    * @param labels the set of labels, as key-value pairs
-    */
-    virtual void add(T value, const trace::KeyValueIterable &labels) override {
-        this->mu_.lock();
-        if (value < 0){
-            throw std::invalid_argument("Counter instrument updates must be non-negative.");
-        } else {
-            auto sp = bindCounter(labels);
-            sp->update(value);
-            sp->unbind();
-        }
-        this->mu_.unlock();
+    else
+    {
+      boundInstruments_[labelset]->inc_ref();
+      return boundInstruments_[labelset];
     }
+  }
 
-    virtual std::vector<Record> GetRecords() override {
-        std::vector<Record> ret;
-        std::vector<std::string> toDelete;
-        for (const auto &x : boundInstruments_){
-            if (x.second->get_ref() == 0){
-                toDelete.push_back(x.first);
-            }
-            auto agg_ptr = dynamic_cast<BoundCounter<T>*>(x.second.get())->GetAggregator();
-            agg_ptr->checkpoint();
-            ret.push_back(Record(x.second->GetName(), x.second->GetDescription(), x.first, agg_ptr));
-        }
-        for (const auto &x : toDelete){
-            boundInstruments_.erase(x);
-        }
-        return ret;
+  /*
+   * Add adds the value to the counter's sum. The labels should contain
+   * the keys and values to be associated with this value.  Counters only
+   * accept positive valued updates.
+   *
+   * @param value the numerical representation of the metric being captured
+   * @param labels the set of labels, as key-value pairs
+   */
+  virtual void add(T value, const trace::KeyValueIterable &labels) override
+  {
+    this->mu_.lock();
+    if (value < 0)
+    {
+      throw std::invalid_argument("Counter instrument updates must be non-negative.");
     }
-    
-    virtual void update(T val, const trace::KeyValueIterable &labels) override {
-        add(val, labels);
+    else
+    {
+      auto sp = bindCounter(labels);
+      sp->update(value);
+      sp->unbind();
     }
+    this->mu_.unlock();
+  }
 
-    // A collection of the bound instruments created by this unbound instrument identified by their labels.
-    std::unordered_map<std::string, nostd::shared_ptr<metrics_api::BoundCounter<T>>> boundInstruments_;
+  virtual std::vector<Record> GetRecords() override
+  {
+    std::vector<Record> ret;
+    std::vector<std::string> toDelete;
+    for (const auto &x : boundInstruments_)
+    {
+      if (x.second->get_ref() == 0)
+      {
+        toDelete.push_back(x.first);
+      }
+      auto agg_ptr = dynamic_cast<BoundCounter<T> *>(x.second.get())->GetAggregator();
+      agg_ptr->checkpoint();
+      ret.push_back(Record(x.second->GetName(), x.second->GetDescription(), x.first, agg_ptr));
+    }
+    for (const auto &x : toDelete)
+    {
+      boundInstruments_.erase(x);
+    }
+    return ret;
+  }
+
+  virtual void update(T val, const trace::KeyValueIterable &labels) override { add(val, labels); }
+
+  // A collection of the bound instruments created by this unbound instrument identified by their
+  // labels.
+  std::unordered_map<std::string, nostd::shared_ptr<metrics_api::BoundCounter<T>>>
+      boundInstruments_;
 };
 
-
 template <class T>
-class BoundUpDownCounter final: public BoundSynchronousInstrument<T>, virtual public metrics_api::BoundUpDownCounter<T> {
+class BoundUpDownCounter final : public BoundSynchronousInstrument<T>,
+                                 virtual public metrics_api::BoundUpDownCounter<T>
+{
 
 public:
-    BoundUpDownCounter<T>() = default;
+  BoundUpDownCounter<T>() = default;
 
-    BoundUpDownCounter<T>(nostd::string_view name,
-                          nostd::string_view description,
-                          nostd::string_view unit,
-                          bool enabled):
-                          BoundSynchronousInstrument<T>(name, description, unit, enabled,
-                                                        metrics_api::InstrumentKind::UpDownCounter,
-                                                        std::shared_ptr<Aggregator<T>>(new CounterAggregator<T>(metrics_api::InstrumentKind::UpDownCounter)))
-    {}
+  BoundUpDownCounter<T>(nostd::string_view name,
+                        nostd::string_view description,
+                        nostd::string_view unit,
+                        bool enabled)
+      : BoundSynchronousInstrument<T>(name,
+                                      description,
+                                      unit,
+                                      enabled,
+                                      metrics_api::InstrumentKind::UpDownCounter,
+                                      std::shared_ptr<Aggregator<T>>(new CounterAggregator<T>(
+                                          metrics_api::InstrumentKind::UpDownCounter)))
+  {}
 
-    /*
-     * Add adds the value to the counter's sum. The labels are already linked to the instrument
-     * and are not specified.
-     *
-     * @param value the numerical representation of the metric being captured
-     * @param labels the set of labels, as key-value pairs
-     */
-    virtual void add(T value) override {
-        this->mu_.lock();
-        this->update(value);
-        this->mu_.unlock();
-    }
+  /*
+   * Add adds the value to the counter's sum. The labels are already linked to the instrument
+   * and are not specified.
+   *
+   * @param value the numerical representation of the metric being captured
+   * @param labels the set of labels, as key-value pairs
+   */
+  virtual void add(T value) override
+  {
+    this->mu_.lock();
+    this->update(value);
+    this->mu_.unlock();
+  }
 };
 
 template <class T>
@@ -171,107 +199,123 @@ class UpDownCounter final : public SynchronousInstrument<T>, public metrics_api:
 {
 
 public:
-    UpDownCounter() = default;
+  UpDownCounter() = default;
 
-    UpDownCounter(nostd::string_view name,
-                     nostd::string_view description,
-                     nostd::string_view unit,
-                     bool enabled):
-                     SynchronousInstrument<T>(name, description, unit, enabled, metrics_api::InstrumentKind::UpDownCounter)
-    {}
+  UpDownCounter(nostd::string_view name,
+                nostd::string_view description,
+                nostd::string_view unit,
+                bool enabled)
+      : SynchronousInstrument<T>(name,
+                                 description,
+                                 unit,
+                                 enabled,
+                                 metrics_api::InstrumentKind::UpDownCounter)
+  {}
 
-    /*
-     * Bind creates a bound instrument for this counter. The labels are
-     * associated with values recorded via subsequent calls to Record.
-     *
-     * @param labels the set of labels, as key-value pairs.
-     * @return a BoundIntCounter tied to the specified labels
-     */
-    nostd::shared_ptr<metrics_api::BoundUpDownCounter<T>> bindUpDownCounter(const trace::KeyValueIterable &labels) override
+  /*
+   * Bind creates a bound instrument for this counter. The labels are
+   * associated with values recorded via subsequent calls to Record.
+   *
+   * @param labels the set of labels, as key-value pairs.
+   * @return a BoundIntCounter tied to the specified labels
+   */
+  nostd::shared_ptr<metrics_api::BoundUpDownCounter<T>> bindUpDownCounter(
+      const trace::KeyValueIterable &labels) override
+  {
+    std::string labelset = KvToString(labels);
+    if (boundInstruments_.find(labelset) == boundInstruments_.end())
     {
-        std::string labelset = KvToString(labels);
-        if (boundInstruments_.find(labelset) == boundInstruments_.end())
-        {
-            auto sp1 = nostd::shared_ptr<metrics_api::BoundUpDownCounter<T>>(new BoundUpDownCounter<T>(this->name_, this->description_, this->unit_, this->enabled_));
-            boundInstruments_[labelset]=sp1;
-            return sp1;
-        }
-        else
-        {
-            boundInstruments_[labelset]->inc_ref();
-            return boundInstruments_[labelset];
-        }
+      auto sp1 = nostd::shared_ptr<metrics_api::BoundUpDownCounter<T>>(
+          new BoundUpDownCounter<T>(this->name_, this->description_, this->unit_, this->enabled_));
+      boundInstruments_[labelset] = sp1;
+      return sp1;
     }
-
-    /*
-     * Add adds the value to the counter's sum. The labels should contain
-     * the keys and values to be associated with this value. Counters only
-     * accept positive valued updates.
-     *
-     * @param value the numerical representation of the metric being captured
-     * @param labels the set of labels, as key-value pairs
-     */
-    void add(T value, const trace::KeyValueIterable &labels) override
+    else
     {
-        this->mu_.lock();
-        auto sp = bindUpDownCounter(labels);
-        sp->update(value);
-        sp->unbind();
-        this->mu_.unlock();
+      boundInstruments_[labelset]->inc_ref();
+      return boundInstruments_[labelset];
     }
-    
-    virtual std::vector<Record> GetRecords() override {
-        std::vector<Record> ret;
-        std::vector<std::string> toDelete;
-        for (const auto &x : boundInstruments_){
-            if (x.second->get_ref() == 0){
-                toDelete.push_back(x.first);
-            }
-            auto agg_ptr = dynamic_cast<BoundCounter<T>*>(x.second.get())->GetAggregator();
-            agg_ptr->checkpoint();
-            ret.push_back(Record(x.second->GetName(), x.second->GetDescription(), x.first, agg_ptr));
-        }
-        for (const auto &x : toDelete){
-            boundInstruments_.erase(x);
-        }
-        return ret;
+  }
+
+  /*
+   * Add adds the value to the counter's sum. The labels should contain
+   * the keys and values to be associated with this value. Counters only
+   * accept positive valued updates.
+   *
+   * @param value the numerical representation of the metric being captured
+   * @param labels the set of labels, as key-value pairs
+   */
+  void add(T value, const trace::KeyValueIterable &labels) override
+  {
+    this->mu_.lock();
+    auto sp = bindUpDownCounter(labels);
+    sp->update(value);
+    sp->unbind();
+    this->mu_.unlock();
+  }
+
+  virtual std::vector<Record> GetRecords() override
+  {
+    std::vector<Record> ret;
+    std::vector<std::string> toDelete;
+    for (const auto &x : boundInstruments_)
+    {
+      if (x.second->get_ref() == 0)
+      {
+        toDelete.push_back(x.first);
+      }
+      auto agg_ptr = dynamic_cast<BoundCounter<T> *>(x.second.get())->GetAggregator();
+      agg_ptr->checkpoint();
+      ret.push_back(Record(x.second->GetName(), x.second->GetDescription(), x.first, agg_ptr));
     }
-
-    virtual void update(T val, const trace::KeyValueIterable &labels) override {
-        add(val, labels);
+    for (const auto &x : toDelete)
+    {
+      boundInstruments_.erase(x);
     }
+    return ret;
+  }
 
+  virtual void update(T val, const trace::KeyValueIterable &labels) override { add(val, labels); }
 
-    std::unordered_map<std::string, nostd::shared_ptr<metrics_api::BoundUpDownCounter<T>>> boundInstruments_;
+  std::unordered_map<std::string, nostd::shared_ptr<metrics_api::BoundUpDownCounter<T>>>
+      boundInstruments_;
 };
 
 template <class T>
-class BoundValueRecorder final: public BoundSynchronousInstrument<T> , public metrics_api::BoundValueRecorder<T>{
+class BoundValueRecorder final : public BoundSynchronousInstrument<T>,
+                                 public metrics_api::BoundValueRecorder<T>
+{
 
 public:
-    BoundValueRecorder() = default;
+  BoundValueRecorder() = default;
 
-    BoundValueRecorder(nostd::string_view name,
-                          nostd::string_view description,
-                          nostd::string_view unit,
-                          bool enabled): BoundSynchronousInstrument<T>(name, description, unit, enabled,
-                                                                       metrics_api::InstrumentKind::ValueRecorder,
-                                                                       std::shared_ptr<Aggregator<T>>(new MinMaxSumCountAggregator<T>(metrics_api::InstrumentKind::ValueRecorder)))
-    {}
+  BoundValueRecorder(nostd::string_view name,
+                     nostd::string_view description,
+                     nostd::string_view unit,
+                     bool enabled)
+      : BoundSynchronousInstrument<T>(
+            name,
+            description,
+            unit,
+            enabled,
+            metrics_api::InstrumentKind::ValueRecorder,
+            std::shared_ptr<Aggregator<T>>(
+                new MinMaxSumCountAggregator<T>(metrics_api::InstrumentKind::ValueRecorder)))
+  {}
 
-    /*
-     * Add adds the value to the counter's sum. The labels are already linked to the instrument
-     * and are not specified.
-     *
-     * @param value the numerical representation of the metric being captured
-     * @param labels the set of labels, as key-value pairs
-     */
-    void record(T value) {
-        this->mu_.lock();
-        this->update(value);
-        this->mu_.unlock();
-    }
-    
+  /*
+   * Add adds the value to the counter's sum. The labels are already linked to the instrument
+   * and are not specified.
+   *
+   * @param value the numerical representation of the metric being captured
+   * @param labels the set of labels, as key-value pairs
+   */
+  void record(T value)
+  {
+    this->mu_.lock();
+    this->update(value);
+    this->mu_.unlock();
+  }
 };
 
 template <class T>
@@ -279,79 +323,91 @@ class ValueRecorder final : public SynchronousInstrument<T>, public metrics_api:
 {
 
 public:
-    ValueRecorder() = default;
+  ValueRecorder() = default;
 
-    ValueRecorder(nostd::string_view name,
-                     nostd::string_view description,
-                     nostd::string_view unit,
-                     bool enabled):
-                     SynchronousInstrument<T>(name, description, unit, enabled, metrics_api::InstrumentKind::ValueRecorder)
-    {}
+  ValueRecorder(nostd::string_view name,
+                nostd::string_view description,
+                nostd::string_view unit,
+                bool enabled)
+      : SynchronousInstrument<T>(name,
+                                 description,
+                                 unit,
+                                 enabled,
+                                 metrics_api::InstrumentKind::ValueRecorder)
+  {}
 
-    /*
-     * Bind creates a bound instrument for this counter. The labels are
-     * associated with values recorded via subsequent calls to Record.
-     *
-     * @param labels the set of labels, as key-value pairs.
-     * @return a BoundIntCounter tied to the specified labels
-     */
-    nostd::shared_ptr<metrics_api::BoundValueRecorder<T>> bindValueRecorder(const trace::KeyValueIterable &labels) override
+  /*
+   * Bind creates a bound instrument for this counter. The labels are
+   * associated with values recorded via subsequent calls to Record.
+   *
+   * @param labels the set of labels, as key-value pairs.
+   * @return a BoundIntCounter tied to the specified labels
+   */
+  nostd::shared_ptr<metrics_api::BoundValueRecorder<T>> bindValueRecorder(
+      const trace::KeyValueIterable &labels) override
+  {
+    std::string labelset = KvToString(labels);
+    if (boundInstruments_.find(labelset) == boundInstruments_.end())
     {
-        std::string labelset = KvToString(labels);
-        if (boundInstruments_.find(labelset) == boundInstruments_.end())
-        {
-            auto sp1 = nostd::shared_ptr<metrics_api::BoundValueRecorder<T>>(new BoundValueRecorder<T>(this->name_, this->description_, this->unit_, this->enabled_));
-            boundInstruments_[labelset]=sp1;
-            return sp1;
-        }
-        else
-        {
-            boundInstruments_[labelset]->inc_ref();
-            return boundInstruments_[labelset];
-        }
+      auto sp1 = nostd::shared_ptr<metrics_api::BoundValueRecorder<T>>(
+          new BoundValueRecorder<T>(this->name_, this->description_, this->unit_, this->enabled_));
+      boundInstruments_[labelset] = sp1;
+      return sp1;
     }
-
-    /*
-     * Add adds the value to the counter's sum. The labels should contain
-     * the keys and values to be associated with this value.  Counters only
-     * accept positive valued updates.
-     *
-     * @param value the numerical representation of the metric being captured
-     * @param labels the set of labels, as key-value pairs
-     */
-    void record(T value, const trace::KeyValueIterable &labels) override
+    else
     {
-        this->mu_.lock();
-        auto sp = bindValueRecorder(labels);
-        sp->update(value);
-        sp->unbind();
-        this->mu_.unlock();
+      boundInstruments_[labelset]->inc_ref();
+      return boundInstruments_[labelset];
     }
-    
-    virtual std::vector<Record> GetRecords() override {
-        std::vector<Record> ret;
-        std::vector<std::string> toDelete;
-        for (const auto &x : boundInstruments_){
-            if (x.second->get_ref() == 0){
-                toDelete.push_back(x.first);
-            }
-            auto agg_ptr = dynamic_cast<BoundCounter<T>*>(x.second.get())->GetAggregator();
-            agg_ptr->checkpoint();
-            ret.push_back(Record(x.second->GetName(), x.second->GetDescription(), x.first, agg_ptr));
-        }
-        for (const auto &x : toDelete){
-            boundInstruments_.erase(x);
-        }
-        return ret;
-    }
+  }
 
-    virtual void update(T value, const trace::KeyValueIterable &labels) override {
-        record(value, labels);
-    }
+  /*
+   * Add adds the value to the counter's sum. The labels should contain
+   * the keys and values to be associated with this value.  Counters only
+   * accept positive valued updates.
+   *
+   * @param value the numerical representation of the metric being captured
+   * @param labels the set of labels, as key-value pairs
+   */
+  void record(T value, const trace::KeyValueIterable &labels) override
+  {
+    this->mu_.lock();
+    auto sp = bindValueRecorder(labels);
+    sp->update(value);
+    sp->unbind();
+    this->mu_.unlock();
+  }
 
-    std::unordered_map<std::string, nostd::shared_ptr<metrics_api::BoundValueRecorder<T>>> boundInstruments_;
+  virtual std::vector<Record> GetRecords() override
+  {
+    std::vector<Record> ret;
+    std::vector<std::string> toDelete;
+    for (const auto &x : boundInstruments_)
+    {
+      if (x.second->get_ref() == 0)
+      {
+        toDelete.push_back(x.first);
+      }
+      auto agg_ptr = dynamic_cast<BoundCounter<T> *>(x.second.get())->GetAggregator();
+      agg_ptr->checkpoint();
+      ret.push_back(Record(x.second->GetName(), x.second->GetDescription(), x.first, agg_ptr));
+    }
+    for (const auto &x : toDelete)
+    {
+      boundInstruments_.erase(x);
+    }
+    return ret;
+  }
+
+  virtual void update(T value, const trace::KeyValueIterable &labels) override
+  {
+    record(value, labels);
+  }
+
+  std::unordered_map<std::string, nostd::shared_ptr<metrics_api::BoundValueRecorder<T>>>
+      boundInstruments_;
 };
 
-}
-}
+}  // namespace metrics
+}  // namespace sdk
 OPENTELEMETRY_END_NAMESPACE

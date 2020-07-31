@@ -20,19 +20,21 @@ using AggregatorVariant = nostd::variant<std::shared_ptr<Aggregator<short>>,
 class Record
 {
 public:
-  explicit Record(nostd::string_view name, nostd::string_view description,
-                  std::string labels, AggregatorVariant aggregator)
+  explicit Record(nostd::string_view name,
+                  nostd::string_view description,
+                  std::string labels,
+                  AggregatorVariant aggregator)
   {
-    name_ = std::string(name);
+    name_        = std::string(name);
     description_ = std::string(description);
-    labels_ = labels;
-    aggregator_ = aggregator;
+    labels_      = labels;
+    aggregator_  = aggregator;
   }
 
-  std::string GetName() {return name_;}
-  std::string GetDescription() {return description_;}
-  std::string GetLabels() {return labels_;}
-  AggregatorVariant GetAggregator() {return aggregator_;}
+  std::string GetName() { return name_; }
+  std::string GetDescription() { return description_; }
+  std::string GetLabels() { return labels_; }
+  AggregatorVariant GetAggregator() { return aggregator_; }
 
 private:
   std::string name_;
@@ -40,6 +42,6 @@ private:
   std::string labels_;
   AggregatorVariant aggregator_;
 };
-} // namespace metrics
-} // namespace sdk
+}  // namespace metrics
+}  // namespace sdk
 OPENTELEMETRY_END_NAMESPACE
