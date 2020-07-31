@@ -5,6 +5,10 @@
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace context
 {
+  // The Token object provides is returned when attaching objects to the 
+  // RuntimeContext object and is associated with a context object, and
+  // can be provided to the RuntimeContext Detach method to remove the 
+  // associated context from the RuntimeContext.
   class Token
   {
     public:
@@ -14,7 +18,9 @@ namespace context
 
     private:
       friend class RuntimeContext;
-
+      
+      // The ContextDetacher object automatically attempts to detach
+      // the Token when all copies of the Token are out of scope. 
       class ContextDetacher {
         public:
 
