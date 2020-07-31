@@ -192,7 +192,11 @@ inline void print_value(std::stringstream &ss,
         ss << '"';
       break;
     default:
+#if __EXCEPTIONS
       throw std::invalid_argument("Labels must be strings");
+#else
+      std::terminate();
+#endif
       break;
   }
 };

@@ -51,7 +51,11 @@ public:
     this->mu_.lock();
     if (value < 0)
     {
+#if __EXCEPTIONS
       throw std::invalid_argument("Counter instrument updates must be non-negative.");
+#else
+      std::terminate();
+#endif
     }
     else
     {
@@ -118,7 +122,11 @@ public:
     this->mu_.lock();
     if (value < 0)
     {
+#if __EXCEPTIONS
       throw std::invalid_argument("Counter instrument updates must be non-negative.");
+#else
+      std::terminate();
+#endif
     }
     else
     {
