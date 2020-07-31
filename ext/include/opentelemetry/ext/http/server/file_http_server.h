@@ -19,7 +19,7 @@ protected:
    * which show up on the web if the user is on the given host:port. Static
    * files can be seen relative to the folder where the executable was ran.
    */
-  FileHttpServer(const std::string &host = "127.0.0.1", int port = "3333") : HttpServer()
+  FileHttpServer(const std::string &host = "127.0.0.1", int port = 3333) : HttpServer()
   {
     std::ostringstream os;
     os << host << ":" << port;
@@ -33,7 +33,7 @@ protected:
    * initialize their own, otherwise everything will be served like a file
    * @param server should be an instance of this object
    */
-  void InitializeFileEndpoint(zPagesHttpServer &server) { server[root_endpt_] = ServeFile; }
+  void InitializeFileEndpoint(FileHttpServer &server) { server[root_endpt_] = ServeFile; }
 
 private:
   /**
