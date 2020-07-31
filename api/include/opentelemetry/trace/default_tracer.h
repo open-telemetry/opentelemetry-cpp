@@ -23,8 +23,7 @@ public:
                                     const KeyValueIterable &attributes,
                                     const StartSpanOptions &options = {}) noexcept
   {
-    return nostd::unique_ptr<Span>(nullptr);
-//     return DefaultSpan::GetInvalid();
+     return nostd::unique_ptr<Span>(new DefaultSpan::GetInvalid());
   }
 
   void ForceFlushWithMicroseconds(uint64_t timeout) noexcept
