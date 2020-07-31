@@ -35,17 +35,20 @@ TracezDataAggregator::GetAggregatedTracezData() {
   return aggregated_tracez_data_;
 }
 
-
-LatencyBoundary TracezDataAggregator::FindLatencyBoundary(ThreadsafeSpanData *span_data) {
+LatencyBoundary TracezDataAggregator::FindLatencyBoundary(
+    ThreadsafeSpanData *span_data) {
   auto span_data_duration = span_data->GetDuration();
-  for (unsigned int boundary = 0; boundary < kLatencyBoundaries.size(); boundary++) {
-    if (span_data_duration < kLatencyBoundaries[boundary + 1]) return (LatencyBoundary)boundary;
+  for (unsigned int boundary = 0; boundary < kLatencyBoundaries.size();
+       boundary++) {
+    if (span_data_duration < kLatencyBoundaries[boundary + 1])
+      return (LatencyBoundary)boundary;
   }
   return LatencyBoundary::k100SecondToMax;
 }
 
 void TracezDataAggregator::InsertIntoSampleSpanList(
-    std::list<ThreadsafeSpanData> &sample_spans, ThreadsafeSpanData &span_data) {
+    std::list<ThreadsafeSpanData> &sample_spans,
+    ThreadsafeSpanData &span_data) {
   /**
    * Check to see if the sample span list size exceeds the set limit, if it does
    * free up memory and remove the earliest inserted sample before appending
