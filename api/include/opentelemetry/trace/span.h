@@ -9,8 +9,13 @@
 #include "opentelemetry/trace/canonical_code.h"
 #include "opentelemetry/trace/key_value_iterable_view.h"
 #include "opentelemetry/version.h"
+//#include "opentelemetry/context/token.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
+namespace context
+{
+  class Token;
+}
 namespace trace
 {
 enum class SpanKind
@@ -73,7 +78,9 @@ public:
   Span(Span &&)      = delete;
   Span &operator=(const Span &) = delete;
   Span &operator=(Span &&) = delete;
-
+  
+  //context::RuntimeContext::Token token_;  
+  context::Token* token_;  
   // Sets an attribute on the Span. If the Span previously contained a mapping for
   // the key, the old value is replaced.
   virtual void SetAttribute(nostd::string_view key,
@@ -153,6 +160,7 @@ public:
   virtual bool IsRecording() const noexcept = 0;
 
   virtual Tracer &tracer() const noexcept = 0;
+  
 };
 }  // namespace trace
 OPENTELEMETRY_END_NAMESPACE

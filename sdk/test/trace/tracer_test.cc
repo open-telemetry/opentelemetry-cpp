@@ -4,7 +4,9 @@
 #include "opentelemetry/sdk/trace/samplers/parent_or_else.h"
 #include "opentelemetry/sdk/trace/simple_processor.h"
 #include "opentelemetry/sdk/trace/span_data.h"
+#include "opentelemetry/context/threadlocal_context.h"
 
+#include <iostream>
 #include <gtest/gtest.h>
 
 using namespace opentelemetry::sdk::trace;
@@ -12,6 +14,8 @@ using opentelemetry::core::SteadyTimestamp;
 using opentelemetry::core::SystemTimestamp;
 namespace nostd  = opentelemetry::nostd;
 namespace common = opentelemetry::common;
+namespace context = opentelemetry::context;
+namespace trace = opentelemetry::trace;
 using opentelemetry::trace::SpanContext;
 
 /**
@@ -120,7 +124,7 @@ TEST(Tracer, StartSpanSampleOn)
   auto tracer_on = initTracer(spans_received);
 
   tracer_on->StartSpan("span 1")->End();
-
+  
   ASSERT_EQ(1, spans_received->size());
 
   auto &span_data = spans_received->at(0);
@@ -378,4 +382,24 @@ TEST(Tracer, TestParentOrElseSampler)
   span_parent_off_1->End();
   span_parent_off_2->End();
   ASSERT_EQ(0, spans_received_parent_off->size());
+}
+
+TEST(Tracer, TestRuntimeContextSpan){
+
+  std::shared_ptr<std::vector<std::unique_ptr<SpanData>>> spans_received(
+      new std::vector<std::unique_ptr<SpanData>>);
+  auto tracer = initTracer(spans_received);
+
+  auto span_first  = tracer->StartSpan("span 1");
+  auto span_second = tracer->StartSpan("span 2");
+
+  ASSERT_EQ(0, spans_received->size());
+
+  nostd::get<nostd::shared_ptr<trace::Span>>(context::RuntimeContext::GetCurrent().GetValue("span_key"))->End();
+  ASSERT_EQ(1, spans_received->size());
+  ASSERT_EQ("span 2", spans_received->at(0)->GetName());
+
+  nostd::get<nostd::shared_ptr<trace::Span>>(context::RuntimeContext::GetCurrent().GetValue("span_key"))->End();
+  ASSERT_EQ(2, spans_received->size());
+  ASSERT_EQ("span 1", spans_received->at(1)->GetName());
 }

@@ -44,7 +44,7 @@ public:
    */
   std::shared_ptr<Sampler> GetSampler() const noexcept;
 
-  nostd::unique_ptr<trace_api::Span> StartSpan(
+  nostd::shared_ptr<trace_api::Span> StartSpan(
       nostd::string_view name,
       const trace_api::KeyValueIterable &attributes,
       const trace_api::StartSpanOptions &options = {}) noexcept override;
