@@ -130,8 +130,8 @@ TEST_F(TracezDataAggregatorTest, SingleCompletedSpan) {
   auto data = tracez_data_aggregator->GetAggregatedTracezData();
   ASSERT_EQ(data.size(), 1);
   ASSERT_TRUE(data.find(span_name1) != data.end());
+  
   auto &aggregated_data = data.at(span_name1);
-
   // Make sure counts of spans are in order
   VerifySpanCountsInTracezData(span_name1, aggregated_data, 0, 0,
                                {1, 0, 0, 0, 0, 0, 0, 0, 0});
@@ -162,8 +162,8 @@ TEST_F(TracezDataAggregatorTest, SingleErrorSpan) {
   // Check to see if span name can be found in aggregation
   ASSERT_EQ(data.size(), 1);
   ASSERT_TRUE(data.find(span_name1) != data.end());
+  
   auto &aggregated_data = data.at(span_name1);
-
   // Make sure counts of spans are in order
   VerifySpanCountsInTracezData(span_name1, aggregated_data, 0, 1,
                                {0, 0, 0, 0, 0, 0, 0, 0, 0});
@@ -395,12 +395,14 @@ TEST_F(TracezDataAggregatorTest, ErrorSampleSpansOverCapacity) {
                     span_error_description);
 
   std::this_thread::sleep_for(milliseconds(500));
+  
   // Fetch data and check if span name is spresent
   auto data = tracez_data_aggregator->GetAggregatedTracezData();
   ASSERT_EQ(data.size(), 1);
   ASSERT_TRUE(data.find(span_name1) != data.end());
 
   std::this_thread::sleep_for(milliseconds(500));
+  
   // Check if error spans are updated according to spans started
   auto &aggregated_data = data.at(span_name1);
   VerifySpanCountsInTracezData(span_name1, aggregated_data, 0,
