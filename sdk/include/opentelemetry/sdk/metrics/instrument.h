@@ -198,7 +198,7 @@ inline void print_value(std::stringstream &ss,
 inline std::string mapToString(const std::map<std::string, std::string> & conv)
 {
     std::stringstream ss;
-    ss << "{ ";
+    ss << "{";
     for (auto i:conv){
         ss << i.first << ':' << i.second << ',';
     }

@@ -127,6 +127,10 @@ public:
         }
         return ret;
     }
+    
+    virtual void update(T val, const trace::KeyValueIterable &labels) override {
+        add(val, labels);
+    }
 
     // A collection of the bound instruments created by this unbound instrument identified by their labels.
     std::unordered_map<std::string, nostd::shared_ptr<metrics_api::BoundCounter<T>>> boundInstruments_;
