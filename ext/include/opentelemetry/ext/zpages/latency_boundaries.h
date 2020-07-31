@@ -49,15 +49,6 @@ enum LatencyBoundary {
   k100SecondToMax
 };
 
-/** Overloading ++ operator for easy iteration **/
-inline LatencyBoundary &operator++(LatencyBoundary &latencyBoundary) {
-  latencyBoundary =
-      LatencyBoundary(static_cast<std::underlying_type<LatencyBoundary>::type>(
-                          latencyBoundary) +
-                      1);
-  return latencyBoundary;
-}
-
 }  // namespace zpages
 }  // namespace ext
 OPENTELEMETRY_END_NAMESPACE
