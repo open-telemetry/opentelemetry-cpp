@@ -4,11 +4,11 @@
 #include "opentelemetry/trace/canonical_code.h"
 #include "opentelemetry/common/attribute_value.h"
 #include "opentelemetry/trace/span.h"
+#include "opentelemetry/trace/default_tracer.h"
 
 #define pass
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace trace {
-class DefaultTracer;
 class DefaultSpan: public Span {
   public:
     // Returns an invalid span.
@@ -72,7 +72,7 @@ class DefaultSpan: public Span {
     }
 
   private:
-    trace::Tracer tracer_;
+    trace::DefaultTracer tracer_;
     SpanContext span_context_;
 };
 }
