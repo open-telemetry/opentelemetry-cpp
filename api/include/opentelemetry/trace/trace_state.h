@@ -29,16 +29,10 @@ namespace trace
 /**
  * TraceState carries tracing-system specific context in a list of key-value pairs. TraceState
  * allows different vendors to propagate additional information and inter-operate with their legacy
- * Id formats.
+ * id formats.
  *
- * Implementation is optimized for a small list of key-value pairs.
- *
- * Key is opaque string up to 256 characters printable. It MUST begin with a lowercase letter,
- * and can only contain lowercase letters a-z, digits 0-9, underscores _, dashes -, asterisks *, and
- * forward slashes /.
- *
- * Value is opaque string up to 256 characters, of printable ASCII RFC0020 characters (i.e. the
- * range 0x20 to 0x7E) except comma , and equals =.
+ * For more information, see the W3C Trace Context specification:
+ * https://www.w3.org/TR/trace-context
  */
 class TraceState
 {
@@ -53,20 +47,23 @@ public:
   public:
     Entry() noexcept = default;
 
+    // Copy constructor.
+    Entry(const Entry &copy);
+
     // Creates an Entry for a given key-value pair.
     Entry(nostd::string_view key, nostd::string_view value) noexcept;
 
-    const char *GetKey();
-    const char *GetValue();
+    nostd::string_view GetKey();
+    nostd::string_view GetValue();
 
   private:
     // Store key and value as raw char pointers to avoid using std::string.
-    const char *key_;
-    const char *value_;
+    nostd::unique_ptr<const char[]> key_;
+    nostd::unique_ptr<const char[]> value_;
   };
 
   // An empty TraceState.
-  TraceState() noexcept : entries_(new Entry[kMaxKeyValuePairs]), num_entries_(0) {}
+  TraceState() noexcept : num_entries_(0) {}
 
   // Returns false if no such key, otherwise returns true and populates value.
   bool Get(nostd::string_view key, nostd::string_view value) const noexcept { return false; }
@@ -88,7 +85,7 @@ public:
 
 private:
   // Store entries in a C-style array to avoid using std::array or std::vector.
-  nostd::unique_ptr<Entry[]> entries_;
+  Entry entries_[kMaxKeyValuePairs];
 
   // Maintain the number of entries in entries_. Must be in the range [0, kMaxKeyValuePairs].
   int num_entries_;
