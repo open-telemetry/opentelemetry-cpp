@@ -25,4 +25,24 @@ using AttributeValue = nostd::variant<bool,
                                       nostd::span<const double>,
                                       nostd::span<const nostd::string_view>>;
 }  // namespace common
+
+enum AttributeType
+{
+  TYPE_BOOL,
+  TYPE_INT,
+  TYPE_INT64,
+  TYPE_UINT,
+  TYPE_UINT64,
+  TYPE_DOUBLE,
+  TYPE_STRING,
+  TYPE_CSTRING,
+  // TYPE_SPAN_BYTE, // TODO: not part of OT spec yet
+  TYPE_SPAN_BOOL,
+  TYPE_SPAN_INT,
+  TYPE_SPAN_INT64,
+  TYPE_SPAN_UINT,
+  TYPE_SPAN_UINT64,
+  TYPE_SPAN_DOUBLE,
+  TYPE_SPAN_STRING
+};
 OPENTELEMETRY_END_NAMESPACE

@@ -1,6 +1,5 @@
 #include <gtest/gtest.h>
 #include "opentelemetry/sdk/metrics/sync_instruments.h"
-#include "opentelemetry/sdk/metrics/async_instruments.h"
 
 #include <cstring>
 #include <string>
