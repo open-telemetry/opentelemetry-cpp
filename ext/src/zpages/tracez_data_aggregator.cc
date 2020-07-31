@@ -26,7 +26,7 @@ TracezDataAggregator::~TracezDataAggregator() {
     execute_.store(false, std::memory_order_release);
     cv_.notify_one();
     aggregate_spans_thread_.join();
-  };
+  }
 }
 
 std::map<std::string, TracezData>
