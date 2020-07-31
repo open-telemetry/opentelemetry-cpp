@@ -7,11 +7,11 @@
 #include "opentelemetry/sdk/metrics/exporter.h"
 #include "opentelemetry/exporters/ostream/metrics_exporter.h"
 #include "opentelemetry/version.h"
+#include "opentelemetry/sdk/metrics/processor.h"
 
-#include <unistd.h>
-#include <iostream>
 #include <sstream>
 #include <thread>
+#include <unistd.h>
 #include <vector>
 
 namespace metrics_api = opentelemetry::metrics;
@@ -23,24 +23,13 @@ namespace sdk
 namespace metrics
 {
 
-class Processor {
-public:
-    Processor() = default;
-    
-    void process(std::vector<Record> alpha){}
-    
-    std::vector<Record> CheckpointSelf() {
-        return std::vector<Record>();
-    }
-};
-
 class PushController
 {
 
 public:
   PushController(nostd::shared_ptr<metrics_api::Meter> meter,
                  nostd::unique_ptr<MetricsExporter> exporter,
-                 nostd::shared_ptr<Processor> processor,
+                 nostd::shared_ptr<MetricsProcessor> processor,
                  double period,
                  int timeout = 30)
   {
@@ -118,17 +107,20 @@ public:
    * exporter_ to be exported.
    *
    */
-  void tick()
-  {
-    std::cout << "tick" << std::endl;
-    processor_->process(dynamic_cast<Meter*>(meter_.get())->Collect());
-    std::vector<Record> checkpointed = processor_->CheckpointSelf();
-    exporter_->Export(checkpointed);
-  }
+    void tick()
+    {
+        std::vector<Record> collected = dynamic_cast<Meter*>(meter_.get())->Collect();
+        for (const auto &rec: collected){
+            processor_->process(rec);
+        }
+        collected = processor_->CheckpointSelf();
+        processor_->FinishedCollection();
+        exporter_->Export(collected);
+    }
 
   nostd::shared_ptr<metrics_api::Meter> meter_;
-  nostd::unique_ptr<MetricsExporter> exporter_;
-  nostd::shared_ptr<Processor> processor_;
+  std::unique_ptr<MetricsExporter> exporter_;
+  nostd::shared_ptr<MetricsProcessor> processor_;
   bool active_ = false;
   unsigned int period_;
   unsigned int timeout_;
