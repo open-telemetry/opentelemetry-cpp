@@ -113,16 +113,19 @@ public:
 
     virtual std::vector<Record> GetRecords() override {
         std::vector<Record> ret;
-        for (auto x : boundInstruments_){
+        std::vector<std::string> toDelete;
+        for (const auto &x : boundInstruments_){
+            if (x.second->get_ref() == 0){
+                toDelete.push_back(x.first);
+            }
             auto agg_ptr = dynamic_cast<BoundCounter<T>*>(x.second.get())->GetAggregator();
             agg_ptr->checkpoint();
             ret.push_back(Record(x.second->GetName(), x.second->GetDescription(), x.first, agg_ptr));
         }
+        for (const auto &x : toDelete){
+            boundInstruments_.erase(x);
+        }
         return ret;
-    }
-    
-    virtual void update(T value, const trace::KeyValueIterable &labels) override {
-        add(value, labels);
     }
 
     // A collection of the bound instruments created by this unbound instrument identified by their labels.
@@ -215,10 +218,17 @@ public:
     
     virtual std::vector<Record> GetRecords() override {
         std::vector<Record> ret;
-        for (auto x : boundInstruments_){
+        std::vector<std::string> toDelete;
+        for (const auto &x : boundInstruments_){
+            if (x.second->get_ref() == 0){
+                toDelete.push_back(x.first);
+            }
             auto agg_ptr = dynamic_cast<BoundCounter<T>*>(x.second.get())->GetAggregator();
             agg_ptr->checkpoint();
             ret.push_back(Record(x.second->GetName(), x.second->GetDescription(), x.first, agg_ptr));
+        }
+        for (const auto &x : toDelete){
+            boundInstruments_.erase(x);
         }
         return ret;
     }
@@ -316,10 +326,17 @@ public:
     
     virtual std::vector<Record> GetRecords() override {
         std::vector<Record> ret;
-        for (auto x : boundInstruments_){
+        std::vector<std::string> toDelete;
+        for (const auto &x : boundInstruments_){
+            if (x.second->get_ref() == 0){
+                toDelete.push_back(x.first);
+            }
             auto agg_ptr = dynamic_cast<BoundCounter<T>*>(x.second.get())->GetAggregator();
             agg_ptr->checkpoint();
             ret.push_back(Record(x.second->GetName(), x.second->GetDescription(), x.first, agg_ptr));
+        }
+        for (const auto &x : toDelete){
+            boundInstruments_.erase(x);
         }
         return ret;
     }

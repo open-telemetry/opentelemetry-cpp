@@ -164,7 +164,8 @@ public:
     
     /**
      * Checkpoints instruments and returns a set of records which are ready for processing.
-     * This method should only be called by the Meter Class as part of the export pipeline.
+     * This method should ONLY be called by the Meter Class as part of the export pipeline
+     * as it also prunes bound instruments with no active references.
      *
      * @param none
      * @return vector of Records which hold the data attached to this synchronous instrument
