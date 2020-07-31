@@ -1,25 +1,16 @@
 #pragma once
 
 #include "opentelemetry/context/context.h"
-//#include "opentelemetry/context/token.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace context
 {
-
-  //class ContextDetacher;
-
-  class Token;
-  class ContextDetacher;
-
-
   class Token
   {
     public:
       bool operator==(const Context &other) noexcept { return context_ == other; }
 
       Token() noexcept = default;
-      //~Token() noexcept { Detach(*this); }
 
     private:
       friend class RuntimeContext;
@@ -34,6 +25,7 @@ namespace context
         private:
           Context context_;
       };
+
       // A constructor that sets the token's Context object to the
       // one that was passed in.
       Token(Context context) 

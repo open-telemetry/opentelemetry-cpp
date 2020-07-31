@@ -6,7 +6,6 @@
 #include "opentelemetry/sdk/trace/span_data.h"
 #include "opentelemetry/context/threadlocal_context.h"
 
-#include <iostream>
 #include <gtest/gtest.h>
 
 using namespace opentelemetry::sdk::trace;
@@ -124,7 +123,6 @@ TEST(Tracer, StartSpanSampleOn)
   auto tracer_on = initTracer(spans_received);
 
   tracer_on->StartSpan("span 1")->End();
-  
   ASSERT_EQ(1, spans_received->size());
 
   auto &span_data = spans_received->at(0);

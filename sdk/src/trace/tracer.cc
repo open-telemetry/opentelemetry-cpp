@@ -48,11 +48,8 @@ nostd::shared_ptr<trace_api::Span> Tracer::StartSpan(
         this->shared_from_this(), processor_.load(), name, attributes, options}};
     
     span->token_ = new context::Token();
-    context::Token token = context::RuntimeContext::Attach(context::RuntimeContext::GetCurrent().SetValue("span_key",span));
-    *(span->token_) = token;
-    //context::RuntimeContext::Detach(*span->token_);
-    //delete span->token_;    
-    //delete span->token_;
+    *(span->token_) = context::RuntimeContext::Attach(context::RuntimeContext::GetCurrent().SetValue("span_key",span));
+    
     // if the attributes is not nullptr, add attributes to the span.
     if (sampling_result.attributes)
     {

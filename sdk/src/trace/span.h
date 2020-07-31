@@ -3,7 +3,6 @@
 #include <mutex>
 
 #include "opentelemetry/context/runtime_context.h"
-
 #include "opentelemetry/sdk/trace/tracer.h"
 #include "opentelemetry/version.h"
 
