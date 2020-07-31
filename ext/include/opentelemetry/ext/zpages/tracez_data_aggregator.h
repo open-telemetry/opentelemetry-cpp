@@ -121,7 +121,7 @@ class TracezDataAggregator {
    * @ returns LatencyBoundary is the latency boundary that the duration belongs
    * to
    */
-  LatencyBoundary FindLatencyBoundary(ThreadsafeSpanData* span_data);
+  LatencyBoundary FindLatencyBoundary(std::unique_ptr<ThreadsafeSpanData> &ok_span);
 
   /**
    * InsertIntoSampleSpanList is a helper function that is called to insert

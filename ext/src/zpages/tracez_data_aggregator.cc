@@ -36,9 +36,9 @@ TracezDataAggregator::GetAggregatedTracezData() {
 }
 
 LatencyBoundary TracezDataAggregator::FindLatencyBoundary(
-    ThreadsafeSpanData *span_data) {
-  auto span_data_duration = span_data->GetDuration();
-  for (unsigned int boundary = 0; boundary < kLatencyBoundaries.size();
+    std::unique_ptr<ThreadsafeSpanData> &span_data) {
+  const auto &span_data_duration = span_data->GetDuration();
+  for (unsigned int boundary = 0; boundary < kLatencyBoundaries.size()-1;
        boundary++) {
     if (span_data_duration < kLatencyBoundaries[boundary + 1])
       return (LatencyBoundary)boundary;
@@ -83,7 +83,7 @@ void TracezDataAggregator::ClearRunningSpanData() {
 void TracezDataAggregator::AggregateStatusOKSpan(
     std::unique_ptr<ThreadsafeSpanData> &ok_span) {
   // Find and update boundary of aggregated data that span belongs
-  auto boundary_name = FindLatencyBoundary(ok_span.get());
+  auto boundary_name = FindLatencyBoundary(ok_span);
 
   // Get the data for name in aggrgation and update count and sample spans
   auto &tracez_data = aggregated_tracez_data_.at(ok_span->GetName().data());
