@@ -48,6 +48,8 @@ public:
 
   bool IsRecording() const noexcept override { return span_->IsRecording(); }
 
+  trace::SpanContext GetContext() { return span_->GetContext(); }
+
 private:
   std::shared_ptr<trace::Tracer> tracer_;
   std::unique_ptr<trace::Span> span_;
@@ -72,8 +74,8 @@ public:
     {
       return nullptr;
     }
-    return nostd::unique_ptr<trace::Span>{new (std::nothrow)
-                                              Span{this->shared_from_this(), std::move(span)}};
+    trace::Span* spn = new (std::nothrow)Span{this->shared_from_this(), std::move(span)};
+    return nostd::unique_ptr<trace::Span>{spn};
   }
 
   void ForceFlushWithMicroseconds(uint64_t timeout) noexcept override
