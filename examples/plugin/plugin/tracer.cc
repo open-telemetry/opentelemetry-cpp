@@ -49,7 +49,7 @@ public:
 
   bool IsRecording() const noexcept override { return true; }
 
-  trace::SpanContext GetContext() const noexcept { return span_->GetContext(); }
+  trace::SpanContext GetContext() const noexcept override { return span_->GetContext(); }
 //  Tracer &tracer() const noexcept override { return *tracer_; }
 
 private:

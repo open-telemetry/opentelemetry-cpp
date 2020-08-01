@@ -47,7 +47,7 @@ public:
 
   bool IsRecording() const noexcept override { return false; }
 
-  SpanContext GetContext() const noexcept {
+  SpanContext GetContext() const noexcept override {
       return span_context_;
   }
 //  Tracer &tracer() const noexcept override { return *tracer_; }
