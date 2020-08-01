@@ -110,7 +110,7 @@ public:
   static constexpr int kValueMaxSize     = 256;
   static constexpr int kMaxKeyValuePairs = 32;
   // An empty TraceState.
-  TraceState() noexcept = default;
+//  TraceState() noexcept = default;
   TraceState(TraceState &&trace_state) {
     tmp_map = trace_state.tmp_map;
   }
