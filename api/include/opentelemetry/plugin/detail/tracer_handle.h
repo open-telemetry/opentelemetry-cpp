@@ -13,8 +13,6 @@ class TracerHandle
 {
 public:
   virtual ~TracerHandle() = default;
-
-  virtual trace::Tracer &tracer() const noexcept = 0;
 };
 }  // namespace plugin
 OPENTELEMETRY_END_NAMESPACE

@@ -17,7 +17,6 @@
 #include <iostream>
 #include <array>
 #include <exception>
-#include "opentelemetry/trace/propagation/http_text_format.h"
 #include "opentelemetry/trace/span_context.h"
 #include "opentelemetry/trace/trace_state.h"
 #include "opentelemetry/trace/key_value_iterable.h"
@@ -27,6 +26,7 @@
 #include "opentelemetry/nostd/shared_ptr.h"
 #include "opentelemetry/nostd/variant.h"
 #include "opentelemetry/nostd/span.h"
+#include "opentelemetry/trace/propagation/http_text_format.h"
 #include "opentelemetry/trace/default_span.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
@@ -304,16 +304,6 @@ class HttpTraceContext : public HTTPTextFormat<T> {
                 return context_from_parent_header;
             }
         }
-        const nostd::string_view kTraceParent = "traceparent";
-        const nostd::string_view kTraceState = "tracestate";
-        const int kVersionBytes = 2;
-        const int kTraceIdBytes = 32;
-        const int kSpanIdBytes = 16;
-        const int kTraceFlagBytes = 2;
-        const int kTraceDelimiterBytes = 3;
-        const int kHeaderSize = kVersionBytes + kTraceIdBytes + kSpanIdBytes + kTraceFlagBytes + kTraceDelimiterBytes;
-        const int kTraceStateMaxMembers = 32;
-        const int kHeaderElementLengths[4] = {2,32,16,2};
 };
 }
 }  // namespace trace
