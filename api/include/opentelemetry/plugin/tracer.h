@@ -48,6 +48,8 @@ public:
 
   bool IsRecording() const noexcept override { return span_->IsRecording(); }
 
+  trace::Tracer &tracer() const noexcept override { return *tracer_; }
+
 private:
   std::shared_ptr<trace::Tracer> tracer_;
   std::unique_ptr<trace::Span> span_;
