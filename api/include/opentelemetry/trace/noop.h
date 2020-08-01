@@ -53,8 +53,8 @@ public:
 //  Tracer &tracer() const noexcept override { return *tracer_; }
 
 private:
-//  std::shared_ptr<Tracer> tracer_;
-    SpanContext span_context_;
+  std::shared_ptr<Tracer> tracer_;
+  SpanContext span_context_;
 };
 
 /**
