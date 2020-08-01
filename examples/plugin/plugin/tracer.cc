@@ -1,6 +1,7 @@
 #include "tracer.h"
 
 #include <iostream>
+#include <memory>
 
 namespace nostd  = opentelemetry::nostd;
 namespace common = opentelemetry::common;
@@ -48,11 +49,13 @@ public:
 
   bool IsRecording() const noexcept override { return true; }
 
+  trace::SpanContext GetContext() const noexcept { return span_->GetContext(); }
 //  Tracer &tracer() const noexcept override { return *tracer_; }
 
 private:
   std::shared_ptr<Tracer> tracer_;
   std::string name_;
+  std::unique_ptr<trace::Span> span_;
 };
 }  // namespace
 
