@@ -43,7 +43,7 @@ public:
   bool IsRecording() const noexcept override;
 
   trace_api::SpanContext GetContext() const noexcept {
-      return span_context_;
+      return trace_api::SpanContext();
   }
 //  trace_api::Tracer &tracer() const noexcept override { return *tracer_; }
 
