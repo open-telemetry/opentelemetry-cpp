@@ -196,18 +196,18 @@ class HttpTraceContext : public HTTPTextFormat<T> {
                         } else if (elt_num == 2) {
                             span_id = trace_parent.substr(start_pos,kHeaderElementLengths[elt_num]);
                         } else {
-                            throw; // Impossible to have more than 4 elements in parent header
+                            return SpanContext(); // Impossible to have more than 4 elements in parent header
                         }
                         countdown = kHeaderElementLengths[++elt_num];
                         start_pos = -1;
                     } else {
-                        throw;
+                        return SpanContext();
                     }
                 } else if ((trace_parent[i]>='a'&&trace_parent[i]<='f')||(trace_parent[i]>='0'&&trace_parent[i]<='9')) {
                     if (start_pos == -1) start_pos = i;
                     countdown--;
                 } else {
-                    throw;
+                    return SpanContext();
                 }
             }
             trace_flags = trace_parent.substr(start_pos,kHeaderElementLengths[elt_num]);
