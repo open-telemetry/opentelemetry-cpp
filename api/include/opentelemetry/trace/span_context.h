@@ -71,6 +71,8 @@ public:
 
   static SpanContext GetInvalid() { return SpanContext(); }
 
+  bool IsSampled() const noexcept { return trace_flags_.IsSampled(); }
+
 private:
   TraceId trace_id_;
   SpanId span_id_;
