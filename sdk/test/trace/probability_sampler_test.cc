@@ -24,32 +24,32 @@ namespace
  * generate a random trace_id and check if it should sample using the provided
  * provider and context
  */
-int RunShouldSampleCountDecision(SpanContext &context, ProbabilitySampler &sampler, int iterations)
-{
-  int actual_count = 0;
-
-  opentelemetry::trace::SpanKind span_kind = opentelemetry::trace::SpanKind::kInternal;
-
-  using M = std::map<std::string, int>;
-  M m1    = {{}};
-  opentelemetry::trace::KeyValueIterableView<M> view{m1};
-
-  for (int i = 0; i < iterations; ++i)
-  {
-    uint8_t buf[16] = {0};
-    Random::GenerateRandomBuffer(buf);
-
-    opentelemetry::trace::TraceId trace_id(buf);
-
-    auto result = sampler.ShouldSample(&context, trace_id, "", span_kind, view);
-    if (result.decision == Decision::RECORD_AND_SAMPLE)
-    {
-      ++actual_count;
-    }
-  }
-
-  return actual_count;
-}
+//int RunShouldSampleCountDecision(SpanContext &context, ProbabilitySampler &sampler, int iterations)
+//{
+//  int actual_count = 0;
+//
+//  opentelemetry::trace::SpanKind span_kind = opentelemetry::trace::SpanKind::kInternal;
+//
+//  using M = std::map<std::string, int>;
+//  M m1    = {{}};
+//  opentelemetry::trace::KeyValueIterableView<M> view{m1};
+//
+//  for (int i = 0; i < iterations; ++i)
+//  {
+//    uint8_t buf[16] = {0};
+//    Random::GenerateRandomBuffer(buf);
+//
+//    opentelemetry::trace::TraceId trace_id(buf);
+//
+//    auto result = sampler.ShouldSample(&context, trace_id, "", span_kind, view);
+//    if (result.decision == Decision::RECORD_AND_SAMPLE)
+//    {
+//      ++actual_count;
+//    }
+//  }
+//
+//  return actual_count;
+//}
 }  // namespace
 
 TEST(ProbabilitySampler, ShouldSampleWithoutContext)

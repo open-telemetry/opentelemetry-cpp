@@ -16,7 +16,6 @@
 #include <map>
 #include <iostream>
 #include <array>
-#include <exception>
 #include "opentelemetry/trace/span_context.h"
 #include "opentelemetry/trace/trace_state.h"
 #include "opentelemetry/trace/key_value_iterable.h"
@@ -59,7 +58,7 @@ class HttpTraceContext : public HTTPTextFormat<T> {
         // Rules that manages how context will be injected to carrier.
         using Setter = void(*)(T &carrier, nostd::string_view trace_type,nostd::string_view trace_description);
 
-        void Inject(Setter setter, T &carrier, const context::Context &context) override {
+        void Inject(Setter setter, T &carrier, const context::Context &context) noexcept override {
             SpanContext span_context = GetCurrentSpan(context)->GetContext();
             if (!span_context.IsValid()) {
                 return;
@@ -67,7 +66,7 @@ class HttpTraceContext : public HTTPTextFormat<T> {
             InjectImpl(setter, carrier, span_context);
         }
 
-        context::Context Extract(Getter getter, const T &carrier, context::Context &context) override {
+        context::Context Extract(Getter getter, const T &carrier, context::Context &context) noexcept override {
             SpanContext span_context = ExtractImpl(getter,carrier);
             nostd::string_view span_key = "current-span";
             nostd::shared_ptr<Span> sp{new DefaultSpan(span_context)};
@@ -179,54 +178,52 @@ class HttpTraceContext : public HTTPTextFormat<T> {
                 std::cout<<"Unparseable trace_parent header. Returning INVALID span context."<<std::endl;
                 return SpanContext();
             }
-            try {
-                nostd::string_view version;
-                nostd::string_view trace_id;
-                nostd::string_view span_id;
-                nostd::string_view trace_flags;
-                int elt_num = 0;
-                int countdown = kHeaderElementLengths[elt_num];
-                int start_pos = -1;
-                for (int i = 0; i < int(trace_parent.size()); i++) {
-                    if (trace_parent[i]=='\t') continue;
-                    else if (trace_parent[i]=='-') {
-                        if (countdown==0) {
-                            if (elt_num == 0) {
-                                version = trace_parent.substr(start_pos,kHeaderElementLengths[elt_num]);
-                            } else if (elt_num == 1) {
-                                trace_id = trace_parent.substr(start_pos,kHeaderElementLengths[elt_num]);
-                            } else if (elt_num == 2) {
-                                span_id = trace_parent.substr(start_pos,kHeaderElementLengths[elt_num]);
-                            } else {
-                                throw; // Impossible to have more than 4 elements in parent header
-                            }
-                            countdown = kHeaderElementLengths[++elt_num];
-                            start_pos = -1;
+            nostd::string_view version;
+            nostd::string_view trace_id;
+            nostd::string_view span_id;
+            nostd::string_view trace_flags;
+            int elt_num = 0;
+            int countdown = kHeaderElementLengths[elt_num];
+            int start_pos = -1;
+            for (int i = 0; i < int(trace_parent.size()); i++) {
+                if (trace_parent[i]=='\t') continue;
+                else if (trace_parent[i]=='-') {
+                    if (countdown==0) {
+                        if (elt_num == 0) {
+                            version = trace_parent.substr(start_pos,kHeaderElementLengths[elt_num]);
+                        } else if (elt_num == 1) {
+                            trace_id = trace_parent.substr(start_pos,kHeaderElementLengths[elt_num]);
+                        } else if (elt_num == 2) {
+                            span_id = trace_parent.substr(start_pos,kHeaderElementLengths[elt_num]);
                         } else {
-                            throw;
+                            throw; // Impossible to have more than 4 elements in parent header
                         }
-                    } else if ((trace_parent[i]>='a'&&trace_parent[i]<='f')||(trace_parent[i]>='0'&&trace_parent[i]<='9')) {
-                        if (start_pos == -1) start_pos = i;
-                        countdown--;
+                        countdown = kHeaderElementLengths[++elt_num];
+                        start_pos = -1;
                     } else {
                         throw;
                     }
+                } else if ((trace_parent[i]>='a'&&trace_parent[i]<='f')||(trace_parent[i]>='0'&&trace_parent[i]<='9')) {
+                    if (start_pos == -1) start_pos = i;
+                    countdown--;
+                } else {
+                    throw;
                 }
-                trace_flags = trace_parent.substr(start_pos,kHeaderElementLengths[elt_num]);
+            }
+            trace_flags = trace_parent.substr(start_pos,kHeaderElementLengths[elt_num]);
 
-                if (trace_id == "00000000000000000000000000000000" || span_id == "0000000000000000") {
-                      return SpanContext();
-                }
-                if (version == "ff") {
-                      return SpanContext();
-                }
-
+            if (trace_id == "00000000000000000000000000000000" || span_id == "0000000000000000") {
+                  return SpanContext();
+            }
+            if (version == "ff") {
+                  return SpanContext();
+            }
+            if (trace_id.length()==32 && span_id.length()==16 && trace_flags.length() == 2) {
                 TraceId trace_id_obj = GenerateTraceIdFromString(trace_id);
                 SpanId span_id_obj = GenerateSpanIdFromString(span_id);
                 TraceFlags trace_flags_obj = GenerateTraceFlagsFromString(trace_flags);
                 return SpanContext(trace_id_obj,span_id_obj,trace_flags_obj,TraceState(),true);
-//                return SpanContext.CreateFromRemoteParent(trace_id_obj, span_id_obj, trace_flags_obj, TraceState());
-            } catch (std::exception& e) {
+            } else {
                 std::cout<<"Unparseable trace_parent header. Returning INVALID span context."<<std::endl;
                 return SpanContext();
             }
@@ -260,7 +257,7 @@ class HttpTraceContext : public HTTPTextFormat<T> {
             }
 
             if (element_num >= kTraceStateMaxMembers) {
-                throw std::invalid_argument("TraceState has too many elements.");
+                return TraceState(); // too many k-v pairs will result in an invalid trace state
             }
             return trace_state;
         }
@@ -290,19 +287,14 @@ class HttpTraceContext : public HTTPTextFormat<T> {
                 return context_from_parent_header;
             }
 
-            try {
-                TraceState trace_state = ExtractTraceState(trace_state_header);
-                return SpanContext(
-                    context_from_parent_header.trace_id(),
-                    context_from_parent_header.span_id(),
-                    context_from_parent_header.trace_flags(),
-                    trace_state,
-                    true
-                );
-            } catch (std::exception& e) {
-                std::cout<<"Unparseable tracestate header. Returning span context without state."<<std::endl;
-                return context_from_parent_header;
-            }
+            TraceState trace_state = ExtractTraceState(trace_state_header);
+            return SpanContext(
+                context_from_parent_header.trace_id(),
+                context_from_parent_header.span_id(),
+                context_from_parent_header.trace_flags(),
+                trace_state,
+                true
+            );
         }
 };
 }
