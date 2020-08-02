@@ -135,7 +135,7 @@ TEST_F(BatchSpanProcessorTestPeer, TestShutdown)
     batch_processor->OnEnd(std::move(test_spans->at(i)));
   }
 
-  batch_processor->Shutdown(std::chrono::milliseconds(50));
+  batch_processor->Shutdown();
 
   EXPECT_EQ(num_spans, spans_received->size());
   for (int i = 0; i < num_spans; ++i)
@@ -162,10 +162,9 @@ TEST_F(BatchSpanProcessorTestPeer, TestForceFlush)
     batch_processor->OnEnd(std::move(test_spans->at(i)));
   }
 
-  // give some time to export
+  // Give some time to export
   std::this_thread::sleep_for(std::chrono::milliseconds(50));
 
-  // force flush
   batch_processor->ForceFlush();
 
   EXPECT_EQ(num_spans, spans_received->size());
@@ -181,7 +180,7 @@ TEST_F(BatchSpanProcessorTestPeer, TestForceFlush)
     batch_processor->OnEnd(std::move(more_test_spans->at(i)));
   }
 
-  // give some time to export the spans
+  // Give some time to export the spans
   std::this_thread::sleep_for(std::chrono::milliseconds(50));
 
   batch_processor->ForceFlush();
@@ -189,7 +188,8 @@ TEST_F(BatchSpanProcessorTestPeer, TestForceFlush)
   EXPECT_EQ(num_spans * 2, spans_received->size());
   for (int i = 0; i < num_spans; ++i)
   {
-    EXPECT_EQ("Span " + std::to_string(i % num_spans), spans_received->at(i)->GetName());
+    EXPECT_EQ("Span " + std::to_string(i % num_spans),
+              spans_received->at(num_spans + i)->GetName());
   }
 }
 
@@ -212,10 +212,9 @@ TEST_F(BatchSpanProcessorTestPeer, TestManySpansLoss)
     batch_processor->OnEnd(std::move(test_spans->at(i)));
   }
 
-  // give some time to export the spans
+  // Give some time to export the spans
   std::this_thread::sleep_for(std::chrono::milliseconds(700));
 
-  // force flush
   batch_processor->ForceFlush();
 
   // Span should be exported by now
@@ -241,10 +240,9 @@ TEST_F(BatchSpanProcessorTestPeer, TestManySpansLossLess)
     batch_processor->OnEnd(std::move(test_spans->at(i)));
   }
 
-  // give some time to export the spans
+  // Give some time to export the spans
   std::this_thread::sleep_for(std::chrono::milliseconds(50));
 
-  // force flush
   batch_processor->ForceFlush();
 
   EXPECT_EQ(num_spans, spans_received->size());

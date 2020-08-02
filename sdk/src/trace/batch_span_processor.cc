@@ -17,41 +17,36 @@ BatchSpanProcessor::BatchSpanProcessor(std::unique_ptr<SpanExporter> &&exporter,
     : exporter_(std::move(exporter)),
       max_queue_size_(max_queue_size),
       schedule_delay_millis_(schedule_delay_millis),
-      max_export_batch_size_(max_export_batch_size)
-{
-  buffer_ =
-      std::unique_ptr<CircularBuffer<Recordable>>(new CircularBuffer<Recordable>(max_queue_size_));
-
-  // Start the background worker thread
-  worker_thread_ = std::thread(&BatchSpanProcessor::DoBackgroundWork, this);
-}
+      max_export_batch_size_(max_export_batch_size),
+      buffer_(max_queue_size_),
+      worker_thread_(&BatchSpanProcessor::DoBackgroundWork, this)
+{}
 
 std::unique_ptr<Recordable> BatchSpanProcessor::MakeRecordable() noexcept
 {
   return exporter_->MakeRecordable();
 }
 
-void BatchSpanProcessor::OnStart(Recordable &span) noexcept
+void BatchSpanProcessor::OnStart(Recordable &) noexcept
 {
   // no-op
-  (void)span;
 }
 
 void BatchSpanProcessor::OnEnd(std::unique_ptr<Recordable> &&span) noexcept
 {
-  if (is_shutdown_.load())
+  if (is_shutdown_.load() == true)
   {
     return;
   }
 
-  if (buffer_->Add(span) == false)
+  if (buffer_.Add(span) == false)
   {
     return;
   }
 
   // If the queue gets at least half full a preemptive notification is
   // sent to the worker thread to start a new export cycle.
-  if (buffer_->size() >= max_queue_size_ / 2)
+  if (buffer_.size() >= max_queue_size_ / 2)
   {
     // signal the worker thread
     cv_.notify_one();
@@ -60,7 +55,7 @@ void BatchSpanProcessor::OnEnd(std::unique_ptr<Recordable> &&span) noexcept
 
 void BatchSpanProcessor::ForceFlush(std::chrono::microseconds timeout) noexcept
 {
-  if (is_shutdown_.load())
+  if (is_shutdown_.load() == true)
   {
     return;
   }
@@ -90,48 +85,35 @@ void BatchSpanProcessor::DoBackgroundWork()
 
   while (true)
   {
-    // If we already have max_export_batch_size_ spans in the buffer, better to export them
-    // now
-    if (buffer_->size() < max_export_batch_size_)
+    // Wait for `timeout` milliseconds
+    std::unique_lock<std::mutex> lk(cv_m_);
+    cv_.wait_for(lk, timeout);
+
+    if (is_shutdown_.load() == true)
     {
-      // In case of spurious wake up, we export only if we have atleast one span
-      // in the batch. This is acceptable because batching is a best mechanism
-      // effort here.
-      do
-      {
-        std::unique_lock<std::mutex> lk(cv_m_);
-
-        cv_.wait_for(lk, std::chrono::milliseconds(timeout));
-
-        // If shutdown has been invoked, break out of the loop
-        // and drain out the queue.
-        if (is_shutdown_.load() == true)
-        {
-          is_shutdown_ = false;
-          // ensure the main thread has been notified
-          while (is_shutdown_.load() == false)
-            ;
-          DrainQueue();
-          return;
-        }
-
-        if (is_force_flush_.load() == true)
-        {
-          break;
-        }
-      } while (buffer_->empty() == true);
+      DrainQueue();
+      return;
     }
 
-    // Get the value of is_force_flush_ to check whether this export is
-    // a result of a ForceFlush call. This flag is propagated to the Export
-    // method as well.
     bool was_force_flush_called = is_force_flush_.load();
 
-    // Set the flag back to false to notify main thread in case ForceFlush
-    // was invoked.
-    if (is_force_flush_.load() == true)
+    // Check if this export was the result of a force flush.
+    if (was_force_flush_called == true)
     {
+      // Since this export was the result of a force flush, signal the
+      // main thread that the worker thread has been notified
       is_force_flush_ = false;
+    }
+    else
+    {
+      // If the buffer was empty during the entire `timeout` time interval,
+      // go back to waiting. If this was a spurious wake-up, we export only if
+      // `buffer_` is not empty. This is acceptable because batching is a best
+      // mechanism effort here.
+      if (buffer_.empty() == true)
+      {
+        continue;
+      }
     }
 
     auto start = std::chrono::steady_clock::now();
@@ -139,6 +121,7 @@ void BatchSpanProcessor::DoBackgroundWork()
     auto end      = std::chrono::steady_clock::now();
     auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(end - start);
 
+    // Subtract the duration of this export call from the next `timeout`.
     timeout = schedule_delay_millis_ - duration;
   }
 }
@@ -151,15 +134,15 @@ void BatchSpanProcessor::Export(const bool was_force_flush_called)
 
   if (was_force_flush_called == true)
   {
-    num_spans_to_export = buffer_->size();
+    num_spans_to_export = buffer_.size();
   }
   else
   {
     num_spans_to_export =
-        buffer_->size() >= max_export_batch_size_ ? max_export_batch_size_ : buffer_->size();
+        buffer_.size() >= max_export_batch_size_ ? max_export_batch_size_ : buffer_.size();
   }
 
-  buffer_->Consume(
+  buffer_.Consume(
       num_spans_to_export, [&](CircularBufferRange<AtomicUniquePtr<Recordable>> range) noexcept {
         range.ForEach([&](AtomicUniquePtr<Recordable> &ptr) {
           std::unique_ptr<Recordable> swap_ptr = std::unique_ptr<Recordable>(nullptr);
@@ -180,16 +163,11 @@ void BatchSpanProcessor::Export(const bool was_force_flush_called)
       force_flush_cv_.notify_one();
     }
   }
-
-  if (is_shutdown_.load() == true)
-  {
-    return;
-  }
 }
 
 void BatchSpanProcessor::DrainQueue()
 {
-  while (buffer_->empty() == false)
+  while (buffer_.empty() == false)
   {
     Export(false);
   }
@@ -199,13 +177,7 @@ void BatchSpanProcessor::Shutdown(std::chrono::microseconds timeout) noexcept
 {
   is_shutdown_ = true;
 
-  // Notify thread, drain the queue and wait for the thread.
-  while (is_shutdown_.load() == true)
-  {
-    cv_.notify_one();
-  }
-
-  is_shutdown_ = true;
+  cv_.notify_one();
   worker_thread_.join();
 
   exporter_->Shutdown();

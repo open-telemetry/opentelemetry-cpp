@@ -112,12 +112,9 @@ private:
   /* The configured backend exporter */
   std::unique_ptr<SpanExporter> exporter_;
 
-  /* The background worker thread */
-  std::thread worker_thread_;
-
   /* Configurable parameters as per the official specs */
-  const std::chrono::milliseconds schedule_delay_millis_;
   const size_t max_queue_size_;
+  const std::chrono::milliseconds schedule_delay_millis_;
   const size_t max_export_batch_size_;
 
   /* Synchronization primitives */
@@ -125,12 +122,15 @@ private:
   std::mutex cv_m_, force_flush_cv_m_;
 
   /* The buffer/queue to which the ended spans are added */
-  std::unique_ptr<common::CircularBuffer<Recordable>> buffer_;
+  common::CircularBuffer<Recordable> buffer_;
 
   /* Important boolean flags to handle the workflow of the processor */
   std::atomic<bool> is_shutdown_{false};
   std::atomic<bool> is_force_flush_{false};
   std::atomic<bool> is_force_flush_notified_{false};
+
+  /* The background worker thread */
+  std::thread worker_thread_;
 };
 
 }  // namespace trace
