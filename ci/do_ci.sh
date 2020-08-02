@@ -109,6 +109,7 @@ elif [[ "$1" == "format" ]]; then
   tools/format.sh
   # normalize file endings according to .gitattributes
 #  git add --renormalize .
+  git add .
   CHANGED="$(git ls-files --modified)"
   if [[ ! -z "$CHANGED" ]]; then
     echo "The following files have changes:"
