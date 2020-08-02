@@ -31,12 +31,15 @@ class SpanContext final
 public:
   // An invalid SpanContext.
   SpanContext() noexcept : trace_state_(new TraceState) {}
-  SpanContext(TraceId trace_id, SpanId span_id, TraceFlags trace_flags, TraceState trace_state, bool is_remote) noexcept {
+  SpanContext(bool sampled_flag, bool has_remote_parent)
+    : trace_flags_(trace::TraceFlags((uint8_t)sampled_flag)),
+      remote_parent_(has_remote_parent){};
+  SpanContext(TraceId trace_id, SpanId span_id, TraceFlags trace_flags, TraceState trace_state, bool has_remote_parent) noexcept {
     trace_id_ = trace_id;
     span_id_ = span_id;
     trace_flags_ = trace_flags;
     trace_state_.reset(new TraceState(trace_state));
-    remote_parent_ = is_remote;
+    remote_parent_ = has_remote_parent;
   }
   SpanContext(SpanContext&& ctx) : trace_id_(ctx.trace_id()), span_id_(ctx.span_id()), trace_flags_(ctx.trace_flags()), trace_state_(std::move(ctx.trace_state_)) {}
   SpanContext(const SpanContext& ctx) : trace_id_(ctx.trace_id()), span_id_(ctx.span_id()), trace_flags_(ctx.trace_flags()), trace_state_(new TraceState(ctx.trace_state())) {}
