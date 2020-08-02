@@ -111,7 +111,7 @@ elif [[ "$1" == "format" ]]; then
   git add --renormalize .
   CHANGED="$(git ls-files --modified)"
   if [[ ! -z "$CHANGED" ]]; then
-    echo "The following files have changes:"
+    echo "The following files have changes: "
     echo "$CHANGED"
     exit 1
   fi
