@@ -6,6 +6,8 @@
 #include "opentelemetry/sdk/trace/tracer.h"
 #include "opentelemetry/version.h"
 
+#define SPAN_KEY "span_key"
+
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace sdk
 {
