@@ -404,13 +404,13 @@ TEST(Tracer, TestRuntimeContextSpan)
   ASSERT_EQ(0, spans_received->size());
 
   nostd::get<nostd::shared_ptr<trace::Span>>(
-      context::RuntimeContext::GetCurrent().GetValue("span_key"))
+      context::RuntimeContext::GetCurrent().GetValue(SPAN_KEY))
       ->End();
   ASSERT_EQ(1, spans_received->size());
   ASSERT_EQ("span 2", spans_received->at(0)->GetName());
 
   nostd::get<nostd::shared_ptr<trace::Span>>(
-      context::RuntimeContext::GetCurrent().GetValue("span_key"))
+      context::RuntimeContext::GetCurrent().GetValue(SPAN_KEY))
       ->End();
   ASSERT_EQ(2, spans_received->size());
   ASSERT_EQ("span 1", spans_received->at(1)->GetName());

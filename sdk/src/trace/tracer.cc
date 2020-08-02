@@ -44,7 +44,7 @@ nostd::shared_ptr<trace_api::Span> Tracer::StartSpan(
 
     span->token_    = new context::Token();
     *(span->token_) = context::RuntimeContext::Attach(
-        context::RuntimeContext::GetCurrent().SetValue("span_key", span));
+        context::RuntimeContext::GetCurrent().SetValue(SPAN_KEY, span));
 
     return span;
   }
@@ -56,7 +56,7 @@ nostd::shared_ptr<trace_api::Span> Tracer::StartSpan(
     span->token_ = new context::Token();
 
     *(span->token_) = context::RuntimeContext::Attach(
-        context::RuntimeContext::GetCurrent().SetValue("span_key", span));
+        context::RuntimeContext::GetCurrent().SetValue(SPAN_KEY, span));
 
     // if the attributes is not nullptr, add attributes to the span.
     if (sampling_result.attributes)
