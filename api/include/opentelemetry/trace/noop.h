@@ -48,6 +48,10 @@ public:
 
   Tracer &tracer() const noexcept override { return *tracer_; }
 
+  context::Token *GetToken() const noexcept override { return nullptr; }
+
+  void SetToken(context::Token * /*token*/) noexcept override {}
+
 private:
   std::shared_ptr<Tracer> tracer_;
 };

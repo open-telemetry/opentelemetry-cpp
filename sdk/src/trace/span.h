@@ -2,7 +2,6 @@
 
 #include <mutex>
 
-#include "opentelemetry/context/runtime_context.h"
 #include "opentelemetry/sdk/trace/tracer.h"
 #include "opentelemetry/version.h"
 
@@ -45,6 +44,10 @@ public:
 
   trace_api::Tracer &tracer() const noexcept override { return *tracer_; }
 
+  context::Token *GetToken() const noexcept override;
+
+  void SetToken(context::Token *token) noexcept override;
+
 private:
   std::shared_ptr<trace_api::Tracer> tracer_;
   std::shared_ptr<SpanProcessor> processor_;
@@ -52,6 +55,7 @@ private:
   std::unique_ptr<Recordable> recordable_;
   opentelemetry::core::SteadyTimestamp start_steady_time;
   bool has_ended_;
+  context::Token *token_;
 };
 }  // namespace trace
 }  // namespace sdk

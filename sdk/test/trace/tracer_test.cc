@@ -179,16 +179,17 @@ TEST(Tracer, StartSpanWithAttributes)
 
   // Start a span with all supported scalar attribute types.
 
-  auto span_first = tracer->StartSpan("span 1", {{"attr1", "string"},
-                                                 {"attr2", false},
-                                                 {"attr1", 314159},
-                                                 {"attr3", (unsigned int)314159},
-                                                 {"attr4", (int64_t)-20},
-                                                 {"attr5", (uint64_t)20},
-                                                 {"attr6", 3.1},
-                                                 {"attr7", "string"}});
+  tracer
+      ->StartSpan("span 1", {{"attr1", "string"},
+                             {"attr2", false},
+                             {"attr1", 314159},
+                             {"attr3", (unsigned int)314159},
+                             {"attr4", (int64_t)-20},
+                             {"attr5", (uint64_t)20},
+                             {"attr6", 3.1},
+                             {"attr7", "string"}})
+      ->End();
 
-  span_first->End();
   ASSERT_EQ(1, spans_received->size());
 
   // Start a span with all supported array attribute types.
@@ -208,8 +209,7 @@ TEST(Tracer, StartSpanWithAttributes)
   m["attr6"] = nostd::span<bool>(listBool);
   m["attr7"] = nostd::span<nostd::string_view>(listStringView);
 
-  auto span_second = tracer->StartSpan("span 2", m);
-  span_second->End();
+  tracer->StartSpan("span 2", m)->End();
 
   ASSERT_EQ(2, spans_received->size());
 
@@ -260,9 +260,10 @@ TEST(Tracer, StartSpanWithAttributesCopy)
     strings->push_back(s1);
     strings->push_back(s2);
     strings->push_back(s3);
-    auto span = tracer->StartSpan(
-        "span 1", {{"attr1", *numbers}, {"attr2", nostd::span<nostd::string_view>(*strings)}});
-    span->End();
+    tracer
+        ->StartSpan("span 1",
+                    {{"attr1", *numbers}, {"attr2", nostd::span<nostd::string_view>(*strings)}})
+        ->End();
   }
 
   ASSERT_EQ(1, spans_received->size());
@@ -403,17 +404,17 @@ TEST(Tracer, StartSpanUpdatesRuntimeContext)
   auto span_first  = tracer->StartSpan("span 1");
   auto span_second = tracer->StartSpan("span 2");
 
-  ASSERT_EQ(0, spans_received->size());
+  EXPECT_EQ(0, spans_received->size());
 
   nostd::get<nostd::shared_ptr<trace::Span>>(
       context::RuntimeContext::GetCurrent().GetValue(SPAN_KEY))
       ->End();
-  ASSERT_EQ(1, spans_received->size());
-  ASSERT_EQ("span 2", spans_received->at(0)->GetName());
+  EXPECT_EQ(1, spans_received->size());
+  EXPECT_EQ("span 2", spans_received->at(0)->GetName());
 
   nostd::get<nostd::shared_ptr<trace::Span>>(
       context::RuntimeContext::GetCurrent().GetValue(SPAN_KEY))
       ->End();
-  ASSERT_EQ(2, spans_received->size());
-  ASSERT_EQ("span 1", spans_received->at(1)->GetName());
+  EXPECT_EQ(2, spans_received->size());
+  EXPECT_EQ("span 1", spans_received->at(1)->GetName());
 }

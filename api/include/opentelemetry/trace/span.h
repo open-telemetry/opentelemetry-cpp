@@ -36,12 +36,10 @@ struct StartSpanOptions
   // Optionally sets the start time of a Span.
   //
   // If the start time of a Span is set, timestamps from both the system clock
-  // and steady clock
-  // must be provided.
+  // and steady clock must be provided.
   //
   // Timestamps from the steady clock can be used to most accurately measure a
-  // Span's
-  // duration, while timestamps from the system clock can be used to most
+  // Span's duration, while timestamps from the system clock can be used to most
   // accurately place a Span's
   // time point relative to other Spans collected across a distributed system.
   core::SystemTimestamp start_system_time;
@@ -83,8 +81,6 @@ public:
   Span(Span &&)      = delete;
   Span &operator=(const Span &) = delete;
   Span &operator=(Span &&) = delete;
-
-  context::Token *token_;
 
   // Sets an attribute on the Span. If the Span previously contained a mapping
   // for
@@ -167,6 +163,10 @@ public:
   virtual bool IsRecording() const noexcept = 0;
 
   virtual Tracer &tracer() const noexcept = 0;
+
+  virtual context::Token *GetToken() const noexcept = 0;
+
+  virtual void SetToken(context::Token *token) noexcept = 0;
 };
 }  // namespace trace
 OPENTELEMETRY_END_NAMESPACE
