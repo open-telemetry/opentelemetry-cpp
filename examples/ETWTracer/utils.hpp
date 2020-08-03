@@ -149,7 +149,7 @@ static inline std::wstring to_utf16_string(const std::string &in)
 static inline GUID GetProviderGuid(const char *providerName)
 {
   std::string name(providerName);
-  std::transform(name.begin(), name.end(), name.begin(), ::toupper);
+  std::transform(name.begin(), name.end(), name.begin(), [](unsigned char c){ return (char)::toupper(c); } );
 
   size_t len      = name.length() * 2 + 0x10;
   uint8_t *buffer = new uint8_t[len];

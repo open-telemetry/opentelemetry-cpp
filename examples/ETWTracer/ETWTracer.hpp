@@ -100,10 +100,11 @@ public:
   /// <returns>Span</returns>
   virtual nostd::unique_ptr<trace::Span> StartSpan(
       nostd::string_view name,
-      const trace::KeyValueIterable &attributes,
+      const trace::KeyValueIterable & attributes,
       const trace::StartSpanOptions &options = {}) noexcept override
   {
     // TODO: support attributes
+    UNREFERENCED_PARAMETER(attributes);
     return trace::to_span_ptr<Span, Tracer>(this, name, options);
   };
 

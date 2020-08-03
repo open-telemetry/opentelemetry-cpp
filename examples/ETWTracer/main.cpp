@@ -104,7 +104,7 @@ void test_ETWProvider_direct()
 #endif
 };
 
-int main(int argc, char *argv[])
+int main(int, char *)
 {
   // test_ETWProvider_direct();
   test_OT_span_API();
