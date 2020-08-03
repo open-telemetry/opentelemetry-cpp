@@ -72,7 +72,7 @@ public:
     auto span = tracer_handle_->tracer().StartSpan(name, attributes, options);
     if (span == nullptr)
     {
-      return nullptr;
+      return nostd::shared_ptr<trace::Span>(nullptr);
     }
     return nostd::shared_ptr<trace::Span>{new (std::nothrow)
                                               Span{this->shared_from_this(), std::move(span)}};
