@@ -10,10 +10,12 @@
 #include "opentelemetry/trace/key_value_iterable_view.h"
 #include "opentelemetry/version.h"
 
+#define SPAN_KEY "span_key"
+
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace context
 {
-  class Token;
+class Token;
 }
 namespace trace
 {
@@ -26,17 +28,21 @@ enum class SpanKind
   kConsumer,
 };
 /**
- * StartSpanOptions provides options to set properties of a Span at the time of its creation
+ * StartSpanOptions provides options to set properties of a Span at the time of
+ * its creation
  */
 struct StartSpanOptions
 {
   // Optionally sets the start time of a Span.
   //
-  // If the start time of a Span is set, timestamps from both the system clock and steady clock
+  // If the start time of a Span is set, timestamps from both the system clock
+  // and steady clock
   // must be provided.
   //
-  // Timestamps from the steady clock can be used to most accurately measure a Span's
-  // duration, while timestamps from the system clock can be used to most accurately place a Span's
+  // Timestamps from the steady clock can be used to most accurately measure a
+  // Span's
+  // duration, while timestamps from the system clock can be used to most
+  // accurately place a Span's
   // time point relative to other Spans collected across a distributed system.
   core::SystemTimestamp start_system_time;
   core::SteadyTimestamp start_steady_time;
@@ -77,10 +83,11 @@ public:
   Span(Span &&)      = delete;
   Span &operator=(const Span &) = delete;
   Span &operator=(Span &&) = delete;
-  
-  context::Token* token_;  
-  
-  // Sets an attribute on the Span. If the Span previously contained a mapping for
+
+  context::Token *token_;
+
+  // Sets an attribute on the Span. If the Span previously contained a mapping
+  // for
   // the key, the old value is replaced.
   virtual void SetAttribute(nostd::string_view key,
                             const common::AttributeValue &value) noexcept = 0;
@@ -134,7 +141,8 @@ public:
                        attributes.begin(), attributes.end()});
   }
 
-  // Sets the status of the span. The default status is OK. Only the value of the last call will be
+  // Sets the status of the span. The default status is OK. Only the value of
+  // the last call will be
   // recorded, and implementations are free to ignore previous calls.
   virtual void SetStatus(CanonicalCode code, nostd::string_view description) noexcept = 0;
 

@@ -6,8 +6,6 @@
 #include "opentelemetry/sdk/trace/tracer.h"
 #include "opentelemetry/version.h"
 
-#define SPAN_KEY "span_key"
-
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace sdk
 {
@@ -53,6 +51,7 @@ private:
   mutable std::mutex mu_;
   std::unique_ptr<Recordable> recordable_;
   opentelemetry::core::SteadyTimestamp start_steady_time;
+  bool has_ended_;
 };
 }  // namespace trace
 }  // namespace sdk

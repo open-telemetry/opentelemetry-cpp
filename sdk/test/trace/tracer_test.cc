@@ -29,7 +29,8 @@ public:
                               trace_api::SpanKind /*span_kind*/,
                               const trace_api::KeyValueIterable & /*attributes*/) noexcept override
   {
-    // Return two pairs of attributes. These attributes should be added to the span attributes
+    // Return two pairs of attributes. These attributes should be added to the
+    // span attributes
     return {Decision::RECORD_AND_SAMPLE,
             nostd::unique_ptr<const std::map<std::string, opentelemetry::common::AttributeValue>>(
                 new const std::map<std::string, opentelemetry::common::AttributeValue>(
@@ -141,7 +142,8 @@ TEST(Tracer, StartSpanSampleOff)
   // This span will not be recorded.
   tracer_off->StartSpan("span 2")->End();
 
-  // The span doesn't write any span data because the sampling decision is alway NOT_RECORD.
+  // The span doesn't write any span data because the sampling decision is alway
+  // NOT_RECORD.
   ASSERT_EQ(0, spans_received->size());
 }
 
