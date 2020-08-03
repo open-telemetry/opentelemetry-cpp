@@ -17,10 +17,6 @@ namespace sdk
 {
 namespace trace
 {
-
-#if 1
-using SpanDataAttributeValue = common::AttributeValue;
-#else
 /**
  * A counterpart to AttributeValue that makes sure a value is owned. This
  * replaces all non-owning references with owned copies.
@@ -30,6 +26,7 @@ using SpanDataAttributeValue = nostd::variant<bool,
                                               uint64_t,
                                               double,
                                               std::string,
+                                              std::vector<uint8_t>,
                                               std::vector<bool>,
                                               std::vector<int64_t>,
                                               std::vector<uint64_t>,
@@ -55,8 +52,13 @@ struct AttributeConverter
   SpanDataAttributeValue operator()(double v) { return SpanDataAttributeValue(v); }
   SpanDataAttributeValue operator()(nostd::string_view v)
   {
-    return SpanDataAttributeValue(std::string(v));
+    return SpanDataAttributeValue(std::string(v.data(), v.size()));
   }
+  SpanDataAttributeValue operator()(const char *s)
+  {
+    return SpanDataAttributeValue(std::string(s));
+  }
+  SpanDataAttributeValue operator()(nostd::span<const uint8_t> v) { return convertSpan<uint8_t>(v); }
   SpanDataAttributeValue operator()(nostd::span<const bool> v) { return convertSpan<bool>(v); }
   SpanDataAttributeValue operator()(nostd::span<const int64_t> v)
   {
@@ -89,7 +91,33 @@ struct AttributeConverter
     return SpanDataAttributeValue(std::move(copy));
   }
 };
-#endif
+
+/**
+ * Class for storing events in SpanData.
+ */
+class SpanDataEvent
+{
+public:
+  SpanDataEvent(std::string name, core::SystemTimestamp timestamp)
+      : name_(name), timestamp_(timestamp)
+  {}
+
+  /**
+   * Get the name for this event
+   * @return the name for this event
+   */
+  std::string GetName() const noexcept { return name_; }
+
+  /**
+   * Get the timestamp for this event
+   * @return the timestamp for this event
+   */
+  core::SystemTimestamp GetTimestamp() const noexcept { return timestamp_; }
+
+private:
+  std::string name_;
+  core::SystemTimestamp timestamp_;
+};
 
 /**
  * SpanData is a representation of all data collected by a span.
@@ -154,6 +182,12 @@ public:
     return attributes_;
   }
 
+  /**
+   * Get the events associated with this span
+   * @return the events associated with this span
+   */
+  const std::vector<SpanDataEvent> &GetEvents() const noexcept { return events_; }
+
   void SetIds(opentelemetry::trace::TraceId trace_id,
               opentelemetry::trace::SpanId span_id,
               opentelemetry::trace::SpanId parent_span_id) noexcept override
@@ -165,14 +199,22 @@ public:
 
   void SetAttribute(nostd::string_view key, const common::AttributeValue &value) noexcept override
   {
-      // TODO: make a copy!!!
-    attributes_[std::string(key)] = value; // TODO
+    attributes_[std::string(key)] = nostd::visit(converter_, value); // FIXME: value
   }
 
-  void AddEvent(nostd::string_view name, core::SystemTimestamp timestamp) noexcept override
+  void AddEvent(nostd::string_view name,
+                core::SystemTimestamp timestamp,
+                const trace_api::KeyValueIterable &attributes) noexcept override
   {
-    (void)name;
-    (void)timestamp;
+    events_.push_back(SpanDataEvent(std::string(name), timestamp));
+    // TODO: handle attributes
+  }
+
+  void AddLink(opentelemetry::trace::SpanContext span_context,
+               const trace_api::KeyValueIterable &attributes) noexcept override
+  {
+    (void)span_context;
+    (void)attributes;
   }
 
   void SetStatus(trace_api::CanonicalCode code, nostd::string_view description) noexcept override
@@ -203,7 +245,8 @@ private:
   opentelemetry::trace::CanonicalCode status_code_{opentelemetry::trace::CanonicalCode::OK};
   std::string status_desc_;
   std::unordered_map<std::string, SpanDataAttributeValue> attributes_;
-  // AttributeConverter converter_;
+  std::vector<SpanDataEvent> events_;
+  AttributeConverter converter_;
 };
 }  // namespace trace
 }  // namespace sdk

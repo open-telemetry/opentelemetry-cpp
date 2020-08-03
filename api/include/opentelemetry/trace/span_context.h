@@ -39,8 +39,9 @@ public:
    * @param has_remote_parent a required parameter specifying if this context has
    * a remote parent
    */
-  SpanContext(bool sampled_flag, bool has_remote_parent) :
-    trace_flags_(trace_api::TraceFlags((uint8_t) sampled_flag)), remote_parent_(has_remote_parent) {};
+  SpanContext(bool sampled_flag, bool has_remote_parent)
+      : trace_flags_(trace_api::TraceFlags((uint8_t)sampled_flag)),
+        remote_parent_(has_remote_parent){};
 
   // @returns the trace_flags associated with this span_context
   const trace_api::TraceFlags &trace_flags() const noexcept { return trace_flags_; }

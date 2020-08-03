@@ -38,7 +38,7 @@ public:
   {
     while (GetLock().test_and_set(std::memory_order_acquire))
       ;
-    GetProvider() = tp; 
+    GetProvider() = tp;
     GetLock().clear(std::memory_order_release);
   }
 

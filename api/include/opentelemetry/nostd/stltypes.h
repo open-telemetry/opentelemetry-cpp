@@ -226,5 +226,18 @@ using index_sequence = std::index_sequence<Ints...>;
 
 #endif
 
+// nostd::holds_alternative
+template <std::size_t I, typename... Ts>
+inline constexpr bool holds_alternative(const variant<Ts...> &v) noexcept
+{
+  return v.index() == I;
+}
+
+template <typename T, typename... Ts>
+inline constexpr bool holds_alternative(const variant<Ts...> &v) noexcept
+{
+  return std::holds_alternative<T, Ts...>(v);
+}
+
 }  // namespace nostd
 OPENTELEMETRY_END_NAMESPACE

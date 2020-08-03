@@ -77,6 +77,34 @@ TEST(StringViewTest, SubstrOutOfRange)
 #endif
 }
 
+TEST(StringViewTest, Compare)
+{
+  string_view s1 = "aaa";
+  string_view s2 = "bbb";
+  string_view s3 = "aaa";
+
+  // Equals
+  EXPECT_EQ(s1, s3);
+  EXPECT_EQ(s1, s1);
+
+  // Less then
+  EXPECT_LT(s1, s2);
+
+  // Greater then
+  EXPECT_GT(s2, s1);
+}
+
+TEST(StringViewTest, MapKeyOrdering)
+{
+  std::map<string_view, size_t> m = {{"bbb", 2}, {"aaa", 1}, {"ccc", 3}};
+  size_t i                        = 1;
+  for (const auto &kv : m)
+  {
+    EXPECT_EQ(kv.second, i);
+    i++;
+  }
+}
+
 static void StringViewSubStr(benchmark::State& state)
 {
     std::string s = "Hello OpenTelemetry nostd::string_view implementation! Feel free to evaluate my performance.";
@@ -151,7 +179,7 @@ static void StringViewExplode(benchmark::State &state)
       sv = s;
       string_view sv2 = s;
       if (sv == sv2)
-        ;
+        ; // FIXME: Warning C4390 ';' : empty controlled statement found; is this the intent ?
     }
   };
 }

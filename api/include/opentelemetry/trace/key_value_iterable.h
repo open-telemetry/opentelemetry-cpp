@@ -43,7 +43,7 @@ public:
   NullKeyValueIterable(){};
 
   virtual bool ForEachKeyValue(
-      nostd::function_ref<bool(nostd::string_view, common::AttributeValue)> callback) const noexcept
+      nostd::function_ref<bool(nostd::string_view, common::AttributeValue)>) const noexcept
   {
     return false;
   };

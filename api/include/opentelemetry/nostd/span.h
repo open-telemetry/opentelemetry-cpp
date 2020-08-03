@@ -7,8 +7,7 @@
 #include <iterator>
 #include <type_traits>
 
-#include "opentelemetry/nostd/utility.h"
-// TODO: consider #include <utility>
+#include "opentelemetry/nostd/nostd.h"
 #include "opentelemetry/version.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
