@@ -9,7 +9,7 @@ namespace metrics
 OStreamMetricsExporter::OStreamMetricsExporter(std::ostream &sout) noexcept : sout_(sout) {}
 
 sdkmetrics::ExportResult OStreamMetricsExporter::Export(
-    std::vector<sdk::metrics::Record> &records) noexcept
+    const std::vector<sdk::metrics::Record> &records) noexcept
 {
   for (auto record : records)
   {

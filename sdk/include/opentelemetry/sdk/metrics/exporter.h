@@ -38,7 +38,7 @@ public:
    * concurrently for the same exporter instance.
    * @param records a vector of unique pointers to metric records
    */
-  virtual ExportResult Export(std::vector<Record> &records) noexcept = 0;
+  virtual ExportResult Export(const std::vector<Record> &records) noexcept = 0;
 
   /**
    * In the Metrics specification, there is no Shutdown function required for exporters

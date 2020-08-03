@@ -28,7 +28,7 @@ public:
    */
   explicit OStreamMetricsExporter(std::ostream &sout = std::cout) noexcept;
 
-  sdkmetrics::ExportResult Export(std::vector<sdkmetrics::Record> &records) noexcept override;
+  sdkmetrics::ExportResult Export(const std::vector<sdkmetrics::Record> &records) noexcept override;
 
 private:
   std::ostream &sout_;
