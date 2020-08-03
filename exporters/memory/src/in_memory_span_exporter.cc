@@ -7,9 +7,6 @@ namespace exporter
 {
 namespace memory
 {
-InMemorySpanExporter::InMemorySpanExporter()
-{}
-
 std::unique_ptr<sdk::trace::Recordable> InMemorySpanExporter::MakeRecordable() noexcept
 {
   return std::unique_ptr<sdk::trace::Recordable>(new sdk::trace::SpanData);
@@ -31,9 +28,9 @@ sdk::trace::ExportResult InMemorySpanExporter::Export(
   return sdk::trace::ExportResult::kSuccess;
 }
 
-std::vector<sdk::trace::SpanData> InMemorySpanExporter::GetData() noexcept
+InMemorySpanData InMemorySpanExporter::GetData() noexcept
 {
-  return span_data_.GetSpans();
+  return span_data_;
 }
 }  // namespace memory
 }  // namespace exporter

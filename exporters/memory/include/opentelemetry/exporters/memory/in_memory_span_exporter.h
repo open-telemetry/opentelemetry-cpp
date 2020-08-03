@@ -17,8 +17,6 @@ namespace memory
 class InMemorySpanExporter final : public opentelemetry::sdk::trace::SpanExporter
 {
 public:
-  InMemorySpanExporter();
-
   std::unique_ptr<sdk::trace::Recordable> MakeRecordable() noexcept override;
 
   sdk::trace::ExportResult Export(
@@ -27,7 +25,7 @@ public:
   void Shutdown(std::chrono::microseconds timeout = std::chrono::microseconds(0)) noexcept override
   {};
 
-  std::vector<sdk::trace::SpanData> GetData() noexcept;
+  InMemorySpanData GetData() noexcept;
 
 private:
   InMemorySpanData span_data_;
