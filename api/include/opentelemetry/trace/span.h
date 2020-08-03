@@ -36,12 +36,10 @@ struct StartSpanOptions
   // Optionally sets the start time of a Span.
   //
   // If the start time of a Span is set, timestamps from both the system clock
-  // and steady clock
-  // must be provided.
+  // and steady clock must be provided.
   //
   // Timestamps from the steady clock can be used to most accurately measure a
-  // Span's
-  // duration, while timestamps from the system clock can be used to most
+  // Span's duration, while timestamps from the system clock can be used to most
   // accurately place a Span's
   // time point relative to other Spans collected across a distributed system.
   core::SystemTimestamp start_system_time;

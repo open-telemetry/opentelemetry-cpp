@@ -1,5 +1,6 @@
 #include "opentelemetry/sdk/trace/tracer.h"
 
+#include "opentelemetry/context/runtime_context.h"
 #include "opentelemetry/nostd/shared_ptr.h"
 #include "opentelemetry/sdk/common/atomic_shared_ptr.h"
 #include "opentelemetry/version.h"
@@ -42,10 +43,6 @@ nostd::shared_ptr<trace_api::Span> Tracer::StartSpan(
     auto span = nostd::shared_ptr<trace_api::Span>{
         new (std::nothrow) trace_api::NoopSpan{this->shared_from_this()}};
 
-    span->token_    = new context::Token();
-    *(span->token_) = context::RuntimeContext::Attach(
-        context::RuntimeContext::GetCurrent().SetValue(SPAN_KEY, span));
-
     return span;
   }
   else
@@ -53,10 +50,8 @@ nostd::shared_ptr<trace_api::Span> Tracer::StartSpan(
     auto span = nostd::shared_ptr<trace_api::Span>{new (std::nothrow) Span{
         this->shared_from_this(), processor_.load(), name, attributes, options}};
 
-    span->token_ = new context::Token();
-
-    *(span->token_) = context::RuntimeContext::Attach(
-        context::RuntimeContext::GetCurrent().SetValue(SPAN_KEY, span));
+    span->token_ = new context::Token(context::RuntimeContext::Attach(
+        context::RuntimeContext::GetCurrent().SetValue(SPAN_KEY, span)));
 
     // if the attributes is not nullptr, add attributes to the span.
     if (sampling_result.attributes)

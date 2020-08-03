@@ -1,5 +1,6 @@
 #include "src/trace/span.h"
 
+#include "opentelemetry/context/runtime_context.h"
 #include "opentelemetry/version.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
@@ -46,10 +47,11 @@ Span::Span(std::shared_ptr<Tracer> &&tracer,
     : tracer_{std::move(tracer)},
       processor_{processor},
       recordable_{processor_->MakeRecordable()},
-      start_steady_time{options.start_steady_time}
+      start_steady_time{options.start_steady_time},
+      has_ended_{false}
+
 {
-  token_     = nullptr;
-  has_ended_ = false;
+  token_ = nullptr;
   (void)options;
   if (recordable_ == nullptr)
   {
