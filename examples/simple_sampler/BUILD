@@ -1,13 +1,27 @@
 cc_library(
-    name = "foo_library",
+    name = "testing_library",
     srcs = [
-        "foo_library/foo_library.cc",
+        "testing_library/testing_library.cc",
     ],
     hdrs = [
-        "foo_library/foo_library.h",
+        "testing_library/testing_library.h",
     ],
     deps = [
         "//api",
+    ],
+)
+
+cc_library(
+    name = "stdout_exporter",
+    srcs = [
+        "stdout_exporter.cc",
+    ],
+    hdrs = [
+        "stdout_exporter.h",
+    ],
+    deps = [
+        "//api",
+        "//sdk/src/trace",
     ],
 )
 
@@ -15,10 +29,10 @@ cc_binary(
     name = "example_simple",
     srcs = [
         "main.cc",
-        "stdout_exporter.h",
     ],
     deps = [
-        ":foo_library",
+        ":testing_library",
+        ":stdout_exporter",
         "//api",
         "//sdk/src/trace",
     ],

@@ -9,7 +9,7 @@
 // Using an exporter that simply dumps span data to stdout.
 #include "stdout_exporter.h"
 
-#include "foo_library/foo_library.h"
+#include "testing_library/testing_library.h"
 
 #include <iostream>
 #include <memory>
@@ -18,6 +18,7 @@ using opentelemetry::sdk::trace::AlwaysOffSampler;
 using opentelemetry::sdk::trace::AlwaysOnSampler;
 using opentelemetry::sdk::trace::ParentOrElseSampler;
 using opentelemetry::sdk::trace::Sampler;
+using example::StdoutExporter;
 
 namespace
 {
@@ -47,12 +48,12 @@ int main()
   InitTracer(always_on_sampler);
 
   // The Tracer records every span
-  foo_library();
+  TestTracer();
 
   std::cout << "\nTesting AlwaysOff Sampler...\n";
   // Set the sampler to AlwaysOn
   InitTracer(always_off_sampler);
 
   // The Tracer records nothing
-  foo_library();
+  TestTracer();
 }

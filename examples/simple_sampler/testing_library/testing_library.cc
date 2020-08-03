@@ -25,7 +25,7 @@ void f2()
 }
 }  // namespace
 
-void foo_library()
+void TestTracer()
 {
   auto span = get_tracer()->StartSpan("library");
 
