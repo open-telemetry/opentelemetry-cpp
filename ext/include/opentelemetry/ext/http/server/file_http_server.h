@@ -85,19 +85,19 @@ private:
    * assuming index.html is the wanted file if a directory is given
    * @param name of the file
    */
-  std::string GetFileName(std::string S)
+  std::string GetFileName(std::string name)
   {
-    if (S.back() == '/')
+    if (name.back() == '/')
     {
-      auto temp = S.substr(0, S.size() - 1);
-      S         = temp;
+      auto temp = name.substr(0, name.size() - 1);
+      name      = temp;
     }
     // If filename appears to be a directory, serve the hypothetical index.html
     // file there
-    if (S.find(".") == std::string::npos)
-      S += "/index.html";
+    if (name.find(".") == std::string::npos)
+      name += "/index.html";
 
-    return S;
+    return name;
   }
 
   /**

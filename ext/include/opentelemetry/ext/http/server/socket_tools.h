@@ -231,7 +231,8 @@ struct SocketAddr
   {
     switch (m_data.sa_family)
     {
-      case AF_INET: {
+      case AF_INET:
+      {
         sockaddr_in const &inet4 = reinterpret_cast<sockaddr_in const &>(m_data);
         return ntohs(inet4.sin_port);
       }
@@ -247,7 +248,8 @@ struct SocketAddr
 
     switch (m_data.sa_family)
     {
-      case AF_INET: {
+      case AF_INET:
+      {
         sockaddr_in const &inet4 = reinterpret_cast<sockaddr_in const &>(m_data);
         u_long addr              = ntohl(inet4.sin_addr.s_addr);
         os << (addr >> 24) << '.' << ((addr >> 16) & 255) << '.' << ((addr >> 8) & 255) << '.'
