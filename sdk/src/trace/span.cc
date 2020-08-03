@@ -133,8 +133,8 @@ void Span::End(const trace_api::EndSpanOptions &options) noexcept
   {
     context::RuntimeContext::Detach(*token_);
     delete token_;
-    // token_ = nullptr;
   }
+
   if (recordable_ == nullptr)
   {
     return;
