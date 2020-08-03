@@ -74,7 +74,7 @@ public:
     {
       return nullptr;
     }
-    return nostd::unique_ptr<trace::Span>{new (std::nothrow)
+    return nostd::shared_ptr<trace::Span>{new (std::nothrow)
                                               Span{this->shared_from_this(), std::move(span)}};
   }
 
