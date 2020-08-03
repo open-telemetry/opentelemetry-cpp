@@ -25,7 +25,7 @@ public:
   void Shutdown(std::chrono::microseconds timeout = std::chrono::microseconds(0)) noexcept override
   {};
 
-  InMemorySpanData GetData() noexcept;
+  InMemorySpanData & GetData() noexcept;
 
 private:
   InMemorySpanData span_data_;

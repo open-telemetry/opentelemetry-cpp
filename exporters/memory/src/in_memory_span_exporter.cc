@@ -28,7 +28,7 @@ sdk::trace::ExportResult InMemorySpanExporter::Export(
   return sdk::trace::ExportResult::kSuccess;
 }
 
-InMemorySpanData InMemorySpanExporter::GetData() noexcept
+InMemorySpanData & InMemorySpanExporter::GetData() noexcept
 {
   return span_data_;
 }
