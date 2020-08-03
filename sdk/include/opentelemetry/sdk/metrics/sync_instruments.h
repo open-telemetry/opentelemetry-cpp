@@ -272,7 +272,7 @@ public:
       {
         toDelete.push_back(x.first);
       }
-      auto agg_ptr = dynamic_cast<BoundCounter<T> *>(x.second.get())->GetAggregator();
+      auto agg_ptr = dynamic_cast<BoundUpDownCounter<T> *>(x.second.get())->GetAggregator();
       agg_ptr->checkpoint();
       ret.push_back(Record(x.second->GetName(), x.second->GetDescription(), x.first, agg_ptr));
     }
@@ -396,7 +396,7 @@ public:
       {
         toDelete.push_back(x.first);
       }
-      auto agg_ptr = dynamic_cast<BoundCounter<T> *>(x.second.get())->GetAggregator();
+      auto agg_ptr = dynamic_cast<BoundValueRecorder<T> *>(x.second.get())->GetAggregator();
       agg_ptr->checkpoint();
       ret.push_back(Record(x.second->GetName(), x.second->GetDescription(), x.first, agg_ptr));
     }
