@@ -1,7 +1,7 @@
 #pragma once
 
+#include <memory>
 #include "opentelemetry/metrics/instrument.h"
-#include "opentelemetry/nostd/shared_ptr.h"
 #include "opentelemetry/nostd/variant.h"
 #include "opentelemetry/sdk/metrics/aggregator/aggregator.h"
 
