@@ -64,7 +64,7 @@ public:
   {}
 
   // trace::Tracer
-  nostd::unique_ptr<trace::Span> StartSpan(
+  nostd::shared_ptr<trace::Span> StartSpan(
       nostd::string_view name,
       const trace::KeyValueIterable &attributes,
       const trace::StartSpanOptions &options = {}) noexcept override
