@@ -18,8 +18,8 @@ cc_binary(
     ],
     deps = [
         ":foo_library",
-        "//exporters/ostream:ostream_span_exporter",
         "//api",
+        "//exporters/ostream:ostream_span_exporter",
         "//sdk/src/trace",
     ],
 )
