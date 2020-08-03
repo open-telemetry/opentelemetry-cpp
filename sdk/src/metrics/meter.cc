@@ -22,17 +22,18 @@ nostd::shared_ptr<metrics_api::Counter<short>> Meter::NewShortCounter(
   return nostd::shared_ptr<metrics_api::Counter<short>>(ptr);
 }
 
-nostd::shared_ptr<metrics_api::Counter<int>> Meter::NewIntCounter(nostd::string_view name,
-                                                                  nostd::string_view description,
-                                                                  nostd::string_view unit,
-                                                                  const bool enabled)
+nostd::shared_ptr<metrics_api::Counter<int>> Meter::NewIntCounter(
+    nostd::string_view name,
+    nostd::string_view description,
+    nostd::string_view unit,
+    const bool enabled)
 {
   if (!IsValidName(name) || NameAlreadyUsed(name))
   {
     throw std::invalid_argument("Invalid Name");
   }
   auto counter = new Counter<int>(name, description, unit, enabled);
-  auto ptr     = std::shared_ptr<metrics_api::Counter<int>>(counter);
+  auto ptr = std::shared_ptr<metrics_api::Counter<int>>(counter);
   metrics_lock_.lock();
   int_metrics_.insert(std::make_pair(std::string(name), ptr));
   metrics_lock_.unlock();
@@ -447,9 +448,10 @@ nostd::shared_ptr<metrics_api::ValueObserver<double>> Meter::NewDoubleValueObser
   return nostd::shared_ptr<metrics_api::ValueObserver<double>>(ptr);
 }
 
-void Meter::RecordShortBatch(const trace::KeyValueIterable &labels,
-                             nostd::span<metrics_api::SynchronousInstrument<short> *> instruments,
-                             nostd::span<const short> values) noexcept
+void Meter::RecordShortBatch(
+    const trace::KeyValueIterable &labels,
+    nostd::span<metrics_api::SynchronousInstrument<short>*> instruments,
+    nostd::span<const short> values) noexcept
 {
   for (int i = 0; i < instruments.size(); ++i)
   {
@@ -457,9 +459,10 @@ void Meter::RecordShortBatch(const trace::KeyValueIterable &labels,
   }
 }
 
-void Meter::RecordIntBatch(const trace::KeyValueIterable &labels,
-                           nostd::span<metrics_api::SynchronousInstrument<int> *> instruments,
-                           nostd::span<const int> values) noexcept
+void Meter::RecordIntBatch(
+    const trace::KeyValueIterable &labels,
+    nostd::span<metrics_api::SynchronousInstrument<int>*> instruments,
+    nostd::span<const int> values) noexcept
 {
   for (int i = 0; i < instruments.size(); ++i)
   {
@@ -467,9 +470,10 @@ void Meter::RecordIntBatch(const trace::KeyValueIterable &labels,
   }
 }
 
-void Meter::RecordFloatBatch(const trace::KeyValueIterable &labels,
-                             nostd::span<metrics_api::SynchronousInstrument<float> *> instruments,
-                             nostd::span<const float> values) noexcept
+void Meter::RecordFloatBatch(
+    const trace::KeyValueIterable &labels,
+    nostd::span<metrics_api::SynchronousInstrument<float>*> instruments,
+    nostd::span<const float> values) noexcept
 {
   for (int i = 0; i < instruments.size(); ++i)
   {
@@ -477,9 +481,10 @@ void Meter::RecordFloatBatch(const trace::KeyValueIterable &labels,
   }
 }
 
-void Meter::RecordDoubleBatch(const trace::KeyValueIterable &labels,
-                              nostd::span<metrics_api::SynchronousInstrument<double> *> instruments,
-                              nostd::span<const double> values) noexcept
+void Meter::RecordDoubleBatch(
+    const trace::KeyValueIterable &labels,
+    nostd::span<metrics_api::SynchronousInstrument<double>*> instruments,
+    nostd::span<const double> values) noexcept
 {
   for (int i = 0; i < instruments.size(); ++i)
   {
@@ -499,93 +504,135 @@ std::vector<Record> Meter::Collect() noexcept
 void Meter::CollectMetrics(std::vector<Record> &records)
 {
   metrics_lock_.lock();
-  for (const auto &pair : short_metrics_)
+  for (auto i = short_metrics_.begin(); i != short_metrics_.end();)
   {
-    if (!pair.second->IsEnabled())
+    CollectSingleSyncInstrument<short>(i, records);
+    if (i->second.use_count() == 1) // Evaluates to true if user's shared_ptr has been deleted
     {
-      continue;
+      i = short_metrics_.erase(i); // Remove instrument that is no longer accessible
     }
-    auto cast_ptr = std::dynamic_pointer_cast<SynchronousInstrument<short>>(pair.second);
-    std::vector<Record> new_records = cast_ptr->GetRecords();
-    records.insert(records.begin(), new_records.begin(), new_records.end());
+    else
+    {
+      i++;
+    }
   }
-  for (const auto &pair : int_metrics_)
+  for (auto i = int_metrics_.begin(); i != int_metrics_.end();)
   {
-    if (!pair.second->IsEnabled())
+    CollectSingleSyncInstrument<int>(i, records);
+    if (i->second.use_count() == 1) // Evaluates to true if user's shared_ptr has been deleted
     {
-      continue;
+      i = int_metrics_.erase(i); // Remove instrument that is no longer accessible
     }
-    auto cast_ptr = std::dynamic_pointer_cast<SynchronousInstrument<int>>(pair.second);
-    std::vector<Record> new_records = cast_ptr->GetRecords();
-    records.insert(records.begin(), new_records.begin(), new_records.end());
+    else
+    {
+      i++;
+    }
   }
-  for (const auto &pair : float_metrics_)
+  for (auto i = float_metrics_.begin(); i != float_metrics_.end();)
   {
-    if (!pair.second->IsEnabled())
+    CollectSingleSyncInstrument<float>(i, records);
+    if (i->second.use_count() == 1) // Evaluates to true if user's shared_ptr has been deleted
     {
-      continue;
+      i = float_metrics_.erase(i); // Remove instrument that is no longer accessible
     }
-    auto cast_ptr = std::dynamic_pointer_cast<SynchronousInstrument<float>>(pair.second);
-    std::vector<Record> new_records = cast_ptr->GetRecords();
-    records.insert(records.begin(), new_records.begin(), new_records.end());
+    else
+    {
+      i++;
+    }
   }
-  for (const auto &pair : double_metrics_)
+  for (auto i = double_metrics_.begin(); i != double_metrics_.end();)
   {
-    if (!pair.second->IsEnabled())
+    CollectSingleSyncInstrument<double>(i, records);
+    if (i->second.use_count() == 1) // Evaluates to true if user's shared_ptr has been deleted
     {
-      continue;
+      i = double_metrics_.erase(i); // Remove instrument that is no longer accessible
     }
-    auto cast_ptr = std::dynamic_pointer_cast<SynchronousInstrument<double>>(pair.second);
-    std::vector<Record> new_records = cast_ptr->GetRecords();
-    records.insert(records.begin(), new_records.begin(), new_records.end());
+    else
+    {
+      i++;
+    }
   }
   metrics_lock_.unlock();
+}
+
+template<typename T>
+void Meter::CollectSingleSyncInstrument(typename std::map<std::string, std::shared_ptr<metrics_api::SynchronousInstrument<T>>>::iterator i, std::vector<Record> &records)
+{
+  if (!i->second->IsEnabled())
+  {
+    i++;
+    return;
+  }
+  auto cast_ptr = std::dynamic_pointer_cast<SynchronousInstrument<T>>(i->second);
+  std::vector<Record> new_records = cast_ptr->GetRecords();
+  records.insert(records.begin(), new_records.begin(), new_records.end());
 }
 
 void Meter::CollectObservers(std::vector<Record> &records)
 {
   observers_lock_.lock();
-  for (const auto &pair : short_observers_)
+  for (auto i = short_observers_.begin(); i != short_observers_.end();)
   {
-    if (!pair.second->IsEnabled())
+    CollectSingleAsyncInstrument<short>(i, records);
+    if (i->second.use_count() == 1)
     {
-      continue;
+      i = short_observers_.erase(i);
     }
-    auto cast_ptr = std::dynamic_pointer_cast<AsynchronousInstrument<short>>(pair.second);
-    std::vector<Record> new_records = cast_ptr->GetRecords();
-    records.insert(records.begin(), new_records.begin(), new_records.end());
+    else
+    {
+      i++;
+    }
   }
-  for (const auto &pair : int_observers_)
+  for (auto i = int_observers_.begin(); i != int_observers_.end();)
   {
-    if (!pair.second->IsEnabled())
+    CollectSingleAsyncInstrument<int>(i, records);
+    if (i->second.use_count() == 1)
     {
-      continue;
+      i = int_observers_.erase(i);
     }
-    auto cast_ptr = std::dynamic_pointer_cast<AsynchronousInstrument<int>>(pair.second);
-    std::vector<Record> new_records = cast_ptr->GetRecords();
-    records.insert(records.begin(), new_records.begin(), new_records.end());
+    else
+    {
+      i++;
+    }
   }
-  for (const auto &pair : float_observers_)
+  for (auto i = float_observers_.begin(); i != float_observers_.end();)
   {
-    if (!pair.second->IsEnabled())
+    CollectSingleAsyncInstrument<float>(i, records);
+    if (i->second.use_count() == 1)
     {
-      continue;
+      i = float_observers_.erase(i);
     }
-    auto cast_ptr = std::dynamic_pointer_cast<AsynchronousInstrument<float>>(pair.second);
-    std::vector<Record> new_records = cast_ptr->GetRecords();
-    records.insert(records.begin(), new_records.begin(), new_records.end());
+    else
+    {
+      i++;
+    }
   }
-  for (const auto &pair : double_observers_)
+  for (auto i = double_observers_.begin(); i != double_observers_.end();)
   {
-    if (!pair.second->IsEnabled())
+    CollectSingleAsyncInstrument<double>(i, records);
+    if (i->second.use_count() == 1)
     {
-      continue;
+      i = double_observers_.erase(i);
     }
-    auto cast_ptr = std::dynamic_pointer_cast<AsynchronousInstrument<double>>(pair.second);
-    std::vector<Record> new_records = cast_ptr->GetRecords();
-    records.insert(records.begin(), new_records.begin(), new_records.end());
+    else
+    {
+      i++;
+    }
   }
   observers_lock_.unlock();
+}
+
+template<typename T>
+void Meter::CollectSingleAsyncInstrument(typename std::map<std::string, std::shared_ptr<metrics_api::AsynchronousInstrument<T>>>::iterator i, std::vector<Record> &records)
+{
+  if (!i->second->IsEnabled())
+  {
+    i++;
+    return;
+  }
+  auto cast_ptr = std::dynamic_pointer_cast<AsynchronousInstrument<T>>(i->second);
+  std::vector<Record> new_records = cast_ptr->GetRecords();
+  records.insert(records.begin(), new_records.begin(), new_records.end());
 }
 
 bool Meter::IsValidName(nostd::string_view name)
@@ -626,6 +673,6 @@ bool Meter::NameAlreadyUsed(nostd::string_view name)
   else
     return false;
 }
-}  // namespace metrics
-}  // namespace sdk
+}
+}
 OPENTELEMETRY_END_NAMESPACE
