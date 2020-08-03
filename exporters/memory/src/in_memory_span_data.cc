@@ -11,26 +11,22 @@ namespace exporter
 {
 namespace memory
 {
-InMemorySpanData::InMemorySpanData()
-{
-  CircularBuffer<sdk::trace::SpanData> buffer{MAX_BUFFER_SIZE};
-  spans_received_ = buffer;
-}
-
-void InMemorySpanData::Add(std::unique_ptr<sdk::trace::SpanData> data) noexcept
+void InMemorySpanData::Add(std::unique_ptr<Recordable> data) noexcept
 {
 	spans_received_.Add(data);
 }
 
-std::vector<sdk::trace::SpanData> InMemorySpanData::GetSpans() noexcept
+std::vector<std::unique_ptr<Recordable>> InMemorySpanData::GetSpans() noexcept
 {
-	std::vector<sdk::trace::SpanData> res;
+	std::vector<std::unique_ptr<Recordable>> res;
 
 	spans_received_.Consume(
-		spans_received_.size(), [&](CircularBufferRange<AtomicUniquePtr<sdk::trace::SpanData>> & range) noexcept {
-			range.ForEach([&](AtomicUniquePtr<sdk::trace::SpanData> & ptr) noexcept {
-				res.push_back(*ptr);
-				ptr.Reset();
+		spans_received_.size(), [&](CircularBufferRange<AtomicUniquePtr<Recordable>> & range) noexcept {
+			range.ForEach([&](AtomicUniquePtr<Recordable> & ptr) noexcept {
+				std::unique_ptr<Recordable> swap_ptr = std::unique_ptr<Recordable>(nullptr);
+				ptr.Swap(swap_ptr);
+
+				res.push_back(std::unique_ptr<Recordable>(swap_ptr.release()));
 				return true;
 			});
 		});
