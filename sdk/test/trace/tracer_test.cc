@@ -393,7 +393,7 @@ TEST(Tracer, TestParentOrElseSampler)
   ASSERT_EQ(0, spans_received_parent_off->size());
 }
 
-TEST(Tracer, TestRuntimeContextSpan)
+TEST(Tracer, StartSpanUpdatesRuntimeContext)
 {
 
   std::shared_ptr<std::vector<std::unique_ptr<SpanData>>> spans_received(
