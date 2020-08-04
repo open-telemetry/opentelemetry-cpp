@@ -69,6 +69,7 @@ public:
   bool Get(nostd::string_view key, nostd::string_view value) const noexcept { return false; }
 
   // Creates an Entry for the key-value pair and adds it to entries.
+  // If value is null, this function is a no-op.
   void Set(nostd::string_view key, nostd::string_view value) const noexcept;
 
   // Returns true if there are no keys, false otherwise.
