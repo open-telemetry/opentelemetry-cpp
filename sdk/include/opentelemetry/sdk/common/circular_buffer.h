@@ -4,9 +4,9 @@
 #include <cstdint>
 #include <memory>
 
+#include "opentelemetry/sdk/common/atomic_unique_ptr.h"
+#include "opentelemetry/sdk/common/circular_buffer_range.h"
 #include "opentelemetry/version.h"
-#include "src/common/atomic_unique_ptr.h"
-#include "src/common/circular_buffer_range.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace sdk
