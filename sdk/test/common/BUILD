@@ -34,7 +34,8 @@ cc_test(
         "atomic_unique_ptr_test.cc",
     ],
     deps = [
-        "//sdk/src/common:atomic_unique_ptr",
+        "//api",
+        "//sdk:headers",
         "@com_google_googletest//:gtest_main",
     ],
 )
@@ -45,7 +46,8 @@ cc_test(
         "circular_buffer_range_test.cc",
     ],
     deps = [
-        "//sdk/src/common:circular_buffer_range",
+        "//api",
+        "//sdk:headers",
         "@com_google_googletest//:gtest_main",
     ],
 )
@@ -76,6 +78,18 @@ otel_cc_benchmark(
     srcs = ["circular_buffer_benchmark.cc"],
     deps = [
         ":baseline_circular_buffer",
-        "//sdk/src/common:circular_buffer",
+        "//sdk:headers",
+    ],
+)
+
+cc_test(
+    name = "empty_attributes_test",
+    srcs = [
+        "empty_attributes_test.cc",
+    ],
+    deps = [
+        "//api",
+        "//sdk:headers",
+        "@com_google_googletest//:gtest_main",
     ],
 )

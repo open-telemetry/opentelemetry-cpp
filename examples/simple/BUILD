@@ -15,11 +15,11 @@ cc_binary(
     name = "example_simple",
     srcs = [
         "main.cc",
-        "stdout_exporter.h",
     ],
     deps = [
         ":foo_library",
         "//api",
+        "//exporters/ostream:ostream_span_exporter",
         "//sdk/src/trace",
     ],
 )

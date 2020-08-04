@@ -1,4 +1,4 @@
-#include "src/common/circular_buffer_range.h"
+#include "opentelemetry/sdk/common/circular_buffer_range.h"
 
 #include <iterator>
 
