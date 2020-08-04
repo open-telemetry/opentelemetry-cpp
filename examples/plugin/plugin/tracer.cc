@@ -1,4 +1,5 @@
 #include "tracer.h"
+#include "opentelemetry/context/runtime_context.h"
 
 #include <iostream>
 
