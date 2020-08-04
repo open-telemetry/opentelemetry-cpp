@@ -4,8 +4,8 @@
 
 #include <thread>
 
-#include "opentelemetry/nostd/span.h"
 #include "opentelemetry/ext/zpages/threadsafe_span_data.h"
+#include "opentelemetry/nostd/span.h"
 #include "opentelemetry/sdk/trace/tracer.h"
 
 using namespace opentelemetry::sdk::trace;
@@ -17,10 +17,11 @@ using namespace opentelemetry::ext::zpages;
  * Helper function uses the current processor to update spans contained in completed_spans
  * and running_spans. completed_spans contains all spans (cumulative), unless marked otherwise
  */
-void UpdateSpans(std::shared_ptr<TracezSpanProcessor>& processor,
-    std::vector<std::unique_ptr<ThreadsafeSpanData>>& completed,
-    std::unordered_set<ThreadsafeSpanData*>& running,
-    bool store_only_new_completed = false) {
+void UpdateSpans(std::shared_ptr<TracezSpanProcessor> &processor,
+                 std::vector<std::unique_ptr<ThreadsafeSpanData>> &completed,
+                 std::unordered_set<ThreadsafeSpanData *> &running,
+                 bool store_only_new_completed = false)
+{
   auto spans = processor->GetSpanSnapshot();
   running    = spans.running;
   if (store_only_new_completed)
@@ -45,11 +46,14 @@ void UpdateSpans(std::shared_ptr<TracezSpanProcessor>& processor,
  * If 1-1 correspondance marked, return true if completed has all names in same frequency,
  * no more or less
  */
-bool ContainsNames(const std::vector<std::string>& names,
-    std::unordered_set<ThreadsafeSpanData*>& running,
-    unsigned int name_start = 0, unsigned int name_end = 0,
-    bool one_to_one_correspondence = false) {
-  if (name_end == 0) name_end = names.size();
+bool ContainsNames(const std::vector<std::string> &names,
+                   std::unordered_set<ThreadsafeSpanData *> &running,
+                   unsigned int name_start        = 0,
+                   unsigned int name_end          = 0,
+                   bool one_to_one_correspondence = false)
+{
+  if (name_end == 0)
+    name_end = names.size();
 
   unsigned int num_names = name_end - name_start;
 
@@ -90,10 +94,12 @@ bool ContainsNames(const std::vector<std::string>& names,
  * If 1-1 correspondance marked, return true if completed has all names in same frequency,
  * no more or less
  */
-bool ContainsNames(const std::vector<std::string>& names,
-    std::vector<std::unique_ptr<ThreadsafeSpanData>>& completed,
-    unsigned int name_start = 0, unsigned int name_end = 0,
-    bool one_to_one_correspondence = false) {
+bool ContainsNames(const std::vector<std::string> &names,
+                   std::vector<std::unique_ptr<ThreadsafeSpanData>> &completed,
+                   unsigned int name_start        = 0,
+                   unsigned int name_end          = 0,
+                   bool one_to_one_correspondence = false)
+{
 
   if (name_end == 0)
     name_end = names.size();
@@ -180,7 +186,7 @@ protected:
   std::shared_ptr<TracezSpanProcessor> processor;
   std::shared_ptr<opentelemetry::trace::Tracer> tracer;
 
-  std::unordered_set<ThreadsafeSpanData*> running;
+  std::unordered_set<ThreadsafeSpanData *> running;
   std::vector<std::unique_ptr<ThreadsafeSpanData>> completed;
 
   std::vector<std::string> span_names;
