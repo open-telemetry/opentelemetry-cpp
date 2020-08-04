@@ -42,10 +42,8 @@ public:
 
   bool IsRecording() const noexcept override;
 
-  trace_api::SpanContext GetContext() const noexcept override {
-      return trace_api::SpanContext();
-  }
-//  trace_api::Tracer &tracer() const noexcept override { return *tracer_; }
+  trace_api::SpanContext GetContext() const noexcept override { return trace_api::SpanContext(); }
+  //  trace_api::Tracer &tracer() const noexcept override { return *tracer_; }
 
 private:
   std::shared_ptr<trace_api::Tracer> tracer_;

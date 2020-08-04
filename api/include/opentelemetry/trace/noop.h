@@ -7,8 +7,8 @@
 #include "opentelemetry/nostd/string_view.h"
 #include "opentelemetry/nostd/unique_ptr.h"
 #include "opentelemetry/trace/span.h"
-#include "opentelemetry/trace/tracer.h"
 #include "opentelemetry/trace/span_context.h"
+#include "opentelemetry/trace/tracer.h"
 #include "opentelemetry/trace/tracer_provider.h"
 #include "opentelemetry/version.h"
 
@@ -47,10 +47,8 @@ public:
 
   bool IsRecording() const noexcept override { return false; }
 
-  SpanContext GetContext() const noexcept override {
-      return span_context_;
-  }
-//  Tracer &tracer() const noexcept override { return *tracer_; }
+  SpanContext GetContext() const noexcept override { return span_context_; }
+  //  Tracer &tracer() const noexcept override { return *tracer_; }
 
 private:
   std::shared_ptr<Tracer> tracer_;

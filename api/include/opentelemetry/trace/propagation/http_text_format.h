@@ -18,20 +18,27 @@ namespace propagation
 //  headers, and a getter and setter function for the extraction and
 // injection of values, respectively.
 template <typename T>
-class HTTPTextFormat {
-    public:
-        // Rules that manages how context will be extracted from carrier.
-        using Getter = nostd::string_view(*)(const T &carrier, nostd::string_view trace_type);
+class HTTPTextFormat
+{
+public:
+  // Rules that manages how context will be extracted from carrier.
+  using Getter = nostd::string_view (*)(const T &carrier, nostd::string_view trace_type);
 
-        // Rules that manages how context will be injected to carrier.
-        using Setter = void(*)(T &carrier, nostd::string_view trace_type,nostd::string_view trace_description);
+  // Rules that manages how context will be injected to carrier.
+  using Setter = void (*)(T &carrier,
+                          nostd::string_view trace_type,
+                          nostd::string_view trace_description);
 
-        // Returns the context that is stored in the HTTP header carrier with self defined rules.
-        virtual context::Context Extract(Getter get_from_carrier, const T &carrier, context::Context &context) noexcept = 0;
+  // Returns the context that is stored in the HTTP header carrier with self defined rules.
+  virtual context::Context Extract(Getter get_from_carrier,
+                                   const T &carrier,
+                                   context::Context &context) noexcept = 0;
 
-        // Sets the context for a HTTP header carrier with self defined rules.
-        virtual void Inject(Setter set_from_carrier, T &carrier, const context::Context &context) noexcept = 0;
+  // Sets the context for a HTTP header carrier with self defined rules.
+  virtual void Inject(Setter set_from_carrier,
+                      T &carrier,
+                      const context::Context &context) noexcept = 0;
 };
-}
-}
+}  // namespace propagation
+}  // namespace trace
 OPENTELEMETRY_END_NAMESPACE

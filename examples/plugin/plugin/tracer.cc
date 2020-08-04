@@ -50,7 +50,7 @@ public:
   bool IsRecording() const noexcept override { return true; }
 
   trace::SpanContext GetContext() const noexcept override { return span_->GetContext(); }
-//  Tracer &tracer() const noexcept override { return *tracer_; }
+  //  Tracer &tracer() const noexcept override { return *tracer_; }
 
 private:
   std::shared_ptr<Tracer> tracer_;

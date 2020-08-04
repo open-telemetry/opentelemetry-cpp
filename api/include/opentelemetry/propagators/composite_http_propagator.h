@@ -15,51 +15,62 @@
 #pragma once
 
 #include "opentelemetry/context/context.h"
-#include "opentelemetry/trace/propagation/httptextformat.h"
 #include "opentelemetry/nostd/span.h"
+#include "opentelemetry/trace/propagation/httptextformat.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace propagators
 {
-    // CompositeHTTPPropagator provides a mechanism for combining multiple
-    // propagators into a single one.
-    template <typename T>
-    class CompositeHTTPPropagator : public trace::propagation::HTTPTextFormat<T> {
-        public:
-            // Rules that manages how context will be extracted from carrier.
-            using Getter = nostd::string_view(*)(const T &carrier, nostd::string_view trace_type);
+// CompositeHTTPPropagator provides a mechanism for combining multiple
+// propagators into a single one.
+template <typename T>
+class CompositeHTTPPropagator : public trace::propagation::HTTPTextFormat<T>
+{
+public:
+  // Rules that manages how context will be extracted from carrier.
+  using Getter = nostd::string_view (*)(const T &carrier, nostd::string_view trace_type);
 
-            // Rules that manages how context will be injected to carrier.
-            using Setter = void(*)(T &carrier, nostd::string_view trace_type,nostd::string_view trace_description);
+  // Rules that manages how context will be injected to carrier.
+  using Setter = void (*)(T &carrier,
+                          nostd::string_view trace_type,
+                          nostd::string_view trace_description);
 
-            // Initializes a Composite Http Propagator with given propagators
-            CompositeHTTPPropagator(nostd::span<trace::propagation::HTTPTextFormat> &propagators) {
-                this.propagators_ = propagators;
-            }
+  // Initializes a Composite Http Propagator with given propagators
+  CompositeHTTPPropagator(nostd::span<trace::propagation::HTTPTextFormat> &propagators)
+  {
+    this.propagators_ = propagators;
+  }
 
-            // Run each of the configured propagators with the given context and carrier.
-            // Propagators are run in the order they are configured, if multiple
-            // propagators write the same context key, the propagator later in the list
-            // will override previous propagators.
-            // See opentelemetry.trace.propagation.httptextformat.HTTPTextFormat.extract
-            Extract(Getter get_from_carrier, const T &carrier, Context &context) {
-                for (nostd::span<trace::propagation::HTTPTextFormat>::iterator it = propagators_.begin(); it != propagators_.end(); it++) {
-                    context = it->Extract(get_from_carrier, carrier, context);
-                }
-                return context;
-            }
-
-            // Run each of the configured propagators with the given context and carrier.
-            // Propagators are run in the order they are configured, if multiple
-            // propagators write the same carrier key, the propagator later in the list
-            // will override previous propagators.
-            // See `opentelemetry.trace.propagation.httptextformat.HTTPTextFormat.inject`
-            Inject(Setter set_from_carrier, T &carrier, const Context &context) {
-                for (nostd::span<trace::propagation::HTTPTextFormat>::iterator it = propagators_.begin(); it != propagators_.end(); it++) {
-                    it->Inject(get_from_carrier, carrier, context);
-                }
-            }
-        private:
-            nostd::span<trace::propagation::HTTPTextFormat> propagators_;
+  // Run each of the configured propagators with the given context and carrier.
+  // Propagators are run in the order they are configured, if multiple
+  // propagators write the same context key, the propagator later in the list
+  // will override previous propagators.
+  // See opentelemetry.trace.propagation.httptextformat.HTTPTextFormat.extract
+  Extract(Getter get_from_carrier, const T &carrier, Context &context)
+  {
+    for (nostd::span<trace::propagation::HTTPTextFormat>::iterator it = propagators_.begin();
+         it != propagators_.end(); it++)
+    {
+      context = it->Extract(get_from_carrier, carrier, context);
     }
+    return context;
+  }
+
+  // Run each of the configured propagators with the given context and carrier.
+  // Propagators are run in the order they are configured, if multiple
+  // propagators write the same carrier key, the propagator later in the list
+  // will override previous propagators.
+  // See `opentelemetry.trace.propagation.httptextformat.HTTPTextFormat.inject`
+  Inject(Setter set_from_carrier, T &carrier, const Context &context)
+  {
+    for (nostd::span<trace::propagation::HTTPTextFormat>::iterator it = propagators_.begin();
+         it != propagators_.end(); it++)
+    {
+      it->Inject(get_from_carrier, carrier, context);
+    }
+  }
+
+private:
+  nostd::span<trace::propagation::HTTPTextFormat> propagators_;
 }
+}  // namespace propagators
