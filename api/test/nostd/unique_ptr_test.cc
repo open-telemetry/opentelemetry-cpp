@@ -89,6 +89,9 @@ TEST(UniquePtrTest, StdUniquePtrConversionOperator)
   EXPECT_EQ(ptr1.get(), nullptr);
   EXPECT_EQ(ptr2.get(), value);
 
+  ptr2 = nullptr;
+  EXPECT_EQ(ptr2.get(), nullptr);
+
   EXPECT_TRUE((std::is_assignable<std::unique_ptr<int>, unique_ptr<int> &&>::value));
   EXPECT_FALSE((std::is_assignable<std::unique_ptr<int>, unique_ptr<int> &>::value));
 }
@@ -109,7 +112,7 @@ TEST(UniquePtrTest, PointerOperators)
 
   EXPECT_EQ(&*ptr1, value);
   EXPECT_EQ(
-      unique_ptr<B> {}->f(), 123);
+      unique_ptr<B> { new B }->f(), 123);
 }
 
 TEST(UniquePtrTest, Reset)
