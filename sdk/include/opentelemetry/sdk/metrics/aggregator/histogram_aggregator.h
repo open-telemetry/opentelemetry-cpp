@@ -134,6 +134,9 @@ public:
     this->values_[0] += other.values_[0];
     this->values_[1] += other.values_[1];
 
+    this->checkpoint_[0] += other.checkpoint_[0];
+    this->checkpoint_[1] += other.checkpoint_[1];
+
     for (size_t i = 0; i < bucketCounts_.size(); i++)
     {
       bucketCounts_[i] += other.bucketCounts_[i];
