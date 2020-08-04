@@ -11,7 +11,7 @@
 #include "opentelemetry/sdk/metrics/record.h"
 #include "opentelemetry/version.h"
 
-#define stringer( x ) ( #x )
+#define stringer(x) (#x)
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 
@@ -67,7 +67,7 @@ private:
 
   /**
    * aggregator_copy creates a copy of the aggregtor passed through process() for a
-   * stateful processor. For Sketch, Histogram and Exact we also need to pass in 
+   * stateful processor. For Sketch, Histogram and Exact we also need to pass in
    * additional constructor values
    */
   template <typename T>
@@ -77,37 +77,36 @@ private:
     auto ins_kind = aggregator->get_instrument_kind();
     auto agg_kind = aggregator->get_aggregator_kind();
 
-    switch(agg_kind)
+    switch (agg_kind)
     {
       case sdkmetrics::AggregatorKind::Counter:
         return std::shared_ptr<sdkmetrics::Aggregator<T>>(
-          new sdkmetrics::CounterAggregator<T>(ins_kind));
+            new sdkmetrics::CounterAggregator<T>(ins_kind));
 
       case sdkmetrics::AggregatorKind::MinMaxSumCount:
         return std::shared_ptr<sdkmetrics::Aggregator<T>>(
-          new sdkmetrics::MinMaxSumCountAggregator<T>(ins_kind));
+            new sdkmetrics::MinMaxSumCountAggregator<T>(ins_kind));
 
       case sdkmetrics::AggregatorKind::Gauge:
         return std::shared_ptr<sdkmetrics::Aggregator<T>>(
-          new sdkmetrics::GaugeAggregator<T>(ins_kind));
-      
+            new sdkmetrics::GaugeAggregator<T>(ins_kind));
+
       case sdkmetrics::AggregatorKind::Sketch:
         return std::shared_ptr<sdkmetrics::Aggregator<T>>(new sdkmetrics::SketchAggregator<T>(
-          ins_kind, aggregator->get_error_bound(), aggregator->get_max_buckets()));
+            ins_kind, aggregator->get_error_bound(), aggregator->get_max_buckets()));
 
       case sdkmetrics::AggregatorKind::Histogram:
         return std::shared_ptr<sdkmetrics::Aggregator<T>>(
-          new sdkmetrics::HistogramAggregator<T>(ins_kind, aggregator->get_boundaries()));  
+            new sdkmetrics::HistogramAggregator<T>(ins_kind, aggregator->get_boundaries()));
 
       case sdkmetrics::AggregatorKind::Exact:
         return std::shared_ptr<sdkmetrics::Aggregator<T>>(
-          new sdkmetrics::ExactAggregator<T>(ins_kind, aggregator->get_quant_estimation()));
-      
+            new sdkmetrics::ExactAggregator<T>(ins_kind, aggregator->get_quant_estimation()));
+
       default:
         return std::shared_ptr<sdkmetrics::Aggregator<T>>(
-          new sdkmetrics::CounterAggregator<T>(ins_kind));
+            new sdkmetrics::CounterAggregator<T>(ins_kind));
     }
-      
   };
 
   /**
@@ -118,42 +117,41 @@ private:
   template <typename T>
   std::shared_ptr<sdkmetrics::Aggregator<T>> aggregator_for(metrics_api::InstrumentKind ins_kind)
   {
-    switch(ins_kind)
+    switch (ins_kind)
     {
       case metrics_api::InstrumentKind::Counter:
         return std::shared_ptr<sdkmetrics::Aggregator<T>>(
-          new sdkmetrics::CounterAggregator<T>(ins_kind));
+            new sdkmetrics::CounterAggregator<T>(ins_kind));
 
       case metrics_api::InstrumentKind::UpDownCounter:
         return std::shared_ptr<sdkmetrics::Aggregator<T>>(
-          new sdkmetrics::CounterAggregator<T>(ins_kind));    
+            new sdkmetrics::CounterAggregator<T>(ins_kind));
 
       case metrics_api::InstrumentKind::ValueRecorder:
         return std::shared_ptr<sdkmetrics::Aggregator<T>>(
-          new sdkmetrics::MinMaxSumCountAggregator<T>(ins_kind)); 
+            new sdkmetrics::MinMaxSumCountAggregator<T>(ins_kind));
 
       case metrics_api::InstrumentKind::SumObserver:
         return std::shared_ptr<sdkmetrics::Aggregator<T>>(
-          new sdkmetrics::CounterAggregator<T>(ins_kind));
+            new sdkmetrics::CounterAggregator<T>(ins_kind));
 
       case metrics_api::InstrumentKind::UpDownSumObserver:
         return std::shared_ptr<sdkmetrics::Aggregator<T>>(
-          new sdkmetrics::CounterAggregator<T>(ins_kind)); 
+            new sdkmetrics::CounterAggregator<T>(ins_kind));
 
       case metrics_api::InstrumentKind::ValueObserver:
         return std::shared_ptr<sdkmetrics::Aggregator<T>>(
-          new sdkmetrics::MinMaxSumCountAggregator<T>(ins_kind)); 
+            new sdkmetrics::MinMaxSumCountAggregator<T>(ins_kind));
 
       default:
         return std::shared_ptr<sdkmetrics::Aggregator<T>>(
-          new sdkmetrics::CounterAggregator<T>(ins_kind));
+            new sdkmetrics::CounterAggregator<T>(ins_kind));
     }
-
   };
 
   /**
    * merge_aggreagtors takes in two shared pointers to aggregators of the same kind.
-   * We first need to dynamically cast to the actual Aggregator that is held in the 
+   * We first need to dynamically cast to the actual Aggregator that is held in the
    * Aggregator<T> wrapper. Then we must get the underlying pointer from the shared
    * pointer and merge them together.
    */
@@ -241,7 +239,6 @@ private:
       temp_batch_agg_raw_exact->merge(*temp_record_agg_raw_exact);
     }
   }
-  
 };
 }  // namespace metrics
 }  // namespace sdk
