@@ -1,9 +1,9 @@
 #pragma once
 
 #include "opentelemetry/sdk/trace/span_data.h"
-#include "src/common/atomic_unique_ptr.h"
-#include "src/common/circular_buffer.h"
-#include "src/common/circular_buffer_range.h"
+#include "opentelemetry/sdk/common/atomic_unique_ptr.h"
+#include "opentelemetry/sdk/common/circular_buffer.h"
+#include "opentelemetry/sdk/common/circular_buffer_range.h"
 #include "opentelemetry/sdk/trace/recordable.h"
 
 using opentelemetry::sdk::common::CircularBuffer;

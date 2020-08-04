@@ -10,9 +10,8 @@ cc_library(
     ],
     strip_include_prefix = "include",
     deps = [
+        "//api",
         "//sdk/src/trace",
-        "//sdk/src/common:atomic_unique_ptr",
-        "//sdk/src/common:circular_buffer",
     ],
 )
 
