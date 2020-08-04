@@ -69,42 +69,20 @@ TEST(Counter, getAggsandnewupdate)
 {
   Counter<int> alpha("test", "none", "unitless", true);
 
-  std::map<std::string, std::string> labels  = {{"key", "value"}};
-  std::map<std::string, std::string> labels1 = {{"key1", "value1"}};
+  std::map<std::string, std::string> labels = {{"key3", "value3"}, {"key2", "value2"}};
 
-  // labels 2 and 3 are actually the same
-  std::map<std::string, std::string> labels2 = {{"key2", "value2"}, {"key3", "value3"}};
-  std::map<std::string, std::string> labels3 = {{"key3", "value3"}, {"key2", "value2"}};
-
-  auto labelkv  = trace::KeyValueIterableView<decltype(labels)>{labels};
-  auto labelkv1 = trace::KeyValueIterableView<decltype(labels1)>{labels1};
-  auto labelkv2 = trace::KeyValueIterableView<decltype(labels2)>{labels2};
-  auto labelkv3 = trace::KeyValueIterableView<decltype(labels3)>{labels3};
-
+  auto labelkv = trace::KeyValueIterableView<decltype(labels)>{labels};
   auto beta    = alpha.bindCounter(labelkv);
-  auto gamma   = alpha.bindCounter(labelkv1);
-  auto delta   = alpha.bindCounter(labelkv1);
-  auto epsilon = alpha.bindCounter(labelkv1);
-  auto zeta    = alpha.bindCounter(labelkv2);
-  auto eta     = alpha.bindCounter(labelkv3);
+  beta->unbind();
 
-  EXPECT_EQ(beta->get_ref(), 1);
-  EXPECT_EQ(gamma->get_ref(), 3);
-  EXPECT_EQ(eta->get_ref(), 2);
-
-  delta->unbind();
-  gamma->unbind();
-  epsilon->unbind();
-
-  EXPECT_EQ(alpha.boundInstruments_[KvToString(labelkv1)]->get_ref(), 0);
-  EXPECT_EQ(alpha.boundInstruments_.size(), 3);
+  EXPECT_EQ(alpha.boundInstruments_[KvToString(labelkv)]->get_ref(), 0);
+  EXPECT_EQ(alpha.boundInstruments_.size(), 1);
 
   auto theta = alpha.GetRecords();
-  EXPECT_EQ(theta.size(), 3);
+  EXPECT_EQ(theta.size(), 1);
   EXPECT_EQ(theta[0].GetName(), "test");
   EXPECT_EQ(theta[0].GetDescription(), "none");
   EXPECT_EQ(theta[0].GetLabels(), "{\"key2\":\"value2\",\"key3\":\"value3\"}");
-  EXPECT_EQ(theta[1].GetLabels(), "{\"key1\":\"value1\"}");
 }
 
 void CounterCallback(std::shared_ptr<Counter<int>> in,
