@@ -11,6 +11,8 @@ namespace exporter
 {
 namespace memory
 {
+InMemorySpanData::InMemorySpanData() : spans_received_(MAX_BUFFER_SIZE) {}
+
 void InMemorySpanData::Add(std::unique_ptr<Recordable> data) noexcept
 {
 	spans_received_.Add(data);

@@ -22,6 +22,8 @@ namespace memory
 class InMemorySpanData final
 {
 public:
+  InMemorySpanData();
+
   void Add(std::unique_ptr<Recordable> data) noexcept;
 
   std::vector<std::unique_ptr<Recordable>> GetSpans() noexcept;
