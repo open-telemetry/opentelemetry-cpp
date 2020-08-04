@@ -2,6 +2,7 @@
 
 #include <algorithm>
 #include <cmath>
+#include <limits>
 #include <map>
 #include <mutex>
 #include <stdexcept>
@@ -20,7 +21,8 @@ namespace metrics
 
 /** Sketch Aggregators implement the DDSketch data type.  Note that data is compressed
  *  by the DDSketch algorithm and users should be informed about its behavior before
- *  selecting it as the aggregation type.
+ *  selecting it as the aggregation type.  NOTE: The current implementation can only support
+ *  non-negative values.
  *
  *  Detailed information about the algorithm can be found in the following paper
  *  published by Datadog: http://www.vldb.org/pvldb/vol12/p2195-masson.pdf
@@ -62,8 +64,23 @@ public:
   void update(T val) override
   {
     this->mu_.lock();
-    double idx = ceil(log(val) / log(gamma));
-    raw_[idx] += 1;
+    int idx;
+    if (val == 0)
+    {
+      idx = std::numeric_limits<int>::min();
+    }
+    else
+    {
+      idx = ceil(log(val) / log(gamma));
+    }
+    if (raw_.find(idx) != raw_.end())
+    {
+      raw_[idx] += 1;
+    }
+    else
+    {
+      raw_[idx] = 1;
+    }
     this->values_[1] += 1;
     this->values_[0] += val;
     if (raw_.size() > max_buckets_)
