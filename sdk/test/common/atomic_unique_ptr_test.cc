@@ -1,4 +1,4 @@
-#include "src/common/atomic_unique_ptr.h"
+#include "opentelemetry/sdk/common/atomic_unique_ptr.h"
 
 #include <gtest/gtest.h>
 using opentelemetry::sdk::common::AtomicUniquePtr;
