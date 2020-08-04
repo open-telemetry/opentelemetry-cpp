@@ -1,5 +1,5 @@
-#include "opentelemetry/sdk/metrics/meter_provider.h"
 #include "opentelemetry/sdk/metrics/meter.h"
+#include "opentelemetry/sdk/metrics/meter_provider.h"
 
 #include <gtest/gtest.h>
 
@@ -18,5 +18,4 @@ TEST(MeterProvider, GetMeter)
   // Should return the same instance each time.
   ASSERT_EQ(t1, t2);
   ASSERT_EQ(t1, t3);
-
 }

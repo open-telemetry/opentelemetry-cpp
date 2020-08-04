@@ -4,8 +4,8 @@ cc_test(
         "threadsafe_span_data_test.cc",
     ],
     deps = [
-        "//sdk/src/trace",
         "//ext/src/zpages",
+        "//sdk/src/trace",
         "@com_google_googletest//:gtest_main",
     ],
 )
@@ -28,8 +28,8 @@ cc_test(
         "tracez_processor_test.cc",
     ],
     deps = [
-        "//sdk/src/trace",
         "//ext/src/zpages",
+        "//sdk/src/trace",
         "@com_google_googletest//:gtest_main",
     ],
 )
