@@ -11,6 +11,18 @@ cc_test(
 )
 
 cc_test(
+    name = "tracez_data_aggregator_tests",
+    srcs = [
+        "tracez_data_aggregator_test.cc",
+    ],
+    deps = [
+        "//ext/src/zpages",
+        "//sdk/src/trace",
+        "@com_google_googletest//:gtest_main",
+    ],
+)
+
+cc_test(
     name = "tracez_processor_tests",
     srcs = [
         "tracez_processor_test.cc",
