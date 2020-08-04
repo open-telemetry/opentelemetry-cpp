@@ -11,8 +11,10 @@ using std::chrono::nanoseconds;
 using std::chrono::seconds;
 
 OPENTELEMETRY_BEGIN_NAMESPACE
-namespace ext {
-namespace zpages {
+namespace ext
+{
+namespace zpages
+{
 /**
  * kLatencyBoundaries is a constant array that contains the 9 latency
  * boundaries. Each value in the array represents the lower limit(inclusive) of
@@ -37,7 +39,8 @@ const std::array<nanoseconds, 9> kLatencyBoundaries = {
  * Using this enum lets you access the latency boundary at each index without
  * using magic numbers
  */
-enum LatencyBoundary {
+enum LatencyBoundary
+{
   k0MicroTo10Micro,
   k10MicroTo100Micro,
   k100MicroTo1Milli,

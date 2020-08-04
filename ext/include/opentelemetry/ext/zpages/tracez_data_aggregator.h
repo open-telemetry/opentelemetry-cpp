@@ -21,8 +21,10 @@
 using opentelemetry::trace::CanonicalCode;
 
 OPENTELEMETRY_BEGIN_NAMESPACE
-namespace ext {
-namespace zpages {
+namespace ext
+{
+namespace zpages
+{
 /**
  * TracezDataAggregator object is responsible for collecting raw data and
  * converting it to useful information that can be made available to
@@ -38,8 +40,9 @@ namespace zpages {
  * TODO: Consider a singleton pattern for this class, not sure if multiple
  * instances of this class should exist.
  */
-class TracezDataAggregator {
- public:
+class TracezDataAggregator
+{
+public:
   /**
    * Constructor creates a thread that calls a function to aggregate span data
    * at regular intervals.
@@ -58,7 +61,7 @@ class TracezDataAggregator {
    */
   std::map<std::string, TracezData> GetAggregatedTracezData();
 
- private:
+private:
   /**
    * AggregateSpans is the function that is called to update the aggregated data
    * with newly completed and running span data
@@ -70,14 +73,13 @@ class TracezDataAggregator {
    * aggregation with the data of newly completed spans.
    * @param completed_spans are the newly completed spans.
    */
-  void AggregateCompletedSpans(
-      std::vector<std::unique_ptr<ThreadsafeSpanData>>& completed_spans);
+  void AggregateCompletedSpans(std::vector<std::unique_ptr<ThreadsafeSpanData>> &completed_spans);
 
   /**
    * AggregateRunningSpans aggregates the data for all running spans received
    * from the span processor. Running spans are not cleared by the span
    * processor and multiple calls to this function may contain running spans for
-   * which data has already been collected in a previous call. Additionally, 
+   * which data has already been collected in a previous call. Additionally,
    * span names can change while span is running and there seems to be
    * no trivial to way to know if it is a new or old running span so at every
    * call to this function the available running span data is reset and
@@ -89,21 +91,21 @@ class TracezDataAggregator {
    * aggregator till the span is completed.
    * @param running_spans is the running spans to be aggregated.
    */
-  void AggregateRunningSpans(std::unordered_set<ThreadsafeSpanData*>& running_spans);
+  void AggregateRunningSpans(std::unordered_set<ThreadsafeSpanData *> &running_spans);
 
   /**
    * AggregateStatusOKSpans is the function called to update the data of spans
    * with status code OK.
    * @param ok_span is the span who's data is to be aggregated
    */
-  void AggregateStatusOKSpan(std::unique_ptr<ThreadsafeSpanData>& ok_span);
+  void AggregateStatusOKSpan(std::unique_ptr<ThreadsafeSpanData> &ok_span);
 
   /**
    * AggregateStatusErrorSpans is the function that is called to update the
    * data of error spans
    * @param error_span is the error span who's data is to be aggregated
    */
-  void AggregateStatusErrorSpan(std::unique_ptr<ThreadsafeSpanData>& error_span);
+  void AggregateStatusErrorSpan(std::unique_ptr<ThreadsafeSpanData> &error_span);
 
   /**
    * ClearRunningSpanData is a function that is used to clear all running span
@@ -130,7 +132,7 @@ class TracezDataAggregator {
    * @param sample_spans the sample span list into which span is to be inserted
    * @param span_data the span_data to be inserted into list
    */
-  void InsertIntoSampleSpanList(std::list<ThreadsafeSpanData>& sample_spans,
+  void InsertIntoSampleSpanList(std::list<ThreadsafeSpanData> &sample_spans,
                                 ThreadsafeSpanData &span_data);
 
   /** Instance of span processor used to collect raw data **/
@@ -147,7 +149,7 @@ class TracezDataAggregator {
    */
   std::map<std::string, TracezData> aggregated_tracez_data_;
   std::mutex mtx_;
-  
+
   /** A boolean that is set to true in the constructor and false in the
    * destructor to start and end execution of aggregate spans **/
   std::atomic<bool> execute_;

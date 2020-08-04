@@ -16,8 +16,8 @@ cc_test(
         "tracez_data_aggregator_test.cc",
     ],
     deps = [
-        "//sdk/src/trace",
         "//ext/src/zpages",
+        "//sdk/src/trace",
         "@com_google_googletest//:gtest_main",
     ],
 )
