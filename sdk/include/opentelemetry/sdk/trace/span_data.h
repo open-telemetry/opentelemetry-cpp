@@ -28,6 +28,7 @@ public:
                 const trace_api::KeyValueIterable &attributes)
       : name_(name), timestamp_(timestamp), attribute_map_(attributes)
   {}
+
   /**
    * Get the name for this event
    * @return the name for this event
