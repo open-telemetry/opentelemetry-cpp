@@ -11,6 +11,8 @@
 #include "opentelemetry/sdk/metrics/record.h"
 #include "opentelemetry/version.h"
 
+#define stringer( x ) ( #x )
+
 OPENTELEMETRY_BEGIN_NAMESPACE
 
 namespace sdk
@@ -33,6 +35,10 @@ private:
   bool stateful_;
   std::unordered_map<std::string, sdkmetrics::AggregatorVariant> batch_map_;
 
+  /**
+   * get_instrument returns the instrument from the passed in AggregatorVariant. We have to
+   * unpack the variant then get the instrument from the Aggreagtor.
+   */
   metrics_api::InstrumentKind get_instrument(sdkmetrics::AggregatorVariant aggregator)
   {
     if (nostd::holds_alternative<std::shared_ptr<sdkmetrics::Aggregator<short>>>(aggregator))
@@ -59,6 +65,11 @@ private:
     return metrics_api::InstrumentKind::Counter;
   }
 
+  /**
+   * aggregator_copy creates a copy of the aggregtor passed through process() for a
+   * stateful processor. For Sketch, Histogram and Exact we also need to pass in 
+   * additional constructor values
+   */
   template <typename T>
   std::shared_ptr<sdkmetrics::Aggregator<T>> aggregator_copy(
       std::shared_ptr<sdkmetrics::Aggregator<T>> aggregator)
@@ -66,79 +77,86 @@ private:
     auto ins_kind = aggregator->get_instrument_kind();
     auto agg_kind = aggregator->get_aggregator_kind();
 
-    if (agg_kind == sdkmetrics::AggregatorKind::Counter)
+    switch(agg_kind)
     {
-      return std::shared_ptr<sdkmetrics::Aggregator<T>>(
+      case sdkmetrics::AggregatorKind::Counter:
+        return std::shared_ptr<sdkmetrics::Aggregator<T>>(
+          new sdkmetrics::CounterAggregator<T>(ins_kind));
+
+      case sdkmetrics::AggregatorKind::MinMaxSumCount:
+        return std::shared_ptr<sdkmetrics::Aggregator<T>>(
+          new sdkmetrics::MinMaxSumCountAggregator<T>(ins_kind));
+
+      case sdkmetrics::AggregatorKind::Gauge:
+        return std::shared_ptr<sdkmetrics::Aggregator<T>>(
+          new sdkmetrics::GaugeAggregator<T>(ins_kind));
+      
+      case sdkmetrics::AggregatorKind::Sketch:
+        return std::shared_ptr<sdkmetrics::Aggregator<T>>(new sdkmetrics::SketchAggregator<T>(
+          ins_kind, aggregator->get_error_bound(), aggregator->get_max_buckets()));
+
+      case sdkmetrics::AggregatorKind::Histogram:
+        return std::shared_ptr<sdkmetrics::Aggregator<T>>(
+          new sdkmetrics::HistogramAggregator<T>(ins_kind, aggregator->get_boundaries()));  
+
+      case sdkmetrics::AggregatorKind::Exact:
+        return std::shared_ptr<sdkmetrics::Aggregator<T>>(
+          new sdkmetrics::ExactAggregator<T>(ins_kind, aggregator->get_quant_estimation()));
+      
+      default:
+        return std::shared_ptr<sdkmetrics::Aggregator<T>>(
           new sdkmetrics::CounterAggregator<T>(ins_kind));
     }
-    else if (agg_kind == sdkmetrics::AggregatorKind::MinMaxSumCount)
-    {
-      return std::shared_ptr<sdkmetrics::Aggregator<T>>(
-          new sdkmetrics::MinMaxSumCountAggregator<T>(ins_kind));
-    }
-    else if (agg_kind == sdkmetrics::AggregatorKind::Gauge)
-    {
-      return std::shared_ptr<sdkmetrics::Aggregator<T>>(
-          new sdkmetrics::GaugeAggregator<T>(ins_kind));
-    }
-    else if (agg_kind == sdkmetrics::AggregatorKind::Sketch)
-    {
-      return std::shared_ptr<sdkmetrics::Aggregator<T>>(new sdkmetrics::SketchAggregator<T>(
-          ins_kind, aggregator->get_error_bound(), aggregator->get_max_buckets()));
-    }
-    else if (agg_kind == sdkmetrics::AggregatorKind::Histogram)
-    {
-      return std::shared_ptr<sdkmetrics::Aggregator<T>>(
-          new sdkmetrics::HistogramAggregator<T>(ins_kind, aggregator->get_boundaries()));
-    }
-    else if (agg_kind == sdkmetrics::AggregatorKind::Exact)
-    {
-      return std::shared_ptr<sdkmetrics::Aggregator<T>>(
-          new sdkmetrics::ExactAggregator<T>(ins_kind, aggregator->get_quant_estimation()));
-    }
-
-    return std::shared_ptr<sdkmetrics::Aggregator<T>>(
-        new sdkmetrics::CounterAggregator<T>(ins_kind));
+      
   };
 
+  /**
+   * aggregator_for will return an Aggregator based off the instrument passed in. This should be
+   * the function that we assign Aggreagtors for instruments, but is currently unused in our
+   * pipeline.
+   */
   template <typename T>
   std::shared_ptr<sdkmetrics::Aggregator<T>> aggregator_for(metrics_api::InstrumentKind ins_kind)
   {
-    if (ins_kind == metrics_api::InstrumentKind::Counter)
+    switch(ins_kind)
     {
-      return std::shared_ptr<sdkmetrics::Aggregator<T>>(
+      case metrics_api::InstrumentKind::Counter:
+        return std::shared_ptr<sdkmetrics::Aggregator<T>>(
           new sdkmetrics::CounterAggregator<T>(ins_kind));
-    }
-    else if (ins_kind == metrics_api::InstrumentKind::UpDownCounter)
-    {
-      return std::shared_ptr<sdkmetrics::Aggregator<T>>(
+
+      case metrics_api::InstrumentKind::UpDownCounter:
+        return std::shared_ptr<sdkmetrics::Aggregator<T>>(
+          new sdkmetrics::CounterAggregator<T>(ins_kind));    
+
+      case metrics_api::InstrumentKind::ValueRecorder:
+        return std::shared_ptr<sdkmetrics::Aggregator<T>>(
+          new sdkmetrics::MinMaxSumCountAggregator<T>(ins_kind)); 
+
+      case metrics_api::InstrumentKind::SumObserver:
+        return std::shared_ptr<sdkmetrics::Aggregator<T>>(
           new sdkmetrics::CounterAggregator<T>(ins_kind));
-    }
-    else if (ins_kind == metrics_api::InstrumentKind::ValueRecorder)
-    {
-      return std::shared_ptr<sdkmetrics::Aggregator<T>>(
-          new sdkmetrics::MinMaxSumCountAggregator<T>(ins_kind));
-    }
-    else if (ins_kind == metrics_api::InstrumentKind::SumObserver)
-    {
-      return std::shared_ptr<sdkmetrics::Aggregator<T>>(
+
+      case metrics_api::InstrumentKind::UpDownSumObserver:
+        return std::shared_ptr<sdkmetrics::Aggregator<T>>(
+          new sdkmetrics::CounterAggregator<T>(ins_kind)); 
+
+      case metrics_api::InstrumentKind::ValueObserver:
+        return std::shared_ptr<sdkmetrics::Aggregator<T>>(
+          new sdkmetrics::MinMaxSumCountAggregator<T>(ins_kind)); 
+
+      default:
+        return std::shared_ptr<sdkmetrics::Aggregator<T>>(
           new sdkmetrics::CounterAggregator<T>(ins_kind));
-    }
-    else if (ins_kind == metrics_api::InstrumentKind::UpDownSumObserver)
-    {
-      return std::shared_ptr<sdkmetrics::Aggregator<T>>(
-          new sdkmetrics::CounterAggregator<T>(ins_kind));
-    }
-    else if (ins_kind == metrics_api::InstrumentKind::ValueObserver)
-    {
-      return std::shared_ptr<sdkmetrics::Aggregator<T>>(
-          new sdkmetrics::MinMaxSumCountAggregator<T>(ins_kind));
     }
 
-    return std::shared_ptr<sdkmetrics::Aggregator<T>>(
-        new sdkmetrics::CounterAggregator<T>(ins_kind));
   };
 
+  /**
+   * merge_aggreagtors takes in two shared pointers to aggregators of the same kind.
+   * We first need to dynamically cast to the actual Aggregator that is held in the 
+   * Aggregator<T> wrapper. Then we must get the underlying pointer from the shared
+   * pointer and merge them together.
+   */
   template <typename T>
   void merge_aggregators(std::shared_ptr<sdkmetrics::Aggregator<T>> batch_agg,
                          std::shared_ptr<sdkmetrics::Aggregator<T>> record_agg)
@@ -223,14 +241,7 @@ private:
       temp_batch_agg_raw_exact->merge(*temp_record_agg_raw_exact);
     }
   }
-
-  std::map<metrics_api::InstrumentKind, std::string> ins_to_string{
-      {metrics_api::InstrumentKind::Counter, "Counter"},
-      {metrics_api::InstrumentKind::UpDownCounter, "UpDownCounter"},
-      {metrics_api::InstrumentKind::SumObserver, "SumObserver"},
-      {metrics_api::InstrumentKind::UpDownSumObserver, "UpDownSumObserver"},
-      {metrics_api::InstrumentKind::ValueObserver, "ValueObserver"},
-      {metrics_api::InstrumentKind::ValueRecorder, "ValueRecorder"}};
+  
 };
 }  // namespace metrics
 }  // namespace sdk

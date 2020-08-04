@@ -23,6 +23,11 @@ std::vector<sdkmetrics::Record> UngroupedMetricsProcessor::CheckpointSelf() noex
 
   for (auto iter : batch_map_)
   {
+    /**
+     * TODO: micro-optimization, scan once or change to using a struct with custom hash function,
+     * to hold the data.
+     */
+
     std::string key               = iter.first;
     std::size_t description_index = key.find("/description/");
     std::size_t labels_index      = key.find("/labels/");
@@ -59,7 +64,7 @@ void UngroupedMetricsProcessor::process(sdkmetrics::Record record) noexcept
   std::string label       = record.GetLabels();
   std::string name        = record.GetName();
   std::string description = record.GetDescription();
-  std::string instrument  = ins_to_string[get_instrument(aggregator)];
+  std::string instrument  = stringer(get_instrument(aggregator));
 
   std::string batch_key = "/name/" + name + "/description/" + description + "/labels/" + label +
                           "/instrument/" + instrument;
