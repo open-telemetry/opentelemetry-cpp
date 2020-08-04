@@ -58,11 +58,11 @@ private:
 
 Tracer::Tracer(nostd::string_view /*output*/) {}
 
-nostd::unique_ptr<trace::Span> Tracer::StartSpan(
+nostd::shared_ptr<trace::Span> Tracer::StartSpan(
     nostd::string_view name,
     const opentelemetry::trace::KeyValueIterable &attributes,
     const trace::StartSpanOptions &options) noexcept
 {
-  return nostd::unique_ptr<opentelemetry::trace::Span>{
+  return nostd::shared_ptr<opentelemetry::trace::Span>{
       new (std::nothrow) Span{this->shared_from_this(), name, attributes, options}};
 }
