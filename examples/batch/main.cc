@@ -14,11 +14,10 @@ namespace
 
 void initTracer()
 {
-  /*                         SET UP EXPORTER                                    */
   auto exporter = std::unique_ptr<sdktrace::SpanExporter>(
       new opentelemetry::exporter::trace::OStreamSpanExporter);
 
-  /*              CONFIGURE BATCH SPAN PROCESSOR PARAMETERS                     */
+  // CONFIGURE BATCH SPAN PROCESSOR PARAMETERS
 
   // We make the queue size `KNumSpans`*2+5 because when the queue is half full, a preemptive notif
   // is sent to start an export call, which we want to avoid in this simple example.
@@ -33,10 +32,6 @@ void initTracer()
   auto processor = std::shared_ptr<sdktrace::SpanProcessor>(new sdktrace::BatchSpanProcessor(
       std::move(exporter), max_queue_size, schedule_delay_millis, max_export_batch_size));
 
-  // Wait for processor's worker thread to initialize.
-  std::this_thread::sleep_for(std::chrono::milliseconds(50));
-
-  /*                         SET UP TRACER PROVIDER                             */
   auto provider = nostd::shared_ptr<opentelemetry::trace::TracerProvider>(
       new sdktrace::TracerProvider(processor));
   // Set the global trace provider.
@@ -64,38 +59,23 @@ int main()
   // Removing this line will leave the default noop TracerProvider in place.
   initTracer();
 
-  {
-    // Generate `kNumSpans` spans.
-    StartAndEndSpans();
+  std::cout << "Creating first batch of " << kNumSpans << " spans and waiting 3 seconds ...\n";
+  StartAndEndSpans();
+  std::this_thread::sleep_for(std::chrono::milliseconds(3000 + 50));
+  // The spans should now be exported.
+  std::cout << "....Exported!\n\n\n";
 
-    printf("Exporting first batch of %d spans in 3 seconds ...\n", kNumSpans);
-    // Sleep for schedule_delay_millis + small delay to account for export time.
-    std::this_thread::sleep_for(std::chrono::milliseconds(3000 + 50));
+  // Do the same again
+  std::cout << "Creating second batch of " << kNumSpans << " spans and waiting 3 seconds ...\n";
+  StartAndEndSpans();
+  std::this_thread::sleep_for(std::chrono::milliseconds(3000 + 50));
+  std::cout << "....Exported!\n\n\n";
 
-    // The spans should now be exported.
-    printf("....Exported!\n\n\n");
-  }
-
-  {
-    // Generate `kNumSpans` spans.
-    StartAndEndSpans();
-
-    printf("Exporting second batch of %d spans in 3 seconds ...\n", kNumSpans);
-    // Sleep for schedule_delay_millis + small delay to account for export time.
-    std::this_thread::sleep_for(std::chrono::milliseconds(3000 + 50));
-
-    // The spans should now be exported.
-    printf("....Exported!\n\n\n");
-  }
-
-  {
-    // Generate `kNumSpans` spans.
-    StartAndEndSpans();
-
-    printf("Shutting down and draining queue.... \n");
-    std::this_thread::sleep_for(std::chrono::milliseconds(2000));
-    // We immediately let the program terminate which invokes the processor destructor
-    // which in turn invokes the processor Shutdown(), which finally drains the queue of ALL
-    // its spans.
-  }
+  // Shutdown and drain queue
+  StartAndEndSpans();
+  printf("Shutting down and draining queue.... \n");
+  std::this_thread::sleep_for(std::chrono::milliseconds(2000));
+  // We immediately let the program terminate which invokes the processor destructor
+  // which in turn invokes the processor Shutdown(), which finally drains the queue of ALL
+  // its spans.
 }
