@@ -82,8 +82,6 @@ public:
   Span &operator=(const Span &) = delete;
   Span &operator=(Span &&) = delete;
 
-  context::Token *token_;
-
   // Sets an attribute on the Span. If the Span previously contained a mapping
   // for
   // the key, the old value is replaced.
@@ -165,6 +163,10 @@ public:
   virtual bool IsRecording() const noexcept = 0;
 
   virtual Tracer &tracer() const noexcept = 0;
+
+  virtual context::Token *GetToken() const noexcept = 0;
+
+  virtual void SetToken(context::Token *token) noexcept = 0;
 };
 }  // namespace trace
 OPENTELEMETRY_END_NAMESPACE
