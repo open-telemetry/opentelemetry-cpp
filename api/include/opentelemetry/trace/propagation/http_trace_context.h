@@ -90,33 +90,6 @@ public:
     return (span.get());
   }
 
-  static void InjectTraceParent(const SpanContext &span_context, T &carrier, Setter setter)
-  {
-    char trace_id[32];
-    TraceId(span_context.trace_id()).ToLowerBase16(trace_id);
-    char span_id[16];
-    SpanId(span_context.span_id()).ToLowerBase16(span_id);
-    char trace_flags[2];
-    TraceFlags(span_context.trace_flags()).ToLowerBase16(trace_flags);
-    // Note: This is only temporary replacement for appendable string
-    std::string hex_string = "00-";
-    for (int i = 0; i < 32; i++)
-    {
-      hex_string += trace_id[i];
-    }
-    hex_string += "-";
-    for (int i = 0; i < 16; i++)
-    {
-      hex_string += span_id[i];
-    }
-    hex_string += "-";
-    for (int i = 0; i < 2; i++)
-    {
-      hex_string += trace_flags[i];
-    }
-    setter(carrier, kTraceParent, hex_string);
-  }
-
   static TraceId GenerateTraceIdFromString(nostd::string_view trace_id)
   {
     const char *tid = trace_id.begin();
@@ -162,20 +135,6 @@ public:
     return TraceFlags(buf);
   }
 
-  static void InjectTraceState(TraceState trace_state, T &carrier, Setter setter)
-  {
-    std::string trace_state_string                           = "";
-    std::map<nostd::string_view, nostd::string_view> entries = trace_state.entries();
-    for (std::map<nostd::string_view, nostd::string_view>::const_iterator it = entries.begin();
-         it != entries.end(); it++)
-    {
-      if (it != entries.begin())
-        trace_state_string += ",";
-      trace_state_string += std::string(it->first) + "=" + std::string(it->second);
-    }
-    setter(carrier, kTraceState, trace_state_string);
-  }
-
 private:
   static uint8_t CharToInt(char c)
   {
@@ -197,6 +156,47 @@ private:
     }
   }
 
+  static void InjectTraceState(TraceState trace_state, T &carrier, Setter setter)
+  {
+    std::string trace_state_string                           = "";
+    std::map<nostd::string_view, nostd::string_view> entries = trace_state.entries();
+    for (std::map<nostd::string_view, nostd::string_view>::const_iterator it = entries.begin();
+         it != entries.end(); it++)
+    {
+      if (it != entries.begin())
+        trace_state_string += ",";
+      trace_state_string += std::string(it->first) + "=" + std::string(it->second);
+    }
+    setter(carrier, kTraceState, trace_state_string);
+  }
+
+  static void InjectTraceParent(const SpanContext &span_context, T &carrier, Setter setter)
+  {
+    char trace_id[32];
+    TraceId(span_context.trace_id()).ToLowerBase16(trace_id);
+    char span_id[16];
+    SpanId(span_context.span_id()).ToLowerBase16(span_id);
+    char trace_flags[2];
+    TraceFlags(span_context.trace_flags()).ToLowerBase16(trace_flags);
+    // Note: This is only temporary replacement for appendable string
+    std::string hex_string = "00-";
+    for (int i = 0; i < 32; i++)
+    {
+      hex_string += trace_id[i];
+    }
+    hex_string += "-";
+    for (int i = 0; i < 16; i++)
+    {
+      hex_string += span_id[i];
+    }
+    hex_string += "-";
+    for (int i = 0; i < 2; i++)
+    {
+      hex_string += trace_flags[i];
+    }
+    setter(carrier, kTraceParent, hex_string);
+  }
+
   static void InjectImpl(Setter setter, T &carrier, const SpanContext &span_context)
   {
     InjectTraceParent(span_context, carrier, setter);
@@ -214,7 +214,7 @@ private:
     if (!is_valid)
     {
       std::cout << "Unparseable trace_parent header. Returning INVALID span context." << std::endl;
-      return SpanContext();
+      return SpanContext(false, false);
     }
     nostd::string_view version;
     nostd::string_view trace_id;
@@ -245,14 +245,15 @@ private:
           }
           else
           {
-            return SpanContext();  // Impossible to have more than 4 elements in parent header
+            return SpanContext(false,
+                               false);  // Impossible to have more than 4 elements in parent header
           }
           countdown = kHeaderElementLengths[++elt_num];
           start_pos = -1;
         }
         else
         {
-          return SpanContext();
+          return SpanContext(false, false);
         }
       }
       else if ((trace_parent[i] >= 'a' && trace_parent[i] <= 'f') ||
@@ -264,18 +265,18 @@ private:
       }
       else
       {
-        return SpanContext();
+        return SpanContext(false, false);
       }
     }
     trace_flags = trace_parent.substr(start_pos, kHeaderElementLengths[elt_num]);
 
     if (trace_id == "00000000000000000000000000000000" || span_id == "0000000000000000")
     {
-      return SpanContext();
+      return SpanContext(false, false);
     }
     if (version == "ff")
     {
-      return SpanContext();
+      return SpanContext(false, false);
     }
     if (trace_id.length() == 32 && span_id.length() == 16 && trace_flags.length() == 2)
     {
@@ -287,7 +288,7 @@ private:
     else
     {
       std::cout << "Unparseable trace_parent header. Returning INVALID span context." << std::endl;
-      return SpanContext();
+      return SpanContext(false, false);
     }
   }
 
@@ -353,7 +354,7 @@ private:
     nostd::string_view trace_parent = getter(carrier, kTraceParent);
     if (trace_parent == "")
     {
-      return SpanContext();
+      return SpanContext(false, false);
     }
     SpanContext context_from_parent_header = ExtractContextFromTraceParent(trace_parent);
     if (!context_from_parent_header.IsValid())

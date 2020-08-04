@@ -30,9 +30,10 @@ class SpanContext final
 {
 public:
   // An invalid SpanContext.
-  SpanContext() noexcept : trace_state_(new TraceState) {}
-  SpanContext(bool sampled_flag, bool has_remote_parent)
-      : trace_flags_(trace::TraceFlags((uint8_t)sampled_flag)), remote_parent_(has_remote_parent){};
+  SpanContext(bool sampled_flag, bool has_remote_parent) noexcept
+      : trace_flags_(trace::TraceFlags((uint8_t)sampled_flag)),
+        trace_state_(new TraceState),
+        remote_parent_(has_remote_parent){};
   SpanContext(TraceId trace_id,
               SpanId span_id,
               TraceFlags trace_flags,
