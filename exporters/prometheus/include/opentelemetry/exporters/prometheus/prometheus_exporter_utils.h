@@ -57,6 +57,9 @@ private:
   static void SetMetricFamily(metric_sdk::Record &record,
                               prometheus_client::MetricFamily *metric_family);
 
+  /**
+   * Set value to metric family for different aggregators
+   */
   template <typename T>
   static void SetMetricFamilyByAggregator(nostd::shared_ptr<metric_sdk::Aggregator<T>> aggregator,
                                           std::string labels_str,
@@ -94,7 +97,7 @@ private:
   /**
    * Set metric data for:
    * MinMaxSumCount => Prometheus Gauge
-   * Use Average (sum / count) as the gauge metric
+   * Use the average (sum/count) as the gauge metric
    */
   static void SetData(double value,
                       const std::string &labels,
@@ -112,6 +115,9 @@ private:
                       std::chrono::nanoseconds time,
                       prometheus_client::MetricFamily *metric_family);
 
+  /**
+   * Set time and labels to metric data
+   */
   static void SetMetricBasic(prometheus_client::ClientMetric &metric,
                              std::chrono::nanoseconds time,
                              const std::string &labels);
@@ -120,9 +126,6 @@ private:
    * Parse a string of labels (key:value) into a vector of pairs
    * {,}
    * {l1:v1,l2:v2,...,}
-   *
-   * @param labels a string of labels
-   * @return a vector of key value pairs
    */
   static std::vector<std::pair<std::string, std::string>> ParseLabel(std::string labels);
 
