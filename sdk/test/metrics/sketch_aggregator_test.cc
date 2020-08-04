@@ -59,8 +59,7 @@ TEST(Sketch, NormalValues)
   EXPECT_EQ(alpha.get_counts(), correct);
 
   std::vector<double> captured_bounds = alpha.get_boundaries();
-    std::cerr <<"captured bounds size " <<captured_bounds.size() <<std::endl;
-  for (int i = 0; i < captured_bounds.size(); i++)
+  for (size_t i = 0; i < (size_t)captured_bounds.size(); i++)
   {
     captured_bounds[i] = round(captured_bounds[i]);
   }
