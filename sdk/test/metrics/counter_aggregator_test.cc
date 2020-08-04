@@ -37,7 +37,7 @@ TEST(CounterAggregator, Update)
   int sum = 0;
   for (int i = 0; i < 100; i++)
   {
-    int tmp = std::rand();
+    int tmp = std::rand() % 128;
     beta.update(tmp);
     sum += tmp;
   }
