@@ -44,8 +44,9 @@ private:
     auto agg     = nostd::get<std::shared_ptr<sdkmetrics::Aggregator<T>>>(value);
     auto aggKind = agg->get_aggregator_kind();
 
-    if (!agg) return;
-    switch(aggKind)
+    if (!agg)
+      return;
+    switch (aggKind)
     {
       case sdkmetrics::AggregatorKind::Counter:
       {
