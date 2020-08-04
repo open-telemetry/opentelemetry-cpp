@@ -37,9 +37,6 @@ private:
    * This function is needed because names in OpenTelemetry can contain
    * alphanumeric characters, '_', '.', and '-', whereas in Prometheus the
    * name should only contain alphanumeric characters and '_'.
-   *
-   * @param key name in OpenTelemetry
-   * @return sanitized name in Prometheus
    */
   static std::string SanitizeNames(std::string name);
 
@@ -51,17 +48,11 @@ private:
    * 2. They are case-insensitive
    * 3. The first character must be non-numeric, non-space, non-punctuation
    * 4. Subsequent characters must belong to the alphanumeric characters, '_', '.', and '-'.
-   *
-   * @param name name to be determined
-   * @return a boolean flag
    */
   static bool IsValidName(const std::string &name);
 
   /**
    * Set value to metric family according to record
-   *
-   * @param record
-   * @param metric_family
    */
   static void SetMetricFamily(metric_sdk::Record &record,
                               prometheus_client::MetricFamily *metric_family);
@@ -73,9 +64,6 @@ private:
 
   /**
    * Translate the OTel metric type to Prometheus metric type
-   *
-   * @param kind
-   * @return
    */
   static prometheus_client::MetricType TranslateType(metric_sdk::AggregatorKind kind);
 
@@ -133,7 +121,7 @@ private:
    * {,}
    * {l1:v1,l2:v2,...,}
    *
-   * @param a string of labels
+   * @param labels a string of labels
    * @return a vector of key value pairs
    */
   static std::vector<std::pair<std::string, std::string>> ParseLabel(std::string labels);
