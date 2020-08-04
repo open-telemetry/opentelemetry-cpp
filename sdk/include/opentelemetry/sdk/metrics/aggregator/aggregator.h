@@ -45,6 +45,7 @@ public:
    * @return none
    */
   virtual void update(T val) = 0;
+
   /**
    * Checkpoints the current value.  This function will overwrite the current checkpoint with the
    * current value.
@@ -53,6 +54,7 @@ public:
    * @return none
    */
   virtual void checkpoint() = 0;
+
   /**
    * Merges the values of two aggregators in a semantically accurate manner.
    * Merging will occur differently for different aggregators depending on the
@@ -70,6 +72,7 @@ public:
    * @return the value of the checkpoint
    */
   virtual std::vector<T> get_checkpoint() = 0;
+
   /**
    * Returns the current value
    *
@@ -77,6 +80,7 @@ public:
    * @return the present aggregator value
    */
   virtual std::vector<T> get_values() = 0;
+
   /**
    * Returns the instrument kind which this aggregator is associated with
    *

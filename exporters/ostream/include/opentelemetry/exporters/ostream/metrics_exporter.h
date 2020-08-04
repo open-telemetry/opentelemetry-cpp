@@ -44,26 +44,30 @@ private:
     auto agg     = nostd::get<std::shared_ptr<sdkmetrics::Aggregator<T>>>(value);
     auto aggKind = agg->get_aggregator_kind();
 
-    if (agg != nullptr)
+    if (!agg) return;
+    switch(aggKind)
     {
-      if (aggKind == sdkmetrics::AggregatorKind::Counter)
+      case sdkmetrics::AggregatorKind::Counter:
       {
         sout_ << "\n  sum         : " << agg->get_checkpoint()[0];
       }
-      else if (aggKind == sdkmetrics::AggregatorKind::MinMaxSumCount)
+      break;
+      case sdkmetrics::AggregatorKind::MinMaxSumCount:
       {
         auto mmsc = agg->get_checkpoint();
         sout_ << "\n  min         : " << mmsc[0] << "\n  max         : " << mmsc[1]
               << "\n  sum         : " << mmsc[2] << "\n  count       : " << mmsc[3];
       }
-      else if (aggKind == sdkmetrics::AggregatorKind::Gauge)
+      break;
+      case sdkmetrics::AggregatorKind::Gauge:
       {
         auto timestamp = agg->get_checkpoint_timestamp();
 
         sout_ << "\n  last value  : " << agg->get_checkpoint()[0]
               << "\n  timestamp   : " << std::to_string(timestamp.time_since_epoch().count());
       }
-      else if (aggKind == sdkmetrics::AggregatorKind::Exact)
+      break;
+      case sdkmetrics::AggregatorKind::Exact:
       {
         // TODO: Find better way to print quantiles
         if (agg->get_quant_estimation())
@@ -93,7 +97,8 @@ private:
           sout_ << ']';
         }
       }
-      else if (aggKind == sdkmetrics::AggregatorKind::Histogram)
+      break;
+      case sdkmetrics::AggregatorKind::Histogram:
       {
         auto boundaries = agg->get_boundaries();
         auto counts     = agg->get_counts();
@@ -122,7 +127,8 @@ private:
         }
         sout_ << ']';
       }
-      else if (aggKind == sdkmetrics::AggregatorKind::Sketch)
+      break;
+      case sdkmetrics::AggregatorKind::Sketch:
       {
         auto boundaries = agg->get_boundaries();
         auto counts     = agg->get_counts();
@@ -151,6 +157,7 @@ private:
         }
         sout_ << ']';
       }
+      break;
     }
   }
 };
