@@ -78,6 +78,7 @@ public:
 
   virtual std::vector<Record> GetRecords() override
   {
+    this->mu_.lock();
     std::vector<Record> ret;
     for (auto x : boundAggregators_)
     {
@@ -85,6 +86,7 @@ public:
       ret.push_back(Record(this->GetName(), this->GetDescription(), x.first, x.second));
     }
     boundAggregators_.clear();
+    this->mu_.unlock();
     return ret;
   }
 
@@ -173,6 +175,7 @@ public:
 
   virtual std::vector<Record> GetRecords() override
   {
+    this->mu_.lock();
     std::vector<Record> ret;
     for (auto x : boundAggregators_)
     {
@@ -180,6 +183,7 @@ public:
       ret.push_back(Record(this->GetName(), this->GetDescription(), x.first, x.second));
     }
     boundAggregators_.clear();
+    this->mu_.unlock();
     return ret;
   }
 
@@ -247,6 +251,7 @@ public:
 
   virtual std::vector<Record> GetRecords() override
   {
+    this->mu_.lock();
     std::vector<Record> ret;
     for (auto x : boundAggregators_)
     {
@@ -254,6 +259,7 @@ public:
       ret.push_back(Record(this->GetName(), this->GetDescription(), x.first, x.second));
     }
     boundAggregators_.clear();
+    this->mu_.unlock();
     return ret;
   }
 
