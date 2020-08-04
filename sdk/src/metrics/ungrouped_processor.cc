@@ -1,5 +1,7 @@
 #include "opentelemetry/sdk/metrics/ungrouped_processor.h"
 
+#define UNGROUPED_PROCESSOR_STRINGER(x) (#x)
+
 OPENTELEMETRY_BEGIN_NAMESPACE
 
 namespace sdk
@@ -64,7 +66,7 @@ void UngroupedMetricsProcessor::process(sdkmetrics::Record record) noexcept
   std::string label       = record.GetLabels();
   std::string name        = record.GetName();
   std::string description = record.GetDescription();
-  std::string instrument  = stringer(get_instrument(aggregator));
+  std::string instrument  = UNGROUPED_PROCESSOR_STRINGER(get_instrument(aggregator));
 
   std::string batch_key = "/name/" + name + "/description/" + description + "/labels/" + label +
                           "/instrument/" + instrument;
@@ -176,3 +178,5 @@ void UngroupedMetricsProcessor::process(sdkmetrics::Record record) noexcept
 }  // namespace sdk
 
 OPENTELEMETRY_END_NAMESPACE
+
+#undef UNGROUPED_PROCESSOR_STRINGER
