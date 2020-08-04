@@ -3,6 +3,7 @@
 #include <chrono>
 #include <unordered_map>
 #include <vector>
+#include "opentelemetry/common/attribute_value.h"
 #include "opentelemetry/core/timestamp.h"
 #include "opentelemetry/nostd/string_view.h"
 #include "opentelemetry/sdk/trace/recordable.h"
@@ -189,7 +190,8 @@ public:
     parent_span_id_ = parent_span_id;
   }
 
-  void SetAttribute(nostd::string_view key, const common::AttributeValue &value) noexcept override
+  void SetAttribute(nostd::string_view key,
+                    const opentelemetry::common::AttributeValue &value) noexcept override
   {
     attributes_[std::string(key)] = nostd::visit(converter_, value);
   }

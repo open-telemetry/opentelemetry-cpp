@@ -8,7 +8,7 @@
 #include <thread>
 #include <vector>
 
-#include "src/common/circular_buffer.h"
+#include "opentelemetry/sdk/common/circular_buffer.h"
 #include "test/common/baseline_circular_buffer.h"
 using opentelemetry::sdk::common::AtomicUniquePtr;
 using opentelemetry::sdk::common::CircularBuffer;
