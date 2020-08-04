@@ -7,9 +7,9 @@
 #include <utility>
 #include <vector>
 
+#include "opentelemetry/ext/zpages/threadsafe_span_data.h"
 #include "opentelemetry/sdk/trace/processor.h"
 #include "opentelemetry/sdk/trace/recordable.h"
-#include "opentelemetry/ext/zpages/threadsafe_span_data.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace ext
@@ -20,11 +20,12 @@ namespace zpages
  * The span processor passes and stores running and completed recordables (casted as span_data)
  * to be used by the TraceZ Data Aggregator.
  */
-class TracezSpanProcessor : public opentelemetry::sdk::trace::SpanProcessor {
- public:
-
-  struct CollectedSpans {
-    std::unordered_set<ThreadsafeSpanData*> running;
+class TracezSpanProcessor : public opentelemetry::sdk::trace::SpanProcessor
+{
+public:
+  struct CollectedSpans
+  {
+    std::unordered_set<ThreadsafeSpanData *> running;
     std::vector<std::unique_ptr<ThreadsafeSpanData>> completed;
   };
 
