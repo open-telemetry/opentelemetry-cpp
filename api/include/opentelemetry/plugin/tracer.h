@@ -13,8 +13,8 @@ namespace plugin
 class Span final : public trace::Span
 {
 public:
-  Span(std::shared_ptr<trace::Tracer> &&tracer, std::unique_ptr<trace::Span> &&span) noexcept
-      : tracer_{std::move(tracer)}, span_{std::move(span)}
+  Span(std::shared_ptr<trace::Tracer> &&tracer, nostd::shared_ptr<trace::Span> span) noexcept
+      : tracer_{std::move(tracer)}, span_{span}
   {}
 
   // trace::Span
@@ -50,9 +50,13 @@ public:
 
   trace::Tracer &tracer() const noexcept override { return *tracer_; }
 
+  context::Token *GetToken() const noexcept override { return nullptr; }
+
+  void SetToken(context::Token *token) noexcept override {}
+
 private:
   std::shared_ptr<trace::Tracer> tracer_;
-  std::unique_ptr<trace::Span> span_;
+  nostd::shared_ptr<trace::Span> span_;
 };
 
 class Tracer final : public trace::Tracer, public std::enable_shared_from_this<Tracer>
@@ -74,8 +78,7 @@ public:
     {
       return nostd::shared_ptr<trace::Span>(nullptr);
     }
-    return nostd::shared_ptr<trace::Span>{new (std::nothrow)
-                                              Span{this->shared_from_this(), std::move(span)}};
+    return nostd::shared_ptr<trace::Span>{new (std::nothrow) Span{this->shared_from_this(), span}};
   }
 
   void ForceFlushWithMicroseconds(uint64_t timeout) noexcept override
