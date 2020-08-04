@@ -35,9 +35,9 @@ TEST(ApiSdkConversion, async){
     
     alpha->observe(123456,labelkv);
     AggregatorVariant canCollect = dynamic_cast<AsynchronousInstrument<int>*>(alpha.get())->GetRecords()[0].GetAggregator();
-    EXPECT_EQ(nostd::holds_alternative<nostd::shared_ptr<Aggregator<short>>>(canCollect), false);
-    EXPECT_EQ(nostd::holds_alternative<nostd::shared_ptr<Aggregator<int>>>(canCollect), true);
-    EXPECT_EQ(nostd::get<nostd::shared_ptr<Aggregator<int>>>(canCollect)->get_checkpoint()[0], 123456);
+    EXPECT_EQ(nostd::holds_alternative<std::shared_ptr<Aggregator<short>>>(canCollect), false);
+    EXPECT_EQ(nostd::holds_alternative<std::shared_ptr<Aggregator<int>>>(canCollect), true);
+    EXPECT_EQ(nostd::get<std::shared_ptr<Aggregator<int>>>(canCollect)->get_checkpoint()[0], 123456);
 }
 
 TEST(IntValueObserver, InstrumentFunctions)
