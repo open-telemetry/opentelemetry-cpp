@@ -76,6 +76,17 @@ cc_test(
 )
 
 cc_test(
+    name = "sketch_aggregator_test",
+    srcs = [
+        "sketch_aggregator_test.cc",
+    ],
+    deps = [
+        "//sdk/src/metrics",
+        "@com_google_googletest//:gtest_main",
+    ],
+)
+
+cc_test(
     name = "ungrouped_processor_test",
     srcs = [
         "ungrouped_processor_test.cc",

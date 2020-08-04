@@ -2,6 +2,7 @@
 
 #include <algorithm>
 #include <cmath>
+#include <limits>
 #include <map>
 #include <mutex>
 #include <stdexcept>
@@ -20,7 +21,8 @@ namespace metrics
 
 /** Sketch Aggregators implement the DDSketch data type.  Note that data is compressed
  *  by the DDSketch algorithm and users should be informed about its behavior before
- *  selecting it as the aggregation type.
+ *  selecting it as the aggregation type.  NOTE: The current implementation can only support
+ *  non-negative values.
  *
  *  Detailed information about the algorithm can be found in the following paper
  *  published by Datadog: http://www.vldb.org/pvldb/vol12/p2195-masson.pdf
@@ -62,8 +64,23 @@ public:
   void update(T val) override
   {
     this->mu_.lock();
-    double idx = ceil(log(val) / log(gamma));
-    raw_[idx] += 1;
+    int idx;
+    if (val == 0)
+    {
+      idx = std::numeric_limits<int>::min();
+    }
+    else
+    {
+      idx = ceil(log(val) / log(gamma));
+    }
+    if (raw_.find(idx) != raw_.end())
+    {
+      raw_[idx] += 1;
+    }
+    else
+    {
+      raw_[idx] = 1;
+    }
     this->values_[1] += 1;
     this->values_[0] += val;
     if (raw_.size() > max_buckets_)
@@ -94,7 +111,6 @@ public:
     int idx   = iter->first;
     int count = iter->second;
 
-    // will iterator ever reach the end, think it is a possibility
     while (count < (q * (this->checkpoint_[1] - 1)) && iter != checkpoint_raw_.end())
     {
       iter++;
@@ -154,7 +170,6 @@ public:
     this->values_[1] += other.values_[1];
     this->checkpoint_[0] += other.checkpoint_[0];
     this->checkpoint_[1] += other.checkpoint_[1];
-
     auto other_iter = other.raw_.begin();
     while (other_iter != other.raw_.end())
     {
@@ -167,7 +182,6 @@ public:
       }
       other_iter++;
     }
-
     auto other_ckpt_iter = other.checkpoint_raw_.begin();
     while (other_ckpt_iter != other.checkpoint_raw_.end())
     {
@@ -224,6 +238,14 @@ public:
   virtual double get_error_bound() override { return error_bound_; }
 
   /**
+   * Returns the maximum allowed buckets
+   *
+   * @param none
+   * @return the maximum allowed buckets
+   */
+  virtual size_t get_max_buckets() override { return max_buckets_; }
+
+  /**
    * Returns the count of each value tracked by this sketch aggregator.  These are returned
    * in the same order as the indices returned by the get_boundaries function.
    *
@@ -240,12 +262,10 @@ public:
     return ret;
   }
 
-  virtual size_t get_max_buckets() override { return max_buckets_; }
-
 private:
   double gamma;
-  size_t max_buckets_;
   double error_bound_;
+  size_t max_buckets_;
   std::map<int, int> raw_;
   std::map<int, int> checkpoint_raw_;
 };
