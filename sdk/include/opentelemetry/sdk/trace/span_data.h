@@ -86,13 +86,50 @@ struct AttributeConverter
 };
 
 /**
+ * Class for storing attributes.
+ */
+class AttributeMap
+{
+public:
+  // Contruct empty attribute map
+  AttributeMap(){};
+
+  // Contruct attribute map and populate with attributes
+  AttributeMap(const trace_api::KeyValueIterable &attributes)
+  {
+    attributes.ForEachKeyValue(
+        [&](nostd::string_view key, opentelemetry::common::AttributeValue value) noexcept {
+          SetAttribute(key, value);
+          return true;
+        });
+  }
+
+  const std::unordered_map<std::string, SpanDataAttributeValue> &GetAttributes() const noexcept
+  {
+    return attributes_;
+  }
+
+  void SetAttribute(nostd::string_view key,
+                    const opentelemetry::common::AttributeValue &value) noexcept
+  {
+    attributes_[std::string(key)] = nostd::visit(converter_, value);
+  }
+
+private:
+  std::unordered_map<std::string, SpanDataAttributeValue> attributes_;
+  AttributeConverter converter_;
+};
+
+/**
  * Class for storing events in SpanData.
  */
 class SpanDataEvent
 {
 public:
-  SpanDataEvent(std::string name, core::SystemTimestamp timestamp)
-      : name_(name), timestamp_(timestamp)
+  SpanDataEvent(std::string name,
+                core::SystemTimestamp timestamp,
+                const trace_api::KeyValueIterable &attributes)
+      : name_(name), timestamp_(timestamp), attribute_map_(attributes)
   {}
   /**
    * Get the name for this event
@@ -106,46 +143,41 @@ public:
    */
   core::SystemTimestamp GetTimestamp() const noexcept { return timestamp_; }
 
+  /**
+   * Get the attributes for this event
+   * @return the attributes for this event
+   */
   const std::unordered_map<std::string, SpanDataAttributeValue> &GetAttributes() const noexcept
   {
-    return attributes_;
-  }
-
-  void SetAttribute(nostd::string_view key,
-                    const opentelemetry::common::AttributeValue &value) noexcept
-  {
-    attributes_[std::string(key)] = nostd::visit(converter_, value);
+    return attribute_map_.GetAttributes();
   }
 
 private:
   std::string name_;
   core::SystemTimestamp timestamp_;
-  std::unordered_map<std::string, SpanDataAttributeValue> attributes_;
-  AttributeConverter converter_;
+  AttributeMap attribute_map_;
 };
 
 /**
  * Class for storing links in SpanData.
+ * TODO: Add trace_id, span_id and trace_state when these are supported by SpanContext
  */
 class SpanDataLink
 {
 public:
-  SpanDataLink() {}
+  SpanDataLink(const trace_api::KeyValueIterable &attributes) : attribute_map_(attributes) {}
 
+  /**
+   * Get the attributes for this link
+   * @return the attributes for this link
+   */
   const std::unordered_map<std::string, SpanDataAttributeValue> &GetAttributes() const noexcept
   {
-    return attributes_;
-  }
-
-  void SetAttribute(nostd::string_view key,
-                    const opentelemetry::common::AttributeValue &value) noexcept
-  {
-    attributes_[std::string(key)] = nostd::visit(converter_, value);
+    return attribute_map_.GetAttributes();
   }
 
 private:
-  std::unordered_map<std::string, SpanDataAttributeValue> attributes_;
-  AttributeConverter converter_;
+  AttributeMap attribute_map_;
 };
 
 /**
@@ -208,7 +240,7 @@ public:
    */
   const std::unordered_map<std::string, SpanDataAttributeValue> &GetAttributes() const noexcept
   {
-    return attributes_;
+    return attribute_map_.GetAttributes();
   }
 
   /**
@@ -235,37 +267,23 @@ public:
   void SetAttribute(nostd::string_view key,
                     const opentelemetry::common::AttributeValue &value) noexcept override
   {
-    attributes_[std::string(key)] = nostd::visit(converter_, value);
+    attribute_map_.SetAttribute(key, value);
   }
 
   void AddEvent(nostd::string_view name,
                 core::SystemTimestamp timestamp,
                 const trace_api::KeyValueIterable &attributes) noexcept override
   {
-    SpanDataEvent event(std::string(name), timestamp);
-
-    attributes.ForEachKeyValue(
-        [&](nostd::string_view key, opentelemetry::common::AttributeValue value) noexcept {
-          event.SetAttribute(key, value);
-          return true;
-        });
-
+    SpanDataEvent event(std::string(name), timestamp, attributes);
     events_.push_back(event);
   }
 
   void AddLink(opentelemetry::trace::SpanContext span_context,
                const trace_api::KeyValueIterable &attributes) noexcept override
   {
-    SpanDataLink link;
-
-    attributes.ForEachKeyValue(
-        [&](nostd::string_view key, opentelemetry::common::AttributeValue value) noexcept {
-          link.SetAttribute(key, value);
-          return true;
-        });
-
+    SpanDataLink link(attributes);
     links_.push_back(link);
-    // TODO: Populate trace_id, span_id and trace_state when these are supported by SpanContext
+    // TODO: Add trace_id, span_id and trace_state when these are supported by SpanContext
   }
 
   void SetStatus(trace_api::CanonicalCode code, nostd::string_view description) noexcept override
@@ -292,7 +310,7 @@ private:
   std::string name_;
   opentelemetry::trace::CanonicalCode status_code_{opentelemetry::trace::CanonicalCode::OK};
   std::string status_desc_;
-  std::unordered_map<std::string, SpanDataAttributeValue> attributes_;
+  AttributeMap attribute_map_;
   std::vector<SpanDataEvent> events_;
   std::vector<SpanDataLink> links_;
   AttributeConverter converter_;

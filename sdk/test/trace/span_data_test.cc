@@ -59,7 +59,7 @@ TEST(SpanData, EventAttributes)
   SpanData data;
   const int kNumAttributes              = 3;
   std::string keys[kNumAttributes]      = {"attr1", "attr2", "attr3"};
-  int values[kNumAttributes]            = {4, 7, 23};
+  int values[kNumAttributes]            = {3, 5, 20};
   std::map<std::string, int> attributes = {
       {keys[0], values[0]}, {keys[1], values[1]}, {keys[2], values[2]}};
 
@@ -79,7 +79,7 @@ TEST(SpanData, Links)
   SpanData data;
   const int kNumAttributes              = 3;
   std::string keys[kNumAttributes]      = {"attr1", "attr2", "attr3"};
-  int values[kNumAttributes]            = {4, 7, 23};
+  int values[kNumAttributes]            = {4, 12, 33};
   std::map<std::string, int> attributes = {
       {keys[0], values[0]}, {keys[1], values[1]}, {keys[2], values[2]}};
 
