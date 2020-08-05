@@ -159,13 +159,13 @@ private:
   static void InjectTraceState(TraceState trace_state, T &carrier, Setter setter)
   {
     std::string trace_state_string                           = "";
-    std::map<nostd::string_view, nostd::string_view> entries = trace_state.entries();
-    for (std::map<nostd::string_view, nostd::string_view>::const_iterator it = entries.begin();
-         it != entries.end(); it++)
-    {
-      if (it != entries.begin())
+    nostd::span<Entries> entries = trace_state.Entries();
+    Entry* entry = entries.data();
+    while (entry != entries.end()) {
+      if (entry != entries.begin())
         trace_state_string += ",";
-      trace_state_string += std::string(it->first) + "=" + std::string(it->second);
+      trace_state_string += std::string(entry->GetKey()) + "=" + std::string(entry->GetValue());
+      entry++;
     }
     setter(carrier, kTraceState, trace_state_string);
   }
@@ -294,12 +294,13 @@ private:
 
   static TraceState ExtractTraceState(nostd::string_view &trace_state_header)
   {
-    //   TraceState.Builder trace_state_builder = TraceState.builder();
     TraceState trace_state = TraceState();
     int start_pos          = -1;
     int end_pos            = -1;
+    int ctr_pos            = -1;
     int element_num        = 0;
-    nostd::string_view list_member;
+    nostd::string_view key;
+    nostd::string_view val;
     for (int i = 0; i < int(trace_state_header.length()); i++)
     {
       if (trace_state_header[i] == '\t')
@@ -309,11 +310,18 @@ private:
         if (start_pos == -1 && end_pos == -1)
           continue;
         element_num++;
-        list_member = trace_state_header.substr(start_pos, end_pos - start_pos + 1);
-        if (list_member != "")
-          AddNewMember(trace_state, list_member);
+        if (ctr_pos != -1) {
+          key = trace_state_header.substr(start_pos, ctr_pos - start_pos + 1);
+          val = trace_state_header.substr(ctr_pos + 1, end_pos - ctr_pos);
+          if (key != "")
+            trace_state.Set(key, val);
+        }
+        ctr_pos   = -1;
         end_pos   = -1;
         start_pos = -1;
+      }
+      else if (trace_state_header[i] == '=') {
+        ctr_pos = i;
       }
       else
       {
@@ -324,9 +332,12 @@ private:
     }
     if (start_pos != -1 && end_pos != -1)
     {
-      list_member = trace_state_header.substr(start_pos, end_pos - start_pos + 1);
-      if (list_member != "")
-        AddNewMember(trace_state, list_member);
+      if (ctr_pos != -1) {
+        key = trace_state_header.substr(start_pos, ctr_pos - start_pos + 1);
+        val = trace_state_header.substr(ctr_pos + 1, end_pos - ctr_pos);
+        if (key != "")
+          trace_state.Set(key, val);
+      }
       element_num++;
     }
 
