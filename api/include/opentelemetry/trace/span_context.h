@@ -31,9 +31,9 @@ class SpanContext final
 public:
   // An invalid SpanContext.
   SpanContext() noexcept
-      : trace_flags_(trace::TraceFlags((uint8_t)sampled_flag)),
+      : trace_flags_(trace::TraceFlags((uint8_t)false)),
         race_state_(new TraceState),
-        emote_parent_(has_remote_parent){};
+        emote_parent_(false){};
 
   SpanContext(bool sampled_flag, bool has_remote_parent) noexcept
       : trace_flags_(trace::TraceFlags((uint8_t)sampled_flag)),
