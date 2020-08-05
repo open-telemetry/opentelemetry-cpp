@@ -89,7 +89,7 @@ public:
 
   bool HasRemoteParent() const noexcept { return remote_parent_; }
 
-  static SpanContext GetInvalid() { return SpanContext(); }
+  static SpanContext GetInvalid() { return SpanContext(false, false); }
 
   bool IsSampled() const noexcept { return trace_flags_.IsSampled(); }
 
