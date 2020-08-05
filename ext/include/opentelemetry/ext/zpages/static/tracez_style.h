@@ -1,11 +1,5 @@
 #pragma once
 
-OPENTELEMETRY_BEGIN_NAMESPACE
-namespace ext
-{
-namespace zpages
-{
-
 const char tracez_style[] =
     ""
     "body {"
@@ -160,6 +154,3 @@ const char tracez_style[] =
     "}"
     "";
 
-}  // namespace zpages
-}  // namespace ext
-OPENTELEMETRY_END_NAMESPACE

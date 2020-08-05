@@ -1,11 +1,5 @@
 #pragma once
 
-OPENTELEMETRY_BEGIN_NAMESPACE
-namespace ext
-{
-namespace zpages
-{
-
 const char tracez_script[] =
     ""
     "window.onload = () => refreshData();"
@@ -290,6 +284,3 @@ const char tracez_script[] =
     "};"
     "";
 
-}  // namespace zpages
-}  // namespace ext
-OPENTELEMETRY_END_NAMESPACE
