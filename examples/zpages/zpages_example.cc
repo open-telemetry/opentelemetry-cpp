@@ -8,6 +8,8 @@
 
 #include "opentelemetry/ext/zpages/zpages.h" // Required file include for zpages
 
+using opentelemetry::core::SteadyTimestamp;
+
 int main(int argc, char* argv[]) {
   
   /** 
@@ -23,26 +25,31 @@ int main(int argc, char* argv[]) {
             << "creates a span every second for the duration of the application"
             << "\n";
   
-  // Create a map of attributes for the span
-  int listInt[] = {1, 2, 3};
+  // Error span
   std::map<std::string, opentelemetry::common::AttributeValue> attribute_map;
-  attribute_map["attribute1"] = opentelemetry::nostd::span<int>(listInt);
-  attribute_map["attribute2"] = 314159;
+  attribute_map["completed_search_for"] = "Unknown user";
+  tracer->StartSpan("user_query_span",attribute_map)->SetStatus(
+      opentelemetry::trace::CanonicalCode::NOT_FOUND, "User not found");
   
-  // Create a span of each type(running, completed and error)
-  tracer->StartSpan("examplespan1",attribute_map)->End();
+  // Long time duration span
+  std::map<std::string, opentelemetry::common::AttributeValue> attribute_map2;
+  attribute_map2["completed_search_for"] = "John Doe";
+  opentelemetry::trace::StartSpanOptions start;
+  start.start_steady_time = SteadyTimestamp(nanoseconds(1));
+  opentelemetry::trace::EndSpanOptions end;
+  end.end_steady_time = SteadyTimestamp(nanoseconds(1000000000000));
+  tracer->StartSpan("user_query_span",attribute_map2,start)->End(end);
 
-  tracer->StartSpan("examplespan1")->End();
-  tracer->StartSpan("examplespan1")->SetStatus(
-      opentelemetry::trace::CanonicalCode::CANCELLED, "Cancelled example");
   
-  // Create another running span with a different name
-  auto running_span = tracer->StartSpan("examplespan2");
+  // Running(deadlock) span
+  std::map<std::string, opentelemetry::common::AttributeValue> attribute_map3;
+  attribute_map3["searching_for"] = "Deleted user";
+  auto running_span = tracer->StartSpan("user_query_span", attribute_map3);
   
   // Create a completed span every second till user stops the loop
   std::cout << "Presss CTRL+C to stop...\n";
   while(true){
     std::this_thread::sleep_for(seconds(1));
-    tracer->StartSpan("examplespan")->End();
+    tracer->StartSpan("ping_user")->End();
   }
 }
