@@ -22,17 +22,23 @@ int main(int argc, char* argv[]) {
   std::cout << "This example for zPages creates a few types of spans and then "
             << "creates a span every second for the duration of the application"
             << "\n";
-  // Create a span of each type(running, completed and error)
-  auto running_span = tracer->StartSpan("examplespan1");
-  running_span->SetAttribute("attribute1", 314159);
-  running_span->End();
   
-  tracer->StartSpan("examplespan")->End();
-  tracer->StartSpan("examplespan")->SetStatus(
+  // Create a map of attributes for the span
+  int listInt[] = {1, 2, 3};
+  std::map<std::string, opentelemetry::common::AttributeValue> attribute_map;
+  attribute_map["attribute1"] = opentelemetry::nostd::span<int>(listInt);
+  attribute_map["attribute2"] = 314159;
+  
+  // Create a span of each type(running, completed and error)
+  tracer->StartSpan("examplespan1",attribute_map)->End();
+
+  tracer->StartSpan("examplespan1")->End();
+  tracer->StartSpan("examplespan1")->SetStatus(
       opentelemetry::trace::CanonicalCode::CANCELLED, "Cancelled example");
   
   // Create another running span with a different name
-  auto running_span2 = tracer->StartSpan("examplespan2");
+  auto running_span = tracer->StartSpan("examplespan2");
+  
   // Create a completed span every second till user stops the loop
   std::cout << "Presss CTRL+C to stop...\n";
   while(true){
