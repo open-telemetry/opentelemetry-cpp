@@ -1,7 +1,8 @@
 #include "src/trace/span.h"
-
 #include "opentelemetry/context/runtime_context.h"
 #include "opentelemetry/version.h"
+
+#include <iostream>
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace sdk
@@ -52,8 +53,6 @@ Span::Span(std::shared_ptr<Tracer> &&tracer,
       token_{nullptr}
 
 {
-  // token_ = nullptr;
-  // has_ended_ = false;
   (void)options;
   if (recordable_ == nullptr)
   {
@@ -73,6 +72,7 @@ Span::Span(std::shared_ptr<Tracer> &&tracer,
 
 Span::~Span()
 {
+  std::cout << "span destruction" << std::endl;
   End();
 }
 
@@ -125,12 +125,14 @@ void Span::UpdateName(nostd::string_view name) noexcept
 
 void Span::End(const trace_api::EndSpanOptions &options) noexcept
 {
+  std::cout << "ending span" << std::endl;
   std::lock_guard<std::mutex> lock_guard{mu_};
 
   if (has_ended_ == true)
   {
     return;
   }
+  std::cout << "first time" << std::endl;
   has_ended_ = true;
 
   if (token_ != nullptr)
