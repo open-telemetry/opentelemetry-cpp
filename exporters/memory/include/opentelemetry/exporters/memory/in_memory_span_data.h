@@ -1,15 +1,8 @@
 #pragma once
 
-#include "opentelemetry/sdk/trace/span_data.h"
-#include "opentelemetry/sdk/common/atomic_unique_ptr.h"
 #include "opentelemetry/sdk/common/circular_buffer.h"
-#include "opentelemetry/sdk/common/circular_buffer_range.h"
 #include "opentelemetry/sdk/trace/recordable.h"
-
-using opentelemetry::sdk::common::CircularBuffer;
-using opentelemetry::sdk::common::CircularBufferRange;
-using opentelemetry::sdk::common::AtomicUniquePtr;
-using opentelemetry::sdk::trace::Recordable;
+#include "vector"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace exporter
@@ -24,12 +17,12 @@ class InMemorySpanData final
 public:
   InMemorySpanData();
 
-  void Add(std::unique_ptr<Recordable> data) noexcept;
+  void Add(std::unique_ptr<opentelemetry::sdk::trace::Recordable> data) noexcept;
 
-  std::vector<std::unique_ptr<Recordable>> GetSpans() noexcept;
+  std::vector<std::unique_ptr<opentelemetry::sdk::trace::Recordable>> GetSpans() noexcept;
 
 private:
-  CircularBuffer<Recordable> spans_received_;
+  opentelemetry::sdk::common::CircularBuffer<opentelemetry::sdk::trace::Recordable> spans_received_;
 };
 }  // namespace memory
 }  // namespace exporter

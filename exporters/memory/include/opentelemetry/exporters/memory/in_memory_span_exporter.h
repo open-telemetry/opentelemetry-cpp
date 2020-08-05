@@ -1,7 +1,7 @@
 #pragma once
 
 #include "opentelemetry/sdk/trace/exporter.h"
-#include "in_memory_span_data.h"
+#include "opentelemetry/exporters/memory/in_memory_span_data.h"
 
 using opentelemetry::exporter::memory::InMemorySpanData;
 

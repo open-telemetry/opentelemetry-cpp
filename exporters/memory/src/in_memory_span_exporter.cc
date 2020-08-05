@@ -1,4 +1,8 @@
 #include "opentelemetry/exporters/memory/in_memory_span_exporter.h"
+#include "opentelemetry/sdk/trace/span_data.h"
+#include "opentelemetry/sdk/trace/recordable.h"
+
+using opentelemetry::sdk::trace::Recordable;
 
 #include <iostream>
 

@@ -1,8 +1,12 @@
 #include "opentelemetry/exporters/memory/in_memory_span_data.h"
+#include "opentelemetry/sdk/trace/span_data.h"
+#include "opentelemetry/sdk/common/atomic_unique_ptr.h"
+#include "opentelemetry/sdk/common/circular_buffer_range.h"
 
 using opentelemetry::sdk::common::CircularBuffer;
 using opentelemetry::sdk::common::CircularBufferRange;
 using opentelemetry::sdk::common::AtomicUniquePtr;
+using opentelemetry::sdk::trace::Recordable;
 
 const size_t MAX_BUFFER_SIZE = 100;
 
