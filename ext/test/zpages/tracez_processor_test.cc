@@ -572,14 +572,13 @@ TEST_F(TracezProcessor, RunningCompletedThreadSafety)
   std::vector<opentelemetry::nostd::shared_ptr<opentelemetry::trace::Span>> spans1;
   std::vector<opentelemetry::nostd::shared_ptr<opentelemetry::trace::Span>> spans2;
   StartManySpans(spans1, tracer, 500);
+  EndAllSpans(spans1);
 
   std::thread start(StartManySpans, std::ref(spans2), tracer, 500);
   std::thread end(EndAllSpans, std::ref(spans2));
 
   start.join();
   end.join();
-
-  EndAllSpans(spans1);
 }
 
 /*
