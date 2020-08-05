@@ -512,6 +512,12 @@ TEST_F(TracezProcessor, RunningThreadSafety)
 
   start1.join();
   start2.join();
+
+  std::thread end1(EndAllSpans, std::ref(spans1));
+  std::thread end2(EndAllSpans, std::ref(spans2));
+
+  end1.join();
+  end2.join();
 }
 
 /*
@@ -529,6 +535,9 @@ TEST_F(TracezProcessor, CompletedThreadSafety)
 
   end1.join();
   end2.join();
+
+  EndAllSpans(spans1);
+  EndAllSpans(spans2);
 }
 
 /*
@@ -551,6 +560,8 @@ TEST_F(TracezProcessor, SnapshotThreadSafety)
 
   snap3.join();
   snap4.join();
+
+  EndAllSpans(spans);
 }
 
 /*
@@ -563,10 +574,12 @@ TEST_F(TracezProcessor, RunningCompletedThreadSafety)
   StartManySpans(spans1, tracer, 500);
 
   std::thread start(StartManySpans, std::ref(spans2), tracer, 500);
-  std::thread end(EndAllSpans, std::ref(spans1));
+  std::thread end(EndAllSpans, std::ref(spans2));
 
   start.join();
   end.join();
+
+  EndAllSpans(spans1);
 }
 
 /*
@@ -581,6 +594,9 @@ TEST_F(TracezProcessor, RunningSnapshotThreadSafety)
 
   start.join();
   snapshots.join();
+
+  std::thread end(EndAllSpans, std::ref(spans));
+  end.join();
 }
 
 /*
@@ -592,10 +608,9 @@ TEST_F(TracezProcessor, SnapshotCompletedThreadSafety)
   StartManySpans(spans, tracer, 500);
 
   std::thread snapshots(GetManySnapshots, std::ref(processor), 500);
-  std::thread end(EndAllSpans, std::ref(spans));
 
   snapshots.join();
-  end.join();
+  EndAllSpans(spans);
 }
 
 /*
@@ -609,9 +624,11 @@ TEST_F(TracezProcessor, RunningSnapshotCompletedThreadSafety)
 
   std::thread start(StartManySpans, std::ref(spans2), tracer, 500);
   std::thread snapshots(GetManySnapshots, std::ref(processor), 500);
-  std::thread end(EndAllSpans, std::ref(spans1));
+  std::thread end2(EndAllSpans, std::ref(spans2));
 
   start.join();
   snapshots.join();
-  end.join();
+  end2.join();
+
+  EndAllSpans(spans1);
 }
