@@ -12,7 +12,7 @@ TEST(RuntimeContextTest, GetCurrent)
   context::Context test_context                         = context::Context(map_test);
   context::Token old_context = context::RuntimeContext::Attach(test_context);
   EXPECT_TRUE(context::RuntimeContext::GetCurrent() == test_context);
-  context::RuntimeContext::Detach(old_context);
+  context::Detach(old_context);
 }
 
 // Tests that detach resets the context to the previous context
@@ -25,9 +25,9 @@ TEST(RuntimeContextTest, Detach)
   context::Token test_context_token = context::RuntimeContext::Attach(test_context);
   context::Token foo_context_token  = context::RuntimeContext::Attach(foo_context);
 
-  context::RuntimeContext::Detach(foo_context_token);
+  context::Detach(foo_context_token);
   EXPECT_TRUE(context::RuntimeContext::GetCurrent() == test_context);
-  context::RuntimeContext::Detach(test_context_token);
+  context::Detach(test_context_token);
 }
 
 // Tests that detach returns false when the wrong context is provided
@@ -39,8 +39,8 @@ TEST(RuntimeContextTest, DetachWrongContext)
   context::Token test_context_token = context::RuntimeContext::Attach(test_context);
   context::Token foo_context_token  = context::RuntimeContext::Attach(foo_context);
   EXPECT_FALSE(context::RuntimeContext::Detach(test_context_token));
-  context::RuntimeContext::Detach(foo_context_token);
-  context::RuntimeContext::Detach(test_context_token);
+  context::Detach(foo_context_token);
+  context::Detach(test_context_token);
 }
 
 // Tests that the ThreadLocalContext can handle three attached contexts
@@ -50,12 +50,11 @@ TEST(RuntimeContextTest, ThreeAttachDetach)
   context::Context test_context                         = context::Context(map_test);
   context::Context foo_context                          = context::Context(map_test);
   context::Context other_context                        = context::Context(map_test);
-  context::Token test_context_token = context::RuntimeContext::Attach(test_context);
-  context::Token foo_context_token  = context::RuntimeContext::Attach(foo_context);
-  context::Token other_context_token =
-      context::RuntimeContext::Attach(other_context);
+  context::Token test_context_token  = context::RuntimeContext::Attach(test_context);
+  context::Token foo_context_token   = context::RuntimeContext::Attach(foo_context);
+  context::Token other_context_token = context::RuntimeContext::Attach(other_context);
 
-  EXPECT_TRUE(context::RuntimeContext::Detach(other_context_token));
-  EXPECT_TRUE(context::RuntimeContext::Detach(foo_context_token));
-  EXPECT_TRUE(context::RuntimeContext::Detach(test_context_token));
+  EXPECT_TRUE(context::Detach(other_context_token));
+  EXPECT_TRUE(context::Detach(foo_context_token));
+  EXPECT_TRUE(context::Detach(test_context_token));
 }
