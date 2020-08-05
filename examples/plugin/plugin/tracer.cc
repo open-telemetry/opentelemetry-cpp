@@ -3,10 +3,11 @@
 
 #include <iostream>
 
-namespace nostd  = opentelemetry::nostd;
-namespace common = opentelemetry::common;
-namespace core   = opentelemetry::core;
-namespace trace  = opentelemetry::trace;
+namespace nostd   = opentelemetry::nostd;
+namespace common  = opentelemetry::common;
+namespace core    = opentelemetry::core;
+namespace trace   = opentelemetry::trace;
+namespace context = opentelemetry::context;
 
 namespace
 {
