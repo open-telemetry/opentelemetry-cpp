@@ -625,9 +625,9 @@ TEST_F(TracezProcessor, RunningSnapshotCompletedThreadSafety)
 
   std::thread start(StartManySpans, std::ref(spans2), tracer, 500);
   std::thread snapshots(GetManySnapshots, std::ref(processor), 500);
-  std::thread end2(EndAllSpans, std::ref(spans2));
-
   start.join();
   snapshots.join();
+
+  std::thread end2(EndAllSpans, std::ref(spans2));
   end2.join();
 }
