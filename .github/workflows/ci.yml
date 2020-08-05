@@ -70,7 +70,7 @@ jobs:
         sudo ./ci/install_bazelisk.sh
     - name: run tests
       run: ./ci/do_ci.sh bazel.test
-      
+
   bazel_valgrind:
     name: Bazel valgrind
     runs-on: ubuntu-latest
