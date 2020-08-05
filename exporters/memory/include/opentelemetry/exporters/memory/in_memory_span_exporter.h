@@ -5,6 +5,8 @@
 
 using opentelemetry::exporter::memory::InMemorySpanData;
 
+const size_t MAX_BUFFER_SIZE = 100;
+
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace exporter
 {
@@ -17,7 +19,7 @@ namespace memory
 class InMemorySpanExporter final : public opentelemetry::sdk::trace::SpanExporter
 {
 public:
-  InMemorySpanExporter();
+  InMemorySpanExporter(size_t = MAX_BUFFER_SIZE);
 
   std::unique_ptr<sdk::trace::Recordable> MakeRecordable() noexcept override;
 

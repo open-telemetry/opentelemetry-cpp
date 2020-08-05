@@ -11,7 +11,7 @@ namespace exporter
 {
 namespace memory
 {
-InMemorySpanExporter::InMemorySpanExporter() {}
+InMemorySpanExporter::InMemorySpanExporter(size_t buffer_size) : span_data_(buffer_size) {}
 
 std::unique_ptr<sdk::trace::Recordable> InMemorySpanExporter::MakeRecordable() noexcept
 {
