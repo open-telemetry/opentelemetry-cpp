@@ -43,4 +43,3 @@ const char tracez_index[] =
     "    </div>"
     "  </body>"
     "</html>";
-

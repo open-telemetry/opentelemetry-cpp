@@ -153,4 +153,3 @@ const char tracez_style[] =
     "  margin: 3px 20px 0 0;"
     "}"
     "";
-

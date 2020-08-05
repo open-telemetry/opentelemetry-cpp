@@ -283,4 +283,3 @@ const char tracez_script[] =
     "  overwriteTable('all');"
     "};"
     "";
-
