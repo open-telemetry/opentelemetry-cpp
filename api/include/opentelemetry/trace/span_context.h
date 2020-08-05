@@ -32,7 +32,7 @@ public:
   // An invalid SpanContext.
   SpanContext() noexcept
       : trace_flags_(trace::TraceFlags((uint8_t)false)),
-        race_state_(new TraceState),
+        trace_state_(new TraceState),
         emote_parent_(false){};
 
   SpanContext(bool sampled_flag, bool has_remote_parent) noexcept
