@@ -1,5 +1,5 @@
 #include "opentelemetry/sdk/trace/tracer.h"
-#include "opentelemetry/exporters/memory/in_memory_span_exporter.h"
+#include "../../../exporters/memory/include/opentelemetry/exporters/memory/in_memory_span_exporter.h"
 #include "opentelemetry/sdk/trace/samplers/always_off.h"
 #include "opentelemetry/sdk/trace/samplers/always_on.h"
 #include "opentelemetry/sdk/trace/samplers/parent_or_else.h"
