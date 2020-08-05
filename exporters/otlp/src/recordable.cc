@@ -22,11 +22,14 @@ void PopulateAttribute(opentelemetry::proto::common::v1::KeyValue *attribute,
                        nostd::string_view key,
                        const opentelemetry::common::AttributeValue &value)
 {
+
+#if 0 // FIXME
   // Assert size of variant to ensure that this method gets updated if the variant
   // definition changes
   static_assert(
       nostd::variant_size<opentelemetry::common::AttributeValue>::value == kAttributeValueSize,
       "AttributeValue contains unknown type");
+#endif
 
   attribute->set_key(key.data(), key.size());
 
