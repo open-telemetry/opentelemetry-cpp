@@ -2,6 +2,7 @@
 
 #include <memory>
 
+#include "opentelemetry/context/runtime_context.h"
 #include "opentelemetry/plugin/detail/dynamic_library_handle.h"
 #include "opentelemetry/plugin/detail/tracer_handle.h"
 #include "opentelemetry/trace/tracer.h"
@@ -50,9 +51,9 @@ public:
 
   trace::Tracer &tracer() const noexcept override { return *tracer_; }
 
-  context::Token *GetToken() const noexcept override { return nullptr; }
+  context::Token *GetToken() const noexcept override { return span_->GetToken(); }
 
-  void SetToken(context::Token *token) noexcept override {}
+  void SetToken(context::Token *token) noexcept override { span_->SetToken(token); }
 
 private:
   std::shared_ptr<trace::Tracer> tracer_;
