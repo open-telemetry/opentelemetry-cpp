@@ -158,10 +158,11 @@ private:
 
   static void InjectTraceState(TraceState trace_state, T &carrier, Setter setter)
   {
-    std::string trace_state_string                           = "";
-    nostd::span<Entries> entries = trace_state.Entries();
-    Entry* entry = entries.data();
-    while (entry != entries.end()) {
+    std::string trace_state_string = "";
+    nostd::span<Entries> entries   = trace_state.Entries();
+    Entry *entry                   = entries.data();
+    while (entry != entries.end())
+    {
       if (entry != entries.begin())
         trace_state_string += ",";
       trace_state_string += std::string(entry->GetKey()) + "=" + std::string(entry->GetValue());
@@ -310,7 +311,8 @@ private:
         if (start_pos == -1 && end_pos == -1)
           continue;
         element_num++;
-        if (ctr_pos != -1) {
+        if (ctr_pos != -1)
+        {
           key = trace_state_header.substr(start_pos, ctr_pos - start_pos + 1);
           val = trace_state_header.substr(ctr_pos + 1, end_pos - ctr_pos);
           if (key != "")
@@ -320,7 +322,8 @@ private:
         end_pos   = -1;
         start_pos = -1;
       }
-      else if (trace_state_header[i] == '=') {
+      else if (trace_state_header[i] == '=')
+      {
         ctr_pos = i;
       }
       else
@@ -332,7 +335,8 @@ private:
     }
     if (start_pos != -1 && end_pos != -1)
     {
-      if (ctr_pos != -1) {
+      if (ctr_pos != -1)
+      {
         key = trace_state_header.substr(start_pos, ctr_pos - start_pos + 1);
         val = trace_state_header.substr(ctr_pos + 1, end_pos - ctr_pos);
         if (key != "")
