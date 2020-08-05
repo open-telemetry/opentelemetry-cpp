@@ -3,6 +3,7 @@
 
 #include <gtest/gtest.h>
 
+#include <iostream>
 #include <thread>
 
 #include "opentelemetry/nostd/span.h"
@@ -509,15 +510,11 @@ TEST_F(TracezProcessor, RunningThreadSafety)
 
   std::thread start1(StartManySpans, std::ref(spans1), tracer, 500);
   std::thread start2(StartManySpans, std::ref(spans2), tracer, 500);
-
   start1.join();
   start2.join();
 
-  std::thread end1(EndAllSpans, std::ref(spans1));
-  std::thread end2(EndAllSpans, std::ref(spans2));
-
-  end1.join();
-  end2.join();
+  EndAllSpans(spans1);
+  EndAllSpans(spans2);
 }
 
 /*
@@ -535,9 +532,6 @@ TEST_F(TracezProcessor, CompletedThreadSafety)
 
   end1.join();
   end2.join();
-
-  EndAllSpans(spans1);
-  EndAllSpans(spans2);
 }
 
 /*
@@ -572,13 +566,14 @@ TEST_F(TracezProcessor, RunningCompletedThreadSafety)
   std::vector<opentelemetry::nostd::shared_ptr<opentelemetry::trace::Span>> spans1;
   std::vector<opentelemetry::nostd::shared_ptr<opentelemetry::trace::Span>> spans2;
   StartManySpans(spans1, tracer, 500);
-  EndAllSpans(spans1);
 
   std::thread start(StartManySpans, std::ref(spans2), tracer, 500);
-  std::thread end(EndAllSpans, std::ref(spans2));
+  std::thread end(EndAllSpans, std::ref(spans1));
 
   start.join();
   end.join();
+
+  EndAllSpans(spans2);
 }
 
 /*
@@ -594,8 +589,7 @@ TEST_F(TracezProcessor, RunningSnapshotThreadSafety)
   start.join();
   snapshots.join();
 
-  std::thread end(EndAllSpans, std::ref(spans));
-  end.join();
+  EndAllSpans(spans);
 }
 
 /*
@@ -605,11 +599,12 @@ TEST_F(TracezProcessor, SnapshotCompletedThreadSafety)
 {
   std::vector<opentelemetry::nostd::shared_ptr<opentelemetry::trace::Span>> spans;
   StartManySpans(spans, tracer, 500);
-  EndAllSpans(spans);
 
   std::thread snapshots(GetManySnapshots, std::ref(processor), 500);
+  std::thread end(EndAllSpans, std::ref(spans));
 
   snapshots.join();
+  end.join();
 }
 
 /*
@@ -620,13 +615,14 @@ TEST_F(TracezProcessor, RunningSnapshotCompletedThreadSafety)
   std::vector<opentelemetry::nostd::shared_ptr<opentelemetry::trace::Span>> spans1;
   std::vector<opentelemetry::nostd::shared_ptr<opentelemetry::trace::Span>> spans2;
   StartManySpans(spans1, tracer, 500);
-  EndAllSpans(spans1);
 
   std::thread start(StartManySpans, std::ref(spans2), tracer, 500);
   std::thread snapshots(GetManySnapshots, std::ref(processor), 500);
+  std::thread end(EndAllSpans, std::ref(spans1));
+
   start.join();
   snapshots.join();
+  end.join();
 
-  std::thread end2(EndAllSpans, std::ref(spans2));
-  end2.join();
+  EndAllSpans(spans2);
 }
