@@ -1,6 +1,8 @@
 #include "src/trace/span.h"
-
+#include "opentelemetry/context/runtime_context.h"
 #include "opentelemetry/version.h"
+
+#include <iostream>
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace sdk
@@ -46,7 +48,10 @@ Span::Span(std::shared_ptr<Tracer> &&tracer,
     : tracer_{std::move(tracer)},
       processor_{processor},
       recordable_{processor_->MakeRecordable()},
-      start_steady_time{options.start_steady_time}
+      start_steady_time{options.start_steady_time},
+      has_ended_{false},
+      token_{nullptr}
+
 {
   (void)options;
   if (recordable_ == nullptr)
@@ -67,6 +72,7 @@ Span::Span(std::shared_ptr<Tracer> &&tracer,
 
 Span::~Span()
 {
+  std::cout << "span destruction" << std::endl;
   End();
 }
 
@@ -119,7 +125,22 @@ void Span::UpdateName(nostd::string_view name) noexcept
 
 void Span::End(const trace_api::EndSpanOptions &options) noexcept
 {
+  std::cout << "ending span" << std::endl;
   std::lock_guard<std::mutex> lock_guard{mu_};
+
+  if (has_ended_ == true)
+  {
+    return;
+  }
+  std::cout << "first time" << std::endl;
+  has_ended_ = true;
+
+  if (token_ != nullptr)
+  {
+    context::RuntimeContext::Detach(*token_);
+    delete token_;
+  }
+
   if (recordable_ == nullptr)
   {
     return;
@@ -138,6 +159,17 @@ bool Span::IsRecording() const noexcept
   std::lock_guard<std::mutex> lock_guard{mu_};
   return recordable_ != nullptr;
 }
+
+context::Token *Span::GetToken() const noexcept
+{
+  return token_;
+}
+
+void Span::SetToken(context::Token *token) noexcept
+{
+  token_ = token;
+}
+
 }  // namespace trace
 }  // namespace sdk
 OPENTELEMETRY_END_NAMESPACE

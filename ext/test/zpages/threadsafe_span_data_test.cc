@@ -1,4 +1,5 @@
 #include "opentelemetry/ext/zpages/threadsafe_span_data.h"
+#include "opentelemetry/context/threadlocal_context.h"
 #include "opentelemetry/nostd/variant.h"
 #include "opentelemetry/trace/span_id.h"
 #include "opentelemetry/trace/trace_id.h"
@@ -6,9 +7,9 @@
 #include <gtest/gtest.h>
 #include <thread>
 
+using opentelemetry::ext::zpages::ThreadsafeSpanData;
 using opentelemetry::sdk::trace::AttributeConverter;
 using opentelemetry::sdk::trace::SpanDataAttributeValue;
-using opentelemetry::ext::zpages::ThreadsafeSpanData;
 
 TEST(ThreadsafeSpanData, DefaultValues)
 {

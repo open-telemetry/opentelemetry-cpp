@@ -1,11 +1,13 @@
 #include "tracer.h"
+#include "opentelemetry/context/runtime_context.h"
 
 #include <iostream>
 
-namespace nostd  = opentelemetry::nostd;
-namespace common = opentelemetry::common;
-namespace core   = opentelemetry::core;
-namespace trace  = opentelemetry::trace;
+namespace nostd   = opentelemetry::nostd;
+namespace common  = opentelemetry::common;
+namespace core    = opentelemetry::core;
+namespace trace   = opentelemetry::trace;
+namespace context = opentelemetry::context;
 
 namespace
 {
@@ -50,6 +52,10 @@ public:
 
   Tracer &tracer() const noexcept override { return *tracer_; }
 
+  context::Token *GetToken() const noexcept override { return nullptr; }
+
+  void SetToken(context::Token *token) noexcept override {}
+
 private:
   std::shared_ptr<Tracer> tracer_;
   std::string name_;
@@ -58,11 +64,11 @@ private:
 
 Tracer::Tracer(nostd::string_view /*output*/) {}
 
-nostd::unique_ptr<trace::Span> Tracer::StartSpan(
+nostd::shared_ptr<trace::Span> Tracer::StartSpan(
     nostd::string_view name,
     const opentelemetry::trace::KeyValueIterable &attributes,
     const trace::StartSpanOptions &options) noexcept
 {
-  return nostd::unique_ptr<opentelemetry::trace::Span>{
+  return nostd::shared_ptr<opentelemetry::trace::Span>{
       new (std::nothrow) Span{this->shared_from_this(), name, attributes, options}};
 }
