@@ -3,8 +3,10 @@
 #include <chrono>
 #include <unordered_map>
 #include <vector>
+#include "opentelemetry/common/attribute_value.h"
 #include "opentelemetry/core/timestamp.h"
 #include "opentelemetry/nostd/nostd.h"
+#include "opentelemetry/sdk/trace/attribute_utils.h"
 #include "opentelemetry/sdk/trace/recordable.h"
 #include "opentelemetry/trace/canonical_code.h"
 #include "opentelemetry/trace/span_id.h"
@@ -18,88 +20,15 @@ namespace sdk
 namespace trace
 {
 /**
- * A counterpart to AttributeValue that makes sure a value is owned. This
- * replaces all non-owning references with owned copies.
- */
-using SpanDataAttributeValue = nostd::variant<bool,
-                                              int64_t,
-                                              uint64_t,
-                                              double,
-                                              std::string,
-                                              std::vector<uint8_t>,
-                                              std::vector<bool>,
-                                              std::vector<int64_t>,
-                                              std::vector<uint64_t>,
-                                              std::vector<double>,
-                                              std::vector<std::string>>;
-
-/**
- * Creates an owned copy (SpanDataAttributeValue) of a non-owning AttributeValue.
- */
-struct AttributeConverter
-{
-  SpanDataAttributeValue operator()(bool v) { return SpanDataAttributeValue(v); }
-  SpanDataAttributeValue operator()(int v)
-  {
-    return SpanDataAttributeValue(static_cast<int64_t>(v));
-  }
-  SpanDataAttributeValue operator()(int64_t v) { return SpanDataAttributeValue(v); }
-  SpanDataAttributeValue operator()(unsigned int v)
-  {
-    return SpanDataAttributeValue(static_cast<uint64_t>(v));
-  }
-  SpanDataAttributeValue operator()(uint64_t v) { return SpanDataAttributeValue(v); }
-  SpanDataAttributeValue operator()(double v) { return SpanDataAttributeValue(v); }
-  SpanDataAttributeValue operator()(nostd::string_view v)
-  {
-    return SpanDataAttributeValue(std::string(v.data(), v.size()));
-  }
-  SpanDataAttributeValue operator()(const char *s)
-  {
-    return SpanDataAttributeValue(std::string(s));
-  }
-  SpanDataAttributeValue operator()(nostd::span<const uint8_t> v) { return convertSpan<uint8_t>(v); }
-  SpanDataAttributeValue operator()(nostd::span<const bool> v) { return convertSpan<bool>(v); }
-  SpanDataAttributeValue operator()(nostd::span<const int64_t> v)
-  {
-    return convertSpan<int64_t>(v);
-  }
-  SpanDataAttributeValue operator()(nostd::span<const unsigned int> v)
-  {
-    return convertSpan<uint64_t>(v);
-  }
-  SpanDataAttributeValue operator()(nostd::span<const uint64_t> v)
-  {
-    return convertSpan<uint64_t>(v);
-  }
-  SpanDataAttributeValue operator()(nostd::span<const double> v) { return convertSpan<double>(v); }
-  SpanDataAttributeValue operator()(nostd::span<const int> v) { return convertSpan<int64_t>(v); }
-  SpanDataAttributeValue operator()(nostd::span<const nostd::string_view> v)
-  {
-    return convertSpan<std::string>(v);
-  }
-
-  template <typename T, typename U = T>
-  SpanDataAttributeValue convertSpan(nostd::span<const U> vals)
-  {
-    std::vector<T> copy;
-    for (auto &val : vals)
-    {
-      copy.push_back(T(val));
-    }
-
-    return SpanDataAttributeValue(std::move(copy));
-  }
-};
-
-/**
- * Class for storing events in SpanData.
+* Class for storing events in SpanData.
  */
 class SpanDataEvent
 {
 public:
-  SpanDataEvent(std::string name, core::SystemTimestamp timestamp)
-      : name_(name), timestamp_(timestamp)
+  SpanDataEvent(std::string name,
+                core::SystemTimestamp timestamp,
+                const trace_api::KeyValueIterable &attributes)
+      : name_(name), timestamp_(timestamp), attribute_map_(attributes)
   {}
 
   /**
@@ -114,9 +43,45 @@ public:
    */
   core::SystemTimestamp GetTimestamp() const noexcept { return timestamp_; }
 
+  /**
+   * Get the attributes for this event
+   * @return the attributes for this event
+   */
+  const std::unordered_map<std::string, SpanDataAttributeValue> &GetAttributes() const noexcept
+  {
+    return attribute_map_.GetAttributes();
+  }
+
 private:
   std::string name_;
   core::SystemTimestamp timestamp_;
+  AttributeMap attribute_map_;
+};
+
+/**
+ * Class for storing links in SpanData.
+ * TODO: Add getters for trace_id, span_id and trace_state when these are supported by SpanContext
+ */
+class SpanDataLink
+{
+public:
+  SpanDataLink(opentelemetry::trace::SpanContext span_context,
+               const trace_api::KeyValueIterable &attributes)
+      : span_context_(span_context), attribute_map_(attributes)
+  {}
+
+  /**
+   * Get the attributes for this link
+   * @return the attributes for this link
+   */
+  const std::unordered_map<std::string, SpanDataAttributeValue> &GetAttributes() const noexcept
+  {
+    return attribute_map_.GetAttributes();
+  }
+
+private:
+  opentelemetry::trace::SpanContext span_context_;
+  AttributeMap attribute_map_;
 };
 
 /**
@@ -179,7 +144,7 @@ public:
    */
   const std::unordered_map<std::string, SpanDataAttributeValue> &GetAttributes() const noexcept
   {
-    return attributes_;
+    return attribute_map_.GetAttributes();
   }
 
   /**
@@ -187,6 +152,12 @@ public:
    * @return the events associated with this span
    */
   const std::vector<SpanDataEvent> &GetEvents() const noexcept { return events_; }
+
+  /**
+   * Get the links associated with this span
+   * @return the links associated with this span
+   */
+  const std::vector<SpanDataLink> &GetLinks() const noexcept { return links_; }
 
   void SetIds(opentelemetry::trace::TraceId trace_id,
               opentelemetry::trace::SpanId span_id,
@@ -197,24 +168,25 @@ public:
     parent_span_id_ = parent_span_id;
   }
 
-  void SetAttribute(nostd::string_view key, const common::AttributeValue &value) noexcept override
+  void SetAttribute(nostd::string_view key,
+                    const opentelemetry::common::AttributeValue &value) noexcept override
   {
-    attributes_[std::string(key)] = nostd::visit(converter_, value); // FIXME: value
+    attribute_map_.SetAttribute(key, value);
   }
 
   void AddEvent(nostd::string_view name,
                 core::SystemTimestamp timestamp,
                 const trace_api::KeyValueIterable &attributes) noexcept override
   {
-    events_.push_back(SpanDataEvent(std::string(name), timestamp));
-    // TODO: handle attributes
+    SpanDataEvent event(std::string(name), timestamp, attributes);
+    events_.push_back(event);
   }
 
   void AddLink(opentelemetry::trace::SpanContext span_context,
                const trace_api::KeyValueIterable &attributes) noexcept override
   {
-    (void)span_context;
-    (void)attributes;
+    SpanDataLink link(span_context, attributes);
+    links_.push_back(link);
   }
 
   void SetStatus(trace_api::CanonicalCode code, nostd::string_view description) noexcept override
@@ -244,9 +216,9 @@ private:
   std::string name_;
   opentelemetry::trace::CanonicalCode status_code_{opentelemetry::trace::CanonicalCode::OK};
   std::string status_desc_;
-  std::unordered_map<std::string, SpanDataAttributeValue> attributes_;
+  AttributeMap attribute_map_;
   std::vector<SpanDataEvent> events_;
-  AttributeConverter converter_;
+  std::vector<SpanDataLink> links_;
 };
 }  // namespace trace
 }  // namespace sdk

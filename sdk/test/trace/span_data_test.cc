@@ -53,3 +53,42 @@ TEST(SpanData, Set)
   ASSERT_EQ(data.GetEvents().at(0).GetName(), "event1");
   ASSERT_EQ(data.GetEvents().at(0).GetTimestamp(), now);
 }
+
+TEST(SpanData, EventAttributes)
+{
+  SpanData data;
+  const int kNumAttributes              = 3;
+  std::string keys[kNumAttributes]      = {"attr1", "attr2", "attr3"};
+  int values[kNumAttributes]            = {3, 5, 20};
+  std::map<std::string, int> attributes = {
+      {keys[0], values[0]}, {keys[1], values[1]}, {keys[2], values[2]}};
+
+  data.AddEvent("Test Event", std::chrono::system_clock::now(),
+                opentelemetry::trace::KeyValueIterableView<std::map<std::string, int>>(attributes));
+
+  for (int i = 0; i < kNumAttributes; i++)
+  {
+    EXPECT_EQ(
+        opentelemetry::nostd::get<int64_t>(data.GetEvents().at(0).GetAttributes().at(keys[i])),
+        values[i]);
+  }
+}
+
+TEST(SpanData, Links)
+{
+  SpanData data;
+  const int kNumAttributes              = 3;
+  std::string keys[kNumAttributes]      = {"attr1", "attr2", "attr3"};
+  int values[kNumAttributes]            = {4, 12, 33};
+  std::map<std::string, int> attributes = {
+      {keys[0], values[0]}, {keys[1], values[1]}, {keys[2], values[2]}};
+
+  data.AddLink(opentelemetry::trace::SpanContext(false, false),
+               opentelemetry::trace::KeyValueIterableView<std::map<std::string, int>>(attributes));
+
+  for (int i = 0; i < kNumAttributes; i++)
+  {
+    EXPECT_EQ(opentelemetry::nostd::get<int64_t>(data.GetLinks().at(0).GetAttributes().at(keys[i])),
+              values[i]);
+  }
+}

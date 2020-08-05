@@ -1,4 +1,4 @@
-#include "src/common/circular_buffer.h"
+#include "opentelemetry/sdk/common/circular_buffer.h"
 
 #include <cassert>
 #include <random>

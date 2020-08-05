@@ -2,9 +2,8 @@
 
 #include <cstdint>
 
-#include "opentelemetry/version.h"
-
 #include "opentelemetry/nostd/nostd.h"
+#include "opentelemetry/version.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace common
