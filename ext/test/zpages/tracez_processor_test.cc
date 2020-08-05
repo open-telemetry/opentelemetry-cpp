@@ -606,11 +606,11 @@ TEST_F(TracezProcessor, SnapshotCompletedThreadSafety)
 {
   std::vector<opentelemetry::nostd::shared_ptr<opentelemetry::trace::Span>> spans;
   StartManySpans(spans, tracer, 500);
+  EndAllSpans(spans);
 
   std::thread snapshots(GetManySnapshots, std::ref(processor), 500);
 
   snapshots.join();
-  EndAllSpans(spans);
 }
 
 /*
