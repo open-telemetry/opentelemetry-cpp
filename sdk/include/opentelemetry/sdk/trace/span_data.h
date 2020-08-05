@@ -58,7 +58,7 @@ private:
 
 /**
  * Class for storing links in SpanData.
- * TODO: Add getters for trace id, span id and trace state when these are supported by SpanContext
+ * TODO: Add getters for trace_id, span_id and trace_state when these are supported by SpanContext
  */
 class SpanDataLink
 {

@@ -2,13 +2,13 @@
 
 #include <gtest/gtest.h>
 
-TEST(AttributeMapTest, DefaultContruction)
+TEST(AttributeMapTest, DefaultConstruction)
 {
   opentelemetry::sdk::trace::AttributeMap map;
   EXPECT_EQ(map.GetAttributes().size(), 0);
 }
 
-TEST(AttributeMapTest, AttributesContruction)
+TEST(AttributeMapTest, AttributesConstruction)
 {
   const int kNumAttributes              = 3;
   std::string keys[kNumAttributes]      = {"attr1", "attr2", "attr3"};
