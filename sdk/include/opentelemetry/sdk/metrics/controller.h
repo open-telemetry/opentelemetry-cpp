@@ -98,7 +98,7 @@ public:
      */
     void run()
     {
-        if (!running){
+        if (!running_){
             running_ = true;
             while (active_)
             {
