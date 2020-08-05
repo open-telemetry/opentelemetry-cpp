@@ -1,7 +1,7 @@
 #pragma once
 
-#include "opentelemetry/sdk/trace/exporter.h"
 #include "opentelemetry/exporters/memory/in_memory_span_data.h"
+#include "opentelemetry/sdk/trace/exporter.h"
 
 const size_t MAX_BUFFER_SIZE = 100;
 
@@ -24,10 +24,10 @@ public:
   sdk::trace::ExportResult Export(
       const nostd::span<std::unique_ptr<sdk::trace::Recordable>> &recordables) noexcept override;
 
-  void Shutdown(std::chrono::microseconds timeout = std::chrono::microseconds(0)) noexcept override
-  {};
+  void Shutdown(
+      std::chrono::microseconds timeout = std::chrono::microseconds(0)) noexcept override{};
 
-  std::shared_ptr<opentelemetry::exporter::memory::InMemorySpanData> & GetData() noexcept;
+  std::shared_ptr<opentelemetry::exporter::memory::InMemorySpanData> &GetData() noexcept;
 
 private:
   std::shared_ptr<opentelemetry::exporter::memory::InMemorySpanData> span_data_;

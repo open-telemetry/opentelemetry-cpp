@@ -1,9 +1,9 @@
 #include "opentelemetry/exporters/memory/in_memory_span_exporter.h"
-#include "opentelemetry/sdk/trace/span_data.h"
 #include "opentelemetry/sdk/trace/recordable.h"
+#include "opentelemetry/sdk/trace/span_data.h"
 
-using opentelemetry::sdk::trace::Recordable;
 using opentelemetry::exporter::memory::InMemorySpanData;
+using opentelemetry::sdk::trace::Recordable;
 
 #include <iostream>
 
@@ -13,7 +13,8 @@ namespace exporter
 namespace memory
 {
 InMemorySpanExporter::InMemorySpanExporter(size_t buffer_size)
-  : span_data_(new InMemorySpanData(buffer_size)) {}
+    : span_data_(new InMemorySpanData(buffer_size))
+{}
 
 std::unique_ptr<sdk::trace::Recordable> InMemorySpanExporter::MakeRecordable() noexcept
 {
@@ -36,7 +37,8 @@ sdk::trace::ExportResult InMemorySpanExporter::Export(
   return sdk::trace::ExportResult::kSuccess;
 }
 
-std::shared_ptr<opentelemetry::exporter::memory::InMemorySpanData> & InMemorySpanExporter::GetData() noexcept
+std::shared_ptr<opentelemetry::exporter::memory::InMemorySpanData>
+    &InMemorySpanExporter::GetData() noexcept
 {
   return span_data_;
 }
