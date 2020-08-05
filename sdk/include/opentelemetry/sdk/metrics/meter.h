@@ -33,9 +33,7 @@ public:
    * @param unit the unit of metric values following https://unitsofmeasure.org/ucum.html.
    * @param enabled a boolean value that turns on or off the metric instrument.
    * @return a shared pointer to the created Counter.
-   * @throws IllegalArgumentException if {@code name} is null
-   * @throws IllegalArgumentException if a different metric by the same name exists in this meter.
-   * @throws IllegalArgumentException if the {@code name} does not match spec requirements.
+   * @throws invalid_argument exception if name is null or does not conform to OTel syntax.
    */
   nostd::shared_ptr<metrics_api::Counter<short>> NewShortCounter(nostd::string_view name,
                                                                  nostd::string_view description,
@@ -66,9 +64,7 @@ public:
    * @param unit the unit of metric values following https://unitsofmeasure.org/ucum.html.
    * @param enabled a boolean value that turns on or off the metric instrument.
    * @return a shared pointer to the created UpDownCounter.
-   * @throws IllegalArgumentException if {@code name} is null
-   * @throws IllegalArgumentException if a different metric by the same name exists in this meter.
-   * @throws IllegalArgumentException if the {@code name} does not match spec requirements.
+   * @throws invalid_argument exception if name is null or does not conform to OTel syntax.
    */
   nostd::shared_ptr<metrics_api::UpDownCounter<short>> NewShortUpDownCounter(
       nostd::string_view name,
@@ -103,9 +99,7 @@ public:
    * @param unit the unit of metric values following https://unitsofmeasure.org/ucum.html.
    * @param enabled a boolean value that turns on or off the metric instrument.
    * @return a shared pointer to the created DoubleValueRecorder.
-   * @throws IllegalArgumentException if {@code name} is null
-   * @throws IllegalArgumentException if a different metric by the same name exists in this meter.
-   * @throws IllegalArgumentException if the {@code name} does not match spec requirements.
+   * @throws invalid_argument exception if name is null or does not conform to OTel syntax.
    */
   nostd::shared_ptr<metrics_api::ValueRecorder<short>> NewShortValueRecorder(
       nostd::string_view name,
@@ -141,9 +135,7 @@ public:
    * @param enabled a boolean value that turns on or off the metric instrument.
    * @param callback the function to be observed by the instrument.
    * @return a shared pointer to the created SumObserver.
-   * @throws IllegalArgumentException if {@code name} is null
-   * @throws IllegalArgumentException if a different metric by the same name exists in this meter.
-   * @throws IllegalArgumentException if the {@code name} does not match spec requirements.
+   * @throws invalid_argument exception if name is null or does not conform to OTel syntax.
    */
   nostd::shared_ptr<metrics_api::SumObserver<short>> NewShortSumObserver(
       nostd::string_view name,
@@ -183,9 +175,7 @@ public:
    * @param enabled a boolean value that turns on or off the metric instrument.
    * @param callback the function to be observed by the instrument.
    * @return a shared pointer to the created UpDownSumObserver.
-   * @throws IllegalArgumentException if {@code name} is null
-   * @throws IllegalArgumentException if a different metric by the same name exists in this meter.
-   * @throws IllegalArgumentException if the {@code name} does not match spec requirements.
+   * @throws invalid_argument exception if name is null or does not conform to OTel syntax.
    */
   nostd::shared_ptr<metrics_api::UpDownSumObserver<short>> NewShortUpDownSumObserver(
       nostd::string_view name,
@@ -225,9 +215,7 @@ public:
    * @param enabled a boolean value that turns on or off the metric instrument.
    * @param callback the function to be observed by the instrument.
    * @return a shared pointer to the created ValueObserver.
-   * @throws IllegalArgumentException if {@code name} is null
-   * @throws IllegalArgumentException if a different metric by the same name exists in this meter.
-   * @throws IllegalArgumentException if the {@code name} does not match spec requirements.
+   * @throws invalid_argument exception if name is null or does not conform to OTel syntax.
    */
   nostd::shared_ptr<metrics_api::ValueObserver<short>> NewShortValueObserver(
       nostd::string_view name,
@@ -379,6 +367,7 @@ private:
   std::mutex metrics_lock_;
   std::mutex observers_lock_;
 };
+
 }  // namespace metrics
 }  // namespace sdk
 OPENTELEMETRY_END_NAMESPACE
