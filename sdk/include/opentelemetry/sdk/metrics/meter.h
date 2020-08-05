@@ -378,7 +378,6 @@ private:
   std::mutex metrics_lock_;
   std::mutex observers_lock_;
 };
-
 }
 }
 OPENTELEMETRY_END_NAMESPACE
