@@ -3,8 +3,6 @@
 #include "opentelemetry/sdk/trace/exporter.h"
 #include "opentelemetry/exporters/memory/in_memory_span_data.h"
 
-using opentelemetry::exporter::memory::InMemorySpanData;
-
 const size_t MAX_BUFFER_SIZE = 100;
 
 OPENTELEMETRY_BEGIN_NAMESPACE
@@ -29,10 +27,10 @@ public:
   void Shutdown(std::chrono::microseconds timeout = std::chrono::microseconds(0)) noexcept override
   {};
 
-  InMemorySpanData & GetData() noexcept;
+  std::shared_ptr<opentelemetry::exporter::memory::InMemorySpanData> & GetData() noexcept;
 
 private:
-  InMemorySpanData span_data_;
+  std::shared_ptr<opentelemetry::exporter::memory::InMemorySpanData> span_data_;
 };
 }  // namespace memory
 }  // namespace exporter

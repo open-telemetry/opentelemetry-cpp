@@ -3,6 +3,7 @@
 #include "opentelemetry/sdk/trace/recordable.h"
 
 using opentelemetry::sdk::trace::Recordable;
+using opentelemetry::exporter::memory::InMemorySpanData;
 
 #include <iostream>
 
@@ -11,7 +12,8 @@ namespace exporter
 {
 namespace memory
 {
-InMemorySpanExporter::InMemorySpanExporter(size_t buffer_size) : span_data_(buffer_size) {}
+InMemorySpanExporter::InMemorySpanExporter(size_t buffer_size)
+  : span_data_(new InMemorySpanData(buffer_size)) {}
 
 std::unique_ptr<sdk::trace::Recordable> InMemorySpanExporter::MakeRecordable() noexcept
 {
@@ -27,14 +29,14 @@ sdk::trace::ExportResult InMemorySpanExporter::Export(
         static_cast<sdk::trace::SpanData *>(recordable.release()));
     if (span != nullptr)
     {
-      span_data_.Add(std::move(span));
+      span_data_.get()->Add(std::move(span));
     }
   }
 
   return sdk::trace::ExportResult::kSuccess;
 }
 
-InMemorySpanData & InMemorySpanExporter::GetData() noexcept
+std::shared_ptr<opentelemetry::exporter::memory::InMemorySpanData> & InMemorySpanExporter::GetData() noexcept
 {
   return span_data_;
 }
