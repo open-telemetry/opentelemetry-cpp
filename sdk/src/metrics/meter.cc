@@ -12,7 +12,11 @@ nostd::shared_ptr<metrics_api::Counter<short>> Meter::NewShortCounter(
 {
   if (!IsValidName(name) || NameAlreadyUsed(name))
   {
+#if __EXCEPTIONS
     throw std::invalid_argument("Invalid Name");
+#else
+    std::terminate();
+#endif
   }
   auto counter = new Counter<short>(name, description, unit, enabled);
   auto ptr     = std::shared_ptr<metrics_api::Counter<short>>(counter);
@@ -29,7 +33,11 @@ nostd::shared_ptr<metrics_api::Counter<int>> Meter::NewIntCounter(nostd::string_
 {
   if (!IsValidName(name) || NameAlreadyUsed(name))
   {
+#if __EXCEPTIONS
     throw std::invalid_argument("Invalid Name");
+#else
+    std::terminate();
+#endif
   }
   auto counter = new Counter<int>(name, description, unit, enabled);
   auto ptr     = std::shared_ptr<metrics_api::Counter<int>>(counter);
@@ -47,7 +55,11 @@ nostd::shared_ptr<metrics_api::Counter<float>> Meter::NewFloatCounter(
 {
   if (!IsValidName(name) || NameAlreadyUsed(name))
   {
+#if __EXCEPTIONS
     throw std::invalid_argument("Invalid Name");
+#else
+    std::terminate();
+#endif
   }
   auto counter = new Counter<float>(name, description, unit, enabled);
   auto ptr     = std::shared_ptr<metrics_api::Counter<float>>(counter);
@@ -65,7 +77,11 @@ nostd::shared_ptr<metrics_api::Counter<double>> Meter::NewDoubleCounter(
 {
   if (!IsValidName(name) || NameAlreadyUsed(name))
   {
+#if __EXCEPTIONS
     throw std::invalid_argument("Invalid Name");
+#else
+    std::terminate();
+#endif
   }
   auto counter = new Counter<double>(name, description, unit, enabled);
   auto ptr     = std::shared_ptr<metrics_api::Counter<double>>(counter);
@@ -83,7 +99,11 @@ nostd::shared_ptr<metrics_api::UpDownCounter<short>> Meter::NewShortUpDownCounte
 {
   if (!IsValidName(name) || NameAlreadyUsed(name))
   {
+#if __EXCEPTIONS
     throw std::invalid_argument("Invalid Name");
+#else
+    std::terminate();
+#endif
   }
   auto udcounter = new UpDownCounter<short>(name, description, unit, enabled);
   auto ptr       = std::shared_ptr<metrics_api::UpDownCounter<short>>(udcounter);
@@ -101,7 +121,11 @@ nostd::shared_ptr<metrics_api::UpDownCounter<int>> Meter::NewIntUpDownCounter(
 {
   if (!IsValidName(name) || NameAlreadyUsed(name))
   {
+#if __EXCEPTIONS
     throw std::invalid_argument("Invalid Name");
+#else
+    std::terminate();
+#endif
   }
   auto udcounter = new UpDownCounter<int>(name, description, unit, enabled);
   auto ptr       = std::shared_ptr<metrics_api::UpDownCounter<int>>(udcounter);
@@ -119,7 +143,11 @@ nostd::shared_ptr<metrics_api::UpDownCounter<float>> Meter::NewFloatUpDownCounte
 {
   if (!IsValidName(name) || NameAlreadyUsed(name))
   {
+#if __EXCEPTIONS
     throw std::invalid_argument("Invalid Name");
+#else
+    std::terminate();
+#endif
   }
   auto udcounter = new UpDownCounter<float>(name, description, unit, enabled);
   auto ptr       = std::shared_ptr<metrics_api::UpDownCounter<float>>(udcounter);
@@ -137,7 +165,11 @@ nostd::shared_ptr<metrics_api::UpDownCounter<double>> Meter::NewDoubleUpDownCoun
 {
   if (!IsValidName(name) || NameAlreadyUsed(name))
   {
+#if __EXCEPTIONS
     throw std::invalid_argument("Invalid Name");
+#else
+    std::terminate();
+#endif
   }
   auto udcounter = new UpDownCounter<double>(name, description, unit, enabled);
   auto ptr       = std::shared_ptr<metrics_api::UpDownCounter<double>>(udcounter);
@@ -155,7 +187,11 @@ nostd::shared_ptr<metrics_api::ValueRecorder<short>> Meter::NewShortValueRecorde
 {
   if (!IsValidName(name) || NameAlreadyUsed(name))
   {
+#if __EXCEPTIONS
     throw std::invalid_argument("Invalid Name");
+#else
+    std::terminate();
+#endif
   }
   auto recorder = new ValueRecorder<short>(name, description, unit, enabled);
   auto ptr      = std::shared_ptr<metrics_api::ValueRecorder<short>>(recorder);
@@ -173,7 +209,11 @@ nostd::shared_ptr<metrics_api::ValueRecorder<int>> Meter::NewIntValueRecorder(
 {
   if (!IsValidName(name) || NameAlreadyUsed(name))
   {
+#if __EXCEPTIONS
     throw std::invalid_argument("Invalid Name");
+#else
+    std::terminate();
+#endif
   }
   auto recorder = new ValueRecorder<int>(name, description, unit, enabled);
   auto ptr      = std::shared_ptr<metrics_api::ValueRecorder<int>>(recorder);
@@ -191,7 +231,11 @@ nostd::shared_ptr<metrics_api::ValueRecorder<float>> Meter::NewFloatValueRecorde
 {
   if (!IsValidName(name) || NameAlreadyUsed(name))
   {
+#if __EXCEPTIONS
     throw std::invalid_argument("Invalid Name");
+#else
+    std::terminate();
+#endif
   }
   auto recorder = new ValueRecorder<float>(name, description, unit, enabled);
   auto ptr      = std::shared_ptr<metrics_api::ValueRecorder<float>>(recorder);
@@ -209,7 +253,11 @@ nostd::shared_ptr<metrics_api::ValueRecorder<double>> Meter::NewDoubleValueRecor
 {
   if (!IsValidName(name) || NameAlreadyUsed(name))
   {
+#if __EXCEPTIONS
     throw std::invalid_argument("Invalid Name");
+#else
+    std::terminate();
+#endif
   }
   auto recorder = new ValueRecorder<double>(name, description, unit, enabled);
   auto ptr      = std::shared_ptr<metrics_api::ValueRecorder<double>>(recorder);
@@ -228,7 +276,11 @@ nostd::shared_ptr<metrics_api::SumObserver<short>> Meter::NewShortSumObserver(
 {
   if (!IsValidName(name) || NameAlreadyUsed(name))
   {
+#if __EXCEPTIONS
     throw std::invalid_argument("Invalid Name");
+#else
+    std::terminate();
+#endif
   }
   auto sumobs = new SumObserver<short>(name, description, unit, enabled, callback);
   auto ptr    = std::shared_ptr<metrics_api::SumObserver<short>>(sumobs);
@@ -247,7 +299,11 @@ nostd::shared_ptr<metrics_api::SumObserver<int>> Meter::NewIntSumObserver(
 {
   if (!IsValidName(name) || NameAlreadyUsed(name))
   {
+#if __EXCEPTIONS
     throw std::invalid_argument("Invalid Name");
+#else
+    std::terminate();
+#endif
   }
   auto sumobs = new SumObserver<int>(name, description, unit, enabled, callback);
   auto ptr    = std::shared_ptr<metrics_api::SumObserver<int>>(sumobs);
@@ -266,7 +322,11 @@ nostd::shared_ptr<metrics_api::SumObserver<float>> Meter::NewFloatSumObserver(
 {
   if (!IsValidName(name) || NameAlreadyUsed(name))
   {
+#if __EXCEPTIONS
     throw std::invalid_argument("Invalid Name");
+#else
+    std::terminate();
+#endif
   }
   auto sumobs = new SumObserver<float>(name, description, unit, enabled, callback);
   auto ptr    = std::shared_ptr<metrics_api::SumObserver<float>>(sumobs);
@@ -285,7 +345,11 @@ nostd::shared_ptr<metrics_api::SumObserver<double>> Meter::NewDoubleSumObserver(
 {
   if (!IsValidName(name) || NameAlreadyUsed(name))
   {
+#if __EXCEPTIONS
     throw std::invalid_argument("Invalid Name");
+#else
+    std::terminate();
+#endif
   }
   auto sumobs = new SumObserver<double>(name, description, unit, enabled, callback);
   auto ptr    = std::shared_ptr<metrics_api::SumObserver<double>>(sumobs);
@@ -304,7 +368,11 @@ nostd::shared_ptr<metrics_api::UpDownSumObserver<short>> Meter::NewShortUpDownSu
 {
   if (!IsValidName(name) || NameAlreadyUsed(name))
   {
+#if __EXCEPTIONS
     throw std::invalid_argument("Invalid Name");
+#else
+    std::terminate();
+#endif
   }
   auto sumobs = new UpDownSumObserver<short>(name, description, unit, enabled, callback);
   auto ptr    = std::shared_ptr<metrics_api::UpDownSumObserver<short>>(sumobs);
@@ -323,7 +391,11 @@ nostd::shared_ptr<metrics_api::UpDownSumObserver<int>> Meter::NewIntUpDownSumObs
 {
   if (!IsValidName(name) || NameAlreadyUsed(name))
   {
+#if __EXCEPTIONS
     throw std::invalid_argument("Invalid Name");
+#else
+    std::terminate();
+#endif
   }
   auto sumobs = new UpDownSumObserver<int>(name, description, unit, enabled, callback);
   auto ptr    = std::shared_ptr<metrics_api::UpDownSumObserver<int>>(sumobs);
@@ -342,7 +414,11 @@ nostd::shared_ptr<metrics_api::UpDownSumObserver<float>> Meter::NewFloatUpDownSu
 {
   if (!IsValidName(name) || NameAlreadyUsed(name))
   {
+#if __EXCEPTIONS
     throw std::invalid_argument("Invalid Name");
+#else
+    std::terminate();
+#endif
   }
   auto sumobs = new UpDownSumObserver<float>(name, description, unit, enabled, callback);
   auto ptr    = std::shared_ptr<metrics_api::UpDownSumObserver<float>>(sumobs);
@@ -361,7 +437,11 @@ nostd::shared_ptr<metrics_api::UpDownSumObserver<double>> Meter::NewDoubleUpDown
 {
   if (!IsValidName(name) || NameAlreadyUsed(name))
   {
+#if __EXCEPTIONS
     throw std::invalid_argument("Invalid Name");
+#else
+    std::terminate();
+#endif
   }
   auto sumobs = new UpDownSumObserver<double>(name, description, unit, enabled, callback);
   auto ptr    = std::shared_ptr<metrics_api::UpDownSumObserver<double>>(sumobs);
@@ -380,7 +460,11 @@ nostd::shared_ptr<metrics_api::ValueObserver<short>> Meter::NewShortValueObserve
 {
   if (!IsValidName(name) || NameAlreadyUsed(name))
   {
+#if __EXCEPTIONS
     throw std::invalid_argument("Invalid Name");
+#else
+    std::terminate();
+#endif
   }
   auto sumobs = new ValueObserver<short>(name, description, unit, enabled, callback);
   auto ptr    = std::shared_ptr<metrics_api::ValueObserver<short>>(sumobs);
@@ -399,7 +483,11 @@ nostd::shared_ptr<metrics_api::ValueObserver<int>> Meter::NewIntValueObserver(
 {
   if (!IsValidName(name) || NameAlreadyUsed(name))
   {
+#if __EXCEPTIONS
     throw std::invalid_argument("Invalid Name");
+#else
+    std::terminate();
+#endif
   }
   auto sumobs = new ValueObserver<int>(name, description, unit, enabled, callback);
   auto ptr    = std::shared_ptr<metrics_api::ValueObserver<int>>(sumobs);
@@ -418,7 +506,11 @@ nostd::shared_ptr<metrics_api::ValueObserver<float>> Meter::NewFloatValueObserve
 {
   if (!IsValidName(name) || NameAlreadyUsed(name))
   {
+#if __EXCEPTIONS
     throw std::invalid_argument("Invalid Name");
+#else
+    std::terminate();
+#endif
   }
   auto sumobs = new ValueObserver<float>(name, description, unit, enabled, callback);
   auto ptr    = std::shared_ptr<metrics_api::ValueObserver<float>>(sumobs);
@@ -437,7 +529,11 @@ nostd::shared_ptr<metrics_api::ValueObserver<double>> Meter::NewDoubleValueObser
 {
   if (!IsValidName(name) || NameAlreadyUsed(name))
   {
+#if __EXCEPTIONS
     throw std::invalid_argument("Invalid Name");
+#else
+    std::terminate();
+#endif
   }
   auto sumobs = new ValueObserver<double>(name, description, unit, enabled, callback);
   auto ptr    = std::shared_ptr<metrics_api::ValueObserver<double>>(sumobs);
