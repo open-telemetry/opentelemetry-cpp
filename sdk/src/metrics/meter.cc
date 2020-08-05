@@ -749,6 +749,8 @@ bool Meter::IsValidName(nostd::string_view name)
 
 bool Meter::NameAlreadyUsed(nostd::string_view name)
 {
+  std::lock_guard<std::mutex> lg_metrics(metrics_lock_);
+  std::lock_guard<std::mutex> lg_obsevers(observers_lock_);
   if (short_metrics_.find(std::string(name)) != short_metrics_.end())
     return true;
   else if (int_metrics_.find(std::string(name)) != int_metrics_.end())
