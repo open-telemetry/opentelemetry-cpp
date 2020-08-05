@@ -8,14 +8,12 @@ using opentelemetry::sdk::common::CircularBufferRange;
 using opentelemetry::sdk::common::AtomicUniquePtr;
 using opentelemetry::sdk::trace::Recordable;
 
-const size_t MAX_BUFFER_SIZE = 100;
-
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace exporter
 {
 namespace memory
 {
-InMemorySpanData::InMemorySpanData() : spans_received_(MAX_BUFFER_SIZE) {}
+InMemorySpanData::InMemorySpanData(size_t buffer_size) : spans_received_(buffer_size) {}
 
 void InMemorySpanData::Add(std::unique_ptr<Recordable> data) noexcept
 {

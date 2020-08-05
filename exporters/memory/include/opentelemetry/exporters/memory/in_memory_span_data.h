@@ -4,6 +4,8 @@
 #include "opentelemetry/sdk/trace/recordable.h"
 #include "vector"
 
+const size_t MAX_BUFFER_SIZE = 100;
+
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace exporter
 {
@@ -15,7 +17,7 @@ namespace memory
 class InMemorySpanData final
 {
 public:
-  InMemorySpanData();
+  InMemorySpanData(size_t = MAX_BUFFER_SIZE);
 
   void Add(std::unique_ptr<opentelemetry::sdk::trace::Recordable> data) noexcept;
 
