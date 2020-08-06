@@ -107,6 +107,7 @@ private:
   /**
    * Set metric data for:
    * Exact => Prometheus Summary
+   * Sketch => Prometheus Summary
    */
   template <typename T>
   static void SetData(std::vector<T> values,
