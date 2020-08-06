@@ -4,6 +4,10 @@
 #include "opentelemetry/sdk/metrics/meter_provider.h"
 #include "opentelemetry/metrics/provider.h"
 
+#include <stdlib.h>
+#include <unistd.h>
+#include <stdio.h>
+
 namespace sdkmetrics = opentelemetry::sdk::metrics;
 namespace nostd      = opentelemetry::nostd;
 namespace trace      = opentelemetry::trace;
@@ -43,18 +47,18 @@ int main() {
   * using a span of instruments and a span of values. This RecordBatch will update the ith
   * instrument with the ith value.
   **/
+  std::cout << "Example 1" << std::endl;
   ControllerStateless.start();
 
   // Updating multiple instruments with the same labelset
   meter->RecordIntBatch(labelkv, instrument_span, instrument_values);
 
   ControllerStateless.stop();
-  std::cout << std::endl;
   /** 
    * Second way of updating an instrument, bind then add. In this method the user binds an instrument to a labelset
    * Then add to the bounded instrument, then unbind.
    **/
-
+  std::cout << "Example 2" << std::endl;
   ControllerStateless.start();
 
   auto boundintupdowncounter = intupdowncounter->bindUpDownCounter(labelkv);
@@ -62,7 +66,6 @@ int main() {
   boundintupdowncounter->unbind();
 
   ControllerStateless.stop();
-  std::cout << std::endl;
   /**
    * The Third and final way is to add a value with a labelset at the same time. This also shows
    * The difference between using a Stateless and Stateful Processor
