@@ -44,12 +44,8 @@ std::vector<prometheus_client::MetricFamily> PrometheusExporterUtils::TranslateT
 }
 
 // ======================= private helper functions =========================
-
 /**
  * Set value to metric family according to record
- *
- * @param record
- * @param metric_family
  */
 void PrometheusExporterUtils::SetMetricFamily(metric_sdk::Record &record,
                                               prometheus_client::MetricFamily *metric_family)
@@ -62,7 +58,6 @@ void PrometheusExporterUtils::SetMetricFamily(metric_sdk::Record &record,
   {
     metric_family->name = record.GetName();
   }
-
   metric_family->help = record.GetDescription();
 
   // unpack the variant and set the metric data to metric family struct
@@ -98,16 +93,12 @@ void PrometheusExporterUtils::SetMetricFamily(metric_sdk::Record &record,
  * This function is needed because names in OpenTelemetry can contain
  * alphanumeric characters, '_', '.', and '-', whereas in Prometheus the
  * name should only contain alphanumeric characters and '_'.
- *
- * @param key name in OpenTelemetry
- * @return sanitized name in Prometheus
  */
 std::string PrometheusExporterUtils::SanitizeNames(std::string name)
 {
   // name cannot be null or empty.
   // a valid OTel name should only contain alphanumeric characters,
   // '_', '.', or '-'.
-  // meaningful exception message
   if (!IsValidName(name))
   {
     throw std::invalid_argument("Received an invalid OTel name.\n");
@@ -134,9 +125,6 @@ std::string PrometheusExporterUtils::SanitizeNames(std::string name)
  * 2. They are case-insensitive
  * 3. The first character must be non-numeric, non-space, non-punctuation
  * 4. Subsequent characters must belong to the alphanumeric characters, '_', '.', and '-'.
- *
- * @param name name to be determined
- * @return a boolean flag
  */
 bool PrometheusExporterUtils::IsValidName(const std::string &name)
 {
@@ -161,6 +149,9 @@ bool PrometheusExporterUtils::IsValidName(const std::string &name)
   return true;
 }
 
+/**
+ * Set value to metric family for different aggregator
+ */
 template <typename T>
 void PrometheusExporterUtils::SetMetricFamilyByAggregator(
     nostd::shared_ptr<metric_sdk::Aggregator<T>> aggregator,
@@ -171,7 +162,6 @@ void PrometheusExporterUtils::SetMetricFamilyByAggregator(
   auto kind                                = aggregator->get_aggregator_kind();
   const prometheus_client::MetricType type = TranslateType(kind);
   metric_family->type                      = type;
-
   // get check-pointed values, label string and check-pointed time
   auto checkpointed_values = aggregator->get_checkpoint();
   auto time                = aggregator->get_checkpoint_timestamp().time_since_epoch();
@@ -184,18 +174,20 @@ void PrometheusExporterUtils::SetMetricFamilyByAggregator(
   }
   else if (type == prometheus_client::MetricType::Summary)  // Sketch, Exact
   {
+    auto quantiles = GetQuantilesVector(aggregator);
     if (kind == metric_sdk::AggregatorKind::Exact)
     {
       // TODO: 1. what if this Exact aggregator is not for quantile estimation?
       // TODO: 2. how many quantile samples should I include in each metric?
       if (aggregator->get_quant_estimation())
       {
-        auto quantiles = GetQuantilesVector(aggregator);
-        SetData(checkpointed_values, quantiles, labels_str, time, metric_family);
+        SetData(checkpointed_values, kind, quantiles, labels_str, time, metric_family);
       }
     }
     else if (kind == metric_sdk::AggregatorKind::Sketch)
-    {}
+    {
+      SetData(checkpointed_values, kind, quantiles, labels_str, time, metric_family);
+    }
   }
   else  // Counter, Gauge, MinMaxSumCount, Untyped
   {
@@ -203,9 +195,7 @@ void PrometheusExporterUtils::SetMetricFamilyByAggregator(
     // Use sum/count is ok.
     if (kind == metric_sdk::AggregatorKind::MinMaxSumCount)
     {
-      int sum    = checkpointed_values[2];
-      int count  = checkpointed_values[3];
-      double avg = (double)sum / count;
+      double avg = (double)checkpointed_values[2] / checkpointed_values[3];
       SetData(avg, labels_str, time, metric_family);
     }
     else
@@ -217,9 +207,6 @@ void PrometheusExporterUtils::SetMetricFamilyByAggregator(
 
 /**
  * Translate the OTel metric type to Prometheus metric type
- *
- * @param record
- * @return
  */
 prometheus_client::MetricType PrometheusExporterUtils::TranslateType(
     metric_sdk::AggregatorKind kind)
@@ -299,6 +286,7 @@ void PrometheusExporterUtils::SetData(double value,
  */
 template <typename T>
 void PrometheusExporterUtils::SetData(std::vector<T> values,
+                                      metric_sdk::AggregatorKind kind,
                                       const std::vector<T> &quantiles,
                                       const std::string &labels,
                                       std::chrono::nanoseconds time,
@@ -307,9 +295,12 @@ void PrometheusExporterUtils::SetData(std::vector<T> values,
   metric_family->metric.emplace_back();
   prometheus_client::ClientMetric &metric = metric_family->metric.back();
   SetMetricBasic(metric, time, labels);
-  SetValue(values, quantiles, &metric);
+  SetValue(values, kind, quantiles, &metric);
 }
 
+/**
+ * Set time and labels to metric data
+ */
 void PrometheusExporterUtils::SetMetricBasic(prometheus_client::ClientMetric &metric,
                                              std::chrono::nanoseconds time,
                                              const std::string &labels)
@@ -339,9 +330,6 @@ void PrometheusExporterUtils::SetMetricBasic(prometheus_client::ClientMetric &me
  * Parse a string of labels (key:value) into a vector of pairs
  * {,}
  * {l1:v1,l2:v2,...,}
- *
- * @param a string of labels
- * @return a vector of key value pairs
  */
 std::vector<std::pair<std::string, std::string>> PrometheusExporterUtils::ParseLabel(
     std::string labels)
@@ -380,13 +368,11 @@ std::vector<T> PrometheusExporterUtils::GetQuantilesVector(
     nostd::shared_ptr<metric_sdk::Aggregator<T>> aggregator)
 {
   std::vector<T> quantiles;
-
   for (double q = 0; q <= 1; q += QUANTILE_STEP)
   {
     T quantile = aggregator->get_quantiles(q);
     quantiles.emplace_back(quantile);
   }
-
   return quantiles;
 }
 
@@ -436,8 +422,7 @@ void PrometheusExporterUtils::SetValue(std::vector<T> values,
 {
   metric->histogram.sample_sum   = values[0];
   metric->histogram.sample_count = values[1];
-
-  int cumulative = 0;
+  int cumulative                 = 0;
   std::vector<prometheus_client::ClientMetric::Bucket> buckets;
   for (int i = 0; i < boundaries.size() + 1; i++)
   {
@@ -452,29 +437,35 @@ void PrometheusExporterUtils::SetValue(std::vector<T> values,
     {
       bucket.upper_bound = std::numeric_limits<double>::infinity();
     }
-
     buckets.emplace_back(bucket);
   }
-
   metric->histogram.bucket = buckets;
 }
 
 /**
- * Handle Exact
+ * Handle Exact and Sketch
  */
 template <typename T>
 void PrometheusExporterUtils::SetValue(std::vector<T> values,
+                                       metric_sdk::AggregatorKind kind,
                                        std::vector<T> quantiles,
                                        prometheus_client::ClientMetric *metric)
 {
-  metric->summary.sample_count = values.size();
-
-  auto sum = 0;
-  for (auto val : values)
+  if (kind == metric_sdk::AggregatorKind::Exact)
   {
-    sum += val;
+    metric->summary.sample_count = values.size();
+    auto sum                     = 0;
+    for (auto val : values)
+    {
+      sum += val;
+    }
+    metric->summary.sample_sum = sum;
   }
-  metric->summary.sample_sum = sum;
+  else if (kind == metric_sdk::AggregatorKind::Sketch)
+  {
+    metric->summary.sample_sum   = values[0];
+    metric->summary.sample_count = values[1];
+  }
 
   double quant = 0;
   std::vector<prometheus_client::ClientMetric::Quantile> prometheus_quantiles;
@@ -486,10 +477,8 @@ void PrometheusExporterUtils::SetValue(std::vector<T> values,
     quant += QUANTILE_STEP;
     prometheus_quantiles.emplace_back(quantile);
   }
-
   metric->summary.quantile = prometheus_quantiles;
 }
-
 }  // namespace prometheus
 }  // namespace exporter
 OPENTELEMETRY_END_NAMESPACE
