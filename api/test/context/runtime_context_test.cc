@@ -64,9 +64,9 @@ TEST(RuntimeContextTest, ThreeAttachDetach)
 // RuntimeContext::SetValue method.
 TEST(RuntimeContextTest, SetValueRuntimeContext)
 {
-  context::Context foo_context                     = context::Context("foo_key", (int64_t)596);
-  context::RuntimeContext::Token old_context_token = context::RuntimeContext::Attach(foo_context);
-  context::Context test_context = context::RuntimeContext::SetValue("test_key", (int64_t)123);
+  context::Context foo_context     = context::Context("foo_key", (int64_t)596);
+  context::Token old_context_token = context::RuntimeContext::Attach(foo_context);
+  context::Context test_context    = context::RuntimeContext::SetValue("test_key", (int64_t)123);
   EXPECT_EQ(nostd::get<int64_t>(test_context.GetValue("test_key")), 123);
   EXPECT_EQ(nostd::get<int64_t>(test_context.GetValue("foo_key")), 596);
 }
@@ -87,8 +87,8 @@ TEST(RuntimeContextTest, SetValueOtherContext)
 // passed in string and the current Runtime Context
 TEST(RuntimeContextTest, GetValueRuntimeContext)
 {
-  context::Context foo_context                     = context::Context("foo_key", (int64_t)596);
-  context::RuntimeContext::Token old_context_token = context::RuntimeContext::Attach(foo_context);
+  context::Context foo_context     = context::Context("foo_key", (int64_t)596);
+  context::Token old_context_token = context::RuntimeContext::Attach(foo_context);
   EXPECT_EQ(nostd::get<int64_t>(context::RuntimeContext::GetValue("foo_key")), 596);
 }
 
