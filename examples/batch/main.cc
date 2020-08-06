@@ -4,6 +4,8 @@
 #include "opentelemetry/exporters/ostream/span_exporter.h"
 #include "opentelemetry/sdk/trace/batch_span_processor.h"
 
+#include "opentelemetry/context/threadlocal_context.h"
+
 #include <chrono>
 #include <thread>
 
