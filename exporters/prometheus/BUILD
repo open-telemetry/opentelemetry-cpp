@@ -21,7 +21,8 @@ cc_library(
     ],
     hdrs = [
         "include/opentelemetry/exporters/prometheus/prometheus_exporter.h",
-        "include/opentelemetry/exporters/prometheus/prometheus_collector.h"
+        "include/opentelemetry/exporters/prometheus/prometheus_collector.h",
+        "include/opentelemetry/exporters/prometheus/prometheus_exporter_utils.h",
     ],
     strip_include_prefix = "include",
     deps = [
