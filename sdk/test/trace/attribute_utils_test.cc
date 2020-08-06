@@ -1,4 +1,5 @@
 #include "opentelemetry/sdk/trace/attribute_utils.h"
+#include "opentelemetry/context/threadlocal_context.h"
 
 #include <gtest/gtest.h>
 
