@@ -11,6 +11,7 @@
 #include "opentelemetry/sdk/metrics/aggregator/gauge_aggregator.h"
 #include "opentelemetry/sdk/metrics/aggregator/histogram_aggregator.h"
 #include "opentelemetry/sdk/metrics/aggregator/min_max_sum_count_aggregator.h"
+#include "opentelemetry/sdk/metrics/aggregator/sketch_aggregator.h"
 
 using opentelemetry::exporter::prometheus::PrometheusExporterUtils;
 namespace metric_sdk = opentelemetry::sdk::metrics;
@@ -362,7 +363,33 @@ TEST(PrometheusExporterUtils, TranslateToPrometheusMinMaxSumCount)
 
 TEST(PrometheusExporterUtils, TranslateToPrometheusSketch)
 {
-  // TODO;
+  auto aggregator = std::shared_ptr<metric_sdk::Aggregator<int>>(
+      new metric_sdk::SketchAggregator<int>(metric_api::InstrumentKind::Counter, 0.0005));
+
+  std::vector<metric_sdk::Record> collection;
+  for (int i = 0; i < 20; i++)
+  {
+    aggregator->update(i);
+  }
+  aggregator->checkpoint();
+  auto record = get_record("sketch", 1, "{label1:v1,label2:v2,}", aggregator);
+  collection.emplace_back(record);
+
+  auto translated = PrometheusExporterUtils::TranslateToPrometheus(collection);
+  ASSERT_EQ(translated.size(), collection.size());
+
+  auto metric           = translated[0];
+  std::vector<int> vals = {aggregator->get_checkpoint()[1], aggregator->get_checkpoint()[0]};
+  assert_basic(metric, "test_sketch_metric_record_v_1_0", record.GetDescription(),
+               prometheus_client::MetricType::Summary, 2, vals);
+
+  auto quantile = metric.metric[0].summary.quantile;
+  ASSERT_EQ(quantile.size(), 5);
+  ASSERT_DOUBLE_EQ(quantile[0].value, 0);
+  ASSERT_DOUBLE_EQ(quantile[1].value, 4);
+  ASSERT_DOUBLE_EQ(quantile[2].value, 9);
+  ASSERT_DOUBLE_EQ(quantile[3].value, 14);
+  ASSERT_DOUBLE_EQ(quantile[4].value, 18);
 }
 
 TEST(PrometheusExporterUtils, TranslateToPrometheusMultipleAggregators)
