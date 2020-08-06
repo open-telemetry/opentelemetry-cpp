@@ -74,13 +74,13 @@ void PrometheusExporterUtils::SetMetricFamily(metric_sdk::Record &record,
     SetMetricFamilyByAggregator(aggregator, labels_str, metric_family);
   }
   else if (nostd::holds_alternative<nostd::shared_ptr<metric_sdk::Aggregator<float>>>(
-               record.GetAggregator()))
+      record.GetAggregator()))
   {
     auto aggregator = nostd::get<nostd::shared_ptr<metric_sdk::Aggregator<float>>>(agg_var);
     SetMetricFamilyByAggregator(aggregator, labels_str, metric_family);
   }
   else if (nostd::holds_alternative<nostd::shared_ptr<metric_sdk::Aggregator<double>>>(
-               record.GetAggregator()))
+      record.GetAggregator()))
   {
     auto aggregator = nostd::get<nostd::shared_ptr<metric_sdk::Aggregator<double>>>(agg_var);
     SetMetricFamilyByAggregator(aggregator, labels_str, metric_family);
@@ -283,6 +283,7 @@ void PrometheusExporterUtils::SetData(double value,
 /**
  * Set metric data for:
  * Exact => Prometheus Summary
+ * Sketch => Prometheus Summary
  */
 template <typename T>
 void PrometheusExporterUtils::SetData(std::vector<T> values,
