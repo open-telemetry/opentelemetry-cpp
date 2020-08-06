@@ -4,9 +4,7 @@
 #include "opentelemetry/sdk/metrics/meter_provider.h"
 #include "opentelemetry/metrics/provider.h"
 
-#include <stdlib.h>
 #include <unistd.h>
-#include <stdio.h>
 
 namespace sdkmetrics = opentelemetry::sdk::metrics;
 namespace nostd      = opentelemetry::nostd;
