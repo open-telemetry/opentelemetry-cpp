@@ -25,126 +25,123 @@ namespace metrics
 
 class PushController
 {
-
-public:
-  PushController(nostd::shared_ptr<metrics_api::Meter> meter,
-                 nostd::unique_ptr<MetricsExporter> exporter,
-                 nostd::shared_ptr<MetricsProcessor> processor,
-                 double period,
-                 int timeout = 30)
-  {
-    meter_     = meter;
-    exporter_  = std::move(exporter);
-    processor_ = processor;
-    timeout_   = (unsigned int)(timeout * 1000000);  // convert seconds to microseconds
-    period_    = (unsigned int)(period * 1000000);
-  }
-
-  /*
-   * Used to check if the metrics pipeline is currecntly active
-   *
-   * @param none
-   * @return true when active, false when on standby
-   */
-//  bool isActive() { return active_; }
-
-  /*
-   * Begins the data processing and export pipeline.  The function first ensures that the pipeline
-   * is not already running.  If not, it begins and detaches a new thread for the Controller's run
-   * function which periodically polls the instruments for their data.
-   *
-   * @param none
-   * @return a boolean which is true when the pipeline is successfully started and false when
-   * already active
-   */
-  bool start()
-  {
-      if (!active_.load())
-    {
-        active_ = true;
-      std::thread runner(&PushController::run, this);
-      runner.detach();
-      return true;
-    }
-    return false;
-  }
-
-  /*
-   * Ends the processing and export pipeline then exports metrics one last time
-   * before returning.
-   *
-   * @param none
-   * @return none
-   */
-  void stop()
-  {
-      if (active_.load())
-    {
-        active_ = false;
-        while (running_.load())
-      {
-        std::this_thread::sleep_for(
-            std::chrono::microseconds(period_ / 100));  // wait until the runner thread concludes
-      }
-      tick();  // flush metrics sitting in the processor
-    }
-  }
-
-  /*
-   * Run the tick function at a regular interval. This function
-   * should be run in its own thread.
-   *
-   * Used to wait between collection intervals.
-   */
-  void run()
-  {
-      if (!running_.load())
-    {
-        running_= true;
-        while (active_.load())
-      {
-        tick();
-        std::this_thread::sleep_for(std::chrono::microseconds(period_));
-      }
-        running_ = false;;
-    }
-  }
-
-  /*
-   * Tick
-   *
-   * Called at regular intervals, this function collects all values from the
-   * member variable meter_, then sends them to the processor_ for
-   * processing. After the records have been processed they are sent to the
-   * exporter_ to be exported.
-   *
-   */
-  void tick()
-  {
-    this->mu_.lock();
-    std::vector<Record> collected = dynamic_cast<Meter *>(meter_.get())->Collect();
-    for (const auto &rec : collected)
-    {
-      processor_->process(rec);
-    }
-    collected = processor_->CheckpointSelf();
-    processor_->FinishedCollection();
-    exporter_->Export(collected);
-    this->mu_.unlock();
-  }
-
-  nostd::shared_ptr<metrics_api::Meter> meter_;
-  nostd::unique_ptr<MetricsExporter> exporter_;
-  nostd::shared_ptr<MetricsProcessor> processor_;
-  std::mutex mu_;
-//  bool active_ = false;
-//  bool running_ = false;
     
+public:
+    PushController(nostd::shared_ptr<metrics_api::Meter> meter,
+                   nostd::unique_ptr<MetricsExporter> exporter,
+                   nostd::shared_ptr<MetricsProcessor> processor,
+                   double period,
+                   int timeout = 30)
+    {
+        meter_     = meter;
+        exporter_  = std::move(exporter);
+        processor_ = processor;
+        timeout_   = (unsigned int)(timeout * 1000000);  // convert seconds to microseconds
+        period_    = (unsigned int)(period * 1000000);
+    }
+    
+    /*
+     * Used to check if the metrics pipeline is currecntly active
+     *
+     * @param none
+     * @return true when active, false when on standby
+     */
+    bool isActive() { return active_.load(); }
+    
+    /*
+     * Begins the data processing and export pipeline.  The function first ensures that the pipeline
+     * is not already running.  If not, it begins and detaches a new thread for the Controller's run
+     * function which periodically polls the instruments for their data.
+     *
+     * @param none
+     * @return a boolean which is true when the pipeline is successfully started and false when
+     * already active
+     */
+    bool start()
+    {
+        if (!active_.load())
+        {
+            active_ = true;
+            std::thread runner(&PushController::run, this);
+            runner.detach();
+            return true;
+        }
+        return false;
+    }
+    
+    /*
+     * Ends the processing and export pipeline then exports metrics one last time
+     * before returning.
+     *
+     * @param none
+     * @return none
+     */
+    void stop()
+    {
+        if (active_.load())
+        {
+            active_ = false;
+            while (running_.load())
+            {
+                std::this_thread::sleep_for(
+                                            std::chrono::microseconds(period_ / 100));  // wait until the runner thread concludes
+            }
+            tick();  // flush metrics sitting in the processor
+        }
+    }
+    
+private:
+    /*
+     * Run the tick function at a regular interval. This function
+     * should be run in its own thread.
+     *
+     * Used to wait between collection intervals.
+     */
+    void run()
+    {
+        if (!running_.load())
+        {
+            running_= true;
+            while (active_.load())
+            {
+                tick();
+                std::this_thread::sleep_for(std::chrono::microseconds(period_));
+            }
+            running_ = false;;
+        }
+    }
+    
+    /*
+     * Tick
+     *
+     * Called at regular intervals, this function collects all values from the
+     * member variable meter_, then sends them to the processor_ for
+     * processing. After the records have been processed they are sent to the
+     * exporter_ to be exported.
+     *
+     */
+    void tick()
+    {
+        this->mu_.lock();
+        std::vector<Record> collected = dynamic_cast<Meter *>(meter_.get())->Collect();
+        for (const auto &rec : collected)
+        {
+            processor_->process(rec);
+        }
+        collected = processor_->CheckpointSelf();
+        processor_->FinishedCollection();
+        exporter_->Export(collected);
+        this->mu_.unlock();
+    }
+    
+    nostd::shared_ptr<metrics_api::Meter> meter_;
+    nostd::unique_ptr<MetricsExporter> exporter_;
+    nostd::shared_ptr<MetricsProcessor> processor_;
+    std::mutex mu_;
     std::atomic<bool> active_ = ATOMIC_VAR_INIT(false);
     std::atomic<bool> running_ = ATOMIC_VAR_INIT(false);
-    
-  unsigned int period_;
-  unsigned int timeout_;
+    unsigned int period_;
+    unsigned int timeout_;
 };
 
 }  // namespace metrics
