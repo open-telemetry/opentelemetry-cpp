@@ -1,10 +1,11 @@
 #include "opentelemetry/context/threadlocal_context.h"
-#include "opentelemetry/sdk/trace/exporter.h"
 #include "opentelemetry/sdk/trace/recordable.h"
 #include "opentelemetry/sdk/trace/simple_processor.h"
 #include "opentelemetry/sdk/trace/span_data.h"
 #include "opentelemetry/sdk/trace/tracer_provider.h"
 #include "opentelemetry/trace/provider.h"
+
+#include "opentelemetry/sdk/trace/exporter.h"
 
 #include "opentelemetry/exporters/ostream/span_exporter.h"
 

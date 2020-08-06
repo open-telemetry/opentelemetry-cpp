@@ -21,7 +21,6 @@ using namespace opentelemetry::ext::zpages;
 void UpdateSpans(std::shared_ptr<TracezSpanProcessor> &processor,
                  std::vector<std::unique_ptr<ThreadsafeSpanData>> &completed,
                  std::unordered_set<ThreadsafeSpanData *> &running,
-
                  bool store_only_new_completed = false)
 {
   auto spans = processor->GetSpanSnapshot();
@@ -50,7 +49,6 @@ void UpdateSpans(std::shared_ptr<TracezSpanProcessor> &processor,
  */
 bool ContainsNames(const std::vector<std::string> &names,
                    std::unordered_set<ThreadsafeSpanData *> &running,
-
                    unsigned int name_start        = 0,
                    unsigned int name_end          = 0,
                    bool one_to_one_correspondence = false)

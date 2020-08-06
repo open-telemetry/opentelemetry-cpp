@@ -34,6 +34,17 @@ cc_test(
 )
 
 cc_test(
+    name = "batch_span_processor_test",
+    srcs = [
+        "batch_span_processor_test.cc",
+    ],
+    deps = [
+        "//sdk/src/trace",
+        "@com_google_googletest//:gtest_main",
+    ],
+)
+
+cc_test(
     name = "tracer_test",
     srcs = [
         "tracer_test.cc",
@@ -84,6 +95,17 @@ cc_test(
     ],
     deps = [
         "//sdk/src/common:random",
+        "//sdk/src/trace",
+        "@com_google_googletest//:gtest_main",
+    ],
+)
+
+cc_test(
+    name = "attribute_utils_test",
+    srcs = [
+        "attribute_utils_test.cc",
+    ],
+    deps = [
         "//sdk/src/trace",
         "@com_google_googletest//:gtest_main",
     ],
