@@ -4,8 +4,8 @@ cc_test(
         "controller_test.cc",
     ],
     deps = [
+        "//exporters/ostream:ostream_metrics_exporter",
         "//sdk/src/metrics",
-	"//exporters/ostream:ostream_metrics_exporter",
         "@com_google_googletest//:gtest_main",
     ],
 )
