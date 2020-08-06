@@ -32,6 +32,12 @@ public:
 
 private:
   /**
+   * Set value to metric family according to record
+   */
+  static void SetMetricFamily(metric_sdk::Record &record,
+                              prometheus_client::MetricFamily *metric_family);
+
+  /**
    * Sanitize the given metric name or label according to Prometheus rule.
    *
    * This function is needed because names in OpenTelemetry can contain
@@ -52,13 +58,7 @@ private:
   static bool IsValidName(const std::string &name);
 
   /**
-   * Set value to metric family according to record
-   */
-  static void SetMetricFamily(metric_sdk::Record &record,
-                              prometheus_client::MetricFamily *metric_family);
-
-  /**
-   * Set value to metric family for different aggregators
+   * Set value to metric family for different aggregator
    */
   template <typename T>
   static void SetMetricFamilyByAggregator(nostd::shared_ptr<metric_sdk::Aggregator<T>> aggregator,
@@ -97,7 +97,7 @@ private:
   /**
    * Set metric data for:
    * MinMaxSumCount => Prometheus Gauge
-   * Use the average (sum/count) as the gauge metric
+   * Use Average (sum / count) as the gauge metric
    */
   static void SetData(double value,
                       const std::string &labels,
@@ -110,6 +110,7 @@ private:
    */
   template <typename T>
   static void SetData(std::vector<T> values,
+                      metric_sdk::AggregatorKind kind,
                       const std::vector<T> &quantiles,
                       const std::string &labels,
                       std::chrono::nanoseconds time,
@@ -158,10 +159,11 @@ private:
                        prometheus_client::ClientMetric *metric);
 
   /**
-   * Handle Exact
+   * Handle Exact and Sketch
    */
   template <typename T>
   static void SetValue(std::vector<T> values,
+                       metric_sdk::AggregatorKind kind,
                        std::vector<T> quantiles,
                        prometheus_client::ClientMetric *metric);
 };
