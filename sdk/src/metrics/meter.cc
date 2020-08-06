@@ -751,26 +751,13 @@ bool Meter::NameAlreadyUsed(nostd::string_view name)
 {
   std::lock_guard<std::mutex> lg_metrics(metrics_lock_);
   std::lock_guard<std::mutex> lg_obsevers(observers_lock_);
-  if (short_metrics_.find(std::string(name)) != short_metrics_.end())
+  if (names_.find(std::string(name)) != names_.end())
     return true;
-  else if (int_metrics_.find(std::string(name)) != int_metrics_.end())
-    return true;
-  else if (float_metrics_.find(std::string(name)) != float_metrics_.end())
-    return true;
-  else if (double_metrics_.find(std::string(name)) != double_metrics_.end())
-    return true;
-
-  else if (short_observers_.find(std::string(name)) != short_observers_.end())
-    return true;
-  else if (int_observers_.find(std::string(name)) != int_observers_.end())
-    return true;
-  else if (float_observers_.find(std::string(name)) != float_observers_.end())
-    return true;
-  else if (double_observers_.find(std::string(name)) != double_observers_.end())
-    return true;
-
   else
+  {
+    names_.insert(std::string(name));
     return false;
+  }
 }
 }  // namespace metrics
 }  // namespace sdk

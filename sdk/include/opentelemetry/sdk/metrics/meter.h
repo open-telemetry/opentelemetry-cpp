@@ -7,7 +7,8 @@
 #include "opentelemetry/sdk/metrics/record.h"
 #include "opentelemetry/sdk/metrics/sync_instruments.h"
 
-#include <map>
+#include <set>
+#include <unordered_set>
 #include <vector>
 
 OPENTELEMETRY_BEGIN_NAMESPACE
@@ -360,6 +361,8 @@ private:
       float_observers_;
   std::map<std::string, std::shared_ptr<metrics_api::AsynchronousInstrument<double>>>
       double_observers_;
+
+  std::unordered_set<std::string> names_;
 
   std::string library_name_;
   std::string library_version_;
