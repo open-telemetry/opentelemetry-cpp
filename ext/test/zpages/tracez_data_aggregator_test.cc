@@ -2,10 +2,10 @@
 
 #include <gtest/gtest.h>
 
+#include "opentelemetry/context/threadlocal_context.h"
 #include "opentelemetry/ext/zpages/tracez_processor.h"
 #include "opentelemetry/sdk/trace/recordable.h"
 #include "opentelemetry/sdk/trace/tracer.h"
-#include "opentelemetry/context/threadlocal_context.h"
 
 using namespace opentelemetry::sdk::trace;
 using namespace opentelemetry::ext::zpages;
@@ -217,7 +217,6 @@ TEST_F(TracezDataAggregatorTest, MultipleRunningSpans)
 
   for (auto i = running_span_container.begin(); i != running_span_container.end(); i++)
     (*i)->End();
-  
 }
 
 /** Test to check if multiple completed spans updates the aggregated data
@@ -317,7 +316,8 @@ TEST_F(TracezDataAggregatorTest, MultipleErrorSpans)
   // Start spans with the error messages based on the map
   for (auto &span_error : span_name_to_error)
   {
-    for (auto error_desc : span_error.second){
+    for (auto error_desc : span_error.second)
+    {
       auto span = tracer->StartSpan(span_error.first);
       span->SetStatus(opentelemetry::trace::CanonicalCode::CANCELLED, error_desc);
       span->End();
@@ -379,7 +379,8 @@ TEST_F(TracezDataAggregatorTest, RunningSampleSpansOverCapacity)
 
   ASSERT_EQ(aggregated_data.sample_running_spans.size(), kMaxNumberOfSampleSpans);
 
-  for(auto i = running_span_container.begin(); i != running_span_container.end(); i++){
+  for (auto i = running_span_container.begin(); i != running_span_container.end(); i++)
+  {
     (*i)->End();
   }
 }
@@ -395,7 +396,8 @@ TEST_F(TracezDataAggregatorTest, ErrorSampleSpansOverCapacity)
   std::vector<std::string> span_error_descriptions = {"error span 1", "error span 2",
                                                       "error span 3", "error span 4",
                                                       "error span 5", "error span 6"};
-  for (auto span_error_description : span_error_descriptions){
+  for (auto span_error_description : span_error_descriptions)
+  {
     auto span = tracer->StartSpan(span_name1);
     span->SetStatus(opentelemetry::trace::CanonicalCode::CANCELLED, span_error_description);
     span->End();
@@ -666,7 +668,7 @@ TEST_F(TracezDataAggregatorTest, NoChangeInBetweenCallsToAggregator)
 
   tracer->StartSpan(span_name1, start)->End(end);
   auto running_span = tracer->StartSpan(span_name2);
-  auto span = tracer->StartSpan(span_name3);
+  auto span         = tracer->StartSpan(span_name3);
   span->SetStatus(opentelemetry::trace::CanonicalCode::CANCELLED, "span cancelled");
   span->End();
   std::this_thread::sleep_for(milliseconds(500));
@@ -682,7 +684,6 @@ TEST_F(TracezDataAggregatorTest, NoChangeInBetweenCallsToAggregator)
 
   ASSERT_TRUE(data.find(span_name3) != data.end());
   VerifySpanCountsInTracezData(span_name3, data.at(span_name3), 0, 1, {0, 0, 0, 0, 0, 0, 0, 0, 0});
-  
+
   running_span->End();
 }
-
