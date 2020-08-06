@@ -1,5 +1,6 @@
 #pragma once
 
+#include <atomic>
 #include <iostream>
 #include <sstream>
 #include <thread>
@@ -45,7 +46,7 @@ public:
    * @param none
    * @return true when active, false when on standby
    */
-  bool isActive() { return active_; }
+//  bool isActive() { return active_; }
 
   /*
    * Begins the data processing and export pipeline.  The function first ensures that the pipeline
@@ -58,16 +59,13 @@ public:
    */
   bool start()
   {
-    mu_.lock();
-    if (!active_)
+      if (!active_.load())
     {
-      active_ = true;
+        active_ = true;
       std::thread runner(&PushController::run, this);
       runner.detach();
-      mu_.unlock();
       return true;
     }
-    mu_.unlock();
     return false;
   }
 
@@ -80,10 +78,10 @@ public:
    */
   void stop()
   {
-    if (active_)
+      if (active_.load())
     {
-      active_ = false;
-      while (running_)
+        active_ = false;
+        while (running_.load())
       {
         std::this_thread::sleep_for(
             std::chrono::microseconds(period_ / 100));  // wait until the runner thread concludes
@@ -100,15 +98,15 @@ public:
    */
   void run()
   {
-    if (!running_)
+      if (!running_.load())
     {
-      running_ = true;
-      while (active_)
+        running_= true;
+        while (active_.load())
       {
         tick();
         std::this_thread::sleep_for(std::chrono::microseconds(period_));
       }
-      running_ = false;
+        running_ = false;;
     }
   }
 
@@ -123,7 +121,7 @@ public:
    */
   void tick()
   {
-    mu_.lock();
+    this->mu_.lock();
     std::vector<Record> collected = dynamic_cast<Meter *>(meter_.get())->Collect();
     for (const auto &rec : collected)
     {
@@ -132,15 +130,19 @@ public:
     collected = processor_->CheckpointSelf();
     processor_->FinishedCollection();
     exporter_->Export(collected);
-    mu_.unlock();
+    this->mu_.unlock();
   }
 
   nostd::shared_ptr<metrics_api::Meter> meter_;
   nostd::unique_ptr<MetricsExporter> exporter_;
   nostd::shared_ptr<MetricsProcessor> processor_;
   std::mutex mu_;
-  bool active_  = false;
-  bool running_ = false;
+//  bool active_ = false;
+//  bool running_ = false;
+    
+    std::atomic<bool> active_ = ATOMIC_VAR_INIT(false);
+    std::atomic<bool> running_ = ATOMIC_VAR_INIT(false);
+    
   unsigned int period_;
   unsigned int timeout_;
 };

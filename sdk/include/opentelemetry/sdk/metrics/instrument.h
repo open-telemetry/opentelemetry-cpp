@@ -113,7 +113,10 @@ public:
    */
   virtual int get_ref() override
   {
-    return ref_;
+      this->mu_.lock();
+      auto ret = ref_;
+      this->mu_.unlock();
+      return ret;
   }
 
   /**
