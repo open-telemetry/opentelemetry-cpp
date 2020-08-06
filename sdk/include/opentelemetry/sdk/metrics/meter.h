@@ -7,7 +7,6 @@
 #include "opentelemetry/sdk/metrics/record.h"
 #include "opentelemetry/sdk/metrics/sync_instruments.h"
 
-#include <set>
 #include <unordered_set>
 #include <vector>
 
