@@ -121,6 +121,7 @@ private:
           else
           {
             auto queried_name = GetAfterSlash(query);
+            ReplaceHtmlChars(queried_name);
             if (StartsWith(query, "aggregations"))
             {
               resp.body = GetAggregations().dump();
