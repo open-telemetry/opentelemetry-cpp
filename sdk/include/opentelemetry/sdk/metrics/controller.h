@@ -1,6 +1,5 @@
 #pragma once
 
-#include <unistd.h>
 #include <iostream>
 #include <sstream>
 #include <thread>
@@ -86,7 +85,7 @@ public:
       active_ = false;
       while (running_)
       {
-        usleep(period_ / 100);  // wait until the runner thread concludes
+        std::this_thread::sleep_for(std::chrono::microseconds(period_ / 100)); // wait until the runner thread concludes
       }
       tick();  // flush metrics sitting in the processor
     }
@@ -106,7 +105,7 @@ public:
       while (active_)
       {
         tick();
-        usleep(period_);
+        std::this_thread::sleep_for(std::chrono::microseconds(period_));
       }
       running_ = false;
     }
