@@ -13,7 +13,7 @@ namespace exporter
 namespace memory
 {
 InMemorySpanExporter::InMemorySpanExporter(size_t buffer_size)
-    : span_data_(new InMemorySpanData(buffer_size))
+    : data_(new InMemorySpanData(buffer_size))
 {}
 
 std::unique_ptr<sdk::trace::Recordable> InMemorySpanExporter::MakeRecordable() noexcept
@@ -30,7 +30,7 @@ sdk::trace::ExportResult InMemorySpanExporter::Export(
         static_cast<sdk::trace::SpanData *>(recordable.release()));
     if (span != nullptr)
     {
-      span_data_.get()->Add(std::move(span));
+      data_.get()->Add(std::move(span));
     }
   }
 
@@ -38,9 +38,9 @@ sdk::trace::ExportResult InMemorySpanExporter::Export(
 }
 
 std::shared_ptr<opentelemetry::exporter::memory::InMemorySpanData>
-    &InMemorySpanExporter::GetData() noexcept
+InMemorySpanExporter::GetData() noexcept
 {
-  return span_data_;
+  return data_;
 }
 }  // namespace memory
 }  // namespace exporter

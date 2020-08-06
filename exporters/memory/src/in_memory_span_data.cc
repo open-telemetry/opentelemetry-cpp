@@ -3,6 +3,8 @@
 #include "opentelemetry/sdk/common/circular_buffer_range.h"
 #include "opentelemetry/sdk/trace/span_data.h"
 
+#include <iostream>
+
 using opentelemetry::sdk::common::AtomicUniquePtr;
 using opentelemetry::sdk::common::CircularBuffer;
 using opentelemetry::sdk::common::CircularBufferRange;
