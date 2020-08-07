@@ -68,7 +68,10 @@ void PrometheusExporterUtils::SetMetricFamily(metric_sdk::Record &record,
 {
   try
   {
-    metric_family->name = SanitizeNames(record.GetName());
+    auto sanitized      = SanitizeNames(record.GetName());
+    metric_family->name = sanitized;
+    std::cout << "Sanitized metric name \"" << record.GetName() << "\" to \"" << sanitized << "\""
+              << std::endl;
   }
   catch (std::invalid_argument &e)
   {
@@ -332,7 +335,10 @@ void PrometheusExporterUtils::SetMetricBasic(prometheus_client::ClientMetric &me
     {
       try
       {
-        metric.label[i].name = SanitizeNames(label_pairs[i].first);
+        auto sanitized       = SanitizeNames(label_pairs[i].first);
+        metric.label[i].name = sanitized;
+        std::cout << "Sanitized label name \"" << label_pairs[i].first << "\" to \"" << sanitized
+                  << "\"" << std::endl;
       }
       catch (std::invalid_argument &e)
       {
