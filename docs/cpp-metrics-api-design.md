@@ -11,7 +11,7 @@ A *metric* is some raw measurement about a service, captured at run-time. Logica
 
 Monitoring and alerting systems commonly use the data provided through metric events, after applying various aggregations and converting into various exposition formats. However, we find that there are many other uses for metric events, such as to record aggregated or raw measurements in tracing and logging systems. For this reason, OpenTelemetry requires a separation of the API from the SDK, so that different SDKs can be configured at run time.
 
-Various instruments also allow for more optimized capture of certain types of measurements.  `Counter` instruments, for example, are monotonic and can therefore be used to capture rate information.  Other potential uses for the `Counter` include tracking the number of bytes received, requests completed, accounts created, etc. 
+Various instruments also allow for more optimized capture of certain types of measurements.  `Counter` instruments, for example, are monotonic and can therefore be used to capture rate information.  Other potential uses for the `Counter` include tracking the number of bytes received, requests completed, accounts created, etc.
 
 A `ValueRecorder` is commonly used to capture latency measurements. Latency measurements are not additive in the sense that there is little need to know the latency-sum of all processed requests. We use a `ValueRecorder` instrument to capture latency measurements typically because we are interested in knowing mean, median, and other summary statistics about individual events.
 
@@ -22,11 +22,11 @@ A `ValueRecorder` is commonly used to capture latency measurements. Latency meas
 ## Design Tenets
 
 * Reliability
-    * The Metrics API and SDK should be “reliable,” meaning that metrics data will always be accounted for. It will get back to the user or an error will be logged.  Reliability also entails that the end-user application will never be blocked.  Error handling will therefore not interfere with the execution of the instrumented program.  
-    * Thread Safety 
-        * As with the Tracer API and SDK, thread safety is not guaranteed on all functions and will be explicitly mentioned in documentation for functions that support concurrent calling.  Generally, the goal is to lock functions which change the state of library objects (incrementing the value of a Counter or adding a new Observer for example) or access global memory.  As a performance consideration, the library strives to hold locks for as short a duration as possible to avoid lock contention concerns.  Calls to create instrumentation may not be thread-safe as this is expected to occur during initialization of the program.  
+    * The Metrics API and SDK should be “reliable,” meaning that metrics data will always be accounted for. It will get back to the user or an error will be logged.  Reliability also entails that the end-user application will never be blocked.  Error handling will therefore not interfere with the execution of the instrumented program.
+    * Thread Safety
+        * As with the Tracer API and SDK, thread safety is not guaranteed on all functions and will be explicitly mentioned in documentation for functions that support concurrent calling.  Generally, the goal is to lock functions which change the state of library objects (incrementing the value of a Counter or adding a new Observer for example) or access global memory.  As a performance consideration, the library strives to hold locks for as short a duration as possible to avoid lock contention concerns.  Calls to create instrumentation may not be thread-safe as this is expected to occur during initialization of the program.
 * Scalability
-    * As OpenTelemetry is a distributed tracing system, it must be able to operate on sizeable systems with predictable overhead growth.  A key requirement of this is that the library does not consume unbounded memory resource. 
+    * As OpenTelemetry is a distributed tracing system, it must be able to operate on sizeable systems with predictable overhead growth.  A key requirement of this is that the library does not consume unbounded memory resource.
 * Security
     * Currently security is not a key consideration but may be addressed at a later date.
 
@@ -46,7 +46,7 @@ A `MeterProvider` interface must support a  `global.SetMeterProvider(MeterProvid
 
 
 * Expects 2 string arguments:
-    * name (required): identifies the instrumentation library. 
+    * name (required): identifies the instrumentation library.
     * version (optional): specifies the version of the instrumenting library (the library injecting OpenTelemetry calls into the code)
 
 ```
@@ -57,7 +57,7 @@ public:
   /*
    * Get Meter Provider
    *
-   * Returns the singleton MeterProvider. By default, a no-op MeterProvider 
+   * Returns the singleton MeterProvider. By default, a no-op MeterProvider
    * is returned. This will never return a nullptr MeterProvider.
    *
    */
@@ -72,7 +72,7 @@ public:
    * Changes the singleton MeterProvider.
    *
    * Arguments:
-   * newMeterProvider, the MeterProvider instance to be set as the new global 
+   * newMeterProvider, the MeterProvider instance to be set as the new global
    *                   provider.
    */
   static void SetMeterProvider(nostd::shared_ptr<MeterProvider> newMeterProvider);
@@ -130,9 +130,9 @@ This interface consists of a set of **instrument constructors**, and a **facilit
 # meter.h
 Class Meter {
 public:
-  
-/////////////////////////Metric Instrument Constructors////////////////////////////  
-  
+
+/////////////////////////Metric Instrument Constructors////////////////////////////
+
  /*
   * New Counter
   *
@@ -146,42 +146,42 @@ public:
   * enabled, a boolean that turns on or off collection.
   *
   */
-  virtual nostd::shared_ptr<Counter<short>> 
-                            NewShortCounter(nostd::string_view name, 
+  virtual nostd::shared_ptr<Counter<short>>
+                            NewShortCounter(nostd::string_view name,
                             nostd::string_view description,
-                            nostd::string_view unit, 
+                            nostd::string_view unit,
                             nostd::string_view enabled) = 0;
 
-  virtual nostd::shared_ptr<Counter<int>> 
-                            NewIntCounter(nostd::string_view name, 
+  virtual nostd::shared_ptr<Counter<int>>
+                            NewIntCounter(nostd::string_view name,
                             nostd::string_view description,
-                            nostd::string_view unit, 
+                            nostd::string_view unit,
                             nostd::string_view enabled) = 0;
 
-  virtual nostd::shared_ptr<Counter<float>> 
-                            NewFloatCounter(nostd::string_view name, 
+  virtual nostd::shared_ptr<Counter<float>>
+                            NewFloatCounter(nostd::string_view name,
                             nostd::string_view description,
-                            nostd::string_view unit, 
+                            nostd::string_view unit,
                             nostd::string_view enabled) = 0;
 
-  virtual nostd::shared_ptr<Counter<double>> 
-                            NewDoubleCounter(nostd::string_view name, 
+  virtual nostd::shared_ptr<Counter<double>>
+                            NewDoubleCounter(nostd::string_view name,
                             nostd::string_view description,
-                            nostd::string_view unit, 
+                            nostd::string_view unit,
                             nostd::string_view enabled) = 0;
-  
-  
+
+
 ////////////////////////////////////////////////////////////////////////////////////
 //                                                                                //
 //              Repeat above functions for short, int, float, and                 //
 //              double type versions of all 6 metric instruments.                 //
 //                                                                                //
-////////////////////////////////////////////////////////////////////////////////////  
+////////////////////////////////////////////////////////////////////////////////////
  /*
   * RecordBatch
   *
-  * Allows the functionality of acting upon multiple metrics with the same set 
-  * of labels with a single API call. Implementations should find bound metric 
+  * Allows the functionality of acting upon multiple metrics with the same set
+  * of labels with a single API call. Implementations should find bound metric
   * instruments that match the key-value pairs in the labels.
   *
   * Arugments:
@@ -189,12 +189,12 @@ public:
   * instruments, a span of pointers to instruments to record to.
   * values, a synchronized span of values to record to those instruments.
   *
-  */ 
-  virtual void RecordIntBatch(nostd::KeyValueIterable labels, 
+  */
+  virtual void RecordIntBatch(nostd::KeyValueIterable labels,
                            nostd::span<shared_ptr<SynchronousInstrument<int>>> instruments,
                            nostd::span<int> values) noexcept;
 
- 
+
  /*
   * Overloaded RecordBatch function which takes initializer lists of pairs.
   * Provided to improve ease-of-use of the BatchRecord function.
@@ -256,7 +256,7 @@ Each measurement taken by a Metric instrument is a Metric event which must conta
 
 
 * timestamp (implicit) — System time when measurement was captured.
-* instrument definition(strings) — Name of instrument, kind, description, and unit of measure 
+* instrument definition(strings) — Name of instrument, kind, description, and unit of measure
 * label set (key value pairs) — Labels associated with the capture, described further below.
 * resources associated with the SDK at startup
 
@@ -279,7 +279,7 @@ MUST support `RecordBatch` calling (where a single set of labels is applied to s
 # metric.h
 
 /*
- * Enum classes to hold the various types of Metric Instruments and their 
+ * Enum classes to hold the various types of Metric Instruments and their
  * bound complements.
  */
 enum class MetricKind
@@ -310,9 +310,9 @@ public:
 
     /**
      * Base class constructor for all other instrument types.  Whether or not
-     * an instrument is synchronous or bound, it requires a name, description, 
+     * an instrument is synchronous or bound, it requires a name, description,
      * unit, and enabled flag.
-     * 
+     *
      * @param name is the identifier of the instrumenting library
      * @param description explains what the metric captures
      * @param unit specified the data type held in the instrument
@@ -332,7 +332,7 @@ public:
 
     // Return the insrument's units of measurement
     nostd::string_view GetUnits();
-    
+
     // Return the kind of the instrument e.g. Counter
     InstrumentKind GetKind();
 };
@@ -345,11 +345,11 @@ template <class T>
 class SynchronousInstrument: public Instrument {
 public:
     SynchronousInstrument() = default;
-    
+
     SynchronousInstrument(nostd::string_view name, nostd::string_view description, nostd::string_view unit, bool enabled);
-    
+
     /**
-    * Returns a Bound Instrument associated with the specified labels.         
+    * Returns a Bound Instrument associated with the specified labels.
     * Multiples requests with the same set of labels may return the same
     * Bound Instrument instance.
     *
@@ -362,7 +362,7 @@ public:
     BoundSynchronousInstrument bind(nostd::KeyValueIterable labels);
 
     /**
-    * Records a single synchronous metric event. 
+    * Records a single synchronous metric event.
     * Since this is an unbound synchronous instrument, labels are required in  * metric capture calls.
     *
     *
@@ -405,31 +405,31 @@ template <class T>
 class AsynchronousInstrument: public Instrument{
 public:
     AsynchronousInstrument(nostd::string_view name, nostd::string_view description, nostd::string_view unit, bool enabled, void (*callback)(ObserverResult<T>));
-   
+
     /**
-     * Captures data by activating the callback function associated with the 
-     * instrument and storing its return value.  Callbacks for asychronous 
+     * Captures data by activating the callback function associated with the
+     * instrument and storing its return value.  Callbacks for asychronous
      * instruments are defined during construction.
-     * 
+     *
      * @param none
      * @return none
      */
     void observe();
-    
+
     /**
     * Captures data from the stored callback function.  The callback itself
-    * makes use of the instrument's observe function to take capture 
+    * makes use of the instrument's observe function to take capture
     * responsibilities out of the user's hands.
     *
     * @param none
     * @return none
     */
     void run();
-    
+
 private:
 
-    // Callback function which takes a pointer to an Asynchronous instrument (this) 
-    // type which is stored in an observer result type and returns nothing.  
+    // Callback function which takes a pointer to an Asynchronous instrument (this)
+    // type which is stored in an observer result type and returns nothing.
     // The function calls the instrument's observe method.
     void (*callback_)(ObserverResult<T>);
 };
@@ -446,13 +446,13 @@ public:
     BoundCounter() = default;
     BoundCounter(nostd::string_view name, nostd::string_view description, nostd::string_view unit, bool enabled);
     /*
-    * Add adds the value to the counter's sum. The labels are already linked   * to the instrument and are not specified. 
-    * 
+    * Add adds the value to the counter's sum. The labels are already linked   * to the instrument and are not specified.
+    *
     * @param value the numerical representation of the metric being captured
     * @param labels the set of labels, as key-value pairs
     */
     void add(T value, nostd::KeyValueIterable labels);
-    
+
     void unbind();
 };
 template <class T>
@@ -463,16 +463,16 @@ public:
     /*
     * Bind creates a bound instrument for this counter. The labels are
     * associated with values recorded via subsequent calls to Record.
-    * 
+    *
     * @param labels the set of labels, as key-value pairs.
     * @return a BoundIntCounter tied to the specified labels
-    */ 
+    */
 
     BoundCounter bind(nostd::KeyValueIterable labels);
     /*
     * Add adds the value to the counter's sum by sending to aggregator. The labels should contain
     * the keys and values to be associated with this value.  Counters only     * accept positive valued updates.
-    * 
+    *
     * @param value the numerical representation of the metric being captured
     * @param labels the set of labels, as key-value pairs
     */
@@ -485,7 +485,7 @@ public:
     /*
     * Add adds the value to the counter's sum. The labels should contain
     * the keys and values to be associated with this value.  Counters only     * accept positive valued updates.
-    * 
+    *
     * @param value the numerical representation of the metric being captured
     * @param labels the set of labels, as key-value pairs
     */
@@ -496,7 +496,7 @@ public:
 
 
 ```
-// The above Counter and BoundCounter are examples of 1 metric instrument.  
+// The above Counter and BoundCounter are examples of 1 metric instrument.
 // The remaining 5 will also be implemented in a similar fashion.
 class UpDownCounter: public SynchronousInstrument;
 class BoundUpDownCounter: public BoundSynchronousInstrument;

@@ -4,16 +4,16 @@
 
 * Reliability
     * The Metrics API and SDK should be “reliable,” meaning that metrics data will always be accounted for. It will get back to the user or an error will be logged.  Reliability also entails that the end-user application will never be blocked.  Error handling will therefore not interfere with the execution of the instrumented program.  The library may “fail fast” during the initialization or configuration path however.
-    * Thread Safety 
-        * As with the Tracer API and SDK, thread safety is not guaranteed on all functions and will be explicitly mentioned in documentation for functions that support concurrent calling.  Generally, the goal is to lock functions which change the state of library objects (incrementing the value of a Counter or adding a new Observer for example) or access global memory.  As a performance consideration, the library strives to hold locks for as short a duration as possible to avoid lock contention concerns.  Calls to create instrumentation may not be thread-safe as this is expected to occur during initialization of the program.  
+    * Thread Safety
+        * As with the Tracer API and SDK, thread safety is not guaranteed on all functions and will be explicitly mentioned in documentation for functions that support concurrent calling.  Generally, the goal is to lock functions which change the state of library objects (incrementing the value of a Counter or adding a new Observer for example) or access global memory.  As a performance consideration, the library strives to hold locks for as short a duration as possible to avoid lock contention concerns.  Calls to create instrumentation may not be thread-safe as this is expected to occur during initialization of the program.
 * Scalability
-    * As OpenTelemetry is a distributed tracing system, it must be able to operate on sizeable systems with predictable overhead growth.  A key requirement of this is that the library does not consume unbounded memory resource. 
+    * As OpenTelemetry is a distributed tracing system, it must be able to operate on sizeable systems with predictable overhead growth.  A key requirement of this is that the library does not consume unbounded memory resource.
 * Security
     * Currently security is not a key consideration but may be addressed at a later date.
 
 ## SDK Data Path Diagram
 
-![Data Path Diagram](../images/DataPath.png) 
+![Data Path Diagram](../images/DataPath.png)
 
 This is the control path our implementation of the metrics SDK will follow. There are five main components: The controller, accumulator, aggregators, processor, and exporter. Each of these components will be further elaborated on.
 
@@ -36,7 +36,7 @@ A `MeterProvider` interface must support a  `global.SetMeterProvider(MeterProvid
 
 
 * Expects 2 string arguments:
-    * name (required): identifies the instrumentation library. 
+    * name (required): identifies the instrumentation library.
     * version (optional): specifies the version of the instrumenting library (the library injecting OpenTelemetry calls into the code).
 
 ### Implementation
@@ -112,14 +112,14 @@ public:
   *                      the version.
   *
   */
-  explicit Meter(MeterProvider meterProvider, 
+  explicit Meter(MeterProvider meterProvider,
                  InstrumentationInfo instrumentationInfo) {
     meterProvider_(meterProvider);
     instrumentationInfo_(instrumentationInfo);
   }
-  
-/////////////////////////Metric Instrument Constructors////////////////////////////  
-  
+
+/////////////////////////Metric Instrument Constructors////////////////////////////
+
  /*
   * New Int Counter
   *
@@ -132,17 +132,17 @@ public:
   * unit, the unit of metric values following the UCUM convention
   *       (https://unitsofmeasure.org/ucum.html).
   *
-  */ 
-  nostd::shared_ptr<Counter<int>> NewIntCounter(nostd::string_view name, 
+  */
+  nostd::shared_ptr<Counter<int>> NewIntCounter(nostd::string_view name,
                                                 nostd::string_view description,
-                                                nostd::string_view unit, 
+                                                nostd::string_view unit,
                                                 nostd::string_view enabled) {
     auto intCounter = Counter<int>(name, description, unit, enabled);
     ptr = shared_ptr<Counter<int>>(intCounter)
     int_metrics_.insert(name, ptr);
-    return ptr; 
+    return ptr;
   }
-  
+
  /*
   * New float Counter
   *
@@ -155,7 +155,7 @@ public:
   * unit, the unit of metric values following the UCUM convention
   *       (https://unitsofmeasure.org/ucum.html).
   *
-  */ 
+  */
   nostd::unique_ptr<Counter<float>> NewFloatCounter(nostd::string_view name,
                                                     nostd::string_view description,
                                                     nostd::string_view unit,
@@ -165,7 +165,7 @@ public:
     float_metrics_.insert(name, ptr);
     return ptr;
   }
-  
+
 ////////////////////////////////////////////////////////////////////////////////////
 //                                                                                //
 //                     Repeat above two functions for all                         //
@@ -173,7 +173,7 @@ public:
 //                     of types short, int, float, and double.                    //
 //                                                                                //
 ////////////////////////////////////////////////////////////////////////////////////
-  
+
 private:
  /*
   * Collect (THREADSAFE)
@@ -198,39 +198,39 @@ private:
     metrics_lock_.unlock();
     return records;
   }
-  
+
  /*
   * Record Batch
   *
-  * Allows the functionality of acting upon multiple metrics with the same set 
-  * of labels with a single API call. Implementations should find bound metric 
+  * Allows the functionality of acting upon multiple metrics with the same set
+  * of labels with a single API call. Implementations should find bound metric
   * instruments that match the key-value pairs in the labels.
   *
   * Arugments:
   * labels, labels associated with all measurements in the batch.
   * records, a KeyValueIterable containing metric instrument names such as
-  *          "IntCounter" or "DoubleSumObserver" and the corresponding value 
+  *          "IntCounter" or "DoubleSumObserver" and the corresponding value
   *          to record for that metric.
   *
-  */ 
-  void RecordBatch(nostd::string_view labels, 
+  */
+  void RecordBatch(nostd::string_view labels,
                    nostd::KeyValueIterable values) {
     for instr in metrics:
       instr.bind(labels) // Bind the instrument to the label set
       instr.record(values.GetValue(instr.type)) // Record the corresponding value
                                                 // to the instrument.
   }
-  
+
   std::map<nostd::string_view, shared_ptr<SynchronousInstrument<short>>> short_metrics_;
   std::map<nostd::string_view, shared_ptr<SynchronousInstrument<short>>> int_metrics_;
   std::map<nostd::string_view, shared_ptr<SynchronousInstrument<short>>> float_metrics_;
   std::map<nostd::string_view, shared_ptr<SynchronousInstrument<short>>> double_metrics_;
-  
+
   std::map<nostd::string_view, shared_ptr<AsynchronousInstrument<short>>> short_observers_;
   std::map<nostd::string_view, shared_ptr<AsynchronousInstrument<short>>> int_observers_;
   std::map<nostd::string_view, shared_ptr<AsynchronousInstrument<short>>> float_observers_;
   std::map<nostd::string_view, shared_ptr<AsynchronousInstrument<short>>> double_observers_;
-  
+
   std::mutex metrics_lock_;
   unique_ptr<MeterProvider> meterProvider_;
   InstrumentationInfo instrumentationInfo_;
@@ -260,7 +260,7 @@ public:
     description_ = description;
     instrumentKind_ = instrumentKind;
     labels_ = labels;
-    aggregator_ = aggregator; 
+    aggregator_ = aggregator;
   }
 
   string GetName() {return name_;}
@@ -305,7 +305,7 @@ The SDK implementation of the `Meter` class will contain a function called `coll
 
 ## **Metric Instrument Class**
 
-Metric instruments capture raw measurements of designated quantities in instrumented applications. All measurements captured by the Metrics API are associated with the instrument which collected that measurement.  
+Metric instruments capture raw measurements of designated quantities in instrumented applications. All measurements captured by the Metrics API are associated with the instrument which collected that measurement.
 
 
 ### Metric Instrument Data Model
@@ -327,7 +327,7 @@ Each measurement taken by a Metric instrument is a Metric event which must conta
 
 
 * timestamp (implicit) — System time when measurement was captured.
-* instrument definition(strings) — Name of instrument, kind, description, and unit of measure 
+* instrument definition(strings) — Name of instrument, kind, description, and unit of measure
 * label set (key value pairs) — Labels associated with the capture, described further below.
 * resources associated with the SDK at startup
 
@@ -355,11 +355,11 @@ Note: these requirements come from a specification currently under development. 
 
 ## **Accumulator**
 
-The Accumulator is responsible for computing aggregation over a fixed unit of time. It essentially takes a set of captures and turns them into a quantity that can be collected and used for meaningful analysis by maintaining aggregators for each active instrument and each distinct label set. For example, the aggregator for a counter must combine multiple calls to Add(increment) into a single sum.  
+The Accumulator is responsible for computing aggregation over a fixed unit of time. It essentially takes a set of captures and turns them into a quantity that can be collected and used for meaningful analysis by maintaining aggregators for each active instrument and each distinct label set. For example, the aggregator for a counter must combine multiple calls to Add(increment) into a single sum.
 
-Accumulators MUST support a `Checkpoint()` operation which saves a snapshot of the current state for collection and a `Merge()` operation which combines the state from multiple aggregators into one.  
+Accumulators MUST support a `Checkpoint()` operation which saves a snapshot of the current state for collection and a `Merge()` operation which combines the state from multiple aggregators into one.
 
-Calls to the Accumulator's  `Collect()` sweep through metric instruments with un-exported updates, checkpoints their aggregators, and submits them to the processor/exporter. This and all other accumulator operations should be extremely efficient and follow the shortest code path possible.  
+Calls to the Accumulator's  `Collect()` sweep through metric instruments with un-exported updates, checkpoints their aggregators, and submits them to the processor/exporter. This and all other accumulator operations should be extremely efficient and follow the shortest code path possible.
 
 Design choice: We have chosen to implement the Accumulator as the SDK implementation of the Meter interface shown above.
 
@@ -389,7 +389,7 @@ public:
     * Arguments:
     * value, the new value to update the instrument with.
     *
-    */ 
+    */
     virtual void Update(<T> value);
 
    /*
@@ -410,14 +410,14 @@ public:
     *
     */
     virtual void Merge(Aggregator other);
-    
+
     /*
      * Getters for various aggregator specific fields
      */
      virtual std::vector<T> get_value() {return current_;}
      virtual std::vector<T> get_checkpoint() {return checkpoint_;}
      virtual core::SystemTimeStamp get_timestamp() {return last_update_timestamp_;}
-       
+
 private:
     std::vector<T> current_;
     std::vector<T> checkpoint_;
@@ -432,7 +432,7 @@ private:
 template <class T>
 class CounterAggregator : public Aggregator<T> {
 public:
-    explicit CounterAggregator(): current(0), checkpoint(0), 
+    explicit CounterAggregator(): current(0), checkpoint(0),
                                   last_update_timestamp(nullptr){}
 
     void Update(T value) {
@@ -470,12 +470,12 @@ The Processor SHOULD act as the primary source of configuration for exporting me
 During the collection pass, the Processor receives a full set of check-pointed aggregators corresponding to each (Instrument, LabelSet) pair with an active record managed by the Accumulator. According to its own configuration, the Processor at this point determines which dimensions to aggregate for export; it computes a checkpoint of (possibly) reduced-dimension export records ready for export. It can be thought of as the business logic or processing phase in the pipeline.
 
 
-Change of dimensions: The user-facing metric API allows users to supply LabelSets containing an unlimited number of labels for any metric update. Some metric exporters will restrict the set of labels when exporting metric data, either to reduce cost or because of system-imposed requirements. A *change of dimensions* maps input LabelSets with potentially many labels into a LabelSet with a fixed set of label keys. A change of dimensions eliminates labels with keys not in the output LabelSet and fills in empty values for label keys that are not in the input LabelSet. This can be used for different filtering options, rate limiting, and alternate aggregation schemes. Additionally, it will be used to prevent unbounded memory growth through capping collected data. The community is still deciding exactly how metrics data will be pruned and this document will be updated when a decision is made. 
+Change of dimensions: The user-facing metric API allows users to supply LabelSets containing an unlimited number of labels for any metric update. Some metric exporters will restrict the set of labels when exporting metric data, either to reduce cost or because of system-imposed requirements. A *change of dimensions* maps input LabelSets with potentially many labels into a LabelSet with a fixed set of label keys. A change of dimensions eliminates labels with keys not in the output LabelSet and fills in empty values for label keys that are not in the input LabelSet. This can be used for different filtering options, rate limiting, and alternate aggregation schemes. Additionally, it will be used to prevent unbounded memory growth through capping collected data. The community is still deciding exactly how metrics data will be pruned and this document will be updated when a decision is made.
 
 
 The following is a pseudo code implementation of a ‘simple’ Processor.
 
-Note: Josh MacDonald is working on implementing a [‘basic’ Processor](https://github.com/jmacd/opentelemetry-go/blob/jmacd/mexport/sdk/metric/processor/simple/simple.go) which allows for further Configuration that lines up with the specification in Go. He will be finishing the implementation and updating the specification within the next few weeks. 
+Note: Josh MacDonald is working on implementing a [‘basic’ Processor](https://github.com/jmacd/opentelemetry-go/blob/jmacd/mexport/sdk/metric/processor/simple/simple.go) which allows for further Configuration that lines up with the specification in Go. He will be finishing the implementation and updating the specification within the next few weeks.
 
 Design choice: We recommend that we implement the ‘simple’ Processor first as apart of the MVP and then will also implement the ‘basic’ Processor later on. Josh recommended having both for doing different processes.
 
@@ -484,26 +484,26 @@ Design choice: We recommend that we implement the ‘simple’ Processor first a
 #processor.cc
 class Processor {
 public:
-    
+
   explicit Processor(Bool stateful) {
     // stateful determines whether the processor computes deltas or lifetime changes
     // in metric values
     stateful_ = stateful;
   }
- 
+
  /*
   * Process
   *
-  * This function chooses which dimensions to aggregate for export.  In the 
+  * This function chooses which dimensions to aggregate for export.  In the
   * reference implementation, the UngroupedProcessor does not process records
   * and simple passes them along to the next step.
-  * 
+  *
   * Arguments:
   * record, a record containing data collected from the active Accumulator
   * in this data pipeline
   */
   void Process(Record record);
-  
+
  /*
   * Checkpoint
   *
@@ -512,7 +512,7 @@ public:
   *
   */
   Collection<Record> Checkpoint();
- 
+
  /*
   * Finished Collection
   *
@@ -533,7 +533,7 @@ public:
   *
   */
   Aggregator AggregatorFor(MetricKind kind);
-  
+
 private:
   Bool stateful_;
   Batch batch_;
@@ -544,7 +544,7 @@ private:
 
 ## **Controller**
 
-Controllers generally are responsible for binding the Accumulator, the Processor, and the Exporter. The controller initiates the collection and export pipeline and manages all the moving parts within it. It also governs the flow of data through the SDK components. Users interface with the controller to begin collection process.  
+Controllers generally are responsible for binding the Accumulator, the Processor, and the Exporter. The controller initiates the collection and export pipeline and manages all the moving parts within it. It also governs the flow of data through the SDK components. Users interface with the controller to begin collection process.
 
 Once the decision has been made to export, the controller must call `Collect()` on the Accumulator, then read the checkpoint from the Processor, then invoke the Exporter.
 
@@ -558,8 +558,8 @@ We recommend implementing the PushController as the initial implementation of th
 ```
 #push_controller.cc
 class PushController {
- 
-    explicit PushController(Meter meter, Exporter exporter, 
+
+    explicit PushController(Meter meter, Exporter exporter,
                             int period, int timeout) {
         meter_ = meter;
         exporter_ = exporter();
@@ -567,7 +567,7 @@ class PushController {
         timeout_ = timeout;
         provider_ = NewMeterProvider(accumulator);
     }
-    
+
    /*
     * Provider
     *
@@ -585,7 +585,7 @@ class PushController {
     *
     */
     void Start();
-    
+
    /*
     * Stop (THREAD SAFE)
     *
@@ -594,7 +594,7 @@ class PushController {
     *
     */
     void Stop();
-    
+
    /*
     * Run
     *
@@ -602,7 +602,7 @@ class PushController {
     *
     */
     void run();
-    
+
    /*
     * Tick (THREAD SAFE)
     *
@@ -613,7 +613,7 @@ class PushController {
     *
     */
     void tick();
-    
+
 private:
     mutex lock_;
     Meter meter_;
@@ -649,7 +649,7 @@ class StdoutExporter: public exporter {
     *
     */
     ExportResult Export(CheckpointSet checkpointSet) noexcept;
-    
+
    /*
     * Shutdown
     *
