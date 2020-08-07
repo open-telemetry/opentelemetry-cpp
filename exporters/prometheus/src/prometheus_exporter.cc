@@ -1,0 +1,91 @@
+#include "opentelemetry/exporters/prometheus/prometheus_exporter.h"
+
+OPENTELEMETRY_BEGIN_NAMESPACE
+namespace exporter
+{
+namespace prometheus
+{
+/**
+ * Constructor - binds an exposer and collector to the exporter
+ * @param address: an address for an exposer that exposes
+ *  an HTTP endpoint for the exporter to connect to
+ */
+PrometheusExporter::PrometheusExporter(std::string &address) : is_shutdown_(false)
+{
+  exposer_   = std::unique_ptr<::prometheus::Exposer>(new ::prometheus::Exposer{address});
+  collector_ = std::shared_ptr<PrometheusCollector>(new PrometheusCollector);
+
+  exposer_->RegisterCollectable(collector_);
+}
+
+/**
+ * PrometheusExporter constructor with no parameters
+ * Used for testing only
+ */
+PrometheusExporter::PrometheusExporter() : is_shutdown_(false)
+{
+  exposer_   = nullptr;
+  collector_ = std::unique_ptr<PrometheusCollector>(new PrometheusCollector);
+}
+
+/**
+ * Exports a batch of Metric Records.
+ * @param records: a collection of records to export
+ * @return: returns a ReturnCode detailing a success, or type of failure
+ */
+sdk::metrics::ExportResult PrometheusExporter::Export(
+    const std::vector<sdk::metrics::Record> &records) noexcept
+{
+  if (is_shutdown_)
+  {
+    return sdk::metrics::ExportResult::kFailure;
+  }
+  else if (records.empty())
+  {
+    return sdk::metrics::ExportResult::kFailureInvalidArgument;
+  }
+  else if (collector_->GetCollection().size() + records.size() > collector_->GetMaxCollectionSize())
+  {
+    return sdk::metrics::ExportResult::kFailureFull;
+  }
+  else
+  {
+    collector_->AddMetricData(records);
+    return sdk::metrics::ExportResult::kSuccess;
+  }
+}
+
+/**
+ * Shuts down the exporter and does cleanup.
+ * Since Prometheus is a pull based interface, 
+ * we cannot serve data remaining in the intermediate
+ * collection to to client an HTTP request being sent, 
+ * so we flush the data.
+ */
+void PrometheusExporter::Shutdown() noexcept
+{
+  is_shutdown_ = true;
+
+  collector_->GetCollection().clear();
+}
+
+/**
+ * @return: returns a shared_ptr to
+ * the PrometheusCollector instance
+ */
+std::shared_ptr<PrometheusCollector> &PrometheusExporter::GetCollector()
+{
+  return collector_;
+}
+
+/**
+ * @return: Gets the shutdown status of the exporter
+ */
+bool PrometheusExporter::IsShutdown() const
+{
+  return is_shutdown_;
+}
+
+}  // namespace prometheus
+}  // namespace exporter
+OPENTELEMETRY_END_NAMESPACE
