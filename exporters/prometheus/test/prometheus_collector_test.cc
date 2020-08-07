@@ -1,3 +1,19 @@
+/*
+ * Copyright The OpenTelemetry Authors
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 #include <gtest/gtest.h>
 #include <future>
 #include <map>
@@ -30,35 +46,41 @@ nostd::shared_ptr<metric_sdk::Aggregator<T>> CreateAgg(metric_sdk::AggregatorKin
   nostd::shared_ptr<metric_sdk::Aggregator<T>> aggregator;
   switch (kind)
   {
-    case metric_sdk::AggregatorKind::Counter: {
+    case metric_sdk::AggregatorKind::Counter:
+    {
       aggregator = nostd::shared_ptr<metric_sdk::Aggregator<T>>(
           new metric_sdk::CounterAggregator<T>(opentelemetry::metrics::InstrumentKind::Counter));
       break;
     }
-    case metric_sdk::AggregatorKind::MinMaxSumCount: {
+    case metric_sdk::AggregatorKind::MinMaxSumCount:
+    {
       aggregator =
           nostd::shared_ptr<metric_sdk::Aggregator<T>>(new metric_sdk::MinMaxSumCountAggregator<T>(
               opentelemetry::metrics::InstrumentKind::Counter));
       break;
     }
-    case metric_sdk::AggregatorKind::Gauge: {
+    case metric_sdk::AggregatorKind::Gauge:
+    {
       aggregator = nostd::shared_ptr<metric_sdk::Aggregator<T>>(
           new metric_sdk::GaugeAggregator<T>(opentelemetry::metrics::InstrumentKind::Counter));
       break;
     }
-    case metric_sdk::AggregatorKind::Sketch: {
+    case metric_sdk::AggregatorKind::Sketch:
+    {
       aggregator = nostd::shared_ptr<metric_sdk::Aggregator<T>>(new metric_sdk::SketchAggregator<T>(
           opentelemetry::metrics::InstrumentKind::Counter, 0.000005));
       break;
     }
-    case metric_sdk::AggregatorKind::Histogram: {
+    case metric_sdk::AggregatorKind::Histogram:
+    {
       std::vector<double> boundaries{10, 20};
       aggregator =
           nostd::shared_ptr<metric_sdk::Aggregator<T>>(new metric_sdk::HistogramAggregator<T>(
               opentelemetry::metrics::InstrumentKind::Counter, boundaries));
       break;
     }
-    case metric_sdk::AggregatorKind::Exact: {
+    case metric_sdk::AggregatorKind::Exact:
+    {
       aggregator = nostd::shared_ptr<metric_sdk::Aggregator<T>>(new metric_sdk::ExactAggregator<T>(
           opentelemetry::metrics::InstrumentKind::Counter, exactMode));
       break;
@@ -686,8 +708,8 @@ TEST(PrometheusCollector, ConcurrentlyAddingAndThenCollecting)
 }
 
 /**
- * Concurrency Test 3: Concurrently adding and collecting. We don't know when the collect function is called,
- * but all data entries are either collected or left in the collection.
+ * Concurrency Test 3: Concurrently adding and collecting. We don't know when the collect function
+ * is called, but all data entries are either collected or left in the collection.
  */
 TEST(PrometheusCollector, ConcurrentlyAddingAndCollecting)
 {
@@ -718,8 +740,8 @@ TEST(PrometheusCollector, ConcurrentlyAddingAndCollecting)
 }
 
 /**
- * Concurrency Test 4: Concurrently adding then concurrently collecting. We don't know which collecting
- * thread fetches all data, but either one should succeed.
+ * Concurrency Test 4: Concurrently adding then concurrently collecting. We don't know which
+ * collecting thread fetches all data, but either one should succeed.
  */
 TEST(PrometheusCollector, ConcurrentlyAddingAndConcurrentlyCollecting)
 {
