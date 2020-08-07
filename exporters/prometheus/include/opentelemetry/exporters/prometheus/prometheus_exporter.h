@@ -52,16 +52,15 @@ public:
    * @param records: a collection of records to export
    * @return: returns a ReturnCode detailing a success, or type of failure
    */
-  sdk::metrics::ExportResult Export(
-      const std::vector<sdk::metrics::Record> &records) noexcept override;
+  sdk::metrics::ExportResult Export(const std::vector<sdk::metrics::Record> &records) noexcept override;
 
-  /**
-   * Shuts down the exporter and does cleanup.
-   * Since Prometheus is a pull based interface,
-   * we cannot serve data remaining in the intermediate
-   * collection to to client an HTTP request being sent,
-   * so we flush the data.
-   */
+/**
+ * Shuts down the exporter and does cleanup.
+ * Since Prometheus is a pull based interface, 
+ * we cannot serve data remaining in the intermediate
+ * collection to to client an HTTP request being sent, 
+ * so we flush the data.
+ */
   void Shutdown() noexcept;
 
   /**

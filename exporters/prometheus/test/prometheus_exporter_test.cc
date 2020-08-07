@@ -1,19 +1,3 @@
-/*
- * Copyright The OpenTelemetry Authors
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- * http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-
 #include <gtest/gtest.h>
 #include <typeinfo>
 
@@ -28,26 +12,21 @@
  * an exposer as an argument, and instead takes no arguments; this
  * private constructor is only to be used here for testing
  */
-OPENTELEMETRY_BEGIN_NAMESPACE
-namespace exporter
-{
-namespace prometheus
-{
-class PrometheusExporterTest  // : public ::testing::Test
+class opentelemetry::exporter::prometheus::PrometheusExporterTest
 {
 public:
-  PrometheusExporter GetExporter() { return PrometheusExporter(); }
+  opentelemetry::exporter::prometheus::PrometheusExporter GetExporter()
+  {
+    return opentelemetry::exporter::prometheus::PrometheusExporter();
+  }
 };
-}  // namespace prometheus
-}  // namespace exporter
-OPENTELEMETRY_END_NAMESPACE
 
 using opentelemetry::exporter::prometheus::PrometheusCollector;
 using opentelemetry::exporter::prometheus::PrometheusExporter;
 using opentelemetry::exporter::prometheus::PrometheusExporterTest;
 using opentelemetry::sdk::metrics::CounterAggregator;
-using opentelemetry::sdk::metrics::ExportResult;
 using opentelemetry::sdk::metrics::Record;
+using opentelemetry::sdk::metrics::ExportResult;
 
 /**
  * Helper function to create a collection of records taken from
@@ -110,7 +89,7 @@ TEST(PrometheusExporter, ShutdownSetsIsShutdownToTrue)
 }
 
 /**
- * The Export() function should return kSuccess = 0
+ * The Export() function should return SUCCESS = 0
  *  when data is exported successfully.
  */
 TEST(PrometheusExporter, ExportSuccessfully)
@@ -124,14 +103,14 @@ TEST(PrometheusExporter, ExportSuccessfully)
 
   auto res = exporter.Export(records);
 
-  // result should be kSuccess = 0
+  // result should be SUCCESS = 0
   ExportResult code = ExportResult::kSuccess;
   ASSERT_EQ(res, code);
 }
 
 /**
  * If the exporter is shutdown, it cannot process
- * any more export requests and returns kFailure = 1.
+ * any more export requests and returns FAILURE_ALREADY_SHUTDOWN = 4.
  */
 TEST(PrometheusExporter, ExporterIsShutdown)
 {
@@ -147,14 +126,14 @@ TEST(PrometheusExporter, ExporterIsShutdown)
   // send export request after shutdown
   auto res = exporter.Export(records);
 
-  // result code should be kFailure = 1
+  // result code should be FAILURE_ALREADY_SHUTDOWN = 4
   ExportResult code = ExportResult::kFailure;
   ASSERT_EQ(res, code);
 }
 
 /**
  * The Export() function should return
- * kFailureFull = 2 when the collection is full,
+ * FAILURE_FULL_COLLECTION = 1 when the collection is full,
  * or when the collection is not full but does not have enough
  * space to hold the batch data.
  */
@@ -178,7 +157,7 @@ TEST(PrometheusExporter, CollectionNotEnoughSpace)
   // collection in the collector
   auto res = exporter.Export(full_records);
 
-  // the result code should be kSuccess = 0
+  // the result code should be SUCCESS = 0
   ExportResult code = ExportResult::kSuccess;
   ASSERT_EQ(res, code);
 
@@ -186,14 +165,14 @@ TEST(PrometheusExporter, CollectionNotEnoughSpace)
   // due to not enough space in the collection
   res = exporter.Export(records);
 
-  // the result code should be kFailureFull = 2
+  // the result code should be FAILURE_FULL_COLLECTION = 1
   code = ExportResult::kFailureFull;
   ASSERT_EQ(res, code);
 }
 
 /**
  *  The Export() function should return
- *  kFailureInvalidArgument = 3 when an empty collection
+ *  FAILURE_INVALID_ARGUMENT = 3 when an empty collection
  *  of records is passed to the Export() function.
  */
 TEST(PrometheusExporter, InvalidArgumentWhenPassedEmptyRecordCollection)
@@ -208,7 +187,7 @@ TEST(PrometheusExporter, InvalidArgumentWhenPassedEmptyRecordCollection)
   // collection in the collector
   auto res = exporter.Export(records);
 
-  // the result code should be kFailureInvalidArgument = 3
+  // the result code should be FAILURE_INVALID_ARGUMENT = 3
   ExportResult code = ExportResult::kFailureInvalidArgument;
   ASSERT_EQ(res, code);
 }
