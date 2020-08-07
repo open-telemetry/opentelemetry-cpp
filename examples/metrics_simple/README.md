@@ -2,7 +2,7 @@
 
 In this example, the application in `main.cc` initializes the metrics pipeline and shows 3 different ways of updating instrument values. Here are more detailed explanations of each part.
 
-1. Initialize a MeterProvider. We will use this to obtain Meter objects in the future.  
+1. Initialize a MeterProvider. We will use this to obtain Meter objects in the future.
 
 `auto provider = shared_ptr<MeterProvider>(new MeterProvider);`
 
@@ -17,7 +17,7 @@ In this example, the application in `main.cc` initializes the metrics pipeline a
 4. Initialize an exporter and processor. In this case, we initialize an OStream Exporter which will print to stdout by default. The Processor is an UngroupedProcessor which doesn’t filter or group captured metrics in any way. The false parameter indicates that this processor will send metric deltas rather than metric cumulatives.
 
 ```
-unique_ptr<MetricsExporter> exporter = unique_ptr<MetricsExporter>(new OStreamMetricsExporter);  
+unique_ptr<MetricsExporter> exporter = unique_ptr<MetricsExporter>(new OStreamMetricsExporter);
 shared_ptr<MetricsProcessor> processor = shared_ptr<MetricsProcessor>(new UngroupedMetricsProcessor(false));
 ```
 
@@ -26,7 +26,7 @@ shared_ptr<MetricsProcessor> processor = shared_ptr<MetricsProcessor>(new Ungrou
 `metrics_sdk::PushController controller(meter, std::move(exporter), processor, 5);`
 `controller.start();`
 
-6. Instrument code with synchronous and asynchronous instrument. These instruments can be placed in areas of interest to collect metrics and are created by the meter. Synchronous instruments are updated whenever the user desires with a value and label set. Calling add on a counter instrument for example will increase its value.  Asynchronous instruments can be updated the same way, but are intended to recieve updates from a callback function. The callback below observes a value of 1. The user never has to call this function as it is automatically called by the controller. 
+6. Instrument code with synchronous and asynchronous instrument. These instruments can be placed in areas of interest to collect metrics and are created by the meter. Synchronous instruments are updated whenever the user desires with a value and label set. Calling add on a counter instrument for example will increase its value.  Asynchronous instruments can be updated the same way, but are intended to recieve updates from a callback function. The callback below observes a value of 1. The user never has to call this function as it is automatically called by the controller.
 
 ```
 
@@ -45,7 +45,7 @@ auto obs= meter->NewIntSumObserver("Counter","none", "none", true, &SumObserverC
 std::map<std::string, std::string> labels = {{"key", "value"}};
 auto labelkv = trace::KeyValueIterableView<decltype(labels)>{labels};
 
-// Capture data from instruments.  Note that the asynchronous instrument is updates 
+// Capture data from instruments.  Note that the asynchronous instrument is updates
 // automatically though its callback at the collection interval.  Additional measurments
 // can be made through calls to its observe function.
 ctr->add(5, labelkv);

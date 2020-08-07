@@ -3,10 +3,10 @@ cc_binary(
     srcs = [
         "main.cc",
     ],
+    linkopts = ["-pthread"],
     deps = [
         "//api",
         "//exporters/ostream:ostream_metrics_exporter",
         "//sdk/src/metrics",
     ],
-    linkopts = ["-pthread"],
 )
