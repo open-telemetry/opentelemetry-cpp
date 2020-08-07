@@ -90,13 +90,13 @@ void PrometheusExporterUtils::SetMetricFamily(metric_sdk::Record &record,
     SetMetricFamilyByAggregator(aggregator, labels_str, metric_family);
   }
   else if (nostd::holds_alternative<nostd::shared_ptr<metric_sdk::Aggregator<float>>>(
-      record.GetAggregator()))
+               record.GetAggregator()))
   {
     auto aggregator = nostd::get<nostd::shared_ptr<metric_sdk::Aggregator<float>>>(agg_var);
     SetMetricFamilyByAggregator(aggregator, labels_str, metric_family);
   }
   else if (nostd::holds_alternative<nostd::shared_ptr<metric_sdk::Aggregator<double>>>(
-      record.GetAggregator()))
+               record.GetAggregator()))
   {
     auto aggregator = nostd::get<nostd::shared_ptr<metric_sdk::Aggregator<double>>>(agg_var);
     SetMetricFamilyByAggregator(aggregator, labels_str, metric_family);
@@ -403,15 +403,18 @@ void PrometheusExporterUtils::SetValue(std::vector<T> values,
 {
   switch (type)
   {
-    case prometheus_client::MetricType::Counter: {
+    case prometheus_client::MetricType::Counter:
+    {
       metric->counter.value = values[0];
       break;
     }
-    case prometheus_client::MetricType::Gauge: {
+    case prometheus_client::MetricType::Gauge:
+    {
       metric->gauge.value = values[0];
       break;
     }
-    case prometheus_client::MetricType::Untyped: {
+    case prometheus_client::MetricType::Untyped:
+    {
       metric->untyped.value = values[0];
       break;
     }
