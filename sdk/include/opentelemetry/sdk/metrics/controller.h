@@ -41,10 +41,12 @@ public:
   }
 
   /*
-   * Used to check if the metrics pipeline is currecntly active
+   * Used to check if the metrics pipeline is currently active
    *
    * @param none
-   * @return true when active, false when on standby
+   * @return true when active, false when on standby.  This is a best guess estimate
+   * and the boolean from start() should be used to determine wheher the pipeline
+   * was initiated successfully.
    */
   bool isActive() { return active_.load(); }
 
