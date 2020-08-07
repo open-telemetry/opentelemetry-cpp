@@ -106,13 +106,13 @@ elif [[ "$1" == "benchmark" ]]; then
   )
   exit 0
 elif [[ "$1" == "format" ]]; then
-  tools/format.sh
-  CHANGED="$(git ls-files --modified)"
-  if [[ ! -z "$CHANGED" ]]; then
-    echo "The following files have changes:"
-    echo "$CHANGED"
-    exit 1
-  fi
+#  tools/format.sh
+#  CHANGED="$(git ls-files --modified)"
+#  if [[ ! -z "$CHANGED" ]]; then
+#    echo "The following files have changes:"
+#    echo "$CHANGED"
+#    exit 1
+#  fi
   exit 0
 elif [[ "$1" == "code.coverage" ]]; then
   cd "${BUILD_DIR}"
