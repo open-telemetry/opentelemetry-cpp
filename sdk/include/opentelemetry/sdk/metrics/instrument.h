@@ -111,7 +111,13 @@ public:
    * @param none
    * @return current ref count of the instrument
    */
-  virtual int get_ref() override { return ref_; }
+  virtual int get_ref() override
+  {
+    this->mu_.lock();
+    auto ret = ref_;
+    this->mu_.unlock();
+    return ret;
+  }
 
   /**
    * Records a single synchronous metric event via a call to the aggregator.
