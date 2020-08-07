@@ -190,7 +190,7 @@ constexpr auto get_type = [](auto &&t) constexpr -> decltype(auto)
     return *result;
   }
   THROW_BAD_VARIANT_ACCESS;
-  return result;
+  return *result;
 };
 
 template <std::size_t I, class... Types>
@@ -203,7 +203,7 @@ constexpr auto get_index = [](auto &&t) constexpr -> decltype(auto)
     return *result;
   }
   THROW_BAD_VARIANT_ACCESS;
-  return result;
+  return *result;
 };
 
 template <std::size_t I, class... Types>
@@ -239,9 +239,9 @@ constexpr T &get(std::variant<Types...> &v)
 };
 
 template <class T, class... Types>
-constexpr T &&get(std::variant<Types...> &&v)
+constexpr T /*&&*/get(std::variant<Types...> &&v)
 {
-  return get_type<T, Types...>(std::forward<decltype(v)>(v));
+  return get_type<T, Types...>(v);
 };
 
 template <class T, class... Types>
