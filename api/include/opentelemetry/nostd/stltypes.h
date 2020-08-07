@@ -171,12 +171,17 @@ public:
 }
 #  endif
 
+#  if __EXCEPTIONS
+#    define THROW_BAD_VARIANT_ACCESS    throw_bad_variant_access()
+#  else
+#    define THROW_BAD_VARIANT_ACCESS    std::terminate()
+#  endif
+
 //
 // nostd::get<...> for Apple Clang
 //
 template <typename T, class... Types>
-constexpr auto get = [](auto &&t) constexpr -> decltype(auto)
-// typename std::enable_if<std::is_rvalue_reference<decltype(t)>::value>::type
+constexpr auto get_type = [](auto &&t) constexpr -> decltype(auto)
 {
   auto v      = t;
   auto result = std::get_if<T>(&v); // TODO: optimize with std::forward(t) if t is not rvalue
@@ -184,12 +189,71 @@ constexpr auto get = [](auto &&t) constexpr -> decltype(auto)
   {
     return *result;
   }
-#  if __EXCEPTIONS
-  throw_bad_variant_access();
-#  else
-  std::terminate();
+  THROW_BAD_VARIANT_ACCESS;
   return result;
-#  endif
+};
+
+template <std::size_t I, class... Types>
+constexpr auto get_index = [](auto &&t) constexpr -> decltype(auto)
+{
+  auto v      = t;
+  auto result = std::get_if<I>(&v);  // TODO: optimize with std::forward(t) if t is not rvalue
+  if (result)
+  {
+    return *result;
+  }
+  THROW_BAD_VARIANT_ACCESS;
+  return result;
+};
+
+template <std::size_t I, class... Types>
+constexpr std::variant_alternative_t<I, std::variant<Types...>> &get(std::variant<Types...> &v)
+{
+  return get_index<I, Types...>(v);
+};
+
+template <std::size_t I, class... Types>
+constexpr std::variant_alternative_t<I, std::variant<Types...>> &&get(std::variant<Types...> &&v)
+{
+  return get_index<I, Types...>(std::forward<decltype(v)>(v));
+};
+
+template <std::size_t I, class... Types>
+constexpr const std::variant_alternative_t<I, std::variant<Types...>> &get(
+    const std::variant<Types...> &v)
+{
+  return get_index<I, Types...>(v);
+};
+
+template <std::size_t I, class... Types>
+constexpr const std::variant_alternative_t<I, std::variant<Types...>> &&get(
+    const std::variant<Types...> &&v)
+{
+  return get_index<I, Types...>(std::forward<decltype(v)>(v));
+};
+
+template <class T, class... Types>
+constexpr T &get(std::variant<Types...> &v)
+{
+  return get_type<T, Types...>(v);
+};
+
+template <class T, class... Types>
+constexpr T &&get(std::variant<Types...> &&v)
+{
+  return get_type<T, Types...>(std::forward<decltype(v)>(v));
+};
+
+template <class T, class... Types>
+constexpr const T &get(const std::variant<Types...> &v)
+{
+  return get_type<T, Types...>(v);
+};
+
+template <class T, class... Types>
+constexpr const T &&get(const std::variant<Types...> &&v)
+{
+  return get_type<T, Types...>(std::forward<decltype(v)>(v));
 };
 
 template <class _Callable, class... _Variants>
@@ -202,11 +266,52 @@ constexpr auto visit(_Callable &&_Obj, _Variants &&... _Args)
 
 #else
 
-// nostd::get<T> for other C++17 compatible compilers
-template <class T>
-constexpr auto get = [](auto &&t) constexpr -> decltype(auto)
+template <std::size_t I, class... Types>
+constexpr std::variant_alternative_t<I, std::variant<Types...>> &get(std::variant<Types...> &v)
 {
-  return std::get<T>(std::forward<decltype(t)>(t));
+  return std::get<I, Types...>(v);
+};
+
+template <std::size_t I, class... Types>
+constexpr std::variant_alternative_t<I, std::variant<Types...>> &&get(std::variant<Types...> &&v)
+{
+  return std::get<I, Types...>(std::forward<decltype(v)>(v));
+};
+
+template <std::size_t I, class... Types>
+constexpr const std::variant_alternative_t<I, std::variant<Types...>> &get(const std::variant<Types...> &v)
+{
+  return std::get<I, Types...>(v);
+};
+
+template <std::size_t I, class... Types>
+constexpr const std::variant_alternative_t<I, std::variant<Types...>> &&get(const std::variant<Types...> &&v)
+{
+  return std::get<I, Types...>(std::forward<decltype(v)>(v));
+};
+
+template <class T, class... Types>
+constexpr T &get(std::variant<Types...> &v)
+{
+  return std::get<T, Types...>(v);
+};
+
+template <class T, class... Types>
+constexpr T &&get(std::variant<Types...> &&v)
+{
+  return std::get<T, Types...>(std::forward<decltype(v)>(v));
+};
+
+template <class T, class... Types>
+constexpr const T &get(const std::variant<Types...> &v)
+{
+  return std::get<T, Types...>(v);
+};
+
+template <class T, class... Types>
+constexpr const T &&get(const std::variant<Types...> &&v)
+{
+  return std::get<T, Types...>(std::forward<decltype(v)>(v));
 };
 
 template <class _Callable, class... _Variants>

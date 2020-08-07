@@ -1,7 +1,7 @@
 #pragma once
 
 #include "opentelemetry/metrics/meter.h"
-#include "opentelemetry/nostd/shared_ptr.h"
+#include "opentelemetry/nostd/nostd.h"
 #include "opentelemetry/sdk/metrics/async_instruments.h"
 #include "opentelemetry/sdk/metrics/instrument.h"
 #include "opentelemetry/sdk/metrics/record.h"

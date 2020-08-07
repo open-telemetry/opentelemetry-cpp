@@ -7,7 +7,7 @@
 #include <vector>
 #include "opentelemetry/exporters/ostream/metrics_exporter.h"
 #include "opentelemetry/metrics/instrument.h"
-#include "opentelemetry/nostd/unique_ptr.h"
+#include "opentelemetry/nostd/nostd.h"
 #include "opentelemetry/sdk/metrics/exporter.h"
 #include "opentelemetry/sdk/metrics/meter.h"
 #include "opentelemetry/sdk/metrics/processor.h"
