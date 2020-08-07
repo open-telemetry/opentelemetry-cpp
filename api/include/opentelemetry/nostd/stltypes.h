@@ -19,35 +19,35 @@
 // Standard library implementation requires at least C++17 compiler.
 // Older C++14 compilers may provide support for __has_include as a
 // conforming extension.
-#  if defined __has_include
-#    if __has_include(<version>)  // Check for __cpp_{feature}
-#      include <version>
-#      if defined(__cpp_lib_span)
-#        define HAVE_SPAN
-#      endif
-#    endif
-#    if __has_include(<span>) && !defined(HAVE_SPAN)  // Check for span
+#if defined __has_include
+#  if __has_include(<version>)  // Check for __cpp_{feature}
+#    include <version>
+#    if defined(__cpp_lib_span)
 #      define HAVE_SPAN
 #    endif
-#    if !__has_include(<string_view>)  // Check for string_view
-#      error \
-          "STL library does not support std::span. Possible solution:"                   \
-         " - #undef HAVE_CPP_STDLIB // to use OpenTelemetry nostd::string_view"
-#    endif
 #  endif
+#  if __has_include(<span>) && !defined(HAVE_SPAN)  // Check for span
+#    define HAVE_SPAN
+#  endif
+#  if !__has_include(<string_view>)  // Check for string_view
+#    error \
+        "STL library does not support std::span. Possible solution:"                   \
+         " - #undef HAVE_CPP_STDLIB // to use OpenTelemetry nostd::string_view"
+#  endif
+#endif
 
-#  include <cstddef>
-#  include <memory>
-#  include <string_view>
-#  include <utility>
-#  include <variant>
+#include <cstddef>
+#include <memory>
+#include <string_view>
+#include <utility>
+#include <variant>
 
-#  if !defined(HAVE_SPAN)
+#if !defined(HAVE_SPAN)
 
-#    if defined(HAVE_GSL)
-#      include <type_traits>
+#  if defined(HAVE_GSL)
+#    include <type_traits>
 // Guidelines Support Library provides an implementation of std::span
-#      include <gsl/gsl>
+#    include <gsl/gsl>
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace nostd
 {
@@ -55,21 +55,21 @@ template <class ElementType, std::size_t Extent = gsl::dynamic_extent>
 using span = gsl::span<ElementType, Extent>;
 }
 OPENTELEMETRY_END_NAMESPACE
-#    else
+#  else
 // No span implementation provided.
-#      error \
-          "STL library does not support std::span. Possible solutions:"                  \
+#    error \
+        "STL library does not support std::span. Possible solutions:"                  \
          " - #undef HAVE_CPP_STDLIB // to use OpenTelemetry nostd::span .. or      "    \
          " - #define HAVE_GSL       // to use gsl::span                            "
-#    endif
+#  endif
 
-#  else  // HAVE_SPAN
+#else  // HAVE_SPAN
 // Using std::span (https://wg21.link/P0122R7) from Standard Library available in C++20 :
 // - GCC libstdc++ 10+
 // - Clang libc++ 7
 // - MSVC Standard Library 19.26*
 // - Apple Clang 10.0.0*
-#    include <span>
+#  include <span>
 OPENTELEMETRY_BEGIN_NAMESPACE
 
 namespace nostd
@@ -77,10 +77,10 @@ namespace nostd
 constexpr std::size_t dynamic_extent = std::numeric_limits<std::size_t>::max();
 
 template <class ElementType, std::size_t Extent = nostd::dynamic_extent>
-using span = std::span<ElementType, Extent> ;
-}
+using span = std::span<ElementType, Extent>;
+}  // namespace nostd
 OPENTELEMETRY_END_NAMESPACE
-#  endif  // of HAVE_SPAN
+#endif  // of HAVE_SPAN
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 // Standard Type aliases in nostd namespace
@@ -140,7 +140,6 @@ using variant = std::variant<_Types...>;
 // nostd::string_view
 using string_view = std::string_view;
 
-
 // nostd::enable_if_t<...>
 template <bool B, class T = void>
 using enable_if_t = typename std::enable_if<B, T>::type;
@@ -153,11 +152,11 @@ using unique_ptr = std::unique_ptr<_Types...>;
 template <class... _Types>
 using shared_ptr = std::shared_ptr<_Types...>;
 
-#  if defined(__APPLE__) && defined(_LIBCPP_USE_AVAILABILITY_APPLE)
+#if defined(__APPLE__) && defined(_LIBCPP_USE_AVAILABILITY_APPLE)
 // Apple Platforms provide std::bad_variant_access only in newer versions of OS.
 // To keep API compatible with any version of OS - we are providing our own
 // implementation of nostd::bad_variant_access exception.
-#    if __EXCEPTIONS
+#  if __EXCEPTIONS
 
 // nostd::bad_variant_access
 class bad_variant_access : public std::exception
@@ -170,26 +169,38 @@ public:
 {
   throw bad_variant_access{};
 }
-#    endif
+#  endif
 
+//
 // nostd::get<...> for Apple Clang
-template <class T, class... Types>
+//
+template <typename T, class... Types>
 constexpr auto get = [](auto &&t) constexpr -> decltype(auto)
+// typename std::enable_if<std::is_rvalue_reference<decltype(t)>::value>::type
 {
-  auto result = std::get_if<T>(&std::forward<decltype(t)>(t));
+  auto v      = t;
+  auto result = std::get_if<T>(&v); // TODO: optimize with std::forward(t) if t is not rvalue
   if (result)
   {
     return *result;
   }
-#    if __EXCEPTIONS
+#  if __EXCEPTIONS
   throw_bad_variant_access();
-#    else
+#  else
   std::terminate();
   return result;
-#    endif
+#  endif
 };
 
-#  else
+template <class _Callable, class... _Variants>
+constexpr auto visit(_Callable &&_Obj, _Variants &&... _Args)
+{
+  // Ref:
+  // https://stackoverflow.com/questions/52310835/xcode-10-call-to-unavailable-function-stdvisit
+  return std::__variant_detail::__visitation::__variant::__visit_value(_Obj, _Args...);
+};
+
+#else
 
 // nostd::get<T> for other C++17 compatible compilers
 template <class T>
@@ -201,10 +212,11 @@ constexpr auto get = [](auto &&t) constexpr -> decltype(auto)
 template <class _Callable, class... _Variants>
 constexpr auto visit(_Callable &&_Obj, _Variants &&... _Args)
 {
-  return std::visit<_Callable, _Variants...>(
-      static_cast<_Callable &&>(_Obj),
-      static_cast<_Variants &&>(_Args)...);
+  return std::visit<_Callable, _Variants...>(static_cast<_Callable &&>(_Obj),
+                                             static_cast<_Variants &&>(_Args)...);
 };
+
+#endif
 
 /*
 # if _HAS_CXX20
@@ -218,13 +230,11 @@ constexpr _Ret visit(_Callable &&_Obj, _Variants &&... _Args)
 # endif
 */
 
-template<std::size_t N>
+template <std::size_t N>
 using make_index_sequence = std::make_index_sequence<N>;
 
-template<std::size_t... Ints>
+template <std::size_t... Ints>
 using index_sequence = std::index_sequence<Ints...>;
-
-#endif
 
 // nostd::holds_alternative
 template <std::size_t I, typename... Ts>
