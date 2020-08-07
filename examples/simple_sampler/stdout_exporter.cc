@@ -13,7 +13,7 @@ sdktrace::ExportResult StdoutExporter::Export(
 {
   for (auto &recordable : spans)
   {
-    const auto* span = static_cast<const sdktrace::SpanData*>(recordable.get());
+    const auto *span = static_cast<const sdktrace::SpanData *>(recordable.get());
 
     if (span != nullptr)
     {

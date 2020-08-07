@@ -15,8 +15,11 @@ namespace example
 class StdoutExporter final : public sdktrace::SpanExporter
 {
   std::unique_ptr<sdktrace::Recordable> MakeRecordable() noexcept override;
+
   sdktrace::ExportResult Export(
       const nostd::span<std::unique_ptr<sdktrace::Recordable>> &spans) noexcept override;
-  void Shutdown(std::chrono::microseconds timeout = std::chrono::microseconds(0)) noexcept override {};
+
+  void Shutdown(
+      std::chrono::microseconds timeout = std::chrono::microseconds(0)) noexcept override{};
 };
 }  // namespace example
