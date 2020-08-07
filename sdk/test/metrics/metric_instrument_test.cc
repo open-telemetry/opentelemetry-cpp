@@ -1,12 +1,13 @@
-#include <gtest/gtest.h>
-#include "opentelemetry/sdk/metrics/sync_instruments.h"
 
+#include <gtest/gtest.h>
 #include <cstring>
 #include <iostream>
 #include <map>
 #include <memory>
 #include <string>
 #include <thread>
+#include "opentelemetry/sdk/metrics/async_instruments.h"
+#include "opentelemetry/sdk/metrics/sync_instruments.h"
 
 namespace metrics_api = opentelemetry::metrics;
 
@@ -15,6 +16,180 @@ namespace sdk
 {
 namespace metrics
 {
+
+void ObserverConstructorCallback(metrics_api::ObserverResult<int> result)
+{
+  std::map<std::string, std::string> labels = {{"key", "value"}};
+  auto labelkv                              = trace::KeyValueIterableView<decltype(labels)>{labels};
+  result.observe(1, labelkv);
+}
+
+TEST(ApiSdkConversion, async)
+{
+  nostd::shared_ptr<metrics_api::AsynchronousInstrument<int>> alpha =
+      nostd::shared_ptr<metrics_api::AsynchronousInstrument<int>>(
+          new ValueObserver<int>("ankit", "none", "unitles", true, &ObserverConstructorCallback));
+
+  std::map<std::string, std::string> labels = {{"key587", "value264"}};
+  auto labelkv                              = trace::KeyValueIterableView<decltype(labels)>{labels};
+
+  alpha->observe(123456, labelkv);
+  EXPECT_EQ(dynamic_cast<AsynchronousInstrument<int> *>(alpha.get())->GetRecords()[0].GetLabels(),
+            "{\"key587\":\"value264\"}");
+
+  alpha->observe(123456, labelkv);
+  AggregatorVariant canCollect =
+      dynamic_cast<AsynchronousInstrument<int> *>(alpha.get())->GetRecords()[0].GetAggregator();
+  EXPECT_EQ(nostd::holds_alternative<std::shared_ptr<Aggregator<short>>>(canCollect), false);
+  EXPECT_EQ(nostd::holds_alternative<std::shared_ptr<Aggregator<int>>>(canCollect), true);
+  EXPECT_EQ(nostd::get<std::shared_ptr<Aggregator<int>>>(canCollect)->get_checkpoint()[0], 123456);
+}
+
+TEST(IntValueObserver, InstrumentFunctions)
+{
+  ValueObserver<int> alpha("enabled", "no description", "unitless", true,
+                           &ObserverConstructorCallback);
+  std::map<std::string, std::string> labels = {{"key", "value"}};
+  auto labelkv                              = trace::KeyValueIterableView<decltype(labels)>{labels};
+
+  EXPECT_EQ(alpha.GetName(), "enabled");
+  EXPECT_EQ(alpha.GetDescription(), "no description");
+  EXPECT_EQ(alpha.GetUnits(), "unitless");
+  EXPECT_EQ(alpha.IsEnabled(), true);
+  EXPECT_EQ(alpha.GetKind(), metrics_api::InstrumentKind::ValueObserver);
+
+  alpha.run();
+  EXPECT_EQ(alpha.boundAggregators_[KvToString(labelkv)]->get_values()[0], 1);  // min
+}
+
+void ObserverCallback(std::shared_ptr<ValueObserver<int>> in,
+                      int freq,
+                      const trace::KeyValueIterable &labels)
+{
+  for (int i = 0; i < freq; i++)
+  {
+    in->observe(i, labels);
+  }
+}
+
+void NegObserverCallback(std::shared_ptr<ValueObserver<int>> in,
+                         int freq,
+                         const trace::KeyValueIterable &labels)
+{
+  for (int i = 0; i < freq; i++)
+  {
+    in->observe(-i, labels);
+  }
+}
+
+TEST(IntValueObserver, StressObserve)
+{
+  std::shared_ptr<ValueObserver<int>> alpha(new ValueObserver<int>(
+      "enabled", "no description", "unitless", true, &ObserverConstructorCallback));
+
+  std::map<std::string, std::string> labels  = {{"key", "value"}};
+  std::map<std::string, std::string> labels1 = {{"key1", "value1"}};
+  auto labelkv  = trace::KeyValueIterableView<decltype(labels)>{labels};
+  auto labelkv1 = trace::KeyValueIterableView<decltype(labels1)>{labels1};
+
+  std::thread first(ObserverCallback, alpha, 25,
+                    labelkv);  // spawn new threads that call the callback
+  std::thread second(ObserverCallback, alpha, 50, labelkv);
+  std::thread third(ObserverCallback, alpha, 25, labelkv1);
+  std::thread fourth(NegObserverCallback, alpha, 100, labelkv1);  // negative values
+
+  first.join();
+  second.join();
+  third.join();
+  fourth.join();
+
+  EXPECT_EQ(alpha->boundAggregators_[KvToString(labelkv)]->get_values()[0], 0);     // min
+  EXPECT_EQ(alpha->boundAggregators_[KvToString(labelkv)]->get_values()[1], 49);    // max
+  EXPECT_EQ(alpha->boundAggregators_[KvToString(labelkv)]->get_values()[2], 1525);  // sum
+  EXPECT_EQ(alpha->boundAggregators_[KvToString(labelkv)]->get_values()[3], 75);    // count
+
+  EXPECT_EQ(alpha->boundAggregators_[KvToString(labelkv1)]->get_values()[0], -99);    // min
+  EXPECT_EQ(alpha->boundAggregators_[KvToString(labelkv1)]->get_values()[1], 24);     // max
+  EXPECT_EQ(alpha->boundAggregators_[KvToString(labelkv1)]->get_values()[2], -4650);  // sum
+  EXPECT_EQ(alpha->boundAggregators_[KvToString(labelkv1)]->get_values()[3], 125);    // count
+}
+
+void SumObserverCallback(std::shared_ptr<SumObserver<int>> in,
+                         int freq,
+                         const trace::KeyValueIterable &labels)
+{
+  for (int i = 0; i < freq; i++)
+  {
+    in->observe(1, labels);
+  }
+}
+
+TEST(IntSumObserver, StressObserve)
+{
+  std::shared_ptr<SumObserver<int>> alpha(
+      new SumObserver<int>("test", "none", "unitless", true, &ObserverConstructorCallback));
+
+  std::map<std::string, std::string> labels  = {{"key", "value"}};
+  std::map<std::string, std::string> labels1 = {{"key1", "value1"}};
+  auto labelkv  = trace::KeyValueIterableView<decltype(labels)>{labels};
+  auto labelkv1 = trace::KeyValueIterableView<decltype(labels1)>{labels1};
+
+  std::thread first(SumObserverCallback, alpha, 100000, labelkv);
+  std::thread second(SumObserverCallback, alpha, 100000, labelkv);
+  std::thread third(SumObserverCallback, alpha, 300000, labelkv1);
+
+  first.join();
+  second.join();
+  third.join();
+
+  EXPECT_EQ(alpha->boundAggregators_[KvToString(labelkv)]->get_values()[0], 200000);
+  EXPECT_EQ(alpha->boundAggregators_[KvToString(labelkv1)]->get_values()[0], 300000);
+}
+
+void UpDownSumObserverCallback(std::shared_ptr<UpDownSumObserver<int>> in,
+                               int freq,
+                               const trace::KeyValueIterable &labels)
+{
+  for (int i = 0; i < freq; i++)
+  {
+    in->observe(1, labels);
+  }
+}
+
+void NegUpDownSumObserverCallback(std::shared_ptr<UpDownSumObserver<int>> in,
+                                  int freq,
+                                  const trace::KeyValueIterable &labels)
+{
+  for (int i = 0; i < freq; i++)
+  {
+    in->observe(-1, labels);
+  }
+}
+
+TEST(IntUpDownObserver, StressAdd)
+{
+  std::shared_ptr<UpDownSumObserver<int>> alpha(
+      new UpDownSumObserver<int>("test", "none", "unitless", true, &ObserverConstructorCallback));
+
+  std::map<std::string, std::string> labels  = {{"key", "value"}};
+  std::map<std::string, std::string> labels1 = {{"key1", "value1"}};
+  auto labelkv  = trace::KeyValueIterableView<decltype(labels)>{labels};
+  auto labelkv1 = trace::KeyValueIterableView<decltype(labels1)>{labels1};
+
+  std::thread first(UpDownSumObserverCallback, alpha, 123400,
+                    labelkv);  // spawn new threads that call the callback
+  std::thread second(UpDownSumObserverCallback, alpha, 123400, labelkv);
+  std::thread third(UpDownSumObserverCallback, alpha, 567800, labelkv1);
+  std::thread fourth(NegUpDownSumObserverCallback, alpha, 123400, labelkv1);  // negative values
+
+  first.join();
+  second.join();
+  third.join();
+  fourth.join();
+
+  EXPECT_EQ(alpha->boundAggregators_[KvToString(labelkv)]->get_values()[0], 123400 * 2);
+  EXPECT_EQ(alpha->boundAggregators_[KvToString(labelkv1)]->get_values()[0], 567800 - 123400);
+}
 
 TEST(Counter, InstrumentFunctions)
 {
@@ -69,42 +244,20 @@ TEST(Counter, getAggsandnewupdate)
 {
   Counter<int> alpha("test", "none", "unitless", true);
 
-  std::map<std::string, std::string> labels  = {{"key", "value"}};
-  std::map<std::string, std::string> labels1 = {{"key1", "value1"}};
+  std::map<std::string, std::string> labels = {{"key3", "value3"}, {"key2", "value2"}};
 
-  // labels 2 and 3 are actually the same
-  std::map<std::string, std::string> labels2 = {{"key2", "value2"}, {"key3", "value3"}};
-  std::map<std::string, std::string> labels3 = {{"key3", "value3"}, {"key2", "value2"}};
-
-  auto labelkv  = trace::KeyValueIterableView<decltype(labels)>{labels};
-  auto labelkv1 = trace::KeyValueIterableView<decltype(labels1)>{labels1};
-  auto labelkv2 = trace::KeyValueIterableView<decltype(labels2)>{labels2};
-  auto labelkv3 = trace::KeyValueIterableView<decltype(labels3)>{labels3};
-
+  auto labelkv = trace::KeyValueIterableView<decltype(labels)>{labels};
   auto beta    = alpha.bindCounter(labelkv);
-  auto gamma   = alpha.bindCounter(labelkv1);
-  auto delta   = alpha.bindCounter(labelkv1);
-  auto epsilon = alpha.bindCounter(labelkv1);
-  auto zeta    = alpha.bindCounter(labelkv2);
-  auto eta     = alpha.bindCounter(labelkv3);
+  beta->unbind();
 
-  EXPECT_EQ(beta->get_ref(), 1);
-  EXPECT_EQ(gamma->get_ref(), 3);
-  EXPECT_EQ(eta->get_ref(), 2);
-
-  delta->unbind();
-  gamma->unbind();
-  epsilon->unbind();
-
-  EXPECT_EQ(alpha.boundInstruments_[KvToString(labelkv1)]->get_ref(), 0);
-  EXPECT_EQ(alpha.boundInstruments_.size(), 3);
+  EXPECT_EQ(alpha.boundInstruments_[KvToString(labelkv)]->get_ref(), 0);
+  EXPECT_EQ(alpha.boundInstruments_.size(), 1);
 
   auto theta = alpha.GetRecords();
-  EXPECT_EQ(theta.size(), 3);
+  EXPECT_EQ(theta.size(), 1);
   EXPECT_EQ(theta[0].GetName(), "test");
   EXPECT_EQ(theta[0].GetDescription(), "none");
   EXPECT_EQ(theta[0].GetLabels(), "{\"key2\":\"value2\",\"key3\":\"value3\"}");
-  EXPECT_EQ(theta[1].GetLabels(), "{\"key1\":\"value1\"}");
 }
 
 void CounterCallback(std::shared_ptr<Counter<int>> in,
@@ -284,4 +437,5 @@ TEST(IntValueRecorder, StressRecord)
 
 }  // namespace metrics
 }  // namespace sdk
+
 OPENTELEMETRY_END_NAMESPACE
