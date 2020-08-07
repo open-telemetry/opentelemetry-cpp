@@ -52,9 +52,6 @@ public:
   }
 
 private:
-  // For testing
-  friend class SimpleProcessorTestPeer;
-
   std::unique_ptr<SpanExporter> exporter_;
 };
 }  // namespace trace

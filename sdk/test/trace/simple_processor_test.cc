@@ -8,39 +8,29 @@
 
 // Import for Bazel
 #include "opentelemetry/exporters/memory/in_memory_span_exporter.h"
+#include "opentelemetry/exporters/memory/in_memory_span_data.h"
 
 #include <gtest/gtest.h>
 
 using namespace opentelemetry::sdk::trace;
 using opentelemetry::exporter::memory::InMemorySpanExporter;
+using opentelemetry::exporter::memory::InMemorySpanData;
 
-using namespace testing;
-
-class SimpleProcessorTestPeer : public ::testing::Test
+TEST(SimpleProcessor, ToInMemorySpanExporter)
 {
-public:
-  InMemorySpanExporter GetExporter(SimpleSpanProcessor &processor)
-  {
-    return *((InMemorySpanExporter *) processor.exporter_.get());
-  }
-};
-
-TEST_F(SimpleProcessorTestPeer, ToInMemorySpanExporter)
-{
-  std::unique_ptr<InMemorySpanExporter> exporter_ptr(new InMemorySpanExporter());
-  SimpleSpanProcessor processor(std::move(exporter_ptr));
+  std::unique_ptr<InMemorySpanExporter> exporter(new InMemorySpanExporter());
+  std::shared_ptr<InMemorySpanData> span_data = exporter.get()->GetData();
+  SimpleSpanProcessor processor(std::move(exporter));
 
   auto recordable = processor.MakeRecordable();
 
   processor.OnStart(*recordable);
 
-  InMemorySpanExporter exporter = GetExporter(processor);
-  ASSERT_EQ(0, exporter.GetData().get()->GetSpans().size());
+  ASSERT_EQ(0, span_data.get()->GetSpans().size());
 
   processor.OnEnd(std::move(recordable));
 
-  exporter = GetExporter(processor);
-  ASSERT_EQ(1, exporter.GetData().get()->GetSpans().size());
+  ASSERT_EQ(1, span_data.get()->GetSpans().size());
 
   processor.Shutdown();
 }
