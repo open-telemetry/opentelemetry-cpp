@@ -59,9 +59,8 @@ public:
    */
   bool start()
   {
-    if (!active_.load())
+    if (!active_.exchange(true))
     {
-      active_ = true;
       std::thread runner(&PushController::run, this);
       runner.detach();
       return true;
@@ -78,9 +77,8 @@ public:
    */
   void stop()
   {
-    if (active_.load())
+    if (active_.exchange(false))
     {
-      active_ = false;
       while (running_.load())
       {
         std::this_thread::sleep_for(
@@ -99,16 +97,14 @@ private:
    */
   void run()
   {
-    if (!running_.load())
+    if (!running_.exchange(true))
     {
-      running_ = true;
       while (active_.load())
       {
         tick();
         std::this_thread::sleep_for(std::chrono::microseconds(period_));
       }
       running_ = false;
-      ;
     }
   }
 
