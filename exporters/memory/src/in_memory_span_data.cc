@@ -9,6 +9,7 @@ using opentelemetry::sdk::common::AtomicUniquePtr;
 using opentelemetry::sdk::common::CircularBuffer;
 using opentelemetry::sdk::common::CircularBufferRange;
 using opentelemetry::sdk::trace::Recordable;
+using opentelemetry::sdk::trace::SpanData;
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace exporter
@@ -19,21 +20,20 @@ InMemorySpanData::InMemorySpanData(size_t buffer_size) : spans_received_(buffer_
 
 void InMemorySpanData::Add(std::unique_ptr<Recordable> data) noexcept
 {
-  spans_received_.Add(data);
+  std::unique_ptr<SpanData> span_data(static_cast<SpanData *>(data.release()));
+  spans_received_.Add(span_data);
 }
 
-std::vector<std::unique_ptr<Recordable>> InMemorySpanData::GetSpans() noexcept
+std::vector<std::unique_ptr<SpanData>> InMemorySpanData::GetSpans() noexcept
 {
-  std::vector<std::unique_ptr<Recordable>> res;
+  std::vector<std::unique_ptr<SpanData>> res;
 
   spans_received_.Consume(
-      spans_received_.size(), [&](CircularBufferRange<AtomicUniquePtr<Recordable>> &
-                                  range) noexcept {
-        range.ForEach([&](AtomicUniquePtr<Recordable> & ptr) noexcept {
-          std::unique_ptr<Recordable> swap_ptr = std::unique_ptr<Recordable>(nullptr);
+      spans_received_.size(), [&](CircularBufferRange<AtomicUniquePtr<SpanData>> range) noexcept {
+        range.ForEach([&](AtomicUniquePtr<SpanData> & ptr) noexcept {
+          std::unique_ptr<SpanData> swap_ptr = std::unique_ptr<SpanData>(nullptr);
           ptr.Swap(swap_ptr);
-
-          res.push_back(std::unique_ptr<Recordable>(swap_ptr.release()));
+          res.push_back(std::unique_ptr<SpanData>(swap_ptr.release()));
           return true;
         });
       });

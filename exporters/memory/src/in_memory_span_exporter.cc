@@ -37,8 +37,7 @@ sdk::trace::ExportResult InMemorySpanExporter::Export(
   return sdk::trace::ExportResult::kSuccess;
 }
 
-std::shared_ptr<opentelemetry::exporter::memory::InMemorySpanData>
-InMemorySpanExporter::GetData() noexcept
+std::shared_ptr<InMemorySpanData> InMemorySpanExporter::GetData() noexcept
 {
   return data_;
 }
