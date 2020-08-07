@@ -1,7 +1,7 @@
 #include "opentelemetry/trace/key_value_iterable_view.h"
 
-#include <map>
 #include <array>
+#include <map>
 #include <string>
 #include <utility>
 
@@ -13,6 +13,8 @@ namespace sdk
  * This helps to avoid constructing a new empty container every time a call is made
  * with default attributes.
  */
+// FIXME: [MG] - why????
+#if 0
 static const opentelemetry::trace::KeyValueIterableView<std::array<std::pair<std::string, int>, 0>>
     &GetEmptyAttributes() noexcept
 {
@@ -23,5 +25,7 @@ static const opentelemetry::trace::KeyValueIterableView<std::array<std::pair<std
 
   return kEmptyAttributes;
 }
+#endif
+
 }  // namespace sdk
 OPENTELEMETRY_END_NAMESPACE

@@ -64,7 +64,7 @@ public:
   void AddEvent(nostd::string_view name)
   {
     AddEvent(name, core::SystemTimestamp(std::chrono::system_clock::now()),
-             opentelemetry::sdk::GetEmptyAttributes());
+             trace_api::NullKeyValueIterable());
   }
 
   /**
@@ -74,7 +74,7 @@ public:
    */
   void AddEvent(nostd::string_view name, core::SystemTimestamp timestamp)
   {
-    AddEvent(name, timestamp, opentelemetry::sdk::GetEmptyAttributes());
+    AddEvent(name, timestamp, trace_api::NullKeyValueIterable());
   }
 
   /**
@@ -91,7 +91,7 @@ public:
    */
   void AddLink(opentelemetry::trace::SpanContext span_context)
   {
-    AddLink(span_context, opentelemetry::sdk::GetEmptyAttributes());
+    AddLink(span_context, trace_api::NullKeyValueIterable());
   }
 
   /**
