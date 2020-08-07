@@ -23,7 +23,7 @@ http_archive(
     name = "com_github_grpc_grpc",
     strip_prefix = "grpc-1.28.0",
     urls = [
-         "https://github.com/grpc/grpc/archive/v1.28.0.tar.gz",
+        "https://github.com/grpc/grpc/archive/v1.28.0.tar.gz",
     ],
 )
 
@@ -79,9 +79,9 @@ http_archive(
     urls = ["https://github.com/google/benchmark/archive/v1.5.0.tar.gz"],
 )
 
-
 # C++ Prometheus Client library.
 load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive", "http_file")
+
 http_archive(
     name = "com_github_jupp0r_prometheus_cpp",
     strip_prefix = "prometheus-cpp-master",
