@@ -1,4 +1,4 @@
-# Final - Metrics SDK Design
+# Metrics SDK Design
 
 ## Design Tenets
 

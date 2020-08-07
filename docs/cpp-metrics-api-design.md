@@ -1,4 +1,4 @@
-# Final - Metrics API Design
+# Metrics API Design
 
 This document outlines a proposed implementation of the OpenTelemetry Metrics API in C++.  The design conforms to the current versions of the [Metrics API Specification](https://github.com/open-telemetry/opentelemetry-specification/blob/master/specification/metrics/api.md) though it is currently under development and subject to change.
 
