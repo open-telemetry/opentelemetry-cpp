@@ -1,10 +1,16 @@
 #include "opentelemetry/sdk/trace/tracer.h"
-#include "../../../exporters/memory/include/opentelemetry/exporters/memory/in_memory_span_exporter.h"
 #include "opentelemetry/sdk/trace/samplers/always_off.h"
 #include "opentelemetry/sdk/trace/samplers/always_on.h"
 #include "opentelemetry/sdk/trace/samplers/parent_or_else.h"
 #include "opentelemetry/sdk/trace/simple_processor.h"
 #include "opentelemetry/sdk/trace/span_data.h"
+
+// Import for CMake
+// #include
+// "../../../exporters/memory/include/opentelemetry/exporters/memory/in_memory_span_exporter.h"
+
+// Import for Bazel
+#include "opentelemetry/exporters/memory/in_memory_span_exporter.h"
 
 #include <gtest/gtest.h>
 
@@ -44,7 +50,7 @@ namespace
 std::shared_ptr<opentelemetry::trace::Tracer> initTracer(
     std::shared_ptr<std::vector<std::unique_ptr<SpanData>>> &received)
 {
-  std::unique_ptr<SpanExporter> exporter(new InMemorySpanExporter(received));
+  std::unique_ptr<SpanExporter> exporter(new InMemorySpanExporter());
   auto processor = std::make_shared<SimpleSpanProcessor>(std::move(exporter));
   return std::shared_ptr<opentelemetry::trace::Tracer>(new Tracer(processor));
 }
@@ -53,7 +59,7 @@ std::shared_ptr<opentelemetry::trace::Tracer> initTracer(
     std::shared_ptr<std::vector<std::unique_ptr<SpanData>>> &received,
     std::shared_ptr<Sampler> sampler)
 {
-  std::unique_ptr<SpanExporter> exporter(new InMemorySpanExporter(received));
+  std::unique_ptr<SpanExporter> exporter(new InMemorySpanExporter());
   auto processor = std::make_shared<SimpleSpanProcessor>(std::move(exporter));
   return std::shared_ptr<opentelemetry::trace::Tracer>(new Tracer(processor, sampler));
 }
