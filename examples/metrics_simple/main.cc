@@ -4,8 +4,6 @@
 #include "opentelemetry/sdk/metrics/meter_provider.h"
 #include "opentelemetry/sdk/metrics/ungrouped_processor.h"
 
-#include <unistd.h>
-
 namespace sdkmetrics = opentelemetry::sdk::metrics;
 namespace nostd      = opentelemetry::nostd;
 namespace trace      = opentelemetry::trace;
@@ -82,7 +80,7 @@ int main()
   for (int i = 0; i < 20; i++)
   {
     intupdowncounter->add(i, labelkv);
-    usleep(.01 * 1000000);
+    std::this_thread::sleep_for(std::chrono::milliseconds(10));
   }
   ControllerStateless.stop();
 
@@ -103,7 +101,7 @@ int main()
   for (int i = 0; i < 20; i++)
   {
     intupdowncounter->add(i, labelkv);
-    usleep(.01 * 1000000);
+    std::this_thread::sleep_for(std::chrono::milliseconds(10));
   }
   ControllerStateful.stop();
 }
