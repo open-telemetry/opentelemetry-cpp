@@ -54,9 +54,6 @@ private:
     tracez_server_->start();
 
     opentelemetry::trace::Provider::SetTracerProvider(tracez_provider_);
-
-    // Give the server some time to set up to prevent crashes
-    std::this_thread::sleep_for(setup_time_);
   }
 
   ~zPages()
@@ -66,5 +63,4 @@ private:
     tracez_server_->stop();
   }
   std::unique_ptr<TracezHttpServer> tracez_server_;
-  const std::chrono::duration<unsigned int, std::nano> setup_time_ = microseconds(10);
 };
