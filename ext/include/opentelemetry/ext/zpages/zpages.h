@@ -1,7 +1,6 @@
 #pragma once
 
 #include <chrono>
-#include <iostream>
 #include <memory>
 
 #include "opentelemetry/ext/zpages/tracez_data_aggregator.h"
