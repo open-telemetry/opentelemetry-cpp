@@ -17,7 +17,7 @@ package(default_visibility = ["//visibility:public"])
 cc_binary(
     name = "zpages_example",
     srcs = [
-        "zpages_example.cc"
+        "zpages_example.cc",
     ],
     linkopts = select({
         "//bazel:windows": [],
@@ -25,7 +25,7 @@ cc_binary(
     }),
     deps = [
         "//ext:headers",
-        "//sdk/src/trace",
         "//ext/src/zpages",
+        "//sdk/src/trace",
     ],
 )
