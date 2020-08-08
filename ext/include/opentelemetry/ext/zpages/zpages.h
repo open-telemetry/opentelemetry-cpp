@@ -21,8 +21,8 @@ using std::chrono::microseconds;
  * Wrapper for zPages that initializes all the components required for zPages,
  * and starts the HTTP server in the constructor and ends it in the destructor.
  * The constructor and destructor for this object is private to prevent
- * creation other than by calling the static function inialize. This follows the
- * meyers singelton pattern and only a single instance of the class is allowed.
+ * creation other than by calling the static function Initialize(). This follows the
+ * meyers singleton pattern and only a single instance of the class is allowed.
  */
 class zPages
 {
