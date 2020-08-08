@@ -28,7 +28,7 @@ int main(int argc, char* argv[]) {
   // Error span
   std::map<std::string, opentelemetry::common::AttributeValue> attribute_map;
   attribute_map["completed_search_for"] = "Unknown user";
-  tracer->StartSpan("user_query_span",attribute_map)->SetStatus(
+  tracer->StartSpan("find user",attribute_map)->SetStatus(
       opentelemetry::trace::CanonicalCode::NOT_FOUND, "User not found");
   
   // Long time duration span
@@ -38,18 +38,18 @@ int main(int argc, char* argv[]) {
   start.start_steady_time = SteadyTimestamp(nanoseconds(1));
   opentelemetry::trace::EndSpanOptions end;
   end.end_steady_time = SteadyTimestamp(nanoseconds(1000000000000));
-  tracer->StartSpan("user_query_span",attribute_map2,start)->End(end);
+  tracer->StartSpan("find user",attribute_map2,start)->End(end);
 
   
   // Running(deadlock) span
   std::map<std::string, opentelemetry::common::AttributeValue> attribute_map3;
   attribute_map3["searching_for"] = "Deleted user";
-  auto running_span = tracer->StartSpan("user_query_span", attribute_map3);
+  auto running_span = tracer->StartSpan("find user", attribute_map3);
   
   // Create a completed span every second till user stops the loop
   std::cout << "Presss CTRL+C to stop...\n";
   while(true){
     std::this_thread::sleep_for(seconds(1));
-    tracer->StartSpan("ping_user")->End();
+    tracer->StartSpan("ping user")->End();
   }
 }
