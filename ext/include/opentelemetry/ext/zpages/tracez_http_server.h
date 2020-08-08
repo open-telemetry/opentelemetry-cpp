@@ -136,7 +136,7 @@ private:
             }
             else
             {
-              resp.body = json::array();
+              resp.body = json::array().dump();
             }
           }
         }

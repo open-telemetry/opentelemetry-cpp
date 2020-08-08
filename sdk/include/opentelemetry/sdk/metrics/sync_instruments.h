@@ -48,7 +48,6 @@ public:
    */
   virtual void add(T value) override
   {
-    this->mu_.lock();
     if (value < 0)
     {
 #if __EXCEPTIONS
@@ -61,7 +60,6 @@ public:
     {
       this->update(value);
     }
-    this->mu_.unlock();
   }
 };
 
@@ -94,18 +92,22 @@ public:
   virtual nostd::shared_ptr<metrics_api::BoundCounter<T>> bindCounter(
       const trace::KeyValueIterable &labels) override
   {
+    this->mu_.lock();
     std::string labelset = KvToString(labels);
     if (boundInstruments_.find(labelset) == boundInstruments_.end())
     {
       auto sp1 = nostd::shared_ptr<metrics_api::BoundCounter<T>>(
           new BoundCounter<T>(this->name_, this->description_, this->unit_, this->enabled_));
       boundInstruments_[labelset] = sp1;
+      this->mu_.unlock();
       return sp1;
     }
     else
     {
       boundInstruments_[labelset]->inc_ref();
-      return boundInstruments_[labelset];
+      auto ret = boundInstruments_[labelset];
+      this->mu_.unlock();
+      return ret;
     }
   }
 
@@ -119,7 +121,6 @@ public:
    */
   virtual void add(T value, const trace::KeyValueIterable &labels) override
   {
-    this->mu_.lock();
     if (value < 0)
     {
 #if __EXCEPTIONS
@@ -134,11 +135,11 @@ public:
       sp->update(value);
       sp->unbind();
     }
-    this->mu_.unlock();
   }
 
   virtual std::vector<Record> GetRecords() override
   {
+    this->mu_.lock();
     std::vector<Record> ret;
     std::vector<std::string> toDelete;
     for (const auto &x : boundInstruments_)
@@ -155,6 +156,7 @@ public:
     {
       boundInstruments_.erase(x);
     }
+    this->mu_.unlock();
     return ret;
   }
 
@@ -194,12 +196,7 @@ public:
    * @param value the numerical representation of the metric being captured
    * @param labels the set of labels, as key-value pairs
    */
-  virtual void add(T value) override
-  {
-    this->mu_.lock();
-    this->update(value);
-    this->mu_.unlock();
-  }
+  virtual void add(T value) override { this->update(value); }
 };
 
 template <class T>
@@ -230,18 +227,22 @@ public:
   nostd::shared_ptr<metrics_api::BoundUpDownCounter<T>> bindUpDownCounter(
       const trace::KeyValueIterable &labels) override
   {
+    this->mu_.lock();
     std::string labelset = KvToString(labels);
     if (boundInstruments_.find(labelset) == boundInstruments_.end())
     {
       auto sp1 = nostd::shared_ptr<metrics_api::BoundUpDownCounter<T>>(
           new BoundUpDownCounter<T>(this->name_, this->description_, this->unit_, this->enabled_));
       boundInstruments_[labelset] = sp1;
+      this->mu_.unlock();
       return sp1;
     }
     else
     {
       boundInstruments_[labelset]->inc_ref();
-      return boundInstruments_[labelset];
+      auto ret = boundInstruments_[labelset];
+      this->mu_.unlock();
+      return ret;
     }
   }
 
@@ -255,15 +256,14 @@ public:
    */
   void add(T value, const trace::KeyValueIterable &labels) override
   {
-    this->mu_.lock();
     auto sp = bindUpDownCounter(labels);
     sp->update(value);
     sp->unbind();
-    this->mu_.unlock();
   }
 
   virtual std::vector<Record> GetRecords() override
   {
+    this->mu_.lock();
     std::vector<Record> ret;
     std::vector<std::string> toDelete;
     for (const auto &x : boundInstruments_)
@@ -280,6 +280,7 @@ public:
     {
       boundInstruments_.erase(x);
     }
+    this->mu_.unlock();
     return ret;
   }
 
@@ -318,12 +319,7 @@ public:
    * @param value the numerical representation of the metric being captured
    * @param labels the set of labels, as key-value pairs
    */
-  void record(T value)
-  {
-    this->mu_.lock();
-    this->update(value);
-    this->mu_.unlock();
-  }
+  void record(T value) { this->update(value); }
 };
 
 template <class T>
@@ -354,18 +350,22 @@ public:
   nostd::shared_ptr<metrics_api::BoundValueRecorder<T>> bindValueRecorder(
       const trace::KeyValueIterable &labels) override
   {
+    this->mu_.lock();
     std::string labelset = KvToString(labels);
     if (boundInstruments_.find(labelset) == boundInstruments_.end())
     {
       auto sp1 = nostd::shared_ptr<metrics_api::BoundValueRecorder<T>>(
           new BoundValueRecorder<T>(this->name_, this->description_, this->unit_, this->enabled_));
       boundInstruments_[labelset] = sp1;
+      this->mu_.unlock();
       return sp1;
     }
     else
     {
       boundInstruments_[labelset]->inc_ref();
-      return boundInstruments_[labelset];
+      auto ret = boundInstruments_[labelset];
+      this->mu_.unlock();
+      return ret;
     }
   }
 
@@ -379,15 +379,14 @@ public:
    */
   void record(T value, const trace::KeyValueIterable &labels) override
   {
-    this->mu_.lock();
     auto sp = bindValueRecorder(labels);
     sp->update(value);
     sp->unbind();
-    this->mu_.unlock();
   }
 
   virtual std::vector<Record> GetRecords() override
   {
+    this->mu_.lock();
     std::vector<Record> ret;
     std::vector<std::string> toDelete;
     for (const auto &x : boundInstruments_)
@@ -404,6 +403,7 @@ public:
     {
       boundInstruments_.erase(x);
     }
+    this->mu_.unlock();
     return ret;
   }
 
