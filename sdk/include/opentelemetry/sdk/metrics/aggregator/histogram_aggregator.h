@@ -62,6 +62,7 @@ public:
    */
   void update(T val) override
   {
+    this->mu_.lock();
     int bucketID = boundaries_.size();
     for (size_t i = 0; i < boundaries_.size(); i++)
     {
@@ -76,7 +77,6 @@ public:
     // auto pos = std::lower_bound (boundaries_.begin(), boundaries_.end(), val);
     // bucketCounts_[pos-boundaries_.begin()] += 1;
 
-    this->mu_.lock();
     this->values_[0] += val;
     this->values_[1] += 1;
     bucketCounts_[bucketID] += 1;
@@ -92,11 +92,13 @@ public:
    */
   void checkpoint() override
   {
+    this->mu_.lock();
     this->checkpoint_  = this->values_;
     this->values_[0]   = 0;
     this->values_[1]   = 0;
     bucketCounts_ckpt_ = bucketCounts_;
     std::fill(bucketCounts_.begin(), bucketCounts_.end(), 0);
+    this->mu_.unlock();
   }
 
   /**
