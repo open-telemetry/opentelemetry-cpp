@@ -1,7 +1,6 @@
 #pragma once
 
 #include <chrono>
-#include <iostream>
 #include <memory>
 
 #include "opentelemetry/ext/zpages/tracez_data_aggregator.h"
@@ -24,14 +23,14 @@ using std::chrono::microseconds;
  * creation other than by calling the static function Initialize(). This follows the
  * meyers singleton pattern and only a single instance of the class is allowed.
  */
-class zPages
+class Zpages
 {
 public:
   /**
    * This function is called if the user wishes to include zPages in their
    * application. It creates a static instance of this class.
    */
-  static void Initialize() { static zPages instance; }
+  static void Initialize() { static Zpages instance; }
 
 private:
   /**
@@ -39,7 +38,7 @@ private:
    * tracez data aggregator and the tracez server. The server is also started in
    * constructor.
    */
-  zPages()
+  Zpages()
   {
     auto tracez_processor_ = std::make_shared<TracezSpanProcessor>();
     auto tracez_provider_  = opentelemetry::nostd::shared_ptr<opentelemetry::trace::TracerProvider>(
@@ -56,7 +55,7 @@ private:
     opentelemetry::trace::Provider::SetTracerProvider(tracez_provider_);
   }
 
-  ~zPages()
+  ~Zpages()
   {
     // shut down the server when the object goes out of scope(at the end of the
     // program)
