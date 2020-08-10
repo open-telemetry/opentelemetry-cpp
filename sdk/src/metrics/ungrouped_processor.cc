@@ -1,7 +1,5 @@
 #include "opentelemetry/sdk/metrics/ungrouped_processor.h"
 
-#define UNGROUPED_PROCESSOR_STRINGER(x) (#x)
-
 OPENTELEMETRY_BEGIN_NAMESPACE
 
 namespace sdk
@@ -163,5 +161,3 @@ void UngroupedMetricsProcessor::process(sdkmetrics::Record record) noexcept
 }  // namespace sdk
 
 OPENTELEMETRY_END_NAMESPACE
-
-#undef UNGROUPED_PROCESSOR_STRINGER
