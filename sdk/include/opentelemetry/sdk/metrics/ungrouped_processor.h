@@ -21,38 +21,42 @@ namespace metrics
 
 struct KeyStruct
 {
-	std::string name;
-	std::string description;
+  std::string name;
+  std::string description;
   std::string labels;
   metrics_api::InstrumentKind ins_kind;
 
-	// constructor
-	KeyStruct(std::string name, std::string description, std::string labels, metrics_api::InstrumentKind ins_kind)
-	{
-		this->name = name;
-		this->description = description;
-    this->labels = labels;
-    this->ins_kind = ins_kind;
-	}
+  // constructor
+  KeyStruct(std::string name,
+            std::string description,
+            std::string labels,
+            metrics_api::InstrumentKind ins_kind)
+  {
+    this->name        = name;
+    this->description = description;
+    this->labels      = labels;
+    this->ins_kind    = ins_kind;
+  }
 
-	// operator== is required to compare keys in case of hash collision
-	bool operator==(const KeyStruct &p) const
-	{
-		return name == p.name && description == p.description && labels == p.labels && ins_kind == p.ins_kind;
-	}
+  // operator== is required to compare keys in case of hash collision
+  bool operator==(const KeyStruct &p) const
+  {
+    return name == p.name && description == p.description && labels == p.labels &&
+           ins_kind == p.ins_kind;
+  }
 };
 
 struct KeyStruct_Hash
 {
-	std::size_t operator() (const KeyStruct &keystruct) const
-	{
-		std::size_t name_size   = keystruct.name.length();
-		std::size_t desc_size   = keystruct.description.length();
+  std::size_t operator()(const KeyStruct &keystruct) const
+  {
+    std::size_t name_size   = keystruct.name.length();
+    std::size_t desc_size   = keystruct.description.length();
     std::size_t labels_size = keystruct.labels.length();
-    std::size_t ins_size    = (int) keystruct.ins_kind;
-		
+    std::size_t ins_size    = (int)keystruct.ins_kind;
+
     return name_size ^ desc_size ^ labels_size + ins_size;
-	}
+  }
 };
 
 class UngroupedMetricsProcessor : public MetricsProcessor

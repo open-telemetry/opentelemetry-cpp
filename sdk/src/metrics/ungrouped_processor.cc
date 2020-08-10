@@ -52,7 +52,7 @@ void UngroupedMetricsProcessor::process(sdkmetrics::Record record) noexcept
   std::string name        = record.GetName();
   std::string description = record.GetDescription();
 
-  KeyStruct batch_key = KeyStruct(name,description,label,get_instrument(aggregator));
+  KeyStruct batch_key = KeyStruct(name, description, label, get_instrument(aggregator));
 
   /**
    * If we have already seen this aggregator then we will merge it with the copy that exists in the
