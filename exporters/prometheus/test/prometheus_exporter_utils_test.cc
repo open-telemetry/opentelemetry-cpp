@@ -52,26 +52,22 @@ void assert_basic(prometheus_client::MetricFamily &metric,
 
   switch (type)
   {
-    case prometheus_client::MetricType::Counter:
-    {
+    case prometheus_client::MetricType::Counter: {
       ASSERT_DOUBLE_EQ(metric_data.counter.value, vals[0]);
       break;
     }
-    case prometheus_client::MetricType::Gauge:
-    {
+    case prometheus_client::MetricType::Gauge: {
       ASSERT_EQ(metric_data.gauge.value, vals[0]);
       break;
     }
-    case prometheus_client::MetricType::Histogram:
-    {
+    case prometheus_client::MetricType::Histogram: {
       ASSERT_DOUBLE_EQ(metric_data.histogram.sample_count, vals[0]);
       ASSERT_DOUBLE_EQ(metric_data.histogram.sample_sum, vals[1]);
       auto buckets = metric_data.histogram.bucket;
       ASSERT_EQ(buckets.size(), vals[2]);
       break;
     }
-    case prometheus_client::MetricType::Summary:
-    {
+    case prometheus_client::MetricType::Summary: {
       ASSERT_DOUBLE_EQ(metric_data.summary.sample_count, vals[0]);
       ASSERT_DOUBLE_EQ(metric_data.summary.sample_sum, vals[1]);
       break;
@@ -109,10 +105,10 @@ metric_sdk::Record get_record(const std::string &type,
                               const std::string &label,
                               std::shared_ptr<metric_sdk::Aggregator<T>> aggregator)
 {
-  std::string name = "test-" + type + "-metric-record-v_" + std::to_string(version) + ".0";
-  std::string desc = "this is a test " + type + " metric record";
-  metric_sdk::Record record(name, desc, label, aggregator);
-  return record;
+std::string name = "test-" + type + "-metric-record-v_" + std::to_string(version) + ".0";
+std::string desc = "this is a test " + type + " metric record";
+metric_sdk::Record record(name, desc, label, aggregator);
+return record;
 }
 
 TEST(PrometheusExporterUtils, TranslateToPrometheusEmptyInputReturnsEmptyCollection)
@@ -337,7 +333,7 @@ TEST(PrometheusExporterUtils, TranslateToPrometheusExact)
     aggregator->update(i);
   }
   aggregator->checkpoint();
-  auto record = get_record("exact", 1, "{label1:v1,label2:v2,label3:v3,}", aggregator);
+  auto record = get_record("exact", 1, "{label-1:v1,label_2:v2,label3:v3,}", aggregator);
   collection.emplace_back(record);
 
   auto translated = PrometheusExporterUtils::TranslateToPrometheus(collection);
@@ -354,6 +350,32 @@ TEST(PrometheusExporterUtils, TranslateToPrometheusExact)
   ASSERT_DOUBLE_EQ(quantile[2].value, 5);
   ASSERT_DOUBLE_EQ(quantile[3].value, 7);
   ASSERT_DOUBLE_EQ(quantile[4].value, 9);
+}
+
+TEST(PrometheusExporterUtils, TranslateToPrometheusExactNoQuantile)
+{
+  auto aggregator = std::shared_ptr<metric_sdk::Aggregator<int>>(
+      new metric_sdk::ExactAggregator<int>(metric_api::InstrumentKind::Counter, false));
+
+  std::vector<metric_sdk::Record> collection;
+  int count_num = 10;
+  for (int i = 0; i < count_num; i++)
+  {
+    aggregator->update(i);
+  }
+  aggregator->checkpoint();
+  auto record = get_record("exact-no-quantile", 1, "{label1:v1,label2:v2,}", aggregator);
+  collection.emplace_back(record);
+
+  auto translated = PrometheusExporterUtils::TranslateToPrometheus(collection);
+  ASSERT_EQ(translated.size(), collection.size());
+
+  auto metric           = translated[0];
+  std::vector<int> vals = {count_num, 45};
+  assert_basic(metric, "test_exact_no_quantile_metric_record_v_1_0", record.GetDescription(),
+               prometheus_client::MetricType::Summary, 2, vals);
+  auto quantile = metric.metric[0].summary.quantile;
+  ASSERT_EQ(quantile.size(), 0);
 }
 
 TEST(PrometheusExporterUtils, TranslateToPrometheusMinMaxSumCount)
