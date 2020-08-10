@@ -1,5 +1,5 @@
 // Import for CMake
-// #include "in_memory_span_data.h"
+// #include "../include/opentelemetry/exporters/memory/in_memory_span_data.h"
 
 // Import for Bazel
 #include "opentelemetry/exporters/memory/in_memory_span_data.h"

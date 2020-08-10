@@ -8,8 +8,7 @@
 #include "opentelemetry/sdk/trace/tracer.h"
 
 // Import for CMake
-// #include
-// "../../../exporters/memory/include/opentelemetry/exporters/memory/in_memory_span_exporter.h"
+// #include "../../../exporters/memory/include/opentelemetry/exporters/memory/in_memory_span_exporter.h"
 
 // Import for Bazel
 #include "opentelemetry/exporters/memory/in_memory_span_exporter.h"

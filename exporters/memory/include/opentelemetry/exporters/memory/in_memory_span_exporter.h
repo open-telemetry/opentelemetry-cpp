@@ -1,5 +1,4 @@
 #pragma once
-#include "opentelemetry/exporters/memory/in_memory_span_exporter.h"
 #include "opentelemetry/sdk/trace/exporter.h"
 
 // Import for CMake

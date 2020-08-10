@@ -1,5 +1,5 @@
 // Import for CMake
-// #include "in_memory_span_data.h"
+// #include "../include/opentelemetry/exporters/memory/in_memory_span_data.h"
 
 // Import for Bazel
 #include "opentelemetry/exporters/memory/in_memory_span_exporter.h"
@@ -13,7 +13,7 @@ using opentelemetry::exporter::memory::InMemorySpanExporter;
 using opentelemetry::sdk::trace::Recordable;
 using opentelemetry::sdk::trace::SpanData;
 
-TEST(InMemoryExporter, AddRecordable)
+TEST(InMemorySpanExporter, ExportBatch)
 {
   InMemorySpanExporter exporter;
 
