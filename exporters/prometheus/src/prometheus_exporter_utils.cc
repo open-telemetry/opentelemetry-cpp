@@ -93,13 +93,13 @@ void PrometheusExporterUtils::SetMetricFamily(metric_sdk::Record &record,
     SetMetricFamilyByAggregator(aggregator, labels_str, metric_family);
   }
   else if (nostd::holds_alternative<nostd::shared_ptr<metric_sdk::Aggregator<float>>>(
-               record.GetAggregator()))
+      record.GetAggregator()))
   {
     auto aggregator = nostd::get<nostd::shared_ptr<metric_sdk::Aggregator<float>>>(agg_var);
     SetMetricFamilyByAggregator(aggregator, labels_str, metric_family);
   }
   else if (nostd::holds_alternative<nostd::shared_ptr<metric_sdk::Aggregator<double>>>(
-               record.GetAggregator()))
+      record.GetAggregator()))
   {
     auto aggregator = nostd::get<nostd::shared_ptr<metric_sdk::Aggregator<double>>>(agg_var);
     SetMetricFamilyByAggregator(aggregator, labels_str, metric_family);
@@ -193,19 +193,20 @@ void PrometheusExporterUtils::SetMetricFamilyByAggregator(
   }
   else if (type == prometheus_client::MetricType::Summary)  // Sketch, Exact
   {
-    auto quantiles = GetQuantilesVector(aggregator);
     if (kind == metric_sdk::AggregatorKind::Exact)
     {
-      // TODO: 1. what if this Exact aggregator is not for quantile estimation?
-      // TODO: 2. how many quantile samples should I include in each metric?
-      if (aggregator->get_quant_estimation())
+      std::vector<T> quantiles;
+      bool do_quantile = aggregator->get_quant_estimation();
+      if (do_quantile)
       {
-        SetData(checkpointed_values, kind, quantiles, labels_str, time, metric_family);
+        quantiles = GetQuantilesVector(aggregator);
       }
+      SetData(checkpointed_values, kind, quantiles, labels_str, time, metric_family, do_quantile);
     }
     else if (kind == metric_sdk::AggregatorKind::Sketch)
     {
-      SetData(checkpointed_values, kind, quantiles, labels_str, time, metric_family);
+      auto quantiles = GetQuantilesVector(aggregator);
+      SetData(checkpointed_values, kind, quantiles, labels_str, time, metric_family, true);
     }
   }
   else  // Counter, Gauge, MinMaxSumCount, Untyped
@@ -310,12 +311,13 @@ void PrometheusExporterUtils::SetData(std::vector<T> values,
                                       const std::vector<T> &quantiles,
                                       const std::string &labels,
                                       std::chrono::nanoseconds time,
-                                      prometheus_client::MetricFamily *metric_family)
+                                      prometheus_client::MetricFamily *metric_family,
+                                      bool do_quantile)
 {
   metric_family->metric.emplace_back();
   prometheus_client::ClientMetric &metric = metric_family->metric.back();
   SetMetricBasic(metric, time, labels);
-  SetValue(values, kind, quantiles, &metric);
+  SetValue(values, kind, quantiles, &metric, do_quantile);
 }
 
 /**
@@ -409,18 +411,15 @@ void PrometheusExporterUtils::SetValue(std::vector<T> values,
 {
   switch (type)
   {
-    case prometheus_client::MetricType::Counter:
-    {
+    case prometheus_client::MetricType::Counter: {
       metric->counter.value = values[0];
       break;
     }
-    case prometheus_client::MetricType::Gauge:
-    {
+    case prometheus_client::MetricType::Gauge: {
       metric->gauge.value = values[0];
       break;
     }
-    case prometheus_client::MetricType::Untyped:
-    {
+    case prometheus_client::MetricType::Untyped: {
       metric->untyped.value = values[0];
       break;
     }
@@ -475,7 +474,8 @@ template <typename T>
 void PrometheusExporterUtils::SetValue(std::vector<T> values,
                                        metric_sdk::AggregatorKind kind,
                                        std::vector<T> quantiles,
-                                       prometheus_client::ClientMetric *metric)
+                                       prometheus_client::ClientMetric *metric,
+                                       bool do_quantile)
 {
   if (kind == metric_sdk::AggregatorKind::Exact)
   {
@@ -493,17 +493,20 @@ void PrometheusExporterUtils::SetValue(std::vector<T> values,
     metric->summary.sample_count = values[1];
   }
 
-  double quant = 0;
-  std::vector<prometheus_client::ClientMetric::Quantile> prometheus_quantiles;
-  for (int i = 0; i < quantiles.size(); i++)
+  if (do_quantile)
   {
-    prometheus_client::ClientMetric::Quantile quantile;
-    quantile.quantile = quant;
-    quantile.value    = quantiles[i];
-    quant += QUANTILE_STEP;
-    prometheus_quantiles.emplace_back(quantile);
+    double quant = 0;
+    std::vector<prometheus_client::ClientMetric::Quantile> prometheus_quantiles;
+    for (int i = 0; i < quantiles.size(); i++)
+    {
+      prometheus_client::ClientMetric::Quantile quantile;
+      quantile.quantile = quant;
+      quantile.value    = quantiles[i];
+      quant += QUANTILE_STEP;
+      prometheus_quantiles.emplace_back(quantile);
+    }
+    metric->summary.quantile = prometheus_quantiles;
   }
-  metric->summary.quantile = prometheus_quantiles;
 }
 }  // namespace prometheus
 }  // namespace exporter
