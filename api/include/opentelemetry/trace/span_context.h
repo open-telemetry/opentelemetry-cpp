@@ -54,13 +54,13 @@ public:
   SpanContext(SpanContext &&ctx)
       : trace_id_(ctx.trace_id()),
         span_id_(ctx.span_id()),
-        trace_flags_(ctx.trace_flags()),
+        trace_flags_(ctx.trace_flags())
 //        trace_state_(std::move(ctx.trace_state_))
   {}
   SpanContext(const SpanContext &ctx)
       : trace_id_(ctx.trace_id()),
         span_id_(ctx.span_id()),
-        trace_flags_(ctx.trace_flags()),
+        trace_flags_(ctx.trace_flags())
 //        trace_state_(new TraceState(ctx.trace_state()))
   {}
 
