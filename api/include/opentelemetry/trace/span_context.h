@@ -32,36 +32,36 @@ public:
   // An invalid SpanContext.
   SpanContext() noexcept
       : trace_flags_(trace::TraceFlags((uint8_t) false)),
-        trace_state_(new TraceState),
+//        trace_state_(new TraceState),
         remote_parent_(false){};
 
   SpanContext(bool sampled_flag, bool has_remote_parent) noexcept
       : trace_flags_(trace::TraceFlags((uint8_t)sampled_flag)),
-        trace_state_(new TraceState),
+//        trace_state_(new TraceState),
         remote_parent_(has_remote_parent){};
   SpanContext(TraceId trace_id,
               SpanId span_id,
               TraceFlags trace_flags,
-              TraceState trace_state,
+//              TraceState trace_state,
               bool has_remote_parent) noexcept
   {
     trace_id_    = trace_id;
     span_id_     = span_id;
     trace_flags_ = trace_flags;
-    trace_state_.reset(new TraceState(trace_state));
+//    trace_state_.reset(new TraceState(trace_state));
     remote_parent_ = has_remote_parent;
   }
   SpanContext(SpanContext &&ctx)
       : trace_id_(ctx.trace_id()),
         span_id_(ctx.span_id()),
         trace_flags_(ctx.trace_flags()),
-        trace_state_(std::move(ctx.trace_state_))
+//        trace_state_(std::move(ctx.trace_state_))
   {}
   SpanContext(const SpanContext &ctx)
       : trace_id_(ctx.trace_id()),
         span_id_(ctx.span_id()),
         trace_flags_(ctx.trace_flags()),
-        trace_state_(new TraceState(ctx.trace_state()))
+//        trace_state_(new TraceState(ctx.trace_state()))
   {}
 
   SpanContext &operator=(const SpanContext &ctx)
@@ -69,7 +69,7 @@ public:
     trace_id_    = ctx.trace_id_;
     span_id_     = ctx.span_id_;
     trace_flags_ = ctx.trace_flags_;
-    trace_state_.reset(new TraceState(*(ctx.trace_state_.get())));
+//    trace_state_.reset(new TraceState(*(ctx.trace_state_.get())));
     return *this;
   };
   SpanContext &operator=(SpanContext &&ctx)
@@ -77,7 +77,7 @@ public:
     trace_id_    = ctx.trace_id_;
     span_id_     = ctx.span_id_;
     trace_flags_ = ctx.trace_flags_;
-    trace_state_.reset(new TraceState(*(ctx.trace_state_.get())));
+//    trace_state_.reset(new TraceState(*(ctx.trace_state_.get())));
     return *this;
   };
   // TODO
@@ -88,7 +88,7 @@ public:
   const TraceId &trace_id() const noexcept { return trace_id_; }
   const SpanId &span_id() const noexcept { return span_id_; }
   const TraceFlags &trace_flags() const noexcept { return trace_flags_; }
-  const TraceState &trace_state() const noexcept { return *trace_state_; }
+//  const TraceState &trace_state() const noexcept { return *trace_state_; }
 
   bool IsValid() const noexcept { return trace_id_.IsValid() && span_id_.IsValid(); }
 
@@ -102,7 +102,7 @@ private:
   TraceId trace_id_;
   SpanId span_id_;
   TraceFlags trace_flags_;
-  nostd::unique_ptr<TraceState> trace_state_;  // Never nullptr.
+//  nostd::unique_ptr<TraceState> trace_state_;  // Never nullptr.
   bool remote_parent_ = false;
 };
 
