@@ -55,7 +55,7 @@ struct KeyStruct_Hash
     std::size_t labels_size = keystruct.labels.length();
     std::size_t ins_size    = (int)keystruct.ins_kind;
 
-    return name_size ^ desc_size ^ labels_size + ins_size;
+    return (name_size ^ desc_size ^ labels_size) + ins_size;
   }
 };
 
