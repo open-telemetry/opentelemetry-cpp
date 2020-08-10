@@ -156,20 +156,20 @@ private:
     }
   }
 
-  static void InjectTraceState(TraceState trace_state, T &carrier, Setter setter)
-  {
-    std::string trace_state_string = "";
-    nostd::span<Entries> entries   = trace_state.Entries();
-    Entry *entry                   = entries.data();
-    while (entry != entries.end())
-    {
-      if (entry != entries.begin())
-        trace_state_string += ",";
-      trace_state_string += std::string(entry->GetKey()) + "=" + std::string(entry->GetValue());
-      entry++;
-    }
-    setter(carrier, kTraceState, trace_state_string);
-  }
+//  static void InjectTraceState(TraceState trace_state, T &carrier, Setter setter)
+//  {
+//    std::string trace_state_string = "";
+//    nostd::span<TraceState::Entries> entries   = trace_state.Entries();
+//    TraceState::Entry *entry                   = entries.data();
+//    while (entry != entries.end())
+//    {
+//      if (entry != entries.begin())
+//        trace_state_string += ",";
+//      trace_state_string += std::string(entry->GetKey()) + "=" + std::string(entry->GetValue());
+//      entry++;
+//    }
+//    setter(carrier, kTraceState, trace_state_string);
+//  }
 
   static void InjectTraceParent(const SpanContext &span_context, T &carrier, Setter setter)
   {
@@ -201,10 +201,10 @@ private:
   static void InjectImpl(Setter setter, T &carrier, const SpanContext &span_context)
   {
     InjectTraceParent(span_context, carrier, setter);
-    if (!span_context.trace_state().empty())
-    {
-      InjectTraceState(span_context.trace_state(), carrier, setter);
-    }
+//    if (!span_context.trace_state().empty())
+//    {
+//      InjectTraceState(span_context.trace_state(), carrier, setter);
+//    }
   }
 
   static SpanContext ExtractContextFromTraceParent(nostd::string_view trace_parent)
@@ -293,76 +293,76 @@ private:
     }
   }
 
-  static TraceState ExtractTraceState(nostd::string_view &trace_state_header)
-  {
-    TraceState trace_state = TraceState();
-    int start_pos          = -1;
-    int end_pos            = -1;
-    int ctr_pos            = -1;
-    int element_num        = 0;
-    nostd::string_view key;
-    nostd::string_view val;
-    for (int i = 0; i < int(trace_state_header.length()); i++)
-    {
-      if (trace_state_header[i] == '\t')
-        continue;
-      else if (trace_state_header[i] == ',')
-      {
-        if (start_pos == -1 && end_pos == -1)
-          continue;
-        element_num++;
-        if (ctr_pos != -1)
-        {
-          key = trace_state_header.substr(start_pos, ctr_pos - start_pos + 1);
-          val = trace_state_header.substr(ctr_pos + 1, end_pos - ctr_pos);
-          if (key != "")
-            trace_state.Set(key, val);
-        }
-        ctr_pos   = -1;
-        end_pos   = -1;
-        start_pos = -1;
-      }
-      else if (trace_state_header[i] == '=')
-      {
-        ctr_pos = i;
-      }
-      else
-      {
-        end_pos = i;
-        if (start_pos == -1)
-          start_pos = i;
-      }
-    }
-    if (start_pos != -1 && end_pos != -1)
-    {
-      if (ctr_pos != -1)
-      {
-        key = trace_state_header.substr(start_pos, ctr_pos - start_pos + 1);
-        val = trace_state_header.substr(ctr_pos + 1, end_pos - ctr_pos);
-        if (key != "")
-          trace_state.Set(key, val);
-      }
-      element_num++;
-    }
-
-    if (element_num >= kTraceStateMaxMembers)
-    {
-      return TraceState();  // too many k-v pairs will result in an invalid trace state
-    }
-    return trace_state;
-  }
-
-  static void AddNewMember(TraceState &trace_state, nostd::string_view member)
-  {
-    for (int i = 0; i < int(member.length()); i++)
-    {
-      if (member[i] == '=')
-      {
-        trace_state.Set(member.substr(0, i), member.substr(i + 1, member.length() - i - 1));
-        return;
-      }
-    }
-  }
+//  static TraceState ExtractTraceState(nostd::string_view &trace_state_header)
+//  {
+//    TraceState trace_state = TraceState();
+//    int start_pos          = -1;
+//    int end_pos            = -1;
+//    int ctr_pos            = -1;
+//    int element_num        = 0;
+//    nostd::string_view key;
+//    nostd::string_view val;
+//    for (int i = 0; i < int(trace_state_header.length()); i++)
+//    {
+//      if (trace_state_header[i] == '\t')
+//        continue;
+//      else if (trace_state_header[i] == ',')
+//      {
+//        if (start_pos == -1 && end_pos == -1)
+//          continue;
+//        element_num++;
+//        if (ctr_pos != -1)
+//        {
+//          key = trace_state_header.substr(start_pos, ctr_pos - start_pos + 1);
+//          val = trace_state_header.substr(ctr_pos + 1, end_pos - ctr_pos);
+//          if (key != "")
+//            trace_state.Set(key, val);
+//        }
+//        ctr_pos   = -1;
+//        end_pos   = -1;
+//        start_pos = -1;
+//      }
+//      else if (trace_state_header[i] == '=')
+//      {
+//        ctr_pos = i;
+//      }
+//      else
+//      {
+//        end_pos = i;
+//        if (start_pos == -1)
+//          start_pos = i;
+//      }
+//    }
+//    if (start_pos != -1 && end_pos != -1)
+//    {
+//      if (ctr_pos != -1)
+//      {
+//        key = trace_state_header.substr(start_pos, ctr_pos - start_pos + 1);
+//        val = trace_state_header.substr(ctr_pos + 1, end_pos - ctr_pos);
+//        if (key != "")
+//          trace_state.Set(key, val);
+//      }
+//      element_num++;
+//    }
+//
+//    if (element_num >= kTraceStateMaxMembers)
+//    {
+//      return TraceState();  // too many k-v pairs will result in an invalid trace state
+//    }
+//    return trace_state;
+//  }
+//
+//  static void AddNewMember(TraceState &trace_state, nostd::string_view member)
+//  {
+//    for (int i = 0; i < int(member.length()); i++)
+//    {
+//      if (member[i] == '=')
+//      {
+//        trace_state.Set(member.substr(0, i), member.substr(i + 1, member.length() - i - 1));
+//        return;
+//      }
+//    }
+//  }
 
   static SpanContext ExtractImpl(Getter getter, const T &carrier)
   {
@@ -372,21 +372,21 @@ private:
       return SpanContext(false, false);
     }
     SpanContext context_from_parent_header = ExtractContextFromTraceParent(trace_parent);
-    if (!context_from_parent_header.IsValid())
-    {
-      return context_from_parent_header;
-    }
+//    if (!context_from_parent_header.IsValid())
+//    {
+    return context_from_parent_header;
+//    }
 
-    nostd::string_view trace_state_header = getter(carrier, kTraceState);
-
-    if (trace_state_header == "" || trace_state_header.empty())
-    {
-      return context_from_parent_header;
-    }
-
-    TraceState trace_state = ExtractTraceState(trace_state_header);
-    return SpanContext(context_from_parent_header.trace_id(), context_from_parent_header.span_id(),
-                       context_from_parent_header.trace_flags(), trace_state, true);
+//    nostd::string_view trace_state_header = getter(carrier, kTraceState);
+//
+//    if (trace_state_header == "" || trace_state_header.empty())
+//    {
+//      return context_from_parent_header;
+//    }
+//
+//    TraceState trace_state = ExtractTraceState(trace_state_header);
+//    return SpanContext(context_from_parent_header.trace_id(), context_from_parent_header.span_id(),
+//                       context_from_parent_header.trace_flags(), trace_state, true);
   }
 };
 }  // namespace propagation
