@@ -407,13 +407,13 @@ TEST(Tracer, StartSpanUpdatesRuntimeContext)
   EXPECT_EQ(0, spans_received->size());
 
   nostd::get<nostd::shared_ptr<trace::Span>>(
-      context::RuntimeContext::GetCurrent().GetValue(SPAN_KEY))
+      context::RuntimeContext::GetCurrent().GetValue(SpanKey))
       ->End();
   EXPECT_EQ(1, spans_received->size());
   EXPECT_EQ("span 2", spans_received->at(0)->GetName());
 
   nostd::get<nostd::shared_ptr<trace::Span>>(
-      context::RuntimeContext::GetCurrent().GetValue(SPAN_KEY))
+      context::RuntimeContext::GetCurrent().GetValue(SpanKey))
       ->End();
   EXPECT_EQ(2, spans_received->size());
   EXPECT_EQ("span 1", spans_received->at(1)->GetName());

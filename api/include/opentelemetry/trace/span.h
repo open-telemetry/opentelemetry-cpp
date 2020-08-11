@@ -6,11 +6,12 @@
 #include "opentelemetry/core/timestamp.h"
 #include "opentelemetry/nostd/span.h"
 #include "opentelemetry/nostd/string_view.h"
+#include "opentelemetry/nostd/unique_ptr.h"
 #include "opentelemetry/trace/canonical_code.h"
 #include "opentelemetry/trace/key_value_iterable_view.h"
 #include "opentelemetry/version.h"
 
-#define SPAN_KEY "span_key"
+constexpr char SpanKey[] = "span_key";
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace context
@@ -164,9 +165,9 @@ public:
 
   virtual Tracer &tracer() const noexcept = 0;
 
-  virtual context::Token *GetToken() const noexcept = 0;
+  virtual nostd::unique_ptr<context::Token> GetToken() const noexcept = 0;
 
-  virtual void SetToken(context::Token *token) noexcept = 0;
+  virtual void SetToken(nostd::unique_ptr<context::Token> &&token) noexcept = 0;
 };
 }  // namespace trace
 OPENTELEMETRY_END_NAMESPACE

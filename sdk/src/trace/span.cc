@@ -52,8 +52,6 @@ Span::Span(std::shared_ptr<Tracer> &&tracer,
       token_{nullptr}
 
 {
-  // token_ = nullptr;
-  // has_ended_ = false;
   (void)options;
   if (recordable_ == nullptr)
   {
@@ -136,7 +134,7 @@ void Span::End(const trace_api::EndSpanOptions &options) noexcept
   if (token_ != nullptr)
   {
     context::RuntimeContext::Detach(*token_);
-    delete token_;
+    token_.reset();
   }
 
   if (recordable_ == nullptr)
@@ -158,14 +156,18 @@ bool Span::IsRecording() const noexcept
   return recordable_ != nullptr;
 }
 
-context::Token *Span::GetToken() const noexcept
+nostd::unique_ptr<context::Token> Span::GetToken() const noexcept
 {
-  return token_;
+  if (token_ != nullptr)
+  {
+    return std::move(token_);
+  }
+  return nullptr;
 }
 
-void Span::SetToken(context::Token *token) noexcept
+void Span::SetToken(nostd::unique_ptr<context::Token> &&token) noexcept
 {
-  token_ = token;
+  token_ = std::move(token);
 }
 
 }  // namespace trace
