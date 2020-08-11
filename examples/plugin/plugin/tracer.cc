@@ -1,5 +1,6 @@
 #include "tracer.h"
 #include "opentelemetry/context/runtime_context.h"
+#include "opentelemetry/nostd/unique_ptr.h"
 
 #include <iostream>
 
@@ -52,9 +53,9 @@ public:
 
   Tracer &tracer() const noexcept override { return *tracer_; }
 
-  context::Token *GetToken() const noexcept override { return nullptr; }
+  nostd::unique_ptr<context::Token> GetToken() const noexcept override { return nullptr; }
 
-  void SetToken(context::Token *token) noexcept override {}
+  void SetToken(nostd::unique_ptr<context::Token> &&token) noexcept override {}
 
 private:
   std::shared_ptr<Tracer> tracer_;
