@@ -96,14 +96,15 @@ public:
   // An empty TraceState.
   TraceState() noexcept : entries_(new Entry[kMaxKeyValuePairs]), num_entries_(0) {}
 
-  // Returns false if no such key, otherwise returns true and populates value.
-  bool Get(nostd::string_view key, nostd::string_view value) noexcept
+  // Returns false if no such key, otherwise returns true and populates the value parameter with the
+  // associated value.
+  bool Get(nostd::string_view key, nostd::string_view &value) noexcept
   {
     for (int i = 0; i < num_entries_; i++)
     {
-      if (key == entries_[i].GetKey())
+      if (key == (entries_.get())[i].GetKey())
       {
-        entries_[i].SetValue(value);
+        value = (entries_.get())[i].GetValue();
         return true;
       }
     }
@@ -121,7 +122,7 @@ public:
 
     if (num_entries_ < kMaxKeyValuePairs)
     {
-      entries_[num_entries_] = entry;
+      (entries_.get())[num_entries_] = entry;
       num_entries_++;
     }
   }
@@ -181,7 +182,7 @@ public:
 
 private:
   // Store entries in a C-style array to avoid using std::array or std::vector.
-  std::unique_ptr<Entry[]> entries_;
+  nostd::unique_ptr<Entry[]> entries_;
 
   // Maintain the number of entries in entries_. Must be in the range [0, kMaxKeyValuePairs].
   int num_entries_;

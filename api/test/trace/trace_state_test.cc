@@ -63,7 +63,9 @@ TEST(EntryTest, SetValue)
 TEST(TraceStateTest, DefaultConstruction)
 {
   TraceState s;
-  EXPECT_FALSE(s.Get("missing_key", "value"));
+  opentelemetry::nostd::string_view return_val = "";
+  EXPECT_FALSE(s.Get("missing_key", return_val));
+  EXPECT_EQ(return_val.data(), "");
   EXPECT_TRUE(s.Empty());
   EXPECT_EQ(0, s.Entries().size());
 }
@@ -98,12 +100,17 @@ TEST(TraceStateTest, Get)
     s.Set(keys[i], values[i]);
   }
 
+  opentelemetry::nostd::string_view return_val = "";
+
   for (int i = 0; i < kNumPairs; i++)
   {
-    EXPECT_TRUE(s.Get(keys[i], values[i]));
+    EXPECT_TRUE(s.Get(keys[i], return_val));
+    EXPECT_EQ(return_val.data(), values[i]);
+    return_val = "";
   }
 
-  EXPECT_FALSE(s.Get("fake_key", "fake_value"));
+  EXPECT_FALSE(s.Get("fake_key", return_val));
+  EXPECT_EQ(return_val.data(), "");
 }
 
 TEST(TraceStateTest, Empty)
