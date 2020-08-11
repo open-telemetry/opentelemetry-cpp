@@ -50,23 +50,23 @@ public:
     // Copy constructor
     Entry(Entry &copy)
     {
-      key_   = StringToPointer(copy.key_.get(), kKeyMaxSize);
-      value_ = StringToPointer(copy.value_.get(), kValueMaxSize);
+      key_   = StringToPointer(nostd::string_view(copy.key_.get()));
+      value_ = StringToPointer(nostd::string_view(copy.value_.get()));
     }
 
     // Assignment operator
     Entry &operator=(Entry &other)
     {
-      key_   = StringToPointer(other.key_.get(), kKeyMaxSize);
-      value_ = StringToPointer(other.value_.get(), kValueMaxSize);
+      key_   = StringToPointer(nostd::string_view(other.key_.get()));
+      value_ = StringToPointer(nostd::string_view(other.value_.get()));
       return *this;
     }
 
     // Create an Entry for a given key-value pair.
     Entry(nostd::string_view key, nostd::string_view value) noexcept
     {
-      key_   = StringToPointer(key.data(), kKeyMaxSize);
-      value_ = StringToPointer(value.data(), kValueMaxSize);
+      key_   = StringToPointer(key);
+      value_ = StringToPointer(value);
     }
 
     // Get the key associated with this entry.
@@ -76,10 +76,7 @@ public:
     nostd::string_view GetValue() { return nostd::string_view(value_.get()); }
 
     // Set the value for this entry. This overrides the previous value.
-    void SetValue(nostd::string_view value)
-    {
-      value_ = StringToPointer(value.data(), kValueMaxSize);
-    }
+    void SetValue(nostd::string_view value) { value_ = StringToPointer(value); }
 
   private:
     // Store key and value as raw char pointers to avoid using std::string.
@@ -88,10 +85,10 @@ public:
 
     // Copy string into a buffer and return a unique_ptr to the buffer.
     // This is a workaround for the fact that strcpy doesn't accept a const char* destination.
-    nostd::unique_ptr<const char[]> StringToPointer(const char *str, const int kMaxSize)
+    nostd::unique_ptr<const char[]> StringToPointer(nostd::string_view str)
     {
-      nostd::unique_ptr<char[]> temp(new char[kMaxSize]);
-      strcpy(temp.get(), str);
+      nostd::unique_ptr<char[]> temp(new char[str.size()]);
+      strcpy(temp.get(), str.data());
       return nostd::unique_ptr<const char[]>(temp.release());
     }
   };
@@ -104,7 +101,7 @@ public:
   {
     for (int i = 0; i < num_entries_; i++)
     {
-      if (strcmp(key.data(), entries_[i].GetKey().data()) == 0)
+      if (key == entries_[i].GetKey())
       {
         entries_[i].SetValue(value);
         return true;
@@ -189,10 +186,7 @@ private:
   // Maintain the number of entries in entries_. Must be in the range [0, kMaxKeyValuePairs].
   int num_entries_;
 
-  static bool IsLowerCaseAlphaOrDigit(char c)
-  {
-    return (c >= 'a' && c <= 'z') || (c >= '0' && c <= '9');
-  }
+  static bool IsLowerCaseAlphaOrDigit(char c) { return isdigit(c) || islower(c); }
 };
 
 }  // namespace trace
