@@ -196,16 +196,21 @@ BatchSpanProcessor::~BatchSpanProcessor()
 
 void BatchSpanProcessor::PrepareForFork() noexcept
 {
-  // no-op
+  cv_m_.lock();
+  force_flush_cv_m_.lock();
 }
 
 void BatchSpanProcessor::OnForkedParent() noexcept
 {
-  // no-op
+  force_flush_cv_m_.unlock();
+  cv_m_.unlock();
 }
 
 void BatchSpanProcessor::OnForkedChild() noexcept
 {
+  force_flush_cv_m_.unlock();
+  cv_m_.unlock();
+
   // We don't want any spans to be duplicated so clear the buffer_
   // in the child
   // NOTE: We do not `Consume` any spans since they will anyway be consumed

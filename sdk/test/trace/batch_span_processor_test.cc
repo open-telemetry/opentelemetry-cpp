@@ -6,8 +6,12 @@
 #include "opentelemetry/trace/provider.h"
 
 #include <gtest/gtest.h>
-#include <sys/wait.h>
-#include <unistd.h>
+
+#if defined(_UNISTD_H) && defined(_SYS_WAIT_H)
+#  include <sys/wait.h>
+#  include <unistd.h>
+#endif
+
 #include <chrono>
 #include <thread>
 
@@ -301,6 +305,7 @@ TEST_F(BatchSpanProcessorTestPeer, TestScheduleDelayMillis)
   }
 }
 
+#if defined(_UNISTD_H) && defined(_SYS_WAIT_H)
 TEST_F(BatchSpanProcessorTestPeer, TestForkHandlers)
 {
   std::shared_ptr<std::atomic<bool>> is_shutdown(new std::atomic<bool>(false));
@@ -325,6 +330,7 @@ TEST_F(BatchSpanProcessorTestPeer, TestForkHandlers)
 
   std::this_thread::sleep_for(schedule_delay_millis + std::chrono::milliseconds(50));
   // The span in the parent process will now be exported
+  EXPECT_TRUE(is_export_completed->load());
 
   pid_t child_pid = fork();
 
@@ -332,9 +338,10 @@ TEST_F(BatchSpanProcessorTestPeer, TestForkHandlers)
   {
     // CHILD PROCESS
 
-    // Clear the `spans_received` vector since a span was already exported in the parent process.
+    // Reset MockExporter private members.
     // This will automatically be handled after a ForkAwareExporter is implemented.
     spans_received->clear();
+    *is_export_completed = false;
 
     // Generate some spans
     for (int i = 0; i < 3; ++i)
@@ -345,10 +352,10 @@ TEST_F(BatchSpanProcessorTestPeer, TestForkHandlers)
     std::this_thread::sleep_for(schedule_delay_millis + std::chrono::milliseconds(50));
 
     // Spans should now be exported in the child process
+    EXPECT_TRUE(is_export_completed->load());
     EXPECT_EQ(3, spans_received->size());
 
     batch_processor->Shutdown();
-
     // End child process
     std::exit(0);
   }
@@ -356,9 +363,10 @@ TEST_F(BatchSpanProcessorTestPeer, TestForkHandlers)
   // We only created one span in the parent process
   EXPECT_EQ(1, spans_received->size());
 
-  // Wait for the child process to finish
+  // Wait for child process to finish
   waitpid(child_pid, nullptr, 0);
 }
+#endif
 
 }  // namespace trace
 }  // namespace sdk
