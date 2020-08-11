@@ -1,3 +1,25 @@
+// The MIT License (MIT)
+
+// Copyright (c) 2015-2016 LightStep
+
+// Permission is hereby granted, free of charge, to any person obtaining a copy
+// of this software and associated documentation files (the "Software"), to deal
+// in the Software without restriction, including without limitation the rights
+// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+// copies of the Software, and to permit persons to whom the Software is
+// furnished to do so, subject to the following conditions:
+
+// The above copyright notice and this permission notice shall be included in all
+// copies or substantial portions of the Software.
+
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+// SOFTWARE.
+
 #include "opentelemetry/sdk/trace/fork_aware_span_processor.h"
 #include "src/common/platform/fork.h"
 
@@ -12,9 +34,6 @@ std::mutex ForkAwareSpanProcessor::mutex_;
 
 ForkAwareSpanProcessor *ForkAwareSpanProcessor::active_span_processors_{nullptr};
 
-//--------------------------------------------------------------------------------------------------
-// constructor
-//--------------------------------------------------------------------------------------------------
 ForkAwareSpanProcessor::ForkAwareSpanProcessor() noexcept
 {
   SetupForkHandlers();
@@ -23,9 +42,6 @@ ForkAwareSpanProcessor::ForkAwareSpanProcessor() noexcept
   active_span_processors_ = this;
 }
 
-//--------------------------------------------------------------------------------------------------
-// destructor
-//--------------------------------------------------------------------------------------------------
 ForkAwareSpanProcessor::~ForkAwareSpanProcessor() noexcept
 {
   std::lock_guard<std::mutex> lock_guard{mutex_};
@@ -46,9 +62,6 @@ ForkAwareSpanProcessor::~ForkAwareSpanProcessor() noexcept
   assert(0 && "ForkAwareSpanProcessor not found in global list");
 }
 
-//--------------------------------------------------------------------------------------------------
-// GetActiveRecordersForTesting
-//--------------------------------------------------------------------------------------------------
 std::vector<const ForkAwareSpanProcessor *>
 ForkAwareSpanProcessor::GetActiveSpanProcessorsForTesting()
 {
@@ -62,9 +75,6 @@ ForkAwareSpanProcessor::GetActiveSpanProcessorsForTesting()
   return result;
 }
 
-//--------------------------------------------------------------------------------------------------
-// PrepareForkHandler
-//--------------------------------------------------------------------------------------------------
 void ForkAwareSpanProcessor::PrepareForkHandler() noexcept
 {
   std::lock_guard<std::mutex> lock_guard{mutex_};
@@ -75,9 +85,6 @@ void ForkAwareSpanProcessor::PrepareForkHandler() noexcept
   }
 }
 
-//--------------------------------------------------------------------------------------------------
-// ParentForkHandler
-//--------------------------------------------------------------------------------------------------
 void ForkAwareSpanProcessor::ParentForkHandler() noexcept
 {
   std::lock_guard<std::mutex> lock_guard{mutex_};
@@ -88,9 +95,6 @@ void ForkAwareSpanProcessor::ParentForkHandler() noexcept
   }
 }
 
-//--------------------------------------------------------------------------------------------------
-// ChildForkHandler
-//--------------------------------------------------------------------------------------------------
 void ForkAwareSpanProcessor::ChildForkHandler() noexcept
 {
   std::lock_guard<std::mutex> lock_guard{mutex_};
@@ -101,9 +105,6 @@ void ForkAwareSpanProcessor::ChildForkHandler() noexcept
   }
 }
 
-//--------------------------------------------------------------------------------------------------
-// SetupForkHandlers
-//--------------------------------------------------------------------------------------------------
 void ForkAwareSpanProcessor::SetupForkHandlers() noexcept
 {
   static bool once = [] {

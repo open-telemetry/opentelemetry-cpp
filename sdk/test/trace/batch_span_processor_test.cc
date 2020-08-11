@@ -6,7 +6,6 @@
 #include "opentelemetry/trace/provider.h"
 
 #include <gtest/gtest.h>
-#include <sys/types.h>
 #include <sys/wait.h>
 #include <unistd.h>
 #include <chrono>
@@ -310,7 +309,7 @@ TEST_F(BatchSpanProcessorTestPeer, TestForkHandlers)
       new std::vector<std::unique_ptr<SpanData>>);
 
   const std::chrono::milliseconds export_delay(0);
-  const std::chrono::milliseconds schedule_delay_millis(2000);
+  const std::chrono::milliseconds schedule_delay_millis(1000);
 
   auto batch_processor = GetMockProcessor(spans_received, is_shutdown, is_export_completed,
                                           export_delay, schedule_delay_millis);
@@ -320,11 +319,22 @@ TEST_F(BatchSpanProcessorTestPeer, TestForkHandlers)
 
   auto tracer = provider->GetTracer("Test tracer");
 
+  // Create a span in the parent process
+  auto span = tracer->StartSpan("Span");
+  span->End();
+
+  std::this_thread::sleep_for(schedule_delay_millis + std::chrono::milliseconds(50));
+  // The span in the parent process will now be exported
+
   pid_t child_pid = fork();
 
   if (child_pid == 0)
   {
     // CHILD PROCESS
+
+    // Clear the `spans_received` vector since a span was already exported in the parent process.
+    // This will automatically be handled after a ForkAwareExporter is implemented.
+    spans_received->clear();
 
     // Generate some spans
     for (int i = 0; i < 3; ++i)
@@ -342,11 +352,6 @@ TEST_F(BatchSpanProcessorTestPeer, TestForkHandlers)
     // End child process
     std::exit(0);
   }
-
-  auto span = tracer->StartSpan("Span");
-  span->End();
-
-  std::this_thread::sleep_for(schedule_delay_millis + std::chrono::milliseconds(50));
 
   // We only created one span in the parent process
   EXPECT_EQ(1, spans_received->size());
