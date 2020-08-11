@@ -2,21 +2,29 @@
 #include "opentelemetry/context/threadlocal_context.h"
 #include "opentelemetry/sdk/trace/span_data.h"
 #include "opentelemetry/sdk/trace/tracer.h"
+#include "opentelemetry/sdk/trace/tracer_provider.h"
+#include "opentelemetry/trace/provider.h"
 
 #include <gtest/gtest.h>
+#include <sys/types.h>
+#include <sys/wait.h>
+#include <unistd.h>
 #include <chrono>
 #include <thread>
 
 OPENTELEMETRY_BEGIN_NAMESPACE
-
+namespace sdk
+{
+namespace trace
+{
 /**
  * Returns a mock span exporter meant exclusively for testing only
  */
-class MockSpanExporter final : public sdk::trace::SpanExporter
+class MockSpanExporter final : public SpanExporter
 {
 public:
   MockSpanExporter(
-      std::shared_ptr<std::vector<std::unique_ptr<sdk::trace::SpanData>>> spans_received,
+      std::shared_ptr<std::vector<std::unique_ptr<SpanData>>> spans_received,
       std::shared_ptr<std::atomic<bool>> is_shutdown,
       std::shared_ptr<std::atomic<bool>> is_export_completed,
       const std::chrono::milliseconds export_delay = std::chrono::milliseconds(0)) noexcept
@@ -26,13 +34,12 @@ public:
         export_delay_(export_delay)
   {}
 
-  std::unique_ptr<sdk::trace::Recordable> MakeRecordable() noexcept override
+  std::unique_ptr<Recordable> MakeRecordable() noexcept override
   {
-    return std::unique_ptr<sdk::trace::Recordable>(new sdk::trace::SpanData);
+    return std::unique_ptr<Recordable>(new SpanData);
   }
 
-  sdk::trace::ExportResult Export(
-      const nostd::span<std::unique_ptr<sdk::trace::Recordable>> &recordables) noexcept override
+  ExportResult Export(const nostd::span<std::unique_ptr<Recordable>> &recordables) noexcept override
   {
     *is_export_completed_ = false;
 
@@ -40,8 +47,7 @@ public:
 
     for (auto &recordable : recordables)
     {
-      auto span = std::unique_ptr<sdk::trace::SpanData>(
-          static_cast<sdk::trace::SpanData *>(recordable.release()));
+      auto span = std::unique_ptr<SpanData>(static_cast<SpanData *>(recordable.release()));
 
       if (span != nullptr)
       {
@@ -50,7 +56,7 @@ public:
     }
 
     *is_export_completed_ = true;
-    return sdk::trace::ExportResult::kSuccess;
+    return ExportResult::kSuccess;
   }
 
   void Shutdown(std::chrono::microseconds timeout = std::chrono::microseconds(0)) noexcept override
@@ -61,7 +67,7 @@ public:
   bool IsExportCompleted() { return is_export_completed_->load(); }
 
 private:
-  std::shared_ptr<std::vector<std::unique_ptr<sdk::trace::SpanData>>> spans_received_;
+  std::shared_ptr<std::vector<std::unique_ptr<SpanData>>> spans_received_;
   std::shared_ptr<std::atomic<bool>> is_shutdown_;
   std::shared_ptr<std::atomic<bool>> is_export_completed_;
   // Meant exclusively to test force flush timeout
@@ -74,8 +80,8 @@ private:
 class BatchSpanProcessorTestPeer : public testing::Test
 {
 public:
-  std::shared_ptr<sdk::trace::SpanProcessor> GetMockProcessor(
-      std::shared_ptr<std::vector<std::unique_ptr<sdk::trace::SpanData>>> spans_received,
+  std::shared_ptr<SpanProcessor> GetMockProcessor(
+      std::shared_ptr<std::vector<std::unique_ptr<SpanData>>> spans_received,
       std::shared_ptr<std::atomic<bool>> is_shutdown,
       std::shared_ptr<std::atomic<bool>> is_export_completed =
           std::shared_ptr<std::atomic<bool>>(new std::atomic<bool>(false)),
@@ -84,36 +90,40 @@ public:
       const size_t max_queue_size                           = 2048,
       const size_t max_export_batch_size                    = 512)
   {
-    return std::shared_ptr<sdk::trace::SpanProcessor>(new sdk::trace::BatchSpanProcessor(
+    return std::shared_ptr<SpanProcessor>(new BatchSpanProcessor(
         GetMockExporter(spans_received, is_shutdown, is_export_completed, export_delay),
         max_queue_size, schedule_delay_millis, max_export_batch_size));
   }
 
-  std::unique_ptr<std::vector<std::unique_ptr<sdk::trace::Recordable>>> GetTestSpans(
-      std::shared_ptr<sdk::trace::SpanProcessor> processor,
+  std::unique_ptr<std::vector<std::unique_ptr<Recordable>>> GetTestSpans(
+      std::shared_ptr<SpanProcessor> processor,
       const int num_spans)
   {
-    std::unique_ptr<std::vector<std::unique_ptr<sdk::trace::Recordable>>> test_spans(
-        new std::vector<std::unique_ptr<sdk::trace::Recordable>>);
+    std::unique_ptr<std::vector<std::unique_ptr<Recordable>>> test_spans(
+        new std::vector<std::unique_ptr<Recordable>>);
 
     for (int i = 0; i < num_spans; ++i)
     {
       test_spans->push_back(processor->MakeRecordable());
-      static_cast<sdk::trace::SpanData *>(test_spans->at(i).get())
-          ->SetName("Span " + std::to_string(i));
+      static_cast<SpanData *>(test_spans->at(i).get())->SetName("Span " + std::to_string(i));
     }
 
     return test_spans;
   }
 
+  size_t GetBufferSize(std::shared_ptr<SpanProcessor> &batch_processor)
+  {
+    return static_cast<BatchSpanProcessor *>(batch_processor.get())->buffer_.size();
+  }
+
 private:
-  std::unique_ptr<sdk::trace::SpanExporter> GetMockExporter(
-      std::shared_ptr<std::vector<std::unique_ptr<sdk::trace::SpanData>>> spans_received,
+  std::unique_ptr<SpanExporter> GetMockExporter(
+      std::shared_ptr<std::vector<std::unique_ptr<SpanData>>> spans_received,
       std::shared_ptr<std::atomic<bool>> is_shutdown,
       std::shared_ptr<std::atomic<bool>> is_export_completed,
       const std::chrono::milliseconds export_delay = std::chrono::milliseconds(0))
   {
-    return std::unique_ptr<sdk::trace::SpanExporter>(
+    return std::unique_ptr<SpanExporter>(
         new MockSpanExporter(spans_received, is_shutdown, is_export_completed, export_delay));
   }
 };
@@ -123,8 +133,8 @@ private:
 TEST_F(BatchSpanProcessorTestPeer, TestShutdown)
 {
   std::shared_ptr<std::atomic<bool>> is_shutdown(new std::atomic<bool>(false));
-  std::shared_ptr<std::vector<std::unique_ptr<sdk::trace::SpanData>>> spans_received(
-      new std::vector<std::unique_ptr<sdk::trace::SpanData>>);
+  std::shared_ptr<std::vector<std::unique_ptr<SpanData>>> spans_received(
+      new std::vector<std::unique_ptr<SpanData>>);
 
   auto batch_processor = GetMockProcessor(spans_received, is_shutdown);
   const int num_spans  = 3;
@@ -150,8 +160,8 @@ TEST_F(BatchSpanProcessorTestPeer, TestShutdown)
 TEST_F(BatchSpanProcessorTestPeer, TestForceFlush)
 {
   std::shared_ptr<std::atomic<bool>> is_shutdown(new std::atomic<bool>(false));
-  std::shared_ptr<std::vector<std::unique_ptr<sdk::trace::SpanData>>> spans_received(
-      new std::vector<std::unique_ptr<sdk::trace::SpanData>>);
+  std::shared_ptr<std::vector<std::unique_ptr<SpanData>>> spans_received(
+      new std::vector<std::unique_ptr<SpanData>>);
 
   auto batch_processor = GetMockProcessor(spans_received, is_shutdown);
   const int num_spans  = 2048;
@@ -199,8 +209,8 @@ TEST_F(BatchSpanProcessorTestPeer, TestManySpansLoss)
   /* Test that when exporting more than max_queue_size spans, some are most likely lost*/
 
   std::shared_ptr<std::atomic<bool>> is_shutdown(new std::atomic<bool>(false));
-  std::shared_ptr<std::vector<std::unique_ptr<sdk::trace::SpanData>>> spans_received(
-      new std::vector<std::unique_ptr<sdk::trace::SpanData>>);
+  std::shared_ptr<std::vector<std::unique_ptr<SpanData>>> spans_received(
+      new std::vector<std::unique_ptr<SpanData>>);
 
   const int max_queue_size = 4096;
 
@@ -227,8 +237,8 @@ TEST_F(BatchSpanProcessorTestPeer, TestManySpansLossLess)
   /* Test that no spans are lost when sending max_queue_size spans */
 
   std::shared_ptr<std::atomic<bool>> is_shutdown(new std::atomic<bool>(false));
-  std::shared_ptr<std::vector<std::unique_ptr<sdk::trace::SpanData>>> spans_received(
-      new std::vector<std::unique_ptr<sdk::trace::SpanData>>);
+  std::shared_ptr<std::vector<std::unique_ptr<SpanData>>> spans_received(
+      new std::vector<std::unique_ptr<SpanData>>);
 
   const int num_spans = 2048;
 
@@ -260,8 +270,8 @@ TEST_F(BatchSpanProcessorTestPeer, TestScheduleDelayMillis)
 
   std::shared_ptr<std::atomic<bool>> is_shutdown(new std::atomic<bool>(false));
   std::shared_ptr<std::atomic<bool>> is_export_completed(new std::atomic<bool>(false));
-  std::shared_ptr<std::vector<std::unique_ptr<sdk::trace::SpanData>>> spans_received(
-      new std::vector<std::unique_ptr<sdk::trace::SpanData>>);
+  std::shared_ptr<std::vector<std::unique_ptr<SpanData>>> spans_received(
+      new std::vector<std::unique_ptr<SpanData>>);
 
   const std::chrono::milliseconds export_delay(0);
   const std::chrono::milliseconds schedule_delay_millis(2000);
@@ -292,4 +302,59 @@ TEST_F(BatchSpanProcessorTestPeer, TestScheduleDelayMillis)
   }
 }
 
+TEST_F(BatchSpanProcessorTestPeer, TestForkHandlers)
+{
+  std::shared_ptr<std::atomic<bool>> is_shutdown(new std::atomic<bool>(false));
+  std::shared_ptr<std::atomic<bool>> is_export_completed(new std::atomic<bool>(false));
+  std::shared_ptr<std::vector<std::unique_ptr<SpanData>>> spans_received(
+      new std::vector<std::unique_ptr<SpanData>>);
+
+  const std::chrono::milliseconds export_delay(0);
+  const std::chrono::milliseconds schedule_delay_millis(2000);
+
+  auto batch_processor = GetMockProcessor(spans_received, is_shutdown, is_export_completed,
+                                          export_delay, schedule_delay_millis);
+
+  auto provider = nostd::shared_ptr<opentelemetry::trace::TracerProvider>(
+      new sdk::trace::TracerProvider(batch_processor));
+
+  auto tracer = provider->GetTracer("Test tracer");
+
+  pid_t child_pid = fork();
+
+  if (child_pid == 0)
+  {
+    // CHILD PROCESS
+
+    // Generate some spans
+    for (int i = 0; i < 3; ++i)
+    {
+      auto span = tracer->StartSpan("Span");
+    }
+
+    std::this_thread::sleep_for(schedule_delay_millis + std::chrono::milliseconds(50));
+
+    // Spans should now be exported in the child process
+    EXPECT_EQ(3, spans_received->size());
+
+    batch_processor->Shutdown();
+
+    // End child process
+    std::exit(0);
+  }
+
+  auto span = tracer->StartSpan("Span");
+  span->End();
+
+  std::this_thread::sleep_for(schedule_delay_millis + std::chrono::milliseconds(50));
+
+  // We only created one span in the parent process
+  EXPECT_EQ(1, spans_received->size());
+
+  // Wait for the child process to finish
+  waitpid(child_pid, nullptr, 0);
+}
+
+}  // namespace trace
+}  // namespace sdk
 OPENTELEMETRY_END_NAMESPACE

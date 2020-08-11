@@ -1,5 +1,6 @@
 #include "opentelemetry/sdk/trace/batch_span_processor.h"
 
+#include <iostream>
 #include <vector>
 using opentelemetry::sdk::common::AtomicUniquePtr;
 using opentelemetry::sdk::common::CircularBuffer;
@@ -191,6 +192,35 @@ BatchSpanProcessor::~BatchSpanProcessor()
   }
 }
 
+/* FORK HANDLERS */
+
+void BatchSpanProcessor::PrepareForFork() noexcept
+{
+  // no-op
+}
+
+void BatchSpanProcessor::OnForkedParent() noexcept
+{
+  // no-op
+}
+
+void BatchSpanProcessor::OnForkedChild() noexcept
+{
+  // We don't want any spans to be duplicated so clear the buffer_
+  // in the child
+  // NOTE: We do not `Consume` any spans since they will anyway be consumed
+  // in the parent process
+  buffer_.Clear();
+
+  // On forking, all other threads get eliminated. So we need to reclaim the resources
+  // used by the eliminated threads, else they'll be zombies.
+  worker_thread_.join();
+
+  // We need to restart the background worker thread here too since
+  // in a multithreaded environment, forking only duplicates the memory stack
+  // of the thread that called it
+  worker_thread_ = std::thread(&BatchSpanProcessor::DoBackgroundWork, this);
+}
 }  // namespace trace
 }  // namespace sdk
 OPENTELEMETRY_END_NAMESPACE

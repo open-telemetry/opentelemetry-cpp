@@ -2,7 +2,7 @@
 
 #include "opentelemetry/sdk/common/circular_buffer.h"
 #include "opentelemetry/sdk/trace/exporter.h"
-#include "opentelemetry/sdk/trace/processor.h"
+#include "opentelemetry/sdk/trace/fork_aware_span_processor.h"
 
 #include <atomic>
 #include <condition_variable>
@@ -19,7 +19,7 @@ namespace trace
  * This is an implementation of the SpanProcessor which creates batches of finished spans and passes
  * the export-friendly span data representations to the configured SpanExporter.
  */
-class BatchSpanProcessor : public SpanProcessor
+class BatchSpanProcessor : public ForkAwareSpanProcessor
 {
 public:
   /**
@@ -88,6 +88,9 @@ public:
   ~BatchSpanProcessor();
 
 private:
+  /* Fixture class meant for testing purposes */
+  friend class BatchSpanProcessorTestPeer;
+
   /**
    * The background routine performed by the worker thread.
    */
@@ -108,6 +111,21 @@ private:
    * passes them to the exporter.
    */
   void DrainQueue();
+
+  /**
+   * Handler called prior to forking.
+   */
+  void PrepareForFork() noexcept;
+
+  /**
+   * Handler called in the parent process after a fork.
+   */
+  void OnForkedParent() noexcept;
+
+  /**
+   * Handler called in the child process after a fork.
+   */
+  void OnForkedChild() noexcept;
 
   /* The configured backend exporter */
   std::unique_ptr<SpanExporter> exporter_;

@@ -1,7 +1,7 @@
 #pragma once
 
 #include "opentelemetry/sdk/trace/exporter.h"
-#include "opentelemetry/sdk/trace/processor.h"
+#include "opentelemetry/sdk/trace/fork_aware_span_processor.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace sdk
@@ -14,7 +14,7 @@ namespace trace
  *
  * OnEnd and ForceFlush are no-ops.
  */
-class SimpleSpanProcessor : public SpanProcessor
+class SimpleSpanProcessor : public ForkAwareSpanProcessor
 {
 public:
   /**
