@@ -16,7 +16,7 @@ namespace memory
 class InMemorySpanData final
 {
 public:
-  InMemorySpanData(size_t buffesr_size) : spans_received_(buffer_size) {}
+  InMemorySpanData(size_t buffer_size) : spans_received_(buffer_size) {}
 
   void Add(std::unique_ptr<opentelemetry::sdk::trace::Recordable> data) noexcept
   {
