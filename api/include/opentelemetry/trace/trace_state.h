@@ -21,21 +21,22 @@
 //#include "opentelemetry/nostd/string_view.h"
 //#include "opentelemetry/nostd/unique_ptr.h"
 //
-//OPENTELEMETRY_BEGIN_NAMESPACE
-//namespace trace
+// OPENTELEMETRY_BEGIN_NAMESPACE
+// namespace trace
 //{
 //
 ///**
 // * TraceState carries tracing-system specific context in a list of key-value pairs. TraceState
-// * allows different vendors to propagate additional information and inter-operate with their legacy
+// * allows different vendors to propagate additional information and inter-operate with their
+// legacy
 // * id formats.
 // *
 // * For more information, see the W3C Trace Context specification:
 // * https://www.w3.org/TR/trace-context
 // */
-//class TraceState
+// class TraceState
 //{
-//public:
+// public:
 //  static constexpr int kKeyMaxSize       = 256;
 //  static constexpr int kValueMaxSize     = 256;
 //  static constexpr int kMaxKeyValuePairs = 32;
@@ -83,7 +84,7 @@
 //  // Returns whether value is a valid value. See https://www.w3.org/TR/trace-context/#value
 //  static bool IsValidValue(nostd::string_view value);
 //
-//private:
+// private:
 //  // Store entries in a C-style array to avoid using std::array or std::vector.
 //  Entry entries_[kMaxKeyValuePairs];
 //
@@ -92,4 +93,4 @@
 //};
 //
 //}  // namespace trace
-//OPENTELEMETRY_END_NAMESPACE
+// OPENTELEMETRY_END_NAMESPACE

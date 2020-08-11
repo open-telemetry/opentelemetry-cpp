@@ -2,12 +2,12 @@
 //
 //#include <gtest/gtest.h>
 //
-//namespace
+// namespace
 //{
 //
-//using opentelemetry::trace::TraceState;
+// using opentelemetry::trace::TraceState;
 //
-//TEST(TraceStateTest, DefaultConstruction)
+// TEST(TraceStateTest, DefaultConstruction)
 //{
 //  TraceState s;
 //  EXPECT_FALSE(s.Get("missing_key", "value"));
