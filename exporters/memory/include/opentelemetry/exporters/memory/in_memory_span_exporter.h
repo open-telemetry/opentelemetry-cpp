@@ -1,10 +1,5 @@
 #pragma once
 #include "opentelemetry/sdk/trace/exporter.h"
-
-// Import for CMake
-// #include "in_memory_span_data.h"
-
-// Import for Bazel
 #include "opentelemetry/exporters/memory/in_memory_span_data.h"
 
 const size_t MAX_BUFFER_SIZE = 100;

@@ -1,9 +1,4 @@
-// Import for CMake
-// #include "../include/opentelemetry/exporters/memory/in_memory_span_data.h"
-
-// Import for Bazel
 #include "opentelemetry/exporters/memory/in_memory_span_data.h"
-
 #include "opentelemetry/nostd/span.h"
 #include "opentelemetry/sdk/trace/span_data.h"
 

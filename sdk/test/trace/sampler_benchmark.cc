@@ -6,12 +6,6 @@
 #include "opentelemetry/sdk/trace/simple_processor.h"
 #include "opentelemetry/sdk/trace/span_data.h"
 #include "opentelemetry/sdk/trace/tracer.h"
-
-// Import for CMake
-// #include
-// "../../../exporters/memory/include/opentelemetry/exporters/memory/in_memory_span_exporter.h"
-
-// Import for Bazel
 #include "opentelemetry/exporters/memory/in_memory_span_exporter.h"
 
 #include <cstdint>
