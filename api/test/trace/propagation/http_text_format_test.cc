@@ -64,7 +64,7 @@ TEST(HTTPTextFormatTest, TraceFlagsBufferGeneration)
   EXPECT_EQ(MapHttpTraceContext::GenerateTraceFlagsFromString("00"), trace::TraceFlags());
 }
 
-//TEST(HTTPTextFormatTest, HeadersWithTraceState)
+// TEST(HTTPTextFormatTest, HeadersWithTraceState)
 //{
 //  const std::map<std::string, std::string> carrier = {
 //      {"traceparent", "00-4bf92f3577b34da6a3ce929d0e0e4736-0102030405060708-01"},
@@ -79,7 +79,7 @@ TEST(HTTPTextFormatTest, TraceFlagsBufferGeneration)
 //  EXPECT_EQ(carrier.size(), c2.size());
 //}
 //
-//TEST(HTTPTextFormatTest, NoTraceParentHeader)
+// TEST(HTTPTextFormatTest, NoTraceParentHeader)
 //{
 //  // When trace context headers are not present, a new SpanContext
 //  // should be created.
@@ -94,7 +94,7 @@ TEST(HTTPTextFormatTest, TraceFlagsBufferGeneration)
 //  EXPECT_EQ(span->GetContext().trace_state(), trace::SpanContext(false, false).trace_state());
 //}
 //
-//TEST(HTTPTextFormatTest, InvalidTraceId)
+// TEST(HTTPTextFormatTest, InvalidTraceId)
 //{
 //  // If the trace id is invalid, we must ignore the full trace parent header,
 //  // and return a random, valid trace.
@@ -112,7 +112,7 @@ TEST(HTTPTextFormatTest, TraceFlagsBufferGeneration)
 //  EXPECT_EQ(span->GetContext().trace_state(), trace::SpanContext(false, false).trace_state());
 //}
 //
-//TEST(HTTPTextFormatTest, InvalidParentId)
+// TEST(HTTPTextFormatTest, InvalidParentId)
 //{
 //  // If the parent id is invalid, we must ignore the full trace parent
 //  // header.
@@ -144,7 +144,7 @@ TEST(HTTPTextFormatTest, NoSendEmptyTraceState)
   EXPECT_FALSE(carrier.count("tracestate") > 0);
 }
 
-//TEST(HTTPTextFormatTest, FormatNotSupported)
+// TEST(HTTPTextFormatTest, FormatNotSupported)
 //{
 //  // If the trace parent does not adhere to the supported format, discard it and
 //  // create a new trace context.
@@ -173,7 +173,7 @@ TEST(HTTPTextFormatTest, PropagateInvalidContext)
   EXPECT_TRUE(carrier.count("traceparent") == 0);
 }
 
-//TEST(HTTPTextFormatTest, TraceStateHeaderWithTrailingComma)
+// TEST(HTTPTextFormatTest, TraceStateHeaderWithTrailingComma)
 //{
 //  // Do not propagate invalid trace context.
 //  const std::map<std::string, std::string> carrier = {
@@ -187,7 +187,7 @@ TEST(HTTPTextFormatTest, PropagateInvalidContext)
 //  EXPECT_TRUE(trace_state.Get("foo", "1"));
 //}
 
-//TEST(HTTPTextFormatTest, TraceStateKeys)
+// TEST(HTTPTextFormatTest, TraceStateKeys)
 //{
 //  // Test for valid key patterns in the tracestate
 //  std::string trace_state_value = "1a-2f@foo=bar1,1a-_*/2b@foo=bar2,foo=bar3,foo-_*/bar=bar4";
