@@ -6,12 +6,13 @@
 #include "opentelemetry/sdk/trace/span_data.h"
 
 // Import for CMake
-// #include "../../../exporters/memory/include/opentelemetry/exporters/memory/in_memory_span_exporter.h"
+// #include
+// "../../../exporters/memory/include/opentelemetry/exporters/memory/in_memory_span_exporter.h"
 // #include "../../../exporters/memory/include/opentelemetry/exporters/memory/in_memory_span_data.h"
 
 // Import for Bazel
-#include "opentelemetry/exporters/memory/in_memory_span_exporter.h"
 #include "opentelemetry/exporters/memory/in_memory_span_data.h"
+#include "opentelemetry/exporters/memory/in_memory_span_exporter.h"
 
 #include <gtest/gtest.h>
 
@@ -20,8 +21,8 @@ using opentelemetry::core::SteadyTimestamp;
 using opentelemetry::core::SystemTimestamp;
 namespace nostd  = opentelemetry::nostd;
 namespace common = opentelemetry::common;
-using opentelemetry::exporter::memory::InMemorySpanExporter;
 using opentelemetry::exporter::memory::InMemorySpanData;
+using opentelemetry::exporter::memory::InMemorySpanExporter;
 using opentelemetry::trace::SpanContext;
 
 /**
@@ -50,14 +51,14 @@ public:
 namespace
 {
 std::shared_ptr<opentelemetry::trace::Tracer> initTracer(
-    std::unique_ptr<InMemorySpanExporter>&& exporter)
+    std::unique_ptr<InMemorySpanExporter> &&exporter)
 {
   auto processor = std::make_shared<SimpleSpanProcessor>(std::move(exporter));
   return std::shared_ptr<opentelemetry::trace::Tracer>(new Tracer(processor));
 }
 
 std::shared_ptr<opentelemetry::trace::Tracer> initTracer(
-    std::unique_ptr<InMemorySpanExporter>&& exporter,
+    std::unique_ptr<InMemorySpanExporter> &&exporter,
     std::shared_ptr<Sampler> sampler)
 {
   auto processor = std::make_shared<SimpleSpanProcessor>(std::move(exporter));
@@ -69,7 +70,7 @@ TEST(Tracer, ToInMemorySpanExporter)
 {
   std::unique_ptr<InMemorySpanExporter> exporter(new InMemorySpanExporter());
   std::shared_ptr<InMemorySpanData> span_data = exporter.get()->GetData();
-  auto tracer = initTracer(std::move(exporter));
+  auto tracer                                 = initTracer(std::move(exporter));
 
   auto span_first  = tracer->StartSpan("span 1");
   auto scope_first = tracer->WithActiveSpan(span_first);
@@ -105,7 +106,7 @@ TEST(Tracer, StartSpanSampleOn)
 {
   std::unique_ptr<InMemorySpanExporter> exporter(new InMemorySpanExporter());
   std::shared_ptr<InMemorySpanData> span_data = exporter.get()->GetData();
-  auto tracer_on = initTracer(std::move(exporter));
+  auto tracer_on                              = initTracer(std::move(exporter));
 
   tracer_on->StartSpan("span 1")->End();
 
@@ -135,7 +136,7 @@ TEST(Tracer, StartSpanWithOptionsTime)
 {
   std::unique_ptr<InMemorySpanExporter> exporter(new InMemorySpanExporter());
   std::shared_ptr<InMemorySpanData> span_data = exporter.get()->GetData();
-  auto tracer = initTracer(std::move(exporter));
+  auto tracer                                 = initTracer(std::move(exporter));
 
   opentelemetry::trace::StartSpanOptions start;
   start.start_system_time = SystemTimestamp(std::chrono::nanoseconds(300));
@@ -158,7 +159,7 @@ TEST(Tracer, StartSpanWithAttributes)
 {
   std::unique_ptr<InMemorySpanExporter> exporter(new InMemorySpanExporter());
   std::shared_ptr<InMemorySpanData> span_data = exporter.get()->GetData();
-  auto tracer = initTracer(std::move(exporter));
+  auto tracer                                 = initTracer(std::move(exporter));
 
   // Start a span with all supported scalar attribute types.
   tracer
@@ -234,7 +235,7 @@ TEST(Tracer, StartSpanWithAttributesCopy)
 {
   std::unique_ptr<InMemorySpanExporter> exporter(new InMemorySpanExporter());
   std::shared_ptr<InMemorySpanData> span_data = exporter.get()->GetData();
-  auto tracer = initTracer(std::move(exporter));
+  auto tracer                                 = initTracer(std::move(exporter));
 
   {
     std::unique_ptr<std::vector<int64_t>> numbers(new std::vector<int64_t>);
@@ -296,7 +297,7 @@ TEST(Tracer, SpanSetAttribute)
 {
   std::unique_ptr<InMemorySpanExporter> exporter(new InMemorySpanExporter());
   std::shared_ptr<InMemorySpanData> span_data = exporter.get()->GetData();
-  auto tracer = initTracer(std::move(exporter));
+  auto tracer                                 = initTracer(std::move(exporter));
 
   auto span = tracer->StartSpan("span 1");
 
@@ -314,7 +315,7 @@ TEST(Tracer, TestAlwaysOnSampler)
 {
   std::unique_ptr<InMemorySpanExporter> exporter(new InMemorySpanExporter());
   std::shared_ptr<InMemorySpanData> span_data = exporter.get()->GetData();
-  auto tracer_on = initTracer(std::move(exporter));
+  auto tracer_on                              = initTracer(std::move(exporter));
 
   // Testing AlwaysOn sampler.
   // Create two spans for each tracer. Check the exported result.
@@ -352,7 +353,8 @@ TEST(Tracer, TestParentOrElseSampler)
   // so this sampler will work as an AlwaysOnSampler.
   std::unique_ptr<InMemorySpanExporter> exporter(new InMemorySpanExporter());
   std::shared_ptr<InMemorySpanData> span_data_parent_on = exporter.get()->GetData();
-  auto tracer_parent_on = initTracer(std::move(exporter),
+  auto tracer_parent_on =
+      initTracer(std::move(exporter),
                  std::make_shared<ParentOrElseSampler>(std::make_shared<AlwaysOnSampler>()));
 
   auto span_parent_on_1 = tracer_parent_on->StartSpan("span 1");
@@ -372,7 +374,8 @@ TEST(Tracer, TestParentOrElseSampler)
   // so this sampler will work as an AlwaysOnSampler.
   std::unique_ptr<InMemorySpanExporter> exporter2(new InMemorySpanExporter());
   std::shared_ptr<InMemorySpanData> span_data_parent_off = exporter2.get()->GetData();
-  auto tracer_parent_off = initTracer(std::move(exporter2),
+  auto tracer_parent_off =
+      initTracer(std::move(exporter2),
                  std::make_shared<ParentOrElseSampler>(std::make_shared<AlwaysOffSampler>()));
 
   auto span_parent_off_1 = tracer_parent_off->StartSpan("span 1");

@@ -3,18 +3,19 @@
 #include "opentelemetry/sdk/trace/span_data.h"
 
 // Import for CMake
-// #include "../../../exporters/memory/include/opentelemetry/exporters/memory/in_memory_span_exporter.h"
+// #include
+// "../../../exporters/memory/include/opentelemetry/exporters/memory/in_memory_span_exporter.h"
 // #include "../../../exporters/memory/include/opentelemetry/exporters/memory/in_memory_span_data.h"
 
 // Import for Bazel
-#include "opentelemetry/exporters/memory/in_memory_span_exporter.h"
 #include "opentelemetry/exporters/memory/in_memory_span_data.h"
+#include "opentelemetry/exporters/memory/in_memory_span_exporter.h"
 
 #include <gtest/gtest.h>
 
 using namespace opentelemetry::sdk::trace;
-using opentelemetry::exporter::memory::InMemorySpanExporter;
 using opentelemetry::exporter::memory::InMemorySpanData;
+using opentelemetry::exporter::memory::InMemorySpanExporter;
 
 TEST(SimpleProcessor, ToInMemorySpanExporter)
 {

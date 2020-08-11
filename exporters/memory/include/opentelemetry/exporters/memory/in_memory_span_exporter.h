@@ -22,7 +22,7 @@ class InMemorySpanExporter final : public opentelemetry::sdk::trace::SpanExporte
 {
 public:
   InMemorySpanExporter(size_t buffer_size = MAX_BUFFER_SIZE)
-    : data_(new opentelemetry::exporter::memory::InMemorySpanData(buffer_size))
+      : data_(new opentelemetry::exporter::memory::InMemorySpanData(buffer_size))
   {}
 
   std::unique_ptr<sdk::trace::Recordable> MakeRecordable() noexcept override
@@ -36,10 +36,10 @@ public:
     for (auto &recordable : recordables)
     {
       auto span = std::unique_ptr<sdk::trace::SpanData>(
-      static_cast<sdk::trace::SpanData *>(recordable.release()));
+          static_cast<sdk::trace::SpanData *>(recordable.release()));
       if (span != nullptr)
       {
-          data_.get()->Add(std::move(span));
+        data_.get()->Add(std::move(span));
       }
     }
 
