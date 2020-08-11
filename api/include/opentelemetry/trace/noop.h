@@ -10,6 +10,7 @@
 #include "opentelemetry/trace/tracer.h"
 #include "opentelemetry/trace/tracer_provider.h"
 #include "opentelemetry/version.h"
+#include "opentelemetry/context/runtime_context.h"
 
 #include <memory>
 
