@@ -45,7 +45,7 @@ public:
   class Entry
   {
   public:
-    Entry() : key_(new char[kKeyMaxSize]), value_(new char[kValueMaxSize]){};
+    Entry() : key_(nullptr), value_(nullptr){};
 
     // Copy constructor
     Entry(Entry &copy)
@@ -80,14 +80,14 @@ public:
 
   private:
     // Store key and value as raw char pointers to avoid using std::string.
-    std::unique_ptr<const char[]> key_;
-    std::unique_ptr<const char[]> value_;
+    nostd::unique_ptr<const char[]> key_;
+    nostd::unique_ptr<const char[]> value_;
 
     // Copy string into a buffer and return a unique_ptr to the buffer.
     // This is a workaround for the fact that strcpy doesn't accept a const char* destination.
     nostd::unique_ptr<const char[]> StringToPointer(nostd::string_view str)
     {
-      nostd::unique_ptr<char[]> temp(new char[str.size()]);
+      nostd::unique_ptr<char[]> temp(new char[str.size() + 1]);
       strcpy(temp.get(), str.data());
       return nostd::unique_ptr<const char[]>(temp.release());
     }
