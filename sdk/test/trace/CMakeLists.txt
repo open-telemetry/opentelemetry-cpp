@@ -14,10 +14,11 @@ foreach(
   add_executable(${testname} "${testname}.cc")
   target_link_libraries(
     ${testname} ${GTEST_BOTH_LIBRARIES} ${CMAKE_THREAD_LIBS_INIT}
-    opentelemetry_common opentelemetry_trace)
+    opentelemetry_trace opentelemetry_common)
   gtest_add_tests(TARGET ${testname} TEST_PREFIX trace. TEST_LIST ${testname})
 endforeach()
 
 add_executable(sampler_benchmark sampler_benchmark.cc)
-target_link_libraries(sampler_benchmark benchmark::benchmark
-                      ${CMAKE_THREAD_LIBS_INIT} opentelemetry_trace)
+target_link_libraries(
+  sampler_benchmark benchmark::benchmark ${CMAKE_THREAD_LIBS_INIT}
+  opentelemetry_trace opentelemetry_common)
