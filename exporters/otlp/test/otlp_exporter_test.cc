@@ -1,5 +1,5 @@
-#include "opentelemetry/exporters/otlp/otlp_exporter.h"
 #include "opentelemetry/context/threadlocal_context.h"
+#include "opentelemetry/exporters/otlp/otlp_exporter.h"
 #include "opentelemetry/proto/collector/trace/v1/trace_service_mock.grpc.pb.h"
 #include "opentelemetry/sdk/trace/simple_processor.h"
 #include "opentelemetry/sdk/trace/tracer_provider.h"
