@@ -1,6 +1,6 @@
 #pragma once
-#include "opentelemetry/sdk/trace/exporter.h"
 #include "opentelemetry/exporters/memory/in_memory_span_data.h"
+#include "opentelemetry/sdk/trace/exporter.h"
 
 const size_t MAX_BUFFER_SIZE = 100;
 
