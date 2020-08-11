@@ -44,8 +44,6 @@ public:
 
   trace_api::Tracer &tracer() const noexcept override { return *tracer_; }
 
-  nostd::unique_ptr<context::Token> GetToken() const noexcept override;
-
   void SetToken(nostd::unique_ptr<context::Token> &&token) noexcept override;
 
 private:

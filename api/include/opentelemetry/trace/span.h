@@ -165,8 +165,6 @@ public:
 
   virtual Tracer &tracer() const noexcept = 0;
 
-  virtual nostd::unique_ptr<context::Token> GetToken() const noexcept = 0;
-
   virtual void SetToken(nostd::unique_ptr<context::Token> &&token) noexcept = 0;
 };
 }  // namespace trace
