@@ -155,16 +155,6 @@ bool Span::IsRecording() const noexcept
   std::lock_guard<std::mutex> lock_guard{mu_};
   return recordable_ != nullptr;
 }
-/*
-nostd::unique_ptr<context::Token> Span::GetToken() const noexcept
-{
-
-  if (token_ != nullptr)
-  {
-    return std::move(token_);
-  }
-  return nullptr;
-}*/
 
 void Span::SetToken(nostd::unique_ptr<context::Token> &&token) noexcept
 {
