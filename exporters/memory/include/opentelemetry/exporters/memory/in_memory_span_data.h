@@ -29,6 +29,8 @@ public:
   {
     std::vector<std::unique_ptr<opentelemetry::sdk::trace::SpanData>> res;
 
+    // Pointer swap is required because the Consume function requires that the
+    // AtomicUniquePointer be set to null
     spans_received_.Consume(
         spans_received_.size(), [&](opentelemetry::sdk::common::CircularBufferRange<
                                     opentelemetry::sdk::common::AtomicUniquePtr<
