@@ -26,8 +26,8 @@ TEST(InMemorySpanData, AddRecordable)
     }
   }
 
+  // Consumes all spans in exporter
   ASSERT_EQ(1, data.GetSpans().size());
 
-  // Consumes all spans in exporter
   ASSERT_EQ(0, data.GetSpans().size());
 }
