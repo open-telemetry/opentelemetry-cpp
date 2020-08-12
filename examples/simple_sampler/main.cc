@@ -9,7 +9,7 @@
 // Using an exporter that simply dumps span data to stdout.
 #include "stdout_exporter.h"
 
-#include "testing_library/testing_library.h"
+#include "test_tracer/test_tracer.h"
 
 #include <iostream>
 #include <memory>

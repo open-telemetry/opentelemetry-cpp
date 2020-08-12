@@ -1,10 +1,10 @@
 cc_library(
-    name = "testing_library",
+    name = "test_tracer",
     srcs = [
-        "testing_library/testing_library.cc",
+        "test_tracer/test_tracer.cc",
     ],
     hdrs = [
-        "testing_library/testing_library.h",
+        "test_tracer/test_tracer.h",
     ],
     deps = [
         "//api",
@@ -31,7 +31,7 @@ cc_binary(
         "main.cc",
     ],
     deps = [
-        ":testing_library",
+        ":test_tracer",
         ":stdout_exporter",
         "//api",
         "//sdk/src/trace",

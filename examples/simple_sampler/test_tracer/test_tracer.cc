@@ -8,7 +8,7 @@ namespace
 nostd::shared_ptr<trace::Tracer> get_tracer()
 {
   auto provider = trace::Provider::GetTracerProvider();
-  return provider->GetTracer("foo_library");
+  return provider->GetTracer("test_tracer");
 }
 
 void f1()
