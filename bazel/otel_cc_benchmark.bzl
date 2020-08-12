@@ -43,6 +43,6 @@ def otel_cc_benchmark(name, srcs, deps):
         name = name + "_smoketest",
         srcs = srcs,
         deps = deps + ["@com_github_google_benchmark//:benchmark"],
-        args = ["--benchmark_min_time=0"],
+        args = ["--benchmark_min_time=0", "--test_output=errors"],
         tags = ["benchmark"],
     )
