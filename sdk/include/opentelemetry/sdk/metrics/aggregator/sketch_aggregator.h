@@ -148,7 +148,6 @@ public:
    */
   void merge(SketchAggregator other)
   {
-    this->mu_.lock();
     if (gamma != other.gamma)
     {
 #if __EXCEPTIONS
@@ -166,6 +165,7 @@ public:
 #endif
     }
 
+    this->mu_.lock();
     this->values_[0] += other.values_[0];
     this->values_[1] += other.values_[1];
     this->checkpoint_[0] += other.checkpoint_[0];

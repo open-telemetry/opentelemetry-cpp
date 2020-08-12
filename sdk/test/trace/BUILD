@@ -100,6 +100,17 @@ cc_test(
     ],
 )
 
+cc_test(
+    name = "attribute_utils_test",
+    srcs = [
+        "attribute_utils_test.cc",
+    ],
+    deps = [
+        "//sdk/src/trace",
+        "@com_google_googletest//:gtest_main",
+    ],
+)
+
 otel_cc_benchmark(
     name = "sampler_benchmark",
     srcs = ["sampler_benchmark.cc"],

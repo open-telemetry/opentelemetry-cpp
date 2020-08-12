@@ -1,6 +1,6 @@
 #include "opentelemetry/exporters/otlp/recordable.h"
-
 #include <gtest/gtest.h>
+#include "opentelemetry/context/threadlocal_context.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace exporter
