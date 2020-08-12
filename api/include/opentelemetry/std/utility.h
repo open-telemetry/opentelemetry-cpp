@@ -17,6 +17,7 @@
 #include "opentelemetry/version.h"
 
 #include <utility>
+#include <cstddef>
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 // Standard Type aliases in nostd namespace
@@ -40,7 +41,7 @@ auto data(const C &c) noexcept(noexcept(c.data())) -> decltype(c.data())
   return c.data();
 }
 
-template <class T, size_t N>
+template <class T, std::size_t N>
 T *data(T (&array)[N]) noexcept
 {
   return array;
@@ -63,8 +64,8 @@ auto size(const C &c) noexcept(noexcept(c.size())) -> decltype(c.size())
   return c.size();
 }
 
-template <class T, size_t N>
-size_t size(T (&array)[N]) noexcept
+template <class T, std::size_t N>
+std::size_t size(T (&array)[N]) noexcept
 {
   return N;
 }
