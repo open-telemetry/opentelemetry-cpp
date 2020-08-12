@@ -59,15 +59,15 @@ cc_test(
     ],
 )
 
-cc_test(
-    name = "otlp_exporter_test",
-    srcs = ["test/otlp_exporter_test.cc"],
-    deps = [
-        ":otlp_exporter",
-        "//api",
-        "@com_google_googletest//:gtest_main",
-    ],
-)
+# cc_test(
+#    name = "otlp_exporter_test",
+#    srcs = ["test/otlp_exporter_test.cc"],
+#    deps = [
+#        ":otlp_exporter",
+#        "//api",
+#        "@com_google_googletest//:gtest_main",
+#    ],
+# )
 
 otel_cc_benchmark(
     name = "otlp_exporter_benchmark",
