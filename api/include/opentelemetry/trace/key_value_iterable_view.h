@@ -35,16 +35,18 @@ class KeyValueIterableView final : public KeyValueIterable
 {
 
 public:
-  explicit KeyValueIterableView(const T &container) noexcept : container_{container} {};
+  explicit KeyValueIterableView(const T &container) noexcept : container_{&container} {};
 
   // KeyValueIterable
   bool ForEachKeyValue(
       nostd::function_ref<bool(nostd::string_view, common::AttributeValue)> callback) const
       noexcept override
   {
-    for (auto &kv : container_)
+    auto iter = std::begin(*container_);
+    auto last = std::end(*container_);
+    for (; iter != last; ++iter)
     {
-      if (!callback(kv.first, kv.second))
+      if (!callback(iter->first, iter->second))
       {
         return false;
       }
@@ -52,10 +54,10 @@ public:
     return true;
   }
 
-  size_t size() const noexcept override { return nostd::size(container_); }
+  size_t size() const noexcept override { return nostd::size(*container_); }
 
 private:
-  const T &container_;
+  const T *container_;
 };
 }  // namespace trace
 OPENTELEMETRY_END_NAMESPACE

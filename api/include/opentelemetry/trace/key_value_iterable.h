@@ -42,7 +42,7 @@ public:
   virtual bool ForEachKeyValue(
       nostd::function_ref<bool(nostd::string_view, common::AttributeValue)>) const noexcept
   {
-    return false;
+    return true;
   };
 
   virtual size_t size() const noexcept { return 0; }
