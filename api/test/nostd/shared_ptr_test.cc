@@ -1,4 +1,4 @@
-#include "opentelemetry/nostd/nostd.h"
+#include "opentelemetry/nostd/shared_ptr.h"
 
 #include <gtest/gtest.h>
 #include <algorithm>

@@ -1,8 +1,8 @@
 #pragma once
 
 #include "opentelemetry/context/context_value.h"
-#include "opentelemetry/nostd/nostd.h"
-
+#include "opentelemetry/nostd/shared_ptr.h"
+#include "opentelemetry/nostd/string_view.h"
 #include <cstring>
 
 OPENTELEMETRY_BEGIN_NAMESPACE

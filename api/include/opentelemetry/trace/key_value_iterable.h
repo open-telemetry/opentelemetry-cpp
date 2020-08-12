@@ -1,11 +1,8 @@
 #pragma once
 
-#include "opentelemetry/version.h"
-
-#include "opentelemetry/nostd/nostd.h"
-#include "opentelemetry/nostd/function_ref.h"
-
 #include "opentelemetry/common/attribute_value.h"
+#include "opentelemetry/nostd/function_ref.h"
+#include "opentelemetry/version.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace trace
@@ -34,9 +31,9 @@ public:
   virtual size_t size() const noexcept = 0;
 };
 
-/**
- * NULL object pattern empty iterable.
- */
+//
+// NULL object pattern empty iterable.
+//
 class NullKeyValueIterable : public KeyValueIterable
 {
 public:

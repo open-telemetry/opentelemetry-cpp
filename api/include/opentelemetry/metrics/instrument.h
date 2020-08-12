@@ -2,7 +2,8 @@
 
 #include <iostream>
 #include "opentelemetry/common/attribute_value.h"
-#include "opentelemetry/nostd/nostd.h"
+#include "opentelemetry/nostd/shared_ptr.h"
+#include "opentelemetry/nostd/string_view.h"
 #include "opentelemetry/trace/key_value_iterable_view.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE

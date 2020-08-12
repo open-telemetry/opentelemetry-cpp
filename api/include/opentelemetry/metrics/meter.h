@@ -3,7 +3,9 @@
 #include "opentelemetry/metrics/async_instruments.h"
 #include "opentelemetry/metrics/instrument.h"
 #include "opentelemetry/metrics/sync_instruments.h"
-#include "opentelemetry/nostd/nostd.h"
+#include "opentelemetry/nostd/shared_ptr.h"
+#include "opentelemetry/nostd/span.h"
+#include "opentelemetry/nostd/string_view.h"
 #include "opentelemetry/version.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE

@@ -201,8 +201,6 @@ TEST(Tracer, StartSpanWithAttributes)
 
   ASSERT_EQ(2, spans_received->size());
 
-// FIXME: SpanData loses type information
-#if 0
   auto &span_data = spans_received->at(0);
   ASSERT_EQ(7, span_data->GetAttributes().size());
   ASSERT_EQ(314159, nostd::get<int64_t>(span_data->GetAttributes().at("attr1")));
@@ -211,7 +209,6 @@ TEST(Tracer, StartSpanWithAttributes)
   ASSERT_EQ(-20, nostd::get<int64_t>(span_data->GetAttributes().at("attr4")));
   ASSERT_EQ(20, nostd::get<uint64_t>(span_data->GetAttributes().at("attr5")));
   ASSERT_EQ(3.1, nostd::get<double>(span_data->GetAttributes().at("attr6")));
-
   ASSERT_EQ("string", nostd::get<std::string>(span_data->GetAttributes().at("attr7")));
 
   auto &span_data2 = spans_received->at(1);
@@ -230,8 +227,6 @@ TEST(Tracer, StartSpanWithAttributes)
             nostd::get<std::vector<bool>>(span_data2->GetAttributes().at("attr6")));
   ASSERT_EQ(std::vector<std::string>({"a", "b"}),
             nostd::get<std::vector<std::string>>(span_data2->GetAttributes().at("attr7")));
-#endif
-
 }
 
 TEST(Tracer, StartSpanWithAttributesCopy)
@@ -262,8 +257,6 @@ TEST(Tracer, StartSpanWithAttributesCopy)
   auto &span_data = spans_received->at(0);
   ASSERT_EQ(2, span_data->GetAttributes().size());
 
-// FIXME
-#if 0
   auto numbers = nostd::get<std::vector<int64_t>>(span_data->GetAttributes().at("attr1"));
   ASSERT_EQ(3, numbers.size());
   ASSERT_EQ(1, numbers[0]);
@@ -275,8 +268,6 @@ TEST(Tracer, StartSpanWithAttributesCopy)
   ASSERT_EQ("a", strings[0]);
   ASSERT_EQ("b", strings[1]);
   ASSERT_EQ("c", strings[2]);
-#endif
-
 }
 
 TEST(Tracer, GetSampler)

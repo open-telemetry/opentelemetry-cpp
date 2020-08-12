@@ -1,7 +1,8 @@
 #pragma once
 
 #include "opentelemetry/metrics/meter.h"
-#include "opentelemetry/nostd/nostd.h"
+#include "opentelemetry/nostd/shared_ptr.h"
+#include "opentelemetry/nostd/string_view.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace metrics

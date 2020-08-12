@@ -1,5 +1,5 @@
 #include "opentelemetry/sdk/trace/simple_processor.h"
-#include "opentelemetry/nostd/nostd.h"
+#include "opentelemetry/nostd/span.h"
 #include "opentelemetry/sdk/trace/span_data.h"
 
 #include <gtest/gtest.h>

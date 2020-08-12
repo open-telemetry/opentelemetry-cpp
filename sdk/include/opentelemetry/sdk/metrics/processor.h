@@ -1,6 +1,6 @@
 #pragma once
-#include "opentelemetry/nostd/nostd.h"
 #include "opentelemetry/metrics/instrument.h"
+#include "opentelemetry/nostd/string_view.h"
 #include "opentelemetry/sdk/metrics/record.h"
 #include "opentelemetry/version.h"
 

@@ -7,7 +7,9 @@
 // (See accompanying file third_party/boost/LICENSE.md or copy at http://boost.org/LICENSE_1_0.txt)
 
 #pragma once
-
+#ifdef HAVE_CPP_STDLIB
+#include "opentelemetry/std/variant.h"
+#else
 #include <array>
 #include <exception>
 #include <limits>
@@ -1279,3 +1281,4 @@ OPENTELEMETRY_END_NAMESPACE
 #undef AUTO_REFREF_RETURN
 
 #undef DECLTYPE_AUTO_RETURN
+#endif

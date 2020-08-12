@@ -1,5 +1,5 @@
 #include "opentelemetry/sdk/metrics/ungrouped_processor.h"
-#include "opentelemetry/nostd/nostd.h"
+#include "opentelemetry/nostd/shared_ptr.h"
 #include "opentelemetry/sdk/metrics/aggregator/counter_aggregator.h"
 
 #include <gtest/gtest.h>

@@ -2,7 +2,7 @@
 
 #include "opentelemetry/common/attribute_value.h"
 #include "opentelemetry/core/timestamp.h"
-#include "opentelemetry/nostd/nostd.h"
+#include "opentelemetry/nostd/string_view.h"
 #include "opentelemetry/sdk/common/empty_attributes.h"
 #include "opentelemetry/trace/canonical_code.h"
 #include "opentelemetry/trace/key_value_iterable.h"

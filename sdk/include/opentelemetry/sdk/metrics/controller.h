@@ -7,7 +7,7 @@
 #include <vector>
 #include "opentelemetry/exporters/ostream/metrics_exporter.h"
 #include "opentelemetry/metrics/instrument.h"
-#include "opentelemetry/nostd/nostd.h"
+#include "opentelemetry/nostd/unique_ptr.h"
 #include "opentelemetry/sdk/metrics/exporter.h"
 #include "opentelemetry/sdk/metrics/meter.h"
 #include "opentelemetry/sdk/metrics/processor.h"
@@ -41,10 +41,12 @@ public:
   }
 
   /*
-   * Used to check if the metrics pipeline is currecntly active
+   * Used to check if the metrics pipeline is currently active
    *
    * @param none
-   * @return true when active, false when on standby
+   * @return true when active, false when on standby.  This is a best guess estimate
+   * and the boolean from start() should be used to determine wheher the pipeline
+   * was initiated successfully.
    */
   bool isActive() { return active_.load(); }
 
@@ -59,9 +61,8 @@ public:
    */
   bool start()
   {
-    if (!active_.load())
+    if (!active_.exchange(true))
     {
-      active_ = true;
       std::thread runner(&PushController::run, this);
       runner.detach();
       return true;
@@ -78,9 +79,8 @@ public:
    */
   void stop()
   {
-    if (active_.load())
+    if (active_.exchange(false))
     {
-      active_ = false;
       while (running_.load())
       {
         std::this_thread::sleep_for(
@@ -99,16 +99,14 @@ private:
    */
   void run()
   {
-    if (!running_.load())
+    if (!running_.exchange(true))
     {
-      running_ = true;
       while (active_.load())
       {
         tick();
         std::this_thread::sleep_for(std::chrono::microseconds(period_));
       }
       running_ = false;
-      ;
     }
   }
 

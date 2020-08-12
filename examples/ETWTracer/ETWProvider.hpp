@@ -252,13 +252,14 @@ public:
           dbuilder.AddString(temp.data());
           break;
         }
-
+#if 0
         case common::AttributeType::TYPE_CSTRING: {
           builder.AddField(name, tld::TypeUtf8String);
           auto temp = nostd::get<const char *>(value);
           dbuilder.AddString(temp);
           break;
         }
+#endif
 
 #    if HAVE_TYPE_GUID
           // TODO: consider adding UUID/GUID to spec
@@ -271,7 +272,9 @@ public:
 #    endif
 
         // TODO: arrays are not supported
+#if 0
         case common::AttributeType::TYPE_SPAN_BYTE:
+#endif
         case common::AttributeType::TYPE_SPAN_BOOL:
         case common::AttributeType::TYPE_SPAN_INT:
         case common::AttributeType::TYPE_SPAN_INT64:

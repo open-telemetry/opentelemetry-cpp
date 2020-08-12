@@ -5,7 +5,7 @@
 #include <vector>
 #include "opentelemetry/common/attribute_value.h"
 #include "opentelemetry/core/timestamp.h"
-#include "opentelemetry/nostd/nostd.h"
+#include "opentelemetry/nostd/string_view.h"
 #include "opentelemetry/sdk/trace/attribute_utils.h"
 #include "opentelemetry/sdk/trace/recordable.h"
 #include "opentelemetry/trace/canonical_code.h"
@@ -20,7 +20,7 @@ namespace sdk
 namespace trace
 {
 /**
-* Class for storing events in SpanData.
+ * Class for storing events in SpanData.
  */
 class SpanDataEvent
 {

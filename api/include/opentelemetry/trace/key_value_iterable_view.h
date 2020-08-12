@@ -4,10 +4,9 @@
 #include <type_traits>
 #include <utility>
 
-#include "opentelemetry/version.h"
-
-#include "opentelemetry/nostd/nostd.h"
+#include "opentelemetry/nostd/utility.h"
 #include "opentelemetry/trace/key_value_iterable.h"
+#include "opentelemetry/version.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace trace
@@ -34,17 +33,16 @@ struct is_key_value_iterable
 template <class T>
 class KeyValueIterableView final : public KeyValueIterable
 {
-  // static_assert(detail::is_key_value_iterable<T>::value, "Must be a key-value iterable");
 
 public:
-  explicit KeyValueIterableView(const T &container) noexcept : container{container} {};
+  explicit KeyValueIterableView(const T &container) noexcept : container_{container} {};
 
   // KeyValueIterable
   bool ForEachKeyValue(
       nostd::function_ref<bool(nostd::string_view, common::AttributeValue)> callback) const
       noexcept override
   {
-    for (auto &kv : container)
+    for (auto &kv : container_)
     {
       if (!callback(kv.first, kv.second))
       {
@@ -54,10 +52,10 @@ public:
     return true;
   }
 
-  size_t size() const noexcept override { return nostd::size(container); }
+  size_t size() const noexcept override { return nostd::size(container_); }
 
 private:
-  const T &container;
+  const T &container_;
 };
 }  // namespace trace
 OPENTELEMETRY_END_NAMESPACE

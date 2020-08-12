@@ -1,6 +1,7 @@
 #pragma once
 
-#include "opentelemetry/nostd/nostd.h"
+#include "opentelemetry/nostd/shared_ptr.h"
+#include "opentelemetry/nostd/string_view.h"
 #include "opentelemetry/trace/tracer.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE

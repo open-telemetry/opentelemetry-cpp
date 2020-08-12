@@ -2,7 +2,10 @@
 
 #include <cstdint>
 
-#include "opentelemetry/nostd/nostd.h"
+#include "opentelemetry/nostd/shared_ptr.h"
+#include "opentelemetry/nostd/span.h"
+#include "opentelemetry/nostd/unique_ptr.h"
+#include "opentelemetry/nostd/variant.h"
 #include "opentelemetry/trace/span_context.h"
 #include "opentelemetry/version.h"
 

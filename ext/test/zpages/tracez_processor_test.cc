@@ -4,8 +4,8 @@
 
 #include <thread>
 
-#include "opentelemetry/nostd/nostd.h"
 #include "opentelemetry/ext/zpages/threadsafe_span_data.h"
+#include "opentelemetry/nostd/span.h"
 #include "opentelemetry/sdk/trace/tracer.h"
 
 using namespace opentelemetry::sdk::trace;

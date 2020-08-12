@@ -5,7 +5,10 @@
 #include <memory>
 #include <string>
 
-#include <opentelemetry/nostd/nostd.h>
+#include <opentelemetry/nostd/span.h>
+#include <opentelemetry/nostd/variant.h>
+#include <opentelemetry/nostd/string_view.h>
+
 #include <opentelemetry/version.h>
 
 #include <opentelemetry/common/attribute_value.h>
@@ -90,6 +93,7 @@ static void print_value(std::stringstream &ss,
       if (jsonTypes)
         ss << '"';
       break;
+#if 0
     case common::AttributeType::TYPE_CSTRING:
       if (jsonTypes)
         ss << '"';
@@ -98,7 +102,6 @@ static void print_value(std::stringstream &ss,
       if (jsonTypes)
         ss << '"';
       break;
-#if 0
     case common::AttributeType::TYPE_SPAN_BYTE:
       print_array<uint8_t>(ss, value, jsonTypes);
       break;

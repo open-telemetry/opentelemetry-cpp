@@ -5,6 +5,7 @@
 #include "opentelemetry/metrics/sync_instruments.h"
 
 #include <memory>
+#include <array>
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 
@@ -34,7 +35,6 @@ TEST(NoopTest, CreateInstruments)
   m->NewIntValueObserver("Test val obs", "For testing", "Unitless", true, &Callback);
 }
 
-#if 0 // FIXME: [MG]
 TEST(NoopMeter, RecordBatch)
 {
   // Test BatchRecord with all supported types
@@ -77,6 +77,4 @@ TEST(NoopMeter, RecordBatch)
   nostd::span<double> dval{dvarr};
   m->RecordDoubleBatch(labelkv, dsp, dval);
 }
-#endif
-
 OPENTELEMETRY_END_NAMESPACE

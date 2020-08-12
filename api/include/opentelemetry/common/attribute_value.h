@@ -2,7 +2,9 @@
 
 #include <cstdint>
 
-#include "opentelemetry/nostd/nostd.h"
+#include "opentelemetry/nostd/span.h"
+#include "opentelemetry/nostd/string_view.h"
+#include "opentelemetry/nostd/variant.h"
 #include "opentelemetry/version.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
@@ -15,8 +17,10 @@ using AttributeValue = nostd::variant<bool,
                                       uint64_t,
                                       double,
                                       nostd::string_view,
+#if 0
                                       const char*,
                                       nostd::span<const uint8_t>,
+#endif
                                       nostd::span<const bool>,
                                       nostd::span<const int32_t>,
                                       nostd::span<const int64_t>,
@@ -34,8 +38,10 @@ enum AttributeType
   TYPE_UINT64,
   TYPE_DOUBLE,
   TYPE_STRING,
+#if 0
   TYPE_CSTRING,
   TYPE_SPAN_BYTE,
+#endif
   TYPE_SPAN_BOOL,
   TYPE_SPAN_INT,
   TYPE_SPAN_INT64,

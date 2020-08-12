@@ -1,4 +1,4 @@
-#include "opentelemetry/nostd/nostd.h"
+#include "opentelemetry/nostd/span.h"
 
 #include <benchmark/benchmark.h>
 #include <cstdint>
@@ -12,9 +12,7 @@
 
 #include <gtest/gtest.h>
 
-using namespace OPENTELEMETRY_NAMESPACE;
-
-#define span OPENTELEMETRY_NAMESPACE::nostd::span
+using opentelemetry::nostd::span;
 
 TEST(SpanTest, DefaultConstruction)
 {

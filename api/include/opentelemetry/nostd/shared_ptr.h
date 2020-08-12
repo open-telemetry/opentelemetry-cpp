@@ -1,5 +1,7 @@
 #pragma once
-
+#ifdef HAVE_CPP_STDLIB
+#include "opentelemetry/std/shared_ptr.h"
+#else
 #include <memory>
 #include <utility>
 #include <cstdlib>
@@ -182,3 +184,4 @@ inline bool operator!=(std::nullptr_t, const shared_ptr<T> &rhs) noexcept
 }
 }  // namespace nostd
 OPENTELEMETRY_END_NAMESPACE
+#endif

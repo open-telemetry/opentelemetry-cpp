@@ -6,7 +6,7 @@
 #include <vector>
 
 #include "opentelemetry/core/timestamp.h"
-#include "opentelemetry/nostd/nostd.h"
+#include "opentelemetry/nostd/string_view.h"
 #include "opentelemetry/sdk/trace/recordable.h"
 #include "opentelemetry/sdk/trace/span_data.h"
 #include "opentelemetry/trace/canonical_code.h"

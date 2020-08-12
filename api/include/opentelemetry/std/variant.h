@@ -16,141 +16,19 @@
 
 #include "opentelemetry/version.h"
 
-// Standard library implementation requires at least C++17 compiler.
-// Older C++14 compilers may provide support for __has_include as a
-// conforming extension.
-#if defined __has_include
-#  if __has_include(<version>)  // Check for __cpp_{feature}
-#    include <version>
-#    if defined(__cpp_lib_span)
-#      define HAVE_SPAN
-#    endif
-#  endif
-#  if __has_include(<span>) && !defined(HAVE_SPAN)  // Check for span
-#    define HAVE_SPAN
-#  endif
-#  if !__has_include(<string_view>)  // Check for string_view
-#    error \
-        "STL library does not support std::span. Possible solution:"                   \
-         " - #undef HAVE_CPP_STDLIB // to use OpenTelemetry nostd::string_view"
-#  endif
-#endif
-
 #include <cstddef>
 #include <memory>
-#include <string_view>
 #include <utility>
 #include <variant>
-
-#if !defined(HAVE_SPAN)
-
-#  if defined(HAVE_GSL)
-#    include <type_traits>
-// Guidelines Support Library provides an implementation of std::span
-#    include <gsl/gsl>
-OPENTELEMETRY_BEGIN_NAMESPACE
-namespace nostd
-{
-template <class ElementType, std::size_t Extent = gsl::dynamic_extent>
-using span = gsl::span<ElementType, Extent>;
-}
-OPENTELEMETRY_END_NAMESPACE
-#  else
-// No span implementation provided.
-#    error \
-        "STL library does not support std::span. Possible solutions:"                  \
-         " - #undef HAVE_CPP_STDLIB // to use OpenTelemetry nostd::span .. or      "    \
-         " - #define HAVE_GSL       // to use gsl::span                            "
-#  endif
-
-#else  // HAVE_SPAN
-// Using std::span (https://wg21.link/P0122R7) from Standard Library available in C++20 :
-// - GCC libstdc++ 10+
-// - Clang libc++ 7
-// - MSVC Standard Library 19.26*
-// - Apple Clang 10.0.0*
-#  include <span>
-OPENTELEMETRY_BEGIN_NAMESPACE
-
-namespace nostd
-{
-constexpr std::size_t dynamic_extent = std::numeric_limits<std::size_t>::max();
-
-template <class ElementType, std::size_t Extent = nostd::dynamic_extent>
-using span = std::span<ElementType, Extent>;
-}  // namespace nostd
-OPENTELEMETRY_END_NAMESPACE
-#endif  // of HAVE_SPAN
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 // Standard Type aliases in nostd namespace
 namespace nostd
 {
 
-//
-// Back port of std::data
-//
-// See https://en.cppreference.com/w/cpp/iterator/data
-//
-template <class C>
-auto data(C &c) noexcept(noexcept(c.data())) -> decltype(c.data())
-{
-  return c.data();
-}
-
-template <class C>
-auto data(const C &c) noexcept(noexcept(c.data())) -> decltype(c.data())
-{
-  return c.data();
-}
-
-template <class T, size_t N>
-T *data(T (&array)[N]) noexcept
-{
-  return array;
-}
-
-template <class E>
-const E *data(std::initializer_list<E> list) noexcept
-{
-  return list.begin();
-}
-
-//
-// Back port of std::size
-//
-// See https://en.cppreference.com/w/cpp/iterator/size
-//
-template <class C>
-auto size(const C &c) noexcept(noexcept(c.size())) -> decltype(c.size())
-{
-  return c.size();
-}
-
-template <class T, size_t N>
-size_t size(T (&array)[N]) noexcept
-{
-  return N;
-}
-
 // nostd::variant<...>
 template <class... _Types>
 using variant = std::variant<_Types...>;
-
-// nostd::string_view
-using string_view = std::string_view;
-
-// nostd::enable_if_t<...>
-template <bool B, class T = void>
-using enable_if_t = typename std::enable_if<B, T>::type;
-
-// nostd::unique_ptr<T...>
-template <class... _Types>
-using unique_ptr = std::unique_ptr<_Types...>;
-
-// nostd::shared_ptr<T...>
-template <class... _Types>
-using shared_ptr = std::shared_ptr<_Types...>;
 
 #if defined(__APPLE__) && defined(_LIBCPP_USE_AVAILABILITY_APPLE)
 // Apple Platforms provide std::bad_variant_access only in newer versions of OS.
@@ -335,12 +213,6 @@ constexpr _Ret visit(_Callable &&_Obj, _Variants &&... _Args)
 # endif
 */
 
-template <std::size_t N>
-using make_index_sequence = std::make_index_sequence<N>;
-
-template <std::size_t... Ints>
-using index_sequence = std::index_sequence<Ints...>;
-
 // nostd::holds_alternative
 template <std::size_t I, typename... Ts>
 inline constexpr bool holds_alternative(const variant<Ts...> &v) noexcept
@@ -354,5 +226,5 @@ inline constexpr bool holds_alternative(const variant<Ts...> &v) noexcept
   return std::holds_alternative<T, Ts...>(v);
 }
 
-}  // namespace nostd
+} // namespace nostd
 OPENTELEMETRY_END_NAMESPACE

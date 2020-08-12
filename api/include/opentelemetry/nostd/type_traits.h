@@ -1,5 +1,7 @@
 #pragma once
-
+#ifdef HAVE_CPP_STDLIB
+#include "opentelemetry/std/type_traits.h"
+#else
 #include <array>
 #include <type_traits>
 
@@ -148,3 +150,4 @@ struct is_trivially_move_assignable
 #endif
 }  // namespace nostd
 OPENTELEMETRY_END_NAMESPACE
+#endif

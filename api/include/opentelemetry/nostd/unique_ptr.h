@@ -1,5 +1,7 @@
 #pragma once
-
+#ifdef HAVE_CPP_STDLIB
+#include "opentelemetry/std/unique_ptr.h"
+#else
 #include <cstddef>
 #include <memory>
 #include <type_traits>
@@ -166,3 +168,4 @@ bool operator!=(std::nullptr_t, const unique_ptr<T> &rhs) noexcept
 }
 }  // namespace nostd
 OPENTELEMETRY_END_NAMESPACE
+#endif

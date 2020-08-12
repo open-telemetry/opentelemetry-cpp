@@ -13,7 +13,8 @@
 #include "opentelemetry/ext/zpages/latency_boundaries.h"
 #include "opentelemetry/ext/zpages/tracez_data.h"
 #include "opentelemetry/ext/zpages/tracez_processor.h"
-#include "opentelemetry/nostd/nostd.h"
+#include "opentelemetry/nostd/span.h"
+#include "opentelemetry/nostd/string_view.h"
 #include "opentelemetry/sdk/trace/span_data.h"
 #include "opentelemetry/trace/canonical_code.h"
 

@@ -1,8 +1,8 @@
 #pragma once
 
 #include <memory>
-#include "opentelemetry/nostd/nostd.h"
 #include "opentelemetry/metrics/instrument.h"
+#include "opentelemetry/nostd/variant.h"
 #include "opentelemetry/sdk/metrics/aggregator/aggregator.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE

@@ -1,5 +1,7 @@
 #pragma once
-
+#ifdef HAVE_CPP_STDLIB
+#include "opentelemetry/std/string_view.h"
+#else
 #include <algorithm>
 #include <cstddef>
 #include <cstring>
@@ -191,3 +193,4 @@ namespace std {
     }
   };
 }
+#endif

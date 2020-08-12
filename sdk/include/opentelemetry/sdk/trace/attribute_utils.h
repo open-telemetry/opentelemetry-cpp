@@ -3,9 +3,7 @@
 #include <unordered_map>
 #include <vector>
 #include "opentelemetry/common/attribute_value.h"
-#include "opentelemetry/nostd/nostd.h"
 #include "opentelemetry/trace/key_value_iterable_view.h"
-
 #include <string>
 
 OPENTELEMETRY_BEGIN_NAMESPACE
@@ -22,7 +20,9 @@ using SpanDataAttributeValue = nostd::variant<bool,
                                               uint64_t,
                                               double,
                                               std::string,
+#if 0
                                               std::vector<uint8_t>,
+#endif
                                               std::vector<bool>,
                                               std::vector<int64_t>,
                                               std::vector<uint64_t>,
@@ -54,7 +54,9 @@ struct AttributeConverter
   {
     return SpanDataAttributeValue(std::string(s));
   }
+#if 0
   SpanDataAttributeValue operator()(nostd::span<const uint8_t> v) { return convertSpan<uint8_t>(v); }
+#endif
   SpanDataAttributeValue operator()(nostd::span<const bool> v) { return convertSpan<bool>(v); }
   SpanDataAttributeValue operator()(nostd::span<const int64_t> v)
   {

@@ -17,7 +17,7 @@
 #include <cstdint>
 #include <cstring>
 
-#include "opentelemetry/nostd/nostd.h"
+#include "opentelemetry/nostd/span.h"
 #include "opentelemetry/version.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE

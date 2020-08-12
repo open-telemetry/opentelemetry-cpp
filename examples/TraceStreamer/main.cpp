@@ -11,7 +11,8 @@
 #include <opentelemetry/trace/trace_id.h>
 #include <opentelemetry/trace/tracer_provider.h>
 
-#include <opentelemetry/nostd/nostd.h>
+#include <opentelemetry/nostd/variant.h>
+#include <opentelemetry/nostd/span.h>
 
 #include <cstdint>
 #include <cstdio>

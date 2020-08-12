@@ -1,7 +1,7 @@
 #pragma once
 
 #include <memory>
-#include "opentelemetry/nostd/nostd.h"
+#include "opentelemetry/nostd/span.h"
 #include "opentelemetry/sdk/trace/recordable.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE

@@ -1,4 +1,7 @@
 #pragma once
+#ifdef HAVE_CPP_STDLIB
+#include "opentelemetry/std/utility.h"
+#else
 
 #include <cstddef>
 #include <initializer_list>
@@ -146,3 +149,4 @@ struct in_place_type_t
 };
 }  // namespace nostd
 OPENTELEMETRY_END_NAMESPACE
+#endif

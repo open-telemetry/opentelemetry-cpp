@@ -13,6 +13,5 @@ static const opentelemetry::trace::NullKeyValueIterable GetEmptyAttributes() noe
 {
   return opentelemetry::trace::NullKeyValueIterable();
 }
-
 }  // namespace sdk
 OPENTELEMETRY_END_NAMESPACE

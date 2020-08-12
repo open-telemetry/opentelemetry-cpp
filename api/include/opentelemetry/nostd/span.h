@@ -1,5 +1,7 @@
 #pragma once
-
+#ifdef HAVE_CPP_STDLIB
+#include "opentelemetry/std/span.h"
+#else
 #include <array>
 #include <cassert>
 #include <cstddef>
@@ -7,7 +9,7 @@
 #include <iterator>
 #include <type_traits>
 
-#include "opentelemetry/nostd/nostd.h"
+#include "opentelemetry/nostd/utility.h"
 #include "opentelemetry/version.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
@@ -238,3 +240,4 @@ private:
 };
 }  // namespace nostd
 OPENTELEMETRY_END_NAMESPACE
+#endif

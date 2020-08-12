@@ -1,4 +1,4 @@
-#include "opentelemetry/nostd/nostd.h"
+#include "opentelemetry/nostd/span.h"
 #include "opentelemetry/sdk/trace/samplers/always_on.h"
 
 #include <gtest/gtest.h>

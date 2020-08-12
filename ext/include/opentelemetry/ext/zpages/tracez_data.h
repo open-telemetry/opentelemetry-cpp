@@ -6,7 +6,8 @@
 #include <string>
 
 #include "opentelemetry/ext/zpages/threadsafe_span_data.h"
-#include "opentelemetry/nostd/nostd.h"
+#include "opentelemetry/nostd/span.h"
+#include "opentelemetry/nostd/string_view.h"
 #include "opentelemetry/sdk/trace/span_data.h"
 #include "opentelemetry/trace/canonical_code.h"
 #include "opentelemetry/trace/span_id.h"

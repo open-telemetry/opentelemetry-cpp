@@ -1,6 +1,6 @@
 #pragma once
 
-#include "opentelemetry/nostd/nostd.h"
+#include "opentelemetry/nostd/type_traits.h"
 #include "opentelemetry/sdk/trace/exporter.h"
 #include "opentelemetry/sdk/trace/span_data.h"
 #include "opentelemetry/version.h"
