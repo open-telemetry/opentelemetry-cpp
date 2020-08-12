@@ -70,10 +70,10 @@ public:
     }
 
     // Gets the key associated with this entry.
-    nostd::string_view GetKey() { return key_.get(); }
+    nostd::string_view GetKey() const { return key_.get(); }
 
     // Gets the value associated with this entry.
-    nostd::string_view GetValue() { return value_.get(); }
+    nostd::string_view GetValue() const { return value_.get(); }
 
     // Sets the value for this entry. This overrides the previous value.
     void SetValue(nostd::string_view value) { value_ = CopyStringToPointer(value); }
@@ -98,7 +98,7 @@ public:
 
   // Returns false if no such key, otherwise returns true and populates the value parameter with the
   // associated value.
-  bool Get(nostd::string_view key, nostd::string_view &value) noexcept
+  bool Get(nostd::string_view key, nostd::string_view &value) const noexcept
   {
     for (auto &entry : Entries())
     {
@@ -112,16 +112,17 @@ public:
   }
 
   // Creates an Entry for the key-value pair and adds it to entries. Returns true if pair was added
-  // succesfully, false otherwise. If value is null, this function is a no-op.
+  // succesfully, false otherwise. If value is null or entries_ is full, this function is a no-op.
   bool Set(nostd::string_view key, nostd::string_view value) noexcept
   {
-    if (value.data() == NULL)
+    if (value.empty())
+    {
       return false;
-
-    Entry entry(key, value);
+    }
 
     if (num_entries_ < kMaxKeyValuePairs)
     {
+      Entry entry(key, value);
       (entries_.get())[num_entries_] = entry;
       num_entries_++;
       return true;
@@ -133,7 +134,10 @@ public:
   bool Empty() const noexcept { return num_entries_ == 0; }
 
   // Returns a span of all the entries. The TraceState object must outlive the span.
-  nostd::span<Entry> Entries() noexcept { return nostd::span<Entry>(entries_.get(), num_entries_); }
+  nostd::span<Entry> Entries() const noexcept
+  {
+    return nostd::span<Entry>(entries_.get(), num_entries_);
+  }
 
   // Returns whether key is a valid key. See https://www.w3.org/TR/trace-context/#key
   static bool IsValidKey(nostd::string_view key)
@@ -143,12 +147,10 @@ public:
       return false;
     }
 
-    int ats     = 0;
-    const int n = key.size();
+    int ats = 0;
 
-    for (int i = 0; i < n; ++i)
+    for (const char c : key)
     {
-      char c = key[i];
       if (!IsLowerCaseAlphaOrDigit(c) && c != '_' && c != '-' && c != '@' && c != '*' && c != '/')
       {
         return false;
@@ -169,11 +171,8 @@ public:
       return false;
     }
 
-    const int n = value.size();
-
-    for (int i = 0; i < n; ++i)
+    for (const char c : value)
     {
-      char c = value[i];
       if (c < ' ' || c > '~' || c == ',' || c == '=')
       {
         return false;
