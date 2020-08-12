@@ -22,7 +22,7 @@ public:
 
   std::unique_ptr<sdk::trace::Recordable> MakeRecordable() noexcept override
   {
-    return std::unique_ptr<sdk::trace::Recordable>(new sdk::trace::SpanData);
+    return std::unique_ptr<sdk::trace::Recordable>(new sdk::trace::SpanData());
   }
 
   sdk::trace::ExportResult Export(
