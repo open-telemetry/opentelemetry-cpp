@@ -6,7 +6,7 @@ namespace example
 {
 std::unique_ptr<sdktrace::Recordable> StdoutExporter::MakeRecordable() noexcept
 {
-  return std::unique_ptr<sdktrace::Recordable>(new sdktrace::SpanData);
+  return std::unique_ptr<sdktrace::Recordable>(new sdktrace::SpanData());
 }
 sdktrace::ExportResult StdoutExporter::Export(
     const nostd::span<std::unique_ptr<sdktrace::Recordable>> &spans) noexcept
