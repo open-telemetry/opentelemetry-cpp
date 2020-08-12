@@ -50,42 +50,42 @@ public:
     // Copy constructor
     Entry(Entry &copy)
     {
-      key_   = StringToPointer(nostd::string_view(copy.key_.get()));
-      value_ = StringToPointer(nostd::string_view(copy.value_.get()));
+      key_   = CopyStringToPointer(copy.key_.get());
+      value_ = CopyStringToPointer(copy.value_.get());
     }
 
     // Assignment operator
     Entry &operator=(Entry &other)
     {
-      key_   = StringToPointer(nostd::string_view(other.key_.get()));
-      value_ = StringToPointer(nostd::string_view(other.value_.get()));
+      key_   = CopyStringToPointer(other.key_.get());
+      value_ = CopyStringToPointer(other.value_.get());
       return *this;
     }
 
-    // Create an Entry for a given key-value pair.
+    // Creates an Entry for a given key-value pair.
     Entry(nostd::string_view key, nostd::string_view value) noexcept
     {
-      key_   = StringToPointer(key);
-      value_ = StringToPointer(value);
+      key_   = CopyStringToPointer(key);
+      value_ = CopyStringToPointer(value);
     }
 
-    // Get the key associated with this entry.
-    nostd::string_view GetKey() { return nostd::string_view(key_.get()); }
+    // Gets the key associated with this entry.
+    nostd::string_view GetKey() { return key_.get(); }
 
-    // Get the value associated with this entry.
-    nostd::string_view GetValue() { return nostd::string_view(value_.get()); }
+    // Gets the value associated with this entry.
+    nostd::string_view GetValue() { return value_.get(); }
 
-    // Set the value for this entry. This overrides the previous value.
-    void SetValue(nostd::string_view value) { value_ = StringToPointer(value); }
+    // Sets the value for this entry. This overrides the previous value.
+    void SetValue(nostd::string_view value) { value_ = CopyStringToPointer(value); }
 
   private:
     // Store key and value as raw char pointers to avoid using std::string.
     nostd::unique_ptr<const char[]> key_;
     nostd::unique_ptr<const char[]> value_;
 
-    // Copy string into a buffer and return a unique_ptr to the buffer.
+    // Copies string into a buffer and returns a unique_ptr to the buffer.
     // This is a workaround for the fact that strcpy doesn't accept a const char* destination.
-    nostd::unique_ptr<const char[]> StringToPointer(nostd::string_view str)
+    nostd::unique_ptr<const char[]> CopyStringToPointer(nostd::string_view str)
     {
       nostd::unique_ptr<char[]> temp(new char[str.size() + 1]);
       strcpy(temp.get(), str.data());
@@ -100,23 +100,23 @@ public:
   // associated value.
   bool Get(nostd::string_view key, nostd::string_view &value) noexcept
   {
-    for (int i = 0; i < num_entries_; i++)
+    for (auto &entry : Entries())
     {
-      if (key == (entries_.get())[i].GetKey())
+      if (key == entry.GetKey())
       {
-        value = (entries_.get())[i].GetValue();
+        value = entry.GetValue();
         return true;
       }
     }
     return false;
   }
 
-  // Creates an Entry for the key-value pair and adds it to entries.
-  // If value is null, this function is a no-op.
-  void Set(nostd::string_view key, nostd::string_view value) noexcept
+  // Creates an Entry for the key-value pair and adds it to entries. Returns true if pair was added
+  // succesfully, false otherwise. If value is null, this function is a no-op.
+  bool Set(nostd::string_view key, nostd::string_view value) noexcept
   {
     if (value.data() == NULL)
-      return;
+      return false;
 
     Entry entry(key, value);
 
@@ -124,7 +124,9 @@ public:
     {
       (entries_.get())[num_entries_] = entry;
       num_entries_++;
+      return true;
     }
+    return false;
   }
 
   // Returns true if there are no keys, false otherwise.
