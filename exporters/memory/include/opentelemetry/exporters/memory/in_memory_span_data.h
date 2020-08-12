@@ -16,8 +16,14 @@ namespace memory
 class InMemorySpanData final
 {
 public:
+  /**
+   * @param buffer_size a required value that sets the size of the CircularBuffer
+   */
   InMemorySpanData(size_t buffer_size) : spans_received_(buffer_size) {}
 
+  /**
+   * @param data a required unique pointer to the data to add to the CircularBuffer
+   */
   void Add(std::unique_ptr<opentelemetry::sdk::trace::Recordable> data) noexcept
   {
     std::unique_ptr<opentelemetry::sdk::trace::SpanData> span_data(
@@ -25,6 +31,11 @@ public:
     spans_received_.Add(span_data);
   }
 
+  /**
+   * @return Returns a vector of unique pointers containing all the span data in the
+   * CircularBuffer. This operation will empty the Buffer, which is why the data
+   * is returned as unique pointers
+   */
   std::vector<std::unique_ptr<opentelemetry::sdk::trace::SpanData>> GetSpans() noexcept
   {
     std::vector<std::unique_ptr<opentelemetry::sdk::trace::SpanData>> res;

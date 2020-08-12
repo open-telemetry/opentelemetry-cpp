@@ -16,15 +16,26 @@ namespace memory
 class InMemorySpanExporter final : public opentelemetry::sdk::trace::SpanExporter
 {
 public:
+  /**
+   * @param buffer_size an optional value that sets the size of the InMemorySpanData
+   */
   InMemorySpanExporter(size_t buffer_size = MAX_BUFFER_SIZE)
       : data_(new opentelemetry::exporter::memory::InMemorySpanData(buffer_size))
   {}
 
+  /**
+   * @return Returns a unique pointer to an empty recordable object
+   */
   std::unique_ptr<sdk::trace::Recordable> MakeRecordable() noexcept override
   {
     return std::unique_ptr<sdk::trace::Recordable>(new sdk::trace::SpanData());
   }
 
+  /**
+   * @param recordables a required span containing unique pointers to the data
+   * to add to the InMemorySpanData
+   * @return Returns the result of the operation
+   */
   sdk::trace::ExportResult Export(
       const nostd::span<std::unique_ptr<sdk::trace::Recordable>> &recordables) noexcept override
   {
@@ -41,9 +52,15 @@ public:
     return sdk::trace::ExportResult::kSuccess;
   }
 
+  /**
+   * @param timeout an optional value containing the timeout of the exporter
+   */
   void Shutdown(
       std::chrono::microseconds timeout = std::chrono::microseconds(0)) noexcept override{};
 
+  /**
+   * @return Returns a shared pointer to this exporters InMemorySpanData
+   */
   std::shared_ptr<opentelemetry::exporter::memory::InMemorySpanData> GetData() noexcept
   {
     return data_;
