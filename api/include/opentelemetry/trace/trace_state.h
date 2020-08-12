@@ -115,19 +115,15 @@ public:
   // succesfully, false otherwise. If value is null or entries_ is full, this function is a no-op.
   bool Set(nostd::string_view key, nostd::string_view value) noexcept
   {
-    if (value.empty())
+    if (value.empty() || num_entries_ >= kMaxKeyValuePairs)
     {
       return false;
     }
 
-    if (num_entries_ < kMaxKeyValuePairs)
-    {
-      Entry entry(key, value);
-      (entries_.get())[num_entries_] = entry;
-      num_entries_++;
-      return true;
-    }
-    return false;
+    Entry entry(key, value);
+    (entries_.get())[num_entries_] = entry;
+    num_entries_++;
+    return true;
   }
 
   // Returns true if there are no keys, false otherwise.
