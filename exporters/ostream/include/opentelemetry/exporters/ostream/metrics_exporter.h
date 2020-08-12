@@ -2,7 +2,6 @@
 
 #include <iostream>
 #include <string>
-
 #include "opentelemetry/sdk/metrics/aggregator/exact_aggregator.h"
 #include "opentelemetry/sdk/metrics/aggregator/gauge_aggregator.h"
 #include "opentelemetry/sdk/metrics/aggregator/histogram_aggregator.h"
