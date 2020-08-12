@@ -44,7 +44,7 @@ public:
 
   nostd::string_view ToString() { return "DefaultSpan"; }
 
-  void SetToken(nostd::unique_ptr<context::Token> &&token) noexcept {}
+  void SetToken(nostd::unique_ptr<context::Token> &&default_token) noexcept {}
 
   DefaultSpan() = default;
 
