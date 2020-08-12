@@ -7,7 +7,8 @@
 
 #include <gtest/gtest.h>
 
-#if defined(_UNISTD_H) && defined(_SYS_WAIT_H)
+#ifdef __unix__
+#  include <sys/mman.h>
 #  include <sys/wait.h>
 #  include <unistd.h>
 #endif
@@ -305,9 +306,15 @@ TEST_F(BatchSpanProcessorTestPeer, TestScheduleDelayMillis)
   }
 }
 
-#if defined(_UNISTD_H) && defined(_SYS_WAIT_H)
+#ifdef __unix__
+#  if !defined(__SANITIZE_THREAD__) && !defined(__SANITIZE_ADDRESS__)
 TEST_F(BatchSpanProcessorTestPeer, TestForkHandlers)
 {
+  // Create shared memory
+  bool *did_child_tests_pass = static_cast<bool *>(
+      mmap(nullptr, sizeof(bool), PROT_READ | PROT_WRITE, MAP_SHARED | MAP_ANONYMOUS, -1, 0));
+  *did_child_tests_pass = false;
+
   std::shared_ptr<std::atomic<bool>> is_shutdown(new std::atomic<bool>(false));
   std::shared_ptr<std::atomic<bool>> is_export_completed(new std::atomic<bool>(false));
   std::shared_ptr<std::vector<std::unique_ptr<SpanData>>> spans_received(
@@ -352,10 +359,10 @@ TEST_F(BatchSpanProcessorTestPeer, TestForkHandlers)
     std::this_thread::sleep_for(schedule_delay_millis + std::chrono::milliseconds(50));
 
     // Spans should now be exported in the child process
-    EXPECT_TRUE(is_export_completed->load());
-    EXPECT_EQ(3, spans_received->size());
+    *did_child_tests_pass = is_export_completed->load() == true && spans_received->size() == 3;
 
     batch_processor->Shutdown();
+
     // End child process
     std::exit(0);
   }
@@ -365,7 +372,12 @@ TEST_F(BatchSpanProcessorTestPeer, TestForkHandlers)
 
   // Wait for child process to finish
   waitpid(child_pid, nullptr, 0);
+
+  EXPECT_TRUE(*did_child_tests_pass);
+
+  munmap(did_child_tests_pass, sizeof(bool));
 }
+#  endif
 #endif
 
 }  // namespace trace
