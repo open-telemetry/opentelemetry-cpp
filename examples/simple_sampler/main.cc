@@ -2,6 +2,7 @@
 #include "opentelemetry/sdk/trace/samplers/always_off.h"
 #include "opentelemetry/sdk/trace/samplers/always_on.h"
 #include "opentelemetry/sdk/trace/samplers/parent_or_else.h"
+#include "opentelemetry/sdk/trace/samplers/probability.h"
 #include "opentelemetry/sdk/trace/simple_processor.h"
 #include "opentelemetry/sdk/trace/tracer_provider.h"
 #include "opentelemetry/trace/provider.h"
@@ -17,6 +18,7 @@
 using opentelemetry::sdk::trace::AlwaysOffSampler;
 using opentelemetry::sdk::trace::AlwaysOnSampler;
 using opentelemetry::sdk::trace::ParentOrElseSampler;
+using opentelemetry::sdk::trace::ProbabilitySampler;
 using opentelemetry::sdk::trace::Sampler;
 using example::StdoutExporter;
 
@@ -42,6 +44,9 @@ int main()
   // A Parent-Or-Else sampler with a delegate AlwaysOn sampler.
   // This sampler requires SpanContext, so is not yet fully functional.
   auto parent_or_else_sampler = std::make_shared<ParentOrElseSampler>(always_on_sampler);
+  // A Probability sampler with a 50% chance of sampling.
+  // This sampler requires SpanContext, so is not yet fully functional.
+  auto probabiltiy_sampler = std::make_shared<ProbabilitySampler>(0.5);
 
   std::cout << "Testing AlwaysOn Sampler...\n";
   // Set the sampler to AlwaysOn

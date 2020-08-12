@@ -20,6 +20,7 @@ The samplers are under `sdk` folder. You can include them by adding:
 #include "opentelemetry/sdk/trace/samplers/always_off.h"
 #include "opentelemetry/sdk/trace/samplers/always_on.h"
 #include "opentelemetry/sdk/trace/samplers/parent_or_else.h"
+#include "opentelemetry/sdk/trace/samplers/probability.h"
 ```
 
 ### Constructing a sampler
@@ -32,6 +33,9 @@ auto always_off_sampler = std::make_shared<AlwaysOffSampler>();
 // A Parent-Or-Else sampler with a delegate AlwaysOn sampler.
 // This sampler requires SpanContext, so is not yet fully functional.
 auto parent_or_else_sampler = std::make_shared<ParentOrElseSampler>(always_on_sampler);
+// A Probability sampler with a 50% chance of sampling.
+// This sampler requires SpanContext, so is not yet fully functional.
+auto probabiltiy_sampler = std::make_shared<ProbabilitySampler>(0.5);
 ```
 
 ### Constructing a Tracer Provider with a sampler
