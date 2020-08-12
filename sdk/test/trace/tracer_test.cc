@@ -1,4 +1,5 @@
 #include "opentelemetry/sdk/trace/tracer.h"
+#include "opentelemetry/context/threadlocal_context.h"
 #include "opentelemetry/sdk/trace/samplers/always_off.h"
 #include "opentelemetry/sdk/trace/samplers/always_on.h"
 #include "opentelemetry/sdk/trace/samplers/parent_or_else.h"
@@ -10,8 +11,10 @@
 using namespace opentelemetry::sdk::trace;
 using opentelemetry::core::SteadyTimestamp;
 using opentelemetry::core::SystemTimestamp;
-namespace nostd  = opentelemetry::nostd;
-namespace common = opentelemetry::common;
+namespace nostd   = opentelemetry::nostd;
+namespace common  = opentelemetry::common;
+namespace context = opentelemetry::context;
+namespace trace   = opentelemetry::trace;
 using opentelemetry::trace::SpanContext;
 
 /**
@@ -26,7 +29,8 @@ public:
                               trace_api::SpanKind /*span_kind*/,
                               const trace_api::KeyValueIterable & /*attributes*/) noexcept override
   {
-    // Return two pairs of attributes. These attributes should be added to the span attributes
+    // Return two pairs of attributes. These attributes should be added to the
+    // span attributes
     return {Decision::RECORD_AND_SAMPLE,
             nostd::unique_ptr<const std::map<std::string, opentelemetry::common::AttributeValue>>(
                 new const std::map<std::string, opentelemetry::common::AttributeValue>(
@@ -105,6 +109,7 @@ TEST(Tracer, ToMockSpanExporter)
 
   span_second->End();
   ASSERT_EQ(1, spans_received->size());
+
   ASSERT_EQ("span 2", spans_received->at(0)->GetName());
 
   span_first->End();
@@ -120,7 +125,6 @@ TEST(Tracer, StartSpanSampleOn)
   auto tracer_on = initTracer(spans_received);
 
   tracer_on->StartSpan("span 1")->End();
-
   ASSERT_EQ(1, spans_received->size());
 
   auto &span_data = spans_received->at(0);
@@ -138,7 +142,8 @@ TEST(Tracer, StartSpanSampleOff)
   // This span will not be recorded.
   tracer_off->StartSpan("span 2")->End();
 
-  // The span doesn't write any span data because the sampling decision is alway NOT_RECORD.
+  // The span doesn't write any span data because the sampling decision is alway
+  // NOT_RECORD.
   ASSERT_EQ(0, spans_received->size());
 }
 
@@ -166,20 +171,26 @@ TEST(Tracer, StartSpanWithOptionsTime)
 
 TEST(Tracer, StartSpanWithAttributes)
 {
+
   std::shared_ptr<std::vector<std::unique_ptr<SpanData>>> spans_received(
       new std::vector<std::unique_ptr<SpanData>>);
   // The default tracer has empty sampling result attribute
   auto tracer = initTracer(spans_received);
 
   // Start a span with all supported scalar attribute types.
-  tracer->StartSpan("span 1", {{"attr1", "string"},
-                               {"attr2", false},
-                               {"attr1", 314159},
-                               {"attr3", (unsigned int)314159},
-                               {"attr4", (int64_t)-20},
-                               {"attr5", (uint64_t)20},
-                               {"attr6", 3.1},
-                               {"attr7", "string"}});
+
+  tracer
+      ->StartSpan("span 1", {{"attr1", "string"},
+                             {"attr2", false},
+                             {"attr1", 314159},
+                             {"attr3", (unsigned int)314159},
+                             {"attr4", (int64_t)-20},
+                             {"attr5", (uint64_t)20},
+                             {"attr6", 3.1},
+                             {"attr7", "string"}})
+      ->End();
+
+  ASSERT_EQ(1, spans_received->size());
 
   // Start a span with all supported array attribute types.
   int listInt[]                       = {1, 2, 3};
@@ -197,7 +208,8 @@ TEST(Tracer, StartSpanWithAttributes)
   m["attr5"] = nostd::span<double>(listDouble);
   m["attr6"] = nostd::span<bool>(listBool);
   m["attr7"] = nostd::span<nostd::string_view>(listStringView);
-  tracer->StartSpan("span 2", m);
+
+  tracer->StartSpan("span 2", m)->End();
 
   ASSERT_EQ(2, spans_received->size());
 
@@ -248,8 +260,10 @@ TEST(Tracer, StartSpanWithAttributesCopy)
     strings->push_back(s1);
     strings->push_back(s2);
     strings->push_back(s3);
-    tracer->StartSpan("span 1",
-                      {{"attr1", *numbers}, {"attr2", nostd::span<nostd::string_view>(*strings)}});
+    tracer
+        ->StartSpan("span 1",
+                    {{"attr1", *numbers}, {"attr2", nostd::span<nostd::string_view>(*strings)}})
+        ->End();
   }
 
   ASSERT_EQ(1, spans_received->size());
@@ -378,4 +392,29 @@ TEST(Tracer, TestParentOrElseSampler)
   span_parent_off_1->End();
   span_parent_off_2->End();
   ASSERT_EQ(0, spans_received_parent_off->size());
+}
+
+TEST(Tracer, StartSpanUpdatesRuntimeContext)
+{
+
+  std::shared_ptr<std::vector<std::unique_ptr<SpanData>>> spans_received(
+      new std::vector<std::unique_ptr<SpanData>>);
+  auto tracer = initTracer(spans_received);
+
+  auto span_first  = tracer->StartSpan("span 1");
+  auto span_second = tracer->StartSpan("span 2");
+
+  EXPECT_EQ(0, spans_received->size());
+
+  nostd::get<nostd::shared_ptr<trace::Span>>(
+      context::RuntimeContext::GetCurrent().GetValue(SpanKey))
+      ->End();
+  EXPECT_EQ(1, spans_received->size());
+  EXPECT_EQ("span 2", spans_received->at(0)->GetName());
+
+  nostd::get<nostd::shared_ptr<trace::Span>>(
+      context::RuntimeContext::GetCurrent().GetValue(SpanKey))
+      ->End();
+  EXPECT_EQ(2, spans_received->size());
+  EXPECT_EQ("span 1", spans_received->at(1)->GetName());
 }

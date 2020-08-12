@@ -1,5 +1,6 @@
 #include <gtest/gtest.h>
 #include <memory>
+#include "opentelemetry/context/threadlocal_context.h"
 #include "opentelemetry/sdk/trace/samplers/always_off.h"
 #include "opentelemetry/sdk/trace/samplers/always_on.h"
 #include "opentelemetry/sdk/trace/samplers/parent_or_else.h"
