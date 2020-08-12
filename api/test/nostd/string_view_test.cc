@@ -5,6 +5,7 @@
 #include <benchmark/benchmark.h>
 #include <cstdint>
 #include <map>
+#include <cstring>
 
 using opentelemetry::nostd::string_view;
 
