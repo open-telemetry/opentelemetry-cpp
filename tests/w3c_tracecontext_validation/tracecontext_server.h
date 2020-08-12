@@ -3,6 +3,8 @@
 #include <fstream>
 #include <iostream>
 #include <string>
+#include <map>
+#include <vector>
 #include <unordered_map>
 #include <vector>
 
@@ -64,20 +66,25 @@ private:
      return result;
   }
 
-  std::string Trim(std::string& str)
+  std::string Trim(std::string& str, char delimiter)
   {
-      std::size_t first = str.find_first_not_of('\"');
+      return Trim(str, delimiter, delimiter);
+  }
+
+  std::string Trim(std::string& str, char delimiter_l, char delimiter_r)
+  {
+      std::size_t first = str.find_first_not_of(delimiter_l);
       if (std::string::npos == first)
       {
           return str;
       }
-      std::size_t last = str.find_last_not_of('\"');
+      std::size_t last = str.find_last_not_of(delimiter_r);
       return str.substr(first, (last - first + 1));
   }
 
-  bool ParseBody(Connection &conn)
+  bool ParseBody(std::string content, std::vector<std::map<std::string,std::string>> &send_list)
   {
-     char const *begin = conn.receiveBuffer.c_str();
+     char const *begin = content;
      char const *ptr   = begin;
      while (*ptr == ' ')
      {
@@ -90,7 +97,14 @@ private:
      // Key-Value Pairs
      while (*ptr != '\r' && *ptr != '\n')
      {
+        std::map<std::string,std::string> kv_pairs;
         // Begin
+        if (*ptr == ',') {
+           ptr++;
+        }
+        while (*ptr == ' ') {
+           ptr++;
+        }
         if (*ptr == '{') {
            ptr++;
         }
@@ -104,7 +118,7 @@ private:
         {
           return false;
         }
-        std::string key1 = Trim(NormalizeName(begin, ptr));
+        std::string key1 = Trim(NormalizeName(begin, ptr), '\"');
         ptr++;
         while (*ptr == ' ')
         {
@@ -116,8 +130,9 @@ private:
         {
           ptr++;
         }
-        conn.request.headers[key1] = Trim(std::string(begin, ptr));
+        kv_pairs[key1] = Trim(std::string(begin, ptr),'[',']');
 
+        ptr++;
         while (*ptr == ' ') {
           ptr++;
         }
@@ -131,7 +146,7 @@ private:
         {
           return false;
         }
-        std::string key2 = Trim(NormalizeName(begin, ptr));
+        std::string key2 = Trim(NormalizeName(begin, ptr), '\"');
         ptr++;
         while (*ptr == ' ')
         {
@@ -143,41 +158,36 @@ private:
         {
           ptr++;
         }
-        conn.request.headers[key2] = Trim(std::string(begin, ptr));
-        if (*ptr == '\r')
-        {
-          ptr++;
-        }
-        if (*ptr != '\n')
-        {
-          return false;
-        }
-        ptr++;
+        kv_pairs[key2] = Trim(std::string(begin, ptr),'[',']');
+        send_list.push_back(kv_pairs);
      }
-     if (*ptr == '\r')
-     {
-        ptr++;
-     }
-     if (*ptr != '\n')
-     {
-        return false;
-     }
-     ptr++;
      return true;
   }
 
-  /**
-   * Sets the response object with the correct file data based on the requested
-   * file address, or return 404 error if a file isn't found
-   * @param req is the HTTP request, which we use to figure out the response to
-   * send
-   * @param resp is the HTTP response we want to send to the frontend, including
-   * file data
-   */
   HTTP_SERVER_NS::HttpRequestCallback SendRequestBack{
      [&](HTTP_SERVER_NS::HttpRequest const &req, HTTP_SERVER_NS::HttpResponse &resp) {
-         HttpClient client = clients.StartNewClient();
-         return 404;
+         std::vector<std::map<std::string,std::string>> send_list;
+         ParseBody(req.content.c_str(),send_list);
+         for (std::map<std::string,std::string> kv_pairs : send_list) {
+            std::string url = "";
+            std::string arguments = "";
+            for (std::map<std::string,std::string>::iterator it = kv_pairs.begin(); it != kv_pairs.end(); it++) {
+                if (it->first == "url") {
+                    url = it->second;
+                } else if (it->first == "arguments") {
+                    arguments = it->second;
+                }
+            }
+            if (url != "") {
+                HttpClient client = clients.StartNewClient();
+                client.AddPostField("arguments",arguments);
+                client.SendRequest(url);
+                client.~HttpClient();
+            } else {
+                return 404;
+            }
+         }
+         return 200;
      }};
 
   const std::string test_protocol_ = "/test/";
