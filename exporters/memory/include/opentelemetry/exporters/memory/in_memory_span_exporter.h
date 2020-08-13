@@ -42,7 +42,7 @@ public:
     for (auto &recordable : recordables)
     {
       auto span = std::unique_ptr<sdk::trace::SpanData>(
-          static_cast<sdk::trace::SpanData *>(recordable.release()));
+          dynamic_cast<sdk::trace::SpanData *>(recordable.release()));
       if (span != nullptr)
       {
         data_.get()->Add(std::move(span));
