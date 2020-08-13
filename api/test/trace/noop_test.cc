@@ -11,9 +11,8 @@ using opentelemetry::trace::Tracer;
 
 //  Note: This test is no longer valid as Span no longer has field of tracer. Whether
 //  removing it depends on the creator of this file.
-// TEST(NoopTest, UseNoopTracers)
-//{
-
+TEST(NoopTest, DISABLE_UseNoopTracers)
+{
 //  std::shared_ptr<Tracer> tracer{new NoopTracer{}};
 //  auto s1 = tracer->StartSpan("abc");
 //  EXPECT_EQ(&s1->tracer(), tracer.get());
@@ -30,4 +29,4 @@ using opentelemetry::trace::Tracer;
 //  s1->AddEvent("abc", attributes3);
 //
 //  s1->SetAttribute("abc", 4);
-//  }
+}
