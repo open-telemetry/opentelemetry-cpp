@@ -63,8 +63,8 @@ public:
     }
 
     // Move contructor and assignment operator
-    Entry(Entry&& other) = default;
-    Entry& operator=(Entry&& other) = default;
+    Entry(Entry &&other) = default;
+    Entry &operator=(Entry &&other) = default;
 
     // Creates an Entry for a given key-value pair.
     Entry(nostd::string_view key, nostd::string_view value) noexcept
