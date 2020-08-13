@@ -54,13 +54,17 @@ public:
       value_ = CopyStringToPointer(copy.value_.get());
     }
 
-    // Assignment operator
+    // Copy assignment operator
     Entry &operator=(Entry &other)
     {
       key_   = CopyStringToPointer(other.key_.get());
       value_ = CopyStringToPointer(other.value_.get());
       return *this;
     }
+
+    // Move contructor and assignment operator
+    Entry(Entry&& other) = default;
+    Entry& operator=(Entry&& other) = default;
 
     // Creates an Entry for a given key-value pair.
     Entry(nostd::string_view key, nostd::string_view value) noexcept
@@ -100,7 +104,7 @@ public:
   // associated value.
   bool Get(nostd::string_view key, nostd::string_view &value) const noexcept
   {
-    for (auto &entry : Entries())
+    for (const auto &entry : Entries())
     {
       if (key == entry.GetKey())
       {
