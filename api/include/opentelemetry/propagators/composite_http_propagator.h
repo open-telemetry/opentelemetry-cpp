@@ -27,7 +27,7 @@ template <typename T>
 class CompositeHTTPPropagator : public trace::propagation::HTTPTextFormat<T>
 {
 public:
-  // Rules that manages how context will be extracted from carrier.
+  // Rules that manage how context will be extracted from carrier.
   using Getter = nostd::string_view (*)(const T &carrier, nostd::string_view trace_type);
 
   // Rules that manages how context will be injected to carrier.
