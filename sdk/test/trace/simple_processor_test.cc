@@ -12,18 +12,18 @@ using opentelemetry::exporter::memory::InMemorySpanExporter;
 TEST(SimpleProcessor, ToInMemorySpanExporter)
 {
   std::unique_ptr<InMemorySpanExporter> exporter(new InMemorySpanExporter());
-  std::shared_ptr<InMemorySpanData> span_data = exporter.get()->GetData();
+  std::shared_ptr<InMemorySpanData> span_data = exporter->GetData();
   SimpleSpanProcessor processor(std::move(exporter));
 
   auto recordable = processor.MakeRecordable();
 
   processor.OnStart(*recordable);
 
-  ASSERT_EQ(0, span_data.get()->GetSpans().size());
+  ASSERT_EQ(0, span_data->GetSpans().size());
 
   processor.OnEnd(std::move(recordable));
 
-  ASSERT_EQ(1, span_data.get()->GetSpans().size());
+  ASSERT_EQ(1, span_data->GetSpans().size());
 
   processor.Shutdown();
 }
