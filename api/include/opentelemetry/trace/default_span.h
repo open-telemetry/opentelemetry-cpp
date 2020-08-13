@@ -57,5 +57,6 @@ public:
 private:
   SpanContext span_context_;
 };
+
 }  // namespace trace
 OPENTELEMETRY_END_NAMESPACE
