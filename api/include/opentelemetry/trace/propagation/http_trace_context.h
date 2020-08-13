@@ -145,7 +145,7 @@ public:
       }
       spn_id++;
     }
-    return SpanId(spn_id);
+    return SpanId(buf);
   }
 
   static TraceFlags GenerateTraceFlagsFromString(nostd::string_view trace_flags)
