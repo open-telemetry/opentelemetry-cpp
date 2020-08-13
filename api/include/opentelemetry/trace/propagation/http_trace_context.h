@@ -99,7 +99,13 @@ public:
     {
       tmp = CharToInt(*trc_id);
       if (tmp < 0)
-        return TraceId(0);
+      {
+        for (int j = 0; j < 16; j++)
+        {
+          buf[j] = 0;
+        }
+        return TraceId(buf);
+      }
       if (i % 2 == 0)
       {
         buf[i / 2] = tmp * 16;
@@ -122,7 +128,13 @@ public:
     {
       tmp = CharToInt(*spn_id);
       if (tmp < 0)
-        return SpanId(0);
+      {
+        for (int j = 0; j < 8; j++)
+        {
+          buf[j] = 0;
+        }
+        return SpanId(buf);
+      }
       if (i % 2 == 0)
       {
         buf[i / 2] = tmp * 16;
