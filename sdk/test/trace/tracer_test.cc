@@ -190,7 +190,7 @@ TEST(Tracer, StartSpanWithAttributes)
 
   tracer->StartSpan("span 2", m)->End();
 
-  auto  spans = span_data->GetSpans();
+  auto spans = span_data->GetSpans();
   ASSERT_EQ(2, spans.size());
 
   auto &cur_span_data = spans.at(0);
