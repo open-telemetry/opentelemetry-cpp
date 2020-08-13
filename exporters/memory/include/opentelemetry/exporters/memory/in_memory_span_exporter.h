@@ -2,13 +2,13 @@
 #include "opentelemetry/exporters/memory/in_memory_span_data.h"
 #include "opentelemetry/sdk/trace/exporter.h"
 
-const size_t MAX_BUFFER_SIZE = 100;
-
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace exporter
 {
 namespace memory
 {
+const size_t MAX_BUFFER_SIZE = 100;
+
 /**
  * A in memory exporter that switches a flag once a valid recordable was received
  * and keeps track of all received spans in memory.
@@ -45,7 +45,7 @@ public:
           dynamic_cast<sdk::trace::SpanData *>(recordable.release()));
       if (span != nullptr)
       {
-        data_.get()->Add(std::move(span));
+        data_->Add(std::move(span));
       }
     }
 
@@ -54,6 +54,7 @@ public:
 
   /**
    * @param timeout an optional value containing the timeout of the exporter
+   * note: passing custom timeout values is not currently supported for this exporter
    */
   void Shutdown(
       std::chrono::microseconds timeout = std::chrono::microseconds(0)) noexcept override{};
