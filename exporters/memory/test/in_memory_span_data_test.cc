@@ -14,17 +14,9 @@ TEST(InMemorySpanData, AddRecordable)
 
   ASSERT_EQ(0, data.GetSpans().size());
 
-  opentelemetry::nostd::span<std::unique_ptr<SpanData>> recordables(
-      new std::unique_ptr<SpanData>(new SpanData()), 1);
+  std::unique_ptr<SpanData> spandata(new SpanData());
 
-  for (auto &recordable : recordables)
-  {
-    auto span = std::unique_ptr<SpanData>(static_cast<SpanData *>(recordable.release()));
-    if (span != nullptr)
-    {
-      data.Add(std::move(span));
-    }
-  }
+  data.Add(std::move(spandata));
 
   // Consumes all spans in exporter
   ASSERT_EQ(1, data.GetSpans().size());

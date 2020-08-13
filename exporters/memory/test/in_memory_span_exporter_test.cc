@@ -14,8 +14,8 @@ TEST(InMemorySpanExporter, ExportBatch)
 
   ASSERT_EQ(0, exporter.GetData().get()->GetSpans().size());
 
-  opentelemetry::nostd::span<std::unique_ptr<Recordable>> batch(
-      new std::unique_ptr<Recordable>(new SpanData()), 1);
+  std::unique_ptr<Recordable> spandata(new SpanData());
+  opentelemetry::nostd::span<std::unique_ptr<Recordable>> batch(&spandata, 1);
 
   exporter.Export(batch);
 
