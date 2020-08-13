@@ -41,9 +41,6 @@ static void Setter(std::map<std::string, std::string> &carrier,
 static trace::propagation::HttpTraceContext<std::map<std::string, std::string>> format =
     trace::propagation::HttpTraceContext<std::map<std::string, std::string>>();
 
-static const nostd::string_view trace_id = "12345678901234567890123456789012";
-static const nostd::string_view span_id  = "1234567890123456";
-
 using MapHttpTraceContext =
     trace::propagation::HttpTraceContext<std::map<std::string, std::string>>;
 TEST(HTTPTextFormatTest, TraceIdBufferGeneration)
@@ -64,6 +61,8 @@ TEST(HTTPTextFormatTest, TraceFlagsBufferGeneration)
   EXPECT_EQ(MapHttpTraceContext::GenerateTraceFlagsFromString("00"), trace::TraceFlags());
 }
 
+// The commented out code below are ones that are related to TraceState. Needs to be uncommented
+// after TraceState is merged.
 // TEST(HTTPTextFormatTest, HeadersWithTraceState)
 //{
 //  const std::map<std::string, std::string> carrier = {
@@ -144,6 +143,8 @@ TEST(HTTPTextFormatTest, NoSendEmptyTraceState)
   EXPECT_FALSE(carrier.count("tracestate") > 0);
 }
 
+// The commented out code below are ones that are related to TraceState. Needs to be uncommented
+// after TraceState is merged.
 // TEST(HTTPTextFormatTest, FormatNotSupported)
 //{
 //  // If the trace parent does not adhere to the supported format, discard it and
@@ -173,6 +174,8 @@ TEST(HTTPTextFormatTest, PropagateInvalidContext)
   EXPECT_TRUE(carrier.count("traceparent") == 0);
 }
 
+// The commented out code below are ones that are related to TraceState. Needs to be uncommented
+// after TraceState is merged.
 // TEST(HTTPTextFormatTest, TraceStateHeaderWithTrailingComma)
 //{
 //  // Do not propagate invalid trace context.

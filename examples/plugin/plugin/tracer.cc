@@ -52,7 +52,7 @@ public:
 
   bool IsRecording() const noexcept override { return true; }
 
-  trace::SpanContext GetContext() const noexcept override { return span_->GetContext(); }
+  trace::SpanContext GetContext() const noexcept override { return span_context_; }
   //  Tracer &tracer() const noexcept override { return *tracer_; }
 
   void SetToken(nostd::unique_ptr<context::Token> &&token) noexcept override {}
@@ -60,7 +60,7 @@ public:
 private:
   std::shared_ptr<Tracer> tracer_;
   std::string name_;
-  std::unique_ptr<trace::Span> span_;
+  trace::SpanContext span_context_;
 };
 }  // namespace
 

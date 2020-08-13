@@ -18,7 +18,9 @@
 #include "opentelemetry/trace/span_id.h"
 #include "opentelemetry/trace/trace_flags.h"
 #include "opentelemetry/trace/trace_id.h"
-#include "opentelemetry/trace/trace_state.h"
+//  The commented out code below are ones that are related to TraceState. Needs to be uncommented
+//  after TraceState is merged.
+//#include "opentelemetry/trace/trace_state.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace trace
@@ -32,31 +34,43 @@ public:
   // An invalid SpanContext.
   SpanContext() noexcept
       : trace_flags_(trace::TraceFlags((uint8_t) false)),
+        //  The commented out code below are ones that are related to TraceState. Needs to be
+        //  uncommented after TraceState is merged.
         //        trace_state_(new TraceState),
         remote_parent_(false){};
 
   SpanContext(bool sampled_flag, bool has_remote_parent) noexcept
       : trace_flags_(trace::TraceFlags((uint8_t)sampled_flag)),
+        //  The commented out code below are ones that are related to TraceState. Needs to be
+        //  uncommented after TraceState is merged.
         //        trace_state_(new TraceState),
         remote_parent_(has_remote_parent){};
   SpanContext(TraceId trace_id,
               SpanId span_id,
               TraceFlags trace_flags,
+              //  The commented out code below are ones that are related to TraceState. Needs to be
+              //  uncommented after TraceState is merged.
               //              TraceState trace_state,
               bool has_remote_parent) noexcept
   {
     trace_id_    = trace_id;
     span_id_     = span_id;
     trace_flags_ = trace_flags;
+    //  The commented out code below are ones that are related to TraceState. Needs to be
+    //  uncommented after TraceState is merged.
     //    trace_state_.reset(new TraceState(trace_state));
     remote_parent_ = has_remote_parent;
   }
   SpanContext(SpanContext &&ctx)
       : trace_id_(ctx.trace_id()), span_id_(ctx.span_id()), trace_flags_(ctx.trace_flags())
+  //  The commented out code below are ones that are related to TraceState. Needs to be uncommented
+  //  after TraceState is merged.
   //        trace_state_(std::move(ctx.trace_state_))
   {}
   SpanContext(const SpanContext &ctx)
       : trace_id_(ctx.trace_id()), span_id_(ctx.span_id()), trace_flags_(ctx.trace_flags())
+  //  The commented out code below are ones that are related to TraceState. Needs to be uncommented
+  //  after TraceState is merged.
   //        trace_state_(new TraceState(ctx.trace_state()))
   {}
 
@@ -65,6 +79,8 @@ public:
     trace_id_    = ctx.trace_id_;
     span_id_     = ctx.span_id_;
     trace_flags_ = ctx.trace_flags_;
+    //  The commented out code below are ones that are related to TraceState. Needs to be
+    //  uncommented after TraceState is merged.
     //    trace_state_.reset(new TraceState(*(ctx.trace_state_.get())));
     return *this;
   };
@@ -73,6 +89,8 @@ public:
     trace_id_    = ctx.trace_id_;
     span_id_     = ctx.span_id_;
     trace_flags_ = ctx.trace_flags_;
+    //  The commented out code below are ones that are related to TraceState. Needs to be
+    //  uncommented after TraceState is merged.
     //    trace_state_.reset(new TraceState(*(ctx.trace_state_.get())));
     return *this;
   };
@@ -84,6 +102,8 @@ public:
   const TraceId &trace_id() const noexcept { return trace_id_; }
   const SpanId &span_id() const noexcept { return span_id_; }
   const TraceFlags &trace_flags() const noexcept { return trace_flags_; }
+  //  The commented out code below are ones that are related to TraceState. Needs to be uncommented
+  //  after TraceState is merged.
   //  const TraceState &trace_state() const noexcept { return *trace_state_; }
 
   bool IsValid() const noexcept { return trace_id_.IsValid() && span_id_.IsValid(); }
@@ -98,6 +118,8 @@ private:
   TraceId trace_id_;
   SpanId span_id_;
   TraceFlags trace_flags_;
+  //  The commented out code below are ones that are related to TraceState. Needs to be uncommented
+  //  after TraceState is merged.
   //  nostd::unique_ptr<TraceState> trace_state_;  // Never nullptr.
   bool remote_parent_ = false;
 };

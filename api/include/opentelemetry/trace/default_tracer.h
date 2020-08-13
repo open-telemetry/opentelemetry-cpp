@@ -4,7 +4,6 @@
 #include "opentelemetry/trace/span.h"
 #include "opentelemetry/trace/tracer.h"
 
-#define pass
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace trace
 {
@@ -28,9 +27,9 @@ public:
     return nostd::unique_ptr<Span>(new DefaultSpan::GetInvalid());
   }
 
-  void ForceFlushWithMicroseconds(uint64_t timeout) noexcept { pass; }
+  void ForceFlushWithMicroseconds(uint64_t timeout) noexcept {}
 
-  void CloseWithMicroseconds(uint64_t timeout) noexcept { pass; }
+  void CloseWithMicroseconds(uint64_t timeout) noexcept {}
 };
 }  // namespace trace
 OPENTELEMETRY_END_NAMESPACE

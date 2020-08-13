@@ -4,7 +4,6 @@
 #include "opentelemetry/trace/span.h"
 #include "opentelemetry/trace/span_context.h"
 
-#define pass
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace trace
 {
@@ -18,11 +17,11 @@ public:
 
   bool IsRecording() const noexcept { return false; }
 
-  void SetAttribute(nostd::string_view key, const common::AttributeValue &value) noexcept { pass; }
+  void SetAttribute(nostd::string_view key, const common::AttributeValue &value) noexcept {}
 
-  void AddEvent(nostd::string_view name) noexcept { pass; }
+  void AddEvent(nostd::string_view name) noexcept {}
 
-  void AddEvent(nostd::string_view name, core::SystemTimestamp timestamp) noexcept { pass; }
+  void AddEvent(nostd::string_view name, core::SystemTimestamp timestamp) noexcept {}
 
   void AddEvent(nostd::string_view name,
                 core::SystemTimestamp timestamp,
@@ -36,11 +35,11 @@ public:
     this->AddEvent(name, std::chrono::system_clock::now(), attributes);
   }
 
-  void SetStatus(CanonicalCode status, nostd::string_view description) noexcept { pass; }
+  void SetStatus(CanonicalCode status, nostd::string_view description) noexcept {}
 
-  void UpdateName(nostd::string_view name) noexcept { pass; }
+  void UpdateName(nostd::string_view name) noexcept {}
 
-  void End(const EndSpanOptions &options = {}) noexcept { pass; }
+  void End(const EndSpanOptions &options = {}) noexcept {}
 
   nostd::string_view ToString() { return "DefaultSpan"; }
 

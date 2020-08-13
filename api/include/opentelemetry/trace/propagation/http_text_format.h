@@ -3,7 +3,6 @@
 #include <cstdint>
 #include "opentelemetry/context/context.h"
 #include "opentelemetry/nostd/string_view.h"
-//#include "opentelemetry/trace/span.h"
 #include "opentelemetry/version.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE

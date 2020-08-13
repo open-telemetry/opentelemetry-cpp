@@ -26,7 +26,9 @@
 #include "opentelemetry/trace/propagation/http_text_format.h"
 #include "opentelemetry/trace/span.h"
 #include "opentelemetry/trace/span_context.h"
-#include "opentelemetry/trace/trace_state.h"
+//  The commented out code below are ones that are related to TraceState. Needs to be uncommented
+//  after TraceState is merged.
+//#include "opentelemetry/trace/trace_state.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace trace
@@ -180,6 +182,8 @@ private:
     }
   }
 
+  //  The commented out code below are ones that are related to TraceState. Needs to be uncommented
+  //  after TraceState is merged.
   //  static void InjectTraceState(TraceState trace_state, T &carrier, Setter setter)
   //  {
   //    std::string trace_state_string = "";
@@ -225,7 +229,8 @@ private:
   static void InjectImpl(Setter setter, T &carrier, const SpanContext &span_context)
   {
     InjectTraceParent(span_context, carrier, setter);
-    //    if (!span_context.trace_state().empty())
+    //    The commented out code below are ones that are related to TraceState. Needs to be
+    //    uncommented after TraceState is merged. if (!span_context.trace_state().empty())
     //    {
     //      InjectTraceState(span_context.trace_state(), carrier, setter);
     //    }
@@ -309,6 +314,8 @@ private:
       SpanId span_id_obj         = GenerateSpanIdFromString(span_id);
       TraceFlags trace_flags_obj = GenerateTraceFlagsFromString(trace_flags);
       return SpanContext(trace_id_obj, span_id_obj, trace_flags_obj, true);
+      // The commented out code below are ones that are related to TraceState. Needs to be
+      // uncommented after TraceState is merged.
       //      return SpanContext(trace_id_obj, span_id_obj, trace_flags_obj, TraceState(), true);
     }
     else
@@ -318,6 +325,8 @@ private:
     }
   }
 
+  //  The commented out code below are ones that are related to TraceState. Needs to be uncommented
+  //  after TraceState is merged.
   //  static TraceState ExtractTraceState(nostd::string_view &trace_state_header)
   //  {
   //    TraceState trace_state = TraceState();
@@ -397,9 +406,12 @@ private:
       return SpanContext(false, false);
     }
     SpanContext context_from_parent_header = ExtractContextFromTraceParent(trace_parent);
-    //    if (!context_from_parent_header.IsValid())
+    //    The commented out code below are ones that are related to TraceState. Needs to be
+    //    uncommented after TraceState is merged. if (!context_from_parent_header.IsValid())
     //    {
     return context_from_parent_header;
+    //    The commented out code below are ones that are related to TraceState. Needs to be
+    //    uncommented after TraceState is merged.
     //    }
 
     //    nostd::string_view trace_state_header = getter(carrier, kTraceState);

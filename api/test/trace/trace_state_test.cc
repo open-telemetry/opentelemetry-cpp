@@ -1,3 +1,5 @@
+//  The commented out code below are ones that are related to TraceState. Needs to be uncommented
+//  after TraceState is merged.
 //#include "opentelemetry/trace/trace_state.h"
 //
 //#include <gtest/gtest.h>
