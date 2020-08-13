@@ -95,14 +95,14 @@ public:
   static TraceId GenerateTraceIdFromString(nostd::string_view trace_id)
   {
     const char *trc_id = trace_id.begin();
-    uint8_t buf[16];
+    uint8_t buf[kTraceIdBytes/2];
     int tmp;
-    for (int i = 0; i < 32; i++)
+    for (int i = 0; i < kTraceIdBytes; i++)
     {
       tmp = CharToInt(*trc_id);
       if (tmp < 0)
       {
-        for (int j = 0; j < 16; j++)
+        for (int j = 0; j < kTraceIdBytes/2; j++)
         {
           buf[j] = 0;
         }
@@ -124,14 +124,14 @@ public:
   static SpanId GenerateSpanIdFromString(nostd::string_view span_id)
   {
     const char *spn_id = span_id.begin();
-    uint8_t buf[8];
+    uint8_t buf[kSpanIdBytes/2];
     int tmp;
-    for (int i = 0; i < 16; i++)
+    for (int i = 0; i < kSpanIdBytes; i++)
     {
       tmp = CharToInt(*spn_id);
       if (tmp < 0)
       {
-        for (int j = 0; j < 8; j++)
+        for (int j = 0; j < kSpanIdBytes/2; j++)
         {
           buf[j] = 0;
         }
