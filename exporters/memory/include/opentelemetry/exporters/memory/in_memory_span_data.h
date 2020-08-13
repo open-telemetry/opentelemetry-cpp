@@ -24,7 +24,7 @@ public:
   /**
    * @param data a required unique pointer to the data to add to the CircularBuffer
    */
-  void Add(std::unique_ptr<opentelemetry::sdk::trace::Recordable> data) noexcept
+  void Add(std::unique_ptr<opentelemetry::sdk::trace::SpanData> data) noexcept
   {
     std::unique_ptr<opentelemetry::sdk::trace::SpanData> span_data(
         static_cast<opentelemetry::sdk::trace::SpanData *>(data.release()));
