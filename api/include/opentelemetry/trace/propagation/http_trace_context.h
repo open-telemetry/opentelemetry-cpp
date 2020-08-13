@@ -98,7 +98,8 @@ public:
     for (int i = 0; i < 32; i++)
     {
       tmp = CharToInt(*trc_id);
-      if (tmp < 0) return TraceId(0);
+      if (tmp < 0)
+        return TraceId(0);
       if (i % 2 == 0)
       {
         buf[i / 2] = tmp * 16;
@@ -120,7 +121,8 @@ public:
     for (int i = 0; i < 16; i++)
     {
       tmp = CharToInt(*spn_id);
-      if (tmp < 0) return SpanId(0);
+      if (tmp < 0)
+        return SpanId(0);
       if (i % 2 == 0)
       {
         buf[i / 2] = tmp * 16;
@@ -139,7 +141,8 @@ public:
     uint8_t buf;
     int tmp1 = CharToInt(trace_flags[0]);
     int tmp2 = CharToInt(trace_flags[1]);
-    if (tmp1 < 0 || tmp2 < 0) return TraceFlags(0); // check for invalid char
+    if (tmp1 < 0 || tmp2 < 0)
+      return TraceFlags(0);  // check for invalid char
     buf = tmp1 * 16 + tmp2;
     return TraceFlags(buf);
   }
