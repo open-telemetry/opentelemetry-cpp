@@ -29,7 +29,7 @@ public:
                           nostd::string_view trace_type,
                           nostd::string_view trace_description);
 
-  // Returns the context that is stored in the HTTP header carrier with self defined rules.
+  // Returns the context that is stored in the HTTP header carrier with the getter as extractor.
   virtual context::Context Extract(Getter get_from_carrier,
                                    const T &carrier,
                                    context::Context &context) noexcept = 0;
