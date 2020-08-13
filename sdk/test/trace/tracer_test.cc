@@ -168,8 +168,6 @@ TEST(Tracer, StartSpanWithAttributes)
                              {"attr9", "string"}})
       ->End();
 
-  ASSERT_EQ(1, spans_received->size());
-
   // Start a span with all supported array attribute types.
   int listInt[]                       = {1, 2, 3};
   unsigned int listUInt[]             = {1, 2, 3};
@@ -193,7 +191,7 @@ TEST(Tracer, StartSpanWithAttributes)
 
   tracer->StartSpan("span 2", m)->End();
 
-  auto spans = span_data.get()->GetSpans();
+  auto  spans = span_data.get()->GetSpans();
   ASSERT_EQ(2, spans.size());
 
   auto &cur_span_data = spans.at(0);
@@ -383,10 +381,12 @@ TEST(Tracer, TestParentOrElseSampler)
 
 TEST(Tracer, WithActiveSpan)
 {
+  std::unique_ptr<InMemorySpanExporter> exporter(new InMemorySpanExporter());
+  std::shared_ptr<InMemorySpanData> span_data = exporter.get()->GetData();
+  auto tracer                                 = initTracer(std::move(exporter));
+  auto spans = span_data.get()->GetSpans();
 
-  std::shared_ptr<std::vector<std::unique_ptr<SpanData>>> spans_received(
-      new std::vector<std::unique_ptr<SpanData>>);
-  auto tracer = initTracer(spans_received);
+  ASSERT_EQ(0, spans.size());
 
   {
     auto span_first  = tracer->StartSpan("span 1");
@@ -396,16 +396,20 @@ TEST(Tracer, WithActiveSpan)
       auto span_second  = tracer->StartSpan("span 2");
       auto scope_second = tracer->WithActiveSpan(span_second);
 
-      EXPECT_EQ(0, spans_received->size());
+  spans = span_data.get()->GetSpans();
+  ASSERT_EQ(0, spans.size());
 
       span_second->End();
     }
 
-    EXPECT_EQ(1, spans_received->size());
-    EXPECT_EQ("span 2", spans_received->at(0)->GetName());
+  spans = span_data.get()->GetSpans();
+  ASSERT_EQ(1, spans.size());
+  EXPECT_EQ("span 2", spans.at(0)->GetName());
 
     span_first->End();
   }
-  EXPECT_EQ(2, spans_received->size());
-  EXPECT_EQ("span 1", spans_received->at(1)->GetName());
+
+  spans = span_data.get()->GetSpans();
+  ASSERT_EQ(1, spans.size());
+  EXPECT_EQ("span 1", spans.at(0)->GetName());
 }
