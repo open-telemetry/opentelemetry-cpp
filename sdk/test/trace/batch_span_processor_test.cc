@@ -27,15 +27,12 @@ namespace trace
 class MockSpanExporter final : public SpanExporter
 {
 public:
-  MockSpanExporter(
-      std::shared_ptr<std::vector<std::unique_ptr<SpanData>>> spans_received,
-      std::shared_ptr<std::atomic<bool>> is_shutdown,
-      std::shared_ptr<std::atomic<bool>> is_export_completed,
-      const std::chrono::milliseconds export_delay = std::chrono::milliseconds(0)) noexcept
+  MockSpanExporter(std::shared_ptr<std::vector<std::unique_ptr<SpanData>>> spans_received,
+                   std::shared_ptr<std::atomic<bool>> is_shutdown,
+                   std::shared_ptr<std::atomic<bool>> is_export_completed) noexcept
       : spans_received_(spans_received),
         is_shutdown_(is_shutdown),
-        is_export_completed_(is_export_completed),
-        export_delay_(export_delay)
+        is_export_completed_(is_export_completed)
   {}
 
   std::unique_ptr<Recordable> MakeRecordable() noexcept override
@@ -46,8 +43,6 @@ public:
   ExportResult Export(const nostd::span<std::unique_ptr<Recordable>> &recordables) noexcept override
   {
     *is_export_completed_ = false;
-
-    std::this_thread::sleep_for(export_delay_);
 
     for (auto &recordable : recordables)
     {
@@ -74,8 +69,6 @@ private:
   std::shared_ptr<std::vector<std::unique_ptr<SpanData>>> spans_received_;
   std::shared_ptr<std::atomic<bool>> is_shutdown_;
   std::shared_ptr<std::atomic<bool>> is_export_completed_;
-  // Meant exclusively to test force flush timeout
-  const std::chrono::milliseconds export_delay_;
 };
 
 /**
@@ -89,14 +82,13 @@ public:
       std::shared_ptr<std::atomic<bool>> is_shutdown,
       std::shared_ptr<std::atomic<bool>> is_export_completed =
           std::shared_ptr<std::atomic<bool>>(new std::atomic<bool>(false)),
-      const std::chrono::milliseconds export_delay          = std::chrono::milliseconds(0),
       const std::chrono::milliseconds schedule_delay_millis = std::chrono::milliseconds(5000),
       const size_t max_queue_size                           = 2048,
       const size_t max_export_batch_size                    = 512)
   {
-    return std::shared_ptr<SpanProcessor>(new BatchSpanProcessor(
-        GetMockExporter(spans_received, is_shutdown, is_export_completed, export_delay),
-        max_queue_size, schedule_delay_millis, max_export_batch_size));
+    return std::shared_ptr<SpanProcessor>(
+        new BatchSpanProcessor(GetMockExporter(spans_received, is_shutdown, is_export_completed),
+                               max_queue_size, schedule_delay_millis, max_export_batch_size));
   }
 
   std::unique_ptr<std::vector<std::unique_ptr<Recordable>>> GetTestSpans(
@@ -115,20 +107,14 @@ public:
     return test_spans;
   }
 
-  size_t GetBufferSize(std::shared_ptr<SpanProcessor> &batch_processor)
-  {
-    return static_cast<BatchSpanProcessor *>(batch_processor.get())->buffer_.size();
-  }
-
 private:
   std::unique_ptr<SpanExporter> GetMockExporter(
       std::shared_ptr<std::vector<std::unique_ptr<SpanData>>> spans_received,
       std::shared_ptr<std::atomic<bool>> is_shutdown,
-      std::shared_ptr<std::atomic<bool>> is_export_completed,
-      const std::chrono::milliseconds export_delay = std::chrono::milliseconds(0))
+      std::shared_ptr<std::atomic<bool>> is_export_completed)
   {
     return std::unique_ptr<SpanExporter>(
-        new MockSpanExporter(spans_received, is_shutdown, is_export_completed, export_delay));
+        new MockSpanExporter(spans_received, is_shutdown, is_export_completed));
   }
 };
 
@@ -277,12 +263,11 @@ TEST_F(BatchSpanProcessorTestPeer, TestScheduleDelayMillis)
   std::shared_ptr<std::vector<std::unique_ptr<SpanData>>> spans_received(
       new std::vector<std::unique_ptr<SpanData>>);
 
-  const std::chrono::milliseconds export_delay(0);
   const std::chrono::milliseconds schedule_delay_millis(2000);
   const size_t max_export_batch_size = 512;
 
-  auto batch_processor = GetMockProcessor(spans_received, is_shutdown, is_export_completed,
-                                          export_delay, schedule_delay_millis);
+  auto batch_processor =
+      GetMockProcessor(spans_received, is_shutdown, is_export_completed, schedule_delay_millis);
 
   auto test_spans = GetTestSpans(batch_processor, max_export_batch_size);
 
@@ -320,11 +305,10 @@ TEST_F(BatchSpanProcessorTestPeer, TestForkHandlers)
   std::shared_ptr<std::vector<std::unique_ptr<SpanData>>> spans_received(
       new std::vector<std::unique_ptr<SpanData>>);
 
-  const std::chrono::milliseconds export_delay(0);
   const std::chrono::milliseconds schedule_delay_millis(1000);
 
-  auto batch_processor = GetMockProcessor(spans_received, is_shutdown, is_export_completed,
-                                          export_delay, schedule_delay_millis);
+  auto batch_processor =
+      GetMockProcessor(spans_received, is_shutdown, is_export_completed, schedule_delay_millis);
 
   auto provider = nostd::shared_ptr<opentelemetry::trace::TracerProvider>(
       new sdk::trace::TracerProvider(batch_processor));
