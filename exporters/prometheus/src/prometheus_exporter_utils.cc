@@ -23,8 +23,6 @@
 #include "opentelemetry/sdk/metrics/aggregator/aggregator.h"
 #include "prometheus/metric_type.h"
 
-#define QUANTILE_STEP 0.25
-
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace exporter
 {
@@ -68,10 +66,14 @@ void PrometheusExporterUtils::SetMetricFamily(metric_sdk::Record &record,
 {
   try
   {
-    auto sanitized      = SanitizeNames(record.GetName());
+    auto origin_name = record.GetName();
+    auto sanitized   = SanitizeNames(origin_name);
+    if (origin_name != sanitized)
+    {
+      std::cout << "Sanitized metric name \"" << origin_name << "\" to \"" << sanitized << "\""
+                << std::endl;
+    }
     metric_family->name = sanitized;
-    std::cout << "Sanitized metric name \"" << record.GetName() << "\" to \"" << sanitized << "\""
-              << std::endl;
   }
   catch (std::invalid_argument &e)
   {
@@ -193,20 +195,23 @@ void PrometheusExporterUtils::SetMetricFamilyByAggregator(
   }
   else if (type == prometheus_client::MetricType::Summary)  // Sketch, Exact
   {
+    std::vector<double> quantile_points = {0, 0.5, 0.9, 0.95, 0.99, 1};
     if (kind == metric_sdk::AggregatorKind::Exact)
     {
       std::vector<T> quantiles;
       bool do_quantile = aggregator->get_quant_estimation();
       if (do_quantile)
       {
-        quantiles = GetQuantilesVector(aggregator);
+        quantiles = GetQuantilesVector(aggregator, quantile_points);
       }
-      SetData(checkpointed_values, kind, quantiles, labels_str, time, metric_family, do_quantile);
+      SetData(checkpointed_values, kind, quantiles, labels_str, time, metric_family, do_quantile,
+              quantile_points);
     }
     else if (kind == metric_sdk::AggregatorKind::Sketch)
     {
-      auto quantiles = GetQuantilesVector(aggregator);
-      SetData(checkpointed_values, kind, quantiles, labels_str, time, metric_family, true);
+      auto quantiles = GetQuantilesVector(aggregator, quantile_points);
+      SetData(checkpointed_values, kind, quantiles, labels_str, time, metric_family, true,
+              quantile_points);
     }
   }
   else  // Counter, Gauge, MinMaxSumCount, Untyped
@@ -312,12 +317,13 @@ void PrometheusExporterUtils::SetData(std::vector<T> values,
                                       const std::string &labels,
                                       std::chrono::nanoseconds time,
                                       prometheus_client::MetricFamily *metric_family,
-                                      bool do_quantile)
+                                      bool do_quantile,
+                                      std::vector<double> quantile_points)
 {
   metric_family->metric.emplace_back();
   prometheus_client::ClientMetric &metric = metric_family->metric.back();
   SetMetricBasic(metric, time, labels);
-  SetValue(values, kind, quantiles, &metric, do_quantile);
+  SetValue(values, kind, quantiles, &metric, do_quantile, quantile_points);
 }
 
 /**
@@ -337,10 +343,14 @@ void PrometheusExporterUtils::SetMetricBasic(prometheus_client::ClientMetric &me
     {
       try
       {
-        auto sanitized       = SanitizeNames(label_pairs[i].first);
+        auto origin_name = label_pairs[i].first;
+        auto sanitized   = SanitizeNames(origin_name);
+        if (origin_name != sanitized)
+        {
+          std::cout << "Sanitized label name \"" << origin_name << "\" to \"" << sanitized << "\""
+                    << std::endl;
+        }
         metric.label[i].name = sanitized;
-        std::cout << "Sanitized label name \"" << label_pairs[i].first << "\" to \"" << sanitized
-                  << "\"" << std::endl;
       }
       catch (std::invalid_argument &e)
       {
@@ -390,10 +400,11 @@ std::vector<std::pair<std::string, std::string>> PrometheusExporterUtils::ParseL
  */
 template <typename T>
 std::vector<T> PrometheusExporterUtils::GetQuantilesVector(
-    nostd::shared_ptr<metric_sdk::Aggregator<T>> aggregator)
+    nostd::shared_ptr<metric_sdk::Aggregator<T>> aggregator,
+    const std::vector<double> &quantile_points)
 {
   std::vector<T> quantiles;
-  for (double q = 0; q <= 1; q += QUANTILE_STEP)
+  for (double q : quantile_points)
   {
     T quantile = aggregator->get_quantiles(q);
     quantiles.emplace_back(quantile);
@@ -475,7 +486,8 @@ void PrometheusExporterUtils::SetValue(std::vector<T> values,
                                        metric_sdk::AggregatorKind kind,
                                        std::vector<T> quantiles,
                                        prometheus_client::ClientMetric *metric,
-                                       bool do_quantile)
+                                       bool do_quantile,
+                                       const std::vector<double> &quantile_points)
 {
   if (kind == metric_sdk::AggregatorKind::Exact)
   {
@@ -495,14 +507,12 @@ void PrometheusExporterUtils::SetValue(std::vector<T> values,
 
   if (do_quantile)
   {
-    double quant = 0;
     std::vector<prometheus_client::ClientMetric::Quantile> prometheus_quantiles;
     for (int i = 0; i < quantiles.size(); i++)
     {
       prometheus_client::ClientMetric::Quantile quantile;
-      quantile.quantile = quant;
+      quantile.quantile = quantile_points[i];
       quantile.value    = quantiles[i];
-      quant += QUANTILE_STEP;
       prometheus_quantiles.emplace_back(quantile);
     }
     metric->summary.quantile = prometheus_quantiles;
