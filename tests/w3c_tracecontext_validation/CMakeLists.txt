@@ -1,5 +1,5 @@
 add_library(
-  tracecontext_validation
+  opentelemetry_w3c_validation
   tracecontext_client.h
   tracecontext_server.h
   tracecontext_validate.cc
