@@ -1,6 +1,6 @@
 package(default_visibility = ["//visibility:public"])
 
-cc_binary(
+cc_library(
     name = "tracecontext_validation",
     srcs = glob(["**/*.cc"]),
     hdrs = glob(["**/*.h"]),
