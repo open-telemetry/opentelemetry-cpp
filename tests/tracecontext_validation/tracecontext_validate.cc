@@ -1,4 +1,4 @@
-#include "../../tests/tracecontext_validation/tracecontext_client.h"
+#include "tracecontext_validation/tracecontext_client.h"
 #include "tracecontext_validation/tracecontext_server.h"
 
 #include <algorithm>
