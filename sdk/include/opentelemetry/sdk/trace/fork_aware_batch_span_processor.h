@@ -2,7 +2,7 @@
 
 #include "opentelemetry/sdk/common/circular_buffer.h"
 #include "opentelemetry/sdk/trace/exporter.h"
-#include "opentelemetry/sdk/trace/processor.h"
+#include "opentelemetry/sdk/trace/fork_aware_span_processor.h"
 
 #include <atomic>
 #include <condition_variable>
@@ -19,7 +19,7 @@ namespace trace
  * This is an implementation of the SpanProcessor which creates batches of finished spans and passes
  * the export-friendly span data representations to the configured SpanExporter.
  */
-class BatchSpanProcessor : public SpanProcessor
+class ForkAwareBatchSpanProcessor : public ForkAwareSpanProcessor
 {
 public:
   /**
@@ -33,7 +33,7 @@ public:
    * @param max_export_batch_size - The maximum batch size of every export. It must be smaller or
    * equal to max_queue_size
    */
-  explicit BatchSpanProcessor(
+  explicit ForkAwareBatchSpanProcessor(
       std::unique_ptr<SpanExporter> &&exporter,
       const size_t max_queue_size                           = 2048,
       const std::chrono::milliseconds schedule_delay_millis = std::chrono::milliseconds(5000),
@@ -85,7 +85,7 @@ public:
    * shared ownership of the processor, and thus doesn't call Shutdown (as the processor might be
    * shared with other Tracers).
    */
-  ~BatchSpanProcessor();
+  ~ForkAwareBatchSpanProcessor();
 
 private:
   /**
@@ -108,6 +108,21 @@ private:
    * passes them to the exporter.
    */
   void DrainQueue();
+
+  /**
+   * Handler called prior to forking.
+   */
+  void PrepareForFork() noexcept;
+
+  /**
+   * Handler called in the parent process after a fork.
+   */
+  void OnForkedParent() noexcept;
+
+  /**
+   * Handler called in the child process after a fork.
+   */
+  void OnForkedChild() noexcept;
 
   /* The configured backend exporter */
   std::unique_ptr<SpanExporter> exporter_;

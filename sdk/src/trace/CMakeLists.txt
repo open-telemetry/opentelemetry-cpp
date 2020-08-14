@@ -4,6 +4,8 @@ add_library(
   tracer.cc
   span.cc
   batch_span_processor.cc
+  fork_aware_batch_span_processor.cc
   fork_aware_span_processor.cc
+  fork_aware_exporter.cc
   samplers/parent_or_else.cc
   samplers/probability.cc)

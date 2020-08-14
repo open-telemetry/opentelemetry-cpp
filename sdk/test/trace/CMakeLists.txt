@@ -9,7 +9,9 @@ foreach(
   parent_or_else_sampler_test
   probability_sampler_test
   batch_span_processor_test
-  attribute_utils_test)
+  attribute_utils_test
+  fork_aware_batch_span_processor_test
+  fork_aware_simple_processor_test
   fork_aware_span_processor_test)
   add_executable(${testname} "${testname}.cc")
   target_link_libraries(

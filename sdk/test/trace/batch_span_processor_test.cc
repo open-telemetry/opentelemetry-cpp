@@ -7,12 +7,6 @@
 
 #include <gtest/gtest.h>
 
-#ifdef __unix__
-#  include <sys/mman.h>
-#  include <sys/wait.h>
-#  include <unistd.h>
-#endif
-
 #include <chrono>
 #include <thread>
 
@@ -62,8 +56,6 @@ public:
   {
     *is_shutdown_ = true;
   }
-
-  bool IsExportCompleted() { return is_export_completed_->load(); }
 
 private:
   std::shared_ptr<std::vector<std::unique_ptr<SpanData>>> spans_received_;
@@ -290,80 +282,6 @@ TEST_F(BatchSpanProcessorTestPeer, TestScheduleDelayMillis)
     EXPECT_EQ("Span " + std::to_string(i), spans_received->at(i)->GetName());
   }
 }
-
-#ifdef __unix__
-#  if !defined(__SANITIZE_THREAD__) && !defined(__SANITIZE_ADDRESS__)
-TEST_F(BatchSpanProcessorTestPeer, TestForkHandlers)
-{
-  // Create shared memory
-  bool *did_child_tests_pass = static_cast<bool *>(
-      mmap(nullptr, sizeof(bool), PROT_READ | PROT_WRITE, MAP_SHARED | MAP_ANONYMOUS, -1, 0));
-  *did_child_tests_pass = false;
-
-  std::shared_ptr<std::atomic<bool>> is_shutdown(new std::atomic<bool>(false));
-  std::shared_ptr<std::atomic<bool>> is_export_completed(new std::atomic<bool>(false));
-  std::shared_ptr<std::vector<std::unique_ptr<SpanData>>> spans_received(
-      new std::vector<std::unique_ptr<SpanData>>);
-
-  const std::chrono::milliseconds schedule_delay_millis(1000);
-
-  auto batch_processor =
-      GetMockProcessor(spans_received, is_shutdown, is_export_completed, schedule_delay_millis);
-
-  auto provider = nostd::shared_ptr<opentelemetry::trace::TracerProvider>(
-      new sdk::trace::TracerProvider(batch_processor));
-
-  auto tracer = provider->GetTracer("Test tracer");
-
-  // Create a span in the parent process
-  auto span = tracer->StartSpan("Span");
-  span->End();
-
-  std::this_thread::sleep_for(schedule_delay_millis + std::chrono::milliseconds(50));
-  // The span in the parent process will now be exported
-  EXPECT_TRUE(is_export_completed->load());
-
-  pid_t child_pid = fork();
-
-  if (child_pid == 0)
-  {
-    // CHILD PROCESS
-
-    // Reset MockExporter private members.
-    // This will automatically be handled after a ForkAwareExporter is implemented.
-    spans_received->clear();
-    *is_export_completed = false;
-
-    // Generate some spans
-    for (int i = 0; i < 3; ++i)
-    {
-      auto span = tracer->StartSpan("Span");
-    }
-
-    std::this_thread::sleep_for(schedule_delay_millis + std::chrono::milliseconds(50));
-
-    // Spans should now be exported in the child process
-    *did_child_tests_pass = is_export_completed->load() == true && spans_received->size() == 3;
-
-    batch_processor->Shutdown();
-
-    // End child process
-    std::exit(0);
-  }
-
-  // We only created one span in the parent process
-  EXPECT_EQ(1, spans_received->size());
-
-  // Wait for child process to finish
-  waitpid(child_pid, nullptr, 0);
-
-  EXPECT_TRUE(*did_child_tests_pass);
-
-  munmap(did_child_tests_pass, sizeof(bool));
-}
-#  endif
-#endif
-
 }  // namespace trace
 }  // namespace sdk
 OPENTELEMETRY_END_NAMESPACE

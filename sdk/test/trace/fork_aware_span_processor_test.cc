@@ -20,16 +20,16 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
+#include <gtest/gtest.h>
 #include <memory>
 
-#include <gtest/gtest.h>
+#include "opentelemetry/context/threadlocal_context.h"
 #include "opentelemetry/sdk/trace/fork_aware_span_processor.h"
 
 using namespace opentelemetry::sdk::trace;
 
 class DummySpanProcessor : public ForkAwareSpanProcessor
 {
-
   std::unique_ptr<Recordable> MakeRecordable() noexcept { return nullptr; }
 
   void OnStart(Recordable &) noexcept {}
