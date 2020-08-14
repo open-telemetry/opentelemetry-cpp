@@ -327,8 +327,8 @@ TEST(PrometheusExporterUtils, TranslateToPrometheusExact)
       new metric_sdk::ExactAggregator<int>(metric_api::InstrumentKind::Counter, true));
 
   std::vector<metric_sdk::Record> collection;
-  int count_num = 10;
-  for (int i = 0; i < count_num; i++)
+  int count_num = 100;
+  for (int i = 0; i <= count_num; i++)
   {
     aggregator->update(i);
   }
@@ -340,16 +340,17 @@ TEST(PrometheusExporterUtils, TranslateToPrometheusExact)
   ASSERT_EQ(translated.size(), collection.size());
 
   auto metric           = translated[0];
-  std::vector<int> vals = {count_num, 45};
+  std::vector<int> vals = {101, 5050};
   assert_basic(metric, "test_exact_metric_record_v_1_0", record.GetDescription(),
                prometheus_client::MetricType::Summary, 3, vals);
   auto quantile = metric.metric[0].summary.quantile;
-  ASSERT_EQ(quantile.size(), 5);
+  ASSERT_EQ(quantile.size(), 6);
   ASSERT_DOUBLE_EQ(quantile[0].value, 0);
-  ASSERT_DOUBLE_EQ(quantile[1].value, 3);
-  ASSERT_DOUBLE_EQ(quantile[2].value, 5);
-  ASSERT_DOUBLE_EQ(quantile[3].value, 7);
-  ASSERT_DOUBLE_EQ(quantile[4].value, 9);
+  ASSERT_DOUBLE_EQ(quantile[1].value, 50);
+  ASSERT_DOUBLE_EQ(quantile[2].value, 90);
+  ASSERT_DOUBLE_EQ(quantile[3].value, 95);
+  ASSERT_DOUBLE_EQ(quantile[4].value, 99);
+  ASSERT_DOUBLE_EQ(quantile[5].value, 100);
 }
 
 TEST(PrometheusExporterUtils, TranslateToPrometheusExactNoQuantile)
@@ -409,7 +410,7 @@ TEST(PrometheusExporterUtils, TranslateToPrometheusSketch)
       new metric_sdk::SketchAggregator<int>(metric_api::InstrumentKind::Counter, 0.0005));
 
   std::vector<metric_sdk::Record> collection;
-  for (int i = 0; i < 20; i++)
+  for (int i = 0; i <= 100; i++)
   {
     aggregator->update(i);
   }
@@ -426,12 +427,13 @@ TEST(PrometheusExporterUtils, TranslateToPrometheusSketch)
                prometheus_client::MetricType::Summary, 2, vals);
 
   auto quantile = metric.metric[0].summary.quantile;
-  ASSERT_EQ(quantile.size(), 5);
+  ASSERT_EQ(quantile.size(), 6);
   ASSERT_DOUBLE_EQ(quantile[0].value, 0);
-  ASSERT_DOUBLE_EQ(quantile[1].value, 4);
-  ASSERT_DOUBLE_EQ(quantile[2].value, 9);
-  ASSERT_DOUBLE_EQ(quantile[3].value, 14);
-  ASSERT_DOUBLE_EQ(quantile[4].value, 18);
+  ASSERT_DOUBLE_EQ(quantile[1].value, 49);
+  ASSERT_DOUBLE_EQ(quantile[2].value, 89);
+  ASSERT_DOUBLE_EQ(quantile[3].value, 94);
+  ASSERT_DOUBLE_EQ(quantile[4].value, 98);
+  ASSERT_DOUBLE_EQ(quantile[5].value, 99);
 }
 
 TEST(PrometheusExporterUtils, TranslateToPrometheusMultipleAggregators)
