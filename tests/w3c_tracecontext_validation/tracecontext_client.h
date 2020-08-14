@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <curl.h>
+#include <curl>
 #include <stdio.h>
 #include <iterator>
 #include <string>

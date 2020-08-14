@@ -10,7 +10,7 @@
 #include <string>
 #include <vector>
 #include <algorithm>
-#include <curl.h>
+#include <curl>
 
 namespace HTTP_SERVER_NS {
 
