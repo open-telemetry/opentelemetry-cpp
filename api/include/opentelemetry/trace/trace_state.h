@@ -105,7 +105,7 @@ public:
   {
     for (const auto &entry : trace_state.Entries())
     {
-      Set(entry.GetKey(), entry.GetValue);
+      Set(entry.GetKey(), entry.GetValue());
     }
     num_entries_ = trace_state.num_entries_;
   }
@@ -113,7 +113,7 @@ public:
   {
     for (const auto &entry : trace_state.Entries())
     {
-      Set(entry.GetKey(), entry.GetValue);
+      Set(entry.GetKey(), entry.GetValue());
     }
     num_entries_ = trace_state.num_entries_;
   }
