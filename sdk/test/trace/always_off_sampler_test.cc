@@ -1,3 +1,4 @@
+#include "opentelemetry/context/threadlocal_context.h"
 #include "opentelemetry/sdk/trace/samplers/always_off.h"
 
 #include <gtest/gtest.h>

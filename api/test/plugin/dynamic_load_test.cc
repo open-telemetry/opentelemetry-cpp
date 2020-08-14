@@ -1,4 +1,5 @@
 #include "opentelemetry/plugin/dynamic_load.h"
+#include "opentelemetry/context/threadlocal_context.h"
 
 #include <gtest/gtest.h>
 

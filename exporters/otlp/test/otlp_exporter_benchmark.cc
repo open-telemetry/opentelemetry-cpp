@@ -1,3 +1,4 @@
+#include "opentelemetry/context/threadlocal_context.h"
 #include "opentelemetry/exporters/otlp/otlp_exporter.h"
 #include "opentelemetry/exporters/otlp/recordable.h"
 

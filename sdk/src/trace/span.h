@@ -45,12 +45,16 @@ public:
   trace_api::SpanContext GetContext() const noexcept override { return trace_api::SpanContext(); }
   //  trace_api::Tracer &tracer() const noexcept override { return *tracer_; }
 
+  void SetToken(nostd::unique_ptr<context::Token> &&token) noexcept override;
+
 private:
   std::shared_ptr<trace_api::Tracer> tracer_;
   std::shared_ptr<SpanProcessor> processor_;
   mutable std::mutex mu_;
   std::unique_ptr<Recordable> recordable_;
   opentelemetry::core::SteadyTimestamp start_steady_time;
+  bool has_ended_;
+  nostd::unique_ptr<context::Token> token_;
 };
 }  // namespace trace
 }  // namespace sdk

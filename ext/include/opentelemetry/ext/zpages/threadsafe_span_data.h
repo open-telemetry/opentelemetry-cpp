@@ -179,8 +179,7 @@ public:
           trace_api::KeyValueIterableView<std::map<std::string, int>>({})) noexcept override
   {
     std::lock_guard<std::mutex> lock(mutex_);
-    events_.push_back(SpanDataEvent(std::string(name), timestamp));
-    // TODO: handle attributes
+    events_.push_back(SpanDataEvent(std::string(name), timestamp, attributes));
   }
 
   ThreadsafeSpanData() {}

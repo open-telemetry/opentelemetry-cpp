@@ -6,12 +6,19 @@
 #include "opentelemetry/core/timestamp.h"
 #include "opentelemetry/nostd/span.h"
 #include "opentelemetry/nostd/string_view.h"
+#include "opentelemetry/nostd/unique_ptr.h"
 #include "opentelemetry/trace/canonical_code.h"
 #include "opentelemetry/trace/key_value_iterable_view.h"
 #include "opentelemetry/trace/span_context.h"
 #include "opentelemetry/version.h"
 
+constexpr char SpanKey[] = "span_key";
+
 OPENTELEMETRY_BEGIN_NAMESPACE
+namespace context
+{
+class Token;
+}
 namespace trace
 {
 enum class SpanKind
@@ -23,17 +30,19 @@ enum class SpanKind
   kConsumer,
 };
 /**
- * StartSpanOptions provides options to set properties of a Span at the time of its creation
+ * StartSpanOptions provides options to set properties of a Span at the time of
+ * its creation
  */
 struct StartSpanOptions
 {
   // Optionally sets the start time of a Span.
   //
-  // If the start time of a Span is set, timestamps from both the system clock and steady clock
-  // must be provided.
+  // If the start time of a Span is set, timestamps from both the system clock
+  // and steady clock must be provided.
   //
-  // Timestamps from the steady clock can be used to most accurately measure a Span's
-  // duration, while timestamps from the system clock can be used to most accurately place a Span's
+  // Timestamps from the steady clock can be used to most accurately measure a
+  // Span's duration, while timestamps from the system clock can be used to most
+  // accurately place a Span's
   // time point relative to other Spans collected across a distributed system.
   core::SystemTimestamp start_system_time;
   core::SteadyTimestamp start_steady_time;
@@ -75,7 +84,8 @@ public:
   Span &operator=(const Span &) = delete;
   Span &operator=(Span &&) = delete;
 
-  // Sets an attribute on the Span. If the Span previously contained a mapping for
+  // Sets an attribute on the Span. If the Span previously contained a mapping
+  // for
   // the key, the old value is replaced.
   virtual void SetAttribute(nostd::string_view key,
                             const common::AttributeValue &value) noexcept = 0;
@@ -129,7 +139,8 @@ public:
                        attributes.begin(), attributes.end()});
   }
 
-  // Sets the status of the span. The default status is OK. Only the value of the last call will be
+  // Sets the status of the span. The default status is OK. Only the value of
+  // the last call will be
   // recorded, and implementations are free to ignore previous calls.
   virtual void SetStatus(CanonicalCode code, nostd::string_view description) noexcept = 0;
 
@@ -152,6 +163,8 @@ public:
   // Returns true if this Span is recording tracing events (e.g. SetAttribute,
   // AddEvent).
   virtual bool IsRecording() const noexcept = 0;
+
+  virtual void SetToken(nostd::unique_ptr<context::Token> &&token) noexcept = 0;
 };
 }  // namespace trace
 OPENTELEMETRY_END_NAMESPACE

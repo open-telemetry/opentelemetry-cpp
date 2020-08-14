@@ -1,3 +1,4 @@
+#include "opentelemetry/context/threadlocal_context.h"
 #include "opentelemetry/sdk/trace/simple_processor.h"
 #include "opentelemetry/sdk/trace/tracer_provider.h"
 #include "opentelemetry/trace/provider.h"
