@@ -9,7 +9,7 @@ cc_binary(
         "//api",
         "//ext:headers",
         "//sdk:headers",
-        "//tests"
+        "//tests",
         "@github_nlohmann_json//:json",
     ],
 )
