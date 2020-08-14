@@ -1,5 +1,3 @@
-#pragma once
-
 #include "tracecontext_client.h"
 #include "tracecontext_server.h"
 
@@ -10,7 +8,7 @@
 #include <string>
 #include <vector>
 #include <algorithm>
-#include <curl>
+#include "curl/curl.h"
 
 namespace HTTP_SERVER_NS {
 

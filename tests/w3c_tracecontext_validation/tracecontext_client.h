@@ -12,11 +12,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <curl>
 #include <stdio.h>
 #include <iterator>
 #include <string>
 #include <vector>
+#include "curl/curl.h"
 
 #pragma once
 
