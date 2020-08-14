@@ -7,7 +7,7 @@
 #include <unordered_map>
 #include <vector>
 
-#include "opentelemetry/ext/http/server/http_server.h"
+#include "../../ext/include/opentelemetry/ext/http/server/http_server.h"
 #include "tracecontext_client.h"
 
 namespace HTTP_SERVER_NS
@@ -29,7 +29,7 @@ protected:
     addListeningPort(port);
   };
 
-  void SetClientManager(HttpClients &http_clients) { clients = http_clients; }
+  void SetClientManager(HTTP_SERVER_NS::HttpClients &http_clients) { clients = http_clients; }
 
   /**
    * Set the HTTP server to serve static files from the root of host:port.
