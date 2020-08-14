@@ -1,7 +1,7 @@
 #pragma once
 
-#include "opentelemetry/tests/w3c_tracecontext_validation/tracecontext_client.h"
-#include "opentelemetry/tests/w3c_tracecontext_validation/tracecontext_server.h"
+#include "tracecontext_client.h"
+#include "tracecontext_server.h"
 
 #include <atomic>
 #include <fstream>
