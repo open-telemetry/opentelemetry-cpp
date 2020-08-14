@@ -18,9 +18,7 @@
 #include "opentelemetry/trace/span_id.h"
 #include "opentelemetry/trace/trace_flags.h"
 #include "opentelemetry/trace/trace_id.h"
-//  The commented out code below are ones that are related to TraceState. Needs to be uncommented
-//  after TraceState is merged.
-//#include "opentelemetry/trace/trace_state.h"
+#include "opentelemetry/trace/trace_state.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace trace
@@ -54,12 +52,14 @@ public:
     remote_parent_ = has_remote_parent;
   }
   SpanContext(SpanContext &&ctx)
-      : trace_id_(ctx.trace_id()), span_id_(ctx.span_id()), trace_flags_(ctx.trace_flags())
-        trace_state_(std::move(ctx.trace_state_))
+      : trace_id_(ctx.trace_id()),
+        span_id_(ctx.span_id()),
+        trace_flags_(ctx.trace_flags()) trace_state_(std::move(ctx.trace_state_))
   {}
   SpanContext(const SpanContext &ctx)
-      : trace_id_(ctx.trace_id()), span_id_(ctx.span_id()), trace_flags_(ctx.trace_flags())
-        trace_state_(new TraceState(ctx.trace_state()))
+      : trace_id_(ctx.trace_id()),
+        span_id_(ctx.span_id()),
+        trace_flags_(ctx.trace_flags()) trace_state_(new TraceState(ctx.trace_state()))
   {}
 
   SpanContext &operator=(const SpanContext &ctx)
