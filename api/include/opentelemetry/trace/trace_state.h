@@ -101,10 +101,22 @@ public:
   TraceState() noexcept : entries_(new Entry[kMaxKeyValuePairs]), num_entries_(0) {}
 
   // movable and copiable
-  TraceState(TraceState &&trace_state) : entries_(trace_state.entries_),
-                                         num_entries_(trace_state.num_entries_) {}
-  TraceState(const TraceState &trace_state) : entries_(spn.GetContext()),
-                                              num_entries_(trace_state.num_entries_) {}
+  TraceState(TraceState &&trace_state)
+  {
+    for (const auto &entry : trace_state.Entries())
+    {
+      Set(entry.GetKey(), entry.GetValue);
+    }
+    num_entries_ = trace_state.num_entries_;
+  }
+  TraceState(const TraceState &trace_state)
+  {
+    for (const auto &entry : trace_state.Entries())
+    {
+      Set(entry.GetKey(), entry.GetValue);
+    }
+    num_entries_ = trace_state.num_entries_;
+  }
 
   // Returns false if no such key, otherwise returns true and populates the value parameter with the
   // associated value.
