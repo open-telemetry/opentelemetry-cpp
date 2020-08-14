@@ -9,7 +9,7 @@ cc_library(
         "//api",
         "//ext:headers",
         "//sdk:headers",
-        "//tests",
+        "//tests:headers",
         "@github_nlohmann_json//:json",
     ],
 )
