@@ -7,7 +7,7 @@
 #include <unordered_map>
 #include <vector>
 
-#include "../../ext/include/opentelemetry/ext/http/server/http_server.h"
+#include "opentelemetry/ext/http/server/http_server.h"
 #include "tracecontext_client.h"
 
 namespace HTTP_SERVER_NS
