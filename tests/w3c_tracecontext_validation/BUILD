@@ -1,10 +1,10 @@
 package(default_visibility = ["//visibility:public"])
 
-cc_library(
+cc_binary(
     name = "tracecontext_validation",
     srcs = glob(["**/*.cc"]),
     hdrs = glob(["**/*.h"]),
-    include_prefix = "ext/zpages",
+    include_prefix = "ext/http/server",
     deps = [
         "//api",
         "//ext:headers",
