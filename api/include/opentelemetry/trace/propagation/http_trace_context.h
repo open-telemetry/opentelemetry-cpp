@@ -326,7 +326,7 @@ private:
 
   static TraceState ExtractTraceState(nostd::string_view &trace_state_header)
   {
-    std::cout<<1<<std::endl;
+    std::cout<<"trace_state_header is "<<trace_state_header<<std::endl;
     TraceState trace_state = TraceState();
     int start_pos          = -1;
     int end_pos            = -1;
