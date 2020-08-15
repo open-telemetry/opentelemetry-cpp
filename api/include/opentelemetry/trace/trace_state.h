@@ -108,6 +108,7 @@ public:
     }
     num_entries_ = trace_state.num_entries_;
   }
+
   TraceState(const TraceState &trace_state)
   {
     for (const auto &entry : trace_state.Entries())
@@ -115,6 +116,18 @@ public:
       Set(entry.GetKey(), entry.GetValue());
     }
     num_entries_ = trace_state.num_entries_;
+  }
+
+  bool operator==(const TraceState &that) const noexcept
+  {
+    if (num_entries_ != that.num_entries_) return false;
+    nostd::string_view value;
+    for (const auto &entry : that.Entries())
+    {
+      Get(entry.GetKey(), value);
+      if (value != entry.GetValue()) return false;
+    }
+    return true;
   }
 
   // Returns false if no such key, otherwise returns true and populates the value parameter with the
