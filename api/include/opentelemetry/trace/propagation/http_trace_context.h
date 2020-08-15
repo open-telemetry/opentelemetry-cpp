@@ -408,6 +408,7 @@ private:
       return context_from_parent_header;
     }
 
+    std::cout<<"trace parent complete"<<std::endl;
     nostd::string_view trace_state_header = getter(carrier, kTraceState);
     if (trace_state_header == "" || trace_state_header.empty())
     {
