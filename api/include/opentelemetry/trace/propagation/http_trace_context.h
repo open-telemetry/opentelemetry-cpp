@@ -80,7 +80,7 @@ public:
     SpanContext span_context    = ExtractImpl(getter, carrier);
     nostd::string_view span_key = "current-span";
     std::cout<<"context get"<<std::endl;
-    for (const auto &entry : trace_state.Entries())
+    for (const auto &entry : span_context.trace_state().Entries())
     {
       std::cout<<"displaying: "<<entry.GetKey()<<" "<<entry.GetValue()<<std::endl;
     }
