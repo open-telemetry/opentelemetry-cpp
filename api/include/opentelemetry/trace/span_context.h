@@ -66,7 +66,7 @@ public:
     {
       std::cout<<"displaying: "<<entry.GetKey()<<" "<<entry.GetValue()<<std::endl;
     }
-    trace_state_(new TraceState(ctx.trace_state()));
+//    trace_state_(new TraceState(ctx.trace_state()));
   }
 
   SpanContext &operator=(const SpanContext &ctx)
