@@ -370,7 +370,6 @@ private:
           start_pos = i;
       }
     }
-    std::cout<<2<<std::endl;
     if (start_pos != -1 && end_pos != -1)
     {
       if (ctr_pos != -1)
@@ -387,11 +386,11 @@ private:
       }
       element_num++;
     }
-    std::cout<<3<<std::endl;
     if (element_num >= kTraceStateMaxMembers)
     {
       return TraceState();  // too many k-v pairs will result in an invalid trace state
     }
+    std::cout<<"trace state returned"<<std::endl;
     return trace_state;
   }
 
