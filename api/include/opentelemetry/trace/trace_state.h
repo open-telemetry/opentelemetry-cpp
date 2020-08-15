@@ -128,7 +128,7 @@ public:
   {
     std::cout<<"copying"<<std::endl;
     entries_.reset(new Entry[kMaxKeyValuePairs]);
-    std::cout<<"copying1"<<std::std::endl;
+    std::cout<<"copying1"<<std::endl;
     num_entries_ = 0;
     for (const auto &entry : trace_state.Entries())
     {
