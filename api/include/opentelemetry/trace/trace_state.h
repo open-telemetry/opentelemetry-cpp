@@ -97,15 +97,15 @@ public:
     nostd::unique_ptr<const char[]> CopyStringToPointer(nostd::string_view str)
     {
       try {
-        std::cout<<"A"<<std::endl;
-        std::cout<<str<<std::endl;
+        //std::cout<<"A"<<std::endl;
+        //std::cout<<str<<std::endl;
         nostd::unique_ptr<char[]> temp(new char[str.size() + 1]);
-        std::cout<<"B"<<std::endl;
+        //std::cout<<"B"<<std::endl;
         strcpy(temp.get(), str.data());
-        std::cout<<"C"<<std::endl;
+        //std::cout<<"C"<<std::endl;
         return nostd::unique_ptr<const char[]>(temp.release());
       } catch (std::exception& e) {
-        std::cout << e.what() << '\n';
+        //std::cout << e.what() << '\n';
         throw;
       }
     }
@@ -117,23 +117,23 @@ public:
   // movable and copiable
   TraceState(TraceState &&trace_state)
   {
-    std::cout<<"moving"<<std::endl;
+    //std::cout<<"moving"<<std::endl;
     entries_.reset(new Entry[kMaxKeyValuePairs]);
-    std::cout<<"moving1"<<std::endl;
+    //std::cout<<"moving1"<<std::endl;
     num_entries_ = 0;
     for (const auto &entry : trace_state.Entries())
     {
-      std::cout<<"moving2"<<std::endl;
+      //std::cout<<"moving2"<<std::endl;
       Entry copy = entry;
       (entries_.get())[num_entries_] = Entry(copy);
       num_entries_++;
     }
-    std::cout<<"moving3"<<std::endl;
+    //std::cout<<"moving3"<<std::endl;
   }
 
   TraceState(const TraceState &trace_state)
   {
-    std::cout<<"copying"<<std::endl;
+    //std::cout<<"copying"<<std::endl;
     entries_.reset(new Entry[kMaxKeyValuePairs]);
     num_entries_ = 0;
     for (const auto &entry : trace_state.Entries())
@@ -142,7 +142,7 @@ public:
       (entries_.get())[num_entries_] = Entry(copy);
       num_entries_++;
     }
-    std::cout<<"copying2"<<std::endl;
+    //std::cout<<"copying2"<<std::endl;
   }
 
   bool operator==(const TraceState &that) const noexcept
@@ -178,7 +178,7 @@ public:
   // succesfully, false otherwise. If value is null or entries_ is full, this function is a no-op.
   bool Set(nostd::string_view key, nostd::string_view value) noexcept
   {
-    std::cout<<"setting: "<<key<<" "<<value<<std::endl;
+    //std::cout<<"setting: "<<key<<" "<<value<<std::endl;
     if (value.empty() || num_entries_ >= kMaxKeyValuePairs)
     {
       return false;
@@ -186,9 +186,9 @@ public:
     Entry entry(key, value);
     (entries_.get())[num_entries_] = entry;
 
-    std::cout<<"set "<<(entries_.get())[num_entries_].GetKey().data()<<std::endl;
+    //std::cout<<"set "<<(entries_.get())[num_entries_].GetKey().data()<<std::endl;
     num_entries_++;
-    std::cout<<"setting complete"<<std::endl;
+    //std::cout<<"setting complete"<<std::endl;
     return true;
   }
 

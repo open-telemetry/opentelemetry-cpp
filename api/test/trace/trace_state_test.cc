@@ -1,6 +1,7 @@
 #include "opentelemetry/trace/trace_state.h"
 
 #include <gtest/gtest.h>
+#include <iostream>
 
 namespace
 {
@@ -82,6 +83,9 @@ TEST(TraceStateTest, Set)
   // Since string_view data is null by default, this should be a no-op
   s.Set(bad_key, null_val);
 
+  opentelemetry::nostd::string_view val_verif;
+  s.Get(key,val_verif);
+  std::cout<<"Verfication of key "<<key<<" is value "<<val_verif<<std::endl;
   opentelemetry::nostd::span<TraceState::Entry> entries = s.Entries();
   EXPECT_EQ(entries.size(), 1);
   EXPECT_EQ(entries[0].GetKey().data(), key);
