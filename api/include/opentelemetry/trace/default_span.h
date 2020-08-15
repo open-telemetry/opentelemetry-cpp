@@ -46,11 +46,11 @@ public:
   DefaultSpan() = default;
 
   DefaultSpan(SpanContext span_context) {
-    this->span_context_ = span_context;
-    for (const auto &entry : (this->span_context_).trace_state().Entries())
+    for (const auto &entry : span_context.trace_state().Entries())
     {
       std::cout<<"displaying: "<<entry.GetKey()<<" "<<entry.GetValue()<<std::endl;
     }
+    this->span_context_ = span_context;
   }
 
   // movable and copiable
