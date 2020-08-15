@@ -374,7 +374,7 @@ private:
     {
       if (ctr_pos != -1)
       {
-        key = trace_state_header.substr(start_pos, ctr_pos - start_pos + 1);
+        key = trace_state_header.substr(start_pos, ctr_pos - start_pos);
         val = trace_state_header.substr(ctr_pos + 1, end_pos - ctr_pos);
         std::cout<<"key: "<<key<<" val: "<<val<<std::endl;
         if (key != "") {
