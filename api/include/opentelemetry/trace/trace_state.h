@@ -62,12 +62,8 @@ public:
       return *this;
     }
 
-    // Move and Copy constructor and assignment operator
+    // Move constructor and assignment operator
     Entry(Entry &&other) = default;
-    Entry(const Entry &other) {
-        key_   = CopyStringToPointer(other.GetKey());
-        value_ = CopyStringToPointer(other.GetValue());
-    }
     Entry &operator=(Entry &&other) = default;
 
     // Creates an Entry for a given key-value pair.
@@ -118,7 +114,8 @@ public:
     for (const auto &entry : trace_state.Entries())
     {
       std::cout<<"moving2"<<std::endl;
-      (entries_.get())[num_entries_] = Entry(entry);
+      Entry copy = entry;
+      (entries_.get())[num_entries_] = Entry(copy);
       num_entries_++;
     }
     std::cout<<"moving3"<<std::endl;
@@ -131,7 +128,8 @@ public:
     num_entries_ = 0;
     for (const auto &entry : trace_state.Entries())
     {
-      (entries_.get())[num_entries_] = Entry(entry);
+      Entry copy = entry;
+      (entries_.get())[num_entries_] = Entry(copy);
       num_entries_++;
     }
     std::cout<<"copying2"<<std::endl;
