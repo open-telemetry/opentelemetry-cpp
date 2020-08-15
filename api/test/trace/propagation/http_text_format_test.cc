@@ -183,7 +183,7 @@ TEST(HTTPTextFormatTest, TraceStateHeaderWithTrailingComma)
   trace::TraceState trace_state = span->GetContext().trace_state();
   nostd::string_view value;
   EXPECT_TRUE(trace_state.Get("foo", value));
-  EXPECT_EQ(value, "1")
+  EXPECT_EQ(value, "1");
 }
 
 TEST(HTTPTextFormatTest, TraceStateKeys)
