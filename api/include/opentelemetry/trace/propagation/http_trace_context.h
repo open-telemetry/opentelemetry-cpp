@@ -382,8 +382,10 @@ private:
     std::cout<<3<<std::endl;
     if (element_num >= kTraceStateMaxMembers)
     {
+      std::cout<<"got into here?"<<std::endl;
       return TraceState();  // too many k-v pairs will result in an invalid trace state
     }
+    std::cout<<"trace state returned"<<std::endl;
     return trace_state;
   }
 
