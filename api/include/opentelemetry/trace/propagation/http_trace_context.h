@@ -80,11 +80,6 @@ public:
     SpanContext span_context    = ExtractImpl(getter, carrier);
     nostd::string_view span_key = "current-span";
     std::cout<<"context get"<<std::endl;
-    for (const auto &entry : span_context.trace_state().Entries())
-    {
-      std::cout<<"displaying: "<<entry.GetKey()<<" "<<entry.GetValue()<<std::endl;
-    }
-    std::cout<<"here!"<<std::endl;
     auto a = new DefaultSpan(span_context);
     std::cout<<"pointer established"<<std::endl;
     nostd::shared_ptr<Span> sp{new DefaultSpan(span_context)};
