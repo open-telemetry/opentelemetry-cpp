@@ -61,9 +61,7 @@ TEST(HTTPTextFormatTest, TraceFlagsBufferGeneration)
   EXPECT_EQ(MapHttpTraceContext::GenerateTraceFlagsFromString("00"), trace::TraceFlags());
 }
 
-The commented out code below are ones that are related to
-    TraceState.Needs to be uncommented after TraceState is merged.TEST(HTTPTextFormatTest,
-                                                                       HeadersWithTraceState)
+TEST(HTTPTextFormatTest, HeadersWithTraceState)
 {
   const std::map<std::string, std::string> carrier = {
       {"traceparent", "00-4bf92f3577b34da6a3ce929d0e0e4736-0102030405060708-01"},
@@ -143,8 +141,7 @@ TEST(HTTPTextFormatTest, NoSendEmptyTraceState)
   EXPECT_FALSE(carrier.count("tracestate") > 0);
 }
 
-The commented out code below are ones that are related to TraceState
-    .Needs to be uncommented after TraceState is merged.TEST(HTTPTextFormatTest, FormatNotSupported)
+TEST(HTTPTextFormatTest, FormatNotSupported)
 {
   // If the trace parent does not adhere to the supported format, discard it and
   // create a new trace context.
@@ -173,9 +170,7 @@ TEST(HTTPTextFormatTest, PropagateInvalidContext)
   EXPECT_TRUE(carrier.count("traceparent") == 0);
 }
 
-The commented out code below are ones that are related to TraceState
-    .Needs to be uncommented after TraceState is merged.TEST(HTTPTextFormatTest,
-                                                             TraceStateHeaderWithTrailingComma)
+TEST(HTTPTextFormatTest, TraceStateHeaderWithTrailingComma)
 {
   // Do not propagate invalid trace context.
   const std::map<std::string, std::string> carrier = {
