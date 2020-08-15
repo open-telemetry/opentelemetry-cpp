@@ -64,6 +64,10 @@ public:
 
     // Move constructor and assignment operator
     Entry(Entry &&other) = default;
+    Entry(const Entry &other) {
+      key_   = CopyStringToPointer(other.key_.get());
+      value_ = CopyStringToPointer(other.value_.get());
+    }
     Entry &operator=(Entry &&other) = default;
 
     // Creates an Entry for a given key-value pair.
