@@ -77,9 +77,9 @@ public:
                            context::Context &context) noexcept override
   {
     std::cout<<"extraction begins"<<std::endl;
-    const SpanContext span_context    = ExtractImpl(getter, carrier);
+    SpanContext span_context    = ExtractImpl(getter, carrier);
     nostd::string_view span_key = "current-span";
-    SpanContext spn(span_context);
+    SpanContext spn = span_context;
     std::cout<<"context get"<<std::endl;
     auto a = new DefaultSpan(spn);
     std::cout<<"pointer established"<<std::endl;
