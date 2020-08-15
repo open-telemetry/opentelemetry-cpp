@@ -58,6 +58,7 @@ public:
     // Copy assignment operator
     Entry &operator=(Entry &other)
     {
+      std::cout<<"assignment: "<<other.key_.get()<<std::endl;
       key_   = CopyStringToPointer(other.key_.get());
       value_ = CopyStringToPointer(other.value_.get());
       return *this;
@@ -184,7 +185,7 @@ public:
       return false;
     }
     Entry entry(key, value);
-    std::cout<<"before assignment"<<std::endl;
+    std::cout<<"before assignment: "<<entry.GetKey()<<std::endl;
     (entries_.get())[num_entries_] = entry;
 
     std::cout<<"set "<<(entries_.get())[num_entries_].GetKey().data()<<std::endl;
