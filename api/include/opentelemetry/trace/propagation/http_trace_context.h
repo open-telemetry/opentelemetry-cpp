@@ -326,7 +326,6 @@ private:
 
   static TraceState ExtractTraceState(nostd::string_view &trace_state_header)
   {
-    std::cout<<"1 it is"<<std::endl;
     std::cout<<"trace_state_header is "<<trace_state_header<<std::endl;
     TraceState trace_state = TraceState();
     int start_pos          = -1;
@@ -378,8 +377,13 @@ private:
       {
         key = trace_state_header.substr(start_pos, ctr_pos - start_pos + 1);
         val = trace_state_header.substr(ctr_pos + 1, end_pos - ctr_pos);
-        if (key != "")
+        std::cout<<"key: "<<key<<" val: "<<val<<std::endl;
+        if (key != "") {
           trace_state.Set(key, val);
+          nostd::string_view v;
+          trace_state.Get(key,v);
+          std::cout<<"value after setting is: "<<v<<std::endl;
+        }
       }
       element_num++;
     }
