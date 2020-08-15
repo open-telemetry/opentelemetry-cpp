@@ -205,6 +205,6 @@ TEST(HTTPTextFormatTest, TraceStateKeys)
   EXPECT_EQ(value, "bar2");
   EXPECT_TRUE(trace_state.Get("foo", value));
   EXPECT_EQ(value, "bar3");
-//  EXPECT_TRUE(trace_state.Get("foo-_*/bar", value));
-//  EXPECT_EQ(value, "bar4");
+  EXPECT_TRUE(trace_state.Get("foo-_*/bar", value));
+  EXPECT_EQ(value, "bar4");
 }
