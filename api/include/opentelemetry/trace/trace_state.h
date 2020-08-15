@@ -109,6 +109,8 @@ public:
     for (const auto &entry : trace_state.Entries())
     {
       std::cout<<"moving2"<<std::endl;
+      std::cout<<entry.GetKey()<<std::endl;
+      std::cout<<entry.GetValue()<<std::endl;
       Set(entry.GetKey(), entry.GetValue());
     }
     std::cout<<"moving3"<<std::endl;
