@@ -104,6 +104,7 @@ public:
       nostd::unique_ptr<char[]> temp(new char[str.size() + 1]);
 //      std::cout<<"B"<<std::endl;
       strcpy(temp.get(), str);
+      temp.get()[str.size()] = '\0';
       std::cout<<"C"<<temp.get()<<std::endl;
       return nostd::unique_ptr<const char[]>(temp.release());
     }
