@@ -17,6 +17,7 @@
 #include <cstdint>
 #include <cstring>
 #include <iostream>
+#include <exception>
 
 #include "opentelemetry/nostd/span.h"
 #include "opentelemetry/nostd/string_view.h"
@@ -95,13 +96,18 @@ public:
     // This is a workaround for the fact that strcpy doesn't accept a const char* destination.
     nostd::unique_ptr<const char[]> CopyStringToPointer(nostd::string_view str)
     {
-      std::cout<<"A"<<std::endl;
-      std::cout<<str<<std::endl;
-      nostd::unique_ptr<char[]> temp(new char[str.size() + 1]);
-      std::cout<<"B"<<std::endl;
-      strcpy(temp.get(), str.data());
-      std::cout<<"C"<<std::endl;
-      return nostd::unique_ptr<const char[]>(temp.release());
+      try {
+        std::cout<<"A"<<std::endl;
+        std::cout<<str<<std::endl;
+        nostd::unique_ptr<char[]> temp(new char[str.size() + 1]);
+        std::cout<<"B"<<std::endl;
+        strcpy(temp.get(), str.data());
+        std::cout<<"C"<<std::endl;
+        return nostd::unique_ptr<const char[]>(temp.release());
+      } catch (std::exception& e) {
+        std::cout << e.what() << '\n';
+        throw;
+      }
     }
   };
 
