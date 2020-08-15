@@ -75,10 +75,8 @@ public:
     // Creates an Entry for a given key-value pair.
     Entry(nostd::string_view key, nostd::string_view value) noexcept
     {
-      std::cout<<"initializing: key is: "<<key<<" value is: "<<value<<std::endl;
       key_   = CopyStringToPointer(key);
       value_ = CopyStringToPointer(value);
-      std::cout<<"initialized: key is: "<<key_.get()<<" value is: "<<value_.get()<<std::endl;
     }
 
     // Gets the key associated with this entry.
@@ -99,13 +97,9 @@ public:
     // This is a workaround for the fact that strcpy doesn't accept a const char* destination.
     nostd::unique_ptr<const char[]> CopyStringToPointer(nostd::string_view str)
     {
-      std::cout<<"A"<<std::endl;
-      std::cout<<str<<" length is "<<str.length()<<std::endl;
       nostd::unique_ptr<char[]> temp(new char[str.size() + 1]);
-//      std::cout<<"B"<<std::endl;
       strcpy(temp.get(), str.data());
       temp.get()[str.size()] = '\0';
-      std::cout<<"C"<<temp.get()<<std::endl;
       return nostd::unique_ptr<const char[]>(temp.release());
     }
   };
@@ -177,18 +171,14 @@ public:
   // succesfully, false otherwise. If value is null or entries_ is full, this function is a no-op.
   bool Set(nostd::string_view key, nostd::string_view value) noexcept
   {
-    std::cout<<"setting: "<<key<<" "<<value<<std::endl;
     if (value.empty() || num_entries_ >= kMaxKeyValuePairs)
     {
       return false;
     }
     Entry entry(key, value);
-    std::cout<<"before assignment: "<<entry.GetKey()<<std::endl;
     (entries_.get())[num_entries_] = entry;
 
-    std::cout<<"set "<<(entries_.get())[num_entries_].GetKey().data()<<std::endl;
     num_entries_++;
-    std::cout<<"setting complete"<<std::endl;
     return true;
   }
 
