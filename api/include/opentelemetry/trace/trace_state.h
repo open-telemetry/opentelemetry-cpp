@@ -69,11 +69,8 @@ public:
     // Creates an Entry for a given key-value pair.
     Entry(nostd::string_view key, nostd::string_view value) noexcept
     {
-      std::cout<<"entry1"<<std::endl;
       key_   = CopyStringToPointer(key);
-      std::cout<<"entry2"<<std::endl;
       value_ = CopyStringToPointer(value);
-      std::cout<<"entry3"<<std::endl;
     }
 
     // Gets the key associated with this entry.
@@ -106,26 +103,28 @@ public:
   // movable and copiable
   TraceState(TraceState &&trace_state)
   {
-    num_entries_ = trace_state.num_entries_;
     std::cout<<"moving"<<std::endl;
     entries_.reset(new Entry[kMaxKeyValuePairs]);
     std::cout<<"moving1"<<std::endl;
+    num_entries_ = 0;
     for (const auto &entry : trace_state.Entries())
     {
       std::cout<<"moving2"<<std::endl;
-      Set(entry.GetKey(), entry.GetValue());
+      (entries_.get())[num_entries_] = Entry(entry);
+      num_entries_++;
     }
     std::cout<<"moving3"<<std::endl;
   }
 
   TraceState(const TraceState &trace_state)
   {
-    num_entries_ = trace_state.num_entries_;
     std::cout<<"copying"<<std::endl;
     entries_.reset(new Entry[kMaxKeyValuePairs]);
+    num_entries_ = 0;
     for (const auto &entry : trace_state.Entries())
     {
-      Set(entry.GetKey(), entry.GetValue());
+      (entries_.get())[num_entries_] = Entry(entry);
+      num_entries_++;
     }
     std::cout<<"copying2"<<std::endl;
   }
