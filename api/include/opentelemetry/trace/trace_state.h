@@ -77,6 +77,7 @@ public:
     {
       key_   = CopyStringToPointer(key);
       value_ = CopyStringToPointer(value);
+      std::cout<<"initialized: key-"<<key_.get()<<" value-"<<value_.get()<<std::endl;
     }
 
     // Gets the key associated with this entry.
