@@ -120,12 +120,14 @@ public:
 
   bool operator==(const TraceState &that) const noexcept
   {
-    if (num_entries_ != that.num_entries_) return false;
+    if (num_entries_ != that.num_entries_)
+      return false;
     nostd::string_view value;
     for (const auto &entry : that.Entries())
     {
       Get(entry.GetKey(), value);
-      if (value != entry.GetValue()) return false;
+      if (value != entry.GetValue())
+        return false;
     }
     return true;
   }
