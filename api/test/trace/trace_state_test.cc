@@ -90,6 +90,7 @@ TEST(TraceStateTest, Set)
   EXPECT_EQ(entries.size(), 1);
   EXPECT_EQ(entries[0].GetKey().data(), key);
   EXPECT_EQ(entries[0].GetValue().data(), val);
+  throw;
 }
 
 TEST(TraceStateTest, Get)

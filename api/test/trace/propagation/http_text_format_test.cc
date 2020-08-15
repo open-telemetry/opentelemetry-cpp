@@ -195,7 +195,7 @@ TEST(HTTPTextFormatTest, TraceStateKeys)
       {"tracestate", trace_state_value}};
   context::Context ctx1 =
       context::Context("current-span", nostd::shared_ptr<trace::Span>(new trace::DefaultSpan()));
-  context::Context ctx2         = format.Extract(Getter, carrier, ctx1);
+//  context::Context ctx2         = format.Extract(Getter, carrier, ctx1);
 //  trace::Span *span             = MapHttpTraceContext::GetCurrentSpan(ctx2);
 //  trace::TraceState trace_state = span->GetContext().trace_state();
 //  nostd::string_view value;
