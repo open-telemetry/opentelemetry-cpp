@@ -80,6 +80,10 @@ public:
     SpanContext span_context    = ExtractImpl(getter, carrier);
     nostd::string_view span_key = "current-span";
     std::cout<<"context get"<<std::endl;
+    for (const auto &entry : trace_state.Entries())
+    {
+      std::cout<<"displaying: "<<entry.GetKey()<<" "<<entry.GetValue()<<std::endl;
+    }
     nostd::shared_ptr<Span> sp{new DefaultSpan(span_context)};
     std::cout<<"set value"<<std::endl;
     return context.SetValue(span_key, sp);
@@ -428,10 +432,6 @@ private:
     }
 
     TraceState trace_state = ExtractTraceState(trace_state_header);
-    for (const auto &entry : trace_state.Entries())
-    {
-      std::cout<<"displaying: "<<entry.GetKey()<<" "<<entry.GetValue()<<std::endl;
-    }
     std::cout<<"trace state extract complete"<<std::endl;
     return SpanContext(context_from_parent_header.trace_id(), context_from_parent_header.span_id(),
                        context_from_parent_header.trace_flags(), trace_state, true);
