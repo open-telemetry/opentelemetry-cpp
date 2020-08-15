@@ -76,9 +76,12 @@ public:
                            const T &carrier,
                            context::Context &context) noexcept override
   {
+    std::cout<<"extraction begins"<<std::endl;
     SpanContext span_context    = ExtractImpl(getter, carrier);
     nostd::string_view span_key = "current-span";
+    std::cout<<"context get"<<std::endl;
     nostd::shared_ptr<Span> sp{new DefaultSpan(span_context)};
+    std::cout<<"set value"<<std::endl;
     return context.SetValue(span_key, sp);
   }
 
