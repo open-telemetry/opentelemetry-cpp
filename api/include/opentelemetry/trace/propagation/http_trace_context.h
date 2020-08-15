@@ -326,6 +326,7 @@ private:
 
   static TraceState ExtractTraceState(nostd::string_view &trace_state_header)
   {
+    std::cout<<1<<std::endl;
     TraceState trace_state = TraceState();
     int start_pos          = -1;
     int end_pos            = -1;
@@ -364,6 +365,7 @@ private:
           start_pos = i;
       }
     }
+    std::cout<<2<<std::endl;
     if (start_pos != -1 && end_pos != -1)
     {
       if (ctr_pos != -1)
@@ -375,7 +377,7 @@ private:
       }
       element_num++;
     }
-
+    std::cout<<3<<std::endl;
     if (element_num >= kTraceStateMaxMembers)
     {
       return TraceState();  // too many k-v pairs will result in an invalid trace state
