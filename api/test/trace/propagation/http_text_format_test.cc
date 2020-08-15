@@ -7,8 +7,7 @@
 #include "opentelemetry/trace/span_context.h"
 #include "opentelemetry/trace/trace_id.h"
 #include "opentelemetry/trace/tracer.h"
-#include <fstream>
-#include <iostream>
+
 #include <map>
 #include <memory>
 #include <string>
@@ -74,8 +73,6 @@ TEST(HTTPTextFormatTest, HeadersWithTraceState)
   format.Inject(Setter, c2, ctx2);
   EXPECT_EQ(c2["traceparent"], "00-4bf92f3577b34da6a3ce929d0e0e4736-0102030405060708-01");
   EXPECT_EQ(c2["tracestate"], "congo=congosSecondPosition,rojo=rojosFirstPosition");
-  std::ostringstream os;
-  os << carrier.size() << ":" << c2.size();
   EXPECT_EQ(carrier.size(), c2.size());
 }
 
