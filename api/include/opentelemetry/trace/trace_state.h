@@ -179,7 +179,8 @@ public:
     Entry entry(key, value);
     std::cout<<"setting2"<<std::endl;
     (entries_.get())[num_entries_] = entry;
-    std::cout<<"setting3"<<std::endl;
+
+    std::cout<<"setting3 "<<(entries_.get())[num_entries_].GetKey()<<std::endl;
     num_entries_++;
     std::cout<<"setting complete"<<std::endl;
     return true;
