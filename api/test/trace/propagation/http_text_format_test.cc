@@ -181,7 +181,9 @@ TEST(HTTPTextFormatTest, TraceStateHeaderWithTrailingComma)
   context::Context ctx2         = format.Extract(Getter, carrier, ctx1);
   trace::Span *span             = MapHttpTraceContext::GetCurrentSpan(ctx2);
   trace::TraceState trace_state = span->GetContext().trace_state();
-  EXPECT_TRUE(trace_state.Get("foo", "1"));
+  nostd::string_view value;
+  EXPECT_TRUE(trace_state.Get("foo", value));
+  EXPECT_EQ(value, "1")
 }
 
 TEST(HTTPTextFormatTest, TraceStateKeys)
@@ -196,8 +198,13 @@ TEST(HTTPTextFormatTest, TraceStateKeys)
   context::Context ctx2         = format.Extract(Getter, carrier, ctx1);
   trace::Span *span             = MapHttpTraceContext::GetCurrentSpan(ctx2);
   trace::TraceState trace_state = span->GetContext().trace_state();
-  EXPECT_TRUE(trace_state.Get("1a-2f@foo", "bar1"));
-  EXPECT_TRUE(trace_state.Get("1a-_*/2b@foo", "bar2"));
-  EXPECT_TRUE(trace_state.Get("foo", "bar3"));
-  EXPECT_TRUE(trace_state.Get("foo-_*/bar", "bar4"));
+  nostd::string_view value;
+  EXPECT_TRUE(trace_state.Get("1a-2f@foo", value));
+  EXPECT_EQ(value, "bar1");
+  EXPECT_TRUE(trace_state.Get("1a-_*/2b@foo", value));
+  EXPECT_EQ(value, "bar2");
+  EXPECT_TRUE(trace_state.Get("foo", value));
+  EXPECT_EQ(value, "bar3");
+  EXPECT_TRUE(trace_state.Get("foo-_*/bar", value));
+  EXPECT_EQ(value, "bar4");
 }
