@@ -60,14 +60,9 @@ public:
   SpanContext(const SpanContext &ctx)
       : trace_id_(ctx.trace_id()),
         span_id_(ctx.span_id()),
-        trace_flags_(ctx.trace_flags())
-  {
-    for (const auto &entry : ctx.trace_state().Entries())
-    {
-      std::cout<<"displaying: "<<entry.GetKey()<<" "<<entry.GetValue()<<std::endl;
-    }
-//    trace_state_(new TraceState(ctx.trace_state()));
-  }
+        trace_flags_(ctx.trace_flags()),
+        trace_state_(new TraceState(ctx.trace_state()))
+  {}
 
   SpanContext &operator=(const SpanContext &ctx)
   {
