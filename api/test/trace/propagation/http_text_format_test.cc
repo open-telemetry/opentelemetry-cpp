@@ -193,8 +193,8 @@ TEST(HTTPTextFormatTest, TraceStateKeys)
   const std::map<std::string, std::string> carrier = {
       {"traceparent", "00-12345678901234567890123456789012-1234567890123456-00"},
       {"tracestate", trace_state_value}};
-//  context::Context ctx1 =
-//      context::Context("current-span", nostd::shared_ptr<trace::Span>(new trace::DefaultSpan()));
+  context::Context ctx1 =
+      context::Context("current-span", nostd::shared_ptr<trace::Span>(new trace::DefaultSpan()));
 //  context::Context ctx2         = format.Extract(Getter, carrier, ctx1);
 //  trace::Span *span             = MapHttpTraceContext::GetCurrentSpan(ctx2);
 //  trace::TraceState trace_state = span->GetContext().trace_state();
