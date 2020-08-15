@@ -104,17 +104,21 @@ public:
   TraceState(TraceState &&trace_state)
   {
     std::cout<<"moving"<<std::endl;
+    entries_.reset(new Entry[kMaxKeyValuePairs]);
+    std::cout<<"moving1"<<std::endl;
     for (const auto &entry : trace_state.Entries())
     {
+      std::cout<<"moving2"<<std::endl;
       Set(entry.GetKey(), entry.GetValue());
     }
-    std::cout<<"moving2"<<std::endl;
+    std::cout<<"moving3"<<std::endl;
     num_entries_ = trace_state.num_entries_;
   }
 
   TraceState(const TraceState &trace_state)
   {
     std::cout<<"copying"<<std::endl;
+    entries_.reset(new Entry[kMaxKeyValuePairs]);
     for (const auto &entry : trace_state.Entries())
     {
       Set(entry.GetKey(), entry.GetValue());
