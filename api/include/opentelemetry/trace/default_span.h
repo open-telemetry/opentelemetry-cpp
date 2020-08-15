@@ -47,7 +47,7 @@ public:
 
   DefaultSpan(SpanContext span_context) {
     this->span_context_ = span_context;
-    for (const auto &entry : this->span_context_)
+    for (const auto &entry : (this->span_context_).trace_state().Entries())
     {
       std::cout<<"displaying: "<<entry.GetKey()<<" "<<entry.GetValue()<<std::endl;
     }
