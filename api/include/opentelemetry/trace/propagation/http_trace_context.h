@@ -76,12 +76,9 @@ public:
                            const T &carrier,
                            context::Context &context) noexcept override
   {
-    std::cout<<"extraction begins"<<std::endl;
     SpanContext span_context    = ExtractImpl(getter, carrier);
     nostd::string_view span_key = "current-span";
-    std::cout<<"context get"<<std::endl;
     nostd::shared_ptr<Span> sp{new DefaultSpan(span_context)};
-    std::cout<<"set value"<<std::endl;
     return context.SetValue(span_key, sp);
   }
 
@@ -326,7 +323,6 @@ private:
 
   static TraceState ExtractTraceState(nostd::string_view &trace_state_header)
   {
-    std::cout<<"trace_state_header is "<<trace_state_header<<std::endl;
     TraceState trace_state = TraceState();
     int start_pos          = -1;
     int end_pos            = -1;
@@ -347,12 +343,10 @@ private:
         {
           key = trace_state_header.substr(start_pos, ctr_pos - start_pos);
           val = trace_state_header.substr(ctr_pos + 1, end_pos - ctr_pos);
-          std::cout<<"key: "<<key<<" val: "<<val<<std::endl;
           if (key != "") {
             trace_state.Set(key, val);
             nostd::string_view v;
             trace_state.Get(key,v);
-            std::cout<<"value after setting is: "<<v<<std::endl;
           }
         }
         ctr_pos   = -1;
@@ -376,12 +370,10 @@ private:
       {
         key = trace_state_header.substr(start_pos, ctr_pos - start_pos);
         val = trace_state_header.substr(ctr_pos + 1, end_pos - ctr_pos);
-        std::cout<<"key: "<<key<<" val: "<<val<<std::endl;
         if (key != "") {
           trace_state.Set(key, val);
           nostd::string_view v;
           trace_state.Get(key,v);
-          std::cout<<"value after setting is: "<<v<<std::endl;
         }
       }
       element_num++;
@@ -390,7 +382,6 @@ private:
     {
       return TraceState();  // too many k-v pairs will result in an invalid trace state
     }
-    std::cout<<"trace state returned"<<std::endl;
     return trace_state;
   }
 
@@ -419,16 +410,13 @@ private:
       return context_from_parent_header;
     }
 
-    std::cout<<"trace parent complete"<<std::endl;
     nostd::string_view trace_state_header = getter(carrier, kTraceState);
-    std::cout<<"getter complete"<<std::endl;
     if (trace_state_header == "" || trace_state_header.empty())
     {
       return context_from_parent_header;
     }
 
     TraceState trace_state = ExtractTraceState(trace_state_header);
-    std::cout<<"trace state extract complete"<<std::endl;
     return SpanContext(context_from_parent_header.trace_id(), context_from_parent_header.span_id(),
                        context_from_parent_header.trace_flags(), trace_state, true);
   }

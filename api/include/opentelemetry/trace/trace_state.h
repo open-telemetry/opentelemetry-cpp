@@ -16,8 +16,6 @@
 
 #include <cstdint>
 #include <cstring>
-#include <iostream>
-#include <exception>
 
 #include "opentelemetry/nostd/span.h"
 #include "opentelemetry/nostd/string_view.h"
@@ -58,7 +56,6 @@ public:
     // Copy assignment operator
     Entry &operator=(Entry &other)
     {
-      std::cout<<"assignment: "<<other.key_.get()<<std::endl;
       key_   = CopyStringToPointer(other.key_.get());
       value_ = CopyStringToPointer(other.value_.get());
       return *this;
@@ -110,35 +107,26 @@ public:
   // movable and copiable
   TraceState(TraceState &&trace_state)
   {
-    std::cout<<"moving"<<std::endl;
     entries_.reset(new Entry[kMaxKeyValuePairs]);
-    std::cout<<"moving1"<<std::endl;
     num_entries_ = 0;
     for (const auto &entry : trace_state.Entries())
     {
-      std::cout<<"moving2"<<std::endl;
       Entry copy = entry;
       (entries_.get())[num_entries_] = Entry(copy);
       num_entries_++;
     }
-    std::cout<<"moving3"<<std::endl;
   }
 
   TraceState(const TraceState &trace_state)
   {
-    std::cout<<"copying"<<std::endl;
     entries_.reset(new Entry[kMaxKeyValuePairs]);
     num_entries_ = 0;
     for (const auto &entry : trace_state.Entries())
     {
-      std::cout<<"copying1.1"<<std::endl;
       Entry copy = entry;
-      std::cout<<"copying1.2 "<<copy.GetKey()<<" "<<copy.GetValue()<<std::endl;
       (entries_.get())[num_entries_] = Entry(copy);
-      std::cout<<"copying1.3"<<std::endl;
       num_entries_++;
     }
-    std::cout<<"copying2"<<std::endl;
   }
 
   bool operator==(const TraceState &that) const noexcept
