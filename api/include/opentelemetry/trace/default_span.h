@@ -3,7 +3,7 @@
 #include "opentelemetry/trace/canonical_code.h"
 #include "opentelemetry/trace/span.h"
 #include "opentelemetry/trace/span_context.h"
-
+#include <iostream>
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace trace
 {
