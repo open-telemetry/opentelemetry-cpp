@@ -410,12 +410,14 @@ private:
 
     std::cout<<"trace parent complete"<<std::endl;
     nostd::string_view trace_state_header = getter(carrier, kTraceState);
+    std::cout<<"getter complete"<<std::endl;
     if (trace_state_header == "" || trace_state_header.empty())
     {
       return context_from_parent_header;
     }
 
     TraceState trace_state = ExtractTraceState(trace_state_header);
+    std::cout<<"trace state extract complete"<<std::endl;
     return SpanContext(context_from_parent_header.trace_id(), context_from_parent_header.span_id(),
                        context_from_parent_header.trace_flags(), trace_state, true);
   }
