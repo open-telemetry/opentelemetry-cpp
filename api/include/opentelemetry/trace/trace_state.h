@@ -16,6 +16,7 @@
 
 #include <cstdint>
 #include <cstring>
+#include <iostream>
 
 #include "opentelemetry/nostd/span.h"
 #include "opentelemetry/nostd/string_view.h"
@@ -102,19 +103,23 @@ public:
   // movable and copiable
   TraceState(TraceState &&trace_state)
   {
+    std::cout<<"moving"<<std::endl;
     for (const auto &entry : trace_state.Entries())
     {
       Set(entry.GetKey(), entry.GetValue());
     }
+    std::cout<<"moving2"<<std::endl;
     num_entries_ = trace_state.num_entries_;
   }
 
   TraceState(const TraceState &trace_state)
   {
+    std::cout<<"copying"<<std::endl;
     for (const auto &entry : trace_state.Entries())
     {
       Set(entry.GetKey(), entry.GetValue());
     }
+    std::cout<<"copying2"<<std::endl;
     num_entries_ = trace_state.num_entries_;
   }
 
