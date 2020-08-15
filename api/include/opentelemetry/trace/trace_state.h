@@ -64,7 +64,10 @@ public:
 
     // Move and Copy constructor and assignment operator
     Entry(Entry &&other) = default;
-    Entry(const Entry &other) = default;
+    Entry(const Entry &other) {
+        key_   = CopyStringToPointer(other.GetKey());
+        value_ = CopyStringToPointer(other.GetValue());
+    }
     Entry &operator=(Entry &&other) = default;
 
     // Creates an Entry for a given key-value pair.
