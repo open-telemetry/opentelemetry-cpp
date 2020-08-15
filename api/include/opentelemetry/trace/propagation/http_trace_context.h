@@ -86,6 +86,7 @@ public:
     }
     std::cout<<"here!"<<std::endl;
     auto a = new DefaultSpan(span_context);
+    std::cout<<"pointer established"<<std::endl;
     nostd::shared_ptr<Span> sp{new DefaultSpan(span_context)};
     std::cout<<"set value"<<std::endl;
     return context.SetValue(span_key, sp);
