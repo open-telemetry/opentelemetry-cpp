@@ -127,7 +127,7 @@ public:
   TraceState(const TraceState &trace_state)
   {
     std::cout<<"copying"<<std::endl;
-//    entries_.reset(new Entry[kMaxKeyValuePairs]);
+    entries_.reset(new Entry[kMaxKeyValuePairs]);
     num_entries_ = 0;
     for (const auto &entry : trace_state.Entries())
     {
