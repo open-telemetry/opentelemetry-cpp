@@ -371,51 +371,51 @@ private:
           trace_state.Set(key, val);
       }
       element_num++;
+    }
 
-      if (element_num >= kTraceStateMaxMembers)
+    if (element_num >= kTraceStateMaxMembers)
+    {
+      return TraceState();  // too many k-v pairs will result in an invalid trace state
+    }
+    return trace_state;
+  }
+
+  static void AddNewMember(TraceState &trace_state, nostd::string_view member)
+  {
+    for (int i = 0; i < int(member.length()); i++)
+    {
+      if (member[i] == '=')
       {
-        return TraceState();  // too many k-v pairs will result in an invalid trace state
+        trace_state.Set(member.substr(0, i), member.substr(i + 1, member.length() - i - 1));
+        return;
       }
-      return trace_state;
+    }
+  }
 
-      static void AddNewMember(TraceState & trace_state, nostd::string_view member)
-      {
-        for (int i = 0; i < int(member.length()); i++)
-        {
-          if (member[i] == '=')
-          {
-            trace_state.Set(member.substr(0, i), member.substr(i + 1, member.length() - i - 1));
-            return;
-          }
-        }
-      }
+  static SpanContext ExtractImpl(Getter getter, const T &carrier)
+  {
+    nostd::string_view trace_parent = getter(carrier, kTraceParent);
+    if (trace_parent == "")
+    {
+      return SpanContext(false, false);
+    }
+    SpanContext context_from_parent_header = ExtractContextFromTraceParent(trace_parent);
+    if (!context_from_parent_header.IsValid())
+    {
+      return context_from_parent_header;
+    }
 
-      static SpanContext ExtractImpl(Getter getter, const T &carrier)
-      {
-        nostd::string_view trace_parent = getter(carrier, kTraceParent);
-        if (trace_parent == "")
-        {
-          return SpanContext(false, false);
-        }
-        SpanContext context_from_parent_header = ExtractContextFromTraceParent(trace_parent);
-        if (!context_from_parent_header.IsValid())
-        {
-          return context_from_parent_header;
-        }
+    nostd::string_view trace_state_header =
+        getter(carrier, kTraceState) if (trace_state_header == "" || trace_state_header.empty())
+    {
+      return context_from_parent_header;
+    }
 
-        nostd::string_view trace_state_header = getter(carrier, kTraceState);
-
-        if (trace_state_header == "" || trace_state_header.empty())
-        {
-          return context_from_parent_header;
-        }
-
-        TraceState trace_state = ExtractTraceState(trace_state_header);
-        return SpanContext(context_from_parent_header.trace_id(),
-                           context_from_parent_header.span_id(),
-                           context_from_parent_header.trace_flags(), trace_state, true);
-      }
-    };
-  }  // namespace propagation
+    TraceState trace_state = ExtractTraceState(trace_state_header);
+    return SpanContext(context_from_parent_header.trace_id(), context_from_parent_header.span_id(),
+                       context_from_parent_header.trace_flags(), trace_state, true);
+  }
+};
+}  // namespace propagation
 }  // namespace trace
 OPENTELEMETRY_END_NAMESPACE
