@@ -170,7 +170,7 @@ public:
   // succesfully, false otherwise. If value is null or entries_ is full, this function is a no-op.
   bool Set(nostd::string_view key, nostd::string_view value) noexcept
   {
-    std::cout<<"setting"<<std::endl;
+    std::cout<<"setting: "<<key<<" "<<value<<std::endl;
     if (value.empty() || num_entries_ >= kMaxKeyValuePairs)
     {
       return false;
