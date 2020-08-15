@@ -37,37 +37,37 @@ OPENTELEMETRY_BEGIN_NAMESPACE
 
 /**
  * CreateAgg() is a helper function that returns a
- * nostd::shared_ptr given an AggregatorKind
+ * std::shared_ptr given an AggregatorKind
  */
 template <typename T>
-nostd::shared_ptr<metric_sdk::Aggregator<T>> CreateAgg(metric_sdk::AggregatorKind kind,
+std::shared_ptr<metric_sdk::Aggregator<T>> CreateAgg(metric_sdk::AggregatorKind kind,
                                                        bool exactMode = true)
 {
-  nostd::shared_ptr<metric_sdk::Aggregator<T>> aggregator;
+  std::shared_ptr<metric_sdk::Aggregator<T>> aggregator;
   switch (kind)
   {
     case metric_sdk::AggregatorKind::Counter:
     {
-      aggregator = nostd::shared_ptr<metric_sdk::Aggregator<T>>(
+      aggregator = std::shared_ptr<metric_sdk::Aggregator<T>>(
           new metric_sdk::CounterAggregator<T>(opentelemetry::metrics::InstrumentKind::Counter));
       break;
     }
     case metric_sdk::AggregatorKind::MinMaxSumCount:
     {
       aggregator =
-          nostd::shared_ptr<metric_sdk::Aggregator<T>>(new metric_sdk::MinMaxSumCountAggregator<T>(
+          std::shared_ptr<metric_sdk::Aggregator<T>>(new metric_sdk::MinMaxSumCountAggregator<T>(
               opentelemetry::metrics::InstrumentKind::Counter));
       break;
     }
     case metric_sdk::AggregatorKind::Gauge:
     {
-      aggregator = nostd::shared_ptr<metric_sdk::Aggregator<T>>(
+      aggregator = std::shared_ptr<metric_sdk::Aggregator<T>>(
           new metric_sdk::GaugeAggregator<T>(opentelemetry::metrics::InstrumentKind::Counter));
       break;
     }
     case metric_sdk::AggregatorKind::Sketch:
     {
-      aggregator = nostd::shared_ptr<metric_sdk::Aggregator<T>>(new metric_sdk::SketchAggregator<T>(
+      aggregator = std::shared_ptr<metric_sdk::Aggregator<T>>(new metric_sdk::SketchAggregator<T>(
           opentelemetry::metrics::InstrumentKind::Counter, 0.000005));
       break;
     }
@@ -75,13 +75,13 @@ nostd::shared_ptr<metric_sdk::Aggregator<T>> CreateAgg(metric_sdk::AggregatorKin
     {
       std::vector<double> boundaries{10, 20};
       aggregator =
-          nostd::shared_ptr<metric_sdk::Aggregator<T>>(new metric_sdk::HistogramAggregator<T>(
+          std::shared_ptr<metric_sdk::Aggregator<T>>(new metric_sdk::HistogramAggregator<T>(
               opentelemetry::metrics::InstrumentKind::Counter, boundaries));
       break;
     }
     case metric_sdk::AggregatorKind::Exact:
     {
-      aggregator = nostd::shared_ptr<metric_sdk::Aggregator<T>>(new metric_sdk::ExactAggregator<T>(
+      aggregator = std::shared_ptr<metric_sdk::Aggregator<T>>(new metric_sdk::ExactAggregator<T>(
           opentelemetry::metrics::InstrumentKind::Counter, exactMode));
       break;
     }
@@ -96,7 +96,7 @@ nostd::shared_ptr<metric_sdk::Aggregator<T>> CreateAgg(metric_sdk::AggregatorKin
  * on what its AggregatorKind is
  */
 template <typename T>
-void Populate(nostd::shared_ptr<metric_sdk::Aggregator<T>> &aggregator)
+void Populate(std::shared_ptr<metric_sdk::Aggregator<T>> &aggregator)
 {
   if (aggregator->get_aggregator_kind() == metric_sdk::AggregatorKind::Counter)
   {
@@ -159,7 +159,7 @@ std::vector<metric_sdk::Record> CreateRecords(int num,
     std::string name        = "record-" + std::to_string(i);
     std::string description = "record " + std::to_string(i) + " for test purpose";
     std::string labels      = "{label1:v1,label2:v2,}";
-    nostd::shared_ptr<metric_sdk::Aggregator<T>> aggregator = CreateAgg<T>(kind, exactMode);
+    std::shared_ptr<metric_sdk::Aggregator<T>> aggregator = CreateAgg<T>(kind, exactMode);
     Populate(aggregator);
 
     metric_sdk::Record r{name, description, labels, aggregator};
@@ -209,10 +209,10 @@ TEST(PrometheusCollector, AddMetricDataWithCounterRecordsSuccessfully)
     ASSERT_EQ(before.GetLabels(), after.GetLabels());
 
     auto before_agg_var = before.GetAggregator();
-    auto before_agg = nostd::get<nostd::shared_ptr<metric_sdk::Aggregator<double>>>(before_agg_var);
+    auto before_agg = nostd::get<std::shared_ptr<metric_sdk::Aggregator<double>>>(before_agg_var);
 
     auto after_agg_var = after.GetAggregator();
-    auto after_agg = nostd::get<nostd::shared_ptr<metric_sdk::Aggregator<double>>>(after_agg_var);
+    auto after_agg = nostd::get<std::shared_ptr<metric_sdk::Aggregator<double>>>(after_agg_var);
 
     ASSERT_EQ(before_agg->get_checkpoint().size(), after_agg->get_checkpoint().size());
     for (int i = 0; i < before_agg->get_checkpoint().size(); i++)
@@ -261,10 +261,10 @@ TEST(PrometheusCollector, AddMetricDataWithMinMaxSumCountRecordsSuccessfully)
     ASSERT_EQ(before.GetLabels(), after.GetLabels());
 
     auto before_agg_var = before.GetAggregator();
-    auto before_agg = nostd::get<nostd::shared_ptr<metric_sdk::Aggregator<short>>>(before_agg_var);
+    auto before_agg = nostd::get<std::shared_ptr<metric_sdk::Aggregator<short>>>(before_agg_var);
 
     auto after_agg_var = after.GetAggregator();
-    auto after_agg = nostd::get<nostd::shared_ptr<metric_sdk::Aggregator<short>>>(after_agg_var);
+    auto after_agg = nostd::get<std::shared_ptr<metric_sdk::Aggregator<short>>>(after_agg_var);
 
     ASSERT_EQ(before_agg->get_checkpoint().size(), after_agg->get_checkpoint().size());
     for (int i = 0; i < before_agg->get_checkpoint().size(); i++)
@@ -313,10 +313,10 @@ TEST(PrometheusCollector, AddMetricDataWithGaugeRecordsSuccessfully)
     ASSERT_EQ(before.GetLabels(), after.GetLabels());
 
     auto before_agg_var = before.GetAggregator();
-    auto before_agg = nostd::get<nostd::shared_ptr<metric_sdk::Aggregator<int>>>(before_agg_var);
+    auto before_agg = nostd::get<std::shared_ptr<metric_sdk::Aggregator<int>>>(before_agg_var);
 
     auto after_agg_var = after.GetAggregator();
-    auto after_agg     = nostd::get<nostd::shared_ptr<metric_sdk::Aggregator<int>>>(after_agg_var);
+    auto after_agg     = nostd::get<std::shared_ptr<metric_sdk::Aggregator<int>>>(after_agg_var);
 
     ASSERT_EQ(before_agg->get_checkpoint().size(), after_agg->get_checkpoint().size());
     for (int i = 0; i < before_agg->get_checkpoint().size(); i++)
@@ -366,10 +366,10 @@ TEST(PrometheusCollector, AddMetricDataWithSketchRecordsSuccessfully)
     ASSERT_EQ(before.GetLabels(), after.GetLabels());
 
     auto before_agg_var = before.GetAggregator();
-    auto before_agg = nostd::get<nostd::shared_ptr<metric_sdk::Aggregator<double>>>(before_agg_var);
+    auto before_agg = nostd::get<std::shared_ptr<metric_sdk::Aggregator<double>>>(before_agg_var);
 
     auto after_agg_var = after.GetAggregator();
-    auto after_agg = nostd::get<nostd::shared_ptr<metric_sdk::Aggregator<double>>>(after_agg_var);
+    auto after_agg = nostd::get<std::shared_ptr<metric_sdk::Aggregator<double>>>(after_agg_var);
 
     ASSERT_EQ(before_agg->get_checkpoint().size(), after_agg->get_checkpoint().size());
     for (int i = 0; i < before_agg->get_checkpoint().size(); i++)
@@ -427,10 +427,10 @@ TEST(PrometheusCollector, AddMetricDataWithHistogramRecordsSuccessfully)
     ASSERT_EQ(before.GetLabels(), after.GetLabels());
 
     auto before_agg_var = before.GetAggregator();
-    auto before_agg = nostd::get<nostd::shared_ptr<metric_sdk::Aggregator<float>>>(before_agg_var);
+    auto before_agg = nostd::get<std::shared_ptr<metric_sdk::Aggregator<float>>>(before_agg_var);
 
     auto after_agg_var = after.GetAggregator();
-    auto after_agg = nostd::get<nostd::shared_ptr<metric_sdk::Aggregator<float>>>(after_agg_var);
+    auto after_agg = nostd::get<std::shared_ptr<metric_sdk::Aggregator<float>>>(after_agg_var);
 
     ASSERT_EQ(before_agg->get_checkpoint().size(), after_agg->get_checkpoint().size());
     for (int i = 0; i < before_agg->get_checkpoint().size(); i++)
@@ -496,10 +496,10 @@ TEST(PrometheusCollector, AddMetricDataWithExactRecordsSuccessfully)
     ASSERT_EQ(before.GetLabels(), after.GetLabels());
 
     auto before_agg_var = before.GetAggregator();
-    auto before_agg = nostd::get<nostd::shared_ptr<metric_sdk::Aggregator<double>>>(before_agg_var);
+    auto before_agg = nostd::get<std::shared_ptr<metric_sdk::Aggregator<double>>>(before_agg_var);
 
     auto after_agg_var = after.GetAggregator();
-    auto after_agg = nostd::get<nostd::shared_ptr<metric_sdk::Aggregator<double>>>(after_agg_var);
+    auto after_agg = nostd::get<std::shared_ptr<metric_sdk::Aggregator<double>>>(after_agg_var);
 
     if (before_agg->get_quant_estimation() && after_agg->get_quant_estimation())
     {
@@ -567,7 +567,7 @@ TEST(PrometheusCollector, AddMetricDataDoesNotAddBadIndividualRecords)
   std::string name        = "bad_record";
   std::string description = "nullptr_agg";
   std::string labels      = "{label1:v1}";
-  nostd::shared_ptr<metric_sdk::Aggregator<int>> aggregator;
+  std::shared_ptr<metric_sdk::Aggregator<int>> aggregator;
   metric_sdk::Record bad_record{name, description, labels, aggregator};
 
   records.push_back(bad_record);
