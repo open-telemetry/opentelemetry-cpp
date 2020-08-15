@@ -337,7 +337,6 @@ private:
     nostd::string_view val;
     for (int i = 0; i < int(trace_state_header.length()); i++)
     {
-      std::cout<<"i is "<<trace_state_header[i]<<" "<<i<<" th"<<std::endl;
       if (trace_state_header[i] == '\t')
         continue;
       else if (trace_state_header[i] == ',')
@@ -387,10 +386,8 @@ private:
     std::cout<<3<<std::endl;
     if (element_num >= kTraceStateMaxMembers)
     {
-      std::cout<<"got into here?"<<std::endl;
       return TraceState();  // too many k-v pairs will result in an invalid trace state
     }
-    std::cout<<"trace state returned"<<std::endl;
     return trace_state;
   }
 
