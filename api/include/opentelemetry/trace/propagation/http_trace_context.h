@@ -350,8 +350,12 @@ private:
           key = trace_state_header.substr(start_pos, ctr_pos - start_pos);
           val = trace_state_header.substr(ctr_pos + 1, end_pos - ctr_pos);
           std::cout<<"key: "<<key<<" val: "<<val<<std::endl;
-          if (key != "")
+          if (key != "") {
             trace_state.Set(key, val);
+            nostd::string_view v;
+            trace_state.Get(key,v);
+            std::cout<<"value after setting is: "<<v<<std::endl;
+          }
         }
         ctr_pos   = -1;
         end_pos   = -1;
