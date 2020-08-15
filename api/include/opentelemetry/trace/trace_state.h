@@ -69,8 +69,11 @@ public:
     // Creates an Entry for a given key-value pair.
     Entry(nostd::string_view key, nostd::string_view value) noexcept
     {
+      std::cout<<"entry1"<<std::endl;
       key_   = CopyStringToPointer(key);
+      std::cout<<"entry2"<<std::endl;
       value_ = CopyStringToPointer(value);
+      std::cout<<"entry3"<<std::endl;
     }
 
     // Gets the key associated with this entry.
