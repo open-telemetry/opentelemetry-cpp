@@ -184,6 +184,7 @@ public:
       return false;
     }
     Entry entry(key, value);
+    std::cout<<"before assignment"<<std::endl;
     (entries_.get())[num_entries_] = entry;
 
     std::cout<<"set "<<(entries_.get())[num_entries_].GetKey().data()<<std::endl;
