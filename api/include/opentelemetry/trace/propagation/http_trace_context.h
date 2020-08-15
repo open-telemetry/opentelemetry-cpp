@@ -84,6 +84,7 @@ public:
     {
       std::cout<<"displaying: "<<entry.GetKey()<<" "<<entry.GetValue()<<std::endl;
     }
+    std::cout<<"here!"<<std::endl;
     nostd::shared_ptr<Span> sp{new DefaultSpan(span_context)};
     std::cout<<"set value"<<std::endl;
     return context.SetValue(span_key, sp);
