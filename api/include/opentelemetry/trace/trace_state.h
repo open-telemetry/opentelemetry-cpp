@@ -62,8 +62,9 @@ public:
       return *this;
     }
 
-    // Move contructor and assignment operator
+    // Move and Copy constructor and assignment operator
     Entry(Entry &&other) = default;
+    Entry(const Entry &other) = default;
     Entry &operator=(Entry &&other) = default;
 
     // Creates an Entry for a given key-value pair.
