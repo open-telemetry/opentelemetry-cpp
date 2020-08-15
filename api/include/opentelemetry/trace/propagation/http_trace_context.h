@@ -79,10 +79,7 @@ public:
     std::cout<<"extraction begins"<<std::endl;
     SpanContext span_context    = ExtractImpl(getter, carrier);
     nostd::string_view span_key = "current-span";
-    SpanContext spn = std::move(span_context);
     std::cout<<"context get"<<std::endl;
-    auto a = new DefaultSpan(spn);
-    std::cout<<"pointer established"<<std::endl;
     nostd::shared_ptr<Span> sp{new DefaultSpan(span_context)};
     std::cout<<"set value"<<std::endl;
     return context.SetValue(span_key, sp);
