@@ -75,6 +75,7 @@ public:
     // Creates an Entry for a given key-value pair.
     Entry(nostd::string_view key, nostd::string_view value) noexcept
     {
+      std::cout<<"initializing: key-"<<key<<" value-"<<value<<std::endl;
       key_   = CopyStringToPointer(key);
       value_ = CopyStringToPointer(value);
       std::cout<<"initialized: key-"<<key_.get()<<" value-"<<value_.get()<<std::endl;
