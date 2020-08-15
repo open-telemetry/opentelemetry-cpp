@@ -336,6 +336,7 @@ private:
     nostd::string_view val;
     for (int i = 0; i < int(trace_state_header.length()); i++)
     {
+      std::cout<<"i is "<<trace_state_header[i]<<" "<<i<<" th"<<std::endl;
       if (trace_state_header[i] == '\t')
         continue;
       else if (trace_state_header[i] == ',')
