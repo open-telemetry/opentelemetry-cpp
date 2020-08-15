@@ -178,16 +178,17 @@ TEST(Tracer, StartSpanWithAttributes)
   auto tracer = initTracer(spans_received);
 
   // Start a span with all supported scalar attribute types.
-  tracer->StartSpan("span 1", {{"attr1", "string"},
-                               {"attr2", false},
-                               {"attr1", 314159},
-                               {"attr3", (unsigned int)314159},
-                               {"attr4", (int32_t)-20},
-                               {"attr5", (uint32_t)20},
-                               {"attr6", (int64_t)-20},
-                               {"attr7", (uint64_t)20},
-                               {"attr8", 3.1},
-                               {"attr9", "string"}})
+  tracer
+      ->StartSpan("span 1", {{"attr1", "string"},
+                             {"attr2", false},
+                             {"attr1", 314159},
+                             {"attr3", (unsigned int)314159},
+                             {"attr4", (int32_t)-20},
+                             {"attr5", (uint32_t)20},
+                             {"attr6", (int64_t)-20},
+                             {"attr7", (uint64_t)20},
+                             {"attr8", 3.1},
+                             {"attr9", "string"}})
       ->End();
 
   ASSERT_EQ(1, spans_received->size());
