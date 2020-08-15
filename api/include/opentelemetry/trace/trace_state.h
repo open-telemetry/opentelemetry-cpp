@@ -99,18 +99,13 @@ public:
     // This is a workaround for the fact that strcpy doesn't accept a const char* destination.
     nostd::unique_ptr<const char[]> CopyStringToPointer(nostd::string_view str)
     {
-      try {
-//        std::cout<<"A"<<std::endl;
-//        std::cout<<str<<std::endl;
-        nostd::unique_ptr<char[]> temp(new char[str.size() + 1]);
-//        std::cout<<"B"<<std::endl;
-        strcpy(temp.get(), str.data());
-//        std::cout<<"C"<<temp.get()<<std::endl;
-        return nostd::unique_ptr<const char[]>(temp.release());
-      } catch (std::exception& e) {
-        std::cout << e.what() << '\n';
-        throw;
-      }
+      std::cout<<"A"<<std::endl;
+      std::cout<<str<<" length is "<<str.length()<<std::endl;
+      nostd::unique_ptr<char[]> temp(new char[str.size() + 1]);
+//      std::cout<<"B"<<std::endl;
+      strcpy(temp.get(), str.data());
+//      std::cout<<"C"<<temp.get()<<std::endl;
+      return nostd::unique_ptr<const char[]>(temp.release());
     }
   };
 
