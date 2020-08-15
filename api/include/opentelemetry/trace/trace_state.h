@@ -96,6 +96,7 @@ public:
     nostd::unique_ptr<const char[]> CopyStringToPointer(nostd::string_view str)
     {
       std::cout<<"A"<<std::endl;
+      std::cout<<str<<std::endl;
       nostd::unique_ptr<char[]> temp(new char[str.size() + 1]);
       std::cout<<"B"<<std::endl;
       strcpy(temp.get(), str.data());
