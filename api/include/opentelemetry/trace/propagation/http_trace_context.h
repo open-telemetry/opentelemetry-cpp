@@ -343,10 +343,11 @@ private:
         {
           key = trace_state_header.substr(start_pos, ctr_pos - start_pos);
           val = trace_state_header.substr(ctr_pos + 1, end_pos - ctr_pos);
-          if (key != "") {
+          if (key != "")
+          {
             trace_state.Set(key, val);
             nostd::string_view v;
-            trace_state.Get(key,v);
+            trace_state.Get(key, v);
           }
         }
         ctr_pos   = -1;
@@ -370,10 +371,11 @@ private:
       {
         key = trace_state_header.substr(start_pos, ctr_pos - start_pos);
         val = trace_state_header.substr(ctr_pos + 1, end_pos - ctr_pos);
-        if (key != "") {
+        if (key != "")
+        {
           trace_state.Set(key, val);
           nostd::string_view v;
-          trace_state.Get(key,v);
+          trace_state.Get(key, v);
         }
       }
       element_num++;

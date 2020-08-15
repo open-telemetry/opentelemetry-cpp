@@ -63,7 +63,8 @@ public:
 
     // Move constructor and assignment operator
     Entry(Entry &&other) = default;
-    Entry(const Entry &other) {
+    Entry(const Entry &other)
+    {
       key_   = CopyStringToPointer(other.key_.get());
       value_ = CopyStringToPointer(other.value_.get());
     }
@@ -95,7 +96,7 @@ public:
     nostd::unique_ptr<const char[]> CopyStringToPointer(nostd::string_view str)
     {
       nostd::unique_ptr<char[]> temp(new char[str.size() + 1]);
-      strncpy(temp.get(), str.data(),str.size());
+      strncpy(temp.get(), str.data(), str.size());
       temp.get()[str.size()] = '\0';
       return nostd::unique_ptr<const char[]>(temp.release());
     }
@@ -111,7 +112,7 @@ public:
     num_entries_ = 0;
     for (const auto &entry : trace_state.Entries())
     {
-      Entry copy = entry;
+      Entry copy                     = entry;
       (entries_.get())[num_entries_] = Entry(copy);
       num_entries_++;
     }
@@ -123,7 +124,7 @@ public:
     num_entries_ = 0;
     for (const auto &entry : trace_state.Entries())
     {
-      Entry copy = entry;
+      Entry copy                     = entry;
       (entries_.get())[num_entries_] = Entry(copy);
       num_entries_++;
     }
