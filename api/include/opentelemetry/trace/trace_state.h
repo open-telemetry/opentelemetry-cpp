@@ -133,7 +133,7 @@ public:
     {
       std::cout<<"copying1.1"<<std::endl;
       Entry copy = entry;
-      std::cout<<"copying1.2"<<std::endl;
+      std::cout<<"copying1.2 "<<copy.GetKey()<<" "<<copy.GetValue()<<std::endl;
       (entries_.get())[num_entries_] = Entry(copy);
       std::cout<<"copying1.3"<<std::endl;
       num_entries_++;
