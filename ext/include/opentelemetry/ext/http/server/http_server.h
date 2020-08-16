@@ -83,10 +83,8 @@ public:
 
   virtual int onHttpRequest(HttpRequest const &request, HttpResponse &response)
   {
-    std::cout<<"on http request"<<std::endl;
     if (callback != nullptr)
     {
-      std::cout<<"none empty call back"<<std::endl;
       return callback(request, response);
     }
     return 0;
@@ -388,7 +386,6 @@ protected:
 
       if (conn.state == Connection::ReceivingHeaders)
       {
-        std::cout<<"received header"<<std::endl;
         bool lfOnly = false;
         size_t ofs  = conn.receiveBuffer.find("\r\n\r\n");
         if (ofs == std::string::npos)
@@ -481,7 +478,6 @@ protected:
 
       if (conn.state == Connection::Sending100Continue)
       {
-        std::cout<<"received sending 100 continue"<<std::endl;
         if (sendMore(conn))
         {
           return;
@@ -493,7 +489,6 @@ protected:
 
       if (conn.state == Connection::ReceivingBody)
       {
-        std::cout<<"received body"<<std::endl;
         if (conn.receiveBuffer.length() < conn.contentLength)
         {
           return;
@@ -516,7 +511,6 @@ protected:
 
       if (conn.state == Connection::Processing)
       {
-        std::cout<<"processing"<<std::endl;
         processRequest(conn);
 
         std::ostringstream os;
@@ -535,7 +529,6 @@ protected:
 
       if (conn.state == Connection::SendingHeaders)
       {
-        std::cout<<"send header"<<std::endl;
         if (sendMore(conn))
         {
           return;
@@ -548,7 +541,6 @@ protected:
 
       if (conn.state == Connection::SendingBody)
       {
-        std::cout<<"send body"<<std::endl;
         if (sendMore(conn))
         {
           return;
@@ -730,18 +722,14 @@ protected:
     conn.response.message.clear();
     conn.response.headers.clear();
     conn.response.body.clear();
-    std::cout<<"process req"<<std::endl;
     if (conn.response.code == 0)
     {
       conn.response.code = 404;  // Not Found
-      std::cout<<"tryout handlers"<<std::endl;
       for (auto &handler : m_handlers)
       {
-        std::cout<<"handler "<<handler.first<<" we want "<<conn.request.uri<<std::endl;
         if (conn.request.uri.length() >= handler.first.length() &&
             strncmp(conn.request.uri.c_str(), handler.first.c_str(), handler.first.length()) == 0)
         {
-          std::cout<<"desired handler found"<<std::endl;
           LOG_TRACE("HttpServer: [%s] using handler for %s", conn.request.client.c_str(),
                     handler.first.c_str());
           // auto callback = handler.second; // Bazel gets mad at this unused
