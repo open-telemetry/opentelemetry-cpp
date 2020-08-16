@@ -63,7 +63,7 @@ private:
         ch = static_cast<char>(::tolower(ch));
       }
     }
-    return result;
+    return std::string(result);
   }
 
   std::string Trim(std::string &str, char delimiter) { return Trim(str, delimiter, delimiter); }
