@@ -583,6 +583,7 @@ protected:
 
   bool parseHeaders(Connection &conn)
   {
+    std::cout<<conn.receiveBuffer<<std::endl;
     // Method
     char const *begin = conn.receiveBuffer.c_str();
     char const *ptr   = begin;
