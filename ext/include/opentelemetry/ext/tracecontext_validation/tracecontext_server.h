@@ -45,7 +45,7 @@ protected:
 private:
   static std::string NormalizeName(char const *begin, char const *end)
   {
-    std::string result(begin, end);
+    const std::string result(begin, end);
     bool first = true;
     for (char &ch : result)
     {
