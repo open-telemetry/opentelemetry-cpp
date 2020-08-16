@@ -83,8 +83,10 @@ public:
 
   virtual int onHttpRequest(HttpRequest const &request, HttpResponse &response)
   {
+    std::cout<<"on http request"<<std::endl;
     if (callback != nullptr)
     {
+      std::cout<<"none empty call back"<<std::endl;
       return callback(request, response);
     }
     return 0;
