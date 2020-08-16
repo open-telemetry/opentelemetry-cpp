@@ -118,8 +118,7 @@ private:
       {
         return false;
       }
-      std::string key1 = NormalizeName(begin, ptr);
-      key1 = Trim(key1, '\"');
+      std::string key1 = Trim(NormalizeName(begin, ptr), '\"');
       ptr++;
       while (*ptr == ' ')
       {
@@ -148,8 +147,7 @@ private:
       {
         return false;
       }
-      std::string key2 = NormalizeName(begin, ptr);
-      key2 = Trim(key2, '\"');
+      std::string key2 = Trim(NormalizeName(begin, ptr), '\"');
       ptr++;
       while (*ptr == ' ')
       {
