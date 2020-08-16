@@ -81,7 +81,7 @@ private:
 
   bool ParseBody(std::string content, std::vector<std::map<std::string, std::string>> &send_list)
   {
-    char const *begin = content;
+    char const *begin = content.c_str();
     char const *ptr   = begin;
     while (*ptr == ' ')
     {
