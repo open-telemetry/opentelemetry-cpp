@@ -10,10 +10,11 @@
 #include "opentelemetry/ext/http/server/http_server.h"
 #include "opentelemetry/ext/tracecontext_validation/tracecontext_client.h"
 
+OPENTELEMETRY_BEGIN_NAMESPACE
 namespace HTTP_SERVER_NS
 {
 
-class TraceContextServer : public HTTP_SERVER_NS::HttpServer
+class TraceContextServer : public HttpServer
 {
 protected:
   /**
@@ -86,5 +87,6 @@ private:
   const std::string test_protocol_ = "/test/";
   HttpClients clients;
 };
-
 }  // namespace HTTP_SERVER_NS
+OPENTELEMETRY_END_NAMESPACE
+

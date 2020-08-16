@@ -1,5 +1,6 @@
 #include "opentelemetry/ext/tracecontext_validation/tracecontext_client.h"
 
+OPENTELEMETRY_BEGIN_NAMESPACE
 namespace HTTP_SERVER_NS
 {
 
@@ -76,3 +77,4 @@ public:
   HttpClient StartNewClient() { return HttpClient(); }
 };
 }  // namespace HTTP_SERVER_NS
+OPENTELEMETRY_END_NAMESPACE
