@@ -3,6 +3,7 @@ cc_binary(
     srcs = [
         "tracecontext_validate.cc",
     ],
+    linkopts = ["-lcurl"],
     deps = [
         "//api",
         "//ext/src/tracecontext_validation",
