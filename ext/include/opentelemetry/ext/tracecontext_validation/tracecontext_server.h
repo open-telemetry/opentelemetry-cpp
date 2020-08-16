@@ -45,7 +45,7 @@ protected:
 private:
   static std::string NormalizeName(char const *begin, char const *end)
   {
-    const std::string result(begin, end);
+    std::string result(begin, end);
     bool first = true;
     for (char &ch : result)
     {
@@ -118,7 +118,8 @@ private:
       {
         return false;
       }
-      std::string key1 = Trim(NormalizeName(begin, ptr), '\"');
+      std::string key1 = NormalizeName(begin, ptr);
+      key1 = Trim(key1, '\"');
       ptr++;
       while (*ptr == ' ')
       {
@@ -130,7 +131,8 @@ private:
       {
         ptr++;
       }
-      kv_pairs[key1] = Trim(std::string(begin, ptr), '[', ']');
+      std::string val1 = std::string(begin, ptr);
+      kv_pairs[key1] = Trim(val1, '[', ']');
 
       ptr++;
       while (*ptr == ' ')
@@ -147,7 +149,8 @@ private:
       {
         return false;
       }
-      std::string key2 = Trim(NormalizeName(begin, ptr), '\"');
+      std::string key2 = NormalizeName(begin, ptr);
+      key2 = Trim(key2, '\"');
       ptr++;
       while (*ptr == ' ')
       {
@@ -159,7 +162,8 @@ private:
       {
         ptr++;
       }
-      kv_pairs[key2] = Trim(std::string(begin, ptr), '[', ']');
+      std::string val2 = std::string(begin, ptr);
+      kv_pairs[key2] = Trim(val2, '[', ']');
       send_list.push_back(kv_pairs);
     }
     return true;
