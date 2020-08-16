@@ -202,7 +202,7 @@ private:
             std::cout<<"sending to url-3"<<std::endl;
             client.SendRequest(url);
             std::cout<<"sending to url-4"<<std::endl;
-            client.~HttpClient();
+//            client.~HttpClient();
             std::cout<<"sending to url-5"<<std::endl;
           }
           else
