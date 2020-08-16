@@ -737,10 +737,11 @@ protected:
       std::cout<<"tryout handlers"<<std::endl;
       for (auto &handler : m_handlers)
       {
-        std::cout<<"handler "<<handler.first<<std::endl;
+        std::cout<<"handler "<<handler.first<<" we want "<<conn.request.uri<<std::endl;
         if (conn.request.uri.length() >= handler.first.length() &&
             strncmp(conn.request.uri.c_str(), handler.first.c_str(), handler.first.length()) == 0)
         {
+          std::cout<<"desired handler found"<<std::endl;
           LOG_TRACE("HttpServer: [%s] using handler for %s", conn.request.client.c_str(),
                     handler.first.c_str());
           // auto callback = handler.second; // Bazel gets mad at this unused
