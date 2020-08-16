@@ -5,5 +5,6 @@ cc_binary(
     ],
     deps = [
         "//api",
+        "//ext/include/opentelemetry/ext/tracecontext_validation",
     ],
 )
