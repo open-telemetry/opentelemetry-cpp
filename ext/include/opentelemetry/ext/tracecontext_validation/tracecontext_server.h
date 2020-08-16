@@ -63,7 +63,7 @@ private:
         ch = static_cast<char>(::tolower(ch));
       }
     }
-    return std::string(result);
+    return result;
   }
 
   std::string Trim(std::string &str, char delimiter) { return Trim(str, delimiter, delimiter); }
@@ -118,7 +118,8 @@ private:
       {
         return false;
       }
-      std::string key1 = Trim(NormalizeName(begin, ptr), '\"');
+      std::string key1 = NormalizeName(begin, ptr);
+      key1 = Trim(key1, '\"');
       ptr++;
       while (*ptr == ' ')
       {
@@ -147,7 +148,8 @@ private:
       {
         return false;
       }
-      std::string key2 = Trim(NormalizeName(begin, ptr), '\"');
+      std::string key2 = NormalizeName(begin, ptr);
+      key2 = Trim(key2, '\"');
       ptr++;
       while (*ptr == ' ')
       {
