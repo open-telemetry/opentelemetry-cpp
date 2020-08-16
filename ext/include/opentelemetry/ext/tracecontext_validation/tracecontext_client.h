@@ -20,6 +20,7 @@
 
 #pragma once
 
+OPENTELEMETRY_BEGIN_NAMESPACE
 namespace HTTP_SERVER_NS
 {
 
@@ -63,3 +64,4 @@ public:
   HttpClient StartNewClient();
 };
 }  // namespace HTTP_SERVER_NS
+OPENTELEMETRY_END_NAMESPACE

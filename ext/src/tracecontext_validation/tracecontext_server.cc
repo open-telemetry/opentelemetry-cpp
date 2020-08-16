@@ -1,5 +1,6 @@
 #include "opentelemetry/ext/tracecontext_validation/tracecontext_server.h"
 
+OPENTELEMETRY_BEGIN_NAMESPACE
 namespace HTTP_SERVER_NS
 {
 
@@ -186,3 +187,4 @@ private:
 };
 
 }  // namespace HTTP_SERVER_NS
+OPENTELEMETRY_END_NAMESPACE
