@@ -14,6 +14,7 @@
 
 #pragma once
 
+#include <iostream>
 #include <functional>
 #include <list>
 #include <map>
@@ -385,6 +386,7 @@ protected:
 
       if (conn.state == Connection::ReceivingHeaders)
       {
+        std::cout<<"received stuff"<<std::endl;
         bool lfOnly = false;
         size_t ofs  = conn.receiveBuffer.find("\r\n\r\n");
         if (ofs == std::string::npos)
