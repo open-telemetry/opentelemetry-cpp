@@ -12,10 +12,11 @@
 #include "opentelemetry/ext/tracecontext_validation/tracecontext_client.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
-namespace HTTP_SERVER_NS
+namespace ext
 {
-
-class TraceContextServer : public HttpServer
+namespace validation
+{
+class TraceContextServer : public HTTP_SERVER_NS::HttpServer
 {
 protected:
   /**
@@ -42,13 +43,127 @@ protected:
   void InitializeFileEndpoint(FileHttpServer &server);
 
 private:
-  static std::string NormalizeName(char const *begin, char const *end);
+  static std::string NormalizeName(char const *begin, char const *end)
+  {
+    std::string result(begin, end);
+    bool first = true;
+    for (char &ch : result)
+    {
+      if (first)
+      {
+        ch    = static_cast<char>(::toupper(ch));
+        first = false;
+      }
+      else if (ch == '-')
+      {
+        first = true;
+      }
+      else
+      {
+        ch = static_cast<char>(::tolower(ch));
+      }
+    }
+    return result;
+  }
 
-  std::string Trim(std::string &str, char delimiter);
+  std::string Trim(std::string &str, char delimiter) { return Trim(str, delimiter, delimiter); }
 
-  std::string Trim(std::string &str, char delimiter_l, char delimiter_r);
+  std::string Trim(std::string &str, char delimiter_l, char delimiter_r)
+  {
+    std::size_t first = str.find_first_not_of(delimiter_l);
+    if (std::string::npos == first)
+    {
+      return str;
+    }
+    std::size_t last = str.find_last_not_of(delimiter_r);
+    return str.substr(first, (last - first + 1));
+  }
 
-  bool ParseBody(std::string content, std::vector<std::map<std::string, std::string>> &send_list);
+  bool ParseBody(std::string content, std::vector<std::map<std::string, std::string>> &send_list)
+  {
+    char const *begin = content;
+    char const *ptr   = begin;
+    while (*ptr == ' ')
+    {
+      ptr++;
+    }
+    if (*ptr == '[')
+    {
+      ptr++;
+    }
+    // Key-Value Pairs
+    while (*ptr != '\r' && *ptr != '\n')
+    {
+      std::map<std::string, std::string> kv_pairs;
+      // Begin
+      if (*ptr == ',')
+      {
+        ptr++;
+      }
+      while (*ptr == ' ')
+      {
+        ptr++;
+      }
+      if (*ptr == '{')
+      {
+        ptr++;
+      }
+      // Key1
+      begin = ptr;
+      while (*ptr && *ptr != ':' && *ptr != ' ' && *ptr != '\r' && *ptr != '\n')
+      {
+        ptr++;
+      }
+      if (*ptr != ':')
+      {
+        return false;
+      }
+      std::string key1 = Trim(NormalizeName(begin, ptr), '\"');
+      ptr++;
+      while (*ptr == ' ')
+      {
+        ptr++;
+      }
+      // Value1
+      begin = ptr;
+      while (*ptr && *ptr != '\r' && *ptr != '\n' && *ptr != ',')
+      {
+        ptr++;
+      }
+      kv_pairs[key1] = Trim(std::string(begin, ptr), '[', ']');
+
+      ptr++;
+      while (*ptr == ' ')
+      {
+        ptr++;
+      }
+      // Key2
+      begin = ptr;
+      while (*ptr && *ptr != ':' && *ptr != ' ' && *ptr != '\r' && *ptr != '\n')
+      {
+        ptr++;
+      }
+      if (*ptr != ':')
+      {
+        return false;
+      }
+      std::string key2 = Trim(NormalizeName(begin, ptr), '\"');
+      ptr++;
+      while (*ptr == ' ')
+      {
+        ptr++;
+      }
+      // Value2
+      begin = ptr;
+      while (*ptr && *ptr != '\r' && *ptr != '\n' && *ptr != '}')
+      {
+        ptr++;
+      }
+      kv_pairs[key2] = Trim(std::string(begin, ptr), '[', ']');
+      send_list.push_back(kv_pairs);
+    }
+    return true;
+  }
 
   HTTP_SERVER_NS::HttpRequestCallback SendRequestBack{
       [&](HTTP_SERVER_NS::HttpRequest const &req, HTTP_SERVER_NS::HttpResponse &resp) {
@@ -88,6 +203,7 @@ private:
   const std::string test_protocol_ = "/test/";
   HttpClients clients;
 };
-}  // namespace HTTP_SERVER_NS
+}// namespace validation
+}// namespace ext
 OPENTELEMETRY_END_NAMESPACE
 

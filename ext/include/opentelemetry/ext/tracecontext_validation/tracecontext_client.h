@@ -22,27 +22,36 @@
 #include "opentelemetry/version.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
-namespace HTTP_SERVER_NS
+namespace ext
 {
-
+namespace validation
+{
 // Because libcurl global init is not thread safe, at most one HttpClients object
 // should be standing at the same time only.
 class HttpClients
 {
 public:
-  // Intialize the environment for all clients
-  HttpClients();
+// Intialize the environment for all clients
+  HttpClients() { curl_global_init(CURL_GLOBAL_ALL); }
 
   // Stop libcurl
-  ~HttpClients();
+  ~HttpClients() { curl_global_cleanup(); }
 
   class HttpClient
   {
   public:
-    HttpClient();
+    HttpClient()
+    {
+      res  = CURLcode();
+      curl = curl_easy_init();
+    }
 
     // clean up the curl
-    ~HttpClient();
+    ~HttpClient()
+    {
+      curl_slist_free_all(list);
+      curl_easy_cleanup(curl);
+    }
 
     // Sending the request stored and return true if communication successful,
     // and false otherwise.
@@ -64,5 +73,6 @@ public:
 
   HttpClient StartNewClient();
 };
-}  // namespace HTTP_SERVER_NS
+} // namespace validation
+} // namespace ext
 OPENTELEMETRY_END_NAMESPACE
