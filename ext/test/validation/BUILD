@@ -4,7 +4,6 @@ cc_binary(
         "tracecontext_validate.cc",
     ],
     deps = [
-        ":tracecontext_validation",
         "//api",
     ],
 )
