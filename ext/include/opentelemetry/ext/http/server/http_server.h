@@ -379,6 +379,7 @@ protected:
     {
       if (conn.state == Connection::Idle)
       {
+        std::cout<<"being idle"<<std::endl;
         conn.response.code = 0;
         conn.state         = Connection::ReceivingHeaders;
         LOG_TRACE("HttpServer: [%s] receiving headers", conn.request.client.c_str());
