@@ -210,7 +210,7 @@ private:
         return 200;
       }};
 
-  const std::string test_protocol_ = "/test/";
+  const std::string test_protocol_ = "/test";
   nostd::unique_ptr<HttpClients> clients;
 };
 }// namespace validation
