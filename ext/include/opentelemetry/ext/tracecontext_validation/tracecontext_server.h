@@ -187,7 +187,7 @@ private:
           }
           if (url != "")
           {
-            HttpClient client = clients.StartNewClient();
+            HttpClients::HttpClient client = clients.StartNewClient();
             client.AddPostField("arguments", arguments);
             client.SendRequest(url);
             client.~HttpClient();
