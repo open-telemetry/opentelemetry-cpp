@@ -728,12 +728,14 @@ protected:
     conn.response.message.clear();
     conn.response.headers.clear();
     conn.response.body.clear();
-
+    std::cout<<"process req"<<std::endl;
     if (conn.response.code == 0)
     {
       conn.response.code = 404;  // Not Found
+      std::cout<<"tryout handlers"<<std::endl;
       for (auto &handler : m_handlers)
       {
+        std::cout<<"handler "<<handler.first<<std::endl;
         if (conn.request.uri.length() >= handler.first.length() &&
             strncmp(conn.request.uri.c_str(), handler.first.c_str(), handler.first.length()) == 0)
         {
