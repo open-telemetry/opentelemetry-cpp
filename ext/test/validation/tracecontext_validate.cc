@@ -28,6 +28,6 @@ int main()
   // Stop server
   server.stop();
   cout << "Server stopped.\n";
-  clients.~HttpClients();
+//  clients.~HttpClients();
   return 0;
 }
