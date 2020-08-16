@@ -1,2 +1,2 @@
-add_subdirectory(zpages)
 add_subdirectory(validation)
+add_subdirectory(zpages)
