@@ -8,7 +8,7 @@
 #include <vector>
 
 #include "opentelemetry/ext/http/server/http_server.h"
-#include "tracecontext_validation/tracecontext_client.h"
+#include "opentelemetry/ext/tracecontext_validation/tracecontext_client.h"
 
 namespace HTTP_SERVER_NS
 {

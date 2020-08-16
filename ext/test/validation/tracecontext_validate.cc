@@ -1,5 +1,5 @@
-#include "tracecontext_validation/tracecontext_client.h"
-#include "tracecontext_validation/tracecontext_server.h"
+#include "opentelemetry/ext/tracecontext_validation/tracecontext_client.h"
+#include "opentelemetry/ext/tracecontext_validation/tracecontext_server.h"
 
 #include <algorithm>
 #include <atomic>
