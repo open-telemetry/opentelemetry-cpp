@@ -175,6 +175,7 @@ private:
 
   HTTP_SERVER_NS::HttpRequestCallback SendRequestBack{
       [&](HTTP_SERVER_NS::HttpRequest const &req, HTTP_SERVER_NS::HttpResponse &resp) {
+        std::cout<<"call back invoked"<<std::endl;
         std::vector<std::map<std::string, std::string>> send_list;
         ParseBody(req.content.c_str(), send_list);
         for (std::map<std::string, std::string> kv_pairs : send_list)
@@ -195,6 +196,7 @@ private:
           }
           if (url != "")
           {
+            std::cout<<"sending to url"<<std::endl;
             HttpClients::HttpClient client = clients.get()->StartNewClient();
             client.AddPostField("arguments", arguments);
             client.SendRequest(url);
