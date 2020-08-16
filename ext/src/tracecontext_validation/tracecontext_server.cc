@@ -5,7 +5,6 @@ namespace ext
 {
 namespace validation
 {
-void SetClientManager(HttpClients &http_clients) { clients = http_clients; }
 } // namespace validation
 } // namespace ext
 OPENTELEMETRY_END_NAMESPACE

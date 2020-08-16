@@ -33,7 +33,7 @@ public:
     InitializeCallBack(*this);
   };
 
-  void SetClientManager(HttpClients &http_clients);
+  void SetClientManager(HttpClients &http_clients) { clients = http_clients; }
 
   /**
    * Set the HTTP server to serve static files from the root of host:port.
