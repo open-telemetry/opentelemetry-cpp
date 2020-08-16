@@ -52,8 +52,8 @@ public:
     // clean up the curl
     ~HttpClient()
     {
-      curl_slist_free_all(list);
-//      curl_easy_cleanup(curl);
+//      curl_slist_free_all(list);
+      curl_easy_cleanup(curl);
     }
 
     // Sending the request stored and return true if communication successful,
