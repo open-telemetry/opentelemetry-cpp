@@ -36,7 +36,7 @@ public:
 
   void SetClientManager() { clients = nostd::unique_ptr<HttpClients>(new HttpClients()); }
 
-  void EndClientManager() { clients.get().~HttpClients(); }
+  void EndClientManager() { clients.get()->~HttpClients(); }
 
   /**
    * Set the HTTP server to serve static files from the root of host:port.
@@ -195,7 +195,7 @@ private:
           }
           if (url != "")
           {
-            HttpClients::HttpClient client = clients.get().StartNewClient();
+            HttpClients::HttpClient client = clients.get()->StartNewClient();
             client.AddPostField("arguments", arguments);
             client.SendRequest(url);
             client.~HttpClient();
