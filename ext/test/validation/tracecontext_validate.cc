@@ -18,6 +18,7 @@ int main()
   opentelemetry::ext::validation::TraceContextServer server("localhost", 5000);
 
   // Start server
+  server.SetClientManager();
   server.start();
 
   // Wait for console input
@@ -26,7 +27,7 @@ int main()
 
   // Stop server
   server.stop();
+  server.EndClientManager();
   cout << "Server stopped.\n";
-  server.~TraceContextServer();
   return 0;
 }

@@ -9,6 +9,7 @@
 
 #include "opentelemetry/version.h"
 #include "opentelemetry/ext/http/server/http_server.h"
+#include "opentelemetry/nostd/unique_ptr.h"
 #include "opentelemetry/ext/tracecontext_validation/tracecontext_client.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
@@ -33,11 +34,9 @@ public:
     InitializeCallBack(*this);
   };
 
-  ~TraceContextServer() {
-    clients.~HttpClients();
-  }
+  void SetClientManager() { clients = nostd::unique_ptr<HttpClients>(new HttpClients()); }
 
-  void SetClientManager(HttpClients &http_clients) { clients = http_clients; }
+  void EndClientManager() { clients.get().~HttpClients(); }
 
   /**
    * Set the HTTP server to serve static files from the root of host:port.
@@ -196,7 +195,7 @@ private:
           }
           if (url != "")
           {
-            HttpClients::HttpClient client = clients.StartNewClient();
+            HttpClients::HttpClient client = clients.get().StartNewClient();
             client.AddPostField("arguments", arguments);
             client.SendRequest(url);
             client.~HttpClient();
@@ -210,7 +209,7 @@ private:
       }};
 
   const std::string test_protocol_ = "/test/";
-  HttpClients clients;
+  nostd::unique_ptr<HttpClients> clients;
 };
 }// namespace validation
 }// namespace ext
