@@ -13,7 +13,7 @@
 // limitations under the License.
 
 #pragma once
-
+#include <iostream>
 #include <stdio.h>
 #include <iterator>
 #include <string>
@@ -32,7 +32,10 @@ class HttpClients
 {
 public:
 // Intialize the environment for all clients
-  HttpClients() { curl_global_init(CURL_GLOBAL_ALL); }
+  HttpClients() {
+    std::cout<<"initializing the http clients"<<std::endl;
+    curl_global_init(CURL_GLOBAL_ALL);
+  }
 
   // Stop libcurl
   ~HttpClients() { curl_global_cleanup(); }
