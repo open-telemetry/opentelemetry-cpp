@@ -5,7 +5,7 @@ cc_binary(
     ],
     deps = [
         "//api",
-        "//ext/src/zpages",
+        "//ext/src/tracecontext_validation",
         "//sdk/src/trace",
     ],
 )
