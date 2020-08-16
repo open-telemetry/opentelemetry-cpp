@@ -379,7 +379,6 @@ protected:
     {
       if (conn.state == Connection::Idle)
       {
-        std::cout<<"being idle"<<std::endl;
         conn.response.code = 0;
         conn.state         = Connection::ReceivingHeaders;
         LOG_TRACE("HttpServer: [%s] receiving headers", conn.request.client.c_str());
@@ -387,7 +386,7 @@ protected:
 
       if (conn.state == Connection::ReceivingHeaders)
       {
-        std::cout<<"received stuff"<<std::endl;
+        std::cout<<"received header"<<std::endl;
         bool lfOnly = false;
         size_t ofs  = conn.receiveBuffer.find("\r\n\r\n");
         if (ofs == std::string::npos)
@@ -480,6 +479,7 @@ protected:
 
       if (conn.state == Connection::Sending100Continue)
       {
+        std::cout<<"received sending 100 continue"<<std::endl;
         if (sendMore(conn))
         {
           return;
@@ -491,6 +491,7 @@ protected:
 
       if (conn.state == Connection::ReceivingBody)
       {
+        std::cout<<"received body"<<std::endl;
         if (conn.receiveBuffer.length() < conn.contentLength)
         {
           return;
@@ -513,6 +514,7 @@ protected:
 
       if (conn.state == Connection::Processing)
       {
+        std::cout<<"processing"<<std::endl;
         processRequest(conn);
 
         std::ostringstream os;
@@ -531,6 +533,7 @@ protected:
 
       if (conn.state == Connection::SendingHeaders)
       {
+        std::cout<<"send header"<<std::endl;
         if (sendMore(conn))
         {
           return;
@@ -543,6 +546,7 @@ protected:
 
       if (conn.state == Connection::SendingBody)
       {
+        std::cout<<"send body"<<std::endl;
         if (sendMore(conn))
         {
           return;
