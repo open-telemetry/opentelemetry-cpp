@@ -30,6 +30,7 @@ protected:
     os << host << ":" << port;
     setServerName(os.str());
     addListeningPort(port);
+    InitializeCallBack(*this);
   };
 
   void SetClientManager(HttpClients &http_clients);
