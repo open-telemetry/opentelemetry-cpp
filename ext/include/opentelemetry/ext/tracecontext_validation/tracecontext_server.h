@@ -40,7 +40,7 @@ protected:
    * initialize their own, otherwise everything will be served like a file
    * @param server should be an instance of this object
    */
-  void InitializeFileEndpoint(FileHttpServer &server);
+  void TraceContextServer::InitializeCallBack(TraceContextServer &server) { server[test_protocol_] = SendRequestBack; }
 
 private:
   static std::string NormalizeName(char const *begin, char const *end)
