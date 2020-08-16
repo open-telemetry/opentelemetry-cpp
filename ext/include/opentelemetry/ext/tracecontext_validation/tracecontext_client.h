@@ -19,6 +19,7 @@
 #include <string>
 #include <vector>
 #include "curl/curl.h"
+#include "opentelemetry/version.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace HTTP_SERVER_NS

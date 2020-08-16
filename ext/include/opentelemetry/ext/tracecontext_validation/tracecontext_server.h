@@ -7,6 +7,7 @@
 #include <unordered_map>
 #include <vector>
 
+#include "opentelemetry/version.h"
 #include "opentelemetry/ext/http/server/http_server.h"
 #include "opentelemetry/ext/tracecontext_validation/tracecontext_client.h"
 
