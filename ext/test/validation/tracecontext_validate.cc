@@ -10,9 +10,7 @@
 #include <vector>
 #include "curl/curl.h"
 
-namespace HTTP_SERVER_NS
-{
-
+using namespace std;
 int main()
 {
   atomic<uint32_t> reqCount{0};
@@ -35,6 +33,5 @@ int main()
   server.stop();
   cout << "Server stopped.\n";
   // clients.~HttpClients();
+  return 0;
 }
-
-}  // namespace HTTP_SERVER_NS
