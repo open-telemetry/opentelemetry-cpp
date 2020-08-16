@@ -1,14 +1,4 @@
-#pragma once
-
-#include <fstream>
-#include <iostream>
-#include <map>
-#include <string>
-#include <unordered_map>
-#include <vector>
-
-#include "opentelemetry/ext/http/server/http_server.h"
-#include "opentelemetry/ext/tracecontext_validation/tracecontext_client.h"
+#include "opentelemetry/ext/tracecontext_validation/tracecontext_server.h"
 
 namespace HTTP_SERVER_NS
 {
@@ -29,15 +19,9 @@ protected:
     addListeningPort(port);
   };
 
-  void SetClientManager(HttpClients &http_clients) { clients = http_clients; }
+  void SetClientManager(HttpClients &http_clients);
 
-  /**
-   * Set the HTTP server to serve static files from the root of host:port.
-   * Derived HTTP servers should initialize the file endpoint AFTER they
-   * initialize their own, otherwise everything will be served like a file
-   * @param server should be an instance of this object
-   */
-  void InitializeFileEndpoint(FileHttpServer &server) { server[test_protocol_] = SendRequestBack; }
+  void InitializeCallBack(FileHttpServer &server) { server[test_protocol_] = SendRequestBack; }
 
 private:
   static std::string NormalizeName(char const *begin, char const *end)

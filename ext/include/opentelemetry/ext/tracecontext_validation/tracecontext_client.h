@@ -29,62 +29,29 @@ class HttpClients
 {
 public:
   // Intialize the environment for all clients
-  HttpClients() { curl_global_init(CURL_GLOBAL_ALL); }
+  HttpClients();
 
   // Stop libcurl
-  ~HttpClients() { curl_global_cleanup(); }
+  ~HttpClients();
 
   class HttpClient
   {
   public:
-    HttpClient()
-    {
-      res  = CURLcode();
-      curl = curl_easy_init();
-    }
+    HttpClient();
 
     // clean up the curl
-    ~HttpClient()
-    {
-      curl_slist_free_all(list);
-      curl_easy_cleanup(curl);
-    }
+    ~HttpClient();
 
     // Sending the request stored and return true if communication successful,
     // and false otherwise.
-    bool SendRequest(std::string url)
-    {
-      if (curl)
-      {
-        curl_easy_setopt(curl, CURLOPT_URL, url);
-        curl_easy_setopt(curl, CURLOPT_HTTPHEADER, list);
-        curl_easy_setopt(curl, CURLOPT_POSTFIELDS, fields);
-        curl_easy_setopt(curl, CURLOPT_POSTFIELDSIZE, -1);
-      }
-      res = curl_easy_perform(curl);
-      if (res != CURLE_OK)
-        return false;
-      else
-        return true;
-    }
+    bool SendRequest(std::string url);
 
     // Set the headers of the post request to be transmitted.
-    void SetHeaders(std::vector<std::string> headers)
-    {
-      for (std::vector<std::string>::iterator it = headers.begin(); it != headers.end(); it++)
-      {
-        list = curl_slist_append(list, (*it).c_str());
-      }
-    }
+    void SetHeaders(std::vector<std::string> headers);
 
     // Set the POST fields of the post request to be transmitted, need to percent-encode '=' sign
     // in trace state to "%3D"
-    void AddPostField(std::string post_field_name, std::string post_field_value)
-    {
-      char *name  = curl_easy_escape(curl, post_field_name.c_str(), 0);
-      char *value = curl_easy_escape(curl, post_field_value.c_str(), 0);
-      fields += "&" + std::string(name) + "=" + std::string(value);
-    }
+    void AddPostField(std::string post_field_name, std::string post_field_value);
 
   private:
     CURL *curl;
@@ -93,6 +60,6 @@ public:
     std::string fields;
   };
 
-  HttpClient StartNewClient() { return HttpClient(); }
+  HttpClient StartNewClient();
 };
 }  // namespace HTTP_SERVER_NS
