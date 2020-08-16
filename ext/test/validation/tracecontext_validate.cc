@@ -16,7 +16,7 @@ int main()
   atomic<uint32_t> reqCount{0};
 
   opentelemetry::ext::validation::TraceContextServer server("localhost", 5000);
-  opentelemetry::ext::validation::HttpClients clients(); // Initialize libcurl
+  opentelemetry::ext::validation::HttpClients clients; // Initialize libcurl
 
   // Start server
   server.start();
