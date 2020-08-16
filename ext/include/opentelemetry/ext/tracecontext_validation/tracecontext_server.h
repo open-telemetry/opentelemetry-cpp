@@ -33,6 +33,10 @@ public:
     InitializeCallBack(*this);
   };
 
+  ~TraceContextServer() {
+    clients.~HttpClients();
+  }
+
   void SetClientManager(HttpClients &http_clients) { clients = http_clients; }
 
   /**
