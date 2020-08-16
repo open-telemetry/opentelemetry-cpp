@@ -583,7 +583,6 @@ protected:
 
   bool parseHeaders(Connection &conn)
   {
-    std::cout<<conn.receiveBuffer<<std::endl;
     // Method
     char const *begin = conn.receiveBuffer.c_str();
     char const *ptr   = begin;
@@ -733,6 +732,7 @@ protected:
     if (conn.response.code == 0)
     {
       conn.response.code = 404;  // Not Found
+      std::cout<<"try out handlers"<<std::endl;
       for (auto &handler : m_handlers)
       {
         if (conn.request.uri.length() >= handler.first.length() &&
