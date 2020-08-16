@@ -18,7 +18,7 @@ namespace validation
 {
 class TraceContextServer : public HTTP_SERVER_NS::HttpServer
 {
-protected:
+public:
   /**
    * Construct the server by initializing the endpoint for serving static files,
    * which show up on the web if the user is on the given host:port. Static
