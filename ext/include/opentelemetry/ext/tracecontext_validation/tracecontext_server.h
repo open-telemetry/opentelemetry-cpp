@@ -131,7 +131,7 @@ private:
         return false;
       }
       std::string key1 = NormalizeName(begin, ptr);
-      key1 = Trim(key1, '\"');
+      key1 = Trim(key1, '"');
       ptr++;
       while (*ptr == ' ')
       {
