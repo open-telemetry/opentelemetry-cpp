@@ -255,7 +255,7 @@ private:
             return 404;
           }
         }
-        for(i = 0; i< count; i++) {
+        for(int i = 0; i< count; i++) {
           pthread_join(tid[i], NULL);
           std::cout<<"Thread "<<i<<" terminated"<<std::endl;
         }
