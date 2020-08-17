@@ -194,8 +194,11 @@ private:
     curl_easy_setopt(curl, CURLOPT_POSTFIELDS, data);
     curl_easy_setopt(curl, CURLOPT_POSTFIELDSIZE, -1);
 
+    std::cout<<"performing"<<std::endl;
     CURLcode res = curl_easy_perform(curl); /* ignores error */
+    std::cout<<"clean up"<<std::endl;
     curl_easy_cleanup(curl);
+    std::cout<<"free"<<std::endl;
     curl_free(data);
     if (res == CURLE_OK) {
         std::cout<<"message of url "<<url<<" delivered"<<std::endl;
