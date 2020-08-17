@@ -194,26 +194,27 @@ private:
   {
     struct ArgStruct *arguments = (struct ArgStruct *)args;
     std::cout<<"pull 1"<<std::endl;
-    CURL *curl;
-    CURLcode res;
-    char *name  = curl_easy_escape(curl, (arguments->name).get(), 0);
-    char *value = curl_easy_escape(curl, (arguments->value).get(), 0);
-    std::string fields = std::string(name) + "=" + std::string(value);
-
     std::cout<<"pull 2 - url is: "<<(arguments->url).get()<<std::endl;
-    curl = curl_easy_init();
-    curl_easy_setopt(curl, CURLOPT_URL, arguments->url);
-    curl_easy_setopt(curl, CURLOPT_POSTFIELDS, fields.c_str());
-    curl_easy_setopt(curl, CURLOPT_POSTFIELDSIZE, -1);
-    std::cout<<"pull 3"<<std::endl;
-    res = curl_easy_perform(curl); /* ignores error */
-    if (res == CURLE_OK || res == 0) {
-        std::cout<<"message of url "<<(arguments->url)<<" delivered"<<std::endl;
-    } else {
-        std::cout<<"message of url "<<(arguments->url)<<" not delivered, code "<<res<<std::endl;
-    }
-    curl_easy_cleanup(curl);
-    std::cout<<"pull 4"<<std::endl;
+//    CURL *curl;
+//    CURLcode res;
+//    char *name  = curl_easy_escape(curl, (arguments->name).get(), 0);
+//    char *value = curl_easy_escape(curl, (arguments->value).get(), 0);
+//    std::string fields = std::string(name) + "=" + std::string(value);
+//
+//    std::cout<<"pull 2 - url is: "<<(arguments->url).get()<<std::endl;
+//    curl = curl_easy_init();
+//    curl_easy_setopt(curl, CURLOPT_URL, arguments->url);
+//    curl_easy_setopt(curl, CURLOPT_POSTFIELDS, fields.c_str());
+//    curl_easy_setopt(curl, CURLOPT_POSTFIELDSIZE, -1);
+//    std::cout<<"pull 3"<<std::endl;
+//    res = curl_easy_perform(curl); /* ignores error */
+//    if (res == CURLE_OK || res == 0) {
+//        std::cout<<"message of url "<<(arguments->url)<<" delivered"<<std::endl;
+//    } else {
+//        std::cout<<"message of url "<<(arguments->url)<<" not delivered, code "<<res<<std::endl;
+//    }
+//    curl_easy_cleanup(curl);
+//    std::cout<<"pull 4"<<std::endl;
 
     return NULL;
   }
