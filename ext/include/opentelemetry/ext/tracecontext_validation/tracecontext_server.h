@@ -11,6 +11,10 @@
 #include "opentelemetry/ext/http/server/http_server.h"
 #include "opentelemetry/nostd/unique_ptr.h"
 #include "opentelemetry/nostd/shared_ptr.h"
+#include "opentelemetry/nostd/string_view.h"
+#include "opentelemetry/context/context.h"
+#include "opentelemetry/trace/default_span.h"
+#include "opentelemetry/trace/http_trace_context.h"
 #include "opentelemetry/ext/tracecontext_validation/tracecontext_client.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
@@ -194,7 +198,6 @@ private:
     std::cout<<"value is "<<value<<std::endl;
 
     curl_easy_setopt(curl, CURLOPT_URL, url.c_str());
-
     curl_easy_setopt(curl, CURLOPT_POST, 1);
     curl_easy_setopt(curl, CURLOPT_POSTFIELDS, value.c_str());
 
@@ -211,17 +214,32 @@ private:
     }
   }
 
+  static nostd::string_view Getter(const std::map<std::string, std::string> &carrier,
+                                   nostd::string_view trace_type = "traceparent")
+  {
+    auto it = carrier.find(std::string(trace_type));
+    if (it != carrier.end())
+    {
+      return nostd::string_view(it->second);
+    }
+    return "";
+  }
+
+  static void Setter(std::map<std::string, std::string> &carrier,
+                     nostd::string_view trace_type        = "traceparent",
+                     nostd::string_view trace_description = "")
+  {
+    carrier[std::string(trace_type)] = std::string(trace_description);
+  }
+
   HTTP_SERVER_NS::HttpRequestCallback SendRequestBack{
       [&](HTTP_SERVER_NS::HttpRequest const &req, HTTP_SERVER_NS::HttpResponse &resp) {
+        bool trace_parent, trace_state;
         std::vector<std::map<std::string, std::string>> send_list;
         ParseBody(req.content.c_str(), send_list);
-        std::cout<<"send list size "<<send_list.size()<<std::endl;
-        if (req.headers.count("Traceparent")) {
-            std::cout<<"trace parent not null: "<<std::endl;
-        }
-        if (req.headers.count("Tracestate")) {
-            std::cout<<"trace state not null: "<<std::endl;
-        }
+        context::Context ctx1 =
+            context::Context("current-span", nostd::shared_ptr<trace::Span>(new trace::DefaultSpan()));
+        context::Context ctx2 = format.Extract(Getter, req.headers, ctx1);
         for (std::map<std::string, std::string> kv_pairs : send_list)
         {
           std::string url       = "";
@@ -240,21 +258,6 @@ private:
           }
           if (url != "")
           {
-//            HttpClients::HttpClient client = clients.get()->StartNewClient();
-//            std::cout<<"sending to url-2"<<std::endl;
-//            client.AddPostField("arguments", arguments);
-//            std::cout<<"sending to url-3"<<std::endl;
-//            client.SendRequest(url);
-//            std::cout<<"sending to url-4"<<std::endl;
-//            client.~HttpClient();
-//            std::cout<<"sending to url-5"<<std::endl;
-            // TODO: solve the memory problem here: to do request in mass, I have to do multithreading. However,
-            // the way to do multithreading, which is pointed out by the libcrul official doc, is to use pthread_create
-            // with a pointer to represent a structure that contains all the parameters and hence the ArgStruct
-            // However, if I init the ArgStruct as a plain object, then when it got pass in the function, it's memory
-            // gets contaminated with the first few characters becoming nonsense. And if I malloc a piece of memory
-            // for it, then it in running it will have free(): invalid pointer error. Could you please help me make a
-            // memory-safe argument structure and successfully send a request to the test service?
             if (!pull_one_url(url, arguments)) {
                 return 404;
             }
