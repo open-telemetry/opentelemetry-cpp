@@ -188,7 +188,7 @@ private:
     std::string fields = std::string(name) + "=" + std::string(value);
 
     curl = curl_easy_init();
-    curl_easy_setopt(curl, CURLOPT_URL, url.c_str());
+    curl_easy_setopt(curl, CURLOPT_URL, args->url.c_str());
     curl_easy_setopt(curl, CURLOPT_POSTFIELDS, fields.c_str());
     curl_easy_setopt(curl, CURLOPT_POSTFIELDSIZE, -1);
     curl_easy_perform(curl); /* ignores error */
