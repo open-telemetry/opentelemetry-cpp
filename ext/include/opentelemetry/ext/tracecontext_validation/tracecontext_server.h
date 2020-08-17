@@ -49,9 +49,9 @@ public:
 
 private:
   struct ArgStruct {
-      char *url;
-      char *name;
-      char *value;
+      std::string url;
+      std::string name;
+      std::string value;
   };
 
   static std::string NormalizeName(char const *begin, char const *end)
@@ -254,13 +254,17 @@ private:
 //            std::cout<<"sending to url-4"<<std::endl;
 //            client.~HttpClient();
 //            std::cout<<"sending to url-5"<<std::endl;
+            // TODO: solve the memory problem here: to do request in mass, I have to do multithreading. However,
+            // the way to do multithreading, which is pointed out by the libcrul official doc, is to use pthread_create
+            // with a pointer to represent a structure that contains all the parameters and hence the ArgStruct
+            // However, if I init the ArgStruct as a plain object, then when it got pass in the function, it's memory
+            // gets contaminated with the first few characters becoming nonsense. And if I malloc a piece of memory
+            // for it, then it in running it will have free(): invalid pointer error. Could you please help me make a
+            // memory-safe argument structure and successfully send a request to the test service?
             struct ArgStruct *args = (struct ArgStruct *)malloc(sizeof(const struct ArgStruct));
-            args->url = (char *)malloc(url.size());
-            std::cout<<"argstruct size is "<<sizeof(struct ArgStruct)<<std::endl;
-            free(args);
-            std::cout<<"freed"<<std::endl;
-//            args->name = "arguments";
-//            args->value = arguments;
+            args->url = url;
+            args->name = "arguments";
+            args->value = arguments;
             std::cout<<"sendingto url "<<url<<" arguments "<<arguments<<std::endl;
 //            int error = pthread_create(&tid[count],
 //                                       NULL, /* default attributes please */
