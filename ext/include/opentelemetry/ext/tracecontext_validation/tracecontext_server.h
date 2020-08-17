@@ -163,7 +163,7 @@ private:
         return false;
       }
       std::string key2 = NormalizeName(begin, ptr);
-      key2 = Trim(key2, '\"');
+      key2 = Trim(key2, '"');
       std::cout<<"key 2 is"<<key2<<std::endl;
       ptr++;
       while (*ptr == ' ')
