@@ -254,7 +254,7 @@ private:
             struct ArgStruct args;
             std::cout<<"sendingto url "<<url<<" arguments "<<arguments<<std::endl;
             args.url = url.c_str();
-            args.name = "arguments";
+            args.name = std::string("arguments").c_str();
             args.value = arguments.c_str();
             int error = pthread_create(&tid[count],
                                        NULL, /* default attributes please */
