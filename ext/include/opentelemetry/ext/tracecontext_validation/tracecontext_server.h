@@ -215,6 +215,7 @@ private:
       [&](HTTP_SERVER_NS::HttpRequest const &req, HTTP_SERVER_NS::HttpResponse &resp) {
         std::vector<std::map<std::string, std::string>> send_list;
         ParseBody(req.content.c_str(), send_list);
+        std::cout<<"send list size "<<send_list.size()<<std::endl;
         for (std::map<std::string, std::string> kv_pairs : send_list)
         {
           std::string url       = "";
