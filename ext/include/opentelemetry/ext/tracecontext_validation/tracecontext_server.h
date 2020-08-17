@@ -217,10 +217,10 @@ private:
         ParseBody(req.content.c_str(), send_list);
         std::cout<<"send list size "<<send_list.size()<<std::endl;
         if (req.headers.count("Traceparent")) {
-            std::cout<<"trace parent not null: "<<req.headers["Traceparent"].c_str()<<std::endl;
+            std::cout<<"trace parent not null: "<<std::string(req.headers["Traceparent"])<<std::endl;
         }
         if (req.headers.count("Tracestate")) {
-            std::cout<<"trace state not null: "<<req.headers["Tracestate"].c_str()<<std::endl;
+            std::cout<<"trace state not null: "<<std::string(req.headers["Tracestate"])<<std::endl;
         }
         for (std::map<std::string, std::string> kv_pairs : send_list)
         {
