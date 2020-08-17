@@ -121,7 +121,7 @@ private:
       }
       // Key1
       begin = ptr;
-      while (*ptr && *ptr != ':' && *ptr != ' ' && *ptr != '\r' && *ptr != '\n')
+      while (*ptr && *ptr != ':' && *ptr != '\r' && *ptr != '\n')
       {
         ptr++;
       }
@@ -153,7 +153,7 @@ private:
       }
       // Key2
       begin = ptr;
-      while (*ptr && *ptr != ':' && *ptr != ' ' && *ptr != '\r' && *ptr != '\n')
+      while (*ptr && *ptr != ':' && *ptr != '\r' && *ptr != '\n')
       {
         ptr++;
       }
