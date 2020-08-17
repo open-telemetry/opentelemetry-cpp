@@ -216,7 +216,7 @@ private:
     }
     curl_easy_cleanup(curl);
     std::cout<<"pull 4"<<std::endl;
-    free(args);
+//    free(args);
 
     return NULL;
   }
