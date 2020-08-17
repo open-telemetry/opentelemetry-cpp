@@ -194,6 +194,7 @@ private:
     struct ArgStruct *arguments = (struct ArgStruct *)args;
     std::cout<<"pull 1"<<std::endl;
     CURL *curl;
+    CURLcode res;
     char *name  = curl_easy_escape(curl, arguments->name.c_str(), 0);
     char *value = curl_easy_escape(curl, arguments->value.c_str(), 0);
     std::string fields = std::string(name) + "=" + std::string(value);
@@ -204,7 +205,7 @@ private:
     curl_easy_setopt(curl, CURLOPT_POSTFIELDS, fields.c_str());
     curl_easy_setopt(curl, CURLOPT_POSTFIELDSIZE, -1);
     std::cout<<"pull 3"<<std::endl;
-    curl_easy_perform(curl); /* ignores error */
+    res = curl_easy_perform(curl); /* ignores error */
     curl_easy_cleanup(curl);
     std::cout<<"pull 4"<<std::endl;
 
