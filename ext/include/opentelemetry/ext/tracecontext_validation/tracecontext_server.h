@@ -104,6 +104,7 @@ private:
     // Key-Value Pairs
     while (*ptr != '\r' && *ptr != '\n')
     {
+      std::cout<<"next round"<<std::endl;
       std::map<std::string, std::string> kv_pairs;
       // Begin
       if (*ptr == ',')
