@@ -187,6 +187,9 @@ private:
   static bool pull_one_url(std::string url, std::string value)
   {
     CURL *curl = curl_easy_init();
+    if (curl == nullptr) {
+        std::cout<<"invalid curl pointer initialized"<<std::endl;
+    }
     std::cout<<"value is "<<value<<std::endl;
     char *data = curl_easy_escape(curl, value.c_str(), 0);
 
