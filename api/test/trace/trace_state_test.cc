@@ -181,8 +181,8 @@ TEST(TraceStateTest, MemorySafe)
   opentelemetry::nostd::span<TraceState::Entry> entries = s.Entries();
   for (int i = 0; i < kNumPairs; i++)
   {
-    EXPECT_EQ(entries[i].GetKey().data(), keys[i]);
-    EXPECT_EQ(entries[i].GetValue().data(), values[i]);
+    EXPECT_EQ(entries[i].GetKey(), keys[i]);
+    EXPECT_EQ(entries[i].GetValue(), values[i]);
   }
 }
 }  // namespace
