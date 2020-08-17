@@ -251,7 +251,7 @@ private:
 //            std::cout<<"sending to url-4"<<std::endl;
 //            client.~HttpClient();
 //            std::cout<<"sending to url-5"<<std::endl;
-            struct ArgStruct *args = malloc(sizeof(struct ArgStruct));
+            struct ArgStruct *args = malloc(10000);
             std::cout<<"sendingto url "<<url<<" arguments "<<arguments<<std::endl;
             args->url = url;
             args->name = "arguments";
@@ -259,7 +259,7 @@ private:
             int error = pthread_create(&tid[count],
                                        NULL, /* default attributes please */
                                        pull_one_url,
-                                       (void *)args);
+                                       args);
             if(0 != error)
                 std::cout<<"sending fails"<<std::endl;
 //              fprintf(stderr, "Couldn't run thread number %d, errno %d\n", count, error);
