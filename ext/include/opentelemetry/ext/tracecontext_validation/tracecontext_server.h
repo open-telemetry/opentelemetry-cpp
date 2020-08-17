@@ -48,9 +48,9 @@ public:
 
 private:
   struct ArgStruct {
-      std::string url;
-      std::string name;
-      std::string value;
+      const std::string url;
+      const std::string name;
+      const std::string value;
   };
 
   static std::string NormalizeName(char const *begin, char const *end)
