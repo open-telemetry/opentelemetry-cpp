@@ -221,7 +221,8 @@ private:
 
   HTTP_SERVER_NS::HttpRequestCallback SendRequestBack{
       [&](HTTP_SERVER_NS::HttpRequest const &req, HTTP_SERVER_NS::HttpResponse &resp) {
-        const pthread_t tid[kMaxUrlPerTest];
+        pthread_t *tid;
+        tid = malloc(kMaxUrlPerTest*sizeof(pthread_t));
         int count = 0;
         std::vector<std::map<std::string, std::string>> send_list;
         ParseBody(req.content.c_str(), send_list);
