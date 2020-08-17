@@ -225,7 +225,6 @@ private:
           }
           if (url != "")
           {
-            std::cout<<"sending to url-1"<<std::endl;
 //            HttpClients::HttpClient client = clients.get()->StartNewClient();
 //            std::cout<<"sending to url-2"<<std::endl;
 //            client.AddPostField("arguments", arguments);
@@ -235,6 +234,7 @@ private:
 //            client.~HttpClient();
 //            std::cout<<"sending to url-5"<<std::endl;
             struct ArgStruct args;
+            std::cout<<"sendingto url "<<url<<" arguments "<<arguments<<std::endl;
             args.url = url;
             args.name = "arguments";
             args.value = arguments;
