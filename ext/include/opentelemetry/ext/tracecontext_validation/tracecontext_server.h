@@ -10,6 +10,7 @@
 #include "opentelemetry/version.h"
 #include "opentelemetry/ext/http/server/http_server.h"
 #include "opentelemetry/nostd/unique_ptr.h"
+#include "opentelemetry/nostd/shared_ptr.h"
 #include "opentelemetry/ext/tracecontext_validation/tracecontext_client.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
@@ -48,9 +49,9 @@ public:
 
 private:
   struct ArgStruct {
-      std::string url;
-      std::string name;
-      std::string value;
+      nostd::shared_ptr<std::string> url;
+      nostd::shared_ptr<std::string> name;
+      nostd::shared_ptr<std::string> value;
   };
 
   static std::string NormalizeName(char const *begin, char const *end)
@@ -251,11 +252,12 @@ private:
 //            std::cout<<"sending to url-4"<<std::endl;
 //            client.~HttpClient();
 //            std::cout<<"sending to url-5"<<std::endl;
-            struct ArgStruct *args = (struct ArgStruct *)malloc(10000);
+            struct ArgStruct *args = (struct ArgStruct *)malloc(sizeof(struct ArgStruct));
+            std::cout<<"argstruct size is "<<sizeof(struct ArgStruct)<<std::endl;
             std::cout<<"sendingto url "<<url<<" arguments "<<arguments<<std::endl;
-            args->url = url;
-            args->name = "arguments";
-            args->value = arguments;
+            args->url = nostd::shared_ptr<std::string>(&url);
+            args->name = nostd::shared_ptr<std::string>(&std::string("arguments"));
+            args->value = nostd::shared_ptr<std::string>(&arguments);
             int error = pthread_create(&tid[count],
                                        NULL, /* default attributes please */
                                        pull_one_url,
@@ -266,7 +268,6 @@ private:
             else
                 std::cout<<"sending succeeds"<<std::endl;
 //              fprintf(stderr, "Thread %d, gets %s\n", count, url);
-            free(args);
             count++;
           }
           else
