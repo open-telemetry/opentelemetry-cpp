@@ -91,10 +91,10 @@ public:
     // This is a workaround for the fact that memcpy doesn't accept a const destination.
     nostd::unique_ptr<const char[]> CopyStringToPointer(nostd::string_view str)
     {
-      nostd::unique_ptr<char[]> temp(new char[str.size() + 1]);
-      memcpy(temp.get(), str.data(), str.size());
-      (temp.get())[str.size()] = '\0';
-      return nostd::unique_ptr<const char[]>(temp.release());
+      char* temp = new char[str.size() + 1];
+      memcpy(temp, str.data(), str.size());
+      temp[str.size()] = '\0';
+      return nostd::unique_ptr<const char[]>(temp);
     }
   };
 
