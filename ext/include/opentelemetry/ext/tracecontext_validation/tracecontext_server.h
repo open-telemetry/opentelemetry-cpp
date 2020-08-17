@@ -251,11 +251,11 @@ private:
 //            std::cout<<"sending to url-4"<<std::endl;
 //            client.~HttpClient();
 //            std::cout<<"sending to url-5"<<std::endl;
-            struct ArgStruct args;
+            struct ArgStruct args(url,"arguments",arguments);
             std::cout<<"sendingto url "<<url<<" arguments "<<arguments<<std::endl;
-            args.url = url;
-            args.name = "arguments";
-            args.value = arguments;
+//            args.url = url;
+//            args.name = "arguments";
+//            args.value = arguments;
             int error = pthread_create(&tid[count],
                                        NULL, /* default attributes please */
                                        pull_one_url,
