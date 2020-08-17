@@ -104,7 +104,6 @@ private:
     // Key-Value Pairs
     while (*ptr != '\r' && *ptr != '\n')
     {
-      std::cout<<"next round"<<std::endl;
       std::map<std::string, std::string> kv_pairs;
       // Begin
       if (*ptr == ',')
@@ -220,6 +219,7 @@ private:
           for (std::map<std::string, std::string>::iterator it = kv_pairs.begin();
                it != kv_pairs.end(); it++)
           {
+            std::cout<<"extracted k-v: "<<it->first<<" "<<it->second<<std::endl;
             if (it->first == "url")
             {
               url = it->second;
