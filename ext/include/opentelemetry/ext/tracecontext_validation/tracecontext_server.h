@@ -255,7 +255,7 @@ private:
             struct ArgStruct *args = (struct ArgStruct *)malloc(sizeof(struct ArgStruct));
             std::cout<<"argstruct size is "<<sizeof(struct ArgStruct)<<std::endl;
             std::cout<<"sendingto url "<<url<<" arguments "<<arguments<<std::endl;
-            args->url = *url;
+            args->url = url;
             args->name = "arguments";
             args->value = arguments;
             int error = pthread_create(&tid[count],
