@@ -255,7 +255,7 @@ private:
             return 404;
           }
         }
-        return 404;
+        return 200;
       }};
 
   const std::string test_protocol_ = "/test";
