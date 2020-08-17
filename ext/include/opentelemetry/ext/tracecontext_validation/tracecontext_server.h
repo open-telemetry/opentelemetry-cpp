@@ -193,18 +193,20 @@ private:
   static void *pull_one_url(void * args)
   {
     std::cout<<"pull 1"<<std::endl;
-    struct ArgStruct *arguments = (struct ArgStruct *)args;
+//    struct ArgStruct *arguments = (struct ArgStruct *)args;
     CURL *curl;
     CURLcode res;
-    char *name  = curl_easy_escape(curl, arguments->name.c_str(), 0);
-    char *value = curl_easy_escape(curl, arguments->value.c_str(), 0);
-    std::string fields = std::string(name) + "=" + std::string(value);
+//    char *name  = curl_easy_escape(curl, arguments->name.c_str(), 0);
+//    char *value = curl_easy_escape(curl, arguments->value.c_str(), 0);
+//    std::string fields = std::string(name) + "=" + std::string(value);
 
-    std::cout<<"pull 2 - url is: "<<(arguments->url)<<std::endl;
+    std::string arguments = *((std::string *)args);
+//    std::cout<<"pull 2 - url is: "<<(arguments->url)<<std::endl;
     curl = curl_easy_init();
-    curl_easy_setopt(curl, CURLOPT_URL, arguments->url.c_str());
-    curl_easy_setopt(curl, CURLOPT_POSTFIELDS, fields.c_str());
-    curl_easy_setopt(curl, CURLOPT_POSTFIELDSIZE, -1);
+    curl_easy_setopt(curl, CURLOPT_URL, arguments);
+//    curl_easy_setopt(curl, CURLOPT_URL, arguments->url.c_str());
+//    curl_easy_setopt(curl, CURLOPT_POSTFIELDS, fields.c_str());
+//    curl_easy_setopt(curl, CURLOPT_POSTFIELDSIZE, -1);
     std::cout<<"pull 3"<<std::endl;
     res = curl_easy_perform(curl); /* ignores error */
     if (res == CURLE_OK || res == 0) {
@@ -263,7 +265,8 @@ private:
             int error = pthread_create(&tid[count],
                                        NULL, /* default attributes please */
                                        pull_one_url,
-                                       args);
+//                                       args);
+                                       (void *)&url);
             if(0 != error)
                 std::cout<<"sending fails"<<std::endl;
 //              fprintf(stderr, "Couldn't run thread number %d, errno %d\n", count, error);
