@@ -190,15 +190,11 @@ private:
     if (curl == nullptr) {
         std::cout<<"invalid curl pointer initialized"<<std::endl;
     }
+    std::cout<<"url is "<<url<<std::endl;
     std::cout<<"value is "<<value<<std::endl;
-//    char *data = curl_easy_escape(curl, value.c_str(), 0);
-//    if (curl == nullptr) {
-//        std::cout<<"invalid data pointer escaped"<<std::endl;
-//    } else {
-//        std::cout<<"valid data pointer"<<*data<<std::endl;
-//    }
 
     curl_easy_setopt(curl, CURLOPT_URL, url.c_str());
+    curl_easy_setopt(curl, CURLOPT_POST, 1);
     curl_easy_setopt(curl, CURLOPT_POSTFIELDS, value.c_str());
     curl_easy_setopt(curl, CURLOPT_POSTFIELDSIZE, -1);
 
