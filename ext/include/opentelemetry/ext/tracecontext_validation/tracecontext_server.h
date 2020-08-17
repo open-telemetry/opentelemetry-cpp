@@ -193,9 +193,9 @@ private:
     std::cout<<"value is "<<value<<std::endl;
     char *data = curl_easy_escape(curl, value.c_str(), 0);
     if (curl == nullptr) {
-        std::cout<<"invalid data pointer escaped"<<std::endl;
+        std::cout<<"invalid data pointer escaped"<<*data<<std::endl;
     } else {
-        std::cout<<"valid data pointer"<<std::endl;
+        std::cout<<"valid data pointer"<<*data<<std::endl;
     }
 
     curl_easy_setopt(curl, CURLOPT_URL, url.c_str());
