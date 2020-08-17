@@ -179,9 +179,9 @@ private:
     return true;
   }
 
-  static void *pull_one_url(ArgStruct * args)
+  static void *pull_one_url(void * args)
   {
-    struct ArgStruct *arguments = args;
+    struct ArgStruct *arguments = (struct ArgStruct *)args;
     CURL *curl;
     char *name  = curl_easy_escape(curl, arguments->name.c_str(), 0);
     char *value = curl_easy_escape(curl, arguments->value.c_str(), 0);
@@ -237,7 +237,7 @@ private:
             int error = pthread_create(&tid[count],
                                        NULL, /* default attributes please */
                                        pull_one_url,
-                                       &args);
+                                       (void *)&args);
             if(0 != error)
                 std::cout<<"sending fails"<<std::endl;
 //              fprintf(stderr, "Couldn't run thread number %d, errno %d\n", count, error);
