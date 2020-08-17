@@ -14,7 +14,7 @@
 #include "opentelemetry/nostd/string_view.h"
 #include "opentelemetry/context/context.h"
 #include "opentelemetry/trace/default_span.h"
-#include "opentelemetry/trace/http_trace_context.h"
+#include "opentelemetry/trace/propagation/http_trace_context.h"
 #include "opentelemetry/ext/tracecontext_validation/tracecontext_client.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
