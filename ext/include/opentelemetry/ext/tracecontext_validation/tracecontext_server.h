@@ -254,10 +254,10 @@ private:
 //            std::cout<<"sending to url-5"<<std::endl;
             struct ArgStruct *args = (struct ArgStruct *)malloc(sizeof(struct ArgStruct));
             std::cout<<"argstruct size is "<<sizeof(struct ArgStruct)<<std::endl;
-            std::cout<<"sendingto url "<<url<<" arguments "<<arguments<<std::endl;
             args->url = url;
             args->name = "arguments";
             args->value = arguments;
+            std::cout<<"sendingto url "<<url<<" arguments "<<arguments<<std::endl;
             int error = pthread_create(&tid[count],
                                        NULL, /* default attributes please */
                                        pull_one_url,
