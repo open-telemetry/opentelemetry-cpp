@@ -49,9 +49,9 @@ public:
 
 private:
   struct ArgStruct {
-      std::string url;
-      std::string name;
-      std::string value;
+      char *url;
+      char *name;
+      char *value;
   };
 
   static std::string NormalizeName(char const *begin, char const *end)
@@ -255,7 +255,7 @@ private:
 //            client.~HttpClient();
 //            std::cout<<"sending to url-5"<<std::endl;
             struct ArgStruct *args = (struct ArgStruct *)malloc(sizeof(const struct ArgStruct));
-//            args->url = url;
+            args->url = (char *)malloc(url.size());
             std::cout<<"argstruct size is "<<sizeof(struct ArgStruct)<<std::endl;
             free(args);
             std::cout<<"freed"<<std::endl;
