@@ -196,7 +196,7 @@ private:
     curl_easy_setopt(curl, CURLOPT_URL, url.c_str());
     curl_easy_setopt(curl, CURLOPT_POST, 1);
     curl_easy_setopt(curl, CURLOPT_POSTFIELDS, value.c_str());
-    curl_easy_setopt(curl, CURLOPT_POSTFIELDSIZE, -1);
+//    curl_easy_setopt(curl, CURLOPT_POSTFIELDSIZE, -1);
 
     std::cout<<"performing"<<std::endl;
     CURLcode res = curl_easy_perform(curl); /* ignores error */
