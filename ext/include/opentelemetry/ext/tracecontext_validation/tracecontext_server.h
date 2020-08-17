@@ -144,7 +144,7 @@ private:
         ptr++;
       }
       std::string val1 = std::string(begin, ptr);
-      val1 = Trim(val1,'[', ']')
+      val1 = Trim(val1,'[', ']');
       kv_pairs[key1] = Trim(val1, '\"', '\"');
       std::cout<<"first k-v pairs get"<<std::endl;
       ptr++;
@@ -178,7 +178,7 @@ private:
         ptr++;
       }
       std::string val2 = std::string(begin, ptr);
-      val2 = Trim(val1,'[', ']')
+      val2 = Trim(val1,'[', ']');
       std::cout<<"value 2 is"<<val2<<std::endl;
       kv_pairs[key2] = Trim(val2, '\"', '\"');
       send_list.push_back(kv_pairs);
