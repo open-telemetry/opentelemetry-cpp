@@ -15,11 +15,15 @@ namespace trace
  * replaces all non-owning references with owned copies.
  */
 using SpanDataAttributeValue = nostd::variant<bool,
+                                              int32_t,
+                                              uint32_t,
                                               int64_t,
                                               uint64_t,
                                               double,
                                               std::string,
                                               std::vector<bool>,
+                                              std::vector<int32_t>,
+                                              std::vector<uint32_t>,
                                               std::vector<int64_t>,
                                               std::vector<uint64_t>,
                                               std::vector<double>,
@@ -31,15 +35,13 @@ using SpanDataAttributeValue = nostd::variant<bool,
 struct AttributeConverter
 {
   SpanDataAttributeValue operator()(bool v) { return SpanDataAttributeValue(v); }
-  SpanDataAttributeValue operator()(int v)
+  SpanDataAttributeValue operator()(int32_t v) { return SpanDataAttributeValue(v); }
+  SpanDataAttributeValue operator()(uint32_t v) { return SpanDataAttributeValue(v); }
+  /*SpanDataAttributeValue operator()(int v)
   {
     return SpanDataAttributeValue(static_cast<int64_t>(v));
-  }
+  }*/
   SpanDataAttributeValue operator()(int64_t v) { return SpanDataAttributeValue(v); }
-  SpanDataAttributeValue operator()(unsigned int v)
-  {
-    return SpanDataAttributeValue(static_cast<uint64_t>(v));
-  }
   SpanDataAttributeValue operator()(uint64_t v) { return SpanDataAttributeValue(v); }
   SpanDataAttributeValue operator()(double v) { return SpanDataAttributeValue(v); }
   SpanDataAttributeValue operator()(nostd::string_view v)
@@ -47,20 +49,23 @@ struct AttributeConverter
     return SpanDataAttributeValue(std::string(v));
   }
   SpanDataAttributeValue operator()(nostd::span<const bool> v) { return convertSpan<bool>(v); }
+  SpanDataAttributeValue operator()(nostd::span<const int32_t> v)
+  {
+    return convertSpan<int32_t>(v);
+  }
+  SpanDataAttributeValue operator()(nostd::span<const uint32_t> v)
+  {
+    return convertSpan<uint32_t>(v);
+  }
   SpanDataAttributeValue operator()(nostd::span<const int64_t> v)
   {
     return convertSpan<int64_t>(v);
-  }
-  SpanDataAttributeValue operator()(nostd::span<const unsigned int> v)
-  {
-    return convertSpan<uint64_t>(v);
   }
   SpanDataAttributeValue operator()(nostd::span<const uint64_t> v)
   {
     return convertSpan<uint64_t>(v);
   }
   SpanDataAttributeValue operator()(nostd::span<const double> v) { return convertSpan<double>(v); }
-  SpanDataAttributeValue operator()(nostd::span<const int> v) { return convertSpan<int64_t>(v); }
   SpanDataAttributeValue operator()(nostd::span<const nostd::string_view> v)
   {
     return convertSpan<std::string>(v);
@@ -69,7 +74,12 @@ struct AttributeConverter
   template <typename T, typename U = T>
   SpanDataAttributeValue convertSpan(nostd::span<const U> vals)
   {
-    const std::vector<T> copy(vals.begin(), vals.end());
+    std::vector<T> copy;
+    for (auto &val : vals)
+    {
+      copy.push_back(T(val));
+    }
+
     return SpanDataAttributeValue(std::move(copy));
   }
 };

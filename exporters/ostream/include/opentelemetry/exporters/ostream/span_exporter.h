@@ -90,6 +90,14 @@ private:
     {
       sout_ << nostd::get<bool>(value);
     }
+    else if (nostd::holds_alternative<int32_t>(value))
+    {
+      sout_ << nostd::get<int32_t>(value);
+    }
+    else if (nostd::holds_alternative<uint32_t>(value))
+    {
+      sout_ << nostd::get<uint32_t>(value);
+    }
     else if (nostd::holds_alternative<int64_t>(value))
     {
       sout_ << nostd::get<int64_t>(value);
@@ -109,6 +117,14 @@ private:
     else if (nostd::holds_alternative<std::vector<bool>>(value))
     {
       print_array<bool>(value);
+    }
+    else if (nostd::holds_alternative<std::vector<int32_t>>(value))
+    {
+      print_array<int32_t>(value);
+    }
+    else if (nostd::holds_alternative<std::vector<uint32_t>>(value))
+    {
+      print_array<uint32_t>(value);
     }
     else if (nostd::holds_alternative<std::vector<int64_t>>(value))
     {

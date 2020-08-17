@@ -1,3 +1,4 @@
+#include "opentelemetry/context/threadlocal_context.h"
 #include "opentelemetry/sdk/trace/samplers/probability.h"
 #include "src/common/random.h"
 
