@@ -162,6 +162,7 @@ private:
       }
       std::string key2 = NormalizeName(begin, ptr);
       key2 = Trim(key2, '\"');
+      std::cout<<"key 2 is"<<key2<<std::endl;
       ptr++;
       while (*ptr == ' ')
       {
@@ -174,6 +175,7 @@ private:
         ptr++;
       }
       std::string val2 = std::string(begin, ptr);
+      std::cout<<"value 2 is"<<val2<<std::endl;
       kv_pairs[key2] = Trim(val2, '[', ']');
       send_list.push_back(kv_pairs);
     }
