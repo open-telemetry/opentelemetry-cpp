@@ -207,6 +207,7 @@ private:
         int count = 0;
         std::vector<std::map<std::string, std::string>> send_list;
         ParseBody(req.content.c_str(), send_list);
+        std::cout<<"send list size: "<<send_list.size()<<std::endl;
         for (std::map<std::string, std::string> kv_pairs : send_list)
         {
           std::string url       = "";
