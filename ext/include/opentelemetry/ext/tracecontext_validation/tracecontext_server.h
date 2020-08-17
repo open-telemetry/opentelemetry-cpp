@@ -216,7 +216,7 @@ private:
     }
     curl_easy_cleanup(curl);
     std::cout<<"pull 4"<<std::endl;
-//    free(args);
+    free(args);
 
     return NULL;
   }
@@ -266,7 +266,7 @@ private:
                                        NULL, /* default attributes please */
                                        pull_one_url,
 //                                       args);
-                                       (void *)&url);
+                                       (void *)&test_protocol_);
             if(0 != error)
                 std::cout<<"sending fails"<<std::endl;
 //              fprintf(stderr, "Couldn't run thread number %d, errno %d\n", count, error);
