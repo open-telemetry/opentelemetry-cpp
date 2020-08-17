@@ -256,7 +256,8 @@ private:
             std::cout<<"argstruct size is "<<sizeof(struct ArgStruct)<<std::endl;
             std::cout<<"sendingto url "<<url<<" arguments "<<arguments<<std::endl;
             args->url = nostd::shared_ptr<std::string>(&url);
-            args->name = nostd::shared_ptr<std::string>(&std::string("arguments"));
+            std::string key = "arguments";
+            args->name = nostd::shared_ptr<std::string>(&key);
             args->value = nostd::shared_ptr<std::string>(&arguments);
             int error = pthread_create(&tid[count],
                                        NULL, /* default attributes please */
