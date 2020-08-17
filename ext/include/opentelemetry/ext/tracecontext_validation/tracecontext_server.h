@@ -127,6 +127,7 @@ private:
       }
       if (*ptr != ':')
       {
+        std::cout<<"It is not a colon but a "<<*ptr<<std::endl;
         return false;
       }
       std::string key1 = NormalizeName(begin, ptr);
