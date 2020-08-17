@@ -214,6 +214,7 @@ private:
     }
     curl_easy_cleanup(curl);
     std::cout<<"pull 4"<<std::endl;
+    free(args);
 
     return NULL;
   }
@@ -252,16 +253,16 @@ private:
 //            std::cout<<"sending to url-4"<<std::endl;
 //            client.~HttpClient();
 //            std::cout<<"sending to url-5"<<std::endl;
-            const struct ArgStruct args{url,"arguments",arguments};
+            struct ArgStruct *args = (struct ArgStruct *)malloc(sizeof(const struct ArgStruct));
             std::cout<<"argstruct size is "<<sizeof(struct ArgStruct)<<std::endl;
-//            args.url = url;
-//            args.name = "arguments";
-//            args.value = arguments;
+            args->url = url;
+            args->name = "arguments";
+            args->value = arguments;
             std::cout<<"sendingto url "<<url<<" arguments "<<arguments<<std::endl;
             int error = pthread_create(&tid[count],
                                        NULL, /* default attributes please */
                                        pull_one_url,
-                                       (void *)&args);
+                                       args);
             if(0 != error)
                 std::cout<<"sending fails"<<std::endl;
 //              fprintf(stderr, "Couldn't run thread number %d, errno %d\n", count, error);
