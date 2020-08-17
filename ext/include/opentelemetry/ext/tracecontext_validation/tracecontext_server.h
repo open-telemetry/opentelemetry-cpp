@@ -131,7 +131,7 @@ private:
         return false;
       }
       std::string key1 = NormalizeName(begin, ptr);
-      key1 = Trim(key1, '"');
+      key1 = Trim(key1, '\"');
       ptr++;
       while (*ptr == ' ')
       {
@@ -163,7 +163,7 @@ private:
         return false;
       }
       std::string key2 = NormalizeName(begin, ptr);
-      key2 = Trim(key2, '"');
+      key2 = Trim(key2, '\"');
       std::cout<<"key 2 is"<<key2<<std::endl;
       ptr++;
       while (*ptr == ' ')
@@ -223,7 +223,7 @@ private:
           for (std::map<std::string, std::string>::iterator it = kv_pairs.begin();
                it != kv_pairs.end(); it++)
           {
-            std::cout<<"extracted k-v: "<<it->first<<" "<<it->second<<std::endl;
+            std::cout<<"extracted k-v: "<<it->first<<" "<<it->second<<" value length "<<it->second.length()<<std::endl;
             if (it->first == "url")
             {
               url = it->second;
