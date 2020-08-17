@@ -143,7 +143,7 @@ private:
       }
       std::string val1 = std::string(begin, ptr);
       kv_pairs[key1] = Trim(val1, '[', ']');
-
+      std::cout<<"first k-v pairs get"<<std::endl;
       ptr++;
       while (*ptr == ' ')
       {
