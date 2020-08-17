@@ -192,8 +192,8 @@ private:
 
   static void *pull_one_url(void * args)
   {
-    struct ArgStruct *arguments = (struct ArgStruct *)args;
     std::cout<<"pull 1"<<std::endl;
+    struct ArgStruct *arguments = (struct ArgStruct *)args;
     CURL *curl;
     CURLcode res;
     char *name  = curl_easy_escape(curl, arguments->name.c_str(), 0);
