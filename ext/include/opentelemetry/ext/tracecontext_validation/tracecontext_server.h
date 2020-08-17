@@ -249,9 +249,7 @@ private:
             // gets contaminated with the first few characters becoming nonsense. And if I malloc a piece of memory
             // for it, then it in running it will have free(): invalid pointer error. Could you please help me make a
             // memory-safe argument structure and successfully send a request to the test service?
-            if (pull_one_url(url, arguments)) {
-                return 200;
-            } else {
+            if (!pull_one_url(url, arguments)) {
                 return 404;
             }
           }
