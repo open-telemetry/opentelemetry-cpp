@@ -260,15 +260,15 @@ private:
             args->name = "arguments";
             args->value = arguments;
             std::cout<<"sendingto url "<<url<<" arguments "<<arguments<<std::endl;
-            int error = pthread_create(&tid[count],
-                                       NULL, /* default attributes please */
-                                       pull_one_url,
-                                       args);
-            if(0 != error)
-                std::cout<<"sending fails"<<std::endl;
-//              fprintf(stderr, "Couldn't run thread number %d, errno %d\n", count, error);
-            else
-                std::cout<<"sending succeeds"<<std::endl;
+//            int error = pthread_create(&tid[count],
+//                                       NULL, /* default attributes please */
+//                                       pull_one_url,
+//                                       args);
+//            if(0 != error)
+//                std::cout<<"sending fails"<<std::endl;
+////              fprintf(stderr, "Couldn't run thread number %d, errno %d\n", count, error);
+//            else
+//                std::cout<<"sending succeeds"<<std::endl;
 //              fprintf(stderr, "Thread %d, gets %s\n", count, url);
             count++;
           }
@@ -277,10 +277,10 @@ private:
             return 404;
           }
         }
-        for(int i = 0; i< count; i++) {
-          pthread_join(tid[i], NULL);
-          std::cout<<"Thread "<<i<<" terminated"<<std::endl;
-        }
+//        for(int i = 0; i< count; i++) {
+//          pthread_join(tid[i], NULL);
+//          std::cout<<"Thread "<<i<<" terminated"<<std::endl;
+//        }
 //        free(tid);
         return 200;
       }};
