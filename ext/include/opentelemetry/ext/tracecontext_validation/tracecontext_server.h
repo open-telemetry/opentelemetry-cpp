@@ -207,9 +207,9 @@ private:
     std::cout<<"pull 3"<<std::endl;
     res = curl_easy_perform(curl); /* ignores error */
     if (res = CURLE_OK || res == 0) {
-        std::cout<<"message delivered"<<std::endl;
+        std::cout<<"message of url "<<(arguments->url)<<" delivered"<<std::endl;
     } else {
-        std::cout<<"message not delivered, code "<<res<<std::endl;
+        std::cout<<"message of url "<<(arguments->url)<<" not delivered, code "<<res<<std::endl;
     }
     curl_easy_cleanup(curl);
     std::cout<<"pull 4"<<std::endl;
