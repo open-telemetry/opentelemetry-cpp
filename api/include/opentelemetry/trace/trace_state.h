@@ -96,7 +96,7 @@ public:
     nostd::unique_ptr<const char[]> CopyStringToPointer(nostd::string_view str)
     {
       nostd::unique_ptr<char[]> temp(new char[str.size() + 1]);
-      strncpy(temp.get(), str.data(), str.size());
+      memcpy(temp.get(), str.data(), str.size());
       temp.get()[str.size()] = '\0';
       return nostd::unique_ptr<const char[]>(temp.release());
     }
