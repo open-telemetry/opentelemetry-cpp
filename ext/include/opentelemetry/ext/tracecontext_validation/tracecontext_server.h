@@ -49,9 +49,9 @@ public:
 
 private:
   struct ArgStruct {
-      nostd::shared_ptr<std::string> url;
-      nostd::shared_ptr<std::string> name;
-      nostd::shared_ptr<std::string> value;
+      std::string url;
+      std::string name;
+      std::string value;
   };
 
   static std::string NormalizeName(char const *begin, char const *end)
@@ -194,27 +194,26 @@ private:
   {
     struct ArgStruct *arguments = (struct ArgStruct *)args;
     std::cout<<"pull 1"<<std::endl;
-    std::cout<<"pull 2 - url is: "<<(arguments->url).get()<<std::endl;
-//    CURL *curl;
-//    CURLcode res;
-//    char *name  = curl_easy_escape(curl, (arguments->name).get(), 0);
-//    char *value = curl_easy_escape(curl, (arguments->value).get(), 0);
-//    std::string fields = std::string(name) + "=" + std::string(value);
-//
-//    std::cout<<"pull 2 - url is: "<<(arguments->url).get()<<std::endl;
-//    curl = curl_easy_init();
-//    curl_easy_setopt(curl, CURLOPT_URL, arguments->url);
-//    curl_easy_setopt(curl, CURLOPT_POSTFIELDS, fields.c_str());
-//    curl_easy_setopt(curl, CURLOPT_POSTFIELDSIZE, -1);
-//    std::cout<<"pull 3"<<std::endl;
-//    res = curl_easy_perform(curl); /* ignores error */
-//    if (res == CURLE_OK || res == 0) {
-//        std::cout<<"message of url "<<(arguments->url)<<" delivered"<<std::endl;
-//    } else {
-//        std::cout<<"message of url "<<(arguments->url)<<" not delivered, code "<<res<<std::endl;
-//    }
-//    curl_easy_cleanup(curl);
-//    std::cout<<"pull 4"<<std::endl;
+    CURL *curl;
+    CURLcode res;
+    char *name  = curl_easy_escape(curl, arguments->name.c_str(), 0);
+    char *value = curl_easy_escape(curl, arguments->value.c_str(), 0);
+    std::string fields = std::string(name) + "=" + std::string(value);
+
+    std::cout<<"pull 2 - url is: "<<(arguments->url)<<std::endl;
+    curl = curl_easy_init();
+    curl_easy_setopt(curl, CURLOPT_URL, arguments->url.c_str());
+    curl_easy_setopt(curl, CURLOPT_POSTFIELDS, fields.c_str());
+    curl_easy_setopt(curl, CURLOPT_POSTFIELDSIZE, -1);
+    std::cout<<"pull 3"<<std::endl;
+    res = curl_easy_perform(curl); /* ignores error */
+    if (res == CURLE_OK || res == 0) {
+        std::cout<<"message of url "<<(arguments->url)<<" delivered"<<std::endl;
+    } else {
+        std::cout<<"message of url "<<(arguments->url)<<" not delivered, code "<<res<<std::endl;
+    }
+    curl_easy_cleanup(curl);
+    std::cout<<"pull 4"<<std::endl;
 
     return NULL;
   }
@@ -256,10 +255,9 @@ private:
             struct ArgStruct *args = (struct ArgStruct *)malloc(sizeof(struct ArgStruct));
             std::cout<<"argstruct size is "<<sizeof(struct ArgStruct)<<std::endl;
             std::cout<<"sendingto url "<<url<<" arguments "<<arguments<<std::endl;
-            args->url = nostd::shared_ptr<std::string>(&url);
-            std::string key = "arguments";
-            args->name = nostd::shared_ptr<std::string>(&key);
-            args->value = nostd::shared_ptr<std::string>(&arguments);
+            args->url = *url;
+            args->name = "arguments";
+            args->value = arguments;
             int error = pthread_create(&tid[count],
                                        NULL, /* default attributes please */
                                        pull_one_url,
