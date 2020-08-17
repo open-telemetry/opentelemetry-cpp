@@ -48,12 +48,6 @@ public:
   void InitializeCallBack(TraceContextServer &server) { server[test_protocol_] = SendRequestBack; }
 
 private:
-  struct ArgStruct {
-      std::string url;
-      std::string name;
-      std::string value;
-  };
-
   static std::string NormalizeName(char const *begin, char const *end)
   {
     std::string result(begin, end);
@@ -145,7 +139,7 @@ private:
         ptr++;
       }
       std::string val1 = std::string(begin, ptr);
-      val1 = Trim(val1,'[', ']');
+//      val1 = Trim(val1,'[', ']');
       kv_pairs[key1] = Trim(val1, '\"', '\"');
       std::cout<<"first k-v pairs get"<<std::endl;
       ptr++;
@@ -179,7 +173,7 @@ private:
         ptr++;
       }
       std::string val2 = std::string(begin, ptr);
-      val2 = Trim(val1,'[', ']');
+//      val2 = Trim(val1,'[', ']');
       std::cout<<"value 2 is"<<val2<<std::endl;
       kv_pairs[key2] = Trim(val2, '\"', '\"');
       send_list.push_back(kv_pairs);
@@ -190,43 +184,35 @@ private:
     return true;
   }
 
-  static void *pull_one_url(void * args)
+  static bool pull_one_url(std::string url, std::string value)
   {
-//    std::cout<<"pull 1"<<std::endl;
-//    struct ArgStruct *arguments = (struct ArgStruct *)args;
-//    CURL *curl;
-//    CURLcode res;
-//    char *name  = curl_easy_escape(curl, arguments->name.c_str(), 0);
-//    char *value = curl_easy_escape(curl, arguments->value.c_str(), 0);
-//    std::string fields = std::string(name) + "=" + std::string(value);
-//
-//    std::cout<<"pull 2 - url is: "<<(arguments->url)<<std::endl;
-//    curl = curl_easy_init();
-//    curl_easy_setopt(curl, CURLOPT_URL, arguments->url.c_str());
-//    curl_easy_setopt(curl, CURLOPT_POSTFIELDS, fields.c_str());
-//    curl_easy_setopt(curl, CURLOPT_POSTFIELDSIZE, -1);
-//    std::cout<<"pull 3"<<std::endl;
-//    res = curl_easy_perform(curl); /* ignores error */
-//    if (res == CURLE_OK || res == 0) {
-//        std::cout<<"message of url "<<(arguments->url)<<" delivered"<<std::endl;
-//    } else {
-//        std::cout<<"message of url "<<(arguments->url)<<" not delivered, code "<<res<<std::endl;
-//    }
-//    curl_easy_cleanup(curl);
-//    std::cout<<"pull 4"<<std::endl;
-//    free(args);
+    CURL *curl;
+    CURLcode res;
+    std::cout<<"value is "<<value<<std::endl;
+    char *data = curl_easy_escape(curl, value.c_str(), 0);
 
-    return NULL;
+    curl = curl_easy_init();
+    curl_easy_setopt(curl, CURLOPT_URL, url.c_str());
+    curl_easy_setopt(curl, CURLOPT_POSTFIELDS, data);
+    curl_easy_setopt(curl, CURLOPT_POSTFIELDSIZE, -1);
+
+    res = curl_easy_perform(curl); /* ignores error */
+    curl_easy_cleanup(curl);
+    curl_free(name);
+    curl_free(value);
+    if (res == CURLE_OK) {
+        std::cout<<"message of url "<<url<<" delivered"<<std::endl;
+        return true;
+    } else {
+        std::cout<<"message of url "<<url<<" not delivered, code "<<res<<std::endl;
+        return false;
+    }
   }
 
   HTTP_SERVER_NS::HttpRequestCallback SendRequestBack{
       [&](HTTP_SERVER_NS::HttpRequest const &req, HTTP_SERVER_NS::HttpResponse &resp) {
-        pthread_t *tid;
-        tid = (pthread_t *)malloc(kMaxUrlPerTest*sizeof(pthread_t));
-        int count = 0;
         std::vector<std::map<std::string, std::string>> send_list;
         ParseBody(req.content.c_str(), send_list);
-        std::cout<<"send list size: "<<send_list.size()<<std::endl;
         for (std::map<std::string, std::string> kv_pairs : send_list)
         {
           std::string url       = "";
@@ -234,7 +220,6 @@ private:
           for (std::map<std::string, std::string>::iterator it = kv_pairs.begin();
                it != kv_pairs.end(); it++)
           {
-            std::cout<<"extracted k-v: "<<it->first<<" "<<it->second<<" value length "<<it->second.length()<<std::endl;
             if (it->first == "url")
             {
               url = it->second;
@@ -261,22 +246,11 @@ private:
             // gets contaminated with the first few characters becoming nonsense. And if I malloc a piece of memory
             // for it, then it in running it will have free(): invalid pointer error. Could you please help me make a
             // memory-safe argument structure and successfully send a request to the test service?
-            struct ArgStruct *args = (struct ArgStruct *)malloc(sizeof(const struct ArgStruct));
-            args->url = url;
-            args->name = "arguments";
-            args->value = arguments;
-            std::cout<<"sendingto url "<<url<<" arguments "<<arguments<<std::endl;
-//            int error = pthread_create(&tid[count],
-//                                       NULL, /* default attributes please */
-//                                       pull_one_url,
-//                                       args);
-//            if(0 != error)
-//                std::cout<<"sending fails"<<std::endl;
-////              fprintf(stderr, "Couldn't run thread number %d, errno %d\n", count, error);
-//            else
-//                std::cout<<"sending succeeds"<<std::endl;
-//              fprintf(stderr, "Thread %d, gets %s\n", count, url);
-            count++;
+            if (pull_one_url(url, arguments)) {
+                return 200;
+            } else {
+                return 404;
+            }
           }
           else
           {
