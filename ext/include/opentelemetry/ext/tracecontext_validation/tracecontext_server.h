@@ -186,17 +186,15 @@ private:
 
   static bool pull_one_url(std::string url, std::string value)
   {
-    CURL *curl;
-    CURLcode res;
+    CURL *curl = curl_easy_init();
     std::cout<<"value is "<<value<<std::endl;
     char *data = curl_easy_escape(curl, value.c_str(), 0);
 
-    curl = curl_easy_init();
     curl_easy_setopt(curl, CURLOPT_URL, url.c_str());
     curl_easy_setopt(curl, CURLOPT_POSTFIELDS, data);
     curl_easy_setopt(curl, CURLOPT_POSTFIELDSIZE, -1);
 
-    res = curl_easy_perform(curl); /* ignores error */
+    CURLcode res = curl_easy_perform(curl); /* ignores error */
     curl_easy_cleanup(curl);
     curl_free(data);
     if (res == CURLE_OK) {
