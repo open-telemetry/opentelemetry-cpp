@@ -88,7 +88,7 @@ public:
     nostd::unique_ptr<const char[]> value_;
 
     // Copies string into a buffer and returns a unique_ptr to the buffer.
-    // This is a workaround for the fact that strcpy doesn't accept a const char* destination.
+    // This is a workaround for the fact that memcpy doesn't accept a const destination.
     nostd::unique_ptr<const char[]> CopyStringToPointer(nostd::string_view str)
     {
       nostd::unique_ptr<char[]> temp(new char[str.size() + 1]);
