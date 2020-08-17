@@ -198,8 +198,7 @@ private:
 
     res = curl_easy_perform(curl); /* ignores error */
     curl_easy_cleanup(curl);
-    curl_free(name);
-    curl_free(value);
+    curl_free(data);
     if (res == CURLE_OK) {
         std::cout<<"message of url "<<url<<" delivered"<<std::endl;
         return true;
@@ -257,11 +256,6 @@ private:
             return 404;
           }
         }
-//        for(int i = 0; i< count; i++) {
-//          pthread_join(tid[i], NULL);
-//          std::cout<<"Thread "<<i<<" terminated"<<std::endl;
-//        }
-        free(tid);
         return 200;
       }};
 
