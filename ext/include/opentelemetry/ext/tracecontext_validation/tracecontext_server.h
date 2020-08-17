@@ -191,7 +191,7 @@ private:
 
   static void *pull_one_url(void * args)
   {
-    struct ArgStruct *arguments = (struct ArgStruct *)args;
+    const struct ArgStruct *arguments = (const struct ArgStruct *)args;
     std::cout<<"pull 1"<<std::endl;
     CURL *curl;
     CURLcode res;
@@ -251,7 +251,7 @@ private:
 //            std::cout<<"sending to url-4"<<std::endl;
 //            client.~HttpClient();
 //            std::cout<<"sending to url-5"<<std::endl;
-            struct ArgStruct args{url,"arguments",arguments};
+            const struct ArgStruct args{url,"arguments",arguments};
             std::cout<<"sendingto url "<<url<<" arguments "<<arguments<<std::endl;
 //            args.url = url;
 //            args.name = "arguments";
