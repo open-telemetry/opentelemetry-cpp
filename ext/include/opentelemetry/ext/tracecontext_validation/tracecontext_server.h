@@ -199,7 +199,7 @@ private:
     char *value = curl_easy_escape(curl, arguments->value.c_str(), 0);
     std::string fields = std::string(name) + "=" + std::string(value);
 
-    std::cout<<"pull 2"<<std::endl;
+    std::cout<<"pull 2 - url is: "<<(arguments->url)<<std::endl;
     curl = curl_easy_init();
     curl_easy_setopt(curl, CURLOPT_URL, arguments->url.c_str());
     curl_easy_setopt(curl, CURLOPT_POSTFIELDS, fields.c_str());
