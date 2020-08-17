@@ -221,7 +221,7 @@ private:
 
   HTTP_SERVER_NS::HttpRequestCallback SendRequestBack{
       [&](HTTP_SERVER_NS::HttpRequest const &req, HTTP_SERVER_NS::HttpResponse &resp) {
-        pthread_t tid[kMaxUrlPerTest];
+        const pthread_t tid[kMaxUrlPerTest];
         int count = 0;
         std::vector<std::map<std::string, std::string>> send_list;
         ParseBody(req.content.c_str(), send_list);
@@ -253,7 +253,8 @@ private:
 //            std::cout<<"sending to url-4"<<std::endl;
 //            client.~HttpClient();
 //            std::cout<<"sending to url-5"<<std::endl;
-            struct ArgStruct *args = (struct ArgStruct *)malloc(sizeof(const struct ArgStruct));
+            struct ArgStruct *args;
+             = (struct ArgStruct *)malloc(sizeof(const struct ArgStruct));
             std::cout<<"argstruct size is "<<sizeof(struct ArgStruct)<<std::endl;
             args->url = url;
             args->name = "arguments";
