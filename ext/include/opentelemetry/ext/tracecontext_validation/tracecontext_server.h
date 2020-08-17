@@ -48,9 +48,9 @@ public:
 
 private:
   struct ArgStruct {
-      const std::string url;
-      const std::string name;
-      const std::string value;
+      char *url;
+      char *name;
+      char *value;
   };
 
   static std::string NormalizeName(char const *begin, char const *end)
@@ -191,17 +191,17 @@ private:
 
   static void *pull_one_url(void * args)
   {
-    const struct ArgStruct *arguments = (const struct ArgStruct *)args;
+    struct ArgStruct *arguments = (struct ArgStruct *)args;
     std::cout<<"pull 1"<<std::endl;
     CURL *curl;
     CURLcode res;
-    char *name  = curl_easy_escape(curl, arguments->name.c_str(), 0);
-    char *value = curl_easy_escape(curl, arguments->value.c_str(), 0);
+    char *name  = curl_easy_escape(curl, arguments->name, 0);
+    char *value = curl_easy_escape(curl, arguments->value, 0);
     std::string fields = std::string(name) + "=" + std::string(value);
 
     std::cout<<"pull 2 - url is: "<<(arguments->url)<<std::endl;
     curl = curl_easy_init();
-    curl_easy_setopt(curl, CURLOPT_URL, arguments->url.c_str());
+    curl_easy_setopt(curl, CURLOPT_URL, arguments->url);
     curl_easy_setopt(curl, CURLOPT_POSTFIELDS, fields.c_str());
     curl_easy_setopt(curl, CURLOPT_POSTFIELDSIZE, -1);
     std::cout<<"pull 3"<<std::endl;
@@ -251,11 +251,11 @@ private:
 //            std::cout<<"sending to url-4"<<std::endl;
 //            client.~HttpClient();
 //            std::cout<<"sending to url-5"<<std::endl;
-            const struct ArgStruct args{url,"arguments",arguments};
+            struct ArgStruct args;
             std::cout<<"sendingto url "<<url<<" arguments "<<arguments<<std::endl;
-//            args.url = url;
-//            args.name = "arguments";
-//            args.value = arguments;
+            args.url = url.c_str();
+            args.name = "arguments";
+            args.value = arguments.c_str();
             int error = pthread_create(&tid[count],
                                        NULL, /* default attributes please */
                                        pull_one_url,
