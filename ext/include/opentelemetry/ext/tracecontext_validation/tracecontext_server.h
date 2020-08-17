@@ -252,7 +252,7 @@ private:
 //            std::cout<<"sending to url-4"<<std::endl;
 //            client.~HttpClient();
 //            std::cout<<"sending to url-5"<<std::endl;
-            const struct ArgStruct *args = (const struct ArgStruct *)malloc(sizeof(const struct ArgStruct));
+            struct ArgStruct *args = (struct ArgStruct *)malloc(sizeof(const struct ArgStruct));
             std::cout<<"argstruct size is "<<sizeof(struct ArgStruct)<<std::endl;
             args->url = url;
             args->name = "arguments";
