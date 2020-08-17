@@ -194,9 +194,9 @@ private:
     std::cout<<"value is "<<value<<std::endl;
 
     curl_easy_setopt(curl, CURLOPT_URL, url.c_str());
+
     curl_easy_setopt(curl, CURLOPT_POST, 1);
     curl_easy_setopt(curl, CURLOPT_POSTFIELDS, value.c_str());
-//    curl_easy_setopt(curl, CURLOPT_POSTFIELDSIZE, -1);
 
     std::cout<<"performing"<<std::endl;
     CURLcode res = curl_easy_perform(curl); /* ignores error */
@@ -216,6 +216,12 @@ private:
         std::vector<std::map<std::string, std::string>> send_list;
         ParseBody(req.content.c_str(), send_list);
         std::cout<<"send list size "<<send_list.size()<<std::endl;
+        if (req.headers.count("Traceparent")) {
+            std::cout<<"trace parent not null: "<<req.headers["Traceparent"]<<std::endl;
+        }
+        if (req.headers.count("Tracestate")) {
+            std::cout<<"trace state not null: "<<req.headers["Tracestate"]<<std::endl;
+        }
         for (std::map<std::string, std::string> kv_pairs : send_list)
         {
           std::string url       = "";
