@@ -241,7 +241,7 @@ private:
             if(0 != error)
               fprintf(stderr, "Couldn't run thread number %d, errno %d\n", count, error);
             else
-              fprintf(stderr, "Thread %d, gets %s\n", count, urls[i]);
+              fprintf(stderr, "Thread %d, gets %s\n", count, url);
             count++;
           }
           else
