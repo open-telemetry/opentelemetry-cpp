@@ -196,8 +196,10 @@ private:
     std::cout<<"pull 1"<<std::endl;
     CURL *curl;
     CURLcode res;
-    char *name  = curl_easy_escape(curl, arguments->name.get(), 0);
-    char *value = curl_easy_escape(curl, arguments->value.get(), 0);
+    const char *n = arguments->name.get();
+    const char *v = arguments->value.get();
+    char *name  = curl_easy_escape(curl, n, 0);
+    char *value = curl_easy_escape(curl, v, 0);
     std::string fields = std::string(name) + "=" + std::string(value);
 
     std::cout<<"pull 2 - url is: "<<(arguments->url).get()<<std::endl;
