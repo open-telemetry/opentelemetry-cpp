@@ -206,6 +206,11 @@ private:
     curl_easy_setopt(curl, CURLOPT_POSTFIELDSIZE, -1);
     std::cout<<"pull 3"<<std::endl;
     res = curl_easy_perform(curl); /* ignores error */
+    if (res = CURLE_OK) {
+        std::cout<<"message delivered"<<std::endl;
+    } else {
+        std::cout<<"message not delivered, code "<<res<<std::endl;
+    }
     curl_easy_cleanup(curl);
     std::cout<<"pull 4"<<std::endl;
 
