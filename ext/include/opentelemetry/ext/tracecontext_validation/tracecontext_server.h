@@ -257,6 +257,7 @@ private:
             struct ArgStruct *args = (struct ArgStruct *)malloc(sizeof(const struct ArgStruct));
 //            std::cout<<"argstruct size is "<<sizeof(struct ArgStruct)<<std::endl;
             args->url = url;
+            free(args);
 //            args->name = "arguments";
 //            args->value = arguments;
             std::cout<<"sendingto url "<<url<<" arguments "<<arguments<<std::endl;
@@ -281,7 +282,7 @@ private:
 //          pthread_join(tid[i], NULL);
 //          std::cout<<"Thread "<<i<<" terminated"<<std::endl;
 //        }
-//        free(tid);
+        free(tid);
         return 200;
       }};
 
