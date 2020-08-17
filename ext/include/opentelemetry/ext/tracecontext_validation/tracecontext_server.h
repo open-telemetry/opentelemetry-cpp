@@ -206,7 +206,7 @@ private:
     curl_easy_setopt(curl, CURLOPT_POSTFIELDSIZE, -1);
     std::cout<<"pull 3"<<std::endl;
     res = curl_easy_perform(curl); /* ignores error */
-    if (res = CURLE_OK || res == 0) {
+    if (res == CURLE_OK || res == 0) {
         std::cout<<"message of url "<<(arguments->url)<<" delivered"<<std::endl;
     } else {
         std::cout<<"message of url "<<(arguments->url)<<" not delivered, code "<<res<<std::endl;
