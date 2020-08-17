@@ -281,6 +281,7 @@ private:
           pthread_join(tid[i], NULL);
           std::cout<<"Thread "<<i<<" terminated"<<std::endl;
         }
+        free(tid);
         return 200;
       }};
 
