@@ -9,7 +9,7 @@ bool HttpClients::HttpClient::SendRequest(std::string url)
 {
   if (curl)
   {
-    curl_easy_setopt(curl, CURLOPT_URL, url);
+    curl_easy_setopt(curl, CURLOPT_URL, url.c_str());
     curl_easy_setopt(curl, CURLOPT_HTTPHEADER, list);
     curl_easy_setopt(curl, CURLOPT_POSTFIELDS, fields);
     curl_easy_setopt(curl, CURLOPT_POSTFIELDSIZE, -1);

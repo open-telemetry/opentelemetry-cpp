@@ -47,6 +47,12 @@ public:
   void InitializeCallBack(TraceContextServer &server) { server[test_protocol_] = SendRequestBack; }
 
 private:
+  struct ArgStruct {
+      std::string url;
+      std::string name;
+      std::string value;
+  };
+
   static std::string NormalizeName(char const *begin, char const *end)
   {
     std::string result(begin, end);
@@ -173,8 +179,28 @@ private:
     return true;
   }
 
+  static void *pull_one_url(void * args)
+  {
+    struct ArgStruct *arguments = args;
+    CURL *curl;
+    char *name  = curl_easy_escape(curl, arguments->name.c_str(), 0);
+    char *value = curl_easy_escape(curl, arguments->value.c_str(), 0);
+    std::string fields = std::string(name) + "=" + std::string(value);
+
+    curl = curl_easy_init();
+    curl_easy_setopt(curl, CURLOPT_URL, url.c_str());
+    curl_easy_setopt(curl, CURLOPT_POSTFIELDS, fields.c_str());
+    curl_easy_setopt(curl, CURLOPT_POSTFIELDSIZE, -1);
+    curl_easy_perform(curl); /* ignores error */
+    curl_easy_cleanup(curl);
+
+    return NULL;
+  }
+
   HTTP_SERVER_NS::HttpRequestCallback SendRequestBack{
       [&](HTTP_SERVER_NS::HttpRequest const &req, HTTP_SERVER_NS::HttpResponse &resp) {
+        pthread_t tid[kMaxUrlPerTest];
+        int count = 0;
         std::vector<std::map<std::string, std::string>> send_list;
         ParseBody(req.content.c_str(), send_list);
         for (std::map<std::string, std::string> kv_pairs : send_list)
@@ -196,14 +222,27 @@ private:
           if (url != "")
           {
             std::cout<<"sending to url-1"<<std::endl;
-            HttpClients::HttpClient client = clients.get()->StartNewClient();
-            std::cout<<"sending to url-2"<<std::endl;
-            client.AddPostField("arguments", arguments);
-            std::cout<<"sending to url-3"<<std::endl;
-            client.SendRequest(url);
-            std::cout<<"sending to url-4"<<std::endl;
-            client.~HttpClient();
-            std::cout<<"sending to url-5"<<std::endl;
+//            HttpClients::HttpClient client = clients.get()->StartNewClient();
+//            std::cout<<"sending to url-2"<<std::endl;
+//            client.AddPostField("arguments", arguments);
+//            std::cout<<"sending to url-3"<<std::endl;
+//            client.SendRequest(url);
+//            std::cout<<"sending to url-4"<<std::endl;
+//            client.~HttpClient();
+//            std::cout<<"sending to url-5"<<std::endl;
+            struct ArgStruct args;
+            args.url = url;
+            args.name = "arguments";
+            args.value = arguments;
+            int error = pthread_create(&tid[count],
+                                       NULL, /* default attributes please */
+                                       pull_one_url,
+                                       (void *)&args);
+            if(0 != error)
+              fprintf(stderr, "Couldn't run thread number %d, errno %d\n", i, error);
+            else
+              fprintf(stderr, "Thread %d, gets %s\n", i, urls[i]);
+            count++;
           }
           else
           {
@@ -214,6 +253,7 @@ private:
       }};
 
   const std::string test_protocol_ = "/test";
+  const int kMaxUrlPerTest = 32;
   nostd::unique_ptr<HttpClients> clients;
 };
 }// namespace validation
