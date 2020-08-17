@@ -266,6 +266,7 @@ private:
             else
                 std::cout<<"sending succeeds"<<std::endl;
 //              fprintf(stderr, "Thread %d, gets %s\n", count, url);
+            free(args);
             count++;
           }
           else
