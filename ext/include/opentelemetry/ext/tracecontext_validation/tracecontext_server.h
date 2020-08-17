@@ -180,6 +180,9 @@ private:
       std::cout<<"value 2 is"<<val2<<std::endl;
       kv_pairs[key2] = Trim(val2, '[', ']');
       send_list.push_back(kv_pairs);
+      if (*ptr == '}') {
+        ptr++;
+      }
     }
     return true;
   }
