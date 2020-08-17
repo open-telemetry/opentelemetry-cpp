@@ -15,7 +15,7 @@ int main()
 {
   atomic<uint32_t> reqCount{0};
 
-  opentelemetry::ext::validation::TraceContextServer server("127.0.0.1", 5000);
+  opentelemetry::ext::validation::TraceContextServer server("local host", 5000);
 
   // Start server
   server.SetClientManager();
