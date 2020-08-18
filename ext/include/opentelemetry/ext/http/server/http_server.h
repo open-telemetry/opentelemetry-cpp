@@ -575,7 +575,7 @@ protected:
     }
   }
 
-  std::string Strip(std::string &str)
+  std::string Strip(std::string str)
   {
     if (str.length() == 0) return str;
     int start = -1;
