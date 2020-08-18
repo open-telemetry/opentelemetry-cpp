@@ -19,6 +19,7 @@
 
 #include "opentelemetry/nostd/span.h"
 #include "opentelemetry/version.h"
+#include "opentelemetry/sdk/src/common/random.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace trace
@@ -73,6 +74,12 @@ public:
   void CopyBytesTo(nostd::span<uint8_t, kSize> dest) const noexcept
   {
     memcpy(dest.data(), rep_, kSize);
+  }
+
+  static TraceId GetRandom() {
+    uint8_t buf[kSize] = {0};
+    Random::GenerateRandomBuffer(buf);
+    return TraceId(buf);
   }
 
 private:

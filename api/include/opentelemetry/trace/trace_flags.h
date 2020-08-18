@@ -55,6 +55,12 @@ public:
   // Copies the TraceFlags to dest.
   void CopyBytesTo(nostd::span<uint8_t, 1> dest) const noexcept { dest[0] = rep_; }
 
+  static TraceFlags GetRandom() {
+    uint8_t buf;
+    Random::GenerateRandom64(buf);
+    return TraceFlags(buf);
+  }
+
 private:
   uint8_t rep_;
 };

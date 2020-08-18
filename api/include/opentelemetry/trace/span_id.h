@@ -66,6 +66,12 @@ public:
     memcpy(dest.data(), rep_, kSize);
   }
 
+  static SpanId GetRandom() {
+    uint8_t buf[kSize] = {0};
+    Random::GenerateRandomBuffer(buf);
+    return SpanId(buf);
+  }
+
 private:
   uint8_t rep_[kSize];
 };

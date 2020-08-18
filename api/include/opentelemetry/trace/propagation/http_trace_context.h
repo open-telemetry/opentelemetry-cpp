@@ -71,7 +71,7 @@ public:
     {
       std::cout<<"invalid span context"<<std::endl;
       // If invalid, make a new traceparent and remove trace state
-      span_context = SpanContext(false,false);
+      span_context = SpanContext::GetRandom();
     }
     InjectImpl(setter, carrier, span_context);
   }

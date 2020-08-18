@@ -92,6 +92,10 @@ public:
 
   static SpanContext GetInvalid() { return SpanContext(false, false); }
 
+  static SpanContext GetRandom() {
+    return SpanContext(TraceId::GetRandom(), SpanId::GetRandom(),TraceFlags::GetRandom(), false);
+  }
+
   bool IsSampled() const noexcept { return trace_flags_.IsSampled(); }
 
 private:
