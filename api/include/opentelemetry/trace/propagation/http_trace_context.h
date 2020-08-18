@@ -219,6 +219,7 @@ private:
     {
       hex_string += trace_flags[i];
     }
+    std::cout<<"injecting here"<<std::endl;
     setter(carrier, kTraceParent, hex_string);
   }
 
