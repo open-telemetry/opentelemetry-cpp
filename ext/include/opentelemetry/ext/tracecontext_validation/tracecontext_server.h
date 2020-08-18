@@ -89,6 +89,21 @@ private:
     return str.substr(first, (last - first + 1));
   }
 
+  std::string Strip(std::string &str)
+  {
+    if (str.length() == 0) return str;
+    int start = -1;
+    int end = -1;
+    for (int i = 0; i < str.length(); i++) {
+      if (str[i] != '\t' && str[i] != ' ') {
+        end = i;
+        if (start == -1) start = i;
+      }
+    }
+    if (start != -1) return str.substr(start, (end - start + 1));
+    else return "";
+  }
+
   bool ParseBody(std::string content, std::vector<std::map<std::string, std::string>> &send_list)
   {
     std::cout<<content<<std::endl;
@@ -132,6 +147,7 @@ private:
       }
       std::string key1 = NormalizeName(begin, ptr);
       key1 = Trim(key1, '\"');
+      key1 = Strip(key1);
       ptr++;
       while (*ptr == ' ')
       {
@@ -144,9 +160,8 @@ private:
         ptr++;
       }
       std::string val1 = std::string(begin, ptr);
-//      val1 = Trim(val1,'[', ']');
-      kv_pairs[key1] = Trim(val1, '\"', '\"');
-      std::cout<<"first k-v pairs get"<<std::endl;
+      val1 = Trim(val1, '\"', '\"');
+      kv_pairs[key1] = Strip(val1);
       ptr++;
       while (*ptr == ' ')
       {
@@ -165,6 +180,7 @@ private:
       }
       std::string key2 = NormalizeName(begin, ptr);
       key2 = Trim(key2, '\"');
+      key2 = Strip(key2);
       std::cout<<"key 2 is"<<key2<<std::endl;
       ptr++;
       while (*ptr == ' ')
@@ -178,9 +194,9 @@ private:
         ptr++;
       }
       std::string val2 = std::string(begin, ptr);
-//      val2 = Trim(val1,'[', ']');
+      val2 = Trim(val2, '\"', '\"');
       std::cout<<"value 2 is"<<val2<<std::endl;
-      kv_pairs[key2] = Trim(val2, '\"', '\"');
+      kv_pairs[key2] = Strip(val2);
       send_list.push_back(kv_pairs);
       if (*ptr == '}') {
         ptr++;
