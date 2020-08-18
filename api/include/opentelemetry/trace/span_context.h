@@ -93,11 +93,11 @@ public:
   static SpanContext GetInvalid() { return SpanContext(false, false); }
 
   static SpanContext GetRandom() {
-    return SpanContext(TraceId::GetRandom(), SpanId::GetRandom(),TraceFlags::GetRandom(), false);
+    return SpanContext(TraceId::GetRandom(), SpanId::GetRandom(), TraceFlags::GetRandom(), false);
   }
 
   static SpanContext UpdateSpanId(SpanContext span_context) {
-    return SpanContext(span_context.trace_id(), SpanId::GetRandom(), span_context.trace_flags(), span_context.HasRemoteParent());
+    return SpanContext(span_context.trace_id(), SpanId::GetRandom(), TraceFlags::GetRandom(), span_context.HasRemoteParent());
   }
 
   bool IsSampled() const noexcept { return trace_flags_.IsSampled(); }
