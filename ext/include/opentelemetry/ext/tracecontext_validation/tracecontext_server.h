@@ -243,6 +243,7 @@ private:
     auto it = carrier.find(trc_type);
     if (it != carrier.end())
     {
+      std::cout<<"carrier found value: "<<it->second<<std::endl;
       return nostd::string_view(it->second);
     }
     return "";
