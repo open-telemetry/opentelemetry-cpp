@@ -211,6 +211,7 @@ private:
     format.Inject(Setter, carrier, context);
 
     FormHeader(chunk, carrier);
+    chunk = curl_slist_append(chunk, "Traceparent: 00-1234567890-112345-123");
     curl_easy_setopt(curl, CURLOPT_POSTFIELDS, value.c_str());
     curl_easy_setopt(curl, CURLOPT_HTTPHEADER, chunk);
     curl_easy_setopt(curl, CURLOPT_URL, url.c_str());
