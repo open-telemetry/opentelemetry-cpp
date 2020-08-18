@@ -234,13 +234,11 @@ private:
   {
     std::string trc_type = std::string(trace_type);
     trc_type[0] = ::toupper(trc_type[0]);
-    std::cout<<"trying to get "<<trc_type<<std::endl;
     auto it = carrier.find(trc_type);
     if (it != carrier.end())
     {
       return nostd::string_view(it->second);
     }
-    std::cout<<"empty handed"<<std::endl;
     return "";
   }
 
@@ -248,6 +246,7 @@ private:
                      nostd::string_view trace_type        = "traceparent",
                      nostd::string_view trace_description = "")
   {
+    std::cout<<"setting for "<<trace_type<<std::endl;
     carrier[std::string(trace_type)] = std::string(trace_description);
   }
 
