@@ -241,6 +241,7 @@ private:
 
   static SpanContext ExtractContextFromTraceParent(nostd::string_view trace_parent)
   {
+    std::cout<<"trace parent is ! "<<trace_parent<<std::endl;
     bool is_valid = trace_parent.length() == kHeaderSize && trace_parent[kVersionBytes] == '-' &&
                     trace_parent[kVersionBytes + kTraceIdBytes + 1] == '-' &&
                     trace_parent[kVersionBytes + kTraceIdBytes + kSpanIdBytes + 2] == '-';
