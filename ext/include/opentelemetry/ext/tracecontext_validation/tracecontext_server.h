@@ -37,6 +37,7 @@ public:
     setServerName(os.str());
     addListeningPort(port);
     InitializeCallBack(*this);
+    format = trace::propagation::HttpTraceContext<std::map<std::string, std::string>>();
   };
 
   void SetClientManager() { clients = nostd::unique_ptr<HttpClients>(new HttpClients()); }
@@ -272,7 +273,7 @@ private:
   const std::string test_protocol_ = "/test";
   const int kMaxUrlPerTest = 32;
   nostd::unique_ptr<HttpClients> clients;
-  const static trace::propagation::HttpTraceContext<std::map<std::string, std::string>> format = trace::propagation::HttpTraceContext<std::map<std::string, std::string>>();
+  static trace::propagation::HttpTraceContext<std::map<std::string, std::string>> format;
 };
 }// namespace validation
 }// namespace ext
