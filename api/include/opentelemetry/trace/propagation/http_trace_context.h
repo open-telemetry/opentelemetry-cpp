@@ -279,8 +279,9 @@ private:
           }
           else
           {
-            return SpanContext(false,
-                               false);  // Impossible to have more than 4 elements in parent header
+            break;
+//            return SpanContext(false,
+//                               false);  // Impossible to have more than 4 elements in parent header
           }
           countdown = kHeaderElementLengths[++elt_num];
           start_pos = -1;
