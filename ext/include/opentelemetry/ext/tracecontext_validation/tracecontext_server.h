@@ -232,7 +232,7 @@ private:
   static nostd::string_view Getter(const std::map<std::string, std::string> &carrier,
                                    nostd::string_view trace_type = "traceparent")
   {
-    if (traceparent.length() > 0)
+    if (trace_type.length() > 0)
       trace_type[0] = ::toupper(trace_type[0]);
     std::cout<<"trying to get "<<trace_type<<std::endl;
     auto it = carrier.find();
