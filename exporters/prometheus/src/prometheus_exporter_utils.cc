@@ -64,21 +64,15 @@ std::vector<prometheus_client::MetricFamily> PrometheusExporterUtils::TranslateT
 void PrometheusExporterUtils::SetMetricFamily(metric_sdk::Record &record,
                                               prometheus_client::MetricFamily *metric_family)
 {
-  try
+
+  auto origin_name = record.GetName();
+  auto sanitized   = SanitizeNames(origin_name);
+  if (origin_name != sanitized)
   {
-    auto origin_name = record.GetName();
-    auto sanitized   = SanitizeNames(origin_name);
-    if (origin_name != sanitized)
-    {
-      std::cout << "Sanitized metric name \"" << origin_name << "\" to \"" << sanitized << "\""
-                << std::endl;
-    }
-    metric_family->name = sanitized;
+    std::cout << "Sanitized metric name \"" << origin_name << "\" to \"" << sanitized << "\""
+              << std::endl;
   }
-  catch (std::invalid_argument &e)
-  {
-    metric_family->name = record.GetName();
-  }
+  metric_family->name = sanitized;
   metric_family->help = record.GetDescription();
 
   // unpack the variant and set the metric data to metric family struct
@@ -295,21 +289,14 @@ void PrometheusExporterUtils::SetMetricBasic(prometheus_client::ClientMetric &me
     metric.label.resize(label_pairs.size());
     for (int i = 0; i < label_pairs.size(); ++i)
     {
-      try
+      auto origin_name = label_pairs[i].first;
+      auto sanitized   = SanitizeNames(origin_name);
+      if (origin_name != sanitized)
       {
-        auto origin_name = label_pairs[i].first;
-        auto sanitized   = SanitizeNames(origin_name);
-        if (origin_name != sanitized)
-        {
-          std::cout << "Sanitized label name \"" << origin_name << "\" to \"" << sanitized << "\""
-                    << std::endl;
-        }
-        metric.label[i].name = sanitized;
+        std::cout << "Sanitized label name \"" << origin_name << "\" to \"" << sanitized << "\""
+                  << std::endl;
       }
-      catch (std::invalid_argument &e)
-      {
-        metric.label[i].name = label_pairs[i].first;
-      }
+      metric.label[i].name  = sanitized;
       metric.label[i].value = label_pairs[i].second;
     }
   }
@@ -376,18 +363,15 @@ void PrometheusExporterUtils::SetValue(std::vector<T> values,
 {
   switch (type)
   {
-    case prometheus_client::MetricType::Counter:
-    {
+    case prometheus_client::MetricType::Counter: {
       metric->counter.value = values[0];
       break;
     }
-    case prometheus_client::MetricType::Gauge:
-    {
+    case prometheus_client::MetricType::Gauge: {
       metric->gauge.value = values[0];
       break;
     }
-    case prometheus_client::MetricType::Untyped:
-    {
+    case prometheus_client::MetricType::Untyped: {
       metric->untyped.value = values[0];
       break;
     }
