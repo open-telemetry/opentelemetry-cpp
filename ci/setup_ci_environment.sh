@@ -8,5 +8,4 @@ apt-get install --no-install-recommends --no-install-suggests -y \
                 wget \
                 git \
                 valgrind \
-                lcov \
-                libcurl4-openssl-dev
+                lcov
