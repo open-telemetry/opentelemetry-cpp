@@ -211,7 +211,7 @@ private:
     format.Inject(Setter, carrier, context);
 
 //    FormHeader(chunk, carrier);
-    for (std::map<std::string,std::string>::iterator it = headers.begin(); it != headers.end(); it++) {
+    for (std::map<std::string,std::string>::iterator it = carrier.begin(); it != carrier.end(); it++) {
         std::string item = (it->first) + ": " + (it->second);
         item[0] = ::toupper(item[0]);
         std::cout<<"item is "<<item<<std::endl;
