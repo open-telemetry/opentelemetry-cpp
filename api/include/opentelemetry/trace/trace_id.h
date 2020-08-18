@@ -21,6 +21,8 @@
 #include "opentelemetry/version.h"
 #include "opentelemetry/common/random.h"
 
+using opentelemetry::api::common::Random;
+
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace trace
 {
