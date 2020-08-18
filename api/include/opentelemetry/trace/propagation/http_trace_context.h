@@ -93,13 +93,19 @@ public:
   static TraceId GenerateTraceIdFromString(nostd::string_view trace_id)
   {
     const char *trc_id = trace_id.begin();
-    uint8_t buf[16];
+    uint8_t buf[kTraceIdBytes / 2];
     int tmp;
-    for (int i = 0; i < 32; i++)
+    for (int i = 0; i < kTraceIdBytes; i++)
     {
       tmp = CharToInt(*trc_id);
       if (tmp < 0)
-        return TraceId(0);
+      {
+        for (int j = 0; j < kTraceIdBytes / 2; j++)
+        {
+          buf[j] = 0;
+        }
+        return TraceId(buf);
+      }
       if (i % 2 == 0)
       {
         buf[i / 2] = tmp * 16;
@@ -115,14 +121,20 @@ public:
 
   static SpanId GenerateSpanIdFromString(nostd::string_view span_id)
   {
-    char *spn_id = span_id.begin();
-    uint8_t buf[8];
+    const char *spn_id = span_id.begin();
+    uint8_t buf[kSpanIdBytes / 2];
     int tmp;
-    for (int i = 0; i < 16; i++)
+    for (int i = 0; i < kSpanIdBytes; i++)
     {
       tmp = CharToInt(*spn_id);
       if (tmp < 0)
-        return SpanId(0);
+      {
+        for (int j = 0; j < kSpanIdBytes / 2; j++)
+        {
+          buf[j] = 0;
+        }
+        return SpanId(buf);
+      }
       if (i % 2 == 0)
       {
         buf[i / 2] = tmp * 16;
@@ -133,7 +145,7 @@ public:
       }
       spn_id++;
     }
-    return SpanId(spn_id);
+    return SpanId(buf);
   }
 
   static TraceFlags GenerateTraceFlagsFromString(nostd::string_view trace_flags)
