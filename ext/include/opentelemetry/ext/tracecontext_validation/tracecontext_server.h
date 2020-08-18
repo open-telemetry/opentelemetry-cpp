@@ -205,7 +205,7 @@ private:
     }
     struct curl_slist *chunk = NULL;
     std::map<std::string, std::string> carrier = {};
-    format.Inject(Setter, carrier, ctx2);
+    format.Inject(Setter, carrier, context);
 
     FormHeader(chunk, carrier);
     curl_easy_setopt(curl, CURLOPT_HTTPHEADER, chunk);
