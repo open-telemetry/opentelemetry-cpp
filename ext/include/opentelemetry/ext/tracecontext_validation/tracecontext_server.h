@@ -267,6 +267,7 @@ private:
             if (it->first == "url")
             {
               url = it->second;
+              std::cout<<"url extracted: "<<url<<std::endl;
             }
             else if (it->first == "arguments")
             {
