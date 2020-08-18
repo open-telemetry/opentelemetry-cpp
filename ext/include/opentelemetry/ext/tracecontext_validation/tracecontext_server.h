@@ -211,10 +211,10 @@ private:
 
     FormHeader(chunk, carrier);
     curl_slist_append(chunk,"Thisistesting: 0001");
-    curl_easy_setopt(curl, CURLOPT_HTTPHEADER, chunk);
     curl_easy_setopt(curl, CURLOPT_URL, url.c_str());
     curl_easy_setopt(curl, CURLOPT_POST, 1);
     curl_easy_setopt(curl, CURLOPT_POSTFIELDS, value.c_str());
+    curl_easy_setopt(curl, CURLOPT_HTTPHEADER, chunk);
 
     std::cout<<"performing"<<std::endl;
     CURLcode res = curl_easy_perform(curl); /* ignores error */
