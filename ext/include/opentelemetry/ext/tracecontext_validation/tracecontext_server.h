@@ -210,8 +210,13 @@ private:
     std::map<std::string, std::string> carrier = {};
     format.Inject(Setter, carrier, context);
 
-    FormHeader(chunk, carrier);
-    chunk = curl_slist_append(chunk, "Traceparent: 00-1234567890-112345-123");
+//    FormHeader(chunk, carrier);
+    for (std::map<std::string,std::string>::iterator it = headers.begin(); it != headers.end(); it++) {
+        std::string item = (it->first) + ": " + (it->second);
+        item[0] = ::toupper(item[0]);
+        std::cout<<"item is "<<item<<std::endl;
+        chunk = curl_slist_append(chunk, item.c_str());
+    }
     curl_easy_setopt(curl, CURLOPT_POSTFIELDS, value.c_str());
     curl_easy_setopt(curl, CURLOPT_HTTPHEADER, chunk);
     curl_easy_setopt(curl, CURLOPT_URL, url.c_str());
