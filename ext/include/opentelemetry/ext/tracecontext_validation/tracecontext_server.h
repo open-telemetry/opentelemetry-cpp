@@ -273,7 +273,7 @@ private:
   const std::string test_protocol_ = "/test";
   const int kMaxUrlPerTest = 32;
   nostd::unique_ptr<HttpClients> clients;
-  static trace::propagation::HttpTraceContext<std::map<std::string, std::string>> format;
+  trace::propagation::HttpTraceContext<std::map<std::string, std::string>> format;
 };
 }// namespace validation
 }// namespace ext
