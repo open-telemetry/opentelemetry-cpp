@@ -192,7 +192,8 @@ private:
   static bool FormHeader(struct curl_slist *chunk, std::map<std::string,std::string> headers) {
     std::cout<<"map size is "<<headers.size()<<std::endl;
     for (std::map<std::string,std::string>::iterator it = headers.begin(); it != headers.end(); it++) {
-        std::string item = (it->first) + ":" + (it->second);
+        std::string item = (it->first) + ": " + (it->second);
+        item[0] = ::toupper(item[0]);
         std::cout<<"item is "<<item<<std::endl;
         chunk = curl_slist_append(chunk, item.c_str());
     }
@@ -210,8 +211,6 @@ private:
     format.Inject(Setter, carrier, context);
 
     FormHeader(chunk, carrier);
-    chunk = curl_slist_append(chunk, "Host: 127.0.0.1:12350");
-    chunk = curl_slist_append(chunk, "Traceparent: 00-11");
     curl_easy_setopt(curl, CURLOPT_POSTFIELDS, value.c_str());
     curl_easy_setopt(curl, CURLOPT_HTTPHEADER, chunk);
     curl_easy_setopt(curl, CURLOPT_URL, url.c_str());
