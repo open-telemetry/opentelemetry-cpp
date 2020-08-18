@@ -233,9 +233,9 @@ private:
                                    nostd::string_view trace_type = "traceparent")
   {
     if (trace_type.length() > 0)
-      trace_type[0] = ::toupper(trace_type[0]);
+      trace_type.data()[0] = ::toupper(trace_type.data()[0]);
     std::cout<<"trying to get "<<trace_type<<std::endl;
-    auto it = carrier.find();
+    auto it = carrier.find(trace_type);
     if (it != carrier.end())
     {
       return nostd::string_view(it->second);
