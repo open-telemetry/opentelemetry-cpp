@@ -20,8 +20,6 @@
 #include "opentelemetry/nostd/span.h"
 #include "opentelemetry/version.h"
 
-using opentelemetry::api::common::Random;
-
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace trace
 {
