@@ -96,6 +96,10 @@ public:
     return SpanContext(TraceId::GetRandom(), SpanId::GetRandom(),TraceFlags::GetRandom(), false);
   }
 
+  static SpanContext UpdateSpanId(SpanContext span_context) {
+    return SpanContext(span_context.trace_id(), SpanId::GetRandom(), span_context.trace_flags(), span_context.HasRemoteParent());
+  }
+
   bool IsSampled() const noexcept { return trace_flags_.IsSampled(); }
 
 private:
