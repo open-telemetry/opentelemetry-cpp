@@ -86,14 +86,18 @@ public:
   const TraceFlags &trace_flags() const noexcept { return trace_flags_; }
   //  const TraceState &trace_state() const noexcept { return *trace_state_; }
 
-  bool IsValid() const noexcept { return trace_id_.IsValid() && span_id_.IsValid(); }
+  bool IsValid() const noexcept {
+    if (!trace_id_.IsValid()) std::cout<<"trace id invalid"<<std::endl;
+    if (!span_id_.IsValid()) std::cout<<"span id invalid"<<std::endl;
+    return trace_id_.IsValid() && span_id_.IsValid();
+  }
 
   bool HasRemoteParent() const noexcept { return remote_parent_; }
 
   static SpanContext GetInvalid() { return SpanContext(false, false); }
 
   static SpanContext GetRandom() {
-    return SpanContext(TraceId::GetRandom(), SpanId::GetRandom(), TraceFlags::GetRandom(), false);
+    return SpanContext(TraceId::GetRandom(), SpanId::GetRandom(), TraceFlags::GetRandom(), true);
   }
 
   static SpanContext UpdateSpanId(SpanContext span_context) {
