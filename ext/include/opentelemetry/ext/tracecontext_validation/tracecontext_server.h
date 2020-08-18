@@ -189,15 +189,25 @@ private:
     return true;
   }
 
-  static bool pull_one_url(std::string url, std::string value)
+  bool FormHeader(struct curl_slist *chunk, std::map<std::string,std::string> headers) {
+    for (std::map<std::string,std::string>::iterator it = headers.begin(); it != headers.end(); it++) {
+        chunk = curl_slist_append(chunk, (it->first) + ":" + (it->second));
+    }
+    return true;
+  }
+
+  static bool pull_one_url(std::string url, std::string value, context::Context context)
   {
     CURL *curl = curl_easy_init();
     if (curl == nullptr) {
         std::cout<<"invalid curl pointer initialized"<<std::endl;
     }
-    std::cout<<"url is "<<url<<std::endl;
-    std::cout<<"value is "<<value<<std::endl;
+    struct curl_slist *chunk = NULL;
+    std::map<std::string, std::string> carrier = {};
+    format.Inject(Setter, carrier, ctx2);
 
+    FormHeader(chunk, carrier);
+    curl_easy_setopt(curl, CURLOPT_HTTPHEADER, chunk);
     curl_easy_setopt(curl, CURLOPT_URL, url.c_str());
     curl_easy_setopt(curl, CURLOPT_POST, 1);
     curl_easy_setopt(curl, CURLOPT_POSTFIELDS, value.c_str());
@@ -206,6 +216,7 @@ private:
     CURLcode res = curl_easy_perform(curl); /* ignores error */
     std::cout<<"clean up"<<std::endl;
     curl_easy_cleanup(curl);
+    curl_slist_free_all(chunk);
     if (res == CURLE_OK) {
         std::cout<<"message of url "<<url<<" delivered"<<std::endl;
         return true;
@@ -258,7 +269,7 @@ private:
           }
           if (url != "")
           {
-            if (!pull_one_url(url, arguments)) {
+            if (!pull_one_url(url, arguments, ctx2)) {
                 return 404;
             }
           }
