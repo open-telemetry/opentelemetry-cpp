@@ -210,7 +210,7 @@ private:
     format.Inject(Setter, carrier, context);
 
     FormHeader(chunk, carrier);
-    curl_slist_append(chunk,"Thisistesting: 0001");
+    curl_slist_append(chunk,"Accept: guiwu");
     curl_easy_setopt(curl, CURLOPT_URL, url.c_str());
     curl_easy_setopt(curl, CURLOPT_POST, 1);
     curl_easy_setopt(curl, CURLOPT_POSTFIELDS, value.c_str());
