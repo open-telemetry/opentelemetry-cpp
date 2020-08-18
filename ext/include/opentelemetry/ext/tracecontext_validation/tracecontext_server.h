@@ -91,7 +91,6 @@ private:
 
   bool ParseBody(std::string content, std::vector<std::map<std::string, std::string>> &send_list)
   {
-    std::cout<<content<<std::endl;
     char const *begin = content.c_str();
     char const *ptr   = begin;
     while (*ptr == ' ')
@@ -127,7 +126,6 @@ private:
       }
       if (*ptr != ':')
       {
-        std::cout<<"It is not a colon but a "<<*ptr<<std::endl;
         return false;
       }
       std::string key1 = NormalizeName(begin, ptr);
@@ -160,13 +158,11 @@ private:
       }
       if (*ptr != ':')
       {
-        std::cout<<"It is not a colon but a "<<*ptr<<std::endl;
         return false;
       }
       std::string key2 = NormalizeName(begin, ptr);
       key2 = Trim(key2, '\"');
       key2 = Strip(key2);
-      std::cout<<"key 2 is"<<key2<<std::endl;
       ptr++;
       while (*ptr == ' ')
       {
@@ -180,7 +176,6 @@ private:
       }
       std::string val2 = std::string(begin, ptr);
       val2 = Trim(val2, '\"', '\"');
-      std::cout<<"value 2 is"<<val2<<std::endl;
       kv_pairs[key2] = Strip(val2);
       send_list.push_back(kv_pairs);
       if (*ptr == '}') {
@@ -191,11 +186,9 @@ private:
   }
 
   static bool FormHeader(struct curl_slist *chunk, std::map<std::string,std::string> headers) {
-    std::cout<<"map size is "<<headers.size()<<std::endl;
     for (std::map<std::string,std::string>::iterator it = headers.begin(); it != headers.end(); it++) {
         std::string item = (it->first) + ": " + (it->second);
         item[0] = ::toupper(item[0]);
-        std::cout<<"item is "<<item<<std::endl;
         chunk = curl_slist_append(chunk, item.c_str());
     }
     return true;
@@ -205,7 +198,6 @@ private:
   {
     CURL *curl = curl_easy_init();
     if (curl == nullptr) {
-        std::cout<<"invalid curl pointer initialized"<<std::endl;
     }
     struct curl_slist *chunk = NULL;
     std::map<std::string, std::string> carrier = {};
@@ -215,16 +207,13 @@ private:
     for (std::map<std::string,std::string>::iterator it = carrier.begin(); it != carrier.end(); it++) {
         std::string item = (it->first) + ": " + (it->second);
         item[0] = ::toupper(item[0]);
-        std::cout<<"item is "<<item<<std::endl;
         chunk = curl_slist_append(chunk, item.c_str());
     }
     curl_easy_setopt(curl, CURLOPT_POSTFIELDS, value.c_str());
     curl_easy_setopt(curl, CURLOPT_HTTPHEADER, chunk);
     curl_easy_setopt(curl, CURLOPT_URL, url.c_str());
 
-    std::cout<<"performing"<<std::endl;
     CURLcode res = curl_easy_perform(curl); /* ignores error */
-    std::cout<<"clean up"<<std::endl;
     curl_easy_cleanup(curl);
     curl_slist_free_all(chunk);
     if (res == CURLE_OK) {
@@ -244,7 +233,7 @@ private:
     auto it = carrier.find(trc_type);
     if (it != carrier.end())
     {
-      std::cout<<"carrier found value: "<<it->second<<std::endl;
+      std::cout<<trace_type+" extracted: "<<it->second<<std::endl;
       return nostd::string_view(it->second);
     }
     return "";
@@ -254,7 +243,6 @@ private:
                      nostd::string_view trace_type        = "traceparent",
                      nostd::string_view trace_description = "")
   {
-    std::cout<<"setting for "<<trace_type<<std::endl;
     carrier[std::string(trace_type)] = std::string(trace_description);
   }
 

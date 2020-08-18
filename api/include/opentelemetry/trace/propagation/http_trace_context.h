@@ -64,9 +64,7 @@ public:
 
   void Inject(Setter setter, T &carrier, const context::Context &context) noexcept override
   {
-    std::cout<<"inject initiates"<<std::endl;
     SpanContext span_context = GetCurrentSpan(context)->GetContext();
-    std::cout<<"span context get"<<std::endl;
     if (!span_context.IsValid())
     {
       std::cout<<"invalid span context"<<std::endl;
@@ -226,7 +224,6 @@ private:
     {
       hex_string += trace_flags[i];
     }
-    std::cout<<"injecting here"<<std::endl;
     setter(carrier, kTraceParent, hex_string);
   }
 
@@ -241,7 +238,6 @@ private:
 
   static SpanContext ExtractContextFromTraceParent(nostd::string_view trace_parent)
   {
-    std::cout<<"trace parent is ! "<<trace_parent<<std::endl;
     bool is_valid = (trace_parent.length() == kHeaderSize || (trace_parent.length() > kHeaderSize
                     && trace_parent[kHeaderSize] == '-')) && trace_parent[kVersionBytes] == '-' &&
                     trace_parent[kVersionBytes + kTraceIdBytes + 1] == '-' &&
@@ -305,7 +301,6 @@ private:
       }
     }
     trace_flags = trace_parent.substr(start_pos, kHeaderElementLengths[elt_num]);
-    std::cout<<"version is ! "<<version<<"trace id is !"<<trace_id<<"span id is !"<<span_id<<std::endl;
     if (trace_id == "00000000000000000000000000000000" || span_id == "0000000000000000")
     {
       return SpanContext(false, false);
@@ -316,10 +311,7 @@ private:
     }
     if (trace_id.length() == 32 && span_id.length() == 16 && trace_flags.length() == 2)
     {
-      std::cout<<"we can be here right?"<<std::endl;
-      std::cout<<"just extracted trace id is "<<trace_id<<std::endl;
       TraceId trace_id_obj       = GenerateTraceIdFromString(trace_id);
-      if (!trace_id_obj.IsValid()) std::cout<<"invalid trace id at the beginning"<<std::endl;
       SpanId span_id_obj         = GenerateSpanIdFromString(span_id);
       TraceFlags trace_flags_obj = GenerateTraceFlagsFromString(trace_flags);
       return SpanContext(trace_id_obj, span_id_obj, trace_flags_obj, true);
