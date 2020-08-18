@@ -14,8 +14,6 @@
 
 #pragma once
 
-#include <iostream>
-
 #include "opentelemetry/nostd/unique_ptr.h"
 #include "opentelemetry/trace/span_id.h"
 #include "opentelemetry/trace/trace_flags.h"
@@ -89,8 +87,6 @@ public:
   //  const TraceState &trace_state() const noexcept { return *trace_state_; }
 
   bool IsValid() const noexcept {
-    if (!trace_id_.IsValid()) std::cout<<"trace id invalid"<<std::endl;
-    if (!span_id_.IsValid()) std::cout<<"span id invalid"<<std::endl;
     return trace_id_.IsValid() && span_id_.IsValid();
   }
 
