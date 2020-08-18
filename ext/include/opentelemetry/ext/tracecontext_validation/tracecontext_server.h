@@ -211,6 +211,7 @@ private:
 
     FormHeader(chunk, carrier);
     chunk = curl_slist_append(chunk, "Host: 127.0.0.1:12350");
+    chunk = curl_slist_append(chunk, "Traceparent: 00-11");
     curl_easy_setopt(curl, CURLOPT_POSTFIELDS, value.c_str());
     curl_easy_setopt(curl, CURLOPT_HTTPHEADER, chunk);
     curl_easy_setopt(curl, CURLOPT_URL, url.c_str());
@@ -267,7 +268,6 @@ private:
             if (it->first == "url")
             {
               url = it->second;
-              std::cout<<"url extracted: "<<url<<std::endl;
             }
             else if (it->first == "arguments")
             {
