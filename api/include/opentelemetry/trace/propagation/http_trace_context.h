@@ -64,9 +64,12 @@ public:
 
   void Inject(Setter setter, T &carrier, const context::Context &context) noexcept override
   {
+    std::cout<<"inject initiates"<<std::endl;
     SpanContext span_context = GetCurrentSpan(context)->GetContext();
+    std::cout<<"span context get"<<std::endl;
     if (!span_context.IsValid())
     {
+      std::cout<<"invalid span context"<<std::endl;
       return;
     }
     InjectImpl(setter, carrier, span_context);
