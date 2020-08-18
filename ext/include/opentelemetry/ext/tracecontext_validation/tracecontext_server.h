@@ -189,6 +189,121 @@ private:
     return true;
   }
 
+  bool parseHeaders(Connection &conn)
+  {
+    // Method
+    char const *begin = conn.receiveBuffer.c_str();
+    char const *ptr   = begin;
+    while (*ptr && *ptr != ' ' && *ptr != '\r' && *ptr != '\n')
+    {
+      ptr++;
+    }
+    if (*ptr != ' ')
+    {
+      return false;
+    }
+    conn.request.method.assign(begin, ptr);
+    while (*ptr == ' ')
+    {
+      ptr++;
+    }
+
+    // URI
+    begin = ptr;
+    while (*ptr && *ptr != ' ' && *ptr != '\r' && *ptr != '\n')
+    {
+      ptr++;
+    }
+    if (*ptr != ' ')
+    {
+      return false;
+    }
+    conn.request.uri.assign(begin, ptr);
+    while (*ptr == ' ')
+    {
+      ptr++;
+    }
+
+    // Protocol
+    begin = ptr;
+    while (*ptr && *ptr != ' ' && *ptr != '\r' && *ptr != '\n')
+    {
+      ptr++;
+    }
+    if (*ptr != '\r' && *ptr != '\n')
+    {
+      return false;
+    }
+    conn.request.protocol.assign(begin, ptr);
+    if (*ptr == '\r')
+    {
+      ptr++;
+    }
+    if (*ptr != '\n')
+    {
+      return false;
+    }
+    ptr++;
+
+    // Headers
+    conn.request.headers.clear();
+    while (*ptr != '\r' && *ptr != '\n')
+    {
+      // Name
+      begin = ptr;
+      while (*ptr && *ptr != ':' && *ptr != ' ' && *ptr != '\r' && *ptr != '\n')
+      {
+        ptr++;
+      }
+      if (*ptr != ':')
+      {
+        return false;
+      }
+      std::string name = normalizeHeaderName(begin, ptr);
+      ptr++;
+      while (*ptr == ' ')
+      {
+        ptr++;
+      }
+
+      // Value
+      begin = ptr;
+      while (*ptr && *ptr != '\r' && *ptr != '\n')
+      {
+        ptr++;
+      }
+      if (conn.request.headers.count(name) == 0 || conn.request.headers[name] == "" || std::string(begin, ptr) == "")
+      {
+        conn.request.headers[name] = std::string(begin, ptr);
+      }
+      else
+      {
+        conn.request.headers[name] = "";
+      }
+      if (*ptr == '\r')
+      {
+        ptr++;
+      }
+      if (*ptr != '\n')
+      {
+        return false;
+      }
+      ptr++;
+    }
+
+    if (*ptr == '\r')
+    {
+      ptr++;
+    }
+    if (*ptr != '\n')
+    {
+      return false;
+    }
+    ptr++;
+
+    return true;
+  }
+
   static bool FormHeader(struct curl_slist *chunk, std::map<std::string,std::string> headers) {
     std::cout<<"map size is "<<headers.size()<<std::endl;
     for (std::map<std::string,std::string>::iterator it = headers.begin(); it != headers.end(); it++) {
