@@ -70,7 +70,8 @@ public:
     if (!span_context.IsValid())
     {
       std::cout<<"invalid span context"<<std::endl;
-      return;
+      // If invalid, make a new traceparent and remove trace state
+      span_context = SpanContext(false,false);
     }
     InjectImpl(setter, carrier, span_context);
   }
