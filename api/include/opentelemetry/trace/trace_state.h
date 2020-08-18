@@ -21,7 +21,8 @@
 #include "opentelemetry/nostd/string_view.h"
 #include "opentelemetry/nostd/unique_ptr.h"
 
-OPENTELEMETRY_BEGIN_NAMESPACE
+namespace opentelemetry
+{
 namespace trace
 {
 
@@ -47,7 +48,7 @@ public:
     Entry() : key_(nullptr), value_(nullptr){};
 
     // Copy constructor
-    Entry(Entry &copy)
+    Entry(const Entry &copy)
     {
       key_   = CopyStringToPointer(copy.key_.get());
       value_ = CopyStringToPointer(copy.value_.get());
@@ -61,13 +62,8 @@ public:
       return *this;
     }
 
-    // Move constructor and assignment operator
+    // Move contructor and assignment operator
     Entry(Entry &&other) = default;
-    Entry(const Entry &other)
-    {
-      key_   = CopyStringToPointer(other.key_.get());
-      value_ = CopyStringToPointer(other.value_.get());
-    }
     Entry &operator=(Entry &&other) = default;
 
     // Creates an Entry for a given key-value pair.
@@ -92,57 +88,18 @@ public:
     nostd::unique_ptr<const char[]> value_;
 
     // Copies string into a buffer and returns a unique_ptr to the buffer.
-    // This is a workaround for the fact that strcpy doesn't accept a const char* destination.
+    // This is a workaround for the fact that memcpy doesn't accept a const destination.
     nostd::unique_ptr<const char[]> CopyStringToPointer(nostd::string_view str)
     {
-      nostd::unique_ptr<char[]> temp(new char[str.size() + 1]);
-      memcpy(temp.get(), str.data(), str.size());
-      temp.get()[str.size()] = '\0';
-      return nostd::unique_ptr<const char[]>(temp.release());
+      char *temp = new char[str.size() + 1];
+      memcpy(temp, str.data(), str.size());
+      temp[str.size()] = '\0';
+      return nostd::unique_ptr<const char[]>(temp);
     }
   };
 
   // An empty TraceState.
   TraceState() noexcept : entries_(new Entry[kMaxKeyValuePairs]), num_entries_(0) {}
-
-  // movable and copiable
-  TraceState(TraceState &&trace_state)
-  {
-    entries_.reset(new Entry[kMaxKeyValuePairs]);
-    num_entries_ = 0;
-    for (const auto &entry : trace_state.Entries())
-    {
-      Entry copy                     = entry;
-      (entries_.get())[num_entries_] = Entry(copy);
-      num_entries_++;
-    }
-  }
-
-  TraceState(const TraceState &trace_state)
-  {
-    entries_.reset(new Entry[kMaxKeyValuePairs]);
-    num_entries_ = 0;
-    for (const auto &entry : trace_state.Entries())
-    {
-      Entry copy                     = entry;
-      (entries_.get())[num_entries_] = Entry(copy);
-      num_entries_++;
-    }
-  }
-
-  bool operator==(const TraceState &that) const noexcept
-  {
-    if (num_entries_ != that.num_entries_)
-      return false;
-    nostd::string_view value;
-    for (const auto &entry : that.Entries())
-    {
-      Get(entry.GetKey(), value);
-      if (value != entry.GetValue())
-        return false;
-    }
-    return true;
-  }
 
   // Returns false if no such key, otherwise returns true and populates the value parameter with the
   // associated value.
@@ -167,9 +124,9 @@ public:
     {
       return false;
     }
+
     Entry entry(key, value);
     (entries_.get())[num_entries_] = entry;
-
     num_entries_++;
     return true;
   }
@@ -236,4 +193,4 @@ private:
 };
 
 }  // namespace trace
-OPENTELEMETRY_END_NAMESPACE
+}  // namespace opentelemetry
