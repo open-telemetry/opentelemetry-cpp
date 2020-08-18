@@ -314,7 +314,9 @@ private:
     if (trace_id.length() == 32 && span_id.length() == 16 && trace_flags.length() == 2)
     {
       std::cout<<"we can be here right?"<<std::endl;
+      std::cout<<"just extracted trace id is "<<trace_id<<std::endl;
       TraceId trace_id_obj       = GenerateTraceIdFromString(trace_id);
+      if (!trace_id_obj.IsValid()) std::cout<<"invalid trace id at the beginning"<<std::endl;
       SpanId span_id_obj         = GenerateSpanIdFromString(span_id);
       TraceFlags trace_flags_obj = GenerateTraceFlagsFromString(trace_flags);
       return SpanContext(trace_id_obj, span_id_obj, trace_flags_obj, true);
