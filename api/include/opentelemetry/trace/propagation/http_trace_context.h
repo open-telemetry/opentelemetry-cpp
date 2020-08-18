@@ -302,7 +302,7 @@ private:
       }
     }
     trace_flags = trace_parent.substr(start_pos, kHeaderElementLengths[elt_num]);
-
+    std::cout<<"version is ! "<<version<<std::endl;
     if (trace_id == "00000000000000000000000000000000" || span_id == "0000000000000000")
     {
       return SpanContext(false, false);
