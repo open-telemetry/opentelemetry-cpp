@@ -7,7 +7,7 @@
 #include "opentelemetry/version.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
-namespace sdk
+namespace api
 {
 namespace common
 {
@@ -64,5 +64,5 @@ private:
   std::array<uint64_t, 2> state_{};
 };
 }  // namespace common
-}  // namespace sdk
+}  // namespace api
 OPENTELEMETRY_END_NAMESPACE

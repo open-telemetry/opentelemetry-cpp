@@ -5,7 +5,7 @@
 #include "opentelemetry/common/fast_random_number_generator.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
-namespace sdk
+namespace api
 {
 namespace common
 {
@@ -34,5 +34,5 @@ private:
   static FastRandomNumberGenerator &GetRandomNumberGenerator() noexcept;
 };
 }  // namespace common
-}  // namespace sdk
+}  // namespace api
 OPENTELEMETRY_END_NAMESPACE

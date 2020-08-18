@@ -5,7 +5,7 @@
 #include <random>
 
 OPENTELEMETRY_BEGIN_NAMESPACE
-namespace sdk
+namespace api
 {
 namespace common
 {
@@ -72,5 +72,5 @@ void Random::GenerateRandomBuffer(opentelemetry::nostd::span<uint8_t> buffer) no
   }
 }
 }  // namespace common
-}  // namespace sdk
+}  // namespace api
 OPENTELEMETRY_END_NAMESPACE

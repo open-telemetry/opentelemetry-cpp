@@ -1,7 +1,7 @@
 #include "src/common/platform/fork.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
-namespace sdk
+namespace api
 {
 namespace common
 {
@@ -16,5 +16,5 @@ int AtFork(void (*prepare)(), void (*parent)(), void (*child)()) noexcept
 }
 }  // namespace platform
 }  // namespace common
-}  // namespace sdk
+}  // namespace api
 OPENTELEMETRY_END_NAMESPACE
