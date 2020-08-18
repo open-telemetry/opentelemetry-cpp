@@ -1,4 +1,4 @@
-#include "src/common/platform/fork.h"
+#include "opentelemetry/common/platform/fork.h"
 
 #include <pthread.h>
 
