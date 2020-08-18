@@ -313,6 +313,7 @@ private:
     }
     if (trace_id.length() == 32 && span_id.length() == 16 && trace_flags.length() == 2)
     {
+      std::cout<<"we can be here right?"<<std::endl;
       TraceId trace_id_obj       = GenerateTraceIdFromString(trace_id);
       SpanId span_id_obj         = GenerateSpanIdFromString(span_id);
       TraceFlags trace_flags_obj = GenerateTraceFlagsFromString(trace_flags);
