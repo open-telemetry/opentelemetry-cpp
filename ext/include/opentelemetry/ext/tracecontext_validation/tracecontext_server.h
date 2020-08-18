@@ -233,7 +233,7 @@ private:
                                    nostd::string_view trace_type = "traceparent")
   {
     std::cout<<"trying to get "<<trace_type<<std::endl;
-    auto it = carrier.find(std::string(trace_type));
+    auto it = carrier.find(normalizeHeaderName(std::string(trace_type).begin(),normalizeHeaderName(std::string(trace_type).end()));
     if (it != carrier.end())
     {
       return nostd::string_view(it->second);
