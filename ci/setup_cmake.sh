@@ -25,6 +25,4 @@ mkdir _build
 cd _build
 cmake .. -DBUILD_SHARED_LIBS=ON
 make -j 4
-mkdir -p deploy
-make DESTDIR=`pwd`/deploy install
 make install
