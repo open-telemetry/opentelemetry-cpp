@@ -194,6 +194,7 @@ private:
     // Method
     char const *begin = conn.receiveBuffer.c_str();
     char const *ptr   = begin;
+    std::cout<<"receive buff as a whole "<<conn.receiveBuffer<<std::endl;
     while (*ptr && *ptr != ' ' && *ptr != '\r' && *ptr != '\n')
     {
       ptr++;
