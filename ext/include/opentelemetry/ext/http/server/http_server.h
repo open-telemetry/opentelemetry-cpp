@@ -575,6 +575,21 @@ protected:
     }
   }
 
+  std::string Strip(std::string &str)
+  {
+    if (str.length() == 0) return str;
+    int start = -1;
+    int end = -1;
+    for (int i = 0; i < str.length(); i++) {
+      if (str[i] != '\t' && str[i] != ' ') {
+        end = i;
+        if (start == -1) start = i;
+      }
+    }
+    if (start != -1) return str.substr(start, (end - start + 1));
+    else return "";
+  }
+
   bool parseHeaders(Connection &conn)
   {
     // Method
@@ -646,7 +661,7 @@ protected:
       {
         return false;
       }
-      std::string name = normalizeHeaderName(begin, ptr);
+      std::string name = Strip(normalizeHeaderName(begin, ptr));
       ptr++;
       while (*ptr == ' ')
       {
@@ -659,11 +674,11 @@ protected:
       {
         ptr++;
       }
-      if (conn.request.headers.count(name) == 0 || conn.request.headers[name] == "")
+      if (conn.request.headers.count(name) == 0 || Strip(conn.request.headers[name]) == "")
       {
-        conn.request.headers[name] = std::string(begin, ptr);
+        conn.request.headers[name] = Strip(std::string(begin, ptr));
       }
-      else if (conn.request.headers[name] != "" && std::string(begin, ptr) != "")
+      else if (Strip(conn.request.headers[name]) != "" && Strip(std::string(begin, ptr)) != "")
       {
         conn.request.headers[name] = "";
       }

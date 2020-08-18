@@ -89,21 +89,6 @@ private:
     return str.substr(first, (last - first + 1));
   }
 
-  std::string Strip(std::string &str)
-  {
-    if (str.length() == 0) return str;
-    int start = -1;
-    int end = -1;
-    for (int i = 0; i < str.length(); i++) {
-      if (str[i] != '\t' && str[i] != ' ') {
-        end = i;
-        if (start == -1) start = i;
-      }
-    }
-    if (start != -1) return str.substr(start, (end - start + 1));
-    else return "";
-  }
-
   bool ParseBody(std::string content, std::vector<std::map<std::string, std::string>> &send_list)
   {
     std::cout<<content<<std::endl;
