@@ -92,7 +92,7 @@ public:
 
   static TraceId GenerateTraceIdFromString(nostd::string_view trace_id)
   {
-    char *trc_id = trace_id.begin();
+    const char *trc_id = trace_id.begin();
     uint8_t buf[16];
     int tmp;
     for (int i = 0; i < 32; i++)
