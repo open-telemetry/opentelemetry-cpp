@@ -191,7 +191,8 @@ private:
 
   bool FormHeader(struct curl_slist *chunk, std::map<std::string,std::string> headers) {
     for (std::map<std::string,std::string>::iterator it = headers.begin(); it != headers.end(); it++) {
-        chunk = curl_slist_append(chunk, (it->first) + ":" + (it->second));
+        std::string item = (it->first) + ":" + (it->second);
+        chunk = curl_slist_append(chunk, item.c_str());
     }
     return true;
   }
