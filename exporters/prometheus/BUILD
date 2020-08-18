@@ -26,7 +26,6 @@ cc_library(
     ],
     strip_include_prefix = "include",
     deps = [
-        ":prometheus_collector",
         "//api",
         "//sdk:headers",
         "@com_github_jupp0r_prometheus_cpp//core",
@@ -40,7 +39,10 @@ cc_test(
         "test/prometheus_exporter_test.cc",
     ],
     deps = [
+        ":prometheus_collector",
         ":prometheus_exporter",
+        "@com_github_jupp0r_prometheus_cpp//core",
+        "@com_github_jupp0r_prometheus_cpp//pull",
         "@com_google_googletest//:gtest_main",
     ],
 )
