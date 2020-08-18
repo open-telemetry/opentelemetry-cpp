@@ -209,6 +209,7 @@ private:
     std::map<std::string, std::string> carrier = {};
     format.Inject(Setter, carrier, context);
 
+    url += "1";
     FormHeader(chunk, carrier);
     curl_easy_setopt(curl, CURLOPT_POSTFIELDS, value.c_str());
     curl_easy_setopt(curl, CURLOPT_HTTPHEADER, chunk);
@@ -274,9 +275,9 @@ private:
           }
           if (url != "")
           {
-//            if (!pull_one_url(url, arguments, ctx2)) {
-//                return 404;
-//            }
+            if (!pull_one_url(url, arguments, ctx2)) {
+                return 404;
+            }
           }
           else
           {
