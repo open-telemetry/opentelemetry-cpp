@@ -48,7 +48,7 @@ public:
     Entry() : key_(nullptr), value_(nullptr){};
 
     // Copy constructor
-    Entry(Entry &copy)
+    Entry(const Entry &copy)
     {
       key_   = CopyStringToPointer(copy.key_.get());
       value_ = CopyStringToPointer(copy.value_.get());
@@ -88,12 +88,13 @@ public:
     nostd::unique_ptr<const char[]> value_;
 
     // Copies string into a buffer and returns a unique_ptr to the buffer.
-    // This is a workaround for the fact that strcpy doesn't accept a const char* destination.
+    // This is a workaround for the fact that memcpy doesn't accept a const destination.
     nostd::unique_ptr<const char[]> CopyStringToPointer(nostd::string_view str)
     {
-      nostd::unique_ptr<char[]> temp(new char[str.size() + 1]);
-      strcpy(temp.get(), str.data());
-      return nostd::unique_ptr<const char[]>(temp.release());
+      char *temp = new char[str.size() + 1];
+      memcpy(temp, str.data(), str.size());
+      temp[str.size()] = '\0';
+      return nostd::unique_ptr<const char[]>(temp);
     }
   };
 

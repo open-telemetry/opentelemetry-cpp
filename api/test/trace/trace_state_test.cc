@@ -160,4 +160,29 @@ TEST(TraceStateTest, IsValidValue)
   EXPECT_FALSE(TraceState::IsValidValue(""));
   EXPECT_FALSE(TraceState::IsValidValue(kLongString));
 }
+
+// Tests that keys and values don't depend on null terminators
+TEST(TraceStateTest, MemorySafe)
+{
+  TraceState s;
+  const int kNumPairs                               = 3;
+  opentelemetry::nostd::string_view key_string      = "test_key_1test_key_2test_key_3";
+  opentelemetry::nostd::string_view val_string      = "test_val_1test_val_2test_val_3";
+  opentelemetry::nostd::string_view keys[kNumPairs] = {
+      key_string.substr(0, 10), key_string.substr(10, 10), key_string.substr(20, 10)};
+  opentelemetry::nostd::string_view values[kNumPairs] = {
+      val_string.substr(0, 10), val_string.substr(10, 10), val_string.substr(20, 10)};
+
+  for (int i = 0; i < kNumPairs; i++)
+  {
+    s.Set(keys[i], values[i]);
+  }
+
+  opentelemetry::nostd::span<TraceState::Entry> entries = s.Entries();
+  for (int i = 0; i < kNumPairs; i++)
+  {
+    EXPECT_EQ(entries[i].GetKey(), keys[i]);
+    EXPECT_EQ(entries[i].GetValue(), values[i]);
+  }
+}
 }  // namespace
