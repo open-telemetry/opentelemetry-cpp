@@ -209,8 +209,8 @@ private:
     std::map<std::string, std::string> carrier = {};
     format.Inject(Setter, carrier, context);
 
+    value += "hohoho";
     FormHeader(chunk, carrier);
-    curl_slist_append(chunk,"Accept: guiwu");
     curl_easy_setopt(curl, CURLOPT_URL, url.c_str());
     curl_easy_setopt(curl, CURLOPT_POST, 1);
     curl_easy_setopt(curl, CURLOPT_POSTFIELDS, value.c_str());
