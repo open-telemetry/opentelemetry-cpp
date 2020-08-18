@@ -272,11 +272,11 @@ private:
       {
         ptr++;
       }
-      if (conn.request.headers.count(name) == 0 || conn.request.headers[name] == "" || std::string(begin, ptr) == "")
+      if (conn.request.headers.count(name) == 0 || conn.request.headers[name] == "")
       {
         conn.request.headers[name] = std::string(begin, ptr);
       }
-      else
+      else if (conn.request.headers[name] != "" && std::string(begin, ptr) != "")
       {
         conn.request.headers[name] = "";
       }
