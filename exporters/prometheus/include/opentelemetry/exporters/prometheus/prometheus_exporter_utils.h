@@ -63,17 +63,6 @@ private:
   static std::string SanitizeNames(std::string name);
 
   /**
-   * Determine whether the input name is a valid OTel name or not
-   *
-   * From the spec:
-   * 1. They are non-empty strings
-   * 2. They are case-insensitive
-   * 3. The first character must be non-numeric, non-space, non-punctuation
-   * 4. Subsequent characters must belong to the alphanumeric characters, '_', '.', and '-'.
-   */
-  static bool IsValidName(const std::string &name);
-
-  /**
    * Set value to metric family for different aggregator
    */
   template <typename T>

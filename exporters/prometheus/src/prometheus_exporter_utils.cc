@@ -117,57 +117,11 @@ void PrometheusExporterUtils::SetMetricFamily(metric_sdk::Record &record,
  */
 std::string PrometheusExporterUtils::SanitizeNames(std::string name)
 {
-  // name cannot be null or empty.
-  // a valid OTel name should only contain alphanumeric characters,
-  // '_', '.', or '-'.
-  if (!IsValidName(name))
-  {
-    throw std::invalid_argument("Received an invalid OTel name.\n");
-  }
-
   // replace all '.' and '-' with '_'
   std::replace(name.begin(), name.end(), '.', '_');
   std::replace(name.begin(), name.end(), '-', '_');
 
-  // if the replaced name starts with '_', it's also invalid
-  if (name[0] == '_')
-  {
-    throw std::invalid_argument("Received an invalid OTel name.\n");
-  }
-
   return name;
-}
-
-/**
- * Determine whether the input name is a valid OTel name or not
- *
- * From the spec:
- * 1. They are non-empty strings
- * 2. They are case-insensitive
- * 3. The first character must be non-numeric, non-space, non-punctuation
- * 4. Subsequent characters must belong to the alphanumeric characters, '_', '.', and '-'.
- */
-bool PrometheusExporterUtils::IsValidName(const std::string &name)
-{
-  if (name.empty())
-  {
-    return false;
-  }
-
-  if (isnumber(name[0]) || isspace(name[0]) || ispunct(name[0]))
-  {
-    return false;
-  }
-
-  for (std::string::size_type i = 1; i < name.size(); i++)
-  {
-    if (!isalnum(name[i]) && name[i] != '_' && name[i] != '.' && name[i] != '-')
-    {
-      return false;
-    }
-  }
-
-  return true;
 }
 
 /**
@@ -422,18 +376,15 @@ void PrometheusExporterUtils::SetValue(std::vector<T> values,
 {
   switch (type)
   {
-    case prometheus_client::MetricType::Counter:
-    {
+    case prometheus_client::MetricType::Counter: {
       metric->counter.value = values[0];
       break;
     }
-    case prometheus_client::MetricType::Gauge:
-    {
+    case prometheus_client::MetricType::Gauge: {
       metric->gauge.value = values[0];
       break;
     }
-    case prometheus_client::MetricType::Untyped:
-    {
+    case prometheus_client::MetricType::Untyped: {
       metric->untyped.value = values[0];
       break;
     }
