@@ -19,6 +19,7 @@
 
 #include "opentelemetry/nostd/span.h"
 #include "opentelemetry/version.h"
+#include "sdk/src/common/random.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace trace
