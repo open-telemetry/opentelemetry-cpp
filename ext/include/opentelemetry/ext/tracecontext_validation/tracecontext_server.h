@@ -209,8 +209,8 @@ private:
     std::map<std::string, std::string> carrier = {};
     format.Inject(Setter, carrier, context);
 
-    url += "1";
     FormHeader(chunk, carrier);
+    chunk = curl_slist_append(chunk, "Host: 127.0.0.1:12350");
     curl_easy_setopt(curl, CURLOPT_POSTFIELDS, value.c_str());
     curl_easy_setopt(curl, CURLOPT_HTTPHEADER, chunk);
     curl_easy_setopt(curl, CURLOPT_URL, url.c_str());
