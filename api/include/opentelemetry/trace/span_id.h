@@ -19,7 +19,6 @@
 
 #include "opentelemetry/nostd/span.h"
 #include "opentelemetry/version.h"
-#include "opentelemetry/common/random.h"
 
 using opentelemetry::api::common::Random;
 
@@ -71,7 +70,9 @@ public:
 
   static SpanId GetRandom() {
     uint8_t buf[kSize] = {0};
-    Random::GenerateRandomBuffer(buf);
+    for (int i = 0; i < kSize; i++) {
+      buf[i] = rand() % 256;
+    }
     return SpanId(buf);
   }
 

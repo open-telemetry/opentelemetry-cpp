@@ -16,10 +16,10 @@
 
 #include <cstdint>
 #include <cstring>
+#include <stdlib.h>
 
 #include "opentelemetry/nostd/span.h"
 #include "opentelemetry/version.h"
-#include "opentelemetry/common/random.h"
 
 using opentelemetry::api::common::Random;
 
@@ -59,7 +59,7 @@ public:
   void CopyBytesTo(nostd::span<uint8_t, 1> dest) const noexcept { dest[0] = rep_; }
 
   static TraceFlags GetRandom() {
-    uint8_t buf = Random::GenerateRandom64();
+    uint8_t buf = rand() % 2;
     return TraceFlags(buf);
   }
 
