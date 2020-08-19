@@ -62,20 +62,6 @@ public:
       return *this;
     }
 
-    bool operator==(const TraceState &that) const noexcept {
-      for (const auto &entry: that.Entries()) {
-        nostd::string_view value;
-        this->Get(entry.GetKey(),value);
-        if (entry.GetValue() != value) return false;
-      }
-      for (const auto &entry: this->Entries()) {
-        nostd::string_view value;
-        that.Get(entry.GetKey(),value);
-        if (entry.GetValue() != value) return false;
-      }
-      return true;
-    }
-
     // Move contructor and assignment operator
     Entry(Entry &&other) = default;
     Entry &operator=(Entry &&other) = default;
@@ -122,6 +108,20 @@ public:
       Set(entry.GetKey(),entry.GetValue());
       num_entries_++;
     }
+  }
+
+  bool operator==(const TraceState &that) const noexcept {
+    for (const auto &entry: that.Entries()) {
+      nostd::string_view value;
+      Get(entry.GetKey(),value);
+      if (entry.GetValue() != value) return false;
+    }
+    for (const auto &entry: Entries()) {
+      nostd::string_view value;
+      that.Get(entry.GetKey(),value);
+      if (entry.GetValue() != value) return false;
+    }
+    return true;
   }
 
   // Returns false if no such key, otherwise returns true and populates the value parameter with the
