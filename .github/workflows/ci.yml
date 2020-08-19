@@ -71,6 +71,19 @@ jobs:
     - name: run tests
       run: ./ci/do_ci.sh bazel.test
 
+  bazel_valgrind:
+    name: Bazel valgrind
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - name: setup
+      run: |
+        sudo ./ci/setup_cmake.sh
+        sudo ./ci/setup_ci_environment.sh
+        sudo ./ci/install_bazelisk.sh
+    - name: run tests
+      run: ./ci/do_ci.sh bazel.valgrind
+
   bazel_noexcept:
     name: Bazel noexcept
     runs-on: ubuntu-latest

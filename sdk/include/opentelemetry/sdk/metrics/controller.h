@@ -5,7 +5,6 @@
 #include <sstream>
 #include <thread>
 #include <vector>
-#include "opentelemetry/exporters/ostream/metrics_exporter.h"
 #include "opentelemetry/metrics/instrument.h"
 #include "opentelemetry/nostd/unique_ptr.h"
 #include "opentelemetry/sdk/metrics/exporter.h"
@@ -63,8 +62,7 @@ public:
   {
     if (!active_.exchange(true))
     {
-      std::thread runner(&PushController::run, this);
-      runner.detach();
+      runner_ = std::thread(&PushController::run, this);
       return true;
     }
     return false;
@@ -81,11 +79,7 @@ public:
   {
     if (active_.exchange(false))
     {
-      while (running_.load())
-      {
-        std::this_thread::sleep_for(
-            std::chrono::microseconds(period_ / 100));  // wait until the runner thread concludes
-      }
+      runner_.join();
       tick();  // flush metrics sitting in the processor
     }
   }
@@ -106,7 +100,7 @@ private:
         tick();
         std::this_thread::sleep_for(std::chrono::microseconds(period_));
       }
-      running_ = false;
+      running_.exchange(false);
     }
   }
 
@@ -136,6 +130,7 @@ private:
   nostd::shared_ptr<metrics_api::Meter> meter_;
   nostd::unique_ptr<MetricsExporter> exporter_;
   nostd::shared_ptr<MetricsProcessor> processor_;
+  std::thread runner_;
   std::mutex mu_;
   std::atomic<bool> active_  = ATOMIC_VAR_INIT(false);
   std::atomic<bool> running_ = ATOMIC_VAR_INIT(false);

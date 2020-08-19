@@ -1,4 +1,5 @@
 #include "opentelemetry/sdk/trace/attribute_utils.h"
+#include "opentelemetry/context/threadlocal_context.h"
 
 #include <gtest/gtest.h>
 
@@ -21,6 +22,6 @@ TEST(AttributeMapTest, AttributesConstruction)
 
   for (int i = 0; i < kNumAttributes; i++)
   {
-    EXPECT_EQ(opentelemetry::nostd::get<int64_t>(map.GetAttributes().at(keys[i])), values[i]);
+    EXPECT_EQ(opentelemetry::nostd::get<int>(map.GetAttributes().at(keys[i])), values[i]);
   }
 }
