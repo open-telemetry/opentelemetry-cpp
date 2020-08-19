@@ -17,7 +17,6 @@
 #include <map>
 #include <string>
 #include "opentelemetry/context/context.h"
-#include "opentelemetry/nostd/unique_ptr.h"
 #include "opentelemetry/nostd/shared_ptr.h"
 #include "opentelemetry/nostd/span.h"
 #include "opentelemetry/nostd/string_view.h"
@@ -330,9 +329,10 @@ private:
     }
   }
 
-  static void ExtractTraceState(nostd::string_view &trace_state_header,nostd::unique_ptr<TraceState> &trace_state)
+  static void ExtractTraceState(nostd::string_view &trace_state_header, TraceState &trace_state)
   {
     std::cout<<"extract trace state"<<std::endl;
+    TraceState trace_state = TraceState();
     int start_pos          = -1;
     int end_pos            = -1;
     int ctr_pos            = -1;
@@ -355,8 +355,7 @@ private:
           if (key != "")
           {
             std::cout<<"key "<<key<<" val "<<val<<std::endl;
-            trace_state.get()->Set(key, val);
-            std::cout<<"set a pair"<<std::endl;
+            trace_state.Set(key, val);
           }
         }
         ctr_pos   = -1;
@@ -374,28 +373,25 @@ private:
           start_pos = i;
       }
     }
-    std::cout<<"extracted here!"<<std::endl;
     if (start_pos != -1 && end_pos != -1)
     {
       if (ctr_pos != -1)
       {
-        std::cout<<"not here?"<<std::endl;
         key = trace_state_header.substr(start_pos, ctr_pos - start_pos);
         val = trace_state_header.substr(ctr_pos + 1, end_pos - ctr_pos);
         if (key != "")
         {
           std::cout<<"key "<<key<<" val "<<val<<std::endl;
-          trace_state.get()->Set(key, val);
+          trace_state.Set(key, val);
         }
       }
       element_num++;
     }
     if (element_num >= kTraceStateMaxMembers)
     {
-      trace_state.reset(new TraceState);  // too many k-v pairs will result in an invalid trace state
-      return;
+      return nostd::shared_ptr<TraceState>(new TraceState());  // too many k-v pairs will result in an invalid trace state
     }
-    return;
+    return nostd::shared_ptr<TraceState>(&trace_state);
   }
 
   static void AddNewMember(TraceState &trace_state, nostd::string_view member)
@@ -429,14 +425,14 @@ private:
       return context_from_parent_header;
     }
 
-    nostd::unique_ptr<TraceState> trace_state;
+    TraceState trace_state;
     ExtractTraceState(trace_state_header, trace_state);
     std::cout<<"trace state returned"<<std::endl;
-    for (const auto &entry: trace_state.get()->Entries()) {
+    for (const auto &entry: trace_state.Entries()) {
       std::cout<<"key is: "<<entry.GetKey()<<" value is: "<<entry.GetValue()<<std::endl;
     }
     return SpanContext(context_from_parent_header.trace_id(), context_from_parent_header.span_id(),
-                       context_from_parent_header.trace_flags(), *(trace_state.get()), true);
+                       context_from_parent_header.trace_flags(), trace_state, true);
   }
 };
 }  // namespace propagation
