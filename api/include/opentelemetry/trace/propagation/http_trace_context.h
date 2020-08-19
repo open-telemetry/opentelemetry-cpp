@@ -242,7 +242,6 @@ private:
 
   static SpanContext ExtractContextFromTraceParent(nostd::string_view trace_parent)
   {
-    std::cout<<"Extract context from trace parent"<<std::endl;
     bool is_valid = (trace_parent.length() == kHeaderSize || (trace_parent.length() > kHeaderSize
                     && trace_parent[kHeaderSize] == '-')) && trace_parent[kVersionBytes] == '-' &&
                     trace_parent[kVersionBytes + kTraceIdBytes + 1] == '-' &&
@@ -353,6 +352,7 @@ private:
           val = trace_state_header.substr(ctr_pos + 1, end_pos - ctr_pos);
           if (key != "")
           {
+            std::cout<<"key "<<key<<" val "<<val<<std::endl;
             trace_state.Set(key, val);
             nostd::string_view v;
             trace_state.Get(key, v);
@@ -381,6 +381,7 @@ private:
         val = trace_state_header.substr(ctr_pos + 1, end_pos - ctr_pos);
         if (key != "")
         {
+          std::cout<<"key "<<key<<" val "<<val<<std::endl;
           trace_state.Set(key, val);
           nostd::string_view v;
           trace_state.Get(key, v);
@@ -392,6 +393,7 @@ private:
     {
       return TraceState();  // too many k-v pairs will result in an invalid trace state
     }
+    std::cout<<"trace state returned"<<val<<std::endl;
     return trace_state;
   }
 
@@ -409,7 +411,6 @@ private:
 
   static SpanContext ExtractImpl(Getter getter, const T &carrier)
   {
-    std::cout<<"extractImpl"<<std::endl;
     nostd::string_view trace_parent = getter(carrier, kTraceParent);
     if (trace_parent == "")
     {
