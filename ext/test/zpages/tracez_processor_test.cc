@@ -1,11 +1,12 @@
 #include "opentelemetry/ext/zpages/tracez_processor.h"
+#include "opentelemetry/context/threadlocal_context.h"
 
 #include <gtest/gtest.h>
 
 #include <thread>
 
+#include "opentelemetry/ext/zpages/threadsafe_span_data.h"
 #include "opentelemetry/nostd/span.h"
-#include "opentelemetry/sdk/trace/span_data.h"
 #include "opentelemetry/sdk/trace/tracer.h"
 
 using namespace opentelemetry::sdk::trace;
@@ -18,8 +19,8 @@ using namespace opentelemetry::ext::zpages;
  * and running_spans. completed_spans contains all spans (cumulative), unless marked otherwise
  */
 void UpdateSpans(std::shared_ptr<TracezSpanProcessor> &processor,
-                 std::vector<std::unique_ptr<opentelemetry::sdk::trace::SpanData>> &completed,
-                 std::unordered_set<opentelemetry::sdk::trace::SpanData *> &running,
+                 std::vector<std::unique_ptr<ThreadsafeSpanData>> &completed,
+                 std::unordered_set<ThreadsafeSpanData *> &running,
                  bool store_only_new_completed = false)
 {
   auto spans = processor->GetSpanSnapshot();
@@ -47,7 +48,7 @@ void UpdateSpans(std::shared_ptr<TracezSpanProcessor> &processor,
  * no more or less
  */
 bool ContainsNames(const std::vector<std::string> &names,
-                   std::unordered_set<opentelemetry::sdk::trace::SpanData *> &running,
+                   std::unordered_set<ThreadsafeSpanData *> &running,
                    unsigned int name_start        = 0,
                    unsigned int name_end          = 0,
                    bool one_to_one_correspondence = false)
@@ -95,7 +96,7 @@ bool ContainsNames(const std::vector<std::string> &names,
  * no more or less
  */
 bool ContainsNames(const std::vector<std::string> &names,
-                   std::vector<std::unique_ptr<opentelemetry::sdk::trace::SpanData>> &completed,
+                   std::vector<std::unique_ptr<ThreadsafeSpanData>> &completed,
                    unsigned int name_start        = 0,
                    unsigned int name_end          = 0,
                    bool one_to_one_correspondence = false)
@@ -146,7 +147,7 @@ void GetManySnapshots(std::shared_ptr<TracezSpanProcessor> &processor, int i)
  * in vector. Used for testing thread safety
  */
 void StartManySpans(
-    std::vector<opentelemetry::nostd::unique_ptr<opentelemetry::trace::Span>> &spans,
+    std::vector<opentelemetry::nostd::shared_ptr<opentelemetry::trace::Span>> &spans,
     std::shared_ptr<opentelemetry::trace::Tracer> tracer,
     int i)
 {
@@ -158,7 +159,7 @@ void StartManySpans(
  * Helper function that ends all spans in the passed in span vector. Used
  * for testing thread safety
  */
-void EndAllSpans(std::vector<opentelemetry::nostd::unique_ptr<opentelemetry::trace::Span>> &spans)
+void EndAllSpans(std::vector<opentelemetry::nostd::shared_ptr<opentelemetry::trace::Span>> &spans)
 {
   for (auto &span : spans)
     span->End();
@@ -186,11 +187,11 @@ protected:
   std::shared_ptr<TracezSpanProcessor> processor;
   std::shared_ptr<opentelemetry::trace::Tracer> tracer;
 
-  std::unordered_set<opentelemetry::sdk::trace::SpanData *> running;
-  std::vector<std::unique_ptr<opentelemetry::sdk::trace::SpanData>> completed;
-
   std::vector<std::string> span_names;
-  std::vector<opentelemetry::nostd::unique_ptr<opentelemetry::trace::Span>> span_vars;
+  std::vector<opentelemetry::nostd::shared_ptr<opentelemetry::trace::Span>> span_vars;
+
+  std::unordered_set<ThreadsafeSpanData *> running;
+  std::vector<std::unique_ptr<ThreadsafeSpanData>> completed;
 };
 
 ///////////////////////////////////////// TESTS ///////////////////////////////////
@@ -503,14 +504,17 @@ TEST_F(TracezProcessor, FlushShutdown)
  */
 TEST_F(TracezProcessor, RunningThreadSafety)
 {
-  std::vector<opentelemetry::nostd::unique_ptr<opentelemetry::trace::Span>> spans1;
-  std::vector<opentelemetry::nostd::unique_ptr<opentelemetry::trace::Span>> spans2;
+  std::vector<opentelemetry::nostd::shared_ptr<opentelemetry::trace::Span>> spans1;
+  std::vector<opentelemetry::nostd::shared_ptr<opentelemetry::trace::Span>> spans2;
 
   std::thread start1(StartManySpans, std::ref(spans1), tracer, 500);
   std::thread start2(StartManySpans, std::ref(spans2), tracer, 500);
 
   start1.join();
   start2.join();
+
+  EndAllSpans(spans1);
+  EndAllSpans(spans2);
 }
 
 /*
@@ -518,8 +522,9 @@ TEST_F(TracezProcessor, RunningThreadSafety)
  */
 TEST_F(TracezProcessor, CompletedThreadSafety)
 {
-  std::vector<opentelemetry::nostd::unique_ptr<opentelemetry::trace::Span>> spans1;
-  std::vector<opentelemetry::nostd::unique_ptr<opentelemetry::trace::Span>> spans2;
+  std::vector<opentelemetry::nostd::shared_ptr<opentelemetry::trace::Span>> spans1;
+  std::vector<opentelemetry::nostd::shared_ptr<opentelemetry::trace::Span>> spans2;
+
   StartManySpans(spans1, tracer, 500);
   StartManySpans(spans2, tracer, 500);
 
@@ -535,7 +540,7 @@ TEST_F(TracezProcessor, CompletedThreadSafety)
  */
 TEST_F(TracezProcessor, SnapshotThreadSafety)
 {
-  std::vector<opentelemetry::nostd::unique_ptr<opentelemetry::trace::Span>> spans;
+  std::vector<opentelemetry::nostd::shared_ptr<opentelemetry::trace::Span>> spans;
 
   std::thread snap1(GetManySnapshots, std::ref(processor), 500);
   std::thread snap2(GetManySnapshots, std::ref(processor), 500);
@@ -550,6 +555,8 @@ TEST_F(TracezProcessor, SnapshotThreadSafety)
 
   snap3.join();
   snap4.join();
+
+  EndAllSpans(spans);
 }
 
 /*
@@ -557,8 +564,9 @@ TEST_F(TracezProcessor, SnapshotThreadSafety)
  */
 TEST_F(TracezProcessor, RunningCompletedThreadSafety)
 {
-  std::vector<opentelemetry::nostd::unique_ptr<opentelemetry::trace::Span>> spans1;
-  std::vector<opentelemetry::nostd::unique_ptr<opentelemetry::trace::Span>> spans2;
+  std::vector<opentelemetry::nostd::shared_ptr<opentelemetry::trace::Span>> spans1;
+  std::vector<opentelemetry::nostd::shared_ptr<opentelemetry::trace::Span>> spans2;
+
   StartManySpans(spans1, tracer, 500);
 
   std::thread start(StartManySpans, std::ref(spans2), tracer, 500);
@@ -566,6 +574,8 @@ TEST_F(TracezProcessor, RunningCompletedThreadSafety)
 
   start.join();
   end.join();
+
+  EndAllSpans(spans2);
 }
 
 /*
@@ -573,13 +583,15 @@ TEST_F(TracezProcessor, RunningCompletedThreadSafety)
  */
 TEST_F(TracezProcessor, RunningSnapshotThreadSafety)
 {
-  std::vector<opentelemetry::nostd::unique_ptr<opentelemetry::trace::Span>> spans;
+  std::vector<opentelemetry::nostd::shared_ptr<opentelemetry::trace::Span>> spans;
 
   std::thread start(StartManySpans, std::ref(spans), tracer, 500);
   std::thread snapshots(GetManySnapshots, std::ref(processor), 500);
 
   start.join();
   snapshots.join();
+
+  EndAllSpans(spans);
 }
 
 /*
@@ -587,7 +599,8 @@ TEST_F(TracezProcessor, RunningSnapshotThreadSafety)
  */
 TEST_F(TracezProcessor, SnapshotCompletedThreadSafety)
 {
-  std::vector<opentelemetry::nostd::unique_ptr<opentelemetry::trace::Span>> spans;
+  std::vector<opentelemetry::nostd::shared_ptr<opentelemetry::trace::Span>> spans;
+
   StartManySpans(spans, tracer, 500);
 
   std::thread snapshots(GetManySnapshots, std::ref(processor), 500);
@@ -602,8 +615,9 @@ TEST_F(TracezProcessor, SnapshotCompletedThreadSafety)
  */
 TEST_F(TracezProcessor, RunningSnapshotCompletedThreadSafety)
 {
-  std::vector<opentelemetry::nostd::unique_ptr<opentelemetry::trace::Span>> spans1;
-  std::vector<opentelemetry::nostd::unique_ptr<opentelemetry::trace::Span>> spans2;
+  std::vector<opentelemetry::nostd::shared_ptr<opentelemetry::trace::Span>> spans1;
+  std::vector<opentelemetry::nostd::shared_ptr<opentelemetry::trace::Span>> spans2;
+
   StartManySpans(spans1, tracer, 500);
 
   std::thread start(StartManySpans, std::ref(spans2), tracer, 500);
@@ -613,4 +627,6 @@ TEST_F(TracezProcessor, RunningSnapshotCompletedThreadSafety)
   start.join();
   snapshots.join();
   end.join();
+
+  EndAllSpans(spans2);
 }

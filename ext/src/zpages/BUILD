@@ -23,5 +23,6 @@ cc_library(
         "//api",
         "//ext:headers",
         "//sdk:headers",
+        "@github_nlohmann_json//:json",
     ],
 )
