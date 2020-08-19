@@ -14,6 +14,8 @@
 
 #pragma once
 
+#include <iostream>
+
 #include "opentelemetry/nostd/unique_ptr.h"
 #include "opentelemetry/trace/span_id.h"
 #include "opentelemetry/trace/trace_flags.h"
