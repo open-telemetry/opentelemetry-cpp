@@ -48,6 +48,8 @@ if(BUILD_TESTING)
   include_directories(SYSTEM ${GTEST_INCLUDE_DIRS})
 endif()
 
+add_subdirectory(third_party/prometheus-cpp)
+
 include_directories(api/include)
 add_subdirectory(api)
 include_directories(sdk/include)
