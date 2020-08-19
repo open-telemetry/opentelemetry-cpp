@@ -8,7 +8,8 @@ foreach(
   always_on_sampler_test
   parent_or_else_sampler_test
   probability_sampler_test
-  batch_span_processor_test)
+  batch_span_processor_test
+  attribute_utils_test)
   add_executable(${testname} "${testname}.cc")
   target_link_libraries(
     ${testname} ${GTEST_BOTH_LIBRARIES} ${CMAKE_THREAD_LIBS_INIT}

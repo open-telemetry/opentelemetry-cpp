@@ -14,15 +14,20 @@ namespace sdk
 {
 namespace metrics
 {
+class DummyExporter : public MetricsExporter
+{
+  ExportResult Export(const std::vector<Record> &records) noexcept
+  {
+    return ExportResult::kSuccess;
+  }
+};
 
 TEST(Controller, Constructor)
 {
 
   std::shared_ptr<metrics_api::Meter> meter =
       std::shared_ptr<metrics_api::Meter>(new Meter("Test"));
-  PushController alpha(meter,
-                       std::unique_ptr<MetricsExporter>(
-                           new opentelemetry::exporter::metrics::OStreamMetricsExporter),
+  PushController alpha(meter, std::unique_ptr<MetricsExporter>(new DummyExporter),
                        std::shared_ptr<MetricsProcessor>(
                            new opentelemetry::sdk::metrics::UngroupedMetricsProcessor(false)),
                        .05);

@@ -1,3 +1,4 @@
+#include "opentelemetry/exporters/ostream/metrics_exporter.h"
 #include "opentelemetry/metrics/provider.h"
 #include "opentelemetry/sdk/metrics/controller.h"
 #include "opentelemetry/sdk/metrics/meter.h"
