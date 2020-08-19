@@ -395,7 +395,6 @@ private:
     {
       return TraceState();  // too many k-v pairs will result in an invalid trace state
     }
-    std::cout<<"trace state returned"<<std::endl;
     return trace_state;
   }
 
@@ -431,6 +430,7 @@ private:
     }
 
     TraceState trace_state = ExtractTraceState(trace_state_header);
+    std::cout<<"trace state returned"<<std::endl;
     return SpanContext(context_from_parent_header.trace_id(), context_from_parent_header.span_id(),
                        context_from_parent_header.trace_flags(), trace_state, true);
   }
