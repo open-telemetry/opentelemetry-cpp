@@ -93,7 +93,7 @@ public:
   static SpanContext GetInvalid() { return SpanContext(false, false); }
 
   static SpanContext GetRandom() {
-    return SpanContext(TraceId::GetRandom(), SpanId::GetRandom(), TraceFlags::GetRandom(), true);
+    return SpanContext(TraceId::GetRandom(), SpanId::GetRandom(), TraceFlags::GetRandom(), TraceState::TraceState(), true);
   }
 
   static SpanContext UpdateSpanId(SpanContext span_context) {
