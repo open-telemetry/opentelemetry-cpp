@@ -42,7 +42,7 @@ public:
 
   bool IsRecording() const noexcept override;
 
-  trace_api::SpanContext GetContext() const noexcept override { return trace_api::SpanContext(); }
+  trace_api::SpanContext GetContext() const noexcept override { return span_context_.get(); }
 
   void SetToken(nostd::unique_ptr<context::Token> &&token) noexcept override;
 
@@ -52,6 +52,7 @@ private:
   mutable std::mutex mu_;
   std::unique_ptr<Recordable> recordable_;
   opentelemetry::core::SteadyTimestamp start_steady_time;
+  std::shared_ptr<trace_api::SpanContext> span_context_;
   bool has_ended_;
   nostd::unique_ptr<context::Token> token_;
 };
