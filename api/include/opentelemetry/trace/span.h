@@ -162,9 +162,6 @@ public:
   // AddEvent).
   virtual bool IsRecording() const noexcept = 0;
 
-  // Cannot have Tracer in Span right now because it will cause cyclical dependency issue
-  // virtual Tracer &tracer() const noexcept = 0;
-
   virtual void SetToken(nostd::unique_ptr<context::Token> &&token) noexcept = 0;
 };
 }  // namespace trace

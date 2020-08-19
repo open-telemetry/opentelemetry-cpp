@@ -1,7 +1,6 @@
 foreach(
   testname
   key_value_iterable_view_test
-  noop_test
   provider_test
   span_id_test
   trace_id_test
