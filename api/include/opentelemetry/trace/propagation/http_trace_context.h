@@ -318,7 +318,7 @@ private:
       TraceId trace_id_obj       = GenerateTraceIdFromString(trace_id);
       SpanId span_id_obj         = GenerateSpanIdFromString(span_id);
       TraceFlags trace_flags_obj = GenerateTraceFlagsFromString(trace_flags);
-      return SpanContext(trace_id_obj, span_id_obj, trace_flags_obj, TraceState(), true);
+      return SpanContext(trace_id_obj, span_id_obj, trace_flags_obj, new TraceState(), true);
     }
     else
     {
