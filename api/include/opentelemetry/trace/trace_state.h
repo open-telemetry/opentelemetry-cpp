@@ -62,6 +62,20 @@ public:
       return *this;
     }
 
+    bool operator==(const TraceState &that) const noexcept {
+      for (const auto &entry: that.Entries()) {
+        nostd::string value;
+        Get(entry.GetKey(),value);
+        if (entry.GetValue() != value) return false;
+      }
+      for (const auto &entry: Entries()) {
+        nostd::string value;
+        that.Get(entry.GetKey(),value);
+        if (entry.GetValue() != value) return false;
+      }
+      return true;
+    }
+
     // Move contructor and assignment operator
     Entry(Entry &&other) = default;
     Entry &operator=(Entry &&other) = default;
