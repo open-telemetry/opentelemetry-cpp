@@ -17,7 +17,6 @@ namespace trace
  * This class provides methods for manipulating the context, creating spans, and controlling spans'
  * lifecycles.
  */
-
 class Tracer
 {
 public:

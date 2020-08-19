@@ -86,4 +86,4 @@ private:
 };
 
 }  // namespace trace
-OPENTELEMETRY_END_NAMESPACE  // namespace opentelemetry
+OPENTELEMETRY_END_NAMESPACE
