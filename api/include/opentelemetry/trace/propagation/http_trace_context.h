@@ -26,6 +26,7 @@
 #include "opentelemetry/trace/propagation/http_text_format.h"
 #include "opentelemetry/trace/span.h"
 #include "opentelemetry/trace/span_context.h"
+#include "opentelemetry/trace/trace_state.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace trace
@@ -184,6 +185,25 @@ private:
     }
   }
 
+  static void InjectTraceState(TraceState trace_state, T &carrier, Setter setter)
+  {
+    std::string trace_state_string = "";
+    bool begin                     = true;
+    for (const auto &entry : trace_state.Entries())
+    {
+      if (!begin)
+      {
+        trace_state_string += ",";
+      }
+      else
+      {
+        begin = !begin;
+      }
+      trace_state_string += std::string(entry.GetKey()) + "=" + std::string(entry.GetValue());
+    }
+    setter(carrier, kTraceState, trace_state_string);
+  }
+
   static void InjectTraceParent(const SpanContext &span_context, T &carrier, Setter setter)
   {
     char trace_id[32];
@@ -214,6 +234,10 @@ private:
   static void InjectImpl(Setter setter, T &carrier, const SpanContext &span_context)
   {
     InjectTraceParent(span_context, carrier, setter);
+    if (!span_context.trace_state().Empty())
+    {
+      InjectTraceState(span_context.trace_state(), carrier, setter);
+    }
   }
 
   static SpanContext ExtractContextFromTraceParent(nostd::string_view trace_parent)
@@ -294,12 +318,90 @@ private:
       TraceId trace_id_obj       = GenerateTraceIdFromString(trace_id);
       SpanId span_id_obj         = GenerateSpanIdFromString(span_id);
       TraceFlags trace_flags_obj = GenerateTraceFlagsFromString(trace_flags);
-      return SpanContext(trace_id_obj, span_id_obj, trace_flags_obj, true);
+      return SpanContext(trace_id_obj, span_id_obj, trace_flags_obj, TraceState(), true);
     }
     else
     {
       std::cout << "Unparseable trace_parent header. Returning INVALID span context." << std::endl;
       return SpanContext(false, false);
+    }
+  }
+
+  static TraceState ExtractTraceState(nostd::string_view &trace_state_header)
+  {
+    TraceState trace_state = TraceState();
+    int start_pos          = -1;
+    int end_pos            = -1;
+    int ctr_pos            = -1;
+    int element_num        = 0;
+    nostd::string_view key;
+    nostd::string_view val;
+    for (int i = 0; i < int(trace_state_header.length()); i++)
+    {
+      if (trace_state_header[i] == '\t')
+        continue;
+      else if (trace_state_header[i] == ',')
+      {
+        if (start_pos == -1 && end_pos == -1)
+          continue;
+        element_num++;
+        if (ctr_pos != -1)
+        {
+          key = trace_state_header.substr(start_pos, ctr_pos - start_pos);
+          val = trace_state_header.substr(ctr_pos + 1, end_pos - ctr_pos);
+          if (key != "")
+          {
+            trace_state.Set(key, val);
+            nostd::string_view v;
+            trace_state.Get(key, v);
+          }
+        }
+        ctr_pos   = -1;
+        end_pos   = -1;
+        start_pos = -1;
+      }
+      else if (trace_state_header[i] == '=')
+      {
+        ctr_pos = i;
+      }
+      else
+      {
+        end_pos = i;
+        if (start_pos == -1)
+          start_pos = i;
+      }
+    }
+    if (start_pos != -1 && end_pos != -1)
+    {
+      if (ctr_pos != -1)
+      {
+        key = trace_state_header.substr(start_pos, ctr_pos - start_pos);
+        val = trace_state_header.substr(ctr_pos + 1, end_pos - ctr_pos);
+        if (key != "")
+        {
+          trace_state.Set(key, val);
+          nostd::string_view v;
+          trace_state.Get(key, v);
+        }
+      }
+      element_num++;
+    }
+    if (element_num >= kTraceStateMaxMembers)
+    {
+      return TraceState();  // too many k-v pairs will result in an invalid trace state
+    }
+    return trace_state;
+  }
+
+  static void AddNewMember(TraceState &trace_state, nostd::string_view member)
+  {
+    for (int i = 0; i < int(member.length()); i++)
+    {
+      if (member[i] == '=')
+      {
+        trace_state.Set(member.substr(0, i), member.substr(i + 1, member.length() - i - 1));
+        return;
+      }
     }
   }
 
@@ -311,7 +413,20 @@ private:
       return SpanContext(false, false);
     }
     SpanContext context_from_parent_header = ExtractContextFromTraceParent(trace_parent);
-    return context_from_parent_header;
+    if (!context_from_parent_header.IsValid())
+    {
+      return context_from_parent_header;
+    }
+
+    nostd::string_view trace_state_header = getter(carrier, kTraceState);
+    if (trace_state_header == "" || trace_state_header.empty())
+    {
+      return context_from_parent_header;
+    }
+
+    TraceState trace_state = ExtractTraceState(trace_state_header);
+    return SpanContext(context_from_parent_header.trace_id(), context_from_parent_header.span_id(),
+                       context_from_parent_header.trace_flags(), trace_state, true);
   }
 };
 }  // namespace propagation

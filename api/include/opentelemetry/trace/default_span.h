@@ -1,9 +1,9 @@
 #pragma once
+#include <iostream>
 #include "opentelemetry/common/attribute_value.h"
 #include "opentelemetry/trace/canonical_code.h"
 #include "opentelemetry/trace/span.h"
 #include "opentelemetry/trace/span_context.h"
-
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace trace
 {
