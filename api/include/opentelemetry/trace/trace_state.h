@@ -107,6 +107,7 @@ public:
   {
     std::cout<<"copying"<<std::endl;
     for (const auto &entry: trace_state.Entries()) {
+      std::cout<<"key is: "<<entry.GetKey()<<" value is: "<<entry.GetValue()<<std::endl;
       Set(entry.GetKey(),entry.GetValue());
       num_entries_++;
     }
