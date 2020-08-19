@@ -329,10 +329,9 @@ private:
     }
   }
 
-  static TraceState ExtractTraceState(nostd::string_view &trace_state_header) const
+  static void ExtractTraceState(nostd::string_view &trace_state_header, TraceState &trace_state)
   {
     std::cout<<"extract trace state"<<std::endl;
-    TraceState trace_state = TraceState();
     int start_pos          = -1;
     int end_pos            = -1;
     int ctr_pos            = -1;
@@ -393,9 +392,9 @@ private:
     }
     if (element_num >= kTraceStateMaxMembers)
     {
-      return TraceState();  // too many k-v pairs will result in an invalid trace state
+      trace_state = TraceState();  // too many k-v pairs will result in an invalid trace state
     }
-    return trace_state;
+    return;
   }
 
   static void AddNewMember(TraceState &trace_state, nostd::string_view member)
@@ -429,7 +428,8 @@ private:
       return context_from_parent_header;
     }
 
-    TraceState trace_state = ExtractTraceState(trace_state_header);
+    TraceState trace_state = TraceState();
+    ExtractTraceState(trace_state_header,trace_state);
     std::cout<<"trace state returned"<<std::endl;
     for (const auto &entry: trace_state.Entries()) {
       std::cout<<"key is: "<<entry.GetKey()<<" value is: "<<entry.GetValue()<<std::endl;
