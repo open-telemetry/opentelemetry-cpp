@@ -329,10 +329,9 @@ private:
     }
   }
 
-  static nostd::shared_ptr<TraceState> ExtractTraceState(nostd::string_view &trace_state_header)
+  static void ExtractTraceState(nostd::string_view &trace_state_header,nostd::shared_ptr<TraceState> &trace_state)
   {
     std::cout<<"extract trace state"<<std::endl;
-    TraceState trace_state = TraceState();
     int start_pos          = -1;
     int end_pos            = -1;
     int ctr_pos            = -1;
@@ -355,9 +354,9 @@ private:
           if (key != "")
           {
             std::cout<<"key "<<key<<" val "<<val<<std::endl;
-            trace_state.Set(key, val);
+            trace_state.get()->Set(key, val);
             nostd::string_view v;
-            trace_state.Get(key, v);
+            trace_state.get()->Get(key, v);
           }
         }
         ctr_pos   = -1;
@@ -384,18 +383,19 @@ private:
         if (key != "")
         {
           std::cout<<"key "<<key<<" val "<<val<<std::endl;
-          trace_state.Set(key, val);
+          trace_state.get()->Set(key, val);
           nostd::string_view v;
-          trace_state.Get(key, v);
+          trace_state.get()->Get(key, v);
         }
       }
       element_num++;
     }
     if (element_num >= kTraceStateMaxMembers)
     {
-      return nostd::shared_ptr<TraceState>(new TraceState());  // too many k-v pairs will result in an invalid trace state
+      trace_state.reset(new TraceState);  // too many k-v pairs will result in an invalid trace state
+      return;
     }
-    return nostd::shared_ptr<TraceState>(&trace_state);
+    return;
   }
 
   static void AddNewMember(TraceState &trace_state, nostd::string_view member)
@@ -429,7 +429,8 @@ private:
       return context_from_parent_header;
     }
 
-    nostd::shared_ptr<TraceState> trace_state = ExtractTraceState(trace_state_header);
+    nostd::shared_ptr<TraceState> trace_state;
+    ExtractTraceState(trace_state_header, trace_state);
     std::cout<<"trace state returned"<<std::endl;
     for (const auto &entry: trace_state.get()->Entries()) {
       std::cout<<"key is: "<<entry.GetKey()<<" value is: "<<entry.GetValue()<<std::endl;
