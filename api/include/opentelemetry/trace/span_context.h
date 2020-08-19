@@ -55,13 +55,13 @@ public:
       : trace_id_(ctx.trace_id()),
         span_id_(ctx.span_id()),
         trace_flags_(ctx.trace_flags()),
-        trace_state_(&ctx.trace_state_)
+        trace_state_(ctx.trace_state_.get())
   {}
   SpanContext(const SpanContext &ctx)
       : trace_id_(ctx.trace_id()),
         span_id_(ctx.span_id()),
         trace_flags_(ctx.trace_flags()),
-        trace_state_(&ctx.trace_state())
+        trace_state_(ctx.trace_state_.get())
   {}
 
   SpanContext &operator=(const SpanContext &ctx)
