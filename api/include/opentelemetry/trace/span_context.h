@@ -42,13 +42,13 @@ public:
   SpanContext(TraceId trace_id,
               SpanId span_id,
               TraceFlags trace_flags,
-              TraceState trace_state,
+              TraceState *trace_state,
               bool has_remote_parent) noexcept
   {
     trace_id_.reset(&trace_id);
     span_id_.reset(&span_id);
     trace_flags_.reset(&trace_flags);
-    trace_state_.reset(&trace_state);
+    trace_state_.reset(trace_state);
     remote_parent_ = has_remote_parent;
   }
   SpanContext(SpanContext &&ctx)
@@ -97,8 +97,8 @@ public:
   }
 
   static SpanContext UpdateSpanId(SpanContext &span_context) {
-    return SpanContext(span_context, true);
-//    return SpanContext(span_context.trace_id(), SpanId::GetRandom(), TraceFlags::GetRandom(), span_context.trace_state(),span_context.HasRemoteParent());
+//    return SpanContext(span_context, true);
+    return SpanContext(span_context.trace_id(), SpanId::GetRandom(), TraceFlags::GetRandom(), &span_context.trace_state(),span_context.HasRemoteParent());
   }
 
   bool IsSampled() const noexcept { return trace_flags_.get()->IsSampled(); }
@@ -110,15 +110,15 @@ private:
   nostd::unique_ptr<TraceState> trace_state_;  // Never nullptr.
   bool remote_parent_ = false;
 
-  SpanContext(SpanContext &span_context, bool update_span) {
-    if (update_span) {
-      trace_id_.reset(span_context.trace_id_.get());
-      span_id_.reset(span_context.span_id_.get());
-      trace_flags_.reset(span_context.trace_flags_.get());
-      trace_state_.reset(span_context.trace_state_.get());
-      remote_parent_ = span_context.remote_parent_;
-    }
-  }
+//  SpanContext(SpanContext &span_context, bool update_span) {
+//    if (update_span) {
+//      trace_id_.reset(span_context.trace_id_.get());
+//      span_id_.reset(span_context.span_id_.get());
+//      trace_flags_.reset(span_context.trace_flags_.get());
+//      trace_state_.reset(span_context.trace_state_.get());
+//      remote_parent_ = span_context.remote_parent_;
+//    }
+//  }
 };
 
 }  // namespace trace
