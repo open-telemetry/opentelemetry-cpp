@@ -387,11 +387,11 @@ private:
       }
       element_num++;
     }
-    if (element_num >= kTraceStateMaxMembers)
-    {
-      return nostd::shared_ptr<TraceState>(new TraceState());  // too many k-v pairs will result in an invalid trace state
-    }
-    return nostd::shared_ptr<TraceState>(&trace_state);
+//    if (element_num >= kTraceStateMaxMembers)
+//    {
+//      return nostd::shared_ptr<TraceState>(new TraceState());  // too many k-v pairs will result in an invalid trace state
+//    }
+    return;
   }
 
   static void AddNewMember(TraceState &trace_state, nostd::string_view member)
