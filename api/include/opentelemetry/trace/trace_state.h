@@ -102,10 +102,8 @@ public:
   TraceState() noexcept : entries_(new Entry[kMaxKeyValuePairs]), num_entries_(0) {}
 
   // Copy Constructor
-  TraceState(const TraceState &trace_state) noexcept
+  TraceState(const TraceState &trace_state) noexcept : entries_(new Entry[kMaxKeyValuePairs]), num_entries_(0)
   {
-    num_entries_ = 0;
-    entries_{new Entry[kMaxKeyValuePairs]};
     for (const auto &entry: trace_state.Entries()) {
       Set(entry.GetKey(),entry.GetValue());
       num_entries_++;
