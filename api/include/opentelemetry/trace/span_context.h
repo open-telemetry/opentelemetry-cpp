@@ -42,7 +42,7 @@ public:
   SpanContext(TraceId trace_id,
               SpanId span_id,
               TraceFlags trace_flags,
-              TraceState trace_state,
+              TraceState &trace_state,
               bool has_remote_parent) noexcept
   {
     trace_id_.reset(&trace_id);
