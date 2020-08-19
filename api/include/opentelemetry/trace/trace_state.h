@@ -16,6 +16,7 @@
 
 #include <cstdint>
 #include <cstring>
+#include <iostream>
 
 #include "opentelemetry/nostd/span.h"
 #include "opentelemetry/nostd/string_view.h"
@@ -104,6 +105,7 @@ public:
   // Copy Constructor
   TraceState(const TraceState &trace_state) noexcept : entries_(new Entry[kMaxKeyValuePairs]), num_entries_(0)
   {
+    std::cout<<"copying"<<std::endl;
     for (const auto &entry: trace_state.Entries()) {
       Set(entry.GetKey(),entry.GetValue());
       num_entries_++;
