@@ -105,7 +105,7 @@ TEST(PrometheusExporter, ShutdownSetsIsShutdownToTrue)
 }
 
 /**
- * The Export() function should return SUCCESS = 0
+ * The Export() function should return kSuccess = 0
  *  when data is exported successfully.
  */
 TEST(PrometheusExporter, ExportSuccessfully)
@@ -119,14 +119,14 @@ TEST(PrometheusExporter, ExportSuccessfully)
 
   auto res = exporter.Export(records);
 
-  // result should be SUCCESS = 0
+  // result should be kSuccess = 0
   ExportResult code = ExportResult::kSuccess;
   ASSERT_EQ(res, code);
 }
 
 /**
  * If the exporter is shutdown, it cannot process
- * any more export requests and returns FAILURE_ALREADY_SHUTDOWN = 4.
+ * any more export requests and returns kFailure = 1.
  */
 TEST(PrometheusExporter, ExporterIsShutdown)
 {
@@ -142,14 +142,14 @@ TEST(PrometheusExporter, ExporterIsShutdown)
   // send export request after shutdown
   auto res = exporter.Export(records);
 
-  // result code should be FAILURE_ALREADY_SHUTDOWN = 4
+  // result code should be kFailure = 1
   ExportResult code = ExportResult::kFailure;
   ASSERT_EQ(res, code);
 }
 
 /**
  * The Export() function should return
- * FAILURE_FULL_COLLECTION = 1 when the collection is full,
+ * kFailureFull = 2 when the collection is full,
  * or when the collection is not full but does not have enough
  * space to hold the batch data.
  */
@@ -173,7 +173,7 @@ TEST(PrometheusExporter, CollectionNotEnoughSpace)
   // collection in the collector
   auto res = exporter.Export(full_records);
 
-  // the result code should be SUCCESS = 0
+  // the result code should be kSuccess = 0
   ExportResult code = ExportResult::kSuccess;
   ASSERT_EQ(res, code);
 
@@ -181,14 +181,14 @@ TEST(PrometheusExporter, CollectionNotEnoughSpace)
   // due to not enough space in the collection
   res = exporter.Export(records);
 
-  // the result code should be FAILURE_FULL_COLLECTION = 1
+  // the result code should be kFailureFull = 2
   code = ExportResult::kFailureFull;
   ASSERT_EQ(res, code);
 }
 
 /**
  *  The Export() function should return
- *  FAILURE_INVALID_ARGUMENT = 3 when an empty collection
+ *  kFailureInvalidArgument = 3 when an empty collection
  *  of records is passed to the Export() function.
  */
 TEST(PrometheusExporter, InvalidArgumentWhenPassedEmptyRecordCollection)
@@ -203,7 +203,7 @@ TEST(PrometheusExporter, InvalidArgumentWhenPassedEmptyRecordCollection)
   // collection in the collector
   auto res = exporter.Export(records);
 
-  // the result code should be FAILURE_INVALID_ARGUMENT = 3
+  // the result code should be kFailureInvalidArgument = 3
   ExportResult code = ExportResult::kFailureInvalidArgument;
   ASSERT_EQ(res, code);
 }
