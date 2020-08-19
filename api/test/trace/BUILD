@@ -11,17 +11,6 @@ cc_test(
     ],
 )
 
-cc_test(
-    name = "noop_test",
-    srcs = [
-        "noop_test.cc",
-    ],
-    deps = [
-        "//api",
-        "@com_google_googletest//:gtest_main",
-    ],
-)
-
 otel_cc_benchmark(
     name = "span_id_benchmark",
     srcs = ["span_id_benchmark.cc"],
