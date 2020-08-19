@@ -36,7 +36,7 @@ public:
         remote_parent_(false){};
 
   SpanContext(bool sampled_flag, bool has_remote_parent) noexcept
-      : trace_flags_(trace::TraceFlags((uint8_t)sampled_flag)),
+      : trace_flags_(new trace::TraceFlags((uint8_t)sampled_flag)),
         trace_state_(new TraceState),
         remote_parent_(has_remote_parent){};
   SpanContext(TraceId trace_id,
