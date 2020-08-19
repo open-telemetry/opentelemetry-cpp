@@ -85,5 +85,3 @@ TEST(HTTPTextFormatTest, PropagateInvalidContext)
   format.Inject(Setter, carrier, ctx);
   EXPECT_TRUE(carrier.count("traceparent") == 0);
 }
-
-// TODO: add trace state tests

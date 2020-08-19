@@ -26,7 +26,6 @@
 #include "opentelemetry/trace/propagation/http_text_format.h"
 #include "opentelemetry/trace/span.h"
 #include "opentelemetry/trace/span_context.h"
-// TODO: include trace_state.h back
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace trace
@@ -180,9 +179,6 @@ private:
     }
   }
 
-  // TODO:
-  // static void InjectTraceState(TraceState trace_state, T &carrier, Setter setter)
-
   static void InjectTraceParent(const SpanContext &span_context, T &carrier, Setter setter)
   {
     char trace_id[32];
@@ -213,7 +209,6 @@ private:
   static void InjectImpl(Setter setter, T &carrier, const SpanContext &span_context)
   {
     InjectTraceParent(span_context, carrier, setter);
-    // TODO: inject Trace State
   }
 
   static SpanContext ExtractContextFromTraceParent(nostd::string_view trace_parent)
@@ -294,7 +289,6 @@ private:
       SpanId span_id_obj         = GenerateSpanIdFromString(span_id);
       TraceFlags trace_flags_obj = GenerateTraceFlagsFromString(trace_flags);
       return SpanContext(trace_id_obj, span_id_obj, trace_flags_obj, true);
-      // TODO: Change to new Span Context constructor once TraceState is done
     }
     else
     {
@@ -302,9 +296,6 @@ private:
       return SpanContext(false, false);
     }
   }
-
-  //  TODO:
-  //  static TraceState ExtractTraceState(nostd::string_view &trace_state_header)
 
   static SpanContext ExtractImpl(Getter getter, const T &carrier)
   {
@@ -314,10 +305,7 @@ private:
       return SpanContext(false, false);
     }
     SpanContext context_from_parent_header = ExtractContextFromTraceParent(trace_parent);
-    // TODO:
-    // if (!context_from_parent_header.IsValid())
     return context_from_parent_header;
-    // TODO: extract from trace state
   }
 };
 }  // namespace propagation

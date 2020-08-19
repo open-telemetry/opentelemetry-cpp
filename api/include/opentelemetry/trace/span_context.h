@@ -18,7 +18,6 @@
 #include "opentelemetry/trace/span_id.h"
 #include "opentelemetry/trace/trace_flags.h"
 #include "opentelemetry/trace/trace_id.h"
-// TODO: include trace_state.h back
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace trace
@@ -31,33 +30,25 @@ class SpanContext final
 public:
   // An invalid SpanContext.
   SpanContext() noexcept
-      : trace_flags_(trace::TraceFlags((uint8_t) false)),
-        // TODO: add trace state as an argument
-        remote_parent_(false){};
+      : trace_flags_(trace::TraceFlags((uint8_t) false)), remote_parent_(false){};
 
   SpanContext(bool sampled_flag, bool has_remote_parent) noexcept
-      : trace_flags_(trace::TraceFlags((uint8_t)sampled_flag)),
-        // TODO: add trace state as an argument
-        remote_parent_(has_remote_parent){};
+      : trace_flags_(trace::TraceFlags((uint8_t)sampled_flag)), remote_parent_(has_remote_parent){};
   SpanContext(TraceId trace_id,
               SpanId span_id,
               TraceFlags trace_flags,
-              // TODO: add trace state as an argument
               bool has_remote_parent) noexcept
   {
-    trace_id_    = trace_id;
-    span_id_     = span_id;
-    trace_flags_ = trace_flags;
-    // TODO: add trace state as an argument
+    trace_id_      = trace_id;
+    span_id_       = span_id;
+    trace_flags_   = trace_flags;
     remote_parent_ = has_remote_parent;
   }
   SpanContext(SpanContext &&ctx)
       : trace_id_(ctx.trace_id()), span_id_(ctx.span_id()), trace_flags_(ctx.trace_flags())
-  // TODO: add trace state as an argument
   {}
   SpanContext(const SpanContext &ctx)
       : trace_id_(ctx.trace_id()), span_id_(ctx.span_id()), trace_flags_(ctx.trace_flags())
-  // TODO: add trace state as an argument
   {}
 
   SpanContext &operator=(const SpanContext &ctx)
@@ -65,7 +56,6 @@ public:
     trace_id_    = ctx.trace_id_;
     span_id_     = ctx.span_id_;
     trace_flags_ = ctx.trace_flags_;
-    // TODO: add trace state as an argument
     return *this;
   };
   SpanContext &operator=(SpanContext &&ctx)
@@ -73,14 +63,12 @@ public:
     trace_id_    = ctx.trace_id_;
     span_id_     = ctx.span_id_;
     trace_flags_ = ctx.trace_flags_;
-    // TODO: add trace state as an argument
     return *this;
   };
 
   const TraceId &trace_id() const noexcept { return trace_id_; }
   const SpanId &span_id() const noexcept { return span_id_; }
   const TraceFlags &trace_flags() const noexcept { return trace_flags_; }
-  // TODO: add trace state getter
 
   bool IsValid() const noexcept { return trace_id_.IsValid() && span_id_.IsValid(); }
 
@@ -94,7 +82,6 @@ private:
   TraceId trace_id_;
   SpanId span_id_;
   TraceFlags trace_flags_;
-  // TODO: add the unique pointer of trace state as a field
   bool remote_parent_ = false;
 };
 
