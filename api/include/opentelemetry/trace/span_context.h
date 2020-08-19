@@ -48,7 +48,7 @@ public:
     trace_id_    = trace_id;
     span_id_     = span_id;
     trace_flags_ = trace_flags;
-    trace_state_.reset(trace_state.get());
+    trace_state_.reset(*trace_state);
     remote_parent_ = has_remote_parent;
   }
   SpanContext(SpanContext &&ctx)
