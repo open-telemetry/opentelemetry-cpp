@@ -55,13 +55,13 @@ public:
       : trace_id_(ctx.trace_id()),
         span_id_(ctx.span_id()),
         trace_flags_(ctx.trace_flags()),
-        trace_state_(std::move(ctx.trace_state_))
+        trace_state_(&ctx.trace_state_)
   {}
   SpanContext(const SpanContext &ctx)
       : trace_id_(ctx.trace_id()),
         span_id_(ctx.span_id()),
         trace_flags_(ctx.trace_flags()),
-        trace_state_(new TraceState(ctx.trace_state()))
+        trace_state_(&ctx.trace_state())
   {}
 
   SpanContext &operator=(const SpanContext &ctx)
@@ -69,7 +69,7 @@ public:
     trace_id_    = ctx.trace_id_;
     span_id_     = ctx.span_id_;
     trace_flags_ = ctx.trace_flags_;
-    trace_state_.reset(new TraceState(*(ctx.trace_state_.get())));
+    trace_state_.reset(ctx.trace_state_.get());
     return *this;
   };
   SpanContext &operator=(SpanContext &&ctx)
@@ -77,7 +77,7 @@ public:
     trace_id_    = ctx.trace_id_;
     span_id_     = ctx.span_id_;
     trace_flags_ = ctx.trace_flags_;
-    trace_state_.reset(new TraceState(*(ctx.trace_state_.get())));
+    trace_state_.reset(ctx.trace_state_.get());
     return *this;
   };
 
