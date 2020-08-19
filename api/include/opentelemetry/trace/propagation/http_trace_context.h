@@ -242,6 +242,7 @@ private:
 
   static SpanContext ExtractContextFromTraceParent(nostd::string_view trace_parent)
   {
+    std::cout<<"Extract context from trace parent"<<std::endl;
     bool is_valid = (trace_parent.length() == kHeaderSize || (trace_parent.length() > kHeaderSize
                     && trace_parent[kHeaderSize] == '-')) && trace_parent[kVersionBytes] == '-' &&
                     trace_parent[kVersionBytes + kTraceIdBytes + 1] == '-' &&
@@ -329,6 +330,7 @@ private:
 
   static TraceState ExtractTraceState(nostd::string_view &trace_state_header)
   {
+    std::cout<<"extract trace state"<<std::endl;
     TraceState trace_state = TraceState();
     int start_pos          = -1;
     int end_pos            = -1;
@@ -407,6 +409,7 @@ private:
 
   static SpanContext ExtractImpl(Getter getter, const T &carrier)
   {
+    std::cout<<"extractImpl"<<std::endl;
     nostd::string_view trace_parent = getter(carrier, kTraceParent);
     if (trace_parent == "")
     {
