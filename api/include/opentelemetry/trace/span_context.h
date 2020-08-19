@@ -45,22 +45,22 @@ public:
               TraceState trace_state,
               bool has_remote_parent) noexcept
   {
-    trace_id_    = trace_id;
-    span_id_     = span_id;
-    trace_flags_ = trace_flags;
+    trace_id_.reset(&trace_id);
+    span_id_.reset(&span_id);
+    trace_flags_.reset(&trace_flags);
     trace_state_.reset(&trace_state);
     remote_parent_ = has_remote_parent;
   }
   SpanContext(SpanContext &&ctx)
-      : trace_id_(ctx.trace_id()),
-        span_id_(ctx.span_id()),
-        trace_flags_(ctx.trace_flags()),
+      : trace_id_(ctx.trace_id_.get()),
+        span_id_(ctx.span_id_.get()),
+        trace_flags_(ctx.trace_flags_.get()),
         trace_state_(ctx.trace_state_.get())
   {}
   SpanContext(const SpanContext &ctx)
-      : trace_id_(ctx.trace_id()),
-        span_id_(ctx.span_id()),
-        trace_flags_(ctx.trace_flags()),
+      : trace_id_(ctx.trace_id_.get()),
+        span_id_(ctx.span_id_.get()),
+        trace_flags_(ctx.trace_flags_.get()),
         trace_state_(ctx.trace_state_.get())
   {}
 
@@ -81,10 +81,10 @@ public:
     return *this;
   };
 
-  const TraceId &trace_id() const noexcept { return trace_id_; }
-  const SpanId &span_id() const noexcept { return span_id_; }
-  const TraceFlags &trace_flags() const noexcept { return trace_flags_; }
-  const TraceState &trace_state() const noexcept { return *trace_state_; }
+  const TraceId &trace_id() const noexcept { return *(trace_id_.get()); }
+  const SpanId &span_id() const noexcept { return *(span_id_.get()); }
+  const TraceFlags &trace_flags() const noexcept { return *(trace_flags_.get()); }
+  const TraceState &trace_state() const noexcept { return *(trace_state_.get()); }
 
   bool IsValid() const noexcept { return trace_id_.IsValid() && span_id_.IsValid(); }
 
@@ -103,9 +103,9 @@ public:
   bool IsSampled() const noexcept { return trace_flags_.IsSampled(); }
 
 private:
-  TraceId trace_id_;
-  SpanId span_id_;
-  TraceFlags trace_flags_;
+  nostd::unique_ptr<TraceId> trace_id_;
+  nostd::unique_ptr<SpanId> span_id_;
+  nostd::unique_ptr<TraceFlags> trace_flags_;
   nostd::unique_ptr<TraceState> trace_state_;  // Never nullptr.
   bool remote_parent_ = false;
 };
