@@ -43,23 +43,23 @@ static trace::propagation::HttpTraceContext<std::map<std::string, std::string>> 
 
 using MapHttpTraceContext =
     trace::propagation::HttpTraceContext<std::map<std::string, std::string>>;
-TEST(HTTPTextFormatTest, TraceIdBufferGeneration)
-{
-  constexpr uint8_t buf[] = {1, 2, 3, 4, 5, 6, 7, 8, 8, 7, 0xaa, 0xbb, 0xcc, 0xdd, 0xee, 0xff};
-  EXPECT_EQ(MapHttpTraceContext::GenerateTraceIdFromString("01020304050607080807aabbccddeeff"),
-            trace::TraceId(buf));
-}
-
-TEST(HTTPTextFormatTest, SpanIdBufferGeneration)
-{
-  constexpr uint8_t buf[] = {1, 2, 0xaa, 0xbb, 0xcc, 0xdd, 0xee, 0xff};
-  EXPECT_EQ(MapHttpTraceContext::GenerateSpanIdFromString("0102aabbccddeeff"), trace::SpanId(buf));
-}
-
-TEST(HTTPTextFormatTest, TraceFlagsBufferGeneration)
-{
-  EXPECT_EQ(MapHttpTraceContext::GenerateTraceFlagsFromString("00"), trace::TraceFlags());
-}
+//TEST(HTTPTextFormatTest, TraceIdBufferGeneration)
+//{
+//  constexpr uint8_t buf[] = {1, 2, 3, 4, 5, 6, 7, 8, 8, 7, 0xaa, 0xbb, 0xcc, 0xdd, 0xee, 0xff};
+//  EXPECT_EQ(MapHttpTraceContext::GenerateTraceIdFromString("01020304050607080807aabbccddeeff"),
+//            trace::TraceId(buf));
+//}
+//
+//TEST(HTTPTextFormatTest, SpanIdBufferGeneration)
+//{
+//  constexpr uint8_t buf[] = {1, 2, 0xaa, 0xbb, 0xcc, 0xdd, 0xee, 0xff};
+//  EXPECT_EQ(MapHttpTraceContext::GenerateSpanIdFromString("0102aabbccddeeff"), trace::SpanId(buf));
+//}
+//
+//TEST(HTTPTextFormatTest, TraceFlagsBufferGeneration)
+//{
+//  EXPECT_EQ(MapHttpTraceContext::GenerateTraceFlagsFromString("00"), trace::TraceFlags());
+//}
 
 TEST(HTTPTextFormatTest, HeadersWithTraceState)
 {
