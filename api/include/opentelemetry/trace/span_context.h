@@ -31,7 +31,7 @@ class SpanContext final
 public:
   // An invalid SpanContext.
   SpanContext() noexcept
-      : trace_flags_(trace::TraceFlags((uint8_t) false)),
+      : trace_flags_(new trace::TraceFlags((uint8_t) false)),
         trace_state_(new TraceState),
         remote_parent_(false){};
 
