@@ -101,7 +101,7 @@ public:
 //    return SpanContext(span_context.trace_id(), SpanId::GetRandom(), TraceFlags::GetRandom(), span_context.trace_state(),span_context.HasRemoteParent());
   }
 
-  bool IsSampled() const noexcept { return trace_flags_.IsSampled(); }
+  bool IsSampled() const noexcept { return trace_flags_.get()->IsSampled(); }
 
 private:
   nostd::unique_ptr<TraceId> trace_id_;
