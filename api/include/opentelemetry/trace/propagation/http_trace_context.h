@@ -356,8 +356,7 @@ private:
           {
             std::cout<<"key "<<key<<" val "<<val<<std::endl;
             trace_state.get()->Set(key, val);
-            nostd::string_view v;
-            trace_state.get()->Get(key, v);
+            std::cout<<"set a pair"<<std::endl;
           }
         }
         ctr_pos   = -1;
@@ -375,18 +374,18 @@ private:
           start_pos = i;
       }
     }
+    std::cout<<"extracted here!"<<std::endl;
     if (start_pos != -1 && end_pos != -1)
     {
       if (ctr_pos != -1)
       {
+        std::cout<<"not here?"<<std::endl;
         key = trace_state_header.substr(start_pos, ctr_pos - start_pos);
         val = trace_state_header.substr(ctr_pos + 1, end_pos - ctr_pos);
         if (key != "")
         {
           std::cout<<"key "<<key<<" val "<<val<<std::endl;
           trace_state.get()->Set(key, val);
-          nostd::string_view v;
-          trace_state.get()->Get(key, v);
         }
       }
       element_num++;
