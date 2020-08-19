@@ -318,7 +318,7 @@ private:
       TraceId trace_id_obj       = GenerateTraceIdFromString(trace_id);
       SpanId span_id_obj         = GenerateSpanIdFromString(span_id);
       TraceFlags trace_flags_obj = GenerateTraceFlagsFromString(trace_flags);
-      return SpanContext(trace_id_obj, span_id_obj, trace_flags_obj, new TraceState(), true);
+      return SpanContext(trace_id_obj, span_id_obj, trace_flags_obj, TraceState(), true);
     }
     else
     {
@@ -426,7 +426,7 @@ private:
 
     TraceState trace_state = ExtractTraceState(trace_state_header);
     return SpanContext(context_from_parent_header.trace_id(), context_from_parent_header.span_id(),
-                       context_from_parent_header.trace_flags(), &trace_state, true);
+                       context_from_parent_header.trace_flags(), trace_state, true);
   }
 };
 }  // namespace propagation

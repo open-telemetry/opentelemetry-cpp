@@ -101,6 +101,17 @@ public:
   // An empty TraceState.
   TraceState() noexcept : entries_(new Entry[kMaxKeyValuePairs]), num_entries_(0) {}
 
+  // Copy Constructor
+  TraceState(const TraceState &trace_state) noexcept
+  {
+    num_entries_ = 0;
+    entries_{new Entry[kMaxKeyValuePairs]};
+    for (const auto &entry: trace_state.Entries()) {
+      Set(entry.GetKey(),entry.GetValue());
+      num_entries_++;
+    }
+  }
+
   // Returns false if no such key, otherwise returns true and populates the value parameter with the
   // associated value.
   bool Get(nostd::string_view key, nostd::string_view &value) const noexcept
