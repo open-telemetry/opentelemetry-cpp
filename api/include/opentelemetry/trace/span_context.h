@@ -86,7 +86,7 @@ public:
   const TraceFlags &trace_flags() const noexcept { return *(trace_flags_.get()); }
   const TraceState &trace_state() const noexcept { return *(trace_state_.get()); }
 
-  bool IsValid() const noexcept { return trace_id_.IsValid() && span_id_.IsValid(); }
+  bool IsValid() const noexcept { return trace_id_.get()->IsValid() && span_id_.get()->IsValid(); }
 
   bool HasRemoteParent() const noexcept { return remote_parent_; }
 
