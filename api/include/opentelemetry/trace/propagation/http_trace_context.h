@@ -332,7 +332,7 @@ private:
   static void ExtractTraceState(nostd::string_view &trace_state_header, TraceState &trace_state)
   {
     std::cout<<"extract trace state"<<std::endl;
-    TraceState trace_state = TraceState();
+//    TraceState trace_state = TraceState();
     int start_pos          = -1;
     int end_pos            = -1;
     int ctr_pos            = -1;
