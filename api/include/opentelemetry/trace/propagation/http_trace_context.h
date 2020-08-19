@@ -17,6 +17,7 @@
 #include <map>
 #include <string>
 #include "opentelemetry/context/context.h"
+#include "opentelemetry/nostd/unique_ptr.h"
 #include "opentelemetry/nostd/shared_ptr.h"
 #include "opentelemetry/nostd/span.h"
 #include "opentelemetry/nostd/string_view.h"
@@ -329,7 +330,7 @@ private:
     }
   }
 
-  static void ExtractTraceState(nostd::string_view &trace_state_header,nostd::shared_ptr<TraceState> &trace_state)
+  static void ExtractTraceState(nostd::string_view &trace_state_header,nostd::unique_ptr<TraceState> &trace_state)
   {
     std::cout<<"extract trace state"<<std::endl;
     int start_pos          = -1;
@@ -429,7 +430,7 @@ private:
       return context_from_parent_header;
     }
 
-    nostd::shared_ptr<TraceState> trace_state;
+    nostd::unique_ptr<TraceState> trace_state;
     ExtractTraceState(trace_state_header, trace_state);
     std::cout<<"trace state returned"<<std::endl;
     for (const auto &entry: trace_state.get()->Entries()) {
