@@ -92,6 +92,10 @@ elif [[ "$1" == "bazel.asan" ]]; then
 elif [[ "$1" == "bazel.tsan" ]]; then
   bazel test --config=tsan $BAZEL_TEST_OPTIONS //...
   exit 0
+elif [[ "$1" == "bazel.valgrind" ]]; then
+  bazel build $BAZEL_OPTIONS //...
+  bazel test --run_under="/usr/bin/valgrind --leak-check=full --error-exitcode=1" $BAZEL_TEST_OPTIONS //...
+  exit 0
 elif [[ "$1" == "benchmark" ]]; then
   [ -z "${BENCHMARK_DIR}" ] && export BENCHMARK_DIR=$HOME/benchmark
   bazel build $BAZEL_OPTIONS -c opt -- \
@@ -107,8 +111,6 @@ elif [[ "$1" == "benchmark" ]]; then
   exit 0
 elif [[ "$1" == "format" ]]; then
   tools/format.sh
-  # normalize file endings according to .gitattributes
-  git add --renormalize .
   CHANGED="$(git ls-files --modified)"
   if [[ ! -z "$CHANGED" ]]; then
     echo "The following files have changes:"

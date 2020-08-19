@@ -4,12 +4,12 @@
 #include <memory>
 #include <mutex>
 #include <unordered_set>
-#include <vector>
 #include <utility>
+#include <vector>
 
+#include "opentelemetry/ext/zpages/threadsafe_span_data.h"
 #include "opentelemetry/sdk/trace/processor.h"
 #include "opentelemetry/sdk/trace/recordable.h"
-#include "opentelemetry/sdk/trace/span_data.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace ext
@@ -20,12 +20,13 @@ namespace zpages
  * The span processor passes and stores running and completed recordables (casted as span_data)
  * to be used by the TraceZ Data Aggregator.
  */
-class TracezSpanProcessor : public opentelemetry::sdk::trace::SpanProcessor {
- public:
-
-  struct CollectedSpans {
-    std::unordered_set<opentelemetry::sdk::trace::SpanData*> running;
-    std::vector<std::unique_ptr<opentelemetry::sdk::trace::SpanData>> completed;
+class TracezSpanProcessor : public opentelemetry::sdk::trace::SpanProcessor
+{
+public:
+  struct CollectedSpans
+  {
+    std::unordered_set<ThreadsafeSpanData *> running;
+    std::vector<std::unique_ptr<ThreadsafeSpanData>> completed;
   };
 
   /*
@@ -39,11 +40,12 @@ class TracezSpanProcessor : public opentelemetry::sdk::trace::SpanProcessor {
    */
   std::unique_ptr<opentelemetry::sdk::trace::Recordable> MakeRecordable() noexcept override
   {
-    return std::unique_ptr<opentelemetry::sdk::trace::Recordable>(new opentelemetry::sdk::trace::SpanData);
+    return std::unique_ptr<opentelemetry::sdk::trace::Recordable>(new ThreadsafeSpanData);
   }
 
   /*
-   * OnStart is called when a span starts; the recordable is cast to span_data and added to running_spans.
+   * OnStart is called when a span starts; the recordable is cast to span_data and added to
+   * running_spans.
    * @param span a recordable for a span that was just started
    */
   void OnStart(opentelemetry::sdk::trace::Recordable &span) noexcept override;
@@ -73,7 +75,8 @@ class TracezSpanProcessor : public opentelemetry::sdk::trace::SpanProcessor {
    * timeout is applied. Currently, timeout does nothing.
    */
   void ForceFlush(
-      std::chrono::microseconds timeout = std::chrono::microseconds(0)) noexcept override {}
+      std::chrono::microseconds timeout = std::chrono::microseconds(0)) noexcept override
+  {}
 
   /*
    * Shut down the processor and do any cleanup required, which is none.
@@ -82,9 +85,10 @@ class TracezSpanProcessor : public opentelemetry::sdk::trace::SpanProcessor {
    * @param timeout an optional timeout, the default timeout of 0 means that no
    * timeout is applied. Currently, timeout does nothing.
    */
-  void Shutdown(std::chrono::microseconds timeout = std::chrono::microseconds(0)) noexcept override {}
+  void Shutdown(std::chrono::microseconds timeout = std::chrono::microseconds(0)) noexcept override
+  {}
 
- private:
+private:
   mutable std::mutex mtx_;
   CollectedSpans spans_;
 };

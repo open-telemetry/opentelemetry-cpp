@@ -3,8 +3,8 @@
 #include "opentelemetry/sdk/common/atomic_shared_ptr.h"
 #include "opentelemetry/sdk/trace/processor.h"
 #include "opentelemetry/sdk/trace/samplers/always_on.h"
-#include "opentelemetry/trace/tracer.h"
 #include "opentelemetry/trace/noop.h"
+#include "opentelemetry/trace/tracer.h"
 #include "opentelemetry/version.h"
 
 #include <memory>
@@ -44,7 +44,7 @@ public:
    */
   std::shared_ptr<Sampler> GetSampler() const noexcept;
 
-  nostd::unique_ptr<trace_api::Span> StartSpan(
+  nostd::shared_ptr<trace_api::Span> StartSpan(
       nostd::string_view name,
       const trace_api::KeyValueIterable &attributes,
       const trace_api::StartSpanOptions &options = {}) noexcept override;

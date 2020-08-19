@@ -1,4 +1,5 @@
 #include "opentelemetry/ext/zpages/threadsafe_span_data.h"
+#include "opentelemetry/context/threadlocal_context.h"
 #include "opentelemetry/nostd/variant.h"
 #include "opentelemetry/trace/span_id.h"
 #include "opentelemetry/trace/trace_id.h"
@@ -6,9 +7,9 @@
 #include <gtest/gtest.h>
 #include <thread>
 
+using opentelemetry::ext::zpages::ThreadsafeSpanData;
 using opentelemetry::sdk::trace::AttributeConverter;
 using opentelemetry::sdk::trace::SpanDataAttributeValue;
-using opentelemetry::ext::zpages::ThreadsafeSpanData;
 
 TEST(ThreadsafeSpanData, DefaultValues)
 {
@@ -51,5 +52,5 @@ TEST(ThreadsafeSpanData, Set)
   ASSERT_EQ(data.GetDescription(), "description");
   ASSERT_EQ(data.GetStartTime().time_since_epoch(), now.time_since_epoch());
   ASSERT_EQ(data.GetDuration(), std::chrono::nanoseconds(1000000));
-  ASSERT_EQ(opentelemetry::nostd::get<int64_t>(data.GetAttributes().at("attr1")), 314159);
+  ASSERT_EQ(opentelemetry::nostd::get<int>(data.GetAttributes().at("attr1")), 314159);
 }
