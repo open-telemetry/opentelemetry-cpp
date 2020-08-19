@@ -46,14 +46,9 @@ enum class ExportResult
   kFailureFull = 2,
 
   /**
-   * The export has timed out.
-   */
-  kFailureTimeout = 3,
-
-  /**
    * The export() function was passed an invalid argument.
    */
-  kFailureInvalidArgument = 4,
+  kFailureInvalidArgument = 3,
 };
 /**
  * MetricsExporter defines the interface that protocol-specific span exporters must
