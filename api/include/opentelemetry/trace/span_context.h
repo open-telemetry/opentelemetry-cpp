@@ -66,17 +66,17 @@ public:
 
   SpanContext &operator=(const SpanContext &ctx)
   {
-    trace_id_    = ctx.trace_id_;
-    span_id_     = ctx.span_id_;
-    trace_flags_ = ctx.trace_flags_;
+    trace_id.reset(ctx.trace_id_.get());
+    span_id_.reset(ctx.span_id_.get());
+    trace_flags_.reset(ctx.trace_flags_.get());
     trace_state_.reset(ctx.trace_state_.get());
     return *this;
   };
   SpanContext &operator=(SpanContext &&ctx)
   {
-    trace_id_    = ctx.trace_id_;
-    span_id_     = ctx.span_id_;
-    trace_flags_ = ctx.trace_flags_;
+    trace_id.reset(ctx.trace_id_.get());
+    span_id_.reset(ctx.span_id_.get());
+    trace_flags_.reset(ctx.trace_flags_.get());
     trace_state_.reset(ctx.trace_state_.get());
     return *this;
   };
