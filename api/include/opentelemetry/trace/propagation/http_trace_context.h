@@ -417,7 +417,8 @@ private:
       return context_from_parent_header;
     }
     std::cout<<"trace state extracting"<<std::endl;
-    TraceState trace_state = ExtractTraceState(trace_state_header);
+    TraceState trace_state = TraceState();
+    ExtractTraceState(trace_state_header);
     std::cout<<"trace state extracted"<<std::endl;
     return SpanContext(context_from_parent_header.trace_id(), context_from_parent_header.span_id(),
                        context_from_parent_header.trace_flags(), trace_state, true);
