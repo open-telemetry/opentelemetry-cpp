@@ -64,7 +64,11 @@ public:
   void Inject(Setter setter, T &carrier, const context::Context &context) noexcept override
   {
     SpanContext span_context = SpanContext();
-    GetCurrentSpan(context, span_context) if (!span_context.IsValid()) { return; }
+    GetCurrentSpan(context, span_context);
+    if (!span_context.IsValid())
+    {
+      return;
+    }
     InjectImpl(setter, carrier, span_context);
   }
 
