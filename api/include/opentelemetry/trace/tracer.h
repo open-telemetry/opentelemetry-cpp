@@ -17,7 +17,6 @@ namespace trace
  * This class provides methods for manipulating the context, creating spans, and controlling spans'
  * lifecycles.
  */
-
 class Tracer
 {
 public:
@@ -30,7 +29,6 @@ public:
    * Attributes will be processed in order, previous attributes with the same
    * key will be overwritten.
    */
-
   virtual nostd::shared_ptr<Span> StartSpan(nostd::string_view name,
                                             const KeyValueIterable &attributes,
                                             const StartSpanOptions &options = {}) noexcept = 0;

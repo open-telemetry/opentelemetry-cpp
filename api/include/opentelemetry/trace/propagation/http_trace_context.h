@@ -64,7 +64,8 @@ public:
 
   void Inject(Setter setter, T &carrier, const context::Context &context) noexcept override
   {
-    SpanContext span_context = GetCurrentSpan(context)->GetContext();
+    SpanContext span_context = SpanContext();
+    GetCurrentSpan(context, span_context);
     if (!span_context.IsValid())
     {
       std::cout << "invalid span context" << std::endl;
@@ -89,22 +90,24 @@ public:
     return context.SetValue(span_key, sp);
   }
 
-  static Span *GetCurrentSpan(const context::Context &context)
+  static void GetCurrentSpan(const context::Context &context, SpanContext &span_context)
   {
     const nostd::string_view span_key = "current-span";
     context::Context ctx(context);
-    nostd::shared_ptr<Span> span = nostd::get<nostd::shared_ptr<Span>>(ctx.GetValue(span_key));
-    return (span.get());
+    context::ContextValue span = ctx.GetValue(span_key);
+    if (nostd::holds_alternative<nostd::shared_ptr<Span>>(span))
+    {
+      span_context = nostd::get<nostd::shared_ptr<Span>>(span).get()->GetContext();
+    }
   }
 
   static TraceId GenerateTraceIdFromString(nostd::string_view trace_id)
   {
     const char *trc_id = trace_id.begin();
     uint8_t buf[kTraceIdBytes / 2];
-    int tmp;
     for (int i = 0; i < kTraceIdBytes; i++)
     {
-      tmp = CharToInt(*trc_id);
+      int tmp = CharToInt(*trc_id);
       if (tmp < 0)
       {
         for (int j = 0; j < kTraceIdBytes / 2; j++)
@@ -130,10 +133,9 @@ public:
   {
     const char *spn_id = span_id.begin();
     uint8_t buf[kSpanIdBytes / 2];
-    int tmp;
     for (int i = 0; i < kSpanIdBytes; i++)
     {
-      tmp = CharToInt(*spn_id);
+      int tmp = CharToInt(spn_id[i]);
       if (tmp < 0)
       {
         for (int j = 0; j < kSpanIdBytes / 2; j++)
@@ -150,23 +152,23 @@ public:
       {
         buf[i / 2] += tmp;
       }
-      spn_id++;
     }
     return SpanId(buf);
   }
 
   static TraceFlags GenerateTraceFlagsFromString(nostd::string_view trace_flags)
   {
-    uint8_t buf;
     int tmp1 = CharToInt(trace_flags[0]);
     int tmp2 = CharToInt(trace_flags[1]);
     if (tmp1 < 0 || tmp2 < 0)
       return TraceFlags(0);  // check for invalid char
-    buf = tmp1 * 16 + tmp2;
+    uint8_t buf = tmp1 * 16 + tmp2;
     return TraceFlags(buf);
   }
 
 private:
+  // Converts a single character to a corresponding integer (e.g. '1' to 1), return -1
+  // if the character is not a valid number in hex.
   static uint8_t CharToInt(char c)
   {
     if (c >= '0' && c <= '9')
@@ -242,90 +244,53 @@ private:
     }
   }
 
+  static bool IsValidHex(nostd::string_view string_view)
+  {
+    for (int i = 0; i < string_view.length(); i++)
+    {
+      if (!(string_view[i] >= '0' && string_view[i] <= '9') &&
+          !(string_view[i] >= 'a' && string_view[i] <= 'f'))
+        return false;
+    }
+    return true;
+  }
+
   static SpanContext ExtractContextFromTraceParent(nostd::string_view trace_parent)
   {
-    bool is_valid = trace_parent.length() == kHeaderSize && trace_parent[kVersionBytes] == '-' &&
-                    trace_parent[kVersionBytes + kTraceIdBytes + 1] == '-' &&
-                    trace_parent[kVersionBytes + kTraceIdBytes + kSpanIdBytes + 2] == '-';
-    if (!is_valid)
+    if (trace_parent.length() != kHeaderSize || trace_parent[kVersionBytes] != '-' ||
+        trace_parent[kVersionBytes + kTraceIdBytes + 1] != '-' ||
+        trace_parent[kVersionBytes + kTraceIdBytes + kSpanIdBytes + 2] != '-')
     {
       std::cout << "Unparseable trace_parent header. Returning INVALID span context." << std::endl;
       return SpanContext(false, false);
     }
-    nostd::string_view version;
-    nostd::string_view trace_id;
-    nostd::string_view span_id;
-    nostd::string_view trace_flags;
-    int elt_num   = 0;
-    int countdown = kHeaderElementLengths[elt_num];
-    int start_pos = -1;
-    for (int i = 0; i < int(trace_parent.size()); i++)
+    nostd::string_view version = trace_parent.substr(0, kHeaderElementLengths[0]);
+    nostd::string_view trace_id =
+        trace_parent.substr(kHeaderElementLengths[0] + 1, kHeaderElementLengths[1]);
+    nostd::string_view span_id = trace_parent.substr(
+        kHeaderElementLengths[0] + kHeaderElementLengths[1] + 2, kHeaderElementLengths[2]);
+    nostd::string_view trace_flags = trace_parent.substr(
+        kHeaderElementLengths[0] + kHeaderElementLengths[1] + kHeaderElementLengths[2] + 3);
+
+    if (version == "ff")
     {
-      if (trace_parent[i] == '\t')
-        continue;
-      else if (trace_parent[i] == '-')
-      {
-        if (countdown == 0)
-        {
-          if (elt_num == 0)
-          {
-            version = trace_parent.substr(start_pos, kHeaderElementLengths[elt_num]);
-          }
-          else if (elt_num == 1)
-          {
-            trace_id = trace_parent.substr(start_pos, kHeaderElementLengths[elt_num]);
-          }
-          else if (elt_num == 2)
-          {
-            span_id = trace_parent.substr(start_pos, kHeaderElementLengths[elt_num]);
-          }
-          else
-          {
-            return SpanContext(false,
-                               false);  // Impossible to have more than 4 elements in parent header
-          }
-          countdown = kHeaderElementLengths[++elt_num];
-          start_pos = -1;
-        }
-        else
-        {
-          return SpanContext(false, false);
-        }
-      }
-      else if ((trace_parent[i] >= 'a' && trace_parent[i] <= 'f') ||
-               (trace_parent[i] >= '0' && trace_parent[i] <= '9'))
-      {
-        if (start_pos == -1)
-          start_pos = i;
-        countdown--;
-      }
-      else
-      {
-        return SpanContext(false, false);
-      }
+      return SpanContext(false, false);
     }
-    trace_flags = trace_parent.substr(start_pos, kHeaderElementLengths[elt_num]);
 
     if (trace_id == "00000000000000000000000000000000" || span_id == "0000000000000000")
     {
       return SpanContext(false, false);
     }
-    if (version == "ff")
-    {
+
+    // validate ids
+    if (!IsValidHex(version) || !IsValidHex(trace_id) || !IsValidHex(span_id) ||
+        !IsValidHex(trace_flags))
       return SpanContext(false, false);
-    }
-    if (trace_id.length() == 32 && span_id.length() == 16 && trace_flags.length() == 2)
-    {
-      TraceId trace_id_obj       = GenerateTraceIdFromString(trace_id);
-      SpanId span_id_obj         = GenerateSpanIdFromString(span_id);
-      TraceFlags trace_flags_obj = GenerateTraceFlagsFromString(trace_flags);
-      return SpanContext(trace_id_obj, span_id_obj, trace_flags_obj, TraceState(), true);
-    }
-    else
-    {
-      std::cout << "Unparseable trace_parent header. Returning INVALID span context." << std::endl;
-      return SpanContext(false, false);
-    }
+
+    TraceId trace_id_obj       = GenerateTraceIdFromString(trace_id);
+    SpanId span_id_obj         = GenerateSpanIdFromString(span_id);
+    TraceFlags trace_flags_obj = GenerateTraceFlagsFromString(trace_flags);
+    return SpanContext(trace_id_obj, span_id_obj, trace_flags_obj, true);
   }
 
   static TraceState ExtractTraceState(nostd::string_view &trace_state_header)
