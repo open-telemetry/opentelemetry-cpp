@@ -290,7 +290,7 @@ private:
     TraceId trace_id_obj       = GenerateTraceIdFromString(trace_id);
     SpanId span_id_obj         = GenerateSpanIdFromString(span_id);
     TraceFlags trace_flags_obj = GenerateTraceFlagsFromString(trace_flags);
-    return SpanContext(trace_id_obj, span_id_obj, trace_flags_obj, true);
+    return SpanContext(trace_id_obj, span_id_obj, trace_flags_obj, TraceState(), true);
   }
 
   static TraceState ExtractTraceState(nostd::string_view &trace_state_header)
