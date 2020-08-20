@@ -66,11 +66,7 @@ public:
    */
   virtual ExportResult Export(const std::vector<Record> &records) noexcept = 0;
 
-  /**
-   * In the Metrics specification, there is no Shutdown function required for exporters
-   * The Shutdown function can be implemented within exporters that wish to have one,
-   * but will not be enforced through this header
-   */
+
 };
 }  // namespace metrics
 }  // namespace sdk
