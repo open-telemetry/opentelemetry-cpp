@@ -109,6 +109,9 @@ public:
       Set(entry.GetKey(),entry.GetValue());
       num_entries_++;
     }
+    for (const auto &entry: Entries()) {
+      std::cout<<"copied key: "<<entry.GetKey()<<" value: "<<entry.GetValue()<<std::endl;;
+    }
   }
 
   bool operator==(const TraceState &that) const noexcept {
