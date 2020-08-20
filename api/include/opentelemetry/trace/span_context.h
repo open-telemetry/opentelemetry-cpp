@@ -66,6 +66,12 @@ public:
     return *this;
   };
 
+  bool operator==(const SpanContext &that) const noexcept
+  {
+    return trace_id() == that.trace_id() && span_id() == that.span_id() &&
+           trace_flags() == that.trace_flags();
+  }
+
   const TraceId &trace_id() const noexcept { return trace_id_; }
   const SpanId &span_id() const noexcept { return span_id_; }
   const TraceFlags &trace_flags() const noexcept { return trace_flags_; }
