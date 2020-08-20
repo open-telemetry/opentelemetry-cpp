@@ -55,8 +55,9 @@ public:
   // Copies the TraceFlags to dest.
   void CopyBytesTo(nostd::span<uint8_t, 1> dest) const noexcept { dest[0] = rep_; }
 
-  static TraceFlags GetRandom() {
-    uint8_t buf = 0; // Current version only accepts 0
+  static TraceFlags GetRandom()
+  {
+    uint8_t buf = 0;  // Current version only accepts 0
     return TraceFlags(buf);
   }
 

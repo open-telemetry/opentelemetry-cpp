@@ -67,10 +67,12 @@ public:
     SpanContext span_context = GetCurrentSpan(context)->GetContext();
     if (!span_context.IsValid())
     {
-      std::cout<<"invalid span context"<<std::endl;
+      std::cout << "invalid span context" << std::endl;
       // If invalid, make a new traceparent and remove trace state
       span_context = SpanContext::GetRandom();
-    } else {
+    }
+    else
+    {
       // otherwise only update Span Id
       span_context = SpanContext::UpdateSpanId(span_context);
     }
