@@ -38,11 +38,11 @@ static void Setter(std::map<std::string, std::string> &carrier,
   carrier[std::string(trace_type)] = std::string(trace_description);
 }
 
-static trace::propagation::HttpTraceContext<std::map<std::string, std::string>> format =
-    trace::propagation::HttpTraceContext<std::map<std::string, std::string>>();
-
 using MapHttpTraceContext =
     trace::propagation::HttpTraceContext<std::map<std::string, std::string>>;
+
+static MapHttpTraceContext format = MapHttpTraceContext();
+
 TEST(HTTPTextFormatTest, TraceIdBufferGeneration)
 {
   constexpr uint8_t buf[] = {1, 2, 3, 4, 5, 6, 7, 8, 8, 7, 0xaa, 0xbb, 0xcc, 0xdd, 0xee, 0xff};
