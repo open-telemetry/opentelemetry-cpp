@@ -87,7 +87,7 @@ public:
     const nostd::string_view span_key = "current-span";
     context::Context ctx(context);
     context::ContextValue span = ctx.GetValue(span_key);
-    if ((int)span == 0)
+    if ((int64_t)span == 0)
     {
       return;
     }
