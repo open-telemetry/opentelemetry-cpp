@@ -14,6 +14,8 @@
 
 #pragma once
 
+#include <iostream>
+
 #include "opentelemetry/nostd/unique_ptr.h"
 #include "opentelemetry/trace/span_id.h"
 #include "opentelemetry/trace/trace_flags.h"
@@ -39,16 +41,20 @@ public:
       : trace_flags_(trace::TraceFlags((uint8_t)sampled_flag)),
         trace_state_(new TraceState),
         remote_parent_(has_remote_parent){};
+
   SpanContext(TraceId trace_id,
               SpanId span_id,
               TraceFlags trace_flags,
               TraceState trace_state,
               bool has_remote_parent) noexcept
   {
+    std::cout<<"copying span context"<<std::endl;
     trace_id_    = trace_id;
     span_id_     = span_id;
     trace_flags_ = trace_flags;
+    std::cout<<"check point"<<std::endl;
     trace_state_.reset(new TraceState(trace_state));
+    std::cout<<"checkpoint passed"<<std::endl;
     remote_parent_ = has_remote_parent;
   }
   SpanContext(SpanContext &&ctx)
