@@ -10,6 +10,7 @@ namespace
 {
 
 using opentelemetry::trace::DefaultSpan;
+using opentelemetry::trace::SpanContext;
 
 TEST(DefaultSpanTest, GetContext)
 {
