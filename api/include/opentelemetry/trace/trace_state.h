@@ -106,7 +106,6 @@ public:
   {
     for (const auto &entry: trace_state.Entries()) {
       std::cout<<"copying key: "<<entry.GetKey()<<" value: "<<entry.GetValue()<<std::endl;
-      num_entries_++;
       Set(entry.GetKey(),entry.GetValue());
     }
     for (const auto &entry: Entries()) {
