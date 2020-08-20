@@ -14,6 +14,7 @@
 
 #pragma once
 
+#include <stdlib.h>
 #include <cstdint>
 #include <cstring>
 
@@ -66,9 +67,11 @@ public:
     memcpy(dest.data(), rep_, kSize);
   }
 
-  static SpanId GetRandom() {
+  static SpanId GetRandom()
+  {
     uint8_t buf[kSize] = {0};
-    for (int i = 0; i < kSize; i++) {
+    for (int i = 0; i < kSize; i++)
+    {
       buf[i] = rand() % 256;
     }
     return SpanId(buf);

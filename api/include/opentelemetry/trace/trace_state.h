@@ -16,14 +16,12 @@
 
 #include <cstdint>
 #include <cstring>
-#include <iostream>
 
 #include "opentelemetry/nostd/span.h"
 #include "opentelemetry/nostd/string_view.h"
 #include "opentelemetry/nostd/unique_ptr.h"
 
-namespace opentelemetry
-{
+OPENTELEMETRY_BEGIN_NAMESPACE
 namespace trace
 {
 
@@ -103,27 +101,30 @@ public:
   TraceState() noexcept : entries_(new Entry[kMaxKeyValuePairs]), num_entries_(0) {}
 
   // Copy Constructor
-  TraceState(const TraceState &trace_state) noexcept : entries_(new Entry[kMaxKeyValuePairs]), num_entries_(0)
+  TraceState(const TraceState &trace_state) noexcept
+      : entries_(new Entry[kMaxKeyValuePairs]), num_entries_(0)
   {
-    std::cout<<"copying"<<std::endl;
-    for (const auto &entry: trace_state.Entries()) {
-      std::cout<<"key is: "<<entry.GetKey()<<" value is: "<<entry.GetValue()<<std::endl;
-      Set(entry.GetKey(),entry.GetValue());
-      std::cout<<"set complete"<<std::endl;
-      num_entries_++;
+    for (const auto &entry : trace_state.Entries())
+    {
+      Set(entry.GetKey(), entry.GetValue());
     }
   }
 
-  bool operator==(const TraceState &that) const noexcept {
-    for (const auto &entry: that.Entries()) {
+  bool operator==(const TraceState &that) const noexcept
+  {
+    for (const auto &entry : that.Entries())
+    {
       nostd::string_view value;
-      Get(entry.GetKey(),value);
-      if (entry.GetValue() != value) return false;
+      Get(entry.GetKey(), value);
+      if (entry.GetValue() != value)
+        return false;
     }
-    for (const auto &entry: Entries()) {
+    for (const auto &entry : Entries())
+    {
       nostd::string_view value;
-      that.Get(entry.GetKey(),value);
-      if (entry.GetValue() != value) return false;
+      that.Get(entry.GetKey(), value);
+      if (entry.GetValue() != value)
+        return false;
     }
     return true;
   }
@@ -220,4 +221,4 @@ private:
 };
 
 }  // namespace trace
-}  // namespace opentelemetry
+OPENTELEMETRY_END_NAMESPACE

@@ -67,10 +67,12 @@ public:
     SpanContext span_context = GetCurrentSpan(context)->GetContext();
     if (!span_context.IsValid())
     {
-      std::cout<<"invalid span context"<<std::endl;
+      std::cout << "invalid span context" << std::endl;
       // If invalid, make a new traceparent and remove trace state
       span_context = SpanContext::GetRandom();
-    } else {
+    }
+    else
+    {
       // otherwise only update Span Id
       span_context = SpanContext::UpdateSpanId(span_context);
     }
@@ -82,10 +84,8 @@ public:
                            context::Context &context) noexcept override
   {
     SpanContext span_context    = ExtractImpl(getter, carrier);
-    std::cout<<"span context complete"<<std::endl;
     nostd::string_view span_key = "current-span";
     nostd::shared_ptr<Span> sp{new DefaultSpan(span_context)};
-    std::cout<<"span init complete"<<std::endl;
     return context.SetValue(span_key, sp);
   }
 
@@ -244,8 +244,7 @@ private:
 
   static SpanContext ExtractContextFromTraceParent(nostd::string_view trace_parent)
   {
-    bool is_valid = (trace_parent.length() == kHeaderSize || (trace_parent.length() > kHeaderSize
-                    && trace_parent[kHeaderSize] == '-')) && trace_parent[kVersionBytes] == '-' &&
+    bool is_valid = trace_parent.length() == kHeaderSize && trace_parent[kVersionBytes] == '-' &&
                     trace_parent[kVersionBytes + kTraceIdBytes + 1] == '-' &&
                     trace_parent[kVersionBytes + kTraceIdBytes + kSpanIdBytes + 2] == '-';
     if (!is_valid)
@@ -282,9 +281,8 @@ private:
           }
           else
           {
-            break;
-//            return SpanContext(false,
-//                               false);  // Impossible to have more than 4 elements in parent header
+            return SpanContext(false,
+                               false);  // Impossible to have more than 4 elements in parent header
           }
           countdown = kHeaderElementLengths[++elt_num];
           start_pos = -1;
@@ -307,6 +305,7 @@ private:
       }
     }
     trace_flags = trace_parent.substr(start_pos, kHeaderElementLengths[elt_num]);
+
     if (trace_id == "00000000000000000000000000000000" || span_id == "0000000000000000")
     {
       return SpanContext(false, false);
@@ -329,10 +328,9 @@ private:
     }
   }
 
-  static void ExtractTraceState(nostd::string_view &trace_state_header, TraceState &trace_state)
+  static TraceState ExtractTraceState(nostd::string_view &trace_state_header)
   {
-    std::cout<<"extract trace state"<<std::endl;
-//    TraceState trace_state = TraceState();
+    TraceState trace_state = TraceState();
     int start_pos          = -1;
     int end_pos            = -1;
     int ctr_pos            = -1;
@@ -354,8 +352,9 @@ private:
           val = trace_state_header.substr(ctr_pos + 1, end_pos - ctr_pos);
           if (key != "")
           {
-            std::cout<<"key "<<key<<" val "<<val<<std::endl;
             trace_state.Set(key, val);
+            nostd::string_view v;
+            trace_state.Get(key, v);
           }
         }
         ctr_pos   = -1;
@@ -381,17 +380,18 @@ private:
         val = trace_state_header.substr(ctr_pos + 1, end_pos - ctr_pos);
         if (key != "")
         {
-          std::cout<<"key "<<key<<" val "<<val<<std::endl;
           trace_state.Set(key, val);
+          nostd::string_view v;
+          trace_state.Get(key, v);
         }
       }
       element_num++;
     }
-//    if (element_num >= kTraceStateMaxMembers)
-//    {
-//      return nostd::shared_ptr<TraceState>(new TraceState());  // too many k-v pairs will result in an invalid trace state
-//    }
-    return;
+    if (element_num >= kTraceStateMaxMembers)
+    {
+      return TraceState();  // too many k-v pairs will result in an invalid trace state
+    }
+    return trace_state;
   }
 
   static void AddNewMember(TraceState &trace_state, nostd::string_view member)
@@ -424,10 +424,7 @@ private:
     {
       return context_from_parent_header;
     }
-
-    TraceState trace_state;
-    ExtractTraceState(trace_state_header, trace_state);
-    std::cout<<"trace state returned"<<std::endl;
+    TraceState trace_state = ExtractTraceState(trace_state_header);
     return SpanContext(context_from_parent_header.trace_id(), context_from_parent_header.span_id(),
                        context_from_parent_header.trace_flags(), trace_state, true);
   }

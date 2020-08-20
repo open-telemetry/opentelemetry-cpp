@@ -14,9 +14,9 @@
 
 #pragma once
 
+#include <stdlib.h>
 #include <cstdint>
 #include <cstring>
-#include <stdlib.h>
 
 #include "opentelemetry/nostd/span.h"
 #include "opentelemetry/version.h"
@@ -76,9 +76,11 @@ public:
     memcpy(dest.data(), rep_, kSize);
   }
 
-  static TraceId GetRandom() {
+  static TraceId GetRandom()
+  {
     uint8_t buf[kSize] = {0};
-    for (int i = 0; i < kSize; i++) {
+    for (int i = 0; i < kSize; i++)
+    {
       buf[i] = rand() % 256;
     }
     return TraceId(buf);
