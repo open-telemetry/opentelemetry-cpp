@@ -1,4 +1,5 @@
 #include "src/trace/span.h"
+#include "src/trace/span_utils.h"
 
 #include "opentelemetry/context/runtime_context.h"
 #include "opentelemetry/version.h"
@@ -43,7 +44,8 @@ Span::Span(std::shared_ptr<Tracer> &&tracer,
            std::shared_ptr<SpanProcessor> processor,
            nostd::string_view name,
            const trace_api::KeyValueIterable &attributes,
-           const trace_api::StartSpanOptions &options) noexcept
+           const trace_api::StartSpanOptions &options,
+           const trace_api::SpanContext &parent_span_context) noexcept
     : tracer_{std::move(tracer)},
       processor_{processor},
       recordable_{processor_->MakeRecordable()},
@@ -59,10 +61,21 @@ Span::Span(std::shared_ptr<Tracer> &&tracer,
   }
   recordable_->SetName(name);
 
-  attributes.ForEachKeyValue([&](nostd::string_view key, common::AttributeValue value) noexcept {
-    recordable_->SetAttribute(key, value);
-    return true;
-  });
+  if (parent_span_context.IsValid())
+  {
+    recordable_->SetIds(parent_span_context.trace_id(), GenerateRandomSpanId(),
+                        parent_span_context.span_id());
+  }
+  else
+  {
+    recordable_->SetIds(GenerateRandomTraceId(), GenerateRandomSpanId(), GenerateRandomSpanId());
+  }
+
+  attributes.ForEachKeyValue(
+      [&](nostd::string_view key, opentelemetry::common::AttributeValue value) noexcept {
+        recordable_->SetAttribute(key, value);
+        return true;
+      });
 
   recordable_->SetStartTime(NowOr(options.start_system_time));
   start_steady_time = NowOr(options.start_steady_time);
@@ -74,7 +87,8 @@ Span::~Span()
   End();
 }
 
-void Span::SetAttribute(nostd::string_view key, const common::AttributeValue &value) noexcept
+void Span::SetAttribute(nostd::string_view key,
+                        const opentelemetry::common::AttributeValue &value) noexcept
 {
   std::lock_guard<std::mutex> lock_guard{mu_};
 
