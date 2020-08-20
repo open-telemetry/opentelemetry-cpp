@@ -99,7 +99,7 @@ public:
     uint8_t buf[kTraceIdBytes / 2];
     for (int i = 0; i < kTraceIdBytes; i++)
     {
-      int tmp = CharToInt(*trc_id);
+      int tmp = HexToInt(*trc_id);
       if (tmp < 0)
       {
         for (int j = 0; j < kTraceIdBytes / 2; j++)
@@ -127,7 +127,7 @@ public:
     uint8_t buf[kSpanIdBytes / 2];
     for (int i = 0; i < kSpanIdBytes; i++)
     {
-      int tmp = CharToInt(spn_id[i]);
+      int tmp = HexToInt(spn_id[i]);
       if (tmp < 0)
       {
         for (int j = 0; j < kSpanIdBytes / 2; j++)
@@ -150,8 +150,8 @@ public:
 
   static TraceFlags GenerateTraceFlagsFromString(nostd::string_view trace_flags)
   {
-    int tmp1 = CharToInt(trace_flags[0]);
-    int tmp2 = CharToInt(trace_flags[1]);
+    int tmp1 = HexToInt(trace_flags[0]);
+    int tmp2 = HexToInt(trace_flags[1]);
     if (tmp1 < 0 || tmp2 < 0)
       return TraceFlags(0);  // check for invalid char
     uint8_t buf = tmp1 * 16 + tmp2;
@@ -161,7 +161,7 @@ public:
 private:
   // Converts a single character to a corresponding integer (e.g. '1' to 1), return -1
   // if the character is not a valid number in hex.
-  static uint8_t CharToInt(char c)
+  static uint8_t HexToInt(char c)
   {
     if (c >= '0' && c <= '9')
     {
@@ -241,12 +241,8 @@ private:
     nostd::string_view trace_flags = trace_parent.substr(
         kHeaderElementLengths[0] + kHeaderElementLengths[1] + kHeaderElementLengths[2] + 3);
 
-    if (version == "ff")
-    {
-      return SpanContext(false, false);
-    }
-
-    if (trace_id == "00000000000000000000000000000000" || span_id == "0000000000000000")
+    if (version == "ff" &&
+        (trace_id == "00000000000000000000000000000000" || span_id == "0000000000000000"))
     {
       return SpanContext(false, false);
     }
@@ -254,7 +250,9 @@ private:
     // validate ids
     if (!IsValidHex(version) || !IsValidHex(trace_id) || !IsValidHex(span_id) ||
         !IsValidHex(trace_flags))
+    {
       return SpanContext(false, false);
+    }
 
     TraceId trace_id_obj       = GenerateTraceIdFromString(trace_id);
     SpanId span_id_obj         = GenerateSpanIdFromString(span_id);
@@ -269,8 +267,8 @@ private:
     {
       return SpanContext(false, false);
     }
-    SpanContext context_from_parent_header = ExtractContextFromTraceParent(trace_parent);
-    return context_from_parent_header;
+
+    return ExtractContextFromTraceParent(trace_parent);
   }
 };
 }  // namespace propagation
