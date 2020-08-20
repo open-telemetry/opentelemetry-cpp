@@ -93,10 +93,9 @@ public:
   {
     const char *trc_id = trace_id.begin();
     uint8_t buf[kTraceIdBytes / 2];
-    int tmp;
     for (int i = 0; i < kTraceIdBytes; i++)
     {
-      tmp = CharToInt(*trc_id);
+      int tmp = CharToInt(*trc_id);
       if (tmp < 0)
       {
         for (int j = 0; j < kTraceIdBytes / 2; j++)
@@ -122,10 +121,9 @@ public:
   {
     const char *spn_id = span_id.begin();
     uint8_t buf[kSpanIdBytes / 2];
-    int tmp;
     for (int i = 0; i < kSpanIdBytes; i++)
     {
-      tmp = CharToInt(*spn_id);
+      int tmp = CharToInt(*spn_id);
       if (tmp < 0)
       {
         for (int j = 0; j < kSpanIdBytes / 2; j++)
@@ -149,16 +147,17 @@ public:
 
   static TraceFlags GenerateTraceFlagsFromString(nostd::string_view trace_flags)
   {
-    uint8_t buf;
     int tmp1 = CharToInt(trace_flags[0]);
     int tmp2 = CharToInt(trace_flags[1]);
     if (tmp1 < 0 || tmp2 < 0)
       return TraceFlags(0);  // check for invalid char
-    buf = tmp1 * 16 + tmp2;
+    uint8_t buf = tmp1 * 16 + tmp2;
     return TraceFlags(buf);
   }
 
 private:
+  // Converts a single character to a corresponding integer (e.g. '1' to 1), return -1
+  // if the character is not a valid number in hex.
   static uint8_t CharToInt(char c)
   {
     if (c >= '0' && c <= '9')
@@ -213,10 +212,9 @@ private:
 
   static SpanContext ExtractContextFromTraceParent(nostd::string_view trace_parent)
   {
-    bool is_valid = trace_parent.length() == kHeaderSize && trace_parent[kVersionBytes] == '-' &&
-                    trace_parent[kVersionBytes + kTraceIdBytes + 1] == '-' &&
-                    trace_parent[kVersionBytes + kTraceIdBytes + kSpanIdBytes + 2] == '-';
-    if (!is_valid)
+    if (trace_parent.length() != kHeaderSize || trace_parent[kVersionBytes] != '-' ||
+        trace_parent[kVersionBytes + kTraceIdBytes + 1] != '-' ||
+        trace_parent[kVersionBytes + kTraceIdBytes + kSpanIdBytes + 2] != '-')
     {
       std::cout << "Unparseable trace_parent header. Returning INVALID span context." << std::endl;
       return SpanContext(false, false);
