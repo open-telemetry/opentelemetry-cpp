@@ -213,6 +213,17 @@ private:
     InjectTraceParent(span_context, carrier, setter);
   }
 
+  static bool IsValidHex(nostd::string_view string_view)
+  {
+    for (int i = 0; i < string_view.length(); i++)
+    {
+      if (!(string_view[i] >= '0' && string_view[i] <= '9') &&
+          !(string_view[i] >= 'a' && string_view[i] <= 'f'))
+        return false;
+    }
+    return true;
+  }
+
   static SpanContext ExtractContextFromTraceParent(nostd::string_view trace_parent)
   {
     if (trace_parent.length() != kHeaderSize || trace_parent[kVersionBytes] != '-' ||
@@ -222,80 +233,33 @@ private:
       std::cout << "Unparseable trace_parent header. Returning INVALID span context." << std::endl;
       return SpanContext(false, false);
     }
-    nostd::string_view version;
-    nostd::string_view trace_id;
-    nostd::string_view span_id;
-    nostd::string_view trace_flags;
-    int elt_num   = 0;
-    int countdown = kHeaderElementLengths[elt_num];
-    int start_pos = -1;
-    for (int i = 0; i < int(trace_parent.size()); i++)
+    nostd::string_view version = trace_parent.substr(0, kHeaderElementLengths[0]);
+    nostd::string_view trace_id =
+        trace_parent.substr(kHeaderElementLengths[0] + 1, kHeaderElementLengths[1]);
+    nostd::string_view span_id = trace_parent.substr(
+        kHeaderElementLengths[0] + kHeaderElementLengths[1] + 2, kHeaderElementLengths[2]);
+    nostd::string_view trace_flags = trace_parent.substr(
+        kHeaderElementLengths[0] + kHeaderElementLengths[1] + kHeaderElementLengths[2] + 3);
+
+    if (version == "ff")
     {
-      if (trace_parent[i] == '\t')
-        continue;
-      else if (trace_parent[i] == '-')
-      {
-        if (countdown == 0)
-        {
-          if (elt_num == 0)
-          {
-            version = trace_parent.substr(start_pos, kHeaderElementLengths[elt_num]);
-          }
-          else if (elt_num == 1)
-          {
-            trace_id = trace_parent.substr(start_pos, kHeaderElementLengths[elt_num]);
-          }
-          else if (elt_num == 2)
-          {
-            span_id = trace_parent.substr(start_pos, kHeaderElementLengths[elt_num]);
-          }
-          else
-          {
-            return SpanContext(false,
-                               false);  // Impossible to have more than 4 elements in parent header
-          }
-          countdown = kHeaderElementLengths[++elt_num];
-          start_pos = -1;
-        }
-        else
-        {
-          return SpanContext(false, false);
-        }
-      }
-      else if ((trace_parent[i] >= 'a' && trace_parent[i] <= 'f') ||
-               (trace_parent[i] >= '0' && trace_parent[i] <= '9'))
-      {
-        if (start_pos == -1)
-          start_pos = i;
-        countdown--;
-      }
-      else
-      {
-        return SpanContext(false, false);
-      }
+      return SpanContext(false, false);
     }
-    trace_flags = trace_parent.substr(start_pos, kHeaderElementLengths[elt_num]);
 
     if (trace_id == "00000000000000000000000000000000" || span_id == "0000000000000000")
     {
       return SpanContext(false, false);
     }
-    if (version == "ff")
-    {
+
+    // validate ids
+    if (!IsValidHex(version) || !IsValidHex(trace_id) || !IsValidHex(span_id) ||
+        !IsValidHex(trace_flags))
       return SpanContext(false, false);
-    }
-    if (trace_id.length() == 32 && span_id.length() == 16 && trace_flags.length() == 2)
-    {
-      TraceId trace_id_obj       = GenerateTraceIdFromString(trace_id);
-      SpanId span_id_obj         = GenerateSpanIdFromString(span_id);
-      TraceFlags trace_flags_obj = GenerateTraceFlagsFromString(trace_flags);
-      return SpanContext(trace_id_obj, span_id_obj, trace_flags_obj, true);
-    }
-    else
-    {
-      std::cout << "Unparseable trace_parent header. Returning INVALID span context." << std::endl;
-      return SpanContext(false, false);
-    }
+
+    TraceId trace_id_obj       = GenerateTraceIdFromString(trace_id);
+    SpanId span_id_obj         = GenerateSpanIdFromString(span_id);
+    TraceFlags trace_flags_obj = GenerateTraceFlagsFromString(trace_flags);
+    return SpanContext(trace_id_obj, span_id_obj, trace_flags_obj, true);
   }
 
   static SpanContext ExtractImpl(Getter getter, const T &carrier)
