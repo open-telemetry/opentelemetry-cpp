@@ -220,7 +220,7 @@ TEST(Tracer, StartSpanWithAttributes)
 
   auto &span_data = spans_received->at(0);
   ASSERT_EQ(9, span_data->GetAttributes().size());
-  ASSERT_EQ(314159, nostd::get<int64_t>(span_data->GetAttributes().at("attr1")));
+  ASSERT_EQ(314159, nostd::get<int>(span_data->GetAttributes().at("attr1")));
   ASSERT_EQ(false, nostd::get<bool>(span_data->GetAttributes().at("attr2")));
   ASSERT_EQ(314159, nostd::get<unsigned int>(span_data->GetAttributes().at("attr3")));
   ASSERT_EQ(-20, nostd::get<int32_t>(span_data->GetAttributes().at("attr4")));
