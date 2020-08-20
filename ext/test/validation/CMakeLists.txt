@@ -1,7 +1,7 @@
 add_library(
   tracecontext_validation
-  tracecontext_client.h
-  tracecontext_server.h
+  ../../ext/include/opentelemetry/ext/tracecontext_validation/tracecontext_client.h
+  ../../ext/include/opentelemetry/ext/tracecontext_validation/tracecontext_server.h
   tracecontext_validate.cc
   ../../ext/include/opentelemetry/ext/http/server/file_http_server.h
   ../../ext/include/opentelemetry/ext/http/server/http_server.h
