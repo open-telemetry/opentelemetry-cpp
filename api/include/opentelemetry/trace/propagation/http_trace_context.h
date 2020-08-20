@@ -89,7 +89,7 @@ public:
     context::ContextValue span = ctx.GetValue(span_key);
     if (nostd::holds_alternative<nostd::shared_ptr<Span>>(span))
     {
-      span_context = nostd::get<nostd::shared_ptr<Span>>(span).get().GetContext();
+      span_context = nostd::get<nostd::shared_ptr<Span>>(span).get()->GetContext();
     }
   }
 
