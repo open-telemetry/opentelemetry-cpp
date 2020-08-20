@@ -379,10 +379,10 @@ private:
       }
       element_num++;
     }
-    if (element_num >= kTraceStateMaxMembers)
-    {
-      trace_state(TraceState());  // too many k-v pairs will result in an invalid trace state
-    }
+//    if (element_num >= kTraceStateMaxMembers)
+//    {
+//      trace_state(TraceState());  // too many k-v pairs will result in an invalid trace state
+//    }
     return;
   }
 
