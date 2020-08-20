@@ -54,6 +54,9 @@ public:
     trace_flags_ = trace_flags;
     std::cout<<"check point"<<std::endl;
     trace_state_.reset(new TraceState(trace_state));
+    for (const auto &entry: trace_state.Entries()) {
+      std::cout<<"param's copy key: "<<entry.GetKey()<<" value: "<<entry.GetValue()<<std::endl;;
+    }
     for (const auto &entry: trace_state_.get()->Entries()) {
       std::cout<<"inside copy key: "<<entry.GetKey()<<" value: "<<entry.GetValue()<<std::endl;;
     }
