@@ -123,7 +123,7 @@ public:
     uint8_t buf[kSpanIdBytes / 2];
     for (int i = 0; i < kSpanIdBytes; i++)
     {
-      int tmp = CharToInt(*spn_id[i]);
+      int tmp = CharToInt(spn_id[i]);
       if (tmp < 0)
       {
         for (int j = 0; j < kSpanIdBytes / 2; j++)
