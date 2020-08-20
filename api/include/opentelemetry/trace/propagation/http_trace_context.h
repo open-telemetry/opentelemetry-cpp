@@ -87,11 +87,10 @@ public:
     const nostd::string_view span_key = "current-span";
     context::Context ctx(context);
     context::ContextValue span = ctx.GetValue(span_key);
-    if (nostd::get<int>(span) == 0)
+    if (nostd::holds_alternative<nostd::shared_ptr<Span>>(span))
     {
-      return;
+      span_context = nostd::get<nostd::shared_ptr<Span>>(span).get().GetContext();
     }
-    span_context = nostd::get<nostd::shared_ptr<Span>>(span).get().GetContext();
   }
 
   static TraceId GenerateTraceIdFromString(nostd::string_view trace_id)
