@@ -76,7 +76,8 @@ public:
                            const T &carrier,
                            context::Context &context) noexcept override
   {
-    SpanContext span_context    = ExtractImpl(getter, carrier);
+    SpanContext span_context = SpanContext();
+    ExtractImpl(getter, carrier, span_context);
     nostd::string_view span_key = "current-span";
     nostd::shared_ptr<Span> sp{new DefaultSpan(span_context)};
     return context.SetValue(span_key, sp);
@@ -399,32 +400,35 @@ private:
     }
   }
 
-  static SpanContext ExtractImpl(Getter getter, const T &carrier)
+  static void ExtractImpl(Getter getter, const T &carrier, SpanContext &span_context)
   {
     nostd::string_view trace_parent = getter(carrier, kTraceParent);
     if (trace_parent == "")
     {
-      return SpanContext(false, false);
+      span_context = SpanContext(false, false);
+      return;
     }
     SpanContext context_from_parent_header = ExtractContextFromTraceParent(trace_parent);
     if (!context_from_parent_header.IsValid())
     {
-      return context_from_parent_header;
+      span_context = SpanContext(context_from_parent_header);
+      return;
     }
 
     nostd::string_view trace_state_header = getter(carrier, kTraceState);
     if (trace_state_header == "" || trace_state_header.empty())
     {
-      return context_from_parent_header;
+      span_context = SpanContext(context_from_parent_header);
+      return;
     }
     std::cout<<"trace state extracting"<<std::endl;
     TraceState trace_state = TraceState();
     ExtractTraceState(trace_state_header, trace_state);
     std::cout<<"trace state extracted"<<std::endl;
-    SpanContext spn_ctx = SpanContext(context_from_parent_header.trace_id(), context_from_parent_header.span_id(),
+    span_context = SpanContext(context_from_parent_header.trace_id(), context_from_parent_header.span_id(),
                        context_from_parent_header.trace_flags(), trace_state, true);
     std::cout<<"spn ctx assigned"<<std::endl;
-    return spn_ctx;
+    return;
   }
 };
 }  // namespace propagation
