@@ -42,10 +42,10 @@ public:
         trace_state_(new TraceState),
         remote_parent_(has_remote_parent){};
 
-  SpanContext(TraceId trace_id,
-              SpanId span_id,
-              TraceFlags trace_flags,
-              TraceState trace_state,
+  SpanContext(TraceId &trace_id,
+              SpanId &span_id,
+              TraceFlags &trace_flags,
+              TraceState &trace_state,
               bool has_remote_parent) noexcept
   {
     std::cout<<"1"<<std::endl;
@@ -66,11 +66,11 @@ public:
         trace_state_(ctx.trace_state_.get())
   {}
   SpanContext(const SpanContext &ctx)
-//      : trace_id_(ctx.trace_id_.get()),
-//        span_id_(ctx.span_id_.get()),
-//        trace_flags_(ctx.trace_flags_.get()),
-//        trace_state_(ctx.trace_state_.get())
-  {     std::cout<<"copy span context"<<std::endl;}
+      : trace_id_(ctx.trace_id_.get()),
+        span_id_(ctx.span_id_.get()),
+        trace_flags_(ctx.trace_flags_.get()),
+        trace_state_(ctx.trace_state_.get())
+  {}
 
   SpanContext &operator=(const SpanContext &ctx)
   {
