@@ -42,10 +42,10 @@ public:
         trace_state_(new TraceState),
         remote_parent_(has_remote_parent){};
 
-  SpanContext(TraceId &trace_id,
-              SpanId &span_id,
-              TraceFlags &trace_flags,
-              TraceState &trace_state,
+  SpanContext(TraceId trace_id,
+              SpanId span_id,
+              TraceFlags trace_flags,
+              TraceState trace_state,
               bool has_remote_parent) noexcept
   {
     std::cout<<"1"<<std::endl;
