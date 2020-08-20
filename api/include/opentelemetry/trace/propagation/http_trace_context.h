@@ -426,6 +426,9 @@ private:
     TraceState trace_state = TraceState();
     ExtractTraceState(trace_state_header, trace_state);
     std::cout<<"trace state extracted"<<std::endl;
+    for (const auto &entry: trace_state.Entries()) {
+      std::cout<<"displaying key: "<<entry.GetKey()<<" value: "<<entry.GetValue()<<std::endl;;
+    }
     span_context = SpanContext(context_from_parent_header.trace_id(), context_from_parent_header.span_id(),
                        context_from_parent_header.trace_flags(), trace_state, true);
     std::cout<<"spn ctx assigned"<<std::endl;
