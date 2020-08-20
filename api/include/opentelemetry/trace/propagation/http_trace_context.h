@@ -63,11 +63,8 @@ public:
 
   void Inject(Setter setter, T &carrier, const context::Context &context) noexcept override
   {
-    SpanContext span_context = GetCurrentSpan(context)->GetContext();
-    if (!span_context.IsValid())
-    {
-      return;
-    }
+    SpanContext span_context = SpanContext();
+    GetCurrentSpan(context, span_context) if (!span_context.IsValid()) { return; }
     InjectImpl(setter, carrier, span_context);
   }
 
@@ -81,12 +78,16 @@ public:
     return context.SetValue(span_key, sp);
   }
 
-  static Span *GetCurrentSpan(const context::Context &context)
+  static void GetCurrentSpan(const context::Context &context, SpanContext &span_context)
   {
     const nostd::string_view span_key = "current-span";
     context::Context ctx(context);
-    nostd::shared_ptr<Span> span = nostd::get<nostd::shared_ptr<Span>>(ctx.GetValue(span_key));
-    return (span.get());
+    context::ContextValue span = ctx.GetValue(span_key);
+    if ((int)span == 0)
+    {
+      return;
+    }
+    span_context = ((Span)span).GetContext();
   }
 
   static TraceId GenerateTraceIdFromString(nostd::string_view trace_id)
