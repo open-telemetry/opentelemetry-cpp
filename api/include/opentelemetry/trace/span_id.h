@@ -16,6 +16,7 @@
 
 #include <cstdint>
 #include <cstring>
+#include <stdlib.h>
 
 #include "opentelemetry/nostd/span.h"
 #include "opentelemetry/version.h"
@@ -64,6 +65,14 @@ public:
   void CopyBytesTo(nostd::span<uint8_t, kSize> dest) const noexcept
   {
     memcpy(dest.data(), rep_, kSize);
+  }
+
+  static SpanId GetRandom() {
+    uint8_t buf[kSize] = {0};
+    for (int i = 0; i < kSize; i++) {
+      buf[i] = rand() % 256;
+    }
+    return SpanId(buf);
   }
 
 private:

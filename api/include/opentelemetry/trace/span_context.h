@@ -14,8 +14,6 @@
 
 #pragma once
 
-#include <iostream>
-
 #include "opentelemetry/nostd/unique_ptr.h"
 #include "opentelemetry/trace/span_id.h"
 #include "opentelemetry/trace/trace_flags.h"
@@ -48,19 +46,10 @@ public:
               TraceState trace_state,
               bool has_remote_parent) noexcept
   {
-    std::cout<<"copying span context"<<std::endl;
     trace_id_    = trace_id;
     span_id_     = span_id;
     trace_flags_ = trace_flags;
-    std::cout<<"check point"<<std::endl;
     trace_state_.reset(new TraceState(trace_state));
-    for (const auto &entry: trace_state.Entries()) {
-      std::cout<<"param's copy key: "<<entry.GetKey()<<" value: "<<entry.GetValue()<<std::endl;;
-    }
-    for (const auto &entry: trace_state_.get()->Entries()) {
-      std::cout<<"inside copy key: "<<entry.GetKey()<<" value: "<<entry.GetValue()<<std::endl;;
-    }
-    std::cout<<"checkpoint passed"<<std::endl;
     remote_parent_ = has_remote_parent;
   }
   SpanContext(SpanContext &&ctx)
@@ -103,6 +92,14 @@ public:
   bool HasRemoteParent() const noexcept { return remote_parent_; }
 
   static SpanContext GetInvalid() { return SpanContext(false, false); }
+
+  static SpanContext GetRandom() {
+    return SpanContext(TraceId::GetRandom(), SpanId::GetRandom(), TraceFlags::GetRandom(), TraceState(), true);
+  }
+
+  static SpanContext UpdateSpanId(SpanContext &span_context) {
+    return SpanContext(span_context.trace_id(), SpanId::GetRandom(), TraceFlags::GetRandom(), span_context.trace_state(),span_context.HasRemoteParent());
+  }
 
   bool IsSampled() const noexcept { return trace_flags_.IsSampled(); }
 
