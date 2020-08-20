@@ -78,6 +78,7 @@ public:
   {
     SpanContext span_context = SpanContext();
     ExtractImpl(getter, carrier, span_context);
+    std::cout<<"extraction success"<<std::endl;
     nostd::string_view span_key = "current-span";
     nostd::shared_ptr<Span> sp{new DefaultSpan(span_context)};
     return context.SetValue(span_key, sp);
