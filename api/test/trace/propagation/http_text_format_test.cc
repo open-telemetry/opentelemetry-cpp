@@ -70,10 +70,10 @@ TEST(HTTPTextFormatTest, HeadersWithTraceState)
       context::Context("current-span", nostd::shared_ptr<trace::Span>(new trace::DefaultSpan()));
   context::Context ctx2                 = format.Extract(Getter, carrier, ctx1);
   std::map<std::string, std::string> c2 = {};
-//  format.Inject(Setter, c2, ctx2);
-//  EXPECT_EQ(c2["traceparent"], "00-4bf92f3577b34da6a3ce929d0e0e4736-0102030405060708-01");
-//  EXPECT_EQ(c2["tracestate"], "congo=congosSecondPosition,rojo=rojosFirstPosition");
-//  EXPECT_EQ(carrier.size(), c2.size());
+  format.Inject(Setter, c2, ctx2);
+  EXPECT_EQ(c2["traceparent"], "00-4bf92f3577b34da6a3ce929d0e0e4736-0102030405060708-01");
+  EXPECT_EQ(c2["tracestate"], "congo=congosSecondPosition,rojo=rojosFirstPosition");
+  EXPECT_EQ(carrier.size(), c2.size());
 }
 
 TEST(HTTPTextFormatTest, NoTraceParentHeader)
