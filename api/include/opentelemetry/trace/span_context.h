@@ -58,6 +58,7 @@ public:
     trace_state_.reset(&trace_state);
     std::cout<<"5"<<std::endl;
     remote_parent_ = has_remote_parent;
+    std::cout<<"6"<<std::endl;
   }
   SpanContext(SpanContext &&ctx)
       : trace_id_(ctx.trace_id_.get()),
