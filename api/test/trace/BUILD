@@ -3,7 +3,7 @@ load("//bazel:otel_cc_benchmark.bzl", "otel_cc_benchmark")
 cc_test(
     name = "default_span_test",
     srcs = [
-        "defaultspan_test.cc",
+        "default_span_test.cc",
     ],
     deps = [
         "//api",

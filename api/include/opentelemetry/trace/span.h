@@ -158,6 +158,7 @@ public:
   virtual void End(const EndSpanOptions &options = {}) noexcept = 0;
 
   virtual trace::SpanContext GetContext() const noexcept = 0;
+
   // Returns true if this Span is recording tracing events (e.g. SetAttribute,
   // AddEvent).
   virtual bool IsRecording() const noexcept = 0;
