@@ -91,7 +91,7 @@ public:
     {
       return;
     }
-    span_context = nostd::get<int>(span).GetContext();
+    span_context = nostd::get<nostd::shared_ptr<trace::Span>>(span).get().GetContext();
   }
 
   static TraceId GenerateTraceIdFromString(nostd::string_view trace_id)
