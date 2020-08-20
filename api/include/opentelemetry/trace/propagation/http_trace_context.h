@@ -420,8 +420,10 @@ private:
     TraceState trace_state = TraceState();
     ExtractTraceState(trace_state_header, trace_state);
     std::cout<<"trace state extracted"<<std::endl;
-    return SpanContext(context_from_parent_header.trace_id(), context_from_parent_header.span_id(),
+    SpanContext spn_ctx = SpanContext(context_from_parent_header.trace_id(), context_from_parent_header.span_id(),
                        context_from_parent_header.trace_flags(), trace_state, true);
+    std::cout<<"spn ctx assigned"<<std::endl;
+    return spn_ctx;
   }
 };
 }  // namespace propagation
