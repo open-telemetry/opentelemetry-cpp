@@ -36,3 +36,9 @@ TEST(SpanContextTest, TraceFlags)
 
   ASSERT_EQ(s2.trace_flags().flags(), 0);
 }
+
+TEST(SpanContextTest, IsValid)
+{
+  SpanContext s1(false, false);
+  ASSERT_FALSE(s1.IsValid());
+}

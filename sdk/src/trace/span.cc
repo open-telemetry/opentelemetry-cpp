@@ -86,6 +86,7 @@ Span::Span(std::shared_ptr<Tracer> &&tracer,
   {
     recordable_->SetIds(GenerateRandomTraceId(), GenerateRandomSpanId(), GenerateRandomSpanId());
   }
+  // TODO: Create and populate SpanContext for this span when SpanContext is fully implemented
 
   attributes.ForEachKeyValue(
       [&](nostd::string_view key, opentelemetry::common::AttributeValue value) noexcept {
