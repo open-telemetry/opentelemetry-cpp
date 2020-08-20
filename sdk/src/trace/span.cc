@@ -1,5 +1,5 @@
 #include "src/trace/span.h"
-#include "src/trace/span_utils.h"
+#include "src/common/random.h"
 
 #include "opentelemetry/context/runtime_context.h"
 #include "opentelemetry/version.h"
@@ -39,6 +39,22 @@ SteadyTimestamp NowOr(const SteadyTimestamp &steady)
   }
 }
 }  // namespace
+
+// Helper function to generate random trace id.
+trace_api::TraceId GenerateRandomTraceId()
+{
+  uint8_t trace_id_buf[trace_api::TraceId::kSize];
+  sdk::common::Random::GenerateRandomBuffer(trace_id_buf);
+  return trace_api::TraceId(trace_id_buf);
+}
+
+// Helper function to generate random span id.
+trace_api::SpanId GenerateRandomSpanId()
+{
+  uint8_t span_id_buf[trace_api::SpanId::kSize];
+  sdk::common::Random::GenerateRandomBuffer(span_id_buf);
+  return trace_api::SpanId(span_id_buf);
+}
 
 Span::Span(std::shared_ptr<Tracer> &&tracer,
            std::shared_ptr<SpanProcessor> processor,
