@@ -105,9 +105,9 @@ public:
   TraceState(const TraceState &trace_state) noexcept : entries_(new Entry[kMaxKeyValuePairs]), num_entries_(0)
   {
     for (const auto &entry: trace_state.Entries()) {
-      std::cout<<"copying key: "<<entry.GetKey()<<" value: "<<entry.GetValue()<<std::endl;;
-      Set(entry.GetKey(),entry.GetValue());
+      std::cout<<"copying key: "<<entry.GetKey()<<" value: "<<entry.GetValue()<<std::endl;
       num_entries_++;
+      Set(entry.GetKey(),entry.GetValue());
     }
     for (const auto &entry: Entries()) {
       std::cout<<"copied key: "<<entry.GetKey()<<" value: "<<entry.GetValue()<<std::endl;;
