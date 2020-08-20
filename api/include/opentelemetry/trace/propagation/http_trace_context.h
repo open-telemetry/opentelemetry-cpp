@@ -76,9 +76,7 @@ public:
                            const T &carrier,
                            context::Context &context) noexcept override
   {
-    SpanContext span_context = SpanContext();
-    ExtractImpl(getter, carrier, span_context);
-    std::cout<<"extraction success"<<std::endl;
+    SpanContext span_context    = ExtractImpl(getter, carrier);
     nostd::string_view span_key = "current-span";
     nostd::shared_ptr<Span> sp{new DefaultSpan(span_context)};
     return context.SetValue(span_key, sp);
@@ -314,8 +312,7 @@ private:
       TraceId trace_id_obj       = GenerateTraceIdFromString(trace_id);
       SpanId span_id_obj         = GenerateSpanIdFromString(span_id);
       TraceFlags trace_flags_obj = GenerateTraceFlagsFromString(trace_flags);
-      TraceState trace_state_obj = TraceState();
-      return SpanContext(trace_id_obj, span_id_obj, trace_flags_obj, trace_state_obj, true);
+      return SpanContext(trace_id_obj, span_id_obj, trace_flags_obj, TraceState(), true);
     }
     else
     {
@@ -324,8 +321,9 @@ private:
     }
   }
 
-  static void ExtractTraceState(nostd::string_view &trace_state_header, TraceState &trace_state)
+  static TraceState ExtractTraceState(nostd::string_view &trace_state_header)
   {
+    TraceState trace_state = TraceState();
     int start_pos          = -1;
     int end_pos            = -1;
     int ctr_pos            = -1;
@@ -382,11 +380,11 @@ private:
       }
       element_num++;
     }
-//    if (element_num >= kTraceStateMaxMembers)
-//    {
-//      trace_state(TraceState());  // too many k-v pairs will result in an invalid trace state
-//    }
-    return;
+    if (element_num >= kTraceStateMaxMembers)
+    {
+      return TraceState();  // too many k-v pairs will result in an invalid trace state
+    }
+    return trace_state;
   }
 
   static void AddNewMember(TraceState &trace_state, nostd::string_view member)
@@ -401,35 +399,27 @@ private:
     }
   }
 
-  static void ExtractImpl(Getter getter, const T &carrier, SpanContext &span_context)
+  static SpanContext ExtractImpl(Getter getter, const T &carrier)
   {
     nostd::string_view trace_parent = getter(carrier, kTraceParent);
     if (trace_parent == "")
     {
-      span_context = SpanContext(false, false);
-      return;
+      return SpanContext(false, false);
     }
     SpanContext context_from_parent_header = ExtractContextFromTraceParent(trace_parent);
     if (!context_from_parent_header.IsValid())
     {
-      span_context = SpanContext(context_from_parent_header);
-      return;
+      return context_from_parent_header;
     }
 
     nostd::string_view trace_state_header = getter(carrier, kTraceState);
     if (trace_state_header == "" || trace_state_header.empty())
     {
-      span_context = SpanContext(context_from_parent_header);
-      return;
+      return context_from_parent_header;
     }
-    std::cout<<"trace state extracting"<<std::endl;
-    TraceState trace_state = TraceState();
-    ExtractTraceState(trace_state_header, trace_state);
-    std::cout<<"trace state extracted"<<std::endl;
-    span_context = SpanContext(context_from_parent_header.trace_id(), context_from_parent_header.span_id(),
+    TraceState trace_state = ExtractTraceState(trace_state_header);
+    return SpanContext(context_from_parent_header.trace_id(), context_from_parent_header.span_id(),
                        context_from_parent_header.trace_flags(), trace_state, true);
-    std::cout<<"spn ctx assigned"<<std::endl;
-    return;
   }
 };
 }  // namespace propagation
