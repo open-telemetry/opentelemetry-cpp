@@ -1,4 +1,5 @@
 #include "opentelemetry/trace/noop.h"
+#include "opentelemetry/core/timestamp.h"
 
 #include <map>
 #include <memory>
@@ -6,6 +7,7 @@
 
 #include <gtest/gtest.h>
 
+using opentelemetry::core::SystemTimestamp;
 using opentelemetry::trace::NoopTracer;
 using opentelemetry::trace::Tracer;
 
@@ -31,5 +33,10 @@ TEST(NoopTest, UseNoopTracers)
 
   EXPECT_EQ(s1->IsRecording(), false);
 
-  s1->SetStatus(404, "span unavailable")
+  s1->SetStatus(404, "span unavailable");
+
+  s1->UpdateName("test_name");
+
+  SystemTimestamp t1;
+  s1->AddEvent("test_time_stamp", t1);
 }
