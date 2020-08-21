@@ -49,8 +49,10 @@ public:
    */
   void checkpoint() override
   {
+    this->mu_.lock();
     this->checkpoint_ = this->values_;
     this->values_[0]  = 0;
+    this->mu_.unlock();
   }
 
   /**

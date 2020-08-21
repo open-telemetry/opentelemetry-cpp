@@ -1,10 +1,5 @@
 #pragma once
 
-#include "opentelemetry/metrics/instrument.h"
-#include "opentelemetry/sdk/metrics/aggregator/aggregator.h"
-#include "opentelemetry/sdk/metrics/record.h"
-#include "opentelemetry/version.h"
-
 #include <iostream>
 #include <map>
 #include <memory>
@@ -12,6 +7,10 @@
 #include <string>
 #include <unordered_map>
 #include <vector>
+#include "opentelemetry/metrics/instrument.h"
+#include "opentelemetry/sdk/metrics/aggregator/aggregator.h"
+#include "opentelemetry/sdk/metrics/record.h"
+#include "opentelemetry/version.h"
 
 namespace metrics_api = opentelemetry::metrics;
 namespace trace_api   = opentelemetry::trace;
@@ -85,7 +84,12 @@ public:
    * @param none
    * @return void
    */
-  virtual void unbind() override { ref_ -= 1; }
+  virtual void unbind() override
+  {
+    this->mu_.lock();
+    ref_ -= 1;
+    this->mu_.unlock();
+  }
 
   /**
    * Increments the reference count. This function is used when binding or instantiating.
@@ -93,7 +97,12 @@ public:
    * @param none
    * @return void
    */
-  virtual void inc_ref() override { ref_ += 1; }
+  virtual void inc_ref() override
+  {
+    this->mu_.lock();
+    ref_ += 1;
+    this->mu_.unlock();
+  }
 
   /**
    * Returns the current reference count of the instrument.  This value is used to
@@ -102,7 +111,13 @@ public:
    * @param none
    * @return current ref count of the instrument
    */
-  virtual int get_ref() override { return ref_; }
+  virtual int get_ref() override
+  {
+    this->mu_.lock();
+    auto ret = ref_;
+    this->mu_.unlock();
+    return ret;
+  }
 
   /**
    * Records a single synchronous metric event via a call to the aggregator.
@@ -164,6 +179,7 @@ public:
     return nostd::shared_ptr<BoundSynchronousInstrument<T>>();
   }
 
+  // This function is necessary for batch recording and should NOT be called by the user
   virtual void update(T value, const trace::KeyValueIterable &labels) override = 0;
 
   /**
@@ -175,6 +191,49 @@ public:
    * @return vector of Records which hold the data attached to this synchronous instrument
    */
   virtual std::vector<Record> GetRecords() = 0;
+};
+
+template <class T>
+class AsynchronousInstrument : public Instrument,
+                               virtual public metrics_api::AsynchronousInstrument<T>
+{
+
+public:
+  AsynchronousInstrument() = default;
+
+  AsynchronousInstrument(nostd::string_view name,
+                         nostd::string_view description,
+                         nostd::string_view unit,
+                         bool enabled,
+                         void (*callback)(metrics_api::ObserverResult<T>),
+                         metrics_api::InstrumentKind kind)
+      : Instrument(name, description, unit, enabled, kind)
+  {
+    this->callback_ = callback;
+  }
+
+  /**
+   * Captures data through a manual call rather than the automatic collection process instituted
+   * in the run function.  Asynchronous instruments are generally expected to obtain data from
+   * their callbacks rather than direct calls.  This function is used by the callback to store data.
+   *
+   * @param value is the numerical representation of the metric being captured
+   * @param labels is the numerical representation of the metric being captured
+   * @return none
+   */
+  virtual void observe(T value, const trace::KeyValueIterable &labels) override = 0;
+
+  virtual std::vector<Record> GetRecords() = 0;
+
+  /**
+   * Captures data by activating the callback function associated with the
+   * instrument and storing its return value.  Callbacks for asynchronous
+   * instruments are defined during construction.
+   *
+   * @param none
+   * @return none
+   */
+  virtual void run() override = 0;
 };
 
 // Helper functions for turning a trace::KeyValueIterable into a string
