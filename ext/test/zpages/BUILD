@@ -37,6 +37,18 @@ cc_test(
 )
 
 otel_cc_benchmark(
+    name = "tracez_aggregator_benchmark",
+    srcs = [
+        "tracez_data_aggregator_benchmark.cc",
+    ],
+    deps = [
+        "//ext/src/zpages",
+        "//sdk/src/trace",
+        "//api",
+    ],
+)
+
+otel_cc_benchmark(
     name = "tracez_processor_benchmark",
     srcs = [
         "tracez_processor_benchmark.cc",
