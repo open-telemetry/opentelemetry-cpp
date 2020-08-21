@@ -83,5 +83,5 @@ TEST(HTTPTextFormatTest, PropagateInvalidContext)
       "current-span",
       nostd::shared_ptr<trace::Span>(new trace::DefaultSpan(trace::SpanContext::GetInvalid()))};
   format.Inject(Setter, carrier, ctx);
-  EXPECT_TRUE(carrier.count("traceparent") == 1);
+  EXPECT_TRUE(carrier.count("traceparent") == 0);
 }
