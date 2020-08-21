@@ -120,14 +120,14 @@ public:
 
   static TraceId GenerateTraceIdFromString(nostd::string_view trace_id)
   {
-    uint8_t buf[kTraceIdBytes / 2];
+    uint8_t buf[kTraceIdBytes / 2] = {0};
     GenerateBuffer(trace_id, kTraceIdBytes, buf);
     return TraceId(buf);
   }
 
   static SpanId GenerateSpanIdFromString(nostd::string_view span_id)
   {
-    uint8_t buf[kSpanIdBytes / 2];
+    uint8_t buf[kSpanIdBytes / 2] = {0};
     GenerateBuffer(span_id, kSpanIdBytes, buf);
     return SpanId(buf);
   }
