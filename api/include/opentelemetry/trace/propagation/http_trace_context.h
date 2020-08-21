@@ -93,7 +93,7 @@ public:
     }
   }
 
-  static void GenerateBuffer(nostd::string_view string, int bytes, uint8_t *buffer)
+  static void GenerateBuffer(nostd::string_view string, int bytes, uint8_t buf[])
   {
     const char *str_id = string.begin();
     for (int i = 0; i < bytes; i++)
@@ -103,17 +103,17 @@ public:
       {
         for (int j = 0; j < bytes / 2; j++)
         {
-          buffer[j] = 0;
+          buf[j] = 0;
         }
         return;
       }
       if (i % 2 == 0)
       {
-        buffer[i / 2] = tmp * 16;
+        buf[i / 2] = tmp * 16;
       }
       else
       {
-        buffer[i / 2] += tmp;
+        buf[i / 2] += tmp;
       }
     }
   }
@@ -121,15 +121,15 @@ public:
   static TraceId GenerateTraceIdFromString(nostd::string_view trace_id)
   {
     uint8_t buf[kTraceIdBytes / 2];
-    GenerateBuffer(trace_id, kTraceIdBytes, &buf);
+    GenerateBuffer(trace_id, kTraceIdBytes, buf);
     return TraceId(buf);
   }
 
   static SpanId GenerateSpanIdFromString(nostd::string_view span_id)
   {
     uint8_t buf[kSpanIdBytes / 2];
-    GenerateBuffer(span_id, kSpanIdBytes, &buf);
-    return SpanId(buf);
+    GenerateBuffer(span_id, kSpanIdBytes, buf);
+    return SpanId();
   }
 
   static TraceFlags GenerateTraceFlagsFromString(nostd::string_view trace_flags)
