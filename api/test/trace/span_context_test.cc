@@ -43,9 +43,9 @@ TEST(SpanContextTest, TraceFlags)
 TEST(SpanContextTest, Invalid)
 {
   SpanContext s1(false, false);
-  ASSERT_FALSE(s1.IsValid());
+  EXPECT_FALSE(s1.IsValid());
 
   // Test that trace id and span id are invalid
-  ASSERT_EQ(s1.trace_id(), opentelemetry::trace::TraceId());
-  ASSERT_EQ(s1.span_id(), opentelemetry::trace::SpanId());
+  EXPECT_EQ(s1.trace_id(), opentelemetry::trace::TraceId());
+  EXPECT_EQ(s1.span_id(), opentelemetry::trace::SpanId());
 }

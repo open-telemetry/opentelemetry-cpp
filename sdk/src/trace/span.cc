@@ -88,11 +88,11 @@ Span::Span(std::shared_ptr<Tracer> &&tracer,
   }
   // TODO: Create and populate SpanContext for this span when SpanContext is fully implemented
 
-  attributes.ForEachKeyValue(
-      [&](nostd::string_view key, opentelemetry::common::AttributeValue value) noexcept {
-        recordable_->SetAttribute(key, value);
-        return true;
-      });
+  attributes.ForEachKeyValue([&](nostd::string_view key,
+                                 opentelemetry::common::AttributeValue value) noexcept {
+    recordable_->SetAttribute(key, value);
+    return true;
+  });
 
   recordable_->SetStartTime(NowOr(options.start_system_time));
   start_steady_time = NowOr(options.start_steady_time);
