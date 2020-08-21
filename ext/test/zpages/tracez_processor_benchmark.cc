@@ -1,49 +1,56 @@
+#include "opentelemetry/context/threadlocal_context.h"
 #include "opentelemetry/ext/zpages/tracez_processor.h"
 
 #include <benchmark/benchmark.h>
+#include <thread>
 
 #include "opentelemetry/sdk/trace/tracer.h"
-#include "opentelemetry/nostd/shared_ptr.h"
 
 using namespace opentelemetry::sdk::trace;
 using namespace opentelemetry::ext::zpages;
 
-//////////////////////////////////// TEST HELPER FUNCTIONS //////////////////////////////
+/////////////////////////////// BENCHMARK HELPER FUNCTIONS //////////////////////////////
 
 /*
- * Helper function that creates i spans, added into the passed in vector
+ * Helper function that creates i spans, which are added into the passed
+ * in vector. Used for testing thread safety
  */
-void StartManySameSpans(
+void StartManySpans(
     std::vector<opentelemetry::nostd::shared_ptr<opentelemetry::trace::Span>> &spans,
     std::shared_ptr<opentelemetry::trace::Tracer> tracer,
     int i)
 {
   for (; i > 0; i--)
-    spans.push_back(tracer->StartSpan("span"));
+    spans.push_back(tracer->StartSpan(""));
 }
 
 /*
  * Helper function that ends all spans in the passed in span vector.
  */
-void EndSpans(std::vector<opentelemetry::nostd::shared_ptr<opentelemetry::trace::Span>> &spans)
+void EndAllSpans(std::vector<opentelemetry::nostd::shared_ptr<opentelemetry::trace::Span>> &spans)
 {
   for (auto &span : spans)
     span->End();
 }
 
-//////////////////////////////// TEST FIXTURE //////////////////////////////////////
-
 /*
- * Reduce code duplication by having single area with shared setup code
+ * Helper function calls GetSpanSnapshot() i times, does nothing otherwise
  */
-class TracezProcessorBM : public benchmark::Fixture
+void GetManySnapshots(std::shared_ptr<TracezSpanProcessor> &processor, int i)
+{
+  for (; i > 0; i--)
+    processor->GetSpanSnapshot();
+}
+
+////////////////////////  FIXTURE FOR SHARED SETUP CODE ///////////////////
+
+class TracezProcessor : public benchmark::Fixture
 {
 protected:
   void SetUp(const ::benchmark::State& state)
   {
     processor  = std::shared_ptr<TracezSpanProcessor>(new TracezSpanProcessor());
     tracer     = std::shared_ptr<opentelemetry::trace::Tracer>(new Tracer(processor));
-
   }
 
   std::shared_ptr<TracezSpanProcessor> processor;
@@ -51,20 +58,88 @@ protected:
 
   std::vector<opentelemetry::nostd::shared_ptr<opentelemetry::trace::Span>> spans;
 
-  const int numIterations = 1000;
-  const int numSpans      = 500;
+  const int numSpans      = 50;
 };
 
-///////////////////////////////////////// TESTS ///////////////////////////////////
+//////////////////////////// BENCHMARK DEFINITIONS /////////////////////////////////
 
-BENCHMARK_F(TracezProcessorBM, BM_TracezProcessorManySameName)(benchmark::State &state)
+/*
+ * Make and end many empty spans.
+ */
+
+BENCHMARK_DEFINE_F(TracezProcessor, BM_RunComplete)(benchmark::State &state)
 {
-  while(state.KeepRunningBatch(numIterations))
+  for (auto _ : state)
   {
-    StartManySameSpans(spans, tracer, 500);
-    EndSpans(spans);
+    StartManySpans(spans, tracer, numSpans);
+    EndAllSpans(spans);
   }
 }
 
+/*
+ * Make many empty spans while spapshots grabbed.
+ */
+BENCHMARK_DEFINE_F(TracezProcessor, BM_RunSnap)(benchmark::State &state)
+{
+  for (auto _ : state)
+  {
+    std::thread start(StartManySpans, std::ref(spans), tracer, numSpans);
+    std::thread snapshots(GetManySnapshots, std::ref(processor), numSpans);
+
+    start.join();
+    snapshots.join();
+
+    EndAllSpans(spans);
+  }
+}
+
+/*
+ * Make many empty spans end while snapshots are being grabbed.
+ */
+BENCHMARK_DEFINE_F(TracezProcessor, BM_SnapComplete)(benchmark::State &state)
+{
+  for (auto _ : state)
+  {
+    StartManySpans(spans, tracer, numSpans);
+
+    std::thread snapshots(GetManySnapshots, std::ref(processor), numSpans);
+    std::thread end(EndAllSpans, std::ref(spans));
+
+    snapshots.join();
+    end.join();
+  }
+
+}
+
+/*
+ * Make many empty spans and end them, all while snapshots are being grabbed.
+ */
+BENCHMARK_DEFINE_F(TracezProcessor, BM_RunSnapComplete)(benchmark::State &state)
+{
+  for (auto _ : state)
+  {
+    std::vector<opentelemetry::nostd::shared_ptr<opentelemetry::trace::Span>> spans2;
+
+    StartManySpans(spans, tracer, numSpans);
+
+    std::thread start(StartManySpans, std::ref(spans2), tracer, numSpans);
+    std::thread snapshots(GetManySnapshots, std::ref(processor), numSpans);
+    std::thread end(EndAllSpans, std::ref(spans));
+
+    start.join();
+    snapshots.join();
+    end.join();
+
+    EndAllSpans(spans2);
+  }
+}
+
+/////////////////////// RUN BENCHMARKS ///////////////////////////
+
+BENCHMARK_REGISTER_F(TracezProcessor, BM_RunComplete)->Arg(10)->Arg(1000);
+BENCHMARK_REGISTER_F(TracezProcessor, BM_RunSnap)->Arg(10)->Arg(1000);
+BENCHMARK_REGISTER_F(TracezProcessor, BM_SnapComplete)->Arg(10)->Arg(1000);
+BENCHMARK_REGISTER_F(TracezProcessor, BM_RunSnapComplete)->Arg(10)->Arg(1000);
 
 BENCHMARK_MAIN();
+
