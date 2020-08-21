@@ -37,8 +37,11 @@ void StartEndSpansLatency(
   start.start_steady_time = SteadyTimestamp(nanoseconds(0));
   for (; i > 0; i--)
   {
+    // Latency bucket depends on the index
+    auto latency_band = kLatencyBoundaries[i % kLatencyBoundaries.size()];
     opentelemetry::trace::EndSpanOptions end;
-    end.end_steady_time = SteadyTimestamp(kLatencyBoundaries[i % kLatencyBoundaries.size()]);
+    end.end_steady_time = SteadyTimestamp(latency_band);
+
     tracer->StartSpan(isUnique ? std::to_string(i) : "", start)->End(end);
   }
 }
