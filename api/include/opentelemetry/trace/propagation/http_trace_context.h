@@ -181,12 +181,12 @@ private:
     {
       hex_string.push_back(trace_id[i]);
     }
-    hex_string.push_back("-");
+    hex_string.push_back('-');
     for (int i = 0; i < 16; i++)
     {
       hex_string.push_back(span_id[i]);
     }
-    hex_string.push_back("-");
+    hex_string.push_back('-');
     for (int i = 0; i < 2; i++)
     {
       hex_string.push_back(trace_flags[i]);
