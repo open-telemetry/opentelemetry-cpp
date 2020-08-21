@@ -181,11 +181,20 @@ private:
     TraceFlags(span_context.trace_flags()).ToLowerBase16(trace_flags);
     // Note: This is only temporary replacement for appendable string
     std::string hex_string = "00-";
-    hex_string += trace_id;
-    hex_string += '-';
-    hex_string += span_id;
-    hex_string += '-';
-    hex_string += trace_flags;
+    for (int i = 0; i < 32; i++)
+    {
+      hex_string.push_back(trace_id[i]);
+    }
+    hex_string.push_back('-');
+    for (int i = 0; i < 16; i++)
+    {
+      hex_string.push_back(span_id[i]);
+    }
+    hex_string.push_back('-');
+    for (int i = 0; i < 2; i++)
+    {
+      hex_string.push_back(trace_flags[i]);
+    }
     setter(carrier, kTraceParent, hex_string);
   }
 
