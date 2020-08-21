@@ -179,17 +179,17 @@ private:
     std::string hex_string = "00-";
     for (int i = 0; i < 32; i++)
     {
-      hex_string.append(trace_id[i]);
+      hex_string.push_back(trace_id[i]);
     }
-    hex_string.append("-");
+    hex_string.push_back("-");
     for (int i = 0; i < 16; i++)
     {
-      hex_string.append(span_id[i]);
+      hex_string.push_back(span_id[i]);
     }
-    hex_string.append("-");
+    hex_string.push_back("-");
     for (int i = 0; i < 2; i++)
     {
-      hex_string.append(trace_flags[i]);
+      hex_string.push_back(trace_flags[i]);
     }
     setter(carrier, kTraceParent, hex_string);
   }
