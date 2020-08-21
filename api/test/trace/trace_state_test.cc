@@ -23,10 +23,10 @@ TEST(EntryTest, KeyValueConstruction)
   TraceState::Entry e(key, val);
 
   EXPECT_EQ(key.size(), e.GetKey().size());
-  EXPECT_EQ(strcmp(key.data(), e.GetKey().data()), 0);
+  EXPECT_EQ(key, e.GetKey());
 
   EXPECT_EQ(val.size(), e.GetValue().size());
-  EXPECT_EQ(strcmp(val.data(), e.GetValue().data()), 0);
+  EXPECT_EQ(val, e.GetValue());
 }
 
 // Test copy constructor
@@ -34,8 +34,8 @@ TEST(EntryTest, Copy)
 {
   TraceState::Entry e("test_key", "test_value");
   TraceState::Entry copy(e);
-  EXPECT_EQ(strcmp(copy.GetKey().data(), e.GetKey().data()), 0);
-  EXPECT_EQ(strcmp(copy.GetValue().data(), e.GetValue().data()), 0);
+  EXPECT_EQ(copy.GetKey(), e.GetKey());
+  EXPECT_EQ(copy.GetValue(), e.GetValue());
 }
 
 // Test assignment operator
@@ -44,8 +44,8 @@ TEST(EntryTest, Assignment)
   TraceState::Entry e("test_key", "test_value");
   TraceState::Entry empty;
   empty = e;
-  EXPECT_EQ(strcmp(empty.GetKey().data(), e.GetKey().data()), 0);
-  EXPECT_EQ(strcmp(empty.GetValue().data(), e.GetValue().data()), 0);
+  EXPECT_EQ(empty.GetKey(), e.GetKey());
+  EXPECT_EQ(empty.GetValue(), e.GetValue());
 }
 
 TEST(EntryTest, SetValue)
@@ -55,7 +55,7 @@ TEST(EntryTest, SetValue)
   e.SetValue(new_val);
 
   EXPECT_EQ(new_val.size(), e.GetValue().size());
-  EXPECT_EQ(strcmp(new_val.data(), e.GetValue().data()), 0);
+  EXPECT_EQ(new_val, e.GetValue());
 }
 
 // -------------------------- TraceState class tests ---------------------------
@@ -65,9 +65,9 @@ TEST(TraceStateTest, DefaultConstruction)
   TraceState s;
   opentelemetry::nostd::string_view return_val = "";
   EXPECT_FALSE(s.Get("missing_key", return_val));
-  EXPECT_EQ(return_val.data(), "");
+  EXPECT_EQ(return_val, "");
   EXPECT_TRUE(s.Empty());
-  EXPECT_EQ(0, s.Entries().size());
+  EXPECT_EQ(s.Entries().size(), 0);
 }
 
 TEST(TraceStateTest, Set)
@@ -84,8 +84,8 @@ TEST(TraceStateTest, Set)
 
   opentelemetry::nostd::span<TraceState::Entry> entries = s.Entries();
   EXPECT_EQ(entries.size(), 1);
-  EXPECT_EQ(entries[0].GetKey().data(), key);
-  EXPECT_EQ(entries[0].GetValue().data(), val);
+  EXPECT_EQ(entries[0].GetKey(), key);
+  EXPECT_EQ(entries[0].GetValue(), val);
 }
 
 TEST(TraceStateTest, Get)
@@ -105,12 +105,12 @@ TEST(TraceStateTest, Get)
   for (int i = 0; i < kNumPairs; i++)
   {
     EXPECT_TRUE(s.Get(keys[i], return_val));
-    EXPECT_EQ(return_val.data(), values[i]);
+    EXPECT_EQ(return_val, values[i]);
     return_val = "";
   }
 
   EXPECT_FALSE(s.Get("fake_key", return_val));
-  EXPECT_EQ(return_val.data(), "");
+  EXPECT_EQ(return_val, "");
 }
 
 TEST(TraceStateTest, Empty)
@@ -137,8 +137,8 @@ TEST(TraceStateTest, Entries)
   opentelemetry::nostd::span<TraceState::Entry> entries = s.Entries();
   for (int i = 0; i < kNumPairs; i++)
   {
-    EXPECT_EQ(entries[i].GetKey().data(), keys[i]);
-    EXPECT_EQ(entries[i].GetValue().data(), values[i]);
+    EXPECT_EQ(entries[i].GetKey(), keys[i]);
+    EXPECT_EQ(entries[i].GetValue(), values[i]);
   }
 }
 
