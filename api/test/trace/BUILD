@@ -1,6 +1,28 @@
 load("//bazel:otel_cc_benchmark.bzl", "otel_cc_benchmark")
 
 cc_test(
+    name = "default_span_test",
+    srcs = [
+        "default_span_test.cc",
+    ],
+    deps = [
+        "//api",
+        "@com_google_googletest//:gtest_main",
+    ],
+)
+
+cc_test(
+    name = "noop_test",
+    srcs = [
+        "noop_test.cc",
+    ],
+    deps = [
+        "//api",
+        "@com_google_googletest//:gtest_main",
+    ],
+)
+
+cc_test(
     name = "key_value_iterable_view_test",
     srcs = [
         "key_value_iterable_view_test.cc",

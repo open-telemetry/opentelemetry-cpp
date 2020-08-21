@@ -38,11 +38,11 @@ static void Setter(std::map<std::string, std::string> &carrier,
   carrier[std::string(trace_type)] = std::string(trace_description);
 }
 
-static trace::propagation::HttpTraceContext<std::map<std::string, std::string>> format =
-    trace::propagation::HttpTraceContext<std::map<std::string, std::string>>();
-
 using MapHttpTraceContext =
     trace::propagation::HttpTraceContext<std::map<std::string, std::string>>;
+
+static MapHttpTraceContext format = MapHttpTraceContext();
+
 TEST(HTTPTextFormatTest, TraceIdBufferGeneration)
 {
   constexpr uint8_t buf[] = {1, 2, 3, 4, 5, 6, 7, 8, 8, 7, 0xaa, 0xbb, 0xcc, 0xdd, 0xee, 0xff};
@@ -81,17 +81,18 @@ TEST(HTTPTextFormatTest, HeadersWithTraceState)
 
 TEST(HTTPTextFormatTest, NoTraceParentHeader)
 {
-  // When trace context headers are not present, a new SpanContext
+  // When trace context headers are not present, a new valid SpanContext
   // should be created.
   const std::map<std::string, std::string> carrier = {};
   context::Context ctx1 =
       context::Context("current-span", nostd::shared_ptr<trace::Span>(new trace::DefaultSpan()));
-  context::Context ctx2 = format.Extract(Getter, carrier, ctx1);
-  trace::Span *span     = MapHttpTraceContext::GetCurrentSpan(ctx2);
-  EXPECT_EQ(span->GetContext().trace_id(), trace::SpanContext(false, false).trace_id());
-  EXPECT_EQ(span->GetContext().span_id(), trace::SpanContext(false, false).span_id());
-  EXPECT_EQ(span->GetContext().trace_flags(), trace::SpanContext(false, false).trace_flags());
-  EXPECT_EQ(span->GetContext().trace_state(), trace::SpanContext(false, false).trace_state());
+  context::Context ctx2           = format.Extract(Getter, carrier, ctx1);
+  trace::SpanContext span_context = trace::SpanContext();
+  MapHttpTraceContext::GetCurrentSpan(ctx2, span_context);
+  EXPECT_EQ(span_context.trace_id(), trace::SpanContext(false, false).trace_id());
+  EXPECT_EQ(span_context.span_id(), trace::SpanContext(false, false).span_id());
+  EXPECT_EQ(span_context.trace_flags(), trace::SpanContext(false, false).trace_flags());
+  EXPECT_EQ(span_context.trace_state(), trace::SpanContext(false, false).trace_state());
 }
 
 TEST(HTTPTextFormatTest, InvalidTraceId)
@@ -104,12 +105,13 @@ TEST(HTTPTextFormatTest, InvalidTraceId)
       {"tracestate", "foo=1,bar=2,foo=3"}};
   context::Context ctx1 =
       context::Context("current-span", nostd::shared_ptr<trace::Span>(new trace::DefaultSpan()));
-  context::Context ctx2 = format.Extract(Getter, carrier, ctx1);
-  trace::Span *span     = MapHttpTraceContext::GetCurrentSpan(ctx2);
-  EXPECT_EQ(span->GetContext().trace_id(), trace::SpanContext(false, false).trace_id());
-  EXPECT_EQ(span->GetContext().span_id(), trace::SpanContext(false, false).span_id());
-  EXPECT_EQ(span->GetContext().trace_flags(), trace::SpanContext(false, false).trace_flags());
-  EXPECT_EQ(span->GetContext().trace_state(), trace::SpanContext(false, false).trace_state());
+  context::Context ctx2           = format.Extract(Getter, carrier, ctx1);
+  trace::SpanContext span_context = trace::SpanContext();
+  MapHttpTraceContext::GetCurrentSpan(ctx2, span_context);
+  EXPECT_EQ(span_context.trace_id(), trace::SpanContext(false, false).trace_id());
+  EXPECT_EQ(span_context.span_id(), trace::SpanContext(false, false).span_id());
+  EXPECT_EQ(span_context.trace_flags(), trace::SpanContext(false, false).trace_flags());
+  EXPECT_EQ(span_context.trace_state(), trace::SpanContext(false, false).trace_state());
 }
 
 TEST(HTTPTextFormatTest, InvalidParentId)
@@ -122,12 +124,13 @@ TEST(HTTPTextFormatTest, InvalidParentId)
       {"tracestate", "foo=1,bar=2,foo=3"}};
   context::Context ctx1 =
       context::Context("current-span", nostd::shared_ptr<trace::Span>(new trace::DefaultSpan()));
-  context::Context ctx2 = format.Extract(Getter, carrier, ctx1);
-  trace::Span *span     = MapHttpTraceContext::GetCurrentSpan(ctx2);
-  EXPECT_EQ(span->GetContext().trace_id(), trace::SpanContext(false, false).trace_id());
-  EXPECT_EQ(span->GetContext().span_id(), trace::SpanContext(false, false).span_id());
-  EXPECT_EQ(span->GetContext().trace_flags(), trace::SpanContext(false, false).trace_flags());
-  EXPECT_EQ(span->GetContext().trace_state(), trace::SpanContext(false, false).trace_state());
+  context::Context ctx2           = format.Extract(Getter, carrier, ctx1);
+  trace::SpanContext span_context = trace::SpanContext();
+  MapHttpTraceContext::GetCurrentSpan(ctx2, span_context);
+  EXPECT_EQ(span_context.trace_id(), trace::SpanContext(false, false).trace_id());
+  EXPECT_EQ(span_context.span_id(), trace::SpanContext(false, false).span_id());
+  EXPECT_EQ(span_context.trace_flags(), trace::SpanContext(false, false).trace_flags());
+  EXPECT_EQ(span_context.trace_state(), trace::SpanContext(false, false).trace_state());
 }
 
 TEST(HTTPTextFormatTest, NoSendEmptyTraceState)
@@ -153,13 +156,14 @@ TEST(HTTPTextFormatTest, FormatNotSupported)
       {"tracestate", "foo=1,bar=2,foo=3"}};
   context::Context ctx1 =
       context::Context("current-span", nostd::shared_ptr<trace::Span>(new trace::DefaultSpan()));
-  context::Context ctx2 = format.Extract(Getter, carrier, ctx1);
-  trace::Span *span     = MapHttpTraceContext::GetCurrentSpan(ctx2);
-  EXPECT_FALSE(span->GetContext().IsValid());
-  EXPECT_EQ(span->GetContext().trace_id(), trace::SpanContext(false, false).trace_id());
-  EXPECT_EQ(span->GetContext().span_id(), trace::SpanContext(false, false).span_id());
-  EXPECT_EQ(span->GetContext().trace_flags(), trace::SpanContext(false, false).trace_flags());
-  EXPECT_EQ(span->GetContext().trace_state(), trace::SpanContext(false, false).trace_state());
+  context::Context ctx2           = format.Extract(Getter, carrier, ctx1);
+  trace::SpanContext span_context = trace::SpanContext();
+  MapHttpTraceContext::GetCurrentSpan(ctx2, span_context);
+  EXPECT_FALSE(span_context.IsValid());
+  EXPECT_EQ(span_context.trace_id(), trace::SpanContext(false, false).trace_id());
+  EXPECT_EQ(span_context.span_id(), trace::SpanContext(false, false).span_id());
+  EXPECT_EQ(span_context.trace_flags(), trace::SpanContext(false, false).trace_flags());
+  EXPECT_EQ(span_context.trace_state(), trace::SpanContext(false, false).trace_state());
 }
 
 TEST(HTTPTextFormatTest, PropagateInvalidContext)
@@ -181,9 +185,10 @@ TEST(HTTPTextFormatTest, TraceStateHeaderWithTrailingComma)
       {"tracestate", "foo=1,"}};
   context::Context ctx1 =
       context::Context("current-span", nostd::shared_ptr<trace::Span>(new trace::DefaultSpan()));
-  context::Context ctx2         = format.Extract(Getter, carrier, ctx1);
-  trace::Span *span             = MapHttpTraceContext::GetCurrentSpan(ctx2);
-  trace::TraceState trace_state = span->GetContext().trace_state();
+  context::Context ctx2           = format.Extract(Getter, carrier, ctx1);
+  trace::SpanContext span_context = trace::SpanContext();
+  MapHttpTraceContext::GetCurrentSpan(ctx2, span_context);
+  trace::TraceState trace_state = span_context.trace_state();
   nostd::string_view value;
   EXPECT_TRUE(trace_state.Get("foo", value));
   EXPECT_EQ(value, "1");
@@ -198,9 +203,10 @@ TEST(HTTPTextFormatTest, TraceStateKeys)
       {"tracestate", trace_state_value}};
   context::Context ctx1 =
       context::Context("current-span", nostd::shared_ptr<trace::Span>(new trace::DefaultSpan()));
-  context::Context ctx2         = format.Extract(Getter, carrier, ctx1);
-  trace::Span *span             = MapHttpTraceContext::GetCurrentSpan(ctx2);
-  trace::TraceState trace_state = span->GetContext().trace_state();
+  context::Context ctx2           = format.Extract(Getter, carrier, ctx1);
+  trace::SpanContext span_context = trace::SpanContext();
+  MapHttpTraceContext::GetCurrentSpan(ctx2, span_context);
+  trace::TraceState trace_state = span_context.trace_state();
   nostd::string_view value;
   EXPECT_TRUE(trace_state.Get("1a-2f@foo", value));
   EXPECT_EQ(value, "bar1");

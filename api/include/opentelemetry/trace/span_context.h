@@ -52,12 +52,14 @@ public:
     trace_state_.reset(new TraceState(trace_state));
     remote_parent_ = has_remote_parent;
   }
+
   SpanContext(SpanContext &&ctx)
       : trace_id_(ctx.trace_id()),
         span_id_(ctx.span_id()),
         trace_flags_(ctx.trace_flags()),
         trace_state_(std::move(ctx.trace_state_))
   {}
+
   SpanContext(const SpanContext &ctx)
       : trace_id_(ctx.trace_id()),
         span_id_(ctx.span_id()),
@@ -73,6 +75,7 @@ public:
     trace_state_.reset(new TraceState(*(ctx.trace_state_.get())));
     return *this;
   };
+
   SpanContext &operator=(SpanContext &&ctx)
   {
     trace_id_    = ctx.trace_id_;
@@ -82,9 +85,18 @@ public:
     return *this;
   };
 
+  bool operator==(const SpanContext &that) const noexcept
+  {
+    return trace_id() == that.trace_id() && span_id() == that.span_id() &&
+           trace_flags() == that.trace_flags();
+  }
+
   const TraceId &trace_id() const noexcept { return trace_id_; }
+
   const SpanId &span_id() const noexcept { return span_id_; }
+
   const TraceFlags &trace_flags() const noexcept { return trace_flags_; }
+
   const TraceState &trace_state() const noexcept { return *trace_state_; }
 
   bool IsValid() const noexcept { return trace_id_.IsValid() && span_id_.IsValid(); }
@@ -116,4 +128,4 @@ private:
 };
 
 }  // namespace trace
-OPENTELEMETRY_END_NAMESPACE  // namespace opentelemetry
+OPENTELEMETRY_END_NAMESPACE
