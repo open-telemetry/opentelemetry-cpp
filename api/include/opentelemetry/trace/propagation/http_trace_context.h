@@ -93,20 +93,20 @@ public:
     }
   }
 
-  static TraceId GenerateTraceIdFromString(nostd::string_view trace_id)
+  static uint8_t GenerateBuffer(nostd::string_view string, int bytes)
   {
-    const char *trc_id = trace_id.begin();
-    uint8_t buf[kTraceIdBytes / 2];
-    for (int i = 0; i < kTraceIdBytes; i++)
+    const char *str_id = string.begin();
+    uint8_t buf[bytes / 2];
+    for (int i = 0; i < bytes; i++)
     {
-      int tmp = HexToInt(*trc_id);
+      int tmp = HexToInt(str_id[i]);
       if (tmp < 0)
       {
-        for (int j = 0; j < kTraceIdBytes / 2; j++)
+        for (int j = 0; j < bytes / 2; j++)
         {
           buf[j] = 0;
         }
-        return TraceId(buf);
+        return buf;
       }
       if (i % 2 == 0)
       {
@@ -116,40 +116,26 @@ public:
       {
         buf[i / 2] += tmp;
       }
-      trc_id++;
     }
-    return TraceId(buf);
+    return buf;
+  }
+
+  static TraceId GenerateTraceIdFromString(nostd::string_view trace_id)
+  {
+    return TraceId(GenerateBuffer(trace_id, kTraceIdBytes));
   }
 
   static SpanId GenerateSpanIdFromString(nostd::string_view span_id)
   {
-    const char *spn_id = span_id.begin();
-    uint8_t buf[kSpanIdBytes / 2];
-    for (int i = 0; i < kSpanIdBytes; i++)
-    {
-      int tmp = HexToInt(spn_id[i]);
-      if (tmp < 0)
-      {
-        for (int j = 0; j < kSpanIdBytes / 2; j++)
-        {
-          buf[j] = 0;
-        }
-        return SpanId(buf);
-      }
-      if (i % 2 == 0)
-      {
-        buf[i / 2] = tmp * 16;
-      }
-      else
-      {
-        buf[i / 2] += tmp;
-      }
-    }
-    return SpanId(buf);
+    return SpanId(GenerateBuffer(span_id, kSpanIdBytes));
   }
 
   static TraceFlags GenerateTraceFlagsFromString(nostd::string_view trace_flags)
   {
+    if (trace_flags.length() > 2)
+    {
+      return TraceFlags(0);  // check for invalid length of flags
+    }
     int tmp1 = HexToInt(trace_flags[0]);
     int tmp2 = HexToInt(trace_flags[1]);
     if (tmp1 < 0 || tmp2 < 0)
@@ -193,17 +179,17 @@ private:
     std::string hex_string = "00-";
     for (int i = 0; i < 32; i++)
     {
-      hex_string += trace_id[i];
+      hex_string.append(trace_id[i]);
     }
-    hex_string += "-";
+    hex_string.append("-");
     for (int i = 0; i < 16; i++)
     {
-      hex_string += span_id[i];
+      hex_string.append(span_id[i]);
     }
-    hex_string += "-";
+    hex_string.append("-");
     for (int i = 0; i < 2; i++)
     {
-      hex_string += trace_flags[i];
+      hex_string.append(trace_flags[i]);
     }
     setter(carrier, kTraceParent, hex_string);
   }
@@ -241,8 +227,8 @@ private:
     nostd::string_view trace_flags = trace_parent.substr(
         kHeaderElementLengths[0] + kHeaderElementLengths[1] + kHeaderElementLengths[2] + 3);
 
-    if (version == "ff" &&
-        (trace_id == "00000000000000000000000000000000" || span_id == "0000000000000000"))
+    if (version == "ff" || trace_id == "00000000000000000000000000000000" ||
+        span_id == "0000000000000000")
     {
       return SpanContext(false, false);
     }
