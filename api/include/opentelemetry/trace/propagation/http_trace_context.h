@@ -93,7 +93,7 @@ public:
     }
   }
 
-  static void GenerateBuffer(nostd::string_view string, int bytes, uint8_t[] & buffer)
+  static void GenerateBuffer(nostd::string_view string, int bytes, uint8_t[] &buffer)
   {
     const char *str_id = string.begin();
     for (int i = 0; i < bytes; i++)
