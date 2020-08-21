@@ -65,8 +65,6 @@ public:
    * @param records a vector of unique pointers to metric records
    */
   virtual ExportResult Export(const std::vector<Record> &records) noexcept = 0;
-
-
 };
 }  // namespace metrics
 }  // namespace sdk
