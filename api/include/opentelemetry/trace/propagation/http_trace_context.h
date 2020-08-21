@@ -93,7 +93,7 @@ public:
     }
   }
 
-  static void GenerateBuffer(nostd::string_view string, int bytes, uint8_t &buffer[])
+  static void GenerateBuffer(nostd::string_view string, int bytes, uint8_t *buffer)
   {
     const char *str_id = string.begin();
     for (int i = 0; i < bytes; i++)
@@ -120,15 +120,15 @@ public:
 
   static TraceId GenerateTraceIdFromString(nostd::string_view trace_id)
   {
-    uint8_t buf[kTraceIdBytes / 2] = {0};
-    GenerateBuffer(trace_id, kTraceIdBytes, buf);
+    uint8_t buf[kTraceIdBytes / 2];
+    GenerateBuffer(trace_id, kTraceIdBytes, &buf);
     return TraceId(buf);
   }
 
   static SpanId GenerateSpanIdFromString(nostd::string_view span_id)
   {
-    uint8_t buf[kSpanIdBytes / 2] = {0};
-    GenerateBuffer(span_id, kSpanIdBytes, buf);
+    uint8_t buf[kSpanIdBytes / 2];
+    GenerateBuffer(span_id, kSpanIdBytes, &buf);
     return SpanId(buf);
   }
 
