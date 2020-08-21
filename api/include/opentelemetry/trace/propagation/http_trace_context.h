@@ -131,7 +131,7 @@ public:
     uint8_t buf[kSpanIdBytes / 2];
     uint8_t *b_ptr = buf;
     GenerateBuffer(span_id, kSpanIdBytes, b_ptr);
-    return SpanId();
+    return SpanId(buf);
   }
 
   static TraceFlags GenerateTraceFlagsFromString(nostd::string_view trace_flags)
