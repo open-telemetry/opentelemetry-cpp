@@ -16,8 +16,8 @@
 #include <iostream>
 #include <map>
 #include <string>
-#include "opentelemetry/context/context.h"
 #include "opentelemetry/nostd/shared_ptr.h"
+#include "opentelemetry/context/context.h"
 #include "opentelemetry/nostd/span.h"
 #include "opentelemetry/nostd/string_view.h"
 #include "opentelemetry/nostd/variant.h"
