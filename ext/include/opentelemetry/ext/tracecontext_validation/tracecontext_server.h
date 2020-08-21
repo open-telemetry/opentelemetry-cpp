@@ -7,22 +7,23 @@
 #include <unordered_map>
 #include <vector>
 
-#include "opentelemetry/version.h"
+#include "opentelemetry/context/context.h"
 #include "opentelemetry/ext/http/server/http_server.h"
-#include "opentelemetry/nostd/unique_ptr.h"
+#include "opentelemetry/ext/tracecontext_validation/tracecontext_client.h"
 #include "opentelemetry/nostd/shared_ptr.h"
 #include "opentelemetry/nostd/string_view.h"
-#include "opentelemetry/context/context.h"
+#include "opentelemetry/nostd/unique_ptr.h"
 #include "opentelemetry/trace/default_span.h"
 #include "opentelemetry/trace/propagation/http_trace_context.h"
-#include "opentelemetry/ext/tracecontext_validation/tracecontext_client.h"
+#include "opentelemetry/version.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace ext
 {
 namespace validation
 {
-static trace::propagation::HttpTraceContext<std::map<std::string, std::string>> format = trace::propagation::HttpTraceContext<std::map<std::string, std::string>>();
+static trace::propagation::HttpTraceContext<std::map<std::string, std::string>> format =
+    trace::propagation::HttpTraceContext<std::map<std::string, std::string>>();
 class TraceContextServer : public HTTP_SERVER_NS::HttpServer
 {
 public:
@@ -129,8 +130,8 @@ private:
         return false;
       }
       std::string key1 = NormalizeName(begin, ptr);
-      key1 = Trim(key1, '\"');
-      key1 = Strip(key1);
+      key1             = Trim(key1, '\"');
+      key1             = Strip(key1);
       ptr++;
       while (*ptr == ' ')
       {
@@ -143,8 +144,8 @@ private:
         ptr++;
       }
       std::string val1 = std::string(begin, ptr);
-      val1 = Trim(val1, '\"', '\"');
-      kv_pairs[key1] = Strip(val1);
+      val1             = Trim(val1, '\"', '\"');
+      kv_pairs[key1]   = Strip(val1);
       ptr++;
       while (*ptr == ' ')
       {
@@ -161,8 +162,8 @@ private:
         return false;
       }
       std::string key2 = NormalizeName(begin, ptr);
-      key2 = Trim(key2, '\"');
-      key2 = Strip(key2);
+      key2             = Trim(key2, '\"');
+      key2             = Strip(key2);
       ptr++;
       while (*ptr == ' ')
       {
@@ -175,21 +176,25 @@ private:
         ptr++;
       }
       std::string val2 = std::string(begin, ptr);
-      val2 = Trim(val2, '\"', '\"');
-      kv_pairs[key2] = Strip(val2);
+      val2             = Trim(val2, '\"', '\"');
+      kv_pairs[key2]   = Strip(val2);
       send_list.push_back(kv_pairs);
-      if (*ptr == '}') {
+      if (*ptr == '}')
+      {
         ptr++;
       }
     }
     return true;
   }
 
-  static bool FormHeader(struct curl_slist *chunk, std::map<std::string,std::string> headers) {
-    for (std::map<std::string,std::string>::iterator it = headers.begin(); it != headers.end(); it++) {
-        std::string item = (it->first) + ": " + (it->second);
-        item[0] = ::toupper(item[0]);
-        chunk = curl_slist_append(chunk, item.c_str());
+  static bool FormHeader(struct curl_slist *chunk, std::map<std::string, std::string> headers)
+  {
+    for (std::map<std::string, std::string>::iterator it = headers.begin(); it != headers.end();
+         it++)
+    {
+      std::string item = (it->first) + ": " + (it->second);
+      item[0]          = ::toupper(item[0]);
+      chunk            = curl_slist_append(chunk, item.c_str());
     }
     return true;
   }
@@ -197,17 +202,20 @@ private:
   static bool pull_one_url(std::string url, std::string value, context::Context context)
   {
     CURL *curl = curl_easy_init();
-    if (curl == nullptr) {
+    if (curl == nullptr)
+    {
     }
-    struct curl_slist *chunk = NULL;
+    struct curl_slist *chunk                   = NULL;
     std::map<std::string, std::string> carrier = {};
     format.Inject(Setter, carrier, context);
 
-//    FormHeader(chunk, carrier);
-    for (std::map<std::string,std::string>::iterator it = carrier.begin(); it != carrier.end(); it++) {
-        std::string item = (it->first) + ": " + (it->second);
-        item[0] = ::toupper(item[0]);
-        chunk = curl_slist_append(chunk, item.c_str());
+    //    FormHeader(chunk, carrier);
+    for (std::map<std::string, std::string>::iterator it = carrier.begin(); it != carrier.end();
+         it++)
+    {
+      std::string item = (it->first) + ": " + (it->second);
+      item[0]          = ::toupper(item[0]);
+      chunk            = curl_slist_append(chunk, item.c_str());
     }
     curl_easy_setopt(curl, CURLOPT_POSTFIELDS, value.c_str());
     curl_easy_setopt(curl, CURLOPT_HTTPHEADER, chunk);
@@ -216,12 +224,15 @@ private:
     CURLcode res = curl_easy_perform(curl); /* ignores error */
     curl_easy_cleanup(curl);
     curl_slist_free_all(chunk);
-    if (res == CURLE_OK) {
-        std::cout<<"message of url "<<url<<" delivered"<<std::endl;
-        return true;
-    } else {
-        std::cout<<"message of url "<<url<<" not delivered, code "<<res<<std::endl;
-        return false;
+    if (res == CURLE_OK)
+    {
+      std::cout << "message of url " << url << " delivered" << std::endl;
+      return true;
+    }
+    else
+    {
+      std::cout << "message of url " << url << " not delivered, code " << res << std::endl;
+      return false;
     }
   }
 
@@ -229,11 +240,11 @@ private:
                                    nostd::string_view trace_type = "traceparent")
   {
     std::string trc_type = std::string(trace_type);
-    trc_type[0] = ::toupper(trc_type[0]);
-    auto it = carrier.find(trc_type);
+    trc_type[0]          = ::toupper(trc_type[0]);
+    auto it              = carrier.find(trc_type);
     if (it != carrier.end())
     {
-      std::cout<<trace_type<<" extracted: "<<it->second<<std::endl;
+      std::cout << trace_type << " extracted: " << it->second << std::endl;
       return nostd::string_view(it->second);
     }
     return "";
@@ -246,48 +257,48 @@ private:
     carrier[std::string(trace_type)] = std::string(trace_description);
   }
 
-  HTTP_SERVER_NS::HttpRequestCallback SendRequestBack{
-      [&](HTTP_SERVER_NS::HttpRequest const &req, HTTP_SERVER_NS::HttpResponse &resp) {
-        std::vector<std::map<std::string, std::string>> send_list;
-        ParseBody(req.content.c_str(), send_list);
-        context::Context ctx1 =
-            context::Context("current-span", nostd::shared_ptr<trace::Span>(new trace::DefaultSpan()));
-        context::Context ctx2 = format.Extract(Getter, req.headers, ctx1);
-        for (std::map<std::string, std::string> kv_pairs : send_list)
+  HTTP_SERVER_NS::HttpRequestCallback SendRequestBack{[&](HTTP_SERVER_NS::HttpRequest const &req,
+                                                          HTTP_SERVER_NS::HttpResponse &resp) {
+    std::vector<std::map<std::string, std::string>> send_list;
+    ParseBody(req.content.c_str(), send_list);
+    context::Context ctx1 =
+        context::Context("current-span", nostd::shared_ptr<trace::Span>(new trace::DefaultSpan()));
+    context::Context ctx2 = format.Extract(Getter, req.headers, ctx1);
+    for (std::map<std::string, std::string> kv_pairs : send_list)
+    {
+      std::string url       = "";
+      std::string arguments = "";
+      for (std::map<std::string, std::string>::iterator it = kv_pairs.begin(); it != kv_pairs.end();
+           it++)
+      {
+        if (it->first == "url")
         {
-          std::string url       = "";
-          std::string arguments = "";
-          for (std::map<std::string, std::string>::iterator it = kv_pairs.begin();
-               it != kv_pairs.end(); it++)
-          {
-            if (it->first == "url")
-            {
-              url = it->second;
-            }
-            else if (it->first == "arguments")
-            {
-              arguments = it->second;
-            }
-          }
-          if (url != "")
-          {
-            if (!pull_one_url(url, arguments, ctx2)) {
-                return 404;
-            }
-          }
-          else
-          {
-            return 404;
-          }
+          url = it->second;
         }
-        return 200;
-      }};
+        else if (it->first == "arguments")
+        {
+          arguments = it->second;
+        }
+      }
+      if (url != "")
+      {
+        if (!pull_one_url(url, arguments, ctx2))
+        {
+          return 404;
+        }
+      }
+      else
+      {
+        return 404;
+      }
+    }
+    return 200;
+  }};
 
   const std::string test_protocol_ = "/test";
-  const int kMaxUrlPerTest = 32;
+  const int kMaxUrlPerTest         = 32;
   nostd::unique_ptr<HttpClients> clients;
 };
-}// namespace validation
-}// namespace ext
+}  // namespace validation
+}  // namespace ext
 OPENTELEMETRY_END_NAMESPACE
-

@@ -14,8 +14,8 @@
 
 #pragma once
 
-#include <iostream>
 #include <functional>
+#include <iostream>
 #include <list>
 #include <map>
 
@@ -577,17 +577,23 @@ protected:
 
   std::string Strip(std::string str)
   {
-    if (str.length() == 0) return str;
+    if (str.length() == 0)
+      return str;
     int start = -1;
-    int end = -1;
-    for (int i = 0; i < str.length(); i++) {
-      if (str[i] != '\t' && str[i] != ' ') {
+    int end   = -1;
+    for (int i = 0; i < str.length(); i++)
+    {
+      if (str[i] != '\t' && str[i] != ' ')
+      {
         end = i;
-        if (start == -1) start = i;
+        if (start == -1)
+          start = i;
       }
     }
-    if (start != -1) return str.substr(start, (end - start + 1));
-    else return "";
+    if (start != -1)
+      return str.substr(start, (end - start + 1));
+    else
+      return "";
   }
 
   bool parseHeaders(Connection &conn)

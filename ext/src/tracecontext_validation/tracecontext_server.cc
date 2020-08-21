@@ -4,7 +4,6 @@ OPENTELEMETRY_BEGIN_NAMESPACE
 namespace ext
 {
 namespace validation
-{
-} // namespace validation
-} // namespace ext
+{}  // namespace validation
+}  // namespace ext
 OPENTELEMETRY_END_NAMESPACE

@@ -13,8 +13,8 @@
 // limitations under the License.
 
 #pragma once
-#include <iostream>
 #include <stdio.h>
+#include <iostream>
 #include <iterator>
 #include <string>
 #include <vector>
@@ -31,9 +31,10 @@ namespace validation
 class HttpClients
 {
 public:
-// Intialize the environment for all clients
-  HttpClients() {
-    std::cout<<"initializing the http clients"<<std::endl;
+  // Intialize the environment for all clients
+  HttpClients()
+  {
+    std::cout << "initializing the http clients" << std::endl;
     curl_global_init(CURL_GLOBAL_ALL);
   }
 
@@ -53,7 +54,7 @@ public:
     ~HttpClient()
     {
       curl_slist_free_all(list);
-//      curl_easy_cleanup(curl);
+      //      curl_easy_cleanup(curl);
     }
 
     // Sending the request stored and return true if communication successful,
@@ -76,6 +77,6 @@ public:
 
   HttpClient StartNewClient();
 };
-} // namespace validation
-} // namespace ext
+}  // namespace validation
+}  // namespace ext
 OPENTELEMETRY_END_NAMESPACE

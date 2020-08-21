@@ -32,14 +32,18 @@ void HttpClients::HttpClient::SetHeaders(std::vector<std::string> headers)
 
 // Set the POST fields of the post request to be transmitted, need to percent-encode '=' sign
 // in trace state to "%3D"
-void HttpClients::HttpClient::AddPostField(std::string post_field_name, std::string post_field_value)
+void HttpClients::HttpClient::AddPostField(std::string post_field_name,
+                                           std::string post_field_value)
 {
   char *name  = curl_easy_escape(curl, post_field_name.c_str(), 0);
   char *value = curl_easy_escape(curl, post_field_value.c_str(), 0);
   fields += "&" + std::string(name) + "=" + std::string(value);
 }
 
-HttpClients::HttpClient HttpClients::StartNewClient() { return HttpClients::HttpClient(); }
-} // namespace validation
-} // namespace ext
+HttpClients::HttpClient HttpClients::StartNewClient()
+{
+  return HttpClients::HttpClient();
+}
+}  // namespace validation
+}  // namespace ext
 OPENTELEMETRY_END_NAMESPACE
