@@ -103,17 +103,17 @@ public:
       {
         for (int j = 0; j < bytes / 2; j++)
         {
-          buf[j] = 0;
+          buffer[j] = 0;
         }
         return;
       }
       if (i % 2 == 0)
       {
-        buf[i / 2] = tmp * 16;
+        buffer[i / 2] = tmp * 16;
       }
       else
       {
-        buf[i / 2] += tmp;
+        buffer[i / 2] += tmp;
       }
     }
   }
