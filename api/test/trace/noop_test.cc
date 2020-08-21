@@ -26,4 +26,8 @@ TEST(NoopTest, UseNoopTracers)
   s1->AddEvent("abc", attributes3);
 
   s1->SetAttribute("abc", 4);
+
+  s1->AddEvent("abc")  // add Empty
+
+      EXPECT_EQ(s1->IsRecording(), false);
 }
