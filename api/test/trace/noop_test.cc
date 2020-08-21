@@ -30,4 +30,6 @@ TEST(NoopTest, UseNoopTracers)
   s1->AddEvent("abc");  // add Empty
 
   EXPECT_EQ(s1->IsRecording(), false);
+
+  s1->SetStatus(404, "span unavailable")
 }
