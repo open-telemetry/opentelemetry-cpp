@@ -24,5 +24,5 @@ zPages are a quick and light way to view tracing and metrics information on stan
 - OTel C++ Design Docs
   - [Tracez Span Processor](https://docs.google.com/document/d/1kO4iZARYyr-EGBlY2VNM3ELU3iw6ZrC58Omup_YT-fU/edit#)
   - [Tracez Data Aggregator](https://docs.google.com/document/d/1ziKFgvhXFfRXZjOlAHQRR-TzcNcTXzg1p2I9oPCEIoU/edit?ts=5ef0d177#heading=h.5irk4csrpu0y)
-  - [Tracez Http Server](https://docs.google.com/document/d/1U1V8QZ5LtGl4Mich-aJ6KZGLHrMIE8pWyspmzvnIefI/edit#) - also includes reference pictures of the zPages/Tracez UI
+  - [Tracez Http Server](https://docs.google.com/document/d/1U1V8QZ5LtGl4Mich-aJ6KZGLHrMIE8pWyspmzvnIefI/edit#) - includes reference pictures of the zPages/Tracez UI
 
