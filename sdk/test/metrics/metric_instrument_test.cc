@@ -461,7 +461,7 @@ TEST(Instruments, NoUpdateNoRecord)
   auto labelkv                              = trace::KeyValueIterableView<decltype(labels)>{labels};
 
   EXPECT_EQ(alpha.GetRecords().size(), 0);
-  beta.record(1, labelkv);
+  gamma.record(1, labelkv);
   EXPECT_EQ(alpha.GetRecords().size(), 1);
 }
 
