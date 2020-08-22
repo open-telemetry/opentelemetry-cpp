@@ -57,8 +57,6 @@ protected:
   std::shared_ptr<opentelemetry::trace::Tracer> tracer;
 
   std::vector<opentelemetry::nostd::shared_ptr<opentelemetry::trace::Span>> spans;
-
-  const int numSpans      = 50;
 };
 
 //////////////////////////// BENCHMARK DEFINITIONS /////////////////////////////////
@@ -69,6 +67,7 @@ protected:
 
 BENCHMARK_DEFINE_F(TracezProcessor, BM_RunComplete)(benchmark::State &state)
 {
+  const int numSpans = state.range(0);
   for (auto _ : state)
   {
     StartManySpans(spans, tracer, numSpans);
@@ -81,6 +80,7 @@ BENCHMARK_DEFINE_F(TracezProcessor, BM_RunComplete)(benchmark::State &state)
  */
 BENCHMARK_DEFINE_F(TracezProcessor, BM_RunSnap)(benchmark::State &state)
 {
+  const int numSpans = state.range(0);
   for (auto _ : state)
   {
     std::thread start(StartManySpans, std::ref(spans), tracer, numSpans);
@@ -98,6 +98,7 @@ BENCHMARK_DEFINE_F(TracezProcessor, BM_RunSnap)(benchmark::State &state)
  */
 BENCHMARK_DEFINE_F(TracezProcessor, BM_SnapComplete)(benchmark::State &state)
 {
+  const int numSpans = state.range(0);
   for (auto _ : state)
   {
     StartManySpans(spans, tracer, numSpans);
@@ -116,6 +117,7 @@ BENCHMARK_DEFINE_F(TracezProcessor, BM_SnapComplete)(benchmark::State &state)
  */
 BENCHMARK_DEFINE_F(TracezProcessor, BM_RunSnapComplete)(benchmark::State &state)
 {
+  const int numSpans = state.range(0);
   for (auto _ : state)
   {
     std::vector<opentelemetry::nostd::shared_ptr<opentelemetry::trace::Span>> spans2;

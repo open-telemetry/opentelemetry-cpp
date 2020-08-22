@@ -87,8 +87,6 @@ protected:
 
   std::unique_ptr<TracezDataAggregator> tracez_data_aggregator;
   std::shared_ptr<opentelemetry::trace::Tracer> tracer;
-
-  const int numSpans      = 1000;
 };
 
 //////////////////////////// BENCHMARK DEFINITIONS /////////////////////////////////
@@ -99,6 +97,7 @@ protected:
 
 BENCHMARK_DEFINE_F(TracezAggregator, BM_InstantSame)(benchmark::State &state)
 {
+  const int numSpans = state.range(0);
   for (auto _ : state)
   {
     StartEndSpans(tracer, numSpans);
@@ -111,6 +110,7 @@ BENCHMARK_DEFINE_F(TracezAggregator, BM_InstantSame)(benchmark::State &state)
 
 BENCHMARK_DEFINE_F(TracezAggregator, BM_InstantUnique)(benchmark::State &state)
 {
+  const int numSpans = state.range(0);
   for (auto _ : state)
   {
     StartEndSpans(tracer, numSpans, true);
@@ -123,6 +123,7 @@ BENCHMARK_DEFINE_F(TracezAggregator, BM_InstantUnique)(benchmark::State &state)
 
 BENCHMARK_DEFINE_F(TracezAggregator, BM_BucketsSame)(benchmark::State &state)
 {
+  const int numSpans = state.range(0);
   for (auto _ : state)
   {
     std::vector<opentelemetry::nostd::shared_ptr<opentelemetry::trace::Span>> running_spans;
@@ -138,6 +139,7 @@ BENCHMARK_DEFINE_F(TracezAggregator, BM_BucketsSame)(benchmark::State &state)
 
 BENCHMARK_DEFINE_F(TracezAggregator, BM_BucketsUnique)(benchmark::State &state)
 {
+  const int numSpans = state.range(0);
   for (auto _ : state)
   {
     std::vector<opentelemetry::nostd::shared_ptr<opentelemetry::trace::Span>> running_spans;
