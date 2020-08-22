@@ -248,6 +248,7 @@ TEST(Counter, getAggsandnewupdate)
 
   auto labelkv = trace::KeyValueIterableView<decltype(labels)>{labels};
   auto beta    = alpha.bindCounter(labelkv);
+  beta->add(1, labelkv)
   beta->unbind();
 
   EXPECT_EQ(alpha.boundInstruments_[KvToString(labelkv)]->get_ref(), 0);
