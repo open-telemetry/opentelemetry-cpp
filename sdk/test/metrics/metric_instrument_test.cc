@@ -435,6 +435,36 @@ TEST(IntValueRecorder, StressRecord)
       125);  // count
 }
 
+TEST(Instruments, NoUpdateNoRecord)
+{
+  // This test verifies that instruments that have received no updates
+  // in the last collection period are not made into records for export.
+
+  Counter<int> alpha("alpha", "no description", "unitless", true);
+  std::map<std::string, std::string> labels  = {{"key", "value"}};
+  auto labelkv  = trace::KeyValueIterableView<decltype(labels)>{labels};
+
+  EXPECT_EQ(alpha->GetRecords().size(), 0);
+  alpha->add(1, labelkv);
+  EXPECT_EQ(alpha->GetRecords().size(), 1);
+
+  UpDownCounter<int> beta("beta", "no description", "unitless", true);
+  std::map<std::string, std::string> labels = {{"key", "value"}};
+  auto labelkv                              = trace::KeyValueIterableView<decltype(labels)>{labels};
+
+  EXPECT_EQ(alpha->GetRecords().size(), 0);
+  beta->add(1, labelkv);
+  EXPECT_EQ(alpha->GetRecords().size(), 1);
+
+  ValueRecorder<int> gamma("gamma", "no description", "unitless", true);
+  std::map<std::string, std::string> labels = {{"key", "value"}};
+  auto labelkv                              = trace::KeyValueIterableView<decltype(labels)>{labels};
+
+  EXPECT_EQ(alpha->GetRecords().size(), 0);
+  beta->record(1, labelkv);
+  EXPECT_EQ(alpha->GetRecords().size(), 1);
+}
+
 }  // namespace metrics
 }  // namespace sdk
 
