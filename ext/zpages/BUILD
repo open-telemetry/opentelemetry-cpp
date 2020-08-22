@@ -12,4 +12,3 @@ cc_library(
         "@github_nlohmann_json//:json",
     ],
 )
-
