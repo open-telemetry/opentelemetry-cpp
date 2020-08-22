@@ -24,8 +24,7 @@ cc_binary(
         "//conditions:default": ["-pthread"],
     }),
     deps = [
-        "//ext:headers",
-        "//ext/src/zpages",
+        "//ext/zpages",
         "//sdk/src/trace",
     ],
 )
