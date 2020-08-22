@@ -450,15 +450,15 @@ TEST(Instruments, NoUpdateNoRecord)
 
   UpDownCounter<int> beta("beta", "no description", "unitless", true);
 
-  EXPECT_EQ(alpha.GetRecords().size(), 0);
+  EXPECT_EQ(beta.GetRecords().size(), 0);
   beta.add(1, labelkv);
-  EXPECT_EQ(alpha.GetRecords().size(), 1);
+  EXPECT_EQ(beta.GetRecords().size(), 1);
 
   ValueRecorder<int> gamma("gamma", "no description", "unitless", true);
 
-  EXPECT_EQ(alpha.GetRecords().size(), 0);
+  EXPECT_EQ(gamma.GetRecords().size(), 0);
   gamma.record(1, labelkv);
-  EXPECT_EQ(alpha.GetRecords().size(), 1);
+  EXPECT_EQ(gamma.GetRecords().size(), 1);
 }
 
 }  // namespace metrics
