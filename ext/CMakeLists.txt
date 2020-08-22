@@ -1,5 +1,3 @@
-add_subdirectory(src)
+add_subdirectory(http)
+add_subdirectory(zpages)
 
-if(BUILD_TESTING)
-  add_subdirectory(test)
-endif()

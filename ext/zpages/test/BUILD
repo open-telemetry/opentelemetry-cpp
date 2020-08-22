@@ -4,7 +4,7 @@ cc_test(
         "threadsafe_span_data_test.cc",
     ],
     deps = [
-        "//ext/src/zpages",
+        "//ext/zpages",
         "//sdk/src/trace",
         "@com_google_googletest//:gtest_main",
     ],
@@ -16,7 +16,7 @@ cc_test(
         "tracez_data_aggregator_test.cc",
     ],
     deps = [
-        "//ext/src/zpages",
+        "//ext/zpages",
         "//sdk/src/trace",
         "@com_google_googletest//:gtest_main",
     ],
@@ -28,7 +28,7 @@ cc_test(
         "tracez_processor_test.cc",
     ],
     deps = [
-        "//ext/src/zpages",
+        "//ext/zpages",
         "//sdk/src/trace",
         "@com_google_googletest//:gtest_main",
     ],
