@@ -64,7 +64,65 @@ protected:
 /*
  * Make and end many empty spans.
  */
+BENCHMARK_DEFINE_F(TracezProcessor, BM_Run)(benchmark::State &state)
+{
+  const int numSpans = state.range(0);
+  for (auto _ : state)
+  {
+    std::vector<opentelemetry::nostd::shared_ptr<opentelemetry::trace::Span>> spans2;
 
+    std::thread start(StartManySpans, std::ref(spans), tracer, numSpans);
+    StartManySpans(spans2, tracer, numSpans);
+
+    start.join();
+
+    EndAllSpans(spans);
+    EndAllSpans(spans2);
+    processor->GetSpanSnapshot();
+  }
+}
+
+/*
+ * Make and end many empty spans.
+ */
+BENCHMARK_DEFINE_F(TracezProcessor, BM_Complete)(benchmark::State &state)
+{
+  const int numSpans = state.range(0);
+  for (auto _ : state)
+  {
+    std::vector<opentelemetry::nostd::shared_ptr<opentelemetry::trace::Span>> spans2;
+    StartManySpans(spans, tracer, numSpans);
+    StartManySpans(spans2, tracer, numSpans);
+
+    std::thread end(EndAllSpans, std::ref(spans));
+    EndAllSpans(spans2);
+
+    end.join();
+    processor->GetSpanSnapshot();
+  }
+}
+
+/*
+ * Make and end many empty spans.
+ */
+BENCHMARK_DEFINE_F(TracezProcessor, BM_Snap)(benchmark::State &state)
+{
+  const int numSpans = state.range(0);
+  for (auto _ : state)
+  {
+    StartManySpans(spans, tracer, numSpans);
+
+    std::thread snap(GetManySnapshots, std::ref(processor), numSpans);
+    GetManySnapshots(processor, numSpans);
+
+    snap.join();
+    EndAllSpans(spans);
+  }
+}
+
+/*
+ * Make and end many empty spans.
+ */
 BENCHMARK_DEFINE_F(TracezProcessor, BM_RunComplete)(benchmark::State &state)
 {
   const int numSpans = state.range(0);
@@ -143,6 +201,9 @@ BENCHMARK_DEFINE_F(TracezProcessor, BM_RunSnapComplete)(benchmark::State &state)
 
 /////////////////////// RUN BENCHMARKS ///////////////////////////
 
+BENCHMARK_REGISTER_F(TracezProcessor, BM_Run)->Arg(10)->Arg(1000);
+BENCHMARK_REGISTER_F(TracezProcessor, BM_Complete)->Arg(10)->Arg(1000);
+BENCHMARK_REGISTER_F(TracezProcessor, BM_Snap)->Arg(10)->Arg(1000);
 BENCHMARK_REGISTER_F(TracezProcessor, BM_RunComplete)->Arg(10)->Arg(1000);
 BENCHMARK_REGISTER_F(TracezProcessor, BM_RunSnap)->Arg(10)->Arg(1000);
 BENCHMARK_REGISTER_F(TracezProcessor, BM_SnapComplete)->Arg(10)->Arg(1000);
