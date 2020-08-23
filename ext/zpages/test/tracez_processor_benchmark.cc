@@ -12,8 +12,7 @@ using namespace opentelemetry::ext::zpages;
 /////////////////////////////// BENCHMARK HELPER FUNCTIONS //////////////////////////////
 
 /*
- * Helper function that creates i spans, which are added into the passed
- * in vector. Used for testing thread safety
+ * Helper function that creates and add i spans into the passed in vector
  */
 void StartManySpans(
     std::vector<opentelemetry::nostd::shared_ptr<opentelemetry::trace::Span>> &spans,
@@ -62,7 +61,7 @@ protected:
 //////////////////////////// BENCHMARK DEFINITIONS /////////////////////////////////
 
 /*
- * Make and end many empty spans.
+ * Make many empty spans.
  */
 BENCHMARK_DEFINE_F(TracezProcessor, BM_Run)(benchmark::State &state)
 {
@@ -74,7 +73,7 @@ BENCHMARK_DEFINE_F(TracezProcessor, BM_Run)(benchmark::State &state)
 }
 
 /*
- * Make and end many empty spans.
+ * Make many snapshots.
  */
 BENCHMARK_DEFINE_F(TracezProcessor, BM_Snap)(benchmark::State &state)
 {
