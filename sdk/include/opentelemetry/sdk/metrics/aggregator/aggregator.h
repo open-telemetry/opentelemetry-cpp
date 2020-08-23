@@ -103,7 +103,7 @@ public:
    * @return A bool indicating wether or not this aggregator has been updated
    * in the most recent collection interval.
    */
-  virtual bool is_updated() final { return updated_;  }
+  virtual bool is_updated() final { return updated_; }
 
   // virtual function to be overriden for the Histogram Aggregator
   virtual std::vector<double> get_boundaries() { return std::vector<double>(); }

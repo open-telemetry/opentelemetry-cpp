@@ -442,8 +442,10 @@ TEST(Instruments, NoUpdateNoRecord)
   // in the last collection period are not made into records for export.
 
   Counter<int> alpha("alpha", "no description", "unitless", true);
-  std::map<std::string, std::string> labels  = {{"key", "value"}};
-  auto labelkv  = trace::KeyValueIterableView<decltype(labels)>{labels};
+
+  std::map<std::string, std::string> labels = {{"key", "value"}};
+
+  auto labelkv = trace::KeyValueIterableView<decltype(labels)>{labels};
 
   EXPECT_EQ(alpha.GetRecords().size(), 0);
   alpha.add(1, labelkv);
