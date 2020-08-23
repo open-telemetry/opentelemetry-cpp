@@ -127,9 +127,11 @@ BENCHMARK_DEFINE_F(TracezAggregator, BM_BucketsSame)(benchmark::State &state)
   for (auto _ : state)
   {
     std::vector<opentelemetry::nostd::shared_ptr<opentelemetry::trace::Span>> running_spans;
-    StartSpans(running_spans, tracer, numSpans / 3);
-    StartEndSpansError(tracer, numSpans / 3);
+    std::thread run(StartSpans, std::ref(running_spans), tracer, numSpans / 3, false);
+    std::thread err(StartEndSpansError, tracer, numSpans / 3, false);
     StartEndSpansLatency(tracer, numSpans / 3);
+    run.join();
+    err.join();
   }
 }
 
@@ -143,9 +145,11 @@ BENCHMARK_DEFINE_F(TracezAggregator, BM_BucketsUnique)(benchmark::State &state)
   for (auto _ : state)
   {
     std::vector<opentelemetry::nostd::shared_ptr<opentelemetry::trace::Span>> running_spans;
-    StartSpans(running_spans, tracer, numSpans / 3, true);
-    StartEndSpansError(tracer, numSpans / 3, true);
+    std::thread run(StartSpans, std::ref(running_spans), tracer, numSpans / 3, true);
+    std::thread err(StartEndSpansError, tracer, numSpans / 3, true);
     StartEndSpansLatency(tracer, numSpans / 3, true);
+    run.join();
+    err.join();
   }
 }
 /////////////////////// RUN BENCHMARKS ///////////////////////////
