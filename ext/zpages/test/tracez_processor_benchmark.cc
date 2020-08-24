@@ -24,7 +24,8 @@ void StartManySpans(
 }
 
 /*
- * Helper function that ends all spans in the passed in span vector.
+ * Helper function that ends and removes all spans in the passed in span vector,
+ * since they'll be in the processor memory.
  */
 void EndAllSpans(std::vector<opentelemetry::nostd::shared_ptr<opentelemetry::trace::Span>> &spans)
 {
@@ -40,7 +41,8 @@ void EndAllSpans(std::vector<opentelemetry::nostd::shared_ptr<opentelemetry::tra
  * Helper function calls GetSpanSnapshot() i times, does nothing otherwise.
  * Snapshots are significant and contribute to performance differences because
  * completed spans are cleared from the processor memory. This function
- * simulates an aggregator querying the processor many times.
+ * simulates an aggregator querying the processor many times, but doesn't
+ * process spans and throws them out.
  */
 void GetManySnapshots(std::shared_ptr<TracezSpanProcessor> &processor, int i)
 {
