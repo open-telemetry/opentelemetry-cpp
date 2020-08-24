@@ -39,7 +39,8 @@ void EndAllSpans(std::vector<opentelemetry::nostd::shared_ptr<opentelemetry::tra
 /*
  * Helper function calls GetSpanSnapshot() i times, does nothing otherwise.
  * Snapshots are significant and contribute to performance differences because
- * completed spans are cleared from the processor memory.
+ * completed spans are cleared from the processor memory. This function
+ * simulates an aggregator querying the processor many times.
  */
 void GetManySnapshots(std::shared_ptr<TracezSpanProcessor> &processor, int i)
 {
