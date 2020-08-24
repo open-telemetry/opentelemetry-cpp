@@ -33,7 +33,9 @@ void EndAllSpans(std::vector<opentelemetry::nostd::shared_ptr<opentelemetry::tra
 }
 
 /*
- * Helper function calls GetSpanSnapshot() i times, does nothing otherwise
+ * Helper function calls GetSpanSnapshot() i times, does nothing otherwise.
+ * Snapshots are significant and contribute to performance differences because
+ * completed spans are cleared from the processor memory.
  */
 void GetManySnapshots(std::shared_ptr<TracezSpanProcessor> &processor, int i)
 {
@@ -61,7 +63,8 @@ protected:
 //////////////////////////// BENCHMARK DEFINITIONS /////////////////////////////////
 
 /*
- * Make many empty spans.
+ * Make many empty spans. This checks the scenario where the processor holds
+ * many running spans but never gets queried.
  */
 BENCHMARK_DEFINE_F(TracezProcessor, BM_Run)(benchmark::State &state)
 {
@@ -73,7 +76,8 @@ BENCHMARK_DEFINE_F(TracezProcessor, BM_Run)(benchmark::State &state)
 }
 
 /*
- * Make many snapshots.
+ * Make many snapshots. This checks the scenario where the processor holds
+ * no spans but gets queried many times.
  */
 BENCHMARK_DEFINE_F(TracezProcessor, BM_Snap)(benchmark::State &state)
 {
@@ -85,7 +89,8 @@ BENCHMARK_DEFINE_F(TracezProcessor, BM_Snap)(benchmark::State &state)
 }
 
 /*
- * Make and end many empty spans.
+ * Make and end many empty spans. This checks the scenario where the processor holds
+ * many running and completed spans but never gets queried.
  */
 BENCHMARK_DEFINE_F(TracezProcessor, BM_RunComplete)(benchmark::State &state)
 {
@@ -105,7 +110,8 @@ BENCHMARK_DEFINE_F(TracezProcessor, BM_RunComplete)(benchmark::State &state)
 }
 
 /*
- * Make many empty spans while spapshots grabbed.
+ * Make many empty spans while spapshots grabbed. This checks the scenario where the
+ * processor holds many running spans and gets queried.
  */
 BENCHMARK_DEFINE_F(TracezProcessor, BM_RunSnap)(benchmark::State &state)
 {
@@ -121,7 +127,9 @@ BENCHMARK_DEFINE_F(TracezProcessor, BM_RunSnap)(benchmark::State &state)
 }
 
 /*
- * Make many empty spans end while snapshots are being grabbed.
+ * Make many empty spans end while snapshots are being grabbed. This checks the scenario
+ * where the processor doesn't make new spans, but existing spans complete while they're
+ * queried.
  */
 BENCHMARK_DEFINE_F(TracezProcessor, BM_SnapComplete)(benchmark::State &state)
 {
@@ -139,7 +147,9 @@ BENCHMARK_DEFINE_F(TracezProcessor, BM_SnapComplete)(benchmark::State &state)
 }
 
 /*
- * Make many empty spans and end them, all while snapshots are being grabbed.
+ * Make many empty spans and end some, all while snapshots are being grabbed. This
+ * checks the scenario where the processor makes new spans, other spans complete,
+ * and all spans are queried. This is the case most similar to real situations.
  */
 BENCHMARK_DEFINE_F(TracezProcessor, BM_RunSnapComplete)(benchmark::State &state)
 {

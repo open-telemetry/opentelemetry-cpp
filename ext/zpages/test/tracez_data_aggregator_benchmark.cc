@@ -100,7 +100,10 @@ protected:
 ////////////// BENCHMARKS WHERE USER NEVER VISITS WEBPAGE /////////////////////////
 
 /*
- * Aggregator handing many spans with the same name, who end instantly.
+ * Aggregator handing many spans with the same name, who end instantly. This
+ * checks the scenario where there's only one Tracez name and minimal sorting
+ * of latencies is required, as all spans should be sorted in the same bucket
+ * under the same span name.
  */
 BENCHMARK_DEFINE_F(TracezAggregator, BM_InstantSame)(benchmark::State &state)
 {
@@ -112,7 +115,10 @@ BENCHMARK_DEFINE_F(TracezAggregator, BM_InstantSame)(benchmark::State &state)
 }
 
 /*
- * Aggregator handing many spans with unique names, who end instantly.
+ * Aggregator handing many spans with unique names, who end instantly. This
+ * checks the scenario where there's many Tracez groups but minimal sorting
+ * of latencies is required. Spans are sorted in different groups but always
+ * in the same bucket.
  */
 BENCHMARK_DEFINE_F(TracezAggregator, BM_InstantUnique)(benchmark::State &state)
 {
@@ -124,7 +130,11 @@ BENCHMARK_DEFINE_F(TracezAggregator, BM_InstantUnique)(benchmark::State &state)
 }
 
 /*
- * Aggregator handing many spans with the same name, who end instantly.
+ * Aggregator handing many spans with the same name, who may fall under error,
+ * running, and any latency group. This checks the scenario where there's only
+ * one Tracez groups but there also needs to be sorting of spans into their
+ * respective buckets. Spans are in the same group but sorted to different
+ * buckets.
  */
 BENCHMARK_DEFINE_F(TracezAggregator, BM_BucketsSame)(benchmark::State &state)
 {
@@ -141,7 +151,11 @@ BENCHMARK_DEFINE_F(TracezAggregator, BM_BucketsSame)(benchmark::State &state)
 }
 
 /*
- * Aggregator handing many spans with unique names, who end instantly.
+ * Aggregator handing many spans with unique names, who may fall under error,
+ * running, and any latency group. This checks the scenario where there's many
+ * Tracez groups and there needs to be sorting of spans into their
+ * respective buckets. Spans are in the different groups and buckets, similar to
+ * real likely use cases.
  */
 BENCHMARK_DEFINE_F(TracezAggregator, BM_BucketsUnique)(benchmark::State &state)
 {
@@ -215,12 +229,12 @@ BENCHMARK_DEFINE_F(TracezAggregator, BM_BucketsUniqueGet)(benchmark::State &stat
 /////////////////////// RUN BENCHMARKS ///////////////////////////
 
 BENCHMARK_REGISTER_F(TracezAggregator, BM_InstantSame)->Arg(10)->Arg(1000);
-BENCHMARK_REGISTER_F(TracezAggregator, BM_InstantUnique)->Arg(10)->Arg(1000);
-BENCHMARK_REGISTER_F(TracezAggregator, BM_BucketsSame)->Arg(10)->Arg(1000);
-BENCHMARK_REGISTER_F(TracezAggregator, BM_BucketsUnique)->Arg(10)->Arg(1000);
 BENCHMARK_REGISTER_F(TracezAggregator, BM_InstantSameGet)->Arg(10)->Arg(1000);
+BENCHMARK_REGISTER_F(TracezAggregator, BM_InstantUnique)->Arg(10)->Arg(1000);
 BENCHMARK_REGISTER_F(TracezAggregator, BM_InstantUniqueGet)->Arg(10)->Arg(1000);
+BENCHMARK_REGISTER_F(TracezAggregator, BM_BucketsSame)->Arg(10)->Arg(1000);
 BENCHMARK_REGISTER_F(TracezAggregator, BM_BucketsSameGet)->Arg(10)->Arg(1000);
+BENCHMARK_REGISTER_F(TracezAggregator, BM_BucketsUnique)->Arg(10)->Arg(1000);
 BENCHMARK_REGISTER_F(TracezAggregator, BM_BucketsUniqueGet)->Arg(10)->Arg(1000);
 
 BENCHMARK_MAIN();
