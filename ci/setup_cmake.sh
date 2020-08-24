@@ -9,6 +9,7 @@ apt-get install --no-install-recommends --no-install-suggests -y \
                 libbenchmark-dev \
                 libgtest-dev \
                 zlib1g-dev \
+                sudo \
                 libcurl4-openssl-dev
 
 # Follows these instructions for setting up gtest
