@@ -84,7 +84,7 @@ Span::Span(std::shared_ptr<Tracer> &&tracer,
   }
   else
   {
-    recordable_->SetIds(GenerateRandomTraceId(), GenerateRandomSpanId(), GenerateRandomSpanId());
+    recordable_->SetIds(GenerateRandomTraceId(), GenerateRandomSpanId(), trace_api::SpanId());
   }
   // TODO: Create and populate SpanContext for this span when SpanContext is fully implemented
 
