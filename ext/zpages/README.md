@@ -1,6 +1,6 @@
 # zPages
 ## Overview
-zPages are a quick and light way to view tracing and metrics information on standard OpenTelemetry C++ instrumented applications. It requires no external dependencies or backend setup. See more information in the OTel zPages experimental [spec](https://github.com/open-telemetry/opentelemetry-specification/blob/5b86d4b6c42e6d1e47d9155ac1e2e27f0f0b7769/experimental/trace/zpages.md). OTel C++ currently only offers Tracez; future zPages to potentially add include TraceConfigz, RPCz, and Statsz.
+zPages are a quick and light way to view tracing and metrics information on standard OpenTelemetry C++ instrumented applications. It requires no external dependencies or backend setup. See more information in the OTel zPages experimental [spec](https://github.com/open-telemetry/opentelemetry-specification/blob/5b86d4b6c42e6d1e47d9155ac1e2e27f0f0b7769/experimental/trace/zpages.md). OTel C++ currently only offers Tracez; future zPages to potentially add include TraceConfigz, RPCz, and Statsz. Events and links need to be added to Tracez.
 
 # Usage
 > TODO: Add CMake instructions
