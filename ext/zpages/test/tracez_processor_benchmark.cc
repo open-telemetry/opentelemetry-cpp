@@ -28,8 +28,12 @@ void StartManySpans(
  */
 void EndAllSpans(std::vector<opentelemetry::nostd::shared_ptr<opentelemetry::trace::Span>> &spans)
 {
-  for (auto &span : spans)
+  while(!spans.empty())
+  {
+    auto span = spans.back();
     span->End();
+    spans.pop_back();
+  }
 }
 
 /*
