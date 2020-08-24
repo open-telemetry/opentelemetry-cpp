@@ -16,7 +16,7 @@ using namespace opentelemetry::ext::zpages;
  */
 void StartManySpans(
     std::vector<opentelemetry::nostd::shared_ptr<opentelemetry::trace::Span>> &spans,
-    std::shared_ptr<opentelemetry::trace::Tracer> tracer,
+    std::shared_ptr<opentelemetry::trace::Tracer> &tracer,
     int i)
 {
   for (; i > 0; i--)
@@ -68,7 +68,7 @@ BENCHMARK_DEFINE_F(TracezProcessor, BM_Run)(benchmark::State &state)
   const int numSpans = state.range(0);
   for (auto _ : state)
   {
-    StartManySpans(spans, tracer, numSpans);
+    StartManySpans(spans, std::ref(tracer), numSpans);
   }
 }
 
@@ -93,9 +93,9 @@ BENCHMARK_DEFINE_F(TracezProcessor, BM_RunComplete)(benchmark::State &state)
   for (auto _ : state)
   {
     std::vector<opentelemetry::nostd::shared_ptr<opentelemetry::trace::Span>> spans2;
-    StartManySpans(spans2, tracer, numSpans);
+    StartManySpans(spans2, std::ref(tracer), numSpans);
 
-    std::thread start(StartManySpans, std::ref(spans), tracer, numSpans);
+    std::thread start(StartManySpans, std::ref(spans), std::ref(tracer), numSpans);
     EndAllSpans(spans2);
 
     start.join();
@@ -113,7 +113,7 @@ BENCHMARK_DEFINE_F(TracezProcessor, BM_RunSnap)(benchmark::State &state)
   for (auto _ : state)
   {
     std::thread snapshots(GetManySnapshots, std::ref(processor), numSpans);
-    StartManySpans(spans, tracer, numSpans);
+    StartManySpans(spans, std::ref(tracer), numSpans);
 
     snapshots.join();
     EndAllSpans(spans);
@@ -128,7 +128,7 @@ BENCHMARK_DEFINE_F(TracezProcessor, BM_SnapComplete)(benchmark::State &state)
   const int numSpans = state.range(0);
   for (auto _ : state)
   {
-    StartManySpans(spans, tracer, numSpans);
+    StartManySpans(spans, std::ref(tracer), numSpans);
 
     std::thread snapshots(GetManySnapshots, std::ref(processor), numSpans);
     EndAllSpans(spans);
@@ -148,9 +148,9 @@ BENCHMARK_DEFINE_F(TracezProcessor, BM_RunSnapComplete)(benchmark::State &state)
   {
     std::vector<opentelemetry::nostd::shared_ptr<opentelemetry::trace::Span>> spans2;
 
-    StartManySpans(spans, tracer, numSpans);
+    StartManySpans(spans, std::ref(tracer), numSpans);
 
-    std::thread start(StartManySpans, std::ref(spans2), tracer, numSpans);
+    std::thread start(StartManySpans, std::ref(spans2), std::ref(tracer), numSpans);
     std::thread snapshots(GetManySnapshots, std::ref(processor), numSpans);
     EndAllSpans(spans);
 
