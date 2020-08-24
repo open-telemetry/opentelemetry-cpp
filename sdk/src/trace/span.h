@@ -19,7 +19,8 @@ public:
                 std::shared_ptr<SpanProcessor> processor,
                 nostd::string_view name,
                 const trace_api::KeyValueIterable &attributes,
-                const trace_api::StartSpanOptions &options) noexcept;
+                const trace_api::StartSpanOptions &options,
+                const trace_api::SpanContext &parent_span_context) noexcept;
 
   ~Span() override;
 
