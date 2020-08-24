@@ -1,5 +1,9 @@
 if(WITH_OTPROTOCOL)
   add_subdirectory(otlp)
 endif()
+
 add_subdirectory(ostream)
-add_subdirectory(prometheus)
+
+if(WITH_PROMETHEUS)
+  add_subdirectory(prometheus)
+endif()
