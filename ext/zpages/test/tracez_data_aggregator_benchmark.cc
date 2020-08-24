@@ -171,7 +171,7 @@ BENCHMARK_DEFINE_F(TracezAggregator, BM_BucketsUnique)(benchmark::State &state)
   }
 }
 
-////////////// SAME BENCHMARKS, BUT USER VISITS WEBPAGE /////////////////////////
+//////// SAME BENCHMARKS, BUT USER VISITS WEBPAGE--DELAYING AGGREGATION WORK /////////
 
 BENCHMARK_DEFINE_F(TracezAggregator, BM_InstantSameGet)(benchmark::State &state)
 {
@@ -219,7 +219,7 @@ BENCHMARK_DEFINE_F(TracezAggregator, BM_BucketsUniqueGet)(benchmark::State &stat
     std::vector<opentelemetry::nostd::shared_ptr<opentelemetry::trace::Span>> running_spans;
     std::thread run(StartSpans, std::ref(running_spans), std::ref(tracer), numSpans / 3, true);
     std::thread err(StartEndSpansError, std::ref(tracer), numSpans / 3, true);
-    std::thread lat(StartEndSpansLatency, std::ref(tracer), numSpans / 3, false);
+    std::thread lat(StartEndSpansLatency, std::ref(tracer), numSpans / 3, true);
     GetManyAggregations(std::ref(aggregator), numSpans / 3);
     run.join();
     err.join();
