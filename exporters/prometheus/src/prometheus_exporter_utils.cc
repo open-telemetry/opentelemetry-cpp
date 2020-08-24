@@ -23,6 +23,8 @@
 #include "opentelemetry/sdk/metrics/aggregator/aggregator.h"
 #include "prometheus/metric_type.h"
 
+namespace prometheus_client = ::prometheus;
+
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace exporter
 {
@@ -36,7 +38,7 @@ namespace prometheus
  * @return a collection of translated metrics that is acceptable by Prometheus
  */
 std::vector<prometheus_client::MetricFamily> PrometheusExporterUtils::TranslateToPrometheus(
-    std::vector<metric_sdk::Record> &records)
+    const std::vector<metric_sdk::Record> &records)
 {
   if (records.empty())
   {
@@ -69,8 +71,7 @@ void PrometheusExporterUtils::SetMetricFamily(metric_sdk::Record &record,
   auto sanitized   = SanitizeNames(origin_name);
   if (origin_name != sanitized)
   {
-    std::cout << "Sanitized metric name \"" << origin_name << "\" to \"" << sanitized << "\""
-              << std::endl;
+    std::cout << "Sanitized metric name \"" << origin_name << "\" to \"" << sanitized << "\"\n";
   }
   metric_family->name = sanitized;
   metric_family->help = record.GetDescription();
@@ -281,7 +282,7 @@ void PrometheusExporterUtils::SetMetricBasic(prometheus_client::ClientMetric &me
                                              std::chrono::nanoseconds time,
                                              const std::string &labels)
 {
-  metric.timestamp_ms = time.count() / 1000;
+  metric.timestamp_ms = time.count() / 1000000;
 
   auto label_pairs = ParseLabel(labels);
   if (!label_pairs.empty())
@@ -293,8 +294,7 @@ void PrometheusExporterUtils::SetMetricBasic(prometheus_client::ClientMetric &me
       auto sanitized   = SanitizeNames(origin_name);
       if (origin_name != sanitized)
       {
-        std::cout << "Sanitized label name \"" << origin_name << "\" to \"" << sanitized << "\""
-                  << std::endl;
+        std::cout << "Sanitized label name \"" << origin_name << "\" to \"" << sanitized << "\"\n";
       }
       metric.label[i].name  = sanitized;
       metric.label[i].value = label_pairs[i].second;
@@ -363,18 +363,15 @@ void PrometheusExporterUtils::SetValue(std::vector<T> values,
 {
   switch (type)
   {
-    case prometheus_client::MetricType::Counter:
-    {
+    case prometheus_client::MetricType::Counter: {
       metric->counter.value = values[0];
       break;
     }
-    case prometheus_client::MetricType::Gauge:
-    {
+    case prometheus_client::MetricType::Gauge: {
       metric->gauge.value = values[0];
       break;
     }
-    case prometheus_client::MetricType::Untyped:
-    {
+    case prometheus_client::MetricType::Untyped: {
       metric->untyped.value = values[0];
       break;
     }

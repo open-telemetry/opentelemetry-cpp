@@ -22,8 +22,7 @@
 #include "opentelemetry/sdk/metrics/record.h"
 #include "prometheus/metric_family.h"
 
-namespace prometheus_client = ::prometheus;
-namespace metric_sdk        = opentelemetry::sdk::metrics;
+namespace metric_sdk = opentelemetry::sdk::metrics;
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace exporter
@@ -43,15 +42,15 @@ public:
    * @param records a collection of metrics in OpenTelemetry
    * @return a collection of translated metrics that is acceptable by Prometheus
    */
-  static std::vector<prometheus_client::MetricFamily> TranslateToPrometheus(
-      std::vector<metric_sdk::Record> &records);
+  static std::vector<::prometheus::MetricFamily> TranslateToPrometheus(
+      const std::vector<metric_sdk::Record> &records);
 
 private:
   /**
    * Set value to metric family according to record
    */
   static void SetMetricFamily(metric_sdk::Record &record,
-                              prometheus_client::MetricFamily *metric_family);
+                              ::prometheus::MetricFamily *metric_family);
 
   /**
    * Sanitize the given metric name or label according to Prometheus rule.
@@ -68,12 +67,12 @@ private:
   template <typename T>
   static void SetMetricFamilyByAggregator(std::shared_ptr<metric_sdk::Aggregator<T>> aggregator,
                                           std::string labels_str,
-                                          prometheus_client::MetricFamily *metric_family);
+                                          ::prometheus::MetricFamily *metric_family);
 
   /**
    * Translate the OTel metric type to Prometheus metric type
    */
-  static prometheus_client::MetricType TranslateType(metric_sdk::AggregatorKind kind);
+  static ::prometheus::MetricType TranslateType(metric_sdk::AggregatorKind kind);
 
   /**
    * Set metric data for:
@@ -83,9 +82,9 @@ private:
   template <typename T>
   static void SetData(std::vector<T> values,
                       const std::string &labels,
-                      prometheus_client::MetricType type,
+                      ::prometheus::MetricType type,
                       std::chrono::nanoseconds time,
-                      prometheus_client::MetricFamily *metric_family);
+                      ::prometheus::MetricFamily *metric_family);
 
   /**
    * Set metric data for:
@@ -97,7 +96,7 @@ private:
                       const std::vector<int> &counts,
                       const std::string &labels,
                       std::chrono::nanoseconds time,
-                      prometheus_client::MetricFamily *metric_family);
+                      ::prometheus::MetricFamily *metric_family);
 
   /**
    * Set metric data for:
@@ -107,7 +106,7 @@ private:
   static void SetData(double value,
                       const std::string &labels,
                       std::chrono::nanoseconds time,
-                      prometheus_client::MetricFamily *metric_family);
+                      ::prometheus::MetricFamily *metric_family);
 
   /**
    * Set metric data for:
@@ -120,14 +119,14 @@ private:
                       const std::vector<T> &quantiles,
                       const std::string &labels,
                       std::chrono::nanoseconds time,
-                      prometheus_client::MetricFamily *metric_family,
+                      ::prometheus::MetricFamily *metric_family,
                       bool do_quantile,
                       std::vector<double> quantile_points);
 
   /**
    * Set time and labels to metric data
    */
-  static void SetMetricBasic(prometheus_client::ClientMetric &metric,
+  static void SetMetricBasic(::prometheus::ClientMetric &metric,
                              std::chrono::nanoseconds time,
                              const std::string &labels);
 
@@ -150,13 +149,13 @@ private:
    */
   template <typename T>
   static void SetValue(std::vector<T> values,
-                       prometheus_client::MetricType type,
-                       prometheus_client::ClientMetric *metric);
+                       ::prometheus::MetricType type,
+                       ::prometheus::ClientMetric *metric);
 
   /**
    * Handle Gauge from MinMaxSumCount
    */
-  static void SetValue(double value, prometheus_client::ClientMetric *metric);
+  static void SetValue(double value, ::prometheus::ClientMetric *metric);
 
   /**
    * Handle Histogram
@@ -165,7 +164,7 @@ private:
   static void SetValue(std::vector<T> values,
                        std::vector<double> boundaries,
                        std::vector<int> counts,
-                       prometheus_client::ClientMetric *metric);
+                       ::prometheus::ClientMetric *metric);
 
   /**
    * Handle Exact and Sketch
@@ -174,7 +173,7 @@ private:
   static void SetValue(std::vector<T> values,
                        metric_sdk::AggregatorKind kind,
                        std::vector<T> quantiles,
-                       prometheus_client::ClientMetric *metric,
+                       ::prometheus::ClientMetric *metric,
                        bool do_quantile,
                        const std::vector<double> &quantile_points);
 };
