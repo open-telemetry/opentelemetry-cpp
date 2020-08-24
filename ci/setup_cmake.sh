@@ -2,12 +2,10 @@
 
 set -e
 
-apt update
 apt-get install --no-install-recommends --no-install-suggests -y \
                 cmake \
                 libbenchmark-dev \
-                libgtest-dev \
-                libcurl4-openssl-dev
+                libgtest-dev
 
 # Follows these instructions for setting up gtest
 # https://www.eriksmistad.no/getting-started-with-google-test-on-ubuntu/
