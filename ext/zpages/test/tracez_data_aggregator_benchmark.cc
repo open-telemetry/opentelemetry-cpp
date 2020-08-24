@@ -114,10 +114,10 @@ protected:
  */
 BENCHMARK_DEFINE_F(TracezAggregator, BM_InstantSame)(benchmark::State &state)
 {
-  const int numSpans = state.range(0);
+  const int num_spans = state.range(0);
   for (auto _ : state)
   {
-    StartEndSpans(tracer, numSpans);
+    StartEndSpans(tracer, num_spans);
   }
 }
 
@@ -129,10 +129,10 @@ BENCHMARK_DEFINE_F(TracezAggregator, BM_InstantSame)(benchmark::State &state)
  */
 BENCHMARK_DEFINE_F(TracezAggregator, BM_InstantUnique)(benchmark::State &state)
 {
-  const int numSpans = state.range(0);
+  const int num_spans = state.range(0);
   for (auto _ : state)
   {
-    StartEndSpans(tracer, numSpans, true);
+    StartEndSpans(tracer, num_spans, true);
   }
 }
 
@@ -145,13 +145,13 @@ BENCHMARK_DEFINE_F(TracezAggregator, BM_InstantUnique)(benchmark::State &state)
  */
 BENCHMARK_DEFINE_F(TracezAggregator, BM_BucketsSame)(benchmark::State &state)
 {
-  const int numSpans = state.range(0);
+  const int num_spans = state.range(0);
   for (auto _ : state)
   {
     std::vector<opentelemetry::nostd::shared_ptr<opentelemetry::trace::Span>> running_spans;
-    std::thread run(StartSpans, std::ref(running_spans), std::ref(tracer), numSpans / 3, false);
-    std::thread err(StartEndSpansError, std::ref(tracer), numSpans / 3, false);
-    StartEndSpansLatency(tracer, numSpans / 3);
+    std::thread run(StartSpans, std::ref(running_spans), std::ref(tracer), num_spans / 3, false);
+    std::thread err(StartEndSpansError, std::ref(tracer), num_spans / 3, false);
+    StartEndSpansLatency(tracer, num_spans / 3);
     run.join();
     err.join();
   }
@@ -166,13 +166,13 @@ BENCHMARK_DEFINE_F(TracezAggregator, BM_BucketsSame)(benchmark::State &state)
  */
 BENCHMARK_DEFINE_F(TracezAggregator, BM_BucketsUnique)(benchmark::State &state)
 {
-  const int numSpans = state.range(0);
+  const int num_spans = state.range(0);
   for (auto _ : state)
   {
     std::vector<opentelemetry::nostd::shared_ptr<opentelemetry::trace::Span>> running_spans;
-    std::thread run(StartSpans, std::ref(running_spans), std::ref(tracer), numSpans / 3, true);
-    std::thread err(StartEndSpansError, std::ref(tracer), numSpans / 3, true);
-    StartEndSpansLatency(tracer, numSpans / 3, true);
+    std::thread run(StartSpans, std::ref(running_spans), std::ref(tracer), num_spans / 3, true);
+    std::thread err(StartEndSpansError, std::ref(tracer), num_spans / 3, true);
+    StartEndSpansLatency(tracer, num_spans / 3, true);
     run.join();
     err.join();
   }
@@ -182,36 +182,36 @@ BENCHMARK_DEFINE_F(TracezAggregator, BM_BucketsUnique)(benchmark::State &state)
 
 BENCHMARK_DEFINE_F(TracezAggregator, BM_InstantSameGet)(benchmark::State &state)
 {
-  const int numSpans = state.range(0);
+  const int num_spans = state.range(0);
   for (auto _ : state)
   {
-    std::thread spans(StartEndSpans, std::ref(tracer), numSpans, false);
-    GetManyAggregations(std::ref(aggregator), numSpans);
+    std::thread spans(StartEndSpans, std::ref(tracer), num_spans, false);
+    GetManyAggregations(std::ref(aggregator), num_spans);
     spans.join();
   }
 }
 
 BENCHMARK_DEFINE_F(TracezAggregator, BM_InstantUniqueGet)(benchmark::State &state)
 {
-  const int numSpans = state.range(0);
+  const int num_spans = state.range(0);
   for (auto _ : state)
   {
-    std::thread spans(StartEndSpans, std::ref(tracer), numSpans, true);
-    GetManyAggregations(std::ref(aggregator), numSpans);
+    std::thread spans(StartEndSpans, std::ref(tracer), num_spans, true);
+    GetManyAggregations(std::ref(aggregator), num_spans);
     spans.join();
   }
 }
 
 BENCHMARK_DEFINE_F(TracezAggregator, BM_BucketsSameGet)(benchmark::State &state)
 {
-  const int numSpans = state.range(0);
+  const int num_spans = state.range(0);
   for (auto _ : state)
   {
     std::vector<opentelemetry::nostd::shared_ptr<opentelemetry::trace::Span>> running_spans;
-    std::thread run(StartSpans, std::ref(running_spans), std::ref(tracer), numSpans / 3, false);
-    std::thread err(StartEndSpansError, std::ref(tracer), numSpans / 3, false);
-    std::thread lat(StartEndSpansLatency, std::ref(tracer), numSpans / 3, false);
-    GetManyAggregations(std::ref(aggregator), numSpans / 3);
+    std::thread run(StartSpans, std::ref(running_spans), std::ref(tracer), num_spans / 3, false);
+    std::thread err(StartEndSpansError, std::ref(tracer), num_spans / 3, false);
+    std::thread lat(StartEndSpansLatency, std::ref(tracer), num_spans / 3, false);
+    GetManyAggregations(std::ref(aggregator), num_spans / 3);
     run.join();
     err.join();
     lat.join();
@@ -220,14 +220,14 @@ BENCHMARK_DEFINE_F(TracezAggregator, BM_BucketsSameGet)(benchmark::State &state)
 
 BENCHMARK_DEFINE_F(TracezAggregator, BM_BucketsUniqueGet)(benchmark::State &state)
 {
-  const int numSpans = state.range(0);
+  const int num_spans = state.range(0);
   for (auto _ : state)
   {
     std::vector<opentelemetry::nostd::shared_ptr<opentelemetry::trace::Span>> running_spans;
-    std::thread run(StartSpans, std::ref(running_spans), std::ref(tracer), numSpans / 3, true);
-    std::thread err(StartEndSpansError, std::ref(tracer), numSpans / 3, true);
-    std::thread lat(StartEndSpansLatency, std::ref(tracer), numSpans / 3, true);
-    GetManyAggregations(std::ref(aggregator), numSpans / 3);
+    std::thread run(StartSpans, std::ref(running_spans), std::ref(tracer), num_spans / 3, true);
+    std::thread err(StartEndSpansError, std::ref(tracer), num_spans / 3, true);
+    std::thread lat(StartEndSpansLatency, std::ref(tracer), num_spans / 3, true);
+    GetManyAggregations(std::ref(aggregator), num_spans / 3);
     run.join();
     err.join();
     lat.join();

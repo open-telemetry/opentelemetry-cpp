@@ -75,10 +75,10 @@ protected:
  */
 BENCHMARK_DEFINE_F(TracezProcessor, BM_Run)(benchmark::State &state)
 {
-  const int numSpans = state.range(0);
+  const int num_spans = state.range(0);
   for (auto _ : state)
   {
-    StartManySpans(spans, std::ref(tracer), numSpans);
+    StartManySpans(spans, std::ref(tracer), num_spans);
   }
 }
 
@@ -88,10 +88,10 @@ BENCHMARK_DEFINE_F(TracezProcessor, BM_Run)(benchmark::State &state)
  */
 BENCHMARK_DEFINE_F(TracezProcessor, BM_Snap)(benchmark::State &state)
 {
-  const int numSpans = state.range(0);
+  const int num_spans = state.range(0);
   for (auto _ : state)
   {
-    GetManySnapshots(processor, numSpans);
+    GetManySnapshots(processor, num_spans);
   }
 }
 
@@ -101,13 +101,13 @@ BENCHMARK_DEFINE_F(TracezProcessor, BM_Snap)(benchmark::State &state)
  */
 BENCHMARK_DEFINE_F(TracezProcessor, BM_RunComplete)(benchmark::State &state)
 {
-  const int numSpans = state.range(0);
+  const int num_spans = state.range(0);
   for (auto _ : state)
   {
     std::vector<opentelemetry::nostd::shared_ptr<opentelemetry::trace::Span>> spans2;
-    StartManySpans(spans2, std::ref(tracer), numSpans);
+    StartManySpans(spans2, std::ref(tracer), num_spans);
 
-    std::thread start(StartManySpans, std::ref(spans), std::ref(tracer), numSpans);
+    std::thread start(StartManySpans, std::ref(spans), std::ref(tracer), num_spans);
     EndAllSpans(spans2);
 
     start.join();
@@ -122,11 +122,11 @@ BENCHMARK_DEFINE_F(TracezProcessor, BM_RunComplete)(benchmark::State &state)
  */
 BENCHMARK_DEFINE_F(TracezProcessor, BM_RunSnap)(benchmark::State &state)
 {
-  const int numSpans = state.range(0);
+  const int num_spans = state.range(0);
   for (auto _ : state)
   {
-    std::thread snapshots(GetManySnapshots, std::ref(processor), numSpans);
-    StartManySpans(spans, std::ref(tracer), numSpans);
+    std::thread snapshots(GetManySnapshots, std::ref(processor), num_spans);
+    StartManySpans(spans, std::ref(tracer), num_spans);
 
     snapshots.join();
     EndAllSpans(spans);
@@ -140,12 +140,12 @@ BENCHMARK_DEFINE_F(TracezProcessor, BM_RunSnap)(benchmark::State &state)
  */
 BENCHMARK_DEFINE_F(TracezProcessor, BM_SnapComplete)(benchmark::State &state)
 {
-  const int numSpans = state.range(0);
+  const int num_spans = state.range(0);
   for (auto _ : state)
   {
-    StartManySpans(spans, std::ref(tracer), numSpans);
+    StartManySpans(spans, std::ref(tracer), num_spans);
 
-    std::thread snapshots(GetManySnapshots, std::ref(processor), numSpans);
+    std::thread snapshots(GetManySnapshots, std::ref(processor), num_spans);
     EndAllSpans(spans);
 
     snapshots.join();
@@ -160,15 +160,15 @@ BENCHMARK_DEFINE_F(TracezProcessor, BM_SnapComplete)(benchmark::State &state)
  */
 BENCHMARK_DEFINE_F(TracezProcessor, BM_RunSnapComplete)(benchmark::State &state)
 {
-  const int numSpans = state.range(0);
+  const int num_spans = state.range(0);
   for (auto _ : state)
   {
     std::vector<opentelemetry::nostd::shared_ptr<opentelemetry::trace::Span>> spans2;
 
-    StartManySpans(spans, std::ref(tracer), numSpans);
+    StartManySpans(spans, std::ref(tracer), num_spans);
 
-    std::thread start(StartManySpans, std::ref(spans2), std::ref(tracer), numSpans);
-    std::thread snapshots(GetManySnapshots, std::ref(processor), numSpans);
+    std::thread start(StartManySpans, std::ref(spans2), std::ref(tracer), num_spans);
+    std::thread snapshots(GetManySnapshots, std::ref(processor), num_spans);
     EndAllSpans(spans);
 
     start.join();
