@@ -10,7 +10,10 @@ namespace exporter
 namespace otlp
 {
 
-const std::string kCollectorAddress = "localhost:55678";
+// Environment variable to configure endpoint for OTLP exporter
+constexpr char kConfiguredEndpoint[] = "OTEL_EXPORTER_OTLP_ENDPOINT";
+// Default endpoint is the OpenTelemetry Collector default address
+std::string kDefaultEndpoint = "localhost:55678";
 
 // ----------------------------- Helper functions ------------------------------
 
@@ -37,7 +40,15 @@ void PopulateRequest(const nostd::span<std::unique_ptr<sdk::trace::Recordable>> 
  */
 std::unique_ptr<proto::collector::trace::v1::TraceService::Stub> MakeServiceStub()
 {
-  auto channel = grpc::CreateChannel(kCollectorAddress, grpc::InsecureChannelCredentials());
+  std::string endpoint      = kDefaultEndpoint;
+  char *configured_endpoint = getenv(kConfiguredEndpoint);
+
+  if (configured_endpoint != NULL)
+  {
+    endpoint = configured_endpoint;
+  }
+
+  auto channel = grpc::CreateChannel(endpoint, grpc::InsecureChannelCredentials());
   return proto::collector::trace::v1::TraceService::NewStub(channel);
 }
 
