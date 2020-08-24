@@ -34,4 +34,3 @@
 
 # Bazel files
 /bazel-*
-/.idea/
