@@ -41,11 +41,10 @@ elif [[ "$1" == "cmake.exporter.otprotocol.test" ]]; then
   make test
   exit 0
 elif [[ "$1" == "cmake.exporter.prometheus.test" ]]; then
-  export DEBIAN_FRONTEND=noninteractive
-  apt-get update
-  apt-get install zlib1g-dev
-  apt-get -y install libcurl4-openssl-dev
-
+#  export DEBIAN_FRONTEND=noninteractive
+#  sudo apt-get update
+#  sudo apt-get install zlib1g-dev
+#  sudo apt-get -y install libcurl4-openssl-dev
   cd third_party
   git clone https://github.com/jupp0r/prometheus-cpp
   cd prometheus-cpp
