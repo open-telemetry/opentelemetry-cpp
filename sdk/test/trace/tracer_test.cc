@@ -111,10 +111,17 @@ TEST(Tracer, ToMockSpanExporter)
   ASSERT_EQ(1, spans_received->size());
 
   ASSERT_EQ("span 2", spans_received->at(0)->GetName());
+  EXPECT_TRUE(spans_received->at(0)->GetTraceId().IsValid());
+  EXPECT_TRUE(spans_received->at(0)->GetSpanId().IsValid());
+  EXPECT_FALSE(spans_received->at(0)->GetParentSpanId().IsValid());
 
   span_first->End();
   ASSERT_EQ(2, spans_received->size());
+
   ASSERT_EQ("span 1", spans_received->at(1)->GetName());
+  EXPECT_TRUE(spans_received->at(1)->GetTraceId().IsValid());
+  EXPECT_TRUE(spans_received->at(1)->GetSpanId().IsValid());
+  EXPECT_FALSE(spans_received->at(1)->GetParentSpanId().IsValid());
 }
 
 TEST(Tracer, StartSpanSampleOn)
