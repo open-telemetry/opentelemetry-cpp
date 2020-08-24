@@ -40,6 +40,33 @@ elif [[ "$1" == "cmake.exporter.otprotocol.test" ]]; then
   make
   make test
   exit 0
+elif [[ "$1" == "cmake.exporter.prometheus.test" ]]; then
+  export DEBIAN_FRONTEND=noninteractive
+  apt-get update
+  apt-get install zlib1g-dev
+  apt-get -y install libcurl4-openssl-dev
+
+  cd third_party
+  git clone https://github.com/jupp0r/prometheus-cpp
+  cd prometheus-cpp
+  git checkout v0.9.0
+  git submodule init
+  git submodule update
+  mkdir _build && cd _build
+  cmake .. -DBUILD_SHARED_LIBS=ON
+  make -j 4
+  make install
+
+  cd "${BUILD_DIR}"
+  rm -rf *
+
+  cmake -DCMAKE_BUILD_TYPE=Debug  \
+        -DWITH_PROMETHEUS=ON \
+        -DCMAKE_CXX_FLAGS="-Werror" \
+        "${SRC_DIR}"
+  make
+  make test
+  exit 0
 elif [[ "$1" == "cmake.test_example_plugin" ]]; then
   # Build the plugin
   cd "${BUILD_DIR}"
