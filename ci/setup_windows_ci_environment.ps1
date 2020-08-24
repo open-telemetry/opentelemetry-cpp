@@ -12,6 +12,4 @@ $VCPKG_DIR=(Get-Item -Path ".\").FullName
 ./vcpkg install --overlay-ports="$PSScriptRoot\ports" benchmark:x64-windows
 
 ./vcpkg install gtest:x64-windows
-
-./vcpkg install --overlay-ports="$PSScriptRoot\ports" prometheus-cpp:x64-windows
 Pop-Location
