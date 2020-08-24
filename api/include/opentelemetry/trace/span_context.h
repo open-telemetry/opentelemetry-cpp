@@ -60,12 +60,11 @@ public:
               SpanId span_id,
               TraceFlags trace_flags,
               bool has_remote_parent) noexcept
-  {
-    trace_id_      = trace_id;
-    span_id_       = span_id;
-    trace_flags_   = trace_flags;
-    remote_parent_ = has_remote_parent;
-  }
+      : trace_id_(trace_id),
+        span_id_(span_id),
+        trace_flags_(trace_flags),
+        remote_parent_(has_remote_parent)
+  {}
 
   SpanContext(SpanContext &&ctx)
       : trace_id_(ctx.trace_id()), span_id_(ctx.span_id()), trace_flags_(ctx.trace_flags())
@@ -102,8 +101,6 @@ public:
   const SpanId &span_id() const noexcept { return span_id_; }
 
   const TraceFlags &trace_flags() const noexcept { return trace_flags_; }
-
-  bool IsValid() const noexcept { return trace_id_.IsValid() && span_id_.IsValid(); }
 
   bool HasRemoteParent() const noexcept { return remote_parent_; }
 
