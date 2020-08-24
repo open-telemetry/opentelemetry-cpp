@@ -12,7 +12,7 @@ using namespace opentelemetry::ext::zpages;
 /////////////////////////////// BENCHMARK HELPER FUNCTIONS //////////////////////////////
 
 /*
- * Helper function that creates and add i spans into the passed in vector
+ * Helper function that creates and add i spans into the passed in vector.
  */
 void StartManySpans(
     std::vector<opentelemetry::nostd::shared_ptr<opentelemetry::trace::Span>> &spans,
@@ -42,7 +42,7 @@ void EndAllSpans(std::vector<opentelemetry::nostd::shared_ptr<opentelemetry::tra
  * Snapshots are significant and contribute to performance differences because
  * completed spans are cleared from the processor memory. This function
  * simulates an aggregator querying the processor many times, but doesn't
- * process spans and throws them out.
+ * aggregate or store spans.
  */
 void GetManySnapshots(std::shared_ptr<TracezSpanProcessor> &processor, int i)
 {

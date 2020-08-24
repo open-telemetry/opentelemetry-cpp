@@ -13,7 +13,7 @@ using opentelemetry::core::SteadyTimestamp;
 /////////////////////////////// BENCHMARK HELPER FUNCTIONS //////////////////////////////
 
 /*
- * Helper function that creates and ends i spans instantly
+ * Helper function that creates and ends i spans instantly.
  */
 void StartEndSpans(
     std::shared_ptr<opentelemetry::trace::Tracer> &tracer,
@@ -46,7 +46,7 @@ void StartEndSpansLatency(
   }
 }
 /*
- * Helper function that creates and ends spans instantly. while simulating
+ * Helper function that creates and ends spans instantly, while simulating
  * error codes.
  */
 void StartEndSpansError(
@@ -71,6 +71,13 @@ void StartSpans(
   for (; i > 0; i--)
     spans.push_back(tracer->StartSpan(isUnique ? std::to_string(i) : ""));
 }
+
+/*
+ * Helper function that queries for Tracez data. This simulates a user visiting
+ * or refreshing the Tracez webpage many times, except this function does and
+ * holds nothing in memory. While this runs, aggregation work and performance is
+ * expected is be affected negatively.
+ */
 
 void GetManyAggregations(std::unique_ptr<TracezDataAggregator> &aggregator, int i)
 {
@@ -97,7 +104,7 @@ protected:
 
 //////////////////////////// BENCHMARK DEFINITIONS /////////////////////////////////
 
-////////////// BENCHMARKS WHERE USER NEVER VISITS WEBPAGE /////////////////////////
+//////////////////////// USER NEVER VISITS WEBPAGE //////////////////////////////
 
 /*
  * Aggregator handing many spans with the same name, who end instantly. This
@@ -155,7 +162,7 @@ BENCHMARK_DEFINE_F(TracezAggregator, BM_BucketsSame)(benchmark::State &state)
  * running, and any latency group. This checks the scenario where there's many
  * Tracez groups and there needs to be sorting of spans into their
  * respective buckets. Spans are in the different groups and buckets, similar to
- * real likely use cases.
+ * likely real use cases.
  */
 BENCHMARK_DEFINE_F(TracezAggregator, BM_BucketsUnique)(benchmark::State &state)
 {
@@ -171,7 +178,7 @@ BENCHMARK_DEFINE_F(TracezAggregator, BM_BucketsUnique)(benchmark::State &state)
   }
 }
 
-//////// SAME BENCHMARKS, BUT USER VISITS WEBPAGE--DELAYING AGGREGATION WORK /////////
+//////////////////// SAME BENCHMARKS, BUT USER VISITS WEBPAGE ////////////////////////
 
 BENCHMARK_DEFINE_F(TracezAggregator, BM_InstantSameGet)(benchmark::State &state)
 {
@@ -226,7 +233,8 @@ BENCHMARK_DEFINE_F(TracezAggregator, BM_BucketsUniqueGet)(benchmark::State &stat
     lat.join();
   }
 }
-/////////////////////// RUN BENCHMARKS ///////////////////////////
+
+//////////////////////////// RUN BENCHMARKS ///////////////////////////////
 
 BENCHMARK_REGISTER_F(TracezAggregator, BM_InstantSame)->Arg(10)->Arg(1000);
 BENCHMARK_REGISTER_F(TracezAggregator, BM_InstantSameGet)->Arg(10)->Arg(1000);
