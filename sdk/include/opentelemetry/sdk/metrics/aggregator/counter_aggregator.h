@@ -36,6 +36,7 @@ public:
   void update(T val) override
   {
     this->mu_.lock();
+    this->updated_ = true;
     this->values_[0] += val;  // atomic operation
     this->mu_.unlock();
   }
@@ -50,6 +51,7 @@ public:
   void checkpoint() override
   {
     this->mu_.lock();
+    this->updated_    = false;
     this->checkpoint_ = this->values_;
     this->values_[0]  = 0;
     this->mu_.unlock();

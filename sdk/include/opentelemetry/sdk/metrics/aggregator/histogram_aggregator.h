@@ -63,7 +63,8 @@ public:
   void update(T val) override
   {
     this->mu_.lock();
-    int bucketID = boundaries_.size();
+    this->updated_ = true;
+    int bucketID   = boundaries_.size();
     for (size_t i = 0; i < boundaries_.size(); i++)
     {
       if (val < boundaries_[i])  // concurrent read is thread-safe
@@ -93,6 +94,7 @@ public:
   void checkpoint() override
   {
     this->mu_.lock();
+    this->updated_     = false;
     this->checkpoint_  = this->values_;
     this->values_[0]   = 0;
     this->values_[1]   = 0;
