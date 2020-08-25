@@ -93,20 +93,36 @@ public:
 
   static TraceId GenerateTraceIdFromString(nostd::string_view trace_id)
   {
-    size_t trace_id_len = kHeaderElementLengths[1];
-    uint8_t buf[trace_id_len / 2];
-    uint8_t *b_ptr = buf;
-    GenerateHexFromString(trace_id, trace_id_len, b_ptr);
-    return TraceId(buf);
+    int trace_id_len = kHeaderElementLengths[1];
+    if (trace_id_len == 32)
+    {
+      // buf has to be manually set to size of 16 as TraceId don't recognize variable initialized
+      // size
+      uint8_t buf[16];
+      uint8_t *b_ptr = buf;
+      GenerateHexFromString(trace_id, trace_id_len, b_ptr);
+      return TraceId(buf);
+    }
+    else
+    {
+      return TraceId();
+    }
   }
 
   static SpanId GenerateSpanIdFromString(nostd::string_view span_id)
   {
-    size_t span_id_len = kHeaderElementLengths[2];
-    uint8_t buf[span_id_len / 2];
-    uint8_t *b_ptr = buf;
-    GenerateHexFromString(span_id, span_id_len, b_ptr);
-    return SpanId(buf);
+    int span_id_len = kHeaderElementLengths[2];
+    if (span_id_len == 16)
+    {
+      uint8_t buf[8];
+      uint8_t *b_ptr = buf;
+      GenerateHexFromString(span_id, span_id_len, b_ptr);
+      return SpanId(buf);
+    }
+    else
+    {
+      return SpanId();
+    }
   }
 
   static TraceFlags GenerateTraceFlagsFromString(nostd::string_view trace_flags)
