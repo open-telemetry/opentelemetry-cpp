@@ -69,10 +69,6 @@ void PrometheusExporterUtils::SetMetricFamily(metric_sdk::Record &record,
 
   auto origin_name = record.GetName();
   auto sanitized   = SanitizeNames(origin_name);
-  if (origin_name != sanitized)
-  {
-    std::cout << "Sanitized metric name \"" << origin_name << "\" to \"" << sanitized << "\"\n";
-  }
   metric_family->name = sanitized;
   metric_family->help = record.GetDescription();
 
@@ -292,10 +288,6 @@ void PrometheusExporterUtils::SetMetricBasic(prometheus_client::ClientMetric &me
     {
       auto origin_name = label_pairs[i].first;
       auto sanitized   = SanitizeNames(origin_name);
-      if (origin_name != sanitized)
-      {
-        std::cout << "Sanitized label name \"" << origin_name << "\" to \"" << sanitized << "\"\n";
-      }
       metric.label[i].name  = sanitized;
       metric.label[i].value = label_pairs[i].second;
     }
