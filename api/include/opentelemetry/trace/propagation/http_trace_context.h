@@ -34,15 +34,12 @@ namespace propagation
 {
 static const nostd::string_view kTraceParent = "traceparent";
 static const nostd::string_view kTraceState  = "tracestate";
-static const int kVersionBytes               = 2;
-static const int kTraceIdBytes               = 32;
-static const int kSpanIdBytes                = 16;
-static const int kTraceFlagBytes             = 2;
 static const int kTraceDelimiterBytes        = 3;
-static const int kHeaderSize =
-    kVersionBytes + kTraceIdBytes + kSpanIdBytes + kTraceFlagBytes + kTraceDelimiterBytes;
-static const int kTraceStateMaxMembers    = 32;
-static const int kHeaderElementLengths[4] = {2, 32, 16, 2};
+static const int kHeaderElementLengths[4]    = {2, 32, 16, 2};
+static const int kHeaderSize                 = kHeaderElementLengths[0] + kHeaderElementLengths[1] +
+                               kHeaderElementLengths[2] + kHeaderElementLengths[3] +
+                               kTraceDelimiterBytes;
+static const int kTraceStateMaxMembers = 32;
 
 // The HttpTraceContext provides methods to extract and inject
 // context into headers of HTTP requests with traces.
@@ -120,17 +117,17 @@ public:
 
   static TraceId GenerateTraceIdFromString(nostd::string_view trace_id)
   {
-    uint8_t buf[kTraceIdBytes / 2];
+    uint8_t buf[kHeaderElementLength[1] / 2];
     uint8_t *b_ptr = buf;
-    GenerateBuffer(trace_id, kTraceIdBytes, b_ptr);
+    GenerateBuffer(trace_id, kHeaderElementLength[1], b_ptr);
     return TraceId(buf);
   }
 
   static SpanId GenerateSpanIdFromString(nostd::string_view span_id)
   {
-    uint8_t buf[kSpanIdBytes / 2];
+    uint8_t buf[kHeaderElementLength[2] / 2];
     uint8_t *b_ptr = buf;
-    GenerateBuffer(span_id, kSpanIdBytes, b_ptr);
+    GenerateBuffer(span_id, kHeaderElementLength[2], b_ptr);
     return SpanId(buf);
   }
 
@@ -216,9 +213,10 @@ private:
 
   static SpanContext ExtractContextFromTraceParent(nostd::string_view trace_parent)
   {
-    if (trace_parent.length() != kHeaderSize || trace_parent[kVersionBytes] != '-' ||
-        trace_parent[kVersionBytes + kTraceIdBytes + 1] != '-' ||
-        trace_parent[kVersionBytes + kTraceIdBytes + kSpanIdBytes + 2] != '-')
+    if (trace_parent.length() != kHeaderSize || trace_parent[kHeaderElementLength[0]] != '-' ||
+        trace_parent[kHeaderElementLength[0] + kHeaderElementLength[1] + 1] != '-' ||
+        trace_parent[kHeaderElementLength[0] + kHeaderElementLength[1] + kHeaderElementLength[2] +
+                     2] != '-')
     {
       std::cout << "Unparseable trace_parent header. Returning INVALID span context." << std::endl;
       return SpanContext(false, false);
