@@ -90,7 +90,8 @@ public:
     }
   }
 
-  static void GenerateBuffer(nostd::string_view string, int bytes, uint8_t *buf)
+  // Converts the hex numbers stored as strings into bytes stored in a buffer.
+  static void GenerateHexFromString(nostd::string_view string, int bytes, uint8_t *buf)
   {
     const char *str_id = string.begin();
     for (int i = 0; i < bytes; i++)
@@ -117,17 +118,17 @@ public:
 
   static TraceId GenerateTraceIdFromString(nostd::string_view trace_id)
   {
-    uint8_t buf[kHeaderElementLength[1] / 2];
+    uint8_t buf[kHeaderElementLengths[1] / 2];
     uint8_t *b_ptr = buf;
-    GenerateBuffer(trace_id, kHeaderElementLength[1], b_ptr);
+    GenerateHexFromString(trace_id, kHeaderElementLengths[1], b_ptr);
     return TraceId(buf);
   }
 
   static SpanId GenerateSpanIdFromString(nostd::string_view span_id)
   {
-    uint8_t buf[kHeaderElementLength[2] / 2];
+    uint8_t buf[kHeaderElementLengths[2] / 2];
     uint8_t *b_ptr = buf;
-    GenerateBuffer(span_id, kHeaderElementLength[2], b_ptr);
+    GenerateHexFromString(span_id, kHeaderElementLengths[2], b_ptr);
     return SpanId(buf);
   }
 
@@ -213,10 +214,10 @@ private:
 
   static SpanContext ExtractContextFromTraceParent(nostd::string_view trace_parent)
   {
-    if (trace_parent.length() != kHeaderSize || trace_parent[kHeaderElementLength[0]] != '-' ||
-        trace_parent[kHeaderElementLength[0] + kHeaderElementLength[1] + 1] != '-' ||
-        trace_parent[kHeaderElementLength[0] + kHeaderElementLength[1] + kHeaderElementLength[2] +
-                     2] != '-')
+    if (trace_parent.length() != kHeaderSize || trace_parent[kHeaderElementLengths[0]] != '-' ||
+        trace_parent[kHeaderElementLengths[0] + kHeaderElementLengths[1] + 1] != '-' ||
+        trace_parent[kHeaderElementLengths[0] + kHeaderElementLengths[1] +
+                     kHeaderElementLengths[2] + 2] != '-')
     {
       std::cout << "Unparseable trace_parent header. Returning INVALID span context." << std::endl;
       return SpanContext(false, false);
