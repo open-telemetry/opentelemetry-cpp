@@ -14,14 +14,18 @@
 
 package(default_visibility = ["//visibility:public"])
 
-cc_library(
-    name = "trace",
-    srcs = glob(["**/*.cc"]),
-    hdrs = glob(["**/*.h"]),
-    include_prefix = "src/trace",
+cc_binary(
+    name = "zpages_example",
+    srcs = [
+        "zpages_example.cc",
+    ],
+    linkopts = select({
+        "//bazel:windows": [],
+        "//conditions:default": ["-pthread"],
+    }),
     deps = [
-        "//api",
-        "//sdk:headers",
-        "//sdk/src/common:random",
+        "//ext:headers",
+        "//ext/src/zpages",
+        "//sdk/src/trace",
     ],
 )
