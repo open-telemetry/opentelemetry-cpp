@@ -83,7 +83,7 @@ public:
   {
     SpanContext *spn_ctx =
         new SpanContext(ctx.trace_id(), ctx.span_id(), ctx.trace_flags(), ctx.HasRemoteParent());
-    this = span_ctx;
+    this = spn_ctx;
     return *this;
   };
 
@@ -91,7 +91,7 @@ public:
   {
     SpanContext *spn_ctx =
         new SpanContext(ctx.trace_id(), ctx.span_id(), ctx.trace_flags(), ctx.HasRemoteParent());
-    this = span_ctx;
+    this = spn_ctx;
     return *this;
   };
 
