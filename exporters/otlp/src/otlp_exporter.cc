@@ -44,7 +44,7 @@ std::unique_ptr<proto::collector::trace::v1::TraceService::Stub> MakeServiceStub
 
 OtlpExporter::OtlpExporter() : OtlpExporter(OtlpExporterOptions()) {}
 
-OtlpExporter::OtlpExporter(OtlpExporterOptions options)
+OtlpExporter::OtlpExporter(const OtlpExporterOptions &options)
     : options_(options), trace_service_stub_(MakeServiceStub(options.endpoint))
 {}
 

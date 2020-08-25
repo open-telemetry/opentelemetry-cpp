@@ -25,7 +25,7 @@ public:
   }
 
   // Get the options associated with the given exporter.
-  OtlpExporterOptions GetOptions(std::unique_ptr<OtlpExporter> &exporter)
+  const OtlpExporterOptions &GetOptions(std::unique_ptr<OtlpExporter> &exporter)
   {
     return exporter->options_;
   }

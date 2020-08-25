@@ -31,7 +31,7 @@ public:
   /**
    * Create an OtlpExporter using the given options.
    */
-  OtlpExporter(OtlpExporterOptions options);
+  OtlpExporter(const OtlpExporterOptions &options);
 
   /**
    * Create a span recordable.
