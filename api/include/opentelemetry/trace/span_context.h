@@ -79,6 +79,19 @@ public:
       : trace_id_(ctx.trace_id()), span_id_(ctx.span_id()), trace_flags_(ctx.trace_flags())
   {}
 
+  SpanContext &operator=(const SpanContext &ctx)
+  {
+    SpanContext *spn_ctx =
+        new SpanContext(ctx.trace_id(), ctx.span_id(), ctx.trace_flags(), ctx.HasRemoteParent());
+    return *spn_ctx;
+  };
+
+  SpanContext &operator=(SpanContext &&ctx)
+  {
+    SpanContext *spn_ctx =
+        new SpanContext(ctx.trace_id(), ctx.span_id(), ctx.trace_flags(), ctx.HasRemoteParent());
+    return *spn_ctx;
+  };
 
   bool operator==(const SpanContext &that) const noexcept
   {
