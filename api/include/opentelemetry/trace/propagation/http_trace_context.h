@@ -43,10 +43,10 @@ static const int kHeaderSize = kHeaderElementLengths[0] + kHeaderElementLengths[
                                kHeaderElementLengths[2] + kHeaderElementLengths[3] +
                                kTraceDelimiterBytes;
 static const int kTraceStateMaxMembers = 32;
-static const int kVersionBytes         = kHeaderElementLengths[0];
-static const int kTraceIdBytes         = kHeaderElementLengths[1];
-static const int kSpanIdBytes          = kHeaderElementLengths[2];
-static const int kTraceFlagBytes       = kHeaderElementLengths[3];
+static const int kVersionBytes         = 2;
+static const int kTraceIdBytes         = 32;
+static const int kSpanIdBytes          = 16;
+static const int kTraceFlagBytes       = 2;
 
 // The HttpTraceContext provides methods to extract and inject
 // context into headers of HTTP requests with traces.
