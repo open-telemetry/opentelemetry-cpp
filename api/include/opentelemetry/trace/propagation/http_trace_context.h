@@ -34,6 +34,8 @@ namespace propagation
 {
 static const nostd::string_view kTraceParent = "traceparent";
 static const nostd::string_view kTraceState  = "tracestate";
+static const int kTraceStateMaxMembers    = 32;
+static const int kHeaderElementLengths[4] = {2, 32, 16, 2};
 static const int kTraceDelimiterBytes        = 3;
 static const int kHeaderElementLengths[4]    = {
     2, 32, 16, 2};  // 0: version, 1: trace id, 2: span id, 3: trace flags
@@ -41,6 +43,10 @@ static const int kHeaderSize = kHeaderElementLengths[0] + kHeaderElementLengths[
                                kHeaderElementLengths[2] + kHeaderElementLengths[3] +
                                kTraceDelimiterBytes;
 static const int kTraceStateMaxMembers = 32;
+static const int kVersionBytes               = kHeaderElementLengths[0];
+static const int kTraceIdBytes               = kHeaderElementLengths[1];
+static const int kSpanIdBytes                = kHeaderElementLengths[2];
+static const int kTraceFlagBytes             = kHeaderElementLengths[3];
 
 // The HttpTraceContext provides methods to extract and inject
 // context into headers of HTTP requests with traces.
@@ -94,35 +100,19 @@ public:
   static TraceId GenerateTraceIdFromString(nostd::string_view trace_id)
   {
     int trace_id_len = kHeaderElementLengths[1];
-    if (trace_id_len == 32)
-    {
-      // buf has to be manually set to size of 16 as TraceId don't recognize variable initialized
-      // size
-      uint8_t buf[16];
-      uint8_t *b_ptr = buf;
-      GenerateHexFromString(trace_id, trace_id_len, b_ptr);
-      return TraceId(buf);
-    }
-    else
-    {
-      return TraceId();
-    }
+    uint8_t buf[kTraceIdBytes / 2];
+    uint8_t *b_ptr = buf;
+    GenerateHexFromString(trace_id, trace_id_len, b_ptr);
+    return TraceId(buf);
   }
 
   static SpanId GenerateSpanIdFromString(nostd::string_view span_id)
   {
     int span_id_len = kHeaderElementLengths[2];
-    if (span_id_len == 16)
-    {
-      uint8_t buf[8];
-      uint8_t *b_ptr = buf;
-      GenerateHexFromString(span_id, span_id_len, b_ptr);
-      return SpanId(buf);
-    }
-    else
-    {
-      return SpanId();
-    }
+    uint8_t buf[kSpanIdBytes / 2];
+    uint8_t *b_ptr = buf;
+    GenerateHexFromString(span_id, span_id_len, b_ptr);
+    return SpanId(buf);
   }
 
   static TraceFlags GenerateTraceFlagsFromString(nostd::string_view trace_flags)
