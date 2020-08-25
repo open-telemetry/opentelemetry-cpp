@@ -79,17 +79,17 @@ public:
       : trace_id_(ctx.trace_id()), span_id_(ctx.span_id()), trace_flags_(ctx.trace_flags())
   {}
 
-  SpanContext &operator=(const SpanContext &ctx)
-      : trace_id_(trace_id), span_id_(span_id), trace_flags_(trace_flags)
-  {
-    return *this;
-  };
-
-  SpanContext &operator=(SpanContext &&ctx)
-      : trace_id_(trace_id), span_id_(span_id), trace_flags_(trace_flags)
-  {
-    return *this;
-  };
+//  SpanContext &operator=(const SpanContext &ctx)
+//      : trace_id_(trace_id), span_id_(span_id), trace_flags_(trace_flags)
+//  {
+//    return *this;
+//  };
+//
+//  SpanContext &operator=(SpanContext &&ctx)
+//      : trace_id_(trace_id), span_id_(span_id), trace_flags_(trace_flags)
+//  {
+//    return *this;
+//  };
 
   bool operator==(const SpanContext &that) const noexcept
   {
