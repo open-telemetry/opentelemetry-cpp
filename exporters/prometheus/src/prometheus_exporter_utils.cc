@@ -280,7 +280,7 @@ void PrometheusExporterUtils::SetMetricBasic(prometheus_client::ClientMetric &me
 {
   metric.timestamp_ms = time.count() / 1000000;
 
-  auto label_pairs = Parse Label(labels);
+  auto label_pairs = ParseLabel(labels);
   if (!label_pairs.empty())
   {
     metric.label.resize(label_pairs.size());
