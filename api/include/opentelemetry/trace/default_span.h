@@ -45,7 +45,7 @@ public:
 
   DefaultSpan() = default;
 
-  DefaultSpan(SpanContext span_context) { this->span_context_ = span_context; }
+  DefaultSpan(SpanContext span_context) : span_context_(span_context) {}
 
   // movable and copiable
   DefaultSpan(DefaultSpan &&spn) : span_context_(spn.GetContext()) {}
