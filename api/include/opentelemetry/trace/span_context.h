@@ -83,14 +83,16 @@ public:
   {
     SpanContext *spn_ctx =
         new SpanContext(ctx.trace_id(), ctx.span_id(), ctx.trace_flags(), ctx.HasRemoteParent());
-    return *spn_ctx;
+    this = span_ctx;
+    return *this;
   };
 
   SpanContext &operator=(SpanContext &&ctx)
   {
     SpanContext *spn_ctx =
         new SpanContext(ctx.trace_id(), ctx.span_id(), ctx.trace_flags(), ctx.HasRemoteParent());
-    return *spn_ctx;
+    this = span_ctx;
+    return *this;
   };
 
   bool operator==(const SpanContext &that) const noexcept
