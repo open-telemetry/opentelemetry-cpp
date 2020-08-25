@@ -1,9 +1,9 @@
-#include "opentelemetry/context/threadlocal_context.h"
 #include "opentelemetry/ext/zpages/tracez_processor.h"
 
 #include <benchmark/benchmark.h>
 #include <thread>
 
+#include "opentelemetry/context/threadlocal_context.h"
 #include "opentelemetry/sdk/trace/tracer.h"
 
 using namespace opentelemetry::sdk::trace;
@@ -16,7 +16,7 @@ using namespace opentelemetry::ext::zpages;
  */
 void StartManySpans(
     std::vector<opentelemetry::nostd::shared_ptr<opentelemetry::trace::Span>> &spans,
-    std::shared_ptr<opentelemetry::trace::Tracer> &tracer,
+    std::unique_ptr<opentelemetry::trace::Tracer> &tracer,
     int i)
 {
   for (; i > 0; i--)
@@ -58,11 +58,11 @@ protected:
   void SetUp(const ::benchmark::State& state)
   {
     processor  = std::shared_ptr<TracezSpanProcessor>(new TracezSpanProcessor());
-    tracer     = std::shared_ptr<opentelemetry::trace::Tracer>(new Tracer(processor));
+    tracer     = std::unique_ptr<opentelemetry::trace::Tracer>(new Tracer(processor));
   }
 
   std::shared_ptr<TracezSpanProcessor> processor;
-  std::shared_ptr<opentelemetry::trace::Tracer> tracer;
+  std::unique_ptr<opentelemetry::trace::Tracer> tracer;
 
   std::vector<opentelemetry::nostd::shared_ptr<opentelemetry::trace::Span>> spans;
 };
@@ -73,7 +73,7 @@ protected:
  * Make many empty spans. This checks the scenario where the processor holds
  * many running spans but never gets queried.
  */
-BENCHMARK_DEFINE_F(TracezProcessor, BM_Run)(benchmark::State &state)
+BENCHMARK_DEFINE_F(TracezProcessor, BM_MakeRunning)(benchmark::State &state)
 {
   const int num_spans = state.range(0);
   for (auto _ : state)
@@ -86,7 +86,7 @@ BENCHMARK_DEFINE_F(TracezProcessor, BM_Run)(benchmark::State &state)
  * Make many snapshots. This checks the scenario where the processor holds
  * no spans but gets queried many times.
  */
-BENCHMARK_DEFINE_F(TracezProcessor, BM_Snap)(benchmark::State &state)
+BENCHMARK_DEFINE_F(TracezProcessor, BM_GetSpans)(benchmark::State &state)
 {
   const int num_spans = state.range(0);
   for (auto _ : state)
@@ -99,7 +99,7 @@ BENCHMARK_DEFINE_F(TracezProcessor, BM_Snap)(benchmark::State &state)
  * Make and end many empty spans. This checks the scenario where the processor holds
  * many running and completed spans but never gets queried.
  */
-BENCHMARK_DEFINE_F(TracezProcessor, BM_RunComplete)(benchmark::State &state)
+BENCHMARK_DEFINE_F(TracezProcessor, BM_MakeRunningMakeComplete)(benchmark::State &state)
 {
   const int num_spans = state.range(0);
   for (auto _ : state)
@@ -120,7 +120,7 @@ BENCHMARK_DEFINE_F(TracezProcessor, BM_RunComplete)(benchmark::State &state)
  * Make many empty spans while spapshots grabbed. This checks the scenario where the
  * processor holds many running spans and gets queried.
  */
-BENCHMARK_DEFINE_F(TracezProcessor, BM_RunSnap)(benchmark::State &state)
+BENCHMARK_DEFINE_F(TracezProcessor, BM_MakeRunningGetSpans)(benchmark::State &state)
 {
   const int num_spans = state.range(0);
   for (auto _ : state)
@@ -138,7 +138,7 @@ BENCHMARK_DEFINE_F(TracezProcessor, BM_RunSnap)(benchmark::State &state)
  * where the processor doesn't make new spans, but existing spans complete while they're
  * queried.
  */
-BENCHMARK_DEFINE_F(TracezProcessor, BM_SnapComplete)(benchmark::State &state)
+BENCHMARK_DEFINE_F(TracezProcessor, BM_GetSpansMakeComplete)(benchmark::State &state)
 {
   const int num_spans = state.range(0);
   for (auto _ : state)
@@ -158,7 +158,7 @@ BENCHMARK_DEFINE_F(TracezProcessor, BM_SnapComplete)(benchmark::State &state)
  * checks the scenario where the processor makes new spans, other spans complete,
  * and all spans are queried. This is the case most similar to real situations.
  */
-BENCHMARK_DEFINE_F(TracezProcessor, BM_RunSnapComplete)(benchmark::State &state)
+BENCHMARK_DEFINE_F(TracezProcessor, BM_MakeRunningGetSpansMakeComplete)(benchmark::State &state)
 {
   const int num_spans = state.range(0);
   for (auto _ : state)
@@ -180,12 +180,13 @@ BENCHMARK_DEFINE_F(TracezProcessor, BM_RunSnapComplete)(benchmark::State &state)
 
 /////////////////////// RUN BENCHMARKS ///////////////////////////
 
-BENCHMARK_REGISTER_F(TracezProcessor, BM_Run)->Arg(10)->Arg(1000);
-BENCHMARK_REGISTER_F(TracezProcessor, BM_Snap)->Arg(10)->Arg(1000);
-BENCHMARK_REGISTER_F(TracezProcessor, BM_RunComplete)->Arg(10)->Arg(1000);
-BENCHMARK_REGISTER_F(TracezProcessor, BM_RunSnap)->Arg(10)->Arg(1000);
-BENCHMARK_REGISTER_F(TracezProcessor, BM_SnapComplete)->Arg(10)->Arg(1000);
-BENCHMARK_REGISTER_F(TracezProcessor, BM_RunSnapComplete)->Arg(10)->Arg(1000);
+// Arg is the number of spans created for each iteration
+BENCHMARK_REGISTER_F(TracezProcessor, BM_MakeRunning)->Arg(10)->Arg(1000);
+BENCHMARK_REGISTER_F(TracezProcessor, BM_GetSpans)->Arg(10)->Arg(1000);
+BENCHMARK_REGISTER_F(TracezProcessor, BM_MakeRunningMakeComplete)->Arg(10)->Arg(1000);
+BENCHMARK_REGISTER_F(TracezProcessor, BM_MakeRunningGetSpans)->Arg(10)->Arg(1000);
+BENCHMARK_REGISTER_F(TracezProcessor, BM_GetSpansMakeComplete)->Arg(10)->Arg(1000);
+BENCHMARK_REGISTER_F(TracezProcessor, BM_MakeRunningGetSpansMakeComplete)->Arg(10)->Arg(1000);
 
 BENCHMARK_MAIN();
 
