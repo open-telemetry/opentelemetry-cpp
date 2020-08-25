@@ -35,8 +35,9 @@ namespace propagation
 static const nostd::string_view kTraceParent = "traceparent";
 static const nostd::string_view kTraceState  = "tracestate";
 static const int kTraceDelimiterBytes        = 3;
-static const int kHeaderElementLengths[4]    = {2, 32, 16, 2};
-static const int kHeaderSize                 = kHeaderElementLengths[0] + kHeaderElementLengths[1] +
+static const int kHeaderElementLengths[4]    = {
+    2, 32, 16, 2};  // 0: version, 1: trace id, 2: span id, 3: trace flags
+static const int kHeaderSize = kHeaderElementLengths[0] + kHeaderElementLengths[1] +
                                kHeaderElementLengths[2] + kHeaderElementLengths[3] +
                                kTraceDelimiterBytes;
 static const int kTraceStateMaxMembers = 32;
@@ -90,32 +91,6 @@ public:
     }
   }
 
-  // Converts the hex numbers stored as strings into bytes stored in a buffer.
-  static void GenerateHexFromString(nostd::string_view string, int bytes, uint8_t *buf)
-  {
-    const char *str_id = string.begin();
-    for (int i = 0; i < bytes; i++)
-    {
-      int tmp = HexToInt(str_id[i]);
-      if (tmp < 0)
-      {
-        for (int j = 0; j < bytes / 2; j++)
-        {
-          buf[j] = 0;
-        }
-        return;
-      }
-      if (i % 2 == 0)
-      {
-        buf[i / 2] = tmp * 16;
-      }
-      else
-      {
-        buf[i / 2] += tmp;
-      }
-    }
-  }
-
   static TraceId GenerateTraceIdFromString(nostd::string_view trace_id)
   {
     uint8_t buf[kHeaderElementLengths[1] / 2];
@@ -147,6 +122,32 @@ public:
   }
 
 private:
+  // Converts the hex numbers stored as strings into bytes stored in a buffer.
+  static void GenerateHexFromString(nostd::string_view string, int bytes, uint8_t *buf)
+  {
+    const char *str_id = string.begin();
+    for (int i = 0; i < bytes; i++)
+    {
+      int tmp = HexToInt(str_id[i]);
+      if (tmp < 0)
+      {
+        for (int j = 0; j < bytes / 2; j++)
+        {
+          buf[j] = 0;
+        }
+        return;
+      }
+      if (i % 2 == 0)
+      {
+        buf[i / 2] = tmp * 16;
+      }
+      else
+      {
+        buf[i / 2] += tmp;
+      }
+    }
+  }
+
   // Converts a single character to a corresponding integer (e.g. '1' to 1), return -1
   // if the character is not a valid number in hex.
   static uint8_t HexToInt(char c)

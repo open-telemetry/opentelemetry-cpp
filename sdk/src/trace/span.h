@@ -53,7 +53,7 @@ private:
   mutable std::mutex mu_;
   std::unique_ptr<Recordable> recordable_;
   opentelemetry::core::SteadyTimestamp start_steady_time;
-  std::shared_ptr<trace_api::SpanContext> span_context_;
+  std::unique_ptr<trace_api::SpanContext> span_context_;
   bool has_ended_;
   nostd::unique_ptr<context::Token> token_;
 };

@@ -22,14 +22,14 @@ public:
    */
   nostd::unique_ptr<Span> StartSpan(nostd::string_view name,
                                     const KeyValueIterable &attributes,
-                                    const StartSpanOptions &options = {}) noexcept
+                                    const StartSpanOptions &options = {}) override noexcept
   {
     return nostd::unique_ptr<Span>(new DefaultSpan::GetInvalid());
   }
 
-  void ForceFlushWithMicroseconds(uint64_t timeout) noexcept {}
+  void ForceFlushWithMicroseconds(uint64_t timeout) override noexcept {}
 
-  void CloseWithMicroseconds(uint64_t timeout) noexcept {}
+  void CloseWithMicroseconds(uint64_t timeout) override noexcept {}
 };
 }  // namespace trace
 OPENTELEMETRY_END_NAMESPACE
