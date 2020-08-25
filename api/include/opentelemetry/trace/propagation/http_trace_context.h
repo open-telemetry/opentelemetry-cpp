@@ -34,8 +34,8 @@ namespace propagation
 {
 static const nostd::string_view kTraceParent = "traceparent";
 static const nostd::string_view kTraceState  = "tracestate";
-static const int kTraceStateMaxMembers    = 32;
-static const int kHeaderElementLengths[4] = {2, 32, 16, 2};
+static const int kTraceStateMaxMembers       = 32;
+static const int kHeaderElementLengths[4]    = {2, 32, 16, 2};
 static const int kTraceDelimiterBytes        = 3;
 static const int kHeaderElementLengths[4]    = {
     2, 32, 16, 2};  // 0: version, 1: trace id, 2: span id, 3: trace flags
@@ -43,10 +43,10 @@ static const int kHeaderSize = kHeaderElementLengths[0] + kHeaderElementLengths[
                                kHeaderElementLengths[2] + kHeaderElementLengths[3] +
                                kTraceDelimiterBytes;
 static const int kTraceStateMaxMembers = 32;
-static const int kVersionBytes               = kHeaderElementLengths[0];
-static const int kTraceIdBytes               = kHeaderElementLengths[1];
-static const int kSpanIdBytes                = kHeaderElementLengths[2];
-static const int kTraceFlagBytes             = kHeaderElementLengths[3];
+static const int kVersionBytes         = kHeaderElementLengths[0];
+static const int kTraceIdBytes         = kHeaderElementLengths[1];
+static const int kSpanIdBytes          = kHeaderElementLengths[2];
+static const int kTraceFlagBytes       = kHeaderElementLengths[3];
 
 // The HttpTraceContext provides methods to extract and inject
 // context into headers of HTTP requests with traces.
