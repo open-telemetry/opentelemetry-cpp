@@ -93,19 +93,19 @@ public:
 
   static TraceId GenerateTraceIdFromString(nostd::string_view trace_id)
   {
-    int trace_id_len = kHeaderElementLengths[1] / 2;
-    uint8_t buf[trace_id_len];
+    size_t trace_id_len = kHeaderElementLengths[1];
+    uint8_t buf[trace_id_len / 2];
     uint8_t *b_ptr = buf;
-    GenerateHexFromString(trace_id, trace_id_len * 2, b_ptr);
+    GenerateHexFromString(trace_id, trace_id_len, b_ptr);
     return TraceId(buf);
   }
 
   static SpanId GenerateSpanIdFromString(nostd::string_view span_id)
   {
-    int span_id_len = kHeaderElementLengths[2] / 2;
-    uint8_t buf[span_id_len];
+    size_t span_id_len = kHeaderElementLengths[2];
+    uint8_t buf[span_id_len / 2];
     uint8_t *b_ptr = buf;
-    GenerateHexFromString(span_id, span_id_len * 2, b_ptr);
+    GenerateHexFromString(span_id, span_id_len, b_ptr);
     return SpanId(buf);
   }
 
