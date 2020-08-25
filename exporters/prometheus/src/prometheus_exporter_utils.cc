@@ -67,8 +67,8 @@ void PrometheusExporterUtils::SetMetricFamily(metric_sdk::Record &record,
                                               prometheus_client::MetricFamily *metric_family)
 {
 
-  auto origin_name = record.GetName();
-  auto sanitized   = SanitizeNames(origin_name);
+  auto origin_name    = record.GetName();
+  auto sanitized      = SanitizeNames(origin_name);
   metric_family->name = sanitized;
   metric_family->help = record.GetDescription();
 
@@ -280,14 +280,14 @@ void PrometheusExporterUtils::SetMetricBasic(prometheus_client::ClientMetric &me
 {
   metric.timestamp_ms = time.count() / 1000000;
 
-  auto label_pairs = ParseLabel(labels);
+  auto label_pairs = Parse Label(labels);
   if (!label_pairs.empty())
   {
     metric.label.resize(label_pairs.size());
     for (int i = 0; i < label_pairs.size(); ++i)
     {
-      auto origin_name = label_pairs[i].first;
-      auto sanitized   = SanitizeNames(origin_name);
+      auto origin_name      = label_pairs[i].first;
+      auto sanitized        = SanitizeNames(origin_name);
       metric.label[i].name  = sanitized;
       metric.label[i].value = label_pairs[i].second;
     }
