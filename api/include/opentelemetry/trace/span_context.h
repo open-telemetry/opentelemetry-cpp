@@ -56,6 +56,11 @@ public:
 
   // @returns the trace_flags associated with this span_context
   const trace_api::TraceFlags &trace_flags() const noexcept { return trace_flags_; }
+
+  const trace_api::TraceId &trace_id() const noexcept { return trace_id_; }
+
+  const trace_api::SpanId &span_id() const noexcept { return span_id_; }
+
   SpanContext(TraceId trace_id,
               SpanId span_id,
               TraceFlags trace_flags,
@@ -96,12 +101,6 @@ public:
            trace_flags() == that.trace_flags();
   }
 
-  const TraceId &trace_id() const noexcept { return trace_id_; }
-
-  const SpanId &span_id() const noexcept { return span_id_; }
-
-  const TraceFlags &trace_flags() const noexcept { return trace_flags_; }
-
   bool HasRemoteParent() const noexcept { return remote_parent_; }
 
   static SpanContext GetInvalid() { return SpanContext(false, false); }
@@ -109,8 +108,8 @@ public:
   bool IsSampled() const noexcept { return trace_flags_.IsSampled(); }
 
 private:
-  const TraceId trace_id_;
-  const SpanId span_id_;
+  const trace_api::TraceId trace_id_;
+  const trace_api::SpanId span_id_;
   const trace_api::TraceFlags trace_flags_;
   const bool remote_parent_ = false;
 };
