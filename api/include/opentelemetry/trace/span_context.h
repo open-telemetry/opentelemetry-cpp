@@ -33,6 +33,10 @@ namespace trace_api = opentelemetry::trace;
 class SpanContext final
 {
 public:
+  // An invalid SpanContext.
+  SpanContext() noexcept
+      : trace_flags_(trace::TraceFlags((uint8_t) false)), remote_parent_(false){};
+
   /* A temporary constructor for an invalid SpanContext.
    * Trace id and span id are set to invalid (all zeros).
    *
@@ -53,19 +57,61 @@ public:
   // @returns the trace_flags associated with this span_context
   const trace_api::TraceFlags &trace_flags() const noexcept { return trace_flags_; }
 
-  // @returns whether this context has the sampled flag set or not
-  bool IsSampled() const noexcept { return trace_flags_.IsSampled(); }
+  const trace_api::TraceId &trace_id() const noexcept { return trace_id_; }
 
-  // @returns whether this context has a remote parent or not
+  const trace_api::SpanId &span_id() const noexcept { return span_id_; }
+
+  SpanContext(TraceId trace_id,
+              SpanId span_id,
+              TraceFlags trace_flags,
+              bool has_remote_parent) noexcept
+      : trace_id_(trace_id),
+        span_id_(span_id),
+        trace_flags_(trace_flags),
+        remote_parent_(has_remote_parent)
+  {}
+
+  SpanContext(SpanContext &&ctx)
+      : trace_id_(ctx.trace_id()), span_id_(ctx.span_id()), trace_flags_(ctx.trace_flags())
+  {}
+
+  SpanContext(const SpanContext &ctx)
+      : trace_id_(ctx.trace_id()), span_id_(ctx.span_id()), trace_flags_(ctx.trace_flags())
+  {}
+  //
+  //  SpanContext &operator=(const SpanContext &ctx)
+  //  {
+  //    SpanContext *spn_ctx =
+  //        new SpanContext(ctx.trace_id(), ctx.span_id(), ctx.trace_flags(),
+  //        ctx.HasRemoteParent());
+  //    this = spn_ctx;
+  //    return *this;
+  //  };
+  //
+  //  SpanContext &operator=(SpanContext &&ctx)
+  //  {
+  //    SpanContext *spn_ctx =
+  //        new SpanContext(ctx.trace_id(), ctx.span_id(), ctx.trace_flags(),
+  //        ctx.HasRemoteParent());
+  //    this = spn_ctx;
+  //    return *this;
+  //  };
+
+  bool operator==(const SpanContext &that) const noexcept
+  {
+    return trace_id() == that.trace_id() && span_id() == that.span_id() &&
+           trace_flags() == that.trace_flags();
+  }
+
   bool HasRemoteParent() const noexcept { return remote_parent_; }
 
-  const TraceId &trace_id() const noexcept { return trace_id_; }
+  static SpanContext GetInvalid() { return SpanContext(false, false); }
 
-  const SpanId &span_id() const noexcept { return span_id_; }
+  bool IsSampled() const noexcept { return trace_flags_.IsSampled(); }
 
 private:
-  const TraceId trace_id_;
-  const SpanId span_id_;
+  const trace_api::TraceId trace_id_;
+  const trace_api::SpanId span_id_;
   const trace_api::TraceFlags trace_flags_;
   const bool remote_parent_ = false;
 };

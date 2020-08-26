@@ -48,7 +48,7 @@ public:
 
   bool IsRecording() const noexcept override { return span_->IsRecording(); }
 
-  trace::Tracer &tracer() const noexcept override { return *tracer_; }
+  trace::SpanContext GetContext() const noexcept override { return span_->GetContext(); }
 
   void SetToken(nostd::unique_ptr<context::Token> &&token) noexcept override {}
 
