@@ -199,10 +199,10 @@ BENCHMARK_DEFINE_F(TracezProcessor, BM_MakeRunningGetSpans)(benchmark::State &st
     CreateRecordables(spans, num_spans);
     state.ResumeTiming();
 
-    std::thread snapshots(GetManySnapshots, std::ref(processor), num_spans);
-    processor_peer->StartAllSpans(spans);
+    std::thread start(&TracezProcessorPeer::StartAllSpans, processor_peer.get(), std::ref(spans));
+    GetManySnapshots(processor, num_spans);
 
-    snapshots.join();
+    start.join();
   }
 }
 
@@ -221,10 +221,10 @@ BENCHMARK_DEFINE_F(TracezProcessor, BM_GetSpansMakeComplete)(benchmark::State &s
     processor_peer->StartAllSpans(spans);
     state.ResumeTiming();
 
-    std::thread snapshots(GetManySnapshots, std::ref(processor), num_spans);
-    processor_peer->EndAllSpans(spans);
+    std::thread end(&TracezProcessorPeer::EndAllSpans, processor_peer.get(), std::ref(spans));
+    GetManySnapshots(processor, num_spans);
 
-    snapshots.join();
+    end.join();
   }
 }
 
@@ -246,12 +246,12 @@ BENCHMARK_DEFINE_F(TracezProcessor, BM_MakeRunningGetSpansMakeComplete)(benchmar
     processor_peer->StartAllSpans(spans);
     state.ResumeTiming();
 
-    std::thread snapshots(GetManySnapshots, std::ref(processor), num_spans);
+    std::thread end(&TracezProcessorPeer::EndAllSpans, processor_peer.get(), std::ref(spans));
     std::thread start(&TracezProcessorPeer::StartAllSpans, processor_peer.get(), std::ref(spans2));
-    processor_peer->EndAllSpans(spans);
+    GetManySnapshots(processor, num_spans);
 
     start.join();
-    snapshots.join();
+    end.join();
   }
 }
 
