@@ -35,7 +35,7 @@ TEST(ApiSdkConversion, async)
 
   alpha->observe(123456, labelkv);
   EXPECT_EQ(dynamic_cast<AsynchronousInstrument<int> *>(alpha.get())->GetRecords()[0].GetLabels(),
-            "{\"key587\":\"value264\"}");
+            "{key587:value264}");
 
   alpha->observe(123456, labelkv);
   AggregatorVariant canCollect =
@@ -257,7 +257,7 @@ TEST(Counter, getAggsandnewupdate)
   EXPECT_EQ(theta.size(), 1);
   EXPECT_EQ(theta[0].GetName(), "test");
   EXPECT_EQ(theta[0].GetDescription(), "none");
-  EXPECT_EQ(theta[0].GetLabels(), "{\"key2\":\"value2\",\"key3\":\"value3\"}");
+  EXPECT_EQ(theta[0].GetLabels(), "{key2:value2,key3:value3}");
 }
 
 void CounterCallback(std::shared_ptr<Counter<int>> in,
