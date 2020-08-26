@@ -2,6 +2,7 @@
 #include "src/common/random.h"
 
 #include "opentelemetry/context/runtime_context.h"
+#include "opentelemetry/trace/trace_flags.h"
 #include "opentelemetry/version.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
@@ -77,22 +78,26 @@ Span::Span(std::shared_ptr<Tracer> &&tracer,
   }
   recordable_->SetName(name);
 
+  trace_api::TraceId trace_id = GenerateRandomTraceId();
   if (parent_span_context.IsValid())
   {
+    trace_id = parent_span_context.trace_id();
     recordable_->SetIds(parent_span_context.trace_id(), GenerateRandomSpanId(),
                         parent_span_context.span_id());
   }
   else
   {
-    recordable_->SetIds(GenerateRandomTraceId(), GenerateRandomSpanId(), trace_api::SpanId());
+    recordable_->SetIds(trace_id, GenerateRandomSpanId(), trace_api::SpanId());
   }
-  // TODO: Create and populate SpanContext for this span when SpanContext is fully implemented
 
-  attributes.ForEachKeyValue([&](nostd::string_view key,
-                                 opentelemetry::common::AttributeValue value) noexcept {
-    recordable_->SetAttribute(key, value);
-    return true;
-  });
+  span_context_ = std::unique_ptr<trace_api::SpanContext>(
+      new trace_api::SpanContext(trace_id, GenerateRandomSpanId(), trace_api::TraceFlags(), false));
+
+  attributes.ForEachKeyValue(
+      [&](nostd::string_view key, opentelemetry::common::AttributeValue value) noexcept {
+        recordable_->SetAttribute(key, value);
+        return true;
+      });
 
   recordable_->SetStartTime(NowOr(options.start_system_time));
   start_steady_time = NowOr(options.start_steady_time);
