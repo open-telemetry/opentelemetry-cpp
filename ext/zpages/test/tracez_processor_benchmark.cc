@@ -16,27 +16,27 @@ namespace zpages
 /////////////////////////////// BENCHMARK HELPER FUNCTIONS //////////////////////////////
 
 /*
- * Helper function that creates i threadsafe span data, adding them to the spans
+ * Helper function that creates num_spans threadsafe span data, adding them to the spans
  * vector during setup to benchmark OnStart and OnEnd times for the processor.
  */
 void CreateRecordables(
     std::vector<std::unique_ptr<ThreadsafeSpanData>> &spans,
-    int i)
+    int num_spans)
 {
-  for (; i > 0; i--)
+  for (; num_spans > 0; num_spans--)
     spans.push_back(std::unique_ptr<ThreadsafeSpanData>(new ThreadsafeSpanData()));
 }
 
 /*
- * Helper function calls GetSpanSnapshot() i times, does nothing otherwise.
+ * Helper function calls GetSpanSnapshot() num_snapshots times, does nothing otherwise.
  * Snapshots are significant and contribute to performance differences because
  * completed spans are cleared from the processor memory. This function
  * simulates an aggregator querying the processor many times, but doesn't
  * aggregate or store spans.
  */
-void GetManySnapshots(std::shared_ptr<TracezSpanProcessor> &processor, int i)
+void GetManySnapshots(std::shared_ptr<TracezSpanProcessor> &processor, int num_snapshots)
 {
-  for (; i > 0; i--)
+  for (; num_snapshots > 0; num_snapshots--)
     processor->GetSpanSnapshot();
 }
 

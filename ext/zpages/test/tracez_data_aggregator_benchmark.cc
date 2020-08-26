@@ -19,56 +19,57 @@ namespace zpages
 /////////////////////////////// BENCHMARK HELPER FUNCTIONS //////////////////////////////
 
 /*
- * Helper function that creates and ends i spans instantly. If is_unique is
+ * Helper function that creates and ends num_spans spans instantly. If is_unique is
  * true, then all spans will have different names.
  */
 void StartEndSpans(
     std::shared_ptr<opentelemetry::trace::Tracer> &tracer,
-    int i,
+    int num_spans,
     bool is_unique = false)
 {
   opentelemetry::trace::StartSpanOptions start;
   opentelemetry::trace::EndSpanOptions end;
   start.start_steady_time = SteadyTimestamp(nanoseconds(0));
   end.end_steady_time = SteadyTimestamp(nanoseconds(1));
-  for (; i > 0; i--)
-    tracer->StartSpan(is_unique ? std::to_string(i) : "", start)->End(end);
+  for (; num_spans > 0; num_spans--)
+    tracer->StartSpan(is_unique ? std::to_string(num_spans) : "", start)->End(end);
 }
 
 /*
- * Helper function that creates and ends spans instantly, while simulating
- * different latencies. If is_unique is true, then all spans will have
- * different names.
+ * Helper function that creates and ends num_spans spans instantly, while
+ * simulating different latencies. If is_unique is true, then all spans will
+ * have different names.
  */
 void StartEndSpansLatency(
     std::shared_ptr<opentelemetry::trace::Tracer> &tracer,
-    int i,
+    int num_spans,
     bool is_unique = false)
 {
   opentelemetry::trace::StartSpanOptions start;
   start.start_steady_time = SteadyTimestamp(nanoseconds(0));
-  for (; i > 0; i--)
+  for (; num_spans > 0; num_spans--)
   {
     // Latency bucket depends on the index
-    auto latency_band = kLatencyBoundaries[i % kLatencyBoundaries.size()];
+    auto latency_band = kLatencyBoundaries[num_spans % kLatencyBoundaries.size()];
     opentelemetry::trace::EndSpanOptions end;
     end.end_steady_time = SteadyTimestamp(latency_band);
 
-    tracer->StartSpan(is_unique ? std::to_string(i) : "", start)->End(end);
+    tracer->StartSpan(is_unique ? std::to_string(num_spans) : "", start)->End(end);
   }
 }
 
 /*
- * Helper function that creates and ends spans instantly, while simulating
- * error codes. If is_unique is true, then all spans will have different names.
+ * Helper function that creates and ends num_spans spans instantly, while
+ * simulating error codes. If is_unique is true, then all spans will have
+ * different names.
  */
 void StartEndSpansError(
     std::shared_ptr<opentelemetry::trace::Tracer> &tracer,
-    int i,
+    int num_spans,
     bool is_unique = false)
 {
-  for (; i > 0; i--)
-    tracer->StartSpan(is_unique ? std::to_string(i) : "")
+  for (; num_spans > 0; num_spans--)
+    tracer->StartSpan(is_unique ? std::to_string(num_spans) : "")
         ->SetStatus(opentelemetry::trace::CanonicalCode::CANCELLED, "");
 }
 
@@ -80,17 +81,17 @@ void StartEndSpansError(
 void StartSpans(
     std::vector<opentelemetry::nostd::shared_ptr<opentelemetry::trace::Span>> &spans,
     std::shared_ptr<opentelemetry::trace::Tracer> &tracer,
-    int i,
+    int num_spans,
     bool is_unique = false)
 {
-  for (; i > 0; i--)
-    spans.push_back(tracer->StartSpan(is_unique ? std::to_string(i) : ""));
+  for (; num_spans > 0; num_spans--)
+    spans.push_back(tracer->StartSpan(is_unique ? std::to_string(num_spans) : ""));
 }
 
 /*
  * Helper function that creates about i spans, evenly split between running, latency (which
  * is further split by bucket), and error. If is_unique is true, then all spans will have
- * different names.
+ * different names. The running spans vector is returned so that they remain running.
  */
 std::vector<opentelemetry::nostd::shared_ptr<opentelemetry::trace::Span>> MakeManySpans(
     std::shared_ptr<opentelemetry::trace::Tracer> &tracer,
