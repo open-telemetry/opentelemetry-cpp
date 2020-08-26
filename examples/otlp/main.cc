@@ -12,7 +12,7 @@ namespace otlp     = opentelemetry::exporter::otlp;
 
 namespace
 {
-void initTracer()
+void InitTracer()
 {
   // Create OTLP exporter instance
   auto exporter = std::unique_ptr<sdktrace::SpanExporter>(new otlp::OtlpExporter);
@@ -28,7 +28,7 @@ void initTracer()
 int main()
 {
   // Removing this line will leave the default noop TracerProvider in place.
-  initTracer();
+  InitTracer();
 
   foo_library();
 }
