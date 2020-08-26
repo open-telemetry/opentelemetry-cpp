@@ -41,7 +41,7 @@ OPENTELEMETRY_BEGIN_NAMESPACE
  */
 template <typename T>
 std::shared_ptr<metric_sdk::Aggregator<T>> CreateAgg(metric_sdk::AggregatorKind kind,
-                                                       bool exactMode = true)
+                                                     bool exactMode = true)
 {
   std::shared_ptr<metric_sdk::Aggregator<T>> aggregator;
   switch (kind)
@@ -212,7 +212,7 @@ TEST(PrometheusCollector, AddMetricDataWithCounterRecordsSuccessfully)
     auto before_agg = nostd::get<std::shared_ptr<metric_sdk::Aggregator<double>>>(before_agg_var);
 
     auto after_agg_var = after.GetAggregator();
-    auto after_agg = nostd::get<std::shared_ptr<metric_sdk::Aggregator<double>>>(after_agg_var);
+    auto after_agg     = nostd::get<std::shared_ptr<metric_sdk::Aggregator<double>>>(after_agg_var);
 
     ASSERT_EQ(before_agg->get_checkpoint().size(), after_agg->get_checkpoint().size());
     for (int i = 0; i < before_agg->get_checkpoint().size(); i++)
@@ -264,7 +264,7 @@ TEST(PrometheusCollector, AddMetricDataWithMinMaxSumCountRecordsSuccessfully)
     auto before_agg = nostd::get<std::shared_ptr<metric_sdk::Aggregator<short>>>(before_agg_var);
 
     auto after_agg_var = after.GetAggregator();
-    auto after_agg = nostd::get<std::shared_ptr<metric_sdk::Aggregator<short>>>(after_agg_var);
+    auto after_agg     = nostd::get<std::shared_ptr<metric_sdk::Aggregator<short>>>(after_agg_var);
 
     ASSERT_EQ(before_agg->get_checkpoint().size(), after_agg->get_checkpoint().size());
     for (int i = 0; i < before_agg->get_checkpoint().size(); i++)
@@ -313,7 +313,7 @@ TEST(PrometheusCollector, AddMetricDataWithGaugeRecordsSuccessfully)
     ASSERT_EQ(before.GetLabels(), after.GetLabels());
 
     auto before_agg_var = before.GetAggregator();
-    auto before_agg = nostd::get<std::shared_ptr<metric_sdk::Aggregator<int>>>(before_agg_var);
+    auto before_agg     = nostd::get<std::shared_ptr<metric_sdk::Aggregator<int>>>(before_agg_var);
 
     auto after_agg_var = after.GetAggregator();
     auto after_agg     = nostd::get<std::shared_ptr<metric_sdk::Aggregator<int>>>(after_agg_var);
@@ -369,7 +369,7 @@ TEST(PrometheusCollector, AddMetricDataWithSketchRecordsSuccessfully)
     auto before_agg = nostd::get<std::shared_ptr<metric_sdk::Aggregator<double>>>(before_agg_var);
 
     auto after_agg_var = after.GetAggregator();
-    auto after_agg = nostd::get<std::shared_ptr<metric_sdk::Aggregator<double>>>(after_agg_var);
+    auto after_agg     = nostd::get<std::shared_ptr<metric_sdk::Aggregator<double>>>(after_agg_var);
 
     ASSERT_EQ(before_agg->get_checkpoint().size(), after_agg->get_checkpoint().size());
     for (int i = 0; i < before_agg->get_checkpoint().size(); i++)
@@ -430,7 +430,7 @@ TEST(PrometheusCollector, AddMetricDataWithHistogramRecordsSuccessfully)
     auto before_agg = nostd::get<std::shared_ptr<metric_sdk::Aggregator<float>>>(before_agg_var);
 
     auto after_agg_var = after.GetAggregator();
-    auto after_agg = nostd::get<std::shared_ptr<metric_sdk::Aggregator<float>>>(after_agg_var);
+    auto after_agg     = nostd::get<std::shared_ptr<metric_sdk::Aggregator<float>>>(after_agg_var);
 
     ASSERT_EQ(before_agg->get_checkpoint().size(), after_agg->get_checkpoint().size());
     for (int i = 0; i < before_agg->get_checkpoint().size(); i++)
@@ -499,7 +499,7 @@ TEST(PrometheusCollector, AddMetricDataWithExactRecordsSuccessfully)
     auto before_agg = nostd::get<std::shared_ptr<metric_sdk::Aggregator<double>>>(before_agg_var);
 
     auto after_agg_var = after.GetAggregator();
-    auto after_agg = nostd::get<std::shared_ptr<metric_sdk::Aggregator<double>>>(after_agg_var);
+    auto after_agg     = nostd::get<std::shared_ptr<metric_sdk::Aggregator<double>>>(after_agg_var);
 
     if (before_agg->get_quant_estimation() && after_agg->get_quant_estimation())
     {
