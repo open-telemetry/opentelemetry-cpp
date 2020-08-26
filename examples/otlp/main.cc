@@ -28,7 +28,7 @@ void InitTracer()
 int main()
 {
   // Removing this line will leave the default noop TracerProvider in place.
-  initTracer();
+  InitTracer();
 
   foo_library();
 }
