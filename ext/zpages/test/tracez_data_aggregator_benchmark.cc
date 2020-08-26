@@ -311,7 +311,7 @@ BENCHMARK_DEFINE_F(TracezAggregator, BM_ManyBucketsManyNames)(benchmark::State &
   }
 }
 
-//////////////////////// USER VISITS WEBPAGE //////////////////////////////
+////////////////// SAME BENCHMARKS, BUT USER VISITS WEBPAGE ///////////////////////////
 
 BENCHMARK_DEFINE_F(TracezAggregatorFetch, BM_SingleBucketSingleName)(benchmark::State &state)
 {

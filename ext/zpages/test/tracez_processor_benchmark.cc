@@ -57,21 +57,25 @@ public:
     processor  = processor_in;
   }
 
+  /*
+   * Calls TracezProcessor::OnStart on each span in spans.
+   */
   void StartAllSpans(std::vector<std::unique_ptr<ThreadsafeSpanData>> &spans)
   {
     for(auto &span : spans)
-    {
       processor->OnStart(*(span.get()));
-    }
   }
 
+  /*
+   * Calls TracezProcessor::OnEnd on each span in spans, which gives ownership
+   * of those spans to the processor. Clears the spans vector since everything in
+   * the spans vector is now garbage.
+   */
   void EndAllSpans(std::vector<std::unique_ptr<ThreadsafeSpanData>> &spans)
   {
-    while(!spans.empty())
-    {
-      processor->OnEnd(std::move(spans.back()));
-      spans.pop_back();
-    }
+    for(auto &span : spans)
+      processor->OnEnd(std::move(span));
+    spans.clear();
   }
 
 private:
@@ -97,8 +101,8 @@ protected:
 //////////////////////////// BENCHMARK DEFINITIONS /////////////////////////////////
 
 /*
- * Make many empty spans. This checks the scenario where the processor holds
- * many running spans but never gets queried.
+ * Make many empty spans. This checks the scenario where the processor holds many
+ * running spans but never gets queried.
  */
 BENCHMARK_DEFINE_F(TracezProcessor, BM_MakeRunning)(benchmark::State &state)
 {
@@ -109,21 +113,20 @@ BENCHMARK_DEFINE_F(TracezProcessor, BM_MakeRunning)(benchmark::State &state)
     processor_peer->EndAllSpans(spans);
     CreateRecordables(spans, num_spans);
     state.ResumeTiming();
+
     processor_peer->StartAllSpans(spans);
   }
 }
 
 /*
- * Make many snapshots. This checks the scenario where the processor holds
- * no spans but gets queried many times.
+ * Make many snapshots. This checks the scenario where the processor holds no spans
+ * but gets queried many times.
  */
 BENCHMARK_DEFINE_F(TracezProcessor, BM_GetSpans)(benchmark::State &state)
 {
   const int num_spans = state.range(0);
   for (auto _ : state)
-  {
     GetManySnapshots(processor, num_spans);
-  }
 }
 
 /*
@@ -145,8 +148,8 @@ BENCHMARK_DEFINE_F(TracezProcessor, BM_MakeRunningMakeComplete)(benchmark::State
 
     std::thread start(&TracezProcessorPeer::StartAllSpans, processor_peer.get(), std::ref(spans2));
     processor_peer->EndAllSpans(spans);
-    start.join();
 
+    start.join();
   }
 }
 
@@ -214,9 +217,9 @@ BENCHMARK_DEFINE_F(TracezProcessor, BM_MakeRunningGetSpansMakeComplete)(benchmar
     std::thread snapshots(GetManySnapshots, std::ref(processor), num_spans);
     std::thread start(&TracezProcessorPeer::StartAllSpans, processor_peer.get(), std::ref(spans2));
     processor_peer->EndAllSpans(spans);
+
     start.join();
     snapshots.join();
-
   }
 }
 
@@ -225,16 +228,19 @@ BENCHMARK_DEFINE_F(TracezProcessor, BM_MakeRunningGetSpansMakeComplete)(benchmar
 // Arg is the number of spans created for each iteration
 BENCHMARK_REGISTER_F(TracezProcessor, BM_MakeRunning)->Arg(10)->Arg(1000);
 BENCHMARK_REGISTER_F(TracezProcessor, BM_GetSpans)->Arg(10)->Arg(1000);
-BENCHMARK_REGISTER_F(TracezProcessor, BM_MakeRunningMakeComplete)->Arg(10)->Arg(1000);
-BENCHMARK_REGISTER_F(TracezProcessor, BM_MakeRunningGetSpans)->Arg(10)->Arg(1000);
-BENCHMARK_REGISTER_F(TracezProcessor, BM_GetSpansMakeComplete)->Arg(10)->Arg(1000);
-BENCHMARK_REGISTER_F(TracezProcessor, BM_MakeRunningGetSpansMakeComplete)->Arg(10)->Arg(1000);
+// These use multiple threads, so that CPU usage needs to be measured as well
+BENCHMARK_REGISTER_F(TracezProcessor, BM_MakeRunningMakeComplete)->Arg(10)->Arg(1000)
+	->MeasureProcessCPUTime()->UseRealTime();
+BENCHMARK_REGISTER_F(TracezProcessor, BM_MakeRunningGetSpans)->Arg(10)->Arg(1000)
+	->MeasureProcessCPUTime()->UseRealTime();
+BENCHMARK_REGISTER_F(TracezProcessor, BM_GetSpansMakeComplete)->Arg(10)->Arg(1000)
+	->MeasureProcessCPUTime()->UseRealTime();
+BENCHMARK_REGISTER_F(TracezProcessor, BM_MakeRunningGetSpansMakeComplete)->Arg(10)->Arg(1000)
+	->MeasureProcessCPUTime()->UseRealTime();
 
 } // namespace zpages
 } // namespace ext
 OPENTELEMETRY_END_NAMESPACE
-// setup: create many unique_ptr recordables
-// onstart + onend = 1 vec each (outside of loop)
-// in loop: pause (make recordables, start if onend other) resume. then call peer onstart onend
+
 BENCHMARK_MAIN();
 
