@@ -78,6 +78,15 @@ public:
     spans.clear();
   }
 
+  /*
+   * Clears running span pointers in processor memory, which is used in between
+   * iterations so that spans_.running doesn't hold nullptr
+   */
+  void ClearRunning()
+  {
+    processor->spans_.running.clear();
+  }
+
 private:
   std::shared_ptr<TracezSpanProcessor> processor;
 };
@@ -110,11 +119,33 @@ BENCHMARK_DEFINE_F(TracezProcessor, BM_MakeRunning)(benchmark::State &state)
   for (auto _ : state)
   {
     state.PauseTiming();
-    processor_peer->EndAllSpans(spans);
+    // Clear span vector if EndAllSpans for spans isn't called
+    spans.clear();
+    // Clear processor memory, ensure no nullptrs are in running span set from
+    // previous iterations from either spans or spans2 if EndAllSpans isn't called
+    processor_peer->ClearRunning();
     CreateRecordables(spans, num_spans);
     state.ResumeTiming();
 
     processor_peer->StartAllSpans(spans);
+  }
+}
+
+/*
+ * End many empty spans. This checks the scenario where the processor holds many
+ * completed spans but never gets queried.
+ */
+BENCHMARK_DEFINE_F(TracezProcessor, BM_MakeComplete)(benchmark::State &state)
+{
+  const int num_spans = state.range(0);
+  for (auto _ : state)
+  {
+    state.PauseTiming();
+    CreateRecordables(spans, num_spans);
+    processor_peer->StartAllSpans(spans);
+    state.ResumeTiming();
+
+    processor_peer->EndAllSpans(spans);
   }
 }
 
@@ -139,7 +170,7 @@ BENCHMARK_DEFINE_F(TracezProcessor, BM_MakeRunningMakeComplete)(benchmark::State
   for (auto _ : state)
   {
     state.PauseTiming();
-    processor_peer->EndAllSpans(spans);
+    processor_peer->ClearRunning();
     std::vector<std::unique_ptr<ThreadsafeSpanData>> spans2;
     CreateRecordables(spans, num_spans);
     CreateRecordables(spans2, num_spans);
@@ -163,7 +194,8 @@ BENCHMARK_DEFINE_F(TracezProcessor, BM_MakeRunningGetSpans)(benchmark::State &st
   for (auto _ : state)
   {
     state.PauseTiming();
-    processor_peer->EndAllSpans(spans);
+    spans.clear();
+    processor_peer->ClearRunning();
     CreateRecordables(spans, num_spans);
     state.ResumeTiming();
 
@@ -207,7 +239,7 @@ BENCHMARK_DEFINE_F(TracezProcessor, BM_MakeRunningGetSpansMakeComplete)(benchmar
   for (auto _ : state)
   {
     state.PauseTiming();
-    processor_peer->EndAllSpans(spans);
+    processor_peer->ClearRunning();
     std::vector<std::unique_ptr<ThreadsafeSpanData>> spans2;
     CreateRecordables(spans, num_spans);
     CreateRecordables(spans2, num_spans);
