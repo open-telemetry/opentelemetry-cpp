@@ -12,7 +12,7 @@ namespace otlp     = opentelemetry::exporter::otlp;
 
 namespace
 {
-void initTracer()
+void InitTracer()
 {
   // Create OTLP exporter instance
   auto exporter = std::unique_ptr<sdktrace::SpanExporter>(new otlp::OtlpExporter);
