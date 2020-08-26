@@ -4,37 +4,27 @@
 #include <thread>
 
 #include "opentelemetry/context/threadlocal_context.h"
-#include "opentelemetry/sdk/trace/tracer.h"
 
 using namespace opentelemetry::sdk::trace;
-using namespace opentelemetry::ext::zpages;
+
+OPENTELEMETRY_BEGIN_NAMESPACE
+namespace ext
+{
+namespace zpages
+{
 
 /////////////////////////////// BENCHMARK HELPER FUNCTIONS //////////////////////////////
 
 /*
- * Helper function that creates and add i spans into the passed in vector.
+ * Helper function that creates i threadsafe span data, adding them to the spans
+ * vector during setup to benchmark OnStart and OnEnd times for the processor.
  */
-void StartManySpans(
-    std::vector<opentelemetry::nostd::shared_ptr<opentelemetry::trace::Span>> &spans,
-    std::unique_ptr<opentelemetry::trace::Tracer> &tracer,
+void CreateRecordables(
+    std::vector<std::unique_ptr<ThreadsafeSpanData>> &spans,
     int i)
 {
   for (; i > 0; i--)
-    spans.push_back(tracer->StartSpan(""));
-}
-
-/*
- * Helper function that ends and removes all spans in the passed in span vector,
- * since they'll be in the processor memory.
- */
-void EndAllSpans(std::vector<opentelemetry::nostd::shared_ptr<opentelemetry::trace::Span>> &spans)
-{
-  while(!spans.empty())
-  {
-    auto span = spans.back();
-    span->End();
-    spans.pop_back();
-  }
+    spans.push_back(std::unique_ptr<ThreadsafeSpanData>(new ThreadsafeSpanData()));
 }
 
 /*
@@ -50,6 +40,44 @@ void GetManySnapshots(std::shared_ptr<TracezSpanProcessor> &processor, int i)
     processor->GetSpanSnapshot();
 }
 
+/////////////////////////// PROCESSOR PEER //////////////////////////////
+
+/*
+ * Friend class allows us to access processor private variables for
+ * benchmarking. It also reduces allows isolation of processor functions
+ * to minimize benchmarking noise, since we don't do the extra computation
+ * of setting variables the tracer would do with StartSpan and EndSpan
+ */
+
+class TracezProcessorPeer
+{
+public:
+  TracezProcessorPeer(std::shared_ptr<TracezSpanProcessor> &processor_in)
+  {
+    processor  = processor_in;
+  }
+
+  void StartAllSpans(std::vector<std::unique_ptr<ThreadsafeSpanData>> &spans)
+  {
+    for(auto &span : spans)
+    {
+      processor->OnStart(*(span.get()));
+    }
+  }
+
+  void EndAllSpans(std::vector<std::unique_ptr<ThreadsafeSpanData>> &spans)
+  {
+    while(!spans.empty())
+    {
+      processor->OnEnd(std::move(spans.back()));
+      spans.pop_back();
+    }
+  }
+
+private:
+  std::shared_ptr<TracezSpanProcessor> processor;
+};
+
 ////////////////////////  FIXTURE FOR SHARED SETUP CODE ///////////////////
 
 class TracezProcessor : public benchmark::Fixture
@@ -58,13 +86,12 @@ protected:
   void SetUp(const ::benchmark::State& state)
   {
     processor  = std::shared_ptr<TracezSpanProcessor>(new TracezSpanProcessor());
-    tracer     = std::unique_ptr<opentelemetry::trace::Tracer>(new Tracer(processor));
+    processor_peer = std::unique_ptr<TracezProcessorPeer>(new TracezProcessorPeer(processor));
   }
-
+  std::vector<std::unique_ptr<ThreadsafeSpanData>> spans;
+  std::unique_ptr<TracezProcessorPeer> processor_peer;
   std::shared_ptr<TracezSpanProcessor> processor;
-  std::unique_ptr<opentelemetry::trace::Tracer> tracer;
 
-  std::vector<opentelemetry::nostd::shared_ptr<opentelemetry::trace::Span>> spans;
 };
 
 //////////////////////////// BENCHMARK DEFINITIONS /////////////////////////////////
@@ -78,7 +105,11 @@ BENCHMARK_DEFINE_F(TracezProcessor, BM_MakeRunning)(benchmark::State &state)
   const int num_spans = state.range(0);
   for (auto _ : state)
   {
-    StartManySpans(spans, std::ref(tracer), num_spans);
+    state.PauseTiming();
+    processor_peer->EndAllSpans(spans);
+    CreateRecordables(spans, num_spans);
+    state.ResumeTiming();
+    processor_peer->StartAllSpans(spans);
   }
 }
 
@@ -104,15 +135,18 @@ BENCHMARK_DEFINE_F(TracezProcessor, BM_MakeRunningMakeComplete)(benchmark::State
   const int num_spans = state.range(0);
   for (auto _ : state)
   {
-    std::vector<opentelemetry::nostd::shared_ptr<opentelemetry::trace::Span>> spans2;
-    StartManySpans(spans2, std::ref(tracer), num_spans);
+    state.PauseTiming();
+    processor_peer->EndAllSpans(spans);
+    std::vector<std::unique_ptr<ThreadsafeSpanData>> spans2;
+    CreateRecordables(spans, num_spans);
+    CreateRecordables(spans2, num_spans);
+    processor_peer->StartAllSpans(spans);
+    state.ResumeTiming();
 
-    std::thread start(StartManySpans, std::ref(spans), std::ref(tracer), num_spans);
-    EndAllSpans(spans2);
-
+    std::thread start(&TracezProcessorPeer::StartAllSpans, processor_peer.get(), std::ref(spans2));
+    processor_peer->EndAllSpans(spans);
     start.join();
 
-    EndAllSpans(spans);
   }
 }
 
@@ -125,11 +159,15 @@ BENCHMARK_DEFINE_F(TracezProcessor, BM_MakeRunningGetSpans)(benchmark::State &st
   const int num_spans = state.range(0);
   for (auto _ : state)
   {
+    state.PauseTiming();
+    processor_peer->EndAllSpans(spans);
+    CreateRecordables(spans, num_spans);
+    state.ResumeTiming();
+
     std::thread snapshots(GetManySnapshots, std::ref(processor), num_spans);
-    StartManySpans(spans, std::ref(tracer), num_spans);
+    processor_peer->StartAllSpans(spans);
 
     snapshots.join();
-    EndAllSpans(spans);
   }
 }
 
@@ -143,14 +181,16 @@ BENCHMARK_DEFINE_F(TracezProcessor, BM_GetSpansMakeComplete)(benchmark::State &s
   const int num_spans = state.range(0);
   for (auto _ : state)
   {
-    StartManySpans(spans, std::ref(tracer), num_spans);
+    state.PauseTiming();
+    CreateRecordables(spans, num_spans);
+    processor_peer->StartAllSpans(spans);
+    state.ResumeTiming();
 
     std::thread snapshots(GetManySnapshots, std::ref(processor), num_spans);
-    EndAllSpans(spans);
+    processor_peer->EndAllSpans(spans);
 
     snapshots.join();
   }
-
 }
 
 /*
@@ -163,18 +203,20 @@ BENCHMARK_DEFINE_F(TracezProcessor, BM_MakeRunningGetSpansMakeComplete)(benchmar
   const int num_spans = state.range(0);
   for (auto _ : state)
   {
-    std::vector<opentelemetry::nostd::shared_ptr<opentelemetry::trace::Span>> spans2;
+    state.PauseTiming();
+    processor_peer->EndAllSpans(spans);
+    std::vector<std::unique_ptr<ThreadsafeSpanData>> spans2;
+    CreateRecordables(spans, num_spans);
+    CreateRecordables(spans2, num_spans);
+    processor_peer->StartAllSpans(spans);
+    state.ResumeTiming();
 
-    StartManySpans(spans, std::ref(tracer), num_spans);
-
-    std::thread start(StartManySpans, std::ref(spans2), std::ref(tracer), num_spans);
     std::thread snapshots(GetManySnapshots, std::ref(processor), num_spans);
-    EndAllSpans(spans);
-
+    std::thread start(&TracezProcessorPeer::StartAllSpans, processor_peer.get(), std::ref(spans2));
+    processor_peer->EndAllSpans(spans);
     start.join();
     snapshots.join();
 
-    EndAllSpans(spans2);
   }
 }
 
@@ -188,5 +230,11 @@ BENCHMARK_REGISTER_F(TracezProcessor, BM_MakeRunningGetSpans)->Arg(10)->Arg(1000
 BENCHMARK_REGISTER_F(TracezProcessor, BM_GetSpansMakeComplete)->Arg(10)->Arg(1000);
 BENCHMARK_REGISTER_F(TracezProcessor, BM_MakeRunningGetSpansMakeComplete)->Arg(10)->Arg(1000);
 
+} // namespace zpages
+} // namespace ext
+OPENTELEMETRY_END_NAMESPACE
+// setup: create many unique_ptr recordables
+// onstart + onend = 1 vec each (outside of loop)
+// in loop: pause (make recordables, start if onend other) resume. then call peer onstart onend
 BENCHMARK_MAIN();
 

@@ -161,6 +161,9 @@ private:
   /** Condition variable that notifies the thread when object is about to be
   destroyed **/
   std::condition_variable cv_;
+
+  /** Friend class used for benchmarking **/
+  friend class TracezDataAggregatorPeer;
 };
 
 }  // namespace zpages

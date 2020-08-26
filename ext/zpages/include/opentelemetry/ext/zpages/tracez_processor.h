@@ -91,6 +91,9 @@ public:
 private:
   mutable std::mutex mtx_;
   CollectedSpans spans_;
+
+  /** Friend class used for benchmarking **/
+  friend class TracezProcessorPeer;
 };
 }  // namespace zpages
 }  // namespace ext
