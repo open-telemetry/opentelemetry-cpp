@@ -158,17 +158,16 @@ public:
   }
 
   /*
-   * Starts a background thread to query for aggregated data every i
-   * nanoseconds. This should affect performance for the aggregator,
-   * since aggregation work cannot be done while aggegation data is being
-   * requested. This simulates a user visiting or refreshing the Tracez
-   * webpage many times, except this function does and holds nothing in
-   * memory.
+   * Starts a background thread to query for aggregated data every
+   * query_interval nanoseconds. This should affect performance for the
+   * aggregator, since aggregation work cannot be done while aggegation
+   * data is being requested. This simulates a user visiting or refreshing
+   * the Tracez webpage many times, except this function does and holds
+   * nothing in memory.
    */
-  void StartPeriodicQuery(int i = 1)
+  void StartPeriodicQueryThread(nanoseconds query_interval = nanoseconds(1))
   {
     run.store(true, std::memory_order_release);
-    nanoseconds query_interval = nanoseconds(i);
     query_thread = std::thread([this, query_interval]() {
       while (run.load(std::memory_order_acquire))
       {
@@ -229,7 +228,7 @@ protected:
   void SetUp(const ::benchmark::State& state) override
   {
     SetTracerAggregatorPeer();
-    aggregator_peer->StartPeriodicQuery();
+    aggregator_peer->StartPeriodicQueryThread();
   }
 };
 
