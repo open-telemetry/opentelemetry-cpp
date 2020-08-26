@@ -9,16 +9,29 @@ namespace exporter
 namespace otlp
 {
 /**
+ * Struct to hold OTLP exporter options.
+ */
+struct OtlpExporterOptions
+{
+  // The endpoint to export to. By default the OpenTelemetry Collector's default endpoint.
+  std::string endpoint = "localhost:55680";
+};
+
+/**
  * The OTLP exporter exports span data in OpenTelemetry Protocol (OTLP) format.
  */
 class OtlpExporter final : public opentelemetry::sdk::trace::SpanExporter
 {
 public:
   /**
-   * Create an OtlpExporter. This constructor initializes a service stub to be
-   * used for exporting.
+   * Create an OtlpExporter using all default options.
    */
   OtlpExporter();
+
+  /**
+   * Create an OtlpExporter using the given options.
+   */
+  OtlpExporter(const OtlpExporterOptions &options);
 
   /**
    * Create a span recordable.
@@ -42,6 +55,9 @@ public:
       std::chrono::microseconds timeout = std::chrono::microseconds(0)) noexcept override{};
 
 private:
+  // The configuration options associated with this exporter.
+  const OtlpExporterOptions options_;
+
   // For testing
   friend class OtlpExporterTestPeer;
 
