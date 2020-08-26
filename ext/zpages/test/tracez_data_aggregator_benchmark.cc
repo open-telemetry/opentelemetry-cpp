@@ -172,8 +172,8 @@ public:
       while (run.load(std::memory_order_acquire))
       {
         std::unique_lock<std::mutex> lock(mtx);
-        aggregator->GetAggregatedTracezData();
-        // Continue if mutex is free and query interval passed
+        auto aggregations = aggregator->GetAggregatedTracezData();
+        // Continue if query interval passed
         cont.wait_for(lock, query_interval);
       }
     });
@@ -212,7 +212,6 @@ protected:
     SetTracerAggregatorPeer();
   }
 
-  // Aggregator peer for accessing private aggregator functions
   std::unique_ptr<TracezDataAggregatorPeer> aggregator_peer;
   // Tracer for creating spans
   std::shared_ptr<opentelemetry::trace::Tracer> tracer;
