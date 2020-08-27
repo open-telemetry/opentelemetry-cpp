@@ -12,6 +12,13 @@ enum class HttpMethod: uint8_t {
     HTTP_PATCH
 };
 
+enum class HttpResult: uint8_t {
+    HTTP_OK,
+    HTTP_ABORTED,
+    HTTP_LOCALFAILURE,
+    HTTP_REMOTEFAILURE
+};
+
 class IHttpClient
 {
 public:
@@ -58,5 +65,4 @@ public:
     virtual void OnHttpResponse(IHttpResponse* response) = 0;
 };
 } // namespace nostd
-OPENTELEMETRY_END_NAMESPACE
 OPENTELEMETRY_END_NAMESPACE
