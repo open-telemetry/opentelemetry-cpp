@@ -96,7 +96,7 @@ void StartSpans(
  */
 std::vector<opentelemetry::nostd::shared_ptr<opentelemetry::trace::Span>> MakeManySpans(
     std::shared_ptr<opentelemetry::trace::Tracer> &tracer,
-    int num_spans,
+    unsigned int num_spans,
     bool is_unique = false)
 {
   // Running spans must be stored in a vector in order to stay running, since only OnStart is called
@@ -214,150 +214,93 @@ protected:
   std::shared_ptr<opentelemetry::trace::Tracer> tracer_;
 };
 
-////////////////////////// BENCHMARK HELPERS ///////////////////////////////
+//////////////////////////// BENCHMARK DEFINITIONS /////////////////////////////////
 
 /*
- * Aggregator handling many spans with the same name, who end instantly. This
- * checks the scenario where there's only one Tracez name and minimal sorting
- * of spans into different latency bands is required, as all spans should be
- * sorted in the same bucket under the same span name.
+ * Aggregator handling many spans where minimal sorting of spans into different
+ * latency bands is required, as all spans should be sorted in the same bucket.
+ * It also means there's minimal memory usage for the Tracez data structure holding
+ * sampled spans.
  */
-void SingleBucketSingleName(
-    benchmark::State &state,
-    std::shared_ptr<opentelemetry::trace::Tracer> &tracer,
-    std::unique_ptr<TracezDataAggregatorPeer> const &aggregator_peer)
+BENCHMARK_DEFINE_F(TracezAggregator, BM_SingleBucket)(benchmark::State &state)
 {
+  const unsigned int num_spans = state.range(0);
+  const bool is_unique = state.range(1);
+  const bool run_periodic_query = state.range(2);
+
+  if (run_periodic_query)
+    aggregator_peer_->StartPeriodicQueryThread();
+
   for (auto _ : state)
   {
     // Do not time span creation, as we're only benchmarking aggregation work
     state.PauseTiming();
-    StartEndSpans(tracer, state.range(0));
+    StartEndSpans(tracer_, num_spans, is_unique);
     state.ResumeTiming();
-    aggregator_peer->Aggregate();
+    aggregator_peer_->Aggregate();
   }
 }
 
 /*
- * Aggregator handling many spans with unique names, who end instantly. This
- * checks the scenario where there's many Tracez groups but minimal sorting
- * of spans into different latency bands is required. Spans are sorted in
- * different groups but always in the same bucket.
+ * Aggregator handling many spans who may fall under error, running, and any
+ * latency group. This requires the aggregator to sorting of spans into their
+ * respective buckets (running, error, latency [including within latency bands]),
+ * which also utilizes more memory.
  */
-void SingleBucketManyNames(
-    benchmark::State &state,
-    std::shared_ptr<opentelemetry::trace::Tracer> &tracer,
-    std::unique_ptr<TracezDataAggregatorPeer> const &aggregator_peer)
+BENCHMARK_DEFINE_F(TracezAggregator, BM_ManyBuckets)(benchmark::State &state)
 {
+  const unsigned int num_spans = state.range(0);
+  const bool is_unique = state.range(1);
+  const bool run_periodic_query = state.range(2);
+
+  if (run_periodic_query)
+    aggregator_peer_->StartPeriodicQueryThread();
+
   for (auto _ : state)
   {
     state.PauseTiming();
-    StartEndSpans(tracer, state.range(0), true);
+    std::vector<opentelemetry::nostd::shared_ptr<
+    	opentelemetry::trace::Span>> running_spans = MakeManySpans(tracer_, num_spans, is_unique);
     state.ResumeTiming();
-    aggregator_peer->Aggregate();
+    aggregator_peer_->Aggregate();
   }
-}
-
-/*
- * Aggregator handling many spans with the same name, who may fall under error,
- * running, and any latency group. This checks the scenario where there's only
- * one Tracez groups but there also needs to be sorting of spans into their
- * respective buckets (running, error, latency [including within latency bands]).
- * Spans are in the same group but sorted to different buckets.
- */
-void ManyBucketsSingleName(
-    benchmark::State &state,
-    std::shared_ptr<opentelemetry::trace::Tracer> &tracer,
-    std::unique_ptr<TracezDataAggregatorPeer> const &aggregator_peer)
-{
-  for (auto _ : state)
-  {
-    state.PauseTiming();
-    auto running_spans = MakeManySpans(tracer, state.range(0));
-    state.ResumeTiming();
-    aggregator_peer->Aggregate();
-  }
-}
-
-/*
- * Aggregator handling many spans with unique names, who may fall under error,
- * running, and any latency group. This checks the scenario where there's many
- * Tracez groups and there also needs to be sorting of spans into their
- * respective buckets (running, error, latency [including within latency bands]).
- * Spans are in the same group but sorted to different buckets.
- */
-void ManyBucketsManyNames(
-    benchmark::State &state,
-    std::shared_ptr<opentelemetry::trace::Tracer> &tracer,
-    std::unique_ptr<TracezDataAggregatorPeer> const &aggregator_peer)
-{
-  for (auto _ : state)
-  {
-    state.PauseTiming();
-    auto running_spans = MakeManySpans(tracer, state.range(0));
-    state.ResumeTiming();
-    aggregator_peer->Aggregate();
-  }
-}
-
-//////////////////////// USER NEVER VISITS WEBPAGE //////////////////////////////
-
-BENCHMARK_DEFINE_F(TracezAggregator, BM_SingleBucketSingleName)(benchmark::State &state)
-{
-  SingleBucketSingleName(state, tracer_, aggregator_peer_);
-}
-
-BENCHMARK_DEFINE_F(TracezAggregator, BM_SingleBucketManyNames)(benchmark::State &state)
-{
-  SingleBucketManyNames(state, tracer_, aggregator_peer_);
-}
-
-BENCHMARK_DEFINE_F(TracezAggregator, BM_ManyBucketsSingleName)(benchmark::State &state)
-{
-  ManyBucketsSingleName(state, tracer_, aggregator_peer_);
-}
-
-BENCHMARK_DEFINE_F(TracezAggregator, BM_ManyBucketsManyNames)(benchmark::State &state)
-{
-  ManyBucketsManyNames(state, tracer_, aggregator_peer_);
-}
-
-///////////// SAME BENCHMARKS, BUT AGGREGATIONS REQUESTED PERIODICALLY /////////////////
-
-BENCHMARK_DEFINE_F(TracezAggregator, BM_SingleBucketSingleNameFetch)(benchmark::State &state)
-{
-  aggregator_peer_->StartPeriodicQueryThread();
-  SingleBucketSingleName(state, tracer_, aggregator_peer_);
-}
-
-BENCHMARK_DEFINE_F(TracezAggregator, BM_SingleBucketManyNamesFetch)(benchmark::State &state)
-{
-  aggregator_peer_->StartPeriodicQueryThread();
-  SingleBucketManyNames(state, tracer_, aggregator_peer_);
-}
-
-BENCHMARK_DEFINE_F(TracezAggregator, BM_ManyBucketsSingleNameFetch)(benchmark::State &state)
-{
-  aggregator_peer_->StartPeriodicQueryThread();
-  ManyBucketsSingleName(state, tracer_, aggregator_peer_);
-}
-
-BENCHMARK_DEFINE_F(TracezAggregator, BM_ManyBucketsManyNamesFetch)(benchmark::State &state)
-{
-  aggregator_peer_->StartPeriodicQueryThread();
-  ManyBucketsManyNames(state, tracer_, aggregator_peer_);
 }
 
 //////////////////////////// RUN BENCHMARKS ///////////////////////////////
 
-// Arg is the number of spans created for each iteration
-BENCHMARK_REGISTER_F(TracezAggregator, BM_SingleBucketSingleName)->Arg(10)->Arg(1000);
-BENCHMARK_REGISTER_F(TracezAggregator, BM_SingleBucketSingleNameFetch)->Arg(10)->Arg(1000);
-BENCHMARK_REGISTER_F(TracezAggregator, BM_SingleBucketManyNames)->Arg(10)->Arg(1000);
-BENCHMARK_REGISTER_F(TracezAggregator, BM_SingleBucketManyNamesFetch)->Arg(10)->Arg(1000);
-BENCHMARK_REGISTER_F(TracezAggregator, BM_ManyBucketsSingleName)->Arg(10)->Arg(1000);
-BENCHMARK_REGISTER_F(TracezAggregator, BM_ManyBucketsSingleNameFetch)->Arg(10)->Arg(1000);
-BENCHMARK_REGISTER_F(TracezAggregator, BM_ManyBucketsManyNames)->Arg(10)->Arg(1000);
-BENCHMARK_REGISTER_F(TracezAggregator, BM_ManyBucketsManyNamesFetch)->Arg(10)->Arg(1000);
+/* Args: spans, is_unique, run_periodic_query
+ *
+ * @num_spans int number of spans created for each iteration
+ * @is_unique bool whether spans are unique or not
+ * @run_periodic_query bool whether to run a background periodic thread of not
+ */
+
+BENCHMARK_REGISTER_F(TracezAggregator, BM_SingleBucket)
+  /*
+   * Same name spans, with different number of spans and periodic query status
+   *
+   * Spans all have the same name, which means there's work to clear stored spans
+   * from memory fairly often so that the number of sampled spans won't go over
+   * the max and memory use is minimal, which are performance factors
+   */
+  ->Args({10, false, false})->Args({10, false, true})
+  ->Args({1000, false, false})->Args({1000, false, true})
+  /*
+   * Many name spans, with different number of spans and periodic query status
+   *
+   * Spans have num_spans unique names, so many more spans are kept stored in memory
+   * and not cleared as often, which affects performance
+   */
+  ->Args({10, true, false})->Args({10, true, true})
+  ->Args({1000, true, false})->Args({1000, true, true});
+
+// Do same permutation of number of spans, span uniqueness, and periodic thread
+// running for many buckets too
+BENCHMARK_REGISTER_F(TracezAggregator, BM_ManyBuckets)
+  ->Args({10, false, false})->Args({10, false, true})
+  ->Args({1000, false, false})->Args({1000, false, true})
+  ->Args({10, true, false})->Args({10, true, true})
+  ->Args({1000, true, false})->Args({1000, true, true});
 
 } // namespace zpages
 } // namespace ext
