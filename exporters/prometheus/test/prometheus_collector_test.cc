@@ -696,11 +696,11 @@ TEST(PrometheusCollector, ConcurrentlyAddingAndThenCollecting)
 
   std::thread first(&PrometheusCollector::AddMetricData, std::ref(collector), std::ref(records1));
   std::thread second(&PrometheusCollector::AddMetricData, std::ref(collector), std::ref(records2));
-
   first.join();
   second.join();
 
-  auto res = collector.Collect();
+  auto collect_future = std::async(&PrometheusCollector::Collect, std::ref(collector));
+  auto res            = collect_future.get();
 
   ASSERT_EQ(collector.GetCollection().size(), 0);
   ASSERT_EQ(res.size(), 4);
@@ -724,10 +724,12 @@ TEST(PrometheusCollector, ConcurrentlyAddingAndCollecting)
 
   std::thread first(&PrometheusCollector::AddMetricData, std::ref(collector), std::ref(records1));
   std::thread second(&PrometheusCollector::AddMetricData, std::ref(collector), std::ref(records2));
-  auto res = collector.Collect();
+  auto collect_future = std::async(&PrometheusCollector::Collect, std::ref(collector));
 
   first.join();
   second.join();
+
+  auto res = collect_future.get();
 
   // the size of collection can be 0, 2, 4, because we don't know when the collect()
   // is really called. However, we claim that if the data in the collection is collected,
@@ -759,13 +761,13 @@ TEST(PrometheusCollector, ConcurrentlyAddingAndConcurrentlyCollecting)
   second.join();
 
   // after adding, then concurrently consuming
-  std::thread first_collect(&PrometheusCollector::Collect, std::ref(collector));
-  std::thread second_collect(&PrometheusCollector::Collect, std::ref(collector));
-  first_collect.join();
-  second_collect.join();
+  auto collect_future1 = std::async(&PrometheusCollector::Collect, std::ref(collector));
+  auto collect_future2 = std::async(&PrometheusCollector::Collect, std::ref(collector));
+  auto res1            = collect_future1.get();
+  auto res2            = collect_future2.get();
 
   // all added data must be collected in either res1 or res2
-  ASSERT_EQ(collector.GetCollection().size(), 0);
+  ASSERT_EQ(res1.size() + res2.size(), 4);
 }
 
 OPENTELEMETRY_END_NAMESPACE
