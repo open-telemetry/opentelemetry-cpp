@@ -231,9 +231,8 @@ protected:
   }
 };
 
-//////////////////////////// BENCHMARK DEFINITIONS /////////////////////////////////
 
-//////////////////////// USER NEVER VISITS WEBPAGE //////////////////////////////
+////////////////////////// BENCHMARK HELPERS ///////////////////////////////
 
 /*
  * Aggregator handing many spans with the same name, who end instantly. This
@@ -241,14 +240,16 @@ protected:
  * of latencies is required, as all spans should be sorted in the same bucket
  * under the same span name.
  */
-BENCHMARK_DEFINE_F(TracezAggregator, BM_SingleBucketSingleName)(benchmark::State &state)
+void SingleBucketSingleName(
+    benchmark::State &state,
+    std::shared_ptr<opentelemetry::trace::Tracer> &tracer,
+    std::unique_ptr<TracezDataAggregatorPeer> const &aggregator_peer)
 {
-  const int num_spans = state.range(0);
   for (auto _ : state)
   {
     // Do not time span creation, as we're only benchmarking aggregation work
     state.PauseTiming();
-    StartEndSpans(tracer, num_spans);
+    StartEndSpans(tracer, state.range(0));
     state.ResumeTiming();
     aggregator_peer->Aggregate();
   }
@@ -260,13 +261,15 @@ BENCHMARK_DEFINE_F(TracezAggregator, BM_SingleBucketSingleName)(benchmark::State
  * of latencies is required. Spans are sorted in different groups but always
  * in the same bucket.
  */
-BENCHMARK_DEFINE_F(TracezAggregator, BM_SingleBucketManyNames)(benchmark::State &state)
+void SingleBucketManyNames(
+    benchmark::State &state,
+    std::shared_ptr<opentelemetry::trace::Tracer> &tracer,
+    std::unique_ptr<TracezDataAggregatorPeer> const &aggregator_peer)
 {
-  const int num_spans = state.range(0);
   for (auto _ : state)
   {
     state.PauseTiming();
-    StartEndSpans(tracer, num_spans, false);
+    StartEndSpans(tracer, state.range(0), true);
     state.ResumeTiming();
     aggregator_peer->Aggregate();
   }
@@ -279,13 +282,15 @@ BENCHMARK_DEFINE_F(TracezAggregator, BM_SingleBucketManyNames)(benchmark::State 
  * respective buckets. Spans are in the same group but sorted to different
  * buckets.
  */
-BENCHMARK_DEFINE_F(TracezAggregator, BM_ManyBucketsSingleName)(benchmark::State &state)
+void ManyBucketsSingleName(
+    benchmark::State &state,
+    std::shared_ptr<opentelemetry::trace::Tracer> &tracer,
+    std::unique_ptr<TracezDataAggregatorPeer> const &aggregator_peer)
 {
-  const int num_spans = state.range(0);
   for (auto _ : state)
   {
     state.PauseTiming();
-    auto running_spans = MakeManySpans(tracer, num_spans, false);
+    auto running_spans = MakeManySpans(tracer, state.range(0));
     state.ResumeTiming();
     aggregator_peer->Aggregate();
   }
@@ -298,66 +303,62 @@ BENCHMARK_DEFINE_F(TracezAggregator, BM_ManyBucketsSingleName)(benchmark::State 
  * respective buckets. Spans are in the different groups and buckets, similar to
  * likely real use cases.
  */
-BENCHMARK_DEFINE_F(TracezAggregator, BM_ManyBucketsManyNames)(benchmark::State &state)
+void ManyBucketsManyNames(
+    benchmark::State &state,
+    std::shared_ptr<opentelemetry::trace::Tracer> &tracer,
+    std::unique_ptr<TracezDataAggregatorPeer> const &aggregator_peer)
 {
-  const int num_spans = state.range(0);
   for (auto _ : state)
   {
     state.PauseTiming();
-    auto running_spans = MakeManySpans(tracer, num_spans, true);
+    auto running_spans = MakeManySpans(tracer, state.range(0));
     state.ResumeTiming();
     aggregator_peer->Aggregate();
   }
+}
+
+//////////////////////// USER NEVER VISITS WEBPAGE //////////////////////////////
+
+BENCHMARK_DEFINE_F(TracezAggregator, BM_SingleBucketSingleName)(benchmark::State &state)
+{
+  SingleBucketSingleName(state, tracer, aggregator_peer);
+}
+
+BENCHMARK_DEFINE_F(TracezAggregator, BM_SingleBucketManyNames)(benchmark::State &state)
+{
+  SingleBucketManyNames(state, tracer, aggregator_peer);
+}
+
+BENCHMARK_DEFINE_F(TracezAggregator, BM_ManyBucketsSingleName)(benchmark::State &state)
+{
+  ManyBucketsSingleName(state, tracer, aggregator_peer);
+}
+
+BENCHMARK_DEFINE_F(TracezAggregator, BM_ManyBucketsManyNames)(benchmark::State &state)
+{
+  ManyBucketsManyNames(state, tracer, aggregator_peer);
 }
 
 ////////////////// SAME BENCHMARKS, BUT USER VISITS WEBPAGE ///////////////////////////
 
 BENCHMARK_DEFINE_F(TracezAggregatorFetch, BM_SingleBucketSingleName)(benchmark::State &state)
 {
-  const int num_spans = state.range(0);
-  for (auto _ : state)
-  {
-    state.PauseTiming();
-    StartEndSpans(tracer, num_spans);
-    state.ResumeTiming();
-    aggregator_peer->Aggregate();
-  }
+  SingleBucketSingleName(state, tracer, aggregator_peer);
 }
 
 BENCHMARK_DEFINE_F(TracezAggregatorFetch, BM_SingleBucketManyNames)(benchmark::State &state)
 {
-  const int num_spans = state.range(0);
-  for (auto _ : state)
-  {
-    state.PauseTiming();
-    StartEndSpans(tracer, num_spans, false);
-    state.ResumeTiming();
-    aggregator_peer->Aggregate();
-  }
+  SingleBucketManyNames(state, tracer, aggregator_peer);
 }
 
 BENCHMARK_DEFINE_F(TracezAggregatorFetch, BM_ManyBucketsSingleName)(benchmark::State &state)
 {
-  const int num_spans = state.range(0);
-  for (auto _ : state)
-  {
-    state.PauseTiming();
-    auto running_spans = MakeManySpans(tracer, num_spans);
-    state.ResumeTiming();
-    aggregator_peer->Aggregate();
-  }
+  ManyBucketsSingleName(state, tracer, aggregator_peer);
 }
 
 BENCHMARK_DEFINE_F(TracezAggregatorFetch, BM_ManyBucketsManyNames)(benchmark::State &state)
 {
-  const int num_spans = state.range(0);
-  for (auto _ : state)
-  {
-    state.PauseTiming();
-    auto running_spans = MakeManySpans(tracer, num_spans, true);
-    state.ResumeTiming();
-    aggregator_peer->Aggregate();
-  }
+  ManyBucketsManyNames(state, tracer, aggregator_peer);
 }
 
 //////////////////////////// RUN BENCHMARKS ///////////////////////////////
