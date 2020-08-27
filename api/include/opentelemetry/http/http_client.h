@@ -49,7 +49,7 @@ public:
     virtual HttpResult GetResult() = 0;
     virtual unsigned GetStatusCode() = 0;
     virtual HttpHeaders& GetHeaders() = 0;
-    virtual std::vector<uint8_t>& GetBody() = 0;
+    virtual void GetBody(uint8_t* body, int* len) = 0;
 };
 
 class IHttpResponseCallback
