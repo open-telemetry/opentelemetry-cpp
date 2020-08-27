@@ -21,9 +21,9 @@ namespace zpages
  */
 void CreateRecordables(
     std::vector<std::unique_ptr<ThreadsafeSpanData>> &spans,
-    int num_spans)
+    unsigned int num_spans)
 {
-  for (; num_spans > 0; num_spans--)
+  for (unsigned int i = 0; i < num_spans; i++)
     spans.push_back(std::unique_ptr<ThreadsafeSpanData>(new ThreadsafeSpanData()));
 }
 
@@ -34,9 +34,9 @@ void CreateRecordables(
  * simulates an aggregator querying the processor many times, but doesn't
  * aggregate or store spans.
  */
-void GetManySnapshots(std::shared_ptr<TracezSpanProcessor> &processor, int num_snapshots)
+void GetManySnapshots(std::shared_ptr<TracezSpanProcessor> &processor, unsigned int num_snapshots)
 {
-  for (; num_snapshots > 0; num_snapshots--)
+  for (unsigned int i = 0; i < num_snapshots; i++)
     processor->GetSpanSnapshot();
 }
 
@@ -119,10 +119,11 @@ BENCHMARK_DEFINE_F(TracezProcessor, BM_MakeRunning)(benchmark::State &state)
   for (auto _ : state)
   {
     state.PauseTiming();
-    // Clear span vector if EndAllSpans for spans isn't called
+    // Clear span vector if EndAllSpans for spans isn't called to avoid double
+    // starting spans
     spans_.clear();
-    // Clear processor memory, ensure no nullptrs are in running span set from
-    // previous iterations from either spans or spans2 if EndAllSpans isn't called
+    // Clear processor memory, which ensures no nullptrs are in running spans are
+    // set from previous iterations when EndAllSpans isn't called on span/spans2
     processor_peer_->ClearRunning();
     CreateRecordables(spans_, num_spans);
     state.ResumeTiming();
@@ -259,8 +260,10 @@ BENCHMARK_DEFINE_F(TracezProcessor, BM_MakeRunningGetSpansMakeComplete)(benchmar
 
 // Arg is the number of spans created for each iteration
 BENCHMARK_REGISTER_F(TracezProcessor, BM_MakeRunning)->Arg(10)->Arg(1000);
+BENCHMARK_REGISTER_F(TracezProcessor, BM_MakeComplete)->Arg(10)->Arg(1000);
 BENCHMARK_REGISTER_F(TracezProcessor, BM_GetSpans)->Arg(10)->Arg(1000);
-// These use multiple threads, so that CPU usage needs to be measured as well
+
+// These use multiple threads, so that CPU usage and thread works needs to be measured
 BENCHMARK_REGISTER_F(TracezProcessor, BM_MakeRunningMakeComplete)->Arg(10)->Arg(1000)
 	->MeasureProcessCPUTime()->UseRealTime();
 BENCHMARK_REGISTER_F(TracezProcessor, BM_MakeRunningGetSpans)->Arg(10)->Arg(1000)

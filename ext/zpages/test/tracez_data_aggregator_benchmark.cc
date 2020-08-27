@@ -24,14 +24,14 @@ namespace zpages
  */
 void StartEndSpans(
     std::shared_ptr<opentelemetry::trace::Tracer> &tracer,
-    int num_spans,
+    unsigned int num_spans,
     bool is_unique = false)
 {
   opentelemetry::trace::StartSpanOptions start;
   opentelemetry::trace::EndSpanOptions end;
   start.start_steady_time = SteadyTimestamp(nanoseconds(0));
   end.end_steady_time = SteadyTimestamp(nanoseconds(1));
-  for (; num_spans > 0; num_spans--)
+  for (unsigned int i = 0; i < num_spans; i++)
     tracer->StartSpan(is_unique ? std::to_string(num_spans) : "", start)->End(end);
 }
 
@@ -42,12 +42,12 @@ void StartEndSpans(
  */
 void StartEndSpansLatency(
     std::shared_ptr<opentelemetry::trace::Tracer> &tracer,
-    int num_spans,
+    unsigned int num_spans,
     bool is_unique = false)
 {
   opentelemetry::trace::StartSpanOptions start;
   start.start_steady_time = SteadyTimestamp(nanoseconds(0));
-  for (; num_spans > 0; num_spans--)
+  for (unsigned int i = 0; i < num_spans; i++)
   {
     // Latency bucket depends on the index
     nanoseconds latency_band = kLatencyBoundaries[num_spans % kLatencyBoundaries.size()];
@@ -65,10 +65,10 @@ void StartEndSpansLatency(
  */
 void StartEndSpansError(
     std::shared_ptr<opentelemetry::trace::Tracer> &tracer,
-    int num_spans,
+    unsigned int num_spans,
     bool is_unique = false)
 {
-  for (; num_spans > 0; num_spans--)
+  for (unsigned int i = 0; i < num_spans; i++)
     tracer->StartSpan(is_unique ? std::to_string(num_spans) : "")
         ->SetStatus(opentelemetry::trace::CanonicalCode::CANCELLED, "");
 }
@@ -81,24 +81,27 @@ void StartEndSpansError(
 void StartSpans(
     std::vector<opentelemetry::nostd::shared_ptr<opentelemetry::trace::Span>> &spans,
     std::shared_ptr<opentelemetry::trace::Tracer> &tracer,
-    int num_spans,
+    unsigned int num_spans,
     bool is_unique = false)
 {
-  for (; num_spans > 0; num_spans--)
+  for (unsigned int i = 0; i < num_spans; i++)
     spans.push_back(tracer->StartSpan(is_unique ? std::to_string(num_spans) : ""));
 }
 
 /*
  * Helper function that creates about num_spans spans, evenly split between running, latency (which
  * is further split by bucket), and error. If is_unique is true, then all spans will have
- * different names. The running spans vector is returned so that they remain running.
+ * different names. The running spans vector is returned so that they remain running. A vector is
+ * returned holding the running spans so they can be held in the caller function and remain running.
  */
 std::vector<opentelemetry::nostd::shared_ptr<opentelemetry::trace::Span>> MakeManySpans(
     std::shared_ptr<opentelemetry::trace::Tracer> &tracer,
     int num_spans,
     bool is_unique = false)
 {
-  // Running spans must be stored in a vector in order to stay running
+  // Running spans must be stored in a vector in order to stay running, since only OnStart is called
+  // for those spans. This vector is only accessed by the run thread, as the other functions' spans
+  // automatically get moved to the processor memory when calling both OnStart and OnEnd
   std::vector<opentelemetry::nostd::shared_ptr<opentelemetry::trace::Span>> running_spans;
   // Use threads to speed up the work
   std::thread run(StartSpans, std::ref(running_spans), std::ref(tracer), num_spans / 3, is_unique);
@@ -108,7 +111,6 @@ std::vector<opentelemetry::nostd::shared_ptr<opentelemetry::trace::Span>> MakeMa
   err.join();
   return running_spans;
 }
-
 
 /////////////////////////// AGGREGATOR PEER //////////////////////////////
 
