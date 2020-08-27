@@ -52,9 +52,9 @@ void GetManySnapshots(std::shared_ptr<TracezSpanProcessor> &processor, int num_s
 class TracezProcessorPeer
 {
 public:
-  TracezProcessorPeer(std::shared_ptr<TracezSpanProcessor> &processor_in)
+  TracezProcessorPeer(std::shared_ptr<TracezSpanProcessor> &processor)
   {
-    processor  = processor_in;
+    processor_  = processor;
   }
 
   /*
@@ -63,7 +63,7 @@ public:
   void StartAllSpans(std::vector<std::unique_ptr<ThreadsafeSpanData>> &spans)
   {
     for(auto &span : spans)
-      processor->OnStart(*(span.get()));
+      processor_->OnStart(*(span.get()));
   }
 
   /*
@@ -74,21 +74,21 @@ public:
   void EndAllSpans(std::vector<std::unique_ptr<ThreadsafeSpanData>> &spans)
   {
     for(auto &span : spans)
-      processor->OnEnd(std::move(span));
+      processor_->OnEnd(std::move(span));
     spans.clear();
   }
 
   /*
    * Clears running span pointers in processor memory, which is used in between
-   * iterations so that spans_.running doesn't hold nullptr
+   * iterations so that processor->spans_.running doesn't hold nullptr
    */
   void ClearRunning()
   {
-    processor->spans_.running.clear();
+    processor_->spans_.running.clear();
   }
 
 private:
-  std::shared_ptr<TracezSpanProcessor> processor;
+  std::shared_ptr<TracezSpanProcessor> processor_;
 };
 
 ////////////////////////  FIXTURE FOR SHARED SETUP CODE ///////////////////
@@ -98,12 +98,12 @@ class TracezProcessor : public benchmark::Fixture
 protected:
   void SetUp(const ::benchmark::State& state)
   {
-    processor  = std::shared_ptr<TracezSpanProcessor>(new TracezSpanProcessor());
-    processor_peer = std::unique_ptr<TracezProcessorPeer>(new TracezProcessorPeer(processor));
+    processor_  = std::shared_ptr<TracezSpanProcessor>(new TracezSpanProcessor());
+    processor_peer_ = std::unique_ptr<TracezProcessorPeer>(new TracezProcessorPeer(processor_));
   }
-  std::vector<std::unique_ptr<ThreadsafeSpanData>> spans;
-  std::unique_ptr<TracezProcessorPeer> processor_peer;
-  std::shared_ptr<TracezSpanProcessor> processor;
+  std::vector<std::unique_ptr<ThreadsafeSpanData>> spans_;
+  std::unique_ptr<TracezProcessorPeer> processor_peer_;
+  std::shared_ptr<TracezSpanProcessor> processor_;
 
 };
 
@@ -120,14 +120,14 @@ BENCHMARK_DEFINE_F(TracezProcessor, BM_MakeRunning)(benchmark::State &state)
   {
     state.PauseTiming();
     // Clear span vector if EndAllSpans for spans isn't called
-    spans.clear();
+    spans_.clear();
     // Clear processor memory, ensure no nullptrs are in running span set from
     // previous iterations from either spans or spans2 if EndAllSpans isn't called
-    processor_peer->ClearRunning();
-    CreateRecordables(spans, num_spans);
+    processor_peer_->ClearRunning();
+    CreateRecordables(spans_, num_spans);
     state.ResumeTiming();
 
-    processor_peer->StartAllSpans(spans);
+    processor_peer_->StartAllSpans(spans_);
   }
 }
 
@@ -141,11 +141,11 @@ BENCHMARK_DEFINE_F(TracezProcessor, BM_MakeComplete)(benchmark::State &state)
   for (auto _ : state)
   {
     state.PauseTiming();
-    CreateRecordables(spans, num_spans);
-    processor_peer->StartAllSpans(spans);
+    CreateRecordables(spans_, num_spans);
+    processor_peer_->StartAllSpans(spans_);
     state.ResumeTiming();
 
-    processor_peer->EndAllSpans(spans);
+    processor_peer_->EndAllSpans(spans_);
   }
 }
 
@@ -157,7 +157,7 @@ BENCHMARK_DEFINE_F(TracezProcessor, BM_GetSpans)(benchmark::State &state)
 {
   const int num_spans = state.range(0);
   for (auto _ : state)
-    GetManySnapshots(processor, num_spans);
+    GetManySnapshots(processor_, num_spans);
 }
 
 /*
@@ -170,22 +170,22 @@ BENCHMARK_DEFINE_F(TracezProcessor, BM_MakeRunningMakeComplete)(benchmark::State
   for (auto _ : state)
   {
     state.PauseTiming();
-    processor_peer->ClearRunning();
+    processor_peer_->ClearRunning();
     std::vector<std::unique_ptr<ThreadsafeSpanData>> spans2;
-    CreateRecordables(spans, num_spans);
+    CreateRecordables(spans_, num_spans);
     CreateRecordables(spans2, num_spans);
-    processor_peer->StartAllSpans(spans);
+    processor_peer_->StartAllSpans(spans_);
     state.ResumeTiming();
 
-    std::thread start(&TracezProcessorPeer::StartAllSpans, processor_peer.get(), std::ref(spans2));
-    processor_peer->EndAllSpans(spans);
+    std::thread start(&TracezProcessorPeer::StartAllSpans, processor_peer_.get(), std::ref(spans2));
+    processor_peer_->EndAllSpans(spans_);
 
     start.join();
   }
 }
 
 /*
- * Make many empty spans while spapshots grabbed. This checks the scenario where the
+ * Make many empty spans while snapshots grabbed. This checks the scenario where the
  * processor holds many running spans and gets queried.
  */
 BENCHMARK_DEFINE_F(TracezProcessor, BM_MakeRunningGetSpans)(benchmark::State &state)
@@ -194,13 +194,13 @@ BENCHMARK_DEFINE_F(TracezProcessor, BM_MakeRunningGetSpans)(benchmark::State &st
   for (auto _ : state)
   {
     state.PauseTiming();
-    spans.clear();
-    processor_peer->ClearRunning();
-    CreateRecordables(spans, num_spans);
+    spans_.clear();
+    processor_peer_->ClearRunning();
+    CreateRecordables(spans_, num_spans);
     state.ResumeTiming();
 
-    std::thread start(&TracezProcessorPeer::StartAllSpans, processor_peer.get(), std::ref(spans));
-    GetManySnapshots(processor, num_spans);
+    std::thread start(&TracezProcessorPeer::StartAllSpans, processor_peer_.get(), std::ref(spans_));
+    GetManySnapshots(processor_, num_spans);
 
     start.join();
   }
@@ -217,12 +217,12 @@ BENCHMARK_DEFINE_F(TracezProcessor, BM_GetSpansMakeComplete)(benchmark::State &s
   for (auto _ : state)
   {
     state.PauseTiming();
-    CreateRecordables(spans, num_spans);
-    processor_peer->StartAllSpans(spans);
+    CreateRecordables(spans_, num_spans);
+    processor_peer_->StartAllSpans(spans_);
     state.ResumeTiming();
 
-    std::thread end(&TracezProcessorPeer::EndAllSpans, processor_peer.get(), std::ref(spans));
-    GetManySnapshots(processor, num_spans);
+    std::thread end(&TracezProcessorPeer::EndAllSpans, processor_peer_.get(), std::ref(spans_));
+    GetManySnapshots(processor_, num_spans);
 
     end.join();
   }
@@ -239,16 +239,16 @@ BENCHMARK_DEFINE_F(TracezProcessor, BM_MakeRunningGetSpansMakeComplete)(benchmar
   for (auto _ : state)
   {
     state.PauseTiming();
-    processor_peer->ClearRunning();
+    processor_peer_->ClearRunning();
     std::vector<std::unique_ptr<ThreadsafeSpanData>> spans2;
-    CreateRecordables(spans, num_spans);
+    CreateRecordables(spans_, num_spans);
     CreateRecordables(spans2, num_spans);
-    processor_peer->StartAllSpans(spans);
+    processor_peer_->StartAllSpans(spans_);
     state.ResumeTiming();
 
-    std::thread end(&TracezProcessorPeer::EndAllSpans, processor_peer.get(), std::ref(spans));
-    std::thread start(&TracezProcessorPeer::StartAllSpans, processor_peer.get(), std::ref(spans2));
-    GetManySnapshots(processor, num_spans);
+    std::thread end(&TracezProcessorPeer::EndAllSpans, processor_peer_.get(), std::ref(spans_));
+    std::thread start(&TracezProcessorPeer::StartAllSpans, processor_peer_.get(), std::ref(spans2));
+    GetManySnapshots(processor_, num_spans);
 
     start.join();
     end.join();
