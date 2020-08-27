@@ -46,41 +46,35 @@ std::shared_ptr<metric_sdk::Aggregator<T>> CreateAgg(metric_sdk::AggregatorKind 
   std::shared_ptr<metric_sdk::Aggregator<T>> aggregator;
   switch (kind)
   {
-    case metric_sdk::AggregatorKind::Counter:
-    {
+    case metric_sdk::AggregatorKind::Counter: {
       aggregator = std::shared_ptr<metric_sdk::Aggregator<T>>(
           new metric_sdk::CounterAggregator<T>(opentelemetry::metrics::InstrumentKind::Counter));
       break;
     }
-    case metric_sdk::AggregatorKind::MinMaxSumCount:
-    {
+    case metric_sdk::AggregatorKind::MinMaxSumCount: {
       aggregator =
           std::shared_ptr<metric_sdk::Aggregator<T>>(new metric_sdk::MinMaxSumCountAggregator<T>(
               opentelemetry::metrics::InstrumentKind::Counter));
       break;
     }
-    case metric_sdk::AggregatorKind::Gauge:
-    {
+    case metric_sdk::AggregatorKind::Gauge: {
       aggregator = std::shared_ptr<metric_sdk::Aggregator<T>>(
           new metric_sdk::GaugeAggregator<T>(opentelemetry::metrics::InstrumentKind::Counter));
       break;
     }
-    case metric_sdk::AggregatorKind::Sketch:
-    {
+    case metric_sdk::AggregatorKind::Sketch: {
       aggregator = std::shared_ptr<metric_sdk::Aggregator<T>>(new metric_sdk::SketchAggregator<T>(
           opentelemetry::metrics::InstrumentKind::Counter, 0.000005));
       break;
     }
-    case metric_sdk::AggregatorKind::Histogram:
-    {
+    case metric_sdk::AggregatorKind::Histogram: {
       std::vector<double> boundaries{10, 20};
       aggregator =
           std::shared_ptr<metric_sdk::Aggregator<T>>(new metric_sdk::HistogramAggregator<T>(
               opentelemetry::metrics::InstrumentKind::Counter, boundaries));
       break;
     }
-    case metric_sdk::AggregatorKind::Exact:
-    {
+    case metric_sdk::AggregatorKind::Exact: {
       aggregator = std::shared_ptr<metric_sdk::Aggregator<T>>(new metric_sdk::ExactAggregator<T>(
           opentelemetry::metrics::InstrumentKind::Counter, exactMode));
       break;
@@ -700,8 +694,7 @@ TEST(PrometheusCollector, ConcurrentlyAddingAndThenCollecting)
   first.join();
   second.join();
 
-  auto collect_future = std::async(&PrometheusCollector::Collect, std::ref(collector));
-  auto res            = collect_future.get();
+  auto res = collector.Collect();
 
   ASSERT_EQ(collector.GetCollection().size(), 0);
   ASSERT_EQ(res.size(), 4);
@@ -725,12 +718,10 @@ TEST(PrometheusCollector, ConcurrentlyAddingAndCollecting)
 
   std::thread first(&PrometheusCollector::AddMetricData, std::ref(collector), std::ref(records1));
   std::thread second(&PrometheusCollector::AddMetricData, std::ref(collector), std::ref(records2));
-  auto collect_future = std::async(&PrometheusCollector::Collect, std::ref(collector));
+  auto res = collector.Collect();
 
   first.join();
   second.join();
-
-  auto res = collect_future.get();
 
   // the size of collection can be 0, 2, 4, because we don't know when the collect()
   // is really called. However, we claim that if the data in the collection is collected,
@@ -762,13 +753,13 @@ TEST(PrometheusCollector, ConcurrentlyAddingAndConcurrentlyCollecting)
   second.join();
 
   // after adding, then concurrently consuming
-  auto collect_future1 = std::async(&PrometheusCollector::Collect, std::ref(collector));
-  auto collect_future2 = std::async(&PrometheusCollector::Collect, std::ref(collector));
-  auto res1            = collect_future1.get();
-  auto res2            = collect_future2.get();
+  std::thread first_collect(&PrometheusCollector::Collect, std::ref(collector));
+  std::thread second_collect(&PrometheusCollector::Collect, std::ref(collector));
+  first_collect.join();
+  second_collect.join();
 
   // all added data must be collected in either res1 or res2
-  ASSERT_EQ(res1.size() + res2.size(), 4);
+  ASSERT_EQ(collector.GetCollection().size(), 0);
 }
 
 OPENTELEMETRY_END_NAMESPACE
