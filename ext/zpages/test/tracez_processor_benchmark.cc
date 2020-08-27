@@ -115,7 +115,7 @@ protected:
  */
 BENCHMARK_DEFINE_F(TracezProcessor, BM_MakeRunning)(benchmark::State &state)
 {
-  const int num_spans = state.range(0);
+  const unsigned int num_spans = state.range(0);
   for (auto _ : state)
   {
     state.PauseTiming();
@@ -138,7 +138,7 @@ BENCHMARK_DEFINE_F(TracezProcessor, BM_MakeRunning)(benchmark::State &state)
  */
 BENCHMARK_DEFINE_F(TracezProcessor, BM_MakeComplete)(benchmark::State &state)
 {
-  const int num_spans = state.range(0);
+  const unsigned int num_spans = state.range(0);
   for (auto _ : state)
   {
     state.PauseTiming();
@@ -156,9 +156,9 @@ BENCHMARK_DEFINE_F(TracezProcessor, BM_MakeComplete)(benchmark::State &state)
  */
 BENCHMARK_DEFINE_F(TracezProcessor, BM_GetSpans)(benchmark::State &state)
 {
-  const int num_spans = state.range(0);
+  const unsigned int num_snapshots = state.range(0);
   for (auto _ : state)
-    GetManySnapshots(processor_, num_spans);
+    GetManySnapshots(processor_, num_snapshots);
 }
 
 /*
@@ -167,7 +167,7 @@ BENCHMARK_DEFINE_F(TracezProcessor, BM_GetSpans)(benchmark::State &state)
  */
 BENCHMARK_DEFINE_F(TracezProcessor, BM_MakeRunningMakeComplete)(benchmark::State &state)
 {
-  const int num_spans = state.range(0);
+  const unsigned int num_spans = state.range(0);
   for (auto _ : state)
   {
     state.PauseTiming();
@@ -191,17 +191,17 @@ BENCHMARK_DEFINE_F(TracezProcessor, BM_MakeRunningMakeComplete)(benchmark::State
  */
 BENCHMARK_DEFINE_F(TracezProcessor, BM_MakeRunningGetSpans)(benchmark::State &state)
 {
-  const int num_spans = state.range(0);
+  const unsigned int num_spans_snaps = state.range(0); // number of spans and snapshots
   for (auto _ : state)
   {
     state.PauseTiming();
     spans_.clear();
     processor_peer_->ClearRunning();
-    CreateRecordables(spans_, num_spans);
+    CreateRecordables(spans_, num_spans_snaps);
     state.ResumeTiming();
 
     std::thread start(&TracezProcessorPeer::StartAllSpans, processor_peer_.get(), std::ref(spans_));
-    GetManySnapshots(processor_, num_spans);
+    GetManySnapshots(processor_, num_spans_snaps);
 
     start.join();
   }
@@ -214,16 +214,16 @@ BENCHMARK_DEFINE_F(TracezProcessor, BM_MakeRunningGetSpans)(benchmark::State &st
  */
 BENCHMARK_DEFINE_F(TracezProcessor, BM_GetSpansMakeComplete)(benchmark::State &state)
 {
-  const int num_spans = state.range(0);
+  const unsigned int num_spans_snaps = state.range(0);
   for (auto _ : state)
   {
     state.PauseTiming();
-    CreateRecordables(spans_, num_spans);
+    CreateRecordables(spans_, num_spans_snaps);
     processor_peer_->StartAllSpans(spans_);
     state.ResumeTiming();
 
     std::thread end(&TracezProcessorPeer::EndAllSpans, processor_peer_.get(), std::ref(spans_));
-    GetManySnapshots(processor_, num_spans);
+    GetManySnapshots(processor_, num_spans_snaps);
 
     end.join();
   }
@@ -236,20 +236,20 @@ BENCHMARK_DEFINE_F(TracezProcessor, BM_GetSpansMakeComplete)(benchmark::State &s
  */
 BENCHMARK_DEFINE_F(TracezProcessor, BM_MakeRunningGetSpansMakeComplete)(benchmark::State &state)
 {
-  const int num_spans = state.range(0);
+  const unsigned int num_spans_snaps = state.range(0);
   for (auto _ : state)
   {
     state.PauseTiming();
     processor_peer_->ClearRunning();
     std::vector<std::unique_ptr<ThreadsafeSpanData>> spans2;
-    CreateRecordables(spans_, num_spans);
-    CreateRecordables(spans2, num_spans);
+    CreateRecordables(spans_, num_spans_snaps);
+    CreateRecordables(spans2, num_spans_snaps);
     processor_peer_->StartAllSpans(spans_);
     state.ResumeTiming();
 
     std::thread end(&TracezProcessorPeer::EndAllSpans, processor_peer_.get(), std::ref(spans_));
     std::thread start(&TracezProcessorPeer::StartAllSpans, processor_peer_.get(), std::ref(spans2));
-    GetManySnapshots(processor_, num_spans);
+    GetManySnapshots(processor_, num_spans_snaps);
 
     start.join();
     end.join();
