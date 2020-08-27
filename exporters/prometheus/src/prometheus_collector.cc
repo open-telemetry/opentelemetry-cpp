@@ -43,20 +43,23 @@ PrometheusCollector::PrometheusCollector(int max_collection_size)
  */
 std::vector<prometheus_client::MetricFamily> PrometheusCollector::Collect() const
 {
+  this->collection_lock_.lock();
   if (metrics_to_collect_->empty())
   {
+    this->collection_lock_.unlock();
     return {};
   }
+  this->collection_lock_.unlock();
 
   std::vector<prometheus_client::MetricFamily> result;
 
   // copy the intermediate collection, and then clear it
   std::vector<metric_sdk::Record> copied_data;
 
-  collection_lock_.lock();
+  this->collection_lock_.lock();
   copied_data = std::vector<metric_sdk::Record>(*metrics_to_collect_);
   metrics_to_collect_->clear();
-  collection_lock_.unlock();
+  this->collection_lock_.unlock();
 
   result = PrometheusExporterUtils::TranslateToPrometheus(copied_data);
   return result;
@@ -70,7 +73,13 @@ std::vector<prometheus_client::MetricFamily> PrometheusCollector::Collect() cons
  */
 void PrometheusCollector::AddMetricData(const std::vector<sdk::metrics::Record> &records)
 {
-  if (metrics_to_collect_->size() + records.size() <= max_collection_size_ && !records.empty())
+  if (records.empty())
+  {
+    return;
+  }
+
+  collection_lock_.lock();
+  if (metrics_to_collect_->size() + records.size() <= max_collection_size_)
   {
     /**
      *  ValidAggregator is a lambda that checks a Record to see if its
@@ -122,13 +131,11 @@ void PrometheusCollector::AddMetricData(const std::vector<sdk::metrics::Record> 
       return true;
     };
 
-    collection_lock_.lock();
-
     for (auto &r : records)
     {
       if (ValidAggregator(r))
       {
-        metrics_to_collect_->push_back(r);
+        metrics_to_collect_->emplace_back(r);
       }
       // Drop the record and write to std::cout
       else
@@ -139,9 +146,8 @@ void PrometheusCollector::AddMetricData(const std::vector<sdk::metrics::Record> 
                   << std::endl;
       }
     }
-
-    collection_lock_.unlock();
   }
+  collection_lock_.unlock();
 }
 
 /**
