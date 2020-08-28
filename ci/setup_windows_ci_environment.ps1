@@ -15,6 +15,6 @@ $VCPKG_DIR=(Get-Item -Path ".\").FullName
 ./vcpkg install gtest:x64-windows
 
 # nlohmann-json
-./vcpkg package nlohmann-json:x64-windows
+./vcpkg install nlohmann-json:x64-windows
 
 Pop-Location
