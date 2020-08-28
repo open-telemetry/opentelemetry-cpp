@@ -33,6 +33,9 @@ struct is_key_value_iterable
 template <class T>
 class KeyValueIterableView final : public KeyValueIterable
 {
+#if 0 // TODO: [MG] - confirm if we really need this
+  static_assert(detail::is_key_value_iterable<T>::value, "Must be a key-value iterable");
+#endif
 
 public:
   explicit KeyValueIterableView(const T &container) noexcept : container_{&container} {};

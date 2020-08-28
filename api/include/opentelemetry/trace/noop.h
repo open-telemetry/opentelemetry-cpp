@@ -4,9 +4,11 @@
 // This file is part of the internal implementation of OpenTelemetry. Nothing in this file should be
 // used directly. Please refer to span.h and tracer.h for documentation on these interfaces.
 
+#include "opentelemetry/context/runtime_context.h"
 #include "opentelemetry/nostd/string_view.h"
 #include "opentelemetry/nostd/unique_ptr.h"
 #include "opentelemetry/trace/span.h"
+#include "opentelemetry/trace/span_context.h"
 #include "opentelemetry/trace/tracer.h"
 #include "opentelemetry/trace/tracer_provider.h"
 #include "opentelemetry/version.h"
@@ -46,10 +48,13 @@ public:
 
   bool IsRecording() const noexcept override { return false; }
 
-  Tracer &tracer() const noexcept override { return *tracer_; }
+  SpanContext GetContext() const noexcept override { return span_context_; }
+
+  void SetToken(nostd::unique_ptr<context::Token> && /* token */) noexcept override {}
 
 private:
   std::shared_ptr<Tracer> tracer_;
+  SpanContext span_context_;
 };
 
 /**
@@ -59,11 +64,11 @@ class NoopTracer final : public Tracer, public std::enable_shared_from_this<Noop
 {
 public:
   // Tracer
-  nostd::unique_ptr<Span> StartSpan(nostd::string_view /*name*/,
+  nostd::shared_ptr<Span> StartSpan(nostd::string_view /*name*/,
                                     const KeyValueIterable & /*attributes*/,
                                     const StartSpanOptions & /*options*/) noexcept override
   {
-    return nostd::unique_ptr<Span>{new (std::nothrow) NoopSpan{this->shared_from_this()}};
+    return nostd::shared_ptr<Span>{new (std::nothrow) NoopSpan{this->shared_from_this()}};
   }
 
   void ForceFlushWithMicroseconds(uint64_t /*timeout*/) noexcept override {}

@@ -366,7 +366,7 @@ public:
   /// <param name="name">Span name</param>
   /// <param name="options">Span options</param>
   /// <returns>Span</returns>
-  virtual nostd::unique_ptr<trace::Span> StartSpan(
+  virtual nostd::shared_ptr<trace::Span> StartSpan(
       nostd::string_view name,
       const trace::KeyValueIterable &attributes,
       const trace::StartSpanOptions &options = {}) noexcept override
@@ -560,6 +560,13 @@ public:
       // TODO: signal this to owner
   }
 
+  virtual trace::SpanContext GetContext() const noexcept override
+  {
+      // FIXME: [MG] - temporary hack
+      static trace::SpanContext context;
+      return context;
+  }
+
   /// <summary>
   /// Check if Span is recording data
   /// </summary>
@@ -568,6 +575,11 @@ public:
   {
       // TODO: not implemented
       return true;
+  }
+
+  virtual void SetToken(nostd::unique_ptr<context::Token> &&token) noexcept override
+  {
+      // FIXME: [MG] - temporary hack
   }
 
   /// <summary>

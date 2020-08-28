@@ -8,7 +8,7 @@ namespace context
 {
 
 // The ThreadLocalContext class is a derived class from RuntimeContext and
-// provides a wrapper for propogating context through cpp thread locally.
+// provides a wrapper for propagating context through cpp thread locally.
 // This file must be included to use the RuntimeContext class if another
 // implementation has not been registered.
 class ThreadLocalContext : public RuntimeContext

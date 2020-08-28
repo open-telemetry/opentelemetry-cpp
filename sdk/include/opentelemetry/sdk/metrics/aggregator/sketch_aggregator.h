@@ -64,6 +64,7 @@ public:
   void update(T val) override
   {
     this->mu_.lock();
+    this->updated_ = true;
     int idx;
     if (val == 0)
     {
@@ -130,6 +131,7 @@ public:
   void checkpoint() override
   {
     this->mu_.lock();
+    this->updated_    = false;
     this->checkpoint_ = this->values_;
     checkpoint_raw_   = raw_;
     this->values_[0]  = 0;

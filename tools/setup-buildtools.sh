@@ -55,6 +55,7 @@ apt-get install -qq clang-format
 apt-get install -qq gtest
 apt-get install -qq libgtest-dev
 apt-get install -qq libbenchmark-dev
+apt-get install -qq nlohmann-json-dev
 fi
 
 ## Change owner from root to current dir owner

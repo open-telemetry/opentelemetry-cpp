@@ -28,5 +28,6 @@ brew install coreutils
 brew install wget
 brew install clang-format
 brew install google-benchmark
-
+brew tap nlohmann/json
+brew install nlohmann-json
 ./tools/build-gtest.sh

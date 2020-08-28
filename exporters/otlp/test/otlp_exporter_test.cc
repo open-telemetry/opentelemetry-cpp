@@ -1,4 +1,5 @@
 #include "opentelemetry/exporters/otlp/otlp_exporter.h"
+#include "opentelemetry/context/threadlocal_context.h"
 #include "opentelemetry/proto/collector/trace/v1/trace_service_mock.grpc.pb.h"
 #include "opentelemetry/sdk/trace/simple_processor.h"
 #include "opentelemetry/sdk/trace/tracer_provider.h"
@@ -21,6 +22,12 @@ public:
       std::unique_ptr<proto::collector::trace::v1::TraceService::StubInterface> &stub_interface)
   {
     return std::unique_ptr<sdk::trace::SpanExporter>(new OtlpExporter(std::move(stub_interface)));
+  }
+
+  // Get the options associated with the given exporter.
+  const OtlpExporterOptions &GetOptions(std::unique_ptr<OtlpExporter> &exporter)
+  {
+    return exporter->options_;
   }
 };
 
@@ -75,6 +82,15 @@ TEST_F(OtlpExporterTestPeer, ExportIntegrationTest)
   auto child_span  = tracer->StartSpan("Test child span");
   child_span->End();
   parent_span->End();
+}
+
+// Test exporter configuration options
+TEST_F(OtlpExporterTestPeer, ConfigTest)
+{
+  OtlpExporterOptions opts;
+  opts.endpoint = "localhost:45454";
+  std::unique_ptr<OtlpExporter> exporter(new OtlpExporter(opts));
+  EXPECT_EQ(GetOptions(exporter).endpoint, "localhost:45454");
 }
 }  // namespace otlp
 }  // namespace exporter

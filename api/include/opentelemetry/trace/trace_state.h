@@ -45,51 +45,151 @@ public:
   class Entry
   {
   public:
-    Entry() noexcept = default;
+    Entry() : key_(nullptr), value_(nullptr){};
 
-    // Copy constructor.
-    Entry(const Entry &copy);
+    // Copy constructor
+    Entry(const Entry &copy)
+    {
+      key_   = CopyStringToPointer(copy.key_.get());
+      value_ = CopyStringToPointer(copy.value_.get());
+    }
+
+    // Copy assignment operator
+    Entry &operator=(Entry &other)
+    {
+      key_   = CopyStringToPointer(other.key_.get());
+      value_ = CopyStringToPointer(other.value_.get());
+      return *this;
+    }
+
+    // Move contructor and assignment operator
+    Entry(Entry &&other) = default;
+    Entry &operator=(Entry &&other) = default;
 
     // Creates an Entry for a given key-value pair.
-    Entry(nostd::string_view key, nostd::string_view value) noexcept;
+    Entry(nostd::string_view key, nostd::string_view value) noexcept
+    {
+      key_   = CopyStringToPointer(key);
+      value_ = CopyStringToPointer(value);
+    }
 
-    nostd::string_view GetKey();
-    nostd::string_view GetValue();
+    // Gets the key associated with this entry.
+    nostd::string_view GetKey() const { return key_.get(); }
+
+    // Gets the value associated with this entry.
+    nostd::string_view GetValue() const { return value_.get(); }
+
+    // Sets the value for this entry. This overrides the previous value.
+    void SetValue(nostd::string_view value) { value_ = CopyStringToPointer(value); }
 
   private:
     // Store key and value as raw char pointers to avoid using std::string.
     nostd::unique_ptr<const char[]> key_;
     nostd::unique_ptr<const char[]> value_;
+
+    // Copies string into a buffer and returns a unique_ptr to the buffer.
+    // This is a workaround for the fact that memcpy doesn't accept a const destination.
+    nostd::unique_ptr<const char[]> CopyStringToPointer(nostd::string_view str)
+    {
+      char *temp = new char[str.size() + 1];
+      memcpy(temp, str.data(), str.size());
+      temp[str.size()] = '\0';
+      return nostd::unique_ptr<const char[]>(temp);
+    }
   };
 
   // An empty TraceState.
-  TraceState() noexcept : num_entries_(0) {}
+  TraceState() noexcept : entries_(new Entry[kMaxKeyValuePairs]), num_entries_(0) {}
 
-  // Returns false if no such key, otherwise returns true and populates value.
-  bool Get(nostd::string_view key, nostd::string_view value) const noexcept { return false; }
+  // Returns false if no such key, otherwise returns true and populates the value parameter with the
+  // associated value.
+  bool Get(nostd::string_view key, nostd::string_view &value) const noexcept
+  {
+    for (const auto &entry : Entries())
+    {
+      if (key == entry.GetKey())
+      {
+        value = entry.GetValue();
+        return true;
+      }
+    }
+    return false;
+  }
 
-  // Creates an Entry for the key-value pair and adds it to entries.
-  // If value is null, this function is a no-op.
-  void Set(nostd::string_view key, nostd::string_view value) const noexcept;
+  // Creates an Entry for the key-value pair and adds it to entries. Returns true if pair was added
+  // succesfully, false otherwise. If value is null or entries_ is full, this function is a no-op.
+  bool Set(nostd::string_view key, nostd::string_view value) noexcept
+  {
+    if (value.empty() || num_entries_ >= kMaxKeyValuePairs)
+    {
+      return false;
+    }
+
+    Entry entry(key, value);
+    (entries_.get())[num_entries_] = entry;
+    num_entries_++;
+    return true;
+  }
 
   // Returns true if there are no keys, false otherwise.
-  bool Empty() const noexcept { return true; }
+  bool Empty() const noexcept { return num_entries_ == 0; }
 
   // Returns a span of all the entries. The TraceState object must outlive the span.
-  nostd::span<Entry> Entries() const noexcept { return {}; }
+  nostd::span<Entry> Entries() const noexcept
+  {
+    return nostd::span<Entry>(entries_.get(), num_entries_);
+  }
 
   // Returns whether key is a valid key. See https://www.w3.org/TR/trace-context/#key
-  static bool IsValidKey(nostd::string_view key);
+  static bool IsValidKey(nostd::string_view key)
+  {
+    if (key.empty() || key.size() > kKeyMaxSize || !IsLowerCaseAlphaOrDigit(key[0]))
+    {
+      return false;
+    }
+
+    int ats = 0;
+
+    for (const char c : key)
+    {
+      if (!IsLowerCaseAlphaOrDigit(c) && c != '_' && c != '-' && c != '@' && c != '*' && c != '/')
+      {
+        return false;
+      }
+      if ((c == '@') && (++ats > 1))
+      {
+        return false;
+      }
+    }
+    return true;
+  }
 
   // Returns whether value is a valid value. See https://www.w3.org/TR/trace-context/#value
-  static bool IsValidValue(nostd::string_view value);
+  static bool IsValidValue(nostd::string_view value)
+  {
+    if (value.empty() || value.size() > kValueMaxSize)
+    {
+      return false;
+    }
+
+    for (const char c : value)
+    {
+      if (c < ' ' || c > '~' || c == ',' || c == '=')
+      {
+        return false;
+      }
+    }
+    return true;
+  }
 
 private:
   // Store entries in a C-style array to avoid using std::array or std::vector.
-  Entry entries_[kMaxKeyValuePairs];
+  nostd::unique_ptr<Entry[]> entries_;
 
   // Maintain the number of entries in entries_. Must be in the range [0, kMaxKeyValuePairs].
   int num_entries_;
+
+  static bool IsLowerCaseAlphaOrDigit(char c) { return isdigit(c) || islower(c); }
 };
 
 }  // namespace trace

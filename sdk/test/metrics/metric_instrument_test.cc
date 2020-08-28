@@ -94,24 +94,24 @@ TEST(IntValueObserver, StressObserve)
 
   std::thread first(ObserverCallback, alpha, 25,
                     labelkv);  // spawn new threads that call the callback
-  std::thread second(ObserverCallback, alpha, 50, labelkv);
+  std::thread second(ObserverCallback, alpha, 25, labelkv);
   std::thread third(ObserverCallback, alpha, 25, labelkv1);
-  std::thread fourth(NegObserverCallback, alpha, 100, labelkv1);  // negative values
+  std::thread fourth(NegObserverCallback, alpha, 25, labelkv1);  // negative values
 
   first.join();
   second.join();
   third.join();
   fourth.join();
 
-  EXPECT_EQ(alpha->boundAggregators_[KvToString(labelkv)]->get_values()[0], 0);     // min
-  EXPECT_EQ(alpha->boundAggregators_[KvToString(labelkv)]->get_values()[1], 49);    // max
-  EXPECT_EQ(alpha->boundAggregators_[KvToString(labelkv)]->get_values()[2], 1525);  // sum
-  EXPECT_EQ(alpha->boundAggregators_[KvToString(labelkv)]->get_values()[3], 75);    // count
+  EXPECT_EQ(alpha->boundAggregators_[KvToString(labelkv)]->get_values()[0], 0);    // min
+  EXPECT_EQ(alpha->boundAggregators_[KvToString(labelkv)]->get_values()[1], 24);   // max
+  EXPECT_EQ(alpha->boundAggregators_[KvToString(labelkv)]->get_values()[2], 600);  // sum
+  EXPECT_EQ(alpha->boundAggregators_[KvToString(labelkv)]->get_values()[3], 50);   // count
 
-  EXPECT_EQ(alpha->boundAggregators_[KvToString(labelkv1)]->get_values()[0], -99);    // min
-  EXPECT_EQ(alpha->boundAggregators_[KvToString(labelkv1)]->get_values()[1], 24);     // max
-  EXPECT_EQ(alpha->boundAggregators_[KvToString(labelkv1)]->get_values()[2], -4650);  // sum
-  EXPECT_EQ(alpha->boundAggregators_[KvToString(labelkv1)]->get_values()[3], 125);    // count
+  EXPECT_EQ(alpha->boundAggregators_[KvToString(labelkv1)]->get_values()[0], -24);  // min
+  EXPECT_EQ(alpha->boundAggregators_[KvToString(labelkv1)]->get_values()[1], 24);   // max
+  EXPECT_EQ(alpha->boundAggregators_[KvToString(labelkv1)]->get_values()[2], 0);    // sum
+  EXPECT_EQ(alpha->boundAggregators_[KvToString(labelkv1)]->get_values()[3], 50);   // count
 }
 
 void SumObserverCallback(std::shared_ptr<SumObserver<int>> in,
@@ -176,19 +176,19 @@ TEST(IntUpDownObserver, StressAdd)
   auto labelkv  = trace::KeyValueIterableView<decltype(labels)>{labels};
   auto labelkv1 = trace::KeyValueIterableView<decltype(labels1)>{labels1};
 
-  std::thread first(UpDownSumObserverCallback, alpha, 123400,
+  std::thread first(UpDownSumObserverCallback, alpha, 12340,
                     labelkv);  // spawn new threads that call the callback
-  std::thread second(UpDownSumObserverCallback, alpha, 123400, labelkv);
-  std::thread third(UpDownSumObserverCallback, alpha, 567800, labelkv1);
-  std::thread fourth(NegUpDownSumObserverCallback, alpha, 123400, labelkv1);  // negative values
+  std::thread second(UpDownSumObserverCallback, alpha, 12340, labelkv);
+  std::thread third(UpDownSumObserverCallback, alpha, 56780, labelkv1);
+  std::thread fourth(NegUpDownSumObserverCallback, alpha, 12340, labelkv1);  // negative values
 
   first.join();
   second.join();
   third.join();
   fourth.join();
 
-  EXPECT_EQ(alpha->boundAggregators_[KvToString(labelkv)]->get_values()[0], 123400 * 2);
-  EXPECT_EQ(alpha->boundAggregators_[KvToString(labelkv1)]->get_values()[0], 567800 - 123400);
+  EXPECT_EQ(alpha->boundAggregators_[KvToString(labelkv)]->get_values()[0], 12340 * 2);
+  EXPECT_EQ(alpha->boundAggregators_[KvToString(labelkv1)]->get_values()[0], 56780 - 12340);
 }
 
 TEST(Counter, InstrumentFunctions)
@@ -248,6 +248,7 @@ TEST(Counter, getAggsandnewupdate)
 
   auto labelkv = trace::KeyValueIterableView<decltype(labels)>{labels};
   auto beta    = alpha.bindCounter(labelkv);
+  beta->add(1);
   beta->unbind();
 
   EXPECT_EQ(alpha.boundInstruments_[KvToString(labelkv)]->get_ref(), 0);
@@ -280,9 +281,9 @@ TEST(Counter, StressAdd)
   auto labelkv  = trace::KeyValueIterableView<decltype(labels)>{labels};
   auto labelkv1 = trace::KeyValueIterableView<decltype(labels1)>{labels1};
 
-  std::thread first(CounterCallback, alpha, 100000, labelkv);
-  std::thread second(CounterCallback, alpha, 100000, labelkv);
-  std::thread third(CounterCallback, alpha, 300000, labelkv1);
+  std::thread first(CounterCallback, alpha, 1000, labelkv);
+  std::thread second(CounterCallback, alpha, 1000, labelkv);
+  std::thread third(CounterCallback, alpha, 3000, labelkv1);
 
   first.join();
   second.join();
@@ -291,11 +292,11 @@ TEST(Counter, StressAdd)
   EXPECT_EQ(dynamic_cast<BoundCounter<int> *>(alpha->boundInstruments_[KvToString(labelkv)].get())
                 ->GetAggregator()
                 ->get_values()[0],
-            200000);
+            2000);
   EXPECT_EQ(dynamic_cast<BoundCounter<int> *>(alpha->boundInstruments_[KvToString(labelkv1)].get())
                 ->GetAggregator()
                 ->get_values()[0],
-            300000);
+            3000);
 }
 
 void UpDownCounterCallback(std::shared_ptr<UpDownCounter<int>> in,
@@ -328,11 +329,11 @@ TEST(IntUpDownCounter, StressAdd)
   auto labelkv  = trace::KeyValueIterableView<decltype(labels)>{labels};
   auto labelkv1 = trace::KeyValueIterableView<decltype(labels1)>{labels1};
 
-  std::thread first(UpDownCounterCallback, alpha, 123400,
+  std::thread first(UpDownCounterCallback, alpha, 12340,
                     labelkv);  // spawn new threads that call the callback
-  std::thread second(UpDownCounterCallback, alpha, 123400, labelkv);
-  std::thread third(UpDownCounterCallback, alpha, 567800, labelkv1);
-  std::thread fourth(NegUpDownCounterCallback, alpha, 123400, labelkv1);  // negative values
+  std::thread second(UpDownCounterCallback, alpha, 12340, labelkv);
+  std::thread third(UpDownCounterCallback, alpha, 56780, labelkv1);
+  std::thread fourth(NegUpDownCounterCallback, alpha, 12340, labelkv1);  // negative values
 
   first.join();
   second.join();
@@ -343,12 +344,12 @@ TEST(IntUpDownCounter, StressAdd)
       dynamic_cast<BoundUpDownCounter<int> *>(alpha->boundInstruments_[KvToString(labelkv)].get())
           ->GetAggregator()
           ->get_values()[0],
-      123400 * 2);
+      12340 * 2);
   EXPECT_EQ(
       dynamic_cast<BoundUpDownCounter<int> *>(alpha->boundInstruments_[KvToString(labelkv1)].get())
           ->GetAggregator()
           ->get_values()[0],
-      567800 - 123400);
+      56780 - 12340);
 }
 
 void RecorderCallback(std::shared_ptr<ValueRecorder<int>> in,
@@ -435,7 +436,34 @@ TEST(IntValueRecorder, StressRecord)
       125);  // count
 }
 
+TEST(Instruments, NoUpdateNoRecord)
+{
+  // This test verifies that instruments that have received no updates
+  // in the last collection period are not made into records for export.
+
+  Counter<int> alpha("alpha", "no description", "unitless", true);
+
+  std::map<std::string, std::string> labels = {{"key", "value"}};
+
+  auto labelkv = trace::KeyValueIterableView<decltype(labels)>{labels};
+
+  EXPECT_EQ(alpha.GetRecords().size(), 0);
+  alpha.add(1, labelkv);
+  EXPECT_EQ(alpha.GetRecords().size(), 1);
+
+  UpDownCounter<int> beta("beta", "no description", "unitless", true);
+
+  EXPECT_EQ(beta.GetRecords().size(), 0);
+  beta.add(1, labelkv);
+  EXPECT_EQ(beta.GetRecords().size(), 1);
+
+  ValueRecorder<int> gamma("gamma", "no description", "unitless", true);
+
+  EXPECT_EQ(gamma.GetRecords().size(), 0);
+  gamma.record(1, labelkv);
+  EXPECT_EQ(gamma.GetRecords().size(), 1);
+}
+
 }  // namespace metrics
 }  // namespace sdk
-
 OPENTELEMETRY_END_NAMESPACE

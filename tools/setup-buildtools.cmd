@@ -44,6 +44,6 @@ vcpkg integrate install
 vcpkg install gtest:x64-windows
 vcpkg install --overlay-ports=%~dp0\ports benchmark:x64-windows
 vcpkg install ms-gsl:x64-windows
-
+vcpkg install nlohmann-json:x64-windows
 popd
 exit /b 0

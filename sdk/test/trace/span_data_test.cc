@@ -1,4 +1,5 @@
 #include "opentelemetry/sdk/trace/span_data.h"
+#include "opentelemetry/context/threadlocal_context.h"
 #include "opentelemetry/nostd/variant.h"
 #include "opentelemetry/trace/span_id.h"
 #include "opentelemetry/trace/trace_id.h"
@@ -38,7 +39,7 @@ TEST(SpanData, Set)
   data.SetStatus(opentelemetry::trace::CanonicalCode::UNKNOWN, "description");
   data.SetStartTime(now);
   data.SetDuration(std::chrono::nanoseconds(1000000));
-  data.SetAttribute("attr1", 314159);
+  data.SetAttribute("attr1", (int64_t)314159);
   data.opentelemetry::sdk::trace::Recordable::AddEvent("event1", now);
 
   ASSERT_EQ(data.GetTraceId(), trace_id);
@@ -57,14 +58,15 @@ TEST(SpanData, Set)
 TEST(SpanData, EventAttributes)
 {
   SpanData data;
-  const int kNumAttributes              = 3;
-  std::string keys[kNumAttributes]      = {"attr1", "attr2", "attr3"};
-  int values[kNumAttributes]            = {3, 5, 20};
-  std::map<std::string, int> attributes = {
+  const int kNumAttributes                  = 3;
+  std::string keys[kNumAttributes]          = {"attr1", "attr2", "attr3"};
+  int64_t values[kNumAttributes]            = {3, 5, 20};
+  std::map<std::string, int64_t> attributes = {
       {keys[0], values[0]}, {keys[1], values[1]}, {keys[2], values[2]}};
 
-  data.AddEvent("Test Event", std::chrono::system_clock::now(),
-                opentelemetry::trace::KeyValueIterableView<std::map<std::string, int>>(attributes));
+  data.AddEvent(
+      "Test Event", std::chrono::system_clock::now(),
+      opentelemetry::trace::KeyValueIterableView<std::map<std::string, int64_t>>(attributes));
 
   for (int i = 0; i < kNumAttributes; i++)
   {
@@ -77,14 +79,15 @@ TEST(SpanData, EventAttributes)
 TEST(SpanData, Links)
 {
   SpanData data;
-  const int kNumAttributes              = 3;
-  std::string keys[kNumAttributes]      = {"attr1", "attr2", "attr3"};
-  int values[kNumAttributes]            = {4, 12, 33};
-  std::map<std::string, int> attributes = {
+  const int kNumAttributes                  = 3;
+  std::string keys[kNumAttributes]          = {"attr1", "attr2", "attr3"};
+  int64_t values[kNumAttributes]            = {4, 12, 33};
+  std::map<std::string, int64_t> attributes = {
       {keys[0], values[0]}, {keys[1], values[1]}, {keys[2], values[2]}};
 
-  data.AddLink(opentelemetry::trace::SpanContext(false, false),
-               opentelemetry::trace::KeyValueIterableView<std::map<std::string, int>>(attributes));
+  data.AddLink(
+      opentelemetry::trace::SpanContext(false, false),
+      opentelemetry::trace::KeyValueIterableView<std::map<std::string, int64_t>>(attributes));
 
   for (int i = 0; i < kNumAttributes; i++)
   {
