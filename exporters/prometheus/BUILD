@@ -15,6 +15,24 @@
 package(default_visibility = ["//visibility:public"])
 
 cc_library(
+    name = "prometheus_collector",
+    srcs = [
+        "src/prometheus_collector.cc",
+    ],
+    hdrs = [
+        "include/opentelemetry/exporters/prometheus/prometheus_collector.h",
+        "include/opentelemetry/exporters/prometheus/prometheus_exporter_utils.h",
+    ],
+    strip_include_prefix = "include",
+    deps = [
+        ":prometheus_utils",
+        "//api",
+        "//sdk:headers",
+        "@com_github_jupp0r_prometheus_cpp//core",
+    ],
+)
+
+cc_library(
     name = "prometheus_utils",
     srcs = [
         "src/prometheus_exporter_utils.cc",
@@ -27,6 +45,17 @@ cc_library(
         "//api",
         "//sdk:headers",
         "@com_github_jupp0r_prometheus_cpp//core",
+    ],
+)
+
+cc_test(
+    name = "prometheus_collector_test",
+    srcs = [
+        "test/prometheus_collector_test.cc",
+    ],
+    deps = [
+        ":prometheus_collector",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 
