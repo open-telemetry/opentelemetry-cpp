@@ -113,10 +113,15 @@ TEST(Tracer, ToMockSpanExporter)
   ASSERT_EQ("span 2", spans_received->at(0)->GetName());
   EXPECT_TRUE(spans_received->at(0)->GetTraceId().IsValid());
   EXPECT_TRUE(spans_received->at(0)->GetSpanId().IsValid());
-  EXPECT_FALSE(spans_received->at(0)->GetParentSpanId().IsValid());
+  EXPECT_TRUE(spans_received->at(0)->GetParentSpanId().IsValid());
 
   span_first->End();
   ASSERT_EQ(2, spans_received->size());
+
+  // Verify trace and parent span id propagation
+  EXPECT_EQ(span_second->GetContext().trace_id(), span_first->GetContext().trace_id());
+  EXPECT_EQ(spans_received->at(0)->GetTraceId(), spans_received->at(1)->GetTraceId());
+  EXPECT_EQ(spans_received->at(0)->GetParentSpanId(), spans_received->at(1)->GetSpanId());
 
   ASSERT_EQ("span 1", spans_received->at(1)->GetName());
   EXPECT_TRUE(spans_received->at(1)->GetTraceId().IsValid());
