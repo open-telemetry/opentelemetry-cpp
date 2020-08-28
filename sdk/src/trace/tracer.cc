@@ -30,6 +30,20 @@ std::shared_ptr<Sampler> Tracer::GetSampler() const noexcept
   return sampler_;
 }
 
+// Helper function to extract the current span context from the runtime context.
+// Returns an invalid span context if the runtime context doesn't contain a span.
+trace_api::SpanContext GetCurrentSpanContext()
+{
+  context::ContextValue curr_span_context = context::RuntimeContext::GetValue(SpanKey);
+
+  if (nostd::holds_alternative<nostd::shared_ptr<trace_api::Span>>(curr_span_context))
+  {
+    auto curr_span = nostd::get<nostd::shared_ptr<trace_api::Span>>(curr_span_context);
+    return curr_span->GetContext();
+  }
+  return trace_api::SpanContext();
+}
+
 nostd::shared_ptr<trace_api::Span> Tracer::StartSpan(
     nostd::string_view name,
     const trace_api::KeyValueIterable &attributes,
@@ -47,18 +61,9 @@ nostd::shared_ptr<trace_api::Span> Tracer::StartSpan(
   }
   else
   {
-    context::ContextValue curr_span_context = context::RuntimeContext::GetValue(SpanKey);
-    trace_api::SpanContext parent_span_context;
-
-    if (nostd::holds_alternative<nostd::shared_ptr<trace_api::Span>>(curr_span_context))
-    {
-      auto curr_span      = nostd::get<nostd::shared_ptr<trace_api::Span>>(curr_span_context);
-      parent_span_context = curr_span->GetContext();
-    }
-
     auto span = nostd::shared_ptr<trace_api::Span>{
         new (std::nothrow) Span{this->shared_from_this(), processor_.load(), name, attributes,
-                                options, parent_span_context}};
+                                options, GetCurrentSpanContext()}};
 
     span->SetToken(
         nostd::unique_ptr<context::Token>(new context::Token(context::RuntimeContext::Attach(

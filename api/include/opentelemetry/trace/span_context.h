@@ -78,15 +78,24 @@ public:
   SpanContext(const SpanContext &ctx)
       : trace_id_(ctx.trace_id()), span_id_(ctx.span_id()), trace_flags_(ctx.trace_flags())
   {}
-
-  SpanContext &operator=(const SpanContext &ctx)
-  {
-    trace_id_ = TraceId(ctx.trace_id_.Id());
-    span_id_ = SpanId(ctx.span_id_.Id());
-    trace_flags_ = TraceFlags(ctx.trace_flags_.flags());;
-    remote_parent_ = ctx.remote_parent_;
-    return *this;
-  };
+  //
+  //  SpanContext &operator=(const SpanContext &ctx)
+  //  {
+  //    SpanContext *spn_ctx =
+  //        new SpanContext(ctx.trace_id(), ctx.span_id(), ctx.trace_flags(),
+  //        ctx.HasRemoteParent());
+  //    this = spn_ctx;
+  //    return *this;
+  //  };
+  //
+  //  SpanContext &operator=(SpanContext &&ctx)
+  //  {
+  //    SpanContext *spn_ctx =
+  //        new SpanContext(ctx.trace_id(), ctx.span_id(), ctx.trace_flags(),
+  //        ctx.HasRemoteParent());
+  //    this = spn_ctx;
+  //    return *this;
+  //  };
 
   bool operator==(const SpanContext &that) const noexcept
   {
@@ -101,10 +110,10 @@ public:
   bool IsSampled() const noexcept { return trace_flags_.IsSampled(); }
 
 private:
-  trace_api::TraceId trace_id_;
-  trace_api::SpanId span_id_;
-  trace_api::TraceFlags trace_flags_;
-  bool remote_parent_ = false;
+  const trace_api::TraceId trace_id_;
+  const trace_api::SpanId span_id_;
+  const trace_api::TraceFlags trace_flags_;
+  const bool remote_parent_ = false;
 };
 }  // namespace trace
 OPENTELEMETRY_END_NAMESPACE
