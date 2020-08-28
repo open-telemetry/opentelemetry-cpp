@@ -4,7 +4,7 @@ set -e
 
 export DEBIAN_FRONTEND=noninteractive
 apt-get update
-apt-get install --ignore-missing --no-install-recommends --no-install-suggests -y \
+echo		\
                 cmake \
                 libbenchmark-dev \
                 libgtest-dev \
@@ -12,7 +12,7 @@ apt-get install --ignore-missing --no-install-recommends --no-install-suggests -
                 sudo \
                 libcurl4-openssl-dev \
                 nlohmann-json-dev \
-                nlohmann-json3-dev
+                nlohmann-json3-dev | xargs -n 1 apt-get install --ignore-missing --no-install-recommends --no-install-suggests -y
 
 # Follows these instructions for setting up gtest
 # https://www.eriksmistad.no/getting-started-with-google-test-on-ubuntu/
