@@ -78,15 +78,16 @@ Span::Span(std::shared_ptr<Tracer> &&tracer,
   }
   recordable_->SetName(name);
 
-  trace_api::TraceId trace_id = GenerateRandomTraceId();
+  trace_api::TraceId trace_id;
+
   if (parent_span_context.IsValid())
   {
     trace_id = parent_span_context.trace_id();
-    recordable_->SetIds(parent_span_context.trace_id(), GenerateRandomSpanId(),
-                        parent_span_context.span_id());
+    recordable_->SetIds(trace_id, GenerateRandomSpanId(), parent_span_context.span_id());
   }
   else
   {
+    trace_id = GenerateRandomTraceId();
     recordable_->SetIds(trace_id, GenerateRandomSpanId(), trace_api::SpanId());
   }
 
