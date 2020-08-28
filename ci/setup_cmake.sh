@@ -14,6 +14,7 @@ echo		\
                 sudo \
                 libcurl4-openssl-dev \
                 nlohmann-json-dev \
+                nlohmann-json3 \
                 nlohmann-json3-dev | xargs -n 1 apt-get install --ignore-missing --no-install-recommends --no-install-suggests -y
 set -e
 
