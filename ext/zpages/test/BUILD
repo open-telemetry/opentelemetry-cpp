@@ -42,9 +42,9 @@ otel_cc_benchmark(
         "tracez_data_aggregator_benchmark.cc",
     ],
     deps = [
+        "//api",
         "//ext/zpages",
         "//sdk/src/trace",
-        "//api",
     ],
 )
 
@@ -54,8 +54,8 @@ otel_cc_benchmark(
         "tracez_processor_benchmark.cc",
     ],
     deps = [
+        "//api",
         "//ext/zpages",
         "//sdk/src/trace",
-        "//api",
     ],
 )

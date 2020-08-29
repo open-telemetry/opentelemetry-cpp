@@ -19,9 +19,8 @@ namespace zpages
  * Helper function that creates num_spans threadsafe span data, adding them to the spans
  * vector during setup to benchmark OnStart and OnEnd times for the processor.
  */
-void CreateRecordables(
-    std::vector<std::unique_ptr<ThreadsafeSpanData>> &spans,
-    unsigned int num_spans)
+void CreateRecordables(std::vector<std::unique_ptr<ThreadsafeSpanData>> &spans,
+                       unsigned int num_spans)
 {
   for (unsigned int i = 0; i < num_spans; i++)
     spans.push_back(std::unique_ptr<ThreadsafeSpanData>(new ThreadsafeSpanData()));
@@ -52,17 +51,14 @@ void GetManySnapshots(std::shared_ptr<TracezSpanProcessor> &processor, unsigned 
 class TracezProcessorPeer
 {
 public:
-  TracezProcessorPeer(std::shared_ptr<TracezSpanProcessor> &processor)
-  {
-    processor_  = processor;
-  }
+  TracezProcessorPeer(std::shared_ptr<TracezSpanProcessor> &processor) { processor_ = processor; }
 
   /*
    * Calls TracezProcessor::OnStart on each span in spans.
    */
   void StartAllSpans(std::vector<std::unique_ptr<ThreadsafeSpanData>> &spans)
   {
-    for(auto &span : spans)
+    for (auto &span : spans)
       processor_->OnStart(*(span.get()));
   }
 
@@ -73,7 +69,7 @@ public:
    */
   void EndAllSpans(std::vector<std::unique_ptr<ThreadsafeSpanData>> &spans)
   {
-    for(auto &span : spans)
+    for (auto &span : spans)
       processor_->OnEnd(std::move(span));
     spans.clear();
   }
@@ -82,10 +78,7 @@ public:
    * Clears running span pointers in processor memory, which is used in between
    * iterations so that processor->spans_.running doesn't hold nullptr
    */
-  void ClearRunning()
-  {
-    processor_->spans_.running.clear();
-  }
+  void ClearRunning() { processor_->spans_.running.clear(); }
 
 private:
   std::shared_ptr<TracezSpanProcessor> processor_;
@@ -96,15 +89,14 @@ private:
 class TracezProcessor : public benchmark::Fixture
 {
 protected:
-  void SetUp(const ::benchmark::State& state)
+  void SetUp(const ::benchmark::State &state)
   {
-    processor_  = std::shared_ptr<TracezSpanProcessor>(new TracezSpanProcessor());
+    processor_      = std::shared_ptr<TracezSpanProcessor>(new TracezSpanProcessor());
     processor_peer_ = std::unique_ptr<TracezProcessorPeer>(new TracezProcessorPeer(processor_));
   }
   std::vector<std::unique_ptr<ThreadsafeSpanData>> spans_;
   std::unique_ptr<TracezProcessorPeer> processor_peer_;
   std::shared_ptr<TracezSpanProcessor> processor_;
-
 };
 
 //////////////////////////// BENCHMARK DEFINITIONS /////////////////////////////////
@@ -191,7 +183,7 @@ BENCHMARK_DEFINE_F(TracezProcessor, BM_MakeRunningMakeComplete)(benchmark::State
  */
 BENCHMARK_DEFINE_F(TracezProcessor, BM_MakeRunningGetSpans)(benchmark::State &state)
 {
-  const unsigned int num_spans_snaps = state.range(0); // number of spans and snapshots
+  const unsigned int num_spans_snaps = state.range(0);  // number of spans and snapshots
   for (auto _ : state)
   {
     state.PauseTiming();
@@ -264,18 +256,29 @@ BENCHMARK_REGISTER_F(TracezProcessor, BM_MakeComplete)->Arg(10)->Arg(1000);
 BENCHMARK_REGISTER_F(TracezProcessor, BM_GetSpans)->Arg(10)->Arg(1000);
 
 // These use multiple threads, so that CPU usage and thread works needs to be measured
-BENCHMARK_REGISTER_F(TracezProcessor, BM_MakeRunningMakeComplete)->Arg(10)->Arg(1000)
-	->MeasureProcessCPUTime()->UseRealTime();
-BENCHMARK_REGISTER_F(TracezProcessor, BM_MakeRunningGetSpans)->Arg(10)->Arg(1000)
-	->MeasureProcessCPUTime()->UseRealTime();
-BENCHMARK_REGISTER_F(TracezProcessor, BM_GetSpansMakeComplete)->Arg(10)->Arg(1000)
-	->MeasureProcessCPUTime()->UseRealTime();
-BENCHMARK_REGISTER_F(TracezProcessor, BM_MakeRunningGetSpansMakeComplete)->Arg(10)->Arg(1000)
-	->MeasureProcessCPUTime()->UseRealTime();
+BENCHMARK_REGISTER_F(TracezProcessor, BM_MakeRunningMakeComplete)
+    ->Arg(10)
+    ->Arg(1000)
+    ->MeasureProcessCPUTime()
+    ->UseRealTime();
+BENCHMARK_REGISTER_F(TracezProcessor, BM_MakeRunningGetSpans)
+    ->Arg(10)
+    ->Arg(1000)
+    ->MeasureProcessCPUTime()
+    ->UseRealTime();
+BENCHMARK_REGISTER_F(TracezProcessor, BM_GetSpansMakeComplete)
+    ->Arg(10)
+    ->Arg(1000)
+    ->MeasureProcessCPUTime()
+    ->UseRealTime();
+BENCHMARK_REGISTER_F(TracezProcessor, BM_MakeRunningGetSpansMakeComplete)
+    ->Arg(10)
+    ->Arg(1000)
+    ->MeasureProcessCPUTime()
+    ->UseRealTime();
 
-} // namespace zpages
-} // namespace ext
+}  // namespace zpages
+}  // namespace ext
 OPENTELEMETRY_END_NAMESPACE
 
 BENCHMARK_MAIN();
-

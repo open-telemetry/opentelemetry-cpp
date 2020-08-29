@@ -22,15 +22,14 @@ namespace zpages
  * Helper function that creates and ends num_spans spans instantly. If is_unique is
  * true, then all spans will have different names.
  */
-void StartEndSpans(
-    std::shared_ptr<opentelemetry::trace::Tracer> &tracer,
-    unsigned int num_spans,
-    bool is_unique = false)
+void StartEndSpans(std::shared_ptr<opentelemetry::trace::Tracer> &tracer,
+                   unsigned int num_spans,
+                   bool is_unique)
 {
   opentelemetry::trace::StartSpanOptions start;
   opentelemetry::trace::EndSpanOptions end;
   start.start_steady_time = SteadyTimestamp(nanoseconds(0));
-  end.end_steady_time = SteadyTimestamp(nanoseconds(1));
+  end.end_steady_time     = SteadyTimestamp(nanoseconds(1));
   for (unsigned int i = 0; i < num_spans; i++)
     tracer->StartSpan(is_unique ? std::to_string(num_spans) : "", start)->End(end);
 }
@@ -40,17 +39,19 @@ void StartEndSpans(
  * spreading spans across all latency bands. If is_unique is true, then all spans
  * will have different names.
  */
-void StartEndSpansLatency(
-    std::shared_ptr<opentelemetry::trace::Tracer> &tracer,
-    unsigned int num_spans,
-    bool is_unique = false)
+void StartEndSpansLatency(std::shared_ptr<opentelemetry::trace::Tracer> &tracer,
+                          unsigned int num_spans,
+                          bool is_unique,
+                          unsigned int latency_span_offset)
 {
   opentelemetry::trace::StartSpanOptions start;
   start.start_steady_time = SteadyTimestamp(nanoseconds(0));
   for (unsigned int i = 0; i < num_spans; i++)
   {
-    // Latency bucket depends on the index
-    nanoseconds latency_band = kLatencyBoundaries[num_spans % kLatencyBoundaries.size()];
+    // Latency bucket depends on the index. Pass-by-ref offset means each span name will have all
+    // buckets filled
+    nanoseconds latency_band =
+        kLatencyBoundaries[num_spans + latency_span_offset % kLatencyBoundaries.size()];
     opentelemetry::trace::EndSpanOptions end;
     end.end_steady_time = SteadyTimestamp(latency_band);
 
@@ -63,13 +64,14 @@ void StartEndSpansLatency(
  * simulating error codes. If is_unique is true, then all spans will have
  * different names.
  */
-void StartEndSpansError(
-    std::shared_ptr<opentelemetry::trace::Tracer> &tracer,
-    unsigned int num_spans,
-    bool is_unique = false)
+void StartEndSpansError(std::shared_ptr<opentelemetry::trace::Tracer> &tracer,
+                        unsigned int num_spans,
+                        bool is_unique)
 {
   for (unsigned int i = 0; i < num_spans; i++)
-    tracer->StartSpan(is_unique ? std::to_string(num_spans) : "")
+    tracer
+        ->StartSpan(is_unique ? std::to_string(num_spans) : "")
+        // Random error status
         ->SetStatus(opentelemetry::trace::CanonicalCode::CANCELLED, "");
 }
 
@@ -78,11 +80,10 @@ void StartEndSpansError(
  * spans are referenced in the passed in vector. If is_unique is true, then all spans
  * will have different names.
  */
-void StartSpans(
-    std::vector<opentelemetry::nostd::shared_ptr<opentelemetry::trace::Span>> &spans,
-    std::shared_ptr<opentelemetry::trace::Tracer> &tracer,
-    unsigned int num_spans,
-    bool is_unique = false)
+void StartSpans(std::vector<opentelemetry::nostd::shared_ptr<opentelemetry::trace::Span>> &spans,
+                std::shared_ptr<opentelemetry::trace::Tracer> &tracer,
+                unsigned int num_spans,
+                bool is_unique)
 {
   for (unsigned int i = 0; i < num_spans; i++)
     spans.push_back(tracer->StartSpan(is_unique ? std::to_string(num_spans) : ""));
@@ -97,18 +98,21 @@ void StartSpans(
 std::vector<opentelemetry::nostd::shared_ptr<opentelemetry::trace::Span>> MakeManySpans(
     std::shared_ptr<opentelemetry::trace::Tracer> &tracer,
     unsigned int num_spans,
-    bool is_unique = false)
+    bool is_unique,
+    unsigned int &latency_span_offset)
 {
   // Running spans must be stored in a vector in order to stay running, since only OnStart is called
   // for those spans. This vector is only accessed by the run thread, as the other functions' spans
   // automatically get moved to the processor memory when calling both OnStart and OnEnd
   std::vector<opentelemetry::nostd::shared_ptr<opentelemetry::trace::Span>> running_spans;
   // Use threads to speed up the work
-  std::thread run(StartSpans, std::ref(running_spans), std::ref(tracer), num_spans / 3, is_unique);
-  std::thread err(StartEndSpansError, std::ref(tracer), num_spans / 3, is_unique);
-  StartEndSpansLatency(tracer, num_spans / 3, is_unique);
+  std::thread run(StartSpans, std::ref(running_spans), std::ref(tracer), num_spans / 6, is_unique);
+  std::thread err(StartEndSpansError, std::ref(tracer), num_spans / 6, is_unique);
+  StartEndSpansLatency(tracer, num_spans * 3 / 4, is_unique, latency_span_offset);
   run.join();
   err.join();
+  // Increment offset for later
+  latency_span_offset++;
   return running_spans;
 }
 
@@ -124,8 +128,7 @@ public:
   TracezDataAggregatorPeer(std::shared_ptr<TracezSpanProcessor> processor)
   {
     // Set up the aggregator
-    aggregator_ = std::unique_ptr<TracezDataAggregator>(
-        new TracezDataAggregator(processor));
+    aggregator_ = std::unique_ptr<TracezDataAggregator>(new TracezDataAggregator(processor));
 
     // Disable the aggregetor's periodic background thread aggregation work, which
     // it normally does during production. Disabling it allows us to isolate
@@ -189,7 +192,6 @@ private:
   std::mutex mtx_;
   std::atomic<bool> run_;
   std::condition_variable cont_;
-  
 };
 
 ////////////////////////  FIXTURE FOR SHARED SETUP CODE ///////////////////
@@ -201,12 +203,12 @@ private:
 class TracezAggregator : public benchmark::Fixture
 {
 protected:
-  void SetUp(const ::benchmark::State& state)
+  void SetUp(const ::benchmark::State &state)
   {
     std::shared_ptr<TracezSpanProcessor> processor(new TracezSpanProcessor());
     tracer_ = std::shared_ptr<opentelemetry::trace::Tracer>(new Tracer(processor));
-    aggregator_peer_ = std::unique_ptr<TracezDataAggregatorPeer>(
-        new TracezDataAggregatorPeer(processor));
+    aggregator_peer_ =
+        std::unique_ptr<TracezDataAggregatorPeer>(new TracezDataAggregatorPeer(processor));
   }
 
   std::unique_ptr<TracezDataAggregatorPeer> aggregator_peer_;
@@ -224,8 +226,8 @@ protected:
  */
 BENCHMARK_DEFINE_F(TracezAggregator, BM_SingleBucket)(benchmark::State &state)
 {
-  const unsigned int num_spans = state.range(0);
-  const bool is_unique = state.range(1);
+  const unsigned int num_spans  = state.range(0);
+  const bool is_unique          = state.range(1);
   const bool run_periodic_query = state.range(2);
 
   if (run_periodic_query)
@@ -249,9 +251,12 @@ BENCHMARK_DEFINE_F(TracezAggregator, BM_SingleBucket)(benchmark::State &state)
  */
 BENCHMARK_DEFINE_F(TracezAggregator, BM_ManyBuckets)(benchmark::State &state)
 {
-  const unsigned int num_spans = state.range(0);
-  const bool is_unique = state.range(1);
+  const unsigned int num_spans  = state.range(0);
+  const bool is_unique          = state.range(1);
   const bool run_periodic_query = state.range(2);
+
+  // Ensure spans get added to each latency bucket
+  unsigned int latency_index_offset = 0;
 
   if (run_periodic_query)
     aggregator_peer_->StartPeriodicQueryThread();
@@ -259,8 +264,8 @@ BENCHMARK_DEFINE_F(TracezAggregator, BM_ManyBuckets)(benchmark::State &state)
   for (auto _ : state)
   {
     state.PauseTiming();
-    std::vector<opentelemetry::nostd::shared_ptr<
-    	opentelemetry::trace::Span>> running_spans = MakeManySpans(tracer_, num_spans, is_unique);
+    std::vector<opentelemetry::nostd::shared_ptr<opentelemetry::trace::Span>> running_spans =
+        MakeManySpans(tracer_, num_spans, is_unique, latency_index_offset);
     state.ResumeTiming();
     aggregator_peer_->Aggregate();
   }
@@ -276,35 +281,42 @@ BENCHMARK_DEFINE_F(TracezAggregator, BM_ManyBuckets)(benchmark::State &state)
  */
 
 BENCHMARK_REGISTER_F(TracezAggregator, BM_SingleBucket)
-  /*
-   * Same name spans, with different number of spans and periodic query status
-   *
-   * Spans all have the same name, which means there's work to clear stored spans
-   * from memory fairly often so that the number of sampled spans won't go over
-   * the max and memory use is minimal, which are performance factors
-   */
-  ->Args({10, false, false})->Args({10, false, true})
-  ->Args({1000, false, false})->Args({1000, false, true})
-  /*
-   * Many name spans, with different number of spans and periodic query status
-   *
-   * Spans have num_spans unique names, so many more spans are kept stored in memory
-   * and not cleared as often, which affects performance
-   */
-  ->Args({10, true, false})->Args({10, true, true})
-  ->Args({1000, true, false})->Args({1000, true, true});
+    /*
+     * Same name spans, with different number of spans and periodic query status
+     *
+     * Spans all have the same name, which means there's work to clear stored spans
+     * from memory fairly often so that the number of sampled spans won't go over
+     * the max and memory use is minimal, which are performance factors
+     */
+    ->Args({10, false, false})
+    ->Args({10, false, true})
+    ->Args({1000, false, false})
+    ->Args({1000, false, true})
+    /*
+     * Many name spans, with different number of spans and periodic query status
+     *
+     * Spans have num_spans unique names, so many more spans are kept stored in memory
+     * and not cleared as often, which affects performance
+     */
+    ->Args({10, true, false})
+    ->Args({10, true, true})
+    ->Args({1000, true, false})
+    ->Args({1000, true, true});
 
 // Do same permutation of number of spans, span uniqueness, and periodic thread
 // running for many buckets too
 BENCHMARK_REGISTER_F(TracezAggregator, BM_ManyBuckets)
-  ->Args({10, false, false})->Args({10, false, true})
-  ->Args({1000, false, false})->Args({1000, false, true})
-  ->Args({10, true, false})->Args({10, true, true})
-  ->Args({1000, true, false})->Args({1000, true, true});
+    ->Args({10, false, false})
+    ->Args({10, false, true})
+    ->Args({1000, false, false})
+    ->Args({1000, false, true})
+    ->Args({10, true, false})
+    ->Args({10, true, true})
+    ->Args({1000, true, false})
+    ->Args({1000, true, true});
 
-} // namespace zpages
-} // namespace ext
+}  // namespace zpages
+}  // namespace ext
 OPENTELEMETRY_END_NAMESPACE
 
 BENCHMARK_MAIN();
-
