@@ -13,6 +13,9 @@ endif()
 option(WITH_OTPROTOCOL
        "Whether to include the OpenTelemetry Protocol in the SDK" OFF)
 
+option(WITH_PROMETHEUS "Whether to include the Prometheus Client in the SDK"
+       OFF)
+
 set(WITH_PROTOBUF OFF)
 if(WITH_OTPROTOCOL)
   set(WITH_PROTOBUF ON)
@@ -56,3 +59,4 @@ add_subdirectory(sdk)
 include_directories(.)
 add_subdirectory(exporters)
 add_subdirectory(examples)
+add_subdirectory(ext)
