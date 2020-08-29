@@ -28,14 +28,22 @@
  * an exposer as an argument, and instead takes no arguments; this
  * private constructor is only to be used here for testing
  */
-class opentelemetry::exporter::prometheus::PrometheusExporterTest
+OPENTELEMETRY_BEGIN_NAMESPACE
+namespace exporter
+{
+namespace prometheus
+{
+class PrometheusExporterTest // : public ::testing::Test
 {
 public:
-  opentelemetry::exporter::prometheus::PrometheusExporter GetExporter()
-  {
-    return opentelemetry::exporter::prometheus::PrometheusExporter();
-  }
+    PrometheusExporter GetExporter()
+    {
+        return PrometheusExporter();
+    }
 };
+}
+}
+OPENTELEMETRY_END_NAMESPACE
 
 using opentelemetry::exporter::prometheus::PrometheusCollector;
 using opentelemetry::exporter::prometheus::PrometheusExporter;
