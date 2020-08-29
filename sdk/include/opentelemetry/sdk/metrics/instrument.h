@@ -244,11 +244,9 @@ inline void print_value(std::stringstream &ss,
   switch (value.index())
   {
     case common::AttributeType::TYPE_STRING:
-      if (jsonTypes)
-        ss << '"';
+
       ss << nostd::get<nostd::string_view>(value);
-      if (jsonTypes)
-        ss << '"';
+
       break;
     default:
 #if __EXCEPTIONS
@@ -282,7 +280,7 @@ inline std::string KvToString(const trace::KeyValueIterable &kv) noexcept
   {
     size_t i = 1;
     kv.ForEachKeyValue([&](nostd::string_view key, common::AttributeValue value) noexcept {
-      ss << "\"" << key << "\":";
+      ss << key << ":";
       print_value(ss, value, true);
       if (size != i)
       {
