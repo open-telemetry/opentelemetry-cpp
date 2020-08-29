@@ -2,10 +2,15 @@
 
 set -e
 
+export DEBIAN_FRONTEND=noninteractive
+apt-get update
 apt-get install --no-install-recommends --no-install-suggests -y \
                 cmake \
                 libbenchmark-dev \
-                libgtest-dev
+                libgtest-dev \
+                zlib1g-dev \
+                sudo \
+                libcurl4-openssl-dev
 
 # Follows these instructions for setting up gtest
 # https://www.eriksmistad.no/getting-started-with-google-test-on-ubuntu/
