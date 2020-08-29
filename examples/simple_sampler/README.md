@@ -6,7 +6,7 @@ The built-in samplers includes `AlwaysOn` , `AlwaysOff` , `Probability` and `Par
 
 1. Make sure you are at `examples\simple-sampler`
 2. Run `bazel build :example_simple` to build the program.
-3. The compiled binary will be in the `bazel-bin\` folder under rood directory. 
+3. The compiled binary will be in the `bazel-bin\` folder under rood directory.
 4. Run `../../bazel-bin/examples/simple_sampler/example_simple` . It will test AlwaysOn and AlwaysOff sampler.
 
 ## Understanding the example
@@ -25,7 +25,7 @@ The samplers are under `sdk` folder. You can include them by adding:
 
 ### Constructing a sampler
 
-It is a common practice to use `std::make_shared` to allocate a sampler dynamically so that it can be used by multiple `Tracer` s. In the `main()` function, we first construct a few samplers. 
+It is a common practice to use `std::make_shared` to allocate a sampler dynamically so that it can be used by multiple `Tracer` s. In the `main()` function, we first construct a few samplers.
 
 ``` 
 auto always_on_sampler  = std::make_shared<AlwaysOnSampler>();
@@ -57,4 +57,4 @@ void initTracer(std::shared_ptr<Sampler> sampler)
 
 ### Expected output
 
-When the `TracerProvider` is using the AlwaysOn sampler, it will record the information from every span, and export it to `stdout` . When it is using AlwaysOff sampler, it will record nothing.  
+When the `TracerProvider` is using the AlwaysOn sampler, it will record the information from every span, and export it to `stdout` . When it is using AlwaysOff sampler, it will record nothing.

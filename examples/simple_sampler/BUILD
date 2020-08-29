@@ -1,3 +1,5 @@
+load("@rules_cc//cc:defs.bzl", "cc_binary", "cc_library")
+
 cc_library(
     name = "test_tracer",
     srcs = [
@@ -31,8 +33,8 @@ cc_binary(
         "main.cc",
     ],
     deps = [
-        ":test_tracer",
         ":stdout_exporter",
+        ":test_tracer",
         "//api",
         "//sdk/src/trace",
     ],

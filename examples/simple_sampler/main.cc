@@ -8,20 +8,19 @@
 #include "opentelemetry/sdk/trace/tracer_provider.h"
 #include "opentelemetry/trace/provider.h"
 
-// Using an exporter that simply dumps span data to stdout.
-#include "stdout_exporter.h"
+#include "stdout_exporter.h"  // Using an exporter that simply dumps span data to stdout.
 
 #include "test_tracer/test_tracer.h"
 
 #include <iostream>
 #include <memory>
 
+using example::StdoutExporter;
 using opentelemetry::sdk::trace::AlwaysOffSampler;
 using opentelemetry::sdk::trace::AlwaysOnSampler;
 using opentelemetry::sdk::trace::ParentOrElseSampler;
 using opentelemetry::sdk::trace::ProbabilitySampler;
 using opentelemetry::sdk::trace::Sampler;
-using example::StdoutExporter;
 
 namespace
 {
