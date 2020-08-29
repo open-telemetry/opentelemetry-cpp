@@ -18,6 +18,8 @@ jobs:
         sudo ./ci/setup_ci_environment.sh
     - name: run tests
       run: ./ci/do_ci.sh cmake.test
+    - name: run prometheus exporter tests
+      run: ./ci/do_ci.sh cmake.exporter.prometheus.test
 
   cmake_test_cxx20:
     name: CMake C++20 test
@@ -55,6 +57,8 @@ jobs:
         sudo ./ci/install_gcc48.sh
     - name: run tests
       run: ./ci/do_ci.sh bazel.legacy.test
+      env:
+        CC: /usr/bin/gcc-4.8
 
   bazel_test:
     name: Bazel
@@ -68,6 +72,19 @@ jobs:
         sudo ./ci/install_bazelisk.sh
     - name: run tests
       run: ./ci/do_ci.sh bazel.test
+
+  bazel_valgrind:
+    name: Bazel valgrind
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - name: setup
+      run: |
+        sudo ./ci/setup_cmake.sh
+        sudo ./ci/setup_ci_environment.sh
+        sudo ./ci/install_bazelisk.sh
+    - name: run tests
+      run: ./ci/do_ci.sh bazel.valgrind
 
   bazel_noexcept:
     name: Bazel noexcept

@@ -33,6 +33,40 @@ cc_library(
     ],
 )
 
+cc_library(
+    name = "prometheus_collector",
+    srcs = [
+        "src/prometheus_collector.cc",
+    ],
+    hdrs = [
+        "include/opentelemetry/exporters/prometheus/prometheus_collector.h",
+        "include/opentelemetry/exporters/prometheus/prometheus_exporter_utils.h",
+    ],
+    strip_include_prefix = "include",
+    deps = [
+        ":prometheus_utils",
+        "//api",
+        "//sdk:headers",
+        "@com_github_jupp0r_prometheus_cpp//core",
+    ],
+)
+
+cc_library(
+    name = "prometheus_utils",
+    srcs = [
+        "src/prometheus_exporter_utils.cc",
+    ],
+    hdrs = [
+        "include/opentelemetry/exporters/prometheus/prometheus_exporter_utils.h",
+    ],
+    strip_include_prefix = "include",
+    deps = [
+        "//api",
+        "//sdk:headers",
+        "@com_github_jupp0r_prometheus_cpp//core",
+    ],
+)
+
 cc_test(
     name = "prometheus_exporter_test",
     srcs = [
@@ -43,6 +77,28 @@ cc_test(
         ":prometheus_exporter",
         "@com_github_jupp0r_prometheus_cpp//core",
         "@com_github_jupp0r_prometheus_cpp//pull",
+        "@com_google_googletest//:gtest_main",
+    ],
+)
+
+cc_test(
+    name = "prometheus_collector_test",
+    srcs = [
+        "test/prometheus_collector_test.cc",
+    ],
+    deps = [
+        ":prometheus_collector",
+        "@com_google_googletest//:gtest_main",
+    ],
+)
+
+cc_test(
+    name = "prometheus_exporter_utils_test",
+    srcs = [
+        "test/prometheus_exporter_utils_test.cc",
+    ],
+    deps = [
+        ":prometheus_utils",
         "@com_google_googletest//:gtest_main",
     ],
 )
