@@ -168,13 +168,13 @@ TEST(HTTPTextFormatTest, FormatNotSupported)
 
 TEST(HTTPTextFormatTest, PropagateInvalidContext)
 {
-  // Upon a invalid parent id in take, generate a valid one in return.
+  // Do not propagate invalid trace context.
   std::map<std::string, std::string> carrier = {};
   context::Context ctx{
       "current-span",
       nostd::shared_ptr<trace::Span>(new trace::DefaultSpan(trace::SpanContext::GetInvalid()))};
   format.Inject(Setter, carrier, ctx);
-  EXPECT_FALSE(carrier.count("traceparent") == 0);
+  EXPECT_TRUE(carrier.count("traceparent") == 0);
 }
 
 TEST(HTTPTextFormatTest, TraceStateHeaderWithTrailingComma)

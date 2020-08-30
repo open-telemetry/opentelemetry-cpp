@@ -1,9 +1,9 @@
 #pragma once
-#include <iostream>
 #include "opentelemetry/common/attribute_value.h"
 #include "opentelemetry/trace/canonical_code.h"
 #include "opentelemetry/trace/span.h"
 #include "opentelemetry/trace/span_context.h"
+
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace trace
 {
@@ -45,7 +45,7 @@ public:
 
   DefaultSpan() = default;
 
-  DefaultSpan(SpanContext span_context) { this->span_context_ = span_context; }
+  DefaultSpan(SpanContext span_context) : span_context_(span_context) {}
 
   // movable and copiable
   DefaultSpan(DefaultSpan &&spn) : span_context_(spn.GetContext()) {}

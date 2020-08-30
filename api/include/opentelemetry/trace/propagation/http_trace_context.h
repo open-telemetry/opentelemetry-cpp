@@ -35,15 +35,17 @@ namespace propagation
 {
 static const nostd::string_view kTraceParent = "traceparent";
 static const nostd::string_view kTraceState  = "tracestate";
-static const int kVersionBytes               = 2;
-static const int kTraceIdBytes               = 32;
-static const int kSpanIdBytes                = 16;
-static const int kTraceFlagBytes             = 2;
 static const int kTraceDelimiterBytes        = 3;
-static const int kHeaderSize =
-    kVersionBytes + kTraceIdBytes + kSpanIdBytes + kTraceFlagBytes + kTraceDelimiterBytes;
-static const int kTraceStateMaxMembers    = 32;
-static const int kHeaderElementLengths[4] = {2, 32, 16, 2};
+static const int kHeaderElementLengths[4]    = {
+    2, 32, 16, 2};  // 0: version, 1: trace id, 2: span id, 3: trace flags
+static const int kHeaderSize = kHeaderElementLengths[0] + kHeaderElementLengths[1] +
+                               kHeaderElementLengths[2] + kHeaderElementLengths[3] +
+                               kTraceDelimiterBytes;
+static const int kTraceStateMaxMembers = 32;
+static const int kVersionBytes         = 2;
+static const int kTraceIdBytes         = 32;
+static const int kSpanIdBytes          = 16;
+static const int kTraceFlagBytes       = 2;
 
 // The HttpTraceContext provides methods to extract and inject
 // context into headers of HTTP requests with traces.
@@ -64,11 +66,9 @@ public:
 
   void Inject(Setter setter, T &carrier, const context::Context &context) noexcept override
   {
-    SpanContext span_context = SpanContext();
-    GetCurrentSpan(context, span_context);
+    SpanContext span_context = GetCurrentSpan(context);
     if (!span_context.IsValid())
     {
-      std::cout << "invalid span context" << std::endl;
       // If invalid, make a new traceparent and remove trace state
       span_context = SpanContext::GetRandom();
     }
@@ -90,18 +90,53 @@ public:
     return context.SetValue(span_key, sp);
   }
 
-  static void GetCurrentSpan(const context::Context &context, SpanContext &span_context)
+  static SpanContext GetCurrentSpan(const context::Context &context)
   {
     const nostd::string_view span_key = "current-span";
     context::Context ctx(context);
     context::ContextValue span = ctx.GetValue(span_key);
     if (nostd::holds_alternative<nostd::shared_ptr<Span>>(span))
     {
-      span_context = nostd::get<nostd::shared_ptr<Span>>(span).get()->GetContext();
+      return nostd::get<nostd::shared_ptr<Span>>(span).get()->GetContext();
     }
+    return SpanContext();
   }
 
-  static void GenerateBuffer(nostd::string_view string, int bytes, uint8_t *buf)
+  static TraceId GenerateTraceIdFromString(nostd::string_view trace_id)
+  {
+    int trace_id_len = kHeaderElementLengths[1];
+    uint8_t buf[kTraceIdBytes / 2];
+    uint8_t *b_ptr = buf;
+    GenerateHexFromString(trace_id, trace_id_len, b_ptr);
+    return TraceId(buf);
+  }
+
+  static SpanId GenerateSpanIdFromString(nostd::string_view span_id)
+  {
+    int span_id_len = kHeaderElementLengths[2];
+    uint8_t buf[kSpanIdBytes / 2];
+    uint8_t *b_ptr = buf;
+    GenerateHexFromString(span_id, span_id_len, b_ptr);
+    return SpanId(buf);
+  }
+
+  static TraceFlags GenerateTraceFlagsFromString(nostd::string_view trace_flags)
+  {
+    if (trace_flags.length() > 2)
+    {
+      return TraceFlags(0);  // check for invalid length of flags
+    }
+    int tmp1 = HexToInt(trace_flags[0]);
+    int tmp2 = HexToInt(trace_flags[1]);
+    if (tmp1 < 0 || tmp2 < 0)
+      return TraceFlags(0);  // check for invalid char
+    uint8_t buf = tmp1 * 16 + tmp2;
+    return TraceFlags(buf);
+  }
+
+private:
+  // Converts the hex numbers stored as strings into bytes stored in a buffer.
+  static void GenerateHexFromString(nostd::string_view string, int bytes, uint8_t *buf)
   {
     const char *str_id = string.begin();
     for (int i = 0; i < bytes; i++)
@@ -126,37 +161,6 @@ public:
     }
   }
 
-  static TraceId GenerateTraceIdFromString(nostd::string_view trace_id)
-  {
-    uint8_t buf[kTraceIdBytes / 2];
-    uint8_t *b_ptr = buf;
-    GenerateBuffer(trace_id, kTraceIdBytes, b_ptr);
-    return TraceId(buf);
-  }
-
-  static SpanId GenerateSpanIdFromString(nostd::string_view span_id)
-  {
-    uint8_t buf[kSpanIdBytes / 2];
-    uint8_t *b_ptr = buf;
-    GenerateBuffer(span_id, kSpanIdBytes, b_ptr);
-    return SpanId(buf);
-  }
-
-  static TraceFlags GenerateTraceFlagsFromString(nostd::string_view trace_flags)
-  {
-    if (trace_flags.length() > 2)
-    {
-      return TraceFlags(0);  // check for invalid length of flags
-    }
-    int tmp1 = HexToInt(trace_flags[0]);
-    int tmp2 = HexToInt(trace_flags[1]);
-    if (tmp1 < 0 || tmp2 < 0)
-      return TraceFlags(0);  // check for invalid char
-    uint8_t buf = tmp1 * 16 + tmp2;
-    return TraceFlags(buf);
-  }
-
-private:
   // Converts a single character to a corresponding integer (e.g. '1' to 1), return -1
   // if the character is not a valid number in hex.
   static uint8_t HexToInt(char c)
@@ -208,11 +212,20 @@ private:
     TraceFlags(span_context.trace_flags()).ToLowerBase16(trace_flags);
     // Note: This is only temporary replacement for appendable string
     std::string hex_string = "00-";
-    hex_string += trace_id;
-    hex_string += '-';
-    hex_string += span_id;
-    hex_string += '-';
-    hex_string += trace_flags;
+    for (int i = 0; i < 32; i++)
+    {
+      hex_string.push_back(trace_id[i]);
+    }
+    hex_string.push_back('-');
+    for (int i = 0; i < 16; i++)
+    {
+      hex_string.push_back(span_id[i]);
+    }
+    hex_string.push_back('-');
+    for (int i = 0; i < 2; i++)
+    {
+      hex_string.push_back(trace_flags[i]);
+    }
     setter(carrier, kTraceParent, hex_string);
   }
 
@@ -238,9 +251,10 @@ private:
 
   static SpanContext ExtractContextFromTraceParent(nostd::string_view trace_parent)
   {
-    if (trace_parent.length() != kHeaderSize || trace_parent[kVersionBytes] != '-' ||
-        trace_parent[kVersionBytes + kTraceIdBytes + 1] != '-' ||
-        trace_parent[kVersionBytes + kTraceIdBytes + kSpanIdBytes + 2] != '-')
+    if (trace_parent.length() != kHeaderSize || trace_parent[kHeaderElementLengths[0]] != '-' ||
+        trace_parent[kHeaderElementLengths[0] + kHeaderElementLengths[1] + 1] != '-' ||
+        trace_parent[kHeaderElementLengths[0] + kHeaderElementLengths[1] +
+                     kHeaderElementLengths[2] + 2] != '-')
     {
       std::cout << "Unparseable trace_parent header. Returning INVALID span context." << std::endl;
       return SpanContext(false, false);

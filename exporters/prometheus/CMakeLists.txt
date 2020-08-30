@@ -12,16 +12,13 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-package(default_visibility = ["//visibility:public"])
+include_directories(include)
 
-cc_library(
-    name = "trace",
-    srcs = glob(["**/*.cc"]),
-    hdrs = glob(["**/*.h"]),
-    include_prefix = "src/trace",
-    deps = [
-        "//api",
-        "//sdk:headers",
-        "//sdk/src/common:random",
-    ],
-)
+find_package(prometheus-cpp CONFIG REQUIRED)
+
+add_library(prometheus_exporter src/prometheus_collector.cc
+                                src/prometheus_exporter_utils.cc)
+
+if(BUILD_TESTING)
+  add_subdirectory(test)
+endif()
