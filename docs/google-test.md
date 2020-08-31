@@ -28,7 +28,7 @@ TEST(TestSuiteName, TestName) {
 
 A [sample unit test](https://github.com/open-telemetry/opentelemetry-cpp/blob/master/sdk/test/trace/tracer_provider_test.cc) from the OTel CPP repo, testing the `GetTracer()` method in the `TracerProvider` class, is shown below.
 
-![SampleUnitTest](/images/SampleUnitTest.png)
+![SampleUnitTest](./images/SampleUnitTest.png)
 
 ### Test Coverage Reports
 
@@ -44,7 +44,7 @@ First, to install bazel, refer to the instructions [here](https://docs.bazel.bui
 
 Bazel makes use of a `BUILD` file, which gives instructions to bazel on how to build the project. The file contains targets that point to a set of source files and dependencies. Along with a `BUILD` file, a `WORKSPACE` file exists that identifies the directory it resides in as a bazel workspace. In the OTel CPP repository, the SDK unit tests using the Google Test framework to ensure code functionality. In the [BUILD](https://github.com/open-telemetry/opentelemetry-cpp/tree/master/sdk/test/trace) file for trace tests, there are six different targets, each corresponding to a different unit test. An example target taken from this file is shown below.
 
-![SampleTarget](/images/SampleTarget.png)
+![SampleTarget](./images/SampleTarget.png)
 
 Integrating Google Tests with bazel is as simple as creating a target with:
 - name: The target name, aka the name of the binary to build
@@ -54,7 +54,7 @@ Integrating Google Tests with bazel is as simple as creating a target with:
 
 Building and executing a unit test is also very simple. 
 
-![BuildAndExecute](/images/BuildAndExecute.png)
+![BuildAndExecute](./images/BuildAndExecute.png)
 
 On terminal, navigate to the directory the WORKSPACE file resides in, and execute two commands:
 
@@ -97,7 +97,7 @@ Next, follow the instructions [here](https://github.com/google/benchmark#install
 
 CMake makes use of a `CMakeLists.txt` file that provides instructions for a project’s source files and targets. There is a main `CMakeLists.txt` file in the root of the project directory, and a `CMakeLists.txt` for each subdirectory. In the main `CMakeLists.txt` file, the `cmake_minimum_required`  and `CMAKE_CXX_STANDARD` are set, the project name is set with `project()`, directories are included and subdirectories added, and much more. However, more importantly, in the context of Google Test within the OTel CPP repo, the `CMakeLists.txt` to look at is the one located in the directory your tests are being written in; for this example, it’s `opentelemetry-cpp/sdk/test/trace`. This [CMakeLists.txt](https://github.com/open-telemetry/opentelemetry-cpp/blob/master/sdk/test/trace/CMakeLists.txt) file, shown below, describes the names of the tests to be added as executables.
 
-![CMakeExample](/images/CMakeExample.png)
+![CMakeExample](./images/CMakeExample.png)
 
 This is how a `CMakeLists.txt` file will be written with the purpose of unit testing. After writing a unit test, navigate to the `CMakeLists.txt` file for that subdirectory and add the test name to the list of test names in `foreach()`.
 
@@ -128,7 +128,7 @@ lcov --directory $PWD --capture --output-file coverage.info
 
 Below is a sample coverage.info file generated from lcov:
 
-![lcovReport](/images/lcovReport.png)
+![lcovReport](./images/lcovReport.png)
 
 
 Additionally, all CMake tests can be ran in a Docker container by navigating to the root of the directory and executing the command:
@@ -140,7 +140,7 @@ Additionally, all CMake tests can be ran in a Docker container by navigating to 
 
 While Google Test itself does not provide performance benchmarking, Google Benchmark, a closely related tool, does. Follow the instructions [here](https://github.com/google/benchmark#installation) to download Google Benchmark using CMake. A basic usage example can be viewed [here](https://github.com/google/benchmark#usage), while a more in depth usage guide can be found [here](https://github.com/google/benchmark#user-guide). Below is a snippet from the basic usage example that outlines the structure of a benchmarked routine. Generally, it is very similar to the Googletest unit testing structure and we can easily convert unit tests into benchmarked routines.
 
-![benchmarkUsage](/images/benchmarkUsage.png)
+![benchmarkUsage](./images/benchmarkUsage.png)
 
 A benchmark consists of a “benchmarked function” which takes a benchmark state as a parameter.  The library automatically decides how many iterations to run based on the duration of the first few run iterations.  This function is called directly underneath using the benchmark macro.  Finally, a call to BENCHMARK_MAIN() runs all benchmarks.  As a proof of concept, below is a unit test for the PrometheusCollector class into a benchmark:
 ```C++
@@ -198,7 +198,7 @@ BENCHMARK_MAIN();
 ```
 
 Output
-![benchmarkPOC](/images/benchmarkPOC.png)
+![benchmarkPOC](./images/benchmarkPOC.png)
 
 OTel provides a bazel shortcut to build tests which can be seen [here](https://github.com/open-telemetry/opentelemetry-cpp/blob/573696f3fdc1fd85e24ac19860ae6f2345837a3e/bazel/otel_cc_benchmark.bzl). This not only creates a benchmark executable, but a “smoketest” which runs each benchmark for one iteration.
 
