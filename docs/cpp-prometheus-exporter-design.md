@@ -20,7 +20,7 @@ pull requests to the HTTP server exposed by the exporter and scrapes metrics dat
 This section introduces the components within the Prometheus exporter as well as their relationships, and the data flow between OpenTelemetry 
 and Prometheus from both users’ perspective and inside the OpenTelemetry.
 
-![image](./images/DataPath.png)
+![DataPath](./images/DataPath.png)
 
 This diagram is re-used from [Metrics API/SDK C++ Design Document](https://github.com/open-telemetry/opentelemetry-cpp/pull/145). It shows the role of an Exporter in the data pipeline. The `export()` 
 function in Exporter is called by the Controller after pre-processing.
@@ -28,7 +28,7 @@ function in Exporter is called by the Controller after pre-processing.
 Since we only focus on the Exporter in this design, the following diagram de-emphasizes the components before the Controller and emphasizes more 
 on the components interacting with Prometheus Exporter directly.
 
-![image](./images/WholeDataFlow.png)
+![WholeDataFlow](./images/WholeDataFlow.png)
 
 ### In the OpenTelemetry scope:
 - Other OpenTelemetry components collect and handle metrics data and interacts with Meter. Meter gets metrics data from those components.
@@ -101,11 +101,11 @@ exporter, translate the data to Prometheus data structure, and serve the data. I
 
 Here we include a UML class diagram inside the exporter to show the dependencies among the classes.
 
-![image](./images/UML.png)
+![UML](./images/.png)
 
 We also include a diagram to illustrate flow of data within the exporter.
 
-![image](./images/ExporterDataFlow.png)
+![ExporterDataFlow](./images/ExporterDataFlow.png)
 
 ### `MetricsExporter` Class (Interface) and `ExportResult` class
 This class is an interface that defines all basic behaviors of an exporter. In C++, a pre-existing [MetricsExporter](https://github.com/open-telemetry/opentelemetry-cpp/blob/master/sdk/include/opentelemetry/sdk/metrics/exporter.h) Interface exists, and we only plan to add more ExportResults while leaving the interface the same. Below, `kSuccess` and `kFailure` already exist, and we plan to add `kFailureFull`, `kFailureTimeout`, and `kFailureInvalidArgument`. This interface is to be used by other metrics exporters as well, such as the [OStreamMetricsExporter](https://github.com/open-telemetry/opentelemetry-cpp/blob/master/exporters/ostream/include/opentelemetry/exporters/ostream/metrics_exporter.h), and not only for Prometheus.
@@ -168,7 +168,7 @@ by the Controller in our data pipeline.
 `export()` function should be implemented to export the metrics data. When this function is called, it adds the input batch of metric `Record`s to 
 a data structure called `metricsToCollect` in the `PrometheusCollector` (will be introduced later).
 - **Parameters**: A batch of metric `Records` to export
-- **Returns**: ReturnCodes, see [ReturnCodes](#returncodes-class) class
+- **Returns**: ExportResult, see above
 
 #### Shut down the exporter
 `shutdown()` function should be implemented to shutdown the exporter. The detailed behavior is not determined yet.
@@ -350,10 +350,10 @@ the collection.
 
 **Add new metric record to collection**
 
-`addMetricData()` takes a batch of metric records as input and adds the records to the collection. This operation is easy and quick, so the 
+`AddMetricData()` takes a batch of metric records as input and adds the records to the collection. This operation is easy and quick, so the 
 lock will not be held for a long time. Here is a pseudo-code snippet
 ```C++
-void addMetricData(Collection<Record> records) {
+void AddMetricData(Collection<Record> records) {
     // require a lock;
     lock.acquire();
     
@@ -381,7 +381,7 @@ current collection, and process the copy. What user pulls is actually a snapshot
 The function to translate OpenTelemetry metrics data to Prometheus metrics data has nothing to do with the `metricsToCollect` collection itself, 
 so translation should not be considered required.
 ```C++
-Colletion<MetricFamily> collect() {
+Colletion<MetricFamily> Collect() {
     // a copy of data
     Collection<Record> copiedCollection;
     
@@ -402,7 +402,7 @@ Colletion<MetricFamily> collect() {
     // ======= Leave the critical region ======
     
     // process the copied data 
-    return PrometheusExporterUtils.translateToPrometheus(copiedCollection);
+    return PrometheusExporterUtils.TranslateToPrometheus(copiedCollection);
 }
 ```
 
@@ -464,17 +464,17 @@ This class has been converted into codes in the `ExportResult class`. See above 
 
 ### `PrometheusExporterUtils` Class
 This class contains all helper methods that will be called by the `collect()`, in order to separate the responsibilities and make the 
-`PrometheusCollector` class clean. This class mainly supports two helpers, `translateToPrometheus()` that translates a collection of 
-OpenTelemetry metrics data to a collection of Prometheus metrics data, and `sanitizeNames()` that replaces all illegal characters in Prometheus 
+`PrometheusCollector` class clean. This class mainly supports two helpers, `TranslateToPrometheus()` that translates a collection of 
+OpenTelemetry metrics data to a collection of Prometheus metrics data, and `SanitizeNames()` that replaces all illegal characters in Prometheus 
 with `_` because of different naming rules between OpenTelemetry and Prometheus.
 
 #### Translate data structure
-`translateToPrometheus(collection)` translates OpenTelemetry metrics data to a Prometheus acceptable form.
+`TranslateToPrometheus(collection)` translates OpenTelemetry metrics data to a Prometheus acceptable form.
 - **Parameters**: A collection of OpenTelemetry metrics data collected from meters.
 - **Return**: A collection of metrics data converted to the data structure that is accepted by Prometheus.
 
 ### Sanitize the name strings
-`sanitizeNames(otel_name)` replace all characters other than `_` and alphanumerical characters to `_`.
+`SanitizeNames(otel_name)` replace all characters other than `_` and alphanumerical characters to `_`.
 - **Parameters**: A label name or metric name in OpenTelemetry that may contain `.` or `-`, which are invalid characters in Prometheus naming rule.
 - **Return**: A string that has all invalid characters in Prometheus replaced to `_`.
 
@@ -490,7 +490,7 @@ public:
      * Helper function to convert OpenTelemetry metrics data collection
      * to Prometheus metrics data collection
      */
-    static Collection<MetricFamily> translateToPrometheus(
+    static Collection<MetricFamily> TranslateToPrometheus(
             Collection<Record> oTelMetrics) 
     {
         // There may also be additional helper functions revoked in
@@ -505,7 +505,7 @@ public:
      * alphanumeric characters, '_', '.', and '-', whereas in Prometheus the
      * name should only contain alphanumeric characters and '_'.
      */
-    static string sanitizeNames(string key)
+    static string SanitizeNames(string key)
     {
         // Replace all characters other than [A-Za-z0-9_] with '_'.
         // ...
