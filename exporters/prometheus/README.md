@@ -36,7 +36,7 @@
 ### Prometheus Exporter Data Path
 #### Exporter
 The position the exporter lies in the metric SDK and the data pipeline before the exporter is shown 
-[here](../../cpp-metrics/README.md#sdk-data-path). The exporter should receive a batch of aggregated and filtered records that are ready for export. 
+[here](https://github.com/open-o11y/docs/blob/master/cpp-metrics/README.md#sdk-data-path). The exporter should receive a batch of aggregated and filtered records that are ready for export. 
 The exact purpose of an exporter depends on which service we are exporting to but generally the exporter 
 must translate OpenTelemetry data to a target data type supported by the backend service, then send that 
 translated data to the service.
@@ -62,7 +62,7 @@ by Prometheus, and serve the parsed result.
 
 ## Usage
 ### Use in the metric data pipeline
-In order to use Prometheus Exporter in the metric data pipeline, follow the setup steps [here](../../cpp-metrics/README.md#usage),
+In order to use Prometheus Exporter in the metric data pipeline, follow the setup steps [here](https://github.com/open-o11y/docs/blob/master/cpp-metrics/README.md#usage),
 but initialize a `PrometheusExporter` instead of an `OStreamExporter`:
 ```C++
 unique_ptr<MetricsExporter> exporter = unique_ptr<MetricsExporter>(new PrometheusExporter);  
