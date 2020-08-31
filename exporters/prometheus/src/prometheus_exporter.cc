@@ -40,7 +40,6 @@ PrometheusExporter::PrometheusExporter(std::string &address) : is_shutdown_(fals
  */
 PrometheusExporter::PrometheusExporter() : is_shutdown_(false)
 {
-  exposer_   = nullptr;
   collector_ = std::unique_ptr<PrometheusCollector>(new PrometheusCollector);
 }
 
