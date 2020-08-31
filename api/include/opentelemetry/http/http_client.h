@@ -100,12 +100,12 @@ public:
 class HttpResponseCallback
 {
 public:
-	// Called when an HTTP request completes.
-	// The passed response object contains details about the exact way the
-	// request finished (HTTP status code, headers, content, error codes
-	// etc.). The ownership of the response object is transferred to the
+    // Called when an HTTP request completes.
+    // The passed response object contains details about the exact way the
+    // request finished (HTTP status code, headers, content, error codes
+    // etc.). The ownership of the response object is transferred to the
     // callback object. It can store it for later if necessary. Finally, it
-	// must be deleted using its virtual destructor.
+    // must be deleted using its virtual destructor.
     virtual void OnHttpResponse(HttpResponse* response) = 0;
 };
 
