@@ -42,12 +42,12 @@ public:
     }
 
 private:
-
     nostd::string_view m_empty{};
 };
 
 class SimpleHttpRequest: public http_api::HttpRequest
 {
+
 public:
 
     SimpleHttpRequest(nostd::string_view const& id): id_(id), method_("GET")
@@ -109,6 +109,7 @@ private:
 
 class SimpleHttpResponse: public http_api::HttpResponse
 {
+
 public:
     SimpleHttpResponse(nostd::string_view const& id):
         id_(id),
@@ -140,8 +141,8 @@ public:
             body_[i++] = e;
         }
     }
-private:
 
+private:
     nostd::string_view id_;
     unsigned statusCode_;
     http_api::HttpHeaders* headers_;
