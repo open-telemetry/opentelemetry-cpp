@@ -11,5 +11,10 @@ $VCPKG_DIR=(Get-Item -Path ".\").FullName
 # Patched Google Benchmark can be shared between vs2017 and vs2019 compilers
 ./vcpkg install --overlay-ports="$PSScriptRoot\ports" benchmark:x64-windows
 
+# Google Test
 ./vcpkg install gtest:x64-windows
+
+# nlohmann-json
+./vcpkg install nlohmann-json:x64-windows
+
 Pop-Location
