@@ -1,3 +1,5 @@
+// Copyright (c) Microsoft. All rights reserved
+
 #pragma once
 
 #include "opentelemetry/nostd/string_view.h"

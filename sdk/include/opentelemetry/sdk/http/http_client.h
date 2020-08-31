@@ -1,3 +1,5 @@
+// Copyright (c) Microsoft. All rights reserved.
+
 #pragma once
 #include "opentelemetry/http/http_client.h"
 #include "opentelemetry/version.h"
