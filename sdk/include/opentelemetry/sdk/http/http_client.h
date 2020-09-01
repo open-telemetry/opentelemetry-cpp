@@ -16,11 +16,12 @@
 #include "opentelemetry/http/http_client.h"
 #include "opentelemetry/version.h"
 
-#include <map>
-#include <vector>
-#include <cstring>
 #include <algorithm>
+#include <cstring>
 #include <functional>
+#include <map>
+#include <memory>
+#include <vector>
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace sdk
@@ -29,18 +30,19 @@ namespace http
 {
 namespace http_api = opentelemetry::http;
 
-static std::function <bool (const std::string&, const std::string&)> CaseInsensitiveComparator
-    = [](const std::string& s1, const std::string& s2) -> bool {
-        std::string str1(s1.length(),' ');
-        std::string str2(s2.length(),' ');
-        auto lowerCase = [](char c) -> char { return tolower(c);};
-        std::transform(s1.begin(), s1.end(), str1.begin(), lowerCase);
-        std::transform(s2.begin(), s2.end(), str2.begin(), lowerCase);
-        return  str1 < str2;
-    };
+static std::function<bool(const std::string &, const std::string &)> CaseInsensitiveComparator =
+    [](const std::string &s1, const std::string &s2) -> bool {
+  std::string str1(s1.length(), ' ');
+  std::string str2(s2.length(), ' ');
+  auto lowerCase = [](char c) -> char { return tolower(c); };
+  std::transform(s1.begin(), s1.end(), str1.begin(), lowerCase);
+  std::transform(s2.begin(), s2.end(), str2.begin(), lowerCase);
+  return str1 < str2;
+};
 
 // HttpHeaders implementation
-class HttpHeaders : http_api::HttpHeaders, std::multimap<std::string, std::string, decltype(CaseInsensitiveComparator)>
+class HttpHeaders : http_api::HttpHeaders,
+                    std::multimap<std::string, std::string, decltype(CaseInsensitiveComparator)>
 {
 public:
   virtual void set(nostd::string_view const &name, nostd::string_view const &value) override
@@ -87,7 +89,7 @@ public:
   virtual void SetUrl(nostd::string_view const &url) override { url_ = url; }
 
   // Gets the HTTP request headers.
-  virtual http_api::HttpHeaders *GetHeaders() const override { return headers_; }
+  virtual http_api::HttpHeaders &GetHeaders() const override { return *headers_; }
 
   // Sets the request body.
   virtual void SetBody(const uint8_t *const body, const size_t len) override
@@ -109,7 +111,7 @@ public:
   }
 
 private:
-  http_api::HttpHeaders *headers_;
+  std::unique_ptr<http_api::HttpHeaders> headers_;
   std::vector<uint8_t> body_;
   nostd::string_view method_;
   nostd::string_view id_;
@@ -128,7 +130,7 @@ public:
 
   virtual unsigned GetStatusCode() override { return statusCode_; }
 
-  virtual http_api::HttpHeaders *GetHeaders() override { return headers_; }
+  virtual const http_api::HttpHeaders &GetHeaders() override { return *headers_; }
 
   virtual void GetBody(uint8_t *body, size_t &len) override
   {
@@ -142,7 +144,7 @@ public:
 private:
   nostd::string_view id_;
   unsigned statusCode_;
-  http_api::HttpHeaders *headers_;
+  std::unique_ptr<http_api::HttpHeaders> headers_;
   http_api::HttpResult result_;
   std::vector<uint8_t> body_;
 };

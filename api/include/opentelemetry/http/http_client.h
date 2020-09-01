@@ -78,7 +78,7 @@ public:
   virtual void SetUrl(nostd::string_view const &url) = 0;
 
   // Gets the request Headers
-  virtual HttpHeaders *GetHeaders() const = 0;
+  virtual HttpHeaders &GetHeaders() const = 0;
 
   // Sets the request body
   virtual void SetBody(const uint8_t *const body, const size_t len) = 0;
@@ -106,7 +106,7 @@ public:
   virtual unsigned GetStatusCode() = 0;
 
   // Gets the response headers.
-  virtual HttpHeaders *GetHeaders() = 0;
+  virtual const HttpHeaders &GetHeaders() = 0;
 
   // Gets the response body.
   virtual void GetBody(uint8_t *body, size_t &len) = 0;
