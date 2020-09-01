@@ -1,4 +1,16 @@
-// Copyright (c) Microsoft. All rights reserved
+// Copyright The OpenTelemetry Authors
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
 
 #pragma once
 
@@ -40,9 +52,12 @@ public:
     virtual void add(nostd::string_view const& name, nostd::string_view const& value) = 0;
 
     // Gets a string value given a name
+    // Returns:
+    //      If there are multiple headers with same name, it returns any one of the value (implementation defined)
+    //      Empty string if there is no header with speicfied name..
     virtual nostd::string_view const& get(nostd::string_view const& name) const = 0;
 
-    // Tests whether the headers contains the specified name.
+    // Tests whether the headers contain the specified name.
     virtual bool has(nostd::string_view const& name) const = 0;
 };
 
