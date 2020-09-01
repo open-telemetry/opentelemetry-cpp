@@ -18,6 +18,9 @@
 
 #include <map>
 #include <vector>
+#include <cstring>
+#include <algorithm>
+#include <functional>
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace sdk
@@ -26,10 +29,19 @@ namespace http
 {
 namespace http_api = opentelemetry::http;
 
-// HttpHeaders implementation
-class HttpHeaders : http_api::HttpHeaders, std::multimap<std::string, std::string>
-{
+static std::function <bool (const std::string&, const std::string&)> CaseInsensitiveComparator
+    = [](const std::string& s1, const std::string& s2) -> bool {
+        std::string str1(s1.length(),' ');
+        std::string str2(s2.length(),' ');
+        auto lowerCase = [](char c) -> char { return tolower(c);};
+        std::transform(s1.begin(), s1.end(), str1.begin(), lowerCase);
+        std::transform(s2.begin(), s2.end(), str2.begin(), lowerCase);
+        return  str1 < str2;
+    };
 
+// HttpHeaders implementation
+class HttpHeaders : http_api::HttpHeaders, std::multimap<std::string, std::string, decltype(CaseInsensitiveComparator)>
+{
 public:
   virtual void set(nostd::string_view const &name, nostd::string_view const &value) override
   {
@@ -49,7 +61,7 @@ public:
     return (it != end()) ? it->second : m_empty;
   }
 
-  virtual bool has(nostd::string_view const &name) const override
+  virtual bool contains(nostd::string_view const &name) const override
   {
     auto it = find(std::string(name.data()));
     return (it != end());

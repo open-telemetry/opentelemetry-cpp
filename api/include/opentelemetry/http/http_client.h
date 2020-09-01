@@ -57,7 +57,7 @@ public:
   virtual nostd::string_view const &get(nostd::string_view const &name) const = 0;
 
   // Tests whether the headers contain the specified name.
-  virtual bool has(nostd::string_view const &name) const = 0;
+  virtual bool contains(nostd::string_view const &name) const = 0;
 };
 
 // The HttpRequest class represents a Request object.
@@ -145,16 +145,16 @@ public:
   // latter case, the OnHttpResponse() callback is called before this
   // method returns. You must keep the callback object alive until its
   // OnHttpResponse() callback is called.
-  virtual void SendRequestAsync(HttpRequest *request, HttpResponseCallback *callback) = 0;
+  virtual void SendRequest(HttpRequest *request, HttpResponseCallback *callback) = 0;
 
   // Cancels an HTTP request.
   // The caller must provide a string ID returned earlier by request->GetId().
   // The request is cancelled asynchronously. The caller must still
   // wait for the relevant OnHttpResponse() callback (it can just come
   // earlier with some "aborted" error status).
-  virtual void CancelRequestAsync(nostd::string_view const &id) = 0;
+  virtual void CancelRequest(nostd::string_view const &id) = 0;
 
-  virtual void CancelAllRequests() {}
+  virtual void CancelAllRequestsSync() {}
 };
 
 }  // namespace http
