@@ -33,16 +33,13 @@ namespace exporter
 {
 namespace prometheus
 {
-class PrometheusExporterTest // : public ::testing::Test
+class PrometheusExporterTest  // : public ::testing::Test
 {
 public:
-    PrometheusExporter GetExporter()
-    {
-        return PrometheusExporter();
-    }
+  PrometheusExporter GetExporter() { return PrometheusExporter(); }
 };
-}
-}
+}  // namespace prometheus
+}  // namespace exporter
 OPENTELEMETRY_END_NAMESPACE
 
 using opentelemetry::exporter::prometheus::PrometheusCollector;
