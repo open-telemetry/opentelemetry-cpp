@@ -84,11 +84,11 @@ std::vector<Record> CreateRecords(int num)
  */
 TEST(PrometheusExporter, InitializeConstructorIsNotShutdown)
 {
-  // PrometheusExporterTest p;
-  // PrometheusExporter exporter = p.GetExporter();
+  PrometheusExporterTest p;
+  PrometheusExporter exporter = p.GetExporter();
 
-  // // Asserts that the exporter is not shutdown.
-  // ASSERT_TRUE(!exporter.IsShutdown());
+  // Asserts that the exporter is not shutdown.
+  ASSERT_TRUE(!exporter.IsShutdown());
 }
 
 /**
