@@ -27,22 +27,24 @@ docker run -d --expose 8080 \
 ```
 
 ## Run Example Program
+
+To run the program, you must provide a command line argument to specify which Aggregator Kind you want to run the demo. The six choices are:
+```
+counter, gauge, mmsc, histogram, exact, sketch
+```
+
 Run with Bazel:
 ```shell script
 bazel build //examples/prometheus_exporter:prometheus_exporter_example
-bazel-bin/examples/prometheus_exporter/prometheus_exporter_example
+bazel-bin/examples/prometheus_exporter/prometheus_exporter_example agg 
 ```
-Specify the Aggregator Kind you want to run the demo
+`agg` is the command line argument to specify.
+
+For example, if we choose Histogram, this is what it would look like to build and execute the example:
 ```
+$ bazel build //examples/prometheus_exporter:prometheus_exporter_example
+$ bazel-bin/examples/prometheus_exporter/prometheus_exporter_example histogram 
 Prometheus Exporter example program running on localhost:8080...
-Choose an aggregator example: {counter, gauge, mmsc, histogram, exact, sketch}
-{type an answer here}
-```
-For example, choose Histogram
-```
-Prometheus Exporter example program running on localhost:8080...
-Choose an aggregator example: {counter, gauge, mmsc, histogram, exact, sketch}
-histogram
 Running histogram example program...
 ```
 The example program generates 4 metrics every second, and exports every 15 seconds.

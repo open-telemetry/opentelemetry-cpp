@@ -124,18 +124,16 @@ namespace
     do_example(aggregator, collection, record, exporter);
   }
 }
-int main()
+int main(int argc, char** argv)
 {
+  std::string agg(argv[1]);
+
   std::string address = "localhost:8080";
   prom_exp::PrometheusExporter exporter{address};
 
   std::cout << "Prometheus Exporter example program running on " << address << "...\n";
-  std::cout << "Choose an aggregator example: {counter, gauge, mmsc, histogram, exact, sketch}\n";
-
-  std::string agg;
-  std::cin >> agg;
-
   std::cout << "Running " << agg << " example program...\n";
+  
   if (agg == "counter")
   {
     counter_example(exporter);
