@@ -3,6 +3,7 @@
 #include "opentelemetry/nostd/unique_ptr.h"
 
 #include <iostream>
+#include <memory>
 
 namespace nostd   = opentelemetry::nostd;
 namespace common  = opentelemetry::common;
@@ -51,13 +52,14 @@ public:
 
   bool IsRecording() const noexcept override { return true; }
 
-  Tracer &tracer() const noexcept override { return *tracer_; }
+  trace::SpanContext GetContext() const noexcept override { return span_context_; }
 
   void SetToken(nostd::unique_ptr<context::Token> &&token) noexcept override {}
 
 private:
   std::shared_ptr<Tracer> tracer_;
   std::string name_;
+  trace::SpanContext span_context_;
 };
 }  // namespace
 

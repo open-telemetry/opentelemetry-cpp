@@ -40,6 +40,33 @@ elif [[ "$1" == "cmake.exporter.otprotocol.test" ]]; then
   make
   make test
   exit 0
+elif [[ "$1" == "cmake.exporter.prometheus.test" ]]; then
+#  export DEBIAN_FRONTEND=noninteractive
+#  apt-get update
+#  apt-get install sudo
+#  apt-get install zlib1g-dev
+#  apt-get -y install libcurl4-openssl-dev
+  cd third_party
+  git clone https://github.com/jupp0r/prometheus-cpp
+  cd prometheus-cpp
+  git checkout v0.9.0
+  git submodule init
+  git submodule update
+  mkdir _build && cd _build
+  cmake .. -DBUILD_SHARED_LIBS=ON
+  make -j 4
+  sudo make install
+
+  cd "${BUILD_DIR}"
+  rm -rf *
+
+  cmake -DCMAKE_BUILD_TYPE=Debug  \
+        -DWITH_PROMETHEUS=ON \
+        -DCMAKE_CXX_FLAGS="-Werror" \
+        "${SRC_DIR}"
+  make
+  make test
+  exit 0
 elif [[ "$1" == "cmake.test_example_plugin" ]]; then
   # Build the plugin
   cd "${BUILD_DIR}"
@@ -79,12 +106,16 @@ elif [[ "$1" == "bazel.test" ]]; then
   bazel test $BAZEL_TEST_OPTIONS //...
   exit 0
 elif [[ "$1" == "bazel.legacy.test" ]]; then
-  bazel build $BAZEL_OPTIONS -- //... -//exporters/otlp/...
-  bazel test $BAZEL_TEST_OPTIONS -- //... -//exporters/otlp/...
+  # we uses C++ future and async() function to test the Prometheus Exporter functionality,
+  # that make this test always fail. ignore Prometheus exporter here.
+  bazel build $BAZEL_OPTIONS -- //... -//exporters/otlp/... -//exporters/prometheus/...
+  bazel test $BAZEL_TEST_OPTIONS -- //... -//exporters/otlp/... -//exporters/prometheus/...
   exit 0
 elif [[ "$1" == "bazel.noexcept" ]]; then
-  bazel build --copt=-fno-exceptions $BAZEL_OPTIONS //...
-  bazel test --copt=-fno-exceptions $BAZEL_TEST_OPTIONS //...
+  # there are some exceptions and error handling code from the Prometheus Client
+  # that make this test always fail. ignore Prometheus exporter in the noexcept here.
+  bazel build --copt=-fno-exceptions $BAZEL_OPTIONS -- //... -//exporters/prometheus/...
+  bazel test --copt=-fno-exceptions $BAZEL_TEST_OPTIONS -- //... -//exporters/prometheus/...
   exit 0
 elif [[ "$1" == "bazel.asan" ]]; then
   bazel test --config=asan $BAZEL_TEST_OPTIONS //...

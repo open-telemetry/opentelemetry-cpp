@@ -1,7 +1,5 @@
 #include "opentelemetry/sdk/metrics/ungrouped_processor.h"
 
-#define UNGROUPED_PROCESSOR_STRINGER(x) (#x)
-
 OPENTELEMETRY_BEGIN_NAMESPACE
 
 namespace sdk
@@ -25,22 +23,9 @@ std::vector<sdkmetrics::Record> UngroupedMetricsProcessor::CheckpointSelf() noex
 
   for (auto iter : batch_map_)
   {
-    /**
-     * TODO: micro-optimization, scan once or change to using a struct with custom hash function,
-     * to hold the data.
-     */
-
-    std::string key               = iter.first;
-    std::size_t description_index = key.find("/description/");
-    std::size_t labels_index      = key.find("/labels/");
-    std::size_t instrument_index  = key.find("/instrument/");
-
-    std::string name = key.substr(6, description_index - 6);
-    std::string description =
-        key.substr(description_index + 13, labels_index - description_index - 13);
-    std::string labels = key.substr(labels_index + 8, instrument_index - labels_index - 8);
-
-    sdkmetrics::Record r{name, description, labels, iter.second};
+    // Create a record from the held KeyStruct values and add to the Checkpoint
+    KeyStruct key = iter.first;
+    sdkmetrics::Record r{key.name, key.description, key.labels, iter.second};
 
     metric_records.push_back(r);
   }
@@ -66,10 +51,8 @@ void UngroupedMetricsProcessor::process(sdkmetrics::Record record) noexcept
   std::string label       = record.GetLabels();
   std::string name        = record.GetName();
   std::string description = record.GetDescription();
-  std::string instrument  = UNGROUPED_PROCESSOR_STRINGER(get_instrument(aggregator));
 
-  std::string batch_key = "/name/" + name + "/description/" + description + "/labels/" + label +
-                          "/instrument/" + instrument;
+  KeyStruct batch_key = KeyStruct(name, description, label, get_instrument(aggregator));
 
   /**
    * If we have already seen this aggregator then we will merge it with the copy that exists in the
@@ -178,5 +161,3 @@ void UngroupedMetricsProcessor::process(sdkmetrics::Record record) noexcept
 }  // namespace sdk
 
 OPENTELEMETRY_END_NAMESPACE
-
-#undef UNGROUPED_PROCESSOR_STRINGER
