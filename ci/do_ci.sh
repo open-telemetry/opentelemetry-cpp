@@ -93,7 +93,7 @@ elif [[ "$1" == "cmake.exporter.prometheus.test" ]]; then
   cd third_party
   git clone https://github.com/jupp0r/prometheus-cpp
   cd prometheus-cpp
-  git checkout v0.9.0
+  # git checkout v0.9.0
   git submodule init
   git submodule update
   mkdir _build && cd _build
