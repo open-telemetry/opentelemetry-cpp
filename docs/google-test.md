@@ -2,7 +2,7 @@
 
 ## Introduction
 
-[Google Test](https://github.com/google/googletest) is a unit testing framework for C++ programming developed by Google. It is currently being used for unit testing in the [Open Telemetry CPP](https://github.com/open-telemetry/opentelemetry-cpp) repo, along with tools like [codecov.io](http://codecov.io/) to thoroughly test the code in the repository. A primer for using Google Test can be found [here](https://github.com/google/googletest/blob/master/googletest/docs/primer.md).
+[Google Test](https://github.com/google/googletest) is a unit testing framework for CPP programming developed by Google. It is currently being used for unit testing in the [Open Telemetry CPP](https://github.com/open-telemetry/opentelemetry-cpp) repo, along with tools like [codecov.io](http://codecov.io/) to thoroughly test the code in the repository. A primer for using Google Test can be found [here](https://github.com/google/googletest/blob/master/googletest/docs/primer.md).
 
 ## Features
 
@@ -10,13 +10,11 @@ Google Test provides a vast set of tools to be used for unit testing. The two mo
 
 ### Assertions
 
-Google Test allows a developer to write test cases that use assertions to verify code behavior. An assertion can result in either a success, nonfatal failure, or fatal failure. A success occurs when the assertion holds true. A nonfatal failure does not abort the current function when an assertion fails, and a fatal failure does. 
-
-Assertions using the syntax `ASSERT_*`  will generate a fatal failure when they fail, and assertions using the syntax `EXPECT_*` will generate a nonfatal failure when they fail. These two types of assertions come in pairs; for example, `ASSERT_TRUE` and `ASSERT_EQ` have a corresponding `EXPECT_TRUE` and `EXPECT_EQ` to match. Refer to the [primer](https://github.com/google/googletest/blob/master/googletest/docs/primer.md) for more details on `ASSERT_*` and  `EXPECT_*` statements.
+Google Test allows a developer to write test cases that use assertions to verify code behavior. Refer to the [assertions](https://github.com/google/googletest/blob/master/googletest/docs/primer.md#assertions) section in the primer for more details.
 
 ### Tests
 
-To create a test, use the `TEST()` macro to define a test function. This is similar to a normal C++ function that returns no value. Googletest assertions are used inside the test function, and the result of the test is determined by the assertions used inside the test function. If any assertion fails (can be either fatal or nonfatal), then the test fails; if all assertions pass, the test succeeds. A sample test function is outlined below.
+To create a test, use the `TEST()` macro to define a test function. This is similar to a normal CPP function that returns no value. Googletest assertions are used inside the test function, and the result of the test is determined by the assertions used inside the test function. If any assertion fails (can be either fatal or nonfatal), then the test fails; if all assertions pass, the test succeeds. A sample test function is outlined below.
 
 ```C++
 TEST(TestSuiteName, TestName) {
