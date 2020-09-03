@@ -2,7 +2,7 @@
 
 ## Introduction
 
-[Google Test](https://github.com/google/googletest) is a unit testing framework for CPP programming developed by Google. It is currently being used for unit testing in the [Open Telemetry CPP](https://github.com/open-telemetry/opentelemetry-cpp) repo, along with tools like [codecov.io](http://codecov.io/) to thoroughly test the code in the repository. A primer for using Google Test can be found [here](https://github.com/google/googletest/blob/master/googletest/docs/primer.md).
+[Google Test](https://github.com/google/googletest) is a unit testing framework for C++ programming developed by Google. It is currently being used for unit testing in the [OpenTelemetry C++](https://github.com/open-telemetry/opentelemetry-cpp) repo, along with tools like [codecov.io](http://codecov.io/) to thoroughly test the code in the repository. A primer for using Google Test can be found [here](https://github.com/google/googletest/blob/master/googletest/docs/primer.md).
 
 ## Features
 
@@ -14,7 +14,7 @@ Google Test allows a developer to write test cases that use assertions to verify
 
 ### Tests
 
-To create a test, use the `TEST()` macro to define a test function. This is similar to a normal CPP function that returns no value. Googletest assertions are used inside the test function, and the result of the test is determined by the assertions used inside the test function. If any assertion fails (can be either fatal or nonfatal), then the test fails; if all assertions pass, the test succeeds. A sample test function is outlined below.
+To create a test, use the `TEST()` macro to define a test function. This is similar to a normal C++ function that returns no value. Googletest assertions are used inside the test function, and the result of the test is determined by the assertions used inside the test function. If any assertion fails (can be either fatal or nonfatal), then the test fails; if all assertions pass, the test succeeds. A sample test function is outlined below.
 
 ```C++
 TEST(TestSuiteName, TestName) {
@@ -24,7 +24,7 @@ TEST(TestSuiteName, TestName) {
 }
 ```
 
-A [sample unit test](https://github.com/open-telemetry/opentelemetry-cpp/blob/master/sdk/test/trace/tracer_provider_test.cc) from the OTel CPP repo, testing the `GetTracer()` method in the `TracerProvider` class, is shown below.
+A [sample unit test](https://github.com/open-telemetry/opentelemetry-cpp/blob/master/sdk/test/trace/tracer_provider_test.cc) from the OTel C++ repo, testing the `GetTracer()` method in the `TracerProvider` class, is shown below.
 
 ![SampleUnitTest](./images/SampleUnitTest.png)
 
@@ -40,7 +40,7 @@ One of the base requirements to build and use Google Test from a source package 
 
 First, to install bazel, refer to the instructions [here](https://docs.bazel.build/versions/3.3.0/install.html), and for an example build using bazel, refer to the tutorial [here](https://docs.bazel.build/versions/3.3.0/tutorial/cpp.html).
 
-Bazel makes use of a `BUILD` file, which gives instructions to bazel on how to build the project. The file contains targets that point to a set of source files and dependencies. Along with a `BUILD` file, a `WORKSPACE` file exists that identifies the directory it resides in as a bazel workspace. In the OTel CPP repository, the SDK unit tests using the Google Test framework to ensure code functionality. In the [BUILD](https://github.com/open-telemetry/opentelemetry-cpp/tree/master/sdk/test/trace) file for trace tests, there are six different targets, each corresponding to a different unit test. An example target taken from this file is shown below.
+Bazel makes use of a `BUILD` file, which gives instructions to bazel on how to build the project. The file contains targets that point to a set of source files and dependencies. Along with a `BUILD` file, a `WORKSPACE` file exists that identifies the directory it resides in as a bazel workspace. In the OTel C++ repository, the SDK unit tests using the Google Test framework to ensure code functionality. In the [BUILD](https://github.com/open-telemetry/opentelemetry-cpp/tree/master/sdk/test/trace) file for trace tests, there are six different targets, each corresponding to a different unit test. An example target taken from this file is shown below.
 
 ![SampleTarget](./images/SampleTarget.png)
 
@@ -93,7 +93,7 @@ This will install Google Test for you; you can delete the source code after runn
 Next, follow the instructions [here](https://github.com/google/benchmark#installation) to download Google Benchmark. The section following this one will detail performance benchmarking using Google Benchmark.
 
 
-CMake makes use of a `CMakeLists.txt` file that provides instructions for a project’s source files and targets. There is a main `CMakeLists.txt` file in the root of the project directory, and a `CMakeLists.txt` for each subdirectory. In the main `CMakeLists.txt` file, the `cmake_minimum_required`  and `CMAKE_CXX_STANDARD` are set, the project name is set with `project()`, directories are included and subdirectories added, and much more. However, more importantly, in the context of Google Test within the OTel CPP repo, the `CMakeLists.txt` to look at is the one located in the directory your tests are being written in; for this example, it’s `opentelemetry-cpp/sdk/test/trace`. This [CMakeLists.txt](https://github.com/open-telemetry/opentelemetry-cpp/blob/master/sdk/test/trace/CMakeLists.txt) file, shown below, describes the names of the tests to be added as executables.
+CMake makes use of a `CMakeLists.txt` file that provides instructions for a project’s source files and targets. There is a main `CMakeLists.txt` file in the root of the project directory, and a `CMakeLists.txt` for each subdirectory. In the main `CMakeLists.txt` file, the `cmake_minimum_required`  and `CMAKE_CXX_STANDARD` are set, the project name is set with `project()`, directories are included and subdirectories added, and much more. However, more importantly, in the context of Google Test within the OTel C++ repo, the `CMakeLists.txt` to look at is the one located in the directory your tests are being written in; for this example, it’s `opentelemetry-cpp/sdk/test/trace`. This [CMakeLists.txt](https://github.com/open-telemetry/opentelemetry-cpp/blob/master/sdk/test/trace/CMakeLists.txt) file, shown below, describes the names of the tests to be added as executables.
 
 ![CMakeExample](./images/CMakeExample.png)
 
