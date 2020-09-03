@@ -35,7 +35,7 @@ TEST(ApiSdkConversion, async)
 
   alpha->observe(123456, labelkv);
   EXPECT_EQ(dynamic_cast<AsynchronousInstrument<int> *>(alpha.get())->GetRecords()[0].GetLabels(),
-            "{\"key587\":\"value264\"}");
+            "{key587:value264}");
 
   alpha->observe(123456, labelkv);
   AggregatorVariant canCollect =
@@ -248,6 +248,7 @@ TEST(Counter, getAggsandnewupdate)
 
   auto labelkv = trace::KeyValueIterableView<decltype(labels)>{labels};
   auto beta    = alpha.bindCounter(labelkv);
+  beta->add(1);
   beta->unbind();
 
   EXPECT_EQ(alpha.boundInstruments_[KvToString(labelkv)]->get_ref(), 0);
@@ -257,7 +258,7 @@ TEST(Counter, getAggsandnewupdate)
   EXPECT_EQ(theta.size(), 1);
   EXPECT_EQ(theta[0].GetName(), "test");
   EXPECT_EQ(theta[0].GetDescription(), "none");
-  EXPECT_EQ(theta[0].GetLabels(), "{\"key2\":\"value2\",\"key3\":\"value3\"}");
+  EXPECT_EQ(theta[0].GetLabels(), "{key2:value2,key3:value3}");
 }
 
 void CounterCallback(std::shared_ptr<Counter<int>> in,
@@ -435,7 +436,34 @@ TEST(IntValueRecorder, StressRecord)
       125);  // count
 }
 
+TEST(Instruments, NoUpdateNoRecord)
+{
+  // This test verifies that instruments that have received no updates
+  // in the last collection period are not made into records for export.
+
+  Counter<int> alpha("alpha", "no description", "unitless", true);
+
+  std::map<std::string, std::string> labels = {{"key", "value"}};
+
+  auto labelkv = trace::KeyValueIterableView<decltype(labels)>{labels};
+
+  EXPECT_EQ(alpha.GetRecords().size(), 0);
+  alpha.add(1, labelkv);
+  EXPECT_EQ(alpha.GetRecords().size(), 1);
+
+  UpDownCounter<int> beta("beta", "no description", "unitless", true);
+
+  EXPECT_EQ(beta.GetRecords().size(), 0);
+  beta.add(1, labelkv);
+  EXPECT_EQ(beta.GetRecords().size(), 1);
+
+  ValueRecorder<int> gamma("gamma", "no description", "unitless", true);
+
+  EXPECT_EQ(gamma.GetRecords().size(), 0);
+  gamma.record(1, labelkv);
+  EXPECT_EQ(gamma.GetRecords().size(), 1);
+}
+
 }  // namespace metrics
 }  // namespace sdk
-
 OPENTELEMETRY_END_NAMESPACE
