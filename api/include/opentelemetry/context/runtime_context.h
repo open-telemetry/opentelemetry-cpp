@@ -1,72 +1,38 @@
 #pragma once
 
-#include "opentelemetry/context/context.h"
+#include "opentelemetry/context/iruntime_context.h"
+#include "opentelemetry/context/threadlocal_context.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace context
 {
-// The Token object provides is returned when attaching objects to the
-// RuntimeContext object and is associated with a context object, and
-// can be provided to the RuntimeContext Detach method to remove the
-// associated context from the RuntimeContext.
-class Token
-{
-public:
-  bool operator==(const Context &other) noexcept { return context_ == other; }
-
-private:
-  friend class RuntimeContext;
-
-  // The ContextDetacher object automatically attempts to detach
-  // the Token when all copies of the Token are out of scope.
-  class ContextDetacher
-  {
-  public:
-    ContextDetacher(Context context) : context_(context) {}
-
-    ~ContextDetacher();
-
-  private:
-    Context context_;
-  };
-
-  Token() noexcept = default;
-
-  // A constructor that sets the token's Context object to the
-  // one that was passed in.
-  Token(Context context)
-  {
-    context_ = context;
-
-    detacher_ = nostd::shared_ptr<ContextDetacher>(new ContextDetacher(context_));
-  };
-
-  Context context_;
-  nostd::shared_ptr<ContextDetacher> detacher_;
-};
 
 // Provides a wrapper for propagating the context object globally. In order
 // to use either the threadlocal_context.h file must be included or another
 // implementation which must be derived from the RuntimeContext can be
 // provided.
-class RuntimeContext
+class RuntimeContext: public IRuntimeContext
 {
 public:
   // Return the current context.
-  static Context GetCurrent() noexcept { return context_handler_->InternalGetCurrent(); }
+  static Context GetCurrent() noexcept { return ContextHandler()->InternalGetCurrent(); }
 
   // Sets the current 'Context' object. Returns a token
   // that can be used to reset to the previous Context.
   static Token Attach(Context context) noexcept
   {
-    return context_handler_->InternalAttach(context);
+    return ContextHandler()->InternalAttach(context);
   }
 
   // Resets the context to a previous value stored in the
   // passed in token. Returns true if successful, false otherwise
-  static bool Detach(Token &token) noexcept { return context_handler_->InternalDetach(token); }
+  static bool Detach(Token &token) noexcept { return ContextHandler()->InternalDetach(token); }
 
-  static RuntimeContext *context_handler_;
+  static inline IRuntimeContext* ContextHandler(IRuntimeContext* context_handler = nullptr)
+  {
+    static IRuntimeContext* context_handler_ = (context_handler!=nullptr)?context_handler:new ThreadLocalContext();
+    return context_handler_;
+  };
 
   // Sets the Key and Value into the passed in context or if a context is not
   // passed in, the RuntimeContext.

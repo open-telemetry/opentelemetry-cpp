@@ -1,7 +1,7 @@
 #pragma once
 
 #include "opentelemetry/context/context.h"
-#include "opentelemetry/context/runtime_context.h"
+#include "opentelemetry/context/iruntime_context.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace context
@@ -11,7 +11,7 @@ namespace context
 // provides a wrapper for propagating context through cpp thread locally.
 // This file must be included to use the RuntimeContext class if another
 // implementation has not been registered.
-class ThreadLocalContext : public RuntimeContext
+class ThreadLocalContext : public IRuntimeContext
 {
 public:
   ThreadLocalContext() noexcept = default;
@@ -51,11 +51,11 @@ private:
     // Pops the top Context off the stack and returns it.
     Context Pop() noexcept
     {
-      if (size_ <= 0)
+      if (size_ == 0)
       {
         return Context();
       }
-      int index = size_ - 1;
+      size_t index = size_ - 1;
       size_--;
       return base_[index];
     }
@@ -83,9 +83,10 @@ private:
     }
 
     // Reallocates the storage array to the pass in new capacity size.
-    void Resize(int new_capacity) noexcept
+    void Resize(size_t new_capacity) noexcept
     {
-      int old_size = size_ - 1;
+      size_t old_size = size_ - 1;
+      // ... :-/ ?
       if (new_capacity == 0)
       {
         new_capacity = 2;
@@ -93,7 +94,10 @@ private:
       Context *temp = new Context[new_capacity];
       if (base_ != nullptr)
       {
-        std::copy(base_, base_ + old_size, temp);
+        for (size_t i=0; (i<old_size)&&(i<new_capacity); i++)
+        {
+          temp[i] = base_[i];
+        }
         delete[] base_;
       }
       base_ = temp;
@@ -108,9 +112,6 @@ private:
 
   static thread_local Stack stack_;
 };
-thread_local ThreadLocalContext::Stack ThreadLocalContext::stack_ = ThreadLocalContext::Stack();
 
-// Registers the ThreadLocalContext as the context handler for the RuntimeContext
-RuntimeContext *RuntimeContext::context_handler_ = new ThreadLocalContext();
 }  // namespace context
 OPENTELEMETRY_END_NAMESPACE

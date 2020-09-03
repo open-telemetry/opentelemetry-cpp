@@ -1,10 +1,21 @@
 if(VCPKG_CMAKE_SYSTEM_NAME STREQUAL "WindowsStore")
-    message(FATAL_ERROR "${PORT} does not currently support UWP")
+  message(FATAL_ERROR "${PORT} does not currently support UWP")
 endif()
 
-# Make sure vs2019 compiled binaries are compat with vs2017
-set(VCPKG_CXX_FLAGS "/Zc:__cplusplus /d2FH4-")
-set(VCPKG_C_FLAGS "/Zc:__cplusplus /d2FH4-")
+if (VCPKG_PLATFORM_TOOLSET STREQUAL "v140")
+  # set(CMAKE_C_COMPILER_WORKS 1)
+  # set(CMAKE_CXX_COMPILER_WORKS 1)
+  set(CMAKE_C_COMPILER cl.exe)
+  set(CMAKE_CXX_COMPILER cl.exe)
+  set(MSVC_TOOLSET_VERSION 140)
+  # set(VCPKG_VISUAL_STUDIO_PATH "C:\\Program Files (x86)\\Microsoft Visual Studio 14.0")
+  # set(VCPKG_PLATFORM_TOOLSET v140)
+else()
+  # Make sure vs2019 compiled binaries are compat with vs2017
+  set(VCPKG_CXX_FLAGS "/Zc:__cplusplus /d2FH4-")
+  set(VCPKG_C_FLAGS "/Zc:__cplusplus /d2FH4-")
+  set(PREFER PREFER_NINJA)
+endif()
 
 include(vcpkg_common_functions)
 
@@ -13,14 +24,12 @@ vcpkg_check_linkage(ONLY_STATIC_LIBRARY)
 vcpkg_from_github(
     OUT_SOURCE_PATH SOURCE_PATH
     REPO google/benchmark
-    REF v1.5.0
-    SHA512 a0df9aa3d03f676e302c76d83b436de36eea0a8517ab50a8f5a11c74ccc68a1f5128fa02474901002d8e6b5a4d290ef0272a798ff4670eab3e2d78dc86bb6cd3
     HEAD_REF master
 )
 
 vcpkg_configure_cmake(
     SOURCE_PATH ${SOURCE_PATH}
-    PREFER_NINJA
+    ${PREFER}
     OPTIONS
         -DBENCHMARK_ENABLE_TESTING=OFF
         -DCMAKE_DEBUG_POSTFIX=d

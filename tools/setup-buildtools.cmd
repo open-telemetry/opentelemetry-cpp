@@ -40,10 +40,11 @@ if ERRORLEVEL 1 (
 )
 
 REM Install it
-vcpkg integrate install
 vcpkg install gtest:x64-windows
-vcpkg install --overlay-ports=%~dp0\ports benchmark:x64-windows
+vcpkg install --head --overlay-ports=%~dp0\ports benchmark:x64-windows
 vcpkg install ms-gsl:x64-windows
 vcpkg install nlohmann-json:x64-windows
+vcpkg install abseil:x64-windows
+vcpkg integrate install
 popd
 exit /b 0

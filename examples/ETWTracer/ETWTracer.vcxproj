@@ -25,6 +25,7 @@
     <RootNamespace>exampleevent</RootNamespace>
     <OpenTelemetrySDKPath>$(MSBuildProjectDirectory)\..\..\</OpenTelemetrySDKPath>
     <ProjectName>ETWTracer</ProjectName>
+    <WindowsTargetPlatformVersion>8.1</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
@@ -81,11 +82,11 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
-    <IncludePath>$(ProjectDir);$(OpenTelemetrySDKPath)\exporters\etw;$(OpenTelemetrySDKPath)\api\include;$(OpenTelemetrySDKPath)\sdk;$(OpenTelemetrySDKPath)\sdk\include;$(OpenTelemetrySDKPath)\third_party\ms-gsl\include;$(IncludePath)</IncludePath>
+    <IncludePath>$(ProjectDir);$(OpenTelemetrySDKPath)\tools\vcpkg\installed\x64-windows\include;$(OpenTelemetrySDKPath)\exporters\etw;$(OpenTelemetrySDKPath)\api\include;$(OpenTelemetrySDKPath)\sdk;$(OpenTelemetrySDKPath)\sdk\include;$(OpenTelemetrySDKPath)\third_party\ms-gsl\include;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LinkIncremental>false</LinkIncremental>
-    <IncludePath>$(ProjectDir);$(OpenTelemetrySDKPath)\exporters\etw;$(OpenTelemetrySDKPath)\api\include;$(OpenTelemetrySDKPath)\sdk;$(OpenTelemetrySDKPath)\sdk\include;$(OpenTelemetrySDKPath)\third_party\ms-gsl\include;$(IncludePath)</IncludePath>
+    <IncludePath>$(ProjectDir);$(OpenTelemetrySDKPath)\tools\vcpkg\installed\x64-windows\include;$(OpenTelemetrySDKPath)\exporters\etw;$(OpenTelemetrySDKPath)\api\include;$(OpenTelemetrySDKPath)\sdk;$(OpenTelemetrySDKPath)\sdk\include;$(OpenTelemetrySDKPath)\third_party\ms-gsl\include;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
@@ -129,7 +130,7 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>HAVE_STD_STRING;HAVE_GSL;_CRT_SECURE_NO_WARNINGS;NOMINMAX;_SILENCE_CXX17_CODECVT_HEADER_DEPRECATION_WARNING;WIN32;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>HAVE_ABSEIL;HAVE_STD_STRING;HAVE_GSL;_CRT_SECURE_NO_WARNINGS;NOMINMAX;_SILENCE_CXX17_CODECVT_HEADER_DEPRECATION_WARNING;WIN32;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>
       </LanguageStandard>
@@ -150,7 +151,7 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>HAVE_STD_STRING;HAVE_GSL;_CRT_SECURE_NO_WARNINGS;NOMINMAX;_SILENCE_CXX17_CODECVT_HEADER_DEPRECATION_WARNING;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>HAVE_ABSEIL;HAVE_STD_STRING;HAVE_GSL;_CRT_SECURE_NO_WARNINGS;NOMINMAX;_SILENCE_CXX17_CODECVT_HEADER_DEPRECATION_WARNING;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>
       </LanguageStandard>

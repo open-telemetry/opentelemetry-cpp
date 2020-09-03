@@ -8,11 +8,11 @@ if(BUILD_TESTING)
   add_executable(ostream_span_test test/ostream_span_test.cc)
 
   target_link_libraries(
-    ostream_span_test ${GTEST_BOTH_LIBRARIES} ${CMAKE_THREAD_LIBS_INIT}
+    ostream_span_test ${GTEST_BOTH_LIBRARIES} ${CMAKE_THREAD_LIBS_INIT} ${CORE_RUNTIME_LIBS}
     opentelemetry_exporter_ostream_span)
 
   target_link_libraries(
-    ostream_metrics_test ${GTEST_BOTH_LIBRARIES} ${CMAKE_THREAD_LIBS_INIT}
+    ostream_metrics_test ${GTEST_BOTH_LIBRARIES} ${CMAKE_THREAD_LIBS_INIT} ${CORE_RUNTIME_LIBS}
     opentelemetry_exporter_ostream_metrics)
 
   gtest_add_tests(TARGET ostream_metrics_test TEST_PREFIX exporter. TEST_LIST

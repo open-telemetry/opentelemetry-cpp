@@ -42,16 +42,18 @@ set "PATH=%PATH%;C:\Program Files\CMake\bin\"
 REM ********************************************************************
 REM Build with nostd implementation
 REM ********************************************************************
-set CONFIG=-DWITH_STL:BOOL=OFF
+set CONFIG=-DWITH_STL:BOOL=OFF %*
 set "OUTDIR=%ROOT%\out\%VS_TOOLS_VERSION%\nostd"
 call :build_config
 
 REM ********************************************************************
-REM Build with STL implementation
+REM Build with STL implementation - only for vs2017+
 REM ********************************************************************
-set CONFIG=-DWITH_STL:BOOL=ON
-set "OUTDIR=%ROOT%\out\%VS_TOOLS_VERSION%\stl"
-call :build_config
+if "%VS_TOOLS_VERSION%" neq "vs2015" (
+  set CONFIG=-DWITH_STL:BOOL=ON
+  set "OUTDIR=%ROOT%\out\%VS_TOOLS_VERSION%\stl"
+  call :build_config
+)
 
 popd
 REM ********************************************************************
@@ -68,5 +70,5 @@ REM Optional platform specification parameter below: -Ax64
 cmake %ROOT% -G "%CMAKE_GEN%" -DCMAKE_TOOLCHAIN_FILE="%VCPKG_CMAKE%" %CONFIG%
 set "SOLUTION=%OUTDIR%\opentelemetry-cpp.sln"
 REM TODO: allow building [Release|Debug]x[Win32|x64|ARM|ARM64]
-msbuild "%SOLUTION%" /p:Configuration=Release /p:Platform=x64
+msbuild "%SOLUTION%" /p:Configuration=Release /p:Platform=x64 /p:VcpkgEnabled=true
 exit /b 0

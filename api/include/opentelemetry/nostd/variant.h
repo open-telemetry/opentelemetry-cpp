@@ -7,8 +7,20 @@
 // (See accompanying file third_party/boost/LICENSE.md or copy at http://boost.org/LICENSE_1_0.txt)
 
 #pragma once
+
 #ifdef HAVE_CPP_STDLIB
 #include "opentelemetry/std/variant.h"
+#elif defined(HAVE_ABSEIL)
+#include "absl/types/variant.h"
+OPENTELEMETRY_BEGIN_NAMESPACE
+namespace nostd
+{
+using absl::variant;
+using absl::get;
+using absl::holds_alternative;
+using absl::visit;
+}  // namespace nostd
+OPENTELEMETRY_END_NAMESPACE
 #else
 #include <array>
 #include <exception>

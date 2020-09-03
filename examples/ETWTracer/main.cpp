@@ -20,7 +20,13 @@
 
 // Option below requires C++17 + msgsl ( https://github.com/microsoft/GSL ) or C++20-compatible compiler (latest Visual Studio 2019)
 // #define HAVE_CPP_STDLIB
+#define HAVE_ABSEIL
+
 #include "ETWTracer.hpp"
+
+#include <opentelemetry/nostd/variant.h>
+#include <opentelemetry/context/runtime_context.h>
+#include <opentelemetry/context/context.h>
 
 using namespace OPENTELEMETRY_NAMESPACE;
 

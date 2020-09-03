@@ -13,13 +13,13 @@
 
 #include <opentelemetry/nostd/variant.h>
 #include <opentelemetry/nostd/span.h>
+#include <opentelemetry/nostd/string_view.h>
 
 #include <cstdint>
 #include <cstdio>
 #include <cstdlib>
 
 #include <map>
-#include <string_view>
 
 #include "StreamTracer.hpp"
 
