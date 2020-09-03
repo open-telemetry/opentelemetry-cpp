@@ -49,8 +49,8 @@ void UpdateSpans(std::shared_ptr<TracezSpanProcessor> &processor,
  */
 bool ContainsNames(const std::vector<std::string> &names,
                    std::unordered_set<ThreadsafeSpanData *> &running,
-                   size_t name_start        = 0,
-                   size_t name_end          = 0,
+                   size_t name_start              = 0,
+                   size_t name_end                = 0,
                    bool one_to_one_correspondence = false)
 {
   if (name_end == 0)
@@ -97,8 +97,8 @@ bool ContainsNames(const std::vector<std::string> &names,
  */
 bool ContainsNames(const std::vector<std::string> &names,
                    std::vector<std::unique_ptr<ThreadsafeSpanData>> &completed,
-                   size_t name_start        = 0,
-                   size_t name_end          = 0,
+                   size_t name_start              = 0,
+                   size_t name_end                = 0,
                    bool one_to_one_correspondence = false)
 {
 

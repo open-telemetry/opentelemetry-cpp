@@ -4,8 +4,8 @@
 #include "opentelemetry/metrics/observer_result.h"
 #include "opentelemetry/metrics/sync_instruments.h"
 
-#include <memory>
 #include <array>
+#include <memory>
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 
