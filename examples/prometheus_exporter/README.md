@@ -34,11 +34,11 @@ counter, gauge, mmsc, histogram, exact, sketch
 ```
 
 Run with Bazel:
-```shell script
+```shell
 bazel build //examples/prometheus_exporter:prometheus_exporter_example
-bazel-bin/examples/prometheus_exporter/prometheus_exporter_example agg 
+bazel-bin/examples/prometheus_exporter/prometheus_exporter_example histogram
 ```
-`agg` is the command line argument to specify.
+The `histogram` command line argument is the argument `agg` to specify.
 
 For example, if we choose Histogram, this is what it would look like to build and execute the example:
 ```
