@@ -1,5 +1,6 @@
 #include "opentelemetry/trace/noop.h"
 #include "opentelemetry/core/timestamp.h"
+#include "opentelemetry/context/runtime_context.h"
 
 #include <map>
 #include <memory>
