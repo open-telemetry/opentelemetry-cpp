@@ -6,7 +6,7 @@
 
 ## Features
 
-Google Test provides a vast set of tools to be used for unit testing. The two most important are assertions and tests. 
+Google Test provides a vast set of tools to be used for unit testing. The two most important are assertions and tests.
 
 ### Assertions
 
@@ -68,11 +68,11 @@ TEST(TracerProvider, GetTracer)
 
 ### Test Coverage Reports
 
-Another feature that Google Test provides is test coverage reports; along with this, Google Test also allows us to easily integrate code coverage tools such as [codecov.io](http://codecov.io/) with the project. 
+Another feature that Google Test provides is test coverage reports; along with this, Google Test also allows us to easily integrate code coverage tools such as [codecov.io](http://codecov.io/) with the project.
 
 ## Integration and Usage
 
-One of the base requirements to build and use Google Test from a source package are to use either Bazel or CMake; the other is a C++11-standard-compliant compiler like GCC or Clang. 
+One of the base requirements to build and use Google Test from a source package are to use either Bazel or CMake; the other is a C++11-standard-compliant compiler like GCC or Clang.
 
 ### Bazel
 
@@ -96,7 +96,7 @@ cc_test(
 Integrating Google Tests with bazel is as simple as creating a target with:
 - name: The target name, aka the name of the binary to build
 - srcs: The source file containing the tests
-- deps: The dependencies of the build; here, `//sdk/src/trace` refers to the directory of the source code being tested, and `@com_google_googletest//:gtest_main` is the Google Test dependency. 
+- deps: The dependencies of the build; here, `//sdk/src/trace` refers to the directory of the source code being tested, and `@com_google_googletest//:gtest_main` is the Google Test dependency.
 
 
 Building and executing a unit test is also very simple. On terminal, navigate to the directory the WORKSPACE file resides in, and execute two commands:
@@ -247,13 +247,13 @@ void CreateRecordsAndCollect(benchmark::State &state) {
             opentelemetry::sdk::metrics::Record r{name, description, labels, aggregator};
             records.push_back(r);
         }
-        
+
         opentelemetry::exporter::prometheus::PrometheusCollector collector;
 
         collector.AddMetricData(records);
 
         collector.Collect();
-        
+
     }
 }
 BENCHMARK(CreateRecordsAndCollect);
@@ -275,4 +275,4 @@ CreateRecordsAndCollect      51989 ns        51821 ns        12438
 
 OTel also provides a bazel shortcut to build tests which can be seen [here](https://github.com/open-telemetry/opentelemetry-cpp/blob/573696f3fdc1fd85e24ac19860ae6f2345837a3e/bazel/otel_cc_benchmark.bzl). This not only creates a benchmark executable, but a “smoketest” which runs each benchmark for one iteration.
 
-We can use benchmarking to measure performance of exporting, data translation, and collecting. Additionally, creating benchmarks for each component will help us determine which areas of the pipeline can be optimized further. 
+We can use benchmarking to measure performance of exporting, data translation, and collecting. Additionally, creating benchmarks for each component will help us determine which areas of the pipeline can be optimized further.
