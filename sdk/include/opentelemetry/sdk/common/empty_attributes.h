@@ -1,6 +1,9 @@
 #include "opentelemetry/trace/key_value_iterable_view.h"
 
+#include <array>
 #include <map>
+#include <string>
+#include <utility>
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace sdk

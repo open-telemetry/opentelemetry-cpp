@@ -118,7 +118,12 @@ private:
 inline bool operator==(string_view lhs, string_view rhs) noexcept
 {
   return lhs.length() == rhs.length() &&
+#if _MSC_VER == 1900
+         // Avoid SCL error in Visual Studio 2015
+         (std::memcmp(lhs.data(), rhs.data(), lhs.length()) == 0);
+#else
          std::equal(lhs.data(), lhs.data() + lhs.length(), rhs.data());
+#endif
 }
 
 inline bool operator==(string_view lhs, const std::string &rhs) noexcept
@@ -172,3 +177,18 @@ inline std::ostream &operator<<(std::ostream &os, string_view s)
 }
 }  // namespace nostd
 OPENTELEMETRY_END_NAMESPACE
+
+namespace std {
+  template <>
+  struct hash<OPENTELEMETRY_NAMESPACE::nostd::string_view>
+  {
+    std::size_t operator()(const OPENTELEMETRY_NAMESPACE::nostd::string_view& k) const
+    {
+        // TODO: for C++17 that has native support for std::basic_string_view it would
+        // be more performance-efficient to provide a zero-copy hash.
+        auto s = std::string(k.data(), k.size());
+        return std::hash<std::string>{}(s);
+    }
+  };
+}
+#endif

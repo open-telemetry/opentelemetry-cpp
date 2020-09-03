@@ -3,6 +3,7 @@
 #include "opentelemetry/context/context_value.h"
 #include "opentelemetry/nostd/shared_ptr.h"
 #include "opentelemetry/nostd/string_view.h"
+#include <cstring>
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace context
@@ -65,7 +66,7 @@ public:
     {
       if (key.size() == data->key_length_)
       {
-        if (memcmp(key.data(), data->key_, data->key_length_) == 0)
+        if (std::memcmp(key.data(), data->key_, data->key_length_) == 0)
         {
           return data->value_;
         }
@@ -81,7 +82,7 @@ public:
     {
       if (key.size() == data->key_length_)
       {
-        if (memcmp(key.data(), data->key_, data->key_length_) == 0)
+        if (std::memcmp(key.data(), data->key_, data->key_length_) == 0)
         {
           return true;
         }

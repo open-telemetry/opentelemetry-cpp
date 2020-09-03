@@ -146,8 +146,8 @@ private:
 
   void printAttributes(std::unordered_map<std::string, sdktrace::SpanDataAttributeValue> map)
   {
-    int size = map.size();
-    int i    = 1;
+    size_t size = map.size();
+    size_t i    = 1;
     for (auto kv : map)
     {
       sout_ << kv.first << ": ";

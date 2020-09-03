@@ -51,8 +51,8 @@ protected:
 void VerifySpanCountsInTracezData(
     const std::string &span_name,
     const TracezData &aggregated_data,
-    unsigned int running_span_count,
-    unsigned int error_span_count,
+    size_t running_span_count,
+    size_t error_span_count,
     std::array<unsigned int, kLatencyBoundaries.size()> completed_span_count_per_latency_bucket)
 {
   // Asserts are needed to check the size of the container because they may need

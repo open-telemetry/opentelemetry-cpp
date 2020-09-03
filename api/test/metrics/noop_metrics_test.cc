@@ -5,6 +5,7 @@
 #include "opentelemetry/metrics/sync_instruments.h"
 
 #include <memory>
+#include <array>
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 

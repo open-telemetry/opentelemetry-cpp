@@ -102,8 +102,8 @@ static void RunSimulation(Buffer &buffer, int num_threads, int n) noexcept
 static void BM_BaselineBuffer(benchmark::State &state)
 {
   const size_t max_elements = 500;
-  auto num_threads          = state.range(0);
-  const int n               = N / num_threads;
+  const int num_threads     = static_cast<int>(state.range(0));
+  const int n               = static_cast<int>(N / num_threads);
   BaselineCircularBuffer<uint64_t> buffer{max_elements};
   for (auto _ : state)
   {
@@ -116,8 +116,8 @@ BENCHMARK(BM_BaselineBuffer)->Arg(1)->Arg(2)->Arg(4);
 static void BM_LockFreeBuffer(benchmark::State &state)
 {
   const size_t max_elements = 500;
-  auto num_threads          = state.range(0);
-  const int n               = N / num_threads;
+  const int num_threads     = static_cast<int>(state.range(0));
+  const int n               = static_cast<int>(N / num_threads);
   CircularBuffer<uint64_t> buffer{max_elements};
   for (auto _ : state)
   {

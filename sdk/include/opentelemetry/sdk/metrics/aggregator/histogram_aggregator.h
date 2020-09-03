@@ -64,7 +64,7 @@ public:
   {
     this->mu_.lock();
     this->updated_ = true;
-    int bucketID   = boundaries_.size();
+    size_t bucketID   = boundaries_.size();
     for (size_t i = 0; i < boundaries_.size(); i++)
     {
       if (val < boundaries_[i])  // concurrent read is thread-safe

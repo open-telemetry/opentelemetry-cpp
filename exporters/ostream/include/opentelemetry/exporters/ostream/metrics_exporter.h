@@ -1,6 +1,7 @@
 #pragma once
 
 #include <iostream>
+#include <string>
 #include "opentelemetry/sdk/metrics/aggregator/exact_aggregator.h"
 #include "opentelemetry/sdk/metrics/aggregator/gauge_aggregator.h"
 #include "opentelemetry/sdk/metrics/aggregator/histogram_aggregator.h"
@@ -83,7 +84,7 @@ private:
         else
         {
           auto vec = agg->get_checkpoint();
-          int size = vec.size();
+          size_t size = vec.size();
           int i    = 1;
 
           sout_ << "\n  values      : " << '[';
@@ -104,8 +105,8 @@ private:
         auto boundaries = agg->get_boundaries();
         auto counts     = agg->get_counts();
 
-        int boundaries_size = boundaries.size();
-        int counts_size     = counts.size();
+        size_t boundaries_size = boundaries.size();
+        size_t counts_size     = counts.size();
 
         sout_ << "\n  buckets     : " << '[';
 
@@ -134,8 +135,8 @@ private:
         auto boundaries = agg->get_boundaries();
         auto counts     = agg->get_counts();
 
-        int boundaries_size = boundaries.size();
-        int counts_size     = counts.size();
+        size_t boundaries_size = boundaries.size();
+        size_t counts_size     = counts.size();
 
         sout_ << "\n  buckets     : " << '[';
 
