@@ -9,6 +9,7 @@
 #include "opentelemetry/nostd/unique_ptr.h"
 #include "opentelemetry/trace/canonical_code.h"
 #include "opentelemetry/trace/key_value_iterable_view.h"
+#include "opentelemetry/trace/span_context.h"
 #include "opentelemetry/version.h"
 
 constexpr char SpanKey[] = "span_key";
@@ -156,14 +157,11 @@ public:
    */
   virtual void End(const EndSpanOptions &options = {}) noexcept = 0;
 
-  // TODO
-  // SpanContext context() const noexcept = 0;
+  virtual trace::SpanContext GetContext() const noexcept = 0;
 
   // Returns true if this Span is recording tracing events (e.g. SetAttribute,
   // AddEvent).
   virtual bool IsRecording() const noexcept = 0;
-
-  virtual Tracer &tracer() const noexcept = 0;
 
   virtual void SetToken(nostd::unique_ptr<context::Token> &&token) noexcept = 0;
 };

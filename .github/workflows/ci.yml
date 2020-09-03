@@ -18,6 +18,8 @@ jobs:
         sudo ./ci/setup_ci_environment.sh
     - name: run tests
       run: ./ci/do_ci.sh cmake.test
+    - name: run prometheus exporter tests
+      run: ./ci/do_ci.sh cmake.exporter.prometheus.test
 
   cmake_test_cxx20:
     name: CMake C++20 test
