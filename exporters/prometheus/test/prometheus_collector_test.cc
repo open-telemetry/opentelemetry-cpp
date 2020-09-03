@@ -46,41 +46,35 @@ std::shared_ptr<metric_sdk::Aggregator<T>> CreateAgg(metric_sdk::AggregatorKind 
   std::shared_ptr<metric_sdk::Aggregator<T>> aggregator;
   switch (kind)
   {
-    case metric_sdk::AggregatorKind::Counter:
-    {
+    case metric_sdk::AggregatorKind::Counter: {
       aggregator = std::shared_ptr<metric_sdk::Aggregator<T>>(
           new metric_sdk::CounterAggregator<T>(opentelemetry::metrics::InstrumentKind::Counter));
       break;
     }
-    case metric_sdk::AggregatorKind::MinMaxSumCount:
-    {
+    case metric_sdk::AggregatorKind::MinMaxSumCount: {
       aggregator =
           std::shared_ptr<metric_sdk::Aggregator<T>>(new metric_sdk::MinMaxSumCountAggregator<T>(
               opentelemetry::metrics::InstrumentKind::Counter));
       break;
     }
-    case metric_sdk::AggregatorKind::Gauge:
-    {
+    case metric_sdk::AggregatorKind::Gauge: {
       aggregator = std::shared_ptr<metric_sdk::Aggregator<T>>(
           new metric_sdk::GaugeAggregator<T>(opentelemetry::metrics::InstrumentKind::Counter));
       break;
     }
-    case metric_sdk::AggregatorKind::Sketch:
-    {
+    case metric_sdk::AggregatorKind::Sketch: {
       aggregator = std::shared_ptr<metric_sdk::Aggregator<T>>(new metric_sdk::SketchAggregator<T>(
           opentelemetry::metrics::InstrumentKind::Counter, 0.000005));
       break;
     }
-    case metric_sdk::AggregatorKind::Histogram:
-    {
+    case metric_sdk::AggregatorKind::Histogram: {
       std::vector<double> boundaries{10, 20};
       aggregator =
           std::shared_ptr<metric_sdk::Aggregator<T>>(new metric_sdk::HistogramAggregator<T>(
               opentelemetry::metrics::InstrumentKind::Counter, boundaries));
       break;
     }
-    case metric_sdk::AggregatorKind::Exact:
-    {
+    case metric_sdk::AggregatorKind::Exact: {
       aggregator = std::shared_ptr<metric_sdk::Aggregator<T>>(new metric_sdk::ExactAggregator<T>(
           opentelemetry::metrics::InstrumentKind::Counter, exactMode));
       break;
