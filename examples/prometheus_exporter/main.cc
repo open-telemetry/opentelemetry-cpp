@@ -126,6 +126,11 @@ namespace
 }
 int main(int argc, char** argv)
 {
+  if(argc != 2) {
+    std::cout << "invalid number of command line arguments\n";
+    return 0;
+  }
+
   std::string agg(argv[1]);
 
   std::string address = "localhost:8080";
@@ -158,6 +163,11 @@ int main(int argc, char** argv)
   {
     sketch_example(exporter);
   }
+  else
+  {
+    std::cout << "invalid aggregator kind given\n";
+  }
+  
 
   return 0;
 }
