@@ -63,7 +63,7 @@ elif [[ "$1" == "cmake.exporter.prometheus.test" ]]; then
   cmake -DCMAKE_BUILD_TYPE=Debug  \
         -DWITH_PROMETHEUS=ON \
         -DCMAKE_CXX_FLAGS="-Werror" \
-        -DMAKE_EXE_LINKER_FLAGS="-lpthread" \
+        -DCMAKE_EXE_LINKER_FLAGS="-lpthread" \
         "${SRC_DIR}"
   make
   make test
