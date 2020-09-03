@@ -19,7 +19,10 @@
 
 #include <mutex>
 
-#include <opentelemetry/nostd/nostd.h>
+#include <opentelemetry/nostd/unique_ptr.h>
+#include <opentelemetry/nostd/shared_ptr.h>
+#include <opentelemetry/nostd/string_view.h>
+
 #include <opentelemetry/trace/key_value_iterable_view.h>
 #include <opentelemetry/trace/span.h>
 #include <opentelemetry/trace/span_id.h>
@@ -98,7 +101,7 @@ public:
   /// <param name="name">Span name</param>
   /// <param name="options">Span options</param>
   /// <returns>Span</returns>
-  virtual nostd::unique_ptr<trace::Span> StartSpan(
+  virtual nostd::shared_ptr<trace::Span> StartSpan(
       nostd::string_view name,
       const trace::KeyValueIterable & attributes,
       const trace::StartSpanOptions &options = {}) noexcept override
@@ -280,6 +283,13 @@ public:
     // TODO: signal this to owner
   }
 
+  virtual trace::SpanContext GetContext() const noexcept
+  {
+      // TODO: not implemented
+      static trace::SpanContext nullContext;
+      return nullContext;
+  }
+
   /// <summary>
   /// Check if Span is recording data
   /// </summary>
@@ -288,6 +298,12 @@ public:
   {
     // TODO: not implemented
     return true;
+  }
+
+  virtual void SetToken(nostd::unique_ptr<context::Token>&& token) noexcept
+  {
+    // TODO: not implemented
+    UNREFERENCED_PARAMETER(token);
   }
 
   /// <summary>

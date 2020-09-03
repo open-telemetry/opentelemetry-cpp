@@ -903,6 +903,7 @@ struct Property
       case TYPE_BOOLEAN:
         return common::AttributeValue(as_bool);
         break;
+#ifdef HAVE_SPAN_BYTE
       case TYPE_UUID: {
         // FIXME: this is super-hacky
         return common::AttributeValue(
@@ -911,6 +912,7 @@ struct Property
                 (uint8_t*)((void*)&as_uuid)+16));
         break;
       }
+#endif
       default:
         /* TODO: add collections */
         break;

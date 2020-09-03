@@ -22,7 +22,7 @@ using SpanDataAttributeValue = nostd::variant<bool,
                                               uint64_t,
                                               double,
                                               std::string,
-#if 0
+#ifdef HAVE_SPAN_BYTE
                                               std::vector<uint8_t>,
 #endif
                                               std::vector<bool>,
@@ -52,7 +52,7 @@ struct AttributeConverter
   {
     return SpanDataAttributeValue(std::string(s));
   }
-#if 0
+#ifdef HAVE_SPAN_BYTE
   SpanDataAttributeValue operator()(nostd::span<const uint8_t> v) { return convertSpan<uint8_t>(v); }
 #endif
   SpanDataAttributeValue operator()(nostd::span<const bool> v) { return convertSpan<bool>(v); }

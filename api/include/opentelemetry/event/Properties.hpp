@@ -22,7 +22,7 @@ static constexpr const char *defaultName = "unknown";
 /// </summary>
 class Properties : public trace::KeyValueIterable
 {
-  std::string name;
+  std::string name_;
   std::map<std::string, Property> m_props;
 
 public:
@@ -31,19 +31,19 @@ public:
   /// You must supply a non-empty name whenever you supply any custom properties for the
   /// event via <b>Properties</b>.
   /// </summary>
-  Properties(const std::string &name) : name(name){};
+  Properties(const std::string &name) : name_(name){};
 
   /// <summary>
   /// Constructs an Properties object (the default constructor).
   /// You must supply a non-empty name whenever you supply any custom properties for the event via
   /// <b>Properties</b>.
   /// </summary>
-  Properties() : name(defaultName){};
+  Properties() : name_(defaultName){};
 
   /// <summary>
   /// The Properties copy constructor.
   /// </summary>
-  Properties(Properties const &copy) : name(copy.name), m_props(copy.m_props) {}
+  Properties(Properties const &copy) : name_(copy.name_), m_props(copy.m_props) {}
 
   /// <summary>
   /// The Properties equals operator overload.
@@ -60,7 +60,7 @@ public:
   /// <b>Properties</b>.
   /// </summary>
   Properties(const std::string &name, const std::map<std::string, Property> &properties)
-      : name(name), m_props(properties)
+      : name_(name), m_props(properties)
   {}
 
   /// <summary>
@@ -92,7 +92,7 @@ public:
   /// </summary>
   Properties(const std::string &name,
              std::initializer_list<std::pair<std::string const, Property>> properties)
-      : name(name)
+      : name_(name)
   {
     (*this) = properties;
   }
@@ -121,7 +121,7 @@ public:
   bool SetName(const std::string &name)
   {
     // TODO: add event name validation rules
-    this->name = name;
+    this->name_ = name;
     return true;
   };
 
@@ -129,7 +129,7 @@ public:
   /// Gets the name of an event. An empty string is returned if the name was never set.
   /// </summary>
   /// <returns>Name of the event</returns>
-  const std::string &GetName() const { return name; }
+  const std::string &GetName() const { return name_; }
 
 #if 0
   /// <summary>

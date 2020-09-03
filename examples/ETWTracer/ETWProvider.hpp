@@ -31,7 +31,6 @@
 #    endif
 
 #    include <opentelemetry/common/attribute_value.h>
-#    include <opentelemetry/nostd/nostd.h>
 #    include <opentelemetry/version.h>
 #    include <opentelemetry/event/UUID.hpp>
 
@@ -306,7 +305,7 @@ public:
     // Event size detection is needed
     int64_t eventByteSize = byteDataVector.size() + byteVector.size();
     int64_t eventKBSize   = (eventByteSize + 1024 - 1) / 1024;
-    bool isLargeEvent     = eventKBSize >= LargeEventSizeKB;
+    // bool isLargeEvent     = eventKBSize >= LargeEventSizeKB;
 
     // TODO: extract
     // - GUID ActivityId

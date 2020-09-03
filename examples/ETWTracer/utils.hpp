@@ -24,6 +24,7 @@ OPENTELEMETRY_BEGIN_NAMESPACE
 namespace utils
 {
 
+#if 0
 ///
 /// Convert from time_point to ISO string
 ///
@@ -39,6 +40,7 @@ static std::string to_string(std::chrono::system_clock::time_point &tp)
   ss << "Z";
   return ss.str();
 }
+#endif
 
 /// <summary>
 /// Compile-time constexpr djb2 hash function for strings

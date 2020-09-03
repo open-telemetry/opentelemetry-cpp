@@ -79,7 +79,6 @@ static void print_value(std::stringstream &ss,
       if (jsonTypes)
         ss << '"';
       break;
-#if 0
     case common::AttributeType::TYPE_CSTRING:
       if (jsonTypes)
         ss << '"';
@@ -88,6 +87,7 @@ static void print_value(std::stringstream &ss,
       if (jsonTypes)
         ss << '"';
       break;
+#ifdef HAVE_SPAN_BYTE
     case common::AttributeType::TYPE_SPAN_BYTE: {
       ss << '[';
       // TODO: do we need to escape string value for JSON?

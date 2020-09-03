@@ -29,6 +29,7 @@ using ETWEvent        = std::map<nostd::string_view, common::AttributeValue>;
 
 // DRAFT - unofficial / extended eventing API compatible with 1DS API surface
 #include <opentelemetry/event/Properties.hpp>
+
 using EventProperties = event::Properties;
 using UUID_t          = event::UUID;
 using time_ticks      = event::time_ticks;
