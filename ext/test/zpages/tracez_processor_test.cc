@@ -1,5 +1,4 @@
 #include "opentelemetry/ext/zpages/tracez_processor.h"
-#include "opentelemetry/context/threadlocal_context.h"
 
 #include <gtest/gtest.h>
 

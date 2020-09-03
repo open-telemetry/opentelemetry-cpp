@@ -1,6 +1,6 @@
 #include "opentelemetry/version.h"
 #include "opentelemetry/nostd/variant.h"
-#include "opentelemetry/context/threadlocal_context.h"
+#include "opentelemetry/context/runtime_context.h"
 
 #if defined(HAVE_ABSEIL)
 namespace absl

@@ -1,4 +1,3 @@
-#include "opentelemetry/context/threadlocal_context.h"
 #include "opentelemetry/plugin/dynamic_load.h"
 
 #include <cstring>

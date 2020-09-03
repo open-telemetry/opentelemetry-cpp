@@ -7,10 +7,7 @@ OPENTELEMETRY_BEGIN_NAMESPACE
 namespace context
 {
 
-// Provides a wrapper for propagating the context object globally. In order
-// to use either the threadlocal_context.h file must be included or another
-// implementation which must be derived from the RuntimeContext can be
-// provided.
+// Provides a wrapper for propagating the context object globally.
 class RuntimeContext: public IRuntimeContext
 {
 public:

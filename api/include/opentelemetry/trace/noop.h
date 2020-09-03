@@ -4,7 +4,6 @@
 // This file is part of the internal implementation of OpenTelemetry. Nothing in this file should be
 // used directly. Please refer to span.h and tracer.h for documentation on these interfaces.
 
-#include "opentelemetry/context/runtime_context.h"
 #include "opentelemetry/nostd/string_view.h"
 #include "opentelemetry/nostd/unique_ptr.h"
 #include "opentelemetry/trace/span.h"
