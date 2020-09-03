@@ -1,6 +1,6 @@
 # Example of ETW Tracer
 
-NOTE: `TraceLoggingDynamic.h` header is pending CELA approval for OSS-approved and is not currently included in this repo.
+NOTE: `TraceLoggingDynamic.h` header is pending Microsoft CELA approval for OSS release (not currently included yet).
 
 # Usage Instructions
 
@@ -8,11 +8,69 @@ Main application utilizes the following headers:
 - **ETWProvider.hpp** - interface to ETW with dynamic manifest.
 - **ETWTracer.hpp**   - header-only implementation of OpenTelemetry C++ SDK API surface that sends events to Event Tracing for Windows.
 
+Step 1: Starting ETW Provider listener. **NOTE: must be run in elevated shell, e.g. Run as Administrator...**
+
+Example script sequence of commands to start the listener `CaptureTrace-ISTraceLoggingProvider.cmd`
+
+Start it in a separate privileged shell:
+
+```
+REM This Provider GUID is a hash of "ISTraceLoggingProvider" Provider Name.
+set PROVIDER_GUID=49592B3E-B03E-5EBF-91E2-846A2E4904E5
+REM Delete the old trace
+del /Y Trace_000001.etl
+REM Reset data collection
+logman stop MyTelemetryTraceData 
+logman delete MyTelemetryTraceData
+REM Create data set
+logman create trace MyTelemetryTraceData -p {%PROVIDER_GUID%} -o Trace.etl
+REM Start collection
+logman start MyTelemetryTraceData
+echo Capturing data for provider %PROVIDER_GUID% ...
+pause
+REM Stop collection
+logman stop MyTelemetryTraceData 
+```
+
+Step 2: Emitting structured ETW traces :
+
+```
+> ETWTracer.exe ISTraceLoggingProvider TestEvent
+
+Testing span API...
+Provider Name: ISTraceLoggingProvider
+Provider GUID: 49592B3E-B03E-5EBF-91E2-846A2E4904E5
+Event name:    TestEvent
+StartSpan: MySpan
+AddEvent: TestEvent
+AddEvent: MyEvent2
+AddEvent: MyEvent1DS
+EndSpan
+[ DONE ]
+Testing ETW logging API...
+Provider Name: ISTraceLoggingProvider
+Provider GUID: 49592B3E-B03E-5EBF-91E2-846A2E4904E5
+Event name:    TestEvent
+Provider Handle: 0x1201f25f249690
+etw.write...
+etw.close...
+[ DONE ]
+```
+
 See `main.cpp` for details.
 
-# Deployment instructions
+Step 3: Go back to ETW Provider listener Window and press any key to stop it. Captured file `Trace_000001.etl` may be reviewed under:
 
-Example requires contents of `api/include/opentelemetry/` headers. There are no prebuilt binaries or libraries:
+  Control Panel >>
+  Computer Management >>
+  Performance >>
+  Data Collector Sets >>
+  User Defined >>
+  MyTelemetryTraceData
+
+# Deployment in production
+
+Example requires contents of all `api/include/opentelemetry/` headers. There are no prebuilt binaries or libraries. Implementation is header-only.
 
 - Open Visual Studio solution `msbuild/opentelemetry-cpp.sln`
 - Open `ETWTracer` project

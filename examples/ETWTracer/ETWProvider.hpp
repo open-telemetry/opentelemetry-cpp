@@ -14,11 +14,6 @@
 
 #pragma once
 
-// #if defined __has_include
-// #  if __has_include("TraceLoggingDynamic.h")
-
-#define HAVE_ETW_PROVIDER
-
 #    ifndef WIN32_LEAN_AND_MEAN
 #      define WIN32_LEAN_AND_MEAN
 #    endif
@@ -196,7 +191,20 @@ public:
     tld::EventDataBuilder<std::vector<BYTE>> dbuilder(byteDataVector);
 
     const std::string EVENT_NAME = "name";
-    auto eventName               = nostd::get<const char *>(eventData[EVENT_NAME]);
+    char *eventName              = "NoName";
+    auto nameField               = eventData[EVENT_NAME];
+    switch (nameField.index())
+    {
+      case common::AttributeType::TYPE_STRING:
+        eventName = (char *)(nostd::get<nostd::string_view>(nameField).data());  // must be 0-terminated!
+        break;
+      case common::AttributeType::TYPE_CSTRING:
+        eventName = (char *)(nostd::get<const char *>(nameField));
+        break;
+      default:
+        // Invalid event name!
+        break;
+    }
 
     builder.Begin(eventName, eventTags);
 
@@ -251,14 +259,12 @@ public:
           dbuilder.AddString(temp.data());
           break;
         }
-#if 0
         case common::AttributeType::TYPE_CSTRING: {
           builder.AddField(name, tld::TypeUtf8String);
           auto temp = nostd::get<const char *>(value);
           dbuilder.AddString(temp);
           break;
         }
-#endif
 
 #    if HAVE_TYPE_GUID
           // TODO: consider adding UUID/GUID to spec
@@ -323,11 +329,11 @@ public:
     return (unsigned long)(writeResponse);
   }
 
+  static const REGHANDLE INVALID_HANDLE = _UI64_MAX;
+
 protected:
 
   const unsigned int LargeEventSizeKB = 62;
-
-  const REGHANDLE INVALID_HANDLE = _UI64_MAX;
 
   const GUID NULL_GUID = {0, 0, 0, {0, 0, 0, 0, 0, 0, 0, 0}};
 
@@ -345,5 +351,3 @@ protected:
 
 OPENTELEMETRY_END_NAMESPACE
 
-// #  endif
-// #endif

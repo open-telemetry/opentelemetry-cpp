@@ -18,15 +18,13 @@
 // - how to implement a custom ETW Tracer
 // - how to use ETW Tracer
 
-// Option below requires C++17 + msgsl ( https://github.com/microsoft/GSL ) or C++20-compatible compiler (latest Visual Studio 2019)
+// Option below requires C++17 + msgsl ( https://github.com/microsoft/GSL ) or C++20-compatible compiler (latest Visual Studio 2019) :
 // #define HAVE_CPP_STDLIB
-#define HAVE_ABSEIL
+// Option below requires Abseil C++ library :
+// #define HAVE_ABSEIL
 
 #include "ETWTracer.hpp"
-
-#include <opentelemetry/nostd/variant.h>
-#include <opentelemetry/context/runtime_context.h>
-#include <opentelemetry/context/context.h>
+#include <string>
 
 using namespace OPENTELEMETRY_NAMESPACE;
 
@@ -42,26 +40,46 @@ using time_ticks      = event::time_ticks;
 using Property        = event::Property;
 using Attribute       = event::Attribute;
 
-/// <summary>
+void printProvider(std::string providerName)
+{
+  if (providerName.at(0) != '{')
+  {
+    auto guid = utils::GetProviderGuid(providerName.c_str());
+    event::UUID uuid(guid);
+    auto guidStr = uuid.to_string();
+    printf("Provider Name: %s\n", providerName.c_str());
+    printf("Provider GUID: %s\n", guidStr.c_str());
+  }
+  else
+  {
+    printf("Provider GUID: %s\n", providerName.c_str());
+  }
+};
+
+    /// <summary>
 /// OpenTelemetry C++ SDK API use example
 /// </summary>
-void test_OT_span_API()
+void test_OT_span_API(std::string providerName, std::string eventName)
 {
+  printf("Testing span API...\n");
+  printProvider(providerName);
+  printf("Event name:    %s\n", eventName.c_str());
+
   // TracerProvider is a Tracer factory.
   ETW::TracerProvider tp;
 
-  //
-  // MyProviderName => {b7aa4d18-240c-5f41-5852-817dbf477472}
   // Use 'StringToGUID' utility or utils::GetProviderGuid to obtain the GUID.
-  //
-  auto tracer = tp.GetTracer("MyProviderName");
+  auto tracer = tp.GetTracer(providerName);
+  printf("StartSpan: MySpan\n");
   auto span   = tracer->StartSpan("MySpan");
 
   // Example 1: Basic illustration of ETW Event container.
   ETWEvent event = { {"uint32Key", (uint32_t)123456}, {"uint64Key", (uint64_t)123456}, {"strKey", "someValue"} };
-  span->AddEvent("MyEvent1", event);
+  printf("AddEvent: %s\n", eventName.c_str());
+  span->AddEvent(eventName, event);
 
   // Example 2: Add map to span using initializer_list without intermediate ETWEvent container.
+  printf("AddEvent: MyEvent2\n");
   span->AddEvent("MyEvent2", {{"key1", "one"}, {"key2", "two"}});
 
   // DRAFT - unofficial / extended eventing API compatible with 1DS API surface.
@@ -75,45 +93,66 @@ void test_OT_span_API()
        /* bool     */ {"boolKey", static_cast<bool>(true)},
        /* GUID     */ {"guidKey1", UUID_t("00010203-0405-0607-0809-0A0B0C0D0E0F")}});
   auto name = myEvent.GetName();
+  printf("AddEvent: %s\n", name.c_str());
   // Convert Event to KeyValueIterableView + set event name as a separate parameter
   span->AddEvent(nostd::string_view(name.c_str(), name.length()), myEvent);
 
   // Conclude the span
+  printf("EndSpan\n");
   span->End();
 
   // end tracing session
   tracer->Close();
+  printf("[ DONE ]\n");
 };
 
 /// <summary>
 /// Direct access to ETWProvider
 /// </summary>
-void test_ETWProvider_direct()
+void test_ETWProvider_direct(std::string providerName, std::string eventName)
 {
-#ifdef HAVE_ETW_PROVIDER
+  printf("Testing ETW logging API...\n");
   using ETWEvent = std::map<nostd::string_view, common::AttributeValue>;
   static ETWProvider etw;
   //
   // MyProviderName => {b7aa4d18-240c-5f41-5852-817dbf477472}
   // Use 'StringToGUID' utility or utils::GetProviderGuid to obtain the GUID.
   //
-  const char *providerId = "MyProviderName";
-  auto handle = etw.open(providerId);
+  printProvider(providerName);
+  printf("Event name:    %s\n", eventName.c_str());
+  auto handle            = etw.open(providerName.c_str());
+  if (handle.providerHandle == ETWProvider::INVALID_HANDLE)
+  {
+    printf("Failed to register provider!\n");
+    return;
+  }
+  printf("Provider Handle: 0x%08llx\n", handle.providerHandle);
   ETWEvent event =
   {
-      {"name", "MyEvent3"},
+      {"name", eventName},
       {"uint32Key", (uint32_t)123456},
       {"uint64Key", (uint64_t)123456},
       {"strKey", "someValue"}
   };
+  printf("etw.write...\n");
   etw.write(handle, event);
+  printf("etw.close...\n");
   etw.close(handle);
-#endif
+  printf("[ DONE ]\n");
 };
 
-int main(int, char *)
+int main(int argc, char *argv[])
 {
-  // test_ETWProvider_direct();
-  test_OT_span_API();
+  std::string providerName = "MyProviderName";
+  std::string eventName    = "MyEvent";
+  if (argc>1)
+  {
+    providerName = argv[1];
+    eventName    = argv[2];
+  }
+
+  test_OT_span_API(providerName, eventName);
+  test_ETWProvider_direct(providerName, eventName);
+
   return 0;
 }

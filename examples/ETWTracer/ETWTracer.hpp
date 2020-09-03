@@ -123,7 +123,10 @@ public:
   /// </summary>
   /// <param name="timeout">Allow Tracer to drop data if timeout is reached</param>
   /// <returns></returns>
-  virtual void CloseWithMicroseconds(uint64_t) noexcept override{};
+  virtual void CloseWithMicroseconds(uint64_t) noexcept override
+  {
+    etwProvider().close(provHandle);
+  };
 
   /// <summary>
   /// Add event data to span associated with tracer
@@ -175,7 +178,10 @@ public:
     AddEvent(span, name, std::chrono::system_clock::now(), trace::NullKeyValueIterable());
   };
 
-  virtual ~Tracer() { etwProvider().close(provHandle); };
+  virtual ~Tracer()
+  {
+    CloseWithMicroseconds(0);
+  };
 };
 
 /// <summary>
