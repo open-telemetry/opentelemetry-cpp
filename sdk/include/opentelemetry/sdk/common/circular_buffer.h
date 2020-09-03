@@ -63,13 +63,12 @@ public:
    */
   void Consume(size_t n) noexcept
   {
-    Consume(
-        n, [](CircularBufferRange<AtomicUniquePtr<T>> & range) noexcept {
-          range.ForEach([](AtomicUniquePtr<T> & ptr) noexcept {
-            ptr.Reset();
-            return true;
-          });
-        });
+    Consume(n, [](CircularBufferRange<AtomicUniquePtr<T>> &range) noexcept {
+      range.ForEach([](AtomicUniquePtr<T> &ptr) noexcept {
+        ptr.Reset();
+        return true;
+      });
+    });
   }
 
   /**
