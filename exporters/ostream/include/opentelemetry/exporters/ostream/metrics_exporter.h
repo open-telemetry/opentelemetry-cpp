@@ -49,28 +49,24 @@ private:
       return;
     switch (aggKind)
     {
-      case sdkmetrics::AggregatorKind::Counter:
-      {
+      case sdkmetrics::AggregatorKind::Counter: {
         sout_ << "\n  sum         : " << agg->get_checkpoint()[0];
       }
       break;
-      case sdkmetrics::AggregatorKind::MinMaxSumCount:
-      {
+      case sdkmetrics::AggregatorKind::MinMaxSumCount: {
         auto mmsc = agg->get_checkpoint();
         sout_ << "\n  min         : " << mmsc[0] << "\n  max         : " << mmsc[1]
               << "\n  sum         : " << mmsc[2] << "\n  count       : " << mmsc[3];
       }
       break;
-      case sdkmetrics::AggregatorKind::Gauge:
-      {
+      case sdkmetrics::AggregatorKind::Gauge: {
         auto timestamp = agg->get_checkpoint_timestamp();
 
         sout_ << "\n  last value  : " << agg->get_checkpoint()[0]
               << "\n  timestamp   : " << std::to_string(timestamp.time_since_epoch().count());
       }
       break;
-      case sdkmetrics::AggregatorKind::Exact:
-      {
+      case sdkmetrics::AggregatorKind::Exact: {
         // TODO: Find better way to print quantiles
         if (agg->get_quant_estimation())
         {
@@ -83,9 +79,9 @@ private:
         }
         else
         {
-          auto vec = agg->get_checkpoint();
+          auto vec    = agg->get_checkpoint();
           size_t size = vec.size();
-          int i    = 1;
+          int i       = 1;
 
           sout_ << "\n  values      : " << '[';
 
@@ -100,8 +96,7 @@ private:
         }
       }
       break;
-      case sdkmetrics::AggregatorKind::Histogram:
-      {
+      case sdkmetrics::AggregatorKind::Histogram: {
         auto boundaries = agg->get_boundaries();
         auto counts     = agg->get_counts();
 
@@ -130,8 +125,7 @@ private:
         sout_ << ']';
       }
       break;
-      case sdkmetrics::AggregatorKind::Sketch:
-      {
+      case sdkmetrics::AggregatorKind::Sketch: {
         auto boundaries = agg->get_boundaries();
         auto counts     = agg->get_counts();
 
