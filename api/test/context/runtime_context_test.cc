@@ -5,6 +5,15 @@
 
 using namespace opentelemetry;
 
+OPENTELEMETRY_BEGIN_NAMESPACE
+namespace context
+{
+
+thread_local ThreadLocalContext::Stack ThreadLocalContext::stack_ = ThreadLocalContext::Stack();
+
+}  // namespace context
+OPENTELEMETRY_END_NAMESPACE
+
 // Tests that GetCurrent returns the current context
 TEST(RuntimeContextTest, GetCurrent)
 {
