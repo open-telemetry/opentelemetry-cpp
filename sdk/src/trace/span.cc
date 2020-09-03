@@ -95,11 +95,11 @@ Span::Span(std::shared_ptr<Tracer> &&tracer,
   span_context_ = std::unique_ptr<trace_api::SpanContext>(
       new trace_api::SpanContext(trace_id, span_id, trace_api::TraceFlags(), false));
 
-  attributes.ForEachKeyValue([&](nostd::string_view key,
-                                 opentelemetry::common::AttributeValue value) noexcept {
-    recordable_->SetAttribute(key, value);
-    return true;
-  });
+  attributes.ForEachKeyValue(
+      [&](nostd::string_view key, opentelemetry::common::AttributeValue value) noexcept {
+        recordable_->SetAttribute(key, value);
+        return true;
+      });
 
   recordable_->SetStartTime(NowOr(options.start_system_time));
   start_steady_time = NowOr(options.start_steady_time);
