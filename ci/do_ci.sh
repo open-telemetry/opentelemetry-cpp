@@ -108,7 +108,7 @@ elif [[ "$1" == "cmake.exporter.prometheus.test" ]]; then
   ${SRC_DIR}/tools/build-benchmark.sh
   cmake -DCMAKE_BUILD_TYPE=Debug  \
         -DCMAKE_CXX_FLAGS="-Werror" \
-        MAKE_EXE_LINKER_FLAGS="-lpthread" \
+        -DMAKE_EXE_LINKER_FLAGS="-lpthread" \
         "${SRC_DIR}"
   make
   make test
