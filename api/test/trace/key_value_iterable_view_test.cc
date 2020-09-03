@@ -1,8 +1,8 @@
 #include "opentelemetry/trace/key_value_iterable_view.h"
 
+#include <gtest/gtest.h>
 #include <map>
 #include "opentelemetry/nostd/type_traits.h"
-#include <gtest/gtest.h>
 
 using namespace opentelemetry;
 
@@ -55,11 +55,11 @@ TEST(KeyValueIterableViewTest, ForEachKeyValueWithExit)
   M m1    = {{"abc", "123"}, {"xyz", "456"}};
   trace::KeyValueIterableView<M> iterable{m1};
   int count = 0;
-  auto exit = iterable.ForEachKeyValue([&count](nostd::string_view /*key*/,
-                                                common::AttributeValue /*value*/) noexcept {
-    ++count;
-    return false;
-  });
+  auto exit = iterable.ForEachKeyValue(
+      [&count](nostd::string_view /*key*/, common::AttributeValue /*value*/) noexcept {
+        ++count;
+        return false;
+      });
   EXPECT_EQ(count, 1);
   EXPECT_FALSE(exit);
 }
