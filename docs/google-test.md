@@ -14,7 +14,7 @@ Google Test allows a developer to write test cases that use assertions to verify
 
 ### Tests
 
-To create a test, use the `TEST()` macro to define a test function. This is similar to a normal C++ function that returns no value. Googletest assertions are used inside the test function, and the result of the test is determined by the assertions used inside the test function. If any assertion fails (can be either fatal or nonfatal), then the test fails; if all assertions pass, the test succeeds. A sample test function is outlined below.
+To create a test, use the `TEST()` macro to define a test function. This is similar to a normal C++ function that returns no value. Google Test assertions are used inside the test function, and the result of the test is determined by the assertions used inside the test function. If any assertion fails (can be either fatal or nonfatal), then the test fails; if all assertions pass, the test succeeds. A sample test function is outlined below.
 
 ```C++
 TEST(TestSuiteName, TestName) {
@@ -98,7 +98,6 @@ Integrating Google Tests with bazel is as simple as creating a target with:
 - srcs: The source file containing the tests
 - deps: The dependencies of the build; here, `//sdk/src/trace` refers to the directory of the source code being tested, and `@com_google_googletest//:gtest_main` is the Google Test dependency.
 
-
 Building and executing a unit test is also very simple. On terminal, navigate to the directory the WORKSPACE file resides in, and execute two commands:
 
 ```
@@ -144,7 +143,6 @@ make install
 This will install Google Test for you; you can delete the source code after running these commands.
 
 Next, follow the instructions [here](https://github.com/google/benchmark#installation) to download Google Benchmark. The section following this one will detail performance benchmarking using Google Benchmark.
-
 
 CMake makes use of a `CMakeLists.txt` file that provides instructions for a project’s source files and targets. There is a main `CMakeLists.txt` file in the root of the project directory, and a `CMakeLists.txt` for each subdirectory. In the main `CMakeLists.txt` file, the `cmake_minimum_required`  and `CMAKE_CXX_STANDARD` are set, the project name is set with `project()`, directories are included and subdirectories added, and much more. However, more importantly, in the context of Google Test within the OTel C++ repo, the `CMakeLists.txt` to look at is the one located in the directory your tests are being written in; for this example, it’s `opentelemetry-cpp/sdk/test/trace`. This [CMakeLists.txt](https://github.com/open-telemetry/opentelemetry-cpp/blob/master/sdk/test/trace/CMakeLists.txt) file, shown below, describes the names of the tests to be added as executables.
 
