@@ -1,8 +1,8 @@
 #include "opentelemetry/nostd/shared_ptr.h"
 
+#include <benchmark/benchmark.h>
 #include <gtest/gtest.h>
 #include <algorithm>
-#include <benchmark/benchmark.h>
 
 using opentelemetry::nostd::shared_ptr;
 
@@ -197,8 +197,8 @@ BENCHMARK(SharedPtrTestSort);
 TEST(SharedPtr, PerfTests)
 {
   // Run all benchmarks
-  int argc     = 0;
+  int argc           = 0;
   const char *argv[] = {""};
-  ::benchmark::Initialize(&argc, (char **)(argv) );
+  ::benchmark::Initialize(&argc, (char **)(argv));
   ::benchmark::RunSpecifiedBenchmarks();
 }

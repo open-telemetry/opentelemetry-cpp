@@ -62,8 +62,8 @@ OPENTELEMETRY_END_NAMESPACE
 // - Clang libc++ 7
 // - MSVC Standard Library 19.26*
 // - Apple Clang 10.0.0*
-#  include <span>
 #  include <limits>
+#  include <span>
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace nostd
 {
@@ -71,6 +71,6 @@ constexpr std::size_t dynamic_extent = std::numeric_limits<std::size_t>::max();
 
 template <class ElementType, std::size_t Extent = nostd::dynamic_extent>
 using span = std::span<ElementType, Extent>;
-} // namespace nostd
+}  // namespace nostd
 OPENTELEMETRY_END_NAMESPACE
 #endif  // of HAVE_SPAN

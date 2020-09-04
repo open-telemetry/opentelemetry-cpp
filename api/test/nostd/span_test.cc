@@ -63,7 +63,6 @@ TEST(SpanTest, PointerCountConstruction)
   /* This test is not supposed to fail with STL. Why is this invalid construct? */
   EXPECT_DEATH((span<int, 2>{array.data(), array.size()}), ".*");
 #endif
-
 }
 
 TEST(SpanTest, RangeConstruction)
@@ -82,7 +81,6 @@ TEST(SpanTest, RangeConstruction)
   /* This test is not supposed to fail with STL. Why is this invalid construct? */
   EXPECT_DEATH((span<int, 2>{std::begin(array), std::end(array)}), ".*");
 #endif
-
 }
 
 TEST(SpanTest, ArrayConstruction)
@@ -192,9 +190,9 @@ TEST(SpanTest, Iteration)
 
 static void SpanIterator(benchmark::State &state)
 {
-  constexpr size_t aSize      = 100000;
+  constexpr size_t aSize = 100000;
   std::array<int, aSize> array{};
-  for (size_t i=0; i<aSize; i++)
+  for (size_t i = 0; i < aSize; i++)
   {
     array[i] = i;
   }
@@ -214,9 +212,9 @@ BENCHMARK(SpanIterator);
 static void SpanConstructor(benchmark::State &state)
 {
   constexpr size_t aSize = 1000000;
-  auto *aInt16 = new std::array<int16_t, aSize>{};
-  auto *aInt32 = new std::array<int32_t, aSize>{};
-  auto *aInt64 = new std::array<int64_t, aSize>{};
+  auto *aInt16           = new std::array<int16_t, aSize>{};
+  auto *aInt32           = new std::array<int32_t, aSize>{};
+  auto *aInt64           = new std::array<int64_t, aSize>{};
   for (size_t i = 0; i < aSize; i++)
   {
     (*aInt16)[i] = i;
@@ -241,7 +239,7 @@ BENCHMARK(SpanConstructor);
 TEST(SpanTest, PerfTests)
 {
   // Run all benchmarks
-  int argc     = 0;
+  int argc           = 0;
   const char *argv[] = {""};
   ::benchmark::Initialize(&argc, (char **)(argv));
   ::benchmark::RunSpecifiedBenchmarks();

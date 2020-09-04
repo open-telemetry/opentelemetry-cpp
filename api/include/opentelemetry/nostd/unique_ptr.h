@@ -1,13 +1,13 @@
 #pragma once
 #ifdef HAVE_CPP_STDLIB
-#include "opentelemetry/std/unique_ptr.h"
+#  include "opentelemetry/std/unique_ptr.h"
 #else
-#include <cstddef>
-#include <memory>
-#include <type_traits>
-#include <utility>
+#  include <cstddef>
+#  include <memory>
+#  include <type_traits>
+#  include <utility>
 
-#include "opentelemetry/version.h"
+#  include "opentelemetry/version.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace nostd

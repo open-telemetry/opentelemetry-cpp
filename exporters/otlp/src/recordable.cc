@@ -23,7 +23,7 @@ void PopulateAttribute(opentelemetry::proto::common::v1::KeyValue *attribute,
                        const opentelemetry::common::AttributeValue &value)
 {
 
-#if 0 // FIXME
+#if 0  // FIXME
   // Assert size of variant to ensure that this method gets updated if the variant
   // definition changes
   static_assert(

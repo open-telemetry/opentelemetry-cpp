@@ -1,13 +1,13 @@
 #pragma once
 #ifdef HAVE_CPP_STDLIB
-#include "opentelemetry/std/type_traits.h"
+#  include "opentelemetry/std/type_traits.h"
 #else
-#include <array>
-#include <type_traits>
+#  include <array>
+#  include <type_traits>
 
-#include "opentelemetry/config.h"
-#include "opentelemetry/nostd/detail/void.h"
-#include "opentelemetry/version.h"
+#  include "opentelemetry/config.h"
+#  include "opentelemetry/nostd/detail/void.h"
+#  include "opentelemetry/version.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace nostd
@@ -118,12 +118,12 @@ using is_nothrow_swappable = detail::swappable::is_nothrow_swappable<is_swappabl
  *  std::is_trivialy_copy_assignable
  *  std::is_trivialy_move_assignable
  */
-#ifdef OPENTELEMETRY_TRIVIALITY_TYPE_TRAITS
+#  ifdef OPENTELEMETRY_TRIVIALITY_TYPE_TRAITS
 using std::is_trivially_copy_assignable;
 using std::is_trivially_copy_constructible;
 using std::is_trivially_move_assignable;
 using std::is_trivially_move_constructible;
-#else
+#  else
 template <typename T>
 struct is_trivially_copy_constructible
 {
@@ -147,7 +147,7 @@ struct is_trivially_move_assignable
 {
   static constexpr bool value = __is_trivial(T);
 };
-#endif
+#  endif
 }  // namespace nostd
 OPENTELEMETRY_END_NAMESPACE
 #endif

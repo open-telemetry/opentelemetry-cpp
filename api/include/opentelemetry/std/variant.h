@@ -50,9 +50,9 @@ public:
 #  endif
 
 #  if __EXCEPTIONS
-#    define THROW_BAD_VARIANT_ACCESS    throw_bad_variant_access()
+#    define THROW_BAD_VARIANT_ACCESS throw_bad_variant_access()
 #  else
-#    define THROW_BAD_VARIANT_ACCESS    std::terminate()
+#    define THROW_BAD_VARIANT_ACCESS std::terminate()
 #  endif
 
 //
@@ -62,7 +62,7 @@ template <typename T, class... Types>
 constexpr auto get_type = [](auto &&t) constexpr -> decltype(auto)
 {
   auto v      = t;
-  auto result = std::get_if<T>(&v); // TODO: optimize with std::forward(t) if t is not rvalue
+  auto result = std::get_if<T>(&v);  // TODO: optimize with std::forward(t) if t is not rvalue
   if (result)
   {
     return *result;
@@ -117,7 +117,7 @@ constexpr T &get(std::variant<Types...> &v)
 };
 
 template <class T, class... Types>
-constexpr T /*&&*/get(std::variant<Types...> &&v)
+constexpr T /*&&*/ get(std::variant<Types...> &&v)
 {
   return get_type<T, Types...>(v);
 };
@@ -157,13 +157,15 @@ constexpr std::variant_alternative_t<I, std::variant<Types...>> &&get(std::varia
 };
 
 template <std::size_t I, class... Types>
-constexpr const std::variant_alternative_t<I, std::variant<Types...>> &get(const std::variant<Types...> &v)
+constexpr const std::variant_alternative_t<I, std::variant<Types...>> &get(
+    const std::variant<Types...> &v)
 {
   return std::get<I, Types...>(v);
 };
 
 template <std::size_t I, class... Types>
-constexpr const std::variant_alternative_t<I, std::variant<Types...>> &&get(const std::variant<Types...> &&v)
+constexpr const std::variant_alternative_t<I, std::variant<Types...>> &&get(
+    const std::variant<Types...> &&v)
 {
   return std::get<I, Types...>(std::forward<decltype(v)>(v));
 };
@@ -226,5 +228,5 @@ inline constexpr bool holds_alternative(const variant<Ts...> &v) noexcept
   return std::holds_alternative<T, Ts...>(v);
 }
 
-} // namespace nostd
+}  // namespace nostd
 OPENTELEMETRY_END_NAMESPACE

@@ -11,11 +11,13 @@ foreach(
   batch_span_processor_test
   attribute_utils_test)
   add_executable(${testname} "${testname}.cc")
-  target_link_libraries(${testname} ${GTEST_BOTH_LIBRARIES} ${CORE_RUNTIME_LIBS}
-                        ${CMAKE_THREAD_LIBS_INIT} opentelemetry_trace)
+  target_link_libraries(
+    ${testname} ${GTEST_BOTH_LIBRARIES} ${CORE_RUNTIME_LIBS}
+    ${CMAKE_THREAD_LIBS_INIT} opentelemetry_trace)
   gtest_add_tests(TARGET ${testname} TEST_PREFIX trace. TEST_LIST ${testname})
 endforeach()
 
 add_executable(sampler_benchmark sampler_benchmark.cc)
-target_link_libraries(sampler_benchmark benchmark::benchmark ${CORE_RUNTIME_LIBS}
-                      ${CMAKE_THREAD_LIBS_INIT} opentelemetry_trace)
+target_link_libraries(
+  sampler_benchmark benchmark::benchmark ${CORE_RUNTIME_LIBS}
+  ${CMAKE_THREAD_LIBS_INIT} opentelemetry_trace)

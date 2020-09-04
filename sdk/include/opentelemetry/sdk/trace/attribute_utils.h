@@ -1,10 +1,10 @@
 #pragma once
 
+#include <string>
 #include <unordered_map>
 #include <vector>
 #include "opentelemetry/common/attribute_value.h"
 #include "opentelemetry/trace/key_value_iterable_view.h"
-#include <string>
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace sdk
@@ -53,7 +53,10 @@ struct AttributeConverter
     return SpanDataAttributeValue(std::string(s));
   }
 #ifdef HAVE_SPAN_BYTE
-  SpanDataAttributeValue operator()(nostd::span<const uint8_t> v) { return convertSpan<uint8_t>(v); }
+  SpanDataAttributeValue operator()(nostd::span<const uint8_t> v)
+  {
+    return convertSpan<uint8_t>(v);
+  }
 #endif
   SpanDataAttributeValue operator()(nostd::span<const bool> v) { return convertSpan<bool>(v); }
   SpanDataAttributeValue operator()(nostd::span<const int32_t> v)

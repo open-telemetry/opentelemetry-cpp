@@ -83,8 +83,9 @@ private:
     };
     sout_ << ']';
   }
-  
-  // TODO: [MG] - would it be more efficient (jump table) to use switch/case on index instead of nostd::holds_alternative<...> ?
+
+  // TODO: [MG] - would it be more efficient (jump table) to use switch/case on index instead of
+  // nostd::holds_alternative<...> ?
   void print_value(sdktrace::SpanDataAttributeValue &value)
   {
     if (nostd::holds_alternative<bool>(value))

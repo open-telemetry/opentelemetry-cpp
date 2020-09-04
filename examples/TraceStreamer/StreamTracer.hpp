@@ -361,7 +361,7 @@ public:
    */
 
   /// <summary>
-  /// 
+  ///
   /// </summary>
   /// <param name="name">Span name</param>
   /// <param name="options">Span options</param>

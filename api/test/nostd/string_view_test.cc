@@ -4,8 +4,8 @@
 
 #include <benchmark/benchmark.h>
 #include <cstdint>
-#include <map>
 #include <cstring>
+#include <map>
 
 using opentelemetry::nostd::string_view;
 
@@ -106,22 +106,25 @@ TEST(StringViewTest, MapKeyOrdering)
   }
 }
 
-static void StringViewSubStr(benchmark::State& state)
+static void StringViewSubStr(benchmark::State &state)
 {
-    std::string s = "Hello OpenTelemetry nostd::string_view implementation! Feel free to evaluate my performance.";
-    for (auto _ : state) {
-        string_view sv = s;
-        auto oneSv = sv.substr(0, 5);
-        auto twoSv = sv.substr(6, 5);
-        auto threeSv = sv.substr(12, 5);
-        auto fourSv = sv.substr(18, 11);
-        auto fiveSv = sv.substr(30, 5);
-        benchmark::DoNotOptimize(oneSv);
-        benchmark::DoNotOptimize(twoSv);
-        benchmark::DoNotOptimize(threeSv);
-        benchmark::DoNotOptimize(fourSv);
-        benchmark::DoNotOptimize(fiveSv);
-    }
+  std::string s =
+      "Hello OpenTelemetry nostd::string_view implementation! Feel free to evaluate my "
+      "performance.";
+  for (auto _ : state)
+  {
+    string_view sv = s;
+    auto oneSv     = sv.substr(0, 5);
+    auto twoSv     = sv.substr(6, 5);
+    auto threeSv   = sv.substr(12, 5);
+    auto fourSv    = sv.substr(18, 11);
+    auto fiveSv    = sv.substr(30, 5);
+    benchmark::DoNotOptimize(oneSv);
+    benchmark::DoNotOptimize(twoSv);
+    benchmark::DoNotOptimize(threeSv);
+    benchmark::DoNotOptimize(fourSv);
+    benchmark::DoNotOptimize(fiveSv);
+  }
 }
 BENCHMARK(StringViewSubStr);
 
@@ -132,9 +135,9 @@ static void StringViewMaps(benchmark::State &state)
   size_t i = 0;
   for (auto _ : state)
   {
-      i %= 200;  // up to 200 key-value pairs in this collection
-      m[string_view(std::to_string(i))] = string_view(std::to_string(i));
-      i += 1;
+    i %= 200;  // up to 200 key-value pairs in this collection
+    m[string_view(std::to_string(i))] = string_view(std::to_string(i));
+    i += 1;
   };
 }
 BENCHMARK(StringViewMaps);
@@ -148,7 +151,8 @@ static void StringViewFromCString(benchmark::State &state)
   {
     string_view sv(s.c_str());
     // scan thru string_view
-    for (const auto &c : sv);
+    for (const auto &c : sv)
+      ;
   };
 }
 BENCHMARK(StringViewFromCString);
@@ -161,7 +165,7 @@ static void StringViewToString(benchmark::State &state)
   std::string txt;
   for (auto _ : state)
   {
-      txt = std::string(s.data(), s.length());
+    txt = std::string(s.data(), s.length());
   };
 }
 BENCHMARK(StringViewToString);
@@ -174,19 +178,19 @@ static void StringViewExplode(benchmark::State &state)
         "Hello OpenTelemetry nostd::string_view implementation! Feel free to evaluate my "
         "performance.";
     std::string s;
-    for (size_t i=0; i<5; i++)
+    for (size_t i = 0; i < 5; i++)
     {
       s += std::string(sv.data(), sv.length());
-      sv = s;
+      sv              = s;
       string_view sv2 = s;
       if (sv == sv2)
-        ; // FIXME: Warning C4390 ';' : empty controlled statement found; is this the intent ?
+        ;  // FIXME: Warning C4390 ';' : empty controlled statement found; is this the intent ?
     }
   };
 }
 BENCHMARK(StringViewExplode);
 
-static void StringViewVector(benchmark::State& state)
+static void StringViewVector(benchmark::State &state)
 {
   std::vector<string_view> v;
   for (auto _ : state)
@@ -203,9 +207,9 @@ BENCHMARK(StringViewVector);
 
 TEST(StringView, PerfTests)
 {
-    // Run all benchmarks
-    int   argc    = 0;
-    const char *argv[] = {""};
-    ::benchmark::Initialize(&argc, (char **)(argv) );
-    ::benchmark::RunSpecifiedBenchmarks();
+  // Run all benchmarks
+  int argc           = 0;
+  const char *argv[] = {""};
+  ::benchmark::Initialize(&argc, (char **)(argv));
+  ::benchmark::RunSpecifiedBenchmarks();
 }

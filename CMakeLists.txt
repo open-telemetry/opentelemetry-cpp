@@ -10,17 +10,16 @@ if(NOT DEFINED CMAKE_CXX_STANDARD)
   set(CMAKE_CXX_STANDARD 11)
 endif()
 
-option(WITH_STL
-       "Whether to use Standard Library for C++latest features" OFF)
+option(WITH_STL "Whether to use Standard Library for C++latest features" OFF)
 
-option(WITH_ABSEIL
-       "Whether to use Abseil for C++latest features" OFF)
+option(WITH_ABSEIL "Whether to use Abseil for C++latest features" OFF)
 
 if(WITH_ABSEIL)
   add_definitions(-DHAVE_ABSEIL)
   find_package(absl CONFIG REQUIRED)
   set(CORE_RUNTIME_LIBS absl::any absl::base absl::bits absl::city)
-# target_link_libraries(main PRIVATE absl::any absl::base absl::bits absl::city)
+  # target_link_libraries(main PRIVATE absl::any absl::base absl::bits
+  # absl::city)
 endif()
 
 if(WITH_STL)
@@ -33,7 +32,8 @@ if(WITH_STL)
   include_directories(${GSL_DIR}/include)
   if(CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")
     set(CMAKE_CXX_FLAGS_SPEED "/O2")
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /Zc:__cplusplus ${CMAKE_CXX_FLAGS_SPEED}")
+    set(CMAKE_CXX_FLAGS
+        "${CMAKE_CXX_FLAGS} /Zc:__cplusplus ${CMAKE_CXX_FLAGS_SPEED}")
   endif()
   if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
     # set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++2a")

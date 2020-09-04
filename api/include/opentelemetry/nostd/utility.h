@@ -1,15 +1,15 @@
 #pragma once
 #ifdef HAVE_CPP_STDLIB
-#include "opentelemetry/std/utility.h"
+#  include "opentelemetry/std/utility.h"
 #else
 
-#include <cstddef>
-#include <initializer_list>
-#include <type_traits>
+#  include <cstddef>
+#  include <initializer_list>
+#  include <type_traits>
 
-#include "opentelemetry/nostd/detail/decay.h"
-#include "opentelemetry/nostd/detail/invoke.h"
-#include "opentelemetry/version.h"
+#  include "opentelemetry/nostd/detail/decay.h"
+#  include "opentelemetry/nostd/detail/invoke.h"
+#  include "opentelemetry/version.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace nostd

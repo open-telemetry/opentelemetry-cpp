@@ -20,7 +20,7 @@ set PROVIDER_GUID=49592B3E-B03E-5EBF-91E2-846A2E4904E5
 REM Delete the old trace
 del /Y Trace_000001.etl
 REM Reset data collection
-logman stop MyTelemetryTraceData 
+logman stop MyTelemetryTraceData
 logman delete MyTelemetryTraceData
 REM Create data set
 logman create trace MyTelemetryTraceData -p {%PROVIDER_GUID%} -o Trace.etl
@@ -29,7 +29,7 @@ logman start MyTelemetryTraceData
 echo Capturing data for provider %PROVIDER_GUID% ...
 pause
 REM Stop collection
-logman stop MyTelemetryTraceData 
+logman stop MyTelemetryTraceData
 ```
 
 Step 2: Emitting structured ETW traces :
@@ -117,7 +117,7 @@ while (1)
   $sr = new-object System.IO.StreamReader($pipe);
   try
   {
-    while ($cmd= $sr.ReadLine()) 
+    while ($cmd= $sr.ReadLine())
     {
       $cmd
     };

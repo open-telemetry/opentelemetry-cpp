@@ -27,5 +27,5 @@ namespace nostd
 template <class... _Types>
 using unique_ptr = std::unique_ptr<_Types...>;
 
-} // namespace nostd
+}  // namespace nostd
 OPENTELEMETRY_END_NAMESPACE

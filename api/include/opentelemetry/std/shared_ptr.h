@@ -27,5 +27,5 @@ namespace nostd
 template <class... _Types>
 using shared_ptr = std::shared_ptr<_Types...>;
 
-} // namespace nostd
+}  // namespace nostd
 OPENTELEMETRY_END_NAMESPACE

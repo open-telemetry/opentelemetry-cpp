@@ -27,5 +27,5 @@ namespace nostd
 template <bool B, class T = void>
 using enable_if_t = typename std::enable_if<B, T>::type;
 
-} // namespace nostd
+}  // namespace nostd
 OPENTELEMETRY_END_NAMESPACE

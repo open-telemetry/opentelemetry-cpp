@@ -6,4 +6,5 @@ else()
 endif()
 
 add_library(opentelemetry_common ${COMMON_SRCS})
-target_link_libraries(opentelemetry_common Threads::Threads ${CORE_RUNTIME_LIBS})
+target_link_libraries(opentelemetry_common Threads::Threads
+                      ${CORE_RUNTIME_LIBS})

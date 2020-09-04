@@ -1,16 +1,16 @@
 #pragma once
 #ifdef HAVE_CPP_STDLIB
-#include "opentelemetry/std/span.h"
+#  include "opentelemetry/std/span.h"
 #else
-#include <array>
-#include <cassert>
-#include <cstddef>
-#include <exception>
-#include <iterator>
-#include <type_traits>
+#  include <array>
+#  include <cassert>
+#  include <cstddef>
+#  include <exception>
+#  include <iterator>
+#  include <type_traits>
 
-#include "opentelemetry/nostd/utility.h"
-#include "opentelemetry/version.h"
+#  include "opentelemetry/nostd/utility.h"
+#  include "opentelemetry/version.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace nostd

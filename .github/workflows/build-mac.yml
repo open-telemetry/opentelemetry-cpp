@@ -22,7 +22,7 @@ jobs:
     strategy:
       matrix:
         config: [release]
-        os: [macos-latest]    
+        os: [macos-latest]
     steps:
 
     - name: Checkout

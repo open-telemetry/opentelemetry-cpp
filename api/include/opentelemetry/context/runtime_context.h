@@ -8,7 +8,7 @@ namespace context
 {
 
 // Provides a wrapper for propagating the context object globally.
-class RuntimeContext: public IRuntimeContext
+class RuntimeContext : public IRuntimeContext
 {
 public:
   // Return the current context.
@@ -25,9 +25,10 @@ public:
   // passed in token. Returns true if successful, false otherwise
   static bool Detach(Token &token) noexcept { return ContextHandler()->InternalDetach(token); }
 
-  static inline IRuntimeContext* ContextHandler(IRuntimeContext* context_handler = nullptr)
+  static inline IRuntimeContext *ContextHandler(IRuntimeContext *context_handler = nullptr)
   {
-    static IRuntimeContext* context_handler_ = (context_handler!=nullptr)?context_handler:new ThreadLocalContext();
+    static IRuntimeContext *context_handler_ =
+        (context_handler != nullptr) ? context_handler : new ThreadLocalContext();
     return context_handler_;
   };
 

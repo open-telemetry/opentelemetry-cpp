@@ -83,9 +83,9 @@ private:
         }
         else
         {
-          auto vec = agg->get_checkpoint();
+          auto vec    = agg->get_checkpoint();
           size_t size = vec.size();
-          int i    = 1;
+          int i       = 1;
 
           sout_ << "\n  values      : " << '[';
 

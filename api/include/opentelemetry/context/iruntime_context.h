@@ -47,18 +47,14 @@ public:
 class IRuntimeContext
 {
 public:
+  // Provides a token with the passed in context
+  Token CreateToken(Context context) noexcept { return Token(context); };
 
-	// Provides a token with the passed in context
-	Token CreateToken(Context context) noexcept
-	{
-		return Token(context);
-	};
+  virtual Context InternalGetCurrent() noexcept = 0;
 
-	virtual Context InternalGetCurrent() noexcept = 0;
+  virtual Token InternalAttach(Context context) noexcept = 0;
 
-	virtual Token InternalAttach(Context context) noexcept = 0;
-
-	virtual bool InternalDetach(Token &token) noexcept = 0;
+  virtual bool InternalDetach(Token &token) noexcept = 0;
 };
 
 }  // namespace context

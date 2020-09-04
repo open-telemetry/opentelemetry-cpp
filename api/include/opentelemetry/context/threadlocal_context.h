@@ -94,7 +94,7 @@ private:
       Context *temp = new Context[new_capacity];
       if (base_ != nullptr)
       {
-        for (size_t i=0; (i<old_size)&&(i<new_capacity); i++)
+        for (size_t i = 0; (i < old_size) && (i < new_capacity); i++)
         {
           temp[i] = base_[i];
         }

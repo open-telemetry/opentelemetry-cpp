@@ -16,8 +16,8 @@
 
 #include "opentelemetry/version.h"
 
-#include <utility>
 #include <cstddef>
+#include <utility>
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 // Standard Type aliases in nostd namespace
@@ -76,5 +76,5 @@ using make_index_sequence = std::make_index_sequence<N>;
 template <std::size_t... Ints>
 using index_sequence = std::index_sequence<Ints...>;
 
-} // namespace nostd
+}  // namespace nostd
 OPENTELEMETRY_END_NAMESPACE

@@ -9,49 +9,49 @@
 #pragma once
 
 #ifdef HAVE_CPP_STDLIB
-#include "opentelemetry/std/variant.h"
+#  include "opentelemetry/std/variant.h"
 #elif defined(HAVE_ABSEIL)
-#include "absl/types/variant.h"
+#  include "absl/types/variant.h"
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace nostd
 {
-using absl::variant;
 using absl::get;
 using absl::holds_alternative;
+using absl::variant;
 using absl::visit;
 }  // namespace nostd
 OPENTELEMETRY_END_NAMESPACE
 #else
-#include <array>
-#include <exception>
-#include <limits>
+#  include <array>
+#  include <exception>
+#  include <limits>
 
-#include "opentelemetry/nostd/detail/all.h"
-#include "opentelemetry/nostd/detail/dependent_type.h"
-#include "opentelemetry/nostd/detail/find_index.h"
-#include "opentelemetry/nostd/detail/functional.h"
-#include "opentelemetry/nostd/detail/recursive_union.h"
-#include "opentelemetry/nostd/detail/trait.h"
-#include "opentelemetry/nostd/detail/type_pack_element.h"
-#include "opentelemetry/nostd/detail/variant_alternative.h"
-#include "opentelemetry/nostd/detail/variant_fwd.h"
-#include "opentelemetry/nostd/detail/variant_size.h"
-#include "opentelemetry/nostd/type_traits.h"
-#include "opentelemetry/nostd/utility.h"
-#include "opentelemetry/version.h"
+#  include "opentelemetry/nostd/detail/all.h"
+#  include "opentelemetry/nostd/detail/dependent_type.h"
+#  include "opentelemetry/nostd/detail/find_index.h"
+#  include "opentelemetry/nostd/detail/functional.h"
+#  include "opentelemetry/nostd/detail/recursive_union.h"
+#  include "opentelemetry/nostd/detail/trait.h"
+#  include "opentelemetry/nostd/detail/type_pack_element.h"
+#  include "opentelemetry/nostd/detail/variant_alternative.h"
+#  include "opentelemetry/nostd/detail/variant_fwd.h"
+#  include "opentelemetry/nostd/detail/variant_size.h"
+#  include "opentelemetry/nostd/type_traits.h"
+#  include "opentelemetry/nostd/utility.h"
+#  include "opentelemetry/version.h"
 
-#define AUTO_RETURN(...) \
-  ->decay_t<decltype(__VA_ARGS__)> { return __VA_ARGS__; }
+#  define AUTO_RETURN(...) \
+    ->decay_t<decltype(__VA_ARGS__)> { return __VA_ARGS__; }
 
-#define AUTO_REFREF_RETURN(...)                                           \
-  ->decltype((__VA_ARGS__))                                               \
-  {                                                                       \
-    static_assert(std::is_reference<decltype((__VA_ARGS__))>::value, ""); \
-    return __VA_ARGS__;                                                   \
-  }
+#  define AUTO_REFREF_RETURN(...)                                           \
+    ->decltype((__VA_ARGS__))                                               \
+    {                                                                       \
+      static_assert(std::is_reference<decltype((__VA_ARGS__))>::value, ""); \
+      return __VA_ARGS__;                                                   \
+    }
 
-#define DECLTYPE_AUTO_RETURN(...) \
-  ->decltype(__VA_ARGS__) { return __VA_ARGS__; }
+#  define DECLTYPE_AUTO_RETURN(...) \
+    ->decltype(__VA_ARGS__) { return __VA_ARGS__; }
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace nostd
@@ -66,11 +66,11 @@ public:
 
 [[noreturn]] inline void throw_bad_variant_access()
 {
-#if __EXCEPTIONS
+#  if __EXCEPTIONS
   throw bad_variant_access{};
-#else
+#  else
   std::terminate();
-#endif
+#  endif
 }
 
 namespace detail
@@ -81,11 +81,11 @@ struct base
 {
   template <std::size_t I, typename V>
   inline static constexpr auto get_alt(V &&v)
-#ifdef _MSC_VER
+#  ifdef _MSC_VER
       AUTO_REFREF_RETURN(recursive_union::get_alt(std::forward<V>(v).data_, in_place_index_t<I>{}))
-#else
+#  else
       AUTO_REFREF_RETURN(recursive_union::get_alt(data(std::forward<V>(v)), in_place_index_t<I>{}))
-#endif
+#  endif
 };
 
 struct variant
@@ -214,7 +214,7 @@ struct base
   }
 };
 
-#if !defined(_MSC_VER) || _MSC_VER >= 1910
+#  if !defined(_MSC_VER) || _MSC_VER >= 1910
 template <typename F, typename... Vs>
 using fmatrix_t = decltype(base::make_fmatrix<F, Vs...>());
 
@@ -238,7 +238,7 @@ struct fdiagonal
 
 template <typename F, typename... Vs>
 constexpr fdiagonal_t<F, Vs...> fdiagonal<F, Vs...>::value;
-#endif
+#  endif
 
 struct alt
 {
@@ -380,41 +380,41 @@ protected:
 
 struct dtor
 {
-#ifdef _MSC_VER
-#  pragma warning(push)
-#  pragma warning(disable : 4100)
-#endif
+#  ifdef _MSC_VER
+#    pragma warning(push)
+#    pragma warning(disable : 4100)
+#  endif
   template <typename Alt>
   inline void operator()(Alt &alt) const noexcept
   {
     alt.~Alt();
   }
-#ifdef _MSC_VER
-#  pragma warning(pop)
-#endif
+#  ifdef _MSC_VER
+#    pragma warning(pop)
+#  endif
 };
 
 template <typename Traits, Trait = Traits::destructible_trait>
 class destructor;
 
-#define OPENTELEMETRY_VARIANT_DESTRUCTOR(destructible_trait, definition, destroy)              \
-  template <typename... Ts>                                                                    \
-  class destructor<traits<Ts...>, destructible_trait> : public base<destructible_trait, Ts...> \
-  {                                                                                            \
-    using super = base<destructible_trait, Ts...>;                                             \
-                                                                                               \
-  public:                                                                                      \
-    using super::super;                                                                        \
-    using super::operator=;                                                                    \
-                                                                                               \
-    destructor(const destructor &) = default;                                                  \
-    destructor(destructor &&)      = default;                                                  \
-    definition destructor &operator=(const destructor &) = default;                            \
-    destructor &operator=(destructor &&) = default;                                            \
-                                                                                               \
-  protected:                                                                                   \
-    destroy                                                                                    \
-  }
+#  define OPENTELEMETRY_VARIANT_DESTRUCTOR(destructible_trait, definition, destroy)              \
+    template <typename... Ts>                                                                    \
+    class destructor<traits<Ts...>, destructible_trait> : public base<destructible_trait, Ts...> \
+    {                                                                                            \
+      using super = base<destructible_trait, Ts...>;                                             \
+                                                                                                 \
+    public:                                                                                      \
+      using super::super;                                                                        \
+      using super::operator=;                                                                    \
+                                                                                                 \
+      destructor(const destructor &) = default;                                                  \
+      destructor(destructor &&)      = default;                                                  \
+      definition destructor &operator=(const destructor &) = default;                            \
+      destructor &operator=(destructor &&) = default;                                            \
+                                                                                                 \
+    protected:                                                                                   \
+      destroy                                                                                    \
+    }
 
 OPENTELEMETRY_VARIANT_DESTRUCTOR(
     Trait::TriviallyAvailable, ~destructor() = default;
@@ -434,7 +434,7 @@ OPENTELEMETRY_VARIANT_DESTRUCTOR(
 OPENTELEMETRY_VARIANT_DESTRUCTOR(Trait::Unavailable, ~destructor() = delete;
                                  , inline void destroy() noexcept  = delete;);
 
-#undef OPENTELEMETRY_VARIANT_DESTRUCTOR
+#  undef OPENTELEMETRY_VARIANT_DESTRUCTOR
 
 template <typename Traits>
 class constructor : public destructor<Traits>
@@ -478,22 +478,22 @@ protected:
 template <typename Traits, Trait = Traits::move_constructible_trait>
 class move_constructor;
 
-#define OPENTELEMETRY_VARIANT_MOVE_CONSTRUCTOR(move_constructible_trait, definition) \
-  template <typename... Ts>                                                          \
-  class move_constructor<traits<Ts...>, move_constructible_trait>                    \
-      : public constructor<traits<Ts...>>                                            \
-  {                                                                                  \
-    using super = constructor<traits<Ts...>>;                                        \
-                                                                                     \
-  public:                                                                            \
-    using super::super;                                                              \
-    using super::operator=;                                                          \
-                                                                                     \
-    move_constructor(const move_constructor &) = default;                            \
-    definition ~move_constructor()             = default;                            \
-    move_constructor &operator=(const move_constructor &) = default;                 \
-    move_constructor &operator=(move_constructor &&) = default;                      \
-  }
+#  define OPENTELEMETRY_VARIANT_MOVE_CONSTRUCTOR(move_constructible_trait, definition) \
+    template <typename... Ts>                                                          \
+    class move_constructor<traits<Ts...>, move_constructible_trait>                    \
+        : public constructor<traits<Ts...>>                                            \
+    {                                                                                  \
+      using super = constructor<traits<Ts...>>;                                        \
+                                                                                       \
+    public:                                                                            \
+      using super::super;                                                              \
+      using super::operator=;                                                          \
+                                                                                       \
+      move_constructor(const move_constructor &) = default;                            \
+      definition ~move_constructor()             = default;                            \
+      move_constructor &operator=(const move_constructor &) = default;                 \
+      move_constructor &operator=(move_constructor &&) = default;                      \
+    }
 
 OPENTELEMETRY_VARIANT_MOVE_CONSTRUCTOR(Trait::TriviallyAvailable,
                                        move_constructor(move_constructor &&that) = default;);
@@ -507,27 +507,27 @@ OPENTELEMETRY_VARIANT_MOVE_CONSTRUCTOR(
 OPENTELEMETRY_VARIANT_MOVE_CONSTRUCTOR(Trait::Unavailable,
                                        move_constructor(move_constructor &&) = delete;);
 
-#undef OPENTELEMETRY_VARIANT_MOVE_CONSTRUCTOR
+#  undef OPENTELEMETRY_VARIANT_MOVE_CONSTRUCTOR
 
 template <typename Traits, Trait = Traits::copy_constructible_trait>
 class copy_constructor;
 
-#define OPENTELEMETRY_VARIANT_COPY_CONSTRUCTOR(copy_constructible_trait, definition) \
-  template <typename... Ts>                                                          \
-  class copy_constructor<traits<Ts...>, copy_constructible_trait>                    \
-      : public move_constructor<traits<Ts...>>                                       \
-  {                                                                                  \
-    using super = move_constructor<traits<Ts...>>;                                   \
-                                                                                     \
-  public:                                                                            \
-    using super::super;                                                              \
-    using super::operator=;                                                          \
-                                                                                     \
-    definition copy_constructor(copy_constructor &&) = default;                      \
-    ~copy_constructor()                              = default;                      \
-    copy_constructor &operator=(const copy_constructor &) = default;                 \
-    copy_constructor &operator=(copy_constructor &&) = default;                      \
-  }
+#  define OPENTELEMETRY_VARIANT_COPY_CONSTRUCTOR(copy_constructible_trait, definition) \
+    template <typename... Ts>                                                          \
+    class copy_constructor<traits<Ts...>, copy_constructible_trait>                    \
+        : public move_constructor<traits<Ts...>>                                       \
+    {                                                                                  \
+      using super = move_constructor<traits<Ts...>>;                                   \
+                                                                                       \
+    public:                                                                            \
+      using super::super;                                                              \
+      using super::operator=;                                                          \
+                                                                                       \
+      definition copy_constructor(copy_constructor &&) = default;                      \
+      ~copy_constructor()                              = default;                      \
+      copy_constructor &operator=(const copy_constructor &) = default;                 \
+      copy_constructor &operator=(copy_constructor &&) = default;                      \
+    }
 
 OPENTELEMETRY_VARIANT_COPY_CONSTRUCTOR(Trait::TriviallyAvailable,
                                        copy_constructor(const copy_constructor &that) = default;);
@@ -539,7 +539,7 @@ OPENTELEMETRY_VARIANT_COPY_CONSTRUCTOR(
 OPENTELEMETRY_VARIANT_COPY_CONSTRUCTOR(Trait::Unavailable,
                                        copy_constructor(const copy_constructor &) = delete;);
 
-#undef OPENTELEMETRY_VARIANT_COPY_CONSTRUCTOR
+#  undef OPENTELEMETRY_VARIANT_COPY_CONSTRUCTOR
 
 template <typename Traits>
 class assignment : public copy_constructor<Traits>
@@ -578,14 +578,14 @@ protected:
   {
     if (this->index() == I)
     {
-#ifdef _MSC_VER
-#  pragma warning(push)
-#  pragma warning(disable : 4244)
-#endif
+#  ifdef _MSC_VER
+#    pragma warning(push)
+#    pragma warning(disable : 4244)
+#  endif
       a.value = std::forward<Arg>(arg);
-#ifdef _MSC_VER
-#  pragma warning(pop)
-#endif
+#  ifdef _MSC_VER
+#    pragma warning(pop)
+#  endif
     }
     else
     {
@@ -623,22 +623,22 @@ protected:
 template <typename Traits, Trait = Traits::move_assignable_trait>
 class move_assignment;
 
-#define OPENTELEMETRY_VARIANT_MOVE_ASSIGNMENT(move_assignable_trait, definition)                 \
-  template <typename... Ts>                                                                      \
-  class move_assignment<traits<Ts...>, move_assignable_trait> : public assignment<traits<Ts...>> \
-  {                                                                                              \
-    using super = assignment<traits<Ts...>>;                                                     \
-                                                                                                 \
-  public:                                                                                        \
-    using super::super;                                                                          \
-    using super::operator=;                                                                      \
-                                                                                                 \
-    move_assignment(const move_assignment &) = default;                                          \
-    move_assignment(move_assignment &&)      = default;                                          \
-    ~move_assignment()                       = default;                                          \
-    move_assignment &operator=(const move_assignment &) = default;                               \
-    definition                                                                                   \
-  }
+#  define OPENTELEMETRY_VARIANT_MOVE_ASSIGNMENT(move_assignable_trait, definition)                 \
+    template <typename... Ts>                                                                      \
+    class move_assignment<traits<Ts...>, move_assignable_trait> : public assignment<traits<Ts...>> \
+    {                                                                                              \
+      using super = assignment<traits<Ts...>>;                                                     \
+                                                                                                   \
+    public:                                                                                        \
+      using super::super;                                                                          \
+      using super::operator=;                                                                      \
+                                                                                                   \
+      move_assignment(const move_assignment &) = default;                                          \
+      move_assignment(move_assignment &&)      = default;                                          \
+      ~move_assignment()                       = default;                                          \
+      move_assignment &operator=(const move_assignment &) = default;                               \
+      definition                                                                                   \
+    }
 
 OPENTELEMETRY_VARIANT_MOVE_ASSIGNMENT(
     Trait::TriviallyAvailable, move_assignment &operator=(move_assignment &&that) = default;);
@@ -656,27 +656,27 @@ OPENTELEMETRY_VARIANT_MOVE_ASSIGNMENT(
 OPENTELEMETRY_VARIANT_MOVE_ASSIGNMENT(Trait::Unavailable,
                                       move_assignment &operator=(move_assignment &&) = delete;);
 
-#undef OPENTELEMETRY_VARIANT_MOVE_ASSIGNMENT
+#  undef OPENTELEMETRY_VARIANT_MOVE_ASSIGNMENT
 
 template <typename Traits, Trait = Traits::copy_assignable_trait>
 class copy_assignment;
 
-#define OPENTELEMETRY_VARIANT_COPY_ASSIGNMENT(copy_assignable_trait, definition) \
-  template <typename... Ts>                                                      \
-  class copy_assignment<traits<Ts...>, copy_assignable_trait>                    \
-      : public move_assignment<traits<Ts...>>                                    \
-  {                                                                              \
-    using super = move_assignment<traits<Ts...>>;                                \
-                                                                                 \
-  public:                                                                        \
-    using super::super;                                                          \
-    using super::operator=;                                                      \
-                                                                                 \
-    copy_assignment(const copy_assignment &) = default;                          \
-    copy_assignment(copy_assignment &&)      = default;                          \
-    ~copy_assignment()                       = default;                          \
-    definition copy_assignment &operator=(copy_assignment &&) = default;         \
-  }
+#  define OPENTELEMETRY_VARIANT_COPY_ASSIGNMENT(copy_assignable_trait, definition) \
+    template <typename... Ts>                                                      \
+    class copy_assignment<traits<Ts...>, copy_assignable_trait>                    \
+        : public move_assignment<traits<Ts...>>                                    \
+    {                                                                              \
+      using super = move_assignment<traits<Ts...>>;                                \
+                                                                                   \
+    public:                                                                        \
+      using super::super;                                                          \
+      using super::operator=;                                                      \
+                                                                                   \
+      copy_assignment(const copy_assignment &) = default;                          \
+      copy_assignment(copy_assignment &&)      = default;                          \
+      ~copy_assignment()                       = default;                          \
+      definition copy_assignment &operator=(copy_assignment &&) = default;         \
+    }
 
 OPENTELEMETRY_VARIANT_COPY_ASSIGNMENT(
     Trait::TriviallyAvailable, copy_assignment &operator=(const copy_assignment &that) = default;);
@@ -692,7 +692,7 @@ OPENTELEMETRY_VARIANT_COPY_ASSIGNMENT(
 OPENTELEMETRY_VARIANT_COPY_ASSIGNMENT(
     Trait::Unavailable, copy_assignment &operator=(const copy_assignment &) = delete;);
 
-#undef OPENTELEMETRY_VARIANT_COPY_ASSIGNMENT
+#  undef OPENTELEMETRY_VARIANT_COPY_ASSIGNMENT
 template <typename... Ts>
 class impl : public copy_assignment<traits<Ts...>>
 {
@@ -733,7 +733,7 @@ public:
         std::swap(lhs, rhs);
       }
       impl tmp(std::move(*rhs));
-#if __EXCEPTIONS
+#  if __EXCEPTIONS
       // EXTENSION: When the move construction of `lhs` into `rhs` throws
       // and `tmp` is nothrow move constructible then we move `tmp` back
       // into `rhs` and provide the strong exception safety guarantee.
@@ -749,9 +749,9 @@ public:
         }
         throw;
       }
-#else
+#  else
       this->generic_construct(*rhs, std::move(*lhs));
-#endif
+#  endif
       this->generic_construct(*lhs, std::move(tmp));
     }
   }
@@ -813,11 +813,11 @@ struct overload_leaf<Arg,
                      enable_if_t<std::is_same<remove_cvref_t<T>, bool>::value
                                      ? std::is_same<remove_cvref_t<Arg>, bool>::value
                                      :
-#if defined(__clang__) || !defined(__GNUC__) || __GNUC__ >= 5
+#  if defined(__clang__) || !defined(__GNUC__) || __GNUC__ >= 5
                                      is_non_narrowing_convertible<Arg, T>::value
-#else
+#  else
                                      std::is_convertible<Arg, T>::value
-#endif
+#  endif
                                  >>
 {
   using impl = size_constant<I> (*)(T);
@@ -1288,9 +1288,9 @@ inline auto swap(variant<Ts...> &lhs, variant<Ts...> &rhs) noexcept(noexcept(lhs
 }  // namespace nostd
 OPENTELEMETRY_END_NAMESPACE
 
-#undef AUTO_RETURN
+#  undef AUTO_RETURN
 
-#undef AUTO_REFREF_RETURN
+#  undef AUTO_REFREF_RETURN
 
-#undef DECLTYPE_AUTO_RETURN
+#  undef DECLTYPE_AUTO_RETURN
 #endif

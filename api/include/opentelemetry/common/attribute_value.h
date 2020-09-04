@@ -17,9 +17,9 @@ using AttributeValue = nostd::variant<bool,
                                       uint64_t,
                                       double,
                                       nostd::string_view,
-                                      const char*,
+                                      const char *,
 #ifdef HAVE_SPAN_BYTE
-                                      nostd::span<const uint8_t>,   // TODO: not part of OT spec yet
+                                      nostd::span<const uint8_t>,  // TODO: not part of OT spec yet
 #endif
                                       nostd::span<const bool>,
                                       nostd::span<const int32_t>,
@@ -40,7 +40,7 @@ enum AttributeType
   TYPE_STRING,
   TYPE_CSTRING,
 #if HAVE_SPAN_BYTE
-  TYPE_SPAN_BYTE,   // TODO: not part of OT spec yet
+  TYPE_SPAN_BYTE,  // TODO: not part of OT spec yet
 #endif
   TYPE_SPAN_BOOL,
   TYPE_SPAN_INT,

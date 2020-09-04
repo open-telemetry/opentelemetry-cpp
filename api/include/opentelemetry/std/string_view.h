@@ -32,5 +32,5 @@ namespace nostd
 // nostd::string_view
 using string_view = std::string_view;
 
-} // namespace nostd
+}  // namespace nostd
 OPENTELEMETRY_END_NAMESPACE
