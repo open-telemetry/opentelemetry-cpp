@@ -118,7 +118,7 @@ public:
       idx = iter->first;
       count += iter->second;
     }
-    return (T)(round(2 * pow(gamma, idx) / (gamma + 1)));
+    return static_cast<T>(round(2 * pow(gamma, idx) / (gamma + 1)));
   }
 
   /**
