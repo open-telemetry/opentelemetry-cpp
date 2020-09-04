@@ -2,6 +2,7 @@
 
 #include <type_traits>
 #include <vector>
+#include <tuple>
 
 #include <gtest/gtest.h>
 
@@ -20,7 +21,8 @@ TEST(UtilityTest, Data)
   std::vector<int> v = {1, 2, 3};
   int array[3]       = {1, 2, 3};
   std::initializer_list<int> list{1, 2, 3};
-  int x;
+  int x = 0;
+  std::ignore = x;
 
   EXPECT_EQ(opentelemetry::nostd::data(v), v.data());
   EXPECT_EQ(opentelemetry::nostd::data(array), array);
@@ -32,7 +34,8 @@ TEST(UtilityTest, Size)
 {
   std::vector<int> v = {1, 2, 3};
   int array[3]       = {1, 2, 3};
-  int x;
+  int x = 0;
+  std::ignore = x;
 
   EXPECT_EQ(opentelemetry::nostd::size(v), v.size());
   EXPECT_EQ(opentelemetry::nostd::size(array), 3);

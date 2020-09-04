@@ -48,8 +48,8 @@ void UpdateSpans(std::shared_ptr<TracezSpanProcessor> &processor,
  */
 bool ContainsNames(const std::vector<std::string> &names,
                    std::unordered_set<ThreadsafeSpanData *> &running,
-                   unsigned int name_start        = 0,
-                   unsigned int name_end          = 0,
+                   size_t name_start        = 0,
+                   size_t name_end          = 0,
                    bool one_to_one_correspondence = false)
 {
   if (name_end == 0)
@@ -96,15 +96,15 @@ bool ContainsNames(const std::vector<std::string> &names,
  */
 bool ContainsNames(const std::vector<std::string> &names,
                    std::vector<std::unique_ptr<ThreadsafeSpanData>> &completed,
-                   unsigned int name_start        = 0,
-                   unsigned int name_end          = 0,
+                   size_t name_start        = 0,
+                   size_t name_end          = 0,
                    bool one_to_one_correspondence = false)
 {
 
   if (name_end == 0)
     name_end = names.size();    // FIXME: Warning C4267 '=' : conversion from 'size_t' to 'unsigned int
 
-  unsigned int num_names = name_end - name_start;
+  size_t num_names = name_end - name_start;
 
   if (num_names > completed.size() || (one_to_one_correspondence && num_names != completed.size()))
   {
