@@ -146,9 +146,9 @@ elif [[ "$1" == "format" ]]; then
   if [[ ! -z "$CHANGED" ]]; then
     echo "The following files have changes:"
     echo "$CHANGED"
+    git diff
     exit 1
   fi
-  git diff
   exit 0
 elif [[ "$1" == "code.coverage" ]]; then
   cd "${BUILD_DIR}"
