@@ -1,8 +1,8 @@
 #include "opentelemetry/trace/key_value_iterable_view.h"
 
+#include <gtest/gtest.h>
 #include <map>
 #include "opentelemetry/nostd/type_traits.h"
-#include <gtest/gtest.h>
 
 using namespace opentelemetry;
 

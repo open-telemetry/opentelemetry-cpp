@@ -1,8 +1,8 @@
 #include "opentelemetry/nostd/utility.h"
 
+#include <tuple>
 #include <type_traits>
 #include <vector>
-#include <tuple>
 
 #include <gtest/gtest.h>
 
