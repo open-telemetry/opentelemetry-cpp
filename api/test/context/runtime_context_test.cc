@@ -1,3 +1,4 @@
+#include "opentelemetry/context/runtime_context.h"
 #include "opentelemetry/context/context.h"
 
 #include <gtest/gtest.h>
