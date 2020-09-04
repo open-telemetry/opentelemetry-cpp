@@ -148,6 +148,7 @@ elif [[ "$1" == "format" ]]; then
     echo "$CHANGED"
     exit 1
   fi
+  git diff
   exit 0
 elif [[ "$1" == "code.coverage" ]]; then
   cd "${BUILD_DIR}"
