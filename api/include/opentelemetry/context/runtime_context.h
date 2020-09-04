@@ -45,8 +45,8 @@ private:
   nostd::shared_ptr<ContextDetacher> detacher_;
 };
 
-/** 
- * RuntimeContextStorage is used by RuntimeContext to store Context frames. 
+/**
+ * RuntimeContextStorage is used by RuntimeContext to store Context frames.
  *
  * Custom context management strategies can be implemented by deriving from
  * this class and passing an initialized RuntimeContextStorage object to
@@ -78,7 +78,7 @@ protected:
   Token CreateToken(Context context) noexcept { return Token(context); }
 };
 
-/** 
+/**
  * Construct and return the default RuntimeContextStorage
  * @return a ThreadLocalContextStorage
  */
@@ -102,10 +102,7 @@ public:
 
   // Resets the context to a previous value stored in the
   // passed in token. Returns true if successful, false otherwise
-  static bool Detach(Token &token) noexcept
-  {
-    return GetRuntimeContextStorage()->Detach(token);
-  }
+  static bool Detach(Token &token) noexcept { return GetRuntimeContextStorage()->Detach(token); }
 
   // Sets the Key and Value into the passed in context or if a context is not
   // passed in, the RuntimeContext.
@@ -147,14 +144,14 @@ public:
     return temp_context.GetValue(key);
   }
 
-  /** 
+  /**
    * Provide a custom runtime context storage.
    *
    * This provides a possibility to override the default thread-local runtime
    * context storage. This has to be set before any spans are created by the
    * application, otherwise context state information will be discarded, which
    * might lead to unexpected results.
-   * 
+   *
    * @param storage a custom runtime context storage
    */
   static void SetRuntimeContextStorage(nostd::shared_ptr<RuntimeContextStorage> storage) noexcept
