@@ -109,8 +109,6 @@ public:
                        span_context.trace_state(), span_context.HasRemoteParent());
   }
 
-  const bool IsSampled() const noexcept { return trace_flags_.IsSampled(); }
-
 private:
   const trace_api::TraceId trace_id_;
   const trace_api::SpanId span_id_;
