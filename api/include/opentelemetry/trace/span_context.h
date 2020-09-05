@@ -36,7 +36,9 @@ class SpanContext final
 public:
   // An invalid SpanContext.
   SpanContext() noexcept
-      : trace_flags_(trace::TraceFlags((uint8_t) false)), trace_state_(new TraceState), remote_parent_(false){};
+      : trace_flags_(trace::TraceFlags((uint8_t) false)),
+        trace_state_(new TraceState),
+        remote_parent_(false){};
 
   /* A temporary constructor for an invalid SpanContext.
    * Trace id and span id are set to invalid (all zeros).
@@ -72,8 +74,7 @@ public:
         span_id_(span_id),
         trace_flags_(trace_flags),
         trace_state_(new TraceState(trace_state));
-        remote_parent_(has_remote_parent)
-  {}
+  remote_parent_(has_remote_parent) {}
 
   SpanContext(SpanContext &&ctx)
       : trace_id_(ctx.trace_id()), span_id_(ctx.span_id()), trace_flags_(ctx.trace_flags())
