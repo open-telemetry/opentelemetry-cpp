@@ -73,8 +73,9 @@ public:
       : trace_id_(trace_id),
         span_id_(span_id),
         trace_flags_(trace_flags),
-        trace_state_(new TraceState(trace_state));
-  remote_parent_(has_remote_parent) {}
+        trace_state_(new TraceState(trace_state)),
+        remote_parent_(has_remote_parent)
+  {}
 
   SpanContext(SpanContext &&ctx)
       : trace_id_(ctx.trace_id()), span_id_(ctx.span_id()), trace_flags_(ctx.trace_flags())
