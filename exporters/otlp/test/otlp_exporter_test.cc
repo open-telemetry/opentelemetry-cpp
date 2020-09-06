@@ -31,34 +31,34 @@ public:
   }
 };
 
-//// Call Export() directly
-// TEST_F(OtlpExporterTestPeer, ExportUnitTest)
-//{
-//  auto mock_stub = new proto::collector::trace::v1::MockTraceServiceStub();
-//  std::unique_ptr<proto::collector::trace::v1::TraceService::StubInterface> stub_interface(
-//      mock_stub);
-//  auto exporter = GetExporter(stub_interface);
-//
-//  auto recordable_1 = exporter->MakeRecordable();
-//  recordable_1->SetName("Test span 1");
-//  auto recordable_2 = exporter->MakeRecordable();
-//  recordable_2->SetName("Test span 2");
-//
-//  // Test successful RPC
-//  nostd::span<std::unique_ptr<sdk::trace::Recordable>> batch_1(&recordable_1, 1);
-//  EXPECT_CALL(*mock_stub, Export(_, _, _)).Times(Exactly(1)).WillOnce(Return(grpc::Status::OK));
-//  auto result = exporter->Export(batch_1);
-//  EXPECT_EQ(sdk::trace::ExportResult::kSuccess, result);
-//
-//  // Test failed RPC
-//  nostd::span<std::unique_ptr<sdk::trace::Recordable>> batch_2(&recordable_2, 1);
-//  EXPECT_CALL(*mock_stub, Export(_, _, _))
-//      .Times(Exactly(1))
-//      .WillOnce(Return(grpc::Status::CANCELLED));
-//  result = exporter->Export(batch_2);
-//  EXPECT_EQ(sdk::trace::ExportResult::kFailure, result);
-//}
-//
+// Call Export() directly
+TEST_F(OtlpExporterTestPeer, ExportUnitTest)
+{
+  auto mock_stub = new proto::collector::trace::v1::MockTraceServiceStub();
+  std::unique_ptr<proto::collector::trace::v1::TraceService::StubInterface> stub_interface(
+      mock_stub);
+  auto exporter = GetExporter(stub_interface);
+
+  auto recordable_1 = exporter->MakeRecordable();
+  recordable_1->SetName("Test span 1");
+  auto recordable_2 = exporter->MakeRecordable();
+  recordable_2->SetName("Test span 2");
+
+  // Test successful RPC
+  nostd::span<std::unique_ptr<sdk::trace::Recordable>> batch_1(&recordable_1, 1);
+  EXPECT_CALL(*mock_stub, Export(_, _, _)).Times(Exactly(1)).WillOnce(Return(grpc::Status::OK));
+  auto result = exporter->Export(batch_1);
+  EXPECT_EQ(sdk::trace::ExportResult::kSuccess, result);
+
+  // Test failed RPC
+  nostd::span<std::unique_ptr<sdk::trace::Recordable>> batch_2(&recordable_2, 1);
+  EXPECT_CALL(*mock_stub, Export(_, _, _))
+      .Times(Exactly(1))
+      .WillOnce(Return(grpc::Status::CANCELLED));
+  result = exporter->Export(batch_2);
+  EXPECT_EQ(sdk::trace::ExportResult::kFailure, result);
+}
+
 // Create spans, let processor call Export()
 TEST_F(OtlpExporterTestPeer, ExportIntegrationTest)
 {
