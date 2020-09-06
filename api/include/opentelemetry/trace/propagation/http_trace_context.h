@@ -219,7 +219,9 @@ private:
       trace_id_str.push_back(trace_id[i]);
     }
     if (trace_id_str == "00000000000000000000000000000000")
+    {
       return;
+    }
     hex_string += trace_id_str;
     hex_string.push_back('-');
     std::string span_id_str = "";
@@ -228,7 +230,9 @@ private:
       span_id_str.push_back(span_id[i]);
     }
     if (span_id_str == "0000000000000000")
+    {
       return;
+    }
     hex_string += span_id_str;
     hex_string.push_back('-');
     std::string trace_flags_str = "";
