@@ -3,6 +3,7 @@
 
 #include "opentelemetry/context/runtime_context.h"
 #include "opentelemetry/trace/trace_flags.h"
+#include "opentelemetry/trace/trace_state.h"
 #include "opentelemetry/version.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
@@ -92,8 +93,8 @@ Span::Span(std::shared_ptr<Tracer> &&tracer,
     recordable_->SetIds(trace_id, span_id, trace_api::SpanId());
   }
 
-  span_context_ = std::unique_ptr<trace_api::SpanContext>(
-      new trace_api::SpanContext(trace_id, span_id, trace_api::TraceFlags(), false));
+  span_context_ = std::unique_ptr<trace_api::SpanContext>(new trace_api::SpanContext(
+      trace_id, span_id, trace_api::TraceFlags(), trace_api::TraceState(), false));
 
   attributes.ForEachKeyValue([&](nostd::string_view key,
                                  opentelemetry::common::AttributeValue value) noexcept {
