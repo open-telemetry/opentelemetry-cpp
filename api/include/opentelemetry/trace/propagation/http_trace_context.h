@@ -212,21 +212,31 @@ private:
     char trace_flags[2];
     TraceFlags(span_context.trace_flags()).ToLowerBase16(trace_flags);
     // Note: This is only temporary replacement for appendable string
-    std::string hex_string = "00-";
+    std::string hex_string   = "00-";
+    std::string trace_id_str = "";
     for (int i = 0; i < 32; i++)
     {
-      hex_string.push_back(trace_id[i]);
+      trace_id_str.push_back(trace_id[i]);
     }
+    if (trace_id_str == "00000000000000000000000000000000")
+      return;
+    hex_string += trace_id_str;
     hex_string.push_back('-');
+    std::string span_id_str = "";
     for (int i = 0; i < 16; i++)
     {
-      hex_string.push_back(span_id[i]);
+      span_id_str.push_back(span_id[i]);
     }
+    if (span_id_str == "0000000000000000")
+      return;
+    hex_string += span_id_str;
     hex_string.push_back('-');
+    std::string trace_flags_str = "";
     for (int i = 0; i < 2; i++)
     {
-      hex_string.push_back(trace_flags[i]);
+      trace_flags_str.push_back(trace_flags[i]);
     }
+    hex_string += trace_flags_str;
     setter(carrier, kTraceParent, hex_string);
   }
 
