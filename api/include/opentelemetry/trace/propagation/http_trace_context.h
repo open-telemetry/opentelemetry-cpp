@@ -12,8 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <iostream>
-
 #include <array>
 #include <iostream>
 #include <map>
@@ -239,7 +237,6 @@ private:
       trace_flags_str.push_back(trace_flags[i]);
     }
     hex_string += trace_flags_str;
-    std::cout << "hex string is " << hex_string << std::endl;
     setter(carrier, kTraceParent, hex_string);
   }
 

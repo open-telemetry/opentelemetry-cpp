@@ -165,14 +165,15 @@ TEST(HTTPTextFormatTest, FormatNotSupported)
 
 TEST(HTTPTextFormatTest, PropagateInvalidContext)
 {
-  // Do not propagate invalid trace context.
+  // Do not propagate invalid trace context, the injection will inject a new valid traceparent
+  // instead
   std::map<std::string, std::string> carrier = {};
   context::Context ctx{
       "current-span",
       nostd::shared_ptr<trace::Span>(new trace::DefaultSpan(trace::SpanContext::GetInvalid()))};
   format.Inject(Setter, carrier, ctx);
-  std::cout << carrier["traceparent"] << std::endl;
-  EXPECT_TRUE(carrier.count("traceparent") == 0);
+  EXPECT_FALSE(carrier.count("traceparent") == 0);
+  EXPECT_NE(carrier["traceparent"], "00-00000000000000000000000000000000-0000000000000000-00");
 }
 
 TEST(HTTPTextFormatTest, TraceStateHeaderWithTrailingComma)
