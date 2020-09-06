@@ -37,7 +37,7 @@ public:
   // An invalid SpanContext.
   SpanContext() noexcept
       : trace_flags_(trace::TraceFlags((uint8_t) false)),
-        trace_state_(new TraceState),
+        trace_state_(TraceState()),
         remote_parent_(false){};
 
   /* A temporary constructor for an invalid SpanContext.
@@ -52,7 +52,7 @@ public:
       : trace_id_(),
         span_id_(),
         trace_flags_(trace_api::TraceFlags((uint8_t)sampled_flag)),
-        trace_state_(new TraceState),
+        trace_state_(TraceState()),
         remote_parent_(has_remote_parent){};
 
   // @returns whether this context is valid
@@ -65,6 +65,8 @@ public:
 
   const trace_api::SpanId &span_id() const noexcept { return span_id_; }
 
+  const trace_api::TraceState &trace_state() const noexcept { return trace_state_; }
+
   SpanContext(TraceId trace_id,
               SpanId span_id,
               TraceFlags trace_flags,
@@ -73,16 +75,22 @@ public:
       : trace_id_(trace_id),
         span_id_(span_id),
         trace_flags_(trace_flags),
-        trace_state_(new TraceState(trace_state)),
+        trace_state_(trace_state),
         remote_parent_(has_remote_parent)
   {}
 
   SpanContext(SpanContext &&ctx)
-      : trace_id_(ctx.trace_id()), span_id_(ctx.span_id()), trace_flags_(ctx.trace_flags())
+      : trace_id_(ctx.trace_id()),
+        span_id_(ctx.span_id()),
+        trace_flags_(ctx.trace_flags()),
+        trace_state_(ctx.trace_state())
   {}
 
   SpanContext(const SpanContext &ctx)
-      : trace_id_(ctx.trace_id()), span_id_(ctx.span_id()), trace_flags_(ctx.trace_flags())
+      : trace_id_(ctx.trace_id()),
+        span_id_(ctx.span_id()),
+        trace_flags_(ctx.trace_flags()),
+        trace_state_(ctx.trace_state())
   {}
 
   bool operator==(const SpanContext &that) const noexcept
@@ -113,7 +121,7 @@ private:
   const trace_api::TraceId trace_id_;
   const trace_api::SpanId span_id_;
   const trace_api::TraceFlags trace_flags_;
-  const nostd::unique_ptr<TraceState> trace_state_;  // Never nullptr.
+  const trace_api::TraceState trace_state_;
   const bool remote_parent_ = false;
 };
 }  // namespace trace
