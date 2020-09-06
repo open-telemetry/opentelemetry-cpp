@@ -70,14 +70,15 @@ public:
     if (!span_context.IsValid())
     {
       // If invalid, make a new traceparent and remove trace state
-      span_context = SpanContext::GetRandom();
+      SpanContext rand_span_context = SpanContext::GetRandom();
+      InjectImpl(setter, carrier, rand_span_context);
     }
     else
     {
       // otherwise only update Span Id
-      span_context = SpanContext::UpdateSpanId(span_context);
+      SpanContext update_span_context = SpanContext::UpdateSpanId(span_context);
+      InjectImpl(setter, carrier, update_span_context);
     }
-    InjectImpl(setter, carrier, span_context);
   }
 
   context::Context Extract(Getter getter,
