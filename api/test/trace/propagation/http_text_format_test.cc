@@ -8,7 +8,6 @@
 #include "opentelemetry/trace/trace_id.h"
 #include "opentelemetry/trace/tracer.h"
 
-#include <iostream>
 #include <map>
 #include <memory>
 #include <string>
