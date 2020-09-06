@@ -122,6 +122,20 @@ TEST(TraceStateTest, Empty)
   EXPECT_FALSE(s.Empty());
 }
 
+// Test trace state comparator
+TEST(TraceStateTest, Comparator)
+{
+  TraceState s1, s2, s3, s4;
+  s1.Set("test_key", "test_value");
+  s2.Set("test_key", "test_value");
+  s3.Set("test_key", "foo_value");
+  s4.Set("test_key", "test_value");
+  s4.Set("foo_key", "foo_value");
+  EXPECT_TRUE(s2 == s1);
+  EXPECT_FALSE(s3 == s1);
+  EXPECT_FALSE(s4 == s1);
+}
+
 TEST(TraceStateTest, Entries)
 {
   TraceState s;
