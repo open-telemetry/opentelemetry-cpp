@@ -59,30 +59,30 @@ public:
 //  EXPECT_EQ(sdk::trace::ExportResult::kFailure, result);
 //}
 //
-//// Create spans, let processor call Export()
-// TEST_F(OtlpExporterTestPeer, ExportIntegrationTest)
-//{
-//  auto mock_stub = new proto::collector::trace::v1::MockTraceServiceStub();
-//  std::unique_ptr<proto::collector::trace::v1::TraceService::StubInterface> stub_interface(
-//      mock_stub);
-//
-//  auto exporter = GetExporter(stub_interface);
-//
-//  auto processor = std::shared_ptr<sdk::trace::SpanProcessor>(
-//      new sdk::trace::SimpleSpanProcessor(std::move(exporter)));
-//  auto provider =
-//      nostd::shared_ptr<trace::TracerProvider>(new sdk::trace::TracerProvider(processor));
-//  auto tracer = provider->GetTracer("test");
-//
-//  EXPECT_CALL(*mock_stub, Export(_, _, _))
-//      .Times(AtLeast(1))
-//      .WillRepeatedly(Return(grpc::Status::OK));
-//
-//  auto parent_span = tracer->StartSpan("Test parent span");
-//  auto child_span  = tracer->StartSpan("Test child span");
-//  child_span->End();
-//  parent_span->End();
-//}
+// Create spans, let processor call Export()
+TEST_F(OtlpExporterTestPeer, ExportIntegrationTest)
+{
+  auto mock_stub = new proto::collector::trace::v1::MockTraceServiceStub();
+  std::unique_ptr<proto::collector::trace::v1::TraceService::StubInterface> stub_interface(
+      mock_stub);
+
+  auto exporter = GetExporter(stub_interface);
+
+  auto processor = std::shared_ptr<sdk::trace::SpanProcessor>(
+      new sdk::trace::SimpleSpanProcessor(std::move(exporter)));
+  auto provider =
+      nostd::shared_ptr<trace::TracerProvider>(new sdk::trace::TracerProvider(processor));
+  auto tracer = provider->GetTracer("test");
+
+  EXPECT_CALL(*mock_stub, Export(_, _, _))
+      .Times(AtLeast(1))
+      .WillRepeatedly(Return(grpc::Status::OK));
+
+  auto parent_span = tracer->StartSpan("Test parent span");
+  auto child_span  = tracer->StartSpan("Test child span");
+  child_span->End();
+  parent_span->End();
+}
 
 // Test exporter configuration options
 TEST_F(OtlpExporterTestPeer, ConfigTest)
