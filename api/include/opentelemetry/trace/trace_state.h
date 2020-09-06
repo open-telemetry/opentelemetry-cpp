@@ -101,14 +101,14 @@ public:
   TraceState() noexcept : entries_(new Entry[kMaxKeyValuePairs]), num_entries_(0) {}
 
   // Copy Constructor
-  //  TraceState(const TraceState &trace_state) noexcept
-  //      : entries_(new Entry[kMaxKeyValuePairs]), num_entries_(0)
-  //  {
-  //    for (const auto &entry : trace_state.Entries())
-  //    {
-  //      Set(entry.GetKey(), entry.GetValue());
-  //    }
-  //  }
+  TraceState(const TraceState &trace_state) noexcept
+      : entries_(new Entry[kMaxKeyValuePairs]), num_entries_(0)
+  {
+    for (const auto &entry : trace_state.Entries())
+    {
+      Set(entry.GetKey(), entry.GetValue());
+    }
+  }
 
   bool operator==(const TraceState &that) const noexcept
   {
