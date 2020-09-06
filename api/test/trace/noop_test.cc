@@ -46,9 +46,7 @@ TEST(NoopTest, UseNoopTracers)
 
   s1->GetContext();
 
-  s1->ForceFlushWithMicroseconds(0);
+  tracer->ForceFlushWithMicroseconds(0);
 
-  s1->CloseWithMicroseconds(0);
-
-  nostd::shared_ptr<opentelemetry::trace::Tracer> tracer = s1->GetTracer("trivial", "trivial");
+  tracer->CloseWithMicroseconds(0);
 }
