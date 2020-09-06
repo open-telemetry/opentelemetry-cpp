@@ -8,6 +8,7 @@
 #include "opentelemetry/trace/trace_id.h"
 #include "opentelemetry/trace/tracer.h"
 
+#include <iostream>
 #include <map>
 #include <memory>
 #include <string>
@@ -170,6 +171,7 @@ TEST(HTTPTextFormatTest, PropagateInvalidContext)
       "current-span",
       nostd::shared_ptr<trace::Span>(new trace::DefaultSpan(trace::SpanContext::GetInvalid()))};
   format.Inject(Setter, carrier, ctx);
+  std::cout << carrier["traceparent"] << std::endl;
   EXPECT_TRUE(carrier.count("traceparent") == 0);
 }
 
