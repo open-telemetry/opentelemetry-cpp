@@ -145,8 +145,8 @@ public:
     }
     else
     {
-      float position = float(this->checkpoint_.size() - 1) * q;
-      int ceiling    = ceil(position);
+      float position = float(float(this->checkpoint_.size() - 1) * q);
+      int ceiling    = int(ceil(position));
       return this->checkpoint_[ceiling];
     }
   }
