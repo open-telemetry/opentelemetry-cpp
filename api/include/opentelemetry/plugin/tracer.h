@@ -50,8 +50,6 @@ public:
 
   trace::SpanContext GetContext() const noexcept override { return span_->GetContext(); }
 
-  void SetToken(nostd::unique_ptr<context::Token> &&token) noexcept override {}
-
 private:
   std::shared_ptr<trace::Tracer> tracer_;
   nostd::shared_ptr<trace::Span> span_;

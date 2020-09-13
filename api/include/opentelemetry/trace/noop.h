@@ -50,8 +50,6 @@ public:
 
   SpanContext GetContext() const noexcept override { return span_context_; }
 
-  void SetToken(nostd::unique_ptr<context::Token> && /* token */) noexcept override {}
-
 private:
   std::shared_ptr<Tracer> tracer_;
   SpanContext span_context_;

@@ -67,9 +67,7 @@ Span::Span(std::shared_ptr<Tracer> &&tracer,
       processor_{processor},
       recordable_{processor_->MakeRecordable()},
       start_steady_time{options.start_steady_time},
-      has_ended_{false},
-      token_{nullptr}
-
+      has_ended_{false}
 {
   (void)options;
   if (recordable_ == nullptr)
@@ -169,12 +167,6 @@ void Span::End(const trace_api::EndSpanOptions &options) noexcept
   }
   has_ended_ = true;
 
-  if (token_ != nullptr)
-  {
-    context::RuntimeContext::Detach(*token_);
-    token_.reset();
-  }
-
   if (recordable_ == nullptr)
   {
     return;
@@ -193,12 +185,6 @@ bool Span::IsRecording() const noexcept
   std::lock_guard<std::mutex> lock_guard{mu_};
   return recordable_ != nullptr;
 }
-
-void Span::SetToken(nostd::unique_ptr<context::Token> &&token) noexcept
-{
-  token_ = std::move(token);
-}
-
 }  // namespace trace
 }  // namespace sdk
 OPENTELEMETRY_END_NAMESPACE
