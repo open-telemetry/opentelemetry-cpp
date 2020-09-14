@@ -434,10 +434,14 @@ TEST(Tracer, WithActiveSpan)
       auto scope_second = tracer->WithActiveSpan(span_second);
 
       EXPECT_EQ(0, spans_received->size());
+
+      span_second->End();
     }
 
     EXPECT_EQ(1, spans_received->size());
     EXPECT_EQ("span 2", spans_received->at(0)->GetName());
+
+    span_first->End();
   }
   EXPECT_EQ(2, spans_received->size());
   EXPECT_EQ("span 1", spans_received->at(1)->GetName());

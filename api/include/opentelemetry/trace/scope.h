@@ -35,21 +35,12 @@ public:
    * Initialize a new scope.
    * @param span the given span will be set as the currently active span.
    */
-  Scope(nostd::shared_ptr<Span> span) noexcept
-      : span_(span),
-        token_(context::Token(context::RuntimeContext::Attach(
+  Scope(nostd::shared_ptr<Span> &span) noexcept
+      : token_(context::Token(context::RuntimeContext::Attach(
             context::RuntimeContext::GetCurrent().SetValue(SpanKey, span))))
   {}
 
-  /**
-   * Destroy a scope.
-   * The span wrapped by this Scope object will be ended, and the previously
-   * active span will be restored.
-   */
-  ~Scope() { span_->End(); }
-
 private:
-  nostd::shared_ptr<Span> span_;
   context::Token token_;
 };
 
