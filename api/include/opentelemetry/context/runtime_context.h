@@ -243,8 +243,8 @@ private:
       {
         return Context();
       }
-      size -= 1;
-      return base_[size];
+      size_ -= 1;
+      return base_[size_];
     }
 
     // Returns the Context at the top of the stack.
