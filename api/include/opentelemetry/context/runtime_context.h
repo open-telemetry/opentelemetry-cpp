@@ -239,19 +239,18 @@ private:
     // Pops the top Context off the stack and returns it.
     Context Pop() noexcept
     {
-      if (size_ <= 0)
+      if (size_ == 0)
       {
         return Context();
       }
-      int index = size_ - 1;
-      size_--;
-      return base_[index];
+      size -= 1;
+      return base_[size];
     }
 
     // Returns the Context at the top of the stack.
     Context Top() const noexcept
     {
-      if (size_ <= 0)
+      if (size_ == 0)
       {
         return Context();
       }
