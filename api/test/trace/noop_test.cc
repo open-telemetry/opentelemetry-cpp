@@ -7,7 +7,6 @@
 
 #include <gtest/gtest.h>
 
-using opentelemetry::context::Token;
 using opentelemetry::core::SystemTimestamp;
 using opentelemetry::trace::NoopTracer;
 using opentelemetry::trace::SpanContext;
@@ -41,8 +40,6 @@ TEST(NoopTest, UseNoopTracers)
 
   SystemTimestamp t1;
   s1->AddEvent("test_time_stamp", t1);
-
-  s1->SetToken(opentelemetry::nostd::unique_ptr<Token>(nullptr));
 
   s1->GetContext();
 }
