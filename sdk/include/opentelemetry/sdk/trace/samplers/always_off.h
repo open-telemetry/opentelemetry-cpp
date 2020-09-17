@@ -10,14 +10,14 @@ namespace trace
 namespace trace_api = opentelemetry::trace;
 
 /**
- * The always off sampler always returns IGNORE, effectively disabling
+ * The always off sampler always returns DROP, effectively disabling
  * tracing functionality.
  */
 class AlwaysOffSampler : public Sampler
 {
 public:
   /**
-   * @return Returns IGNORE always
+   * @return Returns DROP always
    */
   SamplingResult ShouldSample(const trace_api::SpanContext * /*parent_context*/,
                               trace_api::TraceId /*trace_id*/,
@@ -25,7 +25,7 @@ public:
                               trace_api::SpanKind /*span_kind*/,
                               const trace_api::KeyValueIterable & /*attributes*/) noexcept override
   {
-    return {Decision::IGNORE, nullptr};
+    return {Decision::DROP, nullptr};
   }
 
   /**

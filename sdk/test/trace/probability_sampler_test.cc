@@ -75,7 +75,7 @@ TEST(ProbabilitySampler, ShouldSampleWithoutContext)
 
   sampling_result = s1.ShouldSample(nullptr, valid_trace_id, "", span_kind, view);
 
-  ASSERT_EQ(Decision::IGNORE, sampling_result.decision);
+  ASSERT_EQ(Decision::DROP, sampling_result.decision);
   ASSERT_EQ(nullptr, sampling_result.attributes);
 
   ProbabilitySampler s2(0.50000001);
@@ -89,7 +89,7 @@ TEST(ProbabilitySampler, ShouldSampleWithoutContext)
 
   sampling_result = s3.ShouldSample(nullptr, valid_trace_id, "", span_kind, view);
 
-  ASSERT_EQ(Decision::IGNORE, sampling_result.decision);
+  ASSERT_EQ(Decision::DROP, sampling_result.decision);
   ASSERT_EQ(nullptr, sampling_result.attributes);
 
   ProbabilitySampler s4(0.50000000);
@@ -117,7 +117,7 @@ TEST(ProbabilitySampler, ShouldSampleWithContext)
 
   auto sampling_result = s1.ShouldSample(&c1, trace_id, "", span_kind, view);
 
-  ASSERT_EQ(Decision::IGNORE, sampling_result.decision);
+  ASSERT_EQ(Decision::DROP, sampling_result.decision);
   ASSERT_EQ(nullptr, sampling_result.attributes);
 
   sampling_result = s1.ShouldSample(&c2, trace_id, "", span_kind, view);

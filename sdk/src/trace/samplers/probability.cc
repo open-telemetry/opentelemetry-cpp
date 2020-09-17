@@ -98,19 +98,19 @@ SamplingResult ProbabilitySampler::ShouldSample(
     }
     else
     {
-      return {Decision::IGNORE, nullptr};
+      return {Decision::DROP, nullptr};
     }
   }
 
   if (threshold_ == 0)
-    return {Decision::IGNORE, nullptr};
+    return {Decision::DROP, nullptr};
 
   if (CalculateThresholdFromBuffer(trace_id) <= threshold_)
   {
     return {Decision::RECORD_AND_SAMPLE, nullptr};
   }
 
-  return {Decision::IGNORE, nullptr};
+  return {Decision::DROP, nullptr};
 }
 
 nostd::string_view ProbabilitySampler::GetDescription() const noexcept

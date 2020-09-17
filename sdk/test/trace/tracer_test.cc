@@ -156,7 +156,7 @@ TEST(Tracer, StartSpanSampleOff)
   tracer_off->StartSpan("span 2")->End();
 
   // The span doesn't write any span data because the sampling decision is alway
-  // IGNORE.
+  // DROP.
   ASSERT_EQ(0, spans_received->size());
 }
 

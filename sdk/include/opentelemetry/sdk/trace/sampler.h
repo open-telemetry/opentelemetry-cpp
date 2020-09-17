@@ -24,7 +24,7 @@ enum class Decision
 {
   // IsRecording() == false, span will not be recorded and all events and attributes will be
   // dropped.
-  IGNORE,
+  DROP,
   // IsRecording() == true, but Sampled flag MUST NOT be set.
   RECORD_ONLY,
   // IsRecording() == true AND Sampled flag` MUST be set.

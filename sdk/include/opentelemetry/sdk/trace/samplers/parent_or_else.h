@@ -20,7 +20,7 @@ public:
   explicit ParentOrElseSampler(std::shared_ptr<Sampler> delegate_sampler) noexcept;
   /** The decision either respects the parent span's sampling decision or delegates to
    * delegateSampler for root spans
-   * @return Returns IGNORE always
+   * @return Returns DROP always
    */
   SamplingResult ShouldSample(const trace_api::SpanContext *parent_context,
                               trace_api::TraceId trace_id,

@@ -24,7 +24,7 @@ public:
   explicit ProbabilitySampler(double probability);
 
   /**
-   * @return Returns either RECORD_AND_SAMPLE or IGNORE based on current
+   * @return Returns either RECORD_AND_SAMPLE or DROP based on current
    * sampler configuration and provided parent_context / tracer_id. tracer_id
    * is used as a pseudorandom value in conjunction with the predefined
    * threshold to determine whether this trace should be sampled
