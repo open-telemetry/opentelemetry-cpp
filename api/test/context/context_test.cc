@@ -88,6 +88,11 @@ TEST(ContextTest, ContextInheritance)
   EXPECT_EQ(nostd::get<int64_t>(foo_context.GetValue("foo_key")), 321);
   EXPECT_EQ(nostd::get<int64_t>(foo_context.GetValue("other_key")),789);
   EXPECT_EQ(nostd::get<int64_t>(foo_context.GetValue("another_key")),987);
+
+  EXPECT_EQ(nostd::get<int64_t>(test_context.GetValue("other_key")),0);
+  EXPECT_EQ(nostd::get<int64_t>(test_context.GetValue("another_key")),0);
+
+
 }
 
 // Tests that copying a context copies the key value pairs as expected.
