@@ -39,7 +39,7 @@ public:
   template <class T>
   Context SetValues(T &values) noexcept
   {
-    Context context                   = Context(values);
+    Context context                  = Context(values);
     nostd::shared_ptr<DataList> last = context.head_;
     while (last->next_ != nullptr)
     {
