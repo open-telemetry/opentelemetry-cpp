@@ -29,7 +29,7 @@ TEST(ParentOrElseSampler, ShouldSample)
   auto sampling_result  = sampler_off.ShouldSample(nullptr, trace_id, "", span_kind, view);
   auto sampling_result2 = sampler_on.ShouldSample(nullptr, trace_id, "", span_kind, view);
 
-  ASSERT_EQ(Decision::NOT_RECORD, sampling_result.decision);
+  ASSERT_EQ(Decision::IGNORE, sampling_result.decision);
   ASSERT_EQ(Decision::RECORD_AND_SAMPLE, sampling_result2.decision);
 
   // Case 2: Parent exists and SampledFlag is true
@@ -40,7 +40,7 @@ TEST(ParentOrElseSampler, ShouldSample)
   // Case 3: Parent exists and SampledFlag is false
   auto sampling_result4 =
       sampler_on.ShouldSample(&parent_context_nonsampled, trace_id, "", span_kind, view);
-  ASSERT_EQ(Decision::NOT_RECORD, sampling_result4.decision);
+  ASSERT_EQ(Decision::IGNORE, sampling_result4.decision);
 }
 
 TEST(ParentOrElseSampler, GetDescription)

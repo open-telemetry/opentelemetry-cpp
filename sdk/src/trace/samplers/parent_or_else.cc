@@ -29,7 +29,7 @@ SamplingResult ParentOrElseSampler::ShouldSample(
     return {Decision::RECORD_AND_SAMPLE, nullptr};
   }
 
-  return {Decision::NOT_RECORD, nullptr};
+  return {Decision::IGNORE, nullptr};
 }
 
 nostd::string_view ParentOrElseSampler::GetDescription() const noexcept
