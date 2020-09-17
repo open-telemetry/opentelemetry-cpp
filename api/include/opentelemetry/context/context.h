@@ -110,7 +110,7 @@ private:
 
     // Builds a data list off of a key and value iterable and returns the head
     template <class T>
-    DataList(const T &keys_and_vals) : key_{nullptr}
+    DataList(const T &keys_and_vals) : key_{nullptr}, next_(nostd::shared_ptr<DataList>{nullptr})
     {
       bool first = true;
       auto *node = this;
