@@ -151,40 +151,25 @@ public:
    *
    * This provides a possibility to override the default thread-local runtime
    * context storage. This has to be set before any spans are created by the
-   * application, otherwise context state information will be discarded, which
-   * might lead to unexpected results.
+   * application, otherwise the behavior is undefined.
    *
    * @param storage a custom runtime context storage
    */
   static void SetRuntimeContextStorage(nostd::shared_ptr<RuntimeContextStorage> storage) noexcept
   {
-    while (GetLock().test_and_set(std::memory_order_acquire))
-      ;
     GetStorage() = storage;
-    GetLock().clear(std::memory_order_release);
   }
 
 private:
   static nostd::shared_ptr<RuntimeContextStorage> GetRuntimeContextStorage() noexcept
   {
-    while (GetLock().test_and_set(std::memory_order_acquire))
-      ;
-    auto storage = nostd::shared_ptr<RuntimeContextStorage>(GetStorage());
-    GetLock().clear(std::memory_order_release);
-
-    return storage;
+    return GetStorage();
   }
 
   static nostd::shared_ptr<RuntimeContextStorage> &GetStorage() noexcept
   {
     static nostd::shared_ptr<RuntimeContextStorage> context(GetDefaultStorage());
     return context;
-  }
-
-  static std::atomic_flag &GetLock() noexcept
-  {
-    static std::atomic_flag lock = ATOMIC_FLAG_INIT;
-    return lock;
   }
 };
 
@@ -195,10 +180,10 @@ inline Token::ContextDetacher::~ContextDetacher()
   context::RuntimeContext::Detach(token);
 }
 
-// The ThreadLocalContextStorage class is a derived class from RuntimeContext and
-// provides a wrapper for propogating context through cpp thread locally.
-// This file must be included to use the RuntimeContext class if another
-// implementation has not been registered.
+// The ThreadLocalContextStorage class is a derived class from 
+// RuntimeContextStorage and provides a wrapper for propogating context through
+// cpp thread locally. This file must be included to use the RuntimeContext
+// class if another implementation has not been registered.
 class ThreadLocalContextStorage : public RuntimeContextStorage
 {
 public:
