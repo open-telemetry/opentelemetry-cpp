@@ -180,7 +180,7 @@ inline Token::ContextDetacher::~ContextDetacher()
   context::RuntimeContext::Detach(token);
 }
 
-// The ThreadLocalContextStorage class is a derived class from 
+// The ThreadLocalContextStorage class is a derived class from
 // RuntimeContextStorage and provides a wrapper for propogating context through
 // cpp thread locally. This file must be included to use the RuntimeContext
 // class if another implementation has not been registered.
