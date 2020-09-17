@@ -40,7 +40,7 @@ public:
   Context SetValues(T &values) noexcept
   {
     Context context                   = Context(values);
-    nostd::shared_ptr<DataList> &last = context.head_;
+    nostd::shared_ptr<DataList> last = context.head_;
     while (last->next_ != nullptr)
     {
       last = last->next_;
