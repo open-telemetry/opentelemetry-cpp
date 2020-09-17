@@ -1,7 +1,5 @@
 #pragma once
 
-#include <atomic>
-
 #include "opentelemetry/context/context.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
