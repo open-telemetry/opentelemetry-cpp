@@ -13,7 +13,7 @@
 
 ## SDK Data Path Diagram
 
-![Data Path Diagram](../images/DataPath.png)
+<!-- [//]: # ![Data Path Diagram](../images/DataPath.png) -->
 
 This is the control path our implementation of the metrics SDK will follow. There are five main components: The controller, accumulator, aggregators, processor, and exporter. Each of these components will be further elaborated on.
 
