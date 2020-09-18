@@ -351,7 +351,7 @@ The only addition to the SDK metric instrument classes from their API counterpar
 
 Note: these requirements come from a specification currently under development. Changes and feedback are in [PR #347](https://github.com/open-telemetry/opentelemetry-specification/pull/347) and the current document is linked [here](https://github.com/open-telemetry/opentelemetry-specification/blob/64bbb0c611d849b90916005d7714fa2a7132d0bf/specification/metrics/sdk.md).
 
-![Data Path Diagram](../images/DataPath.png)
+<!-- [//]: # ![Data Path Diagram](../images/DataPath.png) -->
 
 ## **Accumulator**
 
