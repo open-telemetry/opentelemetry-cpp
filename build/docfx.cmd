@@ -1,9 +1,9 @@
 SETLOCAL
 SETLOCAL ENABLEEXTENSIONS
 
-docfx build docs\docfx.json > docfx.log
-DEL docs\docfx.json 2> NUL
-DEL docs\toc.yml 2> NUL
+docfx build docfx.json > docfx.log
+DEL docfx.json 2> NUL
+DEL toc.yml 2> NUL
 @IF NOT %ERRORLEVEL% == 0 (
   type docfx.log
   ECHO Error: docfx build failed. 1>&2
