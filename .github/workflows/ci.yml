@@ -215,8 +215,8 @@ jobs:
       with:
         file: /home/runner/build/coverage.info
 
-  docfx_test:
-    name: DocFX test
+  docfx_check:
+    name: DocFX check
     runs-on: windows-latest
     steps:
     - uses: actions/checkout@v2
