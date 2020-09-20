@@ -1,6 +1,7 @@
-SETLOCAL
 SETLOCAL ENABLEEXTENSIONS
 
+type ci\docfx.json > docfx.json
+type ci\toc.yml > toc.yml
 docfx build docfx.json > docfx.log
 DEL docfx.json 2> NUL
 DEL toc.yml 2> NUL
