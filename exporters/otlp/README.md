@@ -8,7 +8,7 @@ For a full list of backends supported by the Collector, see the [main Collector 
 
 ## Configuration
 
-The OTLP exporter offers some configuration options. To configure the exporter, create an `OtlpExporterOptions` struct (defined in [exporter.h](./src/otlp_exporter.cc)), set the options inside, and pass the struct to the `OtlpExporter` constructor, like so:
+The OTLP exporter offers some configuration options. To configure the exporter, create an `OtlpExporterOptions` struct (defined in [exporter.h](https://github.com/open-telemetry/opentelemetry-cpp/blob/master/exporters/otlp/include/opentelemetry/exporters/otlp/otlp_exporter.h)), set the options inside, and pass the struct to the `OtlpExporter` constructor, like so:
 
 ```
 OtlpExporterOptions options;

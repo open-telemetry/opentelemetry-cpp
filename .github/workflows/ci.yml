@@ -2,11 +2,220 @@ name: CI
 
 on:
   push:
+    branches: [ master ]
   pull_request:
     branches: [ master ]
 
 jobs:
-  
+  cmake_test:
+    name: CMake test
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - name: setup
+      run: |
+        sudo ./ci/setup_cmake.sh
+        sudo ./ci/setup_ci_environment.sh
+    - name: run tests
+      run: ./ci/do_ci.sh cmake.test
+    - name: run prometheus exporter tests
+      run: ./ci/do_ci.sh cmake.exporter.prometheus.test
+
+  cmake_test_cxx20:
+    name: CMake C++20 test
+    runs-on: ubuntu-20.04
+    steps:
+    - uses: actions/checkout@v2
+    - name: setup
+      run: |
+        sudo ./ci/setup_ci_environment.sh
+        sudo ./ci/setup_cmake.sh
+    - name: run tests
+      run: ./ci/do_ci.sh cmake.c++20.test
+
+  plugin_test:
+    name: Plugin -> CMake
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - name: setup
+      run: |
+        sudo ./ci/setup_cmake.sh
+        sudo ./ci/setup_ci_environment.sh
+    - name: run tests
+      run: ./ci/do_ci.sh cmake.test_example_plugin
+
+  gcc_48_test:
+    name: Legacy Bazel
+    runs-on: ubuntu-18.04
+    steps:
+    - uses: actions/checkout@v2
+    - name: setup
+      run: |
+        sudo ./ci/setup_ci_environment.sh
+        sudo ./ci/install_bazelisk.sh
+        sudo ./ci/install_gcc48.sh
+    - name: run tests
+      run: ./ci/do_ci.sh bazel.legacy.test
+      env:
+        CC: /usr/bin/gcc-4.8
+
+  bazel_test:
+    name: Bazel
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - name: setup
+      run: |
+        sudo ./ci/setup_cmake.sh
+        sudo ./ci/setup_ci_environment.sh
+        sudo ./ci/install_bazelisk.sh
+    - name: run tests
+      run: ./ci/do_ci.sh bazel.test
+
+  bazel_valgrind:
+    name: Bazel valgrind
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - name: setup
+      run: |
+        sudo ./ci/setup_cmake.sh
+        sudo ./ci/setup_ci_environment.sh
+        sudo ./ci/install_bazelisk.sh
+    - name: run tests
+      run: ./ci/do_ci.sh bazel.valgrind
+
+  bazel_noexcept:
+    name: Bazel noexcept
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - name: setup
+      run: |
+        sudo ./ci/setup_cmake.sh
+        sudo ./ci/setup_ci_environment.sh
+        sudo ./ci/install_bazelisk.sh
+    - name: run tests
+      run: ./ci/do_ci.sh bazel.noexcept
+
+  bazel_asan:
+    name: Bazel asan config
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - name: setup
+      run: |
+        sudo ./ci/setup_cmake.sh
+        sudo ./ci/setup_ci_environment.sh
+        sudo ./ci/install_bazelisk.sh
+    - name: run tests
+      run: ./ci/do_ci.sh bazel.asan
+
+  bazel_tsan:
+    name: Bazel tsan config
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - name: setup
+      run: |
+        sudo ./ci/setup_cmake.sh
+        sudo ./ci/setup_ci_environment.sh
+        sudo ./ci/install_bazelisk.sh
+    - name: run tests
+      run: ./ci/do_ci.sh bazel.tsan
+
+  benchmark:
+    name: Benchmark
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - name: setup
+      run: |
+        sudo ./ci/setup_cmake.sh
+        sudo ./ci/setup_ci_environment.sh
+        sudo ./ci/install_bazelisk.sh
+    - name: run tests
+      run: |
+        env BENCHMARK_DIR=/benchmark
+        ./ci/do_ci.sh benchmark
+    - name: Upload benchmark results
+      uses: actions/upload-artifact@v2
+      with:
+        name: benchmark_reports
+        path: /home/runner/benchmark
+
+  format:
+    name: Format
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - name: setup
+      run: sudo ./ci/install_format_tools.sh
+    - name: run tests
+      run: ./ci/do_ci.sh format
+
+  osx_test:
+    name: Bazel on MacOS
+    runs-on: macos-latest
+    steps:
+    - uses: actions/checkout@v2
+    - name: run tests
+      run: ./ci/do_ci.sh bazel.test
+
+  windows:
+    name: CMake -> exporter proto
+    runs-on: windows-2019
+    steps:
+    - uses: actions/checkout@v2
+    - name: setup
+      run: |
+        ./ci/setup_windows_cmake.ps1
+        ./ci/setup_windows_ci_environment.ps1
+        ./ci/install_windows_protobuf.ps1
+    - name: run cmake test
+      run: ./ci/do_ci.ps1 cmake.test
+    - name: run otprotocol test
+      run: ./ci/do_ci.ps1 cmake.exporter.otprotocol.test
+
+  windows_bazel:
+    name: Bazel Windows
+    runs-on: windows-2019
+    steps:
+    - uses: actions/checkout@v2
+    - name: setup
+      run: ./ci/install_windows_bazelisk.ps1
+    - name: run tests
+      run: ./ci/do_ci.ps1 bazel.build
+
+  windows_plugin_test:
+    name: Plugin -> CMake Windows
+    runs-on: windows-2019
+    steps:
+    - uses: actions/checkout@v2
+    - name: setup
+      run: |
+        ./ci/setup_windows_cmake.ps1
+        ./ci/setup_windows_ci_environment.ps1
+    - name: run tests
+      run: ./ci/do_ci.ps1 cmake.test_example_plugin
+
+  code_coverage:
+    name: Code coverage
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - name: setup
+      run: |
+        sudo ./ci/setup_cmake.sh
+        sudo ./ci/setup_ci_environment.sh
+    - name: run tests and generate report
+      run: ./ci/do_ci.sh code.coverage
+    - name: upload report
+      uses: codecov/codecov-action@v1
+      with:
+        file: /home/runner/build/coverage.info
+
   docfx_check:
     name: DocFX check
     runs-on: windows-latest
