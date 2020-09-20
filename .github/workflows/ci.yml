@@ -214,9 +214,9 @@ jobs:
       uses: codecov/codecov-action@v1
       with:
         file: /home/runner/build/coverage.info
-        
+
   docfx_test:
-    name: DocFX check
+    name: DocFX test
     runs-on: windows-latest
     steps:
     - uses: actions/checkout@v2
