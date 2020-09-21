@@ -248,7 +248,7 @@ Metric instruments are created through instances of the `Meter` class and each t
 * Monotonicity: A monotonic instrument is an additive instrument, where the progression of each sum is non-decreasing. Monotonic instruments are useful for monitoring rate information.
 
 The following instrument types will be supported:
-![Metric Instrument Table](../images/MetricInstrumentsTable.png)
+<!-- [//]: # ![Metric Instrument Table](../images/MetricInstrumentsTable.png) -->
 
 ### Metric Event Data Model
 
