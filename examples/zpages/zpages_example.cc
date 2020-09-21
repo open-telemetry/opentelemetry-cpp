@@ -5,7 +5,6 @@
 #include <chrono>
 #include <iostream>
 #include <string>
-#include "opentelemetry/context/threadlocal_context.h"
 
 #include "opentelemetry/ext/zpages/zpages.h"  // Required file include for zpages
 

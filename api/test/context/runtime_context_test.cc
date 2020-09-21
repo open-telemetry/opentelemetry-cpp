@@ -1,5 +1,5 @@
+#include "opentelemetry/context/runtime_context.h"
 #include "opentelemetry/context/context.h"
-#include "opentelemetry/context/threadlocal_context.h"
 
 #include <gtest/gtest.h>
 

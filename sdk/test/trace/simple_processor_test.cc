@@ -1,5 +1,4 @@
 #include "opentelemetry/sdk/trace/simple_processor.h"
-#include "opentelemetry/context/threadlocal_context.h"
 #include "opentelemetry/nostd/span.h"
 #include "opentelemetry/sdk/trace/span_data.h"
 
