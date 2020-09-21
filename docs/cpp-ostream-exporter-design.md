@@ -35,7 +35,7 @@ The goal of the interface is to minimize burden of implementation for protocol-d
 
 The SpanExporter is called through the SpanProcessor, which passes finished spans to the configured SpanExporter, as soon as they are finished. The SpanProcessor also shutdown the exporter by the Shutdown function within the SpanProcessor.
 
-![SDK Data Path](./images/SpanDataPath.png)
+<!-- [//]: # ![SDK Data Path](./images/SpanDataPath.png) -->
 
 The specification states: exporter must support two functions: Export and Shutdown.
 
@@ -127,7 +127,7 @@ The MetricsExporter has the same requirements as the SpanExporter. The exporter 
 
 Exports a batch of telemetry data. Protocol exporters that will implement this function are typically expected to serialize and transmit the data to the destination.
 
-![SDK Data Path](./images/DataPath.png)
+<!-- [//]: # ![SDK Data Path](./images/DataPath.png) -->
 
 ### `Export(batch of Records)`
 
