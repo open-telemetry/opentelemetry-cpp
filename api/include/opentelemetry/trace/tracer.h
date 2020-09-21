@@ -70,6 +70,16 @@ public:
     return nostd::unique_ptr<Scope>(new Scope{span});
   }
 
+  nostd::shared_ptr<Span> GetCurrentSpan() noexcept 
+  {
+  context::ContextValue active_span = context::RuntimeContext::GetValue(SpanKey);
+  if (nostd::holds_alternative<nostd::shared_ptr<Span>>(active_span)) {
+  return nostd::get<nostd::shared_ptr<Span>>(active_span);
+  } else {
+      return nostd::shared_ptr<Span>(new DefaultSpan(SpanContext::GetInvalid()));
+  }
+  }
+
   /**
    * Force any buffered spans to flush.
    * @param timeout to complete the flush
