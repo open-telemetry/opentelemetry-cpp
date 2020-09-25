@@ -70,6 +70,11 @@ public:
     return nostd::unique_ptr<Scope>(new Scope{span});
   }
 
+  /**
+   * Get the currently active span.
+   * @return the currently active span, or an invalid default span if no span
+   * is active.
+   */
   nostd::shared_ptr<Span> GetCurrentSpan() noexcept
   {
     context::ContextValue active_span = context::RuntimeContext::GetValue(SpanKey);
