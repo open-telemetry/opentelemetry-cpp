@@ -3,6 +3,7 @@
 #include "opentelemetry/nostd/shared_ptr.h"
 #include "opentelemetry/nostd/string_view.h"
 #include "opentelemetry/nostd/unique_ptr.h"
+#include "opentelemetry/trace/default_span.h"
 #include "opentelemetry/trace/scope.h"
 #include "opentelemetry/trace/span.h"
 #include "opentelemetry/version.h"
@@ -68,6 +69,24 @@ public:
   nostd::unique_ptr<Scope> WithActiveSpan(nostd::shared_ptr<Span> &span) noexcept
   {
     return nostd::unique_ptr<Scope>(new Scope{span});
+  }
+
+  /**
+   * Get the currently active span.
+   * @return the currently active span, or an invalid default span if no span
+   * is active.
+   */
+  nostd::shared_ptr<Span> GetCurrentSpan() noexcept
+  {
+    context::ContextValue active_span = context::RuntimeContext::GetValue(SpanKey);
+    if (nostd::holds_alternative<nostd::shared_ptr<Span>>(active_span))
+    {
+      return nostd::get<nostd::shared_ptr<Span>>(active_span);
+    }
+    else
+    {
+      return nostd::shared_ptr<Span>(new DefaultSpan(SpanContext::GetInvalid()));
+    }
   }
 
   /**
