@@ -54,10 +54,13 @@ nostd::shared_ptr<trace_api::Span> Tracer::StartSpan(
       sampler_->ShouldSample(nullptr, trace_api::TraceId(), name, options.kind, attributes);
   if (sampling_result.decision == Decision::DROP)
   {
-    auto span = nostd::shared_ptr<trace_api::Span>{
-        new (std::nothrow) trace_api::NoopSpan{this->shared_from_this()}};
+    // Don't allocate a no-op span for every DROP decision, but use a static
+    // singleton for this case.
+    static trace_api::NoopSpan noop_span(this->shared_from_this());
+    static nostd::shared_ptr<trace_api::Span> noop_span_ptr(
+        std::shared_ptr<trace_api::NoopSpan>(&noop_span, [](trace_api::NoopSpan *) {}));
 
-    return span;
+    return noop_span_ptr;
   }
   else
   {
