@@ -68,11 +68,10 @@ public:
   {
     // Don't allocate a no-op span for every StartSpan call, but use a static
     // singleton for this case.
-    static NoopSpan noop_span(this->shared_from_this());
-    static nostd::shared_ptr<trace_api::Span> noop_span_ptr(
-        std::shared_ptr<NoopSpan>(&noop_span, [](NoopSpan *) {}));
+    static nostd::shared_ptr<trace_api::Span> noop_span(
+        new trace_api::NoopSpan{this->shared_from_this()});
 
-    return noop_span_ptr;
+    return noop_span;
   }
 
   void ForceFlushWithMicroseconds(uint64_t /*timeout*/) noexcept override {}
