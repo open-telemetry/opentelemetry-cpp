@@ -75,23 +75,22 @@ TEST(Tracer, ToInMemorySpanExporter)
   auto span2 = span_data->GetSpans();
   ASSERT_EQ(1, span2.size());
   ASSERT_EQ("span 2", span2.at(0)->GetName());
-  EXPECT_TRUE(span2->GetTraceId().IsValid());
-  EXPECT_TRUE(span2->GetSpanId().IsValid());
-  EXPECT_TRUE(span2->GetParentSpanId().IsValid());
+  EXPECT_TRUE(span2.at(0)->GetTraceId().IsValid());
+  EXPECT_TRUE(span2.at(0)->GetSpanId().IsValid());
+  EXPECT_TRUE(span2.at(0)->GetParentSpanId().IsValid());
 
   span_first->End();
-
-  // Verify trace and parent span id propagation
-  EXPECT_EQ(span_second->GetContext().trace_id(), span_first->GetContext().trace_id());
-  EXPECT_EQ(spans_received->at(0)->GetTraceId(), spans_received->at(1)->GetTraceId());
-  EXPECT_EQ(spans_received->at(0)->GetParentSpanId(), spans_received->at(1)->GetSpanId());
 
   auto span1 = span_data->GetSpans();
   ASSERT_EQ(1, span1.size());
   ASSERT_EQ("span 1", span1.at(0)->GetName());
-  EXPECT_TRUE(span1->GetTraceId().IsValid());
-  EXPECT_TRUE(span1->GetSpanId().IsValid());
-  EXPECT_FALSE(span1->GetParentSpanId().IsValid());
+  EXPECT_TRUE(span1.at(0)->GetTraceId().IsValid());
+  EXPECT_TRUE(span1.at(0)->GetSpanId().IsValid());
+  EXPECT_FALSE(span1.at(0)->GetParentSpanId().IsValid());
+
+  // Verify trace and parent span id propagation
+  EXPECT_EQ(span1.at(0)->GetTraceId(), span2.at(0)->GetTraceId());
+  EXPECT_EQ(span2.at(0)->GetParentSpanId(), span1.at(0)->GetSpanId());
 }
 
 TEST(Tracer, StartSpanSampleOn)
@@ -194,31 +193,37 @@ TEST(Tracer, StartSpanWithAttributes)
   ASSERT_EQ(2, spans.size());
 
   auto &cur_span_data = spans.at(0);
-  ASSERT_EQ(7, cur_span_data->GetAttributes().size());
-  ASSERT_EQ(314159, nostd::get<int64_t>(cur_span_data->GetAttributes().at("attr1")));
+  ASSERT_EQ(9, cur_span_data->GetAttributes().size());
+  ASSERT_EQ(314159, nostd::get<int32_t>(cur_span_data->GetAttributes().at("attr1")));
   ASSERT_EQ(false, nostd::get<bool>(cur_span_data->GetAttributes().at("attr2")));
-  ASSERT_EQ(314159, nostd::get<uint64_t>(cur_span_data->GetAttributes().at("attr3")));
-  ASSERT_EQ(-20, nostd::get<int64_t>(cur_span_data->GetAttributes().at("attr4")));
-  ASSERT_EQ(20, nostd::get<uint64_t>(cur_span_data->GetAttributes().at("attr5")));
-  ASSERT_EQ(3.1, nostd::get<double>(cur_span_data->GetAttributes().at("attr6")));
-  ASSERT_EQ("string", nostd::get<std::string>(cur_span_data->GetAttributes().at("attr7")));
+  ASSERT_EQ(314159, nostd::get<uint32_t>(cur_span_data->GetAttributes().at("attr3")));
+  ASSERT_EQ(-20, nostd::get<int32_t>(cur_span_data->GetAttributes().at("attr4")));
+  ASSERT_EQ(20, nostd::get<uint32_t>(cur_span_data->GetAttributes().at("attr5")));
+  ASSERT_EQ(-20, nostd::get<int64_t>(cur_span_data->GetAttributes().at("attr6")));
+  ASSERT_EQ(20, nostd::get<uint64_t>(cur_span_data->GetAttributes().at("attr7")));
+  ASSERT_EQ(3.1, nostd::get<double>(cur_span_data->GetAttributes().at("attr8")));
+  ASSERT_EQ("string", nostd::get<std::string>(cur_span_data->GetAttributes().at("attr9")));
 
   auto &cur_span_data2 = spans.at(1);
-  ASSERT_EQ(7, cur_span_data2->GetAttributes().size());
-  ASSERT_EQ(std::vector<int64_t>({1, 2, 3}),
-            nostd::get<std::vector<int64_t>>(cur_span_data2->GetAttributes().at("attr1")));
-  ASSERT_EQ(std::vector<uint64_t>({1, 2, 3}),
-            nostd::get<std::vector<uint64_t>>(cur_span_data2->GetAttributes().at("attr2")));
+  ASSERT_EQ(9, cur_span_data2->GetAttributes().size());
+  ASSERT_EQ(std::vector<int32_t>({1, 2, 3}),
+            nostd::get<std::vector<int32_t>>(cur_span_data2->GetAttributes().at("attr1")));
+  ASSERT_EQ(std::vector<uint32_t>({1, 2, 3}),
+            nostd::get<std::vector<uint32_t>>(cur_span_data2->GetAttributes().at("attr2")));
+  ASSERT_EQ(std::vector<int32_t>({1, -2, 3}),
+            nostd::get<std::vector<int32_t>>(cur_span_data2->GetAttributes().at("attr3")));
+  ASSERT_EQ(std::vector<uint32_t>({1, 2, 3}),
+            nostd::get<std::vector<uint32_t>>(cur_span_data2->GetAttributes().at("attr4")));
   ASSERT_EQ(std::vector<int64_t>({1, -2, 3}),
-            nostd::get<std::vector<int64_t>>(cur_span_data2->GetAttributes().at("attr3")));
+            nostd::get<std::vector<int64_t>>(cur_span_data2->GetAttributes().at("attr5")));
   ASSERT_EQ(std::vector<uint64_t>({1, 2, 3}),
-            nostd::get<std::vector<uint64_t>>(cur_span_data2->GetAttributes().at("attr4")));
+            nostd::get<std::vector<uint64_t>>(cur_span_data2->GetAttributes().at("attr6")));
   ASSERT_EQ(std::vector<double>({1.1, 2.1, 3.1}),
-            nostd::get<std::vector<double>>(cur_span_data2->GetAttributes().at("attr5")));
+            nostd::get<std::vector<double>>(cur_span_data2->GetAttributes().at("attr7")));
   ASSERT_EQ(std::vector<bool>({true, false}),
-            nostd::get<std::vector<bool>>(cur_span_data2->GetAttributes().at("attr6")));
+            nostd::get<std::vector<bool>>(cur_span_data2->GetAttributes().at("attr8")));
   ASSERT_EQ(std::vector<std::string>({"a", "b"}),
-            nostd::get<std::vector<std::string>>(cur_span_data2->GetAttributes().at("attr7")));
+            nostd::get<std::vector<std::string>>(cur_span_data2->GetAttributes().at("attr9")));
 }
 
 TEST(Tracer, StartSpanWithAttributesCopy)
@@ -383,7 +388,7 @@ TEST(Tracer, WithActiveSpan)
   std::unique_ptr<InMemorySpanExporter> exporter(new InMemorySpanExporter());
   std::shared_ptr<InMemorySpanData> span_data = exporter->GetData();
   auto tracer                                 = initTracer(std::move(exporter));
-  auto spans = span_data.get()->GetSpans();
+  auto spans                                  = span_data.get()->GetSpans();
 
   ASSERT_EQ(0, spans.size());
 
@@ -395,15 +400,15 @@ TEST(Tracer, WithActiveSpan)
       auto span_second  = tracer->StartSpan("span 2");
       auto scope_second = tracer->WithActiveSpan(span_second);
 
-  spans = span_data->GetSpans();
-  ASSERT_EQ(0, spans.size());
+      spans = span_data->GetSpans();
+      ASSERT_EQ(0, spans.size());
 
       span_second->End();
     }
 
-  spans = span_data->GetSpans();
-  ASSERT_EQ(1, spans.size());
-  EXPECT_EQ("span 2", spans.at(0)->GetName());
+    spans = span_data->GetSpans();
+    ASSERT_EQ(1, spans.size());
+    EXPECT_EQ("span 2", spans.at(0)->GetName());
 
     span_first->End();
   }
