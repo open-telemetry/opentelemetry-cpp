@@ -38,10 +38,14 @@ public:
     span_->AddEvent(name, timestamp, attributes);
   }
 
-  virtual void AddLink(const trace::Link &link) noexcept override {}
-  virtual void AddLink(trace::SpanContext spanContext,
-                       const trace::KeyValueIterable &attributes) noexcept override
-  {}
+  void AddLink(const trace::Link &link) noexcept override { span_->AddLink(link); }
+  void AddLink(trace::SpanContext spanContext,
+               const trace::KeyValueIterable &attributes) noexcept override
+  {
+    span_->AddLink(spanContext, attributes);
+  }
+
+  void AddLink(trace::SpanContext spanContext) noexcept override { span_->AddLink(spanContext); }
 
   void SetStatus(trace::CanonicalCode code, nostd::string_view description) noexcept override
   {

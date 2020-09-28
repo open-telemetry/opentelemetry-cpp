@@ -23,6 +23,12 @@ public:
       : span_context_(span_context), attribute_map_{attributes}
   {}
 
+  Link(opentelemetry::trace::SpanContext span_context)
+      : span_context_(span_context),
+        attribute_map_(
+            std::unordered_map<nostd::string_view, opentelemetry::common::AttributeValue>())
+  {}
+
   const trace_api::SpanContext &GetContext() const noexcept override { return span_context_; }
 
   const trace_api::KeyValueIterable &GetAttributes() const noexcept override

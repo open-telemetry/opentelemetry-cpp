@@ -141,15 +141,12 @@ public:
    *  @param attributes Link attributes
    */
 
-  virtual void AddLink(const trace::Link &link) noexcept                   = 0;
+  virtual void AddLink(const trace::Link &link) noexcept = 0;
+
   virtual void AddLink(trace::SpanContext spanContext,
                        const trace::KeyValueIterable &attributes) noexcept = 0;
 
-  template <class T, nostd::enable_if_t<detail::is_key_value_iterable<T>::value> * = nullptr>
-  void AddLink(trace_api::SpanContext spanContext) noexcept
-  {
-    this->AddLink(spanContext, KeyValueIterableView<T>{});
-  }
+  virtual void AddLink(trace::SpanContext spanContext) noexcept = 0;
 
   // Sets the status of the span. The default status is OK. Only the value of
   // the last call will be

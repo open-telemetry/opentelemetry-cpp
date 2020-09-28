@@ -1,5 +1,6 @@
 #include "opentelemetry/trace/noop.h"
 #include "opentelemetry/core/timestamp.h"
+#include "opentelemetry/trace/key_value_iterable_view.h"
 
 #include <map>
 #include <memory>
@@ -31,6 +32,13 @@ TEST(NoopTest, UseNoopTracers)
   s1->SetAttribute("abc", 4);
 
   s1->AddEvent("abc");  // add Empty
+  SpanContext sp(false, false);
+  s1->AddLink(sp);
+  using M = std::map<std::string, std::string>;
+  M m1    = {{"abc", "123"}, {"xyz", "456"}};
+  opentelemetry::trace::KeyValueIterableView<M> iterable{m1};
+
+  s1->AddLink(sp, iterable);
 
   EXPECT_EQ(s1->IsRecording(), false);
 

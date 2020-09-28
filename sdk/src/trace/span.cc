@@ -162,6 +162,15 @@ void Span::AddLink(trace_api::SpanContext spanContext,
   recordable_->AddLink(spanContext, attributes);
 }
 
+void Span::AddLink(trace_api::SpanContext spanContext) noexcept
+{
+  if (recordable_ == nullptr)
+  {
+    return;
+  }
+  recordable_->AddLink(spanContext);
+}
+
 void Span::SetStatus(trace_api::CanonicalCode code, nostd::string_view description) noexcept
 {
   std::lock_guard<std::mutex> lock_guard{mu_};

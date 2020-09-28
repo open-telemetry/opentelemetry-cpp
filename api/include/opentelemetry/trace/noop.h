@@ -40,11 +40,13 @@ public:
                 const trace::KeyValueIterable & /*attributes*/) noexcept override
   {}
 
-  virtual void AddLink(const Link &link) noexcept override {}
+  void AddLink(const Link &link) noexcept override {}
 
-  virtual void AddLink(trace_api::SpanContext spanContext,
-                       const trace_api::KeyValueIterable &attributes) noexcept override
+  void AddLink(trace_api::SpanContext spanContext,
+               const trace_api::KeyValueIterable &attributes) noexcept override
   {}
+
+  void AddLink(trace_api::SpanContext spanContext) noexcept override {}
 
   void SetStatus(CanonicalCode /*code*/, nostd::string_view /*description*/) noexcept override {}
 

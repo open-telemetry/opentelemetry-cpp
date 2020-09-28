@@ -37,10 +37,12 @@ public:
                 core::SystemTimestamp timestamp,
                 const trace_api::KeyValueIterable &attributes) noexcept override;
 
-  virtual void AddLink(const trace_api::Link &link) noexcept override;
+  void AddLink(const trace_api::Link &link) noexcept override;
 
-  virtual void AddLink(trace_api::SpanContext spanContext,
-                       const trace_api::KeyValueIterable &attributes) noexcept override;
+  void AddLink(trace_api::SpanContext spanContext,
+               const trace_api::KeyValueIterable &attributes) noexcept override;
+
+  void AddLink(trace_api::SpanContext spanContext) noexcept override;
 
   void SetStatus(trace_api::CanonicalCode code, nostd::string_view description) noexcept override;
 
