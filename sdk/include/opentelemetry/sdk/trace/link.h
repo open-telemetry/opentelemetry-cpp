@@ -11,6 +11,8 @@ namespace sdk
 {
 namespace trace
 {
+namespace trace_api = opentelemetry::trace;
+
 class Link final : public trace_api::Link
 {
 public:
