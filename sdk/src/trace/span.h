@@ -3,6 +3,7 @@
 #include <mutex>
 
 #include "opentelemetry/sdk/trace/tracer.h"
+#include "opentelemetry/sdk/trace/link.h"
 #include "opentelemetry/version.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
@@ -20,7 +21,8 @@ public:
                 nostd::string_view name,
                 const trace_api::KeyValueIterable &attributes,
                 const trace_api::StartSpanOptions &options,
-                const trace_api::SpanContext &parent_span_context) noexcept;
+                const trace_api::SpanContext &parent_span_context,
+                const nostd::span<std::shared_ptr<trace_api::Link>> &links) noexcept;
 
   ~Span() override;
 
@@ -34,6 +36,11 @@ public:
   void AddEvent(nostd::string_view name,
                 core::SystemTimestamp timestamp,
                 const trace_api::KeyValueIterable &attributes) noexcept override;
+
+  virtual void AddLink(const trace_api::Link &link) noexcept override;
+
+  virtual void AddLink(trace_api::SpanContext spanContext, 
+                      const trace_api::KeyValueIterable& attributes) noexcept override;
 
   void SetStatus(trace_api::CanonicalCode code, nostd::string_view description) noexcept override;
 

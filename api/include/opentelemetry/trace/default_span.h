@@ -33,6 +33,13 @@ public:
     this->AddEvent(name, std::chrono::system_clock::now(), attributes);
   }
 
+  virtual void AddLink(const trace::Link &link) noexcept override
+  {}
+
+  virtual void AddLink(trace::SpanContext spanContext, 
+                      const trace::KeyValueIterable& attributes) noexcept override
+  {}
+
   void SetStatus(CanonicalCode status, nostd::string_view description) noexcept {}
 
   void UpdateName(nostd::string_view name) noexcept {}

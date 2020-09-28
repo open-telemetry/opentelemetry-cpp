@@ -15,7 +15,7 @@
 
 #include <memory>
 
-OPENTELEMETRY_BEGIN_NAMESPACE
+OPENTELEMETRY_BEGIN_NAMESPACE 
 namespace trace
 {
 /**
@@ -40,6 +40,11 @@ public:
                 const trace::KeyValueIterable & /*attributes*/) noexcept override
   {}
 
+  virtual void AddLink(const Link &link) noexcept override {}
+
+  virtual void AddLink(trace_api::SpanContext spanContext, 
+                      const trace_api::KeyValueIterable& attributes) noexcept override {}
+                      
   void SetStatus(CanonicalCode /*code*/, nostd::string_view /*description*/) noexcept override {}
 
   void UpdateName(nostd::string_view /*name*/) noexcept override {}

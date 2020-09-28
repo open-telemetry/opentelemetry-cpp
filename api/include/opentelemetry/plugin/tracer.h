@@ -5,6 +5,7 @@
 #include "opentelemetry/plugin/detail/dynamic_library_handle.h"
 #include "opentelemetry/plugin/detail/tracer_handle.h"
 #include "opentelemetry/trace/tracer.h"
+#include "opentelemetry/trace/link.h"
 #include "opentelemetry/version.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
@@ -36,6 +37,10 @@ public:
   {
     span_->AddEvent(name, timestamp, attributes);
   }
+
+  virtual void AddLink(const trace::Link &link) noexcept override {}
+  virtual void AddLink(trace::SpanContext spanContext, 
+                      const trace::KeyValueIterable& attributes) noexcept override {}
 
   void SetStatus(trace::CanonicalCode code, nostd::string_view description) noexcept override
   {
