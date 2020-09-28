@@ -9,8 +9,8 @@
 #include "opentelemetry/nostd/unique_ptr.h"
 #include "opentelemetry/trace/canonical_code.h"
 #include "opentelemetry/trace/key_value_iterable_view.h"
-#include "opentelemetry/trace/span_context.h"
 #include "opentelemetry/trace/link.h"
+#include "opentelemetry/trace/span_context.h"
 #include "opentelemetry/version.h"
 
 constexpr char SpanKey[] = "span_key";
@@ -140,16 +140,16 @@ public:
    *  @param spanContext the context of the linked span
    *  @param attributes Link attributes
    */
- 
-  virtual void AddLink(const trace::Link &link) noexcept = 0;
-  virtual void AddLink(trace::SpanContext spanContext, 
-                      const trace::KeyValueIterable& attributes) noexcept = 0; 
+
+  virtual void AddLink(const trace::Link &link) noexcept                   = 0;
+  virtual void AddLink(trace::SpanContext spanContext,
+                       const trace::KeyValueIterable &attributes) noexcept = 0;
 
   template <class T, nostd::enable_if_t<detail::is_key_value_iterable<T>::value> * = nullptr>
   void AddLink(trace_api::SpanContext spanContext) noexcept
   {
     this->AddLink(spanContext, KeyValueIterableView<T>{});
-  }                   
+  }
 
   // Sets the status of the span. The default status is OK. Only the value of
   // the last call will be

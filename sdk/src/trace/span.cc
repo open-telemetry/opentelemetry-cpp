@@ -100,7 +100,7 @@ Span::Span(std::shared_ptr<Tracer> &&tracer,
     return true;
   });
 
-  for (auto &link: links)
+  for (auto &link : links)
   {
     recordable_->AddLink(link->GetContext(), link->GetAttributes());
   }
@@ -143,7 +143,7 @@ void Span::AddEvent(nostd::string_view name,
   (void)attributes;
 }
 
-void Span::AddLink(const trace_api::Link& link) noexcept
+void Span::AddLink(const trace_api::Link &link) noexcept
 {
   if (recordable_ == nullptr)
   {
@@ -152,14 +152,14 @@ void Span::AddLink(const trace_api::Link& link) noexcept
   recordable_->AddLink(link.GetContext(), link.GetAttributes());
 }
 
-void Span::AddLink(trace_api::SpanContext spanContext, 
-              const trace_api::KeyValueIterable& attributes) noexcept
+void Span::AddLink(trace_api::SpanContext spanContext,
+                   const trace_api::KeyValueIterable &attributes) noexcept
 {
-    if (recordable_ == nullptr )
-    {
-      return;
-    }
-    recordable_->AddLink(spanContext, attributes);
+  if (recordable_ == nullptr)
+  {
+    return;
+  }
+  recordable_->AddLink(spanContext, attributes);
 }
 
 void Span::SetStatus(trace_api::CanonicalCode code, nostd::string_view description) noexcept
