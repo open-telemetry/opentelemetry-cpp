@@ -1,4 +1,5 @@
 #include "opentelemetry/sdk/trace/tracer.h"
+#include "opentelemetry/sdk/trace/link.h"
 #include "opentelemetry/sdk/trace/samplers/always_off.h"
 #include "opentelemetry/sdk/trace/samplers/always_on.h"
 #include "opentelemetry/sdk/trace/samplers/parent_or_else.h"
@@ -339,6 +340,24 @@ TEST(Tracer, SpanSetAttribute)
   ASSERT_EQ(1, spans_received->size());
   auto &span_data = spans_received->at(0);
   ASSERT_EQ(3.1, nostd::get<double>(span_data->GetAttributes().at("abc")));
+}
+
+TEST(Tracer, SpanAddLink)
+{
+  std::shared_ptr<std::vector<std::unique_ptr<SpanData>>> spans_received(
+      new std::vector<std::unique_ptr<SpanData>>);
+  auto tracer = initTracer(spans_received);
+
+  auto span = tracer->StartSpan("span 1");
+
+  SpanContext sp1(true, true);
+  span->AddLink(sp1);
+
+  span->End();
+  ASSERT_EQ(1, spans_received->size());
+  auto &span_data = spans_received->at(0);
+
+  ASSERT_EQ(1, span_data->GetLinks().size());
 }
 
 TEST(Tracer, TestAlwaysOnSampler)
