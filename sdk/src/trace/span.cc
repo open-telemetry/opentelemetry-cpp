@@ -119,22 +119,34 @@ void Span::SetAttribute(nostd::string_view key,
 
 void Span::AddEvent(nostd::string_view name) noexcept
 {
-  (void)name;
+  std::lock_guard<std::mutex> lock_guard{mu_};
+  if (recordable_ == nullptr)
+  {
+    return;
+  }
+  recordable_->AddEvent(name);
 }
 
 void Span::AddEvent(nostd::string_view name, core::SystemTimestamp timestamp) noexcept
 {
-  (void)name;
-  (void)timestamp;
+  std::lock_guard<std::mutex> lock_guard{mu_};
+  if (recordable_ == nullptr)
+  {
+    return;
+  }
+  recordable_->AddEvent(name, timestamp);
 }
 
 void Span::AddEvent(nostd::string_view name,
                     core::SystemTimestamp timestamp,
                     const trace_api::KeyValueIterable &attributes) noexcept
 {
-  (void)name;
-  (void)timestamp;
-  (void)attributes;
+  std::lock_guard<std::mutex> lock_guard{mu_};
+  if (recordable_ == nullptr)
+  {
+    return;
+  }
+  recordable_->AddEvent(name, timestamp, attributes);
 }
 
 void Span::SetStatus(trace_api::CanonicalCode code, nostd::string_view description) noexcept
