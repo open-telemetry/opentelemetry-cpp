@@ -1,4 +1,3 @@
-#include "opentelemetry/context/threadlocal_context.h"
 #include "opentelemetry/trace/provider.h"
 
 namespace trace = opentelemetry::trace;

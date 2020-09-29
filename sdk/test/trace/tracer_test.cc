@@ -1,5 +1,4 @@
 #include "opentelemetry/sdk/trace/tracer.h"
-#include "opentelemetry/context/threadlocal_context.h"
 #include "opentelemetry/sdk/trace/samplers/always_off.h"
 #include "opentelemetry/sdk/trace/samplers/always_on.h"
 #include "opentelemetry/sdk/trace/samplers/parent_or_else.h"
@@ -103,6 +102,7 @@ TEST(Tracer, ToMockSpanExporter)
   auto tracer = initTracer(spans_received);
 
   auto span_first  = tracer->StartSpan("span 1");
+  auto scope_first = tracer->WithActiveSpan(span_first);
   auto span_second = tracer->StartSpan("span 2");
 
   ASSERT_EQ(0, spans_received->size());
@@ -155,7 +155,7 @@ TEST(Tracer, StartSpanSampleOff)
   tracer_off->StartSpan("span 2")->End();
 
   // The span doesn't write any span data because the sampling decision is alway
-  // NOT_RECORD.
+  // DROP.
   ASSERT_EQ(0, spans_received->size());
 }
 
@@ -417,27 +417,31 @@ TEST(Tracer, TestParentOrElseSampler)
   ASSERT_EQ(0, spans_received_parent_off->size());
 }
 
-TEST(Tracer, StartSpanUpdatesRuntimeContext)
+TEST(Tracer, WithActiveSpan)
 {
 
   std::shared_ptr<std::vector<std::unique_ptr<SpanData>>> spans_received(
       new std::vector<std::unique_ptr<SpanData>>);
   auto tracer = initTracer(spans_received);
 
-  auto span_first  = tracer->StartSpan("span 1");
-  auto span_second = tracer->StartSpan("span 2");
+  {
+    auto span_first  = tracer->StartSpan("span 1");
+    auto scope_first = tracer->WithActiveSpan(span_first);
 
-  EXPECT_EQ(0, spans_received->size());
+    {
+      auto span_second  = tracer->StartSpan("span 2");
+      auto scope_second = tracer->WithActiveSpan(span_second);
 
-  nostd::get<nostd::shared_ptr<trace::Span>>(
-      context::RuntimeContext::GetCurrent().GetValue(SpanKey))
-      ->End();
-  EXPECT_EQ(1, spans_received->size());
-  EXPECT_EQ("span 2", spans_received->at(0)->GetName());
+      EXPECT_EQ(0, spans_received->size());
 
-  nostd::get<nostd::shared_ptr<trace::Span>>(
-      context::RuntimeContext::GetCurrent().GetValue(SpanKey))
-      ->End();
+      span_second->End();
+    }
+
+    EXPECT_EQ(1, spans_received->size());
+    EXPECT_EQ("span 2", spans_received->at(0)->GetName());
+
+    span_first->End();
+  }
   EXPECT_EQ(2, spans_received->size());
   EXPECT_EQ("span 1", spans_received->at(1)->GetName());
 }

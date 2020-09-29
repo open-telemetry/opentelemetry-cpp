@@ -15,10 +15,6 @@
 constexpr char SpanKey[] = "span_key";
 
 OPENTELEMETRY_BEGIN_NAMESPACE
-namespace context
-{
-class Token;
-}
 namespace trace
 {
 enum class SpanKind
@@ -162,8 +158,6 @@ public:
   // Returns true if this Span is recording tracing events (e.g. SetAttribute,
   // AddEvent).
   virtual bool IsRecording() const noexcept = 0;
-
-  virtual void SetToken(nostd::unique_ptr<context::Token> &&token) noexcept = 0;
 };
 }  // namespace trace
 OPENTELEMETRY_END_NAMESPACE

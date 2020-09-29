@@ -45,8 +45,6 @@ public:
 
   trace_api::SpanContext GetContext() const noexcept override { return *span_context_.get(); }
 
-  void SetToken(nostd::unique_ptr<context::Token> &&token) noexcept override;
-
 private:
   std::shared_ptr<trace_api::Tracer> tracer_;
   std::shared_ptr<SpanProcessor> processor_;
@@ -55,7 +53,6 @@ private:
   opentelemetry::core::SteadyTimestamp start_steady_time;
   std::unique_ptr<trace_api::SpanContext> span_context_;
   bool has_ended_;
-  nostd::unique_ptr<context::Token> token_;
 };
 }  // namespace trace
 }  // namespace sdk

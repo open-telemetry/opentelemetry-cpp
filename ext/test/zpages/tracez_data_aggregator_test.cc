@@ -2,7 +2,6 @@
 
 #include <gtest/gtest.h>
 
-#include "opentelemetry/context/threadlocal_context.h"
 #include "opentelemetry/ext/zpages/tracez_processor.h"
 #include "opentelemetry/sdk/trace/recordable.h"
 #include "opentelemetry/sdk/trace/tracer.h"

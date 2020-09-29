@@ -52,7 +52,7 @@ nostd::shared_ptr<trace_api::Span> Tracer::StartSpan(
   // TODO: replace nullptr with parent context in span context
   auto sampling_result =
       sampler_->ShouldSample(nullptr, trace_api::TraceId(), name, options.kind, attributes);
-  if (sampling_result.decision == Decision::NOT_RECORD)
+  if (sampling_result.decision == Decision::DROP)
   {
     auto span = nostd::shared_ptr<trace_api::Span>{
         new (std::nothrow) trace_api::NoopSpan{this->shared_from_this()}};
@@ -64,10 +64,6 @@ nostd::shared_ptr<trace_api::Span> Tracer::StartSpan(
     auto span = nostd::shared_ptr<trace_api::Span>{
         new (std::nothrow) Span{this->shared_from_this(), processor_.load(), name, attributes,
                                 options, GetCurrentSpanContext()}};
-
-    span->SetToken(
-        nostd::unique_ptr<context::Token>(new context::Token(context::RuntimeContext::Attach(
-            context::RuntimeContext::GetCurrent().SetValue(SpanKey, span)))));
 
     // if the attributes is not nullptr, add attributes to the span.
     if (sampling_result.attributes)

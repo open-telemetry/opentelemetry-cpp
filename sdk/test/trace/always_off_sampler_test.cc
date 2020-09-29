@@ -1,4 +1,3 @@
-#include "opentelemetry/context/threadlocal_context.h"
 #include "opentelemetry/sdk/trace/samplers/always_off.h"
 
 #include <gtest/gtest.h>
@@ -19,7 +18,7 @@ TEST(AlwaysOffSampler, ShouldSample)
 
   auto sampling_result = sampler.ShouldSample(nullptr, trace_id, "", span_kind, view);
 
-  ASSERT_EQ(Decision::NOT_RECORD, sampling_result.decision);
+  ASSERT_EQ(Decision::DROP, sampling_result.decision);
   ASSERT_EQ(nullptr, sampling_result.attributes);
 }
 
