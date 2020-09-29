@@ -39,6 +39,7 @@ TEST(NoopTest, UseNoopTracers)
   opentelemetry::trace::KeyValueIterableView<M> iterable{m1};
 
   s1->AddLink(sp, iterable);
+  s1->AddLink(sp, {{"abc", "123"}, {"xyz", "456"}});
 
   EXPECT_EQ(s1->IsRecording(), false);
 
