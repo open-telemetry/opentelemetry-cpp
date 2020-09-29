@@ -139,6 +139,10 @@ public:
   /** Adds a Link to newly created Span
    *  @param spanContext the context of the linked span
    *  @param attributes Link attributes
+   *
+   *  These methods need to be called immediately after Span
+   *  creation. Specification doesn't allow adding links after
+   *  span creation.
    */
 
   virtual void AddLink(const trace::Link &link) noexcept = 0;
