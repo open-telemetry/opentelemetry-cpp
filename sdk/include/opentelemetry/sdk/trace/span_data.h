@@ -63,7 +63,7 @@ private:
 class SpanDataLink
 {
 public:
-  SpanDataLink(opentelemetry::trace::SpanContext span_context,
+  SpanDataLink(const opentelemetry::trace::SpanContext &span_context,
                const trace_api::KeyValueIterable &attributes)
       : span_context_(span_context), attribute_map_(attributes)
   {}
@@ -180,7 +180,7 @@ public:
     events_.push_back(event);
   }
 
-  void AddLink(opentelemetry::trace::SpanContext span_context,
+  void AddLink(const opentelemetry::trace::SpanContext &span_context,
                const trace_api::KeyValueIterable &attributes) noexcept override
   {
     SpanDataLink link(span_context, attributes);

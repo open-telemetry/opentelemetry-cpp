@@ -152,23 +152,23 @@ void Span::AddLink(const trace_api::Link &link) noexcept
   recordable_->AddLink(link.GetContext(), link.GetAttributes());
 }
 
-void Span::AddLink(trace_api::SpanContext spanContext,
+void Span::AddLink(const trace_api::SpanContext &span_context,
                    const trace_api::KeyValueIterable &attributes) noexcept
 {
   if (recordable_ == nullptr)
   {
     return;
   }
-  recordable_->AddLink(spanContext, attributes);
+  recordable_->AddLink(span_context, attributes);
 }
 
-void Span::AddLink(trace_api::SpanContext spanContext) noexcept
+void Span::AddLink(const trace_api::SpanContext &span_context) noexcept
 {
   if (recordable_ == nullptr)
   {
     return;
   }
-  recordable_->AddLink(spanContext);
+  recordable_->AddLink(span_context);
 }
 
 void Span::SetStatus(trace_api::CanonicalCode code, nostd::string_view description) noexcept

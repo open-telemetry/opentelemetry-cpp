@@ -44,11 +44,11 @@ public:
 
   void AddLink(const trace::Link &link) noexcept override {}
 
-  void AddLink(trace::SpanContext spanContext,
+  void AddLink(const trace::SpanContext &span_context,
                const trace::KeyValueIterable &attributes) noexcept override
   {}
 
-  void AddLink(trace::SpanContext spanContext) noexcept override {}
+  void AddLink(const trace::SpanContext &span_context) noexcept override {}
 
   void SetStatus(trace::CanonicalCode /*code*/,
                  nostd::string_view /*description*/) noexcept override

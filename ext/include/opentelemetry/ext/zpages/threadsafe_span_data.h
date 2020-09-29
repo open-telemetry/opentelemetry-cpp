@@ -163,7 +163,7 @@ public:
   }
 
   void AddLink(
-      opentelemetry::trace::SpanContext span_context,
+      const opentelemetry::trace::SpanContext &span_context,
       const trace_api::KeyValueIterable &attributes =
           trace_api::KeyValueIterableView<std::map<std::string, int>>({})) noexcept override
   {

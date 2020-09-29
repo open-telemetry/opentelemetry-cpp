@@ -39,13 +39,16 @@ public:
   }
 
   void AddLink(const trace::Link &link) noexcept override { span_->AddLink(link); }
-  void AddLink(trace::SpanContext spanContext,
+  void AddLink(const trace::SpanContext &span_context,
                const trace::KeyValueIterable &attributes) noexcept override
   {
-    span_->AddLink(spanContext, attributes);
+    span_->AddLink(span_context, attributes);
   }
 
-  void AddLink(trace::SpanContext spanContext) noexcept override { span_->AddLink(spanContext); }
+  void AddLink(const trace::SpanContext &span_context) noexcept override
+  {
+    span_->AddLink(span_context);
+  }
 
   void SetStatus(trace::CanonicalCode code, nostd::string_view description) noexcept override
   {
