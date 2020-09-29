@@ -3,6 +3,7 @@ if(WITH_OTPROTOCOL)
 endif()
 
 add_subdirectory(ostream)
+add_subdirectory(memory)
 
 if(WITH_PROMETHEUS)
   add_subdirectory(prometheus)

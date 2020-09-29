@@ -69,7 +69,6 @@ Span::Span(std::shared_ptr<Tracer> &&tracer,
       start_steady_time{options.start_steady_time},
       has_ended_{false}
 {
-  (void)options;
   if (recordable_ == nullptr)
   {
     return;

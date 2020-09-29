@@ -66,7 +66,12 @@ public:
                                     const KeyValueIterable & /*attributes*/,
                                     const StartSpanOptions & /*options*/) noexcept override
   {
-    return nostd::shared_ptr<Span>{new (std::nothrow) NoopSpan{this->shared_from_this()}};
+    // Don't allocate a no-op span for every StartSpan call, but use a static
+    // singleton for this case.
+    static nostd::shared_ptr<trace_api::Span> noop_span(
+        new trace_api::NoopSpan{this->shared_from_this()});
+
+    return noop_span;
   }
 
   void ForceFlushWithMicroseconds(uint64_t /*timeout*/) noexcept override {}
