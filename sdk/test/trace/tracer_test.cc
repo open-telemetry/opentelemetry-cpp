@@ -352,15 +352,20 @@ TEST(Tracer, SpanSetEvents)
   span->AddEvent("event 1");
   span->AddEvent("event 2", std::chrono::system_clock::now());
 
+  span->AddEvent("event 3", std::chrono::system_clock::now(),
+                 opentelemetry::sdk::GetEmptyAttributes());
+
   span->End();
   ASSERT_EQ(1, spans_received->size());
 
   auto &span_data_events = spans_received->at(0)->GetEvents();
-  ASSERT_EQ(2, span_data_events.size());
+  ASSERT_EQ(3, span_data_events.size());
   ASSERT_EQ("event 1", span_data_events[0].GetName());
   ASSERT_EQ("event 2", span_data_events[1].GetName());
+  ASSERT_EQ("event 3", span_data_events[2].GetName());
   ASSERT_EQ(0, span_data_events[0].GetAttributes().size());
   ASSERT_EQ(0, span_data_events[1].GetAttributes().size());
+  ASSERT_EQ(0, span_data_events[2].GetAttributes().size());
 }
 
 TEST(Tracer, TestAlwaysOnSampler)
