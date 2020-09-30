@@ -253,9 +253,9 @@ private:
     }
 
     // Reallocates the storage array to the pass in new capacity size.
-    void Resize(int new_capacity) noexcept
+    void Resize(size_t new_capacity) noexcept
     {
-      int old_size = size_ - 1;
+      size_t old_size = size_ - 1;
       if (new_capacity == 0)
       {
         new_capacity = 2;
