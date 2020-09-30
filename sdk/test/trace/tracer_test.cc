@@ -308,21 +308,20 @@ TEST(Tracer, SpanSetAttribute)
 
 TEST(Tracer, SpanSetEvents)
 {
-  std::shared_ptr<std::vector<std::unique_ptr<SpanData>>> spans_received(
-      new std::vector<std::unique_ptr<SpanData>>);
-
-  auto tracer = initTracer(spans_received);
+  std::unique_ptr<InMemorySpanExporter> exporter(new InMemorySpanExporter());
+  std::shared_ptr<InMemorySpanData> span_data = exporter->GetData();
+  auto tracer                                 = initTracer(std::move(exporter));
 
   auto span = tracer->StartSpan("span 1");
   span->AddEvent("event 1");
   span->AddEvent("event 2", std::chrono::system_clock::now());
-
   span->AddEvent("event 3", std::chrono::system_clock::now(), {{"attr1", 1}});
-
   span->End();
-  ASSERT_EQ(1, spans_received->size());
 
-  auto &span_data_events = spans_received->at(0)->GetEvents();
+  auto spans = span_data->GetSpans();
+  ASSERT_EQ(1, spans.size());
+
+  auto &span_data_events = spans.at(0)->GetEvents();
   ASSERT_EQ(3, span_data_events.size());
   ASSERT_EQ("event 1", span_data_events[0].GetName());
   ASSERT_EQ("event 2", span_data_events[1].GetName());
