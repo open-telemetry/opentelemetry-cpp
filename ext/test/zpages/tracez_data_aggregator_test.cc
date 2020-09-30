@@ -60,14 +60,14 @@ void VerifySpanCountsInTracezData(
       << " Count of running spans incorrect for " << span_name << "\n";
 
   EXPECT_EQ(aggregated_data.sample_running_spans.size(),
-            std::min<unsigned int>(running_span_count, kMaxNumberOfSampleSpans))
+            std::min<size_t>(running_span_count, kMaxNumberOfSampleSpans))
       << " Size of sample running spans incorrect for " << span_name << "\n";
 
   EXPECT_EQ(aggregated_data.error_span_count, error_span_count)
       << " Count of error spans incorrect for " << span_name << "\n";
 
   EXPECT_EQ(aggregated_data.sample_error_spans.size(),
-            std::min<unsigned int>(error_span_count, kMaxNumberOfSampleSpans))
+            std::min<size_t>(error_span_count, kMaxNumberOfSampleSpans))
       << " Count of running spans incorrect for " << span_name << "\n";
 
   for (unsigned int boundary = 0; boundary < kLatencyBoundaries.size(); boundary++)
@@ -77,7 +77,7 @@ void VerifySpanCountsInTracezData(
         << " Count of completed spans in latency boundary " << boundary << " incorrect for "
         << span_name << "\n";
     EXPECT_EQ(aggregated_data.sample_latency_spans[boundary].size(),
-              std::min<unsigned int>(completed_span_count_per_latency_bucket[boundary],
+              std::min<size_t>(completed_span_count_per_latency_bucket[boundary],
                                      kMaxNumberOfSampleSpans))
         << " Count of sample completed spans in latency boundary " << boundary << " incorrect for "
         << span_name << "\n";
