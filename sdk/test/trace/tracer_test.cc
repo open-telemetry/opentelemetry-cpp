@@ -60,7 +60,7 @@ std::shared_ptr<opentelemetry::trace::Tracer> initTracer(
   return std::shared_ptr<opentelemetry::trace::Tracer>(new Tracer(processor, sampler));
 }
 }  // namespace
-#if 0
+
 TEST(Tracer, ToInMemorySpanExporter)
 {
   std::unique_ptr<InMemorySpanExporter> exporter(new InMemorySpanExporter());
@@ -334,7 +334,6 @@ TEST(Tracer, SpanSetEvents)
   ASSERT_EQ(1, span_data_events[2].GetAttributes().size());
 }
 
-#endif
 TEST(Tracer, SpanSetLinks)
 {
   std::unique_ptr<InMemorySpanExporter> exporter(new InMemorySpanExporter());
