@@ -49,9 +49,11 @@ nostd::shared_ptr<trace_api::Span> Tracer::StartSpan(
     const trace_api::KeyValueIterable &attributes,
     const trace_api::StartSpanOptions &options) noexcept
 {
-  // TODO: replace nullptr with parent context in span context
+    trace_api::SpanContext parent(
+    options.parent.IsValid() ?  options.parent : GetCurrentSpanContext());
+
   auto sampling_result =
-      sampler_->ShouldSample(nullptr, trace_api::TraceId(), name, options.kind, attributes);
+      sampler_->ShouldSample(&parent, parent.trace_id(), name, options.kind, attributes);
   if (sampling_result.decision == Decision::DROP)
   {
     // Don't allocate a no-op span for every DROP decision, but use a static
@@ -65,7 +67,7 @@ nostd::shared_ptr<trace_api::Span> Tracer::StartSpan(
   {
     auto span = nostd::shared_ptr<trace_api::Span>{
         new (std::nothrow) Span{this->shared_from_this(), processor_.load(), name, attributes,
-                                options, GetCurrentSpanContext()}};
+                                options, parent}};
 
     // if the attributes is not nullptr, add attributes to the span.
     if (sampling_result.attributes)
