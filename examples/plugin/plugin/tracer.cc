@@ -19,7 +19,8 @@ public:
   Span(std::shared_ptr<Tracer> &&tracer,
        nostd::string_view name,
        const opentelemetry::trace::KeyValueIterable & /*attributes*/,
-       const trace::StartSpanOptions & /*options*/) noexcept
+       const trace::StartSpanOptions & /*options*/,
+       const nostd::span<trace::Link> & /*links*/) noexcept
       : tracer_{std::move(tracer)}, name_{name}
   {
     std::cout << "StartSpan: " << name << "\n";
@@ -66,8 +67,9 @@ Tracer::Tracer(nostd::string_view /*output*/) {}
 nostd::shared_ptr<trace::Span> Tracer::StartSpan(
     nostd::string_view name,
     const opentelemetry::trace::KeyValueIterable &attributes,
-    const trace::StartSpanOptions &options) noexcept
+    const trace::StartSpanOptions &options,
+    const nostd::span<trace::Link> &links) noexcept
 {
   return nostd::shared_ptr<opentelemetry::trace::Span>{
-      new (std::nothrow) Span{this->shared_from_this(), name, attributes, options}};
+      new (std::nothrow) Span{this->shared_from_this(), name, attributes, options, links}};
 }

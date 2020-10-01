@@ -20,6 +20,7 @@ public:
                 nostd::string_view name,
                 const trace_api::KeyValueIterable &attributes,
                 const trace_api::StartSpanOptions &options,
+                const nostd::span<trace_api::Link> &links,
                 const trace_api::SpanContext &parent_span_context) noexcept;
 
   ~Span() override;

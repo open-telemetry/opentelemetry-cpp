@@ -14,7 +14,8 @@ public:
   opentelemetry::nostd::shared_ptr<opentelemetry::trace::Span> StartSpan(
       opentelemetry::nostd::string_view name,
       const opentelemetry::trace::KeyValueIterable & /*attributes*/,
-      const opentelemetry::trace::StartSpanOptions & /*options */) noexcept override;
+      const opentelemetry::trace::StartSpanOptions & /*options */,
+      const opentelemetry::nostd::span<opentelemetry::trace::Link> & /*links*/) noexcept override;
 
   void ForceFlushWithMicroseconds(uint64_t /*timeout*/) noexcept override {}
 

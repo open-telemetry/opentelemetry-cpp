@@ -4,6 +4,7 @@
 #include "opentelemetry/nostd/string_view.h"
 #include "opentelemetry/nostd/unique_ptr.h"
 #include "opentelemetry/trace/default_span.h"
+#include "opentelemetry/trace/link.h"
 #include "opentelemetry/trace/scope.h"
 #include "opentelemetry/trace/span.h"
 #include "opentelemetry/version.h"
@@ -33,31 +34,34 @@ public:
    */
   virtual nostd::shared_ptr<Span> StartSpan(nostd::string_view name,
                                             const KeyValueIterable &attributes,
-                                            const StartSpanOptions &options = {}) noexcept = 0;
+                                            const StartSpanOptions &options = {},
+                                            const nostd::span<Link> &links  = {}) noexcept = 0;
 
   nostd::shared_ptr<Span> StartSpan(nostd::string_view name,
                                     const StartSpanOptions &options = {}) noexcept
   {
-    return this->StartSpan(name, {}, options);
+    return this->StartSpan(name, {}, options, {});
   }
 
   template <class T, nostd::enable_if_t<detail::is_key_value_iterable<T>::value> * = nullptr>
   nostd::shared_ptr<Span> StartSpan(nostd::string_view name,
                                     const T &attributes,
-                                    const StartSpanOptions &options = {}) noexcept
+                                    const StartSpanOptions &options = {},
+                                    const nostd::span<Link> &links  = {}) noexcept
   {
-    return this->StartSpan(name, KeyValueIterableView<T>(attributes), options);
+    return this->StartSpan(name, KeyValueIterableView<T>(attributes), options, links);
   }
 
   nostd::shared_ptr<Span> StartSpan(
       nostd::string_view name,
       std::initializer_list<std::pair<nostd::string_view, common::AttributeValue>> attributes,
-      const StartSpanOptions &options = {}) noexcept
+      const StartSpanOptions &options = {},
+      const nostd::span<Link> &links  = {}) noexcept
   {
     return this->StartSpan(name,
                            nostd::span<const std::pair<nostd::string_view, common::AttributeValue>>{
                                attributes.begin(), attributes.end()},
-                           options);
+                           options, links);
   }
 
   /**

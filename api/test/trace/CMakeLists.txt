@@ -8,7 +8,8 @@ foreach(
   span_context_test
   scope_test
   noop_test
-  tracer_test)
+  tracer_test
+  link_test)
   add_executable(api_${testname} "${testname}.cc")
   target_link_libraries(api_${testname} ${GTEST_BOTH_LIBRARIES}
                         ${CMAKE_THREAD_LIBS_INIT} opentelemetry_api)

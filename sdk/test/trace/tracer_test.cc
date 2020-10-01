@@ -5,6 +5,7 @@
 #include "opentelemetry/sdk/trace/samplers/parent_or_else.h"
 #include "opentelemetry/sdk/trace/simple_processor.h"
 #include "opentelemetry/sdk/trace/span_data.h"
+#include "opentelemetry/trace/link.h"
 
 #include <gtest/gtest.h>
 
@@ -15,6 +16,8 @@ namespace nostd  = opentelemetry::nostd;
 namespace common = opentelemetry::common;
 using opentelemetry::exporter::memory::InMemorySpanData;
 using opentelemetry::exporter::memory::InMemorySpanExporter;
+using opentelemetry::trace::KeyValueIterableView;
+using opentelemetry::trace::Link;
 using opentelemetry::trace::SpanContext;
 
 /**
@@ -57,7 +60,7 @@ std::shared_ptr<opentelemetry::trace::Tracer> initTracer(
   return std::shared_ptr<opentelemetry::trace::Tracer>(new Tracer(processor, sampler));
 }
 }  // namespace
-
+#if 0
 TEST(Tracer, ToInMemorySpanExporter)
 {
   std::unique_ptr<InMemorySpanExporter> exporter(new InMemorySpanExporter());
@@ -329,6 +332,31 @@ TEST(Tracer, SpanSetEvents)
   ASSERT_EQ(0, span_data_events[0].GetAttributes().size());
   ASSERT_EQ(0, span_data_events[1].GetAttributes().size());
   ASSERT_EQ(1, span_data_events[2].GetAttributes().size());
+}
+
+#endif
+TEST(Tracer, SpanSetLinks)
+{
+  std::unique_ptr<InMemorySpanExporter> exporter(new InMemorySpanExporter());
+  std::shared_ptr<InMemorySpanData> span_data = exporter->GetData();
+  auto tracer                                 = initTracer(std::move(exporter));
+
+  SpanContext sp(true, true);
+  using Map = std::map<nostd::string_view, int>;
+  Map m1    = {{"attr1", 123}, {"attr2", 456}};
+  KeyValueIterableView<Map> iterable{m1};
+  Link link(sp, iterable);
+  std::vector<Link> links = {link};
+  auto span               = tracer->StartSpan("span 1", {}, {}, links);
+  span->End();
+  auto spans = span_data->GetSpans();
+  ASSERT_EQ(1, spans.size());
+  auto &span_data_links = spans.at(0)->GetLinks();
+  ASSERT_EQ(1, span_data_links.size());
+  auto link1 = span_data_links.at(0);
+  std::cout << nostd::get<int>(link1.GetAttributes().at("attr1"));
+  ASSERT_EQ(nostd::get<int>(link1.GetAttributes().at("attr1")), 123);
+  ASSERT_EQ(nostd::get<int>(link1.GetAttributes().at("attr2")), 456);
 }
 
 TEST(Tracer, TestAlwaysOnSampler)

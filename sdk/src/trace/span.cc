@@ -62,6 +62,7 @@ Span::Span(std::shared_ptr<Tracer> &&tracer,
            nostd::string_view name,
            const trace_api::KeyValueIterable &attributes,
            const trace_api::StartSpanOptions &options,
+           const nostd::span<trace_api::Link> &links,
            const trace_api::SpanContext &parent_span_context) noexcept
     : tracer_{std::move(tracer)},
       processor_{processor},
@@ -97,6 +98,11 @@ Span::Span(std::shared_ptr<Tracer> &&tracer,
     recordable_->SetAttribute(key, value);
     return true;
   });
+
+  for (auto const &link : links)
+  {
+    recordable_->AddLink(link.GetSpanContext(), link.GetAttributes());
+  }
 
   recordable_->SetStartTime(NowOr(options.start_system_time));
   start_steady_time = NowOr(options.start_steady_time);
