@@ -138,9 +138,9 @@ TEST(ProbabilitySampler, ShouldSampleWithContext)
 TEST(ProbabilitySampler, ProbabilitySamplerHalf)
 {
   double probability = 0.5;
-  int iterations = 100000;
+  int iterations     = 100000;
   int expected_count = static_cast<int>(iterations * probability);
-  int variance = static_cast<int>(iterations * 0.01);
+  int variance       = static_cast<int>(iterations * 0.01);
 
   SpanContext c(true, true);
   ProbabilitySampler s(probability);
@@ -154,9 +154,9 @@ TEST(ProbabilitySampler, ProbabilitySamplerHalf)
 TEST(ProbabilitySampler, ProbabilitySamplerOnePercent)
 {
   double probability = 0.01;
-  int iterations = 100000;
+  int iterations     = 100000;
   int expected_count = static_cast<int>(iterations * probability);
-  int variance = static_cast<int>(iterations * 0.01);
+  int variance       = static_cast<int>(iterations * 0.01);
 
   SpanContext c(true, true);
   ProbabilitySampler s(probability);
@@ -170,7 +170,7 @@ TEST(ProbabilitySampler, ProbabilitySamplerOnePercent)
 TEST(ProbabilitySampler, ProbabilitySamplerAll)
 {
   double probability = 1.0;
-  int iterations = 100000;
+  int iterations     = 100000;
   int expected_count = static_cast<int>(iterations * probability);
 
   SpanContext c(true, true);
@@ -184,7 +184,7 @@ TEST(ProbabilitySampler, ProbabilitySamplerAll)
 TEST(ProbabilitySampler, ProbabilitySamplerNone)
 {
   double probability = 0.0;
-  int iterations = 100000;
+  int iterations     = 100000;
   int expected_count = static_cast<int>(iterations * probability);
 
   SpanContext c(true, true);
