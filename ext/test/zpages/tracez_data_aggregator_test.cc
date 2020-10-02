@@ -78,7 +78,7 @@ void VerifySpanCountsInTracezData(
         << span_name << "\n";
     EXPECT_EQ(aggregated_data.sample_latency_spans[boundary].size(),
               std::min<size_t>(completed_span_count_per_latency_bucket[boundary],
-                                     kMaxNumberOfSampleSpans))
+                               kMaxNumberOfSampleSpans))
         << " Count of sample completed spans in latency boundary " << boundary << " incorrect for "
         << span_name << "\n";
   }
