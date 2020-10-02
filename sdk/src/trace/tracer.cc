@@ -58,6 +58,7 @@ nostd::shared_ptr<trace_api::Span> Tracer::StartSpan(
 {
   trace_api::SpanContext parent = GetCurrentSpanContext(options.parent);
 
+  // TODO: replace nullptr with parent context in span context
   auto sampling_result =
       sampler_->ShouldSample(nullptr, parent.trace_id(), name, options.kind, attributes);
   if (sampling_result.decision == Decision::DROP)
