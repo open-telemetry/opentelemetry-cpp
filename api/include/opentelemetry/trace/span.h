@@ -47,7 +47,7 @@ struct StartSpanOptions
   //
   // This defaults to an invalid span context. In this case, the Span is
   // automatically parented to the currently active span.
-  SpanContext parent;
+  SpanContext parent = SpanContext::GetInvalid();
 
   // TODO:
   // SpanContext remote_parent;
