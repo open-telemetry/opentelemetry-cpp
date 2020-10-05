@@ -31,6 +31,9 @@ jobs:
         sudo ./ci/setup_ci_environment.sh
         sudo ./ci/setup_cmake.sh
         sudo ./ci/install_gcc48.sh
+      env:
+        CC: /usr/bin/gcc-4.8
+        CXX: /usr/bin/g++-4.8
     - name: run tests
       run: ./ci/do_ci.sh cmake.legacy.test
       env:
