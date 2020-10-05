@@ -20,7 +20,6 @@ set -e
 
 # Follows these instructions for setting up gtest
 # https://www.eriksmistad.no/getting-started-with-google-test-on-ubuntu/
-echo $CC."--"$CXX
 pushd /usr/src/gtest
 cmake CMakeLists.txt
 make
