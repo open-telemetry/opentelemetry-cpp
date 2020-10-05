@@ -21,7 +21,6 @@ set -e
 # Follows these instructions for setting up gtest
 # https://www.eriksmistad.no/getting-started-with-google-test-on-ubuntu/
 pushd /usr/src/gtest
-echo $CC." --  ".$CXX
 cmake CMakeLists.txt
 make
 cp *.a /usr/lib || cp lib/*.a /usr/lib

@@ -29,8 +29,10 @@ jobs:
     - name: setup
       run: |
         sudo ./ci/setup_ci_environment.sh
-        sudo ./ci/setup_cmake.sh
         sudo ./ci/install_gcc48.sh
+    - name: setup cmake
+      run: |
+        sudo ./ci/setup_cmake.sh
       env:
         CC: /usr/bin/gcc-4.8
         CXX: /usr/bin/g++-4.8
