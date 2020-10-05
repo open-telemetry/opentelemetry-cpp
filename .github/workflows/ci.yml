@@ -21,6 +21,21 @@ jobs:
     - name: run prometheus exporter tests
       run: ./ci/do_ci.sh cmake.exporter.prometheus.test
 
+  cmake_gcc_48_test:
+    name: Legacy CMake
+    runs-on: ubuntu-18.04
+    steps:
+    - uses: actions/checkout@v2
+    - name: setup
+      run: |
+        sudo ./ci/setup_ci_environment.sh
+        sudo ./ci/setup_cmake.sh
+        sudo ./ci/install_gcc48.sh
+    - name: run tests
+      run: ./ci/do_ci.sh cmake.legacy.test
+      env:
+        CC: /usr/bin/gcc-4.8
+        CXX: /usr/bin/g++-4.8
   cmake_test_cxx20:
     name: CMake C++20 test
     runs-on: ubuntu-20.04
