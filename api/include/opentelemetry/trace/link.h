@@ -15,7 +15,7 @@ public:
 
   Link(const opentelemetry::trace::SpanContext &span_context,
        const trace_api::KeyValueIterable &attributes)
-      : span_context_(span_context), attributes_{attributes}
+      : span_context_(span_context), attributes_(attributes)
   {}
 
   template <class T, nostd::enable_if_t<detail::is_key_value_iterable<T>::value> * = nullptr>
