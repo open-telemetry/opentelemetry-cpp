@@ -39,7 +39,7 @@ elif [[ "$1" == "cmake.legacy.test" ]]; then
         "${SRC_DIR}"
   make
   make test
-  exit 0;
+  exit 0
 elif [[ "$1" == "cmake.exporter.otprotocol.test" ]]; then
   cd "${BUILD_DIR}"
   rm -rf *
