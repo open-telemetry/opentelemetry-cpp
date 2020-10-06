@@ -1,3 +1,4 @@
+#include "opentelemetry/exporters/memory/in_memory_span_exporter.h"
 #include "opentelemetry/sdk/trace/sampler.h"
 #include "opentelemetry/sdk/trace/samplers/always_off.h"
 #include "opentelemetry/sdk/trace/samplers/always_on.h"
@@ -12,45 +13,7 @@
 #include <benchmark/benchmark.h>
 
 using namespace opentelemetry::sdk::trace;
-namespace nostd  = opentelemetry::nostd;
-namespace common = opentelemetry::common;
-using opentelemetry::trace::SpanContext;
-
-/**
- * A mock exporter that switches a flag once a valid recordable was received.
- */
-class MockSpanExporter final : public SpanExporter
-{
-public:
-  MockSpanExporter(std::shared_ptr<std::vector<std::unique_ptr<SpanData>>> spans_received) noexcept
-      : spans_received_(spans_received)
-  {}
-
-  std::unique_ptr<Recordable> MakeRecordable() noexcept override
-  {
-    return std::unique_ptr<Recordable>(new SpanData);
-  }
-
-  ExportResult Export(const nostd::span<std::unique_ptr<Recordable>> &recordables) noexcept override
-  {
-    for (auto &recordable : recordables)
-    {
-      auto span = std::unique_ptr<SpanData>(static_cast<SpanData *>(recordable.release()));
-      if (span != nullptr)
-      {
-        spans_received_->push_back(std::move(span));
-      }
-    }
-
-    return ExportResult::kSuccess;
-  }
-
-  void Shutdown(std::chrono::microseconds timeout = std::chrono::microseconds(0)) noexcept override
-  {}
-
-private:
-  std::shared_ptr<std::vector<std::unique_ptr<SpanData>>> spans_received_;
-};
+using opentelemetry::exporter::memory::InMemorySpanExporter;
 
 namespace
 {
@@ -145,10 +108,7 @@ BENCHMARK(BM_ProbabilitySamplerShouldSample);
 // Sampler Helper Function
 void BenchmarkSpanCreation(std::shared_ptr<Sampler> sampler, benchmark::State &state)
 {
-  std::shared_ptr<std::vector<std::unique_ptr<SpanData>>> spans_received(
-      new std::vector<std::unique_ptr<SpanData>>);
-
-  std::unique_ptr<SpanExporter> exporter(new MockSpanExporter(spans_received));
+  std::unique_ptr<SpanExporter> exporter(new InMemorySpanExporter());
   auto processor = std::make_shared<SimpleSpanProcessor>(std::move(exporter));
   auto tracer    = std::shared_ptr<opentelemetry::trace::Tracer>(new Tracer(processor, sampler));
 
