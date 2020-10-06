@@ -72,7 +72,7 @@ public:
     }
     else
     {
-      idx = ceil(log(val) / log(gamma));
+      idx = static_cast<int>(ceil(log(val) / log(gamma)));
     }
     if (raw_.find(idx) != raw_.end())
     {
