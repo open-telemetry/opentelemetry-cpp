@@ -98,9 +98,9 @@ private:
   class DataList
   {
   public:
-    nostd::shared_ptr<DataList> next_;
-
     char *key_;
+
+    nostd::shared_ptr<DataList> next_;
 
     size_t key_length_;
 
