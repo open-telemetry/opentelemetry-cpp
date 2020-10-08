@@ -19,7 +19,11 @@ TBD
 
 See [CONTRIBUTING.md](CONTRIBUTING.md)
 
-We meet weekly on Mondays at 3:00PM PT. Check the [OpenTelemetry community calendar](https://calendar.google.com/calendar/embed?src=google.com_b79e3e90j7bbsa2n2p5an5lf60%40group.calendar.google.com) for specific dates.
+We meet weekly, and the time of the meeting alternates between Monday at 15:00
+PT and Wednesday at 10:00 PT. The meeting is subject to change depending on
+contributors' availability. Check the [OpenTelemetry community
+calendar](https://calendar.google.com/calendar/embed?src=google.com_b79e3e90j7bbsa2n2p5an5lf60%40group.calendar.google.com)
+for specific dates.
 
 Meetings take place via [Zoom video conference](https://zoom.us/j/8203130519).
 
@@ -27,9 +31,11 @@ Meeting notes are available as a public [Google doc](https://docs.google.com/doc
 
 Approvers ([@open-telemetry/cpp-approvers](https://github.com/orgs/open-telemetry/teams/cpp-approvers)):
 
-- [Max Golovanov](https://github.com/maxgolov), Microsoft
+- [Lalit Kumar Bhasin](https://github.com/lalitb), Microsoft
 - [Johannes Tax](https://github.com/pyohannes), New Relic
+- [Max Golovanov](https://github.com/maxgolov), Microsoft
 - [Ryan Burn](https://github.com/rnburn), Lightstep
+- [Tom Tan](https://github.com/ThomsonTan), Microsoft
 
 *Find more about the approver role in [community repository](https://github.com/open-telemetry/community/blob/master/community-membership.md#approver).*
 
