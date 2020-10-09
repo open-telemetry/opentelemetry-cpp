@@ -92,7 +92,7 @@ public:
     {
       return nostd::get<nostd::shared_ptr<Span>>(span).get()->GetContext();
     }
-    return SpanContext();
+    return SpanContext::GetInvalid();
   }
 
   static TraceId GenerateTraceIdFromString(nostd::string_view trace_id)

@@ -20,7 +20,7 @@ public:
        nostd::string_view name,
        const opentelemetry::trace::KeyValueIterable & /*attributes*/,
        const trace::StartSpanOptions & /*options*/) noexcept
-      : tracer_{std::move(tracer)}, name_{name}
+      : tracer_{std::move(tracer)}, name_{name}, span_context_{trace::SpanContext::GetInvalid()}
   {
     std::cout << "StartSpan: " << name << "\n";
   }
