@@ -99,15 +99,13 @@ It may be necessary on certain paths to Telemetry Agent (e.g. ETW) to utilize `u
 
 SDK API surface accepts any notation,  automagically translates into corresponding notation supported by lower-level transport at exporter layer.
 
-Separate implementation will be provided to transform to CsRecord on Bond (direct upload) path.
-
 ## Handling of properties that include a reserved prefix
 
-Reserved prefixes are:
+Example reserved prefixes:
 ```
 /       - JSON Pointer
-ext     - Common Schema extension
-custom_ - Protocol -specific prefix for user-defined custom properties
+ext     - extension
+custom_ - protocol -specific prefix for user-defined custom properties
 ```
 Prefix allows to distinguish a common standard schema property from user-defined (custom) property.
 
