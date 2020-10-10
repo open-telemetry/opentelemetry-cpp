@@ -89,9 +89,24 @@ private:
     sout_ << ']';
   }
 
+  class SpanDataAttributeValueVisitor
+  {
+  public:
+    SpanDataAttributeValueVisitor(OStreamSpanExporter &exporter) : exporter_(exporter) {}
+
+    template <typename T>
+    void operator()(T &&arg)
+    {
+      exporter_.print_value(arg);
+    }
+
+  private:
+    OStreamSpanExporter &exporter_;
+  };
+
   void print_value(sdktrace::SpanDataAttributeValue &value)
   {
-    nostd::visit([this](auto &&arg) { print_value(arg); }, value);
+    nostd::visit(SpanDataAttributeValueVisitor(*this), value);
   }
 
   void printAttributes(std::unordered_map<std::string, sdktrace::SpanDataAttributeValue> map)
