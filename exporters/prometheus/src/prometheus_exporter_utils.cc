@@ -284,7 +284,7 @@ void PrometheusExporterUtils::SetMetricBasic(prometheus_client::ClientMetric &me
   if (!label_pairs.empty())
   {
     metric.label.resize(label_pairs.size());
-    for (int i = 0; i < label_pairs.size(); ++i)
+    for (size_t i = 0; i < label_pairs.size(); ++i)
     {
       auto origin_name      = label_pairs[i].first;
       auto sanitized        = SanitizeNames(origin_name);
@@ -396,7 +396,7 @@ void PrometheusExporterUtils::SetValue(std::vector<T> values,
   metric->histogram.sample_count = values[1];
   int cumulative                 = 0;
   std::vector<prometheus_client::ClientMetric::Bucket> buckets;
-  for (int i = 0; i < boundaries.size() + 1; i++)
+  for (size_t i = 0; i < boundaries.size() + 1; i++)
   {
     prometheus_client::ClientMetric::Bucket bucket;
     cumulative += counts[i];
@@ -444,7 +444,7 @@ void PrometheusExporterUtils::SetValue(std::vector<T> values,
   if (do_quantile)
   {
     std::vector<prometheus_client::ClientMetric::Quantile> prometheus_quantiles;
-    for (int i = 0; i < quantiles.size(); i++)
+    for (size_t i = 0; i < quantiles.size(); i++)
     {
       prometheus_client::ClientMetric::Quantile quantile;
       quantile.quantile = quantile_points[i];

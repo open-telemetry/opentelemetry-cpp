@@ -87,7 +87,7 @@ void assert_histogram(prometheus_client::MetricFamily &metric,
 {
   int cumulative_count = 0;
   auto buckets         = metric.metric[0].histogram.bucket;
-  for (int i = 0; i < buckets.size(); i++)
+  for (size_t i = 0; i < buckets.size(); i++)
   {
     auto bucket = buckets[i];
     if (i != buckets.size() - 1)
