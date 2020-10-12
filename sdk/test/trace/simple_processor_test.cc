@@ -1,6 +1,7 @@
 #include "opentelemetry/sdk/trace/simple_processor.h"
 #include "opentelemetry/exporters/memory/in_memory_span_exporter.h"
 #include "opentelemetry/nostd/span.h"
+#include "opentelemetry/sdk/trace/exporter.h"
 #include "opentelemetry/sdk/trace/span_data.h"
 
 #include <gtest/gtest.h>
@@ -26,4 +27,42 @@ TEST(SimpleProcessor, ToInMemorySpanExporter)
   ASSERT_EQ(1, span_data->GetSpans().size());
 
   processor.Shutdown();
+}
+
+// An exporter that does nothing but record (and give back ) the # of times Shutdown was called.
+class RecordShutdownExporter final : public SpanExporter
+{
+public:
+  RecordShutdownExporter(int *shutdown_counter) : shutdown_counter_(shutdown_counter) {}
+
+  std::unique_ptr<Recordable> MakeRecordable() noexcept override
+  {
+    return std::unique_ptr<Recordable>(new SpanData());
+  }
+
+  ExportResult Export(
+      const opentelemetry::nostd::span<std::unique_ptr<Recordable>> &recordables) noexcept override
+  {
+    return ExportResult::kSuccess;
+  }
+
+  void Shutdown(std::chrono::microseconds timeout = std::chrono::microseconds(0)) noexcept override
+  {
+    *shutdown_counter_ += 1;
+  }
+
+private:
+  int *shutdown_counter_;
+};
+
+TEST(SimpleSpanProcessor, ShutdownCalledOnce)
+{
+  int shutdowns = 0;
+  std::unique_ptr<RecordShutdownExporter> exporter(new RecordShutdownExporter(&shutdowns));
+  SimpleSpanProcessor processor(std::move(exporter));
+  EXPECT_EQ(0, shutdowns);
+  processor.Shutdown();
+  EXPECT_EQ(1, shutdowns);
+  processor.Shutdown();
+  EXPECT_EQ(1, shutdowns);
 }

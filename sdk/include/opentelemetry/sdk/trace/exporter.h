@@ -39,6 +39,8 @@ public:
    * custom recordables or use the default SpanData recordable provided by the
    * SDK.
    * @return a newly initialized Recordable object
+   *
+   * Note: This method must be callable from multiple threads.
    */
   virtual std::unique_ptr<Recordable> MakeRecordable() noexcept = 0;
 
