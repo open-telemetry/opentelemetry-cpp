@@ -31,9 +31,11 @@ Meeting notes are available as a public [Google doc](https://docs.google.com/doc
 
 Approvers ([@open-telemetry/cpp-approvers](https://github.com/orgs/open-telemetry/teams/cpp-approvers)):
 
-- [Max Golovanov](https://github.com/maxgolov), Microsoft
+- [Lalit Kumar Bhasin](https://github.com/lalitb), Microsoft
 - [Johannes Tax](https://github.com/pyohannes), New Relic
+- [Max Golovanov](https://github.com/maxgolov), Microsoft
 - [Ryan Burn](https://github.com/rnburn), Lightstep
+- [Tom Tan](https://github.com/ThomsonTan), Microsoft
 
 *Find more about the approver role in [community repository](https://github.com/open-telemetry/community/blob/master/community-membership.md#approver).*
 

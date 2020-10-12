@@ -41,8 +41,6 @@ public:
 
   nostd::string_view ToString() { return "DefaultSpan"; }
 
-  DefaultSpan() = default;
-
   DefaultSpan(SpanContext span_context) : span_context_(span_context) {}
 
   // movable and copiable
