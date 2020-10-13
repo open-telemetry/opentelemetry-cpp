@@ -22,11 +22,12 @@ public:
    * delegateSampler for root spans
    * @return Returns DROP always
    */
-  SamplingResult ShouldSample(const trace_api::SpanContext *parent_context,
-                              trace_api::TraceId trace_id,
-                              nostd::string_view name,
-                              trace_api::SpanKind span_kind,
-                              const trace_api::KeyValueIterable &attributes) noexcept override;
+  SamplingResult ShouldSample(
+      const trace_api::SpanContext *parent_context,
+      trace_api::TraceId trace_id,
+      nostd::string_view name,
+      trace_api::SpanKind span_kind,
+      const opentelemetry::common::KeyValueIterable &attributes) noexcept override;
 
   /**
    * @return Description MUST be ParentOrElse{delegate_sampler_.getDescription()}

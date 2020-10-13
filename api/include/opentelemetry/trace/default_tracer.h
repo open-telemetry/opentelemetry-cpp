@@ -21,7 +21,7 @@ public:
    * key will be overwritten.
    */
   nostd::unique_ptr<Span> StartSpan(nostd::string_view name,
-                                    const KeyValueIterable &attributes,
+                                    const common::KeyValueIterable &attributes,
                                     const StartSpanOptions &options = {}) override noexcept
   {
     return nostd::unique_ptr<Span>(new DefaultSpan::GetInvalid());

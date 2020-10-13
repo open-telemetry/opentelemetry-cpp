@@ -14,7 +14,7 @@ TEST(AlwaysOffSampler, ShouldSample)
 
   using M = std::map<std::string, int>;
   M m1    = {{}};
-  opentelemetry::trace::KeyValueIterableView<M> view{m1};
+  opentelemetry::common::KeyValueIterableView<M> view{m1};
 
   auto sampling_result = sampler.ShouldSample(nullptr, trace_id, "", span_kind, view);
 

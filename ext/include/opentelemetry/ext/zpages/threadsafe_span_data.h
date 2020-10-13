@@ -162,10 +162,10 @@ public:
     duration_ = duration;
   }
 
-  void AddLink(
-      opentelemetry::trace::SpanContext span_context,
-      const trace_api::KeyValueIterable &attributes =
-          trace_api::KeyValueIterableView<std::map<std::string, int>>({})) noexcept override
+  void AddLink(opentelemetry::trace::SpanContext span_context,
+               const opentelemetry::common::KeyValueIterable &attributes =
+                   opentelemetry::common::KeyValueIterableView<std::map<std::string, int>>(
+                       {})) noexcept override
   {
     std::lock_guard<std::mutex> lock(mutex_);
     (void)span_context;
@@ -175,8 +175,9 @@ public:
   void AddEvent(
       nostd::string_view name,
       core::SystemTimestamp timestamp = core::SystemTimestamp(std::chrono::system_clock::now()),
-      const trace_api::KeyValueIterable &attributes =
-          trace_api::KeyValueIterableView<std::map<std::string, int>>({})) noexcept override
+      const opentelemetry::common::KeyValueIterable &attributes =
+          opentelemetry::common::KeyValueIterableView<std::map<std::string, int>>(
+              {})) noexcept override
   {
     std::lock_guard<std::mutex> lock(mutex_);
     events_.push_back(SpanDataEvent(std::string(name), timestamp, attributes));

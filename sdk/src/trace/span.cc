@@ -60,7 +60,7 @@ trace_api::SpanId GenerateRandomSpanId()
 Span::Span(std::shared_ptr<Tracer> &&tracer,
            std::shared_ptr<SpanProcessor> processor,
            nostd::string_view name,
-           const trace_api::KeyValueIterable &attributes,
+           const opentelemetry::common::KeyValueIterable &attributes,
            const trace_api::StartSpanOptions &options,
            const trace_api::SpanContext &parent_span_context) noexcept
     : tracer_{std::move(tracer)},
@@ -138,7 +138,7 @@ void Span::AddEvent(nostd::string_view name, core::SystemTimestamp timestamp) no
 
 void Span::AddEvent(nostd::string_view name,
                     core::SystemTimestamp timestamp,
-                    const trace_api::KeyValueIterable &attributes) noexcept
+                    const opentelemetry::common::KeyValueIterable &attributes) noexcept
 {
   std::lock_guard<std::mutex> lock_guard{mu_};
   if (recordable_ == nullptr)

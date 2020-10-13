@@ -32,7 +32,7 @@ int RunShouldSampleCountDecision(SpanContext &context, ProbabilitySampler &sampl
 
   using M = std::map<std::string, int>;
   M m1    = {{}};
-  opentelemetry::trace::KeyValueIterableView<M> view{m1};
+  opentelemetry::common::KeyValueIterableView<M> view{m1};
 
   for (int i = 0; i < iterations; ++i)
   {
@@ -60,7 +60,7 @@ TEST(ProbabilitySampler, ShouldSampleWithoutContext)
 
   using M = std::map<std::string, int>;
   M m1    = {{}};
-  opentelemetry::trace::KeyValueIterableView<M> view{m1};
+  opentelemetry::common::KeyValueIterableView<M> view{m1};
 
   ProbabilitySampler s1(0.01);
 
@@ -110,7 +110,7 @@ TEST(ProbabilitySampler, ShouldSampleWithContext)
 
   using M = std::map<std::string, int>;
   M m1    = {{}};
-  opentelemetry::trace::KeyValueIterableView<M> view{m1};
+  opentelemetry::common::KeyValueIterableView<M> view{m1};
 
   ProbabilitySampler s1(0.01);
 

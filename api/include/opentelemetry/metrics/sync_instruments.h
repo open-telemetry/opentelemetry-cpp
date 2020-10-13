@@ -48,7 +48,7 @@ public:
    * @param labels the set of labels, as key-value pairs.
    * @return a BoundIntCounter tied to the specified labels
    */
-  virtual nostd::shared_ptr<BoundCounter<T>> bindCounter(const trace::KeyValueIterable &labels)
+  virtual nostd::shared_ptr<BoundCounter<T>> bindCounter(const common::KeyValueIterable &labels)
   {
     return nostd::shared_ptr<BoundCounter<T>>();
   }
@@ -61,9 +61,9 @@ public:
    * @param value the numerical representation of the metric being captured
    * @param labels the set of labels, as key-value pairs
    */
-  virtual void add(T value, const trace::KeyValueIterable &labels) = 0;
+  virtual void add(T value, const common::KeyValueIterable &labels) = 0;
 
-  virtual void update(T value, const trace::KeyValueIterable &labels) override = 0;
+  virtual void update(T value, const common::KeyValueIterable &labels) override = 0;
 };
 
 template <class T>
@@ -101,7 +101,7 @@ public:
                 bool enabled);
 
   virtual nostd::shared_ptr<BoundUpDownCounter<T>> bindUpDownCounter(
-      const trace::KeyValueIterable &labels)
+      const common::KeyValueIterable &labels)
   {
     return nostd::shared_ptr<BoundUpDownCounter<T>>();
   }
@@ -114,9 +114,9 @@ public:
    * @param value the numerical representation of the metric being captured
    * @param labels the set of labels, as key-value pairs
    */
-  virtual void add(T value, const trace::KeyValueIterable &labels) = 0;
+  virtual void add(T value, const common::KeyValueIterable &labels) = 0;
 
-  virtual void update(T value, const trace::KeyValueIterable &labels) override = 0;
+  virtual void update(T value, const common::KeyValueIterable &labels) override = 0;
 };
 
 template <class T>
@@ -154,7 +154,7 @@ public:
                 bool enabled);
 
   virtual nostd::shared_ptr<BoundValueRecorder<T>> bindValueRecorder(
-      const trace::KeyValueIterable &labels)
+      const common::KeyValueIterable &labels)
   {
     return nostd::shared_ptr<BoundValueRecorder<T>>();
   }
@@ -167,9 +167,9 @@ public:
    * @param value the numerical representation of the metric being captured
    * @param labels the set of labels, as key-value pairs
    */
-  virtual void record(T value, const trace::KeyValueIterable &labels) = 0;
+  virtual void record(T value, const common::KeyValueIterable &labels) = 0;
 
-  virtual void update(T value, const trace::KeyValueIterable &labels) override = 0;
+  virtual void update(T value, const common::KeyValueIterable &labels) override = 0;
 };
 
 }  // namespace metrics

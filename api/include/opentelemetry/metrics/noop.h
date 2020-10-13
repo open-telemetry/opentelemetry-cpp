@@ -38,7 +38,7 @@ public:
 
   virtual nostd::string_view GetUnits() override { return nostd::string_view(""); }
 
-  virtual void observe(T value, const trace::KeyValueIterable &labels) override {}
+  virtual void observe(T value, const common::KeyValueIterable &labels) override {}
 
   virtual void run() override {}
 
@@ -65,7 +65,7 @@ public:
 
   virtual nostd::string_view GetUnits() override { return nostd::string_view(""); }
 
-  virtual void observe(T value, const trace::KeyValueIterable &labels) override {}
+  virtual void observe(T value, const common::KeyValueIterable &labels) override {}
 
   virtual void run() override {}
 
@@ -92,7 +92,7 @@ public:
 
   virtual nostd::string_view GetUnits() override { return nostd::string_view(""); }
 
-  virtual void observe(T value, const trace::KeyValueIterable &labels) override {}
+  virtual void observe(T value, const common::KeyValueIterable &labels) override {}
 
   virtual void run() override {}
 
@@ -138,14 +138,15 @@ public:
               bool /*enabled*/)
   {}
 
-  nostd::shared_ptr<BoundNoopCounter<T>> bindNoopCounter(const trace::KeyValueIterable & /*labels*/)
+  nostd::shared_ptr<BoundNoopCounter<T>> bindNoopCounter(
+      const common::KeyValueIterable & /*labels*/)
   {
     return nostd::shared_ptr<BoundNoopCounter<T>>(new BoundNoopCounter<T>());
   }
 
-  virtual void add(T value, const trace::KeyValueIterable & /*labels*/) override {}
+  virtual void add(T value, const common::KeyValueIterable & /*labels*/) override {}
 
-  virtual void update(T value, const trace::KeyValueIterable & /*labels*/) override {}
+  virtual void update(T value, const common::KeyValueIterable & /*labels*/) override {}
 
   virtual bool IsEnabled() override { return false; }
 
@@ -198,14 +199,14 @@ public:
   {}
 
   nostd::shared_ptr<BoundNoopUpDownCounter<T>> bindNoopUpDownCounter(
-      const trace::KeyValueIterable & /*labels*/)
+      const common::KeyValueIterable & /*labels*/)
   {
     return nostd::shared_ptr<BoundNoopUpDownCounter<T>>(new BoundNoopUpDownCounter<T>());
   }
 
-  virtual void add(T value, const trace::KeyValueIterable & /*labels*/) override {}
+  virtual void add(T value, const common::KeyValueIterable & /*labels*/) override {}
 
-  virtual void update(T value, const trace::KeyValueIterable & /*labels*/) override {}
+  virtual void update(T value, const common::KeyValueIterable & /*labels*/) override {}
 
   virtual bool IsEnabled() override { return false; }
 
@@ -258,14 +259,14 @@ public:
   {}
 
   nostd::shared_ptr<BoundNoopValueRecorder<T>> bindNoopValueRecorder(
-      const trace::KeyValueIterable & /*labels*/)
+      const common::KeyValueIterable & /*labels*/)
   {
     return nostd::shared_ptr<BoundNoopValueRecorder<T>>(new BoundNoopValueRecorder<T>());
   }
 
-  virtual void record(T value, const trace::KeyValueIterable & /*labels*/) override {}
+  virtual void record(T value, const common::KeyValueIterable & /*labels*/) override {}
 
-  virtual void update(T value, const trace::KeyValueIterable & /*labels*/) override {}
+  virtual void update(T value, const common::KeyValueIterable & /*labels*/) override {}
 
   virtual bool IsEnabled() override { return false; }
 
@@ -602,28 +603,28 @@ public:
    * @param instrs the instruments to record to.
    * @param values the value to record to those instruments.
    */
-  void RecordShortBatch(const trace::KeyValueIterable &labels,
+  void RecordShortBatch(const common::KeyValueIterable &labels,
                         nostd::span<SynchronousInstrument<short> *> instruments,
                         nostd::span<const short> values) noexcept override
   {
     // No-op
   }
 
-  void RecordIntBatch(const trace::KeyValueIterable &labels,
+  void RecordIntBatch(const common::KeyValueIterable &labels,
                       nostd::span<SynchronousInstrument<int> *> instruments,
                       nostd::span<const int> values) noexcept override
   {
     // No-op
   }
 
-  void RecordFloatBatch(const trace::KeyValueIterable &labels,
+  void RecordFloatBatch(const common::KeyValueIterable &labels,
                         nostd::span<SynchronousInstrument<float> *> instruments,
                         nostd::span<const float> values) noexcept override
   {
     // No-op
   }
 
-  void RecordDoubleBatch(const trace::KeyValueIterable &labels,
+  void RecordDoubleBatch(const common::KeyValueIterable &labels,
                          nostd::span<SynchronousInstrument<double> *> instruments,
                          nostd::span<const double> values) noexcept override
   {

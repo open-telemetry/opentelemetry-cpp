@@ -39,7 +39,7 @@ public:
 
   void AddEvent(nostd::string_view /*name*/,
                 core::SystemTimestamp /*timestamp*/,
-                const trace::KeyValueIterable & /*attributes*/) noexcept override
+                const common::KeyValueIterable & /*attributes*/) noexcept override
   {}
 
   void SetStatus(CanonicalCode /*code*/, nostd::string_view /*description*/) noexcept override {}
@@ -65,7 +65,7 @@ class NoopTracer final : public Tracer, public std::enable_shared_from_this<Noop
 public:
   // Tracer
   nostd::shared_ptr<Span> StartSpan(nostd::string_view /*name*/,
-                                    const KeyValueIterable & /*attributes*/,
+                                    const common::KeyValueIterable & /*attributes*/,
                                     const StartSpanOptions & /*options*/) noexcept override
   {
     // Don't allocate a no-op span for every StartSpan call, but use a static

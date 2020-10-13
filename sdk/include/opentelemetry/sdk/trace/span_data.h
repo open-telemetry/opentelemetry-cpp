@@ -25,7 +25,7 @@ class SpanDataEvent
 public:
   SpanDataEvent(std::string name,
                 core::SystemTimestamp timestamp,
-                const trace_api::KeyValueIterable &attributes)
+                const opentelemetry::common::KeyValueIterable &attributes)
       : name_(name), timestamp_(timestamp), attribute_map_(attributes)
   {}
 
@@ -64,7 +64,7 @@ class SpanDataLink
 {
 public:
   SpanDataLink(opentelemetry::trace::SpanContext span_context,
-               const trace_api::KeyValueIterable &attributes)
+               const opentelemetry::common::KeyValueIterable &attributes)
       : span_context_(span_context), attribute_map_(attributes)
   {}
 
@@ -174,14 +174,14 @@ public:
 
   void AddEvent(nostd::string_view name,
                 core::SystemTimestamp timestamp,
-                const trace_api::KeyValueIterable &attributes) noexcept override
+                const opentelemetry::common::KeyValueIterable &attributes) noexcept override
   {
     SpanDataEvent event(std::string(name), timestamp, attributes);
     events_.push_back(event);
   }
 
   void AddLink(opentelemetry::trace::SpanContext span_context,
-               const trace_api::KeyValueIterable &attributes) noexcept override
+               const opentelemetry::common::KeyValueIterable &attributes) noexcept override
   {
     SpanDataLink link(span_context, attributes);
     links_.push_back(link);
