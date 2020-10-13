@@ -67,10 +67,10 @@ public:
   nostd::shared_ptr<trace::Span> StartSpan(
       nostd::string_view name,
       const trace::KeyValueIterable &attributes,
-      const trace::StartSpanOptions &options = {},
-      const nostd::span<trace::Link> &links  = {}) noexcept override
+      const trace::SpanContextKeyValueIterable &links,
+      const trace::StartSpanOptions &options = {}) noexcept override
   {
-    auto span = tracer_handle_->tracer().StartSpan(name, attributes, options, links);
+    auto span = tracer_handle_->tracer().StartSpan(name, attributes, links, options);
     if (span == nullptr)
     {
       return nostd::shared_ptr<trace::Span>(nullptr);

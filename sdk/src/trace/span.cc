@@ -5,6 +5,8 @@
 #include "opentelemetry/trace/trace_flags.h"
 #include "opentelemetry/version.h"
 
+#include <unordered_map>
+
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace sdk
 {
@@ -61,8 +63,8 @@ Span::Span(std::shared_ptr<Tracer> &&tracer,
            std::shared_ptr<SpanProcessor> processor,
            nostd::string_view name,
            const trace_api::KeyValueIterable &attributes,
+           const trace_api::SpanContextKeyValueIterable &links,
            const trace_api::StartSpanOptions &options,
-           const nostd::span<trace_api::Link> &links,
            const trace_api::SpanContext &parent_span_context) noexcept
     : tracer_{std::move(tracer)},
       processor_{processor},
@@ -99,10 +101,40 @@ Span::Span(std::shared_ptr<Tracer> &&tracer,
     return true;
   });
 
-  for (auto const &link : links)
-  {
-    recordable_->AddLink(link.GetSpanContext(), link.GetAttributes());
-  }
+  links.ForEachKeyValue([&](trace_api::SpanContext span_context, nostd::string_view key,
+                            opentelemetry::common::AttributeValue value, bool is_last_kv) noexcept {
+    static std::unordered_map<nostd::string_view, opentelemetry::common::AttributeValue>
+        link_attributes = {};
+    if (is_last_kv)
+    {
+      if (key.size())
+      {
+        link_attributes.insert(
+            std::make_pair<nostd::string_view, opentelemetry::common::AttributeValue>(
+                std::move(key), std::move(value)));
+      }
+      if (link_attributes.size())
+      {
+        recordable_->AddLink(
+            span_context,
+            trace_api::KeyValueIterableView<
+                std::unordered_map<nostd::string_view, opentelemetry::common::AttributeValue>>(
+                link_attributes));
+      }
+      else
+      {
+        recordable_->AddLink(span_context);
+      }
+      link_attributes.clear();
+    }
+    else
+    {
+      link_attributes.insert(
+          std::make_pair<nostd::string_view, opentelemetry::common::AttributeValue>(
+              std::move(key), std::move(value)));
+    }
+    return true;
+  });
 
   recordable_->SetStartTime(NowOr(options.start_system_time));
   start_steady_time = NowOr(options.start_steady_time);

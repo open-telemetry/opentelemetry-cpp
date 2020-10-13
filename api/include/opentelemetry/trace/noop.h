@@ -9,6 +9,7 @@
 #include "opentelemetry/nostd/unique_ptr.h"
 #include "opentelemetry/trace/span.h"
 #include "opentelemetry/trace/span_context.h"
+#include "opentelemetry/trace/span_context_kv_iterable.h"
 #include "opentelemetry/trace/tracer.h"
 #include "opentelemetry/trace/tracer_provider.h"
 #include "opentelemetry/version.h"
@@ -64,8 +65,8 @@ public:
   // Tracer
   nostd::shared_ptr<Span> StartSpan(nostd::string_view /*name*/,
                                     const KeyValueIterable & /*attributes*/,
-                                    const StartSpanOptions & /*options*/,
-                                    const nostd::span<Link> & /*links*/) noexcept override
+                                    const SpanContextKeyValueIterable & /*links*/,
+                                    const StartSpanOptions & /*options*/) noexcept override
   {
     // Don't allocate a no-op span for every StartSpan call, but use a static
     // singleton for this case.

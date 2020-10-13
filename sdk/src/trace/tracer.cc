@@ -47,8 +47,8 @@ trace_api::SpanContext GetCurrentSpanContext()
 nostd::shared_ptr<trace_api::Span> Tracer::StartSpan(
     nostd::string_view name,
     const trace_api::KeyValueIterable &attributes,
-    const trace_api::StartSpanOptions &options,
-    const nostd::span<trace_api::Link> &links) noexcept
+    const trace_api::SpanContextKeyValueIterable &links,
+    const trace_api::StartSpanOptions &options) noexcept
 {
   // TODO: replace nullptr with parent context in span context
   auto sampling_result =
@@ -66,7 +66,7 @@ nostd::shared_ptr<trace_api::Span> Tracer::StartSpan(
   {
     auto span = nostd::shared_ptr<trace_api::Span>{
         new (std::nothrow) Span{this->shared_from_this(), processor_.load(), name, attributes,
-                                options, links, GetCurrentSpanContext()}};
+                                links, options, GetCurrentSpanContext()}};
 
     // if the attributes is not nullptr, add attributes to the span.
     if (sampling_result.attributes)
