@@ -48,11 +48,6 @@ public:
                                     const T &attributes,
                                     const StartSpanOptions &options = {}) noexcept
   {
-
-    /*SpanContextKeyValueIterableView<std::initializer_list<std::pair<
-         SpanContext, std::initializer_list<std::pair<nostd::string_view,
-       common::AttributeValue>>>>> links({}); */
-    // return this->StartSpan(name, KeyValueIterableView<T>(attributes), {}, options);
     return this->StartSpan(name, attributes, {}, options);
   }
 
