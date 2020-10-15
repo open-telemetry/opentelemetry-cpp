@@ -5,7 +5,6 @@
 #include "opentelemetry/sdk/trace/samplers/parent_or_else.h"
 #include "opentelemetry/sdk/trace/simple_processor.h"
 #include "opentelemetry/sdk/trace/span_data.h"
-#include "opentelemetry/trace/link.h"
 
 #include <gtest/gtest.h>
 
@@ -17,7 +16,6 @@ namespace common = opentelemetry::common;
 using opentelemetry::exporter::memory::InMemorySpanData;
 using opentelemetry::exporter::memory::InMemorySpanExporter;
 using opentelemetry::trace::KeyValueIterableView;
-using opentelemetry::trace::Link;
 using opentelemetry::trace::SpanContext;
 
 /**
