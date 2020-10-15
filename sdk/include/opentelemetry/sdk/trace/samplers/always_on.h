@@ -19,7 +19,7 @@ public:
    * @return Always return Decision RECORD_AND_SAMPLE
    */
   inline SamplingResult ShouldSample(
-      const trace_api::SpanContext * /*parent_context*/,
+      const trace_api::SpanContext & /*parent_context*/,
       trace_api::TraceId /*trace_id*/,
       nostd::string_view /*name*/,
       trace_api::SpanKind /*span_kind*/,

@@ -9,34 +9,34 @@ namespace trace
 {
 namespace trace_api = opentelemetry::trace;
 /**
- * The probability sampler, based on it's configuration, should either defer the
- * decision to sample to it's parent, or compute and return a decision based on
- * the provided trace_id and probability.
+ * The TraceIdRatioBased sampler computes and returns a decision based on the
+ * provided trace_id and the configured ratio.
  */
-class ProbabilitySampler : public Sampler
+class TraceIdRatioBasedSampler : public Sampler
 {
 public:
   /**
-   * @param probability a required value, 1.0 >= probability >= 0.0, that given any
-   * random trace_id, ShouldSample will return RECORD_AND_SAMPLE
-   * @throws invalid_argument if probability is out of bounds [0.0, 1.0]
+   * @param ratio a required value, 1.0 >= ratio >= 0.0. If the given trace_id
+   * falls into a given ratio of all possible trace_id values, ShouldSample will
+   * return RECORD_AND_SAMPLE.
+   * @throws invalid_argument if ratio is out of bounds [0.0, 1.0]
    */
-  explicit ProbabilitySampler(double probability);
+  explicit TraceIdRatioBasedSampler(double ratio);
 
   /**
    * @return Returns either RECORD_AND_SAMPLE or DROP based on current
-   * sampler configuration and provided parent_context / tracer_id. tracer_id
+   * sampler configuration and provided trace_id and ratio. trace_id
    * is used as a pseudorandom value in conjunction with the predefined
-   * threshold to determine whether this trace should be sampled
+   * ratio to determine whether this trace should be sampled
    */
-  SamplingResult ShouldSample(const trace_api::SpanContext *parent_context,
+  SamplingResult ShouldSample(const trace_api::SpanContext & /*parent_context*/,
                               trace_api::TraceId trace_id,
                               nostd::string_view /*name*/,
                               trace_api::SpanKind /*span_kind*/,
                               const trace_api::KeyValueIterable & /*attributes*/) noexcept override;
 
   /**
-   * @return Description MUST be ProbabilitySampler{0.000100}
+   * @return Description MUST be TraceIdRatioBasedSampler{0.000100}
    */
   nostd::string_view GetDescription() const noexcept override;
 
