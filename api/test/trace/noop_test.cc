@@ -50,8 +50,8 @@ TEST(NoopTest, StartSpan)
 
   std::map<std::string, std::string> attrs                                      = {{"a", "3"}};
   std::vector<std::pair<SpanContext, std::map<std::string, std::string>>> links = {
-      {SpanContext(), attrs}};
+      {SpanContext(false, false), attrs}};
   auto s1 = tracer->StartSpan("abc", attrs, links);
 
-  auto s2 = tracer->StartSpan("efg", {{"a", 3}}, {{SpanContext(), {{"b", 4}}}});
+  auto s2 = tracer->StartSpan("efg", {{"a", 3}}, {{SpanContext(false, false), {{"b", 4}}}});
 }

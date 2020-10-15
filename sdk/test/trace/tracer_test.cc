@@ -341,7 +341,7 @@ TEST(Tracer, SpanSetLinks)
   {
 
     // Single span link passed through Initialization list
-    tracer->StartSpan("efg", {{"attr1", 1}}, {{SpanContext(), {{"attr2", 2}}}})->End();
+    tracer->StartSpan("efg", {{"attr1", 1}}, {{SpanContext(false, false), {{"attr2", 2}}}})->End();
     auto spans = span_data->GetSpans();
     ASSERT_EQ(1, spans.size());
 
@@ -355,7 +355,8 @@ TEST(Tracer, SpanSetLinks)
     // Multiple span links passed through Initialization list
     tracer
         ->StartSpan("efg", {{"attr1", 1}},
-                    {{SpanContext(), {{"attr2", 2}}}, {SpanContext(), {{"attr3", 3}}}})
+                    {{SpanContext(false, false), {{"attr2", 2}}},
+                     {SpanContext(false, false), {{"attr3", 3}}}})
         ->End();
     auto spans = span_data->GetSpans();
     ASSERT_EQ(1, spans.size());
@@ -372,9 +373,9 @@ TEST(Tracer, SpanSetLinks)
 
     // Multiple links, each with multiple attributes passed through Initialization list
     tracer
-        ->StartSpan(
-            "efg", {{"attr1", 1}},
-            {{SpanContext(), {{"attr2", 2}, {"attr3", 3}}}, {SpanContext(), {{"attr4", 4}}}})
+        ->StartSpan("efg", {{"attr1", 1}},
+                    {{SpanContext(false, false), {{"attr2", 2}, {"attr3", 3}}},
+                     {SpanContext(false, false), {{"attr4", 4}}}})
         ->End();
     auto spans = span_data->GetSpans();
     ASSERT_EQ(1, spans.size());
@@ -393,7 +394,7 @@ TEST(Tracer, SpanSetLinks)
     std::map<std::string, std::string> attrs2 = {{"attr3", "3"}, {"attr4", "4"}};
 
     std::vector<std::pair<SpanContext, std::map<std::string, std::string>>> links = {
-        {SpanContext(), attrs1}, {SpanContext(), attrs2}};
+        {SpanContext(false, false), attrs1}, {SpanContext(false, false), attrs2}};
     tracer->StartSpan("efg", attrs1, links)->End();
     auto spans = span_data->GetSpans();
 
