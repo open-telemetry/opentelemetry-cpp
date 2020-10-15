@@ -215,7 +215,7 @@ TEST(PrometheusCollector, AddMetricDataWithCounterRecordsSuccessfully)
     auto after_agg     = nostd::get<std::shared_ptr<metric_sdk::Aggregator<double>>>(after_agg_var);
 
     ASSERT_EQ(before_agg->get_checkpoint().size(), after_agg->get_checkpoint().size());
-    for (int i = 0; i < before_agg->get_checkpoint().size(); i++)
+    for (size_t i = 0; i < before_agg->get_checkpoint().size(); i++)
     {
       ASSERT_EQ(before_agg->get_checkpoint()[i], after_agg->get_checkpoint()[i]);
     }
@@ -267,7 +267,7 @@ TEST(PrometheusCollector, AddMetricDataWithMinMaxSumCountRecordsSuccessfully)
     auto after_agg     = nostd::get<std::shared_ptr<metric_sdk::Aggregator<short>>>(after_agg_var);
 
     ASSERT_EQ(before_agg->get_checkpoint().size(), after_agg->get_checkpoint().size());
-    for (int i = 0; i < before_agg->get_checkpoint().size(); i++)
+    for (size_t i = 0; i < before_agg->get_checkpoint().size(); i++)
     {
       ASSERT_EQ(before_agg->get_checkpoint()[i], after_agg->get_checkpoint()[i]);
     }
@@ -319,7 +319,7 @@ TEST(PrometheusCollector, AddMetricDataWithGaugeRecordsSuccessfully)
     auto after_agg     = nostd::get<std::shared_ptr<metric_sdk::Aggregator<int>>>(after_agg_var);
 
     ASSERT_EQ(before_agg->get_checkpoint().size(), after_agg->get_checkpoint().size());
-    for (int i = 0; i < before_agg->get_checkpoint().size(); i++)
+    for (size_t i = 0; i < before_agg->get_checkpoint().size(); i++)
     {
       ASSERT_EQ(before_agg->get_checkpoint()[i], after_agg->get_checkpoint()[i]);
     }
@@ -372,15 +372,15 @@ TEST(PrometheusCollector, AddMetricDataWithSketchRecordsSuccessfully)
     auto after_agg     = nostd::get<std::shared_ptr<metric_sdk::Aggregator<double>>>(after_agg_var);
 
     ASSERT_EQ(before_agg->get_checkpoint().size(), after_agg->get_checkpoint().size());
-    for (int i = 0; i < before_agg->get_checkpoint().size(); i++)
+    for (size_t i = 0; i < before_agg->get_checkpoint().size(); i++)
     {
       ASSERT_EQ(before_agg->get_checkpoint()[i], after_agg->get_checkpoint()[i]);
     }
-    for (int i = 0; i < before_agg->get_boundaries().size(); i++)
+    for (size_t i = 0; i < before_agg->get_boundaries().size(); i++)
     {
       ASSERT_EQ(before_agg->get_boundaries()[i], after_agg->get_boundaries()[i]);
     }
-    for (int i = 0; i < before_agg->get_counts().size(); i++)
+    for (size_t i = 0; i < before_agg->get_counts().size(); i++)
     {
       ASSERT_EQ(before_agg->get_counts()[i], after_agg->get_counts()[i]);
     }
@@ -433,15 +433,15 @@ TEST(PrometheusCollector, AddMetricDataWithHistogramRecordsSuccessfully)
     auto after_agg     = nostd::get<std::shared_ptr<metric_sdk::Aggregator<float>>>(after_agg_var);
 
     ASSERT_EQ(before_agg->get_checkpoint().size(), after_agg->get_checkpoint().size());
-    for (int i = 0; i < before_agg->get_checkpoint().size(); i++)
+    for (size_t i = 0; i < before_agg->get_checkpoint().size(); i++)
     {
       ASSERT_EQ(before_agg->get_checkpoint()[i], after_agg->get_checkpoint()[i]);
     }
-    for (int i = 0; i < before_agg->get_boundaries().size(); i++)
+    for (size_t i = 0; i < before_agg->get_boundaries().size(); i++)
     {
       ASSERT_EQ(before_agg->get_boundaries()[i], after_agg->get_boundaries()[i]);
     }
-    for (int i = 0; i < before_agg->get_counts().size(); i++)
+    for (size_t i = 0; i < before_agg->get_counts().size(); i++)
     {
       ASSERT_EQ(before_agg->get_counts()[i], after_agg->get_counts()[i]);
     }
@@ -512,7 +512,7 @@ TEST(PrometheusCollector, AddMetricDataWithExactRecordsSuccessfully)
     else
     {
       ASSERT_EQ(before_agg->get_checkpoint().size(), after_agg->get_checkpoint().size());
-      for (int i = 0; i < before_agg->get_checkpoint().size(); i++)
+      for (size_t i = 0; i < before_agg->get_checkpoint().size(); i++)
       {
         ASSERT_EQ(before_agg->get_checkpoint()[i], after_agg->get_checkpoint()[i]);
       }

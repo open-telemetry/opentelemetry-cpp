@@ -29,7 +29,7 @@ namespace prometheus
  * This constructor initializes the collection for metrics to export
  * in this class with default capacity
  */
-PrometheusCollector::PrometheusCollector(int max_collection_size)
+PrometheusCollector::PrometheusCollector(size_t max_collection_size)
     : max_collection_size_(max_collection_size)
 {
   metrics_to_collect_ =

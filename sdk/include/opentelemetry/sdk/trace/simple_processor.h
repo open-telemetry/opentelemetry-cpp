@@ -1,5 +1,9 @@
 #pragma once
 
+#include <atomic>
+#include <mutex>
+
+#include "opentelemetry/common/spin_lock_mutex.h"
 #include "opentelemetry/sdk/trace/exporter.h"
 #include "opentelemetry/sdk/trace/processor.h"
 
@@ -13,6 +17,9 @@ namespace trace
  * SpanExporter, as soon as they are finished.
  *
  * OnEnd and ForceFlush are no-ops.
+ *
+ * All calls to the configured SpanExporter are synchronized using a
+ * spin-lock on an atomic_flag.
  */
 class SimpleSpanProcessor : public SpanProcessor
 {
@@ -35,6 +42,7 @@ public:
   void OnEnd(std::unique_ptr<Recordable> &&span) noexcept override
   {
     nostd::span<std::unique_ptr<Recordable>> batch(&span, 1);
+    const std::lock_guard<opentelemetry::common::SpinLockMutex> locked(lock_);
     if (exporter_->Export(batch) == ExportResult::kFailure)
     {
       /* Once it is defined how the SDK does logging, an error should be
@@ -48,11 +56,17 @@ public:
 
   void Shutdown(std::chrono::microseconds timeout = std::chrono::microseconds(0)) noexcept override
   {
-    exporter_->Shutdown(timeout);
+    // We only call shutdown ONCE.
+    if (!shutdown_latch_.test_and_set(std::memory_order_acquire))
+    {
+      exporter_->Shutdown(timeout);
+    }
   }
 
 private:
   std::unique_ptr<SpanExporter> exporter_;
+  opentelemetry::common::SpinLockMutex lock_;
+  std::atomic_flag shutdown_latch_{ATOMIC_FLAG_INIT};
 };
 }  // namespace trace
 }  // namespace sdk

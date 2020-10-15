@@ -73,8 +73,14 @@ nostd::shared_ptr<trace_api::Span> Tracer::StartSpan(
   }
   else
   {
+<<<<<<< HEAD
+    auto span = nostd::shared_ptr<trace_api::Span>{
+        new (std::nothrow) Span{this->shared_from_this(), processor_.load(), name, attributes,
+                                links, options, GetCurrentSpanContext()}};
+=======
     auto span = nostd::shared_ptr<trace_api::Span>{new (std::nothrow) Span{
-        this->shared_from_this(), processor_.load(), name, attributes, links, options, parent}};
+        this->shared_from_this(), processor_.load(), name, attributes, options, parent}};
+>>>>>>> master
 
     // if the attributes is not nullptr, add attributes to the span.
     if (sampling_result.attributes)

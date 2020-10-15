@@ -25,7 +25,9 @@ namespace trace
 class NoopSpan final : public Span
 {
 public:
-  explicit NoopSpan(const std::shared_ptr<Tracer> &tracer) noexcept : tracer_{tracer} {}
+  explicit NoopSpan(const std::shared_ptr<Tracer> &tracer) noexcept
+      : tracer_{tracer}, span_context_{SpanContext::GetInvalid()}
+  {}
 
   void SetAttribute(nostd::string_view /*key*/,
                     const common::AttributeValue & /*value*/) noexcept override

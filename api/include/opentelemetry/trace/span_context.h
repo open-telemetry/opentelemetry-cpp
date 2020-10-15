@@ -33,10 +33,6 @@ namespace trace_api = opentelemetry::trace;
 class SpanContext final
 {
 public:
-  // An invalid SpanContext.
-  SpanContext() noexcept
-      : trace_flags_(trace::TraceFlags((uint8_t) false)), remote_parent_(false){};
-
   /* A temporary constructor for an invalid SpanContext.
    * Trace id and span id are set to invalid (all zeros).
    *
@@ -71,31 +67,9 @@ public:
         remote_parent_(has_remote_parent)
   {}
 
-  SpanContext(SpanContext &&ctx)
-      : trace_id_(ctx.trace_id()), span_id_(ctx.span_id()), trace_flags_(ctx.trace_flags())
-  {}
+  SpanContext(const SpanContext &ctx) = default;
 
-  SpanContext(const SpanContext &ctx)
-      : trace_id_(ctx.trace_id()), span_id_(ctx.span_id()), trace_flags_(ctx.trace_flags())
-  {}
-  //
-  //  SpanContext &operator=(const SpanContext &ctx)
-  //  {
-  //    SpanContext *spn_ctx =
-  //        new SpanContext(ctx.trace_id(), ctx.span_id(), ctx.trace_flags(),
-  //        ctx.HasRemoteParent());
-  //    this = spn_ctx;
-  //    return *this;
-  //  };
-  //
-  //  SpanContext &operator=(SpanContext &&ctx)
-  //  {
-  //    SpanContext *spn_ctx =
-  //        new SpanContext(ctx.trace_id(), ctx.span_id(), ctx.trace_flags(),
-  //        ctx.HasRemoteParent());
-  //    this = spn_ctx;
-  //    return *this;
-  //  };
+  SpanContext &operator=(const SpanContext &ctx) = default;
 
   bool operator==(const SpanContext &that) const noexcept
   {
@@ -110,10 +84,10 @@ public:
   bool IsSampled() const noexcept { return trace_flags_.IsSampled(); }
 
 private:
-  const trace_api::TraceId trace_id_;
-  const trace_api::SpanId span_id_;
-  const trace_api::TraceFlags trace_flags_;
-  const bool remote_parent_ = false;
+  trace_api::TraceId trace_id_;
+  trace_api::SpanId span_id_;
+  trace_api::TraceFlags trace_flags_;
+  bool remote_parent_ = false;
 };
 }  // namespace trace
 OPENTELEMETRY_END_NAMESPACE
