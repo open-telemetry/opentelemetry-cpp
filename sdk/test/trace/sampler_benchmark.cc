@@ -2,8 +2,8 @@
 #include "opentelemetry/sdk/trace/sampler.h"
 #include "opentelemetry/sdk/trace/samplers/always_off.h"
 #include "opentelemetry/sdk/trace/samplers/always_on.h"
-#include "opentelemetry/sdk/trace/samplers/parent_or_else.h"
-#include "opentelemetry/sdk/trace/samplers/probability.h"
+#include "opentelemetry/sdk/trace/samplers/parent.h"
+#include "opentelemetry/sdk/trace/samplers/trace_id_ratio.h"
 #include "opentelemetry/sdk/trace/simple_processor.h"
 #include "opentelemetry/sdk/trace/span_data.h"
 #include "opentelemetry/sdk/trace/tracer.h"
@@ -14,6 +14,7 @@
 
 using namespace opentelemetry::sdk::trace;
 using opentelemetry::exporter::memory::InMemorySpanExporter;
+using opentelemetry::trace::SpanContext;
 
 namespace
 {
@@ -37,23 +38,23 @@ void BM_AlwaysOnSamplerConstruction(benchmark::State &state)
 }
 BENCHMARK(BM_AlwaysOnSamplerConstruction);
 
-void BM_ParentOrElseSamplerConstruction(benchmark::State &state)
+void BM_ParentBasedSamplerConstruction(benchmark::State &state)
 {
   while (state.KeepRunning())
   {
-    benchmark::DoNotOptimize(ParentOrElseSampler(std::make_shared<AlwaysOnSampler>()));
+    benchmark::DoNotOptimize(ParentBasedSampler(std::make_shared<AlwaysOnSampler>()));
   }
 }
-BENCHMARK(BM_ParentOrElseSamplerConstruction);
+BENCHMARK(BM_ParentBasedSamplerConstruction);
 
-void BM_ProbabilitySamplerConstruction(benchmark::State &state)
+void BM_TraceIdRatioBasedSamplerConstruction(benchmark::State &state)
 {
   while (state.KeepRunning())
   {
-    benchmark::DoNotOptimize(ProbabilitySampler(0.01));
+    benchmark::DoNotOptimize(TraceIdRatioBasedSampler(0.01));
   }
 }
-BENCHMARK(BM_ProbabilitySamplerConstruction);
+BENCHMARK(BM_TraceIdRatioBasedSamplerConstruction);
 
 // Sampler Helper Function
 void BenchmarkShouldSampler(Sampler &sampler, benchmark::State &state)
@@ -67,7 +68,8 @@ void BenchmarkShouldSampler(Sampler &sampler, benchmark::State &state)
 
   while (state.KeepRunning())
   {
-    benchmark::DoNotOptimize(sampler.ShouldSample(nullptr, trace_id, "", span_kind, view));
+    auto invalid_ctx = SpanContext::GetInvalid();
+    benchmark::DoNotOptimize(sampler.ShouldSample(invalid_ctx, trace_id, "", span_kind, view));
   }
 }
 
@@ -89,21 +91,21 @@ void BM_AlwaysOnSamplerShouldSample(benchmark::State &state)
 }
 BENCHMARK(BM_AlwaysOnSamplerShouldSample);
 
-void BM_ParentOrElseSamplerShouldSample(benchmark::State &state)
+void BM_ParentBasedSamplerShouldSample(benchmark::State &state)
 {
-  ParentOrElseSampler sampler(std::make_shared<AlwaysOnSampler>());
+  ParentBasedSampler sampler(std::make_shared<AlwaysOnSampler>());
 
   BenchmarkShouldSampler(sampler, state);
 }
-BENCHMARK(BM_ParentOrElseSamplerShouldSample);
+BENCHMARK(BM_ParentBasedSamplerShouldSample);
 
-void BM_ProbabilitySamplerShouldSample(benchmark::State &state)
+void BM_TraceIdRatioBasedSamplerShouldSample(benchmark::State &state)
 {
-  ProbabilitySampler sampler(0.01);
+  TraceIdRatioBasedSampler sampler(0.01);
 
   BenchmarkShouldSampler(sampler, state);
 }
-BENCHMARK(BM_ProbabilitySamplerShouldSample);
+BENCHMARK(BM_TraceIdRatioBasedSamplerShouldSample);
 
 // Sampler Helper Function
 void BenchmarkSpanCreation(std::shared_ptr<Sampler> sampler, benchmark::State &state)

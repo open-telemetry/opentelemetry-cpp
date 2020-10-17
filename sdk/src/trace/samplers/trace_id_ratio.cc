@@ -13,7 +13,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include "opentelemetry/sdk/trace/samplers/probability.h"
+#include "opentelemetry/sdk/trace/samplers/trace_id_ratio.h"
 
 #include <cmath>
 #include <cstdint>
@@ -24,26 +24,26 @@ namespace trace_api = opentelemetry::trace;
 namespace
 {
 /**
- * Converts a probability in [0, 1] to a threshold in [0, UINT64_MAX]
+ * Converts a ratio in [0, 1] to a threshold in [0, UINT64_MAX]
  *
- * @param probability a required value top be converted to uint64_t. is
- * bounded by 1 >= probability >= 0.
- * @return Returns threshold value computed after converting probability to
+ * @param ratio a required value top be converted to uint64_t. is
+ * bounded by 1 >= ratio >= 0.
+ * @return Returns threshold value computed after converting ratio to
  * uint64_t datatype
  */
-uint64_t CalculateThreshold(double probability) noexcept
+uint64_t CalculateThreshold(double ratio) noexcept
 {
-  if (probability <= 0.0)
+  if (ratio <= 0.0)
     return 0;
-  if (probability >= 1.0)
+  if (ratio >= 1.0)
     return UINT64_MAX;
 
-  // We can't directly return probability * UINT64_MAX.
+  // We can't directly return ratio * UINT64_MAX.
   //
   // UINT64_MAX is (2^64)-1, but as a double rounds up to 2^64.
   // For probabilities >= 1-(2^-54), the product wraps to zero!
   // Instead, calculate the high and low 32 bits separately.
-  const double product = UINT32_MAX * probability;
+  const double product = UINT32_MAX * ratio;
   double hi_bits, lo_bits = ldexp(modf(product, &hi_bits), 32) + product;
   return (static_cast<uint64_t>(hi_bits) << 32) + static_cast<uint64_t>(lo_bits);
 }
@@ -62,9 +62,9 @@ uint64_t CalculateThresholdFromBuffer(const trace_api::TraceId &trace_id) noexce
   uint64_t res = 0;
   std::memcpy(&res, &trace_id, 8);
 
-  double probability = (double)res / UINT64_MAX;
+  double ratio = (double)res / UINT64_MAX;
 
-  return CalculateThreshold(probability);
+  return CalculateThreshold(ratio);
 }
 }  // namespace
 
@@ -73,35 +73,23 @@ namespace sdk
 {
 namespace trace
 {
-ProbabilitySampler::ProbabilitySampler(double probability)
-    : threshold_(CalculateThreshold(probability))
+TraceIdRatioBasedSampler::TraceIdRatioBasedSampler(double ratio)
+    : threshold_(CalculateThreshold(ratio))
 {
-  if (probability > 1.0)
-    probability = 1.0;
-  if (probability < 0.0)
-    probability = 0.0;
-  description_ = "ProbabilitySampler{" + std::to_string(probability) + "}";
+  if (ratio > 1.0)
+    ratio = 1.0;
+  if (ratio < 0.0)
+    ratio = 0.0;
+  description_ = "TraceIdRatioBasedSampler{" + std::to_string(ratio) + "}";
 }
 
-SamplingResult ProbabilitySampler::ShouldSample(
-    const trace_api::SpanContext *parent_context,
+SamplingResult TraceIdRatioBasedSampler::ShouldSample(
+    const trace_api::SpanContext & /*parent_context*/,
     trace_api::TraceId trace_id,
     nostd::string_view /*name*/,
     trace_api::SpanKind /*span_kind*/,
     const opentelemetry::common::KeyValueIterable & /*attributes*/) noexcept
 {
-  if (parent_context && !parent_context->HasRemoteParent())
-  {
-    if (parent_context->IsSampled())
-    {
-      return {Decision::RECORD_AND_SAMPLE, nullptr};
-    }
-    else
-    {
-      return {Decision::DROP, nullptr};
-    }
-  }
-
   if (threshold_ == 0)
     return {Decision::DROP, nullptr};
 
@@ -113,7 +101,7 @@ SamplingResult ProbabilitySampler::ShouldSample(
   return {Decision::DROP, nullptr};
 }
 
-nostd::string_view ProbabilitySampler::GetDescription() const noexcept
+nostd::string_view TraceIdRatioBasedSampler::GetDescription() const noexcept
 {
   return description_;
 }

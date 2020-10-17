@@ -80,9 +80,9 @@ cc_test(
 )
 
 cc_test(
-    name = "parent_or_else_sampler_test",
+    name = "parent_sampler_test",
     srcs = [
-        "parent_or_else_sampler_test.cc",
+        "parent_sampler_test.cc",
     ],
     deps = [
         "//sdk/src/trace",
@@ -91,9 +91,9 @@ cc_test(
 )
 
 cc_test(
-    name = "probability_sampler_test",
+    name = "trace_id_ratio_sampler_test",
     srcs = [
-        "probability_sampler_test.cc",
+        "trace_id_ratio_sampler_test.cc",
     ],
     deps = [
         "//sdk/src/common:random",
