@@ -24,7 +24,7 @@ TEST(ParentBasedSampler, ShouldSample)
   opentelemetry::trace::SpanKind span_kind = opentelemetry::trace::SpanKind::kInternal;
   using M                                  = std::map<std::string, int>;
   M m1                                     = {{}};
-  opentelemetry::trace::KeyValueIterableView<M> view{m1};
+  opentelemetry::common::KeyValueIterableView<M> view{m1};
   trace_api::SpanContext parent_context_sampled(trace_id, span_id, trace_api::TraceFlags{1}, false);
   trace_api::SpanContext parent_context_nonsampled(trace_id, span_id, trace_api::TraceFlags{0},
                                                    false);

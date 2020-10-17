@@ -13,10 +13,11 @@
 
 #include <map>
 
+// TODO: Create generic short pattern for opentelemetry::common and opentelemetry::trace
+
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace sdk
 {
-namespace trace_api = opentelemetry::trace;
 namespace trace
 {
 /**
@@ -99,7 +100,7 @@ public:
    * @param code the status code
    * @param description a description of the status
    */
-  virtual void SetStatus(trace_api::CanonicalCode code,
+  virtual void SetStatus(opentelemetry::trace::CanonicalCode code,
                          nostd::string_view description) noexcept = 0;
 
   /**

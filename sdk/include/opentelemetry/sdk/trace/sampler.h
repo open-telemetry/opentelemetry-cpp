@@ -65,20 +65,12 @@ public:
    * @since 0.1.0
    */
 
-<<<<<<< HEAD
   virtual SamplingResult ShouldSample(
-      const trace_api::SpanContext *parent_context,
+      const trace_api::SpanContext &parent_context,
       trace_api::TraceId trace_id,
       nostd::string_view name,
       trace_api::SpanKind span_kind,
       const opentelemetry::common::KeyValueIterable &attributes) noexcept = 0;
-=======
-  virtual SamplingResult ShouldSample(const trace_api::SpanContext &parent_context,
-                                      trace_api::TraceId trace_id,
-                                      nostd::string_view name,
-                                      trace_api::SpanKind span_kind,
-                                      const trace_api::KeyValueIterable &attributes) noexcept = 0;
->>>>>>> origin/master
 
   /**
    * Returns the sampler name or short description with the configuration.

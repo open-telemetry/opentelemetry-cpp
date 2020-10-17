@@ -30,14 +30,9 @@ TEST(AlwaysOnSampler, ShouldSample)
 
   // Test with a valid trace id and empty parent context
   sampling_result = sampler.ShouldSample(
-<<<<<<< HEAD
-      nullptr, trace_id_valid, "valid trace id test", trace_api::SpanKind::kServer,
-      opentelemetry::common::KeyValueIterableView<std::map<std::string, int>>(key_value_container));
-=======
       SpanContext::GetInvalid(), trace_id_valid, "valid trace id test",
       trace_api::SpanKind::kServer,
-      trace_api::KeyValueIterableView<std::map<std::string, int>>(key_value_container));
->>>>>>> origin/master
+      opentelemetry::common::KeyValueIterableView<std::map<std::string, int>>(key_value_container));
 
   ASSERT_EQ(Decision::RECORD_AND_SAMPLE, sampling_result.decision);
   ASSERT_EQ(nullptr, sampling_result.attributes);

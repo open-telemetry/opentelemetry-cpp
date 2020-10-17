@@ -187,7 +187,8 @@ public:
     links_.push_back(link);
   }
 
-  void SetStatus(trace_api::CanonicalCode code, nostd::string_view description) noexcept override
+  void SetStatus(opentelemetry::trace::CanonicalCode code,
+                 nostd::string_view description) noexcept override
   {
     status_code_ = code;
     status_desc_ = std::string(description);

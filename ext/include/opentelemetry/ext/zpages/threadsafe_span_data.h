@@ -17,7 +17,9 @@
 using opentelemetry::sdk::trace::AttributeConverter;
 using opentelemetry::sdk::trace::SpanDataAttributeValue;
 using opentelemetry::sdk::trace::SpanDataEvent;
-namespace trace_api = opentelemetry::trace;
+
+// TODO: Create generic short pattern for opentelemetry::common and opentelemetry::trace and others
+// as necessary
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace ext
@@ -137,7 +139,8 @@ public:
     attributes_[std::string(key)] = nostd::visit(converter_, value);
   }
 
-  void SetStatus(trace_api::CanonicalCode code, nostd::string_view description) noexcept override
+  void SetStatus(opentelemetry::trace::CanonicalCode code,
+                 nostd::string_view description) noexcept override
   {
     std::lock_guard<std::mutex> lock(mutex_);
     status_code_ = code;

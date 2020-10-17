@@ -34,7 +34,7 @@ int RunShouldSampleCountDecision(trace_api::SpanContext &context,
 
   using M = std::map<std::string, int>;
   M m1    = {{}};
-  opentelemetry::trace::KeyValueIterableView<M> view{m1};
+  opentelemetry::common::KeyValueIterableView<M> view{m1};
 
   for (int i = 0; i < iterations; ++i)
   {
@@ -62,7 +62,7 @@ TEST(TraceIdRatioBasedSampler, ShouldSampleWithoutContext)
 
   using M = std::map<std::string, int>;
   M m1    = {{}};
-  opentelemetry::trace::KeyValueIterableView<M> view{m1};
+  opentelemetry::common::KeyValueIterableView<M> view{m1};
 
   TraceIdRatioBasedSampler s1(0.01);
 
@@ -122,7 +122,7 @@ TEST(TraceIdRatioBasedSampler, ShouldSampleWithContext)
 
   using M = std::map<std::string, int>;
   M m1    = {{}};
-  opentelemetry::trace::KeyValueIterableView<M> view{m1};
+  opentelemetry::common::KeyValueIterableView<M> view{m1};
 
   TraceIdRatioBasedSampler s1(0.01);
 

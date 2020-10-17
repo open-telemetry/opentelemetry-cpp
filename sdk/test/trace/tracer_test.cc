@@ -23,20 +23,12 @@ using opentelemetry::trace::SpanContext;
 class MockSampler final : public Sampler
 {
 public:
-<<<<<<< HEAD
   SamplingResult ShouldSample(
-      const SpanContext * /*parent_context*/,
+      const SpanContext & /*parent_context*/,
       trace_api::TraceId /*trace_id*/,
       nostd::string_view /*name*/,
       trace_api::SpanKind /*span_kind*/,
       const opentelemetry::common::KeyValueIterable & /*attributes*/) noexcept override
-=======
-  SamplingResult ShouldSample(const SpanContext & /*parent_context*/,
-                              trace_api::TraceId /*trace_id*/,
-                              nostd::string_view /*name*/,
-                              trace_api::SpanKind /*span_kind*/,
-                              const trace_api::KeyValueIterable & /*attributes*/) noexcept override
->>>>>>> origin/master
   {
     // Return two pairs of attributes. These attributes should be added to the
     // span attributes

@@ -12,8 +12,6 @@ OPENTELEMETRY_BEGIN_NAMESPACE
 using opentelemetry::metrics::Meter;
 using opentelemetry::metrics::NoopMeter;
 
-namespace metrics_api = opentelemetry::metrics;
-
 void Callback(opentelemetry::metrics::ObserverResult<int> result)
 {
   std::map<std::string, std::string> labels = {{"key", "value"}};

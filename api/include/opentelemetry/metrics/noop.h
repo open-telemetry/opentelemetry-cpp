@@ -15,6 +15,9 @@
 
 #include <memory>
 
+// TODO: Create generic short pattern for opentelemetry::common and opentelemetry::trace and others
+// as necessary
+
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace metrics
 {
@@ -297,36 +300,36 @@ public:
    * @param enabled a boolean that turns the metric instrument on and off.
    * @return
    */
-  opentelemetry::nostd::shared_ptr<Counter<short>> NewShortCounter(nostd::string_view name,
-                                                                   nostd::string_view description,
-                                                                   nostd::string_view unit,
-                                                                   const bool enabled) override
+  nostd::shared_ptr<Counter<short>> NewShortCounter(nostd::string_view name,
+                                                    nostd::string_view description,
+                                                    nostd::string_view unit,
+                                                    const bool enabled) override
   {
     return nostd::shared_ptr<Counter<short>>{
         new NoopCounter<short>(name, description, unit, enabled)};
   }
 
-  opentelemetry::nostd::shared_ptr<Counter<int>> NewIntCounter(nostd::string_view name,
-                                                               nostd::string_view description,
-                                                               nostd::string_view unit,
-                                                               const bool enabled) override
+  nostd::shared_ptr<Counter<int>> NewIntCounter(nostd::string_view name,
+                                                nostd::string_view description,
+                                                nostd::string_view unit,
+                                                const bool enabled) override
   {
     return nostd::shared_ptr<Counter<int>>{new NoopCounter<int>(name, description, unit, enabled)};
   }
 
-  opentelemetry::nostd::shared_ptr<Counter<float>> NewFloatCounter(nostd::string_view name,
-                                                                   nostd::string_view description,
-                                                                   nostd::string_view unit,
-                                                                   const bool enabled) override
+  nostd::shared_ptr<Counter<float>> NewFloatCounter(nostd::string_view name,
+                                                    nostd::string_view description,
+                                                    nostd::string_view unit,
+                                                    const bool enabled) override
   {
     return nostd::shared_ptr<Counter<float>>{
         new NoopCounter<float>(name, description, unit, enabled)};
   }
 
-  opentelemetry::nostd::shared_ptr<Counter<double>> NewDoubleCounter(nostd::string_view name,
-                                                                     nostd::string_view description,
-                                                                     nostd::string_view unit,
-                                                                     const bool enabled) override
+  nostd::shared_ptr<Counter<double>> NewDoubleCounter(nostd::string_view name,
+                                                      nostd::string_view description,
+                                                      nostd::string_view unit,
+                                                      const bool enabled) override
   {
     return nostd::shared_ptr<Counter<double>>{
         new NoopCounter<double>(name, description, unit, enabled)};
@@ -342,41 +345,37 @@ public:
    * @param enabled a boolean that turns the metric instrument on and off.
    * @return
    */
-  opentelemetry::nostd::shared_ptr<UpDownCounter<short>> NewShortUpDownCounter(
-      nostd::string_view name,
-      nostd::string_view description,
-      nostd::string_view unit,
-      const bool enabled) override
+  nostd::shared_ptr<UpDownCounter<short>> NewShortUpDownCounter(nostd::string_view name,
+                                                                nostd::string_view description,
+                                                                nostd::string_view unit,
+                                                                const bool enabled) override
   {
     return nostd::shared_ptr<UpDownCounter<short>>{
         new NoopUpDownCounter<short>(name, description, unit, enabled)};
   }
 
-  opentelemetry::nostd::shared_ptr<UpDownCounter<int>> NewIntUpDownCounter(
-      nostd::string_view name,
-      nostd::string_view description,
-      nostd::string_view unit,
-      const bool enabled) override
+  nostd::shared_ptr<UpDownCounter<int>> NewIntUpDownCounter(nostd::string_view name,
+                                                            nostd::string_view description,
+                                                            nostd::string_view unit,
+                                                            const bool enabled) override
   {
     return nostd::shared_ptr<UpDownCounter<int>>{
         new NoopUpDownCounter<int>(name, description, unit, enabled)};
   }
 
-  opentelemetry::nostd::shared_ptr<UpDownCounter<float>> NewFloatUpDownCounter(
-      nostd::string_view name,
-      nostd::string_view description,
-      nostd::string_view unit,
-      const bool enabled) override
+  nostd::shared_ptr<UpDownCounter<float>> NewFloatUpDownCounter(nostd::string_view name,
+                                                                nostd::string_view description,
+                                                                nostd::string_view unit,
+                                                                const bool enabled) override
   {
     return nostd::shared_ptr<UpDownCounter<float>>{
         new NoopUpDownCounter<float>(name, description, unit, enabled)};
   }
 
-  opentelemetry::nostd::shared_ptr<UpDownCounter<double>> NewDoubleUpDownCounter(
-      nostd::string_view name,
-      nostd::string_view description,
-      nostd::string_view unit,
-      const bool enabled) override
+  nostd::shared_ptr<UpDownCounter<double>> NewDoubleUpDownCounter(nostd::string_view name,
+                                                                  nostd::string_view description,
+                                                                  nostd::string_view unit,
+                                                                  const bool enabled) override
   {
     return nostd::shared_ptr<UpDownCounter<double>>{
         new NoopUpDownCounter<double>(name, description, unit, enabled)};
@@ -392,41 +391,37 @@ public:
    * @param enabled a boolean that turns the metric instrument on and off.
    * @return
    */
-  opentelemetry::nostd::shared_ptr<ValueRecorder<short>> NewShortValueRecorder(
-      nostd::string_view name,
-      nostd::string_view description,
-      nostd::string_view unit,
-      const bool enabled) override
+  nostd::shared_ptr<ValueRecorder<short>> NewShortValueRecorder(nostd::string_view name,
+                                                                nostd::string_view description,
+                                                                nostd::string_view unit,
+                                                                const bool enabled) override
   {
     return nostd::shared_ptr<ValueRecorder<short>>{
         new NoopValueRecorder<short>(name, description, unit, enabled)};
   }
 
-  opentelemetry::nostd::shared_ptr<ValueRecorder<int>> NewIntValueRecorder(
-      nostd::string_view name,
-      nostd::string_view description,
-      nostd::string_view unit,
-      const bool enabled) override
+  nostd::shared_ptr<ValueRecorder<int>> NewIntValueRecorder(nostd::string_view name,
+                                                            nostd::string_view description,
+                                                            nostd::string_view unit,
+                                                            const bool enabled) override
   {
     return nostd::shared_ptr<ValueRecorder<int>>{
         new NoopValueRecorder<int>(name, description, unit, enabled)};
   }
 
-  opentelemetry::nostd::shared_ptr<ValueRecorder<float>> NewFloatValueRecorder(
-      nostd::string_view name,
-      nostd::string_view description,
-      nostd::string_view unit,
-      const bool enabled) override
+  nostd::shared_ptr<ValueRecorder<float>> NewFloatValueRecorder(nostd::string_view name,
+                                                                nostd::string_view description,
+                                                                nostd::string_view unit,
+                                                                const bool enabled) override
   {
     return nostd::shared_ptr<ValueRecorder<float>>{
         new NoopValueRecorder<float>(name, description, unit, enabled)};
   }
 
-  opentelemetry::nostd::shared_ptr<ValueRecorder<double>> NewDoubleValueRecorder(
-      nostd::string_view name,
-      nostd::string_view description,
-      nostd::string_view unit,
-      const bool enabled) override
+  nostd::shared_ptr<ValueRecorder<double>> NewDoubleValueRecorder(nostd::string_view name,
+                                                                  nostd::string_view description,
+                                                                  nostd::string_view unit,
+                                                                  const bool enabled) override
   {
     return nostd::shared_ptr<ValueRecorder<double>>{
         new NoopValueRecorder<double>(name, description, unit, enabled)};
@@ -442,7 +437,7 @@ public:
    * @param enabled a boolean that turns the metric instrument on and off.
    * @return
    */
-  opentelemetry::nostd::shared_ptr<SumObserver<short>> NewShortSumObserver(
+  nostd::shared_ptr<SumObserver<short>> NewShortSumObserver(
       nostd::string_view name,
       nostd::string_view description,
       nostd::string_view unit,
@@ -453,7 +448,7 @@ public:
         new NoopSumObserver<short>(name, description, unit, enabled, callback)};
   }
 
-  opentelemetry::nostd::shared_ptr<SumObserver<int>> NewIntSumObserver(
+  nostd::shared_ptr<SumObserver<int>> NewIntSumObserver(
       nostd::string_view name,
       nostd::string_view description,
       nostd::string_view unit,
@@ -464,7 +459,7 @@ public:
         new NoopSumObserver<int>(name, description, unit, enabled, callback)};
   }
 
-  opentelemetry::nostd::shared_ptr<SumObserver<float>> NewFloatSumObserver(
+  nostd::shared_ptr<SumObserver<float>> NewFloatSumObserver(
       nostd::string_view name,
       nostd::string_view description,
       nostd::string_view unit,
@@ -475,7 +470,7 @@ public:
         new NoopSumObserver<float>(name, description, unit, enabled, callback)};
   }
 
-  opentelemetry::nostd::shared_ptr<SumObserver<double>> NewDoubleSumObserver(
+  nostd::shared_ptr<SumObserver<double>> NewDoubleSumObserver(
       nostd::string_view name,
       nostd::string_view description,
       nostd::string_view unit,
@@ -496,7 +491,7 @@ public:
    * @param enabled a boolean that turns the metric instrument on and off.
    * @return
    */
-  opentelemetry::nostd::shared_ptr<UpDownSumObserver<short>> NewShortUpDownSumObserver(
+  nostd::shared_ptr<UpDownSumObserver<short>> NewShortUpDownSumObserver(
       nostd::string_view name,
       nostd::string_view description,
       nostd::string_view unit,
@@ -507,7 +502,7 @@ public:
         new NoopUpDownSumObserver<short>(name, description, unit, enabled, callback)};
   }
 
-  opentelemetry::nostd::shared_ptr<UpDownSumObserver<int>> NewIntUpDownSumObserver(
+  nostd::shared_ptr<UpDownSumObserver<int>> NewIntUpDownSumObserver(
       nostd::string_view name,
       nostd::string_view description,
       nostd::string_view unit,
@@ -518,7 +513,7 @@ public:
         new NoopUpDownSumObserver<int>(name, description, unit, enabled, callback)};
   }
 
-  opentelemetry::nostd::shared_ptr<UpDownSumObserver<float>> NewFloatUpDownSumObserver(
+  nostd::shared_ptr<UpDownSumObserver<float>> NewFloatUpDownSumObserver(
       nostd::string_view name,
       nostd::string_view description,
       nostd::string_view unit,
@@ -529,7 +524,7 @@ public:
         new NoopUpDownSumObserver<float>(name, description, unit, enabled, callback)};
   }
 
-  opentelemetry::nostd::shared_ptr<UpDownSumObserver<double>> NewDoubleUpDownSumObserver(
+  nostd::shared_ptr<UpDownSumObserver<double>> NewDoubleUpDownSumObserver(
       nostd::string_view name,
       nostd::string_view description,
       nostd::string_view unit,
@@ -550,7 +545,7 @@ public:
    * @param enabled a boolean that turns the metric instrument on and off.
    * @return
    */
-  opentelemetry::nostd::shared_ptr<ValueObserver<short>> NewShortValueObserver(
+  nostd::shared_ptr<ValueObserver<short>> NewShortValueObserver(
       nostd::string_view name,
       nostd::string_view description,
       nostd::string_view unit,
@@ -561,7 +556,7 @@ public:
         new NoopValueObserver<short>(name, description, unit, enabled, callback)};
   }
 
-  opentelemetry::nostd::shared_ptr<ValueObserver<int>> NewIntValueObserver(
+  nostd::shared_ptr<ValueObserver<int>> NewIntValueObserver(
       nostd::string_view name,
       nostd::string_view description,
       nostd::string_view unit,
@@ -572,7 +567,7 @@ public:
         new NoopValueObserver<int>(name, description, unit, enabled, callback)};
   }
 
-  opentelemetry::nostd::shared_ptr<ValueObserver<float>> NewFloatValueObserver(
+  nostd::shared_ptr<ValueObserver<float>> NewFloatValueObserver(
       nostd::string_view name,
       nostd::string_view description,
       nostd::string_view unit,
@@ -583,7 +578,7 @@ public:
         new NoopValueObserver<float>(name, description, unit, enabled, callback)};
   }
 
-  opentelemetry::nostd::shared_ptr<ValueObserver<double>> NewDoubleValueObserver(
+  nostd::shared_ptr<ValueObserver<double>> NewDoubleValueObserver(
       nostd::string_view name,
       nostd::string_view description,
       nostd::string_view unit,
