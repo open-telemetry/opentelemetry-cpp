@@ -88,7 +88,7 @@ SamplingResult TraceIdRatioBasedSampler::ShouldSample(
     trace_api::TraceId trace_id,
     nostd::string_view /*name*/,
     trace_api::SpanKind /*span_kind*/,
-    const trace_api::KeyValueIterable & /*attributes*/) noexcept
+    const opentelemetry::common::KeyValueIterable & /*attributes*/) noexcept
 {
   if (threshold_ == 0)
     return {Decision::DROP, nullptr};

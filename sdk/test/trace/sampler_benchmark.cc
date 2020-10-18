@@ -64,7 +64,7 @@ void BenchmarkShouldSampler(Sampler &sampler, benchmark::State &state)
 
   using M = std::map<std::string, int>;
   M m1    = {{}};
-  opentelemetry::trace::KeyValueIterableView<M> view{m1};
+  opentelemetry::common::KeyValueIterableView<M> view{m1};
 
   while (state.KeepRunning())
   {

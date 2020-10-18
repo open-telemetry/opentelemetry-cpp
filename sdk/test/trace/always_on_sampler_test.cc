@@ -23,7 +23,7 @@ TEST(AlwaysOnSampler, ShouldSample)
   auto sampling_result = sampler.ShouldSample(
       SpanContext::GetInvalid(), trace_id_invalid, "invalid trace id test",
       trace_api::SpanKind::kServer,
-      trace_api::KeyValueIterableView<std::map<std::string, int>>(key_value_container));
+      opentelemetry::common::KeyValueIterableView<std::map<std::string, int>>(key_value_container));
 
   ASSERT_EQ(Decision::RECORD_AND_SAMPLE, sampling_result.decision);
   ASSERT_EQ(nullptr, sampling_result.attributes);
@@ -32,7 +32,7 @@ TEST(AlwaysOnSampler, ShouldSample)
   sampling_result = sampler.ShouldSample(
       SpanContext::GetInvalid(), trace_id_valid, "valid trace id test",
       trace_api::SpanKind::kServer,
-      trace_api::KeyValueIterableView<std::map<std::string, int>>(key_value_container));
+      opentelemetry::common::KeyValueIterableView<std::map<std::string, int>>(key_value_container));
 
   ASSERT_EQ(Decision::RECORD_AND_SAMPLE, sampling_result.decision);
   ASSERT_EQ(nullptr, sampling_result.attributes);

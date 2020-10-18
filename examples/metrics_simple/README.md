@@ -33,7 +33,7 @@ shared_ptr<MetricsProcessor> processor = shared_ptr<MetricsProcessor>(new Ungrou
 // Observer callback function
 void SumObserverCallback(metrics_api::ObserverResult<int> result){
     std::map<std::string, std::string> labels = {{"key", "value"}};
-    auto labelkv = trace::KeyValueIterableView<decltype(labels)>{labels};
+    auto labelkv = common::KeyValueIterableView<decltype(labels)>{labels};
     result.observe(1,labelkv);
 }
 
@@ -43,7 +43,7 @@ auto obs= meter->NewIntSumObserver("Counter","none", "none", true, &SumObserverC
 
 // Create a label set which annotates metric values
 std::map<std::string, std::string> labels = {{"key", "value"}};
-auto labelkv = trace::KeyValueIterableView<decltype(labels)>{labels};
+auto labelkv = common::KeyValueIterableView<decltype(labels)>{labels};
 
 // Capture data from instruments.  Note that the asynchronous instrument is updates
 // automatically though its callback at the collection interval.  Additional measurments

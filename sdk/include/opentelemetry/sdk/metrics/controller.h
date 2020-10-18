@@ -14,7 +14,6 @@
 #include "opentelemetry/version.h"
 
 namespace metrics_api = opentelemetry::metrics;
-namespace trace_api   = opentelemetry::trace;
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace sdk

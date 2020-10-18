@@ -23,7 +23,7 @@ public:
       trace_api::TraceId /*trace_id*/,
       nostd::string_view /*name*/,
       trace_api::SpanKind /*span_kind*/,
-      const trace_api::KeyValueIterable & /*attributes*/) noexcept override
+      const opentelemetry::common::KeyValueIterable & /*attributes*/) noexcept override
   {
     return {Decision::RECORD_AND_SAMPLE, nullptr};
   }

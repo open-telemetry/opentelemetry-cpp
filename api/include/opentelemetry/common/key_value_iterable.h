@@ -5,7 +5,7 @@
 #include "opentelemetry/version.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
-namespace trace
+namespace common
 {
 /**
  * Supports internal iteration over a collection of key-value pairs.
@@ -30,5 +30,5 @@ public:
    */
   virtual size_t size() const noexcept = 0;
 };
-}  // namespace trace
+}  // namespace common
 OPENTELEMETRY_END_NAMESPACE
