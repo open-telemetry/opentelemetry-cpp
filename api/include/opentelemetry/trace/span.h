@@ -3,12 +3,12 @@
 #include <cstdint>
 
 #include "opentelemetry/common/attribute_value.h"
+#include "opentelemetry/common/key_value_iterable_view.h"
 #include "opentelemetry/core/timestamp.h"
 #include "opentelemetry/nostd/span.h"
 #include "opentelemetry/nostd/string_view.h"
 #include "opentelemetry/nostd/unique_ptr.h"
 #include "opentelemetry/trace/canonical_code.h"
-#include "opentelemetry/trace/key_value_iterable_view.h"
 #include "opentelemetry/trace/span_context.h"
 #include "opentelemetry/version.h"
 
@@ -100,25 +100,28 @@ public:
   // Adds an event to the Span, with a custom timestamp, and attributes.
   virtual void AddEvent(nostd::string_view name,
                         core::SystemTimestamp timestamp,
-                        const KeyValueIterable &attributes) noexcept = 0;
+                        const common::KeyValueIterable &attributes) noexcept = 0;
 
-  virtual void AddEvent(nostd::string_view name, const KeyValueIterable &attributes) noexcept
+  virtual void AddEvent(nostd::string_view name,
+                        const common::KeyValueIterable &attributes) noexcept
   {
     this->AddEvent(name, std::chrono::system_clock::now(), attributes);
   }
 
-  template <class T, nostd::enable_if_t<detail::is_key_value_iterable<T>::value> * = nullptr>
+  template <class T,
+            nostd::enable_if_t<common::detail::is_key_value_iterable<T>::value> * = nullptr>
   void AddEvent(nostd::string_view name,
                 core::SystemTimestamp timestamp,
                 const T &attributes) noexcept
   {
-    this->AddEvent(name, timestamp, KeyValueIterableView<T>{attributes});
+    this->AddEvent(name, timestamp, common::KeyValueIterableView<T>{attributes});
   }
 
-  template <class T, nostd::enable_if_t<detail::is_key_value_iterable<T>::value> * = nullptr>
+  template <class T,
+            nostd::enable_if_t<common::detail::is_key_value_iterable<T>::value> * = nullptr>
   void AddEvent(nostd::string_view name, const T &attributes) noexcept
   {
-    this->AddEvent(name, KeyValueIterableView<T>{attributes});
+    this->AddEvent(name, common::KeyValueIterableView<T>{attributes});
   }
 
   void AddEvent(nostd::string_view name,

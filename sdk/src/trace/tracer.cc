@@ -53,14 +53,13 @@ trace_api::SpanContext GetCurrentSpanContext(const trace_api::SpanContext &expli
 
 nostd::shared_ptr<trace_api::Span> Tracer::StartSpan(
     nostd::string_view name,
-    const trace_api::KeyValueIterable &attributes,
+    const opentelemetry::common::KeyValueIterable &attributes,
     const trace_api::StartSpanOptions &options) noexcept
 {
   trace_api::SpanContext parent = GetCurrentSpanContext(options.parent);
 
-  // TODO: replace nullptr with parent context in span context
   auto sampling_result =
-      sampler_->ShouldSample(nullptr, parent.trace_id(), name, options.kind, attributes);
+      sampler_->ShouldSample(parent, parent.trace_id(), name, options.kind, attributes);
   if (sampling_result.decision == Decision::DROP)
   {
     // Don't allocate a no-op span for every DROP decision, but use a static
