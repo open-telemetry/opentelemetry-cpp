@@ -1,6 +1,9 @@
 include_directories(include)
 
 add_library(opentelemetry_exporter_otprotocol src/recordable.cc)
+target_include_directories(
+  opentelemetry_exporter_otprotocol
+  PUBLIC $<TARGET_PROPERTY:opentelemetry_proto,INTERFACE_INCLUDE_DIRECTORIES>)
 target_link_libraries(opentelemetry_exporter_otprotocol
                       $<TARGET_OBJECTS:opentelemetry_proto>)
 
