@@ -1,10 +1,10 @@
-#include "opentelemetry/context/threadlocal_context.h"
 #include "opentelemetry/sdk/trace/samplers/always_off.h"
 
 #include <gtest/gtest.h>
 
 using opentelemetry::sdk::trace::AlwaysOffSampler;
 using opentelemetry::sdk::trace::Decision;
+using opentelemetry::trace::SpanContext;
 
 TEST(AlwaysOffSampler, ShouldSample)
 {
@@ -15,11 +15,12 @@ TEST(AlwaysOffSampler, ShouldSample)
 
   using M = std::map<std::string, int>;
   M m1    = {{}};
-  opentelemetry::trace::KeyValueIterableView<M> view{m1};
+  opentelemetry::common::KeyValueIterableView<M> view{m1};
 
-  auto sampling_result = sampler.ShouldSample(nullptr, trace_id, "", span_kind, view);
+  auto sampling_result =
+      sampler.ShouldSample(SpanContext::GetInvalid(), trace_id, "", span_kind, view);
 
-  ASSERT_EQ(Decision::NOT_RECORD, sampling_result.decision);
+  ASSERT_EQ(Decision::DROP, sampling_result.decision);
   ASSERT_EQ(nullptr, sampling_result.attributes);
 }
 

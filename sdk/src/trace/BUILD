@@ -23,5 +23,6 @@ cc_library(
         "//api",
         "//sdk:headers",
         "//sdk/src/common/platform:fork",
+        "//sdk/src/common:random",
     ],
 )

@@ -3,21 +3,18 @@
 #include <cstdint>
 
 #include "opentelemetry/common/attribute_value.h"
+#include "opentelemetry/common/key_value_iterable_view.h"
 #include "opentelemetry/core/timestamp.h"
 #include "opentelemetry/nostd/span.h"
 #include "opentelemetry/nostd/string_view.h"
 #include "opentelemetry/nostd/unique_ptr.h"
 #include "opentelemetry/trace/canonical_code.h"
-#include "opentelemetry/trace/key_value_iterable_view.h"
+#include "opentelemetry/trace/span_context.h"
 #include "opentelemetry/version.h"
 
 constexpr char SpanKey[] = "span_key";
 
 OPENTELEMETRY_BEGIN_NAMESPACE
-namespace context
-{
-class Token;
-}
 namespace trace
 {
 enum class SpanKind
@@ -46,8 +43,13 @@ struct StartSpanOptions
   core::SystemTimestamp start_system_time;
   core::SteadyTimestamp start_steady_time;
 
+  // Explicitely set the parent of a Span.
+  //
+  // This defaults to an invalid span context. In this case, the Span is
+  // automatically parented to the currently active span.
+  SpanContext parent = SpanContext::GetInvalid();
+
   // TODO:
-  // Span(Context?) parent;
   // SpanContext remote_parent;
   // Links
   SpanKind kind = SpanKind::kInternal;
@@ -98,25 +100,28 @@ public:
   // Adds an event to the Span, with a custom timestamp, and attributes.
   virtual void AddEvent(nostd::string_view name,
                         core::SystemTimestamp timestamp,
-                        const KeyValueIterable &attributes) noexcept = 0;
+                        const common::KeyValueIterable &attributes) noexcept = 0;
 
-  virtual void AddEvent(nostd::string_view name, const KeyValueIterable &attributes) noexcept
+  virtual void AddEvent(nostd::string_view name,
+                        const common::KeyValueIterable &attributes) noexcept
   {
     this->AddEvent(name, std::chrono::system_clock::now(), attributes);
   }
 
-  template <class T, nostd::enable_if_t<detail::is_key_value_iterable<T>::value> * = nullptr>
+  template <class T,
+            nostd::enable_if_t<common::detail::is_key_value_iterable<T>::value> * = nullptr>
   void AddEvent(nostd::string_view name,
                 core::SystemTimestamp timestamp,
                 const T &attributes) noexcept
   {
-    this->AddEvent(name, timestamp, KeyValueIterableView<T>{attributes});
+    this->AddEvent(name, timestamp, common::KeyValueIterableView<T>{attributes});
   }
 
-  template <class T, nostd::enable_if_t<detail::is_key_value_iterable<T>::value> * = nullptr>
+  template <class T,
+            nostd::enable_if_t<common::detail::is_key_value_iterable<T>::value> * = nullptr>
   void AddEvent(nostd::string_view name, const T &attributes) noexcept
   {
-    this->AddEvent(name, KeyValueIterableView<T>{attributes});
+    this->AddEvent(name, common::KeyValueIterableView<T>{attributes});
   }
 
   void AddEvent(nostd::string_view name,
@@ -156,16 +161,11 @@ public:
    */
   virtual void End(const EndSpanOptions &options = {}) noexcept = 0;
 
-  // TODO
-  // SpanContext context() const noexcept = 0;
+  virtual trace::SpanContext GetContext() const noexcept = 0;
 
   // Returns true if this Span is recording tracing events (e.g. SetAttribute,
   // AddEvent).
   virtual bool IsRecording() const noexcept = 0;
-
-  virtual Tracer &tracer() const noexcept = 0;
-
-  virtual void SetToken(nostd::unique_ptr<context::Token> &&token) noexcept = 0;
 };
 }  // namespace trace
 OPENTELEMETRY_END_NAMESPACE

@@ -13,12 +13,20 @@ endif()
 option(WITH_OTPROTOCOL
        "Whether to include the OpenTelemetry Protocol in the SDK" OFF)
 
+option(WITH_PROMETHEUS "Whether to include the Prometheus Client in the SDK"
+       OFF)
+
+option(WITH_TESTS "Whether to enable tests" ON)
+option(WITH_EXAMPLES "Whether to build examples" ON)
+
 set(WITH_PROTOBUF OFF)
 if(WITH_OTPROTOCOL)
   set(WITH_PROTOBUF ON)
 endif()
 
-include(CTest)
+if(WITH_TESTS)
+  include(CTest)
+endif()
 
 find_package(Threads)
 
@@ -55,5 +63,7 @@ include_directories(sdk)
 add_subdirectory(sdk)
 include_directories(.)
 add_subdirectory(exporters)
-add_subdirectory(examples)
+if(WITH_EXAMPLES)
+  add_subdirectory(examples)
+endif()
 add_subdirectory(ext)

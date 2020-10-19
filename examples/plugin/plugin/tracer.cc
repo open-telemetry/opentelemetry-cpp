@@ -3,6 +3,7 @@
 #include "opentelemetry/nostd/unique_ptr.h"
 
 #include <iostream>
+#include <memory>
 
 namespace nostd   = opentelemetry::nostd;
 namespace common  = opentelemetry::common;
@@ -17,9 +18,9 @@ class Span final : public trace::Span
 public:
   Span(std::shared_ptr<Tracer> &&tracer,
        nostd::string_view name,
-       const opentelemetry::trace::KeyValueIterable & /*attributes*/,
+       const opentelemetry::common::KeyValueIterable & /*attributes*/,
        const trace::StartSpanOptions & /*options*/) noexcept
-      : tracer_{std::move(tracer)}, name_{name}
+      : tracer_{std::move(tracer)}, name_{name}, span_context_{trace::SpanContext::GetInvalid()}
   {
     std::cout << "StartSpan: " << name << "\n";
   }
@@ -38,7 +39,7 @@ public:
 
   void AddEvent(nostd::string_view /*name*/,
                 core::SystemTimestamp /*timestamp*/,
-                const trace::KeyValueIterable & /*attributes*/) noexcept override
+                const common::KeyValueIterable & /*attributes*/) noexcept override
   {}
 
   void SetStatus(trace::CanonicalCode /*code*/,
@@ -51,13 +52,12 @@ public:
 
   bool IsRecording() const noexcept override { return true; }
 
-  Tracer &tracer() const noexcept override { return *tracer_; }
-
-  void SetToken(nostd::unique_ptr<context::Token> &&token) noexcept override {}
+  trace::SpanContext GetContext() const noexcept override { return span_context_; }
 
 private:
   std::shared_ptr<Tracer> tracer_;
   std::string name_;
+  trace::SpanContext span_context_;
 };
 }  // namespace
 
@@ -65,7 +65,7 @@ Tracer::Tracer(nostd::string_view /*output*/) {}
 
 nostd::shared_ptr<trace::Span> Tracer::StartSpan(
     nostd::string_view name,
-    const opentelemetry::trace::KeyValueIterable &attributes,
+    const opentelemetry::common::KeyValueIterable &attributes,
     const trace::StartSpanOptions &options) noexcept
 {
   return nostd::shared_ptr<opentelemetry::trace::Span>{

@@ -64,6 +64,7 @@ public:
   void update(T val) override
   {
     this->mu_.lock();
+    this->updated_ = true;
     int idx;
     if (val == 0)
     {
@@ -71,7 +72,7 @@ public:
     }
     else
     {
-      idx = ceil(log(val) / log(gamma));
+      idx = static_cast<int>(ceil(log(val) / log(gamma)));
     }
     if (raw_.find(idx) != raw_.end())
     {
@@ -117,7 +118,7 @@ public:
       idx = iter->first;
       count += iter->second;
     }
-    return round(2 * pow(gamma, idx) / (gamma + 1));
+    return static_cast<T>(round(2 * pow(gamma, idx) / (gamma + 1)));
   }
 
   /**
@@ -130,6 +131,7 @@ public:
   void checkpoint() override
   {
     this->mu_.lock();
+    this->updated_    = false;
     this->checkpoint_ = this->values_;
     checkpoint_raw_   = raw_;
     this->values_[0]  = 0;

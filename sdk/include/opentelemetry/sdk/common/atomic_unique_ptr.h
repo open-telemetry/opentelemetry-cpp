@@ -34,7 +34,7 @@ public:
   /**
    * @return true if the pointer is null
    */
-  bool IsNull() const noexcept { return ptr_ == nullptr; }
+  bool IsNull() const noexcept { return ptr_.load() == nullptr; }
 
   /**
    * Atomically swap the pointer only if it's null.

@@ -1,5 +1,4 @@
 #include "opentelemetry/sdk/trace/attribute_utils.h"
-#include "opentelemetry/context/threadlocal_context.h"
 
 #include <gtest/gtest.h>
 
@@ -17,7 +16,7 @@ TEST(AttributeMapTest, AttributesConstruction)
   std::map<std::string, int> attributes = {
       {keys[0], values[0]}, {keys[1], values[1]}, {keys[2], values[2]}};
 
-  opentelemetry::trace::KeyValueIterableView<std::map<std::string, int>> iterable(attributes);
+  opentelemetry::common::KeyValueIterableView<std::map<std::string, int>> iterable(attributes);
   opentelemetry::sdk::trace::AttributeMap map(iterable);
 
   for (int i = 0; i < kNumAttributes; i++)

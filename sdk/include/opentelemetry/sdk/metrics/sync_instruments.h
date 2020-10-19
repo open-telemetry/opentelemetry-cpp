@@ -90,7 +90,7 @@ public:
    */
 
   virtual nostd::shared_ptr<metrics_api::BoundCounter<T>> bindCounter(
-      const trace::KeyValueIterable &labels) override
+      const common::KeyValueIterable &labels) override
   {
     this->mu_.lock();
     std::string labelset = KvToString(labels);
@@ -119,7 +119,7 @@ public:
    * @param value the numerical representation of the metric being captured
    * @param labels the set of labels, as key-value pairs
    */
-  virtual void add(T value, const trace::KeyValueIterable &labels) override
+  virtual void add(T value, const common::KeyValueIterable &labels) override
   {
     if (value < 0)
     {
@@ -149,8 +149,11 @@ public:
         toDelete.push_back(x.first);
       }
       auto agg_ptr = dynamic_cast<BoundCounter<T> *>(x.second.get())->GetAggregator();
-      agg_ptr->checkpoint();
-      ret.push_back(Record(x.second->GetName(), x.second->GetDescription(), x.first, agg_ptr));
+      if (agg_ptr->is_updated())
+      {
+        agg_ptr->checkpoint();
+        ret.push_back(Record(x.second->GetName(), x.second->GetDescription(), x.first, agg_ptr));
+      }
     }
     for (const auto &x : toDelete)
     {
@@ -160,7 +163,7 @@ public:
     return ret;
   }
 
-  virtual void update(T val, const trace::KeyValueIterable &labels) override { add(val, labels); }
+  virtual void update(T val, const common::KeyValueIterable &labels) override { add(val, labels); }
 
   // A collection of the bound instruments created by this unbound instrument identified by their
   // labels.
@@ -225,7 +228,7 @@ public:
    * @return a BoundIntCounter tied to the specified labels
    */
   nostd::shared_ptr<metrics_api::BoundUpDownCounter<T>> bindUpDownCounter(
-      const trace::KeyValueIterable &labels) override
+      const common::KeyValueIterable &labels) override
   {
     this->mu_.lock();
     std::string labelset = KvToString(labels);
@@ -254,7 +257,7 @@ public:
    * @param value the numerical representation of the metric being captured
    * @param labels the set of labels, as key-value pairs
    */
-  void add(T value, const trace::KeyValueIterable &labels) override
+  void add(T value, const common::KeyValueIterable &labels) override
   {
     auto sp = bindUpDownCounter(labels);
     sp->update(value);
@@ -273,8 +276,11 @@ public:
         toDelete.push_back(x.first);
       }
       auto agg_ptr = dynamic_cast<BoundUpDownCounter<T> *>(x.second.get())->GetAggregator();
-      agg_ptr->checkpoint();
-      ret.push_back(Record(x.second->GetName(), x.second->GetDescription(), x.first, agg_ptr));
+      if (agg_ptr->is_updated())
+      {
+        agg_ptr->checkpoint();
+        ret.push_back(Record(x.second->GetName(), x.second->GetDescription(), x.first, agg_ptr));
+      }
     }
     for (const auto &x : toDelete)
     {
@@ -284,7 +290,7 @@ public:
     return ret;
   }
 
-  virtual void update(T val, const trace::KeyValueIterable &labels) override { add(val, labels); }
+  virtual void update(T val, const common::KeyValueIterable &labels) override { add(val, labels); }
 
   std::unordered_map<std::string, nostd::shared_ptr<metrics_api::BoundUpDownCounter<T>>>
       boundInstruments_;
@@ -348,7 +354,7 @@ public:
    * @return a BoundIntCounter tied to the specified labels
    */
   nostd::shared_ptr<metrics_api::BoundValueRecorder<T>> bindValueRecorder(
-      const trace::KeyValueIterable &labels) override
+      const common::KeyValueIterable &labels) override
   {
     this->mu_.lock();
     std::string labelset = KvToString(labels);
@@ -377,7 +383,7 @@ public:
    * @param value the numerical representation of the metric being captured
    * @param labels the set of labels, as key-value pairs
    */
-  void record(T value, const trace::KeyValueIterable &labels) override
+  void record(T value, const common::KeyValueIterable &labels) override
   {
     auto sp = bindValueRecorder(labels);
     sp->update(value);
@@ -396,8 +402,11 @@ public:
         toDelete.push_back(x.first);
       }
       auto agg_ptr = dynamic_cast<BoundValueRecorder<T> *>(x.second.get())->GetAggregator();
-      agg_ptr->checkpoint();
-      ret.push_back(Record(x.second->GetName(), x.second->GetDescription(), x.first, agg_ptr));
+      if (agg_ptr->is_updated())
+      {
+        agg_ptr->checkpoint();
+        ret.push_back(Record(x.second->GetName(), x.second->GetDescription(), x.first, agg_ptr));
+      }
     }
     for (const auto &x : toDelete)
     {
@@ -407,7 +416,7 @@ public:
     return ret;
   }
 
-  virtual void update(T value, const trace::KeyValueIterable &labels) override
+  virtual void update(T value, const common::KeyValueIterable &labels) override
   {
     record(value, labels);
   }
