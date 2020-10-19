@@ -1,6 +1,7 @@
 #pragma once
 #include <chrono>
 #include <vector>
+#include <map>
 
 #include "opentelemetry/common/key_value_iterable.h"  // fix after moving to "common"
 #include "opentelemetry/logs/log_record.h"
@@ -47,26 +48,30 @@ public:
    * @throws No exceptions under any circumstances.
    */
 
-  /** A method for an unstructured log **/
-  virtual void log(nostd::string_view name, Severity sev, nostd::string_view msg) noexcept = 0;
+  /** Methods for an unstructured logging **/
+  void log(nostd::string_view msg) noexcept {
+    log(Severity::NONE, msg); //Set severity to NONE as default then call the log method below
+  }
 
+  void log(Severity sev, nostd::string_view msg) noexcept {
+    log(sev, msg, 0); //Set timestamp to 0 as default then call the log method below
+  }
+
+  void log(Severity sev, nostd::string_view msg, uint64_t time) noexcept {
+    LogRecord r;
+    r.name = msg;
+    r.severity_number = sev;
+    r.severity_text = "NONE"; //TODO, create function to map severity_number to text
+    r.timestamp = time;
+    log(r); //Call the log(LogRecord) log method
+  }
+  
   /** Methods for structured logs **/
   // (name, sev, KeyValueIterable) overloads
-  virtual void log(nostd::string_view name                    = "",
-                   Severity sev                               = Severity::NONE,
-                   const common::KeyValueIterable &attributes = {}) noexcept = 0;
+  virtual void log(nostd::string_view name,
+                   Severity sev,
+                   const common::KeyValueIterable &attributes) noexcept = 0;
 
-  /*
-  void log(Severity sev, const common::KeyValueIterable &attributes) noexcept
-  {
-    log("", sev, attributes);
-  }
-  void log(nostd::string_view name, const common::KeyValueIterable &attributes) noexcept
-  {
-    log(name, Severity::NONE, attributes);
-  }
-  void log(const common::KeyValueIterable &attributes) noexcept { log("", attributes); }
-  */
 
   // (name, sev, KeyValueIterable) overloads
   template <class T,
@@ -78,21 +83,13 @@ public:
     log(name, sev, common::KeyValueIterableView<T>(attributes));
   }
 
-  void log(nostd::string_view name,
-           std::initializer_list<std::pair<nostd::string_view, common::AttributeValue>>
-               attributes) noexcept
-  {
-    // log(name, nostd::span<const std::pair<nostd::string_view,
-    // common::AttributeValue>>{attributes.begin(), attributes.end()});
-  }
-
   /* A logging statement that takes in a LogRecord.
    * A default LogRecord that will be assigned if no parameters are passed to Logger's .log() method
    * which should at minimum contain the trace_id, span_id, and current timestamp
    * TODO: correlate timestamp, traceid and spanid at the minimum to Log Record
    *
    */
-  virtual void log(const LogRecord &record = {}) noexcept = 0;
+  virtual void log(const LogRecord &record) noexcept = 0;
 
   /*** Future additions*/
   /* templated method for objects / custom types (e.g. JSON, XML, custom classes, etc) (for later)

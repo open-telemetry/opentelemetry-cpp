@@ -23,26 +23,27 @@ class TestProvider : public LoggerProvider
   {
     return shared_ptr<Logger>(nullptr);
   }
+};
 
-  class TestProvider : public LoggerProvider
-  {
-    auto tf = Provider::GetLoggerProvider();
-    EXPECT_NE(nullptr, tf);
-  }
+TEST(Provider, GetLoggerProviderDefault)
+{
+  auto tf = Provider::GetLoggerProvider();
+  EXPECT_NE(nullptr, tf);
+}
 
-  TEST(Provider, SetLoggerProvider)
-  {
-    auto tf = shared_ptr<LoggerProvider>(new TestProvider());
-    Provider::SetLoggerProvider(tf);
-    ASSERT_EQ(tf, Provider::GetLoggerProvider());
-  }
+TEST(Provider, SetLoggerProvider)
+{
+  auto tf = shared_ptr<LoggerProvider>(new TestProvider());
+  Provider::SetLoggerProvider(tf);
+  ASSERT_EQ(tf, Provider::GetLoggerProvider());
+}
 
-  TEST(Provider, MultipleLoggerProviders)
-  {
-    auto tf = shared_ptr<LoggerProvider>(new TestProvider());
-    Provider::SetLoggerProvider(tf);
-    auto tf2 = shared_ptr<LoggerProvider>(new TestProvider());
+TEST(Provider, MultipleLoggerProviders)
+{
+  auto tf = shared_ptr<LoggerProvider>(new TestProvider());
+  Provider::SetLoggerProvider(tf);
+  auto tf2 = shared_ptr<LoggerProvider>(new TestProvider());
+  Provider::SetLoggerProvider(tf2);
 
-    ASSERT_NE(Provider::GetLoggerProvider(), tf);
-  }
-  
+  ASSERT_NE(Provider::GetLoggerProvider(), tf);
+}

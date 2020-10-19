@@ -35,9 +35,6 @@ class TestLogger : public Logger
   // returns the name of the logger
   string_view getName() noexcept override { return "My custom implementation"; }
 
-  // unstructured logging
-  void log(string_view name, Severity sev, string_view msg) noexcept override {}
-
   // structured logging
   void log(string_view name, Severity sev, const KeyValueIterable &attributes) noexcept override {}
   // void log(string_view name, const KeyValueIterable &attributes) noexcept override {}

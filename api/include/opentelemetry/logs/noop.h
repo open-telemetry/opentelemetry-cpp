@@ -28,9 +28,6 @@ public:
   // returns the name of the logger
   nostd::string_view getName() noexcept override { return "NOOP Logger"; }
 
-  // unstructured logging
-  void log(nostd::string_view name, Severity sev, nostd::string_view msg) noexcept override {}
-
   // structured logging
   void log(nostd::string_view name,
            Severity sev,
