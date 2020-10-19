@@ -28,17 +28,7 @@ public:
   // returns the name of the logger
   nostd::string_view getName() noexcept override { return "NOOP Logger"; }
 
-  // structured logging
-  void log(nostd::string_view name,
-           Severity sev,
-           const common::KeyValueIterable &attributes) noexcept override
-  {}
-  // void log(nostd::string_view name, const common::KeyValueIterable &attributes) noexcept override
-  // {}
   void log(const LogRecord &record) noexcept override {}
-
-  // templated method for objects / custom types (e.g. JSON, XML, custom classes, etc); may support
-  // later template<class T> void log(T &some_obj) noexcept override {}
 };
 
 /**

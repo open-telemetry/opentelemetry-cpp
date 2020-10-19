@@ -28,6 +28,7 @@ TEST(Logger, GetNoopLoggerName)
   string_view name = logger->getName();
   EXPECT_EQ("NOOP Logger", name);
 }
+/* TODO: add more tests */
 
 // Define a basic Logger class
 class TestLogger : public Logger
@@ -36,8 +37,6 @@ class TestLogger : public Logger
   string_view getName() noexcept override { return "My custom implementation"; }
 
   // structured logging
-  void log(string_view name, Severity sev, const KeyValueIterable &attributes) noexcept override {}
-  // void log(string_view name, const KeyValueIterable &attributes) noexcept override {}
   void log(const LogRecord &record) noexcept override {}
 };
 

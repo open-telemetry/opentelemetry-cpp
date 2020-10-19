@@ -9,12 +9,12 @@ using opentelemetry::logs::Provider;
 
 // TODO
 TEST(LogRecord, TimestampStore) {}
-TEST(LogRecord, TraceIdStore){}
-TEST(LogRecord, SpanIdStore){}
-TEST(LogRecord, TraceFlagsStore){}
-TEST(LogRecord, SeverityTextStore){}
-TEST(LogRecord, SeverityNumberStore){}
-TEST(LogRecord, NameStore){}
-TEST(LogRecord, BodyStore){}
-TEST(LogRecord, ResourceStore){}
-TEST(LogRecord, AttributesStore){}
+TEST(LogRecord, TraceIdStore) {}
+TEST(LogRecord, SpanIdStore) {}
+TEST(LogRecord, TraceFlagsStore) {}
+TEST(LogRecord, SeverityTextStore) {}
+TEST(LogRecord, SeverityNumberStore) {}
+TEST(LogRecord, NameStore) {}
+TEST(LogRecord, BodyStore) {}
+TEST(LogRecord, ResourceStore) {}
+TEST(LogRecord, AttributesStore) {}
