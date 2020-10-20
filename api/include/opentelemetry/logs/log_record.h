@@ -22,7 +22,7 @@ enum class Severity : uint8_t
 { //Follows this standard: https://google.github.io/styleguide/cppguide.html#Enumerator_Names
   kNone   = 0,       // default Severity; added, not part of Log Data Model
   kTrace  = 1,
-  KTrace2 = 2,
+  kTrace2 = 2,
   kTrace3 = 3,
   kTrace4 = 4,
   kDebug  = 5,
@@ -46,6 +46,12 @@ enum class Severity : uint8_t
   kFatal3 = 23,
   kFatal4 = 24
 };
+
+/* _nullKV is defined as a private variable that allows "resource" and
+    "attributes" fields to be instantiated using it as the default value */
+static common::KeyValueIterableView<std::map<nostd::string_view, nostd::string_view>> _nullKV =
+      common::KeyValueIterableView<std::map<nostd::string_view, nostd::string_view>>{{}};
+
 
 /**
  * A default Event object to be passed in log statements,
@@ -81,10 +87,7 @@ struct LogRecord
     // span_id         = current_span_id;    // TODO: correlate
     // trace_flag      = current_trace_flag; // TODO: correlate 
     name            = "";
-    body            = "";
-    resource        = common::KeyValueIterableView<std::map<nostd::string_view, nostd::string_view>>{{}};
-    attributes      = common::KeyValueIterableView<std::map<nostd::string_view, nostd::string_view>>{{}};
-  }
+    }
 
   /* for ease of use, user can use this function to convert a map into a KeyValueIterable for the resources */
   template <class T, nostd::enable_if_t<common::detail::is_key_value_iterable<T>::value> * = nullptr>
@@ -99,14 +102,6 @@ struct LogRecord
   {
     attributes = common::KeyValueIterableView<T>(_attributes);
   }
-
-
-private:
-  /* _nullKV is defined as a private variable that allows "resource" and
-    "attributes" fields to be instantiated using it as the default value */
-  common::KeyValueIterableView<std::map<nostd::string_view, nostd::string_view>> _nullKV =
-      common::KeyValueIterableView<std::map<nostd::string_view, nostd::string_view>>{{}};
-
 };
 }  // namespace logs
 OPENTELEMETRY_END_NAMESPACE
