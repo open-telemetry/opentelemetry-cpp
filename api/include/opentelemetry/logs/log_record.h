@@ -18,33 +18,33 @@ namespace logs
 
 /* Note: using a class enum here won't allow enum values to be compared to integers, i.e. only other Severity enums (need an explicit cast)
 */
-enum class Severity
-{
-  NONE   = 0,       // default Severity; added, not part of Log Data Model
-  TRACE  = 1,
-  TRACE2 = 2,
-  TRACE3 = 3,
-  TRACE4 = 4,
-  DEBUG1  = 5,
-  DEBUG2 = 6,
-  DEBUG3 = 7,
-  DEBUG4 = 8,
-  INFO   = 9,
-  INFO2  = 10,
-  INFO3  = 11,
-  INFO4  = 12,
-  WARN   = 13,
-  WARN2  = 14,
-  WARN3  = 15,
-  WARN4  = 16,
-  ERROR  = 17,
-  ERROR2 = 18,
-  ERROR3 = 19,
-  ERROR4 = 20,
-  FATAL  = 21,
-  FATAL2 = 22,
-  FATAL3 = 23,
-  FATAL4 = 24
+enum class Severity : uint8_t
+{ //Follows this standard: https://google.github.io/styleguide/cppguide.html#Enumerator_Names
+  kNone   = 0,       // default Severity; added, not part of Log Data Model
+  kTrace  = 1,
+  KTrace2 = 2,
+  kTrace3 = 3,
+  kTrace4 = 4,
+  kDebug  = 5,
+  kDebug2 = 6,
+  kDebug3 = 7,
+  kDebug4 = 8,
+  kInfo   = 9,
+  kInfo2  = 10,
+  kInfo3  = 11,
+  kInfo4  = 12,
+  kWarn   = 13,
+  kWarn2  = 14,
+  kWarn3  = 15,
+  kWarn4  = 16,
+  kError  = 17,
+  kError2 = 18,
+  kError3 = 19,
+  kError4 = 20,
+  kFatal  = 21,
+  kFatal2 = 22,
+  kFatal3 = 23,
+  kFatal4 = 24
 };
 
 /**
@@ -102,50 +102,6 @@ struct LogRecord
 
 
 private:
-  // Move to SDK *(logger.cc):
-  Severity severity_number = Severity::NONE;
-  nostd::string_view severity_text   = severityToString(severity_number);
-  inline nostd::string_view severityToString(Severity)
-  {
-      switch (this->severity_number)
-      {
-      case Severity::NONE:
-          return "NONE";
-      case Severity::TRACE:
-      case Severity::TRACE2:
-      case Severity::TRACE3:
-      case Severity::TRACE4:
-          return "TRACE";
-      case Severity::DEBUG1:
-      case Severity::DEBUG2:
-      case Severity::DEBUG3:
-      case Severity::DEBUG4:
-          return "DEBUG";
-      case Severity::INFO:
-      case Severity::INFO2:
-      case Severity::INFO3:
-      case Severity::INFO4:
-          return "INFO";
-      case Severity::WARN:
-      case Severity::WARN2:
-      case Severity::WARN3:
-      case Severity::WARN4:
-          return "WARN";
-      case Severity::ERROR:
-      case Severity::ERROR2:
-      case Severity::ERROR3:
-      case Severity::ERROR4:
-          return "ERROR";
-      case Severity::FATAL:
-      case Severity::FATAL2:
-      case Severity::FATAL3:
-      case Severity::FATAL4:
-          return "FATAL";
-      default:
-          return "INVALID_SEVERITY";
-      }
-  }
-
   /* _nullKV is defined as a private variable that allows "resource" and
     "attributes" fields to be instantiated using it as the default value */
   common::KeyValueIterableView<std::map<nostd::string_view, nostd::string_view>> _nullKV =

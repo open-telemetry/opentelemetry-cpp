@@ -39,7 +39,9 @@ public:
    * with this log.
    * @throws No exceptions under any circumstances.
    */
-
+  
+  //Potential bool isenabled(severity): Break into seperate future PRs
+  //Log issue about macros (disabling log events below certain level)
 
   /* The below method is a logging statement that takes in a LogRecord.
    * A default LogRecord that will be assigned if no parameters are passed to Logger's .log() method
@@ -47,10 +49,13 @@ public:
    */
   virtual void log(const LogRecord &record) noexcept = 0;
 
+//First, finalize core,
+//Afterwards, come back and add overloads
+
   /** Overloaded methods for unstructured logging **/
   void log(nostd::string_view msg) noexcept
   {
-    log(Severity::NONE, msg);  // Set severity to NONE as default then call the log method below
+    log(Severity::kNone, msg);  // Set severity to NONE as default then call the log method below
   }
 
   void log(Severity sev, nostd::string_view msg) noexcept
@@ -72,7 +77,7 @@ public:
   /** Overloaded methods for structured logging**/
   template <class T, nostd::enable_if_t<common::detail::is_key_value_iterable<T>::value> * = nullptr>
   void log(nostd::string_view name = "",
-           Severity sev            = Severity::NONE,
+           Severity sev            = Severity::kNone,
            const T &attributes     = {}) noexcept
   {
     log(name, sev, common::KeyValueIterableView<T>(attributes));

@@ -71,8 +71,8 @@ TEST(LogRecord, TraceFlagsStore)
 TEST(LogRecord, SeverityStore)
 {
     LogRecord r;
-    r.severity = opentelemetry::logs::Severity::ERROR;
-    EXPECT_EQ(r.severity, opentelemetry::logs::Severity::ERROR);
+    r.severity = opentelemetry::logs::Severity::kError2;
+    EXPECT_EQ(r.severity, opentelemetry::logs::Severity::kError2);
 }
 
 TEST(LogRecord, NameStore)
