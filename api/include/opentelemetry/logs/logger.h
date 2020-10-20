@@ -55,10 +55,11 @@ public:
 
   void log(Severity sev, nostd::string_view msg) noexcept
   {
-    log(sev, msg, 0);  // Set timestamp to 0 as default then call the log method below
+    // Set timestamp to now as default then call the log method below
+    log(sev, msg, core::SystemTimestamp(std::chrono::system_clock::now()));
   }
 
-  void log(Severity sev, nostd::string_view msg, uint64_t time) noexcept
+  void log(Severity sev, nostd::string_view msg, core::SystemTimestamp time) noexcept
   {
     LogRecord r;
     r.body       = msg;

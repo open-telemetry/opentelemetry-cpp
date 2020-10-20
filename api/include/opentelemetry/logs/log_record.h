@@ -25,7 +25,7 @@ enum class Severity
   TRACE2 = 2,
   TRACE3 = 3,
   TRACE4 = 4,
-  DEBUG  = 5,
+  DEBUG1  = 5,
   DEBUG2 = 6,
   DEBUG3 = 7,
   DEBUG4 = 8,
@@ -56,7 +56,7 @@ enum class Severity
 struct LogRecord
 {
   // default fields that will be set if the user doesn't specify them
-  uint64_t timestamp;                   // uint64 nanoseconds since Unix epoch
+  core::SystemTimestamp timestamp;                   // uint64 nanoseconds since Unix epoch
   trace::TraceId trace_id;              // byte sequence
   trace::SpanId span_id;                // byte sequence
   trace::TraceFlags trace_flag;         // byte
@@ -76,7 +76,7 @@ struct LogRecord
   **/
   LogRecord() : resource(_nullKV), attributes(_nullKV)
   {
-    timestamp       = 0;
+    timestamp       = core::SystemTimestamp(std::chrono::system_clock::now());
     // trace_id        = current_trace_id;   // TODO: correlate 
     // span_id         = current_span_id;    // TODO: correlate
     // trace_flag      = current_trace_flag; // TODO: correlate 
@@ -116,7 +116,7 @@ private:
       case Severity::TRACE3:
       case Severity::TRACE4:
           return "TRACE";
-      case Severity::DEBUG:
+      case Severity::DEBUG1:
       case Severity::DEBUG2:
       case Severity::DEBUG3:
       case Severity::DEBUG4:
