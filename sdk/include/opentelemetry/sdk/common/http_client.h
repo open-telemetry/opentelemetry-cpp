@@ -16,7 +16,7 @@
 //      }
 //  };
 //
-//   HttpSessionManager sessiionManager; //  = getStaticInstance();
+//   HttpSessionManager sessiionManager; // sdk can provide singleton implementation for it
 //   auto session = sessionManager.createHttpSession("localhost", 8000);
 //   auto request = session->CreateRequest();
 //   request->AddHeader(..);
