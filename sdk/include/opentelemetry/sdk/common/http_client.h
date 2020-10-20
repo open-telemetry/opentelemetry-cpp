@@ -49,7 +49,7 @@ enum class HttpSessionState
 {
   CREATED,  // session object is created
   ONGOING,  // http(s) request is ongoing
-  FINISHED  // https(s) reuest is finished
+  FINISHED  // https(s) request is finished
 };
 
 using HttpHeader     = std::pair<std::string, std::string>;
