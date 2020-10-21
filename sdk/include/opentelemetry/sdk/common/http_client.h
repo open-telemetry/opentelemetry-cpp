@@ -24,7 +24,7 @@
 //   session->SendRequest(res_handler);
 //   session->FinishSession() // optionally in the end.
 //   ...shutdown
-//    sessionManager.FinishAllSessions()
+//   sessionManager.FinishAllSessions()
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace sdk
