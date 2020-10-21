@@ -39,9 +39,9 @@ public:
    * with this log.
    * @throws No exceptions under any circumstances.
    */
-  
-  //Potential bool isenabled(severity): Break into seperate future PRs
-  //Log issue about macros (disabling log events below certain level)
+
+  // Potential bool isenabled(severity): Break into seperate future PRs
+  // Log issue about macros (disabling log events below certain level)
 
   /* The below method is a logging statement that takes in a LogRecord.
    * A default LogRecord that will be assigned if no parameters are passed to Logger's .log() method
@@ -49,8 +49,8 @@ public:
    */
   virtual void log(const LogRecord &record) noexcept = 0;
 
-//First, finalize core,
-//Afterwards, come back and add overloads
+  // First, finalize core,
+  // Afterwards, come back and add overloads
 
   /** Overloaded methods for unstructured logging **/
   void log(nostd::string_view msg) noexcept
@@ -67,15 +67,16 @@ public:
   void log(Severity sev, nostd::string_view msg, core::SystemTimestamp time) noexcept
   {
     LogRecord r;
-    r.body       = msg;
-    r.severity   = sev;
-    r.timestamp  = time;
+    r.body      = msg;
+    r.severity  = sev;
+    r.timestamp = time;
 
-    log(r);   // converts to a LogRecord object, then calls log(LogRecord)                             
+    log(r);  // converts to a LogRecord object, then calls log(LogRecord)
   }
 
   /** Overloaded methods for structured logging**/
-  template <class T, nostd::enable_if_t<common::detail::is_key_value_iterable<T>::value> * = nullptr>
+  template <class T,
+            nostd::enable_if_t<common::detail::is_key_value_iterable<T>::value> * = nullptr>
   void log(nostd::string_view name = "",
            Severity sev            = Severity::kNone,
            const T &attributes     = {}) noexcept
@@ -84,17 +85,19 @@ public:
   }
 
   void log(nostd::string_view name,
-                   Severity sev,
-                   const common::KeyValueIterable &attributes) noexcept {
+           Severity sev,
+           const common::KeyValueIterable &attributes) noexcept
+  {
     LogRecord r;
-    r.name            = name;
-    r.severity        = sev;
-    r.attributes      = attributes;
+    r.name       = name;
+    r.severity   = sev;
+    r.attributes = attributes;
 
-    log(r);     // converts to a LogRecord object, then calls log(LogRecord)  
+    log(r);  // converts to a LogRecord object, then calls log(LogRecord)
   }
 
-  /** Future enhancement: templated method for objects / custom types (e.g. JSON, XML, custom classes, etc) **/
+  /** Future enhancement: templated method for objects / custom types (e.g. JSON, XML, custom
+   * classes, etc) **/
   // template<class T> void log(T &some_obj) noexcept override;
 };
 }  // namespace logs
