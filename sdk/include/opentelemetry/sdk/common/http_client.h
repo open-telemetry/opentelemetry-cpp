@@ -68,7 +68,7 @@ class Request
 public:
   virtual void SetMethod(Method method) noexcept = 0;
 
-  virtual void setUri(const std::string &uri) noexcept = 0;
+  virtual void SetUri(const std::string &uri) noexcept = 0;
 
   virtual void SetBody(Body &body) noexcept = 0;
 
