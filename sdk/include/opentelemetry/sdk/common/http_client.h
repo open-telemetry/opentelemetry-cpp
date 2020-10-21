@@ -6,25 +6,32 @@
 #include "opentelemetry/nostd/function_ref.h"
 #include "opentelemetry/version.h"
 
-// Usage Example
-//
-// struct ReponseHandler: public HttpResponseHandler {
-//      void OnHttpResponse(HttpResponse& res) noexcept override
-//      {
-//           if (res.IsSuccess())
-//              .. process response
-//      }
-//  };
-//
-//   HttpSessionManager sessionManager; // implementer can provide singleton implementation for it
-//   auto session = sessionManager.createHttpSession("localhost", 8000);
-//   auto request = session->CreateRequest();
-//   request->AddHeader(..);
-//   ResponseHandler res_handler;
-//   session->SendRequest(res_handler);
-//   session->FinishSession() // optionally in the end.
-//   ...shutdown
-//   sessionManager.FinishAllSessions()
+/*
+ Usage Example
+
+ struct SimpleReponseHandler: public ResponseHandler {
+      void OnHttpResponse(HttpResponse& res) noexcept override
+      {
+           if (res.IsSuccess()) {
+            res.GetNextHeader([](std::string name, std::string value) -> bool {
+                std::cout << "Header Name:" << name << " Header Value:"<< value ;
+                return true;
+            });
+            .. process response body
+           }
+      }
+  };
+
+  SessionManager sessionManager; // implementer can provide singleton implementation for it
+  auto session = sessionManager.createSession("localhost", 8000);
+  auto request = session->CreateRequest();
+  request->AddHeader(..);
+  SimpleResponseHandler res_handler;
+  session->SendRequest(res_handler);
+  session->FinishSession() // optionally in the end.
+  ...shutdown
+  sessionManager.FinishAllSessions()
+*/
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace sdk
@@ -34,90 +41,85 @@ namespace common
 namespace http
 {
 
-enum class HttpMethod
+enum class Method
 {
-  HTTP_GET,
-  HTTP_POST,
-  HTTP_PUT,
-  HTTP_OPTIONS,
-  HTTP_HEAD,
-  HTTP_PATCH,
-  HTTP_DELETE
+  Get,
+  Post,
+  Put,
+  Options,
+  Head,
+  Patch,
+  Delete
 };
 
-enum class HttpSessionState
+enum class SessionState
 {
-  CREATED,  // session object is created
-  ONGOING,  // http(s) request is ongoing
-  FINISHED  // https(s) request is finished
+  Created,  // session object is created
+  Ongoing,  // http(s) request is ongoing
+  Finished  // https(s) request is finished
 };
 
-using HttpHeader     = std::pair<std::string, std::string>;
-using HttpBody       = std::vector<uint8_t>;
-using HttpStatusCode = uint16_t;
+using Body       = std::vector<uint8_t>;
+using StatusCode = uint16_t;
 
-class HttpRequest
+class Request
 {
 
 public:
-  virtual void setMethod(HttpMethod method) noexcept = 0;
+  virtual void setMethod(Method method) noexcept = 0;
 
-  virtual void setURI(const std::string &uri) noexcept = 0;
+  virtual void setUri(const std::string &uri) noexcept = 0;
 
-  virtual void SetBody(HttpBody &body) noexcept = 0;
+  virtual void SetBody(Body &body) noexcept = 0;
 
-  virtual void AddHeader(const HttpHeader &header) noexcept = 0;
+  virtual void AddHeader(const std::string &name, const std::string &value) noexcept = 0;
 
-  virtual void ReplaceHeader(const HttpHeader &header) noexcept = 0;
+  virtual void ReplaceHeader(const std::string &name, const std::string &value) noexcept = 0;
 
   virtual void SetTimeoutMs(std::chrono::milliseconds timeout_ms) noexcept = 0;
 };
 
-class HttpResponse
+class Response
 {
 public:
-  virtual const HttpBody &GetBody() const noexcept = 0;
+  virtual const Body &GetBody() const noexcept = 0;
 
-  virtual bool GetNextHeader(nostd::function_ref<bool(HttpHeader)> callable) const noexcept = 0;
+  virtual bool GetNextHeader(
+      nostd::function_ref<bool(std::string name, std::string value)> callable) const noexcept = 0;
 
-  virtual bool GetNextHeader(const std::string &key,
-                             nostd::function_ref<bool(HttpHeader)> callable) const noexcept = 0;
+  virtual bool GetNextHeader(
+      const std::string &key,
+      nostd::function_ref<bool(std::string name, std::string value)> callable) const noexcept = 0;
 
-  virtual HttpStatusCode GetStatusCode() const noexcept = 0;
-
-  virtual bool IsSuccess() const noexcept = 0;
-
-  virtual const std::string &GetErrorMessage() const noexcept = 0;
+  virtual StatusCode GetStatusCode() const noexcept = 0;
 };
 
-class HttpResponseHandler
+class ResponseHandler
 {
-
 public:
-  virtual void OnHttpResponse(HttpResponse &) noexcept = 0;
+  virtual void OnResponse(Response &) noexcept = 0;
+
+  virtual void OnError(std::string &) noexcept = 0;
 };
 
-class HttpSession
+class Session
 {
-
 public:
-  virtual std::shared_ptr<HttpRequest> CreateRequest() noexcept = 0;
+  virtual std::shared_ptr<Request> CreateRequest() noexcept = 0;
 
-  virtual void SendRequest(HttpResponseHandler &) noexcept = 0;
+  virtual void SendRequest(ResponseHandler &) noexcept = 0;
 
-  virtual HttpSessionState GetSessionState() const noexcept = 0;
+  virtual SessionState GetSessionState() const noexcept = 0;
 
   virtual bool CancelSession() noexcept = 0;
 
   virtual bool FinishSession() noexcept = 0;
 };
 
-class HttpSessionManager
+class SessionManager
 {
-
 public:
-  virtual std::shared_ptr<HttpSession> createHttpSession(std::string host,
-                                                         uint16_t port = 80) noexcept = 0;
+  virtual std::shared_ptr<Session> createSession(std::string host, uint16_t port = 80) noexcept = 0;
 
   virtual bool CancelAllSessions() noexcept = 0;
 
