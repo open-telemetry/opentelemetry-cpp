@@ -4,6 +4,7 @@
 #include <string>
 #include <vector>
 #include "opentelemetry/nostd/function_ref.h"
+#include "opentelemetry/nostd/string_view.h"
 #include "opentelemetry/version.h"
 
 /*
@@ -13,7 +14,7 @@
       void OnResponse(Response& res) noexcept override
       {
            if (res.IsSuccess()) {
-            res.GetNextHeader([](std::string name, std::string value) -> bool {
+            res.GetNextHeader([](nostd::string_view name, std::string value) -> bool {
                 std::cout << "Header Name:" << name << " Header Value:"<< value ;
                 return true;
             });
@@ -68,15 +69,17 @@ class Request
 public:
   virtual void SetMethod(Method method) noexcept = 0;
 
-  virtual void SetUri(const std::string &uri) noexcept = 0;
+  virtual void SetUri(const nostd::string_view &uri) noexcept = 0;
 
   virtual void SetBody(Body &body) noexcept = 0;
 
-  virtual void AddHeader(const std::string &name, const std::string &value) noexcept = 0;
+  virtual void AddHeader(const nostd::string_view &name, const std::string &value) noexcept = 0;
 
-  virtual void ReplaceHeader(const std::string &name, const std::string &value) noexcept = 0;
+  virtual void ReplaceHeader(const nostd::string_view &name, const std::string &value) noexcept = 0;
 
   virtual void SetTimeoutMs(std::chrono::milliseconds timeout_ms) noexcept = 0;
+
+  virtual ~Request() = default;
 };
 
 class Response
@@ -85,13 +88,17 @@ public:
   virtual const Body &GetBody() const noexcept = 0;
 
   virtual bool GetNextHeader(
-      nostd::function_ref<bool(std::string name, std::string value)> callable) const noexcept = 0;
+      nostd::function_ref<bool(nostd::string_view name, std::string value)> callable) const
+      noexcept = 0;
 
   virtual bool GetNextHeader(
-      const std::string &key,
-      nostd::function_ref<bool(std::string name, std::string value)> callable) const noexcept = 0;
+      const nostd::string_view &key,
+      nostd::function_ref<bool(nostd::string_view name, std::string value)> callable) const
+      noexcept = 0;
 
   virtual StatusCode GetStatusCode() const noexcept = 0;
+
+  virtual ~Response() = default;
 };
 
 class ResponseHandler
@@ -99,7 +106,9 @@ class ResponseHandler
 public:
   virtual void OnResponse(Response &) noexcept = 0;
 
-  virtual void OnError(std::string &) noexcept = 0;
+  virtual void OnError(nostd::string_view &) noexcept = 0;
+
+  virtual ~ResponseHandler() = default;
 };
 
 class Session
@@ -114,16 +123,21 @@ public:
   virtual bool CancelSession() noexcept = 0;
 
   virtual bool FinishSession() noexcept = 0;
+
+  virtual ~Session() = default;
 };
 
 class SessionManager
 {
 public:
-  virtual std::shared_ptr<Session> CreateSession(std::string host, uint16_t port = 80) noexcept = 0;
+  virtual std::shared_ptr<Session> CreateSession(nostd::string_view host,
+                                                 uint16_t port = 80) noexcept = 0;
 
   virtual bool CancelAllSessions() noexcept = 0;
 
   virtual bool FinishAllSessions() noexcept = 0;
+
+  virtual ~SessionManager() = default;
 };
 }  // namespace http
 }  // namespace common
