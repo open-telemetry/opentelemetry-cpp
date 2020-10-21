@@ -10,7 +10,7 @@
  Usage Example
 
  struct SimpleReponseHandler: public ResponseHandler {
-      void OnHttpResponse(HttpResponse& res) noexcept override
+      void OnResponse(Response& res) noexcept override
       {
            if (res.IsSuccess()) {
             res.GetNextHeader([](std::string name, std::string value) -> bool {
@@ -28,7 +28,7 @@
   request->AddHeader(..);
   SimpleResponseHandler res_handler;
   session->SendRequest(res_handler);
-  session->FinishSession() // optionally in the end.
+  session->FinishSession() // optionally in the end
   ...shutdown
   sessionManager.FinishAllSessions()
 */
