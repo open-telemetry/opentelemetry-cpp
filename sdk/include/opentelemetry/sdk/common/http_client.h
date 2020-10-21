@@ -21,6 +21,11 @@
             .. process response body
            }
       }
+
+      void OnError(nostd::string_view err) noexcept override
+      {
+          std::cout << " Error:" << err;
+      }
   };
 
   SessionManager sessionManager; // implementer can provide singleton implementation for it
@@ -65,7 +70,6 @@ using StatusCode = uint16_t;
 
 class Request
 {
-
 public:
   virtual void SetMethod(Method method) noexcept = 0;
 
