@@ -35,13 +35,13 @@ public:
    * Initialize a new scope.
    * @param span the given span will be set as the currently active span.
    */
-  Scope(nostd::shared_ptr<Span> &span) noexcept
-      : token_(context::Token(context::RuntimeContext::Attach(
-            context::RuntimeContext::GetCurrent().SetValue(SpanKey, span))))
+  Scope(const nostd::shared_ptr<Span> &span) noexcept
+      : token_(context::RuntimeContext::Attach(
+            context::RuntimeContext::GetCurrent().SetValue(SpanKey, span)))
   {}
 
 private:
-  context::Token token_;
+  const nostd::unique_ptr<context::Token> token_;
 };
 
 }  // namespace trace
