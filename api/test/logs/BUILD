@@ -21,15 +21,3 @@ cc_test(
         "@com_google_googletest//:gtest_main",
     ],
 )
-
-cc_test(
-    name = "log_record_test",
-    srcs = [
-        "log_record_test.cc",
-    ],
-    linkstatic = 1,
-    deps = [
-        "//api",
-        "@com_google_googletest//:gtest_main",
-    ],
-)

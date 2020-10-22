@@ -1,4 +1,4 @@
-foreach(testname logger_provider_test logger_test log_record_test)
+foreach(testname logger_provider_test logger_test)
   add_executable(${testname} "${testname}.cc")
   target_link_libraries(${testname} ${GTEST_BOTH_LIBRARIES}
                         ${CMAKE_THREAD_LIBS_INIT} opentelemetry_api)

@@ -19,9 +19,6 @@ namespace logs
  **/
 class Logger
 {
-private:
-  std::vector<LogRecord> records;
-
 public:
   virtual ~Logger() = default;
 
