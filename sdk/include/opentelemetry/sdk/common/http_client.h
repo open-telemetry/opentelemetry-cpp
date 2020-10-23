@@ -123,7 +123,7 @@ public:
 
   virtual void OnError(SessionState, nostd::string_view) noexcept = 0;
 
-  virtual void OnSslValidation(nostd::function_ref<SSLCertificate &()>) noexcept {}
+  virtual void OnConnecting(const SSLCertificate &) noexcept {}
 
   virtual ~EventHandler() = default;
 };
