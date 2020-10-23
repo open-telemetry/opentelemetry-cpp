@@ -121,7 +121,7 @@ class EventHandler
 public:
   virtual void OnResponse(Response &) noexcept = 0;
 
-  virtual void OnError(SessionState, nostd::string_view &) noexcept = 0;
+  virtual void OnError(SessionState, nostd::string_view) noexcept = 0;
 
   virtual void OnSslValidation(nostd::function_ref<SSLCertificate &()>) noexcept {}
 
