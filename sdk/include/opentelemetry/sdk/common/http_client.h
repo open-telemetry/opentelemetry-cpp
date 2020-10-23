@@ -84,7 +84,7 @@ class Request
 public:
   virtual void SetMethod(Method method) noexcept = 0;
 
-  virtual void SetUri(const nostd::string_view &uri) noexcept = 0;
+  virtual void SetUri(nostd::string_view uri) noexcept = 0;
 
   virtual void SetBody(Body &body) noexcept = 0;
 
