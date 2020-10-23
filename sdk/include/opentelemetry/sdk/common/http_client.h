@@ -60,13 +60,24 @@ enum class Method
 
 enum class SessionState
 {
-  Created,  // session object is created
-  Ongoing,  // http(s) request is ongoing
-  Finished  // https(s) request is finished
+  Created,             // session object is created
+  Ongoing,             // session is ongoing
+  Finished,            // session is finished ( this needs to be the final state )
+  Queued,              // http request is queued
+  TimedOut,            // Request timedout, no response received
+  Aborted,             // http request aborted due to local error,
+  Cancelled,           // http request cancelled, possibly due to session->CancelSession();
+  SendingFailed,       // http request sending failed
+  NetworkError,        // network error
+  SSLHandshakeFailed,  // ssl handshake failed
+  ReadError,           // error while reading response
+  WriteError           // error while writing rquest
 };
 
-using Body       = std::vector<uint8_t>;
-using StatusCode = uint16_t;
+using Byte           = uint8_t;
+using StatusCode     = uint16_t;
+using Body           = std::vector<Byte>;
+using SSLCertificate = std::vector<Byte>;
 
 class Request
 {
@@ -91,11 +102,11 @@ class Response
 public:
   virtual const Body &GetBody() const noexcept = 0;
 
-  virtual bool GetNextHeader(
+  virtual bool ForEachHeader(
       nostd::function_ref<bool(nostd::string_view name, std::string value)> callable) const
       noexcept = 0;
 
-  virtual bool GetNextHeader(
+  virtual bool ForEachHeader(
       const nostd::string_view &key,
       nostd::function_ref<bool(nostd::string_view name, std::string value)> callable) const
       noexcept = 0;
@@ -105,14 +116,16 @@ public:
   virtual ~Response() = default;
 };
 
-class ResponseHandler
+class EventHandler
 {
 public:
   virtual void OnResponse(Response &) noexcept = 0;
 
-  virtual void OnError(nostd::string_view &) noexcept = 0;
+  virtual void OnError(SessionState, nostd::string_view &) noexcept = 0;
 
-  virtual ~ResponseHandler() = default;
+  virtual void OnSslValidation(nostd::function_ref<SSLCertificate &()>) noexcept {}
+
+  virtual ~EventHandler() = default;
 };
 
 class Session
@@ -120,9 +133,9 @@ class Session
 public:
   virtual std::shared_ptr<Request> CreateRequest() noexcept = 0;
 
-  virtual void SendRequest(ResponseHandler &) noexcept = 0;
+  virtual void SendRequest(EventHandler &) noexcept = 0;
 
-  virtual SessionState GetSessionState() const noexcept = 0;
+  virtual bool IsSessionActive() noexcept = 0;
 
   virtual bool CancelSession() noexcept = 0;
 
@@ -143,6 +156,7 @@ public:
 
   virtual ~SessionManager() = default;
 };
+
 }  // namespace http
 }  // namespace common
 }  // namespace sdk
