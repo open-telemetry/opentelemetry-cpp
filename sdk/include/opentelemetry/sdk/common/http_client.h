@@ -88,9 +88,9 @@ public:
 
   virtual void SetBody(Body &body) noexcept = 0;
 
-  virtual void AddHeader(const nostd::string_view &name, const std::string &value) noexcept = 0;
+  virtual void AddHeader(nostd::string_view name, nostd::string_view value) noexcept = 0;
 
-  virtual void ReplaceHeader(const nostd::string_view &name, const std::string &value) noexcept = 0;
+  virtual void ReplaceHeader(nostd::string_view name, nostd::string_view value) noexcept = 0;
 
   virtual void SetTimeoutMs(std::chrono::milliseconds timeout_ms) noexcept = 0;
 
