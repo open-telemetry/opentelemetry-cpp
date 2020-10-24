@@ -32,7 +32,7 @@ public:
    * key will be overwritten.
    */
   virtual nostd::shared_ptr<Span> StartSpan(nostd::string_view name,
-                                            const KeyValueIterable &attributes,
+                                            const common::KeyValueIterable &attributes,
                                             const StartSpanOptions &options = {}) noexcept = 0;
 
   nostd::shared_ptr<Span> StartSpan(nostd::string_view name,
@@ -41,12 +41,13 @@ public:
     return this->StartSpan(name, {}, options);
   }
 
-  template <class T, nostd::enable_if_t<detail::is_key_value_iterable<T>::value> * = nullptr>
+  template <class T,
+            nostd::enable_if_t<common::detail::is_key_value_iterable<T>::value> * = nullptr>
   nostd::shared_ptr<Span> StartSpan(nostd::string_view name,
                                     const T &attributes,
                                     const StartSpanOptions &options = {}) noexcept
   {
-    return this->StartSpan(name, KeyValueIterableView<T>(attributes), options);
+    return this->StartSpan(name, common::KeyValueIterableView<T>(attributes), options);
   }
 
   nostd::shared_ptr<Span> StartSpan(

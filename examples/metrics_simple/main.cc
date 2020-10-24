@@ -7,7 +7,6 @@
 
 namespace sdkmetrics = opentelemetry::sdk::metrics;
 namespace nostd      = opentelemetry::nostd;
-namespace trace      = opentelemetry::trace;
 
 int main()
 {
@@ -33,7 +32,7 @@ int main()
 
   // Create a labelset
   std::map<std::string, std::string> labels = {{"key", "value"}};
-  auto labelkv                              = trace::KeyValueIterableView<decltype(labels)>{labels};
+  auto labelkv = opentelemetry::common::KeyValueIterableView<decltype(labels)>{labels};
 
   // Create arrays of instrument and values to add to them
   metrics_api::SynchronousInstrument<int> *iinstr_arr[] = {intupdowncounter.get(),

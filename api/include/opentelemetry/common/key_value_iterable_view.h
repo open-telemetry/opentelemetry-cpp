@@ -4,12 +4,12 @@
 #include <type_traits>
 #include <utility>
 
+#include "opentelemetry/common/key_value_iterable.h"
 #include "opentelemetry/nostd/utility.h"
-#include "opentelemetry/trace/key_value_iterable.h"
 #include "opentelemetry/version.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
-namespace trace
+namespace common
 {
 namespace detail
 {
@@ -60,5 +60,5 @@ public:
 private:
   const T *container_;
 };
-}  // namespace trace
+}  // namespace common
 OPENTELEMETRY_END_NAMESPACE

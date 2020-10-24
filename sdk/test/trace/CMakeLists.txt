@@ -6,8 +6,8 @@ foreach(
   tracer_test
   always_off_sampler_test
   always_on_sampler_test
-  parent_or_else_sampler_test
-  probability_sampler_test
+  parent_sampler_test
+  trace_id_ratio_sampler_test
   batch_span_processor_test
   attribute_utils_test)
   add_executable(${testname} "${testname}.cc")
