@@ -1,3 +1,17 @@
+# Copyright 2019, OpenTelemetry Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
 #pragma once
 
 #include <map>
@@ -76,17 +90,12 @@ struct LogRecord
   common::KeyValueIterable &attributes;  // key/value pair list
 
   /* Default log record if user does not overwrite this.
-   *  TODO: Potentially add other constructors to take default arguments from the user
-   *  TODO: find way to correlate actual trace_id and span_id
-   *  TODO: find way to get current timestamp
-   *  TODO: find better data type for "body" field
+  *  TODO: find better data type for "body" field
+   *  Future enhancement: Potentially add other constructors to take default arguments from the user 
    **/
   LogRecord() : resource(_nullKV), attributes(_nullKV)
   {
     timestamp = core::SystemTimestamp(std::chrono::system_clock::now());
-    // trace_id        = current_trace_id;   // TODO: correlate
-    // span_id         = current_span_id;    // TODO: correlate
-    // trace_flag      = current_trace_flag; // TODO: correlate
     name = "";
   }
 
