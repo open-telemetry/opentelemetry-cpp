@@ -1,5 +1,4 @@
 #include "tracer.h"
-#include "opentelemetry/context/runtime_context.h"
 #include "opentelemetry/nostd/unique_ptr.h"
 
 #include <iostream>

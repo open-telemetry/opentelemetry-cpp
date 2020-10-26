@@ -8,6 +8,8 @@
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace sdk
 {
+
+#if 0
 /**
  * Maintain a static empty array of pairs that represents empty (default) attributes.
  * This helps to avoid constructing a new empty container every time a call is made
@@ -23,5 +25,11 @@ static const opentelemetry::common::KeyValueIterableView<std::array<std::pair<st
 
   return kEmptyAttributes;
 }
+#else
+static const opentelemetry::common::NullKeyValueIterable GetEmptyAttributes() noexcept
+{
+  return opentelemetry::common::NullKeyValueIterable();
+}
+#endif
 }  // namespace sdk
 OPENTELEMETRY_END_NAMESPACE

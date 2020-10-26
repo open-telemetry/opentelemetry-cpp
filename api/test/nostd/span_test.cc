@@ -1,5 +1,8 @@
 #include "opentelemetry/nostd/span.h"
 
+#include <benchmark/benchmark.h>
+#include <cstdint>
+
 #include <algorithm>
 #include <array>
 #include <iterator>
@@ -56,7 +59,10 @@ TEST(SpanTest, PointerCountConstruction)
   EXPECT_EQ(s2.data(), array.data());
   EXPECT_EQ(s2.size(), array.size());
 
+#ifndef HAVE_CPP_STDLIB
+  /* This test is not supposed to fail with STL. Why is this invalid construct? */
   EXPECT_DEATH((span<int, 2>{array.data(), array.size()}), ".*");
+#endif
 }
 
 TEST(SpanTest, RangeConstruction)
@@ -71,7 +77,10 @@ TEST(SpanTest, RangeConstruction)
   EXPECT_EQ(s2.data(), array);
   EXPECT_EQ(s2.size(), 3);
 
+#ifndef HAVE_CPP_STDLIB
+  /* This test is not supposed to fail with STL. Why is this invalid construct? */
   EXPECT_DEATH((span<int, 2>{std::begin(array), std::end(array)}), ".*");
+#endif
 }
 
 TEST(SpanTest, ArrayConstruction)
@@ -106,10 +115,15 @@ TEST(SpanTest, ContainerConstruction)
   EXPECT_EQ(s1.data(), v.data());
   EXPECT_EQ(s1.size(), v.size());
 
-  span<int, 3> s2{v};
+  span<int, 3> s2{v.data(), 3};
+
   EXPECT_EQ(s2.data(), v.data());
   EXPECT_EQ(s2.size(), v.size());
-  EXPECT_DEATH((span<int, 2>{v}), ".*");
+
+#ifndef HAVE_CPP_STDLIB
+  /* This test is not supposed to fail with STL. Why is this invalid construct? */
+  EXPECT_DEATH((span<int, 2>{v.data(), 3}), ".*");
+#endif
 
   EXPECT_FALSE((std::is_constructible<span<int>, std::vector<double>>::value));
   EXPECT_FALSE((std::is_constructible<span<int>, std::list<int>>::value));
@@ -172,4 +186,61 @@ TEST(SpanTest, Iteration)
   span<int, 3> s2{array.data(), array.size()};
   EXPECT_EQ(std::distance(s2.begin(), s2.end()), array.size());
   EXPECT_TRUE(std::equal(s2.begin(), s2.end(), array.begin()));
+}
+
+static void SpanIterator(benchmark::State &state)
+{
+  constexpr size_t aSize = 100000;
+  std::array<int, aSize> array{};
+  for (size_t i = 0; i < aSize; i++)
+  {
+    array[i] = i;
+  }
+  span<int> s1{array.data(), array.size()};
+  for (auto _ : state)
+  {
+    size_t i = 0;
+    for (auto item : s1)
+    {
+      EXPECT_EQ(item, i);
+      i++;
+    }
+  }
+}
+BENCHMARK(SpanIterator);
+
+static void SpanConstructor(benchmark::State &state)
+{
+  constexpr size_t aSize = 1000000;
+  auto *aInt16           = new std::array<int16_t, aSize>{};
+  auto *aInt32           = new std::array<int32_t, aSize>{};
+  auto *aInt64           = new std::array<int64_t, aSize>{};
+  for (size_t i = 0; i < aSize; i++)
+  {
+    (*aInt16)[i] = i;
+    (*aInt32)[i] = i;
+    (*aInt64)[i] = i;
+  }
+  size_t j = aSize;
+  for (auto _ : state)
+  {
+    benchmark::DoNotOptimize([&] {
+      span<int16_t> s1{aInt16->data(), aInt16->size()};
+      span<int32_t> s2{aInt32->data(), aInt32->size()};
+      span<int64_t> s3{aInt64->data(), aInt64->size()};
+    });
+  }
+  delete aInt16;
+  delete aInt32;
+  delete aInt64;
+}
+BENCHMARK(SpanConstructor);
+
+TEST(SpanTest, PerfTests)
+{
+  // Run all benchmarks
+  int argc           = 0;
+  const char *argv[] = {""};
+  ::benchmark::Initialize(&argc, (char **)(argv));
+  ::benchmark::RunSpecifiedBenchmarks();
 }

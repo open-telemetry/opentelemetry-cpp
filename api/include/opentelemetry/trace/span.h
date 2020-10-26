@@ -5,8 +5,10 @@
 #include "opentelemetry/common/attribute_value.h"
 #include "opentelemetry/common/key_value_iterable_view.h"
 #include "opentelemetry/core/timestamp.h"
+#include "opentelemetry/nostd/shared_ptr.h"
 #include "opentelemetry/nostd/span.h"
 #include "opentelemetry/nostd/string_view.h"
+#include "opentelemetry/nostd/type_traits.h"
 #include "opentelemetry/nostd/unique_ptr.h"
 #include "opentelemetry/trace/canonical_code.h"
 #include "opentelemetry/trace/span_context.h"
@@ -167,5 +169,14 @@ public:
   // AddEvent).
   virtual bool IsRecording() const noexcept = 0;
 };
+
+template <class SpanType, class TracerType>
+nostd::shared_ptr<trace::Span> to_span_ptr(TracerType *objPtr,
+                                           nostd::string_view name,
+                                           const trace::StartSpanOptions &options)
+{
+  return nostd::shared_ptr<trace::Span>{new (std::nothrow) SpanType{*objPtr, name, options}};
+}
+
 }  // namespace trace
 OPENTELEMETRY_END_NAMESPACE
