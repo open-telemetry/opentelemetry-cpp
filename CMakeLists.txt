@@ -35,7 +35,7 @@ if(WITH_STL)
   set(CMAKE_CXX_STANDARD 20)
 
   # Guidelines Support Library path. Used if we are not on not get C++20.
-  # 
+  #
   # TODO: respect WITH_ABSEIL as alternate implementation of std::span
   set(GSL_DIR third_party/ms-gsl)
   include_directories(${GSL_DIR}/include)
