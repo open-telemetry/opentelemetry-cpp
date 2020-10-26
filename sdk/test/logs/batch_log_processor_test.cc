@@ -119,7 +119,7 @@ TEST_F(BatchLogProcessorTestPeer, TestShutdown)
       new std::vector<std::unique_ptr<sdk::logs::SpanData>>);
 
   auto batch_processor = GetMockProcessor(logs_received, is_shutdown);
-  const int num_logs  = 3;
+  const int num_logs   = 3;
 
   auto test_logs = GetTestSpans(batch_processor, num_logs);
 
@@ -146,7 +146,7 @@ TEST_F(BatchLogProcessorTestPeer, TestForceFlush)
       new std::vector<std::unique_ptr<sdk::logs::SpanData>>);
 
   auto batch_processor = GetMockProcessor(logs_received, is_shutdown);
-  const int num_logs  = 2048;
+  const int num_logs   = 2048;
 
   auto test_logs = GetTestSpans(batch_processor, num_logs);
 
@@ -181,8 +181,7 @@ TEST_F(BatchLogProcessorTestPeer, TestForceFlush)
   EXPECT_EQ(num_logs * 2, logs_received->size());
   for (int i = 0; i < num_logs; ++i)
   {
-    EXPECT_EQ("Span " + std::to_string(i % num_logs),
-              logs_received->at(num_logs + i)->GetName());
+    EXPECT_EQ("Span " + std::to_string(i % num_logs), logs_received->at(num_logs + i)->GetName());
   }
 }
 
