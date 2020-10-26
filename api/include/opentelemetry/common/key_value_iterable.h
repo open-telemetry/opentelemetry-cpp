@@ -48,5 +48,5 @@ public:
   virtual size_t size() const noexcept { return 0; }
 };
 
-}  // namespace trace
+}  // namespace common
 OPENTELEMETRY_END_NAMESPACE

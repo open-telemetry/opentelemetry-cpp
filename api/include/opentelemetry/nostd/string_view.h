@@ -15,16 +15,16 @@
 #pragma once
 
 #ifdef HAVE_CPP_STDLIB
-#include "opentelemetry/std/string_view.h"
+#  include "opentelemetry/std/string_view.h"
 #else
-#include <algorithm>
-#include <cstddef>
-#include <cstring>
-#include <ostream>
-#include <stdexcept>
-#include <string>
+#  include <algorithm>
+#  include <cstddef>
+#  include <cstring>
+#  include <ostream>
+#  include <stdexcept>
+#  include <string>
 
-#include "opentelemetry/version.h"
+#  include "opentelemetry/version.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace nostd
@@ -75,11 +75,11 @@ public:
   {
     if (pos > length_)
     {
-#if __EXCEPTIONS
+#  if __EXCEPTIONS
       throw std::out_of_range{"opentelemetry::nostd::string_view"};
-#else
+#  else
       std::terminate();
-#endif
+#  endif
     }
     n = (std::min)(n, length_ - pos);
     return string_view(data_ + pos, n);
@@ -135,12 +135,12 @@ private:
 inline bool operator==(string_view lhs, string_view rhs) noexcept
 {
   return lhs.length() == rhs.length() &&
-#if _MSC_VER == 1900
+#  if _MSC_VER == 1900
          // Avoid SCL error in Visual Studio 2015
          (std::memcmp(lhs.data(), rhs.data(), lhs.length()) == 0);
-#else
+#  else
          std::equal(lhs.data(), lhs.data() + lhs.length(), rhs.data());
-#endif
+#  endif
 }
 
 inline bool operator==(string_view lhs, const std::string &rhs) noexcept

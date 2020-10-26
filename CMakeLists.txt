@@ -17,10 +17,11 @@ option(WITH_ABSEIL "Whether to use Abseil for C++latest features" OFF)
 if(WITH_ABSEIL)
   add_definitions(-DHAVE_ABSEIL)
   find_package(absl CONFIG REQUIRED)
-  
-  # Abseil headers-only are needed for absl::variant with Visual Studio 2015 only
+
+  # Abseil headers-only lib is needed for absl::variant to work vs2015.
+  # `nostd::mpark::variant` is not compiling in vs2015.
   set(CORE_RUNTIME_LIBS absl::any absl::base absl::bits absl::city)
-  
+
   # target_link_libraries(main PRIVATE absl::any absl::base absl::bits
   # absl::city)
 endif()
@@ -29,27 +30,21 @@ if(WITH_STL)
 
   # Require at least C++17. C++20 is needed to avoid gsl::span
   add_definitions(-DHAVE_CPP_STDLIB -DHAVE_GSL)
-  
+
   # Ask for 20, but may get C++17
   set(CMAKE_CXX_STANDARD 20)
-  
+
   # Guidelines Support Library path. Used if we are not on not get C++20.
+  # 
   # TODO: respect WITH_ABSEIL as alternate implementation of std::span
   set(GSL_DIR third_party/ms-gsl)
   include_directories(${GSL_DIR}/include)
-  
+
   # Optimize for speed to reduce the hops
   if(CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")
     set(CMAKE_CXX_FLAGS_SPEED "/O2")
     set(CMAKE_CXX_FLAGS
         "${CMAKE_CXX_FLAGS} /Zc:__cplusplus ${CMAKE_CXX_FLAGS_SPEED}")
-  endif()
-  
-  # TODO: cleanup this section / test with older CMake, OR require more modern (latest) CMake?
-  if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
-    # TODO: this shouldn't be unnecessary, assuming that recent (latest)
-    # CMake handles the CMAKE_CXX_STANDARD=20 setting as expected.
-    # set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++2a")
   endif()
 
 endif()

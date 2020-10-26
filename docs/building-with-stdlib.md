@@ -6,6 +6,7 @@ process (environment where ABI compat is not a requirement), or for
 
 Proposed approach cannot be employed for shared libs in environments where
 ABI compatibility is required:
+
 - OpenTelemetry SDK binary compiled with compiler A + STL B
 - may not be ABI compatible with the main executable compiled with compiler
   C + STL D on a same OS.
@@ -17,9 +18,9 @@ In certain scenarios it may be of benefit to compile the OpenTelemetry SDK from
 source using standard library container classes (`std::map`, `std::string_view`,
 `std::span`, `std::variant`) instead of OpenTelemetry `nostd::` analogs (which
 were backported to C++11 and designed as ABI-stable). This PR also can be used
-as a foundation for alternate approach - to also allow bindings to [abseil]
-(https://github.com/abseil/abseil-cpp) classes. That is in environments that
-would rather prefer `Abseil` classes over the standard lib or `nostd`.
+as a foundation for alternate approach - to also allow bindings to [abseil](https://github.com/abseil/abseil-cpp)
+classes. That is in environments that would rather prefer `Abseil` classes
+over the standard lib or `nostd`.
 
 The approach is to provide totally opaque (from SDK code / SDK developer
 perspective) mapping / aliasing from `nostd::` classes back to their `std::`
@@ -65,9 +66,13 @@ module and plugins for products such as NGINX, Envoy, etc.
 ## Scope of changes needed to implement the feature
 
 ### Separate flavors of SDK build
-- `nostd` - OpenTelemetry backport of classes for C++11
+
+Supported build flavors:
+
+- `nostd` - OpenTelemetry backport of classes for C++11. Not using STD Lib.
 - `stl`   - Standard Library. Best be compiled with C++20 compaitlbe compiler.
   C++17 may be used with additional dependencies, e.g. MS-GSL or Abseil.
+- `absl`  - TODO: this should allow using Abseil C++ lirary only (no MS-GSL).
 
 ### Test setup
 
@@ -87,7 +92,7 @@ Consistent handling of `std::variant` across various OS:
   to resolve [this quirk](https://stackoverflow.com/questions/52310835/xcode-10-call-to-unavailable-function-stdvisit).
 
 - ability to optionally borrow implementation of C++20 `gsl::span` from
-  [Microsoft Guidelines Support Library](https://github.com/microsoft/GSL). 
+  [Microsoft Guidelines Support Library](https://github.com/microsoft/GSL).
   This is not necessary for C++20 and above compilers.
 
 - ability to use Abseil `absl::variant` for Visual Studio 2015

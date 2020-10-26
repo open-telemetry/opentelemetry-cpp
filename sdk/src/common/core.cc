@@ -6,7 +6,7 @@ namespace absl
 {
 namespace variant_internal
 {
-void __cdecl ThrowBadVariantAccess(){ /* TODO: std::terminate or re-throw? */ };
+void __cdecl ThrowBadVariantAccess(){/* TODO: std::terminate or re-throw? */};
 }
 }  // namespace absl
 #endif

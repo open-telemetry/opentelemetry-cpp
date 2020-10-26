@@ -25,7 +25,7 @@ static const opentelemetry::common::KeyValueIterableView<std::array<std::pair<st
 
   return kEmptyAttributes;
 }
-#else 
+#else
 static const opentelemetry::common::NullKeyValueIterable GetEmptyAttributes() noexcept
 {
   return opentelemetry::common::NullKeyValueIterable();

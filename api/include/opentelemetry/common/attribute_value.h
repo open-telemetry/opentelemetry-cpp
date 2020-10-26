@@ -10,26 +10,27 @@
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace common
 {
-using AttributeValue = nostd::variant<bool,
-                                      int32_t,
-                                      int64_t,
-                                      uint32_t,
-                                      uint64_t,
-                                      double,
-                                      nostd::string_view,
-                                      const char *,
+using AttributeValue =
+    nostd::variant<bool,
+                   int32_t,
+                   int64_t,
+                   uint32_t,
+                   uint64_t,
+                   double,
+                   nostd::string_view,
+                   const char *,
 #ifdef HAVE_SPAN_BYTE
-                                      // TODO: 8-bit byte arrays / binary blobs are not part of OT spec yet!
-                                      // Ref: https://github.com/open-telemetry/opentelemetry-specification/issues/780
-                                      nostd::span<const uint8_t>,
+                   // TODO: 8-bit byte arrays / binary blobs are not part of OT spec yet!
+                   // Ref: https://github.com/open-telemetry/opentelemetry-specification/issues/780
+                   nostd::span<const uint8_t>,
 #endif
-                                      nostd::span<const bool>,
-                                      nostd::span<const int32_t>,
-                                      nostd::span<const int64_t>,
-                                      nostd::span<const uint32_t>,
-                                      nostd::span<const uint64_t>,
-                                      nostd::span<const double>,
-                                      nostd::span<const nostd::string_view>>;
+                   nostd::span<const bool>,
+                   nostd::span<const int32_t>,
+                   nostd::span<const int64_t>,
+                   nostd::span<const uint32_t>,
+                   nostd::span<const uint64_t>,
+                   nostd::span<const double>,
+                   nostd::span<const nostd::string_view>>;
 
 enum AttributeType
 {

@@ -14,13 +14,13 @@
 
 #pragma once
 #ifdef HAVE_CPP_STDLIB
-#include "opentelemetry/std/shared_ptr.h"
+#  include "opentelemetry/std/shared_ptr.h"
 #else
-#include <cstdlib>
-#include <memory>
-#include <utility>
+#  include <cstdlib>
+#  include <memory>
+#  include <utility>
 
-#include "opentelemetry/version.h"
+#  include "opentelemetry/version.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace nostd

@@ -29,5 +29,5 @@ using absl::visit;
 }  // namespace nostd
 OPENTELEMETRY_END_NAMESPACE
 #else
-#include "opentelemetry/nostd/mpark/variant.h"
+#  include "opentelemetry/nostd/mpark/variant.h"
 #endif
