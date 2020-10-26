@@ -67,9 +67,10 @@ function build_configuration {
   cd $WORKSPACE_ROOT
   OUTDIR=out/$COMPILER_NAME/$BUILD_CONFIG
   mkdir -p $OUTDIR
-  cmake -B $OUTDIR $BUILD_OPTIONS
-  cd $OUTDIR
+  pushd $OUTDIR
+  cmake $BUILD_OPTIONS $WORKSPACE_ROOT
   make
+  popd
 }
 
 build_configuration nostd '-DWITH_STL:BOOL=OFF'

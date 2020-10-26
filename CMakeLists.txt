@@ -31,8 +31,13 @@ if(WITH_STL)
   # Require at least C++17. C++20 is needed to avoid gsl::span
   add_definitions(-DHAVE_CPP_STDLIB -DHAVE_GSL)
 
-  # Ask for 20, but may get C++17
-  set(CMAKE_CXX_STANDARD 20)
+  if(CMAKE_MINOR_VERSION VERSION_LESS "3.18")
+    # Ask for 20, may get anything below
+    set(CMAKE_CXX_STANDARD 20)
+  else()
+    # Ask for 17, may get anything below
+    set(CMAKE_CXX_STANDARD 17)
+  endif()
 
   # Guidelines Support Library path. Used if we are not on not get C++20.
   #
