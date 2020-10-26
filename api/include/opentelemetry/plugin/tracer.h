@@ -2,6 +2,7 @@
 
 #include <memory>
 
+#include "opentelemetry/common/key_value_iterable.h"
 #include "opentelemetry/plugin/detail/dynamic_library_handle.h"
 #include "opentelemetry/plugin/detail/tracer_handle.h"
 #include "opentelemetry/trace/tracer.h"
@@ -32,7 +33,7 @@ public:
 
   void AddEvent(nostd::string_view name,
                 core::SystemTimestamp timestamp,
-                const trace::KeyValueIterable &attributes) noexcept override
+                const common::KeyValueIterable &attributes) noexcept override
   {
     span_->AddEvent(name, timestamp, attributes);
   }
@@ -50,8 +51,6 @@ public:
 
   trace::SpanContext GetContext() const noexcept override { return span_->GetContext(); }
 
-  void SetToken(nostd::unique_ptr<context::Token> &&token) noexcept override {}
-
 private:
   std::shared_ptr<trace::Tracer> tracer_;
   nostd::shared_ptr<trace::Span> span_;
@@ -68,7 +67,7 @@ public:
   // trace::Tracer
   nostd::shared_ptr<trace::Span> StartSpan(
       nostd::string_view name,
-      const trace::KeyValueIterable &attributes,
+      const common::KeyValueIterable &attributes,
       const trace::StartSpanOptions &options = {}) noexcept override
   {
     auto span = tracer_handle_->tracer().StartSpan(name, attributes, options);

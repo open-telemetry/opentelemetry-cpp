@@ -85,7 +85,7 @@ private:
         {
           auto vec    = agg->get_checkpoint();
           size_t size = vec.size();
-          int i       = 1;
+          size_t i    = 1;
 
           sout_ << "\n  values      : " << '[';
 
@@ -110,7 +110,7 @@ private:
 
         sout_ << "\n  buckets     : " << '[';
 
-        for (int i = 0; i < boundaries_size; i++)
+        for (size_t i = 0; i < boundaries_size; i++)
         {
           sout_ << boundaries[i];
 
@@ -120,7 +120,7 @@ private:
         sout_ << ']';
 
         sout_ << "\n  counts      : " << '[';
-        for (int i = 0; i < counts_size; i++)
+        for (size_t i = 0; i < counts_size; i++)
         {
           sout_ << counts[i];
 
@@ -140,7 +140,7 @@ private:
 
         sout_ << "\n  buckets     : " << '[';
 
-        for (int i = 0; i < boundaries_size; i++)
+        for (size_t i = 0; i < boundaries_size; i++)
         {
           sout_ << boundaries[i];
 
@@ -150,7 +150,7 @@ private:
         sout_ << ']';
 
         sout_ << "\n  counts      : " << '[';
-        for (int i = 0; i < counts_size; i++)
+        for (size_t i = 0; i < counts_size; i++)
         {
           sout_ << counts[i];
 

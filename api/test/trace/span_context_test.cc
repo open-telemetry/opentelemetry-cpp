@@ -42,7 +42,7 @@ TEST(SpanContextTest, TraceFlags)
 // Test that SpanContext is invalid
 TEST(SpanContextTest, Invalid)
 {
-  SpanContext s1(false, false);
+  SpanContext s1 = SpanContext::GetInvalid();
   EXPECT_FALSE(s1.IsValid());
 
   // Test that trace id and span id are invalid

@@ -4,6 +4,7 @@
 // This file is part of the internal implementation of OpenTelemetry. Nothing in this file should be
 // used directly. Please refer to span.h and tracer.h for documentation on these interfaces.
 
+#include "opentelemetry/context/runtime_context.h"
 #include "opentelemetry/nostd/string_view.h"
 #include "opentelemetry/nostd/unique_ptr.h"
 #include "opentelemetry/trace/span.h"
@@ -23,7 +24,9 @@ namespace trace
 class NoopSpan final : public Span
 {
 public:
-  explicit NoopSpan(const std::shared_ptr<Tracer> &tracer) noexcept : tracer_{tracer} {}
+  explicit NoopSpan(const std::shared_ptr<Tracer> &tracer) noexcept
+      : tracer_{tracer}, span_context_{SpanContext::GetInvalid()}
+  {}
 
   void SetAttribute(nostd::string_view /*key*/,
                     const common::AttributeValue & /*value*/) noexcept override
@@ -36,7 +39,7 @@ public:
 
   void AddEvent(nostd::string_view /*name*/,
                 core::SystemTimestamp /*timestamp*/,
-                const trace::KeyValueIterable & /*attributes*/) noexcept override
+                const common::KeyValueIterable & /*attributes*/) noexcept override
   {}
 
   void SetStatus(CanonicalCode /*code*/, nostd::string_view /*description*/) noexcept override {}
@@ -48,8 +51,6 @@ public:
   bool IsRecording() const noexcept override { return false; }
 
   SpanContext GetContext() const noexcept override { return span_context_; }
-
-  void SetToken(nostd::unique_ptr<context::Token> && /* token */) noexcept override {}
 
 private:
   std::shared_ptr<Tracer> tracer_;
@@ -64,10 +65,15 @@ class NoopTracer final : public Tracer, public std::enable_shared_from_this<Noop
 public:
   // Tracer
   nostd::shared_ptr<Span> StartSpan(nostd::string_view /*name*/,
-                                    const KeyValueIterable & /*attributes*/,
+                                    const common::KeyValueIterable & /*attributes*/,
                                     const StartSpanOptions & /*options*/) noexcept override
   {
-    return nostd::shared_ptr<Span>{new (std::nothrow) NoopSpan{this->shared_from_this()}};
+    // Don't allocate a no-op span for every StartSpan call, but use a static
+    // singleton for this case.
+    static nostd::shared_ptr<trace_api::Span> noop_span(
+        new trace_api::NoopSpan{this->shared_from_this()});
+
+    return noop_span;
   }
 
   void ForceFlushWithMicroseconds(uint64_t /*timeout*/) noexcept override {}

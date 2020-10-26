@@ -1,11 +1,11 @@
 #pragma once
 
 #include "opentelemetry/common/attribute_value.h"
+#include "opentelemetry/common/key_value_iterable.h"
 #include "opentelemetry/core/timestamp.h"
 #include "opentelemetry/nostd/string_view.h"
 #include "opentelemetry/sdk/common/empty_attributes.h"
 #include "opentelemetry/trace/canonical_code.h"
-#include "opentelemetry/trace/key_value_iterable.h"
 #include "opentelemetry/trace/span_context.h"
 #include "opentelemetry/trace/span_id.h"
 #include "opentelemetry/trace/trace_id.h"
@@ -13,10 +13,11 @@
 
 #include <map>
 
+// TODO: Create generic short pattern for opentelemetry::common and opentelemetry::trace
+
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace sdk
 {
-namespace trace_api = opentelemetry::trace;
 namespace trace
 {
 /**
@@ -55,7 +56,7 @@ public:
    */
   virtual void AddEvent(nostd::string_view name,
                         core::SystemTimestamp timestamp,
-                        const trace_api::KeyValueIterable &attributes) noexcept = 0;
+                        const opentelemetry::common::KeyValueIterable &attributes) noexcept = 0;
 
   /**
    * Add an event to a span with default timestamp and attributes.
@@ -64,7 +65,7 @@ public:
   void AddEvent(nostd::string_view name)
   {
     AddEvent(name, core::SystemTimestamp(std::chrono::system_clock::now()),
-             trace_api::NullKeyValueIterable());
+             opentelemetry::sdk::GetEmptyAttributes());
   }
 
   /**
@@ -74,7 +75,7 @@ public:
    */
   void AddEvent(nostd::string_view name, core::SystemTimestamp timestamp)
   {
-    AddEvent(name, timestamp, trace_api::NullKeyValueIterable());
+    AddEvent(name, timestamp, opentelemetry::sdk::GetEmptyAttributes());
   }
 
   /**
@@ -83,7 +84,7 @@ public:
    * @param attributes the attributes associated with the link
    */
   virtual void AddLink(opentelemetry::trace::SpanContext span_context,
-                       const trace_api::KeyValueIterable &attributes) noexcept = 0;
+                       const opentelemetry::common::KeyValueIterable &attributes) noexcept = 0;
 
   /**
    * Add a link to a span with default (empty) attributes.
@@ -91,7 +92,7 @@ public:
    */
   void AddLink(opentelemetry::trace::SpanContext span_context)
   {
-    AddLink(span_context, trace_api::NullKeyValueIterable());
+    AddLink(span_context, opentelemetry::sdk::GetEmptyAttributes());
   }
 
   /**
@@ -99,7 +100,7 @@ public:
    * @param code the status code
    * @param description a description of the status
    */
-  virtual void SetStatus(trace_api::CanonicalCode code,
+  virtual void SetStatus(opentelemetry::trace::CanonicalCode code,
                          nostd::string_view description) noexcept = 0;
 
   /**

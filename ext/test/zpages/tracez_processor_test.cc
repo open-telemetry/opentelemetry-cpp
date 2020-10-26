@@ -53,10 +53,9 @@ bool ContainsNames(const std::vector<std::string> &names,
                    bool one_to_one_correspondence = false)
 {
   if (name_end == 0)
-    name_end =
-        names.size();  // FIXME: Warning C4267 '=' : conversion from 'size_t' to 'unsigned int'
+    name_end = names.size();
 
-  unsigned int num_names = name_end - name_start;
+  size_t num_names = name_end - name_start;
 
   if (num_names > running.size() ||  // More names than spans, can't have all names
       (one_to_one_correspondence && num_names != running.size()))
@@ -103,8 +102,7 @@ bool ContainsNames(const std::vector<std::string> &names,
 {
 
   if (name_end == 0)
-    name_end =
-        names.size();  // FIXME: Warning C4267 '=' : conversion from 'size_t' to 'unsigned int
+    name_end = names.size();
 
   size_t num_names = name_end - name_start;
 

@@ -1,4 +1,4 @@
-#include "opentelemetry/trace/key_value_iterable_view.h"
+#include "opentelemetry/common/key_value_iterable_view.h"
 
 #include <array>
 #include <map>
@@ -9,9 +9,27 @@ OPENTELEMETRY_BEGIN_NAMESPACE
 namespace sdk
 {
 
-static const opentelemetry::trace::NullKeyValueIterable GetEmptyAttributes() noexcept
+#if 0
+/**
+ * Maintain a static empty array of pairs that represents empty (default) attributes.
+ * This helps to avoid constructing a new empty container every time a call is made
+ * with default attributes.
+ */
+static const opentelemetry::common::KeyValueIterableView<std::array<std::pair<std::string, int>, 0>>
+    &GetEmptyAttributes() noexcept
 {
-  return opentelemetry::trace::NullKeyValueIterable();
+  static const std::array<std::pair<std::string, int>, 0> array{};
+  static const opentelemetry::common::KeyValueIterableView<
+      std::array<std::pair<std::string, int>, 0>>
+      kEmptyAttributes(array);
+
+  return kEmptyAttributes;
 }
+#else 
+static const opentelemetry::common::NullKeyValueIterable GetEmptyAttributes() noexcept
+{
+  return opentelemetry::common::NullKeyValueIterable();
+}
+#endif
 }  // namespace sdk
 OPENTELEMETRY_END_NAMESPACE

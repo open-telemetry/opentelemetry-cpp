@@ -4,7 +4,7 @@
 #include <unordered_map>
 #include <vector>
 #include "opentelemetry/common/attribute_value.h"
-#include "opentelemetry/trace/key_value_iterable_view.h"
+#include "opentelemetry/common/key_value_iterable_view.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace sdk
@@ -99,7 +99,7 @@ public:
   AttributeMap(){};
 
   // Contruct attribute map and populate with attributes
-  AttributeMap(const opentelemetry::trace::KeyValueIterable &attributes)
+  AttributeMap(const opentelemetry::common::KeyValueIterable &attributes)
   {
     attributes.ForEachKeyValue([&](nostd::string_view key,
                                    opentelemetry::common::AttributeValue value) noexcept {

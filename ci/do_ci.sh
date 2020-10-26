@@ -30,6 +30,16 @@ elif [[ "$1" == "cmake.c++20.test" ]]; then
   make
   make test
   exit 0
+elif [[ "$1" == "cmake.legacy.test" ]]; then
+  cd "${BUILD_DIR}"
+  rm -rf *
+  cmake -DCMAKE_BUILD_TYPE=Debug  \
+        -DCMAKE_CXX_FLAGS="-Werror" \
+        -DCMAKE_CXX_STANDARD=11 \
+        "${SRC_DIR}"
+  make
+  make test
+  exit 0
 elif [[ "$1" == "cmake.exporter.otprotocol.test" ]]; then
   cd "${BUILD_DIR}"
   rm -rf *
@@ -125,7 +135,7 @@ elif [[ "$1" == "bazel.tsan" ]]; then
   exit 0
 elif [[ "$1" == "bazel.valgrind" ]]; then
   bazel build $BAZEL_OPTIONS //...
-  bazel test --run_under="/usr/bin/valgrind --leak-check=full --error-exitcode=1" $BAZEL_TEST_OPTIONS //...
+  bazel test --run_under="/usr/bin/valgrind --leak-check=full --error-exitcode=1 --suppressions=\"${SRC_DIR}/ci/valgrind-suppressions\"" $BAZEL_TEST_OPTIONS //...
   exit 0
 elif [[ "$1" == "benchmark" ]]; then
   [ -z "${BENCHMARK_DIR}" ] && export BENCHMARK_DIR=$HOME/benchmark

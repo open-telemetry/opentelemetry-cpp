@@ -1,4 +1,3 @@
-#include "opentelemetry/context/runtime_context.h"
 #include "opentelemetry/nostd/variant.h"
 #include "opentelemetry/version.h"
 
@@ -7,16 +6,7 @@ namespace absl
 {
 namespace variant_internal
 {
-void __cdecl ThrowBadVariantAccess(){};
+void __cdecl ThrowBadVariantAccess(){ /* TODO: std::terminate or re-throw? */ };
 }
 }  // namespace absl
 #endif
-
-OPENTELEMETRY_BEGIN_NAMESPACE
-namespace context
-{
-
-thread_local ThreadLocalContext::Stack ThreadLocalContext::stack_ = ThreadLocalContext::Stack();
-
-}  // namespace context
-OPENTELEMETRY_END_NAMESPACE

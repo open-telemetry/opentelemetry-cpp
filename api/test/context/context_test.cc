@@ -78,14 +78,19 @@ TEST(ContextTest, ContextInheritance)
 {
   using M = std::map<std::string, context::ContextValue>;
 
-  M m1 = {{"test_key", (int64_t)123}, {"foo_key", (int64_t)456}};
-  M m2 = {{"other_key", (int64_t)789}};
+  M m1 = {{"test_key", (int64_t)123}, {"foo_key", (int64_t)321}};
+  M m2 = {{"other_key", (int64_t)789}, {"another_key", (int64_t)987}};
 
   context::Context test_context = context::Context(m1);
   context::Context foo_context  = test_context.SetValues(m2);
 
   EXPECT_EQ(nostd::get<int64_t>(foo_context.GetValue("test_key")), 123);
-  EXPECT_EQ(nostd::get<int64_t>(foo_context.GetValue("foo_key")), 456);
+  EXPECT_EQ(nostd::get<int64_t>(foo_context.GetValue("foo_key")), 321);
+  EXPECT_EQ(nostd::get<int64_t>(foo_context.GetValue("other_key")), 789);
+  EXPECT_EQ(nostd::get<int64_t>(foo_context.GetValue("another_key")), 987);
+
+  EXPECT_EQ(nostd::get<int64_t>(test_context.GetValue("other_key")), 0);
+  EXPECT_EQ(nostd::get<int64_t>(test_context.GetValue("another_key")), 0);
 }
 
 // Tests that copying a context copies the key value pairs as expected.

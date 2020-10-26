@@ -12,6 +12,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
+      with:
+        submodules: 'true'
     - name: setup
       run: |
         sudo ./ci/setup_cmake.sh
@@ -21,11 +23,33 @@ jobs:
     - name: run prometheus exporter tests
       run: ./ci/do_ci.sh cmake.exporter.prometheus.test
 
+  cmake_gcc_48_test:
+    name: CMake gcc 4.8
+    runs-on: ubuntu-18.04
+    steps:
+    - uses: actions/checkout@v2
+      with:
+        submodules: 'true'
+    - name: setup
+      run: |
+        sudo ./ci/setup_ci_environment.sh
+        sudo ./ci/install_gcc48.sh
+    - name: setup cmake
+      run: |
+        sudo CC=/usr/bin/gcc-4.8 CXX=/usr/bin/g++-4.8 ./ci/setup_cmake.sh
+    - name: run tests
+      run: ./ci/do_ci.sh cmake.legacy.test
+      env:
+        CC: /usr/bin/gcc-4.8
+        CXX: /usr/bin/g++-4.8
+
   cmake_test_cxx20:
     name: CMake C++20 test
     runs-on: ubuntu-20.04
     steps:
     - uses: actions/checkout@v2
+      with:
+        submodules: 'true'
     - name: setup
       run: |
         sudo ./ci/setup_ci_environment.sh
@@ -33,11 +57,73 @@ jobs:
     - name: run tests
       run: ./ci/do_ci.sh cmake.c++20.test
 
+  cmake_posix:
+    name: Build on ${{ matrix.os }} ${{ matrix.config }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        config: [release]
+        os: [ubuntu-18.04, ubuntu-20.04, macos-latest]
+    steps:
+    - uses: actions/checkout@v2
+      with:
+        submodules: 'true'
+    - name: build
+      run: tools/build.sh ${{ matrix.config }}
+
+  # TODO #1: add vs2015
+  # TODO #2: consolidate cmake_[vs2015|vs2017|vs2019] into one matrix build
+  cmake_windows_vs2017:
+    name: Build on Windows ${{ matrix.arch }}-${{ matrix.config }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        arch: [x64]
+        config: [release]
+        os: [windows-2016]
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v2
+      with:
+        submodules: 'true'
+    - name: Setup build tools
+      run: |
+        cd "$Env:GITHUB_WORKSPACE"
+        .\tools\setup-buildtools.cmd
+    - name: Build
+      run: |
+        cd "$Env:GITHUB_WORKSPACE"
+        .\tools\build-vs2017.cmd ${{ matrix.config }}
+
+  cmake_windows_vs2019:
+    name: Build on Windows ${{ matrix.arch }}-${{ matrix.config }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        arch: [x64]
+        config: [release]
+        os: [windows-2019]
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v2
+      with:
+        submodules: 'true'
+    - name: Setup build tools
+      run: |
+        cd "$Env:GITHUB_WORKSPACE"
+        .\tools\setup-buildtools.cmd
+    - name: Build
+      run: |
+        cd "$Env:GITHUB_WORKSPACE"
+        .\tools\build-vs2017.cmd ${{ matrix.config }}
+
   plugin_test:
     name: Plugin -> CMake
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
+      with:
+        submodules: 'true'
     - name: setup
       run: |
         sudo ./ci/setup_cmake.sh
@@ -125,11 +211,21 @@ jobs:
     - name: run tests
       run: ./ci/do_ci.sh bazel.tsan
 
+  bazel_osx:
+    name: Bazel on MacOS
+    runs-on: macos-latest
+    steps:
+    - uses: actions/checkout@v2
+    - name: run tests
+      run: ./ci/do_ci.sh bazel.test
+
   benchmark:
     name: Benchmark
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
+      with:
+        submodules: 'true'
     - name: setup
       run: |
         sudo ./ci/setup_cmake.sh
@@ -155,19 +251,13 @@ jobs:
     - name: run tests
       run: ./ci/do_ci.sh format
 
-  osx_test:
-    name: Bazel on MacOS
-    runs-on: macos-latest
-    steps:
-    - uses: actions/checkout@v2
-    - name: run tests
-      run: ./ci/do_ci.sh bazel.test
-
   windows:
     name: CMake -> exporter proto
     runs-on: windows-2019
     steps:
     - uses: actions/checkout@v2
+      with:
+        submodules: 'true'
     - name: setup
       run: |
         ./ci/setup_windows_cmake.ps1
@@ -193,6 +283,8 @@ jobs:
     runs-on: windows-2019
     steps:
     - uses: actions/checkout@v2
+      with:
+        submodules: 'true'
     - name: setup
       run: |
         ./ci/setup_windows_cmake.ps1
@@ -215,3 +307,14 @@ jobs:
       uses: codecov/codecov-action@v1
       with:
         file: /home/runner/build/coverage.info
+
+  docfx_check:
+    name: DocFX check
+    runs-on: windows-latest
+    steps:
+    - uses: actions/checkout@v2
+    - name: install docfx
+      run: choco install docfx -y
+    - name: run ./ci/docfx.cmd
+      shell: cmd
+      run: ./ci/docfx.cmd

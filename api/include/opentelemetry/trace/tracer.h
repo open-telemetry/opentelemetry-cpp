@@ -3,6 +3,8 @@
 #include "opentelemetry/nostd/shared_ptr.h"
 #include "opentelemetry/nostd/string_view.h"
 #include "opentelemetry/nostd/unique_ptr.h"
+#include "opentelemetry/trace/default_span.h"
+#include "opentelemetry/trace/scope.h"
 #include "opentelemetry/trace/span.h"
 #include "opentelemetry/version.h"
 
@@ -30,7 +32,7 @@ public:
    * key will be overwritten.
    */
   virtual nostd::shared_ptr<Span> StartSpan(nostd::string_view name,
-                                            const KeyValueIterable &attributes,
+                                            const common::KeyValueIterable &attributes,
                                             const StartSpanOptions &options = {}) noexcept = 0;
 
   nostd::shared_ptr<Span> StartSpan(nostd::string_view name,
@@ -39,12 +41,13 @@ public:
     return this->StartSpan(name, {}, options);
   }
 
-  template <class T, nostd::enable_if_t<detail::is_key_value_iterable<T>::value> * = nullptr>
+  template <class T,
+            nostd::enable_if_t<common::detail::is_key_value_iterable<T>::value> * = nullptr>
   nostd::shared_ptr<Span> StartSpan(nostd::string_view name,
                                     const T &attributes,
                                     const StartSpanOptions &options = {}) noexcept
   {
-    return this->StartSpan(name, KeyValueIterableView<T>(attributes), options);
+    return this->StartSpan(name, common::KeyValueIterableView<T>(attributes), options);
   }
 
   nostd::shared_ptr<Span> StartSpan(
@@ -56,6 +59,35 @@ public:
                            nostd::span<const std::pair<nostd::string_view, common::AttributeValue>>{
                                attributes.begin(), attributes.end()},
                            options);
+  }
+
+  /**
+   * Set the active span. The span will remain active until the returned Scope
+   * object is destroyed.
+   * @param span the span that should be set as the new active span.
+   * @return a Scope that controls how long the span will be active.
+   */
+  nostd::unique_ptr<Scope> WithActiveSpan(nostd::shared_ptr<Span> &span) noexcept
+  {
+    return nostd::unique_ptr<Scope>(new Scope{span});
+  }
+
+  /**
+   * Get the currently active span.
+   * @return the currently active span, or an invalid default span if no span
+   * is active.
+   */
+  nostd::shared_ptr<Span> GetCurrentSpan() noexcept
+  {
+    context::ContextValue active_span = context::RuntimeContext::GetValue(SpanKey);
+    if (nostd::holds_alternative<nostd::shared_ptr<Span>>(active_span))
+    {
+      return nostd::get<nostd::shared_ptr<Span>>(active_span);
+    }
+    else
+    {
+      return nostd::shared_ptr<Span>(new DefaultSpan(SpanContext::GetInvalid()));
+    }
   }
 
   /**
@@ -80,12 +112,6 @@ public:
   {
     this->CloseWithMicroseconds(
         static_cast<uint64_t>(std::chrono::duration_cast<std::chrono::microseconds>(timeout)));
-  }
-
-  void Close() noexcept
-  {
-    /* TODO: respect timeout from TracerOptions? */
-    CloseWithMicroseconds(0);
   }
 
   virtual void CloseWithMicroseconds(uint64_t timeout) noexcept = 0;
