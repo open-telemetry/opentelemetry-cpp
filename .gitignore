@@ -34,3 +34,9 @@
 
 # Bazel files
 /bazel-*
+
+# Output directories
+/out
+/out.*
+# Indicator that the tools were deployed
+.buildtools
