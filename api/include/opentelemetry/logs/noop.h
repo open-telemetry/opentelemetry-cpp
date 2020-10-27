@@ -20,14 +20,14 @@
 // This file is part of the internal implementation of OpenTelemetry. Nothing in this file should be
 // used directly. Please refer to logger.h for documentation on these interfaces.
 
+#include <memory>
+
 #include "opentelemetry/context/runtime_context.h"
 #include "opentelemetry/logs/logger.h"
 #include "opentelemetry/logs/logger_provider.h"
 #include "opentelemetry/nostd/string_view.h"
 #include "opentelemetry/nostd/unique_ptr.h"
 #include "opentelemetry/version.h"
-
-#include <memory>
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace logs
@@ -40,9 +40,6 @@ class NoopLogger final : public Logger
 {
 public:
   NoopLogger() = default;
-
-  // returns the name of the logger
-  nostd::string_view getName() noexcept override { return "NOOP Logger"; }
 
   void log(const LogRecord &record) noexcept override {}
 };

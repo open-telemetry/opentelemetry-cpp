@@ -39,21 +39,21 @@ public:
   virtual ~Logger() = default;
 
   /* Returns the name of the logger */
-  virtual nostd::string_view getName() = 0;
+  // TODO: decide whether this is useful and/or should be kept, as this is not a method required in the specification.
+  // virtual nostd::string_view getName() = 0;
 
   /**
-   * Creates a log message with the passed characteristics.
+   * Each of the following overloaded log(...) methods 
+   * creates a log message with the specific parameters passed. 
    *
    * @param name the name of the log event.
-   * @param sev the severity level of the log event.
-   * @param msg the string message of the log (perhaps support std::fmt or fmt-lib format).
+   * @param severity the severity level of the log event.
+   * @param message the string message of the log (perhaps support std::fmt or fmt-lib format).
    * @param record the log record (object type LogRecord) that is logged.
    * @param attributes the attributes, stored as a 2D list of key/value pairs, that are associated
    * with this log.
    * @throws No exceptions under any circumstances.
    */
-
-  // Log issue about macros (disabling log events below certain level)
 
   /* The below method is a logging statement that takes in a LogRecord.
    * A default LogRecord that will be assigned if no parameters are passed to Logger's .log() method
@@ -61,52 +61,72 @@ public:
    */
   virtual void log(const LogRecord &record) noexcept = 0;
 
-  // First, finalize core,
-  // Afterwards, come back and add overloads
 
   /** Overloaded methods for unstructured logging **/
-  void log(nostd::string_view msg) noexcept
+  void log(nostd::string_view message) noexcept
   {
-    log(Severity::kNone, msg);  // Set severity to NONE as default then call the log method below
+    // TODO: move this log method to the SDK? since it needs to call an SDK method "isEnabled(Severity)"
+
+    // if(isEnabled(Severity::kDefault)){
+    //   return;
+    // }
+
+    // Set severity to the default then call log(Severity, String message) method 
+    log(Severity::kDefault, message);  
   }
 
-  void log(Severity sev, nostd::string_view msg) noexcept
-  {
-    // Set timestamp to now as default then call the log method below
-    log(sev, msg, core::SystemTimestamp(std::chrono::system_clock::now()));
+  void log(Severity severity, nostd::string_view message) noexcept
+  {    
+    // TODO: move this log method to the SDK? since it needs to call an SDK method "isEnabled(Severity)"
+    // if(isEnabled(Severity::kDefault)){
+    //   return;
+    // }  
+    
+    // TODO: set default timestamp later (not in API)
+    log(severity, message, core::SystemTimestamp(std::chrono::system_clock::now()));
   }
 
-  void log(Severity sev, nostd::string_view msg, core::SystemTimestamp time) noexcept
+  void log(Severity severity, nostd::string_view message, core::SystemTimestamp time) noexcept
   {
+    // TODO: move this log method to the SDK? since it needs to call an SDK method "isEnabled(Severity)"
+    // if(isEnabled(Severity::kDefault)){
+    //   return;
+    // }  
+
+     // creates a LogRecord object with given parameters, then calls log(LogRecord)
     LogRecord r;
-    r.body      = msg;
-    r.severity  = sev;
+    r.severity  = severity;
+    r.body      = message;
     r.timestamp = time;
 
-    log(r);  // converts to a LogRecord object, then calls log(LogRecord)
+    log(r); 
   }
 
   /** Overloaded methods for structured logging**/
+  // TODO: separate this method into separate methods since it is not useful for user to create empty logs 
   template <class T,
             nostd::enable_if_t<common::detail::is_key_value_iterable<T>::value> * = nullptr>
-  void log(nostd::string_view name = "",
-           Severity sev            = Severity::kNone,
+  void log(Severity severity = Severity::kDefault,
+           nostd::string_view name = "",
            const T &attributes     = {}) noexcept
   {
-    log(name, sev, common::KeyValueIterableView<T>(attributes));
+    log(severity, name, common::KeyValueIterableView<T>(attributes));
   }
 
-  void log(nostd::string_view name,
-           Severity sev,
+  void log(Severity severity,
+           nostd::string_view name,
            const common::KeyValueIterable &attributes) noexcept
   {
+    // creates a LogRecord object with given parameters, then calls log(LogRecord)
     LogRecord r;
+    r.severity   = severity;
     r.name       = name;
-    r.severity   = sev;
     r.attributes = attributes;
 
-    log(r);  // converts to a LogRecord object, then calls log(LogRecord)
+    log(r); 
   }
+
+  // TODO: add function aliases such as void debug(), void trace(), void info(), etc. for each severity level 
 
   /** Future enhancement: templated method for objects / custom types (e.g. JSON, XML, custom
    * classes, etc) **/

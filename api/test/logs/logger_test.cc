@@ -26,8 +26,8 @@ TEST(Logger, GetNoopLoggerName)
 {
   auto lp          = Provider::GetLoggerProvider();
   auto logger      = lp->GetLogger("TestLogger");
-  string_view name = logger->getName();
-  EXPECT_EQ("NOOP Logger", name);
+  // string_view name = logger->getName();
+  // EXPECT_EQ("NOOP Logger", name);
 }
 
 TEST(Logger, GetNoopLoggerNameWithArgs)
@@ -39,8 +39,8 @@ TEST(Logger, GetNoopLoggerNameWithArgs)
   auto logger = lp->GetLogger("NoopLoggerWithArgs", args);
   // should probably also test that arguments were set properly too
   // by adding a getArgs() method in NoopLogger
-  string_view name = logger->getName();
-  EXPECT_EQ("NOOP Logger", name);
+  // string_view name = logger->getName();
+  // EXPECT_EQ("NOOP Logger", name);
 }
 
 TEST(Logger, NoopLog)
@@ -56,14 +56,6 @@ TEST(Logger, NoopLog)
 class TestLogger : public Logger
 {
   void log(const LogRecord &record) noexcept override {}
-
-  // returns the name of the logger
-  string_view getName() noexcept override
-  {
-    log(LogRecord{});  // ensure code coverage for the above method. the log() method is already
-                       // tested in NoopLogger tests.
-    return "My custom implementation";
-  }
 };
 
 // Define a basic LoggerProvider class that returns an instance of the logger class defined above
@@ -90,13 +82,13 @@ TEST(Logger, PushLoggerImplementation)
 
   // GetLogger(name, options) function
   auto logger      = lp->GetLogger("TestLogger");
-  string_view name = logger->getName();
-  EXPECT_EQ("My custom implementation", name);
+  // string_view name = logger->getName();
+  // EXPECT_EQ("My custom implementation", name);
 
   // GetLogger(name, args) function
   std::array<string_view, 1> sv{"string"};
   span<string_view> args{sv};
   auto logger2      = lp->GetLogger("TestLogger2", args);
-  string_view name2 = logger2->getName();
-  EXPECT_EQ("My custom implementation", name);
+  // string_view name2 = logger2->getName();
+  // EXPECT_EQ("My custom implementation", name);
 }

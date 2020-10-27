@@ -38,7 +38,6 @@ namespace logs
  */
 enum class Severity : uint8_t
 {
-  kNone   = 0,  // default Severity; added, not part of Log Data Model
   kTrace  = 1,
   kTrace2 = 2,
   kTrace3 = 3,
@@ -62,7 +61,8 @@ enum class Severity : uint8_t
   kFatal  = 21,
   kFatal2 = 22,
   kFatal3 = 23,
-  kFatal4 = 24
+  kFatal4 = 24,
+  kDefault = kInfo // default severity is set to kInfo level, similar to what is done in ILogger 
 };
 
 /* _nullKV is defined as a private variable that allows "resource" and
@@ -93,12 +93,12 @@ struct LogRecord
   common::KeyValueIterable &attributes;  // key/value pair list
 
   /* Default log record if user does not overwrite this.
-   *  TODO: find better data type for "body" field
+   *  TODO: find better data type for "body" field to represent the <Any> type (specified by Log Data Model )
    *  Future enhancement: Potentially add other constructors to take default arguments from the user
    **/
   LogRecord() : resource(_nullKV), attributes(_nullKV)
   {
-    timestamp = core::SystemTimestamp(std::chrono::system_clock::now());
+    // TODO : in SDK, assign a default timestamp if not specified
     name      = "";
   }
 
