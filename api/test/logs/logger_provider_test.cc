@@ -4,6 +4,7 @@
 #include "opentelemetry/nostd/string_view.h"
 
 #include <gtest/gtest.h>
+#include <array>
 
 using opentelemetry::logs::Logger;
 using opentelemetry::logs::LoggerProvider;
@@ -46,4 +47,19 @@ TEST(Provider, MultipleLoggerProviders)
   Provider::SetLoggerProvider(tf2);
 
   ASSERT_NE(Provider::GetLoggerProvider(), tf);
+}
+
+TEST(Provider, GetLogger)
+{
+  auto tf = shared_ptr<LoggerProvider>(new TestProvider());
+  // tests GetLogger(name, options)
+  auto logger = tf->GetLogger("logger1");
+  EXPECT_EQ(nullptr, logger);
+
+  // tests GetLogger(name, arguments)
+
+  std::array<string_view, 1> sv{"string"};
+  span<string_view> args{sv};
+  auto logger2 = tf->GetLogger("logger2", args);
+  EXPECT_EQ(nullptr, logger2);
 }

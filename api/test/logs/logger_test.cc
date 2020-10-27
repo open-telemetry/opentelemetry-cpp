@@ -3,6 +3,7 @@
 #include "opentelemetry/nostd/shared_ptr.h"
 
 #include <gtest/gtest.h>
+#include <array>
 
 using opentelemetry::common::KeyValueIterable;
 using opentelemetry::logs::Logger;
@@ -28,16 +29,41 @@ TEST(Logger, GetNoopLoggerName)
   string_view name = logger->getName();
   EXPECT_EQ("NOOP Logger", name);
 }
-/* TODO: add more tests */
+
+TEST(Logger, GetNoopLoggerNameWithArgs)
+{
+  auto lp = Provider::GetLoggerProvider();
+
+  std::array<string_view, 1> sv{"string"};
+  span<string_view> args{sv};
+  auto logger = lp->GetLogger("NoopLoggerWithArgs", args);
+  // should probably also test that arguments were set properly too
+  // by adding a getArgs() method in NoopLogger
+  string_view name = logger->getName();
+  EXPECT_EQ("NOOP Logger", name);
+}
+
+TEST(Logger, NoopLog)
+{
+  auto lp     = Provider::GetLoggerProvider();
+  auto logger = lp->GetLogger("TestLogger");
+  LogRecord r;
+  r.name = "Noop log name";
+  logger->log(r);
+}
 
 // Define a basic Logger class
 class TestLogger : public Logger
 {
-  // returns the name of the logger
-  string_view getName() noexcept override { return "My custom implementation"; }
-
-  // structured logging
   void log(const LogRecord &record) noexcept override {}
+
+  // returns the name of the logger
+  string_view getName() noexcept override
+  {
+    log(LogRecord{});  // ensure code coverage for the above method. the log() method is already
+                       // tested in NoopLogger tests.
+    return "My custom implementation";
+  }
 };
 
 // Define a basic LoggerProvider class that returns an instance of the logger class defined above
@@ -60,8 +86,17 @@ TEST(Logger, PushLoggerImplementation)
   auto test_provider = shared_ptr<LoggerProvider>(new TestProvider());
   Provider::SetLoggerProvider(test_provider);
 
-  auto lp          = Provider::GetLoggerProvider();
+  auto lp = Provider::GetLoggerProvider();
+
+  // GetLogger(name, options) function
   auto logger      = lp->GetLogger("TestLogger");
   string_view name = logger->getName();
+  EXPECT_EQ("My custom implementation", name);
+
+  // GetLogger(name, args) function
+  std::array<string_view, 1> sv{"string"};
+  span<string_view> args{sv};
+  auto logger2      = lp->GetLogger("TestLogger2", args);
+  string_view name2 = logger2->getName();
   EXPECT_EQ("My custom implementation", name);
 }
