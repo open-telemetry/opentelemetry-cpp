@@ -20,7 +20,7 @@
 #include <map>
 #include <vector>
 
-#include "opentelemetry/common/key_value_iterable.h"  // fix after moving to "common"
+#include "opentelemetry/common/key_value_iterable.h" 
 #include "opentelemetry/logs/log_record.h"
 #include "opentelemetry/nostd/shared_ptr.h"
 #include "opentelemetry/nostd/span.h"

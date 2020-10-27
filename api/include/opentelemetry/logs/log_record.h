@@ -20,7 +20,6 @@
 #include <unordered_map>
 #include "opentelemetry/common/key_value_iterable_view.h"
 #include "opentelemetry/core/timestamp.h"
-#include "opentelemetry/logs/logger.h"
 #include "opentelemetry/nostd/shared_ptr.h"
 #include "opentelemetry/nostd/string_view.h"
 #include "opentelemetry/trace/span_id.h"
@@ -87,7 +86,7 @@ struct LogRecord
   Severity severity;  // Severity enum that combines severity_text and severity_number in the
                       // LogDataModel (can separate in SDK)
 
-  // other fields
+  // other fields that will not be set by default
   nostd::string_view name;  // string
   nostd::string_view body;  // currently a simple string, but should be changed "Any" type
   common::KeyValueIterable &resource;    // key/value pair list
@@ -103,8 +102,8 @@ struct LogRecord
     name      = "";
   }
 
-  /* for ease of use, user can use this function to convert a map into a KeyValueIterable for the
-   * resources */
+  /* for ease of use; user can use this function to convert a map into a KeyValueIterable for the
+   * resources field */
   template <class T,
             nostd::enable_if_t<common::detail::is_key_value_iterable<T>::value> * = nullptr>
   inline void SetResource(const T &_resource)
@@ -112,8 +111,8 @@ struct LogRecord
     resource = common::KeyValueIterableView<T>(_resource);
   }
 
-  /* for ease of use, user to use this function to convert a map into a KeyValueIterable for the
-   * attributes */
+  /* for ease of use; user can use this function to convert a map into a KeyValueIterable for the
+   * attributes field */
   template <class T,
             nostd::enable_if_t<common::detail::is_key_value_iterable<T>::value> * = nullptr>
   inline void SetAttributes(const T &_attributes)
