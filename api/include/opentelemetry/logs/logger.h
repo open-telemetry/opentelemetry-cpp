@@ -62,37 +62,22 @@ public:
   virtual void log(const LogRecord &record) noexcept = 0;
 
   /** Overloaded methods for unstructured logging **/
-  void log(nostd::string_view message) noexcept
+  inline void log(nostd::string_view message) noexcept
   {
-    // TODO: move this log method to the SDK? since it needs to call an SDK method
-    // "isEnabled(Severity)"
-
-    // if(isEnabled(Severity::kDefault)){
-    //   return;
-    // }
-
     // Set severity to the default then call log(Severity, String message) method
     log(Severity::kDefault, message);
   }
 
-  void log(Severity severity, nostd::string_view message) noexcept
+  inline void log(Severity severity, nostd::string_view message) noexcept
   {
-    // TODO: move this log method to the SDK? since it needs to call an SDK method
-    // "isEnabled(Severity)" if(isEnabled(Severity::kDefault)){
-    //   return;
-    // }
-
     // TODO: set default timestamp later (not in API)
     log(severity, message, core::SystemTimestamp(std::chrono::system_clock::now()));
   }
 
-  void log(Severity severity, nostd::string_view message, core::SystemTimestamp time) noexcept
+  inline void log(Severity severity,
+                  nostd::string_view message,
+                  core::SystemTimestamp time) noexcept
   {
-    // TODO: move this log method to the SDK? since it needs to call an SDK method
-    // "isEnabled(Severity)" if(isEnabled(Severity::kDefault)){
-    //   return;
-    // }
-
     // creates a LogRecord object with given parameters, then calls log(LogRecord)
     LogRecord r;
     r.severity  = severity;
@@ -107,16 +92,16 @@ public:
   // empty logs
   template <class T,
             nostd::enable_if_t<common::detail::is_key_value_iterable<T>::value> * = nullptr>
-  void log(Severity severity       = Severity::kDefault,
-           nostd::string_view name = "",
-           const T &attributes     = {}) noexcept
+  inline void log(Severity severity       = Severity::kDefault,
+                  nostd::string_view name = "",
+                  const T &attributes     = {}) noexcept
   {
     log(severity, name, common::KeyValueIterableView<T>(attributes));
   }
 
-  void log(Severity severity,
-           nostd::string_view name,
-           const common::KeyValueIterable &attributes) noexcept
+  inline void log(Severity severity,
+                  nostd::string_view name,
+                  const common::KeyValueIterable &attributes) noexcept
   {
     // creates a LogRecord object with given parameters, then calls log(LogRecord)
     LogRecord r;
@@ -132,7 +117,7 @@ public:
 
   /** Future enhancement: templated method for objects / custom types (e.g. JSON, XML, custom
    * classes, etc) **/
-  // template<class T> void log(T &some_obj) noexcept override;
+  // template<class T> virtual void log(T &some_obj) noexcept;
 };
 }  // namespace logs
 OPENTELEMETRY_END_NAMESPACE
