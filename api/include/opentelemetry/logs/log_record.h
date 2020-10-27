@@ -38,31 +38,31 @@ namespace logs
  */
 enum class Severity : uint8_t
 {
-  kTrace  = 1,
-  kTrace2 = 2,
-  kTrace3 = 3,
-  kTrace4 = 4,
-  kDebug  = 5,
-  kDebug2 = 6,
-  kDebug3 = 7,
-  kDebug4 = 8,
-  kInfo   = 9,
-  kInfo2  = 10,
-  kInfo3  = 11,
-  kInfo4  = 12,
-  kWarn   = 13,
-  kWarn2  = 14,
-  kWarn3  = 15,
-  kWarn4  = 16,
-  kError  = 17,
-  kError2 = 18,
-  kError3 = 19,
-  kError4 = 20,
-  kFatal  = 21,
-  kFatal2 = 22,
-  kFatal3 = 23,
-  kFatal4 = 24,
-  kDefault = kInfo // default severity is set to kInfo level, similar to what is done in ILogger 
+  kTrace   = 1,
+  kTrace2  = 2,
+  kTrace3  = 3,
+  kTrace4  = 4,
+  kDebug   = 5,
+  kDebug2  = 6,
+  kDebug3  = 7,
+  kDebug4  = 8,
+  kInfo    = 9,
+  kInfo2   = 10,
+  kInfo3   = 11,
+  kInfo4   = 12,
+  kWarn    = 13,
+  kWarn2   = 14,
+  kWarn3   = 15,
+  kWarn4   = 16,
+  kError   = 17,
+  kError2  = 18,
+  kError3  = 19,
+  kError4  = 20,
+  kFatal   = 21,
+  kFatal2  = 22,
+  kFatal3  = 23,
+  kFatal4  = 24,
+  kDefault = kInfo  // default severity is set to kInfo level, similar to what is done in ILogger
 };
 
 /* _nullKV is defined as a private variable that allows "resource" and
@@ -93,13 +93,14 @@ struct LogRecord
   common::KeyValueIterable &attributes;  // key/value pair list
 
   /* Default log record if user does not overwrite this.
-   *  TODO: find better data type for "body" field to represent the <Any> type (specified by Log Data Model )
-   *  Future enhancement: Potentially add other constructors to take default arguments from the user
+   * TODO: find better data type to represent the <Any> type for "body"
+   * Future enhancement: Potentially add other constructors to take default arguments
+   * from the user
    **/
   LogRecord() : resource(_nullKV), attributes(_nullKV)
   {
-    // TODO : in SDK, assign a default timestamp if not specified
-    name      = "";
+    // TODO: in SDK, assign a default timestamp if not specified
+    name = "";
   }
 
   /* for ease of use; user can use this function to convert a map into a KeyValueIterable for the

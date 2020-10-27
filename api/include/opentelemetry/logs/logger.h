@@ -39,12 +39,12 @@ public:
   virtual ~Logger() = default;
 
   /* Returns the name of the logger */
-  // TODO: decide whether this is useful and/or should be kept, as this is not a method required in the specification.
-  // virtual nostd::string_view getName() = 0;
+  // TODO: decide whether this is useful and/or should be kept, as this is not a method required in
+  // the specification. virtual nostd::string_view getName() = 0;
 
   /**
-   * Each of the following overloaded log(...) methods 
-   * creates a log message with the specific parameters passed. 
+   * Each of the following overloaded log(...) methods
+   * creates a log message with the specific parameters passed.
    *
    * @param name the name of the log event.
    * @param severity the severity level of the log event.
@@ -61,52 +61,53 @@ public:
    */
   virtual void log(const LogRecord &record) noexcept = 0;
 
-
   /** Overloaded methods for unstructured logging **/
   void log(nostd::string_view message) noexcept
   {
-    // TODO: move this log method to the SDK? since it needs to call an SDK method "isEnabled(Severity)"
+    // TODO: move this log method to the SDK? since it needs to call an SDK method
+    // "isEnabled(Severity)"
 
     // if(isEnabled(Severity::kDefault)){
     //   return;
     // }
 
-    // Set severity to the default then call log(Severity, String message) method 
-    log(Severity::kDefault, message);  
+    // Set severity to the default then call log(Severity, String message) method
+    log(Severity::kDefault, message);
   }
 
   void log(Severity severity, nostd::string_view message) noexcept
-  {    
-    // TODO: move this log method to the SDK? since it needs to call an SDK method "isEnabled(Severity)"
-    // if(isEnabled(Severity::kDefault)){
+  {
+    // TODO: move this log method to the SDK? since it needs to call an SDK method
+    // "isEnabled(Severity)" if(isEnabled(Severity::kDefault)){
     //   return;
-    // }  
-    
+    // }
+
     // TODO: set default timestamp later (not in API)
     log(severity, message, core::SystemTimestamp(std::chrono::system_clock::now()));
   }
 
   void log(Severity severity, nostd::string_view message, core::SystemTimestamp time) noexcept
   {
-    // TODO: move this log method to the SDK? since it needs to call an SDK method "isEnabled(Severity)"
-    // if(isEnabled(Severity::kDefault)){
+    // TODO: move this log method to the SDK? since it needs to call an SDK method
+    // "isEnabled(Severity)" if(isEnabled(Severity::kDefault)){
     //   return;
-    // }  
+    // }
 
-     // creates a LogRecord object with given parameters, then calls log(LogRecord)
+    // creates a LogRecord object with given parameters, then calls log(LogRecord)
     LogRecord r;
     r.severity  = severity;
     r.body      = message;
     r.timestamp = time;
 
-    log(r); 
+    log(r);
   }
 
   /** Overloaded methods for structured logging**/
-  // TODO: separate this method into separate methods since it is not useful for user to create empty logs 
+  // TODO: separate this method into separate methods since it is not useful for user to create
+  // empty logs
   template <class T,
             nostd::enable_if_t<common::detail::is_key_value_iterable<T>::value> * = nullptr>
-  void log(Severity severity = Severity::kDefault,
+  void log(Severity severity       = Severity::kDefault,
            nostd::string_view name = "",
            const T &attributes     = {}) noexcept
   {
@@ -123,10 +124,11 @@ public:
     r.name       = name;
     r.attributes = attributes;
 
-    log(r); 
+    log(r);
   }
 
-  // TODO: add function aliases such as void debug(), void trace(), void info(), etc. for each severity level 
+  // TODO: add function aliases such as void debug(), void trace(), void info(), etc. for each
+  // severity level
 
   /** Future enhancement: templated method for objects / custom types (e.g. JSON, XML, custom
    * classes, etc) **/

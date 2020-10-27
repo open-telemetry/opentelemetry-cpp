@@ -1,9 +1,9 @@
+#include <gtest/gtest.h>
+#include <array>
+
 #include "opentelemetry/logs/logger.h"
 #include "opentelemetry/logs/provider.h"
 #include "opentelemetry/nostd/shared_ptr.h"
-
-#include <gtest/gtest.h>
-#include <array>
 
 using opentelemetry::common::KeyValueIterable;
 using opentelemetry::logs::Logger;
@@ -24,10 +24,8 @@ TEST(Logger, GetLoggerDefault)
 
 TEST(Logger, GetNoopLoggerName)
 {
-  auto lp          = Provider::GetLoggerProvider();
-  auto logger      = lp->GetLogger("TestLogger");
-  // string_view name = logger->getName();
-  // EXPECT_EQ("NOOP Logger", name);
+  auto lp     = Provider::GetLoggerProvider();
+  auto logger = lp->GetLogger("TestLogger");
 }
 
 TEST(Logger, GetNoopLoggerNameWithArgs)
@@ -39,8 +37,6 @@ TEST(Logger, GetNoopLoggerNameWithArgs)
   auto logger = lp->GetLogger("NoopLoggerWithArgs", args);
   // should probably also test that arguments were set properly too
   // by adding a getArgs() method in NoopLogger
-  // string_view name = logger->getName();
-  // EXPECT_EQ("NOOP Logger", name);
 }
 
 TEST(Logger, NoopLog)
@@ -81,14 +77,10 @@ TEST(Logger, PushLoggerImplementation)
   auto lp = Provider::GetLoggerProvider();
 
   // GetLogger(name, options) function
-  auto logger      = lp->GetLogger("TestLogger");
-  // string_view name = logger->getName();
-  // EXPECT_EQ("My custom implementation", name);
+  auto logger = lp->GetLogger("TestLogger");
 
   // GetLogger(name, args) function
   std::array<string_view, 1> sv{"string"};
   span<string_view> args{sv};
-  auto logger2      = lp->GetLogger("TestLogger2", args);
-  // string_view name2 = logger2->getName();
-  // EXPECT_EQ("My custom implementation", name);
+  auto logger2 = lp->GetLogger("TestLogger2", args);
 }

@@ -1,11 +1,10 @@
-#include "opentelemetry/logs/noop.h"
-#include "opentelemetry/core/timestamp.h"
-
+#include <gtest/gtest.h>
 #include <map>
 #include <memory>
 #include <string>
 
-#include <gtest/gtest.h>
+#include "opentelemetry/core/timestamp.h"
+#include "opentelemetry/logs/noop.h"
 
 using opentelemetry::core::SystemTimestamp;
 using opentelemetry::logs::Logger;
