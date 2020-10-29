@@ -41,7 +41,7 @@ public:
   {}
 
 private:
-  const nostd::unique_ptr<context::Token> token_;
+  nostd::unique_ptr<context::Token> token_;
 };
 
 }  // namespace trace
