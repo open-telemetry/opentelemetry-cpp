@@ -83,7 +83,7 @@ public:
    * @param span_context the span context of the linked span
    * @param attributes the attributes associated with the link
    */
-  virtual void AddLink(opentelemetry::trace::SpanContext span_context,
+  virtual void AddLink(const opentelemetry::trace::SpanContext &span_context,
                        const opentelemetry::common::KeyValueIterable &attributes) noexcept = 0;
 
   /**

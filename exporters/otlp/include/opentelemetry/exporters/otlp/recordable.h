@@ -25,7 +25,7 @@ public:
                 core::SystemTimestamp timestamp,
                 const common::KeyValueIterable &attributes) noexcept override;
 
-  void AddLink(opentelemetry::trace::SpanContext span_context,
+  void AddLink(const opentelemetry::trace::SpanContext &span_context,
                const common::KeyValueIterable &attributes) noexcept override;
 
   void SetStatus(trace::CanonicalCode code, nostd::string_view description) noexcept override;
