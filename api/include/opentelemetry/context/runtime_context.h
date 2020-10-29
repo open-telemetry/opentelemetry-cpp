@@ -175,8 +175,9 @@ public:
   // Return the current context.
   Context GetCurrent() noexcept override { return GetStack().Top(); }
 
-  // Resets the context to a previous value stored in the
-  // passed in token. Returns true if successful, false otherwise
+  // Resets the context to the value previous to the passed in token. This will
+  // also detach all child contexts of the passed in token.
+  // Returns true if successful, false otherwise.
   bool Detach(Token &token) noexcept override
   {
     if (!GetStack().Contains(token))
