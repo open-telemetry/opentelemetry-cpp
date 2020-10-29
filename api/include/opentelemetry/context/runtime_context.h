@@ -179,11 +179,18 @@ public:
   // passed in token. Returns true if successful, false otherwise
   bool Detach(Token &token) noexcept override
   {
-    if (!(token == GetStack().Top()))
+    if (!GetStack().Contains(token))
     {
       return false;
     }
+
+    while (!(token == GetStack().Top()))
+    {
+      GetStack().Pop();
+    }
+
     GetStack().Pop();
+
     return true;
   }
 
@@ -212,6 +219,19 @@ private:
       }
       size_ -= 1;
       return base_[size_];
+    }
+
+    bool Contains(const Token &token) const noexcept
+    {
+      for (size_t pos = size_; pos > 0; --pos)
+      {
+        if (token == base_[pos - 1])
+        {
+          return true;
+        }
+      }
+
+      return false;
     }
 
     // Returns the Context at the top of the stack.
