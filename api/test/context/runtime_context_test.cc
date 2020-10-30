@@ -11,7 +11,7 @@ TEST(RuntimeContextTest, GetCurrent)
   std::map<std::string, context::ContextValue> map_test = {{"test_key", (int64_t)123}};
   context::Context test_context                         = context::Context(map_test);
   auto old_context = context::RuntimeContext::Attach(test_context);
-  EXPECT_TRUE(context::RuntimeContext::GetCurrent() == test_context);
+  EXPECT_EQ(context::RuntimeContext::GetCurrent(), test_context);
 }
 
 // Tests that detach resets the context to the previous context
@@ -25,7 +25,7 @@ TEST(RuntimeContextTest, Detach)
   auto foo_context_token  = context::RuntimeContext::Attach(foo_context);
 
   foo_context_token.reset();
-  EXPECT_TRUE(context::RuntimeContext::GetCurrent() == test_context);
+  EXPECT_EQ(context::RuntimeContext::GetCurrent(), test_context);
   test_context_token.reset();
 }
 
@@ -34,9 +34,8 @@ TEST(RuntimeContextTest, DetachWrongContext)
 {
   std::map<std::string, context::ContextValue> map_test = {{"test_key", (int64_t)123}};
   context::Context test_context                         = context::Context(map_test);
-  context::Context foo_context                          = context::Context(map_test);
   auto test_context_token = context::RuntimeContext::Attach(test_context);
-  auto foo_context_token  = context::RuntimeContext::Attach(foo_context);
+  EXPECT_TRUE(context::RuntimeContext::Detach(*test_context_token));
   EXPECT_FALSE(context::RuntimeContext::Detach(*test_context_token));
 }
 
@@ -95,4 +94,39 @@ TEST(RuntimeContextTest, GetValueOtherContext)
 {
   context::Context foo_context = context::Context("foo_key", (int64_t)596);
   EXPECT_EQ(nostd::get<int64_t>(context::RuntimeContext::GetValue("foo_key", &foo_context)), 596);
+}
+
+// Test that any possible order of context detaching doesn't mess up the stack.
+TEST(RuntimeContextTest, DetachOutOfOrder)
+{
+  std::vector<size_t> indices;
+  indices.push_back(0);
+  indices.push_back(1);
+  indices.push_back(2);
+  indices.push_back(3);
+
+  std::vector<context::Context> contexts;
+  for (auto i : indices)
+  {
+    contexts.push_back(context::Context("index", i));
+  }
+
+  do
+  {
+    std::vector<nostd::unique_ptr<context::Token>> tokens;
+
+    for (auto &c : contexts)
+    {
+      tokens.push_back(context::RuntimeContext::Attach(c));
+    }
+
+    for (size_t i : indices)
+    {
+      auto token = std::move(tokens.at(i));
+      context::RuntimeContext::Detach(*token);
+    }
+
+    EXPECT_EQ(context::RuntimeContext::GetCurrent(), context::Context());
+
+  } while (std::next_permutation(indices.begin(), indices.end()));
 }
