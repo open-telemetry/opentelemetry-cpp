@@ -180,6 +180,13 @@ public:
   // Returns true if successful, false otherwise.
   bool Detach(Token &token) noexcept override
   {
+    // In most cases, the context to be detached is on the top of the stack.
+    if (token == GetStack().Top())
+    {
+      GetStack().Pop();
+      return true;
+    }
+
     if (!GetStack().Contains(token))
     {
       return false;
