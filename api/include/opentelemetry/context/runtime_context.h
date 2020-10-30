@@ -175,15 +175,30 @@ public:
   // Return the current context.
   Context GetCurrent() noexcept override { return GetStack().Top(); }
 
-  // Resets the context to a previous value stored in the
-  // passed in token. Returns true if successful, false otherwise
+  // Resets the context to the value previous to the passed in token. This will
+  // also detach all child contexts of the passed in token.
+  // Returns true if successful, false otherwise.
   bool Detach(Token &token) noexcept override
   {
-    if (!(token == GetStack().Top()))
+    // In most cases, the context to be detached is on the top of the stack.
+    if (token == GetStack().Top())
+    {
+      GetStack().Pop();
+      return true;
+    }
+
+    if (!GetStack().Contains(token))
     {
       return false;
     }
+
+    while (!(token == GetStack().Top()))
+    {
+      GetStack().Pop();
+    }
+
     GetStack().Pop();
+
     return true;
   }
 
@@ -212,6 +227,19 @@ private:
       }
       size_ -= 1;
       return base_[size_];
+    }
+
+    bool Contains(const Token &token) const noexcept
+    {
+      for (size_t pos = size_; pos > 0; --pos)
+      {
+        if (token == base_[pos - 1])
+        {
+          return true;
+        }
+      }
+
+      return false;
     }
 
     // Returns the Context at the top of the stack.
