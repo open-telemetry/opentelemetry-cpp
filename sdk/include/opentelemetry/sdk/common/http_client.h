@@ -60,19 +60,20 @@ enum class Method
 
 enum class SessionState
 {
-  Created,             // session object is created
-  Ongoing,             // session is ongoing
-  Finished,            // session is finished ( this needs to be the final state )
-  Queued,              // http request is queued
-  TimedOut,            // Request timedout, no response received
-  Aborted,             // http request aborted due to local error,
-  Cancelled,           // http request cancelled, possibly due to session->CancelSession();
-  SendingFailed,       // http request sending failed
-  NetworkError,        // network error
-  SSLHandshakeFailed,  // ssl handshake failed
-  ReadError,           // error while reading response
-  WriteError           // error while writing rquest
-};
+
+  CreateFailed,
+  Created,
+  SendFailed,
+  Connecting,
+  ConnectFailed,
+  Connected,
+  Sending,
+  Response,
+  Destroy,
+  Aborted,
+  Cancelled,
+  SSLHandshakeFailed
+} ;
 
 using Byte           = uint8_t;
 using StatusCode     = uint16_t;
@@ -121,7 +122,7 @@ class EventHandler
 public:
   virtual void OnResponse(Response &) noexcept = 0;
 
-  virtual void OnError(SessionState, nostd::string_view) noexcept = 0;
+  virtual void OnEvent(SessionState, nostd::string_view) noexcept = 0;
 
   virtual void OnConnecting(const SSLCertificate &) noexcept {}
 
