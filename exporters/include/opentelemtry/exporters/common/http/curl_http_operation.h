@@ -31,7 +31,7 @@ namespace curl
     const std::string http_header_regexp = "(.*)\\: (.*)\\n*";
 
     struct curl_ci {
-        bool operator() (const std::string & s1, const std::string & s2) const {
+        bool operator() (const nostd::string_view & s1, const nostd::string_view& s2) const {
             return std::lexicographical_compare(
                 s1.begin(), s1.end(),
                 s2.begin(), s2.end(),
@@ -115,10 +115,10 @@ public:
         // Specify our custom headers
         for(auto &kv : this->request_headers_)
         {
-            std::string header = kv.first();
+            std::string header = static_cast<std::string>(kv.first);
             header += ": ";
-            header += kv.second();
-            headers_chunk_ = curl_slist_append(headers_chunk_, header());;
+            header += static_cast<std::string>(kv.second);
+            headers_chunk_ = curl_slist_append(headers_chunk_, header.c_str());
         }
 
         if(headers_chunk_ != nullptr)
@@ -321,7 +321,8 @@ public:
             std::smatch match;
             std::regex http_headers_regex(http_header_regexp);
             if (std::regex_search(header, match, http_headers_regex))
-                result[match[1]] = match[2];    // Key: value
+                result.insert(std::pair<nostd::string_view, nostd::string_view>(match[1], match[2]));
+                //result[match.str(1)] = match[2];    // Key: value
         }
         return result;
     }

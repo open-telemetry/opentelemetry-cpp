@@ -67,12 +67,13 @@ public:
 
   virtual const http_sdk::Body &GetBody() const noexcept override { return body_; }
 
-  virtual bool ForEachHeader(nostd::function_ref<bool(nostd::string_view name, nostd::string_view value)> callable) const
+  virtual bool ForEachHeader(
+    nostd::function_ref<bool(nostd::string_view name, nostd::string_view value)> callable) const
       noexcept override
   {
     for (const auto &header : headers_)
     {
-      if (!callable(name, value))
+      if (!callable(header.first, header.second))
       {
         return false;
       }
@@ -80,14 +81,14 @@ public:
     return true;
   }
 
-  virtual bool ForEachHeader(const std::string &key,
+  virtual bool ForEachHeader(const nostd::string_view &name,
                              nostd::function_ref<bool(nostd::string_view name, nostd::string_view value)> callable) const
       noexcept override
   {
-    auto range = headers_.equal_range(key);
+    auto range = headers_.equal_range(name);
     for (auto it = range.first; it != range.second; ++it)
     {
-      if (!callable(std::make_pair(name, value))
+      if (!callable(it->first, it->second))
       {
         return false;
       }
@@ -97,15 +98,10 @@ public:
 
   virtual http_sdk::StatusCode GetStatusCode() const noexcept override { return status_code_; }
 
-  virtual const std::string &GetErrorMessage() const noexcept override { return error_message_; }
-
-  virtual bool IsSuccess() const noexcept override { return (error_message_.length() == 0); }
-
 public:
   Headers headers_;
   http_sdk::Body body_;
   http_sdk::StatusCode status_code_;
-  std::string error_message_;
 };
 
 class SessionManager;
@@ -115,7 +111,7 @@ class Session : public http_sdk::Session
 
 public:
   Session(SessionManager &session_manager, std::string host, uint16_t port = 80)
-      : session_manager_(session_manager), session_state_(http_sdk::SessionState::CREATED)
+      : session_manager_(session_manager), is_session_active_(false)
   {
     if (host.rfind("http://", 0) != 0 && host.rfind("https://", 0) != 0)
     {
@@ -133,29 +129,28 @@ public:
 
   virtual void SendRequest(http_sdk::EventHandler &callback) noexcept override
   {
-    std::string url = host_ + "/" + http_request_->uri_;
+    is_session_active_ = true;
+    std::string url = static_cast<std::string>(host_) + "/" + static_cast<std::string>(http_request_->uri_);
 
-    curl_operation_->reset(new HttpOperation(http_request_->method_, url, http_request_->headers_, callback, http_request_->body_)));
-
-    curl_operation_->SendAsync([this, callback](HttpOperation& operation){
+    curl_operation_.reset(new HttpOperation(http_request_->method_, url, &callback, http_request_->headers_, http_request_->body_));
+    auto callback_ptr = &callback;
+    curl_operation_->SendAsync([this, callback_ptr](HttpOperation& operation){
         if (operation.WasAborted()) {
             //Manually cancelled
-            callback->OnEvent(http_sdk::SessionState::Cancelled, "");     
+            callback_ptr->OnEvent(http_sdk::SessionState::Cancelled, "");     
         }
 
-        if (operation.GetStatusCode() == CURLE_OK){
+        if (operation.GetResponseCode() >= CURL_LAST){ 
+          // we have a http response
           auto response = std::unique_ptr<Response>(new Response());
           //auto responseHeaders = operation.GetResponseHeaders();
           response->headers_ = operation.GetResponseHeaders();  //.insert(responseHeaders.begin(), responseHeaders.end());
-          response->m_body = operation.GetResponseBody();
-          callback->OnResponse(response.release());
+          response->body_ = operation.GetResponseBody();
+          callback_ptr->OnResponse(*response);
         }
-    });
-  }
 
-  virtual http_sdk::SessionState GetSessionState() const noexcept override
-  {
-    return session_state_;
+    });
+    is_session_active_ = false;
   }
 
   virtual bool CancelSession() noexcept override
@@ -169,16 +164,21 @@ public:
     curl_operation_->Finish();
     return true;
   }
+  
+  virtual bool IsSessionActive() noexcept override
+  {
+    return is_session_active_;
+  }
 
   void SetId(uint64_t session_id) { session_id_ = session_id; }
 
 private:
   std::shared_ptr<Request> http_request_;
-  http_sdk::SessionState session_state_;
   nostd::string_view host_;
   std::unique_ptr<HttpOperation> curl_operation_;
   uint64_t session_id_;
   SessionManager &session_manager_;
+  bool is_session_active_;
   //std::unique_ptr<httplib::Client> httplib_client_;
 };
 
@@ -192,10 +192,10 @@ public:
     curl_global_init(CURL_GLOBAL_ALL);
   }
 
-  std::shared_ptr<http_sdk::Session> createSession(std::string host,
+  std::shared_ptr<http_sdk::Session> CreateSession(nostd::string_view host,
                                                            uint16_t port = 80) noexcept override
   {
-    auto session    = std::make_shared<Session>(*this, host, port);
+    auto session    = std::make_shared<Session>(*this, static_cast<std::string>(host), port);
     auto session_id = ++next_session_id_;
     session->SetId(session_id);
     sessions_.insert({session_id, session});
