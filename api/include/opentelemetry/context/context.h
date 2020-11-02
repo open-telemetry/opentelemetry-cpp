@@ -91,7 +91,7 @@ public:
     return false;
   }
 
-  bool operator==(const Context &other) { return (head_ == other.head_); }
+  bool operator==(const Context &other) const noexcept { return (head_ == other.head_); }
 
 private:
   // A linked list to contain the keys and values of this context node
