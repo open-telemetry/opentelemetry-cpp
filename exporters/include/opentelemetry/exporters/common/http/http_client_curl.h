@@ -2,9 +2,9 @@
 
 #include "http_operation_curl.h"
 
+#include <map>
 #include <string>
 #include <vector>
-#include <map>
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace exporters
@@ -16,7 +16,7 @@ namespace http
 namespace curl
 {
 
-namespace http_sdk = opentelemetry::sdk::common::http;
+namespace http_sdk                 = opentelemetry::sdk::common::http;
 const http_sdk::StatusCode Http_Ok = 200;
 
 class Request : public http_sdk::Request
@@ -54,7 +54,7 @@ public:
   http_sdk::Body body_;
   Headers headers_;
   nostd::string_view uri_;
-  std::chrono::milliseconds timeout_ms_{5000}; //ms
+  std::chrono::milliseconds timeout_ms_{5000};  // ms
 };
 
 class Response : public http_sdk::Response
@@ -66,7 +66,7 @@ public:
   virtual const http_sdk::Body &GetBody() const noexcept override { return body_; }
 
   virtual bool ForEachHeader(
-    nostd::function_ref<bool(nostd::string_view name, nostd::string_view value)> callable) const
+      nostd::function_ref<bool(nostd::string_view name, nostd::string_view value)> callable) const
       noexcept override
   {
     for (const auto &header : headers_)
@@ -79,8 +79,9 @@ public:
     return true;
   }
 
-  virtual bool ForEachHeader(const nostd::string_view &name,
-                             nostd::function_ref<bool(nostd::string_view name, nostd::string_view value)> callable) const
+  virtual bool ForEachHeader(
+      const nostd::string_view &name,
+      nostd::function_ref<bool(nostd::string_view name, nostd::string_view value)> callable) const
       noexcept override
   {
     auto range = headers_.equal_range(name);
@@ -127,23 +128,27 @@ public:
   virtual void SendRequest(http_sdk::EventHandler &callback) noexcept override
   {
     is_session_active_ = true;
-    std::string url = static_cast<std::string>(host_) + "/" + static_cast<std::string>(http_request_->uri_);
+    std::string url =
+        static_cast<std::string>(host_) + "/" + static_cast<std::string>(http_request_->uri_);
     auto callback_ptr = &callback;
-    curl_operation_.reset(new HttpOperation(http_request_->method_, url, callback_ptr, http_request_->headers_, http_request_->body_, false, http_request_->timeout_ms_.count()));
-    curl_operation_->SendAsync([this, callback_ptr](HttpOperation& operation){
-        if (operation.WasAborted()) {
-            //Manually cancelled
-            callback_ptr->OnEvent(http_sdk::SessionState::Cancelled, "");     
-        }
+    curl_operation_.reset(new HttpOperation(http_request_->method_, url, callback_ptr,
+                                            http_request_->headers_, http_request_->body_, false,
+                                            http_request_->timeout_ms_.count()));
+    curl_operation_->SendAsync([this, callback_ptr](HttpOperation &operation) {
+      if (operation.WasAborted())
+      {
+        // Manually cancelled
+        callback_ptr->OnEvent(http_sdk::SessionState::Cancelled, "");
+      }
 
-        if (operation.GetResponseCode() >= CURL_LAST){ 
-          // we have a http response
-          auto response = std::unique_ptr<Response>(new Response());
-          response->headers_ = operation.GetResponseHeaders();
-          response->body_ = operation.GetResponseBody();
-          callback_ptr->OnResponse(*response);
-        }
-
+      if (operation.GetResponseCode() >= CURL_LAST)
+      {
+        // we have a http response
+        auto response      = std::unique_ptr<Response>(new Response());
+        response->headers_ = operation.GetResponseHeaders();
+        response->body_    = operation.GetResponseBody();
+        callback_ptr->OnResponse(*response);
+      }
     });
     is_session_active_ = false;
   }
@@ -159,11 +164,8 @@ public:
     curl_operation_->Finish();
     return true;
   }
-  
-  virtual bool IsSessionActive() noexcept override
-  {
-    return is_session_active_;
-  }
+
+  virtual bool IsSessionActive() noexcept override { return is_session_active_; }
 
   void SetId(uint64_t session_id) { session_id_ = session_id; }
 
@@ -176,19 +178,14 @@ private:
   bool is_session_active_;
 };
 
-
 class SessionManager : public http_sdk::SessionManager
 {
 
 public:
-
-  SessionManager()
-  {
-    curl_global_init(CURL_GLOBAL_ALL);
-  }
+  SessionManager() { curl_global_init(CURL_GLOBAL_ALL); }
 
   std::shared_ptr<http_sdk::Session> CreateSession(nostd::string_view host,
-                                                           uint16_t port = 80) noexcept override
+                                                   uint16_t port = 80) noexcept override
   {
     auto session    = std::make_shared<Session>(*this, static_cast<std::string>(host), port);
     auto session_id = ++next_session_id_;
@@ -221,16 +218,14 @@ public:
     sessions_.erase(session_id);
   }
 
-  ~SessionManager() {
-    curl_global_cleanup();
-  }
+  ~SessionManager() { curl_global_cleanup(); }
 
 private:
   std::atomic<uint64_t> next_session_id_;
   std::map<uint64_t, std::shared_ptr<Session>> sessions_;
 };
 
-} // namespace curl
+}  // namespace curl
 }  // namespace http
 }  // namespace common
 }  // namespace exporters

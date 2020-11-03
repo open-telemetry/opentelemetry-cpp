@@ -60,23 +60,22 @@ enum class Method
 
 enum class SessionState
 {
-  CreateFailed,   // session create failed
-  Created,      // session created
-  Destroy,      // session destroyed
-  Connecting,   // connecting to peer 
-  ConnectFailed, // connection failed
-  Connected,  // connected
-  Sending,   // sending request
-  SendFailed,  // request send failed
-  Response,  // response received
-  SSLHandshakeFailed, // SSL Handshake failed
-  TimedOut ,   // request timedout
-  NetworkError, // network error
-  ReadError,  // error reading response
-  WriteError, // error writing request
-  Cancelled // (manually) cancelled
-}; 
-
+  CreateFailed,        // session create failed
+  Created,             // session created
+  Destroy,             // session destroyed
+  Connecting,          // connecting to peer
+  ConnectFailed,       // connection failed
+  Connected,           // connected
+  Sending,             // sending request
+  SendFailed,          // request send failed
+  Response,            // response received
+  SSLHandshakeFailed,  // SSL Handshake failed
+  TimedOut,            // request timedout
+  NetworkError,        // network error
+  ReadError,           // error reading response
+  WriteError,          // error writing request
+  Cancelled            // (manually) cancelled
+};
 
 using Byte           = uint8_t;
 using StatusCode     = uint16_t;

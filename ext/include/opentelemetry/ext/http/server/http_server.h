@@ -24,8 +24,8 @@
 #  ifdef LOG_TRACE
 #    undef LOG_TRACE
 #    define LOG_TRACE(x, ...) printf(x "\n", __VA_ARGS__)
-#     undef LOG_INFO
-#     define LOG_INFO LOG_TRACE
+#    undef LOG_INFO
+#    define LOG_INFO LOG_TRACE
 #  endif
 #endif
 
