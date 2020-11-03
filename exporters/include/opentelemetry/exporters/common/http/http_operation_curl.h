@@ -71,9 +71,7 @@ public:
                 // Default connectivity and response size options
                 bool raw_response        = false,
                 size_t http_conn_timeout = default_http_conn_timeout)
-      :
-
-        //
+      :  //
         method_(method),
         url_(url),
         callback_(callback),
@@ -115,9 +113,9 @@ public:
     // Specify our custom headers
     for (auto &kv : this->request_headers_)
     {
-      std::string header = static_cast<std::string>(kv.first);
+      std::string header = std::string(kv.first);
       header += ": ";
-      header += static_cast<std::string>(kv.second);
+      header += std::string(kv.second);
       headers_chunk_ = curl_slist_append(headers_chunk_, header.c_str());
     }
 
@@ -329,8 +327,9 @@ public:
     std::string header;
     while (std::getline(ss, header, '\n'))
     {
-      // TBD - Regex below crashes for out-of-memory on CI docker container, so
-      // switching to string comparison
+      // TODO - Regex below crashes with out-of-memory on CI docker container, so
+      // switching to string comparison. Need to debug and revert back.
+
       /*std::smatch match;
       std::regex http_headers_regex(http_header_regexp);
       if (std::regex_search(header, match, http_headers_regex))
@@ -340,8 +339,7 @@ public:
       size_t pos = header.find(": ");
       if (pos != std::string::npos)
         result.insert(std::pair<nostd::string_view, nostd::string_view>(
-            static_cast<nostd::string_view>(header.substr(0, pos)),
-            static_cast<nostd::string_view>(header.substr(pos + 2))));
+            nostd::string_view(header.substr(0, pos)), nostd::string_view(header.substr(pos + 2))));
     }
     return result;
   }

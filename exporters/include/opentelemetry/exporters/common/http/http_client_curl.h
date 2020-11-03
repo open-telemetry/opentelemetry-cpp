@@ -21,7 +21,6 @@ const http_sdk::StatusCode Http_Ok = 200;
 
 class Request : public http_sdk::Request
 {
-
 public:
   Request() : method_(http_sdk::Method::Get), uri_("/") {}
 
@@ -59,7 +58,6 @@ public:
 
 class Response : public http_sdk::Response
 {
-
 public:
   Response() : status_code_(Http_Ok) {}
 
@@ -107,7 +105,6 @@ class SessionManager;
 
 class Session : public http_sdk::Session
 {
-
 public:
   Session(SessionManager &session_manager, std::string host, uint16_t port = 80)
       : session_manager_(session_manager), is_session_active_(false)
@@ -179,7 +176,6 @@ private:
 
 class SessionManager : public http_sdk::SessionManager
 {
-
 public:
   SessionManager() { curl_global_init(CURL_GLOBAL_ALL); }
 
