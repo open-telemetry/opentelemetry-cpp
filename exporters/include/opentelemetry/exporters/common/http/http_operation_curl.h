@@ -332,7 +332,8 @@ public:
       std::smatch match;
       std::regex http_headers_regex(http_header_regexp);
       if (std::regex_search(header, match, http_headers_regex))
-        result.insert(std::pair<nostd::string_view, nostd::string_view>(match[1], match[2]));
+        result.insert(std::pair<nostd::string_view, nostd::string_view>(
+            static_cast<nostd::string_view>(match[1]), static_cast<nostd::string_view>(match[2])));
       // result[match.str(1)] = match[2];    // Key: value
     }
     return result;
