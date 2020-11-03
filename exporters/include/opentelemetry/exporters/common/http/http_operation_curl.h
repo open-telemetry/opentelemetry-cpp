@@ -329,12 +329,19 @@ public:
     std::string header;
     while (std::getline(ss, header, '\n'))
     {
-      std::smatch match;
+      // TBD - Regex below crashes for out-of-memory on CI docker container, so
+      // switching to string comparison
+      /*std::smatch match;
       std::regex http_headers_regex(http_header_regexp);
       if (std::regex_search(header, match, http_headers_regex))
         result.insert(std::pair<nostd::string_view, nostd::string_view>(
             static_cast<nostd::string_view>(match[1]), static_cast<nostd::string_view>(match[2])));
-      // result[match.str(1)] = match[2];    // Key: value
+      */
+      size_t pos = header.find(": ");
+      if (pos != std::string::npos)
+        result.insert(std::pair<nostd::string_view, nostd::string_view>(
+            static_cast<nostd::string_view>(header.substr(0, pos)),
+            static_cast<nostd::string_view>(header.substr(pos + 2))));
     }
     return result;
   }
