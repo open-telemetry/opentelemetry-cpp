@@ -114,9 +114,9 @@ public:
   {
     if (host.rfind("http://", 0) != 0 && host.rfind("https://", 0) != 0)
     {
-      host_ = "http://" + host;  // TBD - https support
+      host = "http://" + host;  // TODO - https support
     }
-    host_ = host + ":" + std::to_string(port);
+    host_ = static_cast<nostd::string_view>(host + ":" + std::to_string(port));
   }
 
   std::shared_ptr<http_sdk::Request> CreateRequest() noexcept override
