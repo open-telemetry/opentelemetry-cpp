@@ -114,9 +114,9 @@ public:
   {
     if (host.rfind("http://", 0) != 0 && host.rfind("https://", 0) != 0)
     {
-      host = "http://" + host;  // TODO - https support
+      host_ = "http://" + host;  // TODO - https support
     }
-    host_ = static_cast<nostd::string_view>(host + ":" + std::to_string(port));
+    host_ += ":" + std::to_string(port) + "/";
   }
 
   std::shared_ptr<http_sdk::Request> CreateRequest() noexcept override
@@ -128,9 +128,8 @@ public:
   virtual void SendRequest(http_sdk::EventHandler &callback) noexcept override
   {
     is_session_active_ = true;
-    std::string url =
-        static_cast<std::string>(host_) + "/" + static_cast<std::string>(http_request_->uri_);
-    auto callback_ptr = &callback;
+    std::string url    = host_ + std::string(http_request_->uri_);
+    auto callback_ptr  = &callback;
     curl_operation_.reset(new HttpOperation(http_request_->method_, url, callback_ptr,
                                             http_request_->headers_, http_request_->body_, false,
                                             http_request_->timeout_ms_.count()));
@@ -171,7 +170,7 @@ public:
 
 private:
   std::shared_ptr<Request> http_request_;
-  nostd::string_view host_;
+  std::string host_;
   std::unique_ptr<HttpOperation> curl_operation_;
   uint64_t session_id_;
   SessionManager &session_manager_;
@@ -187,7 +186,7 @@ public:
   std::shared_ptr<http_sdk::Session> CreateSession(nostd::string_view host,
                                                    uint16_t port = 80) noexcept override
   {
-    auto session    = std::make_shared<Session>(*this, static_cast<std::string>(host), port);
+    auto session    = std::make_shared<Session>(*this, std::string(host), port);
     auto session_id = ++next_session_id_;
     session->SetId(session_id);
     sessions_.insert({session_id, session});
