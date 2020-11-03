@@ -7,8 +7,6 @@
 #include <map>
 #include <string>
 
-#include <iostream>
-
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace exporters
 {

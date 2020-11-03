@@ -1,12 +1,10 @@
 #pragma once
 
-#include "curl_http_operation.h"
+#include "http_operation_curl.h"
 
 #include <string>
 #include <vector>
 #include <map>
-
-//#include <iostream>
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace exporters
@@ -48,7 +46,7 @@ public:
 
   void SetTimeoutMs(std::chrono::milliseconds timeout_ms) noexcept override
   {
-    _timeout_ms = timeout_ms;
+    timeout_ms_ = timeout_ms;
   }
 
 public:
@@ -56,7 +54,7 @@ public:
   http_sdk::Body body_;
   Headers headers_;
   nostd::string_view uri_;
-  std::chrono::milliseconds _timeout_ms;
+  std::chrono::milliseconds timeout_ms_{5000}; //ms
 };
 
 class Response : public http_sdk::Response
@@ -118,7 +116,6 @@ public:
       host_ = "http://" + host;  // TBD - https support
     }
     host_ = host + ":" + std::to_string(port);
-    //httplib_client_.reset(new httplib::Client(host.c_str()));
   }
 
   std::shared_ptr<http_sdk::Request> CreateRequest() noexcept override
@@ -131,9 +128,8 @@ public:
   {
     is_session_active_ = true;
     std::string url = static_cast<std::string>(host_) + "/" + static_cast<std::string>(http_request_->uri_);
-
-    curl_operation_.reset(new HttpOperation(http_request_->method_, url, &callback, http_request_->headers_, http_request_->body_));
     auto callback_ptr = &callback;
+    curl_operation_.reset(new HttpOperation(http_request_->method_, url, callback_ptr, http_request_->headers_, http_request_->body_, false, http_request_->timeout_ms_.count()));
     curl_operation_->SendAsync([this, callback_ptr](HttpOperation& operation){
         if (operation.WasAborted()) {
             //Manually cancelled
@@ -143,8 +139,7 @@ public:
         if (operation.GetResponseCode() >= CURL_LAST){ 
           // we have a http response
           auto response = std::unique_ptr<Response>(new Response());
-          //auto responseHeaders = operation.GetResponseHeaders();
-          response->headers_ = operation.GetResponseHeaders();  //.insert(responseHeaders.begin(), responseHeaders.end());
+          response->headers_ = operation.GetResponseHeaders();
           response->body_ = operation.GetResponseBody();
           callback_ptr->OnResponse(*response);
         }
@@ -179,8 +174,8 @@ private:
   uint64_t session_id_;
   SessionManager &session_manager_;
   bool is_session_active_;
-  //std::unique_ptr<httplib::Client> httplib_client_;
 };
+
 
 class SessionManager : public http_sdk::SessionManager
 {

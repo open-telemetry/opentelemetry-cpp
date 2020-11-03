@@ -16,6 +16,9 @@ option(WITH_OTPROTOCOL
 option(WITH_PROMETHEUS "Whether to include the Prometheus Client in the SDK"
        OFF)
 
+option(WITH_CURL "Whether to include HTTP CURL Client in the SDK"
+       OFF)
+
 option(WITH_TESTS "Whether to enable tests" ON)
 option(WITH_EXAMPLES "Whether to build examples" ON)
 
@@ -26,6 +29,14 @@ endif()
 
 if(WITH_TESTS)
   include(CTest)
+endif()
+
+if (WITH_CURL)
+    set(CURL_LIBRARY "-lcurl")
+    find_package(CURL REQUIRED)
+    if (NOT CURL_FOUND)
+        message (FATAL_ERROR "libcurl not found! Have you installed deps?")
+    endif (NOT CURL_FOUND)
 endif()
 
 find_package(Threads)
@@ -62,8 +73,10 @@ include_directories(sdk/include)
 include_directories(sdk)
 add_subdirectory(sdk)
 include_directories(.)
-add_subdirectory(exporters)
 if(WITH_EXAMPLES)
   add_subdirectory(examples)
 endif()
+include_directories(ext/include)
 add_subdirectory(ext)
+include_directories(exporters/include)
+add_subdirectory(exporters)

@@ -24,6 +24,8 @@
 #  ifdef LOG_TRACE
 #    undef LOG_TRACE
 #    define LOG_TRACE(x, ...) printf(x "\n", __VA_ARGS__)
+#     undef LOG_INFO
+#     define LOG_INFO LOG_TRACE
 #  endif
 #endif
 
@@ -249,7 +251,7 @@ public:
 protected:
   virtual void onSocketAcceptable(SocketTools::Socket socket) override
   {
-    LOG_TRACE("HttpServer: accepting socket fd=0x%llx", socket.m_sock);
+    LOG_TRACE("HttpServer: accepting socket fd=0x%d", socket.m_sock);
     assert(std::find(m_listeningSockets.begin(), m_listeningSockets.end(), socket) !=
            m_listeningSockets.end());
 
@@ -269,7 +271,7 @@ protected:
 
   virtual void onSocketReadable(SocketTools::Socket socket) override
   {
-    LOG_TRACE("HttpServer: reading socket fd=0x%llx", socket.m_sock);
+    LOG_TRACE("HttpServer: reading socket fd=0x%d", socket.m_sock);
     // No thread-safety here!
     assert(std::find(m_listeningSockets.begin(), m_listeningSockets.end(), socket) ==
            m_listeningSockets.end());
@@ -297,7 +299,7 @@ protected:
 
   virtual void onSocketWritable(SocketTools::Socket socket) override
   {
-    LOG_TRACE("HttpServer: writing socket fd=0x%llx", socket.m_sock);
+    LOG_TRACE("HttpServer: writing socket fd=0x%d", socket.m_sock);
 
     // No thread-safety here!
     assert(std::find(m_listeningSockets.begin(), m_listeningSockets.end(), socket) ==
@@ -319,7 +321,7 @@ protected:
 
   virtual void onSocketClosed(SocketTools::Socket socket) override
   {
-    LOG_TRACE("HttpServer: closing socket fd=0x%llx", socket.m_sock);
+    LOG_TRACE("HttpServer: closing socket fd=0x%d", socket.m_sock);
     assert(std::find(m_listeningSockets.begin(), m_listeningSockets.end(), socket) ==
            m_listeningSockets.end());
 
@@ -721,7 +723,6 @@ protected:
     conn.response.message.clear();
     conn.response.headers.clear();
     conn.response.body.clear();
-
     if (conn.response.code == 0)
     {
       conn.response.code = 404;  // Not Found

@@ -15,7 +15,6 @@
 #include <unistd.h>
 #endif
 
-
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace exporters
 {
@@ -26,7 +25,7 @@ namespace http
 namespace curl
 {
     namespace http_sdk = opentelemetry::sdk::common::http;
-    const size_t default_http_conn_timeout = 5;
+    const size_t default_http_conn_timeout = 5000; //ms
     const std::string http_status_regexp = "HTTP\\/\\d\\.\\d (\\d+)\\ .*" ;
     const std::string http_header_regexp = "(.*)\\: (.*)\\n*";
 
@@ -49,11 +48,13 @@ public:
 
     void DispatchEvent(http_sdk::SessionState type, std::string reason = "")
     {
-        if(callback_ != nullptr)
+        if(callback_ != nullptr) {
             callback_->OnEvent(type, reason);
+        }
     }
 
     std::atomic<bool>   is_aborted_;      // Set to 'true' when async callback is aborted
+    std::atomic<bool>   is_finished_;       // Set to 'true' when async callback is finished.
 
     /**
      * Create local CURL instance for url and body
@@ -89,6 +90,7 @@ public:
             res_(CURLE_OK),
             sockfd_(0),
             is_aborted_(false),
+            is_finished_(false),
             nread_(0)
     {
         response_.memory = nullptr;
@@ -140,7 +142,8 @@ public:
         {
             result_.wait();
         }
-        DispatchEvent(http_sdk::SessionState::Destroy);
+        //TBD - Need to be uncomment. This will callback instance is deleted.
+        //DispatchEvent(http_sdk::SessionState::Destroy);
         res_ = CURLE_OK;
         curl_easy_cleanup(curl_);
         curl_slist_free_all(headers_chunk_);
@@ -152,9 +155,10 @@ public:
     */
     virtual void Finish()
     {
-        if (result_.valid())
+        if (result_.valid() && !is_finished_)
         {
             result_.wait();
+            is_finished_ = true;
         }
     }
 
@@ -167,7 +171,6 @@ public:
         // Request buffer
         const void *request  = (request_body_.empty())? NULL: &request_body_[0];
         const size_t req_size = request_body_.size();
-
         if(!curl_)
         {
             res_ = CURLE_FAILED_INIT;
@@ -179,9 +182,11 @@ public:
         // curl_easy_setopt(curl, CURLOPT_LOCALPORT, dcf_port);
 
         // Perform initial connect, handling the timeout if needed
+
         curl_easy_setopt(curl_, CURLOPT_CONNECT_ONLY, 1L);
         DispatchEvent(http_sdk::SessionState::Connecting);
         res_ = curl_easy_perform(curl_);
+
         if(CURLE_OK != res_)
         {
             DispatchEvent(http_sdk::SessionState::ConnectFailed, curl_easy_strerror(res_));     // couldn't connect - stage 1
@@ -194,6 +199,7 @@ public:
          */
         long sockextr = 0 ;
         res_ = curl_easy_getinfo(curl_, CURLINFO_LASTSOCKET, &sockextr);
+
         if(CURLE_OK != res_)
         {
             DispatchEvent(http_sdk::SessionState::ConnectFailed, curl_easy_strerror(res_));     // couldn't connect - stage 2
@@ -202,7 +208,7 @@ public:
 
         /* wait for the socket to become ready for sending */
         sockfd_ = sockextr;
-        if( !WaitOnSocket(sockfd_, 0, http_conn_timeout_ * 1000L) || is_aborted_)
+        if( !WaitOnSocket(sockfd_, 0, http_conn_timeout_ ) || is_aborted_)
         {
             res_ = CURLE_OPERATION_TIMEDOUT;
             DispatchEvent(http_sdk::SessionState::ConnectFailed, " Is aborted: " + std::to_string(is_aborted_.load()));     // couldn't connect - stage 3
@@ -232,8 +238,7 @@ public:
             curl_easy_setopt(curl_, CURLOPT_POST, true);
             curl_easy_setopt(curl_, CURLOPT_POSTFIELDS, (const char *)request);
             curl_easy_setopt(curl_, CURLOPT_POSTFIELDSIZE, req_size);
-        } else
-        if (method_ == http_sdk::Method::Get)
+        } else if (method_ == http_sdk::Method::Get)
         {
             // GET
         } else
@@ -241,10 +246,12 @@ public:
             res_ = CURLE_UNSUPPORTED_PROTOCOL;
             return res_;
         }
-        /* abort if slower than 4kb/sec during 30 seconds */
+
+        // abort if slower than 4kb/sec during 30 seconds
         curl_easy_setopt(curl_, CURLOPT_LOW_SPEED_TIME, 30L);
         curl_easy_setopt(curl_, CURLOPT_LOW_SPEED_LIMIT, 4096);
         DispatchEvent(http_sdk::SessionState::Sending);
+
         res_ = curl_easy_perform(curl_);
         if(CURLE_OK != res_)
         {
@@ -279,7 +286,9 @@ public:
         result_ = std::async(std::launch::async, [this, callback] {
             long result = Send();
             if (callback!=nullptr)
+            {
                 callback(*this);
+            }
             return result;
         });
         return result_;
@@ -388,7 +397,7 @@ public:
 
 protected:
     const bool   raw_response_;       // Do not split response headers from response body
-    const size_t http_conn_timeout_;   // Timeout for connect.  Default: 5s
+    const size_t http_conn_timeout_;   // Timeout for connect.  Default: 5000ms
 
     CURL *curl_;                     // Local curl instance
     CURLcode res_;                   // Curl result OR HTTP status code if successful
@@ -509,4 +518,3 @@ protected:
 }  // namespace common
 }  // namespace exporters
 OPENTELEMETRY_END_NAMESPACE
-

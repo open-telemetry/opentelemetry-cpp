@@ -16,6 +16,7 @@ if [[ "$1" == "cmake.test" ]]; then
   rm -rf *
   cmake -DCMAKE_BUILD_TYPE=Debug  \
         -DCMAKE_CXX_FLAGS="-Werror" \
+        -DWITH_CURL=ON \
         "${SRC_DIR}"
   make
   make test
@@ -26,6 +27,7 @@ elif [[ "$1" == "cmake.c++20.test" ]]; then
   cmake -DCMAKE_BUILD_TYPE=Debug  \
         -DCMAKE_CXX_FLAGS="-Werror" \
         -DCMAKE_CXX_STANDARD=20 \
+        -DWITH_CURL=ON \
         "${SRC_DIR}"
   make
   make test
@@ -36,6 +38,7 @@ elif [[ "$1" == "cmake.legacy.test" ]]; then
   cmake -DCMAKE_BUILD_TYPE=Debug  \
         -DCMAKE_CXX_FLAGS="-Werror" \
         -DCMAKE_CXX_STANDARD=11 \
+        -DWITH_CURL=ON \
         "${SRC_DIR}"
   make
   make test
