@@ -124,7 +124,7 @@ TEST(Recordable, AddLink)
       {keys[0], values[0]}, {keys[1], values[1]}, {keys[2], values[2]}};
 
   auto trace_id = rec.span().trace_id();
-  auto span_id = rec.span().span_id();
+  auto span_id  = rec.span().span_id();
 
   rec.AddLink(trace::SpanContext(false, false),
               common::KeyValueIterableView<std::map<std::string, int>>(attributes));
