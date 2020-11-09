@@ -136,15 +136,15 @@ void Recordable::AddLink(const opentelemetry::trace::SpanContext &span_context,
                          const common::KeyValueIterable &attributes) noexcept
 {
   auto *link = span_.add_links();
+  link->set_trace_id(reinterpret_cast<const char *>(span_context.trace_id().Id().data()),
+                     trace::TraceId::kSize);
+  link->set_span_id(reinterpret_cast<const char *>(span_context.span_id().Id().data()),
+                    trace::SpanId::kSize);
   attributes.ForEachKeyValue([&](nostd::string_view key, common::AttributeValue value) noexcept {
     PopulateAttribute(link->add_attributes(), key, value);
     return true;
   });
 
-  span_.set_trace_id(reinterpret_cast<const char *>(span_context.trace_id().Id().data()),
-                     trace::TraceId::kSize);
-  span_.set_span_id(reinterpret_cast<const char *>(span_context.span_id().Id().data()),
-                    trace::SpanId::kSize);
   // TODO: Populate trace_state when it is supported by SpanContext
 }
 
