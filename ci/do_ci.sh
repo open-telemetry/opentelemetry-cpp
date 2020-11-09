@@ -156,6 +156,7 @@ elif [[ "$1" == "format" ]]; then
   if [[ ! -z "$CHANGED" ]]; then
     echo "The following files have changes:"
     echo "$CHANGED"
+    git diff
     exit 1
   fi
   exit 0
