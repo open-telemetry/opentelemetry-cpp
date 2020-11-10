@@ -58,7 +58,7 @@ public:
    * Create local CURL instance for url and body
    *
    * @param url
-   * @param callback 
+   * @param callback
    * @param request  Request Headers
    * @param body  Reques Body
    * @param raw_response whether to parse the response
