@@ -1,8 +1,8 @@
 #pragma once
 
 #include "opentelemetry/common/attribute_value.h"
+#include "opentelemetry/common/key_value_iterable_view.h"
 #include "opentelemetry/nostd/function_ref.h"
-#include "opentelemetry/trace/key_value_iterable_view.h"
 #include "opentelemetry/version.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
