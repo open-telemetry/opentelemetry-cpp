@@ -1,4 +1,4 @@
-if(WITH_OTPROTOCOL)
+if(WITH_OTLP)
   add_subdirectory(otlp)
 endif()
 

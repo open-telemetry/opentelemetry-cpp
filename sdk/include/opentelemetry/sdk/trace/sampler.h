@@ -53,10 +53,10 @@ public:
   /**
    * Called during Span creation to make a sampling decision.
    *
-   * @param parent_context a const pointer of the SpanContext of a parent Span.
-   *     null if this is a root span.
+   * @param parent_context a const reference to the SpanContext of a parent Span.
+   *        An invalid SpanContext if this is a root span.
    * @param trace_id the TraceId for the new Span. This will be identical to that in
-   *     the parentContext, unless this is a root span.
+   *        the parentContext, unless this is a root span.
    * @param name the name of the new Span.
    * @param spanKind the trace_api::SpanKind of the Span.
    * @param attributes list of AttributeValue with their keys.
@@ -65,11 +65,12 @@ public:
    * @since 0.1.0
    */
 
-  virtual SamplingResult ShouldSample(const trace_api::SpanContext *parent_context,
-                                      trace_api::TraceId trace_id,
-                                      nostd::string_view name,
-                                      trace_api::SpanKind span_kind,
-                                      const trace_api::KeyValueIterable &attributes) noexcept = 0;
+  virtual SamplingResult ShouldSample(
+      const trace_api::SpanContext &parent_context,
+      trace_api::TraceId trace_id,
+      nostd::string_view name,
+      trace_api::SpanKind span_kind,
+      const opentelemetry::common::KeyValueIterable &attributes) noexcept = 0;
 
   /**
    * Returns the sampler name or short description with the configuration.

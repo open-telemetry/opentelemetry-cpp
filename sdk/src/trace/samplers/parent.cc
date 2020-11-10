@@ -1,30 +1,30 @@
-#include "opentelemetry/sdk/trace/samplers/parent_or_else.h"
+#include "opentelemetry/sdk/trace/samplers/parent.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace sdk
 {
 namespace trace
 {
-ParentOrElseSampler::ParentOrElseSampler(std::shared_ptr<Sampler> delegate_sampler) noexcept
+ParentBasedSampler::ParentBasedSampler(std::shared_ptr<Sampler> delegate_sampler) noexcept
     : delegate_sampler_(delegate_sampler),
-      description_("ParentOrElse{" + std::string{delegate_sampler->GetDescription()} + "}")
+      description_("ParentBased{" + std::string{delegate_sampler->GetDescription()} + "}")
 {}
 
-SamplingResult ParentOrElseSampler::ShouldSample(
-    const trace_api::SpanContext *parent_context,
+SamplingResult ParentBasedSampler::ShouldSample(
+    const trace_api::SpanContext &parent_context,
     trace_api::TraceId trace_id,
     nostd::string_view name,
     trace_api::SpanKind span_kind,
-    const trace_api::KeyValueIterable &attributes) noexcept
+    const opentelemetry::common::KeyValueIterable &attributes) noexcept
 {
-  if (parent_context == nullptr)
+  if (!parent_context.IsValid())
   {
     // If no parent (root span) exists returns the result of the delegateSampler
     return delegate_sampler_->ShouldSample(parent_context, trace_id, name, span_kind, attributes);
   }
 
   // If parent exists:
-  if (parent_context->IsSampled())
+  if (parent_context.IsSampled())
   {
     return {Decision::RECORD_AND_SAMPLE, nullptr};
   }
@@ -32,7 +32,7 @@ SamplingResult ParentOrElseSampler::ShouldSample(
   return {Decision::DROP, nullptr};
 }
 
-nostd::string_view ParentOrElseSampler::GetDescription() const noexcept
+nostd::string_view ParentBasedSampler::GetDescription() const noexcept
 {
   return description_;
 }

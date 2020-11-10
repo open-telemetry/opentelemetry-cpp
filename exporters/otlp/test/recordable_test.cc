@@ -105,7 +105,7 @@ TEST(Recordable, AddEventWithAttributes)
       {keys[0], values[0]}, {keys[1], values[1]}, {keys[2], values[2]}};
 
   rec.AddEvent("Test Event", std::chrono::system_clock::now(),
-               trace::KeyValueIterableView<std::map<std::string, int>>(attributes));
+               common::KeyValueIterableView<std::map<std::string, int>>(attributes));
 
   for (int i = 0; i < kNumAttributes; i++)
   {
@@ -124,7 +124,7 @@ TEST(Recordable, AddLink)
       {keys[0], values[0]}, {keys[1], values[1]}, {keys[2], values[2]}};
 
   rec.AddLink(trace::SpanContext(false, false),
-              trace::KeyValueIterableView<std::map<std::string, int>>(attributes));
+              common::KeyValueIterableView<std::map<std::string, int>>(attributes));
 
   for (int i = 0; i < kNumAttributes; i++)
   {

@@ -62,7 +62,7 @@ trace_api::SpanId GenerateRandomSpanId()
 Span::Span(std::shared_ptr<Tracer> &&tracer,
            std::shared_ptr<SpanProcessor> processor,
            nostd::string_view name,
-           const trace_api::KeyValueIterable &attributes,
+           const opentelemetry::common::KeyValueIterable &attributes,
            const trace_api::SpanContextKeyValueIterable &links,
            const trace_api::StartSpanOptions &options,
            const trace_api::SpanContext &parent_span_context) noexcept
@@ -101,7 +101,7 @@ Span::Span(std::shared_ptr<Tracer> &&tracer,
     return true;
   });
 
-  links.ForEachKeyValue([&](opentelemetry::trace::SpanContext span_context, opentelemetry::trace::KeyValueIterable& attributes)
+  links.ForEachKeyValue([&](opentelemetry::trace::SpanContext span_context, opentelemetry::common::KeyValueIterable& attributes)
     {
       recordable_->AddLink(span_context, attributes);
       return true;
@@ -147,7 +147,7 @@ void Span::AddEvent(nostd::string_view name, core::SystemTimestamp timestamp) no
 
 void Span::AddEvent(nostd::string_view name,
                     core::SystemTimestamp timestamp,
-                    const trace_api::KeyValueIterable &attributes) noexcept
+                    const opentelemetry::common::KeyValueIterable &attributes) noexcept
 {
   std::lock_guard<std::mutex> lock_guard{mu_};
   if (recordable_ == nullptr)
@@ -157,7 +157,8 @@ void Span::AddEvent(nostd::string_view name,
   recordable_->AddEvent(name, timestamp, attributes);
 }
 
-void Span::SetStatus(trace_api::CanonicalCode code, nostd::string_view description) noexcept
+void Span::SetStatus(opentelemetry::trace::CanonicalCode code,
+                     nostd::string_view description) noexcept
 {
   std::lock_guard<std::mutex> lock_guard{mu_};
   if (recordable_ == nullptr)

@@ -2,7 +2,7 @@
 #include "opentelemetry/exporters/memory/in_memory_span_exporter.h"
 #include "opentelemetry/sdk/trace/samplers/always_off.h"
 #include "opentelemetry/sdk/trace/samplers/always_on.h"
-#include "opentelemetry/sdk/trace/samplers/parent_or_else.h"
+#include "opentelemetry/sdk/trace/samplers/parent.h"
 #include "opentelemetry/sdk/trace/simple_processor.h"
 #include "opentelemetry/sdk/trace/span_data.h"
 
@@ -24,11 +24,12 @@ using opentelemetry::trace::SpanContext;
 class MockSampler final : public Sampler
 {
 public:
-  SamplingResult ShouldSample(const SpanContext * /*parent_context*/,
-                              trace_api::TraceId /*trace_id*/,
-                              nostd::string_view /*name*/,
-                              trace_api::SpanKind /*span_kind*/,
-                              const trace_api::KeyValueIterable & /*attributes*/) noexcept override
+  SamplingResult ShouldSample(
+      const SpanContext & /*parent_context*/,
+      trace_api::TraceId /*trace_id*/,
+      nostd::string_view /*name*/,
+      trace_api::SpanKind /*span_kind*/,
+      const opentelemetry::common::KeyValueIterable & /*attributes*/) noexcept override
   {
     // Return two pairs of attributes. These attributes should be added to the
     // span attributes
@@ -445,7 +446,7 @@ TEST(Tracer, TestAlwaysOffSampler)
   ASSERT_EQ(0, span_data->GetSpans().size());
 }
 
-TEST(Tracer, TestParentOrElseSampler)
+TEST(Tracer, TestParentBasedSampler)
 {
   // Current ShouldSample always pass an empty ParentContext,
   // so this sampler will work as an AlwaysOnSampler.
@@ -453,7 +454,7 @@ TEST(Tracer, TestParentOrElseSampler)
   std::shared_ptr<InMemorySpanData> span_data_parent_on = exporter->GetData();
   auto tracer_parent_on =
       initTracer(std::move(exporter),
-                 std::make_shared<ParentOrElseSampler>(std::make_shared<AlwaysOnSampler>()));
+                 std::make_shared<ParentBasedSampler>(std::make_shared<AlwaysOnSampler>()));
 
   auto span_parent_on_1 = tracer_parent_on->StartSpan("span 1");
   auto span_parent_on_2 = tracer_parent_on->StartSpan("span 2");
@@ -474,7 +475,7 @@ TEST(Tracer, TestParentOrElseSampler)
   std::shared_ptr<InMemorySpanData> span_data_parent_off = exporter2->GetData();
   auto tracer_parent_off =
       initTracer(std::move(exporter2),
-                 std::make_shared<ParentOrElseSampler>(std::make_shared<AlwaysOffSampler>()));
+                 std::make_shared<ParentBasedSampler>(std::make_shared<AlwaysOffSampler>()));
 
   auto span_parent_off_1 = tracer_parent_off->StartSpan("span 1");
   auto span_parent_off_2 = tracer_parent_off->StartSpan("span 2");

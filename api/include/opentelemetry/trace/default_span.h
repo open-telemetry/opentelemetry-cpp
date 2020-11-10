@@ -25,10 +25,10 @@ public:
 
   void AddEvent(nostd::string_view name,
                 core::SystemTimestamp timestamp,
-                const KeyValueIterable &attributes) noexcept
+                const common::KeyValueIterable &attributes) noexcept
   {}
 
-  void AddEvent(nostd::string_view name, const KeyValueIterable &attributes) noexcept
+  void AddEvent(nostd::string_view name, const common::KeyValueIterable &attributes) noexcept
   {
     this->AddEvent(name, std::chrono::system_clock::now(), attributes);
   }

@@ -44,7 +44,7 @@ elif [[ "$1" == "cmake.exporter.otprotocol.test" ]]; then
   cd "${BUILD_DIR}"
   rm -rf *
   cmake -DCMAKE_BUILD_TYPE=Debug  \
-        -DWITH_OTPROTOCOL=ON \
+        -DWITH_OTLP=ON \
         -DCMAKE_CXX_FLAGS="-Werror" \
         "${SRC_DIR}"
   make
@@ -156,6 +156,7 @@ elif [[ "$1" == "format" ]]; then
   if [[ ! -z "$CHANGED" ]]; then
     echo "The following files have changes:"
     echo "$CHANGED"
+    git diff
     exit 1
   fi
   exit 0
