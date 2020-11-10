@@ -69,7 +69,7 @@ enum class SessionState
   Sending,             // sending request
   SendFailed,          // request send failed
   Response,            // response received
-  SSLHandshakeFailed,  // SSL Handshake failed
+  SSLHandshakeFailed,  // SSL handshake failed
   TimedOut,            // request timed out
   NetworkError,        // network error
   ReadError,           // error reading response
