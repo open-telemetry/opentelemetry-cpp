@@ -89,6 +89,9 @@ private:
     sout_ << ']';
   }
 
+// Prior to C++14, generic lambda is not available so fallback to functor.
+#if __cplusplus < 201402L
+
   class SpanDataAttributeValueVisitor
   {
   public:
@@ -104,9 +107,15 @@ private:
     OStreamSpanExporter &exporter_;
   };
 
+#endif
+
   void print_value(sdktrace::SpanDataAttributeValue &value)
   {
+#if __cplusplus < 201402L
     nostd::visit(SpanDataAttributeValueVisitor(*this), value);
+#else
+    nostd::visit([this](auto &&arg) { print_value(arg); }, value);
+#endif
   }
 
   void printAttributes(std::unordered_map<std::string, sdktrace::SpanDataAttributeValue> map)
