@@ -15,10 +15,10 @@ namespace trace
 namespace detail
 {
 template <class T>
-inline void take_span_context_kv(SpanContext, opentelemetry::common::KeyValueIterableView<T>)
+inline void take_span_context_kv(SpanContext, common::KeyValueIterableView<T>)
 {}
 
-template <class T, nostd::enable_if_t<detail::is_key_value_iterable<T>::value> * = nullptr>
+template <class T, nostd::enable_if_t<common::detail::is_key_value_iterable<T>::value> * = nullptr>
 inline void take_span_context_kv(SpanContext, T &)
 {}
 
@@ -75,31 +75,31 @@ private:
   const T *container_;
 
   bool do_callback(SpanContext span_context,
-                   const KeyValueIterable &attributes,
+                   const common::KeyValueIterable &attributes,
                    nostd::function_ref<bool(SpanContext, opentelemetry::common::KeyValueIterable &)>
                        callback) const noexcept
   {
-    if (!callback(span_context, const_cast<opentelemetry::common::KeyValueIterable &>(attributes)))
+    if (!callback(span_context, const_cast<common::KeyValueIterable &>(attributes)))
     {
       return false;
     }
     return true;
   }
 
-  template <class U, nostd::enable_if_t<detail::is_key_value_iterable<U>::value> * = nullptr>
-  bool do_callback(SpanContext span_context,
-                   const U &attributes,
-                   nostd::function_ref<bool(SpanContext, opentelemetry::common::KeyValueIterable &)>
-                       callback) const noexcept
+  template <class U,
+            nostd::enable_if_t<common::detail::is_key_value_iterable<U>::value> * = nullptr>
+  bool do_callback(
+      SpanContext span_context,
+      const U &attributes,
+      nostd::function_ref<bool(SpanContext, common::KeyValueIterable &)> callback) const noexcept
   {
-    return do_callback(span_context, KeyValueIterableView<U>(attributes), callback);
+    return do_callback(span_context, common::KeyValueIterableView<U>(attributes), callback);
   }
 
   bool do_callback(
       SpanContext span_context,
       std::initializer_list<std::pair<nostd::string_view, common::AttributeValue>> attributes,
-      nostd::function_ref<bool(SpanContext, opentelemetry::common::KeyValueIterable &)> callback)
-      const noexcept
+      nostd::function_ref<bool(SpanContext, common::KeyValueIterable &)> callback) const noexcept
   {
     return do_callback(span_context,
                        nostd::span<const std::pair<nostd::string_view, common::AttributeValue>>{

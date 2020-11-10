@@ -13,9 +13,9 @@ using opentelemetry::core::SteadyTimestamp;
 using opentelemetry::core::SystemTimestamp;
 namespace nostd  = opentelemetry::nostd;
 namespace common = opentelemetry::common;
+using opentelemetry::common::KeyValueIterableView;
 using opentelemetry::exporter::memory::InMemorySpanData;
 using opentelemetry::exporter::memory::InMemorySpanExporter;
-using opentelemetry::trace::KeyValueIterableView;
 using opentelemetry::trace::SpanContext;
 
 /**
