@@ -101,40 +101,11 @@ Span::Span(std::shared_ptr<Tracer> &&tracer,
     return true;
   });
 
-  links.ForEachKeyValue([&](trace_api::SpanContext span_context, nostd::string_view key,
-                            opentelemetry::common::AttributeValue value, bool is_last_kv) noexcept {
-    static std::unordered_map<nostd::string_view, opentelemetry::common::AttributeValue>
-        link_attributes = {};
-    if (is_last_kv)
+  links.ForEachKeyValue([&](opentelemetry::trace::SpanContext span_context, opentelemetry::trace::KeyValueIterable& attributes)
     {
-      if (key.size())
-      {
-        link_attributes.insert(
-            std::make_pair<nostd::string_view, opentelemetry::common::AttributeValue>(
-                std::move(key), std::move(value)));
-      }
-      if (link_attributes.size())
-      {
-        recordable_->AddLink(
-            span_context,
-            trace_api::KeyValueIterableView<
-                std::unordered_map<nostd::string_view, opentelemetry::common::AttributeValue>>(
-                link_attributes));
-      }
-      else
-      {
-        recordable_->AddLink(span_context);
-      }
-      link_attributes.clear();
-    }
-    else
-    {
-      link_attributes.insert(
-          std::make_pair<nostd::string_view, opentelemetry::common::AttributeValue>(
-              std::move(key), std::move(value)));
-    }
-    return true;
-  });
+      recordable_->AddLink(span_context, attributes);
+      return true;
+    });
 
   recordable_->SetStartTime(NowOr(options.start_system_time));
   start_steady_time = NowOr(options.start_steady_time);

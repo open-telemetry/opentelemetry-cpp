@@ -24,7 +24,7 @@ public:
    */
   virtual bool ForEachKeyValue(
       nostd::function_ref<
-          bool(SpanContext, nostd::string_view, common::AttributeValue, bool /*is_last_kv */)>
+          bool(SpanContext, opentelemetry::trace::KeyValueIterable&)>
           callback) const noexcept = 0;
   /**
    * @return the number of key-value pairs
