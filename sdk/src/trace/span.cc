@@ -101,11 +101,11 @@ Span::Span(std::shared_ptr<Tracer> &&tracer,
     return true;
   });
 
-  links.ForEachKeyValue([&](opentelemetry::trace::SpanContext span_context, opentelemetry::common::KeyValueIterable& attributes)
-    {
-      recordable_->AddLink(span_context, attributes);
-      return true;
-    });
+  links.ForEachKeyValue([&](opentelemetry::trace::SpanContext span_context,
+                            opentelemetry::common::KeyValueIterable &attributes) {
+    recordable_->AddLink(span_context, attributes);
+    return true;
+  });
 
   recordable_->SetStartTime(NowOr(options.start_system_time));
   start_steady_time = NowOr(options.start_steady_time);
