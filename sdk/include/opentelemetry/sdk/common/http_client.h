@@ -62,7 +62,7 @@ enum class SessionState
 {
   CreateFailed,        // session create failed
   Created,             // session created
-  Destroy,             // session destroyed
+  Destroyed,           // session destroyed
   Connecting,          // connecting to peer
   ConnectFailed,       // connection failed
   Connected,           // connected
@@ -70,7 +70,7 @@ enum class SessionState
   SendFailed,          // request send failed
   Response,            // response received
   SSLHandshakeFailed,  // SSL handshake failed
-  TimedOut,            // request timed out
+  TimedOut,            // request time out
   NetworkError,        // network error
   ReadError,           // error reading response
   WriteError,          // error writing request

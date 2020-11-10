@@ -58,9 +58,11 @@ public:
    * Create local CURL instance for url and body
    *
    * @param url
-   * @param body
+   * @param callback 
+   * @param request  Request Headers
+   * @param body  Reques Body
+   * @param raw_response whether to parse the response
    * @param httpConnTimeout   HTTP connection timeout in seconds
-   * @param httpReadTimeout   HTTP read timeout in seconds
    */
   HttpOperation(http_sdk::Method method,
                 std::string url,
