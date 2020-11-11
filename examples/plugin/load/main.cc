@@ -24,11 +24,7 @@ int main(int argc, char *argv[])
   std::ifstream config_in{argv[2]};
   if (!config_in.good())
   {
-    char err_msg[256] = {
-        '\0',
-    };
-    strerror_s(err_msg, sizeof(err_msg), errno);
-    std::cerr << "Failed to open config file: " << err_msg << "\n";
+    std::perror("Failed to open config file");
     return -1;
   }
   std::string config{std::istreambuf_iterator<char>{config_in}, std::istreambuf_iterator<char>{}};
