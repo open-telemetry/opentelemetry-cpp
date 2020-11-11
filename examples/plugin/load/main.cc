@@ -24,7 +24,9 @@ int main(int argc, char *argv[])
   std::ifstream config_in{argv[2]};
   if (!config_in.good())
   {
-    char err_msg[256] = {'\0',};
+    char err_msg[256] = {
+        '\0',
+    };
     strerror_s(err_msg, sizeof(err_msg), errno);
     std::cerr << "Failed to open config file: " << err_msg << "\n";
     return -1;
