@@ -5,8 +5,6 @@
 #include "opentelemetry/trace/trace_flags.h"
 #include "opentelemetry/version.h"
 
-#include <unordered_map>
-
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace sdk
 {
