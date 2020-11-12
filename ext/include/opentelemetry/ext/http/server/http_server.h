@@ -720,6 +720,7 @@ protected:
   {
     conn.response.message.clear();
     conn.response.headers.clear();
+
     conn.response.body.clear();
     if (conn.response.code == 0)
     {
