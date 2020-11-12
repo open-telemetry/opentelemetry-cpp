@@ -337,8 +337,8 @@ public:
       */
       size_t pos = header.find(": ");
       if (pos != std::string::npos)
-        result.insert(std::pair<nostd::string_view, nostd::string_view>(
-            nostd::string_view(header.substr(0, pos)), nostd::string_view(header.substr(pos + 2))));
+        result.insert(
+            std::pair<std::string, std::string>(header.substr(0, pos), header.substr(pos + 2)));
     }
     return result;
   }
