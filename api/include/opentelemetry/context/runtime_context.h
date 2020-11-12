@@ -12,37 +12,20 @@ namespace context
 class Token
 {
 public:
-  bool operator==(const Context &other) noexcept { return context_ == other; }
+  bool operator==(const Context &other) const noexcept { return context_ == other; }
+
+  ~Token();
 
 private:
   friend class RuntimeContextStorage;
-
-  // The ContextDetacher object automatically attempts to detach
-  // the Token when all copies of the Token are out of scope.
-  class ContextDetacher
-  {
-  public:
-    ContextDetacher(Context context) : context_(context) {}
-
-    ~ContextDetacher();
-
-  private:
-    Context context_;
-  };
 
   Token() noexcept = default;
 
   // A constructor that sets the token's Context object to the
   // one that was passed in.
-  Token(Context context)
-  {
-    context_ = context;
+  Token(Context context) : context_(context) {}
 
-    detacher_ = nostd::shared_ptr<ContextDetacher>(new ContextDetacher(context_));
-  };
-
-  Context context_;
-  nostd::shared_ptr<ContextDetacher> detacher_;
+  const Context context_;
 };
 
 /**
@@ -64,8 +47,9 @@ public:
   /**
    * Set the current context.
    * @param the new current context
+   * @return a token for the new current context. This never returns a nullptr.
    */
-  virtual Token Attach(Context context) noexcept = 0;
+  virtual nostd::unique_ptr<Token> Attach(Context context) noexcept = 0;
 
   /**
    * Detach the context related to the given token.
@@ -75,7 +59,10 @@ public:
   virtual bool Detach(Token &token) noexcept = 0;
 
 protected:
-  Token CreateToken(Context context) noexcept { return Token(context); }
+  nostd::unique_ptr<Token> CreateToken(Context context) noexcept
+  {
+    return nostd::unique_ptr<Token>(new Token(context));
+  }
 };
 
 /**
@@ -95,7 +82,7 @@ public:
 
   // Sets the current 'Context' object. Returns a token
   // that can be used to reset to the previous Context.
-  static Token Attach(Context context) noexcept
+  static nostd::unique_ptr<Token> Attach(Context context) noexcept
   {
     return GetRuntimeContextStorage()->Attach(context);
   }
@@ -171,11 +158,9 @@ private:
   }
 };
 
-inline Token::ContextDetacher::~ContextDetacher()
+inline Token::~Token()
 {
-  context::Token token;
-  token.context_ = context_;
-  context::RuntimeContext::Detach(token);
+  context::RuntimeContext::Detach(*this);
 }
 
 // The ThreadLocalContextStorage class is a derived class from
@@ -190,25 +175,39 @@ public:
   // Return the current context.
   Context GetCurrent() noexcept override { return GetStack().Top(); }
 
-  // Resets the context to a previous value stored in the
-  // passed in token. Returns true if successful, false otherwise
+  // Resets the context to the value previous to the passed in token. This will
+  // also detach all child contexts of the passed in token.
+  // Returns true if successful, false otherwise.
   bool Detach(Token &token) noexcept override
   {
-    if (!(token == GetStack().Top()))
+    // In most cases, the context to be detached is on the top of the stack.
+    if (token == GetStack().Top())
+    {
+      GetStack().Pop();
+      return true;
+    }
+
+    if (!GetStack().Contains(token))
     {
       return false;
     }
+
+    while (!(token == GetStack().Top()))
+    {
+      GetStack().Pop();
+    }
+
     GetStack().Pop();
+
     return true;
   }
 
   // Sets the current 'Context' object. Returns a token
   // that can be used to reset to the previous Context.
-  Token Attach(Context context) noexcept override
+  nostd::unique_ptr<Token> Attach(Context context) noexcept override
   {
     GetStack().Push(context);
-    Token old_context = CreateToken(context);
-    return old_context;
+    return CreateToken(context);
   }
 
 private:
@@ -228,6 +227,19 @@ private:
       }
       size_ -= 1;
       return base_[size_];
+    }
+
+    bool Contains(const Token &token) const noexcept
+    {
+      for (size_t pos = size_; pos > 0; --pos)
+      {
+        if (token == base_[pos - 1])
+        {
+          return true;
+        }
+      }
+
+      return false;
     }
 
     // Returns the Context at the top of the stack.
