@@ -30,7 +30,8 @@ public:
 
   void AddHeader(nostd::string_view name, nostd::string_view value) noexcept override
   {
-    headers_.insert(std::pair<std::string, std::string>(name, value));
+    headers_.insert(std::pair<std::string, std::string>(static_cast<std::string>(name),
+                                                        static_cast<std::string>(value)));
   }
 
   void ReplaceHeader(nostd::string_view name, nostd::string_view value) noexcept override
