@@ -100,7 +100,7 @@ Span::Span(std::shared_ptr<Tracer> &&tracer,
   });
 
   links.ForEachKeyValue([&](opentelemetry::trace::SpanContext span_context,
-                            opentelemetry::common::KeyValueIterable &attributes) {
+                            const opentelemetry::common::KeyValueIterable &attributes) {
     recordable_->AddLink(span_context, attributes);
     return true;
   });

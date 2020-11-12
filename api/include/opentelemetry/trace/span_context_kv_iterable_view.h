@@ -53,14 +53,13 @@ public:
   explicit SpanContextKeyValueIterableView(const T &links) noexcept : container_{&links} {}
 
   bool ForEachKeyValue(
-      nostd::function_ref<bool(SpanContext, opentelemetry::common::KeyValueIterable &)> callback)
-      const noexcept override
+      nostd::function_ref<bool(SpanContext, const opentelemetry::common::KeyValueIterable &)>
+          callback) const noexcept override
   {
     auto iter = std::begin(*container_);
     auto last = std::end(*container_);
     for (; iter != last; ++iter)
     {
-      auto attributes = iter->second;
       if (!this->do_callback(iter->first, iter->second, callback))
       {
         return false;
@@ -74,12 +73,13 @@ public:
 private:
   const T *container_;
 
-  bool do_callback(SpanContext span_context,
-                   const common::KeyValueIterable &attributes,
-                   nostd::function_ref<bool(SpanContext, opentelemetry::common::KeyValueIterable &)>
-                       callback) const noexcept
+  bool do_callback(
+      SpanContext span_context,
+      const common::KeyValueIterable &attributes,
+      nostd::function_ref<bool(SpanContext, const opentelemetry::common::KeyValueIterable &)>
+          callback) const noexcept
   {
-    if (!callback(span_context, const_cast<common::KeyValueIterable &>(attributes)))
+    if (!callback(span_context, attributes))
     {
       return false;
     }
@@ -91,7 +91,8 @@ private:
   bool do_callback(
       SpanContext span_context,
       const U &attributes,
-      nostd::function_ref<bool(SpanContext, common::KeyValueIterable &)> callback) const noexcept
+      nostd::function_ref<bool(SpanContext, const common::KeyValueIterable &)> callback) const
+      noexcept
   {
     return do_callback(span_context, common::KeyValueIterableView<U>(attributes), callback);
   }
@@ -99,7 +100,8 @@ private:
   bool do_callback(
       SpanContext span_context,
       std::initializer_list<std::pair<nostd::string_view, common::AttributeValue>> attributes,
-      nostd::function_ref<bool(SpanContext, common::KeyValueIterable &)> callback) const noexcept
+      nostd::function_ref<bool(SpanContext, const common::KeyValueIterable &)> callback) const
+      noexcept
   {
     return do_callback(span_context,
                        nostd::span<const std::pair<nostd::string_view, common::AttributeValue>>{
