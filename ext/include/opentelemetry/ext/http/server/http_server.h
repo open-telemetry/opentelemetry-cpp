@@ -720,8 +720,8 @@ protected:
   {
     conn.response.message.clear();
     conn.response.headers.clear();
-
     conn.response.body.clear();
+
     if (conn.response.code == 0)
     {
       conn.response.code = 404;  // Not Found
