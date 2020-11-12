@@ -54,6 +54,7 @@ trace_api::SpanContext GetCurrentSpanContext(const trace_api::SpanContext &expli
 nostd::shared_ptr<trace_api::Span> Tracer::StartSpan(
     nostd::string_view name,
     const opentelemetry::common::KeyValueIterable &attributes,
+    const trace_api::SpanContextKeyValueIterable &links,
     const trace_api::StartSpanOptions &options) noexcept
 {
   trace_api::SpanContext parent = GetCurrentSpanContext(options.parent);
@@ -72,7 +73,7 @@ nostd::shared_ptr<trace_api::Span> Tracer::StartSpan(
   else
   {
     auto span = nostd::shared_ptr<trace_api::Span>{new (std::nothrow) Span{
-        this->shared_from_this(), processor_.load(), name, attributes, options, parent}};
+        this->shared_from_this(), processor_.load(), name, attributes, links, options, parent}};
 
     // if the attributes is not nullptr, add attributes to the span.
     if (sampling_result.attributes)

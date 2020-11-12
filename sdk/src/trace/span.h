@@ -19,6 +19,7 @@ public:
                 std::shared_ptr<SpanProcessor> processor,
                 nostd::string_view name,
                 const opentelemetry::common::KeyValueIterable &attributes,
+                const trace_api::SpanContextKeyValueIterable &links,
                 const trace_api::StartSpanOptions &options,
                 const trace_api::SpanContext &parent_span_context) noexcept;
 
