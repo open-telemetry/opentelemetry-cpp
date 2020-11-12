@@ -7,41 +7,44 @@
 #include <vector>
 
 OPENTELEMETRY_BEGIN_NAMESPACE
-namespace exporters
-{
-namespace common
+namespace ext
 {
 namespace http
+{
+namespace client
 {
 namespace curl
 {
 
-namespace http_sdk                 = opentelemetry::sdk::common::http;
-const http_sdk::StatusCode Http_Ok = 200;
+namespace http_client                 = opentelemetry::ext::http::client;
+const http_client::StatusCode Http_Ok = 200;
 
-class Request : public http_sdk::Request
+class Request : public http_client::Request
 {
 public:
-  Request() : method_(http_sdk::Method::Get), uri_("/") {}
+  Request() : method_(http_client::Method::Get), uri_("/") {}
 
-  void SetMethod(http_sdk::Method method) noexcept override { method_ = method; }
+  void SetMethod(http_client::Method method) noexcept override { method_ = method; }
 
-  void SetBody(http_sdk::Body &body) noexcept override { body_ = std::move(body); }
+  void SetBody(http_client::Body &body) noexcept override { body_ = std::move(body); }
 
   void AddHeader(nostd::string_view name, nostd::string_view value) noexcept override
   {
-    headers_.insert(std::pair<nostd::string_view, nostd::string_view>(name, value));
+    headers_.insert(std::pair<std::string, std::string>(name, value));
   }
 
   void ReplaceHeader(nostd::string_view name, nostd::string_view value) noexcept override
   {
     // erase matching headers
-    auto range = headers_.equal_range(name);
+    auto range = headers_.equal_range(static_cast<std::string>(name));
     headers_.erase(range.first, range.second);
     AddHeader(name, value);
   }
 
-  virtual void SetUri(nostd::string_view uri) noexcept override { uri_ = uri; }
+  virtual void SetUri(nostd::string_view uri) noexcept override
+  {
+    uri_ = static_cast<std::string>(uri);
+  }
 
   void SetTimeoutMs(std::chrono::milliseconds timeout_ms) noexcept override
   {
@@ -49,19 +52,19 @@ public:
   }
 
 public:
-  http_sdk::Method method_;
-  http_sdk::Body body_;
+  http_client::Method method_;
+  http_client::Body body_;
   Headers headers_;
-  nostd::string_view uri_;
+  std::string uri_;
   std::chrono::milliseconds timeout_ms_{5000};  // ms
 };
 
-class Response : public http_sdk::Response
+class Response : public http_client::Response
 {
 public:
   Response() : status_code_(Http_Ok) {}
 
-  virtual const http_sdk::Body &GetBody() const noexcept override { return body_; }
+  virtual const http_client::Body &GetBody() const noexcept override { return body_; }
 
   virtual bool ForEachHeader(
       nostd::function_ref<bool(nostd::string_view name, nostd::string_view value)> callable) const
@@ -82,7 +85,7 @@ public:
       nostd::function_ref<bool(nostd::string_view name, nostd::string_view value)> callable) const
       noexcept override
   {
-    auto range = headers_.equal_range(name);
+    auto range = headers_.equal_range(static_cast<std::string>(name));
     for (auto it = range.first; it != range.second; ++it)
     {
       if (!callable(it->first, it->second))
@@ -93,17 +96,17 @@ public:
     return true;
   }
 
-  virtual http_sdk::StatusCode GetStatusCode() const noexcept override { return status_code_; }
+  virtual http_client::StatusCode GetStatusCode() const noexcept override { return status_code_; }
 
 public:
   Headers headers_;
-  http_sdk::Body body_;
-  http_sdk::StatusCode status_code_;
+  http_client::Body body_;
+  http_client::StatusCode status_code_;
 };
 
 class SessionManager;
 
-class Session : public http_sdk::Session
+class Session : public http_client::Session
 {
 public:
   Session(SessionManager &session_manager, std::string host, uint16_t port = 80)
@@ -116,25 +119,25 @@ public:
     host_ += ":" + std::to_string(port) + "/";
   }
 
-  std::shared_ptr<http_sdk::Request> CreateRequest() noexcept override
+  std::shared_ptr<http_client::Request> CreateRequest() noexcept override
   {
     http_request_.reset(new Request());
     return http_request_;
   }
 
-  virtual void SendRequest(http_sdk::EventHandler &callback) noexcept override
+  virtual void SendRequest(http_client::EventHandler &callback) noexcept override
   {
     is_session_active_ = true;
     std::string url    = host_ + std::string(http_request_->uri_);
     auto callback_ptr  = &callback;
     curl_operation_.reset(new HttpOperation(http_request_->method_, url, callback_ptr,
                                             http_request_->headers_, http_request_->body_, false,
-                                            http_request_->timeout_ms_.count()));
+                                            http_request_->timeout_ms_));
     curl_operation_->SendAsync([this, callback_ptr](HttpOperation &operation) {
       if (operation.WasAborted())
       {
         // Manually cancelled
-        callback_ptr->OnEvent(http_sdk::SessionState::Cancelled, "");
+        callback_ptr->OnEvent(http_client::SessionState::Cancelled, "");
       }
 
       if (operation.GetResponseCode() >= CURL_LAST)
@@ -145,8 +148,8 @@ public:
         response->body_    = operation.GetResponseBody();
         callback_ptr->OnResponse(*response);
       }
+      is_session_active_ = false;
     });
-    is_session_active_ = false;
   }
 
   virtual bool CancelSession() noexcept override
@@ -174,13 +177,14 @@ private:
   bool is_session_active_;
 };
 
-class SessionManager : public http_sdk::SessionManager
+class SessionManager : public http_client::SessionManager
 {
 public:
+  // The call (curl_global_init) is not thread safe. Ensure this is called only once.
   SessionManager() { curl_global_init(CURL_GLOBAL_ALL); }
 
-  std::shared_ptr<http_sdk::Session> CreateSession(nostd::string_view host,
-                                                   uint16_t port = 80) noexcept override
+  std::shared_ptr<http_client::Session> CreateSession(nostd::string_view host,
+                                                      uint16_t port = 80) noexcept override
   {
     auto session    = std::make_shared<Session>(*this, std::string(host), port);
     auto session_id = ++next_session_id_;
@@ -221,7 +225,7 @@ private:
 };
 
 }  // namespace curl
+}  // namespace client
 }  // namespace http
-}  // namespace common
-}  // namespace exporters
+}  // namespace ext
 OPENTELEMETRY_END_NAMESPACE

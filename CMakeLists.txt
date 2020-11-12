@@ -16,8 +16,6 @@ option(WITH_OTPROTOCOL
 option(WITH_PROMETHEUS "Whether to include the Prometheus Client in the SDK"
        OFF)
 
-option(WITH_CURL "Whether to include HTTP CURL Client in the SDK" OFF)
-
 option(WITH_TESTS "Whether to enable tests" ON)
 option(WITH_EXAMPLES "Whether to build examples" ON)
 
@@ -75,7 +73,5 @@ include_directories(.)
 if(WITH_EXAMPLES)
   add_subdirectory(examples)
 endif()
-include_directories(ext/include)
 add_subdirectory(ext)
-include_directories(exporters/include)
 add_subdirectory(exporters)

@@ -1,6 +1,6 @@
 #pragma once
 
-#include "opentelemetry/sdk/common/http_client.h"
+#include "opentelemetry/ext/http/client/http_client.h"
 
 #include <curl/curl.h>
 #include <future>
@@ -16,34 +16,34 @@
 #endif
 
 OPENTELEMETRY_BEGIN_NAMESPACE
-namespace exporters
-{
-namespace common
+namespace ext
 {
 namespace http
 {
+namespace client
+{
 namespace curl
 {
-namespace http_sdk                     = opentelemetry::sdk::common::http;
-const size_t default_http_conn_timeout = 5000;  // ms
-const std::string http_status_regexp   = "HTTP\\/\\d\\.\\d (\\d+)\\ .*";
-const std::string http_header_regexp   = "(.*)\\: (.*)\\n*";
+namespace http_client = opentelemetry::ext::http::client;
+const std::chrono::milliseconds default_http_conn_timeout(5000);  // ms
+const std::string http_status_regexp = "HTTP\\/\\d\\.\\d (\\d+)\\ .*";
+const std::string http_header_regexp = "(.*)\\: (.*)\\n*";
 
 struct curl_ci
 {
-  bool operator()(const nostd::string_view &s1, const nostd::string_view &s2) const
+  bool operator()(const std::string &s1, const std::string &s2) const
   {
     return std::lexicographical_compare(
         s1.begin(), s1.end(), s2.begin(), s2.end(),
         [](char c1, char c2) { return ::tolower(c1) < ::tolower(c2); });
   }
 };
-using Headers = std::multimap<nostd::string_view, nostd::string_view, curl_ci>;
+using Headers = std::multimap<std::string, std::string, curl_ci>;
 
 class HttpOperation
 {
 public:
-  void DispatchEvent(http_sdk::SessionState type, std::string reason = "")
+  void DispatchEvent(http_client::SessionState type, std::string reason = "")
   {
     if (callback_ != nullptr)
     {
@@ -64,15 +64,15 @@ public:
    * @param raw_response whether to parse the response
    * @param httpConnTimeout   HTTP connection timeout in seconds
    */
-  HttpOperation(http_sdk::Method method,
+  HttpOperation(http_client::Method method,
                 std::string url,
-                http_sdk::EventHandler *callback,
+                http_client::EventHandler *callback,
                 // Default empty headers and empty request body
-                const Headers &request_headers     = Headers(),
-                const http_sdk::Body &request_body = http_sdk::Body(),
+                const Headers &request_headers        = Headers(),
+                const http_client::Body &request_body = http_client::Body(),
                 // Default connectivity and response size options
-                bool raw_response        = false,
-                size_t http_conn_timeout = default_http_conn_timeout)
+                bool is_raw_response                        = false,
+                std::chrono::milliseconds http_conn_timeout = default_http_conn_timeout)
       :  //
         method_(method),
         url_(url),
@@ -82,7 +82,7 @@ public:
         request_headers_(request_headers),
         request_body_(request_body),
         // Optional connection params
-        raw_response_(raw_response),
+        is_raw_response_(is_raw_response),
         http_conn_timeout_(http_conn_timeout),
         // Result
         res_(CURLE_OK),
@@ -91,15 +91,12 @@ public:
         is_finished_(false),
         nread_(0)
   {
-    response_.memory = nullptr;
-    response_.size   = 0;
-
     /* get a curl handle */
     curl_ = curl_easy_init();
     if (!curl_)
     {
       res_ = CURLE_FAILED_INIT;
-      DispatchEvent(http_sdk::SessionState::CreateFailed);
+      DispatchEvent(http_client::SessionState::CreateFailed);
       return;
     }
 
@@ -126,7 +123,7 @@ public:
       curl_easy_setopt(curl_, CURLOPT_HTTPHEADER, headers_chunk_);
     }
 
-    DispatchEvent(http_sdk::SessionState::Created);
+    DispatchEvent(http_client::SessionState::Created);
   }
 
   /**
@@ -141,7 +138,7 @@ public:
       result_.wait();
     }
     // TBD - Need to be uncomment. This will callback instance is deleted.
-    // DispatchEvent(http_sdk::SessionState::Destroy);
+    // DispatchEvent(http_client::SessionState::Destroy);
     res_ = CURLE_OK;
     curl_easy_cleanup(curl_);
     curl_slist_free_all(headers_chunk_);
@@ -172,7 +169,7 @@ public:
     if (!curl_)
     {
       res_ = CURLE_FAILED_INIT;
-      DispatchEvent(http_sdk::SessionState::SendFailed);
+      DispatchEvent(http_client::SessionState::SendFailed);
       return res_;
     }
 
@@ -182,12 +179,12 @@ public:
     // Perform initial connect, handling the timeout if needed
 
     curl_easy_setopt(curl_, CURLOPT_CONNECT_ONLY, 1L);
-    DispatchEvent(http_sdk::SessionState::Connecting);
+    DispatchEvent(http_client::SessionState::Connecting);
     res_ = curl_easy_perform(curl_);
 
     if (CURLE_OK != res_)
     {
-      DispatchEvent(http_sdk::SessionState::ConnectFailed,
+      DispatchEvent(http_client::SessionState::ConnectFailed,
                     curl_easy_strerror(res_));  // couldn't connect - stage 1
       return res_;
     }
@@ -201,32 +198,32 @@ public:
 
     if (CURLE_OK != res_)
     {
-      DispatchEvent(http_sdk::SessionState::ConnectFailed,
+      DispatchEvent(http_client::SessionState::ConnectFailed,
                     curl_easy_strerror(res_));  // couldn't connect - stage 2
       return res_;
     }
 
     /* wait for the socket to become ready for sending */
     sockfd_ = sockextr;
-    if (!WaitOnSocket(sockfd_, 0, http_conn_timeout_) || is_aborted_)
+    if (!WaitOnSocket(sockfd_, 0, http_conn_timeout_.count()) || is_aborted_)
     {
       res_ = CURLE_OPERATION_TIMEDOUT;
       DispatchEvent(
-          http_sdk::SessionState::ConnectFailed,
+          http_client::SessionState::ConnectFailed,
           " Is aborted: " + std::to_string(is_aborted_.load()));  // couldn't connect - stage 3
       return res_;
     }
 
-    DispatchEvent(http_sdk::SessionState::Connected);
+    DispatchEvent(http_client::SessionState::Connected);
     // once connection is there - switch back to easy perform for HTTP post
     curl_easy_setopt(curl_, CURLOPT_CONNECT_ONLY, 0);
 
     // send all data to our callback function
-    if (raw_response_)
+    if (is_raw_response_)
     {
       curl_easy_setopt(curl_, CURLOPT_HEADER, true);
       curl_easy_setopt(curl_, CURLOPT_WRITEFUNCTION, (void *)&WriteMemoryCallback);
-      curl_easy_setopt(curl_, CURLOPT_WRITEDATA, (void *)&response_);
+      curl_easy_setopt(curl_, CURLOPT_WRITEDATA, (void *)&raw_response_);
     }
     else
     {
@@ -236,14 +233,14 @@ public:
     }
 
     // TODO: only two methods supported for now - POST and GET
-    if (method_ == http_sdk::Method::Post)
+    if (method_ == http_client::Method::Post)
     {
       // POST
       curl_easy_setopt(curl_, CURLOPT_POST, true);
       curl_easy_setopt(curl_, CURLOPT_POSTFIELDS, (const char *)request);
       curl_easy_setopt(curl_, CURLOPT_POSTFIELDSIZE, req_size);
     }
-    else if (method_ == http_sdk::Method::Get)
+    else if (method_ == http_client::Method::Get)
     {
       // GET
     }
@@ -256,12 +253,12 @@ public:
     // abort if slower than 4kb/sec during 30 seconds
     curl_easy_setopt(curl_, CURLOPT_LOW_SPEED_TIME, 30L);
     curl_easy_setopt(curl_, CURLOPT_LOW_SPEED_LIMIT, 4096);
-    DispatchEvent(http_sdk::SessionState::Sending);
+    DispatchEvent(http_client::SessionState::Sending);
 
     res_ = curl_easy_perform(curl_);
     if (CURLE_OK != res_)
     {
-      DispatchEvent(http_sdk::SessionState::SendFailed, curl_easy_strerror(res_));
+      DispatchEvent(http_client::SessionState::SendFailed, curl_easy_strerror(res_));
       return res_;
     }
 
@@ -279,7 +276,7 @@ public:
     /* libcurl is nice enough to parse the http response code itself: */
     curl_easy_getinfo(curl_, CURLINFO_RESPONSE_CODE, &res_);
     // We got some response from server. Dump the contents.
-    DispatchEvent(http_sdk::SessionState::Response);
+    DispatchEvent(http_client::SessionState::Response);
 
     // This function returns:
     // - on success: HTTP status code.
@@ -358,28 +355,16 @@ public:
    *
    * @return
    */
-  std::vector<uint8_t> GetRawResponse()
-  {
-    std::vector<uint8_t> result;
-    if ((response_.memory != nullptr) && (response_.size != 0))
-      result.insert(result.end(), (const char *)response_.memory,
-                    ((const char *)response_.memory) + response_.size);
-    return result;
-  }
+  std::vector<uint8_t> GetRawResponse() { return raw_response_; }
 
   /**
    * Release memory allocated for response
    */
   void ReleaseResponse()
   {
-    if (response_.memory != nullptr)
-    {
-      free(response_.memory);
-      response_.memory = nullptr;
-      response_.size   = 0;
-    }
     resp_headers_.clear();
     resp_body_.clear();
+    raw_response_.clear();
   }
 
   /**
@@ -402,24 +387,25 @@ public:
   CURL *GetHandle() { return curl_; }
 
 protected:
-  const bool raw_response_;         // Do not split response headers from response body
-  const size_t http_conn_timeout_;  // Timeout for connect.  Default: 5000ms
+  const bool is_raw_response_;  // Do not split response headers from response body
+  const std::chrono::milliseconds http_conn_timeout_;  // Timeout for connect.  Default: 5000ms
 
   CURL *curl_;    // Local curl instance
   CURLcode res_;  // Curl result OR HTTP status code if successful
 
-  http_sdk::EventHandler *callback_ = nullptr;
+  http_client::EventHandler *callback_ = nullptr;
 
   // Request values
-  http_sdk::Method method_;
+  http_client::Method method_;
   std::string url_;
   const Headers &request_headers_;
-  const http_sdk::Body &request_body_;
+  const http_client::Body &request_body_;
   struct curl_slist *headers_chunk_ = nullptr;
 
   // Processed response headers and body
   std::vector<uint8_t> resp_headers_;
   std::vector<uint8_t> resp_body_;
+  std::vector<uint8_t> raw_response_;
 
   // Socket parameters
   curl_socket_t sockfd_;
@@ -469,13 +455,6 @@ protected:
     return res;
   }
 
-  // Raw response buffer
-  struct MemoryStruct
-  {
-    char *memory;
-    size_t size;
-  } response_;
-
   /**
    * Old-school memory allocator
    *
@@ -487,25 +466,14 @@ protected:
    */
   static size_t WriteMemoryCallback(void *contents, size_t size, size_t nmemb, void *userp)
   {
-    size_t realsize          = size * nmemb;
-    struct MemoryStruct *mem = (struct MemoryStruct *)userp;
-
-    mem->memory = (char *)(realloc(mem->memory, mem->size + realsize + 1));
-    if (mem->memory == NULL)
-    {
-      /* out of memory! */
-      return 0;
-    }
-
-    memcpy(&(mem->memory[mem->size]), contents, realsize);
-    mem->size += realsize;
-    mem->memory[mem->size] = 0;
-
-    return realsize;
+    std::vector<char> *buf = static_cast<std::vector<char> *>(userp);
+    buf->insert(buf->end(), static_cast<char *>(contents),
+                static_cast<char *>(contents) + (size * nmemb));
+    return size * nmemb;
   }
 
   /**
-   * C++ STL std::string allocator
+   * C++ STL std::vector allocator
    *
    * @param ptr
    * @param size
@@ -528,7 +496,7 @@ protected:
   }
 };
 }  // namespace curl
+}  // namespace client
 }  // namespace http
-}  // namespace common
-}  // namespace exporters
+}  // namespace ext
 OPENTELEMETRY_END_NAMESPACE

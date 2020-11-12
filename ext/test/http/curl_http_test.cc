@@ -1,4 +1,4 @@
-#include "opentelemetry/exporters/common/http/http_client_curl.h"
+#include "opentelemetry/ext//http/client/curl//http_client_curl.h"
 #include "opentelemetry/ext/http/server/http_server.h"
 
 #include <assert.h>
@@ -13,24 +13,24 @@
 
 #include <gtest/gtest.h>
 
-namespace curl     = opentelemetry::exporters::common::http::curl;
-namespace http_sdk = opentelemetry::sdk::common::http;
+namespace curl        = opentelemetry::ext::http::client::curl;
+namespace http_client = opentelemetry::ext::http::client;
 
-class CustomEventHandler : public http_sdk::EventHandler
+class CustomEventHandler : public http_client::EventHandler
 {
 public:
-  virtual void OnResponse(http_sdk::Response &response) noexcept override{};
-  virtual void OnEvent(http_sdk::SessionState state,
+  virtual void OnResponse(http_client::Response &response) noexcept override{};
+  virtual void OnEvent(http_client::SessionState state,
                        opentelemetry::nostd::string_view reason) noexcept override
   {}
-  virtual void OnConnecting(const http_sdk::SSLCertificate &) noexcept {}
+  virtual void OnConnecting(const http_client::SSLCertificate &) noexcept {}
   virtual ~CustomEventHandler() = default;
   bool is_called_               = false;
 };
 
 class GetEventHandler : public CustomEventHandler
 {
-  void OnResponse(http_sdk::Response &response) noexcept override
+  void OnResponse(http_client::Response &response) noexcept override
   {
     ASSERT_EQ(200, response.GetStatusCode());
     ASSERT_EQ(response.GetBody().size(), 0);
@@ -40,7 +40,7 @@ class GetEventHandler : public CustomEventHandler
 
 class PostEventHandler : public CustomEventHandler
 {
-  void OnResponse(http_sdk::Response &response) noexcept override
+  void OnResponse(http_client::Response &response) noexcept override
   {
     ASSERT_EQ(200, response.GetStatusCode());
     std::string body(response.GetBody().begin(), response.GetBody().end());
@@ -150,7 +150,7 @@ TEST_F(BasicCurlHttpTests, SendPostRequest)
   auto session = session_manager.CreateSession("127.0.0.1", HTTP_PORT);
   auto request = session->CreateRequest();
   request->SetUri("post/");
-  request->SetMethod(http_sdk::Method::Post);
+  request->SetMethod(http_client::Method::Post);
   PostEventHandler *handler = new PostEventHandler();
   session->SendRequest(*handler);
   ASSERT_TRUE(waitForRequests(1, 1));

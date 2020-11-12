@@ -40,11 +40,11 @@
 */
 
 OPENTELEMETRY_BEGIN_NAMESPACE
-namespace sdk
-{
-namespace common
+namespace ext
 {
 namespace http
+{
+namespace client
 {
 
 enum class Method
@@ -160,7 +160,7 @@ public:
   virtual ~SessionManager() = default;
 };
 
+}  // namespace client
 }  // namespace http
-}  // namespace common
-}  // namespace sdk
+}  // namespace ext
 OPENTELEMETRY_END_NAMESPACE
