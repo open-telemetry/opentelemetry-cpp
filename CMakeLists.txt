@@ -61,6 +61,10 @@ option(WITH_ELASTICSEARCH
        "Whether to include the Elasticsearch Client in the SDK" OFF)
 
 option(BUILD_TESTING "Whether to enable tests" ON)
+if(WIN32)
+  option(WITH_ETW_EXPORTER "Whether to include the ETW Exporter in the SDK" ON)
+endif(WIN32)
+
 option(WITH_EXAMPLES "Whether to build examples" ON)
 
 find_package(Threads)
