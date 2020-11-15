@@ -29,7 +29,8 @@ public:
       trace_api::TraceId /*trace_id*/,
       nostd::string_view /*name*/,
       trace_api::SpanKind /*span_kind*/,
-      const opentelemetry::common::KeyValueIterable & /*attributes*/) noexcept override
+      const opentelemetry::common::KeyValueIterable & /*attributes*/,
+      const opentelemetry::trace::SpanContextKeyValueIterable & /*links*/) noexcept override
   {
     // Return two pairs of attributes. These attributes should be added to the
     // span attributes

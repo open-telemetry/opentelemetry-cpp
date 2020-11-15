@@ -1,4 +1,5 @@
 #include "opentelemetry/sdk/trace/samplers/trace_id_ratio.h"
+#include "opentelemetry/trace/span_context_kv_iterable_view.h"
 #include "src/common/random.h"
 
 #include <gtest/gtest.h>
@@ -34,7 +35,12 @@ int RunShouldSampleCountDecision(trace_api::SpanContext &context,
 
   using M = std::map<std::string, int>;
   M m1    = {{}};
+
+  using L = std::vector<std::pair<trace_api::SpanContext, std::map<std::string, std::string>>>;
+  L l1 = {{trace_api::SpanContext(false, false), {}}, {trace_api::SpanContext(false, false), {}}};
+
   opentelemetry::common::KeyValueIterableView<M> view{m1};
+  trace_api::SpanContextKeyValueIterableView<L> links{l1};
 
   for (int i = 0; i < iterations; ++i)
   {
@@ -43,7 +49,7 @@ int RunShouldSampleCountDecision(trace_api::SpanContext &context,
 
     opentelemetry::trace::TraceId trace_id(buf);
 
-    auto result = sampler.ShouldSample(context, trace_id, "", span_kind, view);
+    auto result = sampler.ShouldSample(context, trace_id, "", span_kind, view, links);
     if (result.decision == Decision::RECORD_AND_SAMPLE)
     {
       ++actual_count;
@@ -62,12 +68,17 @@ TEST(TraceIdRatioBasedSampler, ShouldSampleWithoutContext)
 
   using M = std::map<std::string, int>;
   M m1    = {{}};
+
+  using L = std::vector<std::pair<trace_api::SpanContext, std::map<std::string, std::string>>>;
+  L l1 = {{trace_api::SpanContext(false, false), {}}, {trace_api::SpanContext(false, false), {}}};
+
   opentelemetry::common::KeyValueIterableView<M> view{m1};
+  trace_api::SpanContextKeyValueIterableView<L> links{l1};
 
   TraceIdRatioBasedSampler s1(0.01);
 
-  auto sampling_result =
-      s1.ShouldSample(trace_api::SpanContext::GetInvalid(), invalid_trace_id, "", span_kind, view);
+  auto sampling_result = s1.ShouldSample(trace_api::SpanContext::GetInvalid(), invalid_trace_id, "",
+                                         span_kind, view, links);
 
   ASSERT_EQ(Decision::RECORD_AND_SAMPLE, sampling_result.decision);
   ASSERT_EQ(nullptr, sampling_result.attributes);
@@ -75,32 +86,32 @@ TEST(TraceIdRatioBasedSampler, ShouldSampleWithoutContext)
   constexpr uint8_t buf[] = {0, 0, 0, 0, 0, 0, 0, 0x80, 0, 0, 0, 0, 0, 0, 0, 0};
   opentelemetry::trace::TraceId valid_trace_id(buf);
 
-  sampling_result =
-      s1.ShouldSample(trace_api::SpanContext::GetInvalid(), valid_trace_id, "", span_kind, view);
+  sampling_result = s1.ShouldSample(trace_api::SpanContext::GetInvalid(), valid_trace_id, "",
+                                    span_kind, view, links);
 
   ASSERT_EQ(Decision::DROP, sampling_result.decision);
   ASSERT_EQ(nullptr, sampling_result.attributes);
 
   TraceIdRatioBasedSampler s2(0.50000001);
 
-  sampling_result =
-      s2.ShouldSample(trace_api::SpanContext::GetInvalid(), valid_trace_id, "", span_kind, view);
+  sampling_result = s2.ShouldSample(trace_api::SpanContext::GetInvalid(), valid_trace_id, "",
+                                    span_kind, view, links);
 
   ASSERT_EQ(Decision::RECORD_AND_SAMPLE, sampling_result.decision);
   ASSERT_EQ(nullptr, sampling_result.attributes);
 
   TraceIdRatioBasedSampler s3(0.49999999);
 
-  sampling_result =
-      s3.ShouldSample(trace_api::SpanContext::GetInvalid(), valid_trace_id, "", span_kind, view);
+  sampling_result = s3.ShouldSample(trace_api::SpanContext::GetInvalid(), valid_trace_id, "",
+                                    span_kind, view, links);
 
   ASSERT_EQ(Decision::DROP, sampling_result.decision);
   ASSERT_EQ(nullptr, sampling_result.attributes);
 
   TraceIdRatioBasedSampler s4(0.50000000);
 
-  sampling_result =
-      s4.ShouldSample(trace_api::SpanContext::GetInvalid(), valid_trace_id, "", span_kind, view);
+  sampling_result = s4.ShouldSample(trace_api::SpanContext::GetInvalid(), valid_trace_id, "",
+                                    span_kind, view, links);
 
   ASSERT_EQ(Decision::RECORD_AND_SAMPLE, sampling_result.decision);
   ASSERT_EQ(nullptr, sampling_result.attributes);
@@ -122,26 +133,31 @@ TEST(TraceIdRatioBasedSampler, ShouldSampleWithContext)
 
   using M = std::map<std::string, int>;
   M m1    = {{}};
+
+  using L = std::vector<std::pair<trace_api::SpanContext, std::map<std::string, std::string>>>;
+  L l1 = {{trace_api::SpanContext(false, false), {}}, {trace_api::SpanContext(false, false), {}}};
+
   opentelemetry::common::KeyValueIterableView<M> view{m1};
+  trace_api::SpanContextKeyValueIterableView<L> links{l1};
 
   TraceIdRatioBasedSampler s1(0.01);
 
-  auto sampling_result = s1.ShouldSample(c1, trace_id, "", span_kind, view);
+  auto sampling_result = s1.ShouldSample(c1, trace_id, "", span_kind, view, links);
 
   ASSERT_EQ(Decision::RECORD_AND_SAMPLE, sampling_result.decision);
   ASSERT_EQ(nullptr, sampling_result.attributes);
 
-  sampling_result = s1.ShouldSample(c2, trace_id, "", span_kind, view);
+  sampling_result = s1.ShouldSample(c2, trace_id, "", span_kind, view, links);
 
   ASSERT_EQ(Decision::RECORD_AND_SAMPLE, sampling_result.decision);
   ASSERT_EQ(nullptr, sampling_result.attributes);
 
-  sampling_result = s1.ShouldSample(c3, trace_id, "", span_kind, view);
+  sampling_result = s1.ShouldSample(c3, trace_id, "", span_kind, view, links);
 
   ASSERT_EQ(Decision::RECORD_AND_SAMPLE, sampling_result.decision);
   ASSERT_EQ(nullptr, sampling_result.attributes);
 
-  sampling_result = s1.ShouldSample(c4, trace_id, "", span_kind, view);
+  sampling_result = s1.ShouldSample(c4, trace_id, "", span_kind, view, links);
 
   ASSERT_EQ(Decision::RECORD_AND_SAMPLE, sampling_result.decision);
   ASSERT_EQ(nullptr, sampling_result.attributes);

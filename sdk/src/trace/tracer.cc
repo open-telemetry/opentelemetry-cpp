@@ -1,5 +1,4 @@
 #include "opentelemetry/sdk/trace/tracer.h"
-
 #include "opentelemetry/context/runtime_context.h"
 #include "opentelemetry/nostd/shared_ptr.h"
 #include "opentelemetry/sdk/common/atomic_shared_ptr.h"
@@ -60,7 +59,7 @@ nostd::shared_ptr<trace_api::Span> Tracer::StartSpan(
   trace_api::SpanContext parent = GetCurrentSpanContext(options.parent);
 
   auto sampling_result =
-      sampler_->ShouldSample(parent, parent.trace_id(), name, options.kind, attributes);
+      sampler_->ShouldSample(parent, parent.trace_id(), name, options.kind, attributes, links);
   if (sampling_result.decision == Decision::DROP)
   {
     // Don't allocate a no-op span for every DROP decision, but use a static

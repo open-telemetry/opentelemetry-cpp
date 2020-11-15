@@ -21,7 +21,8 @@ SamplingResult ParentBasedSampler::ShouldSample(
   if (!parent_context.IsValid())
   {
     // If no parent (root span) exists returns the result of the delegateSampler
-    return delegate_sampler_->ShouldSample(parent_context, trace_id, name, span_kind, attributes, links);
+    return delegate_sampler_->ShouldSample(parent_context, trace_id, name, span_kind, attributes,
+                                           links);
   }
 
   // If parent exists:
