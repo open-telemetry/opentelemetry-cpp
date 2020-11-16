@@ -17,7 +17,8 @@ vcpkg install benchmark
 vcpkg install ms-gsl
 vcpkg install nlohmann-json
 vcpkg install abseil
+vcpkg install protobuf
 
 cd $WORKSPACE_ROOT
 export USE_VCPKG=1
-./tools/build.sh ${1:-nostd} ${2:--DCMAKE_TOOLCHAIN_FILE=$WORKSPACE_ROOT/tools/vcpkg/scripts/buildsystems/vcpkg.cmake}
+./tools/build.sh ${1-nostd} ${2--DCMAKE_TOOLCHAIN_FILE=$WORKSPACE_ROOT/tools/vcpkg/scripts/buildsystems/vcpkg.cmake}

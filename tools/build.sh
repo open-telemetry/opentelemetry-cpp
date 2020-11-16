@@ -41,9 +41,13 @@ function build_dependencies {
 function build {
   echo "Build configuration: $BUILD_CONFIG"
   cd $WORKSPACE_ROOT
-   
-  export BUILD_ROOT=`pwd`/out/$PLATFORM_NAME/$BUILD_CONFIG
+  
+  BUILD_ROOT=`pwd`/out/$PLATFORM_NAME/$BUILD_CONFIG
   mkdir -p $BUILD_ROOT
+  if [ ! -w $BUILD_ROOT ] ; then
+    echo "Unable to create output directory: $BUILD_ROOT"
+    exit 1
+  fi
 
   if [ -z ${USE_VCPKG} ] ; then
     # TODO: consider that dependencies may also be coming from OS or brew
@@ -51,7 +55,7 @@ function build {
   else
     echo VCPKG_ROOT=${VCPKG_ROOT}
     # Prefer ninja from VCPKG if available
-    NINJA=$WORKSPACE_ROOT/`find tools/vcpkg -name ninja -print -quit`
+    NINJA=$WORKSPACE_ROOT/`find tools/vcpkg -name ninja -type f -print -quit`
     if [ -z ${NINJA} ] ; then
       NINJA=`which ninja`
     fi
