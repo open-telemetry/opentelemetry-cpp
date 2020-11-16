@@ -24,7 +24,7 @@ The repository layout structure is as defined by [the specification](https://git
 directory includes header-only abstract classes and no-op implementations that comprise the OpenTelemetry API following
 [the
 specification](https://github.com/open-telemetry/opentelemetry-specification).
-The `sdk` folder is the reference implementation of the API. 
+The `sdk` folder is the reference implementation of the API.
 
 This library would be distributed in source-only format. No shared/static library or distribution package (rpm, deb etc) would be made available as part of Release. See [CHANGELOG.md](CHANGELOG.md).
 
