@@ -45,13 +45,13 @@ if [ ! -f $changelog_file ]; then
     exit 1
 fi
 
-if [ ! grep -q "## [Unreleased]" $ ]; then
+if [ ! grep -q "## [Unreleased]" $changelog_file ]; then
     echo "Error: $changelog_file doesn't contain Unreleased information. Please update the file with changes and run this script again."
     exit 1
 fi
 
 git checkout -b pre_release_${tag} master
-if [ $? -ne 0]; then
+if [ $? -ne 0 ]; then
     echo "Error: Cannot create release branch. Ensure you have sufficient permissions to repo and try again."
     exit 1
 fi
