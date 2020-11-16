@@ -8,15 +8,12 @@
     ```
     ./pre_release.sh -t <new-tag>
     ```
-
 3. Verify that CHANGELOG.md is updated properly:
     ```
     git diff master
     ```
-
 4. Push the changes to upstream and create a Pull Request on GitHub.
     Be sure to include the curated changes from the [Changelog](./CHANGELOG.md) in the description.
-
 
 ## Tag
 
@@ -29,11 +26,9 @@ Failure to do so will leave things in a broken state.
     ```
      git show -s --format=%H
     ```
-
 2. Create a github tag on this commit hash:
     ```
     git tag -a "<new-tag>" -s -m "Version <new-tag>" "<commit-hash>"
-    ```
 
 3. Push tag to upstream remote
     ```
