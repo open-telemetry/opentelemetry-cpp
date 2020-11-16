@@ -33,8 +33,8 @@ fi
 
 if ! git diff --quiet; then \
 	printf "Working tree is not clean, can't proceed with the release process\n"
-	#git status
-	#git diff
+	git status
+	git diff
 	exit 1
 fi
 
@@ -56,8 +56,10 @@ if [ $? -ne 0 ]; then
     exit 1
 fi
 
+#update CHANGELOG.md
+date=$(date '+%Y-%m-%d')
 sed  -i "/\#\# \[Unreleased\]/a\\ \n\#\# \[${tag}\] ${date}"  $changelog_file
-if [ $? -ne 0 ]; then
+if [$? -ne 0]; then
     echo "Error: Cannot update CHANGELOG.md file. Update it manually, create the ${tag} and push changes to upstream"
     exit 1
 fi
