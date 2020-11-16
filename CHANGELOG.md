@@ -7,3 +7,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 ### Added
+    * Trace API and SDK
+    * OTLP Exporter
+### Changed
+### Removed
