@@ -20,9 +20,6 @@ RUN apt-get install -qq -y --ignore-missing \
 	libtool-bin		\
 	make			\
 	pkg-config		\
-	protobuf		\
-	protobuf-compiler	\
-	libprotobuf-dev         \
 	python			\
 	sudo			\
 	tar			\
