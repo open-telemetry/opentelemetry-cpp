@@ -1,8 +1,7 @@
 include_directories(include)
 
 add_library(opentelemetry_exporter_otprotocol src/recordable.cc)
-target_link_libraries(opentelemetry_exporter_otprotocol
-                      $<TARGET_OBJECTS:opentelemetry_proto>)
+target_link_libraries(opentelemetry_exporter_otprotocol opentelemetry_proto)
 
 if(BUILD_TESTING)
   add_executable(recordable_test test/recordable_test.cc)
