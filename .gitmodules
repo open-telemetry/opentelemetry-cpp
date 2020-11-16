@@ -23,4 +23,7 @@
 	url = https://github.com/google/benchmark
         branch = master
 
-
+[submodule "third_party/opentelemetry-proto"]
+	path = third_party/opentelemetry-proto
+	url = https://github.com/open-telemetry/opentelemetry-proto
+        branch = master
