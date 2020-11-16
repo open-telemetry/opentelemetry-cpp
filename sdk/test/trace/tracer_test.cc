@@ -13,6 +13,7 @@ using opentelemetry::core::SteadyTimestamp;
 using opentelemetry::core::SystemTimestamp;
 namespace nostd  = opentelemetry::nostd;
 namespace common = opentelemetry::common;
+using opentelemetry::common::KeyValueIterableView;
 using opentelemetry::exporter::memory::InMemorySpanData;
 using opentelemetry::exporter::memory::InMemorySpanExporter;
 using opentelemetry::trace::SpanContext;
@@ -330,6 +331,83 @@ TEST(Tracer, SpanSetEvents)
   ASSERT_EQ(0, span_data_events[0].GetAttributes().size());
   ASSERT_EQ(0, span_data_events[1].GetAttributes().size());
   ASSERT_EQ(1, span_data_events[2].GetAttributes().size());
+}
+
+TEST(Tracer, SpanSetLinks)
+{
+  std::unique_ptr<InMemorySpanExporter> exporter(new InMemorySpanExporter());
+  std::shared_ptr<InMemorySpanData> span_data = exporter->GetData();
+  auto tracer                                 = initTracer(std::move(exporter));
+
+  {
+
+    // Single span link passed through Initialization list
+    tracer->StartSpan("efg", {{"attr1", 1}}, {{SpanContext(false, false), {{"attr2", 2}}}})->End();
+    auto spans = span_data->GetSpans();
+    ASSERT_EQ(1, spans.size());
+
+    auto &span_data_links = spans.at(0)->GetLinks();
+    ASSERT_EQ(1, span_data_links.size());
+    auto link = span_data_links.at(0);
+    ASSERT_EQ(nostd::get<int>(link.GetAttributes().at("attr2")), 2);
+  }
+  {
+
+    // Multiple span links passed through Initialization list
+    tracer
+        ->StartSpan("efg", {{"attr1", 1}},
+                    {{SpanContext(false, false), {{"attr2", 2}}},
+                     {SpanContext(false, false), {{"attr3", 3}}}})
+        ->End();
+    auto spans = span_data->GetSpans();
+    ASSERT_EQ(1, spans.size());
+
+    auto &span_data_links = spans.at(0)->GetLinks();
+    ASSERT_EQ(2, span_data_links.size());
+    auto link1 = span_data_links.at(0);
+    ASSERT_EQ(nostd::get<int>(link1.GetAttributes().at("attr2")), 2);
+    auto link2 = span_data_links.at(1);
+    ASSERT_EQ(nostd::get<int>(link2.GetAttributes().at("attr3")), 3);
+  }
+
+  {
+
+    // Multiple links, each with multiple attributes passed through Initialization list
+    tracer
+        ->StartSpan("efg", {{"attr1", 1}},
+                    {{SpanContext(false, false), {{"attr2", 2}, {"attr3", 3}}},
+                     {SpanContext(false, false), {{"attr4", 4}}}})
+        ->End();
+    auto spans = span_data->GetSpans();
+    ASSERT_EQ(1, spans.size());
+
+    auto &span_data_links = spans.at(0)->GetLinks();
+    ASSERT_EQ(2, span_data_links.size());
+    auto link1 = span_data_links.at(0);
+    ASSERT_EQ(nostd::get<int>(link1.GetAttributes().at("attr2")), 2);
+    ASSERT_EQ(nostd::get<int>(link1.GetAttributes().at("attr3")), 3);
+    auto link2 = span_data_links.at(1);
+    ASSERT_EQ(nostd::get<int>(link2.GetAttributes().at("attr4")), 4);
+  }
+
+  {
+    std::map<std::string, std::string> attrs1 = {{"attr1", "1"}, {"attr2", "2"}};
+    std::map<std::string, std::string> attrs2 = {{"attr3", "3"}, {"attr4", "4"}};
+
+    std::vector<std::pair<SpanContext, std::map<std::string, std::string>>> links = {
+        {SpanContext(false, false), attrs1}, {SpanContext(false, false), attrs2}};
+    tracer->StartSpan("efg", attrs1, links)->End();
+    auto spans = span_data->GetSpans();
+
+    auto &span_data_links = spans.at(0)->GetLinks();
+    ASSERT_EQ(2, span_data_links.size());
+    auto link1 = span_data_links.at(0);
+    ASSERT_EQ(nostd::get<std::string>(link1.GetAttributes().at("attr1")), "1");
+    ASSERT_EQ(nostd::get<std::string>(link1.GetAttributes().at("attr2")), "2");
+    auto link2 = span_data_links.at(1);
+    ASSERT_EQ(nostd::get<std::string>(link2.GetAttributes().at("attr3")), "3");
+    ASSERT_EQ(nostd::get<std::string>(link2.GetAttributes().at("attr4")), "4");
+  }
 }
 
 TEST(Tracer, TestAlwaysOnSampler)
