@@ -9,6 +9,7 @@ RUN apt-get install -qq -y --ignore-missing \
 	apt-utils		\
 	automake		\
 	build-essential		\
+        bc                      \
 	bzip2			\
 	cmake			\
 	curl			\
@@ -19,6 +20,9 @@ RUN apt-get install -qq -y --ignore-missing \
 	libtool-bin		\
 	make			\
 	pkg-config		\
+	protobuf		\
+	protobuf-compiler	\
+	libprotobuf-dev         \
 	python			\
 	sudo			\
 	tar			\
@@ -26,6 +30,12 @@ RUN apt-get install -qq -y --ignore-missing \
 	unzip			\
 	wget			\
 	zlib1g-dev
+
+## Install cmake since it's an expensive operation and best be done once
+RUN mkdir -p /usr/local/bin
+COPY ./setup-cmake.sh /usr/local/bin/setup-cmake.sh
+RUN chmod +x /usr/local/bin/setup-cmake.sh
+RUN /usr/local/bin/setup-cmake.sh 
 
 # ENTRYPOINT bash
 CMD /bin/bash
