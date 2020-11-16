@@ -51,6 +51,10 @@ if [ ! grep -q "## [Unreleased]" $ ]; then
 fi
 
 git checkout -b pre_release_${tag} master
+if [ $? -ne 0]; then
+    echo "Error: Cannot create release branch. Ensure you have sufficient permissions to repo and try again."
+    exit 1
+fi
 
 sed  -i "/\#\# \[Unreleased\]/a\\ \n\#\# \[${tag}\] ${date}"  $changelog_file
 if [ $? -ne 0 ]; then
