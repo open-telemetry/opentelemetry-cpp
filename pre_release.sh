@@ -62,4 +62,4 @@ git add .
 git commit -m "Prepare for releasing ${tag}"
 
 echo "Now validate the chages using git diff master, create the ${tag} and push changes to upstream"
-echo 
+echo
