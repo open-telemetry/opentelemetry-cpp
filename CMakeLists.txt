@@ -23,10 +23,13 @@ set(WITH_PROTOBUF OFF)
 find_package(Threads)
 
 function(install_windows_deps)
-  # Bootstrap vcpkg from CMake and auto-install deps in case if we are missing deps on Windows
+  # Bootstrap vcpkg from CMake and auto-install deps in case if we are missing
+  # deps on Windows
   message("Installing build tools and dependencies...")
-  execute_process(COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/tools/setup-buildtools.cmd)
-  set(CMAKE_TOOLCHAIN_FILE ${CMAKE_CURRENT_SOURCE_DIR}/tools/vcpkg/scripts/buildsystems/vcpkg.cmake)
+  execute_process(
+    COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/tools/setup-buildtools.cmd)
+  set(CMAKE_TOOLCHAIN_FILE
+      ${CMAKE_CURRENT_SOURCE_DIR}/tools/vcpkg/scripts/buildsystems/vcpkg.cmake)
 endfunction()
 
 if(MSVC)
@@ -51,7 +54,9 @@ if(WITH_PROTOBUF)
     if(WIN32)
       # Always use x64 protoc.exe
       if(NOT EXISTS "${Protobuf_PROTOC_EXECUTABLE}")
-        set(Protobuf_PROTOC_EXECUTABLE ${CMAKE_CURRENT_SOURCE_DIR}/tools/vcpkg/packages/protobuf_x64-windows/tools/protobuf/protoc.exe)
+        set(Protobuf_PROTOC_EXECUTABLE
+            ${CMAKE_CURRENT_SOURCE_DIR}/tools/vcpkg/packages/protobuf_x64-windows/tools/protobuf/protoc.exe
+        )
       endif()
     endif()
     # Latest Protobuf uses mixed case instead of uppercase
@@ -69,9 +74,15 @@ list(APPEND CMAKE_PREFIX_PATH "${CMAKE_BINARY_DIR}")
 if(BUILD_TESTING)
   include(CTest)
   if(EXISTS ${CMAKE_BINARY_DIR}/lib/libgtest.a)
-    # Prefer GTest from build tree. GTest is not always working with CMAKE_PREFIX_PATH
-    set(GTEST_INCLUDE_DIRS ${CMAKE_CURRENT_SOURCE_DIR}/third_party/googletest/googletest/include ${CMAKE_CURRENT_SOURCE_DIR}/third_party/googletest/googlemock/include)
-    set(GTEST_BOTH_LIBRARIES ${CMAKE_BINARY_DIR}/lib/libgtest.a ${CMAKE_BINARY_DIR}/lib/libgtest_main.a ${CMAKE_BINARY_DIR}/lib/libgmock.a)
+    # Prefer GTest from build tree. GTest is not always working with
+    # CMAKE_PREFIX_PATH
+    set(GTEST_INCLUDE_DIRS
+        ${CMAKE_CURRENT_SOURCE_DIR}/third_party/googletest/googletest/include
+        ${CMAKE_CURRENT_SOURCE_DIR}/third_party/googletest/googlemock/include)
+    set(GTEST_BOTH_LIBRARIES
+        ${CMAKE_BINARY_DIR}/lib/libgtest.a
+        ${CMAKE_BINARY_DIR}/lib/libgtest_main.a
+        ${CMAKE_BINARY_DIR}/lib/libgmock.a)
   elseif(WIN32)
     # Make sure we are always bootsrapped with vcpkg on Windows
     find_package(GTest)

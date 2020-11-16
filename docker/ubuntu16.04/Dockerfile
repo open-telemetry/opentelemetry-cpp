@@ -32,7 +32,7 @@ RUN apt-get install -qq -y --ignore-missing \
 RUN mkdir -p /usr/local/bin
 COPY ./setup-cmake.sh /usr/local/bin/setup-cmake.sh
 RUN chmod +x /usr/local/bin/setup-cmake.sh
-RUN /usr/local/bin/setup-cmake.sh 
+RUN /usr/local/bin/setup-cmake.sh
 
 # ENTRYPOINT bash
 CMD /bin/bash
