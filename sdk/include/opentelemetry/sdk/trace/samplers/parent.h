@@ -28,7 +28,7 @@ public:
       nostd::string_view name,
       trace_api::SpanKind span_kind,
       const opentelemetry::common::KeyValueIterable &attributes,
-      const trace_api::SpanContextKeyValueIterable & /*links*/) noexcept override;
+      const trace_api::SpanContextKeyValueIterable &links) noexcept override;
 
   /**
    * @return Description MUST be ParentBased{delegate_sampler_.getDescription()}
