@@ -56,7 +56,7 @@ if [ $? -ne 0 ]; then
     exit 1
 fi
 
-#update CHANGELOG.md
+# update CHANGELOG.md
 date=$(date '+%Y-%m-%d')
 sed  -i "/\#\# \[Unreleased\]/a\\ \n\#\# \[${tag}\] ${date}"  $changelog_file
 if [$? -ne 0]; then
