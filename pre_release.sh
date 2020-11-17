@@ -32,7 +32,7 @@ if [[ $(git tag --list ${tag}) ]]; then
 fi
 
 if ! git diff --quiet; then \
-	printf "Working tree is not clean, can't proceed with the release process\n"
+	echo "Error: Working tree is not clean, can't proceed with the release process\n"
 	git status
 	git diff
 	exit 1
