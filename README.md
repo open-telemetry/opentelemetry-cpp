@@ -42,6 +42,8 @@ sudo cmake --build cmake-out --target install
 cd cmake-out && ctest
 ```
 
+For more details on configuration and installation steps, please refer to [INSTALL.md](./INSTALL.md).
+
 ### Using Bazel
 TBD
 
