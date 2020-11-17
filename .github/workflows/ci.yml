@@ -190,8 +190,6 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
-      with:
-        submodules: 'true'
     - name: setup
       run: sudo ./ci/install_format_tools.sh
     - name: run tests
@@ -273,8 +271,6 @@ jobs:
     runs-on: windows-latest
     steps:
     - uses: actions/checkout@v2
-      with:
-        submodules: 'true'
     - name: install docfx
       run: choco install docfx -y
     - name: run ./ci/docfx.cmd
