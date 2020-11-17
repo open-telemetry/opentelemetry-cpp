@@ -26,7 +26,7 @@ directory includes header-only abstract classes and no-op implementations that c
 specification](https://github.com/open-telemetry/opentelemetry-specification).
 The `sdk` folder is the reference implementation of the API.
 
-The library would be distributed in source-only format. No shared/static library or distribution package (rpm, deb etc) would be made available as part of Release. See [RELEASING.md](./RELEASING.md).
+The library is distributed in source-only format. No shared/static library or distribution packages (rpm, deb, etc.) are made available as part of Release. See [RELEASING.md](./RELEASING.md).
 
 This project supports `Bazel` and `CMake` builds.
 
