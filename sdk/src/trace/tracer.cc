@@ -1,5 +1,4 @@
 #include "opentelemetry/sdk/trace/tracer.h"
-
 #include "opentelemetry/context/runtime_context.h"
 #include "opentelemetry/nostd/shared_ptr.h"
 #include "opentelemetry/sdk/common/atomic_shared_ptr.h"
@@ -54,12 +53,13 @@ trace_api::SpanContext GetCurrentSpanContext(const trace_api::SpanContext &expli
 nostd::shared_ptr<trace_api::Span> Tracer::StartSpan(
     nostd::string_view name,
     const opentelemetry::common::KeyValueIterable &attributes,
+    const trace_api::SpanContextKeyValueIterable &links,
     const trace_api::StartSpanOptions &options) noexcept
 {
   trace_api::SpanContext parent = GetCurrentSpanContext(options.parent);
 
   auto sampling_result =
-      sampler_->ShouldSample(parent, parent.trace_id(), name, options.kind, attributes);
+      sampler_->ShouldSample(parent, parent.trace_id(), name, options.kind, attributes, links);
   if (sampling_result.decision == Decision::DROP)
   {
     // Don't allocate a no-op span for every DROP decision, but use a static
@@ -72,7 +72,7 @@ nostd::shared_ptr<trace_api::Span> Tracer::StartSpan(
   else
   {
     auto span = nostd::shared_ptr<trace_api::Span>{new (std::nothrow) Span{
-        this->shared_from_this(), processor_.load(), name, attributes, options, parent}};
+        this->shared_from_this(), processor_.load(), name, attributes, links, options, parent}};
 
     // if the attributes is not nullptr, add attributes to the span.
     if (sampling_result.attributes)
