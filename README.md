@@ -42,7 +42,18 @@ sudo cmake --build cmake-out --target install
 cd cmake-out && ctest
 ```
 
-For more details on configuration and installation steps, please refer to [INSTALL.md](./INSTALL.md).
+In case the library is distributed through package manager, below is the recommended deployment directory structure for header and librarie(s) on Linux and MacOS platforms.
+
+```
+/usr/local/lib:  For shared or static opentelemetry-cpp library
+/usr/local/include/opentelemetry: For api headers
+/usr/local/include/opentelemetry/sdk: For sdk headers
+/usr/local/src: For installing source package ( say libopentelemetry-dev )
+
+```
+
+For more details on configuration and installation, please refer to [INSTALL.md](./INSTALL.md).
+
 
 ### Using Bazel
 TBD
