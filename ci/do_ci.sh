@@ -57,8 +57,10 @@ elif [[ "$1" == "cmake.exporter.prometheus.test" ]]; then
 #  apt-get install zlib1g-dev
 #  apt-get -y install libcurl4-openssl-dev
   cd third_party/prometheus-cpp
+  git submodule update --recursive
+  [[ -d _build ]] && rm -rf ./_build
   mkdir _build && cd _build
-  cmake .. -DBUILD_SHARED_LIBS=ON
+  cmake .. -DBUILD_SHARED_LIBS=ON -DUSE_THIRDPARTY_LIBRARIES=ON
   make -j 4
   sudo make install
 
