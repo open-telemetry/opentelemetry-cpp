@@ -7,7 +7,7 @@
 #include <unordered_map>
 #include <vector>
 
-#include <opentelemetry/ext/http/server/http_server.h>
+#include "opentelemetry/ext/http/server/http_server.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace ext

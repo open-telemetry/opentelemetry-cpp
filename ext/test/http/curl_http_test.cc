@@ -1,5 +1,5 @@
-#include <opentelemetry/ext/http/server/http_server.h>
 #include "opentelemetry/ext//http/client/curl//http_client_curl.h"
+#include "opentelemetry/ext/http/server/http_server.h"
 
 #include <assert.h>
 #include <atomic>
