@@ -6,7 +6,7 @@ namespace exporter
 namespace otlp
 {
 
-const int kAttributeValueSize = 14;
+const int kAttributeValueSize = 15;
 
 void Recordable::SetIds(trace::TraceId trace_id,
                         trace::SpanId span_id,
@@ -58,6 +58,10 @@ void PopulateAttribute(opentelemetry::proto::common::v1::KeyValue *attribute,
   {
     attribute->mutable_value()->set_string_value(nostd::get<nostd::string_view>(value).data(),
                                                  nostd::get<nostd::string_view>(value).size());
+  }
+  else if (nostd::holds_alternative<const char*>(value))
+  {
+    attribute->mutable_value()->set_string_value(nostd::get<const char *>(value));
   }
   else if (nostd::holds_alternative<nostd::span<const bool>>(value))
   {
