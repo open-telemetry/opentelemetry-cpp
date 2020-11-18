@@ -54,12 +54,7 @@ public:
 
 private:
   opentelemetry::sdk::AtomicSharedPtr<SpanProcessor> processor_;
-#if 0
-  // TODO: pros and cons of exposing this as `std::shared_ptr` vs keeping `nostd::shared_ptr` ?
   std::shared_ptr<opentelemetry::trace::Tracer> tracer_;
-#else
-  opentelemetry::nostd::shared_ptr<opentelemetry::trace::Tracer> tracer_;
-#endif
   const std::shared_ptr<Sampler> sampler_;
 };
 }  // namespace trace

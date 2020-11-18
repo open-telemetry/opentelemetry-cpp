@@ -18,7 +18,10 @@ using AttributeValue =
                    uint64_t,
                    double,
                    nostd::string_view,
+#ifdef HAVE_CSTRING_TYPE
+                   // TODO: add C-string as possible value on API surface
                    const char *,
+#endif
 #ifdef HAVE_SPAN_BYTE
                    // TODO: 8-bit byte arrays / binary blobs are not part of OT spec yet!
                    // Ref: https://github.com/open-telemetry/opentelemetry-specification/issues/780
@@ -41,9 +44,11 @@ enum AttributeType
   TYPE_UINT64,
   TYPE_DOUBLE,
   TYPE_STRING,
+#ifdef HAVE_CSTRING_TYPE
   TYPE_CSTRING,
+#endif
 #ifdef HAVE_SPAN_BYTE
-  TYPE_SPAN_BYTE,  // TODO: not part of OT spec yet
+  TYPE_SPAN_BYTE,
 #endif
   TYPE_SPAN_BOOL,
   TYPE_SPAN_INT,

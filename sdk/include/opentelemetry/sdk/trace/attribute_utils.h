@@ -22,6 +22,9 @@ using SpanDataAttributeValue = nostd::variant<bool,
                                               uint64_t,
                                               double,
                                               std::string,
+#ifdef HAVE_CSTRING_TYPE
+                                              const char *,
+#endif
 #ifdef HAVE_SPAN_BYTE
                                               std::vector<uint8_t>,
 #endif
