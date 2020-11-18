@@ -1,6 +1,7 @@
 [submodule "third_party/prometheus-cpp"]
 	path = third_party/prometheus-cpp
-	url = https://github.com/jupp0r/prometheus-cpp.git
+	url = https://github.com/jupp0r/prometheus-cpp
+	branch = master
 
 [submodule "tools/vcpkg"]
 	path = tools/vcpkg
@@ -15,8 +16,14 @@
 [submodule "third_party/googletest"]
 	path = third_party/googletest
 	url = https://github.com/google/googletest
-        branch = master
+	branch = master
 
 [submodule "third_party/benchmark"]
 	path = third_party/benchmark
 	url = https://github.com/google/benchmark
+	branch = master
+
+[submodule "third_party/opentelemetry-proto"]
+	path = third_party/opentelemetry-proto
+	url = https://github.com/open-telemetry/opentelemetry-proto
+	branch = master

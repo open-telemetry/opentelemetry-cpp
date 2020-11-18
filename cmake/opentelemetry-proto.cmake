@@ -37,7 +37,7 @@ add_custom_command(
     ${TRACE_PROTO}
 )
 
-include_directories(SYSTEM "${CMAKE_BINARY_DIR}/generated/third_party/opentelemetry-proto")
+include_directories("${GENERATED_PROTOBUF_PATH}")
 
 add_library(opentelemetry_proto OBJECT
     ${COMMON_PB_CPP_FILE}
