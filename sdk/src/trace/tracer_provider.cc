@@ -17,7 +17,7 @@ opentelemetry::nostd::shared_ptr<opentelemetry::trace::Tracer> TracerProvider::G
 #if 0
   // TODO: do we have to cast/transform this or can we keep as nostd::shared_ptr<...> ?
   return opentelemetry::nostd::shared_ptr<opentelemetry::trace::Tracer>(tracer_);
-#endif
+#else
   return tracer_;
 #endif
 }
