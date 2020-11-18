@@ -246,6 +246,15 @@ TEST_F(BasicCurlHttpTests, CurlHttpOperations)
   std::multimap<std::string, std::string, curl::curl_ci> m1 = {
       {"name1", "value1_1"}, {"name1", "value1_2"}, {"name2", "value3"}, {"name3", "value3"}};
   curl::Headers headers = m1;
-  curl::HttpOperation http_operations(http_client::Method::Head, "/get", handler, headers, body,
-                                      false);
+  curl::HttpOperation http_operations1(http_client::Method::Head, "/get", handler, headers, body,
+                                       true);
+  http_operations1.Send();
+
+  curl::HttpOperation http_operations2(http_client::Method::Get, "/get", handler, headers, body,
+                                       true);
+  http_operations2.Send();
+
+  curl::HttpOperation http_operations3(http_client::Method::Get, "/get", handler, headers, body,
+                                       false);
+  http_operations3.Send();
 }
