@@ -4,10 +4,9 @@ include_directories(${CMAKE_SOURCE_DIR}/exporters/otlp/include)
 
 add_library(otlp_foo_library foo_library/foo_library.cc)
 target_link_libraries(otlp_foo_library ${CMAKE_THREAD_LIBS_INIT}
-                      ${CORE_RUNTIME_LIBS}
-		      opentelemetry_api)
+                      ${CORE_RUNTIME_LIBS} opentelemetry_api)
 
 add_executable(example_otlp main.cc)
-target_link_libraries( example_otlp ${CMAKE_THREAD_LIBS_INIT} otlp_foo_library
-  ${CORE_RUNTIME_LIBS}
+target_link_libraries(
+  example_otlp ${CMAKE_THREAD_LIBS_INIT} otlp_foo_library ${CORE_RUNTIME_LIBS}
   opentelemetry_trace opentelemetry_exporter_otprotocol)

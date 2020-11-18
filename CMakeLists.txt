@@ -27,7 +27,6 @@ if(WITH_ABSEIL)
 endif()
 
 if(WITH_STL)
-
   # Require at least C++17. C++20 is needed to avoid gsl::span
   add_definitions(-DHAVE_CPP_STDLIB -DHAVE_GSL)
 
@@ -51,12 +50,9 @@ if(WITH_STL)
     set(CMAKE_CXX_FLAGS
         "${CMAKE_CXX_FLAGS} /Zc:__cplusplus ${CMAKE_CXX_FLAGS_SPEED}")
   endif()
-
 endif()
 
-option(WITH_OTPROTOCOL
 option(WITH_OTLP "Whether to include the OpenTelemetry Protocol in the SDK" OFF)
-
 option(WITH_PROMETHEUS "Whether to include the Prometheus Client in the SDK"
        OFF)
 
