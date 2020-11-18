@@ -204,6 +204,11 @@ TEST_F(BasicCurlHttpTests, SendPostRequest)
   auto request = session->CreateRequest();
   request->SetUri("post/");
   request->SetMethod(http_client::Method::Post);
+
+  const char *b          = "test-data";
+  http_client::Body body = {b, b + strlen(b)};
+  request->SetBody(body);
+  request->AddHeader("Content-Type", "text/plain");
   PostEventHandler *handler = new PostEventHandler();
   session->SendRequest(*handler);
   ASSERT_TRUE(waitForRequests(1, 1));
@@ -213,5 +218,20 @@ TEST_F(BasicCurlHttpTests, SendPostRequest)
   session_manager.CancelAllSessions();
   session_manager.FinishAllSessions();
 
+  delete handler;
+}
+
+TEST_F(BasicCurlHttpTests, RequestTimeout)
+{
+  received_requests_.clear();
+  curl::SessionManager session_manager;
+
+  auto session = session_manager.CreateSession("127.0.0.10", HTTP_PORT);  // Non Existing address
+  auto request = session->CreateRequest();
+  request->SetUri("get/");
+  GetEventHandler *handler = new GetEventHandler();
+  session->SendRequest(*handler);
+  session->FinishSession();
+  ASSERT_TRUE(handler->is_called_);
   delete handler;
 }
