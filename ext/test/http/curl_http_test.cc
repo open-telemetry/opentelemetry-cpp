@@ -126,6 +126,59 @@ public:
 
 TEST_F(BasicCurlHttpTests, DoNothing) {}
 
+TEST_F(BasicCurlHttpTests, HttpRequest)
+{
+  curl::Request req;
+  const char *b           = "test-data";
+  http_client::Body body  = {b, b + strlen(b)};
+  http_client::Body body1 = body;
+  req.SetBody(body);
+  ASSERT_EQ(req.body_, body1);
+  req.AddHeader("name1", "value1");
+  req.AddHeader("name2", "value2");
+  ASSERT_TRUE(req.headers_.find("name1")->second == "value1");
+  ASSERT_TRUE(req.headers_.find("name2")->second == "value2");
+
+  req.ReplaceHeader("name1", "value3");
+  ASSERT_EQ(req.headers_.find("name1")->second, "value3");
+
+  req.SetTimeoutMs(std::chrono::duration<int>(5000));
+  ASSERT_EQ(req.timeout_ms_, std::chrono::duration<int>(5000));
+}
+
+TEST_F(BasicCurlHttpTests, HttpResponse)
+{
+  curl::Response res;
+  std::multimap<std::string, std::string, curl::curl_ci> m1 = {
+      {"name1", "value1_1"}, {"name1", "value1_2"}, {"name2", "value3"}, {"name3", "value3"}};
+  res.headers_ = m1;
+
+  const char *b          = "test-data";
+  http_client::Body body = {b, b + strlen(b)};
+  int count              = 0;
+  res.ForEachHeader("name1", [&count](opentelemetry::nostd::string_view name,
+                                      opentelemetry::nostd::string_view value) {
+    if (name != "name1")
+      return false;
+    if (value != "value1_1" && value != "value1_2")
+      return false;
+    count++;
+    return true;
+  });
+  ASSERT_EQ(count, 2);
+  count = 0;
+  res.ForEachHeader(
+      [&count](opentelemetry::nostd::string_view name, opentelemetry::nostd::string_view value) {
+        if (name != "name1" && name != "name2" && name != "name3")
+          return false;
+        if (value != "value1_1" && value != "value1_2" && value != "value2" && value != "value3")
+          return false;
+        count++;
+        return true;
+      });
+  ASSERT_EQ(count, 4);
+}
+
 TEST_F(BasicCurlHttpTests, SendGetRequest)
 {
   received_requests_.clear();
