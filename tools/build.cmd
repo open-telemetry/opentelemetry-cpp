@@ -21,6 +21,10 @@ setlocal enableextensions
 setlocal enabledelayedexpansion
 set "ROOT=%~dp0\.."
 
+if ("%CMAKE_ARCH%"=="") (
+  set CMAKE_ARCH=x64
+)
+
 REM Use preinstalled vcpkg if installed or use our local
 if "%VCPKG_INSTALLATION_ROOT%" neq "" (
   set "VCPKG_CMAKE=%VCPKG_INSTALLATION_ROOT%\scripts\buildsystems\vcpkg.cmake"
@@ -32,7 +36,6 @@ REM ********************************************************************
 REM Setup compiler environment
 REM ********************************************************************
 call "%~dp0\vcvars.cmd"
-
 
 REM ********************************************************************
 REM Use cmake
@@ -47,10 +50,10 @@ set "OUTDIR=%ROOT%\out\%VS_TOOLS_VERSION%\nostd"
 call :build_config
 
 REM ********************************************************************
-REM Build with STL implementation - only for vs2017+
+REM Build with STL implementation only for vs2017+
 REM ********************************************************************
 if "%VS_TOOLS_VERSION%" neq "vs2015" (
-  set CONFIG=-DWITH_STL:BOOL=ON
+  set CONFIG=-DWITH_STL:BOOL=ON %*
   set "OUTDIR=%ROOT%\out\%VS_TOOLS_VERSION%\stl"
   call :build_config
 )
@@ -66,9 +69,12 @@ REM ********************************************************************
 REM TODO: consider rmdir for clean builds
 if not exist "%OUTDIR%" mkdir "%OUTDIR%"
 cd "%OUTDIR%"
-REM Optional platform specification parameter below: -Ax64
-cmake %ROOT% -G "%CMAKE_GEN%" -DCMAKE_TOOLCHAIN_FILE="%VCPKG_CMAKE%" %CONFIG%
+if ("%VS_TOOLS_VERSION%"=="vs2019") (
+  REM Only latest vs2019 generator supports and requires -A parameter
+  cmake %ROOT% -G "%CMAKE_GEN%" -A %CMAKE_ARCH% -DCMAKE_TOOLCHAIN_FILE="%VCPKG_CMAKE%" %CONFIG%
+) else (
+  cmake %ROOT% -G "%CMAKE_GEN%" -DCMAKE_TOOLCHAIN_FILE="%VCPKG_CMAKE%" %CONFIG%
+)
 set "SOLUTION=%OUTDIR%\opentelemetry-cpp.sln"
-REM TODO: allow building [Release|Debug]x[Win32|x64|ARM|ARM64]
-msbuild "%SOLUTION%" /p:Configuration=Release /p:Platform=x64 /p:VcpkgEnabled=true
+msbuild "%SOLUTION%" /p:Configuration=Release /p:VcpkgEnabled=true
 exit /b 0

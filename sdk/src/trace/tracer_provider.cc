@@ -14,8 +14,12 @@ opentelemetry::nostd::shared_ptr<opentelemetry::trace::Tracer> TracerProvider::G
     nostd::string_view library_name,
     nostd::string_view library_version) noexcept
 {
-  // TODO: do we have to transform this at all, if we can keep it nostd::shared_ptr at source?
+#if 0
+  // TODO: do we have to cast/transform this or can we keep as nostd::shared_ptr<...> ?
+  return opentelemetry::nostd::shared_ptr<opentelemetry::trace::Tracer>(tracer_);
+#endif
   return tracer_;
+#endif
 }
 
 void TracerProvider::SetProcessor(std::shared_ptr<SpanProcessor> processor) noexcept

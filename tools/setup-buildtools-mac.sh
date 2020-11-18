@@ -30,4 +30,4 @@ brew install clang-format
 brew install google-benchmark
 brew tap nlohmann/json
 brew install nlohmann-json
-./tools/build-gtest.sh
+brew install abseil
