@@ -4,6 +4,8 @@
 #include <gtest/gtest.h>
 #include <algorithm>
 
+#include <algorithm>
+
 using opentelemetry::nostd::shared_ptr;
 
 class A

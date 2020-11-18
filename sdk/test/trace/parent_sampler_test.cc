@@ -3,6 +3,7 @@
 #include "opentelemetry/sdk/trace/samplers/always_off.h"
 #include "opentelemetry/sdk/trace/samplers/always_on.h"
 #include "opentelemetry/sdk/trace/samplers/parent.h"
+#include "opentelemetry/trace/span_context_kv_iterable_view.h"
 
 using opentelemetry::sdk::trace::AlwaysOffSampler;
 using opentelemetry::sdk::trace::AlwaysOnSampler;
@@ -24,28 +25,33 @@ TEST(ParentBasedSampler, ShouldSample)
   opentelemetry::trace::SpanKind span_kind = opentelemetry::trace::SpanKind::kInternal;
   using M                                  = std::map<std::string, int>;
   M m1                                     = {{}};
+
+  using L = std::vector<std::pair<trace_api::SpanContext, std::map<std::string, std::string>>>;
+  L l1 = {{trace_api::SpanContext(false, false), {}}, {trace_api::SpanContext(false, false), {}}};
+
   opentelemetry::common::KeyValueIterableView<M> view{m1};
+  trace_api::SpanContextKeyValueIterableView<L> links{l1};
   trace_api::SpanContext parent_context_sampled(trace_id, span_id, trace_api::TraceFlags{1}, false);
   trace_api::SpanContext parent_context_nonsampled(trace_id, span_id, trace_api::TraceFlags{0},
                                                    false);
 
   // Case 1: Parent doesn't exist. Return result of delegateSampler()
-  auto sampling_result =
-      sampler_off.ShouldSample(trace_api::SpanContext::GetInvalid(), trace_id, "", span_kind, view);
-  auto sampling_result2 =
-      sampler_on.ShouldSample(trace_api::SpanContext::GetInvalid(), trace_id, "", span_kind, view);
+  auto sampling_result  = sampler_off.ShouldSample(trace_api::SpanContext::GetInvalid(), trace_id,
+                                                  "", span_kind, view, links);
+  auto sampling_result2 = sampler_on.ShouldSample(trace_api::SpanContext::GetInvalid(), trace_id,
+                                                  "", span_kind, view, links);
 
   ASSERT_EQ(Decision::DROP, sampling_result.decision);
   ASSERT_EQ(Decision::RECORD_AND_SAMPLE, sampling_result2.decision);
 
   // Case 2: Parent exists and SampledFlag is true
   auto sampling_result3 =
-      sampler_off.ShouldSample(parent_context_sampled, trace_id, "", span_kind, view);
+      sampler_off.ShouldSample(parent_context_sampled, trace_id, "", span_kind, view, links);
   ASSERT_EQ(Decision::RECORD_AND_SAMPLE, sampling_result3.decision);
 
   // Case 3: Parent exists and SampledFlag is false
   auto sampling_result4 =
-      sampler_on.ShouldSample(parent_context_nonsampled, trace_id, "", span_kind, view);
+      sampler_on.ShouldSample(parent_context_nonsampled, trace_id, "", span_kind, view, links);
   ASSERT_EQ(Decision::DROP, sampling_result4.decision);
 }
 

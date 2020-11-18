@@ -123,9 +123,14 @@ TEST(Recordable, AddLink)
   std::map<std::string, int> attributes = {
       {keys[0], values[0]}, {keys[1], values[1]}, {keys[2], values[2]}};
 
+  auto trace_id = rec.span().trace_id();
+  auto span_id  = rec.span().span_id();
+
   rec.AddLink(trace::SpanContext(false, false),
               common::KeyValueIterableView<std::map<std::string, int>>(attributes));
 
+  EXPECT_EQ(rec.span().trace_id(), trace_id);
+  EXPECT_EQ(rec.span().span_id(), span_id);
   for (int i = 0; i < kNumAttributes; i++)
   {
     EXPECT_EQ(rec.span().links(0).attributes(i).key(), keys[i]);

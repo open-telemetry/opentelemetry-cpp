@@ -182,7 +182,7 @@ public:
     events_.push_back(event);
   }
 
-  void AddLink(opentelemetry::trace::SpanContext span_context,
+  void AddLink(const opentelemetry::trace::SpanContext &span_context,
                const opentelemetry::common::KeyValueIterable &attributes) noexcept override
   {
     SpanDataLink link(span_context, attributes);

@@ -165,7 +165,7 @@ public:
     duration_ = duration;
   }
 
-  void AddLink(opentelemetry::trace::SpanContext span_context,
+  void AddLink(const opentelemetry::trace::SpanContext &span_context,
                const opentelemetry::common::KeyValueIterable &attributes =
                    opentelemetry::common::KeyValueIterableView<std::map<std::string, int>>(
                        {})) noexcept override

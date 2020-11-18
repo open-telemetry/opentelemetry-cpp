@@ -55,7 +55,7 @@ if(WITH_STL)
 endif()
 
 option(WITH_OTPROTOCOL
-       "Whether to include the OpenTelemetry Protocol in the SDK" OFF)
+option(WITH_OTLP "Whether to include the OpenTelemetry Protocol in the SDK" OFF)
 
 option(WITH_PROMETHEUS "Whether to include the Prometheus Client in the SDK"
        OFF)
@@ -64,7 +64,7 @@ option(WITH_TESTS "Whether to enable tests" ON)
 option(WITH_EXAMPLES "Whether to build examples" ON)
 
 set(WITH_PROTOBUF OFF)
-if(WITH_OTPROTOCOL)
+if(WITH_OTLP)
   set(WITH_PROTOBUF ON)
 endif()
 
@@ -90,7 +90,7 @@ if(WITH_PROTOBUF)
   endif()
 endif()
 
-if(WITH_OTPROTOCOL)
+if(WITH_OTLP)
   include(third_party/opentelemetry-proto/Protobuf.cmake)
 endif()
 
