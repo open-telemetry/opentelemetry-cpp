@@ -20,44 +20,7 @@ Any exceptions to this are noted in the individual `README.md` files.
 
 ## Installation
 
-The repository layout structure is as defined by [the specification](https://github.com/open-telemetry/opentelemetry-specification/blob/master/specification/library-layout.md). The `api`
-directory includes header-only abstract classes and no-op implementations that comprise the OpenTelemetry API following
-[the
-specification](https://github.com/open-telemetry/opentelemetry-specification).
-The `sdk` folder is the reference implementation of the API.
-
-The library is distributed in source-only format. No shared/static library or distribution packages (rpm, deb, etc.) are made available as part of Release. See [RELEASING.md](./RELEASING.md).
-
-This project supports `Bazel` and `CMake` builds.
-
-### Using CMake
-On most platforms with all dependencies installed, the following command will compile the source files, and install the header files:
-
-```sh
-cmake -Bcmake-out
-cmake --build cmake-out
-sudo cmake --build cmake-out --target install
-
-#To run the tests
-cd cmake-out && ctest
-```
-
-In case the library is distributed through package manager, below is the recommended deployment directory structure for header and librarie(s) on Linux and MacOS platforms.
-
-```
-/usr/local/lib:  For shared or static opentelemetry-cpp library
-/usr/local/include/opentelemetry: For api headers
-/usr/local/include/opentelemetry/sdk: For sdk headers
-/usr/local/src: For installing source package ( say libopentelemetry-dev )
-
-```
-
-For more details on configuration and installation, please refer to [INSTALL.md](./INSTALL.md).
-
-
-### Using Bazel
-TBD
-
+Please refer to [INSTALL.md](./INSTALL.md).
 
 ## QuickStart
 The `examples/simple` directory contains a minimal program demonstrating
