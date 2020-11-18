@@ -142,15 +142,15 @@ void BatchSpanProcessor::Export(const bool was_force_flush_called)
         buffer_.size() >= max_export_batch_size_ ? max_export_batch_size_ : buffer_.size();
   }
 
-  buffer_.Consume(
-      num_spans_to_export, [&](CircularBufferRange<AtomicUniquePtr<Recordable>> range) noexcept {
-        range.ForEach([&](AtomicUniquePtr<Recordable> &ptr) {
-          std::unique_ptr<Recordable> swap_ptr = std::unique_ptr<Recordable>(nullptr);
-          ptr.Swap(swap_ptr);
-          spans_arr.push_back(std::unique_ptr<Recordable>(swap_ptr.release()));
-          return true;
-        });
-      });
+  buffer_.Consume(num_spans_to_export,
+                  [&](CircularBufferRange<AtomicUniquePtr<Recordable>> range) noexcept {
+                    range.ForEach([&](AtomicUniquePtr<Recordable> &ptr) {
+                      std::unique_ptr<Recordable> swap_ptr = std::unique_ptr<Recordable>(nullptr);
+                      ptr.Swap(swap_ptr);
+                      spans_arr.push_back(std::unique_ptr<Recordable>(swap_ptr.release()));
+                      return true;
+                    });
+                  });
 
   exporter_->Export(nostd::span<std::unique_ptr<Recordable>>(spans_arr.data(), spans_arr.size()));
 
@@ -175,12 +175,14 @@ void BatchSpanProcessor::DrainQueue()
 
 void BatchSpanProcessor::Shutdown(std::chrono::microseconds timeout) noexcept
 {
-  is_shutdown_ = true;
+  is_shutdown_.store(true);
 
   cv_.notify_one();
   worker_thread_.join();
-
-  exporter_->Shutdown();
+  if (exporter_ != nullptr)
+  {
+    exporter_->Shutdown();
+  }
 }
 
 BatchSpanProcessor::~BatchSpanProcessor()
