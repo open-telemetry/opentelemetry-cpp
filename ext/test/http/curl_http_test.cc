@@ -235,3 +235,17 @@ TEST_F(BasicCurlHttpTests, RequestTimeout)
   ASSERT_TRUE(handler->is_called_);
   delete handler;
 }
+
+TEST_F(BasicCurlHttpTests, CurlHttpOperations)
+{
+  GetEventHandler *handler = new GetEventHandler();
+
+  const char *b          = "test-data";
+  http_client::Body body = {b, b + strlen(b)};
+
+  std::multimap<std::string, std::string, curl::curl_ci> m1 = {
+      {"name1", "value1_1"}, {"name1", "value1_2"}, {"name2", "value3"}, {"name3", "value3"}};
+  curl::Headers headers = m1;
+  curl::HttpOperation http_operations(http_client::Method::Head, "/get", handler, headers, body,
+                                      false);
+}
