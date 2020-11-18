@@ -209,5 +209,9 @@ TEST_F(BasicCurlHttpTests, SendPostRequest)
   ASSERT_TRUE(waitForRequests(1, 1));
   session->FinishSession();
   ASSERT_TRUE(handler->is_called_);
+
+  session_manager.CancelAllSessions();
+  session_manager.FinishAllSessions();
+
   delete handler;
 }
