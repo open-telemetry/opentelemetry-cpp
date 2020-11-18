@@ -37,11 +37,9 @@ namespace core  = opentelemetry::core;
 namespace trace = opentelemetry::trace;
 
 OPENTELEMETRY_BEGIN_NAMESPACE
-namespace sdk
-{
-namespace trace
-{
 
+namespace ETW
+{
 class Span;
 
 /// <summary>
@@ -394,9 +392,20 @@ public:
     return nostd::shared_ptr<trace::Tracer>{new (std::nothrow) Tracer(*this, name, evtFmt)};
   }
 };
-	
+}
+
+namespace sdk
+{
+namespace trace
+{
+
 class ETWSpanData final : public Recordable
 {
+public:
+  ETWSpanData(std::string providerName) 
+  { 
+      InitTracerProvider(providerName);
+  }
   /**
    * Get the trace id for this span
    * @return the trace id for this span
@@ -454,18 +463,6 @@ class ETWSpanData final : public Recordable
     return attribute_map_.GetAttributes();
   }
 
-  /**
-   * Get the events associated with this span
-   * @return the events associated with this span
-   */
-  const std::vector<SpanDataEvent> &GetEvents() const noexcept { return events_; }
-
-  /**
-   * Get the links associated with this span
-   * @return the links associated with this span
-   */
-  const std::vector<SpanDataLink> &GetLinks() const noexcept { return links_; }
-
   void SetIds(opentelemetry::trace::TraceId trace_id,
               opentelemetry::trace::SpanId span_id,
               opentelemetry::trace::SpanId parent_span_id) noexcept override
@@ -485,17 +482,14 @@ class ETWSpanData final : public Recordable
                 core::SystemTimestamp timestamp,
                 const opentelemetry::common::KeyValueIterable &attributes) noexcept override
   {
-      // change as per ETW need
-    /*SpanDataEvent event(std::string(name), timestamp, attributes);
-    events_.push_back(event);*/
+    span_->AddEvent(name, timestamp, attributes);
   }
 
-  /*void AddLink(const opentelemetry::trace::SpanContext &span_context,
+  void AddLink(const opentelemetry::trace::SpanContext &span_context,
                const opentelemetry::common::KeyValueIterable &attributes) noexcept override
   {
-    SpanDataLink link(span_context, attributes);
-    links_.push_back(link);
-  }*/
+    // TODO: Link Implementation for the Span to be implemented
+  }
 
   void SetStatus(opentelemetry::trace::CanonicalCode code,
                  nostd::string_view description) noexcept override
@@ -513,6 +507,14 @@ class ETWSpanData final : public Recordable
 
   void SetDuration(std::chrono::nanoseconds duration) noexcept override { duration_ = duration; }
 
+  void InitTracerProvider(std::string providerName)
+  {
+    ETW::TracerProvider tracer_provider_;
+
+    tracer_ = tracer_provider_.GetTracer(providerName);
+    span_   = tracer_->StartSpan(name_);
+  }
+
 private:
   opentelemetry::trace::TraceId trace_id_;
   opentelemetry::trace::SpanId span_id_;
@@ -523,9 +525,8 @@ private:
   opentelemetry::trace::CanonicalCode status_code_{opentelemetry::trace::CanonicalCode::OK};
   std::string status_desc_;
   AttributeMap attribute_map_;
-  TracerProvider tracer_provider_;
-  //std::vector<SpanDataEvent> events_;
-  //std::vector<SpanDataLink> links_;
+  nostd::shared_ptr<opentelemetry::trace::Tracer> tracer_;
+  nostd::shared_ptr<opentelemetry::trace::Span> span_;
 };
 }  // namespace trace
 }  // namespace sdk

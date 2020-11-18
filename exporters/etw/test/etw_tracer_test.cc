@@ -18,6 +18,7 @@
 #define HAVE_NO_TLD
 
 #include "opentelemetry/exporters/etw/etw_tracer_exporter.h"
+#include "opentelemetry/sdk/trace/simple_processor.h"
 
 using namespace OPENTELEMETRY_NAMESPACE;
 
@@ -38,4 +39,47 @@ TEST(ETWTracer, TracerCheck)
   EXPECT_NO_THROW(span->AddEvent(eventName, event));
   EXPECT_NO_THROW(span->End());
   EXPECT_NO_THROW(tracer->Close());
+}
+
+TEST(ETWTracer, ETWTracerTest)
+{
+  std::string providerName = "OpenTelemetry";
+
+  auto exporter = std::unique_ptr<ETW::ETWTracerExporter>(new ETW::ETWTracerExporter(providerName));
+
+  auto processor = std::shared_ptr<sdk::trace::SpanProcessor>(new sdk::trace::SimpleSpanProcessor(std::move(exporter)));
+
+  auto recordable = processor->MakeRecordable();
+  recordable->SetName("MySpan");
+
+  // Create stringstream to redirect to
+  std::stringstream stdoutOutput;
+
+  // Save cout's buffer here
+  std::streambuf *sbuf = std::cout.rdbuf();
+
+  // Redirect cout to our stringstream buffer
+  std::cout.rdbuf(stdoutOutput.rdbuf());
+
+  processor->OnEnd(std::move(recordable));
+
+  std::cout.rdbuf(sbuf);
+
+  std::string expectedOutput = "MySpan\n";
+
+  ASSERT_EQ(stdoutOutput.str(), expectedOutput);
+}
+
+TEST(ETWTracer, ExportUnitTest)
+{
+  std::string providerName = "OpenTelemetry";
+
+  auto exporter = std::unique_ptr<ETW::ETWTracerExporter>(new ETW::ETWTracerExporter(providerName));
+
+  auto recordable = exporter->MakeRecordable();
+  recordable->SetName("MySpan");
+
+  nostd::span<std::unique_ptr<sdk::trace::Recordable>> batch(&recordable, 1);
+  auto result = exporter->Export(batch);
+  EXPECT_EQ(sdk::trace::ExportResult::kSuccess, result);
 }
