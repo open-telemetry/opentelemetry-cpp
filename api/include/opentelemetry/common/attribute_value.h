@@ -42,8 +42,8 @@ enum AttributeType
   TYPE_DOUBLE,
   TYPE_STRING,
   TYPE_CSTRING,
-#if HAVE_SPAN_BYTE
-  TYPE_SPAN_BYTE,
+#ifdef HAVE_SPAN_BYTE
+  TYPE_SPAN_BYTE,  // TODO: not part of OT spec yet
 #endif
   TYPE_SPAN_BOOL,
   TYPE_SPAN_INT,
