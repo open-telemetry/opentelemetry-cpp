@@ -22,10 +22,18 @@ public:
   virtual void OnResponse(http_client::Response &response) noexcept override{};
   virtual void OnEvent(http_client::SessionState state,
                        opentelemetry::nostd::string_view reason) noexcept override
-  {}
+  {
+
+    if (state == http_client::SessionState::Response)
+    {
+      final_state = state;
+    }
+  }
+
   virtual void OnConnecting(const http_client::SSLCertificate &) noexcept {}
   virtual ~CustomEventHandler() = default;
   bool is_called_               = false;
+  http_client::SessionState final_state;
 };
 
 class GetEventHandler : public CustomEventHandler
@@ -35,7 +43,7 @@ class GetEventHandler : public CustomEventHandler
     ASSERT_EQ(200, response.GetStatusCode());
     ASSERT_EQ(response.GetBody().size(), 0);
     is_called_ = true;
-  };
+  }
 };
 
 class PostEventHandler : public CustomEventHandler
@@ -246,15 +254,21 @@ TEST_F(BasicCurlHttpTests, CurlHttpOperations)
   std::multimap<std::string, std::string, curl::curl_ci> m1 = {
       {"name1", "value1_1"}, {"name1", "value1_2"}, {"name2", "value3"}, {"name3", "value3"}};
   curl::Headers headers = m1;
-  curl::HttpOperation http_operations1(http_client::Method::Head, "/get", handler, headers, body,
-                                       true);
-  http_operations1.Send();
+  curl::HttpOperation http_operations1(http_client::Method::Head,
+                                       "http://127.0.0.1:" + std::to_string(HTTP_PORT) + "/get/",
+                                       handler, headers, body, true);
+  long status = http_operations1.Send();
+  ASSERT_EQ(status, 1);  // UNSUPPORTED_PROTOCOL
 
-  curl::HttpOperation http_operations2(http_client::Method::Get, "/get", handler, headers, body,
-                                       true);
+  curl::HttpOperation http_operations2(http_client::Method::Get,
+                                       "http://127.0.0.1:" + std::to_string(HTTP_PORT) + "/get/",
+                                       handler, headers, body, true);
   http_operations2.Send();
+  ASSERT_TRUE(handler->final_state == http_client::SessionState::Response);
 
-  curl::HttpOperation http_operations3(http_client::Method::Get, "/get", handler, headers, body,
-                                       false);
+  curl::HttpOperation http_operations3(http_client::Method::Get,
+                                       "http://127.0.0.1:" + std::to_string(HTTP_PORT) + "/get/",
+                                       handler, headers, body, false);
   http_operations3.Send();
+  ASSERT_TRUE(handler->final_state == http_client::SessionState::Response);
 }
