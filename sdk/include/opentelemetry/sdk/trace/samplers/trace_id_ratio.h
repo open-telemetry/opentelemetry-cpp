@@ -34,7 +34,8 @@ public:
       trace_api::TraceId trace_id,
       nostd::string_view /*name*/,
       trace_api::SpanKind /*span_kind*/,
-      const opentelemetry::common::KeyValueIterable & /*attributes*/) noexcept override;
+      const opentelemetry::common::KeyValueIterable & /*attributes*/,
+      const trace_api::SpanContextKeyValueIterable & /*links*/) noexcept override;
 
   /**
    * @return Description MUST be TraceIdRatioBasedSampler{0.000100}
