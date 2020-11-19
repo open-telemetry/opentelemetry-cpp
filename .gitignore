@@ -34,3 +34,6 @@
 
 # Bazel files
 /bazel-*
+
+# Mac
+*.DS_Store
