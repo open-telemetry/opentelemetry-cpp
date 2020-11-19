@@ -44,7 +44,7 @@ elif [[ "$1" == "cmake.exporter.otprotocol.test" ]]; then
   cd "${BUILD_DIR}"
   rm -rf *
   cmake -DCMAKE_BUILD_TYPE=Debug  \
-        -DWITH_OTPROTOCOL=ON \
+        -DWITH_OTLP=ON \
         -DCMAKE_CXX_FLAGS="-Werror" \
         "${SRC_DIR}"
   make
@@ -156,6 +156,7 @@ elif [[ "$1" == "format" ]]; then
   if [[ ! -z "$CHANGED" ]]; then
     echo "The following files have changes:"
     echo "$CHANGED"
+    git diff
     exit 1
   fi
   exit 0
@@ -168,6 +169,9 @@ elif [[ "$1" == "code.coverage" ]]; then
   make
   make test
   lcov --directory $PWD --capture --output-file coverage.info
+  # removing test http server coverage from the total coverage. We don't use this server completely.
+  lcov --remove coverage.info '*/ext/http/server/*'> tmp_coverage.info 2>/dev/null
+  cp tmp_coverage.info coverage.info
   exit 0
 fi
 

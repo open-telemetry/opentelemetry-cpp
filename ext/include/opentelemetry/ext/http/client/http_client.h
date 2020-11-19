@@ -40,11 +40,11 @@
 */
 
 OPENTELEMETRY_BEGIN_NAMESPACE
-namespace sdk
-{
-namespace common
+namespace ext
 {
 namespace http
+{
+namespace client
 {
 
 enum class Method
@@ -60,18 +60,21 @@ enum class Method
 
 enum class SessionState
 {
-  Created,             // session object is created
-  Ongoing,             // session is ongoing
-  Finished,            // session is finished ( this needs to be the final state )
-  Queued,              // http request is queued
-  TimedOut,            // Request timedout, no response received
-  Aborted,             // http request aborted due to local error,
-  Cancelled,           // http request cancelled, possibly due to session->CancelSession();
-  SendingFailed,       // http request sending failed
+  CreateFailed,        // session create failed
+  Created,             // session created
+  Destroyed,           // session destroyed
+  Connecting,          // connecting to peer
+  ConnectFailed,       // connection failed
+  Connected,           // connected
+  Sending,             // sending request
+  SendFailed,          // request send failed
+  Response,            // response received
+  SSLHandshakeFailed,  // SSL handshake failed
+  TimedOut,            // request time out
   NetworkError,        // network error
-  SSLHandshakeFailed,  // ssl handshake failed
-  ReadError,           // error while reading response
-  WriteError           // error while writing rquest
+  ReadError,           // error reading response
+  WriteError,          // error writing request
+  Cancelled            // (manually) cancelled
 };
 
 using Byte           = uint8_t;
@@ -103,12 +106,12 @@ public:
   virtual const Body &GetBody() const noexcept = 0;
 
   virtual bool ForEachHeader(
-      nostd::function_ref<bool(nostd::string_view name, std::string value)> callable) const
+      nostd::function_ref<bool(nostd::string_view name, nostd::string_view value)> callable) const
       noexcept = 0;
 
   virtual bool ForEachHeader(
       const nostd::string_view &key,
-      nostd::function_ref<bool(nostd::string_view name, std::string value)> callable) const
+      nostd::function_ref<bool(nostd::string_view name, nostd::string_view value)> callable) const
       noexcept = 0;
 
   virtual StatusCode GetStatusCode() const noexcept = 0;
@@ -121,7 +124,7 @@ class EventHandler
 public:
   virtual void OnResponse(Response &) noexcept = 0;
 
-  virtual void OnError(SessionState, nostd::string_view) noexcept = 0;
+  virtual void OnEvent(SessionState, nostd::string_view) noexcept = 0;
 
   virtual void OnConnecting(const SSLCertificate &) noexcept {}
 
@@ -157,7 +160,7 @@ public:
   virtual ~SessionManager() = default;
 };
 
+}  // namespace client
 }  // namespace http
-}  // namespace common
-}  // namespace sdk
+}  // namespace ext
 OPENTELEMETRY_END_NAMESPACE

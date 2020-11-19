@@ -3,6 +3,7 @@
 #include "opentelemetry/common/attribute_value.h"
 #include "opentelemetry/trace/span.h"
 #include "opentelemetry/trace/span_context.h"
+#include "opentelemetry/trace/span_context_kv_iterable.h"
 #include "opentelemetry/trace/trace_id.h"
 #include "opentelemetry/version.h"
 
@@ -70,7 +71,8 @@ public:
       trace_api::TraceId trace_id,
       nostd::string_view name,
       trace_api::SpanKind span_kind,
-      const opentelemetry::common::KeyValueIterable &attributes) noexcept = 0;
+      const opentelemetry::common::KeyValueIterable &attributes,
+      const trace_api::SpanContextKeyValueIterable &links) noexcept = 0;
 
   /**
    * Returns the sampler name or short description with the configuration.
