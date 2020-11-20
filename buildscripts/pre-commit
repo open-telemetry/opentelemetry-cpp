@@ -1,6 +1,10 @@
 #!/usr/bin/env bash
 
-# This script is supposed to execute as pre-commit / per-merge-commit hook to recreate version.cc with latest build information from git
+# This script is supposed to execute tp recreate version.cc. It can be executed as:
+#    git pre-commit hook
+#    git per-merge-commit hook
+#    manually as part of release process ( refer RELEASING.md )
+
 set -eo pipefail
 
 if [[ ! -w "$(pwd)/sdk/src/version/version.cc" ]]; then
@@ -64,5 +68,4 @@ namespace version
 }
 OPENTELEMETRY_END_NAMESPACE
 END
-
 git add "$(pwd)/sdk/src/version/version.cc"
