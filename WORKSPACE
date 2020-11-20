@@ -102,3 +102,13 @@ http_archive(
 load("@com_github_jupp0r_prometheus_cpp//bazel:repositories.bzl", "prometheus_cpp_repositories")
 
 prometheus_cpp_repositories()
+
+
+# libcurl - An optional dependency we pull in for tests.
+http_archive(
+  name = "curl",
+  urls = ["https://curl.haxx.se/download/curl-7.73.0.tar.gz"],
+  strip_prefix = "curl-7.73.0",
+  #TODO - SHA
+  build_file = "@//third_party:curl.BUILD",
+)
