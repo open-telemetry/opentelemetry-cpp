@@ -5,8 +5,8 @@
 1. Make sure all relevant changes for this release are included under `Unreleased` section in `CHANGELOG.md` and are in language that non-contributors to the project can understand.
 
 2. Run the pre-release script. It creates a branch `pre_release_<new-tag>` and updates `CHANGELOG.md` with the `<new-tag>`:
-    ```
-    ./pre_release.sh -t <new-tag>
+    ```console
+    ./buildscripts/pre_release.sh -t <new-tag>
     ```
 3. Verify that CHANGELOG.md is updated properly:
     ```
@@ -34,6 +34,20 @@ Failure to do so will leave things in a broken state.
     ```
     git push upstream
     ```
+
+## Versioning:
+
+Once tag is created, it's time to use that tag for Runtime Versioning
+
+1. Create a new brach for updating version information in `sdk/src/version.cc`
+    ```
+        git checkout -b update_version_${tag} master
+    ```
+2. Run the pre-commit script to update the version:
+    ```console
+        ./buildscripts/pre-commit  
+    ```
+3. Push the changes to upstream and create a Pull Request on GitHub.
 
 ## Release
 Finally create a Release for the new <new-tag> on GitHub. The release body should include all the release notes from the Changelog for this release.
