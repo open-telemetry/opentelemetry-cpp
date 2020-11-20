@@ -27,8 +27,6 @@ else
     major=0 && minor=0 && patch=0 && pre_release="" && build_metadata="" && count_new_commits=0
     latest_commit_hash="$(git rev-parse --short HEAD)"
 fi
-echo "PRE_REL:$pre_release"
-echo "COUNT:$count_new_commits"
 : ${pre_release:="NONE"} # use default string if not defined
 : ${build_metadata:="NONE"} # use default string if not defined
 latest_commit_hash=$(git rev-parse ${latest_commit_hash}) # get full hash from short
@@ -38,9 +36,9 @@ if [[ -z ${latest_commit_hash} ]]; then
     exit 1
 fi
 branch="$(git rev-parse --abbrev-ref HEAD)"
-    short_version="${major}.${minor}.${patch}"
-    full_version="${short_version}-${pre_release}-${build_metadata}-${count_new_commits}-${branch}-${latest_commit_hash}"
-cat > $(pwd)/sdk/src/version/version.cc <<END
+short_version="${major}.${minor}.${patch}"
+full_version="${short_version}-${pre_release}-${build_metadata}-${count_new_commits}-${branch}-${latest_commit_hash}"
+cat > "$(pwd)/sdk/src/version/version.cc" <<END
 // Please DONOT touch this file.
 // Any changes done here would be overwritten by pre-commit git hook
 
