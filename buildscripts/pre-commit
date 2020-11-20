@@ -1,4 +1,4 @@
-#!/usr/bin/env sh
+#!/usr/bin/env bash
 
 # This script is supposed to execute as pre-commit / per-merge-commit hook to recreate version.cc with latest build information from git
 set -eo pipefail
@@ -16,7 +16,7 @@ if [[ ! -z $git_tag ]] && [[ $git_tag =~ $semver_regex ]]; then
     minor="${BASH_REMATCH[2]}"
     patch="${BASH_REMATCH[3]}"
     pre_release="${BASH_REMATCH[5]}" #optional
-    build_metadata="${BASH_REMATCH[6]}" #optional
+    build_metadata="${BASH_REMATCH[7]}" #optional
     count_new_commits="${BASH_REMATCH[9]}"
     latest_commit_hash="${BASH_REMATCH[10]}"
     if [[ -z ${major} ]] || [[ -z ${minor} ]] || [[ -z ${patch} ]] || [[ -z ${count_new_commits} ]] || [[ -z ${latest_commit_hash} ]]; then
@@ -24,8 +24,11 @@ if [[ ! -z $git_tag ]] && [[ $git_tag =~ $semver_regex ]]; then
         exit 1
     fi
 else
+    major=0 && minor=0 && patch=0 && pre_release="" && build_metadata="" && count_new_commits=0
     latest_commit_hash="$(git rev-parse --short HEAD)"
 fi
+echo "PRE_REL:$pre_release"
+echo "COUNT:$count_new_commits"
 : ${pre_release:="NONE"} # use default string if not defined
 : ${build_metadata:="NONE"} # use default string if not defined
 latest_commit_hash=$(git rev-parse ${latest_commit_hash}) # get full hash from short
@@ -35,13 +38,8 @@ if [[ -z ${latest_commit_hash} ]]; then
     exit 1
 fi
 branch="$(git rev-parse --abbrev-ref HEAD)"
-if [[ -z ${major} ]] && [[ -z ${minor} ]] && [[ -z $patch ]]; then
-    short_version=""
-    full_version="${branch}-${latest_commit_hash}"
-else
     short_version="${major}.${minor}.${patch}"
-    full_version="${short_version}-${pre-release}-${build_metadata}-${count_new_commits}-${branch}-${latest_commit_hash}"
-fi
+    full_version="${short_version}-${pre_release}-${build_metadata}-${count_new_commits}-${branch}-${latest_commit_hash}"
 cat > $(pwd)/sdk/src/version/version.cc <<END
 // Please DONOT touch this file.
 // Any changes done here would be overwritten by pre-commit git hook
@@ -58,12 +56,15 @@ namespace version
     const int PATCH_VERSION = ${patch};
     const char* PRE_RELEASE = "${pre_release}";
     const char* BUILD_METADATA = "${build_metadata}";
-    const int COUNT_NEW_COMMITS = "${count_new_commits}"
+    const int COUNT_NEW_COMMITS = ${count_new_commits};
     const char* BRANCH = "${branch}";
     const char* COMMIT_HASH = "${latest_commit_hash}";
     const char* SHORT_VERSION = "${short_version}";
     const char* FULL_VERSION = "${full_version}";
+    const char* BUILD_DATE = "$(date -u)";
 }
+}
+OPENTELEMETRY_END_NAMESPACE
 END
 
 git add "$(pwd)/sdk/src/version/version.cc"

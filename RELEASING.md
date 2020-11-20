@@ -45,7 +45,7 @@ Once tag is created, it's time to use that tag for Runtime Versioning
     ```
 2. Run the pre-commit script to update the version:
     ```console
-        ./buildscripts/pre-commit  
+        ./buildscripts/pre-commit
     ```
 3. Push the changes to upstream and create a Pull Request on GitHub.
 
