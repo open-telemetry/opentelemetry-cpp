@@ -42,7 +42,7 @@ function build {
   echo "Build configuration: $BUILD_CONFIG"
   cd $WORKSPACE_ROOT
   
-  BUILD_ROOT=`pwd`/out/$PLATFORM_NAME/$BUILD_CONFIG
+  export BUILD_ROOT=`pwd`/out/$PLATFORM_NAME/$BUILD_CONFIG
   mkdir -p $BUILD_ROOT
   if [ ! -w $BUILD_ROOT ] ; then
     echo "Unable to create output directory: $BUILD_ROOT"
