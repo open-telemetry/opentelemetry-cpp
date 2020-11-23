@@ -166,6 +166,9 @@ elif [[ "$1" == "code.coverage" ]]; then
   make
   make test
   lcov --directory $PWD --capture --output-file coverage.info
+  # removing test http server coverage from the total coverage. We don't use this server completely.
+  lcov --remove coverage.info '*/ext/http/server/*'> tmp_coverage.info 2>/dev/null
+  cp tmp_coverage.info coverage.info
   exit 0
 fi
 
