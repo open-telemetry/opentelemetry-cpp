@@ -25,7 +25,7 @@ Logger::Logger(std::shared_ptr<LoggerProvider> logger_provider) noexcept
     : logger_provider_(logger_provider)
 {}
 
-void Logger::log(opentelemetry::nostd::shared_ptr<opentelemetry::logs::LogRecord> record) noexcept
+void Logger::Log(opentelemetry::nostd::shared_ptr<opentelemetry::logs::LogRecord> record) noexcept
 {
   // If this logger does not have a processor, no need to create a log record
   auto processor = logger_provider_.lock()->GetProcessor();

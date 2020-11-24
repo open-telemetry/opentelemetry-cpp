@@ -41,7 +41,7 @@ class NoopLogger final : public Logger
 public:
   NoopLogger() = default;
 
-  void log(nostd::shared_ptr<LogRecord> record) noexcept override {}
+  void Log(nostd::shared_ptr<LogRecord> record) noexcept override {}
 };
 
 /**

@@ -59,22 +59,22 @@ public:
    * A default LogRecord that will be assigned if no parameters are passed to Logger's .log() method
    * which should at minimum assign the trace_id, span_id, and timestamp
    */
-  virtual void log(nostd::shared_ptr<LogRecord> record) noexcept = 0;
+  virtual void Log(nostd::shared_ptr<LogRecord> record) noexcept = 0;
 
   /** Overloaded methods for unstructured logging **/
-  inline void log(nostd::string_view message) noexcept
+  inline void Log(nostd::string_view message) noexcept
   {
     // Set severity to the default then call log(Severity, String message) method
-    log(Severity::kDefault, message);
+    Log(Severity::kDefault, message);
   }
 
-  inline void log(Severity severity, nostd::string_view message) noexcept
+  inline void Log(Severity severity, nostd::string_view message) noexcept
   {
     // TODO: set default timestamp later (not in API)
-    log(severity, message, core::SystemTimestamp(std::chrono::system_clock::now()));
+    Log(severity, message, core::SystemTimestamp(std::chrono::system_clock::now()));
   }
 
-  inline void log(Severity severity,
+  inline void Log(Severity severity,
                   nostd::string_view message,
                   core::SystemTimestamp time) noexcept
   {
@@ -84,7 +84,7 @@ public:
     r->body      = message;
     r->timestamp = time;
 
-    log(r);
+    Log(r);
   }
 
   /** Overloaded methods for structured logging**/
@@ -92,14 +92,14 @@ public:
   // empty logs
   template <class T,
             nostd::enable_if_t<common::detail::is_key_value_iterable<T>::value> * = nullptr>
-  inline void log(Severity severity       = Severity::kDefault,
+  inline void Log(Severity severity       = Severity::kDefault,
                   nostd::string_view name = "",
                   const T &attributes     = {}) noexcept
   {
-    log(severity, name, common::KeyValueIterableView<T>(attributes));
+    Log(severity, name, common::KeyValueIterableView<T>(attributes));
   }
 
-  inline void log(Severity severity,
+  inline void Log(Severity severity,
                   nostd::string_view name,
                   const common::KeyValueIterable &attributes) noexcept
   {
@@ -109,7 +109,7 @@ public:
     r->name       = name;
     r->attributes = attributes;
 
-    log(r);
+    Log(r);
   }
 
   // TODO: add function aliases such as void debug(), void trace(), void info(), etc. for each

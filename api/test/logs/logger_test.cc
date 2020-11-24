@@ -44,19 +44,19 @@ TEST(Logger, LogMethod)
   auto logger = lp->GetLogger("TestLogger");
 
   // Test log(severity, name) method
-  logger->log(Severity::kError, "Error message");
+  logger->Log(Severity::kError, "Error message");
 
   // Test log(LogRecord)
   auto r      = opentelemetry::nostd::shared_ptr<LogRecord>(new LogRecord);
   r->name     = "Log Record";
   r->severity = Severity::kInfo;
-  logger->log(r);
+  logger->Log(r);
 }
 
 // Define a basic Logger class
 class TestLogger : public Logger
 {
-  void log(opentelemetry::nostd::shared_ptr<LogRecord> record) noexcept override {}
+  void Log(opentelemetry::nostd::shared_ptr<LogRecord> record) noexcept override {}
 };
 
 // Define a basic LoggerProvider class that returns an instance of the logger class defined above

@@ -32,7 +32,7 @@ TEST(LoggerSDK, LogToNullProcessor)
   // Log a sample log record to a nullptr processor
   auto r  = std::shared_ptr<opentelemetry::logs::LogRecord>(new opentelemetry::logs::LogRecord);
   r->name = "Test log";
-  logger->log(r);
+  logger->Log(r);
 }
 
 class DummyProcessor : public LogProcessor
@@ -67,5 +67,5 @@ TEST(LoggerSDK, LogToAProcessor)
   // Log a sample log record to the processor
   auto r  = std::shared_ptr<opentelemetry::logs::LogRecord>(new opentelemetry::logs::LogRecord);
   r->name = "Test log";
-  logger->log(r);
+  logger->Log(r);
 }
