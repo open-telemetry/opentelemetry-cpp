@@ -1,14 +1,14 @@
 #!/usr/bin/env bash
 
-# This script is supposed to execute tp recreate version.cc. It can be executed as:
+# This script is supposed to be executed to recreate version.cc. It can be executed as:
 #    git pre-commit hook
 #    git per-merge-commit hook
 #    manually as part of release process ( refer RELEASING.md )
 
 set -eo pipefail
 
-if [[ ! -w "$(pwd)/sdk/src/version/version.cc" ]]; then
-    echo "Error: File is not writable. Check permissions again."
+if [[ ! -w "$(pwd)/sdk/src/version/version.cc"  && ! -w "$(pwd)/api/include/opentelemetry/version.h" ]]; then
+    echo "Error: Version file(s) are not writable. Check permissions and try again."
     exit 1
 fi
 
@@ -39,9 +39,14 @@ if [[ -z ${latest_commit_hash} ]]; then
     echo "Error: Incorrect short hash received. Exiting.."
     exit 1
 fi
+
 branch="$(git rev-parse --abbrev-ref HEAD)"
 short_version="${major}.${minor}.${patch}"
 full_version="${short_version}-${pre_release}-${build_metadata}-${count_new_commits}-${branch}-${latest_commit_hash}"
+
+#update api version.h
+sed -i "/^\#define OPENTELEMETRY_VERSION/c\#define OPENTELEMETRY_VERSION \"${short_version}\""  "$(pwd)/api/include/opentelemetry/version.h"
+#update sdk version.cc
 cat > "$(pwd)/sdk/src/version/version.cc" <<END
 // Please DONOT touch this file.
 // Any changes done here would be overwritten by pre-commit git hook
