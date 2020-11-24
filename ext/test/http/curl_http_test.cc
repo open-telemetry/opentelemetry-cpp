@@ -257,4 +257,5 @@ TEST_F(BasicCurlHttpTests, CurlHttpOperations)
   curl::HttpOperation http_operations3(http_client::Method::Get, "/get", handler, headers, body,
                                        false);
   http_operations3.Send();
+  delete handler;
 }
