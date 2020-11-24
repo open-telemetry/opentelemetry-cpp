@@ -18,13 +18,17 @@ C++ standards:
 
 Any exceptions to this are noted in the individual `README.md` files.
 
+Please note that supporting the [C Programming
+Language](https://en.wikipedia.org/wiki/C_(programming_language)) is not a goal
+of the current project.
+
 ## Installation
 
-TBD
+Please refer to [INSTALL.md](./INSTALL.md).
 
-## Quick Start
-
-TBD
+## QuickStart
+The `examples/simple` directory contains a minimal program demonstrating
+how to instrument a small library using a simple `processor` and console `exporter`, along with build files for CMake and Bazel.
 
 ## Contributing
 
