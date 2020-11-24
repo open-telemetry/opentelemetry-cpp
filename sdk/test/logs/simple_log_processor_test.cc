@@ -34,10 +34,10 @@ public:
   }
 
   // Increment the shutdown counter everytime this method is called
-  ShutdownResult Shutdown(std::chrono::microseconds timeout) noexcept override
+  bool Shutdown(std::chrono::microseconds timeout) noexcept override
   {
     *shutdown_counter_ += 1;
-    return ShutdownResult::kSuccess;
+    return true;
   }
 
 private:
@@ -97,37 +97,13 @@ TEST(SimpleLogProcessorTest, ShutdownCalledOnce)
 
   // The first time processor shutdown is called
   EXPECT_EQ(0, num_shutdowns);
-  EXPECT_EQ(ShutdownResult::kSuccess, processor.Shutdown());
+  EXPECT_EQ(true, processor.Shutdown());
   EXPECT_EQ(1, num_shutdowns);
 
   // The second time processor shutdown is called
-  EXPECT_EQ(ShutdownResult::kFailure, processor.Shutdown());
+  EXPECT_EQ(false, processor.Shutdown());
   // Processor::ShutDown(), even if called more than once, should only shutdown exporter once
   EXPECT_EQ(1, num_shutdowns);
-}
-
-class SlowShutDownExporter final : public LogExporter
-{
-public:
-  SlowShutDownExporter() {}
-
-  ExportResult Export(const std::vector<std::unique_ptr<LogRecord>> &records) noexcept override
-  {
-    return ExportResult::kSuccess;
-  }
-
-  ShutdownResult Shutdown(std::chrono::microseconds timeout) noexcept override
-  {
-    return ShutdownResult::kTimeout;
-  }
-};
-
-// Tests whether processor shutdown times out when exporter shutdown times out
-TEST(SimpleLogProcessorTest, ShutDownTimeout)
-{
-  std::unique_ptr<SlowShutDownExporter> exporter(new SlowShutDownExporter());
-  SimpleLogProcessor processor(std::move(exporter));
-  EXPECT_EQ(ShutdownResult::kTimeout, processor.Shutdown(std::chrono::microseconds(1)));
 }
 
 // A test exporter that always returns failure when shut down
@@ -141,10 +117,7 @@ public:
     return ExportResult::kSuccess;
   }
 
-  ShutdownResult Shutdown(std::chrono::microseconds timeout) noexcept override
-  {
-    return ShutdownResult::kFailure;
-  }
+  bool Shutdown(std::chrono::microseconds timeout) noexcept override { return false; }
 };
 
 // Tests for when when processor should fail to shutdown
@@ -154,8 +127,8 @@ TEST(SimpleLogProcessorTest, ShutDownFail)
   SimpleLogProcessor processor(std::move(exporter));
 
   // Expect failure result when exporter fails to shutdown
-  EXPECT_EQ(ShutdownResult::kFailure, processor.Shutdown());
+  EXPECT_EQ(false, processor.Shutdown());
 
   // Expect failure result when processor given a negative timeout allowed to shutdown
-  EXPECT_EQ(ShutdownResult::kFailure, processor.Shutdown(std::chrono::microseconds(-1)));
+  EXPECT_EQ(false, processor.Shutdown(std::chrono::microseconds(-1)));
 }

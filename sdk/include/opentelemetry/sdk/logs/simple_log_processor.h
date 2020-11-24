@@ -45,11 +45,10 @@ public:
 
   void OnReceive(std::unique_ptr<opentelemetry::logs::LogRecord> &&record) noexcept override;
 
-  ShutdownResult ForceFlush(
+  bool ForceFlush(
       std::chrono::microseconds timeout = std::chrono::microseconds(0)) noexcept override;
 
-  ShutdownResult Shutdown(
-      std::chrono::microseconds timeout = std::chrono::microseconds(0)) noexcept override;
+  bool Shutdown(std::chrono::microseconds timeout = std::chrono::microseconds(0)) noexcept override;
 
 private:
   // The configured exporter

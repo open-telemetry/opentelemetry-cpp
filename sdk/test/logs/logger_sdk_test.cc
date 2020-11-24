@@ -38,14 +38,13 @@ TEST(LoggerSDK, LogToNullProcessor)
 class DummyProcessor : public LogProcessor
 {
   void OnReceive(std::unique_ptr<opentelemetry::logs::LogRecord> &&record) noexcept {}
-  ShutdownResult ForceFlush(
-      std::chrono::microseconds timeout = std::chrono::microseconds(0)) noexcept
+  bool ForceFlush(std::chrono::microseconds timeout = std::chrono::microseconds(0)) noexcept
   {
-    return ShutdownResult::kSuccess;
+    return true;
   }
-  ShutdownResult Shutdown(std::chrono::microseconds timeout = std::chrono::microseconds(0)) noexcept
+  bool Shutdown(std::chrono::microseconds timeout = std::chrono::microseconds(0)) noexcept
   {
-    return ShutdownResult::kSuccess;
+    return true;
   }
 };
 

@@ -25,15 +25,9 @@ namespace sdk
 {
 namespace logs
 {
-enum class ShutdownResult
-{
-  kSuccess = 0,
-  kFailure = 1,
-  kTimeout = 2
-};
 /**
- * This Log Processor is responsible for the batching of log records
- * and passing them to exporters.
+ * The Log Processor is responsible for passing log records
+ * to the configured exporter.
  */
 class LogProcessor
 {
@@ -41,8 +35,8 @@ public:
   virtual ~LogProcessor() = default;
 
   /**
-   * OnReceive is responsible for batching every log record that is created by the SDK
-   * @param record a log record that has all the user data and injected data
+   * OnReceive is called by the SDK once a log record has been successfully created.
+   * @param record the log record
    */
   virtual void OnReceive(std::unique_ptr<opentelemetry::logs::LogRecord> &&record) noexcept = 0;
 
@@ -52,17 +46,18 @@ public:
    * A default timeout of 0 mean no timeout is applied.
    * @return a result code indicating whether it succeeded, failed or timed out
    */
-  virtual ShutdownResult ForceFlush(
+  virtual bool ForceFlush(
       std::chrono::microseconds timeout = std::chrono::microseconds(0)) noexcept = 0;
 
   /**
    * Shuts down the processor and does any cleanup required.
    * ShutDown should only be called once for each processor.
-   * @param timeout that the shutdown should finish within.
+   * @param timeout minimum amount of microseconds to wait for
+   * shutdown before giving up and returning failure.
    * A default timeout of 0 means no timeout is applied.
-   * @return a ShutDown result (if it succeeded, failed or timed out)
+   * @return true if the shutdown succeeded, false otherwise
    */
-  virtual ShutdownResult Shutdown(
+  virtual bool Shutdown(
       std::chrono::microseconds timeout = std::chrono::microseconds(0)) noexcept = 0;
 };
 }  // namespace logs

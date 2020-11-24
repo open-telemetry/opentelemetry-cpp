@@ -45,29 +45,28 @@ void SimpleLogProcessor::OnReceive(
   // Get lock to ensure Export() is never called concurrently
   std::lock_guard<opentelemetry::common::SpinLockMutex> locked(lock_);
 
-  if (exporter_->Export(batch) == ExportResult::kFailure)
+  if (exporter_->Export(batch) != ExportResult::kSuccess)
   {
     /* TODO: alert user of the failed or timedout export result */
   }
 }
-
 /**
  *  The simple processor does not have any log records to flush so this method is not used
  */
-ShutdownResult SimpleLogProcessor::ForceFlush(std::chrono::microseconds timeout) noexcept
+bool SimpleLogProcessor::ForceFlush(std::chrono::microseconds timeout) noexcept
 {
-  return ShutdownResult::kSuccess;
+  return true;
 }
 
 /**
  * TODO: This method should not block indefinitely. Should abort within timeout.
  */
-ShutdownResult SimpleLogProcessor::Shutdown(std::chrono::microseconds timeout) noexcept
+bool SimpleLogProcessor::Shutdown(std::chrono::microseconds timeout) noexcept
 {
   if (timeout < std::chrono::microseconds(0))
   {
     // TODO: alert caller of invalid timeout?
-    return ShutdownResult::kFailure;
+    return false;
   }
 
   // Should only shutdown exporter ONCE.
@@ -76,7 +75,7 @@ ShutdownResult SimpleLogProcessor::Shutdown(std::chrono::microseconds timeout) n
     return exporter_->Shutdown(timeout);
   }
 
-  return ShutdownResult::kFailure;
+  return false;
 }
 }  // namespace logs
 }  // namespace sdk

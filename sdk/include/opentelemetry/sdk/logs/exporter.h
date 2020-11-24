@@ -46,14 +46,11 @@ public:
   virtual ~LogExporter() = default;
 
   /**
-   * Exporters that implement this should typically format each LogRecord into the format
-   * required by the exporter destination (e.g. JSON), then send the LogRecord to the exporter.
-   * The exporter may retry logs a maximum of 3 times before dropping and returning kFailure.
-   * If this exporter is already shut down, should return kFailure.
-   * @param records: a vector of unique pointers to log records
+   * This method does any formatting required, then sends the log records
+   * to their export destination. The exporter may attempt to retry sending
+   * logs, but should drop them and return kFailure after a timeout.
+   * @param records a vector of unique pointers to log records
    * @returns an ExportResult code (whether export was success or failure)
-   *
-   * TODO: This method should not block indefinitely. Should abort within timeout.
    */
   virtual ExportResult Export(
       const std::vector<std::unique_ptr<opentelemetry::logs::LogRecord>> &records) noexcept = 0;
@@ -61,10 +58,11 @@ public:
   /**
    * Marks the exporter as ShutDown and cleans up any resources as required.
    * Shutdown should be called only once for each Exporter instance.
-   * @param timeout this method should not block indefinitely; should abort within timeout.
-   * @return a ShutDownResult code (if it succeeded, failed or timed out)
+   * @param timeout minimum amount of microseconds to wait for shutdown before giving up and
+   * returning failure.
+   * @return true if the exporter shutdown succeeded, false otherwise
    */
-  virtual ShutdownResult Shutdown(
+  virtual bool Shutdown(
       std::chrono::microseconds timeout = std::chrono::microseconds(0)) noexcept = 0;
 };
 }  // namespace logs
