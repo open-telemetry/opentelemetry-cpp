@@ -30,8 +30,8 @@ TEST(LoggerSDK, LogToNullProcessor)
   auto logger = lp->GetLogger("logger");
 
   // Log a sample log record to a nullptr processor
-  opentelemetry::logs::LogRecord r;
-  r.name = "Test log";
+  auto r  = std::shared_ptr<opentelemetry::logs::LogRecord>(new opentelemetry::logs::LogRecord);
+  r->name = "Test log";
   logger->log(r);
 }
 
@@ -65,7 +65,7 @@ TEST(LoggerSDK, LogToAProcessor)
   // and that the logger's processor is the same as lp's processor
 
   // Log a sample log record to the processor
-  opentelemetry::logs::LogRecord r;
-  r.name = "Test log";
+  auto r  = std::shared_ptr<opentelemetry::logs::LogRecord>(new opentelemetry::logs::LogRecord);
+  r->name = "Test log";
   logger->log(r);
 }

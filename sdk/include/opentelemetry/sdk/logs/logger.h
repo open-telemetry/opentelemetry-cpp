@@ -47,7 +47,8 @@ public:
    * Writes a log record into the processor.
    * @param record The record to write into the processor.
    */
-  void log(const opentelemetry::logs::LogRecord &record) noexcept override;
+  void log(
+      opentelemetry::nostd::shared_ptr<opentelemetry::logs::LogRecord> record) noexcept override;
 
 private:
   // The logger provider of this Logger. Uses a weak_ptr to avoid cyclic dependancy issues the with

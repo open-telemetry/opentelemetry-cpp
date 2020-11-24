@@ -59,7 +59,7 @@ public:
    * A default LogRecord that will be assigned if no parameters are passed to Logger's .log() method
    * which should at minimum assign the trace_id, span_id, and timestamp
    */
-  virtual void log(const LogRecord &record) noexcept = 0;
+  virtual void log(nostd::shared_ptr<LogRecord> record) noexcept = 0;
 
   /** Overloaded methods for unstructured logging **/
   inline void log(nostd::string_view message) noexcept
@@ -79,10 +79,10 @@ public:
                   core::SystemTimestamp time) noexcept
   {
     // creates a LogRecord object with given parameters, then calls log(LogRecord)
-    LogRecord r;
-    r.severity  = severity;
-    r.body      = message;
-    r.timestamp = time;
+    auto r       = nostd::shared_ptr<LogRecord>(new LogRecord);
+    r->severity  = severity;
+    r->body      = message;
+    r->timestamp = time;
 
     log(r);
   }
@@ -104,10 +104,10 @@ public:
                   const common::KeyValueIterable &attributes) noexcept
   {
     // creates a LogRecord object with given parameters, then calls log(LogRecord)
-    LogRecord r;
-    r.severity   = severity;
-    r.name       = name;
-    r.attributes = attributes;
+    auto r        = nostd::shared_ptr<LogRecord>(new LogRecord);
+    r->severity   = severity;
+    r->name       = name;
+    r->attributes = attributes;
 
     log(r);
   }

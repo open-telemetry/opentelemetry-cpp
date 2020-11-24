@@ -25,7 +25,7 @@ Logger::Logger(std::shared_ptr<LoggerProvider> logger_provider) noexcept
     : logger_provider_(logger_provider)
 {}
 
-void Logger::log(const opentelemetry::logs::LogRecord &record) noexcept
+void Logger::log(opentelemetry::nostd::shared_ptr<opentelemetry::logs::LogRecord> record) noexcept
 {
   // If this logger does not have a processor, no need to create a log record
   auto processor = logger_provider_.lock()->GetProcessor();
@@ -35,15 +35,8 @@ void Logger::log(const opentelemetry::logs::LogRecord &record) noexcept
   }
 
   // TODO: Sampler logic (should include check for minSeverity)
-
-  /**
-   * Convert the LogRecord to the heap first before sending to processor.
-   * TODO: Change the API log(LogRecord) function to log(*LogRecord) so the following line
-   * converting record a heap variable can be removed
-   */
-  auto record_pointer =
-      std::unique_ptr<opentelemetry::logs::LogRecord>(new opentelemetry::logs::LogRecord(record));
-
+  auto record_pointer = std::unique_ptr<opentelemetry::logs::LogRecord>(
+      new opentelemetry::logs::LogRecord(*record.get()));
   // TODO: Do not want to overwrite user-set timestamp if there already is one -
   // add a flag in the API to check if timestamp is set by user already before setting timestamp
 

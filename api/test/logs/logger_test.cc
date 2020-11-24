@@ -24,34 +24,39 @@ TEST(Logger, GetLoggerDefault)
 
 TEST(Logger, GetNoopLoggerName)
 {
-  auto lp     = Provider::GetLoggerProvider();
-  auto logger = lp->GetLogger("TestLogger");
-}
-
-TEST(Logger, GetNoopLoggerNameWithArgs)
-{
   auto lp = Provider::GetLoggerProvider();
 
+  // Get a logger with no arguments
+  auto logger1 = lp->GetLogger("TestLogger1");
+
+  // Get a logger with options passed
+  auto logger2 = lp->GetLogger("TestLogger2", "Options");
+
+  // Get a logger with arguments
   std::array<string_view, 1> sv{"string"};
   span<string_view> args{sv};
-  auto logger = lp->GetLogger("NoopLoggerWithArgs", args);
-  // should probably also test that arguments were set properly too
-  // by adding a getArgs() method in NoopLogger
+  auto logger3 = lp->GetLogger("TestLogger3", args);
 }
 
-TEST(Logger, NoopLog)
+TEST(Logger, LogMethod)
 {
   auto lp     = Provider::GetLoggerProvider();
   auto logger = lp->GetLogger("TestLogger");
-  LogRecord r;
-  r.name = "Noop log name";
+
+  // Test log(severity, name) method
+  logger->log(Severity::kError, "Error message");
+
+  // Test log(LogRecord)
+  auto r      = opentelemetry::nostd::shared_ptr<LogRecord>(new LogRecord);
+  r->name     = "Log Record";
+  r->severity = Severity::kInfo;
   logger->log(r);
 }
 
 // Define a basic Logger class
 class TestLogger : public Logger
 {
-  void log(const LogRecord &record) noexcept override {}
+  void log(opentelemetry::nostd::shared_ptr<LogRecord> record) noexcept override {}
 };
 
 // Define a basic LoggerProvider class that returns an instance of the logger class defined above
