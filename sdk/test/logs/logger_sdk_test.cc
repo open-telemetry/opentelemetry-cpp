@@ -20,6 +20,16 @@
 
 using namespace opentelemetry::sdk::logs;
 
+TEST(LoggerSDK, LoggerName)
+{
+  auto lp      = std::shared_ptr<opentelemetry::logs::LoggerProvider>(new LoggerProvider());
+  auto logger1 = lp->GetLogger("logger1");
+  auto logger2 = lp->GetLogger("logger2");
+
+  ASSERT_EQ("logger1", logger1->GetName());
+  ASSERT_EQ("logger2", logger2->GetName());
+}
+
 TEST(LoggerSDK, LogToNullProcessor)
 {
   // Confirm Logger::log() does not have undefined behavior

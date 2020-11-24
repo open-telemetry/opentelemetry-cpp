@@ -42,6 +42,7 @@ public:
   NoopLogger() = default;
 
   void Log(nostd::shared_ptr<LogRecord> record) noexcept override {}
+  nostd::string_view GetName() noexcept override { return "noop logger"; };
 };
 
 /**

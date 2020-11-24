@@ -15,14 +15,15 @@ using opentelemetry::nostd::shared_ptr;
 using opentelemetry::nostd::span;
 using opentelemetry::nostd::string_view;
 
-TEST(Logger, GetLoggerDefault)
+TEST(Logger, GetLoggerDefaultNoop)
 {
   auto lp     = Provider::GetLoggerProvider();
   auto logger = lp->GetLogger("TestLogger");
   EXPECT_NE(nullptr, logger);
+  EXPECT_EQ(logger->GetName(), "noop logger");
 }
 
-TEST(Logger, GetNoopLoggerName)
+TEST(Logger, GetLoggerMethod)
 {
   auto lp = Provider::GetLoggerProvider();
 
@@ -57,6 +58,7 @@ TEST(Logger, LogMethod)
 class TestLogger : public Logger
 {
   void Log(opentelemetry::nostd::shared_ptr<LogRecord> record) noexcept override {}
+  opentelemetry::nostd::string_view GetName() noexcept override { return "test logger"; };
 };
 
 // Define a basic LoggerProvider class that returns an instance of the logger class defined above
@@ -75,17 +77,14 @@ class TestProvider : public LoggerProvider
 
 TEST(Logger, PushLoggerImplementation)
 {
-  // Push the new loggerprovider class into the global singleton
+  // Push the new loggerprovider class into the API
   auto test_provider = shared_ptr<LoggerProvider>(new TestProvider());
   Provider::SetLoggerProvider(test_provider);
 
   auto lp = Provider::GetLoggerProvider();
 
-  // GetLogger(name, options) function
+  // Get a logger instance and check whether it's GetName() method returns
+  // "test logger" as defined in the custom implementation
   auto logger = lp->GetLogger("TestLogger");
-
-  // GetLogger(name, args) function
-  std::array<string_view, 1> sv{"string"};
-  span<string_view> args{sv};
-  auto logger2 = lp->GetLogger("TestLogger2", args);
+  ASSERT_EQ("test logger", logger->GetName());
 }

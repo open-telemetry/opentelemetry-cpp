@@ -39,8 +39,7 @@ public:
   virtual ~Logger() = default;
 
   /* Returns the name of the logger */
-  // TODO: decide whether this is useful and/or should be kept, as this is not a method required in
-  // the specification. virtual nostd::string_view getName() = 0;
+  virtual nostd::string_view GetName() noexcept = 0;
 
   /**
    * Each of the following overloaded log(...) methods

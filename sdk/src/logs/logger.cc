@@ -21,9 +21,15 @@ namespace sdk
 {
 namespace logs
 {
-Logger::Logger(std::shared_ptr<LoggerProvider> logger_provider) noexcept
-    : logger_provider_(logger_provider)
+Logger::Logger(opentelemetry::nostd::string_view name,
+               std::shared_ptr<LoggerProvider> logger_provider) noexcept
+    : logger_name_(name), logger_provider_(logger_provider)
 {}
+
+opentelemetry::nostd::string_view Logger::GetName() noexcept
+{
+  return logger_name_;
+}
 
 void Logger::Log(opentelemetry::nostd::shared_ptr<opentelemetry::logs::LogRecord> record) noexcept
 {

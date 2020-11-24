@@ -39,9 +39,16 @@ class Logger final : public opentelemetry::logs::Logger
 public:
   /**
    * Initialize a new logger.
+   * @param name The name of this logger instance
    * @param logger_provider The logger provider that owns this logger.
    */
-  explicit Logger(std::shared_ptr<LoggerProvider> logger_provider) noexcept;
+  explicit Logger(opentelemetry::nostd::string_view name,
+                  std::shared_ptr<LoggerProvider> logger_provider) noexcept;
+
+  /**
+   * Returns the name of this logger.
+   */
+  opentelemetry::nostd::string_view GetName() noexcept override;
 
   /**
    * Writes a log record into the processor.
@@ -54,6 +61,9 @@ private:
   // The logger provider of this Logger. Uses a weak_ptr to avoid cyclic dependancy issues the with
   // logger provider
   std::weak_ptr<LoggerProvider> logger_provider_;
+
+  // The name of this logger
+  opentelemetry::nostd::string_view logger_name_;
 };
 
 }  // namespace logs
