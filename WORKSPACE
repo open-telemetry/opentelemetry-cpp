@@ -109,6 +109,6 @@ http_archive(
   name = "curl",
   urls = ["https://curl.haxx.se/download/curl-7.73.0.tar.gz"],
   strip_prefix = "curl-7.73.0",
-  #TODO - SHA
+  sha256 = "ba98332752257b47b9dea6d8c0ad25ec1745c20424f1dd3ff2c99ab59e97cf91",
   build_file = "@//third_party:curl.BUILD",
 )

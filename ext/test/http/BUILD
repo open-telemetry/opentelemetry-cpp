@@ -6,7 +6,7 @@ cc_test(
     deps = [
         "//ext:headers",
         "//sdk/src/trace",
-        "@curl//:curl",
         "@com_google_googletest//:gtest_main",
+        "@curl",
     ],
 )
