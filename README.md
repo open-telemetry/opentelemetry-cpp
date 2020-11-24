@@ -18,6 +18,10 @@ C++ standards:
 
 Any exceptions to this are noted in the individual `README.md` files.
 
+Please note that supporting the [C Programming
+Language](https://en.wikipedia.org/wiki/C_(programming_language)) is not a goal
+of the current project.
+
 ## Installation
 
 Please refer to [INSTALL.md](./INSTALL.md).
