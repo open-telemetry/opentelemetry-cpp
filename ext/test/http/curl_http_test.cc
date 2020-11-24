@@ -96,6 +96,7 @@ public:
   {
     if (request.uri == "/get/")
     {
+
       std::unique_lock<std::mutex> lk(mtx_requests);
       received_requests_.push_back(request);
       response.headers["Content-Type"] = "text/plain";
@@ -114,7 +115,7 @@ public:
 
   bool waitForRequests(unsigned timeOutSec, unsigned expected_count = 1)
   {
-    std::unique_lock<std::mutex> lk(cv_m);
+    std::unique_lock<std::mutex> lk(mtx_requests);
     if (cv_got_events.wait_for(lk, std::chrono::milliseconds(1000 * timeOutSec),
                                [&] { return received_requests_.size() >= expected_count; }))
     {
