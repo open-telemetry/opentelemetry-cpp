@@ -14,7 +14,7 @@ cc_test(
         "-DCURL_STATICLIB",
     ],
     linkopts = select({
-      "//:windows": [ 
+      "//bazel:windows": [ 
           "-DEFAULTLIB:advapi32.lib",
           "-DEFAULTLIB:crypt32.lib",
           "-DEFAULTLIB:Normaliz.lib",
