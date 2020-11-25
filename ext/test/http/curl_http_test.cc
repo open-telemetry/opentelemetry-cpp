@@ -143,8 +143,8 @@ TEST_F(BasicCurlHttpTests, HttpRequest)
   req.ReplaceHeader("name1", "value3");
   ASSERT_EQ(req.headers_.find("name1")->second, "value3");
 
-  req.SetTimeoutMs(std::chrono::duration<int>(5000));
-  ASSERT_EQ(req.timeout_ms_, std::chrono::duration<int>(5000));
+  req.SetTimeoutMs(std::chrono::duration<int>(2000));
+  ASSERT_EQ(req.timeout_ms_, std::chrono::duration<int>(2000));
 }
 
 TEST_F(BasicCurlHttpTests, HttpResponse)
@@ -227,13 +227,14 @@ TEST_F(BasicCurlHttpTests, RequestTimeout)
   received_requests_.clear();
   curl::SessionManager session_manager;
 
-  auto session = session_manager.CreateSession("127.0.0.10", HTTP_PORT);  // Non Existing address
+  auto session =
+      session_manager.CreateSession("222.222.222.200", HTTP_PORT);  // Non Existing address
   auto request = session->CreateRequest();
   request->SetUri("get/");
   GetEventHandler *handler = new GetEventHandler();
   session->SendRequest(*handler);
   session->FinishSession();
-  ASSERT_TRUE(handler->is_called_);
+  ASSERT_FALSE(handler->is_called_);
   delete handler;
 }
 
