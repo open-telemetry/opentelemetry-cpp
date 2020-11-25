@@ -33,7 +33,7 @@ enum class ExportResult
 {
   // The batch was exported successfully
   kSuccess = 0,
-  // The batch was exported unsuccessfully and was dropped
+  // The batch was exported unsuccessfully and was dropped, but can not be retried
   kFailure
 };
 
@@ -46,9 +46,10 @@ public:
   virtual ~LogExporter() = default;
 
   /**
-   * This method does any formatting required, then sends the log records
-   * to their export destination. The exporter may attempt to retry sending
-   * logs, but should drop them and return kFailure after a timeout.
+   * Exports the batch of log records to their export destination.
+   * This method must not be called concurrently for the same exporter instance.
+   * The exporter may attempt to retry sending the batch, but should drop
+   * and return kFailure after a certain timeout.
    * @param records a vector of unique pointers to log records
    * @returns an ExportResult code (whether export was success or failure)
    */
@@ -63,7 +64,7 @@ public:
    * @return true if the exporter shutdown succeeded, false otherwise
    */
   virtual bool Shutdown(
-      std::chrono::microseconds timeout = std::chrono::microseconds(0)) noexcept = 0;
+      std::chrono::microseconds timeout = std::chrono::microseconds::max()) noexcept = 0;
 };
 }  // namespace logs
 }  // namespace sdk

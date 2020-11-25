@@ -43,22 +43,20 @@ public:
   /**
    * Exports all log records that have not yet been exported to the configured Exporter.
    * @param timeout that the forceflush is required to finish within.
-   * A default timeout of 0 mean no timeout is applied.
    * @return a result code indicating whether it succeeded, failed or timed out
    */
   virtual bool ForceFlush(
-      std::chrono::microseconds timeout = std::chrono::microseconds(0)) noexcept = 0;
+      std::chrono::microseconds timeout = std::chrono::microseconds::max()) noexcept = 0;
 
   /**
    * Shuts down the processor and does any cleanup required.
    * ShutDown should only be called once for each processor.
    * @param timeout minimum amount of microseconds to wait for
    * shutdown before giving up and returning failure.
-   * A default timeout of 0 means no timeout is applied.
    * @return true if the shutdown succeeded, false otherwise
    */
   virtual bool Shutdown(
-      std::chrono::microseconds timeout = std::chrono::microseconds(0)) noexcept = 0;
+      std::chrono::microseconds timeout = std::chrono::microseconds::max()) noexcept = 0;
 };
 }  // namespace logs
 }  // namespace sdk
