@@ -9,4 +9,17 @@ cc_test(
         "@com_google_googletest//:gtest_main",
         "@curl",
     ],
+    # TODO: Move copts/linkopts for static CURL usage into shared bzl file.
+    copts = [
+        "-DCURL_STATICLIB",
+    ],
+    linkopts = select({
+      "//:windows": [ 
+          "-DEFAULTLIB:advapi32.lib",
+          "-DEFAULTLIB:crypt32.lib",
+          "-DEFAULTLIB:Normaliz.lib",
+      ],
+      "//conditions:default": [],
+    }),
+    
 )
