@@ -19,6 +19,7 @@
 #include <memory>
 #include <vector>
 #include "opentelemetry/logs/log_record.h"
+#include "opentelemetry/nostd/span.h"
 #include "opentelemetry/sdk/logs/processor.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
@@ -50,11 +51,11 @@ public:
    * This method must not be called concurrently for the same exporter instance.
    * The exporter may attempt to retry sending the batch, but should drop
    * and return kFailure after a certain timeout.
-   * @param records a vector of unique pointers to log records
+   * @param records a span of unique pointers to log records
    * @returns an ExportResult code (whether export was success or failure)
    */
   virtual ExportResult Export(
-      const std::vector<std::unique_ptr<opentelemetry::logs::LogRecord>> &records) noexcept = 0;
+      const nostd::span<std::unique_ptr<opentelemetry::logs::LogRecord>> &records) noexcept = 0;
 
   /**
    * Marks the exporter as ShutDown and cleans up any resources as required.

@@ -1,4 +1,6 @@
 #include "opentelemetry/sdk/logs/simple_log_processor.h"
+#include "opentelemetry/sdk/logs/exporter.h"
+
 #include <gtest/gtest.h>
 
 #include <chrono>
@@ -23,7 +25,8 @@ public:
   {}
 
   // Stores the names of the log records this exporter receives to an internal list
-  ExportResult Export(const std::vector<std::unique_ptr<LogRecord>> &records) noexcept override
+  ExportResult Export(
+      const opentelemetry::nostd::span<std::unique_ptr<LogRecord>> &records) noexcept override
   {
     *batch_size_received = records.size();
     for (auto &record : records)
@@ -112,7 +115,8 @@ class FailShutDownExporter final : public LogExporter
 public:
   FailShutDownExporter() {}
 
-  ExportResult Export(const std::vector<std::unique_ptr<LogRecord>> &records) noexcept override
+  ExportResult Export(
+      const opentelemetry::nostd::span<std::unique_ptr<LogRecord>> &records) noexcept override
   {
     return ExportResult::kSuccess;
   }

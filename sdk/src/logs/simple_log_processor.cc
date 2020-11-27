@@ -39,11 +39,9 @@ SimpleLogProcessor::SimpleLogProcessor(std::unique_ptr<LogExporter> &&exporter)
 void SimpleLogProcessor::OnReceive(
     std::unique_ptr<opentelemetry::logs::LogRecord> &&record) noexcept
 {
-  std::vector<std::unique_ptr<opentelemetry::logs::LogRecord>> batch;
-  batch.emplace_back(std::move(record));
-
+  nostd::span<std::unique_ptr<opentelemetry::logs::LogRecord>> batch(&record, 1);
   // Get lock to ensure Export() is never called concurrently
-  std::lock_guard<opentelemetry::common::SpinLockMutex> locked(lock_);
+  const std::lock_guard<opentelemetry::common::SpinLockMutex> locked(lock_);
 
   if (exporter_->Export(batch) != ExportResult::kSuccess)
   {
