@@ -255,14 +255,6 @@ public:
     {
       { "env_name", "Span" },
       { "env_ver", "4.0" },
-<<<<<<< HEAD
-=======
-
->>>>>>> 7afe098... adds unit tests and addresses the following review comments:
-      // TODO: remove these fields. Provided for illustrative purposes only.
-      { "env_cloud_role", "BusyWorker" },
-      { "env_cloud_roleInstance", "CY1SCH030021417" },
-      { "env_cloud_roleVer", "9.0.15289.2" },
       //
       // TODO: compute time in MessagePack-friendly format
       // TODO: should we consider uint64_t format with Unix timestamps for ELK stack?

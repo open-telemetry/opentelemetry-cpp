@@ -179,12 +179,6 @@ public:
         static_cast<uint64_t>(std::chrono::duration_cast<std::chrono::microseconds>(timeout)));
   }
 
-  void Close() noexcept
-  {
-    /* TODO: respect timeout from TracerOptions? */
-    CloseWithMicroseconds(0);
-  }
-
   virtual void CloseWithMicroseconds(uint64_t timeout) noexcept = 0;
 };
 }  // namespace trace

@@ -182,7 +182,7 @@ public:
   /// <returns></returns>
   void AddEvent(Span &span, nostd::string_view name, core::SystemTimestamp timestamp) noexcept
   {
-    AddEvent(span, name, timestamp, common::NullKeyValueIterable());
+    AddEvent(span, name, timestamp, opentelemetry::sdk::GetEmptyAttributes());
   };
 
   /// <summary>
@@ -192,7 +192,7 @@ public:
   /// <param name="name"></param>
   void AddEvent(Span &span, nostd::string_view name)
   {
-    AddEvent(span, name, std::chrono::system_clock::now(), common::NullKeyValueIterable());
+    AddEvent(span, name, std::chrono::system_clock::now(), opentelemetry::sdk::GetEmptyAttributes());
   };
 
   virtual ~Tracer() { CloseWithMicroseconds(0); };

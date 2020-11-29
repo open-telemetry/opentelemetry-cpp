@@ -38,7 +38,7 @@ TEST(ETWTracer, TracerCheck)
 
   EXPECT_NO_THROW(span->AddEvent(eventName, event));
   EXPECT_NO_THROW(span->End());
-  EXPECT_NO_THROW(tracer->Close());
+  EXPECT_NO_THROW(tracer->CloseWithMicroseconds(0));
 }
 
 TEST(ETWTracer, ETWTracerTest)
