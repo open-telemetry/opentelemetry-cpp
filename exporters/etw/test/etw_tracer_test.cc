@@ -47,7 +47,8 @@ TEST(ETWTracer, ETWTracerTest)
 
   auto exporter = std::unique_ptr<ETW::ETWTracerExporter>(new ETW::ETWTracerExporter(providerName));
 
-  auto processor = std::shared_ptr<sdk::trace::SpanProcessor>(new sdk::trace::SimpleSpanProcessor(std::move(exporter)));
+  auto processor = std::shared_ptr<sdk::trace::SpanProcessor>(
+      new sdk::trace::SimpleSpanProcessor(std::move(exporter)));
 
   auto recordable = processor->MakeRecordable();
   recordable->SetName("MySpan");

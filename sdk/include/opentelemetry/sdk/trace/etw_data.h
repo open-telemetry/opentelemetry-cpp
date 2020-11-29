@@ -20,7 +20,6 @@
 #include "opentelemetry/sdk/trace/exporter.h"
 #include "opentelemetry/sdk/trace/recordable.h"
 #include "opentelemetry/sdk/trace/span_data.h"
-#include "opentelemetry/sdk/trace/recordable.h"
 
 #include <fstream>
 #include <iomanip>
@@ -192,7 +191,8 @@ public:
   /// <param name="name"></param>
   void AddEvent(Span &span, nostd::string_view name)
   {
-    AddEvent(span, name, std::chrono::system_clock::now(), opentelemetry::sdk::GetEmptyAttributes());
+    AddEvent(span, name, std::chrono::system_clock::now(),
+             opentelemetry::sdk::GetEmptyAttributes());
   };
 
   virtual ~Tracer() { CloseWithMicroseconds(0); };
@@ -306,7 +306,7 @@ public:
   virtual trace::SpanContext GetContext() const noexcept
   {
     // TODO: not implemented
-    static trace::SpanContext nullContext;
+    static trace::SpanContext nullContext{trace::SpanContext::GetInvalid()};
     return nullContext;
   }
 
@@ -392,7 +392,7 @@ public:
     return nostd::shared_ptr<trace::Tracer>{new (std::nothrow) Tracer(*this, name, evtFmt)};
   }
 };
-}
+}  // namespace ETW
 
 namespace sdk
 {
@@ -402,10 +402,7 @@ namespace trace
 class ETWSpanData final : public Recordable
 {
 public:
-  ETWSpanData(std::string providerName) 
-  { 
-      InitTracerProvider(providerName);
-  }
+  ETWSpanData(std::string providerName) { InitTracerProvider(providerName); }
   /**
    * Get the trace id for this span
    * @return the trace id for this span

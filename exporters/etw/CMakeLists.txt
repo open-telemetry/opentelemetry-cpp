@@ -15,8 +15,12 @@ if(BUILD_TESTING)
     etw_tracer_test ${GTEST_BOTH_LIBRARIES} ${CMAKE_THREAD_LIBS_INIT}
     opentelemetry_exporter_etw_tracer)
 
-  gtest_add_tests(TARGET etw_provider_test TEST_PREFIX exporter. TEST_LIST
-                  etw_provider_test)
-  gtest_add_tests(TARGET etw_tracer_test TEST_PREFIX exporter. TEST_LIST
-                  etw_tracer_test)
+  gtest_add_tests(
+    TARGET etw_provider_test
+    TEST_PREFIX exporter.
+    TEST_LIST etw_provider_test)
+  gtest_add_tests(
+    TARGET etw_tracer_test
+    TEST_PREFIX exporter.
+    TEST_LIST etw_tracer_test)
 endif() # BUILD_TESTING

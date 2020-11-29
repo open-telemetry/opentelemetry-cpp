@@ -33,10 +33,6 @@ namespace trace_api = opentelemetry::trace;
 class SpanContext final
 {
 public:
-    // An invalid SpanContext.
-    SpanContext() noexcept
-      : trace_flags_(trace::TraceFlags((uint8_t) false)), remote_parent_(false){};
-
   /* A temporary constructor for an invalid SpanContext.
    * Trace id and span id are set to invalid (all zeros).
    *

@@ -25,14 +25,14 @@
 
 #include "opentelemetry/common/key_value_iterable_view.h"
 #include "opentelemetry/trace/span.h"
+#include "opentelemetry/trace/span_context_kv_iterable_view.h"
 #include "opentelemetry/trace/span_id.h"
 #include "opentelemetry/trace/trace_id.h"
 #include "opentelemetry/trace/tracer_provider.h"
-#include "opentelemetry/trace/span_context_kv_iterable_view.h"
 
+#include "opentelemetry/sdk/trace/etw_data.h"
 #include "opentelemetry/sdk/trace/exporter.h"
 #include "opentelemetry/sdk/trace/recordable.h"
-#include "opentelemetry/sdk/trace/etw_data.h"
 
 #include <fstream>
 #include <iomanip>
@@ -60,9 +60,7 @@ public:
    * @param providerName
    * @param eventName
    */
-  ETWTracerExporter(std::string providerName): providerName_(providerName)
-  {
-  }
+  ETWTracerExporter(std::string providerName) : providerName_(providerName) {}
 
   /**
    * @return Returns a unique pointer to an empty recordable object
@@ -105,6 +103,6 @@ private:
   std::shared_ptr<sdk::trace::ETWSpanData> data_;
 };
 
-} // namespace ETW
+}  // namespace ETW
 
 OPENTELEMETRY_END_NAMESPACE
