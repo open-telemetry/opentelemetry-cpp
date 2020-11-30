@@ -1,4 +1,4 @@
-set "PATH=C:\Windows;C:\Windows\System32;C:\WINDOWS\System32\WindowsPowerShell\v1.0\;C:\Program Files\Git\bin"
+set "PATH=%SystemRoot%;%SystemRoot%\System32;%SystemRoot%\System32\WindowsPowerShell\v1.0\;%ProgramFiles%\Git\bin"
 cd %~dp0
 call powershell -File .\install_llvm-win64.ps1
 
