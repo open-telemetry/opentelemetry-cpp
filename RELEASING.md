@@ -48,7 +48,7 @@ Once tag is created, it's time to use that tag for Runtime Versioning
         ./buildscripts/pre-commit
     ```
 
-3. Check if any changes masde since last release broke ABI compatibility. If yes, update `OPENTELEMETRY_ABI_VERSION_NO` in [version.h](./api/include/opentelemetry/version.h).
+3. Check if any changes made since last release broke ABI compatibility. If yes, update `OPENTELEMETRY_ABI_VERSION_NO` in [version.h](./api/include/opentelemetry/version.h).
 
 4. Push the changes to upstream and create a Pull Request on GitHub.
 
