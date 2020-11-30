@@ -1,5 +1,5 @@
 // Please DONOT touch this file.
-// Any changes done here would be overwritten by pre-commit git hook
+// Any changes done here would be overwritten during release/build.
 
 #include "opentelemetry/sdk/version/version.h"
 

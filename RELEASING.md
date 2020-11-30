@@ -39,7 +39,7 @@ Failure to do so will leave things in a broken state.
 
 Once tag is created, it's time to use that tag for Runtime Versioning
 
-1. Create a new brach for updating version information in [version.cc](./sdk/src/version.cc).
+1. Create a new brach for updating version information in `./sdk/src/version.cc`.
     ```
         git checkout -b update_version_${tag} master
     ```
