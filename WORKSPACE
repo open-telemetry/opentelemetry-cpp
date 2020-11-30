@@ -82,7 +82,7 @@ http_archive(
 
 http_archive(
     name = "github_nlohmann_json",
-    build_file = "//third_party/json:nlohmann_json.BUILD",
+    build_file = "//bazel:nlohmann_json.BUILD",
     sha256 = "69cc88207ce91347ea530b227ff0776db82dcb8de6704e1a3d74f4841bc651cf",
     urls = [
         "https://github.com/nlohmann/json/releases/download/v3.6.1/include.zip",
@@ -106,7 +106,7 @@ prometheus_cpp_repositories()
 # libcurl - An optional dependency we pull in for tests.
 http_archive(
     name = "curl",
-    build_file = "@//third_party:curl.BUILD",
+    build_file = "@//bazel:curl.BUILD",
     sha256 = "ba98332752257b47b9dea6d8c0ad25ec1745c20424f1dd3ff2c99ab59e97cf91",
     strip_prefix = "curl-7.73.0",
     urls = ["https://curl.haxx.se/download/curl-7.73.0.tar.gz"],
