@@ -8,7 +8,7 @@ call download.cmd https://llvmextensions.gallerycdn.vsassets.io/extensions/llvme
 REM Install optional components required for ARM build - vs2017-BuildTools
 IF EXIST "%ProgramFiles(x86)%\Microsoft Visual Studio\2017\BuildTools" (
 "%ProgramFiles(x86)%\Microsoft Visual Studio\Installer\vs_installer.exe" ^
-	-- modify --installPath "%ProgramFiles(x86)%\Microsoft Visual Studio\2017\BuildTools" -q ^
+	modify --installPath "%ProgramFiles(x86)%\Microsoft Visual Studio\2017\BuildTools" -q ^
 	--add Microsoft.VisualStudio.Component.VC.ATL ^
 	--add Microsoft.VisualStudio.Component.VC.ATL.ARM ^
 	--add Microsoft.VisualStudio.Component.VC.ATL.ARM64
@@ -18,7 +18,7 @@ IF EXIST "%ProgramFiles(x86)%\Microsoft Visual Studio\2017\BuildTools" (
 REM Install optional components required for ARM build - vs2017-Enterprise
 IF EXIST "%ProgramFiles(x86)%\Microsoft Visual Studio\2017\Enterprise" (
 "%ProgramFiles(x86)%\Microsoft Visual Studio\Installer\vs_installer.exe" ^
-	-- modify --installPath "%ProgramFiles(x86)%\Microsoft Visual Studio\2017\Enterprise" -q ^
+	modify --installPath "%ProgramFiles(x86)%\Microsoft Visual Studio\2017\Enterprise" -q ^
 	--add Microsoft.VisualStudio.Component.VC.ATL ^
 	--add Microsoft.VisualStudio.Component.VC.ATL.ARM ^
 	--add Microsoft.VisualStudio.Component.VC.ATL.ARM64
@@ -28,7 +28,7 @@ IF EXIST "%ProgramFiles(x86)%\Microsoft Visual Studio\2017\Enterprise" (
 REM Install optional components required for ARM build - vs2019-Enterprise
 IF EXIST %ProgramFiles(x86)%\Microsoft Visual Studio\2019\Enterprise (
 "C:\Program Files (x86)\Microsoft Visual Studio\Installer\vs_installer.exe" ^
-	-- modify --installPath "%ProgramFiles(x86)%\Microsoft Visual Studio\2019\Enterprise" -q ^
+	modify --installPath "%ProgramFiles(x86)%\Microsoft Visual Studio\2019\Enterprise" -q ^
 	--add Microsoft.VisualStudio.Component.VC.ATL ^
 	--add Microsoft.VisualStudio.Component.VC.ATL.ARM ^
 	--add Microsoft.VisualStudio.Component.VC.ATL.ARM64
