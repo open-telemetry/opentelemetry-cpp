@@ -39,7 +39,7 @@ Failure to do so will leave things in a broken state.
 
 Once tag is created, it's time to use that tag for Runtime Versioning
 
-1. Create a new brach for updating version information in [version.cc](sdk/src/version.cc).
+1. Create a new brach for updating version information in [version.cc](./sdk/src/version.cc).
     ```
         git checkout -b update_version_${tag} master
     ```
@@ -48,9 +48,17 @@ Once tag is created, it's time to use that tag for Runtime Versioning
         ./buildscripts/pre-commit
     ```
 
-3. Check if any changes masde since last release broke ABI compatibility. If yes, update `OPENTELEMETRY_ABI_VERSION_NO` in [version.h](api/include/opentelemetry/version.h).
+3. Check if any changes masde since last release broke ABI compatibility. If yes, update `OPENTELEMETRY_ABI_VERSION_NO` in [version.h](./api/include/opentelemetry/version.h).
 
 4. Push the changes to upstream and create a Pull Request on GitHub.
+
+5. Once changes are merged, move the tag created earlier to the new commit hash from step 4.
+
+    ```
+    git tag -f <previous-tag> <new-commit-hash>
+    git push --tags --force
+
+    ```
 
 ## Release
 Finally create a Release for the new <new-tag> on GitHub. The release body should include all the release notes from the Changelog for this release.
