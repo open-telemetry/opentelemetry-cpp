@@ -38,7 +38,7 @@ public:
    * OnReceive is called by the SDK once a log record has been successfully created.
    * @param record the log record
    */
-  virtual void OnReceive(std::unique_ptr<opentelemetry::logs::LogRecord> &&record) noexcept = 0;
+  virtual void OnReceive(std::shared_ptr<opentelemetry::logs::LogRecord> record) noexcept = 0;
 
   /**
    * Exports all log records that have not yet been exported to the configured Exporter.

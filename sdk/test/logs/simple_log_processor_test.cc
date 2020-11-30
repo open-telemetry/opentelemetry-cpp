@@ -26,7 +26,7 @@ public:
 
   // Stores the names of the log records this exporter receives to an internal list
   ExportResult Export(
-      const opentelemetry::nostd::span<std::unique_ptr<LogRecord>> &records) noexcept override
+      const opentelemetry::nostd::span<std::shared_ptr<LogRecord>> &records) noexcept override
   {
     *batch_size_received = records.size();
     for (auto &record : records)
@@ -116,7 +116,7 @@ public:
   FailShutDownExporter() {}
 
   ExportResult Export(
-      const opentelemetry::nostd::span<std::unique_ptr<LogRecord>> &records) noexcept override
+      const opentelemetry::nostd::span<std::shared_ptr<LogRecord>> &records) noexcept override
   {
     return ExportResult::kSuccess;
   }

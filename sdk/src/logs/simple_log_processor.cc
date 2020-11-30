@@ -36,16 +36,17 @@ SimpleLogProcessor::SimpleLogProcessor(std::unique_ptr<LogExporter> &&exporter)
  * Batches the log record it receives in a batch of 1 and immediately sends it
  * to the configured exporter
  */
-void SimpleLogProcessor::OnReceive(
-    std::unique_ptr<opentelemetry::logs::LogRecord> &&record) noexcept
+void SimpleLogProcessor::OnReceive(std::shared_ptr<opentelemetry::logs::LogRecord> record) noexcept
 {
-  nostd::span<std::unique_ptr<opentelemetry::logs::LogRecord>> batch(&record, 1);
+  std::vector<std::shared_ptr<opentelemetry::logs::LogRecord>> batch;
+  batch.emplace_back(record);
   // Get lock to ensure Export() is never called concurrently
   const std::lock_guard<opentelemetry::common::SpinLockMutex> locked(lock_);
 
-  if (exporter_->Export(batch) != ExportResult::kSuccess)
+  if (exporter_->Export(opentelemetry::nostd::span<std::shared_ptr<opentelemetry::logs::LogRecord>>(
+          batch.data(), batch.size())) != ExportResult::kSuccess)
   {
-    /* Alert user of the failed export */
+    /* TODO: alert user of the failed or timedout export result */
   }
 }
 /**

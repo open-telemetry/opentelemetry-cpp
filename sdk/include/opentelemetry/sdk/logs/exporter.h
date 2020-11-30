@@ -55,7 +55,7 @@ public:
    * @returns an ExportResult code (whether export was success or failure)
    */
   virtual ExportResult Export(
-      const nostd::span<std::unique_ptr<opentelemetry::logs::LogRecord>> &records) noexcept = 0;
+      const nostd::span<std::shared_ptr<opentelemetry::logs::LogRecord>> &records) noexcept = 0;
 
   /**
    * Marks the exporter as ShutDown and cleans up any resources as required.
