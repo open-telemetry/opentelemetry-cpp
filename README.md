@@ -47,7 +47,6 @@ Meeting notes are available as a public [Google doc](https://docs.google.com/doc
 
 Approvers ([@open-telemetry/cpp-approvers](https://github.com/orgs/open-telemetry/teams/cpp-approvers)):
 
-* [Lalit Kumar Bhasin](https://github.com/lalitb), Microsoft
 * [Johannes Tax](https://github.com/pyohannes), New Relic
 * [Josh Suereth](https://github.com/jsuereth), Google
 * [Max Golovanov](https://github.com/maxgolov), Microsoft
@@ -59,6 +58,7 @@ Approvers ([@open-telemetry/cpp-approvers](https://github.com/orgs/open-telemetr
 Maintainers ([@open-telemetry/cpp-maintainers](https://github.com/orgs/open-telemetry/teams/cpp-maintainers)):
 
 * [Emil Mikulic](https://github.com/g-easy), Google
+* [Lalit Kumar Bhasin](https://github.com/lalitb), Microsoft
 * [Reiley Yang](https://github.com/reyang), Microsoft
 
 Triagers ([@open-telemetry/cpp-triagers](https://github.com/orgs/open-telemetry/teams/cpp-triagers)):
