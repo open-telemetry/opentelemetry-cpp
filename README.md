@@ -63,7 +63,6 @@ Maintainers ([@open-telemetry/cpp-maintainers](https://github.com/orgs/open-tele
 
 Triagers ([@open-telemetry/cpp-triagers](https://github.com/orgs/open-telemetry/teams/cpp-triagers)):
 
-* [Alolita Sharma](https://github.com/alolita), Amazon
 * [Jodee Varney](https://github.com/jodeev), New Relic
 
 *Find more about the maintainer role in [community repository](https://github.com/open-telemetry/community/blob/master/community-membership.md#maintainer).*
