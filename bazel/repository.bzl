@@ -1,7 +1,6 @@
 load("@bazel_tools//tools/build_defs/repo:utils.bzl", "maybe")
 load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive")
 
-
 def opentelemetry_cpp_deps():
     """Loads dependencies need to compile the opentelemetry-cpp library."""
 
@@ -28,7 +27,7 @@ def opentelemetry_cpp_deps():
         sha256 = "d6277f77e0bb922d3f6f56c0f93292bb4cfabfc3c92b31ee5ccea0e100303612",
         strip_prefix = "grpc-1.28.0",
         urls = [
-          "https://github.com/grpc/grpc/archive/v1.28.0.tar.gz",
+            "https://github.com/grpc/grpc/archive/v1.28.0.tar.gz",
         ],
     )
 
@@ -40,7 +39,7 @@ def opentelemetry_cpp_deps():
         sha256 = "b679cef31102ed8beddc39ecfd6368ee311cbee6f50742f13f21be7278781821",
         strip_prefix = "protobuf-3.11.2",
         urls = [
-          "https://github.com/protocolbuffers/protobuf/releases/download/v3.11.2/protobuf-all-3.11.2.tar.gz",
+            "https://github.com/protocolbuffers/protobuf/releases/download/v3.11.2/protobuf-all-3.11.2.tar.gz",
         ],
     )
 
