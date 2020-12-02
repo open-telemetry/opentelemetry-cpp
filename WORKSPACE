@@ -14,7 +14,21 @@
 
 workspace(name = "io_opentelemetry_cpp")
 
-load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive")
+load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive", "http_file")
+
+# Google Benchmark library.
+# Only needed for benchmarks, not to build the OpenTelemetry library.
+local_repository(
+    name = "com_github_google_benchmark",
+    path = "third_party/benchmark",
+)
+
+# GoogleTest framework.
+# Only needed for tests, not to build the OpenTelemetry library.
+local_repository(
+    name = "com_google_googletest",
+    path = "third_party/googletest",
+)
 
 # Load gRPC dependency
 # Note that this dependency needs to be loaded first due to
@@ -62,24 +76,6 @@ new_local_repository(
     path = "third_party/opentelemetry-proto",
 )
 
-# GoogleTest framework.
-# Only needed for tests, not to build the OpenTelemetry library.
-http_archive(
-    name = "com_google_googletest",
-    sha256 = "9dc9157a9a1551ec7a7e43daea9a694a0bb5fb8bec81235d8a1e6ef64c716dcb",
-    strip_prefix = "googletest-release-1.10.0",
-    urls = ["https://github.com/google/googletest/archive/release-1.10.0.tar.gz"],
-)
-
-# Google Benchmark library.
-# Only needed for benchmarks, not to build the OpenTelemetry library.
-http_archive(
-    name = "com_github_google_benchmark",
-    sha256 = "3c6a165b6ecc948967a1ead710d4a181d7b0fbcaa183ef7ea84604994966221a",
-    strip_prefix = "benchmark-1.5.0",
-    urls = ["https://github.com/google/benchmark/archive/v1.5.0.tar.gz"],
-)
-
 http_archive(
     name = "github_nlohmann_json",
     build_file = "//bazel:nlohmann_json.BUILD",
@@ -90,18 +86,13 @@ http_archive(
 )
 
 # C++ Prometheus Client library.
-load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive", "http_file")
-
-http_archive(
+local_repository(
     name = "com_github_jupp0r_prometheus_cpp",
-    sha256 = "85ad6fea0f0dcb413104366b7d6109acdb015aff8767945511c5cad8202a28a6",
-    strip_prefix = "prometheus-cpp-0.9.0",
-    urls = ["https://github.com/jupp0r/prometheus-cpp/archive/v0.9.0.tar.gz"],
+    path = "third_party/prometheus-cpp",
 )
+#load("@com_github_jupp0r_prometheus_cpp//bazel:repositories.bzl", "prometheus_cpp_repositories")
 
-load("@com_github_jupp0r_prometheus_cpp//bazel:repositories.bzl", "prometheus_cpp_repositories")
-
-prometheus_cpp_repositories()
+#prometheus_cpp_repositories()
 
 # libcurl - An optional dependency we pull in for tests.
 http_archive(

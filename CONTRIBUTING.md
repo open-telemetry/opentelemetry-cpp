@@ -73,6 +73,14 @@ Add your fork as a remote:
 git remote add fork https://github.com/YOUR_GITHUB_USERNAME/opentelemetry-cpp.git
 ```
 
+If you haven't, make sure you are loading the submodules required to build OpenTelemetry
+
+```sh
+git submodule init
+git submodule update
+```
+
+
 Check out a new branch, make modifications and push the branch to your fork:
 
 ```sh
