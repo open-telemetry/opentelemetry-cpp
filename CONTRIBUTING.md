@@ -93,12 +93,13 @@ To run tests locally, please read the [CI instructions](ci/README.md).
   as `work-in-progress`, or mark it as [`draft`](https://github.blog/2019-02-14-introducing-draft-pull-requests/).
 * Make sure [CLA](https://identity.linuxfoundation.org/projects/cncf) is
   signed and CI is clear.
+* For non-trivial changes, please update the [CHANGELOG](./CHANGELOG.md).
 
 ### How to Get PRs Merged
 
 A PR is considered to be **ready to merge** when:
 
-* It has received two approvals from [Approvers](https://github.com/open-telemetry/community/blob/master/community-membership.md#approver)
+* It has received atleast one approval from [Approvers](https://github.com/open-telemetry/community/blob/master/community-membership.md#approver)
   / [Maintainers](https://github.com/open-telemetry/community/blob/master/community-membership.md#maintainer)
   (at different companies).
 * Major feedback items/points are resolved.
@@ -108,6 +109,13 @@ A PR is considered to be **ready to merge** when:
 * Urgent fixes can take exceptions as long as it has been actively communicated.
 
 Any Approver / Maintainer can merge the PR once it is **ready to merge**.
+
+If a PR has been stuck (e.g. there are lots of debates and people couldn't agree on each other), the owner should try to get people aligned by:
+
+* Consolidating the perspectives and putting a summary in the PR. It is recommended to add a link into the PR description, which points to a comment with a summary in the PR conversation
+* Stepping back to see if it makes sense to narrow down the scope of the PR or split it up.
+
+If none of the above worked and the PR has been stuck for more than 2 weeks, the owner should bring it to the (OpenTelemetry C++ SIG meeting)[https://zoom.us/j/8203130519].
 
 ## Useful Resources
 
