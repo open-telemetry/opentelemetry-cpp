@@ -99,7 +99,7 @@ To run tests locally, please read the [CI instructions](ci/README.md).
 
 A PR is considered to be **ready to merge** when:
 
-* It has received atleast one approval from [Approvers](https://github.com/open-telemetry/community/blob/master/community-membership.md#approver)
+* It has received at least one approval from [Approvers](https://github.com/open-telemetry/community/blob/master/community-membership.md#approver)
   / [Maintainers](https://github.com/open-telemetry/community/blob/master/community-membership.md#maintainer)
   (at different companies).
 * Major feedback items/points are resolved.
