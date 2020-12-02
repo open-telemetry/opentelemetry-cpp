@@ -15,33 +15,12 @@
 workspace(name = "io_opentelemetry_cpp")
 
 load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive", "http_file")
+load("//bazel:repository.bzl", "opentelemetry_cpp_deps")
 
-# Google Benchmark library.
-# Only needed for benchmarks, not to build the OpenTelemetry library.
-local_repository(
-    name = "com_github_google_benchmark",
-    path = "third_party/benchmark",
-)
+# Load our direct dependencies.
+opentelemetry_cpp_deps()
 
-# GoogleTest framework.
-# Only needed for tests, not to build the OpenTelemetry library.
-local_repository(
-    name = "com_google_googletest",
-    path = "third_party/googletest",
-)
-
-# Load gRPC dependency
-# Note that this dependency needs to be loaded first due to
-# https://github.com/bazelbuild/bazel/issues/6664
-http_archive(
-    name = "com_github_grpc_grpc",
-    sha256 = "d6277f77e0bb922d3f6f56c0f93292bb4cfabfc3c92b31ee5ccea0e100303612",
-    strip_prefix = "grpc-1.28.0",
-    urls = [
-        "https://github.com/grpc/grpc/archive/v1.28.0.tar.gz",
-    ],
-)
-
+# Load gRPC dependencies after load.
 load("@com_github_grpc_grpc//bazel:grpc_deps.bzl", "grpc_deps")
 
 grpc_deps()
@@ -55,50 +34,14 @@ load("@upb//bazel:repository_defs.bzl", "bazel_version_repository")
 
 bazel_version_repository(name = "upb_bazel_version")
 
-# Uses older protobuf version because of
-# https://github.com/protocolbuffers/protobuf/issues/7179
-http_archive(
-    name = "com_google_protobuf",
-    sha256 = "b679cef31102ed8beddc39ecfd6368ee311cbee6f50742f13f21be7278781821",
-    strip_prefix = "protobuf-3.11.2",
-    urls = [
-        "https://github.com/protocolbuffers/protobuf/releases/download/v3.11.2/protobuf-all-3.11.2.tar.gz",
-    ],
-)
+# Load protobuf deps
 
 load("@com_google_protobuf//:protobuf_deps.bzl", "protobuf_deps")
 
 protobuf_deps()
 
-new_local_repository(
-    name = "com_github_opentelemetry_proto",
-    build_file = "//bazel:opentelemetry_proto.BUILD",
-    path = "third_party/opentelemetry-proto",
-)
+# Load prometheus C++ dependencies.
 
-http_archive(
-    name = "github_nlohmann_json",
-    build_file = "//bazel:nlohmann_json.BUILD",
-    sha256 = "69cc88207ce91347ea530b227ff0776db82dcb8de6704e1a3d74f4841bc651cf",
-    urls = [
-        "https://github.com/nlohmann/json/releases/download/v3.6.1/include.zip",
-    ],
-)
+load("@com_github_jupp0r_prometheus_cpp//bazel:repositories.bzl", "prometheus_cpp_repositories")
 
-# C++ Prometheus Client library.
-local_repository(
-    name = "com_github_jupp0r_prometheus_cpp",
-    path = "third_party/prometheus-cpp",
-)
-#load("@com_github_jupp0r_prometheus_cpp//bazel:repositories.bzl", "prometheus_cpp_repositories")
-
-#prometheus_cpp_repositories()
-
-# libcurl - An optional dependency we pull in for tests.
-http_archive(
-    name = "curl",
-    build_file = "@//bazel:curl.BUILD",
-    sha256 = "ba98332752257b47b9dea6d8c0ad25ec1745c20424f1dd3ff2c99ab59e97cf91",
-    strip_prefix = "curl-7.73.0",
-    urls = ["https://curl.haxx.se/download/curl-7.73.0.tar.gz"],
-)
+prometheus_cpp_repositories()
