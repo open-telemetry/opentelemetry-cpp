@@ -10,18 +10,18 @@ OPENTELEMETRY_BEGIN_NAMESPACE
 namespace common
 {
 
-constexpr int SPINLOCK_FAST_ITERATIONS = 100;
+constexpr int SPINLOCK_FAST_ITERATIONS  = 100;
 constexpr int SPINLOCK_YIELD_ITERATIONS = 10;
-constexpr int SPINRLOCK_SLEEP_MS = 1;
+constexpr int SPINRLOCK_SLEEP_MS        = 1;
 
 /**
  * A Mutex which uses atomic flags and spin-locks instead of halting threads.
- * 
+ *
  * This mutex uses an incremental back-off strategy with the following phases:
  * 1. A tight spin-lock loop (pending: using hardware PAUSE/YIELD instructions)
  * 2. A loop where the current thread yields control after checking the lock.
  * 3. Issuing a thread-sleep call before starting back in phase 1.
- * 
+ *
  * This is meant to give a good balance of perofrmance and CPU consumption in
  * practice.
  *
@@ -40,7 +40,8 @@ public:
   /**
    * Attempts to lock the mutex.  Return immediately with `true` (success) or `false` (failure).
    */
-  bool try_lock() noexcept {
+  bool try_lock() noexcept
+  {
     return !flag_.load(std::memory_order_relaxed) &&
            !flag_.exchange(true, std::memory_order_acquire);
   }
@@ -54,22 +55,28 @@ public:
    */
   void lock() noexcept
   {
-    for (;;) {
+    for (;;)
+    {
       // Try once
-      if (!flag_.exchange(true, std::memory_order_acquire)) {
+      if (!flag_.exchange(true, std::memory_order_acquire))
+      {
         return;
       }
       // Spin-Fast
-      for (std::size_t i = 0; i < SPINLOCK_FAST_ITERATIONS; ++i) {
-        if (try_lock()) {
+      for (std::size_t i = 0; i < SPINLOCK_FAST_ITERATIONS; ++i)
+      {
+        if (try_lock())
+        {
           return;
         }
         // TODO: Issue PAUSE/YIELD instruction to reduce contention.
         // e.g. __builtin_ia32_pause() / YieldProcessor() / _mm_pause();
       }
       // Spin-Yield
-      for (std::size_t i = 0; i < SPINLOCK_YIELD_ITERATIONS; ++i) {
-        if (try_lock()) {
+      for (std::size_t i = 0; i < SPINLOCK_YIELD_ITERATIONS; ++i)
+      {
+        if (try_lock())
+        {
           return;
         }
         std::this_thread::yield();
