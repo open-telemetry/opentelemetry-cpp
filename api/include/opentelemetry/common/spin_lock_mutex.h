@@ -12,7 +12,7 @@ namespace common
 
 constexpr int SPINLOCK_FAST_ITERATIONS  = 100;
 constexpr int SPINLOCK_YIELD_ITERATIONS = 10;
-constexpr int SPINRLOCK_SLEEP_MS        = 1;
+constexpr int SPINLOCK_SLEEP_MS         = 1;
 
 /**
  * A Mutex which uses atomic flags and spin-locks instead of halting threads.
@@ -82,7 +82,7 @@ public:
         std::this_thread::yield();
       }
       // Sleep and then start the whole process again.
-      std::this_thread::sleep_for(std::chrono::milliseconds(SPINRLOCK_SLEEP_MS));
+      std::this_thread::sleep_for(std::chrono::milliseconds(SPINLOCK_SLEEP_MS));
     }
     return;
   }
