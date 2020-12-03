@@ -59,9 +59,10 @@ sdktrace::ExportResult OStreamSpanExporter::Export(
   return sdktrace::ExportResult::kSuccess;
 }
 
-void OStreamSpanExporter::Shutdown(std::chrono::microseconds timeout) noexcept
+bool OStreamSpanExporter::Shutdown(std::chrono::microseconds timeout) noexcept
 {
   isShutdown_ = true;
+  return true;
 }
 
 }  // namespace trace

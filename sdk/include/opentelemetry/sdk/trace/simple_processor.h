@@ -50,17 +50,21 @@ public:
     }
   }
 
-  void ForceFlush(
+  bool ForceFlush(
       std::chrono::microseconds timeout = std::chrono::microseconds(0)) noexcept override
-  {}
+  {
+    return true;
+  }
 
-  void Shutdown(std::chrono::microseconds timeout = std::chrono::microseconds(0)) noexcept override
+  bool Shutdown(
+      std::chrono::microseconds timeout = std::chrono::microseconds::max()) noexcept override
   {
     // We only call shutdown ONCE.
     if (exporter_ != nullptr && !shutdown_latch_.test_and_set(std::memory_order_acquire))
     {
-      exporter_->Shutdown(timeout);
+      return exporter_->Shutdown(timeout);
     }
+    return true;
   }
 
   ~SimpleSpanProcessor() { Shutdown(); }
