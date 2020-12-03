@@ -44,6 +44,9 @@ class Logger
 public:
   virtual ~Logger() = default;
 
+  /* Returns the name of the logger */
+  virtual const nostd::string_view GetName() noexcept = 0;
+
   /**
    * Each of the following overloaded Log(...) methods
    * creates a log message with the specific parameters passed.
