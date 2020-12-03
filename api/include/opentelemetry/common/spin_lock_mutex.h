@@ -90,7 +90,7 @@ public:
   void unlock() noexcept { flag_.store(false, std::memory_order_release); }
 
 private:
-  std::atomic<bool> flag_{0};
+  std::atomic<bool> flag_{false};
 };
 
 }  // namespace common
