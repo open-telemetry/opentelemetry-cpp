@@ -99,9 +99,10 @@ To run tests locally, please read the [CI instructions](ci/README.md).
 
 A PR is considered to be **ready to merge** when:
 
-* It has received at least one approval from [Approvers](https://github.com/open-telemetry/community/blob/master/community-membership.md#approver)
-  / [Maintainers](https://github.com/open-telemetry/community/blob/master/community-membership.md#maintainer)
-  (at different companies).
+* It has received two approvals with at least one approval from [Approver](https://github.com/open-telemetry/community/blob/master/community-membership.md#approver)
+  / [Maintainer](https://github.com/open-telemetry/community/blob/master/community-membership.md#maintainer)
+  (at different company).
+* A pull reqeust opened by an Approver / Maintainer can be merged with only one review from  Approver / Maintainer (at different company).
 * Major feedback items/points are resolved.
 * It has been open for review for at least one working day. This gives people
   reasonable time to review.
