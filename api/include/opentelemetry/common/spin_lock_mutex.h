@@ -11,7 +11,6 @@ namespace common
 {
 
 constexpr int SPINLOCK_FAST_ITERATIONS  = 100;
-constexpr int SPINLOCK_YIELD_ITERATIONS = 10;
 constexpr int SPINLOCK_SLEEP_MS         = 1;
 
 /**
@@ -62,7 +61,7 @@ public:
       {
         return;
       }
-      // Spin-Fast
+      // Spin-Fast (goal ~10ns)
       for (std::size_t i = 0; i < SPINLOCK_FAST_ITERATIONS; ++i)
       {
         if (try_lock())
@@ -72,16 +71,13 @@ public:
         // TODO: Issue PAUSE/YIELD instruction to reduce contention.
         // e.g. __builtin_ia32_pause() / YieldProcessor() / _mm_pause();
       }
-      // Spin-Yield
-      for (std::size_t i = 0; i < SPINLOCK_YIELD_ITERATIONS; ++i)
+      // Yield then try again (goal ~100ns)
+      std::this_thread::yield();
+      if (try_lock())
       {
-        if (try_lock())
-        {
-          return;
-        }
-        std::this_thread::yield();
+        return;
       }
-      // Sleep and then start the whole process again.
+      // Sleep and then start the whole process again. (goal ~1000ns)
       std::this_thread::sleep_for(std::chrono::milliseconds(SPINLOCK_SLEEP_MS));
     }
     return;
