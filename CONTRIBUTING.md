@@ -80,7 +80,6 @@ git submodule init
 git submodule update
 ```
 
-
 Check out a new branch, make modifications and push the branch to your fork:
 
 ```sh

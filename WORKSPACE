@@ -14,7 +14,6 @@
 
 workspace(name = "io_opentelemetry_cpp")
 
-load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive", "http_file")
 load("//bazel:repository.bzl", "opentelemetry_cpp_deps")
 
 # Load our direct dependencies.
