@@ -51,7 +51,7 @@ public:
   }
 
   bool ForceFlush(
-      std::chrono::microseconds timeout = std::chrono::microseconds(0)) noexcept override
+      std::chrono::microseconds timeout = std::chrono::microseconds::max()) noexcept override
   {
     return true;
   }

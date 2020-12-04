@@ -144,8 +144,8 @@ void BatchSpanProcessor::Export(const bool was_force_flush_called)
         buffer_.size() >= max_export_batch_size_ ? max_export_batch_size_ : buffer_.size();
   }
 
-  buffer_.Consume(num_spans_to_export,
-                  [&](CircularBufferRange<AtomicUniquePtr<Recordable>> range) noexcept {
+  buffer_.Consume(
+      num_spans_to_export, [&](CircularBufferRange<AtomicUniquePtr<Recordable>> range) noexcept {
                     range.ForEach([&](AtomicUniquePtr<Recordable> &ptr) {
                       std::unique_ptr<Recordable> swap_ptr = std::unique_ptr<Recordable>(nullptr);
                       ptr.Swap(swap_ptr);

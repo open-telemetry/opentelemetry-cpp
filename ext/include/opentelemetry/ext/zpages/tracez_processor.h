@@ -71,8 +71,7 @@ public:
   /*
    * For now, does nothing. In the future, it
    * may send all ended spans that have not yet been sent to the aggregator.
-   * @param timeout an optional timeout, the default timeout of 0 means that no
-   * timeout is applied. Currently, timeout does nothing.
+   * @param timeout an optional timeout. Currently, timeout does nothing.
    * @return return the status of the operation.
    */
   bool ForceFlush(
@@ -89,7 +88,8 @@ public:
    * timeout is applied. Currently, timeout does nothing.
    * @return return the status of the operation.
    */
-  bool Shutdown(std::chrono::microseconds timeout = std::chrono::microseconds(0)) noexcept override
+  bool Shutdown(
+      std::chrono::microseconds timeout = std::chrono::microseconds::max()) noexcept override
   {
     return true;
   }
