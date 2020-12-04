@@ -10,8 +10,8 @@ OPENTELEMETRY_BEGIN_NAMESPACE
 namespace common
 {
 
-constexpr int SPINLOCK_FAST_ITERATIONS  = 100;
-constexpr int SPINLOCK_SLEEP_MS         = 1;
+constexpr int SPINLOCK_FAST_ITERATIONS = 100;
+constexpr int SPINLOCK_SLEEP_MS        = 1;
 
 /**
  * A Mutex which uses atomic flags and spin-locks instead of halting threads.
