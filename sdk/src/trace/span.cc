@@ -106,7 +106,6 @@ Span::Span(std::shared_ptr<Tracer> &&tracer,
   });
 
   recordable_->SetSpanKind(options.kind);
-
   recordable_->SetStartTime(NowOr(options.start_system_time));
   start_steady_time = NowOr(options.start_steady_time);
   processor_->OnStart(*recordable_);
