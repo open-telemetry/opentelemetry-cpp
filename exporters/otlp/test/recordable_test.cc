@@ -43,7 +43,7 @@ TEST(Recordable, SetSpanKind)
   opentelemetry::trace::SpanKind span_kind = opentelemetry::trace::SpanKind::kServer;
   rec.SetSpanKind(span_kind);
   EXPECT_EQ(rec.span().kind(),
-            opentelemetry::proto::trace::v1::Span_SpanKind::Span_SpanKind_SPAN_KIND_SERVER);
+            opentelemetry::proto::trace::v1::Span_SpanKind::Span_SpanKind_SERVER);
 }
 
 TEST(Recordable, SetStartTime)
