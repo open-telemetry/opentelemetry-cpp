@@ -34,7 +34,7 @@ TEST(Controller, Constructor)
 
   auto instr                                = meter->NewIntCounter("test", "none", "none", true);
   std::map<std::string, std::string> labels = {{"key", "value"}};
-  auto labelkv                              = trace::KeyValueIterableView<decltype(labels)>{labels};
+  auto labelkv = common::KeyValueIterableView<decltype(labels)>{labels};
 
   alpha.start();
 

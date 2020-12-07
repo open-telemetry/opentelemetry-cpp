@@ -96,7 +96,8 @@ struct Thread
 {
   std::thread m_thread;
 
-  volatile bool m_terminate{false};
+  // volatile bool m_terminate{false};
+  std::atomic<bool> m_terminate{false};
 
   /// <summary>
   /// Thread Constructor

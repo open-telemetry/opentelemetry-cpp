@@ -72,7 +72,7 @@ public:
     }
     else
     {
-      idx = ceil(log(val) / log(gamma));
+      idx = static_cast<int>(ceil(log(val) / log(gamma)));
     }
     if (raw_.find(idx) != raw_.end())
     {
@@ -118,7 +118,7 @@ public:
       idx = iter->first;
       count += iter->second;
     }
-    return round(2 * pow(gamma, idx) / (gamma + 1));
+    return static_cast<T>(round(2 * pow(gamma, idx) / (gamma + 1)));
   }
 
   /**

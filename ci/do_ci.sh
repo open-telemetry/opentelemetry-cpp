@@ -30,11 +30,21 @@ elif [[ "$1" == "cmake.c++20.test" ]]; then
   make
   make test
   exit 0
+elif [[ "$1" == "cmake.legacy.test" ]]; then
+  cd "${BUILD_DIR}"
+  rm -rf *
+  cmake -DCMAKE_BUILD_TYPE=Debug  \
+        -DCMAKE_CXX_FLAGS="-Werror" \
+        -DCMAKE_CXX_STANDARD=11 \
+        "${SRC_DIR}"
+  make
+  make test
+  exit 0
 elif [[ "$1" == "cmake.exporter.otprotocol.test" ]]; then
   cd "${BUILD_DIR}"
   rm -rf *
   cmake -DCMAKE_BUILD_TYPE=Debug  \
-        -DWITH_OTPROTOCOL=ON \
+        -DWITH_OTLP=ON \
         -DCMAKE_CXX_FLAGS="-Werror" \
         "${SRC_DIR}"
   make
@@ -46,14 +56,11 @@ elif [[ "$1" == "cmake.exporter.prometheus.test" ]]; then
 #  apt-get install sudo
 #  apt-get install zlib1g-dev
 #  apt-get -y install libcurl4-openssl-dev
-  cd third_party
-  git clone https://github.com/jupp0r/prometheus-cpp
-  cd prometheus-cpp
-  git checkout v0.9.0
-  git submodule init
-  git submodule update
+  cd third_party/prometheus-cpp
+  git submodule update --recursive --init
+  [[ -d _build ]] && rm -rf ./_build
   mkdir _build && cd _build
-  cmake .. -DBUILD_SHARED_LIBS=ON
+  cmake .. -DBUILD_SHARED_LIBS=ON -DUSE_THIRDPARTY_LIBRARIES=ON
   make -j 4
   sudo make install
 
@@ -125,7 +132,7 @@ elif [[ "$1" == "bazel.tsan" ]]; then
   exit 0
 elif [[ "$1" == "bazel.valgrind" ]]; then
   bazel build $BAZEL_OPTIONS //...
-  bazel test --run_under="/usr/bin/valgrind --leak-check=full --error-exitcode=1" $BAZEL_TEST_OPTIONS //...
+  bazel test --run_under="/usr/bin/valgrind --leak-check=full --error-exitcode=1 --suppressions=\"${SRC_DIR}/ci/valgrind-suppressions\"" $BAZEL_TEST_OPTIONS //...
   exit 0
 elif [[ "$1" == "benchmark" ]]; then
   [ -z "${BENCHMARK_DIR}" ] && export BENCHMARK_DIR=$HOME/benchmark
@@ -146,6 +153,7 @@ elif [[ "$1" == "format" ]]; then
   if [[ ! -z "$CHANGED" ]]; then
     echo "The following files have changes:"
     echo "$CHANGED"
+    git diff
     exit 1
   fi
   exit 0
@@ -158,6 +166,9 @@ elif [[ "$1" == "code.coverage" ]]; then
   make
   make test
   lcov --directory $PWD --capture --output-file coverage.info
+  # removing test http server coverage from the total coverage. We don't use this server completely.
+  lcov --remove coverage.info '*/ext/http/server/*'> tmp_coverage.info 2>/dev/null
+  cp tmp_coverage.info coverage.info
   exit 0
 fi
 

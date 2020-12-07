@@ -1,5 +1,4 @@
 #include "opentelemetry/sdk/trace/span_data.h"
-#include "opentelemetry/context/threadlocal_context.h"
 #include "opentelemetry/nostd/variant.h"
 #include "opentelemetry/trace/span_id.h"
 #include "opentelemetry/trace/trace_id.h"
@@ -66,7 +65,7 @@ TEST(SpanData, EventAttributes)
 
   data.AddEvent(
       "Test Event", std::chrono::system_clock::now(),
-      opentelemetry::trace::KeyValueIterableView<std::map<std::string, int64_t>>(attributes));
+      opentelemetry::common::KeyValueIterableView<std::map<std::string, int64_t>>(attributes));
 
   for (int i = 0; i < kNumAttributes; i++)
   {
@@ -87,7 +86,7 @@ TEST(SpanData, Links)
 
   data.AddLink(
       opentelemetry::trace::SpanContext(false, false),
-      opentelemetry::trace::KeyValueIterableView<std::map<std::string, int64_t>>(attributes));
+      opentelemetry::common::KeyValueIterableView<std::map<std::string, int64_t>>(attributes));
 
   for (int i = 0; i < kNumAttributes; i++)
   {

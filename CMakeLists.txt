@@ -10,45 +10,96 @@ if(NOT DEFINED CMAKE_CXX_STANDARD)
   set(CMAKE_CXX_STANDARD 11)
 endif()
 
-option(WITH_OTPROTOCOL
-       "Whether to include the OpenTelemetry Protocol in the SDK" OFF)
+option(WITH_OTLP "Whether to include the OpenTelemetry Protocol in the SDK" OFF)
 
 option(WITH_PROMETHEUS "Whether to include the Prometheus Client in the SDK"
        OFF)
 
-set(WITH_PROTOBUF OFF)
-if(WITH_OTPROTOCOL)
-  set(WITH_PROTOBUF ON)
-endif()
+option(BUILD_TESTING "Whether to enable tests" ON)
+option(WITH_EXAMPLES "Whether to build examples" ON)
 
-include(CTest)
+set(WITH_PROTOBUF OFF)
 
 find_package(Threads)
 
-if(CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")
+function(install_windows_deps)
+  # Bootstrap vcpkg from CMake and auto-install deps in case if we are missing
+  # deps on Windows
+  message("Installing build tools and dependencies...")
+  execute_process(
+    COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/tools/setup-buildtools.cmd)
+  set(CMAKE_TOOLCHAIN_FILE
+      ${CMAKE_CURRENT_SOURCE_DIR}/tools/vcpkg/scripts/buildsystems/vcpkg.cmake)
+endfunction()
+
+if(MSVC)
   # Options for Visual C++ compiler: /Zc:__cplusplus - report an updated value
   # for recent C++ language standards. Without this option MSVC returns the
   # value of __cplusplus="199711L"
   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /Zc:__cplusplus")
 endif()
 
+if(WITH_OTLP)
+  set(WITH_PROTOBUF ON)
+endif()
+
 if(WITH_PROTOBUF)
   set(protobuf_MODULE_COMPATIBLE ON)
-  find_package(Protobuf CONFIG NAMES protobuf)
-  # Older versions of protobuf don't use cmake config files.
+  find_package(Protobuf REQUIRED)
   if(NOT protobuf_FOUND)
+    if(WIN32)
+      install_windows_deps()
+    endif()
     find_package(Protobuf REQUIRED)
+    if(WIN32)
+      # Always use x64 protoc.exe
+      if(NOT EXISTS "${Protobuf_PROTOC_EXECUTABLE}")
+        set(Protobuf_PROTOC_EXECUTABLE
+            ${CMAKE_CURRENT_SOURCE_DIR}/tools/vcpkg/packages/protobuf_x64-windows/tools/protobuf/protoc.exe
+        )
+      endif()
+    endif()
+    # Latest Protobuf uses mixed case instead of uppercase
+    set(PROTOBUF_PROTOC_EXECUTABLE ${Protobuf_PROTOC_EXECUTABLE})
   endif()
+  message("PROTOBUF_PROTOC_EXECUTABLE=${PROTOBUF_PROTOC_EXECUTABLE}")
 endif()
 
-if(WITH_OTPROTOCOL)
-  include(third_party/opentelemetry-proto/Protobuf.cmake)
+if(WITH_OTLP)
+  include(cmake/opentelemetry-proto.cmake)
 endif()
+
+list(APPEND CMAKE_PREFIX_PATH "${CMAKE_BINARY_DIR}")
 
 if(BUILD_TESTING)
-  find_package(GTest REQUIRED)
-  find_package(benchmark REQUIRED)
+  include(CTest)
+  if(EXISTS ${CMAKE_BINARY_DIR}/lib/libgtest.a)
+    # Prefer GTest from build tree. GTest is not always working with
+    # CMAKE_PREFIX_PATH
+    set(GTEST_INCLUDE_DIRS
+        ${CMAKE_CURRENT_SOURCE_DIR}/third_party/googletest/googletest/include
+        ${CMAKE_CURRENT_SOURCE_DIR}/third_party/googletest/googlemock/include)
+    set(GTEST_BOTH_LIBRARIES
+        ${CMAKE_BINARY_DIR}/lib/libgtest.a
+        ${CMAKE_BINARY_DIR}/lib/libgtest_main.a
+        ${CMAKE_BINARY_DIR}/lib/libgmock.a)
+  elseif(WIN32)
+    # Make sure we are always bootsrapped with vcpkg on Windows
+    find_package(GTest)
+    if(NOT GTEST_FOUND)
+      install_windows_deps()
+      find_package(GTest REQUIRED)
+    endif()
+  else()
+    # Prefer GTest installed by OS distro, brew or vcpkg package manager
+    find_package(GTest REQUIRED)
+  endif()
   include_directories(SYSTEM ${GTEST_INCLUDE_DIRS})
+  message("GTEST_INCLUDE_DIRS   = ${GTEST_INCLUDE_DIRS}")
+  message("GTEST_BOTH_LIBRARIES = ${GTEST_BOTH_LIBRARIES}")
+  enable_testing()
+  # Benchmark respects the CMAKE_PREFIX_PATH
+  find_package(benchmark CONFIG REQUIRED)
 endif()
 
 include_directories(api/include)
@@ -58,5 +109,7 @@ include_directories(sdk)
 add_subdirectory(sdk)
 include_directories(.)
 add_subdirectory(exporters)
-add_subdirectory(examples)
+if(WITH_EXAMPLES)
+  add_subdirectory(examples)
+endif()
 add_subdirectory(ext)

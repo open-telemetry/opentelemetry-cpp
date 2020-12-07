@@ -28,6 +28,7 @@ cc_test(
         "simple_processor_test.cc",
     ],
     deps = [
+        "//exporters/memory:in_memory_span_exporter",
         "//sdk/src/trace",
         "@com_google_googletest//:gtest_main",
     ],
@@ -50,6 +51,7 @@ cc_test(
         "tracer_test.cc",
     ],
     deps = [
+        "//exporters/memory:in_memory_span_exporter",
         "//sdk/src/trace",
         "@com_google_googletest//:gtest_main",
     ],
@@ -78,9 +80,9 @@ cc_test(
 )
 
 cc_test(
-    name = "parent_or_else_sampler_test",
+    name = "parent_sampler_test",
     srcs = [
-        "parent_or_else_sampler_test.cc",
+        "parent_sampler_test.cc",
     ],
     deps = [
         "//sdk/src/trace",
@@ -89,9 +91,9 @@ cc_test(
 )
 
 cc_test(
-    name = "probability_sampler_test",
+    name = "trace_id_ratio_sampler_test",
     srcs = [
-        "probability_sampler_test.cc",
+        "trace_id_ratio_sampler_test.cc",
     ],
     deps = [
         "//sdk/src/common:random",
@@ -114,5 +116,8 @@ cc_test(
 otel_cc_benchmark(
     name = "sampler_benchmark",
     srcs = ["sampler_benchmark.cc"],
-    deps = ["//sdk/src/trace"],
+    deps = [
+        "//exporters/memory:in_memory_span_exporter",
+        "//sdk/src/trace",
+    ],
 )

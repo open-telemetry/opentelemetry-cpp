@@ -62,19 +62,24 @@ private:
                                        {16, "UNAUTHENTICATED"}};
 
   /*
-    print_array and print_value are used to print out the value of an attribute within a vector.
+    print_value is used to print out the value of an attribute within a vector.
     These values are held in a variant which makes the process of printing them much more
     complicated.
   */
 
   template <typename T>
-  void print_array(sdktrace::SpanDataAttributeValue &value)
+  void print_value(const T &item)
+  {
+    sout_ << item;
+  }
+
+  template <typename T>
+  void print_value(const std::vector<T> &vec)
   {
     sout_ << '[';
-    auto s    = nostd::get<std::vector<T>>(value);
     size_t i  = 1;
-    size_t sz = s.size();
-    for (auto v : s)
+    size_t sz = vec.size();
+    for (auto v : vec)
     {
       sout_ << v;
       if (i != sz)
@@ -84,70 +89,39 @@ private:
     sout_ << ']';
   }
 
+// Prior to C++14, generic lambda is not available so fallback to functor.
+#if __cplusplus < 201402L
+
+  class SpanDataAttributeValueVisitor
+  {
+  public:
+    SpanDataAttributeValueVisitor(OStreamSpanExporter &exporter) : exporter_(exporter) {}
+
+    template <typename T>
+    void operator()(T &&arg)
+    {
+      exporter_.print_value(arg);
+    }
+
+  private:
+    OStreamSpanExporter &exporter_;
+  };
+
+#endif
+
   void print_value(sdktrace::SpanDataAttributeValue &value)
   {
-    if (nostd::holds_alternative<bool>(value))
-    {
-      sout_ << nostd::get<bool>(value);
-    }
-    else if (nostd::holds_alternative<int32_t>(value))
-    {
-      sout_ << nostd::get<int32_t>(value);
-    }
-    else if (nostd::holds_alternative<uint32_t>(value))
-    {
-      sout_ << nostd::get<uint32_t>(value);
-    }
-    else if (nostd::holds_alternative<int64_t>(value))
-    {
-      sout_ << nostd::get<int64_t>(value);
-    }
-    else if (nostd::holds_alternative<uint64_t>(value))
-    {
-      sout_ << nostd::get<uint64_t>(value);
-    }
-    else if (nostd::holds_alternative<double>(value))
-    {
-      sout_ << nostd::get<double>(value);
-    }
-    else if (nostd::holds_alternative<std::string>(value))
-    {
-      sout_ << nostd::get<std::string>(value);
-    }
-    else if (nostd::holds_alternative<std::vector<bool>>(value))
-    {
-      print_array<bool>(value);
-    }
-    else if (nostd::holds_alternative<std::vector<int32_t>>(value))
-    {
-      print_array<int32_t>(value);
-    }
-    else if (nostd::holds_alternative<std::vector<uint32_t>>(value))
-    {
-      print_array<uint32_t>(value);
-    }
-    else if (nostd::holds_alternative<std::vector<int64_t>>(value))
-    {
-      print_array<int64_t>(value);
-    }
-    else if (nostd::holds_alternative<std::vector<uint64_t>>(value))
-    {
-      print_array<uint64_t>(value);
-    }
-    else if (nostd::holds_alternative<std::vector<double>>(value))
-    {
-      print_array<double>(value);
-    }
-    else if (nostd::holds_alternative<std::vector<std::string>>(value))
-    {
-      print_array<std::string>(value);
-    }
+#if __cplusplus < 201402L
+    nostd::visit(SpanDataAttributeValueVisitor(*this), value);
+#else
+    nostd::visit([this](auto &&arg) { print_value(arg); }, value);
+#endif
   }
 
   void printAttributes(std::unordered_map<std::string, sdktrace::SpanDataAttributeValue> map)
   {
-    int size = map.size();
-    int i    = 1;
+    size_t size = map.size();
+    size_t i    = 1;
     for (auto kv : map)
     {
       sout_ << kv.first << ": ";

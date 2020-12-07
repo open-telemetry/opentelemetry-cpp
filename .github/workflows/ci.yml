@@ -12,6 +12,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
+      with:
+        submodules: 'recursive'
     - name: setup
       run: |
         sudo ./ci/setup_cmake.sh
@@ -21,11 +23,33 @@ jobs:
     - name: run prometheus exporter tests
       run: ./ci/do_ci.sh cmake.exporter.prometheus.test
 
+  cmake_gcc_48_test:
+    name: CMake gcc 4.8
+    runs-on: ubuntu-18.04
+    steps:
+    - uses: actions/checkout@v2
+      with:
+        submodules: 'recursive'
+    - name: setup
+      run: |
+        sudo ./ci/setup_ci_environment.sh
+        sudo ./ci/install_gcc48.sh
+    - name: setup cmake
+      run: |
+        sudo CC=/usr/bin/gcc-4.8 CXX=/usr/bin/g++-4.8 ./ci/setup_cmake.sh
+    - name: run tests
+      run: ./ci/do_ci.sh cmake.legacy.test
+      env:
+        CC: /usr/bin/gcc-4.8
+        CXX: /usr/bin/g++-4.8
+
   cmake_test_cxx20:
     name: CMake C++20 test
     runs-on: ubuntu-20.04
     steps:
     - uses: actions/checkout@v2
+      with:
+        submodules: 'recursive'
     - name: setup
       run: |
         sudo ./ci/setup_ci_environment.sh
@@ -38,6 +62,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
+      with:
+        submodules: 'recursive'
     - name: setup
       run: |
         sudo ./ci/setup_cmake.sh
@@ -50,6 +76,8 @@ jobs:
     runs-on: ubuntu-18.04
     steps:
     - uses: actions/checkout@v2
+      with:
+        submodules: 'recursive'
     - name: setup
       run: |
         sudo ./ci/setup_ci_environment.sh
@@ -65,6 +93,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
+      with:
+        submodules: 'recursive'
     - name: setup
       run: |
         sudo ./ci/setup_cmake.sh
@@ -78,6 +108,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
+      with:
+        submodules: 'recursive'
     - name: setup
       run: |
         sudo ./ci/setup_cmake.sh
@@ -91,6 +123,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
+      with:
+        submodules: 'recursive'
     - name: setup
       run: |
         sudo ./ci/setup_cmake.sh
@@ -104,6 +138,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
+      with:
+        submodules: 'recursive'
     - name: setup
       run: |
         sudo ./ci/setup_cmake.sh
@@ -117,6 +153,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
+      with:
+        submodules: 'recursive'
     - name: setup
       run: |
         sudo ./ci/setup_cmake.sh
@@ -130,6 +168,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
+      with:
+        submodules: 'recursive'
     - name: setup
       run: |
         sudo ./ci/setup_cmake.sh
@@ -160,6 +200,8 @@ jobs:
     runs-on: macos-latest
     steps:
     - uses: actions/checkout@v2
+      with:
+        submodules: 'recursive'
     - name: run tests
       run: ./ci/do_ci.sh bazel.test
 
@@ -168,6 +210,8 @@ jobs:
     runs-on: windows-2019
     steps:
     - uses: actions/checkout@v2
+      with:
+        submodules: 'recursive'
     - name: setup
       run: |
         ./ci/setup_windows_cmake.ps1
@@ -183,6 +227,8 @@ jobs:
     runs-on: windows-2019
     steps:
     - uses: actions/checkout@v2
+      with:
+        submodules: 'recursive'
     - name: setup
       run: ./ci/install_windows_bazelisk.ps1
     - name: run tests
@@ -193,6 +239,8 @@ jobs:
     runs-on: windows-2019
     steps:
     - uses: actions/checkout@v2
+      with:
+        submodules: 'recursive'
     - name: setup
       run: |
         ./ci/setup_windows_cmake.ps1
@@ -205,6 +253,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
+      with:
+        submodules: 'recursive'
     - name: setup
       run: |
         sudo ./ci/setup_cmake.sh
@@ -215,3 +265,14 @@ jobs:
       uses: codecov/codecov-action@v1
       with:
         file: /home/runner/build/coverage.info
+
+  docfx_check:
+    name: DocFX check
+    runs-on: windows-latest
+    steps:
+    - uses: actions/checkout@v2
+    - name: install docfx
+      run: choco install docfx -y
+    - name: run ./ci/docfx.cmd
+      shell: cmd
+      run: ./ci/docfx.cmd

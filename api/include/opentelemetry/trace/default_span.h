@@ -25,10 +25,10 @@ public:
 
   void AddEvent(nostd::string_view name,
                 core::SystemTimestamp timestamp,
-                const KeyValueIterable &attributes) noexcept
+                const common::KeyValueIterable &attributes) noexcept
   {}
 
-  void AddEvent(nostd::string_view name, const KeyValueIterable &attributes) noexcept
+  void AddEvent(nostd::string_view name, const common::KeyValueIterable &attributes) noexcept
   {
     this->AddEvent(name, std::chrono::system_clock::now(), attributes);
   }
@@ -40,10 +40,6 @@ public:
   void End(const EndSpanOptions &options = {}) noexcept {}
 
   nostd::string_view ToString() { return "DefaultSpan"; }
-
-  void SetToken(nostd::unique_ptr<context::Token> &&default_token) noexcept {}
-
-  DefaultSpan() = default;
 
   DefaultSpan(SpanContext span_context) : span_context_(span_context) {}
 

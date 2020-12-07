@@ -16,13 +16,13 @@
 #include <iostream>
 #include <map>
 #include <string>
+#include "opentelemetry/common/key_value_iterable.h"
 #include "opentelemetry/context/context.h"
 #include "opentelemetry/nostd/shared_ptr.h"
 #include "opentelemetry/nostd/span.h"
 #include "opentelemetry/nostd/string_view.h"
 #include "opentelemetry/nostd/variant.h"
 #include "opentelemetry/trace/default_span.h"
-#include "opentelemetry/trace/key_value_iterable.h"
 #include "opentelemetry/trace/propagation/http_text_format.h"
 #include "opentelemetry/trace/span.h"
 #include "opentelemetry/trace/span_context.h"
@@ -92,7 +92,7 @@ public:
     {
       return nostd::get<nostd::shared_ptr<Span>>(span).get()->GetContext();
     }
-    return SpanContext();
+    return SpanContext::GetInvalid();
   }
 
   static TraceId GenerateTraceIdFromString(nostd::string_view trace_id)

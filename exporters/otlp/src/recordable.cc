@@ -120,7 +120,7 @@ void Recordable::SetAttribute(nostd::string_view key,
 
 void Recordable::AddEvent(nostd::string_view name,
                           core::SystemTimestamp timestamp,
-                          const trace::KeyValueIterable &attributes) noexcept
+                          const common::KeyValueIterable &attributes) noexcept
 {
   auto *event = span_.add_events();
   event->set_name(name.data(), name.size());
@@ -132,15 +132,20 @@ void Recordable::AddEvent(nostd::string_view name,
   });
 }
 
-void Recordable::AddLink(opentelemetry::trace::SpanContext span_context,
-                         const trace::KeyValueIterable &attributes) noexcept
+void Recordable::AddLink(const opentelemetry::trace::SpanContext &span_context,
+                         const common::KeyValueIterable &attributes) noexcept
 {
   auto *link = span_.add_links();
+  link->set_trace_id(reinterpret_cast<const char *>(span_context.trace_id().Id().data()),
+                     trace::TraceId::kSize);
+  link->set_span_id(reinterpret_cast<const char *>(span_context.span_id().Id().data()),
+                    trace::SpanId::kSize);
   attributes.ForEachKeyValue([&](nostd::string_view key, common::AttributeValue value) noexcept {
     PopulateAttribute(link->add_attributes(), key, value);
     return true;
   });
-  // TODO: Populate trace_id, span_id and trace_state when these are supported by SpanContext
+
+  // TODO: Populate trace_state when it is supported by SpanContext
 }
 
 void Recordable::SetStatus(trace::CanonicalCode code, nostd::string_view description) noexcept

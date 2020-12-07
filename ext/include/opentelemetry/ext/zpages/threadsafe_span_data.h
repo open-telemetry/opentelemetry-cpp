@@ -17,7 +17,9 @@
 using opentelemetry::sdk::trace::AttributeConverter;
 using opentelemetry::sdk::trace::SpanDataAttributeValue;
 using opentelemetry::sdk::trace::SpanDataEvent;
-namespace trace_api = opentelemetry::trace;
+
+// TODO: Create generic short pattern for opentelemetry::common and opentelemetry::trace and others
+// as necessary
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace ext
@@ -137,7 +139,8 @@ public:
     attributes_[std::string(key)] = nostd::visit(converter_, value);
   }
 
-  void SetStatus(trace_api::CanonicalCode code, nostd::string_view description) noexcept override
+  void SetStatus(opentelemetry::trace::CanonicalCode code,
+                 nostd::string_view description) noexcept override
   {
     std::lock_guard<std::mutex> lock(mutex_);
     status_code_ = code;
@@ -162,10 +165,10 @@ public:
     duration_ = duration;
   }
 
-  void AddLink(
-      opentelemetry::trace::SpanContext span_context,
-      const trace_api::KeyValueIterable &attributes =
-          trace_api::KeyValueIterableView<std::map<std::string, int>>({})) noexcept override
+  void AddLink(const opentelemetry::trace::SpanContext &span_context,
+               const opentelemetry::common::KeyValueIterable &attributes =
+                   opentelemetry::common::KeyValueIterableView<std::map<std::string, int>>(
+                       {})) noexcept override
   {
     std::lock_guard<std::mutex> lock(mutex_);
     (void)span_context;
@@ -175,8 +178,9 @@ public:
   void AddEvent(
       nostd::string_view name,
       core::SystemTimestamp timestamp = core::SystemTimestamp(std::chrono::system_clock::now()),
-      const trace_api::KeyValueIterable &attributes =
-          trace_api::KeyValueIterableView<std::map<std::string, int>>({})) noexcept override
+      const opentelemetry::common::KeyValueIterable &attributes =
+          opentelemetry::common::KeyValueIterableView<std::map<std::string, int>>(
+              {})) noexcept override
   {
     std::lock_guard<std::mutex> lock(mutex_);
     events_.push_back(SpanDataEvent(std::string(name), timestamp, attributes));

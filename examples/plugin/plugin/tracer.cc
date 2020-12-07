@@ -18,9 +18,10 @@ class Span final : public trace::Span
 public:
   Span(std::shared_ptr<Tracer> &&tracer,
        nostd::string_view name,
-       const opentelemetry::trace::KeyValueIterable & /*attributes*/,
+       const opentelemetry::common::KeyValueIterable & /*attributes*/,
+       const opentelemetry::trace::SpanContextKeyValueIterable & /*links*/,
        const trace::StartSpanOptions & /*options*/) noexcept
-      : tracer_{std::move(tracer)}, name_{name}
+      : tracer_{std::move(tracer)}, name_{name}, span_context_{trace::SpanContext::GetInvalid()}
   {
     std::cout << "StartSpan: " << name << "\n";
   }
@@ -39,7 +40,7 @@ public:
 
   void AddEvent(nostd::string_view /*name*/,
                 core::SystemTimestamp /*timestamp*/,
-                const trace::KeyValueIterable & /*attributes*/) noexcept override
+                const common::KeyValueIterable & /*attributes*/) noexcept override
   {}
 
   void SetStatus(trace::CanonicalCode /*code*/,
@@ -54,8 +55,6 @@ public:
 
   trace::SpanContext GetContext() const noexcept override { return span_context_; }
 
-  void SetToken(nostd::unique_ptr<context::Token> &&token) noexcept override {}
-
 private:
   std::shared_ptr<Tracer> tracer_;
   std::string name_;
@@ -67,9 +66,10 @@ Tracer::Tracer(nostd::string_view /*output*/) {}
 
 nostd::shared_ptr<trace::Span> Tracer::StartSpan(
     nostd::string_view name,
-    const opentelemetry::trace::KeyValueIterable &attributes,
+    const opentelemetry::common::KeyValueIterable &attributes,
+    const opentelemetry::trace::SpanContextKeyValueIterable &links,
     const trace::StartSpanOptions &options) noexcept
 {
   return nostd::shared_ptr<opentelemetry::trace::Span>{
-      new (std::nothrow) Span{this->shared_from_this(), name, attributes, options}};
+      new (std::nothrow) Span{this->shared_from_this(), name, attributes, links, options}};
 }

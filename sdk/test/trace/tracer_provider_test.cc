@@ -1,5 +1,4 @@
 #include "opentelemetry/sdk/trace/tracer_provider.h"
-#include "opentelemetry/context/threadlocal_context.h"
 #include "opentelemetry/sdk/trace/samplers/always_off.h"
 #include "opentelemetry/sdk/trace/samplers/always_on.h"
 #include "opentelemetry/sdk/trace/simple_processor.h"
@@ -59,4 +58,16 @@ TEST(TracerProvider, GetSampler)
   auto t3 = tp2.GetSampler();
 
   ASSERT_EQ("AlwaysOffSampler", t3->GetDescription());
+}
+
+TEST(TracerProvider, Shutdown)
+{
+  std::shared_ptr<SpanProcessor> processor1(new SimpleSpanProcessor(nullptr));
+
+  TracerProvider tp1(processor1);
+
+  tp1.Shutdown();
+
+  // Verify Shutdown returns.
+  ASSERT_TRUE(true);
 }
