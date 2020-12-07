@@ -227,7 +227,7 @@ private:
   AttributeMap attribute_map_;
   std::vector<SpanDataEvent> events_;
   std::vector<SpanDataLink> links_;
-  opentelemetry::trace::SpanKind span_kind_;
+  opentelemetry::trace::SpanKind span_kind_{opentelemetry::trace::SpanKind::kInternal};
 };
 }  // namespace trace
 }  // namespace sdk
