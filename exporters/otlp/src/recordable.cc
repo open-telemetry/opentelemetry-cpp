@@ -166,23 +166,28 @@ void Recordable::SetSpanKind(opentelemetry::trace::SpanKind span_kind) noexcept
 
   if (span_kind == opentelemetry::trace::SpanKind::kInternal)
   {
-    proto_span_kind = opentelemetry::proto::trace::v1::Span_SpanKind::Span_SpanKind_INTERNAL;
+    proto_span_kind =
+        opentelemetry::proto::trace::v1::Span_SpanKind::Span_SpanKind_SPAN_KIND_INTERNAL;
   }
   else if (span_kind == opentelemetry::trace::SpanKind::kServer)
   {
-    proto_span_kind = opentelemetry::proto::trace::v1::Span_SpanKind::Span_SpanKind_SERVER;
+    proto_span_kind =
+        opentelemetry::proto::trace::v1::Span_SpanKind::Span_SpanKind_SPAN_KIND_SERVER;
   }
   else if (span_kind == opentelemetry::trace::SpanKind::kClient)
   {
-    proto_span_kind = opentelemetry::proto::trace::v1::Span_SpanKind::Span_SpanKind_CLIENT;
+    proto_span_kind =
+        opentelemetry::proto::trace::v1::Span_SpanKind::Span_SpanKind_SPAN_KIND_CLIENT;
   }
   else if (span_kind == opentelemetry::trace::SpanKind::kProducer)
   {
-    proto_span_kind = opentelemetry::proto::trace::v1::Span_SpanKind::Span_SpanKind_PRODUCER;
+    proto_span_kind =
+        opentelemetry::proto::trace::v1::Span_SpanKind::Span_SpanKind_SPAN_KIND_PRODUCER;
   }
   else if (span_kind == opentelemetry::trace::SpanKind::kConsumer)
   {
-    proto_span_kind = opentelemetry::proto::trace::v1::Span_SpanKind::Span_SpanKind_CONSUMER;
+    proto_span_kind =
+        opentelemetry::proto::trace::v1::Span_SpanKind::Span_SpanKind_SPAN_KIND_CONSUMER;
   }
   span_.set_kind(proto_span_kind);
 }
