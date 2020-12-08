@@ -64,7 +64,7 @@ requests (PRs).
 To create a new PR, fork the project in GitHub and clone the upstream repo:
 
 ```sh
-git clone https://github.com/open-telemetry/opentelemetry-cpp.git
+git clone --recursive https://github.com/open-telemetry/opentelemetry-cpp.git
 ```
 
 Add your fork as a remote:
