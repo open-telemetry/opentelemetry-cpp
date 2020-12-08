@@ -9,6 +9,7 @@
 #include "opentelemetry/sdk/trace/attribute_utils.h"
 #include "opentelemetry/sdk/trace/recordable.h"
 #include "opentelemetry/trace/canonical_code.h"
+#include "opentelemetry/trace/span.h"
 #include "opentelemetry/trace/span_id.h"
 #include "opentelemetry/trace/trace_id.h"
 
@@ -113,6 +114,12 @@ public:
   opentelemetry::nostd::string_view GetName() const noexcept { return name_; }
 
   /**
+   * Get the kind of this span
+   * @return the kind of this span
+   */
+  opentelemetry::trace::SpanKind GetSpanKind() const noexcept { return span_kind_; }
+
+  /**
    * Get the status for this span
    * @return the status for this span
    */
@@ -196,6 +203,11 @@ public:
 
   void SetName(nostd::string_view name) noexcept override { name_ = std::string(name); }
 
+  void SetSpanKind(opentelemetry::trace::SpanKind span_kind) noexcept override
+  {
+    span_kind_ = span_kind;
+  }
+
   void SetStartTime(opentelemetry::core::SystemTimestamp start_time) noexcept override
   {
     start_time_ = start_time;
@@ -215,6 +227,7 @@ private:
   AttributeMap attribute_map_;
   std::vector<SpanDataEvent> events_;
   std::vector<SpanDataLink> links_;
+  opentelemetry::trace::SpanKind span_kind_{opentelemetry::trace::SpanKind::kInternal};
 };
 }  // namespace trace
 }  // namespace sdk
