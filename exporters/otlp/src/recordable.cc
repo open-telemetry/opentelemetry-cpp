@@ -164,31 +164,40 @@ void Recordable::SetSpanKind(opentelemetry::trace::SpanKind span_kind) noexcept
   opentelemetry::proto::trace::v1::Span_SpanKind proto_span_kind =
       opentelemetry::proto::trace::v1::Span_SpanKind::Span_SpanKind_SPAN_KIND_UNSPECIFIED;
 
-  if (span_kind == opentelemetry::trace::SpanKind::kInternal)
+  switch (span_kind)
   {
-    proto_span_kind =
-        opentelemetry::proto::trace::v1::Span_SpanKind::Span_SpanKind_SPAN_KIND_INTERNAL;
+
+    case opentelemetry::trace::SpanKind::kInternal:
+      proto_span_kind =
+          opentelemetry::proto::trace::v1::Span_SpanKind::Span_SpanKind_SPAN_KIND_INTERNAL;
+      break;
+
+    case opentelemetry::trace::SpanKind::kServer:
+      proto_span_kind =
+          opentelemetry::proto::trace::v1::Span_SpanKind::Span_SpanKind_SPAN_KIND_SERVER;
+      break;
+
+    case opentelemetry::trace::SpanKind::kClient:
+      proto_span_kind =
+          opentelemetry::proto::trace::v1::Span_SpanKind::Span_SpanKind_SPAN_KIND_CLIENT;
+      break;
+
+    case opentelemetry::trace::SpanKind::kProducer:
+      proto_span_kind =
+          opentelemetry::proto::trace::v1::Span_SpanKind::Span_SpanKind_SPAN_KIND_PRODUCER;
+      break;
+
+    case opentelemetry::trace::SpanKind::kConsumer:
+      proto_span_kind =
+          opentelemetry::proto::trace::v1::Span_SpanKind::Span_SpanKind_SPAN_KIND_CONSUMER;
+      break;
+
+    default:
+      // shouldn't reach here.
+      proto_span_kind =
+          opentelemetry::proto::trace::v1::Span_SpanKind::Span_SpanKind_SPAN_KIND_UNSPECIFIED;
   }
-  else if (span_kind == opentelemetry::trace::SpanKind::kServer)
-  {
-    proto_span_kind =
-        opentelemetry::proto::trace::v1::Span_SpanKind::Span_SpanKind_SPAN_KIND_SERVER;
-  }
-  else if (span_kind == opentelemetry::trace::SpanKind::kClient)
-  {
-    proto_span_kind =
-        opentelemetry::proto::trace::v1::Span_SpanKind::Span_SpanKind_SPAN_KIND_CLIENT;
-  }
-  else if (span_kind == opentelemetry::trace::SpanKind::kProducer)
-  {
-    proto_span_kind =
-        opentelemetry::proto::trace::v1::Span_SpanKind::Span_SpanKind_SPAN_KIND_PRODUCER;
-  }
-  else if (span_kind == opentelemetry::trace::SpanKind::kConsumer)
-  {
-    proto_span_kind =
-        opentelemetry::proto::trace::v1::Span_SpanKind::Span_SpanKind_SPAN_KIND_CONSUMER;
-  }
+
   span_.set_kind(proto_span_kind);
 }
 

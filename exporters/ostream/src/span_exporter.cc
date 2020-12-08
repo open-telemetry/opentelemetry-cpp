@@ -26,7 +26,7 @@ std::ostream &operator<<(std::ostream &os, opentelemetry::trace::SpanKind span_k
     case opentelemetry::trace::SpanKind::kConsumer:
       return os << "Consumer";
   };
-  return os << "Internal";
+  return os << "";
 }
 
 OStreamSpanExporter::OStreamSpanExporter(std::ostream &sout) noexcept : sout_(sout) {}
