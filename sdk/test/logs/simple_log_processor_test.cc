@@ -18,7 +18,7 @@ class TestExporter final : public LogExporter
 public:
   TestExporter(int *shutdown_counter,
                std::shared_ptr<std::vector<std::string>> logs_received,
-               int *batch_size_received)
+               size_t *batch_size_received)
       : shutdown_counter_(shutdown_counter),
         logs_received_(logs_received),
         batch_size_received(batch_size_received)
@@ -46,7 +46,7 @@ public:
 private:
   int *shutdown_counter_;
   std::shared_ptr<std::vector<std::string>> logs_received_;
-  int *batch_size_received;
+  size_t *batch_size_received;
 };
 
 // Tests whether the simple processor successfully creates a batch of size 1
@@ -55,7 +55,7 @@ TEST(SimpleLogProcessorTest, SendReceivedLogsToExporter)
 {
   // Create a simple processor with a TestExporter attached
   std::shared_ptr<std::vector<std::string>> logs_received(new std::vector<std::string>);
-  int batch_size_received = 0;
+  size_t batch_size_received = 0;
 
   std::unique_ptr<TestExporter> exporter(
       new TestExporter(nullptr, logs_received, &batch_size_received));
