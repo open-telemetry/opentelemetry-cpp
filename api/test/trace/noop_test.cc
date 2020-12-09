@@ -7,7 +7,6 @@
 
 #include <gtest/gtest.h>
 
-using opentelemetry::context::Token;
 using opentelemetry::core::SystemTimestamp;
 using opentelemetry::trace::NoopTracer;
 using opentelemetry::trace::SpanContext;
@@ -42,7 +41,17 @@ TEST(NoopTest, UseNoopTracers)
   SystemTimestamp t1;
   s1->AddEvent("test_time_stamp", t1);
 
-  s1->SetToken(opentelemetry::nostd::unique_ptr<Token>(nullptr));
-
   s1->GetContext();
+}
+
+TEST(NoopTest, StartSpan)
+{
+  std::shared_ptr<Tracer> tracer{new NoopTracer{}};
+
+  std::map<std::string, std::string> attrs                                      = {{"a", "3"}};
+  std::vector<std::pair<SpanContext, std::map<std::string, std::string>>> links = {
+      {SpanContext(false, false), attrs}};
+  auto s1 = tracer->StartSpan("abc", attrs, links);
+
+  auto s2 = tracer->StartSpan("efg", {{"a", 3}}, {{SpanContext(false, false), {{"b", 4}}}});
 }

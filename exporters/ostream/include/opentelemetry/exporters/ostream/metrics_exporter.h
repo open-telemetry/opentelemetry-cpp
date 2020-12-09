@@ -1,6 +1,7 @@
 #pragma once
 
 #include <iostream>
+#include <string>
 #include "opentelemetry/sdk/metrics/aggregator/exact_aggregator.h"
 #include "opentelemetry/sdk/metrics/aggregator/gauge_aggregator.h"
 #include "opentelemetry/sdk/metrics/aggregator/histogram_aggregator.h"
@@ -82,9 +83,9 @@ private:
         }
         else
         {
-          auto vec = agg->get_checkpoint();
-          int size = vec.size();
-          int i    = 1;
+          auto vec    = agg->get_checkpoint();
+          size_t size = vec.size();
+          size_t i    = 1;
 
           sout_ << "\n  values      : " << '[';
 
@@ -104,12 +105,12 @@ private:
         auto boundaries = agg->get_boundaries();
         auto counts     = agg->get_counts();
 
-        int boundaries_size = boundaries.size();
-        int counts_size     = counts.size();
+        size_t boundaries_size = boundaries.size();
+        size_t counts_size     = counts.size();
 
         sout_ << "\n  buckets     : " << '[';
 
-        for (int i = 0; i < boundaries_size; i++)
+        for (size_t i = 0; i < boundaries_size; i++)
         {
           sout_ << boundaries[i];
 
@@ -119,7 +120,7 @@ private:
         sout_ << ']';
 
         sout_ << "\n  counts      : " << '[';
-        for (int i = 0; i < counts_size; i++)
+        for (size_t i = 0; i < counts_size; i++)
         {
           sout_ << counts[i];
 
@@ -134,12 +135,12 @@ private:
         auto boundaries = agg->get_boundaries();
         auto counts     = agg->get_counts();
 
-        int boundaries_size = boundaries.size();
-        int counts_size     = counts.size();
+        size_t boundaries_size = boundaries.size();
+        size_t counts_size     = counts.size();
 
         sout_ << "\n  buckets     : " << '[';
 
-        for (int i = 0; i < boundaries_size; i++)
+        for (size_t i = 0; i < boundaries_size; i++)
         {
           sout_ << boundaries[i];
 
@@ -149,7 +150,7 @@ private:
         sout_ << ']';
 
         sout_ << "\n  counts      : " << '[';
-        for (int i = 0; i < counts_size; i++)
+        for (size_t i = 0; i < counts_size; i++)
         {
           sout_ << counts[i];
 

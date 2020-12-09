@@ -120,7 +120,7 @@ void Recordable::SetAttribute(nostd::string_view key,
 
 void Recordable::AddEvent(nostd::string_view name,
                           core::SystemTimestamp timestamp,
-                          const trace::KeyValueIterable &attributes) noexcept
+                          const common::KeyValueIterable &attributes) noexcept
 {
   auto *event = span_.add_events();
   event->set_name(name.data(), name.size());
@@ -132,15 +132,20 @@ void Recordable::AddEvent(nostd::string_view name,
   });
 }
 
-void Recordable::AddLink(opentelemetry::trace::SpanContext span_context,
-                         const trace::KeyValueIterable &attributes) noexcept
+void Recordable::AddLink(const opentelemetry::trace::SpanContext &span_context,
+                         const common::KeyValueIterable &attributes) noexcept
 {
   auto *link = span_.add_links();
+  link->set_trace_id(reinterpret_cast<const char *>(span_context.trace_id().Id().data()),
+                     trace::TraceId::kSize);
+  link->set_span_id(reinterpret_cast<const char *>(span_context.span_id().Id().data()),
+                    trace::SpanId::kSize);
   attributes.ForEachKeyValue([&](nostd::string_view key, common::AttributeValue value) noexcept {
     PopulateAttribute(link->add_attributes(), key, value);
     return true;
   });
-  // TODO: Populate trace_id, span_id and trace_state when these are supported by SpanContext
+
+  // TODO: Populate trace_state when it is supported by SpanContext
 }
 
 void Recordable::SetStatus(trace::CanonicalCode code, nostd::string_view description) noexcept
@@ -152,6 +157,48 @@ void Recordable::SetStatus(trace::CanonicalCode code, nostd::string_view descrip
 void Recordable::SetName(nostd::string_view name) noexcept
 {
   span_.set_name(name.data(), name.size());
+}
+
+void Recordable::SetSpanKind(opentelemetry::trace::SpanKind span_kind) noexcept
+{
+  opentelemetry::proto::trace::v1::Span_SpanKind proto_span_kind =
+      opentelemetry::proto::trace::v1::Span_SpanKind::Span_SpanKind_SPAN_KIND_UNSPECIFIED;
+
+  switch (span_kind)
+  {
+
+    case opentelemetry::trace::SpanKind::kInternal:
+      proto_span_kind =
+          opentelemetry::proto::trace::v1::Span_SpanKind::Span_SpanKind_SPAN_KIND_INTERNAL;
+      break;
+
+    case opentelemetry::trace::SpanKind::kServer:
+      proto_span_kind =
+          opentelemetry::proto::trace::v1::Span_SpanKind::Span_SpanKind_SPAN_KIND_SERVER;
+      break;
+
+    case opentelemetry::trace::SpanKind::kClient:
+      proto_span_kind =
+          opentelemetry::proto::trace::v1::Span_SpanKind::Span_SpanKind_SPAN_KIND_CLIENT;
+      break;
+
+    case opentelemetry::trace::SpanKind::kProducer:
+      proto_span_kind =
+          opentelemetry::proto::trace::v1::Span_SpanKind::Span_SpanKind_SPAN_KIND_PRODUCER;
+      break;
+
+    case opentelemetry::trace::SpanKind::kConsumer:
+      proto_span_kind =
+          opentelemetry::proto::trace::v1::Span_SpanKind::Span_SpanKind_SPAN_KIND_CONSUMER;
+      break;
+
+    default:
+      // shouldn't reach here.
+      proto_span_kind =
+          opentelemetry::proto::trace::v1::Span_SpanKind::Span_SpanKind_SPAN_KIND_UNSPECIFIED;
+  }
+
+  span_.set_kind(proto_span_kind);
 }
 
 void Recordable::SetStartTime(opentelemetry::core::SystemTimestamp start_time) noexcept

@@ -13,7 +13,6 @@
 #include "opentelemetry/version.h"
 
 namespace metrics_api = opentelemetry::metrics;
-namespace trace_api   = opentelemetry::trace;
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace sdk
@@ -174,13 +173,13 @@ public:
    * @return a Bound Instrument
    */
   virtual nostd::shared_ptr<metrics_api::BoundSynchronousInstrument<T>> bind(
-      const trace::KeyValueIterable &labels) override
+      const common::KeyValueIterable &labels) override
   {
     return nostd::shared_ptr<BoundSynchronousInstrument<T>>();
   }
 
   // This function is necessary for batch recording and should NOT be called by the user
-  virtual void update(T value, const trace::KeyValueIterable &labels) override = 0;
+  virtual void update(T value, const common::KeyValueIterable &labels) override = 0;
 
   /**
    * Checkpoints instruments and returns a set of records which are ready for processing.
@@ -221,7 +220,7 @@ public:
    * @param labels is the numerical representation of the metric being captured
    * @return none
    */
-  virtual void observe(T value, const trace::KeyValueIterable &labels) override = 0;
+  virtual void observe(T value, const common::KeyValueIterable &labels) override = 0;
 
   virtual std::vector<Record> GetRecords() = 0;
 
@@ -236,7 +235,7 @@ public:
   virtual void run() override = 0;
 };
 
-// Helper functions for turning a trace::KeyValueIterable into a string
+// Helper functions for turning a common::KeyValueIterable into a string
 inline void print_value(std::stringstream &ss,
                         common::AttributeValue &value,
                         bool jsonTypes = false)
@@ -271,7 +270,7 @@ inline std::string mapToString(const std::map<std::string, std::string> &conv)
   return ss.str();
 }
 
-inline std::string KvToString(const trace::KeyValueIterable &kv) noexcept
+inline std::string KvToString(const common::KeyValueIterable &kv) noexcept
 {
   std::stringstream ss;
   ss << "{";

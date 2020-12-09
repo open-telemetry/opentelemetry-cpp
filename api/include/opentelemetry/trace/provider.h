@@ -1,7 +1,8 @@
 #pragma once
 
-#include <atomic>
+#include <mutex>
 
+#include "opentelemetry/common/spin_lock_mutex.h"
 #include "opentelemetry/nostd/shared_ptr.h"
 #include "opentelemetry/trace/noop.h"
 #include "opentelemetry/trace/tracer_provider.h"
@@ -23,12 +24,8 @@ public:
    */
   static nostd::shared_ptr<TracerProvider> GetTracerProvider() noexcept
   {
-    while (GetLock().test_and_set(std::memory_order_acquire))
-      ;
-    auto provider = nostd::shared_ptr<TracerProvider>(GetProvider());
-    GetLock().clear(std::memory_order_release);
-
-    return provider;
+    std::lock_guard<common::SpinLockMutex> guard(GetLock());
+    return nostd::shared_ptr<TracerProvider>(GetProvider());
   }
 
   /**
@@ -36,10 +33,8 @@ public:
    */
   static void SetTracerProvider(nostd::shared_ptr<TracerProvider> tp) noexcept
   {
-    while (GetLock().test_and_set(std::memory_order_acquire))
-      ;
+    std::lock_guard<common::SpinLockMutex> guard(GetLock());
     GetProvider() = tp;
-    GetLock().clear(std::memory_order_release);
   }
 
 private:
@@ -49,9 +44,9 @@ private:
     return provider;
   }
 
-  static std::atomic_flag &GetLock() noexcept
+  static common::SpinLockMutex &GetLock() noexcept
   {
-    static std::atomic_flag lock = ATOMIC_FLAG_INIT;
+    static common::SpinLockMutex lock;
     return lock;
   }
 };

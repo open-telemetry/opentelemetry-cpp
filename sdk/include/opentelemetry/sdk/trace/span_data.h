@@ -9,6 +9,7 @@
 #include "opentelemetry/sdk/trace/attribute_utils.h"
 #include "opentelemetry/sdk/trace/recordable.h"
 #include "opentelemetry/trace/canonical_code.h"
+#include "opentelemetry/trace/span.h"
 #include "opentelemetry/trace/span_id.h"
 #include "opentelemetry/trace/trace_id.h"
 
@@ -25,7 +26,7 @@ class SpanDataEvent
 public:
   SpanDataEvent(std::string name,
                 core::SystemTimestamp timestamp,
-                const trace_api::KeyValueIterable &attributes)
+                const opentelemetry::common::KeyValueIterable &attributes)
       : name_(name), timestamp_(timestamp), attribute_map_(attributes)
   {}
 
@@ -64,7 +65,7 @@ class SpanDataLink
 {
 public:
   SpanDataLink(opentelemetry::trace::SpanContext span_context,
-               const trace_api::KeyValueIterable &attributes)
+               const opentelemetry::common::KeyValueIterable &attributes)
       : span_context_(span_context), attribute_map_(attributes)
   {}
 
@@ -111,6 +112,12 @@ public:
    * @return the name for this span
    */
   opentelemetry::nostd::string_view GetName() const noexcept { return name_; }
+
+  /**
+   * Get the kind of this span
+   * @return the kind of this span
+   */
+  opentelemetry::trace::SpanKind GetSpanKind() const noexcept { return span_kind_; }
 
   /**
    * Get the status for this span
@@ -174,26 +181,32 @@ public:
 
   void AddEvent(nostd::string_view name,
                 core::SystemTimestamp timestamp,
-                const trace_api::KeyValueIterable &attributes) noexcept override
+                const opentelemetry::common::KeyValueIterable &attributes) noexcept override
   {
     SpanDataEvent event(std::string(name), timestamp, attributes);
     events_.push_back(event);
   }
 
-  void AddLink(opentelemetry::trace::SpanContext span_context,
-               const trace_api::KeyValueIterable &attributes) noexcept override
+  void AddLink(const opentelemetry::trace::SpanContext &span_context,
+               const opentelemetry::common::KeyValueIterable &attributes) noexcept override
   {
     SpanDataLink link(span_context, attributes);
     links_.push_back(link);
   }
 
-  void SetStatus(trace_api::CanonicalCode code, nostd::string_view description) noexcept override
+  void SetStatus(opentelemetry::trace::CanonicalCode code,
+                 nostd::string_view description) noexcept override
   {
     status_code_ = code;
     status_desc_ = std::string(description);
   }
 
   void SetName(nostd::string_view name) noexcept override { name_ = std::string(name); }
+
+  void SetSpanKind(opentelemetry::trace::SpanKind span_kind) noexcept override
+  {
+    span_kind_ = span_kind;
+  }
 
   void SetStartTime(opentelemetry::core::SystemTimestamp start_time) noexcept override
   {
@@ -214,6 +227,7 @@ private:
   AttributeMap attribute_map_;
   std::vector<SpanDataEvent> events_;
   std::vector<SpanDataLink> links_;
+  opentelemetry::trace::SpanKind span_kind_{opentelemetry::trace::SpanKind::kInternal};
 };
 }  // namespace trace
 }  // namespace sdk

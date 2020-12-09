@@ -24,6 +24,8 @@ public:
    * Create a span recordable. This requests a new span recordable from the
    * associated exporter.
    * @return a newly initialized recordable
+   *
+   * Note: This method must be callable from multiple threads.
    */
   virtual std::unique_ptr<Recordable> MakeRecordable() noexcept = 0;
 
