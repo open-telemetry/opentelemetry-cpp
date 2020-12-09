@@ -29,8 +29,8 @@
 #include "opentelemetry/sdk/logs/processor.h"
 
 // Define the maximum number of loggers that are allowed to be registered to the loggerprovider.
-// TODO: Add link to logging spec once this is added to it
-#define MAX_LOGGER_COUNT 100
+// References spec issue https://github.com/open-telemetry/opentelemetry-specification/issues/1259
+#define OTEL_MAX_LOGGER_COUNT 1000
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace sdk
@@ -95,6 +95,9 @@ private:
 
   // A mutex that ensures only one thread is using the map of loggers
   std::mutex mu_;
+
+  // A noop logger that is returned by GetLogger() when OTEL_MAX_LOGGER_COUNT reached
+  opentelemetry::nostd::shared_ptr<opentelemetry::logs::Logger> noop_logger_;
 };
 }  // namespace logs
 }  // namespace sdk

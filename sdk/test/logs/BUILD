@@ -16,7 +16,9 @@ cc_test(
         "logger_sdk_test.cc",
     ],
     deps = [
+        "//exporters/memory:in_memory_span_exporter",
         "//sdk/src/logs",
+        "//sdk/src/trace",
         "@com_google_googletest//:gtest_main",
     ],
 )

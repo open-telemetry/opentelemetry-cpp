@@ -22,7 +22,11 @@ namespace sdk
 namespace logs
 {
 
-LoggerProvider::LoggerProvider() noexcept : processor_{nullptr} {}
+LoggerProvider::LoggerProvider() noexcept
+    : processor_{nullptr},
+      noop_logger_{
+          nostd::shared_ptr<opentelemetry::logs::NoopLogger>(new opentelemetry::logs::NoopLogger)}
+{}
 
 opentelemetry::nostd::shared_ptr<opentelemetry::logs::Logger> LoggerProvider::GetLogger(
     opentelemetry::nostd::string_view name,
@@ -39,20 +43,13 @@ opentelemetry::nostd::shared_ptr<opentelemetry::logs::Logger> LoggerProvider::Ge
   }
 
   // Check if creating a new logger would exceed the max number of loggers
-  // TODO: Remove the noexcept from the API's and SDK's GetLogger(~)
-  /*
-  if (loggers_.size() > MAX_LOGGER_COUNT)
+  if (loggers_.size() >= OTEL_MAX_LOGGER_COUNT)
   {
-#if __EXCEPTIONS
-    throw std::length_error("Number of loggers exceeds max count");
-#else
-    std::terminate();
-#endif
+    // Return a noop logger
+    return noop_logger_;
   }
-  */
 
   // If no logger with that name exists yet, create it and add it to the map of loggers
-
   opentelemetry::nostd::shared_ptr<opentelemetry::logs::Logger> logger(
       new Logger(this->shared_from_this()));
   loggers_[name.data()] = logger;
