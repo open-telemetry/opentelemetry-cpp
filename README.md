@@ -18,13 +18,18 @@ C++ standards:
 
 Any exceptions to this are noted in the individual `README.md` files.
 
+Please note that supporting the [C Programming
+Language](https://en.wikipedia.org/wiki/C_(programming_language)) is not a goal
+of the current project.
+
 ## Installation
 
-TBD
+Please refer to [INSTALL.md](./INSTALL.md).
 
 ## Quick Start
 
-TBD
+The `examples/simple` directory contains a minimal program demonstrating
+how to instrument a small library using a simple `processor` and console `exporter`, along with build files for CMake and Bazel.
 
 ## Contributing
 
@@ -42,22 +47,24 @@ Meeting notes are available as a public [Google doc](https://docs.google.com/doc
 
 Approvers ([@open-telemetry/cpp-approvers](https://github.com/orgs/open-telemetry/teams/cpp-approvers)):
 
-- [Lalit Kumar Bhasin](https://github.com/lalitb), Microsoft
-- [Johannes Tax](https://github.com/pyohannes), New Relic
-- [Max Golovanov](https://github.com/maxgolov), Microsoft
-- [Ryan Burn](https://github.com/rnburn), Lightstep
-- [Tom Tan](https://github.com/ThomsonTan), Microsoft
+* [Johannes Tax](https://github.com/pyohannes), New Relic
+* [Josh Suereth](https://github.com/jsuereth), Google
+* [Max Golovanov](https://github.com/maxgolov), Microsoft
+* [Ryan Burn](https://github.com/rnburn), Lightstep
+* [Tom Tan](https://github.com/ThomsonTan), Microsoft
 
 *Find more about the approver role in [community repository](https://github.com/open-telemetry/community/blob/master/community-membership.md#approver).*
 
 Maintainers ([@open-telemetry/cpp-maintainers](https://github.com/orgs/open-telemetry/teams/cpp-maintainers)):
 
-- [Emil Mikulic](https://github.com/g-easy), Google
-- [Reiley Yang](https://github.com/reyang), Microsoft
+* [Emil Mikulic](https://github.com/g-easy), Google
+* [Lalit Kumar Bhasin](https://github.com/lalitb), Microsoft
+* [Reiley Yang](https://github.com/reyang), Microsoft
 
 Triagers ([@open-telemetry/cpp-triagers](https://github.com/orgs/open-telemetry/teams/cpp-triagers)):
 
-- [Jodee Varney](https://github.com/jodeev), New Relic
+* [Alolita Sharma](https://github.com/alolita), Amazon
+* [Jodee Varney](https://github.com/jodeev), New Relic
 
 *Find more about the maintainer role in [community repository](https://github.com/open-telemetry/community/blob/master/community-membership.md#maintainer).*
 
