@@ -45,7 +45,7 @@ static opentelemetry::nostd::shared_ptr<opentelemetry::logs::LogRecord> record_;
 
 class DummyProcessor : public LogProcessor
 {
-  void OnReceive(std::shared_ptr<opentelemetry::logs::LogRecord> record) noexcept
+  void OnReceive(std::unique_ptr<opentelemetry::logs::LogRecord> &&record) noexcept 
   {
     record_ = opentelemetry::nostd::shared_ptr<opentelemetry::logs::LogRecord>(
         new opentelemetry::logs::LogRecord(*record.get()));
