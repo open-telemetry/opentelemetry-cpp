@@ -15,7 +15,7 @@ OStreamLogExporter::OStreamLogExporter(std::ostream &sout) noexcept : sout_(sout
 sdklogs::ExportResult OStreamLogExporter::Export(
     const nostd::span<std::shared_ptr<opentelemetry::logs::LogRecord>> &records) noexcept
 {
-  if (isShutdown_)
+  if (is_shutdown_)
   {
     return sdklogs::ExportResult::kFailure;
   }
@@ -40,7 +40,7 @@ sdklogs::ExportResult OStreamLogExporter::Export(
     // Print fields most useful to user first
     sout_ << "{\n"
           << "    timestamp   : " << record->timestamp.time_since_epoch().count() << "\n"
-          << "    severity    : " << severityNumToText[static_cast<int>(record->severity)] << "\n"
+          << "    severity    : " << kSeverityNumToText[static_cast<int>(record->severity)] << "\n"
           << "    name        : " << record->name << "\n"
           << "    body        : " << record->body << "\n";
 
@@ -83,7 +83,7 @@ sdklogs::ExportResult OStreamLogExporter::Export(
 
 bool OStreamLogExporter::Shutdown(std::chrono::microseconds timeout) noexcept
 {
-  isShutdown_ = true;
+  is_shutdown_ = true;
   return true;
 }
 

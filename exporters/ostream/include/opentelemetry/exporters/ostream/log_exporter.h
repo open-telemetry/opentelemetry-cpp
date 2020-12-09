@@ -9,9 +9,6 @@
 #include <map>
 #include <sstream>
 
-namespace nostd   = opentelemetry::nostd;
-namespace sdklogs = opentelemetry::sdk::logs;
-
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace exporter
 {
@@ -20,7 +17,7 @@ namespace logs
 /**
  * The OStreamLogExporter exports logs through an ostream (default set to std::cout)
  */
-class OStreamLogExporter final : public sdklogs::LogExporter
+class OStreamLogExporter final : public opentelemetry::sdk::logs::LogExporter
 {
 public:
   /**
@@ -34,8 +31,9 @@ public:
   /**
    * Exports a span of logs sent from the processor.
    */
-  sdklogs::ExportResult Export(const nostd::span<std::shared_ptr<opentelemetry::logs::LogRecord>>
-                                   &records) noexcept override;
+  opentelemetry::sdk::logs::ExportResult Export(
+      const opentelemetry::nostd::span<std::shared_ptr<opentelemetry::logs::LogRecord>>
+          &records) noexcept override;
 
   /**
    * Marks the OStream Log Exporter as shut down.
@@ -47,7 +45,7 @@ private:
   // The OStream to send the logs to
   std::ostream &sout_;
   // Whether this exporter is ShutDown
-  bool isShutdown_ = false;
+  bool is_shutdown_ = false;
 
   /**
    * Internal map of the severity number (from 0 to 24) to severity text, matching the
@@ -55,7 +53,7 @@ private:
    *
    * If more than one exporter requires this, could move this to Severity enum.
    */
-  const nostd::string_view severityNumToText[25] = {
+  const opentelemetry::nostd::string_view kSeverityNumToText[25] = {
       "kInvalid", "kTrace",  "kTrace2", "kTrace3", "kTrace4", "kDebug",  "kDebug2",
       "kDebug3",  "kDebug4", "kInfo",   "kInfo2",  "kInfo3",  "kInfo4",  "kWarn",
       "kWarn2",   "kWarn3",  "kWarn4",  "kError",  "kError2", "kError3", "kError4",
@@ -74,50 +72,50 @@ private:
     switch (value.index())
     {
       case common::AttributeType::TYPE_BOOL:
-        sout_ << (nostd::get<bool>(value) ? "true" : "false");
+        sout_ << (opentelemetry::nostd::get<bool>(value) ? "true" : "false");
         break;
       case common::AttributeType::TYPE_INT:
-        sout_ << nostd::get<int>(value);
+        sout_ << opentelemetry::nostd::get<int>(value);
         break;
       case common::AttributeType::TYPE_INT64:
-        sout_ << nostd::get<int64_t>(value);
+        sout_ << opentelemetry::nostd::get<int64_t>(value);
         break;
       case common::AttributeType::TYPE_UINT:
-        sout_ << nostd::get<unsigned int>(value);
+        sout_ << opentelemetry::nostd::get<unsigned int>(value);
         break;
       case common::AttributeType::TYPE_UINT64:
-        sout_ << nostd::get<uint64_t>(value);
+        sout_ << opentelemetry::nostd::get<uint64_t>(value);
         break;
       case common::AttributeType::TYPE_DOUBLE:
-        sout_ << nostd::get<double>(value);
+        sout_ << opentelemetry::nostd::get<double>(value);
         break;
       case common::AttributeType::TYPE_STRING:
       case common::AttributeType::TYPE_CSTRING:
-        sout_ << nostd::get<nostd::string_view>(value);
+        sout_ << opentelemetry::nostd::get<opentelemetry::nostd::string_view>(value);
         break;
 
         /*** Need to support these? ***/
         // case common::AttributeType::TYPE_SPAN_BOOL:
-        //   sout_ << nostd::get<nostd::span<const bool>>(value);
+        //   sout_ << opentelemetry::nostd::get<opentelemetry::nostd::span<const bool>>(value);
         //   break;
         // case common::AttributeType::TYPE_SPAN_INT:
-        //   sout_ << nostd::get<nostd::span<const int>>(value);
+        //   sout_ << opentelemetry::nostd::get<opentelemetry::nostd::span<const int>>(value);
         //   break;
         // case common::AttributeType::TYPE_SPAN_INT64:
-        //   sout_ << nostd::get<nostd::span<const int64_t>>(value);
+        //   sout_ << opentelemetry::nostd::get<opentelemetry::nostd::span<const int64_t>>(value);
         //   break;
         // case common::AttributeType::TYPE_SPAN_UINT:
-        //   sout_ << nostd::get<nostd::span<const unsigned int>>(value);
-        //   break;
+        //   sout_ << opentelemetry::nostd::get<opentelemetry::nostd::span<const unsigned
+        //   int>>(value); break;
         // case common::AttributeType::TYPE_SPAN_UINT64:
-        //   sout_ << nostd::get<nostd::span<const uint64_t>>(value);
+        //   sout_ << opentelemetry::nostd::get<opentelemetry::nostd::span<const uint64_t>>(value);
         //   break;
         // case common::AttributeType::TYPE_SPAN_DOUBLE:
-        //   sout_ << nostd::get<nostd::span<const double>>(value);
+        //   sout_ << opentelemetry::nostd::get<opentelemetry::nostd::span<const double>>(value);
         //   break;
         // case common::AttributeType::TYPE_SPAN_STRING:
-        //   sout_ << nostd::get<nostd::span<const nostd::string_view>>(value);
-        //   break;
+        //   sout_ << opentelemetry::nostd::get<opentelemetry::nostd::span<const
+        //   opentelemetry::nostd::string_view>>(value); break;
         /******** Up to here ************/
 
       default:
@@ -130,7 +128,9 @@ private:
    * Helper function to print a KeyValueIterable.
    * Outputs a <Key, Value> pair of type <string_view, AttributeValue>
    */
-  void printKV(bool &firstKV, const nostd::string_view &key, const common::AttributeValue &value)
+  void printKV(bool &firstKV,
+               const opentelemetry::nostd::string_view &key,
+               const common::AttributeValue &value)
   {
     if (firstKV)
     {
