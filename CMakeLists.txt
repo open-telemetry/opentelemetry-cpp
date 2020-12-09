@@ -6,6 +6,27 @@ cmake_policy(SET CMP0057 NEW)
 
 project(opentelemetry-cpp)
 
+file(READ "${CMAKE_CURRENT_LIST_DIR}/api/include/opentelemetry/version.h"
+     OPENTELEMETRY_CPP_HEADER_VERSION_H)
+if(OPENTELEMETRY_CPP_HEADER_VERSION_H MATCHES
+   "OPENTELEMETRY_ABI_VERSION_NO[ \t\r\n]+\"?([0-9]+)\"?")
+  math(EXPR OPENTELEMETRY_ABI_VERSION_NO ${CMAKE_MATCH_1})
+else()
+  message(
+    FATAL_ERROR
+      "OPENTELEMETRY_ABI_VERSION_NO not found on ${CMAKE_CURRENT_LIST_DIR}/api/include/opentelemetry/version.h"
+  )
+endif()
+if(OPENTELEMETRY_CPP_HEADER_VERSION_H MATCHES
+   "OPENTELEMETRY_VERSION[ \t\r\n]+\"?([^\"]+)\"?")
+  set(OPENTELEMETRY_VERSION ${CMAKE_MATCH_1})
+else()
+  message(
+    FATAL_ERROR
+      "OPENTELEMETRY_VERSION not found on ${CMAKE_CURRENT_LIST_DIR}/api/include/opentelemetry/version.h"
+  )
+endif()
+
 if(NOT DEFINED CMAKE_CXX_STANDARD)
   set(CMAKE_CXX_STANDARD 11)
 endif()
@@ -81,6 +102,24 @@ if(MSVC)
   # for recent C++ language standards. Without this option MSVC returns the
   # value of __cplusplus="199711L"
   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /Zc:__cplusplus")
+
+  # When using vcpkg, all targets build with the same runtime
+  if(VCPKG_TOOLCHAIN)
+    if(DEFINED ENV{VCPKG_DEFAULT_TRIPLET} AND NOT DEFINED VCPKG_TARGET_TRIPLET)
+      set(VCPKG_TARGET_TRIPLET
+          "$ENV{VCPKG_DEFAULT_TRIPLET}"
+          CACHE STRING "")
+    endif()
+    if(VCPKG_TARGET_TRIPLET MATCHES "^.*windows-static$")
+      set(CMAKE_MSVC_RUNTIME_LIBRARY
+          "MultiThreaded$<$<CONFIG:Debug>:Debug>"
+          CACHE STRING "")
+    else()
+      set(CMAKE_MSVC_RUNTIME_LIBRARY
+          "MultiThreaded$<$<CONFIG:Debug>:Debug>DLL"
+          CACHE STRING "")
+    endif()
+  endif()
 endif()
 
 if(WITH_OTLP)
@@ -156,6 +195,9 @@ if(BUILD_TESTING)
   find_package(benchmark CONFIG REQUIRED)
 endif()
 
+include(GNUInstallDirs)
+include(CMakePackageConfigHelpers)
+
 include_directories(api/include)
 add_subdirectory(api)
 include_directories(sdk/include)
@@ -167,3 +209,34 @@ if(WITH_EXAMPLES)
   add_subdirectory(examples)
 endif()
 add_subdirectory(ext)
+
+# Export cmake config and support find_packages(opentelemetry-cpp CONFIG) Write
+# config file for find_packages(opentelemetry-cpp CONFIG)
+configure_package_config_file(
+  "${CMAKE_CURRENT_LIST_DIR}/opentelemetry-cpp-config.cmake.in"
+  "${CMAKE_CURRENT_BINARY_DIR}/cmake/${PROJECT_NAME}-config.cmake"
+  INSTALL_DESTINATION "${CMAKE_INSTALL_LIBDIR}/cmake"
+  PATH_VARS OPENTELEMETRY_ABI_VERSION_NO OPENTELEMETRY_VERSION PROJECT_NAME
+            CMAKE_INSTALL_LIBDIR
+  NO_CHECK_REQUIRED_COMPONENTS_MACRO)
+
+# Write version file for find_packages(opentelemetry-cpp CONFIG)
+write_basic_package_version_file(
+  "${CMAKE_CURRENT_BINARY_DIR}/cmake/${PROJECT_NAME}-config-version.cmake"
+  VERSION ${OPENTELEMETRY_VERSION}
+  COMPATIBILITY ExactVersion)
+
+install(
+  FILES "${CMAKE_CURRENT_BINARY_DIR}/cmake/${PROJECT_NAME}-config.cmake"
+        "${CMAKE_CURRENT_BINARY_DIR}/cmake/${PROJECT_NAME}-config-version.cmake"
+  DESTINATION "${CMAKE_INSTALL_LIBDIR}/cmake")
+
+# Export all components
+export(
+  EXPORT "${PROJECT_NAME}-target"
+  NAMESPACE "${PROJECT_NAME}::"
+  FILE "${CMAKE_CURRENT_BINARY_DIR}/cmake/${PROJECT_NAME}-target.cmake")
+install(
+  EXPORT "${PROJECT_NAME}-target"
+  NAMESPACE "${PROJECT_NAME}::"
+  DESTINATION "${CMAKE_INSTALL_LIBDIR}/cmake")

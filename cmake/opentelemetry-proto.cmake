@@ -132,17 +132,22 @@ add_library(
   ${METRICS_SERVICE_PB_CPP_FILE}
   ${METRICS_SERVICE_GRPC_PB_CPP_FILE})
 
+set_target_properties(opentelemetry_proto PROPERTIES EXPORT_NAME proto)
+
+install(
+  TARGETS opentelemetry_proto
+  EXPORT "${PROJECT_NAME}-target"
+  RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
+  LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
+  ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR})
+
 if(TARGET protobuf::libprotobuf)
-  target_link_libraries(opentelemetry_proto
-    PUBLIC protobuf::libprotobuf
-  )
+  target_link_libraries(opentelemetry_proto PUBLIC protobuf::libprotobuf)
 else() # cmake 3.8 or lower
   target_include_directories(opentelemetry_proto
-    PUBLIC ${Protobuf_INCLUDE_DIRS}
-  )
+                             PUBLIC ${Protobuf_INCLUDE_DIRS})
   target_include_directories(opentelemetry_proto
-    INTERFACE ${Protobuf_LIBRARIES}
-  )
+                             INTERFACE ${Protobuf_LIBRARIES})
 endif()
 
 if(BUILD_SHARED_LIBS)

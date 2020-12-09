@@ -1,0 +1,88 @@
+#.rst:
+# opentelemetry-cpp-config.cmake
+# --------
+#
+# Find the native opentelemetry-cpp includes and library.
+#
+#
+# Result Variables
+# ^^^^^^^^^^^^^^^^
+#
+# This module defines the following variables:
+#
+# ::
+#
+#   OPENTELEMETRY_CPP_INCLUDE_DIRS  - Include directories of opentelemetry-cpp.
+#   OPENTELEMETRY_CPP_LIBRARY_DIRS  - Link directories of opentelemetry-cpp.
+#   OPENTELEMETRY_CPP_LIBRARIES     - List of libraries when using opentelemetry-cpp.
+#   OPENTELEMETRY_CPP_FOUND         - True if opentelemetry-cpp found.
+#   OPENTELEMETRY_ABI_VERSION_NO    - ABI version of opentelemetry-cpp.
+#   OPENTELEMETRY_VERSION           - Version of opentelemetry-cpp.
+#
+# ::
+#   opentelemetry-cpp::api                        - Imported target of opentelemetry-cpp::api
+#   opentelemetry-cpp::sdk                        - Imported target of opentelemetry-cpp::sdk
+#   opentelemetry-cpp::ext                        - Imported target of opentelemetry-cpp::ext
+#   opentelemetry-cpp::version                    - Imported target of opentelemetry-cpp::version
+#   opentelemetry-cpp::common                     - Imported target of opentelemetry-cpp::common
+#   opentelemetry-cpp::trace                      - Imported target of opentelemetry-cpp::trace
+#   opentelemetry-cpp::metrics                    - Imported target of opentelemetry-cpp::metrics
+#   opentelemetry-cpp::logs                       - Imported target of opentelemetry-cpp::logs
+#   opentelemetry-cpp::in_memory_span_exporter    - Imported target of opentelemetry-cpp::in_memory_span_exporter
+#   opentelemetry-cpp::otlp_exporter              - Imported target of opentelemetry-cpp::otlp_exporter
+#   opentelemetry-cpp::ostream_metrics_exporter   - Imported target of opentelemetry-cpp::ostream_metrics_exporter
+#   opentelemetry-cpp::ostream_span_exporter      - Imported target of opentelemetry-cpp::ostream_span_exporter
+#   opentelemetry-cpp::prometheus_exporter        - Imported target of opentelemetry-cpp::prometheus_exporter
+#   opentelemetry-cpp::zpages                     - Imported target of opentelemetry-cpp::zpages
+#
+
+# =============================================================================
+# Copyright 2020 opentelemetry.
+#
+# Distributed under the Apache License (the "License"); see accompanying file
+# LICENSE for details.
+# =============================================================================
+
+set(OPENTELEMETRY_ABI_VERSION_NO
+    "@OPENTELEMETRY_ABI_VERSION_NO@"
+    CACHE STRING "opentelemetry-cpp ABI version" FORCE)
+set(OPENTELEMETRY_VERSION
+    "@OPENTELEMETRY_VERSION@"
+    CACHE STRING "opentelemetry-cpp version" FORCE)
+
+@PACKAGE_INIT@
+
+# ##############################################################################
+
+set_and_check(OPENTELEMETRY_CPP_INCLUDE_DIRS "@PACKAGE_INCLUDE_INSTALL_DIR@")
+set_and_check(OPENTELEMETRY_CPP_LIBRARY_DIRS "@PACKAGE_CMAKE_INSTALL_LIBDIR@")
+
+include("${CMAKE_CURRENT_LIST_DIR}/@PROJECT_NAME@-target.cmake")
+
+set(OPENTELEMETRY_CPP_LIBRARIES)
+set(_OPENTELEMETRY_CPP_LIBRARIES_TEST_TARGETS
+    api
+    sdk
+    ext
+    version
+    common
+    trace
+    metrics
+    logs
+    otlp_exporter
+    ostream_metrics_exporter
+    ostream_span_exporter
+    zpages)
+foreach(_TEST_TARGET IN LISTS _OPENTELEMETRY_CPP_LIBRARIES_TEST_TARGETS)
+  if(TARGET opentelemetry-cpp::${_TEST_TARGET})
+    list(APPEND OPENTELEMETRY_CPP_LIBRARIES opentelemetry-cpp::${_TEST_TARGET})
+  endif()
+endforeach()
+
+# handle the QUIETLY and REQUIRED arguments and set OPENTELEMETRY_CPP_FOUND to
+# TRUE if all listed variables are TRUE
+include("FindPackageHandleStandardArgs")
+find_package_handle_standard_args(
+  OPENTELEMETRY_CPP
+  FOUND_VAR OPENTELEMETRY_CPP_FOUND
+  REQUIRED_VARS OPENTELEMETRY_CPP_INCLUDE_DIRS OPENTELEMETRY_CPP_LIBRARIES)
