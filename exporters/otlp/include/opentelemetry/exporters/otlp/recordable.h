@@ -32,6 +32,8 @@ public:
 
   void SetName(nostd::string_view name) noexcept override;
 
+  void SetSpanKind(opentelemetry::trace::SpanKind span_kind) noexcept override;
+
   void SetStartTime(opentelemetry::core::SystemTimestamp start_time) noexcept override;
 
   void SetDuration(std::chrono::nanoseconds duration) noexcept override;

@@ -159,6 +159,48 @@ void Recordable::SetName(nostd::string_view name) noexcept
   span_.set_name(name.data(), name.size());
 }
 
+void Recordable::SetSpanKind(opentelemetry::trace::SpanKind span_kind) noexcept
+{
+  opentelemetry::proto::trace::v1::Span_SpanKind proto_span_kind =
+      opentelemetry::proto::trace::v1::Span_SpanKind::Span_SpanKind_SPAN_KIND_UNSPECIFIED;
+
+  switch (span_kind)
+  {
+
+    case opentelemetry::trace::SpanKind::kInternal:
+      proto_span_kind =
+          opentelemetry::proto::trace::v1::Span_SpanKind::Span_SpanKind_SPAN_KIND_INTERNAL;
+      break;
+
+    case opentelemetry::trace::SpanKind::kServer:
+      proto_span_kind =
+          opentelemetry::proto::trace::v1::Span_SpanKind::Span_SpanKind_SPAN_KIND_SERVER;
+      break;
+
+    case opentelemetry::trace::SpanKind::kClient:
+      proto_span_kind =
+          opentelemetry::proto::trace::v1::Span_SpanKind::Span_SpanKind_SPAN_KIND_CLIENT;
+      break;
+
+    case opentelemetry::trace::SpanKind::kProducer:
+      proto_span_kind =
+          opentelemetry::proto::trace::v1::Span_SpanKind::Span_SpanKind_SPAN_KIND_PRODUCER;
+      break;
+
+    case opentelemetry::trace::SpanKind::kConsumer:
+      proto_span_kind =
+          opentelemetry::proto::trace::v1::Span_SpanKind::Span_SpanKind_SPAN_KIND_CONSUMER;
+      break;
+
+    default:
+      // shouldn't reach here.
+      proto_span_kind =
+          opentelemetry::proto::trace::v1::Span_SpanKind::Span_SpanKind_SPAN_KIND_UNSPECIFIED;
+  }
+
+  span_.set_kind(proto_span_kind);
+}
+
 void Recordable::SetStartTime(opentelemetry::core::SystemTimestamp start_time) noexcept
 {
   span_.set_start_time_unix_nano(start_time.time_since_epoch().count());

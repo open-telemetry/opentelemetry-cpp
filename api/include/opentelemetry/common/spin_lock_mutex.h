@@ -1,6 +1,8 @@
 #pragma once
 
 #include <atomic>
+#include <chrono>
+#include <thread>
 
 #include "opentelemetry/version.h"
 
@@ -8,8 +10,19 @@ OPENTELEMETRY_BEGIN_NAMESPACE
 namespace common
 {
 
+constexpr int SPINLOCK_FAST_ITERATIONS = 100;
+constexpr int SPINLOCK_SLEEP_MS        = 1;
+
 /**
  * A Mutex which uses atomic flags and spin-locks instead of halting threads.
+ *
+ * This mutex uses an incremental back-off strategy with the following phases:
+ * 1. A tight spin-lock loop (pending: using hardware PAUSE/YIELD instructions)
+ * 2. A loop where the current thread yields control after checking the lock.
+ * 3. Issuing a thread-sleep call before starting back in phase 1.
+ *
+ * This is meant to give a good balance of perofrmance and CPU consumption in
+ * practice.
  *
  * This class implements the `BasicLockable` specification:
  * https://en.cppreference.com/w/cpp/named_req/BasicLockable
@@ -24,6 +37,15 @@ public:
   SpinLockMutex &operator=(const SpinLockMutex &) volatile = delete;
 
   /**
+   * Attempts to lock the mutex.  Return immediately with `true` (success) or `false` (failure).
+   */
+  bool try_lock() noexcept
+  {
+    return !flag_.load(std::memory_order_relaxed) &&
+           !flag_.exchange(true, std::memory_order_acquire);
+  }
+
+  /**
    * Blocks until a lock can be obtained for the current thread.
    *
    * This mutex will spin the current CPU waiting for the lock to be available.  This can have
@@ -32,22 +54,39 @@ public:
    */
   void lock() noexcept
   {
-    /* Note: We expect code protected by this lock to be "fast", i.e. we do NOT incrementally
-     * back-off and wait/notify here, we just loop until we have access, then try again.
-     *
-     * This has the downside that we could be spinning a long time if the exporter is slow.
-     * Note: in C++20x we could use `.wait` to make this slightly better. This should move to
-     * an exponential-back-off / wait strategy.
-     */
-    while (flag_.test_and_set(std::memory_order_acquire))
-      /** TODO - We should immmediately yield if the machine is single processor. */
-      ;
+    for (;;)
+    {
+      // Try once
+      if (!flag_.exchange(true, std::memory_order_acquire))
+      {
+        return;
+      }
+      // Spin-Fast (goal ~10ns)
+      for (std::size_t i = 0; i < SPINLOCK_FAST_ITERATIONS; ++i)
+      {
+        if (try_lock())
+        {
+          return;
+        }
+        // TODO: Issue PAUSE/YIELD instruction to reduce contention.
+        // e.g. __builtin_ia32_pause() / YieldProcessor() / _mm_pause();
+      }
+      // Yield then try again (goal ~100ns)
+      std::this_thread::yield();
+      if (try_lock())
+      {
+        return;
+      }
+      // Sleep and then start the whole process again. (goal ~1000ns)
+      std::this_thread::sleep_for(std::chrono::milliseconds(SPINLOCK_SLEEP_MS));
+    }
+    return;
   }
   /** Releases the lock held by the execution agent. Throws no exceptions. */
-  void unlock() noexcept { flag_.clear(std::memory_order_release); }
+  void unlock() noexcept { flag_.store(false, std::memory_order_release); }
 
 private:
-  std::atomic_flag flag_{ATOMIC_FLAG_INIT};
+  std::atomic<bool> flag_{false};
 };
 
 }  // namespace common
