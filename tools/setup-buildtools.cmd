@@ -1,5 +1,5 @@
 @echo off
-set "PATH=C:\Program Files\CMake\bin;%~dp0;%~dp0\vcpkg;%PATH%"
+set "PATH=%ProgramFiles%\CMake\bin;%~dp0;%~dp0\vcpkg;%PATH%"
 pushd %~dp0
 
 net session >nul 2>&1

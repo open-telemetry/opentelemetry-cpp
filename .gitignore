@@ -35,6 +35,9 @@
 # Bazel files
 /bazel-*
 
+# Mac
+.DS_Store
+
 # Output directories
 /out
 /out.*
