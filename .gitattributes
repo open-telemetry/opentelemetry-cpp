@@ -3,6 +3,7 @@
 ## C++ and C source files
 *.c                     text eol=lf diff=cpp
 *.h                     text eol=lf diff=cpp
+*.cc                    text eol=lf diff=cpp
 *.cpp                   text eol=lf diff=cpp
 *.cxx                   text eol=lf diff=cpp
 *.hpp                   text eol=lf diff=cpp
