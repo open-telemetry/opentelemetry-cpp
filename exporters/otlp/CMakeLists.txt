@@ -20,7 +20,9 @@ install(
   FILES_MATCHING
   PATTERN "*.h")
 
-target_include_directories(opentelemetry_exporter_otprotocol PRIVATE include)
+target_include_directories(
+  opentelemetry_exporter_otprotocol
+  PUBLIC "$<BUILD_INTERFACE:${CMAKE_CURRENT_LIST_DIR}/include>")
 
 if(BUILD_TESTING)
   add_executable(recordable_test test/recordable_test.cc)

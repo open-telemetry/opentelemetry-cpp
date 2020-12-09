@@ -8,10 +8,13 @@ set_target_properties(opentelemetry_exporter_ostream_metrics
 set_target_properties(opentelemetry_exporter_ostream_span
                       PROPERTIES EXPORT_NAME ostream_span_exporter)
 
-target_include_directories(opentelemetry_exporter_ostream_metrics
-                           PRIVATE include)
+target_include_directories(
+  opentelemetry_exporter_ostream_metrics
+  PUBLIC "$<BUILD_INTERFACE:${CMAKE_CURRENT_LIST_DIR}/include>")
 
-target_include_directories(opentelemetry_exporter_ostream_span PRIVATE include)
+target_include_directories(
+  opentelemetry_exporter_ostream_span
+  PUBLIC "$<BUILD_INTERFACE:${CMAKE_CURRENT_LIST_DIR}/include>")
 
 target_link_libraries(opentelemetry_exporter_ostream_metrics
                       PUBLIC opentelemetry_metrics)
