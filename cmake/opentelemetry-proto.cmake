@@ -24,47 +24,22 @@ set(COMMON_PB_CPP_FILE
     "${GENERATED_PROTOBUF_PATH}/opentelemetry/proto/common/v1/common.pb.cc")
 set(COMMON_PB_H_FILE
     "${GENERATED_PROTOBUF_PATH}/opentelemetry/proto/common/v1/common.pb.h")
-set(COMMON_GRPC_PB_CPP_FILE
-    "${GENERATED_PROTOBUF_PATH}/opentelemetry/proto/common/v1/common.grpc.pb.cc"
-)
-set(COMMON_GRPC_PB_H_FILE
-    "${GENERATED_PROTOBUF_PATH}/opentelemetry/proto/common/v1/common.grpc.pb.h")
 set(RESOURCE_PB_CPP_FILE
     "${GENERATED_PROTOBUF_PATH}/opentelemetry/proto/resource/v1/resource.pb.cc")
 set(RESOURCE_PB_H_FILE
     "${GENERATED_PROTOBUF_PATH}/opentelemetry/proto/resource/v1/resource.pb.h")
-set(RESOURCE_GRPC_PB_CPP_FILE
-    "${GENERATED_PROTOBUF_PATH}/opentelemetry/proto/resource/v1/resource.grpc.pb.cc"
-)
-set(RESOURCE_GRPC_PB_H_FILE
-    "${GENERATED_PROTOBUF_PATH}/opentelemetry/proto/resource/v1/resource.grpc.pb.h"
-)
 set(TRACE_PB_CPP_FILE
     "${GENERATED_PROTOBUF_PATH}/opentelemetry/proto/trace/v1/trace.pb.cc")
 set(TRACE_PB_H_FILE
     "${GENERATED_PROTOBUF_PATH}/opentelemetry/proto/trace/v1/trace.pb.h")
-set(TRACE_GRPC_PB_CPP_FILE
-    "${GENERATED_PROTOBUF_PATH}/opentelemetry/proto/trace/v1/trace.grpc.pb.cc")
-set(TRACE_GRPC_PB_H_FILE
-    "${GENERATED_PROTOBUF_PATH}/opentelemetry/proto/trace/v1/trace.grpc.pb.h")
 set(LOGS_PB_CPP_FILE
     "${GENERATED_PROTOBUF_PATH}/opentelemetry/proto/logs/v1/logs.pb.cc")
 set(LOGS_PB_H_FILE
     "${GENERATED_PROTOBUF_PATH}/opentelemetry/proto/logs/v1/logs.pb.h")
-set(LOGS_GRPC_PB_CPP_FILE
-    "${GENERATED_PROTOBUF_PATH}/opentelemetry/proto/logs/v1/logs.grpc.pb.cc")
-set(LOGS_GRPC_PB_H_FILE
-    "${GENERATED_PROTOBUF_PATH}/opentelemetry/proto/logs/v1/logs.grpc.pb.h")
 set(METRICS_PB_CPP_FILE
     "${GENERATED_PROTOBUF_PATH}/opentelemetry/proto/metrics/v1/metrics.pb.cc")
 set(METRICS_PB_H_FILE
     "${GENERATED_PROTOBUF_PATH}/opentelemetry/proto/metrics/v1/metrics.pb.h")
-set(METRICS_GRPC_PB_CPP_FILE
-    "${GENERATED_PROTOBUF_PATH}/opentelemetry/proto/metrics/v1/metrics.grpc.pb.cc"
-)
-set(METRICS_GRPC_PB_H_FILE
-    "${GENERATED_PROTOBUF_PATH}/opentelemetry/proto/metrics/v1/metrics.grpc.pb.h"
-)
 
 set(TRACE_SERVICE_PB_CPP_FILE
     "${GENERATED_PROTOBUF_PATH}/opentelemetry/proto/collector/trace/v1/trace_service.pb.cc"
@@ -113,24 +88,14 @@ get_target_property(gRPC_CPP_PLUGIN_EXECUTABLE gRPC::grpc_cpp_plugin
 add_custom_command(
   OUTPUT ${COMMON_PB_H_FILE}
          ${COMMON_PB_CPP_FILE}
-         ${COMMON_GRPC_PB_H_FILE}
-         ${COMMON_GRPC_PB_CPP_FILE}
          ${RESOURCE_PB_H_FILE}
          ${RESOURCE_PB_CPP_FILE}
-         ${RESOURCE_GRPC_PB_H_FILE}
-         ${RESOURCE_GRPC_PB_CPP_FILE}
          ${TRACE_PB_H_FILE}
          ${TRACE_PB_CPP_FILE}
-         ${TRACE_GRPC_PB_H_FILE}
-         ${TRACE_GRPC_PB_CPP_FILE}
          ${LOGS_PB_H_FILE}
          ${LOGS_PB_CPP_FILE}
-         ${LOGS_GRPC_PB_H_FILE}
-         ${LOGS_GRPC_PB_CPP_FILE}
          ${METRICS_PB_H_FILE}
          ${METRICS_PB_CPP_FILE}
-         ${METRICS_GRPC_PB_H_FILE}
-         ${METRICS_GRPC_PB_CPP_FILE}
          ${TRACE_SERVICE_PB_H_FILE}
          ${TRACE_SERVICE_PB_CPP_FILE}
          ${TRACE_SERVICE_GRPC_PB_H_FILE}
@@ -156,15 +121,10 @@ include_directories("${GENERATED_PROTOBUF_PATH}")
 add_library(
   opentelemetry_proto OBJECT
   ${COMMON_PB_CPP_FILE}
-  ${COMMON_GRPC_PB_CPP_FILE}
   ${RESOURCE_PB_CPP_FILE}
-  ${RESOURCE_GRPC_PB_CPP_FILE}
   ${TRACE_PB_CPP_FILE}
-  ${TRACE_GRPC_PB_CPP_FILE}
   ${LOGS_PB_CPP_FILE}
-  ${LOGS_GRPC_PB_CPP_FILE}
   ${METRICS_PB_CPP_FILE}
-  ${METRICS_GRPC_PB_CPP_FILE}
   ${TRACE_SERVICE_PB_CPP_FILE}
   ${TRACE_SERVICE_GRPC_PB_CPP_FILE}
   ${LOGS_SERVICE_PB_CPP_FILE}
