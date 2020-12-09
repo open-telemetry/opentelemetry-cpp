@@ -68,7 +68,7 @@ public:
    * NOTE: Timeout functionality not supported yet.
    */
   bool ForceFlush(
-      std::chrono::microseconds timeout = std::chrono::milliseconds::max()) noexcept override;
+      std::chrono::microseconds timeout = std::chrono::microseconds::max()) noexcept override;
 
   /**
    * Shuts down the processor and does any cleanup required. Completely drains the buffer/queue of
@@ -78,7 +78,7 @@ public:
    * NOTE: Timeout functionality not supported yet.
    */
   bool Shutdown(
-      std::chrono::microseconds timeout = std::chrono::milliseconds::max()) noexcept override;
+      std::chrono::microseconds timeout = std::chrono::microseconds::max()) noexcept override;
 
   /**
    * Class destructor which invokes the Shutdown() method. The Shutdown() method is supposed to be
