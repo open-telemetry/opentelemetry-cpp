@@ -28,7 +28,7 @@ using opentelemetry::logs::LogRecord;
  * A sample log exporter
  * for testing the batch log processor
  */
-class TestLogExporter final : public LogExporter
+class MockLogExporter final : public LogExporter
 {
 private:
   std::shared_ptr<std::vector<std::string>> logs_received_;
@@ -37,7 +37,7 @@ private:
   const std::chrono::milliseconds export_delay_;
 
 public:
-  TestLogExporter(std::shared_ptr<std::vector<std::string>> logs_received,
+  MockLogExporter(std::shared_ptr<std::vector<std::string>> logs_received,
                   std::shared_ptr<std::atomic<bool>> is_shutdown,
                   std::shared_ptr<std::atomic<bool>> is_export_completed,
                   const std::chrono::milliseconds export_delay = std::chrono::milliseconds(0))
@@ -80,7 +80,7 @@ class BatchLogProcessorTest : public testing::Test  // ::testing::Test
 public:
   // returns a batch log processor that received a batch of log records, a shared pointer to a
   // is_shutdown flag, and the processor configuration options (default if unspecified)
-  std::shared_ptr<LogProcessor> GetTestProcessor(
+  std::shared_ptr<LogProcessor> GetMockProcessor(
       std::shared_ptr<std::vector<std::string>> logs_received,
       std::shared_ptr<std::atomic<bool>> is_shutdown,
       std::shared_ptr<std::atomic<bool>> is_export_completed =
@@ -91,7 +91,7 @@ public:
       const size_t max_export_batch_size                    = 512)
   {
     return std::shared_ptr<LogProcessor>(
-        new BatchLogProcessor(std::unique_ptr<LogExporter>(new TestLogExporter(
+        new BatchLogProcessor(std::unique_ptr<LogExporter>(new MockLogExporter(
                                   logs_received, is_shutdown, is_export_completed, export_delay)),
                               max_queue_size, schedule_delay_millis, max_export_batch_size));
   }
@@ -103,7 +103,7 @@ TEST_F(BatchLogProcessorTest, TestShutdown)
   std::shared_ptr<std::vector<std::string>> logs_received(new std::vector<std::string>);
   std::shared_ptr<std::atomic<bool>> is_shutdown(new std::atomic<bool>(false));
 
-  auto batch_processor = GetTestProcessor(logs_received, is_shutdown);
+  auto batch_processor = GetMockProcessor(logs_received, is_shutdown);
 
   // create a few test log records and send them to the processor
   const int num_logs = 3;
@@ -137,7 +137,7 @@ TEST_F(BatchLogProcessorTest, TestForceFlush)
   std::shared_ptr<std::atomic<bool>> is_shutdown(new std::atomic<bool>(false));
   std::shared_ptr<std::vector<std::string>> logs_received(new std::vector<std::string>);
 
-  auto batch_processor = GetTestProcessor(logs_received, is_shutdown);
+  auto batch_processor = GetMockProcessor(logs_received, is_shutdown);
   const int num_logs   = 2048;
 
   for (int i = 0; i < num_logs; ++i)
@@ -187,7 +187,7 @@ TEST_F(BatchLogProcessorTest, TestManyLogsLoss)
 
   const int max_queue_size = 4096;
 
-  auto batch_processor = GetTestProcessor(logs_received, is_shutdown);
+  auto batch_processor = GetMockProcessor(logs_received, is_shutdown);
 
   // Create max_queue_size log records
   for (int i = 0; i < max_queue_size; ++i)
@@ -212,7 +212,7 @@ TEST_F(BatchLogProcessorTest, TestManyLogsLossLess)
 
   std::shared_ptr<std::atomic<bool>> is_shutdown(new std::atomic<bool>(false));
   std::shared_ptr<std::vector<std::string>> logs_received(new std::vector<std::string>);
-  auto batch_processor = GetTestProcessor(logs_received, is_shutdown);
+  auto batch_processor = GetMockProcessor(logs_received, is_shutdown);
 
   const int num_logs = 2048;
 
@@ -248,7 +248,7 @@ TEST_F(BatchLogProcessorTest, TestScheduleDelayMillis)
   const std::chrono::milliseconds schedule_delay_millis(2000);
   const size_t max_export_batch_size = 512;
 
-  auto batch_processor = GetTestProcessor(logs_received, is_shutdown, is_export_completed,
+  auto batch_processor = GetMockProcessor(logs_received, is_shutdown, is_export_completed,
                                           export_delay, schedule_delay_millis);
 
   for (int i = 0; i < max_export_batch_size; ++i)
