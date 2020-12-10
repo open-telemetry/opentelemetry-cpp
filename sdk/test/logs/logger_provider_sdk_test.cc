@@ -16,9 +16,9 @@
 
 #include "opentelemetry/logs/provider.h"
 #include "opentelemetry/nostd/shared_ptr.h"
+#include "opentelemetry/sdk/logs/log_record.h"
 #include "opentelemetry/sdk/logs/logger.h"
 #include "opentelemetry/sdk/logs/logger_provider.h"
-#include "opentelemetry/sdk/logs/log_record.h"
 
 #include <gtest/gtest.h>
 
@@ -70,7 +70,8 @@ TEST(LoggerProviderSDK, LoggerProviderLoggerArguments)
 
 class DummyProcessor : public LogProcessor
 {
-  std::unique_ptr<Recordable> MakeRecordable() noexcept {
+  std::unique_ptr<Recordable> MakeRecordable() noexcept
+  {
     return std::unique_ptr<Recordable>(new LogRecord);
   }
 

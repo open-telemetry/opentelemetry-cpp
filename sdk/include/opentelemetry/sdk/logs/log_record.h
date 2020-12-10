@@ -18,8 +18,8 @@
 
 #include <map>
 #include <unordered_map>
-#include "opentelemetry/sdk/logs/attribute_utils.h" // same as traces/attribute_utils 
 #include "opentelemetry/nostd/shared_ptr.h"
+#include "opentelemetry/sdk/logs/attribute_utils.h"  // same as traces/attribute_utils
 #include "opentelemetry/sdk/logs/recordable.h"
 #include "opentelemetry/version.h"
 
@@ -37,56 +37,46 @@ namespace logs
  */
 class LogRecord final : public Recordable
 {
-private: 
+private:
   // Log Data Model fields
-  core::SystemTimestamp timestamp_;                            // uint64 nanoseconds since Unix epoch
-  opentelemetry::trace::TraceId trace_id_;                 // byte sequence
-  opentelemetry::trace::SpanId span_id_;                   // byte sequence
-  opentelemetry::trace::TraceFlags trace_flags_;            // byte
-  opentelemetry::logs::Severity severity_;              // Severity enum 
-  nostd::string_view name_;                                 // string
-  nostd::string_view body_;                             // currently a simple string, but should be changed "Any" type
+  core::SystemTimestamp timestamp_;               // uint64 nanoseconds since Unix epoch
+  opentelemetry::trace::TraceId trace_id_;        // byte sequence
+  opentelemetry::trace::SpanId span_id_;          // byte sequence
+  opentelemetry::trace::TraceFlags trace_flags_;  // byte
+  opentelemetry::logs::Severity severity_;        // Severity enum
+  nostd::string_view name_;                       // string
+  nostd::string_view body_;  // currently a simple string, but should be changed "Any" type
   AttributeMap resource_map_;
   AttributeMap attributes_map_;
 
 public:
-
   /********** Setters for each field (overrides methods from the Recordable interface) ************/
   /**
-   * Set the timestamp for this log. 
+   * Set the timestamp for this log.
    * @param timestamp the timestamp of the event
    */
-  void SetTimestamp(core::SystemTimestamp timestamp) noexcept override
-  {
-    timestamp_ = timestamp;
-  }
+  void SetTimestamp(core::SystemTimestamp timestamp) noexcept override { timestamp_ = timestamp; }
 
   /**
-   * Set the severity for this log. 
+   * Set the severity for this log.
    * @param severity the severity of the event
    */
   void SetSeverity(opentelemetry::logs::Severity severity) noexcept override
   {
-      severity_ = severity;
+    severity_ = severity;
   }
 
- /**
+  /**
    * Set name for this log
    * @param name the name to set
-   */ 
-  void SetName(nostd::string_view name) noexcept override
-  {
-    name_ = name;
-  }
+   */
+  void SetName(nostd::string_view name) noexcept override { name_ = name; }
 
   /**
    * Set body field for this log.
    * @param message the body to set
-   */ 
-  void SetBody(nostd::string_view message) noexcept override
-  {
-    body_ = message;
-  }
+   */
+  void SetBody(nostd::string_view message) noexcept override { body_ = message; }
 
   /**
    * Set a resource for this log.
@@ -115,12 +105,12 @@ public:
    * Set trace id for this log.
    * @param trace_id the trace id to set
    */
-  void SetTraceId(opentelemetry::trace::TraceId trace_id) noexcept  override
+  void SetTraceId(opentelemetry::trace::TraceId trace_id) noexcept override
   {
     trace_id_ = trace_id;
   }
 
- /**
+  /**
    * Set span id for this log.
    * @param span_id the span id to set
    */
@@ -135,7 +125,7 @@ public:
    */
   void SetTraceFlags(opentelemetry::trace::TraceFlags trace_flags) noexcept override
   {
-    trace_flags_ = trace_flags; 
+    trace_flags_ = trace_flags;
   }
 
   /************************** Getters for each field ****************************/
@@ -182,7 +172,7 @@ public:
     return attributes_map_.GetAttributes();
   }
 
-   /**
+  /**
    * Get the trace id for this log
    * @return the trace id for this log
    */
@@ -199,9 +189,7 @@ public:
    * @return the trace flags for this log
    */
   opentelemetry::trace::TraceFlags GetTraceFlags() const noexcept { return trace_flags_; }
-
-
 };
 }  // namespace logs
-} // namespace sdk
+}  // namespace sdk
 OPENTELEMETRY_END_NAMESPACE

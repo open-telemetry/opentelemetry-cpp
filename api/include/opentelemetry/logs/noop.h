@@ -22,17 +22,17 @@
 
 #include <memory>
 
-#include "opentelemetry/context/runtime_context.h"
-#include "opentelemetry/logs/logger.h"
-#include "opentelemetry/logs/logger_provider.h"
-#include "opentelemetry/nostd/unique_ptr.h"
 #include "opentelemetry/common/attribute_value.h"
 #include "opentelemetry/common/key_value_iterable.h"
+#include "opentelemetry/context/runtime_context.h"
 #include "opentelemetry/core/timestamp.h"
+#include "opentelemetry/logs/logger.h"
+#include "opentelemetry/logs/logger_provider.h"
 #include "opentelemetry/logs/severity.h"
 #include "opentelemetry/nostd/shared_ptr.h"
 #include "opentelemetry/nostd/span.h"
 #include "opentelemetry/nostd/string_view.h"
+#include "opentelemetry/nostd/unique_ptr.h"
 #include "opentelemetry/trace/span_id.h"
 #include "opentelemetry/trace/trace_flags.h"
 #include "opentelemetry/trace/trace_id.h"
@@ -50,8 +50,16 @@ namespace logs
 class NoopLogger final : public Logger
 {
 public:
-
-  void Log(core::SystemTimestamp timestamp, Severity severity,  nostd::string_view name, nostd::string_view body, const common::KeyValueIterable &resource, const common::KeyValueIterable &attributes, trace::TraceId trace_id, trace::SpanId span_id, trace::TraceFlags trace_flags) noexcept override{}
+  void Log(core::SystemTimestamp timestamp,
+           Severity severity,
+           nostd::string_view name,
+           nostd::string_view body,
+           const common::KeyValueIterable &resource,
+           const common::KeyValueIterable &attributes,
+           trace::TraceId trace_id,
+           trace::SpanId span_id,
+           trace::TraceFlags trace_flags) noexcept override
+  {}
 };
 
 /**

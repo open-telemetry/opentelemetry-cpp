@@ -14,8 +14,8 @@
  * limitations under the License.
  */
 
-#include "opentelemetry/sdk/logs/logger.h"
 #include "opentelemetry/sdk/logs/log_record.h"
+#include "opentelemetry/sdk/logs/logger.h"
 
 #include <gtest/gtest.h>
 
@@ -36,7 +36,7 @@ TEST(LoggerSDK, LogToNullProcessor)
 
 class DummyProcessor : public LogProcessor
 {
-  std::unique_ptr<Recordable> MakeRecordable() noexcept 
+  std::unique_ptr<Recordable> MakeRecordable() noexcept
   {
     return std::unique_ptr<Recordable>(new LogRecord);
   }

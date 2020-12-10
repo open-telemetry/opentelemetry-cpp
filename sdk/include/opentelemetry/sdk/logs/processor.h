@@ -34,8 +34,7 @@ class LogProcessor
 public:
   virtual ~LogProcessor() = default;
 
-
-/**
+  /**
    * Create a log recordable. This requests a new log recordable from the
    * associated exporter.
    * @return a newly initialized recordable

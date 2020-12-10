@@ -1,7 +1,7 @@
 #include "opentelemetry/sdk/logs/simple_log_processor.h"
+#include "opentelemetry/nostd/span.h"
 #include "opentelemetry/sdk/logs/exporter.h"
 #include "opentelemetry/sdk/logs/log_record.h"
-#include "opentelemetry/nostd/span.h"
 
 #include <gtest/gtest.h>
 
@@ -37,8 +37,7 @@ public:
     *batch_size_received = records.size();
     for (auto &record : records)
     {
-      auto log_record = std::unique_ptr<LogRecord>(
-          static_cast<LogRecord *>(record.release()));
+      auto log_record = std::unique_ptr<LogRecord>(static_cast<LogRecord *>(record.release()));
 
       if (log_record != nullptr)
       {
@@ -66,7 +65,8 @@ private:
 TEST(SimpleLogProcessorTest, SendReceivedLogsToExporter)
 {
   // Create a simple processor with a TestExporter attached
-  std::shared_ptr<std::vector<std::unique_ptr<LogRecord>>> logs_received(new std::vector<std::unique_ptr<LogRecord>>);
+  std::shared_ptr<std::vector<std::unique_ptr<LogRecord>>> logs_received(
+      new std::vector<std::unique_ptr<LogRecord>>);
   size_t batch_size_received = 0;
 
   std::unique_ptr<TestExporter> exporter(
@@ -87,7 +87,7 @@ TEST(SimpleLogProcessorTest, SendReceivedLogsToExporter)
   }
 
   // Test whether the processor's log sent matches the log record received by the exporter
-  EXPECT_EQ(logs_received->size(), num_logs); 
+  EXPECT_EQ(logs_received->size(), num_logs);
   for (int i = 0; i < num_logs; i++)
   {
     EXPECT_EQ("Log", logs_received->at(i)->GetName());

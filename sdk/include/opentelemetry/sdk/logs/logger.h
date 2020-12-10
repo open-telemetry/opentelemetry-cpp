@@ -49,13 +49,22 @@ public:
    * @param severity the severity level of the log event.
    * @param message the string message of the log (perhaps support std::fmt or fmt-lib format).
    * @param record the log record (object type LogRecord) that is logged.
-   * @param attributes the attributes, stored as a 2D list of key/value pairs, that are associated wtih the log event. 
+   * @param attributes the attributes, stored as a 2D list of key/value pairs, that are associated
+   * wtih the log event.
    * @param trace_id the trace id associated with the log event.
    * @param span_id the span id associate with the log event.
    * @param trace_flags the trace flags associated with the log event.
    * @throws No exceptions under any circumstances.   */
-  void Log(core::SystemTimestamp timestamp, opentelemetry::logs::Severity severity,  nostd::string_view name, nostd::string_view body, const common::KeyValueIterable &resource, const common::KeyValueIterable &attributes, trace::TraceId trace_id, trace::SpanId span_id, trace::TraceFlags trace_flags) noexcept override;
- 
+  void Log(core::SystemTimestamp timestamp,
+           opentelemetry::logs::Severity severity,
+           nostd::string_view name,
+           nostd::string_view body,
+           const common::KeyValueIterable &resource,
+           const common::KeyValueIterable &attributes,
+           trace::TraceId trace_id,
+           trace::SpanId span_id,
+           trace::TraceFlags trace_flags) noexcept override;
+
 private:
   // The logger provider of this Logger. Uses a weak_ptr to avoid cyclic dependancy issues the with
   // logger provider

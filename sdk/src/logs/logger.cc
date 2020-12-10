@@ -15,8 +15,8 @@
  */
 
 #include "opentelemetry/sdk/logs/logger.h"
- #include "opentelemetry/sdk/logs/log_record.h"
- #include "opentelemetry/trace/provider.h"
+#include "opentelemetry/sdk/logs/log_record.h"
+#include "opentelemetry/trace/provider.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace sdk
@@ -28,11 +28,19 @@ Logger::Logger(std::shared_ptr<LoggerProvider> logger_provider) noexcept
 {}
 
 /**
- * Create and popualte recordable with the log event's fields passed in. 
+ * Create and popualte recordable with the log event's fields passed in.
  * The timestamp, severity, traceid, spanid, and traceflags, are injected
  * if the user does not specify them.
- */ 
-void Logger::Log(core::SystemTimestamp timestamp, opentelemetry::logs::Severity severity,  nostd::string_view name, nostd::string_view body, const common::KeyValueIterable &resource, const common::KeyValueIterable &attributes, opentelemetry::trace::TraceId trace_id, opentelemetry::trace::SpanId span_id, opentelemetry::trace::TraceFlags trace_flags) noexcept
+ */
+void Logger::Log(core::SystemTimestamp timestamp,
+                 opentelemetry::logs::Severity severity,
+                 nostd::string_view name,
+                 nostd::string_view body,
+                 const common::KeyValueIterable &resource,
+                 const common::KeyValueIterable &attributes,
+                 opentelemetry::trace::TraceId trace_id,
+                 opentelemetry::trace::SpanId span_id,
+                 opentelemetry::trace::TraceFlags trace_flags) noexcept
 {
   // If this logger does not have a processor, no need to create a log record
   auto processor = logger_provider_.lock()->GetProcessor();
@@ -50,11 +58,12 @@ void Logger::Log(core::SystemTimestamp timestamp, opentelemetry::logs::Severity 
   }
 
   // Populate recordable fields
-  if (timestamp == this->default_timestamp_){
-    // Inject current timestamp if none is specified by user 
+  if (timestamp == this->default_timestamp_)
+  {
+    // Inject current timestamp if none is specified by user
     recordable->SetTimestamp(core::SystemTimestamp(std::chrono::system_clock::now()));
-  } 
-  else 
+  }
+  else
   {
     recordable->SetTimestamp(timestamp);
   }
@@ -75,7 +84,6 @@ void Logger::Log(core::SystemTimestamp timestamp, opentelemetry::logs::Severity 
     return true;
   });
 
-
   // Inject trace_id/span_id/trace_flags if none is set by user
   auto provider     = opentelemetry::trace::Provider::GetTracerProvider();
   auto tracer       = provider->GetTracer("foo_library");
@@ -85,8 +93,8 @@ void Logger::Log(core::SystemTimestamp timestamp, opentelemetry::logs::Severity 
   if (!trace_id.IsValid())
   {
     recordable->SetTraceId(span_context.trace_id());
-  } 
-  else 
+  }
+  else
   {
     recordable->SetTraceId(trace_id);
   }
@@ -95,8 +103,8 @@ void Logger::Log(core::SystemTimestamp timestamp, opentelemetry::logs::Severity 
   if (!span_id.IsValid())
   {
     recordable->SetSpanId(span_context.span_id());
-  } 
-  else 
+  }
+  else
   {
     recordable->SetSpanId(span_id);
   }
@@ -105,8 +113,8 @@ void Logger::Log(core::SystemTimestamp timestamp, opentelemetry::logs::Severity 
   if (!trace_flags.IsSampled())
   {
     recordable->SetTraceFlags(span_context.trace_flags());
-  } 
-  else 
+  }
+  else
   {
     recordable->SetTraceFlags(trace_flags);
   }

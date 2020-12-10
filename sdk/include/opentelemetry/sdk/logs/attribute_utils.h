@@ -15,19 +15,19 @@ namespace logs
  * replaces all non-owning references with owned copies.
  */
 using LogRecordAttributeValue = nostd::variant<bool,
-                                              int32_t,
-                                              uint32_t,
-                                              int64_t,
-                                              uint64_t,
-                                              double,
-                                              std::string,
-                                              std::vector<bool>,
-                                              std::vector<int32_t>,
-                                              std::vector<uint32_t>,
-                                              std::vector<int64_t>,
-                                              std::vector<uint64_t>,
-                                              std::vector<double>,
-                                              std::vector<std::string>>;
+                                               int32_t,
+                                               uint32_t,
+                                               int64_t,
+                                               uint64_t,
+                                               double,
+                                               std::string,
+                                               std::vector<bool>,
+                                               std::vector<int32_t>,
+                                               std::vector<uint32_t>,
+                                               std::vector<int64_t>,
+                                               std::vector<uint64_t>,
+                                               std::vector<double>,
+                                               std::vector<std::string>>;
 
 /**
  * Creates an owned copy (LogRecordAttributeValue) of a non-owning AttributeValue.

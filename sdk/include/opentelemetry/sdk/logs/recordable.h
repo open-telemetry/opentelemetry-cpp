@@ -31,27 +31,27 @@ public:
   virtual ~Recordable() = default;
 
   /**
-   * Set the timestamp for this log. 
+   * Set the timestamp for this log.
    * @param timestamp the timestamp to set
    */
   virtual void SetTimestamp(core::SystemTimestamp timestamp) noexcept = 0;
 
   /**
-   * Set the severity for this log. 
+   * Set the severity for this log.
    * @param severity the severity of the event
    */
   virtual void SetSeverity(opentelemetry::logs::Severity severity) noexcept = 0;
 
- /**
+  /**
    * Set name for this log
    * @param name the name to set
-   */ 
+   */
   virtual void SetName(nostd::string_view name) noexcept = 0;
 
   /**
    * Set body field for this log.
    * @param message the body to set
-   */ 
+   */
   virtual void SetBody(nostd::string_view message) noexcept = 0;
 
   /**
@@ -60,7 +60,7 @@ public:
    * @param value the resource value to set
    */
   virtual void SetResource(nostd::string_view key,
-                            const opentelemetry::common::AttributeValue &value) noexcept = 0;
+                           const opentelemetry::common::AttributeValue &value) noexcept = 0;
 
   /**
    * Set an attribute of a log.
@@ -76,7 +76,7 @@ public:
    */
   virtual void SetTraceId(opentelemetry::trace::TraceId trace_id) noexcept = 0;
 
- /**
+  /**
    * Set the span id for this log.
    * @param span_id the span id to set
    */
@@ -87,7 +87,6 @@ public:
    * @param trace_flags the trace flags to set
    */
   virtual void SetTraceFlags(opentelemetry::trace::TraceFlags trace_flags) noexcept = 0;
-
 };
 }  // namespace logs
 }  // namespace sdk

@@ -65,8 +65,7 @@ public:
    * @param records a span of unique pointers to log records
    * @returns an ExportResult code (whether export was success or failure)
    */
-  virtual ExportResult Export(
-      const nostd::span<std::unique_ptr<Recordable>> &records) noexcept = 0;
+  virtual ExportResult Export(const nostd::span<std::unique_ptr<Recordable>> &records) noexcept = 0;
 
   /**
    * Marks the exporter as ShutDown and cleans up any resources as required.
