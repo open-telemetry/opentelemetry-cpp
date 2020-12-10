@@ -96,6 +96,7 @@ public:
   {
     if (request.uri == "/get/")
     {
+
       std::unique_lock<std::mutex> lk(mtx_requests);
       received_requests_.push_back(request);
       response.headers["Content-Type"] = "text/plain";
@@ -114,7 +115,7 @@ public:
 
   bool waitForRequests(unsigned timeOutSec, unsigned expected_count = 1)
   {
-    std::unique_lock<std::mutex> lk(cv_m);
+    std::unique_lock<std::mutex> lk(mtx_requests);
     if (cv_got_events.wait_for(lk, std::chrono::milliseconds(1000 * timeOutSec),
                                [&] { return received_requests_.size() >= expected_count; }))
     {
@@ -142,8 +143,8 @@ TEST_F(BasicCurlHttpTests, HttpRequest)
   req.ReplaceHeader("name1", "value3");
   ASSERT_EQ(req.headers_.find("name1")->second, "value3");
 
-  req.SetTimeoutMs(std::chrono::duration<int>(5000));
-  ASSERT_EQ(req.timeout_ms_, std::chrono::duration<int>(5000));
+  req.SetTimeoutMs(std::chrono::duration<int>(2000));
+  ASSERT_EQ(req.timeout_ms_, std::chrono::duration<int>(2000));
 }
 
 TEST_F(BasicCurlHttpTests, HttpResponse)
@@ -226,13 +227,14 @@ TEST_F(BasicCurlHttpTests, RequestTimeout)
   received_requests_.clear();
   curl::SessionManager session_manager;
 
-  auto session = session_manager.CreateSession("127.0.0.10", HTTP_PORT);  // Non Existing address
+  auto session =
+      session_manager.CreateSession("222.222.222.200", HTTP_PORT);  // Non Existing address
   auto request = session->CreateRequest();
   request->SetUri("get/");
   GetEventHandler *handler = new GetEventHandler();
   session->SendRequest(*handler);
   session->FinishSession();
-  ASSERT_TRUE(handler->is_called_);
+  ASSERT_FALSE(handler->is_called_);
   delete handler;
 }
 
@@ -257,4 +259,5 @@ TEST_F(BasicCurlHttpTests, CurlHttpOperations)
   curl::HttpOperation http_operations3(http_client::Method::Get, "/get", handler, headers, body,
                                        false);
   http_operations3.Send();
+  delete handler;
 }

@@ -175,12 +175,14 @@ void BatchSpanProcessor::DrainQueue()
 
 void BatchSpanProcessor::Shutdown(std::chrono::microseconds timeout) noexcept
 {
-  is_shutdown_ = true;
+  is_shutdown_.store(true);
 
   cv_.notify_one();
   worker_thread_.join();
-
-  exporter_->Shutdown();
+  if (exporter_ != nullptr)
+  {
+    exporter_->Shutdown();
+  }
 }
 
 BatchSpanProcessor::~BatchSpanProcessor()

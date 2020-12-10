@@ -1,5 +1,6 @@
 #include "opentelemetry/sdk/trace/span_data.h"
 #include "opentelemetry/nostd/variant.h"
+#include "opentelemetry/trace/span.h"
 #include "opentelemetry/trace/span_id.h"
 #include "opentelemetry/trace/trace_id.h"
 
@@ -35,6 +36,7 @@ TEST(SpanData, Set)
   SpanData data;
   data.SetIds(trace_id, span_id, parent_span_id);
   data.SetName("span name");
+  data.SetSpanKind(opentelemetry::trace::SpanKind::kServer);
   data.SetStatus(opentelemetry::trace::CanonicalCode::UNKNOWN, "description");
   data.SetStartTime(now);
   data.SetDuration(std::chrono::nanoseconds(1000000));
@@ -45,6 +47,7 @@ TEST(SpanData, Set)
   ASSERT_EQ(data.GetSpanId(), span_id);
   ASSERT_EQ(data.GetParentSpanId(), parent_span_id);
   ASSERT_EQ(data.GetName(), "span name");
+  ASSERT_EQ(data.GetSpanKind(), opentelemetry::trace::SpanKind::kServer);
   ASSERT_EQ(data.GetStatus(), opentelemetry::trace::CanonicalCode::UNKNOWN);
   ASSERT_EQ(data.GetDescription(), "description");
   ASSERT_EQ(data.GetStartTime().time_since_epoch(), now.time_since_epoch());
