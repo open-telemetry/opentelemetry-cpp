@@ -50,7 +50,6 @@ void BatchLogProcessor::OnReceive(std::unique_ptr<LogRecord> &&record) noexcept
 
   if (buffer_.Add(record) == false)
   {
-    std::cerr << "[Batch Log Processor] Adding record to circular buffer failed \n";
     return;
   }
 
@@ -168,7 +167,7 @@ void BatchLogProcessor::Export(const bool was_force_flush_called)
   ExportResult export_status = exporter_->Export(records_arr);
   if (export_status != ExportResult::kSuccess)
   {
-    std::cerr << "[Batch Log Processor] Export failed \n";
+    // Error
   }
 
   // Notify the main thread in case this export was the result of a force flush.
