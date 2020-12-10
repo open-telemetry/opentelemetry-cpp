@@ -18,7 +18,6 @@
 
 #include <map>
 #include <unordered_map>
-#include "opentelemetry/nostd/shared_ptr.h"
 #include "opentelemetry/sdk/logs/attribute_utils.h"  // same as traces/attribute_utils
 #include "opentelemetry/sdk/logs/recordable.h"
 #include "opentelemetry/version.h"
@@ -44,8 +43,8 @@ private:
   opentelemetry::trace::SpanId span_id_;          // byte sequence
   opentelemetry::trace::TraceFlags trace_flags_;  // byte
   opentelemetry::logs::Severity severity_;        // Severity enum
-  nostd::string_view name_;                       // string
-  nostd::string_view body_;  // currently a simple string, but should be changed "Any" type
+  std::string name_;                              // string
+  std::string body_;  // currently a simple string, but should be changed "Any" type
   AttributeMap resource_map_;
   AttributeMap attributes_map_;
 
@@ -70,13 +69,13 @@ public:
    * Set name for this log
    * @param name the name to set
    */
-  void SetName(nostd::string_view name) noexcept override { name_ = name; }
+  void SetName(nostd::string_view name) noexcept override { name_ = std::string(name); }
 
   /**
    * Set body field for this log.
    * @param message the body to set
    */
-  void SetBody(nostd::string_view message) noexcept override { body_ = message; }
+  void SetBody(nostd::string_view message) noexcept override { body_ = std::string(message); }
 
   /**
    * Set a resource for this log.
@@ -146,13 +145,13 @@ public:
    * Get the name of this log
    * @return the name of  this log
    */
-  nostd::string_view GetName() const noexcept { return name_; }
+  std::string GetName() const noexcept { return name_; }
 
   /**
    * Get the body of this log
    * @return the body of this log
    */
-  nostd::string_view GetBody() const noexcept { return body_; }
+  std::string GetBody() const noexcept { return body_; }
 
   /**
    * Get the resource field for this log

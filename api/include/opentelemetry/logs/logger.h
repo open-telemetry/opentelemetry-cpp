@@ -107,13 +107,13 @@ public:
            Severity severity,
            nostd::string_view name,
            nostd::string_view body,
-           const T &resources,
+           const T &resource,
            const U &attributes,
            trace::TraceId trace_id,
            trace::SpanId span_id,
            trace::TraceFlags trace_flags) noexcept
   {
-    Log(timestamp, severity, name, body, common::KeyValueIterableView<T>(resources),
+    Log(timestamp, severity, name, body, common::KeyValueIterableView<T>(resource),
         common::KeyValueIterableView<U>(attributes), trace_id, span_id, trace_flags);
   }
 
