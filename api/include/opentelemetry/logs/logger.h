@@ -155,16 +155,6 @@ public:
   // Set default severity then call Log(Severity, String message) method
   inline void Log(nostd::string_view message) noexcept { this->Log(default_severity_, message); }
 
-  // Set default time, body, resources, traceid, spanid, and traceflags,
-  // and then call Log(Severity, String message) method
-  // inline void Log(Severity severity,
-  //                 nostd::string_view name,
-  //                 const common::KeyValueIterable &attributes) noexcept
-  // {
-  //   this->Log(default_timestamp_, severity, name, default_body_, default_resource_, attributes,
-  //   default_trace_id_, default_span_id_, default_trace_flags_);
-  // }
-
   // TODO: Add more overloaded Log(...) methods with different combiantions of parameters.
 
   // TODO: Add function aliases such as void debug(), void trace(), void info(), etc. for each
