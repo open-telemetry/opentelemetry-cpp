@@ -67,3 +67,10 @@ Purely for illustration purposes, not intended to represent actual releases:
      - Contains stable impls of logging, metrics, trace, baggage, resource, context modules
    - `opentelemetry-contrib 1.12.0`
      - Contains stable impls of 3rd party trace, metrics, and logging exporters and propagators
+
+### Before moving to version 1.0.0:
+
+0.0.x : This would be treated as 0.0.major. Things generally expected to work, but anything can work with upgrade.
+0.x.y: Thsi would be treated as 0.major.minor. There would be distinguish between breaking and non-breaking changes.
+0.x.y-alpha : Alpha release with most of trace functionality available. Not yet fully tested, and things may break.
+0.x.y-beta  : full feature trace functionality. Lesser bugs, and release candidate.
