@@ -30,12 +30,10 @@ must remain backwards compatible. Internal types are allowed to break.
 
   As we deliver package in souce form, and the user is responsible to build them for their platform, they have to be
   aware of these feature flags (documented in CHANGELOG.md), and enable it explicitly through their build system (cmake
-  / bazel or others ) to use the preview feature. In case a feature is behind feature flag, there can be backward
-  breaking changes without incrementing major version (?).
+  / bazel or others ) to use the preview feature.
 
 * New signals will be stabilized via a **minor version bump**, and are not allowed to break existing stable interfaces.
-Feature flag would be removed once we have a stable implementation, and there cann't be any backward breaking changes
-without incrementing major version.
+Feature flag would be removed once we have a stable implementation for the signal.
 
 * GitHub releases will be made for all released versions.
 
