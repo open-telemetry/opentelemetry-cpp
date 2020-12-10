@@ -10,23 +10,73 @@ ABI compatibility is required:
 - OpenTelemetry SDK binary compiled with compiler A + STL B
 - may not be ABI compatible with the main executable compiled with compiler
   C + STL D on a same OS.
-Thus, this approach works best only for statically lined / header only use.
+
+In addition to standard library, similar approach can be reused to implement
+the API surface classes with [Abseil classes](https://abseil.io/) instead of
+`nostd`, in products that prefer Abseil.
 
 ## Motivation
 
-In certain scenarios it may be of benefit to compile the OpenTelemetry SDK from
-source using standard library container classes (`std::map`, `std::string_view`,
-`std::span`, `std::variant`) instead of OpenTelemetry `nostd::` analogs (which
-were backported to C++11 and designed as ABI-stable). This PR also can be used
-as a foundation for alternate approach - to also allow bindings to [abseil](https://github.com/abseil/abseil-cpp)
-classes. That is in environments that would rather prefer `Abseil` classes
-over the standard lib or `nostd`.
+`nostd` classes in OpenTelemetry API were introduced for the following reasons:
+- ABI stability: scenario where different modules are compiled with different
+compiler and incompatible standard library.
+- backport of C++17 and above features to C++11 compiler.
 
-The approach is to provide totally opaque (from SDK code / SDK developer
-perspective) mapping / aliasing from `nostd::` classes back to their `std::`
-counterparts, and that is only done in environments where this is possible.
+The need for custom `nostd` classes is significantly diminished when the SDK is
+compiled with C++17 or above compiler. Only `std::span` needs to be backported.
 
-We continue fully supporting both models and run CI for both.
+Subsequently, there is no need for `nostd` classes in environment with C++20 or
+above compiler, where all system modules are compiled with the same / compatible
+compiler. And where the same standard library implementation is being used. This
+is the case when SDK is compiled into product itself, with no runtime loadable
+components.
+
+Compiling OpenTelemetry SDK from source using standard library classes:
+`std::map`, `std::string_view`, `std::span`, `std::variant`
+instead of `nostd::` yields better performance and debugability at expense
+of potentially losing ABI compatibility. However, the standard library built
+for Release is guaranteed to be compatible across Visual Studio 2015, 2017 and
+2019 compilers on Windows with vc14x runtime. Thus, ABI stability requirement
+introduces an additional unnecessary runtime complexity and overhead.
+
+While we are committed to support `nostd` classes for those environments where
+ABI compatibility is a requirement, we would also like to add flexibility to
+build system to optimize the SDK for the case where ABI compatibility is NOT
+a requirement.
+
+Implementation of this feature can be subsequently be used as a foundation for
+further work - allow bindings to [Abseil](https://github.com/abseil/abseil-cpp)
+"backport" implementation of the standard library.
+
+Implementation is completely opaque from SDK code / SDK developer perspective:
+mapping / aliasing from `nostd::` classes back to their `std::` counterparts
+is done in a corresponding `opentelemetry/nostd/*.h` header. Users still use
+`nostd` classes, but the most optimal implementation is picked up depending on
+whether users require ABI stability or not.
+
+Example environments that contain the full set of standard classes:
+- C++17 or above compiler, with Microsoft GSL backport of `gsl::span`
+- C++20 compilers: Visual Studio 2019+, latest LLVM clang, latest gcc
+
+We continue fully supporting both models (`nostd`, `stdlib`) by running CI for both.
+
+## Implementation
+
+Allow to alias from `nostd::` to `std::` classes for C++17 and above.
+
+Consistent handling of `std::variant` across various OS:
+
+- backport of a few missing variant features, e.g. `std::get` and `std::visit`
+  for older version of Mac OS X. Patches that enable proper handling of
+  `std::visit` and `std::variant` irrespective of OS version to resolve
+  [this quirk](https://stackoverflow.com/questions/52310835/xcode-10-call-to-unavailable-function-stdvisit).
+
+- ability to borrow implementation of C++20 `gsl::span` from
+  [Microsoft Guidelines Support Library](https://github.com/microsoft/GSL).
+  This is necessary for C++17 and above compiler.
+
+- ability to use Abseil classes for Visual Studio 2015 :`nostd::variant` does
+  not compile with Visual Studio 2010. Please refer to [this issue](https://github.com/open-telemetry/opentelemetry-cpp/issues/314)
 
 ## Pros and Cons
 
@@ -42,12 +92,10 @@ runtime-checks for Debug builds that use Standard containers.
 ### Minimizing binary size
 
 No need to marshal types from standard to `nostd`, then back to standard
-library means less code involved and less memcpy. We use Standard classes
-used elsewhere in the app. We can subsequently improve the process by avoiding
-`KeyValueIterable` transform (and, thus, unnecessary memcpy) when we know
-that the incoming types does not need to be 'transferred' across ABI boundary.
-This is the case for statically linked executables and when SDK is implemented
-as 'header-only' library.
+library across ABI boundary - means less code involved and less memcpy. We use
+Standard Library classes used elsewhere in the app. We can optimize the
+event passing by avoiding `KeyValueIterable` transform (and, thus, unnecessary memcpy)
+when we know that the incoming container type matches that one used by SDK.
 
 ### Avoiding unnecessary extra memcpy (perf improvements)
 
@@ -55,48 +103,90 @@ No need to transform from 'native' standard library types, e.g. `std::map` via
 `KeyValueIterable` means we can bypass that transformation process, if and when
 we know that the ABI compatibility is not a requirement in certain environment.
 ETA perf improvement is 1.5%-3% better perf since an extra transform, memcpy,
-iteration for-each key-value is avoided.
+iteration for-each key-value is avoided. Custom OpenTelemetry SDK implementation
+may operate on standard container classes rather than doing transform from one
+container type to another.
 
 ### ABI stability
 
-Obviously this approach does not work in environment where ABI stability
+Obviously this approach does not work in Linux environments, where ABI stability
 guarantee must be provided, e.g. for dynamically loadable OpenTelemetry SDK
-module and plugins for products such as NGINX, Envoy, etc.
+module and plugins for products such as NGINX, Envoy, etc. Example: a product is
+compiled with modern gcc compiler. But OpenTelemetry SDK is compiled with an
+older runtime library. In this case the SDK must be compiled with `nostd`.
 
-## Scope of changes needed to implement the feature
+Note that for most scenarios with modern Windows compilers, STL library is
+ABI-safe across Visual Studio 2015, 2017 and 2019 with vc14x runtime.
+
+Quote from [official documentation](https://docs.microsoft.com/en-us/cpp/porting/binary-compat-2015-2017?view=msvc-160) :
+
+Visual Studio 2015, 2017, and 2019: the runtime libraries and apps compiled by
+any of these versions of the compiler are binary-compatible. It's reflected in
+the C++ toolset major number, which is 14 for all three versions. The toolset
+version is v140 for Visual Studio 2015, v141 for 2017, and v142 for 2019.
+Say you have third-party libraries built by Visual Studio 2015. You can still
+use them in an application built by Visual Studio 2017 or 2019. There's no need
+to recompile with a matching toolset. The latest version of the Microsoft Visual
+C++ Redistributable package (the Redistributable) works for all of them.
+
+Visual Studio provides 1st class debug experience for the standard library.
+## Build and Test considerations
 
 ### Separate flavors of SDK build
 
 Supported build flavors:
 
-- `nostd` - OpenTelemetry backport of classes for C++11. Not using STD Lib.
-- `stl`   - Standard Library. Best be compiled with C++20 compaitlbe compiler.
-  C++17 may be used with additional dependencies, e.g. MS-GSL or Abseil.
-- `absl`  - TODO: this should allow using Abseil C++ lirary only (no MS-GSL).
+- `nostd` - OpenTelemetry backport of classes for C++11. Not using standard lib.
+- `stl`   - Standard Library. Full native experience with C++20 compiler.
+  C++17 works but with additional dependencies, e.g. either MS-GSL or Abseil
+  for `std::span` implementation (`gsl::span` or `absl::Span`).
+- `absl`  - TODO: this should allow using Abseil C++ library only (no MS-GSL).
+
+Currently only `nostd` and `stl` configurations are implemented.
+`absl` is reserved for future use.
+
+### Build matrix
+
+List of compilers that support building with standard library classes:
+
+Compiler           | Language standard | Notes
+-------------------|-------------------|-------------------
+Visual Studio 2015 | C++14             | can only be built with `nostd` flavor
+Visual Studio 2017 | C++17             | requires `gsl::span` for `std::span` implementation
+Visual Studio 2019 | C++20             |
+Xcode 11.x         | C++17             | requires `gsl::span` for `std::span` implementation
+Xcode 12.x         | C++20             |
+gcc-7              | C++17             | requires `gsl::span` for `std::span` implementation
+gcc-9+             | C++20             |
+
+C++20 `std::span` -compatible implementation is needed for C++17 compilers.
+
+Other modern C++ language features used by OpenTelemetry, e.g. `std::string_view`
+and `std::variant` are available in C++17 standard library. Minor customization
+needed for Apple LLVM clang in `std::variant` exception handling due to the fact
+that the variant exception handler presence depends on what OS version developer
+is targeting. This exception on Apple systems is implemented inside the OS system
+library. This idiosyncrasy is now handled by OpenTelemetry API in opaque manner:
+support `nostd::variant` exception handling even on older Mac OS X and iOS by
+providing implementation of it in OpenTelemetry SDK: if exceptions are enabled,
+then throw `nostd::bad_variant_access` exception old OS where `std::bad_variant_access`
+is unavailable.
+
+#### Note on `gsl::span` vs `absl::Span`
+
+It is important to note that, while `absl::Span` is similar in design and
+purpose to the `std::span` (and existing `gsl::span` reference implementation),
+`absl::Span` is not currently guaranteeing to be a drop-in replacement for any
+eventual standard. Instead, `absl::Span` aims to have an interface as similar
+as possible to `absl::string_view`, without the string-specific functionality.
+
+Thus, OpenTelemetry built with standard library prefers `gsl::span` as it is
+fully compatible with standard `std::span`. It may become possible to use Abseil
+classes should we confirm that its behavior is consistent with `nostd::span`
+expectations.
 
 ### Test setup
 
-Tests to validate that all OpenTelemetry functionality is working the same
+CI allows to validate that all OpenTelemetry functionality is working the same
 identical way irrespective of what C++ runtime / STL library it is compiled
-with.
-
-### Implementation Details
-
-Feature allows to alias from `nostd::` to `std::` classes for C++17 and above.
-
-Consistent handling of `std::variant` across various OS:
-
-- backport of a few missing variant features, e.g. `std::get` and `std::visit`
-  for older version of Mac OS X. Patches that enable proper
-  handling of `std::visit` and `std::variant` irrespective of OS version
-  to resolve [this quirk](https://stackoverflow.com/questions/52310835/xcode-10-call-to-unavailable-function-stdvisit).
-
-- ability to optionally borrow implementation of C++20 `gsl::span` from
-  [Microsoft Guidelines Support Library](https://github.com/microsoft/GSL).
-  This is not necessary for C++20 and above compilers.
-
-- ability to use Abseil `absl::variant` for Visual Studio 2015
-
-- set of tools to locally build the SDK with both options across various OS
-  and compilers, including vs2015 (C++11), vs2017 (C++17), vs2019 (C++20),
-  ubuntu-18.xx (C++17), ubuntu-20.xx/gcc-9 (C++20), Mac OS X (C++17 and above).
+with. Additional performance benchmarks were added.
