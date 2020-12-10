@@ -15,6 +15,7 @@
  */
 
 #include "opentelemetry/sdk/logs/logger.h"
+#include "opentelemetry/sdk/logs/log_record.h"
 
 #include <gtest/gtest.h>
 
@@ -22,7 +23,7 @@ using namespace opentelemetry::sdk::logs;
 
 TEST(LoggerSDK, LogToNullProcessor)
 {
-  // Confirm Logger::log() does not have undefined behavior
+  // Confirm Logger::Log() does not have undefined behavior
   // even when there is no processor set
   // since it calls Processor::OnReceive()
 
@@ -30,14 +31,16 @@ TEST(LoggerSDK, LogToNullProcessor)
   auto logger = lp->GetLogger("logger");
 
   // Log a sample log record to a nullptr processor
-  opentelemetry::logs::LogRecord r;
-  r.name = "Test log";
-  logger->log(r);
+  logger->Log("Test log");
 }
 
 class DummyProcessor : public LogProcessor
 {
-  void OnReceive(std::unique_ptr<opentelemetry::logs::LogRecord> &&record) noexcept {}
+  std::unique_ptr<Recordable> MakeRecordable() noexcept 
+  {
+    return std::unique_ptr<Recordable>(new LogRecord);
+  }
+  void OnReceive(std::unique_ptr<Recordable> &&record) noexcept {}
   bool ForceFlush(std::chrono::microseconds timeout = std::chrono::microseconds(0)) noexcept
   {
     return true;
@@ -69,9 +72,4 @@ TEST(LoggerSDK, LogToAProcessor)
   // Should later introduce a way to assert that
   // the logger's processor is the same as "proc"
   // and that the logger's processor is the same as lp's processor
-
-  // Log a sample log record to the processor
-  opentelemetry::logs::LogRecord r;
-  r.name = "Test log";
-  logger->log(r);
 }

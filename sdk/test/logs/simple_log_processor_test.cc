@@ -1,5 +1,7 @@
 #include "opentelemetry/sdk/logs/simple_log_processor.h"
 #include "opentelemetry/sdk/logs/exporter.h"
+#include "opentelemetry/sdk/logs/log_record.h"
+#include "opentelemetry/nostd/span.h"
 
 #include <gtest/gtest.h>
 
@@ -7,7 +9,6 @@
 #include <thread>
 
 using namespace opentelemetry::sdk::logs;
-using opentelemetry::logs::LogRecord;
 
 /*
  * A test exporter that can return a vector of all the records it has received,
@@ -17,12 +18,17 @@ class TestExporter final : public LogExporter
 {
 public:
   TestExporter(int *shutdown_counter,
-               std::shared_ptr<std::vector<std::string>> logs_received,
+               std::shared_ptr<std::vector<std::unique_ptr<LogRecord>>> logs_received,
                size_t *batch_size_received)
       : shutdown_counter_(shutdown_counter),
         logs_received_(logs_received),
         batch_size_received(batch_size_received)
   {}
+
+  std::unique_ptr<Recordable> MakeRecordable() noexcept override
+  {
+    return std::unique_ptr<Recordable>(new LogRecord());
+  }
 
   // Stores the names of the log records this exporter receives to an internal list
   ExportResult Export(
@@ -31,7 +37,13 @@ public:
     *batch_size_received = records.size();
     for (auto &record : records)
     {
-      logs_received_->push_back(record->name.data());
+      auto log_record = std::unique_ptr<LogRecord>(
+          static_cast<LogRecord *>(record.release()));
+
+      if (log_record != nullptr)
+      {
+        logs_received_->push_back(std::move(log_record));
+      }
     }
     return ExportResult::kSuccess;
   }
@@ -45,7 +57,7 @@ public:
 
 private:
   int *shutdown_counter_;
-  std::shared_ptr<std::vector<std::string>> logs_received_;
+  std::shared_ptr<std::vector<std::unique_ptr<LogRecord>>> logs_received_;
   size_t *batch_size_received;
 };
 
@@ -54,7 +66,7 @@ private:
 TEST(SimpleLogProcessorTest, SendReceivedLogsToExporter)
 {
   // Create a simple processor with a TestExporter attached
-  std::shared_ptr<std::vector<std::string>> logs_received(new std::vector<std::string>);
+  std::shared_ptr<std::vector<std::unique_ptr<LogRecord>>> logs_received(new std::vector<std::unique_ptr<LogRecord>>);
   size_t batch_size_received = 0;
 
   std::unique_ptr<TestExporter> exporter(
@@ -66,24 +78,19 @@ TEST(SimpleLogProcessorTest, SendReceivedLogsToExporter)
   const int num_logs = 5;
   for (int i = 0; i < num_logs; i++)
   {
-    auto record = std::unique_ptr<LogRecord>(new LogRecord());
-    std::string s("Log name");
-    s += std::to_string(i);
-    record->name = s;
-
-    processor.OnReceive(std::move(record));
+    auto recordable = processor.MakeRecordable();
+    recordable->SetName("Log");
+    processor.OnReceive(std::move(recordable));
 
     // Verify that the batch of 1 log record sent by processor matches what exporter received
     EXPECT_EQ(1, batch_size_received);
   }
 
   // Test whether the processor's log sent matches the log record received by the exporter
-  EXPECT_EQ(logs_received->size(), num_logs);
+  EXPECT_EQ(logs_received->size(), num_logs); 
   for (int i = 0; i < num_logs; i++)
   {
-    std::string s("Log name");
-    s += std::to_string(i);
-    EXPECT_EQ(s, logs_received->at(i));
+    EXPECT_EQ("Log", logs_received->at(i)->GetName());
   }
 }
 
@@ -114,6 +121,11 @@ class FailShutDownExporter final : public LogExporter
 {
 public:
   FailShutDownExporter() {}
+
+  std::unique_ptr<Recordable> MakeRecordable() noexcept override
+  {
+    return std::unique_ptr<Recordable>(new LogRecord());
+  }
 
   ExportResult Export(
       const opentelemetry::nostd::span<std::unique_ptr<Recordable>> &records) noexcept override
