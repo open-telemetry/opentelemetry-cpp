@@ -20,6 +20,7 @@
 #include <mutex>
 #include <string>
 #include <vector>
+#include <unordered_map>
 
 #include "opentelemetry/logs/logger_provider.h"
 #include "opentelemetry/logs/noop.h"

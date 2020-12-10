@@ -15,6 +15,8 @@
  */
 
 #include "opentelemetry/sdk/logs/logger.h"
+ #include "opentelemetry/sdk/logs/log_record.h"
+ #include "opentelemetry/trace/provider.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace sdk
@@ -25,7 +27,12 @@ Logger::Logger(std::shared_ptr<LoggerProvider> logger_provider) noexcept
     : logger_provider_(logger_provider)
 {}
 
-void Logger::log(const opentelemetry::logs::LogRecord &record) noexcept
+/**
+ * Create and popualte recordable with the log event's fields passed in. 
+ * The timestamp, severity, traceid, spanid, and traceflags, are injected
+ * if the user does not specify them.
+ */ 
+void Logger::Log(core::SystemTimestamp timestamp, opentelemetry::logs::Severity severity,  nostd::string_view name, nostd::string_view body, const common::KeyValueIterable &resource, const common::KeyValueIterable &attributes, opentelemetry::trace::TraceId trace_id, opentelemetry::trace::SpanId span_id, opentelemetry::trace::TraceFlags trace_flags) noexcept
 {
   // If this logger does not have a processor, no need to create a log record
   auto processor = logger_provider_.lock()->GetProcessor();
@@ -36,23 +43,76 @@ void Logger::log(const opentelemetry::logs::LogRecord &record) noexcept
 
   // TODO: Sampler logic (should include check for minSeverity)
 
-  /**
-   * Convert the LogRecord to the heap first before sending to processor.
-   * TODO: Change the API log(LogRecord) function to log(*LogRecord) so the following line
-   * converting record a heap variable can be removed
-   */
-  auto record_pointer =
-      std::unique_ptr<opentelemetry::logs::LogRecord>(new opentelemetry::logs::LogRecord(record));
+  auto recordable = processor->MakeRecordable();
+  if (recordable == nullptr)
+  {
+    return;
+  }
 
-  // TODO: Do not want to overwrite user-set timestamp if there already is one -
-  // add a flag in the API to check if timestamp is set by user already before setting timestamp
+  // Populate recordable fields
+  if (timestamp == this->default_timestamp_){
+    // Inject current timestamp if none is specified by user 
+    recordable->SetTimestamp(core::SystemTimestamp(std::chrono::system_clock::now()));
+  } 
+  else 
+  {
+    recordable->SetTimestamp(timestamp);
+  }
 
-  // Inject timestamp if none is set
-  record_pointer->timestamp = core::SystemTimestamp(std::chrono::system_clock::now());
-  // TODO: inject traceid/spanid later
+  recordable->SetSeverity(severity);
+  recordable->SetName(name);
+  recordable->SetBody(body);
+
+  resource.ForEachKeyValue([&](nostd::string_view key,
+                               opentelemetry::common::AttributeValue value) noexcept {
+    recordable->SetResource(key, value);
+    return true;
+  });
+
+  attributes.ForEachKeyValue([&](nostd::string_view key,
+                                 opentelemetry::common::AttributeValue value) noexcept {
+    recordable->SetAttribute(key, value);
+    return true;
+  });
+
+
+  // Inject trace_id/span_id/trace_flags if none is set by user
+  auto provider     = opentelemetry::trace::Provider::GetTracerProvider();
+  auto tracer       = provider->GetTracer("foo_library");
+  auto span_context = tracer->GetCurrentSpan()->GetContext();
+
+  // Traceid
+  if (!trace_id.IsValid())
+  {
+    recordable->SetTraceId(span_context.trace_id());
+  } 
+  else 
+  {
+    recordable->SetTraceId(trace_id);
+  }
+
+  // Spanid
+  if (!span_id.IsValid())
+  {
+    recordable->SetSpanId(span_context.span_id());
+  } 
+  else 
+  {
+    recordable->SetSpanId(span_id);
+  }
+
+  // Traceflag
+  if (!trace_flags.IsSampled())
+  {
+    recordable->SetTraceFlags(span_context.trace_flags());
+  } 
+  else 
+  {
+    recordable->SetTraceFlags(trace_flags);
+  }
 
   // Send the log record to the processor
-  processor->OnReceive(std::move(record_pointer));
+  processor->OnReceive(std::move(recordable));
 }
 
 }  // namespace logs
