@@ -36,7 +36,8 @@ public:
   sdktrace::ExportResult Export(
       const nostd::span<std::unique_ptr<sdktrace::Recordable>> &spans) noexcept override;
 
-  void Shutdown(std::chrono::microseconds timeout = std::chrono::microseconds(0)) noexcept override;
+  bool Shutdown(
+      std::chrono::microseconds timeout = std::chrono::microseconds::max()) noexcept override;
 
 private:
   std::ostream &sout_;

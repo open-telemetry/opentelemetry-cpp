@@ -50,9 +50,13 @@ public:
    * Shut down the exporter.
    * @param timeout an optional timeout, the default timeout of 0 means that no
    * timeout is applied.
+   * @return return the status of this operation
    */
-  void Shutdown(
-      std::chrono::microseconds timeout = std::chrono::microseconds(0)) noexcept override{};
+  bool Shutdown(
+      std::chrono::microseconds timeout = std::chrono::microseconds::max()) noexcept override
+  {
+    return true;
+  }
 
 private:
   // The configuration options associated with this exporter.
