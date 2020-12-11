@@ -66,8 +66,5 @@ TEST(TracerProvider, Shutdown)
 
   TracerProvider tp1(processor1);
 
-  tp1.Shutdown();
-
-  // Verify Shutdown returns.
-  ASSERT_TRUE(true);
+  EXPECT_TRUE(tp1.Shutdown());
 }

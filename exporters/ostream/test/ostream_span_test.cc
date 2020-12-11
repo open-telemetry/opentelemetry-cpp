@@ -36,7 +36,7 @@ TEST(OStreamSpanExporter, Shutdown)
   // Redirect cout to our stringstream buffer
   std::cout.rdbuf(stdoutOutput.rdbuf());
 
-  processor->Shutdown();
+  EXPECT_TRUE(processor->Shutdown());
   processor->OnEnd(std::move(recordable));
 
   std::cout.rdbuf(sbuf);
