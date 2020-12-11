@@ -16,7 +16,7 @@ opentelemetry::exporter::otlp::OtlpExporterOptions opts;
 void InitTracer()
 {
   // Create OTLP exporter instance
-  auto exporter = std::unique_ptr<sdktrace::SpanExporter>(new otlp::OtlpExporter);
+  auto exporter = std::unique_ptr<sdktrace::SpanExporter>(new otlp::OtlpExporter(opts));
 
   auto processor = std::shared_ptr<sdktrace::SpanProcessor>(
       new sdktrace::SimpleSpanProcessor(std::move(exporter)));
