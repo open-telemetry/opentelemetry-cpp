@@ -1,5 +1,6 @@
 #pragma once
 
+#include "nlohmann/json.hpp"
 #include "opentelemetry/logs/log_record.h"
 #include "opentelemetry/nostd/type_traits.h"
 #include "opentelemetry/sdk/logs/exporter.h"
@@ -11,7 +12,6 @@
 #include <iostream>
 #include <map>
 #include <sstream>
-#include "opentelemetry/exporters/elasticsearch/json.hpp"
 
 namespace nostd   = opentelemetry::nostd;
 namespace sdklogs = opentelemetry::sdk::logs;

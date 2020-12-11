@@ -7,7 +7,6 @@ cc_library(
     ],
     hdrs = [
         "include/opentelemetry/exporters/elasticsearch/es_log_exporter.h",
-        "include/opentelemetry/exporters/elasticsearch/json.hpp",
     ],
     strip_include_prefix = "include",
     deps = [
