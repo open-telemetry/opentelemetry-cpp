@@ -20,7 +20,7 @@ must remain backwards compatible. Internal types are allowed to break.
 ## Policy
 
 * Releases will follow [SemVer](https://semver.org/).
-* Only single source package containing api and sdk for all singals would be released as part of new GitHub release.
+* Only single source package containing api and sdk for all signals would be released as part of the new GitHub release.
 * New telemetry signals will be introduced behind experimental feature flag usng C macro define.
   ```
     #ifdef METRICS_PREVIEW
