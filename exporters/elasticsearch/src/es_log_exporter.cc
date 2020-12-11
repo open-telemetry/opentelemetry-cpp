@@ -214,6 +214,7 @@ json ElasticsearchLogExporter::RecordToJSON(std::unique_ptr<opentelemetry::logs:
     log.push_back({"attributes", attributes});
   }
 
+  // Convert traceid, spanid, and traceflags into strings
   char trace_buf[32];
   record->trace_id.ToLowerBase16(trace_buf);
   log["traceid"] =  std::string(trace_buf, sizeof(trace_buf));
