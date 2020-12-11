@@ -80,8 +80,6 @@ ElasticsearchLogExporter::ElasticsearchLogExporter(const ElasticsearchExporterOp
   // session_ = session_manager_.CreateSession(options_.host_, options_.port_);
 }
 
-
-
 sdklogs::ExportResult ElasticsearchLogExporter::Export(
     const nostd::span<std::unique_ptr<opentelemetry::logs::LogRecord>> &records) noexcept
 {
@@ -97,28 +95,8 @@ sdklogs::ExportResult ElasticsearchLogExporter::Export(
   for (auto &record : records)
   {
     // Convert the log record to a JSON object 
-    json log; 
-    log["timestamp"] =  record->timestamp.time_since_epoch().count();
-    log["severity"] =  record->severity; 
-    log["name"] =  record->name;
-    log["body"] =  record->body;
 
-    char trace_buf[32];
-    record->trace_id.ToLowerBase16(trace_buf);
-    log["traceid"] =  std::string(trace_buf, sizeof(trace_buf));
-
-    char span_buf[16];
-    record->span_id.ToLowerBase16(span_buf);
-    log["spanid"] =  std::string(span_buf, sizeof(span_buf));
-
-    char flag_buf[2];
-    record->trace_flag.ToLowerBase16(flag_buf);
-    log["traceflags"] =  std::string(flag_buf, sizeof(flag_buf));
-
-    // TODO: Write resource and attributes into JSON 
-    // log["resource"] =  record->resource;
-    // log["attributes"] =  record->attributes;
-    logs.emplace_back(log);
+    logs.emplace_back(RecordToJSON(std::move(record)));
   }
 
   // Create a connection to the ElasticSearch instance
@@ -184,11 +162,71 @@ sdklogs::ExportResult ElasticsearchLogExporter::Export(
 
 bool ElasticsearchLogExporter::Shutdown(std::chrono::microseconds timeout) noexcept
 {
-  //isShutdown_ = true;
-
+  isShutdown_ = true;
   //session_->FinishSession();
 
   return true;
+}
+
+json ElasticsearchLogExporter::RecordToJSON(std::unique_ptr<opentelemetry::logs::LogRecord> record)
+{
+  // Create a json object to store the LogRecord information in
+  json log; 
+
+  // Write the simple fields
+  log["timestamp"] =  record->timestamp.time_since_epoch().count();
+  log["name"] =  record->name;
+  log["body"] =  record->body;
+
+  // Write the severity by converting it from its enum to a string
+  static opentelemetry::nostd::string_view severityStringMap_[25] = {
+    "kInvalid", "kTrace",  "kTrace2", "kTrace3", "kTrace4", "kDebug",  "kDebug2",
+    "kDebug3",  "kDebug4", "kInfo",   "kInfo2",  "kInfo3",  "kInfo4",  "kWarn",
+    "kWarn2",   "kWarn3",  "kWarn4",  "kError",  "kError2", "kError3", "kError4",
+    "kFatal",   "kFatal2", "kFatal3", "kFatal4"};
+  log["severity"] =  severityStringMap_[static_cast<int>(record->severity)]; 
+
+  //Convert the resources into a JSON object
+  json resource;
+  if (record->resource != nullptr)
+  {
+    record->resource->ForEachKeyValue([&](nostd::string_view key,
+                                            common::AttributeValue value) noexcept {
+      resource[key.data()] = ValueToString(value);
+      return true;
+    });
+
+    //Push the attributes JSON object into the main JSON under the "resource" key
+    log.push_back({"resource", resource});
+  }
+
+  //Convert the attributes into a JSON object
+  json attributes;
+  if (record->attributes != nullptr)
+  {
+    record->attributes->ForEachKeyValue([&](nostd::string_view key,
+                                            common::AttributeValue value) noexcept {
+      attributes[key.data()] = ValueToString(value);
+      return true;
+    });
+
+    //Push the attributes JSON object into the main JSON under the "attributes" key
+    log.push_back({"attributes", attributes});
+  }
+
+  char trace_buf[32];
+  record->trace_id.ToLowerBase16(trace_buf);
+  log["traceid"] =  std::string(trace_buf, sizeof(trace_buf));
+
+  char span_buf[16];
+  record->span_id.ToLowerBase16(span_buf);
+  log["spanid"] =  std::string(span_buf, sizeof(span_buf));
+
+  char flag_buf[2];
+  record->trace_flags.ToLowerBase16(flag_buf);
+  log["traceflags"] =  std::string(flag_buf, sizeof(flag_buf));
+
+  return log;
 }
 
 }  // namespace logs

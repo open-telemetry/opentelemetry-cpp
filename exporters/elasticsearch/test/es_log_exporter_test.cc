@@ -16,7 +16,7 @@ namespace logs_exporter = opentelemetry::exporter::logs;
 // Attempt to write a log to an invalid host/port, test that the timeout works properly
 TEST(ElasticsearchLogsExporter, InvalidEndpoint) {
     // Create options for the elasticsearch exporter
-    logs_exporter::ElasticsearchExporterOptions options("randominvalidhost", 3000);
+    logs_exporter::ElasticsearchExporterOptions options("invalidhost", -1);
     options.response_timeout_ = 10; // Wait 10 seconds to receive a response
 
     // Create an elasticsearch exporter
