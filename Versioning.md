@@ -6,7 +6,7 @@ This document describes the versioning policy for this repository.
 
 ### API Stability
 
-Once the API for a given signal (spans, logs, metrics, baggage) has been officially released, that API module will function with any SDK that has the same major version, and equal or greater minor or patch version.
+Once the API for a given signal (spans, logs, metrics, baggage) has been officially released, that API module will function with any SDK that has the same MAJOR version and equal or greater MINOR or PATCH version. For example, application compiled with API v1.1 is compatible with SDK v1.1.2, v1.2.0, etc.
 
 For example, libraries that are instrumented with `opentelemetry 1.0.1` will
 function in applications using `opentelemetry 1.11.33` or `opentelemetry
