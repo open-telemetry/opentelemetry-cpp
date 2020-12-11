@@ -52,9 +52,11 @@ public:
     return sdk::trace::ExportResult::kSuccess;
   }
 
-  void Shutdown(std::chrono::microseconds timeout = std::chrono::microseconds(0)) noexcept override
+  bool Shutdown(
+      std::chrono::microseconds timeout = std::chrono::microseconds::max()) noexcept override
   {
     *is_shutdown_ = true;
+    return true;
   }
 
   bool IsExportCompleted() { return is_export_completed_->load(); }
@@ -135,7 +137,7 @@ TEST_F(BatchSpanProcessorTestPeer, TestShutdown)
     batch_processor->OnEnd(std::move(test_spans->at(i)));
   }
 
-  batch_processor->Shutdown();
+  EXPECT_TRUE(batch_processor->Shutdown());
 
   EXPECT_EQ(num_spans, spans_received->size());
   for (int i = 0; i < num_spans; ++i)
@@ -165,7 +167,7 @@ TEST_F(BatchSpanProcessorTestPeer, TestForceFlush)
   // Give some time to export
   std::this_thread::sleep_for(std::chrono::milliseconds(50));
 
-  batch_processor->ForceFlush();
+  EXPECT_TRUE(batch_processor->ForceFlush());
 
   EXPECT_EQ(num_spans, spans_received->size());
   for (int i = 0; i < num_spans; ++i)
@@ -183,7 +185,7 @@ TEST_F(BatchSpanProcessorTestPeer, TestForceFlush)
   // Give some time to export the spans
   std::this_thread::sleep_for(std::chrono::milliseconds(50));
 
-  batch_processor->ForceFlush();
+  EXPECT_TRUE(batch_processor->ForceFlush());
 
   EXPECT_EQ(num_spans * 2, spans_received->size());
   for (int i = 0; i < num_spans; ++i)
@@ -215,7 +217,7 @@ TEST_F(BatchSpanProcessorTestPeer, TestManySpansLoss)
   // Give some time to export the spans
   std::this_thread::sleep_for(std::chrono::milliseconds(700));
 
-  batch_processor->ForceFlush();
+  EXPECT_TRUE(batch_processor->ForceFlush());
 
   // Span should be exported by now
   EXPECT_GE(max_queue_size, spans_received->size());
@@ -243,7 +245,7 @@ TEST_F(BatchSpanProcessorTestPeer, TestManySpansLossLess)
   // Give some time to export the spans
   std::this_thread::sleep_for(std::chrono::milliseconds(50));
 
-  batch_processor->ForceFlush();
+  EXPECT_TRUE(batch_processor->ForceFlush());
 
   EXPECT_EQ(num_spans, spans_received->size());
   for (int i = 0; i < num_spans; ++i)
