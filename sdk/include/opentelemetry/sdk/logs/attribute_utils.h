@@ -37,10 +37,6 @@ struct AttributeConverter
   LogRecordAttributeValue operator()(bool v) { return LogRecordAttributeValue(v); }
   LogRecordAttributeValue operator()(int32_t v) { return LogRecordAttributeValue(v); }
   LogRecordAttributeValue operator()(uint32_t v) { return LogRecordAttributeValue(v); }
-  /*LogRecordAttributeValue operator()(int v)
-  {
-    return LogRecordAttributeValue(static_cast<int64_t>(v));
-  }*/
   LogRecordAttributeValue operator()(int64_t v) { return LogRecordAttributeValue(v); }
   LogRecordAttributeValue operator()(uint64_t v) { return LogRecordAttributeValue(v); }
   LogRecordAttributeValue operator()(double v) { return LogRecordAttributeValue(v); }

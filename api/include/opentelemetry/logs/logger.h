@@ -43,13 +43,14 @@ class Logger
 {
 protected:
   // Default values to set for fields that the user doesn't specify
-  core::SystemTimestamp default_timestamp_;  // uint64 nanoseconds since Unix epoch, default 0
-  Severity default_severity_;                // default 0 (kInvalid)
-  nostd::string_view default_name_;          // default 0 length, nullptr data
-  nostd::string_view default_body_;  // default 0 length, nullptr data. TODO: currently a simple
-                                     // string, but should be changed "Any" type
-  trace::TraceId default_trace_id_;  // default 00000000000000000000000000000000
-  trace::SpanId default_span_id_;    // default 0000000000000000
+  core::SystemTimestamp default_timestamp_ =
+      std::chrono::system_clock::now();  // uint64 nanoseconds since Unix epoch, default 0
+  Severity default_severity_;            // default 0 (kInvalid)
+  nostd::string_view default_name_;      // default 0 length, nullptr data
+  nostd::string_view default_body_;      // default 0 length, nullptr data. TODO: currently a simple
+                                         // string, but should be changed "Any" type
+  trace::TraceId default_trace_id_;      // default 00000000000000000000000000000000
+  trace::SpanId default_span_id_;        // default 0000000000000000
   trace::TraceFlags default_trace_flags_;  // default 00
 
 public:
@@ -138,22 +139,20 @@ public:
   /** Wrapper methods that the user could call for convenience when logging **/
 
   // Set default values for unspecified fields, then call the base Log() method
-  inline void Log(Severity severity,
-                  nostd::string_view message,
-                  core::SystemTimestamp time) noexcept
+  void Log(Severity severity, nostd::string_view message, core::SystemTimestamp time) noexcept
   {
     this->Log(time, severity, default_name_, message, {}, {}, default_trace_id_, default_span_id_,
               default_trace_flags_);
   }
 
   // Set default time, and call base Log(severity, message, time) method
-  inline void Log(Severity severity, nostd::string_view message) noexcept
+  void Log(Severity severity, nostd::string_view message) noexcept
   {
     this->Log(severity, message, default_timestamp_);
   }
 
   // Set default severity then call Log(Severity, String message) method
-  inline void Log(nostd::string_view message) noexcept { this->Log(default_severity_, message); }
+  void Log(nostd::string_view message) noexcept { this->Log(default_severity_, message); }
 
   // TODO: Add more overloaded Log(...) methods with different combiantions of parameters.
 

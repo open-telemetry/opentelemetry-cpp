@@ -54,6 +54,7 @@ void Logger::Log(core::SystemTimestamp timestamp,
   auto recordable = processor->MakeRecordable();
   if (recordable == nullptr)
   {
+    // TODO: Error diagnostics should indicate "recordable creation failed" to user
     return;
   }
 
