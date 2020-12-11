@@ -52,35 +52,32 @@ Feature flag would be removed once we have a stable implementation for the signa
 Purely for illustration purposes, not intended to represent actual releases:
 
 - v0.0.1 release:
-   - `opentelemetry 0.0.1`
-     - Contains experimental impls of trace, resouce ( no feature flag as major version is 0 )
-     - No implementation of logging and metrics available
-   - `opentelemetry-contrib 0.0.1`
-     - Contains experimental impls of 3rd party trace exporters and propagators ( no feature flag as major version is 0)
-     - No implementation for 3rd party logging (and metrics) exporters and propagators
-- v1.0.0 release:
-   - `opentelemetry 1.0.0`
-     - Contains stable impls of trace, baggage and  resource
-     - experimental metrics impl behind feature flag
-   - `opentelemetry-contrib 1.0.0`
-     - Contains stable impls of 3rd party trace exporters and propagators
-     - experimental metrics exporters and propagator impls behind feature flag
+   - `opentelemetry-api 0.0.1`
+     - Contains experimental api's of trace, resouce ( no feature flag as major version is 0 )
+     - No api's of logging and metrics available
+   - `opentelemetry-sdk 0.0.1`
+     - Contains experimental implementation of trace, resouce ( no feature flag as major version is 0 )
+     - No implemtation of logging and metrics available
+- v1.0.0 release: ( with traces )
+   - `opentelemetry-api 1.0.0`
+     - Contains stable apis of trace, baggage and  resource
+     - experimental metrics api's behind feature flag
+   - `opentelemetry-sdk 1.0.0`
+     - Contains stable implementation of trace, baggage and  resource
+     - experimental metrics api's behind feature flag
 - v1.5.0 release (with metrics)
-   - `opentelemetry 1.5.0`
-     - Contains stable impls of metrics, trace, baggage, resource, context modules
-     - experimental logging impl still only behind feature flag
-   - `opentelemetry-contrib 1.6.0`
-     - Contains stable impls of 3rd party trace and metrics exporters and propagators
-     - experimental logging exporters and propagator still impls behind feature flag
+   - `opentelemetry-api 1.5.0`
+     - Contains stable api's of metrics, trace, baggage, resource, context modules
+     - experimental logging api still only behind feature flag
+   - `opentelemetry-sdk 1.5.0`
+     - Contains stable implementation of metrics, trace, baggage, resource, context modules
+     - experimental logging implementation still only behind feature flag
 - v1.10.0 release (with logging)
-   - `opentelemetry 1.10.0`
-     - Contains stable impls of logging, metrics, trace, baggage, resource, context modules
-   - `opentelemetry-contrib 1.12.0`
-     - Contains stable impls of 3rd party trace, metrics, and logging exporters and propagators
+   - `opentelemetry-api 1.10.0`
+     - Contains stable api's of logging, metrics, trace, baggage, resource, context modules
+   - `opentelemetry-sdk 1.10.0`
+     - Contains stable sdk of logging, metrics, trace, baggage, resource, context modules
 
 ### Before moving to version 1.0.0:
 
-- 0.0.x : This would be treated as 0.0.major. Things generally expected to work, but anything can break with upgrade.
-- 0.x.y : This would be treated as 0.major.minor. There would be distinguish between breaking and non-breaking changes.
-- 0.x.y-alpha : Alpha release with most of trace functionality available. Not yet fully tested, and things may break.
-- 0.x.y-beta  : Full feature trace functionality. Lesser bugs, and release candidate.
+- Major version zero (0.y.z) is for initial development. Anything MAY change at any time. The public API SHOULD NOT be considered stable.
