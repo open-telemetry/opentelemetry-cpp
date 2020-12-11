@@ -28,7 +28,7 @@ must remain backwards compatible. Internal types are allowed to break.
     #endif
   ```
 
-  As we deliver package in souce form, and the user is responsible to build them for their platform, they have to be
+  As we deliver package in source form, and the user is responsible to build them for their platform, they must be
   aware of these feature flags (documented in CHANGELOG.md), and enable it explicitly through their build system (cmake
   / bazel or others ) to use the preview feature.
 
