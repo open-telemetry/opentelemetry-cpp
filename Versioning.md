@@ -19,11 +19,11 @@ must remain backwards compatible. Internal types are allowed to break.
 
 ## Policy
 
-* Releases will follow [SemVer](https://semver.org/).
+* Release versions will follow [SemVer 2.0](https://semver.org/).
 * Only single source package containing api and sdk for all signals would be released as part of the new GitHub release.
-* New telemetry signals will be introduced behind experimental feature flag using C macro define.
+* Experimental releases: New (unstable) telemetry signals and features will be introduced behind feature flag using C macro define.
   ```
-    #ifdef METRICS_PREVIEW
+    #ifdef FEATURE_FLAG
          <metrics api/sdk definitions>
     #endif
   ```
@@ -31,6 +31,16 @@ must remain backwards compatible. Internal types are allowed to break.
   As we deliver package in source form, and the user is responsible to build them for their platform, they must be
   aware of these feature flags (documented in CHANGELOG.md), and enable it explicitly through their build system (cmake
   , bazel or others ) to use the preview feature.
+
+  The guidelines in creating feature flag would be:
+  - Naming:
+
+        - `ENABLE_<SIGNAL>_PREVIEW` : For experimetal release of signal api/sdks eg, METRICS_PREVIEW, LOGGING_PREVIEW,
+
+        - `ENABLE_<SIGNAL>_<FEATURE_NAME>_PREVIEW` : For experimental release for any feature within stable signal. Eg, TRACING_JAEGER_PREVIEW to release the experimental Jaeger exporter for tracing.
+
+  - Cleanup: It is good practice to keep feature-flags shortlived as possible. And, aslo important to keep the number of them low. They should be used such that it is easy to remove/cleanup them once the experimental feature is stable.
+
 
 * New signals will be stabilized via a **minor version bump**, and are not allowed to break existing stable interfaces.
 Feature flag would be removed once we have a stable implementation for the signal.
