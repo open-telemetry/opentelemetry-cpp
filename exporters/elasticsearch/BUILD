@@ -22,7 +22,7 @@ cc_test(
     srcs = ["test/es_log_exporter_test.cc"],
     deps = [
         ":es_log_exporter",
-        "@curl",
         "@com_google_googletest//:gtest_main",
+        "@curl",
     ],
 )
