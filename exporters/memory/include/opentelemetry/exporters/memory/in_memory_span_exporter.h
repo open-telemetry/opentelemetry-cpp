@@ -55,9 +55,13 @@ public:
   /**
    * @param timeout an optional value containing the timeout of the exporter
    * note: passing custom timeout values is not currently supported for this exporter
+   * @return Returns the status of the operation
    */
-  void Shutdown(
-      std::chrono::microseconds timeout = std::chrono::microseconds(0)) noexcept override{};
+  bool Shutdown(
+      std::chrono::microseconds timeout = std::chrono::microseconds::max()) noexcept override
+  {
+    return true;
+  };
 
   /**
    * @return Returns a shared pointer to this exporters InMemorySpanData

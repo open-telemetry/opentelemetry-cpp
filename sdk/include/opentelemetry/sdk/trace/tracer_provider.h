@@ -55,7 +55,7 @@ public:
   /**
    * Shutdown the span processor associated with this tracer provider.
    */
-  void Shutdown() noexcept;
+  bool Shutdown() noexcept;
 
 private:
   opentelemetry::sdk::AtomicSharedPtr<SpanProcessor> processor_;
