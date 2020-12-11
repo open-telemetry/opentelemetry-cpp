@@ -12,6 +12,7 @@ namespace otlp     = opentelemetry::exporter::otlp;
 
 namespace
 {
+opentelemetry::exporter::otlp::OtlpExporterOptions opts;
 void InitTracer()
 {
   // Create OTLP exporter instance
@@ -25,8 +26,12 @@ void InitTracer()
 }
 }  // namespace
 
-int main()
+int main(int argc, char *argv[])
 {
+  if (argc > 1)
+  {
+    opts.endpoint = argv[1];
+  }
   // Removing this line will leave the default noop TracerProvider in place.
   InitTracer();
 
