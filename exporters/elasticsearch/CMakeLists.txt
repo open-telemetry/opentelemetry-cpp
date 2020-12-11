@@ -1,4 +1,5 @@
 include_directories(include)
+include_directories(${CMAKE_SOURCE_DIR}/ext/include)
 
 add_library(opentelemetry_exporter_elasticsearch_logs src/es_log_exporter.cc)
 

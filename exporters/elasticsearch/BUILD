@@ -10,10 +10,10 @@ cc_library(
     ],
     strip_include_prefix = "include",
     deps = [
-        "//sdk/src/logs",
         "//ext:headers",
-        "@github_nlohmann_json//:json",
+        "//sdk/src/logs",
         "@curl",
+        "@github_nlohmann_json//:json",
     ],
 )
 
@@ -22,6 +22,7 @@ cc_test(
     srcs = ["test/es_log_exporter_test.cc"],
     deps = [
         ":es_log_exporter",
+        "@curl",
         "@com_google_googletest//:gtest_main",
     ],
 )

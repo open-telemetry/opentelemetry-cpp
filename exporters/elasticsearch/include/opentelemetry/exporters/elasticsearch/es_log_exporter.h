@@ -1,10 +1,10 @@
 #pragma once
 
 #include "nlohmann/json.hpp"
+#include "opentelemetry/ext//http/client/curl//http_client_curl.h"
 #include "opentelemetry/logs/log_record.h"
 #include "opentelemetry/nostd/type_traits.h"
 #include "opentelemetry/sdk/logs/exporter.h"
-#include "opentelemetry/ext//http/client/curl//http_client_curl.h"
 
 #include "opentelemetry/version.h"
 
@@ -15,7 +15,7 @@
 
 namespace nostd   = opentelemetry::nostd;
 namespace sdklogs = opentelemetry::sdk::logs;
-using json = nlohmann::json;
+using json        = nlohmann::json;
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace exporter
@@ -39,19 +39,24 @@ struct ElasticsearchExporterOptions
   bool console_debug_;
 
   /**
-   * 
+   *
    * @param host The host of the Elasticsearch instance
-   * @param port The port of the Elasticsearch instance 
+   * @param port The port of the Elasticsearch instance
    * @param index The index/shard that the logs will be written to
-   * @param response_timeout The maximum time the exporter should wait after sending a request to Elasticsearch
+   * @param response_timeout The maximum time the exporter should wait after sending a request to
+   * Elasticsearch
    * @param console_debug Print the status of the exporter methods in the console
    */
-  ElasticsearchExporterOptions(std::string host = "localhost", int port = 9200, std::string index = "logs/_doc?pretty", int response_timeout = 30, bool console_debug = false) : 
-      host_{host},
-      port_{port},
-      index_{index},
-      response_timeout_{response_timeout},
-      console_debug_{console_debug}
+  ElasticsearchExporterOptions(std::string host     = "localhost",
+                               int port             = 9200,
+                               std::string index    = "logs/_doc?pretty",
+                               int response_timeout = 30,
+                               bool console_debug   = false)
+      : host_{host},
+        port_{port},
+        index_{index},
+        response_timeout_{response_timeout},
+        console_debug_{console_debug}
   {}
 };
 
@@ -73,22 +78,23 @@ public:
   ElasticsearchLogExporter(const ElasticsearchExporterOptions &options);
 
   /**
-   * Exports a vector of log records to the Elasticsearch instance. Guaranteed to return after a  
+   * Exports a vector of log records to the Elasticsearch instance. Guaranteed to return after a
    * timeout specified from the options passed from the constructor.
    * @param records A list of log records to send to Elasticsearch.
    */
-  sdklogs::ExportResult Export(const nostd::span<std::unique_ptr<opentelemetry::logs::LogRecord>> 
-                                      &records) noexcept override;
+  sdklogs::ExportResult Export(const nostd::span<std::unique_ptr<opentelemetry::logs::LogRecord>>
+                                   &records) noexcept override;
 
   /**
-   * Shutdown this exporter. 
+   * Shutdown this exporter.
    * @param timeout The maximum time to wait for the shutdown method to return
    */
   bool Shutdown(std::chrono::microseconds timeout = std::chrono::microseconds(0)) noexcept override;
+
 private:
   // Stores if this exporter had its Shutdown() method called
   bool isShutdown_ = false;
-  
+
   // Configuration options for the exporter
   ElasticsearchExporterOptions options_;
 
@@ -98,44 +104,44 @@ private:
 
   /**
    * Converts a log record into a nlohmann::json object.
-   */ 
+   */
   json RecordToJSON(std::unique_ptr<opentelemetry::logs::LogRecord> record);
 
   /**
    * Converts a common::AttributeValue into a string, which is used for parsing the attributes
    * and resource KeyValueIterables
-   */ 
+   */
   const std::string ValueToString(const common::AttributeValue &value)
-   {
-     switch (value.index())
-     {
-       case common::AttributeType::TYPE_BOOL:
-         return (opentelemetry::nostd::get<bool>(value) ? "true" : "false");
-         break;
-       case common::AttributeType::TYPE_INT:
-         return std::to_string(opentelemetry::nostd::get<int>(value));
-         break;
-       case common::AttributeType::TYPE_INT64:
-         return std::to_string(opentelemetry::nostd::get<int64_t>(value));
-         break;
-       case common::AttributeType::TYPE_UINT:
-         return std::to_string(opentelemetry::nostd::get<unsigned int>(value));
-         break;
-       case common::AttributeType::TYPE_UINT64:
-         return std::to_string(opentelemetry::nostd::get<uint64_t>(value));
-         break;
-       case common::AttributeType::TYPE_DOUBLE:
-         return std::to_string(opentelemetry::nostd::get<double>(value));
-         break;
-       case common::AttributeType::TYPE_STRING:
-       case common::AttributeType::TYPE_CSTRING:
-         return opentelemetry::nostd::get<opentelemetry::nostd::string_view>(value).data();
-         break;
-       default:
-          return "Invalid type";
-          break;
-     }
-   }
+  {
+    switch (value.index())
+    {
+      case common::AttributeType::TYPE_BOOL:
+        return (opentelemetry::nostd::get<bool>(value) ? "true" : "false");
+        break;
+      case common::AttributeType::TYPE_INT:
+        return std::to_string(opentelemetry::nostd::get<int>(value));
+        break;
+      case common::AttributeType::TYPE_INT64:
+        return std::to_string(opentelemetry::nostd::get<int64_t>(value));
+        break;
+      case common::AttributeType::TYPE_UINT:
+        return std::to_string(opentelemetry::nostd::get<unsigned int>(value));
+        break;
+      case common::AttributeType::TYPE_UINT64:
+        return std::to_string(opentelemetry::nostd::get<uint64_t>(value));
+        break;
+      case common::AttributeType::TYPE_DOUBLE:
+        return std::to_string(opentelemetry::nostd::get<double>(value));
+        break;
+      case common::AttributeType::TYPE_STRING:
+      case common::AttributeType::TYPE_CSTRING:
+        return opentelemetry::nostd::get<opentelemetry::nostd::string_view>(value).data();
+        break;
+      default:
+        return "Invalid type";
+        break;
+    }
+  }
 };
 }  // namespace logs
 }  // namespace exporter
