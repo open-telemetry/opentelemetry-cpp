@@ -74,12 +74,7 @@ struct AttributeConverter
   template <typename T, typename U = T>
   LogRecordAttributeValue convertSpan(nostd::span<const U> vals)
   {
-    std::vector<T> copy;
-    for (auto &val : vals)
-    {
-      copy.push_back(T(val));
-    }
-
+    const std::vector<T> copy(vals.begin(), vals.end());
     return LogRecordAttributeValue(std::move(copy));
   }
 };
