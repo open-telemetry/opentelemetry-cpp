@@ -30,7 +30,7 @@ must remain backwards compatible. Internal types are allowed to break.
 
   As we deliver package in source form, and the user is responsible to build them for their platform, they must be
   aware of these feature flags (documented in CHANGELOG.md), and enable it explicitly through their build system (cmake
-  / bazel or others ) to use the preview feature.
+  , bazel or others ) to use the preview feature.
 
 * New signals will be stabilized via a **minor version bump**, and are not allowed to break existing stable interfaces.
 Feature flag would be removed once we have a stable implementation for the signal.
