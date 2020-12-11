@@ -43,22 +43,16 @@ class Logger
 {
 protected:
   // Default values to set for fields that the user doesn't specify
-  core::SystemTimestamp default_timestamp_ =
-      std::chrono::system_clock::now();  // uint64 nanoseconds since Unix epoch, default 0
-  Severity default_severity_;            // default 0 (kInvalid)
-  nostd::string_view default_name_;      // default 0 length, nullptr data
-  nostd::string_view default_body_;      // default 0 length, nullptr data. TODO: currently a simple
-                                         // string, but should be changed "Any" type
-  trace::TraceId default_trace_id_;      // default 00000000000000000000000000000000
-  trace::SpanId default_span_id_;        // default 0000000000000000
-  trace::TraceFlags default_trace_flags_;  // default 00
+  Severity default_severity_;        // default 0 (severity of kInvalid)
+  nostd::string_view default_name_;  // default 0 length, nullptr data
+  nostd::string_view default_body_;  // default 0 length, nullptr data. TODO: currently a simple
+                                     // string, but should be changed "Any" type
+  trace::TraceId default_trace_id_;  // default 00000000000000000000000000000000, in base 16
+  trace::SpanId default_span_id_;    // default 0000000000000000, in base 16
+  trace::TraceFlags default_trace_flags_;  // default 00, in base 16
 
 public:
   virtual ~Logger() = default;
-
-  /* Returns the name of the logger */
-  // TODO: decide whether this is useful and/or should be kept, as this is not a method required in
-  // the specification. virtual nostd::string_view getName() = 0;
 
   /**
    * Each of the following overloaded Log(...) methods
@@ -148,7 +142,7 @@ public:
   // Set default time, and call base Log(severity, message, time) method
   void Log(Severity severity, nostd::string_view message) noexcept
   {
-    this->Log(severity, message, default_timestamp_);
+    this->Log(severity, message, std::chrono::system_clock::now());
   }
 
   // Set default severity then call Log(Severity, String message) method

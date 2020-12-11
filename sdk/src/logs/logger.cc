@@ -28,7 +28,7 @@ Logger::Logger(std::shared_ptr<LoggerProvider> logger_provider) noexcept
 {}
 
 /**
- * Create and popualte recordable with the log event's fields passed in.
+ * Create and populate recordable with the log event's fields passed in.
  * The timestamp, severity, traceid, spanid, and traceflags, are injected
  * if the user does not specify them.
  */
@@ -49,7 +49,7 @@ void Logger::Log(core::SystemTimestamp timestamp,
     return;
   }
 
-  // TODO: Sampler logic (should include check for minSeverity)
+  // TODO: Sampler (should include check for minSeverity)
 
   auto recordable = processor->MakeRecordable();
   if (recordable == nullptr)
@@ -59,16 +59,7 @@ void Logger::Log(core::SystemTimestamp timestamp,
   }
 
   // Populate recordable fields
-  if (timestamp == this->default_timestamp_)
-  {
-    // Inject current timestamp if none is specified by user
-    recordable->SetTimestamp(core::SystemTimestamp(std::chrono::system_clock::now()));
-  }
-  else
-  {
-    recordable->SetTimestamp(timestamp);
-  }
-
+  recordable->SetTimestamp(timestamp);
   recordable->SetSeverity(severity);
   recordable->SetName(name);
   recordable->SetBody(body);
@@ -110,7 +101,7 @@ void Logger::Log(core::SystemTimestamp timestamp,
     recordable->SetSpanId(span_id);
   }
 
-  // Traceflag
+  // Traceflags
   if (!trace_flags.IsSampled())
   {
     recordable->SetTraceFlags(span_context.trace_flags());
