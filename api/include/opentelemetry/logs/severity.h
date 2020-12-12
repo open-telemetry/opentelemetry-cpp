@@ -55,12 +55,12 @@ enum class Severity : uint8_t
 };
 
 /**
- * Internal mapping of the severity enum values above to the severity text that
- * can be printed out by exporters.
+ * Mapping of the severity enum above, to a severity text string (in all caps).
+ * This severity text can be printed out by exporters. Capital letters follow the
+ * spec naming convention.
  *
- * This is included because the specification recommends printing both severity
- * number and text in log records. The convention uses all capital letters to follow
- * the specification's convention as well.
+ * Included to follow the specification's recommendation to print both
+ * severity number and text in each log record.
  */
 const opentelemetry::nostd::string_view SeverityNumToText[25] = {
     "INVALID", "TRACE",  "TRACE2", "TRACE3", "TRACE4", "DEBUG",  "DEBUG2", "DEBUG3", "DEBUG4",

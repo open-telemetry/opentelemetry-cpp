@@ -29,7 +29,7 @@ namespace logs
 {
 
 /**
- * A default Event object to be passed in log statements,
+ * A default Recordable implemenation to be passed in log statements,
  * matching the 10 fields of the Log Data Model.
  * (https://github.com/open-telemetry/opentelemetry-specification/blob/master/specification/logs/data-model.md#log-and-event-record-definition)
  *
@@ -37,24 +37,20 @@ namespace logs
 class LogRecord final : public Recordable
 {
 private:
-  // Log Data Model fields
-  core::SystemTimestamp timestamp_;               // uint64 nanoseconds since Unix epoch
-  opentelemetry::trace::TraceId trace_id_;        // byte sequence
-  opentelemetry::trace::SpanId span_id_;          // byte sequence
-  opentelemetry::trace::TraceFlags trace_flags_;  // byte
-  opentelemetry::logs::Severity severity_;        // Severity enum
-  std::string name_;                              // string
-  std::string body_;  // currently a simple string, but should be changed "Any" type
+  // Default values are set by the respective data structures' constructors for all fields,
+  // except the severity field, which must be set manually (an enum with no default value).
+  opentelemetry::logs::Severity severity_ = opentelemetry::logs::Severity::kInvalid;
   AttributeMap resource_map_;
   AttributeMap attributes_map_;
+  std::string name_;
+  std::string body_;  // Currently a simple string, but should be changed to "Any" type
+  opentelemetry::trace::TraceId trace_id_;
+  opentelemetry::trace::SpanId span_id_;
+  opentelemetry::trace::TraceFlags trace_flags_;
+  core::SystemTimestamp timestamp_;  // uint64 nanoseconds since Unix epoch
 
 public:
   /********** Setters for each field (overrides methods from the Recordable interface) ************/
-  /**
-   * Set the timestamp for this log.
-   * @param timestamp the timestamp of the event
-   */
-  void SetTimestamp(core::SystemTimestamp timestamp) noexcept override { timestamp_ = timestamp; }
 
   /**
    * Set the severity for this log.
@@ -127,13 +123,13 @@ public:
     trace_flags_ = trace_flags;
   }
 
-  /************************** Getters for each field ****************************/
-
   /**
-   * Get the timestamp for this log
-   * @return the timestamp for this log
+   * Set the timestamp for this log.
+   * @param timestamp the timestamp of the event
    */
-  core::SystemTimestamp GetTimestamp() const noexcept { return timestamp_; }
+  void SetTimestamp(core::SystemTimestamp timestamp) noexcept override { timestamp_ = timestamp; }
+
+  /************************** Getters for each field ****************************/
 
   /**
    * Get the severity for this log
@@ -188,6 +184,12 @@ public:
    * @return the trace flags for this log
    */
   opentelemetry::trace::TraceFlags GetTraceFlags() const noexcept { return trace_flags_; }
+
+  /**
+   * Get the timestamp for this log
+   * @return the timestamp for this log
+   */
+  core::SystemTimestamp GetTimestamp() const noexcept { return timestamp_; }
 };
 }  // namespace logs
 }  // namespace sdk

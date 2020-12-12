@@ -82,15 +82,14 @@ void Logger::Log(opentelemetry::logs::Severity severity,
   auto tracer       = provider->GetTracer(logger_name_);
   auto span_context = tracer->GetCurrentSpan()->GetContext();
 
-
   // Leave these fields in the recordable empty if neither the passed in values
-  // nor the context values is valid (e.g. the application is not using traces)
+  // nor the context values are valid (e.g. the application is not using traces)
 
   // Traceid
   if (trace_id.IsValid())
   {
     recordable->SetTraceId(trace_id);
-  } 
+  }
   else if (span_context.trace_id().IsValid())
   {
     recordable->SetTraceId(span_context.trace_id());
@@ -104,17 +103,17 @@ void Logger::Log(opentelemetry::logs::Severity severity,
   else if (span_context.span_id().IsValid())
   {
     recordable->SetSpanId(span_id);
-  } 
+  }
 
   // Traceflags
   if (trace_flags.IsSampled())
   {
     recordable->SetTraceFlags(trace_flags);
   }
-  else if(span_context.trace_flags().IsSampled())
+  else if (span_context.trace_flags().IsSampled())
   {
     recordable->SetTraceFlags(span_context.trace_flags());
-  } 
+  }
 
   // Send the log record to the processor
   processor->OnReceive(std::move(recordable));
