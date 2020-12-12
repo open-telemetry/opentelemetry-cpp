@@ -48,15 +48,15 @@ TEST(Logger, NoopLog)
 // Define a basic Logger class
 class TestLogger : public Logger
 {
-  void Log(opentelemetry::core::SystemTimestamp timestamp,
-           Severity severity,
+  void Log(Severity severity,
            string_view name,
            string_view body,
            const opentelemetry::common::KeyValueIterable &resource,
            const opentelemetry::common::KeyValueIterable &attributes,
            opentelemetry::trace::TraceId trace_id,
            opentelemetry::trace::SpanId span_id,
-           opentelemetry::trace::TraceFlags trace_flags) noexcept override
+           opentelemetry::trace::TraceFlags trace_flags,
+           opentelemetry::core::SystemTimestamp timestamp) noexcept override
   {}
 };
 

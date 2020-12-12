@@ -40,11 +40,11 @@ public:
    * Initialize a new logger.
    * @param logger_provider The logger provider that owns this logger.
    */
-  explicit Logger(std::shared_ptr<LoggerProvider> logger_provider) noexcept;
+  explicit Logger(opentelemetry::nostd::string_view name,
+                  std::shared_ptr<LoggerProvider> logger_provider) noexcept;
 
   /**
    * Writes a log record into the processor.
-   * @param timestamp the timestamp the log record was created.
    * @param severity the severity level of the log event.
    * @param name the name of the log event.
    * @param message the string message of the log (perhaps support std::fmt or fmt-lib format).
@@ -55,21 +55,25 @@ public:
    * @param trace_id the trace id associated with the log event.
    * @param span_id the span id associate with the log event.
    * @param trace_flags the trace flags associated with the log event.
+   * @param timestamp the timestamp the log record was created.
    * @throws No exceptions under any circumstances.   */
-  void Log(core::SystemTimestamp timestamp,
-           opentelemetry::logs::Severity severity,
+  void Log(opentelemetry::logs::Severity severity,
            nostd::string_view name,
            nostd::string_view body,
            const common::KeyValueIterable &resource,
            const common::KeyValueIterable &attributes,
            trace::TraceId trace_id,
            trace::SpanId span_id,
-           trace::TraceFlags trace_flags) noexcept override;
+           trace::TraceFlags trace_flags,
+           core::SystemTimestamp timestamp) noexcept override;
 
 private:
   // The logger provider of this Logger. Uses a weak_ptr to avoid cyclic dependancy issues the with
   // logger provider
   std::weak_ptr<LoggerProvider> logger_provider_;
+
+  // The name of this logger
+  opentelemetry::nostd::string_view logger_name_;
 };
 
 }  // namespace logs

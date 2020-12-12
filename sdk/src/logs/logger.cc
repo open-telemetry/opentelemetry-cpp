@@ -23,8 +23,9 @@ namespace sdk
 {
 namespace logs
 {
-Logger::Logger(std::shared_ptr<LoggerProvider> logger_provider) noexcept
-    : logger_provider_(logger_provider)
+Logger::Logger(opentelemetry::nostd::string_view name,
+               std::shared_ptr<LoggerProvider> logger_provider) noexcept
+    : logger_name_(name), logger_provider_(logger_provider)
 {}
 
 /**
@@ -32,15 +33,15 @@ Logger::Logger(std::shared_ptr<LoggerProvider> logger_provider) noexcept
  * The timestamp, severity, traceid, spanid, and traceflags, are injected
  * if the user does not specify them.
  */
-void Logger::Log(core::SystemTimestamp timestamp,
-                 opentelemetry::logs::Severity severity,
+void Logger::Log(opentelemetry::logs::Severity severity,
                  nostd::string_view name,
                  nostd::string_view body,
                  const common::KeyValueIterable &resource,
                  const common::KeyValueIterable &attributes,
                  opentelemetry::trace::TraceId trace_id,
                  opentelemetry::trace::SpanId span_id,
-                 opentelemetry::trace::TraceFlags trace_flags) noexcept
+                 opentelemetry::trace::TraceFlags trace_flags,
+                 core::SystemTimestamp timestamp) noexcept
 {
   // If this logger does not have a processor, no need to create a log record
   auto processor = logger_provider_.lock()->GetProcessor();
@@ -78,11 +79,11 @@ void Logger::Log(core::SystemTimestamp timestamp,
 
   // Inject trace_id/span_id/trace_flags if none is set by user
   auto provider     = opentelemetry::trace::Provider::GetTracerProvider();
-  auto tracer       = provider->GetTracer("foo_library");
+  auto tracer       = provider->GetTracer(logger_name_);
   auto span_context = tracer->GetCurrentSpan()->GetContext();
 
   // Traceid
-  if (!trace_id.IsValid())
+  if (!trace_id.IsValid() && span_context.trace_id().IsValid())
   {
     recordable->SetTraceId(span_context.trace_id());
   }
@@ -92,7 +93,7 @@ void Logger::Log(core::SystemTimestamp timestamp,
   }
 
   // Spanid
-  if (!span_id.IsValid())
+  if (!span_id.IsValid() && span_context.span_id().IsValid())
   {
     recordable->SetSpanId(span_context.span_id());
   }

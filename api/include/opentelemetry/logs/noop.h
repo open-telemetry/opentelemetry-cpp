@@ -50,15 +50,15 @@ namespace logs
 class NoopLogger final : public Logger
 {
 public:
-  void Log(core::SystemTimestamp timestamp,
-           Severity severity,
+  void Log(Severity severity,
            nostd::string_view name,
            nostd::string_view body,
            const common::KeyValueIterable &resource,
            const common::KeyValueIterable &attributes,
            trace::TraceId trace_id,
            trace::SpanId span_id,
-           trace::TraceFlags trace_flags) noexcept override
+           trace::TraceFlags trace_flags,
+           core::SystemTimestamp timestamp) noexcept override
   {}
 };
 
