@@ -73,7 +73,7 @@ private:
   std::weak_ptr<LoggerProvider> logger_provider_;
 
   // The name of this logger
-  opentelemetry::nostd::string_view logger_name_;
+  std::string logger_name_;
 };
 
 }  // namespace logs
