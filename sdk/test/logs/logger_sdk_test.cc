@@ -34,13 +34,34 @@ TEST(LoggerSDK, LogToNullProcessor)
   logger->Log("Test log");
 }
 
-class DummyProcessor : public LogProcessor
+class MockProcessor final : public LogProcessor
 {
+private:
+  std::shared_ptr<LogRecord> record_received_;
+
+public:
+  // A processor used for testing that keeps a track of the recordable it received
+  explicit MockProcessor(std::shared_ptr<LogRecord> record_received) noexcept
+      : record_received_(record_received)
+  {}
+
   std::unique_ptr<Recordable> MakeRecordable() noexcept
   {
     return std::unique_ptr<Recordable>(new LogRecord);
   }
-  void OnReceive(std::unique_ptr<Recordable> &&record) noexcept {}
+  // OnReceive stores the record it receives into the shared_ptr recordable passed into its
+  // constructor
+  void OnReceive(std::unique_ptr<Recordable> &&record) noexcept
+  {
+    // Cast the recordable received into a concrete LogRecord type
+    auto copy = std::shared_ptr<LogRecord>(static_cast<LogRecord *>(record.release()));
+
+    // Copy over the received log record's name, body, timestamp fields over to the recordable
+    // passed in the constructor
+    record_received_->SetSeverity(copy->GetSeverity());
+    record_received_->SetBody(copy->GetBody());
+    record_received_->SetTimestamp(copy->GetTimestamp());
+  }
   bool ForceFlush(std::chrono::microseconds timeout = std::chrono::microseconds(0)) noexcept
   {
     return true;
@@ -65,11 +86,16 @@ TEST(LoggerSDK, LogToAProcessor)
   ASSERT_EQ(logger, logger2);
 
   // Set a processor for the LoggerProvider
-  std::shared_ptr<LogProcessor> processor = std::shared_ptr<LogProcessor>(new DummyProcessor());
+  auto shared_recordable = std::shared_ptr<LogRecord>(new LogRecord());
+  auto processor         = std::shared_ptr<LogProcessor>(new MockProcessor(shared_recordable));
   lp->SetProcessor(processor);
   ASSERT_EQ(processor, lp->GetProcessor());
 
-  // Should later introduce a way to assert that
-  // the logger's processor is the same as "proc"
-  // and that the logger's processor is the same as lp's processor
+  // Check that the recordable created by the Log() statement is set properly
+  opentelemetry::core::SystemTimestamp now(std::chrono::system_clock::now());
+  logger->Log(opentelemetry::logs::Severity::kWarn, "Message", now);
+
+  ASSERT_EQ(shared_recordable->GetSeverity(), opentelemetry::logs::Severity::kWarn);
+  ASSERT_EQ(shared_recordable->GetBody(), "Message");
+  ASSERT_EQ(shared_recordable->GetTimestamp().time_since_epoch(), now.time_since_epoch());
 }
