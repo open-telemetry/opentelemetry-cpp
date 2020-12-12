@@ -54,6 +54,14 @@ enum class Severity : uint8_t
   kFatal4
 };
 
+/**
+ * Internal mapping of the severity enum values above to the severity text that
+ * can be printed out by exporters.
+ *
+ * This is included because the specification recommends printing both severity
+ * number and text in log records. The convention uses all capital letters to follow
+ * the specification's convention as well.
+ */
 const opentelemetry::nostd::string_view SeverityNumToText[25] = {
     "INVALID", "TRACE",  "TRACE2", "TRACE3", "TRACE4", "DEBUG",  "DEBUG2", "DEBUG3", "DEBUG4",
     "INFO",    "INFO2",  "INFO3",  "INFO4",  "WARN",   "WARN2",  "WARN3",  "WARN4",  "ERROR",
