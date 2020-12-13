@@ -69,12 +69,12 @@ TEST(LoggerProviderSDK, LoggerProviderLoggerArguments)
 
 class DummyProcessor : public LogProcessor
 {
-  void OnReceive(std::shared_ptr<opentelemetry::logs::LogRecord> record) noexcept {}
-  bool ForceFlush(std::chrono::microseconds timeout = std::chrono::microseconds::max()) noexcept
+  void OnReceive(std::unique_ptr<opentelemetry::logs::LogRecord> &&record) noexcept {}
+  bool ForceFlush(std::chrono::microseconds timeout = std::chrono::microseconds(0)) noexcept
   {
     return true;
   }
-  bool Shutdown(std::chrono::microseconds timeout = std::chrono::microseconds::max()) noexcept
+  bool Shutdown(std::chrono::microseconds timeout = std::chrono::microseconds(0)) noexcept
   {
     return true;
   }

@@ -1,12 +1,27 @@
+/*
+ * Copyright The OpenTelemetry Authors
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 #pragma once
 
-#include "opentelemetry/logs/log_record.h"
 #include "opentelemetry/nostd/type_traits.h"
 #include "opentelemetry/sdk/logs/exporter.h"
+#include "opentelemetry/sdk/logs/log_record.h"
 #include "opentelemetry/version.h"
 
 #include <iostream>
-#include <map>
 #include <sstream>
 
 OPENTELEMETRY_BEGIN_NAMESPACE
@@ -26,13 +41,90 @@ public:
    */
   explicit OStreamLogExporter(std::ostream &sout = std::cout) noexcept;
 
-  /*********************** Overloads of LogExporter interface *********************/
+  /*********************************** Helper functions ************************/
+
+  /*
+    print_value is used to print out the value of an attribute within a vector.
+    These values are held in a variant which makes the process of printing them much more
+    complicated.
+  */
+
+  template <typename T>
+  void print_value(const T &item)
+  {
+    sout_ << item;
+  }
+
+  template <typename T>
+  void print_value(const std::vector<T> &vec)
+  {
+    sout_ << '[';
+    size_t i  = 1;
+    size_t sz = vec.size();
+    for (auto v : vec)
+    {
+      sout_ << v;
+      if (i != sz)
+        sout_ << ',' << ' ';
+      i++;
+    };
+    sout_ << ']';
+  }
+
+// Prior to C++14, generic lambda is not available so fallback to functor.
+#if __cplusplus < 201402L
+
+  class OwnedAttributeValueVisitor
+  {
+  public:
+    OwnedAttributeValueVisitor(OStreamLogExporter &exporter) : exporter_(exporter) {}
+
+    template <typename T>
+    void operator()(T &&arg)
+    {
+      exporter_.print_value(arg);
+    }
+
+  private:
+    OStreamLogExporter &exporter_;
+  };
+
+#endif
+
+  void print_value(sdk::common::OwnedAttributeValue &value)
+  {
+#if __cplusplus < 201402L
+    nostd::visit(OwnedAttributeValueVisitor(*this), value);
+#else
+    nostd::visit([this](auto &&arg) { print_value(arg); }, value);
+#endif
+  }
+
+  void printMap(std::unordered_map<std::string, sdk::common::OwnedAttributeValue> map)
+  {
+    size_t size = map.size();
+    size_t i    = 1;
+    for (auto kv : map)
+    {
+      sout_ << "{" << kv.first << ": ";
+      print_value(kv.second);
+      sout_ << "}";
+
+      if (i != size)
+        sout_ << ", ";
+      i++;
+    }
+  }
+
+  /***********************  LogExporter overloaded methods ***********************/
+
+  std::unique_ptr<sdk::logs::Recordable> MakeRecordable() noexcept override;
 
   /**
    * Exports a span of logs sent from the processor.
    */
   opentelemetry::sdk::logs::ExportResult Export(
-      const opentelemetry::nostd::span<std::shared_ptr<opentelemetry::logs::LogRecord>>
+      const opentelemetry::nostd::span<std::unique_ptr<sdk::logs::Recordable>>
           &records) noexcept override;
 
   /**
@@ -44,107 +136,8 @@ public:
 private:
   // The OStream to send the logs to
   std::ostream &sout_;
-  // Whether this exporter is ShutDown
+  // Whether this exporter has been shut down
   bool is_shutdown_ = false;
-
-  /**
-   * Internal map of the severity number (from 0 to 24) to severity text, matching the
-   * values set by the default Severity enum in api/include/opentelemetry/logs/log_record.h
-   *
-   * If more than one exporter requires this, could move this to Severity enum.
-   */
-  const opentelemetry::nostd::string_view kSeverityNumToText[25] = {
-      "kInvalid", "kTrace",  "kTrace2", "kTrace3", "kTrace4", "kDebug",  "kDebug2",
-      "kDebug3",  "kDebug4", "kInfo",   "kInfo2",  "kInfo3",  "kInfo4",  "kWarn",
-      "kWarn2",   "kWarn3",  "kWarn4",  "kError",  "kError2", "kError3", "kError4",
-      "kFatal",   "kFatal2", "kFatal3", "kFatal4"};
-
-  /**
-   * Helper function to print a KeyValueIterable. Outputs a AttributeValue type.
-   *
-   * Based off api/include/opentelemetry/common/attribute_value.h
-   * In the future, may be better to add operator overloads to attribute_value.h
-   * to make more maintainable.
-   *
-   */
-  void print_value(const common::AttributeValue &value)
-  {
-    switch (value.index())
-    {
-      case common::AttributeType::TYPE_BOOL:
-        sout_ << (opentelemetry::nostd::get<bool>(value) ? "true" : "false");
-        break;
-      case common::AttributeType::TYPE_INT:
-        sout_ << opentelemetry::nostd::get<int>(value);
-        break;
-      case common::AttributeType::TYPE_INT64:
-        sout_ << opentelemetry::nostd::get<int64_t>(value);
-        break;
-      case common::AttributeType::TYPE_UINT:
-        sout_ << opentelemetry::nostd::get<unsigned int>(value);
-        break;
-      case common::AttributeType::TYPE_UINT64:
-        sout_ << opentelemetry::nostd::get<uint64_t>(value);
-        break;
-      case common::AttributeType::TYPE_DOUBLE:
-        sout_ << opentelemetry::nostd::get<double>(value);
-        break;
-      case common::AttributeType::TYPE_STRING:
-      case common::AttributeType::TYPE_CSTRING:
-        sout_ << opentelemetry::nostd::get<opentelemetry::nostd::string_view>(value);
-        break;
-
-        /*** Need to support these? ***/
-        // case common::AttributeType::TYPE_SPAN_BOOL:
-        //   sout_ << opentelemetry::nostd::get<opentelemetry::nostd::span<const bool>>(value);
-        //   break;
-        // case common::AttributeType::TYPE_SPAN_INT:
-        //   sout_ << opentelemetry::nostd::get<opentelemetry::nostd::span<const int>>(value);
-        //   break;
-        // case common::AttributeType::TYPE_SPAN_INT64:
-        //   sout_ << opentelemetry::nostd::get<opentelemetry::nostd::span<const int64_t>>(value);
-        //   break;
-        // case common::AttributeType::TYPE_SPAN_UINT:
-        //   sout_ << opentelemetry::nostd::get<opentelemetry::nostd::span<const unsigned
-        //   int>>(value); break;
-        // case common::AttributeType::TYPE_SPAN_UINT64:
-        //   sout_ << opentelemetry::nostd::get<opentelemetry::nostd::span<const uint64_t>>(value);
-        //   break;
-        // case common::AttributeType::TYPE_SPAN_DOUBLE:
-        //   sout_ << opentelemetry::nostd::get<opentelemetry::nostd::span<const double>>(value);
-        //   break;
-        // case common::AttributeType::TYPE_SPAN_STRING:
-        //   sout_ << opentelemetry::nostd::get<opentelemetry::nostd::span<const
-        //   opentelemetry::nostd::string_view>>(value); break;
-        /******** Up to here ************/
-
-      default:
-        sout_ << "Invalid type";
-        break;
-    }
-  }
-
-  /**
-   * Helper function to print a KeyValueIterable.
-   * Outputs a <Key, Value> pair of type <string_view, AttributeValue>
-   */
-  void printKV(bool &firstKV,
-               const opentelemetry::nostd::string_view &key,
-               const common::AttributeValue &value)
-  {
-    if (firstKV)
-    {
-      firstKV = false;
-    }
-    else
-    {
-      sout_ << ", ";
-    }
-
-    sout_ << "{" << key << ": ";
-    print_value(value);
-    sout_ << "}";
-  }
 };
 }  // namespace logs
 }  // namespace exporter
