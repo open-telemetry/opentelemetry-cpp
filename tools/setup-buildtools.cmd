@@ -27,7 +27,7 @@ if ERRORLEVEL 0 (
 )
 
 REM Try to autodetect Visual Studio
-call "%~dp0\vcvars.cmd"
+call "%~dp0vcvars.cmd" x64
 if "%TOOLS_VS_NOTFOUND%" == "1" (
   REM Cannot detect MSBuild path
   REM TODO: no command line tools..
@@ -51,5 +51,6 @@ vcpkg install ms-gsl:x64-windows
 vcpkg install nlohmann-json:x64-windows
 vcpkg install abseil:x64-windows
 vcpkg install protobuf:x64-windows
+vcpkg install gRPC:x64-windows
 popd
 exit /b 0
