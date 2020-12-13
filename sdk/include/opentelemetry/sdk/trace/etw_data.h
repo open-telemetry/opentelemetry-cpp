@@ -497,6 +497,11 @@ public:
 
   void SetName(nostd::string_view name) noexcept override { name_ = std::string(name); }
 
+  void SetSpanKind(opentelemetry::trace::SpanKind span_kind) noexcept override
+  {
+    span_kind_ = span_kind;
+  }
+
   void SetStartTime(opentelemetry::core::SystemTimestamp start_time) noexcept override
   {
     start_time_ = start_time;
@@ -522,6 +527,7 @@ private:
   opentelemetry::trace::CanonicalCode status_code_{opentelemetry::trace::CanonicalCode::OK};
   std::string status_desc_;
   AttributeMap attribute_map_;
+  opentelemetry::trace::SpanKind span_kind_{opentelemetry::trace::SpanKind::kInternal};
   nostd::shared_ptr<opentelemetry::trace::Tracer> tracer_;
   nostd::shared_ptr<opentelemetry::trace::Span> span_;
 };

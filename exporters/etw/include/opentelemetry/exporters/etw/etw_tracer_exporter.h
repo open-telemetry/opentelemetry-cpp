@@ -95,8 +95,10 @@ public:
    * @param timeout an optional value containing the timeout of the exporter
    * note: passing custom timeout values is not currently supported for this exporter
    */
-  void Shutdown(
-      std::chrono::microseconds timeout = std::chrono::microseconds(0)) noexcept override{};
+  bool Shutdown(std::chrono::microseconds timeout = std::chrono::microseconds(0)) noexcept override
+  {
+    return true;
+  };
 
 private:
   std::string providerName_;
