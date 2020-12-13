@@ -1,6 +1,20 @@
-#include "opentelemetry/exporters/elasticsearch/es_log_exporter.h"
+/*
+ * Copyright The OpenTelemetry Authors
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 
-#include <iostream>
+#include "opentelemetry/exporters/elasticsearch/es_log_exporter.h"
 
 namespace nostd       = opentelemetry::nostd;
 namespace sdklogs     = opentelemetry::sdk::logs;
@@ -74,11 +88,7 @@ ElasticsearchLogExporter::ElasticsearchLogExporter() : options_(ElasticsearchExp
 
 ElasticsearchLogExporter::ElasticsearchLogExporter(const ElasticsearchExporterOptions &options)
     : options_{options}
-{
-  // Create a connection to the ElasticSearch instance
-  // TODO: Figure out why not working
-  // session_ = session_manager_.CreateSession(options_.host_, options_.port_);
-}
+{}
 
 sdklogs::ExportResult ElasticsearchLogExporter::Export(
     const nostd::span<std::unique_ptr<opentelemetry::logs::LogRecord>> &records) noexcept
@@ -86,6 +96,9 @@ sdklogs::ExportResult ElasticsearchLogExporter::Export(
   // Return failure if this exporter has been shutdown
   if (isShutdown_)
   {
+    if (options_.console_debug_)
+      std::cout << "Export failed, exporter is shutdown" << std::endl;
+
     return sdklogs::ExportResult::kFailure;
   }
 
@@ -94,19 +107,20 @@ sdklogs::ExportResult ElasticsearchLogExporter::Export(
 
   for (auto &record : records)
   {
-    // Convert the log record to a JSON object
-
+    // Convert the log record to a JSON object, and store in json array
     logs.emplace_back(RecordToJSON(std::move(record)));
   }
 
   // Create a connection to the ElasticSearch instance
-  auto session = session_manager_.CreateSession(options_.host_, options_.port_);
+  opentelemetry::ext::http::client::curl::SessionManager session_manager;
+  auto session = session_manager.CreateSession(options_.host_, options_.port_);
   auto request = session->CreateRequest();
 
   // Populate the request with headers and methods
   request->SetUri(options_.index_ + "/_bulk?pretty");
   request->SetMethod(http_client::Method::Post);
   request->AddHeader("Content-Type", "application/json");
+  request->SetTimeoutMs(std::chrono::milliseconds(1000 * options_.response_timeout_));
 
   // Add the request body
   std::string body = "";
@@ -131,6 +145,11 @@ sdklogs::ExportResult ElasticsearchLogExporter::Export(
     std::cout << "waiting for response from Elasticsearch (timeout = " << options_.response_timeout_
               << " seconds)" << std::endl;
   bool receivedResponse = handler->waitForResponse(options_.response_timeout_);
+
+  // End the session
+  session->FinishSession();
+  session_manager.CancelAllSessions();
+  session_manager.FinishAllSessions();
 
   // If the response was never received
   if (!receivedResponse)
@@ -164,7 +183,6 @@ sdklogs::ExportResult ElasticsearchLogExporter::Export(
 bool ElasticsearchLogExporter::Shutdown(std::chrono::microseconds timeout) noexcept
 {
   isShutdown_ = true;
-  // session_->FinishSession();
 
   return true;
 }

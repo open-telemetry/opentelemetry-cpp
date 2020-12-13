@@ -1,17 +1,29 @@
+/*
+ * Copyright The OpenTelemetry Authors
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 #pragma once
 
 #include "nlohmann/json.hpp"
-#include "opentelemetry/ext//http/client/curl//http_client_curl.h"
+#include "opentelemetry/ext/http/client/curl/http_client_curl.h"
 #include "opentelemetry/logs/log_record.h"
 #include "opentelemetry/nostd/type_traits.h"
 #include "opentelemetry/sdk/logs/exporter.h"
 
-#include "opentelemetry/version.h"
-
 #include <time.h>
 #include <iostream>
-#include <map>
-#include <sstream>
 
 namespace nostd   = opentelemetry::nostd;
 namespace sdklogs = opentelemetry::sdk::logs;
@@ -39,7 +51,8 @@ struct ElasticsearchExporterOptions
   bool console_debug_;
 
   /**
-   *
+   * Constructor for the ElasticsearchExporterOptions. By default, the endpoint is
+   * localhost:9200/logs with a timeout of 30 seconds and disabled console debugging
    * @param host The host of the Elasticsearch instance
    * @param port The port of the Elasticsearch instance
    * @param index The index/shard that the logs will be written to
@@ -49,7 +62,7 @@ struct ElasticsearchExporterOptions
    */
   ElasticsearchExporterOptions(std::string host     = "localhost",
                                int port             = 9200,
-                               std::string index    = "logs/_doc?pretty",
+                               std::string index    = "logs",
                                int response_timeout = 30,
                                bool console_debug   = false)
       : host_{host},
@@ -61,7 +74,7 @@ struct ElasticsearchExporterOptions
 };
 
 /**
- * The ElasticsearchLogExporter exports logs through an ostream to JSON format
+ * The ElasticsearchLogExporter exports logs to Elasticsearch in JSON format
  */
 class ElasticsearchLogExporter final : public sdklogs::LogExporter
 {
@@ -97,10 +110,6 @@ private:
 
   // Configuration options for the exporter
   ElasticsearchExporterOptions options_;
-
-  // Connection related variables
-  opentelemetry::ext::http::client::curl::SessionManager session_manager_;
-  std::shared_ptr<opentelemetry::ext::http::client::curl::Session> session_;
 
   /**
    * Converts a log record into a nlohmann::json object.

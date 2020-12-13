@@ -11,7 +11,7 @@ if(BUILD_TESTING)
     opentelemetry_exporter_elasticsearch_logs)
 
   gtest_add_tests(
-    TARGET es_log_exporter_test 
-    TEST_PREFIX exporter. 
+    TARGET es_log_exporter_test
+    TEST_PREFIX exporter.
     TEST_LIST es_log_exporter_test)
 endif() # BUILD_TESTING
