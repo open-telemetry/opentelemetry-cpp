@@ -19,7 +19,6 @@
 #include <iostream>
 #include <vector>
 
-using opentelemetry::logs::LogRecord;
 using opentelemetry::sdk::common::AtomicUniquePtr;
 using opentelemetry::sdk::common::CircularBuffer;
 using opentelemetry::sdk::common::CircularBufferRange;
@@ -41,7 +40,12 @@ BatchLogProcessor::BatchLogProcessor(std::unique_ptr<LogExporter> &&exporter,
       worker_thread_(&BatchLogProcessor::DoBackgroundWork, this)
 {}
 
-void BatchLogProcessor::OnReceive(std::unique_ptr<LogRecord> &&record) noexcept
+std::unique_ptr<Recordable> BatchLogProcessor::MakeRecordable() noexcept
+{
+  return exporter_->MakeRecordable();
+}
+
+void BatchLogProcessor::OnReceive(std::unique_ptr<Recordable> &&record) noexcept
 {
   if (is_shutdown_.load() == true)
   {
@@ -140,7 +144,7 @@ void BatchLogProcessor::DoBackgroundWork()
 
 void BatchLogProcessor::Export(const bool was_force_flush_called)
 {
-  std::vector<std::unique_ptr<LogRecord>> records_arr;
+  std::vector<std::unique_ptr<Recordable>> records_arr;
 
   size_t num_records_to_export;
 
@@ -155,11 +159,11 @@ void BatchLogProcessor::Export(const bool was_force_flush_called)
   }
 
   buffer_.Consume(
-      num_records_to_export, [&](CircularBufferRange<AtomicUniquePtr<LogRecord>> range) noexcept {
-        range.ForEach([&](AtomicUniquePtr<LogRecord> &ptr) {
-          std::unique_ptr<LogRecord> swap_ptr = std::unique_ptr<LogRecord>(nullptr);
+      num_records_to_export, [&](CircularBufferRange<AtomicUniquePtr<Recordable>> range) noexcept {
+        range.ForEach([&](AtomicUniquePtr<Recordable> &ptr) {
+          std::unique_ptr<Recordable> swap_ptr = std::unique_ptr<Recordable>(nullptr);
           ptr.Swap(swap_ptr);
-          records_arr.push_back(std::unique_ptr<LogRecord>(swap_ptr.release()));
+          records_arr.push_back(std::unique_ptr<Recordable>(swap_ptr.release()));
           return true;
         });
       });

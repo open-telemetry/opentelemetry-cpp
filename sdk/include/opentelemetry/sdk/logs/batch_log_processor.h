@@ -55,12 +55,15 @@ public:
       const std::chrono::milliseconds schedule_delay_millis = std::chrono::milliseconds(5000),
       const size_t max_export_batch_size                    = 512);
 
+  /** Makes a new recordable **/
+  std::unique_ptr<Recordable> MakeRecordable() noexcept override;
+
   /**
    * Called when the Logger's log method creates a log record
    * @param record the log record
    */
 
-  void OnReceive(std::unique_ptr<opentelemetry::logs::LogRecord> &&record) noexcept override;
+  void OnReceive(std::unique_ptr<Recordable> &&record) noexcept override;
 
   /**
    * Export all log records that have not been exported yet.
@@ -120,7 +123,7 @@ private:
   std::mutex cv_m_, force_flush_cv_m_;
 
   /* The buffer/queue to which the ended logs are added */
-  common::CircularBuffer<opentelemetry::logs::LogRecord> buffer_;
+  common::CircularBuffer<Recordable> buffer_;
 
   /* Important boolean flags to handle the workflow of the processor */
   std::atomic<bool> is_shutdown_{false};
