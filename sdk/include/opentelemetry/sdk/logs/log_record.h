@@ -18,7 +18,7 @@
 
 #include <map>
 #include <unordered_map>
-#include "opentelemetry/sdk/logs/attribute_utils.h"  // same as traces/attribute_utils
+#include "opentelemetry/sdk/common/attribute_utils.h"  // same as traces/attribute_utils
 #include "opentelemetry/sdk/logs/recordable.h"
 #include "opentelemetry/version.h"
 
@@ -40,8 +40,8 @@ private:
   // Default values are set by the respective data structures' constructors for all fields,
   // except the severity field, which must be set manually (an enum with no default value).
   opentelemetry::logs::Severity severity_ = opentelemetry::logs::Severity::kInvalid;
-  AttributeMap resource_map_;
-  AttributeMap attributes_map_;
+  common::AttributeMap resource_map_;
+  common::AttributeMap attributes_map_;
   std::string name_;
   std::string body_;  // Currently a simple string, but should be changed to "Any" type
   opentelemetry::trace::TraceId trace_id_;
@@ -153,7 +153,7 @@ public:
    * Get the resource field for this log
    * @return the resource field for this log
    */
-  const std::unordered_map<std::string, LogRecordAttributeValue> &GetResource() const noexcept
+  const std::unordered_map<std::string, common::OwnedAttributeValue> &GetResource() const noexcept
   {
     return resource_map_.GetAttributes();
   }
@@ -162,7 +162,7 @@ public:
    * Get the attributes for this log
    * @return the attributes for this log
    */
-  const std::unordered_map<std::string, LogRecordAttributeValue> &GetAttributes() const noexcept
+  const std::unordered_map<std::string, common::OwnedAttributeValue> &GetAttributes() const noexcept
   {
     return attributes_map_.GetAttributes();
   }

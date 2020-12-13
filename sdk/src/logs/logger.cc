@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 #include "opentelemetry/sdk/logs/logger.h"
 #include "opentelemetry/sdk/logs/log_record.h"
 #include "opentelemetry/trace/provider.h"
@@ -36,8 +35,8 @@ Logger::Logger(opentelemetry::nostd::string_view name,
 void Logger::Log(opentelemetry::logs::Severity severity,
                  nostd::string_view name,
                  nostd::string_view body,
-                 const common::KeyValueIterable &resource,
-                 const common::KeyValueIterable &attributes,
+                 const opentelemetry::common::KeyValueIterable &resource,
+                 const opentelemetry::common::KeyValueIterable &attributes,
                  opentelemetry::trace::TraceId trace_id,
                  opentelemetry::trace::SpanId span_id,
                  opentelemetry::trace::TraceFlags trace_flags,

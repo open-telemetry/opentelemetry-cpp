@@ -17,13 +17,9 @@
 #pragma once
 
 #include "opentelemetry/logs/logger.h"
-#include "opentelemetry/nostd/shared_ptr.h"
-#include "opentelemetry/nostd/string_view.h"
-#include "opentelemetry/sdk/common/atomic_shared_ptr.h"
 #include "opentelemetry/sdk/logs/logger_provider.h"
 #include "opentelemetry/sdk/logs/processor.h"
 
-#include <unordered_map>
 #include <vector>
 
 OPENTELEMETRY_BEGIN_NAMESPACE
@@ -60,8 +56,8 @@ public:
   void Log(opentelemetry::logs::Severity severity,
            nostd::string_view name,
            nostd::string_view body,
-           const common::KeyValueIterable &resource,
-           const common::KeyValueIterable &attributes,
+           const opentelemetry::common::KeyValueIterable &resource,
+           const opentelemetry::common::KeyValueIterable &attributes,
            trace::TraceId trace_id,
            trace::SpanId span_id,
            trace::TraceFlags trace_flags,
