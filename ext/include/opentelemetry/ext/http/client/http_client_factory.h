@@ -18,7 +18,6 @@ public:
 #ifdef WITH_CURL
   static std::shared_ptr<SessionManager> Create()
   {
-
     return std::make_shared<ext::http::client::curl::SessionManager>();
   }
 #else
