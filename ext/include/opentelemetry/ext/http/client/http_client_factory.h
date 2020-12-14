@@ -11,7 +11,6 @@ namespace http
 {
 namespace client
 {
-
 class HttpClientFactory
 {
 public:
@@ -19,11 +18,6 @@ public:
   static std::shared_ptr<SessionManager> Create()
   {
     return std::make_shared<ext::http::client::curl::SessionManager>();
-  }
-#else
-  static std::shared_ptr<SessionManager> Create()
-  {
-    return std::shared_ptr<SessionManager>(nullptr);
   }
 #endif
 };
