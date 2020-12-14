@@ -1,3 +1,6 @@
+if(WITH_OTLP)
+  add_subdirectory(otlp)
+endif()
 add_subdirectory(plugin)
 add_subdirectory(simple)
 add_subdirectory(batch)

@@ -20,11 +20,17 @@
 #include <map>
 #include <vector>
 
+#include "opentelemetry/common/attribute_value.h"
 #include "opentelemetry/common/key_value_iterable.h"
-#include "opentelemetry/logs/log_record.h"
+#include "opentelemetry/common/key_value_iterable_view.h"
+#include "opentelemetry/core/timestamp.h"
+#include "opentelemetry/logs/severity.h"
 #include "opentelemetry/nostd/shared_ptr.h"
 #include "opentelemetry/nostd/span.h"
 #include "opentelemetry/nostd/string_view.h"
+#include "opentelemetry/trace/span_id.h"
+#include "opentelemetry/trace/trace_flags.h"
+#include "opentelemetry/trace/trace_id.h"
 #include "opentelemetry/version.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
@@ -38,86 +44,104 @@ class Logger
 public:
   virtual ~Logger() = default;
 
-  /* Returns the name of the logger */
-  // TODO: decide whether this is useful and/or should be kept, as this is not a method required in
-  // the specification. virtual nostd::string_view getName() = 0;
-
   /**
-   * Each of the following overloaded log(...) methods
+   * Each of the following overloaded Log(...) methods
    * creates a log message with the specific parameters passed.
    *
-   * @param name the name of the log event.
    * @param severity the severity level of the log event.
+   * @param name the name of the log event.
    * @param message the string message of the log (perhaps support std::fmt or fmt-lib format).
-   * @param record the log record (object type LogRecord) that is logged.
+   * @param resource the resources, stored as a 2D list of key/value pairs, that are associated
+   * with the log event.
    * @param attributes the attributes, stored as a 2D list of key/value pairs, that are associated
-   * with this log.
+   * with the log event.
+   * @param trace_id the trace id associated with the log event.
+   * @param span_id the span id associate with the log event.
+   * @param trace_flags the trace flags associated with the log event.
+   * @param timestamp the timestamp the log record was created.
    * @throws No exceptions under any circumstances.
    */
 
-  /* The below method is a logging statement that takes in a LogRecord.
-   * A default LogRecord that will be assigned if no parameters are passed to Logger's .log() method
-   * which should at minimum assign the trace_id, span_id, and timestamp
+  /**
+   * The base Log(...) method that all other Log(...) overloaded methods will eventually call,
+   * in order to create a log record.
+   *
+   * Note this takes in a KeyValueIterable for the resource and attributes fields.
    */
-  virtual void log(const LogRecord &record) noexcept = 0;
+  virtual void Log(Severity severity,
+                   nostd::string_view name,
+                   nostd::string_view body,
+                   const common::KeyValueIterable &resource,
+                   const common::KeyValueIterable &attributes,
+                   trace::TraceId trace_id,
+                   trace::SpanId span_id,
+                   trace::TraceFlags trace_flags,
+                   core::SystemTimestamp timestamp) noexcept = 0;
 
-  /** Overloaded methods for unstructured logging **/
-  inline void log(nostd::string_view message) noexcept
-  {
-    // Set severity to the default then call log(Severity, String message) method
-    log(Severity::kDefault, message);
-  }
-
-  inline void log(Severity severity, nostd::string_view message) noexcept
-  {
-    // TODO: set default timestamp later (not in API)
-    log(severity, message, core::SystemTimestamp(std::chrono::system_clock::now()));
-  }
-
-  inline void log(Severity severity,
-                  nostd::string_view message,
-                  core::SystemTimestamp time) noexcept
-  {
-    // creates a LogRecord object with given parameters, then calls log(LogRecord)
-    LogRecord r;
-    r.severity  = severity;
-    r.body      = message;
-    r.timestamp = time;
-
-    log(r);
-  }
-
-  /** Overloaded methods for structured logging**/
-  // TODO: separate this method into separate methods since it is not useful for user to create
-  // empty logs
+  /*** Overloaded methods for KeyValueIterables ***/
+  /**
+   * The secondary base Log(...) method that all other Log(...) overloaded methods except the one
+   * above will eventually call,  in order to create a log record.
+   *
+   * Note this takes in template types for the resource and attributes fields.
+   */
   template <class T,
-            nostd::enable_if_t<common::detail::is_key_value_iterable<T>::value> * = nullptr>
-  inline void log(Severity severity       = Severity::kDefault,
-                  nostd::string_view name = "",
-                  const T &attributes     = {}) noexcept
+            class U,
+            nostd::enable_if_t<common::detail::is_key_value_iterable<T>::value> * = nullptr,
+            nostd::enable_if_t<common::detail::is_key_value_iterable<U>::value> * = nullptr>
+  void Log(Severity severity,
+           nostd::string_view name,
+           nostd::string_view body,
+           const T &resource,
+           const U &attributes,
+           trace::TraceId trace_id,
+           trace::SpanId span_id,
+           trace::TraceFlags trace_flags,
+           core::SystemTimestamp timestamp) noexcept
   {
-    log(severity, name, common::KeyValueIterableView<T>(attributes));
+    Log(severity, name, body, common::KeyValueIterableView<T>(resource),
+        common::KeyValueIterableView<U>(attributes), trace_id, span_id, trace_flags, timestamp);
   }
 
-  inline void log(Severity severity,
-                  nostd::string_view name,
-                  const common::KeyValueIterable &attributes) noexcept
+  void Log(Severity severity,
+           nostd::string_view name,
+           nostd::string_view body,
+           std::initializer_list<std::pair<nostd::string_view, common::AttributeValue>> resource,
+           std::initializer_list<std::pair<nostd::string_view, common::AttributeValue>> attributes,
+           trace::TraceId trace_id,
+           trace::SpanId span_id,
+           trace::TraceFlags trace_flags,
+           core::SystemTimestamp timestamp) noexcept
   {
-    // creates a LogRecord object with given parameters, then calls log(LogRecord)
-    LogRecord r;
-    r.severity   = severity;
-    r.name       = name;
-    r.attributes = attributes;
-
-    log(r);
+    return this->Log(severity, name, body,
+                     nostd::span<const std::pair<nostd::string_view, common::AttributeValue>>{
+                         resource.begin(), resource.end()},
+                     nostd::span<const std::pair<nostd::string_view, common::AttributeValue>>{
+                         attributes.begin(), attributes.end()},
+                     trace_id, span_id, trace_flags, timestamp);
   }
 
-  // TODO: add function aliases such as void debug(), void trace(), void info(), etc. for each
+  /** Wrapper methods that the user could call for convenience when logging **/
+
+  // Set default values for unspecified fields, then call the base Log() method
+  void Log(Severity severity, nostd::string_view message, core::SystemTimestamp timestamp) noexcept
+  {
+    this->Log(severity, "", message, {}, {}, {}, {}, {}, timestamp);
+  }
+
+  // Set default time, and call base Log(severity, message, time) method
+  void Log(Severity severity, nostd::string_view message) noexcept
+  {
+    this->Log(severity, message, std::chrono::system_clock::now());
+  }
+
+  // Set default severity then call Log(Severity, String message) method
+  void Log(nostd::string_view message) noexcept { this->Log(Severity::kInfo, message); }
+
+  // TODO: Add more overloaded Log(...) methods with different combiantions of parameters.
+
+  // TODO: Add function aliases such as void debug(), void trace(), void info(), etc. for each
   // severity level
-
-  /** Future enhancement: templated method for objects / custom types (e.g. JSON, XML, custom
-   * classes, etc) **/
-  // template<class T> virtual void log(T &some_obj) noexcept;
 };
 }  // namespace logs
 OPENTELEMETRY_END_NAMESPACE
