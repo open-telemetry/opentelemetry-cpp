@@ -248,16 +248,31 @@ TEST_F(BasicCurlHttpTests, CurlHttpOperations)
   std::multimap<std::string, std::string, curl::curl_ci> m1 = {
       {"name1", "value1_1"}, {"name1", "value1_2"}, {"name2", "value3"}, {"name3", "value3"}};
   curl::Headers headers = m1;
-  curl::HttpOperation http_operations1(http_client::Method::Head, "/get", handler, headers, body,
-                                       true);
+  curl::HttpOperation http_operations1(http_client::Method::Head, "/get", handler,
+                                       curl::RequestMode::Async, headers, body, true);
   http_operations1.Send();
 
-  curl::HttpOperation http_operations2(http_client::Method::Get, "/get", handler, headers, body,
-                                       true);
+  curl::HttpOperation http_operations2(http_client::Method::Get, "/get", handler,
+                                       curl::RequestMode::Async, headers, body, true);
   http_operations2.Send();
 
-  curl::HttpOperation http_operations3(http_client::Method::Get, "/get", handler, headers, body,
-                                       false);
+  curl::HttpOperation http_operations3(http_client::Method::Get, "/get", handler,
+                                       curl::RequestMode::Async, headers, body, false);
   http_operations3.Send();
   delete handler;
+}
+
+TEST_F(BasicCurlHttpTests, SendGetRequestSync)
+{
+  received_requests_.clear();
+  curl::SessionManager session_manager;
+
+  auto session = session_manager.CreateSession("127.0.0.1", HTTP_PORT);
+  auto request = session->CreateRequest();
+  request->SetUri("get/");
+  GetEventHandler *handler = new GetEventHandler();
+  http_client::SessionState session_state;
+  auto response = session->SendRequestSync(session_state);
+  EXPECT_EQ(response->GetStatusCode(), 200);
+  EXPECT_EQ(session_state, http_client::SessionState::Response);
 }
