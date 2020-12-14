@@ -230,7 +230,8 @@ TEST_F(BasicCurlHttpTests, RequestTimeout)
   auto session_manager = http_client::HttpClientFactory::Create();
   EXPECT_TRUE(session_manager != nullptr);
 
-  auto session = session_manager->CreateSession("127.0.0.10", HTTP_PORT);  // Non Existing address
+  auto session =
+      session_manager->CreateSession("222.222.222.200", HTTP_PORT);  // Non Existing address
   auto request = session->CreateRequest();
   request->SetUri("get/");
   GetEventHandler *handler = new GetEventHandler();
