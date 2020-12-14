@@ -275,3 +275,19 @@ TEST_F(BasicCurlHttpTests, SendGetRequestSync)
   EXPECT_EQ(response->GetStatusCode(), 200);
   EXPECT_EQ(session_state, http_client::SessionState::Response);
 }
+
+TEST_F(BasicCurlHttpTests, SendGetRequestSyncTimeout)
+{
+  received_requests_.clear();
+  curl::SessionManager session_manager;
+
+  auto session =
+      session_manager.CreateSession("222.222.222.200", HTTP_PORT);  // Non Existing address
+  auto request = session->CreateRequest();
+  request->SetTimeoutMs(std::chrono::milliseconds(3000));
+  request->SetUri("get/");
+  http_client::SessionState session_state;
+  auto response = session->SendRequestSync(session_state);
+  EXPECT_EQ(session_state, http_client::SessionState::ConnectFailed);
+  EXPECT_TRUE(response == nullptr);
+}

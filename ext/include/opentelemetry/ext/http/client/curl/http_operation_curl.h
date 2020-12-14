@@ -189,11 +189,10 @@ public:
     // curl_easy_setopt(curl, CURLOPT_LOCALPORT, dcf_port);
 
     // Perform initial connect, handling the timeout if needed
-
     curl_easy_setopt(curl_, CURLOPT_CONNECT_ONLY, 1L);
+    curl_easy_setopt(curl_, CURLOPT_TIMEOUT, http_conn_timeout_.count() / 1000);
     DispatchEvent(http_client::SessionState::Connecting);
     res_ = curl_easy_perform(curl_);
-
     if (CURLE_OK != res_)
     {
       DispatchEvent(http_client::SessionState::ConnectFailed,
