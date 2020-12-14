@@ -74,7 +74,7 @@ public:
   {}
 
 private:
-  // Define a mutex and condition variable
+  // Define a condition variable used for blocking
   std::condition_variable cv_;
 
   // Whether the response from Elasticsearch has been received
@@ -84,10 +84,13 @@ private:
   std::string body_ = "";
 };
 
-ElasticsearchLogExporter::ElasticsearchLogExporter() : options_(ElasticsearchExporterOptions()) {}
+ElasticsearchLogExporter::ElasticsearchLogExporter()
+    : options_{ElasticsearchExporterOptions()},
+      session_manager_{new ext::http::client::curl::SessionManager()}
+{}
 
 ElasticsearchLogExporter::ElasticsearchLogExporter(const ElasticsearchExporterOptions &options)
-    : options_{options}
+    : options_{options}, session_manager_{new ext::http::client::curl::SessionManager()}
 {}
 
 sdklogs::ExportResult ElasticsearchLogExporter::Export(
@@ -112,8 +115,7 @@ sdklogs::ExportResult ElasticsearchLogExporter::Export(
   }
 
   // Create a connection to the ElasticSearch instance
-  opentelemetry::ext::http::client::curl::SessionManager session_manager;
-  auto session = session_manager.CreateSession(options_.host_, options_.port_);
+  auto session = session_manager_->CreateSession(options_.host_, options_.port_);
   auto request = session->CreateRequest();
 
   // Populate the request with headers and methods
@@ -148,8 +150,6 @@ sdklogs::ExportResult ElasticsearchLogExporter::Export(
 
   // End the session
   session->FinishSession();
-  session_manager.CancelAllSessions();
-  session_manager.FinishAllSessions();
 
   // If the response was never received
   if (!receivedResponse)
@@ -183,6 +183,10 @@ sdklogs::ExportResult ElasticsearchLogExporter::Export(
 bool ElasticsearchLogExporter::Shutdown(std::chrono::microseconds timeout) noexcept
 {
   isShutdown_ = true;
+
+  // Shutdown the session manager
+  session_manager_->CancelAllSessions();
+  session_manager_->FinishAllSessions();
 
   return true;
 }

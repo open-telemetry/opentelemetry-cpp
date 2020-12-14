@@ -111,6 +111,9 @@ private:
   // Configuration options for the exporter
   ElasticsearchExporterOptions options_;
 
+  // Object that stores the HTTP sessions that have been created
+  std::unique_ptr<ext::http::client::SessionManager> session_manager_;
+
   /**
    * Converts a log record into a nlohmann::json object.
    */
