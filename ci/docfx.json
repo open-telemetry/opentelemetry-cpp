@@ -11,7 +11,10 @@
     "resource": [
       {
         "files": [
-
+          "api/**.h",
+          "api/**.cc",
+          "sdk/**.h",
+          "sdk/**.cc"
         ]
       }
     ],

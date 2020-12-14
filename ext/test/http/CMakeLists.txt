@@ -7,6 +7,8 @@ if(CURL_FOUND)
   include_directories(${CURL_INCLUDE_DIR})
   target_link_libraries(${FILENAME} ${GTEST_BOTH_LIBRARIES}
                         ${CMAKE_THREAD_LIBS_INIT} ${CURL_LIBRARIES})
-  gtest_add_tests(TARGET ${FILENAME} TEST_PREFIX ext.http.curl. TEST_LIST
-                  ${FILENAME})
+  gtest_add_tests(
+    TARGET ${FILENAME}
+    TEST_PREFIX ext.http.curl.
+    TEST_LIST ${FILENAME})
 endif()

@@ -52,6 +52,11 @@ public:
    */
   std::shared_ptr<Sampler> GetSampler() const noexcept;
 
+  /**
+   * Shutdown the span processor associated with this tracer provider.
+   */
+  bool Shutdown() noexcept;
+
 private:
   opentelemetry::sdk::AtomicSharedPtr<SpanProcessor> processor_;
   std::shared_ptr<opentelemetry::trace::Tracer> tracer_;

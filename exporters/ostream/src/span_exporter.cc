@@ -10,6 +10,25 @@ namespace exporter
 {
 namespace trace
 {
+
+std::ostream &operator<<(std::ostream &os, opentelemetry::trace::SpanKind span_kind)
+{
+  switch (span_kind)
+  {
+    case opentelemetry::trace::SpanKind::kClient:
+      return os << "Client";
+    case opentelemetry::trace::SpanKind::kInternal:
+      return os << "Internal";
+    case opentelemetry::trace::SpanKind::kServer:
+      return os << "Server";
+    case opentelemetry::trace::SpanKind::kProducer:
+      return os << "Producer";
+    case opentelemetry::trace::SpanKind::kConsumer:
+      return os << "Consumer";
+  };
+  return os << "";
+}
+
 OStreamSpanExporter::OStreamSpanExporter(std::ostream &sout) noexcept : sout_(sout) {}
 
 std::unique_ptr<sdktrace::Recordable> OStreamSpanExporter::MakeRecordable() noexcept
@@ -49,6 +68,7 @@ sdktrace::ExportResult OStreamSpanExporter::Export(
             << "\n  start         : " << span->GetStartTime().time_since_epoch().count()
             << "\n  duration      : " << span->GetDuration().count()
             << "\n  description   : " << span->GetDescription()
+            << "\n  span kind     : " << span->GetSpanKind()
             << "\n  status        : " << statusMap[int(span->GetStatus())]
             << "\n  attributes    : ";
       printAttributes(span->GetAttributes());
@@ -59,9 +79,10 @@ sdktrace::ExportResult OStreamSpanExporter::Export(
   return sdktrace::ExportResult::kSuccess;
 }
 
-void OStreamSpanExporter::Shutdown(std::chrono::microseconds timeout) noexcept
+bool OStreamSpanExporter::Shutdown(std::chrono::microseconds timeout) noexcept
 {
   isShutdown_ = true;
+  return true;
 }
 
 }  // namespace trace
