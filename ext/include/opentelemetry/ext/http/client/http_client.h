@@ -10,6 +10,8 @@
 /*
  Usage Example
 
+Async Request:
+
  struct SimpleReponseHandler: public ResponseHandler {
       void OnResponse(Response& res) noexcept override
       {
@@ -37,6 +39,17 @@
   session->FinishSession() // optionally in the end
   ...shutdown
   sessionManager.FinishAllSessions()
+
+Sync Request:
+
+  SessionMamager sessionManager;
+  auto session = sessionManager.createSession("localhost", 8000);
+  auto request = session->CreateRequest();
+  request->AddHeader(..);
+  SessionState session_state;
+  auto response = session->SendRequestSync(session_state);
+  // session_state will contain SessionState::Response if successful.
+
 */
 
 OPENTELEMETRY_BEGIN_NAMESPACE
