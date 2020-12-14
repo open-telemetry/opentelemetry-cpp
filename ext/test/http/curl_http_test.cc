@@ -270,7 +270,6 @@ TEST_F(BasicCurlHttpTests, SendGetRequestSync)
   auto session = session_manager.CreateSession("127.0.0.1", HTTP_PORT);
   auto request = session->CreateRequest();
   request->SetUri("get/");
-  GetEventHandler *handler = new GetEventHandler();
   http_client::SessionState session_state;
   auto response = session->SendRequestSync(session_state);
   EXPECT_EQ(response->GetStatusCode(), 200);
