@@ -105,20 +105,9 @@ if(MSVC)
 
   # When using vcpkg, all targets build with the same runtime
   if(VCPKG_TOOLCHAIN)
-    if(DEFINED ENV{VCPKG_DEFAULT_TRIPLET} AND NOT DEFINED VCPKG_TARGET_TRIPLET)
-      set(VCPKG_TARGET_TRIPLET
-          "$ENV{VCPKG_DEFAULT_TRIPLET}"
-          CACHE STRING "")
-    endif()
-    if(VCPKG_TARGET_TRIPLET MATCHES "^.*windows-static$")
-      set(CMAKE_MSVC_RUNTIME_LIBRARY
-          "MultiThreaded$<$<CONFIG:Debug>:Debug>"
-          CACHE STRING "")
-    else()
-      set(CMAKE_MSVC_RUNTIME_LIBRARY
-          "MultiThreaded$<$<CONFIG:Debug>:Debug>DLL"
-          CACHE STRING "")
-    endif()
+    set(CMAKE_MSVC_RUNTIME_LIBRARY
+        "MultiThreaded$<$<CONFIG:Debug>:Debug>$<$<STREQUAL:${VCPKG_CRT_LINKAGE},dynamic>:DLL>"
+        CACHE STRING "")
   endif()
 endif()
 
