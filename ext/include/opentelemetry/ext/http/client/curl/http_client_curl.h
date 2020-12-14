@@ -174,7 +174,7 @@ public:
       response->headers_ = curl_operation_->GetResponseHeaders();
       response->body_    = curl_operation_->GetResponseBody();
       is_session_active_ = false;
-      return response;
+      return std::move(response);
     }
     is_session_active_ = false;
     return nullptr;
