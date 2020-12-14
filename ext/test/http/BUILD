@@ -6,6 +6,7 @@ cc_test(
     # TODO: Move copts/linkopts for static CURL usage into shared bzl file.
     copts = [
         "-DCURL_STATICLIB",
+        "-DWITH_CURL",
     ],
     linkopts = select({
         "//bazel:windows": [
