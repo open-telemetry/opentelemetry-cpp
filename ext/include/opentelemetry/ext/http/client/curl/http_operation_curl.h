@@ -29,6 +29,12 @@ const std::chrono::milliseconds default_http_conn_timeout(5000);  // ms
 const std::string http_status_regexp = "HTTP\\/\\d\\.\\d (\\d+)\\ .*";
 const std::string http_header_regexp = "(.*)\\: (.*)\\n*";
 
+enum class RequestMode
+{
+  Sync,
+  Async
+};
+
 struct curl_ci
 {
   bool operator()(const std::string &s1, const std::string &s2) const
@@ -45,9 +51,13 @@ class HttpOperation
 public:
   void DispatchEvent(http_client::SessionState type, std::string reason = "")
   {
-    if (callback_ != nullptr)
+    if (request_mode_ == RequestMode::Async && callback_ != nullptr)
     {
       callback_->OnEvent(type, reason);
+    }
+    else
+    {
+      session_state_ = type;
     }
   }
 
@@ -56,9 +66,10 @@ public:
 
   /**
    * Create local CURL instance for url and body
-   *
-   * @param url
+   * @param method // HTTP Method
+   * @param url    // HTTP URL
    * @param callback
+   * @param request_mode // sync or async
    * @param request  Request Headers
    * @param body  Reques Body
    * @param raw_response whether to parse the response
@@ -67,6 +78,7 @@ public:
   HttpOperation(http_client::Method method,
                 std::string url,
                 http_client::EventHandler *callback,
+                RequestMode request_mode = RequestMode::Async,
                 // Default empty headers and empty request body
                 const Headers &request_headers        = Headers(),
                 const http_client::Body &request_body = http_client::Body(),
@@ -77,7 +89,7 @@ public:
         method_(method),
         url_(url),
         callback_(callback),
-
+        request_mode_(request_mode),
         // Local vars
         request_headers_(request_headers),
         request_body_(request_body),
@@ -298,10 +310,17 @@ public:
     return result_;
   }
 
+  void SendSync() { Send(); }
+
   /**
    * Get HTTP response code. This function returns CURL error code if HTTP response code is invalid.
    */
   long GetResponseCode() { return res_; }
+
+  /**
+   * Get last session state.
+   */
+  http_client::SessionState GetSessionState() { return session_state_; }
 
   /**
    * Get whether or not response was programmatically aborted
@@ -389,6 +408,7 @@ public:
 protected:
   const bool is_raw_response_;  // Do not split response headers from response body
   const std::chrono::milliseconds http_conn_timeout_;  // Timeout for connect.  Default: 5000ms
+  RequestMode request_mode_;
 
   CURL *curl_;    // Local curl instance
   CURLcode res_;  // Curl result OR HTTP status code if successful
@@ -401,6 +421,7 @@ protected:
   const Headers &request_headers_;
   const http_client::Body &request_body_;
   struct curl_slist *headers_chunk_ = nullptr;
+  http_client::SessionState session_state_;
 
   // Processed response headers and body
   std::vector<uint8_t> resp_headers_;
