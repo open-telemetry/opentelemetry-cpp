@@ -20,7 +20,6 @@
 #include <vector>
 
 using opentelemetry::sdk::common::AtomicUniquePtr;
-using opentelemetry::sdk::common::CircularBuffer;
 using opentelemetry::sdk::common::CircularBufferRange;
 
 OPENTELEMETRY_BEGIN_NAMESPACE
@@ -73,7 +72,7 @@ bool BatchLogProcessor::ForceFlush(std::chrono::microseconds timeout) noexcept
     return false;
   }
 
-  is_force_flush_ = true;
+  is_force_flush_.store(true);
 
   // Keep attempting to wake up the worker thread
   while (is_force_flush_.load() == true)
@@ -83,16 +82,15 @@ bool BatchLogProcessor::ForceFlush(std::chrono::microseconds timeout) noexcept
 
   // Now wait for the worker thread to signal back from the Export method
   std::unique_lock<std::mutex> lk(force_flush_cv_m_);
-  while (is_force_flush_notified_.load() == false)
-  {
-    force_flush_cv_.wait(lk);
-  }
+  force_flush_cv_.wait(lk, [this] { return is_force_flush_notified_.load(); });
 
   // Notify the worker thread
-  is_force_flush_notified_ = false;
+  is_force_flush_notified_.store(false);
   return true;
 }
 
+// Note this thread will only be called once by the worker thread (which there is only 1 of)
+// in the constructor,  thus it will not be called concurently.
 void BatchLogProcessor::DoBackgroundWork()
 {
   auto timeout = schedule_delay_millis_;
@@ -116,7 +114,7 @@ void BatchLogProcessor::DoBackgroundWork()
     {
       // Since this export was the result of a force flush, signal the
       // main thread that the worker thread has been notified
-      is_force_flush_ = false;
+      is_force_flush_.store(false);
     }
     else
     {
@@ -168,20 +166,17 @@ void BatchLogProcessor::Export(const bool was_force_flush_called)
         });
       });
 
-  ExportResult export_status = exporter_->Export(records_arr);
-  if (export_status != ExportResult::kSuccess)
+  if (exporter_->Export(records_arr) != ExportResult::kSuccess)
   {
-    // Error
+    // Indicate Error: "[Batch Log Processor]: Failed to export a batch"
   }
 
   // Notify the main thread in case this export was the result of a force flush.
   if (was_force_flush_called == true)
   {
-    is_force_flush_notified_ = true;
-    while (is_force_flush_notified_.load() == true)
-    {
-      force_flush_cv_.notify_one();
-    }
+    is_force_flush_notified_.store(true);
+    // Notifies the thread
+    force_flush_cv_.notify_one();
   }
 }
 
@@ -196,12 +191,15 @@ void BatchLogProcessor::DrainQueue()
 // Note: Timeout functionality is currently not implemented
 bool BatchLogProcessor::Shutdown(std::chrono::microseconds timeout) noexcept
 {
+  // Use a lock to ensure only one thread executes the shutdown function at a time
+  std::unique_lock<std::mutex> lock(shutdown_mutex_);
+
   if (is_shutdown_.load() == true)
   {
     return false;
   }
 
-  is_shutdown_ = true;
+  is_shutdown_.store(true);
 
   // notifies worker thread that shutdown has been called
   cv_.notify_one();
