@@ -107,7 +107,8 @@ public:
    * Shutdown this exporter.
    * @param timeout The maximum time to wait for the shutdown method to return
    */
-  bool Shutdown(std::chrono::microseconds timeout = std::chrono::microseconds(0)) noexcept override;
+  bool Shutdown(
+      std::chrono::microseconds timeout = std::chrono::microseconds::max()) noexcept override;
 
 private:
   // Stores if this exporter had its Shutdown() method called
