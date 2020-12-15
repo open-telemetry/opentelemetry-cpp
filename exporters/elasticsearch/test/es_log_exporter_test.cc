@@ -14,35 +14,19 @@ namespace logs_api      = opentelemetry::logs;
 namespace nostd         = opentelemetry::nostd;
 namespace logs_exporter = opentelemetry::exporter::logs;
 
-// Attempt to write a log to an invalid host/port, test that the timeout works properly
+// Attempt to write a log to an invalid host/port, test that the Export() returns failure
 TEST(ElasticsearchLogsExporterTests, InvalidEndpoint)
 {
-  // Create options for the elasticsearch exporter
-  logs_exporter::ElasticsearchExporterOptions options("localhost", -1, "logs", 5, true);
-  options.response_timeout_ = 10;  // Wait 10 seconds to receive a response
+  // Create invalid connection options for the elasticsearch exporter
+  logs_exporter::ElasticsearchExporterOptions options("localhost", -1);
 
   // Create an elasticsearch exporter
   auto exporter =
       std::unique_ptr<sdklogs::LogExporter>(new logs_exporter::ElasticsearchLogExporter(options));
 
-  // Create a log record
+  // Create a log record and send to the exporter
   auto record = exporter->MakeRecordable();
-  record->SetName("Timeout Log");
-  record->SetSeverity(logs_api::Severity::kFatal);
-  record->SetAttribute("key0", false);
-  record->SetAttribute("key1", "1");
-  record->SetAttribute("key2", 2);
-  record->SetAttribute("key3", 3.142);
-
-  // Write the log record to the exporter, and time the duration
-  auto t1     = std::chrono::high_resolution_clock::now();
   auto result = exporter->Export(nostd::span<std::unique_ptr<sdklogs::Recordable>>(&record, 1));
-  auto t2     = std::chrono::high_resolution_clock::now();
-
-  // Ensure the timeout is within the range of the timeout specified ([10, 10 + 1] seconds)
-  auto duration = std::chrono::duration_cast<std::chrono::seconds>(t2 - t1).count();
-  ASSERT_TRUE((duration >= options.response_timeout_) &&
-              (duration < options.response_timeout_ + 1));
 
   // Ensure the return value is failure
   ASSERT_EQ(result, sdklogs::ExportResult::kFailure);
@@ -63,4 +47,27 @@ TEST(ElasticsearchLogsExporterTests, Shutdown)
 
   // Ensure the return value is failure
   ASSERT_EQ(result, sdklogs::ExportResult::kFailure);
+}
+
+// Test the elasticsearch recordable object
+TEST(ElasticsearchLogsExporterTests, RecordableCreation)
+{
+  // Create an elasticsearch exporter
+  auto exporter =
+      std::unique_ptr<sdklogs::LogExporter>(new logs_exporter::ElasticsearchLogExporter);
+
+  // Create a recordable
+  auto record = exporter->MakeRecordable();
+  record->SetName("Timeout Log");
+  record->SetSeverity(logs_api::Severity::kFatal);
+  record->SetTimestamp(std::chrono::system_clock::now());
+  record->SetBody("Body of the log message");
+
+  // Attributes and resource support different types
+  record->SetAttribute("key0", false);
+  record->SetAttribute("key1", "1");
+  record->SetResource("key2", 2);
+  record->SetResource("key3", 3.142);
+
+  exporter->Export(nostd::span<std::unique_ptr<sdklogs::Recordable>>(&record, 1));
 }

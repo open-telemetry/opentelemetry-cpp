@@ -33,6 +33,11 @@ class ResponseHandler : public http_client::EventHandler
 {
 public:
   /**
+   * Creates a response handler, that by default doesn't display to console
+   */
+  ResponseHandler(bool console_debug = false) : console_debug_{console_debug} {}
+
+  /**
    * Automatically called when the response is received, store the body into a string and notify any
    * threads blocked on this result
    */
@@ -47,14 +52,14 @@ public:
   }
 
   /**
-   * A method the user calls to block their thread until the response is received, or the timeout is
-   * exceeded.
+   * A method the user calls to block their thread until the response is received. The longest
+   * duration is the timeout of the request, set by SetTimeoutMs()
    */
-  bool waitForResponse(unsigned int timeoutSec = 1)
+  bool waitForResponse()
   {
     std::mutex mutex_;
     std::unique_lock<std::mutex> lk(mutex_);
-    cv_.wait_for(lk, std::chrono::milliseconds(1000 * timeoutSec));
+    cv_.wait(lk);
     return response_received_;
   }
 
@@ -63,10 +68,35 @@ public:
    */
   std::string GetResponseBody() { return body_; }
 
-  // Virtual method definition that isn't used
+  // Callback method when an http event occurs
   void OnEvent(http_client::SessionState state,
                opentelemetry::nostd::string_view reason) noexcept override
-  {}
+  {
+    // If any failure event occurs, release the condition variable to unblock main thread
+    switch (state)
+    {
+      case http_client::SessionState::ConnectFailed:
+        if (console_debug_)
+          std::cout << "Connection to elasticsearch failed\n";
+        cv_.notify_all();
+        break;
+      case http_client::SessionState::SendFailed:
+        if (console_debug_)
+          std::cout << "Request failed to be sent to elasticsearch\n";
+        cv_.notify_all();
+        break;
+      case http_client::SessionState::TimedOut:
+        if (console_debug_)
+          std::cout << "Request to elasticsearch timed out\n";
+        cv_.notify_all();
+        break;
+      case http_client::SessionState::NetworkError:
+        if (console_debug_)
+          std::cout << "Network error to elasticsearch\n";
+        cv_.notify_all();
+        break;
+    }
+  }
 
 private:
   // Define a condition variable used for blocking
@@ -77,6 +107,9 @@ private:
 
   // A string to store the response body
   std::string body_ = "";
+
+  // Whether to print the results from the callback
+  bool console_debug_ = false;
 };
 
 ElasticsearchLogExporter::ElasticsearchLogExporter()
@@ -134,7 +167,7 @@ sdklogs::ExportResult ElasticsearchLogExporter::Export(
   request->SetBody(body_vec);
 
   // Send the request
-  std::unique_ptr<ResponseHandler> handler(new ResponseHandler());
+  std::unique_ptr<ResponseHandler> handler(new ResponseHandler(options_.console_debug_));
   session->SendRequest(*handler);
 
   // Wait for the response to be received
@@ -143,25 +176,19 @@ sdklogs::ExportResult ElasticsearchLogExporter::Export(
     std::cout << "waiting for response from Elasticsearch (timeout = " << options_.response_timeout_
               << " seconds)" << std::endl;
   }
-  bool receivedResponse = handler->waitForResponse(options_.response_timeout_);
+  bool write_successful = handler->waitForResponse();
 
   // End the session
   session->FinishSession();
 
-  // If the response was never received
-  if (!receivedResponse)
+  // If an error occured with the HTTP request
+  if (!write_successful)
   {
     // TODO: retry logic
-
-    if (options_.console_debug_)
-    {
-      std::cout << "Request exceeded timeout, aborting..." << std::endl;
-    }
-
     return sdklogs::ExportResult::kFailure;
   }
 
-  // Parse the response output to determine if the request wasen't successful
+  // Parse the response output to determine if Elasticsearch consumed it correctly
   std::string responseBody = handler->GetResponseBody();
   if (responseBody.find("\"failed\" : 0") == std::string::npos)
   {
