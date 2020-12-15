@@ -102,6 +102,7 @@ public:
 
   void printMap(std::unordered_map<std::string, sdk::common::OwnedAttributeValue> map)
   {
+    sout_ << "{";
     size_t size = map.size();
     size_t i    = 1;
     for (auto kv : map)
@@ -114,6 +115,7 @@ public:
         sout_ << ", ";
       i++;
     }
+    sout_ << "}";
   }
 
   /***********************  LogExporter overloaded methods ***********************/

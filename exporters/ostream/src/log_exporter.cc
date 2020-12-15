@@ -49,7 +49,7 @@ sdklogs::ExportResult OStreamLogExporter::Export(
 
     if (log_record == nullptr)
     {
-      // Error "recordable data was lost"
+      // TODO: Log Internal SDK error "recordable data was lost"
       continue;
     }
 
@@ -76,16 +76,16 @@ sdklogs::ExportResult OStreamLogExporter::Export(
           << "\n"
           << "  name          : " << log_record->GetName() << "\n"
           << "  body          : " << log_record->GetBody() << "\n"
-          << "  resource      : {";
+          << "  resource      : ";
 
     printMap(log_record->GetResource());
 
-    sout_ << "}\n"
-          << "  attributes    : {";
+    sout_ << "\n"
+          << "  attributes    : ";
 
     printMap(log_record->GetAttributes());
 
-    sout_ << "}\n"
+    sout_ << "\n"
           << "  trace_id      : " << std::string(trace_id, trace_id_len) << "\n"
           << "  span_id       : " << std::string(span_id, span_id__len) << "\n"
           << "  trace_flags   : " << std::string(trace_flags, trace_flags_len) << "\n"
