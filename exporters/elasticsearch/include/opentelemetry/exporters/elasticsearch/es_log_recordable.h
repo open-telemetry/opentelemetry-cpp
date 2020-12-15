@@ -39,42 +39,6 @@ private:
   // Define a JSON object that will be populated with the log data
   nlohmann::json json_;
 
-  /**
-   * Converts a common::AttributeValue into a string, which is used for converting a
-   * common::AttributeValue into a string
-   */
-  const std::string ValueToString(const common::AttributeValue &value)
-  {
-    switch (value.index())
-    {
-      case common::AttributeType::TYPE_BOOL:
-        return (opentelemetry::nostd::get<bool>(value) ? "true" : "false");
-        break;
-      case common::AttributeType::TYPE_INT:
-        return std::to_string(opentelemetry::nostd::get<int>(value));
-        break;
-      case common::AttributeType::TYPE_INT64:
-        return std::to_string(opentelemetry::nostd::get<int64_t>(value));
-        break;
-      case common::AttributeType::TYPE_UINT:
-        return std::to_string(opentelemetry::nostd::get<unsigned int>(value));
-        break;
-      case common::AttributeType::TYPE_UINT64:
-        return std::to_string(opentelemetry::nostd::get<uint64_t>(value));
-        break;
-      case common::AttributeType::TYPE_DOUBLE:
-        return std::to_string(opentelemetry::nostd::get<double>(value));
-        break;
-      case common::AttributeType::TYPE_STRING:
-      case common::AttributeType::TYPE_CSTRING:
-        return opentelemetry::nostd::get<opentelemetry::nostd::string_view>(value).data();
-        break;
-      default:
-        return "Invalid type";
-        break;
-    }
-  }
-
 public:
   /**
    * Set the severity for this log.
@@ -83,12 +47,7 @@ public:
   void SetSeverity(opentelemetry::logs::Severity severity) noexcept override
   {
     // Convert the severity enum to a string
-    static opentelemetry::nostd::string_view severityStringMap_[25] = {
-        "kInvalid", "kTrace",  "kTrace2", "kTrace3", "kTrace4", "kDebug",  "kDebug2",
-        "kDebug3",  "kDebug4", "kInfo",   "kInfo2",  "kInfo3",  "kInfo4",  "kWarn",
-        "kWarn2",   "kWarn3",  "kWarn4",  "kError",  "kError2", "kError3", "kError4",
-        "kFatal",   "kFatal2", "kFatal3", "kFatal4"};
-    json_["severity"] = severityStringMap_[static_cast<int>(severity)];
+    json_["severity"] = opentelemetry::logs::SeverityNumToText[static_cast<int>(severity)];
   }
 
   /**
@@ -111,7 +70,34 @@ public:
   void SetResource(nostd::string_view key,
                    const opentelemetry::common::AttributeValue &value) noexcept override
   {
-    json_["resource"][key.data()] = ValueToString(value);
+    switch (value.index())
+    {
+      case common::AttributeType::TYPE_BOOL:
+        json_["resource"][key.data()] = opentelemetry::nostd::get<bool>(value) ? true : false;
+        break;
+      case common::AttributeType::TYPE_INT:
+        json_["resource"][key.data()] = opentelemetry::nostd::get<int>(value);
+        break;
+      case common::AttributeType::TYPE_INT64:
+        json_["resource"][key.data()] = opentelemetry::nostd::get<int64_t>(value);
+        break;
+      case common::AttributeType::TYPE_UINT:
+        json_["resource"][key.data()] = opentelemetry::nostd::get<unsigned int>(value);
+        break;
+      case common::AttributeType::TYPE_UINT64:
+        json_["resource"][key.data()] = opentelemetry::nostd::get<uint64_t>(value);
+        break;
+      case common::AttributeType::TYPE_DOUBLE:
+        json_["resource"][key.data()] = opentelemetry::nostd::get<double>(value);
+        break;
+      case common::AttributeType::TYPE_STRING:
+      case common::AttributeType::TYPE_CSTRING:
+        json_["resource"][key.data()] =
+            opentelemetry::nostd::get<opentelemetry::nostd::string_view>(value).data();
+        break;
+      default:
+        break;
+    }
   }
 
   /**
@@ -122,7 +108,34 @@ public:
   void SetAttribute(nostd::string_view key,
                     const opentelemetry::common::AttributeValue &value) noexcept override
   {
-    json_["attributes"][key.data()] = ValueToString(value);
+    switch (value.index())
+    {
+      case common::AttributeType::TYPE_BOOL:
+        json_["attributes"][key.data()] = opentelemetry::nostd::get<bool>(value) ? true : false;
+        break;
+      case common::AttributeType::TYPE_INT:
+        json_["attributes"][key.data()] = opentelemetry::nostd::get<int>(value);
+        break;
+      case common::AttributeType::TYPE_INT64:
+        json_["attributes"][key.data()] = opentelemetry::nostd::get<int64_t>(value);
+        break;
+      case common::AttributeType::TYPE_UINT:
+        json_["attributes"][key.data()] = opentelemetry::nostd::get<unsigned int>(value);
+        break;
+      case common::AttributeType::TYPE_UINT64:
+        json_["attributes"][key.data()] = opentelemetry::nostd::get<uint64_t>(value);
+        break;
+      case common::AttributeType::TYPE_DOUBLE:
+        json_["attributes"][key.data()] = opentelemetry::nostd::get<double>(value);
+        break;
+      case common::AttributeType::TYPE_STRING:
+      case common::AttributeType::TYPE_CSTRING:
+        json_["attributes"][key.data()] =
+            opentelemetry::nostd::get<opentelemetry::nostd::string_view>(value).data();
+        break;
+      default:
+        break;
+    }
   }
 
   /**

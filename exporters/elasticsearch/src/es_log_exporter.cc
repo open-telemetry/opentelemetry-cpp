@@ -61,13 +61,7 @@ public:
   /**
    * Returns the body of the response
    */
-  std::string GetResponseBody()
-  {
-    if (!response_received_)
-      return "No response";
-
-    return body_;
-  }
+  std::string GetResponseBody() { return body_; }
 
   // Virtual method definition that isn't used
   void OnEvent(http_client::SessionState state,
@@ -103,21 +97,14 @@ sdklogs::ExportResult ElasticsearchLogExporter::Export(
     const nostd::span<std::unique_ptr<sdklogs::Recordable>> &records) noexcept
 {
   // Return failure if this exporter has been shutdown
-  if (isShutdown_)
+  if (is_shutdown_)
   {
     if (options_.console_debug_)
+    {
       std::cout << "Export failed, exporter is shutdown" << std::endl;
+    }
 
     return sdklogs::ExportResult::kFailure;
-  }
-
-  // Create a json array to store all the JSON log records
-  json logs = json::array();
-
-  for (auto &record : records)
-  {
-    // Convert the log record to a JSON object, and store in json array
-    // logs.emplace_back(RecordToJSON(std::move(record)));
   }
 
   // Create a connection to the ElasticSearch instance
@@ -130,7 +117,7 @@ sdklogs::ExportResult ElasticsearchLogExporter::Export(
   request->AddHeader("Content-Type", "application/json");
   request->SetTimeoutMs(std::chrono::milliseconds(1000 * options_.response_timeout_));
 
-  // Add the request body
+  // Create the request body
   std::string body = "";
   for (auto &record : records)
   {
@@ -152,8 +139,10 @@ sdklogs::ExportResult ElasticsearchLogExporter::Export(
 
   // Wait for the response to be received
   if (options_.console_debug_)
+  {
     std::cout << "waiting for response from Elasticsearch (timeout = " << options_.response_timeout_
               << " seconds)" << std::endl;
+  }
   bool receivedResponse = handler->waitForResponse(options_.response_timeout_);
 
   // End the session
@@ -165,7 +154,9 @@ sdklogs::ExportResult ElasticsearchLogExporter::Export(
     // TODO: retry logic
 
     if (options_.console_debug_)
+    {
       std::cout << "Request exceeded timeout, aborting..." << std::endl;
+    }
 
     return sdklogs::ExportResult::kFailure;
   }
@@ -189,7 +180,7 @@ sdklogs::ExportResult ElasticsearchLogExporter::Export(
 
 bool ElasticsearchLogExporter::Shutdown(std::chrono::microseconds timeout) noexcept
 {
-  isShutdown_ = true;
+  is_shutdown_ = true;
 
   // Shutdown the session manager
   session_manager_->CancelAllSessions();

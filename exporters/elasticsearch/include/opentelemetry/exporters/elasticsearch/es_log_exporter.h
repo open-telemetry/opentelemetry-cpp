@@ -56,9 +56,9 @@ struct ElasticsearchExporterOptions
    * @param host The host of the Elasticsearch instance
    * @param port The port of the Elasticsearch instance
    * @param index The index/shard that the logs will be written to
-   * @param response_timeout The maximum time the exporter should wait after sending a request to
-   * Elasticsearch
-   * @param console_debug Print the status of the exporter methods in the console
+   * @param response_timeout The maximum time in seconds the exporter should wait for a response
+   * from elasticsearch
+   * @param console_debug If true, print the status of the exporter methods in the console
    */
   ElasticsearchExporterOptions(std::string host     = "localhost",
                                int port             = 9200,
@@ -111,7 +111,7 @@ public:
 
 private:
   // Stores if this exporter had its Shutdown() method called
-  bool isShutdown_ = false;
+  bool is_shutdown_ = false;
 
   // Configuration options for the exporter
   ElasticsearchExporterOptions options_;
