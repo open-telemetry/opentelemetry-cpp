@@ -27,7 +27,6 @@
 
 namespace nostd   = opentelemetry::nostd;
 namespace sdklogs = opentelemetry::sdk::logs;
-using json        = nlohmann::json;
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace exporter
