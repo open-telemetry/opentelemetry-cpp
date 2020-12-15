@@ -194,17 +194,13 @@ TEST(OStreamLogExporter, LogWithVariantTypesToClog)
   // Pass a recordable created by the exporter to be exported
   auto record = exporter->MakeRecordable();
 
-  // Set resources for this log record of only string types as the value
-  // e.g. key/value is a par of type <string, array of strings>
-  // std::vector<int> vect = {1, 2, 1};
-  // record->SetResource("num", opentelemetry::nostd::span<int> {vect.data(), vect.size()});
-
+  // Set resources for this log record of only integer types as the value
   std::array<int, 3> array1 = {1, 2, 3};
   opentelemetry::nostd::span<int> data1{array1.data(), array1.size()};
   record->SetResource("res1", data1);
 
   // Set resources for this log record of bool types as the value
-  // e.g. key/value is a par of type <string, array of strings>
+  // e.g. key/value is a par of type <string, array of bools>
   std::array<bool, 3> array = {false, true, false};
   record->SetAttribute("attr1", opentelemetry::nostd::span<bool>{array.data(), array.size()});
 

@@ -54,19 +54,20 @@ sdklogs::ExportResult OStreamLogExporter::Export(
     }
 
     // Convert trace, spanid, traceflags into exportable representation
-    constexpr int trace_id_bytes    = 16;
-    constexpr int span_id_bytes     = 8;
-    constexpr int trace_flags_bytes = 1;
+    constexpr int trace_id_len    = 32;
+    constexpr int span_id__len    = 16;
+    constexpr int trace_flags_len = 2;
 
-    char trace_id[trace_id_bytes * 2]       = {0};
-    char span_id[span_id_bytes * 2]         = {0};
-    char trace_flags[trace_flags_bytes * 2] = {0};
+    char trace_id[trace_id_len]       = {0};
+    char span_id[span_id__len]        = {0};
+    char trace_flags[trace_flags_len] = {0};
 
     log_record->GetTraceId().ToLowerBase16(trace_id);
     log_record->GetSpanId().ToLowerBase16(span_id);
     log_record->GetTraceFlags().ToLowerBase16(trace_flags);
 
-    // Print out each field of the log record
+    // Print out each field of the log record, noting that severity is separated
+    // into severity_num and severity_text
     sout_ << "{\n"
           << "  timestamp     : " << log_record->GetTimestamp().time_since_epoch().count() << "\n"
           << "  severity_num  : " << static_cast<int>(log_record->GetSeverity()) << "\n"
@@ -85,9 +86,9 @@ sdklogs::ExportResult OStreamLogExporter::Export(
     printMap(log_record->GetAttributes());
 
     sout_ << "}\n"
-          << "  trace_id      : " << std::string(trace_id, 32) << "\n"
-          << "  span_id       : " << std::string(span_id, 16) << "\n"
-          << "  trace_flags   : " << std::string(trace_flags, 2) << "\n"
+          << "  trace_id      : " << std::string(trace_id, trace_id_len) << "\n"
+          << "  span_id       : " << std::string(span_id, span_id__len) << "\n"
+          << "  trace_flags   : " << std::string(trace_flags, trace_flags_len) << "\n"
           << "}\n";
   }
 
