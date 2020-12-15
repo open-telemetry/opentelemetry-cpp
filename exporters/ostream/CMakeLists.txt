@@ -1,4 +1,5 @@
 include_directories(include)
+include_directories(${CMAKE_SOURCE_DIR}/sdk/src/common/platform)
 
 add_library(opentelemetry_exporter_ostream_metrics src/metrics_exporter.cc)
 add_library(opentelemetry_exporter_ostream_span src/span_exporter.cc)
@@ -9,6 +10,7 @@ if(BUILD_TESTING)
 
   target_link_libraries(
     ostream_span_test ${GTEST_BOTH_LIBRARIES} ${CMAKE_THREAD_LIBS_INIT}
+    opentelemetry_trace opentelemetry_common
     opentelemetry_exporter_ostream_span)
 
   target_link_libraries(

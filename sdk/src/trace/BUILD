@@ -22,6 +22,7 @@ cc_library(
     deps = [
         "//api",
         "//sdk:headers",
+        "//sdk/src/common/platform:fork",
         "//sdk/src/common:random",
     ],
 )
