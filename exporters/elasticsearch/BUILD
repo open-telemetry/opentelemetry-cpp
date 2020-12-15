@@ -7,6 +7,7 @@ cc_library(
     ],
     hdrs = [
         "include/opentelemetry/exporters/elasticsearch/es_log_exporter.h",
+        "include/opentelemetry/exporters/elasticsearch/es_log_recordable.h",
     ],
     copts = [
         "-DCURL_STATICLIB",

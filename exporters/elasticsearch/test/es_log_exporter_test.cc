@@ -1,8 +1,8 @@
 #include "opentelemetry/exporters/elasticsearch/es_log_exporter.h"
 #include "opentelemetry/ext/http/server/http_server.h"
-#include "opentelemetry/logs/log_record.h"
 #include "opentelemetry/logs/provider.h"
 #include "opentelemetry/sdk/logs/exporter.h"
+#include "opentelemetry/sdk/logs/log_record.h"
 #include "opentelemetry/sdk/logs/logger_provider.h"
 #include "opentelemetry/sdk/logs/simple_log_processor.h"
 
@@ -26,14 +26,15 @@ TEST(ElasticsearchLogsExporterTests, InvalidEndpoint)
       std::unique_ptr<sdklogs::LogExporter>(new logs_exporter::ElasticsearchLogExporter(options));
 
   // Create a log record
-  auto record  = std::unique_ptr<logs_api::LogRecord>(new logs_api::LogRecord());
-  record->name = "Timeout Log";
-  std::map<std::string, std::string> m = {{"key1", "value1"}, {"key2", "value2"}};
+  auto record = exporter->MakeRecordable();
+  record->SetName("Timeout Log");
+  record->SetSeverity(logs_api::Severity::kFatal);
+  record->SetAttribute("key1", "value1");
+  record->SetAttribute("key2", "value2");
 
   // Write the log record to the exporter, and time the duration
-  nostd::span<std::unique_ptr<opentelemetry::logs::LogRecord>> batch(&record, 1);
   auto t1     = std::chrono::high_resolution_clock::now();
-  auto result = exporter->Export(batch);
+  auto result = exporter->Export(nostd::span<std::unique_ptr<sdklogs::Recordable>>(&record, 1));
   auto t2     = std::chrono::high_resolution_clock::now();
 
   // Ensure the timeout is within the range of the timeout specified ([10, 10 + 1] seconds)
@@ -55,9 +56,8 @@ TEST(ElasticsearchLogsExporterTests, Shutdown)
   ASSERT_TRUE(shutdownResult);
 
   // Write a log to the shutdown exporter
-  auto record = std::unique_ptr<logs_api::LogRecord>(new logs_api::LogRecord());
-  nostd::span<std::unique_ptr<opentelemetry::logs::LogRecord>> batch(&record, 1);
-  auto result = exporter->Export(batch);
+  auto record = exporter->MakeRecordable();
+  auto result = exporter->Export(nostd::span<std::unique_ptr<sdklogs::Recordable>>(&record, 1));
 
   // Ensure the return value is failure
   ASSERT_EQ(result, sdklogs::ExportResult::kFailure);
