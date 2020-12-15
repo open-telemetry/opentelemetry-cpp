@@ -191,26 +191,22 @@ void BatchLogProcessor::DrainQueue()
 // Note: Timeout functionality is currently not implemented
 bool BatchLogProcessor::Shutdown(std::chrono::microseconds timeout) noexcept
 {
-  // Use a lock to ensure only one thread executes the shutdown function at a time
-  std::unique_lock<std::mutex> lock(shutdown_mutex_);
-
-  if (is_shutdown_.load() == true)
+  // Atomically checking whether value of is_shutdown_ is false
+  // and setting it to true
+  if (is_shutdown_.exchange(true) == false)
   {
-    return false;
+    // notifies worker thread that shutdown has been called
+    cv_.notify_one();
+    // wait until worker thread completes current export
+    worker_thread_.join();
+    // calls the exporter to shutdown
+    if (exporter_ != nullptr)
+    {
+      return exporter_->Shutdown();
+    }
+    return true;
   }
-
-  is_shutdown_.store(true);
-
-  // notifies worker thread that shutdown has been called
-  cv_.notify_one();
-  // wait until worker thread completes current export
-  worker_thread_.join();
-  // calls the exporter to shutdown
-  if (exporter_ != nullptr)
-  {
-    return exporter_->Shutdown();
-  }
-  return true;
+  return false;
 }
 
 BatchLogProcessor::~BatchLogProcessor()
