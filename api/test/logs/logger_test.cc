@@ -14,40 +14,61 @@ using opentelemetry::nostd::shared_ptr;
 using opentelemetry::nostd::span;
 using opentelemetry::nostd::string_view;
 
-TEST(LoggerTest, GetLoggerDefaultNoop)
+// Check that the default logger is a noop logger instance
+TEST(Logger, GetLoggerDefault)
 {
   auto lp     = Provider::GetLoggerProvider();
   auto logger = lp->GetLogger("TestLogger");
+  auto name   = logger->GetName();
   EXPECT_NE(nullptr, logger);
-  EXPECT_EQ(logger->GetName(), "noop logger");
+  EXPECT_EQ(name, "noop logger");
 }
 
-TEST(LoggerTest, GetLogger)
+// Test the two additional overloads for GetLogger()
+TEST(Logger, GetNoopLoggerNameWithArgs)
 {
   auto lp = Provider::GetLoggerProvider();
 
-  // Get a logger with no arguments
-  auto logger1 = lp->GetLogger("TestLogger1");
-
-  // Get a logger with options passed
-  auto logger2 = lp->GetLogger("TestLogger2", "Options");
-
-  // Get a logger with arguments
+  // GetLogger(name, list(args))
   std::array<string_view, 1> sv{"string"};
   span<string_view> args{sv};
-  auto logger3 = lp->GetLogger("TestLogger3", args);
+  lp->GetLogger("NoopLoggerWithArgs", args);
+
+  // GetLogger(name, string options)
+  lp->GetLogger("NoopLoggerWithOptions", "options");
 }
 
-TEST(Logger, NoopLog)
+// Test the Log() overloads
+TEST(Logger, LogMethodOverloads)
 {
   auto lp     = Provider::GetLoggerProvider();
   auto logger = lp->GetLogger("TestLogger");
-  logger->Log("Noop log name");
+
+  // Create a map to test the logs with
+  std::map<std::string, std::string> m = {{"key1", "value1"}};
+
+  // Log overloads
+  logger->Log(Severity::kTrace, "Test log message");
+  logger->Log(Severity::kInfo, "Logging a message", "Test log message");
+  logger->Log(Severity::kDebug, m);
+  logger->Log(Severity::kWarn, "Logging a map", m);
+  logger->Log(Severity::kError, {{"key1", "value 1"}, {"key2", 2}});
+  logger->Log(Severity::kFatal, "Logging an initializer list", {{"key1", "value 1"}, {"key2", 2}});
+
+  // Severity methods
+  logger->Trace("Test log message");
+  logger->Debug("Logging a message", "Test log message");
+  logger->Info(m);
+  logger->Warn("Logging a map", m);
+  logger->Error({{"key1", "value 1"}, {"key2", 2}});
+  logger->Fatal("Logging an initializer list", {{"key1", "value 1"}, {"key2", 2}});
 }
 
 // Define a basic Logger class
 class TestLogger : public Logger
 {
+  const opentelemetry::nostd::string_view GetName() noexcept override { return "test logger"; }
+
   void Log(Severity severity,
            string_view name,
            string_view body,
@@ -74,67 +95,15 @@ class TestProvider : public LoggerProvider
   }
 };
 
-TEST(LoggerTest, PushLoggerImplementation)
+TEST(Logger, PushLoggerImplementation)
 {
-  // Push the new loggerprovider class into the API
+  // Push the new loggerprovider class into the global singleton
   auto test_provider = shared_ptr<LoggerProvider>(new TestProvider());
   Provider::SetLoggerProvider(test_provider);
 
   auto lp = Provider::GetLoggerProvider();
 
-  // Get a logger instance and check whether it's GetName() method returns
-  // "test logger" as defined in the custom implementation
+  // Check that the implementation was pushed by calling TestLogger's GetName()
   auto logger = lp->GetLogger("TestLogger");
   ASSERT_EQ("test logger", logger->GetName());
-}
-
-TEST(Logger, LogMethodOverloads)
-{
-  // Use the same TestProvider and TestLogger from the previous test
-  auto test_provider = shared_ptr<LoggerProvider>(new TestProvider());
-  Provider::SetLoggerProvider(test_provider);
-
-  auto lp = Provider::GetLoggerProvider();
-  auto logger = lp->GetLogger("TestLogger");
-
-  // Check that calling the Log() overloads correctly constructs a log record which is automatically put into the static logger_ for testing
-  
-  // Test Log(severity, name, message) method
-  logger->Log(Severity::kError, "Log Name", "This is the log message");
-  ASSERT_EQ(record_->severity, Severity::kError);
-  ASSERT_EQ(record_->name, "Log Name");
-  ASSERT_EQ(record_->body, "This is the log message");
-
-  // Test Trace(name, KVIterable) method
-  std::map<std::string, std::string> m = {{"key1", "val1"}, {"key2", "val2"}};
-  logger->Trace("Logging a map", m);
-  ASSERT_EQ(record_->severity, Severity::kTrace);
-  ASSERT_EQ(record_->name, "Logging a map");
-  ASSERT_EQ(record_->attributes->size(), 2);
-}
-
-TEST(LogRecord, SetDefault)
-{
-  LogRecord r;
-
-  // Check that the timestamp is set to 0 by default
-  ASSERT_EQ(r.timestamp, opentelemetry::core::SystemTimestamp(std::chrono::seconds(0)));
-
-  // Check that the severity is set to kDefault by default
-  ASSERT_EQ(r.severity, Severity::kDefault);
-
-  // Check that trace_id is set to all zeros by default
-  char trace_buf[32];
-  r.trace_id.ToLowerBase16(trace_buf);
-  ASSERT_EQ(std::string(trace_buf, sizeof(trace_buf)), "00000000000000000000000000000000");
-
-  // Check that span_id is set to all zeros by default
-  char span_buf[16];
-  r.span_id.ToLowerBase16(span_buf);
-  ASSERT_EQ(std::string(span_buf, sizeof(span_buf)), "0000000000000000");
-
-  // Check that trace_flags is set to all zeros by default
-  char flags_buf[2];
-  r.trace_flags.ToLowerBase16(flags_buf);
-  ASSERT_EQ(std::string(flags_buf, sizeof(flags_buf)), "00");
 }
