@@ -26,8 +26,8 @@ of the current project.
 
  Our CI pipeline builds and tests on following platforms:
 
-* ubuntu-18.04 Bionic ( Default GCC Compiler - 7.5.0 )
-* ubuntu-18.04 Bionic ( GCC 4.8 with -std=c++11 flag)
+* ubuntu-18.04 ( Default GCC Compiler - 7.5.0 )
+* ubuntu-18.04 ( GCC 4.8 with -std=c++11 flag)
 * ubuntu-20.04 ( Default GCC Compiler - 9.3.0 with -std=c++20 flags )
 * macOS 10.15 ( Xcode 12.2 )
 * Windows Server 2019 (Visual Studio Enterprise 2019 )
