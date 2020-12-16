@@ -54,7 +54,7 @@ opentelemetry::nostd::shared_ptr<opentelemetry::logs::Logger> LoggerProvider::Ge
   // If no logger with that name exists yet, create it and add it to the map of loggers
 
   opentelemetry::nostd::shared_ptr<opentelemetry::logs::Logger> logger(
-      new Logger(this->shared_from_this()));
+      new Logger(name, this->shared_from_this()));
   loggers_[name.data()] = logger;
   return logger;
 }
