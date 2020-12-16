@@ -13,9 +13,9 @@ Increment the:
 
 
 ## [Unreleased]
+
+## [0.0.1] 2020-12-16
 ### Added
-    * Trace API
-    * Logger API experimental
-    * Metrics API experimental
+    * Trace API experimental
 ### Changed
 ### Removed

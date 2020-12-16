@@ -13,9 +13,10 @@ Increment the:
 
 
 ## [Unreleased]
+
+## [0.0.1] 2020-12-16
 ### Added
-    * Trace SDK
-    * Logger SDK experimental
-    * Metrics SDK experimental
+    * Trace SDK experimental
+    * OTLP Exporter
 ### Changed
 ### Removed
