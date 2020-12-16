@@ -22,7 +22,7 @@ Please note that supporting the [C Programming
 Language](https://en.wikipedia.org/wiki/C_(programming_language)) is not a goal
 of the current project.
 
-## Supported Platforms
+## Supported Development Platforms
 
  Our CI pipeline builds and tests on following platforms:
 
