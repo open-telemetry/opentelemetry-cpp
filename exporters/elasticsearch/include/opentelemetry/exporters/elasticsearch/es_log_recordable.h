@@ -39,6 +39,44 @@ private:
   // Define a JSON object that will be populated with the log data
   nlohmann::json json_;
 
+  /**
+   * A helper method that writes a key/value pair under a specified name, the two names used here
+   * being "attributes" and "resources"
+   */
+  void WriteKeyValue(nostd::string_view key,
+                     const opentelemetry::common::AttributeValue &value,
+                     std::string name)
+  {
+    switch (value.index())
+    {
+      case common::AttributeType::TYPE_BOOL:
+        json_[name][key.data()] = opentelemetry::nostd::get<bool>(value) ? true : false;
+        return;
+      case common::AttributeType::TYPE_INT:
+        json_[name][key.data()] = opentelemetry::nostd::get<int>(value);
+        return;
+      case common::AttributeType::TYPE_INT64:
+        json_[name][key.data()] = opentelemetry::nostd::get<int64_t>(value);
+        return;
+      case common::AttributeType::TYPE_UINT:
+        json_[name][key.data()] = opentelemetry::nostd::get<unsigned int>(value);
+        return;
+      case common::AttributeType::TYPE_UINT64:
+        json_[name][key.data()] = opentelemetry::nostd::get<uint64_t>(value);
+        return;
+      case common::AttributeType::TYPE_DOUBLE:
+        json_[name][key.data()] = opentelemetry::nostd::get<double>(value);
+        return;
+      case common::AttributeType::TYPE_STRING:
+      case common::AttributeType::TYPE_CSTRING:
+        json_[name][key.data()] =
+            opentelemetry::nostd::get<opentelemetry::nostd::string_view>(value).data();
+        return;
+      default:
+        return;
+    }
+  }
+
 public:
   /**
    * Set the severity for this log.
@@ -70,34 +108,7 @@ public:
   void SetResource(nostd::string_view key,
                    const opentelemetry::common::AttributeValue &value) noexcept override
   {
-    switch (value.index())
-    {
-      case common::AttributeType::TYPE_BOOL:
-        json_["resource"][key.data()] = opentelemetry::nostd::get<bool>(value) ? true : false;
-        break;
-      case common::AttributeType::TYPE_INT:
-        json_["resource"][key.data()] = opentelemetry::nostd::get<int>(value);
-        break;
-      case common::AttributeType::TYPE_INT64:
-        json_["resource"][key.data()] = opentelemetry::nostd::get<int64_t>(value);
-        break;
-      case common::AttributeType::TYPE_UINT:
-        json_["resource"][key.data()] = opentelemetry::nostd::get<unsigned int>(value);
-        break;
-      case common::AttributeType::TYPE_UINT64:
-        json_["resource"][key.data()] = opentelemetry::nostd::get<uint64_t>(value);
-        break;
-      case common::AttributeType::TYPE_DOUBLE:
-        json_["resource"][key.data()] = opentelemetry::nostd::get<double>(value);
-        break;
-      case common::AttributeType::TYPE_STRING:
-      case common::AttributeType::TYPE_CSTRING:
-        json_["resource"][key.data()] =
-            opentelemetry::nostd::get<opentelemetry::nostd::string_view>(value).data();
-        break;
-      default:
-        break;
-    }
+    WriteKeyValue(key, value, "resource");
   }
 
   /**
@@ -108,34 +119,7 @@ public:
   void SetAttribute(nostd::string_view key,
                     const opentelemetry::common::AttributeValue &value) noexcept override
   {
-    switch (value.index())
-    {
-      case common::AttributeType::TYPE_BOOL:
-        json_["attributes"][key.data()] = opentelemetry::nostd::get<bool>(value) ? true : false;
-        break;
-      case common::AttributeType::TYPE_INT:
-        json_["attributes"][key.data()] = opentelemetry::nostd::get<int>(value);
-        break;
-      case common::AttributeType::TYPE_INT64:
-        json_["attributes"][key.data()] = opentelemetry::nostd::get<int64_t>(value);
-        break;
-      case common::AttributeType::TYPE_UINT:
-        json_["attributes"][key.data()] = opentelemetry::nostd::get<unsigned int>(value);
-        break;
-      case common::AttributeType::TYPE_UINT64:
-        json_["attributes"][key.data()] = opentelemetry::nostd::get<uint64_t>(value);
-        break;
-      case common::AttributeType::TYPE_DOUBLE:
-        json_["attributes"][key.data()] = opentelemetry::nostd::get<double>(value);
-        break;
-      case common::AttributeType::TYPE_STRING:
-      case common::AttributeType::TYPE_CSTRING:
-        json_["attributes"][key.data()] =
-            opentelemetry::nostd::get<opentelemetry::nostd::string_view>(value).data();
-        break;
-      default:
-        break;
-    }
+    WriteKeyValue(key, value, "attributes");
   }
 
   /**
