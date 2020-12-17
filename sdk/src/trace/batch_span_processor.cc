@@ -53,11 +53,11 @@ void BatchSpanProcessor::OnEnd(std::unique_ptr<Recordable> &&span) noexcept
   }
 }
 
-void BatchSpanProcessor::ForceFlush(std::chrono::microseconds timeout) noexcept
+bool BatchSpanProcessor::ForceFlush(std::chrono::microseconds timeout) noexcept
 {
   if (is_shutdown_.load() == true)
   {
-    return;
+    return false;
   }
 
   is_force_flush_ = true;
@@ -77,6 +77,8 @@ void BatchSpanProcessor::ForceFlush(std::chrono::microseconds timeout) noexcept
 
   // Notify the worker thread
   is_force_flush_notified_ = false;
+
+  return true;
 }
 
 void BatchSpanProcessor::DoBackgroundWork()
@@ -173,7 +175,7 @@ void BatchSpanProcessor::DrainQueue()
   }
 }
 
-void BatchSpanProcessor::Shutdown(std::chrono::microseconds timeout) noexcept
+bool BatchSpanProcessor::Shutdown(std::chrono::microseconds timeout) noexcept
 {
   is_shutdown_.store(true);
 
@@ -181,8 +183,10 @@ void BatchSpanProcessor::Shutdown(std::chrono::microseconds timeout) noexcept
   worker_thread_.join();
   if (exporter_ != nullptr)
   {
-    exporter_->Shutdown();
+    return exporter_->Shutdown();
   }
+
+  return true;
 }
 
 BatchSpanProcessor::~BatchSpanProcessor()

@@ -489,8 +489,8 @@ TEST_F(TracezProcessor, FlushShutdown)
   auto pre_running_sz   = running.size();
   auto pre_completed_sz = completed.size();
 
-  processor->ForceFlush();
-  processor->Shutdown();
+  EXPECT_TRUE(processor->ForceFlush());
+  EXPECT_TRUE(processor->Shutdown());
 
   UpdateSpans(processor, completed, running);
 

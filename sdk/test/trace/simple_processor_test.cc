@@ -26,7 +26,7 @@ TEST(SimpleProcessor, ToInMemorySpanExporter)
 
   ASSERT_EQ(1, span_data->GetSpans().size());
 
-  processor.Shutdown();
+  EXPECT_TRUE(processor.Shutdown());
 }
 
 // An exporter that does nothing but record (and give back ) the # of times Shutdown was called.
@@ -46,9 +46,11 @@ public:
     return ExportResult::kSuccess;
   }
 
-  void Shutdown(std::chrono::microseconds timeout = std::chrono::microseconds(0)) noexcept override
+  bool Shutdown(
+      std::chrono::microseconds timeout = std::chrono::microseconds::max()) noexcept override
   {
     *shutdown_counter_ += 1;
+    return true;
   }
 
 private:

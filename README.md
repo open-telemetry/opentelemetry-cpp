@@ -47,7 +47,7 @@ Meeting notes are available as a public [Google doc](https://docs.google.com/doc
 
 Approvers ([@open-telemetry/cpp-approvers](https://github.com/orgs/open-telemetry/teams/cpp-approvers)):
 
-* [Johannes Tax](https://github.com/pyohannes), New Relic
+* [Johannes Tax](https://github.com/pyohannes), Microsoft
 * [Josh Suereth](https://github.com/jsuereth), Google
 * [Max Golovanov](https://github.com/maxgolov), Microsoft
 * [Ryan Burn](https://github.com/rnburn), Lightstep
@@ -61,12 +61,14 @@ Maintainers ([@open-telemetry/cpp-maintainers](https://github.com/orgs/open-tele
 * [Lalit Kumar Bhasin](https://github.com/lalitb), Microsoft
 * [Reiley Yang](https://github.com/reyang), Microsoft
 
+*Find more about the maintainer role in [community repository](https://github.com/open-telemetry/community/blob/master/community-membership.md#maintainer).*
+
 Triagers ([@open-telemetry/cpp-triagers](https://github.com/orgs/open-telemetry/teams/cpp-triagers)):
 
 * [Alolita Sharma](https://github.com/alolita), Amazon
 * [Jodee Varney](https://github.com/jodeev), New Relic
 
-*Find more about the maintainer role in [community repository](https://github.com/open-telemetry/community/blob/master/community-membership.md#maintainer).*
+*Find more about the triager role in [community repository](https://github.com/open-telemetry/community/blob/master/community-membership.md#triager).*
 
 ## Release Schedule
 
