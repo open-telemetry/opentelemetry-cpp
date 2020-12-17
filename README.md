@@ -47,7 +47,7 @@ Meeting notes are available as a public [Google doc](https://docs.google.com/doc
 
 Approvers ([@open-telemetry/cpp-approvers](https://github.com/orgs/open-telemetry/teams/cpp-approvers)):
 
-* [Johannes Tax](https://github.com/pyohannes), New Relic
+* [Johannes Tax](https://github.com/pyohannes), Microsoft
 * [Josh Suereth](https://github.com/jsuereth), Google
 * [Max Golovanov](https://github.com/maxgolov), Microsoft
 * [Ryan Burn](https://github.com/rnburn), Lightstep
