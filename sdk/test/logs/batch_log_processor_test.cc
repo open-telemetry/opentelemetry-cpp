@@ -49,8 +49,7 @@ public:
   ExportResult Export(
       const opentelemetry::nostd::span<std::unique_ptr<Recordable>> &records) noexcept override
   {
-    *is_export_completed_ = false;               // Meant exclusively to test force flush timeout
-    std::this_thread::sleep_for(export_delay_);  // give time for the "export" to complete
+    *is_export_completed_ = false;  // Meant exclusively to test schedule_delay_millis
 
     for (auto &record : records)
     {
@@ -114,7 +113,7 @@ TEST_F(BatchLogProcessorTest, TestShutdown)
 
   auto batch_processor = GetMockProcessor(logs_received, is_shutdown);
 
-  // create a few test log records and send them to the processor
+  // Create a few test log records and send them to the processor
   const int num_logs = 3;
 
   for (int i = 0; i < num_logs; ++i)
@@ -157,10 +156,7 @@ TEST_F(BatchLogProcessorTest, TestForceFlush)
     batch_processor->OnReceive(std::move(log));
   }
 
-  // Give some time to export
-  std::this_thread::sleep_for(std::chrono::milliseconds(500));
-
-  batch_processor->ForceFlush();
+  EXPECT_TRUE(batch_processor->ForceFlush());
 
   EXPECT_EQ(num_logs, logs_received->size());
   for (int i = 0; i < num_logs; ++i)
@@ -176,10 +172,7 @@ TEST_F(BatchLogProcessorTest, TestForceFlush)
     batch_processor->OnReceive(std::move(log));
   }
 
-  // Give some time to export the logs
-  std::this_thread::sleep_for(std::chrono::milliseconds(50));
-
-  batch_processor->ForceFlush();
+  EXPECT_TRUE(batch_processor->ForceFlush());
 
   EXPECT_EQ(num_logs * 2, logs_received->size());
   for (int i = 0; i < num_logs * 2; ++i)
@@ -208,10 +201,7 @@ TEST_F(BatchLogProcessorTest, TestManyLogsLoss)
     batch_processor->OnReceive(std::move(log));
   }
 
-  // Give some time to export the logs
-  std::this_thread::sleep_for(std::chrono::milliseconds(700));
-
-  batch_processor->ForceFlush();
+  EXPECT_TRUE(batch_processor->ForceFlush());
 
   // Log should be exported by now
   EXPECT_GE(max_queue_size, logs_received->size());
@@ -235,10 +225,7 @@ TEST_F(BatchLogProcessorTest, TestManyLogsLossLess)
     batch_processor->OnReceive(std::move(log));
   }
 
-  // Give some time to export the logs
-  std::this_thread::sleep_for(std::chrono::milliseconds(50));
-
-  batch_processor->ForceFlush();
+  EXPECT_TRUE(batch_processor->ForceFlush());
 
   EXPECT_EQ(num_logs, logs_received->size());
   for (int i = 0; i < num_logs; ++i)
@@ -273,7 +260,9 @@ TEST_F(BatchLogProcessorTest, TestScheduleDelayMillis)
   // Sleep for schedule_delay_millis milliseconds
   std::this_thread::sleep_for(schedule_delay_millis);
 
-  // small delay to give time to export
+  // small delay to give time to export, which is being performed
+  // asynchronously by the worker thread (this thread will not
+  // forcibly join() the main thread unless processor's shutdown() is called).
   std::this_thread::sleep_for(std::chrono::milliseconds(50));
 
   // Logs should be exported by now
