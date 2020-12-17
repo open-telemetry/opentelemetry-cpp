@@ -27,11 +27,11 @@ def opentelemetry_cpp_deps():
     # Load gRPC dependency
     maybe(
         http_archive,
+        sha256 = "7372a881122cd85a7224435a1d58bc5e11c88d4fb98a64b83f36f3d1c2f16d39",
         name = "com_github_grpc_grpc",
-        sha256 = "d6277f77e0bb922d3f6f56c0f93292bb4cfabfc3c92b31ee5ccea0e100303612",
-        strip_prefix = "grpc-1.28.0",
+        strip_prefix = "grpc-1.34.0",
         urls = [
-            "https://github.com/grpc/grpc/archive/v1.28.0.tar.gz",
+            "https://github.com/grpc/grpc/archive/v1.34.0.tar.gz",
         ],
     )
 

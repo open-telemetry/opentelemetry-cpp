@@ -1,3 +1,12 @@
-third_party
+bazel-bin
+bazel-opentelemetry-cpp
+bazel-out
+bazel-testlogs
+third_party/benchmark
+third_party/boost
+third_party/googletest
+third_party/nlohmann-json
+third_party/opentelemetry-proto
+third_party/prometheus-cpp
 tools
 out
