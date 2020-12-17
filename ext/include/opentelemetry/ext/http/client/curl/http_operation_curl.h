@@ -378,7 +378,11 @@ public:
       // Simply close the socket - connection reset by peer
       if (sockfd_)
       {
+#if defined(_WIN32)
+        ::closesocket(sockfd_);
+#else
         ::close(sockfd_);
+#endif
         sockfd_ = 0;
       }
     }
