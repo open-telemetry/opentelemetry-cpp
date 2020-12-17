@@ -13,12 +13,12 @@ nostd::shared_ptr<trace::Tracer> get_tracer()
 
 void f1()
 {
-  auto span = get_tracer()->StartSpan("f1");
+  auto scoped_span = trace::Scope(get_tracer()->StartSpan("f1"));
 }
 
 void f2()
 {
-  auto span = get_tracer()->StartSpan("f2");
+  auto scoped_span = trace::Scope(get_tracer()->StartSpan("f2"));
 
   f1();
   f1();
@@ -27,7 +27,7 @@ void f2()
 
 void foo_library()
 {
-  auto span = get_tracer()->StartSpan("library");
+  auto scoped_span = trace::Scope(get_tracer()->StartSpan("library"));
 
   f2();
 }
