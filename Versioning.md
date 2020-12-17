@@ -17,10 +17,17 @@ function in applications using `opentelemetry 1.11.33` or `opentelemetry
 Public portions of the SDK (constructors, configuration, end-user interfaces)
 must remain backwards compatible. Internal types are allowed to break.
 
+### ABI Stability
+
+Refer [ABI Policy](./docs/abi-policy.md) for more details. To summarise
+* ABI stability is guaranted for API.
+* ABI stability is not guaranteed for SDK. C++ In case of ABI breaking changes, instead of bumping up the majore version, new `inline namespace` version will be crearted, and both old API and new API would be made available simultaneously.
+
 ## Policy
 
 * Release versions will follow [SemVer 2.0](https://semver.org/).
 * Only single source package containing api and sdk for all signals would be released as part of the new GitHub release.
+* There would be source package releases for api and sdk. There won't be separate releases for the signals. The release version numbers for api and sdk will not be in sync with each other. As there would be more frequent changes expected in sdk then in api.
 * Experimental releases: New (unstable) telemetry signals and features will be introduced behind feature flag using C macro define.
   ```
     #ifdef FEATURE_FLAG
