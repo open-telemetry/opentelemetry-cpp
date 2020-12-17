@@ -49,7 +49,7 @@ public:
   ExportResult Export(
       const opentelemetry::nostd::span<std::unique_ptr<Recordable>> &records) noexcept override
   {
-    *is_export_completed_ = false;  // Meant exclusively to test schedule_delay_millis
+    *is_export_completed_ = false;  // Meant exclusively to test scheduled_delay_millis
 
     for (auto &record : records)
     {
@@ -92,15 +92,15 @@ public:
       std::shared_ptr<std::atomic<bool>> is_shutdown,
       std::shared_ptr<std::atomic<bool>> is_export_completed =
           std::shared_ptr<std::atomic<bool>>(new std::atomic<bool>(false)),
-      const std::chrono::milliseconds export_delay          = std::chrono::milliseconds(0),
-      const std::chrono::milliseconds schedule_delay_millis = std::chrono::milliseconds(5000),
-      const size_t max_queue_size                           = 2048,
-      const size_t max_export_batch_size                    = 512)
+      const std::chrono::milliseconds export_delay           = std::chrono::milliseconds(0),
+      const std::chrono::milliseconds scheduled_delay_millis = std::chrono::milliseconds(5000),
+      const size_t max_queue_size                            = 2048,
+      const size_t max_export_batch_size                     = 512)
   {
     return std::shared_ptr<LogProcessor>(
         new BatchLogProcessor(std::unique_ptr<LogExporter>(new MockLogExporter(
                                   logs_received, is_shutdown, is_export_completed, export_delay)),
-                              max_queue_size, schedule_delay_millis, max_export_batch_size));
+                              max_queue_size, scheduled_delay_millis, max_export_batch_size));
   }
 };
 
@@ -234,9 +234,9 @@ TEST_F(BatchLogProcessorTest, TestManyLogsLossLess)
   }
 }
 
-TEST_F(BatchLogProcessorTest, TestScheduleDelayMillis)
+TEST_F(BatchLogProcessorTest, TestScheduledDelayMillis)
 {
-  /* Test that max_export_batch_size logs are exported every schedule_delay_millis
+  /* Test that max_export_batch_size logs are exported every scheduled_delay_millis
      seconds */
 
   std::shared_ptr<std::atomic<bool>> is_shutdown(new std::atomic<bool>(false));
@@ -245,11 +245,11 @@ TEST_F(BatchLogProcessorTest, TestScheduleDelayMillis)
       new std::vector<std::unique_ptr<LogRecord>>);
 
   const std::chrono::milliseconds export_delay(0);
-  const std::chrono::milliseconds schedule_delay_millis(2000);
+  const std::chrono::milliseconds scheduled_delay_millis(2000);
   const size_t max_export_batch_size = 512;
 
   auto batch_processor = GetMockProcessor(logs_received, is_shutdown, is_export_completed,
-                                          export_delay, schedule_delay_millis);
+                                          export_delay, scheduled_delay_millis);
 
   for (int i = 0; i < max_export_batch_size; ++i)
   {
@@ -257,8 +257,8 @@ TEST_F(BatchLogProcessorTest, TestScheduleDelayMillis)
     log->SetName("Log" + std::to_string(i));
     batch_processor->OnReceive(std::move(log));
   }
-  // Sleep for schedule_delay_millis milliseconds
-  std::this_thread::sleep_for(schedule_delay_millis);
+  // Sleep for scheduled_delay_millis milliseconds
+  std::this_thread::sleep_for(scheduled_delay_millis);
 
   // small delay to give time to export, which is being performed
   // asynchronously by the worker thread (this thread will not

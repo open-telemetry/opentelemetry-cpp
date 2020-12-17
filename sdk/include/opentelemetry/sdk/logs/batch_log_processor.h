@@ -45,15 +45,15 @@ public:
    * @param exporter - The backend exporter to pass the logs to
    * @param max_queue_size -  The maximum buffer/queue size. After the size is reached, logs are
    * dropped.
-   * @param schedule_delay_millis - The time interval between two consecutive exports.
+   * @param scheduled_delay_millis - The time interval between two consecutive exports.
    * @param max_export_batch_size - The maximum batch size of every export. It must be smaller or
    * equal to max_queue_size
    */
   explicit BatchLogProcessor(
       std::unique_ptr<LogExporter> &&exporter,
-      const size_t max_queue_size                           = 2048,
-      const std::chrono::milliseconds schedule_delay_millis = std::chrono::milliseconds(5000),
-      const size_t max_export_batch_size                    = 512);
+      const size_t max_queue_size                            = 2048,
+      const std::chrono::milliseconds scheduled_delay_millis = std::chrono::milliseconds(5000),
+      const size_t max_export_batch_size                     = 512);
 
   /** Makes a new recordable **/
   std::unique_ptr<Recordable> MakeRecordable() noexcept override;
@@ -115,7 +115,7 @@ private:
 
   /* Configurable parameters as per the official *trace* specs */
   const size_t max_queue_size_;
-  const std::chrono::milliseconds schedule_delay_millis_;
+  const std::chrono::milliseconds scheduled_delay_millis_;
   const size_t max_export_batch_size_;
 
   /* Synchronization primitives */

@@ -31,11 +31,11 @@ namespace logs
 
 BatchLogProcessor::BatchLogProcessor(std::unique_ptr<LogExporter> &&exporter,
                                      const size_t max_queue_size,
-                                     const std::chrono::milliseconds schedule_delay_millis,
+                                     const std::chrono::milliseconds scheduled_delay_millis,
                                      const size_t max_export_batch_size)
     : exporter_(std::move(exporter)),
       max_queue_size_(max_queue_size),
-      schedule_delay_millis_(schedule_delay_millis),
+      scheduled_delay_millis_(scheduled_delay_millis),
       max_export_batch_size_(max_export_batch_size),
       buffer_(max_queue_size_),
       worker_thread_(&BatchLogProcessor::DoBackgroundWork, this)
@@ -106,7 +106,7 @@ void BatchLogProcessor::DrainQueue()
  */
 void BatchLogProcessor::DoBackgroundWork()
 {
-  auto timeout = schedule_delay_millis_;
+  auto timeout = scheduled_delay_millis_;
 
   while (true)
   {
@@ -141,7 +141,7 @@ void BatchLogProcessor::DoBackgroundWork()
     auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(end - start);
 
     // Subtract the duration of this export call from the next `timeout`.
-    timeout = schedule_delay_millis_ - duration;
+    timeout = scheduled_delay_millis_ - duration;
   }
 }
 
