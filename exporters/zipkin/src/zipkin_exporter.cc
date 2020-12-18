@@ -1,5 +1,4 @@
 #include "opentelemetry/exporters/zipkin/zipkin_exporter.h"
-#include <iostream>
 #include "opentelemetry/exporters/zipkin/recordable.h"
 #include "opentelemetry/ext/http/client/http_client_factory.h"
 #include "opentelemetry/ext/http/common/url_parser.h"
@@ -22,8 +21,6 @@ ZipkinExporter::ZipkinExporter(const ZipkinExporterOptions &options)
 ZipkinExporter::ZipkinExporter() : options_(ZipkinExporterOptions()), url_parser_(options_.endpoint)
 {
   http_session_manager_ = ext::http::client::HttpClientFactory::Create();
-  std::cout << "URL: " << options_.endpoint << " " << url_parser_.host_ << " " << url_parser_.port_
-            << "\n";
   InitializeLocalEndpoint();
 }
 
@@ -57,40 +54,25 @@ sdk::trace::ExportResult ZipkinExporter::Export(
     }
   }
   auto body_s = json_spans.dump();
-  std::cout << "FINAL JSON:" << body_s << "\n";
   http_client::Body body_v(body_s.begin(), body_s.end());
   request->SetMethod(opentelemetry::ext::http::client::Method::Post);
   request->SetBody(body_v);
   request->AddHeader("Content-Type", "application/json");
   http_client::SessionState session_state;
   auto response = session->SendRequestSync(session_state);
-  if (response)
-  {
-
-    std::cout << "Response Code." << response->GetStatusCode() << "\n";
-    auto body = response->GetBody();
-    std::cout << "\nBody:";
-    for (auto &c : body)
-    {
-      std::cout << static_cast<char>(c);
-    }
-    std::cout << "\n";
-  }
   if (response && (response->GetStatusCode() == 200 || response->GetStatusCode() == 202))
   {
-    std::cout << " SUCCESS\n";
     return sdk::trace::ExportResult::kSuccess;
   }
   else
   {
-    std::cout << " FAILURE\n";
     if (session_state == http_client::SessionState::ConnectFailed)
     {
-      std::cout << "Connect failed\n";
+      // TODO -> Handle error / retries
     }
-    // TBD -> Handle error / retries
     return sdk::trace::ExportResult::kFailure;
   }
+  return sdk::trace::ExportResult::kSuccess;
 }
 
 void ZipkinExporter::InitializeLocalEndpoint()
