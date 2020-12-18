@@ -7,6 +7,5 @@ target_link_libraries(otlp_foo_library ${CMAKE_THREAD_LIBS_INIT}
                       ${CORE_RUNTIME_LIBS} opentelemetry_api)
 
 add_executable(example_otlp main.cc)
-target_link_libraries(
-  example_otlp ${CMAKE_THREAD_LIBS_INIT} otlp_foo_library ${CORE_RUNTIME_LIBS}
-  opentelemetry_trace opentelemetry_exporter_otprotocol)
+target_link_libraries(example_otlp ${CMAKE_THREAD_LIBS_INIT} otlp_foo_library opentelemetry_trace ${CORE_RUNTIME_LIBS}
+  opentelemetry_exporter_otprotocol gRPC::grpc++)

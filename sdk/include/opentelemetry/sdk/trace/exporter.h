@@ -55,11 +55,11 @@ public:
 
   /**
    * Shut down the exporter.
-   * @param timeout an optional timeout, the default timeout of 0 means that no
-   * timeout is applied.
+   * @param timeout an optional timeout.
+   * @return return the status of the operation.
    */
-  virtual void Shutdown(
-      std::chrono::microseconds timeout = std::chrono::microseconds(0)) noexcept = 0;
+  virtual bool Shutdown(
+      std::chrono::microseconds timeout = std::chrono::microseconds::max()) noexcept = 0;
 };
 }  // namespace trace
 }  // namespace sdk

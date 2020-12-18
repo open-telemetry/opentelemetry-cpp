@@ -137,12 +137,12 @@ Visual Studio provides 1st class debug experience for the standard library.
 Supported build flavors:
 
 - `nostd` - OpenTelemetry backport of classes for C++11. Not using standard lib.
-- `stl`   - Standard Library. Full native experience with C++20 compiler.
+- `stdlib`   - Standard Library. Full native experience with C++20 compiler.
   C++17 works but with additional dependencies, e.g. either MS-GSL or Abseil
   for `std::span` implementation (`gsl::span` or `absl::Span`).
 - `absl`  - TODO: this should allow using Abseil C++ library only (no MS-GSL).
 
-Currently only `nostd` and `stl` configurations are implemented.
+Currently only `nostd` and `stdlib` configurations are implemented.
 `absl` is reserved for future use.
 
 ### Build matrix

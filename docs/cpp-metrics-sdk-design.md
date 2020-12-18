@@ -656,7 +656,7 @@ class StdoutExporter: public exporter {
     * Shuts down the channel and cleans up resources as required.
     *
     */
-    void Shutdown();
+    bool Shutdown();
 };
 ```
 
