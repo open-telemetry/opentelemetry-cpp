@@ -78,7 +78,6 @@ public:
       path_ = "/";  // use default path
       if (is_port)
       {
-        // std::cout << url_[cpos]  + "-" + url_[url_.length()-1] << "\n";
         port_ = std::stoi(std::string(url_.begin() + cpos, url_.begin() + url_.length()));
       }
       else
