@@ -1,8 +1,8 @@
 #pragma once
 
+#include "nlohmann/json.hpp"
 #include "opentelemetry/sdk/trace/recordable.h"
 #include "opentelemetry/version.h"
-#include "nlohmann/json.hpp"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace exporter
@@ -11,9 +11,10 @@ namespace zipkin
 {
 using ZipkinSpan = nlohmann::json;
 
-enum class TransportFormat {
-    JSON,
-    PROTOBUF
+enum class TransportFormat
+{
+  JSON,
+  PROTOBUF
 };
 
 class Recordable final : public sdk::trace::Recordable
@@ -44,7 +45,6 @@ public:
   void SetDuration(std::chrono::nanoseconds duration) noexcept override;
 
 private:
-
   ZipkinSpan span_;
 };
 }  // namespace zipkin

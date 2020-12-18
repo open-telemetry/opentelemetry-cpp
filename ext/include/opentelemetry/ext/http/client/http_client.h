@@ -153,7 +153,6 @@ public:
 
   virtual std::unique_ptr<Response> SendRequestSync(SessionState &) noexcept = 0;
 
-
   virtual bool IsSessionActive() noexcept = 0;
 
   virtual bool CancelSession() noexcept = 0;

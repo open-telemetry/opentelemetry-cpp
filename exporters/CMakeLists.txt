@@ -9,6 +9,6 @@ if(WITH_PROMETHEUS)
   add_subdirectory(prometheus)
 endif()
 
-if (WITH_ZIPKIN)
+if(WITH_ZIPKIN)
   add_subdirectory(zipkin)
 endif()

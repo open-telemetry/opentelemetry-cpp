@@ -67,7 +67,7 @@ public:
   /**
    * Create local CURL instance for url and body
    * @param method // HTTP Method
-   * @param url 
+   * @param url
    * @param callback
    * @param request_mode // sync or async
    * @param request  Request Headers
@@ -318,7 +318,7 @@ public:
    */
   long GetResponseCode() { return res_; }
 
- /**
+  /**
    * Get last session state.
    */
   http_client::SessionState GetSessionState() { return session_state_; }

@@ -1,10 +1,10 @@
 #pragma once
 
-#include "opentelemetry/sdk/trace/exporter.h"
-#include "opentelemetry/sdk/trace/span_data.h"
 #include "opentelemetry/exporters/zipkin/recordable.h"
 #include "opentelemetry/ext/http/client/http_client_factory.h"
 #include "opentelemetry/ext/http/common/url_parser.h"
+#include "opentelemetry/sdk/trace/exporter.h"
+#include "opentelemetry/sdk/trace/span_data.h"
 
 #include "nlohmann/json.hpp"
 
@@ -20,14 +20,14 @@ namespace zipkin
 struct ZipkinExporterOptions
 {
   // The endpoint to export to. By default the OpenTelemetry Collector's default endpoint.
-  std::string endpoint = "http:://localhost:9411/api/v2/spans";
-  TransportFormat format = TransportFormat::JSON;
+  std::string endpoint     = "http:://localhost:9411/api/v2/spans";
+  TransportFormat format   = TransportFormat::JSON;
   std::string service_name = "default-service";
   std::string ipv4;
   std::string ipv6;
 };
 
-namespace trace_sdk = opentelemetry::sdk::trace;
+namespace trace_sdk   = opentelemetry::sdk::trace;
 namespace http_client = opentelemetry::ext::http::client;
 
 /**
@@ -66,15 +66,19 @@ public:
    */
   void Shutdown(
       std::chrono::microseconds timeout = std::chrono::microseconds(0)) noexcept override{};
-    
-  void OnResponse(http_client::Response &response) noexcept override {/*Not required */}
- 
-  virtual void OnEvent(http_client::SessionState state, nostd::string_view msg) noexcept override { /* Not required */};
 
-  virtual void OnConnecting(const http_client::SSLCertificate &) noexcept override { /* Not required */};
+  void OnResponse(http_client::Response &response) noexcept override
+  { /*Not required */
+  }
+
+  virtual void OnEvent(http_client::SessionState state,
+                       nostd::string_view msg) noexcept override{/* Not required */};
+
+  virtual void OnConnecting(const http_client::SSLCertificate &) noexcept override{
+      /* Not required */};
 
 private:
-    void InitializeLocalEndpoint();
+  void InitializeLocalEndpoint();
 
 private:
   // The configuration options associated with this exporter.

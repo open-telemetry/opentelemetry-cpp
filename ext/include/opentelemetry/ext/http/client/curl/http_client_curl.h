@@ -131,9 +131,9 @@ public:
     is_session_active_ = true;
     std::string url    = host_ + std::string(http_request_->uri_);
     auto callback_ptr  = &callback;
-    curl_operation_.reset(new HttpOperation(http_request_->method_, url, callback_ptr, RequestMode::Sync,
-                                            http_request_->headers_, http_request_->body_, false,
-                                            http_request_->timeout_ms_));
+    curl_operation_.reset(new HttpOperation(
+        http_request_->method_, url, callback_ptr, RequestMode::Sync, http_request_->headers_,
+        http_request_->body_, false, http_request_->timeout_ms_));
     curl_operation_->SendAsync([this, callback_ptr](HttpOperation &operation) {
       if (operation.WasAborted())
       {
