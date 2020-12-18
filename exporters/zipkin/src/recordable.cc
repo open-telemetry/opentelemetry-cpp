@@ -9,7 +9,6 @@ namespace zipkin
 {
 
 const int kAttributeValueSize = 14;
-const char *EMPTY_PARENT_SPAN = "0000000000000000";
 
 void Recordable::SetIds(trace::TraceId trace_id,
                         trace::SpanId span_id,
@@ -153,7 +152,7 @@ void Recordable::AddEvent(nostd::string_view name,
 void Recordable::AddLink(const opentelemetry::trace::SpanContext &span_context,
                          const common::KeyValueIterable &attributes) noexcept
 {
-  // TODO: Populate once supported
+  // TODO: Currently not supported by specs:
   // https://github.com/open-telemetry/opentelemetry-specification/blob/master/specification/trace/sdk_exporters/zipkin.md
 }
 
@@ -167,20 +166,16 @@ void Recordable::SetStatus(trace::CanonicalCode code, nostd::string_view descrip
 void Recordable::SetName(nostd::string_view name) noexcept
 {
   span_["name"] = name.data();
-  // span_.set_name(name.data(), name.size());
 }
 
 void Recordable::SetStartTime(opentelemetry::core::SystemTimestamp start_time) noexcept
 {
   span_["timestamp"] = start_time.time_since_epoch().count();
-  // span_.set_start_time_unix_nano(start_time.time_since_epoch().count());
 }
 
 void Recordable::SetDuration(std::chrono::nanoseconds duration) noexcept
 {
   span_["duration"] = duration.count();
-  /*const uint64_t unix_end_time = span_.start_time_unix_nano() + duration.count();
-  span_.set_end_time_unix_nano(unix_end_time);*/
 }
 
 void Recordable::SetSpanKind(opentelemetry::trace::SpanKind span_kind) noexcept {}
