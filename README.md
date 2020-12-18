@@ -24,7 +24,7 @@ of the current project.
 
 ## Supported Development Platforms
 
- Our CI pipeline builds and tests on following x86 platforms:
+ Our CI pipeline builds and tests on following `x86` platforms:
 
 * ubuntu-18.04 ( Default GCC Compiler - 7.5.0 )
 * ubuntu-18.04 ( GCC 4.8 with -std=c++11 flag)
