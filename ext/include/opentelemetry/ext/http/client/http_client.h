@@ -10,6 +10,8 @@
 /*
  Usage Example
 
+Async Request:
+
  struct SimpleReponseHandler: public ResponseHandler {
       void OnResponse(Response& res) noexcept override
       {
@@ -37,6 +39,17 @@
   session->FinishSession() // optionally in the end
   ...shutdown
   sessionManager.FinishAllSessions()
+
+Sync Request:
+
+  SessionMamager sessionManager;
+  auto session = sessionManager.createSession("localhost", 8000);
+  auto request = session->CreateRequest();
+  request->AddHeader(..);
+  SessionState session_state;
+  auto response = session->SendRequestSync(session_state);
+  // session_state will contain SessionState::Response if successful.
+
 */
 
 OPENTELEMETRY_BEGIN_NAMESPACE
@@ -137,6 +150,9 @@ public:
   virtual std::shared_ptr<Request> CreateRequest() noexcept = 0;
 
   virtual void SendRequest(EventHandler &) noexcept = 0;
+
+  virtual std::unique_ptr<Response> SendRequestSync(SessionState &) noexcept = 0;
+
 
   virtual bool IsSessionActive() noexcept = 0;
 

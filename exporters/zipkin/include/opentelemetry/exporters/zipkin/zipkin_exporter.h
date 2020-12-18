@@ -1,0 +1,89 @@
+#pragma once
+
+#include "opentelemetry/sdk/trace/exporter.h"
+#include "opentelemetry/sdk/trace/span_data.h"
+#include "opentelemetry/exporters/zipkin/recordable.h"
+#include "opentelemetry/ext/http/client/http_client_factory.h"
+#include "opentelemetry/ext/http/common/url_parser.h"
+
+#include "nlohmann/json.hpp"
+
+OPENTELEMETRY_BEGIN_NAMESPACE
+namespace exporter
+{
+namespace zipkin
+{
+/**
+ * Struct to hold OTLP exporter options.
+ */
+
+struct ZipkinExporterOptions
+{
+  // The endpoint to export to. By default the OpenTelemetry Collector's default endpoint.
+  std::string endpoint = "http:://localhost:9411/api/v2/spans";
+  TransportFormat format = TransportFormat::JSON;
+  std::string service_name = "default-service";
+  std::string ipv4;
+  std::string ipv6;
+};
+
+namespace trace_sdk = opentelemetry::sdk::trace;
+namespace http_client = opentelemetry::ext::http::client;
+
+/**
+ * The OTLP exporter exports span data in OpenTelemetry Protocol (OTLP) format.
+ */
+class ZipkinExporter final : public trace_sdk::SpanExporter, public http_client::EventHandler
+{
+public:
+  /**
+   * Create an OtlpExporter using all default options.
+   */
+  ZipkinExporter();
+
+  /**
+   * Create an OtlpExporter using the given options.
+   */
+  ZipkinExporter(const ZipkinExporterOptions &options);
+
+  /**
+   * Create a span recordable.
+   * @return a newly initialized Recordable object
+   */
+  std::unique_ptr<trace_sdk::Recordable> MakeRecordable() noexcept override;
+
+  /**
+   * Export a batch of span recordables in OTLP format.
+   * @param spans a span of unique pointers to span recordables
+   */
+  trace_sdk::ExportResult Export(
+      const nostd::span<std::unique_ptr<trace_sdk::Recordable>> &spans) noexcept override;
+
+  /**
+   * Shut down the exporter.
+   * @param timeout an optional timeout, the default timeout of 0 means that no
+   * timeout is applied.
+   */
+  void Shutdown(
+      std::chrono::microseconds timeout = std::chrono::microseconds(0)) noexcept override{};
+    
+  void OnResponse(http_client::Response &response) noexcept override {/*Not required */}
+ 
+  virtual void OnEvent(http_client::SessionState state, nostd::string_view msg) noexcept override { /* Not required */};
+
+  virtual void OnConnecting(const http_client::SSLCertificate &) noexcept override { /* Not required */};
+
+private:
+    void InitializeLocalEndpoint();
+
+private:
+  // The configuration options associated with this exporter.
+  bool isShutdown_ = false;
+  std::shared_ptr<http_client::SessionManager> http_session_manager_;
+  nlohmann::json local_end_point_;
+  ZipkinExporterOptions options_;
+  ext::http::common::UrlParser url_parser_;
+};
+}  // namespace zipkin
+}  // namespace exporter
+OPENTELEMETRY_END_NAMESPACE
