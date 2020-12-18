@@ -42,9 +42,9 @@ Refer [ABI Policy](./docs/abi-policy.md) for more details. To summarise
   The guidelines in creating feature flag would be:
   - Naming:
 
-        - `ENABLE_<SIGNAL>_PREVIEW` : For experimetal release of signal api/sdks eg, METRICS_PREVIEW, LOGGING_PREVIEW,
+    - `ENABLE_<SIGNAL>_PREVIEW` : For experimetal release of signal api/sdks eg, METRICS_PREVIEW, LOGGING_PREVIEW,
 
-        - `ENABLE_<SIGNAL>_<FEATURE_NAME>_PREVIEW` : For experimental release for any feature within stable signal. Eg, TRACING_JAEGER_PREVIEW to release the experimental Jaeger exporter for tracing.
+    - `ENABLE_<SIGNAL>_<FEATURE_NAME>_PREVIEW` : For experimental release for any feature within stable signal. Eg, TRACING_JAEGER_PREVIEW to release the experimental Jaeger exporter for tracing.
 
   - Cleanup: It is good practice to keep feature-flags shortlived as possible. And, aslo important to keep the number of them low. They should be used such that it is easy to remove/cleanup them once the experimental feature is stable.
 
