@@ -182,6 +182,8 @@ void Recordable::SetDuration(std::chrono::nanoseconds duration) noexcept
   /*const uint64_t unix_end_time = span_.start_time_unix_nano() + duration.count();
   span_.set_end_time_unix_nano(unix_end_time);*/
 }
+
+void Recordable::SetSpanKind(opentelemetry::trace::SpanKind span_kind) noexcept {}
 }  // namespace zipkin
 }  // namespace exporter
 OPENTELEMETRY_END_NAMESPACE

@@ -61,11 +61,13 @@ public:
 
   /**
    * Shut down the exporter.
-   * @param timeout an optional timeout, the default timeout of 0 means that no
-   * timeout is applied.
+   * @param timeout an optional timeout, default to max.
    */
-  void Shutdown(
-      std::chrono::microseconds timeout = std::chrono::microseconds(0)) noexcept override{};
+  bool Shutdown(
+      std::chrono::microseconds timeout = std::chrono::microseconds::max()) noexcept override
+  {
+    return true;
+  };
 
   void OnResponse(http_client::Response &response) noexcept override
   { /*Not required */
