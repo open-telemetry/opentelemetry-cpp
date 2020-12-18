@@ -58,7 +58,7 @@ Shuts down the exporter. Called when SDK is shut down. This is an opportunity fo
 
 In the OStreamExporter there is no cleanup to be done, so there is no need to use the timeout within the `Shutdown` function as it will never be blocking.
 
-```
+```cc
 class StreamSpanExporter final : public sdktrace::SpanExporter
 {
 
@@ -142,7 +142,7 @@ The MetricsExporter is called through the Controller in the SDK data path. The e
 
 Shutdown() is currently not required for the OStreamMetricsExporter.
 
-```
+```cc
 class StreamMetricsExporter final : public sdkmeter::MetricsExporter
 {
 
