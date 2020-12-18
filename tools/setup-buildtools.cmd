@@ -1,5 +1,5 @@
 @echo off
-set "PATH=%ProgramFiles%\CMake\bin;%~dp0;%~dp0\vcpkg;%PATH%"
+set "PATH=%ProgramFiles%\CMake\bin;%~dp0;%~dp0vcpkg;%PATH%"
 pushd %~dp0
 
 net session >nul 2>&1
@@ -7,7 +7,7 @@ if %errorLevel% == 0 (
   echo Running with Administrative privilege...
   REM Fail if chocolatey is not installed
   where /Q choco
-  if ERRORLEVEL 1 (
+  if %ERRORLEVEL% == 1 (
     echo This script requires chocolatey. Installation instructions: https://chocolatey.org/docs/installation
     exit -1
   )
@@ -21,7 +21,7 @@ if %errorLevel% == 0 (
 
 REM Print current Visual Studio installations detected
 where /Q vswhere
-if ERRORLEVEL 0 (
+if %ERRORLEVEL% == 0 (
   echo Visual Studio installations detected:
   vswhere -property installationPath
 )
@@ -35,7 +35,7 @@ if "%TOOLS_VS_NOTFOUND%" == "1" (
 )
 
 where /Q vcpkg.exe
-if ERRORLEVEL 1 (
+if %ERRORLEVEL% == 1 (
   REM Build our own vcpkg from source
   pushd .\vcpkg
   call bootstrap-vcpkg.bat
@@ -46,7 +46,7 @@ if ERRORLEVEL 1 (
 
 REM Install dependencies
 vcpkg install gtest:x64-windows
-vcpkg install --head --overlay-ports=%~dp0\ports benchmark:x64-windows
+vcpkg install --head --overlay-ports=%~dp0ports benchmark:x64-windows
 vcpkg install ms-gsl:x64-windows
 vcpkg install nlohmann-json:x64-windows
 vcpkg install abseil:x64-windows
