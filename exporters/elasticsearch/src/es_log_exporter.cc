@@ -43,11 +43,16 @@ public:
    */
   void OnResponse(http_client::Response &response) noexcept override
   {
-    // Store the body of the request
-    body_ = std::string(response.GetBody().begin(), response.GetBody().end());
+    // Lock the private members so they can't be read while being modified
+    {
+      std::unique_lock<std::mutex> lk(mutex_);
 
-    // Set the response_received_ flag to true and notify any threads waiting on this result
-    response_received_ = true;
+      // Store the body of the request
+      body_ = std::string(response.GetBody().begin(), response.GetBody().end());
+
+      // Set the response_received_ flag to true and notify any threads waiting on this result
+      response_received_ = true;
+    }
     cv_.notify_all();
   }
 
@@ -57,7 +62,6 @@ public:
    */
   bool waitForResponse()
   {
-    std::mutex mutex_;
     std::unique_lock<std::mutex> lk(mutex_);
     cv_.wait(lk);
     return response_received_;
@@ -66,7 +70,12 @@ public:
   /**
    * Returns the body of the response
    */
-  std::string GetResponseBody() { return body_; }
+  std::string GetResponseBody() 
+  {
+    // Lock so that body_ can't be written to while returning it
+    std::unique_lock<std::mutex> lk(mutex_);
+    return body_; 
+  }
 
   // Callback method when an http event occurs
   void OnEvent(http_client::SessionState state,
@@ -99,8 +108,9 @@ public:
   }
 
 private:
-  // Define a condition variable used for blocking
+  // Define a condition variable and mutex
   std::condition_variable cv_;
+  std::mutex mutex_;
 
   // Whether the response from Elasticsearch has been received
   bool response_received_ = false;
