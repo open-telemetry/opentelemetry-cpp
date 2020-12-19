@@ -120,14 +120,13 @@ private:
 
   /* Synchronization primitives */
   std::condition_variable cv_, force_flush_cv_;
-  std::mutex cv_m_, force_flush_cv_m_, shutdown_mutex_;
+  std::mutex cv_m_, force_flush_cv_m_;
 
   /* The buffer/queue to which the ended logs are added */
   common::CircularBuffer<Recordable> buffer_;
 
   /* Important boolean flags to handle the workflow of the processor */
-  std::atomic<bool> is_shutdown_{false};  // once is_shutdown is set to true, there shouldn't be a
-                                          // case it's ever set to false again
+  std::atomic<bool> is_shutdown_{false};
   std::atomic<bool> is_force_flush_{false};
   std::atomic<bool> is_force_flush_notified_{false};
 
