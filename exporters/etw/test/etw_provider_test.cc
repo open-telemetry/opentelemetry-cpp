@@ -12,12 +12,14 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <gtest/gtest.h>
-#include <string>
+#ifdef _WIN32
 
-#define HAVE_NO_TLD
+#  include <gtest/gtest.h>
+#  include <string>
 
-#include "opentelemetry/exporters/etw/etw_provider_exporter.h"
+#  define HAVE_NO_TLD
+
+#  include "opentelemetry/exporters/etw/etw_provider_exporter.h"
 
 using namespace OPENTELEMETRY_NAMESPACE;
 
@@ -69,3 +71,5 @@ TEST(ETWProvider, CheckCloseSuccess)
   auto result = etw.close(handle);
   ASSERT_NE(result, etw.STATUS_ERROR);
 }
+
+#endif

@@ -32,6 +32,7 @@ cc_library(
         "src/etw_tracer_exporter.cc",
     ],
     hdrs = [
+        "include/opentelemetry/exporters/etw/etw_data.h",
         "include/opentelemetry/exporters/etw/etw_tracer_exporter.h",
         "include/opentelemetry/exporters/etw/utils.h",
         "include/opentelemetry/exporters/etw/uuid.hpp",

@@ -12,13 +12,15 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <gtest/gtest.h>
-#include <string>
+#ifdef _WIN32
 
-#define HAVE_NO_TLD
+#  include <gtest/gtest.h>
+#  include <string>
 
-#include "opentelemetry/exporters/etw/etw_tracer_exporter.h"
-#include "opentelemetry/sdk/trace/simple_processor.h"
+#  define HAVE_NO_TLD
+
+#  include "opentelemetry/exporters/etw/etw_tracer_exporter.h"
+#  include "opentelemetry/sdk/trace/simple_processor.h"
 
 using namespace OPENTELEMETRY_NAMESPACE;
 
@@ -84,3 +86,5 @@ TEST(ETWTracer, ExportUnitTest)
   auto result = exporter->Export(batch);
   EXPECT_EQ(sdk::trace::ExportResult::kSuccess, result);
 }
+
+#endif

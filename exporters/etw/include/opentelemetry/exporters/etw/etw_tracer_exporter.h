@@ -30,7 +30,6 @@
 #include "opentelemetry/trace/trace_id.h"
 #include "opentelemetry/trace/tracer_provider.h"
 
-#include "opentelemetry/sdk/trace/etw_data.h"
 #include "opentelemetry/sdk/trace/exporter.h"
 #include "opentelemetry/sdk/trace/recordable.h"
 
@@ -41,6 +40,7 @@
 #include <sstream>
 #include <unordered_map>
 
+#include "opentelemetry/exporters/etw/etw_data.h"
 #include "opentelemetry/exporters/etw/etw_provider_exporter.h"
 
 #include "opentelemetry/exporters/etw/utils.h"

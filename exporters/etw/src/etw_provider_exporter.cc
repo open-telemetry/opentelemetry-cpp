@@ -1,3 +1,7 @@
-#define HAVE_NO_TLD
+#ifdef _WIN32
 
-#include "opentelemetry/exporters/etw/etw_provider_exporter.h"
+#  define HAVE_NO_TLD
+
+#  include "opentelemetry/exporters/etw/etw_provider_exporter.h"
+
+#endif
