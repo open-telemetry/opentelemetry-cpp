@@ -45,10 +45,14 @@ def opentelemetry_cpp_deps():
 
     # OTLP Protocol definition
     maybe(
-        native.new_local_repository,
+        http_archive,
         name = "com_github_opentelemetry_proto",
         build_file = "//bazel:opentelemetry_proto.BUILD",
-        path = "third_party/opentelemetry-proto",
+        sha256 = "08f090570e0a112bfae276ba37e9c45bf724b64d902a7a001db33123b840ebd6",
+        strip_prefix = "opentelemetry-proto-0.6.0",
+        urls = [
+            "https://github.com/open-telemetry/opentelemetry-proto/archive/v0.6.0.tar.gz",
+        ],
     )
 
     # JSON library
