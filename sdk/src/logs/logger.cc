@@ -27,6 +27,11 @@ Logger::Logger(opentelemetry::nostd::string_view name,
     : logger_name_(std::string(name)), logger_provider_(logger_provider)
 {}
 
+const opentelemetry::nostd::string_view Logger::GetName() noexcept
+{
+  return logger_name_;
+}
+
 /**
  * Create and populate recordable with the log event's fields passed in.
  * The timestamp, severity, traceid, spanid, and traceflags, are injected
