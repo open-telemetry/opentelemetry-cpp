@@ -50,6 +50,8 @@ namespace logs
 class NoopLogger final : public Logger
 {
 public:
+  const nostd::string_view GetName() noexcept override { return "noop logger"; }
+
   void Log(Severity severity,
            nostd::string_view name,
            nostd::string_view body,
