@@ -31,7 +31,7 @@ TEST(LoggerSDK, LogToNullProcessor)
   auto logger = lp->GetLogger("logger");
 
   // Log a sample log record to a nullptr processor
-  logger->Log("Test log");
+  logger->Debug("Test log");
 }
 
 class MockProcessor final : public LogProcessor
@@ -56,11 +56,11 @@ public:
     // Cast the recordable received into a concrete LogRecord type
     auto copy = std::shared_ptr<LogRecord>(static_cast<LogRecord *>(record.release()));
 
-    // Copy over the received log record's name, body, timestamp fields over to the recordable
+    // Copy over the received log record's severity, name, and body fields over to the recordable
     // passed in the constructor
     record_received_->SetSeverity(copy->GetSeverity());
+    record_received_->SetName(copy->GetName());
     record_received_->SetBody(copy->GetBody());
-    record_received_->SetTimestamp(copy->GetTimestamp());
   }
   bool ForceFlush(std::chrono::microseconds timeout = std::chrono::microseconds(0)) noexcept
   {
@@ -92,10 +92,9 @@ TEST(LoggerSDK, LogToAProcessor)
   ASSERT_EQ(processor, lp->GetProcessor());
 
   // Check that the recordable created by the Log() statement is set properly
-  opentelemetry::core::SystemTimestamp now(std::chrono::system_clock::now());
-  logger->Log(opentelemetry::logs::Severity::kWarn, "Message", now);
+  logger->Log(opentelemetry::logs::Severity::kWarn, "Log Name", "Log Message");
 
   ASSERT_EQ(shared_recordable->GetSeverity(), opentelemetry::logs::Severity::kWarn);
-  ASSERT_EQ(shared_recordable->GetBody(), "Message");
-  ASSERT_EQ(shared_recordable->GetTimestamp().time_since_epoch(), now.time_since_epoch());
+  ASSERT_EQ(shared_recordable->GetName(), "Log Name");
+  ASSERT_EQ(shared_recordable->GetBody(), "Log Message");
 }

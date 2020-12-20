@@ -34,10 +34,16 @@ class Logger final : public opentelemetry::logs::Logger
 public:
   /**
    * Initialize a new logger.
+   * @param name The name of this logger instance
    * @param logger_provider The logger provider that owns this logger.
    */
   explicit Logger(opentelemetry::nostd::string_view name,
                   std::shared_ptr<LoggerProvider> logger_provider) noexcept;
+
+  /**
+   * Returns the name of this logger.
+   */
+  const opentelemetry::nostd::string_view GetName() noexcept override;
 
   /**
    * Writes a log record into the processor.
