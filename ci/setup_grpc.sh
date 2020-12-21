@@ -22,4 +22,4 @@ make -j 6
 make install
 popd
 popd
-export PATH=${INSTALL_DIR}/bin:$PATH  # nsure to use the installed grpc
+export PATH=${INSTALL_DIR}/bin:$PATH  # ensure to use the installed grpc
