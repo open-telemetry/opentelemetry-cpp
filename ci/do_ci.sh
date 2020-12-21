@@ -49,7 +49,7 @@ elif [[ "$1" == "cmake.exporter.otprotocol.test" ]]; then
         "${SRC_DIR}"
   grpc_cpp_plugin=`which grpc_cpp_plugin`
   proto_make_file="CMakeFiles/opentelemetry_proto.dir/build.make"
-  sed -i "s~$grpc_cpp_plugin~gRPC_CPP_PLUGIN_EXECUTABLE-NOTFOUND~" ${proto_make_file}
+  sed -i "s~gRPC_CPP_PLUGIN_EXECUTABLE-NOTFOUND~$grpc_cpp_plugin~" ${proto_make_file}
   make
   make test
   exit 0
