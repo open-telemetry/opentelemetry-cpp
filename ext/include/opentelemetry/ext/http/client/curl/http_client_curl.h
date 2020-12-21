@@ -192,7 +192,7 @@ class SessionManager : public http_client::SessionManager
 {
 public:
   // The call (curl_global_init) is not thread safe. Ensure this is called only once.
-  SessionManager() { curl_global_init(CURL_GLOBAL_ALL); }
+  SessionManager() : next_session_id_{0} { curl_global_init(CURL_GLOBAL_ALL); }
 
   std::shared_ptr<http_client::Session> CreateSession(nostd::string_view host,
                                                       uint16_t port = 80) noexcept override
