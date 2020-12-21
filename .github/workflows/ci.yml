@@ -57,7 +57,7 @@ jobs:
     - name: run tests
       run: ./ci/do_ci.sh cmake.c++20.test
 
-  cmake_test:
+  cmake_otprotocol_test:
     name: CMake otprotocol test
     runs-on: ubuntu-latest
     steps:
