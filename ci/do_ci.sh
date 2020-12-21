@@ -45,7 +45,6 @@ elif [[ "$1" == "cmake.exporter.otprotocol.test" ]]; then
   rm -rf *
   cmake -DCMAKE_BUILD_TYPE=Debug  \
         -DWITH_OTLP=ON \
-        -DCMAKE_CXX_FLAGS="-Werror" \
         "${SRC_DIR}"
   grpc_cpp_plugin=`which grpc_cpp_plugin`
   proto_make_file="CMakeFiles/opentelemetry_proto.dir/build.make"
