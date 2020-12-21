@@ -16,11 +16,12 @@ namespace zipkin
 /**
  * Struct to hold OTLP exporter options.
  */
+std::string ZIPKIN_ENDPOINT_DEFAULT = "http://localhost:9411/api/v2/spans";
 
 struct ZipkinExporterOptions
 {
   // The endpoint to export to. By default the OpenTelemetry Collector's default endpoint.
-  std::string endpoint     = "http:://localhost:9411/api/v2/spans";
+  std::string endpoint     = ZIPKIN_ENDPOINT_DEFAULT;
   TransportFormat format   = TransportFormat::JSON;
   std::string service_name = "default-service";
   std::string ipv4;
