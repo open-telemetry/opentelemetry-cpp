@@ -45,7 +45,7 @@ public:
   {
     return std::unique_ptr<Recordable>(new LogRecord());
   }
-  
+
   // Export method stores the logs received into a shared list of record names
   ExportResult Export(
       const opentelemetry::nostd::span<std::unique_ptr<Recordable>> &records) noexcept override
