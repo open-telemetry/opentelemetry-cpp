@@ -13,7 +13,7 @@
 # limitations under the License.
 
 include_directories(include)
-find_package(CURL)
+find_package(CURL REQUIRED)
 if(CURL_FOUND)
   add_compile_definitions(WITH_CURL)
 endif()
