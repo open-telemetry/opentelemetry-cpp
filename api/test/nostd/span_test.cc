@@ -1,6 +1,5 @@
 #include "opentelemetry/nostd/span.h"
 
-#include <benchmark/benchmark.h>
 #include <cstdint>
 
 #include <algorithm>
@@ -186,61 +185,4 @@ TEST(SpanTest, Iteration)
   span<int, 3> s2{array.data(), array.size()};
   EXPECT_EQ(std::distance(s2.begin(), s2.end()), array.size());
   EXPECT_TRUE(std::equal(s2.begin(), s2.end(), array.begin()));
-}
-
-static void SpanIterator(benchmark::State &state)
-{
-  constexpr size_t aSize = 100000;
-  std::array<int, aSize> array{};
-  for (size_t i = 0; i < aSize; i++)
-  {
-    array[i] = i;
-  }
-  span<int> s1{array.data(), array.size()};
-  for (auto _ : state)
-  {
-    size_t i = 0;
-    for (auto item : s1)
-    {
-      EXPECT_EQ(item, i);
-      i++;
-    }
-  }
-}
-BENCHMARK(SpanIterator);
-
-static void SpanConstructor(benchmark::State &state)
-{
-  constexpr size_t aSize = 1000000;
-  auto *aInt16           = new std::array<int16_t, aSize>{};
-  auto *aInt32           = new std::array<int32_t, aSize>{};
-  auto *aInt64           = new std::array<int64_t, aSize>{};
-  for (size_t i = 0; i < aSize; i++)
-  {
-    (*aInt16)[i] = i;
-    (*aInt32)[i] = i;
-    (*aInt64)[i] = i;
-  }
-  size_t j = aSize;
-  for (auto _ : state)
-  {
-    benchmark::DoNotOptimize([&] {
-      span<int16_t> s1{aInt16->data(), aInt16->size()};
-      span<int32_t> s2{aInt32->data(), aInt32->size()};
-      span<int64_t> s3{aInt64->data(), aInt64->size()};
-    });
-  }
-  delete aInt16;
-  delete aInt32;
-  delete aInt64;
-}
-BENCHMARK(SpanConstructor);
-
-TEST(SpanTest, PerfTests)
-{
-  // Run all benchmarks
-  int argc           = 0;
-  const char *argv[] = {""};
-  ::benchmark::Initialize(&argc, (char **)(argv));
-  ::benchmark::RunSpecifiedBenchmarks();
 }

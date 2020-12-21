@@ -1,6 +1,5 @@
 #include "opentelemetry/nostd/shared_ptr.h"
 
-#include <benchmark/benchmark.h>
 #include <gtest/gtest.h>
 
 #include <algorithm>
@@ -184,22 +183,4 @@ static void SharedPtrTest_Sort(size_t size = 10)
 TEST(SharedPtrTest, Sort)
 {
   SharedPtrTest_Sort();
-}
-
-static void SharedPtrTestSort(benchmark::State &state)
-{
-  for (auto _ : state)
-  {
-    SharedPtrTest_Sort(10000);
-  }
-}
-BENCHMARK(SharedPtrTestSort);
-
-TEST(SharedPtr, PerfTests)
-{
-  // Run all benchmarks
-  int argc           = 0;
-  const char *argv[] = {""};
-  ::benchmark::Initialize(&argc, (char **)(argv));
-  ::benchmark::RunSpecifiedBenchmarks();
 }

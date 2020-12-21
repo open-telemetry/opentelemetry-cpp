@@ -5,11 +5,9 @@ process (environment where ABI compat is not a requirement), or for
 "header-only" implementation of SDK.
 
 Proposed approach cannot be employed for shared libs in environments where
-ABI compatibility is required:
-
-- OpenTelemetry SDK binary compiled with compiler A + STL B
-- may not be ABI compatible with the main executable compiled with compiler
-  C + STL D on a same OS.
+ABI compatibility is required. OpenTelemetry SDK binary compiled with
+`compiler A + STL B` will not be ABI -compatible with the main executable
+compiled with `compiler C + STL D`.
 
 In addition to standard library, similar approach can be reused to implement
 the API surface classes with [Abseil classes](https://abseil.io/) instead of
@@ -142,8 +140,9 @@ Supported build flavors:
   for `std::span` implementation (`gsl::span` or `absl::Span`).
 - `absl`  - TODO: this should allow using Abseil C++ library only (no MS-GSL).
 
-Currently only `nostd` and `stdlib` configurations are implemented.
-`absl` is reserved for future use.
+Currently only `nostd` and `stdlib` configurations are implemented in CMake build.
+`absl` is reserved for future use. Build systems other than CMake need to
+`#define HAVE_CPP_STDLIB` to enable the Standard Library classes.
 
 ### Build matrix
 
@@ -189,4 +188,4 @@ expectations.
 
 CI allows to validate that all OpenTelemetry functionality is working the same
 identical way irrespective of what C++ runtime / STL library it is compiled
-with. Additional performance benchmarks were added.
+with.
