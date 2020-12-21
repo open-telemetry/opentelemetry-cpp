@@ -49,7 +49,7 @@ A `MeterProvider` interface must support a  `global.SetMeterProvider(MeterProvid
     * name (required): identifies the instrumentation library.
     * version (optional): specifies the version of the instrumenting library (the library injecting OpenTelemetry calls into the code)
 
-```
+```cc
 # meter_provider.h
 class Provider
 {
@@ -94,7 +94,7 @@ private:
 
 
 
-```
+```cc
 # meter_provider.h
 class MeterProvider
 {
@@ -126,9 +126,9 @@ This interface consists of a set of **instrument constructors**, and a **facilit
 
 
 
-```
+```cc
 # meter.h
-Class Meter {
+class Meter {
 public:
 
 /////////////////////////Metric Instrument Constructors////////////////////////////
@@ -184,7 +184,7 @@ public:
   * of labels with a single API call. Implementations should find bound metric
   * instruments that match the key-value pairs in the labels.
   *
-  * Arugments:
+  * Arguments:
   * labels, labels associated with all measurements in the batch.
   * instruments, a span of pointers to instruments to record to.
   * values, a synchronized span of values to record to those instruments.
@@ -275,7 +275,7 @@ Direct calling must also be supported.  The user can specify labels with the cap
 MUST support `RecordBatch` calling (where a single set of labels is applied to several metric instruments).
 
 
-```
+```cc
 # metric.h
 
 /*
@@ -340,15 +340,16 @@ public:
 
 
 
-```
+```cc
 template <class T>
 class SynchronousInstrument: public Instrument {
 public:
     SynchronousInstrument() = default;
 
-    SynchronousInstrument(nostd::string_view name, nostd::string_view description, nostd::string_view unit, bool enabled);
+    SynchronousInstrument(nostd::string_view name, nostd::string_view description, nostd::string_view unit,
+                          bool enabled);
 
-    /**
+   /**
     * Returns a Bound Instrument associated with the specified labels.
     * Multiples requests with the same set of labels may return the same
     * Bound Instrument instance.
@@ -358,10 +359,10 @@ public:
     *
     * @param labels the set of labels, as key-value pairs.
     * @return a Bound Instrument
-   */
+    */
     BoundSynchronousInstrument bind(nostd::KeyValueIterable labels);
 
-    /**
+   /**
     * Records a single synchronous metric event.
     * Since this is an unbound synchronous instrument, labels are required in  * metric capture calls.
     *
@@ -369,34 +370,36 @@ public:
     * @param labels the set of labels, as key-value pairs.
     * @param value the numerical representation of the metric being captured
     * @return void
-   */
+    */
     void update(T value, nostd::KeyValueIterable labels); //add or record
 
 };
+
 template <class T>
 class BoundSynchronousInstrument: public Instrument {
 public:
     BoundSynchronousInstrument() = default;
 
     // Will also call the processor to acquire the correct aggregator for this instrument
-    BoundSynchronousInstrument(nostd::string_view name, nostd::string_view description, nostd::string_view unit, bool enabled);
+    BoundSynchronousInstrument(nostd::string_view name, nostd::string_view description, nostd::string_view unit,
+                               bool enabled);
 
-    /**
+   /**
     * Frees the resources associated with this Bound Instrument.
     * The Metric from which this instrument was created is not impacted.
     *
     * @param none
     * @return void
-   */
+    */
     void unbind();
 
-    /**
+   /**
     * Records a single synchronous metric event.  //Call to aggregator
     * Since this is a bound synchronous instrument, labels are notrequired in  * metric capture calls.
     *
     * @param value the numerical representation of the metric being captured
     * @return void
-   */
+    */
     void update(T value); //add or record
 
 };
@@ -404,7 +407,8 @@ public:
 template <class T>
 class AsynchronousInstrument: public Instrument{
 public:
-    AsynchronousInstrument(nostd::string_view name, nostd::string_view description, nostd::string_view unit, bool enabled, void (*callback)(ObserverResult<T>));
+    AsynchronousInstrument(nostd::string_view name, nostd::string_view description, nostd::string_view unit,
+                           bool enabled, void (*callback)(ObserverResult<T>));
 
     /**
      * Captures data by activating the callback function associated with the
@@ -416,7 +420,7 @@ public:
      */
     void observe();
 
-    /**
+   /**
     * Captures data from the stored callback function.  The callback itself
     * makes use of the instrument's observe function to take capture
     * responsibilities out of the user's hands.
@@ -439,14 +443,16 @@ private:
 The Counter below is an example of one Metric instrument.  It is important to note that in the Counter’s add function, it binds the labels to the instrument before calling add, then unbinds.  Therefore all interactions with the aggregator take place through bound instruments and by extension, the BaseBoundInstrument Class.
 
 
-```
+```cc
 template <class T>
 class BoundCounter: public BoundSynchronousInstrument{ //override bind?
 public:
     BoundCounter() = default;
     BoundCounter(nostd::string_view name, nostd::string_view description, nostd::string_view unit, bool enabled);
-    /*
-    * Add adds the value to the counter's sum. The labels are already linked   * to the instrument and are not specified.
+
+   /*
+    * Add adds the value to the counter's sum. The labels are already linked
+    * to the instrument and are not specified.
     *
     * @param value the numerical representation of the metric being captured
     * @param labels the set of labels, as key-value pairs
@@ -455,23 +461,26 @@ public:
 
     void unbind();
 };
+
 template <class T>
 class Counter: public SynchronousInstrument{
 public:
     Counter() = default;
     Counter(nostd::string_view name, nostd::string_view description, nostd::string_view unit, bool enabled);
-    /*
+
+   /*
     * Bind creates a bound instrument for this counter. The labels are
     * associated with values recorded via subsequent calls to Record.
     *
     * @param labels the set of labels, as key-value pairs.
     * @return a BoundIntCounter tied to the specified labels
     */
-
     BoundCounter bind(nostd::KeyValueIterable labels);
-    /*
+
+   /*
     * Add adds the value to the counter's sum by sending to aggregator. The labels should contain
-    * the keys and values to be associated with this value.  Counters only     * accept positive valued updates.
+    * the keys and values to be associated with this value.  Counters only
+    * accept positive valued updates.
     *
     * @param value the numerical representation of the metric being captured
     * @param labels the set of labels, as key-value pairs
@@ -482,9 +491,10 @@ public:
 template <class T>
 class ValueObserver: public AsynchronousInstrument{
 public:
-    /*
+   /*
     * Add adds the value to the counter's sum. The labels should contain
-    * the keys and values to be associated with this value.  Counters only     * accept positive valued updates.
+    * the keys and values to be associated with this value.  Counters only
+    * accept positive valued updates.
     *
     * @param value the numerical representation of the metric being captured
     * @param labels the set of labels, as key-value pairs
@@ -495,7 +505,7 @@ public:
 
 
 
-```
+```cc
 // The above Counter and BoundCounter are examples of 1 metric instrument.
 // The remaining 5 will also be implemented in a similar fashion.
 class UpDownCounter: public SynchronousInstrument;
