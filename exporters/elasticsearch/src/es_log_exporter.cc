@@ -70,11 +70,11 @@ public:
   /**
    * Returns the body of the response
    */
-  std::string GetResponseBody() 
+  std::string GetResponseBody()
   {
     // Lock so that body_ can't be written to while returning it
     std::unique_lock<std::mutex> lk(mutex_);
-    return body_; 
+    return body_;
   }
 
   // Callback method when an http event occurs
