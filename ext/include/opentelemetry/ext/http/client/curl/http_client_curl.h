@@ -110,12 +110,16 @@ class SessionManager;
 class Session : public http_client::Session
 {
 public:
-  Session(SessionManager &session_manager, std::string host, uint16_t port = 80)
+  Session(SessionManager &session_manager, const std::string &host, uint16_t port = 80)
       : session_manager_(session_manager), is_session_active_(false)
   {
     if (host.rfind("http://", 0) != 0 && host.rfind("https://", 0) != 0)
     {
       host_ = "http://" + host;  // TODO - https support
+    }
+    else
+    {
+      host_ = host;
     }
     host_ += ":" + std::to_string(port) + "/";
   }
@@ -168,6 +172,12 @@ public:
   virtual bool IsSessionActive() noexcept override { return is_session_active_; }
 
   void SetId(uint64_t session_id) { session_id_ = session_id; }
+
+  /**
+   * Returns the base URI.
+   * @return the base URI as a string consisting of scheme, host and port.
+   */
+  const std::string &GetBaseUri() const { return host_; }
 
 private:
   std::shared_ptr<Request> http_request_;
