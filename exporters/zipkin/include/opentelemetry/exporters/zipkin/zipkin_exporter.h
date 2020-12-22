@@ -13,11 +13,12 @@ namespace exporter
 {
 namespace zipkin
 {
-/**
- * Struct to hold OTLP exporter options.
- */
+
 std::string ZIPKIN_ENDPOINT_DEFAULT = "http://localhost:9411/api/v2/spans";
 
+/**
+ * Struct to hold Zipkin  exporter options.
+ */
 struct ZipkinExporterOptions
 {
   // The endpoint to export to. By default the OpenTelemetry Collector's default endpoint.
@@ -32,18 +33,18 @@ namespace trace_sdk   = opentelemetry::sdk::trace;
 namespace http_client = opentelemetry::ext::http::client;
 
 /**
- * The OTLP exporter exports span data in OpenTelemetry Protocol (OTLP) format.
+ * The Zipkin exporter exports span data in JSON format as expected by Zipkin
  */
 class ZipkinExporter final : public trace_sdk::SpanExporter, public http_client::EventHandler
 {
 public:
   /**
-   * Create an OtlpExporter using all default options.
+   * Create an ZipkinExporter using all default options.
    */
   ZipkinExporter();
 
   /**
-   * Create an OtlpExporter using the given options.
+   * Create an ZipkinExporter using the given options.
    */
   ZipkinExporter(const ZipkinExporterOptions &options);
 
@@ -54,7 +55,7 @@ public:
   std::unique_ptr<trace_sdk::Recordable> MakeRecordable() noexcept override;
 
   /**
-   * Export a batch of span recordables in OTLP format.
+   * Export a batch of span recordables in JSON format.
    * @param spans a span of unique pointers to span recordables
    */
   trace_sdk::ExportResult Export(
