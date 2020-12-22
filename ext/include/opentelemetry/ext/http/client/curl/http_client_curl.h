@@ -1,6 +1,7 @@
 #pragma once
 
 #include "http_operation_curl.h"
+#include "opentelemetry/ext/http/client/noop.h"
 
 #include <map>
 #include <string>
@@ -177,7 +178,8 @@ public:
       return std::move(response);
     }
     is_session_active_ = false;
-    return nullptr;
+    auto response      = std::unique_ptr<http_client::Response>(new NoopResponse());
+    return std::move(response);
   }
 
   virtual bool CancelSession() noexcept override
@@ -203,6 +205,7 @@ private:
   uint64_t session_id_;
   SessionManager &session_manager_;
   bool is_session_active_;
+  std::shared_ptr<http_client::Response> noop_response;
 };
 
 class SessionManager : public http_client::SessionManager
