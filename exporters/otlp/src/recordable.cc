@@ -59,6 +59,12 @@ void PopulateAttribute(opentelemetry::proto::common::v1::KeyValue *attribute,
     attribute->mutable_value()->set_string_value(nostd::get<nostd::string_view>(value).data(),
                                                  nostd::get<nostd::string_view>(value).size());
   }
+#ifdef HAVE_CSTRING_TYPE
+  else if (nostd::holds_alternative<const char *>(value))
+  {
+    attribute->mutable_value()->set_string_value(nostd::get<const char *>(value));
+  }
+#endif
   else if (nostd::holds_alternative<nostd::span<const bool>>(value))
   {
     for (const auto &val : nostd::get<nostd::span<const bool>>(value))

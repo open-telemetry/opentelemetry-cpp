@@ -12,3 +12,7 @@ endif()
 if(WITH_ZIPKIN)
   add_subdirectory(zipkin)
 endif()
+
+if(WITH_ELASTICSEARCH)
+  add_subdirectory(elasticsearch)
+endif()
