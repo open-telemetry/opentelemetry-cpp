@@ -122,7 +122,7 @@ TEST(HTTPTextFormatTest, GetCurrentSpan)
                                   trace::TraceFlags{true}, false};
   nostd::shared_ptr<trace::Span> sp{new trace::DefaultSpan{span_context}};
 
-  // Set `sp` as the currently active span, which must be usued by `Inject`.
+  // Set `sp` as the currently active span, which must be used by `Inject`.
   trace::Scope scoped_span{sp};
 
   std::map<std::string, std::string> headers = {};
