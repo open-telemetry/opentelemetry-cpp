@@ -18,7 +18,7 @@ cmake -DgRPC_INSTALL=ON \
     -DgRPC_BUILD_TESTS=OFF \
     -DCMAKE_INSTALL_PREFIX=$INSTALL_DIR \
     ../..
-make -j 6
+make -j $(nproc)
 make install
 popd
 popd
