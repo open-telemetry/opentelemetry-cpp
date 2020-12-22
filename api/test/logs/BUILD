@@ -1,9 +1,9 @@
 load("//bazel:otel_cc_benchmark.bzl", "otel_cc_benchmark")
 
 cc_test(
-    name = "logger_provider_test",
+    name = "provider_test",
     srcs = [
-        "logger_provider_test.cc",
+        "provider_test.cc",
     ],
     deps = [
         "//api",

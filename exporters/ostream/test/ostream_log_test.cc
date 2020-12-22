@@ -253,7 +253,7 @@ TEST(OStreamLogExporter, IntegrationTest)
 
   // Write a log to ostream exporter
   opentelemetry::core::SystemTimestamp now(std::chrono::system_clock::now());
-  logger->Log(opentelemetry::logs::Severity::kDebug, "Hello", now);
+  logger->Log(opentelemetry::logs::Severity::kDebug, "", "Hello", {}, {}, {}, {}, {}, now);
 
   // Restore cout's original streambuf
   std::cout.rdbuf(original);

@@ -11,11 +11,11 @@ if(BUILD_TESTING)
 
   target_link_libraries(
     ostream_span_test ${GTEST_BOTH_LIBRARIES} ${CMAKE_THREAD_LIBS_INIT}
-    opentelemetry_exporter_ostream_span)
+    ${CORE_RUNTIME_LIBS} opentelemetry_exporter_ostream_span)
 
   target_link_libraries(
     ostream_metrics_test ${GTEST_BOTH_LIBRARIES} ${CMAKE_THREAD_LIBS_INIT}
-    opentelemetry_exporter_ostream_metrics)
+    ${CORE_RUNTIME_LIBS} opentelemetry_exporter_ostream_metrics)
 
   target_link_libraries(
     ostream_log_test ${GTEST_BOTH_LIBRARIES} ${CMAKE_THREAD_LIBS_INIT}

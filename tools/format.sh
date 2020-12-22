@@ -6,7 +6,7 @@ fi
 
 set -e
 
-FIND="find . -name third_party -prune -o -name tools -prune -o -name .git -prune -o -name _deps -prune -o -name .build -prune -o -name out -prune -o"
+FIND="find . -name third_party -prune -o -name tools -prune -o -name .git -prune -o -name _deps -prune -o -name .build -prune -o -name out -prune -o -name .vs -prune -o"
 
 # GNU syntax.
 SED=(sed -i)

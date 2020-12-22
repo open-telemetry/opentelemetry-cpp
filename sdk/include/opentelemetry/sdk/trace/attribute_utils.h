@@ -1,5 +1,6 @@
 #pragma once
 
+#include <string>
 #include <unordered_map>
 #include <vector>
 #include "opentelemetry/common/attribute_value.h"
@@ -21,6 +22,12 @@ using SpanDataAttributeValue = nostd::variant<bool,
                                               uint64_t,
                                               double,
                                               std::string,
+#ifdef HAVE_CSTRING_TYPE
+                                              const char *,
+#endif
+#ifdef HAVE_SPAN_BYTE
+                                              std::vector<uint8_t>,
+#endif
                                               std::vector<bool>,
                                               std::vector<int32_t>,
                                               std::vector<uint32_t>,
@@ -37,17 +44,23 @@ struct AttributeConverter
   SpanDataAttributeValue operator()(bool v) { return SpanDataAttributeValue(v); }
   SpanDataAttributeValue operator()(int32_t v) { return SpanDataAttributeValue(v); }
   SpanDataAttributeValue operator()(uint32_t v) { return SpanDataAttributeValue(v); }
-  /*SpanDataAttributeValue operator()(int v)
-  {
-    return SpanDataAttributeValue(static_cast<int64_t>(v));
-  }*/
   SpanDataAttributeValue operator()(int64_t v) { return SpanDataAttributeValue(v); }
   SpanDataAttributeValue operator()(uint64_t v) { return SpanDataAttributeValue(v); }
   SpanDataAttributeValue operator()(double v) { return SpanDataAttributeValue(v); }
   SpanDataAttributeValue operator()(nostd::string_view v)
   {
-    return SpanDataAttributeValue(std::string(v));
+    return SpanDataAttributeValue(std::string(v.data(), v.size()));
   }
+  SpanDataAttributeValue operator()(const char *s)
+  {
+    return SpanDataAttributeValue(std::string(s));
+  }
+#ifdef HAVE_SPAN_BYTE
+  SpanDataAttributeValue operator()(nostd::span<const uint8_t> v)
+  {
+    return convertSpan<uint8_t>(v);
+  }
+#endif
   SpanDataAttributeValue operator()(nostd::span<const bool> v) { return convertSpan<bool>(v); }
   SpanDataAttributeValue operator()(nostd::span<const int32_t> v)
   {
@@ -74,12 +87,7 @@ struct AttributeConverter
   template <typename T, typename U = T>
   SpanDataAttributeValue convertSpan(nostd::span<const U> vals)
   {
-    std::vector<T> copy;
-    for (auto &val : vals)
-    {
-      copy.push_back(T(val));
-    }
-
+    const std::vector<T> copy(vals.begin(), vals.end());
     return SpanDataAttributeValue(std::move(copy));
   }
 };
