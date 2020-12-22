@@ -12,8 +12,8 @@
 #endif
 #include <Windows.h>
 
-#include <errhandlingapi.h>
 #include <WinBase.h>
+#include <errhandlingapi.h>
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace plugin

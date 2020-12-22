@@ -21,13 +21,13 @@ namespace common
  * Note for Windows users - please make sure that NOMINMAX is defined, e.g.
  *
  * ...
- * #define NOMINMAX 
+ * #define NOMINMAX
  * #include <Windows.h>
  * ...
  *
  * See:
  * https://stackoverflow.com/questions/13416418/define-nominmax-using-stdmin-max
- * 
+ *
  */
 class FastRandomNumberGenerator
 {
