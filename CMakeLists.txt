@@ -89,7 +89,7 @@ if(WITH_OTLP)
       install_windows_deps()
     endif()
 
-    if(NOT DEFINED CMAKE_TOOLCHAIN_FILE)
+    if(WIN32 AND (NOT DEFINED CMAKE_TOOLCHAIN_FILE))
       message(STATUS_FATAL "Windows dependency installation failed!")
     endif()
     include(${CMAKE_TOOLCHAIN_FILE})
