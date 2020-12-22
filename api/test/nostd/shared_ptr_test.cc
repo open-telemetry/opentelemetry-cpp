@@ -163,7 +163,7 @@ static void SharedPtrTest_Sort(size_t size = 10)
 {
   std::vector<shared_ptr<const int>> nums;
 
-  for (int i = size; i > 0; i--)
+  for (int i = static_cast<int>(size); i > 0; i--)
   {
     nums.push_back(shared_ptr<int>(new int(i)));
   }
