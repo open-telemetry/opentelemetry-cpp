@@ -6,6 +6,17 @@
 
 #include "opentelemetry/version.h"
 
+#if defined(_MSC_VER)
+#  ifndef NOMINMAX
+#    define NOMINMAX
+#  endif
+#  include <Windows.h>
+#elif defined(__i386__) || defined(__x86_64__)
+#  if defined(__clang__)
+#    include <emmintrin.h>
+#  endif
+#endif
+
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace common
 {

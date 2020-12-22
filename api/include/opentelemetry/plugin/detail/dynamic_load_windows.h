@@ -7,10 +7,13 @@
 #include "opentelemetry/plugin/hook.h"
 #include "opentelemetry/version.h"
 
-#include <windows.h>
+#ifndef NOMINMAX
+#  define NOMINMAX
+#endif
+#include <Windows.h>
 
 #include <errhandlingapi.h>
-#include <winbase.h>
+#include <WinBase.h>
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace plugin

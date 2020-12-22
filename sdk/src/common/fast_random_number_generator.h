@@ -17,6 +17,17 @@ namespace common
  * std::mt19937_64; and since we don't care about the other beneficial random
  * number properties that std:mt19937_64 provides for this application, it's a
  * entirely appropriate replacement.
+ *
+ * Note for Windows users - please make sure that NOMINMAX is defined, e.g.
+ *
+ * ...
+ * #define NOMINMAX 
+ * #include <Windows.h>
+ * ...
+ *
+ * See:
+ * https://stackoverflow.com/questions/13416418/define-nominmax-using-stdmin-max
+ * 
  */
 class FastRandomNumberGenerator
 {
