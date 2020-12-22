@@ -3,10 +3,10 @@
 #include "opentelemetry/nostd/span.h"
 #include "opentelemetry/nostd/string_view.h"
 #include "opentelemetry/trace/default_span.h"
+#include "opentelemetry/trace/noop.h"
 #include "opentelemetry/trace/span.h"
 #include "opentelemetry/trace/span_context.h"
 #include "opentelemetry/trace/trace_id.h"
-#include "opentelemetry/trace/noop.h"
 #include "opentelemetry/trace/tracer.h"
 
 #include <map>
@@ -21,7 +21,7 @@
 
 using namespace opentelemetry;
 
-template<typename T>
+template <typename T>
 static std::string Hex(const T &id_item)
 {
   char buf[T::kSize * 2];
@@ -105,7 +105,7 @@ TEST(HTTPTextFormatTest, SetRemoteSpan)
 
   auto ctx2_span = ctx2.GetValue(trace::kSpanKey);
   EXPECT_TRUE(nostd::holds_alternative<nostd::shared_ptr<trace::Span>>(ctx2_span));
-  
+
   auto span = nostd::get<nostd::shared_ptr<trace::Span>>(ctx2_span);
 
   EXPECT_EQ(Hex(span->GetContext().trace_id()), "4bf92f3577b34da6a3ce929d0e0e4736");
@@ -116,9 +116,10 @@ TEST(HTTPTextFormatTest, SetRemoteSpan)
 
 TEST(HTTPTextFormatTest, GetCurrentSpan)
 {
-  constexpr uint8_t buf_span[] = {1, 2, 3, 4, 5, 6, 7, 8};
+  constexpr uint8_t buf_span[]  = {1, 2, 3, 4, 5, 6, 7, 8};
   constexpr uint8_t buf_trace[] = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16};
-  trace::SpanContext span_context{trace::TraceId{buf_trace}, trace::SpanId{buf_span}, trace::TraceFlags{true}, false};
+  trace::SpanContext span_context{trace::TraceId{buf_trace}, trace::SpanId{buf_span},
+                                  trace::TraceFlags{true}, false};
   nostd::shared_ptr<trace::Span> sp{new trace::DefaultSpan{span_context}};
 
   // Set `sp` as the currently active span, which must be usued by `Inject`.

@@ -5,10 +5,10 @@
 
 #include <gtest/gtest.h>
 
+using opentelemetry::trace::kSpanKey;
 using opentelemetry::trace::NoopSpan;
 using opentelemetry::trace::Scope;
 using opentelemetry::trace::Span;
-using opentelemetry::trace::kSpanKey;
 namespace nostd   = opentelemetry::nostd;
 namespace context = opentelemetry::context;
 

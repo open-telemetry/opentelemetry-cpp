@@ -77,7 +77,7 @@ public:
                            const T &carrier,
                            context::Context &context) noexcept override
   {
-    SpanContext span_context    = ExtractImpl(getter, carrier);
+    SpanContext span_context = ExtractImpl(getter, carrier);
     nostd::shared_ptr<Span> sp{new DefaultSpan(span_context)};
     return context.SetValue(kSpanKey, sp);
   }
