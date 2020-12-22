@@ -8,7 +8,7 @@ RUN apt-get -y update && apt-get -y upgrade && apt-get -y dist-upgrade
 RUN apt-get install -qq -y --ignore-missing \
 	apt-utils		\
 	automake		\
-      bc                      \
+	bc                      \
 	build-essential		\
 	bzip2			\
 	cmake			\

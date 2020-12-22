@@ -179,6 +179,16 @@ jobs:
     - name: run tests
       run: ./ci/do_ci.sh bazel.tsan
 
+  bazel_osx:
+    name: Bazel on MacOS
+    runs-on: macos-latest
+    steps:
+    - uses: actions/checkout@v2
+      with:
+        submodules: 'recursive'
+    - name: run tests
+      run: ./ci/do_ci.sh bazel.test
+
   benchmark:
     name: Benchmark
     runs-on: ubuntu-latest
@@ -211,15 +221,6 @@ jobs:
     - name: run tests
       run: ./ci/do_ci.sh format
 
-  osx_test:
-    name: Bazel on MacOS
-    runs-on: macos-latest
-    steps:
-    - uses: actions/checkout@v2
-      with:
-        submodules: 'recursive'
-    - name: run tests
-      run: ./ci/do_ci.sh bazel.test
 
   windows:
     name: CMake -> exporter proto
