@@ -53,7 +53,7 @@ elif [[ "$1" == "cmake.exporter.otprotocol.test" ]]; then
   proto_make_file="CMakeFiles/opentelemetry_proto.dir/build.make"
   sed -i "s~gRPC_CPP_PLUGIN_EXECUTABLE-NOTFOUND~$grpc_cpp_plugin~" ${proto_make_file} #fixme
   make -j $(nproc)
-  make test
+  cd exporters/otlp && make test
   exit 0
 elif [[ "$1" == "cmake.exporter.prometheus.test" ]]; then
 #  export DEBIAN_FRONTEND=noninteractive
