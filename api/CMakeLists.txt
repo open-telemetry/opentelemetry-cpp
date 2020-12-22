@@ -12,3 +12,9 @@ install(
 if(BUILD_TESTING)
   add_subdirectory(test)
 endif()
+
+if(WITH_STL)
+  message("Building with standard library types...")
+else()
+  message("Building with nostd types...")
+endif()
