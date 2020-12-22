@@ -57,6 +57,9 @@ option(WITH_OTLP "Whether to include the OpenTelemetry Protocol in the SDK" OFF)
 option(WITH_PROMETHEUS "Whether to include the Prometheus Client in the SDK"
        OFF)
 
+option(WITH_ELASTICSEARCH
+       "Whether to include the Elasticsearch Client in the SDK" OFF)
+
 option(BUILD_TESTING "Whether to enable tests" ON)
 option(WITH_EXAMPLES "Whether to build examples" ON)
 
