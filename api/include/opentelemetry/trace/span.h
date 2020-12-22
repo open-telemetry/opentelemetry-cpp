@@ -18,7 +18,7 @@ OPENTELEMETRY_BEGIN_NAMESPACE
 namespace trace
 {
 
-// The key the identifies the active span in the current context.
+// The key identifies the active span in the current context.
 constexpr char kSpanKey[] = "active_span";
 
 enum class SpanKind
