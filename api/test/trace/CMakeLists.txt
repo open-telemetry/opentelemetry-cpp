@@ -10,8 +10,9 @@ foreach(
   noop_test
   tracer_test)
   add_executable(api_${testname} "${testname}.cc")
-  target_link_libraries(api_${testname} ${GTEST_BOTH_LIBRARIES}
-                        ${CMAKE_THREAD_LIBS_INIT} opentelemetry_api)
+  target_link_libraries(
+    api_${testname} ${GTEST_BOTH_LIBRARIES} ${CORE_RUNTIME_LIBS}
+    ${CMAKE_THREAD_LIBS_INIT} opentelemetry_api)
   gtest_add_tests(
     TARGET api_${testname}
     TEST_PREFIX trace.
