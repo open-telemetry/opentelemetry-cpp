@@ -10,6 +10,48 @@ if(NOT DEFINED CMAKE_CXX_STANDARD)
   set(CMAKE_CXX_STANDARD 11)
 endif()
 
+option(WITH_STL "Whether to use Standard Library for C++latest features" OFF)
+
+option(WITH_ABSEIL "Whether to use Abseil for C++latest features" OFF)
+
+if(WITH_ABSEIL)
+  add_definitions(-DHAVE_ABSEIL)
+  find_package(absl CONFIG REQUIRED)
+
+  # Abseil headers-only lib is needed for absl::variant to work vs2015.
+  # `nostd::mpark::variant` is not compiling in vs2015.
+  set(CORE_RUNTIME_LIBS absl::any absl::base absl::bits absl::city)
+
+  # target_link_libraries(main PRIVATE absl::any absl::base absl::bits
+  # absl::city)
+endif()
+
+if(WITH_STL)
+  # Require at least C++17. C++20 is needed to avoid gsl::span
+  add_definitions(-DHAVE_CPP_STDLIB -DHAVE_GSL)
+
+  if(CMAKE_MINOR_VERSION VERSION_GREATER "3.18")
+    # Ask for 20, may get anything below
+    set(CMAKE_CXX_STANDARD 20)
+  else()
+    # Ask for 17, may get anything below
+    set(CMAKE_CXX_STANDARD 17)
+  endif()
+
+  # Guidelines Support Library path. Used if we are not on not get C++20.
+  #
+  # TODO: respect WITH_ABSEIL as alternate implementation of std::span
+  set(GSL_DIR third_party/ms-gsl)
+  include_directories(${GSL_DIR}/include)
+
+  # Optimize for speed to reduce the hops
+  if(CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")
+    set(CMAKE_CXX_FLAGS_SPEED "/O2")
+    set(CMAKE_CXX_FLAGS
+        "${CMAKE_CXX_FLAGS} /Zc:__cplusplus ${CMAKE_CXX_FLAGS_SPEED}")
+  endif()
+endif()
+
 option(WITH_OTLP "Whether to include the OpenTelemetry Protocol in the SDK" OFF)
 
 option(WITH_PROMETHEUS "Whether to include the Prometheus Client in the SDK"

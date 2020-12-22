@@ -33,6 +33,9 @@ elif [[ "$1" == "cmake.c++20.test" ]]; then
 elif [[ "$1" == "cmake.legacy.test" ]]; then
   cd "${BUILD_DIR}"
   rm -rf *
+  export BUILD_ROOT="${BUILD_DIR}"
+  ${SRC_DIR}/tools/build-gtest.sh
+  ${SRC_DIR}/tools/build-benchmark.sh
   cmake -DCMAKE_BUILD_TYPE=Debug  \
         -DCMAKE_CXX_FLAGS="-Werror" \
         -DCMAKE_CXX_STANDARD=11 \

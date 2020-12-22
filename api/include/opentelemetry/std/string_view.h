@@ -14,20 +14,23 @@
 
 #pragma once
 
-#ifdef HAVE_CPP_STDLIB
-#  include "opentelemetry/std/variant.h"
-#elif defined(HAVE_ABSEIL)
-// TODO: prefer `absl::variant` over `nostd::variant` since the latter does not compile with vs2015
-#  include "absl/types/variant.h"
+#include "opentelemetry/version.h"
+
+#include "opentelemetry/std/utility.h"
+
+#include <cstddef>
+#include <memory>
+#include <string_view>
+#include <utility>
+#include <variant>
+
 OPENTELEMETRY_BEGIN_NAMESPACE
+// Standard Type aliases in nostd namespace
 namespace nostd
 {
-using absl::get;
-using absl::holds_alternative;
-using absl::variant;
-using absl::visit;
+
+// nostd::string_view
+using string_view = std::string_view;
+
 }  // namespace nostd
 OPENTELEMETRY_END_NAMESPACE
-#else
-#  include "opentelemetry/nostd/mpark/variant.h"
-#endif
