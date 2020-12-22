@@ -294,7 +294,8 @@ TEST_F(BasicCurlHttpTests, SendGetRequestSyncTimeout)
   http_client::SessionState session_state;
   auto response = session->SendRequestSync(session_state);
   EXPECT_EQ(session_state, http_client::SessionState::ConnectFailed);
-  EXPECT_TRUE(response == nullptr);
+  EXPECT_EQ(response->GetStatusCode(), 0);
+  EXPECT_EQ(response->GetBody().size(), 0);
 }
 
 TEST_F(BasicCurlHttpTests, GetBaseUri)

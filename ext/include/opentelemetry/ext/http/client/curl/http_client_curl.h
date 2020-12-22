@@ -172,17 +172,19 @@ public:
     {
       session_state = http_client::SessionState::Cancelled;
     }
+    auto response = std::unique_ptr<Response>(new Response());
     if (curl_operation_->GetResponseCode() >= CURL_LAST)
     {
       // we have a http response
-      auto response      = std::unique_ptr<Response>(new Response());
       response->headers_ = curl_operation_->GetResponseHeaders();
       response->body_    = curl_operation_->GetResponseBody();
-      is_session_active_ = false;
-      return std::move(response);
+    }
+    else
+    {
+      // No http response
+      response->status_code_ = 0;
     }
     is_session_active_ = false;
-    auto response      = std::unique_ptr<http_client::Response>(new NoopResponse());
     return std::move(response);
   }
 
