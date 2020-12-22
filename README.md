@@ -22,6 +22,19 @@ Please note that supporting the [C Programming
 Language](https://en.wikipedia.org/wiki/C_(programming_language)) is not a goal
 of the current project.
 
+## Supported Development Platforms
+
+ Our CI pipeline builds and tests on following `x86-64` platforms:
+
+* ubuntu-18.04 ( Default GCC Compiler - 7.5.0 )
+* ubuntu-18.04 ( GCC 4.8 with -std=c++11 flag)
+* ubuntu-20.04 ( Default GCC Compiler - 9.3.0 with -std=c++20 flags )
+* macOS 10.15 ( Xcode 12.2 )
+* Windows Server 2019 (Visual Studio Enterprise 2019 )
+
+In general, the code shipped from this repository should build on all platforms having C++ compiler with [supported C++ standards](#supported-c-versions)
+
+
 ## Installation
 
 Please refer to [INSTALL.md](./INSTALL.md).
