@@ -1,3 +1,5 @@
+#pragma once
+
 #include "opentelemetry/common/key_value_iterable_view.h"
 
 #include <array>
