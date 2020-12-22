@@ -68,7 +68,9 @@ private:
         json_[name][key.data()] = opentelemetry::nostd::get<double>(value);
         return;
       case common::AttributeType::TYPE_STRING:
+#ifdef HAVE_CSTRING_TYPE
       case common::AttributeType::TYPE_CSTRING:
+#endif
         json_[name][key.data()] =
             opentelemetry::nostd::get<opentelemetry::nostd::string_view>(value).data();
         return;
