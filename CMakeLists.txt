@@ -60,8 +60,6 @@ option(WITH_PROMETHEUS "Whether to include the Prometheus Client in the SDK"
 option(BUILD_TESTING "Whether to enable tests" ON)
 option(WITH_EXAMPLES "Whether to build examples" ON)
 
-set(WITH_PROTOBUF OFF)
-
 find_package(Threads)
 
 function(install_windows_deps)
@@ -71,7 +69,8 @@ function(install_windows_deps)
   execute_process(
     COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/tools/setup-buildtools.cmd)
   set(CMAKE_TOOLCHAIN_FILE
-      ${CMAKE_CURRENT_SOURCE_DIR}/tools/vcpkg/scripts/buildsystems/vcpkg.cmake)
+      ${CMAKE_CURRENT_SOURCE_DIR}/tools/vcpkg/scripts/buildsystems/vcpkg.cmake
+      PARENT_SCOPE)
 endfunction()
 
 if(MSVC)
@@ -82,10 +81,6 @@ if(MSVC)
 endif()
 
 if(WITH_OTLP)
-  set(WITH_PROTOBUF ON)
-endif()
-
-if(WITH_PROTOBUF)
   set(protobuf_MODULE_COMPATIBLE ON)
   find_package(Protobuf)
   find_package(gRPC)
@@ -93,6 +88,12 @@ if(WITH_PROTOBUF)
     if(WIN32 AND (NOT DEFINED CMAKE_TOOLCHAIN_FILE))
       install_windows_deps()
     endif()
+
+    if(NOT DEFINED CMAKE_TOOLCHAIN_FILE)
+      message(STATUS_FATAL "Windows dependency installation failed!")
+    endif()
+    include(${CMAKE_TOOLCHAIN_FILE})
+
     if(NOT protobuf_FOUND)
       find_package(Protobuf REQUIRED)
     endif()
