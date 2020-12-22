@@ -144,7 +144,7 @@ public:
    */
   nostd::shared_ptr<Span> GetCurrentSpan() noexcept
   {
-    context::ContextValue active_span = context::RuntimeContext::GetValue(SpanKey);
+    context::ContextValue active_span = context::RuntimeContext::GetValue(kSpanKey);
     if (nostd::holds_alternative<nostd::shared_ptr<Span>>(active_span))
     {
       return nostd::get<nostd::shared_ptr<Span>>(active_span);

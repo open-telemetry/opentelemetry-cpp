@@ -8,6 +8,7 @@
 using opentelemetry::trace::NoopSpan;
 using opentelemetry::trace::Scope;
 using opentelemetry::trace::Span;
+using opentelemetry::trace::kSpanKey;
 namespace nostd   = opentelemetry::nostd;
 namespace context = opentelemetry::context;
 
@@ -16,7 +17,7 @@ TEST(ScopeTest, Construct)
   nostd::shared_ptr<Span> span(new NoopSpan(nullptr));
   Scope scope(span);
 
-  context::ContextValue active_span_value = context::RuntimeContext::GetValue(SpanKey);
+  context::ContextValue active_span_value = context::RuntimeContext::GetValue(kSpanKey);
   ASSERT_TRUE(nostd::holds_alternative<nostd::shared_ptr<Span>>(active_span_value));
 
   auto active_span = nostd::get<nostd::shared_ptr<Span>>(active_span_value);
@@ -32,14 +33,14 @@ TEST(ScopeTest, Destruct)
     nostd::shared_ptr<Span> span_nested(new NoopSpan(nullptr));
     Scope scope_nested(span_nested);
 
-    context::ContextValue active_span_value = context::RuntimeContext::GetValue(SpanKey);
+    context::ContextValue active_span_value = context::RuntimeContext::GetValue(kSpanKey);
     ASSERT_TRUE(nostd::holds_alternative<nostd::shared_ptr<Span>>(active_span_value));
 
     auto active_span = nostd::get<nostd::shared_ptr<Span>>(active_span_value);
     ASSERT_EQ(active_span, span_nested);
   }
 
-  context::ContextValue active_span_value = context::RuntimeContext::GetValue(SpanKey);
+  context::ContextValue active_span_value = context::RuntimeContext::GetValue(kSpanKey);
   ASSERT_TRUE(nostd::holds_alternative<nostd::shared_ptr<Span>>(active_span_value));
 
   auto active_span = nostd::get<nostd::shared_ptr<Span>>(active_span_value);

@@ -6,6 +6,7 @@
 #include "opentelemetry/trace/span.h"
 #include "opentelemetry/trace/span_context.h"
 #include "opentelemetry/trace/trace_id.h"
+#include "opentelemetry/trace/noop.h"
 #include "opentelemetry/trace/tracer.h"
 
 #include <map>
@@ -19,6 +20,14 @@
 #include "opentelemetry/trace/propagation/http_trace_context.h"
 
 using namespace opentelemetry;
+
+template<typename T>
+static std::string Hex(const T &id_item)
+{
+  char buf[T::kSize * 2];
+  id_item.ToLowerBase16(buf);
+  return std::string(buf, sizeof(buf));
+}
 
 static nostd::string_view Getter(const std::map<std::string, std::string> &carrier,
                                  nostd::string_view trace_type = "traceparent")
@@ -85,4 +94,37 @@ TEST(HTTPTextFormatTest, PropagateInvalidContext)
       nostd::shared_ptr<trace::Span>(new trace::DefaultSpan(trace::SpanContext::GetInvalid()))};
   format.Inject(Setter, carrier, ctx);
   EXPECT_TRUE(carrier.count("traceparent") == 0);
+}
+
+TEST(HTTPTextFormatTest, SetRemoteSpan)
+{
+  const std::map<std::string, std::string> carrier = {
+      {"traceparent", "00-4bf92f3577b34da6a3ce929d0e0e4736-0102030405060708-01"}};
+  context::Context ctx1 = context::Context{};
+  context::Context ctx2 = format.Extract(Getter, carrier, ctx1);
+
+  auto ctx2_span = ctx2.GetValue(trace::kSpanKey);
+  EXPECT_TRUE(nostd::holds_alternative<nostd::shared_ptr<trace::Span>>(ctx2_span));
+  
+  auto span = nostd::get<nostd::shared_ptr<trace::Span>>(ctx2_span);
+
+  EXPECT_EQ(Hex(span->GetContext().trace_id()), "4bf92f3577b34da6a3ce929d0e0e4736");
+  EXPECT_EQ(Hex(span->GetContext().span_id()), "0102030405060708");
+  EXPECT_EQ(span->GetContext().IsSampled(), true);
+  EXPECT_EQ(span->GetContext().HasRemoteParent(), true);
+}
+
+TEST(HTTPTextFormatTest, GetCurrentSpan)
+{
+  constexpr uint8_t buf_span[] = {1, 2, 3, 4, 5, 6, 7, 8};
+  constexpr uint8_t buf_trace[] = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16};
+  trace::SpanContext span_context{trace::TraceId{buf_trace}, trace::SpanId{buf_span}, trace::TraceFlags{true}, false};
+  nostd::shared_ptr<trace::Span> sp{new trace::DefaultSpan{span_context}};
+
+  // Set `sp` as the currently active span, which must be usued by `Inject`.
+  trace::Scope scoped_span{sp};
+
+  std::map<std::string, std::string> headers = {};
+  format.Inject(Setter, headers, context::RuntimeContext::GetCurrent());
+  EXPECT_EQ(headers["traceparent"], "00-0102030405060708090a0b0c0d0e0f10-0102030405060708-01");
 }
