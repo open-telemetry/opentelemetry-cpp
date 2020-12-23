@@ -1,22 +1,21 @@
 #include "opentelemetry/context/runtime_context.h"
+#include "opentelemetry/exporters/ostream/span_exporter.h"
 #include "opentelemetry/ext/http/client/curl/http_client_curl.h"
 #include "opentelemetry/ext/http/server/http_server.h"
 #include "opentelemetry/sdk/trace/simple_processor.h"
 #include "opentelemetry/sdk/trace/tracer_provider.h"
-#include "opentelemetry/trace/propagation/http_text_format.h"
 #include "opentelemetry/trace/propagation/http_trace_context.h"
 #include "opentelemetry/trace/provider.h"
 #include "opentelemetry/trace/scope.h"
 
-#include "nlohmann/json.hpp"
-
-// Using an exporter that simply dumps span data to stdout.
-#include "opentelemetry/exporters/ostream/span_exporter.h"
-
 #include <algorithm>
+#include "nlohmann/json.hpp"
 
 namespace
 {
+static opentelemetry::trace::propagation::HttpTraceContext<std::map<std::string, std::string>>
+    propagator_format;
+
 static void Setter(std::map<std::string, std::string> &carrier,
                    nostd::string_view trace_type        = "traceparent",
                    nostd::string_view trace_description = "")
@@ -69,7 +68,6 @@ struct Uri
     path = uri.substr(host_end + port_end + 2, std::string::npos);
   }
 };
-}  // namespace
 
 // A noop event handler for making HTTP requests. We don't care about response bodies and error
 // messages.
@@ -84,14 +82,13 @@ public:
 
   void OnResponse(opentelemetry::ext::http::client::Response &response) noexcept override {}
 };
+}  // namespace
 
 // Sends an HTTP POST request to the given url, with the given body.
 void send_request(opentelemetry::ext::http::client::curl::SessionManager &client,
                   const std::string &url,
                   const std::string &body)
 {
-  static opentelemetry::trace::propagation::HttpTraceContext<std::map<std::string, std::string>>
-      format;
   static std::unique_ptr<opentelemetry::ext::http::client::EventHandler> handler(
       new NoopEventHandler());
 
@@ -111,7 +108,7 @@ void send_request(opentelemetry::ext::http::client::curl::SessionManager &client
   request->AddHeader("Content-Length", std::to_string(body.size()));
 
   std::map<std::string, std::string> headers;
-  format.Inject(Setter, headers, opentelemetry::context::RuntimeContext::GetCurrent());
+  propagator_format.Inject(Setter, headers, opentelemetry::context::RuntimeContext::GetCurrent());
 
   for (auto const &hdr : headers)
   {
@@ -127,9 +124,6 @@ void send_request(opentelemetry::ext::http::client::curl::SessionManager &client
 // need to be used as body when posting to the given URL.
 int main(int argc, char *argv[])
 {
-  static opentelemetry::trace::propagation::HttpTraceContext<std::map<std::string, std::string>>
-      format;
-
   initTracer();
 
   constexpr char default_host[]   = "localhost";
@@ -161,7 +155,7 @@ int main(int argc, char *argv[])
         for (auto &part : body)
         {
           auto current_ctx = opentelemetry::context::RuntimeContext::GetCurrent();
-          auto ctx         = format.Extract(Getter, req.headers, current_ctx);
+          auto ctx         = propagator_format.Extract(Getter, req.headers, current_ctx);
           auto token       = opentelemetry::context::RuntimeContext::Attach(ctx);
 
           auto url       = part["url"].get<std::string>();
