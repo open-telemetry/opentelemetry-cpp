@@ -1,3 +1,5 @@
+add_subdirectory(propagation)
+
 foreach(
   testname
   key_value_iterable_view_test
