@@ -132,7 +132,8 @@ int main(int argc, char *argv[])
 
   initTracer();
 
-  constexpr char host[] = "localhost";
+  constexpr char default_host[]   = "localhost";
+  constexpr uint16_t default_port = 30000;
   uint16_t port;
 
   // The port the validation service listens to can be specified via the command line.
@@ -142,13 +143,13 @@ int main(int argc, char *argv[])
   }
   else
   {
-    port = 30000;
+    port = default_port;
   }
 
   auto root_span = get_tracer()->StartSpan(__func__);
   opentelemetry::trace::Scope scope(root_span);
 
-  testing::HttpServer server(host, port);
+  testing::HttpServer server(default_host, port);
   opentelemetry::ext::http::client::curl::SessionManager client;
 
   testing::HttpRequestCallback test_cb{
@@ -176,12 +177,13 @@ int main(int argc, char *argv[])
         resp.code = 200;
         return 0;
       }};
+
   server["/test"] = test_cb;
 
   // Start server
   server.start();
 
-  std::cout << "Listening at http://" << host << ":" << port << "/test\n";
+  std::cout << "Listening at http://" << default_host << ":" << port << "/test\n";
 
   // Wait for console input
   std::cin.get();
