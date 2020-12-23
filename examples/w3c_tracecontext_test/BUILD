@@ -7,5 +7,6 @@ cc_binary(
         "//api",
         "//exporters/ostream:ostream_span_exporter",
         "//sdk/src/trace",
+        "//ext:headers",
     ],
 )
