@@ -14,11 +14,13 @@
 #include "opentelemetry/trace/span_context.h"
 #include "opentelemetry/version.h"
 
-constexpr char SpanKey[] = "span_key";
-
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace trace
 {
+
+// The key identifies the active span in the current context.
+constexpr char kSpanKey[] = "active_span";
+
 enum class SpanKind
 {
   kInternal,
