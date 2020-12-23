@@ -68,7 +68,7 @@ public:
     int idx;
     if (val == 0)
     {
-      idx = std::numeric_limits<int>::min();
+      idx = (std::numeric_limits<int>::min());
     }
     else
     {
