@@ -16,15 +16,15 @@ namespace
 static opentelemetry::trace::propagation::HttpTraceContext<std::map<std::string, std::string>>
     propagator_format;
 
-static void Setter(std::map<std::string, std::string> &carrier,
-                   nostd::string_view trace_type        = "traceparent",
-                   nostd::string_view trace_description = "")
+void Setter(std::map<std::string, std::string> &carrier,
+            nostd::string_view trace_type        = "traceparent",
+            nostd::string_view trace_description = "")
 {
   carrier[std::string(trace_type)] = std::string(trace_description);
 }
 
-static nostd::string_view Getter(const std::map<std::string, std::string> &carrier,
-                                 nostd::string_view trace_type = "traceparent")
+nostd::string_view Getter(const std::map<std::string, std::string> &carrier,
+                          nostd::string_view trace_type = "traceparent")
 {
   auto it = carrier.find(std::string(trace_type));
   if (it != carrier.end())
