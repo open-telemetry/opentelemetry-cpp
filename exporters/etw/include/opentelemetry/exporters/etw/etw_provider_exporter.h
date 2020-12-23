@@ -241,9 +241,11 @@ public:
         eventName =
             (char *)(nostd::get<nostd::string_view>(nameField).data());  // must be 0-terminated!
         break;
+#  ifdef HAVE_CSTRING_TYPE
       case common::AttributeType::TYPE_CSTRING:
         eventName = (char *)(nostd::get<const char *>(nameField));
         break;
+#  endif
       default:
         // This is user error. Invalid event name!
         // We supply default 'NoName' event name in this case.
@@ -333,12 +335,14 @@ public:
           jObj[name] = temp;
           break;
         }
+#  ifdef HAVE_CSTRING_TYPE
         case common::AttributeType::TYPE_CSTRING:
         {
           auto temp  = nostd::get<const char *>(value);
           jObj[name] = temp;
           break;
         }
+#  endif
 #  if HAVE_TYPE_GUID
           // TODO: consider adding UUID/GUID to spec
         case common::AttributeType::TYPE_GUID:
@@ -350,8 +354,7 @@ public:
         }
 #  endif
         // TODO: arrays are not supported yet
-#  if 0
-        // TODO: array of uint8_t is not supported by OT spec
+#  ifdef HAVE_SPAN_BYTE
         case common::AttributeType::TYPE_SPAN_BYTE:
 #  endif
         case common::AttributeType::TYPE_SPAN_BOOL:
@@ -471,9 +474,11 @@ public:
         eventName =
             (char *)(nostd::get<nostd::string_view>(nameField).data());  // must be 0-terminated!
         break;
+#  ifdef HAVE_CSTRING_TYPE
       case common::AttributeType::TYPE_CSTRING:
         eventName = (char *)(nostd::get<const char *>(nameField));
         break;
+#  endif
       default:
         // This is user error. Invalid event name!
         // We supply default 'NoName' event name in this case.
@@ -540,6 +545,7 @@ public:
           dbuilder.AddString(temp.data());
           break;
         }
+#  ifdef HAVE_CSTRING_TYPE
         case common::AttributeType::TYPE_CSTRING:
         {
           builder.AddField(name, tld::TypeUtf8String);
@@ -547,7 +553,7 @@ public:
           dbuilder.AddString(temp);
           break;
         }
-
+#  endif
 #  if HAVE_TYPE_GUID
           // TODO: consider adding UUID/GUID to spec
         case common::AttributeType::TYPE_GUID:
@@ -560,7 +566,7 @@ public:
 #  endif
 
         // TODO: arrays are not supported
-#  if 0
+#  ifdef HAVE_SPAN_BYTE
         case common::AttributeType::TYPE_SPAN_BYTE:
 #  endif
         case common::AttributeType::TYPE_SPAN_BOOL:
