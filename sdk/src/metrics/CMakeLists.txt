@@ -3,8 +3,7 @@ add_library(opentelemetry_metrics meter_provider.cc meter.cc
 
 set_target_properties(opentelemetry_metrics PROPERTIES EXPORT_NAME metrics)
 
-target_link_libraries(opentelemetry_metrics PUBLIC opentelemetry_api
-                                                   opentelemetry_sdk)
+target_link_libraries(opentelemetry_metrics PUBLIC opentelemetry_common)
 
 target_include_directories(
   opentelemetry_metrics

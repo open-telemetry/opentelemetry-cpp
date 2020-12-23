@@ -30,6 +30,7 @@
 #   opentelemetry-cpp::logs                       - Imported target of opentelemetry-cpp::logs
 #   opentelemetry-cpp::in_memory_span_exporter    - Imported target of opentelemetry-cpp::in_memory_span_exporter
 #   opentelemetry-cpp::otlp_exporter              - Imported target of opentelemetry-cpp::otlp_exporter
+#   opentelemetry-cpp::ostream_log_exporter       - Imported target of opentelemetry-cpp::ostream_log_exporter
 #   opentelemetry-cpp::ostream_metrics_exporter   - Imported target of opentelemetry-cpp::ostream_metrics_exporter
 #   opentelemetry-cpp::ostream_span_exporter      - Imported target of opentelemetry-cpp::ostream_span_exporter
 #   opentelemetry-cpp::prometheus_exporter        - Imported target of opentelemetry-cpp::prometheus_exporter
@@ -70,6 +71,7 @@ set(_OPENTELEMETRY_CPP_LIBRARIES_TEST_TARGETS
     metrics
     logs
     otlp_exporter
+    ostream_log_exporter
     ostream_metrics_exporter
     ostream_span_exporter
     zpages)
