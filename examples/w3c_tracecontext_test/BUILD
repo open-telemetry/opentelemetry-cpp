@@ -1,5 +1,5 @@
 cc_binary(
-    name = "example_multithreaded",
+    name = "example_w3c_tracecontext_test",
     srcs = [
         "main.cc",
     ],

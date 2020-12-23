@@ -1,14 +1,12 @@
 #include "opentelemetry/context/runtime_context.h"
+#include "opentelemetry/ext/http/client/curl/http_client_curl.h"
+#include "opentelemetry/ext/http/server/http_server.h"
 #include "opentelemetry/sdk/trace/simple_processor.h"
 #include "opentelemetry/sdk/trace/tracer_provider.h"
 #include "opentelemetry/trace/propagation/http_text_format.h"
 #include "opentelemetry/trace/propagation/http_trace_context.h"
 #include "opentelemetry/trace/provider.h"
 #include "opentelemetry/trace/scope.h"
-
-#define HAVE_HTTP_DEBUG 1
-#include "opentelemetry/ext/http/client/curl/http_client_curl.h"
-#include "opentelemetry/ext/http/server/http_server.h"
 
 #include "nlohmann/json.hpp"
 
@@ -127,15 +125,25 @@ void send_request(opentelemetry::ext::http::client::curl::SessionManager &client
 // This application receives requests from the W3C test service. Each request has a JSON body which
 // consists of an array of objects, each containing an URL to which to post to, and arguments which
 // need to be used as body when posting to the given URL.
-int main()
+int main(int argc, char *argv[])
 {
   static opentelemetry::trace::propagation::HttpTraceContext<std::map<std::string, std::string>>
       format;
 
   initTracer();
 
-  constexpr char host[]   = "localhost";
-  constexpr uint16_t port = 30000;
+  constexpr char host[] = "localhost";
+  uint16_t port;
+
+  // The port the validation service listens to can be specified via the command line.
+  if (argc > 1)
+  {
+    port = atoi(argv[1]);
+  }
+  else
+  {
+    port = 30000;
+  }
 
   auto root_span = get_tracer()->StartSpan(__func__);
   opentelemetry::trace::Scope scope(root_span);

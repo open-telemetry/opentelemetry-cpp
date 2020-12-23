@@ -8,16 +8,14 @@ It is implemented according to [this instructions](https://github.com/w3c/trace-
 1. Build and start the test service endpoint:
    ```sh
    $ ./example_w3c_tracecontext_test
+   Listening to http://localhost:30000/test
    ```
    A custom port number for the test service to listen to can be specified:
    ```sh
    $ ./example_w3c_tracecontext_test 31339
+   Listening to http://localhost:31339/test
    ```
-   The test service will print the full URI that the validation service can connect to:
-   ```sh
-   $ ./example_w3c_tracecontext_test 31339
-   Listening to http://localhost:31339/test   
-   ```
+   The test service will print the full URI that the validation service can connect to.
 2. In a different terminal, set up and start the validation service according to
    the [instructions](https://github.com/w3c/trace-context/tree/master/test#run-test-cases),
    giving the address of the test service endpoint as argument:
