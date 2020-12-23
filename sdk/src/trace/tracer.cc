@@ -38,7 +38,7 @@ trace_api::SpanContext GetCurrentSpanContext(const trace_api::SpanContext &expli
   }
 
   // Use the currently active span, if there's one.
-  auto curr_span_context = context::RuntimeContext::GetValue(SpanKey);
+  auto curr_span_context = context::RuntimeContext::GetValue(trace_api::kSpanKey);
 
   if (nostd::holds_alternative<nostd::shared_ptr<trace_api::Span>>(curr_span_context))
   {
