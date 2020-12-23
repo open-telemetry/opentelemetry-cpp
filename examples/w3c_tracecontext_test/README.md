@@ -1,0 +1,28 @@
+# Test service endpoint for W3C validation
+
+This example program is intended to be used as a test service for the [W3C Distributed Tracing Validation Service](https://github.com/w3c/trace-context/tree/master/test).
+It is implemented according to [this instructions](https://github.com/w3c/trace-context/tree/master/test#implement-test-service).
+
+## Usage
+
+1. Build and start the test service endpoint:
+   ```sh
+   $ ./example_w3c_tracecontext_test
+   ```
+   A custom port number for the test service to listen to can be specified:
+   ```sh
+   $ ./example_w3c_tracecontext_test 31339
+   ```
+   The test service will print the full URI that the validation service can connect to:
+   ```sh
+   $ ./example_w3c_tracecontext_test 31339
+   Listening to http://localhost:31339/test   
+   ```
+2. In a different terminal, set up and start the validation service according to
+   the [instructions](https://github.com/w3c/trace-context/tree/master/test#run-test-cases),
+   giving the address of the test service endpoint as argument:
+   ```sh
+   $ python test.py http://localhost:31339/test
+   ```
+3. The validation service will run the test suite and print detailed test results.
+4. Stop the test service by pressing enter.
