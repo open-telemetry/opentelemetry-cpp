@@ -111,6 +111,10 @@ if(MSVC)
   endif()
 endif()
 
+# include GNUInstallDirs before include cmake/opentelemetry-proto.cmake because
+# opentelemetry-proto installs targets to the variables defined in GNUInstallDirs.
+include(GNUInstallDirs)
+
 if(WITH_OTLP)
   set(protobuf_MODULE_COMPATIBLE ON)
   find_package(Protobuf)
@@ -184,7 +188,6 @@ if(BUILD_TESTING)
   find_package(benchmark CONFIG REQUIRED)
 endif()
 
-include(GNUInstallDirs)
 include(CMakePackageConfigHelpers)
 
 include_directories(api/include)
