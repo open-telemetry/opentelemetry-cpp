@@ -119,7 +119,7 @@ add_custom_command(
 include_directories("${GENERATED_PROTOBUF_PATH}")
 
 add_library(
-  opentelemetry_proto OBJECT
+  opentelemetry_proto STATIC
   ${COMMON_PB_CPP_FILE}
   ${RESOURCE_PB_CPP_FILE}
   ${TRACE_PB_CPP_FILE}
