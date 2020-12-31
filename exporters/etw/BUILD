@@ -8,7 +8,7 @@ cc_library(
     hdrs = [
         "include/opentelemetry/exporters/etw/etw_provider_exporter.h",
         "include/opentelemetry/exporters/etw/utils.h",
-        "include/opentelemetry/exporters/etw/uuid.hpp",
+        "include/opentelemetry/exporters/etw/uuid.h",
     ],
     strip_include_prefix = "include",
     deps = [
@@ -35,7 +35,7 @@ cc_library(
         "include/opentelemetry/exporters/etw/etw_data.h",
         "include/opentelemetry/exporters/etw/etw_tracer_exporter.h",
         "include/opentelemetry/exporters/etw/utils.h",
-        "include/opentelemetry/exporters/etw/uuid.hpp",
+        "include/opentelemetry/exporters/etw/uuid.h",
     ],
     strip_include_prefix = "include",
     deps = [

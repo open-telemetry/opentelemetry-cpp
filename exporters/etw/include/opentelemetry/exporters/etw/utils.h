@@ -23,7 +23,7 @@
 #include <sstream>
 #include <string>
 
-#include "opentelemetry/exporters/etw/uuid.hpp"
+#include "opentelemetry/exporters/etw/uuid.h"
 #include "opentelemetry/version.h"
 
 #ifdef _WIN32

@@ -29,7 +29,7 @@
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 
-namespace event
+namespace utils
 {
 
 /// <summary>
@@ -418,6 +418,6 @@ struct UUIDComparer : std::less<UUID>
   inline bool operator()(UUID const &lhs, UUID const &rhs) const { return lhs.Hash() < rhs.Hash(); }
 };
 
-}  // namespace event
+}  // namespace utils
 
 OPENTELEMETRY_END_NAMESPACE

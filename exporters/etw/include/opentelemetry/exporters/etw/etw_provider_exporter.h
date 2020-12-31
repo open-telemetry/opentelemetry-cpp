@@ -26,7 +26,7 @@
 #endif
 
 #include "opentelemetry/common/attribute_value.h"
-#include "opentelemetry/exporters/etw/uuid.hpp"
+#include "opentelemetry/exporters/etw/uuid.h"
 #include "opentelemetry/version.h"
 
 #include "opentelemetry/exporters/etw/utils.h"
@@ -130,7 +130,7 @@ public:
     auto &data = providers()[providerId];
     data.providerMetaVector.clear();
 
-    event::UUID guid = (providerId.rfind("{", 0) == 0) ? event::UUID(providerId.c_str())
+    utils::UUID guid = (providerId.rfind("{", 0) == 0) ? utils::UUID(providerId.c_str())
                                                        :                // It's a ProviderGUID
                            utils::GetProviderGuid(providerId.c_str());  // It's a ProviderName
 
