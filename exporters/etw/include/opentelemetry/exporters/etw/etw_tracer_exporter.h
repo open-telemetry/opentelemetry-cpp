@@ -33,13 +33,6 @@
 #include "opentelemetry/sdk/trace/exporter.h"
 #include "opentelemetry/sdk/trace/recordable.h"
 
-#include <fstream>
-#include <iomanip>
-#include <iostream>
-#include <memory>
-#include <sstream>
-#include <unordered_map>
-
 #include "opentelemetry/exporters/etw/etw_data.h"
 #include "opentelemetry/exporters/etw/etw_provider_exporter.h"
 
