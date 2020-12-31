@@ -53,12 +53,12 @@ TEST(ETWProvider, CheckOpenGUIDDataSuccessfully)
   static ETWProvider etw;
   auto handle = etw.open(providerName.c_str());
 
-  event::UUID uuid_handle(handle.providerGuid);
+  utils::UUID uuid_handle(handle.providerGuid);
   auto guidStrHandle = uuid_handle.to_string();
 
   // get GUID from the providerName
   auto guid = utils::GetProviderGuid(providerName.c_str());
-  event::UUID uuid_name(guid);
+  utils::UUID uuid_name(guid);
   auto guidStrName = uuid_name.to_string();
 
   ASSERT_STREQ(guidStrHandle.c_str(), guidStrName.c_str());
