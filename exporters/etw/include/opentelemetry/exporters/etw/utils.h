@@ -14,6 +14,7 @@
 
 #pragma once
 
+#include <algorithm>
 #include <chrono>
 #include <codecvt>
 #include <ctime>
