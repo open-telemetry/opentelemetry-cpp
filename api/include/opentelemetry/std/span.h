@@ -67,7 +67,7 @@ OPENTELEMETRY_END_NAMESPACE
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace nostd
 {
-constexpr std::size_t dynamic_extent = std::numeric_limits<std::size_t>::max();
+constexpr std::size_t dynamic_extent = (std::numeric_limits<std::size_t>::max());
 
 template <class ElementType, std::size_t Extent = nostd::dynamic_extent>
 using span = std::span<ElementType, Extent>;

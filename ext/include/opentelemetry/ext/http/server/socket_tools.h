@@ -207,7 +207,7 @@ struct SocketAddr
     {
       inet4.sin_port = htons(atoi(colon + 1));
       char buf[16];
-      memcpy(buf, addr, std::min<ptrdiff_t>(15, colon - addr));
+      memcpy(buf, addr, (std::min<ptrdiff_t>)(15, colon - addr));
       buf[15] = '\0';
       ::inet_pton(AF_INET, buf, &inet4.sin_addr);
     }
