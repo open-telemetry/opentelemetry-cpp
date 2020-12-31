@@ -38,9 +38,6 @@ using OwnedAttributeValue = nostd::variant<bool,
                                            uint64_t,
                                            double,
                                            std::string,
-#ifdef HAVE_CSTRING_TYPE
-                                           const char *,
-#endif
 #ifdef HAVE_SPAN_BYTE
                                            std::vector<uint8_t>,
 #endif
@@ -65,9 +62,8 @@ struct AttributeConverter
   OwnedAttributeValue operator()(double v) { return OwnedAttributeValue(v); }
   OwnedAttributeValue operator()(nostd::string_view v)
   {
-    return OwnedAttributeValue(std::string(v.data(), v.size()));
+    return OwnedAttributeValue(std::string(v));
   }
-  OwnedAttributeValue operator()(const char *s) { return OwnedAttributeValue(std::string(s)); }
 #ifdef HAVE_SPAN_BYTE
   OwnedAttributeValue operator()(nostd::span<const uint8_t> v) { return convertSpan<uint8_t>(v); }
 #endif
