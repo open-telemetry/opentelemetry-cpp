@@ -405,8 +405,8 @@ public:
 
     std::vector<uint8_t> v = nlohmann::json::to_msgpack(l1);
 
-    EVENT_DESCRIPTOR evtDescriptor = {
-        .Id = 0, .Version = 0x1, .Channel = 0, .Level = 0, .Opcode = 0, .Task = 0, .Keyword = 0};
+    EVENT_DESCRIPTOR evtDescriptor;
+    EventDescCreate(&evtDescriptor, 0, 0x1, 0, 0, 0, 0, 0);
     EVENT_DATA_DESCRIPTOR evtData[1];
     EventDataDescCreate(&evtData[0], v.data(), v.size());
 
