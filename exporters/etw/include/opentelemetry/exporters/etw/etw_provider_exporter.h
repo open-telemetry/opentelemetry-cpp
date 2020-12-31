@@ -405,17 +405,12 @@ public:
 
     std::vector<uint8_t> v = nlohmann::json::to_msgpack(l1);
 
-    // NUL-terminator and padding for odd-sized buffers
-    v.push_back(0);
-    v.push_back(0);
-    if (v.size() % 2)
-    {
-      v.push_back(0);
-    };
-    void *buff = v.data();
+    EVENT_DESCRIPTOR evtDescriptor = {
+        .Id = 0, .Version = 0x1, .Channel = 0, .Level = 0, .Opcode = 0, .Task = 0, .Keyword = 0};
+    EVENT_DATA_DESCRIPTOR evtData[1];
+    EventDataDescCreate(&evtData[0], v.data(), v.size());
 
-    UCHAR level        = 0;  // LogAlways
-    auto writeResponse = EventWriteString(providerData.providerHandle, level, 0, (PCWSTR)buff);
+    auto writeResponse = EventWrite(providerData.providerHandle, &evtDescriptor, 1, evtData);
 
     switch (writeResponse)
     {
