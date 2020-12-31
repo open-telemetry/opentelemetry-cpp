@@ -83,7 +83,12 @@ option(WITH_ELASTICSEARCH
 
 option(BUILD_TESTING "Whether to enable tests" ON)
 if(WIN32)
-  option(WITH_ETW_EXPORTER "Whether to include the ETW Exporter in the SDK" ON)
+  option(WITH_ETW "Whether to include the ETW Exporter in the SDK" ON)
+  if(WITH_ETW)
+    add_definitions(-DHAVE_MSGPACK)
+    # Option below will be removed once we donate the TraceLoggingDynamic.h to OSS
+    add_definitions(-DHAVE_NO_TLD)
+  endif(WITH_ETW)
 endif(WIN32)
 
 option(WITH_EXAMPLES "Whether to build examples" ON)
