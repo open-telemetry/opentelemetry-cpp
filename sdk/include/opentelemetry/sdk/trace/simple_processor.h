@@ -72,7 +72,7 @@ public:
 private:
   std::unique_ptr<SpanExporter> exporter_;
   opentelemetry::common::SpinLockMutex lock_;
-  std::atomic_flag shutdown_latch_{ATOMIC_FLAG_INIT};
+  std::atomic_flag shutdown_latch_ = ATOMIC_FLAG_INIT;
 };
 }  // namespace trace
 }  // namespace sdk

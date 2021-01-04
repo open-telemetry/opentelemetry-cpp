@@ -57,6 +57,22 @@ jobs:
     - name: run tests
       run: ./ci/do_ci.sh cmake.c++20.test
 
+  cmake_otprotocol_test:
+    name: CMake otprotocol test
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+      with:
+        submodules: 'recursive'
+    - name: setup
+      run: |
+        sudo ./ci/setup_cmake.sh
+        sudo ./ci/setup_ci_environment.sh
+    - name: run otlp exporter tests
+      run: |
+        sudo ./ci/setup_grpc.sh
+        ./ci/do_ci.sh cmake.exporter.otprotocol.test
+
   plugin_test:
     name: Plugin -> CMake
     runs-on: ubuntu-latest
@@ -163,6 +179,16 @@ jobs:
     - name: run tests
       run: ./ci/do_ci.sh bazel.tsan
 
+  bazel_osx:
+    name: Bazel on MacOS
+    runs-on: macos-latest
+    steps:
+    - uses: actions/checkout@v2
+      with:
+        submodules: 'recursive'
+    - name: run tests
+      run: ./ci/do_ci.sh bazel.test
+
   benchmark:
     name: Benchmark
     runs-on: ubuntu-latest
@@ -195,15 +221,6 @@ jobs:
     - name: run tests
       run: ./ci/do_ci.sh format
 
-  osx_test:
-    name: Bazel on MacOS
-    runs-on: macos-latest
-    steps:
-    - uses: actions/checkout@v2
-      with:
-        submodules: 'recursive'
-    - name: run tests
-      run: ./ci/do_ci.sh bazel.test
 
   windows:
     name: CMake -> exporter proto
