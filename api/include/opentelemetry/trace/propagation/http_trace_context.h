@@ -129,7 +129,7 @@ private:
   // Converts the hex numbers stored as strings into bytes stored in a buffer.
   static void GenerateHexFromString(nostd::string_view string, int bytes, uint8_t *buf)
   {
-    const char *str_id = string.begin();
+    const char *str_id = string.data();
     for (int i = 0; i < bytes; i++)
     {
       int tmp = HexToInt(str_id[i]);
