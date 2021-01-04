@@ -43,6 +43,8 @@ namespace trace = opentelemetry::trace;
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 
+namespace exporter
+{
 namespace ETW
 {
 
@@ -60,7 +62,7 @@ public:
    */
   std::unique_ptr<sdk::trace::Recordable> MakeRecordable() noexcept override
   {
-    return std::unique_ptr<sdk::trace::Recordable>(new sdk::trace::ETWSpanData(providerName_));
+    return std::unique_ptr<sdk::trace::Recordable>(new ETWSpanData(providerName_));
   }
 
   /**
@@ -73,8 +75,8 @@ public:
   {
     for (auto &recordable : recordables)
     {
-      auto span = std::unique_ptr<sdk::trace::ETWSpanData>(
-          dynamic_cast<sdk::trace::ETWSpanData *>(recordable.release()));
+      auto span = std::unique_ptr<ETWSpanData>(
+          dynamic_cast<ETWSpanData *>(recordable.release()));
       if (span != nullptr)
       {
         std::cout << span->GetName() << std::endl;
@@ -95,9 +97,8 @@ public:
 
 private:
   std::string providerName_;
-  std::shared_ptr<sdk::trace::ETWSpanData> data_;
 };
-
 }  // namespace ETW
+}  // namespace exporter
 
 OPENTELEMETRY_END_NAMESPACE

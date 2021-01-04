@@ -34,7 +34,7 @@ TEST(ETWTracer, TracerCheck)
   std::string providerName = "OpenTelemetry";
   std::string eventName    = "MyEvent";
 
-  ETW::TracerProvider tp;
+  exporter::ETW::TracerProvider tp;
   auto tracer = tp.GetTracer(providerName);
   auto span   = tracer->StartSpan("MySpan");
 
@@ -50,7 +50,7 @@ TEST(ETWTracer, ETWTracerTest)
 {
   std::string providerName = "OpenTelemetry";
 
-  auto exporter = std::unique_ptr<ETW::ETWTracerExporter>(new ETW::ETWTracerExporter(providerName));
+  auto exporter = std::unique_ptr<exporter::ETW::ETWTracerExporter>(new exporter::ETW::ETWTracerExporter(providerName));
 
   auto processor = std::shared_ptr<sdk::trace::SpanProcessor>(
       new sdk::trace::SimpleSpanProcessor(std::move(exporter)));
@@ -80,7 +80,7 @@ TEST(ETWTracer, ExportUnitTest)
 {
   std::string providerName = "OpenTelemetry";
 
-  auto exporter = std::unique_ptr<ETW::ETWTracerExporter>(new ETW::ETWTracerExporter(providerName));
+  auto exporter = std::unique_ptr<exporter::ETW::ETWTracerExporter>(new exporter::ETW::ETWTracerExporter(providerName));
 
   auto recordable = exporter->MakeRecordable();
   recordable->SetName("MySpan");

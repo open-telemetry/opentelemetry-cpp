@@ -37,6 +37,8 @@ namespace trace = opentelemetry::trace;
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 
+namespace exporter
+{
 namespace ETW
 {
 class Span;
@@ -392,14 +394,8 @@ public:
     return nostd::shared_ptr<trace::Tracer>{new (std::nothrow) Tracer(*this, name, evtFmt)};
   }
 };
-}  // namespace ETW
 
-namespace sdk
-{
-namespace trace
-{
-
-class ETWSpanData final : public Recordable
+class ETWSpanData final : public sdk::trace::Recordable
 {
 public:
   ETWSpanData(std::string providerName) { InitTracerProvider(providerName); }
@@ -455,7 +451,7 @@ public:
    * Get the attributes for this span
    * @return the attributes for this span
    */
-  const std::unordered_map<std::string, SpanDataAttributeValue> &GetAttributes() const noexcept
+  const std::unordered_map<std::string, sdk::trace::SpanDataAttributeValue> &GetAttributes() const noexcept
   {
     return attribute_map_.GetAttributes();
   }
@@ -511,7 +507,7 @@ public:
 
   void InitTracerProvider(std::string providerName)
   {
-    ETW::TracerProvider tracer_provider_;
+    exporter::ETW::TracerProvider tracer_provider_;
 
     tracer_ = tracer_provider_.GetTracer(providerName);
     span_   = tracer_->StartSpan(name_);
@@ -526,11 +522,12 @@ private:
   std::string name_;
   opentelemetry::trace::CanonicalCode status_code_{opentelemetry::trace::CanonicalCode::OK};
   std::string status_desc_;
-  AttributeMap attribute_map_;
+  sdk::trace::AttributeMap attribute_map_;
   opentelemetry::trace::SpanKind span_kind_{opentelemetry::trace::SpanKind::kInternal};
   nostd::shared_ptr<opentelemetry::trace::Tracer> tracer_;
   nostd::shared_ptr<opentelemetry::trace::Span> span_;
 };
-}  // namespace trace
-}  // namespace sdk
+
+}  // namespace ETW
+}  // namespace exporter
 OPENTELEMETRY_END_NAMESPACE
