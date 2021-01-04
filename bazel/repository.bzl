@@ -7,9 +7,13 @@ def opentelemetry_cpp_deps():
     # Google Benchmark library.
     # Only needed for benchmarks, not to build the OpenTelemetry library.
     maybe(
-        native.local_repository,
+        http_archive,
         name = "com_github_google_benchmark",
-        path = "third_party/benchmark",
+        sha256 = "dccbdab796baa1043f04982147e67bb6e118fe610da2c65f88912d73987e700c",
+        strip_prefix = "benchmark-1.5.2",
+        urls = [
+            "https://github.com/google/benchmark/archive/v1.5.2.tar.gz",
+        ],
     )
 
     # GoogleTest framework.
