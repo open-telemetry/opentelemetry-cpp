@@ -35,18 +35,6 @@ def opentelemetry_cpp_deps():
         ],
     )
 
-    # Uses older protobuf version because of
-    # https://github.com/protocolbuffers/protobuf/issues/7179
-    maybe(
-        http_archive,
-        name = "com_google_protobuf",
-        sha256 = "b679cef31102ed8beddc39ecfd6368ee311cbee6f50742f13f21be7278781821",
-        strip_prefix = "protobuf-3.11.2",
-        urls = [
-            "https://github.com/protocolbuffers/protobuf/releases/download/v3.11.2/protobuf-all-3.11.2.tar.gz",
-        ],
-    )
-
     # OTLP Protocol definition
     maybe(
         http_archive,
