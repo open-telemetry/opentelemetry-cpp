@@ -75,8 +75,7 @@ public:
   {
     for (auto &recordable : recordables)
     {
-      auto span = std::unique_ptr<ETWSpanData>(
-          dynamic_cast<ETWSpanData *>(recordable.release()));
+      auto span = std::unique_ptr<ETWSpanData>(dynamic_cast<ETWSpanData *>(recordable.release()));
       if (span != nullptr)
       {
         std::cout << span->GetName() << std::endl;
