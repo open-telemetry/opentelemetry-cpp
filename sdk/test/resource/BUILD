@@ -1,5 +1,5 @@
 cc_test(
-    name = "resouce_test",
+    name = "resource_test",
     srcs = [
         "resource_test.cc",
     ],
