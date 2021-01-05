@@ -35,23 +35,11 @@ def opentelemetry_cpp_deps():
         ],
     )
 
-    # Uses older protobuf version because of
-    # https://github.com/protocolbuffers/protobuf/issues/7179
-    maybe(
-        http_archive,
-        name = "com_google_protobuf",
-        sha256 = "b679cef31102ed8beddc39ecfd6368ee311cbee6f50742f13f21be7278781821",
-        strip_prefix = "protobuf-3.11.2",
-        urls = [
-            "https://github.com/protocolbuffers/protobuf/releases/download/v3.11.2/protobuf-all-3.11.2.tar.gz",
-        ],
-    )
-
     # OTLP Protocol definition
     maybe(
         http_archive,
         name = "com_github_opentelemetry_proto",
-        build_file = "//bazel:opentelemetry_proto.BUILD",
+        build_file = "@io_opentelemetry_cpp//bazel:opentelemetry_proto.BUILD",
         sha256 = "08f090570e0a112bfae276ba37e9c45bf724b64d902a7a001db33123b840ebd6",
         strip_prefix = "opentelemetry-proto-0.6.0",
         urls = [
@@ -63,7 +51,7 @@ def opentelemetry_cpp_deps():
     maybe(
         http_archive,
         name = "github_nlohmann_json",
-        build_file = "//bazel:nlohmann_json.BUILD",
+        build_file = "@io_opentelemetry_cpp//bazel:nlohmann_json.BUILD",
         sha256 = "69cc88207ce91347ea530b227ff0776db82dcb8de6704e1a3d74f4841bc651cf",
         urls = [
             "https://github.com/nlohmann/json/releases/download/v3.6.1/include.zip",
