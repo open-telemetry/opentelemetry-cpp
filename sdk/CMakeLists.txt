@@ -20,7 +20,6 @@ install(
   PATTERN "*.h")
 
 add_subdirectory(src)
-add_subdirectory(test/trace/w3c_tracecontext_test)
 
 if(BUILD_TESTING)
   add_subdirectory(test)
