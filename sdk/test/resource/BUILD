@@ -5,7 +5,7 @@ cc_test(
     ],
     deps = [
         "//api",
-        "//sdk/src/resources",
+        "//sdk/src/resource",
         "@com_google_googletest//:gtest_main",
     ],
 )
