@@ -21,10 +21,6 @@ Resource::Resource(const opentelemetry::sdk::trace::AttributeMap &attributes) no
     : attribute_map_(attributes)
 {}
 
-Resource::Resource(opentelemetry::sdk::trace::AttributeMap &&attributes) noexcept
-    : attribute_map_(std::move(attributes))
-{}
-
 const opentelemetry::sdk::trace::AttributeMap &Resource::GetAttributes() const noexcept
 {
   return attribute_map_;

@@ -24,8 +24,6 @@ public:
 
   Resource(const opentelemetry::sdk::trace::AttributeMap &attributes) noexcept;
 
-  Resource(opentelemetry::sdk::trace::AttributeMap &&attributes) noexcept;
-
   template <class T,
             nostd::enable_if_t<common::detail::is_key_value_iterable<T>::value> * = nullptr>
   Resource(const T &attributes) noexcept : Resource(common::KeyValueIterableView<T>(attributes))
