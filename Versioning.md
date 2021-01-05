@@ -19,38 +19,38 @@ must remain backwards compatible. Internal types are allowed to break.
 
 ### ABI Stability
 
-Refer [ABI Policy](./docs/abi-policy.md) for more details. To summarise
-* ABI stability is guaranted for API.
-* ABI stability is not guaranteed for SDK. C++ In case of ABI breaking changes, instead of bumping up the majore version, new `inline namespace` version will be crearted, and both old API and new API would be made available simultaneously.
+Refer to the [ABI Policy](./docs/abi-policy.md) for more details. To summarise
+* ABI stability is guaranteed for the API.
+* ABI stability is not guaranteed for the SDK. In case of ABI breaking changes, instead of bumping up the major version, a new `inline namespace` version will be created, and both old API and new API would be made available simultaneously.
 
 ## Policy
 
 * Release versions will follow [SemVer 2.0](https://semver.org/).
-* Only single source package containing api and sdk for all signals would be released as part of the new GitHub release.
-* There would be source package releases for api and sdk. There won't be separate releases for the signals. The release version numbers for api and sdk will not be in sync with each other. As there would be more frequent changes expected in sdk then in api.
-* Experimental releases: New (unstable) telemetry signals and features will be introduced behind feature flag using C macro define.
+* Only a single source package containing both the api and sdk for all signals will be released as part of each GitHub release.
+* There will be source package releases for api and sdk. There won't be separate releases for the signals. The release version numbers for api and sdk will not be in sync with each other. As there would be more frequent changes expected in sdk than in the api.
+* Experimental releases: New (unstable) telemetry signals and features will be introduced behind feature flag protected by a preprocessor macro.
   ```
     #ifdef FEATURE_FLAG
          <metrics api/sdk definitions>
     #endif
   ```
 
-  As we deliver package in source form, and the user is responsible to build them for their platform, they must be
-  aware of these feature flags (documented in CHANGELOG.md), and enable it explicitly through their build system (cmake
-  , bazel or others ) to use the preview feature.
+  As we deliver the package in source form, and the user is responsible to build it for their platform, the user must be
+  aware of these feature flags (documented in the [CHANGELOG.md](CHANGELOG.md) file).
+  The user must enable them explicitly through their build system (CMake, Bazel or others) to use any preview features.
 
   The guidelines in creating feature flag would be:
   - Naming:
 
-    - `ENABLE_<SIGNAL>_PREVIEW` : For experimetal release of signal api/sdks eg, METRICS_PREVIEW, LOGGING_PREVIEW,
+    - `ENABLE_<SIGNAL>_PREVIEW` : For experimetal release of signal api/sdks eg, `METRICS_PREVIEW`, `LOGGING_PREVIEW`,
 
-    - `ENABLE_<SIGNAL>_<FEATURE_NAME>_PREVIEW` : For experimental release for any feature within stable signal. Eg, TRACING_JAEGER_PREVIEW to release the experimental Jaeger exporter for tracing.
+    - `ENABLE_<SIGNAL>_<FEATURE_NAME>_PREVIEW` : For experimental release for any feature within stable signal. For example, `TRACING_JAEGER_PREVIEW` to release the experimental Jaeger exporter for tracing.
 
-  - Cleanup: It is good practice to keep feature-flags shortlived as possible. And, aslo important to keep the number of them low. They should be used such that it is easy to remove/cleanup them once the experimental feature is stable.
+  - Cleanup: It is good practice to keep feature-flags as shortlived as possible. And, also important to keep the number of them low. They should be used such that it is easy to remove/cleanup them once the experimental feature is stable.
 
 
 * New signals will be stabilized via a **minor version bump**, and are not allowed to break existing stable interfaces.
-Feature flag would be removed once we have a stable implementation for the signal.
+Feature flags will be removed once we have a stable implementation for the signal.
 
 * GitHub releases will be made for all released versions.
 

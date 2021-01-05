@@ -111,6 +111,11 @@ if(MSVC)
   endif()
 endif()
 
+# include GNUInstallDirs before include cmake/opentelemetry-proto.cmake because
+# opentelemetry-proto installs targets to the location variables defined in
+# GNUInstallDirs.
+include(GNUInstallDirs)
+
 if(WITH_OTLP)
   set(protobuf_MODULE_COMPATIBLE ON)
   find_package(Protobuf)
@@ -145,9 +150,7 @@ if(WITH_OTLP)
     set(PROTOBUF_PROTOC_EXECUTABLE ${Protobuf_PROTOC_EXECUTABLE})
   endif()
   message("PROTOBUF_PROTOC_EXECUTABLE=${PROTOBUF_PROTOC_EXECUTABLE}")
-endif()
 
-if(WITH_OTLP)
   include(cmake/opentelemetry-proto.cmake)
 endif()
 
@@ -184,7 +187,6 @@ if(BUILD_TESTING)
   find_package(benchmark CONFIG REQUIRED)
 endif()
 
-include(GNUInstallDirs)
 include(CMakePackageConfigHelpers)
 
 include_directories(api/include)
@@ -192,7 +194,6 @@ add_subdirectory(api)
 include_directories(sdk/include)
 include_directories(sdk)
 add_subdirectory(sdk)
-include_directories(.)
 add_subdirectory(exporters)
 if(WITH_EXAMPLES)
   add_subdirectory(examples)
