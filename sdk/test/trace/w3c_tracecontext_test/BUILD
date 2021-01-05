@@ -9,5 +9,6 @@ cc_binary(
         "//ext:headers",
         "//sdk/src/trace",
         "@curl",
+	"@github_nlohmann_json//:json",
     ],
 )
