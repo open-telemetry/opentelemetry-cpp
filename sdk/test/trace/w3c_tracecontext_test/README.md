@@ -22,5 +22,11 @@ It is implemented according to [this instructions](https://github.com/w3c/trace-
    ```sh
    $ python test.py http://localhost:31339/test
    ```
+   One can also use the `Dockerfile` provided in this folder to conveniently
+   run the validation service:
+   ```sh
+   $ docker build --tag w3c_driver .
+   $ docker run --network host w3c_driver  http://localhost:31339/test
+   ```
 3. The validation service will run the test suite and print detailed test results.
 4. Stop the test service by pressing enter.
