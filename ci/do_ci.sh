@@ -2,6 +2,18 @@
 
 set -e
 
+function install_prometheus_cpp_client
+{
+  pushd third_party/prometheus-cpp
+  git submodule update --recursive --init
+  [[ -d _build ]] && rm -rf ./_build
+  mkdir _build && cd _build
+  cmake .. -DBUILD_SHARED_LIBS=ON -DUSE_THIRDPARTY_LIBRARIES=ON
+  make -j 4
+  sudo make install
+  popd
+}
+
 [ -z "${SRC_DIR}" ] && export SRC_DIR="`pwd`"
 [ -z "${BUILD_DIR}" ] && export BUILD_DIR=$HOME/build
 mkdir -p "${BUILD_DIR}"
@@ -154,19 +166,6 @@ elif [[ "$1" == "code.coverage" ]]; then
   cp tmp_coverage.info coverage.info
   exit 0
 fi
-
-
-function install_prometheus_cpp_client
-{
-  pushd third_party/prometheus-cpp
-  git submodule update --recursive --init
-  [[ -d _build ]] && rm -rf ./_build
-  mkdir _build && cd _build
-  cmake .. -DBUILD_SHARED_LIBS=ON -DUSE_THIRDPARTY_LIBRARIES=ON
-  make -j 4
-  sudo make install
-  popd
-}
 
 echo "Invalid do_ci.sh target, see ci/README.md for valid targets."
 exit 1
