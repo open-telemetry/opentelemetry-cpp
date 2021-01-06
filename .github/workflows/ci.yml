@@ -87,13 +87,20 @@ jobs:
     - name: run tests
       run: ./ci/do_ci.sh cmake.test_example_plugin
 
-  gcc_48_test:
+  bazel_gcc_48_test:
     name: Bazel gcc 4.8
     runs-on: ubuntu-18.04
     steps:
     - uses: actions/checkout@v2
       with:
         submodules: 'recursive'
+    - name: Mount Bazel Cache
+      uses: actions/cache@v2
+      env:
+        cache-name: bazel_cache
+      with:
+        path: /home/runner/.cache/bazel
+        key: bazel_gcc_48_test
     - name: setup
       run: |
         sudo ./ci/setup_ci_environment.sh
@@ -111,6 +118,13 @@ jobs:
     - uses: actions/checkout@v2
       with:
         submodules: 'recursive'
+    - name: Mount Bazel Cache
+      uses: actions/cache@v2
+      env:
+        cache-name: bazel_cache
+      with:
+        path: /home/runner/.cache/bazel
+        key: bazel_test
     - name: setup
       run: |
         sudo ./ci/setup_ci_environment.sh
@@ -125,6 +139,13 @@ jobs:
     - uses: actions/checkout@v2
       with:
         submodules: 'recursive'
+    - name: Mount Bazel Cache
+      uses: actions/cache@v2
+      env:
+        cache-name: bazel_cache
+      with:
+        path: /home/runner/.cache/bazel
+        key: bazel_valgrind
     - name: setup
       run: |
         sudo ./ci/setup_ci_environment.sh
@@ -139,6 +160,13 @@ jobs:
     - uses: actions/checkout@v2
       with:
         submodules: 'recursive'
+    - name: Mount Bazel Cache
+      uses: actions/cache@v2
+      env:
+        cache-name: bazel_cache
+      with:
+        path: /home/runner/.cache/bazel
+        key: bazel_noexcept
     - name: setup
       run: |
         sudo ./ci/setup_ci_environment.sh
@@ -153,6 +181,13 @@ jobs:
     - uses: actions/checkout@v2
       with:
         submodules: 'recursive'
+    - name: Mount Bazel Cache
+      uses: actions/cache@v2
+      env:
+        cache-name: bazel_cache
+      with:
+        path: /home/runner/.cache/bazel
+        key: bazel_asan
     - name: setup
       run: |
         sudo ./ci/setup_ci_environment.sh
@@ -167,6 +202,13 @@ jobs:
     - uses: actions/checkout@v2
       with:
         submodules: 'recursive'
+    - name: Mount Bazel Cache
+      uses: actions/cache@v2
+      env:
+        cache-name: bazel_cache
+      with:
+        path: /home/runner/.cache/bazel
+        key: bazel_tsan
     - name: setup
       run: |
         sudo ./ci/setup_ci_environment.sh
@@ -181,6 +223,13 @@ jobs:
     - uses: actions/checkout@v2
       with:
         submodules: 'recursive'
+    - name: Mount Bazel Cache
+      uses: actions/cache@v2
+      env:
+        cache-name: bazel_cache
+      with:
+        path: /Users/runner/.cache/bazel
+        key: bazel_osx
     - name: run tests
       run: ./ci/do_ci.sh bazel.test
 
@@ -191,6 +240,13 @@ jobs:
     - uses: actions/checkout@v2
       with:
         submodules: 'recursive'
+    - name: Mount Bazel Cache
+      uses: actions/cache@v2
+      env:
+        cache-name: bazel_cache
+      with:
+        path: /home/runner/.cache/bazel
+        key: bazel_benchmark
     - name: setup
       run: |
         sudo ./ci/setup_ci_environment.sh
