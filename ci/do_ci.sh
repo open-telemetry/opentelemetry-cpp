@@ -12,9 +12,11 @@ BAZEL_OPTIONS=""
 BAZEL_TEST_OPTIONS="$BAZEL_OPTIONS --test_output=errors"
 
 if [[ "$1" == "cmake.test" ]]; then
+  install_prometheus_cpp_client
   cd "${BUILD_DIR}"
   rm -rf *
   cmake -DCMAKE_BUILD_TYPE=Debug  \
+        -DWITH_PROMETHEUS=ON \
         -DCMAKE_CXX_FLAGS="-Werror" \
         "${SRC_DIR}"
   make
@@ -54,30 +56,6 @@ elif [[ "$1" == "cmake.exporter.otprotocol.test" ]]; then
   sed -i "s~gRPC_CPP_PLUGIN_EXECUTABLE-NOTFOUND~$grpc_cpp_plugin~" ${proto_make_file} #fixme
   make -j $(nproc)
   cd exporters/otlp && make test
-  exit 0
-elif [[ "$1" == "cmake.exporter.prometheus.test" ]]; then
-#  export DEBIAN_FRONTEND=noninteractive
-#  apt-get update
-#  apt-get install sudo
-#  apt-get install zlib1g-dev
-#  apt-get -y install libcurl4-openssl-dev
-  cd third_party/prometheus-cpp
-  git submodule update --recursive --init
-  [[ -d _build ]] && rm -rf ./_build
-  mkdir _build && cd _build
-  cmake .. -DBUILD_SHARED_LIBS=ON -DUSE_THIRDPARTY_LIBRARIES=ON
-  make -j 4
-  sudo make install
-
-  cd "${BUILD_DIR}"
-  rm -rf *
-
-  cmake -DCMAKE_BUILD_TYPE=Debug  \
-        -DWITH_PROMETHEUS=ON \
-        -DCMAKE_CXX_FLAGS="-Werror" \
-        "${SRC_DIR}"
-  make
-  make test
   exit 0
 elif [[ "$1" == "cmake.test_example_plugin" ]]; then
   # Build the plugin
@@ -176,6 +154,19 @@ elif [[ "$1" == "code.coverage" ]]; then
   cp tmp_coverage.info coverage.info
   exit 0
 fi
+
+
+function install_prometheus_cpp_client
+{
+  pushd third_party/prometheus-cpp
+  git submodule update --recursive --init
+  [[ -d _build ]] && rm -rf ./_build
+  mkdir _build && cd _build
+  cmake .. -DBUILD_SHARED_LIBS=ON -DUSE_THIRDPARTY_LIBRARIES=ON
+  make -j 4
+  sudo make install
+  popd
+}
 
 echo "Invalid do_ci.sh target, see ci/README.md for valid targets."
 exit 1
