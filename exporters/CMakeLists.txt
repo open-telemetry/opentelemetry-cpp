@@ -12,3 +12,7 @@ endif()
 if(WITH_ELASTICSEARCH)
   add_subdirectory(elasticsearch)
 endif()
+
+if(WITH_ETW)
+  add_subdirectory(etw)
+endif()
