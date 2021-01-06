@@ -43,7 +43,9 @@ public:
   explicit SimpleLogProcessor(std::unique_ptr<LogExporter> &&exporter);
   virtual ~SimpleLogProcessor() = default;
 
-  void OnReceive(std::unique_ptr<opentelemetry::logs::LogRecord> &&record) noexcept override;
+  std::unique_ptr<Recordable> MakeRecordable() noexcept override;
+
+  void OnReceive(std::unique_ptr<Recordable> &&record) noexcept override;
 
   bool ForceFlush(
       std::chrono::microseconds timeout = std::chrono::microseconds::max()) noexcept override;
@@ -57,7 +59,7 @@ private:
   // The lock used to ensure the exporter is not called concurrently
   opentelemetry::common::SpinLockMutex lock_;
   // The atomic boolean flag to ensure the ShutDown() function is only called once
-  std::atomic_flag shutdown_latch_{ATOMIC_FLAG_INIT};
+  std::atomic_flag shutdown_latch_ = ATOMIC_FLAG_INIT;
 };
 }  // namespace logs
 }  // namespace sdk

@@ -4,9 +4,15 @@ if(CURL_FOUND)
   set(FILENAME curl_http_test)
   add_compile_definitions(WITH_CURL)
   add_executable(${FILENAME} ${FILENAME}.cc)
-  include_directories(${CURL_INCLUDE_DIR})
   target_link_libraries(${FILENAME} ${GTEST_BOTH_LIBRARIES}
-                        ${CMAKE_THREAD_LIBS_INIT} ${CURL_LIBRARIES})
+                        ${CMAKE_THREAD_LIBS_INIT})
+
+  if(TARGET CURL::libcurl)
+    target_link_libraries(${FILENAME} CURL::libcurl)
+  else()
+    include_directories(${CURL_INCLUDE_DIRS})
+    target_link_libraries(${FILENAME} ${CURL_LIBRARIES})
+  endif()
   gtest_add_tests(
     TARGET ${FILENAME}
     TEST_PREFIX ext.http.curl.

@@ -60,10 +60,10 @@ See [CONTRIBUTING.md](../../CONTRIBUTING.md) for instructions on building and ru
 
 ## Additional Documentation
 
-[API Design](https://github.com/open-o11y/otel-docs/blob/master/cpp-metrics/api-design.md)
+[API Design](https://github.com/open-o11y/docs/blob/master/cpp-metrics/api-design.md)
 
-[SDK Design](https://github.com/open-o11y/otel-docs/blob/master/cpp-metrics/sdk-design.md)
+[SDK Design](https://github.com/open-o11y/docs/blob/master/cpp-metrics/sdk-design.md)
 
-[OStreamExporters Design](https://github.com/open-o11y/otel-docs/blob/master/exporter/ostream/ostream-exporter-design.md)
+[OStreamExporters Design](https://github.com/open-o11y/docs/blob/master/cpp-ostream/ostream-exporter-design.md)
 
 [OpenTelemetry C++ Metrics Overview](https://github.com/open-o11y/docs/blob/master/cpp-metrics/README.md)

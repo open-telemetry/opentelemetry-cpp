@@ -33,6 +33,9 @@ elif [[ "$1" == "cmake.c++20.test" ]]; then
 elif [[ "$1" == "cmake.legacy.test" ]]; then
   cd "${BUILD_DIR}"
   rm -rf *
+  export BUILD_ROOT="${BUILD_DIR}"
+  ${SRC_DIR}/tools/build-gtest.sh
+  ${SRC_DIR}/tools/build-benchmark.sh
   cmake -DCMAKE_BUILD_TYPE=Debug  \
         -DCMAKE_CXX_FLAGS="-Werror" \
         -DCMAKE_CXX_STANDARD=11 \
@@ -45,10 +48,12 @@ elif [[ "$1" == "cmake.exporter.otprotocol.test" ]]; then
   rm -rf *
   cmake -DCMAKE_BUILD_TYPE=Debug  \
         -DWITH_OTLP=ON \
-        -DCMAKE_CXX_FLAGS="-Werror" \
         "${SRC_DIR}"
-  make
-  make test
+  grpc_cpp_plugin=`which grpc_cpp_plugin`
+  proto_make_file="CMakeFiles/opentelemetry_proto.dir/build.make"
+  sed -i "s~gRPC_CPP_PLUGIN_EXECUTABLE-NOTFOUND~$grpc_cpp_plugin~" ${proto_make_file} #fixme
+  make -j $(nproc)
+  cd exporters/otlp && make test
   exit 0
 elif [[ "$1" == "cmake.exporter.prometheus.test" ]]; then
 #  export DEBIAN_FRONTEND=noninteractive

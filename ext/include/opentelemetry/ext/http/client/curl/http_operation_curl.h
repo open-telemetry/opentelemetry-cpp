@@ -205,7 +205,7 @@ public:
 
     /* wait for the socket to become ready for sending */
     sockfd_ = sockextr;
-    if (!WaitOnSocket(sockfd_, 0, http_conn_timeout_.count()) || is_aborted_)
+    if (!WaitOnSocket(sockfd_, 0, static_cast<long>(http_conn_timeout_.count())) || is_aborted_)
     {
       res_ = CURLE_OPERATION_TIMEDOUT;
       DispatchEvent(
@@ -378,7 +378,11 @@ public:
       // Simply close the socket - connection reset by peer
       if (sockfd_)
       {
+#if defined(_WIN32)
+        ::closesocket(sockfd_);
+#else
         ::close(sockfd_);
+#endif
         sockfd_ = 0;
       }
     }
@@ -409,8 +413,6 @@ protected:
 
   // Socket parameters
   curl_socket_t sockfd_;
-
-  // long sockextr_   = 0;
 
   curl_off_t nread_;
   size_t sendlen_ = 0;  // # bytes sent by client

@@ -8,3 +8,7 @@ add_subdirectory(memory)
 if(WITH_PROMETHEUS)
   add_subdirectory(prometheus)
 endif()
+
+if(WITH_ELASTICSEARCH)
+  add_subdirectory(elasticsearch)
+endif()

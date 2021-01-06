@@ -2,7 +2,7 @@
 
 #include <gtest/gtest.h>
 
-#include "map"
+#include <map>
 
 using opentelemetry::nostd::string_view;
 
@@ -68,7 +68,7 @@ TEST(StringViewTest, SubstrPortion)
 TEST(StringViewTest, SubstrOutOfRange)
 {
   string_view s = "abc123";
-#if __EXCEPTIONS
+#if __EXCEPTIONS || defined(HAVE_STDLIB_CPP)
   EXPECT_THROW(s.substr(10), std::out_of_range);
 #else
   EXPECT_DEATH({ s.substr(10); }, "");

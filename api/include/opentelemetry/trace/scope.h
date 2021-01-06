@@ -37,7 +37,7 @@ public:
    */
   Scope(const nostd::shared_ptr<Span> &span) noexcept
       : token_(context::RuntimeContext::Attach(
-            context::RuntimeContext::GetCurrent().SetValue(SpanKey, span)))
+            context::RuntimeContext::GetCurrent().SetValue(kSpanKey, span)))
   {}
 
 private:

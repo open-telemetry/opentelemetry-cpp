@@ -7,6 +7,7 @@
 #include <chrono>
 #include <condition_variable>
 #include <fstream>
+#include <memory>
 #include <thread>
 #include <vector>
 
@@ -264,4 +265,20 @@ TEST_F(BasicCurlHttpTests, CurlHttpOperations)
                                        false);
   http_operations3.Send();
   delete handler;
+}
+
+TEST_F(BasicCurlHttpTests, GetBaseUri)
+{
+  curl::SessionManager session_manager;
+
+  auto session = session_manager.CreateSession("127.0.0.1", 80);
+  ASSERT_EQ(std::static_pointer_cast<curl::Session>(session)->GetBaseUri(), "http://127.0.0.1:80/");
+
+  session = session_manager.CreateSession("https://127.0.0.1", 443);
+  ASSERT_EQ(std::static_pointer_cast<curl::Session>(session)->GetBaseUri(),
+            "https://127.0.0.1:443/");
+
+  session = session_manager.CreateSession("http://127.0.0.1", 31339);
+  ASSERT_EQ(std::static_pointer_cast<curl::Session>(session)->GetBaseUri(),
+            "http://127.0.0.1:31339/");
 }
