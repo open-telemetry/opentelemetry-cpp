@@ -60,9 +60,13 @@ def opentelemetry_cpp_deps():
 
     # C++ Prometheus Client library.
     maybe(
-        native.local_repository,
+        http_archive,
         name = "com_github_jupp0r_prometheus_cpp",
-        path = "third_party/prometheus-cpp",
+        sha256 = "aab4ef8342319f631969e01b8c41e355704847cbe76131cb1dd5ea1862000bda",
+        strip_prefix = "prometheus-cpp-0.11.0",
+        urls = [
+            "https://github.com/jupp0r/prometheus-cpp/archive/v0.11.0.tar.gz",
+        ],
     )
 
     # libcurl (optional)
