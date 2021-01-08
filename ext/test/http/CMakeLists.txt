@@ -1,6 +1,5 @@
 find_package(CURL)
 if(CURL_FOUND)
-  set(CURL_LIBRARY "-lcurl")
   set(FILENAME curl_http_test)
   add_executable(${FILENAME} ${FILENAME}.cc)
   target_link_libraries(${FILENAME} ${GTEST_BOTH_LIBRARIES}

@@ -47,7 +47,7 @@ public:
    * timeout is applied.
    */
   virtual bool ForceFlush(
-      std::chrono::microseconds timeout = std::chrono::microseconds::max()) noexcept = 0;
+      std::chrono::microseconds timeout = (std::chrono::microseconds::max)()) noexcept = 0;
 
   /**
    * Shut down the processor and do any cleanup required. Ended spans are
@@ -58,7 +58,7 @@ public:
    * timeout is applied.
    */
   virtual bool Shutdown(
-      std::chrono::microseconds timeout = std::chrono::microseconds::max()) noexcept = 0;
+      std::chrono::microseconds timeout = (std::chrono::microseconds::max)()) noexcept = 0;
 };
 }  // namespace trace
 }  // namespace sdk
