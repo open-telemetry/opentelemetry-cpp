@@ -10,7 +10,8 @@ if(CURL_FOUND)
     target_link_libraries(${FILENAME} CURL::libcurl opentelemetry_curl_factory)
   else()
     include_directories(${CURL_INCLUDE_DIRS})
-    target_link_libraries(${FILENAME} ${CURL_LIBRARIES} opentelemetry_curl_factory)
+    target_link_libraries(${FILENAME} ${CURL_LIBRARIES}
+                          opentelemetry_curl_factory)
   endif()
   gtest_add_tests(
     TARGET ${FILENAME}

@@ -1,3 +1,4 @@
+include_directories(sdk)
 add_library(opentelemetry_ext INTERFACE)
 target_include_directories(
   opentelemetry_ext
@@ -19,6 +20,7 @@ install(
   FILES_MATCHING
   PATTERN "*.h")
 
+include_directories(include)
 add_subdirectory(src)
 
 if(BUILD_TESTING)
