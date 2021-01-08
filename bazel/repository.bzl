@@ -19,9 +19,13 @@ def opentelemetry_cpp_deps():
     # GoogleTest framework.
     # Only needed for tests, not to build the OpenTelemetry library.
     maybe(
-        native.local_repository,
+        http_archive,
         name = "com_google_googletest",
-        path = "third_party/googletest",
+        sha256 = "a03a7b24b3a0766dc823c9008dd32c56a1183889c04f084653266af22289ab0c",
+        strip_prefix = "googletest-a6dfd3aca7f2f91f95fc7ab650c95a48420d513d",
+        urls = [
+            "https://github.com/google/googletest/archive/a6dfd3aca7f2f91f95fc7ab650c95a48420d513d.tar.gz",
+        ],
     )
 
     # Load gRPC dependency
