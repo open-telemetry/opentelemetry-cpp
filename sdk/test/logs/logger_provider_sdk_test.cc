@@ -16,6 +16,7 @@
 
 #include "opentelemetry/logs/provider.h"
 #include "opentelemetry/nostd/shared_ptr.h"
+#include "opentelemetry/sdk/logs/log_record.h"
 #include "opentelemetry/sdk/logs/logger.h"
 #include "opentelemetry/sdk/logs/logger_provider.h"
 
@@ -69,7 +70,12 @@ TEST(LoggerProviderSDK, LoggerProviderLoggerArguments)
 
 class DummyProcessor : public LogProcessor
 {
-  void OnReceive(std::unique_ptr<opentelemetry::logs::LogRecord> &&record) noexcept {}
+  std::unique_ptr<Recordable> MakeRecordable() noexcept
+  {
+    return std::unique_ptr<Recordable>(new LogRecord);
+  }
+
+  void OnReceive(std::unique_ptr<Recordable> &&record) noexcept {}
   bool ForceFlush(std::chrono::microseconds timeout = std::chrono::microseconds(0)) noexcept
   {
     return true;

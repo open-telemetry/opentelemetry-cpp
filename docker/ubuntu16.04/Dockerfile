@@ -9,7 +9,7 @@ RUN apt-get install -qq -y --ignore-missing \
 	apt-utils		\
 	automake		\
 	build-essential		\
-      bc                      \
+	bc                      \
 	bzip2			\
 	cmake			\
 	curl			\

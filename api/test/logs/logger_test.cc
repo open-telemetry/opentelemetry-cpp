@@ -1,57 +1,84 @@
 #include <gtest/gtest.h>
 #include <array>
 
+#include "opentelemetry/core/timestamp.h"
 #include "opentelemetry/logs/logger.h"
 #include "opentelemetry/logs/provider.h"
 #include "opentelemetry/nostd/shared_ptr.h"
 
-using opentelemetry::common::KeyValueIterable;
 using opentelemetry::logs::Logger;
 using opentelemetry::logs::LoggerProvider;
-using opentelemetry::logs::LogRecord;
 using opentelemetry::logs::Provider;
 using opentelemetry::logs::Severity;
 using opentelemetry::nostd::shared_ptr;
 using opentelemetry::nostd::span;
 using opentelemetry::nostd::string_view;
 
+// Check that the default logger is a noop logger instance
 TEST(Logger, GetLoggerDefault)
 {
   auto lp     = Provider::GetLoggerProvider();
   auto logger = lp->GetLogger("TestLogger");
+  auto name   = logger->GetName();
   EXPECT_NE(nullptr, logger);
+  EXPECT_EQ(name, "noop logger");
 }
 
-TEST(Logger, GetNoopLoggerName)
-{
-  auto lp     = Provider::GetLoggerProvider();
-  auto logger = lp->GetLogger("TestLogger");
-}
-
+// Test the two additional overloads for GetLogger()
 TEST(Logger, GetNoopLoggerNameWithArgs)
 {
   auto lp = Provider::GetLoggerProvider();
 
+  // GetLogger(name, list(args))
   std::array<string_view, 1> sv{"string"};
   span<string_view> args{sv};
-  auto logger = lp->GetLogger("NoopLoggerWithArgs", args);
-  // should probably also test that arguments were set properly too
-  // by adding a getArgs() method in NoopLogger
+  lp->GetLogger("NoopLoggerWithArgs", args);
+
+  // GetLogger(name, string options)
+  lp->GetLogger("NoopLoggerWithOptions", "options");
 }
 
-TEST(Logger, NoopLog)
+// Test the Log() overloads
+TEST(Logger, LogMethodOverloads)
 {
   auto lp     = Provider::GetLoggerProvider();
   auto logger = lp->GetLogger("TestLogger");
-  LogRecord r;
-  r.name = "Noop log name";
-  logger->log(r);
+
+  // Create a map to test the logs with
+  std::map<std::string, std::string> m = {{"key1", "value1"}};
+
+  // Log overloads
+  logger->Log(Severity::kTrace, "Test log message");
+  logger->Log(Severity::kInfo, "Logging a message", "Test log message");
+  logger->Log(Severity::kDebug, m);
+  logger->Log(Severity::kWarn, "Logging a map", m);
+  logger->Log(Severity::kError, {{"key1", "value 1"}, {"key2", 2}});
+  logger->Log(Severity::kFatal, "Logging an initializer list", {{"key1", "value 1"}, {"key2", 2}});
+
+  // Severity methods
+  logger->Trace("Test log message");
+  logger->Debug("Logging a message", "Test log message");
+  logger->Info(m);
+  logger->Warn("Logging a map", m);
+  logger->Error({{"key1", "value 1"}, {"key2", 2}});
+  logger->Fatal("Logging an initializer list", {{"key1", "value 1"}, {"key2", 2}});
 }
 
 // Define a basic Logger class
 class TestLogger : public Logger
 {
-  void log(const LogRecord &record) noexcept override {}
+  const opentelemetry::nostd::string_view GetName() noexcept override { return "test logger"; }
+
+  void Log(Severity severity,
+           string_view name,
+           string_view body,
+           const opentelemetry::common::KeyValueIterable &resource,
+           const opentelemetry::common::KeyValueIterable &attributes,
+           opentelemetry::trace::TraceId trace_id,
+           opentelemetry::trace::SpanId span_id,
+           opentelemetry::trace::TraceFlags trace_flags,
+           opentelemetry::core::SystemTimestamp timestamp) noexcept override
+  {}
 };
 
 // Define a basic LoggerProvider class that returns an instance of the logger class defined above
@@ -76,11 +103,7 @@ TEST(Logger, PushLoggerImplementation)
 
   auto lp = Provider::GetLoggerProvider();
 
-  // GetLogger(name, options) function
+  // Check that the implementation was pushed by calling TestLogger's GetName()
   auto logger = lp->GetLogger("TestLogger");
-
-  // GetLogger(name, args) function
-  std::array<string_view, 1> sv{"string"};
-  span<string_view> args{sv};
-  auto logger2 = lp->GetLogger("TestLogger2", args);
+  ASSERT_EQ("test logger", logger->GetName());
 }

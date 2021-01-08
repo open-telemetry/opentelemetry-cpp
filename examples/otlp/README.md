@@ -26,6 +26,6 @@ service:
       exporters: [zipkin]
 ```
 
-Note that the OTLP exporter connects to the Collector at `localhost:55680` by default.
+Note that the OTLP exporter connects to the Collector at `localhost:55680` by default. This can be changed with first argument from command-line, for example: `./example_otlp gateway.docker.internal:55680`.
 
 Once you have the Collector running, see [CONTRIBUTING.md](../../CONTRIBUTING.md) for instructions on building and running the example.

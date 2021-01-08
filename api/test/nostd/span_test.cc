@@ -1,5 +1,7 @@
 #include "opentelemetry/nostd/span.h"
 
+#include <cstdint>
+
 #include <algorithm>
 #include <array>
 #include <iterator>
@@ -56,7 +58,10 @@ TEST(SpanTest, PointerCountConstruction)
   EXPECT_EQ(s2.data(), array.data());
   EXPECT_EQ(s2.size(), array.size());
 
+#ifndef HAVE_CPP_STDLIB
+  /* This test is not supposed to fail with STL. Why is this invalid construct? */
   EXPECT_DEATH((span<int, 2>{array.data(), array.size()}), ".*");
+#endif
 }
 
 TEST(SpanTest, RangeConstruction)
@@ -71,7 +76,10 @@ TEST(SpanTest, RangeConstruction)
   EXPECT_EQ(s2.data(), array);
   EXPECT_EQ(s2.size(), 3);
 
+#ifndef HAVE_CPP_STDLIB
+  /* This test is not supposed to fail with STL. Why is this invalid construct? */
   EXPECT_DEATH((span<int, 2>{std::begin(array), std::end(array)}), ".*");
+#endif
 }
 
 TEST(SpanTest, ArrayConstruction)
@@ -106,10 +114,15 @@ TEST(SpanTest, ContainerConstruction)
   EXPECT_EQ(s1.data(), v.data());
   EXPECT_EQ(s1.size(), v.size());
 
-  span<int, 3> s2{v};
+  span<int, 3> s2{v.data(), 3};
+
   EXPECT_EQ(s2.data(), v.data());
   EXPECT_EQ(s2.size(), v.size());
-  EXPECT_DEATH((span<int, 2>{v}), ".*");
+
+#ifndef HAVE_CPP_STDLIB
+  /* This test is not supposed to fail with STL. Why is this invalid construct? */
+  EXPECT_DEATH((span<int, 2>{v.data(), 3}), ".*");
+#endif
 
   EXPECT_FALSE((std::is_constructible<span<int>, std::vector<double>>::value));
   EXPECT_FALSE((std::is_constructible<span<int>, std::list<int>>::value));
