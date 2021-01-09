@@ -19,7 +19,7 @@
 #include <map>
 #include <unordered_map>
 #include "nlohmann/json.hpp"
-#include "opentelemetry/sdk/common/attribute_utils.h"  // same as traces/attribute_utils
+#include "opentelemetry/sdk/common/attribute_utils.h"
 #include "opentelemetry/sdk/logs/recordable.h"
 #include "opentelemetry/version.h"
 

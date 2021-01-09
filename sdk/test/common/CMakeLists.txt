@@ -1,10 +1,12 @@
 foreach(testname
         random_test fast_random_number_generator_test atomic_unique_ptr_test
-        circular_buffer_range_test circular_buffer_test)
+        circular_buffer_range_test circular_buffer_test attribute_utils_test)
+
   add_executable(${testname} "${testname}.cc")
   target_link_libraries(
     ${testname} ${GTEST_BOTH_LIBRARIES} ${CMAKE_THREAD_LIBS_INIT}
     ${CORE_RUNTIME_LIBS} opentelemetry_common opentelemetry_trace)
+
   gtest_add_tests(
     TARGET ${testname}
     TEST_PREFIX trace.
