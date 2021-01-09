@@ -8,8 +8,7 @@ foreach(
   always_on_sampler_test
   parent_sampler_test
   trace_id_ratio_sampler_test
-  batch_span_processor_test
-  attribute_utils_test)
+  batch_span_processor_test)
   add_executable(${testname} "${testname}.cc")
   target_link_libraries(
     ${testname}

@@ -9,8 +9,9 @@
 #include <map>
 #include <sstream>
 
-namespace nostd    = opentelemetry::nostd;
-namespace sdktrace = opentelemetry::sdk::trace;
+namespace nostd     = opentelemetry::nostd;
+namespace sdktrace  = opentelemetry::sdk::trace;
+namespace sdkcommon = opentelemetry::sdk::common;
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace exporter
@@ -93,10 +94,10 @@ private:
 // Prior to C++14, generic lambda is not available so fallback to functor.
 #if __cplusplus < 201402L
 
-  class SpanDataAttributeValueVisitor
+  class OwnedAttributeValueVisitor
   {
   public:
-    SpanDataAttributeValueVisitor(OStreamSpanExporter &exporter) : exporter_(exporter) {}
+    OwnedAttributeValueVisitor(OStreamSpanExporter &exporter) : exporter_(exporter) {}
 
     template <typename T>
     void operator()(T &&arg)
@@ -110,16 +111,16 @@ private:
 
 #endif
 
-  void print_value(sdktrace::SpanDataAttributeValue &value)
+  void print_value(sdkcommon::OwnedAttributeValue &value)
   {
 #if __cplusplus < 201402L
-    nostd::visit(SpanDataAttributeValueVisitor(*this), value);
+    nostd::visit(OwnedAttributeValueVisitor(*this), value);
 #else
     nostd::visit([this](auto &&arg) { print_value(arg); }, value);
 #endif
   }
 
-  void printAttributes(std::unordered_map<std::string, sdktrace::SpanDataAttributeValue> map)
+  void printAttributes(std::unordered_map<std::string, sdkcommon::OwnedAttributeValue> map)
   {
     size_t size = map.size();
     size_t i    = 1;

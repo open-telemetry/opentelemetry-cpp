@@ -451,7 +451,7 @@ public:
    * Get the attributes for this span
    * @return the attributes for this span
    */
-  const std::unordered_map<std::string, sdk::trace::SpanDataAttributeValue> &GetAttributes() const
+  const std::unordered_map<std::string, sdk::common::OwnedAttributeValue> &GetAttributes() const
       noexcept
   {
     return attribute_map_.GetAttributes();
@@ -523,7 +523,7 @@ private:
   std::string name_;
   opentelemetry::trace::CanonicalCode status_code_{opentelemetry::trace::CanonicalCode::OK};
   std::string status_desc_;
-  sdk::trace::AttributeMap attribute_map_;
+  sdk::common::AttributeMap attribute_map_;
   opentelemetry::trace::SpanKind span_kind_{opentelemetry::trace::SpanKind::kInternal};
   nostd::shared_ptr<opentelemetry::trace::Tracer> tracer_;
   nostd::shared_ptr<opentelemetry::trace::Span> span_;
