@@ -17,52 +17,26 @@ namespace sdk
 namespace resource
 {
 
+using ResourceAttributes =
+    std::unordered_map<std::string, opentelemetry::sdk::trace::SpanDataAttributeValue>;
+
 class Resource
 {
 public:
-  Resource(const opentelemetry::common::KeyValueIterable &attributes) noexcept;
+  Resource(const ResourceAttributes &attributes = ResourceAttributes()) noexcept;
 
-  Resource(const opentelemetry::sdk::trace::AttributeMap &attributes) noexcept;
+  const ResourceAttributes &GetAttributes() const noexcept;
 
-  template <class T,
-            nostd::enable_if_t<common::detail::is_key_value_iterable<T>::value> * = nullptr>
-  Resource(const T &attributes) noexcept : Resource(common::KeyValueIterableView<T>(attributes))
-  {}
+  std::shared_ptr<Resource> Merge(const Resource &other);
 
-  Resource(const std::initializer_list<std::pair<nostd::string_view, common::AttributeValue>>
-               attributes) noexcept
-      : Resource(nostd::span<const std::pair<nostd::string_view, common::AttributeValue>>{
-            attributes.begin(), attributes.end()})
-  {}
+  static std::shared_ptr<Resource> Create(const ResourceAttributes &attributes);
 
-  const opentelemetry::sdk::trace::AttributeMap &GetAttributes() const noexcept;
+  static Resource &GetEmpty();
 
-  std::unique_ptr<Resource> Merge(const Resource &other);
-
-  static std::unique_ptr<Resource> Create(
-      const opentelemetry::common::KeyValueIterable &attributes);
-
-  static std::unique_ptr<Resource> Create(
-      std::initializer_list<std::pair<nostd::string_view, common::AttributeValue>>
-          attributes) noexcept
-  {
-    return Create(nostd::span<const std::pair<nostd::string_view, common::AttributeValue>>{
-        attributes.begin(), attributes.end()});
-  }
-
-  template <class T,
-            nostd::enable_if_t<common::detail::is_key_value_iterable<T>::value> * = nullptr>
-  static std::unique_ptr<Resource> Create(const T &attributes) noexcept
-  {
-    return Create(common::KeyValueIterableView<T>(attributes));
-  }
-
-  static std::unique_ptr<Resource> CreateEmpty();
-
-  static std::unique_ptr<Resource> Create(const std::string &attributes);
+  static Resource &GetDefault();
 
 private:
-  const opentelemetry::sdk::trace::AttributeMap attribute_map_;
+  ResourceAttributes attributes_;
 };
 
 }  // namespace resource

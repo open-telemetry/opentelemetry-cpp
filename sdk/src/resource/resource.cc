@@ -13,60 +13,53 @@ const std::string TELEMETRY_SDK_LANGUAGE = "telemetry.sdk.language";
 const std::string TELEMETRY_SDK_NAME     = "telemetry.sdk.name";
 const std::string TELEMETRY_SDK_VERSION  = "telemetry.sdk.version";
 
-Resource::Resource(const opentelemetry::common::KeyValueIterable &attributes) noexcept
-    : attribute_map_(attributes)
-{}
+Resource::Resource(const ResourceAttributes &attributes) noexcept : attributes_(attributes) {}
 
-Resource::Resource(const opentelemetry::sdk::trace::AttributeMap &attributes) noexcept
-    : attribute_map_(attributes)
-{}
-
-const opentelemetry::sdk::trace::AttributeMap &Resource::GetAttributes() const noexcept
+std::shared_ptr<Resource> Resource::Merge(const Resource &other)
 {
-  return attribute_map_;
+  ResourceAttributes merged_resource_attributes(attributes_);
+  for (auto &elem : other.attributes_)
+  {
+    if ((merged_resource_attributes.find(elem.first) == merged_resource_attributes.end()) ||
+        (nostd::holds_alternative<std::string>(attributes_[elem.first]) &&
+         nostd::get<std::string>(attributes_[elem.first]).size() == 0))
+    {
+      merged_resource_attributes[elem.first] = elem.second;
+    }
+  }
+  return std::make_shared<Resource>(Resource(merged_resource_attributes));
 }
 
-std::unique_ptr<Resource> Resource::Merge(const Resource &other)
+std::shared_ptr<Resource> Resource::Create(const ResourceAttributes &attributes)
 {
-  opentelemetry::sdk::trace::AttributeMap merged_resource_attributes(other.GetAttributes());
-  merged_resource_attributes.AddAttributes(attribute_map_);
-  return std::unique_ptr<Resource>(new Resource(merged_resource_attributes));
-}
-
-std::unique_ptr<Resource> Resource::Create(
-    const opentelemetry::common::KeyValueIterable &attributes)
-{
-  Resource default_resource({{{TELEMETRY_SDK_LANGUAGE, "cpp"},
-                              {TELEMETRY_SDK_NAME, "opentelemetry"},
-                              {TELEMETRY_SDK_VERSION, OPENTELEMETRY_SDK_VERSION}}});
+  auto default_resource = Resource::GetDefault();
 
   if (attributes.size() > 0)
   {
-    Resource input_resource(attributes);
-    auto merged_resource = default_resource.Merge(input_resource);
+    Resource tmp_resource(attributes);
+    auto merged_resource = tmp_resource.Merge(default_resource);
     return merged_resource->Merge(*(OTELResourceDetector().Detect()));
   }
   return default_resource.Merge(*(OTELResourceDetector().Detect()));
 }
 
-std::unique_ptr<Resource> Resource::CreateEmpty()
+Resource &Resource::GetEmpty()
 {
-  return Create({});
+  static Resource empty;
+  return empty;
 }
 
-std::unique_ptr<Resource> Resource::Create(const std::string &attributes)
+Resource &Resource::GetDefault()
 {
-  opentelemetry::sdk::trace::AttributeMap resource_attributes;
-  std::istringstream iss(attributes);
-  std::string token;
-  while (std::getline(iss, token, ','))
-  {
-    size_t pos        = token.find('=');
-    std::string key   = token.substr(0, pos);
-    std::string value = token.substr(pos + 1);
-    resource_attributes.SetAttribute(key, value);
-  }
-  return std::unique_ptr<Resource>(new Resource(resource_attributes));
+  static Resource default_resource({{TELEMETRY_SDK_LANGUAGE, "cpp"},
+                                    {TELEMETRY_SDK_NAME, "opentelemetry"},
+                                    {TELEMETRY_SDK_VERSION, OPENTELEMETRY_SDK_VERSION}});
+  return default_resource;
+}
+
+const ResourceAttributes &Resource::GetAttributes() const noexcept
+{
+  return attributes_;
 }
 
 }  // namespace resource
