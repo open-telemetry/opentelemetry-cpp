@@ -115,20 +115,7 @@ public:
   {
     return attributes_;
   }
-
-  void AddAttributes(const AttributeMap &other)
-  {
-    for (auto &attr : other.attributes_)
-    {
-      if ((attributes_.find(attr.first) == attributes_.end()) ||
-          (nostd::holds_alternative<std::string>(attributes_[attr.first]) &&
-           nostd::get<std::string>(attributes_[attr.first]).size() == 0))
-      {
-        attributes_[attr.first] = attr.second;
-      }
-    }
-  }
-
+  
   void SetAttribute(nostd::string_view key,
                     const opentelemetry::common::AttributeValue &value) noexcept
   {
