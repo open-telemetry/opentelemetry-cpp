@@ -115,6 +115,7 @@ public:
   {
     return attributes_;
   }
+  
   void SetAttribute(nostd::string_view key,
                     const opentelemetry::common::AttributeValue &value) noexcept
   {
