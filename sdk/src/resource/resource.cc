@@ -32,10 +32,9 @@ std::shared_ptr<Resource> Resource::Merge(const Resource &other) noexcept
 
 std::shared_ptr<Resource> Resource::Create(const ResourceAttributes &attributes)
 {
-
-  // static std::shared_ptr<Resource> otel_resource = OTELResourceDetector().Detect();
-  auto default_resource = Resource::GetDefault();
-  auto otel_resource    = OTELResourceDetector().Detect();
+  static auto otel_resource = OTELResourceDetector().Detect();
+  auto default_resource     = Resource::GetDefault();
+  // auto otel_resource    = OTELResourceDetector().Detect();
 
   if (attributes.size() > 0)
   {
