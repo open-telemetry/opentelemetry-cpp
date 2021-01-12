@@ -10,7 +10,7 @@
 
 #include <gtest/gtest.h>
 
-class TestResource : public opentelemetry::sdk::resource::Resource::Resource
+class TestResource : public opentelemetry::sdk::resource::Resource
 {
 public:
   TestResource(opentelemetry::sdk::resource::ResourceAttributes attributes =
