@@ -2,7 +2,7 @@
 
 #include "opentelemetry/nostd/string_view.h"
 #include "opentelemetry/nostd/unique_ptr.h"
-#include "opentelemetry/sdk/trace/attribute_utils.h"
+#include "opentelemetry/sdk/common/attribute_utils.h"
 #include "opentelemetry/sdk/version/version.h"
 #include "opentelemetry/version.h"
 
@@ -18,7 +18,7 @@ namespace resource
 {
 
 using ResourceAttributes =
-    std::unordered_map<std::string, opentelemetry::sdk::trace::SpanDataAttributeValue>;
+    std::unordered_map<std::string, opentelemetry::sdk::common::OwnedAttributeValue>;
 
 class Resource
 {
@@ -27,7 +27,7 @@ public:
 
   const ResourceAttributes &GetAttributes() const noexcept;
 
-  std::shared_ptr<Resource> Merge(const Resource &other);
+  std::shared_ptr<Resource> Merge(const Resource &other) noexcept;
 
   static std::shared_ptr<Resource> Create(const ResourceAttributes &attributes);
 

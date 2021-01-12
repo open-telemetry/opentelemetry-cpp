@@ -15,7 +15,7 @@ const std::string TELEMETRY_SDK_VERSION  = "telemetry.sdk.version";
 
 Resource::Resource(const ResourceAttributes &attributes) noexcept : attributes_(attributes) {}
 
-std::shared_ptr<Resource> Resource::Merge(const Resource &other)
+std::shared_ptr<Resource> Resource::Merge(const Resource &other) noexcept
 {
   ResourceAttributes merged_resource_attributes(attributes_);
   for (auto &elem : other.attributes_)
