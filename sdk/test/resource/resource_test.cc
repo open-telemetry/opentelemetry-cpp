@@ -10,6 +10,23 @@
 
 #include <gtest/gtest.h>
 
+class TestResource : public opentelemetry::sdk::resource::Resource::Resource
+{
+public:
+  TestResource(opentelemetry::sdk::resource::ResourceAttributes attributes =
+                   opentelemetry::sdk::resource::ResourceAttributes())
+      : Resource(attributes)
+  {}
+};
+
+/*
+class ResourceTest : public testing::Test{
+protected:
+  TestResource resource;
+
+};
+*/
+
 TEST(ResourceTest, create)
 {
 
@@ -48,9 +65,9 @@ TEST(ResourceTest, Merge)
 {
   std::map<std::string, std::string> expected_attributes = {{"service", "backend"},
                                                             {"host", "service-host"}};
-  opentelemetry::sdk::resource::Resource resource1(
+  TestResource resource1(
       opentelemetry::sdk::resource::ResourceAttributes({{"service", "backend"}}));
-  opentelemetry::sdk::resource::Resource resource2(
+  TestResource resource2(
       opentelemetry::sdk::resource::ResourceAttributes({{"host", "service-host"}}));
 
   auto merged_resource     = resource1.Merge(resource2);
@@ -69,9 +86,8 @@ TEST(ResourceTest, MergeEmptyString)
 {
   std::map<std::string, std::string> expected_attributes = {{"service", "backend"},
                                                             {"host", "service-host"}};
-  opentelemetry::sdk::resource::Resource resource1({{"service", ""}, {"host", "service-host"}});
-  opentelemetry::sdk::resource::Resource resource2(
-      {{"service", "backend"}, {"host", "another-service-host"}});
+  TestResource resource1({{"service", ""}, {"host", "service-host"}});
+  TestResource resource2({{"service", "backend"}, {"host", "another-service-host"}});
 
   auto merged_resource     = resource1.Merge(resource2);
   auto received_attributes = merged_resource->GetAttributes();

@@ -1,5 +1,6 @@
 #include "opentelemetry/sdk/resource/resource_detector.h"
 #include <cstdlib>
+#include "opentelemetry/sdk/resource/resource.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace sdk
@@ -13,8 +14,8 @@ std::shared_ptr<Resource> OTELResourceDetector::Detect() noexcept
 {
   char *attributes_str = std::getenv(OTEL_RESOURCE_ATTRIBUTES);
   if (attributes_str == nullptr)
-    return std::make_shared<Resource>(Resource::GetEmpty());
-
+    return std::make_shared<Resource>(Resource());
+  // return Resource::GetEmpty();
   ResourceAttributes attributes;
   std::istringstream iss(attributes_str);
   std::string token;
