@@ -10,12 +10,20 @@ namespace resource
 {
 
 class Resource;
+
+/**
+ * Interface for a Resource Detector
+ */
 class ResourceDetector
 {
 public:
   virtual std::shared_ptr<Resource> Detect() = 0;
 };
 
+/**
+ * OTelResourceDetector to detect the presence of and create a Resource
+ * from the OTEL_RESOURCE_ATTRIBUTES environment variable.
+ */
 class OTELResourceDetector : public ResourceDetector
 {
 public:
