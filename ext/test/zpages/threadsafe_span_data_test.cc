@@ -7,8 +7,8 @@
 #include <thread>
 
 using opentelemetry::ext::zpages::ThreadsafeSpanData;
-using opentelemetry::sdk::trace::AttributeConverter;
-using opentelemetry::sdk::trace::SpanDataAttributeValue;
+using opentelemetry::sdk::common::AttributeConverter;
+using opentelemetry::sdk::common::OwnedAttributeValue;
 
 TEST(ThreadsafeSpanData, DefaultValues)
 {

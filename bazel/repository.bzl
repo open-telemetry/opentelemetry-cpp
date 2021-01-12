@@ -19,9 +19,13 @@ def opentelemetry_cpp_deps():
     # GoogleTest framework.
     # Only needed for tests, not to build the OpenTelemetry library.
     maybe(
-        native.local_repository,
+        http_archive,
         name = "com_google_googletest",
-        path = "third_party/googletest",
+        sha256 = "a03a7b24b3a0766dc823c9008dd32c56a1183889c04f084653266af22289ab0c",
+        strip_prefix = "googletest-a6dfd3aca7f2f91f95fc7ab650c95a48420d513d",
+        urls = [
+            "https://github.com/google/googletest/archive/a6dfd3aca7f2f91f95fc7ab650c95a48420d513d.tar.gz",
+        ],
     )
 
     # Load gRPC dependency
@@ -60,9 +64,13 @@ def opentelemetry_cpp_deps():
 
     # C++ Prometheus Client library.
     maybe(
-        native.local_repository,
+        http_archive,
         name = "com_github_jupp0r_prometheus_cpp",
-        path = "third_party/prometheus-cpp",
+        sha256 = "aab4ef8342319f631969e01b8c41e355704847cbe76131cb1dd5ea1862000bda",
+        strip_prefix = "prometheus-cpp-0.11.0",
+        urls = [
+            "https://github.com/jupp0r/prometheus-cpp/archive/v0.11.0.tar.gz",
+        ],
     )
 
     # libcurl (optional)
