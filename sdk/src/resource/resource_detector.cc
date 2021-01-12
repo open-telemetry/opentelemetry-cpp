@@ -25,7 +25,6 @@ std::shared_ptr<Resource> OTELResourceDetector::Detect() noexcept
     std::string value = token.substr(pos + 1);
     attributes[key]   = value;
   }
-
   return std::make_shared<Resource>(Resource(attributes));
 }
 

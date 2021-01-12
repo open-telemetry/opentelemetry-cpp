@@ -13,13 +13,13 @@ namespace resource
 class ResourceDetector
 {
 public:
-  virtual std::shared_ptr<opentelemetry::sdk::resource::Resource> Detect() = 0;
+  virtual std::shared_ptr<Resource> Detect() = 0;
 };
 
 class OTELResourceDetector : public ResourceDetector
 {
 public:
-  std::shared_ptr<opentelemetry::sdk::resource::Resource> Detect() noexcept override;
+  std::shared_ptr<Resource> Detect() noexcept override;
 };
 
 }  // namespace resource
