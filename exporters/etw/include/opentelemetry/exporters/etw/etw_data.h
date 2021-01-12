@@ -157,21 +157,7 @@ public:
     });
     m["name"] = name.data();
 
-#ifdef HAVE_TLD
-    if (encoding == ETWProvider::ETW_MANIFEST)
-    {
-      etwProvider().writeTld(provHandle, m);
-      return;
-    }
-#endif
-
-#ifdef HAVE_MSGPACK
-    if (encoding == ETWProvider::ETW_MSGPACK)
-    {
-      etwProvider().writeMsgPack(provHandle, m);
-      return;
-    }
-#endif
+    etwProvider().write(provHandle, m, encoding);
   };
 
   /// <summary>
@@ -355,7 +341,7 @@ public:
     // "XML"            - use XML
     // "ETW"            - use 'classic' Trace Logging Dynamic manifest ETW event
     //
-#if defined(HAVE_NO_TLD) && defined(HAVE_MSGPACK)
+#if defined(HAVE_MSGPACK)
     ETWProvider::EventFormat evtFmt = ETWProvider::EventFormat::ETW_MSGPACK;
 #else
     ETWProvider::EventFormat evtFmt = ETWProvider::EventFormat::ETW_MANIFEST;

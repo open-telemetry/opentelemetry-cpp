@@ -88,7 +88,6 @@ if(WIN32)
     add_definitions(-DHAVE_MSGPACK)
     # Option below will be removed once we donate the TraceLoggingDynamic.h to
     # OSS
-    add_definitions(-DHAVE_NO_TLD)
   endif(WITH_ETW)
 endif(WIN32)
 

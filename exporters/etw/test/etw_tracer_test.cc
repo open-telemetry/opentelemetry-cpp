@@ -17,11 +17,6 @@
 #  include <gtest/gtest.h>
 #  include <string>
 
-/* TODO: this definition needs to be removed when TraceLoggingDynamic.h is OSS */
-#  ifndef HAVE_NO_TLD
-#    define HAVE_NO_TLD
-#  endif
-
 #  include "opentelemetry/exporters/etw/etw_tracer_exporter.h"
 #  include "opentelemetry/sdk/trace/simple_processor.h"
 
@@ -35,7 +30,8 @@ TEST(ETWTracer, TracerCheck)
   std::string eventName    = "MyEvent";
 
   exporter::ETW::TracerProvider tp;
-  auto tracer = tp.GetTracer(providerName);
+  // TODO: this code should fallback to MsgPack if TLD is not available
+  auto tracer = tp.GetTracer(providerName, "TLD");
   auto span   = tracer->StartSpan("MySpan");
 
   ETWEvent event = {

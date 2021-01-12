@@ -36,11 +36,7 @@
 #  include "nlohmann/json.hpp"
 #endif
 
-#ifndef HAVE_NO_TLD
-// Allow to opt-out from `TraceLoggingDynamic.h` header usage
-#  define HAVE_TLD
-#  include "TraceLoggingDynamic.h"
-#endif
+#include "opentelemetry/exporters/etw/etw_traceloggingdynamic.h"
 
 #include <map>
 #include <mutex>
@@ -107,14 +103,9 @@ public:
   /// </summary>
   /// <param name="providerId"></param>
   /// <returns></returns>
-  Handle &open(const std::string &providerId, EventFormat format = EventFormat::ETW_MANIFEST)
+  Handle &open(const std::string &providerId, EventFormat format = EventFormat::ETW_MSGPACK)
   {
     std::lock_guard<std::mutex> lock(m_providerMapLock);
-
-#ifdef HAVE_NO_TLD
-    // Fallback to MessagePack-encoded ETW events
-    format = EventFormat::ETW_MSGPACK;
-#endif
 
     // Check and return if provider is already registered
     auto it = providers().find(providerId);
