@@ -174,7 +174,7 @@ public:
       auto response          = std::unique_ptr<Response>(new Response());
       response->headers_     = curl_operation_->GetResponseHeaders();
       response->body_        = curl_operation_->GetResponseBody();
-      response->status_code_ = operation.GetResponseCode();
+      response->status_code_ = curl_operation_->GetResponseCode();
       is_session_active_     = false;
       return std::move(response);
     }
