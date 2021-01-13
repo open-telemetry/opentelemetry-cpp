@@ -1,10 +1,10 @@
-#include "opentelemetry/sdk/trace/attribute_utils.h"
+#include "opentelemetry/sdk/common/attribute_utils.h"
 
 #include <gtest/gtest.h>
 
 TEST(AttributeMapTest, DefaultConstruction)
 {
-  opentelemetry::sdk::trace::AttributeMap map;
+  opentelemetry::sdk::common::AttributeMap map;
   EXPECT_EQ(map.GetAttributes().size(), 0);
 }
 
@@ -17,7 +17,7 @@ TEST(AttributeMapTest, AttributesConstruction)
       {keys[0], values[0]}, {keys[1], values[1]}, {keys[2], values[2]}};
 
   opentelemetry::common::KeyValueIterableView<std::map<std::string, int>> iterable(attributes);
-  opentelemetry::sdk::trace::AttributeMap map(iterable);
+  opentelemetry::sdk::common::AttributeMap map(iterable);
 
   for (int i = 0; i < kNumAttributes; i++)
   {
