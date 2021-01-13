@@ -144,9 +144,10 @@ public:
       if (operation.GetResponseCode() >= CURL_LAST)
       {
         // we have a http response
-        auto response      = std::unique_ptr<Response>(new Response());
-        response->headers_ = operation.GetResponseHeaders();
-        response->body_    = operation.GetResponseBody();
+        auto response          = std::unique_ptr<Response>(new Response());
+        response->headers_     = operation.GetResponseHeaders();
+        response->body_        = operation.GetResponseBody();
+        response->status_code_ = operation.GetResponseCode();
         callback_ptr->OnResponse(*response);
       }
       is_session_active_ = false;
@@ -170,10 +171,11 @@ public:
     if (curl_operation_->GetResponseCode() >= CURL_LAST)
     {
       // we have a http response
-      auto response      = std::unique_ptr<Response>(new Response());
-      response->headers_ = curl_operation_->GetResponseHeaders();
-      response->body_    = curl_operation_->GetResponseBody();
-      is_session_active_ = false;
+      auto response          = std::unique_ptr<Response>(new Response());
+      response->headers_     = curl_operation_->GetResponseHeaders();
+      response->body_        = curl_operation_->GetResponseBody();
+      response->status_code_ = operation.GetResponseCode();
+      is_session_active_     = false;
       return std::move(response);
     }
     is_session_active_ = false;
