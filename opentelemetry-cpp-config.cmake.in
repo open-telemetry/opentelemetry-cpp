@@ -82,7 +82,7 @@ foreach(_TEST_TARGET IN LISTS _OPENTELEMETRY_CPP_LIBRARIES_TEST_TARGETS)
 endforeach()
 
 # handle the QUIETLY and REQUIRED arguments and set OPENTELEMETRY_CPP_FOUND to
-# TRUE if all listed variables are TRUE
+# TRUE if all variables list contain valid results, e.g. valid file paths.
 include("FindPackageHandleStandardArgs")
 find_package_handle_standard_args(
   OPENTELEMETRY_CPP

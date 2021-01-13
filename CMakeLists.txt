@@ -212,12 +212,13 @@ add_subdirectory(ext)
 
 # Export cmake config and support find_packages(opentelemetry-cpp CONFIG) Write
 # config file for find_packages(opentelemetry-cpp CONFIG)
+set(INCLUDE_INSTALL_DIR "${CMAKE_INSTALL_INCLUDEDIR}")
 configure_package_config_file(
   "${CMAKE_CURRENT_LIST_DIR}/opentelemetry-cpp-config.cmake.in"
   "${CMAKE_CURRENT_BINARY_DIR}/cmake/${PROJECT_NAME}-config.cmake"
   INSTALL_DESTINATION "${CMAKE_INSTALL_LIBDIR}/cmake"
   PATH_VARS OPENTELEMETRY_ABI_VERSION_NO OPENTELEMETRY_VERSION PROJECT_NAME
-            CMAKE_INSTALL_LIBDIR
+            INCLUDE_INSTALL_DIR CMAKE_INSTALL_LIBDIR
   NO_CHECK_REQUIRED_COMPONENTS_MACRO)
 
 # Write version file for find_packages(opentelemetry-cpp CONFIG)
