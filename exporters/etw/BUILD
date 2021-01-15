@@ -6,7 +6,7 @@ cc_library(
         "src/etw_provider_exporter.cc",
     ],
     hdrs = glob([
-        "include/opentelemetry/exporters/etw/*.h"
+        "include/opentelemetry/exporters/etw/*.h",
     ]),
     strip_include_prefix = "include",
     deps = [
@@ -29,8 +29,8 @@ cc_library(
     srcs = [
         "src/etw_tracer_exporter.cc",
     ],
-    hdrs =  glob([
-        "include/opentelemetry/exporters/etw/*.h"
+    hdrs = glob([
+        "include/opentelemetry/exporters/etw/*.h",
     ]),
     strip_include_prefix = "include",
     deps = [
