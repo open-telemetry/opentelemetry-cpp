@@ -11,6 +11,7 @@ pushd /tmp
 wget https://github.com/Kitware/CMake/releases/download/v${CMAKE_VERSION}/cmake-${CMAKE_VERSION}-Linux-x86_64.sh
 chmod +x cmake-${CMAKE_VERSION}-Linux-x86_64.sh
 ./cmake-${CMAKE_VERSION}-Linux-x86_64.sh --prefix=/usr/local --skip-license
+rm cmake-${CMAKE_VERSION}-Linux-x86_64.sh
 popd
 
 set +e
