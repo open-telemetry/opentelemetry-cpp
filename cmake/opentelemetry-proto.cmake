@@ -141,6 +141,12 @@ install(
   LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
   ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR})
 
+install(
+  DIRECTORY ${GENERATED_PROTOBUF_PATH}/opentelemetry
+  DESTINATION include
+  FILES_MATCHING
+  PATTERN "*.h")
+
 if(TARGET protobuf::libprotobuf)
   target_link_libraries(opentelemetry_proto PUBLIC protobuf::libprotobuf)
 else() # cmake 3.8 or lower
