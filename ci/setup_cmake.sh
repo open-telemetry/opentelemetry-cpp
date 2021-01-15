@@ -5,9 +5,16 @@ set -e
 export DEBIAN_FRONTEND=noninteractive
 apt-get update
 
+export CMAKE_VERSION=3.15.2
+
+pushd /tmp
+wget https://github.com/Kitware/CMake/releases/download/v${CMAKE_VERSION}/cmake-${CMAKE_VERSION}-Linux-x86_64.sh
+chmod +x cmake-${CMAKE_VERSION}-Linux-x86_64.sh
+./cmake-${CMAKE_VERSION}-Linux-x86_64.sh --prefix=/usr/local --skip-license
+popd
+
 set +e
 echo		\
-                cmake \
                 libbenchmark-dev \
                 libgtest-dev \
                 zlib1g-dev \
