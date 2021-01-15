@@ -41,7 +41,7 @@
 
 #include "opentelemetry/exporters/etw/etw_properties.h"
 
-namespace core = opentelemetry::core;
+namespace core  = opentelemetry::core;
 namespace trace = opentelemetry::trace;
 
 OPENTELEMETRY_BEGIN_NAMESPACE
@@ -107,8 +107,8 @@ public:
    * Get the attributes for this span
    * @return the attributes for this span
    */
-  const std::unordered_map<std::string, sdk::common::OwnedAttributeValue> &GetAttributes()
-      const noexcept
+  const std::unordered_map<std::string, sdk::common::OwnedAttributeValue> &GetAttributes() const
+      noexcept
   {
     return attribute_map_.GetAttributes();
   }

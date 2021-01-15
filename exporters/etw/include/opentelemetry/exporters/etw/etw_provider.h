@@ -29,8 +29,8 @@
 #include "opentelemetry/exporters/etw/uuid.h"
 #include "opentelemetry/version.h"
 
-#include "opentelemetry/exporters/etw/utils.h"
 #include "opentelemetry/exporters/etw/etw_fields.h"
+#include "opentelemetry/exporters/etw/utils.h"
 
 #ifdef HAVE_MSGPACK
 // This option requires INCLUDE_DIR=$(ProjectDir)\..\..\third_party\json\include;...
@@ -41,9 +41,9 @@
 
 #include <map>
 #include <mutex>
+#include <string>
 #include <unordered_map>
 #include <vector>
-#include <string>
 
 #ifdef HAVE_KRABS_TESTS
 // krabs.hpp requires this definition of min macro from Windows.h
@@ -225,14 +225,13 @@ public:
       return STATUS_ERROR;
     };
 
-    std::string eventName   = "NoName";
-    auto nameField          = eventData[ETW_FIELD_NAME];
+    std::string eventName = "NoName";
+    auto nameField        = eventData[ETW_FIELD_NAME];
 
     switch (nameField.index())
     {
       case common::AttributeType::TYPE_STRING:
-        eventName =
-            (char *)(nostd::get<std::string>(nameField).data());  // must be 0-terminated!
+        eventName = (char *)(nostd::get<std::string>(nameField).data());  // must be 0-terminated!
         break;
 #  ifdef HAVE_CSTRING_TYPE
       case common::AttributeType::TYPE_CSTRING:
@@ -462,8 +461,7 @@ public:
     switch (nameField.index())
     {
       case common::AttributeType::TYPE_STRING:
-        eventName =
-            (char *)(nostd::get<std::string>(nameField).data());
+        eventName = (char *)(nostd::get<std::string>(nameField).data());
         break;
 #  ifdef HAVE_CSTRING_TYPE
       case common::AttributeType::TYPE_CSTRING:

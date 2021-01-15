@@ -24,7 +24,10 @@ public:
    */
   virtual bool ForEachKeyValue(
       nostd::function_ref<bool(SpanContext, const opentelemetry::common::KeyValueIterable &)>
-          callback) const noexcept { return true; };
+          callback) const noexcept
+  {
+    return true;
+  };
   /**
    * @return the number of key-value pairs
    */

@@ -4,14 +4,16 @@
 
 #include "opentelemetry/common/key_value_iterable_view.h"
 
-#include <vector>
-#include <string>
-#include <map>
 #include <opentelemetry/nostd/span.h>
+#include <map>
+#include <string>
+#include <vector>
 
 OPENTELEMETRY_BEGIN_NAMESPACE
-namespace core {};
-namespace trace {};
+namespace core
+{};
+namespace trace
+{};
 namespace exporter
 {
 namespace ETW
@@ -49,7 +51,7 @@ using PropertyVariant =
 /**
  * @brief PropertyValue class that holds PropertyVariant and
  * provides converter for non-owning common::AttributeValue
-*/
+ */
 class PropertyValue : public PropertyVariant
 {
 
@@ -112,8 +114,8 @@ class PropertyValue : public PropertyVariant
    * @brief Convert vector<bool> to span<const bool>.
    * FIXME: std::vector<bool> is a special compact type that does not have .data() member
    *
-   * @param v 
-   * @return 
+   * @param v
+   * @return
    */
   static nostd::span<const bool> to_span(const std::vector<bool> &vec)
   {
@@ -186,9 +188,9 @@ public:
 
   /**
    * @brief Convert owning PropertyValue to non-owning common::AttributeValue
-   * @return 
+   * @return
    */
-  PropertyValue &FromAttributeValue(const common::AttributeValue& v)
+  PropertyValue &FromAttributeValue(const common::AttributeValue &v)
   {
     switch (v.index())
     {
@@ -210,8 +212,9 @@ public:
       case common::AttributeType::TYPE_DOUBLE:
         PropertyVariant::operator=(nostd::get<double>(v));
         break;
-      case common::AttributeType::TYPE_STRING: {
-        PropertyVariant::operator= (nostd::string_view(nostd::get<nostd::string_view>(v)).data());
+      case common::AttributeType::TYPE_STRING:
+      {
+        PropertyVariant::operator=(nostd::string_view(nostd::get<nostd::string_view>(v)).data());
         break;
       };
 
@@ -263,7 +266,7 @@ public:
 
   /**
    * @brief Convert owning PropertyValue to non-owning common::AttributeValue
-   * @param other 
+   * @param other
    */
   common::AttributeValue ToAttributeValue() const
   {
@@ -290,7 +293,8 @@ public:
         value = nostd::get<double>(*this);
         break;
 
-      case common::AttributeType::TYPE_STRING: {
+      case common::AttributeType::TYPE_STRING:
+      {
         const std::string &str = nostd::get<std::string>(*this);
         return nostd::string_view(str.data(), str.size());
         break;
@@ -308,8 +312,9 @@ public:
         break;
 #endif
 
-      case common::AttributeType::TYPE_SPAN_BOOL: {
-        const auto& vec = nostd::get<std::vector<bool>>(*this);
+      case common::AttributeType::TYPE_SPAN_BOOL:
+      {
+        const auto &vec = nostd::get<std::vector<bool>>(*this);
         // FIXME: sort out how to remap from vector<bool> to span<bool>
         break;
       }
@@ -363,17 +368,15 @@ class Properties : public common::KeyValueIterable, public PropertyValueMap
   using PropertyValueType = std::pair<const std::string, PropertyValue>;
 
 public:
-
   /**
    * @brief PropertyValueMap constructor.
    */
-  Properties() : PropertyValueMap() {};
+  Properties() : PropertyValueMap(){};
 
   /**
    * @brief PropertyValueMap constructor from initializer list.
    */
-  Properties(const std::initializer_list<PropertyValueType> properties)
-      : PropertyValueMap()
+  Properties(const std::initializer_list<PropertyValueType> properties) : PropertyValueMap()
   {
     (*this) = (properties);
   };
@@ -383,17 +386,14 @@ public:
    */
   Properties &operator=(std::initializer_list<PropertyValueType> properties)
   {
-    PropertyValueMap::operator = (properties);
+    PropertyValueMap::operator=(properties);
     return (*this);
   };
 
   /**
    * @brief PropertyValueMap constructor from map.
    */
-  Properties(const PropertyValueMap &properties) : PropertyValueMap()
-  {
-    (*this) = properties;
-  };
+  Properties(const PropertyValueMap &properties) : PropertyValueMap() { (*this) = properties; };
 
   /**
    * @brief PropertyValueMap assignment operator from map.
@@ -410,10 +410,7 @@ public:
    * container.
    *
    */
-  Properties(const common::KeyValueIterable &other)
-  {
-    (*this) = other;
-  }
+  Properties(const common::KeyValueIterable &other) { (*this) = other; }
 
   /**
    * @brief PropertyValueMap assignment operator.
@@ -432,10 +429,7 @@ public:
   /**
    * @brief PropertyValueMap property accessor.
    */
-  PropertyValue &operator[](const std::string &k)
-  {
-    return PropertyValueMap::operator[](k);
-  }
+  PropertyValue &operator[](const std::string &k) { return PropertyValueMap::operator[](k); }
 
   /**
    * Iterate over key-value pairs
@@ -443,12 +437,13 @@ public:
    * the iteration is aborted.
    * @return true if every key-value pair was iterated over
    */
-  bool ForEachKeyValue(nostd::function_ref<bool(nostd::string_view, common::AttributeValue)>
-                           callback) const noexcept override
+  bool ForEachKeyValue(
+      nostd::function_ref<bool(nostd::string_view, common::AttributeValue)> callback) const
+      noexcept override
   {
     for (const auto &kv : (*this))
     {
-      const common::AttributeValue& value = kv.second.ToAttributeValue();
+      const common::AttributeValue &value = kv.second.ToAttributeValue();
       if (!callback(nostd::string_view{kv.first}, value))
       {
         return false;
@@ -460,13 +455,9 @@ public:
   /**
    * @return the number of key-value pairs
    */
-  size_t size() const noexcept override
-  {
-    return PropertyValueMap::size();
-  };
-
+  size_t size() const noexcept override { return PropertyValueMap::size(); };
 };
 
-}
+}  // namespace ETW
 }  // namespace exporter
 OPENTELEMETRY_END_NAMESPACE

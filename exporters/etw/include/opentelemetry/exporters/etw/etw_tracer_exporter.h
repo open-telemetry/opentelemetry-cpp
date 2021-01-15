@@ -34,8 +34,8 @@
 #include "opentelemetry/sdk/trace/recordable.h"
 
 #include "opentelemetry/exporters/etw/etw_data.h"
-#include "opentelemetry/exporters/etw/etw_recordable.h"
 #include "opentelemetry/exporters/etw/etw_provider.h"
+#include "opentelemetry/exporters/etw/etw_recordable.h"
 
 #include "opentelemetry/exporters/etw/utils.h"
 

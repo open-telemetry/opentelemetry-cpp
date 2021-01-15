@@ -15,16 +15,16 @@
 #ifdef _WIN32
 
 #  include <gtest/gtest.h>
-#  include <string>
 #  include <map>
+#  include <string>
 
 #  include "opentelemetry/exporters/etw/etw_tracer_exporter.h"
 #  include "opentelemetry/sdk/trace/simple_processor.h"
 
 using namespace OPENTELEMETRY_NAMESPACE;
 
-using Properties = opentelemetry::exporter::ETW::Properties;
-using PropertyValue = opentelemetry::exporter::ETW::PropertyValue;
+using Properties       = opentelemetry::exporter::ETW::Properties;
+using PropertyValue    = opentelemetry::exporter::ETW::PropertyValue;
 using PropertyValueMap = opentelemetry::exporter::ETW::PropertyValueMap;
 
 std::string getTemporaryValue()

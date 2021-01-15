@@ -1,7 +1,7 @@
 #pragma once
 
 #ifdef CUSTOM_ETW_FIELDS_H
-#include CUSTOM_ETW_FIELDS_H
+#  include CUSTOM_ETW_FIELDS_H
 #else
 /* clang-format off */
 
@@ -30,5 +30,5 @@
 #  define ETW_FIELD_SUCCESS         "success"               /* OT Span success        */
 #  define ETW_FIELD_STATUSCODE      "statusCode"            /* OT Span status code    */
 
-/* clang-format on */ 
+/* clang-format on */
 #endif
