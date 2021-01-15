@@ -24,11 +24,11 @@ public:
    */
   virtual bool ForEachKeyValue(
       nostd::function_ref<bool(SpanContext, const opentelemetry::common::KeyValueIterable &)>
-          callback) const noexcept = 0;
+          callback) const noexcept { return true; };
   /**
    * @return the number of key-value pairs
    */
-  virtual size_t size() const noexcept = 0;
+  virtual size_t size() const noexcept { return 0; };
 };
 }  // namespace trace
 OPENTELEMETRY_END_NAMESPACE
