@@ -5,11 +5,9 @@ cc_library(
     srcs = [
         "src/etw_provider_exporter.cc",
     ],
-    hdrs = [
-        "include/opentelemetry/exporters/etw/etw_provider.h",
-        "include/opentelemetry/exporters/etw/utils.h",
-        "include/opentelemetry/exporters/etw/uuid.h",
-    ],
+    hdrs = glob([
+        "include/opentelemetry/exporters/etw/*.h"
+    ]),
     strip_include_prefix = "include",
     deps = [
         "//api",
@@ -31,12 +29,9 @@ cc_library(
     srcs = [
         "src/etw_tracer_exporter.cc",
     ],
-    hdrs = [
-        "include/opentelemetry/exporters/etw/etw_data.h",
-        "include/opentelemetry/exporters/etw/etw_tracer_exporter.h",
-        "include/opentelemetry/exporters/etw/utils.h",
-        "include/opentelemetry/exporters/etw/uuid.h",
-    ],
+    hdrs =  glob([
+        "include/opentelemetry/exporters/etw/*.h"
+    ]),
     strip_include_prefix = "include",
     deps = [
         ":etw_provider_exporter",
