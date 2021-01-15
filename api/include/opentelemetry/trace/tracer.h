@@ -43,8 +43,7 @@ public:
     return this->StartSpan(name, {}, {}, options);
   }
 
-  template <class T,
-            nostd::enable_if_t<common::detail::is_key_value_iterable<T>::value> * = nullptr>
+  template <class T>
   nostd::shared_ptr<Span> StartSpan(nostd::string_view name,
                                     const T &attributes,
                                     const StartSpanOptions &options = {}) noexcept
