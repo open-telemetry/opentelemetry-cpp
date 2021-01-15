@@ -16,76 +16,101 @@
 
 #  include <gtest/gtest.h>
 #  include <string>
+#  include <map>
 
 #  include "opentelemetry/exporters/etw/etw_tracer_exporter.h"
 #  include "opentelemetry/sdk/trace/simple_processor.h"
 
 using namespace OPENTELEMETRY_NAMESPACE;
 
-using ETWEvent = std::map<nostd::string_view, common::AttributeValue>;
+using Properties = opentelemetry::exporter::ETW::Properties;
+using PropertyValue = opentelemetry::exporter::ETW::PropertyValue;
+using PropertyValueMap = opentelemetry::exporter::ETW::PropertyValueMap;
 
+std::string getTemporaryValue()
+{
+  return std::string("Value from Temporary std::string");
+}
+
+/* clang-format off */
 TEST(ETWTracer, TracerCheck)
 {
-  std::string providerName = "OpenTelemetry";
-  std::string eventName    = "MyEvent";
+  // SDK customer specifies their unique ETW ProviderName. Every component or library
+  // is assumed to have its own instrumentation name. Traces are routed to dedicated
+  // provider. Standard hash function maps from ProviderName to ProviderGUID.
+  //
+  // Prominent naming examples from `logman query providers` :
+  //
+  // [Docker]                                 {a3693192-9ed6-46d2-a981-f8226c8363bd}
+  // ...
+  // Intel-Autologger-iclsClient              {B8D7E9A0-65D5-40BE-AFEA-83593FC0164E}
+  // Intel-Autologger-iclsProxy               {301B773F-50F3-4C8E-83F0-53BA9590A13E}
+  // Intel-Autologger-PTTEKRecertification    {F33E9E07-8792-47E8-B3FA-2C92AB32C5B3}
+  // ...
+  // NodeJS-ETW-provider                      {77754E9B-264B-4D8D-B981-E4135C1ECB0C}
+  // ...
+  // OpenSSH                                  {C4B57D35-0636-4BC3-A262-370F249F9802}
+  // ...
+  // Windows Connect Now                      {C100BECE-D33A-4A4B-BF23-BBEF4663D017}
+  // Windows Defender Firewall API            {28C9F48F-D244-45A8-842F-DC9FBC9B6E92}
+  // Windows Defender Firewall API - GP       {0EFF663F-8B6E-4E6D-8182-087A8EAA29CB}
+  // Windows Defender Firewall Driver         {D5E09122-D0B2-4235-ADC1-C89FAAAF1069}
 
+  std::string providerName = "OpenTelemetry"; // supply unique instrumentation name here
   exporter::ETW::TracerProvider tp;
+
   // TODO: this code should fallback to MsgPack if TLD is not available
   auto tracer = tp.GetTracer(providerName, "TLD");
-  auto span   = tracer->StartSpan("MySpan");
 
-  ETWEvent event = {
-      {"uint32Key", (uint32_t)123456}, {"uint64Key", (uint64_t)123456}, {"strKey", "someValue"}};
+  // Span attributes
+  Properties attribs =
+  {
+    {"attrib1", 1},
+    {"attrib2", 2}
+  };
 
-  EXPECT_NO_THROW(span->AddEvent(eventName, event));
-  EXPECT_NO_THROW(span->End());
+  auto outerSpan = tracer->StartSpan("MySpanOuter", attribs);
+
+  // Add first event
+  std::string eventName1 = "MyEvent1";
+  Properties event1 =
+  {
+    {"uint32Key", (uint32_t)1234},
+    {"uint64Key", (uint64_t)1234567890},
+    {"strKey", "someValue"}
+  };
+  EXPECT_NO_THROW(outerSpan->AddEvent(eventName1, event1));
+
+  // Add second event
+  std::string eventName2 = "MyEvent2";
+  Properties event2 =
+  {
+    {"uint32Key", (uint32_t)9876},
+    {"uint64Key", (uint64_t)987654321},
+    {"strKey", "anotherValue"}
+  };
+  EXPECT_NO_THROW(outerSpan->AddEvent(eventName2, event2));
+
+
+  // Create nested span. Note how we share the attributes here..
+  // It is Okay to share or have your own attributes.
+  auto innerSpan = tracer->StartSpan("MySpanInner", attribs);
+  std::string eventName3= "MyEvent3";
+    Properties event3 =
+  {
+    {"uint32Key", (uint32_t)9876},
+    {"uint64Key", (uint64_t)987654321},
+    // {"int32array", {{-1,0,1,2,3}} },
+    {"tempString", getTemporaryValue() }
+  };
+  EXPECT_NO_THROW(innerSpan->AddEvent(eventName3, event3));
+
+  EXPECT_NO_THROW(innerSpan->End());    // end innerSpan
+
+  EXPECT_NO_THROW(outerSpan->End());    // end outerSpan
+
   EXPECT_NO_THROW(tracer->CloseWithMicroseconds(0));
 }
-
-TEST(ETWTracer, ETWTracerTest)
-{
-  std::string providerName = "OpenTelemetry";
-
-  auto exporter = std::unique_ptr<exporter::ETW::ETWTracerExporter>(
-      new exporter::ETW::ETWTracerExporter(providerName));
-
-  auto processor = std::shared_ptr<sdk::trace::SpanProcessor>(
-      new sdk::trace::SimpleSpanProcessor(std::move(exporter)));
-
-  auto recordable = processor->MakeRecordable();
-  recordable->SetName("MySpan");
-
-  // Create stringstream to redirect to
-  std::stringstream stdoutOutput;
-
-  // Save cout's buffer here
-  std::streambuf *sbuf = std::cout.rdbuf();
-
-  // Redirect cout to our stringstream buffer
-  std::cout.rdbuf(stdoutOutput.rdbuf());
-
-  processor->OnEnd(std::move(recordable));
-
-  std::cout.rdbuf(sbuf);
-
-  std::string expectedOutput = "MySpan\n";
-
-  ASSERT_EQ(stdoutOutput.str(), expectedOutput);
-}
-
-TEST(ETWTracer, ExportUnitTest)
-{
-  std::string providerName = "OpenTelemetry";
-
-  auto exporter = std::unique_ptr<exporter::ETW::ETWTracerExporter>(
-      new exporter::ETW::ETWTracerExporter(providerName));
-
-  auto recordable = exporter->MakeRecordable();
-  recordable->SetName("MySpan");
-
-  nostd::span<std::unique_ptr<sdk::trace::Recordable>> batch(&recordable, 1);
-  auto result = exporter->Export(batch);
-  EXPECT_EQ(sdk::trace::ExportResult::kSuccess, result);
-}
+/* clang-format on */
 
 #endif

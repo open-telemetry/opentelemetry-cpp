@@ -34,7 +34,8 @@
 #include "opentelemetry/sdk/trace/recordable.h"
 
 #include "opentelemetry/exporters/etw/etw_data.h"
-#include "opentelemetry/exporters/etw/etw_provider_exporter.h"
+#include "opentelemetry/exporters/etw/etw_recordable.h"
+#include "opentelemetry/exporters/etw/etw_provider.h"
 
 #include "opentelemetry/exporters/etw/utils.h"
 
@@ -48,6 +49,20 @@ namespace exporter
 namespace ETW
 {
 
+/**
+ * @brief ETW Tracer Exporter.
+ *
+ * TODO: this code needs to be reworked because it is not necessary in synchronous
+ * realtime exporter / streamer scenario. Header-only ETW Tracer can export Span
+ * and Events without needing to pack data to into another Recordable. API calls
+ * return right away after the message is passed to ETW sink in realtime. There is
+ * no packaging or aggregation necessary, and no need for a background async thread.
+ *
+ * There is no 100% reliable way to know if ETW events got exported either:
+ * - if events got accepted, but cannot be processed, then then out-of-buffers
+ * notification is only sent to receiving listener-end, not to sender.
+ *
+ */
 class ETWTracerExporter final : public opentelemetry::sdk::trace::SpanExporter
 {
 public:

@@ -6,7 +6,7 @@ cc_library(
         "src/etw_provider_exporter.cc",
     ],
     hdrs = [
-        "include/opentelemetry/exporters/etw/etw_provider_exporter.h",
+        "include/opentelemetry/exporters/etw/etw_provider.h",
         "include/opentelemetry/exporters/etw/utils.h",
         "include/opentelemetry/exporters/etw/uuid.h",
     ],

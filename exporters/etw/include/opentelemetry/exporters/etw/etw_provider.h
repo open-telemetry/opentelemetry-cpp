@@ -30,6 +30,7 @@
 #include "opentelemetry/version.h"
 
 #include "opentelemetry/exporters/etw/utils.h"
+#include "opentelemetry/exporters/etw/etw_fields.h"
 
 #ifdef HAVE_MSGPACK
 // This option requires INCLUDE_DIR=$(ProjectDir)\..\..\third_party\json\include;...
@@ -42,6 +43,7 @@
 #include <mutex>
 #include <unordered_map>
 #include <vector>
+#include <string>
 
 #ifdef HAVE_KRABS_TESTS
 // krabs.hpp requires this definition of min macro from Windows.h
@@ -223,14 +225,14 @@ public:
       return STATUS_ERROR;
     };
 
-    const std::string EVENT_NAME = "name";
-    std::string eventName        = "NoName";
-    auto nameField               = eventData[EVENT_NAME];
+    std::string eventName   = "NoName";
+    auto nameField          = eventData[ETW_FIELD_NAME];
+
     switch (nameField.index())
     {
       case common::AttributeType::TYPE_STRING:
         eventName =
-            (char *)(nostd::get<nostd::string_view>(nameField).data());  // must be 0-terminated!
+            (char *)(nostd::get<std::string>(nameField).data());  // must be 0-terminated!
         break;
 #  ifdef HAVE_CSTRING_TYPE
       case common::AttributeType::TYPE_CSTRING:
@@ -246,26 +248,26 @@ public:
     /* clang-format off */
     nlohmann::json jObj =
     {
-      { "env_name", "Span" },
-      { "env_ver", "4.0" },
+      { ETW_FIELD_NAME, eventName },
+      { ETW_FIELD_VERSION, "4.0" },
       //
       // TODO: compute time in MessagePack-friendly format
       // TODO: should we consider uint64_t format with Unix timestamps for ELK stack?
-      { "env_time",
+      { ETW_FIELD_TIME,
         {
+          // TODO: timestamp
           { "TypeCode", 255 },
           { "Body","0xFFFFFC60000000005F752C2C" }
         }
       },
-      //
-
-      // TODO: follow JSON implementation of OTLP or place protobuf for non-Microsoft flows
+#if 0
+      // TODO: follow JSON implementation of OTLP
       { "env_dt_traceId", "6dcdae7b9b0c7643967d74ee54056178" },
       { "env_dt_spanId", "5866c4322919e641" },
+#endif
       //
-      { "name", eventName },
-      { "kind", 0 },
-      { "startTime",
+      { ETW_FIELD_KIND, 0 },
+      { ETW_FIELD_STARTTIME,
         {
           // TODO: timestamp
           { "TypeCode", 255 },
@@ -275,12 +277,15 @@ public:
     };
     /* clang-format on */
 
+    std::string eventFieldName(ETW_FIELD_NAME);
     for (auto &kv : eventData)
     {
       const char *name = kv.first.data();
-      // Don't include event name field in the payload
-      if (EVENT_NAME == name)
+
+      // Don't include event name field in the Payload section
+      if (eventFieldName == name)
         continue;
+
       auto &value = kv.second;
       switch (value.index())
       {
@@ -322,8 +327,7 @@ public:
         }
         case common::AttributeType::TYPE_STRING:
         {
-          auto temp  = nostd::get<nostd::string_view>(value);
-          jObj[name] = temp;
+          jObj[name] = nostd::get<std::string>(value);
           break;
         }
 #  ifdef HAVE_CSTRING_TYPE
@@ -344,6 +348,7 @@ public:
           break;
         }
 #  endif
+
         // TODO: arrays are not supported yet
 #  ifdef HAVE_SPAN_BYTE
         case common::AttributeType::TYPE_SPAN_BYTE:
@@ -458,7 +463,7 @@ public:
     {
       case common::AttributeType::TYPE_STRING:
         eventName =
-            (char *)(nostd::get<nostd::string_view>(nameField).data());  // must be 0-terminated!
+            (char *)(nostd::get<std::string>(nameField).data());
         break;
 #  ifdef HAVE_CSTRING_TYPE
       case common::AttributeType::TYPE_CSTRING:
@@ -527,8 +532,7 @@ public:
         case common::AttributeType::TYPE_STRING:
         {
           builder.AddField(name, tld::TypeUtf8String);
-          auto temp = nostd::get<nostd::string_view>(value);
-          dbuilder.AddString(temp.data());
+          dbuilder.AddString(nostd::get<std::string>(value).data());
           break;
         }
 #  ifdef HAVE_CSTRING_TYPE

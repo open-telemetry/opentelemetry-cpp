@@ -17,7 +17,7 @@
 #  include <gtest/gtest.h>
 #  include <string>
 
-#  include "opentelemetry/exporters/etw/etw_provider_exporter.h"
+#  include "opentelemetry/exporters/etw/etw_provider.h"
 
 using namespace OPENTELEMETRY_NAMESPACE;
 
