@@ -116,38 +116,32 @@ json TracezHttpServer::GetAttributesJSON(
     /* Convert variant types to into their nonvariant form. This is done this way because
        the frontend and JSON doesn't care about type, and variant's get function only allows
        const integers or literals */
-
+    
     switch (val.index())
     {
-      case 0:
-        attributes_json[key] = opentelemetry::nostd::get<0>(val);
+      case OwnedAttributeType::TYPE_BOOL:
+        attributes_json[key] = opentelemetry::nostd::get<bool>(val);
         break;
-      case 1:
-        attributes_json[key] = opentelemetry::nostd::get<1>(val);
+      case OwnedAttributeType::TYPE_INT:
+        attributes_json[key] = opentelemetry::nostd::get<int32_t>(val);
         break;
-      case 2:
-        attributes_json[key] = opentelemetry::nostd::get<2>(val);
+      case OwnedAttributeType::TYPE_UINT:
+        attributes_json[key] = opentelemetry::nostd::get<uint32_t>(val);
         break;
-      case 3:
-        attributes_json[key] = opentelemetry::nostd::get<3>(val);
+      case OwnedAttributeType::TYPE_INT64:
+        attributes_json[key] = opentelemetry::nostd::get<int64_t>(val);
         break;
-      case 4:
-        attributes_json[key] = opentelemetry::nostd::get<4>(val);
+      case OwnedAttributeType::TYPE_UINT64:
+        attributes_json[key] = opentelemetry::nostd::get<uint64_t>(val);
         break;
-      case 5:
-        attributes_json[key] = opentelemetry::nostd::get<5>(val);
+      case OwnedAttributeType::TYPE_DOUBLE:
+        attributes_json[key] = opentelemetry::nostd::get<double>(val);
         break;
-      case 6:
-        attributes_json[key] = opentelemetry::nostd::get<6>(val);
+      case OwnedAttributeType::TYPE_STRING:
+        attributes_json[key] = opentelemetry::nostd::get<std::string>(val);
         break;
-      case 7:
-        attributes_json[key] = opentelemetry::nostd::get<7>(val);
-        break;
-      case 8:
-        attributes_json[key] = opentelemetry::nostd::get<8>(val);
-        break;
-      case 9:
-        attributes_json[key] = opentelemetry::nostd::get<9>(val);
+      // TODO: arrays support is not implemented
+      default:
         break;
     }
   }
