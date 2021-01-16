@@ -8,6 +8,9 @@ cc_library(
     hdrs = glob([
         "include/opentelemetry/exporters/etw/*.h",
     ]),
+    local_defines = [
+        "HAVE_MSGPACK",
+    ],
     strip_include_prefix = "include",
     deps = [
         "//api",
@@ -18,6 +21,9 @@ cc_library(
 cc_test(
     name = "etw_provider_test",
     srcs = ["test/etw_provider_test.cc"],
+    local_defines = [
+        "HAVE_MSGPACK",
+    ],
     deps = [
         ":etw_provider_exporter",
         "@com_google_googletest//:gtest_main",
@@ -32,6 +38,9 @@ cc_library(
     hdrs = glob([
         "include/opentelemetry/exporters/etw/*.h",
     ]),
+    local_defines = [
+        "HAVE_MSGPACK",
+    ],
     strip_include_prefix = "include",
     deps = [
         ":etw_provider_exporter",
@@ -43,6 +52,9 @@ cc_library(
 cc_test(
     name = "etw_tracer_test",
     srcs = ["test/etw_tracer_test.cc"],
+    local_defines = [
+        "HAVE_MSGPACK",
+    ],
     deps = [
         ":etw_tracer_exporter",
         "@com_google_googletest//:gtest_main",
