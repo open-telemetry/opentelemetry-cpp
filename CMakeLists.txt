@@ -88,8 +88,6 @@ if(WIN32)
   option(WITH_ETW "Whether to include the ETW Exporter in the SDK" ON)
   if(WITH_ETW)
     add_definitions(-DHAVE_MSGPACK)
-    # Option below will be removed once we donate the TraceLoggingDynamic.h to
-    # OSS
   endif(WITH_ETW)
 endif(WIN32)
 
@@ -210,6 +208,9 @@ if(WITH_EXAMPLES)
   add_subdirectory(examples)
 endif()
 add_subdirectory(ext)
+
+# Add nlohmann/json submodule to include directories
+include_directories(third_party/nlohmann-json/single_include)
 
 # Export cmake config and support find_packages(opentelemetry-cpp CONFIG) Write
 # config file for find_packages(opentelemetry-cpp CONFIG)
