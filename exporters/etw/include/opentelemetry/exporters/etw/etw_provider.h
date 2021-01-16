@@ -403,7 +403,7 @@ public:
     EVENT_DESCRIPTOR evtDescriptor;
     EventDescCreate(&evtDescriptor, 0, 0x1, 0, 0, 0, 0, 0);
     EVENT_DATA_DESCRIPTOR evtData[1];
-    EventDataDescCreate(&evtData[0], v.data(), v.size());
+    EventDataDescCreate(&evtData[0], v.data(), static_cast<ULONG>(v.size()));
 
     auto writeResponse = EventWrite(providerData.providerHandle, &evtDescriptor, 1, evtData);
 
