@@ -104,6 +104,8 @@ json TracezHttpServer::GetLatencySpansJSON(const std::string &name, int latency_
   return latency_json;
 }
 
+using OwnedAttributeType = opentelemetry::sdk::common::OwnedAttributeType;
+
 json TracezHttpServer::GetAttributesJSON(
     const opentelemetry::ext::zpages::ThreadsafeSpanData &sample)
 {
@@ -116,7 +118,7 @@ json TracezHttpServer::GetAttributesJSON(
     /* Convert variant types to into their nonvariant form. This is done this way because
        the frontend and JSON doesn't care about type, and variant's get function only allows
        const integers or literals */
-    
+
     switch (val.index())
     {
       case OwnedAttributeType::TYPE_BOOL:
