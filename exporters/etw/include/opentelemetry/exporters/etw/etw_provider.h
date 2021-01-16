@@ -213,11 +213,10 @@ public:
     return STATUS_ERROR;
   }
 
-#ifdef HAVE_MSGPACK
   template <class T>
   unsigned long writeMsgPack(Handle &providerData, T eventData)
   {
-
+#ifdef HAVE_MSGPACK
     // Make sure you stop sending event before register unregistering providerData
     if (providerData.providerHandle == INVALID_HANDLE)
     {
@@ -428,8 +427,10 @@ public:
       return STATUS_EFBIG;
     };
     return (unsigned long)(writeResponse);
-  }
+#else
+    return STATUS_ERROR;
 #endif
+  }
 
   /// <summary>
   /// Send event to Provider Id
