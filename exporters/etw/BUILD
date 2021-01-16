@@ -15,6 +15,7 @@ cc_library(
     deps = [
         "//api",
         "//sdk/src/trace",
+        "@github_nlohmann_json//:json",
     ],
 )
 
@@ -27,6 +28,7 @@ cc_test(
     deps = [
         ":etw_provider_exporter",
         "@com_google_googletest//:gtest_main",
+        "@github_nlohmann_json//:json",
     ],
 )
 
@@ -46,6 +48,7 @@ cc_library(
         ":etw_provider_exporter",
         "//api",
         "//sdk/src/trace",
+        "@github_nlohmann_json//:json",
     ],
 )
 
@@ -58,5 +61,6 @@ cc_test(
     deps = [
         ":etw_tracer_exporter",
         "@com_google_googletest//:gtest_main",
+        "@github_nlohmann_json//:json",
     ],
 )
