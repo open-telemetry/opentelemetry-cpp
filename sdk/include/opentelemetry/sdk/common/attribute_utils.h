@@ -33,21 +33,43 @@ namespace common
  */
 using OwnedAttributeValue = nostd::variant<bool,
                                            int32_t,
-                                           uint32_t,
                                            int64_t,
+                                           uint32_t,
                                            uint64_t,
                                            double,
                                            std::string,
+// TODO: should we have support for C-strings here or std::string is sufficient?
 #ifdef HAVE_SPAN_BYTE
                                            std::vector<uint8_t>,
 #endif
                                            std::vector<bool>,
                                            std::vector<int32_t>,
-                                           std::vector<uint32_t>,
                                            std::vector<int64_t>,
+                                           std::vector<uint32_t>,
                                            std::vector<uint64_t>,
                                            std::vector<double>,
                                            std::vector<std::string>>;
+
+enum OwnedAttributeType
+{
+  TYPE_BOOL,
+  TYPE_INT,
+  TYPE_INT64,
+  TYPE_UINT,
+  TYPE_UINT64,
+  TYPE_DOUBLE,
+  TYPE_STRING,
+#ifdef HAVE_SPAN_BYTE
+  TYPE_SPAN_BYTE,
+#endif
+  TYPE_SPAN_BOOL,
+  TYPE_SPAN_INT,
+  TYPE_SPAN_INT64,
+  TYPE_SPAN_UINT,
+  TYPE_SPAN_UINT64,
+  TYPE_SPAN_DOUBLE,
+  TYPE_SPAN_STRING
+};
 
 /**
  * Creates an owned copy (OwnedAttributeValue) of a non-owning AttributeValue.
@@ -61,6 +83,10 @@ struct AttributeConverter
   OwnedAttributeValue operator()(uint64_t v) { return OwnedAttributeValue(v); }
   OwnedAttributeValue operator()(double v) { return OwnedAttributeValue(v); }
   OwnedAttributeValue operator()(nostd::string_view v)
+  {
+    return OwnedAttributeValue(std::string(v));
+  }
+  OwnedAttributeValue operator()(const char *v)
   {
     return OwnedAttributeValue(std::string(v));
   }
