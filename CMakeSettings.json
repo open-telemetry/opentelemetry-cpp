@@ -72,6 +72,11 @@
                     "name": "WITH_EXAMPLES",
                     "value": "true",
                     "type": "BOOL"
+                },
+                {
+                    "name": "WITH_PROMETHEUS",
+                    "value": "True",
+                    "type": "BOOL"
                 }
             ]
         },
@@ -101,6 +106,11 @@
                     "name": "WITH_EXAMPLES",
                     "value": "true",
                     "type": "BOOL"
+                },
+                {
+                  "name": "WITH_PROMETHEUS",
+                  "value": "True",
+                  "type": "BOOL"
                 }
             ]
         }
