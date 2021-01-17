@@ -65,6 +65,7 @@ cc_test(
     deps = [
         ":otlp_exporter",
         "//api",
+        "//sdk/src/resource",
         "@com_google_googletest//:gtest_main",
     ],
 )

@@ -17,6 +17,7 @@ cc_test(
     ],
     deps = [
         "//ext/src/zpages",
+        "//sdk/src/resource",
         "//sdk/src/trace",
         "@com_google_googletest//:gtest_main",
     ],
@@ -29,6 +30,7 @@ cc_test(
     ],
     deps = [
         "//ext/src/zpages",
+        "//sdk/src/resource",
         "//sdk/src/trace",
         "@com_google_googletest//:gtest_main",
     ],

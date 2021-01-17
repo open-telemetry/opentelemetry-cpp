@@ -20,6 +20,7 @@ cc_binary(
         ":foo_library",
         "//api",
         "//exporters/otlp:otlp_exporter",
+        "//sdk/src/resource",
         "//sdk/src/trace",
     ],
 )
