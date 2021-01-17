@@ -5,6 +5,7 @@
 #include <string>
 
 #include "opentelemetry/nostd/shared_ptr.h"
+#include "opentelemetry/sdk/resource/resource.h"
 #include "opentelemetry/sdk/trace/processor.h"
 #include "opentelemetry/sdk/trace/samplers/always_on.h"
 #include "opentelemetry/sdk/trace/tracer.h"
@@ -25,9 +26,10 @@ public:
    * @param sampler The sampler for this tracer provider. This must
    * not be a nullptr.
    */
-  explicit TracerProvider(
-      std::shared_ptr<SpanProcessor> processor,
-      std::shared_ptr<Sampler> sampler = std::make_shared<AlwaysOnSampler>()) noexcept;
+  explicit TracerProvider(std::shared_ptr<SpanProcessor> processor,
+                          std::shared_ptr<Sampler> sampler = std::make_shared<AlwaysOnSampler>(),
+                          opentelemetry::sdk::resource::Resource &&resource =
+                              opentelemetry::sdk::resource::Resource::Create({})) noexcept;
 
   opentelemetry::nostd::shared_ptr<opentelemetry::trace::Tracer> GetTracer(
       nostd::string_view library_name,
@@ -48,9 +50,15 @@ public:
 
   /**
    * Obtain the sampler associated with this tracer provider.
-   * @return The span processor for this tracer provider.
+   * @return The sampler for this tracer provider.
    */
   std::shared_ptr<Sampler> GetSampler() const noexcept;
+
+  /**
+   * Obtain the resource associated with this tracer provider.
+   * @return The resource for this tracer provider.
+   */
+  const opentelemetry::sdk::resource::Resource &GetResource() const noexcept;
 
   /**
    * Shutdown the span processor associated with this tracer provider.
@@ -61,6 +69,7 @@ private:
   opentelemetry::sdk::AtomicSharedPtr<SpanProcessor> processor_;
   std::shared_ptr<opentelemetry::trace::Tracer> tracer_;
   const std::shared_ptr<Sampler> sampler_;
+  const opentelemetry::sdk::resource::Resource resource_;
 };
 }  // namespace trace
 }  // namespace sdk

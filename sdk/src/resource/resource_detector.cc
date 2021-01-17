@@ -10,11 +10,11 @@ namespace resource
 
 const char *OTEL_RESOURCE_ATTRIBUTES = "OTEL_RESOURCE_ATTRIBUTES";
 
-std::shared_ptr<Resource> OTELResourceDetector::Detect() noexcept
+Resource OTELResourceDetector::Detect() noexcept
 {
   char *attributes_str = std::getenv(OTEL_RESOURCE_ATTRIBUTES);
   if (attributes_str == nullptr)
-    return std::make_shared<Resource>(Resource());
+    return Resource();
   // return Resource::GetEmpty();
   ResourceAttributes attributes;
   std::istringstream iss(attributes_str);
@@ -26,7 +26,7 @@ std::shared_ptr<Resource> OTELResourceDetector::Detect() noexcept
     std::string value = token.substr(pos + 1);
     attributes[key]   = value;
   }
-  return std::make_shared<Resource>(Resource(attributes));
+  return Resource(attributes);
 }
 
 }  // namespace resource

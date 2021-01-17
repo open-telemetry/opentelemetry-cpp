@@ -1,6 +1,7 @@
 #pragma once
 
 #include "opentelemetry/sdk/common/atomic_shared_ptr.h"
+#include "opentelemetry/sdk/resource/resource.h"
 #include "opentelemetry/sdk/trace/processor.h"
 #include "opentelemetry/sdk/trace/samplers/always_on.h"
 #include "opentelemetry/trace/noop.h"
@@ -23,7 +24,9 @@ public:
    * nullptr.
    */
   explicit Tracer(std::shared_ptr<SpanProcessor> processor,
-                  std::shared_ptr<Sampler> sampler = std::make_shared<AlwaysOnSampler>()) noexcept;
+                  std::shared_ptr<Sampler> sampler = std::make_shared<AlwaysOnSampler>(),
+                  const opentelemetry::sdk::resource::Resource &resource =
+                      opentelemetry::sdk::resource::Resource::Create({})) noexcept;
 
   /**
    * Set the span processor associated with this tracer.
@@ -57,6 +60,7 @@ public:
 private:
   opentelemetry::sdk::AtomicSharedPtr<SpanProcessor> processor_;
   const std::shared_ptr<Sampler> sampler_;
+  const opentelemetry::sdk::resource::Resource &resource_;
 };
 }  // namespace trace
 }  // namespace sdk

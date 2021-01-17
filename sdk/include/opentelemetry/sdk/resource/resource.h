@@ -33,7 +33,7 @@ public:
    * @returns the newly merged Resource.
    */
 
-  std::shared_ptr<Resource> Merge(const Resource &other) noexcept;
+  Resource Merge(const Resource &other) noexcept;
 
   /**
    * Returns a newly created Resource with the specified attributes.
@@ -42,7 +42,7 @@ public:
    * @returns the newly created Resource.
    */
 
-  static std::shared_ptr<Resource> Create(const ResourceAttributes &attributes);
+  static Resource Create(const ResourceAttributes &attributes);
 
   /**
    * Returns an Empty resource.

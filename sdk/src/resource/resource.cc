@@ -15,7 +15,7 @@ const std::string TELEMETRY_SDK_VERSION  = "telemetry.sdk.version";
 
 Resource::Resource(const ResourceAttributes &attributes) noexcept : attributes_(attributes) {}
 
-std::shared_ptr<Resource> Resource::Merge(const Resource &other) noexcept
+Resource Resource::Merge(const Resource &other) noexcept
 {
   ResourceAttributes merged_resource_attributes(attributes_);
   for (auto &elem : other.attributes_)
@@ -27,10 +27,10 @@ std::shared_ptr<Resource> Resource::Merge(const Resource &other) noexcept
       merged_resource_attributes[elem.first] = elem.second;
     }
   }
-  return std::make_shared<Resource>(Resource(merged_resource_attributes));
+  return Resource(merged_resource_attributes);
 }
 
-std::shared_ptr<Resource> Resource::Create(const ResourceAttributes &attributes)
+Resource Resource::Create(const ResourceAttributes &attributes)
 {
   static auto otel_resource = OTELResourceDetector().Detect();
   auto default_resource     = Resource::GetDefault();
@@ -40,9 +40,9 @@ std::shared_ptr<Resource> Resource::Create(const ResourceAttributes &attributes)
   {
     Resource tmp_resource(attributes);
     auto merged_resource = tmp_resource.Merge(default_resource);
-    return merged_resource->Merge(*otel_resource);
+    return merged_resource.Merge(otel_resource);
   }
-  return default_resource.Merge(*otel_resource);
+  return default_resource.Merge(otel_resource);
 }
 
 Resource &Resource::GetEmpty()

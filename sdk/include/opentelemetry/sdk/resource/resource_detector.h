@@ -17,7 +17,7 @@ class Resource;
 class ResourceDetector
 {
 public:
-  virtual std::shared_ptr<Resource> Detect() = 0;
+  virtual Resource Detect() = 0;
 };
 
 /**
@@ -27,7 +27,7 @@ public:
 class OTELResourceDetector : public ResourceDetector
 {
 public:
-  std::shared_ptr<Resource> Detect() noexcept override;
+  Resource Detect() noexcept override;
 };
 
 }  // namespace resource

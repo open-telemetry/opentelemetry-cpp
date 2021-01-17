@@ -39,7 +39,7 @@ TEST(ResourceTest, create)
       {"telemetry.sdk.version", OPENTELEMETRY_SDK_VERSION}};
   auto resource = opentelemetry::sdk::resource::Resource::Create(
       {{"service", "backend"}, {"version", "1"}, {"cost", "234.23"}});
-  auto received_attributes = resource->GetAttributes();
+  auto received_attributes = resource.GetAttributes();
 
   for (auto &e : received_attributes)
   {
@@ -50,7 +50,7 @@ TEST(ResourceTest, create)
   opentelemetry::sdk::resource::ResourceAttributes attributes = {
       {"service", "backend"}, {"version", "1"}, {"cost", "234.23"}};
   auto resource2            = opentelemetry::sdk::resource::Resource::Create(attributes);
-  auto received_attributes2 = resource2->GetAttributes();
+  auto received_attributes2 = resource2.GetAttributes();
   for (auto &e : received_attributes2)
   {
     EXPECT_TRUE(expected_attributes.find(e.first) != expected_attributes.end());
@@ -71,7 +71,7 @@ TEST(ResourceTest, Merge)
       opentelemetry::sdk::resource::ResourceAttributes({{"host", "service-host"}}));
 
   auto merged_resource     = resource1.Merge(resource2);
-  auto received_attributes = merged_resource->GetAttributes();
+  auto received_attributes = merged_resource.GetAttributes();
   for (auto &e : received_attributes)
   {
     EXPECT_TRUE(expected_attributes.find(e.first) != expected_attributes.end());
@@ -90,7 +90,7 @@ TEST(ResourceTest, MergeEmptyString)
   TestResource resource2({{"service", "backend"}, {"host", "another-service-host"}});
 
   auto merged_resource     = resource1.Merge(resource2);
-  auto received_attributes = merged_resource->GetAttributes();
+  auto received_attributes = merged_resource.GetAttributes();
 }
 
 // this test uses putenv to set the env variable - this is not available on windows
@@ -104,7 +104,7 @@ TEST(ResourceTest, OtelResourceDetector)
 
   opentelemetry::sdk::resource::OTELResourceDetector detector;
   auto resource            = detector.Detect();
-  auto received_attributes = resource->GetAttributes();
+  auto received_attributes = resource.GetAttributes();
   for (auto &e : received_attributes)
   {
     EXPECT_TRUE(expected_attributes.find(e.first) != expected_attributes.end());
@@ -124,7 +124,7 @@ TEST(ResourceTest, OtelResourceDetectorEmptyEnv)
   putenv(env);
   opentelemetry::sdk::resource::OTELResourceDetector detector;
   auto resource            = detector.Detect();
-  auto received_attributes = resource->GetAttributes();
+  auto received_attributes = resource.GetAttributes();
   for (auto &e : received_attributes)
   {
     EXPECT_TRUE(expected_attributes.find(e.first) != expected_attributes.end());
