@@ -5,7 +5,6 @@
 #include "opentelemetry/sdk/version/version.h"
 #include "opentelemetry/version.h"
 
-#include <cstdlib>
 #include <memory>
 #include <sstream>
 #include <unordered_map>
