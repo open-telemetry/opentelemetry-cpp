@@ -19,14 +19,6 @@ public:
   {}
 };
 
-/*
-class ResourceTest : public testing::Test{
-protected:
-  TestResource resource;
-
-};
-*/
-
 TEST(ResourceTest, create)
 {
 
@@ -80,7 +72,6 @@ TEST(ResourceTest, Merge)
   }
   EXPECT_EQ(received_attributes.size(), expected_attributes.size());
 }
-
 TEST(ResourceTest, MergeEmptyString)
 {
   std::map<std::string, std::string> expected_attributes = {{"service", "backend"},
@@ -94,6 +85,7 @@ TEST(ResourceTest, MergeEmptyString)
 
 // this test uses putenv to set the env variable - this is not available on windows
 #ifdef __linux__
+
 TEST(ResourceTest, OtelResourceDetector)
 {
   std::map<std::string, std::string> expected_attributes = {{"k", "v"}};
@@ -112,15 +104,13 @@ TEST(ResourceTest, OtelResourceDetector)
                 opentelemetry::nostd::get<std::string>(e.second));
   }
   EXPECT_EQ(received_attributes.size(), expected_attributes.size());
-  char env2[] = "OTEL_RESOURCE_ATTRIBUTES=";
-  putenv(env2);
+  unsetenv("OTEL_RESOURCE_ATTRIBUTES");
 }
 
 TEST(ResourceTest, OtelResourceDetectorEmptyEnv)
 {
   std::map<std::string, std::string> expected_attributes = {};
-  char env[]                                             = "OTEL_RESOURCE_ATTRIBUTES=";
-  putenv(env);
+  unsetenv("OTEL_RESOURCE_ATTRIBUTES");
   opentelemetry::sdk::resource::OTELResourceDetector detector;
   auto resource            = detector.Detect();
   auto received_attributes = resource.GetAttributes();
@@ -133,5 +123,4 @@ TEST(ResourceTest, OtelResourceDetectorEmptyEnv)
   }
   EXPECT_EQ(received_attributes.size(), expected_attributes.size());
 }
-
-#endif
+#endif  // __linux__
