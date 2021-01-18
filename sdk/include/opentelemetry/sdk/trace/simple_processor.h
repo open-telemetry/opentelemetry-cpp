@@ -51,13 +51,13 @@ public:
   }
 
   bool ForceFlush(
-      std::chrono::microseconds timeout = std::chrono::microseconds::max()) noexcept override
+      std::chrono::microseconds timeout = (std::chrono::microseconds::max)()) noexcept override
   {
     return true;
   }
 
   bool Shutdown(
-      std::chrono::microseconds timeout = std::chrono::microseconds::max()) noexcept override
+      std::chrono::microseconds timeout = (std::chrono::microseconds::max)()) noexcept override
   {
     // We only call shutdown ONCE.
     if (exporter_ != nullptr && !shutdown_latch_.test_and_set(std::memory_order_acquire))

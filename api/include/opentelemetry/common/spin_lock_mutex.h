@@ -6,6 +6,17 @@
 
 #include "opentelemetry/version.h"
 
+#if defined(_MSC_VER)
+#  ifndef NOMINMAX
+#    define NOMINMAX
+#  endif
+#  include <windows.h>
+#elif defined(__i386__) || defined(__x86_64__)
+#  if defined(__clang__)
+#    include <emmintrin.h>
+#  endif
+#endif
+
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace common
 {
@@ -15,6 +26,14 @@ constexpr int SPINLOCK_SLEEP_MS        = 1;
 
 /**
  * A Mutex which uses atomic flags and spin-locks instead of halting threads.
+ *
+ * This mutex uses an incremental back-off strategy with the following phases:
+ * 1. A tight spin-lock loop (pending: using hardware PAUSE/YIELD instructions)
+ * 2. A loop where the current thread yields control after checking the lock.
+ * 3. Issuing a thread-sleep call before starting back in phase 1.
+ *
+ * This is meant to give a good balance of perofrmance and CPU consumption in
+ * practice.
  *
  * This mutex uses an incremental back-off strategy with the following phases:
  * 1. A tight spin-lock loop (pending: using hardware PAUSE/YIELD instructions)
@@ -68,8 +87,22 @@ public:
         {
           return;
         }
-        // TODO: Issue PAUSE/YIELD instruction to reduce contention.
-        // e.g. __builtin_ia32_pause() / YieldProcessor() / _mm_pause();
+// Issue a Pause/Yield instruction while spinning.
+#if defined(_MSC_VER)
+        YieldProcessor();
+#elif defined(__i386__) || defined(__x86_64__)
+#  if defined(__clang__)
+        _mm_pause();
+#  else
+        __builtin_ia32_pause();
+#  endif
+#elif defined(__arm__)
+        // This intrinsic should fail to be found if YIELD is not supported on the current
+        // processor.
+        __yield();
+#else
+        // TODO: Issue PAGE/YIELD on other architectures.
+#endif
       }
       // Yield then try again (goal ~100ns)
       std::this_thread::yield();
