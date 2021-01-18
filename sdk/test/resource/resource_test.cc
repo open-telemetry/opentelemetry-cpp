@@ -30,33 +30,32 @@ protected:
 TEST(ResourceTest, create)
 {
 
-  std::map<std::string, std::string> expected_attributes = {
+  opentelemetry::sdk::resource::ResourceAttributes expected_attributes = {
       {"service", "backend"},
-      {"version", "1"},
-      {"cost", "234.23"},
+      {"version", (uint32_t)1},
+      {"cost", 234.23},
       {"telemetry.sdk.language", "cpp"},
       {"telemetry.sdk.name", "opentelemetry"},
       {"telemetry.sdk.version", OPENTELEMETRY_SDK_VERSION}};
-  auto resource = opentelemetry::sdk::resource::Resource::Create(
-      {{"service", "backend"}, {"version", "1"}, {"cost", "234.23"}});
-  auto received_attributes = resource.GetAttributes();
-
-  for (auto &e : received_attributes)
-  {
-    EXPECT_EQ(expected_attributes[e.first], opentelemetry::nostd::get<std::string>(e.second));
-  }
-  EXPECT_EQ(received_attributes.size(), expected_attributes.size());
 
   opentelemetry::sdk::resource::ResourceAttributes attributes = {
-      {"service", "backend"}, {"version", "1"}, {"cost", "234.23"}};
+      {"service", "backend"}, {"version", (uint32_t)1}, {"cost", 234.23}};
   auto resource2            = opentelemetry::sdk::resource::Resource::Create(attributes);
   auto received_attributes2 = resource2.GetAttributes();
   for (auto &e : received_attributes2)
   {
+
     EXPECT_TRUE(expected_attributes.find(e.first) != expected_attributes.end());
     if (expected_attributes.find(e.first) != expected_attributes.end())
-      EXPECT_EQ(expected_attributes.find(e.first)->second,
-                opentelemetry::nostd::get<std::string>(e.second));
+      if (e.first == "version")
+        EXPECT_EQ(opentelemetry::nostd::get<uint32_t>(expected_attributes.find(e.first)->second),
+                  opentelemetry::nostd::get<uint32_t>(e.second));
+      else if (e.first == "cost")
+        EXPECT_EQ(opentelemetry::nostd::get<double>(expected_attributes.find(e.first)->second),
+                  opentelemetry::nostd::get<double>(e.second));
+      else
+        EXPECT_EQ(opentelemetry::nostd::get<std::string>(expected_attributes.find(e.first)->second),
+                  opentelemetry::nostd::get<std::string>(e.second));
   }
   EXPECT_EQ(received_attributes2.size(), expected_attributes.size());
 }
