@@ -14,8 +14,11 @@ void initTracer()
       new opentelemetry::exporter::trace::OStreamSpanExporter);
   auto processor = std::shared_ptr<sdktrace::SpanProcessor>(
       new sdktrace::SimpleSpanProcessor(std::move(exporter)));
-  auto provider = nostd::shared_ptr<opentelemetry::trace::TracerProvider>(
-      new sdktrace::TracerProvider(processor));
+  opentelemetry::sdk::resource::OTELResourceDetector detector;
+  auto provider =
+      nostd::shared_ptr<opentelemetry::trace::TracerProvider>(new sdktrace::TracerProvider(
+          processor, std::make_shared<opentelemetry::sdk::trace::AlwaysOnSampler>(),
+          detector.Detect()));
   // Set the global trace provider
   opentelemetry::trace::Provider::SetTracerProvider(provider);
 }
