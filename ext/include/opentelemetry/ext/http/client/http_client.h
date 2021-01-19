@@ -14,8 +14,12 @@
 Sync Request:
 
   HttpClient httpClient;
-  auto response = httpClient.Get(url); // GET request
-  auto response = httpClient.Post(url, data) ; // POST request
+  auto result = httpClient.Get(url); // GET request
+  if (result){
+    auto response = result.GetResponse();
+  } else {
+    std::cout << result.GetSessionState();
+  }
 
 Async Request:
 
