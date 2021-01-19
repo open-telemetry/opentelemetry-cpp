@@ -14,13 +14,6 @@
 #include "opentelemetry/trace/span_id.h"
 #include "opentelemetry/trace/trace_id.h"
 
-using opentelemetry::sdk::trace::AttributeConverter;
-using opentelemetry::sdk::trace::SpanDataAttributeValue;
-using opentelemetry::sdk::trace::SpanDataEvent;
-
-// TODO: Create generic short pattern for opentelemetry::common and opentelemetry::trace and others
-// as necessary
-
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace ext
 {
@@ -117,7 +110,8 @@ public:
    * Get the attributes for this span
    * @return the attributes for this span
    */
-  const std::unordered_map<std::string, SpanDataAttributeValue> GetAttributes() const noexcept
+  const std::unordered_map<std::string, opentelemetry::sdk::common::OwnedAttributeValue>
+  GetAttributes() const noexcept
   {
     std::lock_guard<std::mutex> lock(mutex_);
     return attributes_;
@@ -188,7 +182,8 @@ public:
               {})) noexcept override
   {
     std::lock_guard<std::mutex> lock(mutex_);
-    events_.push_back(SpanDataEvent(std::string(name), timestamp, attributes));
+    events_.push_back(
+        opentelemetry::sdk::trace::SpanDataEvent(std::string(name), timestamp, attributes));
   }
 
   ThreadsafeSpanData() {}
@@ -223,9 +218,9 @@ private:
   opentelemetry::trace::SpanKind span_kind_;
   opentelemetry::trace::CanonicalCode status_code_{opentelemetry::trace::CanonicalCode::OK};
   std::string status_desc_;
-  std::unordered_map<std::string, SpanDataAttributeValue> attributes_;
-  std::vector<SpanDataEvent> events_;
-  AttributeConverter converter_;
+  std::unordered_map<std::string, opentelemetry::sdk::common::OwnedAttributeValue> attributes_;
+  std::vector<opentelemetry::sdk::trace::SpanDataEvent> events_;
+  opentelemetry::sdk::common::AttributeConverter converter_;
 };
 }  // namespace zpages
 }  // namespace ext

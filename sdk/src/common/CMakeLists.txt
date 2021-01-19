@@ -1,4 +1,4 @@
-set(COMMON_SRCS random.cc)
+set(COMMON_SRCS random.cc core.cc)
 if(WIN32)
   list(APPEND COMMON_SRCS platform/fork_windows.cc)
 else()
@@ -6,4 +6,16 @@ else()
 endif()
 
 add_library(opentelemetry_common ${COMMON_SRCS})
-target_link_libraries(opentelemetry_common Threads::Threads)
+
+set_target_properties(opentelemetry_common PROPERTIES EXPORT_NAME common)
+
+target_link_libraries(
+  opentelemetry_common PUBLIC opentelemetry_api opentelemetry_sdk
+                              Threads::Threads ${CORE_RUNTIME_LIBS})
+
+install(
+  TARGETS opentelemetry_common
+  EXPORT "${PROJECT_NAME}-target"
+  RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
+  LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
+  ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR})

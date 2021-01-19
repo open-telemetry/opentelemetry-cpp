@@ -14,9 +14,9 @@
 
 workspace(name = "io_opentelemetry_cpp")
 
+# Load our direct dependencies.
 load("//bazel:repository.bzl", "opentelemetry_cpp_deps")
 
-# Load our direct dependencies.
 opentelemetry_cpp_deps()
 
 # Load gRPC dependencies after load.
@@ -33,14 +33,7 @@ load("@upb//bazel:repository_defs.bzl", "bazel_version_repository")
 
 bazel_version_repository(name = "upb_bazel_version")
 
-# Load protobuf deps
-
-load("@com_google_protobuf//:protobuf_deps.bzl", "protobuf_deps")
-
-protobuf_deps()
-
 # Load prometheus C++ dependencies.
-
 load("@com_github_jupp0r_prometheus_cpp//bazel:repositories.bzl", "prometheus_cpp_repositories")
 
 prometheus_cpp_repositories()

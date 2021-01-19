@@ -13,8 +13,10 @@ Increment the:
 
 
 ## [Unreleased]
+
+## [0.0.1] 2020-12-16
 ### Added
-    * Trace API and SDK
+    * Trace API and SDK experimental
     * OTLP Exporter
 ### Changed
 ### Removed

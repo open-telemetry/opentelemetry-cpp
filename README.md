@@ -22,6 +22,19 @@ Please note that supporting the [C Programming
 Language](https://en.wikipedia.org/wiki/C_(programming_language)) is not a goal
 of the current project.
 
+## Supported Development Platforms
+
+ Our CI pipeline builds and tests on following `x86-64` platforms:
+
+* ubuntu-18.04 ( Default GCC Compiler - 7.5.0 )
+* ubuntu-18.04 ( GCC 4.8 with -std=c++11 flag )
+* ubuntu-20.04 ( Default GCC Compiler - 9.3.0 with -std=c++20 flags )
+* macOS 10.15 ( Xcode 12.2 )
+* Windows Server 2019 (Visual Studio Enterprise 2019 )
+
+In general, the code shipped from this repository should build on all platforms having C++ compiler with [supported C++ standards](#supported-c-versions).
+
+
 ## Installation
 
 Please refer to [INSTALL.md](./INSTALL.md).
@@ -47,7 +60,7 @@ Meeting notes are available as a public [Google doc](https://docs.google.com/doc
 
 Approvers ([@open-telemetry/cpp-approvers](https://github.com/orgs/open-telemetry/teams/cpp-approvers)):
 
-* [Johannes Tax](https://github.com/pyohannes), New Relic
+* [Johannes Tax](https://github.com/pyohannes), Microsoft
 * [Josh Suereth](https://github.com/jsuereth), Google
 * [Max Golovanov](https://github.com/maxgolov), Microsoft
 * [Ryan Burn](https://github.com/rnburn), Lightstep
@@ -74,11 +87,11 @@ Triagers ([@open-telemetry/cpp-triagers](https://github.com/orgs/open-telemetry/
 
 OpenTelemetry C++ is under active development.
 
-The library is not yet _generally available_, and releases aren't guaranteed to
-conform to a specific version of the specification. Future releases will not
-attempt to maintain backwards compatibility with previous releases. Each alpha
-and beta release includes significant changes to the API and SDK packages,
-making them incompatible with each other.
+The API and SDK packages are __not yet generally available__, and releases are
+not guaranteed to conform to a specific version of the specification. Future
+releases will not attempt to maintain backwards compatibility with previous
+releases. Each alpha and beta release could include significant changes to the
+API and SDK packages, making them incompatible with each other.
 
 See the [release
 notes](https://github.com/open-telemetry/opentelemetry-cpp/releases)

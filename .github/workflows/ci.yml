@@ -8,7 +8,7 @@ on:
 
 jobs:
   cmake_test:
-    name: CMake test
+    name: CMake test (without otlp-exporter)
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
@@ -18,10 +18,8 @@ jobs:
       run: |
         sudo ./ci/setup_cmake.sh
         sudo ./ci/setup_ci_environment.sh
-    - name: run tests
+    - name: run cmake tests (without otlp-exporter)
       run: ./ci/do_ci.sh cmake.test
-    - name: run prometheus exporter tests
-      run: ./ci/do_ci.sh cmake.exporter.prometheus.test
 
   cmake_gcc_48_test:
     name: CMake gcc 4.8
@@ -57,6 +55,22 @@ jobs:
     - name: run tests
       run: ./ci/do_ci.sh cmake.c++20.test
 
+  cmake_otprotocol_test:
+    name: CMake test (with otlp-exporter)
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+      with:
+        submodules: 'recursive'
+    - name: setup
+      run: |
+        sudo ./ci/setup_cmake.sh
+        sudo ./ci/setup_ci_environment.sh
+    - name: run otlp exporter tests
+      run: |
+        sudo ./ci/setup_grpc.sh
+        ./ci/do_ci.sh cmake.exporter.otprotocol.test
+
   plugin_test:
     name: Plugin -> CMake
     runs-on: ubuntu-latest
@@ -71,13 +85,20 @@ jobs:
     - name: run tests
       run: ./ci/do_ci.sh cmake.test_example_plugin
 
-  gcc_48_test:
-    name: Legacy Bazel
+  bazel_gcc_48_test:
+    name: Bazel gcc 4.8
     runs-on: ubuntu-18.04
     steps:
     - uses: actions/checkout@v2
       with:
         submodules: 'recursive'
+    - name: Mount Bazel Cache
+      uses: actions/cache@v2
+      env:
+        cache-name: bazel_cache
+      with:
+        path: /home/runner/.cache/bazel
+        key: bazel_gcc_48_test
     - name: setup
       run: |
         sudo ./ci/setup_ci_environment.sh
@@ -95,9 +116,15 @@ jobs:
     - uses: actions/checkout@v2
       with:
         submodules: 'recursive'
+    - name: Mount Bazel Cache
+      uses: actions/cache@v2
+      env:
+        cache-name: bazel_cache
+      with:
+        path: /home/runner/.cache/bazel
+        key: bazel_test
     - name: setup
       run: |
-        sudo ./ci/setup_cmake.sh
         sudo ./ci/setup_ci_environment.sh
         sudo ./ci/install_bazelisk.sh
     - name: run tests
@@ -110,9 +137,15 @@ jobs:
     - uses: actions/checkout@v2
       with:
         submodules: 'recursive'
+    - name: Mount Bazel Cache
+      uses: actions/cache@v2
+      env:
+        cache-name: bazel_cache
+      with:
+        path: /home/runner/.cache/bazel
+        key: bazel_valgrind
     - name: setup
       run: |
-        sudo ./ci/setup_cmake.sh
         sudo ./ci/setup_ci_environment.sh
         sudo ./ci/install_bazelisk.sh
     - name: run tests
@@ -125,9 +158,15 @@ jobs:
     - uses: actions/checkout@v2
       with:
         submodules: 'recursive'
+    - name: Mount Bazel Cache
+      uses: actions/cache@v2
+      env:
+        cache-name: bazel_cache
+      with:
+        path: /home/runner/.cache/bazel
+        key: bazel_noexcept
     - name: setup
       run: |
-        sudo ./ci/setup_cmake.sh
         sudo ./ci/setup_ci_environment.sh
         sudo ./ci/install_bazelisk.sh
     - name: run tests
@@ -140,9 +179,15 @@ jobs:
     - uses: actions/checkout@v2
       with:
         submodules: 'recursive'
+    - name: Mount Bazel Cache
+      uses: actions/cache@v2
+      env:
+        cache-name: bazel_cache
+      with:
+        path: /home/runner/.cache/bazel
+        key: bazel_asan
     - name: setup
       run: |
-        sudo ./ci/setup_cmake.sh
         sudo ./ci/setup_ci_environment.sh
         sudo ./ci/install_bazelisk.sh
     - name: run tests
@@ -155,13 +200,36 @@ jobs:
     - uses: actions/checkout@v2
       with:
         submodules: 'recursive'
+    - name: Mount Bazel Cache
+      uses: actions/cache@v2
+      env:
+        cache-name: bazel_cache
+      with:
+        path: /home/runner/.cache/bazel
+        key: bazel_tsan
     - name: setup
       run: |
-        sudo ./ci/setup_cmake.sh
         sudo ./ci/setup_ci_environment.sh
         sudo ./ci/install_bazelisk.sh
     - name: run tests
       run: ./ci/do_ci.sh bazel.tsan
+
+  bazel_osx:
+    name: Bazel on MacOS
+    runs-on: macos-latest
+    steps:
+    - uses: actions/checkout@v2
+      with:
+        submodules: 'recursive'
+    - name: Mount Bazel Cache
+      uses: actions/cache@v2
+      env:
+        cache-name: bazel_cache
+      with:
+        path: /Users/runner/.cache/bazel
+        key: bazel_osx
+    - name: run tests
+      run: ./ci/do_ci.sh bazel.test
 
   benchmark:
     name: Benchmark
@@ -170,9 +238,15 @@ jobs:
     - uses: actions/checkout@v2
       with:
         submodules: 'recursive'
+    - name: Mount Bazel Cache
+      uses: actions/cache@v2
+      env:
+        cache-name: bazel_cache
+      with:
+        path: /home/runner/.cache/bazel
+        key: bazel_benchmark
     - name: setup
       run: |
-        sudo ./ci/setup_cmake.sh
         sudo ./ci/setup_ci_environment.sh
         sudo ./ci/install_bazelisk.sh
     - name: run tests
@@ -195,15 +269,6 @@ jobs:
     - name: run tests
       run: ./ci/do_ci.sh format
 
-  osx_test:
-    name: Bazel on MacOS
-    runs-on: macos-latest
-    steps:
-    - uses: actions/checkout@v2
-      with:
-        submodules: 'recursive'
-    - name: run tests
-      run: ./ci/do_ci.sh bazel.test
 
   windows:
     name: CMake -> exporter proto

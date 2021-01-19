@@ -110,12 +110,16 @@ class SessionManager;
 class Session : public http_client::Session
 {
 public:
-  Session(SessionManager &session_manager, std::string host, uint16_t port = 80)
+  Session(SessionManager &session_manager, const std::string &host, uint16_t port = 80)
       : session_manager_(session_manager), is_session_active_(false)
   {
     if (host.rfind("http://", 0) != 0 && host.rfind("https://", 0) != 0)
     {
       host_ = "http://" + host;  // TODO - https support
+    }
+    else
+    {
+      host_ = host;
     }
     host_ += ":" + std::to_string(port) + "/";
   }
@@ -198,6 +202,12 @@ public:
 
   void SetId(uint64_t session_id) { session_id_ = session_id; }
 
+  /**
+   * Returns the base URI.
+   * @return the base URI as a string consisting of scheme, host and port.
+   */
+  const std::string &GetBaseUri() const { return host_; }
+
 private:
   std::shared_ptr<Request> http_request_;
   std::string host_;
@@ -211,7 +221,7 @@ class SessionManager : public http_client::SessionManager
 {
 public:
   // The call (curl_global_init) is not thread safe. Ensure this is called only once.
-  SessionManager() { curl_global_init(CURL_GLOBAL_ALL); }
+  SessionManager() : next_session_id_{0} { curl_global_init(CURL_GLOBAL_ALL); }
 
   std::shared_ptr<http_client::Session> CreateSession(nostd::string_view host,
                                                       uint16_t port = 80) noexcept override

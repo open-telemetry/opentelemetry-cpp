@@ -27,3 +27,8 @@
 	path = third_party/opentelemetry-proto
 	url = https://github.com/open-telemetry/opentelemetry-proto
 	branch = master
+
+[submodule "third_party/nlohmann-json"]
+	path = third_party/nlohmann-json
+	url = https://github.com/nlohmann/json
+	branch = master

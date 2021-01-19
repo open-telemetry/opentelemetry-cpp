@@ -18,7 +18,7 @@
 
 #include <chrono>
 #include <memory>
-#include "opentelemetry/logs/log_record.h"
+#include "opentelemetry/sdk/logs/recordable.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace sdk
@@ -35,10 +35,19 @@ public:
   virtual ~LogProcessor() = default;
 
   /**
+   * Create a log recordable. This requests a new log recordable from the
+   * associated exporter.
+   * @return a newly initialized recordable
+   *
+   * Note: This method must be callable from multiple threads.
+   */
+  virtual std::unique_ptr<Recordable> MakeRecordable() noexcept = 0;
+
+  /**
    * OnReceive is called by the SDK once a log record has been successfully created.
    * @param record the log record
    */
-  virtual void OnReceive(std::unique_ptr<opentelemetry::logs::LogRecord> &&record) noexcept = 0;
+  virtual void OnReceive(std::unique_ptr<Recordable> &&record) noexcept = 0;
 
   /**
    * Exports all log records that have not yet been exported to the configured Exporter.
