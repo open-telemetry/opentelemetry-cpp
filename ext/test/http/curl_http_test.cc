@@ -152,7 +152,7 @@ TEST_F(BasicCurlHttpTests, HttpRequest)
 TEST_F(BasicCurlHttpTests, HttpResponse)
 {
   curl::Response res;
-  std::multimap<std::string, std::string, curl::curl_ci> m1 = {
+  http_client::Headers m1 = {
       {"name1", "value1_1"}, {"name1", "value1_2"}, {"name2", "value3"}, {"name3", "value3"}};
   res.headers_ = m1;
 
@@ -250,9 +250,9 @@ TEST_F(BasicCurlHttpTests, CurlHttpOperations)
   const char *b          = "test-data";
   http_client::Body body = {b, b + strlen(b)};
 
-  std::multimap<std::string, std::string, curl::curl_ci> m1 = {
+  http_client::Headers headers = {
       {"name1", "value1_1"}, {"name1", "value1_2"}, {"name2", "value3"}, {"name3", "value3"}};
-  curl::Headers headers = m1;
+
   curl::HttpOperation http_operations1(http_client::Method::Head, "/get", handler,
                                        curl::RequestMode::Async, headers, body, true);
   http_operations1.Send();
@@ -270,21 +270,19 @@ TEST_F(BasicCurlHttpTests, CurlHttpOperations)
 TEST_F(BasicCurlHttpTests, SendGetRequestSync)
 {
   received_requests_.clear();
-  curl::SessionManager session_manager;
+  curl::HttpClient session_manager;
 
-  auto session = session_manager.CreateSession("127.0.0.1", HTTP_PORT);
-  auto request = session->CreateRequest();
-  request->SetUri("get/");
-  http_client::SessionState session_state;
-  auto response = session->SendRequestSync(session_state);
-  EXPECT_EQ(response->GetStatusCode(), 200);
-  EXPECT_EQ(session_state, http_client::SessionState::Response);
+  http_client::Headers m1 = {};
+  auto result =
+      session_manager.Get("http://127.0.0.1:19000/get/", m1);  //           (session_state);
+  EXPECT_EQ(result, true);
+  EXPECT_EQ(result.GetSessionState(), http_client::SessionState::Response);
 }
 
 TEST_F(BasicCurlHttpTests, SendGetRequestSyncTimeout)
 {
   received_requests_.clear();
-  curl::SessionManager session_manager;
+  curl::HttpClient session_manager;
 
   auto session =
       session_manager.CreateSession("222.222.222.200", HTTP_PORT);  // Non Existing address
@@ -292,14 +290,18 @@ TEST_F(BasicCurlHttpTests, SendGetRequestSyncTimeout)
   request->SetTimeoutMs(std::chrono::milliseconds(3000));
   request->SetUri("get/");
   http_client::SessionState session_state;
-  auto response = session->SendRequestSync(session_state);
-  EXPECT_EQ(session_state, http_client::SessionState::ConnectFailed);
-  EXPECT_TRUE(response == nullptr);
+
+  http_client::Headers m1 = {};
+  auto result =
+      session_manager.Get("http://222.222.222.200:19000/get/", m1);  //           (session_state);
+  EXPECT_EQ(result, false);
+
+  EXPECT_EQ(result.GetSessionState(), http_client::SessionState::ConnectFailed);
 }
 
 TEST_F(BasicCurlHttpTests, GetBaseUri)
 {
-  curl::SessionManager session_manager;
+  curl::HttpClient session_manager;
 
   auto session = session_manager.CreateSession("127.0.0.1", 80);
   ASSERT_EQ(std::static_pointer_cast<curl::Session>(session)->GetBaseUri(), "http://127.0.0.1:80/");

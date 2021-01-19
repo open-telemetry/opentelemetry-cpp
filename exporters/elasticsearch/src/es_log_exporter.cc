@@ -124,11 +124,11 @@ private:
 
 ElasticsearchLogExporter::ElasticsearchLogExporter()
     : options_{ElasticsearchExporterOptions()},
-      session_manager_{new ext::http::client::curl::SessionManager()}
+      session_manager_{new ext::http::client::curl::HttpClient()}
 {}
 
 ElasticsearchLogExporter::ElasticsearchLogExporter(const ElasticsearchExporterOptions &options)
-    : options_{options}, session_manager_{new ext::http::client::curl::SessionManager()}
+    : options_{options}, session_manager_{new ext::http::client::curl::HttpClient()}
 {}
 
 std::unique_ptr<sdklogs::Recordable> ElasticsearchLogExporter::MakeRecordable() noexcept

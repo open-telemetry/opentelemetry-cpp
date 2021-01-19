@@ -35,17 +35,6 @@ enum class RequestMode
   Async
 };
 
-struct curl_ci
-{
-  bool operator()(const std::string &s1, const std::string &s2) const
-  {
-    return std::lexicographical_compare(
-        s1.begin(), s1.end(), s2.begin(), s2.end(),
-        [](char c1, char c2) { return ::tolower(c1) < ::tolower(c2); });
-  }
-};
-using Headers = std::multimap<std::string, std::string, curl_ci>;
-
 class HttpOperation
 {
 public:
@@ -80,13 +69,12 @@ public:
                 http_client::EventHandler *callback,
                 RequestMode request_mode = RequestMode::Async,
                 // Default empty headers and empty request body
-                const Headers &request_headers        = Headers(),
-                const http_client::Body &request_body = http_client::Body(),
+                const http_client::Headers &request_headers = http_client::Headers(),
+                const http_client::Body &request_body       = http_client::Body(),
                 // Default connectivity and response size options
                 bool is_raw_response                        = false,
                 std::chrono::milliseconds http_conn_timeout = default_http_conn_timeout)
-      :  //
-        method_(method),
+      : method_(method),
         url_(url),
         callback_(callback),
         request_mode_(request_mode),
