@@ -262,7 +262,7 @@ public:
                            const Data &data,
                            http_client::Headers &headers) noexcept override
   {
-    HttpOperation curl_operation(http_client::Method::Get, url.data(), nullptr, RequestMode::Sync,
+    HttpOperation curl_operation(http_client::Method::Post, url.data(), nullptr, RequestMode::Sync,
                                  headers);
     if (headers.size() == 0)
     {
