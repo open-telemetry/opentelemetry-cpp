@@ -1,4 +1,5 @@
 find_package(CURL)
 if(CURL_FOUND)
-  add_library(opentelemetry_curl_factory http_client_factory_curl)
+  add_library(opentelemetry_curl_factory http_client_factory_curl.cc)
+  target_link_libraries(opentelemetry_curl_factory CURL::libcurl)
 endif()
