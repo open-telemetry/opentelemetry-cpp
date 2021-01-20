@@ -1,5 +1,3 @@
-add_subdirectory(w3c_tracecontext_test)
-
 foreach(
   testname
   tracer_provider_test
