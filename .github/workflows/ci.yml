@@ -331,6 +331,18 @@ jobs:
       with:
         file: /home/runner/build/coverage.info
 
+  misspell:
+    runs-on: ubuntu-latest
+    steps:
+    - name: check out code
+      uses: actions/checkout@v2
+
+    - name: install misspell
+      run: sudo make install-misspell
+
+    - name: run misspell
+      run: make misspell
+
   docfx_check:
     name: DocFX check
     runs-on: windows-latest
