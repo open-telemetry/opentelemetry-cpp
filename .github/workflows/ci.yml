@@ -342,7 +342,7 @@ jobs:
         sh ./install-misspell.sh
 
     - name: run misspell
-      run: ./bin/misspell .
+      run: ./bin/misspell -error .
 
 
   docfx_check:
