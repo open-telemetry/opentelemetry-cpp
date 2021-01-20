@@ -44,7 +44,7 @@ TEST(ETWTracer, TracerCheck)
   // [Docker]                                 {a3693192-9ed6-46d2-a981-f8226c8363bd}
   // ...
   // Intel-Autologger-iclsClient              {B8D7E9A0-65D5-40BE-AFEA-83593FC0164E}
-  // Intel-Autologger-iclsProxy               {301B773F-50F3-4C8E-83F0-53BA9590A13E}
+  // Intel-Autologger-iclsProxy                {301B773F-50F3-4C8E-83F0-53BA9590A13E}
   // Intel-Autologger-PTTEKRecertification    {F33E9E07-8792-47E8-B3FA-2C92AB32C5B3}
   // ...
   // NodeJS-ETW-provider                      {77754E9B-264B-4D8D-B981-E4135C1ECB0C}

@@ -33,9 +33,9 @@
 #include "opentelemetry/sdk/trace/exporter.h"
 #include "opentelemetry/sdk/trace/recordable.h"
 
-#include "opentelemetry/exporters/etw/etw_data.h"
 #include "opentelemetry/exporters/etw/etw_provider.h"
 #include "opentelemetry/exporters/etw/etw_recordable.h"
+#include "opentelemetry/exporters/etw/etw_tracer.h"
 
 #include "opentelemetry/exporters/etw/utils.h"
 
@@ -77,7 +77,7 @@ public:
    */
   std::unique_ptr<sdk::trace::Recordable> MakeRecordable() noexcept override
   {
-    return std::unique_ptr<sdk::trace::Recordable>(new ETWSpanData(providerName_));
+    return std::unique_ptr<sdk::trace::Recordable>(new ETWTraceRecordable(providerName_));
   }
 
   /**
@@ -90,7 +90,8 @@ public:
   {
     for (auto &recordable : recordables)
     {
-      auto span = std::unique_ptr<ETWSpanData>(dynamic_cast<ETWSpanData *>(recordable.release()));
+      auto span = std::unique_ptr<ETWTraceRecordable>(
+          dynamic_cast<ETWTraceRecordable *>(recordable.release()));
       if (span != nullptr)
       {
         std::cout << span->GetName() << std::endl;
