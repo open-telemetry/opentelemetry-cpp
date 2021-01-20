@@ -15,7 +15,7 @@ receivers:
   otlp:
     protocols:
       grpc:
-        endpoint: localhost:55680
+        endpoint: localhost:4317
 exporters:
   zipkin:
     endpoint: "http://localhost:9411/api/v2/spans"
@@ -26,6 +26,6 @@ service:
       exporters: [zipkin]
 ```
 
-Note that the OTLP exporter connects to the Collector at `localhost:55680` by default. This can be changed with first argument from command-line, for example: `./example_otlp gateway.docker.internal:55680`.
+Note that the OTLP exporter connects to the Collector at `localhost:4317` by default. This can be changed with first argument from command-line, for example: `./example_otlp gateway.docker.internal:4317`.
 
 Once you have the Collector running, see [CONTRIBUTING.md](../../CONTRIBUTING.md) for instructions on building and running the example.
