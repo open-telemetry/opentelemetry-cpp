@@ -116,7 +116,7 @@ A PR is considered to be **ready to merge** when:
 * Trivial changes (typo, cosmetic, doc, etc.) don't have to wait for one day.
 * Urgent fixes can take exceptions as long as it has been actively communicated.
 
-Any Maintainer can merge the PR once it is **ready to merge**.
+Any Maintainer can merge the PR once it is **ready to merge**. Maintainer can make conscious judgement to merge pull requests which have not strictly met above requirements.
 
 If a PR has been stuck (e.g. there are lots of debates and people couldn't agree on each other), the owner should try to get people aligned by:
 
