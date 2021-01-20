@@ -191,7 +191,7 @@ sdklogs::ExportResult ElasticsearchLogExporter::Export(
   // End the session
   session->FinishSession();
 
-  // If an error occured with the HTTP request
+  // If an error occurred with the HTTP request
   if (!write_successful)
   {
     // TODO: retry logic
