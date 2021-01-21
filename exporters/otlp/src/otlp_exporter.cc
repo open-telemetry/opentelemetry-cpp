@@ -40,7 +40,7 @@ std::unique_ptr<proto::collector::trace::v1::TraceService::Stub> MakeServiceStub
   return proto::collector::trace::v1::TraceService::NewStub(channel);
 }
 
-// -------------------------------- Contructors --------------------------------
+// -------------------------------- Constructors --------------------------------
 
 OtlpExporter::OtlpExporter() : OtlpExporter(OtlpExporterOptions()) {}
 
