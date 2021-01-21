@@ -200,9 +200,11 @@ endif()
 include(CMakePackageConfigHelpers)
 
 include_directories(api/include)
-add_subdirectory(api)
 include_directories(sdk/include)
 include_directories(sdk)
+include_directories(ext/include)
+
+add_subdirectory(api)
 add_subdirectory(sdk)
 add_subdirectory(exporters)
 if(WITH_EXAMPLES)
