@@ -9,20 +9,18 @@ namespace sdk
 namespace resource
 {
 
-const std::string TELEMETRY_SDK_LANGUAGE = "telemetry.sdk.language";
-const std::string TELEMETRY_SDK_NAME     = "telemetry.sdk.name";
-const std::string TELEMETRY_SDK_VERSION  = "telemetry.sdk.version";
+const std::string kTelemetrySdkLanguage = "telemetry.sdk.language";
+const std::string kTelemetrySdkName     = "telemetry.sdk.name";
+const std::string kTelemetrySdkVersion  = "telemetry.sdk.version";
 
 Resource::Resource(const ResourceAttributes &attributes) noexcept : attributes_(attributes) {}
 
 Resource Resource::Merge(const Resource &other) noexcept
 {
-  ResourceAttributes merged_resource_attributes(attributes_);
-  for (auto &elem : other.attributes_)
+  ResourceAttributes merged_resource_attributes(other.attributes_);
+  for (auto &elem : attributes_)
   {
-    if ((merged_resource_attributes.find(elem.first) == merged_resource_attributes.end()) ||
-        (nostd::holds_alternative<std::string>(attributes_[elem.first]) &&
-         nostd::get<std::string>(attributes_[elem.first]).size() == 0))
+    if (merged_resource_attributes.find(elem.first) == merged_resource_attributes.end())
     {
       merged_resource_attributes[elem.first] = elem.second;
     }
@@ -52,9 +50,9 @@ Resource &Resource::GetEmpty()
 
 Resource &Resource::GetDefault()
 {
-  static Resource default_resource({{TELEMETRY_SDK_LANGUAGE, "cpp"},
-                                    {TELEMETRY_SDK_NAME, "opentelemetry"},
-                                    {TELEMETRY_SDK_VERSION, OPENTELEMETRY_SDK_VERSION}});
+  static Resource default_resource({{kTelemetrySdkLanguage, "cpp"},
+                                    {kTelemetrySdkName, "opentelemetry"},
+                                    {kTelemetrySdkVersion, OPENTELEMETRY_SDK_VERSION}});
   return default_resource;
 }
 

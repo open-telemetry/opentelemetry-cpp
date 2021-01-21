@@ -54,12 +54,12 @@ TEST(ResourceTest, create)
 
 TEST(ResourceTest, Merge)
 {
-  std::map<std::string, std::string> expected_attributes = {{"service", "backend"},
-                                                            {"host", "service-host"}};
   TestResource resource1(
       opentelemetry::sdk::resource::ResourceAttributes({{"service", "backend"}}));
   TestResource resource2(
       opentelemetry::sdk::resource::ResourceAttributes({{"host", "service-host"}}));
+  std::map<std::string, std::string> expected_attributes = {{"service", "backend"},
+                                                            {"host", "service-host"}};
 
   auto merged_resource     = resource1.Merge(resource2);
   auto received_attributes = merged_resource.GetAttributes();
@@ -74,13 +74,22 @@ TEST(ResourceTest, Merge)
 }
 TEST(ResourceTest, MergeEmptyString)
 {
-  std::map<std::string, std::string> expected_attributes = {{"service", "backend"},
-                                                            {"host", "service-host"}};
-  TestResource resource1({{"service", ""}, {"host", "service-host"}});
-  TestResource resource2({{"service", "backend"}, {"host", "another-service-host"}});
+  TestResource resource1({{"service", "backend"}, {"host", "service-host"}});
+  TestResource resource2({{"service", ""}, {"host", "another-service-host"}});
+  std::map<std::string, std::string> expected_attributes = {{"service", ""},
+                                                            {"host", "another-service-host"}};
 
   auto merged_resource     = resource1.Merge(resource2);
   auto received_attributes = merged_resource.GetAttributes();
+
+  for (auto &e : received_attributes)
+  {
+    EXPECT_TRUE(expected_attributes.find(e.first) != expected_attributes.end());
+    if (expected_attributes.find(e.first) != expected_attributes.end())
+      EXPECT_EQ(expected_attributes.find(e.first)->second,
+                opentelemetry::nostd::get<std::string>(e.second));
+  }
+  EXPECT_EQ(received_attributes.size(), expected_attributes.size());
 }
 
 // this test uses putenv to set the env variable - this is not available on windows

@@ -57,7 +57,7 @@ public:
 
   static Resource &GetDefault();
 
-private:
+protected:
   /**
    * The constructor is private and only for use internally by the class and
    * inside ResourceDetector class.
@@ -66,6 +66,7 @@ private:
    */
   Resource(const ResourceAttributes &attributes = ResourceAttributes()) noexcept;
 
+private:
   ResourceAttributes attributes_;
 
   friend class OTELResourceDetector;
