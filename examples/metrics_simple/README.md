@@ -26,7 +26,7 @@ shared_ptr<MetricsProcessor> processor = shared_ptr<MetricsProcessor>(new Ungrou
 `metrics_sdk::PushController controller(meter, std::move(exporter), processor, 5);`
 `controller.start();`
 
-6. Instrument code with synchronous and asynchronous instrument. These instruments can be placed in areas of interest to collect metrics and are created by the meter. Synchronous instruments are updated whenever the user desires with a value and label set. Calling add on a counter instrument for example will increase its value.  Asynchronous instruments can be updated the same way, but are intended to recieve updates from a callback function. The callback below observes a value of 1. The user never has to call this function as it is automatically called by the controller.
+6. Instrument code with synchronous and asynchronous instrument. These instruments can be placed in areas of interest to collect metrics and are created by the meter. Synchronous instruments are updated whenever the user desires with a value and label set. Calling add on a counter instrument for example will increase its value.  Asynchronous instruments can be updated the same way, but are intended to receive updates from a callback function. The callback below observes a value of 1. The user never has to call this function as it is automatically called by the controller.
 
 ```
 

@@ -119,7 +119,7 @@ static void BM_ThreadYieldSpinLockThrashing(benchmark::State &s)
       [](std::atomic<bool> &l) { l.store(false, std::memory_order_release); });
 }
 
-// Run the benchamrks at 2x thread/core and measure the amount of time to thrash around.
+// Run the benchmarks at 2x thread/core and measure the amount of time to thrash around.
 BENCHMARK(BM_SpinLockThrashing)
     ->RangeMultiplier(2)
     ->Range(1, std::thread::hardware_concurrency())

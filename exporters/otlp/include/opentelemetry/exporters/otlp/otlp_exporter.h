@@ -14,7 +14,7 @@ namespace otlp
 struct OtlpExporterOptions
 {
   // The endpoint to export to. By default the OpenTelemetry Collector's default endpoint.
-  std::string endpoint = "localhost:55680";
+  std::string endpoint = "localhost:4317";
 };
 
 /**
