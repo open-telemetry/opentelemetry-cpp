@@ -59,7 +59,7 @@ public:
 
 protected:
   /**
-   * The constructor is private and only for use internally by the class and
+   * The constructor is protected and only for use internally by the class and
    * inside ResourceDetector class.
    * Users should use the Create factory method to obtain a Resource
    * instance.
