@@ -340,10 +340,8 @@ jobs:
       run: |
         curl -L -o ./install-misspell.sh https://git.io/misspell
         sh ./install-misspell.sh
-
     - name: run misspell
       run: ./bin/misspell -error .
-
 
   docfx_check:
     name: DocFX check
