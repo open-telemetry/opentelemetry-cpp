@@ -26,7 +26,6 @@ cc_binary(
     deps = [
         "//ext:headers",
         "//ext/src/zpages",
-        "//sdk/src/resource",
         "//sdk/src/trace",
     ],
 )
