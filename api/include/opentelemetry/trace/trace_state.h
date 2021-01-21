@@ -21,8 +21,7 @@
 #include "opentelemetry/nostd/string_view.h"
 #include "opentelemetry/nostd/unique_ptr.h"
 
-namespace opentelemetry
-{
+OPENTELEMETRY_BEGIN_NAMESPACE
 namespace trace
 {
 
@@ -117,7 +116,7 @@ public:
   }
 
   // Creates an Entry for the key-value pair and adds it to entries. Returns true if pair was added
-  // succesfully, false otherwise. If value is null or entries_ is full, this function is a no-op.
+  // successfully, false otherwise. If value is null or entries_ is full, this function is a no-op.
   bool Set(nostd::string_view key, nostd::string_view value) noexcept
   {
     if (value.empty() || num_entries_ >= kMaxKeyValuePairs)
@@ -193,4 +192,4 @@ private:
 };
 
 }  // namespace trace
-}  // namespace opentelemetry
+OPENTELEMETRY_END_NAMESPACE

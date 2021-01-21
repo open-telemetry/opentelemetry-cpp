@@ -38,7 +38,7 @@ public:
    * @param description explains what the metric captures
    * @param unit specifies the data type held in the instrument
    * @param enabled determines if the metric is currently capturing data
-   * @return Instrument type with the specified attirbutes
+   * @return Instrument type with the specified attributes
    */
   Instrument(nostd::string_view name,
              nostd::string_view description,
