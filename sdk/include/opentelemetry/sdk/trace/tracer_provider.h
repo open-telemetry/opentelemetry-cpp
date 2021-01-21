@@ -26,10 +26,11 @@ public:
    * @param sampler The sampler for this tracer provider. This must
    * not be a nullptr.
    */
-  explicit TracerProvider(std::shared_ptr<SpanProcessor> processor,
-                          std::shared_ptr<Sampler> sampler = std::make_shared<AlwaysOnSampler>(),
-                          opentelemetry::sdk::resource::Resource &&resource =
-                              opentelemetry::sdk::resource::Resource::Create({})) noexcept;
+  explicit TracerProvider(
+      std::shared_ptr<SpanProcessor> processor,
+      opentelemetry::sdk::resource::Resource &&resource =
+          opentelemetry::sdk::resource::Resource::Create({}),
+      std::shared_ptr<Sampler> sampler = std::make_shared<AlwaysOnSampler>()) noexcept;
 
   opentelemetry::nostd::shared_ptr<opentelemetry::trace::Tracer> GetTracer(
       nostd::string_view library_name,

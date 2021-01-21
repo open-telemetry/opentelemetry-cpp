@@ -24,9 +24,8 @@ public:
    * nullptr.
    */
   explicit Tracer(std::shared_ptr<SpanProcessor> processor,
-                  std::shared_ptr<Sampler> sampler = std::make_shared<AlwaysOnSampler>(),
-                  const opentelemetry::sdk::resource::Resource &resource =
-                      opentelemetry::sdk::resource::Resource::Create({})) noexcept;
+                  const opentelemetry::sdk::resource::Resource &resource,
+                  std::shared_ptr<Sampler> sampler = std::make_shared<AlwaysOnSampler>()) noexcept;
 
   /**
    * Set the span processor associated with this tracer.

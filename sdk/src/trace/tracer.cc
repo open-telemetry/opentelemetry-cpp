@@ -11,8 +11,8 @@ namespace sdk
 namespace trace
 {
 Tracer::Tracer(std::shared_ptr<SpanProcessor> processor,
-               std::shared_ptr<Sampler> sampler,
-               const opentelemetry::sdk::resource::Resource &resource) noexcept
+               const opentelemetry::sdk::resource::Resource &resource,
+               std::shared_ptr<Sampler> sampler) noexcept
     : processor_{processor}, sampler_{sampler}, resource_{resource}
 {}
 

@@ -6,7 +6,6 @@ cc_binary(
     deps = [
         "//api",
         "//exporters/ostream:ostream_span_exporter",
-        "//sdk/src/resource",
         "//sdk/src/trace",
     ],
 )

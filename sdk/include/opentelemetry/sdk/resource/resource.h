@@ -21,6 +21,8 @@ using ResourceAttributes =
 class Resource
 {
 public:
+  Resource(const Resource &) = default;
+
   const ResourceAttributes &GetAttributes() const noexcept;
 
   /**
@@ -55,7 +57,7 @@ public:
 
   static Resource &GetDefault();
 
-protected:
+private:
   /**
    * The constructor is private and only for use internally by the class and
    * inside ResourceDetector class.
@@ -64,7 +66,6 @@ protected:
    */
   Resource(const ResourceAttributes &attributes = ResourceAttributes()) noexcept;
 
-private:
   ResourceAttributes attributes_;
 
   friend class OTELResourceDetector;

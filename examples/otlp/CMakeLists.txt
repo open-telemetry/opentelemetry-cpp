@@ -12,7 +12,6 @@ target_link_libraries(
   ${CMAKE_THREAD_LIBS_INIT}
   otlp_foo_library
   opentelemetry_trace
-  opentelemetry_resources
   ${CORE_RUNTIME_LIBS}
   opentelemetry_exporter_otprotocol
   gRPC::grpc++)
