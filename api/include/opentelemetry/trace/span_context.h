@@ -44,7 +44,8 @@ public:
       : trace_id_(),
         span_id_(),
         trace_flags_(trace_api::TraceFlags((uint8_t)sampled_flag)),
-        is_remote_(is_remote) {}
+        is_remote_(is_remote)
+  {}
 
   // @returns whether this context is valid
   bool IsValid() const noexcept { return trace_id_.IsValid() && span_id_.IsValid(); }
@@ -56,14 +57,8 @@ public:
 
   const trace_api::SpanId &span_id() const noexcept { return span_id_; }
 
-  SpanContext(TraceId trace_id,
-              SpanId span_id,
-              TraceFlags trace_flags,
-              bool is_remote) noexcept
-      : trace_id_(trace_id),
-        span_id_(span_id),
-        trace_flags_(trace_flags),
-        is_remote_(is_remote)
+  SpanContext(TraceId trace_id, SpanId span_id, TraceFlags trace_flags, bool is_remote) noexcept
+      : trace_id_(trace_id), span_id_(span_id), trace_flags_(trace_flags), is_remote_(is_remote)
   {}
 
   SpanContext(const SpanContext &ctx) = default;
