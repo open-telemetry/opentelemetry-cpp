@@ -1,4 +1,5 @@
 #include "opentelemetry/ext//http/client/curl//http_client_curl.h"
+#include "opentelemetry/ext/http/client/http_client_factory.h"
 #include "opentelemetry/ext/http/server/http_server.h"
 
 #include <assert.h>
@@ -184,9 +185,10 @@ TEST_F(BasicCurlHttpTests, HttpResponse)
 TEST_F(BasicCurlHttpTests, SendGetRequest)
 {
   received_requests_.clear();
-  curl::SessionManager session_manager;
+  auto session_manager = http_client::HttpClientFactory::Create();
+  EXPECT_TRUE(session_manager != nullptr);
 
-  auto session = session_manager.CreateSession("127.0.0.1", HTTP_PORT);
+  auto session = session_manager->CreateSession("127.0.0.1", HTTP_PORT);
   auto request = session->CreateRequest();
   request->SetUri("get/");
   GetEventHandler *handler = new GetEventHandler();
@@ -200,9 +202,10 @@ TEST_F(BasicCurlHttpTests, SendGetRequest)
 TEST_F(BasicCurlHttpTests, SendPostRequest)
 {
   received_requests_.clear();
-  curl::SessionManager session_manager;
+  auto session_manager = http_client::HttpClientFactory::Create();
+  EXPECT_TRUE(session_manager != nullptr);
 
-  auto session = session_manager.CreateSession("127.0.0.1", HTTP_PORT);
+  auto session = session_manager->CreateSession("127.0.0.1", HTTP_PORT);
   auto request = session->CreateRequest();
   request->SetUri("post/");
   request->SetMethod(http_client::Method::Post);
@@ -217,8 +220,8 @@ TEST_F(BasicCurlHttpTests, SendPostRequest)
   session->FinishSession();
   ASSERT_TRUE(handler->is_called_);
 
-  session_manager.CancelAllSessions();
-  session_manager.FinishAllSessions();
+  session_manager->CancelAllSessions();
+  session_manager->FinishAllSessions();
 
   delete handler;
 }
@@ -226,10 +229,11 @@ TEST_F(BasicCurlHttpTests, SendPostRequest)
 TEST_F(BasicCurlHttpTests, RequestTimeout)
 {
   received_requests_.clear();
-  curl::SessionManager session_manager;
+  auto session_manager = http_client::HttpClientFactory::Create();
+  EXPECT_TRUE(session_manager != nullptr);
 
   auto session =
-      session_manager.CreateSession("222.222.222.200", HTTP_PORT);  // Non Existing address
+      session_manager->CreateSession("222.222.222.200", HTTP_PORT);  // Non Existing address
   auto request = session->CreateRequest();
   request->SetUri("get/");
   GetEventHandler *handler = new GetEventHandler();

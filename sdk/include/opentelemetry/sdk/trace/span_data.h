@@ -6,7 +6,7 @@
 #include "opentelemetry/common/attribute_value.h"
 #include "opentelemetry/core/timestamp.h"
 #include "opentelemetry/nostd/string_view.h"
-#include "opentelemetry/sdk/trace/attribute_utils.h"
+#include "opentelemetry/sdk/common/attribute_utils.h"
 #include "opentelemetry/sdk/trace/recordable.h"
 #include "opentelemetry/trace/canonical_code.h"
 #include "opentelemetry/trace/span.h"
@@ -48,7 +48,7 @@ public:
    * Get the attributes for this event
    * @return the attributes for this event
    */
-  const std::unordered_map<std::string, SpanDataAttributeValue> &GetAttributes() const noexcept
+  const std::unordered_map<std::string, common::OwnedAttributeValue> &GetAttributes() const noexcept
   {
     return attribute_map_.GetAttributes();
   }
@@ -56,7 +56,7 @@ public:
 private:
   std::string name_;
   core::SystemTimestamp timestamp_;
-  AttributeMap attribute_map_;
+  common::AttributeMap attribute_map_;
 };
 
 /**
@@ -75,14 +75,14 @@ public:
    * Get the attributes for this link
    * @return the attributes for this link
    */
-  const std::unordered_map<std::string, SpanDataAttributeValue> &GetAttributes() const noexcept
+  const std::unordered_map<std::string, common::OwnedAttributeValue> &GetAttributes() const noexcept
   {
     return attribute_map_.GetAttributes();
   }
 
 private:
   opentelemetry::trace::SpanContext span_context_;
-  AttributeMap attribute_map_;
+  common::AttributeMap attribute_map_;
 };
 
 /**
@@ -149,7 +149,7 @@ public:
    * Get the attributes for this span
    * @return the attributes for this span
    */
-  const std::unordered_map<std::string, SpanDataAttributeValue> &GetAttributes() const noexcept
+  const std::unordered_map<std::string, common::OwnedAttributeValue> &GetAttributes() const noexcept
   {
     return attribute_map_.GetAttributes();
   }
@@ -229,7 +229,7 @@ private:
   std::string name_;
   opentelemetry::trace::CanonicalCode status_code_{opentelemetry::trace::CanonicalCode::OK};
   std::string status_desc_;
-  AttributeMap attribute_map_;
+  common::AttributeMap attribute_map_;
   std::vector<SpanDataEvent> events_;
   std::vector<SpanDataLink> links_;
   opentelemetry::trace::SpanKind span_kind_{opentelemetry::trace::SpanKind::kInternal};
