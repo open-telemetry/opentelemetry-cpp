@@ -181,7 +181,7 @@ TEST(UngroupedMetricsProcessor, UngroupedProcessorKeepsRecordInformationStateles
 }
 
 /**
- * The following tests are for the Stateful verison of the processor. These tests will make sure
+ * The following tests are for the Stateful version of the processor. These tests will make sure
  * that when we send the same aggreagtor twice through process(), that the values will be merged.
  * We can easily recreate this expected value by making a test aggregator that is updated through
  * both process functions but only checkpointed at the end.

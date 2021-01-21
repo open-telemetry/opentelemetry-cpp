@@ -316,8 +316,8 @@ public:
      * @param name is the identifier of the instrumenting library
      * @param description explains what the metric captures
      * @param unit specified the data type held in the instrument
-     * @param enabled determins if the metric is currently capturing data
-     * @return Instrument type with the specified attirbutes
+     * @param enabled determines if the metric is currently capturing data
+     * @return Instrument type with the specified attributes
      */
     Instrument(nostd::string_view name, nostd::string_view description, nostd::string_view unit, bool enabled);
 
@@ -412,7 +412,7 @@ public:
 
     /**
      * Captures data by activating the callback function associated with the
-     * instrument and storing its return value.  Callbacks for asychronous
+     * instrument and storing its return value.  Callbacks for asynchronous
      * instruments are defined during construction.
      *
      * @param none

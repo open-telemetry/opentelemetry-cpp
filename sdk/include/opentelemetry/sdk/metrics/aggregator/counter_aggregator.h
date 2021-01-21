@@ -28,7 +28,7 @@ public:
   }
 
   /**
-   * Recieves a captured value from the instrument and applies it to the current aggregator value.
+   * Receives a captured value from the instrument and applies it to the current aggregator value.
    *
    * @param val, the raw value used in aggregation
    * @return none

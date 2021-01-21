@@ -48,7 +48,7 @@ public:
   }
 
   /**
-   * Recieves a captured value from the instrument and inserts it into the current histogram counts.
+   * Receives a captured value from the instrument and inserts it into the current histogram counts.
    *
    * Depending on the use case, a linear search or binary search based implementation may be
    * preferred. In uniformly distributed datasets, linear search outperforms binary search until 512
