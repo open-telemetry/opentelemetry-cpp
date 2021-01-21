@@ -356,7 +356,7 @@ TEST_F(TracezDataAggregatorTest, MultipleErrorSpans)
 /**
  * This test checks to see that the maximum number of running samples(5) for a
  * bucket is not exceeded. If there are more spans than this for a single bucket
- * it removes the earliest span that was recieved
+ * it removes the earliest span that was received
  */
 TEST_F(TracezDataAggregatorTest, RunningSampleSpansOverCapacity)
 {
@@ -387,7 +387,7 @@ TEST_F(TracezDataAggregatorTest, RunningSampleSpansOverCapacity)
 /**
  * This test checks to see that the maximum number of error samples(5) for a
  * bucket is not exceeded. If there are more spans than this for a single bucket
- * it removes the earliest span that was recieved
+ * it removes the earliest span that was received
  */
 TEST_F(TracezDataAggregatorTest, ErrorSampleSpansOverCapacity)
 {
@@ -429,7 +429,7 @@ TEST_F(TracezDataAggregatorTest, ErrorSampleSpansOverCapacity)
 /**
  * This test checks to see that the maximum number of latency samples(5) for a
  * bucket is not exceeded. If there are more spans than this for a single bucket
- * it removes the earliest span that was recieved
+ * it removes the earliest span that was received
  */
 TEST_F(TracezDataAggregatorTest, CompletedSampleSpansOverCapacity)
 {
