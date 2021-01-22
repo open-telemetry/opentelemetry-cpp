@@ -21,11 +21,11 @@ namespace trace
 namespace propagation
 {
 
-static const nostd::string_view B3CombinedHeader = "b3";
+static const nostd::string_view kB3CombinedHeader = "b3";
 
-static const nostd::string_view B3TraceIdHeader = "X-B3-TraceId";
-static const nostd::string_view B3SpanIdHeader  = "X-B3-SpanId";
-static const nostd::string_view B3SampledHeader = "X-B3-Sampled";
+static const nostd::string_view kB3TraceIdHeader = "X-B3-TraceId";
+static const nostd::string_view kB3SpanIdHeader  = "X-B3-SpanId";
+static const nostd::string_view kB3SampledHeader = "X-B3-Sampled";
 
 /*
      B3, single header:
@@ -78,7 +78,7 @@ public:
   {
     uint8_t buf[kTraceIdHexStrLength / 2];
     uint8_t *b_ptr = buf;
-    GenerateHexFromString(trace_id, kTraceIdHexStrLength, b_ptr);
+    GenerateBuffFromHexStrPad0(trace_id, sizeof(buf), buf);
     return TraceId(buf);
   }
 
@@ -86,43 +86,49 @@ public:
   {
     uint8_t buf[kSpanIdHexStrLength / 2];
     uint8_t *b_ptr = buf;
-    GenerateHexFromString(span_id, kSpanIdHexStrLength, b_ptr);
+    GenerateBuffFromHexStrPad0(span_id, sizeof(buf), buf);
     return SpanId(buf);
   }
 
   static TraceFlags GenerateTraceFlagsFromString(nostd::string_view trace_flags)
   {
     if (trace_flags.length() != 1 || (trace_flags[0] != '1' && trace_flags[0] != 'd'))
-    {
-      return TraceFlags(0);  // check for invalid length of flags
+    {  // check for invalid length of flags and treat 'd' as sampled
+      return TraceFlags(0);
     }
-    return TraceFlags(TraceFlags::kIsSampled);  // treat 'd' as kIsSampled
+    return TraceFlags(TraceFlags::kIsSampled);
   }
 
 private:
-  // Converts the hex numbers stored as strings into bytes stored in a buffer.
-  static void GenerateHexFromString(nostd::string_view string, int bytes, uint8_t *buf)
+  // Converts hex numbers (string_view) into bytes stored in a buffer and pads buffer with 0.
+  static void GenerateBuffFromHexStrPad0(nostd::string_view string, int bufSize, uint8_t *buf)
   {
-    const char *str_id = string.data();
-    for (int i = 0; i < bytes; i++)
+    const char *strBeg                         = string.data();
+    const nostd::string_view::size_type strLen = string.length();
+    nostd::string_view::size_type posInp       = 0;
+    int posOut                                 = 0;
+    while (posOut < bufSize)
     {
-      int tmp = HexToInt(str_id[i]);
-      if (tmp < 0)
+      int cur = 0;
+      if (posInp < strLen)
       {
-        for (int j = 0; j < bytes / 2; j++)
+        int hexDigit1 = HexToInt(strBeg[posInp++]);
+        int hexDigit2 = 0;
+        if (posInp < strLen)
         {
-          buf[j] = 0;
+          hexDigit2 = HexToInt(strBeg[posInp++]);
         }
-        return;
+        if (hexDigit1 < 0 || hexDigit2 < 0)
+        {  // malformed hex sequence. Fill entire buffer with zeroes.
+          for (int j = 0; j < bufSize; j++)
+          {
+            buf[j] = 0;
+          }
+          return;
+        }
+        cur = hexDigit1 * 16 + hexDigit2;
       }
-      if (i % 2 == 0)
-      {
-        buf[i / 2] = tmp * 16;
-      }
-      else
-      {
-        buf[i / 2] += tmp;
-      }
+      buf[posOut++] = cur;
     }
   }
 
@@ -148,17 +154,6 @@ private:
     }
   }
 
-  static bool IsValidHex(nostd::string_view string_view)
-  {
-    for (int i = 0; i < string_view.length(); i++)
-    {
-      if (!(string_view[i] >= '0' && string_view[i] <= '9') &&
-          !(string_view[i] >= 'a' && string_view[i] <= 'f'))
-        return false;
-    }
-    return true;
-  }
-
   static SpanContext ExtractImpl(Getter getter, const T &carrier)
   {
     // all these are hex values
@@ -167,46 +162,51 @@ private:
     nostd::string_view trace_flags;
 
     // first let's try a single-header variant
-    auto singleB3Header = getter(carrier, B3CombinedHeader);
-    if (singleB3Header != "")
+    auto singleB3Header = getter(carrier, kB3CombinedHeader);
+    if (!singleB3Header.empty())
     {
-      trace_id = singleB3Header.substr(0, kTraceIdHexStrLength);
-      if (singleB3Header.size() > 33)
-      {
-        span_id = singleB3Header.substr(33, kSpanIdHexStrLength);
-      }
-      if (singleB3Header.size() > 50)
-      {
-        trace_flags = singleB3Header.substr(50, kTraceFlagHexStrLength);
+      // From: https://github.com/openzipkin/b3-propagation/blob/master/RATIONALE.md
+      // trace_id can be 16 or 32 chars
+      auto firstSep = singleB3Header.find('-');
+      trace_id      = singleB3Header.substr(0, firstSep);
+      if (firstSep != nostd::string_view::npos)
+      {  // at least two fields are required
+        auto secondSep = singleB3Header.find('-', firstSep + 1);
+        if (secondSep != nostd::string_view::npos)
+        {  // more than two fields - check also trace_flags
+          span_id = singleB3Header.substr(firstSep + 1, secondSep - firstSep - 1);
+          if (secondSep + 1 < singleB3Header.size())
+          {
+            trace_flags = singleB3Header.substr(secondSep + 1, kTraceFlagHexStrLength);
+          }
+        }
+        else
+        {
+          span_id = singleB3Header.substr(firstSep + 1);
+        }
       }
     }
     else
     {
-      trace_id    = getter(carrier, B3TraceIdHeader);
-      span_id     = getter(carrier, B3SpanIdHeader);
-      trace_flags = getter(carrier, B3SampledHeader);
-    }
-
-    // validate ids
-    if (!IsValidHex(trace_id) || !IsValidHex(span_id) || !IsValidHex(trace_flags) ||
-        trace_id == "00000000000000000000000000000000" || span_id == "0000000000000000")
-    {
-      return SpanContext(false, false);
+      trace_id    = getter(carrier, kB3TraceIdHeader);
+      span_id     = getter(carrier, kB3SpanIdHeader);
+      trace_flags = getter(carrier, kB3SampledHeader);
     }
 
     // now convert hex to objects
-    TraceId trace_id_obj       = GenerateTraceIdFromString(trace_id);
-    SpanId span_id_obj         = GenerateSpanIdFromString(span_id);
+    TraceId trace_id_obj = GenerateTraceIdFromString(trace_id);
+    SpanId span_id_obj   = GenerateSpanIdFromString(span_id);
+    if (!trace_id_obj.IsValid() || !span_id_obj.IsValid())
+    {
+      return SpanContext(false, false);
+    }
     TraceFlags trace_flags_obj = GenerateTraceFlagsFromString(trace_flags);
     return SpanContext(trace_id_obj, span_id_obj, trace_flags_obj, true);
   }
 };
 
-// The B3Propagator class provides an interface that enables extracting and injecting
-// context into headers of HTTP requests. HTTP frameworks and clients
-// can integrate with B3Propagator by providing the object containing the
-// headers, and a getter and setter function for the extraction and
-// injection of values, respectively.
+// The B3Propagator class provides interface that enables extracting and injecting context into
+// single header of HTTP Request.
 template <typename T>
 class B3Propagator : public B3PropagatorExtractor<T>
 {
@@ -242,7 +242,7 @@ public:
     }
     hex_string.push_back('-');
     hex_string.push_back(trace_flags[1]);
-    setter(carrier, B3CombinedHeader, hex_string);
+    setter(carrier, kB3CombinedHeader, hex_string);
   }
 };
 
@@ -267,9 +267,9 @@ public:
     SpanId(span_context.span_id()).ToLowerBase16(span_id);
     char trace_flags[2];
     TraceFlags(span_context.trace_flags()).ToLowerBase16(trace_flags);
-    setter(carrier, B3TraceIdHeader, nostd::string_view(trace_id, sizeof(trace_id)));
-    setter(carrier, B3SpanIdHeader, nostd::string_view(span_id, sizeof(span_id)));
-    setter(carrier, B3SampledHeader, nostd::string_view(trace_flags + 1, 1));
+    setter(carrier, kB3TraceIdHeader, nostd::string_view(trace_id, sizeof(trace_id)));
+    setter(carrier, kB3SpanIdHeader, nostd::string_view(span_id, sizeof(span_id)));
+    setter(carrier, kB3SampledHeader, nostd::string_view(trace_flags + 1, 1));
   }
 };
 

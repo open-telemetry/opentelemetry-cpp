@@ -72,6 +72,8 @@ TEST(B3PropagationTest, SpanIdBufferGeneration)
 TEST(B3PropagationTest, TraceFlagsBufferGeneration)
 {
   EXPECT_EQ(MapB3Context::GenerateTraceFlagsFromString("0"), trace::TraceFlags());
+  EXPECT_EQ(MapB3Context::GenerateTraceFlagsFromString("1"),
+            trace::TraceFlags(trace::TraceFlags::kIsSampled));
 }
 
 TEST(B3PropagationTest, PropagateInvalidContext)
@@ -83,6 +85,17 @@ TEST(B3PropagationTest, PropagateInvalidContext)
       nostd::shared_ptr<trace::Span>(new trace::DefaultSpan(trace::SpanContext::GetInvalid()))};
   format.Inject(Setter, carrier, ctx);
   EXPECT_TRUE(carrier.count("b3") == 0);
+}
+
+TEST(B3PropagationTest, ExtractInvalidContext)
+{
+  const std::map<std::string, std::string> carrier = {
+      {"b3", "00000000000000000000000000000000-0000000000000000-0"}};
+  context::Context ctx1 = context::Context{};
+  context::Context ctx2 = format.Extract(Getter, carrier, ctx1);
+  auto ctx2_span        = ctx2.GetValue(trace::kSpanKey);
+  auto span             = nostd::get<nostd::shared_ptr<trace::Span>>(ctx2_span);
+  EXPECT_EQ(span->GetContext().HasRemoteParent(), false);
 }
 
 TEST(B3PropagationTest, SetRemoteSpan)
@@ -100,7 +113,63 @@ TEST(B3PropagationTest, SetRemoteSpan)
   EXPECT_EQ(Hex(span->GetContext().trace_id()), "80f198ee56343ba864fe8b2a57d3eff7");
   EXPECT_EQ(Hex(span->GetContext().span_id()), "e457b5a2e4d86bd1");
   EXPECT_EQ(span->GetContext().IsSampled(), true);
-  // EXPECT_EQ(span->GetContext().HasRemoteParent(), true); // TODO: unsure about this one
+  EXPECT_EQ(span->GetContext().HasRemoteParent(), true);
+}
+
+TEST(B3PropagationTest, SetRemoteSpan_TraceIdShort)
+{
+  const std::map<std::string, std::string> carrier = {
+      {"b3", "80f198ee56343ba8-e457b5a2e4d86bd1-1-05e3ac9a4f6e3b90"}};
+  context::Context ctx1 = context::Context{};
+  context::Context ctx2 = format.Extract(Getter, carrier, ctx1);
+
+  auto ctx2_span = ctx2.GetValue(trace::kSpanKey);
+  EXPECT_TRUE(nostd::holds_alternative<nostd::shared_ptr<trace::Span>>(ctx2_span));
+
+  auto span = nostd::get<nostd::shared_ptr<trace::Span>>(ctx2_span);
+
+  EXPECT_EQ(Hex(span->GetContext().trace_id()), "80f198ee56343ba80000000000000000");
+  EXPECT_EQ(Hex(span->GetContext().span_id()), "e457b5a2e4d86bd1");
+  EXPECT_EQ(span->GetContext().IsSampled(), true);
+  EXPECT_EQ(span->GetContext().HasRemoteParent(), true);
+}
+
+TEST(B3PropagationTest, SetRemoteSpan_SingleHeaderNoFlags)
+{
+  const std::map<std::string, std::string> carrier = {
+      {"b3", "80f198ee56343ba864fe8b2a57d3eff7-e457b5a2e4d86bd1"}};
+  context::Context ctx1 = context::Context{};
+  context::Context ctx2 = format.Extract(Getter, carrier, ctx1);
+
+  auto ctx2_span = ctx2.GetValue(trace::kSpanKey);
+  EXPECT_TRUE(nostd::holds_alternative<nostd::shared_ptr<trace::Span>>(ctx2_span));
+
+  auto span = nostd::get<nostd::shared_ptr<trace::Span>>(ctx2_span);
+
+  EXPECT_EQ(Hex(span->GetContext().trace_id()), "80f198ee56343ba864fe8b2a57d3eff7");
+  EXPECT_EQ(Hex(span->GetContext().span_id()), "e457b5a2e4d86bd1");
+  EXPECT_EQ(span->GetContext().IsSampled(), false);
+  EXPECT_EQ(span->GetContext().HasRemoteParent(), true);
+}
+
+TEST(B3PropagationTest, SetRemoteSpanMultiHeader)
+{
+  const std::map<std::string, std::string> carrier = {
+      {"X-B3-TraceId", "80f198ee56343ba864fe8b2a57d3eff7"},
+      {"X-B3-SpanId", "e457b5a2e4d86bd1"},
+      {"X-B3-Sampled", "1"}};
+  context::Context ctx1 = context::Context{};
+  context::Context ctx2 = format.Extract(Getter, carrier, ctx1);
+
+  auto ctx2_span = ctx2.GetValue(trace::kSpanKey);
+  EXPECT_TRUE(nostd::holds_alternative<nostd::shared_ptr<trace::Span>>(ctx2_span));
+
+  auto span = nostd::get<nostd::shared_ptr<trace::Span>>(ctx2_span);
+
+  EXPECT_EQ(Hex(span->GetContext().trace_id()), "80f198ee56343ba864fe8b2a57d3eff7");
+  EXPECT_EQ(Hex(span->GetContext().span_id()), "e457b5a2e4d86bd1");
+  EXPECT_EQ(span->GetContext().IsSampled(), true);
+  EXPECT_EQ(span->GetContext().HasRemoteParent(), true);
 }
 
 TEST(B3PropagationTest, GetCurrentSpan)

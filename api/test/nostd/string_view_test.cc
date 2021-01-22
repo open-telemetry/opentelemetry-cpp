@@ -75,6 +75,24 @@ TEST(StringViewTest, SubstrOutOfRange)
 #endif
 }
 
+TEST(StringViewTest, FindSingleCharacter)
+{
+  string_view s = "abc";
+
+  // starting from 0-th position (default)
+  EXPECT_EQ(s.find('a'), 0);
+  EXPECT_EQ(s.find('b'), 1);
+  EXPECT_EQ(s.find('c'), 2);
+  EXPECT_EQ(s.find('d'), -1); // FIXME: string_view:npos - problem with linker
+
+  // starting from given index
+  EXPECT_EQ(s.find('a', 1), -1);
+  EXPECT_EQ(s.find('b', 1), 1);
+
+  // out of index
+  EXPECT_EQ(s.find('a', 10), -1);
+}
+
 TEST(StringViewTest, Compare)
 {
   string_view s1 = "aaa";
