@@ -17,15 +17,15 @@ TEST(SpanContextTest, IsSampled)
   ASSERT_EQ(s2.IsSampled(), false);
 }
 
-TEST(SpanContextTest, HasRemoteParent)
+TEST(SpanContextTest, IsRemote)
 {
   SpanContext s1(true, true);
 
-  ASSERT_EQ(s1.HasRemoteParent(), true);
+  ASSERT_EQ(s1.IsRemote(), true);
 
   SpanContext s2(true, false);
 
-  ASSERT_EQ(s2.HasRemoteParent(), false);
+  ASSERT_EQ(s2.IsRemote(), false);
 }
 
 TEST(SpanContextTest, TraceFlags)

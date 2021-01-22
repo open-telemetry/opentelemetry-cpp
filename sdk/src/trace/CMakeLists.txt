@@ -5,7 +5,8 @@ add_library(
 
 set_target_properties(opentelemetry_trace PROPERTIES EXPORT_NAME trace)
 
-target_link_libraries(opentelemetry_trace PUBLIC opentelemetry_common)
+target_link_libraries(opentelemetry_trace PUBLIC opentelemetry_common
+                                                 opentelemetry_resources)
 
 target_include_directories(
   opentelemetry_trace
