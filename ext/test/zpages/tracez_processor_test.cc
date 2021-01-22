@@ -6,6 +6,7 @@
 
 #include "opentelemetry/ext/zpages/threadsafe_span_data.h"
 #include "opentelemetry/nostd/span.h"
+#include "opentelemetry/sdk/resource/resource.h"
 #include "opentelemetry/sdk/trace/tracer.h"
 
 using namespace opentelemetry::sdk::trace;
@@ -174,8 +175,10 @@ class TracezProcessor : public ::testing::Test
 protected:
   void SetUp() override
   {
-    processor  = std::shared_ptr<TracezSpanProcessor>(new TracezSpanProcessor());
-    tracer     = std::shared_ptr<opentelemetry::trace::Tracer>(new Tracer(processor));
+    processor     = std::shared_ptr<TracezSpanProcessor>(new TracezSpanProcessor());
+    auto resource = opentelemetry::sdk::resource::Resource::Create({});
+
+    tracer     = std::shared_ptr<opentelemetry::trace::Tracer>(new Tracer(processor, resource));
     auto spans = processor->GetSpanSnapshot();
     running    = spans.running;
     completed  = std::move(spans.completed);

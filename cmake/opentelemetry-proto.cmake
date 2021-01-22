@@ -82,8 +82,7 @@ foreach(IMPORT_DIR ${PROTOBUF_IMPORT_DIRS})
   list(APPEND PROTOBUF_INCLUDE_FLAGS "-I${IMPORT_DIR}")
 endforeach()
 
-get_target_property(gRPC_CPP_PLUGIN_EXECUTABLE gRPC::grpc_cpp_plugin
-                    IMPORTED_LOCATION_RELEASE)
+set(gRPC_CPP_PLUGIN_EXECUTABLE $<TARGET_FILE:gRPC::grpc_cpp_plugin>)
 
 add_custom_command(
   OUTPUT ${COMMON_PB_H_FILE}
@@ -152,8 +151,8 @@ if(TARGET protobuf::libprotobuf)
 else() # cmake 3.8 or lower
   target_include_directories(opentelemetry_proto
                              PUBLIC ${Protobuf_INCLUDE_DIRS})
-  target_include_directories(opentelemetry_proto
-                             INTERFACE ${Protobuf_LIBRARIES})
+  target_link_libraries(opentelemetry_proto
+                        INTERFACE ${Protobuf_LIBRARIES})
 endif()
 
 if(BUILD_SHARED_LIBS)

@@ -96,7 +96,7 @@ public:
   /**
    * Calculate and return the value of a user specified quantile.
    *
-   * @param q, the quantile to calculate (for example 0.5 is equivelant to the 50th percentile)
+   * @param q, the quantile to calculate (for example 0.5 is equivalent to the 50th percentile)
    */
   virtual T get_quantiles(double q) override
   {
