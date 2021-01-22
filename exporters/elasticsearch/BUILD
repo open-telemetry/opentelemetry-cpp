@@ -23,6 +23,7 @@ cc_library(
     strip_include_prefix = "include",
     deps = [
         "//ext:headers",
+        "//ext/http/client/curl/http_client_curl",
         "//sdk/src/logs",
         "@curl",
         "@github_nlohmann_json//:json",
