@@ -18,13 +18,7 @@ Resource::Resource(const ResourceAttributes &attributes) noexcept : attributes_(
 Resource Resource::Merge(const Resource &other) noexcept
 {
   ResourceAttributes merged_resource_attributes(other.attributes_);
-  for (auto &elem : attributes_)
-  {
-    if (merged_resource_attributes.find(elem.first) == merged_resource_attributes.end())
-    {
-      merged_resource_attributes[elem.first] = elem.second;
-    }
-  }
+  merged_resource_attributes.insert(attributes_.begin(), attributes_.end());
   return Resource(merged_resource_attributes);
 }
 
