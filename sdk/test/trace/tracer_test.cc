@@ -1,5 +1,6 @@
 #include "opentelemetry/sdk/trace/tracer.h"
 #include "opentelemetry/exporters/memory/in_memory_span_exporter.h"
+#include "opentelemetry/sdk/resource/resource.h"
 #include "opentelemetry/sdk/trace/samplers/always_off.h"
 #include "opentelemetry/sdk/trace/samplers/always_on.h"
 #include "opentelemetry/sdk/trace/samplers/parent.h"
@@ -9,6 +10,7 @@
 #include <gtest/gtest.h>
 
 using namespace opentelemetry::sdk::trace;
+using namespace opentelemetry::sdk::resource;
 using opentelemetry::core::SteadyTimestamp;
 using opentelemetry::core::SystemTimestamp;
 namespace nostd  = opentelemetry::nostd;
@@ -49,7 +51,8 @@ std::shared_ptr<opentelemetry::trace::Tracer> initTracer(
     std::unique_ptr<InMemorySpanExporter> &&exporter)
 {
   auto processor = std::make_shared<SimpleSpanProcessor>(std::move(exporter));
-  return std::shared_ptr<opentelemetry::trace::Tracer>(new Tracer(processor));
+  auto resource  = Resource::Create({});
+  return std::shared_ptr<opentelemetry::trace::Tracer>(new Tracer(processor, resource));
 }
 
 std::shared_ptr<opentelemetry::trace::Tracer> initTracer(
@@ -57,7 +60,9 @@ std::shared_ptr<opentelemetry::trace::Tracer> initTracer(
     std::shared_ptr<Sampler> sampler)
 {
   auto processor = std::make_shared<SimpleSpanProcessor>(std::move(exporter));
-  return std::shared_ptr<opentelemetry::trace::Tracer>(new Tracer(processor, sampler));
+  auto resource  = Resource::Create({});
+
+  return std::shared_ptr<opentelemetry::trace::Tracer>(new Tracer(processor, resource, sampler));
 }
 }  // namespace
 
@@ -275,9 +280,10 @@ TEST(Tracer, StartSpanWithAttributesCopy)
 
 TEST(Tracer, GetSampler)
 {
+  auto resource = Resource::Create({});
   // Create a Tracer with a default AlwaysOnSampler
   std::shared_ptr<SpanProcessor> processor_1(new SimpleSpanProcessor(nullptr));
-  std::shared_ptr<Tracer> tracer_on(new Tracer(std::move(processor_1)));
+  std::shared_ptr<Tracer> tracer_on(new Tracer(std::move(processor_1), resource));
 
   auto t1 = tracer_on->GetSampler();
   ASSERT_EQ("AlwaysOnSampler", t1->GetDescription());
@@ -285,7 +291,7 @@ TEST(Tracer, GetSampler)
   // Create a Tracer with a AlwaysOffSampler
   std::shared_ptr<SpanProcessor> processor_2(new SimpleSpanProcessor(nullptr));
   std::shared_ptr<Tracer> tracer_off(
-      new Tracer(std::move(processor_2), std::make_shared<AlwaysOffSampler>()));
+      new Tracer(std::move(processor_2), resource, std::make_shared<AlwaysOffSampler>()));
 
   auto t2 = tracer_off->GetSampler();
   ASSERT_EQ("AlwaysOffSampler", t2->GetDescription());

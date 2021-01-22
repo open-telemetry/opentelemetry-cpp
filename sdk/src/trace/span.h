@@ -21,12 +21,14 @@ public:
                 const opentelemetry::common::KeyValueIterable &attributes,
                 const trace_api::SpanContextKeyValueIterable &links,
                 const trace_api::StartSpanOptions &options,
-                const trace_api::SpanContext &parent_span_context) noexcept;
+                const trace_api::SpanContext &parent_span_context,
+                const opentelemetry::sdk::resource::Resource &resource) noexcept;
 
   ~Span() override;
 
   // trace_api::Span
-  void SetAttribute(nostd::string_view key, const common::AttributeValue &value) noexcept override;
+  void SetAttribute(nostd::string_view key,
+                    const opentelemetry::common::AttributeValue &value) noexcept override;
 
   void AddEvent(nostd::string_view name) noexcept override;
 
