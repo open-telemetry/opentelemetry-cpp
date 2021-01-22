@@ -95,7 +95,7 @@ TEST(B3PropagationTest, ExtractInvalidContext)
   context::Context ctx2 = format.Extract(Getter, carrier, ctx1);
   auto ctx2_span        = ctx2.GetValue(trace::kSpanKey);
   auto span             = nostd::get<nostd::shared_ptr<trace::Span>>(ctx2_span);
-  EXPECT_EQ(span->GetContext().HasRemoteParent(), false);
+  EXPECT_EQ(span->GetContext().IsRemote(), false);
 }
 
 TEST(B3PropagationTest, SetRemoteSpan)
@@ -113,7 +113,7 @@ TEST(B3PropagationTest, SetRemoteSpan)
   EXPECT_EQ(Hex(span->GetContext().trace_id()), "80f198ee56343ba864fe8b2a57d3eff7");
   EXPECT_EQ(Hex(span->GetContext().span_id()), "e457b5a2e4d86bd1");
   EXPECT_EQ(span->GetContext().IsSampled(), true);
-  EXPECT_EQ(span->GetContext().HasRemoteParent(), true);
+  EXPECT_EQ(span->GetContext().IsRemote(), true);
 }
 
 TEST(B3PropagationTest, SetRemoteSpan_TraceIdShort)
@@ -131,7 +131,7 @@ TEST(B3PropagationTest, SetRemoteSpan_TraceIdShort)
   EXPECT_EQ(Hex(span->GetContext().trace_id()), "000000000000000080f198ee56343ba8");
   EXPECT_EQ(Hex(span->GetContext().span_id()), "e457b5a2e4d86bd1");
   EXPECT_EQ(span->GetContext().IsSampled(), true);
-  EXPECT_EQ(span->GetContext().HasRemoteParent(), true);
+  EXPECT_EQ(span->GetContext().IsRemote(), true);
 }
 
 TEST(B3PropagationTest, SetRemoteSpan_SingleHeaderNoFlags)
@@ -149,7 +149,7 @@ TEST(B3PropagationTest, SetRemoteSpan_SingleHeaderNoFlags)
   EXPECT_EQ(Hex(span->GetContext().trace_id()), "80f198ee56343ba864fe8b2a57d3eff7");
   EXPECT_EQ(Hex(span->GetContext().span_id()), "e457b5a2e4d86bd1");
   EXPECT_EQ(span->GetContext().IsSampled(), false);
-  EXPECT_EQ(span->GetContext().HasRemoteParent(), true);
+  EXPECT_EQ(span->GetContext().IsRemote(), true);
 }
 
 TEST(B3PropagationTest, SetRemoteSpanMultiHeader)
@@ -169,7 +169,7 @@ TEST(B3PropagationTest, SetRemoteSpanMultiHeader)
   EXPECT_EQ(Hex(span->GetContext().trace_id()), "80f198ee56343ba864fe8b2a57d3eff7");
   EXPECT_EQ(Hex(span->GetContext().span_id()), "e457b5a2e4d86bd1");
   EXPECT_EQ(span->GetContext().IsSampled(), true);
-  EXPECT_EQ(span->GetContext().HasRemoteParent(), true);
+  EXPECT_EQ(span->GetContext().IsRemote(), true);
 }
 
 TEST(B3PropagationTest, GetCurrentSpan)
