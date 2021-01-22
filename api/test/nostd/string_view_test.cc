@@ -83,7 +83,7 @@ TEST(StringViewTest, FindSingleCharacter)
   EXPECT_EQ(s.find('a'), 0);
   EXPECT_EQ(s.find('b'), 1);
   EXPECT_EQ(s.find('c'), 2);
-  EXPECT_EQ(s.find('d'), -1); // FIXME: string_view:npos - problem with linker
+  EXPECT_EQ(s.find('d'), -1);  // FIXME: string_view:npos - problem with linker
 
   // starting from given index
   EXPECT_EQ(s.find('a', 1), -1);
