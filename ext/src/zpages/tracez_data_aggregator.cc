@@ -159,7 +159,7 @@ void TracezDataAggregator::AggregateSpans()
    * If in the future this is added then clearing of running spans will not bee
    * required.
    * For now this step of clearing and recalculating running span data is
-   * required because it is unkown which spans have moved from running to
+   * required because it is unknown which spans have moved from running to
    * completed since the previous call. Additionally, the span name can change
    * for spans while they are running.
    *
@@ -170,9 +170,9 @@ void TracezDataAggregator::AggregateSpans()
    * unique identifiers to span data have not been added yet.
    *
    * A few things to note:
-   * i) Duplicate running spans may be recieved from the span processor in one
+   * i) Duplicate running spans may be received from the span processor in one
    *    multiple successive calls to this function.
-   * ii) Only the newly completed spans are recieved by this function.
+   * ii) Only the newly completed spans are received by this function.
    *     Completed spans will not be seen more than once
    **/
   ClearRunningSpanData();

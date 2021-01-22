@@ -68,7 +68,7 @@ public:
    * Blocks until a lock can be obtained for the current thread.
    *
    * This mutex will spin the current CPU waiting for the lock to be available.  This can have
-   * decent performance in scenarios where there is low lock contention and lock-holders acheive
+   * decent performance in scenarios where there is low lock contention and lock-holders achieve
    * their work quickly.  It degrades in scenarios where locked tasks take a long time.
    */
   void lock() noexcept
