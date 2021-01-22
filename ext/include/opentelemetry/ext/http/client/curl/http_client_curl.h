@@ -189,8 +189,9 @@ public:
   http_client::Result Get(const nostd::string_view &url,
                           http_client::Headers &headers) noexcept override
   {
+    http_client::Body body;
     HttpOperation curl_operation(http_client::Method::Get, url.data(), nullptr, RequestMode::Sync,
-                                 headers);
+                                 headers, body);
     curl_operation.SendSync();
     auto session_state = curl_operation.GetSessionState();
     if (curl_operation.WasAborted())
