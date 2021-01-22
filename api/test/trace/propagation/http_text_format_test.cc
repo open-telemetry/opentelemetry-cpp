@@ -111,7 +111,7 @@ TEST(HTTPTextFormatTest, SetRemoteSpan)
   EXPECT_EQ(Hex(span->GetContext().trace_id()), "4bf92f3577b34da6a3ce929d0e0e4736");
   EXPECT_EQ(Hex(span->GetContext().span_id()), "0102030405060708");
   EXPECT_EQ(span->GetContext().IsSampled(), true);
-  EXPECT_EQ(span->GetContext().HasRemoteParent(), true);
+  EXPECT_EQ(span->GetContext().IsRemote(), true);
 }
 
 TEST(HTTPTextFormatTest, GetCurrentSpan)
