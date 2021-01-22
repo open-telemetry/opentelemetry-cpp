@@ -117,7 +117,7 @@ private:
   ElasticsearchExporterOptions options_;
 
   // Object that stores the HTTP sessions that have been created
-  std::unique_ptr<ext::http::client::HttpClient> session_manager_;
+  std::unique_ptr<ext::http::client::HttpClient> http_client_;
 };
 }  // namespace logs
 }  // namespace exporter
