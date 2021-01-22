@@ -151,8 +151,8 @@ if(TARGET protobuf::libprotobuf)
 else() # cmake 3.8 or lower
   target_include_directories(opentelemetry_proto
                              PUBLIC ${Protobuf_INCLUDE_DIRS})
-  target_include_directories(opentelemetry_proto
-                             INTERFACE ${Protobuf_LIBRARIES})
+  target_link_libraries(opentelemetry_proto
+                        INTERFACE ${Protobuf_LIBRARIES})
 endif()
 
 if(BUILD_SHARED_LIBS)
