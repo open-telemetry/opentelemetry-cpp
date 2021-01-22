@@ -101,22 +101,20 @@ public:
 
 private:
   // Converts hex numbers (string_view) into bytes stored in a buffer and pads buffer with 0.
-  static void GenerateBuffFromHexStrPad0(nostd::string_view string, int bufSize, uint8_t *buf)
-  {
-    const char *strBeg                         = string.data();
-    const nostd::string_view::size_type strLen = string.length();
-    nostd::string_view::size_type posInp       = 0;
-    int posOut                                 = 0;
-    while (posOut < bufSize)
+  static void GenerateBuffFromHexStrPad0(nostd::string_view hexStr, int bufSize, uint8_t *buf)
+  {  // we are doing this starting from "right" side for left-padding
+    nostd::string_view::size_type posInp = hexStr.length();
+    int posOut                           = bufSize;
+    while (posOut--)
     {
-      int cur = 0;
-      if (posInp < strLen)
+      int val = 0;
+      if (posInp)
       {
-        int hexDigit1 = HexToInt(strBeg[posInp++]);
-        int hexDigit2 = 0;
-        if (posInp < strLen)
+        int hexDigit2 = HexToInt(hexStr[--posInp]);  // low nibble
+        int hexDigit1 = 0;
+        if (posInp)
         {
-          hexDigit2 = HexToInt(strBeg[posInp++]);
+          hexDigit1 = HexToInt(hexStr[--posInp]);
         }
         if (hexDigit1 < 0 || hexDigit2 < 0)
         {  // malformed hex sequence. Fill entire buffer with zeroes.
@@ -126,9 +124,9 @@ private:
           }
           return;
         }
-        cur = hexDigit1 * 16 + hexDigit2;
+        val = hexDigit1 * 16 + hexDigit2;
       }
-      buf[posOut++] = cur;
+      buf[posOut] = val;
     }
   }
 

@@ -128,7 +128,7 @@ TEST(B3PropagationTest, SetRemoteSpan_TraceIdShort)
 
   auto span = nostd::get<nostd::shared_ptr<trace::Span>>(ctx2_span);
 
-  EXPECT_EQ(Hex(span->GetContext().trace_id()), "80f198ee56343ba80000000000000000");
+  EXPECT_EQ(Hex(span->GetContext().trace_id()), "000000000000000080f198ee56343ba8");
   EXPECT_EQ(Hex(span->GetContext().span_id()), "e457b5a2e4d86bd1");
   EXPECT_EQ(span->GetContext().IsSampled(), true);
   EXPECT_EQ(span->GetContext().HasRemoteParent(), true);
