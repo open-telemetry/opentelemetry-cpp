@@ -228,16 +228,21 @@ class HttpClient
 public:
   virtual std::shared_ptr<Session> CreateSession(nostd::string_view host,
                                                  uint16_t port = 80) noexcept = 0;
-
-  virtual Result Get(const nostd::string_view &url, Headers &) noexcept = 0;
-
-  virtual Result Post(const nostd::string_view &url, const Data &data, Headers &) noexcept = 0;
-
-  virtual bool CancelAllSessions() noexcept = 0;
+  virtual bool CancelAllSessions() noexcept                                   = 0;
 
   virtual bool FinishAllSessions() noexcept = 0;
 
   virtual ~HttpClient() = default;
+};
+
+class HttpClientSync
+{
+public:
+  virtual Result Get(const nostd::string_view &url, Headers &) noexcept = 0;
+
+  virtual Result Post(const nostd::string_view &url, const Data &data, Headers &) noexcept = 0;
+
+  virtual ~HttpClientSync() = default;
 };
 
 }  // namespace client

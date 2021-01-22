@@ -7,3 +7,9 @@ opentelemetry::ext::http::client::HttpClientFactory::Create()
 {
   return std::make_shared<opentelemetry::ext::http::client::curl::HttpClient>();
 }
+
+std::shared_ptr<opentelemetry::ext::http::client::HttpClientSync>
+opentelemetry::ext::http::client::HttpClientFactory::CreateSync()
+{
+  return std::make_shared<opentelemetry::ext::http::client::curl::HttpClientSync>();
+}

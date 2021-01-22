@@ -270,11 +270,10 @@ TEST_F(BasicCurlHttpTests, CurlHttpOperations)
 TEST_F(BasicCurlHttpTests, SendGetRequestSync)
 {
   received_requests_.clear();
-  curl::HttpClient session_manager;
+  curl::HttpClientSync http_client;
 
   http_client::Headers m1 = {};
-  auto result =
-      session_manager.Get("http://127.0.0.1:19000/get/", m1);  //           (session_state);
+  auto result = http_client.Get("http://127.0.0.1:19000/get/", m1);  //           (session_state);
   EXPECT_EQ(result, true);
   EXPECT_EQ(result.GetSessionState(), http_client::SessionState::Response);
 }
@@ -282,18 +281,11 @@ TEST_F(BasicCurlHttpTests, SendGetRequestSync)
 TEST_F(BasicCurlHttpTests, SendGetRequestSyncTimeout)
 {
   received_requests_.clear();
-  curl::HttpClient session_manager;
-
-  auto session =
-      session_manager.CreateSession("222.222.222.200", HTTP_PORT);  // Non Existing address
-  auto request = session->CreateRequest();
-  request->SetTimeoutMs(std::chrono::milliseconds(3000));
-  request->SetUri("get/");
-  http_client::SessionState session_state;
+  curl::HttpClientSync http_client;
 
   http_client::Headers m1 = {};
   auto result =
-      session_manager.Get("http://222.222.222.200:19000/get/", m1);  //           (session_state);
+      http_client.Get("http://222.222.222.200:19000/get/", m1);  //           (session_state);
   EXPECT_EQ(result, false);
 
   EXPECT_EQ(result.GetSessionState(), http_client::SessionState::ConnectFailed);
