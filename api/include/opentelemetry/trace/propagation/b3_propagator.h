@@ -15,6 +15,8 @@
 #include "opentelemetry/trace/span.h"
 #include "opentelemetry/trace/span_context.h"
 
+#warning "Hello warning test"
+
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace trace
 {
@@ -132,7 +134,7 @@ private:
 
   // Converts a single character to a corresponding integer (e.g. '1' to 1), return -1
   // if the character is not a valid number in hex.
-  static uint8_t HexToInt(char c)
+  static int8_t HexToInt(char c)
   {
     if (c >= '0' && c <= '9')
     {

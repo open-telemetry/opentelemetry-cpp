@@ -98,6 +98,17 @@ TEST(B3PropagationTest, ExtractInvalidContext)
   EXPECT_EQ(span->GetContext().IsRemote(), false);
 }
 
+TEST(B3PropagationTest, DoNotExtractWithInvalidHex)
+{
+  const std::map<std::string, std::string> carrier = {
+      {"b3", "0000000zzz0000000000000000000000-0000000zzz000000-1"}};
+  context::Context ctx1 = context::Context{};
+  context::Context ctx2 = format.Extract(Getter, carrier, ctx1);
+  auto ctx2_span        = ctx2.GetValue(trace::kSpanKey);
+  auto span             = nostd::get<nostd::shared_ptr<trace::Span>>(ctx2_span);
+  EXPECT_EQ(span->GetContext().HasRemoteParent(), false);
+}
+
 TEST(B3PropagationTest, SetRemoteSpan)
 {
   const std::map<std::string, std::string> carrier = {
