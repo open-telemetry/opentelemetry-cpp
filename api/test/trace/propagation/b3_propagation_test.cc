@@ -106,7 +106,7 @@ TEST(B3PropagationTest, DoNotExtractWithInvalidHex)
   context::Context ctx2 = format.Extract(Getter, carrier, ctx1);
   auto ctx2_span        = ctx2.GetValue(trace::kSpanKey);
   auto span             = nostd::get<nostd::shared_ptr<trace::Span>>(ctx2_span);
-  EXPECT_EQ(span->GetContext().HasRemoteParent(), false);
+  EXPECT_EQ(span->GetContext().IsRemote(), false);
 }
 
 TEST(B3PropagationTest, SetRemoteSpan)

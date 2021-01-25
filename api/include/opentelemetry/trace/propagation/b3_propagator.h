@@ -15,8 +15,6 @@
 #include "opentelemetry/trace/span.h"
 #include "opentelemetry/trace/span_context.h"
 
-#warning "Hello warning test"
-
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace trace
 {
