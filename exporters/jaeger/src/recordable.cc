@@ -12,75 +12,59 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include "opentelemetry/exporters/jaeger/recordable.h"
+#include <opentelemetry/exporters/jaeger/recordable.h>
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace exporter
 {
 namespace jaeger
 {
+
+void PopulateAttribute(nostd::string_view key, const opentelemetry::common::AttributeValue &value)
+{}
+
 void Recordable::SetIds(trace::TraceId trace_id,
                         trace::SpanId span_id,
                         trace::SpanId parent_span_id) noexcept
 {
-
-}
-
-void PopulateAttribute(nostd::string_view key,
-                       const opentelemetry::common::AttributeValue &value)
-{
-
+  span_.__set_traceIdLow(*(reinterpret_cast<int64_t *>(trace_id.Id().data())));
+  span_.__set_traceIdHigh(*(reinterpret_cast<int64_t *>(trace_id.Id().data()) + 1));
+  span_.__set_spanId(*(reinterpret_cast<int64_t *>(trace_id.Id().data())));
+  span_.__set_parentSpanId(*(reinterpret_cast<int64_t *>(parent_span_id.Id().data())));
 }
 
 void Recordable::SetAttribute(nostd::string_view key,
                               const opentelemetry::common::AttributeValue &value) noexcept
-{
-
-}
+{}
 
 void Recordable::AddEvent(nostd::string_view name,
                           core::SystemTimestamp timestamp,
                           const common::KeyValueIterable &attributes) noexcept
-{
-
-}
+{}
 
 void Recordable::AddLink(const opentelemetry::trace::SpanContext &span_context,
                          const common::KeyValueIterable &attributes) noexcept
-{
+{}
 
-}
-
-void Recordable::SetStatus(trace::CanonicalCode code, nostd::string_view description) noexcept
-{
-
-}
-
-void Recordable::SetStatus(trace::CanonicalCode code, nostd::string_view description) noexcept
-{
-
-}
+void Recordable::SetStatus(trace::CanonicalCode code, nostd::string_view description) noexcept {}
 
 void Recordable::SetName(nostd::string_view name) noexcept
 {
-
+  span_.__set_operationName(static_cast<std::string>(name));
 }
 
 void Recordable::SetStartTime(opentelemetry::core::SystemTimestamp start_time) noexcept
 {
-
+  span.__set_startTime(start_time.time_since_epoch().count());
 }
 
-void Recordable::SetDuration(std::chrono::nanoseconds during) noexcept
+void Recordable::SetDuration(std::chrono::nanoseconds duration) noexcept
 {
-
+  span.__set_duration(std::chrono::duration_cast<std::chrono::microseconds>(duration).count());
 }
 
-void Recordable::SetSpanKind(opentelemetry::trace::SpanKind spand_kind) noexcept
-{
+void Recordable::SetSpanKind(opentelemetry::trace::SpanKind spand_kind) noexcept {}
 
-}
-
-}  // namespace zipkin
+}  // namespace jaeger
 }  // namespace exporter
 OPENTELEMETRY_END_NAMESPACE

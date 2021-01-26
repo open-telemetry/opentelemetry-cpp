@@ -14,14 +14,17 @@
 
 #pragma once
 
+#include <opentelemetry/sdk/trace/exporter.h>
+#include <memory>
+
 OPENTELEMETRY_BEGIN_NANESPACE
 namespace exporter
 {
 namespace jaeger
 {
-enum class TransportFormat
+enum class TransportType
 {
-    THRIFT,
+  THRIFT_UDP,
 };
 
 /**
@@ -29,7 +32,10 @@ enum class TransportFormat
  */
 struct JaegerExporterOptions
 {
-
+  // The endpoint to export to.
+  std::string server_addr      = "localhost";
+  uint16_t server_port         = 9090;
+  TransportType transport_type = THRIFT_UDP;
 };
 
 namespace trace_sdk = opentelemetry::sdk::trace;
@@ -54,21 +60,21 @@ public:
    * @param timeout an option timeout, default to max.
    */
   bool Shutdown(
-      std::chrono::microseconds timeout = std::chrono::microseconds::max() noexcept override;
-      )
+      std::chrono::microseconds timeout = std::chrono::microseconds::max() noexcept override;)
   {
-      return true;
+    return true;
   }
 
 private:
-  void InitializeLocalEndpoint();
+  void InitializeEndpoint();
 
 private:
   // The configuration options associated with this exporter.
   bool is_shutdown_ = false;
   JaegerExporterOptions options_;
-
+  std::unique_ptr<ThriftSender> sender_;
 };
+
 }  // namespace jaeger
 }  // namespace exporter
 OPENTELEMETRY_END_NAMESPACE

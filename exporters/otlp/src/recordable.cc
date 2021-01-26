@@ -6,7 +6,7 @@ namespace exporter
 namespace otlp
 {
 
-const int kAttributeValueSize = 14;
+constexpr int kAttributeValueSize = 14;
 
 void Recordable::SetIds(trace::TraceId trace_id,
                         trace::SpanId span_id,

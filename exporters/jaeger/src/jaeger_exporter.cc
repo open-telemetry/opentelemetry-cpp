@@ -12,10 +12,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#pragma once
+#include <opentelemetry/exporters/jaeger/jaeger_exporter.h>
+#include <opentelemetry/exporters/jaeger/recordable.h>
+#include <thrift-gen/cpp/agent_types.h>
 
-#include "opentelemetry/exporters/jaeger/jaeger_exporter.h"
-#include "opentelemetry/exporters/jaeger/recordable.h"
+#include <vector>
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace exporter
@@ -23,20 +24,16 @@ namespace exporter
 namespace jaeger
 {
 
-JaegerExporter::JaegerExporter(const JaegerExporterOptions &options)
-    : options_(options)
+JaegerExporter::JaegerExporter(const JaegerExporterOptions &options) : options_(options)
 {
   InitializeEndpoint();
 }
 
-JaegerExporter::JaegerExporter() : JaegerExporter(JaegerExporterOptions())
-{
-
-}
+JaegerExporter::JaegerExporter() : JaegerExporter(JaegerExporterOptions()) {}
 
 std::unique_ptr<std::trace::Recordable> JaegerExporter::MakeRecordable() noexcept
 {
-  return std::unique<sdk::trace::Recordable>(new Recordable);
+  return std::unique_ptr<sdk::trace::Recordable>(new (nothrow) Recordable);
 }
 
 std::trace::ExportResult JaegerExporter::Export(
@@ -44,17 +41,31 @@ std::trace::ExportResult JaegerExporter::Export(
 {
   if (is_shutdown_)
   {
-      return sdk::trace::ExportResult::kFailuer;
+    return sdk::trace::ExportResult::kFailuer;
   }
+  std::vector<thrift::Span> spans{spans};
+
+  thrift::Batch batch;
+  // batch.__set_process(_process);
+  batch.__set_spans(_spanBuffer);
+
+  sender_.EmitBatch(batch);
+
   return sdk::trace::ExportResult::kSuccess;
 }
 
-void ZipkinExporter::InitializeLocalEndpoint()
+void JaegerExporter::InitializeEndpoint()
 {
-
+  if (options.transport_type == THRIFT_UDP)
+  {
+    sender_ =
+        std::unique_ptr<ThriftSender>(new ThriftSender(options.server_addr, options.server_port));
+  }
+  else
+  {
+    static_assert(false, "Unsupported transport type");
+  }
 }
 
 }  // namespace jaeger
 }  // namespace exporter
-
-

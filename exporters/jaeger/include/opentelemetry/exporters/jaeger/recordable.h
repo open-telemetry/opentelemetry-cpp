@@ -14,8 +14,9 @@
 
 #pragma once
 
-#include "opentelemetry/sdk/trace/recordable.h"
-#include "opentelemetry/version.h"
+#include <opentelemetry/sdk/trace/recordable.h>
+#include <opentelemetry/version.h>
+#include <thrift-gen/cpp/jaeger_types.h>
 
 OPENTELEMETRY_BEGIN_NANESPACE
 namespace exporter
@@ -25,7 +26,7 @@ namespace jaeger
 class Recordable final : public sdk::trace::Recordable
 {
 public:
-  const JaegerSpan &span() const noexcept { return span_;}
+  const thrift::Span &span() const noexcept { return span_; }
 
   voiid SetIds(trace::TraceId trace_id,
                trace::SpanId span_id,
@@ -38,8 +39,8 @@ public:
                 core::SystemTimestamp timestamp,
                 const common::KeyValueIterable &attributes) noexcept override;
 
-  void AddLink(const opentelemetry::trace::SpanContext &span_context
-               const common::KeyValueIterable &attributes) noexcept override;
+  void AddLink(const opentelemetry::trace::SpanContext &span_context const common::KeyValueIterable
+                   &attributes) noexcept override;
 
   void SetStatus(trace::CanonicalCode code, nostd::string_view description) noexcept override;
 
@@ -50,7 +51,7 @@ public:
   void SetSpanKind(opentelemtry::trace::SpanKind span_kind) noexcept override;
 
 private:
-  JaegerSpan span_;
+  thrift::Span span_;
 };
 }  // namespace jaeger
 }  // namespace exporter
