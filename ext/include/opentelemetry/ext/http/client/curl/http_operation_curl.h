@@ -1,6 +1,8 @@
 #pragma once
 
+#include "http_client_curl.h"
 #include "opentelemetry/ext/http/client/http_client.h"
+#include "opentelemetry/version.h"
 
 #include <curl/curl.h>
 #include <future>
@@ -35,17 +37,6 @@ enum class RequestMode
   Async
 };
 
-struct curl_ci
-{
-  bool operator()(const std::string &s1, const std::string &s2) const
-  {
-    return std::lexicographical_compare(
-        s1.begin(), s1.end(), s2.begin(), s2.end(),
-        [](char c1, char c2) { return ::tolower(c1) < ::tolower(c2); });
-  }
-};
-using Headers = std::multimap<std::string, std::string, curl_ci>;
-
 class HttpOperation
 {
 public:
@@ -67,7 +58,7 @@ public:
   /**
    * Create local CURL instance for url and body
    * @param method // HTTP Method
-   * @param url
+   * @param url    // HTTP URL
    * @param callback
    * @param request_mode // sync or async
    * @param request  Request Headers
@@ -80,13 +71,12 @@ public:
                 http_client::EventHandler *callback,
                 RequestMode request_mode = RequestMode::Async,
                 // Default empty headers and empty request body
-                const Headers &request_headers        = Headers(),
-                const http_client::Body &request_body = http_client::Body(),
+                const http_client::Headers &request_headers = http_client::Headers(),
+                const http_client::Body &request_body       = http_client::Body(),
                 // Default connectivity and response size options
                 bool is_raw_response                        = false,
                 std::chrono::milliseconds http_conn_timeout = default_http_conn_timeout)
-      :  //
-        method_(method),
+      : method_(method),
         url_(url),
         callback_(callback),
         request_mode_(request_mode),
@@ -189,12 +179,10 @@ public:
     // curl_easy_setopt(curl, CURLOPT_LOCALPORT, dcf_port);
 
     // Perform initial connect, handling the timeout if needed
-
     curl_easy_setopt(curl_, CURLOPT_CONNECT_ONLY, 1L);
     curl_easy_setopt(curl_, CURLOPT_TIMEOUT, http_conn_timeout_.count() / 1000);
     DispatchEvent(http_client::SessionState::Connecting);
     res_ = curl_easy_perform(curl_);
-
     if (CURLE_OK != res_)
     {
       DispatchEvent(http_client::SessionState::ConnectFailed,

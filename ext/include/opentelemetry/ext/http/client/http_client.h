@@ -1,6 +1,7 @@
 #pragma once
 
 #include <chrono>
+#include <map>
 #include <string>
 #include <vector>
 #include "opentelemetry/nostd/function_ref.h"
@@ -9,6 +10,16 @@
 
 /*
  Usage Example
+
+Sync Request:
+
+  HttpClient httpClient;
+  auto result = httpClient.Get(url); // GET request
+  if (result){
+    auto response = result.GetResponse();
+  } else {
+    std::cout << result.GetSessionState();
+  }
 
 Async Request:
 
@@ -26,29 +37,19 @@ Async Request:
 
       void OnError(nostd::string_view err) noexcept override
       {
-          std::cout << " Error:" << err;
+          std::cerr << " Error:" << err;
       }
   };
 
-  SessionManager sessionManager; // implementer can provide singleton implementation for it
-  auto session = sessionManager.createSession("localhost", 8000);
+  HttpClient httpClient; // implementer can provide singleton implementation for it
+  auto session = httpClient.createSession("localhost", 8000);
   auto request = session->CreateRequest();
   request->AddHeader(..);
   SimpleResponseHandler res_handler;
   session->SendRequest(res_handler);
   session->FinishSession() // optionally in the end
   ...shutdown
-  sessionManager.FinishAllSessions()
-
-Sync Request:
-
-  SessionMamager sessionManager;
-  auto session = sessionManager.createSession("localhost", 8000);
-  auto request = session->CreateRequest();
-  request->AddHeader(..);
-  SessionState session_state;
-  auto response = session->SendRequestSync(session_state);
-  // session_state will contain SessionState::Response if successful.
+  httpClient.FinishAllSessions()
 
 */
 
@@ -93,7 +94,19 @@ enum class SessionState
 using Byte           = uint8_t;
 using StatusCode     = uint16_t;
 using Body           = std::vector<Byte>;
+using Data           = std::map<std::string, std::string>;
 using SSLCertificate = std::vector<Byte>;
+
+struct cmp_ic
+{
+  bool operator()(const std::string &s1, const std::string &s2) const
+  {
+    return std::lexicographical_compare(
+        s1.begin(), s1.end(), s2.begin(), s2.end(),
+        [](char c1, char c2) { return ::tolower(c1) < ::tolower(c2); });
+  }
+};
+using Headers = std::multimap<std::string, std::string, cmp_ic>;
 
 class Request
 {
@@ -132,6 +145,56 @@ public:
   virtual ~Response() = default;
 };
 
+class NoopResponse : public Response
+{
+public:
+  const Body &GetBody() const noexcept override
+  {
+    static Body body;
+    return body;
+  }
+  bool ForEachHeader(
+      nostd::function_ref<bool(nostd::string_view name, nostd::string_view value)> callable) const
+      noexcept override
+  {
+    return true;
+  }
+
+  bool ForEachHeader(
+      const nostd::string_view &key,
+      nostd::function_ref<bool(nostd::string_view name, nostd::string_view value)> callable) const
+      noexcept override
+  {
+    return true;
+  }
+
+  StatusCode GetStatusCode() const noexcept override { return 0; }
+};
+
+class Result
+{
+
+public:
+  Result(std::unique_ptr<Response> res, SessionState session_state)
+      : response_(std::move(res)), session_state_(session_state)
+  {}
+  operator bool() const { return session_state_ == SessionState::Response; }
+  Response &GetResponse()
+  {
+    if (response_ == nullptr)
+    {
+      static NoopResponse res;
+      return res;
+    }
+    return *response_;
+  }
+  SessionState GetSessionState() { return session_state_; }
+
+private:
+  std::unique_ptr<Response> response_;
+  SessionState session_state_;
+};
+
 class EventHandler
 {
 public:
@@ -162,17 +225,28 @@ public:
   virtual ~Session() = default;
 };
 
-class SessionManager
+class HttpClient
 {
 public:
   virtual std::shared_ptr<Session> CreateSession(nostd::string_view host,
                                                  uint16_t port = 80) noexcept = 0;
-
-  virtual bool CancelAllSessions() noexcept = 0;
+  virtual bool CancelAllSessions() noexcept                                   = 0;
 
   virtual bool FinishAllSessions() noexcept = 0;
 
-  virtual ~SessionManager() = default;
+  virtual ~HttpClient() = default;
+};
+
+class HttpClientSync
+{
+public:
+  virtual Result Get(const nostd::string_view &url, const Headers & = {{}}) noexcept = 0;
+
+  virtual Result Post(const nostd::string_view &url,
+                      const Data &data,
+                      const Headers & = {{"content-type", "application/json"}}) noexcept = 0;
+
+  virtual ~HttpClientSync() = default;
 };
 
 }  // namespace client

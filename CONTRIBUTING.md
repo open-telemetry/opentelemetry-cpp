@@ -28,7 +28,7 @@ example-specific documentation for other build automation tools.
 Install the latest bazel version by following the steps listed
 [here](https://docs.bazel.build/versions/master/install.html).
 
-Select an example of interest from the [examples folder](https://github.com/open-telemetry/opentelemetry-cpp/tree/master/examples).
+Select an example of interest from the [examples folder](https://github.com/open-telemetry/opentelemetry-cpp/tree/main/examples).
 Inside each example directory is a `BUILD` file containing instructions for
 Bazel. Find the binary name of your example by inspecting the contents of this
 `BUILD` file.
@@ -116,7 +116,7 @@ A PR is considered to be **ready to merge** when:
 * Trivial changes (typo, cosmetic, doc, etc.) don't have to wait for one day.
 * Urgent fixes can take exceptions as long as it has been actively communicated.
 
-Any Maintainer can merge the PR once it is **ready to merge**.
+Any Maintainer can merge the PR once it is **ready to merge**. Maintainer can make conscious judgement to merge pull requests which have not strictly met above mentioned requirements.
 
 If a PR has been stuck (e.g. there are lots of debates and people couldn't agree on each other), the owner should try to get people aligned by:
 
