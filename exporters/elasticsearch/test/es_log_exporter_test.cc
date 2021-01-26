@@ -14,6 +14,7 @@ namespace logs_api      = opentelemetry::logs;
 namespace nostd         = opentelemetry::nostd;
 namespace logs_exporter = opentelemetry::exporter::logs;
 
+#if 0
 // Attempt to write a log to an invalid host/port, test that the Export() returns failure
 TEST(ElasticsearchLogsExporterTests, InvalidEndpoint)
 {
@@ -71,3 +72,5 @@ TEST(ElasticsearchLogsExporterTests, RecordableCreation)
 
   exporter->Export(nostd::span<std::unique_ptr<sdklogs::Recordable>>(&record, 1));
 }
+
+#endif

@@ -1,6 +1,8 @@
 #pragma once
 
 #include "http_operation_curl.h"
+#include "opentelemetry/ext/http/client/http_client.h"
+#include "opentelemetry/version.h"
 
 #include <map>
 #include <string>
@@ -55,7 +57,7 @@ public:
 public:
   http_client::Method method_;
   http_client::Body body_;
-  Headers headers_;
+  http_client::Headers headers_;
   std::string uri_;
   std::chrono::milliseconds timeout_ms_{5000};  // ms
 };
@@ -105,13 +107,13 @@ public:
   http_client::StatusCode status_code_;
 };
 
-class SessionManager;
+class HttpClient;
 
 class Session : public http_client::Session
 {
 public:
-  Session(SessionManager &session_manager, const std::string &host, uint16_t port = 80)
-      : session_manager_(session_manager), is_session_active_(false)
+  Session(HttpClient &http_client, const std::string &host, uint16_t port = 80)
+      : http_client_(http_client), is_session_active_(false)
   {
     if (host.rfind("http://", 0) != 0 && host.rfind("https://", 0) != 0)
     {
@@ -135,9 +137,9 @@ public:
     is_session_active_ = true;
     std::string url    = host_ + std::string(http_request_->uri_);
     auto callback_ptr  = &callback;
-    curl_operation_.reset(new HttpOperation(http_request_->method_, url, callback_ptr,
-                                            http_request_->headers_, http_request_->body_, false,
-                                            http_request_->timeout_ms_));
+    curl_operation_.reset(new HttpOperation(
+        http_request_->method_, url, callback_ptr, RequestMode::Sync, http_request_->headers_,
+        http_request_->body_, false, http_request_->timeout_ms_));
     curl_operation_->SendAsync([this, callback_ptr](HttpOperation &operation) {
       if (operation.WasAborted())
       {
@@ -148,26 +150,19 @@ public:
       if (operation.GetResponseCode() >= CURL_LAST)
       {
         // we have a http response
-        auto response      = std::unique_ptr<Response>(new Response());
-        response->headers_ = operation.GetResponseHeaders();
-        response->body_    = operation.GetResponseBody();
+        auto response          = std::unique_ptr<Response>(new Response());
+        response->headers_     = operation.GetResponseHeaders();
+        response->body_        = operation.GetResponseBody();
+        response->status_code_ = operation.GetResponseCode();
         callback_ptr->OnResponse(*response);
       }
       is_session_active_ = false;
     });
   }
 
-  virtual bool CancelSession() noexcept override
-  {
-    curl_operation_->Abort();
-    return true;
-  }
+  virtual bool CancelSession() noexcept override;
 
-  virtual bool FinishSession() noexcept override
-  {
-    curl_operation_->Finish();
-    return true;
-  }
+  virtual bool FinishSession() noexcept override;
 
   virtual bool IsSessionActive() noexcept override { return is_session_active_; }
 
@@ -184,15 +179,72 @@ private:
   std::string host_;
   std::unique_ptr<HttpOperation> curl_operation_;
   uint64_t session_id_;
-  SessionManager &session_manager_;
+  HttpClient &http_client_;
   bool is_session_active_;
 };
 
-class SessionManager : public http_client::SessionManager
+class HttpClientSync : public http_client::HttpClientSync
+{
+public:
+  HttpClientSync() { curl_global_init(CURL_GLOBAL_ALL); }
+
+  http_client::Result Get(const nostd::string_view &url,
+                          const http_client::Headers &headers) noexcept override
+  {
+    http_client::Body body;
+    HttpOperation curl_operation(http_client::Method::Get, url.data(), nullptr, RequestMode::Sync,
+                                 headers, body);
+    curl_operation.SendSync();
+    auto session_state = curl_operation.GetSessionState();
+    if (curl_operation.WasAborted())
+    {
+      session_state = http_client::SessionState::Cancelled;
+    }
+    auto response = std::unique_ptr<Response>(new Response());
+    if (curl_operation.GetResponseCode() >= CURL_LAST)
+    {
+      // we have a http response
+
+      response->headers_     = curl_operation.GetResponseHeaders();
+      response->body_        = curl_operation.GetResponseBody();
+      response->status_code_ = curl_operation.GetResponseCode();
+    }
+    return http_client::Result(std::move(response), session_state);
+  }
+
+  http_client::Result Post(const nostd::string_view &url,
+                           const Data &data,
+                           const http_client::Headers &headers) noexcept override
+  {
+    HttpOperation curl_operation(http_client::Method::Post, url.data(), nullptr, RequestMode::Sync,
+                                 headers);
+    curl_operation.SendSync();
+    auto session_state = curl_operation.GetSessionState();
+    if (curl_operation.WasAborted())
+    {
+      session_state = http_client::SessionState::Cancelled;
+    }
+    auto response = std::unique_ptr<Response>(new Response());
+    if (curl_operation.GetResponseCode() >= CURL_LAST)
+    {
+      // we have a http response
+
+      response->headers_     = curl_operation.GetResponseHeaders();
+      response->body_        = curl_operation.GetResponseBody();
+      response->status_code_ = curl_operation.GetResponseCode();
+    }
+
+    return http_client::Result(std::move(response), session_state);
+  }
+
+  ~HttpClientSync() { curl_global_cleanup(); }
+};
+
+class HttpClient : public http_client::HttpClient
 {
 public:
   // The call (curl_global_init) is not thread safe. Ensure this is called only once.
-  SessionManager() : next_session_id_{0} { curl_global_init(CURL_GLOBAL_ALL); }
+  HttpClient() : next_session_id_{0} { curl_global_init(CURL_GLOBAL_ALL); }
 
   std::shared_ptr<http_client::Session> CreateSession(nostd::string_view host,
                                                       uint16_t port = 80) noexcept override
@@ -228,7 +280,7 @@ public:
     sessions_.erase(session_id);
   }
 
-  ~SessionManager() { curl_global_cleanup(); }
+  ~HttpClient() { curl_global_cleanup(); }
 
 private:
   std::atomic<uint64_t> next_session_id_;
