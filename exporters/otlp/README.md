@@ -8,7 +8,7 @@ For a full list of backends supported by the Collector, see the [main Collector 
 
 ## Configuration
 
-The OTLP exporter offers some configuration options. To configure the exporter, create an `OtlpExporterOptions` struct (defined in [exporter.h](https://github.com/open-telemetry/opentelemetry-cpp/blob/master/exporters/otlp/include/opentelemetry/exporters/otlp/otlp_exporter.h)), set the options inside, and pass the struct to the `OtlpExporter` constructor, like so:
+The OTLP exporter offers some configuration options. To configure the exporter, create an `OtlpExporterOptions` struct (defined in [exporter.h](https://github.com/open-telemetry/opentelemetry-cpp/blob/main/exporters/otlp/include/opentelemetry/exporters/otlp/otlp_exporter.h)), set the options inside, and pass the struct to the `OtlpExporter` constructor, like so:
 
 ```
 OtlpExporterOptions options;
@@ -24,4 +24,4 @@ auto exporter = std::unique_ptr<sdktrace::SpanExporter>(new otlp::OtlpExporter(o
 
 ## Example
 
-For a complete example demonstrating how to use the OTLP exporter, see [examples/otlp](https://github.com/open-telemetry/opentelemetry-cpp/blob/master/examples/otlp/).
+For a complete example demonstrating how to use the OTLP exporter, see [examples/otlp](https://github.com/open-telemetry/opentelemetry-cpp/blob/main/examples/otlp/).
