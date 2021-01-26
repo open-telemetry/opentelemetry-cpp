@@ -1,6 +1,7 @@
 #pragma once
 
 #include "http_operation_curl.h"
+#include "opentelemetry/ext/http/client/http_client.h"
 
 #include <map>
 #include <string>
@@ -187,7 +188,7 @@ public:
   HttpClientSync() { curl_global_init(CURL_GLOBAL_ALL); }
 
   http_client::Result Get(const nostd::string_view &url,
-                          http_client::Headers &headers) noexcept override
+                          const http_client::Headers &headers) noexcept override
   {
     http_client::Body body;
     HttpOperation curl_operation(http_client::Method::Get, url.data(), nullptr, RequestMode::Sync,
@@ -212,14 +213,10 @@ public:
 
   http_client::Result Post(const nostd::string_view &url,
                            const Data &data,
-                           http_client::Headers &headers) noexcept override
+                           const http_client::Headers &headers) noexcept override
   {
     HttpOperation curl_operation(http_client::Method::Post, url.data(), nullptr, RequestMode::Sync,
                                  headers);
-    if (headers.size() == 0)
-    {
-      headers.insert({"content-type", "application/json"});
-    }
     curl_operation.SendSync();
     auto session_state = curl_operation.GetSessionState();
     if (curl_operation.WasAborted())

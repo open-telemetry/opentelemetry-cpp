@@ -238,9 +238,11 @@ public:
 class HttpClientSync
 {
 public:
-  virtual Result Get(const nostd::string_view &url, Headers &) noexcept = 0;
+  virtual Result Get(const nostd::string_view &url, const Headers & = {{}}) noexcept = 0;
 
-  virtual Result Post(const nostd::string_view &url, const Data &data, Headers &) noexcept = 0;
+  virtual Result Post(const nostd::string_view &url,
+                      const Data &data,
+                      const Headers & = {{"content-type", "application/json"}}) noexcept = 0;
 
   virtual ~HttpClientSync() = default;
 };
