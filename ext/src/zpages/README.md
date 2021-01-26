@@ -14,7 +14,7 @@ zPages are a quick and light way to view tracing and metrics information on stan
    bazel build //examples/zpages:zpages_example
    bazel-bin/examples/zpages/zpages_example
    ```
-   If you look at the [zPages example's source code](https://github.com/open-telemetry/opentelemetry-cpp/blob/master/examples/zpages/zpages_example.cc), it demonstrates adding zPages, manual application instrumentation (which sends data to zPages for viewing), and simulated use cases for zPages.
+   If you look at the [zPages example's source code](https://github.com/open-telemetry/opentelemetry-cpp/blob/main/examples/zpages/zpages_example.cc), it demonstrates adding zPages, manual application instrumentation (which sends data to zPages for viewing), and simulated use cases for zPages.
 3. View zPages at http://localhost:3000/tracez
 
 
