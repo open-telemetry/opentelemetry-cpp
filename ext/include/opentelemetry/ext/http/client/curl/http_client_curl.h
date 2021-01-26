@@ -2,6 +2,7 @@
 
 #include "http_operation_curl.h"
 #include "opentelemetry/ext/http/client/http_client.h"
+#include "opentelemetry/version.h"
 
 #include <map>
 #include <string>

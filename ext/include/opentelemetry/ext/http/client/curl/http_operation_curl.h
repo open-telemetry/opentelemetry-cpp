@@ -1,5 +1,8 @@
 #pragma once
 
+#include "http_client_curl.h"
+#include "opentelemetry/version.h"
+
 #include <curl/curl.h>
 #include <future>
 #include <map>
