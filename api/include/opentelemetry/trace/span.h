@@ -29,6 +29,16 @@ enum class SpanKind
   kProducer,
   kConsumer,
 };
+
+// StatusCode - Represents the canonical set of status codes of a finished Span.
+
+enum class StatusCode
+{
+  Unset,  // default status
+  Ok,     // Operation has completed successfully.
+  Error   // The operation contains an error
+};
+
 /**
  * StartSpanOptions provides options to set properties of a Span at the time of
  * its creation
@@ -147,10 +157,10 @@ public:
                        attributes.begin(), attributes.end()});
   }
 
-  // Sets the status of the span. The default status is OK. Only the value of
+  // Sets the status of the span. The default status is Unset. Only the value of
   // the last call will be
   // recorded, and implementations are free to ignore previous calls.
-  virtual void SetStatus(CanonicalCode code, nostd::string_view description) noexcept = 0;
+  virtual void SetStatus(StatusCode code, nostd::string_view description) noexcept = 0;
 
   // Updates the name of the Span. If used, this will override the name provided
   // during creation.

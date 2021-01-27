@@ -154,7 +154,7 @@ void Recordable::AddLink(const opentelemetry::trace::SpanContext &span_context,
   // TODO: Populate trace_state when it is supported by SpanContext
 }
 
-void Recordable::SetStatus(trace::CanonicalCode code, nostd::string_view description) noexcept
+void Recordable::SetStatus(trace::StatusCode code, nostd::string_view description) noexcept
 {
   span_.mutable_status()->set_code(opentelemetry::proto::trace::v1::Status_StatusCode(code));
   span_.mutable_status()->set_message(description.data(), description.size());

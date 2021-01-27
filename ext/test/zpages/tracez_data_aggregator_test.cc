@@ -156,7 +156,7 @@ TEST_F(TracezDataAggregatorTest, SingleErrorSpan)
 {
   // Start and end a single error span
   auto span = tracer->StartSpan(span_name1);
-  span->SetStatus(opentelemetry::trace::CanonicalCode::CANCELLED, "span cancelled");
+  span->SetStatus(opentelemetry::trace::StatusCode::Error, "span cancelled");
   span->End();
   std::this_thread::sleep_for(milliseconds(500));
   auto data = tracez_data_aggregator->GetAggregatedTracezData();
@@ -320,7 +320,7 @@ TEST_F(TracezDataAggregatorTest, MultipleErrorSpans)
     for (auto error_desc : span_error.second)
     {
       auto span = tracer->StartSpan(span_error.first);
-      span->SetStatus(opentelemetry::trace::CanonicalCode::CANCELLED, error_desc);
+      span->SetStatus(opentelemetry::trace::StatusCode::Error, error_desc);
       span->End();
     }
   }
@@ -400,7 +400,7 @@ TEST_F(TracezDataAggregatorTest, ErrorSampleSpansOverCapacity)
   for (auto span_error_description : span_error_descriptions)
   {
     auto span = tracer->StartSpan(span_name1);
-    span->SetStatus(opentelemetry::trace::CanonicalCode::CANCELLED, span_error_description);
+    span->SetStatus(opentelemetry::trace::StatusCode::Error, span_error_description);
     span->End();
   }
 
@@ -490,7 +490,7 @@ TEST_F(TracezDataAggregatorTest, SpanNameInAlphabeticalOrder)
   auto span_first = tracer->StartSpan(span_name2);
   tracer->StartSpan(span_name1)->End();
   auto span_third = tracer->StartSpan(span_name3);
-  span_third->SetStatus(opentelemetry::trace::CanonicalCode::CANCELLED, "span cancelled");
+  span_third->SetStatus(opentelemetry::trace::StatusCode::Error, "span cancelled");
   span_third->End();
   std::this_thread::sleep_for(milliseconds(500));
   // Get data and check if span name exists in aggregation
@@ -670,7 +670,7 @@ TEST_F(TracezDataAggregatorTest, NoChangeInBetweenCallsToAggregator)
   tracer->StartSpan(span_name1, start)->End(end);
   auto running_span = tracer->StartSpan(span_name2);
   auto span         = tracer->StartSpan(span_name3);
-  span->SetStatus(opentelemetry::trace::CanonicalCode::CANCELLED, "span cancelled");
+  span->SetStatus(opentelemetry::trace::StatusCode::Error, "span cancelled");
   span->End();
   std::this_thread::sleep_for(milliseconds(500));
   auto data = tracez_data_aggregator->GetAggregatedTracezData();

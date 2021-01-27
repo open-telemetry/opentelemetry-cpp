@@ -158,8 +158,7 @@ void Span::AddEvent(nostd::string_view name,
   recordable_->AddEvent(name, timestamp, attributes);
 }
 
-void Span::SetStatus(opentelemetry::trace::CanonicalCode code,
-                     nostd::string_view description) noexcept
+void Span::SetStatus(opentelemetry::trace::StatusCode code, nostd::string_view description) noexcept
 {
   std::lock_guard<std::mutex> lock_guard{mu_};
   if (recordable_ == nullptr)

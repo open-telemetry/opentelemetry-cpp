@@ -30,7 +30,7 @@ int main(int argc, char *argv[])
   std::map<std::string, opentelemetry::common::AttributeValue> attribute_map;
   attribute_map["completed_search_for"] = "Unknown user";
   tracer->StartSpan("find user", attribute_map)
-      ->SetStatus(opentelemetry::trace::CanonicalCode::NOT_FOUND, "User not found");
+      ->SetStatus(opentelemetry::trace::StatusCode::Error, "User not found");
 
   // Long time duration span
   std::map<std::string, opentelemetry::common::AttributeValue> attribute_map2;

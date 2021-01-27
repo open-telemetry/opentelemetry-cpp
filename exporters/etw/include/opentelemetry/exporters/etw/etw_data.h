@@ -267,8 +267,7 @@ public:
   /// <param name="code"></param>
   /// <param name="description"></param>
   /// <returns></returns>
-  virtual void SetStatus(trace::CanonicalCode code,
-                         nostd::string_view description) noexcept override
+  virtual void SetStatus(trace::StatusCode code, nostd::string_view description) noexcept override
   {
     // TODO: not implemented
     UNREFERENCED_PARAMETER(code);
@@ -485,7 +484,7 @@ public:
     // TODO: Link Implementation for the Span to be implemented
   }
 
-  void SetStatus(opentelemetry::trace::CanonicalCode code,
+  void SetStatus(opentelemetry::trace::StatusCode code,
                  nostd::string_view description) noexcept override
   {
     status_code_ = code;
