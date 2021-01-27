@@ -46,7 +46,7 @@ public:
   /**
    * Create an ZipkinExporter using the given options.
    */
-  ZipkinExporter(const ZipkinExporterOptions &options);
+  explicit ZipkinExporter(const ZipkinExporterOptions &options);
 
   /**
    * Create a span recordable.

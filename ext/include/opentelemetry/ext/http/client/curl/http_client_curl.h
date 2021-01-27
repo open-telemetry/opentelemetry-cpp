@@ -160,36 +160,6 @@ public:
     });
   }
 
-  virtual std::unique_ptr<http_client::Response> SendRequestSync(
-      http_client::SessionState &session_state) noexcept override
-  {
-    is_session_active_ = true;
-    std::string url    = host_ + std::string(http_request_->uri_);
-    curl_operation_.reset(new HttpOperation(http_request_->method_, url, nullptr, RequestMode::Sync,
-                                            http_request_->headers_, http_request_->body_, false,
-                                            http_request_->timeout_ms_));
-    curl_operation_->SendSync();
-    session_state = curl_operation_->GetSessionState();
-    if (curl_operation_->WasAborted())
-    {
-      session_state = http_client::SessionState::Cancelled;
-    }
-    auto response = std::unique_ptr<Response>(new Response());
-    if (curl_operation_->GetResponseCode() >= CURL_LAST)
-    {
-      // we have a http response
-      response->headers_ = curl_operation_->GetResponseHeaders();
-      response->body_    = curl_operation_->GetResponseBody();
-    }
-    else
-    {
-      // No http response
-      response->status_code_ = 0;
-    }
-    is_session_active_ = false;
-    return std::move(response);
-  }
-
   virtual bool CancelSession() noexcept override;
 
   virtual bool FinishSession() noexcept override;
