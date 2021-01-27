@@ -1,8 +1,5 @@
 #pragma once
 #include "opentelemetry/ext/http/client/http_client.h"
-#ifdef WITH_CURL
-#  include "opentelemetry/ext/http/client/curl/http_client_curl.h"
-#endif
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace ext
