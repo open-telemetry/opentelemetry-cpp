@@ -160,7 +160,7 @@ public:
   // Sets the status of the span. The default status is Unset. Only the value of
   // the last call will be
   // recorded, and implementations are free to ignore previous calls.
-  virtual void SetStatus(StatusCode code, nostd::string_view description) noexcept = 0;
+  virtual void SetStatus(StatusCode code, nostd::string_view description = "") noexcept = 0;
 
   // Updates the name of the Span. If used, this will override the name provided
   // during creation.
