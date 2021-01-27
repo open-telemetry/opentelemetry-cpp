@@ -10,7 +10,7 @@
     ```
 3. Verify that CHANGELOG.md is updated properly:
     ```
-    git diff master
+    git diff main
     ```
 4. Push the changes to upstream and create a Pull Request on GitHub.
     Be sure to include the curated changes from the [Changelog](./CHANGELOG.md) in the description.
