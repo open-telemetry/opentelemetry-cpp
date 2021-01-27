@@ -217,29 +217,31 @@ add_subdirectory(ext)
 set(INCLUDE_INSTALL_DIR "${CMAKE_INSTALL_INCLUDEDIR}")
 configure_package_config_file(
   "${CMAKE_CURRENT_LIST_DIR}/opentelemetry-cpp-config.cmake.in"
-  "${CMAKE_CURRENT_BINARY_DIR}/cmake/${PROJECT_NAME}-config.cmake"
-  INSTALL_DESTINATION "${CMAKE_INSTALL_LIBDIR}/cmake"
+  "${CMAKE_CURRENT_BINARY_DIR}/cmake/${PROJECT_NAME}/${PROJECT_NAME}-config.cmake"
+  INSTALL_DESTINATION "${CMAKE_INSTALL_LIBDIR}/cmake/${PROJECT_NAME}"
   PATH_VARS OPENTELEMETRY_ABI_VERSION_NO OPENTELEMETRY_VERSION PROJECT_NAME
             INCLUDE_INSTALL_DIR CMAKE_INSTALL_LIBDIR
   NO_CHECK_REQUIRED_COMPONENTS_MACRO)
 
 # Write version file for find_packages(opentelemetry-cpp CONFIG)
 write_basic_package_version_file(
-  "${CMAKE_CURRENT_BINARY_DIR}/cmake/${PROJECT_NAME}-config-version.cmake"
+  "${CMAKE_CURRENT_BINARY_DIR}/cmake/${PROJECT_NAME}/${PROJECT_NAME}-config-version.cmake"
   VERSION ${OPENTELEMETRY_VERSION}
   COMPATIBILITY ExactVersion)
 
 install(
-  FILES "${CMAKE_CURRENT_BINARY_DIR}/cmake/${PROJECT_NAME}-config.cmake"
-        "${CMAKE_CURRENT_BINARY_DIR}/cmake/${PROJECT_NAME}-config-version.cmake"
-  DESTINATION "${CMAKE_INSTALL_LIBDIR}/cmake")
+  FILES
+    "${CMAKE_CURRENT_BINARY_DIR}/cmake/${PROJECT_NAME}/${PROJECT_NAME}-config.cmake"
+    "${CMAKE_CURRENT_BINARY_DIR}/cmake/${PROJECT_NAME}/${PROJECT_NAME}-config-version.cmake"
+  DESTINATION "${CMAKE_INSTALL_LIBDIR}/cmake/${PROJECT_NAME}")
 
 # Export all components
 export(
   EXPORT "${PROJECT_NAME}-target"
   NAMESPACE "${PROJECT_NAME}::"
-  FILE "${CMAKE_CURRENT_BINARY_DIR}/cmake/${PROJECT_NAME}-target.cmake")
+  FILE "${CMAKE_CURRENT_BINARY_DIR}/cmake/${PROJECT_NAME}/${PROJECT_NAME}-target.cmake"
+)
 install(
   EXPORT "${PROJECT_NAME}-target"
   NAMESPACE "${PROJECT_NAME}::"
-  DESTINATION "${CMAKE_INSTALL_LIBDIR}/cmake")
+  DESTINATION "${CMAKE_INSTALL_LIBDIR}/cmake/${PROJECT_NAME}")
