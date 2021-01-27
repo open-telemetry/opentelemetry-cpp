@@ -9,7 +9,7 @@ namespace exporter
 namespace zipkin
 {
 
-// -------------------------------- Contructors --------------------------------
+// -------------------------------- Constructors --------------------------------
 
 ZipkinExporter::ZipkinExporter(const ZipkinExporterOptions &options)
     : options_(options), url_parser_(options_.endpoint)
