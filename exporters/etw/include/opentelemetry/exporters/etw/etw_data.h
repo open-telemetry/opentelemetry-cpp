@@ -426,7 +426,7 @@ public:
    * Get the status for this span
    * @return the status for this span
    */
-  opentelemetry::trace::CanonicalCode GetStatus() const noexcept { return status_code_; }
+  opentelemetry::trace::StatusCode GetStatus() const noexcept { return status_code_; }
 
   /**
    * Get the status description for this span
@@ -520,7 +520,7 @@ private:
   core::SystemTimestamp start_time_;
   std::chrono::nanoseconds duration_{0};
   std::string name_;
-  opentelemetry::trace::CanonicalCode status_code_{opentelemetry::trace::CanonicalCode::OK};
+  opentelemetry::trace::StatusCode status_code_{opentelemetry::trace::StatusCode::Unset};
   std::string status_desc_;
   sdk::common::AttributeMap attribute_map_;
   opentelemetry::trace::SpanKind span_kind_{opentelemetry::trace::SpanKind::kInternal};
