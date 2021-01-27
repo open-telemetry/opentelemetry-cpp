@@ -243,11 +243,11 @@ public:
   }
 
   http_client::Result Post(const nostd::string_view &url,
-                           const Data &data,
+                           const Body &body,
                            const http_client::Headers &headers) noexcept override
   {
     HttpOperation curl_operation(http_client::Method::Post, url.data(), nullptr, RequestMode::Sync,
-                                 headers);
+                                 headers, body);
     curl_operation.SendSync();
     auto session_state = curl_operation.GetSessionState();
     if (curl_operation.WasAborted())

@@ -38,7 +38,7 @@ TEST(ZipkinSpanRecordable, SetIds)
   EXPECT_EQ(rec.span(), j_span);
 }
 
-TEST(Recordable, SetName)
+TEST(ZipkinSpanRecordable, SetName)
 {
   nostd::string_view name = "Test Span";
   json j_span             = {{"name", name}};
@@ -47,7 +47,7 @@ TEST(Recordable, SetName)
   EXPECT_EQ(rec.span(), j_span);
 }
 
-TEST(Recordable, SetStartTime)
+TEST(ZipkinSpanRecordable, SetStartTime)
 {
   opentelemetry::exporter::zipkin::Recordable rec;
   std::chrono::system_clock::time_point start_time = std::chrono::system_clock::now();
@@ -60,7 +60,7 @@ TEST(Recordable, SetStartTime)
   EXPECT_EQ(rec.span(), j_span);
 }
 
-TEST(Recordable, SetDuration)
+TEST(ZipkinSpanRecordable, SetDuration)
 {
   json j_span = {{"duration", 10}, {"timestamp", 0}};
   opentelemetry::exporter::zipkin::Recordable rec;
@@ -75,7 +75,7 @@ TEST(Recordable, SetDuration)
   EXPECT_EQ(rec.span(), j_span);
 }
 
-TEST(Recordable, SetStatus)
+TEST(ZipkinSpanRecordable, SetStatus)
 {
   opentelemetry::exporter::zipkin::Recordable rec;
   trace::CanonicalCode code(trace::CanonicalCode::OK);
@@ -85,7 +85,7 @@ TEST(Recordable, SetStatus)
   EXPECT_EQ(rec.span(), j_span);
 }
 
-TEST(Recordable, AddEventDefault)
+TEST(ZipkinSpanRecordable, AddEventDefault)
 {
   opentelemetry::exporter::zipkin::Recordable rec;
   nostd::string_view name = "Test Event";
@@ -103,7 +103,7 @@ TEST(Recordable, AddEventDefault)
   EXPECT_EQ(rec.span(), j_span);
 }
 
-TEST(Recordable, AddEventWithAttributes)
+TEST(ZipkinSpanRecordable, AddEventWithAttributes)
 {
   opentelemetry::exporter::zipkin::Recordable rec;
   nostd::string_view name = "Test Event";
@@ -130,7 +130,7 @@ TEST(Recordable, AddEventWithAttributes)
 }
 
 // Test non-int single types. Int single types are tested using templates (see IntAttributeTest)
-TEST(Recordable, SetSingleAtrribute)
+TEST(ZipkinSpanRecordable, SetSingleAtrribute)
 {
   opentelemetry::exporter::zipkin::Recordable rec;
   nostd::string_view bool_key = "bool_attr";
@@ -151,7 +151,7 @@ TEST(Recordable, SetSingleAtrribute)
 }
 
 // Test non-int array types. Int array types are tested using templates (see IntAttributeTest)
-TEST(Recordable, SetArrayAtrribute)
+TEST(ZipkinSpanRecordable, SetArrayAtrribute)
 {
   opentelemetry::exporter::zipkin::Recordable rec;
   nlohmann::json j_span = {{"tags",
@@ -181,15 +181,15 @@ TEST(Recordable, SetArrayAtrribute)
  * use a template approach to test all int types.
  */
 template <typename T>
-struct IntAttributeTest : public testing::Test
+struct ZipkinIntAttributeTest : public testing::Test
 {
   using IntParamType = T;
 };
 
 using IntTypes = testing::Types<int, int64_t, unsigned int, uint64_t>;
-TYPED_TEST_CASE(IntAttributeTest, IntTypes);
+TYPED_TEST_CASE(ZipkinIntAttributeTest, IntTypes);
 
-TYPED_TEST(IntAttributeTest, SetIntSingleAttribute)
+TYPED_TEST(ZipkinIntAttributeTest, SetIntSingleAttribute)
 {
   using IntType = typename TestFixture::IntParamType;
   IntType i     = 2;
@@ -201,7 +201,7 @@ TYPED_TEST(IntAttributeTest, SetIntSingleAttribute)
   EXPECT_EQ(rec.span(), j_span);
 }
 
-TYPED_TEST(IntAttributeTest, SetIntArrayAttribute)
+TYPED_TEST(ZipkinIntAttributeTest, SetIntArrayAttribute)
 {
   using IntType = typename TestFixture::IntParamType;
 
