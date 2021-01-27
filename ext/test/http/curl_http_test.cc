@@ -270,37 +270,6 @@ TEST_F(BasicCurlHttpTests, CurlHttpOperations)
 TEST_F(BasicCurlHttpTests, SendGetRequestSync)
 {
   received_requests_.clear();
-  curl::SessionManager session_manager;
-
-  auto session = session_manager.CreateSession("127.0.0.1", HTTP_PORT);
-  auto request = session->CreateRequest();
-  request->SetUri("get/");
-  http_client::SessionState session_state;
-  auto response = session->SendRequestSync(session_state);
-  EXPECT_EQ(response->GetStatusCode(), 200);
-  EXPECT_EQ(session_state, http_client::SessionState::Response);
-}
-
-TEST_F(BasicCurlHttpTests, SendGetRequestSyncTimeout)
-{
-  received_requests_.clear();
-  curl::SessionManager session_manager;
-
-  auto session =
-      session_manager.CreateSession("222.222.222.200", HTTP_PORT);  // Non Existing address
-  auto request = session->CreateRequest();
-  request->SetTimeoutMs(std::chrono::milliseconds(3000));
-  request->SetUri("get/");
-  http_client::SessionState session_state;
-  auto response = session->SendRequestSync(session_state);
-  EXPECT_EQ(session_state, http_client::SessionState::ConnectFailed);
-  EXPECT_EQ(response->GetStatusCode(), 0);
-  EXPECT_EQ(response->GetBody().size(), 0);
-}
-
-TEST_F(BasicCurlHttpTests, SendGetRequestSync)
-{
-  received_requests_.clear();
   curl::HttpClientSync http_client;
 
   http_client::Headers m1 = {};

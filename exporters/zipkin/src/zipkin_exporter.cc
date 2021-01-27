@@ -14,13 +14,13 @@ namespace zipkin
 ZipkinExporter::ZipkinExporter(const ZipkinExporterOptions &options)
     : options_(options), url_parser_(options_.endpoint)
 {
-  http_session_manager_ = ext::http::client::HttpClientFactory::Create();
+  http_client_ = ext::http::client::HttpClientFactory::CreateSync();
   InitializeLocalEndpoint();
 }
 
 ZipkinExporter::ZipkinExporter() : options_(ZipkinExporterOptions()), url_parser_(options_.endpoint)
 {
-  http_session_manager_ = ext::http::client::HttpClientFactory::Create();
+  http_client_ = ext::http::client::HttpClientFactory::CreateSync();
   InitializeLocalEndpoint();
 }
 
@@ -38,9 +38,9 @@ sdk::trace::ExportResult ZipkinExporter::Export(
   {
     return sdk::trace::ExportResult::kFailure;
   }
-  auto session = http_session_manager_->CreateSession(url_parser_.host_, url_parser_.port_);
-  auto request = session->CreateRequest();
-  request->SetUri(url_parser_.path_);
+  // auto session = http_session_manager_->CreateSession(url_parser_.host_, url_parser_.port_);
+  // auto request = session->CreateRequest();
+  // request->SetUri(url_parser_.path_);
   exporter::zipkin::ZipkinSpan json_spans = {};
   for (auto &recordable : spans)
   {
@@ -55,12 +55,13 @@ sdk::trace::ExportResult ZipkinExporter::Export(
   }
   auto body_s = json_spans.dump();
   http_client::Body body_v(body_s.begin(), body_s.end());
-  request->SetMethod(opentelemetry::ext::http::client::Method::Post);
-  request->SetBody(body_v);
-  request->AddHeader("Content-Type", "application/json");
-  http_client::SessionState session_state;
-  auto response = session->SendRequestSync(session_state);
-  if (response && (response->GetStatusCode() == 200 || response->GetStatusCode() == 202))
+  // request->SetMethod(opentelemetry::ext::http::client::Method::Post);
+  // request->SetBody(body_v);
+  // request->AddHeader("Content-Type", "application/json");
+  // http_client::SessionState session_state;
+  // auto response = session->SendRequestSync(session_state);
+  auto result = http_client_ if (response && (response->GetStatusCode() == 200 ||
+                                              response->GetStatusCode() == 202))
   {
     return sdk::trace::ExportResult::kSuccess;
   }

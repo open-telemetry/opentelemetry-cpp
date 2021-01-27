@@ -35,7 +35,7 @@ namespace http_client = opentelemetry::ext::http::client;
 /**
  * The Zipkin exporter exports span data in JSON format as expected by Zipkin
  */
-class ZipkinExporter final : public trace_sdk::SpanExporter, public http_client::EventHandler
+class ZipkinExporter final : public trace_sdk::SpanExporter
 {
 public:
   /**
@@ -71,26 +71,15 @@ public:
     return true;
   };
 
-  void OnResponse(http_client::Response &response) noexcept override
-  { /*Not required */
-  }
-
-  virtual void OnEvent(http_client::SessionState state,
-                       nostd::string_view msg) noexcept override{/* Not required */};
-
-  virtual void OnConnecting(const http_client::SSLCertificate &) noexcept override{
-      /* Not required */};
-
 private:
   void InitializeLocalEndpoint();
 
 private:
   // The configuration options associated with this exporter.
   bool isShutdown_ = false;
-  std::shared_ptr<http_client::SessionManager> http_session_manager_;
+  std::shared_ptr<http_client::HttpClientSync> http_client;
   nlohmann::json local_end_point_;
   ZipkinExporterOptions options_;
-  ext::http::common::UrlParser url_parser_;
 };
 }  // namespace zipkin
 }  // namespace exporter
