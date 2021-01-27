@@ -16,3 +16,7 @@ endif()
 if(WITH_ETW)
   add_subdirectory(etw)
 endif()
+
+if(WITH_JAEGER)
+  add_subdirectory(jaeger)
+endif()

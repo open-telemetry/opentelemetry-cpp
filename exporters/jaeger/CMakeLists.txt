@@ -27,9 +27,9 @@ add_library(jaeger_trace_exporter ${JAEGER_THRIFT_GENCPP_SOURCES})
 target_link_libraries(jaeger_trace_exporter PRIVATE thrift::thrift Boost::boost)
 
 if(BUILD_TESTING)
-  add_executable(jaeger_exporter_test )
-  target_link_libraries(jaeger_exporter_test ${GTEST_BOTH_LIBRARIES})
-                        ${CMAKE_THREAD_LIBS_INIT} jaeger_trace_exporter)
-
-  gtest_add_tests()
+    #  add_executable(jaeger_exporter_test )
+    #  target_link_libraries(jaeger_exporter_test ${GTEST_BOTH_LIBRARIES})
+    #                        ${CMAKE_THREAD_LIBS_INIT} jaeger_trace_exporter)
+    #
+    #  gtest_add_tests()
 endif() # BUILD_TESTING
