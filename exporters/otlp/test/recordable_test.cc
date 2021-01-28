@@ -77,7 +77,7 @@ TEST(Recordable, SetDuration)
 TEST(Recordable, SetStatus)
 {
   Recordable rec;
-  trace::StatusCode code(trace::StatusCode::Ok);
+  trace::StatusCode code(trace::StatusCode::kOk);
   nostd::string_view description = "For test";
   rec.SetStatus(code, description);
 

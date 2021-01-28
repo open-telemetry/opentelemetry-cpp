@@ -124,8 +124,8 @@ void TracezDataAggregator::AggregateCompletedSpans(
       aggregated_tracez_data_[span_name] = TracezData();
     }
 
-    if (completed_span->GetStatus() == trace::StatusCode::Ok ||
-        completed_span->GetStatus() == trace::StatusCode::Unset)
+    if (completed_span->GetStatus() == trace::StatusCode::kOk ||
+        completed_span->GetStatus() == trace::StatusCode::kUnset)
       AggregateStatusOKSpan(completed_span);
     else
       AggregateStatusErrorSpan(completed_span);

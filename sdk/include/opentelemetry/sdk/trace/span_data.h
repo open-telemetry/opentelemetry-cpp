@@ -227,7 +227,7 @@ private:
   core::SystemTimestamp start_time_;
   std::chrono::nanoseconds duration_{0};
   std::string name_;
-  opentelemetry::trace::StatusCode status_code_{opentelemetry::trace::StatusCode::Unset};
+  opentelemetry::trace::StatusCode status_code_{opentelemetry::trace::StatusCode::kUnset};
   std::string status_desc_;
   common::AttributeMap attribute_map_;
   std::vector<SpanDataEvent> events_;

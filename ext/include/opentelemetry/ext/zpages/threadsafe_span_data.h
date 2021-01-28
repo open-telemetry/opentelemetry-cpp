@@ -216,7 +216,7 @@ private:
   std::chrono::nanoseconds duration_{0};
   std::string name_;
   opentelemetry::trace::SpanKind span_kind_;
-  opentelemetry::trace::StatusCode status_code_{opentelemetry::trace::StatusCode::Unset};
+  opentelemetry::trace::StatusCode status_code_{opentelemetry::trace::StatusCode::kUnset};
   std::string status_desc_;
   std::unordered_map<std::string, opentelemetry::sdk::common::OwnedAttributeValue> attributes_;
   std::vector<opentelemetry::sdk::trace::SpanDataEvent> events_;

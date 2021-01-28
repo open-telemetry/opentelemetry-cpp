@@ -34,9 +34,9 @@ enum class SpanKind
 
 enum class StatusCode
 {
-  Unset,  // default status
-  Ok,     // Operation has completed successfully.
-  Error   // The operation contains an error
+  kUnset,  // default status
+  kOk,     // Operation has completed successfully.
+  kError   // The operation contains an error
 };
 
 /**

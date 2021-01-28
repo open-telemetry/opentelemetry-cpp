@@ -112,7 +112,7 @@ TEST(OStreamSpanExporter, PrintChangedSpanCout)
 
   recordable->SetStartTime(now);
   recordable->SetDuration(std::chrono::nanoseconds(100));
-  recordable->SetStatus(opentelemetry::trace::StatusCode::Ok, "Test Description");
+  recordable->SetStatus(opentelemetry::trace::StatusCode::kOk, "Test Description");
   recordable->SetSpanKind(opentelemetry::trace::SpanKind::kClient);
 
   recordable->SetAttribute("attr1", "string");
@@ -173,7 +173,7 @@ TEST(OStreamSpanExporter, PrintChangedSpanCerr)
 
   recordable->SetStartTime(now);
   recordable->SetDuration(std::chrono::nanoseconds(100));
-  recordable->SetStatus(opentelemetry::trace::StatusCode::Ok, "Test Description");
+  recordable->SetStatus(opentelemetry::trace::StatusCode::kOk, "Test Description");
   recordable->SetSpanKind(opentelemetry::trace::SpanKind::kConsumer);
 
   std::array<bool, 3> array2 = {false, true, false};
@@ -235,7 +235,7 @@ TEST(OStreamSpanExporter, PrintChangedSpanClog)
 
   recordable->SetStartTime(now);
   recordable->SetDuration(std::chrono::nanoseconds(100));
-  recordable->SetStatus(opentelemetry::trace::StatusCode::Ok, "Test Description");
+  recordable->SetStatus(opentelemetry::trace::StatusCode::kOk, "Test Description");
   recordable->SetSpanKind(opentelemetry::trace::SpanKind::kInternal);
 
   std::array<int, 3> array1 = {1, 2, 3};
