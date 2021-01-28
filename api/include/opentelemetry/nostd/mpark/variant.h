@@ -1098,8 +1098,9 @@ namespace detail
 {
 
 template <std::size_t I, typename V>
-inline constexpr /* auto * */ auto generic_get_if(V *v) noexcept AUTO_RETURN(
-    v &&holds_alternative<I>(*v) ? std::addressof(access::variant::get_alt<I>(*v).value) : nullptr)
+inline constexpr /* auto * */ auto generic_get_if(V *v) noexcept
+    AUTO_RETURN(v &&holds_alternative<I>(*v) ? std::addressof(access::variant::get_alt<I>(*v).value)
+                                             : nullptr)
 
 }  // namespace detail
 

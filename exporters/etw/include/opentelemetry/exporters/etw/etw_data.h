@@ -450,8 +450,8 @@ public:
    * Get the attributes for this span
    * @return the attributes for this span
    */
-  const std::unordered_map<std::string, sdk::common::OwnedAttributeValue> &GetAttributes() const
-      noexcept
+  const std::unordered_map<std::string, sdk::common::OwnedAttributeValue> &GetAttributes()
+      const noexcept
   {
     return attribute_map_.GetAttributes();
   }
