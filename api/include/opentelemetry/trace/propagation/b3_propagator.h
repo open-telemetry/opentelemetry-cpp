@@ -43,8 +43,7 @@ static const int kTraceFlagHexStrLength = 1;
 
 // The B3PropagatorExtractor class provides an interface that enables extracting context from
 // headers of HTTP requests. HTTP frameworks and clients can integrate with B3Propagator by
-// providing the object  containing the headers, and a getter function for the extraction.
-// Based on:
+// providing the object containing the headers, and a getter function for the extraction. Based on:
 // https://github.com/open-telemetry/opentelemetry-specification/blob/master/specification/context/api-propagators.md#b3-extract
 template <typename T>
 class B3PropagatorExtractor : public HTTPTextFormat<T>
@@ -77,7 +76,6 @@ public:
   static TraceId GenerateTraceIdFromString(nostd::string_view trace_id)
   {
     uint8_t buf[kTraceIdHexStrLength / 2];
-    uint8_t *b_ptr = buf;
     GenerateBuffFromHexStrPad0(trace_id, sizeof(buf), buf);
     return TraceId(buf);
   }
@@ -85,7 +83,6 @@ public:
   static SpanId GenerateSpanIdFromString(nostd::string_view span_id)
   {
     uint8_t buf[kSpanIdHexStrLength / 2];
-    uint8_t *b_ptr = buf;
     GenerateBuffFromHexStrPad0(span_id, sizeof(buf), buf);
     return SpanId(buf);
   }
@@ -136,15 +133,15 @@ private:
   {
     if (c >= '0' && c <= '9')
     {
-      return (int)(c - '0');
+      return (int8_t)(c - '0');
     }
     else if (c >= 'a' && c <= 'f')
     {
-      return (int)(c - 'a' + 10);
+      return (int8_t)(c - 'a' + 10);
     }
     else if (c >= 'A' && c <= 'F')
     {
-      return (int)(c - 'A' + 10);
+      return (int8_t)(c - 'A' + 10);
     }
     else
     {
@@ -221,9 +218,9 @@ public:
     {
       return;
     }
-    char trace_id[32];
+    char trace_id[kTraceIdHexStrLength];
     TraceId(span_context.trace_id()).ToLowerBase16(trace_id);
-    char span_id[16];
+    char span_id[kSpanIdHexStrLength];
     SpanId(span_context.span_id()).ToLowerBase16(span_id);
     char trace_flags[2];
     TraceFlags(span_context.trace_flags()).ToLowerBase16(trace_flags);
