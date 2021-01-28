@@ -81,6 +81,8 @@ option(WITH_PROMETHEUS "Whether to include the Prometheus Client in the SDK"
 option(WITH_ELASTICSEARCH
        "Whether to include the Elasticsearch Client in the SDK" OFF)
 
+option(WITH_JAEGER "Whether to include the Jaeger exporter" OFF)
+
 option(BUILD_TESTING "Whether to enable tests" ON)
 if(WIN32)
   option(WITH_ETW "Whether to include the ETW Exporter in the SDK" ON)
