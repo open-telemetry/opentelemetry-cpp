@@ -28,7 +28,7 @@ example-specific documentation for other build automation tools.
 Install the latest bazel version by following the steps listed
 [here](https://docs.bazel.build/versions/master/install.html).
 
-Select an example of interest from the [examples folder](https://github.com/open-telemetry/opentelemetry-cpp/tree/master/examples).
+Select an example of interest from the [examples folder](https://github.com/open-telemetry/opentelemetry-cpp/tree/main/examples).
 Inside each example directory is a `BUILD` file containing instructions for
 Bazel. Find the binary name of your example by inspecting the contents of this
 `BUILD` file.

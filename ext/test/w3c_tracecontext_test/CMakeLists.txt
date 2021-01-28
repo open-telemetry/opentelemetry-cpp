@@ -12,5 +12,5 @@ else()
   add_executable(w3c_tracecontext_test main.cc)
   target_link_libraries(
     w3c_tracecontext_test ${CMAKE_THREAD_LIBS_INIT} opentelemetry_trace
-    opentelemetry_exporter_ostream_span ${CURL_LIBRARIES})
+    http_client_curl opentelemetry_exporter_ostream_span ${CURL_LIBRARIES})
 endif()
