@@ -633,7 +633,7 @@ The exporter SHOULD be called with a checkpoint of finished (possibly dimensiona
 
 There is very little left for the exporter to do other than format the metric updates into the desired format and send them on their way.
 
-Design choice: Our idea is to take the simple trace example [StdoutExporter](https://github.com/open-telemetry/opentelemetry-cpp/blob/master/examples/simple/stdout_exporter.h) and add Metric functionality to it. This will allow us to verify that what we are implementing in the API and SDK works as intended. The exporter will go through the different metric instruments and print the value stored in their aggregators to stdout, **for simplicity only Sum is shown here, but all aggregators will be implemented**.
+Design choice: Our idea is to take the simple trace example [OStreamSpanExporter](https://github.com/open-telemetry/opentelemetry-cpp/blob/main/examples/simple/main.cc) and add Metric functionality to it. This will allow us to verify that what we are implementing in the API and SDK works as intended. The exporter will go through the different metric instruments and print the value stored in their aggregators to stdout, **for simplicity only Sum is shown here, but all aggregators will be implemented**.
 
 
 ```cc

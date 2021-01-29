@@ -53,7 +53,7 @@ different binding models and the recommendations.
   itself instrument using OpenTelemetry or register a specific implementation.
 
 For more information on language-agnostic library, please see:
-[OpenTelemetry Specification Library Guidelines](https://github.com/open-telemetry/opentelemetry-specification/blob/master/specification/library-guidelines.md).
+[OpenTelemetry Specification Library Guidelines](https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/library-guidelines.md).
 
 ### ABI Compatibility
 

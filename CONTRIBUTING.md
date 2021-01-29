@@ -8,10 +8,10 @@ See the [public meeting notes](https://docs.google.com/document/d/1i1E4-_y4uJ083
 for a summary description of past meetings. To request edit access, join the
 meeting or get in touch on [Gitter](https://gitter.im/open-telemetry/opentelemetry-cpp).
 
-See the [community membership document](https://github.com/open-telemetry/community/blob/master/community-membership.md)
-on how to become a [**Member**](https://github.com/open-telemetry/community/blob/master/community-membership.md#member),
-[**Approver**](https://github.com/open-telemetry/community/blob/master/community-membership.md#approver)
-and [**Maintainer**](https://github.com/open-telemetry/community/blob/master/community-membership.md#maintainer).
+See the [community membership document](https://github.com/open-telemetry/community/blob/main/community-membership.md)
+on how to become a [**Member**](https://github.com/open-telemetry/community/blob/main/community-membership.md#member),
+[**Approver**](https://github.com/open-telemetry/community/blob/main/community-membership.md#approver)
+and [**Maintainer**](https://github.com/open-telemetry/community/blob/main/community-membership.md#maintainer).
 
 ## Development
 
@@ -106,8 +106,8 @@ To run tests locally, please read the [CI instructions](ci/README.md).
 
 A PR is considered to be **ready to merge** when:
 
-* It has received two approvals with at least one approval from [Approver](https://github.com/open-telemetry/community/blob/master/community-membership.md#approver)
-  / [Maintainer](https://github.com/open-telemetry/community/blob/master/community-membership.md#maintainer)
+* It has received two approvals with at least one approval from [Approver](https://github.com/open-telemetry/community/blob/main/community-membership.md#approver)
+  / [Maintainer](https://github.com/open-telemetry/community/blob/main/community-membership.md#maintainer)
   (at different company).
 * A pull reqeust opened by an Approver / Maintainer can be merged with only one approval from  Approver / Maintainer (at different company).
 * Major feedback items/points are resolved.
@@ -148,7 +148,7 @@ specifically the C++ repository.
 * Read through the [OpenTelemetry Collector](https://github.com/open-telemetry/opentelemetry-collector)
   GitHub repository.
   * This repository has a lot of good information surrounding the
-    OpenTelemetry ecosystem. At the top of the **[readme](https://github.com/open-telemetry/opentelemetry-collector/blob/master/README.md)**,
+    OpenTelemetry ecosystem. At the top of the **[readme](https://github.com/open-telemetry/opentelemetry-collector/blob/main/README.md)**,
     there are multiple links that give newcomers a good idea of what the
     project is about and how to get involved in it.
 * Read through the OpenTelemetry Python documentation
@@ -166,14 +166,14 @@ specifically the C++ repository.
   the example can be found in [PR #94](https://github.com/open-telemetry/opentelemetry-cpp/pull/94).
 
 * Read through the [Java Quick-Start
-  Guide](https://github.com/open-telemetry/opentelemetry-java/blob/master/QUICKSTART.md).
+  Guide](https://github.com/open-telemetry/opentelemetry-java/blob/main/QUICKSTART.md).
   This shows you how the classes and functions will interact in simple and
   easy to digest examples.
 * Take a look at this [Java SDK
-  example](https://github.com/open-telemetry/opentelemetry-java/tree/master/examples/sdk-usage).
+  example](https://github.com/open-telemetry/opentelemetry-java/tree/main/examples/sdk-usage).
   This shows a good use case of the SDK using stdout exporter.
 * Take a look at the [Java Jaeger
-  example](https://github.com/open-telemetry/opentelemetry-java/tree/master/examples/jaeger).
+  example](https://github.com/open-telemetry/opentelemetry-java/tree/main/examples/jaeger).
   This provides a brief introduction to the Jaeger exporter, its interface,
   and how to interact with the service.
 

@@ -44,7 +44,7 @@ static const int kTraceFlagHexStrLength = 1;
 // The B3PropagatorExtractor class provides an interface that enables extracting context from
 // headers of HTTP requests. HTTP frameworks and clients can integrate with B3Propagator by
 // providing the object containing the headers, and a getter function for the extraction. Based on:
-// https://github.com/open-telemetry/opentelemetry-specification/blob/master/specification/context/api-propagators.md#b3-extract
+// https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/context/api-propagators.md#b3-extract
 template <typename T>
 class B3PropagatorExtractor : public HTTPTextFormat<T>
 {
