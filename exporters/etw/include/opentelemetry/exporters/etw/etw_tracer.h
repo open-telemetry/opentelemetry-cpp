@@ -13,6 +13,8 @@
 // limitations under the License.
 #pragma once
 
+#include <algorithm>
+
 #include <cstdint>
 #include <cstdio>
 #include <cstdlib>
@@ -24,6 +26,7 @@
 #include <memory>
 #include <mutex>
 #include <sstream>
+#include <vector>
 
 #include "opentelemetry/nostd/shared_ptr.h"
 #include "opentelemetry/nostd/string_view.h"
@@ -54,6 +57,15 @@ namespace exporter
 {
 namespace ETW
 {
+
+struct ProviderOptions
+{
+  bool enableTraceId;
+  bool enableActivityId;
+  bool enableRelatedActivityId;
+  bool enableAutoContext;
+};
+
 class Span;
 
 /**
@@ -68,6 +80,15 @@ std::string GetName(T &t)
   auto sV = t.GetName();
   return std::string(sV.data(), sV.length());
 }
+
+static inline GUID ToActivityId(const trace::Span *span)
+{
+  if (span == nullptr)
+  {
+    return GUID({0, 0, 0, {0, 0, 0, 0, 0, 0, 0, 0}});
+  }
+  return utils::UUID(span->GetContext().span_id().Id().data()).to_GUID();
+};
 
 /**
  * @brief Utility template to convert SpanId or TraceId to hex.
@@ -107,6 +128,8 @@ class Tracer : public trace::Tracer
    * @brief Encoding (Manifest, MessagePack or XML)
    */
   ETWProvider::EventFormat encoding;
+
+  trace::TraceId traceId_;
 
   /**
    * @brief ETWProvider is a singleton that aggregates all ETW writes.
@@ -149,20 +172,42 @@ class Tracer : public trace::Tracer
    * @param span
    * @param
    */
-  virtual void EndSpan(const Span &span, const trace::EndSpanOptions & = {})
+  virtual void EndSpan(const Span &span, const trace::Span *parent = nullptr, const trace::EndSpanOptions & = {})
   {
     Properties evt;
 
-    auto ctx               = (reinterpret_cast<const trace::Span *>(&span))->GetContext();
+    const trace::Span& spanBase = reinterpret_cast<const trace::Span&>(span);
+
+    auto ctx     = spanBase.GetContext();
     evt[ETW_FIELD_NAME]    = GetName(span);
-    evt[ETW_FIELD_TYPE]    = ETW_FIELD_SPAN_END;
-    evt[ETW_FIELD_SPAN_ID] = ToLowerBase16(ctx.span_id());
+
+    // We use ActivityId instead of ETW_FIELD_SPAN_ID below
+    // evt[ETW_FIELD_SPAN_ID] = ToLowerBase16(ctx.span_id());
+    auto ActivityId = ToActivityId(&spanBase);
+
+    // Could be GUID NULL
+    auto RelatedActivityId = ToActivityId(parent);
 
     // TODO: check what EndSpanOptions should be supported for this exporter
-    etwProvider().write(provHandle, evt, encoding);
+    etwProvider().write(provHandle, evt, &ActivityId, &RelatedActivityId, 2, encoding);
+
+    {
+      const std::lock_guard<std::mutex> lock(scopes_mutex_);
+      auto spanId = ToLowerBase16(spanBase.GetContext().span_id());
+      scopes_.erase(spanId);
+    }
+
+  };
+
+  const trace::TraceId& trace_id()
+  {
+    return traceId_;
   };
 
   friend class Span;
+
+  std::mutex scopes_mutex_;  // protects scopes_
+  std::map<std::string, nostd::unique_ptr<trace::Scope>> scopes_;
 
 public:
   /**
@@ -179,11 +224,18 @@ public:
         provId(providerId.data(), providerId.size()),
         encoding(encoding)
   {
+      GUID trace_id;
+      // Generate random GUID
+      CoCreateGuid(&trace_id);
+      const auto *traceIdBytes = reinterpret_cast<const uint8_t *>(std::addressof(trace_id));
+      // Populate TraceId with that GUID
+      traceId_ = trace::TraceId(traceIdBytes);
+
 #if defined(HAVE_MSGPACK) && !defined(HAVE_TLD)
     /* Fallback to MsgPack encoding if TraceLoggingDynamic feature gate is off */
     this->encoding = ETWProvider::EventFormat::ETW_MSGPACK;
 #endif
-    provHandle = etwProvider().open(provId, encoding);
+      provHandle = etwProvider().open(provId, encoding);
   };
 
   /**
@@ -200,6 +252,16 @@ public:
       const trace::SpanContextKeyValueIterable &links,
       const trace::StartSpanOptions &options = {}) noexcept override
   {
+    const auto parent = GetCurrentSpan();
+    LPCGUID RelatedActivityIdPtr = nullptr;
+    GUID RelatedActivityId;
+    // Propagate parent activity only if parent span (current span) is valid
+    if (parent->GetContext().IsValid())
+    {
+      RelatedActivityId    = ToActivityId(parent.get());
+      RelatedActivityIdPtr = &RelatedActivityId;
+    };
+
     nostd::shared_ptr<trace::Span> result = trace::to_span_ptr<Span, Tracer>(this, name, options);
     auto spanContext                      = result->GetContext();
 
@@ -207,10 +269,12 @@ public:
     Properties evt = attributes;
 
     // Decorate with additional standard fields
-    evt[ETW_FIELD_NAME]     = name.data();
-    evt[ETW_FIELD_TYPE]     = ETW_FIELD_SPAN_START;
+    std::string eventName   = name.data();
+
+    evt[ETW_FIELD_NAME]     = eventName.data();
     evt[ETW_FIELD_TRACE_ID] = ToLowerBase16(spanContext.trace_id());
-    evt[ETW_FIELD_SPAN_ID]  = ToLowerBase16(spanContext.span_id());
+
+    auto ActivityId = ToActivityId(result.get());
 
     // Links
     DecorateLinks(evt, links);
@@ -221,7 +285,14 @@ public:
     // - options.parent
     // - options.start_steady_time
     // - options.start_system_time
-    etwProvider().write(provHandle, evt, encoding);
+    etwProvider().write(provHandle, evt, &ActivityId, RelatedActivityIdPtr, 1, encoding);
+
+    {
+      const std::lock_guard<std::mutex> lock(scopes_mutex_);
+      // Use span_id as index
+      scopes_[ToLowerBase16(result->GetContext().span_id())] = WithActiveSpan(result);
+    }
+
     return result;
   };
 
@@ -268,13 +339,16 @@ public:
     evt[ETW_FIELD_NAME] = name.data();
 
     auto spanContext = span.GetContext();
+
     // Decorate with additional standard fields. This may get expensive
     // and should be configurable for traces that deduct their nested
     // structure based off built-in `ActivityId` and `RelatedActivityId`
-    evt[ETW_FIELD_TRACE_ID] = ToLowerBase16(spanContext.trace_id());
+    // evt[ETW_FIELD_TRACE_ID] = ToLowerBase16(spanContext.trace_id());
     evt[ETW_FIELD_SPAN_ID]  = ToLowerBase16(spanContext.span_id());
 
-    etwProvider().write(provHandle, evt, encoding);
+    auto RelatedActivityId = ToActivityId(&span);
+
+    etwProvider().write(provHandle, evt, nullptr, &RelatedActivityId, encoding);
   };
 
   /**
@@ -314,9 +388,9 @@ class Span : public trace::Span
 {
 protected:
   /**
-   * @brief Parent (Owner) Tracer of this Span
+   * @brief Owner Tracer of this Span
    */
-  Tracer &owner;
+  Tracer &owner_;
 
   /**
    * @brief Span name.
@@ -333,7 +407,38 @@ protected:
    */
   std::atomic<bool> has_started_{false};
 
+  /**
+   * @brief Parent Span of this nested Span (optional)
+   */
+  Span *parent_{nullptr};
+
+  /**
+   * @brief Get Parent Span of this nested Span.
+   * @return Pointer to Parent or nullptr if no Parent.
+   */
+  Span *GetParent() const { return parent_; }
+
+  trace::SpanContext context_;
+
+  const trace::SpanContext CreateContext()
+  {
+    GUID activity_id;
+    // Generate random GUID
+    CoCreateGuid(&activity_id);
+    const auto *activityIdBytes = reinterpret_cast<const uint8_t *>(std::addressof(activity_id));
+    // Populate SpanId with that GUID
+    const trace::SpanId spanId(activityIdBytes);
+    // Inherit trace_id from Tracer
+    const trace::TraceId traceId{owner_.trace_id()};
+    // TODO: TraceFlags are not supported by ETW exporter.
+    const trace::TraceFlags flags{0};
+    // TODO: Remote parent is not supported by ETW exporter.
+    const bool hasRemoteParent = false;
+    return trace::SpanContext{traceId, spanId, flags, hasRemoteParent};
+  }
+
 public:
+
   /**
    * @brief Get Span Name.
    * @return Span Name.
@@ -345,10 +450,11 @@ public:
    * @param owner Owner Tracer
    * @param name Span name
    * @param options Span options
+   * @param parent Parent Span (optional)
    * @return
    */
-  Span(Tracer &owner, nostd::string_view name, const trace::StartSpanOptions &options) noexcept
-      : trace::Span(), owner(owner)
+  Span(Tracer &owner, nostd::string_view name, const trace::StartSpanOptions &options, Span* parent = nullptr) noexcept
+      : trace::Span(), owner_(owner), parent_(parent), context_(CreateContext())
   {
     name_ = name;
     UNREFERENCED_PARAMETER(options);
@@ -364,7 +470,7 @@ public:
    * @param name Event name.
    * @return
    */
-  void AddEvent(nostd::string_view name) noexcept override { owner.AddEvent(*this, name); }
+  void AddEvent(nostd::string_view name) noexcept override { owner_.AddEvent(*this, name); }
 
   /**
    * @brief Add named event with custom timestamp.
@@ -374,7 +480,7 @@ public:
    */
   void AddEvent(nostd::string_view name, core::SystemTimestamp timestamp) noexcept override
   {
-    owner.AddEvent(*this, name, timestamp);
+    owner_.AddEvent(*this, name, timestamp);
   }
 
   /**
@@ -388,7 +494,7 @@ public:
                 core::SystemTimestamp timestamp,
                 const common::KeyValueIterable &attributes) noexcept override
   {
-    owner.AddEvent(*this, name, timestamp, attributes);
+    owner_.AddEvent(*this, name, timestamp, attributes);
   }
 
   /**
@@ -443,7 +549,7 @@ public:
   {
     if (!has_ended_.exchange(true))
     {
-      owner.EndSpan(*this, options);
+      owner_.EndSpan(*this, parent_, options);
     }
   }
 
@@ -453,9 +559,7 @@ public:
    */
   trace::SpanContext GetContext() const noexcept override
   {
-    // TODO: not implemented
-    static trace::SpanContext nullContext{trace::SpanContext::GetInvalid()};
-    return nullContext;
+    return context_;
   }
 
   /**
@@ -480,7 +584,7 @@ public:
   /// Get Owner tracer of this Span
   /// </summary>
   /// <returns></returns>
-  trace::Tracer &tracer() const noexcept { return this->owner; };
+  trace::Tracer &tracer() const noexcept { return this->owner_; };
 };
 
 /// <summary>
