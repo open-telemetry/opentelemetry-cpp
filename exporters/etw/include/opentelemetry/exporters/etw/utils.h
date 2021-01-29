@@ -32,6 +32,8 @@
 #  include <wincrypt.h>
 #  pragma comment(lib, "Advapi32.lib")
 #  pragma comment(lib, "Rpcrt4.lib")
+#  include <Objbase.h>
+#  pragma comment(lib, "Ole32.Lib")
 #endif
 
 OPENTELEMETRY_BEGIN_NAMESPACE
