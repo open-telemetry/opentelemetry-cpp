@@ -14,7 +14,7 @@ namespace exporter
 namespace zipkin
 {
 
-std::string ZIPKIN_ENDPOINT_DEFAULT = "http://localhost:9411/api/v2/spans";
+constexpr std::string kZipkinEndpointDefault = "http://localhost:9411/api/v2/spans";
 
 /**
  * Struct to hold Zipkin  exporter options.
@@ -22,8 +22,8 @@ std::string ZIPKIN_ENDPOINT_DEFAULT = "http://localhost:9411/api/v2/spans";
 struct ZipkinExporterOptions
 {
   // The endpoint to export to. By default the OpenTelemetry Collector's default endpoint.
-  std::string endpoint     = ZIPKIN_ENDPOINT_DEFAULT;
-  TransportFormat format   = TransportFormat::JSON;
+  std::string endpoint     = kZipkinEndpointDefault;
+  TransportFormat format   = TransportFormat::kJson;
   std::string service_name = "default-service";
   std::string ipv4;
   std::string ipv6;
@@ -69,7 +69,7 @@ public:
       std::chrono::microseconds timeout = std::chrono::microseconds::max()) noexcept override
   {
     return true;
-  };
+  }
 
 private:
   void InitializeLocalEndpoint();

@@ -13,8 +13,8 @@ using ZipkinSpan = nlohmann::json;
 
 enum class TransportFormat
 {
-  JSON,
-  PROTOBUF
+  kJson,
+  kProtobuf
 };
 
 class Recordable final : public sdk::trace::Recordable

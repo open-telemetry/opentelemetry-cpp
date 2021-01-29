@@ -1,4 +1,4 @@
-# Copyright 2020, OpenTelemetry Authors
+# Copyright 2021, OpenTelemetry Authors
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -15,7 +15,7 @@
 include_directories(include)
 find_package(CURL)
 if(CURL_FOUND)
-  add_compile_definitions(WITH_CURL)
+  add_definitions(-DWITH_CURL)
 endif()
 add_library(zipkin_trace_exporter src/zipkin_exporter.cc src/recordable.cc)
 if(BUILD_TESTING)
