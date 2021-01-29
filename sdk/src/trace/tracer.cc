@@ -10,8 +10,10 @@ namespace sdk
 {
 namespace trace
 {
-Tracer::Tracer(std::shared_ptr<SpanProcessor> processor, std::shared_ptr<Sampler> sampler) noexcept
-    : processor_{processor}, sampler_{sampler}
+Tracer::Tracer(std::shared_ptr<SpanProcessor> processor,
+               const opentelemetry::sdk::resource::Resource &resource,
+               std::shared_ptr<Sampler> sampler) noexcept
+    : processor_{processor}, sampler_{sampler}, resource_{resource}
 {}
 
 void Tracer::SetProcessor(std::shared_ptr<SpanProcessor> processor) noexcept
@@ -71,8 +73,9 @@ nostd::shared_ptr<trace_api::Span> Tracer::StartSpan(
   }
   else
   {
-    auto span = nostd::shared_ptr<trace_api::Span>{new (std::nothrow) Span{
-        this->shared_from_this(), processor_.load(), name, attributes, links, options, parent}};
+    auto span = nostd::shared_ptr<trace_api::Span>{
+        new (std::nothrow) Span{this->shared_from_this(), processor_.load(), name, attributes,
+                                links, options, parent, resource_}};
 
     // if the attributes is not nullptr, add attributes to the span.
     if (sampling_result.attributes)

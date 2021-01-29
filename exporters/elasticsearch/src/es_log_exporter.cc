@@ -124,11 +124,11 @@ private:
 
 ElasticsearchLogExporter::ElasticsearchLogExporter()
     : options_{ElasticsearchExporterOptions()},
-      session_manager_{new ext::http::client::curl::SessionManager()}
+      http_client_{new ext::http::client::curl::HttpClient()}
 {}
 
 ElasticsearchLogExporter::ElasticsearchLogExporter(const ElasticsearchExporterOptions &options)
-    : options_{options}, session_manager_{new ext::http::client::curl::SessionManager()}
+    : options_{options}, http_client_{new ext::http::client::curl::HttpClient()}
 {}
 
 std::unique_ptr<sdklogs::Recordable> ElasticsearchLogExporter::MakeRecordable() noexcept
@@ -151,7 +151,7 @@ sdklogs::ExportResult ElasticsearchLogExporter::Export(
   }
 
   // Create a connection to the ElasticSearch instance
-  auto session = session_manager_->CreateSession(options_.host_, options_.port_);
+  auto session = http_client_->CreateSession(options_.host_, options_.port_);
   auto request = session->CreateRequest();
 
   // Populate the request with headers and methods
@@ -191,7 +191,7 @@ sdklogs::ExportResult ElasticsearchLogExporter::Export(
   // End the session
   session->FinishSession();
 
-  // If an error occured with the HTTP request
+  // If an error occurred with the HTTP request
   if (!write_successful)
   {
     // TODO: retry logic
@@ -220,8 +220,8 @@ bool ElasticsearchLogExporter::Shutdown(std::chrono::microseconds timeout) noexc
   is_shutdown_ = true;
 
   // Shutdown the session manager
-  session_manager_->CancelAllSessions();
-  session_manager_->FinishAllSessions();
+  http_client_->CancelAllSessions();
+  http_client_->FinishAllSessions();
 
   return true;
 }

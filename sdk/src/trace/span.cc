@@ -63,7 +63,8 @@ Span::Span(std::shared_ptr<Tracer> &&tracer,
            const opentelemetry::common::KeyValueIterable &attributes,
            const trace_api::SpanContextKeyValueIterable &links,
            const trace_api::StartSpanOptions &options,
-           const trace_api::SpanContext &parent_span_context) noexcept
+           const trace_api::SpanContext &parent_span_context,
+           const opentelemetry::sdk::resource::Resource &resource) noexcept
     : tracer_{std::move(tracer)},
       processor_{processor},
       recordable_{processor_->MakeRecordable()},
@@ -108,6 +109,7 @@ Span::Span(std::shared_ptr<Tracer> &&tracer,
   recordable_->SetSpanKind(options.kind);
   recordable_->SetStartTime(NowOr(options.start_system_time));
   start_steady_time = NowOr(options.start_steady_time);
+  // recordable_->SetResource(resource_); TODO
   processor_->OnStart(*recordable_);
 }
 
