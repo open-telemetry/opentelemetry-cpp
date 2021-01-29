@@ -69,7 +69,14 @@ TEST(ETWTracer, TracerCheck)
     {"attrib2", 2}
   };
 
-  auto outerSpan = tracer->StartSpan("MySpanOuter", attribs);
+  auto topSpan = tracer->StartSpan("MySpanTop");
+  std::this_thread::sleep_for (std::chrono::seconds(1));
+
+  auto outerSpan = tracer->StartSpan("MySpanL2", attribs);
+
+  // Create nested span. Note how we share the attributes here.
+  // It is Okay to either reuse/share or have your own attributes.
+  auto innerSpan = tracer->StartSpan("MySpanL3", attribs);
 
   // Add first event
   std::string eventName1 = "MyEvent1";
@@ -80,6 +87,7 @@ TEST(ETWTracer, TracerCheck)
     {"strKey", "someValue"}
   };
   EXPECT_NO_THROW(outerSpan->AddEvent(eventName1, event1));
+  std::this_thread::sleep_for (std::chrono::seconds(1));
 
   // Add second event
   std::string eventName2 = "MyEvent2";
@@ -90,24 +98,25 @@ TEST(ETWTracer, TracerCheck)
     {"strKey", "anotherValue"}
   };
   EXPECT_NO_THROW(outerSpan->AddEvent(eventName2, event2));
+  std::this_thread::sleep_for (std::chrono::seconds(2));
 
-
-  // Create nested span. Note how we share the attributes here..
-  // It is Okay to share or have your own attributes.
-  auto innerSpan = tracer->StartSpan("MySpanInner", attribs);
   std::string eventName3= "MyEvent3";
     Properties event3 =
   {
+    /* Extra metadata that allows event to flow to A.I. pipeline */
+    {"metadata", "ai_event"},
     {"uint32Key", (uint32_t)9876},
     {"uint64Key", (uint64_t)987654321},
     // {"int32array", {{-1,0,1,2,3}} },
     {"tempString", getTemporaryValue() }
   };
   EXPECT_NO_THROW(innerSpan->AddEvent(eventName3, event3));
+  std::this_thread::sleep_for (std::chrono::seconds(1));
 
   EXPECT_NO_THROW(innerSpan->End());    // end innerSpan
 
   EXPECT_NO_THROW(outerSpan->End());    // end outerSpan
+  EXPECT_NO_THROW(topSpan->End());      // end topSpan
 
   EXPECT_NO_THROW(tracer->CloseWithMicroseconds(0));
 }
