@@ -15,6 +15,7 @@ C++ standards:
 * ISO/IEC 14882:2011 (C++11, C++0x)
 * ISO/IEC 14882:2014 (C++14, C++1y)
 * ISO/IEC 14882:2017 (C++17, C++1z)
+* ISO/IEC 14882:2020 (C++20)
 
 Any exceptions to this are noted in the individual `README.md` files.
 
