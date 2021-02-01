@@ -159,8 +159,8 @@ TEST(TraceStateTest, TraceStateDelete)
   EXPECT_EQ(ts2_new.ToHeader(), "");
 
   trace_state_header = "k1=v1";  // single list member, delete invalid entry
-  auto ts3     = TraceState::FromHeader(trace_state_header);
-  auto ts3_new = ts3.Delete(std::string("InvalidKey"));
+  auto ts3           = TraceState::FromHeader(trace_state_header);
+  auto ts3_new       = ts3.Delete(std::string("InvalidKey"));
   EXPECT_EQ(ts3_new.ToHeader(), "");
 }
 
@@ -226,7 +226,6 @@ TEST(TraceStateTest, MemorySafe)
   auto ts1 = ts.Set(keys[2], values[2]);
   auto ts2 = ts1.Set(keys[1], values[1]);
   auto ts3 = ts2.Set(keys[0], values[0]);
-  ;
 
   opentelemetry::nostd::span<TraceState::Entry> entries = ts3.Entries();
   for (int i = 0; i < kNumPairs; i++)
