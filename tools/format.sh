@@ -25,8 +25,8 @@ fi
 # If not overridden, try to use clang-format-8 or clang-format.
 if [[ -z "$CLANG_FORMAT" ]]; then
   CLANG_FORMAT=clang-format
-  if which clang-format-8 >/dev/null; then
-    CLANG_FORMAT=clang-format-8
+  if which clang-format-10 >/dev/null; then
+    CLANG_FORMAT=clang-format-10
   fi
 fi
 
