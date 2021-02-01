@@ -16,6 +16,7 @@
 
 #include <cstdint>
 #include <cstring>
+#include <regex>
 #include <string>
 
 #include <iostream>
@@ -23,19 +24,6 @@
 #include "opentelemetry/nostd/span.h"
 #include "opentelemetry/nostd/string_view.h"
 #include "opentelemetry/nostd/unique_ptr.h"
-
-// regex support in GCC4.8 is limited and buggy, so check for support before using.
-// refer -
-//    https://stackoverflow.com/questions/12530406/is-gcc-4-8-or-earlier-buggy-about-regular-expressions
-#include <regex>
-#if __cplusplus >= 201103L &&                                                                 \
-    (!defined(__GLIBCXX__) || (__cplusplus >= 201402L) ||                                     \
-     (defined(_GLIBCXX_REGEX_DFS_QUANTIFIERS_LIMIT) || defined(_GLIBCXX_REGEX_STATE_LIMIT) || \
-      (defined(_GLIBCXX_RELEASE) && _GLIBCXX_RELEASE > 4)))
-#  define HAVE_WORKING_REGEX 1
-#else
-#  define HAVE_WORKING_REGEX 0
-#endif
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace trace
@@ -286,11 +274,8 @@ public:
    */
   static bool IsValidKey(nostd::string_view key)
   {
-#ifdef HAVE_WORKING_REGEX
-    return IsValidKeyRegEx(key);
-#else
+    // return IsValidKeyRegEx(key); // uncomment me for non-GCC4.8 C++11 compiler
     return IsValidKeyNonRegEx(key);
-#endif
   }
 
   /** Returns whether value is a valid value. See https://www.w3.org/TR/trace-context/#value
@@ -299,11 +284,8 @@ public:
    */
   static bool IsValidValue(nostd::string_view value)
   {
-#ifdef HAVE_WORKING_REGEX
-    return IsValidValueRegEx(value);
-#else
+    // return IsValidValueRegEx(value); // uncomment me for non-GCC4.8 C++11 compiler
     return IsValidValueNonRegEx(value);
-#endif
   }
 
 private:
@@ -331,8 +313,6 @@ private:
 
   static bool IsValidKeyRegEx(nostd::string_view key)
   {
-    std::cout << "\nkey regex";
-
     std::regex reg_key("^[a-z0-9][a-z0-9*_\\-/]{0,255}$");
     std::regex reg_key_multitenant(
         "^[a-z0-9][a-z0-9*_\\-/]{0,240}(@)[a-z0-9][a-z0-9*_\\-/]{0,13}$");
@@ -346,8 +326,6 @@ private:
 
   static bool IsValidValueRegEx(nostd::string_view value)
   {
-    std::cout << "\nval regex";
-
     // Hex 0x20 to 0x2B, 0x2D to 0x3C, 0x3E to 0x7E
     std::regex reg_value(
         "^[\\x20-\\x2B\\x2D-\\x3C\\x3E-\\x7E]{0,255}[\\x21-\\x2B\\x2D-\\x3C\\x3E-\\x7E]$");
@@ -361,8 +339,6 @@ private:
 
   static bool IsValidKeyNonRegEx(nostd::string_view key)
   {
-
-    std::cout << "\nkey non-regex";
     if (key.empty() || key.size() > kKeyMaxSize || !IsLowerCaseAlphaOrDigit(key[0]))
     {
       return false;
@@ -386,7 +362,6 @@ private:
 
   static bool IsValidValueNonRegEx(nostd::string_view value)
   {
-    std::cout << "\nval non-regex";
     if (value.empty() || value.size() > kValueMaxSize)
     {
       return false;
