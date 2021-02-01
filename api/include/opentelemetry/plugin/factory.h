@@ -36,9 +36,9 @@ public:
    * @param error_message on failure this will contain an error message.
    * @return a Tracer on success or nullptr on failure.
    */
-  std::shared_ptr<opentelemetry::trace::Tracer> MakeTracer(nostd::string_view tracer_config,
-                                                           std::string &error_message) const
-      noexcept
+  std::shared_ptr<opentelemetry::trace::Tracer> MakeTracer(
+      nostd::string_view tracer_config,
+      std::string &error_message) const noexcept
   {
     nostd::unique_ptr<char[]> plugin_error_message;
     auto tracer_handle = factory_impl_->MakeTracerHandle(tracer_config, plugin_error_message);

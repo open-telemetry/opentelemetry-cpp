@@ -154,15 +154,15 @@ void BatchLogProcessor::Export(const bool was_force_flush_called)
         buffer_.size() >= max_export_batch_size_ ? max_export_batch_size_ : buffer_.size();
   }
 
-  buffer_.Consume(
-      num_records_to_export, [&](CircularBufferRange<AtomicUniquePtr<Recordable>> range) noexcept {
-        range.ForEach([&](AtomicUniquePtr<Recordable> &ptr) {
-          std::unique_ptr<Recordable> swap_ptr = std::unique_ptr<Recordable>(nullptr);
-          ptr.Swap(swap_ptr);
-          records_arr.push_back(std::unique_ptr<Recordable>(swap_ptr.release()));
-          return true;
-        });
-      });
+  buffer_.Consume(num_records_to_export,
+                  [&](CircularBufferRange<AtomicUniquePtr<Recordable>> range) noexcept {
+                    range.ForEach([&](AtomicUniquePtr<Recordable> &ptr) {
+                      std::unique_ptr<Recordable> swap_ptr = std::unique_ptr<Recordable>(nullptr);
+                      ptr.Swap(swap_ptr);
+                      records_arr.push_back(std::unique_ptr<Recordable>(swap_ptr.release()));
+                      return true;
+                    });
+                  });
 
   exporter_->Export(
       nostd::span<std::unique_ptr<Recordable>>(records_arr.data(), records_arr.size()));

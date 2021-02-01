@@ -38,7 +38,7 @@ public:
     span_->AddEvent(name, timestamp, attributes);
   }
 
-  void SetStatus(trace::CanonicalCode code, nostd::string_view description) noexcept override
+  void SetStatus(trace::StatusCode code, nostd::string_view description) noexcept override
   {
     span_->SetStatus(code, description);
   }
