@@ -30,14 +30,14 @@ static uint64_t ConsumeBufferNumbers(BaselineCircularBuffer<uint64_t> &buffer) n
 static uint64_t ConsumeBufferNumbers(CircularBuffer<uint64_t> &buffer) noexcept
 {
   uint64_t result = 0;
-  buffer.Consume(
-      buffer.size(), [&](CircularBufferRange<AtomicUniquePtr<uint64_t>> & range) noexcept {
-        range.ForEach([&](AtomicUniquePtr<uint64_t> & ptr) noexcept {
-          result += *ptr;
-          ptr.Reset();
-          return true;
-        });
-      });
+  buffer.Consume(buffer.size(),
+                 [&](CircularBufferRange<AtomicUniquePtr<uint64_t>> &range) noexcept {
+                   range.ForEach([&](AtomicUniquePtr<uint64_t> &ptr) noexcept {
+                     result += *ptr;
+                     ptr.Reset();
+                     return true;
+                   });
+                 });
   return result;
 }
 
