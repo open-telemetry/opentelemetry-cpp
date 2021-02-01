@@ -251,8 +251,8 @@ public:
       auto entry = (entries_.get())[i];
       if ((entries_.get())[i].GetKey() != key)
       {
-        auto key   = (entries_.get())[i].GetKey();
-        auto value = (entries_.get())[i].GetValue();
+        auto key   = entry.GetKey();
+        auto value = entry.GetValue();
         Entry e(key, value);
         (ts.entries_.get())[ts.num_entries_++] = e;
       }
