@@ -16,10 +16,14 @@
 
 #include <cstdint>
 #include <cstring>
-#include <regex>
 #include <string>
 
-#include <iostream>
+#include <regex>
+#if (__GNUC__ == 4 && (__GNUC_MINOR__ == 8))
+#  define HAVE_WORKING_REGEX 0
+#else
+#  define HAVE_WORKING_REGEX 1
+#endif
 
 #include "opentelemetry/nostd/span.h"
 #include "opentelemetry/nostd/string_view.h"
@@ -196,7 +200,7 @@ public:
         return std::string(entry.GetValue());
       }
     }
-    return "";
+    return std::string();
   }
 
   /**
@@ -274,8 +278,11 @@ public:
    */
   static bool IsValidKey(nostd::string_view key)
   {
-    // return IsValidKeyRegEx(key); // uncomment me for non-GCC4.8 C++11 compiler
+#if HAVE_WORKING_REGEX
+    return IsValidKeyRegEx(key);
+#else
     return IsValidKeyNonRegEx(key);
+#endif
   }
 
   /** Returns whether value is a valid value. See https://www.w3.org/TR/trace-context/#value
@@ -284,8 +291,11 @@ public:
    */
   static bool IsValidValue(nostd::string_view value)
   {
-    // return IsValidValueRegEx(value); // uncomment me for non-GCC4.8 C++11 compiler
+#if HAVE_WORKING_REGEX
+    return IsValidValueRegEx(value);
+#else
     return IsValidValueNonRegEx(value);
+#endif
   }
 
 private:
