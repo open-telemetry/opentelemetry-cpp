@@ -31,7 +31,7 @@ namespace logs
 /**
  * A default Recordable implemenation to be passed in log statements,
  * matching the 10 fields of the Log Data Model.
- * (https://github.com/open-telemetry/opentelemetry-specification/blob/master/specification/logs/data-model.md#log-and-event-record-definition)
+ * (https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/logs/data-model.md#log-and-event-record-definition)
  *
  */
 class LogRecord final : public Recordable

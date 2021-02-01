@@ -98,11 +98,11 @@ public:
   // Contruct attribute map and populate with attributes
   AttributeMap(const opentelemetry::common::KeyValueIterable &attributes)
   {
-    attributes.ForEachKeyValue([&](nostd::string_view key,
-                                   opentelemetry::common::AttributeValue value) noexcept {
-      SetAttribute(key, value);
-      return true;
-    });
+    attributes.ForEachKeyValue(
+        [&](nostd::string_view key, opentelemetry::common::AttributeValue value) noexcept {
+          SetAttribute(key, value);
+          return true;
+        });
   }
 
   const std::unordered_map<std::string, OwnedAttributeValue> &GetAttributes() const noexcept

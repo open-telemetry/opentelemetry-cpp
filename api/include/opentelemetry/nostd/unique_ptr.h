@@ -102,7 +102,7 @@ public:
     return *this;
   }
 
-  operator std::unique_ptr<T>() && noexcept { return std::unique_ptr<T>{release()}; }
+  operator std::unique_ptr<T>() &&noexcept { return std::unique_ptr<T>{release()}; }
 
   operator bool() const noexcept { return ptr_ != nullptr; }
 
