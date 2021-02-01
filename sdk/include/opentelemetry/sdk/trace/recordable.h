@@ -101,7 +101,7 @@ public:
    * @param code the status code
    * @param description a description of the status
    */
-  virtual void SetStatus(opentelemetry::trace::CanonicalCode code,
+  virtual void SetStatus(opentelemetry::trace::StatusCode code,
                          nostd::string_view description) noexcept = 0;
 
   /**

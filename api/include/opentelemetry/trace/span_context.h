@@ -26,7 +26,7 @@ namespace trace_api = opentelemetry::trace;
 
 /* SpanContext contains the state that must propagate to child Spans and across
  * process boundaries. It contains the identifiers TraceId and SpanId,
- * TraceFlags, TraceState, and whether it has a remote parent.
+ * TraceFlags, TraceState, and whether it was propagated from a remote parent.
  *
  * TODO: This is currently a placeholder class and requires revisiting
  */
@@ -38,14 +38,14 @@ public:
    *
    * @param sampled_flag a required parameter specifying if child spans should be
    * sampled
-   * @param has_remote_parent a required parameter specifying if this context has
-   * a remote parent
+   * @param is_remote true if this context was propagated from a remote parent.
    */
-  SpanContext(bool sampled_flag, bool has_remote_parent)
+  SpanContext(bool sampled_flag, bool is_remote)
       : trace_id_(),
         span_id_(),
         trace_flags_(trace_api::TraceFlags((uint8_t)sampled_flag)),
-        remote_parent_(has_remote_parent){};
+        is_remote_(is_remote)
+  {}
 
   // @returns whether this context is valid
   bool IsValid() const noexcept { return trace_id_.IsValid() && span_id_.IsValid(); }
@@ -57,14 +57,8 @@ public:
 
   const trace_api::SpanId &span_id() const noexcept { return span_id_; }
 
-  SpanContext(TraceId trace_id,
-              SpanId span_id,
-              TraceFlags trace_flags,
-              bool has_remote_parent) noexcept
-      : trace_id_(trace_id),
-        span_id_(span_id),
-        trace_flags_(trace_flags),
-        remote_parent_(has_remote_parent)
+  SpanContext(TraceId trace_id, SpanId span_id, TraceFlags trace_flags, bool is_remote) noexcept
+      : trace_id_(trace_id), span_id_(span_id), trace_flags_(trace_flags), is_remote_(is_remote)
   {}
 
   SpanContext(const SpanContext &ctx) = default;
@@ -77,7 +71,7 @@ public:
            trace_flags() == that.trace_flags();
   }
 
-  bool HasRemoteParent() const noexcept { return remote_parent_; }
+  bool IsRemote() const noexcept { return is_remote_; }
 
   static SpanContext GetInvalid() { return SpanContext(false, false); }
 
@@ -87,7 +81,7 @@ private:
   trace_api::TraceId trace_id_;
   trace_api::SpanId span_id_;
   trace_api::TraceFlags trace_flags_;
-  bool remote_parent_ = false;
+  bool is_remote_ = false;
 };
 }  // namespace trace
 OPENTELEMETRY_END_NAMESPACE

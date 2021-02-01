@@ -34,7 +34,7 @@ TEST(NoopTest, UseNoopTracers)
 
   EXPECT_EQ(s1->IsRecording(), false);
 
-  s1->SetStatus(opentelemetry::trace::CanonicalCode::INVALID_ARGUMENT, "span unavailable");
+  s1->SetStatus(opentelemetry::trace::StatusCode::kUnset, "span unset");
 
   s1->UpdateName("test_name");
 

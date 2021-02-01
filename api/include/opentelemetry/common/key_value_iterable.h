@@ -21,9 +21,8 @@ public:
    * the iteration is aborted.
    * @return true if every key-value pair was iterated over
    */
-  virtual bool ForEachKeyValue(
-      nostd::function_ref<bool(nostd::string_view, common::AttributeValue)> callback) const
-      noexcept = 0;
+  virtual bool ForEachKeyValue(nostd::function_ref<bool(nostd::string_view, common::AttributeValue)>
+                                   callback) const noexcept = 0;
 
   /**
    * @return the number of key-value pairs

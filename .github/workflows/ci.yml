@@ -2,9 +2,9 @@ name: CI
 
 on:
   push:
-    branches: [ master ]
+    branches: [ main ]
   pull_request:
-    branches: [ master ]
+    branches: [ main ]
 
 jobs:
   cmake_test:
@@ -330,6 +330,18 @@ jobs:
       uses: codecov/codecov-action@v1
       with:
         file: /home/runner/build/coverage.info
+
+  misspell:
+    runs-on: ubuntu-latest
+    steps:
+    - name: check out code
+      uses: actions/checkout@v2
+    - name: install misspell
+      run: |
+        curl -L -o ./install-misspell.sh https://git.io/misspell
+        sh ./install-misspell.sh
+    - name: run misspell
+      run: ./bin/misspell -error .
 
   docfx_check:
     name: DocFX check

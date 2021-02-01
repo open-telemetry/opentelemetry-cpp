@@ -18,7 +18,7 @@ TEST(SpanData, DefaultValues)
   ASSERT_EQ(data.GetSpanId(), zero_span_id);
   ASSERT_EQ(data.GetParentSpanId(), zero_span_id);
   ASSERT_EQ(data.GetName(), "");
-  ASSERT_EQ(data.GetStatus(), opentelemetry::trace::CanonicalCode::OK);
+  ASSERT_EQ(data.GetStatus(), opentelemetry::trace::StatusCode::kUnset);
   ASSERT_EQ(data.GetDescription(), "");
   ASSERT_EQ(data.GetStartTime().time_since_epoch(), std::chrono::nanoseconds(0));
   ASSERT_EQ(data.GetDuration(), std::chrono::nanoseconds(0));
@@ -37,7 +37,7 @@ TEST(SpanData, Set)
   data.SetIds(trace_id, span_id, parent_span_id);
   data.SetName("span name");
   data.SetSpanKind(opentelemetry::trace::SpanKind::kServer);
-  data.SetStatus(opentelemetry::trace::CanonicalCode::UNKNOWN, "description");
+  data.SetStatus(opentelemetry::trace::StatusCode::kOk, "description");
   data.SetStartTime(now);
   data.SetDuration(std::chrono::nanoseconds(1000000));
   data.SetAttribute("attr1", (int64_t)314159);
@@ -48,7 +48,7 @@ TEST(SpanData, Set)
   ASSERT_EQ(data.GetParentSpanId(), parent_span_id);
   ASSERT_EQ(data.GetName(), "span name");
   ASSERT_EQ(data.GetSpanKind(), opentelemetry::trace::SpanKind::kServer);
-  ASSERT_EQ(data.GetStatus(), opentelemetry::trace::CanonicalCode::UNKNOWN);
+  ASSERT_EQ(data.GetStatus(), opentelemetry::trace::StatusCode::kOk);
   ASSERT_EQ(data.GetDescription(), "description");
   ASSERT_EQ(data.GetStartTime().time_since_epoch(), now.time_since_epoch());
   ASSERT_EQ(data.GetDuration(), std::chrono::nanoseconds(1000000));

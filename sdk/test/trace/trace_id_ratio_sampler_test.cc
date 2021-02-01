@@ -21,7 +21,7 @@ namespace
  *
  * @param context a required valid span context
  * @param sampler a required valid sampler
- * @param iterations a requried number specifying the number of times to
+ * @param iterations a required number specifying the number of times to
  * generate a random trace_id and check if it should sample using the provided
  * provider and context
  */
