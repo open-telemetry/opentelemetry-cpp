@@ -188,7 +188,7 @@ public:
   // associated value.
   std::string Get(nostd::string_view key) const noexcept
   {
-    for (int i = 0; i < num_entries_; i++)
+    for (size_t i = 0; i < num_entries_; i++)
     {
       auto entry = (entries_.get())[i];
       if (key == entry.GetKey())
@@ -219,7 +219,7 @@ public:
     // add new key-value pair at beginning
     Entry e(key, value);
     (ts.entries_.get())[ts.num_entries_++] = e;
-    for (int i = 0; i < num_entries_; i++)
+    for (size_t i = 0; i < num_entries_; i++)
     {
       auto entry = (entries_.get())[i];
       auto key   = entry.GetKey();
@@ -300,11 +300,11 @@ private:
 
   static nostd::string_view TrimString(nostd::string_view str, size_t left, size_t right)
   {
-    while (str[(std::size_t)right] == ' ')
+    while (str[(std::size_t)right] == ' ' && left < right)
     {
       right--;
     }
-    while (str[(std::size_t)left] == ' ')
+    while (str[(std::size_t)left] == ' ' && left < right)
     {
       left++;
     }
