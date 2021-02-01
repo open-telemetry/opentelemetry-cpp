@@ -48,7 +48,9 @@ public:
    * running_spans.
    * @param span a recordable for a span that was just started
    */
-  void OnStart(opentelemetry::sdk::trace::Recordable &span) noexcept override;
+  void OnStart(opentelemetry::sdk::trace::Recordable &span,
+               const opentelemetry::trace::SpanContext &parent_context =
+                   opentelemetry::trace::SpanContext::GetInvalid()) noexcept override;
 
   /*
    * OnEnd is called when a span ends; that span_data is moved from running_spans to

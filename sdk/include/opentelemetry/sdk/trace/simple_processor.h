@@ -37,7 +37,10 @@ public:
     return exporter_->MakeRecordable();
   }
 
-  void OnStart(Recordable &span) noexcept override {}
+  void OnStart(Recordable &span,
+               const opentelemetry::trace::SpanContext &parent_context =
+                   opentelemetry::trace::SpanContext::GetInvalid()) noexcept override
+  {}
 
   void OnEnd(std::unique_ptr<Recordable> &&span) noexcept override
   {

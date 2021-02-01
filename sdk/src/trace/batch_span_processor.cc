@@ -4,6 +4,7 @@
 using opentelemetry::sdk::common::AtomicUniquePtr;
 using opentelemetry::sdk::common::CircularBuffer;
 using opentelemetry::sdk::common::CircularBufferRange;
+using opentelemetry::trace::SpanContext;
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace sdk
@@ -27,7 +28,7 @@ std::unique_ptr<Recordable> BatchSpanProcessor::MakeRecordable() noexcept
   return exporter_->MakeRecordable();
 }
 
-void BatchSpanProcessor::OnStart(Recordable &) noexcept
+void BatchSpanProcessor::OnStart(Recordable &, const SpanContext &) noexcept
 {
   // no-op
 }
