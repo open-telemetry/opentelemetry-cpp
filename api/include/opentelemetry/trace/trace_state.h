@@ -242,7 +242,7 @@ public:
     {
       return ts;
     }
-    for (int i = 0; i < num_entries_; i++)
+    for (size_t i = 0; i < num_entries_; i++)
     {
       auto entry = (entries_.get())[i];
       if ((entries_.get())[i].GetKey() != key)
