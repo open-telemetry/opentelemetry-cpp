@@ -17,7 +17,7 @@
 #include <cstdint>
 #include <cstring>
 #include <regex>
-#include<string>
+#include <string>
 
 #include "opentelemetry/nostd/span.h"
 #include "opentelemetry/nostd/string_view.h"
@@ -38,11 +38,11 @@ namespace trace
 class TraceState
 {
 public:
-  static constexpr int kKeyMaxSize       = 256;
-  static constexpr int kValueMaxSize     = 256;
-  static constexpr int kMaxKeyValuePairs = 32;
-  static constexpr auto kKeyValueSeparator =  '=' ; 
-  static constexpr auto kMembersSeparator = ',';
+  static constexpr int kKeyMaxSize         = 256;
+  static constexpr int kValueMaxSize       = 256;
+  static constexpr int kMaxKeyValuePairs   = 32;
+  static constexpr auto kKeyValueSeparator = '=';
+  static constexpr auto kMembersSeparator  = ',';
 
   // Class to store key-value pairs.
   class Entry
@@ -101,82 +101,92 @@ public:
     }
   };
 
-    /**
-     * Returns a newly created Tracestate parsed from the header provided. 
-     * @param header Encoding of the tracestate header defined by
-     * the W3C Trace Context specification https://www.w3.org/TR/trace-context/
-     *  @return Tracestate A new Tracestate instance or DEFAULT
-    */ 
-    static TraceState FromHeader( const nostd::string_view& header){
-        TraceState ts;
+  /**
+   * Returns a newly created Tracestate parsed from the header provided.
+   * @param header Encoding of the tracestate header defined by
+   * the W3C Trace Context specification https://www.w3.org/TR/trace-context/
+   *  @return Tracestate A new Tracestate instance or DEFAULT
+   */
+  static TraceState FromHeader(const nostd::string_view &header)
+  {
+    TraceState ts;
 
-        std::size_t begin{0};
-        std::size_t end{0};
-        bool invalid_header = false;
-        while (begin < header.size() && ts.num_entries_ < kMaxKeyValuePairs ) {
-            //find list-member
-            end = header.find(kMembersSeparator, begin);
-            if (end == std::string::npos ){
-                // last list member. `end` points to end of it.
-                end = header.size() - 1;
-            } else {
-                // `end` points to end of current list member
-                end = end  - 1; 
-            }
-            auto list_member = TrimString(header, begin, end ); // OWS handling
-            if (list_member.size() == 0) {
-              // empty list member, move to next in list
-              begin = end + 2; // begin points to start of next member
-              continue;
-            }
-            auto key_end_pos = list_member.find(kKeyValueSeparator) ;
-            if (key_end_pos == std::string::npos ) {
-              // Error: invalid list member, return empty TraceState
-              ts.entries_.reset(nullptr);
-              ts.num_entries_ = 0;          
-              break;
-            }
-            auto key = list_member.substr(0, key_end_pos);
-            auto value = list_member.substr(key_end_pos + 1);
-            if ( !IsValidKey(key) || !IsValidValue(value))
-            {
-              //invalid header. return empty TraceState
-              ts.entries_.reset(nullptr);
-              ts.num_entries_ = 0;
-              break;
-            }
-            Entry entry(key, value);
-            (ts.entries_.get())[ts.num_entries_] = entry;
-            ts.num_entries_++;
-
-            begin = end + 2;
-        }
-        return ts;
-    }
-
-    /**
-     * Creates a w3c tracestate header from TraceState object
-    */
-    std::string ToHeader() {
-      std::string header_s;
-      size_t count = num_entries_;
-      while(count) {
-        auto entry = (entries_.get())[num_entries_ - count];
-        auto kv  = std::string(entry.GetKey()) + kKeyValueSeparator + std::string(entry.GetValue());
-        if (--count) {
-          // append "," if not last member
-          kv +=",";
-        }
-        header_s = header_s + kv;
+    std::size_t begin{0};
+    std::size_t end{0};
+    bool invalid_header = false;
+    while (begin < header.size() && ts.num_entries_ < kMaxKeyValuePairs)
+    {
+      // find list-member
+      end = header.find(kMembersSeparator, begin);
+      if (end == std::string::npos)
+      {
+        // last list member. `end` points to end of it.
+        end = header.size() - 1;
       }
-      return header_s;
+      else
+      {
+        // `end` points to end of current list member
+        end = end - 1;
+      }
+      auto list_member = TrimString(header, begin, end);  // OWS handling
+      if (list_member.size() == 0)
+      {
+        // empty list member, move to next in list
+        begin = end + 2;  // begin points to start of next member
+        continue;
+      }
+      auto key_end_pos = list_member.find(kKeyValueSeparator);
+      if (key_end_pos == std::string::npos)
+      {
+        // Error: invalid list member, return empty TraceState
+        ts.entries_.reset(nullptr);
+        ts.num_entries_ = 0;
+        break;
+      }
+      auto key   = list_member.substr(0, key_end_pos);
+      auto value = list_member.substr(key_end_pos + 1);
+      if (!IsValidKey(key) || !IsValidValue(value))
+      {
+        // invalid header. return empty TraceState
+        ts.entries_.reset(nullptr);
+        ts.num_entries_ = 0;
+        break;
+      }
+      Entry entry(key, value);
+      (ts.entries_.get())[ts.num_entries_] = entry;
+      ts.num_entries_++;
+
+      begin = end + 2;
     }
+    return ts;
+  }
+
+  /**
+   * Creates a w3c tracestate header from TraceState object
+   */
+  std::string ToHeader()
+  {
+    std::string header_s;
+    size_t count = num_entries_;
+    while (count)
+    {
+      auto entry = (entries_.get())[num_entries_ - count];
+      auto kv    = std::string(entry.GetKey()) + kKeyValueSeparator + std::string(entry.GetValue());
+      if (--count)
+      {
+        // append "," if not last member
+        kv += ",";
+      }
+      header_s = header_s + kv;
+    }
+    return header_s;
+  }
 
   // Returns false if no such key, otherwise returns true and populates the value parameter with the
   // associated value.
   std::string Get(nostd::string_view key) const noexcept
   {
-    for (int i = 0 ; i < num_entries_; i++)
+    for (int i = 0; i < num_entries_; i++)
     {
       auto entry = (entries_.get())[i];
       if (key == entry.GetKey())
@@ -187,56 +197,62 @@ public:
     return "";
   }
 
-    /**
-     * Returns `new` TransState object with following mutations applied to the existing instance:
-     *  Update Key value: The updated value must be moved to beginning of List
-     *  Add : The new key-value pair SHOULD be added to beginning of List
-     * 
-     * If the provided key-value pair is invalid, or results in transtate that violates the 
-     * tracecontext specification, they are discarded and same tracestate will be returned.
-    */
-    TraceState Set(const nostd::string_view& key, const nostd::string_view &value)
+  /**
+   * Returns `new` TransState object with following mutations applied to the existing instance:
+   *  Update Key value: The updated value must be moved to beginning of List
+   *  Add : The new key-value pair SHOULD be added to beginning of List
+   *
+   * If the provided key-value pair is invalid, or results in transtate that violates the
+   * tracecontext specification, they are discarded and same tracestate will be returned.
+   */
+  TraceState Set(const nostd::string_view &key, const nostd::string_view &value)
+  {
+    TraceState ts;
+    if ((!IsValidKey(key) || !IsValidValue(value)) || num_entries_ == kMaxKeyValuePairs)
     {
-        TraceState ts;
-        if (( !IsValidKey(key) || !IsValidValue(value)) || num_entries_ == kMaxKeyValuePairs ) {
-            // max size reached. No more entry can be added. Returning empty tracestate
-            return ts ; // empty instance
-        }
+      // max size reached. No more entry can be added. Returning empty tracestate
+      return ts;  // empty instance
+    }
 
-        //add new key-value pair at beginning
+    // add new key-value pair at beginning
+    Entry e(key, value);
+    (ts.entries_.get())[ts.num_entries_++] = e;
+    for (int i = 0; i < num_entries_; i++)
+    {
+      auto entry = (entries_.get())[i];
+      auto key   = entry.GetKey();
+      auto value = entry.GetValue();
+      Entry e(key, value);
+      (ts.entries_.get())[ts.num_entries_++] = e;
+    }
+    return ts;
+  }
+
+  /**
+   * Returns `new` TransState object after removing the attribute with given key ( if present )
+   * @returns empty TransState object if invalid key
+   * @returns copy of original TransState object if key is not present (??)
+   */
+  TraceState Delete(const nostd::string_view &key)
+  {
+    TraceState ts;
+    if (!IsValidKey(key))
+    {
+      return ts;
+    }
+    for (int i = 0; i < num_entries_; i++)
+    {
+      auto entry = (entries_.get())[i];
+      if ((entries_.get())[i].GetKey() != key)
+      {
+        auto key   = (entries_.get())[i].GetKey();
+        auto value = (entries_.get())[i].GetValue();
         Entry e(key, value);
         (ts.entries_.get())[ts.num_entries_++] = e;
-        for (int i = 0 ; i < num_entries_; i++){
-          auto entry = (entries_.get())[i];
-          auto key = entry.GetKey();
-          auto value = entry.GetValue();
-          Entry e(key, value);
-          (ts.entries_.get())[ts.num_entries_++] = e;
-        }
-        return ts;
+      }
     }
-
-    /**
-     * Returns `new` TransState object after removing the attribute with given key ( if present )
-     * @returns empty TransState object if invalid key
-     * @returns copy of original TransState object if key is not present (??)
-     */
-    TraceState Delete(const nostd::string_view &key){
-        TraceState ts;
-        if ( !IsValidKey(key)) {
-          return ts;
-        }
-        for (int i = 0 ; i < num_entries_; i++){
-          auto entry = (entries_.get())[i];
-          if ((entries_.get())[i].GetKey() != key ) {
-            auto key = (entries_.get())[i].GetKey();
-            auto value = (entries_.get())[i].GetValue();
-            Entry e(key, value);
-            (ts.entries_.get())[ts.num_entries_++] = e;          
-          }
-        }
-        return ts;
-    }
+    return ts;
+  }
 
   // Returns true if there are no keys, false otherwise.
   bool Empty() const noexcept { return num_entries_ == 0; }
@@ -248,32 +264,37 @@ public:
   }
 
   /** Returns whether key is a valid key. See https://www.w3.org/TR/trace-context/#key
-   * Identifiers MUST begin with a lowercase letter or a digit, and can only contain 
-   * lowercase letters (a-z), digits (0-9), underscores (_), dashes (-), asterisks (*), 
+   * Identifiers MUST begin with a lowercase letter or a digit, and can only contain
+   * lowercase letters (a-z), digits (0-9), underscores (_), dashes (-), asterisks (*),
    * and forward slashes (/).
-   * For multi-tenant vendor scenarios, an at sign (@) can be used to prefix the vendor name. 
-   * 
+   * For multi-tenant vendor scenarios, an at sign (@) can be used to prefix the vendor name.
+   *
    */
   static bool IsValidKey(nostd::string_view key)
   {
 
     std::regex reg_key("^[a-z0-9][a-z0-9_\\-*/]{0,255}$");
-    std::regex reg_key_multitenant("^[a-z0-9][a-z0-9_\\-*/]{0,240}(@)[a-z0-9][a-z0-9_\\-*/]{0,13}$");  
-    if (std::regex_match(std::string(key), reg_key ) || std::regex_match(std::string(key), reg_key_multitenant)) {
+    std::regex reg_key_multitenant(
+        "^[a-z0-9][a-z0-9_\\-*/]{0,240}(@)[a-z0-9][a-z0-9_\\-*/]{0,13}$");
+    if (std::regex_match(std::string(key), reg_key) ||
+        std::regex_match(std::string(key), reg_key_multitenant))
+    {
       return true;
     }
     return false;
   }
 
   /** Returns whether value is a valid value. See https://www.w3.org/TR/trace-context/#value
-   * The value is an opaque string containing up to 256 printable ASCII (RFC0020) 
+   * The value is an opaque string containing up to 256 printable ASCII (RFC0020)
    *  characters ((i.e., the range 0x20 to 0x7E) except comma , and equal =)
    */
   static bool IsValidValue(nostd::string_view value)
   {
-    // Hex 0x20 to 0x2B, 0x2D to 0x3C, 0x3E to 0x7E 
-    std::regex reg_value("^[\\x20-\\x2B\\x2D-\\x3C\\x3E-\\x7E]{0,255}[\\x21-\\x2B\\x2D-\\x3C\\x3E-\\x7E]$");
-    if (std::regex_match(std::string(value), reg_value)) {
+    // Hex 0x20 to 0x2B, 0x2D to 0x3C, 0x3E to 0x7E
+    std::regex reg_value(
+        "^[\\x20-\\x2B\\x2D-\\x3C\\x3E-\\x7E]{0,255}[\\x21-\\x2B\\x2D-\\x3C\\x3E-\\x7E]$");
+    if (std::regex_match(std::string(value), reg_value))
+    {
       return true;
     }
     return false;
@@ -289,9 +310,16 @@ private:
   // An empty TraceState.
   TraceState() noexcept : entries_(new Entry[kMaxKeyValuePairs]), num_entries_(0) {}
 
- static nostd::string_view TrimString(nostd::string_view str, size_t left, size_t right) {
-    while (str[ (std::size_t) right ]  == ' ' ) { right--; }
-    while (str[ (std::size_t) left] == ' ') { left ++;}
+  static nostd::string_view TrimString(nostd::string_view str, size_t left, size_t right)
+  {
+    while (str[(std::size_t)right] == ' ')
+    {
+      right--;
+    }
+    while (str[(std::size_t)left] == ' ')
+    {
+      left++;
+    }
     return str.substr(left, right - left + 1);
   }
 };

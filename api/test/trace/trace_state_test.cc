@@ -1,7 +1,7 @@
 #include "opentelemetry/trace/trace_state.h"
 
-#include "opentelemetry/nostd/string_view.h"
 #include <gtest/gtest.h>
+#include "opentelemetry/nostd/string_view.h"
 
 namespace
 {
@@ -67,14 +67,17 @@ std::string create_ts_return_header(std::string header)
   return ts.ToHeader();
 }
 
-std::string header_with_max_members(){
+std::string header_with_max_members()
+{
   std::string header = "";
-  auto max_members = opentelemetry::trace::TraceState::kMaxKeyValuePairs;
-  for (int i = 0 ; i < max_members; i++ ){
-    std::string key = "key" + std::to_string(i);
+  auto max_members   = opentelemetry::trace::TraceState::kMaxKeyValuePairs;
+  for (int i = 0; i < max_members; i++)
+  {
+    std::string key   = "key" + std::to_string(i);
     std::string value = "value" + std::to_string(i);
-    header += key +"=" + value;
-    if (i != max_members - 1) {
+    header += key + "=" + value;
+    if (i != max_members - 1)
+    {
       header += ",";
     }
   }
@@ -83,10 +86,10 @@ std::string header_with_max_members(){
 
 TEST(TraceStateTest, ValidateHeaderParsing)
 {
-  std::string trace_state_header = "k1=v1"; // valid header
+  std::string trace_state_header = "k1=v1";  // valid header
   EXPECT_EQ(create_ts_return_header(trace_state_header), trace_state_header);
 
-  trace_state_header = "K1=V1"; // invalid header, key can't start with uppercase.
+  trace_state_header = "K1=V1";  // invalid header, key can't start with uppercase.
   EXPECT_EQ(create_ts_return_header(trace_state_header), "");
 
   trace_state_header = "k1=v1,k2=v2,k3=v3";
@@ -95,87 +98,87 @@ TEST(TraceStateTest, ValidateHeaderParsing)
   trace_state_header = "k1=v1,k2=v2,k3=v3";
   EXPECT_EQ(create_ts_return_header(trace_state_header), trace_state_header);
 
-  trace_state_header = "k1=v1,k2=v2,,";
-  auto expected_state_header =  "k1=v1,k2=v2";
+  trace_state_header         = "k1=v1,k2=v2,,";
+  auto expected_state_header = "k1=v1,k2=v2";
   EXPECT_EQ(create_ts_return_header(trace_state_header), expected_state_header);
 
-  trace_state_header = "k1=v1,k2=v2,sd"; // invalid list member
-  EXPECT_EQ(create_ts_return_header(trace_state_header), ""); // empty header
+  trace_state_header = "k1=v1,k2=v2,sd";                       // invalid list member
+  EXPECT_EQ(create_ts_return_header(trace_state_header), "");  // empty header
 
-  trace_state_header = "1a-2f@foo=bar1,a*/foo-_/bar=bar4" ;// valid list
+  trace_state_header = "1a-2f@foo=bar1,a*/foo-_/bar=bar4";  // valid list
   EXPECT_EQ(create_ts_return_header(trace_state_header), trace_state_header);
 
-  trace_state_header = "1a-2f@foo=bar1,*/foo-_/bar=bar4" ;// invalid list member, key `*/foo-_/bar` must begin with [a-z,0-9]
+  trace_state_header = "1a-2f@foo=bar1,*/foo-_/bar=bar4";  // invalid list member, key `*/foo-_/bar`
+                                                           // must begin with [a-z,0-9]
   EXPECT_EQ(create_ts_return_header(trace_state_header), "");
 
   trace_state_header = header_with_max_members();
   EXPECT_EQ(create_ts_return_header(trace_state_header), trace_state_header);
-
 }
 
-TEST(TraceStateTest, TraceStateGet){
+TEST(TraceStateTest, TraceStateGet)
+{
 
   std::string trace_state_header = header_with_max_members();
-  TraceState ts = TraceState::FromHeader(trace_state_header);
+  TraceState ts                  = TraceState::FromHeader(trace_state_header);
 
-  EXPECT_EQ(ts.Get("key0"),"value0");
-  EXPECT_EQ(ts.Get("key16"),"value16");
-  EXPECT_EQ(ts.Get("key31"),"value31");
-  EXPECT_EQ(ts.Get("key32"),""); // key not found
-
+  EXPECT_EQ(ts.Get("key0"), "value0");
+  EXPECT_EQ(ts.Get("key16"), "value16");
+  EXPECT_EQ(ts.Get("key31"), "value31");
+  EXPECT_EQ(ts.Get("key32"), "");  // key not found
 }
 
-TEST(TraceStateTest, TraceStateSet){
+TEST(TraceStateTest, TraceStateSet)
+{
   std::string trace_state_header = "k1=v1,k2=v2";
-  auto ts1 = TraceState::FromHeader(trace_state_header);
-  auto ts1_new = ts1.Set("k3","v3");
+  auto ts1                       = TraceState::FromHeader(trace_state_header);
+  auto ts1_new                   = ts1.Set("k3", "v3");
   EXPECT_EQ(ts1_new.ToHeader(), "k3=v3,k1=v1,k2=v2");
 
   trace_state_header = header_with_max_members();
-  auto ts2 = TraceState::FromHeader(trace_state_header);
-  auto ts2_new = ts2.Set("n_k1","n_v1"); // adding to max list, should fail and return empty
+  auto ts2           = TraceState::FromHeader(trace_state_header);
+  auto ts2_new       = ts2.Set("n_k1", "n_v1");  // adding to max list, should fail and return empty
   EXPECT_EQ(ts2_new.ToHeader(), "");
 
   trace_state_header = "k1=v1,k2=v2";
-  auto ts3 = TraceState::FromHeader(trace_state_header);
-  auto ts3_new = ts3.Set("*n_k1","n_v1"); // adding invalid key, should return empty
-  EXPECT_EQ(ts3_new.ToHeader(), "");  
+  auto ts3           = TraceState::FromHeader(trace_state_header);
+  auto ts3_new       = ts3.Set("*n_k1", "n_v1");  // adding invalid key, should return empty
+  EXPECT_EQ(ts3_new.ToHeader(), "");
 }
 
-
-TEST(TraceStateTest, TraceStateDelete){
+TEST(TraceStateTest, TraceStateDelete)
+{
   std::string trace_state_header = "k1=v1,k2=v2,k3=v3";
-  auto ts1 = TraceState::FromHeader(trace_state_header);
-  auto ts1_new = ts1.Delete(std::string("k1"));
+  auto ts1                       = TraceState::FromHeader(trace_state_header);
+  auto ts1_new                   = ts1.Delete(std::string("k1"));
   EXPECT_EQ(ts1_new.ToHeader(), "k2=v2,k3=v3");
 
-  trace_state_header = "k1=v1"; //single list member
-  auto ts2 = TraceState::FromHeader(trace_state_header);
-  auto ts2_new = ts2.Delete(std::string("k1"));
+  trace_state_header = "k1=v1";  // single list member
+  auto ts2           = TraceState::FromHeader(trace_state_header);
+  auto ts2_new       = ts2.Delete(std::string("k1"));
   EXPECT_EQ(ts2_new.ToHeader(), "");
 
-  trace_state_header = "k1=v1"; //single list member, delete invalid entry
-  auto ts3 = TraceState::FromHeader(trace_state_header);
+  trace_state_header = "k1=v1";  // single list member, delete invalid entry
+  auto ts3     = TraceState::FromHeader(trace_state_header);
   auto ts3_new = ts3.Delete(std::string("InvalidKey"));
   EXPECT_EQ(ts3_new.ToHeader(), "");
-
 }
 
 TEST(TraceStateTest, Empty)
 {
   std::string trace_state_header = "";
-  auto ts = TraceState::FromHeader(trace_state_header);
+  auto ts                        = TraceState::FromHeader(trace_state_header);
   EXPECT_TRUE(ts.Empty());
 
   trace_state_header = "k1=v1,k2=v2";
-  auto ts1 = TraceState::FromHeader(trace_state_header);
+  auto ts1           = TraceState::FromHeader(trace_state_header);
   EXPECT_FALSE(ts1.Empty());
 }
 
 TEST(TraceStateTest, Entries)
 {
-  std::string trace_state_header = "k1=v1,k2=v2,k3=v3";
-  auto ts1 = TraceState::FromHeader(trace_state_header);
+  std::string trace_state_header                      = "k1=v1,k2=v2,k3=v3";
+  auto ts1                                            = TraceState::FromHeader(trace_state_header);
   const int kNumPairs                                 = 3;
   opentelemetry::nostd::string_view keys[kNumPairs]   = {"k1", "k2", "k3"};
   opentelemetry::nostd::string_view values[kNumPairs] = {"v1", "v2", "v3"};
@@ -210,8 +213,8 @@ TEST(TraceStateTest, IsValidValue)
 // Tests that keys and values don't depend on null terminators
 TEST(TraceStateTest, MemorySafe)
 {
-  std::string trace_state_header = "";
-  auto ts = TraceState::FromHeader(trace_state_header);  
+  std::string trace_state_header                    = "";
+  auto ts                                           = TraceState::FromHeader(trace_state_header);
   const int kNumPairs                               = 3;
   opentelemetry::nostd::string_view key_string      = "test_key_1test_key_2test_key_3";
   opentelemetry::nostd::string_view val_string      = "test_val_1test_val_2test_val_3";
@@ -222,7 +225,8 @@ TEST(TraceStateTest, MemorySafe)
 
   auto ts1 = ts.Set(keys[2], values[2]);
   auto ts2 = ts1.Set(keys[1], values[1]);
-  auto ts3 = ts2.Set(keys[0], values[0]);;
+  auto ts3 = ts2.Set(keys[0], values[0]);
+  ;
 
   opentelemetry::nostd::span<TraceState::Entry> entries = ts3.Entries();
   for (int i = 0; i < kNumPairs; i++)
