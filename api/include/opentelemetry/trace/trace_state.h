@@ -16,12 +16,26 @@
 
 #include <cstdint>
 #include <cstring>
-#include <regex>
 #include <string>
+
+#include <iostream>
 
 #include "opentelemetry/nostd/span.h"
 #include "opentelemetry/nostd/string_view.h"
 #include "opentelemetry/nostd/unique_ptr.h"
+
+// regex support in GCC4.8 is limited and buggy, so check for support before using.
+// refer -
+//    https://stackoverflow.com/questions/12530406/is-gcc-4-8-or-earlier-buggy-about-regular-expressions
+#include <regex>
+#if __cplusplus >= 201103L &&                                                                 \
+    (!defined(__GLIBCXX__) || (__cplusplus >= 201402L) ||                                     \
+     (defined(_GLIBCXX_REGEX_DFS_QUANTIFIERS_LIMIT) || defined(_GLIBCXX_REGEX_STATE_LIMIT) || \
+      (defined(_GLIBCXX_RELEASE) && _GLIBCXX_RELEASE > 4)))
+#  define HAVE_WORKING_REGEX 1
+#else
+#  define HAVE_WORKING_REGEX 0
+#endif
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace trace
@@ -203,14 +217,14 @@ public:
    *  Add : The new key-value pair SHOULD be added to beginning of List
    *
    * If the provided key-value pair is invalid, or results in transtate that violates the
-   * tracecontext specification, they are discarded and same tracestate will be returned.
+   * tracecontext specification, empty tracestate will be returned.
    */
   TraceState Set(const nostd::string_view &key, const nostd::string_view &value)
   {
     TraceState ts;
     if ((!IsValidKey(key) || !IsValidValue(value)) || num_entries_ == kMaxKeyValuePairs)
     {
-      // max size reached. No more entry can be added. Returning empty tracestate
+      // max size reached or invalid key/value. Returning empty tracestate
       return ts;  // empty instance
     }
 
@@ -230,7 +244,7 @@ public:
 
   /**
    * Returns `new` TransState object after removing the attribute with given key ( if present )
-   * @returns empty TransState object if invalid key
+   * @returns empty TransState object if key is invalid
    * @returns copy of original TransState object if key is not present (??)
    */
   TraceState Delete(const nostd::string_view &key)
@@ -272,16 +286,11 @@ public:
    */
   static bool IsValidKey(nostd::string_view key)
   {
-
-    std::regex reg_key("^[a-z0-9][a-z0-9_\\-*/]{0,255}$");
-    std::regex reg_key_multitenant(
-        "^[a-z0-9][a-z0-9_\\-*/]{0,240}(@)[a-z0-9][a-z0-9_\\-*/]{0,13}$");
-    if (std::regex_match(std::string(key), reg_key) ||
-        std::regex_match(std::string(key), reg_key_multitenant))
-    {
-      return true;
-    }
-    return false;
+#ifdef HAVE_WORKING_REGEX
+    return IsValidKeyRegEx(key);
+#else
+    return IsValidKeyNonRegEx(key);
+#endif
   }
 
   /** Returns whether value is a valid value. See https://www.w3.org/TR/trace-context/#value
@@ -290,14 +299,11 @@ public:
    */
   static bool IsValidValue(nostd::string_view value)
   {
-    // Hex 0x20 to 0x2B, 0x2D to 0x3C, 0x3E to 0x7E
-    std::regex reg_value(
-        "^[\\x20-\\x2B\\x2D-\\x3C\\x3E-\\x7E]{0,255}[\\x21-\\x2B\\x2D-\\x3C\\x3E-\\x7E]$");
-    if (std::regex_match(std::string(value), reg_value))
-    {
-      return true;
-    }
-    return false;
+#ifdef HAVE_WORKING_REGEX
+    return IsValidValueRegEx(value);
+#else
+    return IsValidValueNonRegEx(value);
+#endif
   }
 
 private:
@@ -322,7 +328,81 @@ private:
     }
     return str.substr(left, right - left + 1);
   }
-};
 
+  static bool IsValidKeyRegEx(nostd::string_view key)
+  {
+    std::cout << "\nkey regex";
+
+    std::regex reg_key("^[a-z0-9][a-z0-9*_\\-/]{0,255}$");
+    std::regex reg_key_multitenant(
+        "^[a-z0-9][a-z0-9*_\\-/]{0,240}(@)[a-z0-9][a-z0-9*_\\-/]{0,13}$");
+    std::string key_s(key);
+    if (std::regex_match(key_s, reg_key) || std::regex_match(key_s, reg_key_multitenant))
+    {
+      return true;
+    }
+    return false;
+  }
+
+  static bool IsValidValueRegEx(nostd::string_view value)
+  {
+    std::cout << "\nval regex";
+
+    // Hex 0x20 to 0x2B, 0x2D to 0x3C, 0x3E to 0x7E
+    std::regex reg_value(
+        "^[\\x20-\\x2B\\x2D-\\x3C\\x3E-\\x7E]{0,255}[\\x21-\\x2B\\x2D-\\x3C\\x3E-\\x7E]$");
+    // Need to benchmark without regex, as a string object is created here.
+    if (std::regex_match(std::string(value), reg_value))
+    {
+      return true;
+    }
+    return false;
+  }
+
+  static bool IsValidKeyNonRegEx(nostd::string_view key)
+  {
+
+    std::cout << "\nkey non-regex";
+    if (key.empty() || key.size() > kKeyMaxSize || !IsLowerCaseAlphaOrDigit(key[0]))
+    {
+      return false;
+    }
+
+    int ats = 0;
+
+    for (const char c : key)
+    {
+      if (!IsLowerCaseAlphaOrDigit(c) && c != '_' && c != '-' && c != '@' && c != '*' && c != '/')
+      {
+        return false;
+      }
+      if ((c == '@') && (++ats > 1))
+      {
+        return false;
+      }
+    }
+    return true;
+  }
+
+  static bool IsValidValueNonRegEx(nostd::string_view value)
+  {
+    std::cout << "\nval non-regex";
+    if (value.empty() || value.size() > kValueMaxSize)
+    {
+      return false;
+    }
+
+    for (const char c : value)
+    {
+      if (c < ' ' || c > '~' || c == ',' || c == '=')
+      {
+        return false;
+      }
+    }
+    return true;
+  }
+
+  static bool IsLowerCaseAlphaOrDigit(char c) { return isdigit(c) || islower(c); }
+};
 }  // namespace trace
 OPENTELEMETRY_END_NAMESPACE
