@@ -1,10 +1,10 @@
 # OTLP Exporter
 
-The [OpenTelemetry Protocol](https://github.com/open-telemetry/opentelemetry-specification/blob/master/specification/protocol/README.md) (OTLP) is a vendor-agnostic protocol designed as part of the OpenTelemetry project. The OTLP exporter can be used to export to any backend that supports OTLP.
+The [OpenTelemetry Protocol](https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/protocol/README.md) (OTLP) is a vendor-agnostic protocol designed as part of the OpenTelemetry project. The OTLP exporter can be used to export to any backend that supports OTLP.
 
 The [OpenTelemetry Collector](https://github.com/open-telemetry/opentelemetry-collector) is a reference implementation of an OTLP backend. The Collector can be configured to export to many other backends, such as Zipkin and Jaegar.
 
-For a full list of backends supported by the Collector, see the [main Collector repo](https://github.com/open-telemetry/opentelemetry-collector/tree/master/exporter) and [Collector contributions](https://github.com/open-telemetry/opentelemetry-collector-contrib/tree/master/exporter).
+For a full list of backends supported by the Collector, see the [main Collector repo](https://github.com/open-telemetry/opentelemetry-collector/tree/main/exporter) and [Collector contributions](https://github.com/open-telemetry/opentelemetry-collector-contrib/tree/main/exporter).
 
 ## Configuration
 

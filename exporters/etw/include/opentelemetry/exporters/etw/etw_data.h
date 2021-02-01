@@ -267,8 +267,7 @@ public:
   /// <param name="code"></param>
   /// <param name="description"></param>
   /// <returns></returns>
-  virtual void SetStatus(trace::CanonicalCode code,
-                         nostd::string_view description) noexcept override
+  virtual void SetStatus(trace::StatusCode code, nostd::string_view description) noexcept override
   {
     // TODO: not implemented
     UNREFERENCED_PARAMETER(code);
@@ -427,7 +426,7 @@ public:
    * Get the status for this span
    * @return the status for this span
    */
-  opentelemetry::trace::CanonicalCode GetStatus() const noexcept { return status_code_; }
+  opentelemetry::trace::StatusCode GetStatus() const noexcept { return status_code_; }
 
   /**
    * Get the status description for this span
@@ -451,8 +450,8 @@ public:
    * Get the attributes for this span
    * @return the attributes for this span
    */
-  const std::unordered_map<std::string, sdk::common::OwnedAttributeValue> &GetAttributes() const
-      noexcept
+  const std::unordered_map<std::string, sdk::common::OwnedAttributeValue> &GetAttributes()
+      const noexcept
   {
     return attribute_map_.GetAttributes();
   }
@@ -485,7 +484,7 @@ public:
     // TODO: Link Implementation for the Span to be implemented
   }
 
-  void SetStatus(opentelemetry::trace::CanonicalCode code,
+  void SetStatus(opentelemetry::trace::StatusCode code,
                  nostd::string_view description) noexcept override
   {
     status_code_ = code;
@@ -521,7 +520,7 @@ private:
   core::SystemTimestamp start_time_;
   std::chrono::nanoseconds duration_{0};
   std::string name_;
-  opentelemetry::trace::CanonicalCode status_code_{opentelemetry::trace::CanonicalCode::OK};
+  opentelemetry::trace::StatusCode status_code_{opentelemetry::trace::StatusCode::kUnset};
   std::string status_desc_;
   sdk::common::AttributeMap attribute_map_;
   opentelemetry::trace::SpanKind span_kind_{opentelemetry::trace::SpanKind::kInternal};

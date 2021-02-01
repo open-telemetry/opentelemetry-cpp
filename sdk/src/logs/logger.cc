@@ -69,17 +69,17 @@ void Logger::Log(opentelemetry::logs::Severity severity,
   recordable->SetName(name);
   recordable->SetBody(body);
 
-  resource.ForEachKeyValue([&](nostd::string_view key,
-                               opentelemetry::common::AttributeValue value) noexcept {
-    recordable->SetResource(key, value);
-    return true;
-  });
+  resource.ForEachKeyValue(
+      [&](nostd::string_view key, opentelemetry::common::AttributeValue value) noexcept {
+        recordable->SetResource(key, value);
+        return true;
+      });
 
-  attributes.ForEachKeyValue([&](nostd::string_view key,
-                                 opentelemetry::common::AttributeValue value) noexcept {
-    recordable->SetAttribute(key, value);
-    return true;
-  });
+  attributes.ForEachKeyValue(
+      [&](nostd::string_view key, opentelemetry::common::AttributeValue value) noexcept {
+        recordable->SetAttribute(key, value);
+        return true;
+      });
 
   // Inject trace_id/span_id/trace_flags if none is set by user
   auto provider     = opentelemetry::trace::Provider::GetTracerProvider();
