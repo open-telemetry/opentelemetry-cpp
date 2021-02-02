@@ -132,13 +132,13 @@ public:
   virtual const Body &GetBody() const noexcept = 0;
 
   virtual bool ForEachHeader(
-      nostd::function_ref<bool(nostd::string_view name, nostd::string_view value)> callable) const
-      noexcept = 0;
+      nostd::function_ref<bool(nostd::string_view name, nostd::string_view value)> callable)
+      const noexcept = 0;
 
   virtual bool ForEachHeader(
       const nostd::string_view &key,
-      nostd::function_ref<bool(nostd::string_view name, nostd::string_view value)> callable) const
-      noexcept = 0;
+      nostd::function_ref<bool(nostd::string_view name, nostd::string_view value)> callable)
+      const noexcept = 0;
 
   virtual StatusCode GetStatusCode() const noexcept = 0;
 
@@ -153,17 +153,15 @@ public:
     static Body body;
     return body;
   }
-  bool ForEachHeader(
-      nostd::function_ref<bool(nostd::string_view name, nostd::string_view value)> callable) const
-      noexcept override
+  bool ForEachHeader(nostd::function_ref<bool(nostd::string_view name, nostd::string_view value)>
+                         callable) const noexcept override
   {
     return true;
   }
 
-  bool ForEachHeader(
-      const nostd::string_view &key,
-      nostd::function_ref<bool(nostd::string_view name, nostd::string_view value)> callable) const
-      noexcept override
+  bool ForEachHeader(const nostd::string_view &key,
+                     nostd::function_ref<bool(nostd::string_view name, nostd::string_view value)>
+                         callable) const noexcept override
   {
     return true;
   }

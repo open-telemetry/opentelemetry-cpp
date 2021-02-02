@@ -88,11 +88,10 @@ private:
 
   template <class U,
             nostd::enable_if_t<common::detail::is_key_value_iterable<U>::value> * = nullptr>
-  bool do_callback(
-      SpanContext span_context,
-      const U &attributes,
-      nostd::function_ref<bool(SpanContext, const common::KeyValueIterable &)> callback) const
-      noexcept
+  bool do_callback(SpanContext span_context,
+                   const U &attributes,
+                   nostd::function_ref<bool(SpanContext, const common::KeyValueIterable &)>
+                       callback) const noexcept
   {
     return do_callback(span_context, common::KeyValueIterableView<U>(attributes), callback);
   }
@@ -100,8 +99,8 @@ private:
   bool do_callback(
       SpanContext span_context,
       std::initializer_list<std::pair<nostd::string_view, common::AttributeValue>> attributes,
-      nostd::function_ref<bool(SpanContext, const common::KeyValueIterable &)> callback) const
-      noexcept
+      nostd::function_ref<bool(SpanContext, const common::KeyValueIterable &)> callback)
+      const noexcept
   {
     return do_callback(span_context,
                        nostd::span<const std::pair<nostd::string_view, common::AttributeValue>>{
