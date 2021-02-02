@@ -340,11 +340,7 @@ private:
     std::regex reg_value(
         "^[\\x20-\\x2B\\x2D-\\x3C\\x3E-\\x7E]{0,255}[\\x21-\\x2B\\x2D-\\x3C\\x3E-\\x7E]$");
     // Need to benchmark without regex, as a string object is created here.
-    if (std::regex_match(std::string(value), reg_value))
-    {
-      return true;
-    }
-    return false;
+    return std::regex_match(std::string(value), reg_value);
   }
 
   static bool IsValidKeyNonRegEx(nostd::string_view key)
