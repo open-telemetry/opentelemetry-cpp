@@ -188,10 +188,16 @@ public:
     return header_s;
   }
 
-  // Returns false if no such key, otherwise returns true and populates the value parameter with the
-  // associated value.
+  /**
+   *  Returns `value` associated with `key` passed as argument
+   *  Returns empty string if key is invalid  or not found
+   */
   std::string Get(nostd::string_view key) const noexcept
   {
+    if (!IsValidKey(key))
+    {
+      return std::string();
+    }
     for (size_t i = 0; i < num_entries_; i++)
     {
       auto entry = (entries_.get())[i];
@@ -323,8 +329,8 @@ private:
 
   static bool IsValidKeyRegEx(nostd::string_view key)
   {
-    std::regex reg_key("^[a-z0-9][a-z0-9*_\\-/]{0,255}$");
-    std::regex reg_key_multitenant(
+    static std::regex reg_key("^[a-z0-9][a-z0-9*_\\-/]{0,255}$");
+    static std::regex reg_key_multitenant(
         "^[a-z0-9][a-z0-9*_\\-/]{0,240}(@)[a-z0-9][a-z0-9*_\\-/]{0,13}$");
     std::string key_s(key);
     if (std::regex_match(key_s, reg_key) || std::regex_match(key_s, reg_key_multitenant))
