@@ -43,18 +43,20 @@ public:
     // Pointer swap is required because the Consume function requires that the
     // AtomicUniquePointer be set to null
     spans_received_.Consume(
-        spans_received_.size(), [&](opentelemetry::sdk::common::CircularBufferRange<
-                                    opentelemetry::sdk::common::AtomicUniquePtr<
-                                        opentelemetry::sdk::trace::SpanData>> range) noexcept {
-          range.ForEach([&](
-              opentelemetry::sdk::common::AtomicUniquePtr<opentelemetry::sdk::trace::SpanData> &
-              ptr) noexcept {
-            std::unique_ptr<opentelemetry::sdk::trace::SpanData> swap_ptr =
-                std::unique_ptr<opentelemetry::sdk::trace::SpanData>(nullptr);
-            ptr.Swap(swap_ptr);
-            res.push_back(std::unique_ptr<opentelemetry::sdk::trace::SpanData>(swap_ptr.release()));
-            return true;
-          });
+        spans_received_.size(),
+        [&](opentelemetry::sdk::common::CircularBufferRange<
+            opentelemetry::sdk::common::AtomicUniquePtr<opentelemetry::sdk::trace::SpanData>>
+                range) noexcept {
+          range.ForEach(
+              [&](opentelemetry::sdk::common::AtomicUniquePtr<opentelemetry::sdk::trace::SpanData>
+                      &ptr) noexcept {
+                std::unique_ptr<opentelemetry::sdk::trace::SpanData> swap_ptr =
+                    std::unique_ptr<opentelemetry::sdk::trace::SpanData>(nullptr);
+                ptr.Swap(swap_ptr);
+                res.push_back(
+                    std::unique_ptr<opentelemetry::sdk::trace::SpanData>(swap_ptr.release()));
+                return true;
+              });
         });
 
     return res;

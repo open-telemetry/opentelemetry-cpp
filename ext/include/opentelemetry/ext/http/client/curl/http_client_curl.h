@@ -70,8 +70,8 @@ public:
   virtual const http_client::Body &GetBody() const noexcept override { return body_; }
 
   virtual bool ForEachHeader(
-      nostd::function_ref<bool(nostd::string_view name, nostd::string_view value)> callable) const
-      noexcept override
+      nostd::function_ref<bool(nostd::string_view name, nostd::string_view value)> callable)
+      const noexcept override
   {
     for (const auto &header : headers_)
     {
@@ -85,8 +85,8 @@ public:
 
   virtual bool ForEachHeader(
       const nostd::string_view &name,
-      nostd::function_ref<bool(nostd::string_view name, nostd::string_view value)> callable) const
-      noexcept override
+      nostd::function_ref<bool(nostd::string_view name, nostd::string_view value)> callable)
+      const noexcept override
   {
     auto range = headers_.equal_range(static_cast<std::string>(name));
     for (auto it = range.first; it != range.second; ++it)

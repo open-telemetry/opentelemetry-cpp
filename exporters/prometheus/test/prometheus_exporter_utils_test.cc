@@ -52,26 +52,22 @@ void assert_basic(prometheus_client::MetricFamily &metric,
 
   switch (type)
   {
-    case prometheus_client::MetricType::Counter:
-    {
+    case prometheus_client::MetricType::Counter: {
       ASSERT_DOUBLE_EQ(metric_data.counter.value, vals[0]);
       break;
     }
-    case prometheus_client::MetricType::Gauge:
-    {
+    case prometheus_client::MetricType::Gauge: {
       ASSERT_EQ(metric_data.gauge.value, vals[0]);
       break;
     }
-    case prometheus_client::MetricType::Histogram:
-    {
+    case prometheus_client::MetricType::Histogram: {
       ASSERT_DOUBLE_EQ(metric_data.histogram.sample_count, vals[0]);
       ASSERT_DOUBLE_EQ(metric_data.histogram.sample_sum, vals[1]);
       auto buckets = metric_data.histogram.bucket;
       ASSERT_EQ(buckets.size(), vals[2]);
       break;
     }
-    case prometheus_client::MetricType::Summary:
-    {
+    case prometheus_client::MetricType::Summary: {
       ASSERT_DOUBLE_EQ(metric_data.summary.sample_count, vals[0]);
       ASSERT_DOUBLE_EQ(metric_data.summary.sample_sum, vals[1]);
       break;
