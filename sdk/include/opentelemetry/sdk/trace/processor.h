@@ -35,8 +35,7 @@ public:
    * @param parent_context The parent context of the span that just started
    */
   virtual void OnStart(Recordable &span,
-                       const opentelemetry::trace::SpanContext &parent_context =
-                           opentelemetry::trace::SpanContext::GetInvalid()) noexcept = 0;
+                       const opentelemetry::trace::SpanContext &parent_context) noexcept = 0;
 
   /**
    * OnEnd is called when a span is ended.
