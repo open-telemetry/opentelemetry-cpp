@@ -38,7 +38,7 @@ public:
                 core::SystemTimestamp timestamp,
                 const opentelemetry::common::KeyValueIterable &attributes) noexcept override;
 
-  void SetStatus(trace_api::CanonicalCode code, nostd::string_view description) noexcept override;
+  void SetStatus(trace_api::StatusCode code, nostd::string_view description) noexcept override;
 
   void UpdateName(nostd::string_view name) noexcept override;
 

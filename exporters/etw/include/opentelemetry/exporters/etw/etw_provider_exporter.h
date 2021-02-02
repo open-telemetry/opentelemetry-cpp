@@ -143,8 +143,7 @@ public:
     {
 #ifdef HAVE_TLD
       // Register with TraceLoggingDynamic facility - dynamic manifest ETW events.
-      case EventFormat::ETW_MANIFEST:
-      {
+      case EventFormat::ETW_MANIFEST: {
         tld::ProviderMetadataBuilder<std::vector<BYTE>> providerMetaBuilder(
             data.providerMetaVector);
 
@@ -171,8 +170,7 @@ public:
 
 #ifdef HAVE_MSGPACK
       // Register for MsgPack payload ETW events.
-      case EventFormat::ETW_MSGPACK:
-      {
+      case EventFormat::ETW_MSGPACK: {
         REGHANDLE hProvider = 0;
         if (EventRegister(&data.providerGuid, NULL, NULL, &hProvider) != ERROR_SUCCESS)
         {
@@ -293,51 +291,43 @@ public:
       auto &value = kv.second;
       switch (value.index())
       {
-        case common::AttributeType::TYPE_BOOL:
-        {
+        case common::AttributeType::TYPE_BOOL: {
           UINT8 temp = static_cast<UINT8>(nostd::get<bool>(value));
           jObj[name] = temp;
           break;
         }
-        case common::AttributeType::TYPE_INT:
-        {
+        case common::AttributeType::TYPE_INT: {
           auto temp  = nostd::get<int32_t>(value);
           jObj[name] = temp;
           break;
         }
-        case common::AttributeType::TYPE_INT64:
-        {
+        case common::AttributeType::TYPE_INT64: {
           auto temp  = nostd::get<int64_t>(value);
           jObj[name] = temp;
           break;
         }
-        case common::AttributeType::TYPE_UINT:
-        {
+        case common::AttributeType::TYPE_UINT: {
           auto temp  = nostd::get<uint32_t>(value);
           jObj[name] = temp;
           break;
         }
-        case common::AttributeType::TYPE_UINT64:
-        {
+        case common::AttributeType::TYPE_UINT64: {
           auto temp  = nostd::get<uint64_t>(value);
           jObj[name] = temp;
           break;
         }
-        case common::AttributeType::TYPE_DOUBLE:
-        {
+        case common::AttributeType::TYPE_DOUBLE: {
           auto temp  = nostd::get<double>(value);
           jObj[name] = temp;
           break;
         }
-        case common::AttributeType::TYPE_STRING:
-        {
+        case common::AttributeType::TYPE_STRING: {
           auto temp  = nostd::get<nostd::string_view>(value);
           jObj[name] = temp;
           break;
         }
 #  ifdef HAVE_CSTRING_TYPE
-        case common::AttributeType::TYPE_CSTRING:
-        {
+        case common::AttributeType::TYPE_CSTRING: {
           auto temp  = nostd::get<const char *>(value);
           jObj[name] = temp;
           break;
@@ -345,8 +335,7 @@ public:
 #  endif
 #  if HAVE_TYPE_GUID
           // TODO: consider adding UUID/GUID to spec
-        case common::AttributeType::TYPE_GUID:
-        {
+        case common::AttributeType::TYPE_GUID: {
           auto temp = nostd::get<GUID>(value);
           // TODO: add transform from GUID type to string?
           jObj[name] = temp;
@@ -491,58 +480,50 @@ public:
       auto &value = kv.second;
       switch (value.index())
       {
-        case common::AttributeType::TYPE_BOOL:
-        {
+        case common::AttributeType::TYPE_BOOL: {
           builder.AddField(name, tld::TypeBool8);
           UINT8 temp = static_cast<UINT8>(nostd::get<bool>(value));
           dbuilder.AddByte(temp);
           break;
         }
-        case common::AttributeType::TYPE_INT:
-        {
+        case common::AttributeType::TYPE_INT: {
           builder.AddField(name, tld::TypeInt32);
           auto temp = nostd::get<int32_t>(value);
           dbuilder.AddValue(temp);
           break;
         }
-        case common::AttributeType::TYPE_INT64:
-        {
+        case common::AttributeType::TYPE_INT64: {
           builder.AddField(name, tld::TypeInt64);
           auto temp = nostd::get<int64_t>(value);
           dbuilder.AddValue(temp);
           break;
         }
-        case common::AttributeType::TYPE_UINT:
-        {
+        case common::AttributeType::TYPE_UINT: {
           builder.AddField(name, tld::TypeUInt32);
           auto temp = nostd::get<uint32_t>(value);
           dbuilder.AddValue(temp);
           break;
         }
-        case common::AttributeType::TYPE_UINT64:
-        {
+        case common::AttributeType::TYPE_UINT64: {
           builder.AddField(name, tld::TypeUInt64);
           auto temp = nostd::get<uint64_t>(value);
           dbuilder.AddValue(temp);
           break;
         }
-        case common::AttributeType::TYPE_DOUBLE:
-        {
+        case common::AttributeType::TYPE_DOUBLE: {
           builder.AddField(name, tld::TypeDouble);
           auto temp = nostd::get<double>(value);
           dbuilder.AddValue(temp);
           break;
         }
-        case common::AttributeType::TYPE_STRING:
-        {
+        case common::AttributeType::TYPE_STRING: {
           builder.AddField(name, tld::TypeUtf8String);
           auto temp = nostd::get<nostd::string_view>(value);
           dbuilder.AddString(temp.data());
           break;
         }
 #  ifdef HAVE_CSTRING_TYPE
-        case common::AttributeType::TYPE_CSTRING:
-        {
+        case common::AttributeType::TYPE_CSTRING: {
           builder.AddField(name, tld::TypeUtf8String);
           auto temp = nostd::get<const char *>(value);
           dbuilder.AddString(temp);
@@ -551,8 +532,7 @@ public:
 #  endif
 #  if HAVE_TYPE_GUID
           // TODO: consider adding UUID/GUID to spec
-        case common::AttributeType::TYPE_GUID:
-        {
+        case common::AttributeType::TYPE_GUID: {
           builder.AddField(name.c_str(), TypeGuid);
           auto temp = nostd::get<GUID>(value);
           dbuilder.AddBytes(&temp, sizeof(GUID));
