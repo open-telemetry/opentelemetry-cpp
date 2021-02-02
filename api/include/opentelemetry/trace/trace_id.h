@@ -43,10 +43,7 @@ public:
   }
 
   // Creates a TraceId with the given ID.
-  explicit TraceId(const uint8_t* data) noexcept
-  {
-    memcpy(rep_, data, kSize);
-  }
+  explicit TraceId(const uint8_t *data) noexcept { memcpy(rep_, data, kSize); }
 
   // Populates the buffer with the lowercase base16 representation of the ID.
   void ToLowerBase16(nostd::span<char, 2 * kSize> buffer) const noexcept

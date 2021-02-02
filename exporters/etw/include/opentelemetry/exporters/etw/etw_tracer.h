@@ -13,6 +13,7 @@
 // limitations under the License.
 #pragma once
 
+#include <atomic>
 #include <algorithm>
 
 #include <cstdint>
@@ -172,14 +173,16 @@ class Tracer : public trace::Tracer
    * @param span
    * @param
    */
-  virtual void EndSpan(const Span &span, const trace::Span *parent = nullptr, const trace::EndSpanOptions & = {})
+  virtual void EndSpan(const Span &span,
+                       const trace::Span *parent     = nullptr,
+                       const trace::EndSpanOptions & = {})
   {
     Properties evt;
 
-    const trace::Span& spanBase = reinterpret_cast<const trace::Span&>(span);
+    const trace::Span &spanBase = reinterpret_cast<const trace::Span &>(span);
 
-    auto ctx     = spanBase.GetContext();
-    evt[ETW_FIELD_NAME]    = GetName(span);
+    auto ctx            = spanBase.GetContext();
+    evt[ETW_FIELD_NAME] = GetName(span);
 
     // We use ActivityId instead of ETW_FIELD_SPAN_ID below
     // evt[ETW_FIELD_SPAN_ID] = ToLowerBase16(ctx.span_id());
@@ -196,13 +199,9 @@ class Tracer : public trace::Tracer
       auto spanId = ToLowerBase16(spanBase.GetContext().span_id());
       scopes_.erase(spanId);
     }
-
   };
 
-  const trace::TraceId& trace_id()
-  {
-    return traceId_;
-  };
+  const trace::TraceId &trace_id() { return traceId_; };
 
   friend class Span;
 
@@ -224,18 +223,18 @@ public:
         provId(providerId.data(), providerId.size()),
         encoding(encoding)
   {
-      GUID trace_id;
-      // Generate random GUID
-      CoCreateGuid(&trace_id);
-      const auto *traceIdBytes = reinterpret_cast<const uint8_t *>(std::addressof(trace_id));
-      // Populate TraceId with that GUID
-      traceId_ = trace::TraceId(traceIdBytes);
+    GUID trace_id;
+    // Generate random GUID
+    CoCreateGuid(&trace_id);
+    const auto *traceIdBytes = reinterpret_cast<const uint8_t *>(std::addressof(trace_id));
+    // Populate TraceId with that GUID
+    traceId_ = trace::TraceId(traceIdBytes);
 
 #if defined(HAVE_MSGPACK) && !defined(HAVE_TLD)
     /* Fallback to MsgPack encoding if TraceLoggingDynamic feature gate is off */
     this->encoding = ETWProvider::EventFormat::ETW_MSGPACK;
 #endif
-      provHandle = etwProvider().open(provId, encoding);
+    provHandle = etwProvider().open(provId, encoding);
   };
 
   /**
@@ -252,7 +251,7 @@ public:
       const trace::SpanContextKeyValueIterable &links,
       const trace::StartSpanOptions &options = {}) noexcept override
   {
-    const auto parent = GetCurrentSpan();
+    const auto parent            = GetCurrentSpan();
     LPCGUID RelatedActivityIdPtr = nullptr;
     GUID RelatedActivityId;
     // Propagate parent activity only if parent span (current span) is valid
@@ -269,7 +268,7 @@ public:
     Properties evt = attributes;
 
     // Decorate with additional standard fields
-    std::string eventName   = name.data();
+    std::string eventName = name.data();
 
     evt[ETW_FIELD_NAME]     = eventName.data();
     evt[ETW_FIELD_TRACE_ID] = ToLowerBase16(spanContext.trace_id());
@@ -344,7 +343,7 @@ public:
     // and should be configurable for traces that deduct their nested
     // structure based off built-in `ActivityId` and `RelatedActivityId`
     // evt[ETW_FIELD_TRACE_ID] = ToLowerBase16(spanContext.trace_id());
-    evt[ETW_FIELD_SPAN_ID]  = ToLowerBase16(spanContext.span_id());
+    evt[ETW_FIELD_SPAN_ID] = ToLowerBase16(spanContext.span_id());
 
     auto RelatedActivityId = ToActivityId(&span);
 
@@ -438,7 +437,6 @@ protected:
   }
 
 public:
-
   /**
    * @brief Get Span Name.
    * @return Span Name.
@@ -453,7 +451,10 @@ public:
    * @param parent Parent Span (optional)
    * @return
    */
-  Span(Tracer &owner, nostd::string_view name, const trace::StartSpanOptions &options, Span* parent = nullptr) noexcept
+  Span(Tracer &owner,
+       nostd::string_view name,
+       const trace::StartSpanOptions &options,
+       Span *parent = nullptr) noexcept
       : trace::Span(), owner_(owner), parent_(parent), context_(CreateContext())
   {
     name_ = name;
@@ -503,7 +504,7 @@ public:
    * @param description Span description.
    * @return
    */
-  void SetStatus(trace::CanonicalCode code, nostd::string_view description) noexcept override
+  void SetStatus(trace::StatusCode code, nostd::string_view description) noexcept override
   {
     // TODO: not implemented
     UNREFERENCED_PARAMETER(code);
@@ -557,10 +558,7 @@ public:
    * @brief Obtain SpanContext
    * @return
    */
-  trace::SpanContext GetContext() const noexcept override
-  {
-    return context_;
-  }
+  trace::SpanContext GetContext() const noexcept override { return context_; }
 
   /**
    * @brief Check if Span is recording data.

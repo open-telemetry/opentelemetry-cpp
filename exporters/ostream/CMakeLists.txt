@@ -61,19 +61,13 @@ if(BUILD_TESTING)
   target_link_libraries(ostream_log_test ${GTEST_BOTH_LIBRARIES}
                         opentelemetry_exporter_ostream_logs)
 
-  gtest_add_tests(
-    TARGET ostream_log_test
-    TEST_PREFIX exporter.
-    TEST_LIST ostream_log_test)
+  gtest_add_tests(TARGET ostream_log_test TEST_PREFIX exporter. TEST_LIST
+                  ostream_log_test)
 
-  gtest_add_tests(
-    TARGET ostream_metrics_test
-    TEST_PREFIX exporter.
-    TEST_LIST ostream_metrics_test)
+  gtest_add_tests(TARGET ostream_metrics_test TEST_PREFIX exporter. TEST_LIST
+                  ostream_metrics_test)
 
-  gtest_add_tests(
-    TARGET ostream_span_test
-    TEST_PREFIX exporter.
-    TEST_LIST ostream_span_test)
+  gtest_add_tests(TARGET ostream_span_test TEST_PREFIX exporter. TEST_LIST
+                  ostream_span_test)
 
 endif() # BUILD_TESTING

@@ -97,7 +97,7 @@ public:
    * Get the status for this span
    * @return the status for this span
    */
-  trace::CanonicalCode GetStatus() const noexcept { return status_code_; }
+  trace::StatusCode GetStatus() const noexcept { return status_code_; }
 
   /**
    * Get the status description for this span
@@ -121,8 +121,8 @@ public:
    * Get the attributes for this span
    * @return the attributes for this span
    */
-  const std::unordered_map<std::string, sdk::common::OwnedAttributeValue> &GetAttributes() const
-      noexcept
+  const std::unordered_map<std::string, sdk::common::OwnedAttributeValue> &GetAttributes()
+      const noexcept
   {
     return attribute_map_.GetAttributes();
   }
@@ -160,7 +160,7 @@ public:
    * @param description
    * @return
    */
-  void SetStatus(trace::CanonicalCode code, nostd::string_view description) noexcept override
+  void SetStatus(trace::StatusCode code, nostd::string_view description) noexcept override
   {
     status_code_ = code;
     status_desc_ = std::string(description);
@@ -216,7 +216,7 @@ private:
   core::SystemTimestamp start_time_;
   std::chrono::nanoseconds duration_{0};
   std::string name_;
-  trace::CanonicalCode status_code_{trace::CanonicalCode::OK};
+  trace::StatusCode status_code_ { trace::StatusCode::kOk };
   std::string status_desc_;
   sdk::common::AttributeMap attribute_map_;
   trace::SpanKind span_kind_{trace::SpanKind::kInternal};
