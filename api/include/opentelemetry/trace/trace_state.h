@@ -210,7 +210,7 @@ public:
   }
 
   /**
-   * Returns `new` TransState object with following mutations applied to the existing instance:
+   * Returns `new` TraceState object with following mutations applied to the existing instance:
    *  Update Key value: The updated value must be moved to beginning of List
    *  Add : The new key-value pair SHOULD be added to beginning of List
    *
@@ -246,9 +246,9 @@ public:
   }
 
   /**
-   * Returns `new` TransState object after removing the attribute with given key ( if present )
-   * @returns empty TransState object if key is invalid
-   * @returns copy of original TransState object if key is not present (??)
+   * Returns `new` TraceState object after removing the attribute with given key ( if present )
+   * @returns empty TraceState object if key is invalid
+   * @returns copy of original TraceState object if key is not present (??)
    */
   TraceState Delete(const nostd::string_view &key)
   {
