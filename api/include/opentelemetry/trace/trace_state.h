@@ -216,6 +216,8 @@ public:
    *
    * If the provided key-value pair is invalid, or results in transtate that violates the
    * tracecontext specification, empty tracestate will be returned.
+   *
+   * If the exising object has maximum list members, it's copy is returned.
    */
   TraceState Set(const nostd::string_view &key, const nostd::string_view &value)
   {
