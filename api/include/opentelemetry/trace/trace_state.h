@@ -108,10 +108,10 @@ public:
   };
 
   /**
-   * Returns a newly created Tracestate parsed from the header provided.
+   * Returns a newly created TraceState parsed from the header provided.
    * @param header Encoding of the tracestate header defined by
    * the W3C Trace Context specification https://www.w3.org/TR/trace-context/
-   *  @return Tracestate A new Tracestate instance or DEFAULT
+   *  @return Tracestate A new TraceState instance or DEFAULT
    */
   static TraceState FromHeader(nostd::string_view header)
   {
@@ -215,7 +215,7 @@ public:
    *  Add : The new key-value pair SHOULD be added to beginning of List
    *
    * If the provided key-value pair is invalid, or results in transtate that violates the
-   * tracecontext specification, empty tracestate will be returned.
+   * tracecontext specification, empty TraceState instance will be returned.
    *
    * If the existing object has maximum list members, it's copy is returned.
    */
@@ -224,7 +224,7 @@ public:
     TraceState ts;
     if ((!IsValidKey(key) || !IsValidValue(value)))
     {
-      // max size reached or invalid key/value. Returning empty tracestate
+      // max size reached or invalid key/value. Returning empty TraceState
       return ts;  // empty instance
     }
 
