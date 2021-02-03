@@ -100,6 +100,8 @@ TEST(TraceStateTest, ValidateHeaderParsing)
                    {"1a-2f@foo=bar1,a*/foo-_/bar=bar4", "1a-2f@foo=bar1,a*/foo-_/bar=bar4"},
                    {"1a-2f@foo=bar1,*/foo-_/bar=bar4", ""},
                    {",k1=v1", "k1=v1"},
+                   {",", ""},
+                   {",=,", ""},
                    {"", ""},
                    {max_trace_state_header.data(), max_trace_state_header.data()}};
   for (auto &testcase : testcases)

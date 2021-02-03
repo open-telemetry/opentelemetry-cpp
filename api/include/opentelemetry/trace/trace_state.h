@@ -124,6 +124,12 @@ public:
     {
       // find list-member
       end = header.find(kMembersSeparator, begin);
+      if (end == 0)
+      {
+        // special case where "," is first char, move to next list member
+        begin = 1;
+        continue;
+      }
       if (end == std::string::npos)
       {
         // last list member. `end` points to end of it.
@@ -182,7 +188,7 @@ public:
 
       auto entry = (entries_.get())[count];
       header_s.append(std::string(entry.GetKey()));
-      header_s.append(std::string(1, kKeyValueSeparator));
+      header_s.append(1, kKeyValueSeparator);
       header_s.append(std::string(entry.GetValue()));
     }
     return header_s;
