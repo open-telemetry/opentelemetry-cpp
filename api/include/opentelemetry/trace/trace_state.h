@@ -113,7 +113,7 @@ public:
    * the W3C Trace Context specification https://www.w3.org/TR/trace-context/
    *  @return Tracestate A new Tracestate instance or DEFAULT
    */
-  static TraceState FromHeader(const nostd::string_view &header)
+  static TraceState FromHeader(nostd::string_view header)
   {
     TraceState ts;
 
