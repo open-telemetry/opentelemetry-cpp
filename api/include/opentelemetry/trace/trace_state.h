@@ -343,7 +343,7 @@ private:
   static bool IsValidValueRegEx(nostd::string_view value)
   {
     // Hex 0x20 to 0x2B, 0x2D to 0x3C, 0x3E to 0x7E
-    std::regex reg_value(
+    static std::regex reg_value(
         "^[\\x20-\\x2B\\x2D-\\x3C\\x3E-\\x7E]{0,255}[\\x21-\\x2B\\x2D-\\x3C\\x3E-\\x7E]$");
     // Need to benchmark without regex, as a string object is created here.
     return std::regex_match(std::string(value), reg_value);
