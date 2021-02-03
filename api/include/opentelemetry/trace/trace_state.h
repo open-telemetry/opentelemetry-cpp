@@ -132,7 +132,7 @@ public:
       else
       {
         // `end` points to end of current list member
-        end = end - 1;
+        end--;
       }
       auto list_member = TrimString(header, begin, end);  // OWS handling
       if (list_member.size() == 0)
@@ -179,11 +179,11 @@ public:
       {
         header_s.append(",");
       }
-      
+
       auto entry = (entries_.get())[count];
-      header_s.append(entry.GetKey());
-      header_s.append(kKeyValueSeparator);
-      header_s.append(entry.GetValue());
+      header_s.append(std::string(entry.GetKey()));
+      header_s.append(std::string(1, kKeyValueSeparator));
+      header_s.append(std::string(entry.GetValue()));
     }
     return header_s;
   }
@@ -220,15 +220,18 @@ public:
   TraceState Set(const nostd::string_view &key, const nostd::string_view &value)
   {
     TraceState ts;
-    if ((!IsValidKey(key) || !IsValidValue(value)) || num_entries_ == kMaxKeyValuePairs)
+    if ((!IsValidKey(key) || !IsValidValue(value)))
     {
       // max size reached or invalid key/value. Returning empty tracestate
       return ts;  // empty instance
     }
 
-    // add new key-value pair at beginning
-    Entry e(key, value);
-    (ts.entries_.get())[ts.num_entries_++] = e;
+    // add new key-value pair at beginning if list is not reached to its limit
+    if (num_entries_ < kMaxKeyValuePairs)
+    {
+      Entry e(key, value);
+      (ts.entries_.get())[ts.num_entries_++] = e;
+    }
     for (size_t i = 0; i < num_entries_; i++)
     {
       auto entry = (entries_.get())[i];

@@ -86,43 +86,26 @@ std::string header_with_max_members()
 
 TEST(TraceStateTest, ValidateHeaderParsing)
 {
-  struct {
-    const char* input;
-    const char* expected;
-  } testcases[] = {
-    { "k1=v1", "k1=v1" },
-    { "K1=V1", "" },
-    { "k1=v1,k2=v2,k3=v3", "k1=v1,k2=v2,k3=v3" },
-    { "k1=v1,k2=v2,,", "k1=v1,k2=v24" }
-    // not all cases covered
-  };
+  auto max_trace_state_header = header_with_max_members();
 
-  for (auto& testcase : testcases)
+  struct
+  {
+    const char *input;
+    const char *expected;
+  } testcases[] = {{"k1=v1", "k1=v1"},
+                   {"K1=V1", ""},
+                   {"k1=v1,k2=v2,k3=v3", "k1=v1,k2=v2,k3=v3"},
+                   {"k1=v1,k2=v2,,", "k1=v1,k2=v2"},
+                   {"k1=v1,k2=v2,invalidmember", ""},
+                   {"1a-2f@foo=bar1,a*/foo-_/bar=bar4", "1a-2f@foo=bar1,a*/foo-_/bar=bar4"},
+                   {"1a-2f@foo=bar1,*/foo-_/bar=bar4", ""},
+                   {",", ""},
+                   {"", ""},
+                   {max_trace_state_header.data(), max_trace_state_header.data()}};
+  for (auto &testcase : testcases)
   {
     EXPECT_EQ(TraceState::FromHeader(testcase.input).ToHeader(), testcase.expected);
   }
-  trace_state_header = "k1=v1,k2=v2,k3=v3";
-  EXPECT_EQ(create_ts_return_header(trace_state_header), trace_state_header);
-
-  trace_state_header = "k1=v1,k2=v2,k3=v3";
-  EXPECT_EQ(create_ts_return_header(trace_state_header), trace_state_header);
-
-  trace_state_header         = "k1=v1,k2=v2,,";
-  auto expected_state_header = "k1=v1,k2=v2";
-  EXPECT_EQ(create_ts_return_header(trace_state_header), expected_state_header);
-
-  trace_state_header = "k1=v1,k2=v2,sd";                       // invalid list member
-  EXPECT_EQ(create_ts_return_header(trace_state_header), "");  // empty header
-
-  trace_state_header = "1a-2f@foo=bar1,a*/foo-_/bar=bar4";  // valid list
-  EXPECT_EQ(create_ts_return_header(trace_state_header), trace_state_header);
-
-  trace_state_header = "1a-2f@foo=bar1,*/foo-_/bar=bar4";  // invalid list member, key `*/foo-_/bar`
-                                                           // must begin with [a-z,0-9]
-  EXPECT_EQ(create_ts_return_header(trace_state_header), "");
-
-  trace_state_header = header_with_max_members();
-  EXPECT_EQ(create_ts_return_header(trace_state_header), trace_state_header);
 }
 
 TEST(TraceStateTest, TraceStateGet)
@@ -146,8 +129,9 @@ TEST(TraceStateTest, TraceStateSet)
 
   trace_state_header = header_with_max_members();
   auto ts2           = TraceState::FromHeader(trace_state_header);
-  auto ts2_new       = ts2.Set("n_k1", "n_v1");  // adding to max list, should fail and return empty
-  EXPECT_EQ(ts2_new.ToHeader(), "");
+  auto ts2_new =
+      ts2.Set("n_k1", "n_v1");  // adding to max list, should return copy of existing list
+  EXPECT_EQ(ts2_new.ToHeader(), trace_state_header);
 
   trace_state_header = "k1=v1,k2=v2";
   auto ts3           = TraceState::FromHeader(trace_state_header);
