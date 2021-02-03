@@ -32,8 +32,10 @@ public:
   /**
    * OnStart is called when a span is started.
    * @param span a recordable for a span that was just started
+   * @param parent_context The parent context of the span that just started
    */
-  virtual void OnStart(Recordable &span) noexcept = 0;
+  virtual void OnStart(Recordable &span,
+                       const opentelemetry::trace::SpanContext &parent_context) noexcept = 0;
 
   /**
    * OnEnd is called when a span is ended.
