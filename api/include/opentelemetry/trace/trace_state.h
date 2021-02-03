@@ -173,17 +173,17 @@ public:
   std::string ToHeader()
   {
     std::string header_s;
-    size_t count = num_entries_;
-    while (count)
+    for (size_t count = 0; count < num_entries_; count++)
     {
-      auto entry = (entries_.get())[num_entries_ - count];
-      auto kv    = std::string(entry.GetKey()) + kKeyValueSeparator + std::string(entry.GetValue());
-      if (--count)
+      if (count != 0)
       {
-        // append "," if not last member
-        kv += ",";
+        header_s.append(",");
       }
-      header_s = header_s + kv;
+      
+      auto entry = (entries_.get())[count];
+      header_s.append(entry.GetKey());
+      header_s.append(kKeyValueSeparator);
+      header_s.append(entry.GetValue());
     }
     return header_s;
   }
