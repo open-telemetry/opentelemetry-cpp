@@ -217,7 +217,7 @@ public:
    * If the provided key-value pair is invalid, or results in transtate that violates the
    * tracecontext specification, empty tracestate will be returned.
    *
-   * If the exising object has maximum list members, it's copy is returned.
+   * If the existing object has maximum list members, it's copy is returned.
    */
   TraceState Set(const nostd::string_view &key, const nostd::string_view &value)
   {
@@ -321,11 +321,11 @@ private:
 
   static nostd::string_view TrimString(nostd::string_view str, size_t left, size_t right)
   {
-    while (str[(std::size_t)right] == ' ' && left < right)
+    while (str[static_cast<std::size_t>(right)] == ' ' && left < right)
     {
       right--;
     }
-    while (str[(std::size_t)left] == ' ' && left < right)
+    while (str[static_cast<std::size_t>(left)] == ' ' && left < right)
     {
       left++;
     }
