@@ -86,12 +86,21 @@ std::string header_with_max_members()
 
 TEST(TraceStateTest, ValidateHeaderParsing)
 {
-  std::string trace_state_header = "k1=v1";  // valid header
-  EXPECT_EQ(create_ts_return_header(trace_state_header), trace_state_header);
+  struct {
+    const char* input;
+    const char* expected;
+  } testcases[] = {
+    { "k1=v1", "k1=v1" },
+    { "K1=V1", "" },
+    { "k1=v1,k2=v2,k3=v3", "k1=v1,k2=v2,k3=v3" },
+    { "k1=v1,k2=v2,,", "k1=v1,k2=v24" }
+    // not all cases covered
+  };
 
-  trace_state_header = "K1=V1";  // invalid header, key can't start with uppercase.
-  EXPECT_EQ(create_ts_return_header(trace_state_header), "");
-
+  for (auto& testcase : testcases)
+  {
+    EXPECT_EQ(TraceState::FromHeader(testcase.input).ToHeader(), testcase.expected);
+  }
   trace_state_header = "k1=v1,k2=v2,k3=v3";
   EXPECT_EQ(create_ts_return_header(trace_state_header), trace_state_header);
 
