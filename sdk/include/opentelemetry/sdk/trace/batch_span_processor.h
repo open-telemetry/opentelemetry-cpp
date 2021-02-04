@@ -66,8 +66,10 @@ public:
    * NOTE: This method is a no-op.
    *
    * @param span - The span that just started
+   * @param parent_context - The parent context of the span that just started
    */
-  void OnStart(Recordable &span) noexcept override;
+  void OnStart(Recordable &span,
+               const opentelemetry::trace::SpanContext &parent_context) noexcept override;
 
   /**
    * Called when a span ends.
