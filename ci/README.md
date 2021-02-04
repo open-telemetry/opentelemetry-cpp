@@ -15,7 +15,7 @@ CI tests can be run on docker by invoking the script `./ci/run_docker.sh ./ci/do
 * `bazel.valgrind`: build bazel targets and run tests under the valgrind memory checker.
 * `benchmark`: run all benchmarks.
 * `format`: use `tools/format.sh` to enforce text formatting.
-* `code.coverage`: build cmake targets and run tests. Then upload coverage report to [codecov.io](https://codecov.io/).
+* `code.coverage`: build cmake targets with CXX option `--coverage` and run tests.
 
 Additionally, `./ci/run_docker.sh` can be invoked with no arguments to get a docker shell where tests
 can be run manually.
