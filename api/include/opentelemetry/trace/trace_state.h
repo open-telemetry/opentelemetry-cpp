@@ -107,11 +107,35 @@ public:
     }
   };
 
+  // Creates an empty TraceState.
+  TraceState() noexcept : entries_(new Entry[kMaxKeyValuePairs]), num_entries_(0) {}
+
+  TraceState(const TraceState &other) noexcept
+      : entries_(new Entry[kMaxKeyValuePairs]), num_entries_(other.num_entries_)
+  {
+    for (size_t i = 0; i < num_entries_; i++)
+    {
+      entries_.get()[i] = other.entries_.get()[i];
+    }
+  }
+
+  TraceState operator=(const TraceState &other) noexcept
+  {
+    for (size_t i = 0; i < other.num_entries_; i++)
+    {
+      entries_.get()[i] = other.entries_.get()[i];
+    }
+
+    this->num_entries_ = other.num_entries_;
+
+    return *this;
+  }
+
   /**
    * Returns a newly created TraceState parsed from the header provided.
    * @param header Encoding of the tracestate header defined by
    * the W3C Trace Context specification https://www.w3.org/TR/trace-context/
-   *  @return Tracestate A new TraceState instance or DEFAULT
+   * @return TraceState A new TraceState instance or DEFAULT
    */
   static TraceState FromHeader(nostd::string_view header)
   {
@@ -321,9 +345,6 @@ private:
 
   // Maintain the number of entries in entries_. Must be in the range [0, kMaxKeyValuePairs].
   size_t num_entries_;
-
-  // An empty TraceState.
-  TraceState() noexcept : entries_(new Entry[kMaxKeyValuePairs]), num_entries_(0) {}
 
   static nostd::string_view TrimString(nostd::string_view str, size_t left, size_t right)
   {

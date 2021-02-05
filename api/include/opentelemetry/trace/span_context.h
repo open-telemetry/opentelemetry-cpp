@@ -18,6 +18,7 @@
 #include "opentelemetry/trace/span_id.h"
 #include "opentelemetry/trace/trace_flags.h"
 #include "opentelemetry/trace/trace_id.h"
+#include "opentelemetry/trace/trace_state.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace trace
@@ -25,8 +26,8 @@ namespace trace
 namespace trace_api = opentelemetry::trace;
 
 /* SpanContext contains the state that must propagate to child Spans and across
- * process boundaries. It contains the identifiers TraceId and SpanId,
- * TraceFlags, TraceState, and whether it was propagated from a remote parent.
+ * process boundaries. It contains TraceId and SpanId, TraceFlags, TraceState
+ * and whether it was propagated from a remote parent.
  *
  * TODO: This is currently a placeholder class and requires revisiting
  */
@@ -44,8 +45,23 @@ public:
       : trace_id_(),
         span_id_(),
         trace_flags_(trace_api::TraceFlags((uint8_t)sampled_flag)),
-        is_remote_(is_remote)
+        is_remote_(is_remote),
+        trace_state_()
   {}
+
+  SpanContext(TraceId trace_id,
+              SpanId span_id,
+              TraceFlags trace_flags,
+              bool is_remote,
+              TraceState trace_state = TraceState{}) noexcept
+      : trace_id_(trace_id),
+        span_id_(span_id),
+        trace_flags_(trace_flags),
+        is_remote_(is_remote),
+        trace_state_(trace_state)
+  {}
+
+  SpanContext(const SpanContext &ctx) = default;
 
   // @returns whether this context is valid
   bool IsValid() const noexcept { return trace_id_.IsValid() && span_id_.IsValid(); }
@@ -53,15 +69,14 @@ public:
   // @returns the trace_flags associated with this span_context
   const trace_api::TraceFlags &trace_flags() const noexcept { return trace_flags_; }
 
+  // @returns the trace_id associated with this span_context
   const trace_api::TraceId &trace_id() const noexcept { return trace_id_; }
 
+  // @returns the span_id associated with this span_context
   const trace_api::SpanId &span_id() const noexcept { return span_id_; }
 
-  SpanContext(TraceId trace_id, SpanId span_id, TraceFlags trace_flags, bool is_remote) noexcept
-      : trace_id_(trace_id), span_id_(span_id), trace_flags_(trace_flags), is_remote_(is_remote)
-  {}
-
-  SpanContext(const SpanContext &ctx) = default;
+  // @returns the trace_state associated with this span_context
+  const trace_api::TraceState &trace_state() const noexcept { return trace_state_; }
 
   SpanContext &operator=(const SpanContext &ctx) = default;
 
@@ -81,6 +96,7 @@ private:
   trace_api::TraceId trace_id_;
   trace_api::SpanId span_id_;
   trace_api::TraceFlags trace_flags_;
+  trace_api::TraceState trace_state_;
   bool is_remote_ = false;
 };
 }  // namespace trace
