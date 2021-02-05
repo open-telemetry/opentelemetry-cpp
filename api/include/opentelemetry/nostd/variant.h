@@ -36,12 +36,12 @@ using absl::visit;
 class bad_variant_access : public std::exception
 {
 public:
-    virtual const char* what() const noexcept override { return "bad_variant_access"; }
+  virtual const char *what() const noexcept override { return "bad_variant_access"; }
 };
 
 [[noreturn]] inline void throw_bad_variant_access()
 {
-    throw bad_variant_access{};
+  throw bad_variant_access{};
 }
 
 #  if __EXCEPTIONS
@@ -59,10 +59,15 @@ OPENTELEMETRY_END_NAMESPACE
 // to consider a build-time flag that allows to route the handling of ThrowBadVariantAccess to
 // the actual Abseil, in case if a product using OpenTelemetry is compiled with Abseil. That
 // way the standard Abseil exception handler can be used to catch OpenTelemetry exceptions.
-namespace absl {
-    namespace variant_internal {
-        static void ThrowBadVariantAccess() { THROW_BAD_VARIANT_ACCESS; };
-    };  // namespace variant_internal
+namespace absl
+{
+namespace variant_internal
+{
+static void ThrowBadVariantAccess()
+{
+  THROW_BAD_VARIANT_ACCESS;
+};
+};  // namespace variant_internal
 };  // namespace absl
 
 #else
