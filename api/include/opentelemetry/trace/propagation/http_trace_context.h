@@ -174,7 +174,7 @@ private:
     }
   }
 
-  static void InjectTraceParent(const SpanContext &span_context, T &carrier, Setter setter)
+  static void InjectTraceHeaders(const SpanContext &span_context, T &carrier, Setter setter)
   {
     char trace_id[32];
     TraceId(span_context.trace_id()).ToLowerBase16(trace_id);
@@ -199,11 +199,12 @@ private:
       hex_string.push_back(trace_flags[i]);
     }
     setter(carrier, kTraceParent, hex_string);
+    setter(carrier, kTraceState, span_context.trace_state().ToHeader());
   }
 
   static void InjectImpl(Setter setter, T &carrier, const SpanContext &span_context)
   {
-    InjectTraceParent(span_context, carrier, setter);
+    InjectTraceHeaders(span_context, carrier, setter);
   }
 
   static bool IsValidHex(nostd::string_view string_view)
@@ -217,7 +218,7 @@ private:
     return true;
   }
 
-  static SpanContext ExtractContextFromTraceParent(nostd::string_view trace_parent)
+  static SpanContext ExtractContextFromTraceHeaders(nostd::string_view trace_parent, nostd::string_view trace_state)
   {
     if (trace_parent.length() != kHeaderSize || trace_parent[kHeaderElementLengths[0]] != '-' ||
         trace_parent[kHeaderElementLengths[0] + kHeaderElementLengths[1] + 1] != '-' ||
@@ -247,22 +248,25 @@ private:
     {
       return SpanContext(false, false);
     }
-
+    
     TraceId trace_id_obj       = GenerateTraceIdFromString(trace_id);
     SpanId span_id_obj         = GenerateSpanIdFromString(span_id);
     TraceFlags trace_flags_obj = GenerateTraceFlagsFromString(trace_flags);
-    return SpanContext(trace_id_obj, span_id_obj, trace_flags_obj, true);
+
+    
+    return SpanContext(trace_id_obj, span_id_obj, trace_flags_obj, true, opentelemetry::trace::TraceState::FromHeader(trace_state));
   }
 
   static SpanContext ExtractImpl(Getter getter, const T &carrier)
   {
     nostd::string_view trace_parent = getter(carrier, kTraceParent);
+    nostd::string_view trace_state  = getter(carrier, kTraceState);
     if (trace_parent == "")
     {
       return SpanContext(false, false);
     }
 
-    return ExtractContextFromTraceParent(trace_parent);
+    return ExtractContextFromTraceHeaders(trace_parent, trace_state);
   }
 };
 }  // namespace propagation
