@@ -16,6 +16,27 @@ namespace trace
 {
 
 /**
+ * Struct to hold batch SpanProcessor options.
+ */
+struct BatchSpanProcessorOptions
+{
+  /**
+   * The maximum buffer/queue size. After the size is reached, spans are
+   * dropped.
+   */
+  size_t max_queue_size = 2048;
+
+  /* The time interval between two consecutive exports. */
+  std::chrono::milliseconds schedule_delay_millis = std::chrono::milliseconds(5000);
+
+  /**
+   * The maximum batch size of every export. It must be smaller or
+   * equal to max_queue_size.
+   */
+  size_t max_export_batch_size = 512;
+};
+
+/**
  * This is an implementation of the SpanProcessor which creates batches of finished spans and passes
  * the export-friendly span data representations to the configured SpanExporter.
  */
@@ -26,18 +47,11 @@ public:
    * Creates a batch span processor by configuring the specified exporter and other parameters
    * as per the official, language-agnostic opentelemetry specs.
    *
-   * @param exporter - The backend exporter to pass the ended spans to
-   * @param max_queue_size -  The maximum buffer/queue size. After the size is reached, spans are
-   * dropped.
-   * @param schedule_delay_millis - The time interval between two consecutive exports.
-   * @param max_export_batch_size - The maximum batch size of every export. It must be smaller or
-   * equal to max_queue_size
+   * @param exporter - The backend exporter to pass the ended spans to.
+   * @param options - The batch SpanProcessor options.
    */
-  explicit BatchSpanProcessor(
-      std::unique_ptr<SpanExporter> &&exporter,
-      const size_t max_queue_size                           = 2048,
-      const std::chrono::milliseconds schedule_delay_millis = std::chrono::milliseconds(5000),
-      const size_t max_export_batch_size                    = 512);
+  BatchSpanProcessor(std::unique_ptr<SpanExporter> &&exporter,
+                     const BatchSpanProcessorOptions &options);
 
   /**
    * Requests a Recordable(Span) from the configured exporter.
@@ -52,8 +66,10 @@ public:
    * NOTE: This method is a no-op.
    *
    * @param span - The span that just started
+   * @param parent_context - The parent context of the span that just started
    */
-  void OnStart(Recordable &span) noexcept override;
+  void OnStart(Recordable &span,
+               const opentelemetry::trace::SpanContext &parent_context) noexcept override;
 
   /**
    * Called when a span ends.

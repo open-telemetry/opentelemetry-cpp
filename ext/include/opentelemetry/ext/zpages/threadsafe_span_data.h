@@ -70,7 +70,7 @@ public:
    * Get the status for this span
    * @return the status for this span
    */
-  opentelemetry::trace::CanonicalCode GetStatus() const noexcept
+  opentelemetry::trace::StatusCode GetStatus() const noexcept
   {
     std::lock_guard<std::mutex> lock(mutex_);
     return status_code_;
@@ -133,7 +133,7 @@ public:
     attributes_[std::string(key)] = nostd::visit(converter_, value);
   }
 
-  void SetStatus(opentelemetry::trace::CanonicalCode code,
+  void SetStatus(opentelemetry::trace::StatusCode code,
                  nostd::string_view description) noexcept override
   {
     std::lock_guard<std::mutex> lock(mutex_);
@@ -216,7 +216,7 @@ private:
   std::chrono::nanoseconds duration_{0};
   std::string name_;
   opentelemetry::trace::SpanKind span_kind_;
-  opentelemetry::trace::CanonicalCode status_code_{opentelemetry::trace::CanonicalCode::OK};
+  opentelemetry::trace::StatusCode status_code_{opentelemetry::trace::StatusCode::kUnset};
   std::string status_desc_;
   std::unordered_map<std::string, opentelemetry::sdk::common::OwnedAttributeValue> attributes_;
   std::vector<opentelemetry::sdk::trace::SpanDataEvent> events_;

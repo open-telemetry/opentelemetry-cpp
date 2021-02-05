@@ -125,7 +125,7 @@ public:
    * Get the status for this span
    * @return the status for this span
    */
-  opentelemetry::trace::CanonicalCode GetStatus() const noexcept { return status_code_; }
+  opentelemetry::trace::StatusCode GetStatus() const noexcept { return status_code_; }
 
   /**
    * Get the status description for this span
@@ -196,7 +196,7 @@ public:
     links_.push_back(link);
   }
 
-  void SetStatus(opentelemetry::trace::CanonicalCode code,
+  void SetStatus(opentelemetry::trace::StatusCode code,
                  nostd::string_view description) noexcept override
   {
     status_code_ = code;
@@ -227,7 +227,7 @@ private:
   core::SystemTimestamp start_time_;
   std::chrono::nanoseconds duration_{0};
   std::string name_;
-  opentelemetry::trace::CanonicalCode status_code_{opentelemetry::trace::CanonicalCode::OK};
+  opentelemetry::trace::StatusCode status_code_{opentelemetry::trace::StatusCode::kUnset};
   std::string status_desc_;
   common::AttributeMap attribute_map_;
   std::vector<SpanDataEvent> events_;

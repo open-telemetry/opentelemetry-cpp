@@ -85,7 +85,7 @@ public:
 }  // namespace
 
 // Sends an HTTP POST request to the given url, with the given body.
-void send_request(opentelemetry::ext::http::client::curl::SessionManager &client,
+void send_request(opentelemetry::ext::http::client::curl::HttpClient &client,
                   const std::string &url,
                   const std::string &body)
 {
@@ -144,7 +144,7 @@ int main(int argc, char *argv[])
   opentelemetry::trace::Scope scope(root_span);
 
   testing::HttpServer server(default_host, port);
-  opentelemetry::ext::http::client::curl::SessionManager client;
+  opentelemetry::ext::http::client::curl::HttpClient client;
 
   testing::HttpRequestCallback test_cb{
       [&](testing::HttpRequest const &req, testing::HttpResponse &resp) {
