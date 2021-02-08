@@ -503,7 +503,9 @@ public:
       nostd::string_view key,
       const opentelemetry::sdk::common::OwnedAttributeValue &value) noexcept override
   {
-    // TODO
+    // TODO: not implemented
+    UNREFERENCED_PARAMETER(key);
+    UNREFERENCED_PARAMETER(value);
   }
 
   void SetStartTime(opentelemetry::core::SystemTimestamp start_time) noexcept override
@@ -532,7 +534,6 @@ private:
   std::string status_desc_;
   sdk::common::AttributeMap attribute_map_;
   opentelemetry::trace::SpanKind span_kind_{opentelemetry::trace::SpanKind::kInternal};
-  opentelemetry::sdk::resource::Resource resource_;
   nostd::shared_ptr<opentelemetry::trace::Tracer> tracer_;
   nostd::shared_ptr<opentelemetry::trace::Span> span_;
 };
