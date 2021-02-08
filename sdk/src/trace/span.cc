@@ -112,8 +112,7 @@ Span::Span(std::shared_ptr<Tracer> &&tracer,
   {
     recordable_->SetResourceAttribute(attribute.first, attribute.second);
   }
-
-  processor_->OnStart(*recordable_);
+  processor_->OnStart(*recordable_, , parent_span_context);
 }
 
 Span::~Span()

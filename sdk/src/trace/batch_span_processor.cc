@@ -4,6 +4,7 @@
 using opentelemetry::sdk::common::AtomicUniquePtr;
 using opentelemetry::sdk::common::CircularBuffer;
 using opentelemetry::sdk::common::CircularBufferRange;
+using opentelemetry::trace::SpanContext;
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace sdk
@@ -11,13 +12,11 @@ namespace sdk
 namespace trace
 {
 BatchSpanProcessor::BatchSpanProcessor(std::unique_ptr<SpanExporter> &&exporter,
-                                       const size_t max_queue_size,
-                                       const std::chrono::milliseconds schedule_delay_millis,
-                                       const size_t max_export_batch_size)
+                                       const BatchSpanProcessorOptions &options)
     : exporter_(std::move(exporter)),
-      max_queue_size_(max_queue_size),
-      schedule_delay_millis_(schedule_delay_millis),
-      max_export_batch_size_(max_export_batch_size),
+      max_queue_size_(options.max_queue_size),
+      schedule_delay_millis_(options.schedule_delay_millis),
+      max_export_batch_size_(options.max_export_batch_size),
       buffer_(max_queue_size_),
       worker_thread_(&BatchSpanProcessor::DoBackgroundWork, this)
 {}
@@ -27,7 +26,7 @@ std::unique_ptr<Recordable> BatchSpanProcessor::MakeRecordable() noexcept
   return exporter_->MakeRecordable();
 }
 
-void BatchSpanProcessor::OnStart(Recordable &) noexcept
+void BatchSpanProcessor::OnStart(Recordable &, const SpanContext &) noexcept
 {
   // no-op
 }
