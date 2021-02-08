@@ -224,7 +224,7 @@ public:
   }
 
   void SetResourceAttribute(
-      const std::string &key,
+      std::string key,
       const opentelemetry::sdk::common::OwnedAttributeValue &value) noexcept override
   {
     resources_.insert(std::pair<std::string, opentelemetry::sdk::common::OwnedAttributeValue>(

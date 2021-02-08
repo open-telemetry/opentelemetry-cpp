@@ -124,7 +124,7 @@ public:
    * @param value attribute value
    */
   virtual void SetResourceAttribute(
-      const std::string &key,
+      std::string key,
       const opentelemetry::sdk::common::OwnedAttributeValue &value) noexcept = 0;
 
   /**

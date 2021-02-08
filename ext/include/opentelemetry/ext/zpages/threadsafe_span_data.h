@@ -164,7 +164,7 @@ public:
   }
 
   void SetResourceAttribute(
-      const std::string &key,
+      std::string key,
       const opentelemetry::sdk::common::OwnedAttributeValue &value) noexcept override
   {
     std::lock_guard<std::mutex> lock(mutex_);
