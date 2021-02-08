@@ -122,6 +122,16 @@ public:
   opentelemetry::trace::SpanKind GetSpanKind() const noexcept { return span_kind_; }
 
   /**
+   * Get Resources.
+   * @return the resource of this span
+   */
+  const std::unordered_map<std::string, opentelemetry::sdk::common::OwnedAttributeValue>
+      &GetResources() const noexcept
+  {
+    return resources_;
+  }
+
+  /**
    * Get the status for this span
    * @return the status for this span
    */
@@ -213,6 +223,14 @@ public:
     span_kind_ = span_kind;
   }
 
+  void SetResourceAttribute(
+      nostd::string_view key,
+      const opentelemetry::sdk::common::OwnedAttributeValue &value) noexcept override
+  {
+    resources_.insert(std::pair<std::string, opentelemetry::sdk::common::OwnedAttributeValue>(
+        std::string(key.data()), value));
+  }
+
   void SetStartTime(opentelemetry::core::SystemTimestamp start_time) noexcept override
   {
     start_time_ = start_time;
@@ -233,6 +251,7 @@ private:
   std::vector<SpanDataEvent> events_;
   std::vector<SpanDataLink> links_;
   opentelemetry::trace::SpanKind span_kind_{opentelemetry::trace::SpanKind::kInternal};
+  std::unordered_map<std::string, opentelemetry::sdk::common::OwnedAttributeValue> resources_;
 };
 }  // namespace trace
 }  // namespace sdk

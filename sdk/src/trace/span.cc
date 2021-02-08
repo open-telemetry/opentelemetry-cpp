@@ -76,7 +76,6 @@ Span::Span(std::shared_ptr<Tracer> &&tracer,
     return;
   }
   recordable_->SetName(name);
-
   trace_api::TraceId trace_id;
   trace_api::SpanId span_id = GenerateRandomSpanId();
 
@@ -109,7 +108,11 @@ Span::Span(std::shared_ptr<Tracer> &&tracer,
   recordable_->SetSpanKind(options.kind);
   recordable_->SetStartTime(NowOr(options.start_system_time));
   start_steady_time = NowOr(options.start_steady_time);
-  // recordable_->SetResource(resource_); TODO
+  for (auto attribute : resource.GetAttributes())
+  {
+    recordable_->SetResourceAttribute(attribute.first, attribute.second);
+  }
+
   processor_->OnStart(*recordable_);
 }
 

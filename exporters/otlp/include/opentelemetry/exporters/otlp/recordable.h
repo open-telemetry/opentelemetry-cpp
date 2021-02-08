@@ -1,6 +1,8 @@
 #pragma once
 
+#include "opentelemetry/proto/resource/v1/resource.pb.h"
 #include "opentelemetry/proto/trace/v1/trace.pb.h"
+#include "opentelemetry/sdk/resource/resource.h"
 #include "opentelemetry/sdk/trace/recordable.h"
 #include "opentelemetry/version.h"
 
@@ -34,12 +36,19 @@ public:
 
   void SetSpanKind(opentelemetry::trace::SpanKind span_kind) noexcept override;
 
+  void SetResourceAttribute(
+      nostd::string_view key,
+      const opentelemetry::sdk::common::OwnedAttributeValue &value) noexcept override;
+
   void SetStartTime(opentelemetry::core::SystemTimestamp start_time) noexcept override;
 
   void SetDuration(std::chrono::nanoseconds duration) noexcept override;
 
+  proto::resource::v1::Resource &GetResources() noexcept;
+
 private:
   proto::trace::v1::Span span_;
+  proto::resource::v1::Resource resource_;
 };
 }  // namespace otlp
 }  // namespace exporter

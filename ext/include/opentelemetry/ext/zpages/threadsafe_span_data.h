@@ -47,6 +47,17 @@ public:
   }
 
   /**
+   * Get the resources for this span
+   * @return the resources for this span
+   */
+  const std::unordered_map<std::string, opentelemetry::sdk::common::OwnedAttributeValue>
+  GetResources()
+  {
+    std::lock_guard<std::mutex> lock(mutex_);
+    return resources_;
+  }
+
+  /**
    * Get the parent span id for this span
    * @return the span id for this span's parent
    */
@@ -152,6 +163,15 @@ public:
     span_kind_ = span_kind;
   }
 
+  void SetResourceAttribute(
+      nostd::string_view key,
+      const opentelemetry::sdk::common::OwnedAttributeValue &value) noexcept override
+  {
+    std::lock_guard<std::mutex> lock(mutex_);
+    attributes_.insert(
+        std::pair<std::string, opentelemetry::sdk::common::OwnedAttributeValue>(key, value));
+  }
+
   void SetStartTime(opentelemetry::core::SystemTimestamp start_time) noexcept override
   {
     std::lock_guard<std::mutex> lock(mutex_);
@@ -221,6 +241,7 @@ private:
   std::unordered_map<std::string, opentelemetry::sdk::common::OwnedAttributeValue> attributes_;
   std::vector<opentelemetry::sdk::trace::SpanDataEvent> events_;
   opentelemetry::sdk::common::AttributeConverter converter_;
+  std::unordered_map<std::string, opentelemetry::sdk::common::OwnedAttributeValue> resources_;
 };
 }  // namespace zpages
 }  // namespace ext

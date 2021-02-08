@@ -17,6 +17,7 @@
 #include "opentelemetry/trace/trace_id.h"
 #include "opentelemetry/trace/tracer_provider.h"
 
+#include "opentelemetry/sdk/resource/resource.h"
 #include "opentelemetry/sdk/trace/exporter.h"
 #include "opentelemetry/sdk/trace/recordable.h"
 #include "opentelemetry/sdk/trace/span_data.h"
@@ -498,6 +499,13 @@ public:
     span_kind_ = span_kind;
   }
 
+  void SetResourceAttribute(
+      nostd::string_view key,
+      const opentelemetry::sdk::common::OwnedAttributeValue &value) noexcept override
+  {
+    // TODO
+  }
+
   void SetStartTime(opentelemetry::core::SystemTimestamp start_time) noexcept override
   {
     start_time_ = start_time;
@@ -524,6 +532,7 @@ private:
   std::string status_desc_;
   sdk::common::AttributeMap attribute_map_;
   opentelemetry::trace::SpanKind span_kind_{opentelemetry::trace::SpanKind::kInternal};
+  opentelemetry::sdk::resource::Resource resource_;
   nostd::shared_ptr<opentelemetry::trace::Tracer> tracer_;
   nostd::shared_ptr<opentelemetry::trace::Span> span_;
 };

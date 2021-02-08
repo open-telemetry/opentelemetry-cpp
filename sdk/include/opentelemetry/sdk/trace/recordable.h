@@ -4,6 +4,7 @@
 #include "opentelemetry/common/key_value_iterable.h"
 #include "opentelemetry/core/timestamp.h"
 #include "opentelemetry/nostd/string_view.h"
+#include "opentelemetry/sdk/common/attribute_utils.h"
 #include "opentelemetry/sdk/common/empty_attributes.h"
 #include "opentelemetry/trace/canonical_code.h"
 #include "opentelemetry/trace/span.h"
@@ -115,6 +116,16 @@ public:
    * @param span_kind the spankind to set
    */
   virtual void SetSpanKind(opentelemetry::trace::SpanKind span_kind) noexcept = 0;
+
+  /**
+   * Set Resource attribute of the span.
+   * @param key attribute key
+   * @param value attribute value
+   */
+  virtual void SetResourceAttribute(
+      nostd::string_view key,
+      const opentelemetry::sdk::common::OwnedAttributeValue &value) noexcept = 0;
+
   /**
    * Set the start time of the span.
    * @param start_time the start time to set

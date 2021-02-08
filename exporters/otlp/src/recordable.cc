@@ -117,6 +117,101 @@ void PopulateAttribute(opentelemetry::proto::common::v1::KeyValue *attribute,
   }
 }
 
+void PopulateResourceAttribute(opentelemetry::proto::common::v1::KeyValue *attribute,
+                               nostd::string_view key,
+                               const opentelemetry::sdk::common::OwnedAttributeValue &value)
+{
+
+  attribute->set_key(key.data(), key.size());
+
+  if (nostd::holds_alternative<bool>(value))
+  {
+    attribute->mutable_value()->set_bool_value(nostd::get<bool>(value));
+  }
+
+  else if (nostd::holds_alternative<int>(value))
+  {
+    attribute->mutable_value()->set_int_value(nostd::get<int>(value));
+  }
+  else if (nostd::holds_alternative<int64_t>(value))
+  {
+    attribute->mutable_value()->set_int_value(nostd::get<int64_t>(value));
+  }
+  else if (nostd::holds_alternative<unsigned int>(value))
+  {
+    attribute->mutable_value()->set_int_value(nostd::get<unsigned int>(value));
+  }
+  else if (nostd::holds_alternative<uint64_t>(value))
+  {
+    attribute->mutable_value()->set_int_value(nostd::get<uint64_t>(value));
+  }
+  else if (nostd::holds_alternative<double>(value))
+  {
+    attribute->mutable_value()->set_double_value(nostd::get<double>(value));
+  }
+  else if (nostd::holds_alternative<std::string>(value))
+  {
+    attribute->mutable_value()->set_string_value(nostd::get<std::string>(value).data(),
+                                                 nostd::get<std::string>(value).size());
+  }
+#ifdef HAVE_SPAN_BYTE
+  else if (nostd::holds_alternative<uint8_t>(value))
+  {
+    attribute->mutable_value()->set_string_value(nostd::get<uint8_t>(value));
+  }
+#endif
+  else if (nostd::holds_alternative<std::vector<bool>>(value))
+  {
+    for (const auto &val : nostd::get<std::vector<bool>>(value))
+    {
+      attribute->mutable_value()->mutable_array_value()->add_values()->set_bool_value(val);
+    }
+  }
+  else if (nostd::holds_alternative<std::vector<int32_t>>(value))
+  {
+    for (const auto &val : nostd::get<std::vector<int32_t>>(value))
+    {
+      attribute->mutable_value()->mutable_array_value()->add_values()->set_int_value(val);
+    }
+  }
+  else if (nostd::holds_alternative<std::vector<uint32_t>>(value))
+  {
+    for (const auto &val : nostd::get<std::vector<uint32_t>>(value))
+    {
+      attribute->mutable_value()->mutable_array_value()->add_values()->set_int_value(val);
+    }
+  }
+  else if (nostd::holds_alternative<std::vector<int64_t>>(value))
+  {
+    for (const auto &val : nostd::get<std::vector<int64_t>>(value))
+    {
+      attribute->mutable_value()->mutable_array_value()->add_values()->set_int_value(val);
+    }
+  }
+  else if (nostd::holds_alternative<std::vector<uint64_t>>(value))
+  {
+    for (const auto &val : nostd::get<std::vector<uint64_t>>(value))
+    {
+      attribute->mutable_value()->mutable_array_value()->add_values()->set_int_value(val);
+    }
+  }
+  else if (nostd::holds_alternative<std::vector<double>>(value))
+  {
+    for (const auto &val : nostd::get<std::vector<double>>(value))
+    {
+      attribute->mutable_value()->mutable_array_value()->add_values()->set_double_value(val);
+    }
+  }
+  else if (nostd::holds_alternative<std::vector<std::string>>(value))
+  {
+    for (const auto &val : nostd::get<std::vector<std::string>>(value))
+    {
+      attribute->mutable_value()->mutable_array_value()->add_values()->set_string_value(val.data(),
+                                                                                        val.size());
+    }
+  }
+}
+
 void Recordable::SetAttribute(nostd::string_view key,
                               const opentelemetry::common::AttributeValue &value) noexcept
 {
@@ -207,6 +302,14 @@ void Recordable::SetSpanKind(opentelemetry::trace::SpanKind span_kind) noexcept
   span_.set_kind(proto_span_kind);
 }
 
+void Recordable::SetResourceAttribute(
+    nostd::string_view key,
+    const opentelemetry::sdk::common::OwnedAttributeValue &value) noexcept
+{
+  auto attribute = resource_.add_attributes();
+  PopulateResourceAttribute(attribute, key, value);
+}
+
 void Recordable::SetStartTime(opentelemetry::core::SystemTimestamp start_time) noexcept
 {
   span_.set_start_time_unix_nano(start_time.time_since_epoch().count());
@@ -216,6 +319,11 @@ void Recordable::SetDuration(std::chrono::nanoseconds duration) noexcept
 {
   const uint64_t unix_end_time = span_.start_time_unix_nano() + duration.count();
   span_.set_end_time_unix_nano(unix_end_time);
+}
+
+proto::resource::v1::Resource &Recordable::GetResources() noexcept
+{
+  return resource_;
 }
 }  // namespace otlp
 }  // namespace exporter

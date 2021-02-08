@@ -175,9 +175,7 @@ class TracezProcessor : public ::testing::Test
 protected:
   void SetUp() override
   {
-    processor     = std::shared_ptr<TracezSpanProcessor>(new TracezSpanProcessor());
-    auto resource = opentelemetry::sdk::resource::Resource::Create({});
-
+    processor  = std::shared_ptr<TracezSpanProcessor>(new TracezSpanProcessor());
     tracer     = std::shared_ptr<opentelemetry::trace::Tracer>(new Tracer(processor, resource));
     auto spans = processor->GetSpanSnapshot();
     running    = spans.running;
@@ -187,6 +185,9 @@ protected:
   }
 
   std::shared_ptr<TracezSpanProcessor> processor;
+  opentelemetry::sdk::resource::Resource resource =
+      opentelemetry::sdk::resource::Resource::Create({});
+
   std::shared_ptr<opentelemetry::trace::Tracer> tracer;
 
   std::vector<std::string> span_names;
