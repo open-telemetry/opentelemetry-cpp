@@ -500,7 +500,7 @@ public:
   }
 
   void SetResourceAttribute(
-      nostd::string_view key,
+      std::string key,
       const opentelemetry::sdk::common::OwnedAttributeValue &value) noexcept override
   {
     // TODO: not implemented

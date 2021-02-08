@@ -118,7 +118,7 @@ void PopulateAttribute(opentelemetry::proto::common::v1::KeyValue *attribute,
 }
 
 void PopulateResourceAttribute(opentelemetry::proto::common::v1::KeyValue *attribute,
-                               nostd::string_view key,
+                               const std::string &key,
                                const opentelemetry::sdk::common::OwnedAttributeValue &value)
 {
 
@@ -303,7 +303,7 @@ void Recordable::SetSpanKind(opentelemetry::trace::SpanKind span_kind) noexcept
 }
 
 void Recordable::SetResourceAttribute(
-    nostd::string_view key,
+    const std::string &key,
     const opentelemetry::sdk::common::OwnedAttributeValue &value) noexcept
 {
   auto attribute = resource_.add_attributes();

@@ -14,6 +14,7 @@
 #include "opentelemetry/version.h"
 
 #include <map>
+#include <string>
 
 // TODO: Create generic short pattern for opentelemetry::common and opentelemetry::trace
 
@@ -123,7 +124,7 @@ public:
    * @param value attribute value
    */
   virtual void SetResourceAttribute(
-      nostd::string_view key,
+      const std::string &key,
       const opentelemetry::sdk::common::OwnedAttributeValue &value) noexcept = 0;
 
   /**
