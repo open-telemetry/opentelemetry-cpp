@@ -503,7 +503,6 @@ public:
       std::string key,
       const opentelemetry::sdk::common::OwnedAttributeValue &value) noexcept override
   {
-    // TODO: not implemented
     UNREFERENCED_PARAMETER(key);
     UNREFERENCED_PARAMETER(value);
   }
