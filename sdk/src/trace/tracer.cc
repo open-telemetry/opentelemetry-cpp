@@ -13,7 +13,7 @@ namespace trace
 Tracer::Tracer(std::shared_ptr<SpanProcessor> processor,
                const opentelemetry::sdk::resource::Resource &resource,
                std::shared_ptr<Sampler> sampler) noexcept
-    : processor_{processor}, sampler_{sampler}, resource_{resource}
+    : processor_{processor}, sampler_{sampler}, resource_(resource)
 {}
 
 void Tracer::SetProcessor(std::shared_ptr<SpanProcessor> processor) noexcept
