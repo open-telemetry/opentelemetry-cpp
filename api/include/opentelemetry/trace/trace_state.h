@@ -113,27 +113,6 @@ public:
     return nostd::shared_ptr<TraceState>(new TraceState());
   }
 
-  TraceState(const TraceState &other) noexcept
-      : entries_(new Entry[kMaxKeyValuePairs]), num_entries_(other.num_entries_)
-  {
-    for (size_t i = 0; i < num_entries_; i++)
-    {
-      entries_.get()[i] = other.entries_.get()[i];
-    }
-  }
-
-  TraceState operator=(const TraceState &other) noexcept
-  {
-    for (size_t i = 0; i < other.num_entries_; i++)
-    {
-      entries_.get()[i] = other.entries_.get()[i];
-    }
-
-    this->num_entries_ = other.num_entries_;
-
-    return *this;
-  }
-
   /**
    * Returns a newly created TraceState parsed from the header provided.
    * @param header Encoding of the tracestate header defined by
