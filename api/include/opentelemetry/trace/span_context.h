@@ -28,8 +28,6 @@ namespace trace_api = opentelemetry::trace;
 /* SpanContext contains the state that must propagate to child Spans and across
  * process boundaries. It contains TraceId and SpanId, TraceFlags, TraceState
  * and whether it was propagated from a remote parent.
- *
- * TODO: This is currently a placeholder class and requires revisiting
  */
 class SpanContext final
 {
@@ -46,14 +44,14 @@ public:
         span_id_(),
         trace_flags_(trace_api::TraceFlags((uint8_t)sampled_flag)),
         is_remote_(is_remote),
-        trace_state_()
+        trace_state_(TraceState::GetDefault())
   {}
 
   SpanContext(TraceId trace_id,
               SpanId span_id,
               TraceFlags trace_flags,
               bool is_remote,
-              TraceState trace_state = TraceState{}) noexcept
+              TraceState trace_state = TraceState::GetDefault()) noexcept
       : trace_id_(trace_id),
         span_id_(span_id),
         trace_flags_(trace_flags),

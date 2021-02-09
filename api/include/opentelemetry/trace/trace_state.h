@@ -107,8 +107,11 @@ public:
     }
   };
 
-  // Creates an empty TraceState.
-  TraceState() noexcept : entries_(new Entry[kMaxKeyValuePairs]), num_entries_(0) {}
+  static TraceState &GetDefault()
+  {
+    static TraceState ts;
+    return ts;
+  }
 
   TraceState(const TraceState &other) noexcept
       : entries_(new Entry[kMaxKeyValuePairs]), num_entries_(other.num_entries_)
@@ -340,11 +343,8 @@ public:
   }
 
 private:
-  // Store entries in a C-style array to avoid using std::array or std::vector.
-  nostd::unique_ptr<Entry[]> entries_;
-
-  // Maintain the number of entries in entries_. Must be in the range [0, kMaxKeyValuePairs].
-  size_t num_entries_;
+  // Creates an empty TraceState.
+  TraceState() noexcept : entries_(new Entry[kMaxKeyValuePairs]), num_entries_(0) {}
 
   static nostd::string_view TrimString(nostd::string_view str, size_t left, size_t right)
   {
@@ -422,6 +422,13 @@ private:
   }
 
   static bool IsLowerCaseAlphaOrDigit(char c) { return isdigit(c) || islower(c); }
+
+private:
+  // Store entries in a C-style array to avoid using std::array or std::vector.
+  nostd::unique_ptr<Entry[]> entries_;
+
+  // Maintain the number of entries in entries_. Must be in the range [0, kMaxKeyValuePairs].
+  size_t num_entries_;
 };
 }  // namespace trace
 OPENTELEMETRY_END_NAMESPACE
