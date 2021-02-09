@@ -44,14 +44,14 @@ public:
         span_id_(),
         trace_flags_(trace_api::TraceFlags((uint8_t)sampled_flag)),
         is_remote_(is_remote),
-        trace_state_(TraceState::GetDefault())
+        trace_state_(TraceState::GetEmpty())
   {}
 
   SpanContext(TraceId trace_id,
               SpanId span_id,
               TraceFlags trace_flags,
               bool is_remote,
-              TraceState trace_state = TraceState::GetDefault()) noexcept
+              nostd::shared_ptr<TraceState> trace_state = TraceState::GetEmpty()) noexcept
       : trace_id_(trace_id),
         span_id_(span_id),
         trace_flags_(trace_flags),
@@ -74,7 +74,10 @@ public:
   const trace_api::SpanId &span_id() const noexcept { return span_id_; }
 
   // @returns the trace_state associated with this span_context
-  const trace_api::TraceState &trace_state() const noexcept { return trace_state_; }
+  const nostd::shared_ptr<trace_api::TraceState> trace_state() const noexcept
+  {
+    return trace_state_;
+  }
 
   SpanContext &operator=(const SpanContext &ctx) = default;
 
@@ -88,7 +91,7 @@ private:
   trace_api::TraceId trace_id_;
   trace_api::SpanId span_id_;
   trace_api::TraceFlags trace_flags_;
-  trace_api::TraceState trace_state_;
+  nostd::shared_ptr<trace_api::TraceState> trace_state_;
   bool is_remote_ = false;
 };
 }  // namespace trace

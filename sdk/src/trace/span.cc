@@ -96,7 +96,7 @@ Span::Span(std::shared_ptr<Tracer> &&tracer,
   span_context_ = std::unique_ptr<trace_api::SpanContext>(
       new trace_api::SpanContext(trace_id, span_id, trace_api::TraceFlags(), false,
                                  is_parent_span_valid ? parent_span_context.trace_state()
-                                                      : trace_api::TraceState::GetDefault()));
+                                                      : trace_api::TraceState::GetEmpty()));
 
   attributes.ForEachKeyValue(
       [&](nostd::string_view key, opentelemetry::common::AttributeValue value) noexcept {

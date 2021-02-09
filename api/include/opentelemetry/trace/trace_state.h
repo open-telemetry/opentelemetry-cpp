@@ -25,6 +25,7 @@
 #  define HAVE_WORKING_REGEX 1
 #endif
 
+#include "opentelemetry/nostd/shared_ptr.h"
 #include "opentelemetry/nostd/span.h"
 #include "opentelemetry/nostd/string_view.h"
 #include "opentelemetry/nostd/unique_ptr.h"
@@ -107,10 +108,9 @@ public:
     }
   };
 
-  static TraceState &GetDefault()
+  static nostd::shared_ptr<TraceState> GetEmpty()
   {
-    static TraceState ts;
-    return ts;
+    return nostd::shared_ptr<TraceState>(new TraceState());
   }
 
   TraceState(const TraceState &other) noexcept
