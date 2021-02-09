@@ -35,7 +35,8 @@ void PopulateRequest(const nostd::span<std::unique_ptr<sdk::trace::Recordable>> 
       auto resource = rec->GetResources();
       if (resource.attributes_size())
       {
-        resource_span->set_allocated_resource(&resource);
+        // TBD
+        // resource_span->set_allocated_resource(&resource);
         resource_added = true;
       }
     }
