@@ -69,9 +69,10 @@ TEST_F(OtlpExporterTestPeer, ExportIntegrationTest)
 
   auto processor = std::shared_ptr<sdk::trace::SpanProcessor>(
       new sdk::trace::SimpleSpanProcessor(std::move(exporter)));
-  auto provider = nostd::shared_ptr<trace::TracerProvider>(new sdk::trace::TracerProvider(
-      processor, opentelemetry::sdk::resource::Resource::Create({})));
-  auto tracer   = provider->GetTracer("test");
+  auto resource = opentelemetry::sdk::resource::Resource::Create({});
+  auto provider = nostd::shared_ptr<trace::TracerProvider>(
+      new sdk::trace::TracerProvider(processor, std::move(resource)));
+  auto tracer = provider->GetTracer("test");
 
   EXPECT_CALL(*mock_stub, Export(_, _, _))
       .Times(AtLeast(1))
