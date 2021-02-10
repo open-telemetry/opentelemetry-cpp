@@ -110,8 +110,8 @@ public:
 
   static nostd::shared_ptr<TraceState> GetDefault()
   {
-    static TraceState ts;
-    return nostd::shared_ptr<TraceState>{&ts};
+    static nostd::shared_ptr<TraceState> ts{new TraceState()};
+    return ts;
   }
 
   /**
