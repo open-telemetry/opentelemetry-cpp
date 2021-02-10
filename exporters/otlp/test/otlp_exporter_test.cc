@@ -93,6 +93,9 @@ TEST_F(OtlpExporterTestPeer, ConfigTest)
   std::unique_ptr<OtlpExporter> exporter(new OtlpExporter(opts));
   EXPECT_EQ(GetOptions(exporter).endpoint, "localhost:45454");
 }
+
+// TODO - Test that proto is cosntructed with appropraite information.
+
 }  // namespace otlp
 }  // namespace exporter
 OPENTELEMETRY_END_NAMESPACE

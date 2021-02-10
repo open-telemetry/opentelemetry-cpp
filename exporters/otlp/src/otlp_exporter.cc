@@ -1,5 +1,6 @@
 #include "opentelemetry/exporters/otlp/otlp_exporter.h"
 #include "opentelemetry/exporters/otlp/recordable.h"
+#include "opentelemetry/exporters/otlp/shared_utils.h"
 
 #include <grpcpp/grpcpp.h>
 #include <iostream>
@@ -12,15 +13,27 @@ namespace otlp
 
 // ----------------------------- Helper functions ------------------------------
 
+void PopulateResource(const sdk::resource::Resource& resource,
+                      proto::resource::v1::Resource* proto) {
+  // TODO - Fill this out.
+  for (const auto& kv : resource.GetAttributes()) {
+    internal::PopulateAttribute(proto->add_attributes(), kv.first, kv.second);
+  }
+  
+}
+
 /**
  * Add span protobufs contained in recordables to request.
  * @param spans the spans to export
  * @param request the current request
  */
-void PopulateRequest(const nostd::span<std::unique_ptr<sdk::trace::Recordable>> &spans,
+void PopulateRequest(const sdk::resource::Resource& resource,
+                     const nostd::span<std::unique_ptr<sdk::trace::Recordable>> &spans,
                      proto::collector::trace::v1::ExportTraceServiceRequest *request)
 {
   auto resource_span       = request->add_resource_spans();
+  PopulateResource(resource, resource_span->mutable_resource());
+
   auto instrumentation_lib = resource_span->add_instrumentation_library_spans();
 
   for (auto &recordable : spans)
@@ -65,8 +78,7 @@ sdk::trace::ExportResult OtlpExporter::Export(
     const nostd::span<std::unique_ptr<sdk::trace::Recordable>> &spans) noexcept
 {
   proto::collector::trace::v1::ExportTraceServiceRequest request;
-  // TODO - populate Resource.
-  PopulateRequest(spans, &request);
+  PopulateRequest(resource, spans, &request);
 
   grpc::ClientContext context;
   proto::collector::trace::v1::ExportTraceServiceResponse response;

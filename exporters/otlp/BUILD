@@ -26,10 +26,27 @@ cc_library(
     ],
     strip_include_prefix = "include",
     deps = [
+        ":shared_utils",
         "//sdk/src/trace",
         "@com_github_opentelemetry_proto//:trace_proto_cc",
     ],
 )
+
+cc_library(
+    name = "shared_utils",
+    srcs = [
+        "src/shared_utils.cc",
+    ],
+    hdrs = [
+        "include/opentelemetry/exporters/otlp/shared_utils.h",
+    ],
+    strip_include_prefix = "include",
+    deps = [
+        "//sdk/src/trace",
+        "@com_github_opentelemetry_proto//:common_proto_cc",
+    ],
+)
+
 
 cc_library(
     name = "otlp_exporter",
@@ -42,6 +59,7 @@ cc_library(
     strip_include_prefix = "include",
     deps = [
         ":recordable",
+        ":shared_utils",
         "//sdk/src/trace",
 
         # For gRPC
