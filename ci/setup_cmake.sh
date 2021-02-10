@@ -35,7 +35,7 @@ make
 cp *.a /usr/lib || cp lib/*.a /usr/lib
 popd
 dpkg -r libgtest-dev
-pushd usr/src/gtest
+pushd /usr/src/gmock
 cmake CMakeLists.txt
 make
 cp *.a /usr/lib || cp lib/*.a /usr/lib
