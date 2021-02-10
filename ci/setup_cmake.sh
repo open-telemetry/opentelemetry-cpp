@@ -18,6 +18,7 @@ set +e
 echo		\
                 libbenchmark-dev \
                 libgtest-dev \
+                libgmock-dev \
                 zlib1g-dev \
                 sudo \
                 libcurl4-openssl-dev \
@@ -33,3 +34,4 @@ cmake CMakeLists.txt
 make
 cp *.a /usr/lib || cp lib/*.a /usr/lib
 popd
+
