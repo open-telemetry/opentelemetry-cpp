@@ -1,6 +1,7 @@
 #pragma once
 
 #include "opentelemetry/nostd/type_traits.h"
+#include "opentelemetry/sdk/resource/resource.h"
 #include "opentelemetry/sdk/trace/exporter.h"
 #include "opentelemetry/sdk/trace/span_data.h"
 #include "opentelemetry/version.h"
@@ -35,6 +36,7 @@ public:
   std::unique_ptr<sdktrace::Recordable> MakeRecordable() noexcept override;
 
   sdktrace::ExportResult Export(
+      const opentelemetry::sdk::resource::Resource &resource,
       const nostd::span<std::unique_ptr<sdktrace::Recordable>> &spans) noexcept override;
 
   bool Shutdown(

@@ -124,7 +124,9 @@ void BM_OtlpExporterEmptySpans(benchmark::State &state)
   {
     std::array<std::unique_ptr<sdk::trace::Recordable>, kBatchSize> recordables;
     CreateEmptySpans(recordables);
-    exporter->Export(nostd::span<std::unique_ptr<sdk::trace::Recordable>>(recordables));
+    exporter->Export(
+      sdk::resource::Resource::GetDefault(),
+      nostd::span<std::unique_ptr<sdk::trace::Recordable>>(recordables));
   }
 }
 BENCHMARK(BM_OtlpExporterEmptySpans);
@@ -139,7 +141,9 @@ void BM_OtlpExporterSparseSpans(benchmark::State &state)
   {
     std::array<std::unique_ptr<sdk::trace::Recordable>, kBatchSize> recordables;
     CreateSparseSpans(recordables);
-    exporter->Export(nostd::span<std::unique_ptr<sdk::trace::Recordable>>(recordables));
+    exporter->Export(
+      sdk::resource::Resource::GetDefault(),
+      nostd::span<std::unique_ptr<sdk::trace::Recordable>>(recordables));
   }
 }
 BENCHMARK(BM_OtlpExporterSparseSpans);
@@ -154,7 +158,9 @@ void BM_OtlpExporterDenseSpans(benchmark::State &state)
   {
     std::array<std::unique_ptr<sdk::trace::Recordable>, kBatchSize> recordables;
     CreateDenseSpans(recordables);
-    exporter->Export(nostd::span<std::unique_ptr<sdk::trace::Recordable>>(recordables));
+    exporter->Export(
+      sdk::resource::Resource::GetDefault(),
+      nostd::span<std::unique_ptr<sdk::trace::Recordable>>(recordables));
   }
 }
 BENCHMARK(BM_OtlpExporterDenseSpans);

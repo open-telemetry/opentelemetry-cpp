@@ -61,10 +61,11 @@ std::unique_ptr<sdk::trace::Recordable> OtlpExporter::MakeRecordable() noexcept
 }
 
 sdk::trace::ExportResult OtlpExporter::Export(
+    const opentelemetry::sdk::resource::Resource& resource,
     const nostd::span<std::unique_ptr<sdk::trace::Recordable>> &spans) noexcept
 {
   proto::collector::trace::v1::ExportTraceServiceRequest request;
-
+  // TODO - populate Resource.
   PopulateRequest(spans, &request);
 
   grpc::ClientContext context;

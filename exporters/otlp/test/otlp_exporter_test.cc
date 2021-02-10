@@ -1,5 +1,6 @@
 #include "opentelemetry/exporters/otlp/otlp_exporter.h"
 #include "opentelemetry/proto/collector/trace/v1/trace_service_mock.grpc.pb.h"
+#include "opentelemetry/sdk/resource/resource.h"
 #include "opentelemetry/sdk/trace/simple_processor.h"
 #include "opentelemetry/sdk/trace/tracer_provider.h"
 #include "opentelemetry/trace/provider.h"
@@ -7,6 +8,7 @@
 #include <gtest/gtest.h>
 
 using namespace testing;
+using opentelemetry::sdk::resource::Resource;
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace exporter
@@ -46,7 +48,7 @@ TEST_F(OtlpExporterTestPeer, ExportUnitTest)
   // Test successful RPC
   nostd::span<std::unique_ptr<sdk::trace::Recordable>> batch_1(&recordable_1, 1);
   EXPECT_CALL(*mock_stub, Export(_, _, _)).Times(Exactly(1)).WillOnce(Return(grpc::Status::OK));
-  auto result = exporter->Export(batch_1);
+  auto result = exporter->Export(Resource::GetDefault(), batch_1);
   EXPECT_EQ(sdk::trace::ExportResult::kSuccess, result);
 
   // Test failed RPC
@@ -54,7 +56,7 @@ TEST_F(OtlpExporterTestPeer, ExportUnitTest)
   EXPECT_CALL(*mock_stub, Export(_, _, _))
       .Times(Exactly(1))
       .WillOnce(Return(grpc::Status::CANCELLED));
-  result = exporter->Export(batch_2);
+  result = exporter->Export(Resource::GetDefault(), batch_2);
   EXPECT_EQ(sdk::trace::ExportResult::kFailure, result);
 }
 

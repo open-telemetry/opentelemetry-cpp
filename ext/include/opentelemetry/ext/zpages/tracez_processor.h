@@ -43,6 +43,8 @@ public:
     return std::unique_ptr<opentelemetry::sdk::trace::Recordable>(new ThreadsafeSpanData);
   }
 
+  void SetResourceRef(const opentelemetry::sdk::resource::Resource*const resource_ref) noexcept override {}
+
   /*
    * OnStart is called when a span starts; the recordable is cast to span_data and added to
    * running_spans.

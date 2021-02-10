@@ -71,6 +71,7 @@ public:
    * @return Returns the result of the operation
    */
   sdk::trace::ExportResult Export(
+      const opentelemetry::sdk::resource::Resource &resource,
       const nostd::span<std::unique_ptr<sdk::trace::Recordable>> &recordables) noexcept override
   {
     for (auto &recordable : recordables)

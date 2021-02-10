@@ -1,6 +1,7 @@
 #pragma once
 
 #include "opentelemetry/proto/collector/trace/v1/trace_service.grpc.pb.h"
+#include "opentelemetry/sdk/resource/resource.h"
 #include "opentelemetry/sdk/trace/exporter.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
@@ -44,6 +45,7 @@ public:
    * @param spans a span of unique pointers to span recordables
    */
   sdk::trace::ExportResult Export(
+      const sdk::resource::Resource& resource,
       const nostd::span<std::unique_ptr<sdk::trace::Recordable>> &spans) noexcept override;
 
   /**

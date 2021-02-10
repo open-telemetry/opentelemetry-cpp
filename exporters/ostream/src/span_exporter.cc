@@ -37,6 +37,7 @@ std::unique_ptr<sdktrace::Recordable> OStreamSpanExporter::MakeRecordable() noex
 }
 
 sdktrace::ExportResult OStreamSpanExporter::Export(
+    const opentelemetry::sdk::resource::Resource &resource,
     const nostd::span<std::unique_ptr<sdktrace::Recordable>> &spans) noexcept
 {
   if (isShutdown_)
