@@ -18,7 +18,7 @@ set +e
 echo		\
                 libbenchmark-dev \
                 libgtest-dev \
-                libgmock-dev \
+                google-mock \
                 zlib1g-dev \
                 sudo \
                 libcurl4-openssl-dev \
@@ -29,9 +29,11 @@ set -e
 
 # Follows these instructions for setting up gtest
 # https://www.eriksmistad.no/getting-started-with-google-test-on-ubuntu/
-pushd /usr/src/gtest
+for DIR in /usr/src/gtest /usr/src/gmock
+pushd $DIR
 cmake CMakeLists.txt
 make
 cp *.a /usr/lib || cp lib/*.a /usr/lib
 popd
+dpkg -L google-mock
 
