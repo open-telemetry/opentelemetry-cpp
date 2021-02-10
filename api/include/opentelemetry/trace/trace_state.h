@@ -108,9 +108,10 @@ public:
     }
   };
 
-  static nostd::shared_ptr<TraceState> GetEmpty()
+  static nostd::shared_ptr<TraceState> GetDefault()
   {
-    return nostd::shared_ptr<TraceState>(new TraceState());
+    static TraceState ts;
+    return nostd::shared_ptr<TraceState>{&ts};
   }
 
   /**

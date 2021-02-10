@@ -44,14 +44,14 @@ public:
         span_id_(),
         trace_flags_(trace_api::TraceFlags((uint8_t)sampled_flag)),
         is_remote_(is_remote),
-        trace_state_(TraceState::GetEmpty())
+        trace_state_(TraceState::GetDefault())
   {}
 
   SpanContext(TraceId trace_id,
               SpanId span_id,
               TraceFlags trace_flags,
               bool is_remote,
-              nostd::shared_ptr<TraceState> trace_state = TraceState::GetEmpty()) noexcept
+              nostd::shared_ptr<TraceState> trace_state = TraceState::GetDefault()) noexcept
       : trace_id_(trace_id),
         span_id_(span_id),
         trace_flags_(trace_flags),
