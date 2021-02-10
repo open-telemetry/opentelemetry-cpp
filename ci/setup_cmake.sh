@@ -29,11 +29,12 @@ set -e
 
 # Follows these instructions for setting up gtest
 # https://www.eriksmistad.no/getting-started-with-google-test-on-ubuntu/
-for DIR in /usr/src/gtest /usr/src/gmock
+for DIR in /usr/src/gtest /usr/src/gmock ; do
 pushd $DIR
 cmake CMakeLists.txt
 make
 cp *.a /usr/lib || cp lib/*.a /usr/lib
+dpkg -r libgtest-dev google-mock
 popd
-dpkg -L google-mock
+done;
 
