@@ -42,6 +42,7 @@ public:
   }
 
   ExportResult Export(
+      const opentelemetry::sdk::resource::Resource& resource,
       const opentelemetry::nostd::span<std::unique_ptr<Recordable>> &recordables) noexcept override
   {
     return ExportResult::kSuccess;

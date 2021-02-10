@@ -4,6 +4,7 @@
 #include <mutex>
 
 #include "opentelemetry/common/spin_lock_mutex.h"
+#include "opentelemetry/sdk/resource/resource.h"
 #include "opentelemetry/sdk/trace/exporter.h"
 #include "opentelemetry/sdk/trace/processor.h"
 
@@ -37,6 +38,10 @@ public:
     return exporter_->MakeRecordable();
   }
 
+  void SetResourceRef(const opentelemetry::sdk::resource::Resource*const resource_ref) noexcept override {
+    resource_ = resource_ref;
+  }
+
   void OnStart(Recordable &span,
                const opentelemetry::trace::SpanContext &parent_context) noexcept override
   {}
@@ -45,7 +50,9 @@ public:
   {
     nostd::span<std::unique_ptr<Recordable>> batch(&span, 1);
     const std::lock_guard<opentelemetry::common::SpinLockMutex> locked(lock_);
-    if (exporter_->Export(batch) == ExportResult::kFailure)
+    if (exporter_->Export(
+      (resource_ == nullptr) ? opentelemetry::sdk::resource::Resource::GetDefault() : *resource_,
+      batch) == ExportResult::kFailure)
     {
       /* Once it is defined how the SDK does logging, an error should be
        * logged in this case. */
@@ -75,6 +82,8 @@ private:
   std::unique_ptr<SpanExporter> exporter_;
   opentelemetry::common::SpinLockMutex lock_;
   std::atomic_flag shutdown_latch_ = ATOMIC_FLAG_INIT;
+  /** Pointer to the `Resource` associated with all spans being processed. */
+  const opentelemetry::sdk::resource::Resource* resource_;
 };
 }  // namespace trace
 }  // namespace sdk

@@ -1,5 +1,6 @@
 #pragma once
 #include "opentelemetry/exporters/memory/in_memory_span_data.h"
+#include "opentelemetry/sdk/resource/resource.h"
 #include "opentelemetry/sdk/trace/exporter.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
@@ -37,6 +38,7 @@ public:
    * @return Returns the result of the operation
    */
   sdk::trace::ExportResult Export(
+      const opentelemetry::sdk::resource::Resource& resource,
       const nostd::span<std::unique_ptr<sdk::trace::Recordable>> &recordables) noexcept override
   {
     for (auto &recordable : recordables)

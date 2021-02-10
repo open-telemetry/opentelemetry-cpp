@@ -2,6 +2,7 @@
 
 #include <memory>
 #include "opentelemetry/nostd/span.h"
+#include "opentelemetry/sdk/resource/resource.h"
 #include "opentelemetry/sdk/trace/recordable.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
@@ -47,9 +48,11 @@ public:
   /**
    * Exports a batch of span recordables. This method must not be called
    * concurrently for the same exporter instance.
+   * @param Resource the resource associated with all exported spans.
    * @param spans a span of unique pointers to span recordables
    */
   virtual ExportResult Export(
+      const opentelemetry::sdk::resource::Resource& resource,
       const nostd::span<std::unique_ptr<opentelemetry::sdk::trace::Recordable>>
           &spans) noexcept = 0;
 

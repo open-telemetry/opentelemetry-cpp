@@ -4,6 +4,7 @@
 using opentelemetry::sdk::common::AtomicUniquePtr;
 using opentelemetry::sdk::common::CircularBuffer;
 using opentelemetry::sdk::common::CircularBufferRange;
+using opentelemetry::sdk::resource::Resource;
 using opentelemetry::trace::SpanContext;
 
 OPENTELEMETRY_BEGIN_NAMESPACE
@@ -153,7 +154,9 @@ void BatchSpanProcessor::Export(const bool was_force_flush_called)
                     });
                   });
 
-  exporter_->Export(nostd::span<std::unique_ptr<Recordable>>(spans_arr.data(), spans_arr.size()));
+  exporter_->Export(
+    (resource_ == nullptr) ? Resource::GetDefault() : *resource_,
+    nostd::span<std::unique_ptr<Recordable>>(spans_arr.data(), spans_arr.size()));
 
   // Notify the main thread in case this export was the result of a force flush.
   if (was_force_flush_called == true)

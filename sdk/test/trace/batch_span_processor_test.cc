@@ -32,6 +32,7 @@ public:
   }
 
   sdk::trace::ExportResult Export(
+      const opentelemetry::sdk::resource::Resource& resource,
       const nostd::span<std::unique_ptr<sdk::trace::Recordable>> &recordables) noexcept override
   {
     *is_export_completed_ = false;

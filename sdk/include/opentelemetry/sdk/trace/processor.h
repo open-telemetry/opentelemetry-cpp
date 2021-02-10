@@ -3,6 +3,7 @@
 #include <chrono>
 #include <memory>
 #include "opentelemetry/sdk/trace/recordable.h"
+#include "opentelemetry/sdk/resource/resource.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace sdk
@@ -28,6 +29,15 @@ public:
    * Note: This method must be callable from multiple threads.
    */
   virtual std::unique_ptr<Recordable> MakeRecordable() noexcept = 0;
+
+  /**
+   * Associates the `Resource` of the SDK with this processor.   All spans
+   * procesed are assumed to be from this `Resource`.
+   * 
+   * Note: The `Resource` lifetime must be longer than the lifetime of the
+   * `SpanProcessor`.
+   */
+  virtual void SetResourceRef(const opentelemetry::sdk::resource::Resource*const resource_ref) noexcept = 0;
 
   /**
    * OnStart is called when a span is started.

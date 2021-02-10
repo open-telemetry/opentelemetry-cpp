@@ -12,7 +12,9 @@ TracerProvider::TracerProvider(std::shared_ptr<SpanProcessor> processor,
       tracer_(new Tracer(std::move(processor), resource, sampler)),
       sampler_(sampler),
       resource_(resource)
-{}
+{
+  static_cast<Tracer *>(tracer_.get())->GetProcessor()->SetResourceRef(&resource_);
+}
 
 opentelemetry::nostd::shared_ptr<opentelemetry::trace::Tracer> TracerProvider::GetTracer(
     nostd::string_view library_name,
@@ -24,9 +26,10 @@ opentelemetry::nostd::shared_ptr<opentelemetry::trace::Tracer> TracerProvider::G
 void TracerProvider::SetProcessor(std::shared_ptr<SpanProcessor> processor) noexcept
 {
   processor_.store(processor);
-
   auto sdkTracer = static_cast<Tracer *>(tracer_.get());
   sdkTracer->SetProcessor(processor);
+  // Note: We ensure the resource is kept alive for the length of the processor by our own lifecycle.
+  sdkTracer->GetProcessor()->SetResourceRef(&resource_);
 }
 
 std::shared_ptr<SpanProcessor> TracerProvider::GetProcessor() const noexcept
