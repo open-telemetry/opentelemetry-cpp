@@ -114,19 +114,19 @@ public:
   }
 
   /**
-   * Returns a newly created TraceState parsed from the header provided.
+   * Returns shared_ptr to a newly created TraceState parsed from the header provided.
    * @param header Encoding of the tracestate header defined by
    * the W3C Trace Context specification https://www.w3.org/TR/trace-context/
    * @return TraceState A new TraceState instance or DEFAULT
    */
-  static TraceState FromHeader(nostd::string_view header)
+  static nostd::shared_ptr<TraceState> FromHeader(nostd::string_view header)
   {
-    TraceState ts;
+    nostd::shared_ptr<TraceState> ts{new TraceState()};
 
     std::size_t begin{0};
     std::size_t end{0};
     bool invalid_header = false;
-    while (begin < header.size() && ts.num_entries_ < kMaxKeyValuePairs)
+    while (begin < header.size() && ts->num_entries_ < kMaxKeyValuePairs)
     {
       // find list-member
       end = header.find(kMembersSeparator, begin);
@@ -157,8 +157,8 @@ public:
       if (key_end_pos == std::string::npos)
       {
         // Error: invalid list member, return empty TraceState
-        ts.entries_.reset(nullptr);
-        ts.num_entries_ = 0;
+        ts->entries_.reset(nullptr);
+        ts->num_entries_ = 0;
         break;
       }
       auto key   = list_member.substr(0, key_end_pos);
@@ -166,13 +166,13 @@ public:
       if (!IsValidKey(key) || !IsValidValue(value))
       {
         // invalid header. return empty TraceState
-        ts.entries_.reset(nullptr);
-        ts.num_entries_ = 0;
+        ts->entries_.reset(nullptr);
+        ts->num_entries_ = 0;
         break;
       }
       Entry entry(key, value);
-      (ts.entries_.get())[ts.num_entries_] = entry;
-      ts.num_entries_++;
+      (ts->entries_.get())[ts->num_entries_] = entry;
+      ts->num_entries_++;
 
       begin = end + 2;
     }
@@ -222,18 +222,18 @@ public:
   }
 
   /**
-   * Returns `new` TraceState object with following mutations applied to the existing instance:
-   *  Update Key value: The updated value must be moved to beginning of List
-   *  Add : The new key-value pair SHOULD be added to beginning of List
+   * Returns shared_ptr of `new` TraceState object with following mutations applied to the existing
+   * instance: Update Key value: The updated value must be moved to beginning of List Add : The new
+   * key-value pair SHOULD be added to beginning of List
    *
    * If the provided key-value pair is invalid, or results in transtate that violates the
    * tracecontext specification, empty TraceState instance will be returned.
    *
    * If the existing object has maximum list members, it's copy is returned.
    */
-  TraceState Set(const nostd::string_view &key, const nostd::string_view &value)
+  nostd::shared_ptr<TraceState> Set(const nostd::string_view &key, const nostd::string_view &value)
   {
-    TraceState ts;
+    nostd::shared_ptr<TraceState> ts{new TraceState()};
     if ((!IsValidKey(key) || !IsValidValue(value)))
     {
       // max size reached or invalid key/value. Returning empty TraceState
@@ -244,7 +244,7 @@ public:
     if (num_entries_ < kMaxKeyValuePairs)
     {
       Entry e(key, value);
-      (ts.entries_.get())[ts.num_entries_++] = e;
+      (ts->entries_.get())[ts->num_entries_++] = e;
     }
     for (size_t i = 0; i < num_entries_; i++)
     {
@@ -252,19 +252,21 @@ public:
       auto key   = entry.GetKey();
       auto value = entry.GetValue();
       Entry e(key, value);
-      (ts.entries_.get())[ts.num_entries_++] = e;
+      (ts->entries_.get())[ts->num_entries_++] = e;
     }
     return ts;
   }
 
   /**
-   * Returns `new` TraceState object after removing the attribute with given key ( if present )
+   * Returns shared_ptr to a `new` TraceState object after removing the attribute with given key (
+   * if present )
    * @returns empty TraceState object if key is invalid
    * @returns copy of original TraceState object if key is not present (??)
    */
-  TraceState Delete(const nostd::string_view &key)
+  nostd::shared_ptr<TraceState> Delete(const nostd::string_view &key)
   {
-    TraceState ts;
+    nostd::shared_ptr<TraceState> ts{new TraceState()};
+
     if (!IsValidKey(key))
     {
       return ts;
@@ -277,7 +279,7 @@ public:
         auto key   = entry.GetKey();
         auto value = entry.GetValue();
         Entry e(key, value);
-        (ts.entries_.get())[ts.num_entries_++] = e;
+        (ts->entries_.get())[ts->num_entries_++] = e;
       }
     }
     return ts;
