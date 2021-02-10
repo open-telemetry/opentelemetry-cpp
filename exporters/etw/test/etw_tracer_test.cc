@@ -88,7 +88,7 @@ TEST(ETWTracer, ExportUnitTest)
   recordable->SetName("MySpan");
 
   nostd::span<std::unique_ptr<sdk::trace::Recordable>> batch(&recordable, 1);
-  auto result = exporter->Export(batch);
+  auto result = exporter->Export(sdk::resource::Resource::GetDefault(), batch);
   EXPECT_EQ(sdk::trace::ExportResult::kSuccess, result);
 }
 
