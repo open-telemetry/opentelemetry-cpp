@@ -6,7 +6,7 @@ fi
 
 set -e
 
-FIND="find . -name third_party -prune -o -name tools -prune -o -name .git -prune -o -name _deps -prune -o -name .build -prune -o -name out -prune -o -name .vs -prune -o"
+FIND="find . -name third_party -prune -o -name tools -prune -o -name .git -prune -o -name _deps -prune -o -name .build -prune -o -name out -prune -o -name .vs -prune -o -name opentelemetry_logo.jpg -prune -o"
 
 # GNU syntax.
 SED=(sed -i)
@@ -25,8 +25,8 @@ fi
 # If not overridden, try to use clang-format-8 or clang-format.
 if [[ -z "$CLANG_FORMAT" ]]; then
   CLANG_FORMAT=clang-format
-  if which clang-format-8 >/dev/null; then
-    CLANG_FORMAT=clang-format-8
+  if which clang-format-10 >/dev/null; then
+    CLANG_FORMAT=clang-format-10
   fi
 fi
 

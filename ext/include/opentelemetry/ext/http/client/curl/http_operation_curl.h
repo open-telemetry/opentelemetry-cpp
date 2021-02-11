@@ -304,7 +304,7 @@ public:
   /**
    * Get HTTP response code. This function returns CURL error code if HTTP response code is invalid.
    */
-  long GetResponseCode() { return res_; }
+  uint16_t GetResponseCode() { return res_; }
 
   /**
    * Get last session state.
