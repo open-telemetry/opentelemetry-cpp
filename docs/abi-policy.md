@@ -32,11 +32,14 @@ class Tracer {
 public:
   ...
 
-  virtual void f(const std::string& s); // Bad: std::string doesn't have a well-defined ABI.
+  // Bad: std::string doesn't have a well-defined ABI.
+  virtual void f(const std::string& s);
 
-  virtual void f(nostd::string_view s); // OK: We provide a ABI stable string_view type.
+  // OK: We provide a ABI stable string_view type.
+  virtual void f(nostd::string_view s);
 
-  void g(const std::vector<int>& v); // OK: g is non-virtual function.
+  // OK: g is non-virtual function.
+  void g(const std::vector<int>& v);
   ...
 };
 ```
