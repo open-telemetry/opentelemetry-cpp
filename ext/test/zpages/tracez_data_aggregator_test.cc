@@ -6,6 +6,7 @@
 #include "opentelemetry/sdk/resource/resource.h"
 #include "opentelemetry/sdk/trace/recordable.h"
 #include "opentelemetry/sdk/trace/tracer.h"
+#include "opentelemetry/sdk/trace/tracer_provider.h"
 
 using namespace opentelemetry::sdk::trace;
 using namespace opentelemetry::ext::zpages;
@@ -36,13 +37,15 @@ protected:
   {
     std::shared_ptr<TracezSpanProcessor> processor(new TracezSpanProcessor());
     auto resource = opentelemetry::sdk::resource::Resource::Create({});
-    tracer        = std::shared_ptr<opentelemetry::trace::Tracer>(new Tracer(processor, resource));
+    tracer_provider = std::shared_ptr<TracerProvider>(new TracerProvider(processor, std::move(resource)));
+    tracer = tracer_provider->GetTracer("test", "1.0");
     tracez_data_aggregator = std::unique_ptr<TracezDataAggregator>(
         new TracezDataAggregator(processor, milliseconds(10)));
   }
 
   std::unique_ptr<TracezDataAggregator> tracez_data_aggregator;
-  std::shared_ptr<opentelemetry::trace::Tracer> tracer;
+  std::shared_ptr<TracerProvider> tracer_provider;
+  opentelemetry::nostd::shared_ptr<opentelemetry::trace::Tracer> tracer;
 };
 
 /**

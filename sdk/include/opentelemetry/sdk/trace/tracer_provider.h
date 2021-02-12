@@ -68,9 +68,10 @@ public:
 
 private:
   opentelemetry::sdk::AtomicSharedPtr<SpanProcessor> processor_;
-  std::shared_ptr<opentelemetry::trace::Tracer> tracer_;
   const std::shared_ptr<Sampler> sampler_;
   const opentelemetry::sdk::resource::Resource resource_;
+  // TODO: Tracer should be per-instrumentation library
+  std::shared_ptr<opentelemetry::trace::Tracer> tracer_;
 };
 }  // namespace trace
 }  // namespace sdk

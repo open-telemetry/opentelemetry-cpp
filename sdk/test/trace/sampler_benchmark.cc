@@ -8,6 +8,7 @@
 #include "opentelemetry/sdk/trace/simple_processor.h"
 #include "opentelemetry/sdk/trace/span_data.h"
 #include "opentelemetry/sdk/trace/tracer.h"
+#include "opentelemetry/sdk/trace/tracer_provider.h"
 
 #include <cstdint>
 
@@ -120,8 +121,9 @@ void BenchmarkSpanCreation(std::shared_ptr<Sampler> sampler, benchmark::State &s
   std::unique_ptr<SpanExporter> exporter(new InMemorySpanExporter());
   auto processor = std::make_shared<SimpleSpanProcessor>(std::move(exporter));
   auto resource  = opentelemetry::sdk::resource::Resource::Create({});
-  auto tracer =
-      std::shared_ptr<opentelemetry::trace::Tracer>(new Tracer(processor, resource, sampler));
+  auto tracer_provider =
+     std::shared_ptr<TracerProvider>(new TracerProvider(processor, std::move(resource), sampler));
+  auto tracer = tracer_provider->GetTracer("test", "1.0");
 
   while (state.KeepRunning())
   {

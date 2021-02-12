@@ -15,36 +15,18 @@ namespace sdk
 {
 namespace trace
 {
+
+// Forward Declaration due to bidirectional dependency
+class TracerProvider;
+
 class Tracer final : public trace_api::Tracer, public std::enable_shared_from_this<Tracer>
 {
 public:
   /**
    * Initialize a new tracer.
-   * @param processor The span processor for this tracer. This must not be a
-   * nullptr.
+   * @param parent The `TraceProvider` which owns resource + pipeline for traces.
    */
-  explicit Tracer(std::shared_ptr<SpanProcessor> processor,
-                  const opentelemetry::sdk::resource::Resource &resource,
-                  std::shared_ptr<Sampler> sampler = std::make_shared<AlwaysOnSampler>()) noexcept;
-
-  /**
-   * Set the span processor associated with this tracer.
-   * @param processor The new span processor for this tracer. This must not be
-   * a nullptr.
-   */
-  void SetProcessor(std::shared_ptr<SpanProcessor> processor) noexcept;
-
-  /**
-   * Obtain the span processor associated with this tracer.
-   * @return The span processor for this tracer.
-   */
-  std::shared_ptr<SpanProcessor> GetProcessor() const noexcept;
-
-  /**
-   * Obtain the sampler associated with this tracer.
-   * @return The sampler for this tracer.
-   */
-  std::shared_ptr<Sampler> GetSampler() const noexcept;
+  explicit Tracer(const TracerProvider& provider) noexcept;
 
   nostd::shared_ptr<trace_api::Span> StartSpan(
       nostd::string_view name,
@@ -57,9 +39,7 @@ public:
   void CloseWithMicroseconds(uint64_t timeout) noexcept override;
 
 private:
-  opentelemetry::sdk::AtomicSharedPtr<SpanProcessor> processor_;
-  const std::shared_ptr<Sampler> sampler_;
-  const opentelemetry::sdk::resource::Resource &resource_;
+  const TracerProvider& provider_;
 };
 }  // namespace trace
 }  // namespace sdk

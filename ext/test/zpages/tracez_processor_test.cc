@@ -8,6 +8,7 @@
 #include "opentelemetry/nostd/span.h"
 #include "opentelemetry/sdk/resource/resource.h"
 #include "opentelemetry/sdk/trace/tracer.h"
+#include "opentelemetry/sdk/trace/tracer_provider.h"
 
 using namespace opentelemetry::sdk::trace;
 using namespace opentelemetry::ext::zpages;
@@ -148,7 +149,7 @@ void GetManySnapshots(std::shared_ptr<TracezSpanProcessor> &processor, int i)
  */
 void StartManySpans(
     std::vector<opentelemetry::nostd::shared_ptr<opentelemetry::trace::Span>> &spans,
-    std::shared_ptr<opentelemetry::trace::Tracer> tracer,
+    opentelemetry::nostd::shared_ptr<opentelemetry::trace::Tracer> tracer,
     int i)
 {
   for (; i > 0; i--)
@@ -177,8 +178,8 @@ protected:
   {
     processor     = std::shared_ptr<TracezSpanProcessor>(new TracezSpanProcessor());
     auto resource = opentelemetry::sdk::resource::Resource::Create({});
-
-    tracer     = std::shared_ptr<opentelemetry::trace::Tracer>(new Tracer(processor, resource));
+    tracer_provider = std::shared_ptr<TracerProvider>(new TracerProvider(processor, std::move(resource)));
+    tracer     = tracer_provider->GetTracer("test", "1.0");
     auto spans = processor->GetSpanSnapshot();
     running    = spans.running;
     completed  = std::move(spans.completed);
@@ -187,7 +188,8 @@ protected:
   }
 
   std::shared_ptr<TracezSpanProcessor> processor;
-  std::shared_ptr<opentelemetry::trace::Tracer> tracer;
+  std::shared_ptr<opentelemetry::sdk::trace::TracerProvider> tracer_provider;
+  opentelemetry::nostd::shared_ptr<opentelemetry::trace::Tracer> tracer;
 
   std::vector<std::string> span_names;
   std::vector<opentelemetry::nostd::shared_ptr<opentelemetry::trace::Span>> span_vars;

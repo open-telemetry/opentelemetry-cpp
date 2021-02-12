@@ -9,9 +9,9 @@ TracerProvider::TracerProvider(std::shared_ptr<SpanProcessor> processor,
                                opentelemetry::sdk::resource::Resource &&resource,
                                std::shared_ptr<Sampler> sampler) noexcept
     : processor_{processor},
-      tracer_(new Tracer(std::move(processor), resource, sampler)),
       sampler_(sampler),
-      resource_(resource)
+      resource_(resource),
+      tracer_(new Tracer(*this))
 {}
 
 opentelemetry::nostd::shared_ptr<opentelemetry::trace::Tracer> TracerProvider::GetTracer(
@@ -24,9 +24,6 @@ opentelemetry::nostd::shared_ptr<opentelemetry::trace::Tracer> TracerProvider::G
 void TracerProvider::SetProcessor(std::shared_ptr<SpanProcessor> processor) noexcept
 {
   processor_.store(processor);
-
-  auto sdkTracer = static_cast<Tracer *>(tracer_.get());
-  sdkTracer->SetProcessor(processor);
 }
 
 std::shared_ptr<SpanProcessor> TracerProvider::GetProcessor() const noexcept
