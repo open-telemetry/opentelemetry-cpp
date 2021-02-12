@@ -153,7 +153,7 @@ void Recordable::AddLink(const opentelemetry::trace::SpanContext &span_context,
   // https://github.com/open-telemetry/opentelemetry-specification/blob/master/specification/trace/sdk_exporters/zipkin.md
 }
 
-void Recordable::SetStatus(trace::CanonicalCode code, nostd::string_view description) noexcept
+void Recordable::SetStatus(trace::StatusCode code, nostd::string_view description) noexcept
 {
   span_["tags"]["otel.status_code"] = code;
   if (description.size())

@@ -78,7 +78,7 @@ TEST(ZipkinSpanRecordable, SetDuration)
 TEST(ZipkinSpanRecordable, SetStatus)
 {
   opentelemetry::exporter::zipkin::Recordable rec;
-  trace::CanonicalCode code(trace::CanonicalCode::OK);
+  trace::StatusCode code(trace::StatusCode::kOk);
   nostd::string_view description = "For test";
   json j_span = {{"tags", {{"otel.status_code", code}, {"otel.status_description", description}}}};
   rec.SetStatus(code, description);

@@ -14,7 +14,7 @@ namespace exporter
 namespace zipkin
 {
 
-constexpr std::string kZipkinEndpointDefault = "http://localhost:9411/api/v2/spans";
+const std::string kZipkinEndpointDefault = "http://localhost:9411/api/v2/spans";
 
 /**
  * Struct to hold Zipkin  exporter options.
