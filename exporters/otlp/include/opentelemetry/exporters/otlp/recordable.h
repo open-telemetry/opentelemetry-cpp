@@ -18,6 +18,8 @@ public:
               trace::SpanId span_id,
               trace::SpanId parent_span_id) noexcept override;
 
+  void SetResourceRef(const opentelemetry::sdk::resource::Resource*const resource) noexcept override;
+
   void SetAttribute(nostd::string_view key,
                     const opentelemetry::common::AttributeValue &value) noexcept override;
 

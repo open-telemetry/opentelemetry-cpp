@@ -465,6 +465,10 @@ public:
     parent_span_id_ = parent_span_id;
   }
 
+  void SetResourceRef(const opentelemetry::sdk::resource::Resource*const resource) noexcept override {
+    // TODO
+  }
+
   void SetAttribute(nostd::string_view key,
                     const opentelemetry::common::AttributeValue &value) noexcept override
   {

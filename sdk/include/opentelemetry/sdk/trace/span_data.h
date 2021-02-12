@@ -7,6 +7,7 @@
 #include "opentelemetry/core/timestamp.h"
 #include "opentelemetry/nostd/string_view.h"
 #include "opentelemetry/sdk/common/attribute_utils.h"
+#include "opentelemetry/sdk/resource/resource.h"
 #include "opentelemetry/sdk/trace/recordable.h"
 #include "opentelemetry/trace/canonical_code.h"
 #include "opentelemetry/trace/span.h"
@@ -219,6 +220,10 @@ public:
   }
 
   void SetDuration(std::chrono::nanoseconds duration) noexcept override { duration_ = duration; }
+
+  void SetResourceRef(const opentelemetry::sdk::resource::Resource*const resource) noexcept override {
+    // TODO
+  }
 
 private:
   opentelemetry::trace::TraceId trace_id_;

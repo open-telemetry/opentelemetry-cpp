@@ -5,6 +5,7 @@
 #include "opentelemetry/core/timestamp.h"
 #include "opentelemetry/nostd/string_view.h"
 #include "opentelemetry/sdk/common/empty_attributes.h"
+#include "opentelemetry/sdk/resource/resource.h"
 #include "opentelemetry/trace/canonical_code.h"
 #include "opentelemetry/trace/span.h"
 #include "opentelemetry/trace/span_context.h"
@@ -40,6 +41,17 @@ public:
   virtual void SetIds(opentelemetry::trace::TraceId trace_id,
                       opentelemetry::trace::SpanId span_id,
                       opentelemetry::trace::SpanId parent_span_id) noexcept = 0;
+
+  /**
+   * Sets the resource associated with a span.
+   * 
+   * <p> The resource is guaranteed to have a lifetime longer than this recordable.  It is
+   * owned by the `TracerProvider` which (indirectly) owns the `Exporter` that generates a
+   * `Recordable`.
+   * 
+   * @param resource pointer to the Resource for this span.
+   */
+  virtual void SetResourceRef(const opentelemetry::sdk::resource::Resource*const resource) noexcept = 0;
 
   /**
    * Set an attribute of a span.
