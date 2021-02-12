@@ -16,13 +16,11 @@ class Span final : public trace_api::Span
 {
 public:
   explicit Span(std::shared_ptr<Tracer> &&tracer,
-                std::shared_ptr<SpanProcessor> processor,
                 nostd::string_view name,
                 const opentelemetry::common::KeyValueIterable &attributes,
                 const trace_api::SpanContextKeyValueIterable &links,
                 const trace_api::StartSpanOptions &options,
-                const trace_api::SpanContext &parent_span_context,
-                const opentelemetry::sdk::resource::Resource &resource) noexcept;
+                const trace_api::SpanContext &parent_span_context) noexcept;
 
   ~Span() override;
 
@@ -49,8 +47,7 @@ public:
   trace_api::SpanContext GetContext() const noexcept override { return *span_context_.get(); }
 
 private:
-  std::shared_ptr<trace_api::Tracer> tracer_;
-  std::shared_ptr<SpanProcessor> processor_;
+  std::shared_ptr<Tracer> tracer_;
   mutable std::mutex mu_;
   std::unique_ptr<Recordable> recordable_;
   opentelemetry::core::SteadyTimestamp start_steady_time;

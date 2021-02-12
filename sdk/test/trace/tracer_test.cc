@@ -73,7 +73,6 @@ TEST(Tracer, ToInMemorySpanExporter)
   std::shared_ptr<InMemorySpanData> span_data = exporter->GetData();
   auto tracer_provider                        = initTracerProvider(std::move(exporter));
   auto tracer                                 = tracer_provider->GetTracer("test", "1.0");
-
   auto span_first  = tracer->StartSpan("span 1");
   auto scope_first = tracer->WithActiveSpan(span_first);
   auto span_second = tracer->StartSpan("span 2");

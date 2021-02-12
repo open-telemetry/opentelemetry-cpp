@@ -11,7 +11,7 @@ TracerProvider::TracerProvider(std::shared_ptr<SpanProcessor> processor,
     : processor_{processor},
       sampler_(sampler),
       resource_(resource),
-      tracer_(new Tracer(*this))
+      tracer_(new Tracer(this))
 {}
 
 opentelemetry::nostd::shared_ptr<opentelemetry::trace::Tracer> TracerProvider::GetTracer(

@@ -11,7 +11,7 @@ namespace sdk
 {
 namespace trace
 {
-Tracer::Tracer(const opentelemetry::sdk::trace::TracerProvider& provider) noexcept
+Tracer::Tracer(opentelemetry::sdk::trace::TracerProvider* provider) noexcept
     : provider_ { provider }
 {}
 
@@ -43,9 +43,8 @@ nostd::shared_ptr<trace_api::Span> Tracer::StartSpan(
     const trace_api::StartSpanOptions &options) noexcept
 {
   trace_api::SpanContext parent = GetCurrentSpanContext(options.parent);
-
   auto sampling_result =
-    provider_.GetSampler()->ShouldSample(parent, parent.trace_id(), name, options.kind, attributes, links);
+    provider_->GetSampler()->ShouldSample(parent, parent.trace_id(), name, options.kind, attributes, links);
   if (sampling_result.decision == Decision::DROP)
   {
     // Don't allocate a no-op span for every DROP decision, but use a static
@@ -58,8 +57,7 @@ nostd::shared_ptr<trace_api::Span> Tracer::StartSpan(
   else
   {
     auto span = nostd::shared_ptr<trace_api::Span>{
-        new (std::nothrow) Span{this->shared_from_this(), provider_.GetProcessor(), name, attributes,
-                                links, options, parent, provider_.GetResource()}};
+        new (std::nothrow) Span{this->shared_from_this(), name, attributes, links, options, parent}};
 
     // if the attributes is not nullptr, add attributes to the span.
     if (sampling_result.attributes)
