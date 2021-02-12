@@ -14,15 +14,15 @@ void Recordable::SetIds(trace::TraceId trace_id,
                         trace::SpanId span_id,
                         trace::SpanId parent_span_id) noexcept
 {
-  char traceid[trace::TraceId::kSize * 2] = {0};
-  trace_id.ToLowerBase16(traceid);
-  char spanid[trace::SpanId::kSize * 2] = {0};
-  span_id.ToLowerBase16(spanid);
-  char parentid[trace::SpanId::kSize * 2] = {0};
-  parent_span_id.ToLowerBase16(parentid);
-  span_["id"]       = std::string(spanid, 16);
-  span_["parentId"] = std::string(parentid, 16);
-  span_["traceId"]  = std::string(traceid, 32);
+  char trace_id_lower_base16[trace::TraceId::kSize * 2] = {0};
+  trace_id.ToLowerBase16(trace_id_lower_base16);
+  char span_id_lower_base16[trace::SpanId::kSize * 2] = {0};
+  span_id.ToLowerBase16(span_id_lower_base16);
+  char parent_span_id_lower_base16[trace::SpanId::kSize * 2] = {0};
+  parent_span_id.ToLowerBase16(parent_span_id_lower_base16);
+  span_["id"]       = std::string(span_id_lower_base16, 16);
+  span_["parentId"] = std::string(parent_span_id_lower_base16, 16);
+  span_["traceId"]  = std::string(trace_id_lower_base16, 32);
 }
 
 void PopulateAttribute(nlohmann::json &attribute,
@@ -35,8 +35,6 @@ void PopulateAttribute(nlohmann::json &attribute,
       nostd::variant_size<opentelemetry::common::AttributeValue>::value == kAttributeValueSize,
       "AttributeValue contains unknown type");
 
-  // attribute->set_key(key.data(), key.size());
-
   if (nostd::holds_alternative<bool>(value))
   {
     attribute[key.data()] = nostd::get<bool>(value);
@@ -47,7 +45,6 @@ void PopulateAttribute(nlohmann::json &attribute,
   }
   else if (nostd::holds_alternative<int64_t>(value))
   {
-
     attribute[key.data()] = nostd::get<int64_t>(value);
   }
   else if (nostd::holds_alternative<unsigned int>(value))
