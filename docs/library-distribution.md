@@ -63,29 +63,27 @@ regarding this will be documented in [ABI Policy](abi-policy.md).
 
 ## Recommendations
 
-### 1. Link OpenTelemetry plugins for portability.
+### Link OpenTelemetry plugins for portability
 
 If you're a vendor and you wish to distribute an OpenTelemetry plugin (either a
 full implementation of the API or an exporter), you need to take precautions
 when linking your plugin to ensure it's portable. Here are some steps you should
 follow:
 
-1. Ensure you compile to target portable architectures (e.g. x86-64).
-1. Statically link most dependencies. You should statically both external
-   dependencies and the standard C++ library. The exceptions are the standard C
-   library and other low-level system libraries that need to be dynamically
-   linked.
-1. Use an export map to avoid unwanted symbol resolution. When statically
-   linking dependencies in a dynamic library, care should be taken to make sure
-   that symbol resolution for dependencies doesn't conflict with that of the app
-   or other dynamic libraries. See this
-   [StackOverflow post](https://stackoverflow.com/q/47841812/4447365) for more
-   information.
-1. Re-map symbols from the standard C library to portable versions. If you want
-   to plugin to work on systems with different versions of the standard C
-   library, you need to link to portable symbols. See this
-   [StackOverflow answer](https://stackoverflow.com/a/20065096/4447365) for how
-   to do this.
+* Ensure you compile to target portable architectures (e.g. x86-64).
+* Statically link most dependencies. You should statically both external
+  dependencies and the standard C++ library. The exceptions are the standard C
+  library and other low-level system libraries that need to be dynamically
+  linked.
+* Use an export map to avoid unwanted symbol resolution. When statically linking
+  dependencies in a dynamic library, care should be taken to make sure that
+  symbol resolution for dependencies doesn't conflict with that of the app or
+  other dynamic libraries. See this [StackOverflow
+  post](https://stackoverflow.com/q/47841812/4447365) for more information.
+* Re-map symbols from the standard C library to portable versions. If you want
+  to plugin to work on systems with different versions of the standard C
+  library, you need to link to portable symbols. See this [StackOverflow
+  answer](https://stackoverflow.com/a/20065096/4447365) for how to do this.
 
 ## Example Scenarios
 
@@ -106,7 +104,7 @@ For example, a C++ database server might add support for the OpenTelemetry API
 and exposes configuration options that let a user point to a vendor's plugin and
 load it with a JSON config. (With OpenTracing, Ceph explored a deployment
 scenario similar to this. See
-https://www.spinics.net/lists/ceph-devel/msg41007.html)
+this [link](https://www.spinics.net/lists/ceph-devel/msg41007.html))
 
 ### Non OpenTelemetry aware application with OpenTelemetry capability library
 

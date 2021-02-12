@@ -16,9 +16,10 @@ the API surface classes with [Abseil classes](https://abseil.io/) instead of
 ## Motivation
 
 `nostd` classes in OpenTelemetry API were introduced for the following reasons:
-- ABI stability: scenario where different modules are compiled with different
+
+* ABI stability: scenario where different modules are compiled with different
 compiler and incompatible standard library.
-- backport of C++17 and above features to C++11 compiler.
+* backport of C++17 and above features to C++11 compiler.
 
 The need for custom `nostd` classes is significantly diminished when the SDK is
 compiled with C++17 or above compiler. Only `std::span` needs to be backported.
@@ -53,8 +54,9 @@ is done in a corresponding `opentelemetry/nostd/*.h` header. Users still use
 whether users require ABI stability or not.
 
 Example environments that contain the full set of standard classes:
-- C++17 or above compiler, with Microsoft GSL backport of `gsl::span`
-- C++20 compilers: Visual Studio 2019+, latest LLVM clang, latest gcc
+
+* C++17 or above compiler, with Microsoft GSL backport of `gsl::span`
+* C++20 compilers: Visual Studio 2019+, latest LLVM clang, latest gcc
 
 We continue fully supporting both models (`nostd`, `stdlib`) by running CI for both.
 
@@ -128,6 +130,7 @@ to recompile with a matching toolset. The latest version of the Microsoft Visual
 C++ Redistributable package (the Redistributable) works for all of them.
 
 Visual Studio provides 1st class debug experience for the standard library.
+
 ## Build and Test considerations
 
 ### Separate flavors of SDK build

@@ -1,3 +1,5 @@
+# Application Binary Interface (ABI) Policy
+
 To support scenarios where OpenTelemetry implementations are deployed as binary
 plugins, certain restrictions are imposed on portions of the OpenTelemetry API.
 
@@ -9,10 +11,10 @@ types.
 
 In the areas of the API where we need ABI stability, we use C++ as an extended
 C. We assume that standard language features like inheritance follow a
-consistent ABI (vtable layouts, for example, are specified by the
-[Itanium ABI](https://itanium-cxx-abi.github.io/cxx-abi/abi.html#vtable)) and
-can be used across compilers, but don't rely on the ABI stability of the
-C++ standard library classes.
+consistent ABI (vtable layouts, for example, are specified by the [Itanium
+ABI](https://itanium-cxx-abi.github.io/cxx-abi/abi.html#vtable)) and can be used
+across compilers, but don't rely on the ABI stability of the C++ standard
+library classes.
 
 ABI stability is not provided by the interfaces the SDK provides as
 implementation hooks to vendor implementors, like exporters, processors,
@@ -50,7 +52,6 @@ private:
 };
 ```
 
-2. Singletons defined by the OpenTelemetry API must use ABI stable types since
-   they could potentially be shared across multiple instrumented dynamic shared
-   objects (DSOs) compiled against different versions of the C++ standard
-   library.
+Singletons defined by the OpenTelemetry API must use ABI stable types since they
+could potentially be shared across multiple instrumented dynamic shared objects
+(DSOs) compiled against different versions of the C++ standard library.

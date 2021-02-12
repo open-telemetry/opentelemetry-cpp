@@ -1,4 +1,4 @@
-## Building and running tests as a developer
+# Building and running tests as a developer
 
 CI tests can be run on docker by invoking the script `./ci/run_docker.sh ./ci/do_ci.sh <TARGET>` where the targets are:
 

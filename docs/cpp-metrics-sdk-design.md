@@ -3,13 +3,13 @@
 ## Design Tenets
 
 * Reliability
-    * The Metrics API and SDK should be “reliable,” meaning that metrics data will always be accounted for. It will get back to the user or an error will be logged.  Reliability also entails that the end-user application will never be blocked.  Error handling will therefore not interfere with the execution of the instrumented program.  The library may “fail fast” during the initialization or configuration path however.
-    * Thread Safety
-        * As with the Tracer API and SDK, thread safety is not guaranteed on all functions and will be explicitly mentioned in documentation for functions that support concurrent calling.  Generally, the goal is to lock functions which change the state of library objects (incrementing the value of a Counter or adding a new Observer for example) or access global memory.  As a performance consideration, the library strives to hold locks for as short a duration as possible to avoid lock contention concerns.  Calls to create instrumentation may not be thread-safe as this is expected to occur during initialization of the program.
+  * The Metrics API and SDK should be “reliable,” meaning that metrics data will always be accounted for. It will get back to the user or an error will be logged.  Reliability also entails that the end-user application will never be blocked.  Error handling will therefore not interfere with the execution of the instrumented program.  The library may “fail fast” during the initialization or configuration path however.
+  * Thread Safety
+    * As with the Tracer API and SDK, thread safety is not guaranteed on all functions and will be explicitly mentioned in documentation for functions that support concurrent calling.  Generally, the goal is to lock functions which change the state of library objects (incrementing the value of a Counter or adding a new Observer for example) or access global memory.  As a performance consideration, the library strives to hold locks for as short a duration as possible to avoid lock contention concerns.  Calls to create instrumentation may not be thread-safe as this is expected to occur during initialization of the program.
 * Scalability
-    * As OpenTelemetry is a distributed tracing system, it must be able to operate on sizeable systems with predictable overhead growth.  A key requirement of this is that the library does not consume unbounded memory resource.
+  * As OpenTelemetry is a distributed tracing system, it must be able to operate on sizeable systems with predictable overhead growth.  A key requirement of this is that the library does not consume unbounded memory resource.
 * Security
-    * Currently security is not a key consideration but may be addressed at a later date.
+  * Currently security is not a key consideration but may be addressed at a later date.
 
 ## SDK Data Path Diagram
 
@@ -17,34 +17,31 @@
 
 This is the control path our implementation of the metrics SDK will follow. There are five main components: The controller, accumulator, aggregators, processor, and exporter. Each of these components will be further elaborated on.
 
+## API Class Implementations
 
-# API Class Implementations
+### MeterProvider Class
 
-## **MeterProvider Class**
+The singleton global `MeterProvider` can be used to obtain a global Meter by calling `global.GetMeter(name,version)` which calls `GetMeter()` on the initialized global `MeterProvider`.
 
-The singleton global `MeterProvider` can be used to obtain a global Meter by calling `global.GetMeter(name,version)` which calls `GetMeter() `on the initialized global `MeterProvider`.
-
-**Global Meter Provider**
+**Global Meter Provider:**
 
 The API should support a global `MeterProvider`. When a global instance is supported, the API must ensure that `Meter` instances derived from the global `MeterProvider` are initialized after the global SDK implementation is first initialized.
 
 A `MeterProvider` interface must support a  `global.SetMeterProvider(MeterProvider)` function which installs the SDK implementation of the `MeterProvider` into the API.
 
-**Obtaining a Meter from MeterProvider**
+**Obtaining a Meter from MeterProvider:**
 
 **`GetMeter(name, version)` method must be supported**
 
-
 * Expects 2 string arguments:
-    * name (required): identifies the instrumentation library.
-    * version (optional): specifies the version of the instrumenting library (the library injecting OpenTelemetry calls into the code).
+  * name (required): identifies the instrumentation library.
+  * version (optional): specifies the version of the instrumenting library (the library injecting OpenTelemetry calls into the code).
 
-### Implementation
+#### Implementation
 
 The Provider class offers static functions to both get and set the global MeterProvider. Once a user sets the MeterProvider, it will replace the default No-op implementation stored as a private variable and persist for the remainder of the program’s execution. This pattern imitates the TracerProvider used in the Tracing portion of this SDK.
 
-
-```cc
+```cpp
 # meter_provider.cc
 class MeterProvider
 {
@@ -73,15 +70,11 @@ public:
 };
 ```
 
+### Meter Class
 
-
-## **Meter Class**
-
-
-**Metric Events**
+**Metric Events:**
 
 Metric instruments are primarily defined by their name.  Names MUST conform to the following syntax:
-
 
 * Non-empty string
 * case-insensitive
@@ -96,10 +89,9 @@ Each distinctly named Meter (i.e. Meters derived from different instrumentation 
 
 **In order to achieve this, each instance of the `Meter` class will have a container storing all metric instruments that were created using that meter. This way, metric instruments created from different instantiations of the `Meter` class will never be compared to one another and will never result in an error.**
 
+**Implementation:**
 
-### Implementation
-
-```cc
+```cpp
 # meter.h / meter.cc
 class Meter : public API::Meter {
 public:
@@ -237,9 +229,7 @@ private:
 };
 ```
 
-
-
-```cc
+```cpp
 # record.h
 /*
  * This class is used to pass checkpointed values from the Meter
@@ -282,19 +272,16 @@ private:
 };
 ```
 
-
 Metric instruments created from this Meter class will be stored in a map (or another, similar container [needs to be nostd]) called “metrics.” This is identical to the Python implementation and makes sense because the SDK implementation of the `Meter` class should have a function titled `collect_all()` that collects metrics for every instrument created from this meter. In contrast, Java’s implementation has a `MeterSharedState` class that contains a registry (hash map) of all metric instruments spawned from this meter. However, since each `Meter` has its own unique instruments it is easier to store the instruments in the meter itself.
 
 The SDK implementation of the `Meter` class will contain a function called `collect_all()` that will collect the measurements from each metric stored in the `metrics` container. The implementation of this class acts as the accumulator in the SDK specification.
 
 **Pros of this implementation:**
 
-
 * Different constructors and overloaded template calls to those constructors for the various metric instruments allows us to forego much of the code duplication involved in supporting various types.
 * Storing the metric instruments created from this meter directly in the meter object itself allows us to implement the collect_all method without creating a new class that contains the meter state and instrument registry.
 
 **Cons of this implementation:**
-
 
 * Different constructors for the different metric instruments means less duplicated code but still a lot.
 * Storing the metric instruments in the Meter class means that if we have multiple meters, metric instruments are stored in various objects. Using an instrument registry that maps meters to metric instruments resolves this. However, we have designed our SDK to only support one Meter instance.
@@ -302,16 +289,13 @@ The SDK implementation of the `Meter` class will contain a function called `coll
 
 **The SDK implementation of the `Meter` class will act as the Accumulator mentioned in the SDK specification.**
 
-
 ## **Metric Instrument Class**
 
 Metric instruments capture raw measurements of designated quantities in instrumented applications. All measurements captured by the Metrics API are associated with the instrument which collected that measurement.
 
-
 ### Metric Instrument Data Model
 
 Each instrument must have enough information to meaningfully attach its measured values with a process in the instrumented application. As such, metric instruments contain the following fields
-
 
 * name (string) — Identifier for this metric instrument.
 * description (string) — Short description of what this instrument is capturing.
@@ -325,20 +309,18 @@ Each instrument must have enough information to meaningfully attach its measured
 
 Each measurement taken by a Metric instrument is a Metric event which must contain the following information:
 
-
 * timestamp (implicit) — System time when measurement was captured.
 * instrument definition(strings) — Name of instrument, kind, description, and unit of measure
 * label set (key value pairs) — Labels associated with the capture, described further below.
 * resources associated with the SDK at startup
 
-**Label Set**
+**Label Set:**
 
 A key:value mapping of some kind MUST be supported as annotation each metric event. Labels must be represented the same way throughout the API (i.e. using the same idiomatic data structure) and duplicates are dealt with by taking the last value mapping.
 
 Due to the requirement to maintain ABI stability we have chosen to implement labels as type KeyValueIterable. Though, due to performance reasons, we may convert to std::string internally.
 
-
-### Implementation
+**Implementation:**
 
 A base Metric class defines the constructor and binding functions which each metric instrument will need. Once an instrument is bound, it becomes a BoundInstrument which extends the BaseBoundInstrument class. The BaseBoundInstrument is what communicates with the aggregator and performs the actual updating of values. An enum helps to organize the numerous types of metric instruments that will be supported.
 
@@ -346,14 +328,13 @@ The only addition to the SDK metric instrument classes from their API counterpar
 
 **For more information about the structure of metric instruments, refer to the Metrics API Design document.**
 
-
-# Metrics SDK Data Path Implementation
+## Metrics SDK Data Path Implementation
 
 Note: these requirements come from a specification currently under development. Changes and feedback are in [PR #347](https://github.com/open-telemetry/opentelemetry-specification/pull/347) and the current document is linked [here](https://github.com/open-telemetry/opentelemetry-specification/blob/64bbb0c611d849b90916005d7714fa2a7132d0bf/specification/metrics/sdk.md).
 
 <!-- [//]: # ![Data Path Diagram](../images/DataPath.png) -->
 
-## **Accumulator**
+### Accumulator
 
 The Accumulator is responsible for computing aggregation over a fixed unit of time. It essentially takes a set of captures and turns them into a quantity that can be collected and used for meaningful analysis by maintaining aggregators for each active instrument and each distinct label set. For example, the aggregator for a counter must combine multiple calls to Add(increment) into a single sum.
 
@@ -363,16 +344,14 @@ Calls to the Accumulator's  `Collect()` sweep through metric instruments with un
 
 Design choice: We have chosen to implement the Accumulator as the SDK implementation of the Meter interface shown above.
 
-
-## **Aggregator**
+### Aggregator
 
 The term *aggregator* refers to an implementation that can combine multiple metric updates into a single, combined state for a specific function. Aggregators MUST support `Update()`, `Checkpoint()`, and `Merge()` operations. `Update()` is called directly from the Metric instrument in response to a metric event, and may be called concurrently.  The `Checkpoint()` operation is called to atomically save a snapshot of the Aggregator. The `Merge()` operation supports dimensionality reduction by combining state from multiple aggregators into a single Aggregator state.
 
 The SDK must include the Counter aggregator which maintains a sum and the gauge aggregator which maintains last value and timestamp. In addition, the SDK should include MinMaxSumCount, Sketch, Histogram, and Exact aggregators
 All operations should be atomic in languages that support them.
 
-
-```cc
+```cpp
 # aggregator.cc
 class Aggregator {
 public:
@@ -425,9 +404,7 @@ private:
 };
 ```
 
-
-
-```
+```cpp
 # counter_aggregator.cc
 template <class T>
 class CounterAggregator : public Aggregator<T> {
@@ -455,23 +432,18 @@ public:
 };
 ```
 
-
 This Counter is an example Aggregator. We plan on implementing all the Aggregators in the specification: Counter, Gauge, MinMaxSumCount, Sketch, Histogram, and Exact.
 
-
-## **Processor**
+### Processor
 
 The Processor SHOULD act as the primary source of configuration for exporting metrics from the SDK. The two kinds of configuration are:
-
 
 1. Given a metric instrument, choose which concrete aggregator type to apply for in-process aggregation.
 2. Given a metric instrument, choose which dimensions to export by (i.e., the "grouping" function).
 
 During the collection pass, the Processor receives a full set of check-pointed aggregators corresponding to each (Instrument, LabelSet) pair with an active record managed by the Accumulator. According to its own configuration, the Processor at this point determines which dimensions to aggregate for export; it computes a checkpoint of (possibly) reduced-dimension export records ready for export. It can be thought of as the business logic or processing phase in the pipeline.
 
-
 Change of dimensions: The user-facing metric API allows users to supply LabelSets containing an unlimited number of labels for any metric update. Some metric exporters will restrict the set of labels when exporting metric data, either to reduce cost or because of system-imposed requirements. A *change of dimensions* maps input LabelSets with potentially many labels into a LabelSet with a fixed set of label keys. A change of dimensions eliminates labels with keys not in the output LabelSet and fills in empty values for label keys that are not in the input LabelSet. This can be used for different filtering options, rate limiting, and alternate aggregation schemes. Additionally, it will be used to prevent unbounded memory growth through capping collected data. The community is still deciding exactly how metrics data will be pruned and this document will be updated when a decision is made.
-
 
 The following is a pseudo code implementation of a ‘simple’ Processor.
 
@@ -479,8 +451,7 @@ Note: Josh MacDonald is working on implementing a [‘basic’ Processor](https:
 
 Design choice: We recommend that we implement the ‘simple’ Processor first as apart of the MVP and then will also implement the ‘basic’ Processor later on. Josh recommended having both for doing different processes.
 
-
-```cc
+```cpp
 #processor.cc
 class Processor {
 public:
@@ -540,9 +511,7 @@ private:
 };
 ```
 
-
-
-## **Controller**
+### Controller
 
 Controllers generally are responsible for binding the Accumulator, the Processor, and the Exporter. The controller initiates the collection and export pipeline and manages all the moving parts within it. It also governs the flow of data through the SDK components. Users interface with the controller to begin collection process.
 
@@ -554,8 +523,7 @@ There are two different controllers: Push and Pull. The “Push” Controller wi
 
 We recommend implementing the PushController as the initial implementation of the Controller. This Controller is the base controller in the specification. We may also implement the PullController if we have the time to do it.
 
-
-```cc
+```cpp
 #push_controller.cc
 class PushController {
 
@@ -625,9 +593,7 @@ private:
 };
 ```
 
-
-
-## **Exporter**
+### Exporter
 
 The exporter SHOULD be called with a checkpoint of finished (possibly dimensionally reduced) export records. Most configuration decisions have been made before the exporter is invoked, including which instruments are enabled, which concrete aggregator types to use, and which dimensions to aggregate by.
 
@@ -635,8 +601,7 @@ There is very little left for the exporter to do other than format the metric up
 
 Design choice: Our idea is to take the simple trace example [OStreamSpanExporter](https://github.com/open-telemetry/opentelemetry-cpp/blob/main/examples/simple/main.cc) and add Metric functionality to it. This will allow us to verify that what we are implementing in the API and SDK works as intended. The exporter will go through the different metric instruments and print the value stored in their aggregators to stdout, **for simplicity only Sum is shown here, but all aggregators will be implemented**.
 
-
-```cc
+```cpp
 # stdout_exporter.cc
 class StdoutExporter: public exporter {
    /*
@@ -661,22 +626,15 @@ class StdoutExporter: public exporter {
 };
 ```
 
-
-
-```cc
+```cpp
 enum class ExportResult {
    kSuccess,
    kFailure,
 };
 ```
 
-
-
-
-
 ## Test Strategy / Plan
 
 Since there is a specification we will be following, we will not have to write out user stories for testing. We will generally only be writing functional unit tests for this project. The C++ Open Telemetry repository uses [Googletest](https://github.com/google/googletest) because it provides test coverage reports, also allows us to easily integrate code coverage tools such as [codecov.io](http://codecov.io/) with the project. A required coverage target of 90% will help to ensure that our code is fully tested.
 
 An open-source header-only testing framework called [Catch2](https://github.com/catchorg/Catch2) is an alternate option which would satisfy our testing needs. It is easy to use, supports behavior driven development, and does not need to be embedded in the project as source files to operate (unlike Googletest). Code coverage would still be possible using this testing framework but would require us to integrate additional tools. This framework may be preferred as an agnostic replacement for Googletest and is widely used in open source projects.
-
