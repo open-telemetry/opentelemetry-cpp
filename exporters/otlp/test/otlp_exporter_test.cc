@@ -65,22 +65,40 @@ TEST_F(OtlpExporterTestPeer, ExportIntegrationTest)
   std::unique_ptr<proto::collector::trace::v1::TraceService::StubInterface> stub_interface(
       mock_stub);
 
-  auto exporter = GetExporter(stub_interface);
+  proto::collector::trace::v1::ExportTraceServiceRequest request;
 
-  auto processor = std::shared_ptr<sdk::trace::SpanProcessor>(
-      new sdk::trace::SimpleSpanProcessor(std::move(exporter)));
-  auto provider =
-      nostd::shared_ptr<trace::TracerProvider>(new sdk::trace::TracerProvider(processor));
-  auto tracer = provider->GetTracer("test");
+  // Create a scope where all traces are flushed within it
+  {
+    auto exporter = GetExporter(stub_interface);
 
-  EXPECT_CALL(*mock_stub, Export(_, _, _))
-      .Times(AtLeast(1))
-      .WillRepeatedly(Return(grpc::Status::OK));
+    auto processor = std::shared_ptr<sdk::trace::SpanProcessor>(
+        new sdk::trace::SimpleSpanProcessor(std::move(exporter)));
+    auto provider =
+        nostd::shared_ptr<trace::TracerProvider>(new sdk::trace::TracerProvider(processor));
+    auto tracer = provider->GetTracer("test");
 
-  auto parent_span = tracer->StartSpan("Test parent span");
-  auto child_span  = tracer->StartSpan("Test child span");
-  child_span->End();
-  parent_span->End();
+    // TODO: Capture the exported proto and inspect it.
+    EXPECT_CALL(*mock_stub, Export(_, _, _))
+        .Times(AtLeast(1))
+        .WillRepeatedly(
+          DoAll(
+            SaveArg<1>(&request),
+            Return(grpc::Status::OK)
+          ));
+
+    auto parent_span = tracer->StartSpan("Test parent span");
+    auto child_span  = tracer->StartSpan("Test child span");
+    child_span->End();
+    parent_span->End();
+  }
+  // After flushing, let's check the (last) request has the last span.
+  EXPECT_EQ(1, request.resource_spans_size());
+  EXPECT_EQ(1, request.resource_spans(0).instrumentation_library_spans_size());
+  EXPECT_EQ(1, request.resource_spans(0).instrumentation_library_spans(0).spans_size());
+  // Expect the default resource to have been used.
+  EXPECT_EQ(3, request.resource_spans(0).resource().attributes_size());
+  // And that the span name is the last span ended.
+  EXPECT_EQ("Test parent span", request.resource_spans(0).instrumentation_library_spans(0).spans(0).name());
 }
 
 // Test exporter configuration options
