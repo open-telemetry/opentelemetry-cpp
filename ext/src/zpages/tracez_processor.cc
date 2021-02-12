@@ -6,7 +6,8 @@ namespace ext
 namespace zpages
 {
 
-void TracezSpanProcessor::OnStart(opentelemetry::sdk::trace::Recordable &span) noexcept
+void TracezSpanProcessor::OnStart(opentelemetry::sdk::trace::Recordable &span,
+                                  const opentelemetry::trace::SpanContext &parent_context) noexcept
 {
   std::lock_guard<std::mutex> lock(mtx_);
   spans_.running.insert(static_cast<ThreadsafeSpanData *>(&span));
