@@ -19,13 +19,13 @@ The OStreamExporter will only be implementing a Push Exporter framework.
 ## Design Tenets
 
 * Reliability
-    * The Exporter should be reliable; data exported should always be accounted for. The data will either all be successfully exported to the destination server, or in the case of failure, the data is dropped. `Export` will always return failure or success to notify the user of the result.
-    * Thread Safety
-        * The OStreamExporter can be called simultaneously, however we do not handle this in the Exporter. Synchronization should be done at a lower level.
+  * The Exporter should be reliable; data exported should always be accounted for. The data will either all be successfully exported to the destination server, or in the case of failure, the data is dropped. `Export` will always return failure or success to notify the user of the result.
+  * Thread Safety
+    * The OStreamExporter can be called simultaneously, however we do not handle this in the Exporter. Synchronization should be done at a lower level.
 * Scalability
-    * The Exporter must be able to operate on sizeable systems with predictable overhead growth.  A key requirement of this is that the library does not consume unbounded memory resource.
+  * The Exporter must be able to operate on sizeable systems with predictable overhead growth.  A key requirement of this is that the library does not consume unbounded memory resource.
 * Security
-    * OStreamExporter should only be used for development and testing purpose, where security and privacy is less a concern as it doesn't communicate to external systems.
+  * OStreamExporter should only be used for development and testing purpose, where security and privacy is less a concern as it doesn't communicate to external systems.
 
 ## SpanExporter
 
@@ -39,8 +39,7 @@ The SpanExporter is called through the SpanProcessor, which passes finished span
 
 The specification states: exporter must support two functions: Export and Shutdown.
 
-
-### `Export(span of recordables)`
+### SpanExporter.Export(span of recordables)
 
 Exports a batch of telemetry data. Protocol exporters that will implement this function are typically expected to serialize and transmit the data to the destination.
 
@@ -48,7 +47,7 @@ Export() must not block indefinitely. We can rely on printing to an ostream is r
 
 The specification states: Any retry logic that is required by the exporter is the responsibility of the exporter. The default SDK SHOULD NOT implement retry logic, as the required logic is likely to depend heavily on the specific protocol and backend the spans are being sent to.
 
-### `Shutdown()`
+### SpanExporter.Shutdown()
 
 Shuts down the exporter. Called when SDK is shut down. This is an opportunity for exporter to do any cleanup required.
 
@@ -58,7 +57,7 @@ Shuts down the exporter. Called when SDK is shut down. This is an opportunity fo
 
 In the OStreamExporter there is no cleanup to be done, so there is no need to use the timeout within the `Shutdown` function as it will never be blocking.
 
-```cc
+```cpp
 class StreamSpanExporter final : public sdktrace::SpanExporter
 {
 
@@ -116,10 +115,7 @@ public:
         isShutdown = true;
         return true;
     }
-
 };
-
-
 ```
 
 ## MetricsExporter
@@ -130,7 +126,7 @@ Exports a batch of telemetry data. Protocol exporters that will implement this f
 
 <!-- [//]: # ![SDK Data Path](./images/DataPath.png) -->
 
-### `Export(batch of Records)`
+### MetricsExporter.Export(batch of Records)
 
 Export() must not block indefinitely. We can rely on printing to an ostream is reasonably performant and doesn't block.
 
@@ -138,11 +134,11 @@ The specification states: Any retry logic that is required by the exporter is th
 
 The MetricsExporter is called through the Controller in the SDK data path. The exporter will either be called on a regular interval in the case of a push controller or through manual calls in the case of a pull controller.
 
-### `Shutdown()`
+### MetricsExporter.Shutdown()
 
 Shutdown() is currently not required for the OStreamMetricsExporter.
 
-```cc
+```cpp
 class StreamMetricsExporter final : public sdkmeter::MetricsExporter
 {
 
@@ -193,4 +189,5 @@ In terms of test framework, as is described in the [Metrics API/SDK design docum
 * Serialize data to another format (json)
 
 ## Contributors
+
 * Hudson Humphries

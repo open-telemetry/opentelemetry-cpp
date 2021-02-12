@@ -123,7 +123,7 @@ If a PR has been stuck (e.g. there are lots of debates and people couldn't agree
 * Consolidating the perspectives and putting a summary in the PR. It is recommended to add a link into the PR description, which points to a comment with a summary in the PR conversation
 * Stepping back to see if it makes sense to narrow down the scope of the PR or split it up.
 
-If none of the above worked and the PR has been stuck for more than 2 weeks, the owner should bring it to the (OpenTelemetry C++ SIG meeting)[https://zoom.us/j/8203130519]. The meeting passcode is _77777_.
+If none of the above worked and the PR has been stuck for more than 2 weeks, the owner should bring it to the [OpenTelemetry C++ SIG meeting](https://zoom.us/j/8203130519). The meeting passcode is _77777_.
 
 ## Useful Resources
 
