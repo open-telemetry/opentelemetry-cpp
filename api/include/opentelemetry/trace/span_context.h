@@ -79,9 +79,13 @@ public:
     return trace_state_;
   }
 
+  /*
+   * @param that SpanContext for comparing.
+   * @return true if `that` equals the current SpanContext.
+   * N.B. trace_state is ignored for the comparison.
+   */
   bool operator==(const SpanContext &that) const noexcept
   {
-    // TODO: check trace_state?
     return trace_id() == that.trace_id() && span_id() == that.span_id() &&
            trace_flags() == that.trace_flags();
   }
