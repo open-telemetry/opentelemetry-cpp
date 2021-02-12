@@ -47,8 +47,8 @@ public:
    * Exports a span of logs sent from the processor.
    */
   opentelemetry::sdk::logs::ExportResult Export(
-      const opentelemetry::nostd::span<std::unique_ptr<sdk::logs::Recordable>>
-          &records) noexcept override;
+      const opentelemetry::nostd::span<std::unique_ptr<sdk::logs::Recordable>> &records) noexcept
+      override;
 
   /**
    * Marks the OStream Log Exporter as shut down.

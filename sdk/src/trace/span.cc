@@ -63,7 +63,8 @@ Span::Span(std::shared_ptr<Tracer> &&tracer,
            const opentelemetry::common::KeyValueIterable &attributes,
            const trace_api::SpanContextKeyValueIterable &links,
            const trace_api::StartSpanOptions &options,
-           const trace_api::SpanContext &parent_span_context) noexcept
+           const trace_api::SpanContext &parent_span_context,
+           const opentelemetry::sdk::resource::Resource &resource) noexcept
     : tracer_{std::move(tracer)},
       processor_{processor},
       recordable_{processor_->MakeRecordable()},
@@ -93,11 +94,11 @@ Span::Span(std::shared_ptr<Tracer> &&tracer,
   span_context_ = std::unique_ptr<trace_api::SpanContext>(
       new trace_api::SpanContext(trace_id, span_id, trace_api::TraceFlags(), false));
 
-  attributes.ForEachKeyValue([&](nostd::string_view key,
-                                 opentelemetry::common::AttributeValue value) noexcept {
-    recordable_->SetAttribute(key, value);
-    return true;
-  });
+  attributes.ForEachKeyValue(
+      [&](nostd::string_view key, opentelemetry::common::AttributeValue value) noexcept {
+        recordable_->SetAttribute(key, value);
+        return true;
+      });
 
   links.ForEachKeyValue([&](opentelemetry::trace::SpanContext span_context,
                             const opentelemetry::common::KeyValueIterable &attributes) {
@@ -108,7 +109,8 @@ Span::Span(std::shared_ptr<Tracer> &&tracer,
   recordable_->SetSpanKind(options.kind);
   recordable_->SetStartTime(NowOr(options.start_system_time));
   start_steady_time = NowOr(options.start_steady_time);
-  processor_->OnStart(*recordable_);
+  // recordable_->SetResource(resource_); TODO
+  processor_->OnStart(*recordable_, parent_span_context);
 }
 
 Span::~Span()
@@ -156,8 +158,7 @@ void Span::AddEvent(nostd::string_view name,
   recordable_->AddEvent(name, timestamp, attributes);
 }
 
-void Span::SetStatus(opentelemetry::trace::CanonicalCode code,
-                     nostd::string_view description) noexcept
+void Span::SetStatus(opentelemetry::trace::StatusCode code, nostd::string_view description) noexcept
 {
   std::lock_guard<std::mutex> lock_guard{mu_};
   if (recordable_ == nullptr)

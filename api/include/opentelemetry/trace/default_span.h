@@ -33,7 +33,7 @@ public:
     this->AddEvent(name, std::chrono::system_clock::now(), attributes);
   }
 
-  void SetStatus(CanonicalCode status, nostd::string_view description) noexcept {}
+  void SetStatus(StatusCode status, nostd::string_view description) noexcept {}
 
   void UpdateName(nostd::string_view name) noexcept {}
 

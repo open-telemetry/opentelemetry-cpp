@@ -1,7 +1,7 @@
 # OpenTelemetry C++
 
 [![Gitter chat](https://badges.gitter.im/open-telemetry/opentelemetry-cpp.svg)](https://gitter.im/open-telemetry/opentelemetry-cpp?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
-[![codecov.io](https://codecov.io/gh/open-telemetry/opentelemetry-cpp/branch/master/graphs/badge.svg?)](https://codecov.io/gh/open-telemetry/opentelemetry-cpp/)
+[![codecov.io](https://codecov.io/gh/open-telemetry/opentelemetry-cpp/branch/main/graphs/badge.svg?)](https://codecov.io/gh/open-telemetry/opentelemetry-cpp/)
 [![Build Status](https://action-badges.now.sh/open-telemetry/opentelemetry-cpp)](https://github.com/open-telemetry/opentelemetry-cpp/actions)
 [![Release](https://img.shields.io/github/v/release/open-telemetry/opentelemetry-cpp?include_prereleases&style=)](https://github.com/open-telemetry/opentelemetry-cpp/releases/)
 
@@ -15,6 +15,7 @@ C++ standards:
 * ISO/IEC 14882:2011 (C++11, C++0x)
 * ISO/IEC 14882:2014 (C++14, C++1y)
 * ISO/IEC 14882:2017 (C++17, C++1z)
+* ISO/IEC 14882:2020 (C++20)
 
 Any exceptions to this are noted in the individual `README.md` files.
 
@@ -26,14 +27,13 @@ of the current project.
 
  Our CI pipeline builds and tests on following `x86-64` platforms:
 
-* ubuntu-18.04 ( Default GCC Compiler - 7.5.0 )
-* ubuntu-18.04 ( GCC 4.8 with -std=c++11 flag )
-* ubuntu-20.04 ( Default GCC Compiler - 9.3.0 with -std=c++20 flags )
-* macOS 10.15 ( Xcode 12.2 )
-* Windows Server 2019 (Visual Studio Enterprise 2019 )
+* ubuntu-18.04 (Default GCC Compiler - 7.5.0)
+* ubuntu-18.04 (GCC 4.8 with -std=c++11 flag)
+* ubuntu-20.04 (Default GCC Compiler - 9.3.0 with -std=c++20 flags)
+* macOS 10.15 (Xcode 12.2 )
+* Windows Server 2019 (Visual Studio Enterprise 2019)
 
 In general, the code shipped from this repository should build on all platforms having C++ compiler with [supported C++ standards](#supported-c-versions).
-
 
 ## Installation
 
@@ -54,7 +54,7 @@ contributors' availability. Check the [OpenTelemetry community
 calendar](https://calendar.google.com/calendar/embed?src=google.com_b79e3e90j7bbsa2n2p5an5lf60%40group.calendar.google.com)
 for specific dates.
 
-Meetings take place via [Zoom video conference](https://zoom.us/j/8203130519).
+Meetings take place via [Zoom video conference](https://zoom.us/j/8203130519). The passcode is _77777_.
 
 Meeting notes are available as a public [Google doc](https://docs.google.com/document/d/1i1E4-_y4uJ083lCutKGDhkpi3n4_e774SBLi9hPLocw/edit?usp=sharing). For edit access, get in touch on [Gitter](https://gitter.im/open-telemetry/opentelemetry-cpp).
 
@@ -66,7 +66,7 @@ Approvers ([@open-telemetry/cpp-approvers](https://github.com/orgs/open-telemetr
 * [Ryan Burn](https://github.com/rnburn), Lightstep
 * [Tom Tan](https://github.com/ThomsonTan), Microsoft
 
-*Find more about the approver role in [community repository](https://github.com/open-telemetry/community/blob/master/community-membership.md#approver).*
+*Find more about the approver role in [community repository](https://github.com/open-telemetry/community/blob/main/community-membership.md#approver).*
 
 Maintainers ([@open-telemetry/cpp-maintainers](https://github.com/orgs/open-telemetry/teams/cpp-maintainers)):
 
@@ -74,14 +74,14 @@ Maintainers ([@open-telemetry/cpp-maintainers](https://github.com/orgs/open-tele
 * [Lalit Kumar Bhasin](https://github.com/lalitb), Microsoft
 * [Reiley Yang](https://github.com/reyang), Microsoft
 
-*Find more about the maintainer role in [community repository](https://github.com/open-telemetry/community/blob/master/community-membership.md#maintainer).*
+*Find more about the maintainer role in [community repository](https://github.com/open-telemetry/community/blob/main/community-membership.md#maintainer).*
 
 Triagers ([@open-telemetry/cpp-triagers](https://github.com/orgs/open-telemetry/teams/cpp-triagers)):
 
 * [Alolita Sharma](https://github.com/alolita), Amazon
 * [Jodee Varney](https://github.com/jodeev), New Relic
 
-*Find more about the triager role in [community repository](https://github.com/open-telemetry/community/blob/master/community-membership.md#triager).*
+*Find more about the triager role in [community repository](https://github.com/open-telemetry/community/blob/main/community-membership.md#triager).*
 
 ## Release Schedule
 

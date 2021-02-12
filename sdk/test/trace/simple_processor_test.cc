@@ -9,6 +9,7 @@
 using namespace opentelemetry::sdk::trace;
 using opentelemetry::exporter::memory::InMemorySpanData;
 using opentelemetry::exporter::memory::InMemorySpanExporter;
+using opentelemetry::trace::SpanContext;
 
 TEST(SimpleProcessor, ToInMemorySpanExporter)
 {
@@ -18,7 +19,7 @@ TEST(SimpleProcessor, ToInMemorySpanExporter)
 
   auto recordable = processor.MakeRecordable();
 
-  processor.OnStart(*recordable);
+  processor.OnStart(*recordable, SpanContext::GetInvalid());
 
   ASSERT_EQ(0, span_data->GetSpans().size());
 

@@ -1,6 +1,6 @@
 # Metrics API Design
 
-This document outlines a proposed implementation of the OpenTelemetry Metrics API in C++.  The design conforms to the current versions of the [Metrics API Specification](https://github.com/open-telemetry/opentelemetry-specification/blob/master/specification/metrics/api.md) though it is currently under development and subject to change.
+This document outlines a proposed implementation of the OpenTelemetry Metrics API in C++.  The design conforms to the current versions of the [Metrics API Specification](https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/metrics/api.md) though it is currently under development and subject to change.
 
 The design supports a minimal implementation for the library to be used by an application. However, without the reference SDK or another implementation, no metric data will be collected.
 
@@ -243,7 +243,7 @@ Each instrument must have enough information to meaningfully attach its measured
 Metric instruments are created through instances of the `Meter` class and each type of instrument can be described with the following properties:
 
 
-* Synchronicity:  A synchronous instrument is called by the user in a distributed [Context](https://github.com/open-telemetry/opentelemetry-specification/blob/master/specification/context/context.md) (i.e., Span context, Correlation context) and is updated once per request. An asynchronous instrument is called by the SDK once per collection interval and only one value from the interval is kept.
+* Synchronicity:  A synchronous instrument is called by the user in a distributed [Context](https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/context/context.md) (i.e., Span context, Correlation context) and is updated once per request. An asynchronous instrument is called by the SDK once per collection interval and only one value from the interval is kept.
 * Additivity:  An additive instrument is one that records additive measurements, meaning the final sum of updates is the only useful value.  Non-additive instruments should be used when the intent is to capture information about the distribution of values.
 * Monotonicity: A monotonic instrument is an additive instrument, where the progression of each sum is non-decreasing. Monotonic instruments are useful for monitoring rate information.
 
@@ -316,8 +316,8 @@ public:
      * @param name is the identifier of the instrumenting library
      * @param description explains what the metric captures
      * @param unit specified the data type held in the instrument
-     * @param enabled determins if the metric is currently capturing data
-     * @return Instrument type with the specified attirbutes
+     * @param enabled determines if the metric is currently capturing data
+     * @return Instrument type with the specified attributes
      */
     Instrument(nostd::string_view name, nostd::string_view description, nostd::string_view unit, bool enabled);
 
@@ -412,7 +412,7 @@ public:
 
     /**
      * Captures data by activating the callback function associated with the
-     * instrument and storing its return value.  Callbacks for asychronous
+     * instrument and storing its return value.  Callbacks for asynchronous
      * instruments are defined during construction.
      *
      * @param none

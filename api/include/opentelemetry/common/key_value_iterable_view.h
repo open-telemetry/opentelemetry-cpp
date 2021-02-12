@@ -39,9 +39,8 @@ public:
   explicit KeyValueIterableView(const T &container) noexcept : container_{&container} {}
 
   // KeyValueIterable
-  bool ForEachKeyValue(
-      nostd::function_ref<bool(nostd::string_view, common::AttributeValue)> callback) const
-      noexcept override
+  bool ForEachKeyValue(nostd::function_ref<bool(nostd::string_view, common::AttributeValue)>
+                           callback) const noexcept override
   {
     auto iter = std::begin(*container_);
     auto last = std::end(*container_);
