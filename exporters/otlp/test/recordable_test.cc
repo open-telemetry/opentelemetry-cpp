@@ -204,7 +204,7 @@ TEST(Recordable, SetResourceRef)
 {
   Recordable rec;
   sdk::resource::Resource default_resource = sdk::resource::Resource::GetDefault();
-  sdk::resource::Resource empty_resource = sdk::resource::Resource::GetEmpty();
+  sdk::resource::Resource empty_resource   = sdk::resource::Resource::GetEmpty();
   rec.SetResourceRef(&default_resource);
   auto proto = rec.resource();
   EXPECT_EQ(3, proto.attributes_size());

@@ -26,7 +26,7 @@ public:
    * Initialize a new tracer.
    * @param parent The `TraceProvider` which owns resource + pipeline for traces.
    */
-  explicit Tracer(TracerProvider* provider) noexcept;
+  explicit Tracer(TracerProvider *provider) noexcept;
 
   nostd::shared_ptr<trace_api::Span> StartSpan(
       nostd::string_view name,
@@ -39,10 +39,10 @@ public:
   void CloseWithMicroseconds(uint64_t timeout) noexcept override;
 
   /** Returns the provider that created this Tracer. */
-  const TracerProvider& GetProvider() const { return *provider_; }
+  const TracerProvider &GetProvider() const { return *provider_; }
 
 private:
-  TracerProvider* provider_;
+  TracerProvider *provider_;
 };
 }  // namespace trace
 }  // namespace sdk

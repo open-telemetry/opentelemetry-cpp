@@ -6,7 +6,7 @@ namespace exporter
 namespace otlp
 {
 
-const int kAttributeValueSize = 14;
+const int kAttributeValueSize      = 14;
 const int kOwnedAttributeValueSize = 14;
 
 void Recordable::SetIds(trace::TraceId trace_id,
@@ -121,7 +121,8 @@ void PopulateAttribute(opentelemetry::proto::common::v1::KeyValue *attribute,
 /** Maps from C++ attribute into OTLP proto attribute. */
 void PopulateAttribute(opentelemetry::proto::common::v1::KeyValue *attribute,
                        nostd::string_view key,
-                       const sdk::common::OwnedAttributeValue &value) {
+                       const sdk::common::OwnedAttributeValue &value)
+{
   // Assert size of variant to ensure that this method gets updated if the variant
   // definition changes
   static_assert(
@@ -184,7 +185,7 @@ void PopulateAttribute(opentelemetry::proto::common::v1::KeyValue *attribute,
     {
       attribute->mutable_value()->mutable_array_value()->add_values()->set_int_value(val);
     }
-  }  
+  }
   else if (nostd::holds_alternative<std::vector<int64_t>>(value))
   {
     for (const auto &val : nostd::get<std::vector<int64_t>>(value))
@@ -215,19 +216,24 @@ void PopulateAttribute(opentelemetry::proto::common::v1::KeyValue *attribute,
   }
 }
 
-proto::resource::v1::Resource Recordable::resource() const noexcept {
+proto::resource::v1::Resource Recordable::resource() const noexcept
+{
   proto::resource::v1::Resource proto;
-  if (resource_) {
-    for (const auto& kv : resource_->GetAttributes()) {
+  if (resource_)
+  {
+    for (const auto &kv : resource_->GetAttributes())
+    {
       PopulateAttribute(proto.add_attributes(), kv.first, kv.second);
     }
   }
   return proto;
 }
 
-void Recordable::SetResourceRef(const opentelemetry::sdk::resource::Resource*const resource) noexcept {
-    resource_ = resource;
-  };
+void Recordable::SetResourceRef(
+    const opentelemetry::sdk::resource::Resource *const resource) noexcept
+{
+  resource_ = resource;
+};
 
 void Recordable::SetAttribute(nostd::string_view key,
                               const opentelemetry::common::AttributeValue &value) noexcept

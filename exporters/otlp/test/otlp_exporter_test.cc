@@ -80,11 +80,7 @@ TEST_F(OtlpExporterTestPeer, ExportIntegrationTest)
     // TODO: Capture the exported proto and inspect it.
     EXPECT_CALL(*mock_stub, Export(_, _, _))
         .Times(AtLeast(1))
-        .WillRepeatedly(
-          DoAll(
-            SaveArg<1>(&request),
-            Return(grpc::Status::OK)
-          ));
+        .WillRepeatedly(DoAll(SaveArg<1>(&request), Return(grpc::Status::OK)));
 
     auto parent_span = tracer->StartSpan("Test parent span");
     auto child_span  = tracer->StartSpan("Test child span");
@@ -98,7 +94,8 @@ TEST_F(OtlpExporterTestPeer, ExportIntegrationTest)
   // Expect the default resource to have been used.
   EXPECT_EQ(3, request.resource_spans(0).resource().attributes_size());
   // And that the span name is the last span ended.
-  EXPECT_EQ("Test parent span", request.resource_spans(0).instrumentation_library_spans(0).spans(0).name());
+  EXPECT_EQ("Test parent span",
+            request.resource_spans(0).instrumentation_library_spans(0).spans(0).name());
 }
 
 // Test exporter configuration options

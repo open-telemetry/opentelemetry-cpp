@@ -122,7 +122,7 @@ void BenchmarkSpanCreation(std::shared_ptr<Sampler> sampler, benchmark::State &s
   auto processor = std::make_shared<SimpleSpanProcessor>(std::move(exporter));
   auto resource  = opentelemetry::sdk::resource::Resource::Create({});
   auto tracer_provider =
-     std::shared_ptr<TracerProvider>(new TracerProvider(processor, std::move(resource), sampler));
+      std::shared_ptr<TracerProvider>(new TracerProvider(processor, std::move(resource), sampler));
   auto tracer = tracer_provider->GetTracer("test", "1.0");
 
   while (state.KeepRunning())
