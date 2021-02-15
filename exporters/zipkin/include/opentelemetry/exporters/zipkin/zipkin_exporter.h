@@ -77,10 +77,10 @@ private:
 private:
   // The configuration options associated with this exporter.
   bool isShutdown_ = false;
+  ZipkinExporterOptions options_;
   std::shared_ptr<http_client::HttpClientSync> http_client_;
   opentelemetry::ext::http::common::UrlParser url_parser_;
   nlohmann::json local_end_point_;
-  ZipkinExporterOptions options_;
 };
 }  // namespace zipkin
 }  // namespace exporter
