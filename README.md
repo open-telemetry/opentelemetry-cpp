@@ -96,6 +96,10 @@ Triagers
 *Find more about the triager role in [community
 repository](https://github.com/open-telemetry/community/blob/main/community-membership.md#triager).*
 
+### Thanks to all the people who have contributed
+
+[![contributors](https://contributors-img.web.app/image?repo=open-telemetry/opentelemetry-cpp)](https://github.com/open-telemetry/opentelemetry-cpp/graphs/contributors)
+
 ## Release Schedule
 
 OpenTelemetry C++ is under active development.
