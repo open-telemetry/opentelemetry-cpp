@@ -73,4 +73,6 @@ span.
   for further information and resources related to OpenTelemetry C++.
 * For questions related to OpenTelemetry C++ that are not covered by the
   existing documentation, please ask away in [GitHub discussions](https://github.com/open-telemetry/opentelemetry-cpp/discussions).
+* Feel free to join the [CNCF OpenTelemetry C++ Slack channel](https://cloud-native.slack.com/archives/C01N3AT62SJ).
+  If you are new, you can create a CNCF Slack account [here](http://slack.cncf.io/).
 * For bugs and feature requests, write a [GitHub issue](https://github.com/open-telemetry/opentelemetry-cpp/issues).
