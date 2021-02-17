@@ -34,6 +34,7 @@ requires three steps.
 auto provider = opentelemetry::trace::Provider::GetTracerProvider();
 auto tracer = provider->GetTracer("foo_library", "1.0.0");
 ```
+
 The `TracerProvider` acquired in the first step is a singleton object that
 is usually provided by the OpenTelemetry C++ SDK. It is used to provide
 specific implementations for API interfaces. In case no SDK is used, the API
