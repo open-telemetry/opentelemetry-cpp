@@ -8,7 +8,7 @@ the build or adding a dependency.
 * The SDK should have minimal dependencies.
 
 * Exporters can bring in transport dependencies, e.g. Stackdriver exporter
-depends on gRPC.
+  depends on gRPC.
 
 * Support both static linking and dynamic loading.
 
@@ -20,4 +20,4 @@ This also requires a stable C++ ABI. There is quite a bit of interest in this.
 This means STL types can't be used in the interface.
 
 * OpenTelemetry should not _require_ a dedicated thread for background work and
-exporters.
+  exporters.
