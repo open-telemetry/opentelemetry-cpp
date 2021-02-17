@@ -14,7 +14,7 @@ exported and processed.
 The OpenTelemetry C++ API is provided as a header-only library and supports all
 recent versions of the C++ standard, down to C++11.
 
-A single application might dynamically or statically link different libraries
+A single application might dynamically or statically link to different libraries
 that were compiled with different compilers, while several of the linked
 libraries are instrumented with OpenTelemetry. OpenTelemetry C++ supports those
 scenarios by providing a stable ABI. This is achieved by a careful API design,
