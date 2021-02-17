@@ -19,7 +19,7 @@ that were compiled with different compilers, while several of the linked
 libraries are instrumented with OpenTelemetry. OpenTelemetry C++ supports those
 scenarios by providing a stable ABI. This is achieved by a careful API design,
 and most notably by providing ABI stable versions of classes from the standard
-library. All those classes are provided in the `opentelemetry:nostd` namespace.
+library. All those classes are provided in the `opentelemetry::nostd` namespace.
 
 ## Getting started
 
