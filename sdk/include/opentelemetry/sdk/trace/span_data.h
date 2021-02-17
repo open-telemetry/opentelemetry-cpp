@@ -222,7 +222,7 @@ public:
   void SetDuration(std::chrono::nanoseconds duration) noexcept override { duration_ = duration; }
 
   void SetResourceRef(
-      const opentelemetry::sdk::resource::Resource *const resource) noexcept override
+      const opentelemetry::sdk::resource::Resource &resource) noexcept override
   {
     // TODO
   }

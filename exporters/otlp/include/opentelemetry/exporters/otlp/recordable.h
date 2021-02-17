@@ -22,7 +22,7 @@ public:
               trace::SpanId parent_span_id) noexcept override;
 
   void SetResourceRef(
-      const opentelemetry::sdk::resource::Resource *const resource) noexcept override;
+      const opentelemetry::sdk::resource::Resource &resource) noexcept override;
 
   void SetAttribute(nostd::string_view key,
                     const opentelemetry::common::AttributeValue &value) noexcept override;
@@ -46,7 +46,7 @@ public:
 
 private:
   proto::trace::v1::Span span_;
-  const opentelemetry::sdk::resource::Resource *resource_{nullptr};
+  opentelemetry::sdk::resource::Resource &resource_{opentelemetry::sdk::resource::Resource::GetEmpty()};
 };
 }  // namespace otlp
 }  // namespace exporter

@@ -205,14 +205,14 @@ TEST(Recordable, SetResourceRef)
   Recordable rec;
   sdk::resource::Resource default_resource = sdk::resource::Resource::GetDefault();
   sdk::resource::Resource empty_resource   = sdk::resource::Resource::GetEmpty();
-  rec.SetResourceRef(&default_resource);
+  rec.SetResourceRef(default_resource);
   auto proto = rec.resource();
   EXPECT_EQ(3, proto.attributes_size());
   // Note: We don't test ALL attribtues, only a few to avoid flaky tests and to
   // make sure we ARE getting attributes passed through.
   EXPECT_EQ("telemetry.sdk.name", proto.attributes(1).key());
   EXPECT_EQ("opentelemetry", proto.attributes(1).value().string_value());
-  rec.SetResourceRef(&empty_resource);
+  rec.SetResourceRef(empty_resource);
   EXPECT_EQ(0, rec.resource().attributes_size());
 }
 

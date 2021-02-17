@@ -49,10 +49,11 @@ public:
    * owned by the `TracerProvider` which (indirectly) owns the `Exporter` that generates a
    * `Recordable`.
    *
-   * @param resource pointer to the Resource for this span.
+   * @param resource the Resource for this span.
+   *                 Note: this reference will remain stable for the life of the Recordable.
    */
   virtual void SetResourceRef(
-      const opentelemetry::sdk::resource::Resource *const resource) noexcept = 0;
+      const opentelemetry::sdk::resource::Resource &resource) noexcept = 0;
 
   /**
    * Set an attribute of a span.
