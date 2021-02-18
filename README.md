@@ -1,7 +1,6 @@
 # OpenTelemetry C++
 
-[![Gitter
-chat](https://badges.gitter.im/open-telemetry/opentelemetry-cpp.svg)](https://gitter.im/open-telemetry/opentelemetry-cpp?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+[![Slack](https://img.shields.io/badge/slack-@cncf/otel/cpp-brightgreen.svg?logo=slack)](https://cloud-native.slack.com/archives/C01N3AT62SJ)
 [![codecov.io](https://codecov.io/gh/open-telemetry/opentelemetry-cpp/branch/main/graphs/badge.svg?)](https://codecov.io/gh/open-telemetry/opentelemetry-cpp/)
 [![Build
 Status](https://action-badges.now.sh/open-telemetry/opentelemetry-cpp)](https://github.com/open-telemetry/opentelemetry-cpp/actions)
@@ -64,7 +63,7 @@ The passcode is _77777_.
 Meeting notes are available as a public [Google
 doc](https://docs.google.com/document/d/1i1E4-_y4uJ083lCutKGDhkpi3n4_e774SBLi9hPLocw/edit?usp=sharing).
 For edit access, get in touch on
-[Gitter](https://gitter.im/open-telemetry/opentelemetry-cpp).
+[Slack](https://cloud-native.slack.com/archives/C01N3AT62SJ).
 
 Approvers
 ([@open-telemetry/cpp-approvers](https://github.com/orgs/open-telemetry/teams/cpp-approvers)):
@@ -96,6 +95,10 @@ Triagers
 
 *Find more about the triager role in [community
 repository](https://github.com/open-telemetry/community/blob/main/community-membership.md#triager).*
+
+### Thanks to all the people who have contributed
+
+[![contributors](https://contributors-img.web.app/image?repo=open-telemetry/opentelemetry-cpp)](https://github.com/open-telemetry/opentelemetry-cpp/graphs/contributors)
 
 ## Release Schedule
 

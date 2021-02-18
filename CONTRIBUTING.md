@@ -8,7 +8,7 @@ See the [public meeting
 notes](https://docs.google.com/document/d/1i1E4-_y4uJ083lCutKGDhkpi3n4_e774SBLi9hPLocw/edit)
 for a summary description of past meetings. To request edit access, join the
 meeting or get in touch on
-[Gitter](https://gitter.im/open-telemetry/opentelemetry-cpp).
+[Slack](https://cloud-native.slack.com/archives/C01N3AT62SJ).
 
 See the [community membership
 document](https://github.com/open-telemetry/community/blob/main/community-membership.md)
