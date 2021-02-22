@@ -16,8 +16,8 @@
 #include <gtest/gtest.h>
 
 #include "opentelemetry/trace/default_span.h"
-#include "opentelemetry/trace/propagation/text_map_propagator.h"
 #include "opentelemetry/trace/propagation/http_trace_context.h"
+#include "opentelemetry/trace/propagation/text_map_propagator.h"
 
 using namespace opentelemetry;
 
