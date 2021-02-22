@@ -11,13 +11,13 @@ namespace trace
 namespace propagation
 {
 
-// The HTTPTextFormat class provides an interface that enables extracting and injecting
+// The TextMapPropagator class provides an interface that enables extracting and injecting
 // context into headers of HTTP requests. HTTP frameworks and clients
-// can integrate with HTTPTextFormat by providing the object containing the
+// can integrate with TextMapPropagator by providing the object containing the
 // headers, and a getter and setter function for the extraction and
 // injection of values, respectively.
 template <typename T>
-class HTTPTextFormat
+class TextMapPropagator
 {
 public:
   // Rules that manages how context will be extracted from carrier.
