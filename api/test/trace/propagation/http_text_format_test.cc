@@ -16,8 +16,8 @@
 #include <gtest/gtest.h>
 
 #include "opentelemetry/trace/default_span.h"
-#include "opentelemetry/trace/propagation/http_text_format.h"
 #include "opentelemetry/trace/propagation/http_trace_context.h"
+#include "opentelemetry/trace/propagation/text_map_propagator.h"
 
 using namespace opentelemetry;
 
@@ -52,25 +52,25 @@ using MapHttpTraceContext =
 
 static MapHttpTraceContext format = MapHttpTraceContext();
 
-TEST(HTTPTextFormatTest, TraceIdBufferGeneration)
+TEST(TextMapPropagatorTest, TraceIdBufferGeneration)
 {
   constexpr uint8_t buf[] = {1, 2, 3, 4, 5, 6, 7, 8, 8, 7, 0xaa, 0xbb, 0xcc, 0xdd, 0xee, 0xff};
   EXPECT_EQ(MapHttpTraceContext::GenerateTraceIdFromString("01020304050607080807aabbccddeeff"),
             trace::TraceId(buf));
 }
 
-TEST(HTTPTextFormatTest, SpanIdBufferGeneration)
+TEST(TextMapPropagatorTest, SpanIdBufferGeneration)
 {
   constexpr uint8_t buf[] = {1, 2, 0xaa, 0xbb, 0xcc, 0xdd, 0xee, 0xff};
   EXPECT_EQ(MapHttpTraceContext::GenerateSpanIdFromString("0102aabbccddeeff"), trace::SpanId(buf));
 }
 
-TEST(HTTPTextFormatTest, TraceFlagsBufferGeneration)
+TEST(TextMapPropagatorTest, TraceFlagsBufferGeneration)
 {
   EXPECT_EQ(MapHttpTraceContext::GenerateTraceFlagsFromString("00"), trace::TraceFlags());
 }
 
-TEST(HTTPTextFormatTest, NoSendEmptyTraceState)
+TEST(TextMapPropagatorTest, NoSendEmptyTraceState)
 {
   // If the trace state is empty, do not set the header.
   const std::map<std::string, std::string> carrier = {
@@ -85,7 +85,7 @@ TEST(HTTPTextFormatTest, NoSendEmptyTraceState)
   EXPECT_FALSE(carrier.count("tracestate") > 0);
 }
 
-TEST(HTTPTextFormatTest, PropagateInvalidContext)
+TEST(TextMapPropagatorTest, PropagateInvalidContext)
 {
   // Do not propagate invalid trace context.
   std::map<std::string, std::string> carrier = {};
@@ -96,7 +96,7 @@ TEST(HTTPTextFormatTest, PropagateInvalidContext)
   EXPECT_TRUE(carrier.count("traceparent") == 0);
 }
 
-TEST(HTTPTextFormatTest, SetRemoteSpan)
+TEST(TextMapPropagatorTest, SetRemoteSpan)
 {
   const std::map<std::string, std::string> carrier = {
       {"traceparent", "00-4bf92f3577b34da6a3ce929d0e0e4736-0102030405060708-01"}};
@@ -114,7 +114,7 @@ TEST(HTTPTextFormatTest, SetRemoteSpan)
   EXPECT_EQ(span->GetContext().IsRemote(), true);
 }
 
-TEST(HTTPTextFormatTest, GetCurrentSpan)
+TEST(TextMapPropagatorTest, GetCurrentSpan)
 {
   constexpr uint8_t buf_span[]  = {1, 2, 3, 4, 5, 6, 7, 8};
   constexpr uint8_t buf_trace[] = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16};

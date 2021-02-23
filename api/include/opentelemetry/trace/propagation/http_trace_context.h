@@ -23,7 +23,7 @@
 #include "opentelemetry/nostd/string_view.h"
 #include "opentelemetry/nostd/variant.h"
 #include "opentelemetry/trace/default_span.h"
-#include "opentelemetry/trace/propagation/http_text_format.h"
+#include "opentelemetry/trace/propagation/text_map_propagator.h"
 #include "opentelemetry/trace/span.h"
 #include "opentelemetry/trace/span_context.h"
 
@@ -52,7 +52,7 @@ static const int kTraceFlagBytes       = 2;
 //    HttpTraceContext.inject(setter,&carrier,&context);
 //    HttpTraceContext.extract(getter,&carrier,&context);
 template <typename T>
-class HttpTraceContext : public HTTPTextFormat<T>
+class HttpTraceContext : public TextMapPropagator<T>
 {
 public:
   // Rules that manages how context will be extracted from carrier.
