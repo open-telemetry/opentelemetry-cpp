@@ -1,4 +1,4 @@
-// Copyright 2020, OpenTelemetry Authors
+// Copyright 2021, OpenTelemetry Authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -12,9 +12,44 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-ThriftSender::ThriftSender() {}
+#include <opentelemetry/exporters/jaeger/thrift_sender.h>
+#include <opentelemetry/exporters/jaeger/udp_transport.h>
+
+OPENTELEMETRY_BEGIN_NAMESPACE
+namespace exporter
+{
+namespace jaeger
+{
+
+using namespace jaegertracing;
+
+ThriftSender::ThriftSender(std::unique_ptr<Transport> &&transport)
+    : transport_(std::move(transport))
+{
+}
+
 ThriftSender::~ThriftSender() {}
 
-int ThriftSender::Append(std::shared_ptr<thrift::Span> span) {}
+bool ThriftSender::Append(std::unique_ptr<Recordable> &&span) noexcept
+{
+    __debugbreak();
+    if (span == nullptr)
+    {
+        return false;
+    }
 
-int ThriftSender::Flush() {}
+    // spans_.push_back(std::move(span));
+
+    thrift::Batch batch;
+    std::vector<thrift::Span> span_vec;
+    span_vec.push_back(span.release()->span());
+    transport_->EmitBatch(batch);
+    return true;
+}
+
+int ThriftSender::Flush() {return 0;}
+
+}  // namespace jaeger
+}  // namespace exporter
+OPENTELEMETRY_END_NAMESPACE
+

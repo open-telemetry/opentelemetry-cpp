@@ -1,4 +1,4 @@
-// Copyright 2020, OpenTelemetry Authors
+// Copyright 2021, OpenTelemetry Authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -14,8 +14,13 @@
 
 #pragma once
 
-#include <thrift-gen/cpp/agent.h>
+#include <opentelemetry/version.h>
+#include <agent.h>
+#include <memory>
 #include <vector>
+
+#include "recordable.h"
+#include "transport.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace exporter
@@ -23,17 +28,20 @@ namespace exporter
 namespace jaeger
 {
 
+using namespace jaegertracing;
+
 class ThriftSender
 {
 public:
-  ThriftSender();
+  ThriftSender(std::unique_ptr<Transport> &&transport);
   ~ThriftSender();
 
-  int Append(std::shared_ptr<thrift::Span> span);
+  bool Append(std::unique_ptr<Recordable> &&span) noexcept;
   int Flush();
 
 private:
-  std::vector<thrift::Span> _spanBuffer;
+  std::vector<std::unique_ptr<Recordable>> spans_;
+  std::unique_ptr<Transport> transport_;
 };
 
 }  // namespace jaeger

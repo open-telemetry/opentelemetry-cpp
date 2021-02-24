@@ -14,13 +14,17 @@
 
 #pragma once
 
-#include <thrift-gen/cpp/jaeger_types.h>
+#include <opentelemetry/version.h>
+
+#include <jaeger_types.h>
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace exporter
 {
 namespace jaeger
 {
+
+using namespace jaegertracing;
 
 class Transport
 {

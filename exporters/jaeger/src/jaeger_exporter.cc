@@ -1,4 +1,4 @@
-// Copyright 2020, OpenTelemetry Authors
+// Copyright 2021, OpenTelemetry Authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -13,8 +13,10 @@
 // limitations under the License.
 
 #include <opentelemetry/exporters/jaeger/jaeger_exporter.h>
+#include <opentelemetry/exporters/jaeger/thrift_sender.h>
 #include <opentelemetry/exporters/jaeger/recordable.h>
-#include <thrift-gen/cpp/agent_types.h>
+#include <opentelemetry/exporters/jaeger/udp_transport.h>
+#include <agent_types.h>
 
 #include <vector>
 
@@ -31,41 +33,54 @@ JaegerExporter::JaegerExporter(const JaegerExporterOptions &options) : options_(
 
 JaegerExporter::JaegerExporter() : JaegerExporter(JaegerExporterOptions()) {}
 
-std::unique_ptr<std::trace::Recordable> JaegerExporter::MakeRecordable() noexcept
+std::unique_ptr<trace_sdk::Recordable> JaegerExporter::MakeRecordable() noexcept
 {
-  return std::unique_ptr<sdk::trace::Recordable>(new (nothrow) Recordable);
+  return std::unique_ptr<sdk::trace::Recordable>(new Recordable);
 }
 
-std::trace::ExportResult JaegerExporter::Export(
-    const nostd::span<std::unique_ptr<std::trace::Recordable>> &spans) noexcept
+sdk::trace::ExportResult JaegerExporter::Export(
+    const nostd::span<std::unique_ptr<sdk::trace::Recordable>> &spans) noexcept
 {
   if (is_shutdown_)
   {
-    return sdk::trace::ExportResult::kFailuer;
+    return sdk::trace::ExportResult::kFailure;
   }
-  std::vector<thrift::Span> spans{spans};
 
-  thrift::Batch batch;
-  // batch.__set_process(_process);
-  batch.__set_spans(_spanBuffer);
+  for (auto &recordable : spans)
+  {
+      auto rec = std::unique_ptr<Recordable>(static_cast<Recordable *>(recordable.release()));
+      if (rec != nullptr)
+      {
+          sender_->Append(std::move(rec));
+      }
+  }
 
-  sender_.EmitBatch(batch);
+  // thrift::Batch batch;
+
+  // TODO: support process.
+  // batch.__set_process(process);
+  // batch.__set_spans(_span_buffer);
+
+  // sender_.EmitBatch(batch);
 
   return sdk::trace::ExportResult::kSuccess;
 }
 
 void JaegerExporter::InitializeEndpoint()
 {
-  if (options.transport_type == THRIFT_UDP)
+  if (options_.transport_format == TransportFormat::kThriftUdp)
   {
+    auto transport = std::unique_ptr<Transport>(static_cast<Transport*>(new UDPTransport(options_.server_addr, options_.server_port)));
     sender_ =
-        std::unique_ptr<ThriftSender>(new ThriftSender(options.server_addr, options.server_port));
+        std::unique_ptr<ThriftSender>(new ThriftSender(std::move(transport)));
   }
   else
   {
-    static_assert(false, "Unsupported transport type");
+    // The transport format is not implemented.
+    assert(false);
   }
 }
 
 }  // namespace jaeger
 }  // namespace exporter
+OPENTELEMETRY_END_NAMESPACE

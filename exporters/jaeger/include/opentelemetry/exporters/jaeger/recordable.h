@@ -16,19 +16,22 @@
 
 #include <opentelemetry/sdk/trace/recordable.h>
 #include <opentelemetry/version.h>
-#include <thrift-gen/cpp/jaeger_types.h>
+#include <jaeger_types.h>
 
-OPENTELEMETRY_BEGIN_NANESPACE
+OPENTELEMETRY_BEGIN_NAMESPACE
 namespace exporter
 {
 namespace jaeger
 {
+
+using namespace jaegertracing;
+
 class Recordable final : public sdk::trace::Recordable
 {
 public:
   const thrift::Span &span() const noexcept { return span_; }
 
-  voiid SetIds(trace::TraceId trace_id,
+  void SetIds(trace::TraceId trace_id,
                trace::SpanId span_id,
                trace::SpanId parent_span_id) noexcept override;
 
@@ -39,16 +42,18 @@ public:
                 core::SystemTimestamp timestamp,
                 const common::KeyValueIterable &attributes) noexcept override;
 
-  void AddLink(const opentelemetry::trace::SpanContext &span_context const common::KeyValueIterable
+  void AddLink(const opentelemetry::trace::SpanContext &span_context, const common::KeyValueIterable
                    &attributes) noexcept override;
 
-  void SetStatus(trace::CanonicalCode code, nostd::string_view description) noexcept override;
+  void SetStatus(trace::StatusCode code, nostd::string_view description) noexcept override;
 
   void SetName(nostd::string_view name) noexcept override;
 
   void SetStartTime(opentelemetry::core::SystemTimestamp start_time) noexcept override;
 
-  void SetSpanKind(opentelemtry::trace::SpanKind span_kind) noexcept override;
+  void SetSpanKind(opentelemetry::trace::SpanKind span_kind) noexcept override;
+
+  void SetDuration(std::chrono::nanoseconds duration) noexcept override;
 
 private:
   thrift::Span span_;

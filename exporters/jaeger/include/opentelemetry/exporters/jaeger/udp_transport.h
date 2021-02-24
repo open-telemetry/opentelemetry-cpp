@@ -1,5 +1,4 @@
-
-// Copyright 2020, OpenTelemetry Authors
+// Copyright 2021, OpenTelemetry Authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -17,9 +16,14 @@
 
 #include "transport.h"
 
-#include <thrift-gen/cpp/agent.h>
+#include <agent.h>
+#include <thrift/protocol/TBinaryProtocol.h>
+#include <thrift/protocol/TProtocol.h>
+#include <thrift/transport/TBufferTransports.h>
 #include <thrift/transport/TSocket.h>
+#include <thrift/transport/TTransport.h>
 #include <memory>
+#include <string>
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace exporter
@@ -27,12 +31,20 @@ namespace exporter
 namespace jaeger
 {
 
-namespace AgentClient = jagertracing::agent::thrift::AgentClient;
+using AgentClient = jaegertracing::agent::thrift::AgentClient;
+using TBinaryProtocol = apache::thrift::protocol::TBinaryProtocol;
+using TBufferedTransport = apache::thrift::transport::TBufferedTransport;
+using TProtocol = apache::thrift::protocol::TProtocol;
+using TSocket = apache::thrift::transport::TSocket;
+using TTransport = apache::thrift::transport::TTransport;
 
 class UDPTransport : public Transport
 {
-  pubilc : UDPTransport(const std::string &addr, uint16_t port);
-  ~UDPTransport();
+public:
+  // static constexpr int32_t kUdpPacketMaxLength = 65000;
+
+  UDPTransport(const std::string &addr, uint16_t port);
+  virtual ~UDPTransport();
 
   void EmitBatch(const thrift::Batch &batch) override;
 
@@ -40,7 +52,7 @@ private:
   std::unique_ptr<AgentClient> agent_;
   std::shared_ptr<TTransport> socket_;
   std::shared_ptr<TTransport> transport_;
-  std::shared_ptr<TTransport> protocol_;
+  std::shared_ptr<TProtocol> protocol_;
 };
 
 }  // namespace jaeger

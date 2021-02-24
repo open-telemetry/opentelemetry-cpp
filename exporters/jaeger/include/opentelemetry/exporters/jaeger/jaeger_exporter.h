@@ -1,4 +1,4 @@
-// Copyright 2020, OpenTelemetry Authors
+// Copyright 2021, OpenTelemetry Authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -15,17 +15,22 @@
 #pragma once
 
 #include <opentelemetry/sdk/trace/exporter.h>
+#include <chrono>
 #include <memory>
 
-OPENTELEMETRY_BEGIN_NANESPACE
+OPENTELEMETRY_BEGIN_NAMESPACE
 namespace exporter
 {
 namespace jaeger
 {
-enum class TransportType
+enum class TransportFormat
 {
-  THRIFT_UDP,
+  kThriftUdp,
+  kThriftHttp,
+  kProtobufGrpc,
 };
+
+class ThriftSender;
 
 /**
  * Struct to hold Jaeger exporter options.
@@ -34,8 +39,8 @@ struct JaegerExporterOptions
 {
   // The endpoint to export to.
   std::string server_addr      = "localhost";
-  uint16_t server_port         = 9090;
-  TransportType transport_type = THRIFT_UDP;
+  uint16_t server_port         = 6831;
+  TransportFormat transport_format = TransportFormat::kThriftUdp;
 };
 
 namespace trace_sdk = opentelemetry::sdk::trace;
@@ -49,6 +54,17 @@ public:
   JaegerExporter();
 
   /**
+   * Create a JaegerExporter using the given options.
+   */
+  explicit JaegerExporter(const JaegerExporterOptions &options);
+
+  /**
+   * Create a span recordable.
+   * @return a new initialized Recordable object.
+   */
+  std::unique_ptr<trace_sdk::Recordable> MakeRecordable() noexcept override;
+
+  /**
    * Export a batch of spans.
    * @param spans a span of unique pointers to span recordables.
    */
@@ -60,10 +76,11 @@ public:
    * @param timeout an option timeout, default to max.
    */
   bool Shutdown(
-      std::chrono::microseconds timeout = std::chrono::microseconds::max() noexcept override;)
+      std::chrono::microseconds timeout = std::chrono::microseconds::max()) noexcept override
   {
     return true;
   }
+
 
 private:
   void InitializeEndpoint();

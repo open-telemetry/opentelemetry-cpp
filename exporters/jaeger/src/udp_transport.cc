@@ -23,16 +23,17 @@ namespace jaeger
 UDPTransport::UDPTransport(const std::string &addr, uint16_t port)
 {
   socket_    = std::shared_ptr<TTransport>(new TSocket(addr, port));
+  socket_->open();
   transport_ = std::shared_ptr<TTransport>(new TBufferedTransport(socket_));
-  protocol_  = std::shared_ptr<TProtocol>(new TBinaryProtocol(transport));
-  agent_.setProtocol(protocol);
+  protocol_  = std::shared_ptr<TProtocol>(new TBinaryProtocol(transport_));
+  agent_ = std::unique_ptr<AgentClient>(new AgentClient(protocol_));
 }
 
 UDPTransport::~UDPTransport() {}
 
 void UDPTransport::EmitBatch(const thrift::Batch &batch)
 {
-  agent_.emitBatch();
+  agent_->emitBatch(batch);
 }
 
 }  // namespace jaeger

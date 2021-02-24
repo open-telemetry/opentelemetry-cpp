@@ -1,29 +1,27 @@
-# Copyright 2020, OpenTelemetry Authors
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-#     http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
-
 include_directories(include)
+include_directories(thrift-gen)
 
 find_package(Boost REQUIRED)
 find_package(thrift REQUIRED)
+
+if(MSVC)
+    add_definitions(-DNOMINMAX)
+endif()
 
 set(JAEGER_THRIFT_GENCPP_SOURCES
     thrift-gen/Agent.cpp
     thrift-gen/jaeger_types.cpp
     thrift-gen/Collector.cpp
+    thrift-gen/zipkincore_types.cpp
 )
 
-add_library(jaeger_trace_exporter ${JAEGER_THRIFT_GENCPP_SOURCES})
+set(JAEGER_EXPORTER_SOURCES
+    src/jaeger_exporter.cc
+    src/thrift_sender.cc
+    src/udp_transport.cc
+    src/recordable.cc)
+
+add_library(jaeger_trace_exporter ${JAEGER_EXPORTER_SOURCES} ${JAEGER_THRIFT_GENCPP_SOURCES})
 target_link_libraries(jaeger_trace_exporter PRIVATE thrift::thrift Boost::boost)
 
 if(BUILD_TESTING)
