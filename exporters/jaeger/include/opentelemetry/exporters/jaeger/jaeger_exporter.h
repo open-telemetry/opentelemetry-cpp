@@ -38,8 +38,8 @@ class ThriftSender;
 struct JaegerExporterOptions
 {
   // The endpoint to export to.
-  std::string server_addr      = "localhost";
-  uint16_t server_port         = 6831;
+  std::string server_addr          = "localhost";
+  uint16_t server_port             = 6831;
   TransportFormat transport_format = TransportFormat::kThriftUdp;
 };
 
@@ -80,7 +80,6 @@ public:
   {
     return true;
   }
-
 
 private:
   void InitializeEndpoint();

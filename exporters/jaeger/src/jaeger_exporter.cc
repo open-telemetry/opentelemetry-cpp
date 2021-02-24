@@ -12,11 +12,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <opentelemetry/exporters/jaeger/jaeger_exporter.h>
-#include <opentelemetry/exporters/jaeger/thrift_sender.h>
-#include <opentelemetry/exporters/jaeger/recordable.h>
-#include <opentelemetry/exporters/jaeger/udp_transport.h>
 #include <agent_types.h>
+#include <opentelemetry/exporters/jaeger/jaeger_exporter.h>
+#include <opentelemetry/exporters/jaeger/recordable.h>
+#include <opentelemetry/exporters/jaeger/thrift_sender.h>
+#include <opentelemetry/exporters/jaeger/udp_transport.h>
 
 #include <vector>
 
@@ -48,11 +48,11 @@ sdk::trace::ExportResult JaegerExporter::Export(
 
   for (auto &recordable : spans)
   {
-      auto rec = std::unique_ptr<Recordable>(static_cast<Recordable *>(recordable.release()));
-      if (rec != nullptr)
-      {
-          sender_->Append(std::move(rec));
-      }
+    auto rec = std::unique_ptr<Recordable>(static_cast<Recordable *>(recordable.release()));
+    if (rec != nullptr)
+    {
+      sender_->Append(std::move(rec));
+    }
   }
 
   // thrift::Batch batch;
@@ -70,9 +70,9 @@ void JaegerExporter::InitializeEndpoint()
 {
   if (options_.transport_format == TransportFormat::kThriftUdp)
   {
-    auto transport = std::unique_ptr<Transport>(static_cast<Transport*>(new UDPTransport(options_.server_addr, options_.server_port)));
-    sender_ =
-        std::unique_ptr<ThriftSender>(new ThriftSender(std::move(transport)));
+    auto transport = std::unique_ptr<Transport>(
+        static_cast<Transport *>(new UDPTransport(options_.server_addr, options_.server_port)));
+    sender_ = std::unique_ptr<ThriftSender>(new ThriftSender(std::move(transport)));
   }
   else
   {

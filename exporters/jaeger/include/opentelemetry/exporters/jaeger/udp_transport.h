@@ -31,12 +31,12 @@ namespace exporter
 namespace jaeger
 {
 
-using AgentClient = jaegertracing::agent::thrift::AgentClient;
-using TBinaryProtocol = apache::thrift::protocol::TBinaryProtocol;
+using AgentClient        = jaegertracing::agent::thrift::AgentClient;
+using TBinaryProtocol    = apache::thrift::protocol::TBinaryProtocol;
 using TBufferedTransport = apache::thrift::transport::TBufferedTransport;
-using TProtocol = apache::thrift::protocol::TProtocol;
-using TSocket = apache::thrift::transport::TSocket;
-using TTransport = apache::thrift::transport::TTransport;
+using TProtocol          = apache::thrift::protocol::TProtocol;
+using TSocket            = apache::thrift::transport::TSocket;
+using TTransport         = apache::thrift::transport::TTransport;
 
 class UDPTransport : public Transport
 {

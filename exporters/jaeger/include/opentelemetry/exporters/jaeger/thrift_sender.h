@@ -14,8 +14,8 @@
 
 #pragma once
 
-#include <opentelemetry/version.h>
 #include <agent.h>
+#include <opentelemetry/version.h>
 #include <memory>
 #include <vector>
 

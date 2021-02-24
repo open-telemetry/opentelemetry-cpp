@@ -25,31 +25,32 @@ using namespace jaegertracing;
 
 ThriftSender::ThriftSender(std::unique_ptr<Transport> &&transport)
     : transport_(std::move(transport))
-{
-}
+{}
 
 ThriftSender::~ThriftSender() {}
 
 bool ThriftSender::Append(std::unique_ptr<Recordable> &&span) noexcept
 {
-    __debugbreak();
-    if (span == nullptr)
-    {
-        return false;
-    }
+  __debugbreak();
+  if (span == nullptr)
+  {
+    return false;
+  }
 
-    // spans_.push_back(std::move(span));
+  // spans_.push_back(std::move(span));
 
-    thrift::Batch batch;
-    std::vector<thrift::Span> span_vec;
-    span_vec.push_back(span.release()->span());
-    transport_->EmitBatch(batch);
-    return true;
+  thrift::Batch batch;
+  std::vector<thrift::Span> span_vec;
+  span_vec.push_back(span.release()->span());
+  transport_->EmitBatch(batch);
+  return true;
 }
 
-int ThriftSender::Flush() {return 0;}
+int ThriftSender::Flush()
+{
+  return 0;
+}
 
 }  // namespace jaeger
 }  // namespace exporter
 OPENTELEMETRY_END_NAMESPACE
-

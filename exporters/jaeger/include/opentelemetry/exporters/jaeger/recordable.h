@@ -14,9 +14,9 @@
 
 #pragma once
 
+#include <jaeger_types.h>
 #include <opentelemetry/sdk/trace/recordable.h>
 #include <opentelemetry/version.h>
-#include <jaeger_types.h>
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace exporter
@@ -32,8 +32,8 @@ public:
   const thrift::Span &span() const noexcept { return span_; }
 
   void SetIds(trace::TraceId trace_id,
-               trace::SpanId span_id,
-               trace::SpanId parent_span_id) noexcept override;
+              trace::SpanId span_id,
+              trace::SpanId parent_span_id) noexcept override;
 
   void SetAttribute(nostd::string_view key,
                     const opentelemetry::common::AttributeValue &value) noexcept override;
@@ -42,8 +42,8 @@ public:
                 core::SystemTimestamp timestamp,
                 const common::KeyValueIterable &attributes) noexcept override;
 
-  void AddLink(const opentelemetry::trace::SpanContext &span_context, const common::KeyValueIterable
-                   &attributes) noexcept override;
+  void AddLink(const opentelemetry::trace::SpanContext &span_context,
+               const common::KeyValueIterable &attributes) noexcept override;
 
   void SetStatus(trace::StatusCode code, nostd::string_view description) noexcept override;
 
