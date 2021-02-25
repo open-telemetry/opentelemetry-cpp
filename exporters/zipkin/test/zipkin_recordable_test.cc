@@ -98,8 +98,9 @@ TEST(ZipkinSpanRecordable, AddEventDefault)
   uint64_t unix_event_time =
       std::chrono::duration_cast<std::chrono::milliseconds>(event_time.time_since_epoch()).count();
 
-  json j_span = {{"annotations",
-                  {{name, {{"value", nlohmann::json::object()}}}, {"timestamp", unix_event_time}}}};
+  json j_span = {
+      {"annotations",
+       {{{"value", json({{name, json::object()}}).dump()}, {"timestamp", unix_event_time}}}}};
   EXPECT_EQ(rec.span(), j_span);
 }
 
@@ -124,8 +125,8 @@ TEST(ZipkinSpanRecordable, AddEventWithAttributes)
 
   nlohmann::json j_span = {
       {"annotations",
-       {{"Test Event", {{"value", {{"attr1", 4}, {"attr2", 7}, {"attr3", 23}}}}},
-        {"timestamp", unix_event_time}}}};
+       {{{"value", json({{"Test Event", {{"attr1", 4}, {"attr2", 7}, {"attr3", 23}}}}).dump()},
+         {"timestamp", unix_event_time}}}}};
   EXPECT_EQ(rec.span(), j_span);
 }
 

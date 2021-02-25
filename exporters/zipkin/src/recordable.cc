@@ -136,14 +136,22 @@ void Recordable::AddEvent(nostd::string_view name,
                           core::SystemTimestamp timestamp,
                           const common::KeyValueIterable &attributes) noexcept
 {
-  nlohmann::json annotations = nlohmann::json::object();  // empty object
+  nlohmann::json attrs = nlohmann::json::object();  // empty object
   attributes.ForEachKeyValue([&](nostd::string_view key, common::AttributeValue value) noexcept {
-    PopulateAttribute(annotations, key, value);
+    PopulateAttribute(attrs, key, value);
     return true;
   });
-  span_["annotations"][name.data()]["value"] = annotations;
-  span_["annotations"]["timestamp"] =
-      std::chrono::duration_cast<std::chrono::milliseconds>(timestamp.time_since_epoch()).count();
+
+  nlohmann::json annotation = {{"value", nlohmann::json::object({{name.data(), attrs}}).dump()},
+                               {"timestamp", std::chrono::duration_cast<std::chrono::milliseconds>(
+                                                 timestamp.time_since_epoch())
+                                                 .count()}};
+
+  if (!span_.contains("annotations"))
+  {
+    span_["annotations"] = nlohmann::json::array();
+  }
+  span_["annotations"].push_back(annotation);
 }
 
 void Recordable::AddLink(const opentelemetry::trace::SpanContext &span_context,
