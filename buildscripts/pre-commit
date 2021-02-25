@@ -44,9 +44,11 @@ branch="$(git rev-parse --abbrev-ref HEAD)"
 short_version="${major}.${minor}.${patch}"
 full_version="${short_version}-${pre_release}-${build_metadata}-${count_new_commits}-${branch}-${latest_commit_hash}"
 
-#update api version.h
+# Update api version.h
 sed -i "/^\#define OPENTELEMETRY_VERSION/c\#define OPENTELEMETRY_VERSION \"${short_version}\""  "$(pwd)/api/include/opentelemetry/version.h"
-#update sdk version.cc
+git add "$(pwd)/api/include/opentelemetry/version.h"
+
+# Update sdk version.cc
 cat > "$(pwd)/sdk/src/version/version.cc" <<END
 // Please DONOT touch this file.
 // Any changes done here would be overwritten by pre-commit git hook
@@ -74,3 +76,7 @@ namespace version
 OPENTELEMETRY_END_NAMESPACE
 END
 git add "$(pwd)/sdk/src/version/version.cc"
+
+# Update documentation version
+sed -i "/^PROJECT_BRIEF/cPROJECT_BRIEF = \"Version ${short_version}\""  "$(pwd)/api/docs/Doxyfile"
+git add "$(pwd)/api/docs/Doxyfile"
