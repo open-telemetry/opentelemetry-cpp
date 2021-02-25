@@ -5,43 +5,37 @@ namespace sdk
 {
 namespace trace
 {
-TracerProvider::TracerProvider(std::shared_ptr<SpanProcessor> processor,
-                               opentelemetry::sdk::resource::Resource &&resource,
-                               std::shared_ptr<Sampler> sampler) noexcept
-    : processor_{processor},
-      tracer_(new Tracer(std::move(processor), resource, sampler)),
-      sampler_(sampler),
-      resource_(resource)
+TracerProvider::TracerProvider(std::shared_ptr<sdk::trace::TracerContext> context) noexcept
+    : context_{context}, 
+    tracer_(new Tracer(context))
 {}
 
 opentelemetry::nostd::shared_ptr<opentelemetry::trace::Tracer> TracerProvider::GetTracer(
     nostd::string_view library_name,
     nostd::string_view library_version) noexcept
 {
+  // TODO: Instatiate/lookup tracer using an InstrumenationLibrary (name/version).
   return opentelemetry::nostd::shared_ptr<opentelemetry::trace::Tracer>(tracer_);
 }
 
-void TracerProvider::SetProcessor(std::shared_ptr<SpanProcessor> processor) noexcept
+void TracerProvider::SetProcessor(std::unique_ptr<SpanProcessor> processor) noexcept
 {
-  processor_.store(processor);
-
-  auto sdkTracer = static_cast<Tracer *>(tracer_.get());
-  sdkTracer->SetProcessor(processor);
+  return context_->SetProcessor(std::move(processor));
 }
 
-std::shared_ptr<SpanProcessor> TracerProvider::GetProcessor() const noexcept
+SpanProcessor* TracerProvider::GetProcessor() const noexcept
 {
-  return processor_.load();
+  return context_->GetProcessor();
 }
 
-std::shared_ptr<Sampler> TracerProvider::GetSampler() const noexcept
+Sampler* TracerProvider::GetSampler() const noexcept
 {
-  return sampler_;
+  return context_->GetSampler();
 }
 
 const opentelemetry::sdk::resource::Resource &TracerProvider::GetResource() const noexcept
 {
-  return resource_;
+  return context_->GetResource();
 }
 
 bool TracerProvider::Shutdown() noexcept

@@ -10,25 +10,23 @@ namespace sdk
 {
 namespace trace
 {
-Tracer::Tracer(std::shared_ptr<SpanProcessor> processor,
-               const opentelemetry::sdk::resource::Resource &resource,
-               std::shared_ptr<Sampler> sampler) noexcept
-    : processor_{processor}, sampler_{sampler}, resource_{resource}
+Tracer::Tracer(std::shared_ptr<sdk::trace::TracerContext> context) noexcept
+    : context_{context}
 {}
 
-void Tracer::SetProcessor(std::shared_ptr<SpanProcessor> processor) noexcept
+void Tracer::SetProcessor(std::unique_ptr<SpanProcessor> processor) noexcept
 {
-  processor_.store(processor);
+  context_->SetProcessor(std::move(processor));
 }
 
-std::shared_ptr<SpanProcessor> Tracer::GetProcessor() const noexcept
+SpanProcessor* Tracer::GetProcessor() const noexcept
 {
-  return processor_.load();
+  return context_->GetProcessor();
 }
 
-std::shared_ptr<Sampler> Tracer::GetSampler() const noexcept
+Sampler* Tracer::GetSampler() const noexcept
 {
-  return sampler_;
+  return context_->GetSampler();
 }
 
 trace_api::SpanContext GetCurrentSpanContext(const trace_api::SpanContext &explicit_parent)
@@ -61,7 +59,7 @@ nostd::shared_ptr<trace_api::Span> Tracer::StartSpan(
   trace_api::SpanContext parent = GetCurrentSpanContext(options.parent);
 
   auto sampling_result =
-      sampler_->ShouldSample(parent, parent.trace_id(), name, options.kind, attributes, links);
+      GetSampler()->ShouldSample(parent, parent.trace_id(), name, options.kind, attributes, links);
   if (sampling_result.decision == Decision::DROP)
   {
     // Don't allocate a no-op span for every DROP decision, but use a static
@@ -74,8 +72,8 @@ nostd::shared_ptr<trace_api::Span> Tracer::StartSpan(
   else
   {
     auto span = nostd::shared_ptr<trace_api::Span>{
-        new (std::nothrow) Span{this->shared_from_this(), processor_.load(), name, attributes,
-                                links, options, parent, resource_}};
+        new (std::nothrow) Span{this->shared_from_this(), name, attributes,
+                                links, options, parent}};
 
     // if the attributes is not nullptr, add attributes to the span.
     if (sampling_result.attributes)

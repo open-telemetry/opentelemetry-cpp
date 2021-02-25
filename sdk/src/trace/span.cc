@@ -58,16 +58,13 @@ trace_api::SpanId GenerateRandomSpanId()
 }
 
 Span::Span(std::shared_ptr<Tracer> &&tracer,
-           std::shared_ptr<SpanProcessor> processor,
            nostd::string_view name,
            const opentelemetry::common::KeyValueIterable &attributes,
            const trace_api::SpanContextKeyValueIterable &links,
            const trace_api::StartSpanOptions &options,
-           const trace_api::SpanContext &parent_span_context,
-           const opentelemetry::sdk::resource::Resource &resource) noexcept
+           const trace_api::SpanContext &parent_span_context) noexcept
     : tracer_{std::move(tracer)},
-      processor_{processor},
-      recordable_{processor_->MakeRecordable()},
+      recordable_{tracer_->GetProcessor()->MakeRecordable()},
       start_steady_time{options.start_steady_time},
       has_ended_{false}
 {
@@ -114,7 +111,7 @@ Span::Span(std::shared_ptr<Tracer> &&tracer,
   recordable_->SetStartTime(NowOr(options.start_system_time));
   start_steady_time = NowOr(options.start_steady_time);
   // recordable_->SetResource(resource_); TODO
-  processor_->OnStart(*recordable_, parent_span_context);
+  tracer_->GetProcessor()->OnStart(*recordable_, parent_span_context);
 }
 
 Span::~Span()
@@ -201,7 +198,7 @@ void Span::End(const trace_api::EndSpanOptions &options) noexcept
   recordable_->SetDuration(std::chrono::steady_clock::time_point(end_steady_time) -
                            std::chrono::steady_clock::time_point(start_steady_time));
 
-  processor_->OnEnd(std::move(recordable_));
+  tracer_->GetProcessor()->OnEnd(std::move(recordable_));
   recordable_.reset();
 }
 

@@ -19,13 +19,19 @@ namespace trace
  * - A thread-safe class that allows updating/altering processor/exporter pipelines
  *   and sampling config.
  * - The owner/destoryer of Processors/Exporters.  These will remain active until
- *   this class is destroyed.
+ *   this class is destroyed.  I.e. Sampling, Exporting, flushing etc. are all ok if this
+ *   object is alive, and they willl work together.   If this object is destroyed, then
+ *   no shared references to Processor, Exporter, Recordable etc. should exist, and all
+ *   associated pipelines will have been flushed.
+ * 
+ * 
+ * TODOs - This should allow more than one processor pipeline to be attached.
  */
 class TracerContext
 {
 public:
   explicit TracerContext(std::unique_ptr<SpanProcessor> processor,
-                         opentelemetry::sdk::resource::Resource &&resource =
+                         opentelemetry::sdk::resource::Resource resource =
                              opentelemetry::sdk::resource::Resource::Create({}),
                          std::unique_ptr<Sampler> sampler =
                              std::unique_ptr<AlwaysOnSampler>(new AlwaysOnSampler)) noexcept;
@@ -41,7 +47,7 @@ public:
    * @param processor The new span processor for this tracer. This must not be
    * a nullptr.
    */
-  void SetProcessor(std::unique_ptr<SpanProcessor> &&processor) noexcept;
+  void SetProcessor(std::unique_ptr<SpanProcessor> processor) noexcept;
 
   /**
    * Obtain the sampler associated with this tracer.
@@ -59,8 +65,8 @@ public:
 
 private:
   opentelemetry::sdk::common::AtomicUniquePtr<SpanProcessor> processor_;
-  opentelemetry::sdk::common::AtomicUniquePtr<Sampler> sampler_;
   opentelemetry::sdk::resource::Resource resource_;
+  opentelemetry::sdk::common::AtomicUniquePtr<Sampler> sampler_;
 };
 }  // namespace trace
 }  // namespace sdk

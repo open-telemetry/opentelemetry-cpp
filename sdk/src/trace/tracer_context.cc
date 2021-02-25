@@ -8,9 +8,9 @@ namespace trace
 {
 
 TracerContext::TracerContext(std::unique_ptr<SpanProcessor> processor,
-                             opentelemetry::sdk::resource::Resource &&resource,
+                             opentelemetry::sdk::resource::Resource resource,
                              std::unique_ptr<Sampler> sampler) noexcept
-    : processor_(std::move(processor)), sampler_(std::move(sampler)), resource_(resource)
+    : processor_(std::move(processor)), resource_(resource), sampler_(std::move(sampler))
 {}
 
 SpanProcessor *TracerContext::GetProcessor() const noexcept
@@ -28,7 +28,7 @@ const opentelemetry::sdk::resource::Resource &TracerContext::GetResource() const
   return resource_;
 }
 
-void TracerContext::SetProcessor(std::unique_ptr<SpanProcessor> &&processor) noexcept
+void TracerContext::SetProcessor(std::unique_ptr<SpanProcessor> processor) noexcept
 {
   processor_.Reset(processor.release());
 }

@@ -102,8 +102,8 @@ private:
   trace_api::TraceId trace_id_;
   trace_api::SpanId span_id_;
   trace_api::TraceFlags trace_flags_;
-  nostd::shared_ptr<trace_api::TraceState> trace_state_;
   bool is_remote_ = false;
+  nostd::shared_ptr<trace_api::TraceState> trace_state_;
 };
 }  // namespace trace
 OPENTELEMETRY_END_NAMESPACE
