@@ -4,21 +4,22 @@ Standard Library build flavor works best for statically linking the SDK in a
 process (environment where ABI compat is not a requirement), or for
 "header-only" implementation of SDK.
 
-Proposed approach cannot be employed for shared libs in environments where
-ABI compatibility is required. OpenTelemetry SDK binary compiled with
-`compiler A + STL B` will not be ABI -compatible with the main executable
-compiled with `compiler C + STL D`.
+Proposed approach cannot be employed for shared libs in environments where ABI
+compatibility is required. OpenTelemetry SDK binary compiled with `compiler A +
+STL B` will not be ABI -compatible with the main executable compiled with
+`compiler C + STL D`.
 
-In addition to standard library, similar approach can be reused to implement
-the API surface classes with [Abseil classes](https://abseil.io/) instead of
+In addition to standard library, similar approach can be reused to implement the
+API surface classes with [Abseil classes](https://abseil.io/) instead of
 `nostd`, in products that prefer Abseil.
 
 ## Motivation
 
 `nostd` classes in OpenTelemetry API were introduced for the following reasons:
-- ABI stability: scenario where different modules are compiled with different
-compiler and incompatible standard library.
-- backport of C++17 and above features to C++11 compiler.
+
+* ABI stability: scenario where different modules are compiled with different
+  compiler and incompatible standard library.
+* backport of C++17 and above features to C++11 compiler.
 
 The need for custom `nostd` classes is significantly diminished when the SDK is
 compiled with C++17 or above compiler. Only `std::span` needs to be backported.
@@ -30,33 +31,35 @@ is the case when SDK is compiled into product itself, with no runtime loadable
 components.
 
 Compiling OpenTelemetry SDK from source using standard library classes:
-`std::map`, `std::string_view`, `std::span`, `std::variant`
-instead of `nostd::` yields better performance and debugability at expense
-of potentially losing ABI compatibility. However, the standard library built
-for Release is guaranteed to be compatible across Visual Studio 2015, 2017 and
-2019 compilers on Windows with vc14x runtime. Thus, ABI stability requirement
-introduces an additional unnecessary runtime complexity and overhead.
+`std::map`, `std::string_view`, `std::span`, `std::variant` instead of `nostd::`
+yields better performance and debugability at expense of potentially losing ABI
+compatibility. However, the standard library built for Release is guaranteed to
+be compatible across Visual Studio 2015, 2017 and 2019 compilers on Windows with
+vc14x runtime. Thus, ABI stability requirement introduces an additional
+unnecessary runtime complexity and overhead.
 
 While we are committed to support `nostd` classes for those environments where
 ABI compatibility is a requirement, we would also like to add flexibility to
-build system to optimize the SDK for the case where ABI compatibility is NOT
-a requirement.
+build system to optimize the SDK for the case where ABI compatibility is NOT a
+requirement.
 
 Implementation of this feature can be subsequently be used as a foundation for
 further work - allow bindings to [Abseil](https://github.com/abseil/abseil-cpp)
 "backport" implementation of the standard library.
 
 Implementation is completely opaque from SDK code / SDK developer perspective:
-mapping / aliasing from `nostd::` classes back to their `std::` counterparts
-is done in a corresponding `opentelemetry/nostd/*.h` header. Users still use
+mapping / aliasing from `nostd::` classes back to their `std::` counterparts is
+done in a corresponding `opentelemetry/nostd/*.h` header. Users still use
 `nostd` classes, but the most optimal implementation is picked up depending on
 whether users require ABI stability or not.
 
 Example environments that contain the full set of standard classes:
-- C++17 or above compiler, with Microsoft GSL backport of `gsl::span`
-- C++20 compilers: Visual Studio 2019+, latest LLVM clang, latest gcc
 
-We continue fully supporting both models (`nostd`, `stdlib`) by running CI for both.
+* C++17 or above compiler, with Microsoft GSL backport of `gsl::span`
+* C++20 compilers: Visual Studio 2019+, latest LLVM clang, latest gcc
+
+We continue fully supporting both models (`nostd`, `stdlib`) by running CI for
+both.
 
 ## Implementation
 
@@ -64,17 +67,18 @@ Allow to alias from `nostd::` to `std::` classes for C++17 and above.
 
 Consistent handling of `std::variant` across various OS:
 
-- backport of a few missing variant features, e.g. `std::get` and `std::visit`
+* backport of a few missing variant features, e.g. `std::get` and `std::visit`
   for older version of Mac OS X. Patches that enable proper handling of
-  `std::visit` and `std::variant` irrespective of OS version to resolve
-  [this quirk](https://stackoverflow.com/questions/52310835/xcode-10-call-to-unavailable-function-stdvisit).
+  `std::visit` and `std::variant` irrespective of OS version to resolve [this
+  quirk](https://stackoverflow.com/questions/52310835/xcode-10-call-to-unavailable-function-stdvisit).
 
-- ability to borrow implementation of C++20 `gsl::span` from
-  [Microsoft Guidelines Support Library](https://github.com/microsoft/GSL).
-  This is necessary for C++17 and above compiler.
+* ability to borrow implementation of C++20 `gsl::span` from [Microsoft
+  Guidelines Support Library](https://github.com/microsoft/GSL). This is
+  necessary for C++17 and above compiler.
 
-- ability to use Abseil classes for Visual Studio 2015 :`nostd::variant` does
-  not compile with Visual Studio 2010. Please refer to [this issue](https://github.com/open-telemetry/opentelemetry-cpp/issues/314)
+* ability to use Abseil classes for Visual Studio 2015 :`nostd::variant` does
+  not compile with Visual Studio 2010. Please refer to [this
+  issue](https://github.com/open-telemetry/opentelemetry-cpp/issues/314)
 
 ## Pros and Cons
 
@@ -89,11 +93,11 @@ runtime-checks for Debug builds that use Standard containers.
 
 ### Minimizing binary size
 
-No need to marshal types from standard to `nostd`, then back to standard
-library across ABI boundary - means less code involved and less memcpy. We use
-Standard Library classes used elsewhere in the app. We can optimize the
-event passing by avoiding `KeyValueIterable` transform (and, thus, unnecessary memcpy)
-when we know that the incoming container type matches that one used by SDK.
+No need to marshal types from standard to `nostd`, then back to standard library
+across ABI boundary - means less code involved and less memcpy. We use Standard
+Library classes used elsewhere in the app. We can optimize the event passing by
+avoiding `KeyValueIterable` transform (and, thus, unnecessary memcpy) when we
+know that the incoming container type matches that one used by SDK.
 
 ### Avoiding unnecessary extra memcpy (perf improvements)
 
@@ -116,32 +120,35 @@ older runtime library. In this case the SDK must be compiled with `nostd`.
 Note that for most scenarios with modern Windows compilers, STL library is
 ABI-safe across Visual Studio 2015, 2017 and 2019 with vc14x runtime.
 
-Quote from [official documentation](https://docs.microsoft.com/en-us/cpp/porting/binary-compat-2015-2017?view=msvc-160) :
+Quote from [official
+documentation](https://docs.microsoft.com/en-us/cpp/porting/binary-compat-2015-2017?view=msvc-160)
+:
 
 Visual Studio 2015, 2017, and 2019: the runtime libraries and apps compiled by
 any of these versions of the compiler are binary-compatible. It's reflected in
 the C++ toolset major number, which is 14 for all three versions. The toolset
-version is v140 for Visual Studio 2015, v141 for 2017, and v142 for 2019.
-Say you have third-party libraries built by Visual Studio 2015. You can still
-use them in an application built by Visual Studio 2017 or 2019. There's no need
-to recompile with a matching toolset. The latest version of the Microsoft Visual
+version is v140 for Visual Studio 2015, v141 for 2017, and v142 for 2019. Say
+you have third-party libraries built by Visual Studio 2015. You can still use
+them in an application built by Visual Studio 2017 or 2019. There's no need to
+recompile with a matching toolset. The latest version of the Microsoft Visual
 C++ Redistributable package (the Redistributable) works for all of them.
 
 Visual Studio provides 1st class debug experience for the standard library.
+
 ## Build and Test considerations
 
 ### Separate flavors of SDK build
 
 Supported build flavors:
 
-- `nostd` - OpenTelemetry backport of classes for C++11. Not using standard lib.
-- `stdlib`   - Standard Library. Full native experience with C++20 compiler.
-  C++17 works but with additional dependencies, e.g. either MS-GSL or Abseil
-  for `std::span` implementation (`gsl::span` or `absl::Span`).
-- `absl`  - TODO: this should allow using Abseil C++ library only (no MS-GSL).
+* `nostd` - OpenTelemetry backport of classes for C++11. Not using standard lib.
+* `stdlib`   - Standard Library. Full native experience with C++20 compiler.
+  C++17 works but with additional dependencies, e.g. either MS-GSL or Abseil for
+  `std::span` implementation (`gsl::span` or `absl::Span`).
+* `absl`  - TODO: this should allow using Abseil C++ library only (no MS-GSL).
 
-Currently only `nostd` and `stdlib` configurations are implemented in CMake build.
-`absl` is reserved for future use. Build systems other than CMake need to
+Currently only `nostd` and `stdlib` configurations are implemented in CMake
+build. `absl` is reserved for future use. Build systems other than CMake need to
 `#define HAVE_CPP_STDLIB` to enable the Standard Library classes.
 
 ### Build matrix
@@ -160,24 +167,25 @@ gcc-9+             | C++20             |
 
 C++20 `std::span` -compatible implementation is needed for C++17 compilers.
 
-Other modern C++ language features used by OpenTelemetry, e.g. `std::string_view`
-and `std::variant` are available in C++17 standard library. Minor customization
-needed for Apple LLVM clang in `std::variant` exception handling due to the fact
-that the variant exception handler presence depends on what OS version developer
-is targeting. This exception on Apple systems is implemented inside the OS system
-library. This idiosyncrasy is now handled by OpenTelemetry API in opaque manner:
-support `nostd::variant` exception handling even on older Mac OS X and iOS by
-providing implementation of it in OpenTelemetry SDK: if exceptions are enabled,
-then throw `nostd::bad_variant_access` exception old OS where `std::bad_variant_access`
-is unavailable.
+Other modern C++ language features used by OpenTelemetry, e.g.
+`std::string_view` and `std::variant` are available in C++17 standard library.
+Minor customization needed for Apple LLVM clang in `std::variant` exception
+handling due to the fact that the variant exception handler presence depends on
+what OS version developer is targeting. This exception on Apple systems is
+implemented inside the OS system library. This idiosyncrasy is now handled by
+OpenTelemetry API in opaque manner: support `nostd::variant` exception handling
+even on older Mac OS X and iOS by providing implementation of it in
+OpenTelemetry SDK: if exceptions are enabled, then throw
+`nostd::bad_variant_access` exception old OS where `std::bad_variant_access` is
+unavailable.
 
 #### Note on `gsl::span` vs `absl::Span`
 
 It is important to note that, while `absl::Span` is similar in design and
 purpose to the `std::span` (and existing `gsl::span` reference implementation),
 `absl::Span` is not currently guaranteeing to be a drop-in replacement for any
-eventual standard. Instead, `absl::Span` aims to have an interface as similar
-as possible to `absl::string_view`, without the string-specific functionality.
+eventual standard. Instead, `absl::Span` aims to have an interface as similar as
+possible to `absl::string_view`, without the string-specific functionality.
 
 Thus, OpenTelemetry built with standard library prefers `gsl::span` as it is
 fully compatible with standard `std::span`. It may become possible to use Abseil

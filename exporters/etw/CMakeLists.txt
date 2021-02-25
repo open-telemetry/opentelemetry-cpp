@@ -1,4 +1,5 @@
-include_directories(include)
+include_directories(include
+                    ${CMAKE_SOURCE_DIR}/third_party/nlohmann-json/include)
 
 if(BUILD_TESTING)
   add_executable(etw_provider_test test/etw_provider_test.cc)
