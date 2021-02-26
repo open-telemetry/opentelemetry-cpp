@@ -51,7 +51,7 @@ bool TracerProvider::Shutdown() noexcept
 
 bool TracerProvider::ForceFlush(std::chrono::microseconds timeout) noexcept
 {
-  return GetProcessor()->Shutdown(timeout);
+  return GetProcessor()->ForceFlush(timeout);
 }
 }  // namespace trace
 }  // namespace sdk
