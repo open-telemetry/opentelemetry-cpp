@@ -15,8 +15,7 @@ void initTracer()
   auto processor = std::shared_ptr<sdktrace::SpanProcessor>(
       new sdktrace::SimpleSpanProcessor(std::move(exporter)));
   auto provider = nostd::shared_ptr<opentelemetry::trace::TracerProvider>(
-      new sdktrace::TracerProvider(processor, opentelemetry::sdk::resource::Resource::Create({}),
-                                   std::make_shared<opentelemetry::sdk::trace::AlwaysOnSampler>()));
+      new sdktrace::TracerProvider(processor));
 
   // Set the global trace provider
   opentelemetry::trace::Provider::SetTracerProvider(provider);

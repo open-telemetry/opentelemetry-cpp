@@ -1,5 +1,6 @@
 #pragma once
 
+#include "opentelemetry/sdk/common/atomic_shared_ptr.h"
 #include "opentelemetry/sdk/common/atomic_unique_ptr.h"
 #include "opentelemetry/sdk/resource/resource.h"
 #include "opentelemetry/sdk/trace/processor.h"
@@ -30,7 +31,7 @@ namespace trace
 class TracerContext
 {
 public:
-  explicit TracerContext(std::unique_ptr<SpanProcessor> processor,
+  explicit TracerContext(std::shared_ptr<SpanProcessor> processor,
                          opentelemetry::sdk::resource::Resource resource =
                              opentelemetry::sdk::resource::Resource::Create({}),
                          std::unique_ptr<Sampler> sampler =
@@ -47,7 +48,7 @@ public:
    * @param processor The new span processor for this tracer. This must not be
    * a nullptr.
    */
-  void SetProcessor(std::unique_ptr<SpanProcessor> processor) noexcept;
+  void SetProcessor(std::shared_ptr<SpanProcessor> processor) noexcept;
 
   /**
    * Obtain the sampler associated with this tracer.
@@ -64,7 +65,10 @@ public:
   void ForceFlushWithMicroseconds(uint64_t timeout) noexcept;
 
 private:
-  opentelemetry::sdk::common::AtomicUniquePtr<SpanProcessor> processor_;
+  // Note:  Currently Z-Pages Exporter relies on sharing processor w/ HTTP server.
+  // Likely this should be decoupled going forward, for cleaner shutdown semantics
+  // and ownership on pipelines.
+  opentelemetry::sdk::AtomicSharedPtr<SpanProcessor> processor_;
   opentelemetry::sdk::resource::Resource resource_;
   opentelemetry::sdk::common::AtomicUniquePtr<Sampler> sampler_;
 };

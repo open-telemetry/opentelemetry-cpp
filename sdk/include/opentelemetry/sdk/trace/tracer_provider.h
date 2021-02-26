@@ -7,6 +7,7 @@
 #include "opentelemetry/nostd/shared_ptr.h"
 #include "opentelemetry/sdk/resource/resource.h"
 #include "opentelemetry/sdk/trace/processor.h"
+#include "opentelemetry/sdk/trace/samplers/always_on.h"
 #include "opentelemetry/sdk/trace/tracer.h"
 #include "opentelemetry/sdk/trace/tracer_context.h"
 #include "opentelemetry/trace/tracer_provider.h"
@@ -25,6 +26,16 @@ public:
    * not be a nullptr.
    * @param sampler The sampler for this tracer provider. This must
    * not be a nullptr.
+   */
+  explicit TracerProvider(std::shared_ptr<SpanProcessor> processor,
+                         opentelemetry::sdk::resource::Resource resource =
+                             opentelemetry::sdk::resource::Resource::Create({}),
+                         std::unique_ptr<Sampler> sampler =
+                             std::unique_ptr<AlwaysOnSampler>(new AlwaysOnSampler)) noexcept;
+
+  /**
+   * Initialize a new tracer provider with a specified context
+   * @param context The shared tracer configuraiton/pipeline for this provider.
    */
   explicit TracerProvider(
       std::shared_ptr<sdk::trace::TracerContext> context) noexcept;

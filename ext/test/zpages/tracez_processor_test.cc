@@ -177,8 +177,8 @@ protected:
   {
     processor     = std::shared_ptr<TracezSpanProcessor>(new TracezSpanProcessor());
     auto resource = opentelemetry::sdk::resource::Resource::Create({});
-
-    tracer     = std::shared_ptr<opentelemetry::trace::Tracer>(new Tracer(processor, resource));
+    auto context  = std::make_shared<TracerContext>(processor, resource);
+    tracer     = std::shared_ptr<opentelemetry::trace::Tracer>(new Tracer(context));
     auto spans = processor->GetSpanSnapshot();
     running    = spans.running;
     completed  = std::move(spans.completed);

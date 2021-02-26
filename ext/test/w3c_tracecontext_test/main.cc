@@ -40,8 +40,9 @@ void initTracer()
       new opentelemetry::exporter::trace::OStreamSpanExporter);
   auto processor = std::shared_ptr<sdktrace::SpanProcessor>(
       new sdktrace::SimpleSpanProcessor(std::move(exporter)));
+  auto context = std::make_shared<sdktrace::TracerContext>(processor);
   auto provider = nostd::shared_ptr<opentelemetry::trace::TracerProvider>(
-      new sdktrace::TracerProvider(processor));
+      new sdktrace::TracerProvider(context));
   // Set the global trace provider
   opentelemetry::trace::Provider::SetTracerProvider(provider);
 }
