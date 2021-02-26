@@ -1,6 +1,6 @@
 add_library(
   opentelemetry_trace
-  tracer_provider.cc 
+  tracer_provider.cc
   tracer.cc
   span.cc
   batch_span_processor.cc
