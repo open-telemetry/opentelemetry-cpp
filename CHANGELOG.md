@@ -15,6 +15,9 @@ Increment the:
 
 ## [Unreleased]
 
+* Added TracerContext to so Tracer and TracerProvider share SDK configuraiton and
+  updates to exporters apply to all tracers #590
+
 ## [0.0.1] 2020-12-16
 
 ### Added

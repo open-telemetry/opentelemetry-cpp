@@ -19,7 +19,7 @@ namespace trace
  * - A shared reference between TracerProvider and Tracers instantiated.
  * - A thread-safe class that allows updating/altering processor/exporter pipelines
  *   and sampling config.
- * - The owner/destoryer of Processors/Exporters.  These will remain active until
+ * - The owner/destroyer of Processors/Exporters.  These will remain active until
  *   this class is destroyed.  I.e. Sampling, Exporting, flushing etc. are all ok if this
  *   object is alive, and they willl work together.   If this object is destroyed, then
  *   no shared references to Processor, Exporter, Recordable etc. should exist, and all
@@ -37,7 +37,7 @@ public:
                          std::unique_ptr<Sampler> sampler =
                              std::unique_ptr<AlwaysOnSampler>(new AlwaysOnSampler)) noexcept;
   /**
-   * Obtain the span processor assocaited with this tracer context.
+   * Obtain the span processor associated with this tracer context.
    * <p>
    * This does NOT give ownership to the caller and must be used within the lifecycle of
    * a shared `TracerContext` object.
