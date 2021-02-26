@@ -11,7 +11,7 @@
 #include "opentelemetry/nostd/string_view.h"
 #include "opentelemetry/nostd/variant.h"
 #include "opentelemetry/trace/default_span.h"
-#include "opentelemetry/trace/propagation/http_text_format.h"
+#include "opentelemetry/trace/propagation/text_map_propagator.h"
 #include "opentelemetry/trace/span.h"
 #include "opentelemetry/trace/span_context.h"
 
@@ -46,7 +46,7 @@ static const int kTraceFlagHexStrLength = 1;
 // providing the object containing the headers, and a getter function for the extraction. Based on:
 // https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/context/api-propagators.md#b3-extract
 template <typename T>
-class B3PropagatorExtractor : public HTTPTextFormat<T>
+class B3PropagatorExtractor : public TextMapPropagator<T>
 {
 public:
   // Rules that manages how context will be extracted from carrier.

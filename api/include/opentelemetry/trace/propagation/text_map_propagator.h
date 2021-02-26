@@ -11,13 +11,13 @@ namespace trace
 namespace propagation
 {
 
-// The HTTPTextFormat class provides an interface that enables extracting and injecting
-// context into headers of HTTP requests. HTTP frameworks and clients
-// can integrate with HTTPTextFormat by providing the object containing the
+// The TextMapPropagator class provides an interface that enables extracting and injecting
+// context into carriers that travel in-band across process boundaries. HTTP frameworks and clients
+// can integrate with TextMapPropagator by providing the object containing the
 // headers, and a getter and setter function for the extraction and
 // injection of values, respectively.
 template <typename T>
-class HTTPTextFormat
+class TextMapPropagator
 {
 public:
   // Rules that manages how context will be extracted from carrier.
@@ -28,12 +28,12 @@ public:
                           nostd::string_view trace_type,
                           nostd::string_view trace_description);
 
-  // Returns the context that is stored in the HTTP header carrier with the getter as extractor.
+  // Returns the context that is stored in the carrier with the getter as extractor.
   virtual context::Context Extract(Getter get_from_carrier,
                                    const T &carrier,
                                    context::Context &context) noexcept = 0;
 
-  // Sets the context for a HTTP header carrier with self defined rules.
+  // Sets the context for carrier with self defined rules.
   virtual void Inject(Setter set_from_carrier,
                       T &carrier,
                       const context::Context &context) noexcept = 0;

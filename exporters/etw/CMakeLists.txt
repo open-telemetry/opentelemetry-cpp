@@ -1,4 +1,5 @@
-include_directories(include)
+include_directories(include
+                    ${CMAKE_SOURCE_DIR}/third_party/nlohmann-json/include)
 
 add_library(opentelemetry_exporter_etw_provider src/etw_provider_exporter.cc)
 add_library(opentelemetry_exporter_etw_tracer src/etw_tracer_exporter.cc)

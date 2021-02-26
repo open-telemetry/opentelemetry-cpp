@@ -331,6 +331,19 @@ jobs:
       with:
         file: /home/runner/build/coverage.info
 
+  markdown-lint:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: check out code
+      uses: actions/checkout@v2
+
+    - name: install markdownlint-cli
+      run: sudo npm install -g markdownlint-cli
+
+    - name: run markdownlint
+      run: markdownlint .
+
   misspell:
     runs-on: ubuntu-latest
     steps:
