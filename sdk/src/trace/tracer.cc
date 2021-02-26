@@ -10,21 +10,19 @@ namespace sdk
 {
 namespace trace
 {
-Tracer::Tracer(std::shared_ptr<sdk::trace::TracerContext> context) noexcept
-    : context_{context}
-{}
+Tracer::Tracer(std::shared_ptr<sdk::trace::TracerContext> context) noexcept : context_{context} {}
 
 void Tracer::SetProcessor(std::unique_ptr<SpanProcessor> processor) noexcept
 {
   context_->SetProcessor(std::move(processor));
 }
 
-SpanProcessor* Tracer::GetProcessor() const noexcept
+SpanProcessor *Tracer::GetProcessor() const noexcept
 {
   return context_->GetProcessor();
 }
 
-Sampler* Tracer::GetSampler() const noexcept
+Sampler *Tracer::GetSampler() const noexcept
 {
   return context_->GetSampler();
 }
@@ -71,9 +69,8 @@ nostd::shared_ptr<trace_api::Span> Tracer::StartSpan(
   }
   else
   {
-    auto span = nostd::shared_ptr<trace_api::Span>{
-        new (std::nothrow) Span{this->shared_from_this(), name, attributes,
-                                links, options, parent}};
+    auto span = nostd::shared_ptr<trace_api::Span>{new (std::nothrow) Span{
+        this->shared_from_this(), name, attributes, links, options, parent}};
 
     // if the attributes is not nullptr, add attributes to the span.
     if (sampling_result.attributes)

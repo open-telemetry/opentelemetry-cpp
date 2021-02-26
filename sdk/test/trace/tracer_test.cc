@@ -47,22 +47,22 @@ public:
 
 namespace
 {
-std::shared_ptr<opentelemetry::trace::Tracer> initTracer(
-    std::unique_ptr<SpanExporter> &&exporter)
+std::shared_ptr<opentelemetry::trace::Tracer> initTracer(std::unique_ptr<SpanExporter> &&exporter)
 {
   auto processor = std::unique_ptr<SpanProcessor>(new SimpleSpanProcessor(std::move(exporter)));
-  auto context = std::make_shared<TracerContext>(std::move(processor));
+  auto context   = std::make_shared<TracerContext>(std::move(processor));
   return std::shared_ptr<opentelemetry::trace::Tracer>(new Tracer(context));
 }
 
 std::shared_ptr<opentelemetry::trace::Tracer> initTracer(
     std::unique_ptr<SpanExporter> &&exporter,
     // For testing, just shove a pointer over, we'll take it over.
-    Sampler* sampler)
+    Sampler *sampler)
 {
   auto processor = std::unique_ptr<SpanProcessor>(new SimpleSpanProcessor(std::move(exporter)));
   auto resource  = Resource::Create({});
-  auto context = std::make_shared<TracerContext>(std::move(processor), resource, std::unique_ptr<Sampler>(sampler));
+  auto context   = std::make_shared<TracerContext>(std::move(processor), resource,
+                                                 std::unique_ptr<Sampler>(sampler));
   return std::shared_ptr<opentelemetry::trace::Tracer>(new Tracer(context));
 }
 }  // namespace
@@ -458,8 +458,7 @@ TEST(Tracer, TestParentBasedSampler)
   std::unique_ptr<InMemorySpanExporter> exporter(new InMemorySpanExporter());
   std::shared_ptr<InMemorySpanData> span_data_parent_on = exporter->GetData();
   auto tracer_parent_on =
-      initTracer(std::move(exporter),
-                 new ParentBasedSampler(std::make_shared<AlwaysOnSampler>()));
+      initTracer(std::move(exporter), new ParentBasedSampler(std::make_shared<AlwaysOnSampler>()));
 
   auto span_parent_on_1 = tracer_parent_on->StartSpan("span 1");
   auto span_parent_on_2 = tracer_parent_on->StartSpan("span 2");
@@ -478,9 +477,8 @@ TEST(Tracer, TestParentBasedSampler)
   // so this sampler will work as an AlwaysOnSampler.
   std::unique_ptr<InMemorySpanExporter> exporter2(new InMemorySpanExporter());
   std::shared_ptr<InMemorySpanData> span_data_parent_off = exporter2->GetData();
-  auto tracer_parent_off =
-      initTracer(std::move(exporter2),
-                 new ParentBasedSampler(std::make_shared<AlwaysOffSampler>()));
+  auto tracer_parent_off                                 = initTracer(std::move(exporter2),
+                                      new ParentBasedSampler(std::make_shared<AlwaysOffSampler>()));
 
   auto span_parent_off_1 = tracer_parent_off->StartSpan("span 1");
   auto span_parent_off_2 = tracer_parent_off->StartSpan("span 2");

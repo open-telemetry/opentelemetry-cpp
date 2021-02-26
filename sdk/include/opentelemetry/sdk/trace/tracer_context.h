@@ -24,8 +24,8 @@ namespace trace
  *   object is alive, and they willl work together.   If this object is destroyed, then
  *   no shared references to Processor, Exporter, Recordable etc. should exist, and all
  *   associated pipelines will have been flushed.
- * 
- * 
+ *
+ *
  * TODOs - This should allow more than one processor pipeline to be attached.
  */
 class TracerContext

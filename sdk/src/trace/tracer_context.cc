@@ -7,7 +7,6 @@ namespace sdk
 namespace trace
 {
 
-
 TracerContext::TracerContext(std::shared_ptr<SpanProcessor> processor,
                              opentelemetry::sdk::resource::Resource resource,
                              std::unique_ptr<Sampler> sampler) noexcept

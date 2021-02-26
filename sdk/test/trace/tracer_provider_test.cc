@@ -32,9 +32,8 @@ TEST(TracerProvider, GetTracer)
   ASSERT_EQ(tp1.GetProcessor(), sdkTracer1->GetProcessor());
   ASSERT_EQ("AlwaysOnSampler", sdkTracer1->GetSampler()->GetDescription());
   TracerProvider tp2(std::make_shared<TracerContext>(
-    std::unique_ptr<SpanProcessor>(new SimpleSpanProcessor(nullptr)), 
-    Resource::Create({}),
-    std::unique_ptr<Sampler>(new AlwaysOffSampler())));
+      std::unique_ptr<SpanProcessor>(new SimpleSpanProcessor(nullptr)), Resource::Create({}),
+      std::unique_ptr<Sampler>(new AlwaysOffSampler())));
   auto sdkTracer2 = dynamic_cast<Tracer *>(tp2.GetTracer("test").get());
   ASSERT_EQ("AlwaysOffSampler", sdkTracer2->GetSampler()->GetDescription());
 }
@@ -58,8 +57,9 @@ TEST(TracerProvider, GetSampler)
 
   // Create a TracerProvicer with a custom AlwaysOffSampler.
   std::unique_ptr<SpanProcessor> processor2(new SimpleSpanProcessor(nullptr));
-  TracerProvider tp2(std::make_shared<TracerContext>(std::move(processor2), Resource::Create({}), 
-  std::unique_ptr<Sampler>(new AlwaysOffSampler())));
+  TracerProvider tp2(
+      std::make_shared<TracerContext>(std::move(processor2), Resource::Create({}),
+                                      std::unique_ptr<Sampler>(new AlwaysOffSampler())));
   auto t3 = tp2.GetSampler();
 
   ASSERT_EQ("AlwaysOffSampler", t3->GetDescription());

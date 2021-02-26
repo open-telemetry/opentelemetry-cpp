@@ -28,17 +28,16 @@ public:
    * not be a nullptr.
    */
   explicit TracerProvider(std::shared_ptr<SpanProcessor> processor,
-                         opentelemetry::sdk::resource::Resource resource =
-                             opentelemetry::sdk::resource::Resource::Create({}),
-                         std::unique_ptr<Sampler> sampler =
-                             std::unique_ptr<AlwaysOnSampler>(new AlwaysOnSampler)) noexcept;
+                          opentelemetry::sdk::resource::Resource resource =
+                              opentelemetry::sdk::resource::Resource::Create({}),
+                          std::unique_ptr<Sampler> sampler =
+                              std::unique_ptr<AlwaysOnSampler>(new AlwaysOnSampler)) noexcept;
 
   /**
    * Initialize a new tracer provider with a specified context
    * @param context The shared tracer configuraiton/pipeline for this provider.
    */
-  explicit TracerProvider(
-      std::shared_ptr<sdk::trace::TracerContext> context) noexcept;
+  explicit TracerProvider(std::shared_ptr<sdk::trace::TracerContext> context) noexcept;
 
   opentelemetry::nostd::shared_ptr<opentelemetry::trace::Tracer> GetTracer(
       nostd::string_view library_name,
@@ -55,13 +54,13 @@ public:
    * Obtain the span processor associated with this tracer provider.
    * @return The span processor for this tracer provider.
    */
-  SpanProcessor* GetProcessor() const noexcept;
+  SpanProcessor *GetProcessor() const noexcept;
 
   /**
    * Obtain the sampler associated with this tracer provider.
    * @return The sampler for this tracer provider.
    */
-  Sampler* GetSampler() const noexcept;
+  Sampler *GetSampler() const noexcept;
 
   /**
    * Obtain the resource associated with this tracer provider.

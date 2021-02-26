@@ -119,10 +119,9 @@ void BenchmarkSpanCreation(std::shared_ptr<Sampler> sampler, benchmark::State &s
 {
   std::unique_ptr<SpanExporter> exporter(new InMemorySpanExporter());
   auto processor = std::unique_ptr<SpanProcessor>(new SimpleSpanProcessor(std::move(exporter)));
-  auto context = std::make_shared<TracerContext>(std::move(processor));
+  auto context   = std::make_shared<TracerContext>(std::move(processor));
   auto resource  = opentelemetry::sdk::resource::Resource::Create({});
-  auto tracer =
-      std::shared_ptr<opentelemetry::trace::Tracer>(new Tracer(context));
+  auto tracer    = std::shared_ptr<opentelemetry::trace::Tracer>(new Tracer(context));
 
   while (state.KeepRunning())
   {

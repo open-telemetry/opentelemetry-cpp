@@ -1,9 +1,9 @@
 #pragma once
 
 #include "opentelemetry/sdk/common/atomic_shared_ptr.h"
+#include "opentelemetry/sdk/trace/tracer_context.h"
 #include "opentelemetry/trace/noop.h"
 #include "opentelemetry/trace/tracer.h"
-#include "opentelemetry/sdk/trace/tracer_context.h"
 #include "opentelemetry/version.h"
 
 #include <memory>
@@ -34,13 +34,13 @@ public:
    * Obtain the span processor associated with this tracer.
    * @return The span processor for this tracer.
    */
-  SpanProcessor* GetProcessor() const noexcept;
+  SpanProcessor *GetProcessor() const noexcept;
 
   /**
    * Obtain the sampler associated with this tracer.
    * @return The sampler for this tracer.
    */
-  Sampler* GetSampler() const noexcept;
+  Sampler *GetSampler() const noexcept;
 
   nostd::shared_ptr<trace_api::Span> StartSpan(
       nostd::string_view name,
