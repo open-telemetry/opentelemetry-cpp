@@ -199,7 +199,7 @@ private:
       hex_string.push_back(trace_flags[i]);
     }
     setter(carrier, kTraceParent, hex_string);
-    setter(carrier, kTraceState, span_context.trace_state().ToHeader());
+    setter(carrier, kTraceState, span_context.trace_state()->ToHeader());
   }
 
   static void InjectImpl(Setter setter, T &carrier, const SpanContext &span_context)
@@ -218,7 +218,8 @@ private:
     return true;
   }
 
-  static SpanContext ExtractContextFromTraceHeaders(nostd::string_view trace_parent, nostd::string_view trace_state)
+  static SpanContext ExtractContextFromTraceHeaders(nostd::string_view trace_parent,
+                                                    nostd::string_view trace_state)
   {
     if (trace_parent.length() != kHeaderSize || trace_parent[kHeaderElementLengths[0]] != '-' ||
         trace_parent[kHeaderElementLengths[0] + kHeaderElementLengths[1] + 1] != '-' ||
@@ -248,13 +249,13 @@ private:
     {
       return SpanContext(false, false);
     }
-    
+
     TraceId trace_id_obj       = GenerateTraceIdFromString(trace_id);
     SpanId span_id_obj         = GenerateSpanIdFromString(span_id);
     TraceFlags trace_flags_obj = GenerateTraceFlagsFromString(trace_flags);
 
-    
-    return SpanContext(trace_id_obj, span_id_obj, trace_flags_obj, true, opentelemetry::trace::TraceState::FromHeader(trace_state));
+    return SpanContext(trace_id_obj, span_id_obj, trace_flags_obj, true,
+                       opentelemetry::trace::TraceState::FromHeader(trace_state));
   }
 
   static SpanContext ExtractImpl(Getter getter, const T &carrier)
