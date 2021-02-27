@@ -70,3 +70,12 @@ TEST(TracerProvider, Shutdown)
 
   EXPECT_TRUE(tp1.Shutdown());
 }
+
+TEST(TracerProvider, ForceFlush)
+{
+  std::shared_ptr<SpanProcessor> processor1(new SimpleSpanProcessor(nullptr));
+
+  TracerProvider tp1(processor1);
+
+  EXPECT_TRUE(tp1.ForceFlush());
+}

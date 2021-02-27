@@ -15,6 +15,8 @@ Increment the:
 
 ## [Unreleased]
 
+* Added `ForceFlush` to `TracerProvider` in SDK. ([#588](https://github.com/open-telemetry/opentelemetry-cpp/pull/588)).
+
 ## [0.0.1] 2020-12-16
 
 ### Added
