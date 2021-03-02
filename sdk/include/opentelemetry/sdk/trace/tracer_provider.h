@@ -66,6 +66,11 @@ public:
    */
   bool Shutdown() noexcept;
 
+  /**
+   * Force flush the span processor associated with this tracer provider.
+   */
+  bool ForceFlush(std::chrono::microseconds timeout = (std::chrono::microseconds::max)()) noexcept;
+
 private:
   opentelemetry::sdk::AtomicSharedPtr<SpanProcessor> processor_;
   std::shared_ptr<opentelemetry::trace::Tracer> tracer_;
