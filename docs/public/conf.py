@@ -25,7 +25,7 @@ release = '0.1.0'
 
 # Run sphinx on subprojects and copy output
 # -----------------------------------------
-# This is necessary so the readthedocs build works. It doesn't invoke the 
+# This is necessary so the readthedocs build works. It doesn't invoke the
 # Makefile, but just runs sphinx on this conf.py.
 import os
 import shutil
