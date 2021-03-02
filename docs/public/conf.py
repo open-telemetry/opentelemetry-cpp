@@ -33,7 +33,10 @@ import subprocess
 
 apidir = os.path.join('..', '..', 'api', 'docs')
 subprocess.call(['make', 'html'], cwd=apidir) 
-shutil.copytree(os.path.join(apidir, 'otel_api'), os.path.join(os.getcwd(), 'otel_api'))
+targetdir = os.path.join(os.getcwd(), 'otel_api')
+if os.path.exists(targetdir):
+    shutil.rmtree(targetdir)
+shutil.copytree(os.path.join(apidir, 'otel_api'), targetdir)
 
 # -- General configuration ---------------------------------------------------
 
