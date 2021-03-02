@@ -32,7 +32,7 @@ import shutil
 import subprocess
 
 apidir = os.path.join('..', '..', 'api', 'docs')
-subprocess.call(['make', 'html'], cwd=apidir) 
+subprocess.call(['make', 'html'], cwd=apidir)
 targetdir = os.path.join(os.getcwd(), 'otel_api')
 if os.path.exists(targetdir):
     shutil.rmtree(targetdir)
