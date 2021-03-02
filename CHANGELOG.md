@@ -17,7 +17,12 @@ Increment the:
  
 ## [0.2.0] 2021-03-02
 
-* Added `ForceFlush` to `TracerProvider` in SDK. ([#588](https://github.com/open-telemetry/opentelemetry-cpp/pull/588)).
+* [SDK] Added `ForceFlush` to `TracerProvider` in SDK. ([#588](https://github.com/open-telemetry/opentelemetry-cpp/pull/588)).
+* [SDK] Added Resource API
+* [API] Added TraceState support for w3c trace context.
+* [API] Added B3 Propagator
+* [Exporter] Added ETW Exporter
+* [CI] Enable cache for Bazel for faster builds.
 
 ## [0.0.1] 2020-12-16
 
