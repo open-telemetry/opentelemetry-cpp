@@ -14,7 +14,7 @@ Increment the:
 * PATCH version when you make backwards compatible bug fixes.
 
 ## [Unreleased]
- 
+
 ## [0.2.0] 2021-03-02
 
 * [SDK] Added `ForceFlush` to `TracerProvider` in SDK. ([#588](https://github.com/open-telemetry/opentelemetry-cpp/pull/588)).
