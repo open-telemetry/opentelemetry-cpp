@@ -15,6 +15,8 @@ Increment the:
 
 ## [Unreleased]
 
+ * [EXPORTER] Added Zipkin Exporter. ([#471](https://github.com/open-telemetry/opentelemetry-cpp/pull/471))
+
 ## [0.2.0] 2021-03-02
 
 * [SDK] Added `ForceFlush` to `TracerProvider`. ([#588](https://github.com/open-telemetry/opentelemetry-cpp/pull/588)).
