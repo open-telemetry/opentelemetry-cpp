@@ -138,7 +138,7 @@ public:
     std::string url    = host_ + std::string(http_request_->uri_);
     auto callback_ptr  = &callback;
     curl_operation_.reset(new HttpOperation(
-        http_request_->method_, url, callback_ptr, RequestMode::Sync, http_request_->headers_,
+        http_request_->method_, url, callback_ptr, RequestMode::Async, http_request_->headers_,
         http_request_->body_, false, http_request_->timeout_ms_));
     curl_operation_->SendAsync([this, callback_ptr](HttpOperation &operation) {
       if (operation.WasAborted())
@@ -213,11 +213,11 @@ public:
   }
 
   http_client::Result Post(const nostd::string_view &url,
-                           const Data &data,
+                           const Body &body,
                            const http_client::Headers &headers) noexcept override
   {
     HttpOperation curl_operation(http_client::Method::Post, url.data(), nullptr, RequestMode::Sync,
-                                 headers);
+                                 headers, body);
     curl_operation.SendSync();
     auto session_state = curl_operation.GetSessionState();
     if (curl_operation.WasAborted())
