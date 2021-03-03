@@ -15,7 +15,7 @@ Increment the:
 
 ## [Unreleased]
 
- * [EXPORTER] Added Zipkin Exporter. ([#471](https://github.com/open-telemetry/opentelemetry-cpp/pull/471))
+* [EXPORTER] Added Zipkin Exporter. ([#471](https://github.com/open-telemetry/opentelemetry-cpp/pull/471))
 
 ## [0.2.0] 2021-03-02
 
