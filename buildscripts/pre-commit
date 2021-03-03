@@ -78,5 +78,5 @@ END
 git add "$(pwd)/sdk/src/version/version.cc"
 
 # Update documentation version
-sed -i "/^PROJECT_BRIEF/cPROJECT_BRIEF = \"Version ${short_version}\""  "$(pwd)/api/docs/Doxyfile"
-git add "$(pwd)/api/docs/Doxyfile"
+sed -i "/^release =/crelease = \"${short_version}\""  "$(pwd)/docs/public/conf.py"
+git add "$(pwd)/docs/public/conf.py"

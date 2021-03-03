@@ -21,9 +21,6 @@ project = 'OpenTelemetry C++ API'
 copyright = '2021, OpenTelemetry authors'
 author = 'OpenTelemetry authors'
 
-# The full version, including alpha/beta/rc tags
-release = '0.1.0'
-
 # Run doxygen
 # -----------
 # For the readthedocs builds, for some reason exhale doesn't find doxygen.
