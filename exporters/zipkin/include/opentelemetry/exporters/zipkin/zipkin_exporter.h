@@ -39,7 +39,7 @@ class ZipkinExporter final : public trace_sdk::SpanExporter
 {
 public:
   /**
-   * Create an ZipkinExporter using all default options.
+   * Create a ZipkinExporter using all default options.
    */
   ZipkinExporter();
 
