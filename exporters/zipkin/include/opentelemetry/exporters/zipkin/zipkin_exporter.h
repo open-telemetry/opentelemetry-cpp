@@ -44,7 +44,7 @@ public:
   ZipkinExporter();
 
   /**
-   * Create an ZipkinExporter using the given options.
+   * Create a ZipkinExporter using the given options.
    */
   explicit ZipkinExporter(const ZipkinExporterOptions &options);
 
