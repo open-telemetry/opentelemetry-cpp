@@ -119,7 +119,7 @@ A PR is considered to be **ready to merge** when:
   /
   [Maintainer](https://github.com/open-telemetry/community/blob/main/community-membership.md#maintainer)
   (at different company).
-* A pull reqeust opened by an Approver / Maintainer can be merged with only one
+* A pull request opened by an Approver / Maintainer can be merged with only one
   approval from  Approver / Maintainer (at different company).
 * Major feedback items/points are resolved.
 * It has been open for review for at least one working day. This gives people
