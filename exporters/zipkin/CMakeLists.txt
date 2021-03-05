@@ -12,25 +12,20 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-if(WITH_OTLP)
-  add_subdirectory(otlp)
+include_directories(include)
+find_package(CURL)
+if(CURL_FOUND)
+  add_definitions(-DWITH_CURL)
 endif()
+add_library(zipkin_trace_exporter src/zipkin_exporter.cc src/recordable.cc)
+if(BUILD_TESTING)
+  add_executable(zipkin_recordable_test test/zipkin_recordable_test.cc)
 
-add_subdirectory(ostream)
-add_subdirectory(memory)
+  target_link_libraries(zipkin_recordable_test ${GTEST_BOTH_LIBRARIES}
+                        ${CMAKE_THREAD_LIBS_INIT} zipkin_trace_exporter)
 
-if(WITH_PROMETHEUS)
-  add_subdirectory(prometheus)
-endif()
-
-if(WITH_ZIPKIN)
-  add_subdirectory(zipkin)
-endif()
-
-if(WITH_ELASTICSEARCH)
-  add_subdirectory(elasticsearch)
-endif()
-
-if(WITH_ETW)
-  add_subdirectory(etw)
-endif()
+  gtest_add_tests(
+    TARGET zipkin_recordable_test
+    TEST_PREFIX exporter.
+    TEST_LIST zipkin_recordable_test)
+endif() # BUILD_TESTING
