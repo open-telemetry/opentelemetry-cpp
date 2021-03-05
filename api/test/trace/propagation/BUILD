@@ -15,7 +15,7 @@ cc_test(
     name = "jaeger_propagation_test",
     srcs = [
         "jaeger_propagation_test.cc",
-        "util.h"
+        "util.h",
     ],
     deps = [
         "//api",
