@@ -16,6 +16,7 @@ cc_test(
     srcs = [
         "jaeger_propagation_test.cc",
     ],
+    hdrs = ["util.h"],
     deps = [
         "//api",
         "@com_google_googletest//:gtest_main",
