@@ -59,6 +59,7 @@ public:
   void update(T val) override
   {
     this->mu_.lock();
+    this->updated_     = true;
     this->values_[0]   = val;
     current_timestamp_ = core::SystemTimestamp(std::chrono::system_clock::now());
     this->mu_.unlock();
@@ -75,6 +76,7 @@ public:
   {
     this->mu_.lock();
 
+    this->updated_    = false;
     this->checkpoint_ = this->values_;
 
     // Reset the values to default

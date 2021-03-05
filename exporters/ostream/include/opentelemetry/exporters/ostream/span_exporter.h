@@ -9,8 +9,9 @@
 #include <map>
 #include <sstream>
 
-namespace nostd    = opentelemetry::nostd;
-namespace sdktrace = opentelemetry::sdk::trace;
+namespace nostd     = opentelemetry::nostd;
+namespace sdktrace  = opentelemetry::sdk::trace;
+namespace sdkcommon = opentelemetry::sdk::common;
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace exporter
@@ -36,45 +37,35 @@ public:
   sdktrace::ExportResult Export(
       const nostd::span<std::unique_ptr<sdktrace::Recordable>> &spans) noexcept override;
 
-  void Shutdown(std::chrono::microseconds timeout = std::chrono::microseconds(0)) noexcept override;
+  bool Shutdown(
+      std::chrono::microseconds timeout = std::chrono::microseconds::max()) noexcept override;
 
 private:
   std::ostream &sout_;
   bool isShutdown_ = false;
 
   // Mapping status number to the string from api/include/opentelemetry/trace/canonical_code.h
-  std::map<int, std::string> statusMap{{0, "OK"},
-                                       {1, "CANCELLED"},
-                                       {2, "UNKNOWN"},
-                                       {3, "INVALID_ARGUMENT"},
-                                       {4, "DEADLINE_EXCEEDED"},
-                                       {5, "NOT_FOUND"},
-                                       {6, "ALREADY_EXISTS"},
-                                       {7, "PERMISSION_DENIED"},
-                                       {8, "RESOURCE_EXHAUSTED"},
-                                       {9, "FAILED_PRECONDITION"},
-                                       {10, "ABORTED"},
-                                       {11, "OUT_OF_RANGE"},
-                                       {12, "UNIMPLEMENTED"},
-                                       {13, "INTERNAL"},
-                                       {14, "UNAVAILABLE"},
-                                       {15, "DATA_LOSS"},
-                                       {16, "UNAUTHENTICATED"}};
+  std::map<int, std::string> statusMap{{0, "Unset"}, {1, "Ok"}, {2, "Error"}};
 
   /*
-    print_array and print_value are used to print out the value of an attribute within a vector.
+    print_value is used to print out the value of an attribute within a vector.
     These values are held in a variant which makes the process of printing them much more
     complicated.
   */
 
   template <typename T>
-  void print_array(sdktrace::SpanDataAttributeValue &value)
+  void print_value(const T &item)
+  {
+    sout_ << item;
+  }
+
+  template <typename T>
+  void print_value(const std::vector<T> &vec)
   {
     sout_ << '[';
-    auto s    = nostd::get<std::vector<T>>(value);
     size_t i  = 1;
-    size_t sz = s.size();
-    for (auto v : s)
+    size_t sz = vec.size();
+    for (auto v : vec)
     {
       sout_ << v;
       if (i != sz)
@@ -84,70 +75,39 @@ private:
     sout_ << ']';
   }
 
-  void print_value(sdktrace::SpanDataAttributeValue &value)
+// Prior to C++14, generic lambda is not available so fallback to functor.
+#if __cplusplus < 201402L
+
+  class OwnedAttributeValueVisitor
   {
-    if (nostd::holds_alternative<bool>(value))
+  public:
+    OwnedAttributeValueVisitor(OStreamSpanExporter &exporter) : exporter_(exporter) {}
+
+    template <typename T>
+    void operator()(T &&arg)
     {
-      sout_ << nostd::get<bool>(value);
+      exporter_.print_value(arg);
     }
-    else if (nostd::holds_alternative<int32_t>(value))
-    {
-      sout_ << nostd::get<int32_t>(value);
-    }
-    else if (nostd::holds_alternative<uint32_t>(value))
-    {
-      sout_ << nostd::get<uint32_t>(value);
-    }
-    else if (nostd::holds_alternative<int64_t>(value))
-    {
-      sout_ << nostd::get<int64_t>(value);
-    }
-    else if (nostd::holds_alternative<uint64_t>(value))
-    {
-      sout_ << nostd::get<uint64_t>(value);
-    }
-    else if (nostd::holds_alternative<double>(value))
-    {
-      sout_ << nostd::get<double>(value);
-    }
-    else if (nostd::holds_alternative<std::string>(value))
-    {
-      sout_ << nostd::get<std::string>(value);
-    }
-    else if (nostd::holds_alternative<std::vector<bool>>(value))
-    {
-      print_array<bool>(value);
-    }
-    else if (nostd::holds_alternative<std::vector<int32_t>>(value))
-    {
-      print_array<int32_t>(value);
-    }
-    else if (nostd::holds_alternative<std::vector<uint32_t>>(value))
-    {
-      print_array<uint32_t>(value);
-    }
-    else if (nostd::holds_alternative<std::vector<int64_t>>(value))
-    {
-      print_array<int64_t>(value);
-    }
-    else if (nostd::holds_alternative<std::vector<uint64_t>>(value))
-    {
-      print_array<uint64_t>(value);
-    }
-    else if (nostd::holds_alternative<std::vector<double>>(value))
-    {
-      print_array<double>(value);
-    }
-    else if (nostd::holds_alternative<std::vector<std::string>>(value))
-    {
-      print_array<std::string>(value);
-    }
+
+  private:
+    OStreamSpanExporter &exporter_;
+  };
+
+#endif
+
+  void print_value(sdkcommon::OwnedAttributeValue &value)
+  {
+#if __cplusplus < 201402L
+    nostd::visit(OwnedAttributeValueVisitor(*this), value);
+#else
+    nostd::visit([this](auto &&arg) { print_value(arg); }, value);
+#endif
   }
 
-  void printAttributes(std::unordered_map<std::string, sdktrace::SpanDataAttributeValue> map)
+  void printAttributes(std::unordered_map<std::string, sdkcommon::OwnedAttributeValue> map)
   {
-    int size = map.size();
-    int i    = 1;
+    size_t size = map.size();
+    size_t i    = 1;
     for (auto kv : map)
     {
       sout_ << kv.first << ": ";

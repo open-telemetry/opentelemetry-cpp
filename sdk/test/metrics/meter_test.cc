@@ -69,7 +69,7 @@ TEST(Meter, CollectSyncInstruments)
   auto counter = m.NewShortCounter("Test-counter", "For testing", "Unitless", true);
 
   std::map<std::string, std::string> labels = {{"Key", "Value"}};
-  auto labelkv = opentelemetry::trace::KeyValueIterableView<decltype(labels)>{labels};
+  auto labelkv = opentelemetry::common::KeyValueIterableView<decltype(labels)>{labels};
 
   counter->add(1, labelkv);
 
@@ -101,7 +101,7 @@ TEST(Meter, CollectDeletedSync)
   ASSERT_EQ(m.Collect().size(), 0);
 
   std::map<std::string, std::string> labels = {{"Key", "Value"}};
-  auto labelkv = opentelemetry::trace::KeyValueIterableView<decltype(labels)>{labels};
+  auto labelkv = opentelemetry::common::KeyValueIterableView<decltype(labels)>{labels};
   {
     auto counter = m.NewShortCounter("Test-counter", "For testing", "Unitless", true);
     counter->add(1, labelkv);
@@ -118,7 +118,7 @@ TEST(Meter, CollectDeletedSync)
 void Callback(opentelemetry::metrics::ObserverResult<short> result)
 {
   std::map<std::string, std::string> labels = {{"key", "value"}};
-  auto labelkv                              = trace::KeyValueIterableView<decltype(labels)>{labels};
+  auto labelkv = common::KeyValueIterableView<decltype(labels)>{labels};
   result.observe(1, labelkv);
 }
 
@@ -134,7 +134,7 @@ TEST(Meter, CollectAsyncInstruments)
       m.NewShortSumObserver("Test-counter", "For testing", "Unitless", true, &ShortCallback);
 
   std::map<std::string, std::string> labels = {{"Key", "Value"}};
-  auto labelkv = opentelemetry::trace::KeyValueIterableView<decltype(labels)>{labels};
+  auto labelkv = opentelemetry::common::KeyValueIterableView<decltype(labels)>{labels};
 
   sumobs->observe(1, labelkv);
 
@@ -166,7 +166,7 @@ TEST(Meter, CollectDeletedAsync)
   ASSERT_EQ(m.Collect().size(), 0);
 
   std::map<std::string, std::string> labels = {{"Key", "Value"}};
-  auto labelkv = opentelemetry::trace::KeyValueIterableView<decltype(labels)>{labels};
+  auto labelkv = opentelemetry::common::KeyValueIterableView<decltype(labels)>{labels};
   {
     auto sumobs = m.NewShortSumObserver("Test-counter", "For testing", "Unitless", true, &Callback);
     sumobs->observe(1, labelkv);
@@ -191,7 +191,7 @@ TEST(Meter, RecordBatch)
   auto dcounter = m.NewDoubleCounter("Test-dcounter", "For testing", "Unitless", true);
 
   std::map<std::string, std::string> labels = {{"Key", "Value"}};
-  auto labelkv = opentelemetry::trace::KeyValueIterableView<decltype(labels)>{labels};
+  auto labelkv = opentelemetry::common::KeyValueIterableView<decltype(labels)>{labels};
 
   metrics_api::SynchronousInstrument<short> *sinstr_arr[] = {scounter.get()};
   short svalues_arr[]                                     = {1};
@@ -246,7 +246,7 @@ TEST(Meter, DisableCollectSync)
 {
   Meter m("Test");
   std::map<std::string, std::string> labels = {{"Key", "Value"}};
-  auto labelkv = opentelemetry::trace::KeyValueIterableView<decltype(labels)>{labels};
+  auto labelkv = opentelemetry::common::KeyValueIterableView<decltype(labels)>{labels};
   auto c       = m.NewShortCounter("c", "", "", false);
   c->add(1, labelkv);
   ASSERT_EQ(m.Collect().size(), 0);
@@ -256,7 +256,7 @@ TEST(Meter, DisableCollectAsync)
 {
   Meter m("Test");
   std::map<std::string, std::string> labels = {{"Key", "Value"}};
-  auto labelkv = opentelemetry::trace::KeyValueIterableView<decltype(labels)>{labels};
+  auto labelkv = opentelemetry::common::KeyValueIterableView<decltype(labels)>{labels};
   auto c       = m.NewShortValueObserver("c", "", "", false, &ShortCallback);
   c->observe(1, labelkv);
   ASSERT_EQ(m.Collect().size(), 0);

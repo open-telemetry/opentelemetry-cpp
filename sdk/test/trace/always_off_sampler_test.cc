@@ -1,10 +1,10 @@
-#include "opentelemetry/context/threadlocal_context.h"
-#include "opentelemetry/sdk/trace/samplers/always_off.h"
-
 #include <gtest/gtest.h>
+#include "opentelemetry/sdk/trace/samplers/always_off.h"
+#include "opentelemetry/trace/span_context_kv_iterable_view.h"
 
 using opentelemetry::sdk::trace::AlwaysOffSampler;
 using opentelemetry::sdk::trace::Decision;
+using opentelemetry::trace::SpanContext;
 
 TEST(AlwaysOffSampler, ShouldSample)
 {
@@ -15,11 +15,17 @@ TEST(AlwaysOffSampler, ShouldSample)
 
   using M = std::map<std::string, int>;
   M m1    = {{}};
-  opentelemetry::trace::KeyValueIterableView<M> view{m1};
 
-  auto sampling_result = sampler.ShouldSample(nullptr, trace_id, "", span_kind, view);
+  using L = std::vector<std::pair<SpanContext, std::map<std::string, std::string>>>;
+  L l1    = {{SpanContext(false, false), {}}, {SpanContext(false, false), {}}};
 
-  ASSERT_EQ(Decision::NOT_RECORD, sampling_result.decision);
+  opentelemetry::common::KeyValueIterableView<M> view{m1};
+  opentelemetry::trace::SpanContextKeyValueIterableView<L> links{l1};
+
+  auto sampling_result =
+      sampler.ShouldSample(SpanContext::GetInvalid(), trace_id, "", span_kind, view, links);
+
+  ASSERT_EQ(Decision::DROP, sampling_result.decision);
   ASSERT_EQ(nullptr, sampling_result.attributes);
 }
 

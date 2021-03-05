@@ -64,14 +64,15 @@ public:
   void update(T val) override
   {
     this->mu_.lock();
+    this->updated_ = true;
     int idx;
     if (val == 0)
     {
-      idx = std::numeric_limits<int>::min();
+      idx = (std::numeric_limits<int>::min());
     }
     else
     {
-      idx = ceil(log(val) / log(gamma));
+      idx = static_cast<int>(ceil(log(val) / log(gamma)));
     }
     if (raw_.find(idx) != raw_.end())
     {
@@ -95,7 +96,7 @@ public:
   /**
    * Calculate and return the value of a user specified quantile.
    *
-   * @param q, the quantile to calculate (for example 0.5 is equivelant to the 50th percentile)
+   * @param q, the quantile to calculate (for example 0.5 is equivalent to the 50th percentile)
    */
   virtual T get_quantiles(double q) override
   {
@@ -117,7 +118,7 @@ public:
       idx = iter->first;
       count += iter->second;
     }
-    return round(2 * pow(gamma, idx) / (gamma + 1));
+    return static_cast<T>(round(2 * pow(gamma, idx) / (gamma + 1)));
   }
 
   /**
@@ -130,6 +131,7 @@ public:
   void checkpoint() override
   {
     this->mu_.lock();
+    this->updated_    = false;
     this->checkpoint_ = this->values_;
     checkpoint_raw_   = raw_;
     this->values_[0]  = 0;

@@ -48,7 +48,7 @@ public:
   }
 
   /**
-   * Recieves a captured value from the instrument and inserts it into the current histogram counts.
+   * Receives a captured value from the instrument and inserts it into the current histogram counts.
    *
    * Depending on the use case, a linear search or binary search based implementation may be
    * preferred. In uniformly distributed datasets, linear search outperforms binary search until 512
@@ -63,7 +63,8 @@ public:
   void update(T val) override
   {
     this->mu_.lock();
-    int bucketID = boundaries_.size();
+    this->updated_  = true;
+    size_t bucketID = boundaries_.size();
     for (size_t i = 0; i < boundaries_.size(); i++)
     {
       if (val < boundaries_[i])  // concurrent read is thread-safe
@@ -93,6 +94,7 @@ public:
   void checkpoint() override
   {
     this->mu_.lock();
+    this->updated_     = false;
     this->checkpoint_  = this->values_;
     this->values_[0]   = 0;
     this->values_[1]   = 0;

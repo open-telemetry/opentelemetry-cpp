@@ -1,4 +1,3 @@
-#include "opentelemetry/context/threadlocal_context.h"
 #include "opentelemetry/sdk/trace/recordable.h"
 #include "opentelemetry/sdk/trace/simple_processor.h"
 #include "opentelemetry/sdk/trace/span_data.h"
@@ -37,7 +36,7 @@ TEST(OStreamSpanExporter, Shutdown)
   // Redirect cout to our stringstream buffer
   std::cout.rdbuf(stdoutOutput.rdbuf());
 
-  processor->Shutdown();
+  EXPECT_TRUE(processor->Shutdown());
   processor->OnEnd(std::move(recordable));
 
   std::cout.rdbuf(sbuf);
@@ -84,7 +83,8 @@ TEST(OStreamSpanExporter, PrintDefaultSpan)
       "  start         : 0\n"
       "  duration      : 0\n"
       "  description   : \n"
-      "  status        : OK\n"
+      "  span kind     : Internal\n"
+      "  status        : Unset\n"
       "  attributes    : \n"
       "}\n";
   ASSERT_EQ(stdoutOutput.str(), expectedOutput);
@@ -112,7 +112,8 @@ TEST(OStreamSpanExporter, PrintChangedSpanCout)
 
   recordable->SetStartTime(now);
   recordable->SetDuration(std::chrono::nanoseconds(100));
-  recordable->SetStatus(opentelemetry::trace::CanonicalCode::UNIMPLEMENTED, "Test Description");
+  recordable->SetStatus(opentelemetry::trace::StatusCode::kOk, "Test Description");
+  recordable->SetSpanKind(opentelemetry::trace::SpanKind::kClient);
 
   recordable->SetAttribute("attr1", "string");
 
@@ -142,7 +143,8 @@ TEST(OStreamSpanExporter, PrintChangedSpanCout)
       "\n"
       "  duration      : 100\n"
       "  description   : Test Description\n"
-      "  status        : UNIMPLEMENTED\n"
+      "  span kind     : Client\n"
+      "  status        : Ok\n"
       "  attributes    : attr1: string\n"
       "}\n";
   ASSERT_EQ(stdoutOutput.str(), expectedOutput);
@@ -171,7 +173,8 @@ TEST(OStreamSpanExporter, PrintChangedSpanCerr)
 
   recordable->SetStartTime(now);
   recordable->SetDuration(std::chrono::nanoseconds(100));
-  recordable->SetStatus(opentelemetry::trace::CanonicalCode::UNIMPLEMENTED, "Test Description");
+  recordable->SetStatus(opentelemetry::trace::StatusCode::kOk, "Test Description");
+  recordable->SetSpanKind(opentelemetry::trace::SpanKind::kConsumer);
 
   std::array<bool, 3> array2 = {false, true, false};
   opentelemetry::nostd::span<bool> span2{array2.data(), array2.size()};
@@ -203,7 +206,8 @@ TEST(OStreamSpanExporter, PrintChangedSpanCerr)
       "\n"
       "  duration      : 100\n"
       "  description   : Test Description\n"
-      "  status        : UNIMPLEMENTED\n"
+      "  span kind     : Consumer\n"
+      "  status        : Ok\n"
       "  attributes    : attr1: [0,1,0]\n"
       "}\n";
   ASSERT_EQ(stdcerrOutput.str(), expectedOutput);
@@ -231,7 +235,8 @@ TEST(OStreamSpanExporter, PrintChangedSpanClog)
 
   recordable->SetStartTime(now);
   recordable->SetDuration(std::chrono::nanoseconds(100));
-  recordable->SetStatus(opentelemetry::trace::CanonicalCode::UNIMPLEMENTED, "Test Description");
+  recordable->SetStatus(opentelemetry::trace::StatusCode::kOk, "Test Description");
+  recordable->SetSpanKind(opentelemetry::trace::SpanKind::kInternal);
 
   std::array<int, 3> array1 = {1, 2, 3};
   opentelemetry::nostd::span<int> span1{array1.data(), array1.size()};
@@ -263,7 +268,8 @@ TEST(OStreamSpanExporter, PrintChangedSpanClog)
       "\n"
       "  duration      : 100\n"
       "  description   : Test Description\n"
-      "  status        : UNIMPLEMENTED\n"
+      "  span kind     : Internal\n"
+      "  status        : Ok\n"
       "  attributes    : attr1: [1,2,3]\n"
       "}\n";
   ASSERT_EQ(stdclogOutput.str(), expectedOutput);

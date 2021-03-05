@@ -60,6 +60,7 @@ public:
   void update(T val) override
   {
     this->mu_.lock();
+    this->updated_ = true;
 
     if (this->values_[CountValueIndex] == 0 || val < this->values_[MinValueIndex])  // set min
       this->values_[MinValueIndex] = val;
@@ -80,6 +81,7 @@ public:
   void checkpoint() override
   {
     this->mu_.lock();
+    this->updated_    = false;
     this->checkpoint_ = this->values_;
     // Reset the values
     this->values_[MinValueIndex]   = 0;

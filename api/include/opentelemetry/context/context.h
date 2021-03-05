@@ -1,5 +1,6 @@
 #pragma once
 
+#include <cstring>
 #include "opentelemetry/context/context_value.h"
 #include "opentelemetry/nostd/shared_ptr.h"
 #include "opentelemetry/nostd/string_view.h"
@@ -38,8 +39,8 @@ public:
   template <class T>
   Context SetValues(T &values) noexcept
   {
-    Context context                   = Context(values);
-    nostd::shared_ptr<DataList> &last = context.head_;
+    Context context                  = Context(values);
+    nostd::shared_ptr<DataList> last = context.head_;
     while (last->next_ != nullptr)
     {
       last = last->next_;
@@ -65,7 +66,7 @@ public:
     {
       if (key.size() == data->key_length_)
       {
-        if (memcmp(key.data(), data->key_, data->key_length_) == 0)
+        if (std::memcmp(key.data(), data->key_, data->key_length_) == 0)
         {
           return data->value_;
         }
@@ -81,7 +82,7 @@ public:
     {
       if (key.size() == data->key_length_)
       {
-        if (memcmp(key.data(), data->key_, data->key_length_) == 0)
+        if (std::memcmp(key.data(), data->key_, data->key_length_) == 0)
         {
           return true;
         }
@@ -90,16 +91,16 @@ public:
     return false;
   }
 
-  bool operator==(const Context &other) { return (head_ == other.head_); }
+  bool operator==(const Context &other) const noexcept { return (head_ == other.head_); }
 
 private:
   // A linked list to contain the keys and values of this context node
   class DataList
   {
   public:
-    nostd::shared_ptr<DataList> next_;
-
     char *key_;
+
+    nostd::shared_ptr<DataList> next_;
 
     size_t key_length_;
 
@@ -109,7 +110,7 @@ private:
 
     // Builds a data list off of a key and value iterable and returns the head
     template <class T>
-    DataList(const T &keys_and_vals) : key_{nullptr}
+    DataList(const T &keys_and_vals) : key_{nullptr}, next_(nostd::shared_ptr<DataList>{nullptr})
     {
       bool first = true;
       auto *node = this;
@@ -130,7 +131,7 @@ private:
 
     // Builds a data list with just a key and value, so it will just be the head
     // and returns that head.
-    DataList(nostd::string_view key, ContextValue value)
+    DataList(nostd::string_view key, const ContextValue &value)
     {
       key_        = new char[key.size()];
       key_length_ = key.size();

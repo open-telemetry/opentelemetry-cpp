@@ -3,23 +3,24 @@
 #include <cstdint>
 
 #include "opentelemetry/common/attribute_value.h"
+#include "opentelemetry/common/key_value_iterable_view.h"
 #include "opentelemetry/core/timestamp.h"
+#include "opentelemetry/nostd/shared_ptr.h"
 #include "opentelemetry/nostd/span.h"
 #include "opentelemetry/nostd/string_view.h"
+#include "opentelemetry/nostd/type_traits.h"
 #include "opentelemetry/nostd/unique_ptr.h"
 #include "opentelemetry/trace/canonical_code.h"
-#include "opentelemetry/trace/key_value_iterable_view.h"
+#include "opentelemetry/trace/span_context.h"
 #include "opentelemetry/version.h"
 
-constexpr char SpanKey[] = "span_key";
-
 OPENTELEMETRY_BEGIN_NAMESPACE
-namespace context
-{
-class Token;
-}
 namespace trace
 {
+
+// The key identifies the active span in the current context.
+constexpr char kSpanKey[] = "active_span";
+
 enum class SpanKind
 {
   kInternal,
@@ -28,6 +29,16 @@ enum class SpanKind
   kProducer,
   kConsumer,
 };
+
+// StatusCode - Represents the canonical set of status codes of a finished Span.
+
+enum class StatusCode
+{
+  kUnset,  // default status
+  kOk,     // Operation has completed successfully.
+  kError   // The operation contains an error
+};
+
 /**
  * StartSpanOptions provides options to set properties of a Span at the time of
  * its creation
@@ -46,8 +57,13 @@ struct StartSpanOptions
   core::SystemTimestamp start_system_time;
   core::SteadyTimestamp start_steady_time;
 
+  // Explicitly set the parent of a Span.
+  //
+  // This defaults to an invalid span context. In this case, the Span is
+  // automatically parented to the currently active span.
+  SpanContext parent = SpanContext::GetInvalid();
+
   // TODO:
-  // Span(Context?) parent;
   // SpanContext remote_parent;
   // Links
   SpanKind kind = SpanKind::kInternal;
@@ -98,25 +114,28 @@ public:
   // Adds an event to the Span, with a custom timestamp, and attributes.
   virtual void AddEvent(nostd::string_view name,
                         core::SystemTimestamp timestamp,
-                        const KeyValueIterable &attributes) noexcept = 0;
+                        const common::KeyValueIterable &attributes) noexcept = 0;
 
-  virtual void AddEvent(nostd::string_view name, const KeyValueIterable &attributes) noexcept
+  virtual void AddEvent(nostd::string_view name,
+                        const common::KeyValueIterable &attributes) noexcept
   {
     this->AddEvent(name, std::chrono::system_clock::now(), attributes);
   }
 
-  template <class T, nostd::enable_if_t<detail::is_key_value_iterable<T>::value> * = nullptr>
+  template <class T,
+            nostd::enable_if_t<common::detail::is_key_value_iterable<T>::value> * = nullptr>
   void AddEvent(nostd::string_view name,
                 core::SystemTimestamp timestamp,
                 const T &attributes) noexcept
   {
-    this->AddEvent(name, timestamp, KeyValueIterableView<T>{attributes});
+    this->AddEvent(name, timestamp, common::KeyValueIterableView<T>{attributes});
   }
 
-  template <class T, nostd::enable_if_t<detail::is_key_value_iterable<T>::value> * = nullptr>
+  template <class T,
+            nostd::enable_if_t<common::detail::is_key_value_iterable<T>::value> * = nullptr>
   void AddEvent(nostd::string_view name, const T &attributes) noexcept
   {
-    this->AddEvent(name, KeyValueIterableView<T>{attributes});
+    this->AddEvent(name, common::KeyValueIterableView<T>{attributes});
   }
 
   void AddEvent(nostd::string_view name,
@@ -138,10 +157,10 @@ public:
                        attributes.begin(), attributes.end()});
   }
 
-  // Sets the status of the span. The default status is OK. Only the value of
+  // Sets the status of the span. The default status is Unset. Only the value of
   // the last call will be
   // recorded, and implementations are free to ignore previous calls.
-  virtual void SetStatus(CanonicalCode code, nostd::string_view description) noexcept = 0;
+  virtual void SetStatus(StatusCode code, nostd::string_view description = "") noexcept = 0;
 
   // Updates the name of the Span. If used, this will override the name provided
   // during creation.
@@ -156,16 +175,20 @@ public:
    */
   virtual void End(const EndSpanOptions &options = {}) noexcept = 0;
 
-  // TODO
-  // SpanContext context() const noexcept = 0;
+  virtual trace::SpanContext GetContext() const noexcept = 0;
 
   // Returns true if this Span is recording tracing events (e.g. SetAttribute,
   // AddEvent).
   virtual bool IsRecording() const noexcept = 0;
-
-  virtual Tracer &tracer() const noexcept = 0;
-
-  virtual void SetToken(nostd::unique_ptr<context::Token> &&token) noexcept = 0;
 };
+
+template <class SpanType, class TracerType>
+nostd::shared_ptr<trace::Span> to_span_ptr(TracerType *objPtr,
+                                           nostd::string_view name,
+                                           const trace::StartSpanOptions &options)
+{
+  return nostd::shared_ptr<trace::Span>{new (std::nothrow) SpanType{*objPtr, name, options}};
+}
+
 }  // namespace trace
 OPENTELEMETRY_END_NAMESPACE

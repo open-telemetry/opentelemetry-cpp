@@ -24,5 +24,10 @@ sudo chown -R $(whoami) /usr/local/var/homebrew
 sudo chown -R $(whoami) /usr/local/etc/bash_completion.d /usr/local/include /usr/local/lib/pkgconfig /usr/local/share/aclocal /usr/local/share/locale /usr/local/share/zsh /usr/local/share/zsh/site-functions /usr/local/var/homebrew/locks
 
 brew install cmake
+brew install coreutils
 brew install wget
 brew install clang-format
+brew install google-benchmark
+brew tap nlohmann/json
+brew install nlohmann-json
+brew install abseil

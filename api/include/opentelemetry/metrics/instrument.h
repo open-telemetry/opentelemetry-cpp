@@ -2,9 +2,9 @@
 
 #include <iostream>
 #include "opentelemetry/common/attribute_value.h"
+#include "opentelemetry/common/key_value_iterable_view.h"
 #include "opentelemetry/nostd/shared_ptr.h"
 #include "opentelemetry/nostd/string_view.h"
-#include "opentelemetry/trace/key_value_iterable_view.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace metrics
@@ -38,7 +38,7 @@ public:
    * @param description explains what the metric captures
    * @param unit specifies the data type held in the instrument
    * @param enabled determines if the metric is currently capturing data
-   * @return Instrument type with the specified attirbutes
+   * @return Instrument type with the specified attributes
    */
   Instrument(nostd::string_view name,
              nostd::string_view description,
@@ -135,7 +135,7 @@ public:
    * @return a Bound Instrument
    */
   virtual nostd::shared_ptr<BoundSynchronousInstrument<T>> bind(
-      const trace::KeyValueIterable &labels)
+      const common::KeyValueIterable &labels)
   {
     return nostd::shared_ptr<BoundSynchronousInstrument<T>>();
   }
@@ -152,7 +152,7 @@ public:
    * @param value is the numerical representation of the metric being captured
    * @return void
    */
-  virtual void update(T value, const trace::KeyValueIterable &labels) = 0;
+  virtual void update(T value, const common::KeyValueIterable &labels) = 0;
 };
 
 template <class T>
@@ -181,7 +181,7 @@ public:
    * @param labels is the numerical representation of the metric being captured
    * @return none
    */
-  virtual void observe(T value, const trace::KeyValueIterable &labels) = 0;
+  virtual void observe(T value, const common::KeyValueIterable &labels) = 0;
 
   /**
    * Captures data by activating the callback function associated with the

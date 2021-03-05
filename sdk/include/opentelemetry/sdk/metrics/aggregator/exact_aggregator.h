@@ -62,6 +62,7 @@ public:
   void update(T val) override
   {
     this->mu_.lock();
+    this->updated_ = true;
     this->values_.push_back(val);
     this->mu_.unlock();
   }
@@ -74,6 +75,7 @@ public:
   void checkpoint() override
   {
     this->mu_.lock();
+    this->updated_ = false;
     if (quant_estimation_)
     {
       std::sort(this->values_.begin(), this->values_.end());
@@ -143,8 +145,8 @@ public:
     }
     else
     {
-      float position = float(this->checkpoint_.size() - 1) * q;
-      int ceiling    = ceil(position);
+      float position = float(float(this->checkpoint_.size() - 1) * q);
+      int ceiling    = int(ceil(position));
       return this->checkpoint_[ceiling];
     }
   }

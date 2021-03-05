@@ -1,6 +1,5 @@
 #include "opentelemetry/exporters/otlp/recordable.h"
 #include <gtest/gtest.h>
-#include "opentelemetry/context/threadlocal_context.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace exporter
@@ -38,6 +37,14 @@ TEST(Recordable, SetName)
   rec.SetName(name);
   EXPECT_EQ(rec.span().name(), name);
 }
+TEST(Recordable, SetSpanKind)
+{
+  Recordable rec;
+  opentelemetry::trace::SpanKind span_kind = opentelemetry::trace::SpanKind::kServer;
+  rec.SetSpanKind(span_kind);
+  EXPECT_EQ(rec.span().kind(),
+            opentelemetry::proto::trace::v1::Span_SpanKind::Span_SpanKind_SPAN_KIND_SERVER);
+}
 
 TEST(Recordable, SetStartTime)
 {
@@ -70,7 +77,7 @@ TEST(Recordable, SetDuration)
 TEST(Recordable, SetStatus)
 {
   Recordable rec;
-  trace::CanonicalCode code(trace::CanonicalCode::OK);
+  trace::StatusCode code(trace::StatusCode::kOk);
   nostd::string_view description = "For test";
   rec.SetStatus(code, description);
 
@@ -106,7 +113,7 @@ TEST(Recordable, AddEventWithAttributes)
       {keys[0], values[0]}, {keys[1], values[1]}, {keys[2], values[2]}};
 
   rec.AddEvent("Test Event", std::chrono::system_clock::now(),
-               trace::KeyValueIterableView<std::map<std::string, int>>(attributes));
+               common::KeyValueIterableView<std::map<std::string, int>>(attributes));
 
   for (int i = 0; i < kNumAttributes; i++)
   {
@@ -124,9 +131,14 @@ TEST(Recordable, AddLink)
   std::map<std::string, int> attributes = {
       {keys[0], values[0]}, {keys[1], values[1]}, {keys[2], values[2]}};
 
-  rec.AddLink(trace::SpanContext(false, false),
-              trace::KeyValueIterableView<std::map<std::string, int>>(attributes));
+  auto trace_id = rec.span().trace_id();
+  auto span_id  = rec.span().span_id();
 
+  rec.AddLink(trace::SpanContext(false, false),
+              common::KeyValueIterableView<std::map<std::string, int>>(attributes));
+
+  EXPECT_EQ(rec.span().trace_id(), trace_id);
+  EXPECT_EQ(rec.span().span_id(), span_id);
   for (int i = 0; i < kNumAttributes; i++)
   {
     EXPECT_EQ(rec.span().links(0).attributes(i).key(), keys[i]);

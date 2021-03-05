@@ -96,7 +96,7 @@ struct Thread
 {
   std::thread m_thread;
 
-  volatile bool m_terminate{false};
+  std::atomic<bool> m_terminate{false};
 
   /// <summary>
   /// Thread Constructor
@@ -207,7 +207,7 @@ struct SocketAddr
     {
       inet4.sin_port = htons(atoi(colon + 1));
       char buf[16];
-      memcpy(buf, addr, std::min<ptrdiff_t>(15, colon - addr));
+      memcpy(buf, addr, (std::min<ptrdiff_t>)(15, colon - addr));
       buf[15] = '\0';
       ::inet_pton(AF_INET, buf, &inet4.sin_addr);
     }
@@ -231,8 +231,7 @@ struct SocketAddr
   {
     switch (m_data.sa_family)
     {
-      case AF_INET:
-      {
+      case AF_INET: {
         sockaddr_in const &inet4 = reinterpret_cast<sockaddr_in const &>(m_data);
         return ntohs(inet4.sin_port);
       }
@@ -248,8 +247,7 @@ struct SocketAddr
 
     switch (m_data.sa_family)
     {
-      case AF_INET:
-      {
+      case AF_INET: {
         sockaddr_in const &inet4 = reinterpret_cast<sockaddr_in const &>(m_data);
         u_long addr              = ntohl(inet4.sin_addr.s_addr);
         os << (addr >> 24) << '.' << ((addr >> 16) & 255) << '.' << ((addr >> 8) & 255) << '.'

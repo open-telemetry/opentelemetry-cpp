@@ -3,7 +3,10 @@
 #include "opentelemetry/nostd/shared_ptr.h"
 #include "opentelemetry/nostd/string_view.h"
 #include "opentelemetry/nostd/unique_ptr.h"
+#include "opentelemetry/trace/default_span.h"
+#include "opentelemetry/trace/scope.h"
 #include "opentelemetry/trace/span.h"
+#include "opentelemetry/trace/span_context_kv_iterable_view.h"
 #include "opentelemetry/version.h"
 
 #include <chrono>
@@ -30,21 +33,36 @@ public:
    * key will be overwritten.
    */
   virtual nostd::shared_ptr<Span> StartSpan(nostd::string_view name,
-                                            const KeyValueIterable &attributes,
+                                            const common::KeyValueIterable &attributes,
+                                            const SpanContextKeyValueIterable &links,
                                             const StartSpanOptions &options = {}) noexcept = 0;
 
   nostd::shared_ptr<Span> StartSpan(nostd::string_view name,
                                     const StartSpanOptions &options = {}) noexcept
   {
-    return this->StartSpan(name, {}, options);
+    return this->StartSpan(name, {}, {}, options);
   }
 
-  template <class T, nostd::enable_if_t<detail::is_key_value_iterable<T>::value> * = nullptr>
+  template <class T,
+            nostd::enable_if_t<common::detail::is_key_value_iterable<T>::value> * = nullptr>
   nostd::shared_ptr<Span> StartSpan(nostd::string_view name,
                                     const T &attributes,
                                     const StartSpanOptions &options = {}) noexcept
   {
-    return this->StartSpan(name, KeyValueIterableView<T>(attributes), options);
+    return this->StartSpan(name, attributes, {}, options);
+  }
+
+  template <class T,
+            class U,
+            nostd::enable_if_t<common::detail::is_key_value_iterable<T>::value> * = nullptr,
+            nostd::enable_if_t<detail::is_span_context_kv_iterable<U>::value> *   = nullptr>
+  nostd::shared_ptr<Span> StartSpan(nostd::string_view name,
+                                    const T &attributes,
+                                    const U &links,
+                                    const StartSpanOptions &options = {}) noexcept
+  {
+    return this->StartSpan(name, common::KeyValueIterableView<T>(attributes),
+                           SpanContextKeyValueIterableView<U>(links), options);
   }
 
   nostd::shared_ptr<Span> StartSpan(
@@ -52,10 +70,89 @@ public:
       std::initializer_list<std::pair<nostd::string_view, common::AttributeValue>> attributes,
       const StartSpanOptions &options = {}) noexcept
   {
+
+    return this->StartSpan(name, attributes, {}, options);
+  }
+
+  template <class T,
+            nostd::enable_if_t<common::detail::is_key_value_iterable<T>::value> * = nullptr>
+  nostd::shared_ptr<Span> StartSpan(
+      nostd::string_view name,
+      const T &attributes,
+      std::initializer_list<
+          std::pair<SpanContext,
+                    std::initializer_list<std::pair<nostd::string_view, common::AttributeValue>>>>
+          links,
+      const StartSpanOptions &options = {}) noexcept
+  {
+    return this->StartSpan(
+        name, attributes,
+        nostd::span<const std::pair<SpanContext, std::initializer_list<std::pair<
+                                                     nostd::string_view, common::AttributeValue>>>>{
+            links.begin(), links.end()},
+        options);
+  }
+
+  template <class T,
+            nostd::enable_if_t<common::detail::is_key_value_iterable<T>::value> * = nullptr>
+  nostd::shared_ptr<Span> StartSpan(
+      nostd::string_view name,
+      std::initializer_list<std::pair<nostd::string_view, common::AttributeValue>> attributes,
+      const T &links,
+      const StartSpanOptions &options = {}) noexcept
+  {
     return this->StartSpan(name,
                            nostd::span<const std::pair<nostd::string_view, common::AttributeValue>>{
                                attributes.begin(), attributes.end()},
-                           options);
+                           links, options);
+  }
+
+  nostd::shared_ptr<Span> StartSpan(
+      nostd::string_view name,
+      std::initializer_list<std::pair<nostd::string_view, common::AttributeValue>> attributes,
+      std::initializer_list<
+          std::pair<SpanContext,
+                    std::initializer_list<std::pair<nostd::string_view, common::AttributeValue>>>>
+          links,
+      const StartSpanOptions &options = {}) noexcept
+  {
+    return this->StartSpan(
+        name,
+        nostd::span<const std::pair<nostd::string_view, common::AttributeValue>>{attributes.begin(),
+                                                                                 attributes.end()},
+        nostd::span<const std::pair<SpanContext, std::initializer_list<std::pair<
+                                                     nostd::string_view, common::AttributeValue>>>>{
+            links.begin(), links.end()},
+        options);
+  }
+
+  /**
+   * Set the active span. The span will remain active until the returned Scope
+   * object is destroyed.
+   * @param span the span that should be set as the new active span.
+   * @return a Scope that controls how long the span will be active.
+   */
+  nostd::unique_ptr<Scope> WithActiveSpan(nostd::shared_ptr<Span> &span) noexcept
+  {
+    return nostd::unique_ptr<Scope>(new Scope{span});
+  }
+
+  /**
+   * Get the currently active span.
+   * @return the currently active span, or an invalid default span if no span
+   * is active.
+   */
+  nostd::shared_ptr<Span> GetCurrentSpan() noexcept
+  {
+    context::ContextValue active_span = context::RuntimeContext::GetValue(kSpanKey);
+    if (nostd::holds_alternative<nostd::shared_ptr<Span>>(active_span))
+    {
+      return nostd::get<nostd::shared_ptr<Span>>(active_span);
+    }
+    else
+    {
+      return nostd::shared_ptr<Span>(new DefaultSpan(SpanContext::GetInvalid()));
+    }
   }
 
   /**

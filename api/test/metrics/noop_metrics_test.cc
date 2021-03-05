@@ -4,6 +4,7 @@
 #include "opentelemetry/metrics/observer_result.h"
 #include "opentelemetry/metrics/sync_instruments.h"
 
+#include <array>
 #include <memory>
 
 OPENTELEMETRY_BEGIN_NAMESPACE
@@ -11,12 +12,10 @@ OPENTELEMETRY_BEGIN_NAMESPACE
 using opentelemetry::metrics::Meter;
 using opentelemetry::metrics::NoopMeter;
 
-namespace metrics_api = opentelemetry::metrics;
-
 void Callback(opentelemetry::metrics::ObserverResult<int> result)
 {
   std::map<std::string, std::string> labels = {{"key", "value"}};
-  auto labelkv                              = trace::KeyValueIterableView<decltype(labels)>{labels};
+  auto labelkv = common::KeyValueIterableView<decltype(labels)>{labels};
   result.observe(1, labelkv);
 }
 
@@ -42,7 +41,7 @@ TEST(NoopMeter, RecordBatch)
   std::unique_ptr<Meter> m{std::unique_ptr<Meter>(new NoopMeter{})};
 
   std::map<std::string, std::string> labels = {{"Key", "Value"}};
-  auto labelkv = opentelemetry::trace::KeyValueIterableView<decltype(labels)>{labels};
+  auto labelkv = opentelemetry::common::KeyValueIterableView<decltype(labels)>{labels};
 
   auto s = m->NewShortCounter("Test short counter", "For testing", "Unitless", true);
 

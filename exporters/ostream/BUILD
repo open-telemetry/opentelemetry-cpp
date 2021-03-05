@@ -1,6 +1,29 @@
 package(default_visibility = ["//visibility:public"])
 
 cc_library(
+    name = "ostream_log_exporter",
+    srcs = [
+        "src/log_exporter.cc",
+    ],
+    hdrs = [
+        "include/opentelemetry/exporters/ostream/log_exporter.h",
+    ],
+    strip_include_prefix = "include",
+    deps = [
+        "//sdk/src/logs",
+    ],
+)
+
+cc_test(
+    name = "ostream_log_test",
+    srcs = ["test/ostream_log_test.cc"],
+    deps = [
+        ":ostream_log_exporter",
+        "@com_google_googletest//:gtest_main",
+    ],
+)
+
+cc_library(
     name = "ostream_metrics_exporter",
     srcs = [
         "src/metrics_exporter.cc",

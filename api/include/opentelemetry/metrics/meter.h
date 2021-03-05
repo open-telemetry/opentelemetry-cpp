@@ -263,19 +263,19 @@ public:
    * @param values a span of values to record to the instruments in the corresponding
    * position in the instruments span.
    */
-  virtual void RecordShortBatch(const trace::KeyValueIterable &labels,
+  virtual void RecordShortBatch(const common::KeyValueIterable &labels,
                                 nostd::span<SynchronousInstrument<short> *> instruments,
                                 nostd::span<const short> values) noexcept = 0;
 
-  virtual void RecordIntBatch(const trace::KeyValueIterable &labels,
+  virtual void RecordIntBatch(const common::KeyValueIterable &labels,
                               nostd::span<SynchronousInstrument<int> *> instruments,
                               nostd::span<const int> values) noexcept = 0;
 
-  virtual void RecordFloatBatch(const trace::KeyValueIterable &labels,
+  virtual void RecordFloatBatch(const common::KeyValueIterable &labels,
                                 nostd::span<SynchronousInstrument<float> *> instruments,
                                 nostd::span<const float> values) noexcept = 0;
 
-  virtual void RecordDoubleBatch(const trace::KeyValueIterable &labels,
+  virtual void RecordDoubleBatch(const common::KeyValueIterable &labels,
                                  nostd::span<SynchronousInstrument<double> *> instruments,
                                  nostd::span<const double> values) noexcept = 0;
 };

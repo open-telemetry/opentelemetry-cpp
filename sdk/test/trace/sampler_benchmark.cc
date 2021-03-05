@@ -1,9 +1,10 @@
-#include "opentelemetry/context/threadlocal_context.h"
+#include "opentelemetry/exporters/memory/in_memory_span_exporter.h"
+#include "opentelemetry/sdk/resource/resource.h"
 #include "opentelemetry/sdk/trace/sampler.h"
 #include "opentelemetry/sdk/trace/samplers/always_off.h"
 #include "opentelemetry/sdk/trace/samplers/always_on.h"
-#include "opentelemetry/sdk/trace/samplers/parent_or_else.h"
-#include "opentelemetry/sdk/trace/samplers/probability.h"
+#include "opentelemetry/sdk/trace/samplers/parent.h"
+#include "opentelemetry/sdk/trace/samplers/trace_id_ratio.h"
 #include "opentelemetry/sdk/trace/simple_processor.h"
 #include "opentelemetry/sdk/trace/span_data.h"
 #include "opentelemetry/sdk/trace/tracer.h"
@@ -13,45 +14,8 @@
 #include <benchmark/benchmark.h>
 
 using namespace opentelemetry::sdk::trace;
-namespace nostd  = opentelemetry::nostd;
-namespace common = opentelemetry::common;
+using opentelemetry::exporter::memory::InMemorySpanExporter;
 using opentelemetry::trace::SpanContext;
-
-/**
- * A mock exporter that switches a flag once a valid recordable was received.
- */
-class MockSpanExporter final : public SpanExporter
-{
-public:
-  MockSpanExporter(std::shared_ptr<std::vector<std::unique_ptr<SpanData>>> spans_received) noexcept
-      : spans_received_(spans_received)
-  {}
-
-  std::unique_ptr<Recordable> MakeRecordable() noexcept override
-  {
-    return std::unique_ptr<Recordable>(new SpanData);
-  }
-
-  ExportResult Export(const nostd::span<std::unique_ptr<Recordable>> &recordables) noexcept override
-  {
-    for (auto &recordable : recordables)
-    {
-      auto span = std::unique_ptr<SpanData>(static_cast<SpanData *>(recordable.release()));
-      if (span != nullptr)
-      {
-        spans_received_->push_back(std::move(span));
-      }
-    }
-
-    return ExportResult::kSuccess;
-  }
-
-  void Shutdown(std::chrono::microseconds timeout = std::chrono::microseconds(0)) noexcept override
-  {}
-
-private:
-  std::shared_ptr<std::vector<std::unique_ptr<SpanData>>> spans_received_;
-};
 
 namespace
 {
@@ -75,23 +39,23 @@ void BM_AlwaysOnSamplerConstruction(benchmark::State &state)
 }
 BENCHMARK(BM_AlwaysOnSamplerConstruction);
 
-void BM_ParentOrElseSamplerConstruction(benchmark::State &state)
+void BM_ParentBasedSamplerConstruction(benchmark::State &state)
 {
   while (state.KeepRunning())
   {
-    benchmark::DoNotOptimize(ParentOrElseSampler(std::make_shared<AlwaysOnSampler>()));
+    benchmark::DoNotOptimize(ParentBasedSampler(std::make_shared<AlwaysOnSampler>()));
   }
 }
-BENCHMARK(BM_ParentOrElseSamplerConstruction);
+BENCHMARK(BM_ParentBasedSamplerConstruction);
 
-void BM_ProbabilitySamplerConstruction(benchmark::State &state)
+void BM_TraceIdRatioBasedSamplerConstruction(benchmark::State &state)
 {
   while (state.KeepRunning())
   {
-    benchmark::DoNotOptimize(ProbabilitySampler(0.01));
+    benchmark::DoNotOptimize(TraceIdRatioBasedSampler(0.01));
   }
 }
-BENCHMARK(BM_ProbabilitySamplerConstruction);
+BENCHMARK(BM_TraceIdRatioBasedSamplerConstruction);
 
 // Sampler Helper Function
 void BenchmarkShouldSampler(Sampler &sampler, benchmark::State &state)
@@ -101,11 +65,18 @@ void BenchmarkShouldSampler(Sampler &sampler, benchmark::State &state)
 
   using M = std::map<std::string, int>;
   M m1    = {{}};
-  opentelemetry::trace::KeyValueIterableView<M> view{m1};
+
+  using L = std::vector<std::pair<trace_api::SpanContext, std::map<std::string, std::string>>>;
+  L l1 = {{trace_api::SpanContext(false, false), {}}, {trace_api::SpanContext(false, false), {}}};
+
+  opentelemetry::common::KeyValueIterableView<M> view{m1};
+  trace_api::SpanContextKeyValueIterableView<L> links{l1};
 
   while (state.KeepRunning())
   {
-    benchmark::DoNotOptimize(sampler.ShouldSample(nullptr, trace_id, "", span_kind, view));
+    auto invalid_ctx = SpanContext::GetInvalid();
+    benchmark::DoNotOptimize(
+        sampler.ShouldSample(invalid_ctx, trace_id, "", span_kind, view, links));
   }
 }
 
@@ -127,31 +98,30 @@ void BM_AlwaysOnSamplerShouldSample(benchmark::State &state)
 }
 BENCHMARK(BM_AlwaysOnSamplerShouldSample);
 
-void BM_ParentOrElseSamplerShouldSample(benchmark::State &state)
+void BM_ParentBasedSamplerShouldSample(benchmark::State &state)
 {
-  ParentOrElseSampler sampler(std::make_shared<AlwaysOnSampler>());
+  ParentBasedSampler sampler(std::make_shared<AlwaysOnSampler>());
 
   BenchmarkShouldSampler(sampler, state);
 }
-BENCHMARK(BM_ParentOrElseSamplerShouldSample);
+BENCHMARK(BM_ParentBasedSamplerShouldSample);
 
-void BM_ProbabilitySamplerShouldSample(benchmark::State &state)
+void BM_TraceIdRatioBasedSamplerShouldSample(benchmark::State &state)
 {
-  ProbabilitySampler sampler(0.01);
+  TraceIdRatioBasedSampler sampler(0.01);
 
   BenchmarkShouldSampler(sampler, state);
 }
-BENCHMARK(BM_ProbabilitySamplerShouldSample);
+BENCHMARK(BM_TraceIdRatioBasedSamplerShouldSample);
 
 // Sampler Helper Function
 void BenchmarkSpanCreation(std::shared_ptr<Sampler> sampler, benchmark::State &state)
 {
-  std::shared_ptr<std::vector<std::unique_ptr<SpanData>>> spans_received(
-      new std::vector<std::unique_ptr<SpanData>>);
-
-  std::unique_ptr<SpanExporter> exporter(new MockSpanExporter(spans_received));
+  std::unique_ptr<SpanExporter> exporter(new InMemorySpanExporter());
   auto processor = std::make_shared<SimpleSpanProcessor>(std::move(exporter));
-  auto tracer    = std::shared_ptr<opentelemetry::trace::Tracer>(new Tracer(processor, sampler));
+  auto resource  = opentelemetry::sdk::resource::Resource::Create({});
+  auto tracer =
+      std::shared_ptr<opentelemetry::trace::Tracer>(new Tracer(processor, resource, sampler));
 
   while (state.KeepRunning())
   {

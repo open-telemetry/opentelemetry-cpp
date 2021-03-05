@@ -1,5 +1,5 @@
 #include "opentelemetry/sdk/trace/tracer_provider.h"
-#include "opentelemetry/context/threadlocal_context.h"
+#include "opentelemetry/sdk/resource/resource.h"
 #include "opentelemetry/sdk/trace/samplers/always_off.h"
 #include "opentelemetry/sdk/trace/samplers/always_on.h"
 #include "opentelemetry/sdk/trace/simple_processor.h"
@@ -8,12 +8,13 @@
 #include <gtest/gtest.h>
 
 using namespace opentelemetry::sdk::trace;
+using namespace opentelemetry::sdk::resource;
 
 TEST(TracerProvider, GetTracer)
 {
   std::shared_ptr<SpanProcessor> processor(new SimpleSpanProcessor(nullptr));
 
-  TracerProvider tp1(processor);
+  TracerProvider tp1(processor, Resource::Create({}));
   auto t1 = tp1.GetTracer("test");
   auto t2 = tp1.GetTracer("test");
   auto t3 = tp1.GetTracer("different", "1.0.0");
@@ -31,7 +32,7 @@ TEST(TracerProvider, GetTracer)
   ASSERT_EQ(processor, sdkTracer1->GetProcessor());
   ASSERT_EQ("AlwaysOnSampler", sdkTracer1->GetSampler()->GetDescription());
 
-  TracerProvider tp2(processor, std::make_shared<AlwaysOffSampler>());
+  TracerProvider tp2(processor, Resource::Create({}), std::make_shared<AlwaysOffSampler>());
   auto sdkTracer2 = dynamic_cast<Tracer *>(tp2.GetTracer("test").get());
   ASSERT_EQ("AlwaysOffSampler", sdkTracer2->GetSampler()->GetDescription());
 }
@@ -55,8 +56,26 @@ TEST(TracerProvider, GetSampler)
 
   // Create a TracerProvicer with a custom AlwaysOffSampler.
   std::shared_ptr<SpanProcessor> processor2(new SimpleSpanProcessor(nullptr));
-  TracerProvider tp2(processor2, std::make_shared<AlwaysOffSampler>());
+  TracerProvider tp2(processor2, Resource::Create({}), std::make_shared<AlwaysOffSampler>());
   auto t3 = tp2.GetSampler();
 
   ASSERT_EQ("AlwaysOffSampler", t3->GetDescription());
+}
+
+TEST(TracerProvider, Shutdown)
+{
+  std::shared_ptr<SpanProcessor> processor1(new SimpleSpanProcessor(nullptr));
+
+  TracerProvider tp1(processor1);
+
+  EXPECT_TRUE(tp1.Shutdown());
+}
+
+TEST(TracerProvider, ForceFlush)
+{
+  std::shared_ptr<SpanProcessor> processor1(new SimpleSpanProcessor(nullptr));
+
+  TracerProvider tp1(processor1);
+
+  EXPECT_TRUE(tp1.ForceFlush());
 }

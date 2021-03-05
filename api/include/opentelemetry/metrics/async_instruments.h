@@ -28,7 +28,7 @@ public:
    * @param value is the numerical representation of the metric being captured
    * @param labels the set of labels, as key-value pairs
    */
-  virtual void observe(T value, const trace::KeyValueIterable &labels) override = 0;
+  virtual void observe(T value, const common::KeyValueIterable &labels) override = 0;
 
   /**
    * Captures data by activating the callback function associated with the
@@ -55,7 +55,7 @@ public:
               void (*callback)(ObserverResult<T>))
   {}
 
-  virtual void observe(T value, const trace::KeyValueIterable &labels) override = 0;
+  virtual void observe(T value, const common::KeyValueIterable &labels) override = 0;
 
   virtual void run() override = 0;
 };
@@ -74,7 +74,7 @@ public:
                     void (*callback)(ObserverResult<T>))
   {}
 
-  virtual void observe(T value, const trace::KeyValueIterable &labels) override = 0;
+  virtual void observe(T value, const common::KeyValueIterable &labels) override = 0;
 
   virtual void run() override = 0;
 };

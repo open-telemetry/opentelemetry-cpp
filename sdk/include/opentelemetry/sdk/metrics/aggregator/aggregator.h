@@ -97,25 +97,33 @@ public:
    */
   virtual AggregatorKind get_aggregator_kind() final { return agg_kind_; }
 
-  // virtual function to be overriden for the Histogram Aggregator
+  /**
+   * Getter function for updated_ protected var
+   *
+   * @return A bool indicating wether or not this aggregator has been updated
+   * in the most recent collection interval.
+   */
+  virtual bool is_updated() final { return updated_; }
+
+  // virtual function to be overridden for the Histogram Aggregator
   virtual std::vector<double> get_boundaries() { return std::vector<double>(); }
 
-  // virtual function to be overriden for the Histogram Aggregator
+  // virtual function to be overridden for the Histogram Aggregator
   virtual std::vector<int> get_counts() { return std::vector<int>(); }
 
-  // virtual function to be overriden for Exact and Sketch Aggregators
+  // virtual function to be overridden for Exact and Sketch Aggregators
   virtual bool get_quant_estimation() { return false; }
 
-  // virtual function to be overriden for Exact and Sketch Aggregators
+  // virtual function to be overridden for Exact and Sketch Aggregators
   virtual T get_quantiles(double q) { return values_[0]; }
 
-  // virtual function to be overriden for Sketch Aggregator
+  // virtual function to be overridden for Sketch Aggregator
   virtual double get_error_bound() { return 0; }
 
-  // virtual function to be overriden for Sketch Aggregator
+  // virtual function to be overridden for Sketch Aggregator
   virtual size_t get_max_buckets() { return 0; }
 
-  // virtual function to be overriden for Gauge Aggregator
+  // virtual function to be overridden for Gauge Aggregator
   virtual core::SystemTimestamp get_checkpoint_timestamp() { return core::SystemTimestamp(); }
 
   // Custom copy constructor to handle the mutex
@@ -134,6 +142,7 @@ protected:
   opentelemetry::metrics::InstrumentKind kind_;
   std::mutex mu_;
   AggregatorKind agg_kind_;
+  bool updated_;
 };
 
 }  // namespace metrics

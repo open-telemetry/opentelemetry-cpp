@@ -48,7 +48,8 @@ public:
    * running_spans.
    * @param span a recordable for a span that was just started
    */
-  void OnStart(opentelemetry::sdk::trace::Recordable &span) noexcept override;
+  void OnStart(opentelemetry::sdk::trace::Recordable &span,
+               const opentelemetry::trace::SpanContext &parent_context) noexcept override;
 
   /*
    * OnEnd is called when a span ends; that span_data is moved from running_spans to
@@ -71,12 +72,14 @@ public:
   /*
    * For now, does nothing. In the future, it
    * may send all ended spans that have not yet been sent to the aggregator.
-   * @param timeout an optional timeout, the default timeout of 0 means that no
-   * timeout is applied. Currently, timeout does nothing.
+   * @param timeout an optional timeout. Currently, timeout does nothing.
+   * @return return the status of the operation.
    */
-  void ForceFlush(
-      std::chrono::microseconds timeout = std::chrono::microseconds(0)) noexcept override
-  {}
+  bool ForceFlush(
+      std::chrono::microseconds timeout = std::chrono::microseconds::max()) noexcept override
+  {
+    return true;
+  }
 
   /*
    * Shut down the processor and do any cleanup required, which is none.
@@ -84,9 +87,13 @@ public:
    * or Shutdown will return immediately without doing anything.
    * @param timeout an optional timeout, the default timeout of 0 means that no
    * timeout is applied. Currently, timeout does nothing.
+   * @return return the status of the operation.
    */
-  void Shutdown(std::chrono::microseconds timeout = std::chrono::microseconds(0)) noexcept override
-  {}
+  bool Shutdown(
+      std::chrono::microseconds timeout = std::chrono::microseconds::max()) noexcept override
+  {
+    return true;
+  }
 
 private:
   mutable std::mutex mtx_;

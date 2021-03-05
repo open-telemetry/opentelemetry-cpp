@@ -23,7 +23,7 @@ public:
 
   ObserverResult(AsynchronousInstrument<T> *instrument) : instrument_(instrument) {}
 
-  virtual void observe(T value, const trace::KeyValueIterable &labels)
+  virtual void observe(T value, const common::KeyValueIterable &labels)
   {
     instrument_->observe(value, labels);
   }

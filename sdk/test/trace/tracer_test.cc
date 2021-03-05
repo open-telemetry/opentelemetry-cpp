@@ -1,20 +1,23 @@
 #include "opentelemetry/sdk/trace/tracer.h"
-#include "opentelemetry/context/threadlocal_context.h"
+#include "opentelemetry/exporters/memory/in_memory_span_exporter.h"
+#include "opentelemetry/sdk/resource/resource.h"
 #include "opentelemetry/sdk/trace/samplers/always_off.h"
 #include "opentelemetry/sdk/trace/samplers/always_on.h"
-#include "opentelemetry/sdk/trace/samplers/parent_or_else.h"
+#include "opentelemetry/sdk/trace/samplers/parent.h"
 #include "opentelemetry/sdk/trace/simple_processor.h"
 #include "opentelemetry/sdk/trace/span_data.h"
 
 #include <gtest/gtest.h>
 
 using namespace opentelemetry::sdk::trace;
+using namespace opentelemetry::sdk::resource;
 using opentelemetry::core::SteadyTimestamp;
 using opentelemetry::core::SystemTimestamp;
-namespace nostd   = opentelemetry::nostd;
-namespace common  = opentelemetry::common;
-namespace context = opentelemetry::context;
-namespace trace   = opentelemetry::trace;
+namespace nostd  = opentelemetry::nostd;
+namespace common = opentelemetry::common;
+using opentelemetry::common::KeyValueIterableView;
+using opentelemetry::exporter::memory::InMemorySpanData;
+using opentelemetry::exporter::memory::InMemorySpanExporter;
 using opentelemetry::trace::SpanContext;
 
 /**
@@ -23,11 +26,13 @@ using opentelemetry::trace::SpanContext;
 class MockSampler final : public Sampler
 {
 public:
-  SamplingResult ShouldSample(const SpanContext * /*parent_context*/,
-                              trace_api::TraceId /*trace_id*/,
-                              nostd::string_view /*name*/,
-                              trace_api::SpanKind /*span_kind*/,
-                              const trace_api::KeyValueIterable & /*attributes*/) noexcept override
+  SamplingResult ShouldSample(
+      const SpanContext & /*parent_context*/,
+      trace_api::TraceId /*trace_id*/,
+      nostd::string_view /*name*/,
+      trace_api::SpanKind /*span_kind*/,
+      const opentelemetry::common::KeyValueIterable & /*attributes*/,
+      const opentelemetry::trace::SpanContextKeyValueIterable & /*links*/) noexcept override
   {
     // Return two pairs of attributes. These attributes should be added to the
     // span attributes
@@ -40,118 +45,97 @@ public:
   nostd::string_view GetDescription() const noexcept override { return "MockSampler"; }
 };
 
-/**
- * A mock exporter that switches a flag once a valid recordable was received.
- */
-class MockSpanExporter final : public SpanExporter
-{
-public:
-  MockSpanExporter(std::shared_ptr<std::vector<std::unique_ptr<SpanData>>> spans_received) noexcept
-      : spans_received_(spans_received)
-  {}
-
-  std::unique_ptr<Recordable> MakeRecordable() noexcept override
-  {
-    return std::unique_ptr<Recordable>(new SpanData);
-  }
-
-  ExportResult Export(const nostd::span<std::unique_ptr<Recordable>> &recordables) noexcept override
-  {
-    for (auto &recordable : recordables)
-    {
-      auto span = std::unique_ptr<SpanData>(static_cast<SpanData *>(recordable.release()));
-      if (span != nullptr)
-      {
-        spans_received_->push_back(std::move(span));
-      }
-    }
-
-    return ExportResult::kSuccess;
-  }
-
-  void Shutdown(std::chrono::microseconds timeout = std::chrono::microseconds(0)) noexcept override
-  {}
-
-private:
-  std::shared_ptr<std::vector<std::unique_ptr<SpanData>>> spans_received_;
-};
-
 namespace
 {
 std::shared_ptr<opentelemetry::trace::Tracer> initTracer(
-    std::shared_ptr<std::vector<std::unique_ptr<SpanData>>> &received)
+    std::unique_ptr<InMemorySpanExporter> &&exporter)
 {
-  std::unique_ptr<SpanExporter> exporter(new MockSpanExporter(received));
   auto processor = std::make_shared<SimpleSpanProcessor>(std::move(exporter));
-  return std::shared_ptr<opentelemetry::trace::Tracer>(new Tracer(processor));
+  auto resource  = Resource::Create({});
+  return std::shared_ptr<opentelemetry::trace::Tracer>(new Tracer(processor, resource));
 }
 
 std::shared_ptr<opentelemetry::trace::Tracer> initTracer(
-    std::shared_ptr<std::vector<std::unique_ptr<SpanData>>> &received,
+    std::unique_ptr<InMemorySpanExporter> &&exporter,
     std::shared_ptr<Sampler> sampler)
 {
-  std::unique_ptr<SpanExporter> exporter(new MockSpanExporter(received));
   auto processor = std::make_shared<SimpleSpanProcessor>(std::move(exporter));
-  return std::shared_ptr<opentelemetry::trace::Tracer>(new Tracer(processor, sampler));
+  auto resource  = Resource::Create({});
+
+  return std::shared_ptr<opentelemetry::trace::Tracer>(new Tracer(processor, resource, sampler));
 }
 }  // namespace
 
-TEST(Tracer, ToMockSpanExporter)
+TEST(Tracer, ToInMemorySpanExporter)
 {
-  std::shared_ptr<std::vector<std::unique_ptr<SpanData>>> spans_received(
-      new std::vector<std::unique_ptr<SpanData>>);
-  auto tracer = initTracer(spans_received);
+  std::unique_ptr<InMemorySpanExporter> exporter(new InMemorySpanExporter());
+  std::shared_ptr<InMemorySpanData> span_data = exporter->GetData();
+  auto tracer                                 = initTracer(std::move(exporter));
 
   auto span_first  = tracer->StartSpan("span 1");
+  auto scope_first = tracer->WithActiveSpan(span_first);
   auto span_second = tracer->StartSpan("span 2");
 
-  ASSERT_EQ(0, spans_received->size());
+  ASSERT_EQ(0, span_data->GetSpans().size());
 
   span_second->End();
-  ASSERT_EQ(1, spans_received->size());
 
-  ASSERT_EQ("span 2", spans_received->at(0)->GetName());
+  auto span2 = span_data->GetSpans();
+  ASSERT_EQ(1, span2.size());
+  ASSERT_EQ("span 2", span2.at(0)->GetName());
+  EXPECT_TRUE(span2.at(0)->GetTraceId().IsValid());
+  EXPECT_TRUE(span2.at(0)->GetSpanId().IsValid());
+  EXPECT_TRUE(span2.at(0)->GetParentSpanId().IsValid());
 
   span_first->End();
-  ASSERT_EQ(2, spans_received->size());
-  ASSERT_EQ("span 1", spans_received->at(1)->GetName());
+
+  auto span1 = span_data->GetSpans();
+  ASSERT_EQ(1, span1.size());
+  ASSERT_EQ("span 1", span1.at(0)->GetName());
+  EXPECT_TRUE(span1.at(0)->GetTraceId().IsValid());
+  EXPECT_TRUE(span1.at(0)->GetSpanId().IsValid());
+  EXPECT_FALSE(span1.at(0)->GetParentSpanId().IsValid());
+
+  // Verify trace and parent span id propagation
+  EXPECT_EQ(span1.at(0)->GetTraceId(), span2.at(0)->GetTraceId());
+  EXPECT_EQ(span2.at(0)->GetParentSpanId(), span1.at(0)->GetSpanId());
 }
 
 TEST(Tracer, StartSpanSampleOn)
 {
-  // create a tracer with default AlwaysOn sampler.
-  std::shared_ptr<std::vector<std::unique_ptr<SpanData>>> spans_received(
-      new std::vector<std::unique_ptr<SpanData>>);
-  auto tracer_on = initTracer(spans_received);
+  std::unique_ptr<InMemorySpanExporter> exporter(new InMemorySpanExporter());
+  std::shared_ptr<InMemorySpanData> span_data = exporter->GetData();
+  auto tracer_on                              = initTracer(std::move(exporter));
 
   tracer_on->StartSpan("span 1")->End();
-  ASSERT_EQ(1, spans_received->size());
 
-  auto &span_data = spans_received->at(0);
-  ASSERT_LT(std::chrono::nanoseconds(0), span_data->GetStartTime().time_since_epoch());
-  ASSERT_LT(std::chrono::nanoseconds(0), span_data->GetDuration());
+  auto spans = span_data->GetSpans();
+  ASSERT_EQ(1, spans.size());
+
+  auto &cur_span_data = spans.at(0);
+  ASSERT_LT(std::chrono::nanoseconds(0), cur_span_data->GetStartTime().time_since_epoch());
+  ASSERT_LT(std::chrono::nanoseconds(0), cur_span_data->GetDuration());
 }
 
 TEST(Tracer, StartSpanSampleOff)
 {
-  std::shared_ptr<std::vector<std::unique_ptr<SpanData>>> spans_received(
-      new std::vector<std::unique_ptr<SpanData>>);
-  // create a tracer with a custom AlwaysOff sampler.
-  auto tracer_off = initTracer(spans_received, std::make_shared<AlwaysOffSampler>());
+  std::unique_ptr<InMemorySpanExporter> exporter(new InMemorySpanExporter());
+  std::shared_ptr<InMemorySpanData> span_data = exporter->GetData();
+  auto tracer_off = initTracer(std::move(exporter), std::make_shared<AlwaysOffSampler>());
 
   // This span will not be recorded.
   tracer_off->StartSpan("span 2")->End();
 
   // The span doesn't write any span data because the sampling decision is alway
-  // NOT_RECORD.
-  ASSERT_EQ(0, spans_received->size());
+  // DROP.
+  ASSERT_EQ(0, span_data->GetSpans().size());
 }
 
 TEST(Tracer, StartSpanWithOptionsTime)
 {
-  std::shared_ptr<std::vector<std::unique_ptr<SpanData>>> spans_received(
-      new std::vector<std::unique_ptr<SpanData>>);
-  auto tracer = initTracer(spans_received);
+  std::unique_ptr<InMemorySpanExporter> exporter(new InMemorySpanExporter());
+  std::shared_ptr<InMemorySpanData> span_data = exporter->GetData();
+  auto tracer                                 = initTracer(std::move(exporter));
 
   opentelemetry::trace::StartSpanOptions start;
   start.start_system_time = SystemTimestamp(std::chrono::nanoseconds(300));
@@ -162,20 +146,19 @@ TEST(Tracer, StartSpanWithOptionsTime)
 
   tracer->StartSpan("span 1", start)->End(end);
 
-  ASSERT_EQ(1, spans_received->size());
+  auto spans = span_data->GetSpans();
+  ASSERT_EQ(1, spans.size());
 
-  auto &span_data = spans_received->at(0);
-  ASSERT_EQ(std::chrono::nanoseconds(300), span_data->GetStartTime().time_since_epoch());
-  ASSERT_EQ(std::chrono::nanoseconds(30), span_data->GetDuration());
+  auto &cur_span_data = spans.at(0);
+  ASSERT_EQ(std::chrono::nanoseconds(300), cur_span_data->GetStartTime().time_since_epoch());
+  ASSERT_EQ(std::chrono::nanoseconds(30), cur_span_data->GetDuration());
 }
 
 TEST(Tracer, StartSpanWithAttributes)
 {
-
-  std::shared_ptr<std::vector<std::unique_ptr<SpanData>>> spans_received(
-      new std::vector<std::unique_ptr<SpanData>>);
-  // The default tracer has empty sampling result attribute
-  auto tracer = initTracer(spans_received);
+  std::unique_ptr<InMemorySpanExporter> exporter(new InMemorySpanExporter());
+  std::shared_ptr<InMemorySpanData> span_data = exporter->GetData();
+  auto tracer                                 = initTracer(std::move(exporter));
 
   // Start a span with all supported scalar attribute types.
   tracer
@@ -190,8 +173,6 @@ TEST(Tracer, StartSpanWithAttributes)
                              {"attr8", 3.1},
                              {"attr9", "string"}})
       ->End();
-
-  ASSERT_EQ(1, spans_received->size());
 
   // Start a span with all supported array attribute types.
   int listInt[]                       = {1, 2, 3};
@@ -216,47 +197,48 @@ TEST(Tracer, StartSpanWithAttributes)
 
   tracer->StartSpan("span 2", m)->End();
 
-  ASSERT_EQ(2, spans_received->size());
+  auto spans = span_data->GetSpans();
+  ASSERT_EQ(2, spans.size());
 
-  auto &span_data = spans_received->at(0);
-  ASSERT_EQ(9, span_data->GetAttributes().size());
-  ASSERT_EQ(314159, nostd::get<int>(span_data->GetAttributes().at("attr1")));
-  ASSERT_EQ(false, nostd::get<bool>(span_data->GetAttributes().at("attr2")));
-  ASSERT_EQ(314159, nostd::get<unsigned int>(span_data->GetAttributes().at("attr3")));
-  ASSERT_EQ(-20, nostd::get<int32_t>(span_data->GetAttributes().at("attr4")));
-  ASSERT_EQ(20, nostd::get<uint32_t>(span_data->GetAttributes().at("attr5")));
-  ASSERT_EQ(-20, nostd::get<int64_t>(span_data->GetAttributes().at("attr6")));
-  ASSERT_EQ(20, nostd::get<uint64_t>(span_data->GetAttributes().at("attr7")));
-  ASSERT_EQ(3.1, nostd::get<double>(span_data->GetAttributes().at("attr8")));
-  ASSERT_EQ("string", nostd::get<std::string>(span_data->GetAttributes().at("attr9")));
+  auto &cur_span_data = spans.at(0);
+  ASSERT_EQ(9, cur_span_data->GetAttributes().size());
+  ASSERT_EQ(314159, nostd::get<int32_t>(cur_span_data->GetAttributes().at("attr1")));
+  ASSERT_EQ(false, nostd::get<bool>(cur_span_data->GetAttributes().at("attr2")));
+  ASSERT_EQ(314159, nostd::get<uint32_t>(cur_span_data->GetAttributes().at("attr3")));
+  ASSERT_EQ(-20, nostd::get<int32_t>(cur_span_data->GetAttributes().at("attr4")));
+  ASSERT_EQ(20, nostd::get<uint32_t>(cur_span_data->GetAttributes().at("attr5")));
+  ASSERT_EQ(-20, nostd::get<int64_t>(cur_span_data->GetAttributes().at("attr6")));
+  ASSERT_EQ(20, nostd::get<uint64_t>(cur_span_data->GetAttributes().at("attr7")));
+  ASSERT_EQ(3.1, nostd::get<double>(cur_span_data->GetAttributes().at("attr8")));
+  ASSERT_EQ("string", nostd::get<std::string>(cur_span_data->GetAttributes().at("attr9")));
 
-  auto &span_data2 = spans_received->at(1);
-  ASSERT_EQ(9, span_data2->GetAttributes().size());
-  ASSERT_EQ(std::vector<int>({1, 2, 3}),
-            nostd::get<std::vector<int>>(span_data2->GetAttributes().at("attr1")));
-  ASSERT_EQ(std::vector<unsigned int>({1, 2, 3}),
-            nostd::get<std::vector<unsigned int>>(span_data2->GetAttributes().at("attr2")));
-  ASSERT_EQ(std::vector<int32_t>({1, -2, 3}),
-            nostd::get<std::vector<int32_t>>(span_data2->GetAttributes().at("attr3")));
+  auto &cur_span_data2 = spans.at(1);
+  ASSERT_EQ(9, cur_span_data2->GetAttributes().size());
+  ASSERT_EQ(std::vector<int32_t>({1, 2, 3}),
+            nostd::get<std::vector<int32_t>>(cur_span_data2->GetAttributes().at("attr1")));
   ASSERT_EQ(std::vector<uint32_t>({1, 2, 3}),
-            nostd::get<std::vector<uint32_t>>(span_data2->GetAttributes().at("attr4")));
+            nostd::get<std::vector<uint32_t>>(cur_span_data2->GetAttributes().at("attr2")));
+  ASSERT_EQ(std::vector<int32_t>({1, -2, 3}),
+            nostd::get<std::vector<int32_t>>(cur_span_data2->GetAttributes().at("attr3")));
+  ASSERT_EQ(std::vector<uint32_t>({1, 2, 3}),
+            nostd::get<std::vector<uint32_t>>(cur_span_data2->GetAttributes().at("attr4")));
   ASSERT_EQ(std::vector<int64_t>({1, -2, 3}),
-            nostd::get<std::vector<int64_t>>(span_data2->GetAttributes().at("attr5")));
+            nostd::get<std::vector<int64_t>>(cur_span_data2->GetAttributes().at("attr5")));
   ASSERT_EQ(std::vector<uint64_t>({1, 2, 3}),
-            nostd::get<std::vector<uint64_t>>(span_data2->GetAttributes().at("attr6")));
+            nostd::get<std::vector<uint64_t>>(cur_span_data2->GetAttributes().at("attr6")));
   ASSERT_EQ(std::vector<double>({1.1, 2.1, 3.1}),
-            nostd::get<std::vector<double>>(span_data2->GetAttributes().at("attr7")));
+            nostd::get<std::vector<double>>(cur_span_data2->GetAttributes().at("attr7")));
   ASSERT_EQ(std::vector<bool>({true, false}),
-            nostd::get<std::vector<bool>>(span_data2->GetAttributes().at("attr8")));
+            nostd::get<std::vector<bool>>(cur_span_data2->GetAttributes().at("attr8")));
   ASSERT_EQ(std::vector<std::string>({"a", "b"}),
-            nostd::get<std::vector<std::string>>(span_data2->GetAttributes().at("attr9")));
+            nostd::get<std::vector<std::string>>(cur_span_data2->GetAttributes().at("attr9")));
 }
 
 TEST(Tracer, StartSpanWithAttributesCopy)
 {
-  std::shared_ptr<std::vector<std::unique_ptr<SpanData>>> spans_received(
-      new std::vector<std::unique_ptr<SpanData>>);
-  auto tracer = initTracer(spans_received);
+  std::unique_ptr<InMemorySpanExporter> exporter(new InMemorySpanExporter());
+  std::shared_ptr<InMemorySpanData> span_data = exporter->GetData();
+  auto tracer                                 = initTracer(std::move(exporter));
 
   {
     std::unique_ptr<std::vector<int64_t>> numbers(new std::vector<int64_t>);
@@ -277,18 +259,19 @@ TEST(Tracer, StartSpanWithAttributesCopy)
         ->End();
   }
 
-  ASSERT_EQ(1, spans_received->size());
+  auto spans = span_data->GetSpans();
+  ASSERT_EQ(1, spans.size());
 
-  auto &span_data = spans_received->at(0);
-  ASSERT_EQ(2, span_data->GetAttributes().size());
+  auto &cur_span_data = spans.at(0);
+  ASSERT_EQ(2, cur_span_data->GetAttributes().size());
 
-  auto numbers = nostd::get<std::vector<int64_t>>(span_data->GetAttributes().at("attr1"));
+  auto numbers = nostd::get<std::vector<int64_t>>(cur_span_data->GetAttributes().at("attr1"));
   ASSERT_EQ(3, numbers.size());
   ASSERT_EQ(1, numbers[0]);
   ASSERT_EQ(2, numbers[1]);
   ASSERT_EQ(3, numbers[2]);
 
-  auto strings = nostd::get<std::vector<std::string>>(span_data->GetAttributes().at("attr2"));
+  auto strings = nostd::get<std::vector<std::string>>(cur_span_data->GetAttributes().at("attr2"));
   ASSERT_EQ(3, strings.size());
   ASSERT_EQ("a", strings[0]);
   ASSERT_EQ("b", strings[1]);
@@ -297,9 +280,10 @@ TEST(Tracer, StartSpanWithAttributesCopy)
 
 TEST(Tracer, GetSampler)
 {
+  auto resource = Resource::Create({});
   // Create a Tracer with a default AlwaysOnSampler
   std::shared_ptr<SpanProcessor> processor_1(new SimpleSpanProcessor(nullptr));
-  std::shared_ptr<Tracer> tracer_on(new Tracer(std::move(processor_1)));
+  std::shared_ptr<Tracer> tracer_on(new Tracer(std::move(processor_1), resource));
 
   auto t1 = tracer_on->GetSampler();
   ASSERT_EQ("AlwaysOnSampler", t1->GetDescription());
@@ -307,7 +291,7 @@ TEST(Tracer, GetSampler)
   // Create a Tracer with a AlwaysOffSampler
   std::shared_ptr<SpanProcessor> processor_2(new SimpleSpanProcessor(nullptr));
   std::shared_ptr<Tracer> tracer_off(
-      new Tracer(std::move(processor_2), std::make_shared<AlwaysOffSampler>()));
+      new Tracer(std::move(processor_2), resource, std::make_shared<AlwaysOffSampler>()));
 
   auto t2 = tracer_off->GetSampler();
   ASSERT_EQ("AlwaysOffSampler", t2->GetDescription());
@@ -315,26 +299,129 @@ TEST(Tracer, GetSampler)
 
 TEST(Tracer, SpanSetAttribute)
 {
-  std::shared_ptr<std::vector<std::unique_ptr<SpanData>>> spans_received(
-      new std::vector<std::unique_ptr<SpanData>>);
-  auto tracer = initTracer(spans_received);
+  std::unique_ptr<InMemorySpanExporter> exporter(new InMemorySpanExporter());
+  std::shared_ptr<InMemorySpanData> span_data = exporter->GetData();
+  auto tracer                                 = initTracer(std::move(exporter));
 
   auto span = tracer->StartSpan("span 1");
 
   span->SetAttribute("abc", 3.1);
 
   span->End();
-  ASSERT_EQ(1, spans_received->size());
-  auto &span_data = spans_received->at(0);
-  ASSERT_EQ(3.1, nostd::get<double>(span_data->GetAttributes().at("abc")));
+
+  auto spans = span_data->GetSpans();
+  ASSERT_EQ(1, spans.size());
+  auto &cur_span_data = spans.at(0);
+  ASSERT_EQ(3.1, nostd::get<double>(cur_span_data->GetAttributes().at("abc")));
+}
+
+TEST(Tracer, SpanSetEvents)
+{
+  std::unique_ptr<InMemorySpanExporter> exporter(new InMemorySpanExporter());
+  std::shared_ptr<InMemorySpanData> span_data = exporter->GetData();
+  auto tracer                                 = initTracer(std::move(exporter));
+
+  auto span = tracer->StartSpan("span 1");
+  span->AddEvent("event 1");
+  span->AddEvent("event 2", std::chrono::system_clock::now());
+  span->AddEvent("event 3", std::chrono::system_clock::now(), {{"attr1", 1}});
+  span->End();
+
+  auto spans = span_data->GetSpans();
+  ASSERT_EQ(1, spans.size());
+
+  auto &span_data_events = spans.at(0)->GetEvents();
+  ASSERT_EQ(3, span_data_events.size());
+  ASSERT_EQ("event 1", span_data_events[0].GetName());
+  ASSERT_EQ("event 2", span_data_events[1].GetName());
+  ASSERT_EQ("event 3", span_data_events[2].GetName());
+  ASSERT_EQ(0, span_data_events[0].GetAttributes().size());
+  ASSERT_EQ(0, span_data_events[1].GetAttributes().size());
+  ASSERT_EQ(1, span_data_events[2].GetAttributes().size());
+}
+
+TEST(Tracer, SpanSetLinks)
+{
+  std::unique_ptr<InMemorySpanExporter> exporter(new InMemorySpanExporter());
+  std::shared_ptr<InMemorySpanData> span_data = exporter->GetData();
+  auto tracer                                 = initTracer(std::move(exporter));
+
+  {
+
+    // Single span link passed through Initialization list
+    tracer->StartSpan("efg", {{"attr1", 1}}, {{SpanContext(false, false), {{"attr2", 2}}}})->End();
+    auto spans = span_data->GetSpans();
+    ASSERT_EQ(1, spans.size());
+
+    auto &span_data_links = spans.at(0)->GetLinks();
+    ASSERT_EQ(1, span_data_links.size());
+    auto link = span_data_links.at(0);
+    ASSERT_EQ(nostd::get<int>(link.GetAttributes().at("attr2")), 2);
+  }
+  {
+
+    // Multiple span links passed through Initialization list
+    tracer
+        ->StartSpan("efg", {{"attr1", 1}},
+                    {{SpanContext(false, false), {{"attr2", 2}}},
+                     {SpanContext(false, false), {{"attr3", 3}}}})
+        ->End();
+    auto spans = span_data->GetSpans();
+    ASSERT_EQ(1, spans.size());
+
+    auto &span_data_links = spans.at(0)->GetLinks();
+    ASSERT_EQ(2, span_data_links.size());
+    auto link1 = span_data_links.at(0);
+    ASSERT_EQ(nostd::get<int>(link1.GetAttributes().at("attr2")), 2);
+    auto link2 = span_data_links.at(1);
+    ASSERT_EQ(nostd::get<int>(link2.GetAttributes().at("attr3")), 3);
+  }
+
+  {
+
+    // Multiple links, each with multiple attributes passed through Initialization list
+    tracer
+        ->StartSpan("efg", {{"attr1", 1}},
+                    {{SpanContext(false, false), {{"attr2", 2}, {"attr3", 3}}},
+                     {SpanContext(false, false), {{"attr4", 4}}}})
+        ->End();
+    auto spans = span_data->GetSpans();
+    ASSERT_EQ(1, spans.size());
+
+    auto &span_data_links = spans.at(0)->GetLinks();
+    ASSERT_EQ(2, span_data_links.size());
+    auto link1 = span_data_links.at(0);
+    ASSERT_EQ(nostd::get<int>(link1.GetAttributes().at("attr2")), 2);
+    ASSERT_EQ(nostd::get<int>(link1.GetAttributes().at("attr3")), 3);
+    auto link2 = span_data_links.at(1);
+    ASSERT_EQ(nostd::get<int>(link2.GetAttributes().at("attr4")), 4);
+  }
+
+  {
+    std::map<std::string, std::string> attrs1 = {{"attr1", "1"}, {"attr2", "2"}};
+    std::map<std::string, std::string> attrs2 = {{"attr3", "3"}, {"attr4", "4"}};
+
+    std::vector<std::pair<SpanContext, std::map<std::string, std::string>>> links = {
+        {SpanContext(false, false), attrs1}, {SpanContext(false, false), attrs2}};
+    tracer->StartSpan("efg", attrs1, links)->End();
+    auto spans = span_data->GetSpans();
+
+    auto &span_data_links = spans.at(0)->GetLinks();
+    ASSERT_EQ(2, span_data_links.size());
+    auto link1 = span_data_links.at(0);
+    ASSERT_EQ(nostd::get<std::string>(link1.GetAttributes().at("attr1")), "1");
+    ASSERT_EQ(nostd::get<std::string>(link1.GetAttributes().at("attr2")), "2");
+    auto link2 = span_data_links.at(1);
+    ASSERT_EQ(nostd::get<std::string>(link2.GetAttributes().at("attr3")), "3");
+    ASSERT_EQ(nostd::get<std::string>(link2.GetAttributes().at("attr4")), "4");
+  }
 }
 
 TEST(Tracer, TestAlwaysOnSampler)
 {
-  std::shared_ptr<std::vector<std::unique_ptr<SpanData>>> spans_received(
-      new std::vector<std::unique_ptr<SpanData>>);
-
-  auto tracer_on = initTracer(spans_received);
+  std::unique_ptr<InMemorySpanExporter> exporter(new InMemorySpanExporter());
+  std::shared_ptr<InMemorySpanData> span_data = exporter->GetData();
+  auto tracer_on                              = initTracer(std::move(exporter));
 
   // Testing AlwaysOn sampler.
   // Create two spans for each tracer. Check the exported result.
@@ -342,16 +429,18 @@ TEST(Tracer, TestAlwaysOnSampler)
   auto span_on_2 = tracer_on->StartSpan("span 2");
   span_on_2->End();
   span_on_1->End();
-  ASSERT_EQ(2, spans_received->size());
-  ASSERT_EQ("span 2", spans_received->at(0)->GetName());  // span 2 ends first.
-  ASSERT_EQ("span 1", spans_received->at(1)->GetName());
+
+  auto spans = span_data->GetSpans();
+  ASSERT_EQ(2, spans.size());
+  ASSERT_EQ("span 2", spans.at(0)->GetName());  // span 2 ends first.
+  ASSERT_EQ("span 1", spans.at(1)->GetName());
 }
 
 TEST(Tracer, TestAlwaysOffSampler)
 {
-  std::shared_ptr<std::vector<std::unique_ptr<SpanData>>> spans_received_off(
-      new std::vector<std::unique_ptr<SpanData>>);
-  auto tracer_off = initTracer(spans_received_off, std::make_shared<AlwaysOffSampler>());
+  std::unique_ptr<InMemorySpanExporter> exporter(new InMemorySpanExporter());
+  std::shared_ptr<InMemorySpanData> span_data = exporter->GetData();
+  auto tracer_off = initTracer(std::move(exporter), std::make_shared<AlwaysOffSampler>());
   auto span_off_1 = tracer_off->StartSpan("span 1");
   auto span_off_2 = tracer_off->StartSpan("span 2");
 
@@ -361,19 +450,18 @@ TEST(Tracer, TestAlwaysOffSampler)
   span_off_1->End();
 
   // The tracer export nothing with an AlwaysOff sampler
-  ASSERT_EQ(0, spans_received_off->size());
+  ASSERT_EQ(0, span_data->GetSpans().size());
 }
 
-TEST(Tracer, TestParentOrElseSampler)
+TEST(Tracer, TestParentBasedSampler)
 {
-  std::shared_ptr<std::vector<std::unique_ptr<SpanData>>> spans_received_parent_on(
-      new std::vector<std::unique_ptr<SpanData>>);
-
   // Current ShouldSample always pass an empty ParentContext,
   // so this sampler will work as an AlwaysOnSampler.
+  std::unique_ptr<InMemorySpanExporter> exporter(new InMemorySpanExporter());
+  std::shared_ptr<InMemorySpanData> span_data_parent_on = exporter->GetData();
   auto tracer_parent_on =
-      initTracer(spans_received_parent_on,
-                 std::make_shared<ParentOrElseSampler>(std::make_shared<AlwaysOnSampler>()));
+      initTracer(std::move(exporter),
+                 std::make_shared<ParentBasedSampler>(std::make_shared<AlwaysOnSampler>()));
 
   auto span_parent_on_1 = tracer_parent_on->StartSpan("span 1");
   auto span_parent_on_2 = tracer_parent_on->StartSpan("span 2");
@@ -382,18 +470,19 @@ TEST(Tracer, TestParentOrElseSampler)
 
   span_parent_on_2->End();
   span_parent_on_1->End();
-  ASSERT_EQ(2, spans_received_parent_on->size());
-  ASSERT_EQ("span 2", spans_received_parent_on->at(0)->GetName());
-  ASSERT_EQ("span 1", spans_received_parent_on->at(1)->GetName());
 
-  std::shared_ptr<std::vector<std::unique_ptr<SpanData>>> spans_received_parent_off(
-      new std::vector<std::unique_ptr<SpanData>>);
+  auto spans = span_data_parent_on->GetSpans();
+  ASSERT_EQ(2, spans.size());
+  ASSERT_EQ("span 2", spans.at(0)->GetName());
+  ASSERT_EQ("span 1", spans.at(1)->GetName());
 
   // Current ShouldSample always pass an empty ParentContext,
   // so this sampler will work as an AlwaysOnSampler.
+  std::unique_ptr<InMemorySpanExporter> exporter2(new InMemorySpanExporter());
+  std::shared_ptr<InMemorySpanData> span_data_parent_off = exporter2->GetData();
   auto tracer_parent_off =
-      initTracer(spans_received_parent_off,
-                 std::make_shared<ParentOrElseSampler>(std::make_shared<AlwaysOffSampler>()));
+      initTracer(std::move(exporter2),
+                 std::make_shared<ParentBasedSampler>(std::make_shared<AlwaysOffSampler>()));
 
   auto span_parent_off_1 = tracer_parent_off->StartSpan("span 1");
   auto span_parent_off_2 = tracer_parent_off->StartSpan("span 2");
@@ -402,30 +491,75 @@ TEST(Tracer, TestParentOrElseSampler)
 
   span_parent_off_1->End();
   span_parent_off_2->End();
-  ASSERT_EQ(0, spans_received_parent_off->size());
+  ASSERT_EQ(0, span_data_parent_off->GetSpans().size());
 }
 
-TEST(Tracer, StartSpanUpdatesRuntimeContext)
+TEST(Tracer, WithActiveSpan)
 {
+  std::unique_ptr<InMemorySpanExporter> exporter(new InMemorySpanExporter());
+  std::shared_ptr<InMemorySpanData> span_data = exporter->GetData();
+  auto tracer                                 = initTracer(std::move(exporter));
+  auto spans                                  = span_data.get()->GetSpans();
 
-  std::shared_ptr<std::vector<std::unique_ptr<SpanData>>> spans_received(
-      new std::vector<std::unique_ptr<SpanData>>);
-  auto tracer = initTracer(spans_received);
+  ASSERT_EQ(0, spans.size());
 
-  auto span_first  = tracer->StartSpan("span 1");
-  auto span_second = tracer->StartSpan("span 2");
+  {
+    auto span_first  = tracer->StartSpan("span 1");
+    auto scope_first = tracer->WithActiveSpan(span_first);
 
-  EXPECT_EQ(0, spans_received->size());
+    {
+      auto span_second  = tracer->StartSpan("span 2");
+      auto scope_second = tracer->WithActiveSpan(span_second);
 
-  nostd::get<nostd::shared_ptr<trace::Span>>(
-      context::RuntimeContext::GetCurrent().GetValue(SpanKey))
-      ->End();
-  EXPECT_EQ(1, spans_received->size());
-  EXPECT_EQ("span 2", spans_received->at(0)->GetName());
+      spans = span_data->GetSpans();
+      ASSERT_EQ(0, spans.size());
 
-  nostd::get<nostd::shared_ptr<trace::Span>>(
-      context::RuntimeContext::GetCurrent().GetValue(SpanKey))
-      ->End();
-  EXPECT_EQ(2, spans_received->size());
-  EXPECT_EQ("span 1", spans_received->at(1)->GetName());
+      span_second->End();
+    }
+
+    spans = span_data->GetSpans();
+    ASSERT_EQ(1, spans.size());
+    EXPECT_EQ("span 2", spans.at(0)->GetName());
+
+    span_first->End();
+  }
+
+  spans = span_data->GetSpans();
+  ASSERT_EQ(1, spans.size());
+  EXPECT_EQ("span 1", spans.at(0)->GetName());
+}
+
+TEST(Tracer, ExpectParent)
+{
+  std::unique_ptr<InMemorySpanExporter> exporter(new InMemorySpanExporter());
+  std::shared_ptr<InMemorySpanData> span_data = exporter->GetData();
+  auto tracer                                 = initTracer(std::move(exporter));
+  auto spans                                  = span_data.get()->GetSpans();
+
+  ASSERT_EQ(0, spans.size());
+
+  auto span_first = tracer->StartSpan("span 1");
+
+  trace_api::StartSpanOptions options;
+  options.parent   = span_first->GetContext();
+  auto span_second = tracer->StartSpan("span 2", options);
+
+  options.parent  = span_second->GetContext();
+  auto span_third = tracer->StartSpan("span 3", options);
+
+  span_third->End();
+  span_second->End();
+  span_first->End();
+
+  spans = span_data->GetSpans();
+  ASSERT_EQ(3, spans.size());
+  auto spandata_first  = std::move(spans.at(2));
+  auto spandata_second = std::move(spans.at(1));
+  auto spandata_third  = std::move(spans.at(0));
+  EXPECT_EQ("span 1", spandata_first->GetName());
+  EXPECT_EQ("span 2", spandata_second->GetName());
+  EXPECT_EQ("span 3", spandata_third->GetName());
+
+  EXPECT_EQ(spandata_first->GetSpanId(), spandata_second->GetParentSpanId());
+  EXPECT_EQ(spandata_second->GetSpanId(), spandata_third->GetParentSpanId());
 }

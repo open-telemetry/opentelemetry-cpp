@@ -1,4 +1,6 @@
 #include "opentelemetry/trace/span_context.h"
+#include "opentelemetry/trace/span_id.h"
+#include "opentelemetry/trace/trace_id.h"
 
 #include <gtest/gtest.h>
 
@@ -15,15 +17,15 @@ TEST(SpanContextTest, IsSampled)
   ASSERT_EQ(s2.IsSampled(), false);
 }
 
-TEST(SpanContextTest, HasRemoteParent)
+TEST(SpanContextTest, IsRemote)
 {
   SpanContext s1(true, true);
 
-  ASSERT_EQ(s1.HasRemoteParent(), true);
+  ASSERT_EQ(s1.IsRemote(), true);
 
   SpanContext s2(true, false);
 
-  ASSERT_EQ(s2.HasRemoteParent(), false);
+  ASSERT_EQ(s2.IsRemote(), false);
 }
 
 TEST(SpanContextTest, TraceFlags)
@@ -35,4 +37,15 @@ TEST(SpanContextTest, TraceFlags)
   SpanContext s2(false, true);
 
   ASSERT_EQ(s2.trace_flags().flags(), 0);
+}
+
+// Test that SpanContext is invalid
+TEST(SpanContextTest, Invalid)
+{
+  SpanContext s1 = SpanContext::GetInvalid();
+  EXPECT_FALSE(s1.IsValid());
+
+  // Test that trace id and span id are invalid
+  EXPECT_EQ(s1.trace_id(), opentelemetry::trace::TraceId());
+  EXPECT_EQ(s1.span_id(), opentelemetry::trace::SpanId());
 }

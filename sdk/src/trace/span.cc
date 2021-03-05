@@ -1,6 +1,8 @@
 #include "src/trace/span.h"
+#include "src/common/random.h"
 
 #include "opentelemetry/context/runtime_context.h"
+#include "opentelemetry/trace/trace_flags.h"
 #include "opentelemetry/version.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
@@ -39,34 +41,80 @@ SteadyTimestamp NowOr(const SteadyTimestamp &steady)
 }
 }  // namespace
 
+// Helper function to generate random trace id.
+trace_api::TraceId GenerateRandomTraceId()
+{
+  uint8_t trace_id_buf[trace_api::TraceId::kSize];
+  sdk::common::Random::GenerateRandomBuffer(trace_id_buf);
+  return trace_api::TraceId(trace_id_buf);
+}
+
+// Helper function to generate random span id.
+trace_api::SpanId GenerateRandomSpanId()
+{
+  uint8_t span_id_buf[trace_api::SpanId::kSize];
+  sdk::common::Random::GenerateRandomBuffer(span_id_buf);
+  return trace_api::SpanId(span_id_buf);
+}
+
 Span::Span(std::shared_ptr<Tracer> &&tracer,
            std::shared_ptr<SpanProcessor> processor,
            nostd::string_view name,
-           const trace_api::KeyValueIterable &attributes,
-           const trace_api::StartSpanOptions &options) noexcept
+           const opentelemetry::common::KeyValueIterable &attributes,
+           const trace_api::SpanContextKeyValueIterable &links,
+           const trace_api::StartSpanOptions &options,
+           const trace_api::SpanContext &parent_span_context,
+           const opentelemetry::sdk::resource::Resource &resource) noexcept
     : tracer_{std::move(tracer)},
       processor_{processor},
       recordable_{processor_->MakeRecordable()},
       start_steady_time{options.start_steady_time},
-      has_ended_{false},
-      token_{nullptr}
-
+      has_ended_{false}
 {
-  (void)options;
   if (recordable_ == nullptr)
   {
     return;
   }
   recordable_->SetName(name);
 
-  attributes.ForEachKeyValue([&](nostd::string_view key, common::AttributeValue value) noexcept {
-    recordable_->SetAttribute(key, value);
+  trace_api::TraceId trace_id;
+  trace_api::SpanId span_id = GenerateRandomSpanId();
+  bool is_parent_span_valid = false;
+
+  if (parent_span_context.IsValid())
+  {
+    trace_id = parent_span_context.trace_id();
+    recordable_->SetIds(trace_id, span_id, parent_span_context.span_id());
+    is_parent_span_valid = true;
+  }
+  else
+  {
+    trace_id = GenerateRandomTraceId();
+    recordable_->SetIds(trace_id, span_id, trace_api::SpanId());
+  }
+
+  span_context_ = std::unique_ptr<trace_api::SpanContext>(
+      new trace_api::SpanContext(trace_id, span_id, trace_api::TraceFlags(), false,
+                                 is_parent_span_valid ? parent_span_context.trace_state()
+                                                      : trace_api::TraceState::GetDefault()));
+
+  attributes.ForEachKeyValue(
+      [&](nostd::string_view key, opentelemetry::common::AttributeValue value) noexcept {
+        recordable_->SetAttribute(key, value);
+        return true;
+      });
+
+  links.ForEachKeyValue([&](opentelemetry::trace::SpanContext span_context,
+                            const opentelemetry::common::KeyValueIterable &attributes) {
+    recordable_->AddLink(span_context, attributes);
     return true;
   });
 
+  recordable_->SetSpanKind(options.kind);
   recordable_->SetStartTime(NowOr(options.start_system_time));
   start_steady_time = NowOr(options.start_steady_time);
-  processor_->OnStart(*recordable_);
+  // recordable_->SetResource(resource_); TODO
+  processor_->OnStart(*recordable_, parent_span_context);
 }
 
 Span::~Span()
@@ -74,7 +122,8 @@ Span::~Span()
   End();
 }
 
-void Span::SetAttribute(nostd::string_view key, const common::AttributeValue &value) noexcept
+void Span::SetAttribute(nostd::string_view key,
+                        const opentelemetry::common::AttributeValue &value) noexcept
 {
   std::lock_guard<std::mutex> lock_guard{mu_};
 
@@ -83,25 +132,37 @@ void Span::SetAttribute(nostd::string_view key, const common::AttributeValue &va
 
 void Span::AddEvent(nostd::string_view name) noexcept
 {
-  (void)name;
+  std::lock_guard<std::mutex> lock_guard{mu_};
+  if (recordable_ == nullptr)
+  {
+    return;
+  }
+  recordable_->AddEvent(name);
 }
 
 void Span::AddEvent(nostd::string_view name, core::SystemTimestamp timestamp) noexcept
 {
-  (void)name;
-  (void)timestamp;
+  std::lock_guard<std::mutex> lock_guard{mu_};
+  if (recordable_ == nullptr)
+  {
+    return;
+  }
+  recordable_->AddEvent(name, timestamp);
 }
 
 void Span::AddEvent(nostd::string_view name,
                     core::SystemTimestamp timestamp,
-                    const trace_api::KeyValueIterable &attributes) noexcept
+                    const opentelemetry::common::KeyValueIterable &attributes) noexcept
 {
-  (void)name;
-  (void)timestamp;
-  (void)attributes;
+  std::lock_guard<std::mutex> lock_guard{mu_};
+  if (recordable_ == nullptr)
+  {
+    return;
+  }
+  recordable_->AddEvent(name, timestamp, attributes);
 }
 
-void Span::SetStatus(trace_api::CanonicalCode code, nostd::string_view description) noexcept
+void Span::SetStatus(opentelemetry::trace::StatusCode code, nostd::string_view description) noexcept
 {
   std::lock_guard<std::mutex> lock_guard{mu_};
   if (recordable_ == nullptr)
@@ -131,12 +192,6 @@ void Span::End(const trace_api::EndSpanOptions &options) noexcept
   }
   has_ended_ = true;
 
-  if (token_ != nullptr)
-  {
-    context::RuntimeContext::Detach(*token_);
-    token_.reset();
-  }
-
   if (recordable_ == nullptr)
   {
     return;
@@ -155,12 +210,6 @@ bool Span::IsRecording() const noexcept
   std::lock_guard<std::mutex> lock_guard{mu_};
   return recordable_ != nullptr;
 }
-
-void Span::SetToken(nostd::unique_ptr<context::Token> &&token) noexcept
-{
-  token_ = std::move(token);
-}
-
 }  // namespace trace
 }  // namespace sdk
 OPENTELEMETRY_END_NAMESPACE

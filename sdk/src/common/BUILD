@@ -16,7 +16,10 @@ package(default_visibility = ["//visibility:public"])
 
 cc_library(
     name = "random",
-    srcs = ["random.cc"],
+    srcs = [
+        "core.cc",
+        "random.cc",
+    ],
     hdrs = [
         "fast_random_number_generator.h",
         "random.h",

@@ -10,8 +10,6 @@ namespace exporter
 namespace otlp
 {
 
-const std::string kCollectorAddress = "localhost:55678";
-
 // ----------------------------- Helper functions ------------------------------
 
 /**
@@ -35,19 +33,24 @@ void PopulateRequest(const nostd::span<std::unique_ptr<sdk::trace::Recordable>> 
 /**
  * Create service stub to communicate with the OpenTelemetry Collector.
  */
-std::unique_ptr<proto::collector::trace::v1::TraceService::Stub> MakeServiceStub()
+std::unique_ptr<proto::collector::trace::v1::TraceService::Stub> MakeServiceStub(
+    std::string endpoint)
 {
-  auto channel = grpc::CreateChannel(kCollectorAddress, grpc::InsecureChannelCredentials());
+  auto channel = grpc::CreateChannel(endpoint, grpc::InsecureChannelCredentials());
   return proto::collector::trace::v1::TraceService::NewStub(channel);
 }
 
-// -------------------------------- Contructors --------------------------------
+// -------------------------------- Constructors --------------------------------
 
-OtlpExporter::OtlpExporter() : OtlpExporter(MakeServiceStub()) {}
+OtlpExporter::OtlpExporter() : OtlpExporter(OtlpExporterOptions()) {}
+
+OtlpExporter::OtlpExporter(const OtlpExporterOptions &options)
+    : options_(options), trace_service_stub_(MakeServiceStub(options.endpoint))
+{}
 
 OtlpExporter::OtlpExporter(
     std::unique_ptr<proto::collector::trace::v1::TraceService::StubInterface> stub)
-    : trace_service_stub_(std::move(stub))
+    : options_(OtlpExporterOptions()), trace_service_stub_(std::move(stub))
 {}
 
 // ----------------------------- Exporter methods ------------------------------
