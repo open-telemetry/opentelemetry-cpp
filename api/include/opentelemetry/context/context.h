@@ -60,7 +60,7 @@ public:
   }
 
   // Returns the value associated with the passed in key.
-  context::ContextValue GetValue(const nostd::string_view key) noexcept
+  context::ContextValue GetValue(const nostd::string_view key) const noexcept
   {
     for (DataList *data = head_.get(); data != nullptr; data = data->next_.get())
     {
@@ -92,6 +92,17 @@ public:
   }
 
   bool operator==(const Context &other) const noexcept { return (head_ == other.head_); }
+
+  trace::SpanContext GetCurrentSpan() const
+  {
+    ContextValue span = GetValue(trace::kSpanKey);
+    if (nostd::holds_alternative<nostd::shared_ptr<trace::Span>>(span))
+    {
+      return nostd::get<nostd::shared_ptr<trace::Span>>(span).get()->GetContext();
+    }
+
+    return trace::SpanContext::GetInvalid();
+  }
 
 private:
   // A linked list to contain the keys and values of this context node

@@ -62,17 +62,6 @@ public:
     return context.SetValue(kSpanKey, sp);
   }
 
-  static SpanContext GetCurrentSpan(const context::Context &context)
-  {
-    context::Context ctx(context);
-    context::ContextValue span = ctx.GetValue(kSpanKey);
-    if (nostd::holds_alternative<nostd::shared_ptr<Span>>(span))
-    {
-      return nostd::get<nostd::shared_ptr<Span>>(span).get()->GetContext();
-    }
-    return SpanContext::GetInvalid();
-  }
-
   static TraceId GenerateTraceIdFromString(nostd::string_view trace_id)
   {
     uint8_t buf[kTraceIdHexStrLength / 2];
@@ -213,7 +202,7 @@ public:
   // Sets the context for a HTTP header carrier with self defined rules.
   void Inject(Setter setter, T &carrier, const context::Context &context) noexcept override
   {
-    SpanContext span_context = B3PropagatorExtractor<T>::GetCurrentSpan(context);
+    SpanContext span_context = context.GetCurrentSpan();
     if (!span_context.IsValid())
     {
       return;
@@ -251,7 +240,7 @@ public:
                           nostd::string_view trace_description);
   void Inject(Setter setter, T &carrier, const context::Context &context) noexcept override
   {
-    SpanContext span_context = B3PropagatorExtractor<T>::GetCurrentSpan(context);
+    SpanContext span_context = context.GetCurrentSpan();
     if (!span_context.IsValid())
     {
       return;
