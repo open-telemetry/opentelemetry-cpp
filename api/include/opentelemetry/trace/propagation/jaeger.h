@@ -50,18 +50,16 @@ public:
 
     // trace-id(32):span-id(16):0:debug(2)
     char trace_state[trace_id_length + span_id_length + 6];
-    span_context.trace_id().ToLowerBase16(
-        nostd::span<char, trace_id_length>(&trace_state[0], trace_id_length));
+    span_context.trace_id().ToLowerBase16({&trace_state[0], trace_id_length});
     trace_state[trace_id_length] = ':';
-    span_context.span_id().ToLowerBase16(
-        nostd::span<char, span_id_length>(&trace_state[trace_id_length + 1], span_id_length));
+    span_context.span_id().ToLowerBase16({&trace_state[trace_id_length + 1], span_id_length});
     trace_state[trace_id_length + span_id_length + 1] = ':';
     trace_state[trace_id_length + span_id_length + 2] = '0';
     trace_state[trace_id_length + span_id_length + 3] = ':';
     trace_state[trace_id_length + span_id_length + 4] = '0';
     trace_state[trace_id_length + span_id_length + 5] = span_context.IsSampled() ? '1' : '0';
 
-    setter(carrier, kTraceHeader, trace_state);
+    setter(carrier, kTraceHeader, nostd::string_view(trace_state, sizeof(trace_state)));
   }
 
   context::Context Extract(Getter getter,
