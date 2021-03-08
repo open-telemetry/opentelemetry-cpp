@@ -95,7 +95,7 @@ TEST_F(CompositeTestPropagatorTest, Extract)
 
   auto span = nostd::get<nostd::shared_ptr<trace::Span>>(ctx2_span);
 
-  // confirm last propagator in composite propagator list ( B3 here) wins for same key
+  // confirm last propagator in composite propagator list (B3 here) wins for same key
   // ("active_span" here).
   EXPECT_EQ(Hex(span->GetContext().trace_id()), "80f198ee56343ba864fe8b2a57d3eff7");
   EXPECT_EQ(Hex(span->GetContext().span_id()), "e457b5a2e4d86bd1");
