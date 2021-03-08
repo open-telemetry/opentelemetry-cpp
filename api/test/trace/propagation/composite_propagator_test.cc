@@ -1,25 +1,19 @@
-#include "opentelemetry/context/context.h"
-#include "opentelemetry/nostd/shared_ptr.h"
-#include "opentelemetry/nostd/span.h"
 #include "opentelemetry/nostd/string_view.h"
-#include "opentelemetry/trace/default_span.h"
-#include "opentelemetry/trace/noop.h"
+#include "opentelemetry/trace/scope.h"
 #include "opentelemetry/trace/span.h"
 #include "opentelemetry/trace/span_context.h"
-#include "opentelemetry/trace/trace_id.h"
-#include "opentelemetry/trace/tracer.h"
-
-#include <map>
-#include <memory>
-#include <string>
-
-#include <gtest/gtest.h>
 
 #include "opentelemetry/trace/default_span.h"
 #include "opentelemetry/trace/propagation/b3_propagator.h"
 #include "opentelemetry/trace/propagation/composite_propagator.h"
 #include "opentelemetry/trace/propagation/http_trace_context.h"
 #include "opentelemetry/trace/propagation/text_map_propagator.h"
+
+#include <map>
+#include <memory>
+#include <string>
+
+#include <gtest/gtest.h>
 
 using namespace opentelemetry;
 
@@ -49,7 +43,13 @@ static void Setter(std::map<std::string, std::string> &carrier,
   carrier[std::string(trace_type)] = std::string(trace_description);
 }
 
-class CompositeTestPropagatorTest : public ::testing::Test
+using MapHttpTraceContext =
+    trace::propagation::HttpTraceContext<std::map<std::string, std::string>>;
+using MapB3Context = trace::propagation::B3Propagator<std::map<std::string, std::string>>;
+using MapCompositePropagator =
+    trace::propagation::CompositePropagator<std::map<std::string, std::string>>;
+
+class CompositePropagatorTest : public ::testing::Test
 {
   using MapHttpTraceContext =
       trace::propagation::HttpTraceContext<std::map<std::string, std::string>>;
@@ -59,28 +59,26 @@ class CompositeTestPropagatorTest : public ::testing::Test
       trace::propagation::CompositePropagator<std::map<std::string, std::string>>;
 
 public:
-  CompositeTestPropagatorTest()
-      : tc_propogator_(std::make_shared<MapHttpTraceContext>()),
-        b3_propogator_(std::make_shared<MapB3Context>())
+  CompositePropagatorTest()
   {
     std::vector<
-        std::shared_ptr<trace::propagation::TextMapPropagator<std::map<std::string, std::string>>>>
+        std::unique_ptr<trace::propagation::TextMapPropagator<std::map<std::string, std::string>>>>
         propogator_list = {};
-    propogator_list.push_back(tc_propogator_);
-    propogator_list.push_back(b3_propogator_);
+    std::unique_ptr<MapHttpTraceContext> tc_propogator(new MapHttpTraceContext());
+    std::unique_ptr<MapB3Context> b3_propogator(new MapB3Context());
+    propogator_list.push_back(std::move(tc_propogator));
+    propogator_list.push_back(std::move(b3_propogator));
 
-    composite_propagator_ = new MapCompositePropagator(propogator_list);
+    composite_propagator_ = new MapCompositePropagator(std::move(propogator_list));
   }
 
-  ~CompositeTestPropagatorTest() { delete composite_propagator_; }
+  ~CompositePropagatorTest() { delete composite_propagator_; }
 
 protected:
-  std::shared_ptr<MapHttpTraceContext> tc_propogator_;
-  std::shared_ptr<MapB3Context> b3_propogator_;
   MapCompositePropagator *composite_propagator_;
 };
 
-TEST_F(CompositeTestPropagatorTest, Extract)
+TEST_F(CompositePropagatorTest, Extract)
 {
 
   const std::map<std::string, std::string> carrier = {
@@ -103,7 +101,7 @@ TEST_F(CompositeTestPropagatorTest, Extract)
   EXPECT_EQ(span->GetContext().IsRemote(), true);
 }
 
-TEST_F(CompositeTestPropagatorTest, Inject)
+TEST_F(CompositePropagatorTest, Inject)
 {
 
   constexpr uint8_t buf_span[]  = {1, 2, 3, 4, 5, 6, 7, 8};

@@ -13,8 +13,8 @@ template <typename T>
 class CompositePropagator : public TextMapPropagator<T>
 {
 public:
-  CompositePropagator(std::vector<std::shared_ptr<TextMapPropagator<T>>> &propagators)
-      : propagators_(propagators)
+  CompositePropagator(std::vector<std::unique_ptr<TextMapPropagator<T>>> propagators)
+      : propagators_(std::move(propagators))
   {}
   // Rules that manages how context will be extracted from carrier.
   using Getter = nostd::string_view (*)(const T &carrier, nostd::string_view trace_type);
@@ -66,7 +66,7 @@ public:
   }
 
 private:
-  std::vector<std::shared_ptr<TextMapPropagator<T>>> propagators_;
+  std::vector<std::unique_ptr<TextMapPropagator<T>>> propagators_;
 };
 }  // namespace propagation
 }  // namespace trace
