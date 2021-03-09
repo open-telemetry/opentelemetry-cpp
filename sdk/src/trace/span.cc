@@ -78,8 +78,9 @@ Span::Span(std::shared_ptr<Tracer> &&tracer,
   recordable_->SetName(name);
 
   trace_api::TraceId trace_id;
-  trace_api::SpanId span_id = GenerateRandomSpanId();
-  bool is_parent_span_valid = false;
+  trace_api::SpanId span_id         = GenerateRandomSpanId();
+  trace_api::TraceFlags trace_flags = parent_span_context.trace_flags();
+  bool is_parent_span_valid         = false;
 
   if (parent_span_context.IsValid())
   {
@@ -94,7 +95,7 @@ Span::Span(std::shared_ptr<Tracer> &&tracer,
   }
 
   span_context_ = std::unique_ptr<trace_api::SpanContext>(
-      new trace_api::SpanContext(trace_id, span_id, trace_api::TraceFlags(), false,
+      new trace_api::SpanContext(trace_id, span_id, trace_flags, false,
                                  is_parent_span_valid ? parent_span_context.trace_state()
                                                       : trace_api::TraceState::GetDefault()));
 
