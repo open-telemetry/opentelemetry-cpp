@@ -90,7 +90,7 @@ TEST_F(CompositePropagatorTest, Extract)
 
   auto ctx2_span = ctx2.GetValue(trace::kSpanKey);
   EXPECT_TRUE(nostd::holds_alternative<nostd::shared_ptr<trace::Span>>(ctx2_span));
-  
+
   auto span = nostd::get<nostd::shared_ptr<trace::Span>>(ctx2_span);
 
   // confirm last propagator in composite propagator list (B3 here) wins for same key

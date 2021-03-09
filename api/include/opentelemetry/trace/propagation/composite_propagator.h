@@ -62,13 +62,16 @@ public:
     context::Context tmp_context;
     for (auto &p : propagators_)
     {
-      if  (first) {
+      if (first)
+      {
         tmp_context = p->Extract(getter, carrier, context);
-      } else {
+      }
+      else
+      {
         tmp_context = p->Extract(getter, carrier, tmp_context);
       }
     }
-    return propagators_.size() ?  tmp_context  : context;
+    return propagators_.size() ? tmp_context : context;
   }
 
 private:
