@@ -65,6 +65,7 @@ public:
       if (first)
       {
         tmp_context = p->Extract(getter, carrier, context);
+        first       = false;
       }
       else
       {
