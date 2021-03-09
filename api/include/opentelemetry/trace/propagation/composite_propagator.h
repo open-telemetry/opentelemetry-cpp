@@ -58,11 +58,17 @@ public:
                            const T &carrier,
                            context::Context &context) noexcept override
   {
+    auto first = true;
+    context::Context tmp_context;
     for (auto &p : propagators_)
     {
-      context = p->Extract(getter, carrier, context);
+      if  (first) {
+        tmp_context = p->Extract(getter, carrier, context);
+      } else {
+        tmp_context = p->Extract(getter, carrier, tmp_context);
+      }
     }
-    return context;
+    return propagators_.size() ?  tmp_context  : context;
   }
 
 private:
