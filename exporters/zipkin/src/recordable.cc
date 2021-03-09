@@ -191,7 +191,7 @@ void Recordable::SetName(nostd::string_view name) noexcept
 
 void Recordable::SetStartTime(opentelemetry::core::SystemTimestamp start_time) noexcept
 {
-    span_["timestamp"] = std::chrono::duration_cast<std::chrono::microseconds>(start_time.time_since_epoch()).count();
+  span_["timestamp"] = std::chrono::duration_cast<std::chrono::microseconds>(start_time.time_since_epoch()).count();
 }
 
 void Recordable::SetDuration(std::chrono::nanoseconds duration) noexcept
