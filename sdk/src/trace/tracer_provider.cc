@@ -47,6 +47,11 @@ bool TracerProvider::Shutdown() noexcept
 {
   return GetProcessor()->Shutdown();
 }
+
+bool TracerProvider::ForceFlush(std::chrono::microseconds timeout) noexcept
+{
+  return GetProcessor()->ForceFlush(timeout);
+}
 }  // namespace trace
 }  // namespace sdk
 OPENTELEMETRY_END_NAMESPACE

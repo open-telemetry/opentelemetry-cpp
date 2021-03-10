@@ -73,6 +73,11 @@ public:
    */
   bool Shutdown() noexcept;
 
+  /**
+   * Force flush the span processor associated with this tracer provider.
+   */
+  bool ForceFlush(std::chrono::microseconds timeout = (std::chrono::microseconds::max)()) noexcept;
+
 private:
   std::shared_ptr<sdk::trace::TracerContext> context_;
   // TODO: We should have one-tracer per-instrumentation library, per specification.
