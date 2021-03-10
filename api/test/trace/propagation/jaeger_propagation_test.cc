@@ -107,6 +107,8 @@ TEST(JaegerPropagatorTest, ExctractInvalidSpans)
   std::vector<std::string> traces = {
       "4bf92f3577b34da6a3ce929d0e0e47344:0102030405060708:0:00",  // too long trace id
       "4bf92f3577b34da6a3ce929d0e0e4734:01020304050607089:0:00",  // too long span id
+      "4bf92f3577b34da6x3ce929d0y0e4734:01020304050607089:0:00",  // invalid trace id character
+      "4bf92f3577b34da6a3ce929d0e0e4734:01020304g50607089:0:00",  // invalid span id character
       "4bf92f3577b34da6a3ce929d0e0e4734::0:00",
       "",
       "::::",
