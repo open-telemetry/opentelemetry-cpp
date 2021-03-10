@@ -14,9 +14,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#include "detail/context.h"
 #include "detail/hex.h"
 #include "detail/string.h"
-#include "detail/context.h"
 #include "opentelemetry/trace/default_span.h"
 #include "opentelemetry/trace/propagation/text_map_propagator.h"
 
@@ -86,7 +86,8 @@ private:
     const size_t trace_field_count = 4;
     nostd::string_view trace_fields[trace_field_count];
 
-    if (detail::SplitString(trace_identity, ':', trace_fields, trace_field_count) != trace_field_count)
+    if (detail::SplitString(trace_identity, ':', trace_fields, trace_field_count) !=
+        trace_field_count)
     {
       return SpanContext::GetInvalid();
     }
