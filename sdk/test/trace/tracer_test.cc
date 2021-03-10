@@ -19,6 +19,7 @@ using opentelemetry::common::KeyValueIterableView;
 using opentelemetry::exporter::memory::InMemorySpanData;
 using opentelemetry::exporter::memory::InMemorySpanExporter;
 using opentelemetry::trace::SpanContext;
+using opentelemetry::trace::TraceFlags;
 
 /**
  * A mock sampler that returns non-empty sampling results attributes.
@@ -559,6 +560,54 @@ TEST(Tracer, ExpectParent)
   EXPECT_EQ("span 1", spandata_first->GetName());
   EXPECT_EQ("span 2", spandata_second->GetName());
   EXPECT_EQ("span 3", spandata_third->GetName());
+
+  EXPECT_EQ(spandata_first->GetSpanId(), spandata_second->GetParentSpanId());
+  EXPECT_EQ(spandata_second->GetSpanId(), spandata_third->GetParentSpanId());
+}
+
+TEST(Tracer, ExpectParentWithValidSpanContext)
+{
+  std::unique_ptr<InMemorySpanExporter> exporter(new InMemorySpanExporter());
+  std::shared_ptr<InMemorySpanData> span_data = exporter->GetData();
+  auto tracer                                 = initTracer(std::move(exporter));
+  auto spans                                  = span_data.get()->GetSpans();
+
+  ASSERT_EQ(0, spans.size());
+
+  // produce valid SpanContext with pseudo span and trace Id.
+  uint8_t span_id_buf[trace_api::SpanId::kSize] = {
+      1,
+  };
+  trace_api::SpanId span_id{span_id_buf};
+  uint8_t trace_id_buf[trace_api::TraceId::kSize] = {
+      2,
+  };
+  trace_api::TraceId trace_id{trace_id_buf};
+
+  trace_api::StartSpanOptions options;
+  options.parent = SpanContext(trace_id, span_id, TraceFlags{TraceFlags::kIsSampled}, true);
+
+  auto span_first = tracer->StartSpan("span 1", options);
+
+  EXPECT_EQ(span_first->GetContext().trace_flags().IsSampled(), true);
+
+  options.parent   = span_first->GetContext();
+  auto span_second = tracer->StartSpan("span 2", options);
+  EXPECT_EQ(span_second->GetContext().trace_flags().IsSampled(), true);
+
+  options.parent  = span_second->GetContext();
+  auto span_third = tracer->StartSpan("span 3", options);
+  EXPECT_EQ(span_third->GetContext().trace_flags().IsSampled(), true);
+
+  span_third->End();
+  span_second->End();
+  span_first->End();
+
+  spans = span_data->GetSpans();
+  ASSERT_EQ(3, spans.size());
+  auto spandata_first  = std::move(spans.at(2));
+  auto spandata_second = std::move(spans.at(1));
+  auto spandata_third  = std::move(spans.at(0));
 
   EXPECT_EQ(spandata_first->GetSpanId(), spandata_second->GetParentSpanId());
   EXPECT_EQ(spandata_second->GetSpanId(), spandata_third->GetParentSpanId());
