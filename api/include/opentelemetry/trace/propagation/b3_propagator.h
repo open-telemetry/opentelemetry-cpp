@@ -4,6 +4,7 @@
 #include <iostream>
 #include <map>
 #include <string>
+#include "detail/context.h"
 #include "opentelemetry/common/key_value_iterable.h"
 #include "opentelemetry/context/context.h"
 #include "opentelemetry/nostd/shared_ptr.h"
@@ -202,7 +203,7 @@ public:
   // Sets the context for a HTTP header carrier with self defined rules.
   void Inject(Setter setter, T &carrier, const context::Context &context) noexcept override
   {
-    SpanContext span_context = context.GetCurrentSpan();
+    SpanContext span_context = detail::GetCurrentSpan(context);
     if (!span_context.IsValid())
     {
       return;
@@ -240,7 +241,7 @@ public:
                           nostd::string_view trace_description);
   void Inject(Setter setter, T &carrier, const context::Context &context) noexcept override
   {
-    SpanContext span_context = context.GetCurrentSpan();
+    SpanContext span_context = detail::GetCurrentSpan(context);
     if (!span_context.IsValid())
     {
       return;

@@ -92,7 +92,7 @@ TEST(JaegerPropagatorTest, ExtractValidSpans)
     context::Context ctx1                            = context::Context{};
     context::Context ctx2                            = format.Extract(Getter, carrier, ctx1);
 
-    auto span = ctx2.GetCurrentSpan();
+    auto span = trace::propagation::detail::GetCurrentSpan(ctx2);
     EXPECT_TRUE(span.IsValid());
 
     EXPECT_EQ(Hex(span.trace_id()), test_trace.expected_trace_id);
@@ -120,7 +120,7 @@ TEST(JaegerPropagatorTest, ExctractInvalidSpans)
     context::Context ctx1                            = context::Context{};
     context::Context ctx2                            = format.Extract(Getter, carrier, ctx1);
 
-    auto span = ctx2.GetCurrentSpan();
+    auto span = trace::propagation::detail::GetCurrentSpan(ctx2);
     EXPECT_FALSE(span.IsValid());
   }
 }

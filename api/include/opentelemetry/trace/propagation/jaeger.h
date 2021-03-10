@@ -16,6 +16,7 @@
 
 #include "detail/hex.h"
 #include "detail/string.h"
+#include "detail/context.h"
 #include "opentelemetry/trace/default_span.h"
 #include "opentelemetry/trace/propagation/text_map_propagator.h"
 
@@ -39,7 +40,7 @@ public:
 
   void Inject(Setter setter, T &carrier, const context::Context &context) noexcept override
   {
-    SpanContext span_context = context.GetCurrentSpan();
+    SpanContext span_context = detail::GetCurrentSpan(context);
     if (!span_context.IsValid())
     {
       return;

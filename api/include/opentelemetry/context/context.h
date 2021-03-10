@@ -93,17 +93,6 @@ public:
 
   bool operator==(const Context &other) const noexcept { return (head_ == other.head_); }
 
-  trace::SpanContext GetCurrentSpan() const
-  {
-    ContextValue span = GetValue(trace::kSpanKey);
-    if (nostd::holds_alternative<nostd::shared_ptr<trace::Span>>(span))
-    {
-      return nostd::get<nostd::shared_ptr<trace::Span>>(span).get()->GetContext();
-    }
-
-    return trace::SpanContext::GetInvalid();
-  }
-
 private:
   // A linked list to contain the keys and values of this context node
   class DataList
