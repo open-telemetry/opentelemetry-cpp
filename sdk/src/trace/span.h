@@ -15,14 +15,15 @@ namespace trace_api = opentelemetry::trace;
 class Span final : public trace_api::Span
 {
 public:
-  explicit Span(std::shared_ptr<Tracer> &&tracer,
-                std::shared_ptr<SpanProcessor> processor,
-                nostd::string_view name,
-                const opentelemetry::common::KeyValueIterable &attributes,
-                const trace_api::SpanContextKeyValueIterable &links,
-                const trace_api::StartSpanOptions &options,
-                const trace_api::SpanContext &parent_span_context,
-                const opentelemetry::sdk::resource::Resource &resource) noexcept;
+  Span(std::shared_ptr<Tracer> &&tracer,
+       std::shared_ptr<SpanProcessor> processor,
+       nostd::string_view name,
+       const opentelemetry::common::KeyValueIterable &attributes,
+       const trace_api::SpanContextKeyValueIterable &links,
+       const trace_api::StartSpanOptions &options,
+       const trace_api::SpanContext &parent_span_context,
+       const opentelemetry::sdk::resource::Resource &resource,
+       const bool sampled = false) noexcept;
 
   ~Span() override;
 
