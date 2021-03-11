@@ -23,7 +23,7 @@ using namespace OPENTELEMETRY_NAMESPACE;
 
 TEST(ETWProvider, ProviderIsRegisteredSuccessfully)
 {
-  std::string providerName = "OpenTelemetry";
+  std::string providerName = "OpenTelemetry-ETW-Provider";
   static ETWProvider etw;
   auto handle = etw.open(providerName.c_str());
 
@@ -33,7 +33,7 @@ TEST(ETWProvider, ProviderIsRegisteredSuccessfully)
 
 TEST(ETWProvider, ProviderIsNotRegisteredSuccessfully)
 {
-  std::string providerName = "Telemetry";
+  std::string providerName = "OpenTelemetry-ETW-Provider-NULL";
   static ETWProvider etw;
 
   bool registered = etw.is_registered(providerName);
@@ -42,7 +42,7 @@ TEST(ETWProvider, ProviderIsNotRegisteredSuccessfully)
 
 TEST(ETWProvider, CheckOpenGUIDDataSuccessfully)
 {
-  std::string providerName = "OpenTelemetry";
+  std::string providerName = "OpenTelemetry-ETW-Provider";
 
   // get GUID from the handle returned
   static ETWProvider etw;
@@ -61,7 +61,7 @@ TEST(ETWProvider, CheckOpenGUIDDataSuccessfully)
 
 TEST(ETWProvider, CheckCloseSuccess)
 {
-  std::string providerName = "OpenTelemetry";
+  std::string providerName = "OpenTelemetry-ETW-Provider";
 
   static ETWProvider etw;
   auto handle = etw.open(providerName.c_str());

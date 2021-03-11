@@ -56,7 +56,7 @@ TEST(ETWTracer, TracerCheck)
   // Windows Defender Firewall API - GP       {0EFF663F-8B6E-4E6D-8182-087A8EAA29CB}
   // Windows Defender Firewall Driver         {D5E09122-D0B2-4235-ADC1-C89FAAAF1069}
 
-  std::string providerName = "OpenTelemetry"; // supply unique instrumentation name here
+  std::string providerName = "OpenTelemetry-ETW-Provider"; // supply unique instrumentation name here
   exporter::ETW::TracerProvider tp;
 
   // TODO: this code should fallback to MsgPack if TLD is not available
