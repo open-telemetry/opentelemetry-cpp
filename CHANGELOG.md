@@ -16,6 +16,7 @@ Increment the:
 ## [Unreleased]
 
 * [EXPORTER] Added Zipkin Exporter. ([#471](https://github.com/open-telemetry/opentelemetry-cpp/pull/471))
+* [PROPAGATOR] Added Composite Propagator ([#597](https://github.com/open-telemetry/opentelemetry-cpp/pull/597))
 
 ## [0.2.0] 2021-03-02
 

@@ -1,4 +1,4 @@
-set(PROTO_PATH "${CMAKE_SOURCE_DIR}/third_party/opentelemetry-proto")
+set(PROTO_PATH "${CMAKE_CURRENT_SOURCE_DIR}/third_party/opentelemetry-proto")
 
 set(COMMON_PROTO "${PROTO_PATH}/opentelemetry/proto/common/v1/common.proto")
 set(RESOURCE_PROTO
