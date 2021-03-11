@@ -26,6 +26,9 @@ const opentelemetry::sdk::resource::Resource &TracerContext::GetResource() const
 void TracerContext::RegisterPipeline(std::unique_ptr<SpanProcessor> processor) noexcept
 {
   // TODO(jsuereth): Implement
+  // 1. If existing processor is an "AggregateProcessor" append the new processor to it.
+  // 2. If the existing processor is NOT an "AggregateProcessor", create a new Aggregate of this and the other,
+  //    then replace our atomic ptr with the new aggregate.
 }
 
 SpanProcessor& TracerContext::GetActiveProcessor() const noexcept {

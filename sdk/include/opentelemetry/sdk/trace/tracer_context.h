@@ -23,9 +23,6 @@ namespace trace
  *   object is alive, and they willl work together.   If this object is destroyed, then
  *   no shared references to Processor, Exporter, Recordable etc. should exist, and all
  *   associated pipelines will have been flushed.
- *
- *
- * TODOs - This should allow more than one processor pipeline to be attached.
  */
 class TracerContext
 {
@@ -63,12 +60,14 @@ public:
    */
   const opentelemetry::sdk::resource::Resource &GetResource() const noexcept;
 
+  /**
+   * Force all active SpanProcessors to flush any buffered spans
+   * within the given timeout.
+   */
   void ForceFlushWithMicroseconds(uint64_t timeout) noexcept;
 
 private:
-  // Note:  Currently Z-Pages Exporter relies on sharing processor w/ HTTP server.
-  // Likely this should be decoupled going forward, for cleaner shutdown semantics
-  // and ownership on pipelines.
+  // This is an atomic pointer so we can adapt the processor pipeline dynamically.
   opentelemetry::sdk::common::AtomicUniquePtr<SpanProcessor> processor_;
   opentelemetry::sdk::resource::Resource resource_;
   std::unique_ptr<Sampler> sampler_;
