@@ -6,6 +6,7 @@
 #include "opentelemetry/ext/zpages/tracez_data_aggregator.h"
 #include "opentelemetry/ext/zpages/tracez_http_server.h"
 #include "opentelemetry/ext/zpages/tracez_processor.h"
+#include "opentelemetry/ext/zpages/tracez_shared_data.h"
 
 #include "opentelemetry/nostd/shared_ptr.h"
 #include "opentelemetry/sdk/trace/tracer_provider.h"
@@ -13,6 +14,7 @@
 
 using opentelemetry::ext::zpages::TracezDataAggregator;
 using opentelemetry::ext::zpages::TracezHttpServer;
+using opentelemetry::ext::zpages::TracezSharedData;
 using opentelemetry::ext::zpages::TracezSpanProcessor;
 using std::chrono::microseconds;
 
@@ -40,19 +42,20 @@ private:
    */
   ZPages()
   {
-    auto tracez_processor_ = std::make_shared<TracezSpanProcessor>();
-    auto tracez_provider_  = opentelemetry::nostd::shared_ptr<opentelemetry::trace::TracerProvider>(
-        new opentelemetry::sdk::trace::TracerProvider(tracez_processor_));
+    auto tracez_shared_data = std::make_shared<TracezSharedData>(); 
+    auto tracez_processor = std::unique_ptr<opentelemetry::sdk::trace::SpanProcessor>(new TracezSpanProcessor(tracez_shared_data));
+    auto tracez_provider  = opentelemetry::nostd::shared_ptr<opentelemetry::trace::TracerProvider>(
+        new opentelemetry::sdk::trace::TracerProvider(std::move(tracez_processor)));
 
     auto tracez_aggregator =
-        std::unique_ptr<TracezDataAggregator>(new TracezDataAggregator(tracez_processor_));
+        std::unique_ptr<TracezDataAggregator>(new TracezDataAggregator(tracez_shared_data));
 
     tracez_server_ =
         std::unique_ptr<TracezHttpServer>(new TracezHttpServer(std::move(tracez_aggregator)));
 
     tracez_server_->start();
 
-    opentelemetry::trace::Provider::SetTracerProvider(tracez_provider_);
+    opentelemetry::trace::Provider::SetTracerProvider(tracez_provider);
   }
 
   ~ZPages()

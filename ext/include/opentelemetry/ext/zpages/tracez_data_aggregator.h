@@ -12,7 +12,7 @@
 
 #include "opentelemetry/ext/zpages/latency_boundaries.h"
 #include "opentelemetry/ext/zpages/tracez_data.h"
-#include "opentelemetry/ext/zpages/tracez_processor.h"
+#include "opentelemetry/ext/zpages/tracez_shared_data.h"
 #include "opentelemetry/nostd/span.h"
 #include "opentelemetry/nostd/string_view.h"
 #include "opentelemetry/sdk/trace/span_data.h"
@@ -46,10 +46,10 @@ public:
   /**
    * Constructor creates a thread that calls a function to aggregate span data
    * at regular intervals.
-   * @param span_processor is the tracez span processor to be set
+   * @param shared_data is the tracez shared span data
    * @param update_interval the time duration for updating the aggregated data.
    */
-  TracezDataAggregator(std::shared_ptr<TracezSpanProcessor> span_processor,
+  TracezDataAggregator(std::shared_ptr<TracezSharedData> shared_data,
                        milliseconds update_interval = milliseconds(10));
 
   /** Ends the thread set up in the constructor and destroys the object **/
@@ -136,7 +136,7 @@ private:
                                 ThreadsafeSpanData &span_data);
 
   /** Instance of span processor used to collect raw data **/
-  std::shared_ptr<TracezSpanProcessor> tracez_span_processor_;
+  std::shared_ptr<TracezSharedData> tracez_shared_data_;
 
   /**
    * Tree map with key being the name of the span and value being a unique ptr

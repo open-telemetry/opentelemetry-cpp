@@ -6,10 +6,10 @@ namespace ext
 namespace zpages
 {
 
-TracezDataAggregator::TracezDataAggregator(std::shared_ptr<TracezSpanProcessor> span_processor,
+TracezDataAggregator::TracezDataAggregator(std::shared_ptr<TracezSharedData> shared_data,
                                            milliseconds update_interval)
+  : tracez_shared_data_(shared_data)
 {
-  tracez_span_processor_ = span_processor;
 
   // Start a thread that calls AggregateSpans periodically or till notified.
   execute_.store(true, std::memory_order_release);
@@ -153,7 +153,7 @@ void TracezDataAggregator::AggregateRunningSpans(
 
 void TracezDataAggregator::AggregateSpans()
 {
-  auto span_snapshot = tracez_span_processor_->GetSpanSnapshot();
+  auto span_snapshot = tracez_shared_data_->GetSpanSnapshot();
   /**
    * TODO: At this time in the project, there is no way of uniquely identifying
    * a span(their id's are not being set yet).
