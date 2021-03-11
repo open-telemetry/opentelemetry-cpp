@@ -9,10 +9,10 @@ TracerProvider::TracerProvider(std::shared_ptr<sdk::trace::TracerContext> contex
     : context_{context}, tracer_(new Tracer(context))
 {}
 
-TracerProvider::TracerProvider(std::shared_ptr<SpanProcessor> processor,
+TracerProvider::TracerProvider(std::unique_ptr<SpanProcessor> processor,
                                opentelemetry::sdk::resource::Resource resource,
                                std::unique_ptr<Sampler> sampler) noexcept
-    : TracerProvider(std::make_shared<TracerContext>(processor, resource, std::move(sampler)))
+    : TracerProvider(std::make_shared<TracerContext>(std::move(processor), resource, std::move(sampler)))
 {}
 
 opentelemetry::nostd::shared_ptr<opentelemetry::trace::Tracer> TracerProvider::GetTracer(
@@ -23,19 +23,9 @@ opentelemetry::nostd::shared_ptr<opentelemetry::trace::Tracer> TracerProvider::G
   return opentelemetry::nostd::shared_ptr<opentelemetry::trace::Tracer>(tracer_);
 }
 
-void TracerProvider::SetProcessor(std::unique_ptr<SpanProcessor> processor) noexcept
+void TracerProvider::RegisterProcessor(std::unique_ptr<SpanProcessor> processor) noexcept
 {
-  return context_->SetProcessor(std::move(processor));
-}
-
-SpanProcessor *TracerProvider::GetProcessor() const noexcept
-{
-  return context_->GetProcessor();
-}
-
-Sampler *TracerProvider::GetSampler() const noexcept
-{
-  return context_->GetSampler();
+  return context_->RegisterPipeline(std::move(processor));
 }
 
 const opentelemetry::sdk::resource::Resource &TracerProvider::GetResource() const noexcept
@@ -45,12 +35,12 @@ const opentelemetry::sdk::resource::Resource &TracerProvider::GetResource() cons
 
 bool TracerProvider::Shutdown() noexcept
 {
-  return GetProcessor()->Shutdown();
+  return context_->GetActiveProcessor().Shutdown();
 }
 
 bool TracerProvider::ForceFlush(std::chrono::microseconds timeout) noexcept
 {
-  return GetProcessor()->ForceFlush(timeout);
+  return context_->GetActiveProcessor().ForceFlush(timeout);
 }
 }  // namespace trace
 }  // namespace sdk

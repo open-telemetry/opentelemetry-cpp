@@ -12,21 +12,6 @@ namespace trace
 {
 Tracer::Tracer(std::shared_ptr<sdk::trace::TracerContext> context) noexcept : context_{context} {}
 
-void Tracer::SetProcessor(std::unique_ptr<SpanProcessor> processor) noexcept
-{
-  context_->SetProcessor(std::move(processor));
-}
-
-SpanProcessor *Tracer::GetProcessor() const noexcept
-{
-  return context_->GetProcessor();
-}
-
-Sampler *Tracer::GetSampler() const noexcept
-{
-  return context_->GetSampler();
-}
-
 trace_api::SpanContext GetCurrentSpanContext(const trace_api::SpanContext &explicit_parent)
 {
   // Use the explicit parent, if it's valid.
@@ -57,7 +42,7 @@ nostd::shared_ptr<trace_api::Span> Tracer::StartSpan(
   trace_api::SpanContext parent = GetCurrentSpanContext(options.parent);
 
   auto sampling_result =
-      GetSampler()->ShouldSample(parent, parent.trace_id(), name, options.kind, attributes, links);
+      context_->GetSampler().ShouldSample(parent, parent.trace_id(), name, options.kind, attributes, links);
   if (sampling_result.decision == Decision::DROP)
   {
     // Don't allocate a no-op span for every DROP decision, but use a static

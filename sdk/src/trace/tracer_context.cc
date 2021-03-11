@@ -7,20 +7,15 @@ namespace sdk
 namespace trace
 {
 
-TracerContext::TracerContext(std::shared_ptr<SpanProcessor> processor,
+TracerContext::TracerContext(std::unique_ptr<SpanProcessor> processor,
                              opentelemetry::sdk::resource::Resource resource,
                              std::unique_ptr<Sampler> sampler) noexcept
-    : processor_(processor), resource_(resource), sampler_(std::move(sampler))
+    : processor_(std::move(processor)), resource_(resource), sampler_(std::move(sampler))
 {}
 
-SpanProcessor *TracerContext::GetProcessor() const noexcept
+Sampler &TracerContext::GetSampler() const noexcept
 {
-  return processor_.load().get();
-}
-
-Sampler *TracerContext::GetSampler() const noexcept
-{
-  return sampler_.Get();
+  return *sampler_.get();
 }
 
 const opentelemetry::sdk::resource::Resource &TracerContext::GetResource() const noexcept
@@ -28,9 +23,13 @@ const opentelemetry::sdk::resource::Resource &TracerContext::GetResource() const
   return resource_;
 }
 
-void TracerContext::SetProcessor(std::shared_ptr<SpanProcessor> processor) noexcept
+void TracerContext::RegisterPipeline(std::unique_ptr<SpanProcessor> processor) noexcept
 {
-  processor_.store(processor);
+  // TODO(jsuereth): Implement
+}
+
+SpanProcessor& TracerContext::GetActiveProcessor() const noexcept {
+  return *processor_;
 }
 
 }  // namespace trace

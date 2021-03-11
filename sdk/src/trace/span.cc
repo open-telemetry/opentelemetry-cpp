@@ -64,7 +64,7 @@ Span::Span(std::shared_ptr<Tracer> &&tracer,
            const trace_api::StartSpanOptions &options,
            const trace_api::SpanContext &parent_span_context) noexcept
     : tracer_{std::move(tracer)},
-      recordable_{tracer_->GetProcessor()->MakeRecordable()},
+      recordable_{tracer_->GetActiveProcessor().MakeRecordable()},
       start_steady_time{options.start_steady_time},
       has_ended_{false}
 {
@@ -110,8 +110,8 @@ Span::Span(std::shared_ptr<Tracer> &&tracer,
   recordable_->SetSpanKind(options.kind);
   recordable_->SetStartTime(NowOr(options.start_system_time));
   start_steady_time = NowOr(options.start_steady_time);
-  // recordable_->SetResource(resource_); TODO
-  tracer_->GetProcessor()->OnStart(*recordable_, parent_span_context);
+  // TODO - OnStart should use Span.
+  tracer_->GetActiveProcessor().OnStart(*recordable_, parent_span_context);
 }
 
 Span::~Span()
@@ -198,7 +198,8 @@ void Span::End(const trace_api::EndSpanOptions &options) noexcept
   recordable_->SetDuration(std::chrono::steady_clock::time_point(end_steady_time) -
                            std::chrono::steady_clock::time_point(start_steady_time));
 
-  tracer_->GetProcessor()->OnEnd(std::move(recordable_));
+  // TODO - OnEnd should use Span.
+  tracer_->GetActiveProcessor().OnEnd(std::move(recordable_));
   recordable_.reset();
 }
 

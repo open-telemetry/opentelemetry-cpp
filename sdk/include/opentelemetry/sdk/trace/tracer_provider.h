@@ -27,7 +27,7 @@ public:
    * @param sampler The sampler for this tracer provider. This must
    * not be a nullptr.
    */
-  explicit TracerProvider(std::shared_ptr<SpanProcessor> processor,
+  explicit TracerProvider(std::unique_ptr<SpanProcessor> processor,
                           opentelemetry::sdk::resource::Resource resource =
                               opentelemetry::sdk::resource::Resource::Create({}),
                           std::unique_ptr<Sampler> sampler =
@@ -44,23 +44,11 @@ public:
       nostd::string_view library_version = "") noexcept override;
 
   /**
-   * Set the span processor associated with this tracer provider.
+   * Attaches a span processor to this tracer provider.
    * @param processor The new span processor for this tracer provider. This
    * must not be a nullptr.
    */
-  void SetProcessor(std::unique_ptr<SpanProcessor> processor) noexcept;
-
-  /**
-   * Obtain the span processor associated with this tracer provider.
-   * @return The span processor for this tracer provider.
-   */
-  SpanProcessor *GetProcessor() const noexcept;
-
-  /**
-   * Obtain the sampler associated with this tracer provider.
-   * @return The sampler for this tracer provider.
-   */
-  Sampler *GetSampler() const noexcept;
+  void RegisterProcessor(std::unique_ptr<SpanProcessor> processor) noexcept;
 
   /**
    * Obtain the resource associated with this tracer provider.

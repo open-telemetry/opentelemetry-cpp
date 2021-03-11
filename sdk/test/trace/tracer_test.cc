@@ -285,14 +285,14 @@ TEST(Tracer, GetSampler)
   // Create a Tracer with a default AlwaysOnSampler
   auto tracer_on = initTracer(nullptr);
 
-  auto t1 = std::dynamic_pointer_cast<Tracer>(tracer_on)->GetSampler();
-  ASSERT_EQ("AlwaysOnSampler", t1->GetDescription());
+  auto &t1 = std::dynamic_pointer_cast<Tracer>(tracer_on)->GetSampler();
+  ASSERT_EQ("AlwaysOnSampler", t1.GetDescription());
 
   // Create a Tracer with a AlwaysOffSampler
   auto tracer_off = initTracer(nullptr, new AlwaysOffSampler());
 
-  auto t2 = std::dynamic_pointer_cast<Tracer>(tracer_off)->GetSampler();
-  ASSERT_EQ("AlwaysOffSampler", t2->GetDescription());
+  auto &t2 = std::dynamic_pointer_cast<Tracer>(tracer_off)->GetSampler();
+  ASSERT_EQ("AlwaysOffSampler", t2.GetDescription());
 }
 
 TEST(Tracer, SpanSetAttribute)

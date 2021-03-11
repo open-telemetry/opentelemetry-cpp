@@ -1,6 +1,5 @@
 #pragma once
 
-#include "opentelemetry/sdk/common/atomic_shared_ptr.h"
 #include "opentelemetry/sdk/common/atomic_unique_ptr.h"
 #include "opentelemetry/sdk/resource/resource.h"
 #include "opentelemetry/sdk/trace/processor.h"
@@ -31,30 +30,32 @@ namespace trace
 class TracerContext
 {
 public:
-  explicit TracerContext(std::shared_ptr<SpanProcessor> processor,
+  explicit TracerContext(std::unique_ptr<SpanProcessor> processor,
                          opentelemetry::sdk::resource::Resource resource =
                              opentelemetry::sdk::resource::Resource::Create({}),
                          std::unique_ptr<Sampler> sampler =
                              std::unique_ptr<AlwaysOnSampler>(new AlwaysOnSampler)) noexcept;
   /**
-   * Obtain the span processor associated with this tracer context.
-   * <p>
-   * This does NOT give ownership to the caller and must be used within the lifecycle of
-   * a shared `TracerContext` object.
-   */
-  SpanProcessor *GetProcessor() const noexcept;
-  /**
-   * Set the span processor associated with this tracer.
+   * Attaches a span processor to this tracer context.
+   * 
    * @param processor The new span processor for this tracer. This must not be
-   * a nullptr.
+   * a nullptr.  Ownership is given to the `TracerContext`.
    */
-  void SetProcessor(std::shared_ptr<SpanProcessor> processor) noexcept;
+  void RegisterPipeline(std::unique_ptr<SpanProcessor> processor) noexcept;
 
   /**
    * Obtain the sampler associated with this tracer.
    * @return The sampler for this tracer.
    */
-  Sampler *GetSampler() const noexcept;
+  Sampler &GetSampler() const noexcept;
+
+  /**
+   * Obtain the (conceptual) active processor.
+   * 
+   * Note: When more than one processor is active, this will
+   * return an "aggregate" processor
+   */
+  SpanProcessor& GetActiveProcessor() const noexcept;
 
   /**
    * Obtain the resource associated with this tracer context.
@@ -68,9 +69,9 @@ private:
   // Note:  Currently Z-Pages Exporter relies on sharing processor w/ HTTP server.
   // Likely this should be decoupled going forward, for cleaner shutdown semantics
   // and ownership on pipelines.
-  opentelemetry::sdk::AtomicSharedPtr<SpanProcessor> processor_;
+  opentelemetry::sdk::common::AtomicUniquePtr<SpanProcessor> processor_;
   opentelemetry::sdk::resource::Resource resource_;
-  opentelemetry::sdk::common::AtomicUniquePtr<Sampler> sampler_;
+  std::unique_ptr<Sampler> sampler_;
 };
 }  // namespace trace
 }  // namespace sdk
