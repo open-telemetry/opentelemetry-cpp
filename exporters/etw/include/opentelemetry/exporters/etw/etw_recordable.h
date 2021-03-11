@@ -216,7 +216,7 @@ private:
   core::SystemTimestamp start_time_;
   std::chrono::nanoseconds duration_{0};
   std::string name_;
-  trace::StatusCode status_code_ { trace::StatusCode::kOk };
+  trace::StatusCode status_code_{trace::StatusCode::kOk};
   std::string status_desc_;
   sdk::common::AttributeMap attribute_map_;
   trace::SpanKind span_kind_{trace::SpanKind::kInternal};

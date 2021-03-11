@@ -13,8 +13,8 @@
 // limitations under the License.
 #pragma once
 
-#include <atomic>
 #include <algorithm>
+#include <atomic>
 
 #include <cstdint>
 #include <cstdio>

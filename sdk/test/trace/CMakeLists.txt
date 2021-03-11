@@ -19,7 +19,10 @@ foreach(
     opentelemetry_trace
     opentelemetry_resources
     opentelemetry_exporter_in_memory)
-  gtest_add_tests(TARGET ${testname} TEST_PREFIX trace. TEST_LIST ${testname})
+  gtest_add_tests(
+    TARGET ${testname}
+    TEST_PREFIX trace.
+    TEST_LIST ${testname})
 endforeach()
 
 add_executable(sampler_benchmark sampler_benchmark.cc)

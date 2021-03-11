@@ -12,8 +12,10 @@ if(CURL_FOUND)
     include_directories(${CURL_INCLUDE_DIRS})
     target_link_libraries(${FILENAME} ${CURL_LIBRARIES} http_client_curl)
   endif()
-  gtest_add_tests(TARGET ${FILENAME} TEST_PREFIX ext.http.curl. TEST_LIST
-                  ${FILENAME})
+  gtest_add_tests(
+    TARGET ${FILENAME}
+    TEST_PREFIX ext.http.curl.
+    TEST_LIST ${FILENAME})
 endif()
 set(URL_PARSER_FILENAME url_parser_test)
 add_executable(${URL_PARSER_FILENAME} ${URL_PARSER_FILENAME}.cc)
