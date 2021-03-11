@@ -19,9 +19,8 @@
 #endif
 
 #ifdef _MSC_VER
-// evntprov.h(838) : warning C4459 : declaration of 'Version' hides global declaration
+#  pragma warning(push)
 #  pragma warning(disable : 4459)
-// needed for Unit Testing with krabs.hpp
 #  pragma warning(disable : 4018)
 #endif
 
@@ -33,7 +32,6 @@
 #include "opentelemetry/exporters/etw/utils.h"
 
 #ifdef HAVE_MSGPACK
-// This option requires INCLUDE_DIR=$(ProjectDir)\..\..\third_party\json\include;...
 #  include "nlohmann/json.hpp"
 #endif
 
@@ -136,8 +134,7 @@ public:
     {
 #ifdef HAVE_TLD
       // Register with TraceLoggingDynamic facility - dynamic manifest ETW events.
-      case EventFormat::ETW_MANIFEST:
-      {
+      case EventFormat::ETW_MANIFEST: {
         tld::ProviderMetadataBuilder<std::vector<BYTE>> providerMetaBuilder(
             data.providerMetaVector);
 
@@ -164,8 +161,7 @@ public:
 
 #ifdef HAVE_MSGPACK
       // Register for MsgPack payload ETW events.
-      case EventFormat::ETW_MSGPACK:
-      {
+      case EventFormat::ETW_MSGPACK: {
         REGHANDLE hProvider = 0;
         if (EventRegister(&data.providerGuid, NULL, NULL, &hProvider) != ERROR_SUCCESS)
         {
@@ -214,7 +210,11 @@ public:
   }
 
   template <class T>
-  unsigned long writeMsgPack(Handle &providerData, T eventData)
+  unsigned long writeMsgPack(Handle &providerData,
+                             T eventData,
+                             LPCGUID ActivityId        = nullptr,
+                             LPCGUID RelatedActivityId = nullptr,
+                             uint8_t Opcode            = 0 /* Information */)
   {
 #ifdef HAVE_MSGPACK
     // Make sure you stop sending event before register unregistering providerData
@@ -287,50 +287,42 @@ public:
       auto &value = kv.second;
       switch (value.index())
       {
-        case common::AttributeType::TYPE_BOOL:
-        {
+        case common::AttributeType::TYPE_BOOL: {
           UINT8 temp = static_cast<UINT8>(nostd::get<bool>(value));
           jObj[name] = temp;
           break;
         }
-        case common::AttributeType::TYPE_INT:
-        {
+        case common::AttributeType::TYPE_INT: {
           auto temp  = nostd::get<int32_t>(value);
           jObj[name] = temp;
           break;
         }
-        case common::AttributeType::TYPE_INT64:
-        {
+        case common::AttributeType::TYPE_INT64: {
           auto temp  = nostd::get<int64_t>(value);
           jObj[name] = temp;
           break;
         }
-        case common::AttributeType::TYPE_UINT:
-        {
+        case common::AttributeType::TYPE_UINT: {
           auto temp  = nostd::get<uint32_t>(value);
           jObj[name] = temp;
           break;
         }
-        case common::AttributeType::TYPE_UINT64:
-        {
+        case common::AttributeType::TYPE_UINT64: {
           auto temp  = nostd::get<uint64_t>(value);
           jObj[name] = temp;
           break;
         }
-        case common::AttributeType::TYPE_DOUBLE:
-        {
+        case common::AttributeType::TYPE_DOUBLE: {
           auto temp  = nostd::get<double>(value);
           jObj[name] = temp;
           break;
         }
-        case common::AttributeType::TYPE_STRING:
-        {
+        case common::AttributeType::TYPE_STRING: {
           jObj[name] = nostd::get<std::string>(value);
           break;
         }
 #  ifdef HAVE_CSTRING_TYPE
-        case common::AttributeType::TYPE_CSTRING:
-        {
+        case common::AttributeType::TYPE_CSTRING: {
           auto temp  = nostd::get<const char *>(value);
           jObj[name] = temp;
           break;
@@ -338,8 +330,7 @@ public:
 #  endif
 #  if HAVE_TYPE_GUID
           // TODO: consider adding UUID/GUID to spec
-        case common::AttributeType::TYPE_GUID:
-        {
+        case common::AttributeType::TYPE_GUID: {
           auto temp = nostd::get<GUID>(value);
           // TODO: add transform from GUID type to string?
           jObj[name] = temp;
@@ -400,11 +391,28 @@ public:
     std::vector<uint8_t> v = nlohmann::json::to_msgpack(l1);
 
     EVENT_DESCRIPTOR evtDescriptor;
-    EventDescCreate(&evtDescriptor, 0, 0x1, 0, 0, 0, 0, 0);
+    // TODO: event descriptor may be populated with additional values as follows:
+    // Id       - if 0, auto-incremented sequence number that uniquely identifies event in a trace
+    // Version  - event version
+    // Channel  - 11 for TraceLogging
+    // Level    - verbosity level
+    // Task     - TaskId
+    // Opcode   - described in evntprov.h:259 : 0 - info, 1 - activity start, 2 - activity stop.
+    EventDescCreate(&evtDescriptor, 0, 0x1, 0, 0, 0, Opcode, 0);
     EVENT_DATA_DESCRIPTOR evtData[1];
     EventDataDescCreate(&evtData[0], v.data(), static_cast<ULONG>(v.size()));
 
-    auto writeResponse = EventWrite(providerData.providerHandle, &evtDescriptor, 1, evtData);
+    ULONG writeResponse = 0;
+
+    if ((ActivityId != nullptr) || (RelatedActivityId != nullptr))
+    {
+      EventWriteTransfer(providerData.providerHandle, &evtDescriptor, ActivityId, RelatedActivityId,
+                         1, evtData);
+    }
+    else
+    {
+      EventWrite(providerData.providerHandle, &evtDescriptor, 1, evtData);
+    };
 
     switch (writeResponse)
     {
@@ -439,7 +447,11 @@ public:
   /// <param name="eventData"></param>
   /// <returns></returns>
   template <class T>
-  unsigned long writeTld(Handle &providerData, T eventData)
+  unsigned long writeTld(Handle &providerData,
+                         T eventData,
+                         LPCGUID ActivityId        = nullptr,
+                         LPCGUID RelatedActivityId = nullptr,
+                         uint8_t Opcode            = 0 /* Information */)
   {
 #ifdef HAVE_TLD
     // Make sure you stop sending event before register unregistering providerData
@@ -486,57 +498,49 @@ public:
       auto &value = kv.second;
       switch (value.index())
       {
-        case common::AttributeType::TYPE_BOOL:
-        {
+        case common::AttributeType::TYPE_BOOL: {
           builder.AddField(name, tld::TypeBool8);
           UINT8 temp = static_cast<UINT8>(nostd::get<bool>(value));
           dbuilder.AddByte(temp);
           break;
         }
-        case common::AttributeType::TYPE_INT:
-        {
+        case common::AttributeType::TYPE_INT: {
           builder.AddField(name, tld::TypeInt32);
           auto temp = nostd::get<int32_t>(value);
           dbuilder.AddValue(temp);
           break;
         }
-        case common::AttributeType::TYPE_INT64:
-        {
+        case common::AttributeType::TYPE_INT64: {
           builder.AddField(name, tld::TypeInt64);
           auto temp = nostd::get<int64_t>(value);
           dbuilder.AddValue(temp);
           break;
         }
-        case common::AttributeType::TYPE_UINT:
-        {
+        case common::AttributeType::TYPE_UINT: {
           builder.AddField(name, tld::TypeUInt32);
           auto temp = nostd::get<uint32_t>(value);
           dbuilder.AddValue(temp);
           break;
         }
-        case common::AttributeType::TYPE_UINT64:
-        {
+        case common::AttributeType::TYPE_UINT64: {
           builder.AddField(name, tld::TypeUInt64);
           auto temp = nostd::get<uint64_t>(value);
           dbuilder.AddValue(temp);
           break;
         }
-        case common::AttributeType::TYPE_DOUBLE:
-        {
+        case common::AttributeType::TYPE_DOUBLE: {
           builder.AddField(name, tld::TypeDouble);
           auto temp = nostd::get<double>(value);
           dbuilder.AddValue(temp);
           break;
         }
-        case common::AttributeType::TYPE_STRING:
-        {
+        case common::AttributeType::TYPE_STRING: {
           builder.AddField(name, tld::TypeUtf8String);
           dbuilder.AddString(nostd::get<std::string>(value).data());
           break;
         }
 #  ifdef HAVE_CSTRING_TYPE
-        case common::AttributeType::TYPE_CSTRING:
-        {
+        case common::AttributeType::TYPE_CSTRING: {
           builder.AddField(name, tld::TypeUtf8String);
           auto temp = nostd::get<const char *>(value);
           dbuilder.AddString(temp);
@@ -545,8 +549,7 @@ public:
 #  endif
 #  if HAVE_TYPE_GUID
           // TODO: consider adding UUID/GUID to spec
-        case common::AttributeType::TYPE_GUID:
-        {
+        case common::AttributeType::TYPE_GUID: {
           builder.AddField(name.c_str(), TypeGuid);
           auto temp = nostd::get<GUID>(value);
           dbuilder.AddBytes(&temp, sizeof(GUID));
@@ -577,10 +580,12 @@ public:
     }
 
     tld::EventDescriptor eventDescriptor;
+    eventDescriptor.Opcode = Opcode;
+    eventDescriptor.Level  = 0; /* FIXME: Always on for now */
+
     // eventDescriptor.Keyword = MICROSOFT_KEYWORD_CRITICAL_DATA;
     // eventDescriptor.Keyword = MICROSOFT_KEYWORD_TELEMETRY;
     // eventDescriptor.Keyword = MICROSOFT_KEYWORD_MEASURES;
-
     EVENT_DATA_DESCRIPTOR pDataDescriptors[3];
 
     EventDataDescCreate(&pDataDescriptors[2], byteDataVector.data(),
@@ -595,9 +600,19 @@ public:
     // - GUID ActivityId
     // - GUID RelatedActivityId
 
-    HRESULT writeResponse = tld::WriteEvent(providerData.providerHandle, eventDescriptor,
-                                            providerData.providerMetaVector.data(),
-                                            byteVector.data(), 3, pDataDescriptors);
+    HRESULT writeResponse = 0;
+    if ((ActivityId != nullptr) || (RelatedActivityId != nullptr))
+    {
+      tld::WriteEvent(providerData.providerHandle, eventDescriptor,
+                      providerData.providerMetaVector.data(), byteVector.data(), 3,
+                      pDataDescriptors, ActivityId, RelatedActivityId);
+    }
+    else
+    {
+      tld::WriteEvent(providerData.providerHandle, eventDescriptor,
+                      providerData.providerMetaVector.data(), byteVector.data(), 3,
+                      pDataDescriptors);
+    };
 
     if (writeResponse == HRESULT_FROM_WIN32(ERROR_ARITHMETIC_OVERFLOW))
     {
@@ -613,15 +628,18 @@ public:
   template <class T>
   unsigned long write(Handle &providerData,
                       T eventData,
+                      LPCGUID ActivityId              = nullptr,
+                      LPCGUID RelatedActivityId       = nullptr,
+                      uint8_t Opcode                  = 0, /* Information */
                       ETWProvider::EventFormat format = ETWProvider::EventFormat::ETW_MANIFEST)
   {
     if (format == ETWProvider::EventFormat::ETW_MANIFEST)
     {
-      return writeTld(providerData, eventData);
+      return writeTld(providerData, eventData, ActivityId, RelatedActivityId, Opcode);
     }
     if (format == ETWProvider::EventFormat::ETW_MSGPACK)
     {
-      return writeMsgPack(providerData, eventData);
+      return writeMsgPack(providerData, eventData, ActivityId, RelatedActivityId, Opcode);
     }
     if (format == ETWProvider::EventFormat::ETW_XML)
     {
@@ -650,3 +668,7 @@ protected:
 };
 
 OPENTELEMETRY_END_NAMESPACE
+
+#ifdef _MSC_VER
+#  pragma warning(pop)
+#endif

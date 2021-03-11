@@ -10,15 +10,14 @@ foreach(
   span_context_test
   scope_test
   noop_test
+  trace_state_test
   tracer_test)
   add_executable(api_${testname} "${testname}.cc")
   target_link_libraries(
     api_${testname} ${GTEST_BOTH_LIBRARIES} ${CORE_RUNTIME_LIBS}
     ${CMAKE_THREAD_LIBS_INIT} opentelemetry_api)
-  gtest_add_tests(
-    TARGET api_${testname}
-    TEST_PREFIX trace.
-    TEST_LIST api_${testname})
+  gtest_add_tests(TARGET api_${testname} TEST_PREFIX trace. TEST_LIST
+                  api_${testname})
 endforeach()
 
 add_executable(span_id_benchmark span_id_benchmark.cc)

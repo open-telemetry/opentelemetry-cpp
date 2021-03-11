@@ -15,14 +15,17 @@ namespace trace_api = opentelemetry::trace;
 class Span final : public trace_api::Span
 {
 public:
-  explicit Span(std::shared_ptr<Tracer> &&tracer,
-                std::shared_ptr<SpanProcessor> processor,
-                nostd::string_view name,
-                const opentelemetry::common::KeyValueIterable &attributes,
-                const trace_api::SpanContextKeyValueIterable &links,
-                const trace_api::StartSpanOptions &options,
-                const trace_api::SpanContext &parent_span_context,
-                const opentelemetry::sdk::resource::Resource &resource) noexcept;
+  Span(std::shared_ptr<Tracer> &&tracer,
+       std::shared_ptr<SpanProcessor> processor,
+       nostd::string_view name,
+       const opentelemetry::common::KeyValueIterable &attributes,
+       const trace_api::SpanContextKeyValueIterable &links,
+       const trace_api::StartSpanOptions &options,
+       const trace_api::SpanContext &parent_span_context,
+       const opentelemetry::sdk::resource::Resource &resource,
+       const nostd::shared_ptr<opentelemetry::trace::TraceState> trace_state =
+           trace_api::TraceState::GetDefault(),
+       const bool sampled = false) noexcept;
 
   ~Span() override;
 
@@ -38,7 +41,7 @@ public:
                 core::SystemTimestamp timestamp,
                 const opentelemetry::common::KeyValueIterable &attributes) noexcept override;
 
-  void SetStatus(trace_api::CanonicalCode code, nostd::string_view description) noexcept override;
+  void SetStatus(trace_api::StatusCode code, nostd::string_view description) noexcept override;
 
   void UpdateName(nostd::string_view name) noexcept override;
 

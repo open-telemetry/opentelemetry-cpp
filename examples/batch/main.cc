@@ -19,18 +19,17 @@ void initTracer()
 
   // CONFIGURE BATCH SPAN PROCESSOR PARAMETERS
 
+  sdktrace::BatchSpanProcessorOptions options{};
   // We make the queue size `KNumSpans`*2+5 because when the queue is half full, a preemptive notif
   // is sent to start an export call, which we want to avoid in this simple example.
-  const size_t max_queue_size = kNumSpans * 2 + 5;
-
+  options.max_queue_size = kNumSpans * 2 + 5;
   // Time interval (in ms) between two consecutive exports.
-  const std::chrono::milliseconds schedule_delay_millis = std::chrono::milliseconds(3000);
-
+  options.schedule_delay_millis = std::chrono::milliseconds(3000);
   // We export `kNumSpans` after every `schedule_delay_millis` milliseconds.
-  const size_t max_export_batch_size = kNumSpans;
+  options.max_export_batch_size = kNumSpans;
 
-  auto processor = std::shared_ptr<sdktrace::SpanProcessor>(new sdktrace::BatchSpanProcessor(
-      std::move(exporter), max_queue_size, schedule_delay_millis, max_export_batch_size));
+  auto processor = std::shared_ptr<sdktrace::SpanProcessor>(
+      new sdktrace::BatchSpanProcessor(std::move(exporter), options));
 
   auto provider = nostd::shared_ptr<opentelemetry::trace::TracerProvider>(
       new sdktrace::TracerProvider(processor));

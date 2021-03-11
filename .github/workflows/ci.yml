@@ -2,9 +2,9 @@ name: CI
 
 on:
   push:
-    branches: [ master ]
+    branches: [ main ]
   pull_request:
-    branches: [ master ]
+    branches: [ main ]
 
 jobs:
   cmake_test:
@@ -330,6 +330,19 @@ jobs:
       uses: codecov/codecov-action@v1
       with:
         file: /home/runner/build/coverage.info
+
+  markdown-lint:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: check out code
+      uses: actions/checkout@v2
+
+    - name: install markdownlint-cli
+      run: sudo npm install -g markdownlint-cli
+
+    - name: run markdownlint
+      run: markdownlint .
 
   misspell:
     runs-on: ubuntu-latest

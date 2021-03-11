@@ -29,8 +29,6 @@ if(BUILD_TESTING)
   target_link_libraries(
     recordable_test ${GTEST_BOTH_LIBRARIES} ${CMAKE_THREAD_LIBS_INIT}
     opentelemetry_exporter_otprotocol protobuf::libprotobuf gRPC::grpc++)
-  gtest_add_tests(
-    TARGET recordable_test
-    TEST_PREFIX exporter.
-    TEST_LIST recordable_test)
+  gtest_add_tests(TARGET recordable_test TEST_PREFIX exporter. TEST_LIST
+                  recordable_test)
 endif() # BUILD_TESTING

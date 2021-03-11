@@ -225,8 +225,7 @@ public:
       case common::AttributeType::TYPE_DOUBLE:
         PropertyVariant::operator=(nostd::get<double>(v));
         break;
-      case common::AttributeType::TYPE_STRING:
-      {
+      case common::AttributeType::TYPE_STRING: {
         PropertyVariant::operator=(nostd::string_view(nostd::get<nostd::string_view>(v)).data());
         break;
       };
@@ -306,8 +305,7 @@ public:
         value = nostd::get<double>(*this);
         break;
 
-      case common::AttributeType::TYPE_STRING:
-      {
+      case common::AttributeType::TYPE_STRING: {
         const std::string &str = nostd::get<std::string>(*this);
         return nostd::string_view(str.data(), str.size());
         break;
@@ -325,8 +323,7 @@ public:
         break;
 #endif
 
-      case common::AttributeType::TYPE_SPAN_BOOL:
-      {
+      case common::AttributeType::TYPE_SPAN_BOOL: {
         const auto &vec = nostd::get<std::vector<bool>>(*this);
         // FIXME: sort out how to remap from vector<bool> to span<bool>
         break;
@@ -450,9 +447,8 @@ public:
    * the iteration is aborted.
    * @return true if every key-value pair was iterated over
    */
-  bool ForEachKeyValue(
-      nostd::function_ref<bool(nostd::string_view, common::AttributeValue)> callback) const
-      noexcept override
+  bool ForEachKeyValue(nostd::function_ref<bool(nostd::string_view, common::AttributeValue)>
+                           callback) const noexcept override
   {
     for (const auto &kv : (*this))
     {

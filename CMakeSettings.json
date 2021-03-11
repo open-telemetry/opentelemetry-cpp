@@ -28,7 +28,7 @@
     {
       "name": "nostd-x64-Release",
       "generator": "Ninja",
-      "configurationType": "RelWithDebInfo",
+      "configurationType": "Release",
         "inheritEnvironments": [
           "msvc_x64_x64"
         ],
@@ -89,7 +89,7 @@
     {
       "name": "stdlib-x64-Release",
       "generator": "Ninja",
-      "configurationType": "RelWithDebInfo",
+      "configurationType": "Release",
       "inheritEnvironments": [
         "msvc_x64_x64"
       ],

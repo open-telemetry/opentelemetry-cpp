@@ -36,6 +36,8 @@ public:
   // Creates a SpanId with the given ID.
   explicit SpanId(nostd::span<const uint8_t, kSize> id) noexcept { memcpy(rep_, id.data(), kSize); }
 
+  explicit SpanId(const uint8_t *data) noexcept { memcpy(rep_, data, kSize); }
+
   // Populates the buffer with the lowercase base16 representation of the ID.
   void ToLowerBase16(nostd::span<char, 2 * kSize> buffer) const noexcept
   {
@@ -58,7 +60,11 @@ public:
   bool operator!=(const SpanId &that) const noexcept { return !(*this == that); }
 
   // Returns false if the SpanId is all zeros.
-  bool IsValid() const noexcept { return *this != SpanId(); }
+  bool IsValid() const noexcept
+  {
+    static_assert(kSize == 8, "update is needed if kSize is not 8");
+    return *reinterpret_cast<const uint64_t *>(&rep_) != 0ull;
+  }
 
   // Copies the opaque SpanId data to dest.
   void CopyBytesTo(nostd::span<uint8_t, kSize> dest) const noexcept

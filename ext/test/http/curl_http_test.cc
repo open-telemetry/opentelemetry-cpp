@@ -152,7 +152,7 @@ TEST_F(BasicCurlHttpTests, HttpRequest)
 TEST_F(BasicCurlHttpTests, HttpResponse)
 {
   curl::Response res;
-  std::multimap<std::string, std::string, curl::curl_ci> m1 = {
+  http_client::Headers m1 = {
       {"name1", "value1_1"}, {"name1", "value1_2"}, {"name2", "value3"}, {"name3", "value3"}};
   res.headers_ = m1;
 
@@ -250,26 +250,61 @@ TEST_F(BasicCurlHttpTests, CurlHttpOperations)
   const char *b          = "test-data";
   http_client::Body body = {b, b + strlen(b)};
 
-  std::multimap<std::string, std::string, curl::curl_ci> m1 = {
+  http_client::Headers headers = {
       {"name1", "value1_1"}, {"name1", "value1_2"}, {"name2", "value3"}, {"name3", "value3"}};
-  curl::Headers headers = m1;
-  curl::HttpOperation http_operations1(http_client::Method::Head, "/get", handler, headers, body,
-                                       true);
+
+  curl::HttpOperation http_operations1(http_client::Method::Head, "/get", handler,
+                                       curl::RequestMode::Async, headers, body, true);
   http_operations1.Send();
 
-  curl::HttpOperation http_operations2(http_client::Method::Get, "/get", handler, headers, body,
-                                       true);
+  curl::HttpOperation http_operations2(http_client::Method::Get, "/get", handler,
+                                       curl::RequestMode::Async, headers, body, true);
   http_operations2.Send();
 
-  curl::HttpOperation http_operations3(http_client::Method::Get, "/get", handler, headers, body,
-                                       false);
+  curl::HttpOperation http_operations3(http_client::Method::Get, "/get", handler,
+                                       curl::RequestMode::Async, headers, body, false);
   http_operations3.Send();
   delete handler;
 }
 
+TEST_F(BasicCurlHttpTests, SendGetRequestSync)
+{
+  received_requests_.clear();
+  curl::HttpClientSync http_client;
+
+  http_client::Headers m1 = {};
+  auto result             = http_client.Get("http://127.0.0.1:19000/get/", m1);
+  EXPECT_EQ(result, true);
+  EXPECT_EQ(result.GetSessionState(), http_client::SessionState::Response);
+}
+
+TEST_F(BasicCurlHttpTests, SendGetRequestSyncTimeout)
+{
+  received_requests_.clear();
+  curl::HttpClientSync http_client;
+
+  http_client::Headers m1 = {};
+  auto result             = http_client.Get("http://222.222.222.200:19000/get/", m1);
+  EXPECT_EQ(result, false);
+
+  EXPECT_EQ(result.GetSessionState(), http_client::SessionState::ConnectFailed);
+}
+
+TEST_F(BasicCurlHttpTests, SendPostRequestSync)
+{
+  received_requests_.clear();
+  curl::HttpClientSync http_client;
+
+  http_client::Headers m1 = {};
+  http_client::Body body  = {};
+  auto result             = http_client.Post("http://127.0.0.1:19000/post/", body, m1);
+  EXPECT_EQ(result, true);
+  EXPECT_EQ(result.GetSessionState(), http_client::SessionState::Response);
+}
+
 TEST_F(BasicCurlHttpTests, GetBaseUri)
 {
-  curl::SessionManager session_manager;
+  curl::HttpClient session_manager;
 
   auto session = session_manager.CreateSession("127.0.0.1", 80);
   ASSERT_EQ(std::static_pointer_cast<curl::Session>(session)->GetBaseUri(), "http://127.0.0.1:80/");

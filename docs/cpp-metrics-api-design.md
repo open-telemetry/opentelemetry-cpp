@@ -1,55 +1,102 @@
 # Metrics API Design
 
-This document outlines a proposed implementation of the OpenTelemetry Metrics API in C++.  The design conforms to the current versions of the [Metrics API Specification](https://github.com/open-telemetry/opentelemetry-specification/blob/master/specification/metrics/api.md) though it is currently under development and subject to change.
+This document outlines a proposed implementation of the OpenTelemetry Metrics
+API in C++.  The design conforms to the current versions of the [Metrics API
+Specification](https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/metrics/api.md)
+though it is currently under development and subject to change.
 
-The design supports a minimal implementation for the library to be used by an application. However, without the reference SDK or another implementation, no metric data will be collected.
-
+The design supports a minimal implementation for the library to be used by an
+application. However, without the reference SDK or another implementation, no
+metric data will be collected.
 
 ## Use Cases
 
-A *metric* is some raw measurement about a service, captured at run-time. Logically, the moment of capturing one of these measurements is known as a *metric event* which consists not only of the measurement itself, but the time that it was captured as well as contextual annotations which tie it to the event being measured. Users can inject instruments which facilitate the collection of these measurements into their services or systems which may be running locally, in containers, or on distributed platforms.  The data collected are then used by monitoring and alerting systems to provide statistical performance data.
+A *metric* is some raw measurement about a service, captured at run-time.
+Logically, the moment of capturing one of these measurements is known as a
+*metric event* which consists not only of the measurement itself, but the time
+that it was captured as well as contextual annotations which tie it to the event
+being measured. Users can inject instruments which facilitate the collection of
+these measurements into their services or systems which may be running locally,
+in containers, or on distributed platforms.  The data collected are then used by
+monitoring and alerting systems to provide statistical performance data.
 
-Monitoring and alerting systems commonly use the data provided through metric events, after applying various aggregations and converting into various exposition formats. However, we find that there are many other uses for metric events, such as to record aggregated or raw measurements in tracing and logging systems. For this reason, OpenTelemetry requires a separation of the API from the SDK, so that different SDKs can be configured at run time.
+Monitoring and alerting systems commonly use the data provided through metric
+events, after applying various aggregations and converting into various
+exposition formats. However, we find that there are many other uses for metric
+events, such as to record aggregated or raw measurements in tracing and logging
+systems. For this reason, OpenTelemetry requires a separation of the API from
+the SDK, so that different SDKs can be configured at run time.
 
-Various instruments also allow for more optimized capture of certain types of measurements.  `Counter` instruments, for example, are monotonic and can therefore be used to capture rate information.  Other potential uses for the `Counter` include tracking the number of bytes received, requests completed, accounts created, etc.
+Various instruments also allow for more optimized capture of certain types of
+measurements.  `Counter` instruments, for example, are monotonic and can
+therefore be used to capture rate information.  Other potential uses for the
+`Counter` include tracking the number of bytes received, requests completed,
+accounts created, etc.
 
-A `ValueRecorder` is commonly used to capture latency measurements. Latency measurements are not additive in the sense that there is little need to know the latency-sum of all processed requests. We use a `ValueRecorder` instrument to capture latency measurements typically because we are interested in knowing mean, median, and other summary statistics about individual events.
+A `ValueRecorder` is commonly used to capture latency measurements. Latency
+measurements are not additive in the sense that there is little need to know the
+latency-sum of all processed requests. We use a `ValueRecorder` instrument to
+capture latency measurements typically because we are interested in knowing
+mean, median, and other summary statistics about individual events.
 
-`Observers` are a good choice in situations where a measurement is expensive to compute, such that it would be wasteful to compute on every request. For example, a system call is needed to capture process CPU usage, therefore it should be done periodically, not on each request.
-
-
+`Observers` are a good choice in situations where a measurement is expensive to
+compute, such that it would be wasteful to compute on every request. For
+example, a system call is needed to capture process CPU usage, therefore it
+should be done periodically, not on each request.
 
 ## Design Tenets
 
 * Reliability
-    * The Metrics API and SDK should be “reliable,” meaning that metrics data will always be accounted for. It will get back to the user or an error will be logged.  Reliability also entails that the end-user application will never be blocked.  Error handling will therefore not interfere with the execution of the instrumented program.
-    * Thread Safety
-        * As with the Tracer API and SDK, thread safety is not guaranteed on all functions and will be explicitly mentioned in documentation for functions that support concurrent calling.  Generally, the goal is to lock functions which change the state of library objects (incrementing the value of a Counter or adding a new Observer for example) or access global memory.  As a performance consideration, the library strives to hold locks for as short a duration as possible to avoid lock contention concerns.  Calls to create instrumentation may not be thread-safe as this is expected to occur during initialization of the program.
+  * The Metrics API and SDK should be “reliable,” meaning that metrics data will
+    always be accounted for. It will get back to the user or an error will be
+    logged.  Reliability also entails that the end-user application will never
+    be blocked.  Error handling will therefore not interfere with the execution
+    of the instrumented program.
+  * Thread Safety
+    * As with the Tracer API and SDK, thread safety is not guaranteed on all
+      functions and will be explicitly mentioned in documentation for functions
+      that support concurrent calling.  Generally, the goal is to lock functions
+      which change the state of library objects (incrementing the value of a
+      Counter or adding a new Observer for example) or access global memory.  As
+      a performance consideration, the library strives to hold locks for as
+      short a duration as possible to avoid lock contention concerns.  Calls to
+      create instrumentation may not be thread-safe as this is expected to occur
+      during initialization of the program.
 * Scalability
-    * As OpenTelemetry is a distributed tracing system, it must be able to operate on sizeable systems with predictable overhead growth.  A key requirement of this is that the library does not consume unbounded memory resource.
+  * As OpenTelemetry is a distributed tracing system, it must be able to operate
+    on sizeable systems with predictable overhead growth.  A key requirement of
+    this is that the library does not consume unbounded memory resource.
 * Security
-    * Currently security is not a key consideration but may be addressed at a later date.
+  * Currently security is not a key consideration but may be addressed at a
+    later date.
 
 ## **Meter Interface (`MeterProvider` Class)**
 
-The singleton global `MeterProvider` can be used to obtain a global Meter by calling `global.GetMeter(name,version)` which calls `GetMeter() `on the initialized global `MeterProvider`
+The singleton global `MeterProvider` can be used to obtain a global Meter by
+calling `global.GetMeter(name,version)` which calls `GetMeter()` on the
+initialized global `MeterProvider`
 
-**Global Meter Provider**
+**Global Meter Provider:**
 
-The API should support a global `MeterProvider`.  When a global instance is supported, the API must ensure that `Meter` instances derived from the global `MeterProvider` are initialized after the global SDK implementation is first initialized.
+The API should support a global `MeterProvider`.  When a global instance is
+supported, the API must ensure that `Meter` instances derived from the global
+`MeterProvider` are initialized after the global SDK implementation is first
+initialized.
 
-A `MeterProvider` interface must support a  `global.SetMeterProvider(MeterProvider)` function which installs the SDK implementation of the `MeterProvider` into the API
+A `MeterProvider` interface must support a
+`global.SetMeterProvider(MeterProvider)` function which installs the SDK
+implementation of the `MeterProvider` into the API
 
-**Obtaining a Meter from MeterProvider**
+**Obtaining a Meter from MeterProvider:**
 
 **`GetMeter(name, version)` method must be supported**
 
-
 * Expects 2 string arguments:
-    * name (required): identifies the instrumentation library.
-    * version (optional): specifies the version of the instrumenting library (the library injecting OpenTelemetry calls into the code)
+  * name (required): identifies the instrumentation library.
+  * version (optional): specifies the version of the instrumenting library (the
+    library injecting OpenTelemetry calls into the code)
 
-```cc
+```cpp
 # meter_provider.h
 class Provider
 {
@@ -92,9 +139,8 @@ private:
 };
 ```
 
-
-
-```cc
+<!-- markdownlint-disable MD013 -->
+```cpp
 # meter_provider.h
 class MeterProvider
 {
@@ -114,19 +160,17 @@ public:
 };
 ```
 
+Using this MeterProvider, users can obtain new Meters through the GetMeter
+function.
 
-Using this MeterProvider, users can obtain new Meters through the GetMeter function.
+## Metric Instruments (`Meter` Class)
 
+**Metric Events:**
 
-## **Metric Instruments (`Meter` Class)**
+This interface consists of a set of **instrument constructors**, and a
+**facility for capturing batches of measurements.**
 
-**Metric Events**
-
-This interface consists of a set of **instrument constructors**, and a **facility for capturing batches of measurements.**
-
-
-
-```cc
+```cpp
 # meter.h
 class Meter {
 public:
@@ -214,68 +258,104 @@ private:
   InstrumentationInfo instrumentationInfo_;
 }
 ```
+<!-- markdownlint-enable MD013 -->
 
+### Meter API Class Design Considerations
 
+According to the specification, both signed integer and floating point value
+types must be supported.  This implementation will use short, int, float, and
+double types. Different constructors are used for the different metric
+instruments and even for different value types due to C++ being a strongly typed
+language. This is similar to Java’s implementation of the meter class. Python
+gets around this by passing the value type and metric type to a single function
+called `create_metric`.
 
-### **Meter API Class Design Considerations**
+## Instrument Types (`Metric` Class)
 
-According to the specification, both signed integer and floating point value types must be supported.  This implementation will use short, int, float, and double types. Different constructors are used for the different metric instruments and even for different value types due to C++ being a strongly typed language. This is similar to Java’s implementation of the meter class. Python gets around this by passing the value type and metric type to a single function called `create_metric`.
-
-
-## **Instrument Types (`Metric` Class)**
-
-Metric instruments capture raw measurements of designated quantities in instrumented applications.  All measurements captured by the Metrics API are associated with the instrument which collected that measurement.  These instruments are also templated allowing users to decide which data type to capture.  This enhances user control over the memory used by their instrument set and provides greater precision when necessary.
-
+Metric instruments capture raw measurements of designated quantities in
+instrumented applications.  All measurements captured by the Metrics API are
+associated with the instrument which collected that measurement.  These
+instruments are also templated allowing users to decide which data type to
+capture.  This enhances user control over the memory used by their instrument
+set and provides greater precision when necessary.
 
 ### Metric Instrument Data Model
 
-Each instrument must have enough information to meaningfully attach its measured values with a process in the instrumented application.  As such, metric instruments contain the following information:
-
+Each instrument must have enough information to meaningfully attach its measured
+values with a process in the instrumented application.  As such, metric
+instruments contain the following information:
 
 * name (string) — Identifier for this metric instrument.
 * description (string) — Short description of what this instrument is capturing.
-* value_type (string or enum) — Determines whether the value tracked is an int64 or double.
+* value_type (string or enum) — Determines whether the value tracked is an int64
+  or double.
 * meter (Meter) — The Meter instance from which this instrument was derived.
-* label_keys (KeyValueIterable) — A nostd class acting as a map from nostd::string_view to nostd::string_view
-* enabled (boolean) — Determines whether the instrument is currently collecting data.
-* bound_instruments (key value container) — Contains the bound instruments derived from this instrument.
+* label_keys (KeyValueIterable) — A nostd class acting as a map from
+  nostd::string_view to nostd::string_view
+* enabled (boolean) — Determines whether the instrument is currently collecting
+  data.
+* bound_instruments (key value container) — Contains the bound instruments
+  derived from this instrument.
 
-Metric instruments are created through instances of the `Meter` class and each type of instrument can be described with the following properties:
+Metric instruments are created through instances of the `Meter` class and each
+type of instrument can be described with the following properties:
 
-
-* Synchronicity:  A synchronous instrument is called by the user in a distributed [Context](https://github.com/open-telemetry/opentelemetry-specification/blob/master/specification/context/context.md) (i.e., Span context, Correlation context) and is updated once per request. An asynchronous instrument is called by the SDK once per collection interval and only one value from the interval is kept.
-* Additivity:  An additive instrument is one that records additive measurements, meaning the final sum of updates is the only useful value.  Non-additive instruments should be used when the intent is to capture information about the distribution of values.
-* Monotonicity: A monotonic instrument is an additive instrument, where the progression of each sum is non-decreasing. Monotonic instruments are useful for monitoring rate information.
+* Synchronicity:  A synchronous instrument is called by the user in a
+  distributed
+  [Context](https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/context/context.md)
+  (i.e., Span context, Correlation context) and is updated once per request. An
+  asynchronous instrument is called by the SDK once per collection interval and
+  only one value from the interval is kept.
+* Additivity:  An additive instrument is one that records additive measurements,
+  meaning the final sum of updates is the only useful value.  Non-additive
+  instruments should be used when the intent is to capture information about the
+  distribution of values.
+* Monotonicity: A monotonic instrument is an additive instrument, where the
+  progression of each sum is non-decreasing. Monotonic instruments are useful
+  for monitoring rate information.
 
 The following instrument types will be supported:
 <!-- [//]: # ![Metric Instrument Table](../images/MetricInstrumentsTable.png) -->
 
 ### Metric Event Data Model
 
-Each measurement taken by a Metric instrument is a Metric event which must contain the following information:
-
+Each measurement taken by a Metric instrument is a Metric event which must
+contain the following information:
 
 * timestamp (implicit) — System time when measurement was captured.
-* instrument definition(strings) — Name of instrument, kind, description, and unit of measure
-* label set (key value pairs) — Labels associated with the capture, described further below.
+* instrument definition(strings) — Name of instrument, kind, description, and
+  unit of measure
+* label set (key value pairs) — Labels associated with the capture, described
+  further below.
 * resources associated with the SDK at startup
 
-**Label Set**
+**Label Set:**
 
-A key:value mapping of some kind MUST be supported as annotation each metric event.  Labels must be represented the same way throughout the API (i.e. using the same idiomatic data structure) and duplicates are dealt with by taking the last value mapping.
+A key:value mapping of some kind MUST be supported as annotation each metric
+event.  Labels must be represented the same way throughout the API (i.e. using
+the same idiomatic data structure) and duplicates are dealt with by taking the
+last value mapping.
 
-To maintain ABI stability, we have chosen to implement this as a KeyValueIterable type. However, due to performance concerns, we may convert to a std::string internally.
+To maintain ABI stability, we have chosen to implement this as a
+KeyValueIterable type. However, due to performance concerns, we may convert to a
+std::string internally.
 
-**Calling Conventions**
+**Calling Conventions:**
 
-Metric instruments must support bound instrument calling where the labels for each capture remain the same.  After a call to  `instrument.Bind(labels)` , all subsequent calls to `instrument.add()` will include the labels implicitly in their capture.
+Metric instruments must support bound instrument calling where the labels for
+each capture remain the same.  After a call to  `instrument.Bind(labels)` , all
+subsequent calls to `instrument.add()` will include the labels implicitly in
+their capture.
 
-Direct calling must also be supported.  The user can specify labels with the capture rather than binding beforehand by including the labels in the update call: `instrument.Add(x, labels)`.
+Direct calling must also be supported.  The user can specify labels with the
+capture rather than binding beforehand by including the labels in the update
+call: `instrument.Add(x, labels)`.
 
-MUST support `RecordBatch` calling (where a single set of labels is applied to several metric instruments).
+MUST support `RecordBatch` calling (where a single set of labels is applied to
+several metric instruments).
 
-
-```cc
+<!-- markdownlint-disable MD013 -->
+```cpp
 # metric.h
 
 /*
@@ -338,9 +418,7 @@ public:
 };
 ```
 
-
-
-```cc
+```cpp
 template <class T>
 class SynchronousInstrument: public Instrument {
 public:
@@ -438,12 +516,16 @@ private:
     void (*callback_)(ObserverResult<T>);
 };
 ```
+<!-- markdownlint-enable MD013 -->
 
+The Counter below is an example of one Metric instrument.  It is important to
+note that in the Counter’s add function, it binds the labels to the instrument
+before calling add, then unbinds.  Therefore all interactions with the
+aggregator take place through bound instruments and by extension, the
+BaseBoundInstrument Class.
 
-The Counter below is an example of one Metric instrument.  It is important to note that in the Counter’s add function, it binds the labels to the instrument before calling add, then unbinds.  Therefore all interactions with the aggregator take place through bound instruments and by extension, the BaseBoundInstrument Class.
-
-
-```cc
+<!-- markdownlint-disable MD013 -->
+```cpp
 template <class T>
 class BoundCounter: public BoundSynchronousInstrument{ //override bind?
 public:
@@ -503,9 +585,7 @@ public:
 }
 ```
 
-
-
-```cc
+```cpp
 // The above Counter and BoundCounter are examples of 1 metric instrument.
 // The remaining 5 will also be implemented in a similar fashion.
 class UpDownCounter: public SynchronousInstrument;
@@ -519,12 +599,23 @@ class BoundUpDownSumObserver: public AsynchronousInstrument;
 class ValueObserver: public AsynchronousInstrument;
 class BoundValueObserver: public AsynchronousInstrument;
 ```
+<!-- markdownlint-enable MD013 -->
 
+### Metric Class Design Considerations
 
+OpenTelemetry requires several types of metric instruments with very similar
+core usage, but slightly different tracking schemes.  As such, a base Metric
+class defines the necessary functions for each instrument leaving the
+implementation for the specific instrument type.  Each instrument then inherits
+from this base class making the necessary modifications.  In order to facilitate
+efficient aggregation of labeled data, a complementary BoundInstrument class is
+included which attaches the same set of labels to each capture.  Knowing that
+all data in an instrument has the same labels enhances the efficiency of any
+post-collection calculations as there is no need for filtering or separation.
+In the above code examples, a Counter instrument is shown but all 6 mandated by
+the specification will be supported.
 
-### **Metric Class Design Considerations**:
-
-OpenTelemetry requires several types of metric instruments with very similar core usage, but slightly different tracking schemes.  As such, a base Metric class defines the necessary functions for each instrument leaving the implementation for the specific instrument type.  Each instrument then inherits from this base class making the necessary modifications.  In order to facilitate efficient aggregation of labeled data, a complementary BoundInstrument class is included which attaches the same set of labels to each capture.  Knowing that all data in an instrument has the same labels enhances the efficiency of any post-collection calculations as there is no need for filtering or separation.  In the above code examples, a Counter instrument is shown but all 6 mandated by the specification will be supported.
-
-A base BoundInstrument class also serves as the foundation for more specific bound instruments.  It also facilitates the practice of reference counting which can determine when an instrument is unused and can improve memory optimization as inactive bound instruments can be removed for performance.
-
+A base BoundInstrument class also serves as the foundation for more specific
+bound instruments.  It also facilitates the practice of reference counting which
+can determine when an instrument is unused and can improve memory optimization
+as inactive bound instruments can be removed for performance.

@@ -19,6 +19,7 @@ cc_binary(
         "//api",
         "//exporters/ostream:ostream_span_exporter",
         "//ext:headers",
+        "//ext/src/http/client/curl:http_client_curl",
         "//sdk/src/trace",
         "@curl",
         "@github_nlohmann_json//:json",

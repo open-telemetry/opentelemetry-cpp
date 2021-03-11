@@ -3,8 +3,6 @@ foreach(testname prometheus_collector_test prometheus_exporter_utils_test)
   target_link_libraries(
     ${testname} ${GTEST_BOTH_LIBRARIES} ${CMAKE_THREAD_LIBS_INIT}
     prometheus_exporter prometheus-cpp::pull)
-  gtest_add_tests(
-    TARGET ${testname}
-    TEST_PREFIX exporter.
-    TEST_LIST ${testname})
+  gtest_add_tests(TARGET ${testname} TEST_PREFIX exporter. TEST_LIST
+                  ${testname})
 endforeach()

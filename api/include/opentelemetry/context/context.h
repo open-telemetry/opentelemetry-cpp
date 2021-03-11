@@ -131,7 +131,7 @@ private:
 
     // Builds a data list with just a key and value, so it will just be the head
     // and returns that head.
-    DataList(nostd::string_view key, ContextValue value)
+    DataList(nostd::string_view key, const ContextValue &value)
     {
       key_        = new char[key.size()];
       key_length_ = key.size();

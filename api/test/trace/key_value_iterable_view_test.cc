@@ -55,11 +55,11 @@ TEST(KeyValueIterableViewTest, ForEachKeyValueWithExit)
   M m1    = {{"abc", "123"}, {"xyz", "456"}};
   common::KeyValueIterableView<M> iterable{m1};
   int count = 0;
-  auto exit = iterable.ForEachKeyValue([&count](nostd::string_view /*key*/,
-                                                common::AttributeValue /*value*/) noexcept {
-    ++count;
-    return false;
-  });
+  auto exit = iterable.ForEachKeyValue(
+      [&count](nostd::string_view /*key*/, common::AttributeValue /*value*/) noexcept {
+        ++count;
+        return false;
+      });
   EXPECT_EQ(count, 1);
   EXPECT_FALSE(exit);
 }

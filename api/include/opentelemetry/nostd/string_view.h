@@ -120,6 +120,20 @@ public:
     return substr(pos1, count1).compare(string_view(s, count2));
   };
 
+  size_type find(char ch, size_type pos = 0) const noexcept
+  {
+    size_type res = npos;
+    if (pos < length())
+    {
+      auto found = Traits::find(data() + pos, length() - pos, ch);
+      if (found)
+      {
+        res = found - data();
+      }
+    }
+    return res;
+  }
+
   bool operator<(const string_view v) const noexcept { return compare(v) < 0; }
 
   bool operator>(const string_view v) const noexcept { return compare(v) > 0; }
