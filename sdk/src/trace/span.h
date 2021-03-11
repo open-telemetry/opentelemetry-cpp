@@ -23,6 +23,8 @@ public:
        const trace_api::StartSpanOptions &options,
        const trace_api::SpanContext &parent_span_context,
        const opentelemetry::sdk::resource::Resource &resource,
+       const nostd::shared_ptr<opentelemetry::trace::TraceState> trace_state =
+           trace_api::TraceState::GetDefault(),
        const bool sampled = false) noexcept;
 
   ~Span() override;
