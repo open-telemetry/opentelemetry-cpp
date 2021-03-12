@@ -34,6 +34,7 @@ TEST(AlwaysOnSampler, ShouldSample)
 
   ASSERT_EQ(Decision::RECORD_AND_SAMPLE, sampling_result.decision);
   ASSERT_EQ(nullptr, sampling_result.attributes);
+  ASSERT_EQ("", sampling_result.trace_state->ToHeader());
 
   // Test with a valid trace id and empty parent context
   sampling_result = sampler.ShouldSample(
@@ -44,6 +45,7 @@ TEST(AlwaysOnSampler, ShouldSample)
 
   ASSERT_EQ(Decision::RECORD_AND_SAMPLE, sampling_result.decision);
   ASSERT_EQ(nullptr, sampling_result.attributes);
+  ASSERT_EQ("", sampling_result.trace_state->ToHeader());
 }
 
 TEST(AlwaysOnSampler, GetDescription)

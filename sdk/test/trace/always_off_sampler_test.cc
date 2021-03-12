@@ -27,6 +27,7 @@ TEST(AlwaysOffSampler, ShouldSample)
 
   ASSERT_EQ(Decision::DROP, sampling_result.decision);
   ASSERT_EQ(nullptr, sampling_result.attributes);
+  ASSERT_EQ("", sampling_result.trace_state->ToHeader());
 }
 
 TEST(AlwaysOffSampler, GetDescription)
