@@ -23,7 +23,7 @@ private:
 
   // A constructor that sets the token's Context object to the
   // one that was passed in.
-  Token(Context context) : context_(context) {}
+  Token(const Context &context) : context_(context) {}
 
   const Context context_;
 };
@@ -49,7 +49,7 @@ public:
    * @param the new current context
    * @return a token for the new current context. This never returns a nullptr.
    */
-  virtual nostd::unique_ptr<Token> Attach(Context context) noexcept = 0;
+  virtual nostd::unique_ptr<Token> Attach(const Context &context) noexcept = 0;
 
   /**
    * Detach the context related to the given token.
@@ -59,7 +59,7 @@ public:
   virtual bool Detach(Token &token) noexcept = 0;
 
 protected:
-  nostd::unique_ptr<Token> CreateToken(Context context) noexcept
+  nostd::unique_ptr<Token> CreateToken(const Context &context) noexcept
   {
     return nostd::unique_ptr<Token>(new Token(context));
   }
@@ -82,7 +82,7 @@ public:
 
   // Sets the current 'Context' object. Returns a token
   // that can be used to reset to the previous Context.
-  static nostd::unique_ptr<Token> Attach(Context context) noexcept
+  static nostd::unique_ptr<Token> Attach(const Context &context) noexcept
   {
     return GetRuntimeContextStorage()->Attach(context);
   }
@@ -98,7 +98,7 @@ public:
   // mind that the current RuntimeContext will not be changed, and the new
   // context will be returned.
   static Context SetValue(nostd::string_view key,
-                          ContextValue value,
+                          const ContextValue &value,
                           Context *context = nullptr) noexcept
   {
     Context temp_context;
@@ -204,7 +204,7 @@ public:
 
   // Sets the current 'Context' object. Returns a token
   // that can be used to reset to the previous Context.
-  nostd::unique_ptr<Token> Attach(Context context) noexcept override
+  nostd::unique_ptr<Token> Attach(const Context &context) noexcept override
   {
     GetStack().Push(context);
     return CreateToken(context);
@@ -254,7 +254,7 @@ private:
 
     // Pushes the passed in context pointer to the top of the stack
     // and resizes if necessary.
-    void Push(Context context) noexcept
+    void Push(const Context &context) noexcept
     {
       size_++;
       if (size_ > capacity_)
@@ -275,7 +275,14 @@ private:
       Context *temp = new Context[new_capacity];
       if (base_ != nullptr)
       {
-        std::copy(base_, base_ + old_size, temp);
+        // vs2015 does not like this construct considering it unsafe:
+        // - std::copy(base_, base_ + old_size, temp);
+        // Ref.
+        // https://stackoverflow.com/questions/12270224/xutility2227-warning-c4996-std-copy-impl
+        for (size_t i = 0; i < (std::min)(old_size, new_capacity); i++)
+        {
+          temp[i] = base_[i];
+        }
         delete[] base_;
       }
       base_ = temp;

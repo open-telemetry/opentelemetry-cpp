@@ -89,7 +89,7 @@ void Logger::Log(opentelemetry::logs::Severity severity,
   // Leave these fields in the recordable empty if neither the passed in values
   // nor the context values are valid (e.g. the application is not using traces)
 
-  // Traceid
+  // TraceId
   if (trace_id.IsValid())
   {
     recordable->SetTraceId(trace_id);
@@ -99,7 +99,7 @@ void Logger::Log(opentelemetry::logs::Severity severity,
     recordable->SetTraceId(span_context.trace_id());
   }
 
-  // Spanid
+  // SpanId
   if (span_id.IsValid())
   {
     recordable->SetSpanId(span_id);
@@ -109,7 +109,7 @@ void Logger::Log(opentelemetry::logs::Severity severity,
     recordable->SetSpanId(span_id);
   }
 
-  // Traceflags
+  // TraceFlags
   if (trace_flags.IsSampled())
   {
     recordable->SetTraceFlags(trace_flags);

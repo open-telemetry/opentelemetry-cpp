@@ -20,14 +20,21 @@ public:
    * @return Returns DROP always
    */
   SamplingResult ShouldSample(
-      const trace_api::SpanContext & /*parent_context*/,
+      const trace_api::SpanContext &parent_context,
       trace_api::TraceId /*trace_id*/,
       nostd::string_view /*name*/,
       trace_api::SpanKind /*span_kind*/,
       const opentelemetry::common::KeyValueIterable & /*attributes*/,
       const trace_api::SpanContextKeyValueIterable & /*links*/) noexcept override
   {
-    return {Decision::DROP, nullptr};
+    if (!parent_context.IsValid())
+    {
+      return {Decision::DROP, nullptr, opentelemetry::trace::TraceState::GetDefault()};
+    }
+    else
+    {
+      return {Decision::DROP, nullptr, parent_context.trace_state()};
+    }
   }
 
   /**

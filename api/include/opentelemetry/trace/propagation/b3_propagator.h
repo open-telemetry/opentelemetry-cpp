@@ -4,6 +4,7 @@
 #include <iostream>
 #include <map>
 #include <string>
+#include "detail/context.h"
 #include "opentelemetry/common/key_value_iterable.h"
 #include "opentelemetry/context/context.h"
 #include "opentelemetry/nostd/shared_ptr.h"
@@ -11,7 +12,7 @@
 #include "opentelemetry/nostd/string_view.h"
 #include "opentelemetry/nostd/variant.h"
 #include "opentelemetry/trace/default_span.h"
-#include "opentelemetry/trace/propagation/http_text_format.h"
+#include "opentelemetry/trace/propagation/text_map_propagator.h"
 #include "opentelemetry/trace/span.h"
 #include "opentelemetry/trace/span_context.h"
 
@@ -46,7 +47,7 @@ static const int kTraceFlagHexStrLength = 1;
 // providing the object containing the headers, and a getter function for the extraction. Based on:
 // https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/context/api-propagators.md#b3-extract
 template <typename T>
-class B3PropagatorExtractor : public HTTPTextFormat<T>
+class B3PropagatorExtractor : public TextMapPropagator<T>
 {
 public:
   // Rules that manages how context will be extracted from carrier.
@@ -60,17 +61,6 @@ public:
     SpanContext span_context = ExtractImpl(getter, carrier);
     nostd::shared_ptr<Span> sp{new DefaultSpan(span_context)};
     return context.SetValue(kSpanKey, sp);
-  }
-
-  static SpanContext GetCurrentSpan(const context::Context &context)
-  {
-    context::Context ctx(context);
-    context::ContextValue span = ctx.GetValue(kSpanKey);
-    if (nostd::holds_alternative<nostd::shared_ptr<Span>>(span))
-    {
-      return nostd::get<nostd::shared_ptr<Span>>(span).get()->GetContext();
-    }
-    return SpanContext::GetInvalid();
   }
 
   static TraceId GenerateTraceIdFromString(nostd::string_view trace_id)
@@ -213,7 +203,7 @@ public:
   // Sets the context for a HTTP header carrier with self defined rules.
   void Inject(Setter setter, T &carrier, const context::Context &context) noexcept override
   {
-    SpanContext span_context = B3PropagatorExtractor<T>::GetCurrentSpan(context);
+    SpanContext span_context = detail::GetCurrentSpan(context);
     if (!span_context.IsValid())
     {
       return;
@@ -251,7 +241,7 @@ public:
                           nostd::string_view trace_description);
   void Inject(Setter setter, T &carrier, const context::Context &context) noexcept override
   {
-    SpanContext span_context = B3PropagatorExtractor<T>::GetCurrentSpan(context);
+    SpanContext span_context = detail::GetCurrentSpan(context);
     if (!span_context.IsValid())
     {
       return;

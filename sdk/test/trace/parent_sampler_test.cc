@@ -31,9 +31,11 @@ TEST(ParentBasedSampler, ShouldSample)
 
   opentelemetry::common::KeyValueIterableView<M> view{m1};
   trace_api::SpanContextKeyValueIterableView<L> links{l1};
-  trace_api::SpanContext parent_context_sampled(trace_id, span_id, trace_api::TraceFlags{1}, false);
+  auto trace_state = opentelemetry::trace::TraceState::FromHeader("congo=t61rcWkgMzE");
+  trace_api::SpanContext parent_context_sampled(trace_id, span_id, trace_api::TraceFlags{1}, false,
+                                                trace_state);
   trace_api::SpanContext parent_context_nonsampled(trace_id, span_id, trace_api::TraceFlags{0},
-                                                   false);
+                                                   false, trace_state);
 
   // Case 1: Parent doesn't exist. Return result of delegateSampler()
   auto sampling_result  = sampler_off.ShouldSample(trace_api::SpanContext::GetInvalid(), trace_id,
@@ -43,16 +45,20 @@ TEST(ParentBasedSampler, ShouldSample)
 
   ASSERT_EQ(Decision::DROP, sampling_result.decision);
   ASSERT_EQ(Decision::RECORD_AND_SAMPLE, sampling_result2.decision);
+  ASSERT_EQ("", sampling_result.trace_state->ToHeader());
+  ASSERT_EQ("", sampling_result2.trace_state->ToHeader());
 
   // Case 2: Parent exists and SampledFlag is true
   auto sampling_result3 =
       sampler_off.ShouldSample(parent_context_sampled, trace_id, "", span_kind, view, links);
   ASSERT_EQ(Decision::RECORD_AND_SAMPLE, sampling_result3.decision);
+  ASSERT_EQ("congo=t61rcWkgMzE", sampling_result3.trace_state->ToHeader());
 
   // Case 3: Parent exists and SampledFlag is false
   auto sampling_result4 =
       sampler_on.ShouldSample(parent_context_nonsampled, trace_id, "", span_kind, view, links);
   ASSERT_EQ(Decision::DROP, sampling_result4.decision);
+  ASSERT_EQ("congo=t61rcWkgMzE", sampling_result4.trace_state->ToHeader());
 }
 
 TEST(ParentBasedSampler, GetDescription)

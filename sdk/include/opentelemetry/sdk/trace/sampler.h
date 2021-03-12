@@ -5,6 +5,7 @@
 #include "opentelemetry/trace/span_context.h"
 #include "opentelemetry/trace/span_context_kv_iterable.h"
 #include "opentelemetry/trace/trace_id.h"
+#include "opentelemetry/trace/trace_state.h"
 #include "opentelemetry/version.h"
 
 #include <map>
@@ -41,6 +42,8 @@ struct SamplingResult
   Decision decision;
   // A set of span Attributes that will also be added to the Span. Can be nullptr.
   std::unique_ptr<const std::map<std::string, opentelemetry::common::AttributeValue>> attributes;
+  //  The tracestate used by the span.
+  nostd::shared_ptr<opentelemetry::trace::TraceState> trace_state;
 };
 
 /**
@@ -61,7 +64,7 @@ public:
    * @param name the name of the new Span.
    * @param spanKind the trace_api::SpanKind of the Span.
    * @param attributes list of AttributeValue with their keys.
-   * @param links TODO: Collection of links that will be associated with the Span to be created.
+   * @param links Collection of links that will be associated with the Span to be created.
    * @return sampling result whether span should be sampled or not.
    * @since 0.1.0
    */
