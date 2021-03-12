@@ -44,7 +44,14 @@ shutil.copytree(os.path.join(apidir, 'otel_api'), targetdir)
 # extensions coming with Sphinx (named 'sphinx.ext.*') or your custom
 # ones.
 extensions = [
+    "breathe",
 ]
+
+breathe_projects = {
+        "OpenTelemetry C++ API": "../../api/docs/doxyoutput/xml"
+}
+
+breathe_default_project = "OpenTelemetry C++ API"
 
 primary_domain = "cpp"
 
