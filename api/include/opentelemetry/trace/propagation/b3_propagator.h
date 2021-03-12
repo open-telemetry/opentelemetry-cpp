@@ -144,7 +144,7 @@ public:
     }
 
     char trace_identity[kTraceIdHexStrLength + kSpanIdHexStrLength + 3];
-    static_assert(sizeof(trace_identity) == 51);
+    static_assert(sizeof(trace_identity) == 51, "b3 trace identity buffer size mismatch");
     span_context.trace_id().ToLowerBase16({&trace_identity[0], kTraceIdHexStrLength});
     trace_identity[kTraceIdHexStrLength] = '-';
     span_context.span_id().ToLowerBase16(
