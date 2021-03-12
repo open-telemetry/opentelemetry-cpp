@@ -73,9 +73,11 @@ public:
   }
 
 private:
+  static constexpr uint8_t kIsSampled = 0x01;
+
   static TraceFlags GetTraceFlags(uint8_t jaeger_flags)
   {
-    uint8_t sampled = jaeger_flags & 0x01;
+    uint8_t sampled = jaeger_flags & kIsSampled;
     return TraceFlags(sampled);
   }
 
