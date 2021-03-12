@@ -45,7 +45,7 @@ public:
    * running_spans.
    * @param span a recordable for a span that was just started
    */
-  void OnStart(opentelemetry::sdk::trace::Recordable &span,
+  void OnStart(opentelemetry::sdk::trace::Span &span,
                const opentelemetry::trace::SpanContext &parent_context) noexcept override;
 
   /*
@@ -53,7 +53,7 @@ public:
    * completed_spans
    * @param span a recordable for a span that was ended
    */
-  void OnEnd(std::unique_ptr<opentelemetry::sdk::trace::Recordable> &&span) noexcept override;
+  void OnEnd(opentelemetry::sdk::trace::Span &span) noexcept override;
 
   /*
    * For now, does nothing. In the future, it

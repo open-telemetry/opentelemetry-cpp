@@ -21,11 +21,13 @@ TEST(OStreamSpanExporter, Shutdown)
 {
   auto exporter = std::unique_ptr<sdktrace::SpanExporter>(
       new opentelemetry::exporter::trace::OStreamSpanExporter);
-  auto processor = std::shared_ptr<sdktrace::SpanProcessor>(
+  auto processor = std::unique_ptr<sdktrace::SpanProcessor>(
       new sdktrace::SimpleSpanProcessor(std::move(exporter)));
+  auto provider = nostd::shared_ptr<sdktrace::TracerProvider>(
+      new sdktrace::TracerProvider(std::move(processor)));
+  auto tracer = provider->GetTracer("test");
 
-  auto recordable = processor->MakeRecordable();
-  recordable->SetName("Test Span");
+  auto span = tracer->StartSpan("Test Span");
 
   // Create stringstream to redirect to
   std::stringstream stdoutOutput;
@@ -36,8 +38,8 @@ TEST(OStreamSpanExporter, Shutdown)
   // Redirect cout to our stringstream buffer
   std::cout.rdbuf(stdoutOutput.rdbuf());
 
-  EXPECT_TRUE(processor->Shutdown());
-  processor->OnEnd(std::move(recordable));
+  EXPECT_TRUE(provider->Shutdown());
+  span->End();
 
   std::cout.rdbuf(sbuf);
 
@@ -49,16 +51,28 @@ TEST(OStreamSpanExporter, PrintDefaultSpan)
 {
   auto exporter = std::unique_ptr<sdktrace::SpanExporter>(
       new opentelemetry::exporter::trace::OStreamSpanExporter);
-  auto processor = std::shared_ptr<sdktrace::SpanProcessor>(
+  auto processor = std::unique_ptr<sdktrace::SpanProcessor>(
       new sdktrace::SimpleSpanProcessor(std::move(exporter)));
+  auto provider = nostd::shared_ptr<opentelemetry::trace::TracerProvider>(
+      new sdktrace::TracerProvider(std::move(processor)));
 
-  auto recordable = processor->MakeRecordable();
+  auto tracer = provider->GetTracer("test");
+
+  opentelemetry::core::SystemTimestamp sysone(std::chrono::nanoseconds(1));
+  opentelemetry::core::SteadyTimestamp one(std::chrono::nanoseconds(1));
+  opentelemetry::trace::StartSpanOptions startOne;
+  startOne.start_steady_time = one;
+  startOne.start_system_time = sysone;
+  opentelemetry::trace::EndSpanOptions endZero = { one };
+  auto span = tracer->StartSpan("Test Span", startOne);
 
   constexpr uint8_t trace_id_buf[] = {1, 2, 3, 4, 5, 6, 7, 8, 1, 2, 3, 4, 5, 6, 7, 8};
   opentelemetry::trace::TraceId t_id(trace_id_buf);
   constexpr uint8_t span_id_buf[] = {1, 2, 3, 4, 5, 6, 7, 8};
   opentelemetry::trace::SpanId s_id(span_id_buf);
 
+  // A hacky solution to reset the IDs for perfect println.
+  auto& recordable = dynamic_cast<opentelemetry::sdk::trace::Span*>(span.get())->GetRecordablePtr();
   recordable->SetIds(t_id, s_id, s_id);
 
   // Create stringstream to redirect to
@@ -70,17 +84,18 @@ TEST(OStreamSpanExporter, PrintDefaultSpan)
   // Redirect cout to our stringstream buffer
   std::cout.rdbuf(stdoutOutput.rdbuf());
 
-  processor->OnEnd(std::move(recordable));
+  // Ensure start/duration are zero for toString
+  span->End(endZero);
 
   std::cout.rdbuf(sbuf);
 
   std::string expectedOutput =
       "{\n"
-      "  name          : \n"
+      "  name          : Test Span\n"
       "  trace_id      : 01020304050607080102030405060708\n"
       "  span_id       : 0102030405060708\n"
       "  parent_span_id: 0102030405060708\n"
-      "  start         : 0\n"
+      "  start         : 1\n"
       "  duration      : 0\n"
       "  description   : \n"
       "  span kind     : Internal\n"
@@ -95,27 +110,37 @@ TEST(OStreamSpanExporter, PrintChangedSpanCout)
 {
   auto exporter = std::unique_ptr<sdktrace::SpanExporter>(
       new opentelemetry::exporter::trace::OStreamSpanExporter);
-  auto processor = std::shared_ptr<sdktrace::SpanProcessor>(
+  auto processor = std::unique_ptr<sdktrace::SpanProcessor>(
       new sdktrace::SimpleSpanProcessor(std::move(exporter)));
+  auto provider = nostd::shared_ptr<opentelemetry::trace::TracerProvider>(
+      new sdktrace::TracerProvider(std::move(processor)));
 
-  auto recordable = processor->MakeRecordable();
+  auto tracer = provider->GetTracer("test");
 
-  recordable->SetName("Test Span");
+
   opentelemetry::core::SystemTimestamp now(std::chrono::system_clock::now());
+  opentelemetry::core::SteadyTimestamp one(std::chrono::nanoseconds(1));
+  opentelemetry::core::SteadyTimestamp onehundredone(std::chrono::nanoseconds(101));
+  opentelemetry::trace::StartSpanOptions startOpts;
+  startOpts.start_steady_time = one;
+  startOpts.start_system_time = now;
+  opentelemetry::trace::EndSpanOptions endOpts = { onehundredone };
+
+  auto span = tracer->StartSpan("Test Span", startOpts);
+  span->SetStatus(opentelemetry::trace::StatusCode::kOk, "Test Description");
+  span->SetAttribute("attr1", "string");
+
 
   constexpr uint8_t trace_id_buf[] = {1, 2, 3, 4, 5, 6, 7, 8, 1, 2, 3, 4, 5, 6, 7, 8};
   opentelemetry::trace::TraceId t_id(trace_id_buf);
   constexpr uint8_t span_id_buf[] = {1, 2, 3, 4, 5, 6, 7, 8};
   opentelemetry::trace::SpanId s_id(span_id_buf);
 
+  // A hacky solution to reset the IDs for perfect println.
+  // All other settings should be against the API.
+  auto* recordable = dynamic_cast<opentelemetry::sdk::trace::Span*>(span.get())->GetRecordablePtr().get();
   recordable->SetIds(t_id, s_id, s_id);
-
-  recordable->SetStartTime(now);
-  recordable->SetDuration(std::chrono::nanoseconds(100));
-  recordable->SetStatus(opentelemetry::trace::StatusCode::kOk, "Test Description");
   recordable->SetSpanKind(opentelemetry::trace::SpanKind::kClient);
-
-  recordable->SetAttribute("attr1", "string");
 
   // Create stringstream to redirect to
   std::stringstream stdoutOutput;
@@ -126,7 +151,7 @@ TEST(OStreamSpanExporter, PrintChangedSpanCout)
   // Redirect cout to our stringstream buffer
   std::cout.rdbuf(stdoutOutput.rdbuf());
 
-  processor->OnEnd(std::move(recordable));
+  span->End(endOpts);
 
   std::cout.rdbuf(sbuf);
 
@@ -155,30 +180,39 @@ TEST(OStreamSpanExporter, PrintChangedSpanCerr)
 {
   auto exporter = std::unique_ptr<sdktrace::SpanExporter>(
       new opentelemetry::exporter::trace::OStreamSpanExporter(std::cerr));
-  auto processor = std::shared_ptr<sdktrace::SpanProcessor>(
+  auto processor = std::unique_ptr<sdktrace::SpanProcessor>(
       new sdktrace::SimpleSpanProcessor(std::move(exporter)));
+  auto provider = nostd::shared_ptr<sdktrace::TracerProvider>(
+      new sdktrace::TracerProvider(std::move(processor)));
 
-  auto recordable = processor->MakeRecordable();
+  auto tracer = provider->GetTracer("test");
 
-  recordable->SetName("Test Span");
+  opentelemetry::core::SystemTimestamp now(std::chrono::system_clock::now());
+  opentelemetry::core::SteadyTimestamp one(std::chrono::nanoseconds(1));
+  opentelemetry::core::SteadyTimestamp onehundredone(std::chrono::nanoseconds(101));
+  opentelemetry::trace::StartSpanOptions startOpts;
+  startOpts.start_steady_time = one;
+  startOpts.start_system_time = now;
+  opentelemetry::trace::EndSpanOptions endOpts = { onehundredone };
+
+  auto span = tracer->StartSpan("Test Span", startOpts);
+  span->SetStatus(opentelemetry::trace::StatusCode::kOk, "Test Description");
 
   constexpr uint8_t trace_id_buf[] = {1, 2, 3, 4, 5, 6, 7, 8, 1, 2, 3, 4, 5, 6, 7, 8};
   opentelemetry::trace::TraceId t_id(trace_id_buf);
   constexpr uint8_t span_id_buf[] = {1, 2, 3, 4, 5, 6, 7, 8};
   opentelemetry::trace::SpanId s_id(span_id_buf);
 
+  // A hacky solution to reset the IDs for perfect println.
+  // Ideally everything should be set through API.
+  auto* recordable = dynamic_cast<opentelemetry::sdk::trace::Span*>(span.get())->GetRecordablePtr().get();
   recordable->SetIds(t_id, s_id, s_id);
-
-  opentelemetry::core::SystemTimestamp now(std::chrono::system_clock::now());
-
-  recordable->SetStartTime(now);
-  recordable->SetDuration(std::chrono::nanoseconds(100));
-  recordable->SetStatus(opentelemetry::trace::StatusCode::kOk, "Test Description");
   recordable->SetSpanKind(opentelemetry::trace::SpanKind::kConsumer);
 
+  // Add some data to the span.
   std::array<bool, 3> array2 = {false, true, false};
   opentelemetry::nostd::span<bool> span2{array2.data(), array2.size()};
-  recordable->SetAttribute("attr1", span2);
+  span->SetAttribute("attr1", span2);
 
   // Create stringstream to redirect to
   std::stringstream stdcerrOutput;
@@ -189,7 +223,7 @@ TEST(OStreamSpanExporter, PrintChangedSpanCerr)
   // Redirect cout to our stringstream buffer
   std::cerr.rdbuf(stdcerrOutput.rdbuf());
 
-  processor->OnEnd(std::move(recordable));
+  span->End(endOpts);
 
   std::cerr.rdbuf(sbuf);
 
@@ -218,29 +252,40 @@ TEST(OStreamSpanExporter, PrintChangedSpanClog)
 {
   auto exporter = std::unique_ptr<sdktrace::SpanExporter>(
       new opentelemetry::exporter::trace::OStreamSpanExporter(std::clog));
-  auto processor = std::shared_ptr<sdktrace::SpanProcessor>(
+  auto processor = std::unique_ptr<sdktrace::SpanProcessor>(
       new sdktrace::SimpleSpanProcessor(std::move(exporter)));
+  auto provider = nostd::shared_ptr<opentelemetry::trace::TracerProvider>(
+      new sdktrace::TracerProvider(std::move(processor)));
 
-  auto recordable = processor->MakeRecordable();
+  auto tracer = provider->GetTracer("test");
 
-  recordable->SetName("Test Span");
+
+  opentelemetry::core::SystemTimestamp now(std::chrono::system_clock::now());
+  opentelemetry::core::SteadyTimestamp one(std::chrono::nanoseconds(1));
+  opentelemetry::core::SteadyTimestamp onehundredone(std::chrono::nanoseconds(101));
+  opentelemetry::trace::StartSpanOptions startOpts;
+  startOpts.start_steady_time = one;
+  startOpts.start_system_time = now;
+  opentelemetry::trace::EndSpanOptions endOpts = { onehundredone };
+
+  auto span = tracer->StartSpan("Test Span", startOpts);
 
   constexpr uint8_t trace_id_buf[] = {1, 2, 3, 4, 5, 6, 7, 8, 1, 2, 3, 4, 5, 6, 7, 8};
   opentelemetry::trace::TraceId t_id(trace_id_buf);
   constexpr uint8_t span_id_buf[] = {1, 2, 3, 4, 5, 6, 7, 8};
   opentelemetry::trace::SpanId s_id(span_id_buf);
 
-  recordable->SetIds(t_id, s_id, s_id);
-  opentelemetry::core::SystemTimestamp now(std::chrono::system_clock::now());
 
-  recordable->SetStartTime(now);
-  recordable->SetDuration(std::chrono::nanoseconds(100));
-  recordable->SetStatus(opentelemetry::trace::StatusCode::kOk, "Test Description");
+  // A hacky solution to reset the IDs for perfect println.
+  auto* recordable = dynamic_cast<opentelemetry::sdk::trace::Span*>(span.get())->GetRecordablePtr().get();
+  recordable->SetIds(t_id, s_id, s_id);
   recordable->SetSpanKind(opentelemetry::trace::SpanKind::kInternal);
+
+  span->SetStatus(opentelemetry::trace::StatusCode::kOk, "Test Description");
 
   std::array<int, 3> array1 = {1, 2, 3};
   opentelemetry::nostd::span<int> span1{array1.data(), array1.size()};
-  recordable->SetAttribute("attr1", span1);
+  span->SetAttribute("attr1", span1);
 
   // Create stringstream to redirect to
   std::stringstream stdclogOutput;
@@ -251,7 +296,7 @@ TEST(OStreamSpanExporter, PrintChangedSpanClog)
   // Redirect cout to our stringstream buffer
   std::clog.rdbuf(stdclogOutput.rdbuf());
 
-  processor->OnEnd(std::move(recordable));
+  span->End(endOpts);
 
   std::clog.rdbuf(sbuf);
 

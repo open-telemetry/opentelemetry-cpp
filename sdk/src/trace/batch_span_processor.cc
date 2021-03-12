@@ -1,5 +1,7 @@
 #include "opentelemetry/sdk/trace/batch_span_processor.h"
 
+#include "opentelemetry/sdk/trace/span.h"
+
 #include <vector>
 using opentelemetry::sdk::common::AtomicUniquePtr;
 using opentelemetry::sdk::common::CircularBuffer;
@@ -26,19 +28,19 @@ std::unique_ptr<Recordable> BatchSpanProcessor::MakeRecordable() noexcept
   return exporter_->MakeRecordable();
 }
 
-void BatchSpanProcessor::OnStart(Recordable &, const SpanContext &) noexcept
+void BatchSpanProcessor::OnStart(Span &, const SpanContext &) noexcept
 {
   // no-op
 }
 
-void BatchSpanProcessor::OnEnd(std::unique_ptr<Recordable> &&span) noexcept
+void BatchSpanProcessor::OnEnd(Span &span) noexcept
 {
   if (is_shutdown_.load() == true)
   {
     return;
   }
-
-  if (buffer_.Add(span) == false)
+  auto data = span.ConsumeRecordable();
+  if (buffer_.Add(data) == false)
   {
     return;
   }

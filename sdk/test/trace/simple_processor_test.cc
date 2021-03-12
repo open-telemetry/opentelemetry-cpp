@@ -3,6 +3,7 @@
 #include "opentelemetry/nostd/span.h"
 #include "opentelemetry/sdk/trace/exporter.h"
 #include "opentelemetry/sdk/trace/span_data.h"
+#include "opentelemetry/sdk/trace/tracer_provider.h"
 
 #include <gtest/gtest.h>
 
@@ -15,19 +16,14 @@ TEST(SimpleProcessor, ToInMemorySpanExporter)
 {
   std::unique_ptr<InMemorySpanExporter> exporter(new InMemorySpanExporter());
   std::shared_ptr<InMemorySpanData> span_data = exporter->GetData();
-  SimpleSpanProcessor processor(std::move(exporter));
-
-  auto recordable = processor.MakeRecordable();
-
-  processor.OnStart(*recordable, SpanContext::GetInvalid());
-
+  TracerProvider provider(std::unique_ptr<SpanProcessor>(new SimpleSpanProcessor(std::move(exporter))));
+  auto tracer = provider.GetTracer("test");
+  auto span = tracer->StartSpan("span1");
   ASSERT_EQ(0, span_data->GetSpans().size());
-
-  processor.OnEnd(std::move(recordable));
-
+  span->End();
   ASSERT_EQ(1, span_data->GetSpans().size());
 
-  EXPECT_TRUE(processor.Shutdown());
+  EXPECT_TRUE(provider.Shutdown());
 }
 
 // An exporter that does nothing but record (and give back ) the # of times Shutdown was called.

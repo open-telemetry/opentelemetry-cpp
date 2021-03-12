@@ -191,7 +191,7 @@ TEST_F(TracezDataAggregatorTest, MultipleRunningSpans)
   });
 
   // Start and store spans based on the above map
-  std::vector<nostd::shared_ptr<Span>> running_span_container;
+  std::vector<nostd::shared_ptr<opentelemetry::trace::Span>> running_span_container;
   for (auto span_name : running_span_name_to_count)
   {
     for (int count = 0; count < span_name.second; count++)
@@ -367,7 +367,7 @@ TEST_F(TracezDataAggregatorTest, RunningSampleSpansOverCapacity)
 {
   int running_span_count = 6;
   // Start and store spans based on the above map
-  std::vector<nostd::shared_ptr<Span>> running_span_container;
+  std::vector<nostd::shared_ptr<opentelemetry::trace::Span>> running_span_container;
   for (int count = 0; count < running_span_count; count++)
     running_span_container.push_back(tracer->StartSpan(span_name1));
 

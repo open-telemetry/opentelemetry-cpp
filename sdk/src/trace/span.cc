@@ -1,4 +1,5 @@
-#include "src/trace/span.h"
+#include "opentelemetry/sdk/trace/span.h"
+
 #include "src/common/random.h"
 
 #include "opentelemetry/context/runtime_context.h"
@@ -110,8 +111,7 @@ Span::Span(std::shared_ptr<Tracer> &&tracer,
   recordable_->SetSpanKind(options.kind);
   recordable_->SetStartTime(NowOr(options.start_system_time));
   start_steady_time = NowOr(options.start_steady_time);
-  // TODO - OnStart should use Span.
-  tracer_->GetActiveProcessor().OnStart(*recordable_, parent_span_context);
+  tracer_->GetActiveProcessor().OnStart(*this, parent_span_context);
 }
 
 Span::~Span()
@@ -123,14 +123,16 @@ void Span::SetAttribute(nostd::string_view key,
                         const opentelemetry::common::AttributeValue &value) noexcept
 {
   std::lock_guard<std::mutex> lock_guard{mu_};
-
+  if (recordable_ == nullptr || has_ended_) {
+    return;
+  }
   recordable_->SetAttribute(key, value);
 }
 
 void Span::AddEvent(nostd::string_view name) noexcept
 {
   std::lock_guard<std::mutex> lock_guard{mu_};
-  if (recordable_ == nullptr)
+  if (recordable_ == nullptr || has_ended_)
   {
     return;
   }
@@ -140,7 +142,7 @@ void Span::AddEvent(nostd::string_view name) noexcept
 void Span::AddEvent(nostd::string_view name, core::SystemTimestamp timestamp) noexcept
 {
   std::lock_guard<std::mutex> lock_guard{mu_};
-  if (recordable_ == nullptr)
+  if (recordable_ == nullptr || has_ended_)
   {
     return;
   }
@@ -152,7 +154,7 @@ void Span::AddEvent(nostd::string_view name,
                     const opentelemetry::common::KeyValueIterable &attributes) noexcept
 {
   std::lock_guard<std::mutex> lock_guard{mu_};
-  if (recordable_ == nullptr)
+  if (recordable_ == nullptr || has_ended_)
   {
     return;
   }
@@ -162,7 +164,7 @@ void Span::AddEvent(nostd::string_view name,
 void Span::SetStatus(opentelemetry::trace::StatusCode code, nostd::string_view description) noexcept
 {
   std::lock_guard<std::mutex> lock_guard{mu_};
-  if (recordable_ == nullptr)
+  if (recordable_ == nullptr || has_ended_)
   {
     return;
   }
@@ -172,7 +174,7 @@ void Span::SetStatus(opentelemetry::trace::StatusCode code, nostd::string_view d
 void Span::UpdateName(nostd::string_view name) noexcept
 {
   std::lock_guard<std::mutex> lock_guard{mu_};
-  if (recordable_ == nullptr)
+  if (recordable_ == nullptr || has_ended_)
   {
     return;
   }
@@ -198,9 +200,8 @@ void Span::End(const trace_api::EndSpanOptions &options) noexcept
   recordable_->SetDuration(std::chrono::steady_clock::time_point(end_steady_time) -
                            std::chrono::steady_clock::time_point(start_steady_time));
 
-  // TODO - OnEnd should use Span.
-  tracer_->GetActiveProcessor().OnEnd(std::move(recordable_));
-  recordable_.reset();
+  // First, allow the processor(s) to pull recordable off this span.
+  tracer_->GetActiveProcessor().OnEnd(*this);
 }
 
 bool Span::IsRecording() const noexcept

@@ -9,6 +9,10 @@ namespace sdk
 {
 namespace trace
 {
+
+// Forward declaration to break circular dependency.
+class Span;
+
 /**
  * Span processor allow hooks for span start and end method invocations.
  *
@@ -34,14 +38,14 @@ public:
    * @param span a recordable for a span that was just started
    * @param parent_context The parent context of the span that just started
    */
-  virtual void OnStart(Recordable &span,
+  virtual void OnStart(Span &span,
                        const opentelemetry::trace::SpanContext &parent_context) noexcept = 0;
 
   /**
    * OnEnd is called when a span is ended.
-   * @param span a recordable for a span that was ended
+   * @param span the span that ended.  Note: We need to pull our recordables off of this.
    */
-  virtual void OnEnd(std::unique_ptr<Recordable> &&span) noexcept = 0;
+  virtual void OnEnd(Span &span) noexcept = 0;
 
   /**
    * Export all ended spans that have not yet been exported.
