@@ -30,9 +30,8 @@ static const nostd::string_view kB3SampledHeader = "X-B3-Sampled";
                              X-B3-TraceId                X-B3-SpanId    X-B3-ParentSpanId (ignored)
 */
 
-static const int kTraceIdHexStrLength   = 32;
-static const int kSpanIdHexStrLength    = 16;
-static const int kTraceFlagHexStrLength = 1;
+static const int kTraceIdHexStrLength = 32;
+static const int kSpanIdHexStrLength  = 16;
 
 // The B3PropagatorExtractor class provides an interface that enables extracting context from
 // headers of HTTP requests. HTTP frameworks and clients can integrate with B3Propagator by
