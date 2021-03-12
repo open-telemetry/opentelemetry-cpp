@@ -34,8 +34,6 @@ if(BUILD_TESTING)
     TEST_PREFIX exporter.otlp.
     TEST_LIST recordable_test)
   find_library(IS_GMOCK gmock PATH_SUFFIXES lib)
-  message(STATUS "GMOCK-LIBRARY")
-  message(STATUS ${IS_GMOCK})
   if(IS_GMOCK)
     add_executable(otlp_exporter_test test/otlp_exporter_test.cc)
     target_link_libraries(

@@ -24,8 +24,8 @@ googletest_install() {
     tmp_dir=$(mktemp -d)
     pushd $tmp_dir
     wget https://github.com/google/googletest/archive/release-${GOOGLETEST_VERSION}.tar.gz
-    tar -xf release-1.10.0.tar.gz
-    cd googletest-release-1.10.0/
+    tar -xf release-${GOOGLETEST_VERSION}.tar.gz
+    cd googletest-release-${GOOGLETEST_VERSION}/
     mkdir build && cd build
     cmake .. -DBUILD_SHARED_LIBS=ON -DINSTALL_GTEST=ON -DCMAKE_INSTALL_PREFIX:PATH=/usr
     make -j $(nproc)
