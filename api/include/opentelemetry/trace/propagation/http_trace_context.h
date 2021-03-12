@@ -99,7 +99,7 @@ private:
     trace_parent[kTraceIdSize + kSpanIdSize + 4] = '-';
     span_context.trace_flags().ToLowerBase16({&trace_parent[kTraceIdSize + kSpanIdSize + 5], 2});
 
-    setter(carrier, kTraceParent, trace_parent);
+    setter(carrier, kTraceParent, nostd::string_view(trace_parent, sizeof(trace_parent)));
     setter(carrier, kTraceState, span_context.trace_state()->ToHeader());
   }
 
