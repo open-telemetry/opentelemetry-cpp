@@ -1,33 +1,13 @@
-#include "opentelemetry/context/context.h"
-#include "opentelemetry/nostd/shared_ptr.h"
-#include "opentelemetry/nostd/span.h"
-#include "opentelemetry/nostd/string_view.h"
-#include "opentelemetry/trace/default_span.h"
-#include "opentelemetry/trace/noop.h"
-#include "opentelemetry/trace/span.h"
-#include "opentelemetry/trace/span_context.h"
-#include "opentelemetry/trace/trace_id.h"
-#include "opentelemetry/trace/tracer.h"
+#include "opentelemetry/context/runtime_context.h"
+#include "opentelemetry/trace/propagation/b3_propagator.h"
+#include "opentelemetry/trace/scope.h"
+#include "util.h"
 
 #include <map>
-#include <memory>
-#include <string>
 
 #include <gtest/gtest.h>
 
-#include "opentelemetry/trace/default_span.h"
-#include "opentelemetry/trace/propagation/b3_propagator.h"
-#include "opentelemetry/trace/propagation/text_map_propagator.h"
-
 using namespace opentelemetry;
-
-template <typename T>
-static std::string Hex(const T &id_item)
-{
-  char buf[T::kSize * 2];
-  id_item.ToLowerBase16(buf);
-  return std::string(buf, sizeof(buf));
-}
 
 static nostd::string_view Getter(const std::map<std::string, std::string> &carrier,
                                  nostd::string_view key)
@@ -56,24 +36,10 @@ using MapB3ContextMultiHeader =
 
 static MapB3ContextMultiHeader formatMultiHeader = MapB3ContextMultiHeader();
 
-TEST(B3PropagationTest, TraceIdBufferGeneration)
-{
-  constexpr uint8_t buf[] = {1, 2, 3, 4, 5, 6, 7, 8, 8, 7, 0xaa, 0xbb, 0xcc, 0xdd, 0xee, 0xff};
-  EXPECT_EQ(MapB3Context::GenerateTraceIdFromString("01020304050607080807aabbccddeeff"),
-            trace::TraceId(buf));
-}
-
-TEST(B3PropagationTest, SpanIdBufferGeneration)
-{
-  constexpr uint8_t buf[] = {1, 2, 0xaa, 0xbb, 0xcc, 0xdd, 0xee, 0xff};
-  EXPECT_EQ(MapB3Context::GenerateSpanIdFromString("0102aabbccddeeff"), trace::SpanId(buf));
-}
-
 TEST(B3PropagationTest, TraceFlagsBufferGeneration)
 {
-  EXPECT_EQ(MapB3Context::GenerateTraceFlagsFromString("0"), trace::TraceFlags());
-  EXPECT_EQ(MapB3Context::GenerateTraceFlagsFromString("1"),
-            trace::TraceFlags(trace::TraceFlags::kIsSampled));
+  EXPECT_EQ(MapB3Context::TraceFlagsFromHex("0"), trace::TraceFlags());
+  EXPECT_EQ(MapB3Context::TraceFlagsFromHex("1"), trace::TraceFlags(trace::TraceFlags::kIsSampled));
 }
 
 TEST(B3PropagationTest, PropagateInvalidContext)

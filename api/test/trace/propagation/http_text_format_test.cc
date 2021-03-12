@@ -1,33 +1,13 @@
-#include "opentelemetry/context/context.h"
-#include "opentelemetry/nostd/shared_ptr.h"
-#include "opentelemetry/nostd/span.h"
-#include "opentelemetry/nostd/string_view.h"
-#include "opentelemetry/trace/default_span.h"
-#include "opentelemetry/trace/noop.h"
-#include "opentelemetry/trace/span.h"
-#include "opentelemetry/trace/span_context.h"
-#include "opentelemetry/trace/trace_id.h"
-#include "opentelemetry/trace/tracer.h"
+#include "opentelemetry/context/runtime_context.h"
+#include "opentelemetry/trace/propagation/http_trace_context.h"
+#include "opentelemetry/trace/scope.h"
+#include "util.h"
 
 #include <map>
-#include <memory>
-#include <string>
 
 #include <gtest/gtest.h>
 
-#include "opentelemetry/trace/default_span.h"
-#include "opentelemetry/trace/propagation/http_trace_context.h"
-#include "opentelemetry/trace/propagation/text_map_propagator.h"
-
 using namespace opentelemetry;
-
-template <typename T>
-static std::string Hex(const T &id_item)
-{
-  char buf[T::kSize * 2];
-  id_item.ToLowerBase16(buf);
-  return std::string(buf, sizeof(buf));
-}
 
 static nostd::string_view Getter(const std::map<std::string, std::string> &carrier,
                                  nostd::string_view trace_type = "traceparent")
@@ -52,22 +32,9 @@ using MapHttpTraceContext =
 
 static MapHttpTraceContext format = MapHttpTraceContext();
 
-TEST(TextMapPropagatorTest, TraceIdBufferGeneration)
-{
-  constexpr uint8_t buf[] = {1, 2, 3, 4, 5, 6, 7, 8, 8, 7, 0xaa, 0xbb, 0xcc, 0xdd, 0xee, 0xff};
-  EXPECT_EQ(MapHttpTraceContext::GenerateTraceIdFromString("01020304050607080807aabbccddeeff"),
-            trace::TraceId(buf));
-}
-
-TEST(TextMapPropagatorTest, SpanIdBufferGeneration)
-{
-  constexpr uint8_t buf[] = {1, 2, 0xaa, 0xbb, 0xcc, 0xdd, 0xee, 0xff};
-  EXPECT_EQ(MapHttpTraceContext::GenerateSpanIdFromString("0102aabbccddeeff"), trace::SpanId(buf));
-}
-
 TEST(TextMapPropagatorTest, TraceFlagsBufferGeneration)
 {
-  EXPECT_EQ(MapHttpTraceContext::GenerateTraceFlagsFromString("00"), trace::TraceFlags());
+  EXPECT_EQ(MapHttpTraceContext::TraceFlagsFromHex("00"), trace::TraceFlags());
 }
 
 TEST(TextMapPropagatorTest, NoSendEmptyTraceState)
