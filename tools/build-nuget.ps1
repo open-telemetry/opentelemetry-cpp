@@ -32,7 +32,7 @@ function New-TemporaryDirectory
 function GetGitWorkTree()
 {
   # TODO: presently we assume that GIT_WORK_TREE is 1-level up.
-  # Ucnomment the following line if this is not the case.
+  # Uncomment the following line if this is not the case:
   # $result = (git rev-parse --show-toplevel) -join ''
   $result = ( Get-Item -Path .. ).Fullname
   $result = $result -replace '[\\/]', '\'
