@@ -129,6 +129,8 @@ TEST(TextMapPropagatorTest, InvalidIdentitiesAreNotExtracted)
       "00-0af7651916cd43dd8448eb211c8031-b9c7c989f97918e1-01",
       "00-0af7651916cd43dd8448eb211c80319c-b9c7c989f97-01",
       "00-1-1-00",
+      "00--b9c7c989f97918e1-01",
+      "00-0af7651916cd43dd8448eb211c80319c1--01",
       "",
       "---",
   };
