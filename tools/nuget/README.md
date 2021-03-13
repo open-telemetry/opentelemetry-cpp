@@ -20,13 +20,11 @@ git describe --tags
 
 3. Push selected package to nuget feed.
 
-Learn more about NuGet packages [here](https://docs.microsoft.com/en-us/nuget/guides/native-packages).
+Learn more about native code NuGet packages [here](https://docs.microsoft.com/en-us/nuget/guides/native-packages).
 
 ## Proposed NuGet package flavors
 
-This section is a `DRAFT` - Work-in-Progress.
-
-The following packages MAY be created and published at nuget.org :
+This section is a `DRAFT` - Work-in-Progress. The following packages MAY be created and published at nuget.org :
 
 | Package Name                 | Desription                                                  | Notes |
 |------------------------------|-------------------------------------------------------------|-------|
@@ -37,8 +35,8 @@ The following packages MAY be created and published at nuget.org :
 | OpenTelemetry.Cpp.Ext        | Extended functionality.                                     |       |
 | OpenTelemetry.Cpp.Exporters  | Exporters.                                                  |       |
 
-Prebuilt libraries MAY be provided in future in `OpenTelemetry.Cpp.${CompilerABI}` package.
+Prebuilt libraries MAY be provided in future in `OpenTelemetry.Cpp.${CompilerABI}` package for each compiler.
 
-Refer to [Boost libary](https://www.nuget.org/packages?q=boost) nuget packages for example how to create
-a nuget package for a given compiler and runtime. [Fuget Package Explorer](https://www.fuget.org/) may
-be used to learn how to create a custom nuget spec.
+Refer to [Boost library](https://www.nuget.org/packages?q=boost) nuget packages for example how to create
+a nuget package for a given compiler and runtime, using [Fuget Package Explorer](https://www.fuget.org/)
+that allows to see the original nuget spec for each package.
