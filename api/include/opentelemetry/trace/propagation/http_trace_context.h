@@ -25,8 +25,10 @@ namespace propagation
 {
 static const nostd::string_view kTraceParent = "traceparent";
 static const nostd::string_view kTraceState  = "tracestate";
+static const size_t kVersionSize             = 2;
 static const size_t kTraceIdSize             = 32;
 static const size_t kSpanIdSize              = 16;
+static const size_t kTraceFlagsSize          = 2;
 static const size_t kTraceParentSize         = 55;
 
 // The HttpTraceContext provides methods to extract and inject
@@ -87,6 +89,15 @@ public:
   }
 
 private:
+  static constexpr uint8_t kInvalidVersion = 0xFF;
+
+  static bool IsValidVersion(nostd::string_view version_hex)
+  {
+    uint8_t version;
+    detail::HexToBinary(version_hex, &version, sizeof(version));
+    return version != kInvalidVersion;
+  }
+
   static void InjectImpl(Setter setter, T &carrier, const SpanContext &span_context)
   {
     char trace_parent[kTraceParentSize];
@@ -106,7 +117,7 @@ private:
   static SpanContext ExtractContextFromTraceHeaders(nostd::string_view trace_parent,
                                                     nostd::string_view trace_state)
   {
-    if (trace_parent.size() < kTraceParentSize)
+    if (trace_parent.size() != kTraceParentSize)
     {
       return SpanContext::GetInvalid();
     }
@@ -122,22 +133,32 @@ private:
     nostd::string_view span_id_hex     = fields[2];
     nostd::string_view trace_flags_hex = fields[3];
 
+    if (version_hex.size() != kVersionSize || trace_id_hex.size() != kTraceIdSize ||
+        span_id_hex.size() != kSpanIdSize || trace_flags_hex.size() != kTraceFlagsSize)
+    {
+      return SpanContext::GetInvalid();
+    }
+
     if (!detail::IsValidHex(version_hex) || !detail::IsValidHex(trace_id_hex) ||
         !detail::IsValidHex(span_id_hex) || !detail::IsValidHex(trace_flags_hex))
     {
       return SpanContext::GetInvalid();
     }
 
-    TraceId trace_id       = TraceIdFromHex(trace_id_hex);
-    SpanId span_id         = SpanIdFromHex(span_id_hex);
-    TraceFlags trace_flags = TraceFlagsFromHex(trace_flags_hex);
-
-    if (!trace_id.IsValid() || !span_id.IsValid() || !trace_flags.IsValid())
+    if (!IsValidVersion(version_hex))
     {
       return SpanContext::GetInvalid();
     }
 
-    return SpanContext(trace_id, span_id, trace_flags, true,
+    TraceId trace_id = TraceIdFromHex(trace_id_hex);
+    SpanId span_id   = SpanIdFromHex(span_id_hex);
+
+    if (!trace_id.IsValid() || !span_id.IsValid())
+    {
+      return SpanContext::GetInvalid();
+    }
+
+    return SpanContext(trace_id, span_id, TraceFlagsFromHex(trace_flags_hex), true,
                        opentelemetry::trace::TraceState::FromHeader(trace_state));
   }
 

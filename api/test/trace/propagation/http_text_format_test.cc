@@ -117,3 +117,29 @@ TEST(TextMapPropagatorTest, GetCurrentSpan)
   EXPECT_EQ(headers["traceparent"], "00-0102030405060708090a0b0c0d0e0f10-0102030405060708-01");
   EXPECT_EQ(headers["tracestate"], "congo=t61rcWkgMzE");
 }
+
+TEST(TextMapPropagatorTest, InvalidIdentitiesAreNotExtracted)
+{
+  std::vector<std::string> traces = {
+      "ff-0af7651916cd43dd8448eb211c80319c-b9c7c989f97918e1-01",
+      "00-0af7651916cd43dd8448eb211c80319c1-b9c7c989f97918e1-01",
+      "00-0af7651916cd43dd8448eb211c80319c-b9c7c989f97918e11-01",
+      "0-0af7651916cd43dd8448eb211c80319c-b9c7c989f97918e1-01",
+      "00-0af7651916cd43dd8448eb211c80319c-b9c7c989f97918e1-0",
+      "00-0af7651916cd43dd8448eb211c8031-b9c7c989f97918e1-01",
+      "00-0af7651916cd43dd8448eb211c80319c-b9c7c989f97-01",
+      "00-1-1-00",
+      "",
+      "---",
+  };
+
+  for (auto &trace : traces)
+  {
+    const std::map<std::string, std::string> carrier = {{"traceparent", trace}};
+    context::Context ctx1                            = context::Context{};
+    context::Context ctx2                            = format.Extract(Getter, carrier, ctx1);
+
+    auto span = trace::propagation::detail::GetCurrentSpan(ctx2);
+    EXPECT_FALSE(span.IsValid());
+  }
+}

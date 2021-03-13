@@ -31,15 +31,12 @@ class TraceFlags final
 {
 public:
   static constexpr uint8_t kIsSampled = 1;
-  static constexpr uint8_t kForbidden = 0xFF;
 
   TraceFlags() noexcept : rep_{0} {}
 
   explicit TraceFlags(uint8_t flags) noexcept : rep_(flags) {}
 
   bool IsSampled() const noexcept { return rep_ & kIsSampled; }
-
-  bool IsValid() const noexcept { return rep_ != kForbidden; }
 
   // Populates the buffer with the lowercase base16 representation of the flags.
   void ToLowerBase16(nostd::span<char, 2> buffer) const noexcept
