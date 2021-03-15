@@ -88,9 +88,7 @@ public:
         count++;
       }
     }
-    // std::cout << " HEADER : " << header << " COUMT" << count << "\n";
     nostd::shared_ptr<TraceState> ts(new TraceState(count));
-    // std::cout << " After initialize ts\n";
     // now lets parse header again to fetch tokens
     bool invalid_header = false;
     begin               = 0;
@@ -98,7 +96,6 @@ public:
     count               = 0;
     while (begin < header.size() && count < kMaxKeyValuePairs)
     {
-      // std::cout << " Begin:" << begin   <<  " " << count << "\n";
       // find list-member
       end = header.find(kMembersSeparator, begin);
       if (end == 0)
@@ -107,7 +104,6 @@ public:
         begin = 1;
         continue;
       }
-      // std::cout << "2\n";
       if (end == std::string::npos)
       {
         // last list member. `end` points to end of it.
@@ -118,7 +114,6 @@ public:
         // `end` points to end of current list member
         end--;
       }
-      // std::cout << "3\n";
       auto list_member = TrimString(header, begin, end);  // OWS handling
       if (list_member.size() == 0)
       {
@@ -126,7 +121,6 @@ public:
         begin = end + 2;  // begin points to start of next member
         continue;
       }
-      // std::cout << "4\n";
       auto key_end_pos = list_member.find(kKeyValueSeparator);
       if (key_end_pos == std::string::npos)
       {
@@ -134,27 +128,21 @@ public:
         ts->kv_properties_.reset(new opentelemetry::common::KeyValueProperties());
         break;
       }
-      // std::cout << "5\n";
 
       auto key   = list_member.substr(0, key_end_pos);
       auto value = list_member.substr(key_end_pos + 1);
-      // std::cout << "6\n";
 
       if (!IsValidKey(key) || !IsValidValue(value))
       {
         // invalid header. return empty TraceState
-        // std::cout << " before invalud test \n";
         ts->kv_properties_.reset(new opentelemetry::common::KeyValueProperties());
-        // std::cout << " after invalid test \n";
         break;
       }
-      // std::cout << " Adding : " << key <<  " " << value << "\n";
 
       ts->kv_properties_->AddEntry(key, value);
 
       begin = end + 2;
     }
-    // std::cout << "returning ts\n";
     return ts;
   }
 
