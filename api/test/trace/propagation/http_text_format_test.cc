@@ -85,6 +85,23 @@ TEST(TextMapPropagatorTest, NoSendEmptyTraceState)
   EXPECT_FALSE(carrier.count("tracestate") > 0);
 }
 
+TEST(TextMapPropagatorTest, PropogateTraceState)
+{
+  const std::map<std::string, std::string> carrier = {
+      {"traceparent", "00-4bf92f3577b34da6a3ce929d0e0e4736-0102030405060708-01"},
+      {"tracestate", "congo=t61rcWkgMzE"}};
+  context::Context ctx1 = context::Context{
+      "current-span",
+      nostd::shared_ptr<trace::Span>(new trace::DefaultSpan(trace::SpanContext::GetInvalid()))};
+  context::Context ctx2                 = format.Extract(Getter, carrier, ctx1);
+  std::map<std::string, std::string> c2 = {};
+  format.Inject(Setter, c2, ctx2);
+
+  EXPECT_TRUE(carrier.count("traceparent") > 0);
+  EXPECT_TRUE(carrier.count("tracestate") > 0);
+  EXPECT_EQ(c2["tracestate"], "congo=t61rcWkgMzE");
+}
+
 TEST(TextMapPropagatorTest, PropagateInvalidContext)
 {
   // Do not propagate invalid trace context.
@@ -94,6 +111,7 @@ TEST(TextMapPropagatorTest, PropagateInvalidContext)
       nostd::shared_ptr<trace::Span>(new trace::DefaultSpan(trace::SpanContext::GetInvalid()))};
   format.Inject(Setter, carrier, ctx);
   EXPECT_TRUE(carrier.count("traceparent") == 0);
+  EXPECT_TRUE(carrier.count("tracestate") == 0);
 }
 
 TEST(TextMapPropagatorTest, SetRemoteSpan)
@@ -118,8 +136,10 @@ TEST(TextMapPropagatorTest, GetCurrentSpan)
 {
   constexpr uint8_t buf_span[]  = {1, 2, 3, 4, 5, 6, 7, 8};
   constexpr uint8_t buf_trace[] = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16};
+
+  auto trace_state = trace::TraceState::FromHeader("congo=t61rcWkgMzE");
   trace::SpanContext span_context{trace::TraceId{buf_trace}, trace::SpanId{buf_span},
-                                  trace::TraceFlags{true}, false};
+                                  trace::TraceFlags{true}, false, trace_state};
   nostd::shared_ptr<trace::Span> sp{new trace::DefaultSpan{span_context}};
 
   // Set `sp` as the currently active span, which must be used by `Inject`.
@@ -128,4 +148,5 @@ TEST(TextMapPropagatorTest, GetCurrentSpan)
   std::map<std::string, std::string> headers = {};
   format.Inject(Setter, headers, context::RuntimeContext::GetCurrent());
   EXPECT_EQ(headers["traceparent"], "00-0102030405060708090a0b0c0d0e0f10-0102030405060708-01");
+  EXPECT_EQ(headers["tracestate"], "congo=t61rcWkgMzE");
 }
