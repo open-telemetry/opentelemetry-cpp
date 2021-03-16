@@ -16,8 +16,7 @@ build systems for Abseil.
 ### Building as Standalone CMake Project:
 
 1. Getting the opentelementry-cpp source:
-
-```
+```bash
 # Change to the directory where you want to create the code repository
 $ cd ~
 $ mkdir source && cd source
@@ -29,8 +28,7 @@ $
 ```
 
 2. Navigate to the repository cloned above, and create the `CMake` build configuration.
-
-```
+```bash
 $ cd opentelemetry-cpp
 $ mkdir build && cd build
 $ cmake .. -DCMAKE_BUILD_TYPE=Debug -DCMAKE_CXX_FLAGS="-Werror"
@@ -44,7 +42,7 @@ $
 ```
 
 3. Once build configuration is created, build the CMake targets - this includes building SDKs, and building unittests for API and SDK. Note that since API is header only library, no separate build is triggered for it.
-```
+```bash
 $ cmake --build . --target all
 Scanning dependencies of target timestamp_test
 [  0%] Building CXX object api/test/core/CMakeFiles/timestamp_test.dir/timestamp_test.cc.o
@@ -58,7 +56,7 @@ $
 ```
 
 4. Once CMake tests are built, run them with `ctest` command
-```
+```bash
 $ ctest
 Test project /tmp/opentelemetry-cpp/build
        Start   1: trace.SystemTimestampTest.Construction
@@ -72,7 +70,7 @@ $
 ```
 
 5. Optionally install the header files for API, and generated targets and header files for SDK at custom/default install location.
-```
+```bash
 $ cmake --install . --config Debug --prefix /<install_root>/
 -- Installing: /<install-root>/lib/cmake/opentelemetry-cpp/opentelemetry-cpp-config.cmake
 -- Installing: /<install-root>/lib/cmake/opentelemetry-cpp/opentelemetry-cpp-config-version.cmake
@@ -85,9 +83,7 @@ $
 ```
 
 ### Incorporating Into An Existing CMake Project
-
 TBD
 
 ## Build instructions using CMake
-
 TBD
