@@ -21,7 +21,7 @@ build systems for Abseil.
 # Change to the directory where you want to create the code repository
 $ cd ~
 $ mkdir source && cd source
-$ git clone [(https://github.com/open-telemetry/opentelemetry-cpp](https://github.com/open-telemetry/opentelemetry-cpp)
+$ git clone [https://github.com/open-telemetry/opentelemetry-cpp](https://github.com/open-telemetry/opentelemetry-cpp)
 Cloning into 'opentelemetry-cpp'...
 ...
 Resolving deltas: 100% (3225/3225), done.
