@@ -74,6 +74,7 @@ if(WITH_STL)
 endif()
 
 option(WITH_OTLP "Whether to include the OpenTelemetry Protocol in the SDK" OFF)
+option(WITH_ZIPKIN "Whether to include the Zipkin exporter in the SDK" OFF)
 
 option(WITH_PROMETHEUS "Whether to include the Prometheus Client in the SDK"
        OFF)
