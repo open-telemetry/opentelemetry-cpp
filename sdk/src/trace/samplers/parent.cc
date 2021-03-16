@@ -28,10 +28,10 @@ SamplingResult ParentBasedSampler::ShouldSample(
   // If parent exists:
   if (parent_context.IsSampled())
   {
-    return {Decision::RECORD_AND_SAMPLE, nullptr};
+    return {Decision::RECORD_AND_SAMPLE, nullptr, parent_context.trace_state()};
   }
 
-  return {Decision::DROP, nullptr};
+  return {Decision::DROP, nullptr, parent_context.trace_state()};
 }
 
 nostd::string_view ParentBasedSampler::GetDescription() const noexcept

@@ -94,7 +94,6 @@ enum class SessionState
 using Byte           = uint8_t;
 using StatusCode     = uint16_t;
 using Body           = std::vector<Byte>;
-using Data           = std::map<std::string, std::string>;
 using SSLCertificate = std::vector<Byte>;
 
 struct cmp_ic
@@ -239,7 +238,7 @@ public:
   virtual Result Get(const nostd::string_view &url, const Headers & = {{}}) noexcept = 0;
 
   virtual Result Post(const nostd::string_view &url,
-                      const Data &data,
+                      const Body &body,
                       const Headers & = {{"content-type", "application/json"}}) noexcept = 0;
 
   virtual ~HttpClientSync() = default;
