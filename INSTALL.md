@@ -60,6 +60,16 @@ build configuration.
    $
    ```
 
+   Some of the important cmake build variables we can use while building
+   configuration:
+   - `-DCMAKE_POSITION_INDEPENDENT_CODE=ON` : Please note that with default
+   configuration, the code is compiled without `-fpic` option, so it is not
+   suitable for inclusion in shared library. To enable the code for inclusion
+   in shared libraries, this variable is used.
+
+   - `-DWITH_OTLP=ON` : To enable building Otlp exporter.
+   - `-DWITH_PROMETHEUS` : To enable building prometheus exporter.
+
 3. Once build configuration is created, build the CMake targets -
  this includes building SDKs, and building unittests for API and SDK.
  Note that since API is header only library, no separate build is triggered for it.
