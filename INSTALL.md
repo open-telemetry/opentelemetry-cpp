@@ -18,7 +18,7 @@ To install Git, consult the [Set up Git](https://help.github.com/articles/set-up
 guide on GitHub.
 - [CMake](https://cmake.org/) for building opentelemetry-cpp API,
 SDK with their unittests. We use CMake version 3.15.2 in our build system.
-To install CMake, consult the [Insalling CMake](https://cmake.org/install/) guide.
+To install CMake, consult the [Installing CMake](https://cmake.org/install/) guide.
 - [GoogleTest](https://github.com/google/googletest) framework to build and
 run the unittests.
 We use GoogleTest version 1.10.0 in our build system. To install GoogleTest,
