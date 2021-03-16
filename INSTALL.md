@@ -12,7 +12,7 @@ build systems for opentelemetry-cpp.
 - [Git](https://git-scm.com/) for fetching opentelemetry-cpp source code from repository. To install Git, consult the [Set up Git](https://help.github.com/articles/set-up-git/) guide on GitHub.
 - [CMake](https://cmake.org/) for building opentelemetry-cpp API, SDK with their unittests. We use CMake version 3.15.2 in our build system. To install CMake, consult the [Insalling CMake](https://cmake.org/install/) guide.
 - [GoogleTest](https://github.com/google/googletest) framework to build and run the unittests. We use GoogleTest version 1.10.0 in our build system. To install GoogleTest, consult the [GoogleTest Build Instructions](https://github.com/google/googletest/blob/master/googletest/README.md#generic-build-instructions).
-- Apart from above core requirements, the Exporters and Propagators have their build dependencies which are not covered here. E.g, Otlp Exporter needs grpc library, and Zipkin exporter needs nlohmann-json and libcurl, ETW exporter need nlohmann-json parser to build. This is covered in the build instructions for these components.
+- Apart from above core requirements, the Exporters and Propagators have their build dependencies which are not covered here. E.g, Otlp Exporter needs grpc/protobuf library, Zipkin exporter needs nlohmann-json and libcurl, ETW exporter need nlohmann-json to build. This is covered in the build instructions for these components.
 
 ### Building as Standalone CMake Project:
 
