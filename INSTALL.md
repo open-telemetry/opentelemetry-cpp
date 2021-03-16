@@ -1,7 +1,7 @@
 # Building opentelemetry-cpp
 
 [Bazel](https://bazel.build) and [CMake](https://cmake.org/) are the official
-build systems for Abseil.
+build systems for opentelemetry-cpp.
 
 ## Build instructions using CMake
 
