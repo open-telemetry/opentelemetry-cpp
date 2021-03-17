@@ -12,7 +12,7 @@ Refer to [Platforms Supported](./README.md#supported-development-platforms)
 for more information.
 - A compatible C++ compiler supporting at least C++11.
 Major compilers are supported.
-Refer [Supported Compilers](./README.md#supported-c-versions) for more information.
+Refer to [Supported Compilers](./README.md#supported-c-versions) for more information.
 - [Git](https://git-scm.com/) for fetching opentelemetry-cpp source code from repository.
 To install Git, consult the [Set up Git](https://help.github.com/articles/set-up-git/)
 guide on GitHub.
