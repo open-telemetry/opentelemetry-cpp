@@ -50,7 +50,7 @@ build configuration.
    ```console
    $ cd opentelemetry-cpp
    $ mkdir build && cd build
-   $ cmake .. -DCMAKE_BUILD_TYPE=Debug -DCMAKE_CXX_FLAGS="-Werror"
+   $ cmake ..
    -- The C compiler identification is GNU 9.3.0
    -- The CXX compiler identification is GNU 9.3.0
    ...
