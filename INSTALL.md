@@ -118,7 +118,19 @@ targets and header files for SDK at custom/default install location.
 
 ### Incorporating Into An Existing CMake Project
 
-TBD
+To use the library from a CMake project, you can locate it directly with
+ `find_package` and use the imported targets from generated package
+ configurations. As of now, this will import targets for both API and SDK.
+In future, there may be separate packages for API and SDK which can be
+installed and imported separtely according to need.
+
+```cmake
+# CMakeLists.txt
+find_package(opentelemetry-cpp REQUIRED)
+...
+target_include_directories(foo PRIVATE ${OPENTELEMETRY_CPP_INCLUDE_DIRS})
+target_link_libraries(foo PRIVATE ${OPENTELEMETRY_CPP_LIBRARIES})
+```
 
 ## Build instructions using Bazel
 
