@@ -8,7 +8,7 @@ build systems for opentelemetry-cpp.
 ### Prerequisites
 
 - A supported platform (e.g. Windows, macOS or Linux).
-Refer [Platforms Supported](./README.md#supported-development-platforms)
+Refer to [Platforms Supported](./README.md#supported-development-platforms)
 for more information.
 - A compatible C++ compiler supporting atleast C++11.
 Major compilers are supported.
