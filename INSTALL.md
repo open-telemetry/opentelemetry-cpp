@@ -10,7 +10,7 @@ build systems for opentelemetry-cpp.
 - A supported platform (e.g. Windows, macOS or Linux).
 Refer to [Platforms Supported](./README.md#supported-development-platforms)
 for more information.
-- A compatible C++ compiler supporting atleast C++11.
+- A compatible C++ compiler supporting at least C++11.
 Major compilers are supported.
 Refer [Supported Compilers](./README.md#supported-c-versions) for more information.
 - [Git](https://git-scm.com/) for fetching opentelemetry-cpp source code from repository.
