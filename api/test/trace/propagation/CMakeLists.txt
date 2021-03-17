@@ -1,5 +1,5 @@
 foreach(testname http_text_format_test b3_propagation_test
-                 composite_propagator_test)
+                 jaeger_propagation_test composite_propagator_test)
   add_executable(${testname} "${testname}.cc")
   target_link_libraries(
     ${testname} ${GTEST_BOTH_LIBRARIES} ${CORE_RUNTIME_LIBS}
