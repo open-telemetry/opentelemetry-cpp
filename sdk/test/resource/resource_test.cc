@@ -39,6 +39,7 @@ TEST(ResourceTest, create)
 
     EXPECT_TRUE(expected_attributes.find(e.first) != expected_attributes.end());
     if (expected_attributes.find(e.first) != expected_attributes.end())
+    {
       if (e.first == "version")
         EXPECT_EQ(opentelemetry::nostd::get<uint32_t>(expected_attributes.find(e.first)->second),
                   opentelemetry::nostd::get<uint32_t>(e.second));
@@ -48,6 +49,7 @@ TEST(ResourceTest, create)
       else
         EXPECT_EQ(opentelemetry::nostd::get<std::string>(expected_attributes.find(e.first)->second),
                   opentelemetry::nostd::get<std::string>(e.second));
+    }
   }
   EXPECT_EQ(received_attributes2.size(), expected_attributes.size());
 }
@@ -67,8 +69,10 @@ TEST(ResourceTest, Merge)
   {
     EXPECT_TRUE(expected_attributes.find(e.first) != expected_attributes.end());
     if (expected_attributes.find(e.first) != expected_attributes.end())
+    {
       EXPECT_EQ(expected_attributes.find(e.first)->second,
                 opentelemetry::nostd::get<std::string>(e.second));
+    }
   }
   EXPECT_EQ(received_attributes.size(), expected_attributes.size());
 }
@@ -86,8 +90,10 @@ TEST(ResourceTest, MergeEmptyString)
   {
     EXPECT_TRUE(expected_attributes.find(e.first) != expected_attributes.end());
     if (expected_attributes.find(e.first) != expected_attributes.end())
+    {
       EXPECT_EQ(expected_attributes.find(e.first)->second,
                 opentelemetry::nostd::get<std::string>(e.second));
+    }
   }
   EXPECT_EQ(received_attributes.size(), expected_attributes.size());
 }
@@ -109,8 +115,10 @@ TEST(ResourceTest, OtelResourceDetector)
   {
     EXPECT_TRUE(expected_attributes.find(e.first) != expected_attributes.end());
     if (expected_attributes.find(e.first) != expected_attributes.end())
+    {
       EXPECT_EQ(expected_attributes.find(e.first)->second,
                 opentelemetry::nostd::get<std::string>(e.second));
+    }
   }
   EXPECT_EQ(received_attributes.size(), expected_attributes.size());
   unsetenv("OTEL_RESOURCE_ATTRIBUTES");
@@ -127,8 +135,10 @@ TEST(ResourceTest, OtelResourceDetectorEmptyEnv)
   {
     EXPECT_TRUE(expected_attributes.find(e.first) != expected_attributes.end());
     if (expected_attributes.find(e.first) != expected_attributes.end())
+    {
       EXPECT_EQ(expected_attributes.find(e.first)->second,
                 opentelemetry::nostd::get<std::string>(e.second));
+    }
   }
   EXPECT_EQ(received_attributes.size(), expected_attributes.size());
 }

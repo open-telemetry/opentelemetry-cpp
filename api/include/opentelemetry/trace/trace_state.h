@@ -126,7 +126,6 @@ public:
 
     std::size_t begin{0};
     std::size_t end{0};
-    bool invalid_header = false;
     while (begin < header.size() && ts->num_entries_ < kMaxKeyValuePairs)
     {
       // find list-member
