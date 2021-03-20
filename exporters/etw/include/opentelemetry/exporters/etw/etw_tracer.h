@@ -80,18 +80,19 @@ typedef struct
 } TracerProviderConfiguration;
 
 /**
- * @brief Helper template to convert a variant value from TracerProviderOptions to TracerProviderConfiguration
- * 
+ * @brief Helper template to convert a variant value from TracerProviderOptions to
+ * TracerProviderConfiguration
+ *
  * @param options           TracerProviderOptions passed on API surface
  * @param key               Option name
  * @param value             Reference to destination value
  * @param defaultValue      Default value if option is not supplied
-*/
-template<typename T>
+ */
+template <typename T>
 static inline void GetOption(const TracerProviderOptions &options,
-    const char *key,
-    T &value,
-    T defaultValue)
+                             const char *key,
+                             T &value,
+                             T defaultValue)
 {
   auto it = options.find(key);
   if (it != options.end())
@@ -127,9 +128,9 @@ std::string GetName(T &t)
  * @tparam T    ETW::TracerProvider
  * @param t     ETW::TracerProvider ref
  * @return      TracerProviderConfiguration ref
-*/
+ */
 template <class T>
-TracerProviderConfiguration& GetConfiguration(T& t)
+TracerProviderConfiguration &GetConfiguration(T &t)
 {
   return t.config_;
 }
@@ -138,15 +139,15 @@ TracerProviderConfiguration& GetConfiguration(T& t)
  * @brief Utility method to convert SppanContext.span_id() (8 byte) to ActivityId GUID (16 bytes)
  * @param span OpenTelemetry Span pointer
  * @return GUID struct containing 8-bytes of SpanId + 8 NUL bytes.
-*/
-static inline bool CopySpanIdToActivityId(const trace::SpanContext& spanContext, GUID & outGuid )
+ */
+static inline bool CopySpanIdToActivityId(const trace::SpanContext &spanContext, GUID &outGuid)
 {
   memset(&outGuid, 0, sizeof(outGuid));
   if (!spanContext.IsValid())
   {
     return false;
   }
-  auto spanId        = spanContext.span_id().Id().data();
+  auto spanId = spanContext.span_id().Id().data();
   std::copy(spanId, spanId + 8, reinterpret_cast<uint8_t *>(&outGuid));
   return true;
 };
@@ -188,7 +189,7 @@ class Tracer : public trace::Tracer
   /**
    * @brief Provider Handle
    */
-  ETWProvider::Handle& provHandle;
+  ETWProvider::Handle &provHandle;
 
   trace::TraceId traceId_;
 
@@ -239,12 +240,12 @@ class Tracer : public trace::Tracer
    * @param
    */
   virtual void EndSpan(const Span &span,
-                       const trace::Span *parentSpan     = nullptr,
+                       const trace::Span *parentSpan = nullptr,
                        const trace::EndSpanOptions & = {})
   {
-    const auto &cfg = GetConfiguration(tracerProvider_);
+    const auto &cfg             = GetConfiguration(tracerProvider_);
     const trace::Span &spanBase = reinterpret_cast<const trace::Span &>(span);
-    auto spanContext = spanBase.GetContext();
+    auto spanContext            = spanBase.GetContext();
 
     Properties evt;
     evt[ETW_FIELD_NAME] = GetName(span);
@@ -306,8 +307,8 @@ class Tracer : public trace::Tracer
   /**
    * @brief Init a reference to ETW::ProviderHandle
    * @return Provider Handle
-  */
-  ETWProvider::Handle& initProvHandle()
+   */
+  ETWProvider::Handle &initProvHandle()
   {
 #if defined(HAVE_MSGPACK) && !defined(HAVE_TLD)
     /* Fallback to MsgPack encoding if TraceLoggingDynamic feature gate is off */
@@ -317,8 +318,7 @@ class Tracer : public trace::Tracer
     return etwProvider().open(provId, encoding);
   }
 
- public:
-
+public:
   /**
    * @brief Tracer constructor
    * @param parent Parent TraceProvider
@@ -339,7 +339,7 @@ class Tracer : public trace::Tracer
     CoCreateGuid(&trace_id);
     // Populate TraceId of the Tracer with that random GUID
     const auto *traceIdBytes = reinterpret_cast<const uint8_t *>(std::addressof(trace_id));
-    traceId_ = trace::TraceId(traceIdBytes);
+    traceId_                 = trace::TraceId(traceIdBytes);
   };
 
   /**
@@ -356,12 +356,13 @@ class Tracer : public trace::Tracer
       const trace::SpanContextKeyValueIterable &links,
       const trace::StartSpanOptions &options = {}) noexcept override
   {
-    const auto &cfg              = GetConfiguration(tracerProvider_);
+    const auto &cfg = GetConfiguration(tracerProvider_);
 
     // Parent Context:
     // - either use current span
     // - or attach to parent SpanContext specified in options
-    const auto parentContext = (options.parent.IsValid()) ? options.parent : GetCurrentSpan()->GetContext();
+    const auto parentContext =
+        (options.parent.IsValid()) ? options.parent : GetCurrentSpan()->GetContext();
 
     // Copy Span attributes to event Payload
     Properties evt = attributes;
@@ -387,7 +388,7 @@ class Tracer : public trace::Tracer
     std::string eventName = name.data();
 
     // Populate Etw.EventName attribute at envelope level
-    evt[ETW_FIELD_NAME]   = eventName;
+    evt[ETW_FIELD_NAME] = eventName;
 
     // Populate Payload["SpanId"] attribute
     // Populate Payload["ParentSpanId"] attribute if parent Span is valid
@@ -752,20 +753,19 @@ public:
 
 /**
  * @brief ETW TracerProvider
-*/
+ */
 class TracerProvider : public trace::TracerProvider
 {
 public:
-
   /**
    * @brief TracerProvider options supplied during initialization.
-  */
+   */
   TracerProviderConfiguration config_;
 
   /**
    * @brief Construct instance of TracerProvider with given options
    * @param options Configuration options
-  */
+   */
   TracerProvider(TracerProviderOptions options) : trace::TracerProvider()
   {
     // By default we ensure that all events carry their with TraceId and SpanId
@@ -777,8 +777,8 @@ public:
     // https://docs.microsoft.com/en-us/windows/win32/api/evntprov/nf-evntprov-eventwritetransfer
 
     // Map current `SpanId` to ActivityId - GUID that uniquely identifies this activity. If NULL,
-    // ETW gets the identifier from the thread local storage. For details on getting this identifier,
-    // see EventActivityIdControl.
+    // ETW gets the identifier from the thread local storage. For details on getting this
+    // identifier, see EventActivityIdControl.
     GetOption(options, "enableActivityId", config_.enableActivityId, false);
 
     // Map parent `SpanId` to RelatedActivityId -  Activity identifier from the previous component.

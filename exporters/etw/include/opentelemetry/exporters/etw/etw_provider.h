@@ -151,12 +151,12 @@ public:
             tld::RegisterProvider(&hProvider, &data.providerGuid, data.providerMetaVector.data()))
         {
           // There was an error registering the ETW provider
-          data.refCount = 0;
+          data.refCount       = 0;
           data.providerHandle = INVALID_HANDLE;
         }
         else
         {
-          data.refCount = 1;
+          data.refCount       = 1;
           data.providerHandle = hProvider;
         };
       };
@@ -170,12 +170,12 @@ public:
         if (EventRegister(&data.providerGuid, NULL, NULL, &hProvider) != ERROR_SUCCESS)
         {
           // There was an error registering the ETW provider
-          data.refCount = 0;
+          data.refCount       = 0;
           data.providerHandle = INVALID_HANDLE;
         }
         else
         {
-          data.refCount = 1;
+          data.refCount       = 1;
           data.providerHandle = hProvider;
         }
       };
@@ -208,7 +208,7 @@ public:
       if (it->second.providerHandle == handle.providerHandle)
       {
         // reference to item in the map of open provider handles
-        auto &data = it->second;
+        auto &data           = it->second;
         unsigned long result = STATUS_OK;
 
         data.refCount--;
@@ -614,19 +614,18 @@ public:
     EventDataDescCreate(&pDataDescriptors[2], byteDataVector.data(),
                         static_cast<ULONG>(byteDataVector.size()));
 
-
     HRESULT writeResponse = 0;
     if ((ActivityId != nullptr) || (RelatedActivityId != nullptr))
     {
       writeResponse = tld::WriteEvent(providerData.providerHandle, eventDescriptor,
-                      providerData.providerMetaVector.data(), byteVector.data(), 3,
-                      pDataDescriptors, ActivityId, RelatedActivityId);
+                                      providerData.providerMetaVector.data(), byteVector.data(), 3,
+                                      pDataDescriptors, ActivityId, RelatedActivityId);
     }
     else
     {
       writeResponse = tld::WriteEvent(providerData.providerHandle, eventDescriptor,
-                      providerData.providerMetaVector.data(), byteVector.data(), 3,
-                      pDataDescriptors);
+                                      providerData.providerMetaVector.data(), byteVector.data(), 3,
+                                      pDataDescriptors);
     };
 
     // Event is larger than ETW max sized of 64KB
