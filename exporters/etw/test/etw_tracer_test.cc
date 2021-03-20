@@ -120,6 +120,88 @@ TEST(ETWTracer, TracerCheck)
 
   EXPECT_NO_THROW(tracer->CloseWithMicroseconds(0));
 }
+
+// Lowest decoration level -> smaller ETW event size.
+// Expected output in C# listener on the other side:
+// no ActivityID GUID, no SpanId, no TraceId.
+/*
+{
+  "Timestamp": "2021-03-19T21:04:38.411193-07:00",
+  "ProviderName": "OpenTelemetry-ETW-Provider",
+  "Id": 13,
+  "Message": null,
+  "ProcessId": 15120,
+  "Level": "Always",
+  "Keywords": "0x0000000000000000",
+  "EventName": "C.min/Stop",
+  "ActivityID": null,
+  "RelatedActivityID": null,
+  "Payload": {}
+}
+*/
+TEST(ETWTracer, TracerCheckMinDecoration)
+{
+  std::string providerName = "OpenTelemetry-ETW-Provider";
+  exporter::ETW::TracerProvider tp
+  ({
+      {"enableTraceId", false},
+      {"enableSpanId", false},
+      {"enableActivityId", false},
+      {"enableRelatedActivityId", false},
+      {"enableAutoParent", false}
+  });
+  auto tracer = tp.GetTracer(providerName, "TLD");
+  auto aSpan = tracer->StartSpan("A.min");
+  auto bSpan = tracer->StartSpan("B.min");
+  auto cSpan = tracer->StartSpan("C.min");
+  cSpan->End();
+  bSpan->End();
+  aSpan->End();
+  tracer->CloseWithMicroseconds(0);
+}
+
+// Highest decoration level -> larger ETW event size
+// Expected output in C# listener on the other side:
+// ActivityID GUID (==SpanId), SpanId, TraceId.
+/*
+{
+  "Timestamp": "2021-03-19T21:04:38.4120274-07:00",
+  "ProviderName": "OpenTelemetry-ETW-Provider",
+  "Id": 21,
+  "Message": null,
+  "ProcessId": 15120,
+  "Level": "Always",
+  "Keywords": "0x0000000000000000",
+  "EventName": "C.max/Stop",
+  "ActivityID": "d55a2c25-8033-40ab-0000-000000000000",
+  "RelatedActivityID": null,
+  "Payload": {
+    "SpanId": "252c5ad53380ab40",
+    "TraceId": "4dea2a63c188894ea5ab979e5cd7ec36"
+  }
+}
+*/
+TEST(ETWTracer, TracerCheckMaxDecoration)
+{
+  std::string providerName = "OpenTelemetry-ETW-Provider";
+  exporter::ETW::TracerProvider tp
+  ({
+      {"enableTraceId", true},
+      {"enableSpanId", true},
+      {"enableActivityId", true},
+      {"enableRelatedActivityId", true},
+      {"enableAutoParent", true}
+  });
+  auto tracer = tp.GetTracer(providerName, "TLD");
+  auto aSpan = tracer->StartSpan("A.max");
+  auto bSpan = tracer->StartSpan("B.max");
+  auto cSpan = tracer->StartSpan("C.max");
+  cSpan->End();
+  bSpan->End();
+  aSpan->End();
+  tracer->CloseWithMicroseconds(0);
+}
+
 /* clang-format on */
 
 #endif
