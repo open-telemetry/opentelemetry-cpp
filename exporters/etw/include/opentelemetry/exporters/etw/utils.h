@@ -127,18 +127,21 @@ CleanUp:
 /// <summary>
 /// Convert UTF-8 string to UTF-16 wide string.
 ///
-/// FIXME: this conversion is marked deprecated after C++17:
-/// https://en.cppreference.com/w/cpp/locale/codecvt_utf8_utf16
-/// It works well with Visual C++, but may not work with clang.
-/// Best long-term solution is to use Win32 API instead.
-///
 /// </summary>
 /// <param name="in"></param>
 /// <returns></returns>
 static inline std::wstring to_utf16_string(const std::string &in)
 {
+#ifdef _WIN32
+  int in_length = static_cast<int>(in.size());
+  int out_length = MultiByteToWideChar(CP_UTF8, 0, &in[0], in_length, NULL, 0);
+  std::wstring result(out_length, '\0');
+  MultiByteToWideChar(CP_UTF8, 0, &in[0], in_length, &result[0], out_length);
+  return result;
+#else
   std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>, wchar_t> converter;
   return converter.from_bytes(in);
+#endif
 }
 
 /// <summary>
