@@ -32,6 +32,7 @@
 #include "opentelemetry/nostd/shared_ptr.h"
 #include "opentelemetry/nostd/string_view.h"
 #include "opentelemetry/nostd/unique_ptr.h"
+#include "opentelemetry/nostd/variant.h"
 
 #include "opentelemetry/common/key_value_iterable_view.h"
 
@@ -59,15 +60,53 @@ namespace exporter
 namespace ETW
 {
 
-struct ProviderOptions
+/**
+ * @brief TracerProvider Options passed via SDK API.
+ */
+using TracerProviderOptions =
+    std::map<std::string, nostd::variant<std::string, uint64_t, float, bool>>;
+
+/**
+ * @brief TracerProvider runtime configuration class. Internal representation
+ * of TracerProviderOptions used by various components of SDK.
+ */
+typedef struct
 {
-  bool enableTraceId;
-  bool enableActivityId;
-  bool enableRelatedActivityId;
-  bool enableAutoContext;
-};
+  bool enableTraceId;            // Set `TraceId` on ETW events
+  bool enableSpanId;             // Set `SpanId` on ETW events
+  bool enableActivityId;         // Assign `SpanId` to `ActivityId`
+  bool enableRelatedActivityId;  // Assign parent `SpanId` to `RelatedActivityId`
+  bool enableAutoParent;         // Start new spans as children of current active span
+} TracerProviderConfiguration;
+
+/**
+ * @brief Helper template to convert a variant value from TracerProviderOptions to TracerProviderConfiguration
+ * 
+ * @param options           TracerProviderOptions passed on API surface
+ * @param key               Option name
+ * @param value             Reference to destination value
+ * @param defaultValue      Default value if option is not supplied
+*/
+template<typename T>
+static inline void GetOption(const TracerProviderOptions &options,
+    const char *key,
+    T &value,
+    T defaultValue)
+{
+  auto it = options.find(key);
+  if (it != options.end())
+  {
+    auto val = it->second;
+    value    = nostd::get<T>(val);
+  }
+  else
+  {
+    value = defaultValue;
+  }
+}
 
 class Span;
+class TracerProvider;
 
 /**
  * @brief Utility template for Span.GetName()
@@ -82,13 +121,34 @@ std::string GetName(T &t)
   return std::string(sV.data(), sV.length());
 }
 
-static inline GUID ToActivityId(const trace::Span *span)
+/**
+ * @brief Utility template for forward-declaration of ETW::TracerProvider._config
+ *
+ * @tparam T    ETW::TracerProvider
+ * @param t     ETW::TracerProvider ref
+ * @return      TracerProviderConfiguration ref
+*/
+template <class T>
+TracerProviderConfiguration& GetConfiguration(T& t)
 {
-  if (span == nullptr)
+  return t.config_;
+}
+
+/**
+ * @brief Utility method to convert SppanContext.span_id() (8 byte) to ActivityId GUID (16 bytes)
+ * @param span OpenTelemetry Span pointer
+ * @return GUID struct containing 8-bytes of SpanId + 8 NUL bytes.
+*/
+static inline bool CopySpanIdToActivityId(const trace::SpanContext& spanContext, GUID & outGuid )
+{
+  memset(&outGuid, 0, sizeof(outGuid));
+  if (!spanContext.IsValid())
   {
-    return GUID({0, 0, 0, {0, 0, 0, 0, 0, 0, 0, 0}});
+    return false;
   }
-  return utils::UUID(span->GetContext().span_id().Id().data()).to_GUID();
+  auto spanId        = spanContext.span_id().Id().data();
+  std::copy(spanId, spanId + 8, reinterpret_cast<uint8_t *>(&outGuid));
+  return true;
 };
 
 /**
@@ -113,7 +173,7 @@ class Tracer : public trace::Tracer
   /**
    * @brief Parent provider of this Tracer
    */
-  trace::TracerProvider &parent;
+  ETW::TracerProvider &tracerProvider_;
 
   /**
    * @brief ProviderId (Name or GUID)
@@ -121,16 +181,18 @@ class Tracer : public trace::Tracer
   std::string provId;
 
   /**
-   * @brief Provider Handle
-   */
-  ETWProvider::Handle provHandle;
-
-  /**
    * @brief Encoding (Manifest, MessagePack or XML)
    */
   ETWProvider::EventFormat encoding;
 
+  /**
+   * @brief Provider Handle
+   */
+  ETWProvider::Handle& provHandle;
+
   trace::TraceId traceId_;
+
+  std::atomic<bool> isClosed_{true};
 
   /**
    * @brief ETWProvider is a singleton that aggregates all ETW writes.
@@ -144,8 +206,8 @@ class Tracer : public trace::Tracer
 
   /**
    * @brief Internal method that allows to populate Links to other Spans.
-   * This is temporary implementation, that assumes the links are mentioned
-   * comma-separated in their order of appearance.
+   * Span links are in hexadecimal representation, comma-separated in their
+   * order of appearance.
    *
    * @param attributes
    * @param links
@@ -153,19 +215,22 @@ class Tracer : public trace::Tracer
   virtual void DecorateLinks(Properties &attributes,
                              const trace::SpanContextKeyValueIterable &links) const
   {
-    // Links
-    size_t idx = 0;
-    std::string linksValue;
-    links.ForEachKeyValue([&](trace::SpanContext ctx, const common::KeyValueIterable &) {
-      if (!linksValue.empty())
-      {
-        linksValue += ',';
-        linksValue += ToLowerBase16(ctx.span_id());
-      }
-      idx++;
-      return true;
-    });
-    attributes[ETW_FIELD_SPAN_LINKS] = linksValue;
+    // Add `SpanLinks` attribute if the list is not empty
+    if (links.size())
+    {
+      size_t idx = 0;
+      std::string linksValue;
+      links.ForEachKeyValue([&](trace::SpanContext ctx, const common::KeyValueIterable &) {
+        if (!linksValue.empty())
+        {
+          linksValue += ',';
+          linksValue += ToLowerBase16(ctx.span_id());
+        }
+        idx++;
+        return true;
+      });
+      attributes[ETW_FIELD_SPAN_LINKS] = linksValue;
+    }
   };
 
   /**
@@ -174,27 +239,57 @@ class Tracer : public trace::Tracer
    * @param
    */
   virtual void EndSpan(const Span &span,
-                       const trace::Span *parent     = nullptr,
+                       const trace::Span *parentSpan     = nullptr,
                        const trace::EndSpanOptions & = {})
   {
-    Properties evt;
-
+    const auto &cfg = GetConfiguration(tracerProvider_);
     const trace::Span &spanBase = reinterpret_cast<const trace::Span &>(span);
+    auto spanContext = spanBase.GetContext();
 
-    auto ctx            = spanBase.GetContext();
+    Properties evt;
     evt[ETW_FIELD_NAME] = GetName(span);
 
-    // We use ActivityId instead of ETW_FIELD_SPAN_ID below
-    // evt[ETW_FIELD_SPAN_ID] = ToLowerBase16(ctx.span_id());
-    auto ActivityId = ToActivityId(&spanBase);
+    if (cfg.enableSpanId)
+    {
+      evt[ETW_FIELD_SPAN_ID] = ToLowerBase16(spanContext.span_id());
+    }
 
-    // Could be GUID NULL
-    auto RelatedActivityId = ToActivityId(parent);
+    if (cfg.enableTraceId)
+    {
+      evt[ETW_FIELD_TRACE_ID] = ToLowerBase16(spanContext.trace_id());
+    }
 
-    // TODO: check what EndSpanOptions should be supported for this exporter
-    etwProvider().write(provHandle, evt, &ActivityId, &RelatedActivityId, 2, encoding);
+    // Populate ActivityId if enabled
+    GUID ActivityId;
+    LPGUID ActivityIdPtr = nullptr;
+    if (cfg.enableActivityId)
+    {
+      if (CopySpanIdToActivityId(spanBase.GetContext(), ActivityId))
+      {
+        ActivityIdPtr = &ActivityId;
+      }
+    }
+
+    // Populate RelatedActivityId if enabled
+    GUID RelatedActivityId;
+    LPGUID RelatedActivityIdPtr = nullptr;
+    if (cfg.enableRelatedActivityId)
+    {
+      if (parentSpan != nullptr)
+      {
+        if (CopySpanIdToActivityId(parentSpan->GetContext(), RelatedActivityId))
+        {
+          RelatedActivityIdPtr = &RelatedActivityId;
+        }
+      }
+    }
+
+    // TODO: check what EndSpanOptions should be supported for this exporter.
+    // The only option available currently (end_steady_time) does not apply.
+    etwProvider().write(provHandle, evt, ActivityIdPtr, RelatedActivityIdPtr, 2, encoding);
 
     {
+      // Atomically remove the span from list of spans
       const std::lock_guard<std::mutex> lock(scopes_mutex_);
       auto spanId = ToLowerBase16(spanBase.GetContext().span_id());
       scopes_.erase(spanId);
@@ -208,33 +303,43 @@ class Tracer : public trace::Tracer
   std::mutex scopes_mutex_;  // protects scopes_
   std::map<std::string, nostd::unique_ptr<trace::Scope>> scopes_;
 
-public:
+  /**
+   * @brief Init a reference to ETW::ProviderHandle
+   * @return Provider Handle
+  */
+  ETWProvider::Handle& initProvHandle()
+  {
+#if defined(HAVE_MSGPACK) && !defined(HAVE_TLD)
+    /* Fallback to MsgPack encoding if TraceLoggingDynamic feature gate is off */
+    encoding = ETWProvider::EventFormat::ETW_MSGPACK;
+#endif
+    isClosed_ = false;
+    return etwProvider().open(provId, encoding);
+  }
+
+ public:
+
   /**
    * @brief Tracer constructor
    * @param parent Parent TraceProvider
    * @param providerId ProviderId - Name or GUID
    * @param encoding ETW encoding format to use.
    */
-  Tracer(trace::TracerProvider &parent,
+  Tracer(ETW::TracerProvider &parent,
          nostd::string_view providerId     = "",
          ETWProvider::EventFormat encoding = ETWProvider::EventFormat::ETW_MANIFEST)
       : trace::Tracer(),
-        parent(parent),
+        tracerProvider_(parent),
         provId(providerId.data(), providerId.size()),
-        encoding(encoding)
+        encoding(encoding),
+        provHandle(initProvHandle())
   {
-    GUID trace_id;
     // Generate random GUID
+    GUID trace_id;
     CoCreateGuid(&trace_id);
+    // Populate TraceId of the Tracer with that random GUID
     const auto *traceIdBytes = reinterpret_cast<const uint8_t *>(std::addressof(trace_id));
-    // Populate TraceId with that GUID
     traceId_ = trace::TraceId(traceIdBytes);
-
-#if defined(HAVE_MSGPACK) && !defined(HAVE_TLD)
-    /* Fallback to MsgPack encoding if TraceLoggingDynamic feature gate is off */
-    this->encoding = ETWProvider::EventFormat::ETW_MSGPACK;
-#endif
-    provHandle = etwProvider().open(provId, encoding);
   };
 
   /**
@@ -251,40 +356,75 @@ public:
       const trace::SpanContextKeyValueIterable &links,
       const trace::StartSpanOptions &options = {}) noexcept override
   {
-    const auto parent            = GetCurrentSpan();
-    LPCGUID RelatedActivityIdPtr = nullptr;
+    const auto &cfg              = GetConfiguration(tracerProvider_);
+
+    // Parent Context:
+    // - either use current span
+    // - or attach to parent SpanContext specified in options
+    const auto parentContext = (options.parent.IsValid()) ? options.parent : GetCurrentSpan()->GetContext();
+
+    // Copy Span attributes to event Payload
+    Properties evt = attributes;
+
+    // Populate Etw.RelatedActivityId at envelope level if enabled
     GUID RelatedActivityId;
-    // Propagate parent activity only if parent span (current span) is valid
-    if (parent->GetContext().IsValid())
+    LPCGUID RelatedActivityIdPtr = nullptr;
+    if (cfg.enableAutoParent)
     {
-      RelatedActivityId    = ToActivityId(parent.get());
-      RelatedActivityIdPtr = &RelatedActivityId;
-    };
+      if (cfg.enableRelatedActivityId)
+      {
+        if (CopySpanIdToActivityId(parentContext, RelatedActivityId))
+        {
+          RelatedActivityIdPtr = &RelatedActivityId;
+        }
+      }
+    }
 
     nostd::shared_ptr<trace::Span> result = trace::to_span_ptr<Span, Tracer>(this, name, options);
     auto spanContext                      = result->GetContext();
 
-    // Event properties
-    Properties evt = attributes;
-
     // Decorate with additional standard fields
     std::string eventName = name.data();
 
-    evt[ETW_FIELD_NAME]     = eventName.data();
-    evt[ETW_FIELD_TRACE_ID] = ToLowerBase16(spanContext.trace_id());
+    // Populate Etw.EventName attribute at envelope level
+    evt[ETW_FIELD_NAME]   = eventName;
 
-    auto ActivityId = ToActivityId(result.get());
+    // Populate Payload["SpanId"] attribute
+    // Populate Payload["ParentSpanId"] attribute if parent Span is valid
+    if (cfg.enableSpanId)
+    {
+      if (parentContext.IsValid())
+      {
+        evt[ETW_FIELD_SPAN_PARENTID] = ToLowerBase16(parentContext.span_id());
+      }
+      evt[ETW_FIELD_SPAN_ID] = ToLowerBase16(spanContext.span_id());
+    }
+
+    // Populate Etw.Payload["TraceId"] attribute
+    if (cfg.enableTraceId)
+    {
+      evt[ETW_FIELD_TRACE_ID] = ToLowerBase16(spanContext.trace_id());
+    }
+
+    // Populate Etw.ActivityId at envelope level if enabled
+    GUID ActivityId;
+    LPCGUID ActivityIdPtr = nullptr;
+    if (cfg.enableActivityId)
+    {
+      if (CopySpanIdToActivityId(result.get()->GetContext(), ActivityId))
+      {
+        ActivityIdPtr = &ActivityId;
+      }
+    }
 
     // Links
     DecorateLinks(evt, links);
-    // NOTE: we neither allow adding attributes nor links after StartSpan.
 
-    // TODO: add support for options
+    // TODO: add support for options that are presently ignored :
     // - options.kind
-    // - options.parent
     // - options.start_steady_time
     // - options.start_system_time
-    etwProvider().write(provHandle, evt, &ActivityId, RelatedActivityIdPtr, 1, encoding);
+    etwProvider().write(provHandle, evt, ActivityIdPtr, RelatedActivityIdPtr, 1, encoding);
 
     {
       const std::lock_guard<std::mutex> lock(scopes_mutex_);
@@ -306,12 +446,20 @@ public:
 
   /**
    * @brief Close tracer, spending up to given amount of microseconds to flush and close.
-   * NOTE: This method closes the current ETW Provider Handle.
+   * NOTE: This method decrements the reference count on current ETW Provider Handle and
+   * closes it if reference count on that provider handle is zero.
    *
    * @param  timeout Allow Tracer to drop data if timeout is reached.
    * @return
    */
-  void CloseWithMicroseconds(uint64_t) noexcept override { etwProvider().close(provHandle); };
+  void CloseWithMicroseconds(uint64_t) noexcept override
+  {
+    // Close once only
+    if (!isClosed_.exchange(true))
+    {
+      etwProvider().close(provHandle);
+    }
+  };
 
   /**
    * @brief Add event data to span associated with tracer.
@@ -326,28 +474,45 @@ public:
                 core::SystemTimestamp timestamp,
                 const common::KeyValueIterable &attributes) noexcept
   {
-    // TODO: respect originating timestamp
+    // TODO: respect originating timestamp. Do we need to reserve
+    // a special 'Timestamp' field or is it an overkill? The delta
+    // between when `AddEvent` API is called and when ETW layer
+    // timestamp is appended is nanos- to micros-, thus handling
+    // the explicitly provided timestamp is only necessary in case
+    // if a process wants to submit back-dated or future-dated
+    // timestamp. Unless there is a strong ask from any ETW customer
+    // to have it, this feature (custom timestamp) remains unimplemented.
     (void)timestamp;
 
-    // Event properties.
-    // TODO: if we know that the incoming type is already `Properties`,
-    // then we could avoid the memcpy by reusing the incoming attributes.
-    // This would require non-const argument.
+    const auto &cfg = GetConfiguration(tracerProvider_);
+
+    // OPTIMIZATION OPPORTUNITY: Event properties assigned from attributes.
+    // If we know that the parameter is of non-const container type `Properties`,
+    // then we can append more to container and avoid the memcpy entirely.
     Properties evt = attributes;
 
     evt[ETW_FIELD_NAME] = name.data();
 
-    auto spanContext = span.GetContext();
+    const auto &spanContext = span.GetContext();
+    if (cfg.enableSpanId)
+    {
+      evt[ETW_FIELD_SPAN_ID] = ToLowerBase16(spanContext.span_id());
+    }
 
-    // Decorate with additional standard fields. This may get expensive
-    // and should be configurable for traces that deduct their nested
-    // structure based off built-in `ActivityId` and `RelatedActivityId`
-    // evt[ETW_FIELD_TRACE_ID] = ToLowerBase16(spanContext.trace_id());
-    evt[ETW_FIELD_SPAN_ID] = ToLowerBase16(spanContext.span_id());
+    if (cfg.enableTraceId)
+    {
+      evt[ETW_FIELD_TRACE_ID] = ToLowerBase16(spanContext.trace_id());
+    }
 
-    auto RelatedActivityId = ToActivityId(&span);
+    LPGUID ActivityIdPtr = nullptr;
+    GUID ActivityId;
+    if (cfg.enableActivityId)
+    {
+      CopySpanIdToActivityId(spanContext, ActivityId);
+      ActivityIdPtr = &ActivityId;
+    }
 
-    etwProvider().write(provHandle, evt, nullptr, &RelatedActivityId, encoding);
+    etwProvider().write(provHandle, evt, ActivityIdPtr, nullptr, encoding);
   };
 
   /**
@@ -585,19 +750,53 @@ public:
   trace::Tracer &tracer() const noexcept { return this->owner_; };
 };
 
-/// <summary>
-/// stream::TraceProvider
-/// </summary>
+/**
+ * @brief ETW TracerProvider
+*/
 class TracerProvider : public trace::TracerProvider
 {
 public:
-  /// <summary>
-  /// Obtain a Tracer of given type (name) and supply extra argument arg2 to it.
-  /// </summary>
-  /// <param name="name">Tracer Type</param>
-  /// <param name="args">Tracer arguments</param>
-  /// <returns></returns>
-  ///
+
+  /**
+   * @brief TracerProvider options supplied during initialization.
+  */
+  TracerProviderConfiguration config_;
+
+  /**
+   * @brief Construct instance of TracerProvider with given options
+   * @param options Configuration options
+  */
+  TracerProvider(TracerProviderOptions options) : trace::TracerProvider()
+  {
+    // By default we ensure that all events carry their with TraceId and SpanId
+    GetOption(options, "enableTraceId", config_.enableTraceId, true);
+    GetOption(options, "enableSpanId", config_.enableSpanId, true);
+
+    // Backwards-compatibility option that allows to reuse ETW-specific parenting described here:
+    // https://docs.microsoft.com/en-us/uwp/api/windows.foundation.diagnostics.loggingoptions.relatedactivityid
+    // https://docs.microsoft.com/en-us/windows/win32/api/evntprov/nf-evntprov-eventwritetransfer
+
+    // Map current `SpanId` to ActivityId - GUID that uniquely identifies this activity. If NULL,
+    // ETW gets the identifier from the thread local storage. For details on getting this identifier,
+    // see EventActivityIdControl.
+    GetOption(options, "enableActivityId", config_.enableActivityId, false);
+
+    // Map parent `SpanId` to RelatedActivityId -  Activity identifier from the previous component.
+    // Use this parameter to link your component's events to the previous component's events.
+    GetOption(options, "enableRelatedActivityId", config_.enableRelatedActivityId, false);
+
+    // When a new Span is started, the current span automatically becomes its parent.
+    GetOption(options, "enableAutoParent", config_.enableAutoParent, false);
+  }
+
+  TracerProvider() : trace::TracerProvider()
+  {
+    config_.enableTraceId           = true;
+    config_.enableSpanId            = true;
+    config_.enableActivityId        = false;
+    config_.enableRelatedActivityId = false;
+    config_.enableAutoParent        = false;
+  }
 
   /**
    * @brief Obtain ETW Tracer.
