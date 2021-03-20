@@ -74,6 +74,7 @@ public:
   /// </summary>
   struct Handle
   {
+    uint64_t refCount;
     REGHANDLE providerHandle;
     std::vector<BYTE> providerMetaVector;
     GUID providerGuid;
@@ -113,6 +114,7 @@ public:
     {
       if (it->second.providerHandle != INVALID_HANDLE)
       {
+        it->second.refCount++;
         return it->second;
       }
     }
@@ -149,10 +151,12 @@ public:
             tld::RegisterProvider(&hProvider, &data.providerGuid, data.providerMetaVector.data()))
         {
           // There was an error registering the ETW provider
+          data.refCount = 0;
           data.providerHandle = INVALID_HANDLE;
         }
         else
         {
+          data.refCount = 1;
           data.providerHandle = hProvider;
         };
       };
@@ -166,10 +170,12 @@ public:
         if (EventRegister(&data.providerGuid, NULL, NULL, &hProvider) != ERROR_SUCCESS)
         {
           // There was an error registering the ETW provider
+          data.refCount = 0;
           data.providerHandle = INVALID_HANDLE;
         }
         else
         {
+          data.refCount = 1;
           data.providerHandle = hProvider;
         }
       };
@@ -186,12 +192,12 @@ public:
     return data;
   }
 
-  /// <summary>
-  /// Unregister Provider
-  /// </summary>
-  /// <param name="providerId"></param>
-  /// <returns></returns>
-  unsigned long close(Handle data)
+  /**
+   * @brief Unregister provider
+   * @param data Provider Handle
+   * @return status code
+   */
+  unsigned long close(Handle handle)
   {
     std::lock_guard<std::mutex> lock(m_providerMapLock);
 
@@ -199,10 +205,31 @@ public:
     auto it = m.begin();
     while (it != m.end())
     {
-      if (it->second.providerHandle == data.providerHandle)
+      if (it->second.providerHandle == handle.providerHandle)
       {
-        auto result = EventUnregister(data.providerHandle);
-        m.erase(it);
+        // reference to item in the map of open provider handles
+        auto &data = it->second;
+        unsigned long result = STATUS_OK;
+
+        data.refCount--;
+        if (data.refCount == 0)
+        {
+#ifdef HAVE_TLD
+          if (data.providerMetaVector.size())
+          {
+            // ETW/TraceLoggingDynamic provider
+            result = tld::UnregisterProvider(data.providerHandle);
+          }
+          else
+#endif
+          {
+            // Other provider types, e.g. ETW/MsgPack
+            result = EventUnregister(data.providerHandle);
+          }
+
+          it->second.providerHandle = INVALID_HANDLE;
+          m.erase(it);
+        }
         return result;
       }
     };
@@ -583,37 +610,26 @@ public:
     eventDescriptor.Opcode = Opcode;
     eventDescriptor.Level  = 0; /* FIXME: Always on for now */
 
-    // eventDescriptor.Keyword = MICROSOFT_KEYWORD_CRITICAL_DATA;
-    // eventDescriptor.Keyword = MICROSOFT_KEYWORD_TELEMETRY;
-    // eventDescriptor.Keyword = MICROSOFT_KEYWORD_MEASURES;
     EVENT_DATA_DESCRIPTOR pDataDescriptors[3];
-
     EventDataDescCreate(&pDataDescriptors[2], byteDataVector.data(),
                         static_cast<ULONG>(byteDataVector.size()));
 
-    // Event size detection is needed
-    int64_t eventByteSize = byteDataVector.size() + byteVector.size();
-    int64_t eventKBSize   = (eventByteSize + 1024 - 1) / 1024;
-    // bool isLargeEvent     = eventKBSize >= LargeEventSizeKB;
-
-    // TODO: extract
-    // - GUID ActivityId
-    // - GUID RelatedActivityId
 
     HRESULT writeResponse = 0;
     if ((ActivityId != nullptr) || (RelatedActivityId != nullptr))
     {
-      tld::WriteEvent(providerData.providerHandle, eventDescriptor,
+      writeResponse = tld::WriteEvent(providerData.providerHandle, eventDescriptor,
                       providerData.providerMetaVector.data(), byteVector.data(), 3,
                       pDataDescriptors, ActivityId, RelatedActivityId);
     }
     else
     {
-      tld::WriteEvent(providerData.providerHandle, eventDescriptor,
+      writeResponse = tld::WriteEvent(providerData.providerHandle, eventDescriptor,
                       providerData.providerMetaVector.data(), byteVector.data(), 3,
                       pDataDescriptors);
     };
 
+    // Event is larger than ETW max sized of 64KB
     if (writeResponse == HRESULT_FROM_WIN32(ERROR_ARITHMETIC_OVERFLOW))
     {
       return STATUS_EFBIG;
