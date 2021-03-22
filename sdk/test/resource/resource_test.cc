@@ -54,7 +54,6 @@ TEST(ResourceTest, create_without_servicename)
 
 TEST(ResourceTest, create_with_servicename)
 {
-
   opentelemetry::sdk::resource::ResourceAttributes expected_attributes = {
       {"version", (uint32_t)1},
       {"cost", 234.23},
@@ -63,7 +62,6 @@ TEST(ResourceTest, create_with_servicename)
       {"telemetry.sdk.version", OPENTELEMETRY_SDK_VERSION},
       {"service.name", "backend"},
   };
-
   opentelemetry::sdk::resource::ResourceAttributes attributes = {
       {"service.name", "backend"}, {"version", (uint32_t)1}, {"cost", 234.23}};
   auto resource            = opentelemetry::sdk::resource::Resource::Create(attributes);
@@ -85,6 +83,26 @@ TEST(ResourceTest, create_with_servicename)
   EXPECT_EQ(received_attributes.size(), expected_attributes.size());  // for missing service.name
 }
 
+TEST(ResourceTest, create_with_emptyatrributes)
+{
+  opentelemetry::sdk::resource::ResourceAttributes expected_attributes = {
+      {"telemetry.sdk.language", "cpp"},
+      {"telemetry.sdk.name", "opentelemetry"},
+      {"telemetry.sdk.version", OPENTELEMETRY_SDK_VERSION},
+      {"service.name", "unknown_service"},
+  };
+  opentelemetry::sdk::resource::ResourceAttributes attributes = {};
+  auto resource            = opentelemetry::sdk::resource::Resource::Create(attributes);
+  auto received_attributes = resource.GetAttributes();
+  for (auto &e : received_attributes)
+  {
+    EXPECT_TRUE(expected_attributes.find(e.first) != expected_attributes.end());
+    if (expected_attributes.find(e.first) != expected_attributes.end())
+      EXPECT_EQ(opentelemetry::nostd::get<std::string>(expected_attributes.find(e.first)->second),
+                opentelemetry::nostd::get<std::string>(e.second));
+  }
+  EXPECT_EQ(received_attributes.size(), expected_attributes.size());  // for missing service.name
+}
 TEST(ResourceTest, Merge)
 {
   TestResource resource1(
@@ -105,6 +123,7 @@ TEST(ResourceTest, Merge)
   }
   EXPECT_EQ(received_attributes.size(), expected_attributes.size());
 }
+
 TEST(ResourceTest, MergeEmptyString)
 {
   TestResource resource1({{"service", "backend"}, {"host", "service-host"}});
