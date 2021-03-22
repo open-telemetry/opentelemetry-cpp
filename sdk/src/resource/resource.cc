@@ -9,9 +9,11 @@ namespace sdk
 namespace resource
 {
 
-const std::string kTelemetrySdkLanguage = "telemetry.sdk.language";
-const std::string kTelemetrySdkName     = "telemetry.sdk.name";
-const std::string kTelemetrySdkVersion  = "telemetry.sdk.version";
+const std::string kTelemetrySdkLanguage  = "telemetry.sdk.language";
+const std::string kTelemetrySdkName      = "telemetry.sdk.name";
+const std::string kTelemetrySdkVersion   = "telemetry.sdk.version";
+const std::string kServiceName           = "service.name";
+const std::string kProcessExecutableName = "process.executable.name";
 
 Resource::Resource(const ResourceAttributes &attributes) noexcept : attributes_(attributes) {}
 
@@ -25,15 +27,19 @@ Resource Resource::Merge(const Resource &other) noexcept
 Resource Resource::Create(const ResourceAttributes &attributes)
 {
   static auto otel_resource = OTELResourceDetector().Detect();
-  auto default_resource     = Resource::GetDefault();
+  auto resource = Resource::GetDefault().Merge(otel_resource).Merge(Resource(attributes));
 
-  if (attributes.size() > 0)
+  if (resource.attributes_.find(kServiceName) == resource.attributes_.end())
   {
-    Resource tmp_resource(attributes);
-    auto merged_resource = tmp_resource.Merge(default_resource);
-    return merged_resource.Merge(otel_resource);
+    std::string default_service_name = "unknown_service";
+    auto it_process_executable_name  = resource.attributes_.find(kProcessExecutableName);
+    if (it_process_executable_name != resource.attributes_.end())
+    {
+      default_service_name += ":" + nostd::get<std::string>(it_process_executable_name->second);
+    }
+    resource.attributes_[kServiceName] = default_service_name;
   }
-  return default_resource.Merge(otel_resource);
+  return resource;
 }
 
 Resource &Resource::GetEmpty()
