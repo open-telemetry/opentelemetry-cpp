@@ -210,6 +210,39 @@ static inline GUID GetProviderGuid(const char *providerName)
 }
 #endif
 
+int64_t getUtcSystemTimeMs()
+{
+#ifdef _WIN32
+  ULARGE_INTEGER now;
+  ::GetSystemTimeAsFileTime(reinterpret_cast<FILETIME *>(&now));
+  return (now.QuadPart - 116444736000000000ull) / 10000;
+#else
+  return std::chrono::system_clock::now().time_since_epoch() / std::chrono::milliseconds(1);
+#endif
+}
+
+int64_t getUtcSystemTimeinTicks()
+{
+#ifdef _WIN32
+  FILETIME tocks;
+  ::GetSystemTimeAsFileTime(&tocks);
+  ULONGLONG ticks = (ULONGLONG(tocks.dwHighDateTime) << 32) | tocks.dwLowDateTime;
+  // number of days from beginning to 1601 multiplied by ticks per day
+  return ticks + 0x701ce1722770000ULL;
+#else
+  // On Un*x systems system_clock de-facto contains UTC time. Ref:
+  // https://en.cppreference.com/w/cpp/chrono/system_clock
+  // This UTC epoch contract has been signed in blood since C++20
+  std::chrono::time_point<std::chrono::system_clock> now = std::chrono::system_clock::now();
+  auto duration                                          = now.time_since_epoch();
+  auto millis    = std::chrono::duration_cast<std::chrono::milliseconds>(duration).count();
+  uint64_t ticks = millis;
+  ticks *= 10000;                 // convert millis to ticks (1 tick = 100ns)
+  ticks += 0x89F7FF5F7B58000ULL;  // UTC time 0 in .NET ticks
+  return ticks;
+#endif
+}
+
 };  // namespace utils
 
 OPENTELEMETRY_END_NAMESPACE
