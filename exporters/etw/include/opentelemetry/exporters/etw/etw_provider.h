@@ -241,10 +241,10 @@ public:
                              T eventData,
                              LPCGUID ActivityId        = nullptr,
                              LPCGUID RelatedActivityId = nullptr,
-                             uint8_t Opcode            = 0 /* Information */)
+                             uint8_t Opcode            = 0)
   {
 #ifdef HAVE_MSGPACK
-    // Make sure you stop sending event before register unregistering providerData
+    // Events can only be sent if provider is registered
     if (providerData.providerHandle == INVALID_HANDLE)
     {
       // Provider not registered!
@@ -253,6 +253,19 @@ public:
 
     std::string eventName = "NoName";
     auto nameField        = eventData[ETW_FIELD_NAME];
+
+#  ifdef HAVE_FIELD_TIME
+    // Event time is appended by ETW layer itself by default. This code allows
+    // to override the timestamp by millisecond timestamp, in case if it has
+    // not been already provided by the upper layer.
+    if (!eventData.count(ETW_FIELD_TIME))
+    {
+      // TODO: if nanoseconds resolution is required, then we can populate it in 96-bit MsgPack
+      // spec. auto nanos =
+      // std::chrono::duration_cast<std::chrono::nanoseconds>(now.time_since_epoch()).count();
+      eventData[ETW_FIELD_TIME] = opentelemetry::utils::getUtcSystemTimeMs();
+    }
+#  endif
 
     switch (nameField.index())
     {
@@ -265,8 +278,7 @@ public:
         break;
 #  endif
       default:
-        // This is user error. Invalid event name!
-        // We supply default 'NoName' event name in this case.
+        // If invalid event name is supplied, then we replace it with 'NoName'
         break;
     }
 
@@ -274,31 +286,7 @@ public:
     nlohmann::json jObj =
     {
       { ETW_FIELD_NAME, eventName },
-      { ETW_FIELD_VERSION, "4.0" },
-      //
-      // TODO: compute time in MessagePack-friendly format
-      // TODO: should we consider uint64_t format with Unix timestamps for ELK stack?
-      { ETW_FIELD_TIME,
-        {
-          // TODO: timestamp
-          { "TypeCode", 255 },
-          { "Body","0xFFFFFC60000000005F752C2C" }
-        }
-      },
-#if 0
-      // TODO: follow JSON implementation of OTLP
-      { "env_dt_traceId", "6dcdae7b9b0c7643967d74ee54056178" },
-      { "env_dt_spanId", "5866c4322919e641" },
-#endif
-      //
-      { ETW_FIELD_KIND, 0 },
-      { ETW_FIELD_STARTTIME,
-        {
-          // TODO: timestamp
-          { "TypeCode", 255 },
-          { "Body", "0xFFFF87CC000000005F752C2C" }
-        }
-      }
+      { ETW_FIELD_KIND, Opcode }
     };
     /* clang-format on */
 
@@ -382,40 +370,7 @@ public:
       }
     };
 
-    // Layer 1
-    nlohmann::json l1 = nlohmann::json::array();
-    // Layer 2
-    nlohmann::json l2 = nlohmann::json::array();
-    // Layer 3
-    nlohmann::json l3 = nlohmann::json::array();
-
-    l1.push_back("Span");
-
-    {
-      // TODO: clarify why this is needed
-      // TODO: fix time here
-      nlohmann::json j;
-      j["TypeCode"] = 255;
-      j["Body"]     = "0xFFFFFC60000000005F752C2C";
-      l3.push_back(j);
-    };
-
-    // Actual value object goes here
-    l3.push_back(jObj);
-
-    l2.push_back(l3);
-    l1.push_back(l2);
-
-    {
-      // Another time field again, but at the top
-      // TODO: fix time here
-      nlohmann::json j;
-      j["TypeCode"] = 255;
-      j["Body"]     = "0xFFFFFC60000000005F752C2C";
-      l1.push_back(j);
-    };
-
-    std::vector<uint8_t> v = nlohmann::json::to_msgpack(l1);
+    std::vector<uint8_t> v = nlohmann::json::to_msgpack(jObj);
 
     EVENT_DESCRIPTOR evtDescriptor;
     // TODO: event descriptor may be populated with additional values as follows:
@@ -428,17 +383,15 @@ public:
     EventDescCreate(&evtDescriptor, 0, 0x1, 0, 0, 0, Opcode, 0);
     EVENT_DATA_DESCRIPTOR evtData[1];
     EventDataDescCreate(&evtData[0], v.data(), static_cast<ULONG>(v.size()));
-
     ULONG writeResponse = 0;
-
     if ((ActivityId != nullptr) || (RelatedActivityId != nullptr))
     {
-      EventWriteTransfer(providerData.providerHandle, &evtDescriptor, ActivityId, RelatedActivityId,
-                         1, evtData);
+      writeResponse = EventWriteTransfer(providerData.providerHandle, &evtDescriptor, ActivityId,
+                                         RelatedActivityId, 1, evtData);
     }
     else
     {
-      EventWrite(providerData.providerHandle, &evtDescriptor, 1, evtData);
+      writeResponse = EventWrite(providerData.providerHandle, &evtDescriptor, 1, evtData);
     };
 
     switch (writeResponse)
@@ -495,7 +448,7 @@ public:
     tld::EventMetadataBuilder<std::vector<BYTE>> builder(byteVector);
     tld::EventDataBuilder<std::vector<BYTE>> dbuilder(byteDataVector);
 
-    const std::string EVENT_NAME = "name";
+    const std::string EVENT_NAME = ETW_FIELD_NAME;
     std::string eventName        = "NoName";
     auto nameField               = eventData[EVENT_NAME];
     switch (nameField.index())
@@ -643,10 +596,10 @@ public:
   template <class T>
   unsigned long write(Handle &providerData,
                       T eventData,
-                      LPCGUID ActivityId              = nullptr,
-                      LPCGUID RelatedActivityId       = nullptr,
-                      uint8_t Opcode                  = 0, /* Information */
-                      ETWProvider::EventFormat format = ETWProvider::EventFormat::ETW_MANIFEST)
+                      LPCGUID ActivityId,
+                      LPCGUID RelatedActivityId,
+                      uint8_t Opcode,
+                      ETWProvider::EventFormat format)
   {
     if (format == ETWProvider::EventFormat::ETW_MANIFEST)
     {
