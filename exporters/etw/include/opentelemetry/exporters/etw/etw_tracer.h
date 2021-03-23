@@ -513,7 +513,7 @@ public:
       ActivityIdPtr = &ActivityId;
     }
 
-    etwProvider().write(provHandle, evt, ActivityIdPtr, nullptr, encoding);
+    etwProvider().write(provHandle, evt, ActivityIdPtr, nullptr, 0, encoding);
   };
 
   /**
