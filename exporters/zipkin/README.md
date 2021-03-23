@@ -12,7 +12,7 @@ Refer to install instructions [INSTALL.md](../../INSTALL.md#building-as-standalo
 Modify step 2 to create `cmake` build configuration for compiling Zipkin as below:
 
 ```console
-   $ cmake -DWITH_OTLP=ON ..
+   $ cmake -DWITH_ZIPKIN=ON ..
    -- The C compiler identification is GNU 9.3.0
    -- The CXX compiler identification is GNU 9.3.0
    ...
@@ -35,9 +35,9 @@ Resource, a fallback name of "unknown_service" will be used.
 
 ```cpp
 
- opentelemetry::exporter::zipkin::ZipkinExporterOptions options;
- options.endpoint = "http://localhost:9411/api/v2/spans";
- options.service_name = "my_service";
+opentelemetry::exporter::zipkin::ZipkinExporterOptions options;
+options.endpoint = "http://localhost:9411/api/v2/spans";
+options.service_name = "my_service";
 
 auto exporter = std::unique_ptr<opentelemetry::sdk::trace::SpanExporter>(
     new opentelemetry::exporter::zipkin::ZipkinExporter(options));
