@@ -30,6 +30,8 @@ if [[ "$1" == "cmake.test" ]]; then
   rm -rf *
   cmake -DCMAKE_BUILD_TYPE=Debug  \
         -DWITH_PROMETHEUS=ON \
+        -DWITH_ZIPKIN=ON \
+        -DWITH_ELASTICSEARCH=ON \
         -DCMAKE_CXX_FLAGS="-Werror" \
         "${SRC_DIR}"
   make
