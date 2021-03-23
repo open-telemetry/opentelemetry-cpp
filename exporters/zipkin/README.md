@@ -8,7 +8,7 @@
 
 ### CMake Install Instructions
 
-Refer to install instructions [INSTALL.md](INSTALL.md#building-as-standalone-cmake-project).
+Refer to install instructions [../../INSTALL.md](INSTALL.md#building-as-standalone-cmake-project).
 Modify step 2 to create `cmake` build configuration for compiling Zipkin as below:
 
 ```console
