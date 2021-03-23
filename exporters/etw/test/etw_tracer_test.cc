@@ -56,7 +56,7 @@ TEST(ETWTracer, TracerCheck)
   // Windows Defender Firewall API - GP       {0EFF663F-8B6E-4E6D-8182-087A8EAA29CB}
   // Windows Defender Firewall Driver         {D5E09122-D0B2-4235-ADC1-C89FAAAF1069}
 
-  std::string providerName = "OpenTelemetry-ETW-Provider"; // supply unique instrumentation name here
+  std::string providerName = "OpenTelemetry-ETW-TLD"; // supply unique instrumentation name here
   exporter::ETW::TracerProvider tp;
 
   // TODO: this code should fallback to MsgPack if TLD is not available
@@ -141,7 +141,7 @@ TEST(ETWTracer, TracerCheck)
 */
 TEST(ETWTracer, TracerCheckMinDecoration)
 {
-  std::string providerName = "OpenTelemetry-ETW-Provider";
+  std::string providerName = "OpenTelemetry-ETW-TLD";
   exporter::ETW::TracerProvider tp
   ({
       {"enableTraceId", false},
@@ -183,7 +183,7 @@ TEST(ETWTracer, TracerCheckMinDecoration)
 */
 TEST(ETWTracer, TracerCheckMaxDecoration)
 {
-  std::string providerName = "OpenTelemetry-ETW-Provider";
+  std::string providerName = "OpenTelemetry-ETW-TLD";
   exporter::ETW::TracerProvider tp
   ({
       {"enableTraceId", true},
@@ -192,13 +192,48 @@ TEST(ETWTracer, TracerCheckMaxDecoration)
       {"enableRelatedActivityId", true},
       {"enableAutoParent", true}
   });
-  auto tracer = tp.GetTracer(providerName, "TLD");
+  auto tracer = tp.GetTracer(providerName, "TLD" );
   auto aSpan = tracer->StartSpan("A.max");
   auto bSpan = tracer->StartSpan("B.max");
   auto cSpan = tracer->StartSpan("C.max");
   cSpan->End();
   bSpan->End();
   aSpan->End();
+  tracer->CloseWithMicroseconds(0);
+}
+
+TEST(ETWTracer, TracerCheckMsgPack)
+{
+  std::string providerName = "OpenTelemetry-ETW-MsgPack";
+  exporter::ETW::TracerProvider tp
+  ({
+      {"enableTraceId", true},
+      {"enableSpanId", true},
+      {"enableActivityId", true},
+      {"enableRelatedActivityId", true},
+      {"enableAutoParent", true}
+  });
+  auto tracer = tp.GetTracer(providerName, "MsgPack" );
+  {
+      auto aSpan = tracer->StartSpan("A.max");
+      {
+          auto bSpan = tracer->StartSpan("B.max");
+          {
+              auto cSpan = tracer->StartSpan("C.max");
+              std::string eventName = "MyMsgPackEvent";
+              Properties event =
+              {
+                  {"uint32Key", (uint32_t)1234},
+                  {"uint64Key", (uint64_t)1234567890},
+                  {"strKey", "someValue"}
+              };
+              cSpan->AddEvent(eventName, event);
+              cSpan->End();
+          }
+          bSpan->End();
+      }
+      aSpan->End();
+  }
   tracer->CloseWithMicroseconds(0);
 }
 
