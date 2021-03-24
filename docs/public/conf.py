@@ -36,22 +36,22 @@ subprocess.call(['make', 'html'], cwd=apidir)
 targetdir = os.path.join(os.getcwd(), 'otel_api')
 sourcedir = os.path.join(apidir, 'otel_api')
 if os.path.exists(targetdir):
-    shutil.rmtree(targetdir)
+  shutil.rmtree(targetdir)
 os.makedirs(targetdir)
 
 # Now copying the previously created APi documentation. Table of contents
 # are filtered out, because those don't go well together with the furo theme.
 for fname in os.listdir(sourcedir):
   with open(os.path.join(sourcedir, fname), 'r') as fin:
-      with open(os.path.join(targetdir, fname), 'w') as fout:
+    with open(os.path.join(targetdir, fname), 'w') as fout:
+      skip = False
+      for line in fin:
+        if line.startswith('.. contents'):
+          skip = True
+        elif not line.startswith(' '):
           skip = False
-          for line in fin:
-            if line.startswith('.. contents'):
-               skip = True
-            elif not line.startswith(' '):
-               skip = False
-            if not skip:
-               fout.write(line)
+        if not skip:
+          fout.write(line)
 
 # -- General configuration ---------------------------------------------------
 
