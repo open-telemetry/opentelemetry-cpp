@@ -57,7 +57,7 @@ public:
   void CloseWithMicroseconds(uint64_t timeout) noexcept override;
 
 private:
-  opentelemetry::sdk::AtomicSharedPtr<SpanProcessor> processor_;
+  opentelemetry::sdk::common::AtomicSharedPtr<SpanProcessor> processor_;
   const std::shared_ptr<Sampler> sampler_;
   const opentelemetry::sdk::resource::Resource &resource_;
 };
