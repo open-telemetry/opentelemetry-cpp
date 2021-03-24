@@ -15,6 +15,8 @@ Increment the:
 
 ## [Unreleased]
 
+* [SDK] Read Zipkin endpoint from environment variable. ([#24](https://github.com/open-telemetry/opentelemetry-cpp/pull/624))
+
 ## [0.3.0] 2021-03-19
 
 * [EXPORTER] Added Zipkin Exporter. ([#471](https://github.com/open-telemetry/opentelemetry-cpp/pull/471))
