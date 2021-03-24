@@ -274,7 +274,6 @@ TEST(OStreamLogExporter, IntegrationTest)
       "  span_id       : 0000000000000000\n"
       "  trace_flags   : 00\n"
       "}\n";
-  "}\n";
 
   ASSERT_EQ(stdcoutOutput.str(), expectedOutput);
 }
