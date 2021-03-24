@@ -39,6 +39,8 @@ public:
    * Releases ownership of the originally registered recordable.
    */
   std::unique_ptr<Recordable> ReleaseRecordableFor(const SpanProcessor& processor) noexcept;
+  /** Access the recordable attached by a given processor. */
+  const std::unique_ptr<Recordable>& GetRecordableFor(const SpanProcessor& processor) const noexcept;
 
 
   Tracer &GetTracer() { return *tracer_; }

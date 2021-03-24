@@ -9,6 +9,7 @@
 
 #include "opentelemetry/ext/zpages/threadsafe_span_data.h"
 #include "opentelemetry/ext/zpages/tracez_shared_data.h"
+#include "opentelemetry/sdk/trace/exportable_span.h"
 #include "opentelemetry/sdk/trace/processor.h"
 #include "opentelemetry/sdk/trace/recordable.h"
 
@@ -35,9 +36,9 @@ public:
    * Create a span recordable, which is span_data
    * @return a newly initialized recordable
    */
-  std::unique_ptr<opentelemetry::sdk::trace::Recordable> MakeRecordable() noexcept override
+  void RegisterRecordable(opentelemetry::sdk::trace::ExportableSpan& span) noexcept override 
   {
-    return std::unique_ptr<opentelemetry::sdk::trace::Recordable>(new ThreadsafeSpanData);
+    span.RegisterRecordableFor(*this, std::unique_ptr<opentelemetry::sdk::trace::Recordable>(new ThreadsafeSpanData));
   }
 
   /*
@@ -45,7 +46,7 @@ public:
    * running_spans.
    * @param span a recordable for a span that was just started
    */
-  void OnStart(opentelemetry::sdk::trace::Span &span,
+  void OnStart(opentelemetry::sdk::trace::ExportableSpan &span,
                const opentelemetry::trace::SpanContext &parent_context) noexcept override;
 
   /*
@@ -53,7 +54,7 @@ public:
    * completed_spans
    * @param span a recordable for a span that was ended
    */
-  void OnEnd(opentelemetry::sdk::trace::Span &span) noexcept override;
+  void OnEnd(std::unique_ptr<opentelemetry::sdk::trace::ExportableSpan> &&span) noexcept override;
 
   /*
    * For now, does nothing. In the future, it

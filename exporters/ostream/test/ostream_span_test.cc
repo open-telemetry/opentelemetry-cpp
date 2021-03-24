@@ -5,6 +5,7 @@
 #include "opentelemetry/trace/provider.h"
 
 #include "opentelemetry/sdk/trace/exporter.h"
+#include "opentelemetry/sdk/trace/span.h"
 
 #include "opentelemetry/exporters/ostream/span_exporter.h"
 
@@ -72,7 +73,7 @@ TEST(OStreamSpanExporter, PrintDefaultSpan)
   opentelemetry::trace::SpanId s_id(span_id_buf);
 
   // A hacky solution to reset the IDs for perfect println.
-  auto& recordable = dynamic_cast<opentelemetry::sdk::trace::Span*>(span.get())->GetRecordablePtr();
+  auto& recordable = dynamic_cast<opentelemetry::sdk::trace::Span*>(span.get())->GetExportable();
   recordable->SetIds(t_id, s_id, s_id);
 
   // Create stringstream to redirect to
@@ -138,7 +139,7 @@ TEST(OStreamSpanExporter, PrintChangedSpanCout)
 
   // A hacky solution to reset the IDs for perfect println.
   // All other settings should be against the API.
-  auto* recordable = dynamic_cast<opentelemetry::sdk::trace::Span*>(span.get())->GetRecordablePtr().get();
+  auto* recordable = dynamic_cast<opentelemetry::sdk::trace::Span*>(span.get())->GetExportable().get();
   recordable->SetIds(t_id, s_id, s_id);
   recordable->SetSpanKind(opentelemetry::trace::SpanKind::kClient);
 
@@ -205,7 +206,7 @@ TEST(OStreamSpanExporter, PrintChangedSpanCerr)
 
   // A hacky solution to reset the IDs for perfect println.
   // Ideally everything should be set through API.
-  auto* recordable = dynamic_cast<opentelemetry::sdk::trace::Span*>(span.get())->GetRecordablePtr().get();
+  auto* recordable = dynamic_cast<opentelemetry::sdk::trace::Span*>(span.get())->GetExportable().get();
   recordable->SetIds(t_id, s_id, s_id);
   recordable->SetSpanKind(opentelemetry::trace::SpanKind::kConsumer);
 
@@ -277,7 +278,7 @@ TEST(OStreamSpanExporter, PrintChangedSpanClog)
 
 
   // A hacky solution to reset the IDs for perfect println.
-  auto* recordable = dynamic_cast<opentelemetry::sdk::trace::Span*>(span.get())->GetRecordablePtr().get();
+  auto* recordable = dynamic_cast<opentelemetry::sdk::trace::Span*>(span.get())->GetExportable().get();
   recordable->SetIds(t_id, s_id, s_id);
   recordable->SetSpanKind(opentelemetry::trace::SpanKind::kInternal);
 

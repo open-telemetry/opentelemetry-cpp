@@ -45,6 +45,18 @@ std::unique_ptr<Recordable> ExportableSpan::ReleaseRecordableFor(const SpanProce
     return std::unique_ptr<Recordable>(nullptr);
 }
 
+const std::unique_ptr<Recordable>& ExportableSpan::GetRecordableFor(const SpanProcessor& processor) const noexcept
+{
+    // TODO - return nullptr ref on failed lookup?
+    static std::unique_ptr<Recordable> empty(nullptr);
+    auto i = recordables_.find(MakeKey(processor));
+    if (i != recordables_.end())
+    {
+        return i->second;
+    }
+    return empty;
+}
+
 void ExportableSpan::RegisterRecordableFor(const SpanProcessor& processor, std::unique_ptr<Recordable> recordable) noexcept 
 {
     // TODO

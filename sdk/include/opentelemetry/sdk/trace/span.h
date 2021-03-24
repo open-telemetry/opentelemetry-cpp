@@ -49,6 +49,8 @@ public:
 
   trace_api::SpanContext GetContext() const noexcept override { return *span_context_.get(); }
 
+  // For Testing only
+  std::unique_ptr<ExportableSpan> &GetExportable() noexcept { return exportable_; }
 private:
   // Returns the recordable, or nullptr if not available.
   Recordable* GetRecordable() const {

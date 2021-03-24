@@ -210,8 +210,6 @@ protected:
  */
 TEST_F(TracezProcessor, NoSpans)
 {
-  auto recordable = processor->MakeRecordable();
-
   EXPECT_EQ(running.size(), 0);
   EXPECT_EQ(completed.size(), 0);
 }
