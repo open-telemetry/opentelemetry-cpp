@@ -8,6 +8,8 @@
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace sdk
 {
+namespace common
+{
 /**
  * A wrapper to provide atomic shared pointers.
  *
@@ -52,5 +54,6 @@ private:
   std::shared_ptr<T> ptr_;
 };
 #endif
+}  // namespace common
 }  // namespace sdk
 OPENTELEMETRY_END_NAMESPACE
