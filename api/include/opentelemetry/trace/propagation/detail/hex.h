@@ -43,12 +43,12 @@ bool IsValidHex(nostd::string_view s)
  */
 bool HexToBinary(nostd::string_view hex, uint8_t *buffer, size_t buffer_size)
 {
+  std::memset(buffer, 0, buffer_size);
+
   if (hex.size() > buffer_size * 2)
   {
     return false;
   }
-
-  std::memset(buffer, 0, buffer_size);
 
   int64_t hex_size     = int64_t(hex.size());
   int64_t buffer_pos   = int64_t(buffer_size) - (hex_size + 1) / 2;
