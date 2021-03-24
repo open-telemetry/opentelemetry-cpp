@@ -7,6 +7,7 @@
 #include <chrono>
 #include <thread>
 
+
 OPENTELEMETRY_BEGIN_NAMESPACE
 
 /**
@@ -165,7 +166,6 @@ TEST_F(BatchSpanProcessorTestPeer, TestForceFlush)
 
   // Give some time to export the spans
   std::this_thread::sleep_for(std::chrono::milliseconds(50));
-
   EXPECT_TRUE(tracer_provider.ForceFlush());
 
   EXPECT_EQ(num_spans * 2, spans_received->size());

@@ -3,6 +3,7 @@
 #include <mutex>
 
 #include "opentelemetry/trace/tracer.h"
+#include "opentelemetry/sdk/trace/exportable_span.h"
 #include "opentelemetry/sdk/trace/recordable.h"
 #include "opentelemetry/sdk/trace/tracer.h"
 #include "opentelemetry/sdk/trace/tracer_context.h"
@@ -14,7 +15,7 @@ namespace sdk
 namespace trace
 {
 
-class Span final : public opentelemetry::trace::Span
+class Span final : public opentelemetry::trace::Span, public std::enable_shared_from_this<Span>
 {
 public:
   explicit Span(std::shared_ptr<Tracer> &&tracer,
@@ -48,32 +49,16 @@ public:
 
   trace_api::SpanContext GetContext() const noexcept override { return *span_context_.get(); }
 
-  /** 
-   * Gives ownership of the recordable.
-   * 
-   * Must only be called after `End()`.
-   *
-   * TODO(jsuereth): This method will be reworked once multi-processor span support is added.
-   */
-  std::unique_ptr<Recordable> ConsumeRecordable() {
-    return std::unique_ptr<Recordable>(recordable_.release());
-  }
-
-  /** 
-   * A pointer to the current recordable.  Could be nullptr.
-   * 
-   * Note: this does not give over control, and is currently only used for z-pages.
-   * 
-   * TODO(jsuereth): This method will be reworked once multi-processor span support is added.
-   */
-  std::unique_ptr<Recordable>& GetRecordablePtr() {
-    return recordable_;
-  }
-
 private:
-  std::shared_ptr<Tracer> tracer_;
+  // Returns the recordable, or nullptr if not available.
+  Recordable* GetRecordable() const {
+    if (exportable_ != nullptr) {
+      return exportable_.get();
+    }
+    return nullptr;
+  }
   mutable std::mutex mu_;
-  std::unique_ptr<Recordable> recordable_;
+  std::unique_ptr<ExportableSpan> exportable_;
   opentelemetry::core::SteadyTimestamp start_steady_time;
   std::unique_ptr<opentelemetry::trace::SpanContext> span_context_;
   bool has_ended_;

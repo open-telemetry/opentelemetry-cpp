@@ -127,6 +127,7 @@ public:
    */
   virtual void SetDuration(std::chrono::nanoseconds duration) noexcept = 0;
 };
+
 }  // namespace trace
 }  // namespace sdk
 OPENTELEMETRY_END_NAMESPACE

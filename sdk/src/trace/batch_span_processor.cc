@@ -23,24 +23,23 @@ BatchSpanProcessor::BatchSpanProcessor(std::unique_ptr<SpanExporter> &&exporter,
       worker_thread_(&BatchSpanProcessor::DoBackgroundWork, this)
 {}
 
-std::unique_ptr<Recordable> BatchSpanProcessor::MakeRecordable() noexcept
+void BatchSpanProcessor::RegisterRecordable(ExportableSpan& span) noexcept
 {
-  return exporter_->MakeRecordable();
+  span.RegisterRecordableFor(*this, exporter_->MakeRecordable());
 }
 
-void BatchSpanProcessor::OnStart(Span &, const SpanContext &) noexcept
+void BatchSpanProcessor::OnStart(ExportableSpan &, const SpanContext &) noexcept
 {
   // no-op
 }
 
-void BatchSpanProcessor::OnEnd(Span &span) noexcept
+void BatchSpanProcessor::OnEnd(std::unique_ptr<ExportableSpan> &&span) noexcept
 {
   if (is_shutdown_.load() == true)
   {
     return;
   }
-  auto data = span.ConsumeRecordable();
-  if (buffer_.Add(data) == false)
+  if (buffer_.Add(span) == false)
   {
     return;
   }
@@ -146,11 +145,11 @@ void BatchSpanProcessor::Export(const bool was_force_flush_called)
   }
 
   buffer_.Consume(num_spans_to_export,
-                  [&](CircularBufferRange<AtomicUniquePtr<Recordable>> range) noexcept {
-                    range.ForEach([&](AtomicUniquePtr<Recordable> &ptr) {
-                      std::unique_ptr<Recordable> swap_ptr = std::unique_ptr<Recordable>(nullptr);
+                  [&](CircularBufferRange<AtomicUniquePtr<ExportableSpan>> range) noexcept {
+                    range.ForEach([&](AtomicUniquePtr<ExportableSpan> &ptr) {
+                      std::unique_ptr<ExportableSpan> swap_ptr = std::unique_ptr<ExportableSpan>(nullptr);
                       ptr.Swap(swap_ptr);
-                      spans_arr.push_back(std::unique_ptr<Recordable>(swap_ptr.release()));
+                      spans_arr.push_back(swap_ptr->ReleaseRecordableFor(*this));
                       return true;
                     });
                   });

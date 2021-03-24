@@ -2,7 +2,8 @@
 
 #include <chrono>
 #include <memory>
-#include "opentelemetry/sdk/trace/recordable.h"
+
+#include "opentelemetry/trace/span_context.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace sdk
@@ -11,7 +12,7 @@ namespace trace
 {
 
 // Forward declaration to break circular dependency.
-class Span;
+class ExportableSpan;
 
 /**
  * Span processor allow hooks for span start and end method invocations.
@@ -25,27 +26,23 @@ public:
   virtual ~SpanProcessor() = default;
 
   /**
-   * Create a span recordable. This requests a new span recordable from the
-   * associated exporter.
-   * @return a newly initialized recordable
-   *
-   * Note: This method must be callable from multiple threads.
+   * Registers any `Recordable` this span processor will use.
    */
-  virtual std::unique_ptr<Recordable> MakeRecordable() noexcept = 0;
+  virtual void RegisterRecordable(ExportableSpan& span) noexcept = 0;
 
   /**
    * OnStart is called when a span is started.
    * @param span a recordable for a span that was just started
    * @param parent_context The parent context of the span that just started
    */
-  virtual void OnStart(Span &span,
+  virtual void OnStart(ExportableSpan &span,
                        const opentelemetry::trace::SpanContext &parent_context) noexcept = 0;
 
   /**
    * OnEnd is called when a span is ended.
    * @param span the span that ended.  Note: We need to pull our recordables off of this.
    */
-  virtual void OnEnd(Span &span) noexcept = 0;
+  virtual void OnEnd(std::unique_ptr<ExportableSpan> &&span) noexcept = 0;
 
   /**
    * Export all ended spans that have not yet been exported.

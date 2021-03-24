@@ -6,7 +6,7 @@
 #include "opentelemetry/common/spin_lock_mutex.h"
 #include "opentelemetry/sdk/trace/exporter.h"
 #include "opentelemetry/sdk/trace/processor.h"
-#include "opentelemetry/sdk/trace/span.h"
+#include "opentelemetry/sdk/trace/exportable_span.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace sdk
@@ -33,18 +33,18 @@ public:
       : exporter_(std::move(exporter))
   {}
 
-  std::unique_ptr<Recordable> MakeRecordable() noexcept override
+  void RegisterRecordable(ExportableSpan& span) noexcept override
   {
-    return exporter_->MakeRecordable();
+    span.RegisterRecordableFor(*this, exporter_->MakeRecordable());
   }
 
-  void OnStart(Span &span,
+  void OnStart(ExportableSpan &span,
                const opentelemetry::trace::SpanContext &parent_context) noexcept override
   {}
 
-  void OnEnd(Span &span) noexcept override
+  void OnEnd(std::unique_ptr<ExportableSpan> &&span) noexcept override
   {
-    auto data = span.ConsumeRecordable();
+    auto data = span->ReleaseRecordableFor(*this);
     nostd::span<std::unique_ptr<Recordable>> batch(&data, 1);
     const std::lock_guard<opentelemetry::common::SpinLockMutex> locked(lock_);
     if (exporter_->Export(batch) == ExportResult::kFailure)
