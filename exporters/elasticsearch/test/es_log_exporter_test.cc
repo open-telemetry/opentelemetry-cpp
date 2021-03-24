@@ -77,4 +77,4 @@ TEST(ElasticsearchLogsExporterTests, RecordableCreation)
 
   exporter->Export(nostd::span<std::unique_ptr<sdklogs::Recordable>>(&record, 1));
 }
-#endif
+

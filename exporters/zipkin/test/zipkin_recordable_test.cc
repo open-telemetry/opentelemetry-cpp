@@ -13,6 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 #include "opentelemetry/sdk/trace/recordable.h"
 #include "opentelemetry/sdk/trace/simple_processor.h"
 #include "opentelemetry/sdk/trace/span_data.h"
@@ -69,7 +70,7 @@ TEST(ZipkinSpanRecordable, SetStartTime)
   opentelemetry::core::SystemTimestamp start_timestamp(start_time);
 
   uint64_t unix_start =
-      std::chrono::duration_cast<std::chrono::nanoseconds>(start_time.time_since_epoch()).count();
+      std::chrono::duration_cast<std::chrono::microseconds>(start_time.time_since_epoch()).count();
   json j_span = {{"timestamp", unix_start}};
   rec.SetStartTime(start_timestamp);
   EXPECT_EQ(rec.span(), j_span);
@@ -92,12 +93,21 @@ TEST(ZipkinSpanRecordable, SetDuration)
 
 TEST(ZipkinSpanRecordable, SetStatus)
 {
-  opentelemetry::exporter::zipkin::Recordable rec;
-  trace::StatusCode code(trace::StatusCode::kOk);
-  nostd::string_view description = "For test";
-  json j_span = {{"tags", {{"otel.status_code", code}, {"otel.status_description", description}}}};
-  rec.SetStatus(code, description);
-  EXPECT_EQ(rec.span(), j_span);
+  std::string description                     = "Error description";
+  std::vector<trace::StatusCode> status_codes = {trace::StatusCode::kError, trace::StatusCode::kOk};
+  for (auto &status_code : status_codes)
+  {
+    opentelemetry::exporter::zipkin::Recordable rec;
+    trace::StatusCode code(status_code);
+    json j_span;
+    if (status_code == trace::StatusCode::kError)
+      j_span = {{"tags", {{"otel.status_code", status_code}, {"error", description}}}};
+    else
+      j_span = {{"tags", {{"otel.status_code", status_code}}}};
+
+    rec.SetStatus(code, description);
+    EXPECT_EQ(rec.span(), j_span);
+  }
 }
 
 TEST(ZipkinSpanRecordable, AddEventDefault)

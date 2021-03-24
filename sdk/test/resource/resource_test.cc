@@ -19,7 +19,7 @@ public:
   {}
 };
 
-TEST(ResourceTest, create)
+TEST(ResourceTest, create_without_servicename)
 {
 
   opentelemetry::sdk::resource::ResourceAttributes expected_attributes = {
@@ -28,15 +28,15 @@ TEST(ResourceTest, create)
       {"cost", 234.23},
       {"telemetry.sdk.language", "cpp"},
       {"telemetry.sdk.name", "opentelemetry"},
-      {"telemetry.sdk.version", OPENTELEMETRY_SDK_VERSION}};
+      {"telemetry.sdk.version", OPENTELEMETRY_SDK_VERSION},
+      {"service.name", "unknown_service"}};
 
   opentelemetry::sdk::resource::ResourceAttributes attributes = {
       {"service", "backend"}, {"version", (uint32_t)1}, {"cost", 234.23}};
-  auto resource2            = opentelemetry::sdk::resource::Resource::Create(attributes);
-  auto received_attributes2 = resource2.GetAttributes();
-  for (auto &e : received_attributes2)
+  auto resource            = opentelemetry::sdk::resource::Resource::Create(attributes);
+  auto received_attributes = resource.GetAttributes();
+  for (auto &e : received_attributes)
   {
-
     EXPECT_TRUE(expected_attributes.find(e.first) != expected_attributes.end());
     if (expected_attributes.find(e.first) != expected_attributes.end())
       if (e.first == "version")
@@ -49,9 +49,62 @@ TEST(ResourceTest, create)
         EXPECT_EQ(opentelemetry::nostd::get<std::string>(expected_attributes.find(e.first)->second),
                   opentelemetry::nostd::get<std::string>(e.second));
   }
-  EXPECT_EQ(received_attributes2.size(), expected_attributes.size());
+  EXPECT_EQ(received_attributes.size(), expected_attributes.size());  // for missing service.name
 }
 
+TEST(ResourceTest, create_with_servicename)
+{
+  opentelemetry::sdk::resource::ResourceAttributes expected_attributes = {
+      {"version", (uint32_t)1},
+      {"cost", 234.23},
+      {"telemetry.sdk.language", "cpp"},
+      {"telemetry.sdk.name", "opentelemetry"},
+      {"telemetry.sdk.version", OPENTELEMETRY_SDK_VERSION},
+      {"service.name", "backend"},
+  };
+  opentelemetry::sdk::resource::ResourceAttributes attributes = {
+      {"service.name", "backend"}, {"version", (uint32_t)1}, {"cost", 234.23}};
+  auto resource            = opentelemetry::sdk::resource::Resource::Create(attributes);
+  auto received_attributes = resource.GetAttributes();
+  for (auto &e : received_attributes)
+  {
+    EXPECT_TRUE(expected_attributes.find(e.first) != expected_attributes.end());
+    if (expected_attributes.find(e.first) != expected_attributes.end())
+    {
+      if (e.first == "version")
+        EXPECT_EQ(opentelemetry::nostd::get<uint32_t>(expected_attributes.find(e.first)->second),
+                  opentelemetry::nostd::get<uint32_t>(e.second));
+      else if (e.first == "cost")
+        EXPECT_EQ(opentelemetry::nostd::get<double>(expected_attributes.find(e.first)->second),
+                  opentelemetry::nostd::get<double>(e.second));
+      else
+        EXPECT_EQ(opentelemetry::nostd::get<std::string>(expected_attributes.find(e.first)->second),
+                  opentelemetry::nostd::get<std::string>(e.second));
+    }
+  }
+  EXPECT_EQ(received_attributes.size(), expected_attributes.size());  // for missing service.name
+}
+
+TEST(ResourceTest, create_with_emptyatrributes)
+{
+  opentelemetry::sdk::resource::ResourceAttributes expected_attributes = {
+      {"telemetry.sdk.language", "cpp"},
+      {"telemetry.sdk.name", "opentelemetry"},
+      {"telemetry.sdk.version", OPENTELEMETRY_SDK_VERSION},
+      {"service.name", "unknown_service"},
+  };
+  opentelemetry::sdk::resource::ResourceAttributes attributes = {};
+  auto resource            = opentelemetry::sdk::resource::Resource::Create(attributes);
+  auto received_attributes = resource.GetAttributes();
+  for (auto &e : received_attributes)
+  {
+    EXPECT_TRUE(expected_attributes.find(e.first) != expected_attributes.end());
+    if (expected_attributes.find(e.first) != expected_attributes.end())
+      EXPECT_EQ(opentelemetry::nostd::get<std::string>(expected_attributes.find(e.first)->second),
+                opentelemetry::nostd::get<std::string>(e.second));
+  }
+  EXPECT_EQ(received_attributes.size(), expected_attributes.size());  // for missing service.name
+}
 TEST(ResourceTest, Merge)
 {
   TestResource resource1(
@@ -67,11 +120,14 @@ TEST(ResourceTest, Merge)
   {
     EXPECT_TRUE(expected_attributes.find(e.first) != expected_attributes.end());
     if (expected_attributes.find(e.first) != expected_attributes.end())
+    {
       EXPECT_EQ(expected_attributes.find(e.first)->second,
                 opentelemetry::nostd::get<std::string>(e.second));
+    }
   }
   EXPECT_EQ(received_attributes.size(), expected_attributes.size());
 }
+
 TEST(ResourceTest, MergeEmptyString)
 {
   TestResource resource1({{"service", "backend"}, {"host", "service-host"}});
@@ -86,8 +142,10 @@ TEST(ResourceTest, MergeEmptyString)
   {
     EXPECT_TRUE(expected_attributes.find(e.first) != expected_attributes.end());
     if (expected_attributes.find(e.first) != expected_attributes.end())
+    {
       EXPECT_EQ(expected_attributes.find(e.first)->second,
                 opentelemetry::nostd::get<std::string>(e.second));
+    }
   }
   EXPECT_EQ(received_attributes.size(), expected_attributes.size());
 }
@@ -109,8 +167,10 @@ TEST(ResourceTest, OtelResourceDetector)
   {
     EXPECT_TRUE(expected_attributes.find(e.first) != expected_attributes.end());
     if (expected_attributes.find(e.first) != expected_attributes.end())
+    {
       EXPECT_EQ(expected_attributes.find(e.first)->second,
                 opentelemetry::nostd::get<std::string>(e.second));
+    }
   }
   EXPECT_EQ(received_attributes.size(), expected_attributes.size());
   unsetenv("OTEL_RESOURCE_ATTRIBUTES");
@@ -127,8 +187,10 @@ TEST(ResourceTest, OtelResourceDetectorEmptyEnv)
   {
     EXPECT_TRUE(expected_attributes.find(e.first) != expected_attributes.end());
     if (expected_attributes.find(e.first) != expected_attributes.end())
+    {
       EXPECT_EQ(expected_attributes.find(e.first)->second,
                 opentelemetry::nostd::get<std::string>(e.second));
+    }
   }
   EXPECT_EQ(received_attributes.size(), expected_attributes.size());
 }

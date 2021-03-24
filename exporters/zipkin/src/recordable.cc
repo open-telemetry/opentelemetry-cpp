@@ -179,9 +179,14 @@ void Recordable::AddLink(const opentelemetry::trace::SpanContext &span_context,
 
 void Recordable::SetStatus(trace::StatusCode code, nostd::string_view description) noexcept
 {
-  span_["tags"]["otel.status_code"] = code;
-  if (description.size())
-    span_["tags"]["otel.status_description"] = description;
+  if (code != trace::StatusCode::kUnset)
+  {
+    span_["tags"]["otel.status_code"] = code;
+    if (code == trace::StatusCode::kError)
+    {
+      span_["tags"]["error"] = description;
+    }
+  }
 }
 
 void Recordable::SetName(nostd::string_view name) noexcept
