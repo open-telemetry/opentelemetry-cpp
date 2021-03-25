@@ -33,7 +33,6 @@ TracezSharedData::CollectedSpans TracezSharedData::GetSpanSnapshot() noexcept
   return snapshot;
 }
 
-
 }  // namespace zpages
 }  // namespace ext
 OPENTELEMETRY_END_NAMESPACE

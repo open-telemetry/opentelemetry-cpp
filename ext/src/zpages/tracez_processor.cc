@@ -15,7 +15,8 @@ void TracezSpanProcessor::OnStart(opentelemetry::sdk::trace::Recordable &span,
 void TracezSpanProcessor::OnEnd(
     std::unique_ptr<opentelemetry::sdk::trace::Recordable> &&span) noexcept
 {
-  shared_data_->OnEnd(std::unique_ptr<ThreadsafeSpanData>(static_cast<ThreadsafeSpanData *>(span.release())));
+  shared_data_->OnEnd(
+      std::unique_ptr<ThreadsafeSpanData>(static_cast<ThreadsafeSpanData *>(span.release())));
 }
 
 }  // namespace zpages

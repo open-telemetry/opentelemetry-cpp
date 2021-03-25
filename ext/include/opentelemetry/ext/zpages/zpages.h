@@ -14,8 +14,8 @@
 
 using opentelemetry::ext::zpages::TracezDataAggregator;
 using opentelemetry::ext::zpages::TracezHttpServer;
-using opentelemetry::ext::zpages::TracezSpanProcessor;
 using opentelemetry::ext::zpages::TracezSharedData;
+using opentelemetry::ext::zpages::TracezSpanProcessor;
 using std::chrono::microseconds;
 
 /**
@@ -33,17 +33,17 @@ public:
    * application. It creates a static instance of this class and replaces the
    * global TracerProvider with one that delegates spans to tracez.
    */
-  static void Initialize() 
-  { 
-    Instance().ReplaceGlobalProvider();    
-  }
+  static void Initialize() { Instance().ReplaceGlobalProvider(); }
 
-  /** 
-   * Returns the singletone instnace of ZPages, useful for attaching z-pages span processors to non-global providers. 
-   * 
-   * Note: This will instantiate the Tracez instance and webserver if it hasn't already been instantiated.
+  /**
+   * Returns the singletone instnace of ZPages, useful for attaching z-pages span processors to
+   * non-global providers.
+   *
+   * Note: This will instantiate the Tracez instance and webserver if it hasn't already been
+   * instantiated.
    */
-  static ZPages& Instance() {
+  static ZPages &Instance()
+  {
     static ZPages instance;
     return instance;
   }
@@ -51,14 +51,16 @@ public:
   /** Replaces the global tracer provider with an instance that exports to tracez. */
   void ReplaceGlobalProvider()
   {
-    std::shared_ptr<opentelemetry::sdk::trace::SpanProcessor> tracez_processor (MakeSpanProcessor().release());
-    auto tracez_provider_  = opentelemetry::nostd::shared_ptr<opentelemetry::trace::TracerProvider>(
+    std::shared_ptr<opentelemetry::sdk::trace::SpanProcessor> tracez_processor(
+        MakeSpanProcessor().release());
+    auto tracez_provider_ = opentelemetry::nostd::shared_ptr<opentelemetry::trace::TracerProvider>(
         new opentelemetry::sdk::trace::TracerProvider(tracez_processor));
     opentelemetry::trace::Provider::SetTracerProvider(tracez_provider_);
   }
 
   /** Retruns a new span processor that will output to z-pages. */
-  std::unique_ptr<TracezSpanProcessor> MakeSpanProcessor() {
+  std::unique_ptr<TracezSpanProcessor> MakeSpanProcessor()
+  {
     return std::unique_ptr<TracezSpanProcessor>(new TracezSpanProcessor(tracez_shared_));
   }
 

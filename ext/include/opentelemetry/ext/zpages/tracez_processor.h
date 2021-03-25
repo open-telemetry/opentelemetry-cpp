@@ -27,8 +27,9 @@ public:
   /*
    * Initialize a span processor.
    */
-   explicit TracezSpanProcessor(std::shared_ptr<TracezSharedData> shared_data) noexcept 
-    : shared_data_(shared_data) {}
+  explicit TracezSpanProcessor(std::shared_ptr<TracezSharedData> shared_data) noexcept
+      : shared_data_(shared_data)
+  {}
 
   /*
    * Create a span recordable, which is span_data

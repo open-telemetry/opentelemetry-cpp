@@ -175,7 +175,7 @@ class TracezProcessor : public ::testing::Test
 protected:
   void SetUp() override
   {
-    shared_data = std::shared_ptr<TracezSharedData>(new TracezSharedData());
+    shared_data   = std::shared_ptr<TracezSharedData>(new TracezSharedData());
     processor     = std::shared_ptr<TracezSpanProcessor>(new TracezSpanProcessor(shared_data));
     auto resource = opentelemetry::sdk::resource::Resource::Create({});
 
