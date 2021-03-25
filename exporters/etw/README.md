@@ -60,7 +60,7 @@ int main(int argc, const char* argv[])
 {
   // Obtain a Tracer object for instrumentation name.
   // Each Tracer is associated with unique TraceId.
-  auto tracer = tp.GetTracer(providerName, "TLD");       
+  auto tracer = tp.GetTracer(providerName, "TLD");
 
   // Properties is a helper class in ETW namespace that is otherwise compatible
   // with Key-Value Iterable accepted by OpenTelemetry API. Using Properties
