@@ -108,13 +108,14 @@ private:
   {
     size_t size = map.size();
     size_t i    = 1;
+    sout_ << std::endl;
     for (auto kv : map)
     {
-      sout_ << kv.first << ": ";
+      sout_ << "\t" << kv.first << ": ";
       print_value(kv.second);
 
       if (i != size)
-        sout_ << ", ";
+        sout_ << std::endl;
       i++;
     }
   }
