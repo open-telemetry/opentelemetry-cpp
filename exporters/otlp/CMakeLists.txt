@@ -33,7 +33,7 @@ if(BUILD_TESTING)
     TARGET recordable_test
     TEST_PREFIX exporter.otlp.
     TEST_LIST recordable_test)
-  find_library(GMOCK_LIB gmockx PATH_SUFFIXES lib)
+  find_library(GMOCK_LIB gmock PATH_SUFFIXES lib)
   if(GMOCK_LIB)
     add_executable(otlp_exporter_test test/otlp_exporter_test.cc)
     target_link_libraries(
