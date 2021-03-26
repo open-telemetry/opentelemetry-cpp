@@ -11,8 +11,8 @@ This is a simple example that demonstrates tracing an HTTP request from client t
 ### Running the example
 
 1. The example uses HTTP server and client provided as part of this repo:
-    * [HTTP Client](../../ext/include/opentelemetry/ext/http/client)
-    * [HTTP Server](../../ext/include/opentelemetry/ext/http/server)
+    * [HTTP Client]([../../ext/include/opentelemetry/ext/http/client](https://github.com/open-telemetry/opentelemetry-cpp/tree/main/ext/include/opentelemetry/ext/http/client))
+    * [HTTP Server]([../../ext/include/opentelemetry/ext/http/server](https://github.com/open-telemetry/opentelemetry-cpp/tree/main/ext/include/opentelemetry/ext/http/server))
 
 2. Build and Deploy the opentelementry-cpp as described in [INSTALL.md](../../INSTALL.md)
 
