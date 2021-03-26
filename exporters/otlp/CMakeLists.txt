@@ -33,15 +33,15 @@ if(BUILD_TESTING)
     TARGET recordable_test
     TEST_PREFIX exporter.otlp.
     TEST_LIST recordable_test)
-  find_library(IS_GMOCK gmock PATH_SUFFIXES lib)
-  if(IS_GMOCK)
+  find_library(GMOCK_LIB gmockx PATH_SUFFIXES lib)
+  if(GMOCK_LIB)
     add_executable(otlp_exporter_test test/otlp_exporter_test.cc)
     target_link_libraries(
       otlp_exporter_test
       ${GTEST_BOTH_LIBRARIES}
       ${CMAKE_THREAD_LIBS_INIT}
       opentelemetry_exporter_otprotocol
-      gmock
+      ${GMOCK_LIB}
       protobuf::libprotobuf
       gRPC::grpc++)
     gtest_add_tests(
