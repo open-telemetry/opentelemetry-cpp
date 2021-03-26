@@ -1,13 +1,25 @@
-include_directories(${CMAKE_SOURCE_DIR}/exporters/ostream/include
-                    ${CMAKE_SOURCE_DIR}/ext/include ${CMAKE_SOURCE_DIR/})
+find_package(CURL)
+find_package(nlohmann_json)
 
-add_executable(http_client client.cc)
-add_executable(http_server server.cc)
+if(NOT CURL_FOUND)
+  message(WARNING "Skipping example_w3c_tracecontext_test: CURL not found")
+else()
+  include_directories(${CMAKE_SOURCE_DIR}/exporters/ostream/include
+                      ${CMAKE_SOURCE_DIR}/ext/include ${CMAKE_SOURCE_DIR/})
 
-target_link_libraries(
-  http_client ${CMAKE_THREAD_LIBS_INIT} ${CORE_RUNTIME_LIBS}
-  opentelemetry_trace http_client_curl opentelemetry_exporter_ostream_span)
+  add_executable(http_client client.cc)
+  add_executable(http_server server.cc)
 
-target_link_libraries(
-  http_server ${CMAKE_THREAD_LIBS_INIT} ${CORE_RUNTIME_LIBS}
-  opentelemetry_trace http_client_curl opentelemetry_exporter_ostream_span)
+  target_link_libraries(
+    http_client
+    ${CMAKE_THREAD_LIBS_INIT}
+    ${CORE_RUNTIME_LIBS}
+    opentelemetry_trace
+    http_client_curl
+    opentelemetry_exporter_ostream_span
+    ${CURL_LIBRARIES})
+
+  target_link_libraries(
+    http_server ${CMAKE_THREAD_LIBS_INIT} ${CORE_RUNTIME_LIBS}
+    opentelemetry_trace http_client_curl opentelemetry_exporter_ostream_span)
+endif()
