@@ -10,7 +10,7 @@ void sendRequest(std::string url)
 
   // start active span
   opentelemetry::trace::StartSpanOptions options;
-  options.kind = opentelemetry::trace::SpanKind::kClient;  // server
+  options.kind = opentelemetry::trace::SpanKind::kClient;  // client
   auto span =
       get_tracer("http-client")
           ->StartSpan("sentRequest", {{"component", "http"}, {"http.method", "GET"}}, options);
