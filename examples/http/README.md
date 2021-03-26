@@ -2,11 +2,14 @@
 
 ## HTTP
 
-This is a simple example that demonstrates tracing an HTTP request from client to server. The example shows several aspects of tracing, such as:
+This is a simple example that demonstrates tracing an HTTP request from client to server. The example shows several aspects of tracing such as:
 
 * Using the `TracerProvider`
 * Span Attributes
-* Using the console exporter
+* Span Events
+* Using the ostream exporter
+* Nested spans (TBD)
+* W3c Trace Context Propagation (TBD)
 
 ### Running the example
 
