@@ -1,33 +1,13 @@
-#include "opentelemetry/context/context.h"
-#include "opentelemetry/nostd/shared_ptr.h"
-#include "opentelemetry/nostd/span.h"
-#include "opentelemetry/nostd/string_view.h"
-#include "opentelemetry/trace/default_span.h"
-#include "opentelemetry/trace/noop.h"
-#include "opentelemetry/trace/span.h"
-#include "opentelemetry/trace/span_context.h"
-#include "opentelemetry/trace/trace_id.h"
-#include "opentelemetry/trace/tracer.h"
+#include "opentelemetry/context/runtime_context.h"
+#include "opentelemetry/trace/propagation/http_trace_context.h"
+#include "opentelemetry/trace/scope.h"
+#include "util.h"
 
 #include <map>
-#include <memory>
-#include <string>
 
 #include <gtest/gtest.h>
 
-#include "opentelemetry/trace/default_span.h"
-#include "opentelemetry/trace/propagation/http_trace_context.h"
-#include "opentelemetry/trace/propagation/text_map_propagator.h"
-
 using namespace opentelemetry;
-
-template <typename T>
-static std::string Hex(const T &id_item)
-{
-  char buf[T::kSize * 2];
-  id_item.ToLowerBase16(buf);
-  return std::string(buf, sizeof(buf));
-}
 
 static nostd::string_view Getter(const std::map<std::string, std::string> &carrier,
                                  nostd::string_view trace_type = "traceparent")
@@ -52,22 +32,9 @@ using MapHttpTraceContext =
 
 static MapHttpTraceContext format = MapHttpTraceContext();
 
-TEST(TextMapPropagatorTest, TraceIdBufferGeneration)
-{
-  constexpr uint8_t buf[] = {1, 2, 3, 4, 5, 6, 7, 8, 8, 7, 0xaa, 0xbb, 0xcc, 0xdd, 0xee, 0xff};
-  EXPECT_EQ(MapHttpTraceContext::GenerateTraceIdFromString("01020304050607080807aabbccddeeff"),
-            trace::TraceId(buf));
-}
-
-TEST(TextMapPropagatorTest, SpanIdBufferGeneration)
-{
-  constexpr uint8_t buf[] = {1, 2, 0xaa, 0xbb, 0xcc, 0xdd, 0xee, 0xff};
-  EXPECT_EQ(MapHttpTraceContext::GenerateSpanIdFromString("0102aabbccddeeff"), trace::SpanId(buf));
-}
-
 TEST(TextMapPropagatorTest, TraceFlagsBufferGeneration)
 {
-  EXPECT_EQ(MapHttpTraceContext::GenerateTraceFlagsFromString("00"), trace::TraceFlags());
+  EXPECT_EQ(MapHttpTraceContext::TraceFlagsFromHex("00"), trace::TraceFlags());
 }
 
 TEST(TextMapPropagatorTest, NoSendEmptyTraceState)
@@ -149,4 +116,32 @@ TEST(TextMapPropagatorTest, GetCurrentSpan)
   format.Inject(Setter, headers, context::RuntimeContext::GetCurrent());
   EXPECT_EQ(headers["traceparent"], "00-0102030405060708090a0b0c0d0e0f10-0102030405060708-01");
   EXPECT_EQ(headers["tracestate"], "congo=t61rcWkgMzE");
+}
+
+TEST(TextMapPropagatorTest, InvalidIdentitiesAreNotExtracted)
+{
+  std::vector<std::string> traces = {
+      "ff-0af7651916cd43dd8448eb211c80319c-b9c7c989f97918e1-01",
+      "00-0af7651916cd43dd8448eb211c80319c1-b9c7c989f97918e1-01",
+      "00-0af7651916cd43dd8448eb211c80319c-b9c7c989f97918e11-01",
+      "0-0af7651916cd43dd8448eb211c80319c-b9c7c989f97918e1-01",
+      "00-0af7651916cd43dd8448eb211c80319c-b9c7c989f97918e1-0",
+      "00-0af7651916cd43dd8448eb211c8031-b9c7c989f97918e1-01",
+      "00-0af7651916cd43dd8448eb211c80319c-b9c7c989f97-01",
+      "00-1-1-00",
+      "00--b9c7c989f97918e1-01",
+      "00-0af7651916cd43dd8448eb211c80319c1--01",
+      "",
+      "---",
+  };
+
+  for (auto &trace : traces)
+  {
+    const std::map<std::string, std::string> carrier = {{"traceparent", trace}};
+    context::Context ctx1                            = context::Context{};
+    context::Context ctx2                            = format.Extract(Getter, carrier, ctx1);
+
+    auto span = trace::propagation::detail::GetCurrentSpan(ctx2);
+    EXPECT_FALSE(span.IsValid());
+  }
 }

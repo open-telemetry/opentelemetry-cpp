@@ -76,21 +76,22 @@ public:
                 // Default connectivity and response size options
                 bool is_raw_response                        = false,
                 std::chrono::milliseconds http_conn_timeout = default_http_conn_timeout)
-      : method_(method),
-        url_(url),
-        callback_(callback),
-        request_mode_(request_mode),
-        // Local vars
-        request_headers_(request_headers),
-        request_body_(request_body),
+      : is_aborted_(false),
+        is_finished_(false),
         // Optional connection params
         is_raw_response_(is_raw_response),
         http_conn_timeout_(http_conn_timeout),
+        request_mode_(request_mode),
+        curl_(nullptr),
         // Result
         res_(CURLE_OK),
+        callback_(callback),
+        method_(method),
+        url_(url),
+        // Local vars
+        request_headers_(request_headers),
+        request_body_(request_body),
         sockfd_(0),
-        is_aborted_(false),
-        is_finished_(false),
         nread_(0)
   {
     /* get a curl handle */
@@ -406,7 +407,7 @@ protected:
   CURL *curl_;    // Local curl instance
   CURLcode res_;  // Curl result OR HTTP status code if successful
 
-  http_client::EventHandler *callback_ = nullptr;
+  http_client::EventHandler *callback_;
 
   // Request values
   http_client::Method method_;

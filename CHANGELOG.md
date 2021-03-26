@@ -15,9 +15,16 @@ Increment the:
 
 ## [Unreleased]
 
+* [SDK] Read Zipkin endpoint from environment variable. ([#24](https://github.com/open-telemetry/opentelemetry-cpp/pull/624))
+
+## [0.3.0] 2021-03-19
+
 * [EXPORTER] Added Zipkin Exporter. ([#471](https://github.com/open-telemetry/opentelemetry-cpp/pull/471))
 * [API] Added Jaeger propagator. ([#599](https://github.com/open-telemetry/opentelemetry-cpp/pull/599))
 * [PROPAGATOR] Added Composite Propagator ([#597](https://github.com/open-telemetry/opentelemetry-cpp/pull/597))
+* [API] Propagate traceflag from parent ([#603](https://github.com/open-telemetry/opentelemetry-cpp/pull/603))
+* [DOCS] Add sphinx support for api doc generation ([595](https://github.com/open-telemetry/opentelemetry-cpp/pull/595))
+* [SDK] Add service.name if missing in Resource ([#616](https://github.com/open-telemetry/opentelemetry-cpp/pull/616))
 
 ## [0.2.0] 2021-03-02
 

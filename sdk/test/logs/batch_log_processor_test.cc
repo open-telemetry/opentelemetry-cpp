@@ -252,7 +252,7 @@ TEST_F(BatchLogProcessorTest, TestScheduledDelayMillis)
   auto batch_processor = GetMockProcessor(logs_received, is_shutdown, is_export_completed,
                                           export_delay, scheduled_delay_millis);
 
-  for (int i = 0; i < max_export_batch_size; ++i)
+  for (std::size_t i = 0; i < max_export_batch_size; ++i)
   {
     auto log = batch_processor->MakeRecordable();
     log->SetName("Log" + std::to_string(i));

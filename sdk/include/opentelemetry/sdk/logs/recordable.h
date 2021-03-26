@@ -4,7 +4,6 @@
 #include "opentelemetry/common/key_value_iterable.h"
 #include "opentelemetry/core/timestamp.h"
 #include "opentelemetry/logs/severity.h"
-#include "opentelemetry/sdk/common/empty_attributes.h"
 #include "opentelemetry/trace/span.h"
 #include "opentelemetry/trace/span_context.h"
 #include "opentelemetry/trace/span_id.h"

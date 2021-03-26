@@ -1,20 +1,12 @@
 #pragma once
 
-#include <array>
-#include <iostream>
-#include <map>
-#include <string>
 #include "detail/context.h"
-#include "opentelemetry/common/key_value_iterable.h"
-#include "opentelemetry/context/context.h"
-#include "opentelemetry/nostd/shared_ptr.h"
-#include "opentelemetry/nostd/span.h"
-#include "opentelemetry/nostd/string_view.h"
-#include "opentelemetry/nostd/variant.h"
+#include "detail/hex.h"
+#include "detail/string.h"
 #include "opentelemetry/trace/default_span.h"
 #include "opentelemetry/trace/propagation/text_map_propagator.h"
-#include "opentelemetry/trace/span.h"
-#include "opentelemetry/trace/span_context.h"
+
+#include <array>
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace trace
@@ -38,9 +30,8 @@ static const nostd::string_view kB3SampledHeader = "X-B3-Sampled";
                              X-B3-TraceId                X-B3-SpanId    X-B3-ParentSpanId (ignored)
 */
 
-static const int kTraceIdHexStrLength   = 32;
-static const int kSpanIdHexStrLength    = 16;
-static const int kTraceFlagHexStrLength = 1;
+static const int kTraceIdHexStrLength = 32;
+static const int kSpanIdHexStrLength  = 16;
 
 // The B3PropagatorExtractor class provides an interface that enables extracting context from
 // headers of HTTP requests. HTTP frameworks and clients can integrate with B3Propagator by
@@ -63,21 +54,21 @@ public:
     return context.SetValue(kSpanKey, sp);
   }
 
-  static TraceId GenerateTraceIdFromString(nostd::string_view trace_id)
+  static TraceId TraceIdFromHex(nostd::string_view trace_id)
   {
     uint8_t buf[kTraceIdHexStrLength / 2];
-    GenerateBuffFromHexStrPad0(trace_id, sizeof(buf), buf);
+    detail::HexToBinary(trace_id, buf, sizeof(buf));
     return TraceId(buf);
   }
 
-  static SpanId GenerateSpanIdFromString(nostd::string_view span_id)
+  static SpanId SpanIdFromHex(nostd::string_view span_id)
   {
     uint8_t buf[kSpanIdHexStrLength / 2];
-    GenerateBuffFromHexStrPad0(span_id, sizeof(buf), buf);
+    detail::HexToBinary(span_id, buf, sizeof(buf));
     return SpanId(buf);
   }
 
-  static TraceFlags GenerateTraceFlagsFromString(nostd::string_view trace_flags)
+  static TraceFlags TraceFlagsFromHex(nostd::string_view trace_flags)
   {
     if (trace_flags.length() != 1 || (trace_flags[0] != '1' && trace_flags[0] != 'd'))
     {  // check for invalid length of flags and treat 'd' as sampled
@@ -87,106 +78,48 @@ public:
   }
 
 private:
-  // Converts hex numbers (string_view) into bytes stored in a buffer and pads buffer with 0.
-  static void GenerateBuffFromHexStrPad0(nostd::string_view hexStr, int bufSize, uint8_t *buf)
-  {  // we are doing this starting from "right" side for left-padding
-    nostd::string_view::size_type posInp = hexStr.length();
-    int posOut                           = bufSize;
-    while (posOut--)
-    {
-      int val = 0;
-      if (posInp)
-      {
-        int hexDigit2 = HexToInt(hexStr[--posInp]);  // low nibble
-        int hexDigit1 = 0;
-        if (posInp)
-        {
-          hexDigit1 = HexToInt(hexStr[--posInp]);
-        }
-        if (hexDigit1 < 0 || hexDigit2 < 0)
-        {  // malformed hex sequence. Fill entire buffer with zeroes.
-          for (int j = 0; j < bufSize; j++)
-          {
-            buf[j] = 0;
-          }
-          return;
-        }
-        val = hexDigit1 * 16 + hexDigit2;
-      }
-      buf[posOut] = val;
-    }
-  }
-
-  // Converts a single character to a corresponding integer (e.g. '1' to 1), return -1
-  // if the character is not a valid number in hex.
-  static int8_t HexToInt(char c)
-  {
-    if (c >= '0' && c <= '9')
-    {
-      return (int8_t)(c - '0');
-    }
-    else if (c >= 'a' && c <= 'f')
-    {
-      return (int8_t)(c - 'a' + 10);
-    }
-    else if (c >= 'A' && c <= 'F')
-    {
-      return (int8_t)(c - 'A' + 10);
-    }
-    else
-    {
-      return -1;
-    }
-  }
-
   static SpanContext ExtractImpl(Getter getter, const T &carrier)
   {
-    // all these are hex values
-    nostd::string_view trace_id;
-    nostd::string_view span_id;
-    nostd::string_view trace_flags;
+    nostd::string_view trace_id_hex;
+    nostd::string_view span_id_hex;
+    nostd::string_view trace_flags_hex;
 
     // first let's try a single-header variant
     auto singleB3Header = getter(carrier, kB3CombinedHeader);
     if (!singleB3Header.empty())
     {
-      // From: https://github.com/openzipkin/b3-propagation/blob/master/RATIONALE.md
-      // trace_id can be 16 or 32 chars
-      auto firstSep = singleB3Header.find('-');
-      trace_id      = singleB3Header.substr(0, firstSep);
-      if (firstSep != nostd::string_view::npos)
-      {  // at least two fields are required
-        auto secondSep = singleB3Header.find('-', firstSep + 1);
-        if (secondSep != nostd::string_view::npos)
-        {  // more than two fields - check also trace_flags
-          span_id = singleB3Header.substr(firstSep + 1, secondSep - firstSep - 1);
-          if (secondSep + 1 < singleB3Header.size())
-          {
-            trace_flags = singleB3Header.substr(secondSep + 1, kTraceFlagHexStrLength);
-          }
-        }
-        else
-        {
-          span_id = singleB3Header.substr(firstSep + 1);
-        }
+      std::array<nostd::string_view, 3> fields{};
+      // https://github.com/openzipkin/b3-propagation/blob/master/RATIONALE.md
+      if (detail::SplitString(singleB3Header, '-', fields.data(), 3) < 2)
+      {
+        return SpanContext::GetInvalid();
       }
+
+      trace_id_hex    = fields[0];
+      span_id_hex     = fields[1];
+      trace_flags_hex = fields[2];
     }
     else
     {
-      trace_id    = getter(carrier, kB3TraceIdHeader);
-      span_id     = getter(carrier, kB3SpanIdHeader);
-      trace_flags = getter(carrier, kB3SampledHeader);
+      trace_id_hex    = getter(carrier, kB3TraceIdHeader);
+      span_id_hex     = getter(carrier, kB3SpanIdHeader);
+      trace_flags_hex = getter(carrier, kB3SampledHeader);
     }
 
-    // now convert hex to objects
-    TraceId trace_id_obj = GenerateTraceIdFromString(trace_id);
-    SpanId span_id_obj   = GenerateSpanIdFromString(span_id);
-    if (!trace_id_obj.IsValid() || !span_id_obj.IsValid())
+    if (!detail::IsValidHex(trace_id_hex) || !detail::IsValidHex(span_id_hex))
     {
-      return SpanContext(false, false);
+      return SpanContext::GetInvalid();
     }
-    TraceFlags trace_flags_obj = GenerateTraceFlagsFromString(trace_flags);
-    return SpanContext(trace_id_obj, span_id_obj, trace_flags_obj, true);
+
+    TraceId trace_id = TraceIdFromHex(trace_id_hex);
+    SpanId span_id   = SpanIdFromHex(span_id_hex);
+
+    if (!trace_id.IsValid() || !span_id.IsValid())
+    {
+      return SpanContext::GetInvalid();
+    }
+
+    return SpanContext(trace_id, span_id, TraceFlagsFromHex(trace_flags_hex), true);
   }
 };
 
@@ -208,26 +141,18 @@ public:
     {
       return;
     }
-    char trace_id[kTraceIdHexStrLength];
-    TraceId(span_context.trace_id()).ToLowerBase16(trace_id);
-    char span_id[kSpanIdHexStrLength];
-    SpanId(span_context.span_id()).ToLowerBase16(span_id);
-    char trace_flags[2];
-    TraceFlags(span_context.trace_flags()).ToLowerBase16(trace_flags);
-    // Note: This is only temporary replacement for appendable string
-    std::string hex_string = "";
-    for (int i = 0; i < 32; i++)
-    {
-      hex_string.push_back(trace_id[i]);
-    }
-    hex_string.push_back('-');
-    for (int i = 0; i < 16; i++)
-    {
-      hex_string.push_back(span_id[i]);
-    }
-    hex_string.push_back('-');
-    hex_string.push_back(trace_flags[1]);
-    setter(carrier, kB3CombinedHeader, hex_string);
+
+    char trace_identity[kTraceIdHexStrLength + kSpanIdHexStrLength + 3];
+    static_assert(sizeof(trace_identity) == 51, "b3 trace identity buffer size mismatch");
+    span_context.trace_id().ToLowerBase16({&trace_identity[0], kTraceIdHexStrLength});
+    trace_identity[kTraceIdHexStrLength] = '-';
+    span_context.span_id().ToLowerBase16(
+        {&trace_identity[kTraceIdHexStrLength + 1], kSpanIdHexStrLength});
+    trace_identity[kTraceIdHexStrLength + kSpanIdHexStrLength + 1] = '-';
+    trace_identity[kTraceIdHexStrLength + kSpanIdHexStrLength + 2] =
+        span_context.trace_flags().IsSampled() ? '1' : '0';
+
+    setter(carrier, kB3CombinedHeader, nostd::string_view(trace_identity, sizeof(trace_identity)));
   }
 };
 
