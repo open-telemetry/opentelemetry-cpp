@@ -145,7 +145,7 @@ TEST(OStreamSpanExporter, PrintChangedSpanCout)
       "  description   : Test Description\n"
       "  span kind     : Client\n"
       "  status        : Ok\n"
-      "  attributes    : attr1: string\n"
+      "  attributes    : \n\tattr1: string\n"
       "}\n";
   ASSERT_EQ(stdoutOutput.str(), expectedOutput);
 }
@@ -208,7 +208,7 @@ TEST(OStreamSpanExporter, PrintChangedSpanCerr)
       "  description   : Test Description\n"
       "  span kind     : Consumer\n"
       "  status        : Ok\n"
-      "  attributes    : attr1: [0,1,0]\n"
+      "  attributes    : \n\tattr1: [0,1,0]\n"
       "}\n";
   ASSERT_EQ(stdcerrOutput.str(), expectedOutput);
 }
@@ -270,7 +270,7 @@ TEST(OStreamSpanExporter, PrintChangedSpanClog)
       "  description   : Test Description\n"
       "  span kind     : Internal\n"
       "  status        : Ok\n"
-      "  attributes    : attr1: [1,2,3]\n"
+      "  attributes    : \n\tattr1: [1,2,3]\n"
       "}\n";
   ASSERT_EQ(stdclogOutput.str(), expectedOutput);
 }
