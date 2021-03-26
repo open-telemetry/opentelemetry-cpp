@@ -1,8 +1,7 @@
 find_package(CURL)
-find_package(nlohmann_json)
 
 if(NOT CURL_FOUND)
-  message(WARNING "Skipping example_w3c_tracecontext_test: CURL not found")
+  message(WARNING "Skipping http client/server example build: CURL not found")
 else()
   include_directories(${CMAKE_SOURCE_DIR}/exporters/ostream/include
                       ${CMAKE_SOURCE_DIR}/ext/include ${CMAKE_SOURCE_DIR/})
