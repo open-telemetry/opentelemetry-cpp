@@ -1,6 +1,8 @@
 # Code owners file.
 # This file controls who is tagged for review for any given pull request.
 
-* @open-telemetry/cpp-approvers
+# For ETW exporter
+exporters/etw/*  @reyang @maxgolov @lalitb @ThomsonTan @open-telemetry/cpp-approvers
 
-/exporters/etw/	@reyang @maxgolov @lalitb @ThomsonTan
+# For anything not explicitly taken by someone else:
+*       @open-telemetry/cpp-approvers

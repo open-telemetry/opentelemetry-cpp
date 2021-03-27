@@ -23,10 +23,6 @@
 #include <vector>
 
 OPENTELEMETRY_BEGIN_NAMESPACE
-namespace core
-{};
-namespace trace
-{};
 namespace exporter
 {
 namespace ETW
@@ -75,20 +71,19 @@ class PropertyValue : public PropertyVariant
    * @return
    */
   template <typename T>
-  static std::vector<T> to_vector(const nostd::span<const T, std::size_t(-1)> &source)
+  static std::vector<T> to_vector(const nostd::span<const T, nostd::dynamic_extent> &source)
   {
     return std::vector<T>(source.begin(), source.end());
   };
 
   /**
    * @brief Convert span<string_view> to vector<string>
-   * @param source
-   * @return
+   * @param source Span of non-owning string views.
+   * @return Vector of owned strings.
    */
   std::vector<std::string> static to_vector(const nostd::span<const nostd::string_view> &source)
   {
-    std::vector<std::string> result;
-    result.reserve(source.size());
+    std::vector<std::string> result(source.size());
     for (const auto &item : source)
     {
       result.push_back(std::string(item.data()));
@@ -98,9 +93,9 @@ class PropertyValue : public PropertyVariant
 
   /**
    * @brief Convert vector<INTEGRAL> to span<INTEGRAL>.
-   * @tparam T
-   * @param std::vector<T>
-   * @return nostd::span<const T>
+   * @tparam T Integral type
+   * @param vec Vector of integral type primitives to convert to span.
+   * @return Span of integral type primitives.
    */
   template <typename T, std::enable_if_t<std::is_integral<T>::value, bool> = true>
   static nostd::span<const T> to_span(const std::vector<T> &vec)
@@ -111,9 +106,9 @@ class PropertyValue : public PropertyVariant
 
   /**
    * @brief Convert vector<FLOAT> to span<const FLOAT>.
-   * @tparam T
-   * @param std::vector<T>
-   * @return nostd::span<const T>
+   * @tparam T Float type
+   * @param vec Vector of float type primitives to convert to span.
+   * @return Span of float type primitives.
    */
   template <typename T, std::enable_if_t<std::is_floating_point<T>::value, bool> = true>
   static nostd::span<const T> to_span(const std::vector<T> &vec)
@@ -121,21 +116,6 @@ class PropertyValue : public PropertyVariant
     nostd::span<const T> result(vec.data(), vec.size());
     return result;
   };
-
-#if 0
-  /**
-   * @brief Convert vector<bool> to span<const bool>.
-   * FIXME: std::vector<bool> is a special compact type that does not have .data() member
-   *
-   * @param v
-   * @return
-   */
-  static nostd::span<const bool> to_span(const std::vector<bool> &vec)
-  {
-    nostd::span<const bool> result(vec.data(), vec.size());
-    return result;
-  };
-#endif
 
 public:
   /**

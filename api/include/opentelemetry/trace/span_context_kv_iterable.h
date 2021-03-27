@@ -24,14 +24,28 @@ public:
    */
   virtual bool ForEachKeyValue(
       nostd::function_ref<bool(SpanContext, const opentelemetry::common::KeyValueIterable &)>
-          callback) const noexcept
-  {
-    return true;
-  };
+          callback) const noexcept = 0;
   /**
    * @return the number of key-value pairs
    */
-  virtual size_t size() const noexcept { return 0; };
+  virtual size_t size() const noexcept = 0;
 };
+
+/**
+ * @brief Null Span context that does not carry any information.
+ */
+class NullSpanContext : public SpanContextKeyValueIterable
+{
+public:
+  bool ForEachKeyValue(
+      nostd::function_ref<bool(SpanContext, const opentelemetry::common::KeyValueIterable &)>
+          callback) const noexcept override
+  {
+    return false;
+  }
+
+  size_t size() const noexcept override { return 0; };
+};
+
 }  // namespace trace
 OPENTELEMETRY_END_NAMESPACE

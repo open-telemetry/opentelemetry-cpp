@@ -356,6 +356,33 @@ public:
       const trace::SpanContextKeyValueIterable &links,
       const trace::StartSpanOptions &options = {}) noexcept override
   {
+#ifdef RTTI_ENABLED
+    common::KeyValueIterable &attribs = const_cast<common::KeyValueIterable &>(attributes);
+    Properties *evt                   = dynamic_cast<Properties *>(&attribs);
+    if (evt != nullptr)
+    {
+      // Pass as a reference to original modifyable collection without creating a copy
+      return StartSpan(name, *evt, links, options);
+    }
+#endif
+    Properties evtCopy = attributes;
+    return StartSpan(name, evtCopy, links, options);
+  }
+
+  /**
+   * @brief Start Span
+   * @param name Span name
+   * @param attributes Span attributes
+   * @param links Span links
+   * @param options Span options
+   * @return
+   */
+  virtual nostd::shared_ptr<trace::Span> StartSpan(
+      nostd::string_view name,
+      Properties &evt,
+      const trace::SpanContextKeyValueIterable &links,
+      const trace::StartSpanOptions &options = {}) noexcept
+  {
     const auto &cfg = GetConfiguration(tracerProvider_);
 
     // Parent Context:
@@ -363,9 +390,6 @@ public:
     // - or attach to parent SpanContext specified in options
     const auto parentContext =
         (options.parent.IsValid()) ? options.parent : GetCurrentSpan()->GetContext();
-
-    // Copy Span attributes to event Payload
-    Properties evt = attributes;
 
     // Populate Etw.RelatedActivityId at envelope level if enabled
     GUID RelatedActivityId;
@@ -475,6 +499,33 @@ public:
                 core::SystemTimestamp timestamp,
                 const common::KeyValueIterable &attributes) noexcept
   {
+#ifdef RTTI_ENABLED
+    common::KeyValueIterable &attribs = const_cast<common::KeyValueIterable &>(attributes);
+    Properties *evt                   = dynamic_cast<Properties *>(&attribs);
+    if (evt != nullptr)
+    {
+      // Pass as a reference to original modifyable collection without creating a copy
+      return AddEvent(span, name, timestamp, *evt);
+    }
+#endif
+    // Pass a copy converted to Properties object on stack
+    Properties evtCopy = attributes;
+    return AddEvent(span, name, timestamp, evtCopy);
+  }
+
+  /**
+   * @brief Add event data to span associated with tracer.
+   * @param span Parent span.
+   * @param name Event name.
+   * @param timestamp Event timestamp.
+   * @param attributes Event attributes.
+   * @return
+   */
+  void AddEvent(trace::Span &span,
+                nostd::string_view name,
+                core::SystemTimestamp timestamp,
+                Properties &evt) noexcept
+  {
     // TODO: respect originating timestamp. Do we need to reserve
     // a special 'Timestamp' field or is it an overkill? The delta
     // between when `AddEvent` API is called and when ETW layer
@@ -486,11 +537,6 @@ public:
     (void)timestamp;
 
     const auto &cfg = GetConfiguration(tracerProvider_);
-
-    // OPTIMIZATION OPPORTUNITY: Event properties assigned from attributes.
-    // If we know that the parameter is of non-const container type `Properties`,
-    // then we can append more to container and avoid the memcpy entirely.
-    Properties evt = attributes;
 
     evt[ETW_FIELD_NAME] = name.data();
 
