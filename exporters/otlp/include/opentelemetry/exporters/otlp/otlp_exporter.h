@@ -4,7 +4,7 @@
 #include "opentelemetry/sdk/trace/exporter.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
-namespace exporte
+namespace exporter
 {
 namespace otlp
 {
@@ -25,7 +25,7 @@ struct OtlpExporterOptions
 /**
  * The OTLP exporter exports span data in OpenTelemetry Protocol (OTLP) format.
  */
-class OtlpExporter final : public opentelemetry::sdk::trace::SpanExporte
+class OtlpExporter final : public opentelemetry::sdk::trace::SpanExporter
 {
 public:
   /**
@@ -81,5 +81,5 @@ private:
   OtlpExporter(std::unique_ptr<proto::collector::trace::v1::TraceService::StubInterface> stub);
 };
 }  // namespace otlp
-}  // namespace exporte
+}  // namespace exporter
 OPENTELEMETRY_END_NAMESPACE

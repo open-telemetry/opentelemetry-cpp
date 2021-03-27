@@ -6,7 +6,7 @@
 #include <iostream>
 
 OPENTELEMETRY_BEGIN_NAMESPACE
-namespace exporte
+namespace exporter
 {
 namespace otlp
 {
@@ -96,5 +96,5 @@ sdk::trace::ExportResult OtlpExporter::Export(
   return sdk::trace::ExportResult::kSuccess;
 }
 }  // namespace otlp
-}  // namespace exporte
+}  // namespace exporter
 OPENTELEMETRY_END_NAMESPACE

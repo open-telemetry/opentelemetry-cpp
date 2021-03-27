@@ -20,7 +20,7 @@ void InitTracer()
   auto processor = std::shared_ptr<sdktrace::SpanProcessor>(
       new sdktrace::SimpleSpanProcessor(std::move(exporter)));
   auto provider = nostd::shared_ptr<trace::TracerProvider>(new sdktrace::TracerProvider(processor));
-  // Set the global trace provide
+  // Set the global trace provider
   trace::Provider::SetTracerProvider(provider);
 }
 }  // namespace
