@@ -4,7 +4,7 @@
 #include "opentelemetry/sdk/trace/exporter.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
-namespace exporter
+namespace exporte
 {
 namespace otlp
 {
@@ -13,20 +13,19 @@ namespace otlp
  */
 struct OtlpExporterOptions
 {
-    // The endpoint to export to. By default the OpenTelemetry Collector's default endpoint.
-    std::string endpoint = "localhost:4317";
-    // By default when false, uses grpc::InsecureChannelCredentials(); If true,
-    // uses ssl_credentials_cacert_path
-    bool use_ssl_credentials = false;
-    // ssl_credentials_cacert_path specifies path to .pem file to be used for SSL encryption.
-    std::string ssl_credentials_cacert_path = "";
-
+  // The endpoint to export to. By default the OpenTelemetry Collector's default endpoint.
+  std::string endpoint = "localhost:4317";
+  // By default when false, uses grpc::InsecureChannelCredentials(); If true,
+  // uses ssl_credentials_cacert_path
+  bool use_ssl_credentials = false;
+  // ssl_credentials_cacert_path specifies path to .pem file to be used for SSL encryption.
+  std::string ssl_credentials_cacert_path = "";
 };
 
 /**
  * The OTLP exporter exports span data in OpenTelemetry Protocol (OTLP) format.
  */
-class OtlpExporter final : public opentelemetry::sdk::trace::SpanExporter
+class OtlpExporter final : public opentelemetry::sdk::trace::SpanExporte
 {
 public:
   /**
@@ -82,5 +81,5 @@ private:
   OtlpExporter(std::unique_ptr<proto::collector::trace::v1::TraceService::StubInterface> stub);
 };
 }  // namespace otlp
-}  // namespace exporter
+}  // namespace exporte
 OPENTELEMETRY_END_NAMESPACE
