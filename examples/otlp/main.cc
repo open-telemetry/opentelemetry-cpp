@@ -32,7 +32,7 @@ int main(int argc, char *argv[])
     opts.endpoint = argv[1];
     if (argc > 2)
     {
-      opts.use_ssl_credentials = true;
+      opts.use_ssl_credentials         = true;
       opts.ssl_credentials_cacert_path = argv[2];
     }
   }
