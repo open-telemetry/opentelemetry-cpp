@@ -15,12 +15,6 @@ namespace detail
 {
 inline void take_key_value(nostd::string_view, common::AttributeValue) {}
 
-template <class T, nostd::enable_if_t<std::is_base_of<KeyValueIterable, T>::value>>
-auto is_key_value_iterable_impl(T iterable) -> std::true_type{};
-
-template <class T, nostd::enable_if_t<std::is_same<const KeyValueIterable &, T>::value>>
-auto is_key_value_iterable_impl(T iterable) -> std::true_type{};
-
 template <class T>
 auto is_key_value_iterable_impl(T iterable)
     -> decltype(take_key_value(std::begin(iterable)->first, std::begin(iterable)->second),
