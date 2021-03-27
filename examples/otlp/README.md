@@ -10,6 +10,11 @@ SDK](https://github.com/open-telemetry/opentelemetry-cpp). The application then
 calls a `foo_library` which has been instrumented using the [OpenTelemetry
 API](https://github.com/open-telemetry/opentelemetry-cpp/tree/main/api).
 
+To enable tls authentication for OTLP grpc exporter, SslCredentials can be used by
+specifying the path to cacert pem file via OtlpExporterOptions. The path to such a
+.pem file can be provided as a command-line argument alongwith the collector endpoint
+to the main binary invocation above.
+
 Resulting spans are exported to the **OpenTelemetry Collector** using the OTLP
 exporter. The OpenTelemetry Collector can be configured to export to other
 backends (see list of [supported

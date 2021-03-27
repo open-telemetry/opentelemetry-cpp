@@ -3,6 +3,8 @@
 
 #include <grpcpp/grpcpp.h>
 #include <iostream>
+#include <fstream>
+
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace exporter
@@ -30,13 +32,26 @@ void PopulateRequest(const nostd::span<std::unique_ptr<sdk::trace::Recordable>> 
   }
 }
 
+static std::string get_file_contents(const char *fpath)
+{
+  std::ifstream finstream(fpath);
+  std::string contents;
+  contents.assign((std::istreambuf_iterator<char>(finstream)),std::istreambuf_iterator<char>());
+  finstream.close();
+  return contents;
+}
+
 /**
  * Create service stub to communicate with the OpenTelemetry Collector.
  */
-std::unique_ptr<proto::collector::trace::v1::TraceService::Stub> MakeServiceStub(
-    std::string endpoint)
+std::unique_ptr<proto::collector::trace::v1::TraceService::Stub> MakeServiceStub(const OtlpExporterOptions &options)
 {
-  auto channel = grpc::CreateChannel(endpoint, grpc::InsecureChannelCredentials());
+  auto channel = grpc::CreateChannel(options.endpoint, grpc::InsecureChannelCredentials());
+  if (options.use_ssl_credentials) {
+    grpc::SslCredentialsOptions ssl_opts;
+    ssl_opts.pem_root_certs= get_file_contents((options.ssl_credentials_cacert_path).c_str());;
+    channel = grpc::CreateChannel(options.endpoint, grpc::SslCredentials(ssl_opts));
+  }
   return proto::collector::trace::v1::TraceService::NewStub(channel);
 }
 
@@ -45,7 +60,7 @@ std::unique_ptr<proto::collector::trace::v1::TraceService::Stub> MakeServiceStub
 OtlpExporter::OtlpExporter() : OtlpExporter(OtlpExporterOptions()) {}
 
 OtlpExporter::OtlpExporter(const OtlpExporterOptions &options)
-    : options_(options), trace_service_stub_(MakeServiceStub(options.endpoint))
+    : options_(options), trace_service_stub_(MakeServiceStub(options))
 {}
 
 OtlpExporter::OtlpExporter(
