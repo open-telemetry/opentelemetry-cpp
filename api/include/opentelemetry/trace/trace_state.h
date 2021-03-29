@@ -106,7 +106,7 @@ public:
     std::string header_s;
     bool first = true;
     kv_properties_->GetAllEntries(
-        [&header_s, &first ](nostd::string_view key, nostd::string_view value) noexcept {
+        [&header_s, &first](nostd::string_view key, nostd::string_view value) noexcept {
           if (!first)
           {
             header_s.append(",");

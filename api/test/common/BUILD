@@ -9,7 +9,7 @@ otel_cc_benchmark(
 cc_test(
     name = "kv_properties_test",
     srcs = [
-        "kv_properties_test.cc"
+        "kv_properties_test.cc",
     ],
     deps = [
         "//api",
@@ -20,7 +20,7 @@ cc_test(
 cc_test(
     name = "string_util_test",
     srcs = [
-        "string_util_test.cc"
+        "string_util_test.cc",
     ],
     deps = [
         "//api",
