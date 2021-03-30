@@ -91,6 +91,18 @@ TEST_F(OtlpExporterTestPeer, ConfigTest)
   std::unique_ptr<OtlpExporter> exporter(new OtlpExporter(opts));
   EXPECT_EQ(GetOptions(exporter).endpoint, "localhost:45454");
 }
+
+// Test exporter configuration options with use_ssl_credentials
+TEST_F(OtlpExporterTestPeer, ConfigSslCredentialsTest)
+{
+    std::string cacert_str = "--begin and end fake cert--";
+    OtlpExporterOptions opts;
+    opts.use_ssl_credentials              = true;
+    opts.ssl_credentials_cacert_as_string = cacert_str;
+    std::unique_ptr<OtlpExporter> exporter(new OtlpExporter(opts));
+    EXPECT_EQ(GetOptions(exporter).ssl_credentials_cacert_as_string, cacert_str);
+    EXPECT_EQ(GetOptions(exporter).use_ssl_credentials, true);
+}
 }  // namespace otlp
 }  // namespace exporter
 OPENTELEMETRY_END_NAMESPACE

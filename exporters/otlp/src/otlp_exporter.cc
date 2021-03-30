@@ -50,8 +50,15 @@ std::unique_ptr<proto::collector::trace::v1::TraceService::Stub> MakeServiceStub
   if (options.use_ssl_credentials)
   {
     grpc::SslCredentialsOptions ssl_opts;
-    ssl_opts.pem_root_certs = get_file_contents((options.ssl_credentials_cacert_path).c_str());
-    channel                 = grpc::CreateChannel(options.endpoint, grpc::SslCredentials(ssl_opts));
+    if (options.ssl_credentials_cacert_path.empty())
+    {
+      ssl_opts.pem_root_certs = options.ssl_credentials_cacert_as_string;
+    }
+    else
+    {
+      ssl_opts.pem_root_certs = get_file_contents((options.ssl_credentials_cacert_path).c_str());
+    }
+    channel = grpc::CreateChannel(options.endpoint, grpc::SslCredentials(ssl_opts));
   }
   else
   {
