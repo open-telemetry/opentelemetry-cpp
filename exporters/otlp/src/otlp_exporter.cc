@@ -46,12 +46,16 @@ static std::string get_file_contents(const char *fpath)
 std::unique_ptr<proto::collector::trace::v1::TraceService::Stub> MakeServiceStub(
     const OtlpExporterOptions &options)
 {
-  auto channel = grpc::CreateChannel(options.endpoint, grpc::InsecureChannelCredentials());
+  std::shared_ptr<grpc_impl::Channel> channel;
   if (options.use_ssl_credentials)
   {
     grpc::SslCredentialsOptions ssl_opts;
     ssl_opts.pem_root_certs = get_file_contents((options.ssl_credentials_cacert_path).c_str());
     channel                 = grpc::CreateChannel(options.endpoint, grpc::SslCredentials(ssl_opts));
+  }
+  else
+  {
+    channel = grpc::CreateChannel(options.endpoint, grpc::InsecureChannelCredentials());
   }
   return proto::collector::trace::v1::TraceService::NewStub(channel);
 }
