@@ -107,15 +107,12 @@ private:
   void printAttributes(std::unordered_map<std::string, sdkcommon::OwnedAttributeValue> map)
   {
     size_t size = map.size();
-    size_t i    = 1;
+    // size_t i    = 1;
     for (auto kv : map)
     {
-      sout_ << kv.first << ": ";
+      sout_ << "\t" << kv.first << ": ";
       print_value(kv.second);
-
-      if (i != size)
-        sout_ << ", ";
-      i++;
+      sout_ << std::endl;
     }
   }
 };
