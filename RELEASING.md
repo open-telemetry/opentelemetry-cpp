@@ -85,3 +85,9 @@ git push --tags --force
 
 Finally create a Release for the new `<new-tag>` on GitHub. The release body
 should include all the release notes from the Changelog for this release.
+
+## Post Release
+
+Update the OpenTelemetry.io document
+[here](https://github.com/open-telemetry/opentelemetry.io/tree/main/content/en/docs/cpp)
+by sending a Pull Request.
