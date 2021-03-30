@@ -46,7 +46,7 @@ static std::string get_file_contents(const char *fpath)
 std::unique_ptr<proto::collector::trace::v1::TraceService::Stub> MakeServiceStub(
     const OtlpExporterOptions &options)
 {
-  std::shared_ptr<grpc_impl::Channel> channel;
+  std::shared_ptr<grpc::Channel> channel;
   if (options.use_ssl_credentials)
   {
     grpc::SslCredentialsOptions ssl_opts;
