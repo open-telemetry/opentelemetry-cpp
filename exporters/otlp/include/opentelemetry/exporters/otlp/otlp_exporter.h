@@ -15,6 +15,14 @@ struct OtlpExporterOptions
 {
   // The endpoint to export to. By default the OpenTelemetry Collector's default endpoint.
   std::string endpoint = "localhost:4317";
+  // By default when false, uses grpc::InsecureChannelCredentials(); If true,
+  // uses ssl_credentials_cacert_path if non-empty, else uses ssl_credentials_cacert_as_string
+  bool use_ssl_credentials = false;
+  // ssl_credentials_cacert_path specifies path to .pem file to be used for SSL encryption.
+  std::string ssl_credentials_cacert_path = "";
+  // ssl_credentials_cacert_as_string in-memory string representation of .pem file to be used for
+  // SSL encryption.
+  std::string ssl_credentials_cacert_as_string = "";
 };
 
 /**
