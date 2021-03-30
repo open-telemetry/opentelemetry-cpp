@@ -20,7 +20,8 @@ struct OtlpExporterOptions
   bool use_ssl_credentials = false;
   // ssl_credentials_cacert_path specifies path to .pem file to be used for SSL encryption.
   std::string ssl_credentials_cacert_path = "";
-  // ssl_credentials_cacert_as_string in-memory string representation of .pem file to be used for SSL encryption.
+  // ssl_credentials_cacert_as_string in-memory string representation of .pem file to be used for
+  // SSL encryption.
   std::string ssl_credentials_cacert_as_string = "";
 };
 
