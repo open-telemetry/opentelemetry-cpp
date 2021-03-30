@@ -39,48 +39,49 @@ This is a simple example that demonstrates tracing an HTTP request from client t
 
    ```console
    {
-     name          : sentRequest
-     trace_id      : a70a75ade26d2c1fed6cfd5116f4a3db
-     span_id       : ed870ae26eb1b78c
+     name          : /helloworld
+     trace_id      : 15c7ca1993b536085f4097f2818a7be4
+     span_id       : 7d9136e4eb4cb59d
      parent_span_id: 0000000000000000
-     start         : 1616754223528238500
-     duration      : 1848300
+     start         : 1617075613395810300
+     duration      : 1901100
      description   :
      span kind     : Client
      status        : Unset
      attributes    :
-           http.session_state: 8
-           http.header.Date: Fri, 26 Mar 2021 10:23:43 GMT
+           http.header.Date: Tue, 30 Mar 2021 03:40:13 GMT
            http.header.Content-Length: 0
            http.status_code: 200
+           http.method: GET
            http.header.Host: localhost
            http.header.Content-Type: text/plain
            http.header.Connection: keep-alive
-           http.url: http://localhost:8800/helloworld
-           http.method: GET
-           component: http
+           http.scheme: http
+           http.url: h**p://localhost:8800/helloworld
    }
-
    ```
 
    * Server console
 
    ```console
    {
-     name          : handle_request
-     trace_id      : f92ff8f5f6553ead210f2643779e1587
-     span_id       : 195fae1770f514ce
+     name          : /helloworld
+     trace_id      : bfa611a4bbb8b1871ef6a222d6a0f4dd
+     span_id       : 19e3cda7df63c9b9
      parent_span_id: 0000000000000000
-     start         : 1616754460952018400
-     duration      : 20600
+     start         : 1617075522491536300
+     duration      : 50700
      description   :
      span kind     : Server
      status        : Unset
      attributes    :
-           http.req.headerHost: localhost:8800
-           http.req.headerAccept: */*
-           component: http
-           req_method: GET
-           req_url: /helloworld
+           http.header.Accept: */*
+           http.request_content_length: 0
+           http.header.Host: localhost:8800
+           http.scheme: http
+           http.client_ip: 127.0.0.1:44616
+           http.method: GET
+           net.host.port: 8800
+           http.server_name: localhost
    }
    ```

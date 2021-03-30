@@ -27,17 +27,15 @@ public:
     }
 
     void Start() {
-        if (!is_running_) {
+        if (!is_running_.exchange(true)) {
             server_.addListeningPort(port_);
             server_.start();
-            is_running_ = true;
         }
     }
 
     void Stop() {
-        if (is_running_){
+        if (is_running_.exchange(false)){
             server_.stop();
-            is_running_ = false;
         }
     }
 

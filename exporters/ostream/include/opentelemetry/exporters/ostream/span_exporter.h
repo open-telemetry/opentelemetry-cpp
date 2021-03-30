@@ -110,10 +110,6 @@ private:
     size_t i    = 1;
     for (auto kv : map)
     {
-      if (i == 1)
-      {
-        sout_ << std::endl;
-      }
       sout_ << "\t" << kv.first << ": ";
       print_value(kv.second);
 
