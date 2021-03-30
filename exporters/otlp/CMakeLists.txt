@@ -33,27 +33,16 @@ if(BUILD_TESTING)
     TARGET recordable_test
     TEST_PREFIX exporter.otlp.
     TEST_LIST recordable_test)
-  if(MSVC)
-    add_definitions(-DGTEST_LINKED_AS_SHARED_LIBRARY=1)
-  endif()
-  if(MSVC AND CMAKE_BUILD_TYPE STREQUAL "Debug")
-    find_library(GMOCK_LIB gmockd PATH_SUFFIXES lib)
-  else()
-    find_library(GMOCK_LIB gmock PATH_SUFFIXES lib)
-  endif()
-  if(GMOCK_LIB)
-    add_executable(otlp_exporter_test test/otlp_exporter_test.cc)
-    target_link_libraries(
-      otlp_exporter_test
-      ${GTEST_BOTH_LIBRARIES}
-      ${CMAKE_THREAD_LIBS_INIT}
-      opentelemetry_exporter_otprotocol
-      ${GMOCK_LIB}
-      protobuf::libprotobuf
-      gRPC::grpc++)
-    gtest_add_tests(
-      TARGET otlp_exporter_test
-      TEST_PREFIX exporter.otlp.
-      TEST_LIST otlp_exporter_test)
-  endif()
+  add_executable(otlp_exporter_test test/otlp_exporter_test.cc)
+  target_link_libraries(
+    otlp_exporter_test
+    ${GTEST_BOTH_LIBRARIES}
+    ${CMAKE_THREAD_LIBS_INIT}
+    opentelemetry_exporter_otprotocol
+    protobuf::libprotobuf
+    gRPC::grpc++)
+  gtest_add_tests(
+    TARGET otlp_exporter_test
+    TEST_PREFIX exporter.otlp.
+    TEST_LIST otlp_exporter_test)
 endif() # BUILD_TESTING
