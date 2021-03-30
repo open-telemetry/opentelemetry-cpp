@@ -145,8 +145,8 @@ TEST(OStreamSpanExporter, PrintChangedSpanCout)
       "  description   : Test Description\n"
       "  span kind     : Client\n"
       "  status        : Ok\n"
-      "  attributes    :\n"
-      " \tattr1: string\n"
+      "  attributes    : \n"
+      "\tattr1: string\n"
       "}\n";
   ASSERT_EQ(stdoutOutput.str(), expectedOutput);
 }
