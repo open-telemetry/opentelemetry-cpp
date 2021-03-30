@@ -113,10 +113,6 @@ private:
       sout_ << "\t" << kv.first << ": ";
       print_value(kv.second);
       sout_ << std::endl;
-
-      // if (i != size)
-      //  sout_ << std::endl;
-      // i++;
     }
   }
 };
