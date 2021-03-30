@@ -32,7 +32,7 @@ representation of binary blobs on ETW wire.
 
 ## Example project
 
-The following include directories are required, relative to the top-level source tree of OpenTelemetry C++ SDK:
+The following include directories are required, relative to the top-level source tree of OpenTelemetry C++ repo:
 
 - api/include/
 - exporters/etw/include/
@@ -107,11 +107,11 @@ These options affect how "embedded in application" OpenTelemetry C++ SDK code is
 
 | Name        | Description                                                      |
 |---------------------|------------------------------------------------------------------------------------------------------------------------|
-| HAVE_CPP_STDLIB   | Use STL classes for API surface. This option requires at least C++17. C++20 is recommended.              |
-| HAVE_GSL      | Use [Microsoft GSL](https://github.com/microsoft/GSL) for `gsl::span` implementation. Library must be in include path. |
-| HAVE_ABSEIL_VARIANT | Use `absl::variant` instead of `std::variant`                                      |
-| HAVE_TLD      | Use ETW/TraceLogging Dynamic protocol. This is the default implementation.                       |
-| HAVE_CSTRING_TYPE   | Allow passing C-string type `const char *` to API calls.                                 |
+| HAVE_CPP_STDLIB   | Use STL classes for API surface. This option requires at least C++17. C++20 is recommended. Some customers may benefit from STL library provided with the compiler instead of using custom OpenTelemetry `nostd::` implementation due to security and performance considerations. |
+| HAVE_GSL      | Use [Microsoft GSL](https://github.com/microsoft/GSL) for `gsl::span` implementation. Library must be in include path. Microsoft GSL claims to be the most feature-complete implementation of `std::span`. It may be used instead of `nostd::span` implementation in projects that statically link OpenTelemetry SDK. |
+| HAVE_ABSEIL_VARIANT | Use `absl::variant` instead of `nostd::variant`. `nostd::variant` is incompatible with Visual Studio 2015. `absl::variant` should be used instead if targeting Visual Studio 2015. |
+| HAVE_TLD      | Use ETW/TraceLogging Dynamic protocol. This is the default implementation compatible with existing C# "listeners" / "decoders" of ETW events. This option requires an additional optional Microsoft MIT-licensed `TraceLoggingDynamic.h` header. |
+| HAVE_CSTRING_TYPE   | Allow passing C-string type `const char *` to API calls. In several scenarios (e.g. integration with C code) it is more performant to construct `nostd::string_view` from original C-string instead of constructing it from `std::string` copy of the C-string, thus avoiding unnecessary `memcpy`. |
 
 ## Debugging
 
@@ -161,7 +161,7 @@ exporter. For example, the version included in `third_party/nlohmann-json` direc
 used.
 
 There is currently **no built-in decoder available** for this format. However, there is ongoing
-effort to include the ETW/MsgPack encoder in [Azure/diagnostics-eventflow](https://github.com/Azure/diagnostics-eventflow)
+effort to include the ETW/MsgPack decoder in [Azure/diagnostics-eventflow](https://github.com/Azure/diagnostics-eventflow)
 project, which may be used as a side-car listener to forward incoming ETW/MsgPack events to many
 other destinations, such as:
 
