@@ -579,7 +579,7 @@ public:
       writeResponse = tld::WriteEvent(providerData.providerHandle, eventDescriptor,
                                       providerData.providerMetaVector.data(), byteVector.data(), 3,
                                       pDataDescriptors);
-    };
+    }
 
     // Event is larger than ETW max sized of 64KB
     if (writeResponse == HRESULT_FROM_WIN32(ERROR_ARITHMETIC_OVERFLOW))
