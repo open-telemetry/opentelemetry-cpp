@@ -16,7 +16,7 @@ namespace trace
 namespace propagation
 {
 
-/* Stores the singlaton TextMapPropagator */
+/* Stores the singleton TextMapPropagator */
 
 template <typename T>
 class GlobalPropagator
