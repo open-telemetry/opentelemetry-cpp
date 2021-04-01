@@ -25,9 +25,9 @@
 #else
 
 /**
- 
+
   List of configurable Field Name constants:
-  
+
    Version                      - Schema version (optional for ETW exporter).
    _name                        - Built-in ETW name at envelope level (dedicated ETW field).
    _time                        - Built-in ETW time at envelope level (dedicated ETW field).
@@ -38,9 +38,9 @@
    Name                         - OT Span name in ETW 'Payload["Name"]'
    ParentId                     - OT Span parentId
    Links                        - OT Span links array
- 
+
   Other standard fields (reserved names) that may be appended by ETW channel:
- 
+
    Level                        - a 1-byte integer that enables filtering based on the severity or verbosity of events
    ProviderGuid                 - ETW Provider Guid
    ProviderName                 - ETW Provider Name
@@ -53,7 +53,7 @@
    RelatedActivityId            - RelatedActivityId for EventSource parenting (parent event)
    Pid                          - Process Id
    Tid                          - Thread Id
- 
+
   Example "Span" as shown in Visual Studio "Diagnostic Events" view. EventName="Span":
 
     {

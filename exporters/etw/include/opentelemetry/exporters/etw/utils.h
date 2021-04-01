@@ -287,7 +287,6 @@ std::string formatUtcTimestampMsAsISO8601(int64_t timestampMs)
   return buf;
 }
 
-
 };  // namespace utils
 
 OPENTELEMETRY_END_NAMESPACE

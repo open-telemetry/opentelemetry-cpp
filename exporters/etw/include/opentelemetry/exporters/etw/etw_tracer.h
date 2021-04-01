@@ -110,17 +110,20 @@ static inline void GetOption(const TracerProviderOptions &options,
 class Span;
 
 /**
- * @brief Template that allows to instantiate new Span object for header-only forward-declared ETW::Span type
- * 
+ * @brief Template that allows to instantiate new Span object for header-only forward-declared
+ * ETW::Span type
+ *
  * @tparam SpanType     Expected to be ETW::Span
  * @tparam TracerType   expected to be ETW::Tracer
  * @param objPtr        Pointer to parent
  * @param name          Span Name
  * @param options       Span Options
  * @return              Span instance
-*/
+ */
 template <class SpanType, class TracerType>
-SpanType* new_span(TracerType *objPtr, nostd::string_view name, const trace::StartSpanOptions &options)
+SpanType *new_span(TracerType *objPtr,
+                   nostd::string_view name,
+                   const trace::StartSpanOptions &options)
 {
   return new (std::nothrow) SpanType{*objPtr, name, options};
 }
@@ -130,7 +133,7 @@ SpanType* new_span(TracerType *objPtr, nostd::string_view name, const trace::Sta
  * @tparam SpanType     Expected to be ETW::Span
  * @param ptr           Pointer to ETW::Span
  * @return              Smart shared pointer to `trace::Span`
-*/
+ */
 template <class SpanType>
 nostd::shared_ptr<trace::Span> to_span_ptr(SpanType *ptr)
 {
@@ -157,7 +160,7 @@ std::string GetName(T &t)
  * @tparam T            ETW::Span
  * @param t             instance of ETW::Span
  * @return              Span Start timestamp
-*/
+ */
 template <class T>
 core::SystemTimestamp GetStartTime(T &t)
 {
@@ -169,7 +172,7 @@ core::SystemTimestamp GetStartTime(T &t)
  * @tparam T           ETW::Span
  * @param t            instance of ETW::Span
  * @return             Span Stop timestamp
-*/
+ */
 template <class T>
 core::SystemTimestamp GetEndTime(T &t)
 {
@@ -183,9 +186,9 @@ class Properties;
  * @tparam T           ETW::Span
  * @param instance     instance of ETW::Span
  * @param t            Properties to store as Attributes
-*/
+ */
 template <class T>
-void SetSpanAttributes(T& instance, Properties &t)
+void SetSpanAttributes(T &instance, Properties &t)
 {
   instance.SetAttributes(t);
 }
@@ -194,10 +197,10 @@ void SetSpanAttributes(T& instance, Properties &t)
  * @brief Utility template to obtain Span Attributes
  * @tparam T           ETW::Span
  * @param instance     instance of ETW::Span
- * @return             ref to Span Attributes 
-*/
+ * @return             ref to Span Attributes
+ */
 template <class T>
-Properties& GetSpanAttributes(T &instance)
+Properties &GetSpanAttributes(T &instance)
 {
   return instance.GetAttributes();
 }
@@ -389,8 +392,11 @@ class Tracer : public trace::Tracer
       // local time, but rather UTC time (Z=0).
       std::chrono::system_clock::time_point startTime = GetStartTime(currentSpan);
       std::chrono::system_clock::time_point endTime   = GetEndTime(currentSpan);
-      int64_t startTimeMs = std::chrono::duration_cast<std::chrono::milliseconds>(startTime.time_since_epoch()).count();
-      int64_t endTimeMs = std::chrono::duration_cast<std::chrono::milliseconds>(endTime.time_since_epoch()).count();
+      int64_t startTimeMs =
+          std::chrono::duration_cast<std::chrono::milliseconds>(startTime.time_since_epoch())
+              .count();
+      int64_t endTimeMs =
+          std::chrono::duration_cast<std::chrono::milliseconds>(endTime.time_since_epoch()).count();
 
       // It may be more optimal to enable passing timestamps as UTC milliseconds
       // since Unix epoch instead of string, but that implies additional tooling
@@ -398,7 +404,7 @@ class Tracer : public trace::Tracer
       evt[ETW_FIELD_STARTTIME] = utils::formatUtcTimestampMsAsISO8601(startTimeMs);
 
       // Duration of Span in milliseconds
-      evt[ETW_FIELD_DURATION]  = endTimeMs - startTimeMs;
+      evt[ETW_FIELD_DURATION] = endTimeMs - startTimeMs;
       etwProvider().write(provHandle, evt, ActivityIdPtr, RelatedActivityIdPtr, 0, encoding);
     }
 
@@ -520,7 +526,7 @@ public:
 
     // This template pattern allows us to forward-declare the ETW::Span,
     // create an instance of it, then assign it to tracer::Span result.
-    auto currentSpan = new_span<Span, Tracer>(this, name, options);
+    auto currentSpan                      = new_span<Span, Tracer>(this, name, options);
     nostd::shared_ptr<trace::Span> result = to_span_ptr<Span>(currentSpan);
 
     auto spanContext = result->GetContext();
@@ -721,12 +727,11 @@ public:
 class Span : public trace::Span
 {
 protected:
-
   friend class Tracer;
 
   /**
    * @brief Span properties are attached on "Span" event on end of Span.
-  */
+   */
   Properties attributes_;
 
   core::SystemTimestamp start_time_;
@@ -783,11 +788,10 @@ protected:
   }
 
 public:
-
   /**
    * @brief Get start time of this Span.
-   * @return 
-  */
+   * @return
+   */
   core::SystemTimestamp GetStartTime() { return start_time_; }
 
   /**
@@ -874,21 +878,15 @@ public:
     UNREFERENCED_PARAMETER(description);
   }
 
-  void SetAttributes(Properties attributes)
-  {
-      attributes_ = attributes;
-  }
+  void SetAttributes(Properties attributes) { attributes_ = attributes; }
 
   /**
    * @brief Obtain span attributes specified at Span start.
    * NOTE: please consider that this method is NOT thread-safe.
-   * 
+   *
    * @return ref to Properties collection
-  */
-  Properties& GetAttributes()
-  {
-      return attributes_;
-  }
+   */
+  Properties &GetAttributes() { return attributes_; }
 
   /**
    * @brief Sets an attribute on the Span. If the Span previously contained a mapping
