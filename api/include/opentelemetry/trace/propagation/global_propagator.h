@@ -37,8 +37,8 @@ public:
 private:
   static nostd::shared_ptr<TextMapPropagator<T>> &GetPropagator() noexcept
   {
-    static nostd::shared_ptr<TextMapPropagator<T>> propagators(new NoOpPropagator<T>());
-    return propagators;
+    static nostd::shared_ptr<TextMapPropagator<T>> propagator(new NoOpPropagator<T>());
+    return propagator;
   }
 
   static common::SpinLockMutex &GetLock() noexcept
