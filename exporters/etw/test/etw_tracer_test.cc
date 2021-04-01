@@ -147,6 +147,7 @@ TEST(ETWTracer, TracerCheckMinDecoration)
       {"enableTraceId", false},
       {"enableSpanId", false},
       {"enableActivityId", false},
+      {"enableActivityTracking", true},
       {"enableRelatedActivityId", false},
       {"enableAutoParent", false}
   });

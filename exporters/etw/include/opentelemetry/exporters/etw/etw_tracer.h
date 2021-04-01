@@ -75,6 +75,7 @@ typedef struct
   bool enableTraceId;            // Set `TraceId` on ETW events
   bool enableSpanId;             // Set `SpanId` on ETW events
   bool enableActivityId;         // Assign `SpanId` to `ActivityId`
+  bool enableActivityTracking;   // Emit TraceLogging events for Span/Start and Span/Stop
   bool enableRelatedActivityId;  // Assign parent `SpanId` to `RelatedActivityId`
   bool enableAutoParent;         // Start new spans as children of current active span
 } TracerProviderConfiguration;
@@ -107,13 +108,42 @@ static inline void GetOption(const TracerProviderOptions &options,
 }
 
 class Span;
+
+/**
+ * @brief Template that allows to instantiate new Span object for header-only forward-declared ETW::Span type
+ * 
+ * @tparam SpanType     Expected to be ETW::Span
+ * @tparam TracerType   expected to be ETW::Tracer
+ * @param objPtr        Pointer to parent
+ * @param name          Span Name
+ * @param options       Span Options
+ * @return              Span instance
+*/
+template <class SpanType, class TracerType>
+SpanType* new_span(TracerType *objPtr, nostd::string_view name, const trace::StartSpanOptions &options)
+{
+  return new (std::nothrow) SpanType{*objPtr, name, options};
+}
+
+/**
+ * @brief Template that allows to convert ETW::Span pointer to smart shared pointer to `trace::Span`
+ * @tparam SpanType     Expected to be ETW::Span
+ * @param ptr           Pointer to ETW::Span
+ * @return              Smart shared pointer to `trace::Span`
+*/
+template <class SpanType>
+nostd::shared_ptr<trace::Span> to_span_ptr(SpanType *ptr)
+{
+  return nostd::shared_ptr<trace::Span>{ptr};
+}
+
 class TracerProvider;
 
 /**
- * @brief Utility template for Span.GetName()
- * @tparam T
- * @param t
- * @return
+ * @brief Utility template for obtaining Span Name
+ * @tparam T            ETW::Span
+ * @param t             instance of ETW::Span
+ * @return              Span Name
  */
 template <class T>
 std::string GetName(T &t)
@@ -123,7 +153,57 @@ std::string GetName(T &t)
 }
 
 /**
- * @brief Utility template for forward-declaration of ETW::TracerProvider._config
+ * @brief Utility template to obtain Span start time
+ * @tparam T            ETW::Span
+ * @param t             instance of ETW::Span
+ * @return              Span Start timestamp
+*/
+template <class T>
+core::SystemTimestamp GetStartTime(T &t)
+{
+  return t.GetStartTime();
+}
+
+/**
+ * @brief Utility template to obtain Span end time
+ * @tparam T           ETW::Span
+ * @param t            instance of ETW::Span
+ * @return             Span Stop timestamp
+*/
+template <class T>
+core::SystemTimestamp GetEndTime(T &t)
+{
+  return t.GetEndTime();
+}
+
+class Properties;
+
+/**
+ * @brief Utility template to store Attributes on Span
+ * @tparam T           ETW::Span
+ * @param instance     instance of ETW::Span
+ * @param t            Properties to store as Attributes
+*/
+template <class T>
+void SetSpanAttributes(T& instance, Properties &t)
+{
+  instance.SetAttributes(t);
+}
+
+/**
+ * @brief Utility template to obtain Span Attributes
+ * @tparam T           ETW::Span
+ * @param instance     instance of ETW::Span
+ * @return             ref to Span Attributes 
+*/
+template <class T>
+Properties& GetSpanAttributes(T &instance)
+{
+  return instance.GetAttributes();
+}
+
+/**
+ * @brief Utility template to obtain ETW::TracerProvider._config
  *
  * @tparam T    ETW::TracerProvider
  * @param t     ETW::TracerProvider ref
@@ -247,7 +327,9 @@ class Tracer : public trace::Tracer
     const trace::Span &spanBase = reinterpret_cast<const trace::Span &>(span);
     auto spanContext            = spanBase.GetContext();
 
-    Properties evt;
+    // Populate Span with presaved attributes
+    Span &currentSpan   = const_cast<Span &>(span);
+    Properties evt      = GetSpanAttributes(currentSpan);
     evt[ETW_FIELD_NAME] = GetName(span);
 
     if (cfg.enableSpanId)
@@ -285,9 +367,40 @@ class Tracer : public trace::Tracer
       }
     }
 
-    // TODO: check what EndSpanOptions should be supported for this exporter.
-    // The only option available currently (end_steady_time) does not apply.
-    etwProvider().write(provHandle, evt, ActivityIdPtr, RelatedActivityIdPtr, 2, encoding);
+    if (cfg.enableActivityTracking)
+    {
+      // TODO: check what EndSpanOptions should be supported for this exporter.
+      // The only option available currently (end_steady_time) does not apply.
+      //
+      // This event on Span Stop enables generation of "non-transactional"
+      // OpCode=Stop in alignment with TraceLogging Activity "EventSource"
+      // spec.
+      etwProvider().write(provHandle, evt, ActivityIdPtr, RelatedActivityIdPtr, 2, encoding);
+    }
+
+    {
+      // Now since the span has ended, we need to emit the "Span" event that
+      // contains the entire span information, attributes, time, etc. on it.
+      evt[ETW_FIELD_NAME]         = ETW_VALUE_SPAN;
+      evt[ETW_FIELD_PAYLOAD_NAME] = GetName(span);
+
+      // Add timing details in ISO8601 format, which adequately represents
+      // the actual time, taking Timezone into consideration. This is NOT
+      // local time, but rather UTC time (Z=0).
+      std::chrono::system_clock::time_point startTime = GetStartTime(currentSpan);
+      std::chrono::system_clock::time_point endTime   = GetEndTime(currentSpan);
+      int64_t startTimeMs = std::chrono::duration_cast<std::chrono::milliseconds>(startTime.time_since_epoch()).count();
+      int64_t endTimeMs = std::chrono::duration_cast<std::chrono::milliseconds>(endTime.time_since_epoch()).count();
+
+      // It may be more optimal to enable passing timestamps as UTC milliseconds
+      // since Unix epoch instead of string, but that implies additional tooling
+      // is needed to convert it, rendering it NOT human-readable.
+      evt[ETW_FIELD_STARTTIME] = utils::formatUtcTimestampMsAsISO8601(startTimeMs);
+
+      // Duration of Span in milliseconds
+      evt[ETW_FIELD_DURATION]  = endTimeMs - startTimeMs;
+      etwProvider().write(provHandle, evt, ActivityIdPtr, RelatedActivityIdPtr, 0, encoding);
+    }
 
     {
       // Atomically remove the span from list of spans
@@ -405,8 +518,12 @@ public:
       }
     }
 
-    nostd::shared_ptr<trace::Span> result = trace::to_span_ptr<Span, Tracer>(this, name, options);
-    auto spanContext                      = result->GetContext();
+    // This template pattern allows us to forward-declare the ETW::Span,
+    // create an instance of it, then assign it to tracer::Span result.
+    auto currentSpan = new_span<Span, Tracer>(this, name, options);
+    nostd::shared_ptr<trace::Span> result = to_span_ptr<Span>(currentSpan);
+
+    auto spanContext = result->GetContext();
 
     // Decorate with additional standard fields
     std::string eventName = name.data();
@@ -445,11 +562,17 @@ public:
     // Links
     DecorateLinks(evt, links);
 
-    // TODO: add support for options that are presently ignored :
-    // - options.kind
-    // - options.start_steady_time
-    // - options.start_system_time
-    etwProvider().write(provHandle, evt, ActivityIdPtr, RelatedActivityIdPtr, 1, encoding);
+    // Remember Span attributes to be passed down to ETW on Span end
+    SetSpanAttributes(*currentSpan, evt);
+
+    if (cfg.enableActivityTracking)
+    {
+      // TODO: add support for options that are presently ignored :
+      // - options.kind
+      // - options.start_steady_time
+      // - options.start_system_time
+      etwProvider().write(provHandle, evt, ActivityIdPtr, RelatedActivityIdPtr, 1, encoding);
+    };
 
     {
       const std::lock_guard<std::mutex> lock(scopes_mutex_);
@@ -598,6 +721,17 @@ public:
 class Span : public trace::Span
 {
 protected:
+
+  friend class Tracer;
+
+  /**
+   * @brief Span properties are attached on "Span" event on end of Span.
+  */
+  Properties attributes_;
+
+  core::SystemTimestamp start_time_;
+  core::SystemTimestamp end_time_;
+
   /**
    * @brief Owner Tracer of this Span
    */
@@ -649,6 +783,19 @@ protected:
   }
 
 public:
+
+  /**
+   * @brief Get start time of this Span.
+   * @return 
+  */
+  core::SystemTimestamp GetStartTime() { return start_time_; }
+
+  /**
+   * @brief Get end time of this Span.
+   * @return
+   */
+  core::SystemTimestamp GetEndTime() { return end_time_; }
+
   /**
    * @brief Get Span Name.
    * @return Span Name.
@@ -667,7 +814,11 @@ public:
        nostd::string_view name,
        const trace::StartSpanOptions &options,
        Span *parent = nullptr) noexcept
-      : trace::Span(), owner_(owner), parent_(parent), context_(CreateContext())
+      : trace::Span(),
+        owner_(owner),
+        parent_(parent),
+        context_(CreateContext()),
+        start_time_(std::chrono::system_clock::now())
   {
     name_ = name;
     UNREFERENCED_PARAMETER(options);
@@ -721,7 +872,23 @@ public:
     // TODO: not implemented
     UNREFERENCED_PARAMETER(code);
     UNREFERENCED_PARAMETER(description);
-  };
+  }
+
+  void SetAttributes(Properties attributes)
+  {
+      attributes_ = attributes;
+  }
+
+  /**
+   * @brief Obtain span attributes specified at Span start.
+   * NOTE: please consider that this method is NOT thread-safe.
+   * 
+   * @return ref to Properties collection
+  */
+  Properties& GetAttributes()
+  {
+      return attributes_;
+  }
 
   /**
    * @brief Sets an attribute on the Span. If the Span previously contained a mapping
@@ -760,6 +927,8 @@ public:
    */
   void End(const trace::EndSpanOptions &options = {}) noexcept override
   {
+    end_time_ = std::chrono::system_clock::now();
+
     if (!has_ended_.exchange(true))
     {
       owner_.EndSpan(*this, parent_, options);
@@ -822,6 +991,10 @@ public:
     // https://docs.microsoft.com/en-us/uwp/api/windows.foundation.diagnostics.loggingoptions.relatedactivityid
     // https://docs.microsoft.com/en-us/windows/win32/api/evntprov/nf-evntprov-eventwritetransfer
 
+    // Emit separate events compatible with TraceLogging Activity/Start and Activity/Stop
+    // format for every Span emitted.
+    GetOption(options, "enableActivityTracking", config_.enableActivityTracking, false);
+
     // Map current `SpanId` to ActivityId - GUID that uniquely identifies this activity. If NULL,
     // ETW gets the identifier from the thread local storage. For details on getting this
     // identifier, see EventActivityIdControl.
@@ -840,6 +1013,7 @@ public:
     config_.enableTraceId           = true;
     config_.enableSpanId            = true;
     config_.enableActivityId        = false;
+    config_.enableActivityTracking  = false;
     config_.enableRelatedActivityId = false;
     config_.enableAutoParent        = false;
   }
