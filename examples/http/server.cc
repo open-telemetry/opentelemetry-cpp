@@ -50,7 +50,6 @@ public:
 int main(int argc, char *argv[])
 {
   initTracer();
-  uint16_t port;
 
   // The port the validation service listens to can be specified via the command line.
   if (argc > 1)
