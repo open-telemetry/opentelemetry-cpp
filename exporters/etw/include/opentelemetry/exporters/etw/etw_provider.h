@@ -286,7 +286,7 @@ public:
     nlohmann::json jObj =
     {
       { ETW_FIELD_NAME, eventName },
-      { ETW_FIELD_KIND, Opcode }
+      { ETW_FIELD_OPCODE, Opcode }
     };
     /* clang-format on */
 
