@@ -67,24 +67,23 @@ public:
   static nostd::shared_ptr<TraceState> FromHeader(nostd::string_view header)
   {
 
-    size_t cnt = 0;
-    common::KeyValueStringIterator kv_str_itr(header);
+    common::KeyValueStringTokenizer kv_str_tokenizer(header);
+    size_t cnt = kv_str_tokenizer.NumTokens();  // upper bound on number of kv pairs
+    if (cnt > kMaxKeyValuePairs)
+    {
+      cnt = kMaxKeyValuePairs;
+    }
+
+    nostd::shared_ptr<TraceState> ts(new TraceState(cnt));
     bool kv_valid;
     nostd::string_view key, value;
-    while (kv_str_itr.next(kv_valid, key, value) && cnt < kMaxKeyValuePairs)
+    while (kv_str_tokenizer.next(kv_valid, key, value) && ts->kv_properties_->Size() < cnt)
     {
       if (kv_valid == false)
       {
         return GetDefault();
       }
 
-      ++cnt;
-    }
-
-    nostd::shared_ptr<TraceState> ts(new TraceState(cnt));
-    kv_str_itr.reset();
-    while (kv_str_itr.next(kv_valid, key, value) && ts->kv_properties_->Size() < cnt)
-    {
       if (!IsValidKey(key) || !IsValidValue(value))
       {
         // invalid header. return empty TraceState

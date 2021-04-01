@@ -67,66 +67,114 @@ TEST(EntryTest, SetValue)
   EXPECT_EQ(new_val, e.GetValue());
 }
 
-// ------------------------- KeyValueStringIterator tests ---------------------------------
+// ------------------------- KeyValueStringTokenizer tests ---------------------------------
 
-using opentelemetry::common::KeyValueStringIterator;
+using opentelemetry::common::KeyValueStringTokenizer;
+using opentelemetry::common::KeyValueStringTokenizerOptions;
 
-TEST(KVStringIter, SinglePair)
+TEST(KVStringTokenizer, SinglePair)
 {
   bool valid_kv;
   nostd::string_view key, value;
   opentelemetry::nostd::string_view str = "k1=v1";
-  KeyValueStringIterator itr(str, ',', '=');
-  EXPECT_TRUE(itr.next(valid_kv, key, value));
+  KeyValueStringTokenizerOptions opts;
+  KeyValueStringTokenizer tk(str, opts);
+  EXPECT_TRUE(tk.next(valid_kv, key, value));
   EXPECT_TRUE(valid_kv);
   EXPECT_EQ(key, "k1");
   EXPECT_EQ(value, "v1");
-  EXPECT_FALSE(itr.next(valid_kv, key, value));
+  EXPECT_FALSE(tk.next(valid_kv, key, value));
 }
 
-TEST(KVStringIter, ValidPairsWithEmptyEntries)
+TEST(KVStringTokenizer, AcceptEmptyEntries)
+{
+  bool valid_kv;
+  nostd::string_view key, value;
+  opentelemetry::nostd::string_view str = ":k1=v1::k2=v2: ";
+  KeyValueStringTokenizerOptions opts;
+  opts.member_separator     = ':';
+  opts.ignore_empty_members = false;
+
+  KeyValueStringTokenizer tk(str, opts);
+  EXPECT_TRUE(tk.next(valid_kv, key, value));  // empty pair
+  EXPECT_TRUE(tk.next(valid_kv, key, value));
+  EXPECT_TRUE(valid_kv);
+  EXPECT_EQ(key, "k1");
+  EXPECT_EQ(value, "v1");
+  EXPECT_TRUE(tk.next(valid_kv, key, value));  // empty pair
+  EXPECT_EQ(key, "");
+  EXPECT_EQ(value, "");
+  EXPECT_TRUE(tk.next(valid_kv, key, value));
+  EXPECT_TRUE(tk.next(valid_kv, key, value));  // empty pair
+  EXPECT_FALSE(tk.next(valid_kv, key, value));
+}
+
+TEST(KVStringTokenizer, ValidPairsWithEmptyEntries)
 {
   opentelemetry::nostd::string_view str = "k1:v1===k2:v2==";
   bool valid_kv;
   nostd::string_view key, value;
-  KeyValueStringIterator itr(str, '=', ':');
-  EXPECT_TRUE(itr.next(valid_kv, key, value));
+  KeyValueStringTokenizerOptions opts;
+  opts.member_separator    = '=';
+  opts.key_value_separator = ':';
+
+  KeyValueStringTokenizer tk(str, opts);
+  EXPECT_TRUE(tk.next(valid_kv, key, value));
   EXPECT_TRUE(valid_kv);
   EXPECT_EQ(key, "k1");
   EXPECT_EQ(value, "v1");
 
-  EXPECT_TRUE(itr.next(valid_kv, key, value));
+  EXPECT_TRUE(tk.next(valid_kv, key, value));
   EXPECT_TRUE(valid_kv);
   EXPECT_EQ(key, "k2");
   EXPECT_EQ(value, "v2");
 
-  EXPECT_FALSE(itr.next(valid_kv, key, value));
+  EXPECT_FALSE(tk.next(valid_kv, key, value));
 }
 
-TEST(KVStringIter, InvalidPairs)
+TEST(KVStringTokenizer, InvalidPairs)
 {
   opentelemetry::nostd::string_view str = "k1=v1,invalid  ,,  k2=v2   ,invalid";
-  KeyValueStringIterator itr(str);
+  KeyValueStringTokenizer tk(str);
   bool valid_kv;
   nostd::string_view key, value;
-  EXPECT_TRUE(itr.next(valid_kv, key, value));
+  EXPECT_TRUE(tk.next(valid_kv, key, value));
 
   EXPECT_TRUE(valid_kv);
   EXPECT_EQ(key, "k1");
   EXPECT_EQ(value, "v1");
 
-  EXPECT_TRUE(itr.next(valid_kv, key, value));
+  EXPECT_TRUE(tk.next(valid_kv, key, value));
   EXPECT_FALSE(valid_kv);
 
-  EXPECT_TRUE(itr.next(valid_kv, key, value));
+  EXPECT_TRUE(tk.next(valid_kv, key, value));
   EXPECT_TRUE(valid_kv);
   EXPECT_EQ(key, "k2");
   EXPECT_EQ(value, "v2");
 
-  EXPECT_TRUE(itr.next(valid_kv, key, value));
+  EXPECT_TRUE(tk.next(valid_kv, key, value));
   EXPECT_FALSE(valid_kv);
 
-  EXPECT_FALSE(itr.next(valid_kv, key, value));
+  EXPECT_FALSE(tk.next(valid_kv, key, value));
+}
+
+TEST(KVStringTokenizer, NumTokens)
+{
+  struct
+  {
+    const char *input;
+    size_t expected;
+  } testcases[] = {{"k1=v1", 1},
+                   {" ", 1},
+                   {"k1=v1,k2=v2,k3=v3", 3},
+                   {"k1=v1,", 1},
+                   {"k1=v1,k2=v2,invalidmember", 3},
+                   {"", 0}};
+  for (auto &testcase : testcases)
+  {
+    KeyValueStringTokenizer tk(testcase.input);
+    EXPECT_EQ(tk.NumTokens(), testcase.expected);
+  }
 }
 
 //------------------------- KeyValueProperties tests ---------------------------------

@@ -27,17 +27,22 @@ OPENTELEMETRY_BEGIN_NAMESPACE
 namespace common
 {
 
-// Iterator for key-value headers
-class KeyValueStringIterator
+// Constructor parameter for KeyValueStringTokenizer
+struct KeyValueStringTokenizerOptions
+{
+  char member_separator     = ',';
+  char key_value_separator  = '=';
+  bool ignore_empty_members = true;
+};
+
+// Tokenizer for key-value headers
+class KeyValueStringTokenizer
 {
 public:
-  KeyValueStringIterator(nostd::string_view str,
-                         char member_separator    = ',',
-                         char key_value_separator = '=')
-      : str_(str),
-        member_separator_(member_separator),
-        key_value_separator_(key_value_separator),
-        index_(0)
+  KeyValueStringTokenizer(
+      nostd::string_view str,
+      const KeyValueStringTokenizerOptions &opts = KeyValueStringTokenizerOptions())
+      : str_(str), opts_(opts), index_(0)
   {}
 
   // Returns next key value in the string header
@@ -50,7 +55,7 @@ public:
     valid_kv = true;
     while (index_ < str_.size())
     {
-      size_t end = str_.find(member_separator_, index_);
+      size_t end = str_.find(opts_.member_separator, index_);
       if (end == std::string::npos)
       {
         end = str_.size() - 1;
@@ -63,13 +68,20 @@ public:
       auto list_member = StringUtil::Trim(str_, index_, end);
       if (list_member.size() == 0)
       {
-        // empty list member. Move to next entry. For both baggage and trace_state this is valid
-        // behaviour.
+        // empty list member
         index_ = end + 2;
-        continue;
+        if (opts_.ignore_empty_members)
+        {
+          continue;
+        }
+
+        valid_kv = true;
+        key      = "";
+        value    = "";
+        return true;
       }
 
-      auto key_end_pos = list_member.find(key_value_separator_);
+      auto key_end_pos = list_member.find(opts_.key_value_separator);
       if (key_end_pos == std::string::npos)
       {
         // invalid member
@@ -90,13 +102,31 @@ public:
     return false;
   }
 
+  // Returns total number of tokens in header string
+  size_t NumTokens() const noexcept
+  {
+    size_t cnt = 0, begin = 0;
+    while (begin < str_.size())
+    {
+      ++cnt;
+      size_t end = str_.find(opts_.member_separator, begin);
+      if (end == std::string::npos)
+      {
+        break;
+      }
+
+      begin = end + 1;
+    }
+
+    return cnt;
+  }
+
   // Resets the iterator
   void reset() noexcept { index_ = 0; }
 
 private:
   nostd::string_view str_;
-  const char member_separator_;
-  const char key_value_separator_;
+  KeyValueStringTokenizerOptions opts_;
   size_t index_;
 };
 
