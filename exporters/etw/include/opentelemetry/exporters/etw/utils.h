@@ -259,6 +259,35 @@ int64_t getUtcSystemTimeinTicks()
 #endif
 }
 
+std::string formatUtcTimestampMsAsISO8601(int64_t timestampMs)
+{
+  char buf[sizeof("YYYY-MM-DDTHH:MM:SS.sssZ") + 1] = {0};
+#ifdef _WIN32
+  __time64_t seconds = static_cast<__time64_t>(timestampMs / 1000);
+  int milliseconds   = static_cast<int>(timestampMs % 1000);
+  tm tm;
+  if (::_gmtime64_s(&tm, &seconds) != 0)
+  {
+    memset(&tm, 0, sizeof(tm));
+  }
+  ::_snprintf_s(buf, _TRUNCATE, "%04d-%02d-%02dT%02d:%02d:%02d.%03dZ", 1900 + tm.tm_year,
+                1 + tm.tm_mon, tm.tm_mday, tm.tm_hour, tm.tm_min, tm.tm_sec, milliseconds);
+#else
+  time_t seconds   = static_cast<time_t>(timestampMs / 1000);
+  int milliseconds = static_cast<int>(timestampMs % 1000);
+  tm tm;
+  bool valid = (gmtime_r(&seconds, &tm) != NULL);
+  if (!valid)
+  {
+    memset(&tm, 0, sizeof(tm));
+  }
+  (void)snprintf(buf, sizeof(buf), "%04d-%02d-%02dT%02d:%02d:%02d.%03dZ", 1900 + tm.tm_year,
+                 1 + tm.tm_mon, tm.tm_mday, tm.tm_hour, tm.tm_min, tm.tm_sec, milliseconds);
+#endif
+  return buf;
+}
+
+
 };  // namespace utils
 
 OPENTELEMETRY_END_NAMESPACE
