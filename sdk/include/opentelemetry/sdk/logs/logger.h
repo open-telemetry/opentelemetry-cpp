@@ -70,12 +70,12 @@ public:
            core::SystemTimestamp timestamp) noexcept override;
 
 private:
+  // The name of this logger
+  std::string logger_name_;
+
   // The logger provider of this Logger. Uses a weak_ptr to avoid cyclic dependency issues the with
   // logger provider
   std::weak_ptr<LoggerProvider> logger_provider_;
-
-  // The name of this logger
-  std::string logger_name_;
 };
 
 }  // namespace logs

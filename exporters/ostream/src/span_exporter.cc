@@ -69,10 +69,10 @@ sdktrace::ExportResult OStreamSpanExporter::Export(
             << "\n  duration      : " << span->GetDuration().count()
             << "\n  description   : " << span->GetDescription()
             << "\n  span kind     : " << span->GetSpanKind()
-            << "\n  status        : " << statusMap[int(span->GetStatus())]
-            << "\n  attributes    : ";
+            << "\n  status        : " << statusMap[int(span->GetStatus())] << "\n  attributes    : "
+            << "\n";
       printAttributes(span->GetAttributes());
-      sout_ << "\n}\n";
+      sout_ << "}\n";
     }
   }
 

@@ -1,7 +1,9 @@
 add_library(
   opentelemetry_zpages
   tracez_processor.cc
+  tracez_shared_data.cc
   tracez_data_aggregator.cc
+  ../../include/opentelemetry/ext/zpages/tracez_shared_data.h
   ../../include/opentelemetry/ext/zpages/tracez_processor.h
   ../../include/opentelemetry/ext/zpages/tracez_data_aggregator.h
   ../../include/opentelemetry/ext/zpages/tracez_http_server.h)

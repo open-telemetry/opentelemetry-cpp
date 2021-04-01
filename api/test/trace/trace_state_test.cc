@@ -63,8 +63,8 @@ TEST(EntryTest, SetValue)
 
 std::string create_ts_return_header(std::string header)
 {
-  TraceState ts = TraceState::FromHeader(header);
-  return ts.ToHeader();
+  auto ts = TraceState::FromHeader(header);
+  return ts->ToHeader();
 }
 
 std::string header_with_max_members()
@@ -106,7 +106,7 @@ TEST(TraceStateTest, ValidateHeaderParsing)
                    {max_trace_state_header.data(), max_trace_state_header.data()}};
   for (auto &testcase : testcases)
   {
-    EXPECT_EQ(TraceState::FromHeader(testcase.input).ToHeader(), testcase.expected);
+    EXPECT_EQ(TraceState::FromHeader(testcase.input)->ToHeader(), testcase.expected);
   }
 }
 
@@ -114,60 +114,60 @@ TEST(TraceStateTest, TraceStateGet)
 {
 
   std::string trace_state_header = header_with_max_members();
-  TraceState ts                  = TraceState::FromHeader(trace_state_header);
+  auto ts                        = TraceState::FromHeader(trace_state_header);
 
-  EXPECT_EQ(ts.Get("key0"), "value0");
-  EXPECT_EQ(ts.Get("key16"), "value16");
-  EXPECT_EQ(ts.Get("key31"), "value31");
-  EXPECT_EQ(ts.Get("key32"), "");  // key not found
+  EXPECT_EQ(ts->Get("key0"), "value0");
+  EXPECT_EQ(ts->Get("key16"), "value16");
+  EXPECT_EQ(ts->Get("key31"), "value31");
+  EXPECT_EQ(ts->Get("key32"), "");  // key not found
 }
 
 TEST(TraceStateTest, TraceStateSet)
 {
   std::string trace_state_header = "k1=v1,k2=v2";
   auto ts1                       = TraceState::FromHeader(trace_state_header);
-  auto ts1_new                   = ts1.Set("k3", "v3");
-  EXPECT_EQ(ts1_new.ToHeader(), "k3=v3,k1=v1,k2=v2");
+  auto ts1_new                   = ts1->Set("k3", "v3");
+  EXPECT_EQ(ts1_new->ToHeader(), "k3=v3,k1=v1,k2=v2");
 
   trace_state_header = header_with_max_members();
   auto ts2           = TraceState::FromHeader(trace_state_header);
   auto ts2_new =
-      ts2.Set("n_k1", "n_v1");  // adding to max list, should return copy of existing list
-  EXPECT_EQ(ts2_new.ToHeader(), trace_state_header);
+      ts2->Set("n_k1", "n_v1");  // adding to max list, should return copy of existing list
+  EXPECT_EQ(ts2_new->ToHeader(), trace_state_header);
 
   trace_state_header = "k1=v1,k2=v2";
   auto ts3           = TraceState::FromHeader(trace_state_header);
-  auto ts3_new       = ts3.Set("*n_k1", "n_v1");  // adding invalid key, should return empty
-  EXPECT_EQ(ts3_new.ToHeader(), "");
+  auto ts3_new       = ts3->Set("*n_k1", "n_v1");  // adding invalid key, should return empty
+  EXPECT_EQ(ts3_new->ToHeader(), "");
 }
 
 TEST(TraceStateTest, TraceStateDelete)
 {
   std::string trace_state_header = "k1=v1,k2=v2,k3=v3";
   auto ts1                       = TraceState::FromHeader(trace_state_header);
-  auto ts1_new                   = ts1.Delete(std::string("k1"));
-  EXPECT_EQ(ts1_new.ToHeader(), "k2=v2,k3=v3");
+  auto ts1_new                   = ts1->Delete(std::string("k1"));
+  EXPECT_EQ(ts1_new->ToHeader(), "k2=v2,k3=v3");
 
   trace_state_header = "k1=v1";  // single list member
   auto ts2           = TraceState::FromHeader(trace_state_header);
-  auto ts2_new       = ts2.Delete(std::string("k1"));
-  EXPECT_EQ(ts2_new.ToHeader(), "");
+  auto ts2_new       = ts2->Delete(std::string("k1"));
+  EXPECT_EQ(ts2_new->ToHeader(), "");
 
   trace_state_header = "k1=v1";  // single list member, delete invalid entry
   auto ts3           = TraceState::FromHeader(trace_state_header);
-  auto ts3_new       = ts3.Delete(std::string("InvalidKey"));
-  EXPECT_EQ(ts3_new.ToHeader(), "");
+  auto ts3_new       = ts3->Delete(std::string("InvalidKey"));
+  EXPECT_EQ(ts3_new->ToHeader(), "");
 }
 
 TEST(TraceStateTest, Empty)
 {
   std::string trace_state_header = "";
   auto ts                        = TraceState::FromHeader(trace_state_header);
-  EXPECT_TRUE(ts.Empty());
+  EXPECT_TRUE(ts->Empty());
 
   trace_state_header = "k1=v1,k2=v2";
   auto ts1           = TraceState::FromHeader(trace_state_header);
-  EXPECT_FALSE(ts1.Empty());
+  EXPECT_FALSE(ts1->Empty());
 }
 
 TEST(TraceStateTest, Entries)
@@ -178,7 +178,7 @@ TEST(TraceStateTest, Entries)
   opentelemetry::nostd::string_view keys[kNumPairs]   = {"k1", "k2", "k3"};
   opentelemetry::nostd::string_view values[kNumPairs] = {"v1", "v2", "v3"};
 
-  opentelemetry::nostd::span<TraceState::Entry> entries = ts1.Entries();
+  opentelemetry::nostd::span<TraceState::Entry> entries = ts1->Entries();
   for (int i = 0; i < kNumPairs; i++)
   {
     EXPECT_EQ(entries[i].GetKey(), keys[i]);
@@ -218,11 +218,11 @@ TEST(TraceStateTest, MemorySafe)
   opentelemetry::nostd::string_view values[kNumPairs] = {
       val_string.substr(0, 10), val_string.substr(10, 10), val_string.substr(20, 10)};
 
-  auto ts1 = ts.Set(keys[2], values[2]);
-  auto ts2 = ts1.Set(keys[1], values[1]);
-  auto ts3 = ts2.Set(keys[0], values[0]);
+  auto ts1 = ts->Set(keys[2], values[2]);
+  auto ts2 = ts1->Set(keys[1], values[1]);
+  auto ts3 = ts2->Set(keys[0], values[0]);
 
-  opentelemetry::nostd::span<TraceState::Entry> entries = ts3.Entries();
+  opentelemetry::nostd::span<TraceState::Entry> entries = ts3->Entries();
   for (int i = 0; i < kNumPairs; i++)
   {
     EXPECT_EQ(entries[i].GetKey(), keys[i]);

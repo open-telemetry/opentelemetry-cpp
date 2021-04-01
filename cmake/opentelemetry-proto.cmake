@@ -1,4 +1,4 @@
-set(PROTO_PATH "${CMAKE_SOURCE_DIR}/third_party/opentelemetry-proto")
+set(PROTO_PATH "${CMAKE_CURRENT_SOURCE_DIR}/third_party/opentelemetry-proto")
 
 set(COMMON_PROTO "${PROTO_PATH}/opentelemetry/proto/common/v1/common.proto")
 set(RESOURCE_PROTO
@@ -110,7 +110,7 @@ add_custom_command(
   COMMAND
     ${PROTOBUF_PROTOC_EXECUTABLE} ARGS "--proto_path=${PROTO_PATH}"
     ${PROTOBUF_INCLUDE_FLAGS} "--cpp_out=${GENERATED_PROTOBUF_PATH}"
-    "--grpc_out=${GENERATED_PROTOBUF_PATH}"
+    "--grpc_out=generate_mock_code=true:${GENERATED_PROTOBUF_PATH}"
     --plugin=protoc-gen-grpc="${gRPC_CPP_PLUGIN_EXECUTABLE}" ${COMMON_PROTO}
     ${RESOURCE_PROTO} ${TRACE_PROTO} ${LOGS_PROTO} ${METRICS_PROTO}
     ${TRACE_SERVICE_PROTO} ${LOGS_SERVICE_PROTO} ${METRICS_SERVICE_PROTO})
