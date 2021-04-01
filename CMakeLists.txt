@@ -181,7 +181,7 @@ if(BUILD_TESTING)
   elseif(WIN32)
     # Make sure we are always bootsrapped with vcpkg on Windows
     find_package(GTest)
-    if(NOT GTEST_FOUND)
+    if(NOT (GTEST_FOUND OR GTest_FOUND))
       install_windows_deps()
       find_package(GTest REQUIRED)
     endif()
