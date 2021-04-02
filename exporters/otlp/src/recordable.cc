@@ -9,7 +9,6 @@ namespace otlp
 //
 // See `attribute_value.h` for details.
 // Expecting to remove the two feature gates for:
-// - HAVE_CSTRING_TYPE  - follows spec, but adding `const char *` on API surface.
 // - HAVE_SPAN_BYTE     - proposal for binary type or byte array (uint8_t[]).
 //
 #if defined(HAVE_SPAN_BYTE)
