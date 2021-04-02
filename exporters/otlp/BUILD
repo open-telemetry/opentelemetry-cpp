@@ -39,9 +39,9 @@ cc_library(
         "src/otlp_exporter.cc",
     ],
     hdrs = [
+        "include/opentelemetry/exporters/otlp/otlp_exporter.h",
         "include/opentelemetry/exporters/otlp/protobuf_include_prefix.h",
         "include/opentelemetry/exporters/otlp/protobuf_include_suffix.h",
-        "include/opentelemetry/exporters/otlp/otlp_exporter.h",
     ],
     strip_include_prefix = "include",
     deps = [
