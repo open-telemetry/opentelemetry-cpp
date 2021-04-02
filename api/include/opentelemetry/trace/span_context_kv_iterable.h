@@ -41,7 +41,7 @@ public:
       nostd::function_ref<bool(SpanContext, const opentelemetry::common::KeyValueIterable &)>
           callback) const noexcept override
   {
-    return false;
+    return true;
   }
 
   size_t size() const noexcept override { return 0; };
