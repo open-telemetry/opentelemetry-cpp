@@ -38,7 +38,6 @@ using OwnedAttributeValue = nostd::variant<bool,
                                            uint64_t,
                                            double,
                                            std::string,
-// TODO: should we have support for C-strings here or std::string is sufficient?
 #ifdef HAVE_SPAN_BYTE
                                            std::vector<uint8_t>,
 #endif
@@ -52,23 +51,23 @@ using OwnedAttributeValue = nostd::variant<bool,
 
 enum OwnedAttributeType
 {
-  TYPE_BOOL,
-  TYPE_INT,
-  TYPE_INT64,
-  TYPE_UINT,
-  TYPE_UINT64,
-  TYPE_DOUBLE,
-  TYPE_STRING,
+  kTypeBool,
+  kTypeInt,
+  kTypeInt64,
+  kTypeUInt,
+  kTypeUInt64,
+  kTypeDouble,
+  kTypeString,
 #ifdef HAVE_SPAN_BYTE
-  TYPE_SPAN_BYTE,
+  kTypeSpanByte,
 #endif
-  TYPE_SPAN_BOOL,
-  TYPE_SPAN_INT,
-  TYPE_SPAN_INT64,
-  TYPE_SPAN_UINT,
-  TYPE_SPAN_UINT64,
-  TYPE_SPAN_DOUBLE,
-  TYPE_SPAN_STRING
+  kTypeSpanBool,
+  kTypeSpanInt,
+  kTypeSpanInt64,
+  kTypeSpanUInt,
+  kTypeSpanUInt64,
+  kTypeSpanDouble,
+  kTypeSpanString
 };
 
 /**
