@@ -49,12 +49,12 @@ and emitting a span named `MySpan` with attributes on it, as well as `MyEvent` w
 #include "opentelemetry/exporters/etw/etw_tracer_exporter.h"
 
 using namespace OPENTELEMETRY_NAMESPACE;
-using namespace opentelemetry::exporter::ETW;
+using namespace opentelemetry::exporter::etw;
 
 // Supply unique instrumentation name (ETW Provider Name) here:
 std::string providerName = "OpenTelemetry-ETW-Provider";
 
-exporter::ETW::TracerProvider tp;
+exporter::etw::TracerProvider tp;
 
 int main(int argc, const char* argv[])
 {
