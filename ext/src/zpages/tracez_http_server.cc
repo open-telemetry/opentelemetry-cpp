@@ -121,25 +121,25 @@ json TracezHttpServer::GetAttributesJSON(
 
     switch (val.index())
     {
-      case OwnedAttributeType::TYPE_BOOL:
+      case OwnedAttributeType::kTypeBool:
         attributes_json[key] = opentelemetry::nostd::get<bool>(val);
         break;
-      case OwnedAttributeType::TYPE_INT:
+      case OwnedAttributeType::kTypeInt:
         attributes_json[key] = opentelemetry::nostd::get<int32_t>(val);
         break;
-      case OwnedAttributeType::TYPE_UINT:
+      case OwnedAttributeType::kTypeUInt:
         attributes_json[key] = opentelemetry::nostd::get<uint32_t>(val);
         break;
-      case OwnedAttributeType::TYPE_INT64:
+      case OwnedAttributeType::kTypeInt64:
         attributes_json[key] = opentelemetry::nostd::get<int64_t>(val);
         break;
-      case OwnedAttributeType::TYPE_UINT64:
+      case OwnedAttributeType::kTypeUInt64:
         attributes_json[key] = opentelemetry::nostd::get<uint64_t>(val);
         break;
-      case OwnedAttributeType::TYPE_DOUBLE:
+      case OwnedAttributeType::kTypeDouble:
         attributes_json[key] = opentelemetry::nostd::get<double>(val);
         break;
-      case OwnedAttributeType::TYPE_STRING:
+      case OwnedAttributeType::kTypeString:
         attributes_json[key] = opentelemetry::nostd::get<std::string>(val);
         break;
       // TODO: arrays support is not implemented
