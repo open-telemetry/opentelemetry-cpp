@@ -104,8 +104,6 @@ json TracezHttpServer::GetLatencySpansJSON(const std::string &name, int latency_
   return latency_json;
 }
 
-using OwnedAttributeType = opentelemetry::sdk::common::OwnedAttributeType;
-
 json TracezHttpServer::GetAttributesJSON(
     const opentelemetry::ext::zpages::ThreadsafeSpanData &sample)
 {
@@ -121,29 +119,35 @@ json TracezHttpServer::GetAttributesJSON(
 
     switch (val.index())
     {
-      case OwnedAttributeType::kTypeBool:
-        attributes_json[key] = opentelemetry::nostd::get<bool>(val);
+      case 0:
+        attributes_json[key] = opentelemetry::nostd::get<0>(val);
         break;
-      case OwnedAttributeType::kTypeInt:
-        attributes_json[key] = opentelemetry::nostd::get<int32_t>(val);
+      case 1:
+        attributes_json[key] = opentelemetry::nostd::get<1>(val);
         break;
-      case OwnedAttributeType::kTypeUInt:
-        attributes_json[key] = opentelemetry::nostd::get<uint32_t>(val);
+      case 2:
+        attributes_json[key] = opentelemetry::nostd::get<2>(val);
         break;
-      case OwnedAttributeType::kTypeInt64:
-        attributes_json[key] = opentelemetry::nostd::get<int64_t>(val);
+      case 3:
+        attributes_json[key] = opentelemetry::nostd::get<3>(val);
         break;
-      case OwnedAttributeType::kTypeUInt64:
-        attributes_json[key] = opentelemetry::nostd::get<uint64_t>(val);
+      case 4:
+        attributes_json[key] = opentelemetry::nostd::get<4>(val);
         break;
-      case OwnedAttributeType::kTypeDouble:
-        attributes_json[key] = opentelemetry::nostd::get<double>(val);
+      case 5:
+        attributes_json[key] = opentelemetry::nostd::get<5>(val);
         break;
-      case OwnedAttributeType::kTypeString:
-        attributes_json[key] = opentelemetry::nostd::get<std::string>(val);
+      case 6:
+        attributes_json[key] = opentelemetry::nostd::get<6>(val);
         break;
-      // TODO: arrays support is not implemented
-      default:
+      case 7:
+        attributes_json[key] = opentelemetry::nostd::get<7>(val);
+        break;
+      case 8:
+        attributes_json[key] = opentelemetry::nostd::get<8>(val);
+        break;
+      case 9:
+        attributes_json[key] = opentelemetry::nostd::get<9>(val);
         break;
     }
   }
