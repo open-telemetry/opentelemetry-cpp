@@ -12,11 +12,7 @@ namespace otlp
 // - HAVE_CSTRING_TYPE  - follows spec, but adding `const char *` on API surface.
 // - HAVE_SPAN_BYTE     - proposal for binary type or byte array (uint8_t[]).
 //
-#if defined(HAVE_CSTRING_TYPE) && defined(HAVE_SPAN_BYTE)
-const int kAttributeValueSize = 16;
-#elif defined(HAVE_CSTRING_TYPE)
-const int kAttributeValueSize = 15;
-#elif defined(HAVE_SPAN_BYTE)
+#if defined(HAVE_SPAN_BYTE)
 const int kAttributeValueSize = 15;
 #else
 const int kAttributeValueSize = 14;
@@ -73,12 +69,6 @@ void PopulateAttribute(opentelemetry::proto::common::v1::KeyValue *attribute,
     attribute->mutable_value()->set_string_value(nostd::get<nostd::string_view>(value).data(),
                                                  nostd::get<nostd::string_view>(value).size());
   }
-#ifdef HAVE_CSTRING_TYPE
-  else if (nostd::holds_alternative<const char *>(value))
-  {
-    attribute->mutable_value()->set_string_value(nostd::get<const char *>(value));
-  }
-#endif
 #ifdef HAVE_SPAN_BYTE
   else if (nostd::holds_alternative<nostd::span<const uint8_t>>(value))
   {
