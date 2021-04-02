@@ -23,9 +23,9 @@
 
 using namespace OPENTELEMETRY_NAMESPACE;
 
-using Properties       = opentelemetry::exporter::ETW::Properties;
-using PropertyValue    = opentelemetry::exporter::ETW::PropertyValue;
-using PropertyValueMap = opentelemetry::exporter::ETW::PropertyValueMap;
+using Properties       = opentelemetry::exporter::etw::Properties;
+using PropertyValue    = opentelemetry::exporter::etw::PropertyValue;
+using PropertyValueMap = opentelemetry::exporter::etw::PropertyValueMap;
 
 std::string getTemporaryValue()
 {
@@ -57,7 +57,7 @@ TEST(ETWTracer, TracerCheck)
   // Windows Defender Firewall Driver         {D5E09122-D0B2-4235-ADC1-C89FAAAF1069}
 
   std::string providerName = "OpenTelemetry-ETW-TLD"; // supply unique instrumentation name here
-  exporter::ETW::TracerProvider tp;
+  exporter::etw::TracerProvider tp;
 
   // TODO: this code should fallback to MsgPack if TLD is not available
   auto tracer = tp.GetTracer(providerName, "TLD");
@@ -142,7 +142,7 @@ TEST(ETWTracer, TracerCheck)
 TEST(ETWTracer, TracerCheckMinDecoration)
 {
   std::string providerName = "OpenTelemetry-ETW-TLD";
-  exporter::ETW::TracerProvider tp
+  exporter::etw::TracerProvider tp
   ({
       {"enableTraceId", false},
       {"enableSpanId", false},
@@ -185,7 +185,7 @@ TEST(ETWTracer, TracerCheckMinDecoration)
 TEST(ETWTracer, TracerCheckMaxDecoration)
 {
   std::string providerName = "OpenTelemetry-ETW-TLD";
-  exporter::ETW::TracerProvider tp
+  exporter::etw::TracerProvider tp
   ({
       {"enableTraceId", true},
       {"enableSpanId", true},
@@ -206,7 +206,7 @@ TEST(ETWTracer, TracerCheckMaxDecoration)
 TEST(ETWTracer, TracerCheckMsgPack)
 {
   std::string providerName = "OpenTelemetry-ETW-MsgPack";
-  exporter::ETW::TracerProvider tp
+  exporter::etw::TracerProvider tp
   ({
       {"enableTraceId", true},
       {"enableSpanId", true},
