@@ -108,7 +108,7 @@ TEST(RuntimeContextTest, DetachOutOfOrder)
   std::vector<context::Context> contexts;
   for (auto i : indices)
   {
-    contexts.push_back(context::Context("index", i));
+    contexts.push_back(context::Context("index", (int64_t)i));
   }
 
   do

@@ -34,11 +34,12 @@ class TracezDataAggregatorTest : public ::testing::Test
 protected:
   void SetUp() override
   {
-    std::shared_ptr<TracezSpanProcessor> processor(new TracezSpanProcessor());
+    std::shared_ptr<TracezSharedData> shared_data(new TracezSharedData());
+    std::shared_ptr<TracezSpanProcessor> processor(new TracezSpanProcessor(shared_data));
     auto resource = opentelemetry::sdk::resource::Resource::Create({});
     tracer        = std::shared_ptr<opentelemetry::trace::Tracer>(new Tracer(processor, resource));
     tracez_data_aggregator = std::unique_ptr<TracezDataAggregator>(
-        new TracezDataAggregator(processor, milliseconds(10)));
+        new TracezDataAggregator(shared_data, milliseconds(10)));
   }
 
   std::unique_ptr<TracezDataAggregator> tracez_data_aggregator;

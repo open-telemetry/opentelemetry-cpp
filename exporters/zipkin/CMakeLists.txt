@@ -17,12 +17,28 @@ find_package(CURL)
 if(CURL_FOUND)
   add_definitions(-DWITH_CURL)
 endif()
-add_library(zipkin_trace_exporter src/zipkin_exporter.cc src/recordable.cc)
+add_library(opentelemetry_exporter_zipkin_trace src/zipkin_exporter.cc
+                                                src/recordable.cc)
+
+install(
+  TARGETS opentelemetry_exporter_zipkin_trace
+  EXPORT "${PROJECT_NAME}-target"
+  RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
+  LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
+  ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR})
+
+install(
+  DIRECTORY include/opentelemetry/exporters/zipkin
+  DESTINATION include/opentelemetry/exporters/
+  FILES_MATCHING
+  PATTERN "*.h")
+
 if(BUILD_TESTING)
   add_executable(zipkin_recordable_test test/zipkin_recordable_test.cc)
 
-  target_link_libraries(zipkin_recordable_test ${GTEST_BOTH_LIBRARIES}
-                        ${CMAKE_THREAD_LIBS_INIT} zipkin_trace_exporter)
+  target_link_libraries(
+    zipkin_recordable_test ${GTEST_BOTH_LIBRARIES} ${CMAKE_THREAD_LIBS_INIT}
+    opentelemetry_exporter_zipkin_trace http_client_curl)
 
   gtest_add_tests(
     TARGET zipkin_recordable_test

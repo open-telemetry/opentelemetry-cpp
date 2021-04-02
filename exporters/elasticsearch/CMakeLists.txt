@@ -10,6 +10,19 @@ if(BUILD_TESTING)
     es_log_exporter_test ${GTEST_BOTH_LIBRARIES} ${CMAKE_THREAD_LIBS_INIT}
     opentelemetry_exporter_elasticsearch_logs)
 
+  install(
+    TARGETS opentelemetry_exporter_elasticsearch_logs
+    EXPORT "${PROJECT_NAME}-target"
+    RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
+    LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
+    ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR})
+
+  install(
+    DIRECTORY include/opentelemetry/exporters/elasticsearch
+    DESTINATION include/opentelemetry/exporters/
+    FILES_MATCHING
+    PATTERN "*.h")
+
   gtest_add_tests(
     TARGET es_log_exporter_test
     TEST_PREFIX exporter.

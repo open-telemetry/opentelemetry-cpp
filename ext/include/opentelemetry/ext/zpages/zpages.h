@@ -6,6 +6,7 @@
 #include "opentelemetry/ext/zpages/tracez_data_aggregator.h"
 #include "opentelemetry/ext/zpages/tracez_http_server.h"
 #include "opentelemetry/ext/zpages/tracez_processor.h"
+#include "opentelemetry/ext/zpages/tracez_shared_data.h"
 
 #include "opentelemetry/nostd/shared_ptr.h"
 #include "opentelemetry/sdk/trace/tracer_provider.h"
@@ -13,6 +14,7 @@
 
 using opentelemetry::ext::zpages::TracezDataAggregator;
 using opentelemetry::ext::zpages::TracezHttpServer;
+using opentelemetry::ext::zpages::TracezSharedData;
 using opentelemetry::ext::zpages::TracezSpanProcessor;
 using std::chrono::microseconds;
 
@@ -28,9 +30,39 @@ class ZPages
 public:
   /**
    * This function is called if the user wishes to include zPages in their
-   * application. It creates a static instance of this class.
+   * application. It creates a static instance of this class and replaces the
+   * global TracerProvider with one that delegates spans to tracez.
    */
-  static void Initialize() { static ZPages instance; }
+  static void Initialize() { Instance().ReplaceGlobalProvider(); }
+
+  /**
+   * Returns the singletone instnace of ZPages, useful for attaching z-pages span processors to
+   * non-global providers.
+   *
+   * Note: This will instantiate the Tracez instance and webserver if it hasn't already been
+   * instantiated.
+   */
+  static ZPages &Instance()
+  {
+    static ZPages instance;
+    return instance;
+  }
+
+  /** Replaces the global tracer provider with an instance that exports to tracez. */
+  void ReplaceGlobalProvider()
+  {
+    std::shared_ptr<opentelemetry::sdk::trace::SpanProcessor> tracez_processor(
+        MakeSpanProcessor().release());
+    auto tracez_provider_ = opentelemetry::nostd::shared_ptr<opentelemetry::trace::TracerProvider>(
+        new opentelemetry::sdk::trace::TracerProvider(tracez_processor));
+    opentelemetry::trace::Provider::SetTracerProvider(tracez_provider_);
+  }
+
+  /** Retruns a new span processor that will output to z-pages. */
+  std::unique_ptr<TracezSpanProcessor> MakeSpanProcessor()
+  {
+    return std::unique_ptr<TracezSpanProcessor>(new TracezSpanProcessor(tracez_shared_));
+  }
 
 private:
   /**
@@ -40,19 +72,13 @@ private:
    */
   ZPages()
   {
-    auto tracez_processor_ = std::make_shared<TracezSpanProcessor>();
-    auto tracez_provider_  = opentelemetry::nostd::shared_ptr<opentelemetry::trace::TracerProvider>(
-        new opentelemetry::sdk::trace::TracerProvider(tracez_processor_));
-
+    // Construct shared data nd start tracez webserver.
+    tracez_shared_ = std::make_shared<TracezSharedData>();
     auto tracez_aggregator =
-        std::unique_ptr<TracezDataAggregator>(new TracezDataAggregator(tracez_processor_));
-
+        std::unique_ptr<TracezDataAggregator>(new TracezDataAggregator(tracez_shared_));
     tracez_server_ =
         std::unique_ptr<TracezHttpServer>(new TracezHttpServer(std::move(tracez_aggregator)));
-
     tracez_server_->start();
-
-    opentelemetry::trace::Provider::SetTracerProvider(tracez_provider_);
   }
 
   ~ZPages()
@@ -61,5 +87,6 @@ private:
     // program)
     tracez_server_->stop();
   }
+  std::shared_ptr<TracezSharedData> tracez_shared_;
   std::unique_ptr<TracezHttpServer> tracez_server_;
 };
