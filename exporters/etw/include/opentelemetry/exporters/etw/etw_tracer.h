@@ -43,8 +43,6 @@
 #include "opentelemetry/trace/tracer_provider.h"
 
 #include "opentelemetry/sdk/trace/exporter.h"
-#include "opentelemetry/sdk/trace/recordable.h"
-#include "opentelemetry/sdk/trace/span_data.h"
 
 #include "opentelemetry/exporters/etw/etw_fields.h"
 #include "opentelemetry/exporters/etw/etw_properties.h"
@@ -57,7 +55,7 @@ namespace trace = opentelemetry::trace;
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace exporter
 {
-namespace ETW
+namespace etw
 {
 
 /**
@@ -111,10 +109,10 @@ class Span;
 
 /**
  * @brief Template that allows to instantiate new Span object for header-only forward-declared
- * ETW::Span type
+ * etw::Span type
  *
- * @tparam SpanType     Expected to be ETW::Span
- * @tparam TracerType   expected to be ETW::Tracer
+ * @tparam SpanType     Expected to be etw::Span
+ * @tparam TracerType   expected to be etw::Tracer
  * @param objPtr        Pointer to parent
  * @param name          Span Name
  * @param options       Span Options
@@ -129,9 +127,9 @@ SpanType *new_span(TracerType *objPtr,
 }
 
 /**
- * @brief Template that allows to convert ETW::Span pointer to smart shared pointer to `trace::Span`
- * @tparam SpanType     Expected to be ETW::Span
- * @param ptr           Pointer to ETW::Span
+ * @brief Template that allows to convert etw::Span pointer to smart shared pointer to `trace::Span`
+ * @tparam SpanType     Expected to be etw::Span
+ * @param ptr           Pointer to etw::Span
  * @return              Smart shared pointer to `trace::Span`
  */
 template <class SpanType>
@@ -144,8 +142,8 @@ class TracerProvider;
 
 /**
  * @brief Utility template for obtaining Span Name
- * @tparam T            ETW::Span
- * @param t             instance of ETW::Span
+ * @tparam T            etw::Span
+ * @param t             instance of etw::Span
  * @return              Span Name
  */
 template <class T>
@@ -157,8 +155,8 @@ std::string GetName(T &t)
 
 /**
  * @brief Utility template to obtain Span start time
- * @tparam T            ETW::Span
- * @param t             instance of ETW::Span
+ * @tparam T            etw::Span
+ * @param t             instance of etw::Span
  * @return              Span Start timestamp
  */
 template <class T>
@@ -169,8 +167,8 @@ core::SystemTimestamp GetStartTime(T &t)
 
 /**
  * @brief Utility template to obtain Span end time
- * @tparam T           ETW::Span
- * @param t            instance of ETW::Span
+ * @tparam T           etw::Span
+ * @param t            instance of etw::Span
  * @return             Span Stop timestamp
  */
 template <class T>
@@ -183,8 +181,8 @@ class Properties;
 
 /**
  * @brief Utility template to store Attributes on Span
- * @tparam T           ETW::Span
- * @param instance     instance of ETW::Span
+ * @tparam T           etw::Span
+ * @param instance     instance of etw::Span
  * @param t            Properties to store as Attributes
  */
 template <class T>
@@ -195,8 +193,8 @@ void SetSpanAttributes(T &instance, Properties &t)
 
 /**
  * @brief Utility template to obtain Span Attributes
- * @tparam T           ETW::Span
- * @param instance     instance of ETW::Span
+ * @tparam T           etw::Span
+ * @param instance     instance of etw::Span
  * @return             ref to Span Attributes
  */
 template <class T>
@@ -206,10 +204,10 @@ Properties &GetSpanAttributes(T &instance)
 }
 
 /**
- * @brief Utility template to obtain ETW::TracerProvider._config
+ * @brief Utility template to obtain etw::TracerProvider._config
  *
- * @tparam T    ETW::TracerProvider
- * @param t     ETW::TracerProvider ref
+ * @tparam T    etw::TracerProvider
+ * @param t     etw::TracerProvider ref
  * @return      TracerProviderConfiguration ref
  */
 template <class T>
@@ -257,7 +255,7 @@ class Tracer : public trace::Tracer
   /**
    * @brief Parent provider of this Tracer
    */
-  ETW::TracerProvider &tracerProvider_;
+  etw::TracerProvider &tracerProvider_;
 
   /**
    * @brief ProviderId (Name or GUID)
@@ -318,7 +316,7 @@ class Tracer : public trace::Tracer
   };
 
   /**
-   * @brief Allow our friendly ETW::Span to end itself on Tracer.
+   * @brief Allow our friendly etw::Span to end itself on Tracer.
    * @param span
    * @param
    */
@@ -424,7 +422,7 @@ class Tracer : public trace::Tracer
   std::map<std::string, nostd::unique_ptr<trace::Scope>> scopes_;
 
   /**
-   * @brief Init a reference to ETW::ProviderHandle
+   * @brief Init a reference to etw::ProviderHandle
    * @return Provider Handle
    */
   ETWProvider::Handle &initProvHandle()
@@ -444,7 +442,7 @@ public:
    * @param providerId ProviderId - Name or GUID
    * @param encoding ETW encoding format to use.
    */
-  Tracer(ETW::TracerProvider &parent,
+  Tracer(etw::TracerProvider &parent,
          nostd::string_view providerId     = "",
          ETWProvider::EventFormat encoding = ETWProvider::EventFormat::ETW_MANIFEST)
       : trace::Tracer(),
@@ -456,9 +454,11 @@ public:
     // Generate random GUID
     GUID trace_id;
     CoCreateGuid(&trace_id);
-    // Populate TraceId of the Tracer with that random GUID
-    const auto *traceIdBytes = reinterpret_cast<const uint8_t *>(std::addressof(trace_id));
-    traceId_                 = trace::TraceId(traceIdBytes);
+    // Populate TraceId of the Tracer with the above GUID
+    const auto *traceIdPtr = reinterpret_cast<const uint8_t *>(std::addressof(trace_id));
+    nostd::span<const uint8_t, trace::TraceId::kSize> traceIdBytes(
+        traceIdPtr, traceIdPtr + trace::TraceId::kSize);
+    traceId_ = trace::TraceId(traceIdBytes);
   };
 
   /**
@@ -524,7 +524,7 @@ public:
       }
     }
 
-    // This template pattern allows us to forward-declare the ETW::Span,
+    // This template pattern allows us to forward-declare the etw::Span,
     // create an instance of it, then assign it to tracer::Span result.
     auto currentSpan                      = new_span<Span, Tracer>(this, name, options);
     nostd::shared_ptr<trace::Span> result = to_span_ptr<Span>(currentSpan);
@@ -722,7 +722,7 @@ public:
 };
 
 /**
- * @brief ETW::Span allows to send event data to ETW listener.
+ * @brief etw::Span allows to send event data to ETW listener.
  */
 class Span : public trace::Span
 {
@@ -775,9 +775,13 @@ protected:
     GUID activity_id;
     // Generate random GUID
     CoCreateGuid(&activity_id);
-    const auto *activityIdBytes = reinterpret_cast<const uint8_t *>(std::addressof(activity_id));
+    const auto *activityIdPtr = reinterpret_cast<const uint8_t *>(std::addressof(activity_id));
+
     // Populate SpanId with that GUID
-    const trace::SpanId spanId(activityIdBytes);
+    nostd::span<const uint8_t, trace::SpanId::kSize> spanIdBytes(
+        activityIdPtr, activityIdPtr + trace::SpanId::kSize);
+    const trace::SpanId spanId(spanIdBytes);
+
     // Inherit trace_id from Tracer
     const trace::TraceId traceId{owner_.trace_id()};
     // TODO: TraceFlags are not supported by ETW exporter.
@@ -1072,6 +1076,6 @@ public:
   }
 };
 
-}  // namespace ETW
+}  // namespace etw
 }  // namespace exporter
 OPENTELEMETRY_END_NAMESPACE

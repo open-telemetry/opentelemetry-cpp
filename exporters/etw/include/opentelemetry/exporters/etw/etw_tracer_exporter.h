@@ -31,89 +31,11 @@
 #include "opentelemetry/trace/tracer_provider.h"
 
 #include "opentelemetry/sdk/trace/exporter.h"
-#include "opentelemetry/sdk/trace/recordable.h"
 
 #include "opentelemetry/exporters/etw/etw_provider.h"
-#include "opentelemetry/exporters/etw/etw_recordable.h"
 #include "opentelemetry/exporters/etw/etw_tracer.h"
 
 #include "opentelemetry/exporters/etw/utils.h"
 
 namespace core  = opentelemetry::core;
 namespace trace = opentelemetry::trace;
-
-OPENTELEMETRY_BEGIN_NAMESPACE
-
-namespace exporter
-{
-namespace ETW
-{
-
-/**
- * @brief ETW Tracer Exporter.
- *
- * TODO: this code needs to be reworked because it is not necessary in synchronous
- * realtime exporter / streamer scenario. Header-only ETW Tracer can export Span
- * and Events without needing to pack data to into another Recordable. API calls
- * return right away after the message is passed to ETW sink in realtime. There is
- * no packaging or aggregation necessary, and no need for a background async thread.
- *
- * There is no 100% reliable way to know if ETW events got exported either:
- * - if events got accepted, but cannot be processed, then then out-of-buffers
- * notification is only sent to receiving listener-end, not to sender.
- *
- */
-class ETWTracerExporter final : public opentelemetry::sdk::trace::SpanExporter
-{
-public:
-  /**
-   * @param providerName
-   * @param eventName
-   */
-  ETWTracerExporter(std::string providerName) : providerName_(providerName) {}
-
-  /**
-   * @return Returns a unique pointer to an empty recordable object
-   */
-  std::unique_ptr<sdk::trace::Recordable> MakeRecordable() noexcept override
-  {
-    return std::unique_ptr<sdk::trace::Recordable>(new ETWTraceRecordable(providerName_));
-  }
-
-  /**
-   * @param recordables a required span containing unique pointers to the data
-   * to add to the ETWTracerExporter
-   * @return Returns the result of the operation
-   */
-  sdk::trace::ExportResult Export(
-      const nostd::span<std::unique_ptr<sdk::trace::Recordable>> &recordables) noexcept override
-  {
-    for (auto &recordable : recordables)
-    {
-      auto span = std::unique_ptr<ETWTraceRecordable>(
-          dynamic_cast<ETWTraceRecordable *>(recordable.release()));
-      if (span != nullptr)
-      {
-        std::cout << span->GetName() << std::endl;
-      }
-    }
-
-    return sdk::trace::ExportResult::kSuccess;
-  }
-
-  /**
-   * @param timeout an optional value containing the timeout of the exporter
-   * note: passing custom timeout values is not currently supported for this exporter
-   */
-  bool Shutdown(std::chrono::microseconds timeout = std::chrono::microseconds(0)) noexcept override
-  {
-    return true;
-  };
-
-private:
-  std::string providerName_;
-};
-}  // namespace ETW
-}  // namespace exporter
-
-OPENTELEMETRY_END_NAMESPACE

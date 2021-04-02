@@ -25,7 +25,7 @@
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace exporter
 {
-namespace ETW
+namespace etw
 {
 
 /**
@@ -41,9 +41,7 @@ using PropertyVariant =
                    uint64_t,
                    double,
                    std::string,
-#ifdef HAVE_CSTRING_TYPE
                    const char *,
-#endif
 #ifdef HAVE_SPAN_BYTE
                    // TODO: 8-bit byte arrays / binary blobs are not part of OT spec yet!
                    // Ref: https://github.com/open-telemetry/opentelemetry-specification/issues/780
@@ -56,6 +54,28 @@ using PropertyVariant =
                    std::vector<uint64_t>,
                    std::vector<double>,
                    std::vector<std::string>>;
+
+enum PropertyType
+{
+  kTypeBool,
+  kTypeInt,
+  kTypeInt64,
+  kTypeUInt,
+  kTypeUInt64,
+  kTypeDouble,
+  kTypeString,
+  kTypeCString,
+#ifdef HAVE_SPAN_BYTE
+  kTypeSpanByte,
+#endif
+  kTypeSpanBool,
+  kTypeSpanInt,
+  kTypeSpanInt64,
+  kTypeSpanUInt,
+  kTypeSpanUInt64,
+  kTypeSpanDouble,
+  kTypeSpanString
+};
 
 /**
  * @brief PropertyValue class that holds PropertyVariant and
@@ -187,66 +207,58 @@ public:
   {
     switch (v.index())
     {
-      case common::AttributeType::TYPE_BOOL:
+      case common::AttributeType::kTypeBool:
         PropertyVariant::operator=(nostd::get<bool>(v));
         break;
-      case common::AttributeType::TYPE_INT:
+      case common::AttributeType::kTypeInt:
         PropertyVariant::operator=(nostd::get<int32_t>(v));
         break;
-      case common::AttributeType::TYPE_INT64:
+      case common::AttributeType::kTypeInt64:
         PropertyVariant::operator=(nostd::get<int64_t>(v));
         break;
-      case common::AttributeType::TYPE_UINT:
+      case common::AttributeType::kTypeUInt:
         PropertyVariant::operator=(nostd::get<uint32_t>(v));
         break;
-      case common::AttributeType::TYPE_UINT64:
+      case common::AttributeType::kTypeUInt64:
         PropertyVariant::operator=(nostd::get<uint64_t>(v));
         break;
-      case common::AttributeType::TYPE_DOUBLE:
+      case common::AttributeType::kTypeDouble:
         PropertyVariant::operator=(nostd::get<double>(v));
         break;
-      case common::AttributeType::TYPE_STRING: {
+      case common::AttributeType::kTypeString: {
         PropertyVariant::operator=(nostd::string_view(nostd::get<nostd::string_view>(v)).data());
         break;
       };
-
-#ifdef HAVE_CSTRING_TYPE
-      case common::AttributeType::TYPE_CSTRING:
-        PropertyVariant::operator=(nostd::get<const char *>(v));
-        break;
-#endif
-
 #ifdef HAVE_SPAN_BYTE
-      case common::AttributeType::TYPE_SPAN_BYTE:
+      case common::AttributeType::kTypeSpanByte:
         PropertyVariant::operator=(to_vector(nostd::get<nostd::span<const uint8_t>>(v)));
         break;
 #endif
-
-      case common::AttributeType::TYPE_SPAN_BOOL:
+      case common::AttributeType::kTypeSpanBool:
         PropertyVariant::operator=(to_vector(nostd::get<nostd::span<const bool>>(v)));
         break;
 
-      case common::AttributeType::TYPE_SPAN_INT:
+      case common::AttributeType::kTypeSpanInt:
         PropertyVariant::operator=(to_vector(nostd::get<nostd::span<const int32_t>>(v)));
         break;
 
-      case common::AttributeType::TYPE_SPAN_INT64:
+      case common::AttributeType::kTypeSpanInt64:
         PropertyVariant::operator=(to_vector(nostd::get<nostd::span<const int64_t>>(v)));
         break;
 
-      case common::AttributeType::TYPE_SPAN_UINT:
+      case common::AttributeType::kTypeSpanUInt:
         PropertyVariant::operator=(to_vector(nostd::get<nostd::span<const uint32_t>>(v)));
         break;
 
-      case common::AttributeType::TYPE_SPAN_UINT64:
+      case common::AttributeType::kTypeSpanUInt64:
         PropertyVariant::operator=(to_vector(nostd::get<nostd::span<const uint64_t>>(v)));
         break;
 
-      case common::AttributeType::TYPE_SPAN_DOUBLE:
+      case common::AttributeType::kTypeSpanDouble:
         PropertyVariant::operator=(to_vector(nostd::get<nostd::span<const double>>(v)));
         break;
 
-      case common::AttributeType::TYPE_SPAN_STRING:
+      case common::AttributeType::kTypeSpanString:
         PropertyVariant::operator=(to_vector(nostd::get<nostd::span<const nostd::string_view>>(v)));
         break;
 
@@ -266,70 +278,67 @@ public:
 
     switch (this->index())
     {
-      case common::AttributeType::TYPE_BOOL:
+      case PropertyType::kTypeBool:
         value = nostd::get<bool>(*this);
         break;
-      case common::AttributeType::TYPE_INT:
+      case PropertyType::kTypeInt:
         value = nostd::get<int32_t>(*this);
         break;
-      case common::AttributeType::TYPE_INT64:
+      case PropertyType::kTypeInt64:
         value = nostd::get<int64_t>(*this);
         break;
-      case common::AttributeType::TYPE_UINT:
+      case PropertyType::kTypeUInt:
         value = nostd::get<uint32_t>(*this);
         break;
-      case common::AttributeType::TYPE_UINT64:
+      case PropertyType::kTypeUInt64:
         value = nostd::get<uint64_t>(*this);
         break;
-      case common::AttributeType::TYPE_DOUBLE:
+      case PropertyType::kTypeDouble:
         value = nostd::get<double>(*this);
         break;
-
-      case common::AttributeType::TYPE_STRING: {
+      case PropertyType::kTypeString: {
         const std::string &str = nostd::get<std::string>(*this);
         return nostd::string_view(str.data(), str.size());
         break;
       }
-
-#ifdef HAVE_CSTRING_TYPE
-      case common::AttributeType::TYPE_CSTRING:
-        value = nostd::get<const char *>(*this);
+      case PropertyType::kTypeCString: {
+        const char *data = nostd::get<const char *>(*this);
+        return nostd::string_view(data, (data) ? strlen(data) : 0);
         break;
-#endif
+      }
 
 #ifdef HAVE_SPAN_BYTE
-      case common::AttributeType::TYPE_SPAN_BYTE:
+      case common::AttributeType::kTypeSpanByte:
         value = to_span(nostd::get<std::vector<uint8_t>>(self));
         break;
 #endif
 
-      case common::AttributeType::TYPE_SPAN_BOOL: {
+      case PropertyType::kTypeSpanBool: {
         const auto &vec = nostd::get<std::vector<bool>>(*this);
         // FIXME: sort out how to remap from vector<bool> to span<bool>
         break;
       }
-
-      case common::AttributeType::TYPE_SPAN_INT:
+      case PropertyType::kTypeSpanInt:
         value = to_span(nostd::get<std::vector<int32_t>>(*this));
         break;
 
-      case common::AttributeType::TYPE_SPAN_INT64:
+      case PropertyType::kTypeSpanInt64:
         value = to_span(nostd::get<std::vector<int64_t>>(*this));
         break;
 
-      case common::AttributeType::TYPE_SPAN_UINT:
+      case PropertyType::kTypeSpanUInt:
         value = to_span(nostd::get<std::vector<uint32_t>>(*this));
         break;
 
-      case common::AttributeType::TYPE_SPAN_UINT64:
+      case PropertyType::kTypeSpanUInt64:
         value = to_span(nostd::get<std::vector<uint64_t>>(*this));
         break;
 
-      case common::AttributeType::TYPE_SPAN_DOUBLE:
+      case PropertyType::kTypeSpanDouble:
         value = to_span(nostd::get<std::vector<double>>(*this));
         break;
 
-      case common::AttributeType::TYPE_SPAN_STRING:
+      case PropertyType::kTypeSpanString:
         // FIXME: sort out how to remap from vector<string> to span<string_view>
         // value = to_span(nostd::get<std::vector<std::string>>(self));
         break;
@@ -447,6 +456,6 @@ public:
   size_t size() const noexcept override { return PropertyValueMap::size(); };
 };
 
-}  // namespace ETW
+}  // namespace etw
 }  // namespace exporter
 OPENTELEMETRY_END_NAMESPACE

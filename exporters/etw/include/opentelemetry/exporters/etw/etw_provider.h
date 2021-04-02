@@ -24,7 +24,7 @@
 #  pragma warning(disable : 4018)
 #endif
 
-#include "opentelemetry/common/attribute_value.h"
+#include "opentelemetry/exporters/etw/etw_properties.h"
 #include "opentelemetry/exporters/etw/uuid.h"
 #include "opentelemetry/version.h"
 
@@ -53,6 +53,9 @@
 #define MICROSOFT_EVENTTAG_NORMAL_PERSISTENCE 0x01000000
 
 OPENTELEMETRY_BEGIN_NAMESPACE
+
+using Properties   = exporter::etw::Properties;
+using PropertyType = exporter::etw::PropertyType;
 
 class ETWProvider
 {
@@ -236,9 +239,8 @@ public:
     return STATUS_ERROR;
   }
 
-  template <class T>
   unsigned long writeMsgPack(Handle &providerData,
-                             T eventData,
+                             exporter::etw::Properties &eventData,
                              LPCGUID ActivityId        = nullptr,
                              LPCGUID RelatedActivityId = nullptr,
                              uint8_t Opcode            = 0)
@@ -269,14 +271,12 @@ public:
 
     switch (nameField.index())
     {
-      case common::AttributeType::TYPE_STRING:
+      case PropertyType::kTypeString:
         eventName = (char *)(nostd::get<std::string>(nameField).data());  // must be 0-terminated!
         break;
-#  ifdef HAVE_CSTRING_TYPE
-      case common::AttributeType::TYPE_CSTRING:
+      case PropertyType::kTypeCString:
         eventName = (char *)(nostd::get<const char *>(nameField));
         break;
-#  endif
       default:
         // If invalid event name is supplied, then we replace it with 'NoName'
         break;
@@ -302,47 +302,45 @@ public:
       auto &value = kv.second;
       switch (value.index())
       {
-        case common::AttributeType::TYPE_BOOL: {
+        case PropertyType::kTypeBool: {
           UINT8 temp = static_cast<UINT8>(nostd::get<bool>(value));
           jObj[name] = temp;
           break;
         }
-        case common::AttributeType::TYPE_INT: {
+        case PropertyType::kTypeInt: {
           auto temp  = nostd::get<int32_t>(value);
           jObj[name] = temp;
           break;
         }
-        case common::AttributeType::TYPE_INT64: {
+        case PropertyType::kTypeInt64: {
           auto temp  = nostd::get<int64_t>(value);
           jObj[name] = temp;
           break;
         }
-        case common::AttributeType::TYPE_UINT: {
+        case PropertyType::kTypeUInt: {
           auto temp  = nostd::get<uint32_t>(value);
           jObj[name] = temp;
           break;
         }
-        case common::AttributeType::TYPE_UINT64: {
+        case PropertyType::kTypeUInt64: {
           auto temp  = nostd::get<uint64_t>(value);
           jObj[name] = temp;
           break;
         }
-        case common::AttributeType::TYPE_DOUBLE: {
+        case PropertyType::kTypeDouble: {
           auto temp  = nostd::get<double>(value);
           jObj[name] = temp;
           break;
         }
-        case common::AttributeType::TYPE_STRING: {
+        case PropertyType::kTypeString: {
           jObj[name] = nostd::get<std::string>(value);
           break;
         }
-#  ifdef HAVE_CSTRING_TYPE
-        case common::AttributeType::TYPE_CSTRING: {
+        case PropertyType::kTypeCString: {
           auto temp  = nostd::get<const char *>(value);
           jObj[name] = temp;
           break;
         }
-#  endif
 #  if HAVE_TYPE_GUID
           // TODO: consider adding UUID/GUID to spec
         case common::AttributeType::TYPE_GUID: {
@@ -357,13 +355,13 @@ public:
 #  ifdef HAVE_SPAN_BYTE
         case common::AttributeType::TYPE_SPAN_BYTE:
 #  endif
-        case common::AttributeType::TYPE_SPAN_BOOL:
-        case common::AttributeType::TYPE_SPAN_INT:
-        case common::AttributeType::TYPE_SPAN_INT64:
-        case common::AttributeType::TYPE_SPAN_UINT:
-        case common::AttributeType::TYPE_SPAN_UINT64:
-        case common::AttributeType::TYPE_SPAN_DOUBLE:
-        case common::AttributeType::TYPE_SPAN_STRING:
+        case PropertyType::kTypeSpanBool:
+        case PropertyType::kTypeSpanInt:
+        case PropertyType::kTypeSpanInt64:
+        case PropertyType::kTypeSpanUInt:
+        case PropertyType::kTypeSpanUInt64:
+        case PropertyType::kTypeSpanDouble:
+        case PropertyType::kTypeSpanString:
         default:
           // TODO: unsupported type
           break;
@@ -426,9 +424,8 @@ public:
   /// <param name="providerId"></param>
   /// <param name="eventData"></param>
   /// <returns></returns>
-  template <class T>
   unsigned long writeTld(Handle &providerData,
-                         T eventData,
+                         Properties &eventData,
                          LPCGUID ActivityId        = nullptr,
                          LPCGUID RelatedActivityId = nullptr,
                          uint8_t Opcode            = 0 /* Information */)
@@ -453,14 +450,12 @@ public:
     auto nameField               = eventData[EVENT_NAME];
     switch (nameField.index())
     {
-      case common::AttributeType::TYPE_STRING:
+      case PropertyType::kTypeString:
         eventName = (char *)(nostd::get<std::string>(nameField).data());
         break;
-#  ifdef HAVE_CSTRING_TYPE
-      case common::AttributeType::TYPE_CSTRING:
+      case PropertyType::kTypeCString:
         eventName = (char *)(nostd::get<const char *>(nameField));
         break;
-#  endif
       default:
         // This is user error. Invalid event name!
         // We supply default 'NoName' event name in this case.
@@ -478,58 +473,56 @@ public:
       auto &value = kv.second;
       switch (value.index())
       {
-        case common::AttributeType::TYPE_BOOL: {
+        case PropertyType::kTypeBool: {
           builder.AddField(name, tld::TypeBool8);
           UINT8 temp = static_cast<UINT8>(nostd::get<bool>(value));
           dbuilder.AddByte(temp);
           break;
         }
-        case common::AttributeType::TYPE_INT: {
+        case PropertyType::kTypeInt: {
           builder.AddField(name, tld::TypeInt32);
           auto temp = nostd::get<int32_t>(value);
           dbuilder.AddValue(temp);
           break;
         }
-        case common::AttributeType::TYPE_INT64: {
+        case PropertyType::kTypeInt64: {
           builder.AddField(name, tld::TypeInt64);
           auto temp = nostd::get<int64_t>(value);
           dbuilder.AddValue(temp);
           break;
         }
-        case common::AttributeType::TYPE_UINT: {
+        case PropertyType::kTypeUInt: {
           builder.AddField(name, tld::TypeUInt32);
           auto temp = nostd::get<uint32_t>(value);
           dbuilder.AddValue(temp);
           break;
         }
-        case common::AttributeType::TYPE_UINT64: {
+        case PropertyType::kTypeUInt64: {
           builder.AddField(name, tld::TypeUInt64);
           auto temp = nostd::get<uint64_t>(value);
           dbuilder.AddValue(temp);
           break;
         }
-        case common::AttributeType::TYPE_DOUBLE: {
+        case PropertyType::kTypeDouble: {
           builder.AddField(name, tld::TypeDouble);
           auto temp = nostd::get<double>(value);
           dbuilder.AddValue(temp);
           break;
         }
-        case common::AttributeType::TYPE_STRING: {
+        case PropertyType::kTypeString: {
           builder.AddField(name, tld::TypeUtf8String);
           dbuilder.AddString(nostd::get<std::string>(value).data());
           break;
         }
-#  ifdef HAVE_CSTRING_TYPE
-        case common::AttributeType::TYPE_CSTRING: {
+        case PropertyType::kTypeCString: {
           builder.AddField(name, tld::TypeUtf8String);
           auto temp = nostd::get<const char *>(value);
           dbuilder.AddString(temp);
           break;
         }
-#  endif
 #  if HAVE_TYPE_GUID
           // TODO: consider adding UUID/GUID to spec
-        case common::AttributeType::TYPE_GUID: {
+        case PropertyType::kGUID: {
           builder.AddField(name.c_str(), TypeGuid);
           auto temp = nostd::get<GUID>(value);
           dbuilder.AddBytes(&temp, sizeof(GUID));
@@ -539,15 +532,15 @@ public:
 
         // TODO: arrays are not supported
 #  ifdef HAVE_SPAN_BYTE
-        case common::AttributeType::TYPE_SPAN_BYTE:
+        case PropertyType::kTypeSpanByte:
 #  endif
-        case common::AttributeType::TYPE_SPAN_BOOL:
-        case common::AttributeType::TYPE_SPAN_INT:
-        case common::AttributeType::TYPE_SPAN_INT64:
-        case common::AttributeType::TYPE_SPAN_UINT:
-        case common::AttributeType::TYPE_SPAN_UINT64:
-        case common::AttributeType::TYPE_SPAN_DOUBLE:
-        case common::AttributeType::TYPE_SPAN_STRING:
+        case PropertyType::kTypeSpanBool:
+        case PropertyType::kTypeSpanInt:
+        case PropertyType::kTypeSpanInt64:
+        case PropertyType::kTypeSpanUInt:
+        case PropertyType::kTypeSpanUInt64:
+        case PropertyType::kTypeSpanDouble:
+        case PropertyType::kTypeSpanString:
         default:
           // TODO: unsupported type
           break;
@@ -593,9 +586,8 @@ public:
 #endif
   }
 
-  template <class T>
   unsigned long write(Handle &providerData,
-                      T eventData,
+                      Properties &eventData,
                       LPCGUID ActivityId,
                       LPCGUID RelatedActivityId,
                       uint8_t Opcode,
