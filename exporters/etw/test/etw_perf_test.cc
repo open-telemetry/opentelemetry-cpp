@@ -25,15 +25,15 @@
 
 using namespace OPENTELEMETRY_NAMESPACE;
 
-using Properties       = opentelemetry::exporter::ETW::Properties;
-using PropertyValue    = opentelemetry::exporter::ETW::PropertyValue;
-using PropertyValueMap = opentelemetry::exporter::ETW::PropertyValueMap;
+using Properties       = opentelemetry::exporter::etw::Properties;
+using PropertyValue    = opentelemetry::exporter::etw::PropertyValue;
+using PropertyValueMap = opentelemetry::exporter::etw::PropertyValueMap;
 
 namespace
 {
 static constexpr const char *providerName = "OpenTelemetry-ETW-StressTest";
 
-static exporter::ETW::TracerProviderOptions providerOptions = {{"enableTraceId", false},
+static exporter::etw::TracerProviderOptions providerOptions = {{"enableTraceId", false},
                                                                {"enableSpanId", false},
                                                                {"enableActivityId", false},
                                                                {"enableRelatedActivityId", false},
@@ -41,7 +41,7 @@ static exporter::ETW::TracerProviderOptions providerOptions = {{"enableTraceId",
 
 class ETWProviderStressTest
 {
-  exporter::ETW::TracerProvider provider_;
+  exporter::etw::TracerProvider provider_;
   std::string mode_;
   nostd::shared_ptr<trace::Tracer> tracer_;
   nostd::shared_ptr<trace::Span> span_;
