@@ -1,6 +1,11 @@
 #pragma once
 
+#include "opentelemetry/exporters/otlp/protobuf_include_prefix.h"
+
 #include "opentelemetry/proto/trace/v1/trace.pb.h"
+
+#include "opentelemetry/exporters/otlp/protobuf_include_suffix.h"
+
 #include "opentelemetry/sdk/trace/recordable.h"
 #include "opentelemetry/version.h"
 

@@ -1,5 +1,11 @@
 #include "opentelemetry/exporters/otlp/otlp_exporter.h"
+
+#include "opentelemetry/exporters/otlp/protobuf_include_prefix.h"
+
 #include "opentelemetry/proto/collector/trace/v1/trace_service_mock.grpc.pb.h"
+
+#include "opentelemetry/exporters/otlp/protobuf_include_suffix.h"
+
 #include "opentelemetry/sdk/trace/simple_processor.h"
 #include "opentelemetry/sdk/trace/tracer_provider.h"
 #include "opentelemetry/trace/provider.h"
