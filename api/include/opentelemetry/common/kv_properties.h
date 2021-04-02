@@ -256,7 +256,8 @@ public:
       auto &entry = (entries_.get())[i];
       if (entry.GetKey() == key)
       {
-        value = std::string(entry.GetValue());
+        const auto &entry_value = entry.GetValue();
+        value                   = std::string(entry_value.data(), entry_value.size());
         return true;
       }
     }

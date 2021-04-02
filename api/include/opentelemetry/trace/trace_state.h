@@ -114,9 +114,9 @@ public:
           {
             first = false;
           }
-          header_s.append(std::string(key));
+          header_s.append(std::string(key.data(), key.size()));
           header_s.append(1, kKeyValueSeparator);
-          header_s.append(std::string(value));
+          header_s.append(std::string(value.data(), value.size()));
           return true;
         });
     return header_s;
@@ -263,7 +263,7 @@ private:
     static std::regex reg_key("^[a-z0-9][a-z0-9*_\\-/]{0,255}$");
     static std::regex reg_key_multitenant(
         "^[a-z0-9][a-z0-9*_\\-/]{0,240}(@)[a-z0-9][a-z0-9*_\\-/]{0,13}$");
-    std::string key_s(key);
+    std::string key_s(key.data(), key.size());
     if (std::regex_match(key_s, reg_key) || std::regex_match(key_s, reg_key_multitenant))
     {
       return true;
@@ -277,7 +277,7 @@ private:
     static std::regex reg_value(
         "^[\\x20-\\x2B\\x2D-\\x3C\\x3E-\\x7E]{0,255}[\\x21-\\x2B\\x2D-\\x3C\\x3E-\\x7E]$");
     // Need to benchmark without regex, as a string object is created here.
-    return std::regex_match(std::string(value), reg_value);
+    return std::regex_match(std::string(value.data(), value.size()), reg_value);
   }
 
   static bool IsValidKeyNonRegEx(nostd::string_view key)
