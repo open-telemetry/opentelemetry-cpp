@@ -29,7 +29,7 @@ namespace zipkin
 // Expecting to remove the two feature gates for:
 // - HAVE_SPAN_BYTE     - proposal for binary type or byte array (uint8_t[]).
 //
-#elif defined(HAVE_SPAN_BYTE)
+#if defined(HAVE_SPAN_BYTE)
 const int kAttributeValueSize = 15;
 #else
 const int kAttributeValueSize = 14;
