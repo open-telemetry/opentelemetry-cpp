@@ -8,6 +8,7 @@
 #include <vector>
 
 #include "opentelemetry/ext/zpages/threadsafe_span_data.h"
+#include "opentelemetry/ext/zpages/tracez_shared_data.h"
 #include "opentelemetry/sdk/trace/processor.h"
 #include "opentelemetry/sdk/trace/recordable.h"
 
@@ -23,16 +24,12 @@ namespace zpages
 class TracezSpanProcessor : public opentelemetry::sdk::trace::SpanProcessor
 {
 public:
-  struct CollectedSpans
-  {
-    std::unordered_set<ThreadsafeSpanData *> running;
-    std::vector<std::unique_ptr<ThreadsafeSpanData>> completed;
-  };
-
   /*
    * Initialize a span processor.
    */
-  explicit TracezSpanProcessor() noexcept {}
+  explicit TracezSpanProcessor(std::shared_ptr<TracezSharedData> shared_data) noexcept
+      : shared_data_(shared_data)
+  {}
 
   /*
    * Create a span recordable, which is span_data
@@ -57,17 +54,6 @@ public:
    * @param span a recordable for a span that was ended
    */
   void OnEnd(std::unique_ptr<opentelemetry::sdk::trace::Recordable> &&span) noexcept override;
-
-  /*
-   * Returns a snapshot of all spans stored. This snapshot has a copy of the
-   * stored running_spans and gives ownership of completed spans to the caller.
-   * Stored completed_spans are cleared from the processor. Currently,
-   * copy-on-write is utilized where possible to minimize contention, but locks
-   * may be added in the future.
-   * @return snapshot of all currently running spans and newly completed spans
-   * (spans never sent while complete) at the time that the function is called
-   */
-  CollectedSpans GetSpanSnapshot() noexcept;
 
   /*
    * For now, does nothing. In the future, it
@@ -96,8 +82,7 @@ public:
   }
 
 private:
-  mutable std::mutex mtx_;
-  CollectedSpans spans_;
+  std::shared_ptr<TracezSharedData> shared_data_;
 };
 }  // namespace zpages
 }  // namespace ext

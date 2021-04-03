@@ -17,18 +17,13 @@
 #  include <gtest/gtest.h>
 #  include <string>
 
-/* TODO: this definition needs to be removed when TraceLoggingDynamic.h is OSS */
-#  ifndef HAVE_NO_TLD
-#    define HAVE_NO_TLD
-#  endif
-
-#  include "opentelemetry/exporters/etw/etw_provider_exporter.h"
+#  include "opentelemetry/exporters/etw/etw_provider.h"
 
 using namespace OPENTELEMETRY_NAMESPACE;
 
 TEST(ETWProvider, ProviderIsRegisteredSuccessfully)
 {
-  std::string providerName = "OpenTelemetry";
+  std::string providerName = "OpenTelemetry-ETW-Provider";
   static ETWProvider etw;
   auto handle = etw.open(providerName.c_str());
 
@@ -38,7 +33,7 @@ TEST(ETWProvider, ProviderIsRegisteredSuccessfully)
 
 TEST(ETWProvider, ProviderIsNotRegisteredSuccessfully)
 {
-  std::string providerName = "Telemetry";
+  std::string providerName = "OpenTelemetry-ETW-Provider-NULL";
   static ETWProvider etw;
 
   bool registered = etw.is_registered(providerName);
@@ -47,7 +42,7 @@ TEST(ETWProvider, ProviderIsNotRegisteredSuccessfully)
 
 TEST(ETWProvider, CheckOpenGUIDDataSuccessfully)
 {
-  std::string providerName = "OpenTelemetry";
+  std::string providerName = "OpenTelemetry-ETW-Provider";
 
   // get GUID from the handle returned
   static ETWProvider etw;
@@ -66,7 +61,7 @@ TEST(ETWProvider, CheckOpenGUIDDataSuccessfully)
 
 TEST(ETWProvider, CheckCloseSuccess)
 {
-  std::string providerName = "OpenTelemetry";
+  std::string providerName = "OpenTelemetry-ETW-Provider";
 
   static ETWProvider etw;
   auto handle = etw.open(providerName.c_str());

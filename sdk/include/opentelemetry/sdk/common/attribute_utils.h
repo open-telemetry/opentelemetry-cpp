@@ -33,8 +33,8 @@ namespace common
  */
 using OwnedAttributeValue = nostd::variant<bool,
                                            int32_t,
-                                           uint32_t,
                                            int64_t,
+                                           uint32_t,
                                            uint64_t,
                                            double,
                                            std::string,
@@ -43,11 +43,32 @@ using OwnedAttributeValue = nostd::variant<bool,
 #endif
                                            std::vector<bool>,
                                            std::vector<int32_t>,
-                                           std::vector<uint32_t>,
                                            std::vector<int64_t>,
+                                           std::vector<uint32_t>,
                                            std::vector<uint64_t>,
                                            std::vector<double>,
                                            std::vector<std::string>>;
+
+enum OwnedAttributeType
+{
+  kTypeBool,
+  kTypeInt,
+  kTypeInt64,
+  kTypeUInt,
+  kTypeUInt64,
+  kTypeDouble,
+  kTypeString,
+#ifdef HAVE_SPAN_BYTE
+  kTypeSpanByte,
+#endif
+  kTypeSpanBool,
+  kTypeSpanInt,
+  kTypeSpanInt64,
+  kTypeSpanUInt,
+  kTypeSpanUInt64,
+  kTypeSpanDouble,
+  kTypeSpanString
+};
 
 /**
  * Creates an owned copy (OwnedAttributeValue) of a non-owning AttributeValue.
@@ -64,6 +85,7 @@ struct AttributeConverter
   {
     return OwnedAttributeValue(std::string(v));
   }
+  OwnedAttributeValue operator()(const char *v) { return OwnedAttributeValue(std::string(v)); }
 #ifdef HAVE_SPAN_BYTE
   OwnedAttributeValue operator()(nostd::span<const uint8_t> v) { return convertSpan<uint8_t>(v); }
 #endif

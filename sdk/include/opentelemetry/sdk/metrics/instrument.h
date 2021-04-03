@@ -242,7 +242,7 @@ inline void print_value(std::stringstream &ss,
 {
   switch (value.index())
   {
-    case common::AttributeType::TYPE_STRING:
+    case common::AttributeType::kTypeString:
 
       ss << nostd::get<nostd::string_view>(value);
 

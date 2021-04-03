@@ -49,28 +49,25 @@ private:
   {
     switch (value.index())
     {
-      case common::AttributeType::TYPE_BOOL:
+      case common::AttributeType::kTypeBool:
         json_[name][key.data()] = opentelemetry::nostd::get<bool>(value) ? true : false;
         return;
-      case common::AttributeType::TYPE_INT:
+      case common::AttributeType::kTypeInt:
         json_[name][key.data()] = opentelemetry::nostd::get<int>(value);
         return;
-      case common::AttributeType::TYPE_INT64:
+      case common::AttributeType::kTypeInt64:
         json_[name][key.data()] = opentelemetry::nostd::get<int64_t>(value);
         return;
-      case common::AttributeType::TYPE_UINT:
+      case common::AttributeType::kTypeUInt:
         json_[name][key.data()] = opentelemetry::nostd::get<unsigned int>(value);
         return;
-      case common::AttributeType::TYPE_UINT64:
+      case common::AttributeType::kTypeUInt64:
         json_[name][key.data()] = opentelemetry::nostd::get<uint64_t>(value);
         return;
-      case common::AttributeType::TYPE_DOUBLE:
+      case common::AttributeType::kTypeDouble:
         json_[name][key.data()] = opentelemetry::nostd::get<double>(value);
         return;
-      case common::AttributeType::TYPE_STRING:
-#ifdef HAVE_CSTRING_TYPE
-      case common::AttributeType::TYPE_CSTRING:
-#endif
+      case common::AttributeType::kTypeString:
         json_[name][key.data()] =
             opentelemetry::nostd::get<opentelemetry::nostd::string_view>(value).data();
         return;

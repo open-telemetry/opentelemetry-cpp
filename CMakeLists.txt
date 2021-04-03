@@ -87,9 +87,6 @@ if(WIN32)
   option(WITH_ETW "Whether to include the ETW Exporter in the SDK" ON)
   if(WITH_ETW)
     add_definitions(-DHAVE_MSGPACK)
-    # Option below will be removed once we donate the TraceLoggingDynamic.h to
-    # OSS
-    add_definitions(-DHAVE_NO_TLD)
   endif(WITH_ETW)
 endif(WIN32)
 
@@ -167,8 +164,8 @@ endif()
 
 list(APPEND CMAKE_PREFIX_PATH "${CMAKE_BINARY_DIR}")
 
+include(CTest)
 if(BUILD_TESTING)
-  include(CTest)
   if(EXISTS ${CMAKE_BINARY_DIR}/lib/libgtest.a)
     # Prefer GTest from build tree. GTest is not always working with
     # CMAKE_PREFIX_PATH
@@ -182,7 +179,7 @@ if(BUILD_TESTING)
   elseif(WIN32)
     # Make sure we are always bootsrapped with vcpkg on Windows
     find_package(GTest)
-    if(NOT GTEST_FOUND)
+    if(NOT (GTEST_FOUND OR GTest_FOUND))
       install_windows_deps()
       find_package(GTest REQUIRED)
     endif()
@@ -212,6 +209,9 @@ if(WITH_EXAMPLES)
   add_subdirectory(examples)
 endif()
 add_subdirectory(ext)
+
+# Add nlohmann/json submodule to include directories
+include_directories(third_party/nlohmann-json/single_include)
 
 # Export cmake config and support find_packages(opentelemetry-cpp CONFIG) Write
 # config file for find_packages(opentelemetry-cpp CONFIG)
