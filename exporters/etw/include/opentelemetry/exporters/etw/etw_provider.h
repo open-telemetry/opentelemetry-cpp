@@ -1,4 +1,4 @@
-// Copyright 2020, OpenTelemetry Authors
+// Copyright 2020-2021, OpenTelemetry Authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -19,31 +19,27 @@
 #endif
 
 #ifdef _MSC_VER
-// evntprov.h(838) : warning C4459 : declaration of 'Version' hides global declaration
+#  pragma warning(push)
 #  pragma warning(disable : 4459)
-// needed for Unit Testing with krabs.hpp
 #  pragma warning(disable : 4018)
 #endif
 
-#include "opentelemetry/common/attribute_value.h"
+#include "opentelemetry/exporters/etw/etw_properties.h"
 #include "opentelemetry/exporters/etw/uuid.h"
 #include "opentelemetry/version.h"
 
+#include "opentelemetry/exporters/etw/etw_fields.h"
 #include "opentelemetry/exporters/etw/utils.h"
 
 #ifdef HAVE_MSGPACK
-// This option requires INCLUDE_DIR=$(ProjectDir)\..\..\third_party\json\include;...
 #  include "nlohmann/json.hpp"
 #endif
 
-#ifndef HAVE_NO_TLD
-// Allow to opt-out from `TraceLoggingDynamic.h` header usage
-#  define HAVE_TLD
-#  include "TraceLoggingDynamic.h"
-#endif
+#include "opentelemetry/exporters/etw/etw_traceloggingdynamic.h"
 
 #include <map>
 #include <mutex>
+#include <string>
 #include <unordered_map>
 #include <vector>
 
@@ -57,6 +53,9 @@
 #define MICROSOFT_EVENTTAG_NORMAL_PERSISTENCE 0x01000000
 
 OPENTELEMETRY_BEGIN_NAMESPACE
+
+using Properties   = exporter::etw::Properties;
+using PropertyType = exporter::etw::PropertyType;
 
 class ETWProvider
 {
@@ -78,6 +77,7 @@ public:
   /// </summary>
   struct Handle
   {
+    uint64_t refCount;
     REGHANDLE providerHandle;
     std::vector<BYTE> providerMetaVector;
     GUID providerGuid;
@@ -107,14 +107,9 @@ public:
   /// </summary>
   /// <param name="providerId"></param>
   /// <returns></returns>
-  Handle &open(const std::string &providerId, EventFormat format = EventFormat::ETW_MANIFEST)
+  Handle &open(const std::string &providerId, EventFormat format = EventFormat::ETW_MSGPACK)
   {
     std::lock_guard<std::mutex> lock(m_providerMapLock);
-
-#ifdef HAVE_NO_TLD
-    // Fallback to MessagePack-encoded ETW events
-    format = EventFormat::ETW_MSGPACK;
-#endif
 
     // Check and return if provider is already registered
     auto it = providers().find(providerId);
@@ -122,6 +117,7 @@ public:
     {
       if (it->second.providerHandle != INVALID_HANDLE)
       {
+        it->second.refCount++;
         return it->second;
       }
     }
@@ -158,10 +154,12 @@ public:
             tld::RegisterProvider(&hProvider, &data.providerGuid, data.providerMetaVector.data()))
         {
           // There was an error registering the ETW provider
+          data.refCount       = 0;
           data.providerHandle = INVALID_HANDLE;
         }
         else
         {
+          data.refCount       = 1;
           data.providerHandle = hProvider;
         };
       };
@@ -175,10 +173,12 @@ public:
         if (EventRegister(&data.providerGuid, NULL, NULL, &hProvider) != ERROR_SUCCESS)
         {
           // There was an error registering the ETW provider
+          data.refCount       = 0;
           data.providerHandle = INVALID_HANDLE;
         }
         else
         {
+          data.refCount       = 1;
           data.providerHandle = hProvider;
         }
       };
@@ -195,12 +195,12 @@ public:
     return data;
   }
 
-  /// <summary>
-  /// Unregister Provider
-  /// </summary>
-  /// <param name="providerId"></param>
-  /// <returns></returns>
-  unsigned long close(Handle data)
+  /**
+   * @brief Unregister provider
+   * @param data Provider Handle
+   * @return status code
+   */
+  unsigned long close(Handle handle)
   {
     std::lock_guard<std::mutex> lock(m_providerMapLock);
 
@@ -208,131 +208,139 @@ public:
     auto it = m.begin();
     while (it != m.end())
     {
-      if (it->second.providerHandle == data.providerHandle)
+      if (it->second.providerHandle == handle.providerHandle)
       {
-        auto result = EventUnregister(data.providerHandle);
-        m.erase(it);
+        // reference to item in the map of open provider handles
+        auto &data           = it->second;
+        unsigned long result = STATUS_OK;
+
+        data.refCount--;
+        if (data.refCount == 0)
+        {
+#ifdef HAVE_TLD
+          if (data.providerMetaVector.size())
+          {
+            // ETW/TraceLoggingDynamic provider
+            result = tld::UnregisterProvider(data.providerHandle);
+          }
+          else
+#endif
+          {
+            // Other provider types, e.g. ETW/MsgPack
+            result = EventUnregister(data.providerHandle);
+          }
+
+          it->second.providerHandle = INVALID_HANDLE;
+          m.erase(it);
+        }
         return result;
       }
     };
     return STATUS_ERROR;
   }
 
-#ifdef HAVE_MSGPACK
-  template <class T>
-  unsigned long writeMsgPack(Handle &providerData, T eventData)
+  unsigned long writeMsgPack(Handle &providerData,
+                             exporter::etw::Properties &eventData,
+                             LPCGUID ActivityId        = nullptr,
+                             LPCGUID RelatedActivityId = nullptr,
+                             uint8_t Opcode            = 0)
   {
-
-    // Make sure you stop sending event before register unregistering providerData
+#ifdef HAVE_MSGPACK
+    // Events can only be sent if provider is registered
     if (providerData.providerHandle == INVALID_HANDLE)
     {
       // Provider not registered!
       return STATUS_ERROR;
     };
 
-    const std::string EVENT_NAME = "name";
-    std::string eventName        = "NoName";
-    auto nameField               = eventData[EVENT_NAME];
+    std::string eventName = "NoName";
+    auto nameField        = eventData[ETW_FIELD_NAME];
+
+#  ifdef HAVE_FIELD_TIME
+    // Event time is appended by ETW layer itself by default. This code allows
+    // to override the timestamp by millisecond timestamp, in case if it has
+    // not been already provided by the upper layer.
+    if (!eventData.count(ETW_FIELD_TIME))
+    {
+      // TODO: if nanoseconds resolution is required, then we can populate it in 96-bit MsgPack
+      // spec. auto nanos =
+      // std::chrono::duration_cast<std::chrono::nanoseconds>(now.time_since_epoch()).count();
+      eventData[ETW_FIELD_TIME] = opentelemetry::utils::getUtcSystemTimeMs();
+    }
+#  endif
+
     switch (nameField.index())
     {
-      case common::AttributeType::TYPE_STRING:
-        eventName =
-            (char *)(nostd::get<nostd::string_view>(nameField).data());  // must be 0-terminated!
+      case PropertyType::kTypeString:
+        eventName = (char *)(nostd::get<std::string>(nameField).data());  // must be 0-terminated!
         break;
-#  ifdef HAVE_CSTRING_TYPE
-      case common::AttributeType::TYPE_CSTRING:
+      case PropertyType::kTypeCString:
         eventName = (char *)(nostd::get<const char *>(nameField));
         break;
-#  endif
       default:
-        // This is user error. Invalid event name!
-        // We supply default 'NoName' event name in this case.
+        // If invalid event name is supplied, then we replace it with 'NoName'
         break;
     }
 
     /* clang-format off */
     nlohmann::json jObj =
     {
-      { "env_name", "Span" },
-      { "env_ver", "4.0" },
-      //
-      // TODO: compute time in MessagePack-friendly format
-      // TODO: should we consider uint64_t format with Unix timestamps for ELK stack?
-      { "env_time",
-        {
-          { "TypeCode", 255 },
-          { "Body","0xFFFFFC60000000005F752C2C" }
-        }
-      },
-      //
-
-      // TODO: follow JSON implementation of OTLP or place protobuf for non-Microsoft flows
-      { "env_dt_traceId", "6dcdae7b9b0c7643967d74ee54056178" },
-      { "env_dt_spanId", "5866c4322919e641" },
-      //
-      { "name", eventName },
-      { "kind", 0 },
-      { "startTime",
-        {
-          // TODO: timestamp
-          { "TypeCode", 255 },
-          { "Body", "0xFFFF87CC000000005F752C2C" }
-        }
-      }
+      { ETW_FIELD_NAME, eventName },
+      { ETW_FIELD_OPCODE, Opcode }
     };
     /* clang-format on */
 
+    std::string eventFieldName(ETW_FIELD_NAME);
     for (auto &kv : eventData)
     {
       const char *name = kv.first.data();
-      // Don't include event name field in the payload
-      if (EVENT_NAME == name)
+
+      // Don't include event name field in the Payload section
+      if (eventFieldName == name)
         continue;
+
       auto &value = kv.second;
       switch (value.index())
       {
-        case common::AttributeType::TYPE_BOOL: {
+        case PropertyType::kTypeBool: {
           UINT8 temp = static_cast<UINT8>(nostd::get<bool>(value));
           jObj[name] = temp;
           break;
         }
-        case common::AttributeType::TYPE_INT: {
+        case PropertyType::kTypeInt: {
           auto temp  = nostd::get<int32_t>(value);
           jObj[name] = temp;
           break;
         }
-        case common::AttributeType::TYPE_INT64: {
+        case PropertyType::kTypeInt64: {
           auto temp  = nostd::get<int64_t>(value);
           jObj[name] = temp;
           break;
         }
-        case common::AttributeType::TYPE_UINT: {
+        case PropertyType::kTypeUInt: {
           auto temp  = nostd::get<uint32_t>(value);
           jObj[name] = temp;
           break;
         }
-        case common::AttributeType::TYPE_UINT64: {
+        case PropertyType::kTypeUInt64: {
           auto temp  = nostd::get<uint64_t>(value);
           jObj[name] = temp;
           break;
         }
-        case common::AttributeType::TYPE_DOUBLE: {
+        case PropertyType::kTypeDouble: {
           auto temp  = nostd::get<double>(value);
           jObj[name] = temp;
           break;
         }
-        case common::AttributeType::TYPE_STRING: {
-          auto temp  = nostd::get<nostd::string_view>(value);
-          jObj[name] = temp;
+        case PropertyType::kTypeString: {
+          jObj[name] = nostd::get<std::string>(value);
           break;
         }
-#  ifdef HAVE_CSTRING_TYPE
-        case common::AttributeType::TYPE_CSTRING: {
+        case PropertyType::kTypeCString: {
           auto temp  = nostd::get<const char *>(value);
           jObj[name] = temp;
           break;
         }
-#  endif
 #  if HAVE_TYPE_GUID
           // TODO: consider adding UUID/GUID to spec
         case common::AttributeType::TYPE_GUID: {
@@ -342,64 +350,47 @@ public:
           break;
         }
 #  endif
+
         // TODO: arrays are not supported yet
 #  ifdef HAVE_SPAN_BYTE
         case common::AttributeType::TYPE_SPAN_BYTE:
 #  endif
-        case common::AttributeType::TYPE_SPAN_BOOL:
-        case common::AttributeType::TYPE_SPAN_INT:
-        case common::AttributeType::TYPE_SPAN_INT64:
-        case common::AttributeType::TYPE_SPAN_UINT:
-        case common::AttributeType::TYPE_SPAN_UINT64:
-        case common::AttributeType::TYPE_SPAN_DOUBLE:
-        case common::AttributeType::TYPE_SPAN_STRING:
+        case PropertyType::kTypeSpanBool:
+        case PropertyType::kTypeSpanInt:
+        case PropertyType::kTypeSpanInt64:
+        case PropertyType::kTypeSpanUInt:
+        case PropertyType::kTypeSpanUInt64:
+        case PropertyType::kTypeSpanDouble:
+        case PropertyType::kTypeSpanString:
         default:
           // TODO: unsupported type
           break;
       }
     };
 
-    // Layer 1
-    nlohmann::json l1 = nlohmann::json::array();
-    // Layer 2
-    nlohmann::json l2 = nlohmann::json::array();
-    // Layer 3
-    nlohmann::json l3 = nlohmann::json::array();
-
-    l1.push_back("Span");
-
-    {
-      // TODO: clarify why this is needed
-      // TODO: fix time here
-      nlohmann::json j;
-      j["TypeCode"] = 255;
-      j["Body"]     = "0xFFFFFC60000000005F752C2C";
-      l3.push_back(j);
-    };
-
-    // Actual value object goes here
-    l3.push_back(jObj);
-
-    l2.push_back(l3);
-    l1.push_back(l2);
-
-    {
-      // Another time field again, but at the top
-      // TODO: fix time here
-      nlohmann::json j;
-      j["TypeCode"] = 255;
-      j["Body"]     = "0xFFFFFC60000000005F752C2C";
-      l1.push_back(j);
-    };
-
-    std::vector<uint8_t> v = nlohmann::json::to_msgpack(l1);
+    std::vector<uint8_t> v = nlohmann::json::to_msgpack(jObj);
 
     EVENT_DESCRIPTOR evtDescriptor;
-    EventDescCreate(&evtDescriptor, 0, 0x1, 0, 0, 0, 0, 0);
+    // TODO: event descriptor may be populated with additional values as follows:
+    // Id       - if 0, auto-incremented sequence number that uniquely identifies event in a trace
+    // Version  - event version
+    // Channel  - 11 for TraceLogging
+    // Level    - verbosity level
+    // Task     - TaskId
+    // Opcode   - described in evntprov.h:259 : 0 - info, 1 - activity start, 2 - activity stop.
+    EventDescCreate(&evtDescriptor, 0, 0x1, 0, 0, 0, Opcode, 0);
     EVENT_DATA_DESCRIPTOR evtData[1];
     EventDataDescCreate(&evtData[0], v.data(), static_cast<ULONG>(v.size()));
-
-    auto writeResponse = EventWrite(providerData.providerHandle, &evtDescriptor, 1, evtData);
+    ULONG writeResponse = 0;
+    if ((ActivityId != nullptr) || (RelatedActivityId != nullptr))
+    {
+      writeResponse = EventWriteTransfer(providerData.providerHandle, &evtDescriptor, ActivityId,
+                                         RelatedActivityId, 1, evtData);
+    }
+    else
+    {
+      writeResponse = EventWrite(providerData.providerHandle, &evtDescriptor, 1, evtData);
+    };
 
     switch (writeResponse)
     {
@@ -422,8 +413,10 @@ public:
       return STATUS_EFBIG;
     };
     return (unsigned long)(writeResponse);
-  }
+#else
+    return STATUS_ERROR;
 #endif
+  }
 
   /// <summary>
   /// Send event to Provider Id
@@ -431,8 +424,11 @@ public:
   /// <param name="providerId"></param>
   /// <param name="eventData"></param>
   /// <returns></returns>
-  template <class T>
-  unsigned long writeTld(Handle &providerData, T eventData)
+  unsigned long writeTld(Handle &providerData,
+                         Properties &eventData,
+                         LPCGUID ActivityId        = nullptr,
+                         LPCGUID RelatedActivityId = nullptr,
+                         uint8_t Opcode            = 0 /* Information */)
   {
 #ifdef HAVE_TLD
     // Make sure you stop sending event before register unregistering providerData
@@ -449,20 +445,17 @@ public:
     tld::EventMetadataBuilder<std::vector<BYTE>> builder(byteVector);
     tld::EventDataBuilder<std::vector<BYTE>> dbuilder(byteDataVector);
 
-    const std::string EVENT_NAME = "name";
+    const std::string EVENT_NAME = ETW_FIELD_NAME;
     std::string eventName        = "NoName";
     auto nameField               = eventData[EVENT_NAME];
     switch (nameField.index())
     {
-      case common::AttributeType::TYPE_STRING:
-        eventName =
-            (char *)(nostd::get<nostd::string_view>(nameField).data());  // must be 0-terminated!
+      case PropertyType::kTypeString:
+        eventName = (char *)(nostd::get<std::string>(nameField).data());
         break;
-#  ifdef HAVE_CSTRING_TYPE
-      case common::AttributeType::TYPE_CSTRING:
+      case PropertyType::kTypeCString:
         eventName = (char *)(nostd::get<const char *>(nameField));
         break;
-#  endif
       default:
         // This is user error. Invalid event name!
         // We supply default 'NoName' event name in this case.
@@ -480,59 +473,56 @@ public:
       auto &value = kv.second;
       switch (value.index())
       {
-        case common::AttributeType::TYPE_BOOL: {
+        case PropertyType::kTypeBool: {
           builder.AddField(name, tld::TypeBool8);
           UINT8 temp = static_cast<UINT8>(nostd::get<bool>(value));
           dbuilder.AddByte(temp);
           break;
         }
-        case common::AttributeType::TYPE_INT: {
+        case PropertyType::kTypeInt: {
           builder.AddField(name, tld::TypeInt32);
           auto temp = nostd::get<int32_t>(value);
           dbuilder.AddValue(temp);
           break;
         }
-        case common::AttributeType::TYPE_INT64: {
+        case PropertyType::kTypeInt64: {
           builder.AddField(name, tld::TypeInt64);
           auto temp = nostd::get<int64_t>(value);
           dbuilder.AddValue(temp);
           break;
         }
-        case common::AttributeType::TYPE_UINT: {
+        case PropertyType::kTypeUInt: {
           builder.AddField(name, tld::TypeUInt32);
           auto temp = nostd::get<uint32_t>(value);
           dbuilder.AddValue(temp);
           break;
         }
-        case common::AttributeType::TYPE_UINT64: {
+        case PropertyType::kTypeUInt64: {
           builder.AddField(name, tld::TypeUInt64);
           auto temp = nostd::get<uint64_t>(value);
           dbuilder.AddValue(temp);
           break;
         }
-        case common::AttributeType::TYPE_DOUBLE: {
+        case PropertyType::kTypeDouble: {
           builder.AddField(name, tld::TypeDouble);
           auto temp = nostd::get<double>(value);
           dbuilder.AddValue(temp);
           break;
         }
-        case common::AttributeType::TYPE_STRING: {
+        case PropertyType::kTypeString: {
           builder.AddField(name, tld::TypeUtf8String);
-          auto temp = nostd::get<nostd::string_view>(value);
-          dbuilder.AddString(temp.data());
+          dbuilder.AddString(nostd::get<std::string>(value).data());
           break;
         }
-#  ifdef HAVE_CSTRING_TYPE
-        case common::AttributeType::TYPE_CSTRING: {
+        case PropertyType::kTypeCString: {
           builder.AddField(name, tld::TypeUtf8String);
           auto temp = nostd::get<const char *>(value);
           dbuilder.AddString(temp);
           break;
         }
-#  endif
 #  if HAVE_TYPE_GUID
           // TODO: consider adding UUID/GUID to spec
-        case common::AttributeType::TYPE_GUID: {
+        case PropertyType::kGUID: {
           builder.AddField(name.c_str(), TypeGuid);
           auto temp = nostd::get<GUID>(value);
           dbuilder.AddBytes(&temp, sizeof(GUID));
@@ -542,15 +532,15 @@ public:
 
         // TODO: arrays are not supported
 #  ifdef HAVE_SPAN_BYTE
-        case common::AttributeType::TYPE_SPAN_BYTE:
+        case PropertyType::kTypeSpanByte:
 #  endif
-        case common::AttributeType::TYPE_SPAN_BOOL:
-        case common::AttributeType::TYPE_SPAN_INT:
-        case common::AttributeType::TYPE_SPAN_INT64:
-        case common::AttributeType::TYPE_SPAN_UINT:
-        case common::AttributeType::TYPE_SPAN_UINT64:
-        case common::AttributeType::TYPE_SPAN_DOUBLE:
-        case common::AttributeType::TYPE_SPAN_STRING:
+        case PropertyType::kTypeSpanBool:
+        case PropertyType::kTypeSpanInt:
+        case PropertyType::kTypeSpanInt64:
+        case PropertyType::kTypeSpanUInt:
+        case PropertyType::kTypeSpanUInt64:
+        case PropertyType::kTypeSpanDouble:
+        case PropertyType::kTypeSpanString:
         default:
           // TODO: unsupported type
           break;
@@ -563,28 +553,28 @@ public:
     }
 
     tld::EventDescriptor eventDescriptor;
-    // eventDescriptor.Keyword = MICROSOFT_KEYWORD_CRITICAL_DATA;
-    // eventDescriptor.Keyword = MICROSOFT_KEYWORD_TELEMETRY;
-    // eventDescriptor.Keyword = MICROSOFT_KEYWORD_MEASURES;
+    eventDescriptor.Opcode = Opcode;
+    eventDescriptor.Level  = 0; /* FIXME: Always on for now */
 
     EVENT_DATA_DESCRIPTOR pDataDescriptors[3];
-
     EventDataDescCreate(&pDataDescriptors[2], byteDataVector.data(),
                         static_cast<ULONG>(byteDataVector.size()));
 
-    // Event size detection is needed
-    int64_t eventByteSize = byteDataVector.size() + byteVector.size();
-    int64_t eventKBSize   = (eventByteSize + 1024 - 1) / 1024;
-    // bool isLargeEvent     = eventKBSize >= LargeEventSizeKB;
+    HRESULT writeResponse = 0;
+    if ((ActivityId != nullptr) || (RelatedActivityId != nullptr))
+    {
+      writeResponse = tld::WriteEvent(providerData.providerHandle, eventDescriptor,
+                                      providerData.providerMetaVector.data(), byteVector.data(), 3,
+                                      pDataDescriptors, ActivityId, RelatedActivityId);
+    }
+    else
+    {
+      writeResponse = tld::WriteEvent(providerData.providerHandle, eventDescriptor,
+                                      providerData.providerMetaVector.data(), byteVector.data(), 3,
+                                      pDataDescriptors);
+    }
 
-    // TODO: extract
-    // - GUID ActivityId
-    // - GUID RelatedActivityId
-
-    HRESULT writeResponse = tld::WriteEvent(providerData.providerHandle, eventDescriptor,
-                                            providerData.providerMetaVector.data(),
-                                            byteVector.data(), 3, pDataDescriptors);
-
+    // Event is larger than ETW max sized of 64KB
     if (writeResponse == HRESULT_FROM_WIN32(ERROR_ARITHMETIC_OVERFLOW))
     {
       return STATUS_EFBIG;
@@ -596,18 +586,20 @@ public:
 #endif
   }
 
-  template <class T>
   unsigned long write(Handle &providerData,
-                      T eventData,
-                      ETWProvider::EventFormat format = ETWProvider::EventFormat::ETW_MANIFEST)
+                      Properties &eventData,
+                      LPCGUID ActivityId,
+                      LPCGUID RelatedActivityId,
+                      uint8_t Opcode,
+                      ETWProvider::EventFormat format)
   {
     if (format == ETWProvider::EventFormat::ETW_MANIFEST)
     {
-      return writeTld(providerData, eventData);
+      return writeTld(providerData, eventData, ActivityId, RelatedActivityId, Opcode);
     }
     if (format == ETWProvider::EventFormat::ETW_MSGPACK)
     {
-      return writeMsgPack(providerData, eventData);
+      return writeMsgPack(providerData, eventData, ActivityId, RelatedActivityId, Opcode);
     }
     if (format == ETWProvider::EventFormat::ETW_XML)
     {
@@ -636,3 +628,7 @@ protected:
 };
 
 OPENTELEMETRY_END_NAMESPACE
+
+#ifdef _MSC_VER
+#  pragma warning(pop)
+#endif

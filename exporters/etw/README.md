@@ -49,12 +49,12 @@ and emitting a span named `MySpan` with attributes on it, as well as `MyEvent` w
 #include "opentelemetry/exporters/etw/etw_tracer_exporter.h"
 
 using namespace OPENTELEMETRY_NAMESPACE;
-using namespace opentelemetry::exporter::ETW;
+using namespace opentelemetry::exporter::etw;
 
 // Supply unique instrumentation name (ETW Provider Name) here:
 std::string providerName = "OpenTelemetry-ETW-Provider";
 
-exporter::ETW::TracerProvider tp;
+exporter::etw::TracerProvider tp;
 
 int main(int argc, const char* argv[])
 {
@@ -111,7 +111,6 @@ These options affect how "embedded in application" OpenTelemetry C++ SDK code is
 | HAVE_GSL      | Use [Microsoft GSL](https://github.com/microsoft/GSL) for `gsl::span` implementation. Library must be in include path. Microsoft GSL claims to be the most feature-complete implementation of `std::span`. It may be used instead of `nostd::span` implementation in projects that statically link OpenTelemetry SDK. |
 | HAVE_ABSEIL_VARIANT | Use `absl::variant` instead of `nostd::variant`. `nostd::variant` is incompatible with Visual Studio 2015. `absl::variant` should be used instead if targeting Visual Studio 2015. |
 | HAVE_TLD      | Use ETW/TraceLogging Dynamic protocol. This is the default implementation compatible with existing C# "listeners" / "decoders" of ETW events. This option requires an additional optional Microsoft MIT-licensed `TraceLoggingDynamic.h` header. |
-| HAVE_CSTRING_TYPE   | Allow passing C-string type `const char *` to API calls. In several scenarios (e.g. integration with C code) it is more performant to construct `nostd::string_view` from original C-string instead of constructing it from `std::string` copy of the C-string, thus avoiding unnecessary `memcpy`. |
 
 ## Debugging
 

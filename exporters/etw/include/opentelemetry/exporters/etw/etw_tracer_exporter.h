@@ -31,73 +31,11 @@
 #include "opentelemetry/trace/tracer_provider.h"
 
 #include "opentelemetry/sdk/trace/exporter.h"
-#include "opentelemetry/sdk/trace/recordable.h"
 
-#include "opentelemetry/exporters/etw/etw_data.h"
-#include "opentelemetry/exporters/etw/etw_provider_exporter.h"
+#include "opentelemetry/exporters/etw/etw_provider.h"
+#include "opentelemetry/exporters/etw/etw_tracer.h"
 
 #include "opentelemetry/exporters/etw/utils.h"
 
 namespace core  = opentelemetry::core;
 namespace trace = opentelemetry::trace;
-
-OPENTELEMETRY_BEGIN_NAMESPACE
-
-namespace exporter
-{
-namespace ETW
-{
-
-class ETWTracerExporter final : public opentelemetry::sdk::trace::SpanExporter
-{
-public:
-  /**
-   * @param providerName
-   * @param eventName
-   */
-  ETWTracerExporter(std::string providerName) : providerName_(providerName) {}
-
-  /**
-   * @return Returns a unique pointer to an empty recordable object
-   */
-  std::unique_ptr<sdk::trace::Recordable> MakeRecordable() noexcept override
-  {
-    return std::unique_ptr<sdk::trace::Recordable>(new ETWSpanData(providerName_));
-  }
-
-  /**
-   * @param recordables a required span containing unique pointers to the data
-   * to add to the ETWTracerExporter
-   * @return Returns the result of the operation
-   */
-  sdk::trace::ExportResult Export(
-      const nostd::span<std::unique_ptr<sdk::trace::Recordable>> &recordables) noexcept override
-  {
-    for (auto &recordable : recordables)
-    {
-      auto span = std::unique_ptr<ETWSpanData>(dynamic_cast<ETWSpanData *>(recordable.release()));
-      if (span != nullptr)
-      {
-        std::cout << span->GetName() << std::endl;
-      }
-    }
-
-    return sdk::trace::ExportResult::kSuccess;
-  }
-
-  /**
-   * @param timeout an optional value containing the timeout of the exporter
-   * note: passing custom timeout values is not currently supported for this exporter
-   */
-  bool Shutdown(std::chrono::microseconds timeout = std::chrono::microseconds(0)) noexcept override
-  {
-    return true;
-  };
-
-private:
-  std::string providerName_;
-};
-}  // namespace ETW
-}  // namespace exporter
-
-OPENTELEMETRY_END_NAMESPACE
