@@ -19,7 +19,8 @@ void InitTracer()
   auto exporter  = std::unique_ptr<sdktrace::SpanExporter>(new otlp::OtlpExporter(opts));
   auto processor = std::unique_ptr<sdktrace::SpanProcessor>(
       new sdktrace::SimpleSpanProcessor(std::move(exporter)));
-  auto provider = nostd::shared_ptr<trace::TracerProvider>(new sdktrace::TracerProvider(std::move(processor)));
+  auto provider =
+      nostd::shared_ptr<trace::TracerProvider>(new sdktrace::TracerProvider(std::move(processor)));
   // Set the global trace provider
   trace::Provider::SetTracerProvider(provider);
 }

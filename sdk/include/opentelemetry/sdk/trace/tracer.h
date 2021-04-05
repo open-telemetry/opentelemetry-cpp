@@ -32,15 +32,11 @@ public:
 
   void CloseWithMicroseconds(uint64_t timeout) noexcept override;
 
-
   /** Returns the currently active span processor. */
-  SpanProcessor& GetActiveProcessor() noexcept {
-    return context_->GetActiveProcessor();
-  }
-
+  SpanProcessor &GetActiveProcessor() noexcept { return context_->GetActiveProcessor(); }
 
   // Note: Test only
-  Sampler& GetSampler() { return context_->GetSampler(); }
+  Sampler &GetSampler() { return context_->GetSampler(); }
 
 private:
   std::shared_ptr<sdk::trace::TracerContext> context_;

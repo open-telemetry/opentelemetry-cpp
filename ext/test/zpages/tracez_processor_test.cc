@@ -180,9 +180,8 @@ protected:
     auto resource = opentelemetry::sdk::resource::Resource::Create({});
     // Note: we make a *different* processor for the tracercontext. THis is because
     // all the tests use shared data, and we want to make sure this works correctly.
-    auto context  = std::make_shared<TracerContext>(
-      std::unique_ptr<SpanProcessor>(new TracezSpanProcessor(shared_data)),
-      resource);
+    auto context = std::make_shared<TracerContext>(
+        std::unique_ptr<SpanProcessor>(new TracezSpanProcessor(shared_data)), resource);
 
     tracer     = std::shared_ptr<opentelemetry::trace::Tracer>(new Tracer(context));
     auto spans = shared_data->GetSpanSnapshot();

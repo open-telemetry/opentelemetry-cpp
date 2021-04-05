@@ -35,7 +35,7 @@ public:
                              std::unique_ptr<AlwaysOnSampler>(new AlwaysOnSampler)) noexcept;
   /**
    * Attaches a span processor to this tracer context.
-   * 
+   *
    * @param processor The new span processor for this tracer. This must not be
    * a nullptr.  Ownership is given to the `TracerContext`.
    */
@@ -49,11 +49,11 @@ public:
 
   /**
    * Obtain the (conceptual) active processor.
-   * 
+   *
    * Note: When more than one processor is active, this will
    * return an "aggregate" processor
    */
-  SpanProcessor& GetActiveProcessor() const noexcept;
+  SpanProcessor &GetActiveProcessor() const noexcept;
 
   /**
    * Obtain the resource associated with this tracer context.

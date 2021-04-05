@@ -9,8 +9,8 @@
 #include "opentelemetry/sdk/trace/processor.h"
 #include "opentelemetry/sdk/trace/samplers/always_on.h"
 #include "opentelemetry/sdk/trace/tracer.h"
-#include "opentelemetry/trace/tracer_provider.h"
 #include "opentelemetry/sdk/trace/tracer_context.h"
+#include "opentelemetry/trace/tracer_provider.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace sdk
@@ -47,7 +47,7 @@ public:
    * Attaches a span processor to this tracer provider.
    * @param processor The new span processor for this tracer provider. This
    * must not be a nullptr.
-   * 
+   *
    * Note: This process may not receive any in-flight spans, but will get newly created spans.
    */
   void RegisterProcessor(std::unique_ptr<SpanProcessor> processor) noexcept;

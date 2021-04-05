@@ -37,9 +37,8 @@ protected:
     std::shared_ptr<TracezSharedData> shared_data(new TracezSharedData());
     auto resource = opentelemetry::sdk::resource::Resource::Create({});
     auto context  = std::make_shared<TracerContext>(
-      std::unique_ptr<SpanProcessor>(new TracezSpanProcessor(shared_data)),
-      resource);
-    tracer        = std::shared_ptr<opentelemetry::trace::Tracer>(new Tracer(context));
+        std::unique_ptr<SpanProcessor>(new TracezSpanProcessor(shared_data)), resource);
+    tracer                 = std::shared_ptr<opentelemetry::trace::Tracer>(new Tracer(context));
     tracez_data_aggregator = std::unique_ptr<TracezDataAggregator>(
         new TracezDataAggregator(shared_data, milliseconds(10)));
   }

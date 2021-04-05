@@ -42,8 +42,8 @@ nostd::shared_ptr<trace_api::Span> Tracer::StartSpan(
 {
   trace_api::SpanContext parent = GetCurrentSpanContext(options.parent);
 
-  auto sampling_result =
-      context_->GetSampler().ShouldSample(parent, parent.trace_id(), name, options.kind, attributes, links);
+  auto sampling_result = context_->GetSampler().ShouldSample(parent, parent.trace_id(), name,
+                                                             options.kind, attributes, links);
   if (sampling_result.decision == Decision::DROP)
   {
     // Don't allocate a no-op span for every DROP decision, but use a static
@@ -55,9 +55,9 @@ nostd::shared_ptr<trace_api::Span> Tracer::StartSpan(
   }
   else
   {
-    auto span = nostd::shared_ptr<trace_api::Span>{new (std::nothrow) Span{
-        this->shared_from_this(), name, attributes, links, options, parent,
-        sampling_result.trace_state, true}};
+    auto span = nostd::shared_ptr<trace_api::Span>{
+        new (std::nothrow) Span{this->shared_from_this(), name, attributes, links, options, parent,
+                                sampling_result.trace_state, true}};
 
     // if the attributes is not nullptr, add attributes to the span.
     if (sampling_result.attributes)
