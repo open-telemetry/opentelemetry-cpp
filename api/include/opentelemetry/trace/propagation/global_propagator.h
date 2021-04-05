@@ -18,26 +18,25 @@ namespace propagation
 
 /* Stores the singleton TextMapPropagator */
 
-template <typename T>
 class GlobalPropagator
 {
 public:
-  static nostd::shared_ptr<TextMapPropagator<T>> GetGlobalPropagator() noexcept
+  static nostd::shared_ptr<TextMapPropagator> GetGlobalPropagator() noexcept
   {
     std::lock_guard<common::SpinLockMutex> guard(GetLock());
-    return nostd::shared_ptr<TextMapPropagator<T>>(GetPropagator());
+    return nostd::shared_ptr<TextMapPropagator>(GetPropagator());
   }
 
-  static void SetGlobalPropagator(nostd::shared_ptr<TextMapPropagator<T>> prop) noexcept
+  static void SetGlobalPropagator(nostd::shared_ptr<TextMapPropagator> prop) noexcept
   {
     std::lock_guard<common::SpinLockMutex> guard(GetLock());
     GetPropagator() = prop;
   }
 
 private:
-  static nostd::shared_ptr<TextMapPropagator<T>> &GetPropagator() noexcept
+  static nostd::shared_ptr<TextMapPropagator> &GetPropagator() noexcept
   {
-    static nostd::shared_ptr<TextMapPropagator<T>> propagator(new NoOpPropagator<T>());
+    static nostd::shared_ptr<TextMapPropagator> propagator(new NoOpPropagator());
     return propagator;
   }
 

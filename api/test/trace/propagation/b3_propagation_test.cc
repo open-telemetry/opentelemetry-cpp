@@ -9,30 +9,31 @@
 
 using namespace opentelemetry;
 
-static nostd::string_view Getter(const std::map<std::string, std::string> &carrier,
-                                 nostd::string_view key)
+class TextMapCarrierTest : public trace::propagation::TextMapCarrier
 {
-  auto it = carrier.find(std::string(key));
-  if (it != carrier.end())
+public:
+  virtual nostd::string_view Get(const nostd::string_view &key) const noexcept override
   {
-    return nostd::string_view(it->second);
+    auto it = headers_.find(std::string(key));
+    if (it != headers_.end())
+    {
+      return nostd::string_view(it->second);
+    }
+    return "";
   }
-  return "";
-}
+  virtual void Set(const nostd::string_view &key, const nostd::string_view &value) noexcept override
+  {
+    headers_[std::string(key)] = std::string(value);
+  }
 
-static void Setter(std::map<std::string, std::string> &carrier,
-                   nostd::string_view key,
-                   nostd::string_view value = "")
-{
-  carrier[std::string(key)] = std::string(value);
-}
+  std::map<std::string, std::string> headers_;
+};
 
-using MapB3Context = trace::propagation::B3Propagator<std::map<std::string, std::string>>;
+using MapB3Context = trace::propagation::B3Propagator;
 
 static MapB3Context format = MapB3Context();
 
-using MapB3ContextMultiHeader =
-    trace::propagation::B3PropagatorMultiHeader<std::map<std::string, std::string>>;
+using MapB3ContextMultiHeader = trace::propagation::B3PropagatorMultiHeader;
 
 static MapB3ContextMultiHeader formatMultiHeader = MapB3ContextMultiHeader();
 
@@ -45,20 +46,20 @@ TEST(B3PropagationTest, TraceFlagsBufferGeneration)
 TEST(B3PropagationTest, PropagateInvalidContext)
 {
   // Do not propagate invalid trace context.
-  std::map<std::string, std::string> carrier = {};
+  TextMapCarrierTest carrier;
   context::Context ctx{
       "current-span",
       nostd::shared_ptr<trace::Span>(new trace::DefaultSpan(trace::SpanContext::GetInvalid()))};
-  format.Inject(Setter, carrier, ctx);
-  EXPECT_TRUE(carrier.count("b3") == 0);
+  format.Inject(carrier, ctx);
+  EXPECT_TRUE(carrier.headers_.count("b3") == 0);
 }
 
 TEST(B3PropagationTest, ExtractInvalidContext)
 {
-  const std::map<std::string, std::string> carrier = {
-      {"b3", "00000000000000000000000000000000-0000000000000000-0"}};
+  TextMapCarrierTest carrier;
+  carrier.headers_      = {{"b3", "00000000000000000000000000000000-0000000000000000-0"}};
   context::Context ctx1 = context::Context{};
-  context::Context ctx2 = format.Extract(Getter, carrier, ctx1);
+  context::Context ctx2 = format.Extract(carrier, ctx1);
   auto ctx2_span        = ctx2.GetValue(trace::kSpanKey);
   auto span             = nostd::get<nostd::shared_ptr<trace::Span>>(ctx2_span);
   EXPECT_EQ(span->GetContext().IsRemote(), false);
@@ -66,10 +67,10 @@ TEST(B3PropagationTest, ExtractInvalidContext)
 
 TEST(B3PropagationTest, DoNotExtractWithInvalidHex)
 {
-  const std::map<std::string, std::string> carrier = {
-      {"b3", "0000000zzz0000000000000000000000-0000000zzz000000-1"}};
+  TextMapCarrierTest carrier;
+  carrier.headers_      = {{"b3", "0000000zzz0000000000000000000000-0000000zzz000000-1"}};
   context::Context ctx1 = context::Context{};
-  context::Context ctx2 = format.Extract(Getter, carrier, ctx1);
+  context::Context ctx2 = format.Extract(carrier, ctx1);
   auto ctx2_span        = ctx2.GetValue(trace::kSpanKey);
   auto span             = nostd::get<nostd::shared_ptr<trace::Span>>(ctx2_span);
   EXPECT_EQ(span->GetContext().IsRemote(), false);
@@ -77,10 +78,11 @@ TEST(B3PropagationTest, DoNotExtractWithInvalidHex)
 
 TEST(B3PropagationTest, SetRemoteSpan)
 {
-  const std::map<std::string, std::string> carrier = {
+  TextMapCarrierTest carrier;
+  carrier.headers_ = {
       {"b3", "80f198ee56343ba864fe8b2a57d3eff7-e457b5a2e4d86bd1-1-05e3ac9a4f6e3b90"}};
   context::Context ctx1 = context::Context{};
-  context::Context ctx2 = format.Extract(Getter, carrier, ctx1);
+  context::Context ctx2 = format.Extract(carrier, ctx1);
 
   auto ctx2_span = ctx2.GetValue(trace::kSpanKey);
   EXPECT_TRUE(nostd::holds_alternative<nostd::shared_ptr<trace::Span>>(ctx2_span));
@@ -95,10 +97,10 @@ TEST(B3PropagationTest, SetRemoteSpan)
 
 TEST(B3PropagationTest, SetRemoteSpan_TraceIdShort)
 {
-  const std::map<std::string, std::string> carrier = {
-      {"b3", "80f198ee56343ba8-e457b5a2e4d86bd1-1-05e3ac9a4f6e3b90"}};
+  TextMapCarrierTest carrier;
+  carrier.headers_      = {{"b3", "80f198ee56343ba8-e457b5a2e4d86bd1-1-05e3ac9a4f6e3b90"}};
   context::Context ctx1 = context::Context{};
-  context::Context ctx2 = format.Extract(Getter, carrier, ctx1);
+  context::Context ctx2 = format.Extract(carrier, ctx1);
 
   auto ctx2_span = ctx2.GetValue(trace::kSpanKey);
   EXPECT_TRUE(nostd::holds_alternative<nostd::shared_ptr<trace::Span>>(ctx2_span));
@@ -113,10 +115,10 @@ TEST(B3PropagationTest, SetRemoteSpan_TraceIdShort)
 
 TEST(B3PropagationTest, SetRemoteSpan_SingleHeaderNoFlags)
 {
-  const std::map<std::string, std::string> carrier = {
-      {"b3", "80f198ee56343ba864fe8b2a57d3eff7-e457b5a2e4d86bd1"}};
+  TextMapCarrierTest carrier;
+  carrier.headers_      = {{"b3", "80f198ee56343ba864fe8b2a57d3eff7-e457b5a2e4d86bd1"}};
   context::Context ctx1 = context::Context{};
-  context::Context ctx2 = format.Extract(Getter, carrier, ctx1);
+  context::Context ctx2 = format.Extract(carrier, ctx1);
 
   auto ctx2_span = ctx2.GetValue(trace::kSpanKey);
   EXPECT_TRUE(nostd::holds_alternative<nostd::shared_ptr<trace::Span>>(ctx2_span));
@@ -131,12 +133,12 @@ TEST(B3PropagationTest, SetRemoteSpan_SingleHeaderNoFlags)
 
 TEST(B3PropagationTest, SetRemoteSpanMultiHeader)
 {
-  const std::map<std::string, std::string> carrier = {
-      {"X-B3-TraceId", "80f198ee56343ba864fe8b2a57d3eff7"},
-      {"X-B3-SpanId", "e457b5a2e4d86bd1"},
-      {"X-B3-Sampled", "1"}};
+  TextMapCarrierTest carrier;
+  carrier.headers_      = {{"X-B3-TraceId", "80f198ee56343ba864fe8b2a57d3eff7"},
+                      {"X-B3-SpanId", "e457b5a2e4d86bd1"},
+                      {"X-B3-Sampled", "1"}};
   context::Context ctx1 = context::Context{};
-  context::Context ctx2 = format.Extract(Getter, carrier, ctx1);
+  context::Context ctx2 = format.Extract(carrier, ctx1);
 
   auto ctx2_span = ctx2.GetValue(trace::kSpanKey);
   EXPECT_TRUE(nostd::holds_alternative<nostd::shared_ptr<trace::Span>>(ctx2_span));
@@ -151,6 +153,7 @@ TEST(B3PropagationTest, SetRemoteSpanMultiHeader)
 
 TEST(B3PropagationTest, GetCurrentSpan)
 {
+  TextMapCarrierTest carrier;
   constexpr uint8_t buf_span[]  = {1, 2, 3, 4, 5, 6, 7, 8};
   constexpr uint8_t buf_trace[] = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16};
   trace::SpanContext span_context{trace::TraceId{buf_trace}, trace::SpanId{buf_span},
@@ -160,13 +163,13 @@ TEST(B3PropagationTest, GetCurrentSpan)
   // Set `sp` as the currently active span, which must be used by `Inject`.
   trace::Scope scoped_span{sp};
 
-  std::map<std::string, std::string> headers = {};
-  format.Inject(Setter, headers, context::RuntimeContext::GetCurrent());
-  EXPECT_EQ(headers["b3"], "0102030405060708090a0b0c0d0e0f10-0102030405060708-1");
+  format.Inject(carrier, context::RuntimeContext::GetCurrent());
+  EXPECT_EQ(carrier.headers_["b3"], "0102030405060708090a0b0c0d0e0f10-0102030405060708-1");
 }
 
 TEST(B3PropagationTest, GetCurrentSpanMultiHeader)
 {
+  TextMapCarrierTest carrier;
   constexpr uint8_t buf_span[]  = {1, 2, 3, 4, 5, 6, 7, 8};
   constexpr uint8_t buf_trace[] = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16};
   trace::SpanContext span_context{trace::TraceId{buf_trace}, trace::SpanId{buf_span},
@@ -176,9 +179,8 @@ TEST(B3PropagationTest, GetCurrentSpanMultiHeader)
   // Set `sp` as the currently active span, which must be used by `Inject`.
   trace::Scope scoped_span{sp};
 
-  std::map<std::string, std::string> headers = {};
-  formatMultiHeader.Inject(Setter, headers, context::RuntimeContext::GetCurrent());
-  EXPECT_EQ(headers["X-B3-TraceId"], "0102030405060708090a0b0c0d0e0f10");
-  EXPECT_EQ(headers["X-B3-SpanId"], "0102030405060708");
-  EXPECT_EQ(headers["X-B3-Sampled"], "1");
+  formatMultiHeader.Inject(carrier, context::RuntimeContext::GetCurrent());
+  EXPECT_EQ(carrier.headers_["X-B3-TraceId"], "0102030405060708090a0b0c0d0e0f10");
+  EXPECT_EQ(carrier.headers_["X-B3-SpanId"], "0102030405060708");
+  EXPECT_EQ(carrier.headers_["X-B3-Sampled"], "1");
 }

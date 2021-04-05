@@ -9,20 +9,12 @@ namespace trace
 namespace propagation
 {
 
-template <typename T>
-class CompositePropagator : public TextMapPropagator<T>
+class CompositePropagator : public TextMapPropagator
 {
 public:
-  CompositePropagator(std::vector<std::unique_ptr<TextMapPropagator<T>>> propagators)
+  CompositePropagator(std::vector<std::unique_ptr<TextMapPropagator>> propagators)
       : propagators_(std::move(propagators))
   {}
-  // Rules that manages how context will be extracted from carrier.
-  using Getter = nostd::string_view (*)(const T &carrier, nostd::string_view trace_type);
-
-  // Rules that manages how context will be injected to carrier.
-  using Setter = void (*)(T &carrier,
-                          nostd::string_view trace_type,
-                          nostd::string_view trace_description);
 
   /**
    * Run each of the configured propagators with the given context and carrier.
@@ -36,11 +28,11 @@ public:
    *
    */
 
-  void Inject(Setter setter, T &carrier, const context::Context &context) noexcept override
+  void Inject(TextMapCarrier &carrier, const context::Context &context) noexcept override
   {
     for (auto &p : propagators_)
     {
-      p->Inject(setter, carrier, context);
+      p->Inject(carrier, context);
     }
   }
 
@@ -54,8 +46,7 @@ public:
    * @param context Context to add values to
    * @param carrier Carrier from which to extract context
    */
-  context::Context Extract(Getter getter,
-                           const T &carrier,
+  context::Context Extract(const TextMapCarrier &carrier,
                            context::Context &context) noexcept override
   {
     auto first = true;
@@ -64,19 +55,19 @@ public:
     {
       if (first)
       {
-        tmp_context = p->Extract(getter, carrier, context);
+        tmp_context = p->Extract(carrier, context);
         first       = false;
       }
       else
       {
-        tmp_context = p->Extract(getter, carrier, tmp_context);
+        tmp_context = p->Extract(carrier, tmp_context);
       }
     }
     return propagators_.size() ? tmp_context : context;
   }
 
 private:
-  std::vector<std::unique_ptr<TextMapPropagator<T>>> propagators_;
+  std::vector<std::unique_ptr<TextMapPropagator>> propagators_;
 };
 }  // namespace propagation
 }  // namespace trace
