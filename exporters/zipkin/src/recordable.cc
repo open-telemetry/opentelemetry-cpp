@@ -24,7 +24,16 @@ namespace exporter
 namespace zipkin
 {
 
+//
+// See `attribute_value.h` for details.
+// Expecting to remove the two feature gates for:
+// - HAVE_SPAN_BYTE     - proposal for binary type or byte array (uint8_t[]).
+//
+#if defined(HAVE_SPAN_BYTE)
+const int kAttributeValueSize = 15;
+#else
 const int kAttributeValueSize = 14;
+#endif
 
 void Recordable::SetIds(trace::TraceId trace_id,
                         trace::SpanId span_id,
@@ -80,6 +89,16 @@ void PopulateAttribute(nlohmann::json &attribute,
     attribute[key.data()] = nostd::string_view(nostd::get<nostd::string_view>(value).data(),
                                                nostd::get<nostd::string_view>(value).size());
   }
+#ifdef HAVE_SPAN_BYTE
+  else if (nostd::holds_alternative<nostd::span<const uint8_t>>(value))
+  {
+    attribute[key.data()] = {};
+    for (const auto &val : nostd::get<nostd::span<const uint8_t>>(value))
+    {
+      attribute[key.data()].push_back(val);
+    }
+  }
+#endif
   else if (nostd::holds_alternative<nostd::span<const bool>>(value))
   {
     attribute[key.data()] = {};
