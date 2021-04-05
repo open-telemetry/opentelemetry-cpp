@@ -51,10 +51,8 @@ public:
   /** Replaces the global tracer provider with an instance that exports to tracez. */
   void ReplaceGlobalProvider()
   {
-    std::shared_ptr<opentelemetry::sdk::trace::SpanProcessor> tracez_processor(
-        MakeSpanProcessor().release());
     auto tracez_provider_ = opentelemetry::nostd::shared_ptr<opentelemetry::trace::TracerProvider>(
-        new opentelemetry::sdk::trace::TracerProvider(tracez_processor));
+        new opentelemetry::sdk::trace::TracerProvider(MakeSpanProcessor()));
     opentelemetry::trace::Provider::SetTracerProvider(tracez_provider_);
   }
 
