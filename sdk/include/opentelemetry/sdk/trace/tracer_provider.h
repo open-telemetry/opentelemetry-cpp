@@ -10,6 +10,7 @@
 #include "opentelemetry/sdk/trace/samplers/always_on.h"
 #include "opentelemetry/sdk/trace/tracer.h"
 #include "opentelemetry/trace/tracer_provider.h"
+#include "opentelemetry/sdk/trace/tracer_context.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace sdk
@@ -26,34 +27,30 @@ public:
    * @param sampler The sampler for this tracer provider. This must
    * not be a nullptr.
    */
-  explicit TracerProvider(
-      std::shared_ptr<SpanProcessor> processor,
-      opentelemetry::sdk::resource::Resource &&resource =
-          opentelemetry::sdk::resource::Resource::Create({}),
-      std::shared_ptr<Sampler> sampler = std::make_shared<AlwaysOnSampler>()) noexcept;
+  explicit TracerProvider(std::unique_ptr<SpanProcessor> processor,
+                          opentelemetry::sdk::resource::Resource resource =
+                              opentelemetry::sdk::resource::Resource::Create({}),
+                          std::unique_ptr<Sampler> sampler =
+                              std::unique_ptr<AlwaysOnSampler>(new AlwaysOnSampler)) noexcept;
+
+  /**
+   * Initialize a new tracer provider with a specified context
+   * @param context The shared tracer configuration/pipeline for this provider.
+   */
+  explicit TracerProvider(std::shared_ptr<sdk::trace::TracerContext> context) noexcept;
 
   opentelemetry::nostd::shared_ptr<opentelemetry::trace::Tracer> GetTracer(
       nostd::string_view library_name,
       nostd::string_view library_version = "") noexcept override;
 
   /**
-   * Set the span processor associated with this tracer provider.
+   * Attaches a span processor to this tracer provider.
    * @param processor The new span processor for this tracer provider. This
    * must not be a nullptr.
+   * 
+   * Note: This process may not receive any in-flight spans, but will get newly created spans.
    */
-  void SetProcessor(std::shared_ptr<SpanProcessor> processor) noexcept;
-
-  /**
-   * Obtain the span processor associated with this tracer provider.
-   * @return The span processor for this tracer provider.
-   */
-  std::shared_ptr<SpanProcessor> GetProcessor() const noexcept;
-
-  /**
-   * Obtain the sampler associated with this tracer provider.
-   * @return The sampler for this tracer provider.
-   */
-  std::shared_ptr<Sampler> GetSampler() const noexcept;
+  void RegisterProcessor(std::unique_ptr<SpanProcessor> processor) noexcept;
 
   /**
    * Obtain the resource associated with this tracer provider.
@@ -72,10 +69,8 @@ public:
   bool ForceFlush(std::chrono::microseconds timeout = (std::chrono::microseconds::max)()) noexcept;
 
 private:
-  opentelemetry::sdk::common::AtomicSharedPtr<SpanProcessor> processor_;
+  std::shared_ptr<sdk::trace::TracerContext> context_;
   std::shared_ptr<opentelemetry::trace::Tracer> tracer_;
-  const std::shared_ptr<Sampler> sampler_;
-  const opentelemetry::sdk::resource::Resource resource_;
 };
 }  // namespace trace
 }  // namespace sdk
