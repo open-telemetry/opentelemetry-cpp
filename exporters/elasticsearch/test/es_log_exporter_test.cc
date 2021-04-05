@@ -35,7 +35,7 @@ TEST(ElasticsearchLogsExporterTests, InvalidEndpoint)
   auto result = exporter->Export(nostd::span<std::unique_ptr<sdklogs::Recordable>>(&record, 1));
 
   // Ensure the return value is failure
-  ASSERT_EQ(result, sdklogs::ExportResult::kFailure);
+  ASSERT_EQ(result, sdk::common::ExportResult::kFailure);
 }
 
 // Test that when the exporter is shutdown, any call to Export should return failure
@@ -52,7 +52,7 @@ TEST(ElasticsearchLogsExporterTests, Shutdown)
   auto result = exporter->Export(nostd::span<std::unique_ptr<sdklogs::Recordable>>(&record, 1));
 
   // Ensure the return value is failure
-  ASSERT_EQ(result, sdklogs::ExportResult::kFailure);
+  ASSERT_EQ(result, sdk::common::ExportResult::kFailure);
 }
 
 // Test the elasticsearch recordable object

@@ -45,7 +45,7 @@ public:
   {
     nostd::span<std::unique_ptr<Recordable>> batch(&span, 1);
     const std::lock_guard<opentelemetry::common::SpinLockMutex> locked(lock_);
-    if (exporter_->Export(batch) == ExportResult::kFailure)
+    if (exporter_->Export(batch) == sdk::common::ExportResult::kFailure)
     {
       /* Once it is defined how the SDK does logging, an error should be
        * logged in this case. */
