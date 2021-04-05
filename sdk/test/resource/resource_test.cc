@@ -11,7 +11,7 @@
 #include <gtest/gtest.h>
 
 #if defined(_WIN32)
-#define putenv _putenv
+#  define putenv _putenv
 #endif
 
 class TestResource : public opentelemetry::sdk::resource::Resource
