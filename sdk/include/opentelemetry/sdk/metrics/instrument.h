@@ -278,16 +278,17 @@ inline std::string KvToString(const opentelemetry::common::KeyValueIterable &kv)
   if (size)
   {
     size_t i = 1;
-    kv.ForEachKeyValue([&](nostd::string_view key, opentelemetry::common::AttributeValue value) noexcept {
-      ss << key << ":";
-      print_value(ss, value, true);
-      if (size != i)
-      {
-        ss << ",";
-      }
-      i++;
-      return true;
-    });
+    kv.ForEachKeyValue(
+        [&](nostd::string_view key, opentelemetry::common::AttributeValue value) noexcept {
+          ss << key << ":";
+          print_value(ss, value, true);
+          if (size != i)
+          {
+            ss << ",";
+          }
+          i++;
+          return true;
+        });
   };
   ss << "}";
   return ss.str();

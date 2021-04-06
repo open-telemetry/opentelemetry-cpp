@@ -18,8 +18,8 @@
 
 #include <memory>
 #include <vector>
-#include "opentelemetry/sdk/common/exporter_utils.h"
 #include "opentelemetry/nostd/span.h"
+#include "opentelemetry/sdk/common/exporter_utils.h"
 #include "opentelemetry/sdk/logs/processor.h"
 #include "opentelemetry/sdk/logs/recordable.h"
 
@@ -55,7 +55,8 @@ public:
    * @param records a span of unique pointers to log records
    * @returns an ExportResult code (whether export was success or failure)
    */
-  virtual sdk::common::ExportResult Export(const nostd::span<std::unique_ptr<Recordable>> &records) noexcept = 0;
+  virtual sdk::common::ExportResult Export(
+      const nostd::span<std::unique_ptr<Recordable>> &records) noexcept = 0;
 
   /**
    * Marks the exporter as ShutDown and cleans up any resources as required.

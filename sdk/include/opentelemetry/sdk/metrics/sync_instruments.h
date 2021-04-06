@@ -163,7 +163,10 @@ public:
     return ret;
   }
 
-  virtual void update(T val, const opentelemetry::common::KeyValueIterable &labels) override { add(val, labels); }
+  virtual void update(T val, const opentelemetry::common::KeyValueIterable &labels) override
+  {
+    add(val, labels);
+  }
 
   // A collection of the bound instruments created by this unbound instrument identified by their
   // labels.
@@ -290,7 +293,10 @@ public:
     return ret;
   }
 
-  virtual void update(T val, const opentelemetry::common::KeyValueIterable &labels) override { add(val, labels); }
+  virtual void update(T val, const opentelemetry::common::KeyValueIterable &labels) override
+  {
+    add(val, labels);
+  }
 
   std::unordered_map<std::string, nostd::shared_ptr<metrics_api::BoundUpDownCounter<T>>>
       boundInstruments_;
