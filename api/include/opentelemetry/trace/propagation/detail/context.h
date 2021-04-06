@@ -9,7 +9,7 @@ namespace propagation
 namespace detail
 {
 
-trace::SpanContext GetCurrentSpan(const context::Context &context)
+inline trace::SpanContext GetCurrentSpan(const context::Context &context)
 {
   context::ContextValue span = context.GetValue(trace::kSpanKey);
   if (nostd::holds_alternative<nostd::shared_ptr<trace::Span>>(span))
