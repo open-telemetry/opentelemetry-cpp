@@ -1,3 +1,17 @@
+// Copyright 2021, OpenTelemetry Authors
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
 #include "opentelemetry/trace/trace_state.h"
 
 #include <gtest/gtest.h>
@@ -7,57 +21,13 @@ namespace
 {
 
 using opentelemetry::trace::TraceState;
+namespace nostd = opentelemetry::nostd;
 
 // Random string of length 257. Used for testing strings with max length 256.
 const char *kLongString =
     "4aekid3he76zgytjavudqqeltyvu5zqio2lx7d92dlxlf0z4883irvxuwelsq27sx1mlrjg3r7ad3jeq09rjppyd9veorg"
     "2nmihy4vilabfts8bsxruih0urusmjnglzl3iwpjinmo835dbojcrd73p56nw80v4xxrkye59ytmu5v84ysfa24d58ovv9"
     "w1n54n0mhhf4z0mpv6oudywrp9vfoks6lrvxv3uihvbi2ihazf237kvt1nbsjn3kdvfdb";
-
-// ------------------------- Entry class tests ---------------------------------
-
-// Test constructor that takes a key-value pair
-TEST(EntryTest, KeyValueConstruction)
-{
-  opentelemetry::nostd::string_view key = "test_key";
-  opentelemetry::nostd::string_view val = "test_value";
-  TraceState::Entry e(key, val);
-
-  EXPECT_EQ(key.size(), e.GetKey().size());
-  EXPECT_EQ(key, e.GetKey());
-
-  EXPECT_EQ(val.size(), e.GetValue().size());
-  EXPECT_EQ(val, e.GetValue());
-}
-
-// Test copy constructor
-TEST(EntryTest, Copy)
-{
-  TraceState::Entry e("test_key", "test_value");
-  TraceState::Entry copy(e);
-  EXPECT_EQ(copy.GetKey(), e.GetKey());
-  EXPECT_EQ(copy.GetValue(), e.GetValue());
-}
-
-// Test assignment operator
-TEST(EntryTest, Assignment)
-{
-  TraceState::Entry e("test_key", "test_value");
-  TraceState::Entry empty;
-  empty = e;
-  EXPECT_EQ(empty.GetKey(), e.GetKey());
-  EXPECT_EQ(empty.GetValue(), e.GetValue());
-}
-
-TEST(EntryTest, SetValue)
-{
-  TraceState::Entry e("test_key", "test_value");
-  opentelemetry::nostd::string_view new_val = "new_value";
-  e.SetValue(new_val);
-
-  EXPECT_EQ(new_val.size(), e.GetValue().size());
-  EXPECT_EQ(new_val, e.GetValue());
-}
 
 // -------------------------- TraceState class tests ---------------------------
 
@@ -70,7 +40,7 @@ std::string create_ts_return_header(std::string header)
 std::string header_with_max_members()
 {
   std::string header = "";
-  auto max_members   = opentelemetry::trace::TraceState::kMaxKeyValuePairs;
+  auto max_members   = TraceState::kMaxKeyValuePairs;
   for (int i = 0; i < max_members; i++)
   {
     std::string key   = "key" + std::to_string(i);
@@ -106,7 +76,7 @@ TEST(TraceStateTest, ValidateHeaderParsing)
                    {max_trace_state_header.data(), max_trace_state_header.data()}};
   for (auto &testcase : testcases)
   {
-    EXPECT_EQ(TraceState::FromHeader(testcase.input)->ToHeader(), testcase.expected);
+    EXPECT_EQ(create_ts_return_header(testcase.input), testcase.expected);
   }
 }
 
@@ -116,10 +86,14 @@ TEST(TraceStateTest, TraceStateGet)
   std::string trace_state_header = header_with_max_members();
   auto ts                        = TraceState::FromHeader(trace_state_header);
 
-  EXPECT_EQ(ts->Get("key0"), "value0");
-  EXPECT_EQ(ts->Get("key16"), "value16");
-  EXPECT_EQ(ts->Get("key31"), "value31");
-  EXPECT_EQ(ts->Get("key32"), "");  // key not found
+  std::string value;
+  EXPECT_TRUE(ts->Get("key0", value));
+  EXPECT_EQ(value, "value0");
+  EXPECT_TRUE(ts->Get("key16", value));
+  EXPECT_EQ(value, "value16");
+  EXPECT_TRUE(ts->Get("key31", value));
+  EXPECT_EQ(value, "value31");
+  EXPECT_FALSE(ts->Get("key32", value));
 }
 
 TEST(TraceStateTest, TraceStateSet)
@@ -170,20 +144,20 @@ TEST(TraceStateTest, Empty)
   EXPECT_FALSE(ts1->Empty());
 }
 
-TEST(TraceStateTest, Entries)
+TEST(TraceStateTest, GetAllEntries)
 {
-  std::string trace_state_header                      = "k1=v1,k2=v2,k3=v3";
-  auto ts1                                            = TraceState::FromHeader(trace_state_header);
-  const int kNumPairs                                 = 3;
-  opentelemetry::nostd::string_view keys[kNumPairs]   = {"k1", "k2", "k3"};
-  opentelemetry::nostd::string_view values[kNumPairs] = {"v1", "v2", "v3"};
-
-  opentelemetry::nostd::span<TraceState::Entry> entries = ts1->Entries();
-  for (int i = 0; i < kNumPairs; i++)
-  {
-    EXPECT_EQ(entries[i].GetKey(), keys[i]);
-    EXPECT_EQ(entries[i].GetValue(), values[i]);
-  }
+  std::string trace_state_header       = "k1=v1,k2=v2,k3=v3";
+  auto ts1                             = TraceState::FromHeader(trace_state_header);
+  const int kNumPairs                  = 3;
+  nostd::string_view keys[kNumPairs]   = {"k1", "k2", "k3"};
+  nostd::string_view values[kNumPairs] = {"v1", "v2", "v3"};
+  size_t index                         = 0;
+  ts1->GetAllEntries([&keys, &values, &index](nostd::string_view key, nostd::string_view value) {
+    EXPECT_EQ(key, keys[index]);
+    EXPECT_EQ(value, values[index]);
+    index++;
+    return true;
+  });
 }
 
 TEST(TraceStateTest, IsValidKey)
@@ -208,25 +182,26 @@ TEST(TraceStateTest, IsValidValue)
 // Tests that keys and values don't depend on null terminators
 TEST(TraceStateTest, MemorySafe)
 {
-  std::string trace_state_header                    = "";
-  auto ts                                           = TraceState::FromHeader(trace_state_header);
-  const int kNumPairs                               = 3;
-  opentelemetry::nostd::string_view key_string      = "test_key_1test_key_2test_key_3";
-  opentelemetry::nostd::string_view val_string      = "test_val_1test_val_2test_val_3";
-  opentelemetry::nostd::string_view keys[kNumPairs] = {
-      key_string.substr(0, 10), key_string.substr(10, 10), key_string.substr(20, 10)};
-  opentelemetry::nostd::string_view values[kNumPairs] = {
-      val_string.substr(0, 10), val_string.substr(10, 10), val_string.substr(20, 10)};
+  std::string trace_state_header       = "";
+  auto ts                              = TraceState::FromHeader(trace_state_header);
+  const int kNumPairs                  = 3;
+  nostd::string_view key_string        = "test_key_1test_key_2test_key_3";
+  nostd::string_view val_string        = "test_val_1test_val_2test_val_3";
+  nostd::string_view keys[kNumPairs]   = {key_string.substr(0, 10), key_string.substr(10, 10),
+                                        key_string.substr(20, 10)};
+  nostd::string_view values[kNumPairs] = {val_string.substr(0, 10), val_string.substr(10, 10),
+                                          val_string.substr(20, 10)};
 
-  auto ts1 = ts->Set(keys[2], values[2]);
-  auto ts2 = ts1->Set(keys[1], values[1]);
-  auto ts3 = ts2->Set(keys[0], values[0]);
+  auto ts1     = ts->Set(keys[2], values[2]);
+  auto ts2     = ts1->Set(keys[1], values[1]);
+  auto ts3     = ts2->Set(keys[0], values[0]);
+  size_t index = 0;
 
-  opentelemetry::nostd::span<TraceState::Entry> entries = ts3->Entries();
-  for (int i = 0; i < kNumPairs; i++)
-  {
-    EXPECT_EQ(entries[i].GetKey(), keys[i]);
-    EXPECT_EQ(entries[i].GetValue(), values[i]);
-  }
+  ts3->GetAllEntries([&keys, &values, &index](nostd::string_view key, nostd::string_view value) {
+    EXPECT_EQ(key, keys[index]);
+    EXPECT_EQ(value, values[index]);
+    index++;
+    return true;
+  });
 }
 }  // namespace
