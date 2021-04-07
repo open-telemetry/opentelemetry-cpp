@@ -1,6 +1,11 @@
 #pragma once
 
+#include "opentelemetry/exporters/otlp/protobuf_include_prefix.h"
+
 #include "opentelemetry/proto/collector/trace/v1/trace_service.grpc.pb.h"
+
+#include "opentelemetry/exporters/otlp/protobuf_include_suffix.h"
+
 #include "opentelemetry/sdk/trace/exporter.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
