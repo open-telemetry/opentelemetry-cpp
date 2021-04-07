@@ -37,6 +37,16 @@ SpanProcessor &TracerContext::GetActiveProcessor() const noexcept
   return *processor_;
 }
 
+bool TracerContext::ForceFlush(std::chrono::microseconds timeout) noexcept
+{
+  return processor_->ForceFlush(timeout);
+}
+
+bool TracerContext::Shutdown() noexcept
+{
+  return processor_->Shutdown();
+}
+
 }  // namespace trace
 }  // namespace sdk
 OPENTELEMETRY_END_NAMESPACE

@@ -65,7 +65,13 @@ public:
    * Force all active SpanProcessors to flush any buffered spans
    * within the given timeout.
    */
-  void ForceFlushWithMicroseconds(uint64_t timeout) noexcept;
+  bool ForceFlush(
+      std::chrono::microseconds timeout = (std::chrono::microseconds::max)()) noexcept;
+
+  /**
+   * Shutdown the span processor associated with this tracer provider.
+   */
+  bool Shutdown() noexcept;
 
 private:
   // This is an atomic pointer so we can adapt the processor pipeline dynamically.

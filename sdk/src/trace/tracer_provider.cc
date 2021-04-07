@@ -35,12 +35,12 @@ const opentelemetry::sdk::resource::Resource &TracerProvider::GetResource() cons
 
 bool TracerProvider::Shutdown() noexcept
 {
-  return context_->GetActiveProcessor().Shutdown();
+  return context_->Shutdown();
 }
 
 bool TracerProvider::ForceFlush(std::chrono::microseconds timeout) noexcept
 {
-  return context_->GetActiveProcessor().ForceFlush(timeout);
+  return context_->ForceFlush(timeout);
 }
 
 }  // namespace trace
