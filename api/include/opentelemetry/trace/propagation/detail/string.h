@@ -14,7 +14,10 @@ namespace detail
  * Splits a string by separator, up to given buffer count words.
  * Returns the amount of words the input was split into.
  */
-size_t SplitString(nostd::string_view s, char separator, nostd::string_view *results, size_t count)
+inline size_t SplitString(nostd::string_view s,
+                          char separator,
+                          nostd::string_view *results,
+                          size_t count)
 {
   if (count == 0)
   {
