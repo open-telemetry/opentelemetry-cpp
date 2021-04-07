@@ -6,6 +6,7 @@ cc_binary(
     ],
     deps = [
         "//api",
+        "//ext:headers",
         "//ext/src/http/client/curl:http_client_curl",
         "//exporters/ostream:ostream_span_exporter",
         "//sdk/src/trace",
