@@ -21,7 +21,7 @@ namespace trace
  *   and sampling config.
  * - The owner/destroyer of Processors/Exporters.  These will remain active until
  *   this class is destroyed.  I.e. Sampling, Exporting, flushing etc. are all ok if this
- *   object is alive, and they willl work together.   If this object is destroyed, then
+ *   object is alive, and they will work together. If this object is destroyed, then
  *   no shared references to Processor, Exporter, Recordable etc. should exist, and all
  *   associated pipelines will have been flushed.
  */
