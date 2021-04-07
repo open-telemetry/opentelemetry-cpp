@@ -87,10 +87,24 @@ TEST(SpanData, Links)
   std::map<std::string, int64_t> attributes = {
       {keys[0], values[0]}, {keys[1], values[1]}, {keys[2], values[2]}};
 
+  // produce valid SpanContext with pseudo span and trace Id.
+  uint8_t span_id_buf[opentelemetry::trace::SpanId::kSize] = {
+      1,
+  };
+  opentelemetry::trace::SpanId span_id{span_id_buf};
+  uint8_t trace_id_buf[opentelemetry::trace::TraceId::kSize] = {
+      2,
+  };
+  opentelemetry::trace::TraceId trace_id{trace_id_buf};
+  const auto span_context = opentelemetry::trace::SpanContext(
+      trace_id, span_id,
+      opentelemetry::trace::TraceFlags{opentelemetry::trace::TraceFlags::kIsSampled}, true);
+
   data.AddLink(
-      opentelemetry::trace::SpanContext(false, false),
+      span_context,
       opentelemetry::common::KeyValueIterableView<std::map<std::string, int64_t>>(attributes));
 
+  EXPECT_EQ(data.GetLinks().at(0).GetSpanContext(), span_context);
   for (int i = 0; i < kNumAttributes; i++)
   {
     EXPECT_EQ(opentelemetry::nostd::get<int64_t>(data.GetLinks().at(0).GetAttributes().at(keys[i])),
