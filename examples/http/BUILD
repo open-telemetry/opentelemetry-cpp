@@ -10,6 +10,19 @@ cc_binary(
         "//exporters/ostream:ostream_span_exporter",
         "//sdk/src/trace",
     ],
+    # TODO: Move copts/linkopts for static CURL usage into shared bzl file.
+    copts = [
+        "-DCURL_STATICLIB",
+        "-DWITH_CURL",
+    ],
+    linkopts = select({
+        "//bazel:windows": [
+            "-DEFAULTLIB:advapi32.lib",
+            "-DEFAULTLIB:crypt32.lib",
+            "-DEFAULTLIB:Normaliz.lib",
+        ],
+        "//conditions:default": [],
+    }),
 )
 
 cc_binary(
