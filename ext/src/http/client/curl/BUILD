@@ -7,6 +7,11 @@ cc_library(
         "http_client_factory_curl.cc",
     ],
     include_prefix = "src/http/client/curl",
+    # TODO: Move copts/linkopts for static CURL usage into shared bzl file.
+    copts = [
+        "-DCURL_STATICLIB",
+        "-DWITH_CURL",
+    ],
     deps = [
         "//api",
         "//ext:headers",
