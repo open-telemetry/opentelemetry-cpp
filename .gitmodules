@@ -32,6 +32,3 @@
 	path = third_party/nlohmann-json
 	url = https://github.com/nlohmann/json
 	branch = master
-[submodule "third_party/jaeger-idl"]
-	path = third_party/jaeger-idl
-	url = https://github.com/jaegertracing/jaeger-idl
