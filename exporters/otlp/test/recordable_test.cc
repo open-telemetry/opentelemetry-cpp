@@ -212,7 +212,7 @@ struct IntAttributeTest : public testing::Test
 };
 
 using IntTypes = testing::Types<int, int64_t, unsigned int, uint64_t>;
-TYPED_TEST_CASE(IntAttributeTest, IntTypes);
+TYPED_TEST_SUITE(IntAttributeTest, IntTypes);
 
 TYPED_TEST(IntAttributeTest, SetIntSingleAttribute)
 {

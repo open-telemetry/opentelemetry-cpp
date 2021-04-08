@@ -61,7 +61,6 @@ private:
 
 /**
  * Class for storing links in SpanData.
- * TODO: Add getters for trace_id, span_id and trace_state when these are supported by SpanContext
  */
 class SpanDataLink
 {
@@ -79,6 +78,12 @@ public:
   {
     return attribute_map_.GetAttributes();
   }
+
+  /**
+   * Get the span context for this link
+   * @return the span context for this link
+   */
+  const opentelemetry::trace::SpanContext &GetSpanContext() const noexcept { return span_context_; }
 
 private:
   opentelemetry::trace::SpanContext span_context_;
