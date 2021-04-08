@@ -29,7 +29,9 @@ using namespace jaegertracing;
 class Recordable final : public sdk::trace::Recordable
 {
 public:
-  std::unique_ptr<thrift::Span> &&Span() noexcept { return std::move(span_); }
+  Recordable();
+
+  thrift::Span *Span() noexcept { return span_.release(); }
 
   void SetIds(trace::TraceId trace_id,
               trace::SpanId span_id,

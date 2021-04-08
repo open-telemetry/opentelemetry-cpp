@@ -20,6 +20,8 @@ namespace exporter
 namespace jaeger
 {
 
+Recordable::Recordable() : span_{new thrift::Span} {}
+
 void PopulateAttribute(nostd::string_view key, const opentelemetry::common::AttributeValue &value)
 {}
 

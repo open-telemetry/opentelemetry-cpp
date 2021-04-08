@@ -44,9 +44,9 @@ int ThriftSender::Append(std::unique_ptr<Recordable> &&span) noexcept
     // max_span_bytes -= process_byte_size_;
   }
 
-  auto jaeger_span = span->Span();
+  thrift::Span &jaeger_span = *span->Span();
 
-  const uint32_t span_size = CalcSizeOfSerializedThrift(*jaeger_span.get());
+  const uint32_t span_size = CalcSizeOfSerializedThrift(jaeger_span);
   if (span_size > max_span_bytes)
   {
     // TODO, handle too large span.
@@ -56,7 +56,7 @@ int ThriftSender::Append(std::unique_ptr<Recordable> &&span) noexcept
   byte_buffer_size_ += span_size;
   if (byte_buffer_size_ <= max_span_bytes)
   {
-    span_buffer_.push_back(*jaeger_span.release());
+    span_buffer_.push_back(jaeger_span);
     if (byte_buffer_size_ < max_span_bytes)
     {
       return 0;
@@ -69,7 +69,7 @@ int ThriftSender::Append(std::unique_ptr<Recordable> &&span) noexcept
   }
 
   const auto flushed = Flush();
-  span_buffer_.push_back(*jaeger_span.release());
+  span_buffer_.push_back(jaeger_span);
   byte_buffer_size_ = span_size + process_bytes_size_;
 
   return flushed;
