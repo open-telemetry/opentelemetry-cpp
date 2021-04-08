@@ -13,7 +13,8 @@
 // limitations under the License.
 
 #include <opentelemetry/exporters/jaeger/thrift_sender.h>
-#include <opentelemetry/exporters/jaeger/udp_transport.h>
+
+#include "udp_transport.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace exporter
@@ -27,28 +28,54 @@ ThriftSender::ThriftSender(std::unique_ptr<Transport> &&transport)
     : transport_(std::move(transport))
 {}
 
-ThriftSender::~ThriftSender() {}
-
 bool ThriftSender::Append(std::unique_ptr<Recordable> &&span) noexcept
 {
-  __debugbreak();
   if (span == nullptr)
   {
     return false;
   }
 
-  // spans_.push_back(std::move(span));
+  if (process_.serviceName.empty())
+  {
+    // TODO: populate Span.Process from OpenTelemetry resources.
+  }
 
   thrift::Batch batch;
   std::vector<thrift::Span> span_vec;
   span_vec.push_back(span.release()->span());
   transport_->EmitBatch(batch);
+
   return true;
 }
 
 int ThriftSender::Flush()
 {
-  return 0;
+  if (span_buffer_.empty())
+  {
+    return 0;
+  }
+
+  thrift::Batch batch;
+  batch.__set_process(process_);
+  batch.__set_spans(span_buffer_);
+
+  try
+  {
+    transport_->EmitBatch(batch);
+  }
+  catch (const std::system_error &)
+  {}
+  catch (const std::exception &)
+  {}
+  catch (...)
+  {}
+
+  return static_cast<int>(batch.spans.size());
+}
+
+void ThriftSender::Close()
+{
+  // transport_->close();
 }
 
 }  // namespace jaeger

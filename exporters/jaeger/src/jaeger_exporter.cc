@@ -16,7 +16,8 @@
 #include <opentelemetry/exporters/jaeger/jaeger_exporter.h>
 #include <opentelemetry/exporters/jaeger/recordable.h>
 #include <opentelemetry/exporters/jaeger/thrift_sender.h>
-#include <opentelemetry/exporters/jaeger/udp_transport.h>
+
+#include "udp_transport.h"
 
 #include <vector>
 

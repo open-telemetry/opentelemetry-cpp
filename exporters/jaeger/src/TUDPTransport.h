@@ -14,13 +14,14 @@
 
 #pragma once
 
-#include <agent.h>
-#include <memory>
-#include <vector>
+#ifdef _WIN32
+#  include <winsock2.h>
+#else
+#  include <sys/socket.h>
+#endif
 
-#include "recordable.h"
-#include "sender.h"
-#include "transport.h"
+#include <thrift/transport/PlatformSocket.h>
+#include <thrift/transport/TVirtualTransport.h>
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace exporter
@@ -28,25 +29,30 @@ namespace exporter
 namespace jaeger
 {
 
-using namespace jaegertracing;
-
-constexpr auto kEmitBatchOverhead = 30;
-
-class ThriftSender : public Sender
+class TUDPTransport : public apache::thrift::transport::TVirtualTransport<TUDPTransport>
 {
 public:
-  ThriftSender(std::unique_ptr<Transport> &&transport);
-  ~ThriftSender() override { Close(); }
+  TUDPTransport(const std::string &host, int port);
+  ~TUDPTransport() override;
 
-  bool Append(std::unique_ptr<Recordable> &&span) noexcept override;
-  int Flush() override;
-  void Close() override;
+  bool isOpen() const override;
+
+  void open() override;
+
+  void close() override;
+
+  uint32_t read(uint8_t *buf, uint32_t len);
+
+  void write(const uint8_t *buf, uint32_t len);
+
+  void flush() override;
 
 private:
-  std::vector<std::unique_ptr<Recordable>> spans_;
-  std::vector<thrift::Span> span_buffer_;
-  std::unique_ptr<Transport> transport_;
-  thrift::Process process_;
+  std::string host_;
+  int port_;
+  THRIFT_SOCKET socket_;
+  struct addrinfo *server_addr_info_ = nullptr;
+  uint32_t sockaddr_len              = 0;
 };
 
 }  // namespace jaeger

@@ -14,6 +14,7 @@
 
 #pragma once
 
+#include "TUDPTransport.h"
 #include "transport.h"
 
 #include <agent.h>
@@ -50,7 +51,7 @@ public:
 
 private:
   std::unique_ptr<AgentClient> agent_;
-  std::shared_ptr<TTransport> socket_;
+  std::shared_ptr<TTransport> endpoint_transport_;
   std::shared_ptr<TTransport> transport_;
   std::shared_ptr<TProtocol> protocol_;
 };

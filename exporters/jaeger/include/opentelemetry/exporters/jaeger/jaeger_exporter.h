@@ -18,6 +18,18 @@
 #include <chrono>
 #include <memory>
 
+#if (defined(__BYTE_ORDER__) && defined(__ORDER_LITTLE_ENDIAN__) && \
+     __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__)
+#  define OTEL_IS_LITTLE_ENDIAN 1
+#elif defined(__BYTE_ORDER__) && defined(__ORDER_BIG_ENDIAN__) && \
+    __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__
+#  define OTEL_IS_LITTLE_ENDIAN 0
+#elif defined(_WIN32)
+#  define OTEL_IS_LITTLE_ENDIAN 1
+#else
+#  error "Cannot detect the endianess for OpenTelemetry"
+#endif
+
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace exporter
 {
