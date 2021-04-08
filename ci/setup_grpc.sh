@@ -13,7 +13,7 @@ fi
 export BUILD_DIR=/tmp/
 export INSTALL_DIR=/usr/local/
 pushd $BUILD_DIR
-git clone --depth=1 -b v1.34.0 https://github.com/grpc/grpc
+git clone --depth=1 -b v1.38.0 https://github.com/grpc/grpc
 cd grpc
 git submodule init
 git submodule update --depth 1
