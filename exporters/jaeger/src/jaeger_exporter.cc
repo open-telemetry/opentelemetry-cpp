@@ -56,14 +56,6 @@ sdk::trace::ExportResult JaegerExporter::Export(
     }
   }
 
-  // thrift::Batch batch;
-
-  // TODO: support process.
-  // batch.__set_process(process);
-  // batch.__set_spans(_span_buffer);
-
-  // sender_.EmitBatch(batch);
-
   return sdk::trace::ExportResult::kSuccess;
 }
 

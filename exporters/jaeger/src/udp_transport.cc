@@ -34,7 +34,16 @@ UDPTransport::~UDPTransport() {}
 
 void UDPTransport::EmitBatch(const thrift::Batch &batch)
 {
-  agent_->emitBatch(batch);
+  try
+  {
+    agent_->emitBatch(batch);
+  }
+  catch (const std::system_error &)
+  {}
+  catch (const std::exception &)
+  {}
+  catch (...)
+  {}
 }
 
 }  // namespace jaeger

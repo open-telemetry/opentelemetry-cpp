@@ -86,16 +86,7 @@ int ThriftSender::Flush()
   batch.__set_process(process_);
   batch.__set_spans(span_buffer_);
 
-  try
-  {
-    transport_->EmitBatch(batch);
-  }
-  catch (const std::system_error &)
-  {}
-  catch (const std::exception &)
-  {}
-  catch (...)
-  {}
+  transport_->EmitBatch(batch);
 
   ResetBuffers();
 
