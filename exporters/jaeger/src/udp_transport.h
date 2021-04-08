@@ -51,6 +51,8 @@ public:
 
   uint32_t MaxPacketSize() const override { return max_packet_size_; }
 
+  void InitSocket();
+
 private:
   std::unique_ptr<AgentClient> agent_;
   std::shared_ptr<TTransport> endpoint_transport_;

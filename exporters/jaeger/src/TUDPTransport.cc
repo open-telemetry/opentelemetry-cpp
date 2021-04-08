@@ -20,7 +20,9 @@ namespace exporter
 namespace jaeger
 {
 
-TUDPTransport::TUDPTransport(const std::string &host, int port) : host_(host), port_(port) {}
+TUDPTransport::TUDPTransport(const std::string &host, int port)
+    : host_(host), port_(port), socket_(THRIFT_INVALID_SOCKET)
+{}
 
 TUDPTransport::~TUDPTransport()
 {
