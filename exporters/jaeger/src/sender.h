@@ -30,7 +30,7 @@ public:
   Sender()          = default;
   virtual ~Sender() = default;
 
-  virtual bool Append(std::unique_ptr<Recordable> &&span) = 0;
+  virtual int Append(std::unique_ptr<Recordable> &&span) = 0;
 
   virtual int Flush() = 0;
 

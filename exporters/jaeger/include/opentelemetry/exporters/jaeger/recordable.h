@@ -29,7 +29,7 @@ using namespace jaegertracing;
 class Recordable final : public sdk::trace::Recordable
 {
 public:
-  const thrift::Span &span() const noexcept { return span_; }
+  std::unique_ptr<thrift::Span> &&Span() noexcept { return std::move(span_); }
 
   void SetIds(trace::TraceId trace_id,
               trace::SpanId span_id,
@@ -56,7 +56,7 @@ public:
   void SetDuration(std::chrono::nanoseconds duration) noexcept override;
 
 private:
-  thrift::Span span_;
+  std::unique_ptr<thrift::Span> span_;
 };
 }  // namespace jaeger
 }  // namespace exporter

@@ -21,6 +21,7 @@ namespace jaeger
 {
 
 UDPTransport::UDPTransport(const std::string &addr, uint16_t port)
+    : max_packet_size_(kUDPPacketMaxLength)
 {
   endpoint_transport_ = std::shared_ptr<TTransport>(new TUDPTransport(addr, port));
   endpoint_transport_->open();

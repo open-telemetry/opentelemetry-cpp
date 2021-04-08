@@ -42,18 +42,21 @@ using TTransport         = apache::thrift::transport::TTransport;
 class UDPTransport : public Transport
 {
 public:
-  // static constexpr int32_t kUdpPacketMaxLength = 65000;
+  static constexpr auto kUDPPacketMaxLength = 65000;
 
   UDPTransport(const std::string &addr, uint16_t port);
   virtual ~UDPTransport();
 
   void EmitBatch(const thrift::Batch &batch) override;
 
+  uint32_t MaxPacketSize() const override { return max_packet_size_; }
+
 private:
   std::unique_ptr<AgentClient> agent_;
   std::shared_ptr<TTransport> endpoint_transport_;
   std::shared_ptr<TTransport> transport_;
   std::shared_ptr<TProtocol> protocol_;
+  uint32_t max_packet_size_;
 };
 
 }  // namespace jaeger

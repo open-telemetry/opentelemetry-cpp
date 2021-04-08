@@ -33,6 +33,7 @@ public:
   virtual ~Transport() = default;
 
   virtual void EmitBatch(const thrift::Batch &batch) = 0;
+  virtual uint32_t MaxPacketSize() const             = 0;
 };
 
 }  // namespace jaeger

@@ -27,10 +27,10 @@ void Recordable::SetIds(trace::TraceId trace_id,
                         trace::SpanId span_id,
                         trace::SpanId parent_span_id) noexcept
 {
-  span_.__set_traceIdLow(*(reinterpret_cast<const int64_t *>(trace_id.Id().data())));
-  span_.__set_traceIdHigh(*(reinterpret_cast<const int64_t *>(trace_id.Id().data()) + 1));
-  span_.__set_spanId(*(reinterpret_cast<const int64_t *>(trace_id.Id().data())));
-  span_.__set_parentSpanId(*(reinterpret_cast<const int64_t *>(parent_span_id.Id().data())));
+  span_->__set_traceIdLow(*(reinterpret_cast<const int64_t *>(trace_id.Id().data())));
+  span_->__set_traceIdHigh(*(reinterpret_cast<const int64_t *>(trace_id.Id().data()) + 1));
+  span_->__set_spanId(*(reinterpret_cast<const int64_t *>(trace_id.Id().data())));
+  span_->__set_parentSpanId(*(reinterpret_cast<const int64_t *>(parent_span_id.Id().data())));
 }
 
 void Recordable::SetAttribute(nostd::string_view key,
@@ -50,17 +50,17 @@ void Recordable::SetStatus(trace::StatusCode code, nostd::string_view descriptio
 
 void Recordable::SetName(nostd::string_view name) noexcept
 {
-  span_.__set_operationName(static_cast<std::string>(name));
+  span_->__set_operationName(static_cast<std::string>(name));
 }
 
 void Recordable::SetStartTime(opentelemetry::core::SystemTimestamp start_time) noexcept
 {
-  span_.__set_startTime(start_time.time_since_epoch().count());
+  span_->__set_startTime(start_time.time_since_epoch().count());
 }
 
 void Recordable::SetDuration(std::chrono::nanoseconds duration) noexcept
 {
-  span_.__set_duration(std::chrono::duration_cast<std::chrono::microseconds>(duration).count());
+  span_->__set_duration(std::chrono::duration_cast<std::chrono::microseconds>(duration).count());
 }
 
 void Recordable::SetSpanKind(opentelemetry::trace::SpanKind spand_kind) noexcept {}

@@ -20,7 +20,7 @@ namespace exporter
 namespace jaeger
 {
 
-TUDPTransport::TUDPTransport() {}
+TUDPTransport::TUDPTransport(const std::string &host, int port) : host_(host), port_(port) {}
 
 TUDPTransport::~TUDPTransport()
 {
@@ -47,16 +47,16 @@ void TUDPTransport::open()
 
   struct addrinfo hints;
   int error;
-  char port[sizeof("65535")];
+  char port[sizeof("65535") + 1];
 
   std::memset(&hints, 0, sizeof(hints));
-  hints.ai_family     = AF_UNSPEC;
-  hints.ai_sockettype = SOCK_DGRAM;
-  hints.ai_flags      = AI_PASSIVE | AI_ADDRCONFIG;
+  hints.ai_family   = AF_UNSPEC;
+  hints.ai_socktype = SOCK_DGRAM;
+  hints.ai_flags    = AI_PASSIVE | AI_ADDRCONFIG;
 
   sprintf(port, "%d", port_);
 
-  error = getaddrinfo(host_.cstr(), port, &hints, &server_addr_info_);
+  error = getaddrinfo(host_.c_str(), port, &hints, &server_addr_info_);
 
   if (error)
   {
@@ -65,9 +65,9 @@ void TUDPTransport::open()
   }
 
   socket_      = socket(server_addr_info_->ai_family, server_addr_info_->ai_socktype,
-                        server_addr_info_->ap_protocol);
-  sockaddr_len = server_addr_info->ai_addr->sa_family == AF_INET ? sizeof(struct in_addr)
-                                                                 : sizeof(struct in6_addr);
+                        server_addr_info_->ai_protocol);
+  sockaddr_len = server_addr_info_->ai_addr->sa_family == AF_INET ? sizeof(struct in_addr)
+                                                                  : sizeof(struct in6_addr);
 }
 
 void TUDPTransport::close()
@@ -81,12 +81,27 @@ void TUDPTransport::close()
 
 uint32_t TUDPTransport::read(uint8_t *buf, uint32_t len)
 {
-  return 0;
+  uint32_t num_read = recvfrom(socket_,
+#if defined(_WIN32)
+                               reinterpret_cast<char *>(buf), len, 0, server_addr_info_->ai_addr,
+                               reinterpret_cast<int *>(&sockaddr_len)
+#else
+                               buf, len, 0, server_addr_info_->ai_addr, &sockaddr_len
+#endif
+  );
+
+  return num_read;
 }
 
 void TUDPTransport::write(const uint8_t *buf, uint32_t len)
 {
-  sendto(socket_, buf, len, server_addr_info->ai_addr, sockaddr_len);
+  sendto(socket_,
+#if defined(_WIN32)
+         reinterpret_cast<const char *>(buf),
+#else
+         buf,
+#endif
+         len, 0, server_addr_info_->ai_addr, sockaddr_len);
 }
 
 void TUDPTransport::flush() {}

@@ -13,7 +13,8 @@ set(JAEGER_THRIFT_GENCPP_SOURCES
     thrift-gen/zipkincore_types.cpp)
 
 set(JAEGER_EXPORTER_SOURCES src/jaeger_exporter.cc src/thrift_sender.cc
-                            src/udp_transport.cc src/recordable.cc)
+                            src/udp_transport.cc src/recordable.cc
+                            src/TUDPTransport.cc)
 
 add_library(jaeger_trace_exporter ${JAEGER_EXPORTER_SOURCES}
                                   ${JAEGER_THRIFT_GENCPP_SOURCES})

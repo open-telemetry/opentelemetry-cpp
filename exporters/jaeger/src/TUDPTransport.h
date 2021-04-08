@@ -20,6 +20,7 @@
 #  include <sys/socket.h>
 #endif
 
+#include <opentelemetry/version.h>
 #include <thrift/transport/PlatformSocket.h>
 #include <thrift/transport/TVirtualTransport.h>
 

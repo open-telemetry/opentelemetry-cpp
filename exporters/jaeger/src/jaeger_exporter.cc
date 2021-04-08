@@ -15,8 +15,8 @@
 #include <agent_types.h>
 #include <opentelemetry/exporters/jaeger/jaeger_exporter.h>
 #include <opentelemetry/exporters/jaeger/recordable.h>
-#include <opentelemetry/exporters/jaeger/thrift_sender.h>
 
+#include "thrift_sender.h"
 #include "udp_transport.h"
 
 #include <vector>
