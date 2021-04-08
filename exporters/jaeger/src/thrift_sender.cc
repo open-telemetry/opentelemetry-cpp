@@ -93,7 +93,10 @@ int ThriftSender::Flush()
   return static_cast<int>(batch.spans.size());
 }
 
-void ThriftSender::Close() {}
+void ThriftSender::Close()
+{
+  Flush();
+}
 
 }  // namespace jaeger
 }  // namespace exporter

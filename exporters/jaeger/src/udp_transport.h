@@ -52,6 +52,7 @@ public:
   uint32_t MaxPacketSize() const override { return max_packet_size_; }
 
   void InitSocket();
+  void CleanSocket();
 
 private:
   std::unique_ptr<AgentClient> agent_;

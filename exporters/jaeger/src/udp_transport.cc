@@ -32,11 +32,14 @@ UDPTransport::UDPTransport(const std::string &addr, uint16_t port)
   agent_     = std::unique_ptr<AgentClient>(new AgentClient(protocol_));
 }
 
-UDPTransport::~UDPTransport() {}
+UDPTransport::~UDPTransport()
+{
+  CleanSocket();
+}
 
 void UDPTransport::InitSocket()
 {
-#ifdef WIN32
+#if defined(_WIN32)
   /* Use the MAKEWORD(lowbyte, highbyte) macro declared in Windef.h */
   WORD wVersionRequested = MAKEWORD(2, 2);
 
@@ -44,11 +47,8 @@ void UDPTransport::InitSocket()
   int err = WSAStartup(wVersionRequested, &wsaData);
   if (err != 0)
   {
-    std::ostringstream oss;
-    oss << "Failed to find a usable Winsock DLL. WSAStartup failed with "
-           "error "
-        << err;
-    throw std::system_error(errno, std::system_category(), oss.str());
+    // TODO: handle error
+    return;
   }
 
   /* Confirm that the WinSock DLL supports 2.2.*/
@@ -59,14 +59,18 @@ void UDPTransport::InitSocket()
 
   if (LOBYTE(wsaData.wVersion) != 2 || HIBYTE(wsaData.wVersion) != 2)
   {
+    // TODO: handle error that WinSock 2.2 is not supported.
     WSACleanup();
 
-    std::ostringstream oss;
-    oss << "Failed to find a usable Winsock DLL. WSAStartup failed with "
-           "error "
-        << err;
-    throw std::system_error(errno, std::system_category(), oss.str());
+    return;
   }
+#endif
+}
+
+void UDPTransport::CleanSocket()
+{
+#if defined(_WIN32)
+  WSACleanup();
 #endif
 }
 
