@@ -23,6 +23,7 @@
 #include <thread>
 
 using namespace opentelemetry::sdk::logs;
+using namespace opentelemetry::sdk::common;
 
 /**
  * A sample log exporter

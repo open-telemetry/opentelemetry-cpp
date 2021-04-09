@@ -47,7 +47,7 @@ void SimpleLogProcessor::OnReceive(std::unique_ptr<Recordable> &&record) noexcep
   // Get lock to ensure Export() is never called concurrently
   const std::lock_guard<opentelemetry::common::SpinLockMutex> locked(lock_);
 
-  if (exporter_->Export(batch) != ExportResult::kSuccess)
+  if (exporter_->Export(batch) != sdk::common::ExportResult::kSuccess)
   {
     /* Alert user of the failed export */
   }

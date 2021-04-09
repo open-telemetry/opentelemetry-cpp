@@ -173,13 +173,13 @@ public:
    * @return a Bound Instrument
    */
   virtual nostd::shared_ptr<metrics_api::BoundSynchronousInstrument<T>> bind(
-      const common::KeyValueIterable &labels) override
+      const opentelemetry::common::KeyValueIterable &labels) override
   {
     return nostd::shared_ptr<BoundSynchronousInstrument<T>>();
   }
 
   // This function is necessary for batch recording and should NOT be called by the user
-  virtual void update(T value, const common::KeyValueIterable &labels) override = 0;
+  virtual void update(T value, const opentelemetry::common::KeyValueIterable &labels) override = 0;
 
   /**
    * Checkpoints instruments and returns a set of records which are ready for processing.
@@ -220,7 +220,7 @@ public:
    * @param labels is the numerical representation of the metric being captured
    * @return none
    */
-  virtual void observe(T value, const common::KeyValueIterable &labels) override = 0;
+  virtual void observe(T value, const opentelemetry::common::KeyValueIterable &labels) override = 0;
 
   virtual std::vector<Record> GetRecords() = 0;
 
@@ -237,12 +237,12 @@ public:
 
 // Helper functions for turning a common::KeyValueIterable into a string
 inline void print_value(std::stringstream &ss,
-                        common::AttributeValue &value,
+                        opentelemetry::common::AttributeValue &value,
                         bool jsonTypes = false)
 {
   switch (value.index())
   {
-    case common::AttributeType::kTypeString:
+    case opentelemetry::common::AttributeType::kTypeString:
 
       ss << nostd::get<nostd::string_view>(value);
 
@@ -270,7 +270,7 @@ inline std::string mapToString(const std::map<std::string, std::string> &conv)
   return ss.str();
 }
 
-inline std::string KvToString(const common::KeyValueIterable &kv) noexcept
+inline std::string KvToString(const opentelemetry::common::KeyValueIterable &kv) noexcept
 {
   std::stringstream ss;
   ss << "{";
@@ -278,16 +278,17 @@ inline std::string KvToString(const common::KeyValueIterable &kv) noexcept
   if (size)
   {
     size_t i = 1;
-    kv.ForEachKeyValue([&](nostd::string_view key, common::AttributeValue value) noexcept {
-      ss << key << ":";
-      print_value(ss, value, true);
-      if (size != i)
-      {
-        ss << ",";
-      }
-      i++;
-      return true;
-    });
+    kv.ForEachKeyValue(
+        [&](nostd::string_view key, opentelemetry::common::AttributeValue value) noexcept {
+          ss << key << ":";
+          print_value(ss, value, true);
+          if (size != i)
+          {
+            ss << ",";
+          }
+          i++;
+          return true;
+        });
   };
   ss << "}";
   return ss.str();

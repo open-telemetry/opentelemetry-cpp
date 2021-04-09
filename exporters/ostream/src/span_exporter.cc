@@ -36,12 +36,12 @@ std::unique_ptr<sdktrace::Recordable> OStreamSpanExporter::MakeRecordable() noex
   return std::unique_ptr<sdktrace::Recordable>(new sdktrace::SpanData);
 }
 
-sdktrace::ExportResult OStreamSpanExporter::Export(
+sdk::common::ExportResult OStreamSpanExporter::Export(
     const nostd::span<std::unique_ptr<sdktrace::Recordable>> &spans) noexcept
 {
   if (isShutdown_)
   {
-    return sdktrace::ExportResult::kFailure;
+    return sdk::common::ExportResult::kFailure;
   }
 
   for (auto &recordable : spans)
@@ -80,7 +80,7 @@ sdktrace::ExportResult OStreamSpanExporter::Export(
     }
   }
 
-  return sdktrace::ExportResult::kSuccess;
+  return sdk::common::ExportResult::kSuccess;
 }
 
 bool OStreamSpanExporter::Shutdown(std::chrono::microseconds timeout) noexcept

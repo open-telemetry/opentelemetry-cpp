@@ -34,7 +34,7 @@ public:
 
   std::unique_ptr<sdktrace::Recordable> MakeRecordable() noexcept override;
 
-  sdktrace::ExportResult Export(
+  sdk::common::ExportResult Export(
       const nostd::span<std::unique_ptr<sdktrace::Recordable>> &spans) noexcept override;
 
   bool Shutdown(

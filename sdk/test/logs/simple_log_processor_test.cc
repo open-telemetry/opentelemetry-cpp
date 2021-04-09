@@ -9,6 +9,7 @@
 #include <thread>
 
 using namespace opentelemetry::sdk::logs;
+using namespace opentelemetry::sdk::common;
 
 /*
  * A test exporter that can return a vector of all the records it has received,

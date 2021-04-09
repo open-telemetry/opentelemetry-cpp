@@ -46,12 +46,12 @@ std::unique_ptr<sdk::trace::Recordable> ZipkinExporter::MakeRecordable() noexcep
   return std::unique_ptr<sdk::trace::Recordable>(new Recordable);
 }
 
-sdk::trace::ExportResult ZipkinExporter::Export(
+sdk::common::ExportResult ZipkinExporter::Export(
     const nostd::span<std::unique_ptr<sdk::trace::Recordable>> &spans) noexcept
 {
   if (isShutdown_)
   {
-    return sdk::trace::ExportResult::kFailure;
+    return sdk::common::ExportResult::kFailure;
   }
   exporter::zipkin::ZipkinSpan json_spans = {};
   for (auto &recordable : spans)
@@ -71,7 +71,7 @@ sdk::trace::ExportResult ZipkinExporter::Export(
   if (result && result.GetResponse().GetStatusCode() == 200 ||
       result.GetResponse().GetStatusCode() == 202)
   {
-    return sdk::trace::ExportResult::kSuccess;
+    return sdk::common::ExportResult::kSuccess;
   }
   else
   {
@@ -79,9 +79,9 @@ sdk::trace::ExportResult ZipkinExporter::Export(
     {
       // TODO -> Handle error / retries
     }
-    return sdk::trace::ExportResult::kFailure;
+    return sdk::common::ExportResult::kFailure;
   }
-  return sdk::trace::ExportResult::kSuccess;
+  return sdk::common::ExportResult::kSuccess;
 }
 
 void ZipkinExporter::InitializeLocalEndpoint()
