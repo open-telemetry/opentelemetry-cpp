@@ -8,25 +8,27 @@
 
 using namespace opentelemetry;
 
-static nostd::string_view Getter(const std::map<std::string, std::string> &carrier,
-                                 nostd::string_view trace_type = "uber-trace-id")
+class TextMapCarrierTest : public trace::propagation::TextMapCarrier
 {
-  auto it = carrier.find(std::string(trace_type));
-  if (it != carrier.end())
+public:
+  virtual nostd::string_view Get(const nostd::string_view &key) const noexcept override
   {
-    return nostd::string_view(it->second);
+    auto it = headers_.find(std::string(key));
+    if (it != headers_.end())
+    {
+      return nostd::string_view(it->second);
+    }
+    return "";
   }
-  return "";
-}
+  virtual void Set(const nostd::string_view &key, const nostd::string_view &value) noexcept override
+  {
+    headers_[std::string(key)] = std::string(value);
+  }
 
-static void Setter(std::map<std::string, std::string> &carrier,
-                   nostd::string_view trace_type        = "uber-trace-id",
-                   nostd::string_view trace_description = "")
-{
-  carrier[std::string(trace_type)] = std::string(trace_description);
-}
+  std::map<std::string, std::string> headers_;
+};
 
-using Propagator = trace::propagation::JaegerPropagator<std::map<std::string, std::string>>;
+using Propagator = trace::propagation::JaegerPropagator;
 
 static Propagator format = Propagator();
 
@@ -88,9 +90,10 @@ TEST(JaegerPropagatorTest, ExtractValidSpans)
 
   for (TestTrace &test_trace : traces)
   {
-    const std::map<std::string, std::string> carrier = {{"uber-trace-id", test_trace.trace_state}};
-    context::Context ctx1                            = context::Context{};
-    context::Context ctx2                            = format.Extract(Getter, carrier, ctx1);
+    TextMapCarrierTest carrier;
+    carrier.headers_      = {{"uber-trace-id", test_trace.trace_state}};
+    context::Context ctx1 = context::Context{};
+    context::Context ctx2 = format.Extract(carrier, ctx1);
 
     auto span = trace::propagation::detail::GetCurrentSpan(ctx2);
     EXPECT_TRUE(span.IsValid());
@@ -104,6 +107,7 @@ TEST(JaegerPropagatorTest, ExtractValidSpans)
 
 TEST(JaegerPropagatorTest, ExctractInvalidSpans)
 {
+  TextMapCarrierTest carrier;
   std::vector<std::string> traces = {
       "4bf92f3577b34da6a3ce929d0e0e47344:0102030405060708:0:00",  // too long trace id
       "4bf92f3577b34da6a3ce929d0e0e4734:01020304050607089:0:00",  // too long span id
@@ -118,9 +122,9 @@ TEST(JaegerPropagatorTest, ExctractInvalidSpans)
 
   for (auto &trace : traces)
   {
-    const std::map<std::string, std::string> carrier = {{"uber-trace-id", trace}};
-    context::Context ctx1                            = context::Context{};
-    context::Context ctx2                            = format.Extract(Getter, carrier, ctx1);
+    carrier.headers_      = {{"uber-trace-id", trace}};
+    context::Context ctx1 = context::Context{};
+    context::Context ctx2 = format.Extract(carrier, ctx1);
 
     auto span = trace::propagation::detail::GetCurrentSpan(ctx2);
     EXPECT_FALSE(span.IsValid());
@@ -129,6 +133,7 @@ TEST(JaegerPropagatorTest, ExctractInvalidSpans)
 
 TEST(JaegerPropagatorTest, InjectsContext)
 {
+  TextMapCarrierTest carrier;
   constexpr uint8_t buf_span[]  = {1, 2, 3, 4, 5, 6, 7, 8};
   constexpr uint8_t buf_trace[] = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16};
   trace::SpanContext span_context{trace::TraceId{buf_trace}, trace::SpanId{buf_span},
@@ -136,17 +141,17 @@ TEST(JaegerPropagatorTest, InjectsContext)
   nostd::shared_ptr<trace::Span> sp{new trace::DefaultSpan{span_context}};
   trace::Scope scoped_span{sp};
 
-  std::map<std::string, std::string> headers = {};
-  format.Inject(Setter, headers, context::RuntimeContext::GetCurrent());
-  EXPECT_EQ(headers["uber-trace-id"], "0102030405060708090a0b0c0d0e0f10:0102030405060708:0:01");
+  format.Inject(carrier, context::RuntimeContext::GetCurrent());
+  EXPECT_EQ(carrier.headers_["uber-trace-id"],
+            "0102030405060708090a0b0c0d0e0f10:0102030405060708:0:01");
 }
 
 TEST(JaegerPropagatorTest, DoNotInjectInvalidContext)
 {
-  std::map<std::string, std::string> carrier = {};
+  TextMapCarrierTest carrier;
   context::Context ctx{
       "current-span",
       nostd::shared_ptr<trace::Span>(new trace::DefaultSpan(trace::SpanContext::GetInvalid()))};
-  format.Inject(Setter, carrier, ctx);
-  EXPECT_TRUE(carrier.count("uber-trace-id") == 0);
+  format.Inject(carrier, ctx);
+  EXPECT_TRUE(carrier.headers_.count("uber-trace-id") == 0);
 }

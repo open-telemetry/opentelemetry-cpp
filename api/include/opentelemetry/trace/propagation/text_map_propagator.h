@@ -11,11 +11,15 @@ namespace trace
 namespace propagation
 {
 
+// TextMapCarrier is the storage medium used by TextMapPropagator.
 class TextMapCarrier
 {
 
 public:
-  virtual nostd::string_view Get(const nostd::string_view &key) const noexcept              = 0;
+  /*returns the value associated with the passed key.*/
+  virtual nostd::string_view Get(const nostd::string_view &key) const noexcept = 0;
+
+  /*stores the key-value pair.*/
   virtual void Set(const nostd::string_view &key, const nostd::string_view &value) noexcept = 0;
 };
 
@@ -28,7 +32,7 @@ public:
 class TextMapPropagator
 {
 public:
-  // Returns the context that is stored in the carrier with the getter as extractor.
+  // Returns the context that is stored in the carrier with the TextMapCarrier as extractor.
   virtual context::Context Extract(const TextMapCarrier &carrier,
                                    context::Context &context) noexcept = 0;
 

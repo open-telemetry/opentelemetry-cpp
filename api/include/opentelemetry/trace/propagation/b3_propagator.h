@@ -41,7 +41,7 @@ static const int kSpanIdHexStrLength  = 16;
 class B3PropagatorExtractor : public TextMapPropagator
 {
 public:
-  // Returns the context that is stored in the HTTP header carrier with the getter as extractor.
+  // Returns the context that is stored in the HTTP header carrier.
   context::Context Extract(const TextMapCarrier &carrier,
                            context::Context &context) noexcept override
   {

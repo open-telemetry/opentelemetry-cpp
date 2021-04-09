@@ -22,7 +22,6 @@ public:
    * propagators write the same carrier key, the propagator later in the list
    * will "win".
    *
-   * @param setter Rules that manages how context will be injected to carrier.
    * @param carrier Carrier into which context will be injected
    * @param context Context to inject
    *
@@ -42,9 +41,8 @@ public:
    * propagators write the same context key, the propagator later in the list
    * will "win".
    *
-   * @param setter Rules that manages how context will be extracte from carrier.
-   * @param context Context to add values to
    * @param carrier Carrier from which to extract context
+   * @param context Context to add values to
    */
   context::Context Extract(const TextMapCarrier &carrier,
                            context::Context &context) noexcept override
