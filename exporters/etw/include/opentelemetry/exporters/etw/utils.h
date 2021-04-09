@@ -32,6 +32,24 @@
 #  include <wincrypt.h>
 #  pragma comment(lib, "Advapi32.lib")
 #  pragma comment(lib, "Rpcrt4.lib")
+#  include <Objbase.h>
+#  pragma comment(lib, "Ole32.Lib")
+#endif
+
+#ifndef RTTI_ENABLED
+#  if defined(__clang__)
+#    if __has_feature(cxx_rtti)
+#      define RTTI_ENABLED
+#    endif
+#  elif defined(__GNUG__)
+#    if defined(__GXX_RTTI)
+#      define RTTI_ENABLED
+#    endif
+#  elif defined(_MSC_VER)
+#    if defined(_CPPRTTI)
+#      define RTTI_ENABLED
+#    endif
+#  endif
 #endif
 
 OPENTELEMETRY_BEGIN_NAMESPACE
@@ -125,18 +143,21 @@ CleanUp:
 /// <summary>
 /// Convert UTF-8 string to UTF-16 wide string.
 ///
-/// FIXME: this conversion is marked deprecated after C++17:
-/// https://en.cppreference.com/w/cpp/locale/codecvt_utf8_utf16
-/// It works well with Visual C++, but may not work with clang.
-/// Best long-term solution is to use Win32 API instead.
-///
 /// </summary>
 /// <param name="in"></param>
 /// <returns></returns>
 static inline std::wstring to_utf16_string(const std::string &in)
 {
+#  ifdef _WIN32
+  int in_length  = static_cast<int>(in.size());
+  int out_length = MultiByteToWideChar(CP_UTF8, 0, &in[0], in_length, NULL, 0);
+  std::wstring result(out_length, '\0');
+  MultiByteToWideChar(CP_UTF8, 0, &in[0], in_length, &result[0], out_length);
+  return result;
+#  else
   std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>, wchar_t> converter;
   return converter.from_bytes(in);
+#  endif
 }
 
 /// <summary>
@@ -204,6 +225,67 @@ static inline GUID GetProviderGuid(const char *providerName)
   return guid;
 }
 #endif
+
+int64_t getUtcSystemTimeMs()
+{
+#ifdef _WIN32
+  ULARGE_INTEGER now;
+  ::GetSystemTimeAsFileTime(reinterpret_cast<FILETIME *>(&now));
+  return (now.QuadPart - 116444736000000000ull) / 10000;
+#else
+  return std::chrono::system_clock::now().time_since_epoch() / std::chrono::milliseconds(1);
+#endif
+}
+
+int64_t getUtcSystemTimeinTicks()
+{
+#ifdef _WIN32
+  FILETIME tocks;
+  ::GetSystemTimeAsFileTime(&tocks);
+  ULONGLONG ticks = (ULONGLONG(tocks.dwHighDateTime) << 32) | tocks.dwLowDateTime;
+  // number of days from beginning to 1601 multiplied by ticks per day
+  return ticks + 0x701ce1722770000ULL;
+#else
+  // On Un*x systems system_clock de-facto contains UTC time. Ref:
+  // https://en.cppreference.com/w/cpp/chrono/system_clock
+  // This UTC epoch contract has been signed in blood since C++20
+  std::chrono::time_point<std::chrono::system_clock> now = std::chrono::system_clock::now();
+  auto duration                                          = now.time_since_epoch();
+  auto millis    = std::chrono::duration_cast<std::chrono::milliseconds>(duration).count();
+  uint64_t ticks = millis;
+  ticks *= 10000;                 // convert millis to ticks (1 tick = 100ns)
+  ticks += 0x89F7FF5F7B58000ULL;  // UTC time 0 in .NET ticks
+  return ticks;
+#endif
+}
+
+std::string formatUtcTimestampMsAsISO8601(int64_t timestampMs)
+{
+  char buf[sizeof("YYYY-MM-DDTHH:MM:SS.sssZ") + 1] = {0};
+#ifdef _WIN32
+  __time64_t seconds = static_cast<__time64_t>(timestampMs / 1000);
+  int milliseconds   = static_cast<int>(timestampMs % 1000);
+  tm tm;
+  if (::_gmtime64_s(&tm, &seconds) != 0)
+  {
+    memset(&tm, 0, sizeof(tm));
+  }
+  ::_snprintf_s(buf, _TRUNCATE, "%04d-%02d-%02dT%02d:%02d:%02d.%03dZ", 1900 + tm.tm_year,
+                1 + tm.tm_mon, tm.tm_mday, tm.tm_hour, tm.tm_min, tm.tm_sec, milliseconds);
+#else
+  time_t seconds   = static_cast<time_t>(timestampMs / 1000);
+  int milliseconds = static_cast<int>(timestampMs % 1000);
+  tm tm;
+  bool valid = (gmtime_r(&seconds, &tm) != NULL);
+  if (!valid)
+  {
+    memset(&tm, 0, sizeof(tm));
+  }
+  (void)snprintf(buf, sizeof(buf), "%04d-%02d-%02dT%02d:%02d:%02d.%03dZ", 1900 + tm.tm_year,
+                 1 + tm.tm_mon, tm.tm_mday, tm.tm_hour, tm.tm_min, tm.tm_sec, milliseconds);
+#endif
+  return buf;
+}
 
 };  // namespace utils
 

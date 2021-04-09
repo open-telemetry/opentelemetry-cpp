@@ -60,10 +60,21 @@ cc_library(
     ],
 )
 
+cc_library(
+    name = "ostream_capture",
+    hdrs = [
+        "test/ostream_capture.h",
+    ],
+    deps = [
+        "//api",
+    ],
+)
+
 cc_test(
     name = "ostream_span_test",
     srcs = ["test/ostream_span_test.cc"],
     deps = [
+        ":ostream_capture",
         ":ostream_span_exporter",
         "@com_google_googletest//:gtest_main",
     ],

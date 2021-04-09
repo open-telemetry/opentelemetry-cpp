@@ -55,6 +55,8 @@ set(OPENTELEMETRY_VERSION
 
 # ##############################################################################
 
+find_package(Threads)
+
 set_and_check(OPENTELEMETRY_CPP_INCLUDE_DIRS "@PACKAGE_INCLUDE_INSTALL_DIR@")
 set_and_check(OPENTELEMETRY_CPP_LIBRARY_DIRS "@PACKAGE_CMAKE_INSTALL_LIBDIR@")
 

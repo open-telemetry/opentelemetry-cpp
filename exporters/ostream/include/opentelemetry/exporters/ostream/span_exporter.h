@@ -95,7 +95,7 @@ private:
 
 #endif
 
-  void print_value(sdkcommon::OwnedAttributeValue &value)
+  void print_value(const sdkcommon::OwnedAttributeValue &value)
   {
 #if __cplusplus < 201402L
     nostd::visit(OwnedAttributeValueVisitor(*this), value);
@@ -104,20 +104,13 @@ private:
 #endif
   }
 
-  void printAttributes(std::unordered_map<std::string, sdkcommon::OwnedAttributeValue> map)
-  {
-    size_t size = map.size();
-    size_t i    = 1;
-    for (auto kv : map)
-    {
-      sout_ << kv.first << ": ";
-      print_value(kv.second);
+  // various print helpers
+  void printAttributes(const std::unordered_map<std::string, sdkcommon::OwnedAttributeValue> &map,
+                       const std::string prefix = "\n\t");
 
-      if (i != size)
-        sout_ << ", ";
-      i++;
-    }
-  }
+  void printEvents(const std::vector<sdktrace::SpanDataEvent> &events);
+
+  void printLinks(const std::vector<sdktrace::SpanDataLink> &links);
 };
 }  // namespace trace
 }  // namespace exporter

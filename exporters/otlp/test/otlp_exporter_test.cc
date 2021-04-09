@@ -1,5 +1,11 @@
 #include "opentelemetry/exporters/otlp/otlp_exporter.h"
+
+#include "opentelemetry/exporters/otlp/protobuf_include_prefix.h"
+
 #include "opentelemetry/proto/collector/trace/v1/trace_service_mock.grpc.pb.h"
+
+#include "opentelemetry/exporters/otlp/protobuf_include_suffix.h"
+
 #include "opentelemetry/sdk/trace/simple_processor.h"
 #include "opentelemetry/sdk/trace/tracer_provider.h"
 #include "opentelemetry/trace/provider.h"
@@ -90,6 +96,18 @@ TEST_F(OtlpExporterTestPeer, ConfigTest)
   opts.endpoint = "localhost:45454";
   std::unique_ptr<OtlpExporter> exporter(new OtlpExporter(opts));
   EXPECT_EQ(GetOptions(exporter).endpoint, "localhost:45454");
+}
+
+// Test exporter configuration options with use_ssl_credentials
+TEST_F(OtlpExporterTestPeer, ConfigSslCredentialsTest)
+{
+  std::string cacert_str = "--begin and end fake cert--";
+  OtlpExporterOptions opts;
+  opts.use_ssl_credentials              = true;
+  opts.ssl_credentials_cacert_as_string = cacert_str;
+  std::unique_ptr<OtlpExporter> exporter(new OtlpExporter(opts));
+  EXPECT_EQ(GetOptions(exporter).ssl_credentials_cacert_as_string, cacert_str);
+  EXPECT_EQ(GetOptions(exporter).use_ssl_credentials, true);
 }
 }  // namespace otlp
 }  // namespace exporter

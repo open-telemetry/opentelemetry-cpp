@@ -25,6 +25,7 @@
 #  define HAVE_WORKING_REGEX 1
 #endif
 
+#include "opentelemetry/common/kv_properties.h"
 #include "opentelemetry/nostd/shared_ptr.h"
 #include "opentelemetry/nostd/span.h"
 #include "opentelemetry/nostd/string_view.h"
@@ -51,63 +52,6 @@ public:
   static constexpr auto kKeyValueSeparator = '=';
   static constexpr auto kMembersSeparator  = ',';
 
-  // Class to store key-value pairs.
-  class Entry
-  {
-  public:
-    Entry() : key_(nullptr), value_(nullptr){};
-
-    // Copy constructor
-    Entry(const Entry &copy)
-    {
-      key_   = CopyStringToPointer(copy.key_.get());
-      value_ = CopyStringToPointer(copy.value_.get());
-    }
-
-    // Copy assignment operator
-    Entry &operator=(Entry &other)
-    {
-      key_   = CopyStringToPointer(other.key_.get());
-      value_ = CopyStringToPointer(other.value_.get());
-      return *this;
-    }
-
-    // Move contructor and assignment operator
-    Entry(Entry &&other) = default;
-    Entry &operator=(Entry &&other) = default;
-
-    // Creates an Entry for a given key-value pair.
-    Entry(nostd::string_view key, nostd::string_view value) noexcept
-    {
-      key_   = CopyStringToPointer(key);
-      value_ = CopyStringToPointer(value);
-    }
-
-    // Gets the key associated with this entry.
-    nostd::string_view GetKey() const { return key_.get(); }
-
-    // Gets the value associated with this entry.
-    nostd::string_view GetValue() const { return value_.get(); }
-
-    // Sets the value for this entry. This overrides the previous value.
-    void SetValue(nostd::string_view value) { value_ = CopyStringToPointer(value); }
-
-  private:
-    // Store key and value as raw char pointers to avoid using std::string.
-    nostd::unique_ptr<const char[]> key_;
-    nostd::unique_ptr<const char[]> value_;
-
-    // Copies string into a buffer and returns a unique_ptr to the buffer.
-    // This is a workaround for the fact that memcpy doesn't accept a const destination.
-    nostd::unique_ptr<const char[]> CopyStringToPointer(nostd::string_view str)
-    {
-      char *temp = new char[str.size() + 1];
-      memcpy(temp, str.data(), str.size());
-      temp[str.size()] = '\0';
-      return nostd::unique_ptr<const char[]>(temp);
-    }
-  };
-
   static nostd::shared_ptr<TraceState> GetDefault()
   {
     static nostd::shared_ptr<TraceState> ts{new TraceState()};
@@ -122,61 +66,34 @@ public:
    */
   static nostd::shared_ptr<TraceState> FromHeader(nostd::string_view header)
   {
-    nostd::shared_ptr<TraceState> ts{new TraceState()};
 
-    std::size_t begin{0};
-    std::size_t end{0};
-    bool invalid_header = false;
-    while (begin < header.size() && ts->num_entries_ < kMaxKeyValuePairs)
+    common::KeyValueStringTokenizer kv_str_tokenizer(header);
+    size_t cnt = kv_str_tokenizer.NumTokens();  // upper bound on number of kv pairs
+    if (cnt > kMaxKeyValuePairs)
     {
-      // find list-member
-      end = header.find(kMembersSeparator, begin);
-      if (end == 0)
+      cnt = kMaxKeyValuePairs;
+    }
+
+    nostd::shared_ptr<TraceState> ts(new TraceState(cnt));
+    bool kv_valid;
+    nostd::string_view key, value;
+    while (kv_str_tokenizer.next(kv_valid, key, value) && ts->kv_properties_->Size() < cnt)
+    {
+      if (kv_valid == false)
       {
-        // special case where "," is first char, move to next list member
-        begin = 1;
-        continue;
+        return GetDefault();
       }
-      if (end == std::string::npos)
-      {
-        // last list member. `end` points to end of it.
-        end = header.size() - 1;
-      }
-      else
-      {
-        // `end` points to end of current list member
-        end--;
-      }
-      auto list_member = TrimString(header, begin, end);  // OWS handling
-      if (list_member.size() == 0)
-      {
-        // empty list member, move to next in list
-        begin = end + 2;  // begin points to start of next member
-        continue;
-      }
-      auto key_end_pos = list_member.find(kKeyValueSeparator);
-      if (key_end_pos == std::string::npos)
-      {
-        // Error: invalid list member, return empty TraceState
-        ts->entries_.reset(nullptr);
-        ts->num_entries_ = 0;
-        break;
-      }
-      auto key   = list_member.substr(0, key_end_pos);
-      auto value = list_member.substr(key_end_pos + 1);
+
       if (!IsValidKey(key) || !IsValidValue(value))
       {
         // invalid header. return empty TraceState
-        ts->entries_.reset(nullptr);
-        ts->num_entries_ = 0;
+        ts->kv_properties_.reset(new opentelemetry::common::KeyValueProperties());
         break;
       }
-      Entry entry(key, value);
-      (ts->entries_.get())[ts->num_entries_] = entry;
-      ts->num_entries_++;
 
-      begin = end + 2;
+      ts->kv_properties_->AddEntry(key, value);
     }
+
     return ts;
   }
 
@@ -186,18 +103,22 @@ public:
   std::string ToHeader()
   {
     std::string header_s;
-    for (size_t count = 0; count < num_entries_; count++)
-    {
-      if (count != 0)
-      {
-        header_s.append(",");
-      }
-
-      auto entry = (entries_.get())[count];
-      header_s.append(std::string(entry.GetKey()));
-      header_s.append(1, kKeyValueSeparator);
-      header_s.append(std::string(entry.GetValue()));
-    }
+    bool first = true;
+    kv_properties_->GetAllEntries(
+        [&header_s, &first](nostd::string_view key, nostd::string_view value) noexcept {
+          if (!first)
+          {
+            header_s.append(",");
+          }
+          else
+          {
+            first = false;
+          }
+          header_s.append(std::string(key.data(), key.size()));
+          header_s.append(1, kKeyValueSeparator);
+          header_s.append(std::string(value.data(), value.size()));
+          return true;
+        });
     return header_s;
   }
 
@@ -205,21 +126,14 @@ public:
    *  Returns `value` associated with `key` passed as argument
    *  Returns empty string if key is invalid  or not found
    */
-  std::string Get(nostd::string_view key) const noexcept
+  bool Get(nostd::string_view key, std::string &value) const noexcept
   {
     if (!IsValidKey(key))
     {
-      return std::string();
+      return false;
     }
-    for (size_t i = 0; i < num_entries_; i++)
-    {
-      auto entry = (entries_.get())[i];
-      if (key == entry.GetKey())
-      {
-        return std::string(entry.GetValue());
-      }
-    }
-    return std::string();
+
+    return kv_properties_->GetValue(key, value);
   }
 
   /**
@@ -234,27 +148,28 @@ public:
    */
   nostd::shared_ptr<TraceState> Set(const nostd::string_view &key, const nostd::string_view &value)
   {
-    nostd::shared_ptr<TraceState> ts{new TraceState()};
-    if ((!IsValidKey(key) || !IsValidValue(value)))
+    auto curr_size = kv_properties_->Size();
+    if (!IsValidKey(key) || !IsValidValue(value))
     {
       // max size reached or invalid key/value. Returning empty TraceState
-      return ts;  // empty instance
+      return TraceState::GetDefault();
     }
-
-    // add new key-value pair at beginning if list is not reached to its limit
-    if (num_entries_ < kMaxKeyValuePairs)
+    auto allocate_size = curr_size;
+    if (curr_size < kMaxKeyValuePairs)
     {
-      Entry e(key, value);
-      (ts->entries_.get())[ts->num_entries_++] = e;
+      allocate_size += 1;
     }
-    for (size_t i = 0; i < num_entries_; i++)
+    nostd::shared_ptr<TraceState> ts(new TraceState(allocate_size));
+    if (curr_size < kMaxKeyValuePairs)
     {
-      auto entry = (entries_.get())[i];
-      auto key   = entry.GetKey();
-      auto value = entry.GetValue();
-      Entry e(key, value);
-      (ts->entries_.get())[ts->num_entries_++] = e;
+      // add new field first
+      ts->kv_properties_->AddEntry(key, value);
     }
+    // add rest of the fields.
+    kv_properties_->GetAllEntries([&ts](nostd::string_view key, nostd::string_view value) {
+      ts->kv_properties_->AddEntry(key, value);
+      return true;
+    });
     return ts;
   }
 
@@ -266,35 +181,37 @@ public:
    */
   nostd::shared_ptr<TraceState> Delete(const nostd::string_view &key)
   {
-    nostd::shared_ptr<TraceState> ts{new TraceState()};
-
     if (!IsValidKey(key))
     {
-      return ts;
+      return TraceState::GetDefault();
     }
-    for (size_t i = 0; i < num_entries_; i++)
+    auto curr_size     = kv_properties_->Size();
+    auto allocate_size = curr_size;
+    std::string unused;
+    if (kv_properties_->GetValue(key, unused))
     {
-      auto entry = (entries_.get())[i];
-      if ((entries_.get())[i].GetKey() != key)
-      {
-        auto key   = entry.GetKey();
-        auto value = entry.GetValue();
-        Entry e(key, value);
-        (ts->entries_.get())[ts->num_entries_++] = e;
-      }
+      allocate_size -= 1;
     }
+    nostd::shared_ptr<TraceState> ts(new TraceState(allocate_size));
+    kv_properties_->GetAllEntries(
+        [&ts, &key](nostd::string_view e_key, nostd::string_view e_value) {
+          if (key != e_key)
+            ts->kv_properties_->AddEntry(e_key, e_value);
+          return true;
+        });
     return ts;
   }
 
   // Returns true if there are no keys, false otherwise.
-  bool Empty() const noexcept { return num_entries_ == 0; }
+  bool Empty() const noexcept { return kv_properties_->Size() == 0; }
 
-  // Returns a span of all the entries. The TraceState object must outlive the span.
-  nostd::span<Entry> Entries() const noexcept
+  // @return all key-values entris by repeatedly invoking the function reference passed as argument
+  // for each entry
+  bool GetAllEntries(
+      nostd::function_ref<bool(nostd::string_view, nostd::string_view)> callback) const noexcept
   {
-    return nostd::span<Entry>(entries_.get(), num_entries_);
+    return kv_properties_->GetAllEntries(callback);
   }
-
   /** Returns whether key is a valid key. See https://www.w3.org/TR/trace-context/#key
    * Identifiers MUST begin with a lowercase letter or a digit, and can only contain
    * lowercase letters (a-z), digits (0-9), underscores (_), dashes (-), asterisks (*),
@@ -325,8 +242,8 @@ public:
   }
 
 private:
-  // Creates an empty TraceState.
-  TraceState() noexcept : entries_(new Entry[kMaxKeyValuePairs]), num_entries_(0) {}
+  TraceState() : kv_properties_(new opentelemetry::common::KeyValueProperties()){};
+  TraceState(size_t size) : kv_properties_(new opentelemetry::common::KeyValueProperties(size)){};
 
   static nostd::string_view TrimString(nostd::string_view str, size_t left, size_t right)
   {
@@ -346,7 +263,7 @@ private:
     static std::regex reg_key("^[a-z0-9][a-z0-9*_\\-/]{0,255}$");
     static std::regex reg_key_multitenant(
         "^[a-z0-9][a-z0-9*_\\-/]{0,240}(@)[a-z0-9][a-z0-9*_\\-/]{0,13}$");
-    std::string key_s(key);
+    std::string key_s(key.data(), key.size());
     if (std::regex_match(key_s, reg_key) || std::regex_match(key_s, reg_key_multitenant))
     {
       return true;
@@ -360,7 +277,7 @@ private:
     static std::regex reg_value(
         "^[\\x20-\\x2B\\x2D-\\x3C\\x3E-\\x7E]{0,255}[\\x21-\\x2B\\x2D-\\x3C\\x3E-\\x7E]$");
     // Need to benchmark without regex, as a string object is created here.
-    return std::regex_match(std::string(value), reg_value);
+    return std::regex_match(std::string(value.data(), value.size()), reg_value);
   }
 
   static bool IsValidKeyNonRegEx(nostd::string_view key)
@@ -407,10 +324,7 @@ private:
 
 private:
   // Store entries in a C-style array to avoid using std::array or std::vector.
-  nostd::unique_ptr<Entry[]> entries_;
-
-  // Maintain the number of entries in entries_. Must be in the range [0, kMaxKeyValuePairs].
-  size_t num_entries_;
+  nostd::unique_ptr<opentelemetry::common::KeyValueProperties> kv_properties_;
 };
 }  // namespace trace
 OPENTELEMETRY_END_NAMESPACE
