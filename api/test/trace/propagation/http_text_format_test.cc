@@ -10,6 +10,7 @@
 #include <gtest/gtest.h>
 
 using namespace opentelemetry;
+
 class TextMapCarrierTest : public trace::propagation::TextMapCarrier
 {
 public:
@@ -151,10 +152,10 @@ TEST(TextMapPropagatorTest, InvalidIdentitiesAreNotExtracted)
   }
 }
 
-TEST(GlobalPropagator, NoOpPropagator)
+TEST(GlobalTextMapPropagator, NoOpPropagator)
 {
 
-  auto propagator = trace::propagation::GlobalPropagator::GetGlobalPropagator();
+  auto propagator = trace::propagation::GlobalTextMapPropagator::GetGlobalPropagator();
   TextMapCarrierTest carrier;
 
   carrier.headers_ = {{"traceparent", "00-4bf92f3577b34da6a3ce929d0e0e4736-0102030405060708-01"},
@@ -174,10 +175,10 @@ TEST(GlobalPropagator, NoOpPropagator)
 TEST(GlobalPropagator, SetAndGet)
 {
 
-  trace::propagation::GlobalPropagator::SetGlobalPropagator(
+  trace::propagation::GlobalTextMapPropagator::SetGlobalPropagator(
       nostd::shared_ptr<trace::propagation::TextMapPropagator>(new MapHttpTraceContext()));
 
-  auto propagator = trace::propagation::GlobalPropagator::GetGlobalPropagator();
+  auto propagator = trace::propagation::GlobalTextMapPropagator::GetGlobalPropagator();
 
   TextMapCarrierTest carrier;
   carrier.headers_ = {{"traceparent", "00-4bf92f3577b34da6a3ce929d0e0e4736-0102030405060708-01"},

@@ -18,7 +18,7 @@ namespace propagation
 
 /* Stores the singleton TextMapPropagator */
 
-class GlobalPropagator
+class GlobalTextMapPropagator
 {
 public:
   static nostd::shared_ptr<TextMapPropagator> GetGlobalPropagator() noexcept
