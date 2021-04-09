@@ -32,6 +32,7 @@ public:
   Recordable();
 
   thrift::Span *Span() noexcept { return span_.release(); }
+  std::vector<thrift::Tag> Tags() noexcept { return std::move(tags_); }
 
   void SetIds(trace::TraceId trace_id,
               trace::SpanId span_id,
@@ -58,8 +59,19 @@ public:
   void SetDuration(std::chrono::nanoseconds duration) noexcept override;
 
 private:
+  void AddTag(const std::string &key, const std::string &value);
+  void AddTag(const std::string &key, bool value);
+  void AddTag(const std::string &key, int64_t value);
+  void AddTag(const std::string &key, double value);
+
+  void PopulateAttribute(nostd::string_view key,
+                         const opentelemetry::common::AttributeValue &value);
+
+private:
   std::unique_ptr<thrift::Span> span_;
+  std::vector<thrift::Tag> tags_;
 };
+
 }  // namespace jaeger
 }  // namespace exporter
 OPENTELEMETRY_END_NAMESPACE

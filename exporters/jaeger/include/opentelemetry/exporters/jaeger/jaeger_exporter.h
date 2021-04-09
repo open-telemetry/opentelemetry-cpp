@@ -24,6 +24,7 @@ namespace jaeger
 enum class TransportFormat
 {
   kThriftUdp,
+  kThriftUdpCompact,
   kThriftHttp,
   kProtobufGrpc,
 };
@@ -38,7 +39,7 @@ struct JaegerExporterOptions
   // The endpoint to export to.
   std::string server_addr          = "localhost";
   uint16_t server_port             = 6831;
-  TransportFormat transport_format = TransportFormat::kThriftUdp;
+  TransportFormat transport_format = TransportFormat::kThriftUdpCompact;
 };
 
 namespace trace_sdk = opentelemetry::sdk::trace;

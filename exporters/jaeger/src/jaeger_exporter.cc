@@ -61,7 +61,7 @@ sdk::trace::ExportResult JaegerExporter::Export(
 
 void JaegerExporter::InitializeEndpoint()
 {
-  if (options_.transport_format == TransportFormat::kThriftUdp)
+  if (options_.transport_format == TransportFormat::kThriftUdpCompact)
   {
     auto transport = std::unique_ptr<Transport>(
         static_cast<Transport *>(new UDPTransport(options_.server_addr, options_.server_port)));

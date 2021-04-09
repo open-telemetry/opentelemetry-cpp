@@ -19,6 +19,7 @@
 
 #include <agent.h>
 #include <thrift/protocol/TBinaryProtocol.h>
+#include <thrift/protocol/TCompactProtocol.h>
 #include <thrift/protocol/TProtocol.h>
 #include <thrift/transport/TBufferTransports.h>
 #include <thrift/transport/TSocket.h>
@@ -34,6 +35,7 @@ namespace jaeger
 
 using AgentClient        = jaegertracing::agent::thrift::AgentClient;
 using TBinaryProtocol    = apache::thrift::protocol::TBinaryProtocol;
+using TCompactProtocol   = apache::thrift::protocol::TCompactProtocol;
 using TBufferedTransport = apache::thrift::transport::TBufferedTransport;
 using TProtocol          = apache::thrift::protocol::TProtocol;
 using TSocket            = apache::thrift::transport::TSocket;

@@ -15,7 +15,9 @@
 #pragma once
 
 #include <agent.h>
+#include <atomic>
 #include <memory>
+#include <mutex>
 #include <vector>
 
 #include <opentelemetry/exporters/jaeger/recordable.h>
@@ -51,6 +53,7 @@ private:
     span_buffer_.clear();
     byte_buffer_size_ = process_bytes_size_;
   }
+
   template <typename ThriftType>
   uint32_t CalcSizeOfSerializedThrift(const ThriftType &base)
   {
@@ -64,6 +67,8 @@ private:
     return size;
   }
 
+  int FlushWithLock();
+
 private:
   std::vector<std::unique_ptr<Recordable>> spans_;
   std::vector<thrift::Span> span_buffer_;
@@ -71,6 +76,8 @@ private:
   std::unique_ptr<apache::thrift::protocol::TProtocolFactory> protocol_factory_;
   std::shared_ptr<apache::thrift::transport::TMemoryBuffer> thrift_buffer_;
   thrift::Process process_;
+
+  std::mutex lock_;
 
   // Size in bytes of the serialization buffer.
   uint32_t byte_buffer_size_   = 0;
