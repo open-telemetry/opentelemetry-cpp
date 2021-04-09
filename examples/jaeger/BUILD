@@ -11,15 +11,16 @@ cc_library(
     ],
 )
 
-cc_binary(
-    name = "example_otlp",
-    srcs = [
-        "main.cc",
-    ],
-    deps = [
-        ":foo_library",
-        "//api",
-        "//exporters/jaeger:jaeger_exporter",
-        "//sdk/src/trace",
-    ],
-)
+# TODO: enable bazel build
+# cc_binary(
+#     name = "example_jaeger",
+#     srcs = [
+#         "main.cc",
+#     ],
+#     deps = [
+#         ":foo_library",
+#         "//api",
+#         "//exporters/jaeger:jaeger_exporter",
+#         "//sdk/src/trace",
+#     ],
+# )
