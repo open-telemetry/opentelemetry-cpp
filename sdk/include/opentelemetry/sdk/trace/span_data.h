@@ -100,13 +100,19 @@ public:
    * Get the trace id for this span
    * @return the trace id for this span
    */
-  opentelemetry::trace::TraceId GetTraceId() const noexcept { return trace_id_; }
+  opentelemetry::trace::TraceId GetTraceId() const noexcept { return span_context_.trace_id(); }
 
   /**
    * Get the span id for this span
    * @return the span id for this span
    */
-  opentelemetry::trace::SpanId GetSpanId() const noexcept { return span_id_; }
+  opentelemetry::trace::SpanId GetSpanId() const noexcept { return span_context_.span_id(); }
+
+  /**
+   * Get the span context for this span
+   * @return the span context for this span
+   */
+  const opentelemetry::trace::SpanContext &GetSpanContext() const noexcept { return span_context_; }
 
   /**
    * Get the parent span id for this span
@@ -171,12 +177,10 @@ public:
    */
   const std::vector<SpanDataLink> &GetLinks() const noexcept { return links_; }
 
-  void SetIds(opentelemetry::trace::TraceId trace_id,
-              opentelemetry::trace::SpanId span_id,
-              opentelemetry::trace::SpanId parent_span_id) noexcept override
+  void SetIdentity(const opentelemetry::trace::SpanContext &span_context,
+                   opentelemetry::trace::SpanId parent_span_id) noexcept override
   {
-    trace_id_       = trace_id;
-    span_id_        = span_id;
+    span_context_   = span_context;
     parent_span_id_ = parent_span_id;
   }
 
@@ -186,9 +190,12 @@ public:
     attribute_map_.SetAttribute(key, value);
   }
 
-  void AddEvent(nostd::string_view name,
-                core::SystemTimestamp timestamp,
-                const opentelemetry::common::KeyValueIterable &attributes) noexcept override
+  void AddEvent(
+      nostd::string_view name,
+      core::SystemTimestamp timestamp = core::SystemTimestamp(std::chrono::system_clock::now()),
+      const opentelemetry::common::KeyValueIterable &attributes =
+          opentelemetry::common::KeyValueIterableView<std::map<std::string, int>>(
+              {})) noexcept override
   {
     SpanDataEvent event(std::string(name), timestamp, attributes);
     events_.push_back(event);
@@ -226,8 +233,7 @@ public:
   void SetDuration(std::chrono::nanoseconds duration) noexcept override { duration_ = duration; }
 
 private:
-  opentelemetry::trace::TraceId trace_id_;
-  opentelemetry::trace::SpanId span_id_;
+  opentelemetry::trace::SpanContext span_context_{false, false};
   opentelemetry::trace::SpanId parent_span_id_;
   core::SystemTimestamp start_time_;
   std::chrono::nanoseconds duration_{0};
