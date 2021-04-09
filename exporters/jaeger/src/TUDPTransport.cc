@@ -67,7 +67,7 @@ void TUDPTransport::open()
   }
 
   socket_      = socket(server_addr_info_->ai_family, server_addr_info_->ai_socktype,
-                        server_addr_info_->ai_protocol);
+                   server_addr_info_->ai_protocol);
   sockaddr_len = server_addr_info_->ai_addr->sa_family == AF_INET ? sizeof(struct sockaddr_in)
                                                                   : sizeof(struct sockaddr_in6);
 }
