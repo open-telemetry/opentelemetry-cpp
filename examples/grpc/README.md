@@ -1,7 +1,7 @@
 ## OpenTelemetry C++ Example
 
 Grpc
-This is a simple example that demonstrates tracing an request using grpc that was done under user reasearch
+This is a simple example that demonstrates tracing an request using grpc that was done under user research
 
 The example tests the auto instrumentations and spans.
 
