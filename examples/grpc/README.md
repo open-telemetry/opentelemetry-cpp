@@ -25,5 +25,4 @@ $ ./greeter_client
 ...
 ...
 You should see a Hello World message on the console.
-
-You should also be able to traces created as a part of auto instrumentation
+You should also be able to traces created as a part of auto instrumentation.
