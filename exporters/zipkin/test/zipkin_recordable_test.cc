@@ -35,7 +35,7 @@ namespace sdktrace = opentelemetry::sdk::trace;
 using json         = nlohmann::json;
 
 // Testing Shutdown functionality of OStreamSpanExporter, should expect no data to be sent to Stream
-TEST(ZipkinSpanRecordable, SetIds)
+TEST(ZipkinSpanRecordable, SetIdentity)
 {
   json j_span = {{"id", "0000000000000002"},
                  {"parentId", "0000000000000003"},
@@ -50,7 +50,11 @@ TEST(ZipkinSpanRecordable, SetIds)
   const trace::SpanId parent_span_id(
       std::array<const uint8_t, trace::SpanId::kSize>({0, 0, 0, 0, 0, 0, 0, 3}));
 
-  rec.SetIds(trace_id, span_id, parent_span_id);
+  const opentelemetry::trace::SpanContext span_context{
+      trace_id, span_id,
+      opentelemetry::trace::TraceFlags{opentelemetry::trace::TraceFlags::kIsSampled}, true};
+
+  rec.SetIdentity(span_context, parent_span_id);
   EXPECT_EQ(rec.span(), j_span);
 }
 

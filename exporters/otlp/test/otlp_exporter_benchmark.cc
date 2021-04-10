@@ -19,6 +19,11 @@ const trace::SpanId kSpanId(std::array<const uint8_t, trace::SpanId::kSize>({0, 
                                                                              2}));
 const trace::SpanId kParentSpanId(std::array<const uint8_t, trace::SpanId::kSize>({0, 0, 0, 0, 0, 0,
                                                                                    0, 3}));
+const auto kTraceState = opentelemetry::trace::TraceState::GetDefault() -> Set("key1", "value");
+const opentelemetry::trace::SpanContext kSpanContext{
+    kTraceId, kSpanId,
+    opentelemetry::trace::TraceFlags{opentelemetry::trace::TraceFlags::kIsSampled}, true,
+    kTraceState};
 
 // ----------------------- Helper classes and functions ------------------------
 
@@ -80,7 +85,7 @@ void CreateSparseSpans(std::array<std::unique_ptr<sdk::trace::Recordable>, kBatc
   {
     auto recordable = std::unique_ptr<sdk::trace::Recordable>(new Recordable);
 
-    recordable->SetIds(kTraceId, kSpanId, kParentSpanId);
+    recordable->SetIdentity(kSpanContext, kParentSpanId);
     recordable->SetName("TestSpan");
     recordable->SetStartTime(core::SystemTimestamp(std::chrono::system_clock::now()));
     recordable->SetDuration(std::chrono::nanoseconds(10));
@@ -96,7 +101,7 @@ void CreateDenseSpans(std::array<std::unique_ptr<sdk::trace::Recordable>, kBatch
   {
     auto recordable = std::unique_ptr<sdk::trace::Recordable>(new Recordable);
 
-    recordable->SetIds(kTraceId, kSpanId, kParentSpanId);
+    recordable->SetIdentity(kSpanContext, kParentSpanId);
     recordable->SetName("TestSpan");
     recordable->SetStartTime(core::SystemTimestamp(std::chrono::system_clock::now()));
     recordable->SetDuration(std::chrono::nanoseconds(10));

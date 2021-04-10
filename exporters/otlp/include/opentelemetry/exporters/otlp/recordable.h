@@ -19,9 +19,8 @@ class Recordable final : public sdk::trace::Recordable
 public:
   const proto::trace::v1::Span &span() const noexcept { return span_; }
 
-  void SetIds(trace::TraceId trace_id,
-              trace::SpanId span_id,
-              trace::SpanId parent_span_id) noexcept override;
+  void SetIdentity(const opentelemetry::trace::SpanContext &span_context,
+                   opentelemetry::trace::SpanId parent_span_id) noexcept override;
 
   void SetAttribute(nostd::string_view key,
                     const opentelemetry::common::AttributeValue &value) noexcept override;
