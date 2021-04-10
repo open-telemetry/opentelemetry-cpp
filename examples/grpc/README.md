@@ -13,7 +13,7 @@ greeter_client.cc
 Build and Deploy the opentelementry-cpp as described in INSTALL.md
 
 1. The server sleeps for 30ms then writes HelloWorld on the screen.
-1.  On the server, configure the SDK to only batch a small number of spans, and to flush them quickly, so that you can see your data without having to wait.
+1. On the server, configure the SDK to only batch a small number of spans, and to flush them quickly, so that you can see your data without having to wait.
 1. The default settings of the OpenTelemetry SDK achieve this, so we do not need explicitly make changes.
 
 Start the server from the examples/grpc directory
