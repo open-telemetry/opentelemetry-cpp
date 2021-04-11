@@ -18,7 +18,7 @@ TEST(ContextTest, ContextGetValueReturnsExpectedValue)
 {
   std::map<std::string, context::ContextValue> map_test = {{"test_key", (int64_t)123},
                                                            {"foo_key", (int64_t)456}};
-  context::Context test_context                         = context::Context(map_test);
+  const context::Context test_context                   = context::Context(map_test);
   EXPECT_EQ(nostd::get<int64_t>(test_context.GetValue("test_key")), 123);
   EXPECT_EQ(nostd::get<int64_t>(test_context.GetValue("foo_key")), 456);
 }
@@ -119,7 +119,7 @@ TEST(ContextTest, ContextEmptyMap)
 TEST(ContextTest, ContextHasKey)
 {
   std::map<std::string, context::ContextValue> map_test = {{"test_key", (int64_t)123}};
-  context::Context context_test                         = context::Context(map_test);
+  const context::Context context_test                   = context::Context(map_test);
   EXPECT_TRUE(context_test.HasKey("test_key"));
   EXPECT_FALSE(context_test.HasKey("foo_key"));
 }
