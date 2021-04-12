@@ -14,6 +14,8 @@ Increment the:
 * PATCH version when you make backwards compatible bug fixes.
 
 ## [Unreleased]
+ 
+## [0.4.0] 2021-04-12
 
 * [SDK] Read Zipkin endpoint from environment variable. ([#24](https://github.com/open-telemetry/opentelemetry-cpp/pull/624))
 
