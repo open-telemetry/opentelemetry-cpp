@@ -6,7 +6,16 @@ namespace exporter
 namespace otlp
 {
 
+//
+// See `attribute_value.h` for details.
+// Expecting to remove the two feature gates for:
+// - HAVE_SPAN_BYTE     - proposal for binary type or byte array (uint8_t[]).
+//
+#if defined(HAVE_SPAN_BYTE)
+const int kAttributeValueSize = 15;
+#else
 const int kAttributeValueSize = 14;
+#endif
 
 void Recordable::SetIds(trace::TraceId trace_id,
                         trace::SpanId span_id,
@@ -59,6 +68,15 @@ void PopulateAttribute(opentelemetry::proto::common::v1::KeyValue *attribute,
     attribute->mutable_value()->set_string_value(nostd::get<nostd::string_view>(value).data(),
                                                  nostd::get<nostd::string_view>(value).size());
   }
+#ifdef HAVE_SPAN_BYTE
+  else if (nostd::holds_alternative<nostd::span<const uint8_t>>(value))
+  {
+    for (const auto &val : nostd::get<nostd::span<const uint8_t>>(value))
+    {
+      attribute->mutable_value()->mutable_array_value()->add_values()->set_int_value(val);
+    }
+  }
+#endif
   else if (nostd::holds_alternative<nostd::span<const bool>>(value))
   {
     for (const auto &val : nostd::get<nostd::span<const bool>>(value))
@@ -148,7 +166,7 @@ void Recordable::AddLink(const opentelemetry::trace::SpanContext &span_context,
   // TODO: Populate trace_state when it is supported by SpanContext
 }
 
-void Recordable::SetStatus(trace::CanonicalCode code, nostd::string_view description) noexcept
+void Recordable::SetStatus(trace::StatusCode code, nostd::string_view description) noexcept
 {
   span_.mutable_status()->set_code(opentelemetry::proto::trace::v1::Status_StatusCode(code));
   span_.mutable_status()->set_message(description.data(), description.size());
@@ -157,6 +175,48 @@ void Recordable::SetStatus(trace::CanonicalCode code, nostd::string_view descrip
 void Recordable::SetName(nostd::string_view name) noexcept
 {
   span_.set_name(name.data(), name.size());
+}
+
+void Recordable::SetSpanKind(opentelemetry::trace::SpanKind span_kind) noexcept
+{
+  opentelemetry::proto::trace::v1::Span_SpanKind proto_span_kind =
+      opentelemetry::proto::trace::v1::Span_SpanKind::Span_SpanKind_SPAN_KIND_UNSPECIFIED;
+
+  switch (span_kind)
+  {
+
+    case opentelemetry::trace::SpanKind::kInternal:
+      proto_span_kind =
+          opentelemetry::proto::trace::v1::Span_SpanKind::Span_SpanKind_SPAN_KIND_INTERNAL;
+      break;
+
+    case opentelemetry::trace::SpanKind::kServer:
+      proto_span_kind =
+          opentelemetry::proto::trace::v1::Span_SpanKind::Span_SpanKind_SPAN_KIND_SERVER;
+      break;
+
+    case opentelemetry::trace::SpanKind::kClient:
+      proto_span_kind =
+          opentelemetry::proto::trace::v1::Span_SpanKind::Span_SpanKind_SPAN_KIND_CLIENT;
+      break;
+
+    case opentelemetry::trace::SpanKind::kProducer:
+      proto_span_kind =
+          opentelemetry::proto::trace::v1::Span_SpanKind::Span_SpanKind_SPAN_KIND_PRODUCER;
+      break;
+
+    case opentelemetry::trace::SpanKind::kConsumer:
+      proto_span_kind =
+          opentelemetry::proto::trace::v1::Span_SpanKind::Span_SpanKind_SPAN_KIND_CONSUMER;
+      break;
+
+    default:
+      // shouldn't reach here.
+      proto_span_kind =
+          opentelemetry::proto::trace::v1::Span_SpanKind::Span_SpanKind_SPAN_KIND_UNSPECIFIED;
+  }
+
+  span_.set_kind(proto_span_kind);
 }
 
 void Recordable::SetStartTime(opentelemetry::core::SystemTimestamp start_time) noexcept

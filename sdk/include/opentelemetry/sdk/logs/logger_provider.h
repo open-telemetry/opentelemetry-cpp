@@ -19,6 +19,7 @@
 #include <memory>
 #include <mutex>
 #include <string>
+#include <unordered_map>
 #include <vector>
 
 #include "opentelemetry/logs/logger_provider.h"
@@ -87,7 +88,7 @@ public:
 
 private:
   // A pointer to the processor stored by this logger provider
-  opentelemetry::sdk::AtomicSharedPtr<LogProcessor> processor_;
+  opentelemetry::sdk::common::AtomicSharedPtr<LogProcessor> processor_;
 
   // A vector of pointers to all the loggers that have been created
   std::unordered_map<std::string, opentelemetry::nostd::shared_ptr<opentelemetry::logs::Logger>>

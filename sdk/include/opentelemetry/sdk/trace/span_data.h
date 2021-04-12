@@ -6,11 +6,14 @@
 #include "opentelemetry/common/attribute_value.h"
 #include "opentelemetry/core/timestamp.h"
 #include "opentelemetry/nostd/string_view.h"
-#include "opentelemetry/sdk/trace/attribute_utils.h"
+#include "opentelemetry/sdk/common/attribute_utils.h"
 #include "opentelemetry/sdk/trace/recordable.h"
 #include "opentelemetry/trace/canonical_code.h"
+#include "opentelemetry/trace/span.h"
 #include "opentelemetry/trace/span_id.h"
 #include "opentelemetry/trace/trace_id.h"
+
+#include <string>
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace sdk
@@ -45,7 +48,7 @@ public:
    * Get the attributes for this event
    * @return the attributes for this event
    */
-  const std::unordered_map<std::string, SpanDataAttributeValue> &GetAttributes() const noexcept
+  const std::unordered_map<std::string, common::OwnedAttributeValue> &GetAttributes() const noexcept
   {
     return attribute_map_.GetAttributes();
   }
@@ -53,12 +56,11 @@ public:
 private:
   std::string name_;
   core::SystemTimestamp timestamp_;
-  AttributeMap attribute_map_;
+  common::AttributeMap attribute_map_;
 };
 
 /**
  * Class for storing links in SpanData.
- * TODO: Add getters for trace_id, span_id and trace_state when these are supported by SpanContext
  */
 class SpanDataLink
 {
@@ -72,14 +74,20 @@ public:
    * Get the attributes for this link
    * @return the attributes for this link
    */
-  const std::unordered_map<std::string, SpanDataAttributeValue> &GetAttributes() const noexcept
+  const std::unordered_map<std::string, common::OwnedAttributeValue> &GetAttributes() const noexcept
   {
     return attribute_map_.GetAttributes();
   }
 
+  /**
+   * Get the span context for this link
+   * @return the span context for this link
+   */
+  const opentelemetry::trace::SpanContext &GetSpanContext() const noexcept { return span_context_; }
+
 private:
   opentelemetry::trace::SpanContext span_context_;
-  AttributeMap attribute_map_;
+  common::AttributeMap attribute_map_;
 };
 
 /**
@@ -113,10 +121,16 @@ public:
   opentelemetry::nostd::string_view GetName() const noexcept { return name_; }
 
   /**
+   * Get the kind of this span
+   * @return the kind of this span
+   */
+  opentelemetry::trace::SpanKind GetSpanKind() const noexcept { return span_kind_; }
+
+  /**
    * Get the status for this span
    * @return the status for this span
    */
-  opentelemetry::trace::CanonicalCode GetStatus() const noexcept { return status_code_; }
+  opentelemetry::trace::StatusCode GetStatus() const noexcept { return status_code_; }
 
   /**
    * Get the status description for this span
@@ -140,7 +154,7 @@ public:
    * Get the attributes for this span
    * @return the attributes for this span
    */
-  const std::unordered_map<std::string, SpanDataAttributeValue> &GetAttributes() const noexcept
+  const std::unordered_map<std::string, common::OwnedAttributeValue> &GetAttributes() const noexcept
   {
     return attribute_map_.GetAttributes();
   }
@@ -187,14 +201,22 @@ public:
     links_.push_back(link);
   }
 
-  void SetStatus(opentelemetry::trace::CanonicalCode code,
+  void SetStatus(opentelemetry::trace::StatusCode code,
                  nostd::string_view description) noexcept override
   {
     status_code_ = code;
     status_desc_ = std::string(description);
   }
 
-  void SetName(nostd::string_view name) noexcept override { name_ = std::string(name); }
+  void SetName(nostd::string_view name) noexcept override
+  {
+    name_ = std::string(name.data(), name.length());
+  }
+
+  void SetSpanKind(opentelemetry::trace::SpanKind span_kind) noexcept override
+  {
+    span_kind_ = span_kind;
+  }
 
   void SetStartTime(opentelemetry::core::SystemTimestamp start_time) noexcept override
   {
@@ -210,11 +232,12 @@ private:
   core::SystemTimestamp start_time_;
   std::chrono::nanoseconds duration_{0};
   std::string name_;
-  opentelemetry::trace::CanonicalCode status_code_{opentelemetry::trace::CanonicalCode::OK};
+  opentelemetry::trace::StatusCode status_code_{opentelemetry::trace::StatusCode::kUnset};
   std::string status_desc_;
-  AttributeMap attribute_map_;
+  common::AttributeMap attribute_map_;
   std::vector<SpanDataEvent> events_;
   std::vector<SpanDataLink> links_;
+  opentelemetry::trace::SpanKind span_kind_{opentelemetry::trace::SpanKind::kInternal};
 };
 }  // namespace trace
 }  // namespace sdk

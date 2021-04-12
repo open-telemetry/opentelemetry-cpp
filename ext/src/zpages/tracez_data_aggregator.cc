@@ -6,10 +6,10 @@ namespace ext
 namespace zpages
 {
 
-TracezDataAggregator::TracezDataAggregator(std::shared_ptr<TracezSpanProcessor> span_processor,
+TracezDataAggregator::TracezDataAggregator(std::shared_ptr<TracezSharedData> shared_data,
                                            milliseconds update_interval)
 {
-  tracez_span_processor_ = span_processor;
+  tracez_shared_data_ = shared_data;
 
   // Start a thread that calls AggregateSpans periodically or till notified.
   execute_.store(true, std::memory_order_release);
@@ -124,7 +124,8 @@ void TracezDataAggregator::AggregateCompletedSpans(
       aggregated_tracez_data_[span_name] = TracezData();
     }
 
-    if (completed_span->GetStatus() == CanonicalCode::OK)
+    if (completed_span->GetStatus() == trace::StatusCode::kOk ||
+        completed_span->GetStatus() == trace::StatusCode::kUnset)
       AggregateStatusOKSpan(completed_span);
     else
       AggregateStatusErrorSpan(completed_span);
@@ -152,14 +153,14 @@ void TracezDataAggregator::AggregateRunningSpans(
 
 void TracezDataAggregator::AggregateSpans()
 {
-  auto span_snapshot = tracez_span_processor_->GetSpanSnapshot();
+  auto span_snapshot = tracez_shared_data_->GetSpanSnapshot();
   /**
    * TODO: At this time in the project, there is no way of uniquely identifying
    * a span(their id's are not being set yet).
    * If in the future this is added then clearing of running spans will not bee
    * required.
    * For now this step of clearing and recalculating running span data is
-   * required because it is unkown which spans have moved from running to
+   * required because it is unknown which spans have moved from running to
    * completed since the previous call. Additionally, the span name can change
    * for spans while they are running.
    *
@@ -170,9 +171,9 @@ void TracezDataAggregator::AggregateSpans()
    * unique identifiers to span data have not been added yet.
    *
    * A few things to note:
-   * i) Duplicate running spans may be recieved from the span processor in one
+   * i) Duplicate running spans may be received from the span processor in one
    *    multiple successive calls to this function.
-   * ii) Only the newly completed spans are recieved by this function.
+   * ii) Only the newly completed spans are received by this function.
    *     Completed spans will not be seen more than once
    **/
   ClearRunningSpanData();

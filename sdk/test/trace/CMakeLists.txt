@@ -8,12 +8,17 @@ foreach(
   always_on_sampler_test
   parent_sampler_test
   trace_id_ratio_sampler_test
-  batch_span_processor_test
-  attribute_utils_test)
+  batch_span_processor_test)
   add_executable(${testname} "${testname}.cc")
   target_link_libraries(
-    ${testname} ${GTEST_BOTH_LIBRARIES} ${CMAKE_THREAD_LIBS_INIT}
-    opentelemetry_common opentelemetry_trace opentelemetry_exporter_in_memory)
+    ${testname}
+    ${CORE_RUNTIME_LIBS}
+    ${GTEST_BOTH_LIBRARIES}
+    ${CMAKE_THREAD_LIBS_INIT}
+    opentelemetry_common
+    opentelemetry_trace
+    opentelemetry_resources
+    opentelemetry_exporter_in_memory)
   gtest_add_tests(
     TARGET ${testname}
     TEST_PREFIX trace.
@@ -22,5 +27,10 @@ endforeach()
 
 add_executable(sampler_benchmark sampler_benchmark.cc)
 target_link_libraries(
-  sampler_benchmark benchmark::benchmark ${CMAKE_THREAD_LIBS_INIT}
-  opentelemetry_trace opentelemetry_exporter_in_memory)
+  sampler_benchmark
+  benchmark::benchmark
+  ${CMAKE_THREAD_LIBS_INIT}
+  ${CORE_RUNTIME_LIBS}
+  opentelemetry_trace
+  opentelemetry_resources
+  opentelemetry_exporter_in_memory)

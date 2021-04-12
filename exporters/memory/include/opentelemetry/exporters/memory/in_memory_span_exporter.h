@@ -36,7 +36,7 @@ public:
    * to add to the InMemorySpanData
    * @return Returns the result of the operation
    */
-  sdk::trace::ExportResult Export(
+  sdk::common::ExportResult Export(
       const nostd::span<std::unique_ptr<sdk::trace::Recordable>> &recordables) noexcept override
   {
     for (auto &recordable : recordables)
@@ -49,15 +49,19 @@ public:
       }
     }
 
-    return sdk::trace::ExportResult::kSuccess;
+    return sdk::common::ExportResult::kSuccess;
   }
 
   /**
    * @param timeout an optional value containing the timeout of the exporter
    * note: passing custom timeout values is not currently supported for this exporter
+   * @return Returns the status of the operation
    */
-  void Shutdown(
-      std::chrono::microseconds timeout = std::chrono::microseconds(0)) noexcept override{};
+  bool Shutdown(
+      std::chrono::microseconds timeout = std::chrono::microseconds::max()) noexcept override
+  {
+    return true;
+  };
 
   /**
    * @return Returns a shared pointer to this exporters InMemorySpanData

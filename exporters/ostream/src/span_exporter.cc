@@ -10,6 +10,25 @@ namespace exporter
 {
 namespace trace
 {
+
+std::ostream &operator<<(std::ostream &os, opentelemetry::trace::SpanKind span_kind)
+{
+  switch (span_kind)
+  {
+    case opentelemetry::trace::SpanKind::kClient:
+      return os << "Client";
+    case opentelemetry::trace::SpanKind::kInternal:
+      return os << "Internal";
+    case opentelemetry::trace::SpanKind::kServer:
+      return os << "Server";
+    case opentelemetry::trace::SpanKind::kProducer:
+      return os << "Producer";
+    case opentelemetry::trace::SpanKind::kConsumer:
+      return os << "Consumer";
+  };
+  return os << "";
+}
+
 OStreamSpanExporter::OStreamSpanExporter(std::ostream &sout) noexcept : sout_(sout) {}
 
 std::unique_ptr<sdktrace::Recordable> OStreamSpanExporter::MakeRecordable() noexcept
@@ -17,12 +36,12 @@ std::unique_ptr<sdktrace::Recordable> OStreamSpanExporter::MakeRecordable() noex
   return std::unique_ptr<sdktrace::Recordable>(new sdktrace::SpanData);
 }
 
-sdktrace::ExportResult OStreamSpanExporter::Export(
+sdk::common::ExportResult OStreamSpanExporter::Export(
     const nostd::span<std::unique_ptr<sdktrace::Recordable>> &spans) noexcept
 {
   if (isShutdown_)
   {
-    return sdktrace::ExportResult::kFailure;
+    return sdk::common::ExportResult::kFailure;
   }
 
   for (auto &recordable : spans)
@@ -49,19 +68,67 @@ sdktrace::ExportResult OStreamSpanExporter::Export(
             << "\n  start         : " << span->GetStartTime().time_since_epoch().count()
             << "\n  duration      : " << span->GetDuration().count()
             << "\n  description   : " << span->GetDescription()
+            << "\n  span kind     : " << span->GetSpanKind()
             << "\n  status        : " << statusMap[int(span->GetStatus())]
             << "\n  attributes    : ";
       printAttributes(span->GetAttributes());
+      sout_ << "\n  events        : ";
+      printEvents(span->GetEvents());
+      sout_ << "\n  links         : ";
+      printLinks(span->GetLinks());
       sout_ << "\n}\n";
     }
   }
 
-  return sdktrace::ExportResult::kSuccess;
+  return sdk::common::ExportResult::kSuccess;
 }
 
-void OStreamSpanExporter::Shutdown(std::chrono::microseconds timeout) noexcept
+bool OStreamSpanExporter::Shutdown(std::chrono::microseconds timeout) noexcept
 {
   isShutdown_ = true;
+  return true;
+}
+
+void OStreamSpanExporter::printAttributes(
+    const std::unordered_map<std::string, sdkcommon::OwnedAttributeValue> &map,
+    const std::string prefix)
+{
+  for (const auto &kv : map)
+  {
+    sout_ << prefix << kv.first << ": ";
+    print_value(kv.second);
+  }
+}
+
+void OStreamSpanExporter::printEvents(const std::vector<sdktrace::SpanDataEvent> &events)
+{
+  for (const auto &event : events)
+  {
+    sout_ << "\n\t{"
+          << "\n\t  name          : " << event.GetName()
+          << "\n\t  timestamp     : " << event.GetTimestamp().time_since_epoch().count()
+          << "\n\t  attributes    : ";
+    printAttributes(event.GetAttributes(), "\n\t\t");
+    sout_ << "\n\t}";
+  }
+}
+
+void OStreamSpanExporter::printLinks(const std::vector<sdktrace::SpanDataLink> &links)
+{
+  for (const auto &link : links)
+  {
+    char trace_id[32] = {0};
+    char span_id[16]  = {0};
+    link.GetSpanContext().trace_id().ToLowerBase16(trace_id);
+    link.GetSpanContext().span_id().ToLowerBase16(span_id);
+    sout_ << "\n\t{"
+          << "\n\t  trace_id      : " << std::string(trace_id, 32)
+          << "\n\t  span_id       : " << std::string(span_id, 16)
+          << "\n\t  tracestate    : " << link.GetSpanContext().trace_state()->ToHeader()
+          << "\n\t  attributes    : ";
+    printAttributes(link.GetAttributes(), "\n\t\t");
+    sout_ << "\n\t}";
+  }
 }
 
 }  // namespace trace

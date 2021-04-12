@@ -7,8 +7,10 @@
 #include <gtest/gtest.h>
 
 using namespace opentelemetry::sdk::trace;
+using namespace opentelemetry::sdk::common;
 using opentelemetry::exporter::memory::InMemorySpanData;
 using opentelemetry::exporter::memory::InMemorySpanExporter;
+using opentelemetry::trace::SpanContext;
 
 TEST(SimpleProcessor, ToInMemorySpanExporter)
 {
@@ -18,7 +20,7 @@ TEST(SimpleProcessor, ToInMemorySpanExporter)
 
   auto recordable = processor.MakeRecordable();
 
-  processor.OnStart(*recordable);
+  processor.OnStart(*recordable, SpanContext::GetInvalid());
 
   ASSERT_EQ(0, span_data->GetSpans().size());
 
@@ -26,7 +28,7 @@ TEST(SimpleProcessor, ToInMemorySpanExporter)
 
   ASSERT_EQ(1, span_data->GetSpans().size());
 
-  processor.Shutdown();
+  EXPECT_TRUE(processor.Shutdown());
 }
 
 // An exporter that does nothing but record (and give back ) the # of times Shutdown was called.
@@ -46,9 +48,11 @@ public:
     return ExportResult::kSuccess;
   }
 
-  void Shutdown(std::chrono::microseconds timeout = std::chrono::microseconds(0)) noexcept override
+  bool Shutdown(
+      std::chrono::microseconds timeout = std::chrono::microseconds::max()) noexcept override
   {
     *shutdown_counter_ += 1;
+    return true;
   }
 
 private:

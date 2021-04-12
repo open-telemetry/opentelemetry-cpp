@@ -8,6 +8,7 @@
 #include <vector>
 
 #include "opentelemetry/ext/zpages/threadsafe_span_data.h"
+#include "opentelemetry/ext/zpages/tracez_shared_data.h"
 #include "opentelemetry/sdk/trace/processor.h"
 #include "opentelemetry/sdk/trace/recordable.h"
 
@@ -23,16 +24,12 @@ namespace zpages
 class TracezSpanProcessor : public opentelemetry::sdk::trace::SpanProcessor
 {
 public:
-  struct CollectedSpans
-  {
-    std::unordered_set<ThreadsafeSpanData *> running;
-    std::vector<std::unique_ptr<ThreadsafeSpanData>> completed;
-  };
-
   /*
    * Initialize a span processor.
    */
-  explicit TracezSpanProcessor() noexcept {}
+  explicit TracezSpanProcessor(std::shared_ptr<TracezSharedData> shared_data) noexcept
+      : shared_data_(shared_data)
+  {}
 
   /*
    * Create a span recordable, which is span_data
@@ -48,7 +45,8 @@ public:
    * running_spans.
    * @param span a recordable for a span that was just started
    */
-  void OnStart(opentelemetry::sdk::trace::Recordable &span) noexcept override;
+  void OnStart(opentelemetry::sdk::trace::Recordable &span,
+               const opentelemetry::trace::SpanContext &parent_context) noexcept override;
 
   /*
    * OnEnd is called when a span ends; that span_data is moved from running_spans to
@@ -58,25 +56,16 @@ public:
   void OnEnd(std::unique_ptr<opentelemetry::sdk::trace::Recordable> &&span) noexcept override;
 
   /*
-   * Returns a snapshot of all spans stored. This snapshot has a copy of the
-   * stored running_spans and gives ownership of completed spans to the caller.
-   * Stored completed_spans are cleared from the processor. Currently,
-   * copy-on-write is utilized where possible to minimize contention, but locks
-   * may be added in the future.
-   * @return snapshot of all currently running spans and newly completed spans
-   * (spans never sent while complete) at the time that the function is called
-   */
-  CollectedSpans GetSpanSnapshot() noexcept;
-
-  /*
    * For now, does nothing. In the future, it
    * may send all ended spans that have not yet been sent to the aggregator.
-   * @param timeout an optional timeout, the default timeout of 0 means that no
-   * timeout is applied. Currently, timeout does nothing.
+   * @param timeout an optional timeout. Currently, timeout does nothing.
+   * @return return the status of the operation.
    */
-  void ForceFlush(
-      std::chrono::microseconds timeout = std::chrono::microseconds(0)) noexcept override
-  {}
+  bool ForceFlush(
+      std::chrono::microseconds timeout = std::chrono::microseconds::max()) noexcept override
+  {
+    return true;
+  }
 
   /*
    * Shut down the processor and do any cleanup required, which is none.
@@ -84,13 +73,16 @@ public:
    * or Shutdown will return immediately without doing anything.
    * @param timeout an optional timeout, the default timeout of 0 means that no
    * timeout is applied. Currently, timeout does nothing.
+   * @return return the status of the operation.
    */
-  void Shutdown(std::chrono::microseconds timeout = std::chrono::microseconds(0)) noexcept override
-  {}
+  bool Shutdown(
+      std::chrono::microseconds timeout = std::chrono::microseconds::max()) noexcept override
+  {
+    return true;
+  }
 
 private:
-  mutable std::mutex mtx_;
-  CollectedSpans spans_;
+  std::shared_ptr<TracezSharedData> shared_data_;
 };
 }  // namespace zpages
 }  // namespace ext

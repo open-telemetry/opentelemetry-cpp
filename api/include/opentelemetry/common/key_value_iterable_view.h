@@ -30,18 +30,26 @@ struct is_key_value_iterable
 };
 }  // namespace detail
 
+/**
+ * @brief Container for key-value pairs that can transform every value in it to one of types
+ * listed in common::AttributeValue. It may contain value types that are not directly map'able
+ * to primitive value types. In that case the `ForEachKeyValue` method acts as a transform to
+ * convert the value type to one listed under AtributeValue (bool, int32_t, int64_t, uint32_t,
+ * uint64_t, double, nostd::string_view, or arrays of primite types). For example, if UUID,
+ * GUID, or UTF-16 string type is passed as one of values stored inside this container, the
+ * container itself may provide a custom implementation of `ForEachKeyValue` to transform the
+ * 'non-standard' type to one of the standard types.
+ */
 template <class T>
 class KeyValueIterableView final : public KeyValueIterable
 {
-  static_assert(detail::is_key_value_iterable<T>::value, "Must be a key-value iterable");
 
 public:
   explicit KeyValueIterableView(const T &container) noexcept : container_{&container} {}
 
   // KeyValueIterable
-  bool ForEachKeyValue(
-      nostd::function_ref<bool(nostd::string_view, common::AttributeValue)> callback) const
-      noexcept override
+  bool ForEachKeyValue(nostd::function_ref<bool(nostd::string_view, common::AttributeValue)>
+                           callback) const noexcept override
   {
     auto iter = std::begin(*container_);
     auto last = std::end(*container_);

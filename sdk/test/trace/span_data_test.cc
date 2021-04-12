@@ -1,5 +1,6 @@
 #include "opentelemetry/sdk/trace/span_data.h"
 #include "opentelemetry/nostd/variant.h"
+#include "opentelemetry/trace/span.h"
 #include "opentelemetry/trace/span_id.h"
 #include "opentelemetry/trace/trace_id.h"
 
@@ -17,7 +18,7 @@ TEST(SpanData, DefaultValues)
   ASSERT_EQ(data.GetSpanId(), zero_span_id);
   ASSERT_EQ(data.GetParentSpanId(), zero_span_id);
   ASSERT_EQ(data.GetName(), "");
-  ASSERT_EQ(data.GetStatus(), opentelemetry::trace::CanonicalCode::OK);
+  ASSERT_EQ(data.GetStatus(), opentelemetry::trace::StatusCode::kUnset);
   ASSERT_EQ(data.GetDescription(), "");
   ASSERT_EQ(data.GetStartTime().time_since_epoch(), std::chrono::nanoseconds(0));
   ASSERT_EQ(data.GetDuration(), std::chrono::nanoseconds(0));
@@ -35,7 +36,8 @@ TEST(SpanData, Set)
   SpanData data;
   data.SetIds(trace_id, span_id, parent_span_id);
   data.SetName("span name");
-  data.SetStatus(opentelemetry::trace::CanonicalCode::UNKNOWN, "description");
+  data.SetSpanKind(opentelemetry::trace::SpanKind::kServer);
+  data.SetStatus(opentelemetry::trace::StatusCode::kOk, "description");
   data.SetStartTime(now);
   data.SetDuration(std::chrono::nanoseconds(1000000));
   data.SetAttribute("attr1", (int64_t)314159);
@@ -45,7 +47,8 @@ TEST(SpanData, Set)
   ASSERT_EQ(data.GetSpanId(), span_id);
   ASSERT_EQ(data.GetParentSpanId(), parent_span_id);
   ASSERT_EQ(data.GetName(), "span name");
-  ASSERT_EQ(data.GetStatus(), opentelemetry::trace::CanonicalCode::UNKNOWN);
+  ASSERT_EQ(data.GetSpanKind(), opentelemetry::trace::SpanKind::kServer);
+  ASSERT_EQ(data.GetStatus(), opentelemetry::trace::StatusCode::kOk);
   ASSERT_EQ(data.GetDescription(), "description");
   ASSERT_EQ(data.GetStartTime().time_since_epoch(), now.time_since_epoch());
   ASSERT_EQ(data.GetDuration(), std::chrono::nanoseconds(1000000));
@@ -84,10 +87,24 @@ TEST(SpanData, Links)
   std::map<std::string, int64_t> attributes = {
       {keys[0], values[0]}, {keys[1], values[1]}, {keys[2], values[2]}};
 
+  // produce valid SpanContext with pseudo span and trace Id.
+  uint8_t span_id_buf[opentelemetry::trace::SpanId::kSize] = {
+      1,
+  };
+  opentelemetry::trace::SpanId span_id{span_id_buf};
+  uint8_t trace_id_buf[opentelemetry::trace::TraceId::kSize] = {
+      2,
+  };
+  opentelemetry::trace::TraceId trace_id{trace_id_buf};
+  const auto span_context = opentelemetry::trace::SpanContext(
+      trace_id, span_id,
+      opentelemetry::trace::TraceFlags{opentelemetry::trace::TraceFlags::kIsSampled}, true);
+
   data.AddLink(
-      opentelemetry::trace::SpanContext(false, false),
+      span_context,
       opentelemetry::common::KeyValueIterableView<std::map<std::string, int64_t>>(attributes));
 
+  EXPECT_EQ(data.GetLinks().at(0).GetSpanContext(), span_context);
   for (int i = 0; i < kNumAttributes; i++)
   {
     EXPECT_EQ(opentelemetry::nostd::get<int64_t>(data.GetLinks().at(0).GetAttributes().at(keys[i])),

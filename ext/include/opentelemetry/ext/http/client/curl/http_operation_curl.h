@@ -1,6 +1,8 @@
 #pragma once
 
+#include "http_client_curl.h"
 #include "opentelemetry/ext/http/client/http_client.h"
+#include "opentelemetry/version.h"
 
 #include <curl/curl.h>
 #include <future>
@@ -29,25 +31,24 @@ const std::chrono::milliseconds default_http_conn_timeout(5000);  // ms
 const std::string http_status_regexp = "HTTP\\/\\d\\.\\d (\\d+)\\ .*";
 const std::string http_header_regexp = "(.*)\\: (.*)\\n*";
 
-struct curl_ci
+enum class RequestMode
 {
-  bool operator()(const std::string &s1, const std::string &s2) const
-  {
-    return std::lexicographical_compare(
-        s1.begin(), s1.end(), s2.begin(), s2.end(),
-        [](char c1, char c2) { return ::tolower(c1) < ::tolower(c2); });
-  }
+  Sync,
+  Async
 };
-using Headers = std::multimap<std::string, std::string, curl_ci>;
 
 class HttpOperation
 {
 public:
   void DispatchEvent(http_client::SessionState type, std::string reason = "")
   {
-    if (callback_ != nullptr)
+    if (request_mode_ == RequestMode::Async && callback_ != nullptr)
     {
       callback_->OnEvent(type, reason);
+    }
+    else
+    {
+      session_state_ = type;
     }
   }
 
@@ -56,9 +57,10 @@ public:
 
   /**
    * Create local CURL instance for url and body
-   *
-   * @param url
+   * @param method // HTTP Method
+   * @param url    // HTTP URL
    * @param callback
+   * @param request_mode // sync or async
    * @param request  Request Headers
    * @param body  Reques Body
    * @param raw_response whether to parse the response
@@ -67,28 +69,29 @@ public:
   HttpOperation(http_client::Method method,
                 std::string url,
                 http_client::EventHandler *callback,
+                RequestMode request_mode = RequestMode::Async,
                 // Default empty headers and empty request body
-                const Headers &request_headers        = Headers(),
-                const http_client::Body &request_body = http_client::Body(),
+                const http_client::Headers &request_headers = http_client::Headers(),
+                const http_client::Body &request_body       = http_client::Body(),
                 // Default connectivity and response size options
                 bool is_raw_response                        = false,
                 std::chrono::milliseconds http_conn_timeout = default_http_conn_timeout)
-      :  //
-        method_(method),
-        url_(url),
-        callback_(callback),
-
-        // Local vars
-        request_headers_(request_headers),
-        request_body_(request_body),
+      : is_aborted_(false),
+        is_finished_(false),
         // Optional connection params
         is_raw_response_(is_raw_response),
         http_conn_timeout_(http_conn_timeout),
+        request_mode_(request_mode),
+        curl_(nullptr),
         // Result
         res_(CURLE_OK),
+        callback_(callback),
+        method_(method),
+        url_(url),
+        // Local vars
+        request_headers_(request_headers),
+        request_body_(request_body),
         sockfd_(0),
-        is_aborted_(false),
-        is_finished_(false),
         nread_(0)
   {
     /* get a curl handle */
@@ -177,11 +180,10 @@ public:
     // curl_easy_setopt(curl, CURLOPT_LOCALPORT, dcf_port);
 
     // Perform initial connect, handling the timeout if needed
-
     curl_easy_setopt(curl_, CURLOPT_CONNECT_ONLY, 1L);
+    curl_easy_setopt(curl_, CURLOPT_TIMEOUT, http_conn_timeout_.count() / 1000);
     DispatchEvent(http_client::SessionState::Connecting);
     res_ = curl_easy_perform(curl_);
-
     if (CURLE_OK != res_)
     {
       DispatchEvent(http_client::SessionState::ConnectFailed,
@@ -205,7 +207,7 @@ public:
 
     /* wait for the socket to become ready for sending */
     sockfd_ = sockextr;
-    if (!WaitOnSocket(sockfd_, 0, http_conn_timeout_.count()) || is_aborted_)
+    if (!WaitOnSocket(sockfd_, 0, static_cast<long>(http_conn_timeout_.count())) || is_aborted_)
     {
       res_ = CURLE_OPERATION_TIMEDOUT;
       DispatchEvent(
@@ -298,10 +300,17 @@ public:
     return result_;
   }
 
+  void SendSync() { Send(); }
+
   /**
    * Get HTTP response code. This function returns CURL error code if HTTP response code is invalid.
    */
-  long GetResponseCode() { return res_; }
+  uint16_t GetResponseCode() { return res_; }
+
+  /**
+   * Get last session state.
+   */
+  http_client::SessionState GetSessionState() { return session_state_; }
 
   /**
    * Get whether or not response was programmatically aborted
@@ -378,7 +387,11 @@ public:
       // Simply close the socket - connection reset by peer
       if (sockfd_)
       {
+#if defined(_WIN32)
+        ::closesocket(sockfd_);
+#else
         ::close(sockfd_);
+#endif
         sockfd_ = 0;
       }
     }
@@ -389,11 +402,12 @@ public:
 protected:
   const bool is_raw_response_;  // Do not split response headers from response body
   const std::chrono::milliseconds http_conn_timeout_;  // Timeout for connect.  Default: 5000ms
+  RequestMode request_mode_;
 
   CURL *curl_;    // Local curl instance
   CURLcode res_;  // Curl result OR HTTP status code if successful
 
-  http_client::EventHandler *callback_ = nullptr;
+  http_client::EventHandler *callback_;
 
   // Request values
   http_client::Method method_;
@@ -401,6 +415,7 @@ protected:
   const Headers &request_headers_;
   const http_client::Body &request_body_;
   struct curl_slist *headers_chunk_ = nullptr;
+  http_client::SessionState session_state_;
 
   // Processed response headers and body
   std::vector<uint8_t> resp_headers_;
@@ -409,8 +424,6 @@ protected:
 
   // Socket parameters
   curl_socket_t sockfd_;
-
-  // long sockextr_   = 0;
 
   curl_off_t nread_;
   size_t sendlen_ = 0;  // # bytes sent by client

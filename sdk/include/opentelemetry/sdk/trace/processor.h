@@ -32,8 +32,10 @@ public:
   /**
    * OnStart is called when a span is started.
    * @param span a recordable for a span that was just started
+   * @param parent_context The parent context of the span that just started
    */
-  virtual void OnStart(Recordable &span) noexcept = 0;
+  virtual void OnStart(Recordable &span,
+                       const opentelemetry::trace::SpanContext &parent_context) noexcept = 0;
 
   /**
    * OnEnd is called when a span is ended.
@@ -46,8 +48,8 @@ public:
    * @param timeout an optional timeout, the default timeout of 0 means that no
    * timeout is applied.
    */
-  virtual void ForceFlush(
-      std::chrono::microseconds timeout = std::chrono::microseconds(0)) noexcept = 0;
+  virtual bool ForceFlush(
+      std::chrono::microseconds timeout = (std::chrono::microseconds::max)()) noexcept = 0;
 
   /**
    * Shut down the processor and do any cleanup required. Ended spans are
@@ -57,8 +59,8 @@ public:
    * @param timeout an optional timeout, the default timeout of 0 means that no
    * timeout is applied.
    */
-  virtual void Shutdown(
-      std::chrono::microseconds timeout = std::chrono::microseconds(0)) noexcept = 0;
+  virtual bool Shutdown(
+      std::chrono::microseconds timeout = (std::chrono::microseconds::max)()) noexcept = 0;
 };
 }  // namespace trace
 }  // namespace sdk

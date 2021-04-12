@@ -18,26 +18,16 @@
 
 #include <memory>
 #include <vector>
-#include "opentelemetry/logs/log_record.h"
 #include "opentelemetry/nostd/span.h"
+#include "opentelemetry/sdk/common/exporter_utils.h"
 #include "opentelemetry/sdk/logs/processor.h"
+#include "opentelemetry/sdk/logs/recordable.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace sdk
 {
 namespace logs
 {
-/**
- * ExportResult is returned as result of exporting a batch of Log Records.
- */
-enum class ExportResult
-{
-  // The batch was exported successfully
-  kSuccess = 0,
-  // The batch was exported unsuccessfully and was dropped, but can not be retried
-  kFailure
-};
-
 /**
  * LogExporter defines the interface that log exporters must implement.
  */
@@ -47,6 +37,17 @@ public:
   virtual ~LogExporter() = default;
 
   /**
+   * Create a log recordable. This object will be used to record log data and
+   * will subsequently be passed to LogExporter::Export. Vendors can implement
+   * custom recordables or use the default LogRecord recordable provided by the
+   * SDK.
+   * @return a newly initialized Recordable object
+   *
+   * Note: This method must be callable from multiple threads.
+   */
+  virtual std::unique_ptr<Recordable> MakeRecordable() noexcept = 0;
+
+  /**
    * Exports the batch of log records to their export destination.
    * This method must not be called concurrently for the same exporter instance.
    * The exporter may attempt to retry sending the batch, but should drop
@@ -54,8 +55,8 @@ public:
    * @param records a span of unique pointers to log records
    * @returns an ExportResult code (whether export was success or failure)
    */
-  virtual ExportResult Export(
-      const nostd::span<std::unique_ptr<opentelemetry::logs::LogRecord>> &records) noexcept = 0;
+  virtual sdk::common::ExportResult Export(
+      const nostd::span<std::unique_ptr<Recordable>> &records) noexcept = 0;
 
   /**
    * Marks the exporter as ShutDown and cleans up any resources as required.

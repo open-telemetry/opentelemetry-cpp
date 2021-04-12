@@ -2,7 +2,7 @@
 
 #include <gtest/gtest.h>
 
-#include "map"
+#include <map>
 
 using opentelemetry::nostd::string_view;
 
@@ -68,11 +68,29 @@ TEST(StringViewTest, SubstrPortion)
 TEST(StringViewTest, SubstrOutOfRange)
 {
   string_view s = "abc123";
-#if __EXCEPTIONS
+#if __EXCEPTIONS || defined(HAVE_CPP_STDLIB)
   EXPECT_THROW(s.substr(10), std::out_of_range);
 #else
   EXPECT_DEATH({ s.substr(10); }, "");
 #endif
+}
+
+TEST(StringViewTest, FindSingleCharacter)
+{
+  string_view s = "abc";
+
+  // starting from 0-th position (default)
+  EXPECT_EQ(s.find('a'), 0);
+  EXPECT_EQ(s.find('b'), 1);
+  EXPECT_EQ(s.find('c'), 2);
+  EXPECT_EQ(s.find('d'), -1);  // FIXME: string_view:npos - problem with linker
+
+  // starting from given index
+  EXPECT_EQ(s.find('a', 1), -1);
+  EXPECT_EQ(s.find('b', 1), 1);
+
+  // out of index
+  EXPECT_EQ(s.find('a', 10), -1);
 }
 
 TEST(StringViewTest, Compare)

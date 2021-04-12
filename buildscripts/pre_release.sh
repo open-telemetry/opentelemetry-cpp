@@ -45,12 +45,12 @@ if [ ! -f $changelog_file ]; then
     exit 1
 fi
 
-if [ ! grep -q "## [Unreleased]" $changelog_file ]; then
+if [ ! grep -q "^\#\# \[Unreleased\]$" $changelog_file ]; then
     echo "Error: $changelog_file doesn't contain Unreleased information. Please update the file with changes and run this script again."
     exit 1
 fi
 
-git checkout -b pre_release_${tag} master
+git checkout -b pre_release_${tag} main
 if [ $? -ne 0 ]; then
     echo "Error: Cannot create release branch. Ensure you have sufficient permissions to repo and try again."
     exit 1
@@ -59,13 +59,13 @@ fi
 # update CHANGELOG.md
 date=$(date '+%Y-%m-%d')
 sed  -i "/\#\# \[Unreleased\]/a\\ \n\#\# \[${tag}\] ${date}"  $changelog_file
-if [$? -ne 0]; then
+if [ $? -ne 0 ]; then
     echo "Error: Cannot update CHANGELOG.md file. Update it manually, create the ${tag} and push changes to upstream"
     exit 1
 fi
 
-git add .
+git add CHANGELOG.md
 git commit -m "Prepare for releasing ${tag}"
 
-echo "Now validate the chages using git diff master, create the ${tag} and push changes to upstream"
+echo "Now validate the changes using git diff main, create the ${tag} and push changes to upstream"
 echo

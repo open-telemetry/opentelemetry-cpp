@@ -21,14 +21,31 @@ public:
    * the iteration is aborted.
    * @return true if every key-value pair was iterated over
    */
-  virtual bool ForEachKeyValue(
-      nostd::function_ref<bool(nostd::string_view, common::AttributeValue)> callback) const
-      noexcept = 0;
+  virtual bool ForEachKeyValue(nostd::function_ref<bool(nostd::string_view, common::AttributeValue)>
+                                   callback) const noexcept = 0;
 
   /**
    * @return the number of key-value pairs
    */
   virtual size_t size() const noexcept = 0;
 };
+
+//
+// NULL object pattern empty iterable.
+//
+class NullKeyValueIterable : public KeyValueIterable
+{
+public:
+  NullKeyValueIterable(){};
+
+  virtual bool ForEachKeyValue(
+      nostd::function_ref<bool(nostd::string_view, common::AttributeValue)>) const noexcept
+  {
+    return true;
+  };
+
+  virtual size_t size() const noexcept { return 0; }
+};
+
 }  // namespace common
 OPENTELEMETRY_END_NAMESPACE

@@ -17,39 +17,14 @@
 #pragma once
 
 #include <memory>
+#include "opentelemetry/sdk/common/exporter_utils.h"
 #include "opentelemetry/sdk/metrics/record.h"
-#include "opentelemetry/version.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace sdk
 {
 namespace metrics
 {
-/**
- * ExportResult is returned as result of exporting a batch of records.
- */
-enum class ExportResult
-{
-  /**
-   * Batch was successfully exported.
-   */
-  kSuccess = 0,
-  /**
-   * Exporting failed. The caller must not retry exporting the same batch; the
-   * batch must be dropped.
-   */
-  kFailure = 1,
-
-  /**
-   * The collection does not have enough space to receive the export batch.
-   */
-  kFailureFull = 2,
-
-  /**
-   * The export() function was passed an invalid argument.
-   */
-  kFailureInvalidArgument = 3,
-};
 /**
  * MetricsExporter defines the interface that protocol-specific span exporters must
  * implement.
@@ -64,7 +39,7 @@ public:
    * concurrently for the same exporter instance.
    * @param records a vector of unique pointers to metric records
    */
-  virtual ExportResult Export(const std::vector<Record> &records) noexcept = 0;
+  virtual sdk::common::ExportResult Export(const std::vector<Record> &records) noexcept = 0;
 };
 }  // namespace metrics
 }  // namespace sdk

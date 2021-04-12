@@ -1,5 +1,4 @@
 #include "tracer.h"
-#include "opentelemetry/context/runtime_context.h"
 #include "opentelemetry/nostd/unique_ptr.h"
 
 #include <iostream>
@@ -43,8 +42,7 @@ public:
                 const common::KeyValueIterable & /*attributes*/) noexcept override
   {}
 
-  void SetStatus(trace::CanonicalCode /*code*/,
-                 nostd::string_view /*description*/) noexcept override
+  void SetStatus(trace::StatusCode /*code*/, nostd::string_view /*description*/) noexcept override
   {}
 
   void UpdateName(nostd::string_view /*name*/) noexcept override {}

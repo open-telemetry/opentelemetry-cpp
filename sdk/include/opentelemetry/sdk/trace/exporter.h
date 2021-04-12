@@ -2,6 +2,7 @@
 
 #include <memory>
 #include "opentelemetry/nostd/span.h"
+#include "opentelemetry/sdk/common/exporter_utils.h"
 #include "opentelemetry/sdk/trace/recordable.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
@@ -9,21 +10,6 @@ namespace sdk
 {
 namespace trace
 {
-/**
- * ExportResult is returned as result of exporting a span batch.
- */
-enum class ExportResult
-{
-  /**
-   * Batch was successfully exported.
-   */
-  kSuccess = 0,
-  /**
-   * Exporting failed. The caller must not retry exporting the same batch; the
-   * batch must be dropped.
-   */
-  kFailure
-};
 /**
  * SpanExporter defines the interface that protocol-specific span exporters must
  * implement.
@@ -49,17 +35,17 @@ public:
    * concurrently for the same exporter instance.
    * @param spans a span of unique pointers to span recordables
    */
-  virtual ExportResult Export(
+  virtual sdk::common::ExportResult Export(
       const nostd::span<std::unique_ptr<opentelemetry::sdk::trace::Recordable>>
           &spans) noexcept = 0;
 
   /**
    * Shut down the exporter.
-   * @param timeout an optional timeout, the default timeout of 0 means that no
-   * timeout is applied.
+   * @param timeout an optional timeout.
+   * @return return the status of the operation.
    */
-  virtual void Shutdown(
-      std::chrono::microseconds timeout = std::chrono::microseconds(0)) noexcept = 0;
+  virtual bool Shutdown(
+      std::chrono::microseconds timeout = std::chrono::microseconds::max()) noexcept = 0;
 };
 }  // namespace trace
 }  // namespace sdk

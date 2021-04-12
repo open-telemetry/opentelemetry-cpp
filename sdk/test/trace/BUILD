@@ -6,6 +6,7 @@ cc_test(
         "tracer_provider_test.cc",
     ],
     deps = [
+        "//sdk/src/resource",
         "//sdk/src/trace",
         "@com_google_googletest//:gtest_main",
     ],
@@ -52,6 +53,7 @@ cc_test(
     ],
     deps = [
         "//exporters/memory:in_memory_span_exporter",
+        "//sdk/src/resource",
         "//sdk/src/trace",
         "@com_google_googletest//:gtest_main",
     ],
@@ -102,22 +104,12 @@ cc_test(
     ],
 )
 
-cc_test(
-    name = "attribute_utils_test",
-    srcs = [
-        "attribute_utils_test.cc",
-    ],
-    deps = [
-        "//sdk/src/trace",
-        "@com_google_googletest//:gtest_main",
-    ],
-)
-
 otel_cc_benchmark(
     name = "sampler_benchmark",
     srcs = ["sampler_benchmark.cc"],
     deps = [
         "//exporters/memory:in_memory_span_exporter",
+        "//sdk/src/resource",
         "//sdk/src/trace",
     ],
 )

@@ -9,8 +9,9 @@
 #include <map>
 #include <sstream>
 
-namespace nostd    = opentelemetry::nostd;
-namespace sdktrace = opentelemetry::sdk::trace;
+namespace nostd     = opentelemetry::nostd;
+namespace sdktrace  = opentelemetry::sdk::trace;
+namespace sdkcommon = opentelemetry::sdk::common;
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace exporter
@@ -33,33 +34,18 @@ public:
 
   std::unique_ptr<sdktrace::Recordable> MakeRecordable() noexcept override;
 
-  sdktrace::ExportResult Export(
+  sdk::common::ExportResult Export(
       const nostd::span<std::unique_ptr<sdktrace::Recordable>> &spans) noexcept override;
 
-  void Shutdown(std::chrono::microseconds timeout = std::chrono::microseconds(0)) noexcept override;
+  bool Shutdown(
+      std::chrono::microseconds timeout = std::chrono::microseconds::max()) noexcept override;
 
 private:
   std::ostream &sout_;
   bool isShutdown_ = false;
 
   // Mapping status number to the string from api/include/opentelemetry/trace/canonical_code.h
-  std::map<int, std::string> statusMap{{0, "OK"},
-                                       {1, "CANCELLED"},
-                                       {2, "UNKNOWN"},
-                                       {3, "INVALID_ARGUMENT"},
-                                       {4, "DEADLINE_EXCEEDED"},
-                                       {5, "NOT_FOUND"},
-                                       {6, "ALREADY_EXISTS"},
-                                       {7, "PERMISSION_DENIED"},
-                                       {8, "RESOURCE_EXHAUSTED"},
-                                       {9, "FAILED_PRECONDITION"},
-                                       {10, "ABORTED"},
-                                       {11, "OUT_OF_RANGE"},
-                                       {12, "UNIMPLEMENTED"},
-                                       {13, "INTERNAL"},
-                                       {14, "UNAVAILABLE"},
-                                       {15, "DATA_LOSS"},
-                                       {16, "UNAUTHENTICATED"}};
+  std::map<int, std::string> statusMap{{0, "Unset"}, {1, "Ok"}, {2, "Error"}};
 
   /*
     print_value is used to print out the value of an attribute within a vector.
@@ -92,10 +78,10 @@ private:
 // Prior to C++14, generic lambda is not available so fallback to functor.
 #if __cplusplus < 201402L
 
-  class SpanDataAttributeValueVisitor
+  class OwnedAttributeValueVisitor
   {
   public:
-    SpanDataAttributeValueVisitor(OStreamSpanExporter &exporter) : exporter_(exporter) {}
+    OwnedAttributeValueVisitor(OStreamSpanExporter &exporter) : exporter_(exporter) {}
 
     template <typename T>
     void operator()(T &&arg)
@@ -109,29 +95,22 @@ private:
 
 #endif
 
-  void print_value(sdktrace::SpanDataAttributeValue &value)
+  void print_value(const sdkcommon::OwnedAttributeValue &value)
   {
 #if __cplusplus < 201402L
-    nostd::visit(SpanDataAttributeValueVisitor(*this), value);
+    nostd::visit(OwnedAttributeValueVisitor(*this), value);
 #else
     nostd::visit([this](auto &&arg) { print_value(arg); }, value);
 #endif
   }
 
-  void printAttributes(std::unordered_map<std::string, sdktrace::SpanDataAttributeValue> map)
-  {
-    size_t size = map.size();
-    size_t i    = 1;
-    for (auto kv : map)
-    {
-      sout_ << kv.first << ": ";
-      print_value(kv.second);
+  // various print helpers
+  void printAttributes(const std::unordered_map<std::string, sdkcommon::OwnedAttributeValue> &map,
+                       const std::string prefix = "\n\t");
 
-      if (i != size)
-        sout_ << ", ";
-      i++;
-    }
-  }
+  void printEvents(const std::vector<sdktrace::SpanDataEvent> &events);
+
+  void printLinks(const std::vector<sdktrace::SpanDataLink> &links);
 };
 }  // namespace trace
 }  // namespace exporter

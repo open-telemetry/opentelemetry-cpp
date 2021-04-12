@@ -52,6 +52,13 @@ public:
     return this->StartSpan(name, attributes, {}, options);
   }
 
+  nostd::shared_ptr<Span> StartSpan(nostd::string_view name,
+                                    const common::KeyValueIterable &attributes,
+                                    const StartSpanOptions &options = {}) noexcept
+  {
+    return this->StartSpan(name, attributes, NullSpanContext(), options);
+  }
+
   template <class T,
             class U,
             nostd::enable_if_t<common::detail::is_key_value_iterable<T>::value> * = nullptr,
@@ -144,7 +151,7 @@ public:
    */
   nostd::shared_ptr<Span> GetCurrentSpan() noexcept
   {
-    context::ContextValue active_span = context::RuntimeContext::GetValue(SpanKey);
+    context::ContextValue active_span = context::RuntimeContext::GetValue(kSpanKey);
     if (nostd::holds_alternative<nostd::shared_ptr<Span>>(active_span))
     {
       return nostd::get<nostd::shared_ptr<Span>>(active_span);

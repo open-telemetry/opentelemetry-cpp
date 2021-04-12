@@ -1,6 +1,11 @@
 #pragma once
 
+#include "opentelemetry/exporters/otlp/protobuf_include_prefix.h"
+
 #include "opentelemetry/proto/collector/trace/v1/trace_service.grpc.pb.h"
+
+#include "opentelemetry/exporters/otlp/protobuf_include_suffix.h"
+
 #include "opentelemetry/sdk/trace/exporter.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
@@ -14,7 +19,15 @@ namespace otlp
 struct OtlpExporterOptions
 {
   // The endpoint to export to. By default the OpenTelemetry Collector's default endpoint.
-  std::string endpoint = "localhost:55680";
+  std::string endpoint = "localhost:4317";
+  // By default when false, uses grpc::InsecureChannelCredentials(); If true,
+  // uses ssl_credentials_cacert_path if non-empty, else uses ssl_credentials_cacert_as_string
+  bool use_ssl_credentials = false;
+  // ssl_credentials_cacert_path specifies path to .pem file to be used for SSL encryption.
+  std::string ssl_credentials_cacert_path = "";
+  // ssl_credentials_cacert_as_string in-memory string representation of .pem file to be used for
+  // SSL encryption.
+  std::string ssl_credentials_cacert_as_string = "";
 };
 
 /**
@@ -43,16 +56,20 @@ public:
    * Export a batch of span recordables in OTLP format.
    * @param spans a span of unique pointers to span recordables
    */
-  sdk::trace::ExportResult Export(
+  sdk::common::ExportResult Export(
       const nostd::span<std::unique_ptr<sdk::trace::Recordable>> &spans) noexcept override;
 
   /**
    * Shut down the exporter.
    * @param timeout an optional timeout, the default timeout of 0 means that no
    * timeout is applied.
+   * @return return the status of this operation
    */
-  void Shutdown(
-      std::chrono::microseconds timeout = std::chrono::microseconds(0)) noexcept override{};
+  bool Shutdown(
+      std::chrono::microseconds timeout = std::chrono::microseconds::max()) noexcept override
+  {
+    return true;
+  }
 
 private:
   // The configuration options associated with this exporter.

@@ -6,6 +6,7 @@
 #include "opentelemetry/nostd/string_view.h"
 #include "opentelemetry/sdk/common/empty_attributes.h"
 #include "opentelemetry/trace/canonical_code.h"
+#include "opentelemetry/trace/span.h"
 #include "opentelemetry/trace/span_context.h"
 #include "opentelemetry/trace/span_id.h"
 #include "opentelemetry/trace/trace_id.h"
@@ -100,7 +101,7 @@ public:
    * @param code the status code
    * @param description a description of the status
    */
-  virtual void SetStatus(opentelemetry::trace::CanonicalCode code,
+  virtual void SetStatus(opentelemetry::trace::StatusCode code,
                          nostd::string_view description) noexcept = 0;
 
   /**
@@ -109,6 +110,11 @@ public:
    */
   virtual void SetName(nostd::string_view name) noexcept = 0;
 
+  /**
+   * Set the spankind of the span.
+   * @param span_kind the spankind to set
+   */
+  virtual void SetSpanKind(opentelemetry::trace::SpanKind span_kind) noexcept = 0;
   /**
    * Set the start time of the span.
    * @param start_time the start time to set

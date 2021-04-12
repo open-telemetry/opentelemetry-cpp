@@ -2,6 +2,7 @@
 #include "opentelemetry/exporters/otlp/recordable.h"
 
 #include <grpcpp/grpcpp.h>
+#include <fstream>
 #include <iostream>
 
 OPENTELEMETRY_BEGIN_NAMESPACE
@@ -30,22 +31,48 @@ void PopulateRequest(const nostd::span<std::unique_ptr<sdk::trace::Recordable>> 
   }
 }
 
+static std::string get_file_contents(const char *fpath)
+{
+  std::ifstream finstream(fpath);
+  std::string contents;
+  contents.assign((std::istreambuf_iterator<char>(finstream)), std::istreambuf_iterator<char>());
+  finstream.close();
+  return contents;
+}
+
 /**
  * Create service stub to communicate with the OpenTelemetry Collector.
  */
 std::unique_ptr<proto::collector::trace::v1::TraceService::Stub> MakeServiceStub(
-    std::string endpoint)
+    const OtlpExporterOptions &options)
 {
-  auto channel = grpc::CreateChannel(endpoint, grpc::InsecureChannelCredentials());
+  std::shared_ptr<grpc::Channel> channel;
+  if (options.use_ssl_credentials)
+  {
+    grpc::SslCredentialsOptions ssl_opts;
+    if (options.ssl_credentials_cacert_path.empty())
+    {
+      ssl_opts.pem_root_certs = options.ssl_credentials_cacert_as_string;
+    }
+    else
+    {
+      ssl_opts.pem_root_certs = get_file_contents((options.ssl_credentials_cacert_path).c_str());
+    }
+    channel = grpc::CreateChannel(options.endpoint, grpc::SslCredentials(ssl_opts));
+  }
+  else
+  {
+    channel = grpc::CreateChannel(options.endpoint, grpc::InsecureChannelCredentials());
+  }
   return proto::collector::trace::v1::TraceService::NewStub(channel);
 }
 
-// -------------------------------- Contructors --------------------------------
+// -------------------------------- Constructors --------------------------------
 
 OtlpExporter::OtlpExporter() : OtlpExporter(OtlpExporterOptions()) {}
 
 OtlpExporter::OtlpExporter(const OtlpExporterOptions &options)
-    : options_(options), trace_service_stub_(MakeServiceStub(options.endpoint))
+    : options_(options), trace_service_stub_(MakeServiceStub(options))
 {}
 
 OtlpExporter::OtlpExporter(
@@ -60,7 +87,7 @@ std::unique_ptr<sdk::trace::Recordable> OtlpExporter::MakeRecordable() noexcept
   return std::unique_ptr<sdk::trace::Recordable>(new Recordable);
 }
 
-sdk::trace::ExportResult OtlpExporter::Export(
+sdk::common::ExportResult OtlpExporter::Export(
     const nostd::span<std::unique_ptr<sdk::trace::Recordable>> &spans) noexcept
 {
   proto::collector::trace::v1::ExportTraceServiceRequest request;
@@ -75,9 +102,9 @@ sdk::trace::ExportResult OtlpExporter::Export(
   if (!status.ok())
   {
     std::cerr << "[OTLP Exporter] Export() failed: " << status.error_message() << "\n";
-    return sdk::trace::ExportResult::kFailure;
+    return sdk::common::ExportResult::kFailure;
   }
-  return sdk::trace::ExportResult::kSuccess;
+  return sdk::common::ExportResult::kSuccess;
 }
 }  // namespace otlp
 }  // namespace exporter

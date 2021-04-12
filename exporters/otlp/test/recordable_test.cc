@@ -37,6 +37,14 @@ TEST(Recordable, SetName)
   rec.SetName(name);
   EXPECT_EQ(rec.span().name(), name);
 }
+TEST(Recordable, SetSpanKind)
+{
+  Recordable rec;
+  opentelemetry::trace::SpanKind span_kind = opentelemetry::trace::SpanKind::kServer;
+  rec.SetSpanKind(span_kind);
+  EXPECT_EQ(rec.span().kind(),
+            opentelemetry::proto::trace::v1::Span_SpanKind::Span_SpanKind_SPAN_KIND_SERVER);
+}
 
 TEST(Recordable, SetStartTime)
 {
@@ -69,7 +77,7 @@ TEST(Recordable, SetDuration)
 TEST(Recordable, SetStatus)
 {
   Recordable rec;
-  trace::CanonicalCode code(trace::CanonicalCode::OK);
+  trace::StatusCode code(trace::StatusCode::kOk);
   nostd::string_view description = "For test";
   rec.SetStatus(code, description);
 
@@ -204,7 +212,7 @@ struct IntAttributeTest : public testing::Test
 };
 
 using IntTypes = testing::Types<int, int64_t, unsigned int, uint64_t>;
-TYPED_TEST_CASE(IntAttributeTest, IntTypes);
+TYPED_TEST_SUITE(IntAttributeTest, IntTypes);
 
 TYPED_TEST(IntAttributeTest, SetIntSingleAttribute)
 {

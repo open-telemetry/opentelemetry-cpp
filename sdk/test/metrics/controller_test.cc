@@ -8,6 +8,7 @@
 // #include <chrono>
 
 namespace metrics_api = opentelemetry::metrics;
+using namespace opentelemetry::sdk::common;
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace sdk
@@ -34,7 +35,7 @@ TEST(Controller, Constructor)
 
   auto instr                                = meter->NewIntCounter("test", "none", "none", true);
   std::map<std::string, std::string> labels = {{"key", "value"}};
-  auto labelkv = common::KeyValueIterableView<decltype(labels)>{labels};
+  auto labelkv = opentelemetry::common::KeyValueIterableView<decltype(labels)>{labels};
 
   alpha.start();
 

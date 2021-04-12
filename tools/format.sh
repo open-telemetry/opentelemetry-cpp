@@ -6,7 +6,7 @@ fi
 
 set -e
 
-FIND="find . -name third_party -prune -o -name tools -prune -o -name .git -prune -o -name _deps -prune -o -name .build -prune -o -name out -prune -o"
+FIND="find . -name third_party -prune -o -name tools -prune -o -name .git -prune -o -name _deps -prune -o -name .build -prune -o -name out -prune -o -name .vs -prune -o -name opentelemetry_logo.png -prune -o"
 
 # GNU syntax.
 SED=(sed -i)
@@ -25,8 +25,8 @@ fi
 # If not overridden, try to use clang-format-8 or clang-format.
 if [[ -z "$CLANG_FORMAT" ]]; then
   CLANG_FORMAT=clang-format
-  if which clang-format-8 >/dev/null; then
-    CLANG_FORMAT=clang-format-8
+  if which clang-format-10 >/dev/null; then
+    CLANG_FORMAT=clang-format-10
   fi
 fi
 
@@ -36,7 +36,7 @@ $CLANG_FORMAT -i -style=file \
 
 if which cmake-format >/dev/null; then
   echo "Running cmake-format $(cmake-format --version 2>&1)."
-  cmake-format -i $($FIND -name 'CMakeLists.txt' -print)
+  cmake-format -i $($FIND -name 'CMakeLists.txt' -print -name '*.cmake' -print -name '*.cmake.in' -print)
 else
   echo "Can't find cmake-format. It can be installed with:"
   echo "  pip install --user cmake_format"

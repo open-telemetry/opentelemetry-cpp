@@ -5,18 +5,22 @@
 #include "opentelemetry/common/attribute_value.h"
 #include "opentelemetry/common/key_value_iterable_view.h"
 #include "opentelemetry/core/timestamp.h"
+#include "opentelemetry/nostd/shared_ptr.h"
 #include "opentelemetry/nostd/span.h"
 #include "opentelemetry/nostd/string_view.h"
+#include "opentelemetry/nostd/type_traits.h"
 #include "opentelemetry/nostd/unique_ptr.h"
 #include "opentelemetry/trace/canonical_code.h"
 #include "opentelemetry/trace/span_context.h"
 #include "opentelemetry/version.h"
 
-constexpr char SpanKey[] = "span_key";
-
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace trace
 {
+
+// The key identifies the active span in the current context.
+constexpr char kSpanKey[] = "active_span";
+
 enum class SpanKind
 {
   kInternal,
@@ -25,6 +29,16 @@ enum class SpanKind
   kProducer,
   kConsumer,
 };
+
+// StatusCode - Represents the canonical set of status codes of a finished Span.
+
+enum class StatusCode
+{
+  kUnset,  // default status
+  kOk,     // Operation has completed successfully.
+  kError   // The operation contains an error
+};
+
 /**
  * StartSpanOptions provides options to set properties of a Span at the time of
  * its creation
@@ -43,7 +57,7 @@ struct StartSpanOptions
   core::SystemTimestamp start_system_time;
   core::SteadyTimestamp start_steady_time;
 
-  // Explicitely set the parent of a Span.
+  // Explicitly set the parent of a Span.
   //
   // This defaults to an invalid span context. In this case, the Span is
   // automatically parented to the currently active span.
@@ -143,10 +157,10 @@ public:
                        attributes.begin(), attributes.end()});
   }
 
-  // Sets the status of the span. The default status is OK. Only the value of
+  // Sets the status of the span. The default status is Unset. Only the value of
   // the last call will be
   // recorded, and implementations are free to ignore previous calls.
-  virtual void SetStatus(CanonicalCode code, nostd::string_view description) noexcept = 0;
+  virtual void SetStatus(StatusCode code, nostd::string_view description = "") noexcept = 0;
 
   // Updates the name of the Span. If used, this will override the name provided
   // during creation.
@@ -167,5 +181,14 @@ public:
   // AddEvent).
   virtual bool IsRecording() const noexcept = 0;
 };
+
+template <class SpanType, class TracerType>
+nostd::shared_ptr<trace::Span> to_span_ptr(TracerType *objPtr,
+                                           nostd::string_view name,
+                                           const trace::StartSpanOptions &options)
+{
+  return nostd::shared_ptr<trace::Span>{new (std::nothrow) SpanType{*objPtr, name, options}};
+}
+
 }  // namespace trace
 OPENTELEMETRY_END_NAMESPACE

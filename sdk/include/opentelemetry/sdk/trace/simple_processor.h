@@ -37,30 +37,36 @@ public:
     return exporter_->MakeRecordable();
   }
 
-  void OnStart(Recordable &span) noexcept override {}
+  void OnStart(Recordable &span,
+               const opentelemetry::trace::SpanContext &parent_context) noexcept override
+  {}
 
   void OnEnd(std::unique_ptr<Recordable> &&span) noexcept override
   {
     nostd::span<std::unique_ptr<Recordable>> batch(&span, 1);
     const std::lock_guard<opentelemetry::common::SpinLockMutex> locked(lock_);
-    if (exporter_->Export(batch) == ExportResult::kFailure)
+    if (exporter_->Export(batch) == sdk::common::ExportResult::kFailure)
     {
       /* Once it is defined how the SDK does logging, an error should be
        * logged in this case. */
     }
   }
 
-  void ForceFlush(
-      std::chrono::microseconds timeout = std::chrono::microseconds(0)) noexcept override
-  {}
+  bool ForceFlush(
+      std::chrono::microseconds timeout = (std::chrono::microseconds::max)()) noexcept override
+  {
+    return true;
+  }
 
-  void Shutdown(std::chrono::microseconds timeout = std::chrono::microseconds(0)) noexcept override
+  bool Shutdown(
+      std::chrono::microseconds timeout = (std::chrono::microseconds::max)()) noexcept override
   {
     // We only call shutdown ONCE.
     if (exporter_ != nullptr && !shutdown_latch_.test_and_set(std::memory_order_acquire))
     {
-      exporter_->Shutdown(timeout);
+      return exporter_->Shutdown(timeout);
     }
+    return true;
   }
 
   ~SimpleSpanProcessor() { Shutdown(); }
@@ -68,7 +74,7 @@ public:
 private:
   std::unique_ptr<SpanExporter> exporter_;
   opentelemetry::common::SpinLockMutex lock_;
-  std::atomic_flag shutdown_latch_{ATOMIC_FLAG_INIT};
+  std::atomic_flag shutdown_latch_ = ATOMIC_FLAG_INIT;
 };
 }  // namespace trace
 }  // namespace sdk
