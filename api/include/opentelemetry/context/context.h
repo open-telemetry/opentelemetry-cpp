@@ -76,7 +76,7 @@ public:
   }
 
   // Checks for key and returns true if found
-  bool HasKey(const nostd::string_view key) noexcept
+  bool HasKey(const nostd::string_view key) const noexcept
   {
     for (DataList *data = head_.get(); data != nullptr; data = data->next_.get())
     {
