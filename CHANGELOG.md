@@ -17,7 +17,7 @@ Increment the:
 
 ## [0.4.0] 2021-04-12
 
-* [EXPORTER] ETW Exporter Enhancements ([#519](https://github.com/open-telemetry/opentelemetry-cpp/pull/519))
+* [EXPORTER] ETW Exporter enhancements ([#519](https://github.com/open-telemetry/opentelemetry-cpp/pull/519))
 * [EXPORTER] Read Zipkin endpoint from environment variable. ([#624](https://github.com/open-telemetry/opentelemetry-cpp/pull/624))
 * [EXPORTER] Split Zpages webserver hosting from Exporter ([#626](https://github.com/open-telemetry/opentelemetry-cpp/pull/626))
 * [EXPORTER] ETW Exporter Usage Instructions ([#628](https://github.com/open-telemetry/opentelemetry-cpp/pull/628))
