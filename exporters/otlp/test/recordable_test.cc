@@ -6,25 +6,29 @@ namespace exporter
 {
 namespace otlp
 {
-TEST(Recordable, SetIds)
+TEST(Recordable, SetIdentity)
 {
-  const trace::TraceId trace_id(std::array<const uint8_t, trace::TraceId::kSize>(
-      {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1}));
-
-  const trace::SpanId span_id(
-      std::array<const uint8_t, trace::SpanId::kSize>({0, 0, 0, 0, 0, 0, 0, 2}));
-
-  const trace::SpanId parent_span_id(
-      std::array<const uint8_t, trace::SpanId::kSize>({0, 0, 0, 0, 0, 0, 0, 3}));
+  constexpr uint8_t trace_id_buf[]       = {1, 2, 3, 4, 5, 6, 7, 8, 1, 2, 3, 4, 5, 6, 7, 8};
+  constexpr uint8_t span_id_buf[]        = {1, 2, 3, 4, 5, 6, 7, 8};
+  constexpr uint8_t parent_span_id_buf[] = {8, 7, 6, 5, 4, 3, 2, 1};
+  opentelemetry::trace::TraceId trace_id{trace_id_buf};
+  opentelemetry::trace::SpanId span_id{span_id_buf};
+  opentelemetry::trace::SpanId parent_span_id{parent_span_id_buf};
+  const auto trace_state = opentelemetry::trace::TraceState::GetDefault()->Set("key1", "value");
+  const opentelemetry::trace::SpanContext span_context{
+      trace_id, span_id,
+      opentelemetry::trace::TraceFlags{opentelemetry::trace::TraceFlags::kIsSampled}, true,
+      trace_state};
 
   Recordable rec;
 
-  rec.SetIds(trace_id, span_id, parent_span_id);
+  rec.SetIdentity(span_context, parent_span_id);
 
   EXPECT_EQ(rec.span().trace_id(), std::string(reinterpret_cast<const char *>(trace_id.Id().data()),
                                                trace::TraceId::kSize));
   EXPECT_EQ(rec.span().span_id(),
             std::string(reinterpret_cast<const char *>(span_id.Id().data()), trace::SpanId::kSize));
+  EXPECT_EQ(rec.span().trace_state(), "key1=value");
   EXPECT_EQ(rec.span().parent_span_id(),
             std::string(reinterpret_cast<const char *>(parent_span_id.Id().data()),
                         trace::SpanId::kSize));
