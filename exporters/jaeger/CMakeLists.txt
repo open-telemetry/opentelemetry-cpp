@@ -18,7 +18,7 @@ set(JAEGER_EXPORTER_SOURCES
 
 add_library(jaeger_trace_exporter ${JAEGER_EXPORTER_SOURCES}
                                   ${JAEGER_THRIFT_GENCPP_SOURCES})
-target_link_libraries(jaeger_trace_exporter PRIVATE thrift::thrift Boost::boost)
+target_link_libraries(jaeger_trace_exporter PRIVATE thrift::thrift)
 
 if(BUILD_TESTING)
   add_executable(jaeger_recordable_test test/jaeger_recordable_test.cc)
