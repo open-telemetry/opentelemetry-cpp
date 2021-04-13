@@ -48,6 +48,7 @@ constexpr const char *kDefaultSpanPrinted =
     "  name          : \n"
     "  trace_id      : 00000000000000000000000000000000\n"
     "  span_id       : 0000000000000000\n"
+    "  tracestate    : \n"
     "  parent_span_id: 0000000000000000\n"
     "  start         : 0\n"
     "  duration      : 0\n"
@@ -85,16 +86,21 @@ TEST(OStreamSpanExporter, PrintSpanWithBasicFields)
 
   auto recordable = processor->MakeRecordable();
 
+  constexpr uint8_t trace_id_buf[]       = {1, 2, 3, 4, 5, 6, 7, 8, 1, 2, 3, 4, 5, 6, 7, 8};
+  constexpr uint8_t span_id_buf[]        = {1, 2, 3, 4, 5, 6, 7, 8};
+  constexpr uint8_t parent_span_id_buf[] = {8, 7, 6, 5, 4, 3, 2, 1};
+  opentelemetry::trace::TraceId trace_id{trace_id_buf};
+  opentelemetry::trace::SpanId span_id{span_id_buf};
+  opentelemetry::trace::SpanId parent_span_id{parent_span_id_buf};
+  const auto trace_state = opentelemetry::trace::TraceState::GetDefault()->Set("state1", "value");
+  const opentelemetry::trace::SpanContext span_context{
+      trace_id, span_id,
+      opentelemetry::trace::TraceFlags{opentelemetry::trace::TraceFlags::kIsSampled}, true,
+      trace_state};
+
+  recordable->SetIdentity(span_context, parent_span_id);
   recordable->SetName("Test Span");
   opentelemetry::core::SystemTimestamp now(std::chrono::system_clock::now());
-
-  constexpr uint8_t trace_id_buf[] = {1, 2, 3, 4, 5, 6, 7, 8, 1, 2, 3, 4, 5, 6, 7, 8};
-  opentelemetry::trace::TraceId t_id(trace_id_buf);
-  constexpr uint8_t span_id_buf[] = {1, 2, 3, 4, 5, 6, 7, 8};
-  opentelemetry::trace::SpanId s_id(span_id_buf);
-
-  recordable->SetIds(t_id, s_id, s_id);
-
   recordable->SetStartTime(now);
   recordable->SetDuration(std::chrono::nanoseconds(100));
   recordable->SetStatus(opentelemetry::trace::StatusCode::kOk, "Test Description");
@@ -109,7 +115,8 @@ TEST(OStreamSpanExporter, PrintSpanWithBasicFields)
       "  name          : Test Span\n"
       "  trace_id      : 01020304050607080102030405060708\n"
       "  span_id       : 0102030405060708\n"
-      "  parent_span_id: 0102030405060708\n"
+      "  tracestate    : state1=value\n"
+      "  parent_span_id: 0807060504030201\n"
       "  start         : " +
       start +
       "\n"
@@ -143,6 +150,7 @@ TEST(OStreamSpanExporter, PrintSpanWithAttribute)
       "  name          : \n"
       "  trace_id      : 00000000000000000000000000000000\n"
       "  span_id       : 0000000000000000\n"
+      "  tracestate    : \n"
       "  parent_span_id: 0000000000000000\n"
       "  start         : 0\n"
       "  duration      : 0\n"
@@ -178,6 +186,7 @@ TEST(OStreamSpanExporter, PrintSpanWithArrayAttribute)
       "  name          : \n"
       "  trace_id      : 00000000000000000000000000000000\n"
       "  span_id       : 0000000000000000\n"
+      "  tracestate    : \n"
       "  parent_span_id: 0000000000000000\n"
       "  start         : 0\n"
       "  duration      : 0\n"
@@ -219,6 +228,7 @@ TEST(OStreamSpanExporter, PrintSpanWithEvents)
       "  name          : \n"
       "  trace_id      : 00000000000000000000000000000000\n"
       "  span_id       : 0000000000000000\n"
+      "  tracestate    : \n"
       "  parent_span_id: 0000000000000000\n"
       "  start         : 0\n"
       "  duration      : 0\n"
@@ -291,6 +301,7 @@ TEST(OStreamSpanExporter, PrintSpanWithLinks)
       "  name          : \n"
       "  trace_id      : 00000000000000000000000000000000\n"
       "  span_id       : 0000000000000000\n"
+      "  tracestate    : \n"
       "  parent_span_id: 0000000000000000\n"
       "  start         : 0\n"
       "  duration      : 0\n"

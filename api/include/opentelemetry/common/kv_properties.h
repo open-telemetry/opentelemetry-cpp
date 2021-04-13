@@ -12,6 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#pragma once
+
 #include "opentelemetry/common/key_value_iterable_view.h"
 #include "opentelemetry/common/string_util.h"
 #include "opentelemetry/nostd/function_ref.h"

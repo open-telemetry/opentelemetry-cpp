@@ -64,6 +64,7 @@ sdk::common::ExportResult OStreamSpanExporter::Export(
             << "\n  name          : " << span->GetName()
             << "\n  trace_id      : " << std::string(trace_id, 32)
             << "\n  span_id       : " << std::string(span_id, 16)
+            << "\n  tracestate    : " << span->GetSpanContext().trace_state()->ToHeader()
             << "\n  parent_span_id: " << std::string(parent_span_id, 16)
             << "\n  start         : " << span->GetStartTime().time_since_epoch().count()
             << "\n  duration      : " << span->GetDuration().count()
