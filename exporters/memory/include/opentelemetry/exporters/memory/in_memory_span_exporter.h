@@ -36,7 +36,7 @@ public:
    * to add to the InMemorySpanData
    * @return Returns the result of the operation
    */
-  sdk::trace::ExportResult Export(
+  sdk::common::ExportResult Export(
       const nostd::span<std::unique_ptr<sdk::trace::Recordable>> &recordables) noexcept override
   {
     for (auto &recordable : recordables)
@@ -49,7 +49,7 @@ public:
       }
     }
 
-    return sdk::trace::ExportResult::kSuccess;
+    return sdk::common::ExportResult::kSuccess;
   }
 
   /**

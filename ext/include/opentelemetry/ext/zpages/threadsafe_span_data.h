@@ -33,7 +33,7 @@ public:
   opentelemetry::trace::TraceId GetTraceId() const noexcept
   {
     std::lock_guard<std::mutex> lock(mutex_);
-    return trace_id_;
+    return span_context_.trace_id();
   }
 
   /**
@@ -43,7 +43,17 @@ public:
   opentelemetry::trace::SpanId GetSpanId() const noexcept
   {
     std::lock_guard<std::mutex> lock(mutex_);
-    return span_id_;
+    return span_context_.span_id();
+  }
+
+  /**
+   * Get the span context for this span
+   * @return the span context for this span
+   */
+  const opentelemetry::trace::SpanContext &GetSpanContext() const noexcept
+  {
+    std::lock_guard<std::mutex> lock(mutex_);
+    return span_context_;
   }
 
   /**
@@ -110,20 +120,18 @@ public:
    * Get the attributes for this span
    * @return the attributes for this span
    */
-  const std::unordered_map<std::string, opentelemetry::sdk::common::OwnedAttributeValue>
-  GetAttributes() const noexcept
+  std::unordered_map<std::string, opentelemetry::sdk::common::OwnedAttributeValue> GetAttributes()
+      const noexcept
   {
     std::lock_guard<std::mutex> lock(mutex_);
     return attributes_;
   }
 
-  void SetIds(opentelemetry::trace::TraceId trace_id,
-              opentelemetry::trace::SpanId span_id,
-              opentelemetry::trace::SpanId parent_span_id) noexcept override
+  void SetIdentity(const opentelemetry::trace::SpanContext &span_context,
+                   opentelemetry::trace::SpanId parent_span_id) noexcept override
   {
     std::lock_guard<std::mutex> lock(mutex_);
-    trace_id_       = trace_id;
-    span_id_        = span_id;
+    span_context_   = span_context;
     parent_span_id_ = parent_span_id;
   }
 
@@ -195,8 +203,7 @@ public:
 private:
   ThreadsafeSpanData(const ThreadsafeSpanData &threadsafe_span_data,
                      const std::lock_guard<std::mutex> &)
-      : trace_id_(threadsafe_span_data.trace_id_),
-        span_id_(threadsafe_span_data.span_id_),
+      : span_context_(threadsafe_span_data.span_context_),
         parent_span_id_(threadsafe_span_data.parent_span_id_),
         start_time_(threadsafe_span_data.start_time_),
         duration_(threadsafe_span_data.duration_),
@@ -209,8 +216,7 @@ private:
   {}
 
   mutable std::mutex mutex_;
-  opentelemetry::trace::TraceId trace_id_;
-  opentelemetry::trace::SpanId span_id_;
+  opentelemetry::trace::SpanContext span_context_{false, false};
   opentelemetry::trace::SpanId parent_span_id_;
   core::SystemTimestamp start_time_;
   std::chrono::nanoseconds duration_{0};

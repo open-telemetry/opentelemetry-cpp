@@ -35,14 +35,13 @@ const int kAttributeValueSize = 15;
 const int kAttributeValueSize = 14;
 #endif
 
-void Recordable::SetIds(trace::TraceId trace_id,
-                        trace::SpanId span_id,
-                        trace::SpanId parent_span_id) noexcept
+void Recordable::SetIdentity(const opentelemetry::trace::SpanContext &span_context,
+                             opentelemetry::trace::SpanId parent_span_id) noexcept
 {
   char trace_id_lower_base16[trace::TraceId::kSize * 2] = {0};
-  trace_id.ToLowerBase16(trace_id_lower_base16);
+  span_context.trace_id().ToLowerBase16(trace_id_lower_base16);
   char span_id_lower_base16[trace::SpanId::kSize * 2] = {0};
-  span_id.ToLowerBase16(span_id_lower_base16);
+  span_context.span_id().ToLowerBase16(span_id_lower_base16);
   char parent_span_id_lower_base16[trace::SpanId::kSize * 2] = {0};
   parent_span_id.ToLowerBase16(parent_span_id_lower_base16);
   span_["id"]       = std::string(span_id_lower_base16, 16);
