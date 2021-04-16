@@ -70,7 +70,6 @@ void PopulateAttribute(opentelemetry::proto::common::v1::KeyValue *attribute,
     attribute->mutable_value()->set_string_value(nostd::get<nostd::string_view>(value).data(),
                                                  nostd::get<nostd::string_view>(value).size());
   }
-#ifdef HAVE_SPAN_BYTE
   else if (nostd::holds_alternative<nostd::span<const uint8_t>>(value))
   {
     for (const auto &val : nostd::get<nostd::span<const uint8_t>>(value))
@@ -78,7 +77,6 @@ void PopulateAttribute(opentelemetry::proto::common::v1::KeyValue *attribute,
       attribute->mutable_value()->mutable_array_value()->add_values()->set_int_value(val);
     }
   }
-#endif
   else if (nostd::holds_alternative<nostd::span<const bool>>(value))
   {
     for (const auto &val : nostd::get<nostd::span<const bool>>(value))

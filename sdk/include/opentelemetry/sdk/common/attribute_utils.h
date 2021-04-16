@@ -31,23 +31,26 @@ namespace common
  * A counterpart to AttributeValue that makes sure a value is owned. This
  * replaces all non-owning references with owned copies.
  */
-using OwnedAttributeValue = nostd::variant<bool,
-                                           int32_t,
-                                           int64_t,
-                                           uint32_t,
-                                           uint64_t,
-                                           double,
-                                           std::string,
-#ifdef HAVE_SPAN_BYTE
-                                           std::vector<uint8_t>,
-#endif
-                                           std::vector<bool>,
-                                           std::vector<int32_t>,
-                                           std::vector<int64_t>,
-                                           std::vector<uint32_t>,
-                                           std::vector<uint64_t>,
-                                           std::vector<double>,
-                                           std::vector<std::string>>;
+using OwnedAttributeValue =
+	nostd::variant<bool,
+                       int32_t,
+                       uint32_t,
+                       int64_t,
+                       double,
+                       std::string,
+                       std::vector<bool>,
+                       std::vector<int32_t>,
+                       std::vector<uint32_t>,
+                       std::vector<int64_t>,
+                       std::vector<double>,
+                       std::vector<std::string>>,
+		       // Not currently supported by the specification, but reserved for future use.
+                       // See https://github.com/open-telemetry/opentelemetry-specification/issues/780
+                       uint64_t,
+		       // Not currently supported by the specification, but reserved for future use.
+                       std::vector<uint64_t>,
+		       // Not currently supported by the specification, but reserved for future use.
+                       std::vector<uint8_t>;
 
 enum OwnedAttributeType
 {
@@ -55,19 +58,17 @@ enum OwnedAttributeType
   kTypeInt,
   kTypeInt64,
   kTypeUInt,
-  kTypeUInt64,
   kTypeDouble,
   kTypeString,
-#ifdef HAVE_SPAN_BYTE
-  kTypeSpanByte,
-#endif
   kTypeSpanBool,
   kTypeSpanInt,
   kTypeSpanInt64,
   kTypeSpanUInt,
-  kTypeSpanUInt64,
   kTypeSpanDouble,
-  kTypeSpanString
+  kTypeSpanString,
+  kTypeUInt64,
+  kTypeSpanUInt64,
+  kTypeSpanByte
 };
 
 /**
@@ -86,9 +87,7 @@ struct AttributeConverter
     return OwnedAttributeValue(std::string(v));
   }
   OwnedAttributeValue operator()(const char *v) { return OwnedAttributeValue(std::string(v)); }
-#ifdef HAVE_SPAN_BYTE
   OwnedAttributeValue operator()(nostd::span<const uint8_t> v) { return convertSpan<uint8_t>(v); }
-#endif
   OwnedAttributeValue operator()(nostd::span<const bool> v) { return convertSpan<bool>(v); }
   OwnedAttributeValue operator()(nostd::span<const int32_t> v) { return convertSpan<int32_t>(v); }
   OwnedAttributeValue operator()(nostd::span<const uint32_t> v) { return convertSpan<uint32_t>(v); }
