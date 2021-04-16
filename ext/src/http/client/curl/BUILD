@@ -12,6 +12,15 @@ cc_library(
         "-DCURL_STATICLIB",
         "-DWITH_CURL",
     ],
+    linkopts = select({
+        "//bazel:windows": [
+            "-DEFAULTLIB:advapi32.lib",
+            "-DEFAULTLIB:crypt32.lib",
+            "-DEFAULTLIB:Normaliz.lib",
+            "-DEFAULTLIB:Ws2_32.lib",
+        ],
+        "//conditions:default": [],
+    }),
     deps = [
         "//api",
         "//ext:headers",
