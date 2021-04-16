@@ -43,7 +43,7 @@ Please refer to [INSTALL.md](./INSTALL.md).
 
 ## Getting Started
 
-You can find a getting started guide on [opentelemetry-cpp.readthedocs.io](https://opentelemetry-cpp.readthedocs.io/en/latest/)
+As an application owner, or the library author, you can find a getting started guide on [opentelemetry-cpp.readthedocs.io](https://opentelemetry-cpp.readthedocs.io/en/latest/)
 
 The `examples/simple` directory contains a minimal program demonstrating how to
 instrument a small library using a simple `processor` and console `exporter`,
