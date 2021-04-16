@@ -4,17 +4,17 @@ cc_binary(
         "client.cc",
         "tracer_common.hpp",
     ],
+    # TODO: Move copts/linkopts for static CURL usage into shared bzl file.
+    copts = [
+        "-DCURL_STATICLIB",
+        "-DWITH_CURL",
+    ],
     deps = [
         "//api",
         "//exporters/ostream:ostream_span_exporter",
         "//ext:headers",
         "//ext/src/http/client/curl:http_client_curl",
         "//sdk/src/trace",
-    ],
-    # TODO: Move copts/linkopts for static CURL usage into shared bzl file.
-    copts = [
-        "-DCURL_STATICLIB",
-        "-DWITH_CURL",
     ],
     linkopts = select({
         "//bazel:windows": [
