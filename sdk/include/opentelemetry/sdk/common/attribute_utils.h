@@ -44,12 +44,12 @@ using OwnedAttributeValue =
                        std::vector<int64_t>,
                        std::vector<double>,
                        std::vector<std::string>>,
-		       // Not currently supported by the specification, but reserved for future use.
-                       // See https://github.com/open-telemetry/opentelemetry-specification/issues/780
+                       // Not currently supported by the specification, but reserved for future use.
                        uint64_t,
-		       // Not currently supported by the specification, but reserved for future use.
+                       // Not currently supported by the specification, but reserved for future use.
                        std::vector<uint64_t>,
-		       // Not currently supported by the specification, but reserved for future use.
+                       // Not currently supported by the specification, but reserved for future use.
+                       // See https://github.com/open-telemetry/opentelemetry-specification/issues/780
                        std::vector<uint8_t>;
 
 enum OwnedAttributeType

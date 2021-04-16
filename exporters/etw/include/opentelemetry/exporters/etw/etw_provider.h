@@ -274,6 +274,9 @@ public:
       case PropertyType::kTypeString:
         eventName = (char *)(nostd::get<std::string>(nameField).data());  // must be 0-terminated!
         break;
+      case PropertyType::kTypeCString:
+        eventName = (char *)(nostd::get<const char *>(nameField));
+        break;
       default:
         // If invalid event name is supplied, then we replace it with 'NoName'
         break;
@@ -333,6 +336,11 @@ public:
           jObj[name] = nostd::get<std::string>(value);
           break;
         }
+        case PropertyType::kTypeCString: {
+          auto temp  = nostd::get<const char *>(value);
+          jObj[name] = temp;
+          break;
+        }
 #  if HAVE_TYPE_GUID
           // TODO: consider adding UUID/GUID to spec
         case common::AttributeType::TYPE_GUID: {
@@ -344,7 +352,7 @@ public:
 #  endif
 
         // TODO: arrays are not supported yet
-#  endif
+        case PropertyType::kTypeSpanByte:
         case PropertyType::kTypeSpanBool:
         case PropertyType::kTypeSpanInt:
         case PropertyType::kTypeSpanInt64:
@@ -352,7 +360,6 @@ public:
         case PropertyType::kTypeSpanUInt64:
         case PropertyType::kTypeSpanDouble:
         case PropertyType::kTypeSpanString:
-        case common::AttributeType::kTypeSpanByte:
         default:
           // TODO: unsupported type
           break;
@@ -444,6 +451,9 @@ public:
       case PropertyType::kTypeString:
         eventName = (char *)(nostd::get<std::string>(nameField).data());
         break;
+      case PropertyType::kTypeCString:
+        eventName = (char *)(nostd::get<const char *>(nameField));
+        break;
       default:
         // This is user error. Invalid event name!
         // We supply default 'NoName' event name in this case.
@@ -502,6 +512,12 @@ public:
           dbuilder.AddString(nostd::get<std::string>(value).data());
           break;
         }
+        case PropertyType::kTypeCString: {
+          builder.AddField(name, tld::TypeUtf8String);
+          auto temp = nostd::get<const char *>(value);
+          dbuilder.AddString(temp);
+          break;
+        }
 #  if HAVE_TYPE_GUID
           // TODO: consider adding UUID/GUID to spec
         case PropertyType::kGUID: {
@@ -513,6 +529,7 @@ public:
 #  endif
 
         // TODO: arrays are not supported
+        case PropertyType::kTypeSpanByte:
         case PropertyType::kTypeSpanBool:
         case PropertyType::kTypeSpanInt:
         case PropertyType::kTypeSpanInt64:
@@ -520,7 +537,6 @@ public:
         case PropertyType::kTypeSpanUInt64:
         case PropertyType::kTypeSpanDouble:
         case PropertyType::kTypeSpanString:
-        case PropertyType::kTypeSpanByte:
         default:
           // TODO: unsupported type
           break;

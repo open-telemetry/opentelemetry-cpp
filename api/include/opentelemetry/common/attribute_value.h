@@ -44,12 +44,14 @@ using AttributeValue =
                    nostd::span<const uint32_t>,
                    nostd::span<const double>,
                    nostd::span<const nostd::string_view>,
-		   // Not currently supported by the specification, but reserved for future use.
-                   // See https://github.com/open-telemetry/opentelemetry-specification/issues/780
+                   // Not currently supported by the specification, but reserved for future use.
+		   // Added to provide support for all primitive C++ types.
                    uint64_t,
-		   // Not currently supported by the specification, but reserved for future use.
+                   // Not currently supported by the specification, but reserved for future use.
+		   // Added to provide support for all primitive C++ types.
                    nostd::span<const uint64_t>,
-		   // Not currently supported by the specification, but reserved for future use.
+                   // Not currently supported by the specification, but reserved for future use.
+                   // See https://github.com/open-telemetry/opentelemetry-specification/issues/780
                    nostd::span<const uint8_t>>;
 
 enum AttributeType
