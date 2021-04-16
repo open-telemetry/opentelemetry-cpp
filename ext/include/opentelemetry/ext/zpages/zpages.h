@@ -52,7 +52,8 @@ public:
   void ReplaceGlobalProvider()
   {
     // GCC 4.8 can't infer the type coercion.
-    std::unique_ptr<opentelemetry::sdk::trace::SpanProcessor> processor(MakeSpanProcessor().release());
+    std::unique_ptr<opentelemetry::sdk::trace::SpanProcessor> processor(
+        MakeSpanProcessor().release());
     auto tracez_provider_ = opentelemetry::nostd::shared_ptr<opentelemetry::trace::TracerProvider>(
         new opentelemetry::sdk::trace::TracerProvider(std::move(processor)));
     opentelemetry::trace::Provider::SetTracerProvider(tracez_provider_);

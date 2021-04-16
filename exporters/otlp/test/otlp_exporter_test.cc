@@ -75,8 +75,8 @@ TEST_F(OtlpExporterTestPeer, ExportIntegrationTest)
 
   auto processor = std::unique_ptr<sdk::trace::SpanProcessor>(
       new sdk::trace::SimpleSpanProcessor(std::move(exporter)));
-  auto provider =
-      nostd::shared_ptr<trace::TracerProvider>(new sdk::trace::TracerProvider(std::move(processor)));
+  auto provider = nostd::shared_ptr<trace::TracerProvider>(
+      new sdk::trace::TracerProvider(std::move(processor)));
   auto tracer = provider->GetTracer("test");
 
   EXPECT_CALL(*mock_stub, Export(_, _, _))
