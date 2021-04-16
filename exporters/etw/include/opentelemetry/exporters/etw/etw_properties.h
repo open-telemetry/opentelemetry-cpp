@@ -22,6 +22,10 @@
 #include <string>
 #include <vector>
 
+#ifdef _WIN32
+#  include <Windows.h>
+#endif
+
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace exporter
 {
@@ -182,7 +186,7 @@ public:
    * @param v
    * @return
    */
-  PropertyValue(const char *value) : PropertyVariant(value){};
+  PropertyValue(const char *value) : PropertyVariant(std::string(value)){};
 
   /**
    * @brief PropertyValue from string.
@@ -316,6 +320,7 @@ public:
       case PropertyType::kTypeSpanBool: {
         const auto &vec = nostd::get<std::vector<bool>>(*this);
         // FIXME: sort out how to remap from vector<bool> to span<bool>
+        UNREFERENCED_PARAMETER(vec);
         break;
       }
       case PropertyType::kTypeSpanInt:

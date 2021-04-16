@@ -216,6 +216,12 @@ TracerProviderConfiguration &GetConfiguration(T &t)
   return t.config_;
 }
 
+template <class T>
+void UpdateStatus(T &t, Properties &props)
+{
+  t.UpdateStatus(props);
+}
+
 /**
  * @brief Utility method to convert SppanContext.span_id() (8 byte) to ActivityId GUID (16 bytes)
  * @param span OpenTelemetry Span pointer
@@ -400,9 +406,18 @@ class Tracer : public trace::Tracer
       // since Unix epoch instead of string, but that implies additional tooling
       // is needed to convert it, rendering it NOT human-readable.
       evt[ETW_FIELD_STARTTIME] = utils::formatUtcTimestampMsAsISO8601(startTimeMs);
-
+#ifdef ETW_FIELD_ENDTTIME
+      // ETW has its own precise timestamp at envelope layer for every event.
+      // However, in some scenarios it is easier to deal with ISO8601 strings.
+      // In that case we convert the app-created timestamp and place it into
+      // Payload[$ETW_FIELD_TIME] field. The option configurable at compile-time.
+      evt[ETW_FIELD_ENDTTIME] = utils::formatUtcTimestampMsAsISO8601(endTimeMs);
+#endif
       // Duration of Span in milliseconds
       evt[ETW_FIELD_DURATION] = endTimeMs - startTimeMs;
+      // Presently we assume that all spans are server spans
+      evt[ETW_FIELD_SPAN_KIND] = uint32_t(trace::SpanKind::kServer);
+      UpdateStatus(currentSpan, evt);
       etwProvider().write(provHandle, evt, ActivityIdPtr, RelatedActivityIdPtr, 0, encoding);
     }
 
@@ -688,6 +703,14 @@ public:
       ActivityIdPtr = &ActivityId;
     }
 
+#ifdef HAVE_FIELD_TIME
+    {
+      auto timeNow        = std::chrono::system_clock::now().time_since_epoch();
+      auto millis         = std::chrono::duration_cast<std::chrono::milliseconds>(timeNow).count();
+      evt[ETW_FIELD_TIME] = utils::formatUtcTimestampMsAsISO8601(millis);
+    }
+#endif
+
     etwProvider().write(provHandle, evt, ActivityIdPtr, nullptr, 0, encoding);
   };
 
@@ -736,6 +759,9 @@ protected:
 
   core::SystemTimestamp start_time_;
   core::SystemTimestamp end_time_;
+
+  trace::StatusCode status_code_{trace::StatusCode::kUnset};
+  std::string status_description_;
 
   /**
    * @brief Owner Tracer of this Span
@@ -792,6 +818,27 @@ protected:
   }
 
 public:
+  /**
+   * @brief Update Properties object with current Span status
+   * @param evt
+   */
+  void UpdateStatus(Properties &evt)
+  {
+    /* Should we avoid populating this extra field if status is unset? */
+    if ((status_code_ == trace::StatusCode::kUnset) || (status_code_ == trace::StatusCode::kOk))
+    {
+      evt[ETW_FIELD_SUCCESS]       = "True";
+      evt[ETW_FIELD_STATUSCODE]    = uint32_t(status_code_);
+      evt[ETW_FIELD_STATUSMESSAGE] = status_description_;
+    }
+    else
+    {
+      evt[ETW_FIELD_SUCCESS]       = "False";
+      evt[ETW_FIELD_STATUSCODE]    = uint32_t(status_code_);
+      evt[ETW_FIELD_STATUSMESSAGE] = status_description_;
+    }
+  }
+
   /**
    * @brief Get start time of this Span.
    * @return
@@ -877,9 +924,8 @@ public:
    */
   void SetStatus(trace::StatusCode code, nostd::string_view description) noexcept override
   {
-    // TODO: not implemented
-    UNREFERENCED_PARAMETER(code);
-    UNREFERENCED_PARAMETER(description);
+    status_code_        = code;
+    status_description_ = description.data();
   }
 
   void SetAttributes(Properties attributes) { attributes_ = attributes; }

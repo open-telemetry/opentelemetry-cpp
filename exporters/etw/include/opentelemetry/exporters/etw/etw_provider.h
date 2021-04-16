@@ -414,6 +414,11 @@ public:
     };
     return (unsigned long)(writeResponse);
 #else
+    UNREFERENCED_PARAMETER(providerData);
+    UNREFERENCED_PARAMETER(eventData);
+    UNREFERENCED_PARAMETER(ActivityId);
+    UNREFERENCED_PARAMETER(RelatedActivityId);
+    UNREFERENCED_PARAMETER(Opcode);
     return STATUS_ERROR;
 #endif
   }
@@ -467,10 +472,7 @@ public:
     for (auto &kv : eventData)
     {
       const char *name = kv.first.data();
-      // Don't include event name field in the payload
-      if (EVENT_NAME == name)
-        continue;
-      auto &value = kv.second;
+      auto &value      = kv.second;
       switch (value.index())
       {
         case PropertyType::kTypeBool: {
