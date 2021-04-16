@@ -20,7 +20,7 @@ namespace common
 ///    (IEEE 754-1985) or signed 64 bit integer.
 ///  - Homogenous arrays of primitive type values.
 ///
-/// \warning 
+/// \warning
 /// \parblock The OpenTelemetry C++ API currently supports several attribute
 /// value types that are not covered by the OpenTelemetry specification:
 ///  - \c uint64_t
@@ -45,10 +45,10 @@ using AttributeValue =
                    nostd::span<const double>,
                    nostd::span<const nostd::string_view>,
                    // Not currently supported by the specification, but reserved for future use.
-		   // Added to provide support for all primitive C++ types.
+                   // Added to provide support for all primitive C++ types.
                    uint64_t,
                    // Not currently supported by the specification, but reserved for future use.
-		   // Added to provide support for all primitive C++ types.
+                   // Added to provide support for all primitive C++ types.
                    nostd::span<const uint64_t>,
                    // Not currently supported by the specification, but reserved for future use.
                    // See https://github.com/open-telemetry/opentelemetry-specification/issues/780

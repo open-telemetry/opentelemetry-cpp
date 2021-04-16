@@ -30,27 +30,28 @@ namespace common
 /**
  * A counterpart to AttributeValue that makes sure a value is owned. This
  * replaces all non-owning references with owned copies.
+ *
+ * The following types are not currently supported by the OpenTelemetry
+ * specification, but reserved for future use:
+ *  - uint64_t
+ *  - std::vector<uint64_t>
+ *  - std::vector<uint8_t>
  */
-using OwnedAttributeValue =
-	nostd::variant<bool,
-                       int32_t,
-                       uint32_t,
-                       int64_t,
-                       double,
-                       std::string,
-                       std::vector<bool>,
-                       std::vector<int32_t>,
-                       std::vector<uint32_t>,
-                       std::vector<int64_t>,
-                       std::vector<double>,
-                       std::vector<std::string>>,
-                       // Not currently supported by the specification, but reserved for future use.
-                       uint64_t,
-                       // Not currently supported by the specification, but reserved for future use.
-                       std::vector<uint64_t>,
-                       // Not currently supported by the specification, but reserved for future use.
-                       // See https://github.com/open-telemetry/opentelemetry-specification/issues/780
-                       std::vector<uint8_t>;
+using OwnedAttributeValue = nostd::variant<bool,
+                                           int32_t,
+                                           uint32_t,
+                                           int64_t,
+                                           double,
+                                           std::string,
+                                           std::vector<bool>,
+                                           std::vector<int32_t>,
+                                           std::vector<uint32_t>,
+                                           std::vector<int64_t>,
+                                           std::vector<double>,
+                                           std::vector<std::string>,
+                                           uint64_t,
+                                           std::vector<uint64_t>,
+                                           std::vector<uint8_t>>;
 
 enum OwnedAttributeType
 {
