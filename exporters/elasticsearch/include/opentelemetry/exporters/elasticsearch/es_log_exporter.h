@@ -99,7 +99,7 @@ public:
    * timeout specified from the options passed from the constructor.
    * @param records A list of log records to send to Elasticsearch.
    */
-  sdklogs::ExportResult Export(
+  sdk::common::ExportResult Export(
       const nostd::span<std::unique_ptr<sdk::logs::Recordable>> &records) noexcept override;
 
   /**

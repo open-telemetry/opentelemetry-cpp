@@ -46,7 +46,7 @@ public:
    * @param value is the numerical representation of the metric being captured
    * @param labels the set of labels, as key-value pairs
    */
-  virtual void observe(T value, const common::KeyValueIterable &labels) override
+  virtual void observe(T value, const opentelemetry::common::KeyValueIterable &labels) override
   {
     this->mu_.lock();
     std::string labelset = KvToString(labels);
@@ -121,7 +121,7 @@ public:
    * @param value is the numerical representation of the metric being captured
    * @param labels the set of labels, as key-value pairs
    */
-  virtual void observe(T value, const common::KeyValueIterable &labels) override
+  virtual void observe(T value, const opentelemetry::common::KeyValueIterable &labels) override
   {
     this->mu_.lock();
     std::string labelset = KvToString(labels);
@@ -219,7 +219,7 @@ public:
    * @param value is the numerical representation of the metric being captured
    * @param labels the set of labels, as key-value pairs
    */
-  virtual void observe(T value, const common::KeyValueIterable &labels) override
+  virtual void observe(T value, const opentelemetry::common::KeyValueIterable &labels) override
   {
     this->mu_.lock();
     std::string labelset = KvToString(labels);

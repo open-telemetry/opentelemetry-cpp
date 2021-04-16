@@ -253,19 +253,19 @@ public:
    * @param values a span of pairs where the first element of the pair is a metric instrument
    * to record to, and the second element is the value to update that instrument with.
    */
-  void RecordShortBatch(const common::KeyValueIterable &labels,
+  void RecordShortBatch(const opentelemetry::common::KeyValueIterable &labels,
                         nostd::span<metrics_api::SynchronousInstrument<short> *> instruments,
                         nostd::span<const short> values) noexcept override;
 
-  void RecordIntBatch(const common::KeyValueIterable &labels,
+  void RecordIntBatch(const opentelemetry::common::KeyValueIterable &labels,
                       nostd::span<metrics_api::SynchronousInstrument<int> *> instruments,
                       nostd::span<const int> values) noexcept override;
 
-  void RecordFloatBatch(const common::KeyValueIterable &labels,
+  void RecordFloatBatch(const opentelemetry::common::KeyValueIterable &labels,
                         nostd::span<metrics_api::SynchronousInstrument<float> *> instruments,
                         nostd::span<const float> values) noexcept override;
 
-  void RecordDoubleBatch(const common::KeyValueIterable &labels,
+  void RecordDoubleBatch(const opentelemetry::common::KeyValueIterable &labels,
                          nostd::span<metrics_api::SynchronousInstrument<double> *> instruments,
                          nostd::span<const double> values) noexcept override;
 

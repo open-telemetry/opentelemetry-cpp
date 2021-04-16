@@ -76,7 +76,7 @@ public:
   }
 
   // Checks for key and returns true if found
-  bool HasKey(const nostd::string_view key) noexcept
+  bool HasKey(const nostd::string_view key) const noexcept
   {
     for (DataList *data = head_.get(); data != nullptr; data = data->next_.get())
     {
@@ -140,7 +140,7 @@ private:
       next_  = nostd::shared_ptr<DataList>{nullptr};
     }
 
-    DataList &operator=(DataList &&other)
+    DataList &operator=(DataList &&other) noexcept
     {
       key_length_ = other.key_length_;
       value_      = std::move(other.value_);

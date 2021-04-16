@@ -22,6 +22,8 @@ cc_library(
         "src/recordable.cc",
     ],
     hdrs = [
+        "include/opentelemetry/exporters/otlp/protobuf_include_prefix.h",
+        "include/opentelemetry/exporters/otlp/protobuf_include_suffix.h",
         "include/opentelemetry/exporters/otlp/recordable.h",
     ],
     strip_include_prefix = "include",
@@ -38,6 +40,8 @@ cc_library(
     ],
     hdrs = [
         "include/opentelemetry/exporters/otlp/otlp_exporter.h",
+        "include/opentelemetry/exporters/otlp/protobuf_include_prefix.h",
+        "include/opentelemetry/exporters/otlp/protobuf_include_suffix.h",
     ],
     strip_include_prefix = "include",
     deps = [
