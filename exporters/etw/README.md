@@ -117,8 +117,9 @@ These options affect how "embedded in application" OpenTelemetry C++ SDK code is
 ### ETW TraceLogging Dynamic Events
 
 ETW supports a mode that is called "Dynamic Manifest", where event may contain strongly-typed
-key-value pairs, with primitive types such as `integer`, `double`, `string`, etc. This mode
-is optional and requires `TraceLoggingDynamic.h` header.
+key-value pairs, with primitive types such as `integer`, `double`, `string`, etc.
+[TraceLogging Dynamic library](https://github.com/microsoft/tracelogging-dynamic-windows)
+has been donated by Microsoft under MIT license.
 
 Complete [list of ETW types](https://docs.microsoft.com/en-us/windows/win32/wes/eventmanifestschema-outputtype-complextype#remarks).
 
