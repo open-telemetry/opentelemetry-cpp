@@ -9,13 +9,6 @@ cc_binary(
         "-DCURL_STATICLIB",
         "-DWITH_CURL",
     ],
-    deps = [
-        "//api",
-        "//exporters/ostream:ostream_span_exporter",
-        "//ext:headers",
-        "//ext/src/http/client/curl:http_client_curl",
-        "//sdk/src/trace",
-    ],
     linkopts = select({
         "//bazel:windows": [
             "-DEFAULTLIB:advapi32.lib",
@@ -24,6 +17,13 @@ cc_binary(
         ],
         "//conditions:default": [],
     }),
+    deps = [
+        "//api",
+        "//exporters/ostream:ostream_span_exporter",
+        "//ext:headers",
+        "//ext/src/http/client/curl:http_client_curl",
+        "//sdk/src/trace",
+    ],
 )
 
 cc_binary(
