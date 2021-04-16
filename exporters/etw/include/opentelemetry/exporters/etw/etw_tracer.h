@@ -70,12 +70,13 @@ using TracerProviderOptions =
  */
 typedef struct
 {
-  bool enableTraceId;            // Set `TraceId` on ETW events
-  bool enableSpanId;             // Set `SpanId` on ETW events
-  bool enableActivityId;         // Assign `SpanId` to `ActivityId`
-  bool enableActivityTracking;   // Emit TraceLogging events for Span/Start and Span/Stop
-  bool enableRelatedActivityId;  // Assign parent `SpanId` to `RelatedActivityId`
-  bool enableAutoParent;         // Start new spans as children of current active span
+  bool enableTraceId;                // Set `TraceId` on ETW events
+  bool enableSpanId;                 // Set `SpanId` on ETW events
+  bool enableActivityId;             // Assign `SpanId` to `ActivityId`
+  bool enableActivityTracking;       // Emit TraceLogging events for Span/Start and Span/Stop
+  bool enableRelatedActivityId;      // Assign parent `SpanId` to `RelatedActivityId`
+  bool enableAutoParent;             // Start new spans as children of current active span
+  ETWProvider::EventFormat encoding; // Event encoding to use for this provider (TLD, MsgPack, XML, etc.).
 } TracerProviderConfiguration;
 
 /**
@@ -103,6 +104,72 @@ static inline void GetOption(const TracerProviderOptions &options,
   {
     value = defaultValue;
   }
+}
+
+/**
+ * @brief Helper template to convert encoding config option to EventFormat.
+ * Configuration option passed as `options["encoding"] = "MsgPack"`.
+ * Default encoding is TraceLogging Dynamic Manifest (TLD).
+ *
+ * Valid encoding names listed below.
+ * 
+ * For MessagePack encoding:
+ * - "MSGPACK"
+ * - "MsgPack"
+ * - "MessagePack"
+ * 
+ * For XML encoding:
+ * - "XML"
+ * - "xml"
+ * 
+ * For TraceLogging Dynamic encoding:
+ * - "TLD"
+ * - "tld"
+ * 
+ */
+static inline ETWProvider::EventFormat GetEncoding(const TracerProviderOptions &options)
+{
+  ETWProvider::EventFormat evtFmt = ETWProvider::EventFormat::ETW_MANIFEST;
+
+  auto it = options.find("encoding");
+  if (it != options.end())
+  {
+    auto varValue = it->second;
+    std::string val = nostd::get<std::string>(varValue);
+
+#pragma warning(push)
+#pragma warning(disable : 4307) /* Integral constant overflow - OK while computing hash */
+    auto h = utils::hashCode(val.c_str());
+    switch (h)
+    {
+      case CONST_HASHCODE(MSGPACK):
+        // nobrk
+      case CONST_HASHCODE(MsgPack):
+        // nobrk
+      case CONST_HASHCODE(MessagePack):
+        evtFmt = ETWProvider::EventFormat::ETW_MSGPACK;
+        break;
+
+      case CONST_HASHCODE(XML):
+        // nobrk
+      case CONST_HASHCODE(xml):
+        evtFmt = ETWProvider::EventFormat::ETW_XML;
+        break;
+
+      case CONST_HASHCODE(TLD):
+        // nobrk
+      case CONST_HASHCODE(tld):
+        // nobrk
+        evtFmt = ETWProvider::EventFormat::ETW_MANIFEST;
+        break;
+
+      default:
+        break;
+    }
+#pragma warning(pop)
+  }
+
+  return evtFmt;
 }
 
 class Span;
@@ -1054,6 +1121,9 @@ public:
 
     // When a new Span is started, the current span automatically becomes its parent.
     GetOption(options, "enableAutoParent", config_.enableAutoParent, false);
+
+    // Determines what encoding to use for ETW events: TraceLogging Dynamic, MsgPack, XML, etc.
+    config_.encoding = GetEncoding(options);
   }
 
   TracerProvider() : trace::TracerProvider()
@@ -1064,6 +1134,7 @@ public:
     config_.enableActivityTracking  = false;
     config_.enableRelatedActivityId = false;
     config_.enableAutoParent        = false;
+    config_.encoding                = ETWProvider::EventFormat::ETW_MANIFEST;
   }
 
   /**
@@ -1080,44 +1151,8 @@ public:
   nostd::shared_ptr<trace::Tracer> GetTracer(nostd::string_view name,
                                              nostd::string_view args = "") override
   {
-#if defined(HAVE_MSGPACK)
-    // Prefer MsgPack over ETW by default
-    ETWProvider::EventFormat evtFmt = ETWProvider::EventFormat::ETW_MSGPACK;
-#else
-    // Fallback to ETW TraceLoggingDynamic if MsgPack support is not compiled in
-    ETWProvider::EventFormat evtFmt = ETWProvider::EventFormat::ETW_MANIFEST;
-#endif
-
-#pragma warning(push)
-#pragma warning(disable : 4307) /* Integral constant overflow - OK while computing hash */
-    auto h = utils::hashCode(args.data());
-    switch (h)
-    {
-      case CONST_HASHCODE(MSGPACK):
-        // nobrk
-      case CONST_HASHCODE(MsgPack):
-        // nobrk
-      case CONST_HASHCODE(MessagePack):
-        evtFmt = ETWProvider::EventFormat::ETW_MSGPACK;
-        break;
-
-      case CONST_HASHCODE(XML):
-        // nobrk
-      case CONST_HASHCODE(xml):
-        evtFmt = ETWProvider::EventFormat::ETW_XML;
-        break;
-
-      case CONST_HASHCODE(TLD):
-        // nobrk
-      case CONST_HASHCODE(tld):
-        // nobrk
-        evtFmt = ETWProvider::EventFormat::ETW_MANIFEST;
-        break;
-
-      default:
-        break;
-    }
-#pragma warning(pop)
+    UNREFERENCED_PARAMETER(args);
+    ETWProvider::EventFormat evtFmt = config_.encoding;
     return nostd::shared_ptr<trace::Tracer>{new (std::nothrow) Tracer(*this, name, evtFmt)};
   }
 };
