@@ -37,7 +37,7 @@ public:
    * Attaches a span processor to this tracer context.
    *
    * @param processor The new span processor for this tracer. This must not be
-   * a nullptr.  Ownership is given to the `TracerContext`.
+   * a nullptr. Ownership is given to the `TracerContext`.
    */
   void RegisterPipeline(std::unique_ptr<SpanProcessor> processor) noexcept;
 

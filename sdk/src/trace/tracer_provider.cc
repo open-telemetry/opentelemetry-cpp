@@ -23,7 +23,7 @@ opentelemetry::nostd::shared_ptr<opentelemetry::trace::Tracer> TracerProvider::G
   return opentelemetry::nostd::shared_ptr<opentelemetry::trace::Tracer>(tracer_);
 }
 
-void TracerProvider::RegisterProcessor(std::unique_ptr<SpanProcessor> processor) noexcept
+void TracerProvider::RegisterPipeline(std::unique_ptr<SpanProcessor> processor) noexcept
 {
   return context_->RegisterPipeline(std::move(processor));
 }

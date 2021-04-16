@@ -44,13 +44,13 @@ public:
       nostd::string_view library_version = "") noexcept override;
 
   /**
-   * Attaches a span processor to this tracer provider.
+   * Attaches a span processor pipeline to this tracer provider.
    * @param processor The new span processor for this tracer provider. This
    * must not be a nullptr.
    *
    * Note: This process may not receive any in-flight spans, but will get newly created spans.
    */
-  void RegisterProcessor(std::unique_ptr<SpanProcessor> processor) noexcept;
+  void RegisterPipeline(std::unique_ptr<SpanProcessor> processor) noexcept;
 
   /**
    * Obtain the resource associated with this tracer provider.
