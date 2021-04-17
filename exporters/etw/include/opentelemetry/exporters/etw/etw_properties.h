@@ -302,8 +302,8 @@ public:
         return nostd::string_view(data, (data) ? strlen(data) : 0);
         break;
       }
-      case common::AttributeType::kTypeSpanByte: {
-        value = to_span(nostd::get<std::vector<uint8_t>>(self));
+      case PropertyType::kTypeSpanByte: {
+        value = to_span(nostd::get<std::vector<uint8_t>>(*this));
         break;
       }
       case PropertyType::kTypeSpanBool: {
