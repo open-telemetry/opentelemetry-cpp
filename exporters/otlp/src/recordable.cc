@@ -8,14 +8,8 @@ namespace otlp
 
 //
 // See `attribute_value.h` for details.
-// Expecting to remove the two feature gates for:
-// - HAVE_SPAN_BYTE     - proposal for binary type or byte array (uint8_t[]).
 //
-#if defined(HAVE_SPAN_BYTE)
 const int kAttributeValueSize = 15;
-#else
-const int kAttributeValueSize = 14;
-#endif
 
 void Recordable::SetIdentity(const opentelemetry::trace::SpanContext &span_context,
                              opentelemetry::trace::SpanId parent_span_id) noexcept
