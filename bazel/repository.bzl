@@ -28,6 +28,18 @@ def opentelemetry_cpp_deps():
         ],
     )
 
+    # Load protobuf dependency, building with bazel 4.0 or upper require protobuf 3.13.0 or upper.
+    # See https://github.com/open-telemetry/opentelemetry-cpp/issues/665
+    maybe(
+        http_archive,
+        name = "com_google_protobuf",
+        sha256 = "0cbdc9adda01f6d2facc65a22a2be5cecefbefe5a09e5382ee8879b522c04441",
+        strip_prefix = "protobuf-3.15.8",
+        urls = [
+            "https://github.com/protocolbuffers/protobuf/archive/v3.15.8.tar.gz",
+        ],
+    )
+
     # Load gRPC dependency
     maybe(
         http_archive,
