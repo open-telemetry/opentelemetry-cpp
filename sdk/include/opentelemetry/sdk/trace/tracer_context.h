@@ -2,6 +2,7 @@
 
 #include "opentelemetry/sdk/common/atomic_unique_ptr.h"
 #include "opentelemetry/sdk/resource/resource.h"
+#include "opentelemetry/sdk/trace/id_generator.h"
 #include "opentelemetry/sdk/trace/processor.h"
 #include "opentelemetry/sdk/trace/samplers/always_on.h"
 #include "opentelemetry/version.h"
@@ -28,11 +29,13 @@ namespace trace
 class TracerContext
 {
 public:
-  explicit TracerContext(std::unique_ptr<SpanProcessor> processor,
-                         opentelemetry::sdk::resource::Resource resource =
-                             opentelemetry::sdk::resource::Resource::Create({}),
-                         std::unique_ptr<Sampler> sampler =
-                             std::unique_ptr<AlwaysOnSampler>(new AlwaysOnSampler)) noexcept;
+  explicit TracerContext(
+      std::unique_ptr<SpanProcessor> processor,
+      opentelemetry::sdk::resource::Resource resource =
+          opentelemetry::sdk::resource::Resource::Create({}),
+      std::unique_ptr<Sampler> sampler = std::unique_ptr<AlwaysOnSampler>(new AlwaysOnSampler),
+      std::unique_ptr<IdGenerator> id_generator =
+          std::unique_ptr<IdGenerator>(new RandomIdGenerator())) noexcept;
   /**
    * Attaches a span processor to this tracer context.
    *
@@ -62,6 +65,12 @@ public:
   const opentelemetry::sdk::resource::Resource &GetResource() const noexcept;
 
   /**
+   * Obtain the Id Generator associated with this tracer context.
+   * @return The ID Generator for this tracer context.
+   */
+  opentelemetry::sdk::trace::IdGenerator &GetIdGenerator() const noexcept;
+
+  /**
    * Force all active SpanProcessors to flush any buffered spans
    * within the given timeout.
    */
@@ -77,6 +86,7 @@ private:
   opentelemetry::sdk::common::AtomicUniquePtr<SpanProcessor> processor_;
   opentelemetry::sdk::resource::Resource resource_;
   std::unique_ptr<Sampler> sampler_;
+  std::unique_ptr<IdGenerator> id_generator_;
 };
 
 }  // namespace trace

@@ -11,9 +11,12 @@ TracerProvider::TracerProvider(std::shared_ptr<sdk::trace::TracerContext> contex
 
 TracerProvider::TracerProvider(std::unique_ptr<SpanProcessor> processor,
                                opentelemetry::sdk::resource::Resource resource,
-                               std::unique_ptr<Sampler> sampler) noexcept
-    : TracerProvider(
-          std::make_shared<TracerContext>(std::move(processor), resource, std::move(sampler)))
+                               std::unique_ptr<Sampler> sampler,
+                               std::unique_ptr<IdGenerator> id_generator) noexcept
+    : TracerProvider(std::make_shared<TracerContext>(std::move(processor),
+                                                     resource,
+                                                     std::move(sampler),
+                                                     std::move(id_generator)))
 {}
 
 opentelemetry::nostd::shared_ptr<opentelemetry::trace::Tracer> TracerProvider::GetTracer(
