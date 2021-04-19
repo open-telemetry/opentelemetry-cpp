@@ -80,7 +80,7 @@ public:
    * Export a batch of span recordables in JSON format.
    * @param spans a span of unique pointers to span recordables
    */
-  trace_sdk::ExportResult Export(
+  sdk::common::ExportResult Export(
       const nostd::span<std::unique_ptr<trace_sdk::Recordable>> &spans) noexcept override;
 
   /**

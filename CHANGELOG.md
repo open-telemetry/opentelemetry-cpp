@@ -15,7 +15,15 @@ Increment the:
 
 ## [Unreleased]
 
-* [SDK] Read Zipkin endpoint from environment variable. ([#24](https://github.com/open-telemetry/opentelemetry-cpp/pull/624))
+## [0.4.0] 2021-04-12
+
+* [EXPORTER] ETW Exporter enhancements ([#519](https://github.com/open-telemetry/opentelemetry-cpp/pull/519))
+* [EXPORTER] Read Zipkin endpoint from environment variable. ([#624](https://github.com/open-telemetry/opentelemetry-cpp/pull/624))
+* [EXPORTER] Split Zpages webserver hosting from Exporter ([#626](https://github.com/open-telemetry/opentelemetry-cpp/pull/626))
+* [EXPORTER] ETW Exporter Usage Instructions ([#628](https://github.com/open-telemetry/opentelemetry-cpp/pull/628))
+* [INSTRUMENTATION] HTTP Client/Server Instrumentation example ([#632](https://github.com/open-telemetry/opentelemetry-cpp/pull/632))
+* [EXPORTER] Enable tls authentication for otlp grpc exporter ([#635](Enable tls authentication for otlp grpc exporter))
+* [API] Refactoring trace_state to reuse common functionality in baggage ([#638](https://github.com/open-telemetry/opentelemetry-cpp/pull/638/files))
 
 ## [0.3.0] 2021-03-19
 

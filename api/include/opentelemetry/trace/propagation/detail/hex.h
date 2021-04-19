@@ -32,7 +32,7 @@ inline int8_t HexToInt(char c)
   return kHexDigits[uint8_t(c)];
 }
 
-bool IsValidHex(nostd::string_view s)
+inline bool IsValidHex(nostd::string_view s)
 {
   return std::all_of(s.begin(), s.end(), [](char c) { return HexToInt(c) != -1; });
 }
@@ -41,7 +41,7 @@ bool IsValidHex(nostd::string_view s)
  * Converts a hexadecimal to binary format if the hex string will fit the buffer.
  * Smaller hex strings are left padded with zeroes.
  */
-bool HexToBinary(nostd::string_view hex, uint8_t *buffer, size_t buffer_size)
+inline bool HexToBinary(nostd::string_view hex, uint8_t *buffer, size_t buffer_size)
 {
   std::memset(buffer, 0, buffer_size);
 

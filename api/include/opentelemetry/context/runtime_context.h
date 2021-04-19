@@ -58,6 +58,8 @@ public:
    */
   virtual bool Detach(Token &token) noexcept = 0;
 
+  virtual ~RuntimeContextStorage(){};
+
 protected:
   nostd::unique_ptr<Token> CreateToken(const Context &context) noexcept
   {

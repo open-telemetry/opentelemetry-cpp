@@ -46,7 +46,7 @@ public:
   /**
    * Exports a span of logs sent from the processor.
    */
-  opentelemetry::sdk::logs::ExportResult Export(
+  opentelemetry::sdk::common::ExportResult Export(
       const opentelemetry::nostd::span<std::unique_ptr<sdk::logs::Recordable>> &records) noexcept
       override;
 

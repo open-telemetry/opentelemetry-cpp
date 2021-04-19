@@ -116,12 +116,12 @@ std::unique_ptr<sdklogs::Recordable> OStreamLogExporter::MakeRecordable() noexce
   return std::unique_ptr<sdklogs::Recordable>(new sdklogs::LogRecord());
 }
 
-sdklogs::ExportResult OStreamLogExporter::Export(
+sdk::common::ExportResult OStreamLogExporter::Export(
     const nostd::span<std::unique_ptr<sdklogs::Recordable>> &records) noexcept
 {
   if (is_shutdown_)
   {
-    return sdklogs::ExportResult::kFailure;
+    return sdk::common::ExportResult::kFailure;
   }
 
   for (auto &record : records)
@@ -175,7 +175,7 @@ sdklogs::ExportResult OStreamLogExporter::Export(
           << "}\n";
   }
 
-  return sdklogs::ExportResult::kSuccess;
+  return sdk::common::ExportResult::kSuccess;
 }
 
 bool OStreamLogExporter::Shutdown(std::chrono::microseconds timeout) noexcept

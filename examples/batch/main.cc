@@ -28,11 +28,11 @@ void initTracer()
   // We export `kNumSpans` after every `schedule_delay_millis` milliseconds.
   options.max_export_batch_size = kNumSpans;
 
-  auto processor = std::shared_ptr<sdktrace::SpanProcessor>(
+  auto processor = std::unique_ptr<sdktrace::SpanProcessor>(
       new sdktrace::BatchSpanProcessor(std::move(exporter), options));
 
   auto provider = nostd::shared_ptr<opentelemetry::trace::TracerProvider>(
-      new sdktrace::TracerProvider(processor));
+      new sdktrace::TracerProvider(std::move(processor)));
   // Set the global trace provider.
   opentelemetry::trace::Provider::SetTracerProvider(provider);
 }

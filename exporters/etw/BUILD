@@ -1,55 +1,43 @@
 package(default_visibility = ["//visibility:public"])
 
 cc_library(
-    name = "etw_provider_exporter",
-    srcs = [
-        "src/etw_provider_exporter.cc",
+    name = "etw_exporter",
+    hdrs = glob([
+        "include/opentelemetry/exporters/etw/*.h",
+    ]),
+    includes = ["include"],
+    local_defines = [
+        "HAVE_MSGPACK",
     ],
-    hdrs = [
-        "include/opentelemetry/exporters/etw/etw_provider_exporter.h",
-        "include/opentelemetry/exporters/etw/utils.h",
-        "include/opentelemetry/exporters/etw/uuid.h",
-    ],
-    strip_include_prefix = "include",
     deps = [
         "//api",
         "//sdk/src/trace",
+        "@github_nlohmann_json//:json",
     ],
 )
 
 cc_test(
     name = "etw_provider_test",
     srcs = ["test/etw_provider_test.cc"],
+    local_defines = [
+        "HAVE_MSGPACK",
+    ],
     deps = [
-        ":etw_provider_exporter",
+        ":etw_exporter",
         "@com_google_googletest//:gtest_main",
-    ],
-)
-
-cc_library(
-    name = "etw_tracer_exporter",
-    srcs = [
-        "src/etw_tracer_exporter.cc",
-    ],
-    hdrs = [
-        "include/opentelemetry/exporters/etw/etw_data.h",
-        "include/opentelemetry/exporters/etw/etw_tracer_exporter.h",
-        "include/opentelemetry/exporters/etw/utils.h",
-        "include/opentelemetry/exporters/etw/uuid.h",
-    ],
-    strip_include_prefix = "include",
-    deps = [
-        ":etw_provider_exporter",
-        "//api",
-        "//sdk/src/trace",
+        "@github_nlohmann_json//:json",
     ],
 )
 
 cc_test(
     name = "etw_tracer_test",
     srcs = ["test/etw_tracer_test.cc"],
+    local_defines = [
+        "HAVE_MSGPACK",
+    ],
     deps = [
-        ":etw_tracer_exporter",
+        ":etw_exporter",
         "@com_google_googletest//:gtest_main",
+        "@github_nlohmann_json//:json",
     ],
 )

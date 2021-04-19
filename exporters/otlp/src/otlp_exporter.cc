@@ -87,7 +87,7 @@ std::unique_ptr<sdk::trace::Recordable> OtlpExporter::MakeRecordable() noexcept
   return std::unique_ptr<sdk::trace::Recordable>(new Recordable);
 }
 
-sdk::trace::ExportResult OtlpExporter::Export(
+sdk::common::ExportResult OtlpExporter::Export(
     const nostd::span<std::unique_ptr<sdk::trace::Recordable>> &spans) noexcept
 {
   proto::collector::trace::v1::ExportTraceServiceRequest request;
@@ -102,9 +102,9 @@ sdk::trace::ExportResult OtlpExporter::Export(
   if (!status.ok())
   {
     std::cerr << "[OTLP Exporter] Export() failed: " << status.error_message() << "\n";
-    return sdk::trace::ExportResult::kFailure;
+    return sdk::common::ExportResult::kFailure;
   }
-  return sdk::trace::ExportResult::kSuccess;
+  return sdk::common::ExportResult::kSuccess;
 }
 }  // namespace otlp
 }  // namespace exporter

@@ -87,9 +87,6 @@ if(WIN32)
   option(WITH_ETW "Whether to include the ETW Exporter in the SDK" ON)
   if(WITH_ETW)
     add_definitions(-DHAVE_MSGPACK)
-    # Option below will be removed once we donate the TraceLoggingDynamic.h to
-    # OSS
-    add_definitions(-DHAVE_NO_TLD)
   endif(WITH_ETW)
 endif(WIN32)
 
@@ -167,8 +164,8 @@ endif()
 
 list(APPEND CMAKE_PREFIX_PATH "${CMAKE_BINARY_DIR}")
 
+include(CTest)
 if(BUILD_TESTING)
-  include(CTest)
   if(EXISTS ${CMAKE_BINARY_DIR}/lib/libgtest.a)
     # Prefer GTest from build tree. GTest is not always working with
     # CMAKE_PREFIX_PATH
@@ -181,21 +178,17 @@ if(BUILD_TESTING)
         ${CMAKE_BINARY_DIR}/lib/libgmock.a)
   elseif(WIN32)
     # Make sure we are always bootsrapped with vcpkg on Windows
-    find_package(GTest CONFIG)
-    if(NOT GTest_FOUND)
+    find_package(GTest)
+    if(NOT (GTEST_FOUND OR GTest_FOUND))
       install_windows_deps()
-      find_package(GTest CONFIG REQUIRED)
+      find_package(GTest REQUIRED)
     endif()
-    set(GTEST_BOTH_LIBRARIES GTest::gtest GTest::gtest_main GTest::gmock)
   else()
     # Prefer GTest installed by OS distro, brew or vcpkg package manager
-    find_package(GTest CONFIG REQUIRED)
-    set(GTEST_BOTH_LIBRARIES GTest::gtest GTest::gtest_main GTest::gmock)
+    find_package(GTest REQUIRED)
   endif()
-  if(GTEST_INCLUDE_DIRS)
-    include_directories(SYSTEM ${GTEST_INCLUDE_DIRS})
-    message("GTEST_INCLUDE_DIRS   = ${GTEST_INCLUDE_DIRS}")
-  endif()
+  include_directories(SYSTEM ${GTEST_INCLUDE_DIRS})
+  message("GTEST_INCLUDE_DIRS   = ${GTEST_INCLUDE_DIRS}")
   message("GTEST_BOTH_LIBRARIES = ${GTEST_BOTH_LIBRARIES}")
   enable_testing()
   # Benchmark respects the CMAKE_PREFIX_PATH
@@ -216,6 +209,9 @@ if(WITH_EXAMPLES)
   add_subdirectory(examples)
 endif()
 add_subdirectory(ext)
+
+# Add nlohmann/json submodule to include directories
+include_directories(third_party/nlohmann-json/single_include)
 
 # Export cmake config and support find_packages(opentelemetry-cpp CONFIG) Write
 # config file for find_packages(opentelemetry-cpp CONFIG)

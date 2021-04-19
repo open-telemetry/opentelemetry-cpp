@@ -24,16 +24,24 @@ namespace exporter
 namespace zipkin
 {
 
+//
+// See `attribute_value.h` for details.
+// Expecting to remove the two feature gates for:
+// - HAVE_SPAN_BYTE     - proposal for binary type or byte array (uint8_t[]).
+//
+#if defined(HAVE_SPAN_BYTE)
+const int kAttributeValueSize = 15;
+#else
 const int kAttributeValueSize = 14;
+#endif
 
-void Recordable::SetIds(trace::TraceId trace_id,
-                        trace::SpanId span_id,
-                        trace::SpanId parent_span_id) noexcept
+void Recordable::SetIdentity(const opentelemetry::trace::SpanContext &span_context,
+                             opentelemetry::trace::SpanId parent_span_id) noexcept
 {
   char trace_id_lower_base16[trace::TraceId::kSize * 2] = {0};
-  trace_id.ToLowerBase16(trace_id_lower_base16);
+  span_context.trace_id().ToLowerBase16(trace_id_lower_base16);
   char span_id_lower_base16[trace::SpanId::kSize * 2] = {0};
-  span_id.ToLowerBase16(span_id_lower_base16);
+  span_context.span_id().ToLowerBase16(span_id_lower_base16);
   char parent_span_id_lower_base16[trace::SpanId::kSize * 2] = {0};
   parent_span_id.ToLowerBase16(parent_span_id_lower_base16);
   span_["id"]       = std::string(span_id_lower_base16, 16);
@@ -80,6 +88,16 @@ void PopulateAttribute(nlohmann::json &attribute,
     attribute[key.data()] = nostd::string_view(nostd::get<nostd::string_view>(value).data(),
                                                nostd::get<nostd::string_view>(value).size());
   }
+#ifdef HAVE_SPAN_BYTE
+  else if (nostd::holds_alternative<nostd::span<const uint8_t>>(value))
+  {
+    attribute[key.data()] = {};
+    for (const auto &val : nostd::get<nostd::span<const uint8_t>>(value))
+    {
+      attribute[key.data()].push_back(val);
+    }
+  }
+#endif
   else if (nostd::holds_alternative<nostd::span<const bool>>(value))
   {
     attribute[key.data()] = {};
