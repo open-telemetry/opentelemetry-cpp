@@ -41,7 +41,9 @@ having C++ compiler with [supported C++ standards](#supported-c-versions).
 
 Please refer to [INSTALL.md](./INSTALL.md).
 
-## Quick Start
+## Getting Started
+
+As an application owner or the library author, you can find the getting started guide and reference documentation on [opentelemetry-cpp.readthedocs.io](https://opentelemetry-cpp.readthedocs.io/en/latest/)
 
 The `examples/simple` directory contains a minimal program demonstrating how to
 instrument a small library using a simple `processor` and console `exporter`,
