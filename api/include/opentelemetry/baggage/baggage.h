@@ -146,19 +146,17 @@ public:
         value    = value.substr(0, metadata_separator);
       }
 
-      int err = 0;
-      key     = Decode(common::StringUtil::Trim(key), err);
-      value   = Decode(common::StringUtil::Trim(value), err);
+      int err        = 0;
+      auto key_str   = Decode(common::StringUtil::Trim(key), err);
+      auto value_str = Decode(common::StringUtil::Trim(value), err);
 
-      if (err == 0 && IsValidKey(key) && IsValidValue(value))
+      if (err == 0 && IsValidKey(key_str) && IsValidValue(value_str))
       {
         if (!metadata.empty())
         {
-          std::string value_with_metadata(value.data(), value.size());
-          value_with_metadata.append(metadata.data(), metadata.size());
-          value = value_with_metadata;
+          value_str.append(metadata.data(), metadata.size());
         }
-        baggage->kv_properties_->AddEntry(key, value);
+        baggage->kv_properties_->AddEntry(key_str, value_str);
       }
     }
 

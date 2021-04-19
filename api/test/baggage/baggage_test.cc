@@ -61,7 +61,7 @@ TEST(BaggageTest, ValidateExtractHeader)
        {"V1", "v2;metadata", "v3"}},  // metadata is part of value
       {",k1 =v1,k2=v2 ; metadata,",
        {"k1", "k2"},
-       {"v1", "v2; metadata"}},  // key andd value are trimmed
+       {"v1", "v2; metadata"}},  // key and value are trimmed
       {"1a-2f%40foo=bar%251,a%2A%2Ffoo-_%2Fbar=bar+4",
        {"1a-2f@foo", "a*/foo-_/bar"},
        {"bar%1", "bar 4"}},                                       // decoding is done properly
@@ -187,7 +187,7 @@ TEST(BaggageTest, BaggageRemove)
   auto new_baggage = baggage->Delete("key0");
   EXPECT_FALSE(new_baggage->GetValue("key0", value));
 
-  // trying Delete on non existant key
+  // trying Delete on non existent key
   EXPECT_FALSE(baggage->GetValue("key181", value));
   auto new_baggage_2 = baggage->Delete("key181");
   EXPECT_FALSE(new_baggage_2->GetValue("key181", value));
