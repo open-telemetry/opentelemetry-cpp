@@ -45,6 +45,24 @@ public:
   nostd::string_view GetDescription() const noexcept override { return "MockSampler"; }
 };
 
+/**
+ * A Mock Custom Id Generator
+ */
+class MockIdGenerator : public IdGenerator
+{
+  opentelemetry::trace::SpanId GenerateSpanId() noexcept override
+  {
+    return opentelemetry::trace::SpanId(buf_span);
+  }
+
+  opentelemetry::trace::TraceId GenerateTraceId() noexcept override
+  {
+    return opentelemetry::trace::TraceId(buf_trace);
+  }
+  uint8_t buf_span[8]   = {1, 2, 3, 4, 5, 6, 7, 8};
+  uint8_t buf_trace[16] = {1, 2, 3, 4, 5, 6, 7, 8, 8, 7, 6, 5, 4, 3, 2, 1};
+};
+
 namespace
 {
 std::shared_ptr<opentelemetry::trace::Tracer> initTracer(std::unique_ptr<SpanExporter> &&exporter)
@@ -57,12 +75,14 @@ std::shared_ptr<opentelemetry::trace::Tracer> initTracer(std::unique_ptr<SpanExp
 std::shared_ptr<opentelemetry::trace::Tracer> initTracer(
     std::unique_ptr<SpanExporter> &&exporter,
     // For testing, just shove a pointer over, we'll take it over.
-    Sampler *sampler)
+    Sampler *sampler,
+    IdGenerator *id_generator = new RandomIdGenerator)
 {
   auto processor = std::unique_ptr<SpanProcessor>(new SimpleSpanProcessor(std::move(exporter)));
   auto resource  = Resource::Create({});
   auto context   = std::make_shared<TracerContext>(std::move(processor), resource,
-                                                 std::unique_ptr<Sampler>(sampler));
+                                                 std::unique_ptr<Sampler>(sampler),
+                                                 std::unique_ptr<IdGenerator>(id_generator));
   return std::shared_ptr<opentelemetry::trace::Tracer>(new Tracer(context));
 }
 }  // namespace
@@ -130,6 +150,30 @@ TEST(Tracer, StartSpanSampleOff)
   // The span doesn't write any span data because the sampling decision is alway
   // DROP.
   ASSERT_EQ(0, span_data->GetSpans().size());
+}
+
+TEST(Tracer, StartSpanCustomIdGenerator)
+{
+  IdGenerator *id_generator = new MockIdGenerator();
+  std::unique_ptr<InMemorySpanExporter> exporter(new InMemorySpanExporter());
+  std::shared_ptr<InMemorySpanData> span_data = exporter->GetData();
+  auto tracer = initTracer(std::move(exporter), new AlwaysOnSampler(), id_generator);
+
+  tracer->StartSpan("span 1")->End();
+  auto spans          = span_data->GetSpans();
+  auto &cur_span_data = spans.at(0);
+
+  char rec_trace[32], exp_trace[32];
+  char rec_span[16], exp_span[16];
+
+  cur_span_data->GetTraceId().ToLowerBase16(rec_trace);
+  id_generator->GenerateTraceId().ToLowerBase16(exp_trace);
+
+  cur_span_data->GetSpanId().ToLowerBase16(rec_span);
+  id_generator->GenerateSpanId().ToLowerBase16(exp_span);
+
+  ASSERT_EQ(std::string(rec_trace, sizeof(rec_trace)), std::string(exp_trace, sizeof(exp_trace)));
+  ASSERT_EQ(std::string(rec_span, sizeof(rec_span)), std::string(exp_span, sizeof(exp_span)));
 }
 
 TEST(Tracer, StartSpanWithOptionsTime)
