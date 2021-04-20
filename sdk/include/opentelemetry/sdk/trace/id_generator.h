@@ -28,6 +28,8 @@ class IdGenerator
 {
 
 public:
+  virtual ~IdGenerator() = default;
+
   /** Returns a SpanId represented by opaque 128-bit trace identifier */
   virtual opentelemetry::trace::SpanId GenerateSpanId() noexcept = 0;
 
