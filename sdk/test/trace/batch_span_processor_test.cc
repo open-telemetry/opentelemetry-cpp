@@ -31,7 +31,7 @@ public:
     return std::unique_ptr<sdk::trace::Recordable>(new sdk::trace::SpanData);
   }
 
-  sdk::trace::ExportResult Export(
+  sdk::common::ExportResult Export(
       const nostd::span<std::unique_ptr<sdk::trace::Recordable>> &recordables) noexcept override
   {
     *is_export_completed_ = false;
@@ -50,7 +50,7 @@ public:
     }
 
     *is_export_completed_ = true;
-    return sdk::trace::ExportResult::kSuccess;
+    return sdk::common::ExportResult::kSuccess;
   }
 
   bool Shutdown(

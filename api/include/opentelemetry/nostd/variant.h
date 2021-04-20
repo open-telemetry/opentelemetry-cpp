@@ -22,7 +22,17 @@
 // toolchains, it may drop support for Visual Studio 2015 in future versions. Perhaps a good
 // option would be to determine if Abseil is available, then use the outside implementation,
 // but it is not guaranteed to be still compatible with 2015. Thus, the local snapshot here.
+#  ifdef _MSC_VER
+// Abseil variant implementation contains some benign non-impacting warnings
+// that should be suppressed if compiling with Visual Studio 2017 and above.
+#    pragma warning(push)
+#    pragma warning(disable : 4245)  // conversion from int to const unsigned _int64
+#    pragma warning(disable : 4127)  // conditional expression is constant
+#  endif
 #  include "./absl/types/variant.h"
+#  ifdef _MSC_VER
+#    pragma warning(pop)
+#  endif
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace nostd
@@ -63,10 +73,17 @@ namespace absl
 {
 namespace variant_internal
 {
+#  ifdef _MSC_VER
+#    pragma warning(push)
+#    pragma warning(disable : 4211)  // nonstandard extension used: redefined extern to static
+#  endif
 static void ThrowBadVariantAccess()
 {
   THROW_BAD_VARIANT_ACCESS;
 };
+#  ifdef _MSC_VER
+#    pragma warning(pop)
+#  endif
 };  // namespace variant_internal
 };  // namespace absl
 

@@ -56,7 +56,7 @@ public:
    * Export a batch of span recordables in OTLP format.
    * @param spans a span of unique pointers to span recordables
    */
-  sdk::trace::ExportResult Export(
+  sdk::common::ExportResult Export(
       const nostd::span<std::unique_ptr<sdk::trace::Recordable>> &spans) noexcept override;
 
   /**

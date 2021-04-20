@@ -36,12 +36,12 @@ std::unique_ptr<sdktrace::Recordable> OStreamSpanExporter::MakeRecordable() noex
   return std::unique_ptr<sdktrace::Recordable>(new sdktrace::SpanData);
 }
 
-sdktrace::ExportResult OStreamSpanExporter::Export(
+sdk::common::ExportResult OStreamSpanExporter::Export(
     const nostd::span<std::unique_ptr<sdktrace::Recordable>> &spans) noexcept
 {
   if (isShutdown_)
   {
-    return sdktrace::ExportResult::kFailure;
+    return sdk::common::ExportResult::kFailure;
   }
 
   for (auto &recordable : spans)
@@ -64,6 +64,7 @@ sdktrace::ExportResult OStreamSpanExporter::Export(
             << "\n  name          : " << span->GetName()
             << "\n  trace_id      : " << std::string(trace_id, 32)
             << "\n  span_id       : " << std::string(span_id, 16)
+            << "\n  tracestate    : " << span->GetSpanContext().trace_state()->ToHeader()
             << "\n  parent_span_id: " << std::string(parent_span_id, 16)
             << "\n  start         : " << span->GetStartTime().time_since_epoch().count()
             << "\n  duration      : " << span->GetDuration().count()
@@ -80,7 +81,7 @@ sdktrace::ExportResult OStreamSpanExporter::Export(
     }
   }
 
-  return sdktrace::ExportResult::kSuccess;
+  return sdk::common::ExportResult::kSuccess;
 }
 
 bool OStreamSpanExporter::Shutdown(std::chrono::microseconds timeout) noexcept
