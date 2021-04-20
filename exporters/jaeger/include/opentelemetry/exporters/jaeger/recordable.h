@@ -34,9 +34,8 @@ public:
   thrift::Span *Span() noexcept { return span_.release(); }
   std::vector<thrift::Tag> Tags() noexcept { return std::move(tags_); }
 
-  void SetIds(trace::TraceId trace_id,
-              trace::SpanId span_id,
-              trace::SpanId parent_span_id) noexcept override;
+  void SetIdentity(const opentelemetry::trace::SpanContext &span_context,
+                   opentelemetry::trace::SpanId parent_span_id) noexcept override;
 
   void SetAttribute(nostd::string_view key,
                     const opentelemetry::common::AttributeValue &value) noexcept override;
@@ -60,6 +59,7 @@ public:
 
 private:
   void AddTag(const std::string &key, const std::string &value);
+  void AddTag(const std::string &key, const char *value);
   void AddTag(const std::string &key, bool value);
   void AddTag(const std::string &key, int64_t value);
   void AddTag(const std::string &key, double value);

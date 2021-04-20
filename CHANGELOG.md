@@ -15,6 +15,8 @@ Increment the:
 
 ## [Unreleased]
 
+* [EXPORTER] Add Jaeger exporter ([#534](https://github.com/open-telemetry/opentelemetry-cpp/pull/534))
+
 ## [0.4.0] 2021-04-12
 
 * [EXPORTER] ETW Exporter enhancements ([#519](https://github.com/open-telemetry/opentelemetry-cpp/pull/519))

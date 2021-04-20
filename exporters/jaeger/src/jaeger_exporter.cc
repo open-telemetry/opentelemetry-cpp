@@ -39,12 +39,12 @@ std::unique_ptr<trace_sdk::Recordable> JaegerExporter::MakeRecordable() noexcept
   return std::unique_ptr<sdk::trace::Recordable>(new Recordable);
 }
 
-sdk::trace::ExportResult JaegerExporter::Export(
+sdk_common::ExportResult JaegerExporter::Export(
     const nostd::span<std::unique_ptr<sdk::trace::Recordable>> &spans) noexcept
 {
   if (is_shutdown_)
   {
-    return sdk::trace::ExportResult::kFailure;
+    return sdk_common::ExportResult::kFailure;
   }
 
   for (auto &recordable : spans)
@@ -56,13 +56,14 @@ sdk::trace::ExportResult JaegerExporter::Export(
     }
   }
 
-  return sdk::trace::ExportResult::kSuccess;
+  return sdk_common::ExportResult::kSuccess;
 }
 
 void JaegerExporter::InitializeEndpoint()
 {
   if (options_.transport_format == TransportFormat::kThriftUdpCompact)
   {
+    // TODO: do we need support any authentication mechanism?
     auto transport = std::unique_ptr<Transport>(
         static_cast<Transport *>(new UDPTransport(options_.server_addr, options_.server_port)));
     sender_ = std::unique_ptr<ThriftSender>(new ThriftSender(std::move(transport)));

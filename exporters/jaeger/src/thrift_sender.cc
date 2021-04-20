@@ -56,7 +56,7 @@ int ThriftSender::Append(std::unique_ptr<Recordable> &&span) noexcept
   const uint32_t span_size = CalcSizeOfSerializedThrift(jaeger_span);
   if (span_size > max_span_bytes)
   {
-    // TODO, handle too large span.
+    // TODO, log too large span error.
     return 0;
   }
 

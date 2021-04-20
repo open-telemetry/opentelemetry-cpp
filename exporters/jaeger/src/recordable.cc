@@ -22,8 +22,7 @@ namespace jaeger
 
 Recordable::Recordable() : span_{new thrift::Span} {}
 
-void Recordable::PopulateAttribute(nostd::string_view key,
-                                   const opentelemetry::common::AttributeValue &value)
+void Recordable::PopulateAttribute(nostd::string_view key, const common::AttributeValue &value)
 {
   if (nostd::holds_alternative<int64_t>(value))
   {
@@ -44,18 +43,20 @@ void Recordable::PopulateAttribute(nostd::string_view key,
   // TODO: extend other AttributeType to the types supported by Jaeger.
 }
 
-void Recordable::SetIds(trace::TraceId trace_id,
-                        trace::SpanId span_id,
-                        trace::SpanId parent_span_id) noexcept
+void Recordable::SetIdentity(const trace::SpanContext &span_context,
+                             trace::SpanId parent_span_id) noexcept
 {
-  span_->__set_traceIdLow(*(reinterpret_cast<const int64_t *>(trace_id.Id().data())));
-  span_->__set_traceIdHigh(*(reinterpret_cast<const int64_t *>(trace_id.Id().data()) + 1));
-  span_->__set_spanId(*(reinterpret_cast<const int64_t *>(span_id.Id().data())));
+  span_->__set_traceIdLow(
+      *(reinterpret_cast<const int64_t *>(span_context.trace_id().Id().data())));
+  span_->__set_traceIdHigh(
+      *(reinterpret_cast<const int64_t *>(span_context.trace_id().Id().data()) + 1));
+  span_->__set_spanId(*(reinterpret_cast<const int64_t *>(span_context.span_id().Id().data())));
   span_->__set_parentSpanId(*(reinterpret_cast<const int64_t *>(parent_span_id.Id().data())));
+
+  // TODO: set trace_state.
 }
 
-void Recordable::SetAttribute(nostd::string_view key,
-                              const opentelemetry::common::AttributeValue &value) noexcept
+void Recordable::SetAttribute(nostd::string_view key, const common::AttributeValue &value) noexcept
 {
   PopulateAttribute(key, value);
 }
@@ -67,7 +68,7 @@ void Recordable::AddEvent(nostd::string_view name,
   // TODO: convert event to Jaeger Log
 }
 
-void Recordable::AddLink(const opentelemetry::trace::SpanContext &span_context,
+void Recordable::AddLink(const trace::SpanContext &span_context,
                          const common::KeyValueIterable &attributes) noexcept
 {
   // TODO: convert link to SpanRefernece
@@ -98,7 +99,7 @@ void Recordable::SetName(nostd::string_view name) noexcept
   span_->__set_operationName(static_cast<std::string>(name));
 }
 
-void Recordable::SetStartTime(opentelemetry::core::SystemTimestamp start_time) noexcept
+void Recordable::SetStartTime(core::SystemTimestamp start_time) noexcept
 {
   span_->__set_startTime(
       std::chrono::duration_cast<std::chrono::microseconds>(start_time.time_since_epoch()).count());
@@ -109,7 +110,7 @@ void Recordable::SetDuration(std::chrono::nanoseconds duration) noexcept
   span_->__set_duration(std::chrono::duration_cast<std::chrono::microseconds>(duration).count());
 }
 
-void Recordable::SetSpanKind(opentelemetry::trace::SpanKind span_kind) noexcept
+void Recordable::SetSpanKind(trace::SpanKind span_kind) noexcept
 {
   switch (span_kind)
   {
@@ -143,6 +144,11 @@ void Recordable::AddTag(const std::string &key, const std::string &value)
   tag.__set_vStr(value);
 
   tags_.push_back(tag);
+}
+
+void Recordable::AddTag(const std::string &key, const char *value)
+{
+  AddTag(key, std::string{value});
 }
 
 void Recordable::AddTag(const std::string &key, bool value)

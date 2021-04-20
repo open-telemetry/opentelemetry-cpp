@@ -1,7 +1,6 @@
 include_directories(include)
 include_directories(thrift-gen)
 
-find_package(Boost REQUIRED)
 find_package(thrift REQUIRED)
 
 if(MSVC)

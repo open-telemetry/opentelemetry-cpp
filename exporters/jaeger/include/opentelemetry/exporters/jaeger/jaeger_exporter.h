@@ -42,7 +42,8 @@ struct JaegerExporterOptions
   TransportFormat transport_format = TransportFormat::kThriftUdpCompact;
 };
 
-namespace trace_sdk = opentelemetry::sdk::trace;
+namespace trace_sdk  = opentelemetry::sdk::trace;
+namespace sdk_common = opentelemetry::sdk::common;
 
 class JaegerExporter final : public trace_sdk::SpanExporter
 {
@@ -67,7 +68,7 @@ public:
    * Export a batch of spans.
    * @param spans a span of unique pointers to span recordables.
    */
-  trace_sdk::ExportResult Export(
+  sdk_common::ExportResult Export(
       const nostd::span<std::unique_ptr<trace_sdk::Recordable>> &spans) noexcept override;
 
   /**
