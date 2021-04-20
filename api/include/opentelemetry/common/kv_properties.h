@@ -237,7 +237,7 @@ public:
   }
 
   // Adds new kv pair into kv properties
-  void AddEntry(const nostd::string_view &key, const nostd::string_view &value)
+  void AddEntry(nostd::string_view key, nostd::string_view value)
   {
     if (num_entries_ < max_num_entries_)
     {
@@ -262,7 +262,7 @@ public:
   }
 
   // Return value for key if exists, return false otherwise
-  bool GetValue(const nostd::string_view key, std::string &value) const
+  bool GetValue(nostd::string_view key, std::string &value) const
   {
     for (size_t i = 0; i < num_entries_; i++)
     {

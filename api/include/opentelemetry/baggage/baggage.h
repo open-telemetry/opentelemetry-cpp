@@ -51,7 +51,7 @@ public:
   /* Get value for key in the baggage
      @returns true if key is found, false otherwise
   */
-  bool GetValue(const nostd::string_view &key, std::string &value) const
+  bool GetValue(nostd::string_view key, std::string &value) const
   {
     return kv_properties_->GetValue(key, value);
   }
@@ -98,7 +98,7 @@ public:
   // if key does not exist, copy of current baggage is returned.
   // Validity of key is not checked as invalid keys should never be populated in baggage in the
   // first place.
-  nostd::shared_ptr<Baggage> Delete(const nostd::string_view &key)
+  nostd::shared_ptr<Baggage> Delete(nostd::string_view key)
   {
     // keeping size of baggage same as key might not be found in it
     nostd::shared_ptr<Baggage> baggage(new Baggage(kv_properties_->Size()));
