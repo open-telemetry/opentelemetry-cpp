@@ -12,7 +12,7 @@ using namespace opentelemetry::baggage;
 std::string header_with_custom_entries(size_t num_entries)
 {
   std::string header;
-  for (int i = 0; i < num_entries; i++)
+  for (size_t i = 0; i < num_entries; i++)
   {
     std::string key   = "key" + std::to_string(i);
     std::string value = "value" + std::to_string(i);
@@ -28,12 +28,12 @@ std::string header_with_custom_entries(size_t num_entries)
 std::string header_with_custom_size(size_t key_value_size, size_t num_entries)
 {
   std::string header = "";
-  for (int i = 0; i < num_entries; i++)
+  for (size_t i = 0; i < num_entries; i++)
   {
     std::string str = std::to_string(i + 1);
     str += "=";
     assert(key_value_size > str.size());
-    for (int j = str.size(); j < key_value_size; j++)
+    for (size_t j = str.size(); j < key_value_size; j++)
     {
       str += "a";
     }
@@ -116,11 +116,15 @@ TEST(BaggageTest, ValidateInjectHeader)
                    {{"k3", "k2", "k1"}, {"", "v2", "v1"}, "k1=v1,k2=v2,k3="},  // empty value
                    {{"1a-2f@foo", "a*/foo-_/bar"},
                     {"bar%1", "bar 4"},
-                    "a%2A%2Ffoo-_%2Fbar=bar+4,1a-2f%40foo=bar%251"}};  // encoding is done properly
+                    "a%2A%2Ffoo-_%2Fbar=bar+4,1a-2f%40foo=bar%251"},  // encoding is done properly
+                   {{"foo 1"},
+                    {"bar 1;  metadata ; ;;"},
+                    "foo+1=bar+1;  metadata ; ;;"}};  // metadata is added without encoding
+
   for (auto &testcase : testcases)
   {
     nostd::shared_ptr<Baggage> baggage(new Baggage{});
-    for (int i = 0; i < testcase.keys.size(); i++)
+    for (size_t i = 0; i < testcase.keys.size(); i++)
     {
       baggage = baggage->Set(testcase.keys[i], testcase.values[i]);
     }
