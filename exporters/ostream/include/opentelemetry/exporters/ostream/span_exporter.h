@@ -100,7 +100,12 @@ private:
 #if __cplusplus < 201402L
     nostd::visit(OwnedAttributeValueVisitor(*this), value);
 #else
-    nostd::visit([this](auto &&arg) { print_value(arg); }, value);
+    nostd::visit(
+        [this](auto &&arg) {
+          /* explicit this is needed by some gcc versions (observed with v5.4.0)*/
+          this->print_value(arg);
+        },
+        value);
 #endif
   }
 
