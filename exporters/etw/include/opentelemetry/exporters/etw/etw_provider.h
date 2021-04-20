@@ -352,9 +352,7 @@ public:
 #  endif
 
         // TODO: arrays are not supported yet
-#  ifdef HAVE_SPAN_BYTE
-        case common::AttributeType::TYPE_SPAN_BYTE:
-#  endif
+        case PropertyType::kTypeSpanByte:
         case PropertyType::kTypeSpanBool:
         case PropertyType::kTypeSpanInt:
         case PropertyType::kTypeSpanInt64:
@@ -531,9 +529,7 @@ public:
 #  endif
 
         // TODO: arrays are not supported
-#  ifdef HAVE_SPAN_BYTE
         case PropertyType::kTypeSpanByte:
-#  endif
         case PropertyType::kTypeSpanBool:
         case PropertyType::kTypeSpanInt:
         case PropertyType::kTypeSpanInt64:

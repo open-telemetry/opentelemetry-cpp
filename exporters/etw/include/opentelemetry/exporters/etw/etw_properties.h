@@ -42,11 +42,9 @@ using PropertyVariant =
                    double,
                    std::string,
                    const char *,
-#ifdef HAVE_SPAN_BYTE
-                   // TODO: 8-bit byte arrays / binary blobs are not part of OT spec yet!
+                   // 8-bit byte arrays / binary blobs are not part of OT spec yet!
                    // Ref: https://github.com/open-telemetry/opentelemetry-specification/issues/780
                    std::vector<uint8_t>,
-#endif
                    std::vector<bool>,
                    std::vector<int32_t>,
                    std::vector<int64_t>,
@@ -65,9 +63,7 @@ enum PropertyType
   kTypeDouble,
   kTypeString,
   kTypeCString,
-#ifdef HAVE_SPAN_BYTE
   kTypeSpanByte,
-#endif
   kTypeSpanBool,
   kTypeSpanInt,
   kTypeSpanInt64,
@@ -229,11 +225,11 @@ public:
         PropertyVariant::operator=(nostd::string_view(nostd::get<nostd::string_view>(v)).data());
         break;
       };
-#ifdef HAVE_SPAN_BYTE
+
       case common::AttributeType::kTypeSpanByte:
         PropertyVariant::operator=(to_vector(nostd::get<nostd::span<const uint8_t>>(v)));
         break;
-#endif
+
       case common::AttributeType::kTypeSpanBool:
         PropertyVariant::operator=(to_vector(nostd::get<nostd::span<const bool>>(v)));
         break;
@@ -306,13 +302,10 @@ public:
         return nostd::string_view(data, (data) ? strlen(data) : 0);
         break;
       }
-
-#ifdef HAVE_SPAN_BYTE
-      case common::AttributeType::kTypeSpanByte:
-        value = to_span(nostd::get<std::vector<uint8_t>>(self));
+      case PropertyType::kTypeSpanByte: {
+        value = to_span(nostd::get<std::vector<uint8_t>>(*this));
         break;
-#endif
-
+      }
       case PropertyType::kTypeSpanBool: {
         const auto &vec = nostd::get<std::vector<bool>>(*this);
         // FIXME: sort out how to remap from vector<bool> to span<bool>
