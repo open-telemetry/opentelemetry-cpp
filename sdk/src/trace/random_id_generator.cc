@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include "opentelemetry/sdk/trace/id_generator.h"
+#include "opentelemetry/sdk/trace/random_id_generator.h"
 #include "opentelemetry/version.h"
 #include "src/common/random.h"
 

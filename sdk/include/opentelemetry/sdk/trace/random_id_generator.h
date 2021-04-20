@@ -13,9 +13,7 @@
 // limitations under the License.
 
 #pragma once
-#include "opentelemetry/trace/span_id.h"
-#include "opentelemetry/trace/trace_id.h"
-#include "opentelemetry/version.h"
+#include "opentelemetry/sdk/trace/id_generator.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace sdk
@@ -23,17 +21,14 @@ namespace sdk
 namespace trace
 {
 
-/** IdGenerator provides an interface for generating Trace Id and Span Id */
-class IdGenerator
+class RandomIdGenerator : public IdGenerator
 {
-
 public:
-  /** Returns a SpanId represented by opaque 128-bit trace identifier */
-  virtual opentelemetry::trace::SpanId GenerateSpanId() noexcept = 0;
+  opentelemetry::trace::SpanId GenerateSpanId() noexcept override;
 
-  /** Returns a TraceId represented by opaque 64-bit trace identifier */
-  virtual opentelemetry::trace::TraceId GenerateTraceId() noexcept = 0;
+  opentelemetry::trace::TraceId GenerateTraceId() noexcept override;
 };
+
 }  // namespace trace
 
 }  // namespace sdk

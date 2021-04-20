@@ -163,17 +163,8 @@ TEST(Tracer, StartSpanCustomIdGenerator)
   auto spans          = span_data->GetSpans();
   auto &cur_span_data = spans.at(0);
 
-  char rec_trace[32], exp_trace[32];
-  char rec_span[16], exp_span[16];
-
-  cur_span_data->GetTraceId().ToLowerBase16(rec_trace);
-  id_generator->GenerateTraceId().ToLowerBase16(exp_trace);
-
-  cur_span_data->GetSpanId().ToLowerBase16(rec_span);
-  id_generator->GenerateSpanId().ToLowerBase16(exp_span);
-
-  ASSERT_EQ(std::string(rec_trace, sizeof(rec_trace)), std::string(exp_trace, sizeof(exp_trace)));
-  ASSERT_EQ(std::string(rec_span, sizeof(rec_span)), std::string(exp_span, sizeof(exp_span)));
+  EXPECT_EQ(cur_span_data->GetTraceId(), id_generator->GenerateTraceId());
+  EXPECT_EQ(cur_span_data->GetSpanId(), id_generator->GenerateSpanId());
 }
 
 TEST(Tracer, StartSpanWithOptionsTime)
