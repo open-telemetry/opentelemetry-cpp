@@ -53,7 +53,7 @@ TEST_F(OtlpExporterTestPeer, ExportUnitTest)
   nostd::span<std::unique_ptr<sdk::trace::Recordable>> batch_1(&recordable_1, 1);
   EXPECT_CALL(*mock_stub, Export(_, _, _)).Times(Exactly(1)).WillOnce(Return(grpc::Status::OK));
   auto result = exporter->Export(batch_1);
-  EXPECT_EQ(sdk::trace::ExportResult::kSuccess, result);
+  EXPECT_EQ(sdk::common::ExportResult::kSuccess, result);
 
   // Test failed RPC
   nostd::span<std::unique_ptr<sdk::trace::Recordable>> batch_2(&recordable_2, 1);
@@ -61,7 +61,7 @@ TEST_F(OtlpExporterTestPeer, ExportUnitTest)
       .Times(Exactly(1))
       .WillOnce(Return(grpc::Status::CANCELLED));
   result = exporter->Export(batch_2);
-  EXPECT_EQ(sdk::trace::ExportResult::kFailure, result);
+  EXPECT_EQ(sdk::common::ExportResult::kFailure, result);
 }
 
 // Create spans, let processor call Export()
@@ -73,10 +73,10 @@ TEST_F(OtlpExporterTestPeer, ExportIntegrationTest)
 
   auto exporter = GetExporter(stub_interface);
 
-  auto processor = std::shared_ptr<sdk::trace::SpanProcessor>(
+  auto processor = std::unique_ptr<sdk::trace::SpanProcessor>(
       new sdk::trace::SimpleSpanProcessor(std::move(exporter)));
-  auto provider =
-      nostd::shared_ptr<trace::TracerProvider>(new sdk::trace::TracerProvider(processor));
+  auto provider = nostd::shared_ptr<trace::TracerProvider>(
+      new sdk::trace::TracerProvider(std::move(processor)));
   auto tracer = provider->GetTracer("test");
 
   EXPECT_CALL(*mock_stub, Export(_, _, _))

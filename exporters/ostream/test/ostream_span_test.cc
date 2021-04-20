@@ -1,3 +1,4 @@
+#include "opentelemetry/common/key_value_iterable_view.h"
 #include "opentelemetry/sdk/trace/recordable.h"
 #include "opentelemetry/sdk/trace/simple_processor.h"
 #include "opentelemetry/sdk/trace/span_data.h"
@@ -8,13 +9,19 @@
 
 #include "opentelemetry/exporters/ostream/span_exporter.h"
 
-#include <iostream>
+#include "ostream_capture.h"
 
 #include <gtest/gtest.h>
+#include <iostream>
+
+using namespace opentelemetry::exporter::ostream::test;
 
 namespace trace    = opentelemetry::trace;
+namespace common   = opentelemetry::common;
 namespace nostd    = opentelemetry::nostd;
 namespace sdktrace = opentelemetry::sdk::trace;
+
+using Attributes = std::initializer_list<std::pair<nostd::string_view, common::AttributeValue>>;
 
 // Testing Shutdown functionality of OStreamSpanExporter, should expect no data to be sent to Stream
 TEST(OStreamSpanExporter, Shutdown)
@@ -27,108 +34,79 @@ TEST(OStreamSpanExporter, Shutdown)
   auto recordable = processor->MakeRecordable();
   recordable->SetName("Test Span");
 
-  // Create stringstream to redirect to
-  std::stringstream stdoutOutput;
+  // Capture the output of cout
+  const auto captured = WithOStreamCapture(std::cout, [&]() {
+    EXPECT_TRUE(processor->Shutdown());
+    processor->OnEnd(std::move(recordable));
+  });
 
-  // Save cout's buffer here
-  std::streambuf *sbuf = std::cout.rdbuf();
-
-  // Redirect cout to our stringstream buffer
-  std::cout.rdbuf(stdoutOutput.rdbuf());
-
-  EXPECT_TRUE(processor->Shutdown());
-  processor->OnEnd(std::move(recordable));
-
-  std::cout.rdbuf(sbuf);
-
-  ASSERT_EQ(stdoutOutput.str(), "");
+  EXPECT_EQ(captured, "");
 }
+
+constexpr const char *kDefaultSpanPrinted =
+    "{\n"
+    "  name          : \n"
+    "  trace_id      : 00000000000000000000000000000000\n"
+    "  span_id       : 0000000000000000\n"
+    "  tracestate    : \n"
+    "  parent_span_id: 0000000000000000\n"
+    "  start         : 0\n"
+    "  duration      : 0\n"
+    "  description   : \n"
+    "  span kind     : Internal\n"
+    "  status        : Unset\n"
+    "  attributes    : \n"
+    "  events        : \n"
+    "  links         : \n"
+    "}\n";
 
 // Testing what a default span that is not changed will print out, either all 0's or empty values
 TEST(OStreamSpanExporter, PrintDefaultSpan)
 {
+  std::stringstream output;
   auto exporter = std::unique_ptr<sdktrace::SpanExporter>(
-      new opentelemetry::exporter::trace::OStreamSpanExporter);
+      new opentelemetry::exporter::trace::OStreamSpanExporter(output));
   auto processor = std::shared_ptr<sdktrace::SpanProcessor>(
       new sdktrace::SimpleSpanProcessor(std::move(exporter)));
 
   auto recordable = processor->MakeRecordable();
-
-  constexpr uint8_t trace_id_buf[] = {1, 2, 3, 4, 5, 6, 7, 8, 1, 2, 3, 4, 5, 6, 7, 8};
-  opentelemetry::trace::TraceId t_id(trace_id_buf);
-  constexpr uint8_t span_id_buf[] = {1, 2, 3, 4, 5, 6, 7, 8};
-  opentelemetry::trace::SpanId s_id(span_id_buf);
-
-  recordable->SetIds(t_id, s_id, s_id);
-
-  // Create stringstream to redirect to
-  std::stringstream stdoutOutput;
-
-  // Save cout's buffer here
-  std::streambuf *sbuf = std::cout.rdbuf();
-
-  // Redirect cout to our stringstream buffer
-  std::cout.rdbuf(stdoutOutput.rdbuf());
 
   processor->OnEnd(std::move(recordable));
 
-  std::cout.rdbuf(sbuf);
-
-  std::string expectedOutput =
-      "{\n"
-      "  name          : \n"
-      "  trace_id      : 01020304050607080102030405060708\n"
-      "  span_id       : 0102030405060708\n"
-      "  parent_span_id: 0102030405060708\n"
-      "  start         : 0\n"
-      "  duration      : 0\n"
-      "  description   : \n"
-      "  span kind     : Internal\n"
-      "  status        : Unset\n"
-      "  attributes    : \n"
-      "}\n";
-  ASSERT_EQ(stdoutOutput.str(), expectedOutput);
+  EXPECT_EQ(output.str(), kDefaultSpanPrinted);
 }
 
-// Testing if the changes we make to a span will carry over through the exporter
-TEST(OStreamSpanExporter, PrintChangedSpanCout)
+TEST(OStreamSpanExporter, PrintSpanWithBasicFields)
 {
+  std::stringstream output;
   auto exporter = std::unique_ptr<sdktrace::SpanExporter>(
-      new opentelemetry::exporter::trace::OStreamSpanExporter);
+      new opentelemetry::exporter::trace::OStreamSpanExporter(output));
   auto processor = std::shared_ptr<sdktrace::SpanProcessor>(
       new sdktrace::SimpleSpanProcessor(std::move(exporter)));
 
   auto recordable = processor->MakeRecordable();
 
+  constexpr uint8_t trace_id_buf[]       = {1, 2, 3, 4, 5, 6, 7, 8, 1, 2, 3, 4, 5, 6, 7, 8};
+  constexpr uint8_t span_id_buf[]        = {1, 2, 3, 4, 5, 6, 7, 8};
+  constexpr uint8_t parent_span_id_buf[] = {8, 7, 6, 5, 4, 3, 2, 1};
+  opentelemetry::trace::TraceId trace_id{trace_id_buf};
+  opentelemetry::trace::SpanId span_id{span_id_buf};
+  opentelemetry::trace::SpanId parent_span_id{parent_span_id_buf};
+  const auto trace_state = opentelemetry::trace::TraceState::GetDefault()->Set("state1", "value");
+  const opentelemetry::trace::SpanContext span_context{
+      trace_id, span_id,
+      opentelemetry::trace::TraceFlags{opentelemetry::trace::TraceFlags::kIsSampled}, true,
+      trace_state};
+
+  recordable->SetIdentity(span_context, parent_span_id);
   recordable->SetName("Test Span");
   opentelemetry::core::SystemTimestamp now(std::chrono::system_clock::now());
-
-  constexpr uint8_t trace_id_buf[] = {1, 2, 3, 4, 5, 6, 7, 8, 1, 2, 3, 4, 5, 6, 7, 8};
-  opentelemetry::trace::TraceId t_id(trace_id_buf);
-  constexpr uint8_t span_id_buf[] = {1, 2, 3, 4, 5, 6, 7, 8};
-  opentelemetry::trace::SpanId s_id(span_id_buf);
-
-  recordable->SetIds(t_id, s_id, s_id);
-
   recordable->SetStartTime(now);
   recordable->SetDuration(std::chrono::nanoseconds(100));
   recordable->SetStatus(opentelemetry::trace::StatusCode::kOk, "Test Description");
   recordable->SetSpanKind(opentelemetry::trace::SpanKind::kClient);
 
-  recordable->SetAttribute("attr1", "string");
-
-  // Create stringstream to redirect to
-  std::stringstream stdoutOutput;
-
-  // Save cout's buffer here
-  std::streambuf *sbuf = std::cout.rdbuf();
-
-  // Redirect cout to our stringstream buffer
-  std::cout.rdbuf(stdoutOutput.rdbuf());
-
   processor->OnEnd(std::move(recordable));
-
-  std::cout.rdbuf(sbuf);
 
   std::string start = std::to_string(now.time_since_epoch().count());
 
@@ -137,7 +115,8 @@ TEST(OStreamSpanExporter, PrintChangedSpanCout)
       "  name          : Test Span\n"
       "  trace_id      : 01020304050607080102030405060708\n"
       "  span_id       : 0102030405060708\n"
-      "  parent_span_id: 0102030405060708\n"
+      "  tracestate    : state1=value\n"
+      "  parent_span_id: 0807060504030201\n"
       "  start         : " +
       start +
       "\n"
@@ -146,13 +125,226 @@ TEST(OStreamSpanExporter, PrintChangedSpanCout)
       "  span kind     : Client\n"
       "  status        : Ok\n"
       "  attributes    : \n"
-      "\tattr1: string\n"
+      "  events        : \n"
+      "  links         : \n"
       "}\n";
-  ASSERT_EQ(stdoutOutput.str(), expectedOutput);
+  EXPECT_EQ(output.str(), expectedOutput);
 }
 
-// PrintChangedSpan to std::cerr
-TEST(OStreamSpanExporter, PrintChangedSpanCerr)
+TEST(OStreamSpanExporter, PrintSpanWithAttribute)
+{
+  std::stringstream output;
+  auto exporter = std::unique_ptr<sdktrace::SpanExporter>(
+      new opentelemetry::exporter::trace::OStreamSpanExporter(output));
+  auto processor = std::shared_ptr<sdktrace::SpanProcessor>(
+      new sdktrace::SimpleSpanProcessor(std::move(exporter)));
+
+  auto recordable = processor->MakeRecordable();
+
+  recordable->SetAttribute("attr1", "string");
+
+  processor->OnEnd(std::move(recordable));
+
+  std::string expectedOutput =
+      "{\n"
+      "  name          : \n"
+      "  trace_id      : 00000000000000000000000000000000\n"
+      "  span_id       : 0000000000000000\n"
+      "  tracestate    : \n"
+      "  parent_span_id: 0000000000000000\n"
+      "  start         : 0\n"
+      "  duration      : 0\n"
+      "  description   : \n"
+      "  span kind     : Internal\n"
+      "  status        : Unset\n"
+      "  attributes    : \n"
+      "\tattr1: string\n"
+      "  events        : \n"
+      "  links         : \n"
+      "}\n";
+  EXPECT_EQ(output.str(), expectedOutput);
+}
+
+TEST(OStreamSpanExporter, PrintSpanWithArrayAttribute)
+{
+  std::stringstream output;
+  auto exporter = std::unique_ptr<sdktrace::SpanExporter>(
+      new opentelemetry::exporter::trace::OStreamSpanExporter(output));
+  auto processor = std::shared_ptr<sdktrace::SpanProcessor>(
+      new sdktrace::SimpleSpanProcessor(std::move(exporter)));
+
+  auto recordable = processor->MakeRecordable();
+
+  std::array<int, 3> array1 = {1, 2, 3};
+  opentelemetry::nostd::span<int> span1{array1.data(), array1.size()};
+  recordable->SetAttribute("array1", span1);
+
+  processor->OnEnd(std::move(recordable));
+
+  std::string expectedOutput =
+      "{\n"
+      "  name          : \n"
+      "  trace_id      : 00000000000000000000000000000000\n"
+      "  span_id       : 0000000000000000\n"
+      "  tracestate    : \n"
+      "  parent_span_id: 0000000000000000\n"
+      "  start         : 0\n"
+      "  duration      : 0\n"
+      "  description   : \n"
+      "  span kind     : Internal\n"
+      "  status        : Unset\n"
+      "  attributes    : \n"
+      "\tarray1: [1,2,3]\n"
+      "  events        : \n"
+      "  links         : \n"
+      "}\n";
+  EXPECT_EQ(output.str(), expectedOutput);
+}
+
+TEST(OStreamSpanExporter, PrintSpanWithEvents)
+{
+  std::stringstream output;
+  auto exporter = std::unique_ptr<sdktrace::SpanExporter>(
+      new opentelemetry::exporter::trace::OStreamSpanExporter(output));
+  auto processor = std::shared_ptr<sdktrace::SpanProcessor>(
+      new sdktrace::SimpleSpanProcessor(std::move(exporter)));
+
+  auto recordable = processor->MakeRecordable();
+  opentelemetry::core::SystemTimestamp now(std::chrono::system_clock::now());
+  opentelemetry::core::SystemTimestamp next(std::chrono::system_clock::now() +
+                                            std::chrono::seconds(1));
+
+  std::string now_str  = std::to_string(now.time_since_epoch().count());
+  std::string next_str = std::to_string(next.time_since_epoch().count());
+
+  recordable->AddEvent("hello", now);
+  recordable->AddEvent("world", next,
+                       common::KeyValueIterableView<Attributes>({{"attr1", "string"}}));
+
+  processor->OnEnd(std::move(recordable));
+
+  std::string expectedOutput =
+      "{\n"
+      "  name          : \n"
+      "  trace_id      : 00000000000000000000000000000000\n"
+      "  span_id       : 0000000000000000\n"
+      "  tracestate    : \n"
+      "  parent_span_id: 0000000000000000\n"
+      "  start         : 0\n"
+      "  duration      : 0\n"
+      "  description   : \n"
+      "  span kind     : Internal\n"
+      "  status        : Unset\n"
+      "  attributes    : \n"
+      "  events        : \n"
+      "\t{\n"
+      "\t  name          : hello\n"
+      "\t  timestamp     : " +
+      now_str +
+      "\n"
+      "\t  attributes    : \n"
+      "\t}\n"
+      "\t{\n"
+      "\t  name          : world\n"
+      "\t  timestamp     : " +
+      next_str +
+      "\n"
+      "\t  attributes    : \n"
+      "\t\tattr1: string\n"
+      "\t}\n"
+      "  links         : \n"
+      "}\n";
+  EXPECT_EQ(output.str(), expectedOutput);
+}
+
+TEST(OStreamSpanExporter, PrintSpanWithLinks)
+{
+  std::stringstream output;
+  auto exporter = std::unique_ptr<sdktrace::SpanExporter>(
+      new opentelemetry::exporter::trace::OStreamSpanExporter(output));
+  auto processor = std::shared_ptr<sdktrace::SpanProcessor>(
+      new sdktrace::SimpleSpanProcessor(std::move(exporter)));
+
+  auto recordable = processor->MakeRecordable();
+
+  // produce valid SpanContext with pseudo span and trace Id.
+  uint8_t span_id_buf[opentelemetry::trace::SpanId::kSize] = {
+      1,
+  };
+  opentelemetry::trace::SpanId span_id{span_id_buf};
+  uint8_t trace_id_buf[opentelemetry::trace::TraceId::kSize] = {
+      2,
+  };
+  opentelemetry::trace::TraceId trace_id{trace_id_buf};
+  const auto span_context = opentelemetry::trace::SpanContext(
+      trace_id, span_id,
+      opentelemetry::trace::TraceFlags{opentelemetry::trace::TraceFlags::kIsSampled}, true);
+
+  // and another to check preserving order.
+  uint8_t span_id_buf2[opentelemetry::trace::SpanId::kSize] = {
+      3,
+  };
+  opentelemetry::trace::SpanId span_id2{span_id_buf2};
+  const auto span_context2 = opentelemetry::trace::SpanContext(
+      trace_id, span_id2,
+      opentelemetry::trace::TraceFlags{opentelemetry::trace::TraceFlags::kIsSampled}, true,
+      opentelemetry::trace::TraceState::FromHeader("state1=value"));
+
+  recordable->AddLink(span_context);
+  recordable->AddLink(span_context2,
+                      common::KeyValueIterableView<Attributes>({{"attr1", "string"}}));
+
+  processor->OnEnd(std::move(recordable));
+
+  std::string expectedOutput =
+      "{\n"
+      "  name          : \n"
+      "  trace_id      : 00000000000000000000000000000000\n"
+      "  span_id       : 0000000000000000\n"
+      "  tracestate    : \n"
+      "  parent_span_id: 0000000000000000\n"
+      "  start         : 0\n"
+      "  duration      : 0\n"
+      "  description   : \n"
+      "  span kind     : Internal\n"
+      "  status        : Unset\n"
+      "  attributes    : \n"
+      "  events        : \n"
+      "  links         : \n"
+      "\t{\n"
+      "\t  trace_id      : 02000000000000000000000000000000\n"
+      "\t  span_id       : 0100000000000000\n"
+      "\t  tracestate    : \n"
+      "\t  attributes    : \n"
+      "\t}\n"
+      "\t{\n"
+      "\t  trace_id      : 02000000000000000000000000000000\n"
+      "\t  span_id       : 0300000000000000\n"
+      "\t  tracestate    : state1=value\n"
+      "\t  attributes    : \n"
+      "\t\tattr1: string\n"
+      "\t}\n"
+      "}\n";
+  EXPECT_EQ(output.str(), expectedOutput);
+}
+
+// Test with the three common ostreams, tests are more of a sanity check and usage examples.
+TEST(OStreamSpanExporter, PrintSpanToCout)
+{
+  auto exporter = std::unique_ptr<sdktrace::SpanExporter>(
+      new opentelemetry::exporter::trace::OStreamSpanExporter);
+  auto processor = std::shared_ptr<sdktrace::SpanProcessor>(
+      new sdktrace::SimpleSpanProcessor(std::move(exporter)));
+
+  auto recordable = processor->MakeRecordable();
+
+  const auto captured =
+      WithOStreamCapture(std::cout, [&]() { processor->OnEnd(std::move(recordable)); });
+
+  EXPECT_EQ(captured, kDefaultSpanPrinted);
+}
+
+TEST(OStreamSpanExporter, PrintSpanToCerr)
 {
   auto exporter = std::unique_ptr<sdktrace::SpanExporter>(
       new opentelemetry::exporter::trace::OStreamSpanExporter(std::cerr));
@@ -161,62 +353,13 @@ TEST(OStreamSpanExporter, PrintChangedSpanCerr)
 
   auto recordable = processor->MakeRecordable();
 
-  recordable->SetName("Test Span");
+  const auto captured =
+      WithOStreamCapture(std::cerr, [&]() { processor->OnEnd(std::move(recordable)); });
 
-  constexpr uint8_t trace_id_buf[] = {1, 2, 3, 4, 5, 6, 7, 8, 1, 2, 3, 4, 5, 6, 7, 8};
-  opentelemetry::trace::TraceId t_id(trace_id_buf);
-  constexpr uint8_t span_id_buf[] = {1, 2, 3, 4, 5, 6, 7, 8};
-  opentelemetry::trace::SpanId s_id(span_id_buf);
-
-  recordable->SetIds(t_id, s_id, s_id);
-
-  opentelemetry::core::SystemTimestamp now(std::chrono::system_clock::now());
-
-  recordable->SetStartTime(now);
-  recordable->SetDuration(std::chrono::nanoseconds(100));
-  recordable->SetStatus(opentelemetry::trace::StatusCode::kOk, "Test Description");
-  recordable->SetSpanKind(opentelemetry::trace::SpanKind::kConsumer);
-
-  std::array<bool, 3> array2 = {false, true, false};
-  opentelemetry::nostd::span<bool> span2{array2.data(), array2.size()};
-  recordable->SetAttribute("attr1", span2);
-
-  // Create stringstream to redirect to
-  std::stringstream stdcerrOutput;
-
-  // Save cout's buffer here
-  std::streambuf *sbuf = std::cerr.rdbuf();
-
-  // Redirect cout to our stringstream buffer
-  std::cerr.rdbuf(stdcerrOutput.rdbuf());
-
-  processor->OnEnd(std::move(recordable));
-
-  std::cerr.rdbuf(sbuf);
-
-  std::string start = std::to_string(now.time_since_epoch().count());
-
-  std::string expectedOutput =
-      "{\n"
-      "  name          : Test Span\n"
-      "  trace_id      : 01020304050607080102030405060708\n"
-      "  span_id       : 0102030405060708\n"
-      "  parent_span_id: 0102030405060708\n"
-      "  start         : " +
-      start +
-      "\n"
-      "  duration      : 100\n"
-      "  description   : Test Description\n"
-      "  span kind     : Consumer\n"
-      "  status        : Ok\n"
-      "  attributes    : \n"
-      "\tattr1: [0,1,0]\n"
-      "}\n";
-  ASSERT_EQ(stdcerrOutput.str(), expectedOutput);
+  EXPECT_EQ(captured, kDefaultSpanPrinted);
 }
 
-// PrintChangedSpan to std::clog
-TEST(OStreamSpanExporter, PrintChangedSpanClog)
+TEST(OStreamSpanExporter, PrintSpanToClog)
 {
   auto exporter = std::unique_ptr<sdktrace::SpanExporter>(
       new opentelemetry::exporter::trace::OStreamSpanExporter(std::clog));
@@ -225,55 +368,8 @@ TEST(OStreamSpanExporter, PrintChangedSpanClog)
 
   auto recordable = processor->MakeRecordable();
 
-  recordable->SetName("Test Span");
+  const auto captured =
+      WithOStreamCapture(std::clog, [&]() { processor->OnEnd(std::move(recordable)); });
 
-  constexpr uint8_t trace_id_buf[] = {1, 2, 3, 4, 5, 6, 7, 8, 1, 2, 3, 4, 5, 6, 7, 8};
-  opentelemetry::trace::TraceId t_id(trace_id_buf);
-  constexpr uint8_t span_id_buf[] = {1, 2, 3, 4, 5, 6, 7, 8};
-  opentelemetry::trace::SpanId s_id(span_id_buf);
-
-  recordable->SetIds(t_id, s_id, s_id);
-  opentelemetry::core::SystemTimestamp now(std::chrono::system_clock::now());
-
-  recordable->SetStartTime(now);
-  recordable->SetDuration(std::chrono::nanoseconds(100));
-  recordable->SetStatus(opentelemetry::trace::StatusCode::kOk, "Test Description");
-  recordable->SetSpanKind(opentelemetry::trace::SpanKind::kInternal);
-
-  std::array<int, 3> array1 = {1, 2, 3};
-  opentelemetry::nostd::span<int> span1{array1.data(), array1.size()};
-  recordable->SetAttribute("attr1", span1);
-
-  // Create stringstream to redirect to
-  std::stringstream stdclogOutput;
-
-  // Save cout's buffer here
-  std::streambuf *sbuf = std::clog.rdbuf();
-
-  // Redirect cout to our stringstream buffer
-  std::clog.rdbuf(stdclogOutput.rdbuf());
-
-  processor->OnEnd(std::move(recordable));
-
-  std::clog.rdbuf(sbuf);
-
-  std::string start = std::to_string(now.time_since_epoch().count());
-
-  std::string expectedOutput =
-      "{\n"
-      "  name          : Test Span\n"
-      "  trace_id      : 01020304050607080102030405060708\n"
-      "  span_id       : 0102030405060708\n"
-      "  parent_span_id: 0102030405060708\n"
-      "  start         : " +
-      start +
-      "\n"
-      "  duration      : 100\n"
-      "  description   : Test Description\n"
-      "  span kind     : Internal\n"
-      "  status        : Ok\n"
-      "  attributes    : \n"
-      "\tattr1: [1,2,3]\n"
-      "}\n";
-  ASSERT_EQ(stdclogOutput.str(), expectedOutput);
+  EXPECT_EQ(captured, kDefaultSpanPrinted);
 }

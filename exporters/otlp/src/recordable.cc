@@ -17,14 +17,16 @@ const int kAttributeValueSize = 15;
 const int kAttributeValueSize = 14;
 #endif
 
-void Recordable::SetIds(trace::TraceId trace_id,
-                        trace::SpanId span_id,
-                        trace::SpanId parent_span_id) noexcept
+void Recordable::SetIdentity(const opentelemetry::trace::SpanContext &span_context,
+                             opentelemetry::trace::SpanId parent_span_id) noexcept
 {
-  span_.set_trace_id(reinterpret_cast<const char *>(trace_id.Id().data()), trace::TraceId::kSize);
-  span_.set_span_id(reinterpret_cast<const char *>(span_id.Id().data()), trace::SpanId::kSize);
+  span_.set_trace_id(reinterpret_cast<const char *>(span_context.trace_id().Id().data()),
+                     trace::TraceId::kSize);
+  span_.set_span_id(reinterpret_cast<const char *>(span_context.span_id().Id().data()),
+                    trace::SpanId::kSize);
   span_.set_parent_span_id(reinterpret_cast<const char *>(parent_span_id.Id().data()),
                            trace::SpanId::kSize);
+  span_.set_trace_state(span_context.trace_state()->ToHeader());
 }
 
 void PopulateAttribute(opentelemetry::proto::common::v1::KeyValue *attribute,

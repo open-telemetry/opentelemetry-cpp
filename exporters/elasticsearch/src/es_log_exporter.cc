@@ -136,7 +136,7 @@ std::unique_ptr<sdklogs::Recordable> ElasticsearchLogExporter::MakeRecordable() 
   return std::unique_ptr<sdklogs::Recordable>(new ElasticSearchRecordable);
 }
 
-sdklogs::ExportResult ElasticsearchLogExporter::Export(
+sdk::common::ExportResult ElasticsearchLogExporter::Export(
     const nostd::span<std::unique_ptr<sdklogs::Recordable>> &records) noexcept
 {
   // Return failure if this exporter has been shutdown
@@ -147,7 +147,7 @@ sdklogs::ExportResult ElasticsearchLogExporter::Export(
       std::cout << "Export failed, exporter is shutdown" << std::endl;
     }
 
-    return sdklogs::ExportResult::kFailure;
+    return sdk::common::ExportResult::kFailure;
   }
 
   // Create a connection to the ElasticSearch instance
@@ -195,7 +195,7 @@ sdklogs::ExportResult ElasticsearchLogExporter::Export(
   if (!write_successful)
   {
     // TODO: retry logic
-    return sdklogs::ExportResult::kFailure;
+    return sdk::common::ExportResult::kFailure;
   }
 
   // Parse the response output to determine if Elasticsearch consumed it correctly
@@ -209,10 +209,10 @@ sdklogs::ExportResult ElasticsearchLogExporter::Export(
     }
 
     // TODO: Retry logic
-    return sdklogs::ExportResult::kFailure;
+    return sdk::common::ExportResult::kFailure;
   }
 
-  return sdklogs::ExportResult::kSuccess;
+  return sdk::common::ExportResult::kSuccess;
 }
 
 bool ElasticsearchLogExporter::Shutdown(std::chrono::microseconds timeout) noexcept

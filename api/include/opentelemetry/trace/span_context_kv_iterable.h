@@ -39,7 +39,7 @@ class NullSpanContext : public SpanContextKeyValueIterable
 public:
   bool ForEachKeyValue(
       nostd::function_ref<bool(SpanContext, const opentelemetry::common::KeyValueIterable &)>
-          callback) const noexcept override
+      /* callback */) const noexcept override
   {
     return true;
   }

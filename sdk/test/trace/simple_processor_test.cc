@@ -7,6 +7,7 @@
 #include <gtest/gtest.h>
 
 using namespace opentelemetry::sdk::trace;
+using namespace opentelemetry::sdk::common;
 using opentelemetry::exporter::memory::InMemorySpanData;
 using opentelemetry::exporter::memory::InMemorySpanExporter;
 using opentelemetry::trace::SpanContext;
