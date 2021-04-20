@@ -203,7 +203,7 @@ public:
 private:
   static bool IsPrintableString(nostd::string_view str)
   {
-    for (const auto &ch : str)
+    for (const auto ch : str)
     {
       if (ch < ' ' || ch > '~')
       {
