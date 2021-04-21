@@ -192,7 +192,7 @@ public:
 
   void AddEvent(
       nostd::string_view name,
-      common::SystemTimestamp timestamp = common::SystemTimestamp(std::chrono::system_clock::now()),
+      opentelemetry::common::SystemTimestamp timestamp = opentelemetry::common::SystemTimestamp(std::chrono::system_clock::now()),
       const opentelemetry::common::KeyValueIterable &attributes =
           opentelemetry::common::KeyValueIterableView<std::map<std::string, int>>(
               {})) noexcept override
@@ -235,7 +235,7 @@ public:
 private:
   opentelemetry::trace::SpanContext span_context_{false, false};
   opentelemetry::trace::SpanId parent_span_id_;
-  common::SystemTimestamp start_time_;
+  opentelemetry::common::SystemTimestamp start_time_;
   std::chrono::nanoseconds duration_{0};
   std::string name_;
   opentelemetry::trace::StatusCode status_code_{opentelemetry::trace::StatusCode::kUnset};
