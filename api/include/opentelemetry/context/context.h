@@ -140,7 +140,7 @@ private:
       next_  = nostd::shared_ptr<DataList>{nullptr};
     }
 
-    DataList &operator=(DataList &&other)
+    DataList &operator=(DataList &&other) noexcept
     {
       key_length_ = other.key_length_;
       value_      = std::move(other.value_);
