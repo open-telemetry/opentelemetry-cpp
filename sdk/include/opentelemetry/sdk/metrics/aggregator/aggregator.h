@@ -2,7 +2,7 @@
 
 #include <mutex>
 #include <vector>
-#include "opentelemetry/core/timestamp.h"
+#include "opentelemetry/common/timestamp.h"
 #include "opentelemetry/metrics/instrument.h"
 #include "opentelemetry/version.h"
 
@@ -124,7 +124,7 @@ public:
   virtual size_t get_max_buckets() { return 0; }
 
   // virtual function to be overridden for Gauge Aggregator
-  virtual core::SystemTimestamp get_checkpoint_timestamp() { return core::SystemTimestamp(); }
+  virtual common::SystemTimestamp get_checkpoint_timestamp() { return common::SystemTimestamp(); }
 
   // Custom copy constructor to handle the mutex
   Aggregator(const Aggregator &cp)

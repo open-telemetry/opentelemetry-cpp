@@ -160,7 +160,7 @@ std::string GetName(T &t)
  * @return              Span Start timestamp
  */
 template <class T>
-core::SystemTimestamp GetStartTime(T &t)
+common::SystemTimestamp GetStartTime(T &t)
 {
   return t.GetStartTime();
 }
@@ -172,7 +172,7 @@ core::SystemTimestamp GetStartTime(T &t)
  * @return             Span Stop timestamp
  */
 template <class T>
-core::SystemTimestamp GetEndTime(T &t)
+common::SystemTimestamp GetEndTime(T &t)
 {
   return t.GetEndTime();
 }
@@ -625,7 +625,7 @@ public:
    */
   void AddEvent(trace::Span &span,
                 nostd::string_view name,
-                core::SystemTimestamp timestamp,
+                common::SystemTimestamp timestamp,
                 const common::KeyValueIterable &attributes) noexcept
   {
 #ifdef RTTI_ENABLED
@@ -652,7 +652,7 @@ public:
    */
   void AddEvent(trace::Span &span,
                 nostd::string_view name,
-                core::SystemTimestamp timestamp,
+                common::SystemTimestamp timestamp,
                 Properties &evt) noexcept
   {
     // TODO: respect originating timestamp. Do we need to reserve
@@ -700,7 +700,7 @@ public:
    */
   void AddEvent(trace::Span &span,
                 nostd::string_view name,
-                core::SystemTimestamp timestamp) noexcept
+                common::SystemTimestamp timestamp) noexcept
   {
     AddEvent(span, name, timestamp, sdk::GetEmptyAttributes());
   };
@@ -734,8 +734,8 @@ protected:
    */
   Properties attributes_;
 
-  core::SystemTimestamp start_time_;
-  core::SystemTimestamp end_time_;
+  common::SystemTimestamp start_time_;
+  common::SystemTimestamp end_time_;
 
   /**
    * @brief Owner Tracer of this Span
@@ -796,13 +796,13 @@ public:
    * @brief Get start time of this Span.
    * @return
    */
-  core::SystemTimestamp GetStartTime() { return start_time_; }
+  common::SystemTimestamp GetStartTime() { return start_time_; }
 
   /**
    * @brief Get end time of this Span.
    * @return
    */
-  core::SystemTimestamp GetEndTime() { return end_time_; }
+  common::SystemTimestamp GetEndTime() { return end_time_; }
 
   /**
    * @brief Get Span Name.
@@ -850,7 +850,7 @@ public:
    * @param timestamp
    * @return
    */
-  void AddEvent(nostd::string_view name, core::SystemTimestamp timestamp) noexcept override
+  void AddEvent(nostd::string_view name, common::SystemTimestamp timestamp) noexcept override
   {
     owner_.AddEvent(*this, name, timestamp);
   }
@@ -863,7 +863,7 @@ public:
    * @return
    */
   void AddEvent(nostd::string_view name,
-                core::SystemTimestamp timestamp,
+                common::SystemTimestamp timestamp,
                 const common::KeyValueIterable &attributes) noexcept override
   {
     owner_.AddEvent(*this, name, timestamp, attributes);

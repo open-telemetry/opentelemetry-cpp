@@ -100,7 +100,7 @@ TEST(OStreamSpanExporter, PrintSpanWithBasicFields)
 
   recordable->SetIdentity(span_context, parent_span_id);
   recordable->SetName("Test Span");
-  opentelemetry::core::SystemTimestamp now(std::chrono::system_clock::now());
+  opentelemetry::common::SystemTimestamp now(std::chrono::system_clock::now());
   recordable->SetStartTime(now);
   recordable->SetDuration(std::chrono::nanoseconds(100));
   recordable->SetStatus(opentelemetry::trace::StatusCode::kOk, "Test Description");
@@ -210,8 +210,8 @@ TEST(OStreamSpanExporter, PrintSpanWithEvents)
       new sdktrace::SimpleSpanProcessor(std::move(exporter)));
 
   auto recordable = processor->MakeRecordable();
-  opentelemetry::core::SystemTimestamp now(std::chrono::system_clock::now());
-  opentelemetry::core::SystemTimestamp next(std::chrono::system_clock::now() +
+  opentelemetry::common::SystemTimestamp now(std::chrono::system_clock::now());
+  opentelemetry::common::SystemTimestamp next(std::chrono::system_clock::now() +
                                             std::chrono::seconds(1));
 
   std::string now_str  = std::to_string(now.time_since_epoch().count());

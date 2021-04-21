@@ -47,7 +47,7 @@ private:
   opentelemetry::trace::TraceId trace_id_;
   opentelemetry::trace::SpanId span_id_;
   opentelemetry::trace::TraceFlags trace_flags_;
-  core::SystemTimestamp timestamp_;  // uint64 nanoseconds since Unix epoch
+  common::SystemTimestamp timestamp_;  // uint64 nanoseconds since Unix epoch
 
 public:
   /********** Setters for each field (overrides methods from the Recordable interface) ************/
@@ -127,7 +127,7 @@ public:
    * Set the timestamp for this log.
    * @param timestamp the timestamp of the event
    */
-  void SetTimestamp(core::SystemTimestamp timestamp) noexcept override { timestamp_ = timestamp; }
+  void SetTimestamp(common::SystemTimestamp timestamp) noexcept override { timestamp_ = timestamp; }
 
   /************************** Getters for each field ****************************/
 
@@ -189,7 +189,7 @@ public:
    * Get the timestamp for this log
    * @return the timestamp for this log
    */
-  core::SystemTimestamp GetTimestamp() const noexcept { return timestamp_; }
+  common::SystemTimestamp GetTimestamp() const noexcept { return timestamp_; }
 };
 }  // namespace logs
 }  // namespace sdk

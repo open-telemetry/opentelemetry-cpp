@@ -2,7 +2,7 @@
 
 #include "opentelemetry/common/attribute_value.h"
 #include "opentelemetry/common/key_value_iterable.h"
-#include "opentelemetry/core/timestamp.h"
+#include "opentelemetry/common/timestamp.h"
 #include "opentelemetry/logs/severity.h"
 #include "opentelemetry/trace/span.h"
 #include "opentelemetry/trace/span_context.h"
@@ -32,7 +32,7 @@ public:
    * Set the timestamp for this log.
    * @param timestamp the timestamp to set
    */
-  virtual void SetTimestamp(core::SystemTimestamp timestamp) noexcept = 0;
+  virtual void SetTimestamp(common::SystemTimestamp timestamp) noexcept = 0;
 
   /**
    * Set the severity for this log.

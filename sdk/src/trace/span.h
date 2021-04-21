@@ -33,10 +33,10 @@ public:
 
   void AddEvent(nostd::string_view name) noexcept override;
 
-  void AddEvent(nostd::string_view name, core::SystemTimestamp timestamp) noexcept override;
+  void AddEvent(nostd::string_view name, common::SystemTimestamp timestamp) noexcept override;
 
   void AddEvent(nostd::string_view name,
-                core::SystemTimestamp timestamp,
+                common::SystemTimestamp timestamp,
                 const opentelemetry::common::KeyValueIterable &attributes) noexcept override;
 
   void SetStatus(trace_api::StatusCode code, nostd::string_view description) noexcept override;
@@ -53,7 +53,7 @@ private:
   std::shared_ptr<Tracer> tracer_;
   mutable std::mutex mu_;
   std::unique_ptr<Recordable> recordable_;
-  opentelemetry::core::SteadyTimestamp start_steady_time;
+  opentelemetry::common::SteadyTimestamp start_steady_time;
   std::unique_ptr<trace_api::SpanContext> span_context_;
   bool has_ended_;
 };

@@ -67,7 +67,7 @@ public:
            trace::TraceId trace_id,
            trace::SpanId span_id,
            trace::TraceFlags trace_flags,
-           core::SystemTimestamp timestamp) noexcept override;
+           common::SystemTimestamp timestamp) noexcept override;
 
 private:
   // The name of this logger
