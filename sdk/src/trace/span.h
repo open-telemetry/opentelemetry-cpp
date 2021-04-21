@@ -33,7 +33,8 @@ public:
 
   void AddEvent(nostd::string_view name) noexcept override;
 
-  void AddEvent(nostd::string_view name, opentelemetry::common::SystemTimestamp timestamp) noexcept override;
+  void AddEvent(nostd::string_view name,
+                opentelemetry::common::SystemTimestamp timestamp) noexcept override;
 
   void AddEvent(nostd::string_view name,
                 opentelemetry::common::SystemTimestamp timestamp,

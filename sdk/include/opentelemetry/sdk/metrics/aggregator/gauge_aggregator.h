@@ -82,7 +82,7 @@ public:
     // Reset the values to default
     this->values_[0]      = 0;
     checkpoint_timestamp_ = current_timestamp_;
-    current_timestamp_    = opentelemetry::common::SystemTimestamp(std::chrono::system_clock::now());
+    current_timestamp_ = opentelemetry::common::SystemTimestamp(std::chrono::system_clock::now());
 
     this->mu_.unlock();
   }
@@ -101,7 +101,7 @@ public:
       this->values_[0] = other.values_[0];
       // Now merge checkpoints
       this->checkpoint_[0] = other.checkpoint_[0];
-      current_timestamp_   = opentelemetry::common::SystemTimestamp(std::chrono::system_clock::now());
+      current_timestamp_ = opentelemetry::common::SystemTimestamp(std::chrono::system_clock::now());
       this->mu_.unlock();
     }
     else
@@ -119,7 +119,10 @@ public:
   /**
    * @return the latest checkpointed timestamp
    */
-  opentelemetry::common::SystemTimestamp get_checkpoint_timestamp() override { return checkpoint_timestamp_; }
+  opentelemetry::common::SystemTimestamp get_checkpoint_timestamp() override
+  {
+    return checkpoint_timestamp_;
+  }
 
   /**
    * @return the values_ vector stored in this aggregator

@@ -127,7 +127,10 @@ public:
    * Set the timestamp for this log.
    * @param timestamp the timestamp of the event
    */
-  void SetTimestamp(opentelemetry::common::SystemTimestamp timestamp) noexcept override { timestamp_ = timestamp; }
+  void SetTimestamp(opentelemetry::common::SystemTimestamp timestamp) noexcept override
+  {
+    timestamp_ = timestamp;
+  }
 
   /************************** Getters for each field ****************************/
 
