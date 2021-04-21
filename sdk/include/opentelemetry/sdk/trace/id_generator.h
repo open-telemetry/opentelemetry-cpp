@@ -13,40 +13,30 @@
 // limitations under the License.
 
 #pragma once
-
-#include "opentelemetry/nostd/string_view.h"
+#include "opentelemetry/trace/span_id.h"
+#include "opentelemetry/trace/trace_id.h"
+#include "opentelemetry/version.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
-namespace common
+namespace sdk
+{
+namespace trace
 {
 
-class StringUtil
+/** IdGenerator provides an interface for generating Trace Id and Span Id */
+class IdGenerator
 {
+
 public:
-  static nostd::string_view Trim(nostd::string_view str, size_t left, size_t right)
-  {
-    while (str[static_cast<std::size_t>(left)] == ' ' && left <= right)
-    {
-      left++;
-    }
-    while (str[static_cast<std::size_t>(right)] == ' ' && left <= right)
-    {
-      right--;
-    }
-    return str.substr(left, 1 + right - left);
-  }
+  virtual ~IdGenerator() = default;
 
-  static nostd::string_view Trim(nostd::string_view str)
-  {
-    if (str.empty())
-    {
-      return str;
-    }
+  /** Returns a SpanId represented by opaque 128-bit trace identifier */
+  virtual opentelemetry::trace::SpanId GenerateSpanId() noexcept = 0;
 
-    return Trim(str, 0, str.size() - 1);
-  }
+  /** Returns a TraceId represented by opaque 64-bit trace identifier */
+  virtual opentelemetry::trace::TraceId GenerateTraceId() noexcept = 0;
 };
+}  // namespace trace
 
-}  // namespace common
-
+}  // namespace sdk
 OPENTELEMETRY_END_NAMESPACE

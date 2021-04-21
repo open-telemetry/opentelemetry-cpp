@@ -9,8 +9,12 @@ namespace trace
 
 TracerContext::TracerContext(std::unique_ptr<SpanProcessor> processor,
                              opentelemetry::sdk::resource::Resource resource,
-                             std::unique_ptr<Sampler> sampler) noexcept
-    : processor_(std::move(processor)), resource_(resource), sampler_(std::move(sampler))
+                             std::unique_ptr<Sampler> sampler,
+                             std::unique_ptr<IdGenerator> id_generator) noexcept
+    : processor_(std::move(processor)),
+      resource_(resource),
+      sampler_(std::move(sampler)),
+      id_generator_(std::move(id_generator))
 {}
 
 Sampler &TracerContext::GetSampler() const noexcept
@@ -21,6 +25,11 @@ Sampler &TracerContext::GetSampler() const noexcept
 const opentelemetry::sdk::resource::Resource &TracerContext::GetResource() const noexcept
 {
   return resource_;
+}
+
+opentelemetry::sdk::trace::IdGenerator &TracerContext::GetIdGenerator() const noexcept
+{
+  return *id_generator_;
 }
 
 void TracerContext::RegisterPipeline(std::unique_ptr<SpanProcessor> processor) noexcept
