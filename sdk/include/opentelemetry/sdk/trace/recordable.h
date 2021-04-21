@@ -54,7 +54,7 @@ public:
    * @param attributes the attributes associated with the event
    */
   virtual void AddEvent(nostd::string_view name,
-                        common::SystemTimestamp timestamp,
+                        opentelemetry::common::SystemTimestamp timestamp,
                         const opentelemetry::common::KeyValueIterable &attributes) noexcept = 0;
 
   /**
@@ -63,7 +63,7 @@ public:
    */
   void AddEvent(nostd::string_view name)
   {
-    AddEvent(name, common::SystemTimestamp(std::chrono::system_clock::now()),
+    AddEvent(name, opentelemetry::common::SystemTimestamp(std::chrono::system_clock::now()),
              opentelemetry::sdk::GetEmptyAttributes());
   }
 
@@ -72,7 +72,7 @@ public:
    * @param name the name of the event
    * @param timestamp the timestamp of the event
    */
-  void AddEvent(nostd::string_view name, common::SystemTimestamp timestamp)
+  void AddEvent(nostd::string_view name, opentelemetry::common::SystemTimestamp timestamp)
   {
     AddEvent(name, timestamp, opentelemetry::sdk::GetEmptyAttributes());
   }

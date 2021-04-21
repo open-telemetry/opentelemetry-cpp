@@ -33,10 +33,10 @@ public:
 
   void AddEvent(nostd::string_view name) noexcept override;
 
-  void AddEvent(nostd::string_view name, common::SystemTimestamp timestamp) noexcept override;
+  void AddEvent(nostd::string_view name, opentelemetry::common::SystemTimestamp timestamp) noexcept override;
 
   void AddEvent(nostd::string_view name,
-                common::SystemTimestamp timestamp,
+                opentelemetry::common::SystemTimestamp timestamp,
                 const opentelemetry::common::KeyValueIterable &attributes) noexcept override;
 
   void SetStatus(trace_api::StatusCode code, nostd::string_view description) noexcept override;

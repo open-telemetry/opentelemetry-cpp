@@ -145,7 +145,7 @@ void Span::AddEvent(nostd::string_view name) noexcept
   recordable_->AddEvent(name);
 }
 
-void Span::AddEvent(nostd::string_view name, common::SystemTimestamp timestamp) noexcept
+void Span::AddEvent(nostd::string_view name, SystemTimestamp timestamp) noexcept
 {
   std::lock_guard<std::mutex> lock_guard{mu_};
   if (recordable_ == nullptr)
@@ -156,7 +156,7 @@ void Span::AddEvent(nostd::string_view name, common::SystemTimestamp timestamp) 
 }
 
 void Span::AddEvent(nostd::string_view name,
-                    common::SystemTimestamp timestamp,
+                    SystemTimestamp timestamp,
                     const opentelemetry::common::KeyValueIterable &attributes) noexcept
 {
   std::lock_guard<std::mutex> lock_guard{mu_};

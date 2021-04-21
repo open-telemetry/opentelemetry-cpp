@@ -124,7 +124,7 @@ public:
   virtual size_t get_max_buckets() { return 0; }
 
   // virtual function to be overridden for Gauge Aggregator
-  virtual common::SystemTimestamp get_checkpoint_timestamp() { return common::SystemTimestamp(); }
+  virtual opentelemetry::common::SystemTimestamp get_checkpoint_timestamp() { return opentelemetry::common::SystemTimestamp(); }
 
   // Custom copy constructor to handle the mutex
   Aggregator(const Aggregator &cp)

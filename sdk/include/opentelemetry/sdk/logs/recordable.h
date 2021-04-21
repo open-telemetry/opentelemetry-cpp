@@ -32,7 +32,7 @@ public:
    * Set the timestamp for this log.
    * @param timestamp the timestamp to set
    */
-  virtual void SetTimestamp(common::SystemTimestamp timestamp) noexcept = 0;
+  virtual void SetTimestamp(opentelemetry::common::SystemTimestamp timestamp) noexcept = 0;
 
   /**
    * Set the severity for this log.
