@@ -212,7 +212,7 @@ TEST(OStreamSpanExporter, PrintSpanWithEvents)
   auto recordable = processor->MakeRecordable();
   opentelemetry::common::SystemTimestamp now(std::chrono::system_clock::now());
   opentelemetry::common::SystemTimestamp next(std::chrono::system_clock::now() +
-                                            std::chrono::seconds(1));
+                                              std::chrono::seconds(1));
 
   std::string now_str  = std::to_string(now.time_since_epoch().count());
   std::string next_str = std::to_string(next.time_since_epoch().count());

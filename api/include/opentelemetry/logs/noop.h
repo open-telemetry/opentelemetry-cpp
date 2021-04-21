@@ -24,8 +24,8 @@
 
 #include "opentelemetry/common/attribute_value.h"
 #include "opentelemetry/common/key_value_iterable.h"
-#include "opentelemetry/context/runtime_context.h"
 #include "opentelemetry/common/timestamp.h"
+#include "opentelemetry/context/runtime_context.h"
 #include "opentelemetry/logs/logger.h"
 #include "opentelemetry/logs/logger_provider.h"
 #include "opentelemetry/logs/severity.h"
