@@ -32,3 +32,8 @@
 	path = third_party/nlohmann-json
 	url = https://github.com/nlohmann/json
 	branch = master
+
+[submodule "third_party/tracelogging"]
+	path = third_party/tracelogging
+	url = https://github.com/microsoft/tracelogging-dynamic-windows
+	branch = main
