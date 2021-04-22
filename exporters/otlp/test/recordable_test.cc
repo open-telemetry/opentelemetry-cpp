@@ -54,7 +54,7 @@ TEST(Recordable, SetStartTime)
 {
   Recordable rec;
   std::chrono::system_clock::time_point start_time = std::chrono::system_clock::now();
-  core::SystemTimestamp start_timestamp(start_time);
+  common::SystemTimestamp start_timestamp(start_time);
 
   uint64_t unix_start =
       std::chrono::duration_cast<std::chrono::nanoseconds>(start_time.time_since_epoch()).count();
@@ -67,7 +67,7 @@ TEST(Recordable, SetDuration)
 {
   Recordable rec;
   // Start time is 0
-  core::SystemTimestamp start_timestamp;
+  common::SystemTimestamp start_timestamp;
 
   std::chrono::nanoseconds duration(10);
   uint64_t unix_end = duration.count();
@@ -95,7 +95,7 @@ TEST(Recordable, AddEventDefault)
   nostd::string_view name = "Test Event";
 
   std::chrono::system_clock::time_point event_time = std::chrono::system_clock::now();
-  core::SystemTimestamp event_timestamp(event_time);
+  common::SystemTimestamp event_timestamp(event_time);
 
   rec.sdk::trace::Recordable::AddEvent(name, event_timestamp);
 

@@ -1,7 +1,7 @@
 #include <gtest/gtest.h>
 #include <array>
 
-#include "opentelemetry/core/timestamp.h"
+#include "opentelemetry/common/timestamp.h"
 #include "opentelemetry/logs/logger.h"
 #include "opentelemetry/logs/provider.h"
 #include "opentelemetry/nostd/shared_ptr.h"
@@ -77,7 +77,7 @@ class TestLogger : public Logger
            opentelemetry::trace::TraceId trace_id,
            opentelemetry::trace::SpanId span_id,
            opentelemetry::trace::TraceFlags trace_flags,
-           opentelemetry::core::SystemTimestamp timestamp) noexcept override
+           opentelemetry::common::SystemTimestamp timestamp) noexcept override
   {}
 };
 
