@@ -12,9 +12,12 @@ TracerProvider::TracerProvider(std::shared_ptr<sdk::trace::TracerContext> contex
 TracerProvider::TracerProvider(std::unique_ptr<SpanProcessor> processor,
                                opentelemetry::sdk::resource::Resource resource,
                                std::unique_ptr<Sampler> sampler) noexcept
-    : TracerProvider(
-          std::make_shared<TracerContext>(std::move(processor), resource, std::move(sampler)))
-{}
+{
+  std::vector<std::unique_ptr<SpanProcessor>> processors;
+  processors.push_back(std::move(processor));
+  *this = TracerProvider(
+      std::make_shared<TracerContext>(std::move(processors), resource, std::move(sampler)));
+}
 
 opentelemetry::nostd::shared_ptr<opentelemetry::trace::Tracer> TracerProvider::GetTracer(
     nostd::string_view library_name,
@@ -23,9 +26,9 @@ opentelemetry::nostd::shared_ptr<opentelemetry::trace::Tracer> TracerProvider::G
   return opentelemetry::nostd::shared_ptr<opentelemetry::trace::Tracer>(tracer_);
 }
 
-void TracerProvider::RegisterPipeline(std::unique_ptr<SpanProcessor> processor) noexcept
+void TracerProvider::AddProcessor(std::unique_ptr<SpanProcessor> processor) noexcept
 {
-  return context_->RegisterPipeline(std::move(processor));
+  context_->AddProcessor(std::move(processor));
 }
 
 const opentelemetry::sdk::resource::Resource &TracerProvider::GetResource() const noexcept

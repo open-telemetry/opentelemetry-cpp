@@ -1,5 +1,5 @@
 #include "opentelemetry/sdk/trace/tracer_context.h"
-#include "opentelemetry/sdk/trace/processor.h"
+#include "opentelemetry/sdk/trace/multi_span_processor.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace sdk
@@ -7,10 +7,12 @@ namespace sdk
 namespace trace
 {
 
-TracerContext::TracerContext(std::unique_ptr<SpanProcessor> processor,
+TracerContext::TracerContext(std::vector<std::unique_ptr<SpanProcessor>> &&processors,
                              opentelemetry::sdk::resource::Resource resource,
                              std::unique_ptr<Sampler> sampler) noexcept
-    : processor_(std::move(processor)), resource_(resource), sampler_(std::move(sampler))
+    : resource_(resource),
+      sampler_(std::move(sampler)),
+      processor_(std::unique_ptr<SpanProcessor>(new MultiSpanProcessor(std::move(processors))))
 {}
 
 Sampler &TracerContext::GetSampler() const noexcept
@@ -23,8 +25,11 @@ const opentelemetry::sdk::resource::Resource &TracerContext::GetResource() const
   return resource_;
 }
 
-void TracerContext::RegisterPipeline(std::unique_ptr<SpanProcessor> processor) noexcept
+void TracerContext::AddProcessor(std::unique_ptr<SpanProcessor> processor) noexcept
 {
+
+  auto multi_processor = static_cast<MultiSpanProcessor *>(processor_.Get());
+  multi_processor->AddProcessor(std::move(processor));
   // TODO(jsuereth): Implement
   // 1. If existing processor is an "AggregateProcessor" append the new processor to it.
   // 2. If the existing processor is NOT an "AggregateProcessor", create a new Aggregate of this and
@@ -32,7 +37,7 @@ void TracerContext::RegisterPipeline(std::unique_ptr<SpanProcessor> processor) n
   //    then replace our atomic ptr with the new aggregate.
 }
 
-SpanProcessor &TracerContext::GetActiveProcessor() const noexcept
+SpanProcessor &TracerContext::GetProcessor() const noexcept
 {
   return *processor_;
 }

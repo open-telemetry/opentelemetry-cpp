@@ -13,8 +13,9 @@ using namespace opentelemetry::sdk::resource;
 TEST(TracerProvider, GetTracer)
 {
   std::unique_ptr<SpanProcessor> processor(new SimpleSpanProcessor(nullptr));
-
-  TracerProvider tp1(std::make_shared<TracerContext>(std::move(processor), Resource::Create({})));
+  std::vector<std::unique_ptr<SpanProcessor>> processors;
+  processors.push_back(std::move(processor));
+  TracerProvider tp1(std::make_shared<TracerContext>(std::move(processors), Resource::Create({})));
   auto t1 = tp1.GetTracer("test");
   auto t2 = tp1.GetTracer("test");
   auto t3 = tp1.GetTracer("different", "1.0.0");
@@ -31,18 +32,24 @@ TEST(TracerProvider, GetTracer)
   auto sdkTracer1 = dynamic_cast<Tracer *>(t1.get());
   ASSERT_NE(nullptr, sdkTracer1);
   ASSERT_EQ("AlwaysOnSampler", sdkTracer1->GetSampler().GetDescription());
-  TracerProvider tp2(std::make_shared<TracerContext>(
-      std::unique_ptr<SpanProcessor>(new SimpleSpanProcessor(nullptr)), Resource::Create({}),
-      std::unique_ptr<Sampler>(new AlwaysOffSampler())));
+
+  std::unique_ptr<SpanProcessor> processor2(new SimpleSpanProcessor(nullptr));
+  std::vector<std::unique_ptr<SpanProcessor>> processors2;
+  processors2.push_back(std::move(processor2));
+  TracerProvider tp2(
+      std::make_shared<TracerContext>(std::move(processors2), Resource::Create({}),
+                                      std::unique_ptr<Sampler>(new AlwaysOffSampler())));
   auto sdkTracer2 = dynamic_cast<Tracer *>(tp2.GetTracer("test").get());
   ASSERT_EQ("AlwaysOffSampler", sdkTracer2->GetSampler().GetDescription());
 }
 
 TEST(TracerProvider, Shutdown)
 {
-  std::unique_ptr<SpanProcessor> processor1(new SimpleSpanProcessor(nullptr));
+  std::unique_ptr<SpanProcessor> processor(new SimpleSpanProcessor(nullptr));
+  std::vector<std::unique_ptr<SpanProcessor>> processors;
+  processors.push_back(std::move(processor));
 
-  TracerProvider tp1(std::make_shared<TracerContext>(std::move(processor1)));
+  TracerProvider tp1(std::make_shared<TracerContext>(std::move(processors)));
 
   EXPECT_TRUE(tp1.Shutdown());
 }

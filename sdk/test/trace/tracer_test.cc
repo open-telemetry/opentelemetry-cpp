@@ -50,7 +50,9 @@ namespace
 std::shared_ptr<opentelemetry::trace::Tracer> initTracer(std::unique_ptr<SpanExporter> &&exporter)
 {
   auto processor = std::unique_ptr<SpanProcessor>(new SimpleSpanProcessor(std::move(exporter)));
-  auto context   = std::make_shared<TracerContext>(std::move(processor));
+  std::vector<std::unique_ptr<SpanProcessor>> processors;
+  processors.push_back(std::move(processor));
+  auto context = std::make_shared<TracerContext>(std::move(processors));
   return std::shared_ptr<opentelemetry::trace::Tracer>(new Tracer(context));
 }
 
@@ -60,11 +62,14 @@ std::shared_ptr<opentelemetry::trace::Tracer> initTracer(
     Sampler *sampler)
 {
   auto processor = std::unique_ptr<SpanProcessor>(new SimpleSpanProcessor(std::move(exporter)));
-  auto resource  = Resource::Create({});
-  auto context   = std::make_shared<TracerContext>(std::move(processor), resource,
+  std::vector<std::unique_ptr<SpanProcessor>> processors;
+  processors.push_back(std::move(processor));
+  auto resource = Resource::Create({});
+  auto context  = std::make_shared<TracerContext>(std::move(processors), resource,
                                                  std::unique_ptr<Sampler>(sampler));
   return std::shared_ptr<opentelemetry::trace::Tracer>(new Tracer(context));
 }
+
 }  // namespace
 
 TEST(Tracer, ToInMemorySpanExporter)

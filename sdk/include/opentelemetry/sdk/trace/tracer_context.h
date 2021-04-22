@@ -28,18 +28,19 @@ namespace trace
 class TracerContext
 {
 public:
-  explicit TracerContext(std::unique_ptr<SpanProcessor> processor,
+  explicit TracerContext(std::vector<std::unique_ptr<SpanProcessor>> &&processor,
                          opentelemetry::sdk::resource::Resource resource =
                              opentelemetry::sdk::resource::Resource::Create({}),
                          std::unique_ptr<Sampler> sampler =
                              std::unique_ptr<AlwaysOnSampler>(new AlwaysOnSampler)) noexcept;
+
   /**
    * Attaches a span processor to this tracer context.
    *
    * @param processor The new span processor for this tracer. This must not be
    * a nullptr. Ownership is given to the `TracerContext`.
    */
-  void RegisterPipeline(std::unique_ptr<SpanProcessor> processor) noexcept;
+  void AddProcessor(std::unique_ptr<SpanProcessor> processor) noexcept;
 
   /**
    * Obtain the sampler associated with this tracer.
@@ -53,7 +54,7 @@ public:
    * Note: When more than one processor is active, this will
    * return an "aggregate" processor
    */
-  SpanProcessor &GetActiveProcessor() const noexcept;
+  SpanProcessor &GetProcessor() const noexcept;
 
   /**
    * Obtain the resource associated with this tracer context.

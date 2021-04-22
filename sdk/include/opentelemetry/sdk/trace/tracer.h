@@ -32,8 +32,8 @@ public:
 
   void CloseWithMicroseconds(uint64_t timeout) noexcept override;
 
-  /** Returns the currently active span processor. */
-  SpanProcessor &GetActiveProcessor() noexcept { return context_->GetActiveProcessor(); }
+  /** Returns the configured span processor. */
+  SpanProcessor &GetProcessor() noexcept { return context_->GetProcessor(); }
 
   // Note: Test only
   Sampler &GetSampler() { return context_->GetSampler(); }

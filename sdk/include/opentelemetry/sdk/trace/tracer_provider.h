@@ -50,13 +50,19 @@ public:
    *
    * Note: This process may not receive any in-flight spans, but will get newly created spans.
    */
-  void RegisterPipeline(std::unique_ptr<SpanProcessor> processor) noexcept;
+  void AddProcessor(std::unique_ptr<SpanProcessor> processor) noexcept;
 
   /**
    * Obtain the resource associated with this tracer provider.
    * @return The resource for this tracer provider.
    */
   const opentelemetry::sdk::resource::Resource &GetResource() const noexcept;
+
+  /**
+   * Obtain the span processor associated with this tracer provider.
+   * @return The span processor for this tracer provider.
+   */
+  std::shared_ptr<SpanProcessor> GetProcessor() const noexcept;
 
   /**
    * Shutdown the span processor associated with this tracer provider.
