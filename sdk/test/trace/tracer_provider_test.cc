@@ -38,7 +38,7 @@ TEST(TracerProvider, GetTracer)
   TracerProvider tp2(
       std::make_shared<TracerContext>(std::move(processors2), Resource::Create({}),
                                       std::unique_ptr<Sampler>(new AlwaysOffSampler()),
-                                      std::unique_ptr<IdGenerator>(new RandomIdGenerator)));));
+                                      std::unique_ptr<IdGenerator>(new RandomIdGenerator)));
   auto sdkTracer2 = dynamic_cast<Tracer *>(tp2.GetTracer("test").get());
   ASSERT_EQ("AlwaysOffSampler", sdkTracer2->GetSampler().GetDescription());
 }

@@ -1,5 +1,6 @@
 #pragma once
 
+#include "opentelemetry/common/timestamp.h"
 #include "opentelemetry/sdk/trace/processor.h"
 #include "opentelemetry/sdk/trace/recordable.h"
 #include "opentelemetry/version.h"
@@ -79,7 +80,7 @@ public:
   }
 
   virtual void AddEvent(nostd::string_view name,
-                        core::SystemTimestamp timestamp,
+                        opentelemetry::common::SystemTimestamp timestamp,
                         const opentelemetry::common::KeyValueIterable &attributes) noexcept override
   {
 
@@ -123,7 +124,7 @@ public:
     }
   }
 
-  virtual void SetStartTime(opentelemetry::core::SystemTimestamp start_time) noexcept override
+  virtual void SetStartTime(opentelemetry::common::SystemTimestamp start_time) noexcept override
   {
     for (auto &recordable : recordables_)
     {
