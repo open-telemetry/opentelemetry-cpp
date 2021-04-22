@@ -1,5 +1,5 @@
 cc_library(
-    name = "foo_library",
+    name = "foo_multi_library",
     srcs = [
         "foo_library/foo_library.cc",
     ],
@@ -12,12 +12,12 @@ cc_library(
 )
 
 cc_binary(
-    name = "example_simple",
+    name = "example_multi_processor",
     srcs = [
         "main.cc",
     ],
     deps = [
-        ":foo_library",
+        ":foo_multi_library",
         "//api",
         "//exporters/ostream:ostream_span_exporter",
         "//sdk/src/trace",
