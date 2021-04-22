@@ -80,6 +80,7 @@ public:
         processor->OnEnd(std::move(recordable));
       }
     }
+    delete multi_recordable;
   }
 
   bool ForceFlush(
