@@ -27,11 +27,14 @@ public:
    * @param sampler The sampler for this tracer provider. This must
    * not be a nullptr.
    */
-  explicit TracerProvider(std::unique_ptr<SpanProcessor> processor,
-                          opentelemetry::sdk::resource::Resource resource =
-                              opentelemetry::sdk::resource::Resource::Create({}),
-                          std::unique_ptr<Sampler> sampler =
-                              std::unique_ptr<AlwaysOnSampler>(new AlwaysOnSampler)) noexcept;
+  explicit TracerProvider(
+      std::unique_ptr<SpanProcessor> processor,
+      opentelemetry::sdk::resource::Resource resource =
+          opentelemetry::sdk::resource::Resource::Create({}),
+      std::unique_ptr<Sampler> sampler = std::unique_ptr<AlwaysOnSampler>(new AlwaysOnSampler),
+      std::unique_ptr<opentelemetry::sdk::trace::IdGenerator> id_generator =
+          std::unique_ptr<opentelemetry::sdk::trace::IdGenerator>(
+              new RandomIdGenerator())) noexcept;
 
   /**
    * Initialize a new tracer provider with a specified context

@@ -10,9 +10,11 @@ namespace trace
 TracerContext::TracerContext(std::vector<std::unique_ptr<SpanProcessor>> &&processors,
                              opentelemetry::sdk::resource::Resource resource,
                              std::unique_ptr<Sampler> sampler) noexcept
-    : resource_(resource),
+    : 
+      processor_(std::unique_ptr<SpanProcessor>(new MultiSpanProcessor(std::move(processors))),
+      resource_(resource),
       sampler_(std::move(sampler)),
-      processor_(std::unique_ptr<SpanProcessor>(new MultiSpanProcessor(std::move(processors))))
+      id_generator_(std::move(id_generator)))
 {}
 
 Sampler &TracerContext::GetSampler() const noexcept
@@ -25,16 +27,16 @@ const opentelemetry::sdk::resource::Resource &TracerContext::GetResource() const
   return resource_;
 }
 
+opentelemetry::sdk::trace::IdGenerator &TracerContext::GetIdGenerator() const noexcept
+{
+  return *id_generator_;
+}
+
 void TracerContext::AddProcessor(std::unique_ptr<SpanProcessor> processor) noexcept
 {
 
   auto multi_processor = static_cast<MultiSpanProcessor *>(processor_.Get());
   multi_processor->AddProcessor(std::move(processor));
-  // TODO(jsuereth): Implement
-  // 1. If existing processor is an "AggregateProcessor" append the new processor to it.
-  // 2. If the existing processor is NOT an "AggregateProcessor", create a new Aggregate of this and
-  // the other,
-  //    then replace our atomic ptr with the new aggregate.
 }
 
 SpanProcessor &TracerContext::GetProcessor() const noexcept

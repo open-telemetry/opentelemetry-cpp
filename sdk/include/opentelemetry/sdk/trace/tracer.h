@@ -35,6 +35,9 @@ public:
   /** Returns the configured span processor. */
   SpanProcessor &GetProcessor() noexcept { return context_->GetProcessor(); }
 
+  /** Returns the configured Id generator */
+  IdGenerator &GetIdGenerator() noexcept { return context_->GetIdGenerator(); }
+
   // Note: Test only
   Sampler &GetSampler() { return context_->GetSampler(); }
 

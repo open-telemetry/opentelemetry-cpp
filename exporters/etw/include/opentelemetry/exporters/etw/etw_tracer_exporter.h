@@ -37,5 +37,4 @@
 
 #include "opentelemetry/exporters/etw/utils.h"
 
-namespace core  = opentelemetry::core;
 namespace trace = opentelemetry::trace;

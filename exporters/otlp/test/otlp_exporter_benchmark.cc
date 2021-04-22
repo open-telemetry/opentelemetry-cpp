@@ -87,7 +87,7 @@ void CreateSparseSpans(std::array<std::unique_ptr<sdk::trace::Recordable>, kBatc
 
     recordable->SetIdentity(kSpanContext, kParentSpanId);
     recordable->SetName("TestSpan");
-    recordable->SetStartTime(core::SystemTimestamp(std::chrono::system_clock::now()));
+    recordable->SetStartTime(common::SystemTimestamp(std::chrono::system_clock::now()));
     recordable->SetDuration(std::chrono::nanoseconds(10));
 
     recordables[i] = std::move(recordable);
@@ -103,7 +103,7 @@ void CreateDenseSpans(std::array<std::unique_ptr<sdk::trace::Recordable>, kBatch
 
     recordable->SetIdentity(kSpanContext, kParentSpanId);
     recordable->SetName("TestSpan");
-    recordable->SetStartTime(core::SystemTimestamp(std::chrono::system_clock::now()));
+    recordable->SetStartTime(common::SystemTimestamp(std::chrono::system_clock::now()));
     recordable->SetDuration(std::chrono::nanoseconds(10));
 
     for (int i = 0; i < kNumAttributes; i++)

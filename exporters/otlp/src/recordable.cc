@@ -131,7 +131,7 @@ void Recordable::SetAttribute(nostd::string_view key,
 }
 
 void Recordable::AddEvent(nostd::string_view name,
-                          core::SystemTimestamp timestamp,
+                          common::SystemTimestamp timestamp,
                           const common::KeyValueIterable &attributes) noexcept
 {
   auto *event = span_.add_events();
@@ -213,7 +213,7 @@ void Recordable::SetSpanKind(opentelemetry::trace::SpanKind span_kind) noexcept
   span_.set_kind(proto_span_kind);
 }
 
-void Recordable::SetStartTime(opentelemetry::core::SystemTimestamp start_time) noexcept
+void Recordable::SetStartTime(opentelemetry::common::SystemTimestamp start_time) noexcept
 {
   span_.set_start_time_unix_nano(start_time.time_since_epoch().count());
 }
