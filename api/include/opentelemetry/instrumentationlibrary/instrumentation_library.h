@@ -14,8 +14,8 @@
 
 #pragma once
 
-#include "opentelemetry/nostd/unique_ptr.h"
 #include "opentelemetry/nostd/string_view.h"
+#include "opentelemetry/nostd/unique_ptr.h"
 #include "opentelemetry/version.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
@@ -23,7 +23,8 @@ OPENTELEMETRY_BEGIN_NAMESPACE
 namespace instrumentationlibrary
 {
 
-class InstrumentationLibrary {
+class InstrumentationLibrary
+{
 public:
   InstrumentationLibrary(const InstrumentationLibrary &) = default;
 
@@ -33,17 +34,20 @@ public:
    * @param version version of the instrumentation library.
    * @returns the newly created InstrumentationLibrary.
    */
-  static nostd::unique_ptr<InstrumentationLibrary> create(nostd::string_view name, nostd::string_view version)
+  static nostd::unique_ptr<InstrumentationLibrary> create(nostd::string_view name,
+                                                          nostd::string_view version)
   {
-    return nostd::unique_ptr<InstrumentationLibrary>(new InstrumentationLibrary{std::string{name}, std::string{version}});
+    return nostd::unique_ptr<InstrumentationLibrary>(
+        new InstrumentationLibrary{std::string{name}, std::string{version}});
   }
 
   const std::string &GetName() const { return name_; }
   const std::string &GetVersion() const { return version_; }
 
 private:
-  InstrumentationLibrary(nostd::string_view name, nostd::string_view version):
-      name_(name), version_(version) {}
+  InstrumentationLibrary(nostd::string_view name, nostd::string_view version)
+      : name_(name), version_(version)
+  {}
 
 private:
   std::string name_;
