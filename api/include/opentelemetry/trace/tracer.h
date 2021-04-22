@@ -170,7 +170,7 @@ public:
    * Get the instrumentation library associated with the current tracer.
    * @return the instrumentation library for current tracer.
    */
-  InstrumentationLibrary *GetInstruemntationLibrary() const noexcept
+  InstrumentationLibrary *GetInstrumentationLibrary() const noexcept
   {
     return instrumentation_library_.get();
   }
