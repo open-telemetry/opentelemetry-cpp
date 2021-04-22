@@ -28,7 +28,7 @@ static std::string Hex(const T &id_item)
 class TextMapCarrierTest : public trace::propagation::TextMapCarrier
 {
 public:
-  virtual nostd::string_view Get(const nostd::string_view &key) const noexcept override
+  virtual nostd::string_view Get(nostd::string_view key) const noexcept override
   {
     auto it = headers_.find(std::string(key));
     if (it != headers_.end())
@@ -37,7 +37,7 @@ public:
     }
     return "";
   }
-  virtual void Set(const nostd::string_view &key, const nostd::string_view &value) noexcept override
+  virtual void Set(nostd::string_view key, nostd::string_view value) noexcept override
   {
     headers_[std::string(key)] = std::string(value);
   }

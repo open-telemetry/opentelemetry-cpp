@@ -14,13 +14,12 @@ namespace propagation
 // TextMapCarrier is the storage medium used by TextMapPropagator.
 class TextMapCarrier
 {
-
 public:
   /*returns the value associated with the passed key.*/
-  virtual nostd::string_view Get(const nostd::string_view &key) const noexcept = 0;
+  virtual nostd::string_view Get(nostd::string_view key) const noexcept = 0;
 
   /*stores the key-value pair.*/
-  virtual void Set(const nostd::string_view &key, const nostd::string_view &value) noexcept = 0;
+  virtual void Set(nostd::string_view key, nostd::string_view value) noexcept = 0;
 };
 
 // The TextMapPropagator class provides an interface that enables extracting and injecting

@@ -16,16 +16,14 @@ class NoOpPropagator : public TextMapPropagator
 {
 public:
   /** Noop extract function does nothing and returns the input context */
-  virtual context::Context Extract(const TextMapCarrier & /*carrier*/,
-                                   context::Context &context) noexcept override
+  context::Context Extract(const TextMapCarrier & /*carrier*/,
+                           context::Context &context) noexcept override
   {
     return context;
   }
 
   /** Noop inject function does nothing */
-  virtual void Inject(TextMapCarrier & /*carrier*/,
-                      const context::Context &context) noexcept override
-  {}
+  void Inject(TextMapCarrier & /*carrier*/, const context::Context &context) noexcept override {}
 };
 }  // namespace propagation
 }  // namespace trace
