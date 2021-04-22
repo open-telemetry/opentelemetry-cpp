@@ -33,10 +33,10 @@ public:
   void CloseWithMicroseconds(uint64_t timeout) noexcept override;
 
   /** Returns the currently active span processor. */
-  SpanProcessor &GetActiveProcessor() noexcept { return context_->GetActiveProcessor(); }
+  SpanProcessor &GetActiveProcessor() const noexcept { return context_->GetActiveProcessor(); }
 
   /** Returns the configured Id generator */
-  IdGenerator &GetIdGenerator() noexcept { return context_->GetIdGenerator(); }
+  IdGenerator &GetIdGenerator() const noexcept { return context_->GetIdGenerator(); }
 
   // Note: Test only
   Sampler &GetSampler() { return context_->GetSampler(); }

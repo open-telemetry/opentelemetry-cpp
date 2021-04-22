@@ -23,6 +23,9 @@ opentelemetry::nostd::shared_ptr<opentelemetry::trace::Tracer> TracerProvider::G
     nostd::string_view library_name,
     nostd::string_view library_version) noexcept
 {
+  tracer_->SetInstrumentationLibrary(
+      opentelemetry::instrumentationlibrary::InstrumentationLibrary::create(library_name,
+                                                                            library_version));
   return opentelemetry::nostd::shared_ptr<opentelemetry::trace::Tracer>(tracer_);
 }
 
