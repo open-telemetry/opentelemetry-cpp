@@ -175,6 +175,7 @@ TEST(GlobalTextMapPropagator, NoOpPropagator)
 TEST(GlobalPropagator, SetAndGet)
 {
 
+  auto trace_state_value = "congo=t61rcWkgMzE";
   trace::propagation::GlobalTextMapPropagator::SetGlobalPropagator(
       nostd::shared_ptr<trace::propagation::TextMapPropagator>(new MapHttpTraceContext()));
 
@@ -182,7 +183,7 @@ TEST(GlobalPropagator, SetAndGet)
 
   TextMapCarrierTest carrier;
   carrier.headers_ = {{"traceparent", "00-4bf92f3577b34da6a3ce929d0e0e4736-0102030405060708-01"},
-                      {"tracestate", "congo=t61rcWkgMzE"}};
+                      {"tracestate", trace_state_value}};
   context::Context ctx1 = context::Context{
       "current-span",
       nostd::shared_ptr<trace::Span>(new trace::DefaultSpan(trace::SpanContext::GetInvalid()))};
@@ -193,5 +194,5 @@ TEST(GlobalPropagator, SetAndGet)
 
   EXPECT_TRUE(carrier.headers_.count("traceparent") > 0);
   EXPECT_TRUE(carrier.headers_.count("tracestate") > 0);
-  EXPECT_EQ(carrier.headers_["tracestate"], "congo=t61rcWkgMzE");
+  EXPECT_EQ(carrier.headers_["tracestate"], trace_state_value);
 }
