@@ -1,5 +1,5 @@
 #include "opentelemetry/trace/noop.h"
-#include "opentelemetry/core/timestamp.h"
+#include "opentelemetry/common/timestamp.h"
 
 #include <map>
 #include <memory>
@@ -7,7 +7,7 @@
 
 #include <gtest/gtest.h>
 
-using opentelemetry::core::SystemTimestamp;
+using opentelemetry::common::SystemTimestamp;
 using opentelemetry::trace::NoopTracer;
 using opentelemetry::trace::SpanContext;
 using opentelemetry::trace::Tracer;

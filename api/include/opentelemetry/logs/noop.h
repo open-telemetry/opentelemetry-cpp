@@ -24,8 +24,8 @@
 
 #include "opentelemetry/common/attribute_value.h"
 #include "opentelemetry/common/key_value_iterable.h"
+#include "opentelemetry/common/timestamp.h"
 #include "opentelemetry/context/runtime_context.h"
-#include "opentelemetry/core/timestamp.h"
 #include "opentelemetry/logs/logger.h"
 #include "opentelemetry/logs/logger_provider.h"
 #include "opentelemetry/logs/severity.h"
@@ -60,7 +60,7 @@ public:
            trace::TraceId trace_id,
            trace::SpanId span_id,
            trace::TraceFlags trace_flags,
-           core::SystemTimestamp timestamp) noexcept override
+           common::SystemTimestamp timestamp) noexcept override
   {}
 };
 

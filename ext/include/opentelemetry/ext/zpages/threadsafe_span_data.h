@@ -5,7 +5,7 @@
 #include <unordered_map>
 #include <vector>
 
-#include "opentelemetry/core/timestamp.h"
+#include "opentelemetry/common/timestamp.h"
 #include "opentelemetry/nostd/string_view.h"
 #include "opentelemetry/sdk/trace/recordable.h"
 #include "opentelemetry/sdk/trace/span_data.h"
@@ -100,7 +100,7 @@ public:
    * Get the start time for this span
    * @return the start time for this span
    */
-  opentelemetry::core::SystemTimestamp GetStartTime() const noexcept
+  opentelemetry::common::SystemTimestamp GetStartTime() const noexcept
   {
     std::lock_guard<std::mutex> lock(mutex_);
     return start_time_;
@@ -160,7 +160,7 @@ public:
     span_kind_ = span_kind;
   }
 
-  void SetStartTime(opentelemetry::core::SystemTimestamp start_time) noexcept override
+  void SetStartTime(opentelemetry::common::SystemTimestamp start_time) noexcept override
   {
     std::lock_guard<std::mutex> lock(mutex_);
     start_time_ = start_time;
@@ -184,7 +184,7 @@ public:
 
   void AddEvent(
       nostd::string_view name,
-      core::SystemTimestamp timestamp = core::SystemTimestamp(std::chrono::system_clock::now()),
+      common::SystemTimestamp timestamp = common::SystemTimestamp(std::chrono::system_clock::now()),
       const opentelemetry::common::KeyValueIterable &attributes =
           opentelemetry::common::KeyValueIterableView<std::map<std::string, int>>(
               {})) noexcept override
@@ -218,7 +218,7 @@ private:
   mutable std::mutex mutex_;
   opentelemetry::trace::SpanContext span_context_{false, false};
   opentelemetry::trace::SpanId parent_span_id_;
-  core::SystemTimestamp start_time_;
+  common::SystemTimestamp start_time_;
   std::chrono::nanoseconds duration_{0};
   std::string name_;
   opentelemetry::trace::SpanKind span_kind_;
