@@ -19,6 +19,7 @@ cc_binary(
     deps = [
         ":foo_multi_library",
         "//api",
+        "//exporters/memory:in_memory_span_exporter",
         "//exporters/ostream:ostream_span_exporter",
         "//sdk/src/trace",
     ],
