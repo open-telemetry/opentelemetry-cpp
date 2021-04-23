@@ -52,10 +52,10 @@
 
 #define MICROSOFT_EVENTTAG_NORMAL_PERSISTENCE 0x01000000
 
+using namespace OPENTELEMETRY_NAMESPACE::exporter::etw;
+
 OPENTELEMETRY_BEGIN_NAMESPACE
 
-using Properties   = exporter::etw::Properties;
-using PropertyType = exporter::etw::PropertyType;
 
 class ETWProvider
 {
