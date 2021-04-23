@@ -30,14 +30,15 @@ opentelemetry::nostd::shared_ptr<opentelemetry::trace::Tracer> TracerProvider::G
   auto lib = InstrumentationLibrary::create(library_name, library_version);
   for (auto &tracer : tracers_)
   {
-    auto &tracer_lib = tracer->GetInstrumentationLibrary();
+    auto &tracer_lib =
+        dynamic_cast<sdk::trace::Tracer *>(tracer.get())->GetInstrumentationLibrary();
     if (tracer_lib == *lib)
     {
-      return opentelemetry::nostd::shared_ptr<opentelemetry::trace::Tracer>(tracer);
+      return tracer;
     }
   }
   auto tracer = new sdk::trace::Tracer(context_, std::move(lib));
-  tracers_.push_back(std::shared_ptr<sdk::trace::Tracer>(std::move(tracer)));
+  tracers_.push_back(nostd::shared_ptr<opentelemetry::trace::Tracer>(std::move(tracer)));
 
   return tracers_.back();
 }

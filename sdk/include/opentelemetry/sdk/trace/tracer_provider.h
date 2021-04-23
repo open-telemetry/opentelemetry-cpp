@@ -74,7 +74,7 @@ public:
 
 private:
   std::shared_ptr<sdk::trace::TracerContext> context_;
-  std::vector<std::shared_ptr<sdk::trace::Tracer>> tracers_;
+  std::vector<nostd::shared_ptr<opentelemetry::trace::Tracer>> tracers_;
 };
 }  // namespace trace
 }  // namespace sdk
