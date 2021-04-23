@@ -509,10 +509,6 @@ class Tracer : public trace::Tracer
    */
   ETWProvider::Handle &initProvHandle()
   {
-#if defined(HAVE_MSGPACK) && !defined(HAVE_TLD)
-    /* Fallback to MsgPack encoding if TraceLoggingDynamic feature gate is off */
-    encoding = ETWProvider::EventFormat::ETW_MSGPACK;
-#endif
     isClosed_ = false;
     return etwProvider().open(provId, encoding);
   }

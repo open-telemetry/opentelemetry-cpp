@@ -137,7 +137,6 @@ public:
 
     switch (format)
     {
-#ifdef HAVE_TLD
       // Register with TraceLoggingDynamic facility - dynamic manifest ETW events.
       case EventFormat::ETW_MANIFEST: {
         tld::ProviderMetadataBuilder<std::vector<BYTE>> providerMetaBuilder(
@@ -164,7 +163,6 @@ public:
         };
       };
       break;
-#endif
 
 #ifdef HAVE_MSGPACK
       // Register for MsgPack payload ETW events.
@@ -217,14 +215,12 @@ public:
         data.refCount--;
         if (data.refCount == 0)
         {
-#ifdef HAVE_TLD
           if (data.providerMetaVector.size())
           {
             // ETW/TraceLoggingDynamic provider
             result = tld::UnregisterProvider(data.providerHandle);
           }
           else
-#endif
           {
             // Other provider types, e.g. ETW/MsgPack
             result = EventUnregister(data.providerHandle);
@@ -435,7 +431,6 @@ public:
                          LPCGUID RelatedActivityId = nullptr,
                          uint8_t Opcode            = 0 /* Information */)
   {
-#ifdef HAVE_TLD
     // Make sure you stop sending event before register unregistering providerData
     if (providerData.providerHandle == INVALID_HANDLE)
     {
@@ -583,9 +578,6 @@ public:
     };
 
     return (unsigned long)(writeResponse);
-#else
-    return STATUS_ERROR;
-#endif
   }
 
   unsigned long write(Handle &providerData,
