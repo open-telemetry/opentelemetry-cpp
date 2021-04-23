@@ -7,6 +7,7 @@ cc_test(
     ],
     deps = [
         "//api",
+        "//sdk:headers",
         "@com_google_googletest//:gtest_main",
     ],
 )
