@@ -24,8 +24,11 @@ public:
    * Initialize a new tracer provider with a specified sampler
    * @param processor The span processor for this tracer provider. This must
    * not be a nullptr.
+   * @param resource  The resources for this tracer provider.
    * @param sampler The sampler for this tracer provider. This must
    * not be a nullptr.
+   * @param id_generator The custom id generator for this tracer provider. This must
+   * not be a nullptr
    */
   explicit TracerProvider(
       std::unique_ptr<SpanProcessor> processor,
@@ -47,7 +50,7 @@ public:
       nostd::string_view library_version = "") noexcept override;
 
   /**
-   * Attaches a span processor pipeline to this tracer provider.
+   * Attaches a span processor to list of configured processors for this tracer provider.
    * @param processor The new span processor for this tracer provider. This
    * must not be a nullptr.
    *

@@ -7,8 +7,6 @@
 
 #include <map>
 
-// TODO: Create generic short pattern for opentelemetry::common and opentelemetry::trace
-
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace sdk
 {
@@ -23,11 +21,6 @@ std::size_t MakeKey(const SpanProcessor &processor)
 
 }  // namespace
 
-/**
- * Maintains a representation of a span in a format that can be processed by a recorder.
- *
- * This class is thread-compatible.
- */
 class MultiRecordable : public Recordable
 {
 public:

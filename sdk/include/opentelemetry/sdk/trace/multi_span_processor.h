@@ -6,8 +6,6 @@
 #include "opentelemetry/sdk/trace/multi_recordable.h"
 #include "opentelemetry/sdk/trace/processor.h"
 
-#include <iostream>
-
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace sdk
 {
@@ -31,20 +29,23 @@ public:
   {
     for (auto &processor : processors)
     {
-      std::cout << " \nAdding processor...";
       if (processor)
+      {
         processors_.push_back(std::move(processor));
+      }
     }
   }
 
   void AddProcessor(std::unique_ptr<SpanProcessor> &&processor)
   {
-    processors_.push_back(std::move(processor));
+    if (processor)
+    {
+      processors_.push_back(std::move(processor));
+    }
   }
 
   std::unique_ptr<Recordable> MakeRecordable() noexcept override
   {
-    std::cout << " Make recordable";
     auto recordable       = std::unique_ptr<Recordable>(new MultiRecordable);
     auto multi_recordable = static_cast<MultiRecordable *>(recordable.get());
     for (auto &processor : processors_)

@@ -21,9 +21,9 @@ namespace trace
  * - A thread-safe class that allows updating/altering processor/exporter pipelines
  *   and sampling config.
  * - The owner/destroyer of Processors/Exporters.  These will remain active until
- *   this class is destroyed.  I.e. Sampling, Exporting, flushing etc. are all ok if this
- *   object is alive, and they will work together. If this object is destroyed, then
- *   no shared references to Processor, Exporter, Recordable etc. should exist, and all
+ *   this class is destroyed.  I.e. Sampling, Exporting, flushing, Custom Iterator etc. are all ok
+ * if this object is alive, and they will work together. If this object is destroyed, then no shared
+ * references to Processor, Exporter, Recordable, Custom Iterator etc. should exist, and all
  *   associated pipelines will have been flushed.
  */
 class TracerContext
@@ -36,9 +36,10 @@ public:
       std::unique_ptr<Sampler> sampler = std::unique_ptr<AlwaysOnSampler>(new AlwaysOnSampler),
       std::unique_ptr<IdGenerator> id_generator =
           std::unique_ptr<IdGenerator>(new RandomIdGenerator())) noexcept;
+
   /**
-   * Attaches a span processor to this tracer context.
-   *
+   * Attaches a span processor to list of configured processors to this tracer context.
+   * Processor once attached can't be removed.
    * @param processor The new span processor for this tracer. This must not be
    * a nullptr. Ownership is given to the `TracerContext`.
    */
@@ -51,7 +52,7 @@ public:
   Sampler &GetSampler() const noexcept;
 
   /**
-   * Obtain the (conceptual) active processor.
+   * Obtain the configured (composite) processor.
    *
    * Note: When more than one processor is active, this will
    * return an "aggregate" processor
