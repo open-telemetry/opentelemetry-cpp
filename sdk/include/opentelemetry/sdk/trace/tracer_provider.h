@@ -2,6 +2,7 @@
 
 #include <map>
 #include <memory>
+#include <mutex>
 #include <string>
 #include <vector>
 
@@ -75,6 +76,7 @@ public:
 private:
   std::shared_ptr<sdk::trace::TracerContext> context_;
   std::vector<nostd::shared_ptr<opentelemetry::trace::Tracer>> tracers_;
+  std::mutex lock_;
 };
 }  // namespace trace
 }  // namespace sdk

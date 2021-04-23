@@ -48,9 +48,9 @@ public:
    * @param other the instrumentation library to compare to.
    * @returns true if the 2 instrumentation libraries are equal, false otherwise.
    */
-  bool operator==(const InstrumentationLibrary& other) const
+  bool operator==(const InstrumentationLibrary &other) const
   {
-      return this->name_ == other.name_ && this->version_ == other.version_;
+    return this->name_ == other.name_ && this->version_ == other.version_;
   }
 
   const std::string &GetName() const { return name_; }

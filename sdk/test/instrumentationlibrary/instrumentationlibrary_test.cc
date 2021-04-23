@@ -13,12 +13,11 @@
 // limitations under the License.
 
 #include "opentelemetry/nostd/string_view.h"
+#include "opentelemetry/sdk/instrumentationlibrary/instrumentation_library.h"
 
 #include <gtest/gtest.h>
 #include <string>
 #include <vector>
-
-#include "opentelemetry/sdk/instrumentationlibrary/instrumentation_library.h"
 
 using namespace opentelemetry;
 using namespace opentelemetry::sdk::instrumentationlibrary;

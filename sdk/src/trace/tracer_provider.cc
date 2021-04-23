@@ -27,6 +27,8 @@ opentelemetry::nostd::shared_ptr<opentelemetry::trace::Tracer> TracerProvider::G
   //   // TODO: log invalid name.
   // }
 
+  const std::lock_guard<std::mutex> guard(lock_);
+
   auto lib = InstrumentationLibrary::create(library_name, library_version);
   for (auto &tracer : tracers_)
   {
@@ -37,8 +39,7 @@ opentelemetry::nostd::shared_ptr<opentelemetry::trace::Tracer> TracerProvider::G
       return tracer;
     }
   }
-  auto tracer = new sdk::trace::Tracer(context_, std::move(lib));
-  tracers_.push_back(nostd::shared_ptr<opentelemetry::trace::Tracer>(std::move(tracer)));
+  tracers_.push_back(nostd::shared_ptr<opentelemetry::trace::Tracer>(new sdk::trace::Tracer(context_, std::move(lib))));
 
   return tracers_.back();
 }
