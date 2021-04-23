@@ -19,7 +19,7 @@ TracerProvider::TracerProvider(std::unique_ptr<SpanProcessor> processor,
                                                      std::move(id_generator)))
 {}
 
-opentelemetry::nostd::shared_ptr<opentelemetry::trace::Tracer> TracerProvider::GetTracer(
+nostd::shared_ptr<opentelemetry::trace::Tracer> TracerProvider::GetTracer(
     nostd::string_view library_name,
     nostd::string_view library_version) noexcept
 {
@@ -32,16 +32,15 @@ opentelemetry::nostd::shared_ptr<opentelemetry::trace::Tracer> TracerProvider::G
   auto lib = InstrumentationLibrary::create(library_name, library_version);
   for (auto &tracer : tracers_)
   {
-    auto &tracer_lib =
-        dynamic_cast<sdk::trace::Tracer *>(tracer.get())->GetInstrumentationLibrary();
+    auto &tracer_lib = tracer->GetInstrumentationLibrary();
     if (tracer_lib == *lib)
     {
       return tracer;
     }
   }
-  tracers_.push_back(nostd::shared_ptr<opentelemetry::trace::Tracer>(new sdk::trace::Tracer(context_, std::move(lib))));
-
-  return tracers_.back();
+  tracers_.push_back(std::shared_ptr<opentelemetry::sdk::trace::Tracer>(
+      new sdk::trace::Tracer(context_, std::move(lib))));
+  return nostd::shared_ptr<opentelemetry::trace::Tracer>{tracers_.back()};
 }
 
 void TracerProvider::RegisterPipeline(std::unique_ptr<SpanProcessor> processor) noexcept
