@@ -1,34 +1,37 @@
 #include "opentelemetry/context/runtime_context.h"
+#include "opentelemetry/trace/propagation/global_propagator.h"
 #include "opentelemetry/trace/propagation/http_trace_context.h"
 #include "opentelemetry/trace/scope.h"
 #include "util.h"
 
 #include <map>
+#include <unordered_map>
 
 #include <gtest/gtest.h>
 
 using namespace opentelemetry;
 
-static nostd::string_view Getter(const std::map<std::string, std::string> &carrier,
-                                 nostd::string_view trace_type = "traceparent")
+class TextMapCarrierTest : public trace::propagation::TextMapCarrier
 {
-  auto it = carrier.find(std::string(trace_type));
-  if (it != carrier.end())
+public:
+  virtual nostd::string_view Get(nostd::string_view key) const noexcept override
   {
-    return nostd::string_view(it->second);
+    auto it = headers_.find(std::string(key));
+    if (it != headers_.end())
+    {
+      return nostd::string_view(it->second);
+    }
+    return "";
   }
-  return "";
-}
+  virtual void Set(nostd::string_view key, nostd::string_view value) noexcept override
+  {
+    headers_[std::string(key)] = std::string(value);
+  }
 
-static void Setter(std::map<std::string, std::string> &carrier,
-                   nostd::string_view trace_type        = "traceparent",
-                   nostd::string_view trace_description = "")
-{
-  carrier[std::string(trace_type)] = std::string(trace_description);
-}
+  std::map<std::string, std::string> headers_;
+};
 
-using MapHttpTraceContext =
-    trace::propagation::HttpTraceContext<std::map<std::string, std::string>>;
+using MapHttpTraceContext = trace::propagation::HttpTraceContext;
 
 static MapHttpTraceContext format = MapHttpTraceContext();
 
@@ -40,53 +43,54 @@ TEST(TextMapPropagatorTest, TraceFlagsBufferGeneration)
 TEST(TextMapPropagatorTest, NoSendEmptyTraceState)
 {
   // If the trace state is empty, do not set the header.
-  const std::map<std::string, std::string> carrier = {
-      {"traceparent", "00-4bf92f3577b34da6a3ce929d0e0e4736-0102030405060708-01"}};
+  TextMapCarrierTest carrier;
+  carrier.headers_ = {{"traceparent", "00-4bf92f3577b34da6a3ce929d0e0e4736-0102030405060708-01"}};
   context::Context ctx1 = context::Context{
       "current-span",
       nostd::shared_ptr<trace::Span>(new trace::DefaultSpan(trace::SpanContext::GetInvalid()))};
-  context::Context ctx2                 = format.Extract(Getter, carrier, ctx1);
-  std::map<std::string, std::string> c2 = {};
-  format.Inject(Setter, c2, ctx2);
-  EXPECT_TRUE(carrier.count("traceparent") > 0);
-  EXPECT_FALSE(carrier.count("tracestate") > 0);
+  context::Context ctx2 = format.Extract(carrier, ctx1);
+  TextMapCarrierTest carrier2;
+  format.Inject(carrier2, ctx2);
+  EXPECT_TRUE(carrier.headers_.count("traceparent") > 0);
+  EXPECT_FALSE(carrier.headers_.count("tracestate") > 0);
 }
 
 TEST(TextMapPropagatorTest, PropogateTraceState)
 {
-  const std::map<std::string, std::string> carrier = {
-      {"traceparent", "00-4bf92f3577b34da6a3ce929d0e0e4736-0102030405060708-01"},
-      {"tracestate", "congo=t61rcWkgMzE"}};
+  TextMapCarrierTest carrier;
+  carrier.headers_ = {{"traceparent", "00-4bf92f3577b34da6a3ce929d0e0e4736-0102030405060708-01"},
+                      {"tracestate", "congo=t61rcWkgMzE"}};
   context::Context ctx1 = context::Context{
       "current-span",
       nostd::shared_ptr<trace::Span>(new trace::DefaultSpan(trace::SpanContext::GetInvalid()))};
-  context::Context ctx2                 = format.Extract(Getter, carrier, ctx1);
-  std::map<std::string, std::string> c2 = {};
-  format.Inject(Setter, c2, ctx2);
+  context::Context ctx2 = format.Extract(carrier, ctx1);
 
-  EXPECT_TRUE(carrier.count("traceparent") > 0);
-  EXPECT_TRUE(carrier.count("tracestate") > 0);
-  EXPECT_EQ(c2["tracestate"], "congo=t61rcWkgMzE");
+  TextMapCarrierTest carrier2;
+  format.Inject(carrier2, ctx2);
+
+  EXPECT_TRUE(carrier.headers_.count("traceparent") > 0);
+  EXPECT_TRUE(carrier.headers_.count("tracestate") > 0);
+  EXPECT_EQ(carrier2.headers_["tracestate"], "congo=t61rcWkgMzE");
 }
 
 TEST(TextMapPropagatorTest, PropagateInvalidContext)
 {
   // Do not propagate invalid trace context.
-  std::map<std::string, std::string> carrier = {};
+  TextMapCarrierTest carrier;
   context::Context ctx{
       "current-span",
       nostd::shared_ptr<trace::Span>(new trace::DefaultSpan(trace::SpanContext::GetInvalid()))};
-  format.Inject(Setter, carrier, ctx);
-  EXPECT_TRUE(carrier.count("traceparent") == 0);
-  EXPECT_TRUE(carrier.count("tracestate") == 0);
+  format.Inject(carrier, ctx);
+  EXPECT_TRUE(carrier.headers_.count("traceparent") == 0);
+  EXPECT_TRUE(carrier.headers_.count("tracestate") == 0);
 }
 
 TEST(TextMapPropagatorTest, SetRemoteSpan)
 {
-  const std::map<std::string, std::string> carrier = {
-      {"traceparent", "00-4bf92f3577b34da6a3ce929d0e0e4736-0102030405060708-01"}};
+  TextMapCarrierTest carrier;
+  carrier.headers_ = {{"traceparent", "00-4bf92f3577b34da6a3ce929d0e0e4736-0102030405060708-01"}};
   context::Context ctx1 = context::Context{};
-  context::Context ctx2 = format.Extract(Getter, carrier, ctx1);
+  context::Context ctx2 = format.Extract(carrier, ctx1);
 
   auto ctx2_span = ctx2.GetValue(trace::kSpanKey);
   EXPECT_TRUE(nostd::holds_alternative<nostd::shared_ptr<trace::Span>>(ctx2_span));
@@ -101,6 +105,7 @@ TEST(TextMapPropagatorTest, SetRemoteSpan)
 
 TEST(TextMapPropagatorTest, GetCurrentSpan)
 {
+  TextMapCarrierTest carrier;
   constexpr uint8_t buf_span[]  = {1, 2, 3, 4, 5, 6, 7, 8};
   constexpr uint8_t buf_trace[] = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16};
 
@@ -112,14 +117,15 @@ TEST(TextMapPropagatorTest, GetCurrentSpan)
   // Set `sp` as the currently active span, which must be used by `Inject`.
   trace::Scope scoped_span{sp};
 
-  std::map<std::string, std::string> headers = {};
-  format.Inject(Setter, headers, context::RuntimeContext::GetCurrent());
-  EXPECT_EQ(headers["traceparent"], "00-0102030405060708090a0b0c0d0e0f10-0102030405060708-01");
-  EXPECT_EQ(headers["tracestate"], "congo=t61rcWkgMzE");
+  format.Inject(carrier, context::RuntimeContext::GetCurrent());
+  EXPECT_EQ(carrier.headers_["traceparent"],
+            "00-0102030405060708090a0b0c0d0e0f10-0102030405060708-01");
+  EXPECT_EQ(carrier.headers_["tracestate"], "congo=t61rcWkgMzE");
 }
 
 TEST(TextMapPropagatorTest, InvalidIdentitiesAreNotExtracted)
 {
+  TextMapCarrierTest carrier;
   std::vector<std::string> traces = {
       "ff-0af7651916cd43dd8448eb211c80319c-b9c7c989f97918e1-01",
       "00-0af7651916cd43dd8448eb211c80319c1-b9c7c989f97918e1-01",
@@ -137,11 +143,56 @@ TEST(TextMapPropagatorTest, InvalidIdentitiesAreNotExtracted)
 
   for (auto &trace : traces)
   {
-    const std::map<std::string, std::string> carrier = {{"traceparent", trace}};
-    context::Context ctx1                            = context::Context{};
-    context::Context ctx2                            = format.Extract(Getter, carrier, ctx1);
+    carrier.headers_      = {{"traceparent", trace}};
+    context::Context ctx1 = context::Context{};
+    context::Context ctx2 = format.Extract(carrier, ctx1);
 
     auto span = trace::propagation::detail::GetCurrentSpan(ctx2);
     EXPECT_FALSE(span.IsValid());
   }
+}
+
+TEST(GlobalTextMapPropagator, NoOpPropagator)
+{
+
+  auto propagator = trace::propagation::GlobalTextMapPropagator::GetGlobalPropagator();
+  TextMapCarrierTest carrier;
+
+  carrier.headers_ = {{"traceparent", "00-4bf92f3577b34da6a3ce929d0e0e4736-0102030405060708-01"},
+                      {"tracestate", "congo=t61rcWkgMzE"}};
+  context::Context ctx1 = context::Context{
+      "current-span",
+      nostd::shared_ptr<trace::Span>(new trace::DefaultSpan(trace::SpanContext::GetInvalid()))};
+  context::Context ctx2 = propagator->Extract(carrier, ctx1);
+
+  TextMapCarrierTest carrier2;
+  propagator->Inject(carrier2, ctx2);
+
+  EXPECT_TRUE(carrier2.headers_.count("tracestate") == 0);
+  EXPECT_TRUE(carrier2.headers_.count("traceparent") == 0);
+}
+
+TEST(GlobalPropagator, SetAndGet)
+{
+
+  auto trace_state_value = "congo=t61rcWkgMzE";
+  trace::propagation::GlobalTextMapPropagator::SetGlobalPropagator(
+      nostd::shared_ptr<trace::propagation::TextMapPropagator>(new MapHttpTraceContext()));
+
+  auto propagator = trace::propagation::GlobalTextMapPropagator::GetGlobalPropagator();
+
+  TextMapCarrierTest carrier;
+  carrier.headers_ = {{"traceparent", "00-4bf92f3577b34da6a3ce929d0e0e4736-0102030405060708-01"},
+                      {"tracestate", trace_state_value}};
+  context::Context ctx1 = context::Context{
+      "current-span",
+      nostd::shared_ptr<trace::Span>(new trace::DefaultSpan(trace::SpanContext::GetInvalid()))};
+  context::Context ctx2 = propagator->Extract(carrier, ctx1);
+
+  TextMapCarrierTest carrier2;
+  propagator->Inject(carrier2, ctx2);
+
+  EXPECT_TRUE(carrier.headers_.count("traceparent") > 0);
+  EXPECT_TRUE(carrier.headers_.count("tracestate") > 0);
+  EXPECT_EQ(carrier.headers_["tracestate"], trace_state_value);
 }
