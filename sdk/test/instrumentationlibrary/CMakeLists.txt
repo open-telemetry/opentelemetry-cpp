@@ -7,6 +7,6 @@ foreach(testname instrumentationlibrary_test)
     ${CMAKE_THREAD_LIBS_INIT} opentelemetry_api)
   gtest_add_tests(
     TARGET ${testname}
-    TEST_PREFIX baggage.
+    TEST_PREFIX instrumentationlibrary.
     TEST_LIST ${testname})
 endforeach()

@@ -1,6 +1,5 @@
 #pragma once
 
-#include "opentelemetry/instrumentationlibrary/instrumentation_library.h"
 #include "opentelemetry/nostd/shared_ptr.h"
 #include "opentelemetry/nostd/string_view.h"
 #include "opentelemetry/nostd/unique_ptr.h"
@@ -15,8 +14,6 @@
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace trace
 {
-
-using InstrumentationLibrary = opentelemetry::instrumentationlibrary::InstrumentationLibrary;
 
 /**
  * Handles span creation and in-process context propagation.
@@ -167,25 +164,6 @@ public:
   }
 
   /**
-   * Get the instrumentation library associated with the current tracer.
-   * @return the instrumentation library for current tracer.
-   */
-  InstrumentationLibrary *GetInstrumentationLibrary() const noexcept
-  {
-    return instrumentation_library_.get();
-  }
-
-  /**
-   * Set instrumentation library.
-   * @param instrumentation library to set on the current tracer.
-   */
-  void SetInstrumentationLibrary(
-      nostd::unique_ptr<InstrumentationLibrary> &&instrumentation_library) noexcept
-  {
-    instrumentation_library_ = std::move(instrumentation_library);
-  }
-
-  /**
    * Force any buffered spans to flush.
    * @param timeout to complete the flush
    */
@@ -210,9 +188,6 @@ public:
   }
 
   virtual void CloseWithMicroseconds(uint64_t timeout) noexcept = 0;
-
-private:
-  std::unique_ptr<InstrumentationLibrary> instrumentation_library_;
 };
 }  // namespace trace
 OPENTELEMETRY_END_NAMESPACE

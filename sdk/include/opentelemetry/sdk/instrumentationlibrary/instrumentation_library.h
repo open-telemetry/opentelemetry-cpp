@@ -20,6 +20,8 @@
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 
+namespace sdk
+{
 namespace instrumentationlibrary
 {
 
@@ -35,10 +37,20 @@ public:
    * @returns the newly created InstrumentationLibrary.
    */
   static nostd::unique_ptr<InstrumentationLibrary> create(nostd::string_view name,
-                                                          nostd::string_view version)
+                                                          nostd::string_view version = "")
   {
     return nostd::unique_ptr<InstrumentationLibrary>(
         new InstrumentationLibrary{std::string{name}, std::string{version}});
+  }
+
+  /**
+   * Compare 2 instrumentation libraries.
+   * @param other the instrumentation library to compare to.
+   * @returns true if the 2 instrumentation libraries are equal, false otherwise.
+   */
+  bool operator==(const InstrumentationLibrary& other) const
+  {
+      return this->name_ == other.name_ && this->version_ == other.version_;
   }
 
   const std::string &GetName() const { return name_; }
@@ -55,5 +67,6 @@ private:
 };
 
 }  // namespace instrumentationlibrary
+}  // namespace sdk
 
 OPENTELEMETRY_END_NAMESPACE

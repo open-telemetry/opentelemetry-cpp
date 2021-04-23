@@ -3,6 +3,7 @@
 #include <map>
 #include <memory>
 #include <string>
+#include <vector>
 
 #include "opentelemetry/nostd/shared_ptr.h"
 #include "opentelemetry/sdk/resource/resource.h"
@@ -73,7 +74,7 @@ public:
 
 private:
   std::shared_ptr<sdk::trace::TracerContext> context_;
-  std::shared_ptr<opentelemetry::trace::Tracer> tracer_;
+  std::vector<std::shared_ptr<sdk::trace::Tracer>> tracers_;
 };
 }  // namespace trace
 }  // namespace sdk

@@ -18,10 +18,10 @@
 #include <string>
 #include <vector>
 
-#include "opentelemetry/instrumentationlibrary/instrumentation_library.h"
+#include "opentelemetry/sdk/instrumentationlibrary/instrumentation_library.h"
 
 using namespace opentelemetry;
-using namespace opentelemetry::instrumentationlibrary;
+using namespace opentelemetry::sdk::instrumentationlibrary;
 
 TEST(InstrumentationLibrary, CreateInstrumentationLibrary)
 {

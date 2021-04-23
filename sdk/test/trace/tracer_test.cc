@@ -513,7 +513,7 @@ TEST(Tracer, TestParentBasedSampler)
   std::unique_ptr<InMemorySpanExporter> exporter2(new InMemorySpanExporter());
   std::shared_ptr<InMemorySpanData> span_data_parent_off = exporter2->GetData();
   auto tracer_parent_off                                 = initTracer(std::move(exporter2),
-                                      new ParentBasedSampler(std::make_shared<AlwaysOffSampler>()));
+                                                                      new ParentBasedSampler(std::make_shared<AlwaysOffSampler>()));
 
   auto span_parent_off_1 = tracer_parent_off->StartSpan("span 1");
   auto span_parent_off_2 = tracer_parent_off->StartSpan("span 2");
