@@ -36,33 +36,24 @@ static const size_t kTraceParentSize         = 55;
 // Example:
 //    HttpTraceContext().inject(setter, carrier, context);
 //    HttpTraceContext().extract(getter, carrier, context);
-template <typename T>
-class HttpTraceContext : public TextMapPropagator<T>
+
+class HttpTraceContext : public TextMapPropagator
 {
 public:
-  // Rules that manages how context will be extracted from carrier.
-  using Getter = nostd::string_view (*)(const T &carrier, nostd::string_view trace_type);
-
-  // Rules that manages how context will be injected to carrier.
-  using Setter = void (*)(T &carrier,
-                          nostd::string_view trace_type,
-                          nostd::string_view trace_description);
-
-  void Inject(Setter setter, T &carrier, const context::Context &context) noexcept override
+  void Inject(TextMapCarrier &carrier, const context::Context &context) noexcept override
   {
     SpanContext span_context = detail::GetCurrentSpan(context);
     if (!span_context.IsValid())
     {
       return;
     }
-    InjectImpl(setter, carrier, span_context);
+    InjectImpl(carrier, span_context);
   }
 
-  context::Context Extract(Getter getter,
-                           const T &carrier,
+  context::Context Extract(const TextMapCarrier &carrier,
                            context::Context &context) noexcept override
   {
-    SpanContext span_context = ExtractImpl(getter, carrier);
+    SpanContext span_context = ExtractImpl(carrier);
     nostd::shared_ptr<Span> sp{new DefaultSpan(span_context)};
     return context.SetValue(kSpanKey, sp);
   }
@@ -98,7 +89,7 @@ private:
     return version != kInvalidVersion;
   }
 
-  static void InjectImpl(Setter setter, T &carrier, const SpanContext &span_context)
+  static void InjectImpl(TextMapCarrier &carrier, const SpanContext &span_context)
   {
     char trace_parent[kTraceParentSize];
     trace_parent[0] = '0';
@@ -110,8 +101,8 @@ private:
     trace_parent[kTraceIdSize + kSpanIdSize + 4] = '-';
     span_context.trace_flags().ToLowerBase16({&trace_parent[kTraceIdSize + kSpanIdSize + 5], 2});
 
-    setter(carrier, kTraceParent, nostd::string_view(trace_parent, sizeof(trace_parent)));
-    setter(carrier, kTraceState, span_context.trace_state()->ToHeader());
+    carrier.Set(kTraceParent, nostd::string_view(trace_parent, sizeof(trace_parent)));
+    carrier.Set(kTraceState, span_context.trace_state()->ToHeader());
   }
 
   static SpanContext ExtractContextFromTraceHeaders(nostd::string_view trace_parent,
@@ -162,10 +153,10 @@ private:
                        opentelemetry::trace::TraceState::FromHeader(trace_state));
   }
 
-  static SpanContext ExtractImpl(Getter getter, const T &carrier)
+  static SpanContext ExtractImpl(const TextMapCarrier &carrier)
   {
-    nostd::string_view trace_parent = getter(carrier, kTraceParent);
-    nostd::string_view trace_state  = getter(carrier, kTraceState);
+    nostd::string_view trace_parent = carrier.Get(kTraceParent);
+    nostd::string_view trace_state  = carrier.Get(kTraceState);
     if (trace_parent == "")
     {
       return SpanContext::GetInvalid();

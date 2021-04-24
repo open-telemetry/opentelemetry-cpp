@@ -11,8 +11,8 @@
 
 using namespace opentelemetry::sdk::trace;
 using namespace opentelemetry::sdk::resource;
-using opentelemetry::core::SteadyTimestamp;
-using opentelemetry::core::SystemTimestamp;
+using opentelemetry::common::SteadyTimestamp;
+using opentelemetry::common::SystemTimestamp;
 namespace nostd  = opentelemetry::nostd;
 namespace common = opentelemetry::common;
 using opentelemetry::common::KeyValueIterableView;

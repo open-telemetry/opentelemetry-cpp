@@ -41,7 +41,7 @@ TEST(ThreadsafeSpanData, Set)
       trace_id, span_id,
       opentelemetry::trace::TraceFlags{opentelemetry::trace::TraceFlags::kIsSampled}, true,
       trace_state};
-  opentelemetry::core::SystemTimestamp now(std::chrono::system_clock::now());
+  opentelemetry::common::SystemTimestamp now(std::chrono::system_clock::now());
 
   ThreadsafeSpanData data;
   data.SetIdentity(span_context, parent_span_id);

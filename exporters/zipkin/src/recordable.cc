@@ -159,7 +159,7 @@ void Recordable::SetAttribute(nostd::string_view key,
 }
 
 void Recordable::AddEvent(nostd::string_view name,
-                          core::SystemTimestamp timestamp,
+                          common::SystemTimestamp timestamp,
                           const common::KeyValueIterable &attributes) noexcept
 {
   nlohmann::json attrs = nlohmann::json::object();  // empty object
@@ -204,7 +204,7 @@ void Recordable::SetName(nostd::string_view name) noexcept
   span_["name"] = name.data();
 }
 
-void Recordable::SetStartTime(opentelemetry::core::SystemTimestamp start_time) noexcept
+void Recordable::SetStartTime(opentelemetry::common::SystemTimestamp start_time) noexcept
 {
   span_["timestamp"] =
       std::chrono::duration_cast<std::chrono::microseconds>(start_time.time_since_epoch()).count();

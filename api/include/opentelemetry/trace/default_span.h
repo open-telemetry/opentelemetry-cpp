@@ -23,10 +23,10 @@ public:
 
   void AddEvent(nostd::string_view /* name */) noexcept {}
 
-  void AddEvent(nostd::string_view /* name */, core::SystemTimestamp /* timestamp */) noexcept {}
+  void AddEvent(nostd::string_view /* name */, common::SystemTimestamp /* timestamp */) noexcept {}
 
   void AddEvent(nostd::string_view /* name */,
-                core::SystemTimestamp /* timestamp */,
+                common::SystemTimestamp /* timestamp */,
                 const common::KeyValueIterable & /* attributes */) noexcept
   {}
 

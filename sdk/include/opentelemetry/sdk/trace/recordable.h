@@ -2,7 +2,7 @@
 
 #include "opentelemetry/common/attribute_value.h"
 #include "opentelemetry/common/key_value_iterable.h"
-#include "opentelemetry/core/timestamp.h"
+#include "opentelemetry/common/timestamp.h"
 #include "opentelemetry/nostd/string_view.h"
 #include "opentelemetry/sdk/common/empty_attributes.h"
 #include "opentelemetry/trace/canonical_code.h"
@@ -54,7 +54,7 @@ public:
    * @param attributes the attributes associated with the event
    */
   virtual void AddEvent(nostd::string_view name,
-                        core::SystemTimestamp timestamp,
+                        opentelemetry::common::SystemTimestamp timestamp,
                         const opentelemetry::common::KeyValueIterable &attributes) noexcept = 0;
 
   /**
@@ -63,7 +63,7 @@ public:
    */
   void AddEvent(nostd::string_view name)
   {
-    AddEvent(name, core::SystemTimestamp(std::chrono::system_clock::now()),
+    AddEvent(name, opentelemetry::common::SystemTimestamp(std::chrono::system_clock::now()),
              opentelemetry::sdk::GetEmptyAttributes());
   }
 
@@ -72,7 +72,7 @@ public:
    * @param name the name of the event
    * @param timestamp the timestamp of the event
    */
-  void AddEvent(nostd::string_view name, core::SystemTimestamp timestamp)
+  void AddEvent(nostd::string_view name, opentelemetry::common::SystemTimestamp timestamp)
   {
     AddEvent(name, timestamp, opentelemetry::sdk::GetEmptyAttributes());
   }
@@ -118,7 +118,7 @@ public:
    * Set the start time of the span.
    * @param start_time the start time to set
    */
-  virtual void SetStartTime(opentelemetry::core::SystemTimestamp start_time) noexcept = 0;
+  virtual void SetStartTime(opentelemetry::common::SystemTimestamp start_time) noexcept = 0;
 
   /**
    * Set the duration of the span.
