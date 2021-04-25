@@ -38,6 +38,11 @@ public:
       std::unique_ptr<opentelemetry::sdk::trace::IdGenerator> id_generator =
           std::unique_ptr<opentelemetry::sdk::trace::IdGenerator>(
               new RandomIdGenerator())) noexcept;
+  
+  explicit TracerProvider(std::vector<std::unique_ptr<SpanProcessor>> &&processors,
+                 opentelemetry::sdk::resource::Resource resource,
+                 std::unique_ptr<Sampler> sampler,
+                std::unique_ptr<IdGenerator> id_generator) noexcept;
 
   /**
    * Initialize a new tracer provider with a specified context
@@ -55,6 +60,7 @@ public:
    * must not be a nullptr.
    *
    * Note: This process may not receive any in-flight spans, but will get newly created spans.
+   * Note: This method is not thread safe, and should ideally be called from main thread.
    */
   void AddProcessor(std::unique_ptr<SpanProcessor> processor) noexcept;
 

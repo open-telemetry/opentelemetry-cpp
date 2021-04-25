@@ -10,6 +10,8 @@
 using namespace opentelemetry::sdk::trace;
 using namespace opentelemetry::sdk::resource;
 
+#include<iostream>
+
 TEST(TracerProvider, GetTracer)
 {
   std::unique_ptr<SpanProcessor> processor(new SimpleSpanProcessor(nullptr));

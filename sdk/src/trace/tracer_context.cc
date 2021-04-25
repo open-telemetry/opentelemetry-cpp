@@ -35,7 +35,7 @@ opentelemetry::sdk::trace::IdGenerator &TracerContext::GetIdGenerator() const no
 void TracerContext::AddProcessor(std::unique_ptr<SpanProcessor> processor) noexcept
 {
 
-  auto multi_processor = static_cast<MultiSpanProcessor *>(processor_.Get());
+  auto multi_processor = static_cast<MultiSpanProcessor *>(processor_.get());
   multi_processor->AddProcessor(std::move(processor));
 }
 

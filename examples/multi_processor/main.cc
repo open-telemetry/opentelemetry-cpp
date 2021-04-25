@@ -29,17 +29,11 @@ void initTracer()
   auto processor2 = std::unique_ptr<sdktrace::SpanProcessor>(
       new sdktrace::SimpleSpanProcessor(std::move(exporter2)));
 
-  std::vector<std::unique_ptr<sdktrace::SpanProcessor>> processors;
-  processors.push_back(std::move(processor1));
-  processors.push_back(std::move(processor2));
-  // Default is an always-on sampler.
-  auto context = std::make_shared<sdktrace::TracerContext>(std::move(processors));
-
-  auto provider = nostd::shared_ptr<opentelemetry::trace::TracerProvider>(
-      new sdktrace::TracerProvider(context));
-
+  auto provider = nostd::shared_ptr<opentelemetry::sdk::trace::TracerProvider>(
+      new sdktrace::TracerProvider(std::move(processor1)));
+  provider->AddProcessor(std::move(processor2));
   // Set the global trace provider
-  opentelemetry::trace::Provider::SetTracerProvider(provider);
+  opentelemetry::trace::Provider::SetTracerProvider(std::move(provider));
 }
 
 void dumpSpans(std::vector<std::unique_ptr<opentelemetry::sdk::trace::SpanData>> &spans)

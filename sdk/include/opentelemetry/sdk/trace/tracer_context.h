@@ -42,6 +42,8 @@ public:
    * Processor once attached can't be removed.
    * @param processor The new span processor for this tracer. This must not be
    * a nullptr. Ownership is given to the `TracerContext`.
+   * 
+   * Note: This method is not thread safe.
    */
   void AddProcessor(std::unique_ptr<SpanProcessor> processor) noexcept;
 
@@ -84,7 +86,7 @@ public:
 
 private:
   // This is an atomic pointer so we can adapt the processor pipeline dynamically.
-  opentelemetry::sdk::common::AtomicUniquePtr<SpanProcessor> processor_;
+  std::unique_ptr<SpanProcessor> processor_;
   opentelemetry::sdk::resource::Resource resource_;
   std::unique_ptr<Sampler> sampler_;
   std::unique_ptr<IdGenerator> id_generator_;

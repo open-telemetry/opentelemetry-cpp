@@ -1,5 +1,5 @@
 
-# Simple Trace Example
+# Simple Multi Processor Trace Example
 
 In this example, the application in `main.cc` initializes and registers a tracer
 provider from the [OpenTelemetry
