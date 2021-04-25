@@ -42,7 +42,7 @@ public:
    * Processor once attached can't be removed.
    * @param processor The new span processor for this tracer. This must not be
    * a nullptr. Ownership is given to the `TracerContext`.
-   * 
+   *
    * Note: This method is not thread safe.
    */
   void AddProcessor(std::unique_ptr<SpanProcessor> processor) noexcept;

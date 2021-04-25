@@ -38,11 +38,11 @@ public:
       std::unique_ptr<opentelemetry::sdk::trace::IdGenerator> id_generator =
           std::unique_ptr<opentelemetry::sdk::trace::IdGenerator>(
               new RandomIdGenerator())) noexcept;
-  
+
   explicit TracerProvider(std::vector<std::unique_ptr<SpanProcessor>> &&processors,
-                 opentelemetry::sdk::resource::Resource resource,
-                 std::unique_ptr<Sampler> sampler,
-                std::unique_ptr<IdGenerator> id_generator) noexcept;
+                          opentelemetry::sdk::resource::Resource resource,
+                          std::unique_ptr<Sampler> sampler,
+                          std::unique_ptr<IdGenerator> id_generator) noexcept;
 
   /**
    * Initialize a new tracer provider with a specified context

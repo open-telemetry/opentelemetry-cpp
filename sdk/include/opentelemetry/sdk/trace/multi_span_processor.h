@@ -6,7 +6,7 @@
 #include "opentelemetry/sdk/trace/multi_recordable.h"
 #include "opentelemetry/sdk/trace/processor.h"
 
-#include<iostream>
+#include <iostream>
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace sdk
@@ -27,7 +27,8 @@ struct MultiSpanProcessorOptions
 class MultiSpanProcessor : public SpanProcessor
 {
 public:
-  MultiSpanProcessor(std::vector<std::unique_ptr<SpanProcessor>> &&processors):head_(nullptr), tail_(nullptr), count_(0)
+  MultiSpanProcessor(std::vector<std::unique_ptr<SpanProcessor>> &&processors)
+      : head_(nullptr), tail_(nullptr), count_(0)
   {
     for (auto &processor : processors)
     {
@@ -41,10 +42,13 @@ public:
     if (processor)
     {
       ProcessorNode *pNode = new ProcessorNode(std::move(processor), tail_);
-      if (count_ > 0){
+      if (count_ > 0)
+      {
         tail_->next_ = pNode;
-        tail_ = pNode;
-      } else {
+        tail_        = pNode;
+      }
+      else
+      {
         head_ = tail_ = pNode;
       }
       count_++;
@@ -55,8 +59,9 @@ public:
   {
     auto recordable       = std::unique_ptr<Recordable>(new MultiRecordable);
     auto multi_recordable = static_cast<MultiRecordable *>(recordable.get());
-    ProcessorNode *node = head_;
-    while (node != nullptr) {
+    ProcessorNode *node   = head_;
+    while (node != nullptr)
+    {
       auto processor = node->value_.get();
       multi_recordable->AddRecordable(*processor, processor->MakeRecordable());
       node = node->next_;
@@ -68,10 +73,10 @@ public:
                        const opentelemetry::trace::SpanContext &parent_context) noexcept override
   {
     auto multi_recordable = static_cast<MultiRecordable *>(&span);
-    ProcessorNode *node = head_;
+    ProcessorNode *node   = head_;
     while (node != nullptr)
     {
-      auto processor = node->value_.get();
+      auto processor   = node->value_.get();
       auto &recordable = multi_recordable->GetRecordable(*processor);
       if (recordable != nullptr)
       {
@@ -84,11 +89,11 @@ public:
   virtual void OnEnd(std::unique_ptr<Recordable> &&span) noexcept override
   {
     auto multi_recordable = static_cast<MultiRecordable *>(span.release());
-    ProcessorNode *node = head_;
-    while (node != nullptr) 
+    ProcessorNode *node   = head_;
+    while (node != nullptr)
     {
-     auto processor = node->value_.get();
-     auto recordable = multi_recordable->ReleaseRecordable(*processor);
+      auto processor  = node->value_.get();
+      auto recordable = multi_recordable->ReleaseRecordable(*processor);
       if (recordable != nullptr)
       {
         processor->OnEnd(std::move(recordable));
@@ -101,9 +106,9 @@ public:
   bool ForceFlush(
       std::chrono::microseconds timeout = (std::chrono::microseconds::max)()) noexcept override
   {
-    bool result = true;
+    bool result         = true;
     ProcessorNode *node = head_;
-    while (node != nullptr) 
+    while (node != nullptr)
     {
       auto processor = node->value_.get();
       result |= processor->ForceFlush(timeout);
@@ -115,7 +120,7 @@ public:
   bool Shutdown(
       std::chrono::microseconds timeout = (std::chrono::microseconds::max)()) noexcept override
   {
-    bool result = true;
+    bool result         = true;
     ProcessorNode *node = head_;
     while (node != nullptr)
     {
@@ -126,43 +131,53 @@ public:
     return result;
   }
 
-  ~MultiSpanProcessor() 
-  { 
+  ~MultiSpanProcessor()
+  {
     Shutdown();
     Cleanup();
-
   }
 
 private:
-struct ProcessorNode {
-  std::unique_ptr<SpanProcessor> value_;
-  ProcessorNode *next_, *prev_;
-  ProcessorNode(std::unique_ptr<SpanProcessor> &&value, ProcessorNode *prev = nullptr, ProcessorNode *next=nullptr):value_(std::move(value)), prev_(prev), next_(next) {}
-};
+  struct ProcessorNode
+  {
+    std::unique_ptr<SpanProcessor> value_;
+    ProcessorNode *next_, *prev_;
+    ProcessorNode(std::unique_ptr<SpanProcessor> &&value,
+                  ProcessorNode *prev = nullptr,
+                  ProcessorNode *next = nullptr)
+        : value_(std::move(value)), prev_(prev), next_(next)
+    {}
+  };
 
- void Cleanup() { 
-     if(count_) {
-       ProcessorNode *node = tail_;
-       while(node != nullptr){
-         if (node->next_ != nullptr) {
-           delete node->next_;
-           node->next_ = nullptr;
-         } 
-         if (node->prev_ != nullptr){
-           node = node->prev_;
-         } else {
-           delete node;
-           node = nullptr;
-         } 
-       }
-       head_ = tail_ = nullptr;
-       count_ = 0;
-     }
- }
+  void Cleanup()
+  {
+    if (count_)
+    {
+      ProcessorNode *node = tail_;
+      while (node != nullptr)
+      {
+        if (node->next_ != nullptr)
+        {
+          delete node->next_;
+          node->next_ = nullptr;
+        }
+        if (node->prev_ != nullptr)
+        {
+          node = node->prev_;
+        }
+        else
+        {
+          delete node;
+          node = nullptr;
+        }
+      }
+      head_ = tail_ = nullptr;
+      count_        = 0;
+    }
+  }
 
   ProcessorNode *head_, *tail_;
   size_t count_;
-
 };
 }  // namespace trace
 }  // namespace sdk

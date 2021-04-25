@@ -10,7 +10,7 @@
 using namespace opentelemetry::sdk::trace;
 using namespace opentelemetry::sdk::resource;
 
-#include<iostream>
+#include <iostream>
 
 TEST(TracerProvider, GetTracer)
 {
