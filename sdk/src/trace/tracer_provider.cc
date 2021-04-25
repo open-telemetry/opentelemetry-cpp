@@ -20,6 +20,15 @@ TracerProvider::TracerProvider(std::unique_ptr<SpanProcessor> processor,
       std::move(processors), resource, std::move(sampler), std::move(id_generator)));
 }
 
+TracerProvider::TracerProvider(std::vector<std::unique_ptr<SpanProcessor>> &&processors,
+                               opentelemetry::sdk::resource::Resource resource,
+                               std::unique_ptr<Sampler> sampler,
+                               std::unique_ptr<IdGenerator> id_generator) noexcept
+{
+  *this = TracerProvider(std::make_shared<TracerContext>(
+      std::move(processors), resource, std::move(sampler), std::move(id_generator)));
+}
+
 opentelemetry::nostd::shared_ptr<opentelemetry::trace::Tracer> TracerProvider::GetTracer(
     nostd::string_view library_name,
     nostd::string_view library_version) noexcept
