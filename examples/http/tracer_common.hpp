@@ -4,7 +4,7 @@
 #include "opentelemetry/sdk/trace/tracer_provider.h"
 #include "opentelemetry/trace/provider.h"
 
-#include<vector>
+#include <vector>
 
 namespace {
 
