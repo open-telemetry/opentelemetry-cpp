@@ -9,7 +9,7 @@ namespace sdk
 namespace version
 {
 const int MAJOR_VERSION     = 0;
-const int MINOR_VERSION     = 4;
+const int MINOR_VERSION     = 5;
 const int PATCH_VERSION     = 0;
 const char *PRE_RELEASE     = "";
 const char *BUILD_METADATA  = "";
