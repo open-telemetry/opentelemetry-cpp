@@ -117,7 +117,7 @@ Span::Span(std::shared_ptr<Tracer> &&tracer,
   recordable_->SetSpanKind(options.kind);
   recordable_->SetStartTime(NowOr(options.start_system_time));
   start_steady_time = NowOr(options.start_steady_time);
-  // recordable_->SetResource(tracer_->GetResoource()); TODO
+  recordable_->SetResource(tracer_->GetResource());
   // recordable_->SetResource(tracer_->GetInstrumentationLibrary()); TODO
   tracer_->GetActiveProcessor().OnStart(*recordable_, parent_span_context);
 }

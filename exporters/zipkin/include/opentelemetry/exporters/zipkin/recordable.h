@@ -57,9 +57,13 @@ public:
 
   void SetStartTime(opentelemetry::core::SystemTimestamp start_time) noexcept override;
 
-  virtual void SetSpanKind(opentelemetry::trace::SpanKind span_kind) noexcept override;
+  void SetSpanKind(opentelemetry::trace::SpanKind span_kind) noexcept override;
+
+  void SetResource( const opentelemetry::sdk::resource::Resource& resource) noexcept override;
+
 
   void SetDuration(std::chrono::nanoseconds duration) noexcept override;
+  
 
 private:
   ZipkinSpan span_;

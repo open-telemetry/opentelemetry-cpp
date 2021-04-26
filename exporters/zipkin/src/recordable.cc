@@ -204,6 +204,12 @@ void Recordable::SetName(nostd::string_view name) noexcept
   span_["name"] = name.data();
 }
 
+void SetResource( const opentelemetry::sdk::resource::Resource& resource) noexcept
+{
+
+}
+
+
 void Recordable::SetStartTime(opentelemetry::core::SystemTimestamp start_time) noexcept
 {
   span_["timestamp"] =

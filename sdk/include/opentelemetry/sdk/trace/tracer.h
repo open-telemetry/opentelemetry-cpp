@@ -35,6 +35,9 @@ public:
   /** Returns the currently active span processor. */
   SpanProcessor &GetActiveProcessor() noexcept { return context_->GetActiveProcessor(); }
 
+  /** Returns the currently configured resource **/
+  const opentelemetry::sdk::resource::Resource &GetResource() { return context_->GetResource();}
+
   // Note: Test only
   Sampler &GetSampler() { return context_->GetSampler(); }
 
