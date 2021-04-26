@@ -15,6 +15,8 @@ Increment the:
 
 ## [Unreleased]
 
+* [SDK] Add instrumentation library and multiple tracer support ([#693](https://github.com/open-telemetry/opentelemetry-cpp/pull/693))
+
 ## [0.5.0] 2021-04-26
 
 * [SDK] Support custom span-id and trace-id generator ([#681](https://github.com/open-telemetry/opentelemetry-cpp/pull/681))

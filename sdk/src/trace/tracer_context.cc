@@ -19,7 +19,7 @@ TracerContext::TracerContext(std::unique_ptr<SpanProcessor> processor,
 
 Sampler &TracerContext::GetSampler() const noexcept
 {
-  return *sampler_.get();
+  return *sampler_;
 }
 
 const opentelemetry::sdk::resource::Resource &TracerContext::GetResource() const noexcept
