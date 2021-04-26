@@ -26,13 +26,13 @@ public:
 
   void AddEvent(nostd::string_view name) noexcept override { span_->AddEvent(name); }
 
-  void AddEvent(nostd::string_view name, core::SystemTimestamp timestamp) noexcept override
+  void AddEvent(nostd::string_view name, common::SystemTimestamp timestamp) noexcept override
   {
     span_->AddEvent(name, timestamp);
   }
 
   void AddEvent(nostd::string_view name,
-                core::SystemTimestamp timestamp,
+                common::SystemTimestamp timestamp,
                 const common::KeyValueIterable &attributes) noexcept override
   {
     span_->AddEvent(name, timestamp, attributes);

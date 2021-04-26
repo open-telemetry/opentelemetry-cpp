@@ -22,6 +22,8 @@ Increment the:
 * [SDK] Global Propagator ([#668](https://github.com/open-telemetry/opentelemetry-cpp/pull/668))
 * [SDK] Create SharedContext for updating span pipeline ([#650](https://github.com/open-telemetry/opentelemetry-cpp/pull/650))
 * [API] Baggage implementation ([#676](https://github.com/open-telemetry/opentelemetry-cpp/pull/676))
+* [API] Move class from opentelemetry::core namespace to opentelemetry::common namespace ([#686](https://github.com/open-telemetry/opentelemetry-cpp/pull/686))
+
 
 ## [0.4.0] 2021-04-12
 

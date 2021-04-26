@@ -4,7 +4,7 @@
 
 #include "opentelemetry/common/attribute_value.h"
 #include "opentelemetry/common/key_value_iterable_view.h"
-#include "opentelemetry/core/timestamp.h"
+#include "opentelemetry/common/timestamp.h"
 #include "opentelemetry/nostd/shared_ptr.h"
 #include "opentelemetry/nostd/span.h"
 #include "opentelemetry/nostd/string_view.h"
@@ -54,8 +54,8 @@ struct StartSpanOptions
   // Span's duration, while timestamps from the system clock can be used to most
   // accurately place a Span's
   // time point relative to other Spans collected across a distributed system.
-  core::SystemTimestamp start_system_time;
-  core::SteadyTimestamp start_steady_time;
+  common::SystemTimestamp start_system_time;
+  common::SteadyTimestamp start_steady_time;
 
   // Explicitly set the parent of a Span.
   //
@@ -75,7 +75,7 @@ struct StartSpanOptions
 struct EndSpanOptions
 {
   // Optionally sets the end time of a Span.
-  core::SteadyTimestamp end_steady_time;
+  common::SteadyTimestamp end_steady_time;
 };
 
 class Tracer;
@@ -109,11 +109,11 @@ public:
   virtual void AddEvent(nostd::string_view name) noexcept = 0;
 
   // Adds an event to the Span, with a custom timestamp.
-  virtual void AddEvent(nostd::string_view name, core::SystemTimestamp timestamp) noexcept = 0;
+  virtual void AddEvent(nostd::string_view name, common::SystemTimestamp timestamp) noexcept = 0;
 
   // Adds an event to the Span, with a custom timestamp, and attributes.
   virtual void AddEvent(nostd::string_view name,
-                        core::SystemTimestamp timestamp,
+                        common::SystemTimestamp timestamp,
                         const common::KeyValueIterable &attributes) noexcept = 0;
 
   virtual void AddEvent(nostd::string_view name,
@@ -125,7 +125,7 @@ public:
   template <class T,
             nostd::enable_if_t<common::detail::is_key_value_iterable<T>::value> * = nullptr>
   void AddEvent(nostd::string_view name,
-                core::SystemTimestamp timestamp,
+                common::SystemTimestamp timestamp,
                 const T &attributes) noexcept
   {
     this->AddEvent(name, timestamp, common::KeyValueIterableView<T>{attributes});
@@ -139,7 +139,7 @@ public:
   }
 
   void AddEvent(nostd::string_view name,
-                core::SystemTimestamp timestamp,
+                common::SystemTimestamp timestamp,
                 std::initializer_list<std::pair<nostd::string_view, common::AttributeValue>>
                     attributes) noexcept
   {

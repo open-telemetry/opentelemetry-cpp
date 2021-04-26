@@ -47,6 +47,12 @@ public:
       : str_(str), opts_(opts), index_(0)
   {}
 
+  static nostd::string_view GetDefaultKeyOrValue()
+  {
+    static std::string default_str = "";
+    return default_str;
+  }
+
   // Returns next key value in the string header
   // @param valid_kv : if the found kv pair is valid or not
   // @param key : key in kv pair
@@ -57,10 +63,15 @@ public:
     valid_kv = true;
     while (index_ < str_.size())
     {
-      size_t end = str_.find(opts_.member_separator, index_);
+      bool is_empty_pair = false;
+      size_t end         = str_.find(opts_.member_separator, index_);
       if (end == std::string::npos)
       {
         end = str_.size() - 1;
+      }
+      else if (end == index_)  // empty pair. do not update end
+      {
+        is_empty_pair = true;
       }
       else
       {
@@ -68,18 +79,18 @@ public:
       }
 
       auto list_member = StringUtil::Trim(str_, index_, end);
-      if (list_member.size() == 0)
+      if (list_member.size() == 0 || is_empty_pair)
       {
         // empty list member
-        index_ = end + 2;
+        index_ = end + 2 - is_empty_pair;
         if (opts_.ignore_empty_members)
         {
           continue;
         }
 
         valid_kv = true;
-        key      = "";
-        value    = "";
+        key      = GetDefaultKeyOrValue();
+        value    = GetDefaultKeyOrValue();
         return true;
       }
 
@@ -226,7 +237,7 @@ public:
   }
 
   // Adds new kv pair into kv properties
-  void AddEntry(const nostd::string_view &key, const nostd::string_view &value)
+  void AddEntry(nostd::string_view key, nostd::string_view value)
   {
     if (num_entries_ < max_num_entries_)
     {
@@ -251,7 +262,7 @@ public:
   }
 
   // Return value for key if exists, return false otherwise
-  bool GetValue(const nostd::string_view key, std::string &value) const
+  bool GetValue(nostd::string_view key, std::string &value) const
   {
     for (size_t i = 0; i < num_entries_; i++)
     {
