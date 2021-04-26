@@ -14,6 +14,8 @@ Increment the:
 * PATCH version when you make backwards compatible bug fixes.
 
 ## [Unreleased]
+ 
+## [0.5.0] 2021-04-26
 
 ## [0.4.0] 2021-04-12
 
