@@ -17,7 +17,7 @@ Increment the:
 
 ## [0.5.0] 2021-04-26
 
-* [SDK] Support Custom span-id and trace-id generator ([#681](https://github.com/open-telemetry/opentelemetry-cpp/pull/681))
+* [SDK] Support custom span-id and trace-id generator ([#681](https://github.com/open-telemetry/opentelemetry-cpp/pull/681))
 * [SDK] Add SpanContext (and TraceState) to Recordable ([#667](https://github.com/open-telemetry/opentelemetry-cpp/pull/667))
 * [SDK] Global Propagator ([#668](https://github.com/open-telemetry/opentelemetry-cpp/pull/668))
 * [SDK] Create SharedContext for updating span pipeline ([#650](https://github.com/open-telemetry/opentelemetry-cpp/pull/650))
