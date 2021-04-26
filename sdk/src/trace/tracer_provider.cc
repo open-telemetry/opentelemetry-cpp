@@ -24,20 +24,21 @@ nostd::shared_ptr<opentelemetry::trace::Tracer> TracerProvider::GetTracer(
     nostd::string_view library_version) noexcept
 {
   // if (library_name == "") {
-  //   // TODO: log invalid name.
+  //   // TODO: log invalid library_name.
   // }
 
   const std::lock_guard<std::mutex> guard(lock_);
 
-  auto lib = InstrumentationLibrary::create(library_name, library_version);
   for (auto &tracer : tracers_)
   {
     auto &tracer_lib = tracer->GetInstrumentationLibrary();
-    if (tracer_lib == *lib)
+    if (tracer_lib.equal(library_name, library_version))
     {
       return nostd::shared_ptr<opentelemetry::trace::Tracer>{tracer};
     }
   }
+
+  auto lib = InstrumentationLibrary::create(library_name, library_version);
   tracers_.push_back(std::shared_ptr<opentelemetry::sdk::trace::Tracer>(
       new sdk::trace::Tracer(context_, std::move(lib))));
   return nostd::shared_ptr<opentelemetry::trace::Tracer>{tracers_.back()};

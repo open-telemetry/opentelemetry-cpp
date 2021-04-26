@@ -50,7 +50,20 @@ public:
    */
   bool operator==(const InstrumentationLibrary &other) const
   {
-    return this->name_ == other.name_ && this->version_ == other.version_;
+    return equal(other.name_, other.version_);
+  }
+
+  /**
+   * Check whether the instrumentation library has given name and version.
+   * This could be used to check version equality and avoid heap allocation.
+   * @param name name of the instrumentation library to compare.
+   * @param version version of the instrumentatoin library to compare.
+   * @returns true if name and version in this instrumentation library are equal with the given name
+   * and version.
+   */
+  bool equal(const nostd::string_view name, const nostd::string_view version) const
+  {
+    return this->name_ == name && this->version_ == version;
   }
 
   const std::string &GetName() const { return name_; }
