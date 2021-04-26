@@ -33,12 +33,12 @@ public:
   const std::unique_ptr<Recordable> &GetRecordable(const SpanProcessor &processor) const noexcept
   {
     // TODO - return nullptr ref on failed lookup?
-    static std::unique_ptr<Recordable> empty(nullptr);
     auto i = recordables_.find(MakeKey(processor));
     if (i != recordables_.end())
     {
       return i->second;
     }
+    static std::unique_ptr<Recordable> empty(nullptr);
     return empty;
   }
 
