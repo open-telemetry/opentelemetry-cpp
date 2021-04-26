@@ -16,8 +16,8 @@ TracerProvider::TracerProvider(std::unique_ptr<SpanProcessor> processor,
 {
   std::vector<std::unique_ptr<SpanProcessor>> processors;
   processors.push_back(std::move(processor));
-  *this = TracerProvider(std::make_shared<TracerContext>(
-      std::move(processors), resource, std::move(sampler), std::move(id_generator)));
+  context_ = std::make_shared<TracerContext>(std::move(processors), resource, std::move(sampler),
+                                             std::move(id_generator));
 }
 
 TracerProvider::TracerProvider(std::vector<std::unique_ptr<SpanProcessor>> &&processors,
@@ -25,8 +25,8 @@ TracerProvider::TracerProvider(std::vector<std::unique_ptr<SpanProcessor>> &&pro
                                std::unique_ptr<Sampler> sampler,
                                std::unique_ptr<IdGenerator> id_generator) noexcept
 {
-  *this = TracerProvider(std::make_shared<TracerContext>(
-      std::move(processors), resource, std::move(sampler), std::move(id_generator)));
+  context_ = std::make_shared<TracerContext>(std::move(processors), resource, std::move(sampler),
+                                             std::move(id_generator));
 }
 
 nostd::shared_ptr<opentelemetry::trace::Tracer> TracerProvider::GetTracer(
