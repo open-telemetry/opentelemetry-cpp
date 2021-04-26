@@ -14,8 +14,14 @@ Increment the:
 * PATCH version when you make backwards compatible bug fixes.
 
 ## [Unreleased]
- 
+
 ## [0.5.0] 2021-04-26
+
+* [SDK] Support Custom span-id and trace-id generator ([#681](https://github.com/open-telemetry/opentelemetry-cpp/pull/681))
+* [SDK] Add SpanContext (and TraceState) to Recordable ([#667](https://github.com/open-telemetry/opentelemetry-cpp/pull/667))
+* [SDK] Global Propagator ([#668](https://github.com/open-telemetry/opentelemetry-cpp/pull/668))
+* [SDK] Create SharedContext for updating span pipeline ([#650](https://github.com/open-telemetry/opentelemetry-cpp/pull/650))
+* [API] Baggage implementation ([#676](https://github.com/open-telemetry/opentelemetry-cpp/pull/676))
 
 ## [0.4.0] 2021-04-12
 
