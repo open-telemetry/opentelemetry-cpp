@@ -6,7 +6,7 @@ namespace sdk
 namespace trace
 {
 TracerProvider::TracerProvider(std::shared_ptr<sdk::trace::TracerContext> context) noexcept
-    : context_{context}, tracer_(new Tracer(context))
+    : context_{context}
 {}
 
 TracerProvider::TracerProvider(std::unique_ptr<SpanProcessor> processor,
@@ -19,11 +19,29 @@ TracerProvider::TracerProvider(std::unique_ptr<SpanProcessor> processor,
                                                      std::move(id_generator)))
 {}
 
-opentelemetry::nostd::shared_ptr<opentelemetry::trace::Tracer> TracerProvider::GetTracer(
+nostd::shared_ptr<opentelemetry::trace::Tracer> TracerProvider::GetTracer(
     nostd::string_view library_name,
     nostd::string_view library_version) noexcept
 {
-  return opentelemetry::nostd::shared_ptr<opentelemetry::trace::Tracer>(tracer_);
+  // if (library_name == "") {
+  //   // TODO: log invalid library_name.
+  // }
+
+  const std::lock_guard<std::mutex> guard(lock_);
+
+  for (auto &tracer : tracers_)
+  {
+    auto &tracer_lib = tracer->GetInstrumentationLibrary();
+    if (tracer_lib.equal(library_name, library_version))
+    {
+      return nostd::shared_ptr<opentelemetry::trace::Tracer>{tracer};
+    }
+  }
+
+  auto lib = InstrumentationLibrary::create(library_name, library_version);
+  tracers_.push_back(std::shared_ptr<opentelemetry::sdk::trace::Tracer>(
+      new sdk::trace::Tracer(context_, std::move(lib))));
+  return nostd::shared_ptr<opentelemetry::trace::Tracer>{tracers_.back()};
 }
 
 void TracerProvider::RegisterPipeline(std::unique_ptr<SpanProcessor> processor) noexcept
