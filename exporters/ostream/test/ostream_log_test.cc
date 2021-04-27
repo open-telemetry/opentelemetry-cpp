@@ -1,5 +1,7 @@
+#include <array>
 #include "opentelemetry/exporters/ostream/log_exporter.h"
 #include "opentelemetry/logs/provider.h"
+#include "opentelemetry/nostd/span.h"
 #include "opentelemetry/sdk/logs/logger_provider.h"
 #include "opentelemetry/sdk/logs/simple_log_processor.h"
 
