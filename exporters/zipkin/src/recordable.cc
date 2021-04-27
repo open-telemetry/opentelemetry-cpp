@@ -231,10 +231,6 @@ void Recordable::SetSpanKind(opentelemetry::trace::SpanKind span_kind) noexcept
   {
     span_["kind"] = span_iter->second;
   }
-  else
-  {
-    span_["kind"] = nullptr;
-  }
 }
 }  // namespace zipkin
 }  // namespace exporter
