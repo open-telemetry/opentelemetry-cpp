@@ -77,7 +77,7 @@ public:
       typename std::enable_if<!std::is_same<function_ref, typename std::decay<F>::type>::value,
                               int>::type = 0,
       typename std::enable_if<
-#if (__cplusplus >= 201703L)
+#if (__cplusplus >= 201703L) || (defined(_MSVC_LANG) && (_MSVC_LANG >= 201402))
           // std::result_of deprecated in C++17, removed in C++20
           std::is_convertible<typename std::invoke_result<F, Args...>::type, R>::value,
 #else
