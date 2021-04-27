@@ -135,7 +135,7 @@ public:
    * @param instrumentation_library the instrumentation library to set
    */
   virtual void SetInstrumentationLibrary(
-      std::shared_ptr<const InstrumentationLibrary> &&instrumentation_library) noexcept = 0;
+      const InstrumentationLibrary &instrumentation_library) noexcept = 0;
 };
 }  // namespace trace
 }  // namespace sdk

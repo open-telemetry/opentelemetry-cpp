@@ -225,8 +225,8 @@ void Recordable::SetDuration(std::chrono::nanoseconds duration) noexcept
 }
 
 void Recordable::SetInstrumentationLibrary(
-    std::shared_ptr<const opentelemetry::sdk::instrumentationlibrary::InstrumentationLibrary>
-        &&instrumentation_library) noexcept
+    const opentelemetry::sdk::instrumentationlibrary::InstrumentationLibrary
+        &instrumentation_library) noexcept
 {
   // TODO: add instrumentation library to OTLP exporter.
 }

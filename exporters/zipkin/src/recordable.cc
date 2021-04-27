@@ -216,11 +216,11 @@ void Recordable::SetDuration(std::chrono::nanoseconds duration) noexcept
 }
 
 void Recordable::SetInstrumentationLibrary(
-    std::shared_ptr<const opentelemetry::sdk::instrumentationlibrary::InstrumentationLibrary>
-        &&instrumentation_library) noexcept
+    const opentelemetry::sdk::instrumentationlibrary::InstrumentationLibrary
+        &instrumentation_library) noexcept
 {
-  span_["tags"]["otel.library.name"]    = instrumentation_library->GetName();
-  span_["tags"]["otel.library.version"] = instrumentation_library->GetVersion();
+  span_["tags"]["otel.library.name"]    = instrumentation_library.GetName();
+  span_["tags"]["otel.library.version"] = instrumentation_library.GetVersion();
 }
 
 void Recordable::SetSpanKind(opentelemetry::trace::SpanKind span_kind) noexcept {}

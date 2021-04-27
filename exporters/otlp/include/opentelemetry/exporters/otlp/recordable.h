@@ -43,8 +43,8 @@ public:
   void SetDuration(std::chrono::nanoseconds duration) noexcept override;
 
   void SetInstrumentationLibrary(
-      std::shared_ptr<const opentelemetry::sdk::instrumentationlibrary::InstrumentationLibrary>
-          &&instrumentation_library) noexcept override;
+      const opentelemetry::sdk::instrumentationlibrary::InstrumentationLibrary
+          &instrumentation_library) noexcept override;
 
 private:
   proto::trace::v1::Span span_;

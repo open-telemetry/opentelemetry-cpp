@@ -45,9 +45,9 @@ public:
   IdGenerator &GetIdGenerator() const noexcept { return context_->GetIdGenerator(); }
 
   /** Returns the associated instruementation library */
-  std::shared_ptr<const InstrumentationLibrary> GetInstrumentationLibrary() const noexcept
+  const InstrumentationLibrary &GetInstrumentationLibrary() const noexcept
   {
-    return instrumentation_library_;
+    return *instrumentation_library_;
   }
 
   // Note: Test only
