@@ -22,6 +22,7 @@
 #  pragma warning(push)
 #  pragma warning(disable : 4459)
 #  pragma warning(disable : 4018)
+#  pragma warning(disable : 5054)
 #endif
 
 #include "opentelemetry/exporters/etw/etw_properties.h"
