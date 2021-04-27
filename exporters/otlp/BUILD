@@ -28,7 +28,7 @@ cc_library(
     ],
     strip_include_prefix = "include",
     deps = [
-        "//sdk/resource",
+        "//sdk/src/resource",
         "//sdk/src/trace",
         "@com_github_opentelemetry_proto//:trace_proto_cc",
     ],
