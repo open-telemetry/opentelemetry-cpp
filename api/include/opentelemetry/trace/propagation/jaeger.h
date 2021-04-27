@@ -44,9 +44,11 @@ public:
 
     // trace-id(32):span-id(16):0:debug(2)
     char trace_identity[trace_id_length + span_id_length + 6];
-    span_context.trace_id().ToLowerBase16({&trace_identity[0], trace_id_length});
+    span_context.trace_id().ToLowerBase16(
+        nostd::span<char, 2 * TraceId::kSize>{&trace_identity[0], trace_id_length});
     trace_identity[trace_id_length] = ':';
-    span_context.span_id().ToLowerBase16({&trace_identity[trace_id_length + 1], span_id_length});
+    span_context.span_id().ToLowerBase16(
+        nostd::span<char, 2 * SpanId::kSize>{&trace_identity[trace_id_length + 1], span_id_length});
     trace_identity[trace_id_length + span_id_length + 1] = ':';
     trace_identity[trace_id_length + span_id_length + 2] = '0';
     trace_identity[trace_id_length + span_id_length + 3] = ':';

@@ -14,8 +14,10 @@
  * limitations under the License.
  */
 
+#include <array>
 #include "opentelemetry/logs/provider.h"
 #include "opentelemetry/nostd/shared_ptr.h"
+#include "opentelemetry/nostd/string_view.h"
 #include "opentelemetry/sdk/logs/log_record.h"
 #include "opentelemetry/sdk/logs/logger.h"
 #include "opentelemetry/sdk/logs/logger_provider.h"
