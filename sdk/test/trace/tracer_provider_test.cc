@@ -27,8 +27,7 @@ TEST(TracerProvider, GetTracer)
 
   // Should return the same instance each time.
   ASSERT_EQ(t1, t2);
-  // TODO: t3 should be a different instance.
-  ASSERT_EQ(t1, t3);
+  ASSERT_NE(t1, t3);
 
   // Should be an sdk::trace::Tracer with the processor attached.
   auto sdkTracer1 = dynamic_cast<Tracer *>(t1.get());
@@ -43,6 +42,16 @@ TEST(TracerProvider, GetTracer)
                                       std::unique_ptr<IdGenerator>(new RandomIdGenerator)));
   auto sdkTracer2 = dynamic_cast<Tracer *>(tp2.GetTracer("test").get());
   ASSERT_EQ("AlwaysOffSampler", sdkTracer2->GetSampler().GetDescription());
+
+  auto instrumentation_library1 = sdkTracer1->GetInstrumentationLibrary();
+  ASSERT_EQ(instrumentation_library1.GetName(), "test");
+  ASSERT_EQ(instrumentation_library1.GetVersion(), "");
+
+  // Should be an sdk::trace::Tracer with the processor attached.
+  auto sdkTracer3               = dynamic_cast<Tracer *>(t3.get());
+  auto instrumentation_library3 = sdkTracer3->GetInstrumentationLibrary();
+  ASSERT_EQ(instrumentation_library3.GetName(), "different");
+  ASSERT_EQ(instrumentation_library3.GetVersion(), "1.0.0");
 }
 
 TEST(TracerProvider, Shutdown)

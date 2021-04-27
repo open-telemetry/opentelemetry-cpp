@@ -11,7 +11,10 @@ namespace sdk
 namespace trace
 {
 
-Tracer::Tracer(std::shared_ptr<sdk::trace::TracerContext> context) noexcept : context_{context} {}
+Tracer::Tracer(std::shared_ptr<sdk::trace::TracerContext> context,
+               std::unique_ptr<InstrumentationLibrary> instrumentation_library) noexcept
+    : context_{context}, instrumentation_library_{std::move(instrumentation_library)}
+{}
 
 trace_api::SpanContext GetCurrentSpanContext(const trace_api::SpanContext &explicit_parent)
 {
