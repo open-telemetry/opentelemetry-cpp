@@ -11,8 +11,8 @@ namespace sdk
 namespace trace
 {
 
-using opentelemetry::core::SteadyTimestamp;
-using opentelemetry::core::SystemTimestamp;
+using opentelemetry::common::SteadyTimestamp;
+using opentelemetry::common::SystemTimestamp;
 
 namespace
 {
@@ -41,22 +41,6 @@ SteadyTimestamp NowOr(const SteadyTimestamp &steady)
 }
 }  // namespace
 
-// Helper function to generate random trace id.
-trace_api::TraceId GenerateRandomTraceId()
-{
-  uint8_t trace_id_buf[trace_api::TraceId::kSize];
-  sdk::common::Random::GenerateRandomBuffer(trace_id_buf);
-  return trace_api::TraceId(trace_id_buf);
-}
-
-// Helper function to generate random span id.
-trace_api::SpanId GenerateRandomSpanId()
-{
-  uint8_t span_id_buf[trace_api::SpanId::kSize];
-  sdk::common::Random::GenerateRandomBuffer(span_id_buf);
-  return trace_api::SpanId(span_id_buf);
-}
-
 Span::Span(std::shared_ptr<Tracer> &&tracer,
            nostd::string_view name,
            const opentelemetry::common::KeyValueIterable &attributes,
@@ -77,7 +61,7 @@ Span::Span(std::shared_ptr<Tracer> &&tracer,
   recordable_->SetName(name);
 
   trace_api::TraceId trace_id;
-  trace_api::SpanId span_id = GenerateRandomSpanId();
+  trace_api::SpanId span_id = tracer_->GetIdGenerator().GenerateSpanId();
   trace_api::SpanId parent_span_id;
   bool is_parent_span_valid = false;
 
@@ -89,7 +73,7 @@ Span::Span(std::shared_ptr<Tracer> &&tracer,
   }
   else
   {
-    trace_id = GenerateRandomTraceId();
+    trace_id = tracer_->GetIdGenerator().GenerateTraceId();
   }
 
   span_context_ = std::unique_ptr<trace_api::SpanContext>(new trace_api::SpanContext(
@@ -145,7 +129,7 @@ void Span::AddEvent(nostd::string_view name) noexcept
   recordable_->AddEvent(name);
 }
 
-void Span::AddEvent(nostd::string_view name, core::SystemTimestamp timestamp) noexcept
+void Span::AddEvent(nostd::string_view name, SystemTimestamp timestamp) noexcept
 {
   std::lock_guard<std::mutex> lock_guard{mu_};
   if (recordable_ == nullptr)
@@ -156,7 +140,7 @@ void Span::AddEvent(nostd::string_view name, core::SystemTimestamp timestamp) no
 }
 
 void Span::AddEvent(nostd::string_view name,
-                    core::SystemTimestamp timestamp,
+                    SystemTimestamp timestamp,
                     const opentelemetry::common::KeyValueIterable &attributes) noexcept
 {
   std::lock_guard<std::mutex> lock_guard{mu_};

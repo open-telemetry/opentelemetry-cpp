@@ -35,6 +35,16 @@ public:
     }
     return str.substr(left, 1 + right - left);
   }
+
+  static nostd::string_view Trim(nostd::string_view str)
+  {
+    if (str.empty())
+    {
+      return str;
+    }
+
+    return Trim(str, 0, str.size() - 1);
+  }
 };
 
 }  // namespace common

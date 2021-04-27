@@ -26,14 +26,8 @@ namespace zipkin
 
 //
 // See `attribute_value.h` for details.
-// Expecting to remove the two feature gates for:
-// - HAVE_SPAN_BYTE     - proposal for binary type or byte array (uint8_t[]).
 //
-#if defined(HAVE_SPAN_BYTE)
 const int kAttributeValueSize = 15;
-#else
-const int kAttributeValueSize = 14;
-#endif
 
 void Recordable::SetIdentity(const opentelemetry::trace::SpanContext &span_context,
                              opentelemetry::trace::SpanId parent_span_id) noexcept
@@ -88,7 +82,6 @@ void PopulateAttribute(nlohmann::json &attribute,
     attribute[key.data()] = nostd::string_view(nostd::get<nostd::string_view>(value).data(),
                                                nostd::get<nostd::string_view>(value).size());
   }
-#ifdef HAVE_SPAN_BYTE
   else if (nostd::holds_alternative<nostd::span<const uint8_t>>(value))
   {
     attribute[key.data()] = {};
@@ -97,7 +90,6 @@ void PopulateAttribute(nlohmann::json &attribute,
       attribute[key.data()].push_back(val);
     }
   }
-#endif
   else if (nostd::holds_alternative<nostd::span<const bool>>(value))
   {
     attribute[key.data()] = {};
@@ -167,7 +159,7 @@ void Recordable::SetAttribute(nostd::string_view key,
 }
 
 void Recordable::AddEvent(nostd::string_view name,
-                          core::SystemTimestamp timestamp,
+                          common::SystemTimestamp timestamp,
                           const common::KeyValueIterable &attributes) noexcept
 {
   nlohmann::json attrs = nlohmann::json::object();  // empty object
@@ -212,7 +204,7 @@ void Recordable::SetName(nostd::string_view name) noexcept
   span_["name"] = name.data();
 }
 
-void Recordable::SetStartTime(opentelemetry::core::SystemTimestamp start_time) noexcept
+void Recordable::SetStartTime(opentelemetry::common::SystemTimestamp start_time) noexcept
 {
   span_["timestamp"] =
       std::chrono::duration_cast<std::chrono::microseconds>(start_time.time_since_epoch()).count();

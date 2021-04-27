@@ -8,7 +8,7 @@
 
 #include "opentelemetry/ext/zpages/zpages.h"  // Required file include for zpages
 
-using opentelemetry::core::SteadyTimestamp;
+using opentelemetry::common::SteadyTimestamp;
 
 int main(int argc, char *argv[])
 {

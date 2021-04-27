@@ -23,7 +23,7 @@
 #include "opentelemetry/common/attribute_value.h"
 #include "opentelemetry/common/key_value_iterable.h"
 #include "opentelemetry/common/key_value_iterable_view.h"
-#include "opentelemetry/core/timestamp.h"
+#include "opentelemetry/common/timestamp.h"
 #include "opentelemetry/logs/severity.h"
 #include "opentelemetry/nostd/shared_ptr.h"
 #include "opentelemetry/nostd/span.h"
@@ -80,7 +80,7 @@ public:
                    trace::TraceId trace_id,
                    trace::SpanId span_id,
                    trace::TraceFlags trace_flags,
-                   core::SystemTimestamp timestamp) noexcept = 0;
+                   common::SystemTimestamp timestamp) noexcept = 0;
 
   /*** Overloaded methods for KeyValueIterables ***/
   /**
@@ -101,7 +101,7 @@ public:
            trace::TraceId trace_id,
            trace::SpanId span_id,
            trace::TraceFlags trace_flags,
-           core::SystemTimestamp timestamp) noexcept
+           common::SystemTimestamp timestamp) noexcept
   {
     Log(severity, name, body, common::KeyValueIterableView<T>(resource),
         common::KeyValueIterableView<U>(attributes), trace_id, span_id, trace_flags, timestamp);
@@ -115,7 +115,7 @@ public:
            trace::TraceId trace_id,
            trace::SpanId span_id,
            trace::TraceFlags trace_flags,
-           core::SystemTimestamp timestamp) noexcept
+           common::SystemTimestamp timestamp) noexcept
   {
     return this->Log(severity, name, body,
                      nostd::span<const std::pair<nostd::string_view, common::AttributeValue>>{

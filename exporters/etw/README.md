@@ -110,15 +110,17 @@ These options affect how "embedded in application" OpenTelemetry C++ SDK code is
 | HAVE_CPP_STDLIB   | Use STL classes for API surface. This option requires at least C++17. C++20 is recommended. Some customers may benefit from STL library provided with the compiler instead of using custom OpenTelemetry `nostd::` implementation due to security and performance considerations. |
 | HAVE_GSL      | Use [Microsoft GSL](https://github.com/microsoft/GSL) for `gsl::span` implementation. Library must be in include path. Microsoft GSL claims to be the most feature-complete implementation of `std::span`. It may be used instead of `nostd::span` implementation in projects that statically link OpenTelemetry SDK. |
 | HAVE_ABSEIL_VARIANT | Use `absl::variant` instead of `nostd::variant`. `nostd::variant` is incompatible with Visual Studio 2015. `absl::variant` should be used instead if targeting Visual Studio 2015. |
+| HAVE_TLD      | Use ETW/TraceLogging Dynamic protocol. This is the default implementation compatible with existing C# "listeners" / "decoders" of ETW events. This option requires an additional optional Microsoft MIT-licensed `TraceLoggingDynamic.h` header. |
 
 ## Debugging
 
 ### ETW TraceLogging Dynamic Events
 
 ETW supports a mode that is called "Dynamic Manifest", where event may contain strongly-typed
-key-value pairs, with primitive types such as `integer`, `double`, `string`, etc.
-[TraceLogging Dynamic library](https://github.com/microsoft/tracelogging-dynamic-windows)
-has been donated by Microsoft under MIT license.
+key-value pairs, with primitive types such as `integer`, `double`, `string`, etc. This mode
+requires `TraceLoggingDynamic.h` header. Please refer to upstream repository containining
+[Microsoft TraceLogging Dynamic framework](https://github.com/microsoft/tracelogging-dynamic-windows)
+licensed under [MIT License](https://github.com/microsoft/tracelogging-dynamic-windows/blob/main/LICENSE).
 
 Complete [list of ETW types](https://docs.microsoft.com/en-us/windows/win32/wes/eventmanifestschema-outputtype-complextype#remarks).
 
