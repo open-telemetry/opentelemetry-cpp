@@ -47,7 +47,7 @@ public:
                     const opentelemetry::common::AttributeValue &value) noexcept override;
 
   void AddEvent(nostd::string_view name,
-                core::SystemTimestamp timestamp,
+                common::SystemTimestamp timestamp,
                 const common::KeyValueIterable &attributes) noexcept override;
 
   void AddLink(const opentelemetry::trace::SpanContext &span_context,
@@ -57,7 +57,7 @@ public:
 
   void SetName(nostd::string_view name) noexcept override;
 
-  void SetStartTime(opentelemetry::core::SystemTimestamp start_time) noexcept override;
+  void SetStartTime(opentelemetry::common::SystemTimestamp start_time) noexcept override;
 
   void SetSpanKind(opentelemetry::trace::SpanKind span_kind) noexcept override;
 

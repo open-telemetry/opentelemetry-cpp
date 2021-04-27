@@ -158,7 +158,7 @@ public:
    * Set the timestamp for this log.
    * @param timestamp the timestamp of the event
    */
-  void SetTimestamp(core::SystemTimestamp timestamp) noexcept override
+  void SetTimestamp(common::SystemTimestamp timestamp) noexcept override
   {
     json_["timestamp"] = timestamp.time_since_epoch().count();
   }

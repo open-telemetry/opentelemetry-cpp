@@ -7,26 +7,46 @@
 #include "opentelemetry/version.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
-namespace core
+namespace common
 {
 /**
- * Represents a timepoint relative to the system clock epoch
+ * @brief A timepoint relative to the system clock epoch.
+ *
+ * This is used for marking the beginning and end of an operation.
  */
 class SystemTimestamp
 {
 public:
+  /**
+   * @brief Initializes a system timestamp pointing to the start of the epoch.
+   */
   SystemTimestamp() noexcept : nanos_since_epoch_{0} {}
 
+  /**
+   * @brief Initializes a system timestamp from a duration.
+   *
+   * @param time_since_epoch Time elapsed since the beginning of the epoch.
+   */
   template <class Rep, class Period>
   explicit SystemTimestamp(const std::chrono::duration<Rep, Period> &time_since_epoch) noexcept
       : nanos_since_epoch_{static_cast<int64_t>(
             std::chrono::duration_cast<std::chrono::nanoseconds>(time_since_epoch).count())}
   {}
 
+  /**
+   * @brief Initializes a system timestamp based on a point in time.
+   *
+   * @param time_point A point in time.
+   */
   /*implicit*/ SystemTimestamp(const std::chrono::system_clock::time_point &time_point) noexcept
       : SystemTimestamp{time_point.time_since_epoch()}
   {}
 
+  /**
+   * @brief Returns a time point for the time stamp.
+   *
+   * @return A time point corresponding to the time stamp.
+   */
   operator std::chrono::system_clock::time_point() const noexcept
   {
     return std::chrono::system_clock::time_point{
@@ -35,18 +55,30 @@ public:
   }
 
   /**
-   * @return the amount of time that has passed since the system clock epoch
+   * @brief Returns the nanoseconds since the beginning of the epoch.
+   *
+   * @return Elapsed nanoseconds since the beginning of the epoch for this timestamp.
    */
   std::chrono::nanoseconds time_since_epoch() const noexcept
   {
     return std::chrono::nanoseconds{nanos_since_epoch_};
   }
 
+  /**
+   * @brief Compare two steady time stamps.
+   *
+   * @return true if the two time stamps are equal.
+   */
   bool operator==(const SystemTimestamp &other) const noexcept
   {
     return nanos_since_epoch_ == other.nanos_since_epoch_;
   }
 
+  /**
+   * @brief Compare two steady time stamps for inequality.
+   *
+   * @return true if the two time stamps are not equal.
+   */
   bool operator!=(const SystemTimestamp &other) const noexcept
   {
     return nanos_since_epoch_ != other.nanos_since_epoch_;
@@ -57,23 +89,43 @@ private:
 };
 
 /**
- * Represents a timepoint relative to the monotonic clock epoch
+ * @brief A timepoint relative to the monotonic clock epoch
+ *
+ * This is used for calculating the duration of an operation.
  */
 class SteadyTimestamp
 {
 public:
+  /**
+   * @brief Initializes a monotonic timestamp pointing to the start of the epoch.
+   */
   SteadyTimestamp() noexcept : nanos_since_epoch_{0} {}
 
+  /**
+   * @brief Initializes a monotonic timestamp from a duration.
+   *
+   * @param time_since_epoch Time elapsed since the beginning of the epoch.
+   */
   template <class Rep, class Period>
   explicit SteadyTimestamp(const std::chrono::duration<Rep, Period> &time_since_epoch) noexcept
       : nanos_since_epoch_{static_cast<int64_t>(
             std::chrono::duration_cast<std::chrono::nanoseconds>(time_since_epoch).count())}
   {}
 
+  /**
+   * @brief Initializes a monotonic timestamp based on a point in time.
+   *
+   * @param time_point A point in time.
+   */
   /*implicit*/ SteadyTimestamp(const std::chrono::steady_clock::time_point &time_point) noexcept
       : SteadyTimestamp{time_point.time_since_epoch()}
   {}
 
+  /**
+   * @brief Returns a time point for the time stamp.
+   *
+   * @return A time point corresponding to the time stamp.
+   */
   operator std::chrono::steady_clock::time_point() const noexcept
   {
     return std::chrono::steady_clock::time_point{
@@ -82,18 +134,30 @@ public:
   }
 
   /**
-   * @return the amount of time that has passed since the monotonic clock epoch
+   * @brief Returns the nanoseconds since the beginning of the epoch.
+   *
+   * @return Elapsed nanoseconds since the beginning of the epoch for this timestamp.
    */
   std::chrono::nanoseconds time_since_epoch() const noexcept
   {
     return std::chrono::nanoseconds{nanos_since_epoch_};
   }
 
+  /**
+   * @brief Compare two steady time stamps.
+   *
+   * @return true if the two time stamps are equal.
+   */
   bool operator==(const SteadyTimestamp &other) const noexcept
   {
     return nanos_since_epoch_ == other.nanos_since_epoch_;
   }
 
+  /**
+   * @brief Compare two steady time stamps for inequality.
+   *
+   * @return true if the two time stamps are not equal.
+   */
   bool operator!=(const SteadyTimestamp &other) const noexcept
   {
     return nanos_since_epoch_ != other.nanos_since_epoch_;
@@ -102,5 +166,5 @@ public:
 private:
   int64_t nanos_since_epoch_;
 };
-}  // namespace core
+}  // namespace common
 OPENTELEMETRY_END_NAMESPACE

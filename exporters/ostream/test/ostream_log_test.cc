@@ -97,7 +97,7 @@ TEST(OStreamLogExporter, SimpleLogToCout)
 
   // Pass a default recordable created by the exporter to be exported
   // Create a log record and manually timestamp, severity, name, message
-  opentelemetry::core::SystemTimestamp now(std::chrono::system_clock::now());
+  opentelemetry::common::SystemTimestamp now(std::chrono::system_clock::now());
 
   auto record = std::unique_ptr<sdklogs::Recordable>(new sdklogs::LogRecord());
   record->SetTimestamp(now);
@@ -252,7 +252,7 @@ TEST(OStreamLogExporter, IntegrationTest)
   std::cout.rdbuf(stdcoutOutput.rdbuf());
 
   // Write a log to ostream exporter
-  opentelemetry::core::SystemTimestamp now(std::chrono::system_clock::now());
+  opentelemetry::common::SystemTimestamp now(std::chrono::system_clock::now());
   logger->Log(opentelemetry::logs::Severity::kDebug, "", "Hello", {}, {}, {}, {}, {}, now);
 
   // Restore cout's original streambuf

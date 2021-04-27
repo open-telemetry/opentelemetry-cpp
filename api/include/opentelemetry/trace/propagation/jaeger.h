@@ -28,17 +28,10 @@ namespace propagation
 
 static const nostd::string_view kTraceHeader = "uber-trace-id";
 
-template <typename T>
-class JaegerPropagator : public TextMapPropagator<T>
+class JaegerPropagator : public TextMapPropagator
 {
 public:
-  using Getter = nostd::string_view (*)(const T &carrier, nostd::string_view trace_type);
-
-  using Setter = void (*)(T &carrier,
-                          nostd::string_view trace_type,
-                          nostd::string_view trace_description);
-
-  void Inject(Setter setter, T &carrier, const context::Context &context) noexcept override
+  void Inject(TextMapCarrier &carrier, const context::Context &context) noexcept override
   {
     SpanContext span_context = detail::GetCurrentSpan(context);
     if (!span_context.IsValid())
@@ -60,14 +53,13 @@ public:
     trace_identity[trace_id_length + span_id_length + 4] = '0';
     trace_identity[trace_id_length + span_id_length + 5] = span_context.IsSampled() ? '1' : '0';
 
-    setter(carrier, kTraceHeader, nostd::string_view(trace_identity, sizeof(trace_identity)));
+    carrier.Set(kTraceHeader, nostd::string_view(trace_identity, sizeof(trace_identity)));
   }
 
-  context::Context Extract(Getter getter,
-                           const T &carrier,
+  context::Context Extract(const TextMapCarrier &carrier,
                            context::Context &context) noexcept override
   {
-    SpanContext span_context = ExtractImpl(getter, carrier);
+    SpanContext span_context = ExtractImpl(carrier);
     nostd::shared_ptr<Span> sp{new DefaultSpan(span_context)};
     return context.SetValue(kSpanKey, sp);
   }
@@ -81,9 +73,9 @@ private:
     return TraceFlags(sampled);
   }
 
-  static SpanContext ExtractImpl(Getter getter, const T &carrier)
+  static SpanContext ExtractImpl(const TextMapCarrier &carrier)
   {
-    nostd::string_view trace_identity = getter(carrier, kTraceHeader);
+    nostd::string_view trace_identity = carrier.Get(kTraceHeader);
 
     const size_t trace_field_count = 4;
     nostd::string_view trace_fields[trace_field_count];

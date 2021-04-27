@@ -22,7 +22,7 @@
 
 #include "opentelemetry/sdk/trace/exporter.h"
 
-#include "opentelemetry/core/timestamp.h"
+#include "opentelemetry/common/timestamp.h"
 #include "opentelemetry/exporters/zipkin/recordable.h"
 
 #include <iostream>
@@ -71,7 +71,7 @@ TEST(ZipkinSpanRecordable, SetStartTime)
 {
   opentelemetry::exporter::zipkin::Recordable rec;
   std::chrono::system_clock::time_point start_time = std::chrono::system_clock::now();
-  opentelemetry::core::SystemTimestamp start_timestamp(start_time);
+  opentelemetry::common::SystemTimestamp start_timestamp(start_time);
 
   uint64_t unix_start =
       std::chrono::duration_cast<std::chrono::microseconds>(start_time.time_since_epoch()).count();
@@ -85,7 +85,7 @@ TEST(ZipkinSpanRecordable, SetDuration)
   json j_span = {{"duration", 10}, {"timestamp", 0}};
   opentelemetry::exporter::zipkin::Recordable rec;
   // Start time is 0
-  opentelemetry::core::SystemTimestamp start_timestamp;
+  opentelemetry::common::SystemTimestamp start_timestamp;
 
   std::chrono::nanoseconds duration(10);
   uint64_t unix_end = duration.count();
@@ -120,7 +120,7 @@ TEST(ZipkinSpanRecordable, AddEventDefault)
   nostd::string_view name = "Test Event";
 
   std::chrono::system_clock::time_point event_time = std::chrono::system_clock::now();
-  opentelemetry::core::SystemTimestamp event_timestamp(event_time);
+  opentelemetry::common::SystemTimestamp event_timestamp(event_time);
 
   rec.opentelemetry::sdk::trace::Recordable::AddEvent(name, event_timestamp);
 
@@ -139,7 +139,7 @@ TEST(ZipkinSpanRecordable, AddEventWithAttributes)
   nostd::string_view name = "Test Event";
 
   std::chrono::system_clock::time_point event_time = std::chrono::system_clock::now();
-  opentelemetry::core::SystemTimestamp event_timestamp(event_time);
+  opentelemetry::common::SystemTimestamp event_timestamp(event_time);
   uint64_t unix_event_time =
       std::chrono::duration_cast<std::chrono::milliseconds>(event_time.time_since_epoch()).count();
 
