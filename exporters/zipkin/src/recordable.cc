@@ -25,7 +25,8 @@ namespace exporter
 namespace zipkin
 {
 
-std::map<opentelemetry::trace::SpanKind, std::string> kSpanKindMap = {
+// constexpr needs keys to be constexpr, const is next best to use.
+const std::map<opentelemetry::trace::SpanKind, std::string> kSpanKindMap = {
     {opentelemetry::trace::SpanKind::kClient, "CLIENT"},
     {opentelemetry::trace::SpanKind::kServer, "SERVER"},
     {opentelemetry::trace::SpanKind::kConsumer, "CONSUMER"},
