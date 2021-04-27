@@ -1,7 +1,7 @@
 #pragma once
 
 #include "opentelemetry/exporters/otlp/protobuf_include_prefix.h"
-
+#include "opentelemetry/proto/resource/v1/resource.pb.h"
 #include "opentelemetry/proto/trace/v1/trace.pb.h"
 
 #include "opentelemetry/exporters/otlp/protobuf_include_suffix.h"
@@ -18,6 +18,9 @@ class Recordable final : public sdk::trace::Recordable
 {
 public:
   const proto::trace::v1::Span &span() const noexcept { return span_; }
+
+  /** Dynamically converts the resource of this span into a proto. */
+  proto::resource::v1::Resource resource() const noexcept;
 
   void SetIdentity(const opentelemetry::trace::SpanContext &span_context,
                    opentelemetry::trace::SpanId parent_span_id) noexcept override;
@@ -46,6 +49,7 @@ public:
 
 private:
   proto::trace::v1::Span span_;
+  opentelemetry::sdk::resource::Resource &resource_{opentelemetry::sdk::resource::Resource::GetEmpty()};
 };
 }  // namespace otlp
 }  // namespace exporter

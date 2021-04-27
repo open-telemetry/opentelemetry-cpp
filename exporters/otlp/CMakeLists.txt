@@ -5,7 +5,7 @@ set_target_properties(opentelemetry_exporter_otprotocol
                       PROPERTIES EXPORT_NAME otlp_exporter)
 
 target_link_libraries(opentelemetry_exporter_otprotocol
-                      PUBLIC opentelemetry_trace opentelemetry_proto)
+                      PUBLIC opentelemetry_trace opentelemetry_resources opentelemetry_proto)
 
 install(
   TARGETS opentelemetry_exporter_otprotocol

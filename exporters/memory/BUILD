@@ -9,6 +9,7 @@ cc_library(
     deps = [
         "//api",
         "//sdk/src/trace",
+        "//sdk/resource"
     ],
 )
 
@@ -28,7 +29,7 @@ cc_library(
     strip_include_prefix = "include",
     deps = [
         ":in_memory_span_data",
-        "//sdk/src/trace",
+        "//sdk/src/trace"
     ],
 )
 
