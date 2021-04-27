@@ -26,7 +26,7 @@ namespace zipkin
 {
 
 // constexpr needs keys to be constexpr, const is next best to use.
-const std::map<opentelemetry::trace::SpanKind, std::string> kSpanKindMap = {
+static const std::map<opentelemetry::trace::SpanKind, std::string> kSpanKindMap = {
     {opentelemetry::trace::SpanKind::kClient, "CLIENT"},
     {opentelemetry::trace::SpanKind::kServer, "SERVER"},
     {opentelemetry::trace::SpanKind::kConsumer, "CONSUMER"},
@@ -228,7 +228,7 @@ void Recordable::SetSpanKind(opentelemetry::trace::SpanKind span_kind) noexcept
 {
   if (kSpanKindMap.find(span_kind) != kSpanKindMap.end())
   {
-    span_["kind"] = kSpanKindMap[span_kind];
+    span_["kind"] = kSpanKindMap.at(span_kind);
   }
   else
   {
