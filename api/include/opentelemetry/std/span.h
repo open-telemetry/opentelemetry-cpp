@@ -28,11 +28,11 @@
 #  endif
 #  if !defined(HAVE_SPAN)
 #    // Check for Visual Studio span
-#    if defined(_MSVC_VALUE) && _HAS_CXX20
+#    if defined(_MSVC_LANG) && _HAS_CXX20
 #      define HAVE_SPAN
 #    endif
 #    // Check for other compiler span implementation
-#    if !defined(_MSVC_VALUE) && __has_include(<span>)
+#    if !defined(_MSVC_LANG) && __has_include(<span>)
 // This works as long as compiler standard is set to C++20
 #      define HAVE_SPAN
 #    endif
