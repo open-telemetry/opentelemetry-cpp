@@ -240,7 +240,7 @@ void Recordable::SetInstrumentationLibrary(
   span_["tags"]["otel.library.name"]    = instrumentation_library.GetName();
   span_["tags"]["otel.library.version"] = instrumentation_library.GetVersion();
 }
-  
+
 }  // namespace zipkin
 }  // namespace exporter
 OPENTELEMETRY_END_NAMESPACE
