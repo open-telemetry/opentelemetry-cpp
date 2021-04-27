@@ -226,9 +226,10 @@ void Recordable::SetDuration(std::chrono::nanoseconds duration) noexcept
 
 void Recordable::SetSpanKind(opentelemetry::trace::SpanKind span_kind) noexcept
 {
-  if (kSpanKindMap.find(span_kind) != kSpanKindMap.end())
+  auto span_iter = kSpanKindMap.find(span_kind);
+  if (span_iter != kSpanKindMap.end())
   {
-    span_["kind"] = kSpanKindMap.at(span_kind);
+    span_["kind"] = *span_iter;
   }
   else
   {
