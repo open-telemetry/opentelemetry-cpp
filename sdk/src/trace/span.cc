@@ -59,6 +59,7 @@ Span::Span(std::shared_ptr<Tracer> &&tracer,
     return;
   }
   recordable_->SetName(name);
+  recordable_->SetInstrumentationLibrary(tracer_->GetInstrumentationLibrary());
 
   trace_api::TraceId trace_id;
   trace_api::SpanId span_id = tracer_->GetIdGenerator().GenerateSpanId();
@@ -80,9 +81,9 @@ Span::Span(std::shared_ptr<Tracer> &&tracer,
       trace_id, span_id,
       sampled ? trace_api::TraceFlags{trace_api::TraceFlags::kIsSampled} : trace_api::TraceFlags{},
       false,
-      trace_state ? trace_state
-                  : is_parent_span_valid ? parent_span_context.trace_state()
-                                         : trace_api::TraceState::GetDefault()));
+      trace_state            ? trace_state
+      : is_parent_span_valid ? parent_span_context.trace_state()
+                             : trace_api::TraceState::GetDefault()));
 
   recordable_->SetIdentity(*span_context_, parent_span_id);
 

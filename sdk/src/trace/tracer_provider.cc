@@ -32,7 +32,7 @@ nostd::shared_ptr<opentelemetry::trace::Tracer> TracerProvider::GetTracer(
   for (auto &tracer : tracers_)
   {
     auto &tracer_lib = tracer->GetInstrumentationLibrary();
-    if (tracer_lib.equal(library_name, library_version))
+    if (tracer_lib->equal(library_name, library_version))
     {
       return nostd::shared_ptr<opentelemetry::trace::Tracer>{tracer};
     }

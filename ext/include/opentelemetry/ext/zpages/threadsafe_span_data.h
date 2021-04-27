@@ -172,6 +172,14 @@ public:
     duration_ = duration;
   }
 
+  void SetInstrumentationLibrary(
+      std::shared_ptr<const opentelemetry::sdk::instrumentationlibrary::InstrumentationLibrary>
+          &&instrumentation_library) noexcept override
+  {
+    std::lock_guard<std::mutex> lock(mutex_);
+    instrumentation_library_ = std::move(instrumentation_library);
+  }
+
   void AddLink(const opentelemetry::trace::SpanContext &span_context,
                const opentelemetry::common::KeyValueIterable &attributes =
                    opentelemetry::common::KeyValueIterableView<std::map<std::string, int>>(
@@ -212,7 +220,8 @@ private:
         status_desc_(threadsafe_span_data.status_desc_),
         attributes_(threadsafe_span_data.attributes_),
         events_(threadsafe_span_data.events_),
-        converter_(threadsafe_span_data.converter_)
+        converter_(threadsafe_span_data.converter_),
+        instrumentation_library_(threadsafe_span_data.instrumentation_library_)
   {}
 
   mutable std::mutex mutex_;
@@ -227,6 +236,8 @@ private:
   std::unordered_map<std::string, opentelemetry::sdk::common::OwnedAttributeValue> attributes_;
   std::vector<opentelemetry::sdk::trace::SpanDataEvent> events_;
   opentelemetry::sdk::common::AttributeConverter converter_;
+  std::shared_ptr<const opentelemetry::sdk::instrumentationlibrary::InstrumentationLibrary>
+      instrumentation_library_;
 };
 }  // namespace zpages
 }  // namespace ext

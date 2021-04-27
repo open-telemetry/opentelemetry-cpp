@@ -215,6 +215,14 @@ void Recordable::SetDuration(std::chrono::nanoseconds duration) noexcept
   span_["duration"] = duration.count();
 }
 
+void Recordable::SetInstrumentationLibrary(
+    std::shared_ptr<const opentelemetry::sdk::instrumentationlibrary::InstrumentationLibrary>
+        &&instrumentation_library) noexcept
+{
+  span_["otel.library.name"]    = instrumentation_library->GetName();
+  span_["otel.library.version"] = instrumentation_library->GetVersion();
+}
+
 void Recordable::SetSpanKind(opentelemetry::trace::SpanKind span_kind) noexcept {}
 }  // namespace zipkin
 }  // namespace exporter

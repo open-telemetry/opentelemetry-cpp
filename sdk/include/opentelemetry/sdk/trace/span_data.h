@@ -232,6 +232,12 @@ public:
 
   void SetDuration(std::chrono::nanoseconds duration) noexcept override { duration_ = duration; }
 
+  void SetInstrumentationLibrary(
+      std::shared_ptr<const InstrumentationLibrary> &&instrumentation_library) noexcept override
+  {
+    instrumentation_library_ = instrumentation_library;
+  }
+
 private:
   opentelemetry::trace::SpanContext span_context_{false, false};
   opentelemetry::trace::SpanId parent_span_id_;
@@ -244,6 +250,7 @@ private:
   std::vector<SpanDataEvent> events_;
   std::vector<SpanDataLink> links_;
   opentelemetry::trace::SpanKind span_kind_{opentelemetry::trace::SpanKind::kInternal};
+  std::weak_ptr<const InstrumentationLibrary> instrumentation_library_;
 };
 }  // namespace trace
 }  // namespace sdk
