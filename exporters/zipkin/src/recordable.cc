@@ -16,13 +16,21 @@
 
 #include "opentelemetry/exporters/zipkin/recordable.h"
 
-#include <iostream>
+#include <map>
+#include <string>
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace exporter
 {
 namespace zipkin
 {
+
+std::map<opentelemetry::trace::SpanKind, std::string> kSpanKindMap = {
+    {opentelemetry::trace::SpanKind::kClient, "CLIENT"},
+    {opentelemetry::trace::SpanKind::kServer, "SERVER"},
+    {opentelemetry::trace::SpanKind::kConsumer, "CONSUMER"},
+    {opentelemetry::trace::SpanKind::kProducer, "PRODUCER"},
+};
 
 //
 // See `attribute_value.h` for details.
@@ -215,7 +223,17 @@ void Recordable::SetDuration(std::chrono::nanoseconds duration) noexcept
   span_["duration"] = duration.count();
 }
 
-void Recordable::SetSpanKind(opentelemetry::trace::SpanKind span_kind) noexcept {}
+void Recordable::SetSpanKind(opentelemetry::trace::SpanKind span_kind) noexcept
+{
+  if (kSpanKindMap.find(span_kind) != kSpanKindMap.end())
+  {
+    span_["kind"] = kSpanKindMap[span_kind];
+  }
+  else
+  {
+    span_["kind"] = nullptr;
+  }
+}
 }  // namespace zipkin
 }  // namespace exporter
 OPENTELEMETRY_END_NAMESPACE
