@@ -148,8 +148,11 @@ public:
    * Get the attributes associated with the resource
    * @returns the attributes associated with the resource configured for TracerProvider
    */
-  
-  const opentelemetry::sdk::resource::ResourceAttributes& GetResource() const noexcept { return resourceAttributes_;}
+
+  const opentelemetry::sdk::resource::ResourceAttributes &GetResource() const noexcept
+  {
+    return resourceAttributes_;
+  }
 
   /**
    * Get the start time for this span
@@ -232,11 +235,10 @@ public:
     span_kind_ = span_kind;
   }
 
-  void SetResource( const opentelemetry::sdk::resource::Resource& resource) noexcept override
+  void SetResource(const opentelemetry::sdk::resource::Resource &resource) noexcept override
   {
     resourceAttributes_ = resource.GetAttributes();
   }
-
 
   void SetStartTime(opentelemetry::core::SystemTimestamp start_time) noexcept override
   {

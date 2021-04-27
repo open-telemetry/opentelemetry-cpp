@@ -28,8 +28,8 @@ cc_library(
     ],
     strip_include_prefix = "include",
     deps = [
+        "//sdk/resource",
         "//sdk/src/trace",
-        "//sdk/resource"
         "@com_github_opentelemetry_proto//:trace_proto_cc",
     ],
 )

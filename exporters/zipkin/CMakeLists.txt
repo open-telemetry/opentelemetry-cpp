@@ -38,7 +38,8 @@ if(BUILD_TESTING)
 
   target_link_libraries(
     zipkin_recordable_test ${GTEST_BOTH_LIBRARIES} ${CMAKE_THREAD_LIBS_INIT}
-    opentelemetry_exporter_zipkin_trace opentelemetry_resources http_client_curl)
+    opentelemetry_exporter_zipkin_trace opentelemetry_resources
+    http_client_curl)
 
   gtest_add_tests(
     TARGET zipkin_recordable_test

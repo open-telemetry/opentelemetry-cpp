@@ -123,7 +123,6 @@ void PopulateAttribute(opentelemetry::proto::common::v1::KeyValue *attribute,
   }
 }
 
-
 /** Maps from C++ attribute into OTLP proto attribute. */
 void PopulateAttribute(opentelemetry::proto::common::v1::KeyValue *attribute,
                        nostd::string_view key,
@@ -230,12 +229,10 @@ proto::resource::v1::Resource Recordable::resource() const noexcept
   return proto;
 }
 
-void Recordable::SetResource(
-    const opentelemetry::sdk::resource::Resource &resource) noexcept
+void Recordable::SetResource(const opentelemetry::sdk::resource::Resource &resource) noexcept
 {
   resource_ = resource;
 };
-
 
 void Recordable::SetAttribute(nostd::string_view key,
                               const opentelemetry::common::AttributeValue &value) noexcept
@@ -327,11 +324,7 @@ void Recordable::SetSpanKind(opentelemetry::trace::SpanKind span_kind) noexcept
   span_.set_kind(proto_span_kind);
 }
 
-  void SetResource( const opentelemetry::sdk::resource::Resource& resource) noexcept
-  {
-
-  }
-
+void SetResource(const opentelemetry::sdk::resource::Resource &resource) noexcept {}
 
 void Recordable::SetStartTime(opentelemetry::core::SystemTimestamp start_time) noexcept
 {

@@ -5,8 +5,8 @@
 #include "opentelemetry/core/timestamp.h"
 #include "opentelemetry/nostd/string_view.h"
 #include "opentelemetry/sdk/common/empty_attributes.h"
-#include "opentelemetry/trace/canonical_code.h"
 #include "opentelemetry/sdk/resource/resource.h"
+#include "opentelemetry/trace/canonical_code.h"
 #include "opentelemetry/trace/span.h"
 #include "opentelemetry/trace/span_context.h"
 #include "opentelemetry/trace/span_id.h"
@@ -115,12 +115,11 @@ public:
    */
   virtual void SetSpanKind(opentelemetry::trace::SpanKind span_kind) noexcept = 0;
 
-
   /**
    * Set Resource of the span
    * @param Resource the resource to set
    */
-  virtual void SetResource( const opentelemetry::sdk::resource::Resource& resource) noexcept = 0;
+  virtual void SetResource(const opentelemetry::sdk::resource::Resource &resource) noexcept = 0;
 
   /**
    * Set the start time of the span.

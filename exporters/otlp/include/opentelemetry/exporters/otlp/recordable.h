@@ -41,7 +41,7 @@ public:
 
   void SetSpanKind(opentelemetry::trace::SpanKind span_kind) noexcept override;
 
-  void SetResource( const opentelemetry::sdk::resource::Resource& resource) noexcept override;
+  void SetResource(const opentelemetry::sdk::resource::Resource &resource) noexcept override;
 
   void SetStartTime(opentelemetry::core::SystemTimestamp start_time) noexcept override;
 
@@ -49,7 +49,8 @@ public:
 
 private:
   proto::trace::v1::Span span_;
-  opentelemetry::sdk::resource::Resource &resource_{opentelemetry::sdk::resource::Resource::GetEmpty()};
+  opentelemetry::sdk::resource::Resource &resource_{
+      opentelemetry::sdk::resource::Resource::GetEmpty()};
 };
 }  // namespace otlp
 }  // namespace exporter

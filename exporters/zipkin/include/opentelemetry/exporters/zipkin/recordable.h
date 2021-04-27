@@ -38,7 +38,7 @@ class Recordable final : public sdk::trace::Recordable
 public:
   const ZipkinSpan &span() const noexcept { return span_; }
 
-  const std::string & GetServiceName() const noexcept { return service_name_; }
+  const std::string &GetServiceName() const noexcept { return service_name_; }
 
   void SetIdentity(const opentelemetry::trace::SpanContext &span_context,
                    opentelemetry::trace::SpanId parent_span_id) noexcept override;
@@ -61,11 +61,9 @@ public:
 
   void SetSpanKind(opentelemetry::trace::SpanKind span_kind) noexcept override;
 
-  void SetResource( const opentelemetry::sdk::resource::Resource& resource) noexcept override;
-
+  void SetResource(const opentelemetry::sdk::resource::Resource &resource) noexcept override;
 
   void SetDuration(std::chrono::nanoseconds duration) noexcept override;
-  
 
 private:
   ZipkinSpan span_;
