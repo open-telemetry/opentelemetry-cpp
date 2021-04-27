@@ -101,7 +101,8 @@ TEST(ZipkinSpanRecordable, SetInstrumentationLibrary)
 
   const char *library_name    = "otel-cpp";
   const char *library_version = "0.5.0";
-  json j_span = {{"otel.library.name", library_name}, {"otel.library.version", library_version}};
+  json j_span                 = {
+      {"tags", {{"otel.library.name", library_name}, {"otel.library.version", library_version}}}};
   opentelemetry::exporter::zipkin::Recordable rec;
 
   rec.SetInstrumentationLibrary(std::shared_ptr<InstrumentationLibrary>(
