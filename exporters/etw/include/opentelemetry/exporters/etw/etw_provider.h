@@ -57,7 +57,6 @@ using namespace OPENTELEMETRY_NAMESPACE::exporter::etw;
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 
-
 class ETWProvider
 {
 
@@ -516,7 +515,7 @@ public:
           dbuilder.AddString(temp);
           break;
         }
-#  if HAVE_TYPE_GUID
+#if HAVE_TYPE_GUID
           // TODO: consider adding UUID/GUID to spec
         case PropertyType::kGUID: {
           builder.AddField(name.c_str(), TypeGuid);
@@ -524,7 +523,7 @@ public:
           dbuilder.AddBytes(&temp, sizeof(GUID));
           break;
         }
-#  endif
+#endif
 
         // TODO: arrays are not supported
         case PropertyType::kTypeSpanByte:

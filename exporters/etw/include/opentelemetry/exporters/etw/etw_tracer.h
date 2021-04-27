@@ -69,13 +69,14 @@ using TracerProviderOptions =
  */
 typedef struct
 {
-  bool enableTraceId;                // Set `TraceId` on ETW events
-  bool enableSpanId;                 // Set `SpanId` on ETW events
-  bool enableActivityId;             // Assign `SpanId` to `ActivityId`
-  bool enableActivityTracking;       // Emit TraceLogging events for Span/Start and Span/Stop
-  bool enableRelatedActivityId;      // Assign parent `SpanId` to `RelatedActivityId`
-  bool enableAutoParent;             // Start new spans as children of current active span
-  ETWProvider::EventFormat encoding; // Event encoding to use for this provider (TLD, MsgPack, XML, etc.).
+  bool enableTraceId;            // Set `TraceId` on ETW events
+  bool enableSpanId;             // Set `SpanId` on ETW events
+  bool enableActivityId;         // Assign `SpanId` to `ActivityId`
+  bool enableActivityTracking;   // Emit TraceLogging events for Span/Start and Span/Stop
+  bool enableRelatedActivityId;  // Assign parent `SpanId` to `RelatedActivityId`
+  bool enableAutoParent;         // Start new spans as children of current active span
+  ETWProvider::EventFormat
+      encoding;  // Event encoding to use for this provider (TLD, MsgPack, XML, etc.).
 } TracerProviderConfiguration;
 
 /**
@@ -111,20 +112,20 @@ static inline void GetOption(const TracerProviderOptions &options,
  * Default encoding is TraceLogging Dynamic Manifest (TLD).
  *
  * Valid encoding names listed below.
- * 
+ *
  * For MessagePack encoding:
  * - "MSGPACK"
  * - "MsgPack"
  * - "MessagePack"
- * 
+ *
  * For XML encoding:
  * - "XML"
  * - "xml"
- * 
+ *
  * For TraceLogging Dynamic encoding:
  * - "TLD"
  * - "tld"
- * 
+ *
  */
 static inline ETWProvider::EventFormat GetEncoding(const TracerProviderOptions &options)
 {
@@ -133,7 +134,7 @@ static inline ETWProvider::EventFormat GetEncoding(const TracerProviderOptions &
   auto it = options.find("encoding");
   if (it != options.end())
   {
-    auto varValue = it->second;
+    auto varValue   = it->second;
     std::string val = nostd::get<std::string>(varValue);
 
 #pragma warning(push)
