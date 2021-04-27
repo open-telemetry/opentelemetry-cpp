@@ -33,7 +33,7 @@
 #    endif
 #    // Check for other compiler span implementation
 #    if !defined(_MSVC_VALUE) && __has_include(<span>)
-       // This works as long as compiler standard is set to C++20
+// This works as long as compiler standard is set to C++20
 #      define HAVE_SPAN
 #    endif
 #  endif
@@ -51,7 +51,7 @@ template <class ElementType, std::size_t Extent = gsl::dynamic_extent>
 using span = gsl::span<ElementType, Extent>;
 }
 OPENTELEMETRY_END_NAMESPACE
-#  define HAVE_SPAN
+#    define HAVE_SPAN
 #  else
 // No `gsl::span`, no `std::span`, fallback to `nostd::span`
 #  endif
