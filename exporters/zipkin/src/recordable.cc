@@ -229,7 +229,7 @@ void Recordable::SetSpanKind(opentelemetry::trace::SpanKind span_kind) noexcept
   auto span_iter = kSpanKindMap.find(span_kind);
   if (span_iter != kSpanKindMap.end())
   {
-    span_["kind"] = *span_iter;
+    span_["kind"] = span_iter->second;
   }
   else
   {
