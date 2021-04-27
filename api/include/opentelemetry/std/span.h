@@ -26,13 +26,16 @@
 #      define HAVE_SPAN
 #    endif
 #  endif
-#  if __has_include(<span>) && !defined(HAVE_SPAN)  // Check for span
-#    define HAVE_SPAN
-#  endif
-#  if !__has_include(<string_view>)  // Check for string_view
-#    error \
-        "STL library does not support std::span. Possible solution:"                   \
-         " - #undef HAVE_CPP_STDLIB // to use OpenTelemetry nostd::string_view"
+#  if !defined(HAVE_SPAN)
+#    // Check for Visual Studio span
+#    if defined(_MSVC_VALUE) && _HAS_CXX20
+#      define HAVE_SPAN
+#    endif
+#    // Check for other compiler span implementation
+#    if !defined(_MSVC_VALUE) && __has_include(<span>)
+       // This works as long as compiler standard is set to C++20
+#      define HAVE_SPAN
+#    endif
 #  endif
 #endif
 
@@ -48,12 +51,9 @@ template <class ElementType, std::size_t Extent = gsl::dynamic_extent>
 using span = gsl::span<ElementType, Extent>;
 }
 OPENTELEMETRY_END_NAMESPACE
+#  define HAVE_SPAN
 #  else
-// No span implementation provided.
-#    error \
-        "STL library does not support std::span. Possible solutions:"                  \
-         " - #undef HAVE_CPP_STDLIB // to use OpenTelemetry nostd::span .. or      "    \
-         " - #define HAVE_GSL       // to use gsl::span                            "
+// No `gsl::span`, no `std::span`, fallback to `nostd::span`
 #  endif
 
 #else  // HAVE_SPAN
