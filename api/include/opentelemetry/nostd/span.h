@@ -14,9 +14,13 @@
 
 #pragma once
 
+// Try to use either `std::span` or `gsl::span`
 #ifdef HAVE_CPP_STDLIB
 #  include "opentelemetry/std/span.h"
-#else
+#endif
+
+// Fallback to `nostd::span` if necessary
+#if !defined(HAVE_SPAN)
 #  include <array>
 #  include <cassert>
 #  include <cstddef>
