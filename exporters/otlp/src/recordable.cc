@@ -9,7 +9,8 @@ namespace otlp
 //
 // See `attribute_value.h` for details.
 //
-const int kAttributeValueSize = 15;
+const int kAttributeValueSize      = 15;
+const int kOwnedAttributeValueSize = 15;
 
 void Recordable::SetIdentity(const opentelemetry::trace::SpanContext &span_context,
                              opentelemetry::trace::SpanId parent_span_id) noexcept
