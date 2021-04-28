@@ -129,6 +129,14 @@ TEST(ZipkinSpanRecordable, SetStatus)
   }
 }
 
+TEST(ZipkinSpanRecordable, SetSpanKind)
+{
+  json j_json_client = {{"kind", "CLIENT"}};
+  opentelemetry::exporter::zipkin::Recordable rec;
+  rec.SetSpanKind(opentelemetry::trace::SpanKind::kClient);
+  EXPECT_EQ(rec.span(), j_json_client);
+}
+
 TEST(ZipkinSpanRecordable, AddEventDefault)
 {
   opentelemetry::exporter::zipkin::Recordable rec;
