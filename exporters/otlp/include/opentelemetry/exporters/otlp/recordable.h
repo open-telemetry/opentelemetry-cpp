@@ -49,8 +49,7 @@ public:
 
 private:
   proto::trace::v1::Span span_;
-  opentelemetry::sdk::resource::Resource &resource_{
-      opentelemetry::sdk::resource::Resource::GetEmpty()};
+  const opentelemetry::sdk::resource::Resource *resource_;
 };
 }  // namespace otlp
 }  // namespace exporter

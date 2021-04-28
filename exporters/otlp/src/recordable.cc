@@ -219,16 +219,19 @@ void PopulateAttribute(opentelemetry::proto::common::v1::KeyValue *attribute,
 proto::resource::v1::Resource Recordable::resource() const noexcept
 {
   proto::resource::v1::Resource proto;
-  for (const auto &kv : resource_.GetAttributes())
+  if (resource_)
   {
-    PopulateAttribute(proto.add_attributes(), kv.first, kv.second);
+    for (const auto &kv : resource_->GetAttributes())
+    {
+      PopulateAttribute(proto.add_attributes(), kv.first, kv.second);
+    }
   }
   return proto;
 }
 
 void Recordable::SetResource(const opentelemetry::sdk::resource::Resource &resource) noexcept
 {
-  resource_ = resource;
+  resource_ = &resource;
 };
 
 void Recordable::SetAttribute(nostd::string_view key,
