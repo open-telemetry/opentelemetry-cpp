@@ -41,7 +41,6 @@ public:
 
   void SetSpanKind(opentelemetry::trace::SpanKind span_kind) noexcept override;
 
-
   void SetResource(const opentelemetry::sdk::resource::Resource &resource) noexcept override;
 
   void SetStartTime(opentelemetry::common::SystemTimestamp start_time) noexcept override;

@@ -165,10 +165,6 @@ void PopulateAttribute(opentelemetry::proto::common::v1::KeyValue *attribute,
   {
     attribute->mutable_value()->set_string_value(nostd::get<std::string>(value));
   }
-  else if (nostd::holds_alternative<uint8_t>(value))
-  {
-    attribute->mutable_value()->set_int_value(nostd::get<uint8_t>(value));
-  }
   else if (nostd::holds_alternative<std::vector<bool>>(value))
   {
     for (const auto &val : nostd::get<std::vector<bool>>(value))

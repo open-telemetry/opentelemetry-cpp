@@ -27,13 +27,13 @@ void PopulateRequest(const nostd::span<std::unique_ptr<sdk::trace::Recordable>> 
 
   for (auto &recordable : spans)
   {
+    auto rec = std::unique_ptr<Recordable>(static_cast<Recordable *>(recordable.release()));
     // We assume all the spans are for the same resource.
     if (!has_resource)
     {
       *resource_span->mutable_resource() = rec->resource();
       has_resource                       = true;
     }
-    auto rec = std::unique_ptr<Recordable>(static_cast<Recordable *>(recordable.release()));
     *instrumentation_lib->add_spans() = std::move(rec->span());
   }
 }
