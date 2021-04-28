@@ -61,6 +61,10 @@ public:
 
   void SetDuration(std::chrono::nanoseconds duration) noexcept override;
 
+  void SetInstrumentationLibrary(
+      const opentelemetry::sdk::instrumentationlibrary::InstrumentationLibrary
+          &instrumentation_library) noexcept override;
+
 private:
   ZipkinSpan span_;
 };
