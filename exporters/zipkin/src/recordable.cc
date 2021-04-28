@@ -232,6 +232,15 @@ void Recordable::SetSpanKind(opentelemetry::trace::SpanKind span_kind) noexcept
     span_["kind"] = span_iter->second;
   }
 }
+
+void Recordable::SetInstrumentationLibrary(
+    const opentelemetry::sdk::instrumentationlibrary::InstrumentationLibrary
+        &instrumentation_library) noexcept
+{
+  span_["tags"]["otel.library.name"]    = instrumentation_library.GetName();
+  span_["tags"]["otel.library.version"] = instrumentation_library.GetVersion();
+}
+  
 }  // namespace zipkin
 }  // namespace exporter
 OPENTELEMETRY_END_NAMESPACE
