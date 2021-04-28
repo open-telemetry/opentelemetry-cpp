@@ -95,6 +95,21 @@ TEST(ZipkinSpanRecordable, SetDuration)
   EXPECT_EQ(rec.span(), j_span);
 }
 
+TEST(ZipkinSpanRecordable, SetInstrumentationLibrary)
+{
+  using InstrumentationLibrary = opentelemetry::sdk::instrumentationlibrary::InstrumentationLibrary;
+
+  const char *library_name    = "otel-cpp";
+  const char *library_version = "0.5.0";
+  json j_span                 = {
+      {"tags", {{"otel.library.name", library_name}, {"otel.library.version", library_version}}}};
+  opentelemetry::exporter::zipkin::Recordable rec;
+
+  rec.SetInstrumentationLibrary(*InstrumentationLibrary::create(library_name, library_version));
+
+  EXPECT_EQ(rec.span(), j_span);
+}
+
 TEST(ZipkinSpanRecordable, SetStatus)
 {
   std::string description                     = "Error description";
@@ -226,7 +241,7 @@ struct ZipkinIntAttributeTest : public testing::Test
 };
 
 using IntTypes = testing::Types<int, int64_t, unsigned int, uint64_t>;
-TYPED_TEST_CASE(ZipkinIntAttributeTest, IntTypes);
+TYPED_TEST_SUITE(ZipkinIntAttributeTest, IntTypes);
 
 TYPED_TEST(ZipkinIntAttributeTest, SetIntSingleAttribute)
 {

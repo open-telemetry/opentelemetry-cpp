@@ -336,6 +336,14 @@ void Recordable::SetDuration(std::chrono::nanoseconds duration) noexcept
   const uint64_t unix_end_time = span_.start_time_unix_nano() + duration.count();
   span_.set_end_time_unix_nano(unix_end_time);
 }
+
+void Recordable::SetInstrumentationLibrary(
+    const opentelemetry::sdk::instrumentationlibrary::InstrumentationLibrary
+        &instrumentation_library) noexcept
+{
+  // TODO: add instrumentation library to OTLP exporter.
+}
+
 }  // namespace otlp
 }  // namespace exporter
 OPENTELEMETRY_END_NAMESPACE

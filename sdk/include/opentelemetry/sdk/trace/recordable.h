@@ -6,6 +6,7 @@
 #include "opentelemetry/nostd/string_view.h"
 #include "opentelemetry/sdk/common/empty_attributes.h"
 #include "opentelemetry/sdk/resource/resource.h"
+#include "opentelemetry/sdk/instrumentationlibrary/instrumentation_library.h"
 #include "opentelemetry/trace/canonical_code.h"
 #include "opentelemetry/trace/span.h"
 #include "opentelemetry/trace/span_context.h"
@@ -22,6 +23,9 @@ namespace sdk
 {
 namespace trace
 {
+
+using namespace opentelemetry::sdk::instrumentationlibrary;
+
 /**
  * Maintains a representation of a span in a format that can be processed by a recorder.
  *
@@ -132,6 +136,13 @@ public:
    * @param duration the duration to set
    */
   virtual void SetDuration(std::chrono::nanoseconds duration) noexcept = 0;
+
+  /**
+   * Set the instrumentation library of the span.
+   * @param instrumentation_library the instrumentation library to set
+   */
+  virtual void SetInstrumentationLibrary(
+      const InstrumentationLibrary &instrumentation_library) noexcept = 0;
 };
 }  // namespace trace
 }  // namespace sdk

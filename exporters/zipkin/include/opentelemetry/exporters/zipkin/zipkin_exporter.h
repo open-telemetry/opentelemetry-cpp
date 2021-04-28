@@ -34,7 +34,23 @@ const char *kZipkinEndpointDefault = "http://localhost:9411/api/v2/spans";
 
 static const std::string GetDefaultZipkinEndpoint()
 {
-  auto endpoint_from_env = std::getenv("OTEL_EXPORTER_ZIPKIN_ENDPOINT");
+  const char *otel_exporter_zipkin_endpoint_env = "OTEL_EXPORTER_ZIPKIN_ENDPOINT";
+#if defined(_MSC_VER)
+  // avoid calling std::getenv which is deprecated in MSVC.
+  size_t required_size = 0;
+  getenv_s(&required_size, nullptr, 0, otel_exporter_zipkin_endpoint_env);
+  const char *endpoint_from_env = nullptr;
+  std::unique_ptr<char> endpoint_buffer;
+  if (required_size > 0)
+  {
+    endpoint_buffer = std::unique_ptr<char>{new char[required_size]};
+    getenv_s(&required_size, endpoint_buffer.get(), required_size,
+             otel_exporter_zipkin_endpoint_env);
+    endpoint_from_env = endpoint_buffer.get();
+  }
+#else
+  auto endpoint_from_env = std::getenv(otel_exporter_zipkin_endpoint_env);
+#endif
   return std::string{endpoint_from_env ? endpoint_from_env : kZipkinEndpointDefault};
 }
 
