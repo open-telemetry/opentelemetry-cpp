@@ -133,6 +133,15 @@ public:
     }
   }
 
+  void SetInstrumentationLibrary(
+      const InstrumentationLibrary &instrumentation_library) noexcept override
+  {
+    for (auto &recordable : recordables_)
+    {
+      recordable.second->SetInstrumentationLibrary(instrumentation_library);
+    }
+  }
+
 private:
   std::map<std::size_t, std::unique_ptr<Recordable>> recordables_;
 };
