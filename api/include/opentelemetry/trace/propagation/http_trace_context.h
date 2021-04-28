@@ -12,9 +12,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#include <array>
 #include "detail/context.h"
 #include "detail/hex.h"
 #include "detail/string.h"
+#include "opentelemetry/nostd/string_view.h"
 #include "opentelemetry/trace/default_span.h"
 #include "opentelemetry/trace/propagation/text_map_propagator.h"
 
@@ -95,11 +97,14 @@ private:
     trace_parent[0] = '0';
     trace_parent[1] = '0';
     trace_parent[2] = '-';
-    span_context.trace_id().ToLowerBase16({&trace_parent[3], kTraceIdSize});
+    span_context.trace_id().ToLowerBase16(
+        nostd::span<char, 2 * TraceId::kSize>{&trace_parent[3], kTraceIdSize});
     trace_parent[kTraceIdSize + 3] = '-';
-    span_context.span_id().ToLowerBase16({&trace_parent[kTraceIdSize + 4], kSpanIdSize});
+    span_context.span_id().ToLowerBase16(
+        nostd::span<char, 2 * SpanId::kSize>{&trace_parent[kTraceIdSize + 4], kSpanIdSize});
     trace_parent[kTraceIdSize + kSpanIdSize + 4] = '-';
-    span_context.trace_flags().ToLowerBase16({&trace_parent[kTraceIdSize + kSpanIdSize + 5], 2});
+    span_context.trace_flags().ToLowerBase16(
+        nostd::span<char, 2>{&trace_parent[kTraceIdSize + kSpanIdSize + 5], 2});
 
     carrier.Set(kTraceParent, nostd::string_view(trace_parent, sizeof(trace_parent)));
     carrier.Set(kTraceState, span_context.trace_state()->ToHeader());

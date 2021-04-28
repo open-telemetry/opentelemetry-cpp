@@ -232,7 +232,7 @@ struct ZipkinIntAttributeTest : public testing::Test
 };
 
 using IntTypes = testing::Types<int, int64_t, unsigned int, uint64_t>;
-TYPED_TEST_CASE(ZipkinIntAttributeTest, IntTypes);
+TYPED_TEST_SUITE(ZipkinIntAttributeTest, IntTypes);
 
 TYPED_TEST(ZipkinIntAttributeTest, SetIntSingleAttribute)
 {

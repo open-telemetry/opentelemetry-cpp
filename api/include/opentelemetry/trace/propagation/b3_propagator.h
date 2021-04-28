@@ -135,10 +135,11 @@ public:
 
     char trace_identity[kTraceIdHexStrLength + kSpanIdHexStrLength + 3];
     static_assert(sizeof(trace_identity) == 51, "b3 trace identity buffer size mismatch");
-    span_context.trace_id().ToLowerBase16({&trace_identity[0], kTraceIdHexStrLength});
+    span_context.trace_id().ToLowerBase16(
+        nostd::span<char, 2 * TraceId::kSize>{&trace_identity[0], kTraceIdHexStrLength});
     trace_identity[kTraceIdHexStrLength] = '-';
-    span_context.span_id().ToLowerBase16(
-        {&trace_identity[kTraceIdHexStrLength + 1], kSpanIdHexStrLength});
+    span_context.span_id().ToLowerBase16(nostd::span<char, 2 * SpanId::kSize>{
+        &trace_identity[kTraceIdHexStrLength + 1], kSpanIdHexStrLength});
     trace_identity[kTraceIdHexStrLength + kSpanIdHexStrLength + 1] = '-';
     trace_identity[kTraceIdHexStrLength + kSpanIdHexStrLength + 2] =
         span_context.trace_flags().IsSampled() ? '1' : '0';

@@ -1,16 +1,32 @@
-#include "opentelemetry/exporters/otlp/otlp_exporter.h"
+#ifndef HAVE_CPP_STDLIB
+// Unfortunately as of 04/27/2021 the fix is NOT in the vcpkg snapshot of Google Test.
+// Remove above `#ifdef` once the GMock fix for C++20 is in the mainline.
+//
+// Please refer to this GitHub issue for additional details:
+// https://github.com/google/googletest/issues/2914
+// https://github.com/google/googletest/commit/61f010d703b32de9bfb20ab90ece38ab2f25977f
+//
+// If we compile using Visual Studio 2019 with `c++latest` (C++20) without the GMock fix,
+// then the compilation here fails in `gmock-actions.h` from:
+//   .\tools\vcpkg\installed\x64-windows\include\gmock\gmock-actions.h(819):
+//   error C2653: 'result_of': is not a class or namespace name
+//
+// That is because `std::result_of` has been removed in C++20.
 
-#include "opentelemetry/exporters/otlp/protobuf_include_prefix.h"
+#  include "opentelemetry/exporters/otlp/otlp_exporter.h"
 
-#include "opentelemetry/proto/collector/trace/v1/trace_service_mock.grpc.pb.h"
+#  include "opentelemetry/exporters/otlp/protobuf_include_prefix.h"
 
-#include "opentelemetry/exporters/otlp/protobuf_include_suffix.h"
+// Problematic code that pulls in Gmock and breaks with vs2019/c++latest :
+#  include "opentelemetry/proto/collector/trace/v1/trace_service_mock.grpc.pb.h"
 
-#include "opentelemetry/sdk/trace/simple_processor.h"
-#include "opentelemetry/sdk/trace/tracer_provider.h"
-#include "opentelemetry/trace/provider.h"
+#  include "opentelemetry/exporters/otlp/protobuf_include_suffix.h"
 
-#include <gtest/gtest.h>
+#  include "opentelemetry/sdk/trace/simple_processor.h"
+#  include "opentelemetry/sdk/trace/tracer_provider.h"
+#  include "opentelemetry/trace/provider.h"
+
+#  include <gtest/gtest.h>
 
 using namespace testing;
 
@@ -112,3 +128,4 @@ TEST_F(OtlpExporterTestPeer, ConfigSslCredentialsTest)
 }  // namespace otlp
 }  // namespace exporter
 OPENTELEMETRY_END_NAMESPACE
+#endif
