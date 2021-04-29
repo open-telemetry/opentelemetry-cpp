@@ -10,14 +10,19 @@
 using namespace opentelemetry::sdk::trace;
 using namespace opentelemetry::sdk::resource;
 
+#include <iostream>
+
 TEST(TracerProvider, GetTracer)
 {
   std::unique_ptr<SpanProcessor> processor(new SimpleSpanProcessor(nullptr));
-
-  TracerProvider tp1(std::make_shared<TracerContext>(std::move(processor), Resource::Create({})));
+  std::vector<std::unique_ptr<SpanProcessor>> processors;
+  processors.push_back(std::move(processor));
+  TracerProvider tp1(std::make_shared<TracerContext>(std::move(processors), Resource::Create({})));
   auto t1 = tp1.GetTracer("test");
   auto t2 = tp1.GetTracer("test");
   auto t3 = tp1.GetTracer("different", "1.0.0");
+  auto t4 = tp1.GetTracer("");
+  auto t5 = tp1.GetTracer(opentelemetry::nostd::string_view{});
   ASSERT_NE(nullptr, t1);
   ASSERT_NE(nullptr, t2);
   ASSERT_NE(nullptr, t3);
@@ -25,15 +30,19 @@ TEST(TracerProvider, GetTracer)
   // Should return the same instance each time.
   ASSERT_EQ(t1, t2);
   ASSERT_NE(t1, t3);
+  ASSERT_EQ(t4, t5);
 
   // Should be an sdk::trace::Tracer with the processor attached.
   auto sdkTracer1 = dynamic_cast<Tracer *>(t1.get());
   ASSERT_NE(nullptr, sdkTracer1);
   ASSERT_EQ("AlwaysOnSampler", sdkTracer1->GetSampler().GetDescription());
-  TracerProvider tp2(std::make_shared<TracerContext>(
-      std::unique_ptr<SpanProcessor>(new SimpleSpanProcessor(nullptr)), Resource::Create({}),
-      std::unique_ptr<Sampler>(new AlwaysOffSampler()),
-      std::unique_ptr<IdGenerator>(new RandomIdGenerator)));
+  std::unique_ptr<SpanProcessor> processor2(new SimpleSpanProcessor(nullptr));
+  std::vector<std::unique_ptr<SpanProcessor>> processors2;
+  processors2.push_back(std::move(processor2));
+  TracerProvider tp2(
+      std::make_shared<TracerContext>(std::move(processors2), Resource::Create({}),
+                                      std::unique_ptr<Sampler>(new AlwaysOffSampler()),
+                                      std::unique_ptr<IdGenerator>(new RandomIdGenerator)));
   auto sdkTracer2 = dynamic_cast<Tracer *>(tp2.GetTracer("test").get());
   ASSERT_EQ("AlwaysOffSampler", sdkTracer2->GetSampler().GetDescription());
 
@@ -50,9 +59,11 @@ TEST(TracerProvider, GetTracer)
 
 TEST(TracerProvider, Shutdown)
 {
-  std::unique_ptr<SpanProcessor> processor1(new SimpleSpanProcessor(nullptr));
+  std::unique_ptr<SpanProcessor> processor(new SimpleSpanProcessor(nullptr));
+  std::vector<std::unique_ptr<SpanProcessor>> processors;
+  processors.push_back(std::move(processor));
 
-  TracerProvider tp1(std::make_shared<TracerContext>(std::move(processor1)));
+  TracerProvider tp1(std::make_shared<TracerContext>(std::move(processors)));
 
   EXPECT_TRUE(tp1.Shutdown());
 }
