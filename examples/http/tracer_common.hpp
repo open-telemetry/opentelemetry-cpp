@@ -4,7 +4,7 @@
 #include "opentelemetry/sdk/trace/tracer_provider.h"
 #include "opentelemetry/trace/provider.h"
 
-#include <iostream>
+#include <vector>
 
 namespace {
 
@@ -13,8 +13,10 @@ void initTracer() {
       new opentelemetry::exporter::trace::OStreamSpanExporter);
   auto processor = std::unique_ptr<sdktrace::SpanProcessor>(
       new sdktrace::SimpleSpanProcessor(std::move(exporter)));
+  std::vector<std::unique_ptr<sdktrace::SpanProcessor>> processors;
+  processors.push_back(std::move(processor));
   // Default is an always-on sampler.
-  auto context = std::make_shared<sdktrace::TracerContext>(std::move(processor));
+  auto context = std::make_shared<sdktrace::TracerContext>(std::move(processors));
   auto provider =  nostd::shared_ptr<opentelemetry::trace::TracerProvider>(
       new sdktrace::TracerProvider(context));
   // Set the global trace provider
