@@ -215,8 +215,10 @@ endif()
 add_subdirectory(ext)
 
 if(DEFINED ENV{OPENTELEMETRY_CONTRIB_PATH})
-  # Add custom contrib path to build tree.
-  add_subdirectory($ENV{OPENTELEMETRY_CONTRIB_PATH})
+  # Add custom contrib path to build tree and consolidate binary artifacts in
+  # current project binary output directory.
+  add_subdirectory($ENV{OPENTELEMETRY_CONTRIB_PATH}
+                   ${PROJECT_BINARY_DIR}/contrib)
 endif()
 
 if(WITH_CONTRIB)
