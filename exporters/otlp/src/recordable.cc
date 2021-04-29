@@ -216,7 +216,7 @@ void PopulateAttribute(opentelemetry::proto::common::v1::KeyValue *attribute,
   }
 }
 
-proto::resource::v1::Resource Recordable::resource() const noexcept
+proto::resource::v1::Resource Recordable::ProtoResource() const noexcept
 {
   proto::resource::v1::Resource proto;
   if (resource_)
@@ -323,8 +323,6 @@ void Recordable::SetSpanKind(opentelemetry::trace::SpanKind span_kind) noexcept
 
   span_.set_kind(proto_span_kind);
 }
-
-void SetResource(const opentelemetry::sdk::resource::Resource &resource) noexcept {}
 
 void Recordable::SetStartTime(opentelemetry::common::SystemTimestamp start_time) noexcept
 {
