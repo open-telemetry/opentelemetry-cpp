@@ -21,6 +21,8 @@ TEST(TracerProvider, GetTracer)
   auto t1 = tp1.GetTracer("test");
   auto t2 = tp1.GetTracer("test");
   auto t3 = tp1.GetTracer("different", "1.0.0");
+  auto t4 = tp1.GetTracer("");
+  auto t5 = tp1.GetTracer(opentelemetry::nostd::string_view{});
   ASSERT_NE(nullptr, t1);
   ASSERT_NE(nullptr, t2);
   ASSERT_NE(nullptr, t3);
@@ -28,6 +30,7 @@ TEST(TracerProvider, GetTracer)
   // Should return the same instance each time.
   ASSERT_EQ(t1, t2);
   ASSERT_NE(t1, t3);
+  ASSERT_EQ(t4, t5);
 
   // Should be an sdk::trace::Tracer with the processor attached.
   auto sdkTracer1 = dynamic_cast<Tracer *>(t1.get());
