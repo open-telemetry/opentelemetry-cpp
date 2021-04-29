@@ -3,6 +3,7 @@ cmake_minimum_required(VERSION 3.1)
 # See https://cmake.org/cmake/help/v3.3/policy/CMP0057.html required by certain
 # versions of gtest
 cmake_policy(SET CMP0057 NEW)
+cmake_policy(SET CMP0079 NEW)
 
 project(opentelemetry-cpp)
 
@@ -30,6 +31,8 @@ endif()
 if(NOT DEFINED CMAKE_CXX_STANDARD)
   set(CMAKE_CXX_STANDARD 11)
 endif()
+
+option(WITH_CONTRIB "Build OpenTelemetry C++ SDK with optional community contributions" OFF)
 
 option(WITH_STL "Whether to use Standard Library for C++latest features" OFF)
 
@@ -209,6 +212,30 @@ if(WITH_EXAMPLES)
   add_subdirectory(examples)
 endif()
 add_subdirectory(ext)
+
+if(WITH_CONTRIB)
+  # This option requires CMake 3.11+
+  # - specify `WITH_CONTRIB` CMake option to overlay custom contrib
+  # - set `OPENTELEMETRY_CONTRIB_PATH` env var to point to custom contrib
+  # - if variable is not set, then official contrib repo is cloned
+  if(DEFINED ENV{OPENTELEMETRY_CONTRIB_PATH})
+    # Use custom local snapshot of contrib :
+    add_subdirectory($ENV{OPENTELEMETRY_CONTRIB_PATH})
+  else()
+    # Or clone official contrib from main :
+    include(FetchContent)
+    FetchContent_Declare(
+        contrib
+        GIT_REPOSITORY "https://github.com/open-telemetry/opentelemetry-cpp-contrib"
+        GIT_TAG "maxgolov/fluentd_exporter"
+    )
+    FetchContent_GetProperties(contrib)
+    if(NOT contrib_POPULATED)
+      FetchContent_Populate(contrib)
+      add_subdirectory(${contrib_SOURCE_DIR})
+    endif()
+  endif()
+endif()
 
 # Add nlohmann/json submodule to include directories
 include_directories(third_party/nlohmann-json/single_include)
