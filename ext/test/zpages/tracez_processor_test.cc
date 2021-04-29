@@ -175,13 +175,16 @@ class TracezProcessor : public ::testing::Test
 protected:
   void SetUp() override
   {
-    shared_data   = std::shared_ptr<TracezSharedData>(new TracezSharedData());
-    processor     = std::shared_ptr<TracezSpanProcessor>(new TracezSpanProcessor(shared_data));
+    shared_data = std::shared_ptr<TracezSharedData>(new TracezSharedData());
+    processor   = std::shared_ptr<TracezSpanProcessor>(new TracezSpanProcessor(shared_data));
+    std::unique_ptr<SpanProcessor> processor2(new TracezSpanProcessor(shared_data));
+    std::vector<std::unique_ptr<SpanProcessor>> processors;
+    processors.push_back(std::move(processor2));
     auto resource = opentelemetry::sdk::resource::Resource::Create({});
+
     // Note: we make a *different* processor for the tracercontext. THis is because
     // all the tests use shared data, and we want to make sure this works correctly.
-    auto context = std::make_shared<TracerContext>(
-        std::unique_ptr<SpanProcessor>(new TracezSpanProcessor(shared_data)), resource);
+    auto context = std::make_shared<TracerContext>(std::move(processors), resource);
 
     tracer     = std::shared_ptr<opentelemetry::trace::Tracer>(new Tracer(context));
     auto spans = shared_data->GetSpanSnapshot();
