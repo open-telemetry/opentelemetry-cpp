@@ -32,7 +32,8 @@ if(NOT DEFINED CMAKE_CXX_STANDARD)
   set(CMAKE_CXX_STANDARD 11)
 endif()
 
-option(WITH_CONTRIB "Build OpenTelemetry C++ SDK with optional community contributions" OFF)
+option(WITH_CONTRIB
+       "Build OpenTelemetry C++ SDK with optional community contributions" OFF)
 
 option(WITH_STL "Whether to use Standard Library for C++latest features" OFF)
 
@@ -213,27 +214,22 @@ if(WITH_EXAMPLES)
 endif()
 add_subdirectory(ext)
 
+if(DEFINED ENV{OPENTELEMETRY_CONTRIB_PATH})
+  # Add custom contrib path to build tree.
+  add_subdirectory($ENV{OPENTELEMETRY_CONTRIB_PATH})
+endif()
+
 if(WITH_CONTRIB)
-  # This option requires CMake 3.11+
-  # - specify `WITH_CONTRIB` CMake option to overlay custom contrib
-  # - set `OPENTELEMETRY_CONTRIB_PATH` env var to point to custom contrib
-  # - if variable is not set, then official contrib repo is cloned
-  if(DEFINED ENV{OPENTELEMETRY_CONTRIB_PATH})
-    # Use custom local snapshot of contrib :
-    add_subdirectory($ENV{OPENTELEMETRY_CONTRIB_PATH})
-  else()
-    # Or clone official contrib from main :
-    include(FetchContent)
-    FetchContent_Declare(
-        contrib
-        GIT_REPOSITORY "https://github.com/open-telemetry/opentelemetry-cpp-contrib"
-        GIT_TAG "maxgolov/fluentd_exporter"
-    )
-    FetchContent_GetProperties(contrib)
-    if(NOT contrib_POPULATED)
-      FetchContent_Populate(contrib)
-      add_subdirectory(${contrib_SOURCE_DIR})
-    endif()
+  # This option requires CMake 3.11+: add standard remote contrib to build tree.
+  include(FetchContent)
+  FetchContent_Declare(
+    contrib
+    GIT_REPOSITORY "https://github.com/open-telemetry/opentelemetry-cpp-contrib"
+    GIT_TAG "maxgolov/fluentd_exporter")
+  FetchContent_GetProperties(contrib)
+  if(NOT contrib_POPULATED)
+    FetchContent_Populate(contrib)
+    add_subdirectory(${contrib_SOURCE_DIR})
   endif()
 endif()
 
