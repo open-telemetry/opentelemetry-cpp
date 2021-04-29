@@ -95,6 +95,21 @@ TEST(ZipkinSpanRecordable, SetDuration)
   EXPECT_EQ(rec.span(), j_span);
 }
 
+TEST(ZipkinSpanRecordable, SetInstrumentationLibrary)
+{
+  using InstrumentationLibrary = opentelemetry::sdk::instrumentationlibrary::InstrumentationLibrary;
+
+  const char *library_name    = "otel-cpp";
+  const char *library_version = "0.5.0";
+  json j_span                 = {
+      {"tags", {{"otel.library.name", library_name}, {"otel.library.version", library_version}}}};
+  opentelemetry::exporter::zipkin::Recordable rec;
+
+  rec.SetInstrumentationLibrary(*InstrumentationLibrary::create(library_name, library_version));
+
+  EXPECT_EQ(rec.span(), j_span);
+}
+
 TEST(ZipkinSpanRecordable, SetStatus)
 {
   std::string description                     = "Error description";
@@ -112,6 +127,14 @@ TEST(ZipkinSpanRecordable, SetStatus)
     rec.SetStatus(code, description);
     EXPECT_EQ(rec.span(), j_span);
   }
+}
+
+TEST(ZipkinSpanRecordable, SetSpanKind)
+{
+  json j_json_client = {{"kind", "CLIENT"}};
+  opentelemetry::exporter::zipkin::Recordable rec;
+  rec.SetSpanKind(opentelemetry::trace::SpanKind::kClient);
+  EXPECT_EQ(rec.span(), j_json_client);
 }
 
 TEST(ZipkinSpanRecordable, AddEventDefault)

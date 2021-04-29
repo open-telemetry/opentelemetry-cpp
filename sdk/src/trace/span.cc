@@ -59,6 +59,7 @@ Span::Span(std::shared_ptr<Tracer> &&tracer,
     return;
   }
   recordable_->SetName(name);
+  recordable_->SetInstrumentationLibrary(tracer_->GetInstrumentationLibrary());
 
   trace_api::TraceId trace_id;
   trace_api::SpanId span_id = tracer_->GetIdGenerator().GenerateSpanId();
