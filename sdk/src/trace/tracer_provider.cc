@@ -23,6 +23,9 @@ nostd::shared_ptr<opentelemetry::trace::Tracer> TracerProvider::GetTracer(
     nostd::string_view library_name,
     nostd::string_view library_version) noexcept
 {
+  if (library_name.data() == nullptr) {
+      library_name = "";
+  }
   // if (library_name == "") {
   //   // TODO: log invalid library_name.
   // }
