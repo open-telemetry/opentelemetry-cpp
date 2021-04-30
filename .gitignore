@@ -43,3 +43,8 @@
 /out.*
 # Indicator that the tools were deployed
 .buildtools
+
+# Temporary Bazel directories
+/bazel-*
+/plugin
+/build
