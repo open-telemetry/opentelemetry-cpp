@@ -1,0 +1,6 @@
+pushd "%~dp0"
+set "PATH=%CD%;%PATH%"
+cd ..
+bazel.exe build %* //...
+bazel.exe test %* //...
+popd
