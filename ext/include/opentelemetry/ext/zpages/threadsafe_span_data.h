@@ -160,6 +160,11 @@ public:
     span_kind_ = span_kind;
   }
 
+  void SetResource(const opentelemetry::sdk::resource::Resource & /*resource*/) noexcept override
+  {
+    // Not Implemented
+  }
+
   void SetStartTime(opentelemetry::common::SystemTimestamp start_time) noexcept override
   {
     std::lock_guard<std::mutex> lock(mutex_);
