@@ -1,10 +1,10 @@
 #include <initializer_list>
 #include <memory>
 #include <vector>
-#include "opentelemetry/trace/propagation/text_map_propagator.h"
+#include "opentelemetry/context/propagation/text_map_propagator.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
-namespace trace
+namespace context
 {
 namespace propagation
 {
@@ -68,5 +68,5 @@ private:
   std::vector<std::unique_ptr<TextMapPropagator>> propagators_;
 };
 }  // namespace propagation
-}  // namespace trace
+}  // namespace context
 OPENTELEMETRY_END_NAMESPACE;
