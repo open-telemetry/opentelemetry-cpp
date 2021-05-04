@@ -13,16 +13,30 @@ TracerProvider::TracerProvider(std::unique_ptr<SpanProcessor> processor,
                                opentelemetry::sdk::resource::Resource resource,
                                std::unique_ptr<Sampler> sampler,
                                std::unique_ptr<IdGenerator> id_generator) noexcept
-    : TracerProvider(std::make_shared<TracerContext>(std::move(processor),
-                                                     resource,
-                                                     std::move(sampler),
-                                                     std::move(id_generator)))
-{}
+{
+  std::vector<std::unique_ptr<SpanProcessor>> processors;
+  processors.push_back(std::move(processor));
+  context_ = std::make_shared<TracerContext>(std::move(processors), resource, std::move(sampler),
+                                             std::move(id_generator));
+}
+
+TracerProvider::TracerProvider(std::vector<std::unique_ptr<SpanProcessor>> &&processors,
+                               opentelemetry::sdk::resource::Resource resource,
+                               std::unique_ptr<Sampler> sampler,
+                               std::unique_ptr<IdGenerator> id_generator) noexcept
+{
+  context_ = std::make_shared<TracerContext>(std::move(processors), resource, std::move(sampler),
+                                             std::move(id_generator));
+}
 
 nostd::shared_ptr<opentelemetry::trace::Tracer> TracerProvider::GetTracer(
     nostd::string_view library_name,
     nostd::string_view library_version) noexcept
 {
+  if (library_name.data() == nullptr)
+  {
+    library_name = "";
+  }
   // if (library_name == "") {
   //   // TODO: log invalid library_name.
   // }
@@ -44,9 +58,9 @@ nostd::shared_ptr<opentelemetry::trace::Tracer> TracerProvider::GetTracer(
   return nostd::shared_ptr<opentelemetry::trace::Tracer>{tracers_.back()};
 }
 
-void TracerProvider::RegisterPipeline(std::unique_ptr<SpanProcessor> processor) noexcept
+void TracerProvider::AddProcessor(std::unique_ptr<SpanProcessor> processor) noexcept
 {
-  return context_->RegisterPipeline(std::move(processor));
+  context_->AddProcessor(std::move(processor));
 }
 
 const opentelemetry::sdk::resource::Resource &TracerProvider::GetResource() const noexcept
