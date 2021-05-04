@@ -80,11 +80,11 @@ namespace testing
         // std::cout << "ping: ";
         // std::cout << requestText << std::endl;
         int res = client.send(requestText.c_str(), requestText.length());
-        assert(res == requestText.size());
+        EXPECT_EQ(res, requestText.size());
 
         // <- pong
         char responseText[1024] = {0};
-        int size = client.recv(responseText, sizeof(responseText));
+        client.recv(responseText, sizeof(responseText));
         // std::cout << "pong: ";
         // std::cout << (const char*)(responseText) << std::endl;
         EXPECT_TRUE(requestText == responseText);

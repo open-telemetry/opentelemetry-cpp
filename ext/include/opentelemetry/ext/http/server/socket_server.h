@@ -70,7 +70,7 @@ struct SocketServer : public Reactor::SocketCallback
     size_t bytes_sent;        // Total bytes bytes_sent to client
 
     std::set<State> state;  // Current connection state
-    bool keepalive;         // Keep connection alive (reserved for future use)
+    bool keepalive{false};  // Keep connection alive (reserved for future use)
   };
 
   SocketAddr bind_address;            // Server bind address
