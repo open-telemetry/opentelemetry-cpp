@@ -44,7 +44,7 @@ class HttpTraceContext : public TextMapPropagator
 public:
   void Inject(TextMapCarrier &carrier, const context::Context &context) noexcept override
   {
-    SpanContext span_context = detail::GetCurrentSpan(context);
+    SpanContext span_context = detail::GetSpanFromContext(context)->GetContext();
     if (!span_context.IsValid())
     {
       return;
@@ -57,7 +57,7 @@ public:
   {
     SpanContext span_context = ExtractImpl(carrier);
     nostd::shared_ptr<Span> sp{new DefaultSpan(span_context)};
-    return context.SetValue(kSpanKey, sp);
+    return detail::SetSpanToContext(context, sp);
   }
 
   static TraceId TraceIdFromHex(nostd::string_view trace_id)
