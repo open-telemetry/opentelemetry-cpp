@@ -391,6 +391,11 @@ struct SocketAddr
   }
 };  // namespace SocketTools
 
+static const char *kSchemeUDP  = "udp";
+static const char *kSchemeTCP  = "tcp";
+static const char *kSchemeUnix = "unix";
+static const char *kSchemeUnk  = "unknown";
+
 struct SocketParams
 {
   int af;     // POSIX socket domain
@@ -408,15 +413,15 @@ struct SocketParams
     if ((af == AF_INET) || (af == AF_INET6))
     {
       if (type == SOCK_DGRAM)
-        return "udp";
+        return kSchemeUDP;
       if (type == SOCK_STREAM)
-        return "tcp";
+        return kSchemeTCP;
     }
     if (af == AF_UNIX)
     {
-      return "unix";
+      return kSchemeUnix;
     }
-    return "unknown";
+    return kSchemeUnk;
   }
 };
 
