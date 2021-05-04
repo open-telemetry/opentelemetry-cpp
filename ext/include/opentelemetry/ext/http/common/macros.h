@@ -37,7 +37,7 @@
 #endif
 
 // Annex K macros
-#if !defined(_MSC_VER) && !defined(__STDC_LIB_EXT1__)
+#if !defined(_MSC_VER)
 #  ifndef strncpy_s
 #    define strncpy_s(dest, destsz, src, count) \
       strncpy(dest, src, (destsz <= count) ? destsz : count)

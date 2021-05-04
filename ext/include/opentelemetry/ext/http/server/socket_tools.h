@@ -56,12 +56,17 @@
 
 // This code requires WinSock2 on Windows.
 #  pragma comment(lib, "ws2_32.lib")
-
-#  ifdef __has_include
-#    if __has_include(<afunix.h>)
-// Plus Win 10 SDK 17063+ is necessary for Unix domain sockets support.
-#      include <afunix.h>
-#      define HAVE_UNIX_DOMAIN
+// Workaround for libcurl redefinition of afunix.h struct :
+// https://github.com/curl/curl/blob/7645324072c2f052fa662aded6f26821141ecda1/lib/config-win32.h#L721
+// Unfortunately libcurl defines a structure that should otherwise be normally defined by afunix.h .
+// When that happens, we cannot build the sockets library with Unix domain support.
+#  if !defined(USE_UNIX_SOCKETS)
+#    ifdef __has_include
+#      if __has_include(<afunix.h>)
+// Win 10 SDK 17063+ is necessary for Unix domain sockets support.
+#        include <afunix.h>
+#        define HAVE_UNIX_DOMAIN
+#      endif
 #    endif
 #  endif
 
@@ -360,8 +365,8 @@ struct SocketAddr
       os << (const char *)(m_data_un.sun_path);
     }
     else
-    {
 #endif
+    {
       switch (m_data.sa_family)
       {
         case AF_INET6: {
