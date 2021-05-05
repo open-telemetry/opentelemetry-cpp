@@ -21,10 +21,15 @@ public:
 
     const HttpTextMapCarrier<std::map<std::string, std::string>> carrier(
         (std::map<std::string, std::string> &)request.headers);
-    auto prop = opentelemetry::trace::propagation::GlobalTextMapPropagator::GetGlobalPropagator();
+    auto prop = opentelemetry::context::propagation::GlobalTextMapPropagator::GetGlobalPropagator();
     auto current_ctx = opentelemetry::context::RuntimeContext::GetCurrent();
     auto new_context = prop->Extract(carrier, current_ctx);
     options.parent   = GetSpanFromContext(new_context)->GetContext();
+
+    char trace_buf[opentelemetry::trace::TraceId::kSize * 2];
+
+    options.parent.trace_id().ToLowerBase16(trace_buf);
+    std::cout << "\n\nTRACE__ID: " << std::string(trace_buf, sizeof(trace_buf)) << std::endl;
 
     auto span = get_tracer("http-server")
                     ->StartSpan(span_name,

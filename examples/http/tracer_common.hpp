@@ -12,6 +12,8 @@
 #include "opentelemetry/ext/http/client/http_client.h"
 #include <iostream>
 #include <vector>
+#include <cstring>
+
 
 namespace {
 
@@ -28,7 +30,7 @@ inline nostd::shared_ptr<opentelemetry::trace::Span> GetSpanFromContext(const op
 }
 
 template <typename T>
-class HttpTextMapCarrier : public opentelemetry::trace::propagation::TextMapCarrier
+class HttpTextMapCarrier : public opentelemetry::context::propagation::TextMapCarrier
 {
 public:
 
@@ -37,13 +39,22 @@ public:
   HttpTextMapCarrier() = default;
   virtual nostd::string_view Get(nostd::string_view key) const noexcept override
   {
-    auto it = headers_.find(std::string(key));
-    if (it != headers_.end())
-    {
-      return nostd::string_view(it->second);
+    std::string key_to_compare = key.data();
+    //hack to compare as http server store header with first letter in caps
+    if ( key == opentelemetry::trace::propagation::kTraceParent) {
+      key_to_compare = "Traceparent";
+    } else if (key == opentelemetry::trace::propagation::kTraceState) {
+      key_to_compare == "Tracestate";
     }
+   auto it = headers_.find(key_to_compare);
+
+   if (it != headers_.end()){
+     return it->second;
+   }
+
     return "";
   }
+
   virtual void Set(nostd::string_view key, nostd::string_view value) noexcept override
   {
     headers_.insert(std::pair<std::string, std::string>(std::string(key), std::string(value)));
