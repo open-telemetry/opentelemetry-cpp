@@ -62,11 +62,16 @@ void Recordable::SetAttribute(nostd::string_view key, const common::AttributeVal
 }
 
 void Recordable::AddEvent(nostd::string_view name,
-                          core::SystemTimestamp timestamp,
+                          common::SystemTimestamp timestamp,
                           const common::KeyValueIterable &attributes) noexcept
 {
   // TODO: convert event to Jaeger Log
 }
+
+void Recordable::SetInstrumentationLibrary(
+    const opentelemetry::sdk::instrumentationlibrary::InstrumentationLibrary
+        &instrumentation_library) noexcept
+{}
 
 void Recordable::AddLink(const trace::SpanContext &span_context,
                          const common::KeyValueIterable &attributes) noexcept
@@ -99,7 +104,17 @@ void Recordable::SetName(nostd::string_view name) noexcept
   span_->__set_operationName(static_cast<std::string>(name));
 }
 
-void Recordable::SetStartTime(core::SystemTimestamp start_time) noexcept
+void Recordable::SetResource(const opentelemetry::sdk::resource::Resource &resource) noexcept
+{
+  // only service.name attribute is supported by specs as of now.
+  // auto attributes = resource.GetAttributes();
+  // if (attributes.find("service.name") != attributes.end())
+  // {
+  //   service_name_ = nostd::get<std::string>(attributes["service.name"]);
+  // }
+}
+
+void Recordable::SetStartTime(common::SystemTimestamp start_time) noexcept
 {
   span_->__set_startTime(
       std::chrono::duration_cast<std::chrono::microseconds>(start_time.time_since_epoch()).count());

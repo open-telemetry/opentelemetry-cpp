@@ -73,7 +73,7 @@ TEST(JaegerSpanRecordable, SetStartTime)
   opentelemetry::exporter::jaeger::Recordable rec;
 
   std::chrono::system_clock::time_point start_time = std::chrono::system_clock::now();
-  opentelemetry::core::SystemTimestamp start_timestamp(start_time);
+  opentelemetry::common::SystemTimestamp start_timestamp(start_time);
   uint64_t unix_start =
       std::chrono::duration_cast<std::chrono::microseconds>(start_time.time_since_epoch()).count();
   rec.SetStartTime(start_timestamp);
@@ -87,7 +87,7 @@ TEST(JaegerSpanRecordable, SetDuration)
 {
   opentelemetry::exporter::jaeger::Recordable rec;
 
-  opentelemetry::core::SystemTimestamp start_timestamp;
+  opentelemetry::common::SystemTimestamp start_timestamp;
 
   std::chrono::microseconds duration(10);
   uint64_t unix_end = duration.count();
