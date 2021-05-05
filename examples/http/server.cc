@@ -19,6 +19,13 @@ public:
     options.kind          = opentelemetry::trace::SpanKind::kServer;  // server
     std::string span_name = request.uri;
 
+    const HttpTextMapCarrier<std::map<std::string, std::string>> carrier(
+        (std::map<std::string, std::string> &)request.headers);
+    auto prop = opentelemetry::trace::propagation::GlobalTextMapPropagator::GetGlobalPropagator();
+    auto current_ctx = opentelemetry::context::RuntimeContext::GetCurrent();
+    auto new_context = prop->Extract(carrier, current_ctx);
+    options.parent   = GetSpanFromContext(new_context)->GetContext();
+
     auto span = get_tracer("http-server")
                     ->StartSpan(span_name,
                                 {{"http.server_name", server_name},
@@ -30,6 +37,7 @@ public:
                                 options);
 
     auto scope = get_tracer("http_server")->WithActiveSpan(span);
+
     for (auto &kv : request.headers)
     {
       span->SetAttribute("http.header." + std::string(kv.first.data()), kv.second);

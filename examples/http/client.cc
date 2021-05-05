@@ -21,9 +21,12 @@ void sendRequest(const std::string &url)
                                {"http.scheme", url_parser.scheme_},
                                {"http.method", "GET"}},
                               options);
-  auto scope = get_tracer("http-client")->WithActiveSpan(span);
-
-  opentelemetry::ext::http::client::Result result = http_client->Get(url);
+  auto scope       = get_tracer("http-client")->WithActiveSpan(span);
+  auto current_ctx = opentelemetry::context::RuntimeContext::GetCurrent();
+  HttpTextMapCarrier<opentelemetry::ext::http::client::Headers> carrier;
+  auto prop = opentelemetry::trace::propagation::GlobalTextMapPropagator::GetGlobalPropagator();
+  prop->Inject(carrier, current_ctx);
+  opentelemetry::ext::http::client::Result result = http_client->Get(url, carrier.headers_);
   if (result)
   {
     // set span attributes
