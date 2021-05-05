@@ -2,17 +2,27 @@
 
 ## Prerequisite
 
-* [Get Jaeger](https://www.jaegertracing.io/docs/getting-started/) and run Jaeger agent.
+* [Get Jaeger](https://www.jaegertracing.io/docs/getting-started/) and run
+  Jaeger agent.
 
 ## Installation
 
 ## CMake Installation Instructions
 
-Refer to install instructions [INSTALL.md](../../INSTALL.md#building-as-standalone-cmake-project).
-Modify step 2 to create `cmake` build configuration for compiling with Jaeger exporter as below:
+Refer to install instructions
+[INSTALL.md](../../INSTALL.md#building-as-standalone-cmake-project). Modify step
+2 to create `cmake` build configuration for compiling with Jaeger exporter as
+below:
 
 ```console
    $ cmake -DWITH_JAEGER=ON ..
+   -- The C compiler identification is GNU 9.3.0
+   -- The CXX compiler identification is GNU 9.3.0
+   ...
+   -- Configuring done
+   -- Generating done
+   -- Build files have been written to: /home/<user>/source/opentelemetry-cpp/build
+   $
 ```
 
 ### Bazel install Instructions

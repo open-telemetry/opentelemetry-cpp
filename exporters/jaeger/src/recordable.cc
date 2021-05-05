@@ -127,26 +127,33 @@ void Recordable::SetDuration(std::chrono::nanoseconds duration) noexcept
 
 void Recordable::SetSpanKind(trace::SpanKind span_kind) noexcept
 {
+  const char *span_kind_str = nullptr;
+
+  // map SpanKind to Jaeger tag span.kind.
   switch (span_kind)
   {
     case opentelemetry::trace::SpanKind::kClient: {
-      AddTag("span.kind", "client");
+      span_kind_str = "client";
       break;
     }
     case opentelemetry::trace::SpanKind::kServer: {
-      AddTag("span.kind", "server");
+      span_kind_str = "server";
       break;
     }
     case opentelemetry::trace::SpanKind::kConsumer: {
-      AddTag("span.kind", "consumer");
+      span_kind_str = "consumer";
       break;
     }
     case opentelemetry::trace::SpanKind::kProducer: {
-      AddTag("span.kind", "producer");
+      span_kind_str = "producer";
       break;
     }
     default:
       break;
+  }
+
+  if (span_kind_str != nullptr) {
+    AddTag("span.kind", span_kind_str);
   }
 }
 
