@@ -15,7 +15,7 @@ namespace
 {
 static opentelemetry::trace::propagation::HttpTraceContext propagator_format;
 
-class TextMapCarrierTest : public opentelemetry::trace::propagation::TextMapCarrier
+class TextMapCarrierTest : public opentelemetry::context::propagation::TextMapCarrier
 {
 public:
   TextMapCarrierTest(std::map<std::string, std::string> &headers) : headers_(headers) {}
