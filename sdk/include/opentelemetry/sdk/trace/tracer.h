@@ -1,6 +1,7 @@
 #pragma once
 
 #include "opentelemetry/sdk/common/atomic_shared_ptr.h"
+#include "opentelemetry/sdk/instrumentationlibrary/instrumentation_library.h"
 #include "opentelemetry/sdk/resource/resource.h"
 #include "opentelemetry/sdk/trace/processor.h"
 #include "opentelemetry/sdk/trace/samplers/always_on.h"
@@ -16,11 +17,16 @@ namespace sdk
 {
 namespace trace
 {
+
+using namespace opentelemetry::sdk::instrumentationlibrary;
+
 class Tracer final : public trace_api::Tracer, public std::enable_shared_from_this<Tracer>
 {
 public:
   /** Construct a new Tracer with the given context pipeline. */
-  explicit Tracer(std::shared_ptr<sdk::trace::TracerContext> context) noexcept;
+  explicit Tracer(std::shared_ptr<sdk::trace::TracerContext> context,
+                  std::unique_ptr<InstrumentationLibrary> instrumentation_library =
+                      InstrumentationLibrary::create("")) noexcept;
 
   nostd::shared_ptr<trace_api::Span> StartSpan(
       nostd::string_view name,
@@ -32,17 +38,27 @@ public:
 
   void CloseWithMicroseconds(uint64_t timeout) noexcept override;
 
-  /** Returns the currently active span processor. */
-  SpanProcessor &GetActiveProcessor() noexcept { return context_->GetActiveProcessor(); }
+  /** Returns the configured span processor. */
+  SpanProcessor &GetProcessor() noexcept { return context_->GetProcessor(); }
 
   /** Returns the configured Id generator */
-  IdGenerator &GetIdGenerator() noexcept { return context_->GetIdGenerator(); }
+  IdGenerator &GetIdGenerator() const noexcept { return context_->GetIdGenerator(); }
+
+  /** Returns the associated instruementation library */
+  const InstrumentationLibrary &GetInstrumentationLibrary() const noexcept
+  {
+    return *instrumentation_library_;
+  }
+
+  /** Returns the currently configured resource **/
+  const opentelemetry::sdk::resource::Resource &GetResource() { return context_->GetResource(); }
 
   // Note: Test only
   Sampler &GetSampler() { return context_->GetSampler(); }
 
 private:
   std::shared_ptr<sdk::trace::TracerContext> context_;
+  std::shared_ptr<InstrumentationLibrary> instrumentation_library_;
 };
 }  // namespace trace
 }  // namespace sdk

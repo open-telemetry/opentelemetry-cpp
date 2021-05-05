@@ -14,6 +14,7 @@
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace trace
 {
+
 /**
  * Handles span creation and in-process context propagation.
  *

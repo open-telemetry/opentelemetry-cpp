@@ -2,9 +2,11 @@
 
 #include "opentelemetry/common/attribute_value.h"
 #include "opentelemetry/common/key_value_iterable.h"
-#include "opentelemetry/core/timestamp.h"
+#include "opentelemetry/common/timestamp.h"
 #include "opentelemetry/nostd/string_view.h"
 #include "opentelemetry/sdk/common/empty_attributes.h"
+#include "opentelemetry/sdk/instrumentationlibrary/instrumentation_library.h"
+#include "opentelemetry/sdk/resource/resource.h"
 #include "opentelemetry/trace/canonical_code.h"
 #include "opentelemetry/trace/span.h"
 #include "opentelemetry/trace/span_context.h"
@@ -21,6 +23,9 @@ namespace sdk
 {
 namespace trace
 {
+
+using namespace opentelemetry::sdk::instrumentationlibrary;
+
 /**
  * Maintains a representation of a span in a format that can be processed by a recorder.
  *
@@ -54,7 +59,7 @@ public:
    * @param attributes the attributes associated with the event
    */
   virtual void AddEvent(nostd::string_view name,
-                        core::SystemTimestamp timestamp,
+                        opentelemetry::common::SystemTimestamp timestamp,
                         const opentelemetry::common::KeyValueIterable &attributes) noexcept = 0;
 
   /**
@@ -63,7 +68,7 @@ public:
    */
   void AddEvent(nostd::string_view name)
   {
-    AddEvent(name, core::SystemTimestamp(std::chrono::system_clock::now()),
+    AddEvent(name, opentelemetry::common::SystemTimestamp(std::chrono::system_clock::now()),
              opentelemetry::sdk::GetEmptyAttributes());
   }
 
@@ -72,7 +77,7 @@ public:
    * @param name the name of the event
    * @param timestamp the timestamp of the event
    */
-  void AddEvent(nostd::string_view name, core::SystemTimestamp timestamp)
+  void AddEvent(nostd::string_view name, opentelemetry::common::SystemTimestamp timestamp)
   {
     AddEvent(name, timestamp, opentelemetry::sdk::GetEmptyAttributes());
   }
@@ -115,16 +120,29 @@ public:
   virtual void SetSpanKind(opentelemetry::trace::SpanKind span_kind) noexcept = 0;
 
   /**
+   * Set Resource of the span
+   * @param Resource the resource to set
+   */
+  virtual void SetResource(const opentelemetry::sdk::resource::Resource &resource) noexcept = 0;
+
+  /**
    * Set the start time of the span.
    * @param start_time the start time to set
    */
-  virtual void SetStartTime(opentelemetry::core::SystemTimestamp start_time) noexcept = 0;
+  virtual void SetStartTime(opentelemetry::common::SystemTimestamp start_time) noexcept = 0;
 
   /**
    * Set the duration of the span.
    * @param duration the duration to set
    */
   virtual void SetDuration(std::chrono::nanoseconds duration) noexcept = 0;
+
+  /**
+   * Set the instrumentation library of the span.
+   * @param instrumentation_library the instrumentation library to set
+   */
+  virtual void SetInstrumentationLibrary(
+      const InstrumentationLibrary &instrumentation_library) noexcept = 0;
 };
 }  // namespace trace
 }  // namespace sdk

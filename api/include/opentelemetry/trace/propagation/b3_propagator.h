@@ -37,19 +37,15 @@ static const int kSpanIdHexStrLength  = 16;
 // headers of HTTP requests. HTTP frameworks and clients can integrate with B3Propagator by
 // providing the object containing the headers, and a getter function for the extraction. Based on:
 // https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/context/api-propagators.md#b3-extract
-template <typename T>
-class B3PropagatorExtractor : public TextMapPropagator<T>
+
+class B3PropagatorExtractor : public TextMapPropagator
 {
 public:
-  // Rules that manages how context will be extracted from carrier.
-  using Getter = nostd::string_view (*)(const T &carrier, nostd::string_view trace_type);
-
-  // Returns the context that is stored in the HTTP header carrier with the getter as extractor.
-  context::Context Extract(Getter getter,
-                           const T &carrier,
+  // Returns the context that is stored in the HTTP header carrier.
+  context::Context Extract(const TextMapCarrier &carrier,
                            context::Context &context) noexcept override
   {
-    SpanContext span_context = ExtractImpl(getter, carrier);
+    SpanContext span_context = ExtractImpl(carrier);
     nostd::shared_ptr<Span> sp{new DefaultSpan(span_context)};
     return context.SetValue(kSpanKey, sp);
   }
@@ -78,14 +74,14 @@ public:
   }
 
 private:
-  static SpanContext ExtractImpl(Getter getter, const T &carrier)
+  static SpanContext ExtractImpl(const TextMapCarrier &carrier)
   {
     nostd::string_view trace_id_hex;
     nostd::string_view span_id_hex;
     nostd::string_view trace_flags_hex;
 
     // first let's try a single-header variant
-    auto singleB3Header = getter(carrier, kB3CombinedHeader);
+    auto singleB3Header = carrier.Get(kB3CombinedHeader);
     if (!singleB3Header.empty())
     {
       std::array<nostd::string_view, 3> fields{};
@@ -101,9 +97,9 @@ private:
     }
     else
     {
-      trace_id_hex    = getter(carrier, kB3TraceIdHeader);
-      span_id_hex     = getter(carrier, kB3SpanIdHeader);
-      trace_flags_hex = getter(carrier, kB3SampledHeader);
+      trace_id_hex    = carrier.Get(kB3TraceIdHeader);
+      span_id_hex     = carrier.Get(kB3SpanIdHeader);
+      trace_flags_hex = carrier.Get(kB3SampledHeader);
     }
 
     if (!detail::IsValidHex(trace_id_hex) || !detail::IsValidHex(span_id_hex))
@@ -125,16 +121,11 @@ private:
 
 // The B3Propagator class provides interface that enables extracting and injecting context into
 // single header of HTTP Request.
-template <typename T>
-class B3Propagator : public B3PropagatorExtractor<T>
+class B3Propagator : public B3PropagatorExtractor
 {
 public:
-  // Rules that manages how context will be injected to carrier.
-  using Setter = void (*)(T &carrier,
-                          nostd::string_view trace_type,
-                          nostd::string_view trace_description);
   // Sets the context for a HTTP header carrier with self defined rules.
-  void Inject(Setter setter, T &carrier, const context::Context &context) noexcept override
+  void Inject(TextMapCarrier &carrier, const context::Context &context) noexcept override
   {
     SpanContext span_context = detail::GetCurrentSpan(context);
     if (!span_context.IsValid())
@@ -144,27 +135,23 @@ public:
 
     char trace_identity[kTraceIdHexStrLength + kSpanIdHexStrLength + 3];
     static_assert(sizeof(trace_identity) == 51, "b3 trace identity buffer size mismatch");
-    span_context.trace_id().ToLowerBase16({&trace_identity[0], kTraceIdHexStrLength});
+    span_context.trace_id().ToLowerBase16(
+        nostd::span<char, 2 * TraceId::kSize>{&trace_identity[0], kTraceIdHexStrLength});
     trace_identity[kTraceIdHexStrLength] = '-';
-    span_context.span_id().ToLowerBase16(
-        {&trace_identity[kTraceIdHexStrLength + 1], kSpanIdHexStrLength});
+    span_context.span_id().ToLowerBase16(nostd::span<char, 2 * SpanId::kSize>{
+        &trace_identity[kTraceIdHexStrLength + 1], kSpanIdHexStrLength});
     trace_identity[kTraceIdHexStrLength + kSpanIdHexStrLength + 1] = '-';
     trace_identity[kTraceIdHexStrLength + kSpanIdHexStrLength + 2] =
         span_context.trace_flags().IsSampled() ? '1' : '0';
 
-    setter(carrier, kB3CombinedHeader, nostd::string_view(trace_identity, sizeof(trace_identity)));
+    carrier.Set(kB3CombinedHeader, nostd::string_view(trace_identity, sizeof(trace_identity)));
   }
 };
 
-template <typename T>
-class B3PropagatorMultiHeader : public B3PropagatorExtractor<T>
+class B3PropagatorMultiHeader : public B3PropagatorExtractor
 {
 public:
-  // Rules that manages how context will be injected to carrier.
-  using Setter = void (*)(T &carrier,
-                          nostd::string_view trace_type,
-                          nostd::string_view trace_description);
-  void Inject(Setter setter, T &carrier, const context::Context &context) noexcept override
+  void Inject(TextMapCarrier &carrier, const context::Context &context) noexcept override
   {
     SpanContext span_context = detail::GetCurrentSpan(context);
     if (!span_context.IsValid())
@@ -177,9 +164,9 @@ public:
     SpanId(span_context.span_id()).ToLowerBase16(span_id);
     char trace_flags[2];
     TraceFlags(span_context.trace_flags()).ToLowerBase16(trace_flags);
-    setter(carrier, kB3TraceIdHeader, nostd::string_view(trace_id, sizeof(trace_id)));
-    setter(carrier, kB3SpanIdHeader, nostd::string_view(span_id, sizeof(span_id)));
-    setter(carrier, kB3SampledHeader, nostd::string_view(trace_flags + 1, 1));
+    carrier.Set(kB3TraceIdHeader, nostd::string_view(trace_id, sizeof(trace_id)));
+    carrier.Set(kB3SpanIdHeader, nostd::string_view(span_id, sizeof(span_id)));
+    carrier.Set(kB3SampledHeader, nostd::string_view(trace_flags + 1, 1));
   }
 };
 

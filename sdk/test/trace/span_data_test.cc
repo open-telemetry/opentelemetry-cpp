@@ -40,7 +40,7 @@ TEST(SpanData, Set)
       trace_id, span_id,
       opentelemetry::trace::TraceFlags{opentelemetry::trace::TraceFlags::kIsSampled}, true,
       trace_state};
-  opentelemetry::core::SystemTimestamp now(std::chrono::system_clock::now());
+  opentelemetry::common::SystemTimestamp now(std::chrono::system_clock::now());
 
   SpanData data;
   data.SetIdentity(span_context, parent_span_id);
@@ -89,6 +89,16 @@ TEST(SpanData, EventAttributes)
         opentelemetry::nostd::get<int64_t>(data.GetEvents().at(0).GetAttributes().at(keys[i])),
         values[i]);
   }
+}
+
+TEST(SpanData, Resources)
+{
+  SpanData data;
+  auto resource   = opentelemetry::sdk::resource::Resource::Create({});
+  auto input_attr = resource.GetAttributes();
+  data.SetResource(resource);
+  auto output_attr = data.GetResource().GetAttributes();
+  EXPECT_EQ(input_attr, output_attr);
 }
 
 TEST(SpanData, Links)

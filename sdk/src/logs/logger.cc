@@ -45,7 +45,7 @@ void Logger::Log(opentelemetry::logs::Severity severity,
                  opentelemetry::trace::TraceId trace_id,
                  opentelemetry::trace::SpanId span_id,
                  opentelemetry::trace::TraceFlags trace_flags,
-                 core::SystemTimestamp timestamp) noexcept
+                 opentelemetry::common::SystemTimestamp timestamp) noexcept
 {
   // If this logger does not have a processor, no need to create a log record
   auto processor = logger_provider_.lock()->GetProcessor();

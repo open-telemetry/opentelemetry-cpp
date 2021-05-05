@@ -7,4 +7,8 @@
 #      define HAVE_TLD
 #    endif
 #  endif
+#else
+#  ifdef HAVE_TLD
+#    include "TraceLoggingDynamic.h"
+#  endif
 #endif

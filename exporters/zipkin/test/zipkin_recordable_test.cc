@@ -22,7 +22,7 @@
 
 #include "opentelemetry/sdk/trace/exporter.h"
 
-#include "opentelemetry/core/timestamp.h"
+#include "opentelemetry/common/timestamp.h"
 #include "opentelemetry/exporters/zipkin/recordable.h"
 
 #include <iostream>
@@ -71,7 +71,7 @@ TEST(ZipkinSpanRecordable, SetStartTime)
 {
   opentelemetry::exporter::zipkin::Recordable rec;
   std::chrono::system_clock::time_point start_time = std::chrono::system_clock::now();
-  opentelemetry::core::SystemTimestamp start_timestamp(start_time);
+  opentelemetry::common::SystemTimestamp start_timestamp(start_time);
 
   uint64_t unix_start =
       std::chrono::duration_cast<std::chrono::microseconds>(start_time.time_since_epoch()).count();
@@ -85,13 +85,28 @@ TEST(ZipkinSpanRecordable, SetDuration)
   json j_span = {{"duration", 10}, {"timestamp", 0}};
   opentelemetry::exporter::zipkin::Recordable rec;
   // Start time is 0
-  opentelemetry::core::SystemTimestamp start_timestamp;
+  opentelemetry::common::SystemTimestamp start_timestamp;
 
   std::chrono::nanoseconds duration(10);
   uint64_t unix_end = duration.count();
 
   rec.SetStartTime(start_timestamp);
   rec.SetDuration(duration);
+  EXPECT_EQ(rec.span(), j_span);
+}
+
+TEST(ZipkinSpanRecordable, SetInstrumentationLibrary)
+{
+  using InstrumentationLibrary = opentelemetry::sdk::instrumentationlibrary::InstrumentationLibrary;
+
+  const char *library_name    = "otel-cpp";
+  const char *library_version = "0.5.0";
+  json j_span                 = {
+      {"tags", {{"otel.library.name", library_name}, {"otel.library.version", library_version}}}};
+  opentelemetry::exporter::zipkin::Recordable rec;
+
+  rec.SetInstrumentationLibrary(*InstrumentationLibrary::create(library_name, library_version));
+
   EXPECT_EQ(rec.span(), j_span);
 }
 
@@ -114,13 +129,21 @@ TEST(ZipkinSpanRecordable, SetStatus)
   }
 }
 
+TEST(ZipkinSpanRecordable, SetSpanKind)
+{
+  json j_json_client = {{"kind", "CLIENT"}};
+  opentelemetry::exporter::zipkin::Recordable rec;
+  rec.SetSpanKind(opentelemetry::trace::SpanKind::kClient);
+  EXPECT_EQ(rec.span(), j_json_client);
+}
+
 TEST(ZipkinSpanRecordable, AddEventDefault)
 {
   opentelemetry::exporter::zipkin::Recordable rec;
   nostd::string_view name = "Test Event";
 
   std::chrono::system_clock::time_point event_time = std::chrono::system_clock::now();
-  opentelemetry::core::SystemTimestamp event_timestamp(event_time);
+  opentelemetry::common::SystemTimestamp event_timestamp(event_time);
 
   rec.opentelemetry::sdk::trace::Recordable::AddEvent(name, event_timestamp);
 
@@ -139,7 +162,7 @@ TEST(ZipkinSpanRecordable, AddEventWithAttributes)
   nostd::string_view name = "Test Event";
 
   std::chrono::system_clock::time_point event_time = std::chrono::system_clock::now();
-  opentelemetry::core::SystemTimestamp event_timestamp(event_time);
+  opentelemetry::common::SystemTimestamp event_timestamp(event_time);
   uint64_t unix_event_time =
       std::chrono::duration_cast<std::chrono::milliseconds>(event_time.time_since_epoch()).count();
 
@@ -205,6 +228,15 @@ TEST(ZipkinSpanRecordable, SetArrayAtrribute)
   EXPECT_EQ(rec.span(), j_span);
 }
 
+TEST(ZipkinSpanRecordable, SetResource)
+{
+  opentelemetry::exporter::zipkin::Recordable rec;
+  std::string service_name = "test";
+  auto resource = opentelemetry::sdk::resource::Resource::Create({{"service.name", service_name}});
+  rec.SetResource(resource);
+  EXPECT_EQ(rec.GetServiceName(), service_name);
+}
+
 /**
  * AttributeValue can contain different int types, such as int, int64_t,
  * unsigned int, and uint64_t. To avoid writing test cases for each, we can
@@ -217,7 +249,7 @@ struct ZipkinIntAttributeTest : public testing::Test
 };
 
 using IntTypes = testing::Types<int, int64_t, unsigned int, uint64_t>;
-TYPED_TEST_CASE(ZipkinIntAttributeTest, IntTypes);
+TYPED_TEST_SUITE(ZipkinIntAttributeTest, IntTypes);
 
 TYPED_TEST(ZipkinIntAttributeTest, SetIntSingleAttribute)
 {

@@ -11,8 +11,8 @@ namespace sdk
 namespace trace
 {
 
-using opentelemetry::core::SteadyTimestamp;
-using opentelemetry::core::SystemTimestamp;
+using opentelemetry::common::SteadyTimestamp;
+using opentelemetry::common::SystemTimestamp;
 
 namespace
 {
@@ -50,7 +50,7 @@ Span::Span(std::shared_ptr<Tracer> &&tracer,
            const nostd::shared_ptr<opentelemetry::trace::TraceState> trace_state,
            const bool sampled) noexcept
     : tracer_{std::move(tracer)},
-      recordable_{tracer_->GetActiveProcessor().MakeRecordable()},
+      recordable_{tracer_->GetProcessor().MakeRecordable()},
       start_steady_time{options.start_steady_time},
       has_ended_{false}
 {
@@ -59,6 +59,7 @@ Span::Span(std::shared_ptr<Tracer> &&tracer,
     return;
   }
   recordable_->SetName(name);
+  recordable_->SetInstrumentationLibrary(tracer_->GetInstrumentationLibrary());
 
   trace_api::TraceId trace_id;
   trace_api::SpanId span_id = tracer_->GetIdGenerator().GenerateSpanId();
@@ -101,9 +102,8 @@ Span::Span(std::shared_ptr<Tracer> &&tracer,
   recordable_->SetSpanKind(options.kind);
   recordable_->SetStartTime(NowOr(options.start_system_time));
   start_steady_time = NowOr(options.start_steady_time);
-  // recordable_->SetResource(tracer_->GetResoource()); TODO
-  // recordable_->SetResource(tracer_->GetInstrumentationLibrary()); TODO
-  tracer_->GetActiveProcessor().OnStart(*recordable_, parent_span_context);
+  recordable_->SetResource(tracer_->GetResource());
+  tracer_->GetProcessor().OnStart(*recordable_, parent_span_context);
 }
 
 Span::~Span()
@@ -129,7 +129,7 @@ void Span::AddEvent(nostd::string_view name) noexcept
   recordable_->AddEvent(name);
 }
 
-void Span::AddEvent(nostd::string_view name, core::SystemTimestamp timestamp) noexcept
+void Span::AddEvent(nostd::string_view name, SystemTimestamp timestamp) noexcept
 {
   std::lock_guard<std::mutex> lock_guard{mu_};
   if (recordable_ == nullptr)
@@ -140,7 +140,7 @@ void Span::AddEvent(nostd::string_view name, core::SystemTimestamp timestamp) no
 }
 
 void Span::AddEvent(nostd::string_view name,
-                    core::SystemTimestamp timestamp,
+                    SystemTimestamp timestamp,
                     const opentelemetry::common::KeyValueIterable &attributes) noexcept
 {
   std::lock_guard<std::mutex> lock_guard{mu_};
@@ -190,7 +190,7 @@ void Span::End(const trace_api::EndSpanOptions &options) noexcept
   recordable_->SetDuration(std::chrono::steady_clock::time_point(end_steady_time) -
                            std::chrono::steady_clock::time_point(start_steady_time));
 
-  tracer_->GetActiveProcessor().OnEnd(std::move(recordable_));
+  tracer_->GetProcessor().OnEnd(std::move(recordable_));
   recordable_.reset();
 }
 

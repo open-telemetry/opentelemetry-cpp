@@ -13,26 +13,28 @@
 
 namespace
 {
-static opentelemetry::trace::propagation::HttpTraceContext<std::map<std::string, std::string>>
-    propagator_format;
+static opentelemetry::trace::propagation::HttpTraceContext propagator_format;
 
-void Setter(std::map<std::string, std::string> &carrier,
-            nostd::string_view trace_type        = "traceparent",
-            nostd::string_view trace_description = "")
+class TextMapCarrierTest : public opentelemetry::trace::propagation::TextMapCarrier
 {
-  carrier[std::string(trace_type)] = std::string(trace_description);
-}
-
-nostd::string_view Getter(const std::map<std::string, std::string> &carrier,
-                          nostd::string_view trace_type = "traceparent")
-{
-  auto it = carrier.find(std::string(trace_type));
-  if (it != carrier.end())
+public:
+  TextMapCarrierTest(std::map<std::string, std::string> &headers) : headers_(headers) {}
+  virtual nostd::string_view Get(nostd::string_view key) const noexcept override
   {
-    return nostd::string_view(it->second);
+    auto it = headers_.find(std::string(key));
+    if (it != headers_.end())
+    {
+      return nostd::string_view(it->second);
+    }
+    return "";
   }
-  return "";
-}
+  virtual void Set(nostd::string_view key, nostd::string_view value) noexcept override
+  {
+    headers_[std::string(key)] = std::string(value);
+  }
+
+  std::map<std::string, std::string> &headers_;
+};
 
 void initTracer()
 {
@@ -40,7 +42,9 @@ void initTracer()
       new opentelemetry::exporter::trace::OStreamSpanExporter);
   auto processor = std::unique_ptr<sdktrace::SpanProcessor>(
       new sdktrace::SimpleSpanProcessor(std::move(exporter)));
-  auto context  = std::make_shared<sdktrace::TracerContext>(std::move(processor));
+  std::vector<std::unique_ptr<sdktrace::SpanProcessor>> processors;
+  processors.push_back(std::move(processor));
+  auto context  = std::make_shared<sdktrace::TracerContext>(std::move(processors));
   auto provider = nostd::shared_ptr<opentelemetry::trace::TracerProvider>(
       new sdktrace::TracerProvider(context));
   // Set the global trace provider
@@ -109,7 +113,8 @@ void send_request(opentelemetry::ext::http::client::curl::HttpClient &client,
   request->AddHeader("Content-Length", std::to_string(body.size()));
 
   std::map<std::string, std::string> headers;
-  propagator_format.Inject(Setter, headers, opentelemetry::context::RuntimeContext::GetCurrent());
+  TextMapCarrierTest carrier(headers);
+  propagator_format.Inject(carrier, opentelemetry::context::RuntimeContext::GetCurrent());
 
   for (auto const &hdr : headers)
   {
@@ -155,8 +160,9 @@ int main(int argc, char *argv[])
 
         for (auto &part : body)
         {
+          const TextMapCarrierTest carrier((std::map<std::string, std::string> &)req.headers);
           auto current_ctx = opentelemetry::context::RuntimeContext::GetCurrent();
-          auto ctx         = propagator_format.Extract(Getter, req.headers, current_ctx);
+          auto ctx         = propagator_format.Extract(carrier, current_ctx);
           auto token       = opentelemetry::context::RuntimeContext::Attach(ctx);
 
           auto url       = part["url"].get<std::string>();

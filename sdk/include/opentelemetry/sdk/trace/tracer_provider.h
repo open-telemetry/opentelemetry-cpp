@@ -2,7 +2,9 @@
 
 #include <map>
 #include <memory>
+#include <mutex>
 #include <string>
+#include <vector>
 
 #include "opentelemetry/nostd/shared_ptr.h"
 #include "opentelemetry/sdk/resource/resource.h"
@@ -24,11 +26,23 @@ public:
    * Initialize a new tracer provider with a specified sampler
    * @param processor The span processor for this tracer provider. This must
    * not be a nullptr.
+   * @param resource  The resources for this tracer provider.
    * @param sampler The sampler for this tracer provider. This must
    * not be a nullptr.
+   * @param id_generator The custom id generator for this tracer provider. This must
+   * not be a nullptr
    */
   explicit TracerProvider(
       std::unique_ptr<SpanProcessor> processor,
+      opentelemetry::sdk::resource::Resource resource =
+          opentelemetry::sdk::resource::Resource::Create({}),
+      std::unique_ptr<Sampler> sampler = std::unique_ptr<AlwaysOnSampler>(new AlwaysOnSampler),
+      std::unique_ptr<opentelemetry::sdk::trace::IdGenerator> id_generator =
+          std::unique_ptr<opentelemetry::sdk::trace::IdGenerator>(
+              new RandomIdGenerator())) noexcept;
+
+  explicit TracerProvider(
+      std::vector<std::unique_ptr<SpanProcessor>> &&processors,
       opentelemetry::sdk::resource::Resource resource =
           opentelemetry::sdk::resource::Resource::Create({}),
       std::unique_ptr<Sampler> sampler = std::unique_ptr<AlwaysOnSampler>(new AlwaysOnSampler),
@@ -47,19 +61,26 @@ public:
       nostd::string_view library_version = "") noexcept override;
 
   /**
-   * Attaches a span processor pipeline to this tracer provider.
+   * Attaches a span processor to list of configured processors for this tracer provider.
    * @param processor The new span processor for this tracer provider. This
    * must not be a nullptr.
    *
    * Note: This process may not receive any in-flight spans, but will get newly created spans.
+   * Note: This method is not thread safe, and should ideally be called from main thread.
    */
-  void RegisterPipeline(std::unique_ptr<SpanProcessor> processor) noexcept;
+  void AddProcessor(std::unique_ptr<SpanProcessor> processor) noexcept;
 
   /**
    * Obtain the resource associated with this tracer provider.
    * @return The resource for this tracer provider.
    */
   const opentelemetry::sdk::resource::Resource &GetResource() const noexcept;
+
+  /**
+   * Obtain the span processor associated with this tracer provider.
+   * @return The span processor for this tracer provider.
+   */
+  std::shared_ptr<SpanProcessor> GetProcessor() const noexcept;
 
   /**
    * Shutdown the span processor associated with this tracer provider.
@@ -73,7 +94,8 @@ public:
 
 private:
   std::shared_ptr<sdk::trace::TracerContext> context_;
-  std::shared_ptr<opentelemetry::trace::Tracer> tracer_;
+  std::vector<std::shared_ptr<opentelemetry::sdk::trace::Tracer>> tracers_;
+  std::mutex lock_;
 };
 }  // namespace trace
 }  // namespace sdk

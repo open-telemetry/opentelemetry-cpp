@@ -4,7 +4,7 @@
 #include <unordered_map>
 #include <vector>
 #include "opentelemetry/common/attribute_value.h"
-#include "opentelemetry/core/timestamp.h"
+#include "opentelemetry/common/timestamp.h"
 #include "opentelemetry/nostd/string_view.h"
 #include "opentelemetry/sdk/common/attribute_utils.h"
 #include "opentelemetry/sdk/trace/recordable.h"
@@ -27,7 +27,7 @@ class SpanDataEvent
 {
 public:
   SpanDataEvent(std::string name,
-                core::SystemTimestamp timestamp,
+                opentelemetry::common::SystemTimestamp timestamp,
                 const opentelemetry::common::KeyValueIterable &attributes)
       : name_(name), timestamp_(timestamp), attribute_map_(attributes)
   {}
@@ -42,7 +42,7 @@ public:
    * Get the timestamp for this event
    * @return the timestamp for this event
    */
-  core::SystemTimestamp GetTimestamp() const noexcept { return timestamp_; }
+  opentelemetry::common::SystemTimestamp GetTimestamp() const noexcept { return timestamp_; }
 
   /**
    * Get the attributes for this event
@@ -55,7 +55,7 @@ public:
 
 private:
   std::string name_;
-  core::SystemTimestamp timestamp_;
+  opentelemetry::common::SystemTimestamp timestamp_;
   common::AttributeMap attribute_map_;
 };
 
@@ -145,10 +145,17 @@ public:
   opentelemetry::nostd::string_view GetDescription() const noexcept { return status_desc_; }
 
   /**
+   * Get the attributes associated with the resource
+   * @returns the attributes associated with the resource configured for TracerProvider
+   */
+
+  const opentelemetry::sdk::resource::Resource &GetResource() const noexcept { return *resource_; }
+
+  /**
    * Get the start time for this span
    * @return the start time for this span
    */
-  opentelemetry::core::SystemTimestamp GetStartTime() const noexcept { return start_time_; }
+  opentelemetry::common::SystemTimestamp GetStartTime() const noexcept { return start_time_; }
 
   /**
    * Get the duration for this span
@@ -190,12 +197,12 @@ public:
     attribute_map_.SetAttribute(key, value);
   }
 
-  void AddEvent(
-      nostd::string_view name,
-      core::SystemTimestamp timestamp = core::SystemTimestamp(std::chrono::system_clock::now()),
-      const opentelemetry::common::KeyValueIterable &attributes =
-          opentelemetry::common::KeyValueIterableView<std::map<std::string, int>>(
-              {})) noexcept override
+  void AddEvent(nostd::string_view name,
+                opentelemetry::common::SystemTimestamp timestamp =
+                    opentelemetry::common::SystemTimestamp(std::chrono::system_clock::now()),
+                const opentelemetry::common::KeyValueIterable &attributes =
+                    opentelemetry::common::KeyValueIterableView<std::map<std::string, int>>(
+                        {})) noexcept override
   {
     SpanDataEvent event(std::string(name), timestamp, attributes);
     events_.push_back(event);
@@ -225,17 +232,28 @@ public:
     span_kind_ = span_kind;
   }
 
-  void SetStartTime(opentelemetry::core::SystemTimestamp start_time) noexcept override
+  void SetResource(const opentelemetry::sdk::resource::Resource &resource) noexcept override
+  {
+    resource_ = &resource;
+  }
+
+  void SetStartTime(opentelemetry::common::SystemTimestamp start_time) noexcept override
   {
     start_time_ = start_time;
   }
 
   void SetDuration(std::chrono::nanoseconds duration) noexcept override { duration_ = duration; }
 
+  void SetInstrumentationLibrary(
+      const InstrumentationLibrary &instrumentation_library) noexcept override
+  {
+    instrumentation_library_ = &instrumentation_library;
+  }
+
 private:
   opentelemetry::trace::SpanContext span_context_{false, false};
   opentelemetry::trace::SpanId parent_span_id_;
-  core::SystemTimestamp start_time_;
+  opentelemetry::common::SystemTimestamp start_time_;
   std::chrono::nanoseconds duration_{0};
   std::string name_;
   opentelemetry::trace::StatusCode status_code_{opentelemetry::trace::StatusCode::kUnset};
@@ -244,6 +262,8 @@ private:
   std::vector<SpanDataEvent> events_;
   std::vector<SpanDataLink> links_;
   opentelemetry::trace::SpanKind span_kind_{opentelemetry::trace::SpanKind::kInternal};
+  const opentelemetry::sdk::resource::Resource *resource_;
+  const InstrumentationLibrary *instrumentation_library_;
 };
 }  // namespace trace
 }  // namespace sdk

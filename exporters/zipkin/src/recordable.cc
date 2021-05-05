@@ -16,13 +16,22 @@
 
 #include "opentelemetry/exporters/zipkin/recordable.h"
 
-#include <iostream>
+#include <map>
+#include <string>
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace exporter
 {
 namespace zipkin
 {
+
+// constexpr needs keys to be constexpr, const is next best to use.
+static const std::map<opentelemetry::trace::SpanKind, std::string> kSpanKindMap = {
+    {opentelemetry::trace::SpanKind::kClient, "CLIENT"},
+    {opentelemetry::trace::SpanKind::kServer, "SERVER"},
+    {opentelemetry::trace::SpanKind::kConsumer, "CONSUMER"},
+    {opentelemetry::trace::SpanKind::kProducer, "PRODUCER"},
+};
 
 //
 // See `attribute_value.h` for details.
@@ -159,7 +168,7 @@ void Recordable::SetAttribute(nostd::string_view key,
 }
 
 void Recordable::AddEvent(nostd::string_view name,
-                          core::SystemTimestamp timestamp,
+                          common::SystemTimestamp timestamp,
                           const common::KeyValueIterable &attributes) noexcept
 {
   nlohmann::json attrs = nlohmann::json::object();  // empty object
@@ -204,7 +213,17 @@ void Recordable::SetName(nostd::string_view name) noexcept
   span_["name"] = name.data();
 }
 
-void Recordable::SetStartTime(opentelemetry::core::SystemTimestamp start_time) noexcept
+void Recordable::SetResource(const opentelemetry::sdk::resource::Resource &resource) noexcept
+{
+  // only service.name attribute is supported by specs as of now.
+  auto attributes = resource.GetAttributes();
+  if (attributes.find("service.name") != attributes.end())
+  {
+    service_name_ = nostd::get<std::string>(attributes["service.name"]);
+  }
+}
+
+void Recordable::SetStartTime(opentelemetry::common::SystemTimestamp start_time) noexcept
 {
   span_["timestamp"] =
       std::chrono::duration_cast<std::chrono::microseconds>(start_time.time_since_epoch()).count();
@@ -215,7 +234,23 @@ void Recordable::SetDuration(std::chrono::nanoseconds duration) noexcept
   span_["duration"] = duration.count();
 }
 
-void Recordable::SetSpanKind(opentelemetry::trace::SpanKind span_kind) noexcept {}
+void Recordable::SetSpanKind(opentelemetry::trace::SpanKind span_kind) noexcept
+{
+  auto span_iter = kSpanKindMap.find(span_kind);
+  if (span_iter != kSpanKindMap.end())
+  {
+    span_["kind"] = span_iter->second;
+  }
+}
+
+void Recordable::SetInstrumentationLibrary(
+    const opentelemetry::sdk::instrumentationlibrary::InstrumentationLibrary
+        &instrumentation_library) noexcept
+{
+  span_["tags"]["otel.library.name"]    = instrumentation_library.GetName();
+  span_["tags"]["otel.library.version"] = instrumentation_library.GetVersion();
+}
+
 }  // namespace zipkin
 }  // namespace exporter
 OPENTELEMETRY_END_NAMESPACE

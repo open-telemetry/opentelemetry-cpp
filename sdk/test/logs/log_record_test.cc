@@ -32,7 +32,7 @@ TEST(LogRecord, SetAndGet)
   opentelemetry::trace::TraceId trace_id;
   opentelemetry::trace::SpanId span_id;
   opentelemetry::trace::TraceFlags trace_flags;
-  opentelemetry::core::SystemTimestamp now(std::chrono::system_clock::now());
+  opentelemetry::common::SystemTimestamp now(std::chrono::system_clock::now());
 
   // Set all fields of the LogRecord
   LogRecord record;

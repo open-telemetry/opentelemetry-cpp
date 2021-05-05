@@ -11,7 +11,7 @@ using namespace opentelemetry::sdk::trace;
 using namespace opentelemetry::ext::zpages;
 namespace nostd  = opentelemetry::nostd;
 namespace common = opentelemetry::common;
-using opentelemetry::core::SteadyTimestamp;
+using opentelemetry::common::SteadyTimestamp;
 using opentelemetry::v0::trace::Span;
 
 const std::string span_name1 = "span 1";
@@ -36,8 +36,11 @@ protected:
   {
     std::shared_ptr<TracezSharedData> shared_data(new TracezSharedData());
     auto resource = opentelemetry::sdk::resource::Resource::Create({});
-    auto context  = std::make_shared<TracerContext>(
-        std::unique_ptr<SpanProcessor>(new TracezSpanProcessor(shared_data)), resource);
+    std::unique_ptr<SpanProcessor> processor(new TracezSpanProcessor(shared_data));
+    std::vector<std::unique_ptr<SpanProcessor>> processors;
+    processors.push_back(std::move(processor));
+
+    auto context           = std::make_shared<TracerContext>(std::move(processors), resource);
     tracer                 = std::shared_ptr<opentelemetry::trace::Tracer>(new Tracer(context));
     tracez_data_aggregator = std::unique_ptr<TracezDataAggregator>(
         new TracezDataAggregator(shared_data, milliseconds(10)));
