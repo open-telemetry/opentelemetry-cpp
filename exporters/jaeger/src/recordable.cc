@@ -152,7 +152,8 @@ void Recordable::SetSpanKind(trace::SpanKind span_kind) noexcept
       break;
   }
 
-  if (span_kind_str != nullptr) {
+  if (span_kind_str != nullptr)
+  {
     AddTag("span.kind", span_kind_str);
   }
 }
