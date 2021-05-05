@@ -4,14 +4,14 @@
 #include "opentelemetry/sdk/trace/tracer_provider.h"
 #include "opentelemetry/trace/provider.h"
 
-#include "opentelemetry/trace/propagation/global_propagator.h"
+#include "opentelemetry/context/propagation/global_propagator.h"
 #include "opentelemetry/trace/propagation/http_trace_context.h"
-#include "opentelemetry/trace/propagation/text_map_propagator.h"
+#include "opentelemetry/context/propagation/text_map_propagator.h"
 
 #include "opentelemetry/nostd/shared_ptr.h"
 #include "opentelemetry/ext/http/client/http_client.h"
-
 #include <iostream>
+#include <vector>
 
 namespace {
 
@@ -58,16 +58,18 @@ void initTracer() {
       new opentelemetry::exporter::trace::OStreamSpanExporter);
   auto processor = std::unique_ptr<sdktrace::SpanProcessor>(
       new sdktrace::SimpleSpanProcessor(std::move(exporter)));
+  std::vector<std::unique_ptr<sdktrace::SpanProcessor>> processors;
+  processors.push_back(std::move(processor));
   // Default is an always-on sampler.
-  auto context = std::make_shared<sdktrace::TracerContext>(std::move(processor));
+  auto context = std::make_shared<sdktrace::TracerContext>(std::move(processors));
   auto provider =  nostd::shared_ptr<opentelemetry::trace::TracerProvider>(
       new sdktrace::TracerProvider(context));
   // Set the global trace provider
   opentelemetry::trace::Provider::SetTracerProvider(provider);
 
   //set http propagator
-  opentelemetry::trace::propagation::GlobalTextMapPropagator::SetGlobalPropagator(
-      nostd::shared_ptr<opentelemetry::trace::propagation::TextMapPropagator>(new opentelemetry::trace::propagation::HttpTraceContext()));
+  opentelemetry::context::propagation::GlobalTextMapPropagator::SetGlobalPropagator(
+      nostd::shared_ptr<opentelemetry::context::propagation::TextMapPropagator>(new opentelemetry::trace::propagation::HttpTraceContext()));
 }
 
 nostd::shared_ptr<opentelemetry::trace::Tracer> get_tracer(std::string tracer_name)

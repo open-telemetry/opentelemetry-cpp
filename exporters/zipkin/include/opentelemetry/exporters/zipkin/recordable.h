@@ -38,6 +38,8 @@ class Recordable final : public sdk::trace::Recordable
 public:
   const ZipkinSpan &span() const noexcept { return span_; }
 
+  const std::string &GetServiceName() const noexcept { return service_name_; }
+
   void SetIdentity(const opentelemetry::trace::SpanContext &span_context,
                    opentelemetry::trace::SpanId parent_span_id) noexcept override;
 
@@ -57,12 +59,19 @@ public:
 
   void SetStartTime(opentelemetry::common::SystemTimestamp start_time) noexcept override;
 
-  virtual void SetSpanKind(opentelemetry::trace::SpanKind span_kind) noexcept override;
+  void SetSpanKind(opentelemetry::trace::SpanKind span_kind) noexcept override;
+
+  void SetResource(const opentelemetry::sdk::resource::Resource &resource) noexcept override;
 
   void SetDuration(std::chrono::nanoseconds duration) noexcept override;
 
+  void SetInstrumentationLibrary(
+      const opentelemetry::sdk::instrumentationlibrary::InstrumentationLibrary
+          &instrumentation_library) noexcept override;
+
 private:
   ZipkinSpan span_;
+  std::string service_name_;
 };
 }  // namespace zipkin
 }  // namespace exporter

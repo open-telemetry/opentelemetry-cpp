@@ -62,6 +62,12 @@ sdk::common::ExportResult ZipkinExporter::Export(
       auto json_span = rec->span();
       // add localEndPoint
       json_span["localEndpoint"] = local_end_point_;
+      // check service.name
+      auto service_name = rec->GetServiceName();
+      if (service_name.size())
+      {
+        json_span["localEndpoint"]["serviceName"] = service_name;
+      }
       json_spans.push_back(json_span);
     }
   }

@@ -16,8 +16,8 @@
 
 #include <mutex>
 
-#include "opentelemetry/trace/propagation/noop_propagator.h"
-#include "opentelemetry/trace/propagation/text_map_propagator.h"
+#include "opentelemetry/context/propagation/noop_propagator.h"
+#include "opentelemetry/context/propagation/text_map_propagator.h"
 
 #include "opentelemetry/common/spin_lock_mutex.h"
 #include "opentelemetry/nostd/shared_ptr.h"
@@ -25,7 +25,7 @@
 #include "opentelemetry/version.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
-namespace trace
+namespace context
 {
 namespace propagation
 {
@@ -62,5 +62,5 @@ private:
 };
 
 }  // namespace propagation
-}  // namespace trace
+}  // namespace context
 OPENTELEMETRY_END_NAMESPACE
