@@ -47,13 +47,22 @@ sdk_common::ExportResult JaegerExporter::Export(
     return sdk_common::ExportResult::kFailure;
   }
 
+  std::size_t exported_size = 0;
+
   for (auto &recordable : spans)
   {
     auto rec = std::unique_ptr<Recordable>(static_cast<Recordable *>(recordable.release()));
     if (rec != nullptr)
     {
-      sender_->Append(std::move(rec));
+      exported_size += sender_->Append(std::move(rec));
     }
+  }
+
+  exported_size += sender_->Flush();
+
+  if (exported_size == 0)
+  {
+    return sdk_common::ExportResult::kFailure;
   }
 
   return sdk_common::ExportResult::kSuccess;

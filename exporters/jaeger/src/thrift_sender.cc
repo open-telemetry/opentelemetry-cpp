@@ -36,8 +36,6 @@ int ThriftSender::Append(std::unique_ptr<Recordable> &&span) noexcept
     return 0;
   }
 
-  std::lock_guard<std::mutex> guard{lock_};
-
   uint32_t max_span_bytes = transport_->MaxPacketSize() - kEmitBatchOverhead;
   if (process_.serviceName.empty())
   {
@@ -72,7 +70,7 @@ int ThriftSender::Append(std::unique_ptr<Recordable> &&span) noexcept
     }
   }
 
-  const auto flushed = FlushWithLock();
+  const auto flushed = Flush();
   span_buffer_.push_back(jaeger_span);
   byte_buffer_size_ = span_size + process_bytes_size_;
 
@@ -80,13 +78,6 @@ int ThriftSender::Append(std::unique_ptr<Recordable> &&span) noexcept
 }
 
 int ThriftSender::Flush()
-{
-  std::lock_guard<std::mutex> guard{lock_};
-
-  return FlushWithLock();
-}
-
-int ThriftSender::FlushWithLock()
 {
   if (span_buffer_.empty())
   {

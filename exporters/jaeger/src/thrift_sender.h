@@ -67,8 +67,6 @@ private:
     return size;
   }
 
-  int FlushWithLock();
-
 private:
   std::vector<std::unique_ptr<Recordable>> spans_;
   std::vector<thrift::Span> span_buffer_;
@@ -76,8 +74,6 @@ private:
   std::unique_ptr<apache::thrift::protocol::TProtocolFactory> protocol_factory_;
   std::shared_ptr<apache::thrift::transport::TMemoryBuffer> thrift_buffer_;
   thrift::Process process_;
-
-  std::mutex lock_;
 
   // Size in bytes of the serialization buffer.
   uint32_t byte_buffer_size_   = 0;
