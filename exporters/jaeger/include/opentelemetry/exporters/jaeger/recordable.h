@@ -33,6 +33,7 @@ public:
 
   thrift::Span *Span() noexcept { return span_.release(); }
   std::vector<thrift::Tag> Tags() noexcept { return std::move(tags_); }
+  const std::string &ServiceName() const noexcept { return service_name_; }
 
   void SetIdentity(const opentelemetry::trace::SpanContext &span_context,
                    opentelemetry::trace::SpanId parent_span_id) noexcept override;
@@ -76,6 +77,7 @@ private:
 private:
   std::unique_ptr<thrift::Span> span_;
   std::vector<thrift::Tag> tags_;
+  std::string service_name_;
 };
 
 }  // namespace jaeger

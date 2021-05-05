@@ -107,11 +107,11 @@ void Recordable::SetName(nostd::string_view name) noexcept
 void Recordable::SetResource(const opentelemetry::sdk::resource::Resource &resource) noexcept
 {
   // only service.name attribute is supported by specs as of now.
-  // auto attributes = resource.GetAttributes();
-  // if (attributes.find("service.name") != attributes.end())
-  // {
-  //   service_name_ = nostd::get<std::string>(attributes["service.name"]);
-  // }
+  auto attributes = resource.GetAttributes();
+  if (attributes.find("service.name") != attributes.end())
+  {
+    service_name_ = nostd::get<std::string>(attributes["service.name"]);
+  }
 }
 
 void Recordable::SetStartTime(common::SystemTimestamp start_time) noexcept

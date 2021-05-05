@@ -41,10 +41,7 @@ int ThriftSender::Append(std::unique_ptr<Recordable> &&span) noexcept
   uint32_t max_span_bytes = transport_->MaxPacketSize() - kEmitBatchOverhead;
   if (process_.serviceName.empty())
   {
-    // TODO: populate Span.Process from OpenTelemetry resources.
-    // process_bytes_size_ = CalcSizeOfSerializedThrift(process_);
-    // max_span_bytes -= process_byte_size_;
-    process_.serviceName = "OTel-Jaeger";
+    process_.serviceName = span->ServiceName();
 
     process_bytes_size_ = CalcSizeOfSerializedThrift(process_);
     max_span_bytes -= process_bytes_size_;

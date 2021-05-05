@@ -13,7 +13,10 @@ set(JAEGER_EXPORTER_SOURCES
 
 add_library(jaeger_trace_exporter ${JAEGER_EXPORTER_SOURCES}
                                   ${JAEGER_THRIFT_GENCPP_SOURCES})
-target_link_libraries(jaeger_trace_exporter PRIVATE thrift::thrift)
+target_link_libraries(
+  jaeger_trace_exporter
+  PUBLIC opentelemetry_resources
+  PRIVATE thrift::thrift)
 
 if(MSVC)
   target_compile_definitions(jaeger_trace_exporter PUBLIC NOMINMAX)
