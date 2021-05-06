@@ -10,7 +10,7 @@ This is a simple example that demonstrates tracing an HTTP request from client t
 * Span Events
 * Using the ostream exporter
 * Nested spans (TBD)
-* W3c Trace Context Propagation
+* W3C Trace Context Propagation
 
 ### Running the example
 
