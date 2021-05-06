@@ -5,6 +5,7 @@
 This is a simple example that demonstrates tracing an HTTP request from client to server. The example shows several aspects of tracing such as:
 
 * Using the `TracerProvider`
+* Using the `GlobalPropagator`
 * Span Attributes
 * Span Events
 * Using the ostream exporter
@@ -101,3 +102,5 @@ This is a simple example that demonstrates tracing an HTTP request from client t
 
    }
    ```
+
+   As seen from example above, `trace_id` and `parent_span_id` is propagated from client to server.
