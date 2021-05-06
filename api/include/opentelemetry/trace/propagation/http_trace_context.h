@@ -20,8 +20,6 @@
 #include "opentelemetry/nostd/string_view.h"
 #include "opentelemetry/trace/default_span.h"
 
-#include <iostream>
-
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace trace
 {
@@ -59,11 +57,6 @@ public:
                            context::Context &context) noexcept override
   {
     SpanContext span_context = ExtractImpl(carrier);
-    char trace_buf[opentelemetry::trace::TraceId::kSize * 2];
-
-    span_context.trace_id().ToLowerBase16(trace_buf);
-    std::cout << "\n\nTRACE__ID in HTTP trace context: "
-              << std::string(trace_buf, sizeof(trace_buf)) << std::endl;
     nostd::shared_ptr<Span> sp{new DefaultSpan(span_context)};
     return context.SetValue(kSpanKey, sp);
   }
@@ -170,8 +163,7 @@ private:
   static SpanContext ExtractImpl(const opentelemetry::context::propagation::TextMapCarrier &carrier)
   {
     nostd::string_view trace_parent = carrier.Get(kTraceParent);
-    std::cout << " \nTRACE PARENT:" << trace_parent << "\n";
-    nostd::string_view trace_state = carrier.Get(kTraceState);
+    nostd::string_view trace_state  = carrier.Get(kTraceState);
     if (trace_parent == "")
     {
       return SpanContext::GetInvalid();
