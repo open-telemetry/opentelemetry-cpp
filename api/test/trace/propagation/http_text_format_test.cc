@@ -147,7 +147,7 @@ TEST(TextMapPropagatorTest, InvalidIdentitiesAreNotExtracted)
     context::Context ctx1 = context::Context{};
     context::Context ctx2 = format.Extract(carrier, ctx1);
 
-    auto span = trace::propagation::detail::GetSpanFromContext(ctx2)->GetContext();
+    auto span = trace::propagation::GetSpan(ctx2)->GetContext();
     EXPECT_FALSE(span.IsValid());
   }
 }

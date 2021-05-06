@@ -7,28 +7,23 @@ namespace trace
 {
 namespace propagation
 {
-namespace detail
-{
 
-inline nostd::shared_ptr<trace::Span> GetSpanFromContext(const context::Context &context)
+inline nostd::shared_ptr<trace::Span> GetSpan(const context::Context &context)
 {
   context::ContextValue span = context.GetValue(trace::kSpanKey);
   if (nostd::holds_alternative<nostd::shared_ptr<trace::Span>>(span))
   {
     return nostd::get<nostd::shared_ptr<trace::Span>>(span);
   }
-  static nostd::shared_ptr<Span> invalid_span{new DefaultSpan(SpanContext::GetInvalid())};
-  return invalid_span;
+  return nostd::shared_ptr<trace::Span>(new DefaultSpan(SpanContext::GetInvalid()));
 }
 
-inline context::Context SetSpanToContext(context::Context &context,
-                                         nostd::shared_ptr<trace::Span> span)
+inline context::Context SetSpan(context::Context &context, nostd::shared_ptr<trace::Span> span)
 {
 
   return context.SetValue(kSpanKey, span);
 }
 
-}  // namespace detail
 }  // namespace propagation
 }  // namespace trace
 OPENTELEMETRY_END_NAMESPACE
