@@ -839,6 +839,8 @@ RECURSIVE              = YES
 
 EXCLUDE                = ../include/opentelemetry/common/spin_lock_mutex.h \
                          ../include/opentelemetry/common/key_value_iterable_view.h \
+                         ../include/opentelemetry/common/kv_properties.h \
+                         ../include/opentelemetry/common/string_util.h \
                          ../include/opentelemetry/trace/span_context_kv_iterable_view.h \
                          ../include/opentelemetry/nostd/detail
 
