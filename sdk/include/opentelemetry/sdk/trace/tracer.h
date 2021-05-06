@@ -50,6 +50,9 @@ public:
     return *instrumentation_library_;
   }
 
+  /** Returns the currently configured resource **/
+  const opentelemetry::sdk::resource::Resource &GetResource() { return context_->GetResource(); }
+
   // Note: Test only
   Sampler &GetSampler() { return context_->GetSampler(); }
 

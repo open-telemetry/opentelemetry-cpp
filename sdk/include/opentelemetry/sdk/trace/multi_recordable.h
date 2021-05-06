@@ -63,8 +63,8 @@ public:
     }
   }
 
-  virtual void SetAttribute(nostd::string_view key,
-                            const opentelemetry::common::AttributeValue &value) noexcept override
+  void SetAttribute(nostd::string_view key,
+                    const opentelemetry::common::AttributeValue &value) noexcept override
   {
     for (auto &recordable : recordables_)
     {
@@ -72,9 +72,9 @@ public:
     }
   }
 
-  virtual void AddEvent(nostd::string_view name,
-                        opentelemetry::common::SystemTimestamp timestamp,
-                        const opentelemetry::common::KeyValueIterable &attributes) noexcept override
+  void AddEvent(nostd::string_view name,
+                opentelemetry::common::SystemTimestamp timestamp,
+                const opentelemetry::common::KeyValueIterable &attributes) noexcept override
   {
 
     for (auto &recordable : recordables_)
@@ -83,8 +83,8 @@ public:
     }
   }
 
-  virtual void AddLink(const opentelemetry::trace::SpanContext &span_context,
-                       const opentelemetry::common::KeyValueIterable &attributes) noexcept override
+  void AddLink(const opentelemetry::trace::SpanContext &span_context,
+               const opentelemetry::common::KeyValueIterable &attributes) noexcept override
   {
     for (auto &recordable : recordables_)
     {
@@ -92,8 +92,8 @@ public:
     }
   }
 
-  virtual void SetStatus(opentelemetry::trace::StatusCode code,
-                         nostd::string_view description) noexcept override
+  void SetStatus(opentelemetry::trace::StatusCode code,
+                 nostd::string_view description) noexcept override
   {
     for (auto &recordable : recordables_)
     {
@@ -101,7 +101,7 @@ public:
     }
   }
 
-  virtual void SetName(nostd::string_view name) noexcept override
+  void SetName(nostd::string_view name) noexcept override
   {
     for (auto &recordable : recordables_)
     {
@@ -109,7 +109,7 @@ public:
     }
   }
 
-  virtual void SetSpanKind(opentelemetry::trace::SpanKind span_kind) noexcept override
+  void SetSpanKind(opentelemetry::trace::SpanKind span_kind) noexcept override
   {
     for (auto &recordable : recordables_)
     {
@@ -117,7 +117,15 @@ public:
     }
   }
 
-  virtual void SetStartTime(opentelemetry::common::SystemTimestamp start_time) noexcept override
+  void SetResource(const opentelemetry::sdk::resource::Resource &resource) noexcept override
+  {
+    for (auto &recordable : recordables_)
+    {
+      recordable.second->SetResource(resource);
+    }
+  }
+
+  void SetStartTime(opentelemetry::common::SystemTimestamp start_time) noexcept override
   {
     for (auto &recordable : recordables_)
     {
@@ -125,7 +133,7 @@ public:
     }
   }
 
-  virtual void SetDuration(std::chrono::nanoseconds duration) noexcept override
+  void SetDuration(std::chrono::nanoseconds duration) noexcept override
   {
     for (auto &recordable : recordables_)
     {

@@ -228,6 +228,15 @@ TEST(ZipkinSpanRecordable, SetArrayAtrribute)
   EXPECT_EQ(rec.span(), j_span);
 }
 
+TEST(ZipkinSpanRecordable, SetResource)
+{
+  opentelemetry::exporter::zipkin::Recordable rec;
+  std::string service_name = "test";
+  auto resource = opentelemetry::sdk::resource::Resource::Create({{"service.name", service_name}});
+  rec.SetResource(resource);
+  EXPECT_EQ(rec.GetServiceName(), service_name);
+}
+
 /**
  * AttributeValue can contain different int types, such as int, int64_t,
  * unsigned int, and uint64_t. To avoid writing test cases for each, we can

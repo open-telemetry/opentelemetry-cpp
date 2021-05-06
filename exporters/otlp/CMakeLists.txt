@@ -4,8 +4,9 @@ add_library(opentelemetry_exporter_otprotocol src/recordable.cc
 set_target_properties(opentelemetry_exporter_otprotocol
                       PROPERTIES EXPORT_NAME otlp_exporter)
 
-target_link_libraries(opentelemetry_exporter_otprotocol
-                      PUBLIC opentelemetry_trace opentelemetry_proto)
+target_link_libraries(
+  opentelemetry_exporter_otprotocol
+  PUBLIC opentelemetry_trace opentelemetry_resources opentelemetry_proto)
 
 install(
   TARGETS opentelemetry_exporter_otprotocol
@@ -35,6 +36,12 @@ if(BUILD_TESTING)
     TEST_LIST recordable_test)
   if(MSVC)
     add_definitions(-DGTEST_LINKED_AS_SHARED_LIBRARY=1)
+  endif()
+  if(GMOCK_LIB)
+    # unset GMOCK_LIB to force find_library to redo the lookup, as the cached
+    # entry could cause linking to incorrect flavor of gmock and leading to
+    # runtime error.
+    unset(GMOCK_LIB CACHE)
   endif()
   if(MSVC AND CMAKE_BUILD_TYPE STREQUAL "Debug")
     find_library(GMOCK_LIB gmockd PATH_SUFFIXES lib)
