@@ -9,7 +9,7 @@
 
 using namespace opentelemetry;
 
-class TextMapCarrierTest : public trace::propagation::TextMapCarrier
+class TextMapCarrierTest : public context::propagation::TextMapCarrier
 {
 public:
   virtual nostd::string_view Get(nostd::string_view key) const noexcept override

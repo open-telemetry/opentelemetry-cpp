@@ -6,7 +6,7 @@
 #include "opentelemetry/version.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
-namespace trace
+namespace context
 {
 namespace propagation
 {
@@ -39,5 +39,5 @@ public:
   virtual void Inject(TextMapCarrier &carrier, const context::Context &context) noexcept = 0;
 };
 }  // namespace propagation
-}  // namespace trace
+}  // namespace context
 OPENTELEMETRY_END_NAMESPACE

@@ -3,11 +3,11 @@
 #include "opentelemetry/trace/span.h"
 #include "opentelemetry/trace/span_context.h"
 
+#include "opentelemetry/context/propagation/composite_propagator.h"
+#include "opentelemetry/context/propagation/text_map_propagator.h"
 #include "opentelemetry/trace/default_span.h"
 #include "opentelemetry/trace/propagation/b3_propagator.h"
-#include "opentelemetry/trace/propagation/composite_propagator.h"
 #include "opentelemetry/trace/propagation/http_trace_context.h"
-#include "opentelemetry/trace/propagation/text_map_propagator.h"
 
 #include <map>
 #include <memory>
@@ -25,7 +25,7 @@ static std::string Hex(const T &id_item)
   return std::string(buf, sizeof(buf));
 }
 
-class TextMapCarrierTest : public trace::propagation::TextMapCarrier
+class TextMapCarrierTest : public context::propagation::TextMapCarrier
 {
 public:
   virtual nostd::string_view Get(nostd::string_view key) const noexcept override
@@ -51,21 +51,22 @@ class CompositePropagatorTest : public ::testing::Test
 public:
   CompositePropagatorTest()
   {
-    std::vector<std::unique_ptr<trace::propagation::TextMapPropagator>> propogator_list = {};
-    std::unique_ptr<trace::propagation::TextMapPropagator> w3c_propogator(
+    std::vector<std::unique_ptr<context::propagation::TextMapPropagator>> propogator_list = {};
+    std::unique_ptr<context::propagation::TextMapPropagator> w3c_propogator(
         new trace::propagation::HttpTraceContext());
-    std::unique_ptr<trace::propagation::TextMapPropagator> b3_propogator(
+    std::unique_ptr<context::propagation::TextMapPropagator> b3_propogator(
         new trace::propagation::B3Propagator());
     propogator_list.push_back(std::move(w3c_propogator));
     propogator_list.push_back(std::move(b3_propogator));
 
-    composite_propagator_ = new trace::propagation::CompositePropagator(std::move(propogator_list));
+    composite_propagator_ =
+        new context::propagation::CompositePropagator(std::move(propogator_list));
   }
 
   ~CompositePropagatorTest() { delete composite_propagator_; }
 
 protected:
-  trace::propagation::CompositePropagator *composite_propagator_;
+  context::propagation::CompositePropagator *composite_propagator_;
 };
 
 TEST_F(CompositePropagatorTest, Extract)
