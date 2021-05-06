@@ -80,10 +80,6 @@ void UDPTransport::EmitBatch(const thrift::Batch &batch)
   {
     agent_->emitBatch(batch);
   }
-  catch (const std::system_error &)
-  {}
-  catch (const std::exception &)
-  {}
   catch (...)
   {}
 }

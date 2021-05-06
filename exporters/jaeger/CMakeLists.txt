@@ -1,7 +1,7 @@
 include_directories(include)
 include_directories(thrift-gen)
 
-find_package(thrift REQUIRED)
+find_package(Thrift REQUIRED)
 
 set(JAEGER_THRIFT_GENCPP_SOURCES
     thrift-gen/Agent.cpp thrift-gen/jaeger_types.cpp thrift-gen/Collector.cpp

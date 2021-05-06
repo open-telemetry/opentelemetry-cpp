@@ -17,7 +17,10 @@
 #ifdef _WIN32
 #  include <winsock2.h>
 #else
+#  include <netdb.h>
+#  include <string.h>
 #  include <sys/socket.h>
+#  include <sys/types.h>
 #endif
 
 #include <opentelemetry/version.h>

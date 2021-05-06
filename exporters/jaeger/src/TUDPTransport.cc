@@ -28,7 +28,7 @@ TUDPTransport::~TUDPTransport()
 {
   if (server_addr_info_)
   {
-    ::freeaddrinfo(server_addr_info_);
+    freeaddrinfo(server_addr_info_);
     server_addr_info_ = nullptr;
     sockaddr_len      = 0;
   }
@@ -51,7 +51,7 @@ void TUDPTransport::open()
   int error;
   char port[sizeof("65535") + 1];
 
-  std::memset(&hints, 0, sizeof(hints));
+  memset(&hints, 0, sizeof(hints));
   hints.ai_family   = AF_UNSPEC;
   hints.ai_socktype = SOCK_DGRAM;
   hints.ai_flags    = AI_PASSIVE | AI_ADDRCONFIG;
