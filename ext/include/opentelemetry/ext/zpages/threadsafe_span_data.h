@@ -160,6 +160,11 @@ public:
     span_kind_ = span_kind;
   }
 
+  void SetResource(const opentelemetry::sdk::resource::Resource & /*resource*/) noexcept override
+  {
+    // Not Implemented
+  }
+
   void SetStartTime(opentelemetry::common::SystemTimestamp start_time) noexcept override
   {
     std::lock_guard<std::mutex> lock(mutex_);
@@ -170,6 +175,14 @@ public:
   {
     std::lock_guard<std::mutex> lock(mutex_);
     duration_ = duration;
+  }
+
+  void SetInstrumentationLibrary(
+      const opentelemetry::sdk::instrumentationlibrary::InstrumentationLibrary
+          &instrumentation_library) noexcept override
+  {
+    std::lock_guard<std::mutex> lock(mutex_);
+    instrumentation_library_ = &instrumentation_library;
   }
 
   void AddLink(const opentelemetry::trace::SpanContext &span_context,
@@ -212,7 +225,8 @@ private:
         status_desc_(threadsafe_span_data.status_desc_),
         attributes_(threadsafe_span_data.attributes_),
         events_(threadsafe_span_data.events_),
-        converter_(threadsafe_span_data.converter_)
+        converter_(threadsafe_span_data.converter_),
+        instrumentation_library_(threadsafe_span_data.instrumentation_library_)
   {}
 
   mutable std::mutex mutex_;
@@ -227,6 +241,8 @@ private:
   std::unordered_map<std::string, opentelemetry::sdk::common::OwnedAttributeValue> attributes_;
   std::vector<opentelemetry::sdk::trace::SpanDataEvent> events_;
   opentelemetry::sdk::common::AttributeConverter converter_;
+  const opentelemetry::sdk::instrumentationlibrary::InstrumentationLibrary
+      *instrumentation_library_;
 };
 }  // namespace zpages
 }  // namespace ext
