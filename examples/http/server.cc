@@ -1,5 +1,5 @@
-#include "server.hpp"
-#include "tracer_common.hpp"
+#include "server.h"
+#include "tracer_common.h"
 
 #include <iostream>
 #include <thread>
