@@ -21,11 +21,15 @@ void sendRequest(const std::string &url)
                                {"http.scheme", url_parser.scheme_},
                                {"http.method", "GET"}},
                               options);
-  auto scope       = get_tracer("http-client")->WithActiveSpan(span);
+  auto scope = get_tracer("http-client")->WithActiveSpan(span);
+
+  // inject current context into http header
   auto current_ctx = opentelemetry::context::RuntimeContext::GetCurrent();
   HttpTextMapCarrier<opentelemetry::ext::http::client::Headers> carrier;
   auto prop = opentelemetry::context::propagation::GlobalTextMapPropagator::GetGlobalPropagator();
   prop->Inject(carrier, current_ctx);
+
+  // send http request
   opentelemetry::ext::http::client::Result result = http_client->Get(url, carrier.headers_);
   if (result)
   {

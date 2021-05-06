@@ -16,7 +16,6 @@
 
 
 namespace {
-
 //TBD - This function be removed once #723 is merged
 inline nostd::shared_ptr<opentelemetry::trace::Span> GetSpanFromContext(const opentelemetry::context::Context &context)
 {
@@ -40,18 +39,16 @@ public:
   virtual nostd::string_view Get(nostd::string_view key) const noexcept override
   {
     std::string key_to_compare = key.data();
-    //hack to compare as http server store header with first letter in caps
+    //Header's first letter seems to be  automatically capitaliazed by our test http-server, so compare accordingly.
     if ( key == opentelemetry::trace::propagation::kTraceParent) {
       key_to_compare = "Traceparent";
     } else if (key == opentelemetry::trace::propagation::kTraceState) {
       key_to_compare == "Tracestate";
     }
    auto it = headers_.find(key_to_compare);
-
    if (it != headers_.end()){
      return it->second;
    }
-
     return "";
   }
 
@@ -61,7 +58,6 @@ public:
   }
 
   T headers_;
-
 };
 
 void initTracer() {
@@ -78,7 +74,7 @@ void initTracer() {
   // Set the global trace provider
   opentelemetry::trace::Provider::SetTracerProvider(provider);
 
-  //set http propagator
+  //set global propagator
   opentelemetry::context::propagation::GlobalTextMapPropagator::SetGlobalPropagator(
       nostd::shared_ptr<opentelemetry::context::propagation::TextMapPropagator>(new opentelemetry::trace::propagation::HttpTraceContext()));
 }
