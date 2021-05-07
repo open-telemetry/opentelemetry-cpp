@@ -16,34 +16,14 @@ Tracer::Tracer(std::shared_ptr<sdk::trace::TracerContext> context,
     : context_{context}, instrumentation_library_{std::move(instrumentation_library)}
 {}
 
-trace_api::SpanContext GetCurrentSpanContext(const trace_api::SpanContext &explicit_parent)
-{
-  // Use the explicit parent, if it's valid.
-  if (explicit_parent.IsValid())
-  {
-    return explicit_parent;
-  }
-
-  // Use the currently active span, if there's one.
-  auto curr_span_context = context::RuntimeContext::GetValue(trace_api::kSpanKey);
-
-  if (nostd::holds_alternative<nostd::shared_ptr<trace_api::Span>>(curr_span_context))
-  {
-    auto curr_span = nostd::get<nostd::shared_ptr<trace_api::Span>>(curr_span_context);
-    return curr_span->GetContext();
-  }
-
-  // Otherwise return an invalid SpanContext.
-  return trace_api::SpanContext::GetInvalid();
-}
-
 nostd::shared_ptr<trace_api::Span> Tracer::StartSpan(
     nostd::string_view name,
     const opentelemetry::common::KeyValueIterable &attributes,
     const trace_api::SpanContextKeyValueIterable &links,
     const trace_api::StartSpanOptions &options) noexcept
 {
-  trace_api::SpanContext parent = GetCurrentSpanContext(options.parent);
+  trace_api::SpanContext parent =
+      options.parent.IsValid() ? options.parent : GetCurrentSpan()->GetContext();
 
   auto sampling_result = context_->GetSampler().ShouldSample(parent, parent.trace_id(), name,
                                                              options.kind, attributes, links);

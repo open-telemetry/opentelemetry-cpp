@@ -22,6 +22,7 @@
 #  pragma warning(push)
 #  pragma warning(disable : 4459)
 #  pragma warning(disable : 4018)
+#  pragma warning(disable : 5054)
 #endif
 
 #include "opentelemetry/exporters/etw/etw_properties.h"
@@ -52,10 +53,9 @@
 
 #define MICROSOFT_EVENTTAG_NORMAL_PERSISTENCE 0x01000000
 
-OPENTELEMETRY_BEGIN_NAMESPACE
+using namespace OPENTELEMETRY_NAMESPACE::exporter::etw;
 
-using Properties   = exporter::etw::Properties;
-using PropertyType = exporter::etw::PropertyType;
+OPENTELEMETRY_BEGIN_NAMESPACE
 
 class ETWProvider
 {
@@ -137,7 +137,6 @@ public:
 
     switch (format)
     {
-#ifdef HAVE_TLD
       // Register with TraceLoggingDynamic facility - dynamic manifest ETW events.
       case EventFormat::ETW_MANIFEST: {
         tld::ProviderMetadataBuilder<std::vector<BYTE>> providerMetaBuilder(
@@ -164,7 +163,6 @@ public:
         };
       };
       break;
-#endif
 
 #ifdef HAVE_MSGPACK
       // Register for MsgPack payload ETW events.
@@ -217,14 +215,12 @@ public:
         data.refCount--;
         if (data.refCount == 0)
         {
-#ifdef HAVE_TLD
           if (data.providerMetaVector.size())
           {
             // ETW/TraceLoggingDynamic provider
             result = tld::UnregisterProvider(data.providerHandle);
           }
           else
-#endif
           {
             // Other provider types, e.g. ETW/MsgPack
             result = EventUnregister(data.providerHandle);
@@ -412,6 +408,11 @@ public:
     };
     return (unsigned long)(writeResponse);
 #else
+    UNREFERENCED_PARAMETER(providerData);
+    UNREFERENCED_PARAMETER(eventData);
+    UNREFERENCED_PARAMETER(ActivityId);
+    UNREFERENCED_PARAMETER(RelatedActivityId);
+    UNREFERENCED_PARAMETER(Opcode);
     return STATUS_ERROR;
 #endif
   }
@@ -428,7 +429,6 @@ public:
                          LPCGUID RelatedActivityId = nullptr,
                          uint8_t Opcode            = 0 /* Information */)
   {
-#ifdef HAVE_TLD
     // Make sure you stop sending event before register unregistering providerData
     if (providerData.providerHandle == INVALID_HANDLE)
     {
@@ -465,10 +465,7 @@ public:
     for (auto &kv : eventData)
     {
       const char *name = kv.first.data();
-      // Don't include event name field in the payload
-      if (EVENT_NAME == name)
-        continue;
-      auto &value = kv.second;
+      auto &value      = kv.second;
       switch (value.index())
       {
         case PropertyType::kTypeBool: {
@@ -518,7 +515,7 @@ public:
           dbuilder.AddString(temp);
           break;
         }
-#  if HAVE_TYPE_GUID
+#if HAVE_TYPE_GUID
           // TODO: consider adding UUID/GUID to spec
         case PropertyType::kGUID: {
           builder.AddField(name.c_str(), TypeGuid);
@@ -526,7 +523,7 @@ public:
           dbuilder.AddBytes(&temp, sizeof(GUID));
           break;
         }
-#  endif
+#endif
 
         // TODO: arrays are not supported
         case PropertyType::kTypeSpanByte:
@@ -577,9 +574,6 @@ public:
     };
 
     return (unsigned long)(writeResponse);
-#else
-    return STATUS_ERROR;
-#endif
   }
 
   unsigned long write(Handle &providerData,
