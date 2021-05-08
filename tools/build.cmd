@@ -26,8 +26,8 @@ if ("%CMAKE_ARCH%"=="") (
 )
 
 REM Use preinstalled vcpkg if installed or use our local
-if "%VCPKG_INSTALLATION_ROOT%" neq "" (
-  set "VCPKG_CMAKE=%VCPKG_INSTALLATION_ROOT%\scripts\buildsystems\vcpkg.cmake"
+if "%VCPKG_ROOT%" neq "" (
+  set "VCPKG_CMAKE=%VCPKG_ROOT%\scripts\buildsystems\vcpkg.cmake"
 ) else (
   set "VCPKG_CMAKE=%CD%\vcpkg\scripts\buildsystems\vcpkg.cmake"
 )
