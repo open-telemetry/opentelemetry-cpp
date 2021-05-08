@@ -1,5 +1,6 @@
 @echo off
 set "PATH=%ProgramFiles%\CMake\bin;%~dp0;%~dp0vcpkg;%PATH%"
+if "%VCPKG_ROOT%" NEQ "" set "PATH=%VCPKG_ROOT%;%PATH%"
 pushd %~dp0
 
 net session >nul 2>&1
