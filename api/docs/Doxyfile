@@ -839,8 +839,10 @@ RECURSIVE              = YES
 
 EXCLUDE                = ../include/opentelemetry/common/spin_lock_mutex.h \
                          ../include/opentelemetry/common/key_value_iterable_view.h \
+                         ../include/opentelemetry/common/kv_properties.h \
+                         ../include/opentelemetry/common/string_util.h \
                          ../include/opentelemetry/trace/span_context_kv_iterable_view.h \
-                         ../include/opentelemetry/nostd/detail
+                         ../include/opentelemetry/nostd
 
 # The EXCLUDE_SYMLINKS tag can be used to select whether or not files or
 # directories that are symbolic links (a Unix file system feature) are excluded
