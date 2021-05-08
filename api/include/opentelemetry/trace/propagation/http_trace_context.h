@@ -45,7 +45,7 @@ public:
   void Inject(opentelemetry::context::propagation::TextMapCarrier &carrier,
               const context::Context &context) noexcept override
   {
-    SpanContext span_context = detail::GetCurrentSpan(context);
+    SpanContext span_context = GetSpan(context)->GetContext();
     if (!span_context.IsValid())
     {
       return;
@@ -58,7 +58,7 @@ public:
   {
     SpanContext span_context = ExtractImpl(carrier);
     nostd::shared_ptr<Span> sp{new DefaultSpan(span_context)};
-    return context.SetValue(kSpanKey, sp);
+    return SetSpan(context, sp);
   }
 
   static TraceId TraceIdFromHex(nostd::string_view trace_id)
