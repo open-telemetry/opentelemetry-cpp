@@ -3,6 +3,7 @@
 #include "../tracer_common.h"
 #include "grpc_map_carrier.h"
 #include "opentelemetry/trace/provider.h"
+#include "foo_split.h"
 
 namespace
 {

@@ -28,7 +28,7 @@ using grpc_example::Greeter;
 using grpc_example::GreetRequest;
 using grpc_example::GreetResponse;
 
-class GreeterInterceptor : public grpc::experimental::Intercepto
+class GreeterInterceptor : public grpc::experimental::Interceptor
 {
 public:
   GreeterInterceptor(grpc::experimental::ServerRpcInfo *info)

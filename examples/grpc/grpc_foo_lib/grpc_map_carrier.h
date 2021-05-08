@@ -3,7 +3,7 @@
 #include "opentelemetry/context/propagation/text_map_propagator.h"
 #include "opentelemetry/nostd/string_view.h"
 
-class gRPCMapCarrier : public opentelemetry::context::propagation::TextMapCarrie
+class gRPCMapCarrier : public opentelemetry::context::propagation::TextMapCarrier
 {
 private:
   std::map<std::string, std::string> headers_;
