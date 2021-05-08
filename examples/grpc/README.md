@@ -2,14 +2,14 @@
 
 ## gRPC
 
-This is a simple example that demonstrates tracing a gRPC request from client to server. The example shows several aspects of tracing such as:
+This is a simple example that demonstrates tracing a gRPC request from client to server. There is an experimental directory in this example - the code within has been commented out to prevent any conflicts. The example shows several aspects of tracing such as:
 
 * Using the `TracerProvider`
-* Implementing the TextMapCarrie
+* Implementing the TextMapCarrier
 * Context injection/extraction
 * Span Attributes
 * Span Semantic Conventions
-* Using the ostream exporte
+* Using the ostream exporter
 * Nested spans
 * W3c Trace Context Propagation (Very soon!)
 

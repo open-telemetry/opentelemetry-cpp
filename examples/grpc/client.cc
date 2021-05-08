@@ -41,29 +41,25 @@ public:
     // because it is required per OpenTelemetry's rpc semantic conventions,
     // and because it could still be useful to a debugger in the future.
     std::string span_name = "GreeterClient/Greet";
-    auto span             = get_tracer("grpc-client")
-                    ->StartSpan(span_name,
-                                {{"rpc.system", "grpc"},
-                                 {"rpc.service", "grpc-example.GreetService"},
-                                 {"rpc.method", "Greet"},
-                                 {"net.peer.ip", ip},
-                                 {"net.peer.port", port},
-                                 {"rpc.grpc.status_code", 0}},
-                                options);
-    auto scope = get_tracer("grpc-client")->WithActiveSpan(span);
+    auto span             = get_tracer("grpc")->StartSpan(span_name,
+                                              {{"rpc.system", "grpc"},
+                                               {"rpc.service", "grpc-example.GreetService"},
+                                               {"rpc.method", "Greet"},
+                                               {"net.peer.ip", ip},
+                                               {"net.peer.port", port}},
+                                              options);
+    auto scope            = get_tracer("grpc")->WithActiveSpan(span);
 
     gRPCMapCarrier carrier;
     carrier.gRPCMapCarrier::Set("http.header.stub", "temporarily-stubbed");
-
-    opentelemetry::context::Context ctx1 = opentelemetry::context::Context{"current-span", span};
-    opentelemetry::context::Context ctx2 = propagator->Extract(carrier, ctx1);
-    gRPCMapCarrier carrier2;
-    propagator->Inject(carrier2, ctx2);
+    opentelemetry::context::Context ctx = opentelemetry::context::Context{"current-span", span};
+    propagator->Inject(carrier, ctx);
 
     Status status = stub_->Greet(&context, request, &response);
     if (status.ok())
     {
       span->SetStatus(opentelemetry::trace::StatusCode::kOk);
+      span->SetAttribute("rpc.grpc.status_code", status.error_code());
       // Make sure to end your spans!
       span->End();
       return response.response();
@@ -72,6 +68,7 @@ public:
     {
       std::cout << status.error_code() << ": " << status.error_message() << std::endl;
       span->SetStatus(opentelemetry::trace::StatusCode::kError);
+      span->SetAttribute("rpc.grpc.status_code", status.error_code());
       // Make sure to end your spans!
       span->End();
       return "RPC failed";

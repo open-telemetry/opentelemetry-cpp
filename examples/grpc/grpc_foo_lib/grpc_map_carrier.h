@@ -1,4 +1,5 @@
 #pragma once
+#include <map>
 #include "opentelemetry/context/context.h"
 #include "opentelemetry/context/propagation/text_map_propagator.h"
 #include "opentelemetry/nostd/string_view.h"

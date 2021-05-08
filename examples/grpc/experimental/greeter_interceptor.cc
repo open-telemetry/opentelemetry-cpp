@@ -1,4 +1,4 @@
-#include "messages.grpc.pb.h"
+/*#include "messages.grpc.pb.h"
 #include "tracer_common.h"
 
 #include <grpcpp/grpcpp.h>
@@ -197,3 +197,4 @@ int main(int argc, char **argv)
   RunServer(port);
   return 0;
 }
+*/
