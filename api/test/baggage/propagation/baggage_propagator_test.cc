@@ -52,7 +52,7 @@ TEST(BaggagePropagatorTest, ExtractAndInjectBaggage)
       {"key1=val1,key2=val2,a,val3", "key1=val1,key2=val2"},  // valid header with invalid value
       {"key1=,key2=val2", "key1=,key2=val2"},                 // valid header with empty value
       {"invalid_header", ""},                                 // invalid header
-      {max_baggage_kv, ""}};
+      {max_baggage_kv, ""}};                                  // max key-value pair length
 
   for (auto baggage : baggages)
   {
@@ -63,7 +63,6 @@ TEST(BaggagePropagatorTest, ExtractAndInjectBaggage)
 
     BaggageCarrierTest carrier2;
     format.Inject(carrier2, ctx2);
-    // auto ctx2_baggage = baggage::propagation::GetBaggage(ctx2);
     EXPECT_EQ(carrier2.headers_[kBaggageHeader.data()], baggage.second);
   }
 }
