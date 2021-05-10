@@ -141,7 +141,7 @@ TEST(OStreamSpanExporter, PrintSpanWithAttribute)
 
   auto recordable = processor->MakeRecordable();
 
-  recordable->SetAttribute("attr1", "string");
+  recordable->SetAttribute("attr1", std::string("string"));
 
   processor->OnEnd(std::move(recordable));
 
@@ -218,8 +218,8 @@ TEST(OStreamSpanExporter, PrintSpanWithEvents)
   std::string next_str = std::to_string(next.time_since_epoch().count());
 
   recordable->AddEvent("hello", now);
-  recordable->AddEvent("world", next,
-                       common::KeyValueIterableView<Attributes>({{"attr1", "string"}}));
+  recordable->AddEvent(
+      "world", next, common::KeyValueIterableView<Attributes>({{"attr1", std::string("string")}}));
 
   processor->OnEnd(std::move(recordable));
 
@@ -292,7 +292,7 @@ TEST(OStreamSpanExporter, PrintSpanWithLinks)
 
   recordable->AddLink(span_context);
   recordable->AddLink(span_context2,
-                      common::KeyValueIterableView<Attributes>({{"attr1", "string"}}));
+                      common::KeyValueIterableView<Attributes>({{"attr1", std::string("string")}}));
 
   processor->OnEnd(std::move(recordable));
 

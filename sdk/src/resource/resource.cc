@@ -50,9 +50,10 @@ Resource &Resource::GetEmpty()
 
 Resource &Resource::GetDefault()
 {
-  static Resource default_resource({{kTelemetrySdkLanguage, "cpp"},
-                                    {kTelemetrySdkName, "opentelemetry"},
-                                    {kTelemetrySdkVersion, OPENTELEMETRY_SDK_VERSION}});
+  static Resource default_resource(
+      {{kTelemetrySdkLanguage, std::string("cpp")},
+       {kTelemetrySdkName, std::string("opentelemetry")},
+       {kTelemetrySdkVersion, std::string(OPENTELEMETRY_SDK_VERSION)}});
   return default_resource;
 }
 

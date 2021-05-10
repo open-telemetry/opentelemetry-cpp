@@ -27,16 +27,16 @@ TEST(ResourceTest, create_without_servicename)
 {
 
   opentelemetry::sdk::resource::ResourceAttributes expected_attributes = {
-      {"service", "backend"},
+      {"service", std::string("backend")},
       {"version", (uint32_t)1},
       {"cost", 234.23},
-      {"telemetry.sdk.language", "cpp"},
-      {"telemetry.sdk.name", "opentelemetry"},
-      {"telemetry.sdk.version", OPENTELEMETRY_SDK_VERSION},
-      {"service.name", "unknown_service"}};
+      {"telemetry.sdk.language", std::string("cpp")},
+      {"telemetry.sdk.name", std::string("opentelemetry")},
+      {"telemetry.sdk.version", std::string(OPENTELEMETRY_SDK_VERSION)},
+      {"service.name", std::string("unknown_service")}};
 
   opentelemetry::sdk::resource::ResourceAttributes attributes = {
-      {"service", "backend"}, {"version", (uint32_t)1}, {"cost", 234.23}};
+      {"service", std::string("backend")}, {"version", (uint32_t)1}, {"cost", 234.23}};
   auto resource            = opentelemetry::sdk::resource::Resource::Create(attributes);
   auto received_attributes = resource.GetAttributes();
   for (auto &e : received_attributes)
@@ -61,13 +61,13 @@ TEST(ResourceTest, create_with_servicename)
   opentelemetry::sdk::resource::ResourceAttributes expected_attributes = {
       {"version", (uint32_t)1},
       {"cost", 234.23},
-      {"telemetry.sdk.language", "cpp"},
-      {"telemetry.sdk.name", "opentelemetry"},
-      {"telemetry.sdk.version", OPENTELEMETRY_SDK_VERSION},
-      {"service.name", "backend"},
+      {"telemetry.sdk.language", std::string("cpp")},
+      {"telemetry.sdk.name", std::string("opentelemetry")},
+      {"telemetry.sdk.version", std::string(OPENTELEMETRY_SDK_VERSION)},
+      {"service.name", std::string("backend")},
   };
   opentelemetry::sdk::resource::ResourceAttributes attributes = {
-      {"service.name", "backend"}, {"version", (uint32_t)1}, {"cost", 234.23}};
+      {"service.name", std::string("backend")}, {"version", (uint32_t)1}, {"cost", 234.23}};
   auto resource            = opentelemetry::sdk::resource::Resource::Create(attributes);
   auto received_attributes = resource.GetAttributes();
   for (auto &e : received_attributes)
@@ -92,10 +92,10 @@ TEST(ResourceTest, create_with_servicename)
 TEST(ResourceTest, create_with_emptyatrributes)
 {
   opentelemetry::sdk::resource::ResourceAttributes expected_attributes = {
-      {"telemetry.sdk.language", "cpp"},
-      {"telemetry.sdk.name", "opentelemetry"},
-      {"telemetry.sdk.version", OPENTELEMETRY_SDK_VERSION},
-      {"service.name", "unknown_service"},
+      {"telemetry.sdk.language", std::string("cpp")},
+      {"telemetry.sdk.name", std::string("opentelemetry")},
+      {"telemetry.sdk.version", std::string(OPENTELEMETRY_SDK_VERSION)},
+      {"service.name", std::string("unknown_service")},
   };
   opentelemetry::sdk::resource::ResourceAttributes attributes = {};
   auto resource            = opentelemetry::sdk::resource::Resource::Create(attributes);
@@ -112,11 +112,11 @@ TEST(ResourceTest, create_with_emptyatrributes)
 TEST(ResourceTest, Merge)
 {
   TestResource resource1(
-      opentelemetry::sdk::resource::ResourceAttributes({{"service", "backend"}}));
+      opentelemetry::sdk::resource::ResourceAttributes({{"service", std::string("backend")}}));
   TestResource resource2(
-      opentelemetry::sdk::resource::ResourceAttributes({{"host", "service-host"}}));
-  std::map<std::string, std::string> expected_attributes = {{"service", "backend"},
-                                                            {"host", "service-host"}};
+      opentelemetry::sdk::resource::ResourceAttributes({{"host", std::string("service-host")}}));
+  std::map<std::string, std::string> expected_attributes = {{"service", std::string("backend")},
+                                                            {"host", std::string("service-host")}};
 
   auto merged_resource     = resource1.Merge(resource2);
   auto received_attributes = merged_resource.GetAttributes();
@@ -134,10 +134,12 @@ TEST(ResourceTest, Merge)
 
 TEST(ResourceTest, MergeEmptyString)
 {
-  TestResource resource1({{"service", "backend"}, {"host", "service-host"}});
-  TestResource resource2({{"service", ""}, {"host", "another-service-host"}});
-  std::map<std::string, std::string> expected_attributes = {{"service", ""},
-                                                            {"host", "another-service-host"}};
+  TestResource resource1(
+      {{"service", std::string("backend")}, {"host", std::string("service-host")}});
+  TestResource resource2(
+      {{"service", std::string("")}, {"host", std::string("another-service-host")}});
+  std::map<std::string, std::string> expected_attributes = {
+      {"service", std::string("")}, {"host", std::string("another-service-host")}};
 
   auto merged_resource     = resource1.Merge(resource2);
   auto received_attributes = merged_resource.GetAttributes();

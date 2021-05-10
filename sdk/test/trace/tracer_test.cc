@@ -203,7 +203,7 @@ TEST(Tracer, StartSpanWithAttributes)
 
   // Start a span with all supported scalar attribute types.
   tracer
-      ->StartSpan("span 1", {{"attr1", "string"},
+      ->StartSpan("span 1", {{"attr1", std::string("string")},
                              {"attr2", false},
                              {"attr1", 314159},
                              {"attr3", (unsigned int)314159},
@@ -212,7 +212,7 @@ TEST(Tracer, StartSpanWithAttributes)
                              {"attr6", (int64_t)-20},
                              {"attr7", (uint64_t)20},
                              {"attr8", 3.1},
-                             {"attr9", "string"}})
+                             {"attr9", std::string("string")}})
       ->End();
 
   // Start a span with all supported array attribute types.

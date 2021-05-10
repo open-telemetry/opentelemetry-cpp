@@ -150,7 +150,7 @@ TEST(OStreamLogExporter, LogWithStringAttributesToCerr)
   auto record = exporter->MakeRecordable();
 
   // Set resources for this log record only of type <string, string>
-  record->SetResource("key1", "val1");
+  record->SetResource("key1", std::string("val1"));
 
   // Set attributes to this log record of type <string, AttributeValue>
   record->SetAttribute("a", true);
