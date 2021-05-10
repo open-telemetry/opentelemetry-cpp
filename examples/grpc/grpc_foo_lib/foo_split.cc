@@ -4,10 +4,10 @@ namespace
 {
 std::vector<std::string> mysplit(std::string s, char delim)
 {
+  initTracer();
   auto propagator = get_propagator();
 
-  gRPCMapCarrier carrier;
-  carrier.gRPCMapCarrier::Set("http.header.stub", "temporarily-stubbed");
+  gRPCMapCarrier<opentelemetry::ext::http::client::Headers> carrier;
   auto span  = get_tracer("grpc")->StartSpan("splitfunc");
   auto scope = get_tracer("grpc")->WithActiveSpan(span);
 
@@ -30,10 +30,10 @@ std::vector<std::string> mysplit(std::string s, char delim)
 
 std::vector<std::string> split(std::string s, char delim)
 {
+  initTracer();
   auto propagator = get_propagator();
 
-  gRPCMapCarrier carrier;
-  carrier.gRPCMapCarrier::Set("http.header.stub", "temporarily-stubbed");
+  gRPCMapCarrier<opentelemetry::ext::http::client::Headers> carrier;
 
   auto span  = get_tracer("grpc")->StartSpan("splitlib");
   auto scope = get_tracer("grpc")->WithActiveSpan(span);

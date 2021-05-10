@@ -30,8 +30,6 @@ public:
     GreetResponse response;
     ClientContext context;
     request.set_request("Nice to meet you!");
-    // See tracer_common.h for this function
-    auto propagator = get_propagator();
 
     opentelemetry::trace::StartSpanOptions options;
     options.kind = opentelemetry::trace::SpanKind::kClient;
@@ -49,14 +47,16 @@ public:
                                                {"net.peer.port", port}},
                                               options);
     auto scope            = get_tracer("grpc")->WithActiveSpan(span);
-    // Text map-style carrier for the propagator. Include other relevant information here.
-    gRPCMapCarrier carrier;
-    carrier.gRPCMapCarrier::Set("http.header.stub", "temporarily-stubbed");
-    // The current runtime context has information about the currently active span.
-    // We need to add that to our carrier so that the server can extract it later,
-    // enabling the span hierarchy.
+    opentelemetry::nostd::span<const uint8_t, 8> sp = span->GetContext().span_id().Id(); 
+    for(const uint8_t &e : sp) {
+      std::cout << unsigned(e) << ' ';
+    }
+    std::cout << '\n';
     auto current_ctx = opentelemetry::context::RuntimeContext::GetCurrent();
-    propagator->Inject(carrier, current_ctx);
+    const gRPCMapCarrier<opentelemetry::ext::http::client::Headers> carrier;
+    auto prop = opentelemetry::context::propagation::GlobalTextMapPropagator::GetGlobalPropagator();
+    prop->Inject(carrier, current_ctx);
+
     // Send request to server
     Status status = stub_->Greet(&context, request, &response);
     if (status.ok())

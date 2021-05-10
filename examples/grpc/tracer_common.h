@@ -13,8 +13,8 @@
 #include <cstring>
 #include <iostream>
 #include <vector>
-#include "opentelemetry/ext/http/client/http_client.h"
 #include "opentelemetry/nostd/shared_ptr.h"
+#include "opentelemetry/ext/http/client/http_client.h"
 
 namespace
 {
@@ -24,10 +24,12 @@ inline nostd::shared_ptr<opentelemetry::trace::Span> GetSpanFromContext(
   opentelemetry::context::ContextValue span = context.GetValue(opentelemetry::trace::kSpanKey);
   if (nostd::holds_alternative<nostd::shared_ptr<opentelemetry::trace::Span>>(span))
   {
+    std::cout << "GETSPAN FROM CONTEXT YES\n";
     return nostd::get<nostd::shared_ptr<opentelemetry::trace::Span>>(span);
   }
   static nostd::shared_ptr<opentelemetry::trace::Span> invalid_span{
       new opentelemetry::trace::DefaultSpan(opentelemetry::trace::SpanContext::GetInvalid())};
+  std::cout << "GETSPANFROMCONTEXT no\n";
   return invalid_span;
 }
 
@@ -62,9 +64,6 @@ nostd::shared_ptr<opentelemetry::trace::Tracer> get_tracer(std::string tracer_na
 // boilerplate from gRPC example services/library
 nostd::shared_ptr<opentelemetry::context::propagation::TextMapPropagator> get_propagator()
 {
-  opentelemetry::context::propagation::GlobalTextMapPropagator::SetGlobalPropagator(
-      opentelemetry::nostd::shared_ptr<opentelemetry::context::propagation::TextMapPropagator>(
-          new opentelemetry::trace::propagation::HttpTraceContext()));
   auto propagator =
       opentelemetry::context::propagation::GlobalTextMapPropagator::GetGlobalPropagator();
   return propagator;

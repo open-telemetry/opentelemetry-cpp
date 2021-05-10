@@ -2,6 +2,7 @@
 #include "grpc_foo_lib/grpc_map_carrier.h"
 #include "messages.grpc.pb.h"
 #include "tracer_common.h"
+#include "opentelemetry/trace/span_context_kv_iterable_view.h"
 
 #include <grpcpp/grpcpp.h>
 #include <grpcpp/server.h>
@@ -13,6 +14,7 @@
 #include <sstream>
 #include <string>
 #include <thread>
+#include <map>
 
 using grpc::Server;
 using grpc::ServerBuilder;
@@ -24,6 +26,9 @@ using grpc_example::Greeter;
 using grpc_example::GreetRequest;
 using grpc_example::GreetResponse;
 
+using Span = opentelemetry::trace::Span;
+using SpanContext = opentelemetry::trace::SpanContext;
+
 namespace
 {
 class GreeterServer final : public Greeter::Service
@@ -33,8 +38,6 @@ public:
                const GreetRequest *request,
                GreetResponse *response) override
   {
-    // Get global propagator to move spans across rpc boundaries
-    auto propagator = get_propagator();
     // Create a SpanOptions object and set the kind to Server to inform OpenTel.
     opentelemetry::trace::StartSpanOptions options;
     options.kind = opentelemetry::trace::SpanKind::kServer;
@@ -45,30 +48,34 @@ public:
     // to get any carrier-relevant information at this point without doing work that
     // we want to capture in a span, but we include the definition at this point to fit
     // real-life scenarios
-    gRPCMapCarrier carrier;
-    // The current RuntimeContext should contain the currently active span, which is from
-    // the client side. To implement the span hierarchy, we need to fetch that span from
-    // the RuntimeContext so that we can set it as the parent of our new span
+    std::map<std::string, std::string> m;
+    m.insert(std::pair<std::string, std::string>("1", "2"));
+    const gRPCMapCarrier<std::map<std::string, std::string>> carrier((std::map<std::string, std::string> &) m);
+    auto prop = opentelemetry::context::propagation::GlobalTextMapPropagator::GetGlobalPropagator();
     auto current_ctx = opentelemetry::context::RuntimeContext::GetCurrent();
-    // We want a new context that will have the information that we 'could' have placed
-    // in the carrier already, as well as the RuntimeContext which has our parent-span
-    // information. Contexts are immutable, so we need to make a new one
-    auto new_ctx = propagator->Extract(carrier, current_ctx);
-    options.parent = GetSpanFromContext(new_ctx)->GetContext();
+    auto new_context = prop->Extract(carrier, current_ctx);
+    auto s = GetSpanFromContext(new_context);
+    opentelemetry::nostd::span<const uint8_t, 8> sp = s->GetContext().span_id().Id(); 
+    for(const uint8_t &e : sp) {
+      std::cout << unsigned(e) << ' ';
+    }
+    std::cout << '\n';
+    options.parent   = s->GetContext();
+
     // Build a new span from a tracer, start, and activate it. When adding
     // attributes to spans, be sure to follow the OpenTelemetry Semantic
     // Conventions that are relevant to your project as closely as possible
     // Some protocols/patterns that have specified conventions:
     // RPC, HTTP, AWS Lambda, Database, Exceptions, etc.
     std::string span_name = "GreeterService/Greet";
-    auto span             = get_tracer("grpc-server")
+    auto span             = get_tracer("grpc")
                     ->StartSpan(span_name,
                                 {{"rpc.system", "grpc"},
                                  {"rpc.service", "GreeterService"},
                                  {"rpc.method", "Greet"},
                                  {"rpc.grpc.status_code", 0}},
                                 options);
-    auto scope = get_tracer("grpc-server")->WithActiveSpan(span);
+    auto scope = get_tracer("grpc")->WithActiveSpan(span);
 
     // Fetch and parse whatever HTTP headers we can from the gRPC request.
     span->AddEvent("Processing client attributes");
@@ -77,9 +84,9 @@ public:
 
     // Fill the carrier with other headers. gRPC runs on HTTP 2, so we add all 
     // of the HTTP headers that we just extracted
-    carrier.gRPCMapCarrier::Set("net.ip.version", peer_name_attributes.at(0));
-    carrier.gRPCMapCarrier::Set("net.peer.ip", peer_name_attributes.at(1));
-    carrier.gRPCMapCarrier::Set("net.peer.port", peer_name_attributes.at(2));
+    /*carrier.Set("net.ip.version", peer_name_attributes.at(0));
+    carrier.Set("net.peer.ip", peer_name_attributes.at(1));
+    carrier.Set("net.peer.port", peer_name_attributes.at(2));*/
 
     std::string req = request->request();
     std::cout << std::endl << "grpc_client says: " << req << std::endl;
