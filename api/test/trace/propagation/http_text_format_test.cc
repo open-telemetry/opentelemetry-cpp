@@ -1,5 +1,5 @@
+#include "opentelemetry/context/propagation/global_propagator.h"
 #include "opentelemetry/context/runtime_context.h"
-#include "opentelemetry/trace/propagation/global_propagator.h"
 #include "opentelemetry/trace/propagation/http_trace_context.h"
 #include "opentelemetry/trace/scope.h"
 #include "util.h"
@@ -11,7 +11,7 @@
 
 using namespace opentelemetry;
 
-class TextMapCarrierTest : public trace::propagation::TextMapCarrier
+class TextMapCarrierTest : public context::propagation::TextMapCarrier
 {
 public:
   virtual nostd::string_view Get(nostd::string_view key) const noexcept override
@@ -147,7 +147,7 @@ TEST(TextMapPropagatorTest, InvalidIdentitiesAreNotExtracted)
     context::Context ctx1 = context::Context{};
     context::Context ctx2 = format.Extract(carrier, ctx1);
 
-    auto span = trace::propagation::detail::GetCurrentSpan(ctx2);
+    auto span = trace::propagation::GetSpan(ctx2)->GetContext();
     EXPECT_FALSE(span.IsValid());
   }
 }
@@ -155,7 +155,7 @@ TEST(TextMapPropagatorTest, InvalidIdentitiesAreNotExtracted)
 TEST(GlobalTextMapPropagator, NoOpPropagator)
 {
 
-  auto propagator = trace::propagation::GlobalTextMapPropagator::GetGlobalPropagator();
+  auto propagator = context::propagation::GlobalTextMapPropagator::GetGlobalPropagator();
   TextMapCarrierTest carrier;
 
   carrier.headers_ = {{"traceparent", "00-4bf92f3577b34da6a3ce929d0e0e4736-0102030405060708-01"},
@@ -176,10 +176,10 @@ TEST(GlobalPropagator, SetAndGet)
 {
 
   auto trace_state_value = "congo=t61rcWkgMzE";
-  trace::propagation::GlobalTextMapPropagator::SetGlobalPropagator(
-      nostd::shared_ptr<trace::propagation::TextMapPropagator>(new MapHttpTraceContext()));
+  context::propagation::GlobalTextMapPropagator::SetGlobalPropagator(
+      nostd::shared_ptr<context::propagation::TextMapPropagator>(new MapHttpTraceContext()));
 
-  auto propagator = trace::propagation::GlobalTextMapPropagator::GetGlobalPropagator();
+  auto propagator = context::propagation::GlobalTextMapPropagator::GetGlobalPropagator();
 
   TextMapCarrierTest carrier;
   carrier.headers_ = {{"traceparent", "00-4bf92f3577b34da6a3ce929d0e0e4736-0102030405060708-01"},

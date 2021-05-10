@@ -16,9 +16,9 @@
 #include "detail/context.h"
 #include "detail/hex.h"
 #include "detail/string.h"
+#include "opentelemetry/context/propagation/text_map_propagator.h"
 #include "opentelemetry/nostd/string_view.h"
 #include "opentelemetry/trace/default_span.h"
-#include "opentelemetry/trace/propagation/text_map_propagator.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace trace
@@ -39,12 +39,13 @@ static const size_t kTraceParentSize         = 55;
 //    HttpTraceContext().inject(setter, carrier, context);
 //    HttpTraceContext().extract(getter, carrier, context);
 
-class HttpTraceContext : public TextMapPropagator
+class HttpTraceContext : public opentelemetry::context::propagation::TextMapPropagator
 {
 public:
-  void Inject(TextMapCarrier &carrier, const context::Context &context) noexcept override
+  void Inject(opentelemetry::context::propagation::TextMapCarrier &carrier,
+              const context::Context &context) noexcept override
   {
-    SpanContext span_context = detail::GetCurrentSpan(context);
+    SpanContext span_context = GetSpan(context)->GetContext();
     if (!span_context.IsValid())
     {
       return;
@@ -52,12 +53,12 @@ public:
     InjectImpl(carrier, span_context);
   }
 
-  context::Context Extract(const TextMapCarrier &carrier,
+  context::Context Extract(const opentelemetry::context::propagation::TextMapCarrier &carrier,
                            context::Context &context) noexcept override
   {
     SpanContext span_context = ExtractImpl(carrier);
     nostd::shared_ptr<Span> sp{new DefaultSpan(span_context)};
-    return context.SetValue(kSpanKey, sp);
+    return SetSpan(context, sp);
   }
 
   static TraceId TraceIdFromHex(nostd::string_view trace_id)
@@ -91,7 +92,8 @@ private:
     return version != kInvalidVersion;
   }
 
-  static void InjectImpl(TextMapCarrier &carrier, const SpanContext &span_context)
+  static void InjectImpl(opentelemetry::context::propagation::TextMapCarrier &carrier,
+                         const SpanContext &span_context)
   {
     char trace_parent[kTraceParentSize];
     trace_parent[0] = '0';
@@ -158,7 +160,7 @@ private:
                        opentelemetry::trace::TraceState::FromHeader(trace_state));
   }
 
-  static SpanContext ExtractImpl(const TextMapCarrier &carrier)
+  static SpanContext ExtractImpl(const opentelemetry::context::propagation::TextMapCarrier &carrier)
   {
     nostd::string_view trace_parent = carrier.Get(kTraceParent);
     nostd::string_view trace_state  = carrier.Get(kTraceState);

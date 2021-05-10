@@ -37,6 +37,12 @@ if(BUILD_TESTING)
   if(MSVC)
     add_definitions(-DGTEST_LINKED_AS_SHARED_LIBRARY=1)
   endif()
+  if(GMOCK_LIB)
+    # unset GMOCK_LIB to force find_library to redo the lookup, as the cached
+    # entry could cause linking to incorrect flavor of gmock and leading to
+    # runtime error.
+    unset(GMOCK_LIB CACHE)
+  endif()
   if(MSVC AND CMAKE_BUILD_TYPE STREQUAL "Debug")
     find_library(GMOCK_LIB gmockd PATH_SUFFIXES lib)
   else()
