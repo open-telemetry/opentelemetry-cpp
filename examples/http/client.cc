@@ -1,6 +1,6 @@
 #include "opentelemetry/ext/http/client/http_client_factory.h"
 #include "opentelemetry/ext/http/common/url_parser.h"
-#include "tracer_common.hpp"
+#include "tracer_common.h"
 
 namespace
 {
@@ -23,7 +23,14 @@ void sendRequest(const std::string &url)
                               options);
   auto scope = get_tracer("http-client")->WithActiveSpan(span);
 
-  opentelemetry::ext::http::client::Result result = http_client->Get(url);
+  // inject current context into http header
+  auto current_ctx = opentelemetry::context::RuntimeContext::GetCurrent();
+  HttpTextMapCarrier<opentelemetry::ext::http::client::Headers> carrier;
+  auto prop = opentelemetry::context::propagation::GlobalTextMapPropagator::GetGlobalPropagator();
+  prop->Inject(carrier, current_ctx);
+
+  // send http request
+  opentelemetry::ext::http::client::Result result = http_client->Get(url, carrier.headers_);
   if (result)
   {
     // set span attributes

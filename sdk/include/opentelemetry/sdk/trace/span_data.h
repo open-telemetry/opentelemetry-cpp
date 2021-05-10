@@ -145,6 +145,13 @@ public:
   opentelemetry::nostd::string_view GetDescription() const noexcept { return status_desc_; }
 
   /**
+   * Get the attributes associated with the resource
+   * @returns the attributes associated with the resource configured for TracerProvider
+   */
+
+  const opentelemetry::sdk::resource::Resource &GetResource() const noexcept { return *resource_; }
+
+  /**
    * Get the start time for this span
    * @return the start time for this span
    */
@@ -225,6 +232,11 @@ public:
     span_kind_ = span_kind;
   }
 
+  void SetResource(const opentelemetry::sdk::resource::Resource &resource) noexcept override
+  {
+    resource_ = &resource;
+  }
+
   void SetStartTime(opentelemetry::common::SystemTimestamp start_time) noexcept override
   {
     start_time_ = start_time;
@@ -250,6 +262,7 @@ private:
   std::vector<SpanDataEvent> events_;
   std::vector<SpanDataLink> links_;
   opentelemetry::trace::SpanKind span_kind_{opentelemetry::trace::SpanKind::kInternal};
+  const opentelemetry::sdk::resource::Resource *resource_;
   const InstrumentationLibrary *instrumentation_library_;
 };
 }  // namespace trace

@@ -226,7 +226,7 @@ static inline GUID GetProviderGuid(const char *providerName)
 }
 #endif
 
-int64_t getUtcSystemTimeMs()
+static inline int64_t getUtcSystemTimeMs()
 {
 #ifdef _WIN32
   ULARGE_INTEGER now;
@@ -237,7 +237,7 @@ int64_t getUtcSystemTimeMs()
 #endif
 }
 
-int64_t getUtcSystemTimeinTicks()
+static inline int64_t getUtcSystemTimeinTicks()
 {
 #ifdef _WIN32
   FILETIME tocks;
@@ -259,9 +259,16 @@ int64_t getUtcSystemTimeinTicks()
 #endif
 }
 
-std::string formatUtcTimestampMsAsISO8601(int64_t timestampMs)
+/**
+ * @brief Convert local system milliseconds time to ISO8601 string UTC time
+ *
+ * @param timestampMs   Milliseconds since epoch in system time
+ *
+ * @return ISO8601 UTC string with microseconds part set to 000
+ */
+static inline std::string formatUtcTimestampMsAsISO8601(int64_t timestampMs)
 {
-  char buf[sizeof("YYYY-MM-DDTHH:MM:SS.sssZ") + 1] = {0};
+  char buf[sizeof("YYYY-MM-DDTHH:MM:SS.ssssssZ") + 1] = {0};
 #ifdef _WIN32
   __time64_t seconds = static_cast<__time64_t>(timestampMs / 1000);
   int milliseconds   = static_cast<int>(timestampMs % 1000);
@@ -270,8 +277,8 @@ std::string formatUtcTimestampMsAsISO8601(int64_t timestampMs)
   {
     memset(&tm, 0, sizeof(tm));
   }
-  ::_snprintf_s(buf, _TRUNCATE, "%04d-%02d-%02dT%02d:%02d:%02d.%03dZ", 1900 + tm.tm_year,
-                1 + tm.tm_mon, tm.tm_mday, tm.tm_hour, tm.tm_min, tm.tm_sec, milliseconds);
+  ::_snprintf_s(buf, _TRUNCATE, "%04d-%02d-%02dT%02d:%02d:%02d.%06dZ", 1900 + tm.tm_year,
+                1 + tm.tm_mon, tm.tm_mday, tm.tm_hour, tm.tm_min, tm.tm_sec, 1000 * milliseconds);
 #else
   time_t seconds   = static_cast<time_t>(timestampMs / 1000);
   int milliseconds = static_cast<int>(timestampMs % 1000);
@@ -281,8 +288,8 @@ std::string formatUtcTimestampMsAsISO8601(int64_t timestampMs)
   {
     memset(&tm, 0, sizeof(tm));
   }
-  (void)snprintf(buf, sizeof(buf), "%04d-%02d-%02dT%02d:%02d:%02d.%03dZ", 1900 + tm.tm_year,
-                 1 + tm.tm_mon, tm.tm_mday, tm.tm_hour, tm.tm_min, tm.tm_sec, milliseconds);
+  (void)snprintf(buf, sizeof(buf), "%04d-%02d-%02dT%02d:%02d:%02d.%06dZ", 1900 + tm.tm_year,
+                 1 + tm.tm_mon, tm.tm_mday, tm.tm_hour, tm.tm_min, tm.tm_sec, 1000 * milliseconds);
 #endif
   return buf;
 }

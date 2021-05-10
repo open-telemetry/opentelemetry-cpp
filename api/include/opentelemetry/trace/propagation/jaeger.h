@@ -17,8 +17,8 @@
 #include "detail/context.h"
 #include "detail/hex.h"
 #include "detail/string.h"
+#include "opentelemetry/context/propagation/text_map_propagator.h"
 #include "opentelemetry/trace/default_span.h"
-#include "opentelemetry/trace/propagation/text_map_propagator.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace trace
@@ -28,12 +28,13 @@ namespace propagation
 
 static const nostd::string_view kTraceHeader = "uber-trace-id";
 
-class JaegerPropagator : public TextMapPropagator
+class JaegerPropagator : public context::propagation::TextMapPropagator
 {
 public:
-  void Inject(TextMapCarrier &carrier, const context::Context &context) noexcept override
+  void Inject(context::propagation::TextMapCarrier &carrier,
+              const context::Context &context) noexcept override
   {
-    SpanContext span_context = detail::GetCurrentSpan(context);
+    SpanContext span_context = GetSpan(context)->GetContext();
     if (!span_context.IsValid())
     {
       return;
@@ -58,12 +59,12 @@ public:
     carrier.Set(kTraceHeader, nostd::string_view(trace_identity, sizeof(trace_identity)));
   }
 
-  context::Context Extract(const TextMapCarrier &carrier,
+  context::Context Extract(const context::propagation::TextMapCarrier &carrier,
                            context::Context &context) noexcept override
   {
     SpanContext span_context = ExtractImpl(carrier);
     nostd::shared_ptr<Span> sp{new DefaultSpan(span_context)};
-    return context.SetValue(kSpanKey, sp);
+    return SetSpan(context, sp);
   }
 
 private:
@@ -75,7 +76,7 @@ private:
     return TraceFlags(sampled);
   }
 
-  static SpanContext ExtractImpl(const TextMapCarrier &carrier)
+  static SpanContext ExtractImpl(const context::propagation::TextMapCarrier &carrier)
   {
     nostd::string_view trace_identity = carrier.Get(kTraceHeader);
 
