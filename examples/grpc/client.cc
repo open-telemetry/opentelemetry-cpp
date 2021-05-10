@@ -49,12 +49,15 @@ public:
                                                {"net.peer.port", port}},
                                               options);
     auto scope            = get_tracer("grpc")->WithActiveSpan(span);
-
+    // Text map-style carrier for the propagator. Include other relevant information here.
     gRPCMapCarrier carrier;
     carrier.gRPCMapCarrier::Set("http.header.stub", "temporarily-stubbed");
-    opentelemetry::context::Context ctx = opentelemetry::context::Context{"current-span", span};
-    propagator->Inject(carrier, ctx);
-
+    // The current runtime context has information about the currently active span.
+    // We need to add that to our carrier so that the server can extract it later,
+    // enabling the span hierarchy.
+    auto current_ctx = opentelemetry::context::RuntimeContext::GetCurrent();
+    propagator->Inject(carrier, current_ctx);
+    // Send request to server
     Status status = stub_->Greet(&context, request, &response);
     if (status.ok())
     {

@@ -38,6 +38,23 @@ public:
     // Create a SpanOptions object and set the kind to Server to inform OpenTel.
     opentelemetry::trace::StartSpanOptions options;
     options.kind = opentelemetry::trace::SpanKind::kServer;
+    // Create a text map carrier for our propagator. This carrier holds all of our
+    // information that needs to be propagated. We instantiate our carrier here as
+    // in your systems you will probably have information to fill it with before 
+    // even starting your span, maybe your client's http headers. There is no way
+    // to get any carrier-relevant information at this point without doing work that
+    // we want to capture in a span, but we include the definition at this point to fit
+    // real-life scenarios
+    gRPCMapCarrier carrier;
+    // The current RuntimeContext should contain the currently active span, which is from
+    // the client side. To implement the span hierarchy, we need to fetch that span from
+    // the RuntimeContext so that we can set it as the parent of our new span
+    auto current_ctx = opentelemetry::context::RuntimeContext::GetCurrent();
+    // We want a new context that will have the information that we 'could' have placed
+    // in the carrier already, as well as the RuntimeContext which has our parent-span
+    // information. Contexts are immutable, so we need to make a new one
+    auto new_ctx = propagator->Extract(carrier, current_ctx);
+    options.parent = GetSpanFromContext(new_ctx)->GetContext();
     // Build a new span from a tracer, start, and activate it. When adding
     // attributes to spans, be sure to follow the OpenTelemetry Semantic
     // Conventions that are relevant to your project as closely as possible
@@ -54,31 +71,22 @@ public:
     auto scope = get_tracer("grpc-server")->WithActiveSpan(span);
 
     // Fetch and parse whatever HTTP headers we can from the gRPC request.
+    span->AddEvent("Processing client attributes");
     std::string peer_name                         = context->peer();
     std::vector<std::string> peer_name_attributes = split(peer_name, ':');
 
-    // Create a text map carrier and fill it with other headers. gRPC runs on
-    // HTTP 2, so we add all the HTTP headers that we just extracted
-    gRPCMapCarrier carrier;
+    // Fill the carrier with other headers. gRPC runs on HTTP 2, so we add all 
+    // of the HTTP headers that we just extracted
     carrier.gRPCMapCarrier::Set("net.ip.version", peer_name_attributes.at(0));
     carrier.gRPCMapCarrier::Set("net.peer.ip", peer_name_attributes.at(1));
     carrier.gRPCMapCarrier::Set("net.peer.port", peer_name_attributes.at(2));
 
-    // Build a context and add a k-v pair for the current span, so OpenTelemetry
-    // can know the causal relationship between spans, and can infer the parent
-    // -> child hierarchy of spans
-    opentelemetry::context::Context ctx1 = opentelemetry::context::Context{"current-span", span};
-    // Because contexts are immutable, we build another one and extract the contents
-    // of our carrier with extra header information, and ctx1 which has our current span
-    opentelemetry::context::Context ctx2 = propagator->Extract(carrier, ctx1);
-    // Build another carrier to hold the combination of all of our span data
-    gRPCMapCarrier carrier2;
-    propagator->Inject(carrier2, ctx2);
-
     std::string req = request->request();
     std::cout << std::endl << "grpc_client says: " << req << std::endl;
     std::string message = "The pleasure is mine.";
+    // Send response to client
     response->set_response(message);
+    span->AddEvent("Response sent to client");
 
     span->SetStatus(opentelemetry::trace::StatusCode::kOk);
     // Make sure to end your spans!
