@@ -1,10 +1,10 @@
 #pragma once
 
-#include "opentelemetry/trace/propagation/text_map_propagator.h"
+#include "opentelemetry/context/propagation/text_map_propagator.h"
 #include "opentelemetry/version.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
-namespace trace
+namespace context
 {
 namespace propagation
 {
@@ -26,5 +26,5 @@ public:
   void Inject(TextMapCarrier & /*carrier*/, const context::Context &context) noexcept override {}
 };
 }  // namespace propagation
-}  // namespace trace
+}  // namespace context
 OPENTELEMETRY_END_NAMESPACE
