@@ -15,6 +15,7 @@ Increment the:
 
 ## [Unreleased]
 
+* [EXPORTER] Add Jaeger exporter ([#534](https://github.com/open-telemetry/opentelemetry-cpp/pull/534))
 * [SDK] Add instrumentation library and multiple tracer support ([#693](https://github.com/open-telemetry/opentelemetry-cpp/pull/693))
 
 ## [0.5.0] 2021-04-26
