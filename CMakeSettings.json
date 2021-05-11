@@ -115,6 +115,12 @@
             ]
         },
         {
+            // These environment variables apply to all configurations.
+            "environments": [
+                {
+                    "OPENTELEMETRY_CONTRIB_PATH": "${projectDir}\\..\\opentelemetry-cpp-contrib"
+                }
+            ],
             "name": "stdlib-x64-Release-contrib",
             "generator": "Ninja",
             "configurationType": "Release",
@@ -128,7 +134,52 @@
             "variables": [
                 {
                     "name": "WITH_CONTRIB",
+                    "value": "False",
+                    "type": "BOOL"
+                },
+                {
+                    "name": "WITH_STL",
                     "value": "True",
+                    "type": "BOOL"
+                },
+                {
+                    "name": "WITH_OTLP",
+                    "value": "True",
+                    "type": "BOOL"
+                },
+                {
+                    "name": "WITH_EXAMPLES",
+                    "value": "true",
+                    "type": "BOOL"
+                },
+                {
+                    "name": "WITH_PROMETHEUS",
+                    "value": "True",
+                    "type": "BOOL"
+                }
+            ]
+        },
+        {
+            // These environment variables apply to all configurations.
+            "environments": [
+                {
+                    "OPENTELEMETRY_CONTRIB_PATH": "${projectDir}\\..\\opentelemetry-cpp-contrib"
+                }
+            ],
+            "name": "stdlib-x64-Debug-contrib",
+            "generator": "Ninja",
+            "configurationType": "Debug",
+            "buildRoot": "${projectDir}\\out\\vs2019\\${name}",
+            "installRoot": "${projectDir}\\out\\vs2019\\${name}\\install",
+            "cmakeCommandArgs": "",
+            "buildCommandArgs": "",
+            "ctestCommandArgs": "",
+            "cmakeToolchain": "",
+            "inheritEnvironments": [ "msvc_x64_x64" ],
+            "variables": [
+                {
+                    "name": "WITH_CONTRIB",
+                    "value": "False",
                     "type": "BOOL"
                 },
                 {
