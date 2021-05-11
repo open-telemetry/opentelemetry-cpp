@@ -10,7 +10,7 @@
 
 #include <gtest/gtest.h>
 
-#include <opentelemetry/ext/http/server/socket_server.h>
+#include <opentelemetry/ext/net/common/socket_server.h>
 
 using namespace SOCKET_SERVER_NS;
 using namespace std;
@@ -56,41 +56,72 @@ namespace testing
         return result;
     }
 
-    void StartEchoServer(SocketServer& server)
+    std::string GenerateBigString(size_t maxLength = 60000)
     {
-        server.onRequest = [&](SocketServer::Connection& conn) {
-            // std::cout << "SocketServer::onRequest: " << conn.received_buffer << std::endl;
-            conn.buffer_sent.clear();
-            conn.buffer_received.swap(conn.buffer_sent);
-            // Signal to Reactor that it's time to respond
-            conn.state.insert(SocketServer::Connection::Responding);
-        };
-
-        server.onResponse = [&](SocketServer::Connection& conn) {
-            // std::cout << "SocketServer::onResponse: " << conn.sendBuffer << std::endl;
-        };
-
-        server.Start();
-        // Client must match the server params.
-        Socket client(server.server_socket_params);
-        client.connect(server.address());
-
-        // ping ->
-        std::string requestText("Hello!");
-        // std::cout << "ping: ";
-        // std::cout << requestText << std::endl;
-        int res = client.send(requestText.c_str(), requestText.length());
-        EXPECT_EQ(res, requestText.size());
-
-        // <- pong
-        char responseText[1024] = {0};
-        client.recv(responseText, sizeof(responseText));
-        // std::cout << "pong: ";
-        // std::cout << (const char*)(responseText) << std::endl;
-        EXPECT_TRUE(requestText == responseText);
-        client.close();
-        server.Stop();
+        char* bigBuff = (char *)calloc(maxLength, sizeof(char));
+        for (size_t i = 0; i < sizeof(bigBuff); i++)
+        {
+            bigBuff[i] = char(i % 255);
+        }
+        bigBuff[maxLength] = 0;
+        std::string bigString((const char*)bigBuff, maxLength);
+        free(bigBuff);
+        return bigString;
     }
+
+    struct EchoServerTest
+    {
+        SocketServer& server;
+
+        EchoServerTest(SocketServer& server) :
+            server(server)
+        {
+            server.onRequest = [&](SocketServer::Connection& conn) {
+                // std::cout << "SocketServer::onRequest: ";
+                // std::cout << conn.request_buffer << std::endl;
+                conn.response_buffer.clear();
+                conn.request_buffer.swap(conn.response_buffer);
+                // Signal to Reactor that it's time to respond
+                conn.state.insert(SocketServer::Connection::Responding);
+            };
+
+            server.onResponse = [&](SocketServer::Connection& conn) {
+                // std::cout << "SocketServer::onResponse: ";
+                // std::cout << conn.response_buffer << std::endl;
+            };
+        }
+
+        void Start()
+        {
+            server.Start();
+        }
+
+        void Stop()
+        {
+            server.Stop();
+        }
+
+        void PingPong(std::string request_text, size_t numIterations = 1)
+        {
+            // Client must match the server params.
+            Socket client(server.server_socket_params);
+            client.connect(server.address());
+            for (size_t i = 0; i < numIterations; i++)
+            {
+                // -> ping
+                int total_bytes_sent = client.send(request_text.c_str(), request_text.length());
+                EXPECT_EQ(total_bytes_sent, request_text.size());
+
+                // <- pong
+                std::string response_text;
+                response_text.resize(request_text.size(), 0);
+                size_t total_bytes_received = client.readall(response_text);
+                EXPECT_EQ(total_bytes_received, total_bytes_sent);
+                EXPECT_EQ(request_text, response_text);
+            }
+            client.close();
+        }
+    };
 
     TEST(SocketTests, IPv4_SocketAddr_toString)
     {
@@ -111,7 +142,10 @@ namespace testing
         SocketParams params{AF_INET, SOCK_STREAM, 0};
         SocketAddr destination("127.0.0.1:3000");
         SocketServer server(destination, params);
-        StartEchoServer(server);
+        EchoServerTest test(server);
+        test.Start();
+        test.PingPong("Hello, world!");
+        test.Stop();
     }
 
     TEST(SocketTests, BasicUdpEchoTest)
@@ -119,7 +153,10 @@ namespace testing
         SocketParams params{AF_INET, SOCK_DGRAM, 0};
         SocketAddr destination("127.0.0.1:4000");
         SocketServer server(destination, params);
-        StartEchoServer(server);
+        EchoServerTest test(server);
+        test.Start();
+        test.PingPong("Hello, world!");
+        test.Stop();
     }
 
     TEST(SocketTests, BasicUnixDomainEchoTest)
@@ -133,6 +170,10 @@ namespace testing
         std::remove(socket_name.c_str());
         SocketAddr destination(socket_name.c_str(), true);
         SocketServer server(destination, params);
-        StartEchoServer(server);
+        EchoServerTest test(server);
+        test.Start();
+        test.PingPong("Hello, world!");
+        test.Stop();
     }
+
 }

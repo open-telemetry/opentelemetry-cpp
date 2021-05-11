@@ -104,7 +104,7 @@
 #  endif
 #endif
 
-#include "opentelemetry/ext/http/common/macros.h"
+#include "opentelemetry/ext/net/common/macros.h"
 
 namespace common
 {
@@ -249,9 +249,16 @@ struct SocketAddr
     inet4.sin_addr.s_addr = htonl(addr);
   }
 
-  SocketAddr(char const *addr, bool unixDomain = false) : SocketAddr()
+  SocketAddr(const char *addr, bool unixDomain = false) : SocketAddr()
   {
     isUnixDomain = unixDomain;
+    std::string ipAddress = addr;
+    auto found            = ipAddress.find("://");
+    if (found != std::string::npos)
+    {
+      // always strip scheme
+      ipAddress.erase(0, found + 3);
+    }
 
 #ifdef HAVE_UNIX_DOMAIN
     if (isUnixDomain)
@@ -265,7 +272,7 @@ struct SocketAddr
 
     // Convert {IPv4|IPv6}:{port} string to Network address and Port.
     int port              = 0;
-    std::string ipAddress = addr;
+
     // If numColons is more than 2, then it is IPv6 address
     size_t numColons = std::count(ipAddress.begin(), ipAddress.end(), ':');
     // Find last colon, which should indicate the port number
@@ -527,6 +534,42 @@ struct Socket
   {
     assert(m_sock != Invalid);
     return static_cast<int>(::recv(m_sock, reinterpret_cast<char *>(buffer), size, flags));
+  }
+
+  template <typename T>
+  size_t readall(T& buffer)
+  {
+    size_t total_bytes_received = 0;
+    int bytes_received       = 0;
+    // Read response fully
+    do
+    {
+      bytes_received = recv((void *)(buffer.data() + total_bytes_received), buffer.size() - total_bytes_received);
+      if (bytes_received > 0)
+      {
+        total_bytes_received += bytes_received;
+      }
+    } while ((bytes_received > 0) && (error() != SocketTools::Socket::ErrorWouldBlock) && (total_bytes_received<buffer.size()));
+    buffer.resize(total_bytes_received);
+    return total_bytes_received;
+  }
+
+  template<typename T>
+  size_t writeall(T &buffer)
+  {
+    size_t total_bytes_sent = 0;
+    int bytes_sent       = 0;
+    // Write response fully
+    do
+    {
+      bytes_sent =
+          send((void *)(buffer.data() + total_bytes_sent), buffer.size() - total_bytes_sent);
+      if (bytes_sent > 0)
+      {
+        total_bytes_sent += bytes_sent;
+      }
+    } while ((bytes_sent > 0) && (error() != SocketTools::Socket::ErrorWouldBlock) && (total_bytes_sent < buffer.size()));
+    return total_bytes_sent;
   }
 
   int send(void const *buffer, size_t size)
@@ -891,8 +934,14 @@ public:
   void stop()
   {
     LOG_INFO("Reactor: Stopping...");
-    // Force-abort the main server socket
-    m_sockets[0].socket.close();
+    // If UDP server, then force-close it to stop.
+    if (!m_streaming) {
+      LOCKGUARD(m_sockets_mutex);
+      if (m_sockets.size())
+      {
+        m_sockets[0].socket.close();
+      }
+    }
     joinThread();
 
     // Only acquire the lock after the worker(s) have joined
@@ -941,9 +990,8 @@ public:
       // Process only one bound address at the moment, not many.
       // This single-threaded implementation passes UDP buffers
       // to onSocketReadable, that should decide what to do with
-      // the socket. Callback may implements its own thread pool.
-      LOCKGUARD(m_sockets_mutex);
-      Socket &socket = m_sockets[0].socket;
+      // the socket. Callback may implement its own thread pool.
+      Socket socket = m_sockets[0].socket;
       LOG_TRACE("Reactor: socket 0x%x receive loop started...", static_cast<int>(socket));
       while (!shouldTerminate())
       {
