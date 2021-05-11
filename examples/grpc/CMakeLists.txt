@@ -1,8 +1,6 @@
+find_package(gRPC)
+find_package(Protobuf)
 
-if(NOT Protobuf_FOUND)
-  find_package(Protobuf)
-elseif(NOT gRPC_FOUND)
-  find_package(gRPC)
 if(NOT Protobuf_FOUND)
   message(WARNING "Aborting grpc example build, protobuf not found.")
 elseif(NOT gRPC_FOUND)
