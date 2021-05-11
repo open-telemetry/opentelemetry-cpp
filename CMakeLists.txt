@@ -7,6 +7,8 @@ cmake_policy(SET CMP0079 NEW)
 
 project(opentelemetry-cpp)
 
+set(OPENTELEMETRY_SOURCE_DIR ${CMAKE_CURRENT_LIST_DIR})
+
 file(READ "${CMAKE_CURRENT_LIST_DIR}/api/include/opentelemetry/version.h"
      OPENTELEMETRY_CPP_HEADER_VERSION_H)
 if(OPENTELEMETRY_CPP_HEADER_VERSION_H MATCHES
