@@ -19,7 +19,7 @@ This is a simple example that demonstrates tracing a gRPC request from client to
 installed both of these packages on your system, in such a way that CMake would know
 how to find them with this command:
 
-'''find_package(gRPC)'''
+```find_package(gRPC)```
 
 If you install these with a package manager like '''brew''' or '''apt''', you should not need to do extra work.
 
