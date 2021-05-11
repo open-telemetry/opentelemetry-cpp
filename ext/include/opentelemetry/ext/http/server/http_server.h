@@ -18,7 +18,7 @@
 #include <list>
 #include <map>
 
-#include "socket_tools.h"
+#include "opentelemetry/ext/net/common/socket_tools.h"
 
 #ifdef HAVE_HTTP_DEBUG
 #  ifdef LOG_TRACE

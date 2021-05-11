@@ -1,4 +1,4 @@
-#include "opentelemetry/ext/http/common/url_parser.h"
+#include "opentelemetry/ext/net/common/url_parser.h"
 
 #include <gtest/gtest.h>
 
