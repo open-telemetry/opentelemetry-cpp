@@ -24,12 +24,12 @@ inline nostd::shared_ptr<opentelemetry::trace::Span> GetSpanFromContext(
   opentelemetry::context::ContextValue span = context.GetValue(opentelemetry::trace::kSpanKey);
   if (nostd::holds_alternative<nostd::shared_ptr<opentelemetry::trace::Span>>(span))
   {
-    std::cout << "GETSPAN FROM CONTEXT YES\n";
+    //std::cout << "GETSPAN FROM CONTEXT YES\n";
     return nostd::get<nostd::shared_ptr<opentelemetry::trace::Span>>(span);
   }
   static nostd::shared_ptr<opentelemetry::trace::Span> invalid_span{
       new opentelemetry::trace::DefaultSpan(opentelemetry::trace::SpanContext::GetInvalid())};
-  std::cout << "GETSPANFROMCONTEXT no\n";
+  //std::cout << "GETSPANFROMCONTEXT no\n";
   return invalid_span;
 }
 

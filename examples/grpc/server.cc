@@ -49,17 +49,25 @@ public:
     // we want to capture in a span, but we include the definition at this point to fit
     // real-life scenarios
     std::map<std::string, std::string> m;
-    m.insert(std::pair<std::string, std::string>("1", "2"));
+    // Try inserting data into the map
+    // m.insert(std::pair<std::string, std::string>("1", "2"));
+    // Also tried without passing a map at all, like in grpc/client.cc
     const gRPCMapCarrier<std::map<std::string, std::string>> carrier((std::map<std::string, std::string> &) m);
     auto prop = opentelemetry::context::propagation::GlobalTextMapPropagator::GetGlobalPropagator();
+    // GetSpanFromContext fails here
     auto current_ctx = opentelemetry::context::RuntimeContext::GetCurrent();
+    // GetSpanFromContext for new_context actually returns a span, suggesting there should be
+    // a usable parent span in this context
     auto new_context = prop->Extract(carrier, current_ctx);
     auto s = GetSpanFromContext(new_context);
+    // Commented out debugging output. Only outputs '0 0 0 0 0 0' as the spanid, which
+    // I'm fairly sure indicates an inactive/invalid span
+    /*
     opentelemetry::nostd::span<const uint8_t, 8> sp = s->GetContext().span_id().Id(); 
     for(const uint8_t &e : sp) {
       std::cout << unsigned(e) << ' ';
     }
-    std::cout << '\n';
+    std::cout << '\n';*/
     options.parent   = s->GetContext();
 
     // Build a new span from a tracer, start, and activate it. When adding

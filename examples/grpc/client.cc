@@ -47,13 +47,17 @@ public:
                                                {"net.peer.port", port}},
                                               options);
     auto scope            = get_tracer("grpc")->WithActiveSpan(span);
+
+    /*
+    Commented out some debugging output, in case a reviewer finds it useful
     opentelemetry::nostd::span<const uint8_t, 8> sp = span->GetContext().span_id().Id(); 
     for(const uint8_t &e : sp) {
       std::cout << unsigned(e) << ' ';
     }
-    std::cout << '\n';
+    std::cout << '\n';*/
     auto current_ctx = opentelemetry::context::RuntimeContext::GetCurrent();
-    const gRPCMapCarrier<opentelemetry::ext::http::client::Headers> carrier;
+    // Experimented with opentelemetry::ext::http::client::Headers here too
+    gRPCMapCarrier<std::map<std::string, std::string>> carrier;
     auto prop = opentelemetry::context::propagation::GlobalTextMapPropagator::GetGlobalPropagator();
     prop->Inject(carrier, current_ctx);
 
