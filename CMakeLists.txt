@@ -27,6 +27,7 @@ else()
   )
 endif()
 
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
 if(NOT DEFINED CMAKE_CXX_STANDARD)
   set(CMAKE_CXX_STANDARD 11)
 endif()
