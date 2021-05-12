@@ -1,4 +1,5 @@
-#include "opentelemetry/sdk/metrics/ungrouped_processor.h"
+#ifdef ENABLE_METRIC_PREVIEW
+#  include "opentelemetry/sdk/metrics/ungrouped_processor.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 
@@ -161,3 +162,4 @@ void UngroupedMetricsProcessor::process(sdkmetrics::Record record) noexcept
 }  // namespace sdk
 
 OPENTELEMETRY_END_NAMESPACE
+#endif

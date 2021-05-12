@@ -1,14 +1,15 @@
-#pragma once
+#ifdef ENABLE_METRIC_PREVIEW
+#  pragma once
 
-#include "opentelemetry/metrics/meter.h"
-#include "opentelemetry/nostd/shared_ptr.h"
-#include "opentelemetry/sdk/metrics/async_instruments.h"
-#include "opentelemetry/sdk/metrics/instrument.h"
-#include "opentelemetry/sdk/metrics/record.h"
-#include "opentelemetry/sdk/metrics/sync_instruments.h"
+#  include "opentelemetry/metrics/meter.h"
+#  include "opentelemetry/nostd/shared_ptr.h"
+#  include "opentelemetry/sdk/metrics/async_instruments.h"
+#  include "opentelemetry/sdk/metrics/instrument.h"
+#  include "opentelemetry/sdk/metrics/record.h"
+#  include "opentelemetry/sdk/metrics/sync_instruments.h"
 
-#include <unordered_set>
-#include <vector>
+#  include <unordered_set>
+#  include <vector>
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace sdk
@@ -373,3 +374,4 @@ private:
 }  // namespace metrics
 }  // namespace sdk
 OPENTELEMETRY_END_NAMESPACE
+#endif

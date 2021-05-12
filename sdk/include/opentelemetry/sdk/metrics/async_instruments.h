@@ -1,15 +1,16 @@
-#pragma once
+#ifdef ENABLE_METRIC_PREVIEW
+#  pragma once
 
-#include <map>
-#include <memory>
-#include <sstream>
-#include <stdexcept>
-#include <vector>
-#include "opentelemetry/metrics/async_instruments.h"
-#include "opentelemetry/sdk/metrics/aggregator/counter_aggregator.h"
-#include "opentelemetry/sdk/metrics/aggregator/min_max_sum_count_aggregator.h"
-#include "opentelemetry/sdk/metrics/instrument.h"
-#include "opentelemetry/version.h"
+#  include <map>
+#  include <memory>
+#  include <sstream>
+#  include <stdexcept>
+#  include <vector>
+#  include "opentelemetry/metrics/async_instruments.h"
+#  include "opentelemetry/sdk/metrics/aggregator/counter_aggregator.h"
+#  include "opentelemetry/sdk/metrics/aggregator/min_max_sum_count_aggregator.h"
+#  include "opentelemetry/sdk/metrics/instrument.h"
+#  include "opentelemetry/version.h"
 
 namespace metrics_api = opentelemetry::metrics;
 
@@ -131,11 +132,11 @@ public:
       boundAggregators_.insert(std::make_pair(labelset, sp1));
       if (value < 0)
       {
-#if __EXCEPTIONS
+#  if __EXCEPTIONS
         throw std::invalid_argument("Counter instrument updates must be non-negative.");
-#else
+#  else
         std::terminate();
-#endif
+#  endif
       }
       else
       {
@@ -146,11 +147,11 @@ public:
     {
       if (value < 0)
       {
-#if __EXCEPTIONS
+#  if __EXCEPTIONS
         throw std::invalid_argument("Counter instrument updates must be non-negative.");
-#else
+#  else
         std::terminate();
-#endif
+#  endif
       }
       else
       {
@@ -270,3 +271,4 @@ public:
 }  // namespace metrics
 }  // namespace sdk
 OPENTELEMETRY_END_NAMESPACE
+#endif

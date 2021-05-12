@@ -1,16 +1,17 @@
-#pragma once
+#ifdef ENABLE_METRIC_PREVIEW
+#  pragma once
 
-#include <iostream>
-#include <map>
-#include <memory>
-#include <sstream>
-#include <string>
-#include <unordered_map>
-#include <vector>
-#include "opentelemetry/metrics/instrument.h"
-#include "opentelemetry/sdk/metrics/aggregator/aggregator.h"
-#include "opentelemetry/sdk/metrics/record.h"
-#include "opentelemetry/version.h"
+#  include <iostream>
+#  include <map>
+#  include <memory>
+#  include <sstream>
+#  include <string>
+#  include <unordered_map>
+#  include <vector>
+#  include "opentelemetry/metrics/instrument.h"
+#  include "opentelemetry/sdk/metrics/aggregator/aggregator.h"
+#  include "opentelemetry/sdk/metrics/record.h"
+#  include "opentelemetry/version.h"
 
 namespace metrics_api = opentelemetry::metrics;
 
@@ -248,11 +249,11 @@ inline void print_value(std::stringstream &ss,
 
       break;
     default:
-#if __EXCEPTIONS
+#  if __EXCEPTIONS
       throw std::invalid_argument("Labels must be strings");
-#else
+#  else
       std::terminate();
-#endif
+#  endif
       break;
   }
 };
@@ -297,3 +298,4 @@ inline std::string KvToString(const opentelemetry::common::KeyValueIterable &kv)
 }  // namespace metrics
 }  // namespace sdk
 OPENTELEMETRY_END_NAMESPACE
+#endif

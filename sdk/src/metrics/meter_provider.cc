@@ -1,4 +1,5 @@
-#include "opentelemetry/sdk/metrics/meter_provider.h"
+#ifdef ENABLE_METRIC_PREVIEW
+#  include "opentelemetry/sdk/metrics/meter_provider.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace sdk
@@ -19,3 +20,4 @@ opentelemetry::nostd::shared_ptr<opentelemetry::metrics::Meter> MeterProvider::G
 }  // namespace metrics
 }  // namespace sdk
 OPENTELEMETRY_END_NAMESPACE
+#endif

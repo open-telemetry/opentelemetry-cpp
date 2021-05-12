@@ -1,9 +1,11 @@
-#include "opentelemetry/sdk/metrics/aggregator/histogram_aggregator.h"
-
 #include <gtest/gtest.h>
-#include <iostream>
-#include <numeric>
-#include <thread>
+
+#ifdef ENABLE_METRIC_PREVIEW
+#  include "opentelemetry/sdk/metrics/aggregator/histogram_aggregator.h"
+
+#  include <iostream>
+#  include <numeric>
+#  include <thread>
 // #include <chrono>
 
 namespace metrics_api = opentelemetry::metrics;
@@ -144,7 +146,7 @@ TEST(Histogram, Concurrency)
   EXPECT_EQ(alpha.get_counts(), beta.get_counts());
 }
 
-#if __EXCEPTIONS
+#  if __EXCEPTIONS
 
 TEST(Histogram, Errors)
 {
@@ -160,8 +162,14 @@ TEST(Histogram, Errors)
   EXPECT_ANY_THROW(beta.merge(gamma));
 }
 
-#endif
+#  endif
 
 }  // namespace metrics
 }  // namespace sdk
 OPENTELEMETRY_END_NAMESPACE
+#else
+TEST(Histogram, DummyTest)
+{
+  // empty
+}
+#endif

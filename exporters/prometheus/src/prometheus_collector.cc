@@ -13,10 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+#ifdef ENABLE_METRIC_PREVIEW
+#  include <iostream>
 
-#include <iostream>
-
-#include "opentelemetry/exporters/prometheus/prometheus_collector.h"
+#  include "opentelemetry/exporters/prometheus/prometheus_collector.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace exporter
@@ -173,3 +173,4 @@ int PrometheusCollector::GetMaxCollectionSize() const
 }  // namespace prometheus
 }  // namespace exporter
 OPENTELEMETRY_END_NAMESPACE
+#endif

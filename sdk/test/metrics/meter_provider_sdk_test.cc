@@ -1,7 +1,8 @@
-#include "opentelemetry/sdk/metrics/meter.h"
-#include "opentelemetry/sdk/metrics/meter_provider.h"
-
 #include <gtest/gtest.h>
+
+#ifdef ENABLE_METRIC_PREVIEW
+#  include "opentelemetry/sdk/metrics/meter.h"
+#  include "opentelemetry/sdk/metrics/meter_provider.h"
 
 using namespace opentelemetry::sdk::metrics;
 
@@ -19,3 +20,9 @@ TEST(MeterProvider, GetMeter)
   ASSERT_EQ(t1, t2);
   ASSERT_EQ(t1, t3);
 }
+#else
+TEST(MeterProvider, DummyTest)
+{
+  // empty
+}
+#endif

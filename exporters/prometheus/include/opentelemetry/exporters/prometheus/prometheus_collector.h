@@ -13,17 +13,17 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+#ifdef ENABLE_METRIC_PREVIEW
+#  pragma once
 
-#pragma once
+#  include <memory>
+#  include <mutex>
+#  include <vector>
 
-#include <memory>
-#include <mutex>
-#include <vector>
-
-#include "opentelemetry/sdk/metrics/record.h"
-#include "prometheus/collectable.h"
-#include "prometheus/metric_family.h"
-#include "prometheus_exporter_utils.h"
+#  include "opentelemetry/sdk/metrics/record.h"
+#  include "prometheus/collectable.h"
+#  include "prometheus/metric_family.h"
+#  include "prometheus_exporter_utils.h"
 
 namespace prometheus_client = ::prometheus;
 namespace metric_sdk        = opentelemetry::sdk::metrics;
@@ -98,3 +98,4 @@ private:
 }  // namespace prometheus
 }  // namespace exporter
 OPENTELEMETRY_END_NAMESPACE
+#endif

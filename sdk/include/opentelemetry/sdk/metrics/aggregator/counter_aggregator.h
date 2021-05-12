@@ -1,10 +1,11 @@
-#pragma once
+#ifdef ENABLE_METRIC_PREVIEW
+#  pragma once
 
-#include <mutex>
-#include <vector>
-#include "opentelemetry/metrics/instrument.h"
-#include "opentelemetry/sdk/metrics/aggregator/aggregator.h"
-#include "opentelemetry/version.h"
+#  include <mutex>
+#  include <vector>
+#  include "opentelemetry/metrics/instrument.h"
+#  include "opentelemetry/sdk/metrics/aggregator/aggregator.h"
+#  include "opentelemetry/version.h"
 
 namespace metrics_api = opentelemetry::metrics;
 
@@ -75,11 +76,11 @@ public:
     }
     else
     {
-#if __EXCEPTIONS
+#  if __EXCEPTIONS
       throw std::invalid_argument("Aggregators of different types cannot be merged.");
-#else
+#  else
       std::terminate();
-#endif
+#  endif
     }
   }
 
@@ -103,3 +104,4 @@ public:
 }  // namespace metrics
 }  // namespace sdk
 OPENTELEMETRY_END_NAMESPACE
+#endif

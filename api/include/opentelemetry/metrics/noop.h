@@ -1,19 +1,20 @@
-#pragma once
+#ifdef ENABLE_METRIC_PREVIEW
+#  pragma once
 // Please refer to provider.h for documentation on how to obtain a Meter object.
 //
 // This file is part of the internal implementation of OpenTelemetry. Nothing in this file should be
 // used directly. Please refer to meter.h for documentation on these interfaces.
 
-#include "opentelemetry/metrics/async_instruments.h"
-#include "opentelemetry/metrics/instrument.h"
-#include "opentelemetry/metrics/meter.h"
-#include "opentelemetry/metrics/meter_provider.h"
-#include "opentelemetry/metrics/sync_instruments.h"
-#include "opentelemetry/nostd/string_view.h"
-#include "opentelemetry/nostd/unique_ptr.h"
-#include "opentelemetry/version.h"
+#  include "opentelemetry/metrics/async_instruments.h"
+#  include "opentelemetry/metrics/instrument.h"
+#  include "opentelemetry/metrics/meter.h"
+#  include "opentelemetry/metrics/meter_provider.h"
+#  include "opentelemetry/metrics/sync_instruments.h"
+#  include "opentelemetry/nostd/string_view.h"
+#  include "opentelemetry/nostd/unique_ptr.h"
+#  include "opentelemetry/version.h"
 
-#include <memory>
+#  include <memory>
 
 // TODO: Create generic short pattern for opentelemetry::common and opentelemetry::trace and others
 // as necessary
@@ -647,3 +648,4 @@ private:
 };
 }  // namespace metrics
 OPENTELEMETRY_END_NAMESPACE
+#endif

@@ -1,7 +1,9 @@
 #include <gtest/gtest.h>
-#include <thread>
 
-#include "opentelemetry/sdk/metrics/aggregator/exact_aggregator.h"
+#ifdef ENABLE_METRIC_PREVIEW
+#  include <thread>
+
+#  include "opentelemetry/sdk/metrics/aggregator/exact_aggregator.h"
 
 using namespace opentelemetry::sdk::metrics;
 
@@ -179,10 +181,10 @@ TEST(ExactAggregatorInOrder, Quantile)
     agg.update(i);
   }
   agg.checkpoint();
-#if __EXCEPTIONS
+#  if __EXCEPTIONS
   ASSERT_THROW(agg.get_quantiles(0.5), std::domain_error);
-#else
-#endif
+#  else
+#  endif
 }
 
 void callback(ExactAggregator<int> &agg)
@@ -215,3 +217,9 @@ TEST(ExactAggregatorQuant, Concurrency)
 
   ASSERT_EQ(agg.get_checkpoint(), correct);
 }
+#else
+TEST(ExactAggregatorQuant, DummyTest)
+{
+  // empty
+}
+#endif
