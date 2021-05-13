@@ -4,6 +4,7 @@
 #include "opentelemetry/sdk/resource/resource.h"
 #include "opentelemetry/sdk/trace/processor.h"
 #include "opentelemetry/sdk/trace/random_id_generator.h"
+#include "opentelemetry/sdk/trace/span_limits.h"
 #include "opentelemetry/sdk/trace/samplers/always_on.h"
 #include "opentelemetry/version.h"
 
@@ -35,7 +36,8 @@ public:
           opentelemetry::sdk::resource::Resource::Create({}),
       std::unique_ptr<Sampler> sampler = std::unique_ptr<AlwaysOnSampler>(new AlwaysOnSampler),
       std::unique_ptr<IdGenerator> id_generator =
-          std::unique_ptr<IdGenerator>(new RandomIdGenerator())) noexcept;
+          std::unique_ptr<IdGenerator>(new RandomIdGenerator()),
+      SpanLimits limits = SpanLimits()) noexcept;
 
   /**
    * Attaches a span processor to list of configured processors to this tracer context.
@@ -74,6 +76,12 @@ public:
   opentelemetry::sdk::trace::IdGenerator &GetIdGenerator() const noexcept;
 
   /**
+   * Obtain the Span Limits associated with this tracer context.
+   * @return The Span Limits object for this tracer context.
+   */
+  const SpanLimits &GetSpanLimits() const noexcept;
+
+  /**
    * Force all active SpanProcessors to flush any buffered spans
    * within the given timeout.
    */
@@ -90,6 +98,7 @@ private:
   opentelemetry::sdk::resource::Resource resource_;
   std::unique_ptr<Sampler> sampler_;
   std::unique_ptr<IdGenerator> id_generator_;
+  SpanLimits limits_;
 };
 
 }  // namespace trace

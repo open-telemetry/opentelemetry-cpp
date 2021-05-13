@@ -47,6 +47,7 @@ Span::Span(std::shared_ptr<Tracer> &&tracer,
            const trace_api::SpanContextKeyValueIterable &links,
            const trace_api::StartSpanOptions &options,
            const trace_api::SpanContext &parent_span_context,
+           const SpanLimits &span_limits,
            const nostd::shared_ptr<opentelemetry::trace::TraceState> trace_state,
            const bool sampled) noexcept
     : tracer_{std::move(tracer)},

@@ -39,7 +39,8 @@ public:
       std::unique_ptr<Sampler> sampler = std::unique_ptr<AlwaysOnSampler>(new AlwaysOnSampler),
       std::unique_ptr<opentelemetry::sdk::trace::IdGenerator> id_generator =
           std::unique_ptr<opentelemetry::sdk::trace::IdGenerator>(
-              new RandomIdGenerator())) noexcept;
+              new RandomIdGenerator()),
+      SpanLimits limits = SpanLimits()) noexcept;
 
   explicit TracerProvider(
       std::vector<std::unique_ptr<SpanProcessor>> &&processors,
@@ -48,7 +49,8 @@ public:
       std::unique_ptr<Sampler> sampler = std::unique_ptr<AlwaysOnSampler>(new AlwaysOnSampler),
       std::unique_ptr<opentelemetry::sdk::trace::IdGenerator> id_generator =
           std::unique_ptr<opentelemetry::sdk::trace::IdGenerator>(
-              new RandomIdGenerator())) noexcept;
+              new RandomIdGenerator()),
+      SpanLimits limits = SpanLimits()) noexcept;
 
   /**
    * Initialize a new tracer provider with a specified context
@@ -81,6 +83,12 @@ public:
    * @return The span processor for this tracer provider.
    */
   std::shared_ptr<SpanProcessor> GetProcessor() const noexcept;
+
+  /**
+   * Obtain the span limits associated with this tracer provider.
+   * @return The Span Limits object for this tracer provider.
+   */
+  const SpanLimits &GetSpanLimits() const noexcept;
 
   /**
    * Shutdown the span processor associated with this tracer provider.
