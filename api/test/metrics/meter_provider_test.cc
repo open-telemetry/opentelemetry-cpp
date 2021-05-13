@@ -1,6 +1,5 @@
-#include <gtest/gtest.h>
-
-#ifdef ENABLE_METRIC_PREVIEW
+#ifdef ENABLE_METRICS_PREVIEW
+#  include <gtest/gtest.h>
 #  include "opentelemetry/metrics/provider.h"
 #  include "opentelemetry/nostd/shared_ptr.h"
 
@@ -39,10 +38,5 @@ TEST(Provider, MultipleMeterProviders)
   Provider::SetMeterProvider(tf2);
 
   ASSERT_NE(Provider::GetMeterProvider(), tf);
-}
-#else
-TEST(Provider, DummyTest)
-{
-  // empty
 }
 #endif

@@ -1,6 +1,5 @@
-#include <gtest/gtest.h>
-
-#ifdef ENABLE_METRIC_PREVIEW
+#ifdef ENABLE_METRICS_PREVIEW
+#  include <gtest/gtest.h>
 #  include <cstring>
 #  include <iostream>
 #  include <map>
@@ -468,9 +467,4 @@ TEST(Instruments, NoUpdateNoRecord)
 }  // namespace metrics
 }  // namespace sdk
 OPENTELEMETRY_END_NAMESPACE
-#else
-TEST(Instruments, DummyTest)
-{
-  // empty
-}
 #endif

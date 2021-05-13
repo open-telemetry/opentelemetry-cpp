@@ -1,9 +1,8 @@
-#include <gtest/gtest.h>
-
-#ifdef ENABLE_METRIC_PREVIEW
+#ifdef ENABLE_METRICS_PREVIEW
+#  include "opentelemetry/sdk/metrics/ungrouped_processor.h"
+#  include <gtest/gtest.h>
 #  include "opentelemetry/nostd/shared_ptr.h"
 #  include "opentelemetry/sdk/metrics/aggregator/counter_aggregator.h"
-#  include "opentelemetry/sdk/metrics/ungrouped_processor.h"
 
 namespace sdkmetrics  = opentelemetry::sdk::metrics;
 namespace metrics_api = opentelemetry::metrics;
@@ -620,10 +619,5 @@ TEST(UngroupedMetricsProcessor, UngroupedProcessorKeepsRecordInformationStateful
   ASSERT_EQ(nostd::get<std::shared_ptr<sdkmetrics::Aggregator<int>>>(checkpoint2[0].GetAggregator())
                 ->get_checkpoint(),
             test_aggregator->get_checkpoint());
-}
-#else
-TEST(UngroupedMetricsProcessor, DummyTest)
-{
-  // empty
 }
 #endif

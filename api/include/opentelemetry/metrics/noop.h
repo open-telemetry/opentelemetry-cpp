@@ -1,5 +1,5 @@
-#ifdef ENABLE_METRIC_PREVIEW
-#  pragma once
+#pragma once
+#ifdef ENABLE_METRICS_PREVIEW
 // Please refer to provider.h for documentation on how to obtain a Meter object.
 //
 // This file is part of the internal implementation of OpenTelemetry. Nothing in this file should be

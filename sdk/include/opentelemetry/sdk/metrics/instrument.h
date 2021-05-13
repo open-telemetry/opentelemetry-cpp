@@ -1,5 +1,5 @@
-#ifdef ENABLE_METRIC_PREVIEW
-#  pragma once
+#pragma once
+#ifdef ENABLE_METRICS_PREVIEW
 
 #  include <iostream>
 #  include <map>

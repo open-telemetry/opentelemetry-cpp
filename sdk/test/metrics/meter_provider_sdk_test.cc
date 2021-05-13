@@ -1,6 +1,6 @@
-#include <gtest/gtest.h>
+#ifdef ENABLE_METRICS_PREVIEW
+#  include <gtest/gtest.h>
 
-#ifdef ENABLE_METRIC_PREVIEW
 #  include "opentelemetry/sdk/metrics/meter.h"
 #  include "opentelemetry/sdk/metrics/meter_provider.h"
 
@@ -19,10 +19,5 @@ TEST(MeterProvider, GetMeter)
   // Should return the same instance each time.
   ASSERT_EQ(t1, t2);
   ASSERT_EQ(t1, t3);
-}
-#else
-TEST(MeterProvider, DummyTest)
-{
-  // empty
 }
 #endif

@@ -1,7 +1,7 @@
-#include <gtest/gtest.h>
-
-#ifdef ENABLE_METRIC_PREVIEW
+#ifdef ENABLE_METRICS_PREVIEW
+#  include <gtest/gtest.h>
 #  include <future>
+
 #  include "opentelemetry/sdk/metrics/meter.h"
 
 using namespace opentelemetry::sdk::metrics;
@@ -289,9 +289,4 @@ TEST(MeterStringUtil, AlreadyExists)
 #  endif
 }
 OPENTELEMETRY_END_NAMESPACE
-#else
-TEST(MeterStringUtil, DummyTest)
-{
-  // empty
-}
 #endif

@@ -1,6 +1,6 @@
-#include <gtest/gtest.h>
 
-#ifdef ENABLE_METRIC_PREVIEW
+#ifdef ENABLE_METRICS_PREVIEW
+#  include <gtest/gtest.h>
 #  include <thread>
 
 #  include "opentelemetry/sdk/metrics/aggregator/gauge_aggregator.h"
@@ -126,10 +126,5 @@ TEST(GaugeAggregator, Concurrency)
   second.join();
 
   ASSERT_EQ(agg.get_values()[0], 10000);
-}
-#else
-TEST(GaugeAggregator, DummyTest)
-{
-  // empty
 }
 #endif

@@ -14,8 +14,8 @@
  * limitations under the License.
  */
 
-#include <gtest/gtest.h>
-#ifdef ENABLE_METRIC_PREVIEW
+#ifdef ENABLE_METRICS_PREVIEW
+#  include <gtest/gtest.h>
 #  include <map>
 #  include <numeric>
 #  include <string>
@@ -470,9 +470,4 @@ TEST(PrometheusExporterUtils, TranslateToPrometheusMultipleAggregators)
                prometheus_client::MetricType::Gauge, 1, vals);
 }
 OPENTELEMETRY_END_NAMESPACE
-#else
-TEST(PrometheusExporterUtils, DummyTest)
-{
-  // empty
-}
 #endif

@@ -14,9 +14,8 @@
  * limitations under the License.
  */
 
-#include <gtest/gtest.h>
-
-#ifdef ENABLE_METRIC_PREVIEW
+#ifdef ENABLE_METRICS_PREVIEW
+#  include <gtest/gtest.h>
 #  include <future>
 #  include <map>
 #  include <thread>
@@ -767,9 +766,4 @@ TEST(PrometheusCollector, ConcurrentlyAddingAndConcurrentlyCollecting)
 }
 
 OPENTELEMETRY_END_NAMESPACE
-#else
-TEST(PrometheusCollector, DummyTest)
-{
-  // empty
-}
 #endif

@@ -1,11 +1,11 @@
-#include <gtest/gtest.h>
-
-#ifdef ENABLE_METRIC_PREVIEW
+#ifdef ENABLE_METRICS_PREVIEW
 #  include "opentelemetry/sdk/metrics/aggregator/histogram_aggregator.h"
 
+#  include <gtest/gtest.h>
 #  include <iostream>
 #  include <numeric>
 #  include <thread>
+
 // #include <chrono>
 
 namespace metrics_api = opentelemetry::metrics;
@@ -167,9 +167,4 @@ TEST(Histogram, Errors)
 }  // namespace metrics
 }  // namespace sdk
 OPENTELEMETRY_END_NAMESPACE
-#else
-TEST(Histogram, DummyTest)
-{
-  // empty
-}
 #endif

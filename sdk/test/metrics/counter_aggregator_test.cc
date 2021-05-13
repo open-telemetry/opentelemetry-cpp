@@ -1,8 +1,7 @@
-#include <gtest/gtest.h>
-
-#ifdef ENABLE_METRIC_PREVIEW
+#ifdef ENABLE_METRICS_PREVIEW
 #  include "opentelemetry/sdk/metrics/aggregator/counter_aggregator.h"
 
+#  include <gtest/gtest.h>
 #  include <numeric>
 #  include <thread>
 
@@ -115,9 +114,4 @@ TEST(CounterAggregator, Merge)
 }  // namespace metrics
 }  // namespace sdk
 OPENTELEMETRY_END_NAMESPACE
-#else
-TEST(CounterAggregator, DummyTest)
-{
-  // empty
-}
 #endif

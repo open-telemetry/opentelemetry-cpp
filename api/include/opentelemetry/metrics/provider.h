@@ -1,6 +1,5 @@
-#ifdef ENABLE_METRIC_PREVIEW
-#  pragma once
-
+#pragma once
+#ifdef ENABLE_METRICS_PREVIEW
 #  include <mutex>
 
 #  include "opentelemetry/common/spin_lock_mutex.h"

@@ -1,5 +1,5 @@
+#pragma once
 #ifdef ENABLE_METRICS_PREVIEW
-#  pragma once
 
 #  include "instrument.h"
 #  include "observer_result.h"

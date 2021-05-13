@@ -1,6 +1,5 @@
-#include <gtest/gtest.h>
-
-#ifdef ENABLE_METRIC_PREVIEW
+#ifdef ENABLE_METRICS_PREVIEW
+#  include <gtest/gtest.h>
 #  include "opentelemetry/metrics/instrument.h"
 #  include "opentelemetry/metrics/noop.h"
 #  include "opentelemetry/metrics/observer_result.h"
@@ -78,9 +77,4 @@ TEST(NoopMeter, RecordBatch)
   m->RecordDoubleBatch(labelkv, dsp, dval);
 }
 OPENTELEMETRY_END_NAMESPACE
-#else
-TEST(NoopMeter, DummyTest)
-{
-  // empty
-}
 #endif

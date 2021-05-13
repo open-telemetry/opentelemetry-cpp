@@ -1,9 +1,9 @@
-#include <gtest/gtest.h>
-
-#ifdef ENABLE_METRIC_PREVIEW
+#ifdef ENABLE_METRICS_PREVIEW
+#  include <gtest/gtest.h>
 #  include <cstring>
 #  include <map>
 #  include <string>
+
 #  include "opentelemetry/metrics/noop.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
@@ -185,9 +185,4 @@ TEST(ValueRecorder, Record)
 
 }  // namespace metrics
 OPENTELEMETRY_END_NAMESPACE
-#else
-TEST(ValueRecorder, DummyTest)
-{
-  // empty
-}
 #endif

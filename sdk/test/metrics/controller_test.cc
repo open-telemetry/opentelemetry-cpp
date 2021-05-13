@@ -1,10 +1,9 @@
-#include <gtest/gtest.h>
-
-#ifdef ENABLE_METRIC_PREVIEW
+#ifdef ENABLE_METRICS_PREVIEW
 #  include "opentelemetry/sdk/metrics/controller.h"
 #  include "opentelemetry/sdk/metrics/meter.h"
 #  include "opentelemetry/sdk/metrics/ungrouped_processor.h"
 
+#  include <gtest/gtest.h>
 #  include <numeric>
 #  include <thread>
 // #include <chrono>
@@ -51,9 +50,4 @@ TEST(Controller, Constructor)
 }  // namespace metrics
 }  // namespace sdk
 OPENTELEMETRY_END_NAMESPACE
-#else
-TEST(Controller, DummyTest)
-{
-  // empty
-}
 #endif

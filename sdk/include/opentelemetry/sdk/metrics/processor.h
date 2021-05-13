@@ -1,5 +1,5 @@
-#ifdef ENABLE_METRIC_PREVIEW
-#  pragma once
+#pragma once
+#ifdef ENABLE_METRICS_PREVIEW
 #  include "opentelemetry/metrics/instrument.h"
 #  include "opentelemetry/nostd/string_view.h"
 #  include "opentelemetry/sdk/metrics/record.h"

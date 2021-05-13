@@ -1,8 +1,7 @@
-#include <gtest/gtest.h>
-
-#ifdef ENABLE_METRIC_PREVIEW
+#ifdef ENABLE_METRICS_PREVIEW
 #  include "opentelemetry/sdk/metrics/aggregator/sketch_aggregator.h"
 
+#  include <gtest/gtest.h>
 #  include <iostream>
 #  include <numeric>
 #  include <thread>
@@ -249,9 +248,4 @@ TEST(Sketch, Errors)
 }  // namespace metrics
 }  // namespace sdk
 OPENTELEMETRY_END_NAMESPACE
-#else
-TEST(Sketch, DummyTest)
-{
-  // empty
-}
 #endif

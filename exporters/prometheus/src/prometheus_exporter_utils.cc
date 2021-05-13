@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-#ifdef ENABLE_METRIC_PREVIEW
+#ifdef ENABLE_METRICS_PREVIEW
 #  include <iostream>
 #  include <sstream>
 #  include <utility>

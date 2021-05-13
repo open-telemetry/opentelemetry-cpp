@@ -1,5 +1,5 @@
-#ifdef ENABLE_METRIC_PREVIEW
-#  pragma once
+#pragma once
+#ifdef ENABLE_METRICS_PREVIEW
 
 #  include "opentelemetry/metrics/async_instruments.h"
 #  include "opentelemetry/metrics/instrument.h"

@@ -1,4 +1,4 @@
-#ifdef ENABLE_METRIC_PREVIEW
+#ifdef ENABLE_METRICS_PREVIEW
 #  include "opentelemetry/sdk/metrics/meter.h"
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace sdk

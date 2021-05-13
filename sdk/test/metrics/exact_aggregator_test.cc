@@ -1,6 +1,6 @@
 #include <gtest/gtest.h>
 
-#ifdef ENABLE_METRIC_PREVIEW
+#ifdef ENABLE_METRICS_PREVIEW
 #  include <thread>
 
 #  include "opentelemetry/sdk/metrics/aggregator/exact_aggregator.h"
