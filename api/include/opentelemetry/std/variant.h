@@ -33,6 +33,8 @@ using variant = std::variant<_Types...>;
 template <class... _Types>
 using variant_size = std::variant_size<_Types...>;
 
+using monostate = std::monostate;
+
 #if defined(__APPLE__) && defined(_LIBCPP_USE_AVAILABILITY_APPLE)
 // Apple Platforms provide std::bad_variant_access only in newer versions of OS.
 // To keep API compatible with any version of OS - we are providing our own
