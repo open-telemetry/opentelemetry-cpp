@@ -72,23 +72,13 @@ public:
         }
       }
     }
-    return (int64_t)0;
+    return ContextValue{};
   }
 
   // Checks for key and returns true if found
   bool HasKey(const nostd::string_view key) const noexcept
   {
-    for (DataList *data = head_.get(); data != nullptr; data = data->next_.get())
-    {
-      if (key.size() == data->key_length_)
-      {
-        if (std::memcmp(key.data(), data->key_, data->key_length_) == 0)
-        {
-          return true;
-        }
-      }
-    }
-    return false;
+    return !nostd::holds_alternative<nostd::monostate>(GetValue(key));
   }
 
   bool operator==(const Context &other) const noexcept { return (head_ == other.head_); }
