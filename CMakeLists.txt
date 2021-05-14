@@ -69,7 +69,7 @@ if(WITH_STL)
       # Turn off optimizations for DEBUG
       set(CMAKE_CXX_FLAGS_SPEED "/Od")
     else()
-      STRING(REGEX MATCH "\/O" result ${CMAKE_CXX_FLAGS})
+      string(REGEX MATCH "\/O" result ${CMAKE_CXX_FLAGS})
       if(NOT ${result} MATCHES "\/O")
         set(CMAKE_CXX_FLAGS_SPEED "/O2")
       endif()

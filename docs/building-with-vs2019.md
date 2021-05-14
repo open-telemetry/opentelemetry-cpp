@@ -1,4 +1,4 @@
-# Building OpenTelemetry C++ SDK with Visual Studio 2019, CMake and Ninja.
+# Building OpenTelemetry C++ SDK with Visual Studio 2019, CMake and Ninja
 
 ## Preface
 
@@ -6,6 +6,7 @@ These instructions are focused on developers and integrators, providing a hassle
 and FAST option of building OpenTelemetry C++ SDK with Visual Studio on Windows.
 
 The process is optimized for both scenarios:
+
 - SDK developer experience on developer machine.
 - final product CI/CD pipeline.
 
@@ -13,6 +14,7 @@ The process is optimized for both scenarios:
 
 Visual Studio 2019 is a Full-featured integrated development environment (IDE) for
 Android, iOS, Windows, web, and cloud. There are three editions:
+
 - FREE [Community Edition](https://visualstudio.microsoft.com/thank-you-downloading-visual-studio/?sku=Community&rel=16)
 - [Professional](https://visualstudio.microsoft.com/thank-you-downloading-visual-studio/?sku=Professional&rel=16)
 - [Enterprise](https://visualstudio.microsoft.com/thank-you-downloading-visual-studio/?sku=Enterprise&rel=16)
@@ -67,12 +69,14 @@ Please install the following software:
 - Install [Git tools for Windows](https://git-scm.com/downloads).
 
 Setup script below uses Chocolatey to install the following components:
+
 - `vswhere` - utility to auto-discover Visual Studio installation.
 - `cmake`
 - `git`
 - `vcpkg` to download, compile and install 3rd party C++ libraries from source.
 
 List of C++ dependencies compiled and installed via `vcpkg`:
+
 - [Google Test](https://github.com/google/googletest)
 - [Google Benchmark](https://github.com/google/benchmark)
 - [Microsoft GSL](https://github.com/microsoft/GSL)
@@ -119,6 +123,7 @@ tools\build.cmd
 
 The build of all SDK components is done using CMake + ninja in less than couple
 minutes. Above script shows you how to build both configurations:
+
 - `nostd`  - OpenTelemetry implementation of standard containers.
 - `stdlib` - Standard Template Library containers.
 
@@ -157,24 +162,26 @@ built in one run: `nostd-debug` and `stdlib-debug`.
 set CMAKE_GEN=Visual Studio 16 2019
 ptime build.cmd
 ...
+Execution time: 543.701 s
 ```
 
-*Execution time: 543.701 s*
-
-# Ninja build timing
+### Ninja build timing
 
 ```console
 REM Unset CMAKE_GEN= - default is ninja with autodetection of ninja.exe tool path
 set CMAKE_GEN=
 ptime build.cmd
 ...
+Execution time: 105.158 s
 ```
 
-*Execution time: 105.158 s*
+## Conclusion
 
-It is recommended to built the SDK with *Ninja* since it allows to build the SDK at
-least x5 times faster than MSBuild for a full clean build. Incremental builds with
-*Ninja* are also considerably faster, taking about 10 seconds total for 2 build
-configurations. Absolute time may differ depending on machine being benchmarked.
-Relative ratio on most machines would demonstrate that building with *Ninja* build
-greatly optimizes your development cycle and is much more energy-friendly.
+It is strongly recommended to built the SDK with *Ninja* since it allows to build
+the SDK at least x5 times faster than MSBuild for a full clean build. Incremental
+builds with *Ninja* are also considerably faster. Each incremental build is taking
+about 10 seconds total for 2 build configurations. Absolute time may differ depending
+on machine being benchmarked. Relative ratio on most machines demonstrate that
+building with *Ninja* build greatly optimizes your development cycle. Not only it
+saves your development time, optimizes your CI/CD cycle, it is also much more
+environmentally friendly.
