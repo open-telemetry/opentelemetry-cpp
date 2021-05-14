@@ -115,7 +115,7 @@ The necessary build tools are installed. This step requires elevation to install
 additional tooling, e.g. CMake to `Program Files`. The necessary dependencies are
 being built using [vcpkg package manager](https://vcpkg.io/en/index.html). This
 one-time step is time-consuming - about up to 5-10 minutes. It has to be done once
-once during the initial installation and configuration of build tools and dependencies.
+during the initial installation and configuration of build tools and dependencies.
 
 ```console
 tools\build.cmd
@@ -145,16 +145,18 @@ Visual Studio extension to run all SDK and Exporter tests in IDE.
 
 Visual Studio provides an excellent debugging and troubleshooting experience,
 with incremental builds using Ninja typically taking just one click to build
-and less than a few seconds for the build to be complete.
+and less than a few seconds for the build to complete.
 
 ## Build time comparison between `MSBuild` and `Ninja`
 
 After the initial set of 3rd party dependencies have been built via
 `tools\setup-buildtools.cmd`, we can benchmark the OpenTelemetry C++ SDK build
 times with [MSBuild](https://docs.microsoft.com/en-us/visualstudio/msbuild/msbuild?view=vs-2019)
-vs with [Ninja](https://ninja-build.org/). [ptime utility](https://community.chocolatey.org/packages/ptime)
-may be used to measure the total execution time for two build configurations
-built in one run: `nostd-debug` and `stdlib-debug`.
+vs with [Ninja](https://ninja-build.org/).
+
+[ptime utility](https://community.chocolatey.org/packages/ptime) may be used
+to measure the total execution time for two build configurations built in one
+run: `nostd-debug` and `stdlib-debug`.
 
 ### MSBuild build timing
 
@@ -177,11 +179,11 @@ Execution time: 105.158 s
 
 ## Conclusion
 
-It is strongly recommended to built the SDK with *Ninja* since it allows to build
-the SDK at least x5 times faster than MSBuild for a full clean build. Incremental
-builds with *Ninja* are also considerably faster. Each incremental build is taking
-about 10 seconds total for 2 build configurations. Absolute time may differ depending
-on machine being benchmarked. Relative ratio on most machines demonstrate that
-building with *Ninja* build greatly optimizes your development cycle. Not only it
-saves your development time, optimizes your CI/CD cycle, it is also much more
+It is strongly recommended to build the SDK with *Ninja* since it is at least x5
+times faster than MSBuild for a full clean build. Incremental builds with *Ninja*
+are also considerably faster. Each incremental build is taking about 10 seconds
+total for 2 build configurations. Absolute time may differ depending on machine
+being benchmarked. Relative ratio on most machines demonstrate that building
+with *Ninja* build greatly optimizes your development cycle. Not only it saves
+your development time, optimizes your CI/CD cycle, it is also much more
 environmentally friendly.
