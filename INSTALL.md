@@ -64,8 +64,8 @@ build systems for opentelemetry-cpp.
 
    - `-DCMAKE_POSITION_INDEPENDENT_CODE=ON` : Please note that with default
      configuration, the code is compiled without `-fpic` option, so it is not
-     suitable for inclusion in shared library. To enable the code for inclusion
-     in shared libraries, this variable is used.
+     suitable for inclusion in shared libraries. To enable the code for
+     inclusion in shared libraries, this variable is used.
 
    - `-DWITH_OTLP=ON` : To enable building Otlp exporter.
    - `-DWITH_PROMETHEUS=ON` : To enable building prometheus exporter.
