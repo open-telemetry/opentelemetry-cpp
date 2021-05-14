@@ -183,7 +183,7 @@ It is strongly recommended to build the SDK with *Ninja* since it is at least x5
 times faster than MSBuild for a full clean build. Incremental builds with *Ninja*
 are also considerably faster. Each incremental build is taking about 10 seconds
 total for 2 build configurations. Absolute time may differ depending on machine
-being benchmarked. Relative ratio on most machines demonstrate that building
-with *Ninja* build greatly optimizes your development cycle. Not only it saves
-your development time, optimizes your CI/CD cycle, it is also much more
+being benchmarked. Relative ratio on most machines demonstrates that building
+with *Ninja* build system greatly optimizes your development cycle. Not only it
+saves your development time, optimizes your CI/CD cycle, but it is also much more
 environmentally friendly.
