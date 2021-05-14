@@ -16,8 +16,8 @@ Visual Studio 2019 is a Full-featured integrated development environment (IDE) f
 Android, iOS, Windows, web, and cloud. There are three editions:
 
 - FREE [Community Edition](https://visualstudio.microsoft.com/thank-you-downloading-visual-studio/?sku=Community&rel=16)
-- [Professional](https://visualstudio.microsoft.com/thank-you-downloading-visual-studio/?sku=Professional&rel=16)
-- [Enterprise](https://visualstudio.microsoft.com/thank-you-downloading-visual-studio/?sku=Enterprise&rel=16)
+- [Professional Edition](https://visualstudio.microsoft.com/thank-you-downloading-visual-studio/?sku=Professional&rel=16)
+- [Enterprise Edition](https://visualstudio.microsoft.com/thank-you-downloading-visual-studio/?sku=Enterprise&rel=16)
 
 There is also no-IDE 'headless' set of command line tools available as
 `Visual Studio 2019 Build Tools` package. You may install it on Windows
