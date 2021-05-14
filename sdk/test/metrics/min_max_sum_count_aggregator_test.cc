@@ -1,7 +1,8 @@
-#include <gtest/gtest.h>
-#include <thread>
+#ifdef ENABLE_METRICS_PREVIEW
+#  include <gtest/gtest.h>
+#  include <thread>
 
-#include "opentelemetry/sdk/metrics/aggregator/min_max_sum_count_aggregator.h"
+#  include "opentelemetry/sdk/metrics/aggregator/min_max_sum_count_aggregator.h"
 
 using namespace opentelemetry::sdk::metrics;
 
@@ -201,3 +202,4 @@ TEST(MinMaxSumCountAggregator, Concurrency)
   ASSERT_EQ(value_set[2], 2 * 50005000);
   ASSERT_EQ(value_set[3], 2 * 10000);
 }
+#endif

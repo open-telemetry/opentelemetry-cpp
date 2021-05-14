@@ -49,8 +49,6 @@ endif()
 
 if(WITH_STL)
   # Require at least C++17. C++20 is needed to avoid gsl::span
-  add_definitions(-DHAVE_CPP_STDLIB -DHAVE_GSL)
-
   if(CMAKE_MINOR_VERSION VERSION_GREATER "3.18")
     # Ask for 20, may get anything below
     set(CMAKE_CXX_STANDARD 20)
@@ -108,6 +106,12 @@ endif(WIN32)
 
 option(WITH_EXAMPLES "Whether to build examples" ON)
 
+option(WITH_METRICS_PREVIEW "Whether to build metrics preview" OFF)
+
+if(WITH_METRICS_PREVIEW)
+  add_definitions(-DENABLE_METRICS_PREVIEW)
+endif()
+
 find_package(Threads)
 
 function(install_windows_deps)
@@ -144,7 +148,7 @@ if(WITH_OTLP)
   set(protobuf_MODULE_COMPATIBLE ON)
   find_package(Protobuf)
   find_package(gRPC)
-  if((NOT protobuf_FOUND) OR (NOT gRPC_FOUND))
+  if((NOT Protobuf_FOUND AND NOT PROTOBUF_FOUND) OR (NOT gRPC_FOUND))
     if(WIN32 AND (NOT DEFINED CMAKE_TOOLCHAIN_FILE))
       install_windows_deps()
     endif()
@@ -156,7 +160,7 @@ if(WITH_OTLP)
       include(${CMAKE_TOOLCHAIN_FILE})
     endif()
 
-    if(NOT protobuf_FOUND)
+    if(NOT Protobuf_FOUND AND NOT PROTOBUF_FOUND)
       find_package(Protobuf REQUIRED)
     endif()
     if(NOT gRPC_FOUND)
@@ -171,7 +175,9 @@ if(WITH_OTLP)
       endif()
     endif()
     # Latest Protobuf uses mixed case instead of uppercase
-    set(PROTOBUF_PROTOC_EXECUTABLE ${Protobuf_PROTOC_EXECUTABLE})
+    if(Protobuf_PROTOC_EXECUTABLE)
+      set(PROTOBUF_PROTOC_EXECUTABLE ${Protobuf_PROTOC_EXECUTABLE})
+    endif()
   endif()
   message("PROTOBUF_PROTOC_EXECUTABLE=${PROTOBUF_PROTOC_EXECUTABLE}")
 

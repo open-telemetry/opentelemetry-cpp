@@ -13,7 +13,8 @@
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace context
 {
-using ContextValue = nostd::variant<bool,
+using ContextValue = nostd::variant<nostd::monostate,
+                                    bool,
                                     int64_t,
                                     uint64_t,
                                     double,
