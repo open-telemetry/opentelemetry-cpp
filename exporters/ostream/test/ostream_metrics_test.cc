@@ -1,14 +1,16 @@
-#include "opentelemetry/exporters/ostream/metrics_exporter.h"
-#include "opentelemetry/sdk/metrics/aggregator/counter_aggregator.h"
-#include "opentelemetry/sdk/metrics/aggregator/exact_aggregator.h"
-#include "opentelemetry/sdk/metrics/aggregator/gauge_aggregator.h"
-#include "opentelemetry/sdk/metrics/aggregator/min_max_sum_count_aggregator.h"
-#include "opentelemetry/sdk/metrics/aggregator/sketch_aggregator.h"
-#include "opentelemetry/sdk/metrics/exporter.h"
-#include "opentelemetry/sdk/metrics/record.h"
-
 #include <gtest/gtest.h>
-#include <iostream>
+#ifdef ENABLE_METRICS_PREVIEW
+
+#  include "opentelemetry/exporters/ostream/metrics_exporter.h"
+#  include "opentelemetry/sdk/metrics/aggregator/counter_aggregator.h"
+#  include "opentelemetry/sdk/metrics/aggregator/exact_aggregator.h"
+#  include "opentelemetry/sdk/metrics/aggregator/gauge_aggregator.h"
+#  include "opentelemetry/sdk/metrics/aggregator/min_max_sum_count_aggregator.h"
+#  include "opentelemetry/sdk/metrics/aggregator/sketch_aggregator.h"
+#  include "opentelemetry/sdk/metrics/exporter.h"
+#  include "opentelemetry/sdk/metrics/record.h"
+
+#  include <iostream>
 
 namespace sdkmetrics  = opentelemetry::sdk::metrics;
 namespace metrics_api = opentelemetry::metrics;
@@ -288,3 +290,9 @@ TEST(OStreamMetricsExporter, PrintSketch)
 
   ASSERT_EQ(stdoutOutput.str(), expectedOutput);
 }
+#else
+TEST(OStreamMetricsExporter, DummyTest)
+{
+  // empty
+}
+#endif
