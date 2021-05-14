@@ -111,7 +111,7 @@ if not exist "%OUTDIR%" mkdir "%OUTDIR%"
 cd "%OUTDIR%"
 
 if "!VS_TOOLS_VERSION!" == "vs2019" (
-  REM Prefer ninja if avilable
+  REM Prefer ninja if available
   if "!CMAKE_GEN!" == "Ninja" (
     call :build_config_ninja
     exit /b
