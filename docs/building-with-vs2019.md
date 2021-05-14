@@ -133,7 +133,7 @@ instructions that detail how to [run build build tools in a docker container](ht
 ## Building in Visual Studio 2019 IDE
 
 - Run as Administrator: `tools\setup-buildtools.cmd` to install the necessary
-build tooling. This builds installs all build tools and builds all 3rd party
+build tooling. This script installs all build tools and builds all 3rd party
 dependencies from source using [vcpkg package manager](https://vcpkg.io/en/index.html).
 - Launch Visual Studio 2019 IDE.
 - Use `Open a local folder` option to open the folder where you cloned the source code.
