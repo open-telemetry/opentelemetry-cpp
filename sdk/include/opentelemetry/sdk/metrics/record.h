@@ -1,9 +1,10 @@
 #pragma once
+#ifdef ENABLE_METRICS_PREVIEW
 
-#include <memory>
-#include "opentelemetry/metrics/instrument.h"
-#include "opentelemetry/nostd/variant.h"
-#include "opentelemetry/sdk/metrics/aggregator/aggregator.h"
+#  include <memory>
+#  include "opentelemetry/metrics/instrument.h"
+#  include "opentelemetry/nostd/variant.h"
+#  include "opentelemetry/sdk/metrics/aggregator/aggregator.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 
@@ -45,3 +46,4 @@ private:
 }  // namespace metrics
 }  // namespace sdk
 OPENTELEMETRY_END_NAMESPACE
+#endif

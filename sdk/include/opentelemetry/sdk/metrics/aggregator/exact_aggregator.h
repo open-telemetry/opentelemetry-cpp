@@ -1,13 +1,14 @@
 #pragma once
+#ifdef ENABLE_METRICS_PREVIEW
 
-#include "opentelemetry/metrics/instrument.h"
-#include "opentelemetry/sdk/metrics/aggregator/aggregator.h"
-#include "opentelemetry/version.h"
+#  include "opentelemetry/metrics/instrument.h"
+#  include "opentelemetry/sdk/metrics/aggregator/aggregator.h"
+#  include "opentelemetry/version.h"
 
-#include <cmath>
-#include <memory>
-#include <mutex>
-#include <vector>
+#  include <cmath>
+#  include <memory>
+#  include <mutex>
+#  include <vector>
 
 namespace metrics_api = opentelemetry::metrics;
 
@@ -120,20 +121,20 @@ public:
     if (!quant_estimation_)
     {
 // Log error
-#if __EXCEPTIONS
+#  if __EXCEPTIONS
       throw std::domain_error("Exact aggregator is not in quantile estimation mode!");
-#else
+#  else
       std::terminate();
-#endif
+#  endif
     }
     if (this->checkpoint_.size() == 0 || q < 0 || q > 1)
     {
 // Log error
-#if __EXCEPTIONS
+#  if __EXCEPTIONS
       throw std::invalid_argument("Arg 'q' must be between 0 and 1, inclusive");
-#else
+#  else
       std::terminate();
-#endif
+#  endif
     }
     else if (q == 0 || this->checkpoint_.size() == 1)
     {
@@ -164,3 +165,4 @@ private:
 }  // namespace metrics
 }  // namespace sdk
 OPENTELEMETRY_END_NAMESPACE
+#endif

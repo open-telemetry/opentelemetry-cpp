@@ -1,10 +1,11 @@
 #pragma once
+#ifdef ENABLE_METRICS_PREVIEW
 
-#include <mutex>
-#include <vector>
-#include "opentelemetry/common/timestamp.h"
-#include "opentelemetry/metrics/instrument.h"
-#include "opentelemetry/version.h"
+#  include <mutex>
+#  include <vector>
+#  include "opentelemetry/common/timestamp.h"
+#  include "opentelemetry/metrics/instrument.h"
+#  include "opentelemetry/version.h"
 
 namespace metrics_api = opentelemetry::metrics;
 
@@ -151,3 +152,4 @@ protected:
 }  // namespace metrics
 }  // namespace sdk
 OPENTELEMETRY_END_NAMESPACE
+#endif

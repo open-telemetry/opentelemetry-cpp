@@ -92,6 +92,12 @@ endif(WIN32)
 
 option(WITH_EXAMPLES "Whether to build examples" ON)
 
+option(WITH_METRICS_PREVIEW "Whether to build metrics preview" OFF)
+
+if(WITH_METRICS_PREVIEW)
+  add_definitions(-DENABLE_METRICS_PREVIEW)
+endif()
+
 find_package(Threads)
 
 function(install_windows_deps)
