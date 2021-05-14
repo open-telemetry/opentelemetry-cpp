@@ -21,10 +21,10 @@ namespace sdk
 namespace metrics
 {
 
-#if defined(_MSC_VER)
-#  pragma warning(push)
-#  pragma warning(disable : 4250)  // inheriting methods via dominance
-#endif
+#  if defined(_MSC_VER)
+#    pragma warning(push)
+#    pragma warning(disable : 4250)  // inheriting methods via dominance
+#  endif
 
 class Instrument : virtual public metrics_api::Instrument
 {
@@ -300,9 +300,9 @@ inline std::string KvToString(const opentelemetry::common::KeyValueIterable &kv)
   return ss.str();
 }
 
-#if defined(_MSC_VER)
-#  pragma warning(pop)
-#endif
+#  if defined(_MSC_VER)
+#    pragma warning(pop)
+#  endif
 
 }  // namespace metrics
 }  // namespace sdk
