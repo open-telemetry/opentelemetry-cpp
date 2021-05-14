@@ -1,12 +1,13 @@
-#pragma once
+#ifdef ENABLE_METRICS_PREVIEW
+#  pragma once
 
-#include <iostream>
-#include <string>
-#include "opentelemetry/sdk/metrics/aggregator/exact_aggregator.h"
-#include "opentelemetry/sdk/metrics/aggregator/gauge_aggregator.h"
-#include "opentelemetry/sdk/metrics/aggregator/histogram_aggregator.h"
-#include "opentelemetry/sdk/metrics/exporter.h"
-#include "opentelemetry/sdk/metrics/record.h"
+#  include <iostream>
+#  include <string>
+#  include "opentelemetry/sdk/metrics/aggregator/exact_aggregator.h"
+#  include "opentelemetry/sdk/metrics/aggregator/gauge_aggregator.h"
+#  include "opentelemetry/sdk/metrics/aggregator/histogram_aggregator.h"
+#  include "opentelemetry/sdk/metrics/exporter.h"
+#  include "opentelemetry/sdk/metrics/record.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace sdkmetrics = opentelemetry::sdk::metrics;
@@ -161,3 +162,4 @@ private:
 }  // namespace metrics
 }  // namespace exporter
 OPENTELEMETRY_END_NAMESPACE
+#endif

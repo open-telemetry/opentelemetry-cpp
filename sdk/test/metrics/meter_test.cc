@@ -1,6 +1,8 @@
-#include "opentelemetry/sdk/metrics/meter.h"
-#include <gtest/gtest.h>
-#include <future>
+#ifdef ENABLE_METRICS_PREVIEW
+#  include <gtest/gtest.h>
+#  include <future>
+
+#  include "opentelemetry/sdk/metrics/meter.h"
 
 using namespace opentelemetry::sdk::metrics;
 namespace metrics_api = opentelemetry::metrics;
@@ -264,7 +266,7 @@ TEST(Meter, DisableCollectAsync)
 
 TEST(MeterStringUtil, IsValid)
 {
-#if __EXCEPTIONS
+#  if __EXCEPTIONS
   Meter m("Test");
   ASSERT_ANY_THROW(m.NewShortCounter("", "Empty name is invalid", " ", true));
   ASSERT_ANY_THROW(m.NewShortCounter("1a", "Can't begin with a number", " ", true));
@@ -272,18 +274,19 @@ TEST(MeterStringUtil, IsValid)
   ASSERT_ANY_THROW(m.NewShortCounter(" a", "Can't begin with space", " ", true));
   ASSERT_ANY_THROW(m.NewShortCounter(
       "te^ s=%t", "Only alphanumeric ., -, and _ characters are allowed", " ", true));
-#endif
+#  endif
 }
 
 TEST(MeterStringUtil, AlreadyExists)
 {
-#if __EXCEPTIONS
+#  if __EXCEPTIONS
   Meter m("Test");
 
   m.NewShortCounter("a", "First instance of instrument named 'a'", "", true);
   ASSERT_ANY_THROW(m.NewShortCounter("a", "Second (illegal) instrument named 'a'", "", true));
   ASSERT_ANY_THROW(m.NewShortSumObserver("a", "Still illegal even though it is not a short counter",
                                          "", true, &ShortCallback));
-#endif
+#  endif
 }
 OPENTELEMETRY_END_NAMESPACE
+#endif

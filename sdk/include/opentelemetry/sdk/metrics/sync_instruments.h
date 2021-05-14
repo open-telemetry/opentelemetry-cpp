@@ -1,14 +1,15 @@
 #pragma once
+#ifdef ENABLE_METRICS_PREVIEW
 
-#include <map>
-#include <memory>
-#include <sstream>
-#include <stdexcept>
-#include <vector>
-#include "opentelemetry/metrics/sync_instruments.h"
-#include "opentelemetry/sdk/metrics/aggregator/counter_aggregator.h"
-#include "opentelemetry/sdk/metrics/aggregator/min_max_sum_count_aggregator.h"
-#include "opentelemetry/sdk/metrics/instrument.h"
+#  include <map>
+#  include <memory>
+#  include <sstream>
+#  include <stdexcept>
+#  include <vector>
+#  include "opentelemetry/metrics/sync_instruments.h"
+#  include "opentelemetry/sdk/metrics/aggregator/counter_aggregator.h"
+#  include "opentelemetry/sdk/metrics/aggregator/min_max_sum_count_aggregator.h"
+#  include "opentelemetry/sdk/metrics/instrument.h"
 
 namespace metrics_api = opentelemetry::metrics;
 
@@ -17,6 +18,11 @@ namespace sdk
 {
 namespace metrics
 {
+
+#  if defined(_MSC_VER)
+#    pragma warning(push)
+#    pragma warning(disable : 4250)  // inheriting methods via dominance
+#  endif
 
 template <class T>
 class BoundCounter final : public BoundSynchronousInstrument<T>, public metrics_api::BoundCounter<T>
@@ -50,11 +56,11 @@ public:
   {
     if (value < 0)
     {
-#if __EXCEPTIONS
+#  if __EXCEPTIONS
       throw std::invalid_argument("Counter instrument updates must be non-negative.");
-#else
+#  else
       std::terminate();
-#endif
+#  endif
     }
     else
     {
@@ -123,11 +129,11 @@ public:
   {
     if (value < 0)
     {
-#if __EXCEPTIONS
+#  if __EXCEPTIONS
       throw std::invalid_argument("Counter instrument updates must be non-negative.");
-#else
+#  else
       std::terminate();
-#endif
+#  endif
     }
     else
     {
@@ -431,6 +437,11 @@ public:
       boundInstruments_;
 };
 
+#  if defined(_MSC_VER)
+#    pragma warning(pop)
+#  endif
+
 }  // namespace metrics
 }  // namespace sdk
 OPENTELEMETRY_END_NAMESPACE
+#endif
