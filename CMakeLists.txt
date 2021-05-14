@@ -67,15 +67,15 @@ if(WITH_STL)
   if(CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")
     if(CMAKE_BUILD_TYPE MATCHES Debug)
       # Turn off optimizations for DEBUG
-      set(CMAKE_CXX_FLAGS_SPEED "/Od")
+      set(MSVC_CXX_OPT_FLAG "/Od")
     else()
       string(REGEX MATCH "\/O" result ${CMAKE_CXX_FLAGS})
       if(NOT ${result} MATCHES "\/O")
-        set(CMAKE_CXX_FLAGS_SPEED "/O2")
+        set(MSVC_CXX_OPT_FLAG "/O2")
       endif()
     endif()
     set(CMAKE_CXX_FLAGS
-        "${CMAKE_CXX_FLAGS} /Zc:__cplusplus ${CMAKE_CXX_FLAGS_SPEED}")
+        "${CMAKE_CXX_FLAGS} /Zc:__cplusplus ${MSVC_CXX_OPT_FLAG}")
   endif()
 endif()
 
