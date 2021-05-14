@@ -20,6 +20,11 @@ namespace sdk
 namespace metrics
 {
 
+#if defined(_MSC_VER)
+#  pragma warning(push)
+#  pragma warning(disable : 4250)  // inheriting methods via dominance
+#endif
+
 template <class T>
 class ValueObserver : public AsynchronousInstrument<T>, virtual public metrics_api::ValueObserver<T>
 {
@@ -267,6 +272,10 @@ public:
   // Public mapping from labels (stored as strings) to their respective aggregators
   std::unordered_map<std::string, std::shared_ptr<Aggregator<T>>> boundAggregators_;
 };
+
+#if defined(_MSC_VER)
+#  pragma warning(pop)
+#endif
 
 }  // namespace metrics
 }  // namespace sdk
