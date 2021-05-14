@@ -12,6 +12,10 @@
 #include "opentelemetry/sdk/metrics/record.h"
 #include "opentelemetry/version.h"
 
+#if defined(_MSC_VER)
+#pragma warning(disable:4250)
+#endif
+
 namespace metrics_api = opentelemetry::metrics;
 
 OPENTELEMETRY_BEGIN_NAMESPACE
