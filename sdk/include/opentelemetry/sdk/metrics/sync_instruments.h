@@ -18,6 +18,11 @@ namespace sdk
 namespace metrics
 {
 
+#if defined(_MSC_VER)
+#  pragma warning(push)
+#  pragma warning(disable : 4250)  // inheriting methods via dominance
+#endif
+
 template <class T>
 class BoundCounter final : public BoundSynchronousInstrument<T>, public metrics_api::BoundCounter<T>
 {
@@ -430,6 +435,10 @@ public:
   std::unordered_map<std::string, nostd::shared_ptr<metrics_api::BoundValueRecorder<T>>>
       boundInstruments_;
 };
+
+#if defined(_MSC_VER)
+#  pragma warning(pop)
+#endif
 
 }  // namespace metrics
 }  // namespace sdk
