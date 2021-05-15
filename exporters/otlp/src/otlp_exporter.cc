@@ -28,8 +28,18 @@ void PopulateRequest(const nostd::span<std::unique_ptr<sdk::trace::Recordable>> 
   for (auto &recordable : spans)
   {
     auto rec = std::unique_ptr<Recordable>(static_cast<Recordable *>(recordable.release()));
-    // TODO - Handle Resource
     *instrumentation_lib->add_spans() = std::move(rec->span());
+
+    if (!has_resource)
+    {
+      std::unique_ptr<proto::resource::v1::Resource> proto_resource{
+          new proto::resource::v1::Resource};
+
+      rec->PopulateProtoResource(proto_resource.get());
+
+      resource_span->set_allocated_resource(proto_resource.release());
+      has_resource = true;
+    }
   }
 }
 

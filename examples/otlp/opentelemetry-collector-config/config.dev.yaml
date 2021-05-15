@@ -1,0 +1,15 @@
+exporters:
+  logging:
+    loglevel: DEBUG
+receivers:
+  otlp:
+    protocols:
+      grpc:
+        endpoint: 0.0.0.0:4317
+service:
+  pipelines:
+    traces:
+      receivers:
+      - otlp
+      exporters:
+      - logging
