@@ -29,13 +29,16 @@ Open a terminal window at the root directory of this repo and launch the
 OpenTelemetry Collector with an OTLP receiver by running:
 
 - On Unix based systems use:
+
 ```console
-docker run --rm -it -p 4317:4317 -v $(pwd)/examples/otlp:/cfg otel/opentelemetry-collector:0.19.0 --config=--config=/cfg/opentelemetry-collector-config/config.dev.yaml
+docker run --rm -it -p 4317:4317 -v $(pwd)/examples/otlp:/cfg otel/opentelemetry-collector:0.19.0 --config=/cfg/opentelemetry-collector-config/config.dev.yaml
 ```
 
-- On Windows use: docker run --rm -it -p 4317:4317 -v "%cd%/examples/otlp":/cfg
-  otel/opentelemetry-collector:0.19.0
-  --config=/cfg/opentelemetry-collector-config/config.dev.yaml
+- On Windows use:
+
+```console
+docker run --rm -it -p 4317:4317 -v "%cd%/examples/otlp":/cfg otel/opentelemetry-collector:0.19.0 --config=/cfg/opentelemetry-collector-config/config.dev.yaml
+```
 
 Note that the OTLP exporter connects to the Collector at `localhost:4317` by
 default. This can be changed with first argument from command-line, for example:
