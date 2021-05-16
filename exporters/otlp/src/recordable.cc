@@ -216,15 +216,18 @@ void PopulateAttribute(opentelemetry::proto::common::v1::KeyValue *attribute,
   }
 }
 
-void Recordable::PopulateProtoResource(proto::resource::v1::Resource *proto) const noexcept
+proto::resource::v1::Resource Recordable::ProtoResource() const noexcept
 {
+  proto::resource::v1::Resource proto;
   if (resource_)
   {
     for (const auto &kv : resource_->GetAttributes())
     {
-      PopulateAttribute(proto->add_attributes(), kv.first, kv.second);
+      PopulateAttribute(proto.add_attributes(), kv.first, kv.second);
     }
   }
+
+  return proto;
 }
 
 void Recordable::SetResource(const opentelemetry::sdk::resource::Resource &resource) noexcept

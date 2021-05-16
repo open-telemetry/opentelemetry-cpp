@@ -20,7 +20,7 @@ public:
   const proto::trace::v1::Span &span() const noexcept { return span_; }
 
   /** Dynamically converts the resource of this span into a proto. */
-  void PopulateProtoResource(proto::resource::v1::Resource *resource) const noexcept;
+  proto::resource::v1::Resource ProtoResource() const noexcept;
 
   void SetIdentity(const opentelemetry::trace::SpanContext &span_context,
                    opentelemetry::trace::SpanId parent_span_id) noexcept override;

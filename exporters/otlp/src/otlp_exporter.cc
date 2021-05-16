@@ -32,13 +32,8 @@ void PopulateRequest(const nostd::span<std::unique_ptr<sdk::trace::Recordable>> 
 
     if (!has_resource)
     {
-      std::unique_ptr<proto::resource::v1::Resource> proto_resource{
-          new proto::resource::v1::Resource};
-
-      rec->PopulateProtoResource(proto_resource.get());
-
-      resource_span->set_allocated_resource(proto_resource.release());
-      has_resource = true;
+      *resource_span->mutable_resource() = rec->ProtoResource();
+      has_resource                       = true;
     }
   }
 }
