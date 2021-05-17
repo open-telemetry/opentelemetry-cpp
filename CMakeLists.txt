@@ -7,6 +7,19 @@ cmake_policy(SET CMP0079 NEW)
 
 project(opentelemetry-cpp)
 
+# Mark variables as used so cmake doesn't complain about them
+mark_as_advanced(CMAKE_TOOLCHAIN_FILE)
+
+# Autodetect vcpkg toolchain
+if(DEFINED ENV{VCPKG_ROOT} AND NOT DEFINED CMAKE_TOOLCHAIN_FILE)
+  set(CMAKE_TOOLCHAIN_FILE "$ENV{VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake"
+      CACHE STRING "")
+endif()
+
+if(VCPKG_CHAINLOAD_TOOLCHAIN_FILE)
+    include("${VCPKG_CHAINLOAD_TOOLCHAIN_FILE}")
+endif()
+
 set(OPENTELEMETRY_SOURCE_DIR ${CMAKE_CURRENT_LIST_DIR})
 
 file(READ "${CMAKE_CURRENT_LIST_DIR}/api/include/opentelemetry/version.h"
@@ -73,9 +86,17 @@ if(WITH_STL)
 
   # Optimize for speed to reduce the hops
   if(CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")
-    set(CMAKE_CXX_FLAGS_SPEED "/O2")
+    if(CMAKE_BUILD_TYPE MATCHES Debug)
+      # Turn off optimizations for DEBUG
+      set(MSVC_CXX_OPT_FLAG "/Od")
+    else()
+      string(REGEX MATCH "\/O" result ${CMAKE_CXX_FLAGS})
+      if(NOT ${result} MATCHES "\/O")
+        set(MSVC_CXX_OPT_FLAG "/O2")
+      endif()
+    endif()
     set(CMAKE_CXX_FLAGS
-        "${CMAKE_CXX_FLAGS} /Zc:__cplusplus ${CMAKE_CXX_FLAGS_SPEED}")
+        "${CMAKE_CXX_FLAGS} /Zc:__cplusplus ${MSVC_CXX_OPT_FLAG}")
   endif()
 endif()
 
@@ -92,6 +113,12 @@ option(WITH_JAEGER "Whether to include the Jaeger exporter" OFF)
 
 option(BUILD_TESTING "Whether to enable tests" ON)
 if(WIN32)
+  if(BUILD_TESTING)
+    if(MSVC)
+      # GTest bug: https://github.com/google/googletest/issues/860
+      add_compile_options(/wd4275)
+    endif()
+  endif()
   option(WITH_ETW "Whether to include the ETW Exporter in the SDK" ON)
   if(WITH_ETW)
     add_definitions(-DHAVE_MSGPACK)
@@ -99,6 +126,12 @@ if(WIN32)
 endif(WIN32)
 
 option(WITH_EXAMPLES "Whether to build examples" ON)
+
+option(WITH_METRICS_PREVIEW "Whether to build metrics preview" OFF)
+
+if(WITH_METRICS_PREVIEW)
+  add_definitions(-DENABLE_METRICS_PREVIEW)
+endif()
 
 find_package(Threads)
 
@@ -136,7 +169,7 @@ if(WITH_OTLP)
   set(protobuf_MODULE_COMPATIBLE ON)
   find_package(Protobuf)
   find_package(gRPC)
-  if((NOT protobuf_FOUND) OR (NOT gRPC_FOUND))
+  if((NOT Protobuf_FOUND AND NOT PROTOBUF_FOUND) OR (NOT gRPC_FOUND))
     if(WIN32 AND (NOT DEFINED CMAKE_TOOLCHAIN_FILE))
       install_windows_deps()
     endif()
@@ -148,7 +181,7 @@ if(WITH_OTLP)
       include(${CMAKE_TOOLCHAIN_FILE})
     endif()
 
-    if(NOT protobuf_FOUND)
+    if(NOT Protobuf_FOUND AND NOT PROTOBUF_FOUND)
       find_package(Protobuf REQUIRED)
     endif()
     if(NOT gRPC_FOUND)
@@ -163,7 +196,9 @@ if(WITH_OTLP)
       endif()
     endif()
     # Latest Protobuf uses mixed case instead of uppercase
-    set(PROTOBUF_PROTOC_EXECUTABLE ${Protobuf_PROTOC_EXECUTABLE})
+    if(Protobuf_PROTOC_EXECUTABLE)
+      set(PROTOBUF_PROTOC_EXECUTABLE ${Protobuf_PROTOC_EXECUTABLE})
+    endif()
   endif()
   message("PROTOBUF_PROTOC_EXECUTABLE=${PROTOBUF_PROTOC_EXECUTABLE}")
 
