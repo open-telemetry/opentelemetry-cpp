@@ -1,6 +1,7 @@
 #pragma once
+#ifdef ENABLE_METRICS_PREVIEW
 
-#include "instrument.h"
+#  include "instrument.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace metrics
@@ -174,3 +175,4 @@ public:
 
 }  // namespace metrics
 OPENTELEMETRY_END_NAMESPACE
+#endif

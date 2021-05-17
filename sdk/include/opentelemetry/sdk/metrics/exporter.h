@@ -13,12 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 #pragma once
+#ifdef ENABLE_METRICS_PREVIEW
 
-#include <memory>
-#include "opentelemetry/sdk/common/exporter_utils.h"
-#include "opentelemetry/sdk/metrics/record.h"
+#  include <memory>
+#  include "opentelemetry/sdk/common/exporter_utils.h"
+#  include "opentelemetry/sdk/metrics/record.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace sdk
@@ -44,3 +44,4 @@ public:
 }  // namespace metrics
 }  // namespace sdk
 OPENTELEMETRY_END_NAMESPACE
+#endif

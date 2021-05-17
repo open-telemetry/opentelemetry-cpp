@@ -1,11 +1,11 @@
 #pragma once
+#ifdef ENABLE_METRICS_PREVIEW
+#  include <mutex>
 
-#include <mutex>
-
-#include "opentelemetry/common/spin_lock_mutex.h"
-#include "opentelemetry/metrics/meter_provider.h"
-#include "opentelemetry/metrics/noop.h"
-#include "opentelemetry/nostd/shared_ptr.h"
+#  include "opentelemetry/common/spin_lock_mutex.h"
+#  include "opentelemetry/metrics/meter_provider.h"
+#  include "opentelemetry/metrics/noop.h"
+#  include "opentelemetry/nostd/shared_ptr.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace metrics
@@ -53,3 +53,4 @@ private:
 
 }  // namespace metrics
 OPENTELEMETRY_END_NAMESPACE
+#endif

@@ -39,7 +39,9 @@ namespace nostd
 {
 using absl::get;
 using absl::holds_alternative;
+using absl::monostate;
 using absl::variant;
+using absl::variant_size;
 using absl::visit;
 
 // nostd::bad_variant_access

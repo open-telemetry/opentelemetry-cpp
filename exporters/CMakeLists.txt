@@ -19,7 +19,7 @@ endif()
 add_subdirectory(ostream)
 add_subdirectory(memory)
 
-if(WITH_PROMETHEUS)
+if(WITH_PROMETHEUS AND WITH_METRICS_PREVIEW)
   add_subdirectory(prometheus)
 endif()
 

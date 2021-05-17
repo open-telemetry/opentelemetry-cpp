@@ -14,22 +14,23 @@
  * limitations under the License.
  */
 
-#include <gtest/gtest.h>
-#include <future>
-#include <map>
-#include <thread>
+#ifdef ENABLE_METRICS_PREVIEW
+#  include <gtest/gtest.h>
+#  include <future>
+#  include <map>
+#  include <thread>
 
-#include "opentelemetry/exporters/prometheus/prometheus_collector.h"
-#include "opentelemetry/metrics/instrument.h"
-#include "opentelemetry/sdk/metrics/aggregator/aggregator.h"
-#include "opentelemetry/sdk/metrics/aggregator/counter_aggregator.h"
-#include "opentelemetry/sdk/metrics/aggregator/exact_aggregator.h"
-#include "opentelemetry/sdk/metrics/aggregator/gauge_aggregator.h"
-#include "opentelemetry/sdk/metrics/aggregator/histogram_aggregator.h"
-#include "opentelemetry/sdk/metrics/aggregator/min_max_sum_count_aggregator.h"
-#include "opentelemetry/sdk/metrics/aggregator/sketch_aggregator.h"
-#include "opentelemetry/sdk/metrics/record.h"
-#include "opentelemetry/version.h"
+#  include "opentelemetry/exporters/prometheus/prometheus_collector.h"
+#  include "opentelemetry/metrics/instrument.h"
+#  include "opentelemetry/sdk/metrics/aggregator/aggregator.h"
+#  include "opentelemetry/sdk/metrics/aggregator/counter_aggregator.h"
+#  include "opentelemetry/sdk/metrics/aggregator/exact_aggregator.h"
+#  include "opentelemetry/sdk/metrics/aggregator/gauge_aggregator.h"
+#  include "opentelemetry/sdk/metrics/aggregator/histogram_aggregator.h"
+#  include "opentelemetry/sdk/metrics/aggregator/min_max_sum_count_aggregator.h"
+#  include "opentelemetry/sdk/metrics/aggregator/sketch_aggregator.h"
+#  include "opentelemetry/sdk/metrics/record.h"
+#  include "opentelemetry/version.h"
 
 using opentelemetry::exporter::prometheus::PrometheusCollector;
 
@@ -765,3 +766,4 @@ TEST(PrometheusCollector, ConcurrentlyAddingAndConcurrentlyCollecting)
 }
 
 OPENTELEMETRY_END_NAMESPACE
+#endif

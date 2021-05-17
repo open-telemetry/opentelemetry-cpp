@@ -14,14 +14,15 @@
  * limitations under the License.
  */
 
-#include <iostream>
-#include <sstream>
-#include <utility>
-#include <vector>
+#ifdef ENABLE_METRICS_PREVIEW
+#  include <iostream>
+#  include <sstream>
+#  include <utility>
+#  include <vector>
 
-#include "opentelemetry/exporters/prometheus/prometheus_exporter_utils.h"
-#include "opentelemetry/sdk/metrics/aggregator/aggregator.h"
-#include "prometheus/metric_type.h"
+#  include "opentelemetry/exporters/prometheus/prometheus_exporter_utils.h"
+#  include "opentelemetry/sdk/metrics/aggregator/aggregator.h"
+#  include "prometheus/metric_type.h"
 
 namespace prometheus_client = ::prometheus;
 
@@ -454,3 +455,4 @@ void PrometheusExporterUtils::SetValue(std::vector<T> values,
 }  // namespace prometheus
 }  // namespace exporter
 OPENTELEMETRY_END_NAMESPACE
+#endif
