@@ -1,8 +1,8 @@
-#include "opentelemetry/sdk/metrics/ungrouped_processor.h"
-#include "opentelemetry/nostd/shared_ptr.h"
-#include "opentelemetry/sdk/metrics/aggregator/counter_aggregator.h"
-
-#include <gtest/gtest.h>
+#ifdef ENABLE_METRICS_PREVIEW
+#  include "opentelemetry/sdk/metrics/ungrouped_processor.h"
+#  include <gtest/gtest.h>
+#  include "opentelemetry/nostd/shared_ptr.h"
+#  include "opentelemetry/sdk/metrics/aggregator/counter_aggregator.h"
 
 namespace sdkmetrics  = opentelemetry::sdk::metrics;
 namespace metrics_api = opentelemetry::metrics;
@@ -620,3 +620,4 @@ TEST(UngroupedMetricsProcessor, UngroupedProcessorKeepsRecordInformationStateful
                 ->get_checkpoint(),
             test_aggregator->get_checkpoint());
 }
+#endif

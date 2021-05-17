@@ -1,9 +1,10 @@
-#include "opentelemetry/sdk/metrics/aggregator/sketch_aggregator.h"
+#ifdef ENABLE_METRICS_PREVIEW
+#  include "opentelemetry/sdk/metrics/aggregator/sketch_aggregator.h"
 
-#include <gtest/gtest.h>
-#include <iostream>
-#include <numeric>
-#include <thread>
+#  include <gtest/gtest.h>
+#  include <iostream>
+#  include <numeric>
+#  include <thread>
 
 namespace metrics_api = opentelemetry::metrics;
 
@@ -226,7 +227,7 @@ TEST(Sketch, Concurrency)
   EXPECT_EQ(alpha.get_boundaries(), beta.get_boundaries());
 }
 
-#if __EXCEPTIONS
+#  if __EXCEPTIONS
 
 TEST(Sketch, Errors)
 {
@@ -242,8 +243,9 @@ TEST(Sketch, Errors)
   EXPECT_ANY_THROW(tol1.get_quantiles(1.000001));
 }
 
-#endif
+#  endif
 
 }  // namespace metrics
 }  // namespace sdk
 OPENTELEMETRY_END_NAMESPACE
+#endif
