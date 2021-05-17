@@ -14,10 +14,10 @@ static const nostd::string_view kBaggageHeader = "baggage";
 
 inline nostd::shared_ptr<baggage::Baggage> GetBaggage(const context::Context &context)
 {
-  context::ContextValue baggage = context.GetValue(kBaggageHeader);
-  if (nostd::holds_alternative<nostd::shared_ptr<baggage::Baggage>>(baggage))
+  context::ContextValue context_value = context.GetValue(kBaggageHeader);
+  if (nostd::holds_alternative<nostd::shared_ptr<baggage::Baggage>>(context_value))
   {
-    return nostd::get<nostd::shared_ptr<baggage::Baggage>>(baggage);
+    return nostd::get<nostd::shared_ptr<baggage::Baggage>>(context_value);
   }
   static nostd::shared_ptr<baggage::Baggage> empty_baggage{new baggage::Baggage()};
   return empty_baggage;

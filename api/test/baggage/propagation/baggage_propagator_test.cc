@@ -41,8 +41,11 @@ TEST(BaggagePropagatorTest, ExtractNoBaggageHeader)
 
 TEST(BaggagePropagatorTest, ExtractAndInjectBaggage)
 {
-  std::string max_baggage_kv = std::string(baggage::Baggage::kMaxKeyValueSize / 2 + 1, 'k') + "=" +
-                               std::string(baggage::Baggage::kMaxKeyValueSize / 2 + 1, 'v');
+  // create header string for baggage larger than allowed size (kMaxKeyValueSize)
+  std::string very_large_baggage_header =
+      std::string(baggage::Baggage::kMaxKeyValueSize / 2 + 1, 'k') + "=" +
+      std::string(baggage::Baggage::kMaxKeyValueSize / 2 + 1, 'v');
+
   std::map<std::string, std::string> baggages = {
       {"key1=val1,key2=val2", "key1=val1,key2=val2"},                // valid header
       {"key1 =   val1,  key2 =val2   ", "key1=val1,key2=val2"},      // valid header with spaces
@@ -52,7 +55,7 @@ TEST(BaggagePropagatorTest, ExtractAndInjectBaggage)
       {"key1=val1,key2=val2,a,val3", "key1=val1,key2=val2"},  // valid header with invalid value
       {"key1=,key2=val2", "key1=,key2=val2"},                 // valid header with empty value
       {"invalid_header", ""},                                 // invalid header
-      {max_baggage_kv, ""}};                                  // max key-value pair length
+      {very_large_baggage_header, ""}};  // baggage header larger than allowed size.
 
   for (auto baggage : baggages)
   {
