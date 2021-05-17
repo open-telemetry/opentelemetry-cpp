@@ -1,6 +1,4 @@
-include(GoogleTest)
-
-foreach(testname baggage_test)
+foreach(testname baggage_propagator_test)
   add_executable(${testname} "${testname}.cc")
   target_link_libraries(
     ${testname} ${GTEST_BOTH_LIBRARIES} ${CORE_RUNTIME_LIBS}
@@ -10,4 +8,3 @@ foreach(testname baggage_test)
     TEST_PREFIX baggage.
     TEST_LIST ${testname})
 endforeach()
-add_subdirectory(propagation)
