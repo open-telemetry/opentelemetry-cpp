@@ -17,7 +17,7 @@
 
 # -- Project information -----------------------------------------------------
 
-project = 'OpenTelemetry C++ API'
+project = 'OpenTelemetry C++ SDK'
 copyright = '2021, OpenTelemetry authors'
 author = 'OpenTelemetry authors'
 
@@ -43,14 +43,14 @@ extensions = [
 ]
 
 breathe_projects = {
-        "OpenTelemetry C++ API": "./doxyoutput/xml"
+        "OpenTelemetry C++ SDK": "./doxyoutput/xml"
 }
 
 breathe_default_project = "OpenTelemetry C++ API"
 
 exhale_args = {
-        "containmentFolder": "otel_api",
-        "rootFileName": "otel_api.rst",
+        "containmentFolder": "otel_sdk",
+        "rootFileName": "otel_sdk.rst",
         "rootFileTitle": "Reference documentation",
         "doxygenStripFromPath": "..",
         "exhaleUseDoxyfile": True,
