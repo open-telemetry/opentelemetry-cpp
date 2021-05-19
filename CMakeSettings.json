@@ -115,6 +115,45 @@
             ]
         },
         {
+            "name": "stdlib-x64-Debug-contrib",
+            "generator": "Ninja",
+            "configurationType": "Debug",
+            "buildRoot": "${projectDir}\\out\\vs2019\\${name}",
+            "installRoot": "${projectDir}\\out\\vs2019\\${name}\\install",
+            "cmakeCommandArgs": "",
+            "buildCommandArgs": "",
+            "ctestCommandArgs": "",
+            "cmakeToolchain": "",
+            "inheritEnvironments": [ "msvc_x64_x64" ],
+            "variables": [
+                {
+                    "name": "BUILD_CONTRIB",
+                    "value": "True",
+                    "type": "BOOL"
+                },
+                {
+                    "name": "WITH_STL",
+                    "value": "True",
+                    "type": "BOOL"
+                },
+                {
+                    "name": "WITH_OTLP",
+                    "value": "True",
+                    "type": "BOOL"
+                },
+                {
+                    "name": "WITH_EXAMPLES",
+                    "value": "true",
+                    "type": "BOOL"
+                },
+                {
+                    "name": "WITH_PROMETHEUS",
+                    "value": "True",
+                    "type": "BOOL"
+                }
+            ]
+        },
+        {
             "name": "stdlib-x64-Release-contrib",
             "generator": "Ninja",
             "configurationType": "Release",
@@ -127,7 +166,7 @@
             "inheritEnvironments": [ "msvc_x64_x64" ],
             "variables": [
                 {
-                    "name": "WITH_CONTRIB",
+                    "name": "BUILD_CONTRIB",
                     "value": "True",
                     "type": "BOOL"
                 },
