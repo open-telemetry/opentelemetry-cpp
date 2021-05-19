@@ -1,9 +1,10 @@
-#include "opentelemetry/exporters/ostream/metrics_exporter.h"
-#include "opentelemetry/metrics/provider.h"
-#include "opentelemetry/sdk/metrics/controller.h"
-#include "opentelemetry/sdk/metrics/meter.h"
-#include "opentelemetry/sdk/metrics/meter_provider.h"
-#include "opentelemetry/sdk/metrics/ungrouped_processor.h"
+#ifdef ENABLE_METRICS_PREVIEW
+#  include "opentelemetry/exporters/ostream/metrics_exporter.h"
+#  include "opentelemetry/metrics/provider.h"
+#  include "opentelemetry/sdk/metrics/controller.h"
+#  include "opentelemetry/sdk/metrics/meter.h"
+#  include "opentelemetry/sdk/metrics/meter_provider.h"
+#  include "opentelemetry/sdk/metrics/ungrouped_processor.h"
 
 namespace sdkmetrics = opentelemetry::sdk::metrics;
 namespace nostd      = opentelemetry::nostd;
@@ -105,3 +106,9 @@ int main()
   }
   ControllerStateful.stop();
 }
+#else
+int main()
+{
+  // empty
+}
+#endif

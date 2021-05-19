@@ -1,7 +1,8 @@
 #pragma once
+#ifdef ENABLE_METRICS_PREVIEW
 
-#include "instrument.h"
-#include "opentelemetry/nostd/shared_ptr.h"
+#  include "instrument.h"
+#  include "opentelemetry/nostd/shared_ptr.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace metrics
@@ -34,3 +35,4 @@ private:
 
 }  // namespace metrics
 OPENTELEMETRY_END_NAMESPACE
+#endif

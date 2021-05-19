@@ -226,6 +226,7 @@ proto::resource::v1::Resource Recordable::ProtoResource() const noexcept
       PopulateAttribute(proto.add_attributes(), kv.first, kv.second);
     }
   }
+
   return proto;
 }
 
