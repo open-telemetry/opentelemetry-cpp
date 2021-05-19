@@ -1,4 +1,4 @@
-name: "Code Scanning - Action"
+name: "CodeQL Code Scan"
 
 on:
   workflow_dispatch:
@@ -17,25 +17,20 @@ on:
 jobs:
   CodeQL-Build:
     runs-on: ubuntu-latest
-    
     steps:
     - name: Checkout repository
       uses: actions/checkout@v2.3.4
       with:
          submodules: 'recursive'
-
     - name: Setup
       run: |
         sudo ./ci/setup_cmake.sh
         sudo ./ci/setup_ci_environment.sh
-        
     - name: Initialize CodeQL
       uses: github/codeql-action/init@v1
       with:
-        languages: cpp 
-    
+       languages: cpp
     - name: Autobuild
       uses: github/codeql-action/autobuild@v1
-
     - name: Perform CodeQL Analysis
       uses: github/codeql-action/analyze@v1
