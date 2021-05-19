@@ -3,6 +3,9 @@ include_directories(${CMAKE_SOURCE_DIR}/ext/include)
 
 add_library(opentelemetry_exporter_elasticsearch_logs src/es_log_exporter.cc)
 
+target_link_libraries(opentelemetry_exporter_elasticsearch_logs
+                      PUBLIC opentelemetry_trace http_client_curl)
+
 if(BUILD_TESTING)
   add_executable(es_log_exporter_test test/es_log_exporter_test.cc)
 

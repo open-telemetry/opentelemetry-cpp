@@ -32,6 +32,7 @@ if [[ "$1" == "cmake.test" ]]; then
         -DWITH_PROMETHEUS=ON \
         -DWITH_ZIPKIN=ON \
         -DWITH_ELASTICSEARCH=ON \
+        -DWITH_METRICS_PREVIEW=ON \
         -DCMAKE_CXX_FLAGS="-Werror" \
         "${SRC_DIR}"
   make
@@ -107,7 +108,7 @@ EOF
   examples/plugin/load/load_plugin_example ${PLUGIN_DIR}/libexample_plugin.so /dev/null
   exit 0
 elif [[ "$1" == "bazel.test" ]]; then
-  bazel $BAZEL_STARTUP_OPTIONS build $BAZEL_OPTIONS //...
+  bazel $BAZEL_STARTUP_OPTIONS build --copt=-DENABLE_METRICS_PREVIEW $BAZEL_OPTIONS //...
   bazel $BAZEL_STARTUP_OPTIONS test $BAZEL_TEST_OPTIONS //...
   exit 0
 elif [[ "$1" == "bazel.legacy.test" ]]; then

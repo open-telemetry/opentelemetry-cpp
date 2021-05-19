@@ -19,7 +19,7 @@ endif()
 add_subdirectory(ostream)
 add_subdirectory(memory)
 
-if(WITH_PROMETHEUS)
+if(WITH_PROMETHEUS AND WITH_METRICS_PREVIEW)
   add_subdirectory(prometheus)
 endif()
 
@@ -33,4 +33,8 @@ endif()
 
 if(WITH_ETW)
   add_subdirectory(etw)
+endif()
+
+if(WITH_JAEGER)
+  add_subdirectory(jaeger)
 endif()

@@ -54,5 +54,6 @@ vcpkg install abseil:x64-windows
 vcpkg install protobuf:x64-windows
 vcpkg install gRPC:x64-windows
 vcpkg install prometheus-cpp:x64-windows
+vcpkg install curl:x64-windows
 popd
 exit /b 0

@@ -47,7 +47,7 @@ public:
     }
     else if (key == opentelemetry::trace::propagation::kTraceState)
     {
-      key_to_compare == "Tracestate";
+      key_to_compare = "Tracestate";
     }
     auto it = headers_.find(key_to_compare);
     if (it != headers_.end())

@@ -150,6 +150,28 @@ TEST(Recordable, AddLink)
   }
 }
 
+TEST(Recordable, SetResource)
+{
+  Recordable rec;
+  const std::string service_name_key = "service.name";
+  std::string service_name           = "test-otlp";
+  auto resource =
+      opentelemetry::sdk::resource::Resource::Create({{service_name_key, service_name}});
+  rec.SetResource(resource);
+
+  auto proto_resource     = rec.ProtoResource();
+  bool found_service_name = false;
+  for (size_t i = 0; i < proto_resource.attributes_size(); i++)
+  {
+    auto attr = proto_resource.attributes(static_cast<int>(i));
+    if (attr.key() == service_name_key && attr.value().string_value() == service_name)
+    {
+      found_service_name = true;
+    }
+  }
+  EXPECT_TRUE(found_service_name);
+}
+
 // Test non-int single types. Int single types are tested using templates (see IntAttributeTest)
 TEST(Recordable, SetSingleAtrribute)
 {
