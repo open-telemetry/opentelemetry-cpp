@@ -46,7 +46,7 @@ breathe_projects = {
         "OpenTelemetry C++ SDK": "./doxyoutput/xml"
 }
 
-breathe_default_project = "OpenTelemetry C++ API"
+breathe_default_project = "OpenTelemetry C++ SDK"
 
 exhale_args = {
         "containmentFolder": "otel_sdk",
