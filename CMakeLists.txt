@@ -32,7 +32,7 @@ if(NOT DEFINED CMAKE_CXX_STANDARD)
   set(CMAKE_CXX_STANDARD 11)
 endif()
 
-option(WITH_CONTRIB
+option(BUILD_CONTRIB
        "Build OpenTelemetry C++ SDK with optional community contributions" OFF)
 
 option(WITH_STL "Whether to use Standard Library for C++latest features" OFF)
@@ -221,13 +221,13 @@ if(DEFINED ENV{OPENTELEMETRY_CONTRIB_PATH})
                    ${PROJECT_BINARY_DIR}/contrib)
 endif()
 
-if(WITH_CONTRIB)
+if(BUILD_CONTRIB)
   # This option requires CMake 3.11+: add standard remote contrib to build tree.
   include(FetchContent)
   FetchContent_Declare(
     contrib
     GIT_REPOSITORY "https://github.com/open-telemetry/opentelemetry-cpp-contrib"
-    GIT_TAG "maxgolov/fluentd_exporter")
+    GIT_TAG "main")
   FetchContent_GetProperties(contrib)
   if(NOT contrib_POPULATED)
     FetchContent_Populate(contrib)
