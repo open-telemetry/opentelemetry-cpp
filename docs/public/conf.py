@@ -53,6 +53,29 @@ for fname in os.listdir(sourcedir):
         if not skip:
           fout.write(line)
 
+sdkdir = os.path.join('..', '..', 'sdk', 'docs')
+subprocess.call(['make', 'html'], cwd=sdkdir)
+targetdir = os.path.join(os.getcwd(), 'otel_sdk')
+sourcedir = os.path.join(apidir, 'otel_sdk')
+if os.path.exists(targetdir):
+  shutil.rmtree(targetdir)
+os.makedirs(targetdir)
+
+# Now copying the previously created SDK documentation. Table of contents
+# are filtered out, because those don't go well together with the furo theme.
+for fname in os.listdir(sourcedir):
+  with open(os.path.join(sourcedir, fname), 'r') as fin:
+    with open(os.path.join(targetdir, fname), 'w') as fout:
+      skip = False
+      for line in fin:
+        if line.startswith('.. contents'):
+          skip = True
+        elif not line.startswith(' '):
+          skip = False
+        if not skip:
+          fout.write(line)
+
+
 # -- General configuration ---------------------------------------------------
 
 # Add any Sphinx extension module names here, as strings. They can be
@@ -63,7 +86,8 @@ extensions = [
 ]
 
 breathe_projects = {
-        "OpenTelemetry C++ API": "../../api/docs/doxyoutput/xml"
+        "OpenTelemetry C++ API": "../../api/docs/doxyoutput/xml",
+        "OpenTelemetry C++ SDK": "../../sdk/docs/doxyoutput/xml"
 }
 
 breathe_default_project = "OpenTelemetry C++ API"
