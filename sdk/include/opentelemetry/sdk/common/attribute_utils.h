@@ -58,16 +58,16 @@ enum OwnedAttributeType
 {
   kTypeBool,
   kTypeInt,
-  kTypeInt64,
   kTypeUInt,
+  kTypeInt64,
   kTypeDouble,
+  kTypeCString,
   kTypeString,
   kTypeSpanBool,
   kTypeSpanInt,
-  kTypeSpanInt64,
   kTypeSpanUInt,
+  kTypeSpanInt64,
   kTypeSpanDouble,
-  kTypeSpanCString,
   kTypeSpanString,
   kTypeUInt64,
   kTypeSpanUInt64,
@@ -89,6 +89,7 @@ struct AttributeConverter
   {
     return OwnedAttributeValue(std::string(v));
   }
+  OwnedAttributeValue operator()(std::string v) { return OwnedAttributeValue(v); }
   OwnedAttributeValue operator()(const char *v) { return OwnedAttributeValue(std::string(v)); }
   OwnedAttributeValue operator()(nostd::span<const uint8_t> v) { return convertSpan<uint8_t>(v); }
   OwnedAttributeValue operator()(nostd::span<const bool> v) { return convertSpan<bool>(v); }
