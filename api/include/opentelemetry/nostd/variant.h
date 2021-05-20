@@ -71,12 +71,13 @@ OPENTELEMETRY_BEGIN_NAMESPACE
 namespace nostd
 {
 using absl::get;
+using absl::get_if;
 using absl::holds_alternative;
 using absl::monostate;
 using absl::variant;
+using absl::variant_alternative_t;
 using absl::variant_size;
 using absl::visit;
-
 }  // namespace nostd
 OPENTELEMETRY_END_NAMESPACE
 
