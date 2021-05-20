@@ -76,10 +76,10 @@ namespace variant_internal {
 {
   THROW_BAD_VARIANT_ACCESS;
 };
-[[noreturn]] static void Rethrow()
-{
-  THROW_BAD_VARIANT_ACCESS; // Unused!
-};
+//[[noreturn]] static void Rethrow()
+//{
+//  THROW_BAD_VARIANT_ACCESS; // Unused!
+//};
 #else
 // Original implementation requires linking Abseil library!
 [[noreturn]] void ThrowBadVariantAccess();
