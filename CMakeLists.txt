@@ -65,9 +65,17 @@ if(WITH_STL)
 
   # Optimize for speed to reduce the hops
   if(CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")
-    set(CMAKE_CXX_FLAGS_SPEED "/O2")
+    if(CMAKE_BUILD_TYPE MATCHES Debug)
+      # Turn off optimizations for DEBUG
+      set(MSVC_CXX_OPT_FLAG "/Od")
+    else()
+      string(REGEX MATCH "\/O" result ${CMAKE_CXX_FLAGS})
+      if(NOT ${result} MATCHES "\/O")
+        set(MSVC_CXX_OPT_FLAG "/O2")
+      endif()
+    endif()
     set(CMAKE_CXX_FLAGS
-        "${CMAKE_CXX_FLAGS} /Zc:__cplusplus ${CMAKE_CXX_FLAGS_SPEED}")
+        "${CMAKE_CXX_FLAGS} /Zc:__cplusplus ${MSVC_CXX_OPT_FLAG}")
   endif()
 endif()
 
@@ -84,6 +92,12 @@ option(WITH_JAEGER "Whether to include the Jaeger exporter" OFF)
 
 option(BUILD_TESTING "Whether to enable tests" ON)
 if(WIN32)
+  if(BUILD_TESTING)
+    if(MSVC)
+      # GTest bug: https://github.com/google/googletest/issues/860
+      add_compile_options(/wd4275)
+    endif()
+  endif()
   option(WITH_ETW "Whether to include the ETW Exporter in the SDK" ON)
   if(WITH_ETW)
     add_definitions(-DHAVE_MSGPACK)
