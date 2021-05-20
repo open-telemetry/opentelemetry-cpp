@@ -42,8 +42,8 @@
 #ifndef ABSL_TYPES_VARIANT_H_
 #define ABSL_TYPES_VARIANT_H_
 
-#include "absl/base/config.h"
-#include "absl/utility/utility.h"
+#include "../base/config.h"
+#include "../utility/utility.h"
 
 #ifdef ABSL_USES_STD_VARIANT
 
@@ -73,10 +73,10 @@ ABSL_NAMESPACE_END
 #include <type_traits>
 #include <utility>
 
-#include "absl/base/macros.h"
-#include "absl/base/port.h"
-#include "absl/meta/type_traits.h"
-#include "absl/types/internal/variant.h"
+#include "../base/macros.h"
+#include "../base/port.h"
+#include "../meta/type_traits.h"
+#include "../types/internal/variant.h"
 
 namespace absl {
 ABSL_NAMESPACE_BEGIN

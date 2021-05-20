@@ -17,7 +17,7 @@
 
 #include <type_traits>
 
-#include "absl/base/internal/identity.h"
+#include "identity.h"
 
 // File:
 //   This file define a macro that allows the creation of or emulation of C++17

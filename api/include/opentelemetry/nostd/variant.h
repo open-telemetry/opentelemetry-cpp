@@ -18,11 +18,11 @@
 #  include "opentelemetry/std/variant.h"
 #else
 
-#ifndef HAVE_ABSEIL
+#  ifndef HAVE_ABSEIL
 // We use a LOCAL snapshot of Abseil that is known to compile with Visual Studio 2015.
 // Header-only. Without compiling the actual Abseil binary. As Abseil moves on to new
 // toolchains, it may drop support for Visual Studio 2015 in future versions.
-#  include <exception>
+#    include <exception>
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace nostd
@@ -38,15 +38,15 @@ public:
 {
   throw bad_variant_access{};
 }
-}
+}  // namespace nostd
 OPENTELEMETRY_END_NAMESPACE
 
-#  if defined(__EXCEPTIONS) || defined(__cpp_exceptions)
-#    define THROW_BAD_VARIANT_ACCESS opentelemetry::nostd::throw_bad_variant_access()
-#  else
-#    define THROW_BAD_VARIANT_ACCESS std::terminate()
+#    if defined(__EXCEPTIONS) || defined(__cpp_exceptions)
+#      define THROW_BAD_VARIANT_ACCESS opentelemetry::nostd::throw_bad_variant_access()
+#    else
+#      define THROW_BAD_VARIANT_ACCESS std::terminate()
+#    endif
 #  endif
-#endif
 
 #  ifdef _MSC_VER
 // Abseil variant implementation contains some benign non-impacting warnings
@@ -55,7 +55,13 @@ OPENTELEMETRY_END_NAMESPACE
 #    pragma warning(disable : 4245)  // conversion from int to const unsigned _int64
 #    pragma warning(disable : 4127)  // conditional expression is constant
 #  endif
-#  include "absl/types/variant.h"
+
+#  ifdef HAVE_ABSEIL
+#    include "absl/types/variant.h"
+#  else
+#    include "./absl/types/variant.h"
+#  endif
+
 #  ifdef _MSC_VER
 #    pragma warning(pop)
 #  endif

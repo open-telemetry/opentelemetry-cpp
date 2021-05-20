@@ -19,8 +19,8 @@
 #ifndef ABSL_BASE_PORT_H_
 #define ABSL_BASE_PORT_H_
 
-#include "absl/base/attributes.h"
-#include "absl/base/config.h"
-#include "absl/base/optimization.h"
+#include "attributes.h"
+#include "config.h"
+#include "optimization.h"
 
 #endif  // ABSL_BASE_PORT_H_

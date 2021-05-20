@@ -27,15 +27,15 @@
 #include <tuple>
 #include <type_traits>
 
-#include "absl/base/config.h"
-#include "absl/base/internal/identity.h"
-#include "absl/base/internal/inline_variable.h"
-#include "absl/base/internal/invoke.h"
-#include "absl/base/macros.h"
-#include "absl/base/optimization.h"
-#include "absl/meta/type_traits.h"
-#include "absl/types/bad_variant_access.h"
-#include "absl/utility/utility.h"
+#include "../../base/config.h"
+#include "../../base/internal/identity.h"
+#include "../../base/internal/inline_variable.h"
+#include "../../base/internal/invoke.h"
+#include "../../base/macros.h"
+#include "../../base/optimization.h"
+#include "../../meta/type_traits.h"
+#include "../../types/bad_variant_access.h"
+#include "../../utility/utility.h"
 
 #if !defined(ABSL_USES_STD_VARIANT)
 

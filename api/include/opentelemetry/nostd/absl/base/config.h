@@ -63,8 +63,8 @@
 #include <TargetConditionals.h>
 #endif
 
-#include "absl/base/options.h"
-#include "absl/base/policy_checks.h"
+#include "options.h"
+#include "policy_checks.h"
 
 // Helper macro to convert a CPP variable to a string literal.
 #define ABSL_INTERNAL_DO_TOKEN_STR(x) #x

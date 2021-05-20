@@ -39,7 +39,7 @@
 #include <type_traits>
 #include <utility>
 
-#include "absl/meta/type_traits.h"
+#include "../../meta/type_traits.h"
 
 // The following code is internal implementation detail.  See the comment at the
 // top of this file for the API documentation.

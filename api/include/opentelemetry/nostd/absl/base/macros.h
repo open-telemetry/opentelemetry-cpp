@@ -31,9 +31,9 @@
 #include <cassert>
 #include <cstddef>
 
-#include "absl/base/attributes.h"
-#include "absl/base/optimization.h"
-#include "absl/base/port.h"
+#include "attributes.h"
+#include "optimization.h"
+#include "port.h"
 
 // ABSL_ARRAYSIZE()
 //

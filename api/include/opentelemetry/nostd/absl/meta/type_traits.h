@@ -39,7 +39,7 @@
 #include <functional>
 #include <type_traits>
 
-#include "absl/base/config.h"
+#include "../base/config.h"
 
 // MSVC constructibility traits do not detect destructor properties and so our
 // implementations should not use them as a source-of-truth.

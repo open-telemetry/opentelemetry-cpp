@@ -23,7 +23,7 @@
 
 #include <stdexcept>
 
-#include "absl/base/config.h"
+#include "../base/config.h"
 
 #ifdef ABSL_USES_STD_VARIANT
 

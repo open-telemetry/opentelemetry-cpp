@@ -16,7 +16,7 @@
 #ifndef ABSL_BASE_INTERNAL_IDENTITY_H_
 #define ABSL_BASE_INTERNAL_IDENTITY_H_
 
-#include "absl/base/config.h"
+#include "../config.h"
 
 namespace absl {
 ABSL_NAMESPACE_BEGIN

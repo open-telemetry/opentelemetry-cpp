@@ -22,7 +22,7 @@
 #ifndef ABSL_BASE_OPTIMIZATION_H_
 #define ABSL_BASE_OPTIMIZATION_H_
 
-#include "absl/base/config.h"
+#include "config.h"
 
 // ABSL_BLOCK_TAIL_CALL_OPTIMIZATION
 //
