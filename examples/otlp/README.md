@@ -10,36 +10,34 @@ SDK](https://github.com/open-telemetry/opentelemetry-cpp). The application then
 calls a `foo_library` which has been instrumented using the [OpenTelemetry
 API](https://github.com/open-telemetry/opentelemetry-cpp/tree/main/api).
 
-To enable TLS authentication for OTLP grpc exporter, SslCredentials can be used by
-specifying the path to client certificate pem file, or the string containing this certificate via OtlpExporterOptions. The path to such a
-.pem file can be provided as a command-line argument alongwith the collector endpoint
-to the main binary invocation above.
+To enable TLS authentication for OTLP grpc exporter, SslCredentials can be used
+by specifying the path to client certificate pem file, or the string containing
+this certificate via OtlpExporterOptions. The path to such a .pem file can be
+provided as a command-line argument alongwith the collector endpoint to the main
+binary invocation above.
 
 Resulting spans are exported to the **OpenTelemetry Collector** using the OTLP
 exporter. The OpenTelemetry Collector can be configured to export to other
 backends (see list of [supported
 backends](https://github.com/open-telemetry/opentelemetry-collector/blob/main/exporter/README.md)).
 
-For instructions on downloading and running the OpenTelemetry Collector, see
-[Getting Started](https://opentelemetry.io/docs/collector/about/).
+Follow below command to run the **OpenTelemetry Collector** with OTLP receiver
+in docker which dumps the received data into console. See [Getting
+Started](https://opentelemetry.io/docs/collector/about/) for more information.
 
-Here is an example of a Collector `config.yaml` file that can be used to export
-to [Zipkin](https://zipkin.io/) via the Collector using the OTLP exporter:
+Open a terminal window at the root directory of this repo and launch the
+OpenTelemetry Collector with an OTLP receiver by running:
 
-```yml
-receivers:
-  otlp:
-    protocols:
-      grpc:
-        endpoint: localhost:4317
-exporters:
-  zipkin:
-    endpoint: "http://localhost:9411/api/v2/spans"
-service:
-  pipelines:
-    traces:
-      receivers: [otlp]
-      exporters: [zipkin]
+- On Unix based systems use:
+
+```console
+docker run --rm -it -p 4317:4317 -v $(pwd)/examples/otlp:/cfg otel/opentelemetry-collector:0.19.0 --config=/cfg/opentelemetry-collector-config/config.dev.yaml
+```
+
+- On Windows use:
+
+```console
+docker run --rm -it -p 4317:4317 -v "%cd%/examples/otlp":/cfg otel/opentelemetry-collector:0.19.0 --config=/cfg/opentelemetry-collector-config/config.dev.yaml
 ```
 
 Note that the OTLP exporter connects to the Collector at `localhost:4317` by
