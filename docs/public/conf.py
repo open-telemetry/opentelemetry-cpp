@@ -87,7 +87,7 @@ extensions = [
 ]
 
 breathe_projects = {
-        "OpenTelemetry C++ API": "../../api/docs/doxyoutput/xml"
+        "OpenTelemetry C++ API": "../../api/docs/doxyoutput/xml",
         "OpenTelemetry C++ SDK": "../../sdk/docs/doxyoutput/xml"
 }
 
