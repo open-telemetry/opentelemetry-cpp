@@ -39,8 +39,6 @@ if(WITH_ABSEIL)
   add_definitions(-DHAVE_ABSEIL)
   find_package(absl CONFIG REQUIRED)
 
-  # Abseil headers-only lib is needed for absl::variant to work vs2015.
-  # `nostd::mpark::variant` is not compiling in vs2015.
   set(CORE_RUNTIME_LIBS absl::any absl::base absl::bits absl::city)
 
   # target_link_libraries(main PRIVATE absl::any absl::base absl::bits

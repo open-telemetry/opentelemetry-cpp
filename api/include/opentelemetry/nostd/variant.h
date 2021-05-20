@@ -16,7 +16,7 @@
 
 #ifdef HAVE_CPP_STDLIB
 #  include "opentelemetry/std/variant.h"
-#elif defined(HAVE_ABSEIL_VARIANT)
+#else
 // TODO: we use a LOCAL snapshot of Abseil that is known to compile with Visual Studio 2015,
 // header-only, without compiling the actual Abseil binary. As Abseil moves on to new
 // toolchains, it may drop support for Visual Studio 2015 in future versions. Perhaps a good
@@ -89,6 +89,4 @@ static void ThrowBadVariantAccess()
 };  // namespace variant_internal
 };  // namespace absl
 
-#else
-#  include "opentelemetry/nostd/mpark/variant.h"
 #endif
