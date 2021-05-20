@@ -31,28 +31,6 @@ import os
 import shutil
 import subprocess
 
-apidir = os.path.join('..', '..', 'api', 'docs')
-subprocess.call(['make', 'html'], cwd=apidir)
-targetdir = os.path.join(os.getcwd(), 'otel_api')
-sourcedir = os.path.join(apidir, 'otel_api')
-if os.path.exists(targetdir):
-  shutil.rmtree(targetdir)
-os.makedirs(targetdir)
-
-# Now copying the previously created APi documentation. Table of contents
-# are filtered out, because those don't go well together with the furo theme.
-for fname in os.listdir(sourcedir):
-  with open(os.path.join(sourcedir, fname), 'r') as fin:
-    with open(os.path.join(targetdir, fname), 'w') as fout:
-      skip = False
-      for line in fin:
-        if line.startswith('.. contents'):
-          skip = True
-        elif not line.startswith(' '):
-          skip = False
-        if not skip:
-          fout.write(line)
-
 sdkdir = os.path.join('..', '..', 'sdk', 'docs')
 subprocess.call(['make', 'html'], cwd=sdkdir)
 targetdir = os.path.join(os.getcwd(), 'otel_sdk')
@@ -86,11 +64,10 @@ extensions = [
 ]
 
 breathe_projects = {
-        "OpenTelemetry C++ API": "../../api/docs/doxyoutput/xml",
         "OpenTelemetry C++ SDK": "../../sdk/docs/doxyoutput/xml"
 }
 
-breathe_default_project = "OpenTelemetry C++ API"
+breathe_default_project = "OpenTelemetry C++ SDK"
 
 primary_domain = "cpp"
 
