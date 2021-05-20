@@ -50,8 +50,9 @@ TEST(ResourceTest, create_without_servicename)
         EXPECT_EQ(opentelemetry::nostd::get<double>(expected_attributes.find(e.first)->second),
                   opentelemetry::nostd::get<double>(e.second));
       else
-        EXPECT_EQ(opentelemetry::nostd::get<std::string>(expected_attributes.find(e.first)->second),
-                  opentelemetry::nostd::get<std::string>(e.second));
+        EXPECT_STREQ(
+            opentelemetry::nostd::get<const char *>(expected_attributes.find(e.first)->second),
+            opentelemetry::nostd::get<std::string>(e.second).c_str());
   }
   EXPECT_EQ(received_attributes.size(), expected_attributes.size());  // for missing service.name
 }
@@ -82,8 +83,9 @@ TEST(ResourceTest, create_with_servicename)
         EXPECT_EQ(opentelemetry::nostd::get<double>(expected_attributes.find(e.first)->second),
                   opentelemetry::nostd::get<double>(e.second));
       else
-        EXPECT_EQ(opentelemetry::nostd::get<std::string>(expected_attributes.find(e.first)->second),
-                  opentelemetry::nostd::get<std::string>(e.second));
+        EXPECT_STREQ(
+            opentelemetry::nostd::get<const char *>(expected_attributes.find(e.first)->second),
+            opentelemetry::nostd::get<std::string>(e.second).c_str());
     }
   }
   EXPECT_EQ(received_attributes.size(), expected_attributes.size());  // for missing service.name
@@ -104,8 +106,9 @@ TEST(ResourceTest, create_with_emptyatrributes)
   {
     EXPECT_TRUE(expected_attributes.find(e.first) != expected_attributes.end());
     if (expected_attributes.find(e.first) != expected_attributes.end())
-      EXPECT_EQ(opentelemetry::nostd::get<std::string>(expected_attributes.find(e.first)->second),
-                opentelemetry::nostd::get<std::string>(e.second));
+      EXPECT_STREQ(
+          opentelemetry::nostd::get<const char *>(expected_attributes.find(e.first)->second),
+          opentelemetry::nostd::get<std::string>(e.second).c_str());
   }
   EXPECT_EQ(received_attributes.size(), expected_attributes.size());  // for missing service.name
 }

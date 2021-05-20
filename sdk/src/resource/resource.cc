@@ -15,7 +15,18 @@ const std::string kTelemetrySdkVersion   = "telemetry.sdk.version";
 const std::string kServiceName           = "service.name";
 const std::string kProcessExecutableName = "process.executable.name";
 
-Resource::Resource(const ResourceAttributes &attributes) noexcept : attributes_(attributes) {}
+Resource::Resource(const ResourceAttributes &attributes) noexcept : attributes_(attributes)
+{
+  for (auto &kv : attributes_)
+  {
+    // replace all const char * objects by owning std::string objects
+    if (kv.second.index() == opentelemetry::sdk::common::kTypeCString)
+    {
+      std::string vStr = nostd::get<const char *>(kv.second);
+      kv.second        = vStr;
+    }
+  }
+}
 
 Resource Resource::Merge(const Resource &other) noexcept
 {
