@@ -36,7 +36,7 @@ static const std::map<opentelemetry::trace::SpanKind, std::string> kSpanKindMap 
 //
 // See `attribute_value.h` for details.
 //
-const int kAttributeValueSize = 15;
+const int kAttributeValueSize = 16;
 
 void Recordable::SetIdentity(const opentelemetry::trace::SpanContext &span_context,
                              opentelemetry::trace::SpanId parent_span_id) noexcept
