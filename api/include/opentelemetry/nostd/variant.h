@@ -41,7 +41,7 @@ public:
 }  // namespace nostd
 OPENTELEMETRY_END_NAMESPACE
 
-#    if defined(__EXCEPTIONS) || defined(__cpp_exceptions)
+#    if defined(__EXCEPTIONS)
 #      define THROW_BAD_VARIANT_ACCESS opentelemetry::nostd::throw_bad_variant_access()
 #    else
 #      define THROW_BAD_VARIANT_ACCESS std::terminate()
