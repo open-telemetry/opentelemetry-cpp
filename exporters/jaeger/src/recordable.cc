@@ -36,6 +36,10 @@ void Recordable::PopulateAttribute(nostd::string_view key, const common::Attribu
   {
     AddTag(std::string{key}, nostd::get<double>(value));
   }
+  else if (nostd::holds_alternative<const char *>(value))
+  {
+    AddTag(std::string{key}, std::string{nostd::get<const char *>(value)});
+  }
   else if (nostd::holds_alternative<nostd::string_view>(value))
   {
     AddTag(std::string{key}, std::string{nostd::get<nostd::string_view>(value)});

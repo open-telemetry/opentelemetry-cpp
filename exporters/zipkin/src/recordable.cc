@@ -86,6 +86,10 @@ void PopulateAttribute(nlohmann::json &attribute,
   {
     attribute[key.data()] = nostd::get<double>(value);
   }
+  else if (nostd::holds_alternative<const char *>(value))
+  {
+    attribute[key.data()] = nostd::get<const char *>(value);
+  }
   else if (nostd::holds_alternative<nostd::string_view>(value))
   {
     attribute[key.data()] = nostd::string_view(nostd::get<nostd::string_view>(value).data(),

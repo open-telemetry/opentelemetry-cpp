@@ -67,6 +67,9 @@ private:
       case common::AttributeType::kTypeDouble:
         json_[name][key.data()] = opentelemetry::nostd::get<double>(value);
         return;
+      case common::AttributeType::kTypeCString:
+        json_[name][key.data()] = opentelemetry::nostd::get<const char *>(value);
+        return;
       case common::AttributeType::kTypeString:
         json_[name][key.data()] =
             opentelemetry::nostd::get<opentelemetry::nostd::string_view>(value).data();
