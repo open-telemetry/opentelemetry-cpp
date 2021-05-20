@@ -13,13 +13,13 @@
 // limitations under the License.
 //
 
-#ifndef ABSL_BASE_INTERNAL_IDENTITY_H_
-#define ABSL_BASE_INTERNAL_IDENTITY_H_
+#ifndef OTABSL_BASE_INTERNAL_IDENTITY_H_
+#define OTABSL_BASE_INTERNAL_IDENTITY_H_
 
 #include "../config.h"
 
 namespace absl {
-ABSL_NAMESPACE_BEGIN
+OTABSL_NAMESPACE_BEGIN
 namespace internal {
 
 template <typename T>
@@ -31,7 +31,7 @@ template <typename T>
 using identity_t = typename identity<T>::type;
 
 }  // namespace internal
-ABSL_NAMESPACE_END
+OTABSL_NAMESPACE_END
 }  // namespace absl
 
-#endif  // ABSL_BASE_INTERNAL_IDENTITY_H_
+#endif  // OTABSL_BASE_INTERNAL_IDENTITY_H_

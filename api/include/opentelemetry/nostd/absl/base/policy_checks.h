@@ -21,8 +21,8 @@
 // reported with `#error`. This enforcement is best effort, so successfully
 // compiling this header does not guarantee a supported configuration.
 
-#ifndef ABSL_BASE_POLICY_CHECKS_H_
-#define ABSL_BASE_POLICY_CHECKS_H_
+#ifndef OTABSL_BASE_POLICY_CHECKS_H_
+#define OTABSL_BASE_POLICY_CHECKS_H_
 
 // Included for the __GLIBC_PREREQ macro used below.
 #include <limits.h>
@@ -110,4 +110,4 @@
 #error "Abseil assumes that int is at least 4 bytes. "
 #endif
 
-#endif  // ABSL_BASE_POLICY_CHECKS_H_
+#endif  // OTABSL_BASE_POLICY_CHECKS_H_

@@ -32,8 +32,8 @@
 // features is brittle and not guaranteed. Neither the standard library nor
 // Abseil provides any guarantee that APIs are stable in the face of template
 // metaprogramming. Use with caution.
-#ifndef ABSL_META_TYPE_TRAITS_H_
-#define ABSL_META_TYPE_TRAITS_H_
+#ifndef OTABSL_META_TYPE_TRAITS_H_
+#define OTABSL_META_TYPE_TRAITS_H_
 
 #include <stddef.h>
 #include <functional>
@@ -44,11 +44,11 @@
 // MSVC constructibility traits do not detect destructor properties and so our
 // implementations should not use them as a source-of-truth.
 #if defined(_MSC_VER) && !defined(__clang__) && !defined(__GNUC__)
-#define ABSL_META_INTERNAL_STD_CONSTRUCTION_TRAITS_DONT_CHECK_DESTRUCTION 1
+#define OTABSL_META_INTERNAL_STD_CONSTRUCTION_TRAITS_DONT_CHECK_DESTRUCTION 1
 #endif
 
 namespace absl {
-ABSL_NAMESPACE_BEGIN
+OTABSL_NAMESPACE_BEGIN
 
 // Defined and documented later on in this file.
 template <typename T>
@@ -298,7 +298,7 @@ template <typename T>
 struct is_trivially_destructible
     : std::integral_constant<bool, __has_trivial_destructor(T) &&
                                    std::is_destructible<T>::value> {
-#ifdef ABSL_HAVE_STD_IS_TRIVIALLY_DESTRUCTIBLE
+#ifdef OTABSL_HAVE_STD_IS_TRIVIALLY_DESTRUCTIBLE
  private:
   static constexpr bool compliant = std::is_trivially_destructible<T>::value ==
                                     is_trivially_destructible::value;
@@ -308,7 +308,7 @@ struct is_trivially_destructible
   static_assert(compliant || !std::is_trivially_destructible<T>::value,
                 "Not compliant with std::is_trivially_destructible; "
                 "Standard: true, Implementation: false");
-#endif  // ABSL_HAVE_STD_IS_TRIVIALLY_DESTRUCTIBLE
+#endif  // OTABSL_HAVE_STD_IS_TRIVIALLY_DESTRUCTIBLE
 };
 
 // is_trivially_default_constructible()
@@ -348,9 +348,9 @@ struct is_trivially_default_constructible
     : std::integral_constant<bool, __has_trivial_constructor(T) &&
                                    std::is_default_constructible<T>::value &&
                                    is_trivially_destructible<T>::value> {
-#if defined(ABSL_HAVE_STD_IS_TRIVIALLY_CONSTRUCTIBLE) && \
+#if defined(OTABSL_HAVE_STD_IS_TRIVIALLY_CONSTRUCTIBLE) && \
     !defined(                                            \
-        ABSL_META_INTERNAL_STD_CONSTRUCTION_TRAITS_DONT_CHECK_DESTRUCTION)
+        OTABSL_META_INTERNAL_STD_CONSTRUCTION_TRAITS_DONT_CHECK_DESTRUCTION)
  private:
   static constexpr bool compliant =
       std::is_trivially_default_constructible<T>::value ==
@@ -361,7 +361,7 @@ struct is_trivially_default_constructible
   static_assert(compliant || !std::is_trivially_default_constructible<T>::value,
                 "Not compliant with std::is_trivially_default_constructible; "
                 "Standard: true, Implementation: false");
-#endif  // ABSL_HAVE_STD_IS_TRIVIALLY_CONSTRUCTIBLE
+#endif  // OTABSL_HAVE_STD_IS_TRIVIALLY_CONSTRUCTIBLE
 };
 
 // is_trivially_move_constructible()
@@ -383,9 +383,9 @@ struct is_trivially_move_constructible
           std::is_object<T>::value && !std::is_array<T>::value,
           type_traits_internal::IsTriviallyMoveConstructibleObject<T>,
           std::is_reference<T>>::type::type {
-#if defined(ABSL_HAVE_STD_IS_TRIVIALLY_CONSTRUCTIBLE) && \
+#if defined(OTABSL_HAVE_STD_IS_TRIVIALLY_CONSTRUCTIBLE) && \
     !defined(                                            \
-        ABSL_META_INTERNAL_STD_CONSTRUCTION_TRAITS_DONT_CHECK_DESTRUCTION)
+        OTABSL_META_INTERNAL_STD_CONSTRUCTION_TRAITS_DONT_CHECK_DESTRUCTION)
  private:
   static constexpr bool compliant =
       std::is_trivially_move_constructible<T>::value ==
@@ -396,7 +396,7 @@ struct is_trivially_move_constructible
   static_assert(compliant || !std::is_trivially_move_constructible<T>::value,
                 "Not compliant with std::is_trivially_move_constructible; "
                 "Standard: true, Implementation: false");
-#endif  // ABSL_HAVE_STD_IS_TRIVIALLY_CONSTRUCTIBLE
+#endif  // OTABSL_HAVE_STD_IS_TRIVIALLY_CONSTRUCTIBLE
 };
 
 // is_trivially_copy_constructible()
@@ -418,9 +418,9 @@ struct is_trivially_copy_constructible
           std::is_object<T>::value && !std::is_array<T>::value,
           type_traits_internal::IsTriviallyCopyConstructibleObject<T>,
           std::is_lvalue_reference<T>>::type::type {
-#if defined(ABSL_HAVE_STD_IS_TRIVIALLY_CONSTRUCTIBLE) && \
+#if defined(OTABSL_HAVE_STD_IS_TRIVIALLY_CONSTRUCTIBLE) && \
     !defined(                                            \
-        ABSL_META_INTERNAL_STD_CONSTRUCTION_TRAITS_DONT_CHECK_DESTRUCTION)
+        OTABSL_META_INTERNAL_STD_CONSTRUCTION_TRAITS_DONT_CHECK_DESTRUCTION)
  private:
   static constexpr bool compliant =
       std::is_trivially_copy_constructible<T>::value ==
@@ -431,7 +431,7 @@ struct is_trivially_copy_constructible
   static_assert(compliant || !std::is_trivially_copy_constructible<T>::value,
                 "Not compliant with std::is_trivially_copy_constructible; "
                 "Standard: true, Implementation: false");
-#endif  // ABSL_HAVE_STD_IS_TRIVIALLY_CONSTRUCTIBLE
+#endif  // OTABSL_HAVE_STD_IS_TRIVIALLY_CONSTRUCTIBLE
 };
 
 // is_trivially_move_assignable()
@@ -457,7 +457,7 @@ struct is_trivially_move_assignable
           std::is_move_assignable<type_traits_internal::SingleMemberUnion<T>>,
           type_traits_internal::IsTriviallyMoveAssignableReference<T>>::type::
           type {
-#ifdef ABSL_HAVE_STD_IS_TRIVIALLY_ASSIGNABLE
+#ifdef OTABSL_HAVE_STD_IS_TRIVIALLY_ASSIGNABLE
  private:
   static constexpr bool compliant =
       std::is_trivially_move_assignable<T>::value ==
@@ -468,7 +468,7 @@ struct is_trivially_move_assignable
   static_assert(compliant || !std::is_trivially_move_assignable<T>::value,
                 "Not compliant with std::is_trivially_move_assignable; "
                 "Standard: true, Implementation: false");
-#endif  // ABSL_HAVE_STD_IS_TRIVIALLY_ASSIGNABLE
+#endif  // OTABSL_HAVE_STD_IS_TRIVIALLY_ASSIGNABLE
 };
 
 // is_trivially_copy_assignable()
@@ -491,7 +491,7 @@ struct is_trivially_copy_assignable
     : std::integral_constant<
           bool, __has_trivial_assign(typename std::remove_reference<T>::type) &&
                     absl::is_copy_assignable<T>::value> {
-#ifdef ABSL_HAVE_STD_IS_TRIVIALLY_ASSIGNABLE
+#ifdef OTABSL_HAVE_STD_IS_TRIVIALLY_ASSIGNABLE
  private:
   static constexpr bool compliant =
       std::is_trivially_copy_assignable<T>::value ==
@@ -502,7 +502,7 @@ struct is_trivially_copy_assignable
   static_assert(compliant || !std::is_trivially_copy_assignable<T>::value,
                 "Not compliant with std::is_trivially_copy_assignable; "
                 "Standard: true, Implementation: false");
-#endif  // ABSL_HAVE_STD_IS_TRIVIALLY_ASSIGNABLE
+#endif  // OTABSL_HAVE_STD_IS_TRIVIALLY_ASSIGNABLE
 };
 
 namespace type_traits_internal {
@@ -626,15 +626,15 @@ namespace type_traits_internal {
 //
 #if defined(_MSC_VER) || (defined(_LIBCPP_VERSION) && \
                           _LIBCPP_VERSION < 4000 && _LIBCPP_STD_VER > 11)
-#define ABSL_META_INTERNAL_STD_HASH_SFINAE_FRIENDLY_ 0
+#define OTABSL_META_INTERNAL_STD_HASH_SFINAE_FRIENDLY_ 0
 #else
-#define ABSL_META_INTERNAL_STD_HASH_SFINAE_FRIENDLY_ 1
+#define OTABSL_META_INTERNAL_STD_HASH_SFINAE_FRIENDLY_ 1
 #endif
 
-#if !ABSL_META_INTERNAL_STD_HASH_SFINAE_FRIENDLY_
+#if !OTABSL_META_INTERNAL_STD_HASH_SFINAE_FRIENDLY_
 template <typename Key, typename = size_t>
 struct IsHashable : std::true_type {};
-#else   // ABSL_META_INTERNAL_STD_HASH_SFINAE_FRIENDLY_
+#else   // OTABSL_META_INTERNAL_STD_HASH_SFINAE_FRIENDLY_
 template <typename Key, typename = void>
 struct IsHashable : std::false_type {};
 
@@ -644,7 +644,7 @@ struct IsHashable<
     absl::enable_if_t<std::is_convertible<
         decltype(std::declval<std::hash<Key>&>()(std::declval<Key const&>())),
         std::size_t>::value>> : std::true_type {};
-#endif  // !ABSL_META_INTERNAL_STD_HASH_SFINAE_FRIENDLY_
+#endif  // !OTABSL_META_INTERNAL_STD_HASH_SFINAE_FRIENDLY_
 
 struct AssertHashEnabledHelper {
  private:
@@ -753,7 +753,7 @@ using swap_internal::Swap;
 using swap_internal::StdSwapIsUnconstrained;
 
 }  // namespace type_traits_internal
-ABSL_NAMESPACE_END
+OTABSL_NAMESPACE_END
 }  // namespace absl
 
-#endif  // ABSL_META_TYPE_TRAITS_H_
+#endif  // OTABSL_META_TYPE_TRAITS_H_

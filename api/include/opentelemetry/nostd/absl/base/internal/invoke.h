@@ -32,8 +32,8 @@
 // The implementation is SFINAE-friendly: substitution failure within Invoke()
 // isn't an error.
 
-#ifndef ABSL_BASE_INTERNAL_INVOKE_H_
-#define ABSL_BASE_INTERNAL_INVOKE_H_
+#ifndef OTABSL_BASE_INTERNAL_INVOKE_H_
+#define OTABSL_BASE_INTERNAL_INVOKE_H_
 
 #include <algorithm>
 #include <type_traits>
@@ -45,7 +45,7 @@
 // top of this file for the API documentation.
 
 namespace absl {
-ABSL_NAMESPACE_BEGIN
+OTABSL_NAMESPACE_BEGIN
 namespace base_internal {
 
 // The five classes below each implement one of the clauses from the definition
@@ -182,7 +182,7 @@ InvokeT<F, Args...> Invoke(F&& f, Args&&... args) {
 }
 
 }  // namespace base_internal
-ABSL_NAMESPACE_END
+OTABSL_NAMESPACE_END
 }  // namespace absl
 
-#endif  // ABSL_BASE_INTERNAL_INVOKE_H_
+#endif  // OTABSL_BASE_INTERNAL_INVOKE_H_

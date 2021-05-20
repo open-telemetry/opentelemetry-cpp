@@ -16,8 +16,8 @@
 // separate file to avoid cluttering the top of the API header with
 // implementation details.
 
-#ifndef ABSL_TYPES_variant_internal_H_
-#define ABSL_TYPES_variant_internal_H_
+#ifndef OTABSL_TYPES_variant_internal_H_
+#define OTABSL_TYPES_variant_internal_H_
 
 #include <cassert>
 #include <cstddef>
@@ -37,15 +37,15 @@
 #include "../../types/bad_variant_access.h"
 #include "../../utility/utility.h"
 
-#if !defined(ABSL_USES_STD_VARIANT)
+#if !defined(OTABSL_USES_STD_VARIANT)
 
 namespace absl {
-ABSL_NAMESPACE_BEGIN
+OTABSL_NAMESPACE_BEGIN
 
 template <class... Types>
 class variant;
 
-ABSL_INTERNAL_INLINE_CONSTEXPR(size_t, variant_npos, -1);
+OTABSL_INTERNAL_INLINE_CONSTEXPR(size_t, variant_npos, -1);
 
 template <class T>
 struct variant_size;
@@ -272,7 +272,7 @@ struct UnreachableSwitchCase {
   template <class Op>
   [[noreturn]] static VisitIndicesResultT<Op, std::size_t> Run(
       Op&& /*ignored*/) {
-#if ABSL_HAVE_BUILTIN(__builtin_unreachable) || \
+#if OTABSL_HAVE_BUILTIN(__builtin_unreachable) || \
     (defined(__GNUC__) && !defined(__clang__))
     __builtin_unreachable();
 #elif defined(_MSC_VER)
@@ -292,7 +292,7 @@ struct UnreachableSwitchCase {
 template <class Op, std::size_t I>
 struct ReachableSwitchCase {
   static VisitIndicesResultT<Op, std::size_t> Run(Op&& op) {
-    return absl::base_internal::Invoke(absl::forward<Op>(op), SizeT<I>());
+    return absl::OTABSL_OPTION_INLINE_NAMESPACE_NAME::base_internal::Invoke(absl::forward<Op>(op), SizeT<I>());
   }
 };
 
@@ -301,7 +301,7 @@ struct ReachableSwitchCase {
 // power of 2 is because the number was picked to correspond to a power of 2
 // amount of "normal" alternatives, plus one for the possibility of the user
 // providing "monostate" in addition to the more natural alternatives.
-ABSL_INTERNAL_INLINE_CONSTEXPR(std::size_t, MaxUnrolledVisitCases, 33);
+OTABSL_INTERNAL_INLINE_CONSTEXPR(std::size_t, MaxUnrolledVisitCases, 33);
 
 // Note: The default-definition is for unreachable cases.
 template <bool IsReachable>
@@ -423,8 +423,8 @@ struct VisitIndicesSwitch {
       case 32:
         return PickCase<Op, 32, EndIndex>::Run(absl::forward<Op>(op));
       default:
-        ABSL_ASSERT(i == variant_npos);
-        return absl::base_internal::Invoke(absl::forward<Op>(op), NPos());
+        OTABSL_ASSERT(i == variant_npos);
+        return absl::OTABSL_OPTION_INLINE_NAMESPACE_NAME::base_internal::Invoke(absl::forward<Op>(op), NPos());
     }
   }
 };
@@ -488,7 +488,7 @@ struct VisitIndicesVariadicImpl<absl::index_sequence<N...>, EndIndices...> {
     template <std::size_t I>
     VisitIndicesResultT<Op, decltype(EndIndices)...> operator()(
         SizeT<I> /*index*/) && {
-      return base_internal::Invoke(
+      return OTABSL_OPTION_INLINE_NAMESPACE_NAME::base_internal::Invoke(
           absl::forward<Op>(op),
           SizeT<UnflattenIndex<I, N, (EndIndices + 1)...>::value -
                 std::size_t{1}>()...);
@@ -608,7 +608,7 @@ struct VariantCoreAccess {
   // Access a variant alternative, throwing if the index is incorrect.
   template <std::size_t I, class Variant>
   static VariantAccessResult<I, Variant> CheckedAccess(Variant&& self) {
-    if (ABSL_PREDICT_FALSE(self.index_ != I)) {
+    if (OTABSL_PREDICT_FALSE(self.index_ != I)) {
       TypedThrowBadVariantAccess<VariantAccessResult<I, Variant>>();
     }
 
@@ -930,7 +930,7 @@ struct PerformVisitation {
                      absl::result_of_t<Op(VariantAccessResult<
                                           Is, QualifiedVariants>...)>>::value,
         "All visitation overloads must have the same return type.");
-    return absl::base_internal::Invoke(
+    return absl::OTABSL_OPTION_INLINE_NAMESPACE_NAME::base_internal::Invoke(
         absl::forward<Op>(op),
         VariantCoreAccess::Access<Is>(
             absl::forward<QualifiedVariants>(std::get<TupIs>(variant_tup)))...);
@@ -1059,7 +1059,7 @@ class VariantStateBase {
   std::size_t index_;
 };
 
-using absl::internal::identity;
+using absl::OTABSL_OPTION_INLINE_NAMESPACE_NAME::internal::identity;
 
 // OverloadSet::Overload() is a unary function which is overloaded to
 // take any of the element types of the variant, by reference-to-const.
@@ -1639,8 +1639,8 @@ struct VariantHashBase<Variant,
 };
 
 }  // namespace variant_internal
-ABSL_NAMESPACE_END
+OTABSL_NAMESPACE_END
 }  // namespace absl
 
-#endif  // !defined(ABSL_USES_STD_VARIANT)
-#endif  // ABSL_TYPES_variant_internal_H_
+#endif  // !defined(OTABSL_USES_STD_VARIANT)
+#endif  // OTABSL_TYPES_variant_internal_H_

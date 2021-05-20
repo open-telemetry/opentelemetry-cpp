@@ -29,24 +29,24 @@
 // Example:
 //
 // Suppose a programmer wants to write a program that uses the 'mmap()' system
-// call. The Abseil macro for that feature (`ABSL_HAVE_MMAP`) allows you to
+// call. The Abseil macro for that feature (`OTABSL_HAVE_MMAP`) allows you to
 // selectively include the `mmap.h` header and bracket code using that feature
 // in the macro:
 //
 //   #include "absl/base/config.h"
 //
-//   #ifdef ABSL_HAVE_MMAP
+//   #ifdef OTABSL_HAVE_MMAP
 //   #include "sys/mman.h"
-//   #endif  //ABSL_HAVE_MMAP
+//   #endif  //OTABSL_HAVE_MMAP
 //
 //   ...
-//   #ifdef ABSL_HAVE_MMAP
+//   #ifdef OTABSL_HAVE_MMAP
 //   void *ptr = mmap(...);
 //   ...
-//   #endif  // ABSL_HAVE_MMAP
+//   #endif  // OTABSL_HAVE_MMAP
 
-#ifndef ABSL_BASE_CONFIG_H_
-#define ABSL_BASE_CONFIG_H_
+#ifndef OTABSL_BASE_CONFIG_H_
+#define OTABSL_BASE_CONFIG_H_
 
 // Included for the __GLIBC__ macro (or similar macros on other systems).
 #include <limits.h>
@@ -67,14 +67,14 @@
 #include "policy_checks.h"
 
 // Helper macro to convert a CPP variable to a string literal.
-#define ABSL_INTERNAL_DO_TOKEN_STR(x) #x
-#define ABSL_INTERNAL_TOKEN_STR(x) ABSL_INTERNAL_DO_TOKEN_STR(x)
+#define OTABSL_INTERNAL_DO_TOKEN_STR(x) #x
+#define OTABSL_INTERNAL_TOKEN_STR(x) OTABSL_INTERNAL_DO_TOKEN_STR(x)
 
 // -----------------------------------------------------------------------------
 // Abseil namespace annotations
 // -----------------------------------------------------------------------------
 
-// ABSL_NAMESPACE_BEGIN/ABSL_NAMESPACE_END
+// OTABSL_NAMESPACE_BEGIN/OTABSL_NAMESPACE_END
 //
 // An annotation placed at the beginning/end of each `namespace absl` scope.
 // This is used to inject an inline namespace.
@@ -82,11 +82,11 @@
 // The proper way to write Abseil code in the `absl` namespace is:
 //
 // namespace absl {
-// ABSL_NAMESPACE_BEGIN
+// OTABSL_NAMESPACE_BEGIN
 //
 // void Foo();  // absl::Foo().
 //
-// ABSL_NAMESPACE_END
+// OTABSL_NAMESPACE_END
 // }  // namespace absl
 //
 // Users of Abseil should not use these macros, because users of Abseil should
@@ -94,37 +94,37 @@
 // not support forward declarations of its own types, nor does it support
 // user-provided specialization of Abseil templates.  Code that violates these
 // rules may be broken without warning.)
-#if !defined(ABSL_OPTION_USE_INLINE_NAMESPACE) || \
-    !defined(ABSL_OPTION_INLINE_NAMESPACE_NAME)
+#if !defined(OTABSL_OPTION_USE_INLINE_NAMESPACE) || \
+    !defined(OTABSL_OPTION_INLINE_NAMESPACE_NAME)
 #error options.h is misconfigured.
 #endif
 
-// Check that ABSL_OPTION_INLINE_NAMESPACE_NAME is neither "head" nor ""
-#if defined(__cplusplus) && ABSL_OPTION_USE_INLINE_NAMESPACE == 1
+// Check that OTABSL_OPTION_INLINE_NAMESPACE_NAME is neither "head" nor ""
+#if defined(__cplusplus) && OTABSL_OPTION_USE_INLINE_NAMESPACE == 1
 
-#define ABSL_INTERNAL_INLINE_NAMESPACE_STR \
-  ABSL_INTERNAL_TOKEN_STR(ABSL_OPTION_INLINE_NAMESPACE_NAME)
+#define OTABSL_INTERNAL_INLINE_NAMESPACE_STR \
+  OTABSL_INTERNAL_TOKEN_STR(OTABSL_OPTION_INLINE_NAMESPACE_NAME)
 
-static_assert(ABSL_INTERNAL_INLINE_NAMESPACE_STR[0] != '\0',
-              "options.h misconfigured: ABSL_OPTION_INLINE_NAMESPACE_NAME must "
+static_assert(OTABSL_INTERNAL_INLINE_NAMESPACE_STR[0] != '\0',
+              "options.h misconfigured: OTABSL_OPTION_INLINE_NAMESPACE_NAME must "
               "not be empty.");
-static_assert(ABSL_INTERNAL_INLINE_NAMESPACE_STR[0] != 'h' ||
-                  ABSL_INTERNAL_INLINE_NAMESPACE_STR[1] != 'e' ||
-                  ABSL_INTERNAL_INLINE_NAMESPACE_STR[2] != 'a' ||
-                  ABSL_INTERNAL_INLINE_NAMESPACE_STR[3] != 'd' ||
-                  ABSL_INTERNAL_INLINE_NAMESPACE_STR[4] != '\0',
-              "options.h misconfigured: ABSL_OPTION_INLINE_NAMESPACE_NAME must "
+static_assert(OTABSL_INTERNAL_INLINE_NAMESPACE_STR[0] != 'h' ||
+                  OTABSL_INTERNAL_INLINE_NAMESPACE_STR[1] != 'e' ||
+                  OTABSL_INTERNAL_INLINE_NAMESPACE_STR[2] != 'a' ||
+                  OTABSL_INTERNAL_INLINE_NAMESPACE_STR[3] != 'd' ||
+                  OTABSL_INTERNAL_INLINE_NAMESPACE_STR[4] != '\0',
+              "options.h misconfigured: OTABSL_OPTION_INLINE_NAMESPACE_NAME must "
               "be changed to a new, unique identifier name.");
 
 #endif
 
-#if ABSL_OPTION_USE_INLINE_NAMESPACE == 0
-#define ABSL_NAMESPACE_BEGIN
-#define ABSL_NAMESPACE_END
-#elif ABSL_OPTION_USE_INLINE_NAMESPACE == 1
-#define ABSL_NAMESPACE_BEGIN \
-  inline namespace ABSL_OPTION_INLINE_NAMESPACE_NAME {
-#define ABSL_NAMESPACE_END }
+#if OTABSL_OPTION_USE_INLINE_NAMESPACE == 0
+#define OTABSL_NAMESPACE_BEGIN
+#define OTABSL_NAMESPACE_END
+#elif OTABSL_OPTION_USE_INLINE_NAMESPACE == 1
+#define OTABSL_NAMESPACE_BEGIN \
+  inline namespace OTABSL_OPTION_INLINE_NAMESPACE_NAME {
+#define OTABSL_NAMESPACE_END }
 #else
 #error options.h is misconfigured.
 #endif
@@ -133,7 +133,7 @@ static_assert(ABSL_INTERNAL_INLINE_NAMESPACE_STR[0] != 'h' ||
 // Compiler Feature Checks
 // -----------------------------------------------------------------------------
 
-// ABSL_HAVE_BUILTIN()
+// OTABSL_HAVE_BUILTIN()
 //
 // Checks whether the compiler supports a Clang Feature Checking Macro, and if
 // so, checks whether it supports the provided builtin function "x" where x
@@ -143,82 +143,82 @@ static_assert(ABSL_INTERNAL_INLINE_NAMESPACE_STR[0] != 'h' ||
 // Note: Use this macro to avoid an extra level of #ifdef __has_builtin check.
 // http://releases.llvm.org/3.3/tools/clang/docs/LanguageExtensions.html
 #ifdef __has_builtin
-#define ABSL_HAVE_BUILTIN(x) __has_builtin(x)
+#define OTABSL_HAVE_BUILTIN(x) __has_builtin(x)
 #else
-#define ABSL_HAVE_BUILTIN(x) 0
+#define OTABSL_HAVE_BUILTIN(x) 0
 #endif
 
 #if defined(__is_identifier)
-#define ABSL_INTERNAL_HAS_KEYWORD(x) !(__is_identifier(x))
+#define OTABSL_INTERNAL_HAS_KEYWORD(x) !(__is_identifier(x))
 #else
-#define ABSL_INTERNAL_HAS_KEYWORD(x) 0
+#define OTABSL_INTERNAL_HAS_KEYWORD(x) 0
 #endif
 
-// ABSL_HAVE_TLS is defined to 1 when __thread should be supported.
+// OTABSL_HAVE_TLS is defined to 1 when __thread should be supported.
 // We assume __thread is supported on Linux when compiled with Clang or compiled
 // against libstdc++ with _GLIBCXX_HAVE_TLS defined.
-#ifdef ABSL_HAVE_TLS
-#error ABSL_HAVE_TLS cannot be directly set
+#ifdef OTABSL_HAVE_TLS
+#error OTABSL_HAVE_TLS cannot be directly set
 #elif defined(__linux__) && (defined(__clang__) || defined(_GLIBCXX_HAVE_TLS))
-#define ABSL_HAVE_TLS 1
+#define OTABSL_HAVE_TLS 1
 #endif
 
-// ABSL_HAVE_STD_IS_TRIVIALLY_DESTRUCTIBLE
+// OTABSL_HAVE_STD_IS_TRIVIALLY_DESTRUCTIBLE
 //
 // Checks whether `std::is_trivially_destructible<T>` is supported.
 //
 // Notes: All supported compilers using libc++ support this feature, as does
 // gcc >= 4.8.1 using libstdc++, and Visual Studio.
-#ifdef ABSL_HAVE_STD_IS_TRIVIALLY_DESTRUCTIBLE
-#error ABSL_HAVE_STD_IS_TRIVIALLY_DESTRUCTIBLE cannot be directly set
+#ifdef OTABSL_HAVE_STD_IS_TRIVIALLY_DESTRUCTIBLE
+#error OTABSL_HAVE_STD_IS_TRIVIALLY_DESTRUCTIBLE cannot be directly set
 #elif defined(_LIBCPP_VERSION) ||                                        \
     (!defined(__clang__) && defined(__GNUC__) && defined(__GLIBCXX__) && \
      (__GNUC__ > 4 || (__GNUC__ == 4 && __GNUC_MINOR__ >= 8))) ||        \
     defined(_MSC_VER)
-#define ABSL_HAVE_STD_IS_TRIVIALLY_DESTRUCTIBLE 1
+#define OTABSL_HAVE_STD_IS_TRIVIALLY_DESTRUCTIBLE 1
 #endif
 
-// ABSL_HAVE_STD_IS_TRIVIALLY_CONSTRUCTIBLE
+// OTABSL_HAVE_STD_IS_TRIVIALLY_CONSTRUCTIBLE
 //
 // Checks whether `std::is_trivially_default_constructible<T>` and
 // `std::is_trivially_copy_constructible<T>` are supported.
 
-// ABSL_HAVE_STD_IS_TRIVIALLY_ASSIGNABLE
+// OTABSL_HAVE_STD_IS_TRIVIALLY_ASSIGNABLE
 //
 // Checks whether `std::is_trivially_copy_assignable<T>` is supported.
 
 // Notes: Clang with libc++ supports these features, as does gcc >= 5.1 with
 // either libc++ or libstdc++, and Visual Studio (but not NVCC).
-#if defined(ABSL_HAVE_STD_IS_TRIVIALLY_CONSTRUCTIBLE)
-#error ABSL_HAVE_STD_IS_TRIVIALLY_CONSTRUCTIBLE cannot be directly set
-#elif defined(ABSL_HAVE_STD_IS_TRIVIALLY_ASSIGNABLE)
-#error ABSL_HAVE_STD_IS_TRIVIALLY_ASSIGNABLE cannot directly set
+#if defined(OTABSL_HAVE_STD_IS_TRIVIALLY_CONSTRUCTIBLE)
+#error OTABSL_HAVE_STD_IS_TRIVIALLY_CONSTRUCTIBLE cannot be directly set
+#elif defined(OTABSL_HAVE_STD_IS_TRIVIALLY_ASSIGNABLE)
+#error OTABSL_HAVE_STD_IS_TRIVIALLY_ASSIGNABLE cannot directly set
 #elif (defined(__clang__) && defined(_LIBCPP_VERSION)) ||        \
     (!defined(__clang__) && defined(__GNUC__) &&                 \
      (__GNUC__ > 7 || (__GNUC__ == 7 && __GNUC_MINOR__ >= 4)) && \
      (defined(_LIBCPP_VERSION) || defined(__GLIBCXX__))) ||      \
     (defined(_MSC_VER) && !defined(__NVCC__))
-#define ABSL_HAVE_STD_IS_TRIVIALLY_CONSTRUCTIBLE 1
-#define ABSL_HAVE_STD_IS_TRIVIALLY_ASSIGNABLE 1
+#define OTABSL_HAVE_STD_IS_TRIVIALLY_CONSTRUCTIBLE 1
+#define OTABSL_HAVE_STD_IS_TRIVIALLY_ASSIGNABLE 1
 #endif
 
-// ABSL_HAVE_SOURCE_LOCATION_CURRENT
+// OTABSL_HAVE_SOURCE_LOCATION_CURRENT
 //
 // Indicates whether `absl::SourceLocation::current()` will return useful
 // information in some contexts.
-#ifndef ABSL_HAVE_SOURCE_LOCATION_CURRENT
-#if ABSL_INTERNAL_HAS_KEYWORD(__builtin_LINE) && \
-    ABSL_INTERNAL_HAS_KEYWORD(__builtin_FILE)
-#define ABSL_HAVE_SOURCE_LOCATION_CURRENT 1
+#ifndef OTABSL_HAVE_SOURCE_LOCATION_CURRENT
+#if OTABSL_INTERNAL_HAS_KEYWORD(__builtin_LINE) && \
+    OTABSL_INTERNAL_HAS_KEYWORD(__builtin_FILE)
+#define OTABSL_HAVE_SOURCE_LOCATION_CURRENT 1
 #endif
 #endif
 
-// ABSL_HAVE_THREAD_LOCAL
+// OTABSL_HAVE_THREAD_LOCAL
 //
 // Checks whether C++11's `thread_local` storage duration specifier is
 // supported.
-#ifdef ABSL_HAVE_THREAD_LOCAL
-#error ABSL_HAVE_THREAD_LOCAL cannot be directly set
+#ifdef OTABSL_HAVE_THREAD_LOCAL
+#error OTABSL_HAVE_THREAD_LOCAL cannot be directly set
 #elif defined(__APPLE__)
 // Notes:
 // * Xcode's clang did not support `thread_local` until version 8, and
@@ -232,10 +232,10 @@ static_assert(ABSL_INTERNAL_INLINE_NAMESPACE_STR[0] != 'h' ||
 // `defined(__APPLE__)` check.
 #if __has_feature(cxx_thread_local) && \
     !(TARGET_OS_IPHONE && __IPHONE_OS_VERSION_MIN_REQUIRED < __IPHONE_9_0)
-#define ABSL_HAVE_THREAD_LOCAL 1
+#define OTABSL_HAVE_THREAD_LOCAL 1
 #endif
 #else  // !defined(__APPLE__)
-#define ABSL_HAVE_THREAD_LOCAL 1
+#define OTABSL_HAVE_THREAD_LOCAL 1
 #endif
 
 // There are platforms for which TLS should not be used even though the compiler
@@ -257,19 +257,19 @@ static_assert(ABSL_INTERNAL_INLINE_NAMESPACE_STR[0] != 'h' ||
 #if defined(__ANDROID__) && defined(__clang__) && defined(__NDK_MAJOR__) && \
     defined(__NDK_MINOR__) &&                                               \
     ((__NDK_MAJOR__ < 12) || ((__NDK_MAJOR__ == 12) && (__NDK_MINOR__ < 1)))
-#undef ABSL_HAVE_TLS
-#undef ABSL_HAVE_THREAD_LOCAL
+#undef OTABSL_HAVE_TLS
+#undef OTABSL_HAVE_THREAD_LOCAL
 #endif
 #endif  // defined(__ANDROID__) && defined(__clang__)
 
 // Emscripten doesn't yet support `thread_local` or `__thread`.
 // https://github.com/emscripten-core/emscripten/issues/3502
 #if defined(__EMSCRIPTEN__)
-#undef ABSL_HAVE_TLS
-#undef ABSL_HAVE_THREAD_LOCAL
+#undef OTABSL_HAVE_TLS
+#undef OTABSL_HAVE_THREAD_LOCAL
 #endif  // defined(__EMSCRIPTEN__)
 
-// ABSL_HAVE_INTRINSIC_INT128
+// OTABSL_HAVE_INTRINSIC_INT128
 //
 // Checks whether the __int128 compiler extension for a 128-bit integral type is
 // supported.
@@ -282,51 +282,51 @@ static_assert(ABSL_INTERNAL_INLINE_NAMESPACE_STR[0] != 'h' ||
 // * On Nvidia's nvcc:
 //   * nvcc also defines __GNUC__ and __SIZEOF_INT128__, but not all versions
 //     actually support __int128.
-#ifdef ABSL_HAVE_INTRINSIC_INT128
-#error ABSL_HAVE_INTRINSIC_INT128 cannot be directly set
+#ifdef OTABSL_HAVE_INTRINSIC_INT128
+#error OTABSL_HAVE_INTRINSIC_INT128 cannot be directly set
 #elif defined(__SIZEOF_INT128__)
 #if (defined(__clang__) && !defined(_WIN32)) || \
     (defined(__CUDACC__) && __CUDACC_VER_MAJOR__ >= 9) ||                \
     (defined(__GNUC__) && !defined(__clang__) && !defined(__CUDACC__))
-#define ABSL_HAVE_INTRINSIC_INT128 1
+#define OTABSL_HAVE_INTRINSIC_INT128 1
 #elif defined(__CUDACC__)
 // __CUDACC_VER__ is a full version number before CUDA 9, and is defined to a
 // string explaining that it has been removed starting with CUDA 9. We use
 // nested #ifs because there is no short-circuiting in the preprocessor.
 // NOTE: `__CUDACC__` could be undefined while `__CUDACC_VER__` is defined.
 #if __CUDACC_VER__ >= 70000
-#define ABSL_HAVE_INTRINSIC_INT128 1
+#define OTABSL_HAVE_INTRINSIC_INT128 1
 #endif  // __CUDACC_VER__ >= 70000
 #endif  // defined(__CUDACC__)
-#endif  // ABSL_HAVE_INTRINSIC_INT128
+#endif  // OTABSL_HAVE_INTRINSIC_INT128
 
-// ABSL_HAVE_EXCEPTIONS
+// OTABSL_HAVE_EXCEPTIONS
 //
 // Checks whether the compiler both supports and enables exceptions. Many
 // compilers support a "no exceptions" mode that disables exceptions.
 //
-// Generally, when ABSL_HAVE_EXCEPTIONS is not defined:
+// Generally, when OTABSL_HAVE_EXCEPTIONS is not defined:
 //
 // * Code using `throw` and `try` may not compile.
 // * The `noexcept` specifier will still compile and behave as normal.
 // * The `noexcept` operator may still return `false`.
 //
 // For further details, consult the compiler's documentation.
-#ifdef ABSL_HAVE_EXCEPTIONS
-#error ABSL_HAVE_EXCEPTIONS cannot be directly set.
+#ifdef OTABSL_HAVE_EXCEPTIONS
+#error OTABSL_HAVE_EXCEPTIONS cannot be directly set.
 
 #elif defined(__clang__)
 
 #if __clang_major__ > 3 || (__clang_major__ == 3 && __clang_minor__ >= 6)
 // Clang >= 3.6
 #if __has_feature(cxx_exceptions)
-#define ABSL_HAVE_EXCEPTIONS 1
+#define OTABSL_HAVE_EXCEPTIONS 1
 #endif  // __has_feature(cxx_exceptions)
 #else
 // Clang < 3.6
 // http://releases.llvm.org/3.6.0/tools/clang/docs/ReleaseNotes.html#the-exceptions-macro
 #if defined(__EXCEPTIONS) && __has_feature(cxx_exceptions)
-#define ABSL_HAVE_EXCEPTIONS 1
+#define OTABSL_HAVE_EXCEPTIONS 1
 #endif  // defined(__EXCEPTIONS) && __has_feature(cxx_exceptions)
 #endif  // __clang_major__ > 3 || (__clang_major__ == 3 && __clang_minor__ >= 6)
 
@@ -334,7 +334,7 @@ static_assert(ABSL_INTERNAL_INLINE_NAMESPACE_STR[0] != 'h' ||
 #elif !(defined(__GNUC__) && (__GNUC__ < 5) && !defined(__EXCEPTIONS)) &&    \
     !(defined(__GNUC__) && (__GNUC__ >= 5) && !defined(__cpp_exceptions)) && \
     !(defined(_MSC_VER) && !defined(_CPPUNWIND))
-#define ABSL_HAVE_EXCEPTIONS 1
+#define OTABSL_HAVE_EXCEPTIONS 1
 #endif
 
 // -----------------------------------------------------------------------------
@@ -358,41 +358,41 @@ static_assert(ABSL_INTERNAL_INLINE_NAMESPACE_STR[0] != 'h' ||
 // Note that since Android defines both __ANDROID__ and __linux__, one
 // may probe for either Linux or Android by simply testing for __linux__.
 
-// ABSL_HAVE_MMAP
+// OTABSL_HAVE_MMAP
 //
 // Checks whether the platform has an mmap(2) implementation as defined in
 // POSIX.1-2001.
-#ifdef ABSL_HAVE_MMAP
-#error ABSL_HAVE_MMAP cannot be directly set
+#ifdef OTABSL_HAVE_MMAP
+#error OTABSL_HAVE_MMAP cannot be directly set
 #elif defined(__linux__) || defined(__APPLE__) || defined(__FreeBSD__) ||   \
     defined(__ros__) || defined(__native_client__) || defined(__asmjs__) || \
     defined(__wasm__) || defined(__Fuchsia__) || defined(__sun) || \
     defined(__ASYLO__)
-#define ABSL_HAVE_MMAP 1
+#define OTABSL_HAVE_MMAP 1
 #endif
 
-// ABSL_HAVE_PTHREAD_GETSCHEDPARAM
+// OTABSL_HAVE_PTHREAD_GETSCHEDPARAM
 //
 // Checks whether the platform implements the pthread_(get|set)schedparam(3)
 // functions as defined in POSIX.1-2001.
-#ifdef ABSL_HAVE_PTHREAD_GETSCHEDPARAM
-#error ABSL_HAVE_PTHREAD_GETSCHEDPARAM cannot be directly set
+#ifdef OTABSL_HAVE_PTHREAD_GETSCHEDPARAM
+#error OTABSL_HAVE_PTHREAD_GETSCHEDPARAM cannot be directly set
 #elif defined(__linux__) || defined(__APPLE__) || defined(__FreeBSD__) || \
     defined(__ros__)
-#define ABSL_HAVE_PTHREAD_GETSCHEDPARAM 1
+#define OTABSL_HAVE_PTHREAD_GETSCHEDPARAM 1
 #endif
 
-// ABSL_HAVE_SCHED_YIELD
+// OTABSL_HAVE_SCHED_YIELD
 //
 // Checks whether the platform implements sched_yield(2) as defined in
 // POSIX.1-2001.
-#ifdef ABSL_HAVE_SCHED_YIELD
-#error ABSL_HAVE_SCHED_YIELD cannot be directly set
+#ifdef OTABSL_HAVE_SCHED_YIELD
+#error OTABSL_HAVE_SCHED_YIELD cannot be directly set
 #elif defined(__linux__) || defined(__ros__) || defined(__native_client__)
-#define ABSL_HAVE_SCHED_YIELD 1
+#define OTABSL_HAVE_SCHED_YIELD 1
 #endif
 
-// ABSL_HAVE_SEMAPHORE_H
+// OTABSL_HAVE_SEMAPHORE_H
 //
 // Checks whether the platform supports the <semaphore.h> header and sem_init(3)
 // family of functions as standardized in POSIX.1-2001.
@@ -401,24 +401,24 @@ static_assert(ABSL_INTERNAL_INLINE_NAMESPACE_STR[0] != 'h' ||
 // explicitly deprecated and will cause build failures if enabled for those
 // platforms.  We side-step the issue by not defining it here for Apple
 // platforms.
-#ifdef ABSL_HAVE_SEMAPHORE_H
-#error ABSL_HAVE_SEMAPHORE_H cannot be directly set
+#ifdef OTABSL_HAVE_SEMAPHORE_H
+#error OTABSL_HAVE_SEMAPHORE_H cannot be directly set
 #elif defined(__linux__) || defined(__ros__)
-#define ABSL_HAVE_SEMAPHORE_H 1
+#define OTABSL_HAVE_SEMAPHORE_H 1
 #endif
 
-// ABSL_HAVE_ALARM
+// OTABSL_HAVE_ALARM
 //
 // Checks whether the platform supports the <signal.h> header and alarm(2)
 // function as standardized in POSIX.1-2001.
-#ifdef ABSL_HAVE_ALARM
-#error ABSL_HAVE_ALARM cannot be directly set
+#ifdef OTABSL_HAVE_ALARM
+#error OTABSL_HAVE_ALARM cannot be directly set
 #elif defined(__GOOGLE_GRTE_VERSION__)
 // feature tests for Google's GRTE
-#define ABSL_HAVE_ALARM 1
+#define OTABSL_HAVE_ALARM 1
 #elif defined(__GLIBC__)
 // feature test for glibc
-#define ABSL_HAVE_ALARM 1
+#define OTABSL_HAVE_ALARM 1
 #elif defined(_MSC_VER)
 // feature tests for Microsoft's library
 #elif defined(__MINGW32__)
@@ -433,11 +433,11 @@ static_assert(ABSL_INTERNAL_INLINE_NAMESPACE_STR[0] != 'h' ||
 #elif defined(__native_client__)
 #else
 // other standard libraries
-#define ABSL_HAVE_ALARM 1
+#define OTABSL_HAVE_ALARM 1
 #endif
 
-// ABSL_IS_LITTLE_ENDIAN
-// ABSL_IS_BIG_ENDIAN
+// OTABSL_IS_LITTLE_ENDIAN
+// OTABSL_IS_BIG_ENDIAN
 //
 // Checks the endianness of the platform.
 //
@@ -445,21 +445,21 @@ static_assert(ABSL_INTERNAL_INLINE_NAMESPACE_STR[0] != 'h' ||
 // Clang (since 3.2); see
 // https://gcc.gnu.org/onlinedocs/cpp/Common-Predefined-Macros.html.
 // Otherwise, if _WIN32, assume little endian. Otherwise, bail with an error.
-#if defined(ABSL_IS_BIG_ENDIAN)
-#error "ABSL_IS_BIG_ENDIAN cannot be directly set."
+#if defined(OTABSL_IS_BIG_ENDIAN)
+#error "OTABSL_IS_BIG_ENDIAN cannot be directly set."
 #endif
-#if defined(ABSL_IS_LITTLE_ENDIAN)
-#error "ABSL_IS_LITTLE_ENDIAN cannot be directly set."
+#if defined(OTABSL_IS_LITTLE_ENDIAN)
+#error "OTABSL_IS_LITTLE_ENDIAN cannot be directly set."
 #endif
 
 #if (defined(__BYTE_ORDER__) && defined(__ORDER_LITTLE_ENDIAN__) && \
      __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__)
-#define ABSL_IS_LITTLE_ENDIAN 1
+#define OTABSL_IS_LITTLE_ENDIAN 1
 #elif defined(__BYTE_ORDER__) && defined(__ORDER_BIG_ENDIAN__) && \
     __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__
-#define ABSL_IS_BIG_ENDIAN 1
+#define OTABSL_IS_BIG_ENDIAN 1
 #elif defined(_WIN32)
-#define ABSL_IS_LITTLE_ENDIAN 1
+#define OTABSL_IS_LITTLE_ENDIAN 1
 #else
 #error "absl endian detection needs to be set up for your compiler"
 #endif
@@ -480,63 +480,63 @@ static_assert(ABSL_INTERNAL_INLINE_NAMESPACE_STR[0] != 'h' ||
    __ENVIRONMENT_WATCH_OS_VERSION_MIN_REQUIRED__ < 120000) || \
   (defined(__ENVIRONMENT_TV_OS_VERSION_MIN_REQUIRED__) && \
    __ENVIRONMENT_TV_OS_VERSION_MIN_REQUIRED__ < 50000))
-#define ABSL_INTERNAL_APPLE_CXX17_TYPES_UNAVAILABLE 1
+#define OTABSL_INTERNAL_APPLE_CXX17_TYPES_UNAVAILABLE 1
 #else
-#define ABSL_INTERNAL_APPLE_CXX17_TYPES_UNAVAILABLE 0
+#define OTABSL_INTERNAL_APPLE_CXX17_TYPES_UNAVAILABLE 0
 #endif
 
-// ABSL_HAVE_STD_ANY
+// OTABSL_HAVE_STD_ANY
 //
 // Checks whether C++17 std::any is available by checking whether <any> exists.
-#ifdef ABSL_HAVE_STD_ANY
-#error "ABSL_HAVE_STD_ANY cannot be directly set."
+#ifdef OTABSL_HAVE_STD_ANY
+#error "OTABSL_HAVE_STD_ANY cannot be directly set."
 #endif
 
 #ifdef __has_include
 #if __has_include(<any>) && __cplusplus >= 201703L && \
-    !ABSL_INTERNAL_APPLE_CXX17_TYPES_UNAVAILABLE
-#define ABSL_HAVE_STD_ANY 1
+    !OTABSL_INTERNAL_APPLE_CXX17_TYPES_UNAVAILABLE
+#define OTABSL_HAVE_STD_ANY 1
 #endif
 #endif
 
-// ABSL_HAVE_STD_OPTIONAL
+// OTABSL_HAVE_STD_OPTIONAL
 //
 // Checks whether C++17 std::optional is available.
-#ifdef ABSL_HAVE_STD_OPTIONAL
-#error "ABSL_HAVE_STD_OPTIONAL cannot be directly set."
+#ifdef OTABSL_HAVE_STD_OPTIONAL
+#error "OTABSL_HAVE_STD_OPTIONAL cannot be directly set."
 #endif
 
 #ifdef __has_include
 #if __has_include(<optional>) && __cplusplus >= 201703L && \
-    !ABSL_INTERNAL_APPLE_CXX17_TYPES_UNAVAILABLE
-#define ABSL_HAVE_STD_OPTIONAL 1
+    !OTABSL_INTERNAL_APPLE_CXX17_TYPES_UNAVAILABLE
+#define OTABSL_HAVE_STD_OPTIONAL 1
 #endif
 #endif
 
-// ABSL_HAVE_STD_VARIANT
+// OTABSL_HAVE_STD_VARIANT
 //
 // Checks whether C++17 std::variant is available.
-#ifdef ABSL_HAVE_STD_VARIANT
-#error "ABSL_HAVE_STD_VARIANT cannot be directly set."
+#ifdef OTABSL_HAVE_STD_VARIANT
+#error "OTABSL_HAVE_STD_VARIANT cannot be directly set."
 #endif
 
 #ifdef __has_include
 #if __has_include(<variant>) && __cplusplus >= 201703L && \
-    !ABSL_INTERNAL_APPLE_CXX17_TYPES_UNAVAILABLE
-#define ABSL_HAVE_STD_VARIANT 1
+    !OTABSL_INTERNAL_APPLE_CXX17_TYPES_UNAVAILABLE
+#define OTABSL_HAVE_STD_VARIANT 1
 #endif
 #endif
 
-// ABSL_HAVE_STD_STRING_VIEW
+// OTABSL_HAVE_STD_STRING_VIEW
 //
 // Checks whether C++17 std::string_view is available.
-#ifdef ABSL_HAVE_STD_STRING_VIEW
-#error "ABSL_HAVE_STD_STRING_VIEW cannot be directly set."
+#ifdef OTABSL_HAVE_STD_STRING_VIEW
+#error "OTABSL_HAVE_STD_STRING_VIEW cannot be directly set."
 #endif
 
 #ifdef __has_include
 #if __has_include(<string_view>) && __cplusplus >= 201703L
-#define ABSL_HAVE_STD_STRING_VIEW 1
+#define OTABSL_HAVE_STD_STRING_VIEW 1
 #endif
 #endif
 
@@ -549,70 +549,70 @@ static_assert(ABSL_INTERNAL_INLINE_NAMESPACE_STR[0] != 'h' ||
 // TODO(zhangxy): fix tests before enabling aliasing for `std::any`.
 #if defined(_MSC_VER) && _MSC_VER >= 1910 && \
     ((defined(_MSVC_LANG) && _MSVC_LANG > 201402) || __cplusplus > 201402)
-// #define ABSL_HAVE_STD_ANY 1
-#define ABSL_HAVE_STD_OPTIONAL 1
-#define ABSL_HAVE_STD_VARIANT 1
-#define ABSL_HAVE_STD_STRING_VIEW 1
+// #define OTABSL_HAVE_STD_ANY 1
+#define OTABSL_HAVE_STD_OPTIONAL 1
+#define OTABSL_HAVE_STD_VARIANT 1
+#define OTABSL_HAVE_STD_STRING_VIEW 1
 #endif
 
-// ABSL_USES_STD_ANY
+// OTABSL_USES_STD_ANY
 //
 // Indicates whether absl::any is an alias for std::any.
-#if !defined(ABSL_OPTION_USE_STD_ANY)
+#if !defined(OTABSL_OPTION_USE_STD_ANY)
 #error options.h is misconfigured.
-#elif ABSL_OPTION_USE_STD_ANY == 0 || \
-    (ABSL_OPTION_USE_STD_ANY == 2 && !defined(ABSL_HAVE_STD_ANY))
-#undef ABSL_USES_STD_ANY
-#elif ABSL_OPTION_USE_STD_ANY == 1 || \
-    (ABSL_OPTION_USE_STD_ANY == 2 && defined(ABSL_HAVE_STD_ANY))
-#define ABSL_USES_STD_ANY 1
+#elif OTABSL_OPTION_USE_STD_ANY == 0 || \
+    (OTABSL_OPTION_USE_STD_ANY == 2 && !defined(OTABSL_HAVE_STD_ANY))
+#undef OTABSL_USES_STD_ANY
+#elif OTABSL_OPTION_USE_STD_ANY == 1 || \
+    (OTABSL_OPTION_USE_STD_ANY == 2 && defined(OTABSL_HAVE_STD_ANY))
+#define OTABSL_USES_STD_ANY 1
 #else
 #error options.h is misconfigured.
 #endif
 
-// ABSL_USES_STD_OPTIONAL
+// OTABSL_USES_STD_OPTIONAL
 //
 // Indicates whether absl::optional is an alias for std::optional.
-#if !defined(ABSL_OPTION_USE_STD_OPTIONAL)
+#if !defined(OTABSL_OPTION_USE_STD_OPTIONAL)
 #error options.h is misconfigured.
-#elif ABSL_OPTION_USE_STD_OPTIONAL == 0 || \
-    (ABSL_OPTION_USE_STD_OPTIONAL == 2 && !defined(ABSL_HAVE_STD_OPTIONAL))
-#undef ABSL_USES_STD_OPTIONAL
-#elif ABSL_OPTION_USE_STD_OPTIONAL == 1 || \
-    (ABSL_OPTION_USE_STD_OPTIONAL == 2 && defined(ABSL_HAVE_STD_OPTIONAL))
-#define ABSL_USES_STD_OPTIONAL 1
+#elif OTABSL_OPTION_USE_STD_OPTIONAL == 0 || \
+    (OTABSL_OPTION_USE_STD_OPTIONAL == 2 && !defined(OTABSL_HAVE_STD_OPTIONAL))
+#undef OTABSL_USES_STD_OPTIONAL
+#elif OTABSL_OPTION_USE_STD_OPTIONAL == 1 || \
+    (OTABSL_OPTION_USE_STD_OPTIONAL == 2 && defined(OTABSL_HAVE_STD_OPTIONAL))
+#define OTABSL_USES_STD_OPTIONAL 1
 #else
 #error options.h is misconfigured.
 #endif
 
-// ABSL_USES_STD_VARIANT
+// OTABSL_USES_STD_VARIANT
 //
 // Indicates whether absl::variant is an alias for std::variant.
-#if !defined(ABSL_OPTION_USE_STD_VARIANT)
+#if !defined(OTABSL_OPTION_USE_STD_VARIANT)
 #error options.h is misconfigured.
-#elif ABSL_OPTION_USE_STD_VARIANT == 0 || \
-    (ABSL_OPTION_USE_STD_VARIANT == 2 && !defined(ABSL_HAVE_STD_VARIANT))
-#undef ABSL_USES_STD_VARIANT
-#elif ABSL_OPTION_USE_STD_VARIANT == 1 || \
-    (ABSL_OPTION_USE_STD_VARIANT == 2 && defined(ABSL_HAVE_STD_VARIANT))
-#define ABSL_USES_STD_VARIANT 1
+#elif OTABSL_OPTION_USE_STD_VARIANT == 0 || \
+    (OTABSL_OPTION_USE_STD_VARIANT == 2 && !defined(OTABSL_HAVE_STD_VARIANT))
+#undef OTABSL_USES_STD_VARIANT
+#elif OTABSL_OPTION_USE_STD_VARIANT == 1 || \
+    (OTABSL_OPTION_USE_STD_VARIANT == 2 && defined(OTABSL_HAVE_STD_VARIANT))
+#define OTABSL_USES_STD_VARIANT 1
 #else
 #error options.h is misconfigured.
 #endif
 
-// ABSL_USES_STD_STRING_VIEW
+// OTABSL_USES_STD_STRING_VIEW
 //
 // Indicates whether absl::string_view is an alias for std::string_view.
-#if !defined(ABSL_OPTION_USE_STD_STRING_VIEW)
+#if !defined(OTABSL_OPTION_USE_STD_STRING_VIEW)
 #error options.h is misconfigured.
-#elif ABSL_OPTION_USE_STD_STRING_VIEW == 0 || \
-    (ABSL_OPTION_USE_STD_STRING_VIEW == 2 &&  \
-     !defined(ABSL_HAVE_STD_STRING_VIEW))
-#undef ABSL_USES_STD_STRING_VIEW
-#elif ABSL_OPTION_USE_STD_STRING_VIEW == 1 || \
-    (ABSL_OPTION_USE_STD_STRING_VIEW == 2 &&  \
-     defined(ABSL_HAVE_STD_STRING_VIEW))
-#define ABSL_USES_STD_STRING_VIEW 1
+#elif OTABSL_OPTION_USE_STD_STRING_VIEW == 0 || \
+    (OTABSL_OPTION_USE_STD_STRING_VIEW == 2 &&  \
+     !defined(OTABSL_HAVE_STD_STRING_VIEW))
+#undef OTABSL_USES_STD_STRING_VIEW
+#elif OTABSL_OPTION_USE_STD_STRING_VIEW == 1 || \
+    (OTABSL_OPTION_USE_STD_STRING_VIEW == 2 &&  \
+     defined(OTABSL_HAVE_STD_STRING_VIEW))
+#define OTABSL_USES_STD_STRING_VIEW 1
 #else
 #error options.h is misconfigured.
 #endif
@@ -622,34 +622,34 @@ static_assert(ABSL_INTERNAL_INLINE_NAMESPACE_STR[0] != 'h' ||
 // struct can throw. This defeats some of variant_test and
 // variant_exception_safety_test.
 #if defined(_MSC_VER) && _MSC_VER >= 1700 && defined(_DEBUG)
-#define ABSL_INTERNAL_MSVC_2017_DBG_MODE
+#define OTABSL_INTERNAL_MSVC_2017_DBG_MODE
 #endif
 
-// ABSL_INTERNAL_MANGLED_NS
-// ABSL_INTERNAL_MANGLED_BACKREFERENCE
+// OTABSL_INTERNAL_MANGLED_NS
+// OTABSL_INTERNAL_MANGLED_BACKREFERENCE
 //
 // Internal macros for building up mangled names in our internal fork of CCTZ.
 // This implementation detail is only needed and provided for the MSVC build.
 //
-// These macros both expand to string literals.  ABSL_INTERNAL_MANGLED_NS is
+// These macros both expand to string literals.  OTABSL_INTERNAL_MANGLED_NS is
 // the mangled spelling of the `absl` namespace, and
-// ABSL_INTERNAL_MANGLED_BACKREFERENCE is a back-reference integer representing
+// OTABSL_INTERNAL_MANGLED_BACKREFERENCE is a back-reference integer representing
 // the proper count to skip past the CCTZ fork namespace names.  (This number
 // is one larger when there is an inline namespace name to skip.)
 #if defined(_MSC_VER)
-#if ABSL_OPTION_USE_INLINE_NAMESPACE == 0
-#define ABSL_INTERNAL_MANGLED_NS "absl"
-#define ABSL_INTERNAL_MANGLED_BACKREFERENCE "5"
+#if OTABSL_OPTION_USE_INLINE_NAMESPACE == 0
+#define OTABSL_INTERNAL_MANGLED_NS "absl"
+#define OTABSL_INTERNAL_MANGLED_BACKREFERENCE "5"
 #else
-#define ABSL_INTERNAL_MANGLED_NS \
-  ABSL_INTERNAL_TOKEN_STR(ABSL_OPTION_INLINE_NAMESPACE_NAME) "@absl"
-#define ABSL_INTERNAL_MANGLED_BACKREFERENCE "6"
+#define OTABSL_INTERNAL_MANGLED_NS \
+  OTABSL_INTERNAL_TOKEN_STR(OTABSL_OPTION_INLINE_NAMESPACE_NAME) "@absl"
+#define OTABSL_INTERNAL_MANGLED_BACKREFERENCE "6"
 #endif
 #endif
 
-#undef ABSL_INTERNAL_HAS_KEYWORD
+#undef OTABSL_INTERNAL_HAS_KEYWORD
 
-// ABSL_DLL
+// OTABSL_DLL
 //
 // When building Abseil as a DLL, this macro expands to `__declspec(dllexport)`
 // so we can annotate symbols appropriately as being exported. When used in
@@ -657,15 +657,15 @@ static_assert(ABSL_INTERNAL_INLINE_NAMESPACE_STR[0] != 'h' ||
 // that consumers know the symbol is defined inside the DLL. In all other cases,
 // the macro expands to nothing.
 #if defined(_MSC_VER)
-#if defined(ABSL_BUILD_DLL)
-#define ABSL_DLL __declspec(dllexport)
+#if defined(OTABSL_BUILD_DLL)
+#define OTABSL_DLL __declspec(dllexport)
 #elif 1
-#define ABSL_DLL __declspec(dllimport)
+#define OTABSL_DLL __declspec(dllimport)
 #else
-#define ABSL_DLL
+#define OTABSL_DLL
 #endif
 #else
-#define ABSL_DLL
+#define OTABSL_DLL
 #endif  // defined(_MSC_VER)
 
-#endif  // ABSL_BASE_CONFIG_H_
+#endif  // OTABSL_BASE_CONFIG_H_

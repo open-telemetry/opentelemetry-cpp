@@ -18,27 +18,27 @@
 //
 // This header file defines the `absl::bad_variant_access` type.
 
-#ifndef ABSL_TYPES_BAD_VARIANT_ACCESS_H_
-#define ABSL_TYPES_BAD_VARIANT_ACCESS_H_
+#ifndef OTABSL_TYPES_BAD_VARIANT_ACCESS_H_
+#define OTABSL_TYPES_BAD_VARIANT_ACCESS_H_
 
 #include <stdexcept>
 
 #include "../base/config.h"
 
-#ifdef ABSL_USES_STD_VARIANT
+#ifdef OTABSL_USES_STD_VARIANT
 
 #include <variant>
 
 namespace absl {
-ABSL_NAMESPACE_BEGIN
+OTABSL_NAMESPACE_BEGIN
 using std::bad_variant_access;
-ABSL_NAMESPACE_END
+OTABSL_NAMESPACE_END
 }  // namespace absl
 
-#else  // ABSL_USES_STD_VARIANT
+#else  // OTABSL_USES_STD_VARIANT
 
 namespace absl {
-ABSL_NAMESPACE_BEGIN
+OTABSL_NAMESPACE_BEGIN
 
 // -----------------------------------------------------------------------------
 // bad_variant_access
@@ -86,9 +86,9 @@ namespace variant_internal {
 [[noreturn]] void Rethrow();
 #endif
 }  // namespace variant_internal
-ABSL_NAMESPACE_END
+OTABSL_NAMESPACE_END
 }  // namespace absl
 
-#endif  // ABSL_USES_STD_VARIANT
+#endif  // OTABSL_USES_STD_VARIANT
 
-#endif  // ABSL_TYPES_BAD_VARIANT_ACCESS_H_
+#endif  // OTABSL_TYPES_BAD_VARIANT_ACCESS_H_

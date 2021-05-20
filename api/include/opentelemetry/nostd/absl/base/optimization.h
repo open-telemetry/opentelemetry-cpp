@@ -19,12 +19,12 @@
 //
 // This header file defines portable macros for performance optimization.
 
-#ifndef ABSL_BASE_OPTIMIZATION_H_
-#define ABSL_BASE_OPTIMIZATION_H_
+#ifndef OTABSL_BASE_OPTIMIZATION_H_
+#define OTABSL_BASE_OPTIMIZATION_H_
 
 #include "config.h"
 
-// ABSL_BLOCK_TAIL_CALL_OPTIMIZATION
+// OTABSL_BLOCK_TAIL_CALL_OPTIMIZATION
 //
 // Instructs the compiler to avoid optimizing tail-call recursion. Use of this
 // macro is useful when you wish to preserve the existing function order within
@@ -34,30 +34,30 @@
 //
 //   int f() {
 //     int result = g();
-//     ABSL_BLOCK_TAIL_CALL_OPTIMIZATION();
+//     OTABSL_BLOCK_TAIL_CALL_OPTIMIZATION();
 //     return result;
 //   }
 #if defined(__pnacl__)
-#define ABSL_BLOCK_TAIL_CALL_OPTIMIZATION() if (volatile int x = 0) { (void)x; }
+#define OTABSL_BLOCK_TAIL_CALL_OPTIMIZATION() if (volatile int x = 0) { (void)x; }
 #elif defined(__clang__)
 // Clang will not tail call given inline volatile assembly.
-#define ABSL_BLOCK_TAIL_CALL_OPTIMIZATION() __asm__ __volatile__("")
+#define OTABSL_BLOCK_TAIL_CALL_OPTIMIZATION() __asm__ __volatile__("")
 #elif defined(__GNUC__)
 // GCC will not tail call given inline volatile assembly.
-#define ABSL_BLOCK_TAIL_CALL_OPTIMIZATION() __asm__ __volatile__("")
+#define OTABSL_BLOCK_TAIL_CALL_OPTIMIZATION() __asm__ __volatile__("")
 #elif defined(_MSC_VER)
 #include <intrin.h>
 // The __nop() intrinsic blocks the optimisation.
-#define ABSL_BLOCK_TAIL_CALL_OPTIMIZATION() __nop()
+#define OTABSL_BLOCK_TAIL_CALL_OPTIMIZATION() __nop()
 #else
-#define ABSL_BLOCK_TAIL_CALL_OPTIMIZATION() if (volatile int x = 0) { (void)x; }
+#define OTABSL_BLOCK_TAIL_CALL_OPTIMIZATION() if (volatile int x = 0) { (void)x; }
 #endif
 
-// ABSL_CACHELINE_SIZE
+// OTABSL_CACHELINE_SIZE
 //
 // Explicitly defines the size of the L1 cache for purposes of alignment.
 // Setting the cacheline size allows you to specify that certain objects be
-// aligned on a cacheline boundary with `ABSL_CACHELINE_ALIGNED` declarations.
+// aligned on a cacheline boundary with `OTABSL_CACHELINE_ALIGNED` declarations.
 // (See below.)
 //
 // NOTE: this macro should be replaced with the following C++17 features, when
@@ -71,35 +71,35 @@
 #if defined(__GNUC__)
 // Cache line alignment
 #if defined(__i386__) || defined(__x86_64__)
-#define ABSL_CACHELINE_SIZE 64
+#define OTABSL_CACHELINE_SIZE 64
 #elif defined(__powerpc64__)
-#define ABSL_CACHELINE_SIZE 128
+#define OTABSL_CACHELINE_SIZE 128
 #elif defined(__aarch64__)
 // We would need to read special register ctr_el0 to find out L1 dcache size.
 // This value is a good estimate based on a real aarch64 machine.
-#define ABSL_CACHELINE_SIZE 64
+#define OTABSL_CACHELINE_SIZE 64
 #elif defined(__arm__)
 // Cache line sizes for ARM: These values are not strictly correct since
 // cache line sizes depend on implementations, not architectures.  There
 // are even implementations with cache line sizes configurable at boot
 // time.
 #if defined(__ARM_ARCH_5T__)
-#define ABSL_CACHELINE_SIZE 32
+#define OTABSL_CACHELINE_SIZE 32
 #elif defined(__ARM_ARCH_7A__)
-#define ABSL_CACHELINE_SIZE 64
+#define OTABSL_CACHELINE_SIZE 64
 #endif
 #endif
 
-#ifndef ABSL_CACHELINE_SIZE
+#ifndef OTABSL_CACHELINE_SIZE
 // A reasonable default guess.  Note that overestimates tend to waste more
 // space, while underestimates tend to waste more time.
-#define ABSL_CACHELINE_SIZE 64
+#define OTABSL_CACHELINE_SIZE 64
 #endif
 
-// ABSL_CACHELINE_ALIGNED
+// OTABSL_CACHELINE_ALIGNED
 //
 // Indicates that the declared object be cache aligned using
-// `ABSL_CACHELINE_SIZE` (see above). Cacheline aligning objects allows you to
+// `OTABSL_CACHELINE_SIZE` (see above). Cacheline aligning objects allows you to
 // load a set of related objects in the L1 cache for performance improvements.
 // Cacheline aligning objects properly allows constructive memory sharing and
 // prevents destructive (or "false") memory sharing.
@@ -111,7 +111,7 @@
 // See http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2016/p0154r1.html
 // for more information.
 //
-// On some compilers, `ABSL_CACHELINE_ALIGNED` expands to an `__attribute__`
+// On some compilers, `OTABSL_CACHELINE_ALIGNED` expands to an `__attribute__`
 // or `__declspec` attribute. For compilers where this is not known to work,
 // the macro expands to nothing.
 //
@@ -126,9 +126,9 @@
 // this attribute, so prefer to put it at the beginning of your declaration.
 // For example,
 //
-//   ABSL_CACHELINE_ALIGNED static Foo* foo = ...
+//   OTABSL_CACHELINE_ALIGNED static Foo* foo = ...
 //
-//   class ABSL_CACHELINE_ALIGNED Bar { ...
+//   class OTABSL_CACHELINE_ALIGNED Bar { ...
 //
 // Recommendations:
 //
@@ -138,23 +138,23 @@
 //    the generated machine code.
 // 3) Prefer applying this attribute to individual variables. Avoid
 //    applying it to types. This tends to localize the effect.
-#define ABSL_CACHELINE_ALIGNED __attribute__((aligned(ABSL_CACHELINE_SIZE)))
+#define OTABSL_CACHELINE_ALIGNED __attribute__((aligned(OTABSL_CACHELINE_SIZE)))
 #elif defined(_MSC_VER)
-#define ABSL_CACHELINE_SIZE 64
-#define ABSL_CACHELINE_ALIGNED __declspec(align(ABSL_CACHELINE_SIZE))
+#define OTABSL_CACHELINE_SIZE 64
+#define OTABSL_CACHELINE_ALIGNED __declspec(align(OTABSL_CACHELINE_SIZE))
 #else
-#define ABSL_CACHELINE_SIZE 64
-#define ABSL_CACHELINE_ALIGNED
+#define OTABSL_CACHELINE_SIZE 64
+#define OTABSL_CACHELINE_ALIGNED
 #endif
 
-// ABSL_PREDICT_TRUE, ABSL_PREDICT_FALSE
+// OTABSL_PREDICT_TRUE, OTABSL_PREDICT_FALSE
 //
 // Enables the compiler to prioritize compilation using static analysis for
 // likely paths within a boolean branch.
 //
 // Example:
 //
-//   if (ABSL_PREDICT_TRUE(expression)) {
+//   if (OTABSL_PREDICT_TRUE(expression)) {
 //     return result;                        // Faster if more likely
 //   } else {
 //     return 0;
@@ -169,13 +169,13 @@
 // branch in a codebase is likely counterproductive; however, annotating
 // specific branches that are both hot and consistently mispredicted is likely
 // to yield performance improvements.
-#if ABSL_HAVE_BUILTIN(__builtin_expect) || \
+#if OTABSL_HAVE_BUILTIN(__builtin_expect) || \
     (defined(__GNUC__) && !defined(__clang__))
-#define ABSL_PREDICT_FALSE(x) (__builtin_expect(x, 0))
-#define ABSL_PREDICT_TRUE(x) (__builtin_expect(false || (x), true))
+#define OTABSL_PREDICT_FALSE(x) (__builtin_expect(x, 0))
+#define OTABSL_PREDICT_TRUE(x) (__builtin_expect(false || (x), true))
 #else
-#define ABSL_PREDICT_FALSE(x) (x)
-#define ABSL_PREDICT_TRUE(x) (x)
+#define OTABSL_PREDICT_FALSE(x) (x)
+#define OTABSL_PREDICT_TRUE(x) (x)
 #endif
 
-#endif  // ABSL_BASE_OPTIMIZATION_H_
+#endif  // OTABSL_BASE_OPTIMIZATION_H_
