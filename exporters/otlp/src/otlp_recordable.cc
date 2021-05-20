@@ -1,4 +1,4 @@
-#include "opentelemetry/exporters/otlp/recordable.h"
+#include "opentelemetry/exporters/otlp/otlp_recordable.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace exporter
@@ -12,8 +12,8 @@ namespace otlp
 const int kAttributeValueSize      = 15;
 const int kOwnedAttributeValueSize = 15;
 
-void Recordable::SetIdentity(const opentelemetry::trace::SpanContext &span_context,
-                             opentelemetry::trace::SpanId parent_span_id) noexcept
+void OtlpRecordable::SetIdentity(const opentelemetry::trace::SpanContext &span_context,
+                                 opentelemetry::trace::SpanId parent_span_id) noexcept
 {
   span_.set_trace_id(reinterpret_cast<const char *>(span_context.trace_id().Id().data()),
                      trace::TraceId::kSize);
@@ -216,7 +216,7 @@ void PopulateAttribute(opentelemetry::proto::common::v1::KeyValue *attribute,
   }
 }
 
-proto::resource::v1::Resource Recordable::ProtoResource() const noexcept
+proto::resource::v1::Resource OtlpRecordable::ProtoResource() const noexcept
 {
   proto::resource::v1::Resource proto;
   if (resource_)
@@ -230,21 +230,21 @@ proto::resource::v1::Resource Recordable::ProtoResource() const noexcept
   return proto;
 }
 
-void Recordable::SetResource(const opentelemetry::sdk::resource::Resource &resource) noexcept
+void OtlpRecordable::SetResource(const opentelemetry::sdk::resource::Resource &resource) noexcept
 {
   resource_ = &resource;
 };
 
-void Recordable::SetAttribute(nostd::string_view key,
-                              const opentelemetry::common::AttributeValue &value) noexcept
+void OtlpRecordable::SetAttribute(nostd::string_view key,
+                                  const opentelemetry::common::AttributeValue &value) noexcept
 {
   auto *attribute = span_.add_attributes();
   PopulateAttribute(attribute, key, value);
 }
 
-void Recordable::AddEvent(nostd::string_view name,
-                          common::SystemTimestamp timestamp,
-                          const common::KeyValueIterable &attributes) noexcept
+void OtlpRecordable::AddEvent(nostd::string_view name,
+                              common::SystemTimestamp timestamp,
+                              const common::KeyValueIterable &attributes) noexcept
 {
   auto *event = span_.add_events();
   event->set_name(name.data(), name.size());
@@ -256,8 +256,8 @@ void Recordable::AddEvent(nostd::string_view name,
   });
 }
 
-void Recordable::AddLink(const opentelemetry::trace::SpanContext &span_context,
-                         const common::KeyValueIterable &attributes) noexcept
+void OtlpRecordable::AddLink(const opentelemetry::trace::SpanContext &span_context,
+                             const common::KeyValueIterable &attributes) noexcept
 {
   auto *link = span_.add_links();
   link->set_trace_id(reinterpret_cast<const char *>(span_context.trace_id().Id().data()),
@@ -272,18 +272,18 @@ void Recordable::AddLink(const opentelemetry::trace::SpanContext &span_context,
   // TODO: Populate trace_state when it is supported by SpanContext
 }
 
-void Recordable::SetStatus(trace::StatusCode code, nostd::string_view description) noexcept
+void OtlpRecordable::SetStatus(trace::StatusCode code, nostd::string_view description) noexcept
 {
   span_.mutable_status()->set_code(opentelemetry::proto::trace::v1::Status_StatusCode(code));
   span_.mutable_status()->set_message(description.data(), description.size());
 }
 
-void Recordable::SetName(nostd::string_view name) noexcept
+void OtlpRecordable::SetName(nostd::string_view name) noexcept
 {
   span_.set_name(name.data(), name.size());
 }
 
-void Recordable::SetSpanKind(opentelemetry::trace::SpanKind span_kind) noexcept
+void OtlpRecordable::SetSpanKind(opentelemetry::trace::SpanKind span_kind) noexcept
 {
   opentelemetry::proto::trace::v1::Span_SpanKind proto_span_kind =
       opentelemetry::proto::trace::v1::Span_SpanKind::Span_SpanKind_SPAN_KIND_UNSPECIFIED;
@@ -325,18 +325,18 @@ void Recordable::SetSpanKind(opentelemetry::trace::SpanKind span_kind) noexcept
   span_.set_kind(proto_span_kind);
 }
 
-void Recordable::SetStartTime(opentelemetry::common::SystemTimestamp start_time) noexcept
+void OtlpRecordable::SetStartTime(opentelemetry::common::SystemTimestamp start_time) noexcept
 {
   span_.set_start_time_unix_nano(start_time.time_since_epoch().count());
 }
 
-void Recordable::SetDuration(std::chrono::nanoseconds duration) noexcept
+void OtlpRecordable::SetDuration(std::chrono::nanoseconds duration) noexcept
 {
   const uint64_t unix_end_time = span_.start_time_unix_nano() + duration.count();
   span_.set_end_time_unix_nano(unix_end_time);
 }
 
-void Recordable::SetInstrumentationLibrary(
+void OtlpRecordable::SetInstrumentationLibrary(
     const opentelemetry::sdk::instrumentationlibrary::InstrumentationLibrary
         &instrumentation_library) noexcept
 {
