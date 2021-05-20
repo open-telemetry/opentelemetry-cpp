@@ -4,7 +4,7 @@
 #include "opentelemetry/nostd/variant.h"
 // clang-format on
 
-#if defined(HAVE_ABSEIL) && !defined(HAVE_ABSEIL_VARIANT)
+#if defined(HAVE_ABSEIL)
 
 #  if defined(__GNUC__) || defined(__GNUG__)
 #    ifndef __cdecl
