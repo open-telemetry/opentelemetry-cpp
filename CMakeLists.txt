@@ -43,6 +43,9 @@ if(WITH_ABSEIL)
 
   # target_link_libraries(main PRIVATE absl::any absl::base absl::bits
   # absl::city)
+else()
+  # Use local snapshot of Abseil Variant implementation.
+  include_directories(api/include/opentelemetry/nostd)
 endif()
 
 if(WITH_STL)

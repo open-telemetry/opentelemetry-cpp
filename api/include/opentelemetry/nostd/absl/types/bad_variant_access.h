@@ -69,10 +69,22 @@ class bad_variant_access : public std::exception {
 };
 
 namespace variant_internal {
-
+#ifdef THROW_BAD_VARIANT_ACCESS
+// Header-only implementation with static throw implementation.
+// No need to link against Abseil library.
+[[noreturn]] static void ThrowBadVariantAccess()
+{
+  THROW_BAD_VARIANT_ACCESS;
+};
+[[noreturn]] static void Rethrow()
+{
+  THROW_BAD_VARIANT_ACCESS; // Unused!
+};
+#else
+// Original implementation requires linking Abseil library!
 [[noreturn]] void ThrowBadVariantAccess();
 [[noreturn]] void Rethrow();
-
+#endif
 }  // namespace variant_internal
 ABSL_NAMESPACE_END
 }  // namespace absl
