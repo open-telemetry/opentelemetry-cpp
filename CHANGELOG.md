@@ -16,6 +16,7 @@ Increment the:
 ## [Unreleased]
 
 * [EXPORTER] Populate resource to OTLP proto data ([#758](https://github.com/open-telemetry/opentelemetry-cpp/pull/758))
+* [API] Switch from MPark variant to `absl::variant` ([#771](https://github.com/open-telemetry/opentelemetry-cpp/pull/771))
 
 ## [0.6.0] 2021-05-11
 
