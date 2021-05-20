@@ -14,6 +14,8 @@
 
 #pragma once
 
+#include "opentelemetry/version.h"
+
 #ifdef HAVE_CPP_STDLIB
 #  include "opentelemetry/std/variant.h"
 #else
