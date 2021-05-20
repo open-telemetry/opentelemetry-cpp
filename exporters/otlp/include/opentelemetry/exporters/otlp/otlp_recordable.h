@@ -14,7 +14,7 @@ namespace exporter
 {
 namespace otlp
 {
-class Recordable final : public sdk::trace::Recordable
+class OtlpRecordable final : public sdk::trace::Recordable
 {
 public:
   const proto::trace::v1::Span &span() const noexcept { return span_; }
