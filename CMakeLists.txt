@@ -104,6 +104,10 @@ if(WIN32)
   endif(WITH_ETW)
 endif(WIN32)
 
+option(
+  WITH_API_ONLY
+  "Only build the API (use as a header-only library). Overrides WITH_EXAMPLES"
+  OFF)
 option(WITH_EXAMPLES "Whether to build examples" ON)
 
 option(WITH_METRICS_PREVIEW "Whether to build metrics preview" OFF)
@@ -220,17 +224,21 @@ endif()
 include(CMakePackageConfigHelpers)
 
 include_directories(api/include)
-include_directories(sdk/include)
-include_directories(sdk)
-include_directories(ext/include)
 
 add_subdirectory(api)
-add_subdirectory(sdk)
-add_subdirectory(exporters)
-if(WITH_EXAMPLES)
-  add_subdirectory(examples)
+
+if(NOT WITH_API_ONLY)
+  include_directories(sdk/include)
+  include_directories(sdk)
+  include_directories(ext/include)
+
+  add_subdirectory(sdk)
+  add_subdirectory(exporters)
+  if(WITH_EXAMPLES)
+    add_subdirectory(examples)
+  endif()
+  add_subdirectory(ext)
 endif()
-add_subdirectory(ext)
 
 # Add nlohmann/json submodule to include directories
 include_directories(third_party/nlohmann-json/single_include)
