@@ -15,6 +15,7 @@ Increment the:
 
 ## [Unreleased]
 
+* [CI] Add CodeQL security scan CI workflow ([#770](https://github.com/open-telemetry/opentelemetry-cpp/pull/770))
 * [EXPORTER] Populate resource to OTLP proto data ([#758](https://github.com/open-telemetry/opentelemetry-cpp/pull/758))
 * [API] Switch from MPark variant to `absl::variant` ([#771](https://github.com/open-telemetry/opentelemetry-cpp/pull/771))
 
