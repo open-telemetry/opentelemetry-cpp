@@ -13,14 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 #pragma once
+#ifdef ENABLE_METRICS_PREVIEW
 
-#include <string>
-#include <vector>
+#  include <string>
+#  include <vector>
 
-#include "opentelemetry/sdk/metrics/record.h"
-#include "prometheus/metric_family.h"
+#  include "opentelemetry/sdk/metrics/record.h"
+#  include "prometheus/metric_family.h"
 
 namespace metric_sdk = opentelemetry::sdk::metrics;
 
@@ -180,3 +180,4 @@ private:
 }  // namespace prometheus
 }  // namespace exporter
 OPENTELEMETRY_END_NAMESPACE
+#endif
