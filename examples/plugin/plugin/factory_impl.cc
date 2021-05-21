@@ -1,7 +1,5 @@
-/*
- * Copyright The OpenTelemetry Authors
- * SPDX-License-Identifier: Apache-2.0
- */
+// Copyright (c) 2021 OpenTelemetry Authors
+// SPDX-License-Identifier: Apache-2.0
 
 #include "opentelemetry/plugin/factory.h"
 #include "opentelemetry/plugin/hook.h"

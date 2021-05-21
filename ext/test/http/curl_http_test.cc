@@ -1,7 +1,5 @@
-/*
- * Copyright The OpenTelemetry Authors
- * SPDX-License-Identifier: Apache-2.0
- */
+// Copyright (c) 2021 OpenTelemetry Authors
+// SPDX-License-Identifier: Apache-2.0
 
 #include "opentelemetry/ext//http/client/curl//http_client_curl.h"
 #include "opentelemetry/ext/http/client/http_client_factory.h"

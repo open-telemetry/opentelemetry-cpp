@@ -1,7 +1,5 @@
-/*
- * Copyright The OpenTelemetry Authors
- * SPDX-License-Identifier: Apache-2.0
- */
+// Copyright (c) 2021 OpenTelemetry Authors
+// SPDX-License-Identifier: Apache-2.0
 
 #include "opentelemetry/sdk/trace/random_id_generator.h"
 #include "opentelemetry/version.h"

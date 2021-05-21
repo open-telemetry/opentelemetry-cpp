@@ -1,7 +1,5 @@
-/*
- * Copyright The OpenTelemetry Authors
- * SPDX-License-Identifier: Apache-2.0
- */
+// Copyright (c) 2021 OpenTelemetry Authors
+// SPDX-License-Identifier: Apache-2.0
 
 #pragma once
 // Please refer to provider.h for documentation on how to obtain a Tracer object.

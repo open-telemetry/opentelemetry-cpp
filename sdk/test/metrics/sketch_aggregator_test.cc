@@ -1,7 +1,5 @@
-/*
- * Copyright The OpenTelemetry Authors
- * SPDX-License-Identifier: Apache-2.0
- */
+// Copyright (c) 2021 OpenTelemetry Authors
+// SPDX-License-Identifier: Apache-2.0
 
 #ifdef ENABLE_METRICS_PREVIEW
 #  include "opentelemetry/sdk/metrics/aggregator/sketch_aggregator.h"
