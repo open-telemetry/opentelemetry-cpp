@@ -65,9 +65,17 @@ if(WITH_STL)
 
   # Optimize for speed to reduce the hops
   if(CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")
-    set(CMAKE_CXX_FLAGS_SPEED "/O2")
+    if(CMAKE_BUILD_TYPE MATCHES Debug)
+      # Turn off optimizations for DEBUG
+      set(MSVC_CXX_OPT_FLAG "/Od")
+    else()
+      string(REGEX MATCH "\/O" result ${CMAKE_CXX_FLAGS})
+      if(NOT ${result} MATCHES "\/O")
+        set(MSVC_CXX_OPT_FLAG "/O2")
+      endif()
+    endif()
     set(CMAKE_CXX_FLAGS
-        "${CMAKE_CXX_FLAGS} /Zc:__cplusplus ${CMAKE_CXX_FLAGS_SPEED}")
+        "${CMAKE_CXX_FLAGS} /Zc:__cplusplus ${MSVC_CXX_OPT_FLAG}")
   endif()
 endif()
 
@@ -84,12 +92,22 @@ option(WITH_JAEGER "Whether to include the Jaeger exporter" OFF)
 
 option(BUILD_TESTING "Whether to enable tests" ON)
 if(WIN32)
+  if(BUILD_TESTING)
+    if(MSVC)
+      # GTest bug: https://github.com/google/googletest/issues/860
+      add_compile_options(/wd4275)
+    endif()
+  endif()
   option(WITH_ETW "Whether to include the ETW Exporter in the SDK" ON)
   if(WITH_ETW)
     add_definitions(-DHAVE_MSGPACK)
   endif(WITH_ETW)
 endif(WIN32)
 
+option(
+  WITH_API_ONLY
+  "Only build the API (use as a header-only library). Overrides WITH_EXAMPLES"
+  OFF)
 option(WITH_EXAMPLES "Whether to build examples" ON)
 
 option(WITH_METRICS_PREVIEW "Whether to build metrics preview" OFF)
@@ -206,17 +224,21 @@ endif()
 include(CMakePackageConfigHelpers)
 
 include_directories(api/include)
-include_directories(sdk/include)
-include_directories(sdk)
-include_directories(ext/include)
 
 add_subdirectory(api)
-add_subdirectory(sdk)
-add_subdirectory(exporters)
-if(WITH_EXAMPLES)
-  add_subdirectory(examples)
+
+if(NOT WITH_API_ONLY)
+  include_directories(sdk/include)
+  include_directories(sdk)
+  include_directories(ext/include)
+
+  add_subdirectory(sdk)
+  add_subdirectory(exporters)
+  if(WITH_EXAMPLES)
+    add_subdirectory(examples)
+  endif()
+  add_subdirectory(ext)
 endif()
-add_subdirectory(ext)
 
 # Add nlohmann/json submodule to include directories
 include_directories(third_party/nlohmann-json/single_include)
