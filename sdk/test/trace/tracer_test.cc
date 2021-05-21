@@ -48,6 +48,8 @@ public:
     }
     else
     {
+      // we should never reach here
+      assert(false);
       return {Decision::DROP};
     }
   }
