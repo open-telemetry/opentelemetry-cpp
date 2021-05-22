@@ -95,7 +95,6 @@ public:
                            {}, options);
   }
 
-
   template <class T,
             nostd::enable_if_t<common::detail::is_key_value_iterable<T>::value> * = nullptr>
   nostd::shared_ptr<Span> StartSpan(
