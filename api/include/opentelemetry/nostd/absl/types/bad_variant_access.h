@@ -72,11 +72,11 @@ namespace variant_internal {
 #ifdef THROW_BAD_VARIANT_ACCESS
 // Header-only implementation with static throw implementation.
 // No need to link against Abseil library.
-[[noreturn]] static void ThrowBadVariantAccess()
+[[noreturn]] static inline void ThrowBadVariantAccess()
 {
   THROW_BAD_VARIANT_ACCESS;
 };
-//[[noreturn]] static void Rethrow()
+//[[noreturn]] static inline void Rethrow()
 //{
 //  THROW_BAD_VARIANT_ACCESS; // Unused!
 //};
