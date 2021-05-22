@@ -25,6 +25,9 @@ OPENTELEMETRY_BEGIN_NAMESPACE
 // Standard Type aliases in nostd namespace
 namespace nostd
 {
+using std::variant_alternative_t;
+using std::get_if;
+using std::monostate;
 
 // nostd::variant<...>
 template <class... _Types>
