@@ -46,6 +46,8 @@ if(WITH_ABSEIL)
 endif()
 
 if(WITH_STL)
+  add_definitions(-DHAVE_CPP_STDLIB)
+  add_definitions(-DHAVE_GSL)
   # Require at least C++17. C++20 is needed to avoid gsl::span
   if(CMAKE_MINOR_VERSION VERSION_GREATER "3.18")
     # Ask for 20, may get anything below
