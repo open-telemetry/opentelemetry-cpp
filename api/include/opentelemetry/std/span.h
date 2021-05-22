@@ -37,6 +37,9 @@
 #      define HAVE_SPAN
 #    endif
 #  endif
+#  if !__has_include(<gsl/gsl>)
+#    undef HAVE_GSL
+#  endif
 #endif
 
 #if !defined(HAVE_SPAN)
