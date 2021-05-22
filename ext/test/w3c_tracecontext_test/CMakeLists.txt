@@ -4,7 +4,7 @@ find_package(CURL)
 if(NOT CURL_FOUND)
   message(WARNING "Skipping example_w3c_tracecontext_test: CURL not found")
 else()
-  find_package(nlohmann_json)
+  find_package(nlohmann_json QUIET)
   if(NOT nlohmann_json_FOUND)
     # Add library from git submodule to include path
     include_directories(
