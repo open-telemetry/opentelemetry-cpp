@@ -17,7 +17,7 @@
 #include "TUDPTransport.h"
 #include "transport.h"
 
-#include <agent.h>
+#include <Agent.h>
 #include <thrift/protocol/TBinaryProtocol.h>
 #include <thrift/protocol/TCompactProtocol.h>
 #include <thrift/protocol/TProtocol.h>
