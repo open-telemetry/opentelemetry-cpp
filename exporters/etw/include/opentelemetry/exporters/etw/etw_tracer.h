@@ -487,21 +487,11 @@ class Tracer : public trace::Tracer
       UpdateStatus(currentSpan, evt);
       etwProvider().write(provHandle, evt, ActivityIdPtr, RelatedActivityIdPtr, 0, encoding);
     }
-
-    {
-      // Atomically remove the span from list of spans
-      const std::lock_guard<std::mutex> lock(scopes_mutex_);
-      auto spanId = ToLowerBase16(spanBase.GetContext().span_id());
-      scopes_.erase(spanId);
-    }
   };
 
   const trace::TraceId &trace_id() { return traceId_; };
 
   friend class Span;
-
-  std::mutex scopes_mutex_;  // protects scopes_
-  std::map<std::string, nostd::unique_ptr<trace::Scope>> scopes_;
 
   /**
    * @brief Init a reference to etw::ProviderHandle
@@ -657,12 +647,6 @@ public:
       // - options.start_system_time
       etwProvider().write(provHandle, evt, ActivityIdPtr, RelatedActivityIdPtr, 1, encoding);
     };
-
-    {
-      const std::lock_guard<std::mutex> lock(scopes_mutex_);
-      // Use span_id as index
-      scopes_[ToLowerBase16(result->GetContext().span_id())] = WithActiveSpan(result);
-    }
 
     return result;
   };
