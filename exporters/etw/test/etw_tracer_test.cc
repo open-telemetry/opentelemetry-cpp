@@ -74,7 +74,7 @@ TEST(ETWTracer, TracerCheck)
     std::this_thread::sleep_for (std::chrono::seconds(1));
     {
       auto outerSpan = tracer->StartSpan("MySpanL2", attribs);
-      auto outerScope = tracer->WithActiveSpan(outerScope);
+      auto outerScope = tracer->WithActiveSpan(outerSpan);
 
       // Create nested span. Note how we share the attributes here.
       // It is Okay to either reuse/share or have your own attributes.
@@ -156,12 +156,18 @@ TEST(ETWTracer, TracerCheckMinDecoration)
       {"enableAutoParent", false}
   });
   auto tracer = tp.GetTracer(providerName, "TLD");
-  auto aSpan = tracer->StartSpan("A.min");
-  auto bSpan = tracer->StartSpan("B.min");
-  auto cSpan = tracer->StartSpan("C.min");
-  cSpan->End();
-  bSpan->End();
-  aSpan->End();
+  {
+    auto aSpan = tracer->StartSpan("A.min");
+    auto aScope = tracer->WithActiveSpan(aSpan);
+    {
+      auto bSpan = tracer->StartSpan("B.min");
+      auto bScope = tracer->WithActiveSpan(bSpan);
+      {
+        auto cSpan = tracer->StartSpan("C.min");
+        auto cScope = tracer->WithActiveSpan(cSpan);
+      }
+    }
+}
   tracer->CloseWithMicroseconds(0);
 }
 
