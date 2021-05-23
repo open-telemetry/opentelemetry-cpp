@@ -26,8 +26,6 @@ TEST(TracerTest, GetCurrentSpan)
       auto scope_second = tracer->WithActiveSpan(span_second);
       current           = tracer->GetCurrentSpan();
       ASSERT_EQ(current, span_second);
-
-      // scope_second.reset(nullptr);
     }
     current = tracer->GetCurrentSpan();
     ASSERT_EQ(current, span_first);
