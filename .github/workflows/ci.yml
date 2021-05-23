@@ -16,11 +16,11 @@ jobs:
         submodules: 'recursive'
     - name: setup
       run: |
-        ./ci/setup_cmake.sh
-        ./ci/setup_ci_environment.sh
+        sudo ./ci/setup_cmake.sh
+        sudo ./ci/setup_ci_environment.sh
     - name: run cmake tests (without otlp-exporter)
       run: |
-        ./ci/setup_thrift.sh
+        sudo ./ci/setup_thrift.sh
         ./ci/do_ci.sh cmake.test
 
   cmake_gcc_48_test:
@@ -32,11 +32,11 @@ jobs:
         submodules: 'recursive'
     - name: setup
       run: |
-        ./ci/setup_ci_environment.sh
-        ./ci/install_gcc48.sh
+        sudo ./ci/setup_ci_environment.sh
+        sudo ./ci/install_gcc48.sh
     - name: setup cmake
       run: |
-        CC=/usr/bin/gcc-4.8 CXX=/usr/bin/g++-4.8 ./ci/setup_cmake.sh
+        sudo CC=/usr/bin/gcc-4.8 CXX=/usr/bin/g++-4.8 ./ci/setup_cmake.sh
     - name: run tests
       run: ./ci/do_ci.sh cmake.legacy.test
       env:
@@ -52,8 +52,8 @@ jobs:
         submodules: 'recursive'
     - name: setup
       run: |
-        ./ci/setup_ci_environment.sh
-        ./ci/setup_cmake.sh
+        sudo ./ci/setup_ci_environment.sh
+        sudo ./ci/setup_cmake.sh
     - name: run tests
       run: ./ci/do_ci.sh cmake.c++20.test
 
@@ -66,11 +66,11 @@ jobs:
         submodules: 'recursive'
     - name: setup
       run: |
-        ./ci/setup_cmake.sh
-        ./ci/setup_ci_environment.sh
+        sudo ./ci/setup_cmake.sh
+        sudo ./ci/setup_ci_environment.sh
     - name: run otlp exporter tests
       run: |
-        ./ci/setup_grpc.sh
+        sudo ./ci/setup_grpc.sh
         ./ci/do_ci.sh cmake.exporter.otprotocol.test
 
   plugin_test:
@@ -82,8 +82,8 @@ jobs:
         submodules: 'recursive'
     - name: setup
       run: |
-        ./ci/setup_cmake.sh
-        ./ci/setup_ci_environment.sh
+        sudo ./ci/setup_cmake.sh
+        sudo ./ci/setup_ci_environment.sh
     - name: run tests
       run: ./ci/do_ci.sh cmake.test_example_plugin
 
@@ -103,9 +103,9 @@ jobs:
         key: bazel_gcc_48_test
     - name: setup
       run: |
-        ./ci/setup_ci_environment.sh
-        ./ci/install_bazelisk.sh
-        ./ci/install_gcc48.sh
+        sudo ./ci/setup_ci_environment.sh
+        sudo ./ci/install_bazelisk.sh
+        sudo ./ci/install_gcc48.sh
     - name: run tests
       run: ./ci/do_ci.sh bazel.legacy.test
       env:
@@ -127,8 +127,8 @@ jobs:
         key: bazel_test
     - name: setup
       run: |
-        ./ci/setup_ci_environment.sh
-        ./ci/install_bazelisk.sh
+        sudo ./ci/setup_ci_environment.sh
+        sudo ./ci/install_bazelisk.sh
     - name: run tests
       run: ./ci/do_ci.sh bazel.test
 
@@ -148,8 +148,8 @@ jobs:
         key: bazel_valgrind
     - name: setup
       run: |
-        ./ci/setup_ci_environment.sh
-        ./ci/install_bazelisk.sh
+        sudo ./ci/setup_ci_environment.sh
+        sudo ./ci/install_bazelisk.sh
     - name: run tests
       run: ./ci/do_ci.sh bazel.valgrind
 
@@ -169,8 +169,8 @@ jobs:
         key: bazel_noexcept
     - name: setup
       run: |
-        ./ci/setup_ci_environment.sh
-        ./ci/install_bazelisk.sh
+        sudo ./ci/setup_ci_environment.sh
+        sudo ./ci/install_bazelisk.sh
     - name: run tests
       run: ./ci/do_ci.sh bazel.noexcept
 
@@ -190,8 +190,8 @@ jobs:
         key: bazel_asan
     - name: setup
       run: |
-        ./ci/setup_ci_environment.sh
-        ./ci/install_bazelisk.sh
+        sudo ./ci/setup_ci_environment.sh
+        sudo ./ci/install_bazelisk.sh
     - name: run tests
       run: ./ci/do_ci.sh bazel.asan
 
@@ -211,8 +211,8 @@ jobs:
         key: bazel_tsan
     - name: setup
       run: |
-        ./ci/setup_ci_environment.sh
-        ./ci/install_bazelisk.sh
+        sudo ./ci/setup_ci_environment.sh
+        sudo ./ci/install_bazelisk.sh
     - name: run tests
       run: ./ci/do_ci.sh bazel.tsan
 
@@ -249,8 +249,8 @@ jobs:
         key: bazel_benchmark
     - name: setup
       run: |
-        ./ci/setup_ci_environment.sh
-        ./ci/install_bazelisk.sh
+        sudo ./ci/setup_ci_environment.sh
+        sudo ./ci/install_bazelisk.sh
     - name: run tests
       run: |
         env BENCHMARK_DIR=/benchmark
@@ -267,7 +267,7 @@ jobs:
     steps:
     - uses: actions/checkout@v2
     - name: setup
-      run: ./ci/install_format_tools.sh
+      run: sudo ./ci/install_format_tools.sh
     - name: run tests
       run: ./ci/do_ci.sh format
 
@@ -324,8 +324,8 @@ jobs:
         submodules: 'recursive'
     - name: setup
       run: |
-        ./ci/setup_cmake.sh
-        ./ci/setup_ci_environment.sh
+        sudo ./ci/setup_cmake.sh
+        sudo ./ci/setup_ci_environment.sh
     - name: run tests and generate report
       run: ./ci/do_ci.sh code.coverage
     - name: upload report
@@ -341,7 +341,7 @@ jobs:
       uses: actions/checkout@v2
 
     - name: install markdownlint-cli
-      run: npm install -g markdownlint-cli
+      run: sudo npm install -g markdownlint-cli
 
     - name: run markdownlint
       run: markdownlint .
