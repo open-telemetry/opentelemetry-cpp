@@ -1,7 +1,7 @@
 // Copyright The OpenTelemetry Authors
 // SPDX-License-Identifier: Apache-2.0
 
-#include "opentelemetry/exporters/otlp/recordable.h"
+#include "opentelemetry/exporters/otlp/otlp_recordable.h"
 #include <gtest/gtest.h>
 
 OPENTELEMETRY_BEGIN_NAMESPACE
@@ -9,7 +9,7 @@ namespace exporter
 {
 namespace otlp
 {
-TEST(Recordable, SetIdentity)
+TEST(OtlpRecordable, SetIdentity)
 {
   constexpr uint8_t trace_id_buf[]       = {1, 2, 3, 4, 5, 6, 7, 8, 1, 2, 3, 4, 5, 6, 7, 8};
   constexpr uint8_t span_id_buf[]        = {1, 2, 3, 4, 5, 6, 7, 8};
@@ -23,7 +23,7 @@ TEST(Recordable, SetIdentity)
       opentelemetry::trace::TraceFlags{opentelemetry::trace::TraceFlags::kIsSampled}, true,
       trace_state};
 
-  Recordable rec;
+  OtlpRecordable rec;
 
   rec.SetIdentity(span_context, parent_span_id);
 
@@ -37,25 +37,25 @@ TEST(Recordable, SetIdentity)
                         trace::SpanId::kSize));
 }
 
-TEST(Recordable, SetName)
+TEST(OtlpRecordable, SetName)
 {
-  Recordable rec;
+  OtlpRecordable rec;
   nostd::string_view name = "Test Span";
   rec.SetName(name);
   EXPECT_EQ(rec.span().name(), name);
 }
-TEST(Recordable, SetSpanKind)
+TEST(OtlpRecordable, SetSpanKind)
 {
-  Recordable rec;
+  OtlpRecordable rec;
   opentelemetry::trace::SpanKind span_kind = opentelemetry::trace::SpanKind::kServer;
   rec.SetSpanKind(span_kind);
   EXPECT_EQ(rec.span().kind(),
             opentelemetry::proto::trace::v1::Span_SpanKind::Span_SpanKind_SPAN_KIND_SERVER);
 }
 
-TEST(Recordable, SetStartTime)
+TEST(OtlpRecordable, SetStartTime)
 {
-  Recordable rec;
+  OtlpRecordable rec;
   std::chrono::system_clock::time_point start_time = std::chrono::system_clock::now();
   common::SystemTimestamp start_timestamp(start_time);
 
@@ -66,9 +66,9 @@ TEST(Recordable, SetStartTime)
   EXPECT_EQ(rec.span().start_time_unix_nano(), unix_start);
 }
 
-TEST(Recordable, SetDuration)
+TEST(OtlpRecordable, SetDuration)
 {
-  Recordable rec;
+  OtlpRecordable rec;
   // Start time is 0
   common::SystemTimestamp start_timestamp;
 
@@ -81,9 +81,9 @@ TEST(Recordable, SetDuration)
   EXPECT_EQ(rec.span().end_time_unix_nano(), unix_end);
 }
 
-TEST(Recordable, SetStatus)
+TEST(OtlpRecordable, SetStatus)
 {
-  Recordable rec;
+  OtlpRecordable rec;
   trace::StatusCode code(trace::StatusCode::kOk);
   nostd::string_view description = "For test";
   rec.SetStatus(code, description);
@@ -92,9 +92,9 @@ TEST(Recordable, SetStatus)
   EXPECT_EQ(rec.span().status().message(), description);
 }
 
-TEST(Recordable, AddEventDefault)
+TEST(OtlpRecordable, AddEventDefault)
 {
-  Recordable rec;
+  OtlpRecordable rec;
   nostd::string_view name = "Test Event";
 
   std::chrono::system_clock::time_point event_time = std::chrono::system_clock::now();
@@ -110,9 +110,9 @@ TEST(Recordable, AddEventDefault)
   EXPECT_EQ(rec.span().events(0).attributes().size(), 0);
 }
 
-TEST(Recordable, AddEventWithAttributes)
+TEST(OtlpRecordable, AddEventWithAttributes)
 {
-  Recordable rec;
+  OtlpRecordable rec;
   const int kNumAttributes              = 3;
   std::string keys[kNumAttributes]      = {"attr1", "attr2", "attr3"};
   int values[kNumAttributes]            = {4, 7, 23};
@@ -129,9 +129,9 @@ TEST(Recordable, AddEventWithAttributes)
   }
 }
 
-TEST(Recordable, AddLink)
+TEST(OtlpRecordable, AddLink)
 {
-  Recordable rec;
+  OtlpRecordable rec;
   const int kNumAttributes              = 3;
   std::string keys[kNumAttributes]      = {"attr1", "attr2", "attr3"};
   int values[kNumAttributes]            = {5, 12, 40};
@@ -153,10 +153,32 @@ TEST(Recordable, AddLink)
   }
 }
 
-// Test non-int single types. Int single types are tested using templates (see IntAttributeTest)
-TEST(Recordable, SetSingleAtrribute)
+TEST(OtlpRecordable, SetResource)
 {
-  Recordable rec;
+  OtlpRecordable rec;
+  const std::string service_name_key = "service.name";
+  std::string service_name           = "test-otlp";
+  auto resource =
+      opentelemetry::sdk::resource::Resource::Create({{service_name_key, service_name}});
+  rec.SetResource(resource);
+
+  auto proto_resource     = rec.ProtoResource();
+  bool found_service_name = false;
+  for (size_t i = 0; i < proto_resource.attributes_size(); i++)
+  {
+    auto attr = proto_resource.attributes(static_cast<int>(i));
+    if (attr.key() == service_name_key && attr.value().string_value() == service_name)
+    {
+      found_service_name = true;
+    }
+  }
+  EXPECT_TRUE(found_service_name);
+}
+
+// Test non-int single types. Int single types are tested using templates (see IntAttributeTest)
+TEST(OtlpRecordable, SetSingleAtrribute)
+{
+  OtlpRecordable rec;
   nostd::string_view bool_key = "bool_attr";
   common::AttributeValue bool_val(true);
   rec.SetAttribute(bool_key, bool_val);
@@ -181,9 +203,9 @@ TEST(Recordable, SetSingleAtrribute)
 }
 
 // Test non-int array types. Int array types are tested using templates (see IntAttributeTest)
-TEST(Recordable, SetArrayAtrribute)
+TEST(OtlpRecordable, SetArrayAtrribute)
 {
-  Recordable rec;
+  OtlpRecordable rec;
   const int kArraySize = 3;
 
   bool bool_arr[kArraySize] = {true, false, true};
@@ -227,7 +249,7 @@ TYPED_TEST(IntAttributeTest, SetIntSingleAttribute)
   IntType i     = 2;
   common::AttributeValue int_val(i);
 
-  Recordable rec;
+  OtlpRecordable rec;
   rec.SetAttribute("int_attr", int_val);
   EXPECT_EQ(rec.span().attributes(0).value().int_value(), nostd::get<IntType>(int_val));
 }
@@ -240,7 +262,7 @@ TYPED_TEST(IntAttributeTest, SetIntArrayAttribute)
   IntType int_arr[kArraySize] = {4, 5, 6};
   nostd::span<const IntType> int_span(int_arr);
 
-  Recordable rec;
+  OtlpRecordable rec;
   rec.SetAttribute("int_arr_attr", int_span);
 
   for (int i = 0; i < kArraySize; i++)

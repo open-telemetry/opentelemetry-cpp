@@ -50,11 +50,11 @@ Span::Span(std::shared_ptr<Tracer> &&tracer,
            const trace_api::SpanContextKeyValueIterable &links,
            const trace_api::StartSpanOptions &options,
            const trace_api::SpanContext &parent_span_context,
-           const nostd::shared_ptr<opentelemetry::trace::TraceState> trace_state,
-           const bool sampled) noexcept
+           std::unique_ptr<trace_api::SpanContext> span_context) noexcept
     : tracer_{std::move(tracer)},
       recordable_{tracer_->GetProcessor().MakeRecordable()},
       start_steady_time{options.start_steady_time},
+      span_context_(std::move(span_context)),
       has_ended_{false}
 {
   if (recordable_ == nullptr)
@@ -63,32 +63,9 @@ Span::Span(std::shared_ptr<Tracer> &&tracer,
   }
   recordable_->SetName(name);
   recordable_->SetInstrumentationLibrary(tracer_->GetInstrumentationLibrary());
-
-  trace_api::TraceId trace_id;
-  trace_api::SpanId span_id = tracer_->GetIdGenerator().GenerateSpanId();
-  trace_api::SpanId parent_span_id;
-  bool is_parent_span_valid = false;
-
-  if (parent_span_context.IsValid())
-  {
-    trace_id             = parent_span_context.trace_id();
-    parent_span_id       = parent_span_context.span_id();
-    is_parent_span_valid = true;
-  }
-  else
-  {
-    trace_id = tracer_->GetIdGenerator().GenerateTraceId();
-  }
-
-  span_context_ = std::unique_ptr<trace_api::SpanContext>(new trace_api::SpanContext(
-      trace_id, span_id,
-      sampled ? trace_api::TraceFlags{trace_api::TraceFlags::kIsSampled} : trace_api::TraceFlags{},
-      false,
-      trace_state ? trace_state
-                  : is_parent_span_valid ? parent_span_context.trace_state()
-                                         : trace_api::TraceState::GetDefault()));
-
-  recordable_->SetIdentity(*span_context_, parent_span_id);
+  recordable_->SetIdentity(*span_context_, parent_span_context.IsValid()
+                                               ? parent_span_context.span_id()
+                                               : trace_api::SpanId());
 
   attributes.ForEachKeyValue(
       [&](nostd::string_view key, opentelemetry::common::AttributeValue value) noexcept {

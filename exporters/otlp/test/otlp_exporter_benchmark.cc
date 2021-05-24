@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 #include "opentelemetry/exporters/otlp/otlp_exporter.h"
-#include "opentelemetry/exporters/otlp/recordable.h"
+#include "opentelemetry/exporters/otlp/otlp_recordable.h"
 
 #include <benchmark/benchmark.h>
 
@@ -76,7 +76,7 @@ void CreateEmptySpans(std::array<std::unique_ptr<sdk::trace::Recordable>, kBatch
 {
   for (int i = 0; i < kBatchSize; i++)
   {
-    auto recordable = std::unique_ptr<sdk::trace::Recordable>(new Recordable);
+    auto recordable = std::unique_ptr<sdk::trace::Recordable>(new OtlpRecordable);
     recordables[i]  = std::move(recordable);
   }
 }
@@ -86,7 +86,7 @@ void CreateSparseSpans(std::array<std::unique_ptr<sdk::trace::Recordable>, kBatc
 {
   for (int i = 0; i < kBatchSize; i++)
   {
-    auto recordable = std::unique_ptr<sdk::trace::Recordable>(new Recordable);
+    auto recordable = std::unique_ptr<sdk::trace::Recordable>(new OtlpRecordable);
 
     recordable->SetIdentity(kSpanContext, kParentSpanId);
     recordable->SetName("TestSpan");
@@ -102,7 +102,7 @@ void CreateDenseSpans(std::array<std::unique_ptr<sdk::trace::Recordable>, kBatch
 {
   for (int i = 0; i < kBatchSize; i++)
   {
-    auto recordable = std::unique_ptr<sdk::trace::Recordable>(new Recordable);
+    auto recordable = std::unique_ptr<sdk::trace::Recordable>(new OtlpRecordable);
 
     recordable->SetIdentity(kSpanContext, kParentSpanId);
     recordable->SetName("TestSpan");

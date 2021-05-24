@@ -25,8 +25,8 @@ static const size_t kTraceParentSize         = 55;
 // The HttpTraceContext provides methods to extract and inject
 // context into headers of HTTP requests with traces.
 // Example:
-//    HttpTraceContext().inject(setter, carrier, context);
-//    HttpTraceContext().extract(getter, carrier, context);
+//    HttpTraceContext().Inject(carrier, context);
+//    HttpTraceContext().Extract(carrier, context);
 
 class HttpTraceContext : public opentelemetry::context::propagation::TextMapPropagator
 {
