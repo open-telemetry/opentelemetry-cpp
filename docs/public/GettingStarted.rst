@@ -68,7 +68,7 @@ Create nested Spans
 
 
 Spans can be nested, and have a parent-child relationship with other spans.
-When a given span is active,the newly created span inherits the active span's
+When a given span is active, the newly created span inherits the active span's
 trace ID, and other context attributes.
 
 Context Propagation
