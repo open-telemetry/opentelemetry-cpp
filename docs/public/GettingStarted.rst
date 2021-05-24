@@ -53,17 +53,17 @@ active span. A span without a parent is called root span.
 Create nested Spans
 ^^^^^^^^^^^^^^^^^^^
 
-..code:: cpp
+.. code:: cpp
 
     auto outer_span = tracer->StartSpan("Outer operation");
     auto outer_scope = tracer->WithActiveSpan(outer_span);
     {
         auto inner_span = tracer->StartSpan("Inner operation");
         auto inner_scope = tracer->WithActiveSpan(inner_span);
-        ---
+        // inner operation
         inner_span->End();
     }
-    ---
+    // outer operation
     outer_span->End();
 
 
@@ -74,7 +74,7 @@ trace ID, and other context attributes.
 Context Propagation
 ^^^^^^^^^^^^^^^^^^
 
-..code:: cpp
+.. code:: cpp
 
     HttpTextMapCarrier<opentelemetry::ext::http::client::Headers> carrier;
     auto propagator =
