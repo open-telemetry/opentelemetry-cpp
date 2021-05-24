@@ -48,5 +48,51 @@ related span is ended.
 
 The concept of an active span is important, as any span that is created
 without explicitly specifying a parent is parented to the currently
-active span.
+active span. A span without a parent is called root span.
 
+Create nested Spans
+^^^^^^^^^^^^^^^^^^^
+
+..code:: cpp
+
+    auto outer_span = tracer->StartSpan("Outer operation");
+    auto outer_scope = tracer->WithActiveSpan(outer_span);
+    {
+        auto inner_span = tracer->StartSpan("Inner operation");
+        auto inner_scope = tracer->WithActiveSpan(inner_span);
+        ---
+        inner_span->End();
+    }
+    ---
+    outer_span->End();
+
+
+Spans can be nested, and have a parent-child relationship with other spans.
+When a given span is active,the newly created span inherits the active span's
+trace ID, and other context attributes.
+
+Context Propagation
+^^^^^^^^^^^^^^^^^^
+
+..code:: cpp
+
+    HttpTextMapCarrier<opentelemetry::ext::http::client::Headers> carrier;
+    auto propagator =
+        opentelemetry::context::propagation::GlobalTextMapPropagator::GetGlobalPropagator();
+
+    //inject context to headers
+    auto current_ctx = opentelemetry::context::RuntimeContext::GetCurrent();
+    propagator->Inject(carrier, current_ctx);
+
+    //Extract headers to context
+    auto current_ctx = opentelemetry::context::RuntimeContext::GetCurrent();
+    auto new_context = propagator->Extract(carrier, current_ctx);
+    auto remote_span = opentelemetry::trace::propagation::GetSpan(new_context);
+
+
+
+``Context`` contains the meta-data of the currently active Span including Span Id,
+Trace Id, and flags. Context Propagation is an important mechanism in distributed
+tracing to transfer this Context across service boundary often through HTTP headers.
+OpenTelemetry provides a text-based approach to propagate context to remote services
+using the W3C Trace Context HTTP headers.
