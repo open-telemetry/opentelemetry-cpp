@@ -167,7 +167,7 @@ TEST(ETWTracer, TracerCheckMinDecoration)
         auto cScope = tracer->WithActiveSpan(cSpan);
         cSpan->End();
       }
-      bSpan->End()
+      bSpan->End();
     }
     aSpan->End();
 }
