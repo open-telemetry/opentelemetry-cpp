@@ -6,8 +6,8 @@
 
 namespace
 {
-uint16_t server_port         = 8800;
-constexpr const char* server_name = "localhost";
+uint16_t server_port              = 8800;
+constexpr const char *server_name = "localhost";
 
 class RequestHandler : public HTTP_SERVER_NS::HttpRequestCallback
 {
@@ -28,16 +28,17 @@ public:
     options.parent   = GetSpanFromContext(new_context)->GetContext();
 
     // start span with parent context extracted from http header
-    auto span = get_tracer("http-server")
-                    ->StartSpan(span_name,
-                    {
-                      {"http.server_name", server_name},
-                      {"net.host.port", server_port},
-                      {"http.method", request.method},
-                      {"http.scheme", "http"},
-                      {"http.request_content_length", static_cast<uint64_t>(request.content.length()) },
-                      {"http.client_ip", request.client}
-                    }, options);
+    auto span =
+        get_tracer("http-server")
+            ->StartSpan(
+                span_name,
+                {{"http.server_name", server_name},
+                 {"net.host.port", server_port},
+                 {"http.method", request.method},
+                 {"http.scheme", "http"},
+                 {"http.request_content_length", static_cast<uint64_t>(request.content.length())},
+                 {"http.client_ip", request.client}},
+                options);
 
     auto scope = get_tracer("http_server")->WithActiveSpan(span);
 
