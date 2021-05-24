@@ -1,5 +1,5 @@
 
-// Copyright (c) 2021 OpenTelemetry Authors
+// Copyright The OpenTelemetry Authors
 // SPDX-License-Identifier: Apache-2.0
 
 #include "src/common/random.h"

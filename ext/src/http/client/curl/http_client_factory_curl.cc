@@ -1,4 +1,4 @@
-// Copyright (c) 2021 OpenTelemetry Authors
+// Copyright The OpenTelemetry Authors
 // SPDX-License-Identifier: Apache-2.0
 
 #include "opentelemetry/ext/http/client/curl/http_client_curl.h"
