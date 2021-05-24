@@ -60,10 +60,10 @@ Create nested Spans
     {
         auto inner_span = tracer->StartSpan("Inner operation");
         auto inner_scope = tracer->WithActiveSpan(inner_span);
-        // inner operation
+        // ... perform inner operation
         inner_span->End();
     }
-    // outer operation
+    // ... perform outer operation
     outer_span->End();
 
 
@@ -76,6 +76,12 @@ Context Propagation
 
 .. code:: cpp
 
+    // set global propagator
+    opentelemetry::context::propagation::GlobalTextMapPropagator::SetGlobalPropagator(
+        nostd::shared_ptr<opentelemetry::context::propagation::TextMapPropagator>(
+            new opentelemetry::trace::propagation::HttpTraceContext()));
+
+    // get global propagator
     HttpTextMapCarrier<opentelemetry::ext::http::client::Headers> carrier;
     auto propagator =
         opentelemetry::context::propagation::GlobalTextMapPropagator::GetGlobalPropagator();
