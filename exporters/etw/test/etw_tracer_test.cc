@@ -165,8 +165,11 @@ TEST(ETWTracer, TracerCheckMinDecoration)
       {
         auto cSpan = tracer->StartSpan("C.min");
         auto cScope = tracer->WithActiveSpan(cSpan);
+        cSpan->End();
       }
+      bSpan->End()
     }
+    aSpan->End();
 }
   tracer->CloseWithMicroseconds(0);
 }
@@ -213,8 +216,11 @@ TEST(ETWTracer, TracerCheckMaxDecoration)
       {
         auto cSpan = tracer->StartSpan("C.max");
         auto cScope = tracer->WithActiveSpan(cSpan);
+        cSpan->End();
       }
+      bSpan->End();
     }
+    aSpan->End();
   }
   tracer->CloseWithMicroseconds(0);
 }
@@ -248,8 +254,11 @@ TEST(ETWTracer, TracerCheckMsgPack)
                   {"strKey", "someValue"}
               };
               cSpan->AddEvent(eventName, event);
+              cSpan->End();
           }
+          bSpan->End();
       }
+      aSpan->End();
   }
   tracer->CloseWithMicroseconds(0);
 }
