@@ -116,10 +116,13 @@ TEST(ETWTracer, TracerCheck)
         };
         EXPECT_NO_THROW(innerSpan->AddEvent(eventName3, event3));
         std::this_thread::sleep_for (std::chrono::seconds(1));
+        innerSpan->End();
 
       }
+      outerSpan->End();
 
     }
+    topSpan->End();
   }
 
   EXPECT_NO_THROW(tracer->CloseWithMicroseconds(0));
