@@ -116,13 +116,13 @@ TEST(ETWTracer, TracerCheck)
         };
         EXPECT_NO_THROW(innerSpan->AddEvent(eventName3, event3));
         std::this_thread::sleep_for (std::chrono::seconds(1));
-        innerSpan->End();
+        EXPECT_NO_THROW(innerSpan->End());
 
       }
-      outerSpan->End();
+      EXPECT_NO_THROW(outerSpan->End());
 
     }
-    topSpan->End();
+    EXPECT_NO_THROW(topSpan->End());
   }
 
   EXPECT_NO_THROW(tracer->CloseWithMicroseconds(0));
@@ -168,11 +168,11 @@ TEST(ETWTracer, TracerCheckMinDecoration)
       {
         auto cSpan = tracer->StartSpan("C.min");
         auto cScope = tracer->WithActiveSpan(cSpan);
-        cSpan->End();
+        EXPECT_NO_THROW(cSpan->End());
       }
-      bSpan->End();
+      EXPECT_NO_THROW(bSpan->End());
     }
-    aSpan->End();
+    EXPECT_NO_THROW(aSpan->End());
 }
   tracer->CloseWithMicroseconds(0);
 }
@@ -219,11 +219,11 @@ TEST(ETWTracer, TracerCheckMaxDecoration)
       {
         auto cSpan = tracer->StartSpan("C.max");
         auto cScope = tracer->WithActiveSpan(cSpan);
-        cSpan->End();
+        EXPECT_NO_THROW(cSpan->End());
       }
-      bSpan->End();
+      EXPECT_NO_THROW(bSpan->End());
     }
-    aSpan->End();
+    EXPECT_NO_THROW(aSpan->End());
   }
   tracer->CloseWithMicroseconds(0);
 }
@@ -257,11 +257,11 @@ TEST(ETWTracer, TracerCheckMsgPack)
                   {"strKey", "someValue"}
               };
               cSpan->AddEvent(eventName, event);
-              cSpan->End();
+              EXPECT_NO_THROW(cSpan->End());
           }
-          bSpan->End();
+          EXPECT_NO_THROW(bSpan->End());
       }
-      aSpan->End();
+      EXPECT_NO_THROW(aSpan->End());
   }
   tracer->CloseWithMicroseconds(0);
 }
