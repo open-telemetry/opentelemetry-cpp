@@ -5,7 +5,12 @@ if(CURL_FOUND)
   set_target_properties(http_client_curl PROPERTIES EXPORT_NAME
                                                     http_client_curl)
 
-  target_link_libraries(http_client_curl PUBLIC CURL::libcurl)
+  if(TARGET CURL::libcurl)
+    target_link_libraries(http_client_curl PUBLIC CURL::libcurl)
+  else()
+    include_directories(${CURL_INCLUDE_DIRS})
+    target_link_libraries(http_client_curl PUBLIC ${CURL_LIBRARIES})
+  endif()
 
   install(
     TARGETS http_client_curl
