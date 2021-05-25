@@ -3,10 +3,17 @@
 ## Preface
 
 This document explains how to refresh the local snapshot of OpenTelemetry `absl::variant`
-snapshot used by header-only OpenTelemetry API. Start with cloning Abseil and check out
-using Release tag. Latest tag at the time of this writing is `20210324.1`.
+snapshot used by header-only OpenTelemetry API. Please avoid unnecessarily updating the
+Abseil snapshot unless there is a significant compiler issue or security bug addressed
+in the mainline. It is not expected for the new snapshot to be refreshed more often than
+once in several years. Updating the snapshot may require an update of OpenTelemetry API
+version due to potential ABI compliance issues. Learn more about [ABI compliance](https://fedoraproject.org/wiki/How_to_check_for_ABI_changes_with_abi_compliance_checker).
 
 ## Cloning the mainline Abseil
+
+Start with cloning Abseil and check out using Release tag.
+
+Latest Release tag at the time of this writing is `20210324.1`.
 
 Example:
 
@@ -70,7 +77,7 @@ it is important to continue using `nostd::` classes for code portability reasons
 
 ## Script to perform namespace renaming from `ABSL_` to `OTABSL_`
 
-Change to directory that contains the `abseil-cpp` directory.
+Change to directory that contains the `abseil-cpp` snapshot.
 
 Review the script below. This process irreversibely alters the contents of Abseil snapshot!
 
@@ -88,7 +95,7 @@ Next, use any visual diff tool to compare your snapshot versus OpenTelemetry sna
 [Beyond Compare](https://www.scootersoftware.com/download.php) is a good cross-platform tool
 to use for that purpose. Carefully compare all files line-by-line.
 
-### Additional patches
+### Additional patches that must be applied manually
 
 You'd notice that after the namespace renaming is done, there are still several places of code
 that require further manual patching:
@@ -113,11 +120,16 @@ In case if new Abseil library snapshot is significantly different from the curre
 used by OpenTelemetry SDK, then it may be ABI-incompatible. You need to run
 [ABI Compliance Checker](https://lvc.github.io/abi-compliance-checker/) tool to verify your
 compiled DLL or Shared Libraries for compliance. If ABI compliance issues were discovered,
-then increment the version of inline namespace from `otel_v1` to `otel_v1_x`. Once all tests
-pass, conclude the merge / integration of the new snapshot. Please avoid unnecessarily
-updating the Abseil snapshot unless there is a significant compiler issue or security bug
-addressed in the mainline. It is not expected for the snapshot to be taken more often than
-once in several years.
+then increment the version of inline namespace from `otel_v1` to `otel_v1_x` or `otel_v2`.
+
+Please use your best judgement if you discover ABI compliance issue. Build the library with
+new namespace. Note that the new library can no longer be used in products that used a
+previous version of API. OpenTelemetry API version upgrade is likely needed.
+
+## Testing
+
+Please run all standard tests. Once all tests pass, conclude the merge / integration of the
+new updated local private snapshot of Abseil library.
 
 ## Conclusion
 
@@ -125,3 +137,6 @@ Enjoy the private snapshot of Abseil `absl::variant` included in OpenTelemetry A
 snapshot does not collide with any other instance of the Abseil library used elsewhere in your
 project. This snapshot provides a long-term ABI compatibility guarantee for OpenTelemetry C++
 API surface for years to come until the next major API version upgrade gets released.
+
+As mentioned above, please avoid refreshing it too often due to potential ABI compatibility
+implications.
