@@ -26,6 +26,7 @@ mkdir -p "${PLUGIN_DIR}"
 BAZEL_OPTIONS=""
 BAZEL_TEST_OPTIONS="$BAZEL_OPTIONS --test_output=errors"
 BAZEL_STARTUP_OPTIONS="--output_user_root=$HOME/.cache/bazel"
+CTEST_OUTPUT_ON_FAILURE=1
 
 if [[ "$1" == "cmake.test" ]]; then
   install_prometheus_cpp_client
