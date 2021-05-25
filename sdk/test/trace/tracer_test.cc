@@ -21,25 +21,37 @@ using opentelemetry::exporter::memory::InMemorySpanExporter;
 using opentelemetry::trace::SpanContext;
 
 /**
- * A mock sampler that returns non-empty sampling results attributes.
+ * A mock sampler with ShouldSample returning:
+ *  Decision::RECORD_AND_SAMPLE if trace_id is valid
+ *  Decision::DROP otherwise.
  */
 class MockSampler final : public Sampler
 {
 public:
   SamplingResult ShouldSample(
       const SpanContext & /*parent_context*/,
-      trace_api::TraceId /*trace_id*/,
+      trace_api::TraceId trace_id,
       nostd::string_view /*name*/,
       trace_api::SpanKind /*span_kind*/,
       const opentelemetry::common::KeyValueIterable & /*attributes*/,
       const opentelemetry::trace::SpanContextKeyValueIterable & /*links*/) noexcept override
   {
-    // Return two pairs of attributes. These attributes should be added to the
-    // span attributes
-    return {Decision::RECORD_AND_SAMPLE,
-            nostd::unique_ptr<const std::map<std::string, opentelemetry::common::AttributeValue>>(
-                new const std::map<std::string, opentelemetry::common::AttributeValue>(
-                    {{"sampling_attr1", 123}, {"sampling_attr2", "string"}}))};
+    // Sample only if valid trace_id ( This is to test Sampler get's valid trace id)
+    if (trace_id.IsValid())
+    {
+      // Return two pairs of attributes. These attributes should be added to the
+      // span attributes
+      return {Decision::RECORD_AND_SAMPLE,
+              nostd::unique_ptr<const std::map<std::string, opentelemetry::common::AttributeValue>>(
+                  new const std::map<std::string, opentelemetry::common::AttributeValue>(
+                      {{"sampling_attr1", 123}, {"sampling_attr2", "string"}}))};
+    }
+    else
+    {
+      // we should never reach here
+      assert(false);
+      return {Decision::DROP};
+    }
   }
 
   nostd::string_view GetDescription() const noexcept override { return "MockSampler"; }
@@ -598,4 +610,16 @@ TEST(Tracer, ExpectParent)
 
   EXPECT_EQ(spandata_first->GetSpanId(), spandata_second->GetParentSpanId());
   EXPECT_EQ(spandata_second->GetSpanId(), spandata_third->GetParentSpanId());
+}
+
+TEST(Tracer, ValidTraceIdToSampler)
+{
+  std::unique_ptr<InMemorySpanExporter> exporter(new InMemorySpanExporter());
+  std::shared_ptr<InMemorySpanData> span_data = exporter->GetData();
+  auto tracer                                 = initTracer(std::move(exporter), new MockSampler());
+
+  auto span = tracer->StartSpan("span 1");
+  // sampler was fed with valid trace_id, so span shouldn't be NoOp Span.
+  EXPECT_TRUE(span->IsRecording());
+  EXPECT_TRUE(span->GetContext().IsValid());
 }
