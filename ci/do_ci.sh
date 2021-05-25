@@ -34,6 +34,7 @@ if [[ "$1" == "cmake.test" ]]; then
   cmake -DCMAKE_BUILD_TYPE=Debug  \
         -DWITH_PROMETHEUS=ON \
         -DWITH_ZIPKIN=ON \
+        -DWITH_JAEGER=ON \
         -DWITH_ELASTICSEARCH=ON \
         -DWITH_METRICS_PREVIEW=ON \
         -DCMAKE_CXX_FLAGS="-Werror" \
