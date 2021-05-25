@@ -5,7 +5,7 @@ build systems for opentelemetry-cpp.
 
 ## Build instructions using CMake
 
-### Prerequisites
+### Prerequisites for CMake
 
 - A supported platform (e.g. Windows, macOS or Linux). Refer to [Platforms
   Supported](./README.md#supported-development-platforms) for more information.
@@ -133,7 +133,7 @@ target_link_libraries(foo PRIVATE ${OPENTELEMETRY_CPP_LIBRARIES})
 
 ## Build instructions using Bazel
 
-### Prerequisites
+### Prerequisites for Bazel
 
 - A supported platform (e.g. Windows, macOS or Linux).
 Refer to [Platforms Supported](./README.md#supported-development-platforms)
@@ -178,10 +178,12 @@ To install Bazel, consult the [Installing Bazel](https://docs.bazel.build/versio
 
    ```
 
-4. Once Bazel tests are built, run them with `bazel test //...` command
+3. Once Bazel tests are built, run them with `bazel test //...` command
 
    ```console
    $ bazel test //...
+   ..
+   $
    ```
 
-5. The build artifacts will be located under `bazel-bin`
+4. The build artifacts will be located under `bazel-bin`
