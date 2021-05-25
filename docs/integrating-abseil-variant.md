@@ -63,7 +63,7 @@ it is important to continue using `nostd::` classes for code portability reasons
 
 # Script to perform namespace renaming from `ABSL_` to `OTABSL_`
 
-Change to directory that contains the `abseil-cpp` directory.
+Change to directory that contains the `abseil-cpp` snapshot.
 
 Review the script below. This process irreversibely alters the contents of Abseil snapshot!
 
