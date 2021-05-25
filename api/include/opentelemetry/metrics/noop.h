@@ -1,3 +1,6 @@
+// Copyright The OpenTelemetry Authors
+// SPDX-License-Identifier: Apache-2.0
+
 #pragma once
 #ifdef ENABLE_METRICS_PREVIEW
 // Please refer to provider.h for documentation on how to obtain a Meter object.
