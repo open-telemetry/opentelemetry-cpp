@@ -1,3 +1,6 @@
+// Copyright The OpenTelemetry Authors
+// SPDX-License-Identifier: Apache-2.0
+
 #ifndef HAVE_CPP_STDLIB
 // Unfortunately as of 04/27/2021 the fix is NOT in the vcpkg snapshot of Google Test.
 // Remove above `#ifdef` once the GMock fix for C++20 is in the mainline.
