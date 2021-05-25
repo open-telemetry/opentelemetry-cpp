@@ -20,19 +20,20 @@ TEST(TracerTest, GetCurrentSpan)
   auto current = tracer->GetCurrentSpan();
   ASSERT_FALSE(current->GetContext().IsValid());
 
-  auto scope_first = tracer->WithActiveSpan(span_first);
-  current          = tracer->GetCurrentSpan();
-  ASSERT_EQ(current, span_first);
+  {
+    auto scope_first = tracer->WithActiveSpan(span_first);
+    current          = tracer->GetCurrentSpan();
+    ASSERT_EQ(current, span_first);
 
-  auto scope_second = tracer->WithActiveSpan(span_second);
-  current           = tracer->GetCurrentSpan();
-  ASSERT_EQ(current, span_second);
+    {
+      auto scope_second = tracer->WithActiveSpan(span_second);
+      current           = tracer->GetCurrentSpan();
+      ASSERT_EQ(current, span_second);
+    }
+    current = tracer->GetCurrentSpan();
+    ASSERT_EQ(current, span_first);
+  }
 
-  scope_second.reset(nullptr);
-  current = tracer->GetCurrentSpan();
-  ASSERT_EQ(current, span_first);
-
-  scope_first.reset(nullptr);
   current = tracer->GetCurrentSpan();
   ASSERT_FALSE(current->GetContext().IsValid());
 }
