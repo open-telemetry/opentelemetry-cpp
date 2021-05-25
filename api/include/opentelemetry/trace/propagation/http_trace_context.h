@@ -160,6 +160,15 @@ private:
 
     return ExtractContextFromTraceHeaders(trace_parent, trace_state);
   }
+
+  bool Fields(nostd::function_ref<bool(nostd::string_view)> callback) const noexcept override
+  {
+    if (callback(kTraceParent) && callback(kTraceState))
+    {
+      return true;
+    }
+    return false;
+  }
 };
 }  // namespace propagation
 }  // namespace trace

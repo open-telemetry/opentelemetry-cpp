@@ -27,6 +27,11 @@ public:
 
   /** Noop inject function does nothing */
   void Inject(TextMapCarrier & /*carrier*/, const context::Context &context) noexcept override {}
+
+  bool Fields(nostd::function_ref<bool(nostd::string_view)> callback) const noexcept override
+  {
+    return true;
+  }
 };
 }  // namespace propagation
 }  // namespace context
