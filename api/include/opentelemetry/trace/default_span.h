@@ -1,3 +1,6 @@
+// Copyright The OpenTelemetry Authors
+// SPDX-License-Identifier: Apache-2.0
+
 #pragma once
 #include "opentelemetry/common/attribute_value.h"
 #include "opentelemetry/trace/canonical_code.h"

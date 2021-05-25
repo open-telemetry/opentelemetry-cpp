@@ -1,16 +1,6 @@
-// Copyright 2021, OpenTelemetry Authors
-//
-// Licensed under the Apache License, Version 2.0 (the "License");
-// you may not use this file except in compliance with the License.
-// You may obtain a copy of the License at
-//
-// http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an "AS IS" BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
+// Copyright The OpenTelemetry Authors
+// SPDX-License-Identifier: Apache-2.0
+
 #pragma once
 
 #include <algorithm>
@@ -487,21 +477,11 @@ class Tracer : public trace::Tracer
       UpdateStatus(currentSpan, evt);
       etwProvider().write(provHandle, evt, ActivityIdPtr, RelatedActivityIdPtr, 0, encoding);
     }
-
-    {
-      // Atomically remove the span from list of spans
-      const std::lock_guard<std::mutex> lock(scopes_mutex_);
-      auto spanId = ToLowerBase16(spanBase.GetContext().span_id());
-      scopes_.erase(spanId);
-    }
   };
 
   const trace::TraceId &trace_id() { return traceId_; };
 
   friend class Span;
-
-  std::mutex scopes_mutex_;  // protects scopes_
-  std::map<std::string, nostd::unique_ptr<trace::Scope>> scopes_;
 
   /**
    * @brief Init a reference to etw::ProviderHandle
@@ -657,12 +637,6 @@ public:
       // - options.start_system_time
       etwProvider().write(provHandle, evt, ActivityIdPtr, RelatedActivityIdPtr, 1, encoding);
     };
-
-    {
-      const std::lock_guard<std::mutex> lock(scopes_mutex_);
-      // Use span_id as index
-      scopes_[ToLowerBase16(result->GetContext().span_id())] = WithActiveSpan(result);
-    }
 
     return result;
   };

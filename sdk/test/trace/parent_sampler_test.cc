@@ -1,3 +1,6 @@
+// Copyright The OpenTelemetry Authors
+// SPDX-License-Identifier: Apache-2.0
+
 #include <gtest/gtest.h>
 #include <memory>
 #include "opentelemetry/sdk/trace/samplers/always_off.h"

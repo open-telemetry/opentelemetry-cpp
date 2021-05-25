@@ -1,3 +1,6 @@
+// Copyright The OpenTelemetry Authors
+// SPDX-License-Identifier: Apache-2.0
+
 #include "opentelemetry/nostd/span.h"
 #include "opentelemetry/sdk/trace/samplers/always_on.h"
 #include "opentelemetry/trace/span_context_kv_iterable_view.h"
