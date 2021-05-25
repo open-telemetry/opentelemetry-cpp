@@ -61,7 +61,7 @@ C++ SDK may also use either its own snapshot of Abseil, or standard library (e.g
 `std::variant`, or share the implementation of variant with the gRPC library. In all of these cases
 it is important to continue using `nostd::` classes for code portability reasons.
 
-# Script to perform namespace renaming from `ABSL_` to `OTABSL_`~
+# Script to perform namespace renaming from `ABSL_` to `OTABSL_`
 
 Change to directory that contains the `abseil-cpp` directory.
 
