@@ -1,3 +1,6 @@
+// Copyright The OpenTelemetry Authors
+// SPDX-License-Identifier: Apache-2.0
+
 #pragma once
 #include "opentelemetry/context/context.h"
 #include "opentelemetry/trace/default_span.h"
