@@ -2,12 +2,17 @@
 
 ## Preface
 
-This document explains how to refresh the local snapshot of OpenTelemetry `absl::variant`
-snapshot used by header-only OpenTelemetry API. Please avoid unnecessarily updating the
-Abseil snapshot unless there is a significant compiler issue or security bug addressed
-in the mainline. It is not expected for the new snapshot to be refreshed more often than
-once in several years. Updating the snapshot may require an update of OpenTelemetry API
-version due to potential ABI compliance issues. Learn more about [ABI compliance](https://fedoraproject.org/wiki/How_to_check_for_ABI_changes_with_abi_compliance_checker).
+Default `nostd::variant` implementation used by OpenTelemetry  API is an alias to variant
+implementation provided by [Abseil library](https://github.com/abseil/abseil-cpp/blob/master/absl/types/variant.h).
+
+This document explains how to refresh the local snapshot of `absl::variant` used by
+header-only OpenTelemetry API. Please avoid unnecessarily updating the Abseil snapshot
+unless there is a significant compiler issue or security bug addressed in the mainline.
+Abseil implementation of variant is not expected be refreshed more often than once
+in several years. Updating the snapshot may require an update of OpenTelemetry API
+version due to potential ABI compliance issues.
+
+Learn more about [ABI compliance](https://fedoraproject.org/wiki/How_to_check_for_ABI_changes_with_abi_compliance_checker).
 
 ## Cloning the mainline Abseil
 
