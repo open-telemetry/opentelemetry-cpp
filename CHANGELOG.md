@@ -14,6 +14,8 @@ Increment the:
 * PATCH version when you make backwards compatible bug fixes.
 
 ## [Unreleased]
+ 
+## [0.7.0] 2021-05-26
 
 * [CI] Add CodeQL security scan CI workflow ([#770](https://github.com/open-telemetry/opentelemetry-cpp/pull/770))
 * [EXPORTER] Populate resource to OTLP proto data ([#758](https://github.com/open-telemetry/opentelemetry-cpp/pull/758))
