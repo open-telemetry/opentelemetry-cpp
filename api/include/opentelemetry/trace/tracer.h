@@ -1,3 +1,6 @@
+// Copyright The OpenTelemetry Authors
+// SPDX-License-Identifier: Apache-2.0
+
 #pragma once
 
 #include "opentelemetry/nostd/shared_ptr.h"
@@ -140,10 +143,7 @@ public:
    * @param span the span that should be set as the new active span.
    * @return a Scope that controls how long the span will be active.
    */
-  static nostd::unique_ptr<Scope> WithActiveSpan(nostd::shared_ptr<Span> &span) noexcept
-  {
-    return nostd::unique_ptr<Scope>(new Scope{span});
-  }
+  static Scope WithActiveSpan(nostd::shared_ptr<Span> &span) noexcept { return Scope{span}; }
 
   /**
    * Get the currently active span.
