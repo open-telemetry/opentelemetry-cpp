@@ -5,7 +5,7 @@ build systems for opentelemetry-cpp.
 
 ## Build instructions using CMake
 
-### Prerequisites
+### Prerequisites for CMake
 
 - A supported platform (e.g. Windows, macOS or Linux). Refer to [Platforms
   Supported](./README.md#supported-development-platforms) for more information.
@@ -133,4 +133,57 @@ target_link_libraries(foo PRIVATE ${OPENTELEMETRY_CPP_LIBRARIES})
 
 ## Build instructions using Bazel
 
-TBD
+### Prerequisites for Bazel
+
+- A supported platform (e.g. Windows, macOS or Linux).
+Refer to [Platforms Supported](./README.md#supported-development-platforms)
+for more information.
+- A compatible C++ compiler supporting at least C++11.
+Major compilers are supported.
+Refer to [Supported Compilers](./README.md#supported-c-versions) for more information.
+- [Git](https://git-scm.com/) for fetching opentelemetry-cpp source code from repository.
+To install Git, consult the [Set up Git](https://help.github.com/articles/set-up-git/)
+guide on GitHub.
+- [Bazel](https://www.bazel.build/) for building opentelemetry-cpp API,
+SDK with their unittests. We use 3.7.2 in our build system.
+
+To install Bazel, consult the [Installing Bazel](https://docs.bazel.build/versions/3.7.0/install.html) guide.
+
+### Building as Standalone Bazel Project
+
+1. Getting the opentelementry-cpp source:
+
+   ```console
+   # Change to the directory where you want to create the code repository
+   $ cd ~
+   $ mkdir source && cd source
+   $ git clone https://github.com/open-telemetry/opentelemetry-cpp
+   Cloning into 'opentelemetry-cpp'...
+   ...
+   Resolving deltas: 100% (3225/3225), done.
+   $
+   ```
+
+2. Download the dependencies and build the source code:
+
+   ```console
+   $ bazel build //...
+   bazel build -- //... -//exporters/otlp/... -//exporters/prometheus/...
+   Extracting Bazel installation...
+   Starting local Bazel server and connecting to it...
+   INFO: Analyzed 121 targets (98 packages loaded, 3815 targets configured).
+   INFO: Found 121 targets...
+   INFO: From Compiling sdk/src/trace/tracer_context.cc:
+   ...
+
+   ```
+
+3. Once Bazel tests are built, run them with `bazel test //...` command
+
+   ```console
+   $ bazel test //...
+   ..
+   $
+   ```
+
+4. The build artifacts will be located under `bazel-bin`
