@@ -1,10 +1,14 @@
-#pragma once
+// Copyright The OpenTelemetry Authors
+// SPDX-License-Identifier: Apache-2.0
 
-#include <mutex>
-#include <vector>
-#include "opentelemetry/metrics/instrument.h"
-#include "opentelemetry/sdk/metrics/aggregator/aggregator.h"
-#include "opentelemetry/version.h"
+#pragma once
+#ifdef ENABLE_METRICS_PREVIEW
+
+#  include <mutex>
+#  include <vector>
+#  include "opentelemetry/metrics/instrument.h"
+#  include "opentelemetry/sdk/metrics/aggregator/aggregator.h"
+#  include "opentelemetry/version.h"
 
 namespace metrics_api = opentelemetry::metrics;
 
@@ -75,11 +79,11 @@ public:
     }
     else
     {
-#if __EXCEPTIONS
+#  if __EXCEPTIONS
       throw std::invalid_argument("Aggregators of different types cannot be merged.");
-#else
+#  else
       std::terminate();
-#endif
+#  endif
     }
   }
 
@@ -103,3 +107,4 @@ public:
 }  // namespace metrics
 }  // namespace sdk
 OPENTELEMETRY_END_NAMESPACE
+#endif

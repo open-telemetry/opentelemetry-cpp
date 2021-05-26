@@ -1,3 +1,6 @@
+// Copyright The OpenTelemetry Authors
+// SPDX-License-Identifier: Apache-2.0
+
 #include "opentelemetry/ext/zpages/tracez_data_aggregator.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE

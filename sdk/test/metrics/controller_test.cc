@@ -1,10 +1,14 @@
-#include "opentelemetry/sdk/metrics/controller.h"
-#include "opentelemetry/sdk/metrics/meter.h"
-#include "opentelemetry/sdk/metrics/ungrouped_processor.h"
+// Copyright The OpenTelemetry Authors
+// SPDX-License-Identifier: Apache-2.0
 
-#include <gtest/gtest.h>
-#include <numeric>
-#include <thread>
+#ifdef ENABLE_METRICS_PREVIEW
+#  include "opentelemetry/sdk/metrics/controller.h"
+#  include "opentelemetry/sdk/metrics/meter.h"
+#  include "opentelemetry/sdk/metrics/ungrouped_processor.h"
+
+#  include <gtest/gtest.h>
+#  include <numeric>
+#  include <thread>
 // #include <chrono>
 
 namespace metrics_api = opentelemetry::metrics;
@@ -49,3 +53,4 @@ TEST(Controller, Constructor)
 }  // namespace metrics
 }  // namespace sdk
 OPENTELEMETRY_END_NAMESPACE
+#endif

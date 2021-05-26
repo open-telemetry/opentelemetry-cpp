@@ -1,3 +1,6 @@
+// Copyright The OpenTelemetry Authors
+// SPDX-License-Identifier: Apache-2.0
+
 #include "opentelemetry/context/runtime_context.h"
 #include "opentelemetry/exporters/ostream/span_exporter.h"
 #include "opentelemetry/ext/http/client/curl/http_client_curl.h"

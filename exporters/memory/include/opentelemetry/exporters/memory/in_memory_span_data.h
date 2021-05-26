@@ -1,9 +1,13 @@
+// Copyright The OpenTelemetry Authors
+// SPDX-License-Identifier: Apache-2.0
+
 #pragma once
 
 #include "opentelemetry/sdk/common/circular_buffer.h"
 #include "opentelemetry/sdk/trace/recordable.h"
 #include "opentelemetry/sdk/trace/span_data.h"
-#include "vector"
+
+#include <vector>
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace exporter

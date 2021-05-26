@@ -1,3 +1,6 @@
+// Copyright The OpenTelemetry Authors
+// SPDX-License-Identifier: Apache-2.0
+
 #include "opentelemetry/sdk/resource/resource.h"
 #include "opentelemetry/common/key_value_iterable_view.h"
 #include "opentelemetry/nostd/string_view.h"

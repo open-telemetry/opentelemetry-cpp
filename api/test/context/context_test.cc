@@ -1,3 +1,6 @@
+// Copyright The OpenTelemetry Authors
+// SPDX-License-Identifier: Apache-2.0
+
 #include "opentelemetry/context/context.h"
 
 #include <map>
@@ -58,7 +61,7 @@ TEST(ContextTest, ContextImmutability)
   context::Context context_test = context::Context(map_test);
   context::Context context_foo  = context_test.SetValue("foo_key", (int64_t)456);
 
-  EXPECT_NE(nostd::get<int64_t>(context_test.GetValue("foo_key")), 456);
+  EXPECT_FALSE(nostd::holds_alternative<int64_t>(context_test.GetValue("foo_key")));
 }
 
 // Tests that writing the same to a context overwrites the original value.
@@ -89,8 +92,8 @@ TEST(ContextTest, ContextInheritance)
   EXPECT_EQ(nostd::get<int64_t>(foo_context.GetValue("other_key")), 789);
   EXPECT_EQ(nostd::get<int64_t>(foo_context.GetValue("another_key")), 987);
 
-  EXPECT_EQ(nostd::get<int64_t>(test_context.GetValue("other_key")), 0);
-  EXPECT_EQ(nostd::get<int64_t>(test_context.GetValue("another_key")), 0);
+  EXPECT_TRUE(nostd::holds_alternative<nostd::monostate>(test_context.GetValue("other_key")));
+  EXPECT_TRUE(nostd::holds_alternative<nostd::monostate>(test_context.GetValue("another_key")));
 }
 
 // Tests that copying a context copies the key value pairs as expected.

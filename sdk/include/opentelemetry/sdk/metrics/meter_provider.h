@@ -1,11 +1,15 @@
+// Copyright The OpenTelemetry Authors
+// SPDX-License-Identifier: Apache-2.0
+
 #pragma once
+#ifdef ENABLE_METRICS_PREVIEW
 
-#include "opentelemetry/metrics/meter_provider.h"
-#include "opentelemetry/nostd/shared_ptr.h"
-#include "opentelemetry/sdk/metrics/meter.h"
+#  include "opentelemetry/metrics/meter_provider.h"
+#  include "opentelemetry/nostd/shared_ptr.h"
+#  include "opentelemetry/sdk/metrics/meter.h"
 
-#include <memory>
-#include <string>
+#  include <memory>
+#  include <string>
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace sdk
@@ -30,3 +34,4 @@ private:
 }  // namespace metrics
 }  // namespace sdk
 OPENTELEMETRY_END_NAMESPACE
+#endif

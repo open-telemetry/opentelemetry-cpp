@@ -35,6 +35,7 @@
 #   opentelemetry-cpp::ostream_span_exporter      - Imported target of opentelemetry-cpp::ostream_span_exporter
 #   opentelemetry-cpp::prometheus_exporter        - Imported target of opentelemetry-cpp::prometheus_exporter
 #   opentelemetry-cpp::zpages                     - Imported target of opentelemetry-cpp::zpages
+#   opentelemetry-cpp::http_client_curl           - Imported target of opentelemetry-cpp::http_client_curl
 #
 
 # =============================================================================

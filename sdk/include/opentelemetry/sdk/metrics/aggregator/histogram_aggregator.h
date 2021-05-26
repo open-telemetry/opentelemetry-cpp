@@ -1,12 +1,16 @@
-#pragma once
+// Copyright The OpenTelemetry Authors
+// SPDX-License-Identifier: Apache-2.0
 
-#include <algorithm>
-#include <mutex>
-#include <stdexcept>
-#include <vector>
-#include "opentelemetry/metrics/instrument.h"
-#include "opentelemetry/sdk/metrics/aggregator/aggregator.h"
-#include "opentelemetry/version.h"
+#pragma once
+#ifdef ENABLE_METRICS_PREVIEW
+
+#  include <algorithm>
+#  include <mutex>
+#  include <stdexcept>
+#  include <vector>
+#  include "opentelemetry/metrics/instrument.h"
+#  include "opentelemetry/sdk/metrics/aggregator/aggregator.h"
+#  include "opentelemetry/version.h"
 
 namespace metrics_api = opentelemetry::metrics;
 
@@ -32,11 +36,11 @@ public:
   {
     if (!std::is_sorted(boundaries.begin(), boundaries.end()))
     {
-#if __EXCEPTIONS
+#  if __EXCEPTIONS
       throw std::invalid_argument("Histogram boundaries must be monotonic.");
-#else
+#  else
       std::terminate();
-#endif
+#  endif
     }
     this->kind_        = kind;
     this->agg_kind_    = AggregatorKind::Histogram;
@@ -119,20 +123,20 @@ public:
     // Ensure that incorrect types are not merged
     if (this->agg_kind_ != other.agg_kind_)
     {
-#if __EXCEPTIONS
+#  if __EXCEPTIONS
       throw std::invalid_argument("Aggregators of different types cannot be merged.");
-#else
+#  else
       std::terminate();
-#endif
+#  endif
       // Reject histogram merges with differing boundary vectors
     }
     else if (other.boundaries_ != this->boundaries_)
     {
-#if __EXCEPTIONS
+#  if __EXCEPTIONS
       throw std::invalid_argument("Histogram boundaries do not match.");
-#else
+#  else
       std::terminate();
-#endif
+#  endif
     }
 
     this->values_[0] += other.values_[0];
@@ -202,3 +206,4 @@ private:
 }  // namespace metrics
 }  // namespace sdk
 OPENTELEMETRY_END_NAMESPACE
+#endif

@@ -1,11 +1,15 @@
-#include <gtest/gtest.h>
-#include "opentelemetry/metrics/instrument.h"
-#include "opentelemetry/metrics/noop.h"
-#include "opentelemetry/metrics/observer_result.h"
-#include "opentelemetry/metrics/sync_instruments.h"
+// Copyright The OpenTelemetry Authors
+// SPDX-License-Identifier: Apache-2.0
 
-#include <array>
-#include <memory>
+#ifdef ENABLE_METRICS_PREVIEW
+#  include <gtest/gtest.h>
+#  include "opentelemetry/metrics/instrument.h"
+#  include "opentelemetry/metrics/noop.h"
+#  include "opentelemetry/metrics/observer_result.h"
+#  include "opentelemetry/metrics/sync_instruments.h"
+
+#  include <array>
+#  include <memory>
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 
@@ -76,3 +80,4 @@ TEST(NoopMeter, RecordBatch)
   m->RecordDoubleBatch(labelkv, dsp, dval);
 }
 OPENTELEMETRY_END_NAMESPACE
+#endif

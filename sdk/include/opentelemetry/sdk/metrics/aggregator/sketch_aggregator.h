@@ -1,15 +1,19 @@
-#pragma once
+// Copyright The OpenTelemetry Authors
+// SPDX-License-Identifier: Apache-2.0
 
-#include <algorithm>
-#include <cmath>
-#include <limits>
-#include <map>
-#include <mutex>
-#include <stdexcept>
-#include <vector>
-#include "opentelemetry/metrics/instrument.h"
-#include "opentelemetry/sdk/metrics/aggregator/aggregator.h"
-#include "opentelemetry/version.h"
+#pragma once
+#ifdef ENABLE_METRICS_PREVIEW
+
+#  include <algorithm>
+#  include <cmath>
+#  include <limits>
+#  include <map>
+#  include <mutex>
+#  include <stdexcept>
+#  include <vector>
+#  include "opentelemetry/metrics/instrument.h"
+#  include "opentelemetry/sdk/metrics/aggregator/aggregator.h"
+#  include "opentelemetry/version.h"
 
 namespace metrics_api = opentelemetry::metrics;
 
@@ -102,11 +106,11 @@ public:
   {
     if (q < 0 || q > 1)
     {
-#if __EXCEPTIONS
+#  if __EXCEPTIONS
       throw std::invalid_argument("Quantile values must fall between 0 and 1");
-#else
+#  else
       std::terminate();
-#endif
+#  endif
     }
     auto iter = checkpoint_raw_.begin();
     int idx   = iter->first;
@@ -152,19 +156,19 @@ public:
   {
     if (gamma != other.gamma)
     {
-#if __EXCEPTIONS
+#  if __EXCEPTIONS
       throw std::invalid_argument("Aggregators must have identical error tolerance");
-#else
+#  else
       std::terminate();
-#endif
+#  endif
     }
     else if (max_buckets_ != other.max_buckets_)
     {
-#if __EXCEPTIONS
+#  if __EXCEPTIONS
       throw std::invalid_argument("Aggregators must have the same maximum bucket allowance");
-#else
+#  else
       std::terminate();
-#endif
+#  endif
     }
 
     this->mu_.lock();
@@ -275,3 +279,4 @@ private:
 }  // namespace metrics
 }  // namespace sdk
 OPENTELEMETRY_END_NAMESPACE
+#endif

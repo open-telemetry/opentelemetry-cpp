@@ -15,7 +15,16 @@ Increment the:
 
 ## [Unreleased]
 
+* [CI] Add CodeQL security scan CI workflow ([#770](https://github.com/open-telemetry/opentelemetry-cpp/pull/770))
+* [EXPORTER] Populate resource to OTLP proto data ([#758](https://github.com/open-telemetry/opentelemetry-cpp/pull/758))
+
+## [0.6.0] 2021-05-11
+
+* [EXPORTER] Add Jaeger exporter ([#534](https://github.com/open-telemetry/opentelemetry-cpp/pull/534))
+* [SDK] Support multiple processors ([#692](https://github.com/open-telemetry/opentelemetry-cpp/pull/692))
 * [SDK] Add instrumentation library and multiple tracer support ([#693](https://github.com/open-telemetry/opentelemetry-cpp/pull/693))
+* [SDK] Resource integration with Exporters ([#706](https://github.com/open-telemetry/opentelemetry-cpp/pull/706))
+* [EXAMPLE] Enhance existing http example with propagation ([#727](https://github.com/open-telemetry/opentelemetry-cpp/pull/727))
 
 ## [0.5.0] 2021-04-26
 

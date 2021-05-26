@@ -1,3 +1,6 @@
+// Copyright The OpenTelemetry Authors
+// SPDX-License-Identifier: Apache-2.0
+
 #include <array>
 #include "opentelemetry/exporters/ostream/log_exporter.h"
 #include "opentelemetry/logs/provider.h"

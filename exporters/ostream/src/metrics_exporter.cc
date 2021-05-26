@@ -1,4 +1,8 @@
-#include "opentelemetry/exporters/ostream/metrics_exporter.h"
+// Copyright The OpenTelemetry Authors
+// SPDX-License-Identifier: Apache-2.0
+
+#ifdef ENABLE_METRICS_PREVIEW
+#  include "opentelemetry/exporters/ostream/metrics_exporter.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace exporter
@@ -48,3 +52,4 @@ sdk::common::ExportResult OStreamMetricsExporter::Export(
 }  // namespace metrics
 }  // namespace exporter
 OPENTELEMETRY_END_NAMESPACE
+#endif

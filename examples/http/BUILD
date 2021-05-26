@@ -2,7 +2,7 @@ cc_binary(
     name = "example_http_client",
     srcs = [
         "client.cc",
-        "tracer_common.hpp",
+        "tracer_common.h",
     ],
     # TODO: Move copts/linkopts for static CURL usage into shared bzl file.
     copts = [
@@ -30,8 +30,8 @@ cc_binary(
     name = "example_http_server",
     srcs = [
         "server.cc",
-        "server.hpp",
-        "tracer_common.hpp",
+        "server.h",
+        "tracer_common.h",
     ],
     deps = [
         "//api",

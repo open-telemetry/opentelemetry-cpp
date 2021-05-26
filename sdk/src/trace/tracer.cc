@@ -1,9 +1,14 @@
+// Copyright The OpenTelemetry Authors
+// SPDX-License-Identifier: Apache-2.0
+
 #include "opentelemetry/sdk/trace/tracer.h"
 #include "opentelemetry/context/runtime_context.h"
 #include "opentelemetry/nostd/shared_ptr.h"
 #include "opentelemetry/sdk/common/atomic_shared_ptr.h"
 #include "opentelemetry/version.h"
 #include "src/trace/span.h"
+
+#include <memory>
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace sdk
@@ -16,37 +21,32 @@ Tracer::Tracer(std::shared_ptr<sdk::trace::TracerContext> context,
     : context_{context}, instrumentation_library_{std::move(instrumentation_library)}
 {}
 
-trace_api::SpanContext GetCurrentSpanContext(const trace_api::SpanContext &explicit_parent)
-{
-  // Use the explicit parent, if it's valid.
-  if (explicit_parent.IsValid())
-  {
-    return explicit_parent;
-  }
-
-  // Use the currently active span, if there's one.
-  auto curr_span_context = context::RuntimeContext::GetValue(trace_api::kSpanKey);
-
-  if (nostd::holds_alternative<nostd::shared_ptr<trace_api::Span>>(curr_span_context))
-  {
-    auto curr_span = nostd::get<nostd::shared_ptr<trace_api::Span>>(curr_span_context);
-    return curr_span->GetContext();
-  }
-
-  // Otherwise return an invalid SpanContext.
-  return trace_api::SpanContext::GetInvalid();
-}
-
 nostd::shared_ptr<trace_api::Span> Tracer::StartSpan(
     nostd::string_view name,
     const opentelemetry::common::KeyValueIterable &attributes,
     const trace_api::SpanContextKeyValueIterable &links,
     const trace_api::StartSpanOptions &options) noexcept
 {
-  trace_api::SpanContext parent = GetCurrentSpanContext(options.parent);
+  trace_api::SpanContext parent_context =
+      options.parent.IsValid() ? options.parent : GetCurrentSpan()->GetContext();
 
-  auto sampling_result = context_->GetSampler().ShouldSample(parent, parent.trace_id(), name,
+  trace_api::TraceId trace_id;
+  trace_api::SpanId span_id = GetIdGenerator().GenerateSpanId();
+  bool is_parent_span_valid = false;
+
+  if (parent_context.IsValid())
+  {
+    trace_id             = parent_context.trace_id();
+    is_parent_span_valid = true;
+  }
+  else
+  {
+    trace_id = GetIdGenerator().GenerateTraceId();
+  }
+
+  auto sampling_result = context_->GetSampler().ShouldSample(parent_context, trace_id, name,
                                                              options.kind, attributes, links);
+
   if (sampling_result.decision == Decision::DROP)
   {
     // Don't allocate a no-op span for every DROP decision, but use a static
@@ -58,9 +58,16 @@ nostd::shared_ptr<trace_api::Span> Tracer::StartSpan(
   }
   else
   {
+
+    auto span_context = std::unique_ptr<trace_api::SpanContext>(new trace_api::SpanContext(
+        trace_id, span_id, trace_api::TraceFlags{trace_api::TraceFlags::kIsSampled}, false,
+        sampling_result.trace_state ? sampling_result.trace_state
+                                    : is_parent_span_valid ? parent_context.trace_state()
+                                                           : trace_api::TraceState::GetDefault()));
+
     auto span = nostd::shared_ptr<trace_api::Span>{
-        new (std::nothrow) Span{this->shared_from_this(), name, attributes, links, options, parent,
-                                sampling_result.trace_state, true}};
+        new (std::nothrow) Span{this->shared_from_this(), name, attributes, links, options,
+                                parent_context, std::move(span_context)}};
 
     // if the attributes is not nullptr, add attributes to the span.
     if (sampling_result.attributes)

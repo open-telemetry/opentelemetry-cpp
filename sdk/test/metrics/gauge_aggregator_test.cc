@@ -1,7 +1,11 @@
-#include <gtest/gtest.h>
-#include <thread>
+// Copyright The OpenTelemetry Authors
+// SPDX-License-Identifier: Apache-2.0
 
-#include "opentelemetry/sdk/metrics/aggregator/gauge_aggregator.h"
+#ifdef ENABLE_METRICS_PREVIEW
+#  include <gtest/gtest.h>
+#  include <thread>
+
+#  include "opentelemetry/sdk/metrics/aggregator/gauge_aggregator.h"
 
 using namespace opentelemetry::sdk::metrics;
 
@@ -125,3 +129,4 @@ TEST(GaugeAggregator, Concurrency)
 
   ASSERT_EQ(agg.get_values()[0], 10000);
 }
+#endif

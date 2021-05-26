@@ -1,5 +1,8 @@
 @echo off
-set "PATH=%ProgramFiles%\CMake\bin;%~dp0;%~dp0vcpkg;%PATH%"
+setlocal enableextensions
+setlocal enabledelayedexpansion
+set "PATH=%ProgramFiles%\CMake\bin;%~dp0;%~dp0vcpkg;%ProgramData%\chocolatey\bin;%PATH%"
+if "%VCPKG_ROOT%" NEQ "" set "PATH=%VCPKG_ROOT%;%PATH%"
 pushd %~dp0
 
 net session >nul 2>&1
@@ -26,18 +29,25 @@ if %ERRORLEVEL% == 0 (
   vswhere -property installationPath
 )
 
+REM This script allows to pass architecture in ARCH env var
+if not defined ARCH (
+  set ARCH=x64
+)
+
 REM Try to autodetect Visual Studio
-call "%~dp0vcvars.cmd" x64
+call "%~dp0vcvars.cmd"
 if "%TOOLS_VS_NOTFOUND%" == "1" (
-  REM Cannot detect MSBuild path
-  REM TODO: no command line tools..
-  REM TODO: use MSBuild from vswhere?
+  echo WARNING: cannot autodetect Visual Studio installation!
 )
 
 where /Q vcpkg.exe
 if %ERRORLEVEL% == 1 (
   REM Build our own vcpkg from source
-  pushd .\vcpkg
+  REM Prefer building in VCPKG_ROOT
+  if not defined VCPKG_ROOT (
+    set "VCPKG_ROOT=%~dp0\vcpkg"
+  )
+  pushd "!VCPKG_ROOT!"
   call bootstrap-vcpkg.bat
   popd
 ) else (
@@ -45,13 +55,14 @@ if %ERRORLEVEL% == 1 (
 )
 
 REM Install dependencies
-vcpkg install gtest:x64-windows
-vcpkg install --head --overlay-ports=%~dp0ports benchmark:x64-windows
-vcpkg install ms-gsl:x64-windows
-vcpkg install nlohmann-json:x64-windows
-vcpkg install abseil:x64-windows
-vcpkg install protobuf:x64-windows
-vcpkg install gRPC:x64-windows
-vcpkg install prometheus-cpp:x64-windows
+vcpkg install gtest:%ARCH%-windows
+vcpkg install --head --overlay-ports=%~dp0ports benchmark:%ARCH%-windows
+vcpkg install ms-gsl:%ARCH%-windows
+vcpkg install nlohmann-json:%ARCH%-windows
+vcpkg install abseil:%ARCH%-windows
+vcpkg install protobuf:%ARCH%-windows
+vcpkg install gRPC:%ARCH%-windows
+vcpkg install prometheus-cpp:%ARCH%-windows
+vcpkg install curl:%ARCH%-windows
 popd
 exit /b 0

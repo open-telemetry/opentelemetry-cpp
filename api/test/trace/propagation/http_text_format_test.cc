@@ -1,3 +1,6 @@
+// Copyright The OpenTelemetry Authors
+// SPDX-License-Identifier: Apache-2.0
+
 #include "opentelemetry/context/propagation/global_propagator.h"
 #include "opentelemetry/context/runtime_context.h"
 #include "opentelemetry/trace/propagation/http_trace_context.h"
@@ -147,7 +150,7 @@ TEST(TextMapPropagatorTest, InvalidIdentitiesAreNotExtracted)
     context::Context ctx1 = context::Context{};
     context::Context ctx2 = format.Extract(carrier, ctx1);
 
-    auto span = trace::propagation::detail::GetCurrentSpan(ctx2);
+    auto span = trace::propagation::GetSpan(ctx2)->GetContext();
     EXPECT_FALSE(span.IsValid());
   }
 }

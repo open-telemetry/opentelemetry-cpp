@@ -1,7 +1,3 @@
-if(VCPKG_CMAKE_SYSTEM_NAME STREQUAL "WindowsStore")
-  message(FATAL_ERROR "${PORT} does not currently support UWP")
-endif()
-
 if (VCPKG_PLATFORM_TOOLSET STREQUAL "v140")
   # set(CMAKE_C_COMPILER_WORKS 1)
   # set(CMAKE_CXX_COMPILER_WORKS 1)
@@ -17,14 +13,18 @@ else()
   set(PREFER PREFER_NINJA)
 endif()
 
-include(vcpkg_common_functions)
+#https://github.com/google/benchmark/issues/661
+vcpkg_fail_port_install(ON_TARGET "uwp") 
 
 vcpkg_check_linkage(ONLY_STATIC_LIBRARY)
 
 vcpkg_from_github(
     OUT_SOURCE_PATH SOURCE_PATH
     REPO google/benchmark
+    REF c05843a9f622db08ad59804c190f98879b76beba # v1.5.3
+    SHA512 1
     HEAD_REF master
+    PATCHES "version.patch"
 )
 
 vcpkg_configure_cmake(
@@ -41,9 +41,10 @@ vcpkg_copy_pdbs()
 
 vcpkg_fixup_cmake_targets(CONFIG_PATH lib/cmake/benchmark)
 
+vcpkg_fixup_pkgconfig(SYSTEM_LIBRARIES pthread)
+
 file(REMOVE_RECURSE ${CURRENT_PACKAGES_DIR}/debug/include)
 file(REMOVE_RECURSE ${CURRENT_PACKAGES_DIR}/debug/share)
 
 # Handle copyright
-file(COPY ${SOURCE_PATH}/LICENSE DESTINATION ${CURRENT_PACKAGES_DIR}/share/benchmark)
-file(RENAME ${CURRENT_PACKAGES_DIR}/share/benchmark/LICENSE ${CURRENT_PACKAGES_DIR}/share/benchmark/copyright)
+file(INSTALL ${SOURCE_PATH}/LICENSE DESTINATION ${CURRENT_PACKAGES_DIR}/share/${PORT} RENAME copyright)

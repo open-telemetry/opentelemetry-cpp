@@ -1,16 +1,6 @@
-// Copyright 2021, OpenTelemetry Authors
-//
-// Licensed under the Apache License, Version 2.0 (the "License");
-// you may not use this file except in compliance with the License.
-// You may obtain a copy of the License at
-//
-// http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an "AS IS" BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
+// Copyright The OpenTelemetry Authors
+// SPDX-License-Identifier: Apache-2.0
+
 #pragma once
 
 #include <algorithm>
@@ -75,6 +65,8 @@ typedef struct
   bool enableActivityTracking;   // Emit TraceLogging events for Span/Start and Span/Stop
   bool enableRelatedActivityId;  // Assign parent `SpanId` to `RelatedActivityId`
   bool enableAutoParent;         // Start new spans as children of current active span
+  ETWProvider::EventFormat
+      encoding;  // Event encoding to use for this provider (TLD, MsgPack, XML, etc.).
 } TracerProviderConfiguration;
 
 /**
@@ -102,6 +94,72 @@ static inline void GetOption(const TracerProviderOptions &options,
   {
     value = defaultValue;
   }
+}
+
+/**
+ * @brief Helper template to convert encoding config option to EventFormat.
+ * Configuration option passed as `options["encoding"] = "MsgPack"`.
+ * Default encoding is TraceLogging Dynamic Manifest (TLD).
+ *
+ * Valid encoding names listed below.
+ *
+ * For MessagePack encoding:
+ * - "MSGPACK"
+ * - "MsgPack"
+ * - "MessagePack"
+ *
+ * For XML encoding:
+ * - "XML"
+ * - "xml"
+ *
+ * For TraceLogging Dynamic encoding:
+ * - "TLD"
+ * - "tld"
+ *
+ */
+static inline ETWProvider::EventFormat GetEncoding(const TracerProviderOptions &options)
+{
+  ETWProvider::EventFormat evtFmt = ETWProvider::EventFormat::ETW_MANIFEST;
+
+  auto it = options.find("encoding");
+  if (it != options.end())
+  {
+    auto varValue   = it->second;
+    std::string val = nostd::get<std::string>(varValue);
+
+#pragma warning(push)
+#pragma warning(disable : 4307) /* Integral constant overflow - OK while computing hash */
+    auto h = utils::hashCode(val.c_str());
+    switch (h)
+    {
+      case CONST_HASHCODE(MSGPACK):
+        // nobrk
+      case CONST_HASHCODE(MsgPack):
+        // nobrk
+      case CONST_HASHCODE(MessagePack):
+        evtFmt = ETWProvider::EventFormat::ETW_MSGPACK;
+        break;
+
+      case CONST_HASHCODE(XML):
+        // nobrk
+      case CONST_HASHCODE(xml):
+        evtFmt = ETWProvider::EventFormat::ETW_XML;
+        break;
+
+      case CONST_HASHCODE(TLD):
+        // nobrk
+      case CONST_HASHCODE(tld):
+        // nobrk
+        evtFmt = ETWProvider::EventFormat::ETW_MANIFEST;
+        break;
+
+      default:
+        break;
+    }
+#pragma warning(pop)
+  }
+
+  return evtFmt;
 }
 
 class Span;
@@ -213,6 +271,12 @@ template <class T>
 TracerProviderConfiguration &GetConfiguration(T &t)
 {
   return t.config_;
+}
+
+template <class T>
+void UpdateStatus(T &t, Properties &props)
+{
+  t.UpdateStatus(props);
 }
 
 /**
@@ -399,17 +463,19 @@ class Tracer : public trace::Tracer
       // since Unix epoch instead of string, but that implies additional tooling
       // is needed to convert it, rendering it NOT human-readable.
       evt[ETW_FIELD_STARTTIME] = utils::formatUtcTimestampMsAsISO8601(startTimeMs);
-
+#ifdef ETW_FIELD_ENDTTIME
+      // ETW has its own precise timestamp at envelope layer for every event.
+      // However, in some scenarios it is easier to deal with ISO8601 strings.
+      // In that case we convert the app-created timestamp and place it into
+      // Payload[$ETW_FIELD_TIME] field. The option configurable at compile-time.
+      evt[ETW_FIELD_ENDTTIME] = utils::formatUtcTimestampMsAsISO8601(endTimeMs);
+#endif
       // Duration of Span in milliseconds
       evt[ETW_FIELD_DURATION] = endTimeMs - startTimeMs;
+      // Presently we assume that all spans are server spans
+      evt[ETW_FIELD_SPAN_KIND] = uint32_t(trace::SpanKind::kServer);
+      UpdateStatus(currentSpan, evt);
       etwProvider().write(provHandle, evt, ActivityIdPtr, RelatedActivityIdPtr, 0, encoding);
-    }
-
-    {
-      // Atomically remove the span from list of spans
-      const std::lock_guard<std::mutex> lock(scopes_mutex_);
-      auto spanId = ToLowerBase16(spanBase.GetContext().span_id());
-      scopes_.erase(spanId);
     }
   };
 
@@ -417,19 +483,12 @@ class Tracer : public trace::Tracer
 
   friend class Span;
 
-  std::mutex scopes_mutex_;  // protects scopes_
-  std::map<std::string, nostd::unique_ptr<trace::Scope>> scopes_;
-
   /**
    * @brief Init a reference to etw::ProviderHandle
    * @return Provider Handle
    */
   ETWProvider::Handle &initProvHandle()
   {
-#if defined(HAVE_MSGPACK) && !defined(HAVE_TLD)
-    /* Fallback to MsgPack encoding if TraceLoggingDynamic feature gate is off */
-    encoding = ETWProvider::EventFormat::ETW_MSGPACK;
-#endif
     isClosed_ = false;
     return etwProvider().open(provId, encoding);
   }
@@ -579,12 +638,6 @@ public:
       etwProvider().write(provHandle, evt, ActivityIdPtr, RelatedActivityIdPtr, 1, encoding);
     };
 
-    {
-      const std::lock_guard<std::mutex> lock(scopes_mutex_);
-      // Use span_id as index
-      scopes_[ToLowerBase16(result->GetContext().span_id())] = WithActiveSpan(result);
-    }
-
     return result;
   };
 
@@ -687,6 +740,14 @@ public:
       ActivityIdPtr = &ActivityId;
     }
 
+#ifdef HAVE_FIELD_TIME
+    {
+      auto timeNow        = std::chrono::system_clock::now().time_since_epoch();
+      auto millis         = std::chrono::duration_cast<std::chrono::milliseconds>(timeNow).count();
+      evt[ETW_FIELD_TIME] = utils::formatUtcTimestampMsAsISO8601(millis);
+    }
+#endif
+
     etwProvider().write(provHandle, evt, ActivityIdPtr, nullptr, 0, encoding);
   };
 
@@ -735,6 +796,9 @@ protected:
 
   common::SystemTimestamp start_time_;
   common::SystemTimestamp end_time_;
+
+  trace::StatusCode status_code_{trace::StatusCode::kUnset};
+  std::string status_description_;
 
   /**
    * @brief Owner Tracer of this Span
@@ -791,6 +855,27 @@ protected:
   }
 
 public:
+  /**
+   * @brief Update Properties object with current Span status
+   * @param evt
+   */
+  void UpdateStatus(Properties &evt)
+  {
+    /* Should we avoid populating this extra field if status is unset? */
+    if ((status_code_ == trace::StatusCode::kUnset) || (status_code_ == trace::StatusCode::kOk))
+    {
+      evt[ETW_FIELD_SUCCESS]       = "True";
+      evt[ETW_FIELD_STATUSCODE]    = uint32_t(status_code_);
+      evt[ETW_FIELD_STATUSMESSAGE] = status_description_;
+    }
+    else
+    {
+      evt[ETW_FIELD_SUCCESS]       = "False";
+      evt[ETW_FIELD_STATUSCODE]    = uint32_t(status_code_);
+      evt[ETW_FIELD_STATUSMESSAGE] = status_description_;
+    }
+  }
+
   /**
    * @brief Get start time of this Span.
    * @return
@@ -876,9 +961,8 @@ public:
    */
   void SetStatus(trace::StatusCode code, nostd::string_view description) noexcept override
   {
-    // TODO: not implemented
-    UNREFERENCED_PARAMETER(code);
-    UNREFERENCED_PARAMETER(description);
+    status_code_        = code;
+    status_description_ = description.data();
   }
 
   void SetAttributes(Properties attributes) { attributes_ = attributes; }
@@ -1007,6 +1091,9 @@ public:
 
     // When a new Span is started, the current span automatically becomes its parent.
     GetOption(options, "enableAutoParent", config_.enableAutoParent, false);
+
+    // Determines what encoding to use for ETW events: TraceLogging Dynamic, MsgPack, XML, etc.
+    config_.encoding = GetEncoding(options);
   }
 
   TracerProvider() : trace::TracerProvider()
@@ -1017,6 +1104,7 @@ public:
     config_.enableActivityTracking  = false;
     config_.enableRelatedActivityId = false;
     config_.enableAutoParent        = false;
+    config_.encoding                = ETWProvider::EventFormat::ETW_MANIFEST;
   }
 
   /**
@@ -1033,44 +1121,8 @@ public:
   nostd::shared_ptr<trace::Tracer> GetTracer(nostd::string_view name,
                                              nostd::string_view args = "") override
   {
-#if defined(HAVE_MSGPACK)
-    // Prefer MsgPack over ETW by default
-    ETWProvider::EventFormat evtFmt = ETWProvider::EventFormat::ETW_MSGPACK;
-#else
-    // Fallback to ETW TraceLoggingDynamic if MsgPack support is not compiled in
-    ETWProvider::EventFormat evtFmt = ETWProvider::EventFormat::ETW_MANIFEST;
-#endif
-
-#pragma warning(push)
-#pragma warning(disable : 4307) /* Integral constant overflow - OK while computing hash */
-    auto h = utils::hashCode(args.data());
-    switch (h)
-    {
-      case CONST_HASHCODE(MSGPACK):
-        // nobrk
-      case CONST_HASHCODE(MsgPack):
-        // nobrk
-      case CONST_HASHCODE(MessagePack):
-        evtFmt = ETWProvider::EventFormat::ETW_MSGPACK;
-        break;
-
-      case CONST_HASHCODE(XML):
-        // nobrk
-      case CONST_HASHCODE(xml):
-        evtFmt = ETWProvider::EventFormat::ETW_XML;
-        break;
-
-      case CONST_HASHCODE(TLD):
-        // nobrk
-      case CONST_HASHCODE(tld):
-        // nobrk
-        evtFmt = ETWProvider::EventFormat::ETW_MANIFEST;
-        break;
-
-      default:
-        break;
-    }
-#pragma warning(pop)
+    UNREFERENCED_PARAMETER(args);
+    ETWProvider::EventFormat evtFmt = config_.encoding;
     return nostd::shared_ptr<trace::Tracer>{new (std::nothrow) Tracer(*this, name, evtFmt)};
   }
 };
