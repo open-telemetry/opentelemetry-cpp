@@ -14,11 +14,18 @@ Increment the:
 * PATCH version when you make backwards compatible bug fixes.
 
 ## [Unreleased]
- 
+
 ## [0.7.0] 2021-05-26
 
-* [CI] Add CodeQL security scan CI workflow ([#770](https://github.com/open-telemetry/opentelemetry-cpp/pull/770))
+* [METRICS] Move metrics api/sdk under preview feature flag ([#745](https://github.com/open-telemetry/opentelemetry-cpp/pull/745))
+* [DOCS] Add instructions to build using Bazel ([#747](https://github.com/open-telemetry/opentelemetry-cpp/pull/747))
+* [DOCS] Update copyright headers ([#754](https://github.com/open-telemetry/opentelemetry-cpp/pull/754))
 * [EXPORTER] Populate resource to OTLP proto data ([#758](https://github.com/open-telemetry/opentelemetry-cpp/pull/758))
+* [CI] Add CodeQL security scan CI workflow ([#770](https://github.com/open-telemetry/opentelemetry-cpp/pull/770))
+* [SDK] Fix for sampling of root span ([#784](https://github.com/open-telemetry/opentelemetry-cpp/pull/784))
+* [API] `BREAKING CHANGE` - Tracer::WithActiveSpan() to return Scope object intead of unique_ptr ([#788](https://github.com/open-telemetry/opentelemetry-cpp/pull/788))
+* [DOCS] Add docs for nested spans and context propagation in readthedocs ([#792](https://github.com/open-telemetry/opentelemetry-cpp/pull/792))
+* [CI] Output verbose error for failed unit-test in CI ([#796](https://github.com/open-telemetry/opentelemetry-cpp/pull/796))
 
 ## [0.6.0] 2021-05-11
 
