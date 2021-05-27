@@ -13,11 +13,17 @@ install(
   LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
   ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR})
 
+set(EXCLUDE_METRICS_HEADERS "")
+if(NOT WITH_METRICS_PREVIEW)
+  set(EXCLUDE_METRICS_HEADERS "metrics")
+endif()
+
 install(
   DIRECTORY include/opentelemetry/sdk
   DESTINATION include/opentelemetry/
   FILES_MATCHING
-  PATTERN "*.h")
+  PATTERN "*.h"
+  PATTERN "${EXCLUDE_METRICS_HEADERS}" EXCLUDE)
 
 add_subdirectory(src)
 
