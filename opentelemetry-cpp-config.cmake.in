@@ -76,10 +76,15 @@ set(_OPENTELEMETRY_CPP_LIBRARIES_TEST_TARGETS
     trace
     metrics
     logs
+    in_memory_span_exporter
     otlp_exporter
     ostream_log_exporter
     ostream_metrics_exporter
     ostream_span_exporter
+    prometheus_exporter
+    elasticsearch_log_exporter
+    etw_exporter
+    jaeger_trace_exporter
     zpages
     http_client_curl)
 foreach(_TEST_TARGET IN LISTS _OPENTELEMETRY_CPP_LIBRARIES_TEST_TARGETS)
