@@ -1,10 +1,28 @@
-include_directories(include)
-include_directories(${CMAKE_SOURCE_DIR}/ext/include)
-
 add_library(opentelemetry_exporter_elasticsearch_logs src/es_log_exporter.cc)
+
+set_target_properties(opentelemetry_exporter_elasticsearch_logs
+                      PROPERTIES EXPORT_NAME elasticsearch_log_exporter)
+
+target_include_directories(
+  opentelemetry_exporter_elasticsearch_logs
+  PUBLIC "$<BUILD_INTERFACE:${CMAKE_CURRENT_LIST_DIR}/include>"
+         "$<INSTALL_INTERFACE:include>")
 
 target_link_libraries(opentelemetry_exporter_elasticsearch_logs
                       PUBLIC opentelemetry_trace http_client_curl)
+
+install(
+  TARGETS opentelemetry_exporter_elasticsearch_logs
+  EXPORT "${PROJECT_NAME}-target"
+  RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
+  LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
+  ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR})
+
+install(
+  DIRECTORY include/opentelemetry/exporters/elasticsearch
+  DESTINATION include/opentelemetry/exporters/
+  FILES_MATCHING
+  PATTERN "*.h")
 
 if(BUILD_TESTING)
   add_executable(es_log_exporter_test test/es_log_exporter_test.cc)
@@ -12,19 +30,6 @@ if(BUILD_TESTING)
   target_link_libraries(
     es_log_exporter_test ${GTEST_BOTH_LIBRARIES} ${CMAKE_THREAD_LIBS_INIT}
     opentelemetry_exporter_elasticsearch_logs)
-
-  install(
-    TARGETS opentelemetry_exporter_elasticsearch_logs
-    EXPORT "${PROJECT_NAME}-target"
-    RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
-    LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
-    ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR})
-
-  install(
-    DIRECTORY include/opentelemetry/exporters/elasticsearch
-    DESTINATION include/opentelemetry/exporters/
-    FILES_MATCHING
-    PATTERN "*.h")
 
   gtest_add_tests(
     TARGET es_log_exporter_test

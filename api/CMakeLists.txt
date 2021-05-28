@@ -17,6 +17,19 @@ set(LOGS_EXCLUDE_PATTERN "")
 if(NOT WITH_LOGS_PREVIEW)
   set(LOGS_EXCLUDE_PATTERN "logs")
 endif()
+
+set(METRICS_EXCLUDE_PATTERN "")
+if(NOT WITH_METRICS_PREVIEW)
+  set(METRICS_EXCLUDE_PATTERN "metrics")
+endif()
+
+install(
+  DIRECTORY include/opentelemetry
+  DESTINATION include
+  FILES_MATCHING
+  PATTERN "*.h"
+  PATTERN "${METRICS_EXCLUDE_PATTERN}" EXCLUDE)
+
 install(
   DIRECTORY include/opentelemetry
   DESTINATION include
