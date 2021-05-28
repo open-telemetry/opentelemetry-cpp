@@ -39,6 +39,7 @@ if [[ "$1" == "cmake.test" ]]; then
         -DWITH_JAEGER=ON \
         -DWITH_ELASTICSEARCH=ON \
         -DWITH_METRICS_PREVIEW=ON \
+        -DWITH_LOGS_PREVIEW=ON \
         -DCMAKE_CXX_FLAGS="-Werror" \
         "${SRC_DIR}"
   make

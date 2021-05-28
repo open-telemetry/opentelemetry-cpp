@@ -1,9 +1,10 @@
 // Copyright The OpenTelemetry Authors
 // SPDX-License-Identifier: Apache-2.0
 
-#include "opentelemetry/sdk/logs/logger.h"
-#include "opentelemetry/sdk/logs/log_record.h"
-#include "opentelemetry/trace/provider.h"
+#ifdef ENABLE_LOGS_PREVIEW
+#  include "opentelemetry/sdk/logs/logger.h"
+#  include "opentelemetry/sdk/logs/log_record.h"
+#  include "opentelemetry/trace/provider.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace sdk
@@ -114,3 +115,4 @@ void Logger::Log(opentelemetry::logs::Severity severity,
 }  // namespace logs
 }  // namespace sdk
 OPENTELEMETRY_END_NAMESPACE
+#endif
