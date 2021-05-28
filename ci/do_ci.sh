@@ -23,7 +23,7 @@ mkdir -p "${BUILD_DIR}"
 [ -z "${PLUGIN_DIR}" ] && export PLUGIN_DIR=$HOME/plugin
 mkdir -p "${PLUGIN_DIR}"
 
-BAZEL_OPTIONS="-copt=-DENABLE_METRICS_PREVIEW --copt=-DENABLE_LOGS_PREVIEW"
+BAZEL_OPTIONS="--copt=-DENABLE_METRICS_PREVIEW --copt=-DENABLE_LOGS_PREVIEW"
 BAZEL_TEST_OPTIONS="$BAZEL_OPTIONS --test_output=errors"
 BAZEL_STARTUP_OPTIONS="--output_user_root=$HOME/.cache/bazel"
 
