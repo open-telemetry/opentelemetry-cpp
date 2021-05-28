@@ -33,7 +33,8 @@ install(
   DIRECTORY include/opentelemetry/exporters/ostream
   DESTINATION include/opentelemetry/exporters/
   FILES_MATCHING
-  PATTERN "metrics_exporter.h" EXCLUDE)
+  PATTERN "metrics_exporter.h" EXCLUDE
+  PATTERN "*.h")
 
 if(BUILD_TESTING)
   add_executable(ostream_span_test test/ostream_span_test.cc)

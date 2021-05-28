@@ -60,7 +60,6 @@ TEST(ETWTracer, TracerCheck)
   {
     auto topSpan = tracer->StartSpan("MySpanTop");
     auto topScope = tracer->WithActiveSpan(topSpan);
-    std::this_thread::sleep_for (std::chrono::seconds(1));
     {
       auto outerSpan = tracer->StartSpan("MySpanL2", attribs);
       auto outerScope = tracer->WithActiveSpan(outerSpan);
@@ -80,7 +79,6 @@ TEST(ETWTracer, TracerCheck)
           {"strKey", "someValue"}
         };
         EXPECT_NO_THROW(outerSpan->AddEvent(eventName1, event1));
-        std::this_thread::sleep_for (std::chrono::seconds(1));
 
         // Add second event
         std::string eventName2 = "MyEvent2";
@@ -91,7 +89,6 @@ TEST(ETWTracer, TracerCheck)
           {"strKey", "anotherValue"}
         };
         EXPECT_NO_THROW(outerSpan->AddEvent(eventName2, event2));
-        std::this_thread::sleep_for (std::chrono::seconds(2));
 
         std::string eventName3= "MyEvent3";
         Properties event3 =
@@ -104,7 +101,6 @@ TEST(ETWTracer, TracerCheck)
           {"tempString", getTemporaryValue() }
         };
         EXPECT_NO_THROW(innerSpan->AddEvent(eventName3, event3));
-        std::this_thread::sleep_for (std::chrono::seconds(1));
         EXPECT_NO_THROW(innerSpan->End());
 
       }
