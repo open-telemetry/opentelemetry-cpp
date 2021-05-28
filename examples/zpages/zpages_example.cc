@@ -1,3 +1,6 @@
+// Copyright The OpenTelemetry Authors
+// SPDX-License-Identifier: Apache-2.0
+
 /**
  * This is a basic example for zpages that helps users get familiar with how to
  * use this feature in OpenTelemetery

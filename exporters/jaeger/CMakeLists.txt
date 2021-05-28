@@ -1,4 +1,3 @@
-include_directories(include)
 include_directories(thrift-gen)
 
 find_package(Thrift REQUIRED)
@@ -13,6 +12,15 @@ set(JAEGER_EXPORTER_SOURCES
 
 add_library(jaeger_trace_exporter ${JAEGER_EXPORTER_SOURCES}
                                   ${JAEGER_THRIFT_GENCPP_SOURCES})
+
+set_target_properties(jaeger_trace_exporter PROPERTIES EXPORT_NAME
+                                                       jaeger_trace_exporter)
+
+target_include_directories(
+  jaeger_trace_exporter
+  PUBLIC "$<BUILD_INTERFACE:${CMAKE_CURRENT_LIST_DIR}/include>"
+         "$<INSTALL_INTERFACE:include>")
+
 target_link_libraries(
   jaeger_trace_exporter
   PUBLIC opentelemetry_resources
@@ -25,6 +33,19 @@ if(MSVC)
                                PUBLIC THRIFT_STATIC_DEFINE)
   endif()
 endif()
+
+install(
+  TARGETS jaeger_trace_exporter
+  EXPORT "${PROJECT_NAME}-target"
+  RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
+  LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
+  ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR})
+
+install(
+  DIRECTORY include/opentelemetry/exporters/jaeger
+  DESTINATION include/opentelemetry/exporters/
+  FILES_MATCHING
+  PATTERN "*.h")
 
 if(BUILD_TESTING)
   add_executable(jaeger_recordable_test test/jaeger_recordable_test.cc)

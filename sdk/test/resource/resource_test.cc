@@ -1,3 +1,6 @@
+// Copyright The OpenTelemetry Authors
+// SPDX-License-Identifier: Apache-2.0
+
 #include "opentelemetry/sdk/resource/resource.h"
 #include "opentelemetry/common/key_value_iterable_view.h"
 #include "opentelemetry/nostd/string_view.h"
@@ -25,7 +28,11 @@ public:
 
 TEST(ResourceTest, create_without_servicename)
 {
-
+  // Note that we pass resource attributes as `const char *`. But SDK
+  // sees all resource attribute values copied into owning object that
+  // contains only `std::string` values. That is why the test below
+  // verifies that values that we retrieve back are all `std::string`
+  // and not `const char *`.
   opentelemetry::sdk::resource::ResourceAttributes expected_attributes = {
       {"service", "backend"},
       {"version", (uint32_t)1},
