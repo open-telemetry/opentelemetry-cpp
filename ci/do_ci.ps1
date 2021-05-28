@@ -5,7 +5,7 @@ $action = $args[0]
 
 $SRC_DIR=(Get-Item -Path ".\").FullName
 
-$BAZEL_OPTIONS=""
+$BAZEL_OPTIONS="--copt=-DENABLE_METRICS_PREVIEW --copt=-DENABLE_LOGS_PREVIEW"
 $BAZEL_TEST_OPTIONS="$BAZEL_OPTIONS --test_output=errors"
 
 if (!(test-path build)) {
