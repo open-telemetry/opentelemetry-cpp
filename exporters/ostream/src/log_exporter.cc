@@ -1,9 +1,10 @@
 // Copyright The OpenTelemetry Authors
 // SPDX-License-Identifier: Apache-2.0
 
-#include "opentelemetry/exporters/ostream/log_exporter.h"
+#ifdef ENABLE_LOGS_PREVIEW
+#  include "opentelemetry/exporters/ostream/log_exporter.h"
 
-#include <iostream>
+#  include <iostream>
 
 namespace nostd   = opentelemetry::nostd;
 namespace sdklogs = opentelemetry::sdk::logs;
@@ -44,7 +45,7 @@ void print_value(const std::vector<T> &vec, std::ostream &sout)
 }
 
 // Prior to C++14, generic lambda is not available so fallback to functor.
-#if __cplusplus < 201402L
+#  if __cplusplus < 201402L
 
 class OwnedAttributeValueVisitor
 {
@@ -62,15 +63,15 @@ private:
   std::ostream &sout_;
 };
 
-#endif
+#  endif
 
 void print_value(sdk::common::OwnedAttributeValue &value, std::ostream &sout)
 {
-#if __cplusplus < 201402L
+#  if __cplusplus < 201402L
   nostd::visit(OwnedAttributeValueVisitor(sout), value);
-#else
+#  else
   nostd::visit([&sout](auto &&arg) { print_value(arg, sout); }, value);
-#endif
+#  endif
 }
 
 void printMap(std::unordered_map<std::string, sdk::common::OwnedAttributeValue> map,
@@ -174,3 +175,4 @@ bool OStreamLogExporter::Shutdown(std::chrono::microseconds timeout) noexcept
 }  // namespace logs
 }  // namespace exporter
 OPENTELEMETRY_END_NAMESPACE
+#endif
