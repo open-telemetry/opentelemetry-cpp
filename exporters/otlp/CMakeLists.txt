@@ -1,16 +1,46 @@
-add_library(opentelemetry_exporter_otprotocol src/otlp_recordable.cc
-                                              src/otlp_exporter.cc)
+add_library(opentelemetry_otlp_recordable src/otlp_recordable.cc)
+set_target_properties(opentelemetry_otlp_recordable PROPERTIES EXPORT_NAME
+                                                               otlp_recordable)
 
-set_target_properties(opentelemetry_exporter_otprotocol
-                      PROPERTIES EXPORT_NAME otlp_exporter)
+target_include_directories(
+  opentelemetry_otlp_recordable
+  PUBLIC "$<BUILD_INTERFACE:${CMAKE_CURRENT_LIST_DIR}/include>"
+         "$<INSTALL_INTERFACE:include>")
 
+set(OPENTELEMETRY_OTLP_TARGETS opentelemetry_otlp_recordable)
 target_link_libraries(
-  opentelemetry_exporter_otprotocol
-  PUBLIC opentelemetry_trace opentelemetry_resources opentelemetry_proto
-         protobuf::libprotobuf gRPC::grpc++)
+  opentelemetry_otlp_recordable
+  PUBLIC opentelemetry_trace opentelemetry_resources opentelemetry_proto)
+
+if(WITH_OTLP_GRPC)
+  add_library(opentelemetry_exporter_otlp_grpc src/otlp_exporter.cc)
+
+  set_target_properties(opentelemetry_exporter_otlp_grpc
+                        PROPERTIES EXPORT_NAME otlp_exporter)
+
+  target_link_libraries(
+    opentelemetry_exporter_otlp_grpc PUBLIC opentelemetry_otlp_recordable
+                                            protobuf::libprotobuf gRPC::grpc++)
+
+  list(APPEND OPENTELEMETRY_OTLP_TARGETS opentelemetry_exporter_otlp_grpc)
+endif()
+
+if(WITH_OTLP_HTTP)
+  add_library(opentelemetry_exporter_otlp_http src/otlp_http_exporter.cc)
+
+  set_target_properties(opentelemetry_exporter_otlp_http
+                        PROPERTIES EXPORT_NAME otlp_http_exporter)
+
+  target_link_libraries(
+    opentelemetry_exporter_otlp_http
+    PUBLIC opentelemetry_otlp_recordable http_client_curl
+           nlohmann_json::nlohmann_json)
+
+  list(APPEND OPENTELEMETRY_OTLP_TARGETS opentelemetry_exporter_otlp_http)
+endif()
 
 install(
-  TARGETS opentelemetry_exporter_otprotocol
+  TARGETS ${OPENTELEMETRY_OTLP_TARGETS}
   EXPORT "${PROJECT_NAME}-target"
   RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
   LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
@@ -22,15 +52,10 @@ install(
   FILES_MATCHING
   PATTERN "*.h")
 
-target_include_directories(
-  opentelemetry_exporter_otprotocol
-  PUBLIC "$<BUILD_INTERFACE:${CMAKE_CURRENT_LIST_DIR}/include>")
-
 if(BUILD_TESTING)
   add_executable(otlp_recordable_test test/otlp_recordable_test.cc)
-  target_link_libraries(
-    otlp_recordable_test ${GTEST_BOTH_LIBRARIES} ${CMAKE_THREAD_LIBS_INIT}
-    opentelemetry_exporter_otprotocol)
+  target_link_libraries(otlp_recordable_test ${GTEST_BOTH_LIBRARIES}
+                        ${CMAKE_THREAD_LIBS_INIT} opentelemetry_otlp_recordable)
   gtest_add_tests(
     TARGET otlp_recordable_test
     TEST_PREFIX exporter.otlp.
@@ -57,7 +82,7 @@ if(BUILD_TESTING)
   add_executable(otlp_exporter_test test/otlp_exporter_test.cc)
   target_link_libraries(
     otlp_exporter_test ${GTEST_BOTH_LIBRARIES} ${CMAKE_THREAD_LIBS_INIT}
-    ${GMOCK_LIB} opentelemetry_exporter_otprotocol)
+    ${GMOCK_LIB} opentelemetry_exporter_otlp_grpc)
   gtest_add_tests(
     TARGET otlp_exporter_test
     TEST_PREFIX exporter.otlp.

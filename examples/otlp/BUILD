@@ -12,14 +12,27 @@ cc_library(
 )
 
 cc_binary(
-    name = "example_otlp",
+    name = "example_otlp_grpc",
     srcs = [
-        "main.cc",
+        "grpc_main.cc",
     ],
     deps = [
         ":foo_library",
         "//api",
         "//exporters/otlp:otlp_exporter",
+        "//sdk/src/trace",
+    ],
+)
+
+cc_binary(
+    name = "example_otlp_http",
+    srcs = [
+        "http_main.cc",
+    ],
+    deps = [
+        ":foo_library",
+        "//api",
+        "//exporters/otlp:otlp_http_exporter",
         "//sdk/src/trace",
     ],
 )

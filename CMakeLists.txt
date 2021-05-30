@@ -203,7 +203,7 @@ if(WITH_OTLP)
       find_package(Protobuf REQUIRED)
     endif()
     if(NOT gRPC_FOUND)
-      find_package(gRPC REQUIRED)
+      find_package(gRPC)
     endif()
     if(WIN32)
       # Always use x64 protoc.exe
@@ -221,6 +221,23 @@ if(WITH_OTLP)
   message("PROTOBUF_PROTOC_EXECUTABLE=${PROTOBUF_PROTOC_EXECUTABLE}")
 
   include(cmake/opentelemetry-proto.cmake)
+
+  if(gRPC_FOUND)
+    option(WITH_OTLP_GRPC
+           "Whether to include the OTLP gRPC exporter in the SDK" ON)
+  else()
+    option(WITH_OTLP_GRPC
+           "Whether to include the OTLP gRPC exporter in the SDK" OFF)
+  endif()
+  find_package(CURL)
+  find_package(nlohmann_json)
+  if(CURL_FOUND AND nlohmann_json_FOUND)
+    option(WITH_OTLP_HTTP
+           "Whether to include the OTLP http exporter in the SDK" ON)
+  else()
+    option(WITH_OTLP_HTTP
+           "Whether to include the OTLP http exporter in the SDK" OFF)
+  endif()
 endif()
 
 list(APPEND CMAKE_PREFIX_PATH "${CMAKE_BINARY_DIR}")
@@ -268,11 +285,11 @@ if(NOT WITH_API_ONLY)
   include_directories(ext/include)
 
   add_subdirectory(sdk)
+  add_subdirectory(ext)
   add_subdirectory(exporters)
   if(WITH_EXAMPLES)
     add_subdirectory(examples)
   endif()
-  add_subdirectory(ext)
 endif()
 
 # Add nlohmann/json submodule to include directories

@@ -55,6 +55,36 @@ cc_library(
     ],
 )
 
+cc_library(
+    name = "otlp_http_exporter",
+    srcs = [
+        "src/otlp_http_exporter.cc",
+    ],
+    hdrs = [
+        "include/opentelemetry/exporters/otlp/otlp_http_exporter.h",
+        "include/opentelemetry/exporters/otlp/protobuf_include_prefix.h",
+        "include/opentelemetry/exporters/otlp/protobuf_include_suffix.h",
+    ],
+    copts = [
+        "-DCURL_STATICLIB",
+    ],
+    linkopts = select({
+        "//bazel:windows": [
+            "-DEFAULTLIB:advapi32.lib",
+            "-DEFAULTLIB:crypt32.lib",
+        ],
+        "//conditions:default": [],
+    }),
+    strip_include_prefix = "include",
+    deps = [
+        ":otlp_recordable",
+        "//ext/src/http/client/curl:http_client_curl",
+        "//sdk/src/trace",
+        "@com_github_opentelemetry_proto//:trace_service_proto_cc",
+        "@github_nlohmann_json//:json",
+    ],
+)
+
 cc_test(
     name = "otlp_recordable_test",
     srcs = ["test/otlp_recordable_test.cc"],
