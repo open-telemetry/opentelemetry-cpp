@@ -1,3 +1,6 @@
+// Copyright The OpenTelemetry Authors
+// SPDX-License-Identifier: Apache-2.0
+
 // This file may be include multiple times, do not add #pragma once here
 
 #if defined(_MSC_VER)

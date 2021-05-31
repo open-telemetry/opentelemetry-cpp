@@ -1,3 +1,6 @@
+// Copyright The OpenTelemetry Authors
+// SPDX-License-Identifier: Apache-2.0
+
 #include "opentelemetry/trace/propagation/jaeger.h"
 #include "opentelemetry/trace/scope.h"
 #include "util.h"

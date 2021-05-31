@@ -116,6 +116,12 @@ if(WITH_METRICS_PREVIEW)
   add_definitions(-DENABLE_METRICS_PREVIEW)
 endif()
 
+option(WITH_LOGS_PREVIEW "Whether to build logs preview" OFF)
+
+if(WITH_LOGS_PREVIEW)
+  add_definitions(-DENABLE_LOGS_PREVIEW)
+endif()
+
 find_package(Threads)
 
 function(install_windows_deps)

@@ -1,3 +1,6 @@
+// Copyright The OpenTelemetry Authors
+// SPDX-License-Identifier: Apache-2.0
+
 #include "opentelemetry/sdk/trace/tracer_provider.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE

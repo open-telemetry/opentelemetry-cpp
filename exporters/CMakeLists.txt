@@ -27,7 +27,7 @@ if(WITH_ZIPKIN)
   add_subdirectory(zipkin)
 endif()
 
-if(WITH_ELASTICSEARCH)
+if(WITH_ELASTICSEARCH AND WITH_LOGS_PREVIEW)
   add_subdirectory(elasticsearch)
 endif()
 

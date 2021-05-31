@@ -1,10 +1,15 @@
-#include <gtest/gtest.h>
-#include <array>
+// Copyright The OpenTelemetry Authors
+// SPDX-License-Identifier: Apache-2.0
 
-#include "opentelemetry/logs/provider.h"
-#include "opentelemetry/nostd/shared_ptr.h"
-#include "opentelemetry/nostd/span.h"
-#include "opentelemetry/nostd/string_view.h"
+#ifdef ENABLE_LOGS_PREVIEW
+
+#  include <gtest/gtest.h>
+#  include <array>
+
+#  include "opentelemetry/logs/provider.h"
+#  include "opentelemetry/nostd/shared_ptr.h"
+#  include "opentelemetry/nostd/span.h"
+#  include "opentelemetry/nostd/string_view.h"
 
 using opentelemetry::logs::Logger;
 using opentelemetry::logs::LoggerProvider;
@@ -63,3 +68,4 @@ TEST(Provider, GetLogger)
   auto logger2 = tf->GetLogger("logger2", args);
   EXPECT_EQ(nullptr, logger2);
 }
+#endif

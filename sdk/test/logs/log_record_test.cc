@@ -1,9 +1,14 @@
-#include "opentelemetry/sdk/logs/log_record.h"
-#include "opentelemetry/nostd/variant.h"
-#include "opentelemetry/trace/span_id.h"
-#include "opentelemetry/trace/trace_id.h"
+// Copyright The OpenTelemetry Authors
+// SPDX-License-Identifier: Apache-2.0
 
-#include <gtest/gtest.h>
+#ifdef ENABLE_LOGS_PREVIEW
+
+#  include "opentelemetry/sdk/logs/log_record.h"
+#  include "opentelemetry/nostd/variant.h"
+#  include "opentelemetry/trace/span_id.h"
+#  include "opentelemetry/trace/trace_id.h"
+
+#  include <gtest/gtest.h>
 
 using opentelemetry::sdk::logs::LogRecord;
 
@@ -57,3 +62,4 @@ TEST(LogRecord, SetAndGet)
   ASSERT_EQ(record.GetTraceFlags(), trace_flags);
   ASSERT_EQ(record.GetTimestamp().time_since_epoch(), now.time_since_epoch());
 }
+#endif

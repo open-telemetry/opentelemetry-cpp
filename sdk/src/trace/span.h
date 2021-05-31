@@ -1,3 +1,6 @@
+// Copyright The OpenTelemetry Authors
+// SPDX-License-Identifier: Apache-2.0
+
 #pragma once
 
 #include <mutex>
@@ -21,10 +24,8 @@ public:
        const trace_api::SpanContextKeyValueIterable &links,
        const trace_api::StartSpanOptions &options,
        const trace_api::SpanContext &parent_span_context,
-       const SpanLimits &span_limits,
-       const nostd::shared_ptr<opentelemetry::trace::TraceState> trace_state =
-           trace_api::TraceState::GetDefault(),
-       const bool sampled = false) noexcept;
+       std::unique_ptr<trace_api::SpanContext> span_context,
+       const SpanLimits &span_limits) noexcept;
 
   ~Span() override;
 
