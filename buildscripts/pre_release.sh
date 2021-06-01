@@ -1,5 +1,8 @@
 #!/bin/bash
 
+# Copyright The OpenTelemetry Authors
+# SPDX-License-Identifier: Apache-2.0
+
 usage() { echo "Usage: $0 -t <tag>" 1>&2; exit 1; }
 
 while getopts ":t:" o; do

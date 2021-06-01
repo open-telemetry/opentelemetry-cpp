@@ -58,8 +58,6 @@ if(WITH_ABSEIL)
   add_definitions(-DHAVE_ABSEIL)
   find_package(absl CONFIG REQUIRED)
 
-  # Abseil headers-only lib is needed for absl::variant to work vs2015.
-  # `nostd::mpark::variant` is not compiling in vs2015.
   set(CORE_RUNTIME_LIBS absl::any absl::base absl::bits absl::city)
 
   # target_link_libraries(main PRIVATE absl::any absl::base absl::bits
@@ -123,12 +121,22 @@ if(WIN32)
   endif(WITH_ETW)
 endif(WIN32)
 
+option(
+  WITH_API_ONLY
+  "Only build the API (use as a header-only library). Overrides WITH_EXAMPLES"
+  OFF)
 option(WITH_EXAMPLES "Whether to build examples" ON)
 
 option(WITH_METRICS_PREVIEW "Whether to build metrics preview" OFF)
 
 if(WITH_METRICS_PREVIEW)
   add_definitions(-DENABLE_METRICS_PREVIEW)
+endif()
+
+option(WITH_LOGS_PREVIEW "Whether to build logs preview" OFF)
+
+if(WITH_LOGS_PREVIEW)
+  add_definitions(-DENABLE_LOGS_PREVIEW)
 endif()
 
 find_package(Threads)
@@ -239,17 +247,21 @@ endif()
 include(CMakePackageConfigHelpers)
 
 include_directories(api/include)
-include_directories(sdk/include)
-include_directories(sdk)
-include_directories(ext/include)
 
 add_subdirectory(api)
-add_subdirectory(sdk)
-add_subdirectory(exporters)
-if(WITH_EXAMPLES)
-  add_subdirectory(examples)
+
+if(NOT WITH_API_ONLY)
+  include_directories(sdk/include)
+  include_directories(sdk)
+  include_directories(ext/include)
+
+  add_subdirectory(sdk)
+  add_subdirectory(exporters)
+  if(WITH_EXAMPLES)
+    add_subdirectory(examples)
+  endif()
+  add_subdirectory(ext)
 endif()
-add_subdirectory(ext)
 
 if(DEFINED ENV{OPENTELEMETRY_CONTRIB_PATH})
   # Add custom contrib path to build tree and consolidate binary artifacts in

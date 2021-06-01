@@ -1,3 +1,6 @@
+// Copyright The OpenTelemetry Authors
+// SPDX-License-Identifier: Apache-2.0
+
 #pragma once
 
 #include "opentelemetry/exporters/otlp/protobuf_include_prefix.h"
@@ -14,7 +17,7 @@ namespace exporter
 {
 namespace otlp
 {
-class Recordable final : public sdk::trace::Recordable
+class OtlpRecordable final : public sdk::trace::Recordable
 {
 public:
   const proto::trace::v1::Span &span() const noexcept { return span_; }

@@ -19,7 +19,9 @@ jobs:
         sudo ./ci/setup_cmake.sh
         sudo ./ci/setup_ci_environment.sh
     - name: run cmake tests (without otlp-exporter)
-      run: ./ci/do_ci.sh cmake.test
+      run: |
+        sudo ./ci/setup_thrift.sh
+        ./ci/do_ci.sh cmake.test
 
   cmake_gcc_48_test:
     name: CMake gcc 4.8

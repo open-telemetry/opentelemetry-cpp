@@ -1,16 +1,5 @@
-// Copyright 2020, OpenTelemetry Authors
-//
-// Licensed under the Apache License, Version 2.0 (the "License");
-// you may not use this file except in compliance with the License.
-// You may obtain a copy of the License at
-//
-// http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an "AS IS" BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
+// Copyright The OpenTelemetry Authors
+// SPDX-License-Identifier: Apache-2.0
 
 #ifdef _WIN32
 
@@ -70,55 +59,58 @@ TEST(ETWTracer, TracerCheck)
     {"attrib1", 1},
     {"attrib2", 2}
   };
-
-  auto topSpan = tracer->StartSpan("MySpanTop");
-  std::this_thread::sleep_for (std::chrono::seconds(1));
-
-  auto outerSpan = tracer->StartSpan("MySpanL2", attribs);
-
-  // Create nested span. Note how we share the attributes here.
-  // It is Okay to either reuse/share or have your own attributes.
-  auto innerSpan = tracer->StartSpan("MySpanL3", attribs);
-
-  // Add first event
-  std::string eventName1 = "MyEvent1";
-  Properties event1 =
   {
-    {"uint32Key", (uint32_t)1234},
-    {"uint64Key", (uint64_t)1234567890},
-    {"strKey", "someValue"}
-  };
-  EXPECT_NO_THROW(outerSpan->AddEvent(eventName1, event1));
-  std::this_thread::sleep_for (std::chrono::seconds(1));
+    auto topSpan = tracer->StartSpan("MySpanTop");
+    auto topScope = tracer->WithActiveSpan(topSpan);
+    {
+      auto outerSpan = tracer->StartSpan("MySpanL2", attribs);
+      auto outerScope = tracer->WithActiveSpan(outerSpan);
 
-  // Add second event
-  std::string eventName2 = "MyEvent2";
-  Properties event2 =
-  {
-    {"uint32Key", (uint32_t)9876},
-    {"uint64Key", (uint64_t)987654321},
-    {"strKey", "anotherValue"}
-  };
-  EXPECT_NO_THROW(outerSpan->AddEvent(eventName2, event2));
-  std::this_thread::sleep_for (std::chrono::seconds(2));
+      // Create nested span. Note how we share the attributes here.
+      // It is Okay to either reuse/share or have your own attributes.
+      {
+        auto innerSpan = tracer->StartSpan("MySpanL3", attribs);
+        auto innerScope = tracer->WithActiveSpan(innerSpan);
 
-  std::string eventName3= "MyEvent3";
-    Properties event3 =
-  {
-    /* Extra metadata that allows event to flow to A.I. pipeline */
-    {"metadata", "ai_event"},
-    {"uint32Key", (uint32_t)9876},
-    {"uint64Key", (uint64_t)987654321},
-    // {"int32array", {{-1,0,1,2,3}} },
-    {"tempString", getTemporaryValue() }
-  };
-  EXPECT_NO_THROW(innerSpan->AddEvent(eventName3, event3));
-  std::this_thread::sleep_for (std::chrono::seconds(1));
+        // Add first event
+        std::string eventName1 = "MyEvent1";
+        Properties event1 =
+        {
+          {"uint32Key", (uint32_t)1234},
+          {"uint64Key", (uint64_t)1234567890},
+          {"strKey", "someValue"}
+        };
+        EXPECT_NO_THROW(outerSpan->AddEvent(eventName1, event1));
 
-  EXPECT_NO_THROW(innerSpan->End());    // end innerSpan
+        // Add second event
+        std::string eventName2 = "MyEvent2";
+        Properties event2 =
+        {
+          {"uint32Key", (uint32_t)9876},
+          {"uint64Key", (uint64_t)987654321},
+          {"strKey", "anotherValue"}
+        };
+        EXPECT_NO_THROW(outerSpan->AddEvent(eventName2, event2));
 
-  EXPECT_NO_THROW(outerSpan->End());    // end outerSpan
-  EXPECT_NO_THROW(topSpan->End());      // end topSpan
+        std::string eventName3= "MyEvent3";
+        Properties event3 =
+        {
+          /* Extra metadata that allows event to flow to A.I. pipeline */
+          {"metadata", "ai_event"},
+          {"uint32Key", (uint32_t)9876},
+          {"uint64Key", (uint64_t)987654321},
+          // {"int32array", {{-1,0,1,2,3}} },
+          {"tempString", getTemporaryValue() }
+        };
+        EXPECT_NO_THROW(innerSpan->AddEvent(eventName3, event3));
+        EXPECT_NO_THROW(innerSpan->End());
+
+      }
+      EXPECT_NO_THROW(outerSpan->End());
+
+    }
+    EXPECT_NO_THROW(topSpan->End());
+  }
 
   EXPECT_NO_THROW(tracer->CloseWithMicroseconds(0));
 }
@@ -154,12 +146,21 @@ TEST(ETWTracer, TracerCheckMinDecoration)
       {"enableAutoParent", false}
   });
   auto tracer = tp.GetTracer(providerName);
-  auto aSpan = tracer->StartSpan("A.min");
-  auto bSpan = tracer->StartSpan("B.min");
-  auto cSpan = tracer->StartSpan("C.min");
-  cSpan->End();
-  bSpan->End();
-  aSpan->End();
+  {
+    auto aSpan = tracer->StartSpan("A.min");
+    auto aScope = tracer->WithActiveSpan(aSpan);
+    {
+      auto bSpan = tracer->StartSpan("B.min");
+      auto bScope = tracer->WithActiveSpan(bSpan);
+      {
+        auto cSpan = tracer->StartSpan("C.min");
+        auto cScope = tracer->WithActiveSpan(cSpan);
+        EXPECT_NO_THROW(cSpan->End());
+      }
+      EXPECT_NO_THROW(bSpan->End());
+    }
+    EXPECT_NO_THROW(aSpan->End());
+}
   tracer->CloseWithMicroseconds(0);
 }
 
@@ -196,12 +197,21 @@ TEST(ETWTracer, TracerCheckMaxDecoration)
       {"enableAutoParent", true}
   });
   auto tracer = tp.GetTracer(providerName);
-  auto aSpan = tracer->StartSpan("A.max");
-  auto bSpan = tracer->StartSpan("B.max");
-  auto cSpan = tracer->StartSpan("C.max");
-  cSpan->End();
-  bSpan->End();
-  aSpan->End();
+  {
+    auto aSpan = tracer->StartSpan("A.max");
+    auto aScope = tracer->WithActiveSpan(aSpan);
+    {
+      auto bSpan = tracer->StartSpan("B.max");
+      auto bScope = tracer->WithActiveSpan(bSpan);
+      {
+        auto cSpan = tracer->StartSpan("C.max");
+        auto cScope = tracer->WithActiveSpan(cSpan);
+        EXPECT_NO_THROW(cSpan->End());
+      }
+      EXPECT_NO_THROW(bSpan->End());
+    }
+    EXPECT_NO_THROW(aSpan->End());
+  }
   tracer->CloseWithMicroseconds(0);
 }
 
