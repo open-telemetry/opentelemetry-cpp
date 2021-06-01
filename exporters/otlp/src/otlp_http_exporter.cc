@@ -304,118 +304,6 @@ void ConvertListFieldToJson(nlohmann::json &value,
 }
 
 /**
- * This class handles the response message from the Elasticsearch request
- */
-class ResponseHandler : public http_client::EventHandler
-{
-public:
-  /**
-   * Creates a response handler, that by default doesn't display to console
-   */
-  ResponseHandler(bool console_debug = false) : console_debug_{console_debug} {}
-
-  /**
-   * Automatically called when the response is received, store the body into a string and notify any
-   * threads blocked on this result
-   */
-  void OnResponse(http_client::Response &response) noexcept override
-  {
-    // Lock the private members so they can't be read while being modified
-    {
-      std::unique_lock<std::mutex> lk(mutex_);
-
-      if (console_debug_)
-      {
-        std::cout << "[OTLP HTTP Exporter] Status:" << response.GetStatusCode() << std::endl
-                  << std::string(response.GetBody().begin(), response.GetBody().end()) << std::endl;
-        response.ForEachHeader([](opentelemetry::nostd::string_view header_name,
-                                  opentelemetry::nostd::string_view header_value) {
-          std::cout << "\tHeader: " << header_name.data() << " : " << header_value.data()
-                    << std::endl;
-          return true;
-        });
-      }
-
-      // Set the response_received_ flag to true and notify any threads waiting on this result
-      response_received_ = true;
-    }
-    cv_.notify_all();
-  }
-
-  /**
-   * A method the user calls to block their thread until the response is received. The longest
-   * duration is the timeout of the request, set by SetTimeoutMs()
-   */
-  bool waitForResponse()
-  {
-    std::unique_lock<std::mutex> lk(mutex_);
-    cv_.wait(lk);
-    return response_received_;
-  }
-
-  // Callback method when an http event occurs
-  void OnEvent(http_client::SessionState state,
-               opentelemetry::nostd::string_view reason) noexcept override
-  {
-    // If any failure event occurs, release the condition variable to unblock main thread
-    switch (state)
-    {
-      case http_client::SessionState::ConnectFailed:
-        if (console_debug_)
-        {
-          std::cerr << "[OTLP HTTP Exporter] Connection to http server failed." << reason
-                    << std::endl;
-        }
-        cv_.notify_all();
-        break;
-      case http_client::SessionState::SendFailed:
-        if (console_debug_)
-        {
-          std::cerr << "[OTLP HTTP Exporter] Request failed to be sent to http server." << reason
-                    << std::endl;
-        }
-        cv_.notify_all();
-        break;
-      case http_client::SessionState::TimedOut:
-        if (console_debug_)
-        {
-          std::cerr << "[OTLP HTTP Exporter] Request to http server timed out." << reason
-                    << std::endl;
-        }
-        cv_.notify_all();
-        break;
-      case http_client::SessionState::NetworkError:
-        if (console_debug_)
-        {
-          std::cerr << "[OTLP HTTP Exporter] Network error to http server." << reason << std::endl;
-        }
-        cv_.notify_all();
-        break;
-      case http_client::SessionState::Cancelled:
-        if (console_debug_)
-        {
-          std::cerr << "[OTLP HTTP Exporter] Request cancelled." << reason << std::endl;
-        }
-        cv_.notify_all();
-        break;
-      default:
-        break;
-    }
-  }
-
-private:
-  // Define a condition variable and mutex
-  std::condition_variable cv_;
-  std::mutex mutex_;
-
-  // Whether the response from Elasticsearch has been received
-  bool response_received_ = false;
-
-  // Whether to print the results from the callback
-  bool console_debug_ = false;
-};
-
-/**
  * Add span protobufs contained in recordables to request.
  * @param spans the spans to export
  * @param request the current request
@@ -486,6 +374,7 @@ sdk::common::ExportResult OtlpHttpExporter::Export(
 
   // Send the request
   auto client = http_client::HttpClientFactory::CreateSync();
+  // TODO: Set timeout
   auto result = client->Post(options_.url, body_vec, {{"content-type", kHttpContentType}});
 
   // If an error occurred with the HTTP request
@@ -585,7 +474,7 @@ bool OtlpHttpExporter::Shutdown(std::chrono::microseconds) noexcept
 {
   is_shutdown_ = true;
 
-  // TODO: Shutdown the curl operation
+  // TODO: Shutdown the http request
 
   return true;
 }
