@@ -76,14 +76,14 @@ Purely for illustration purposes, not intended to represent actual releases:
   * No API and SDK of logging and metrics available
 * v1.0.0-rc1 release:
   * Pre-release, no API/ABI guarantees, but more stable than alpha/beta.
-  * Contains pre-release API and SDK of trace, baggage and  resource
+  * Contains pre-release API and SDK of trace, baggage and resource
   * experimental metrics and logging API/SDK behind feature flag
 * v1.0.0: ( with traces )
-  * Contains stable API and SDK of trace, baggage and  resource
+  * Contains stable API and SDK of trace, baggage and resource
   * experimental metrics and logging API/SDK behind feature flag
 * v1.5.0 release (with metrics)
   * Contains stable API and SDK of metrics, trace, baggage, resource.
-  * experimental logging api still only behind feature flag
+  * experimental logging API/SDK behind feature flag
 * v1.10.0 release (with logging)
   * Contains stable API and SDK of logging, metrics, trace, baggage, resource.
 
