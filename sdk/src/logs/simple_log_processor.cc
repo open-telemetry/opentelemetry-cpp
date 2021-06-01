@@ -1,10 +1,11 @@
 // Copyright The OpenTelemetry Authors
 // SPDX-License-Identifier: Apache-2.0
 
-#include "opentelemetry/sdk/logs/simple_log_processor.h"
+#ifdef ENABLE_LOGS_PREVIEW
+#  include "opentelemetry/sdk/logs/simple_log_processor.h"
 
-#include <chrono>
-#include <vector>
+#  include <chrono>
+#  include <vector>
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace sdk
@@ -60,3 +61,4 @@ bool SimpleLogProcessor::Shutdown(std::chrono::microseconds timeout) noexcept
 }  // namespace logs
 }  // namespace sdk
 OPENTELEMETRY_END_NAMESPACE
+#endif

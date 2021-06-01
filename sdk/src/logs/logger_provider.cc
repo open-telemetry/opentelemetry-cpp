@@ -1,7 +1,9 @@
 // Copyright The OpenTelemetry Authors
 // SPDX-License-Identifier: Apache-2.0
 
-#include "opentelemetry/sdk/logs/logger_provider.h"
+#ifdef ENABLE_LOGS_PREVIEW
+
+#  include "opentelemetry/sdk/logs/logger_provider.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace sdk
@@ -66,3 +68,4 @@ void LoggerProvider::SetProcessor(std::shared_ptr<LogProcessor> processor) noexc
 }  // namespace logs
 }  // namespace sdk
 OPENTELEMETRY_END_NAMESPACE
+#endif

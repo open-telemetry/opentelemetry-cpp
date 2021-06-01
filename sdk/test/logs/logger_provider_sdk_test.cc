@@ -1,15 +1,17 @@
 // Copyright The OpenTelemetry Authors
 // SPDX-License-Identifier: Apache-2.0
 
-#include <array>
-#include "opentelemetry/logs/provider.h"
-#include "opentelemetry/nostd/shared_ptr.h"
-#include "opentelemetry/nostd/string_view.h"
-#include "opentelemetry/sdk/logs/log_record.h"
-#include "opentelemetry/sdk/logs/logger.h"
-#include "opentelemetry/sdk/logs/logger_provider.h"
+#ifdef ENABLE_LOGS_PREVIEW
 
-#include <gtest/gtest.h>
+#  include <array>
+#  include "opentelemetry/logs/provider.h"
+#  include "opentelemetry/nostd/shared_ptr.h"
+#  include "opentelemetry/nostd/string_view.h"
+#  include "opentelemetry/sdk/logs/log_record.h"
+#  include "opentelemetry/sdk/logs/logger.h"
+#  include "opentelemetry/sdk/logs/logger_provider.h"
+
+#  include <gtest/gtest.h>
 
 using namespace opentelemetry::sdk::logs;
 
@@ -86,3 +88,4 @@ TEST(LoggerProviderSDK, GetAndSetProcessor)
   lp.SetProcessor(proc2);
   ASSERT_EQ(proc2, lp.GetProcessor());
 }
+#endif

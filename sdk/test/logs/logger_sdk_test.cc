@@ -1,10 +1,12 @@
 // Copyright The OpenTelemetry Authors
 // SPDX-License-Identifier: Apache-2.0
 
-#include "opentelemetry/sdk/logs/log_record.h"
-#include "opentelemetry/sdk/logs/logger.h"
+#ifdef ENABLE_LOGS_PREVIEW
 
-#include <gtest/gtest.h>
+#  include "opentelemetry/sdk/logs/log_record.h"
+#  include "opentelemetry/sdk/logs/logger.h"
+
+#  include <gtest/gtest.h>
 
 using namespace opentelemetry::sdk::logs;
 
@@ -85,3 +87,4 @@ TEST(LoggerSDK, LogToAProcessor)
   ASSERT_EQ(shared_recordable->GetName(), "Log Name");
   ASSERT_EQ(shared_recordable->GetBody(), "Log Message");
 }
+#endif
