@@ -13,10 +13,11 @@ target_link_libraries(
   PUBLIC opentelemetry_trace opentelemetry_resources opentelemetry_proto)
 
 if(WITH_OTLP_GRPC)
-  add_library(opentelemetry_exporter_otlp_grpc src/otlp_exporter.cc)
+  find_package(gRPC REQUIRED)
+  add_library(opentelemetry_exporter_otlp_grpc src/otlp_grpc_exporter.cc)
 
   set_target_properties(opentelemetry_exporter_otlp_grpc
-                        PROPERTIES EXPORT_NAME otlp_exporter)
+                        PROPERTIES EXPORT_NAME otlp_grpc_exporter)
 
   target_link_libraries(
     opentelemetry_exporter_otlp_grpc PUBLIC opentelemetry_otlp_recordable
@@ -26,6 +27,8 @@ if(WITH_OTLP_GRPC)
 endif()
 
 if(WITH_OTLP_HTTP)
+  find_package(CURL REQUIRED)
+  find_package(nlohmann_json REQUIRED)
   add_library(opentelemetry_exporter_otlp_http src/otlp_http_exporter.cc)
 
   set_target_properties(opentelemetry_exporter_otlp_http

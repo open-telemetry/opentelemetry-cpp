@@ -3,6 +3,7 @@
 
 #include "opentelemetry/exporters/otlp/otlp_http_exporter.h"
 #include "opentelemetry/exporters/otlp/otlp_recordable.h"
+#include "opentelemetry/ext/http/client/http_client_factory.h"
 
 #include "nlohmann/json.hpp"
 
@@ -325,7 +326,7 @@ public:
 
       if (console_debug_)
       {
-        std::cout << "[HTTP Exporter] Status:" << response.GetStatusCode() << std::endl
+        std::cout << "[OTLP HTTP Exporter] Status:" << response.GetStatusCode() << std::endl
                   << std::string(response.GetBody().begin(), response.GetBody().end()) << std::endl;
         response.ForEachHeader([](opentelemetry::nostd::string_view header_name,
                                   opentelemetry::nostd::string_view header_value) {
@@ -362,14 +363,15 @@ public:
       case http_client::SessionState::ConnectFailed:
         if (console_debug_)
         {
-          std::cerr << "[HTTP Exporter] Connection to http server failed." << reason << std::endl;
+          std::cerr << "[OTLP HTTP Exporter] Connection to http server failed." << reason
+                    << std::endl;
         }
         cv_.notify_all();
         break;
       case http_client::SessionState::SendFailed:
         if (console_debug_)
         {
-          std::cerr << "[HTTP Exporter] Request failed to be sent to http server." << reason
+          std::cerr << "[OTLP HTTP Exporter] Request failed to be sent to http server." << reason
                     << std::endl;
         }
         cv_.notify_all();
@@ -377,21 +379,22 @@ public:
       case http_client::SessionState::TimedOut:
         if (console_debug_)
         {
-          std::cerr << "[HTTP Exporter] Request to http server timed out." << reason << std::endl;
+          std::cerr << "[OTLP HTTP Exporter] Request to http server timed out." << reason
+                    << std::endl;
         }
         cv_.notify_all();
         break;
       case http_client::SessionState::NetworkError:
         if (console_debug_)
         {
-          std::cerr << "[HTTP Exporter] Network error to http server." << reason << std::endl;
+          std::cerr << "[OTLP HTTP Exporter] Network error to http server." << reason << std::endl;
         }
         cv_.notify_all();
         break;
       case http_client::SessionState::Cancelled:
         if (console_debug_)
         {
-          std::cerr << "[HTTP Exporter] Request cancelled." << reason << std::endl;
+          std::cerr << "[OTLP HTTP Exporter] Request cancelled." << reason << std::endl;
         }
         cv_.notify_all();
         break;
@@ -460,7 +463,7 @@ sdk::common::ExportResult OtlpHttpExporter::Export(
   {
     if (options_.console_debug)
     {
-      std::cerr << "[HTTP Exporter] Export failed, exporter is shutdown" << std::endl;
+      std::cerr << "[OTLP HTTP Exporter] Export failed, exporter is shutdown" << std::endl;
     }
 
     return sdk::common::ExportResult::kFailure;
@@ -477,56 +480,102 @@ sdk::common::ExportResult OtlpHttpExporter::Export(
       json_request.dump(-1, ' ', false, nlohmann::detail::error_handler_t::replace);
   if (options_.console_debug)
   {
-    std::cerr << "[HTTP Exporter] Request body:\n" << post_body_json << std::endl;
+    std::cout << "[OTLP HTTP Exporter] Request body:\n" << post_body_json << std::endl;
   }
   http_client::Body body_vec(post_body_json.begin(), post_body_json.end());
 
   // Send the request
-  std::unique_ptr<ResponseHandler> handler(new ResponseHandler(options_.console_debug));
-  std::unique_ptr<http_client::curl::HttpOperation> curl_operation;
-  curl_operation.reset(new http_client::curl::HttpOperation(
-      http_client::Method::Post, options_.url, handler.get(), http_client::curl::RequestMode::Async,
-      {{"content-type", kHttpContentType}}, body_vec, false,
-      std::chrono::milliseconds(options_.response_timeout)));
-
-  auto callback_ptr = handler.get();
-  curl_operation->SendAsync([callback_ptr](http_client::curl::HttpOperation &operation) {
-    if (operation.WasAborted())
-    {
-      // Manually cancelled
-      callback_ptr->OnEvent(http_client::SessionState::Cancelled, "");
-    }
-
-    if (operation.GetResponseCode() >= CURL_LAST)
-    {
-      // we have a http response
-      auto response =
-          std::unique_ptr<http_client::curl::Response>(new http_client::curl::Response());
-      response->headers_     = operation.GetResponseHeaders();
-      response->body_        = operation.GetResponseBody();
-      response->status_code_ = operation.GetResponseCode();
-      callback_ptr->OnResponse(*response);
-    }
-  });
-
-  {
-    std::lock_guard<std::mutex> lock_guard(mutex_);
-    curl_operation_.swap(curl_operation);
-  }
-
-  bool write_successful = handler->waitForResponse();
-
-  {
-    std::lock_guard<std::mutex> lock_guard(mutex_);
-    curl_operation_->Finish();
-    curl_operation_.reset();
-  }
+  auto client = http_client::HttpClientFactory::CreateSync();
+  auto result = client->Post(options_.url, body_vec, {{"content-type", kHttpContentType}});
 
   // If an error occurred with the HTTP request
-  if (!write_successful)
+  if (!result)
   {
+    if (options_.console_debug)
+    {
+      switch (result.GetSessionState())
+      {
+        case http_client::SessionState::CreateFailed:
+          std::cerr << "[OTLP HTTP Exporter] session state: session create failed" << std::endl;
+          break;
+
+        case http_client::SessionState::Created:
+          std::cerr << "[OTLP HTTP Exporter] session state: session created" << std::endl;
+          break;
+
+        case http_client::SessionState::Destroyed:
+          std::cerr << "[OTLP HTTP Exporter] session state: session destroyed" << std::endl;
+          break;
+
+        case http_client::SessionState::Connecting:
+          std::cerr << "[OTLP HTTP Exporter] session state: connecting to peer" << std::endl;
+          break;
+
+        case http_client::SessionState::ConnectFailed:
+          std::cerr << "[OTLP HTTP Exporter] session state: connection failed" << std::endl;
+          break;
+
+        case http_client::SessionState::Connected:
+          std::cerr << "[OTLP HTTP Exporter] session state: connected" << std::endl;
+          break;
+
+        case http_client::SessionState::Sending:
+          std::cerr << "[OTLP HTTP Exporter] session state: sending request" << std::endl;
+          break;
+
+        case http_client::SessionState::SendFailed:
+          std::cerr << "[OTLP HTTP Exporter] session state: request send failed" << std::endl;
+          break;
+
+        case http_client::SessionState::Response:
+          std::cerr << "[OTLP HTTP Exporter] session state: response received" << std::endl;
+          break;
+
+        case http_client::SessionState::SSLHandshakeFailed:
+          std::cerr << "[OTLP HTTP Exporter] session state: SSL handshake failed" << std::endl;
+          break;
+
+        case http_client::SessionState::TimedOut:
+          std::cerr << "[OTLP HTTP Exporter] session state: request time out" << std::endl;
+          break;
+
+        case http_client::SessionState::NetworkError:
+          std::cerr << "[OTLP HTTP Exporter] session state: network error" << std::endl;
+          break;
+
+        case http_client::SessionState::ReadError:
+          std::cerr << "[OTLP HTTP Exporter] session state: error reading response" << std::endl;
+          break;
+
+        case http_client::SessionState::WriteError:
+          std::cerr << "[OTLP HTTP Exporter] session state: error writing request" << std::endl;
+          break;
+
+        case http_client::SessionState::Cancelled:
+          std::cerr << "[OTLP HTTP Exporter] session state: (manually) cancelled" << std::endl;
+          break;
+
+        default:
+          break;
+      }
+    }
     // TODO: retry logic
     return sdk::common::ExportResult::kFailure;
+  }
+
+  if (options_.console_debug)
+  {
+    std::cout << "[OTLP HTTP Exporter] Status:" << result.GetResponse().GetStatusCode() << std::endl
+              << "Header:" << std::endl;
+    result.GetResponse().ForEachHeader([](opentelemetry::nostd::string_view header_name,
+                                          opentelemetry::nostd::string_view header_value) {
+      std::cout << "\t" << header_name.data() << " : " << header_value.data() << std::endl;
+      return true;
+    });
+    std::cout << "Body:" << std::endl
+              << std::string(result.GetResponse().GetBody().begin(),
+                             result.GetResponse().GetBody().end())
+              << std::endl;
   }
 
   return sdk::common::ExportResult::kSuccess;
@@ -536,14 +585,7 @@ bool OtlpHttpExporter::Shutdown(std::chrono::microseconds) noexcept
 {
   is_shutdown_ = true;
 
-  // Shutdown the curl operation
-  std::lock_guard<std::mutex> lock_guard(mutex_);
-  if (curl_operation_)
-  {
-    curl_operation_->Abort();
-    curl_operation_->Finish();
-    curl_operation_.reset();
-  }
+  // TODO: Shutdown the curl operation
 
   return true;
 }

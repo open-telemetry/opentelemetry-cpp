@@ -6,8 +6,6 @@
 // We need include exporter.h first, which will include Windows.h with NOMINMAX on Windows
 #include "opentelemetry/sdk/trace/exporter.h"
 
-#include "opentelemetry/ext/http/client/curl/http_client_curl.h"
-
 #include <memory>
 #include <mutex>
 #include <string>
@@ -103,10 +101,6 @@ private:
 
   // The configuration options associated with this exporter.
   const OtlpHttpExporterOptions options_;
-
-  // Object that stores the HTTP sessions that have been created
-  std::unique_ptr<opentelemetry::ext::http::client::curl::HttpOperation> curl_operation_;
-  std::mutex mutex_;
 };
 }  // namespace otlp
 }  // namespace exporter

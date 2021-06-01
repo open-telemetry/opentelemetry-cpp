@@ -19,15 +19,15 @@ contributions](https://github.com/open-telemetry/opentelemetry-collector-contrib
 ## Configuration
 
 The OTLP exporter offers some configuration options. To configure the exporter,
-create an `OtlpExporterOptions` struct (defined in
-[otlp_exporter.h](https://github.com/open-telemetry/opentelemetry-cpp/blob/main/exporters/otlp/include/opentelemetry/exporters/otlp/otlp_exporter.h)),
-set the options inside, and pass the struct to the `OtlpExporter` constructor,
+create an `OtlpGrpcExporterOptions` struct (defined in
+[otlp_grpc_exporter.h](https://github.com/open-telemetry/opentelemetry-cpp/blob/main/exporters/otlp/include/opentelemetry/exporters/otlp/otlp_grpc_exporter.h)),
+set the options inside, and pass the struct to the `OtlpGrpcExporter` constructor,
 like so:
 
 ```cpp
-OtlpExporterOptions options;
+OtlpGrpcExporterOptions options;
 options.endpoint = "localhost:12345";
-auto exporter = std::unique_ptr<sdktrace::SpanExporter>(new otlp::OtlpExporter(options));
+auto exporter = std::unique_ptr<sdktrace::SpanExporter>(new otlp::OtlpGrpcExporter(options));
 ```
 
 The OTLP HTTP exporter offers some configuration options. To configure the exporter,

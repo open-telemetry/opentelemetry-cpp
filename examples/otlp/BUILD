@@ -19,7 +19,7 @@ cc_binary(
     deps = [
         ":foo_library",
         "//api",
-        "//exporters/otlp:otlp_exporter",
+        "//exporters/otlp:otlp_grpc_exporter",
         "//sdk/src/trace",
     ],
 )

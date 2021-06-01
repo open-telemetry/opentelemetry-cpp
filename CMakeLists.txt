@@ -221,23 +221,15 @@ if(WITH_OTLP)
   message("PROTOBUF_PROTOC_EXECUTABLE=${PROTOBUF_PROTOC_EXECUTABLE}")
 
   include(cmake/opentelemetry-proto.cmake)
-
-  if(gRPC_FOUND)
-    option(WITH_OTLP_GRPC
-           "Whether to include the OTLP gRPC exporter in the SDK" ON)
-  else()
-    option(WITH_OTLP_GRPC
-           "Whether to include the OTLP gRPC exporter in the SDK" OFF)
-  endif()
+  include(CMakeDependentOption)
   find_package(CURL)
   find_package(nlohmann_json)
-  if(CURL_FOUND AND nlohmann_json_FOUND)
-    option(WITH_OTLP_HTTP
-           "Whether to include the OTLP http exporter in the SDK" ON)
-  else()
-    option(WITH_OTLP_HTTP
-           "Whether to include the OTLP http exporter in the SDK" OFF)
-  endif()
+  cmake_dependent_option(
+    WITH_OTLP_GRPC "Whether to include the OTLP gRPC exporter in the SDK" ON
+    "gRPC_FOUND" OFF)
+  cmake_dependent_option(
+    WITH_OTLP_HTTP "Whether to include the OTLP http exporter in the SDK" ON
+    "CURL_FOUND;nlohmann_json_FOUND" OFF)
 endif()
 
 list(APPEND CMAKE_PREFIX_PATH "${CMAKE_BINARY_DIR}")
