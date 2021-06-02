@@ -251,7 +251,7 @@ struct SocketAddr
 
   SocketAddr(const char *addr, bool unixDomain = false) : SocketAddr()
   {
-    isUnixDomain = unixDomain;
+    isUnixDomain          = unixDomain;
     std::string ipAddress = addr;
     auto found            = ipAddress.find("://");
     if (found != std::string::npos)
@@ -271,7 +271,7 @@ struct SocketAddr
 #endif
 
     // Convert {IPv4|IPv6}:{port} string to Network address and Port.
-    int port              = 0;
+    int port = 0;
 
     // If numColons is more than 2, then it is IPv6 address
     size_t numColons = std::count(ipAddress.begin(), ipAddress.end(), ':');
@@ -537,28 +537,30 @@ struct Socket
   }
 
   template <typename T>
-  size_t readall(T& buffer)
+  size_t readall(T &buffer)
   {
     size_t total_bytes_received = 0;
-    int bytes_received       = 0;
+    int bytes_received          = 0;
     // Read response fully
     do
     {
-      bytes_received = recv((void *)(buffer.data() + total_bytes_received), buffer.size() - total_bytes_received);
+      bytes_received = recv((void *)(buffer.data() + total_bytes_received),
+                            buffer.size() - total_bytes_received);
       if (bytes_received > 0)
       {
         total_bytes_received += bytes_received;
       }
-    } while ((bytes_received > 0) && (error() != SocketTools::Socket::ErrorWouldBlock) && (total_bytes_received<buffer.size()));
+    } while ((bytes_received > 0) && (error() != SocketTools::Socket::ErrorWouldBlock) &&
+             (total_bytes_received < buffer.size()));
     buffer.resize(total_bytes_received);
     return total_bytes_received;
   }
 
-  template<typename T>
+  template <typename T>
   size_t writeall(T &buffer)
   {
     size_t total_bytes_sent = 0;
-    int bytes_sent       = 0;
+    int bytes_sent          = 0;
     // Write response fully
     do
     {
@@ -568,7 +570,8 @@ struct Socket
       {
         total_bytes_sent += bytes_sent;
       }
-    } while ((bytes_sent > 0) && (error() != SocketTools::Socket::ErrorWouldBlock) && (total_bytes_sent < buffer.size()));
+    } while ((bytes_sent > 0) && (error() != SocketTools::Socket::ErrorWouldBlock) &&
+             (total_bytes_sent < buffer.size()));
     return total_bytes_sent;
   }
 
@@ -935,7 +938,8 @@ public:
   {
     LOG_INFO("Reactor: Stopping...");
     // If UDP server, then force-close it to stop.
-    if (!m_streaming) {
+    if (!m_streaming)
+    {
       LOCKGUARD(m_sockets_mutex);
       if (m_sockets.size())
       {

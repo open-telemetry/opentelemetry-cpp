@@ -102,13 +102,11 @@ struct SocketServer : public Reactor::SocketCallback
     server_socket = Socket(server_socket_params);
 
     // Default lambda here implements an echo server
-    onRequest = [this](Connection &conn)
-    {
+    onRequest = [this](Connection &conn) {
       conn.state.insert(SocketServer::Connection::Responding);
     };
 
-    onResponse = [this](Connection &)
-    {
+    onResponse = [this](Connection &) {
       // Empty response
     };
 
@@ -173,10 +171,10 @@ struct SocketServer : public Reactor::SocketCallback
 
       LOCKGUARD(connections_mutex);
       csocket.setNonBlocking();
-      Connection &conn    = connections[csocket];
-      conn.socket         = csocket;
-      conn.state          = {Connection::Idle};
-      conn.client         = caddr;
+      Connection &conn = connections[csocket];
+      conn.socket      = csocket;
+      conn.state       = {Connection::Idle};
+      conn.client      = caddr;
       reactor.addSocket(csocket, Reactor::Readable | Reactor::Closed);
       LOG_TRACE("Server: [%s] accepted", CLID(conn));
     }
@@ -257,12 +255,12 @@ struct SocketServer : public Reactor::SocketCallback
     LOG_ERROR("Server: socket not found in connections map!");
   }
 
-    /**
+  /**
    * @brief Read from TCP or Unix Domain connection into request_buffer.
    * This function invokes `HandleConnection` to process the buffer.
-   * 
+   *
    * @param conn_tcp Connection object.
-  */
+   */
   virtual void ReadStreamBuffer(Connection &conn_tcp)
   {
     conn_tcp.request_buffer.clear();
@@ -286,14 +284,15 @@ struct SocketServer : public Reactor::SocketCallback
    * @brief Read from UDP connection into request_buffer.
    * This function invokes `HandleConnection` to process the buffer.
    *
-   * @param conn_udp 
-  */
-  virtual void ReadDatagramBuffer(Connection& conn_udp)
+   * @param conn_udp
+   */
+  virtual void ReadDatagramBuffer(Connection &conn_udp)
   {
     // Maximum size is 0xffff - (sizeof(IP Header) + sizeof(UDP Header)).
     // Try to read the entire datagram.
     conn_udp.request_buffer.resize(0xffff);
-    int size = conn_udp.socket.recvfrom((void *)(conn_udp.request_buffer.data()), 0xffff, 0, conn_udp.client);
+    int size = conn_udp.socket.recvfrom((void *)(conn_udp.request_buffer.data()), 0xffff, 0,
+                                        conn_udp.client);
     if (size > 0)
     {
       LOG_ERROR("Server: [%s] datagram read %d bytes", CLID(conn_udp), size);
@@ -326,7 +325,7 @@ struct SocketServer : public Reactor::SocketCallback
     }
 
     size_t total_bytes_sent = 0;
-    uint32_t optval = 0;
+    uint32_t optval         = 0;
 
     conn.socket.getsockopt(SOL_SOCKET, SO_TYPE, optval);
 
@@ -335,7 +334,7 @@ struct SocketServer : public Reactor::SocketCallback
     {
       total_bytes_sent =
           conn.socket.sendto(conn.response_buffer.data(),
-                                      static_cast<int>(conn.response_buffer.size()), 0, conn.client);
+                             static_cast<int>(conn.response_buffer.size()), 0, conn.client);
       LOG_TRACE("Server: [%s] datagram sent %d", CLID(conn), total_bytes_sent);
       return false;
     }
@@ -393,11 +392,11 @@ struct SocketServer : public Reactor::SocketCallback
     LOG_WARN("Server: [%s] connection closed unexpectedly", CLID(conn));
   }
 
-  void CloseConnection(Connection& conn)
+  void CloseConnection(Connection &conn)
   {
-     LOG_TRACE("Server: [%s] closing connection...", CLID(conn));
-     conn.socket.shutdown(SocketTools::Socket::ShutdownSend);
-     onConnectionClosed(conn);
+    LOG_TRACE("Server: [%s] closing connection...", CLID(conn));
+    conn.socket.shutdown(SocketTools::Socket::ShutdownSend);
+    onConnectionClosed(conn);
   }
 
   /**
@@ -444,7 +443,6 @@ struct SocketServer : public Reactor::SocketCallback
       onConnectionClosed(conn);
     }
   }
-
 };
 }  // namespace SOCKET_SERVER_NS
 #endif
