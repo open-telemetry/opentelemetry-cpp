@@ -62,12 +62,12 @@ nostd::shared_ptr<trace_api::Span> Tracer::StartSpan(
     auto span_context = std::unique_ptr<trace_api::SpanContext>(new trace_api::SpanContext(
         trace_id, span_id, trace_api::TraceFlags{trace_api::TraceFlags::kIsSampled}, false,
         sampling_result.trace_state ? sampling_result.trace_state
-                                    : is_parent_span_valid ? parent_context.trace_state()
-                                                           : trace_api::TraceState::GetDefault()));
+        : is_parent_span_valid      ? parent_context.trace_state()
+                                    : trace_api::TraceState::GetDefault()));
 
-    auto span = nostd::shared_ptr<trace_api::Span>{
-        new (std::nothrow) Span{this->shared_from_this(), name, attributes, links, options,
-                                parent_context, std::move(span_context), context_->GetSpanLimits()}};
+    auto span = nostd::shared_ptr<trace_api::Span>{new (std::nothrow) Span{
+        this->shared_from_this(), name, attributes, links, options, parent_context,
+        std::move(span_context), context_->GetSpanLimits()}};
 
     // if the attributes is not nullptr, add attributes to the span.
     if (sampling_result.attributes)

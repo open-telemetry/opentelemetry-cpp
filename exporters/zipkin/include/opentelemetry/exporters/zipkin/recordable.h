@@ -56,8 +56,11 @@ public:
       const opentelemetry::sdk::instrumentationlibrary::InstrumentationLibrary
           &instrumentation_library) noexcept override;
 
+  void SetSpanLimits(const opentelemetry::sdk::trace::SpanLimits &span_limits) noexcept override;
+
 private:
   ZipkinSpan span_;
+  opentelemetry::sdk::trace::SpanLimits span_limit_;
   std::string service_name_;
 };
 }  // namespace zipkin

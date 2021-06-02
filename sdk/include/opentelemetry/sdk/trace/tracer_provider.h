@@ -41,8 +41,7 @@ public:
           opentelemetry::sdk::resource::Resource::Create({}),
       std::unique_ptr<Sampler> sampler = std::unique_ptr<AlwaysOnSampler>(new AlwaysOnSampler),
       std::unique_ptr<opentelemetry::sdk::trace::IdGenerator> id_generator =
-          std::unique_ptr<opentelemetry::sdk::trace::IdGenerator>(
-              new RandomIdGenerator()),
+          std::unique_ptr<opentelemetry::sdk::trace::IdGenerator>(new RandomIdGenerator()),
       SpanLimits limits = SpanLimits()) noexcept;
 
   explicit TracerProvider(
@@ -51,8 +50,7 @@ public:
           opentelemetry::sdk::resource::Resource::Create({}),
       std::unique_ptr<Sampler> sampler = std::unique_ptr<AlwaysOnSampler>(new AlwaysOnSampler),
       std::unique_ptr<opentelemetry::sdk::trace::IdGenerator> id_generator =
-          std::unique_ptr<opentelemetry::sdk::trace::IdGenerator>(
-              new RandomIdGenerator()),
+          std::unique_ptr<opentelemetry::sdk::trace::IdGenerator>(new RandomIdGenerator()),
       SpanLimits limits = SpanLimits()) noexcept;
 
   /**

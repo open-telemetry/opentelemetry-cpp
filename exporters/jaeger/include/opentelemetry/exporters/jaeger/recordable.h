@@ -53,6 +53,8 @@ public:
       const opentelemetry::sdk::instrumentationlibrary::InstrumentationLibrary
           &instrumentation_library) noexcept override;
 
+  void SetSpanLimits(const opentelemetry::sdk::trace::SpanLimits &span_limits) noexcept override;
+
 private:
   void AddTag(const std::string &key, const std::string &value);
   void AddTag(const std::string &key, const char *value);
@@ -65,6 +67,7 @@ private:
 
 private:
   std::unique_ptr<thrift::Span> span_;
+  opentelemetry::sdk::trace::SpanLimits span_limit_;
   std::vector<thrift::Tag> tags_;
   std::string service_name_;
 };

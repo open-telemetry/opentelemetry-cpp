@@ -54,8 +54,11 @@ public:
       const opentelemetry::sdk::instrumentationlibrary::InstrumentationLibrary
           &instrumentation_library) noexcept override;
 
+  void SetSpanLimits(const opentelemetry::sdk::trace::SpanLimits &span_limits) noexcept override;
+
 private:
   proto::trace::v1::Span span_;
+  opentelemetry::sdk::trace::SpanLimits span_limit_;
   const opentelemetry::sdk::resource::Resource *resource_ = nullptr;
 };
 }  // namespace otlp

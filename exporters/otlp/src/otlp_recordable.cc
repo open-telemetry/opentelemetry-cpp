@@ -346,6 +346,12 @@ void OtlpRecordable::SetInstrumentationLibrary(
   // TODO: add instrumentation library to OTLP exporter.
 }
 
+void OtlpRecordable::SetSpanLimits(
+    const opentelemetry::sdk::trace::SpanLimits &span_limits) noexcept
+{
+  span_limit_ = span_limits;
+}
+
 }  // namespace otlp
 }  // namespace exporter
 OPENTELEMETRY_END_NAMESPACE
