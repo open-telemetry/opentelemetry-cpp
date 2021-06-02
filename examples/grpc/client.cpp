@@ -35,11 +35,7 @@ public:
 
     opentelemetry::trace::StartSpanOptions options;
     options.kind = opentelemetry::trace::SpanKind::kClient;
-    // Spans are only as useful as the information that you put in them.
-    // Even though this is a client service, it can still be useful to add
-    // as much data as possible. We add attributes for peer ip and port, both
-    // because it is required per OpenTelemetry's rpc semantic conventions,
-    // and because it could still be useful to a debugger in the future.
+
     std::string span_name = "GreeterClient/Greet";
     auto span             = get_tracer("grpc")->StartSpan(span_name,
                                               {{"rpc.system", "grpc"},

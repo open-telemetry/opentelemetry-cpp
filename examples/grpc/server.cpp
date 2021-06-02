@@ -52,11 +52,6 @@ public:
     auto new_context = prop->Extract(carrier, current_ctx);
     options.parent   = opentelemetry::trace::propagation::GetSpan(new_context)->GetContext();
 
-    // Build a new span from a tracer, start, and activate it. When adding
-    // attributes to spans, be sure to follow the OpenTelemetry Semantic
-    // Conventions that are relevant to your project as closely as possible
-    // Some protocols/patterns that have specified conventions:
-    // RPC, HTTP, AWS Lambda, Database, Exceptions, etc.
     std::string span_name = "GreeterService/Greet";
     auto span             = get_tracer("grpc")
                     ->StartSpan(span_name,
@@ -69,14 +64,6 @@ public:
 
     // Fetch and parse whatever HTTP headers we can from the gRPC request.
     span->AddEvent("Processing client attributes");
-    //std::string peer_name                         = context->peer();
-    //std::vector<std::string> peer_name_attributes = split(peer_name, ':');
-
-    // Fill the carrier with other headers. gRPC runs on HTTP 2, so we add all
-    // of the HTTP headers that we just extracted
-    /*carrier.Set("net.ip.version", peer_name_attributes.at(0));
-    carrier.Set("net.peer.ip", peer_name_attributes.at(1));
-    carrier.Set("net.peer.port", peer_name_attributes.at(2));*/
 
     std::string req = request->request();
     std::cout << std::endl << "grpc_client says: " << req << std::endl;
