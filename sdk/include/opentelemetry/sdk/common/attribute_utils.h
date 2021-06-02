@@ -29,7 +29,6 @@ using OwnedAttributeValue = nostd::variant<bool,
                                            uint32_t,
                                            int64_t,
                                            double,
-                                           const char *,
                                            std::string,
                                            std::vector<bool>,
                                            std::vector<int32_t>,
@@ -48,7 +47,6 @@ enum OwnedAttributeType
   kTypeUInt,
   kTypeInt64,
   kTypeDouble,
-  kTypeCString,
   kTypeString,
   kTypeSpanBool,
   kTypeSpanInt,
@@ -101,14 +99,14 @@ struct AttributeConverter
 /**
  * Class for storing attributes.
  */
-class AttributeMap
+class AttributeMap : public std::unordered_map<std::string, OwnedAttributeValue>
 {
 public:
   // Contruct empty attribute map
-  AttributeMap(){};
+  AttributeMap() : std::unordered_map<std::string, OwnedAttributeValue>() {};
 
   // Contruct attribute map and populate with attributes
-  AttributeMap(const opentelemetry::common::KeyValueIterable &attributes)
+  AttributeMap(const opentelemetry::common::KeyValueIterable &attributes) : AttributeMap()
   {
     attributes.ForEachKeyValue(
         [&](nostd::string_view key, opentelemetry::common::AttributeValue value) noexcept {
@@ -117,19 +115,29 @@ public:
         });
   }
 
-  const std::unordered_map<std::string, OwnedAttributeValue> &GetAttributes() const noexcept
+  // Construct map from initializer list by applying `SetAttribute` transform for every attribute
+  AttributeMap(std::initializer_list <std::pair<nostd::string_view, opentelemetry::common::AttributeValue>> attributes) : AttributeMap()
   {
-    return attributes_;
+    for (auto& kv : attributes)
+    {
+      SetAttribute(kv.first, kv.second);
+    }
   }
 
+  // Returns a reference to this map
+  const std::unordered_map<std::string, OwnedAttributeValue> &GetAttributes() const noexcept
+  {
+    return (*this);
+  }
+
+  // Convert non-owning key-value to owning std::string(key) and OwnedAttributeValue(value)
   void SetAttribute(nostd::string_view key,
                     const opentelemetry::common::AttributeValue &value) noexcept
   {
-    attributes_[std::string(key)] = nostd::visit(converter_, value);
+    (*this)[std::string(key)] = nostd::visit(converter_, value);
   }
 
 private:
-  std::unordered_map<std::string, OwnedAttributeValue> attributes_;
   AttributeConverter converter_;
 };
 }  // namespace common

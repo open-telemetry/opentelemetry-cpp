@@ -28,11 +28,7 @@ public:
 
 TEST(ResourceTest, create_without_servicename)
 {
-  // Note that we pass resource attributes as `const char *`. But SDK
-  // sees all resource attribute values copied into owning object that
-  // contains only `std::string` values. That is why the test below
-  // verifies that values that we retrieve back are all `std::string`
-  // and not `const char *`.
+
   opentelemetry::sdk::resource::ResourceAttributes expected_attributes = {
       {"service", "backend"},
       {"version", (uint32_t)1},
@@ -57,9 +53,8 @@ TEST(ResourceTest, create_without_servicename)
         EXPECT_EQ(opentelemetry::nostd::get<double>(expected_attributes.find(e.first)->second),
                   opentelemetry::nostd::get<double>(e.second));
       else
-        EXPECT_STREQ(
-            opentelemetry::nostd::get<const char *>(expected_attributes.find(e.first)->second),
-            opentelemetry::nostd::get<std::string>(e.second).c_str());
+        EXPECT_EQ(opentelemetry::nostd::get<std::string>(expected_attributes.find(e.first)->second),
+                  opentelemetry::nostd::get<std::string>(e.second));
   }
   EXPECT_EQ(received_attributes.size(), expected_attributes.size());  // for missing service.name
 }
@@ -90,9 +85,8 @@ TEST(ResourceTest, create_with_servicename)
         EXPECT_EQ(opentelemetry::nostd::get<double>(expected_attributes.find(e.first)->second),
                   opentelemetry::nostd::get<double>(e.second));
       else
-        EXPECT_STREQ(
-            opentelemetry::nostd::get<const char *>(expected_attributes.find(e.first)->second),
-            opentelemetry::nostd::get<std::string>(e.second).c_str());
+        EXPECT_EQ(opentelemetry::nostd::get<std::string>(expected_attributes.find(e.first)->second),
+                  opentelemetry::nostd::get<std::string>(e.second));
     }
   }
   EXPECT_EQ(received_attributes.size(), expected_attributes.size());  // for missing service.name
@@ -113,9 +107,8 @@ TEST(ResourceTest, create_with_emptyatrributes)
   {
     EXPECT_TRUE(expected_attributes.find(e.first) != expected_attributes.end());
     if (expected_attributes.find(e.first) != expected_attributes.end())
-      EXPECT_STREQ(
-          opentelemetry::nostd::get<const char *>(expected_attributes.find(e.first)->second),
-          opentelemetry::nostd::get<std::string>(e.second).c_str());
+      EXPECT_EQ(opentelemetry::nostd::get<std::string>(expected_attributes.find(e.first)->second),
+                opentelemetry::nostd::get<std::string>(e.second));
   }
   EXPECT_EQ(received_attributes.size(), expected_attributes.size());  // for missing service.name
 }
