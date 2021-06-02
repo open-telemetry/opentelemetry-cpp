@@ -1,15 +1,19 @@
-#pragma once
+// Copyright The OpenTelemetry Authors
+// SPDX-License-Identifier: Apache-2.0
 
-#include <map>
-#include <memory>
-#include <sstream>
-#include <stdexcept>
-#include <vector>
-#include "opentelemetry/metrics/async_instruments.h"
-#include "opentelemetry/sdk/metrics/aggregator/counter_aggregator.h"
-#include "opentelemetry/sdk/metrics/aggregator/min_max_sum_count_aggregator.h"
-#include "opentelemetry/sdk/metrics/instrument.h"
-#include "opentelemetry/version.h"
+#pragma once
+#ifdef ENABLE_METRICS_PREVIEW
+
+#  include <map>
+#  include <memory>
+#  include <sstream>
+#  include <stdexcept>
+#  include <vector>
+#  include "opentelemetry/metrics/async_instruments.h"
+#  include "opentelemetry/sdk/metrics/aggregator/counter_aggregator.h"
+#  include "opentelemetry/sdk/metrics/aggregator/min_max_sum_count_aggregator.h"
+#  include "opentelemetry/sdk/metrics/instrument.h"
+#  include "opentelemetry/version.h"
 
 namespace metrics_api = opentelemetry::metrics;
 
@@ -18,6 +22,11 @@ namespace sdk
 {
 namespace metrics
 {
+
+#  if defined(_MSC_VER)
+#    pragma warning(push)
+#    pragma warning(disable : 4250)  // inheriting methods via dominance
+#  endif
 
 template <class T>
 class ValueObserver : public AsynchronousInstrument<T>, virtual public metrics_api::ValueObserver<T>
@@ -131,11 +140,11 @@ public:
       boundAggregators_.insert(std::make_pair(labelset, sp1));
       if (value < 0)
       {
-#if __EXCEPTIONS
+#  if __EXCEPTIONS
         throw std::invalid_argument("Counter instrument updates must be non-negative.");
-#else
+#  else
         std::terminate();
-#endif
+#  endif
       }
       else
       {
@@ -146,11 +155,11 @@ public:
     {
       if (value < 0)
       {
-#if __EXCEPTIONS
+#  if __EXCEPTIONS
         throw std::invalid_argument("Counter instrument updates must be non-negative.");
-#else
+#  else
         std::terminate();
-#endif
+#  endif
       }
       else
       {
@@ -267,6 +276,11 @@ public:
   std::unordered_map<std::string, std::shared_ptr<Aggregator<T>>> boundAggregators_;
 };
 
+#  if defined(_MSC_VER)
+#    pragma warning(pop)
+#  endif
+
 }  // namespace metrics
 }  // namespace sdk
 OPENTELEMETRY_END_NAMESPACE
+#endif

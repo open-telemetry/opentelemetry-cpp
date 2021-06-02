@@ -1,9 +1,7 @@
 #!/usr/bin/env bash
 
-# This script is supposed to be executed to recreate version.cc. It can be executed as:
-#    git pre-commit hook
-#    git per-merge-commit hook
-#    manually as part of release process ( refer RELEASING.md )
+# Copyright The OpenTelemetry Authors
+# SPDX-License-Identifier: Apache-2.0
 
 set -eo pipefail
 

@@ -1,8 +1,12 @@
-#include "opentelemetry/sdk/metrics/aggregator/counter_aggregator.h"
+// Copyright The OpenTelemetry Authors
+// SPDX-License-Identifier: Apache-2.0
 
-#include <gtest/gtest.h>
-#include <numeric>
-#include <thread>
+#ifdef ENABLE_METRICS_PREVIEW
+#  include "opentelemetry/sdk/metrics/aggregator/counter_aggregator.h"
+
+#  include <gtest/gtest.h>
+#  include <numeric>
+#  include <thread>
 
 namespace metrics_api = opentelemetry::metrics;
 
@@ -113,3 +117,4 @@ TEST(CounterAggregator, Merge)
 }  // namespace metrics
 }  // namespace sdk
 OPENTELEMETRY_END_NAMESPACE
+#endif

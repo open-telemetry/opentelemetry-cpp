@@ -1,4 +1,4 @@
-add_library(opentelemetry_exporter_otprotocol src/recordable.cc
+add_library(opentelemetry_exporter_otprotocol src/otlp_recordable.cc
                                               src/otlp_exporter.cc)
 
 set_target_properties(opentelemetry_exporter_otprotocol
@@ -27,14 +27,14 @@ target_include_directories(
   PUBLIC "$<BUILD_INTERFACE:${CMAKE_CURRENT_LIST_DIR}/include>")
 
 if(BUILD_TESTING)
-  add_executable(recordable_test test/recordable_test.cc)
+  add_executable(otlp_recordable_test test/otlp_recordable_test.cc)
   target_link_libraries(
-    recordable_test ${GTEST_BOTH_LIBRARIES} ${CMAKE_THREAD_LIBS_INIT}
+    otlp_recordable_test ${GTEST_BOTH_LIBRARIES} ${CMAKE_THREAD_LIBS_INIT}
     opentelemetry_exporter_otprotocol)
   gtest_add_tests(
-    TARGET recordable_test
+    TARGET otlp_recordable_test
     TEST_PREFIX exporter.otlp.
-    TEST_LIST recordable_test)
+    TEST_LIST otlp_recordable_test)
   if(MSVC)
     add_definitions(-DGTEST_LINKED_AS_SHARED_LIBRARY=1)
   endif()

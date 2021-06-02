@@ -1,7 +1,13 @@
-#include "opentelemetry/nostd/variant.h"
-#include "opentelemetry/version.h"
+// Copyright The OpenTelemetry Authors
+// SPDX-License-Identifier: Apache-2.0
 
-#if defined(HAVE_ABSEIL)
+// clang-format off
+// version.h should be included before nostd/variant.h.
+#include "opentelemetry/version.h"
+#include "opentelemetry/nostd/variant.h"
+// clang-format on
+
+#if defined(HAVE_ABSEIL) && !defined(HAVE_ABSEIL_VARIANT)
 
 #  if defined(__GNUC__) || defined(__GNUG__)
 #    ifndef __cdecl

@@ -13,11 +13,29 @@ install(
   LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
   ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR})
 
+set(LOGS_EXCLUDE_PATTERN "")
+if(NOT WITH_LOGS_PREVIEW)
+  set(LOGS_EXCLUDE_PATTERN "logs")
+endif()
+
+set(METRICS_EXCLUDE_PATTERN "")
+if(NOT WITH_METRICS_PREVIEW)
+  set(METRICS_EXCLUDE_PATTERN "metrics")
+endif()
+
 install(
   DIRECTORY include/opentelemetry
   DESTINATION include
   FILES_MATCHING
-  PATTERN "*.h")
+  PATTERN "*.h"
+  PATTERN "${METRICS_EXCLUDE_PATTERN}" EXCLUDE)
+
+install(
+  DIRECTORY include/opentelemetry
+  DESTINATION include
+  FILES_MATCHING
+  PATTERN "*.h"
+  PATTERN "${LOGS_EXCLUDE_PATTERN}" EXCLUDE)
 
 if(BUILD_TESTING)
   add_subdirectory(test)
@@ -25,6 +43,8 @@ endif()
 
 if(WITH_STL)
   message("Building with standard library types...")
+  target_compile_definitions(opentelemetry_api INTERFACE HAVE_CPP_STDLIB
+                                                         HAVE_GSL)
 else()
   message("Building with nostd types...")
 endif()

@@ -1,33 +1,21 @@
-/*
- * Copyright The OpenTelemetry Authors
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- * http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
+// Copyright The OpenTelemetry Authors
+// SPDX-License-Identifier: Apache-2.0
 
-#include <map>
-#include <numeric>
-#include <string>
-#include <typeinfo>
+#ifdef ENABLE_METRICS_PREVIEW
+#  include <gtest/gtest.h>
+#  include <map>
+#  include <numeric>
+#  include <string>
+#  include <typeinfo>
 
-#include <gtest/gtest.h>
-#include <opentelemetry/version.h>
-#include "opentelemetry/exporters/prometheus/prometheus_exporter_utils.h"
-#include "opentelemetry/sdk/metrics/aggregator/counter_aggregator.h"
-#include "opentelemetry/sdk/metrics/aggregator/exact_aggregator.h"
-#include "opentelemetry/sdk/metrics/aggregator/gauge_aggregator.h"
-#include "opentelemetry/sdk/metrics/aggregator/histogram_aggregator.h"
-#include "opentelemetry/sdk/metrics/aggregator/min_max_sum_count_aggregator.h"
-#include "opentelemetry/sdk/metrics/aggregator/sketch_aggregator.h"
+#  include <opentelemetry/version.h>
+#  include "opentelemetry/exporters/prometheus/prometheus_exporter_utils.h"
+#  include "opentelemetry/sdk/metrics/aggregator/counter_aggregator.h"
+#  include "opentelemetry/sdk/metrics/aggregator/exact_aggregator.h"
+#  include "opentelemetry/sdk/metrics/aggregator/gauge_aggregator.h"
+#  include "opentelemetry/sdk/metrics/aggregator/histogram_aggregator.h"
+#  include "opentelemetry/sdk/metrics/aggregator/min_max_sum_count_aggregator.h"
+#  include "opentelemetry/sdk/metrics/aggregator/sketch_aggregator.h"
 
 using opentelemetry::exporter::prometheus::PrometheusExporterUtils;
 namespace metric_sdk        = opentelemetry::sdk::metrics;
@@ -469,3 +457,4 @@ TEST(PrometheusExporterUtils, TranslateToPrometheusMultipleAggregators)
                prometheus_client::MetricType::Gauge, 1, vals);
 }
 OPENTELEMETRY_END_NAMESPACE
+#endif

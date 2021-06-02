@@ -1,7 +1,11 @@
-#pragma once
+// Copyright The OpenTelemetry Authors
+// SPDX-License-Identifier: Apache-2.0
 
-#include "instrument.h"
-#include "observer_result.h"
+#pragma once
+#ifdef ENABLE_METRICS_PREVIEW
+
+#  include "instrument.h"
+#  include "observer_result.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace metrics
@@ -81,3 +85,4 @@ public:
 
 }  // namespace metrics
 OPENTELEMETRY_END_NAMESPACE
+#endif

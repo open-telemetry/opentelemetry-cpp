@@ -1,7 +1,10 @@
-#include "opentelemetry/metrics/provider.h"
-#include "opentelemetry/nostd/shared_ptr.h"
+// Copyright The OpenTelemetry Authors
+// SPDX-License-Identifier: Apache-2.0
 
-#include <gtest/gtest.h>
+#ifdef ENABLE_METRICS_PREVIEW
+#  include <gtest/gtest.h>
+#  include "opentelemetry/metrics/provider.h"
+#  include "opentelemetry/nostd/shared_ptr.h"
 
 using opentelemetry::metrics::Meter;
 using opentelemetry::metrics::MeterProvider;
@@ -39,3 +42,4 @@ TEST(Provider, MultipleMeterProviders)
 
   ASSERT_NE(Provider::GetMeterProvider(), tf);
 }
+#endif
