@@ -20,12 +20,10 @@ This is a simple example that demonstrates tracing a gRPC request from client to
 
     ``find_package(gRPC)``
 
-If you install these with a package manager like '''brew''' or '''apt''', you should not need to do extra work.
-
-1. Build and Deploy the opentelementry-cpp as described in [INSTALL.md](../../INSTALL.md). Building the project will build all of the examples
+2. Build and Deploy the opentelementry-cpp as described in [INSTALL.md](../../INSTALL.md). Building the project will build all of the examples
    and create new folders containing their executables within the 'build' directory NOT the 'examples' directory.
 
-2. Start the server from your `build/examples/grpc` directory. Both the server and client are configured to use 8800 as the default port,
+3. Start the server from your `build/examples/grpc` directory. Both the server and client are configured to use 8800 as the default port,
    but if you would like to use another port, you can specify that as an argument.
 
    ```console
@@ -33,14 +31,14 @@ If you install these with a package manager like '''brew''' or '''apt''', you sh
     Server listening on port: 0.0.0.0:8800
    ```
 
-3. In a separate terminal window, run the client to make a single request:
+4. In a separate terminal window, run the client to make a single request:
 
     ```console
     $ ./client [port_num]
     ...
     ```
 
-4. You should see console exporter output for both the client and server sessions.
+5. You should see console exporter output for both the client and server sessions.
    * Client console
 
    ```console
