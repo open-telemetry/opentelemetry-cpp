@@ -114,9 +114,19 @@ public:
         });
   }
 
+  const std::size_t GetAttributeMapSize() const noexcept
+  {
+    return attributes_.size();
+  }
+
   const std::unordered_map<std::string, OwnedAttributeValue> &GetAttributes() const noexcept
   {
     return attributes_;
+  }
+
+  bool KeyExists(nostd::string_view key) noexcept
+  {
+    return attributes_.find(std::string(key)) != attributes_.end();
   }
 
   void SetAttribute(nostd::string_view key,

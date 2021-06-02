@@ -67,6 +67,7 @@ Span::Span(std::shared_ptr<Tracer> &&tracer,
   recordable_->SetIdentity(*span_context_, parent_span_context.IsValid()
                                                ? parent_span_context.span_id()
                                                : trace_api::SpanId());
+  recordable_->SetSpanLimit(span_limits);
 
   attributes.ForEachKeyValue(
       [&](nostd::string_view key, opentelemetry::common::AttributeValue value) noexcept {

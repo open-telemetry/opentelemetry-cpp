@@ -197,7 +197,10 @@ public:
   void SetAttribute(nostd::string_view key,
                     const opentelemetry::common::AttributeValue &value) noexcept override
   {
-    attribute_map_.SetAttribute(key, value);
+    if (attribute_map_.GetAttributeMapSize() < GetSpanLimits().AttributeCountLimit
+          || attribute_map_.KeyExists(key)) {
+      attribute_map_.SetAttribute(key, value);
+    }
   }
 
   void AddEvent(nostd::string_view name,
