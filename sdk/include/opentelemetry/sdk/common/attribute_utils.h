@@ -103,7 +103,7 @@ class AttributeMap : public std::unordered_map<std::string, OwnedAttributeValue>
 {
 public:
   // Contruct empty attribute map
-  AttributeMap() : std::unordered_map<std::string, OwnedAttributeValue>() {};
+  AttributeMap() : std::unordered_map<std::string, OwnedAttributeValue>(){};
 
   // Contruct attribute map and populate with attributes
   AttributeMap(const opentelemetry::common::KeyValueIterable &attributes) : AttributeMap()
@@ -116,9 +116,12 @@ public:
   }
 
   // Construct map from initializer list by applying `SetAttribute` transform for every attribute
-  AttributeMap(std::initializer_list <std::pair<nostd::string_view, opentelemetry::common::AttributeValue>> attributes) : AttributeMap()
+  AttributeMap(
+      std::initializer_list<std::pair<nostd::string_view, opentelemetry::common::AttributeValue>>
+          attributes)
+      : AttributeMap()
   {
-    for (auto& kv : attributes)
+    for (auto &kv : attributes)
     {
       SetAttribute(kv.first, kv.second);
     }
