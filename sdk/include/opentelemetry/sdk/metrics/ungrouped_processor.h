@@ -1,15 +1,19 @@
-#pragma once
+// Copyright The OpenTelemetry Authors
+// SPDX-License-Identifier: Apache-2.0
 
-#include <map>
-#include "opentelemetry/sdk/metrics/aggregator/counter_aggregator.h"
-#include "opentelemetry/sdk/metrics/aggregator/exact_aggregator.h"
-#include "opentelemetry/sdk/metrics/aggregator/gauge_aggregator.h"
-#include "opentelemetry/sdk/metrics/aggregator/histogram_aggregator.h"
-#include "opentelemetry/sdk/metrics/aggregator/min_max_sum_count_aggregator.h"
-#include "opentelemetry/sdk/metrics/aggregator/sketch_aggregator.h"
-#include "opentelemetry/sdk/metrics/processor.h"
-#include "opentelemetry/sdk/metrics/record.h"
-#include "opentelemetry/version.h"
+#pragma once
+#ifdef ENABLE_METRICS_PREVIEW
+
+#  include <map>
+#  include "opentelemetry/sdk/metrics/aggregator/counter_aggregator.h"
+#  include "opentelemetry/sdk/metrics/aggregator/exact_aggregator.h"
+#  include "opentelemetry/sdk/metrics/aggregator/gauge_aggregator.h"
+#  include "opentelemetry/sdk/metrics/aggregator/histogram_aggregator.h"
+#  include "opentelemetry/sdk/metrics/aggregator/min_max_sum_count_aggregator.h"
+#  include "opentelemetry/sdk/metrics/aggregator/sketch_aggregator.h"
+#  include "opentelemetry/sdk/metrics/processor.h"
+#  include "opentelemetry/sdk/metrics/record.h"
+#  include "opentelemetry/version.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 
@@ -283,3 +287,4 @@ private:
 }  // namespace sdk
 
 OPENTELEMETRY_END_NAMESPACE
+#endif

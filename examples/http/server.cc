@@ -1,3 +1,6 @@
+// Copyright The OpenTelemetry Authors
+// SPDX-License-Identifier: Apache-2.0
+
 #include "server.h"
 #include "tracer_common.h"
 
@@ -25,15 +28,7 @@ public:
     auto prop = opentelemetry::context::propagation::GlobalTextMapPropagator::GetGlobalPropagator();
     auto current_ctx = opentelemetry::context::RuntimeContext::GetCurrent();
     auto new_context = prop->Extract(carrier, current_ctx);
-    opentelemetry::nostd::span<const uint8_t, 8> sp =
-        GetSpanFromContext(new_context)->GetContext().span_id().Id();
-    for (const uint8_t &e : sp)
-    {
-      std::cout << unsigned(e) << ' ';
-    }
-    std::cout << '\n';
-
-    options.parent = GetSpanFromContext(new_context)->GetContext();
+    options.parent   = opentelemetry::trace::propagation::GetSpan(new_context)->GetContext();
 
     // start span with parent context extracted from http header
     auto span = get_tracer("http-server")

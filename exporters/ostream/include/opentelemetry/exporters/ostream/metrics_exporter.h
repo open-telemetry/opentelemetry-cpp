@@ -1,12 +1,16 @@
-#pragma once
+// Copyright The OpenTelemetry Authors
+// SPDX-License-Identifier: Apache-2.0
 
-#include <iostream>
-#include <string>
-#include "opentelemetry/sdk/metrics/aggregator/exact_aggregator.h"
-#include "opentelemetry/sdk/metrics/aggregator/gauge_aggregator.h"
-#include "opentelemetry/sdk/metrics/aggregator/histogram_aggregator.h"
-#include "opentelemetry/sdk/metrics/exporter.h"
-#include "opentelemetry/sdk/metrics/record.h"
+#pragma once
+#ifdef ENABLE_METRICS_PREVIEW
+
+#  include <iostream>
+#  include <string>
+#  include "opentelemetry/sdk/metrics/aggregator/exact_aggregator.h"
+#  include "opentelemetry/sdk/metrics/aggregator/gauge_aggregator.h"
+#  include "opentelemetry/sdk/metrics/aggregator/histogram_aggregator.h"
+#  include "opentelemetry/sdk/metrics/exporter.h"
+#  include "opentelemetry/sdk/metrics/record.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace sdkmetrics = opentelemetry::sdk::metrics;
@@ -161,3 +165,4 @@ private:
 }  // namespace metrics
 }  // namespace exporter
 OPENTELEMETRY_END_NAMESPACE
+#endif

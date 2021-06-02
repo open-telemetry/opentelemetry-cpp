@@ -1,16 +1,20 @@
-#pragma once
+// Copyright The OpenTelemetry Authors
+// SPDX-License-Identifier: Apache-2.0
 
-#include <iostream>
-#include <map>
-#include <memory>
-#include <sstream>
-#include <string>
-#include <unordered_map>
-#include <vector>
-#include "opentelemetry/metrics/instrument.h"
-#include "opentelemetry/sdk/metrics/aggregator/aggregator.h"
-#include "opentelemetry/sdk/metrics/record.h"
-#include "opentelemetry/version.h"
+#pragma once
+#ifdef ENABLE_METRICS_PREVIEW
+
+#  include <iostream>
+#  include <map>
+#  include <memory>
+#  include <sstream>
+#  include <string>
+#  include <unordered_map>
+#  include <vector>
+#  include "opentelemetry/metrics/instrument.h"
+#  include "opentelemetry/sdk/metrics/aggregator/aggregator.h"
+#  include "opentelemetry/sdk/metrics/record.h"
+#  include "opentelemetry/version.h"
 
 namespace metrics_api = opentelemetry::metrics;
 
@@ -19,6 +23,11 @@ namespace sdk
 {
 namespace metrics
 {
+
+#  if defined(_MSC_VER)
+#    pragma warning(push)
+#    pragma warning(disable : 4250)  // inheriting methods via dominance
+#  endif
 
 class Instrument : virtual public metrics_api::Instrument
 {
@@ -248,11 +257,11 @@ inline void print_value(std::stringstream &ss,
 
       break;
     default:
-#if __EXCEPTIONS
+#  if __EXCEPTIONS
       throw std::invalid_argument("Labels must be strings");
-#else
+#  else
       std::terminate();
-#endif
+#  endif
       break;
   }
 };
@@ -294,6 +303,11 @@ inline std::string KvToString(const opentelemetry::common::KeyValueIterable &kv)
   return ss.str();
 }
 
+#  if defined(_MSC_VER)
+#    pragma warning(pop)
+#  endif
+
 }  // namespace metrics
 }  // namespace sdk
 OPENTELEMETRY_END_NAMESPACE
+#endif

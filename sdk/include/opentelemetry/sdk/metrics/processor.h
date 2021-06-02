@@ -1,12 +1,16 @@
-#pragma once
-#include "opentelemetry/metrics/instrument.h"
-#include "opentelemetry/nostd/string_view.h"
-#include "opentelemetry/sdk/metrics/record.h"
-#include "opentelemetry/version.h"
+// Copyright The OpenTelemetry Authors
+// SPDX-License-Identifier: Apache-2.0
 
-#include <iostream>
-#include <string>
-#include <unordered_map>
+#pragma once
+#ifdef ENABLE_METRICS_PREVIEW
+#  include "opentelemetry/metrics/instrument.h"
+#  include "opentelemetry/nostd/string_view.h"
+#  include "opentelemetry/sdk/metrics/record.h"
+#  include "opentelemetry/version.h"
+
+#  include <iostream>
+#  include <string>
+#  include <unordered_map>
 
 namespace sdkmetrics = opentelemetry::sdk::metrics;
 
@@ -33,3 +37,4 @@ public:
 }  // namespace sdk
 
 OPENTELEMETRY_END_NAMESPACE
+#endif

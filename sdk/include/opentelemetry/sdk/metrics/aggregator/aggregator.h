@@ -1,10 +1,14 @@
-#pragma once
+// Copyright The OpenTelemetry Authors
+// SPDX-License-Identifier: Apache-2.0
 
-#include <mutex>
-#include <vector>
-#include "opentelemetry/common/timestamp.h"
-#include "opentelemetry/metrics/instrument.h"
-#include "opentelemetry/version.h"
+#pragma once
+#ifdef ENABLE_METRICS_PREVIEW
+
+#  include <mutex>
+#  include <vector>
+#  include "opentelemetry/common/timestamp.h"
+#  include "opentelemetry/metrics/instrument.h"
+#  include "opentelemetry/version.h"
 
 namespace metrics_api = opentelemetry::metrics;
 
@@ -151,3 +155,4 @@ protected:
 }  // namespace metrics
 }  // namespace sdk
 OPENTELEMETRY_END_NAMESPACE
+#endif

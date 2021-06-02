@@ -44,7 +44,7 @@ PROJECT_NUMBER         =
 # for a project that appears at the top of each page and should give viewer a
 # quick idea about the purpose of the project. Keep the description short.
 
-PROJECT_BRIEF          = "Version 0.6.0"
+PROJECT_BRIEF          = "Version 0.7.0"
 
 # With the PROJECT_LOGO tag one can specify a logo or an icon that is included
 # in the documentation. The maximum height of the logo should not exceed 55
@@ -790,8 +790,9 @@ WARN_LOGFILE           =
 # spaces. See also FILE_PATTERNS and EXTENSION_MAPPING
 # Note: If this tag is empty the current directory is searched.
 
-INPUT                  = ../include/opentelemetry/common \
-                         ../include/opentelemetry/core \
+INPUT                  = ../include/opentelemetry/baggage \
+                         ../include/opentelemetry/context \
+                         ../include/opentelemetry/common \
                          ../include/opentelemetry/nostd/shared_ptr.h \
                          ../include/opentelemetry/nostd/span.h \
                          ../include/opentelemetry/nostd/string_view.h \
@@ -869,7 +870,10 @@ EXCLUDE_PATTERNS       =
 # Note that the wildcards are matched against the file with absolute path, so to
 # exclude all test directories use the pattern */test/*
 
-EXCLUDE_SYMBOLS        = "AttributeType"
+EXCLUDE_SYMBOLS        = AttributeType \
+                         Context::DataList \
+                         ThreadLocalContextStorage::Stack
+
 
 # The EXAMPLE_PATH tag can be used to specify one or more files or directories
 # that contain example code fragments that are included (see the \include

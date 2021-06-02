@@ -1,5 +1,8 @@
+// Copyright The OpenTelemetry Authors
+// SPDX-License-Identifier: Apache-2.0
+
 #include "opentelemetry/exporters/otlp/otlp_exporter.h"
-#include "opentelemetry/exporters/otlp/recordable.h"
+#include "opentelemetry/exporters/otlp/otlp_recordable.h"
 
 #include <grpcpp/grpcpp.h>
 #include <fstream>
@@ -27,9 +30,14 @@ void PopulateRequest(const nostd::span<std::unique_ptr<sdk::trace::Recordable>> 
 
   for (auto &recordable : spans)
   {
-    auto rec = std::unique_ptr<Recordable>(static_cast<Recordable *>(recordable.release()));
-    // TODO - Handle Resource
+    auto rec = std::unique_ptr<OtlpRecordable>(static_cast<OtlpRecordable *>(recordable.release()));
     *instrumentation_lib->add_spans() = std::move(rec->span());
+
+    if (!has_resource)
+    {
+      *resource_span->mutable_resource() = rec->ProtoResource();
+      has_resource                       = true;
+    }
   }
 }
 
@@ -86,7 +94,7 @@ OtlpExporter::OtlpExporter(
 
 std::unique_ptr<sdk::trace::Recordable> OtlpExporter::MakeRecordable() noexcept
 {
-  return std::unique_ptr<sdk::trace::Recordable>(new Recordable);
+  return std::unique_ptr<sdk::trace::Recordable>(new OtlpRecordable);
 }
 
 sdk::common::ExportResult OtlpExporter::Export(

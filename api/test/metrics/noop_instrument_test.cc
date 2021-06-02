@@ -1,8 +1,13 @@
-#include <gtest/gtest.h>
-#include <cstring>
-#include <map>
-#include <string>
-#include "opentelemetry/metrics/noop.h"
+// Copyright The OpenTelemetry Authors
+// SPDX-License-Identifier: Apache-2.0
+
+#ifdef ENABLE_METRICS_PREVIEW
+#  include <gtest/gtest.h>
+#  include <cstring>
+#  include <map>
+#  include <string>
+
+#  include "opentelemetry/metrics/noop.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace metrics
@@ -183,3 +188,4 @@ TEST(ValueRecorder, Record)
 
 }  // namespace metrics
 OPENTELEMETRY_END_NAMESPACE
+#endif

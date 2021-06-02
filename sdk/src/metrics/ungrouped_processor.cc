@@ -1,4 +1,8 @@
-#include "opentelemetry/sdk/metrics/ungrouped_processor.h"
+// Copyright The OpenTelemetry Authors
+// SPDX-License-Identifier: Apache-2.0
+
+#ifdef ENABLE_METRICS_PREVIEW
+#  include "opentelemetry/sdk/metrics/ungrouped_processor.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 
@@ -161,3 +165,4 @@ void UngroupedMetricsProcessor::process(sdkmetrics::Record record) noexcept
 }  // namespace sdk
 
 OPENTELEMETRY_END_NAMESPACE
+#endif

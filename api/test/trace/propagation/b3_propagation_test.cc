@@ -1,3 +1,6 @@
+// Copyright The OpenTelemetry Authors
+// SPDX-License-Identifier: Apache-2.0
+
 #include "opentelemetry/context/runtime_context.h"
 #include "opentelemetry/trace/propagation/b3_propagator.h"
 #include "opentelemetry/trace/scope.h"

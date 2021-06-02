@@ -1,17 +1,21 @@
-#pragma once
+// Copyright The OpenTelemetry Authors
+// SPDX-License-Identifier: Apache-2.0
 
-#include <atomic>
-#include <iostream>
-#include <sstream>
-#include <thread>
-#include <vector>
-#include "opentelemetry/metrics/instrument.h"
-#include "opentelemetry/nostd/unique_ptr.h"
-#include "opentelemetry/sdk/metrics/exporter.h"
-#include "opentelemetry/sdk/metrics/meter.h"
-#include "opentelemetry/sdk/metrics/processor.h"
-#include "opentelemetry/sdk/metrics/record.h"
-#include "opentelemetry/version.h"
+#pragma once
+#ifdef ENABLE_METRICS_PREVIEW
+
+#  include <atomic>
+#  include <iostream>
+#  include <sstream>
+#  include <thread>
+#  include <vector>
+#  include "opentelemetry/metrics/instrument.h"
+#  include "opentelemetry/nostd/unique_ptr.h"
+#  include "opentelemetry/sdk/metrics/exporter.h"
+#  include "opentelemetry/sdk/metrics/meter.h"
+#  include "opentelemetry/sdk/metrics/processor.h"
+#  include "opentelemetry/sdk/metrics/record.h"
+#  include "opentelemetry/version.h"
 
 namespace metrics_api = opentelemetry::metrics;
 
@@ -140,3 +144,4 @@ private:
 }  // namespace metrics
 }  // namespace sdk
 OPENTELEMETRY_END_NAMESPACE
+#endif

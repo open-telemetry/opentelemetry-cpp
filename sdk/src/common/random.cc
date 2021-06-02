@@ -1,3 +1,7 @@
+
+// Copyright The OpenTelemetry Authors
+// SPDX-License-Identifier: Apache-2.0
+
 #include "src/common/random.h"
 #include "src/common/platform/fork.h"
 

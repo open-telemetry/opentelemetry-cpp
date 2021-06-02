@@ -1,13 +1,16 @@
+// Copyright The OpenTelemetry Authors
+// SPDX-License-Identifier: Apache-2.0
 
-#include <gtest/gtest.h>
-#include <cstring>
-#include <iostream>
-#include <map>
-#include <memory>
-#include <string>
-#include <thread>
-#include "opentelemetry/sdk/metrics/async_instruments.h"
-#include "opentelemetry/sdk/metrics/sync_instruments.h"
+#ifdef ENABLE_METRICS_PREVIEW
+#  include <gtest/gtest.h>
+#  include <cstring>
+#  include <iostream>
+#  include <map>
+#  include <memory>
+#  include <string>
+#  include <thread>
+#  include "opentelemetry/sdk/metrics/async_instruments.h"
+#  include "opentelemetry/sdk/metrics/sync_instruments.h"
 
 namespace metrics_api = opentelemetry::metrics;
 
@@ -467,3 +470,4 @@ TEST(Instruments, NoUpdateNoRecord)
 }  // namespace metrics
 }  // namespace sdk
 OPENTELEMETRY_END_NAMESPACE
+#endif

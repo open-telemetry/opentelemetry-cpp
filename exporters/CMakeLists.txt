@@ -19,7 +19,7 @@ endif()
 add_subdirectory(ostream)
 add_subdirectory(memory)
 
-if(WITH_PROMETHEUS)
+if(WITH_PROMETHEUS AND WITH_METRICS_PREVIEW)
   add_subdirectory(prometheus)
 endif()
 
@@ -27,7 +27,7 @@ if(WITH_ZIPKIN)
   add_subdirectory(zipkin)
 endif()
 
-if(WITH_ELASTICSEARCH)
+if(WITH_ELASTICSEARCH AND WITH_LOGS_PREVIEW)
   add_subdirectory(elasticsearch)
 endif()
 
