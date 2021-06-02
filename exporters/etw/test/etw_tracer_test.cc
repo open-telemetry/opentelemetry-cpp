@@ -254,7 +254,7 @@ TEST(ETWTracer, TracerCheckMsgPack)
  * @brief Global Tracer singleton may be placed in .h header and
  * shared across different compilation units. All would get the
  * same object.
- * 
+ *
  * @return Single global tracer instance.
 */
 static OPENTELEMETRY_NAMESPACE::trace::TracerProvider& GetGlobalTracerProvider()
