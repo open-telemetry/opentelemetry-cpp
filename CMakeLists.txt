@@ -6,6 +6,20 @@ cmake_policy(SET CMP0057 NEW)
 
 project(opentelemetry-cpp)
 
+# Mark variables as used so cmake doesn't complain about them
+mark_as_advanced(CMAKE_TOOLCHAIN_FILE)
+
+# Autodetect vcpkg toolchain
+if(DEFINED ENV{VCPKG_ROOT} AND NOT DEFINED CMAKE_TOOLCHAIN_FILE)
+  set(CMAKE_TOOLCHAIN_FILE
+      "$ENV{VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake"
+      CACHE STRING "")
+endif()
+
+if(VCPKG_CHAINLOAD_TOOLCHAIN_FILE)
+  include("${VCPKG_CHAINLOAD_TOOLCHAIN_FILE}")
+endif()
+
 file(READ "${CMAKE_CURRENT_LIST_DIR}/api/include/opentelemetry/version.h"
      OPENTELEMETRY_CPP_HEADER_VERSION_H)
 if(OPENTELEMETRY_CPP_HEADER_VERSION_H MATCHES
@@ -96,6 +110,7 @@ option(WITH_JAEGER "Whether to include the Jaeger exporter" OFF)
 
 option(BUILD_TESTING "Whether to enable tests" ON)
 if(WIN32)
+  add_definitions(-DNOMINMAX)
   if(BUILD_TESTING)
     if(MSVC)
       # GTest bug: https://github.com/google/googletest/issues/860
@@ -138,6 +153,16 @@ function(install_windows_deps)
       ${CMAKE_CURRENT_SOURCE_DIR}/tools/vcpkg/scripts/buildsystems/vcpkg.cmake
       PARENT_SCOPE)
 endfunction()
+
+if(WITH_JAEGER)
+  find_package(Thrift QUIET CONFIG)
+  if(NOT Thrift_FOUND)
+    # Install Thrift and propagate via vcpkg toolchain file
+    if(WIN32 AND (NOT DEFINED CMAKE_TOOLCHAIN_FILE))
+      install_windows_deps()
+    endif()
+  endif()
+endif()
 
 if(MSVC)
   # Options for Visual C++ compiler: /Zc:__cplusplus - report an updated value
