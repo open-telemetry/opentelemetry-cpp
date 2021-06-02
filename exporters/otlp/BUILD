@@ -95,8 +95,8 @@ cc_test(
 )
 
 cc_test(
-    name = "otlp_exporter_test",
-    srcs = ["test/otlp_exporter_test.cc"],
+    name = "otlp_grpc_exporter_test",
+    srcs = ["test/otlp_grpc_exporter_test.cc"],
     deps = [
         ":otlp_grpc_exporter",
         "//api",
@@ -105,8 +105,8 @@ cc_test(
 )
 
 otel_cc_benchmark(
-    name = "otlp_exporter_benchmark",
-    srcs = ["test/otlp_exporter_benchmark.cc"],
+    name = "otlp_grpc_exporter_benchmark",
+    srcs = ["test/otlp_grpc_exporter_benchmark.cc"],
     deps = [
         ":otlp_grpc_exporter",
     ],

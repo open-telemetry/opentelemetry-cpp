@@ -2,21 +2,8 @@
 // SPDX-License-Identifier: Apache-2.0
 
 #ifndef HAVE_CPP_STDLIB
-// Unfortunately as of 04/27/2021 the fix is NOT in the vcpkg snapshot of Google Test.
-// Remove above `#ifdef` once the GMock fix for C++20 is in the mainline.
-//
-// Please refer to this GitHub issue for additional details:
-// https://github.com/google/googletest/issues/2914
-// https://github.com/google/googletest/commit/61f010d703b32de9bfb20ab90ece38ab2f25977f
-//
-// If we compile using Visual Studio 2019 with `c++latest` (C++20) without the GMock fix,
-// then the compilation here fails in `gmock-actions.h` from:
-//   .\tools\vcpkg\installed\x64-windows\include\gmock\gmock-actions.h(819):
-//   error C2653: 'result_of': is not a class or namespace name
-//
-// That is because `std::result_of` has been removed in C++20.
 
-#  include "opentelemetry/exporters/otlp/otlp_grpc_exporter.h"
+#  include "opentelemetry/exporters/otlp/otlp_http_exporter.h"
 
 #  include "opentelemetry/exporters/otlp/protobuf_include_prefix.h"
 
@@ -25,6 +12,7 @@
 
 #  include "opentelemetry/exporters/otlp/protobuf_include_suffix.h"
 
+#  include "opentelemetry/ext/http/server/http_server.h"
 #  include "opentelemetry/sdk/trace/simple_processor.h"
 #  include "opentelemetry/sdk/trace/tracer_provider.h"
 #  include "opentelemetry/trace/provider.h"
@@ -39,7 +27,7 @@ namespace exporter
 namespace otlp
 {
 
-class OtlpExporterTestPeer : public ::testing::Test
+class OtlpHttpExporterTestPeer : public ::testing::Test
 {
 public:
   std::unique_ptr<sdk::trace::SpanExporter> GetExporter(
@@ -57,7 +45,7 @@ public:
 };
 
 // Call Export() directly
-TEST_F(OtlpExporterTestPeer, ExportUnitTest)
+TEST_F(OtlpHttpExporterTestPeer, ExportUnitTest)
 {
   auto mock_stub = new proto::collector::trace::v1::MockTraceServiceStub();
   std::unique_ptr<proto::collector::trace::v1::TraceService::StubInterface> stub_interface(
@@ -85,7 +73,7 @@ TEST_F(OtlpExporterTestPeer, ExportUnitTest)
 }
 
 // Create spans, let processor call Export()
-TEST_F(OtlpExporterTestPeer, ExportIntegrationTest)
+TEST_F(OtlpHttpExporterTestPeer, ExportIntegrationTest)
 {
   auto mock_stub = new proto::collector::trace::v1::MockTraceServiceStub();
   std::unique_ptr<proto::collector::trace::v1::TraceService::StubInterface> stub_interface(
@@ -110,7 +98,7 @@ TEST_F(OtlpExporterTestPeer, ExportIntegrationTest)
 }
 
 // Test exporter configuration options
-TEST_F(OtlpExporterTestPeer, ConfigTest)
+TEST_F(OtlpHttpExporterTestPeer, ConfigTest)
 {
   OtlpGrpcExporterOptions opts;
   opts.endpoint = "localhost:45454";
@@ -119,7 +107,7 @@ TEST_F(OtlpExporterTestPeer, ConfigTest)
 }
 
 // Test exporter configuration options with use_ssl_credentials
-TEST_F(OtlpExporterTestPeer, ConfigSslCredentialsTest)
+TEST_F(OtlpHttpExporterTestPeer, ConfigSslCredentialsTest)
 {
   std::string cacert_str = "--begin and end fake cert--";
   OtlpGrpcExporterOptions opts;

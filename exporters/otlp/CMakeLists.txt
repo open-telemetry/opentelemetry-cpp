@@ -82,12 +82,12 @@ if(BUILD_TESTING)
   else()
     find_library(GMOCK_LIB gmock PATH_SUFFIXES lib)
   endif()
-  add_executable(otlp_exporter_test test/otlp_exporter_test.cc)
+  add_executable(otlp_grpc_exporter_test test/otlp_grpc_exporter_test.cc)
   target_link_libraries(
-    otlp_exporter_test ${GTEST_BOTH_LIBRARIES} ${CMAKE_THREAD_LIBS_INIT}
+    otlp_grpc_exporter_test ${GTEST_BOTH_LIBRARIES} ${CMAKE_THREAD_LIBS_INIT}
     ${GMOCK_LIB} opentelemetry_exporter_otlp_grpc)
   gtest_add_tests(
-    TARGET otlp_exporter_test
+    TARGET otlp_grpc_exporter_test
     TEST_PREFIX exporter.otlp.
-    TEST_LIST otlp_exporter_test)
+    TEST_LIST otlp_grpc_exporter_test)
 endif() # BUILD_TESTING
