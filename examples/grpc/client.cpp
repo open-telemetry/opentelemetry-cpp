@@ -47,10 +47,11 @@ public:
 
     auto scope = get_tracer("grpc-client")->WithActiveSpan(span);
 
-  auto current_ctx = opentelemetry::context::RuntimeContext::GetCurrent();
-  GrpcClientCarrier carrier(&context);
-  auto prop = opentelemetry::context::propagation::GlobalTextMapPropagator::GetGlobalPropagator();
-  prop->Inject(carrier, current_ctx);
+    // inject current context to grpc metadata
+    auto current_ctx = opentelemetry::context::RuntimeContext::GetCurrent();
+    GrpcClientCarrier carrier(&context);
+    auto prop = opentelemetry::context::propagation::GlobalTextMapPropagator::GetGlobalPropagator();
+    prop->Inject(carrier, current_ctx);
 
     // Send request to server
     Status status = stub_->Greet(&context, request, &response);

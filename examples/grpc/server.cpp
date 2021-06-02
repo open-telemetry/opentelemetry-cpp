@@ -44,7 +44,7 @@ public:
     opentelemetry::trace::StartSpanOptions options;
     options.kind = opentelemetry::trace::SpanKind::kServer;
 
-    // extract context from http header
+    // extract context from grpc metadata
     GrpcServerCarrier carrier(context);
 
     auto prop = opentelemetry::context::propagation::GlobalTextMapPropagator::GetGlobalPropagator();
