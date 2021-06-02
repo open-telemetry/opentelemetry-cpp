@@ -12,12 +12,13 @@ mark_as_advanced(CMAKE_TOOLCHAIN_FILE)
 
 # Autodetect vcpkg toolchain
 if(DEFINED ENV{VCPKG_ROOT} AND NOT DEFINED CMAKE_TOOLCHAIN_FILE)
-  set(CMAKE_TOOLCHAIN_FILE "$ENV{VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake"
+  set(CMAKE_TOOLCHAIN_FILE
+      "$ENV{VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake"
       CACHE STRING "")
 endif()
 
 if(VCPKG_CHAINLOAD_TOOLCHAIN_FILE)
-    include("${VCPKG_CHAINLOAD_TOOLCHAIN_FILE}")
+  include("${VCPKG_CHAINLOAD_TOOLCHAIN_FILE}")
 endif()
 
 set(OPENTELEMETRY_SOURCE_DIR ${CMAKE_CURRENT_LIST_DIR})
@@ -109,6 +110,7 @@ option(WITH_JAEGER "Whether to include the Jaeger exporter" OFF)
 
 option(BUILD_TESTING "Whether to enable tests" ON)
 if(WIN32)
+  add_definitions(-DNOMINMAX)
   if(BUILD_TESTING)
     if(MSVC)
       # GTest bug: https://github.com/google/googletest/issues/860
@@ -151,6 +153,16 @@ function(install_windows_deps)
       ${CMAKE_CURRENT_SOURCE_DIR}/tools/vcpkg/scripts/buildsystems/vcpkg.cmake
       PARENT_SCOPE)
 endfunction()
+
+if(WITH_JAEGER)
+  find_package(Thrift QUIET CONFIG)
+  if(NOT Thrift_FOUND)
+    # Install Thrift and propagate via vcpkg toolchain file
+    if(WIN32 AND (NOT DEFINED CMAKE_TOOLCHAIN_FILE))
+      install_windows_deps()
+    endif()
+  endif()
+endif()
 
 if(MSVC)
   # Options for Visual C++ compiler: /Zc:__cplusplus - report an updated value
@@ -286,6 +298,11 @@ endif()
 
 # Add nlohmann/json submodule to include directories
 include_directories(third_party/nlohmann-json/single_include)
+find_package(nlohmann_json QUIET CONFIG)
+if(nlohmann_json_FOUND)
+  # Add header-only library found by CMake
+  set(NLOHMANN_JSON_LIB nlohmann_json nlohmann_json::nlohmann_json)
+endif()
 
 # Export cmake config and support find_packages(opentelemetry-cpp CONFIG) Write
 # config file for find_packages(opentelemetry-cpp CONFIG)
