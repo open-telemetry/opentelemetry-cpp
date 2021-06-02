@@ -64,5 +64,6 @@ vcpkg install protobuf:%ARCH%-windows
 vcpkg install gRPC:%ARCH%-windows
 vcpkg install prometheus-cpp:%ARCH%-windows
 vcpkg install curl:%ARCH%-windows
+vcpkg install thrift:%ARCH%-windows
 popd
 exit /b 0
