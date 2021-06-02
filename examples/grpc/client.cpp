@@ -1,11 +1,11 @@
-#include "grpc_foo_lib/foo_split.h"
-#include "grpc_foo_lib/grpc_map_carrier.h"
-#include "messages.grpc.pb.h"
 #include "tracer_common.h"
+#include <iostream>
+#include <memory>
+#include <string>
 
 #include <grpcpp/grpcpp.h>
-#include <iostream>
-#include <string>
+
+#include "messages.grpc.pb.h"
 
 using grpc::Channel;
 using grpc::ClientContext;
@@ -16,8 +16,10 @@ using grpc_example::Greeter;
 using grpc_example::GreetRequest;
 using grpc_example::GreetResponse;
 
+
 namespace
 {
+
 class GreeterClient
 {
 public:
@@ -46,20 +48,13 @@ public:
                                                {"net.peer.ip", ip},
                                                {"net.peer.port", port}},
                                               options);
-    auto scope            = get_tracer("grpc")->WithActiveSpan(span);
 
-    /*
-    Commented out some debugging output, in case a reviewer finds it useful
-    opentelemetry::nostd::span<const uint8_t, 8> sp = span->GetContext().span_id().Id(); 
-    for(const uint8_t &e : sp) {
-      std::cout << unsigned(e) << ' ';
-    }
-    std::cout << '\n';*/
-    auto current_ctx = opentelemetry::context::RuntimeContext::GetCurrent();
-    // Experimented with opentelemetry::ext::http::client::Headers here too
-    gRPCMapCarrier<std::map<std::string, std::string>> carrier;
-    auto prop = opentelemetry::context::propagation::GlobalTextMapPropagator::GetGlobalPropagator();
-    prop->Inject(carrier, current_ctx);
+    auto scope = get_tracer("grpc-client")->WithActiveSpan(span);
+
+  auto current_ctx = opentelemetry::context::RuntimeContext::GetCurrent();
+  GrpcClientCarrier carrier(&context);
+  auto prop = opentelemetry::context::propagation::GlobalTextMapPropagator::GetGlobalPropagator();
+  prop->Inject(carrier, current_ctx);
 
     // Send request to server
     Status status = stub_->Greet(&context, request, &response);
@@ -98,6 +93,10 @@ void RunClient(uint16_t port)
 int main(int argc, char **argv)
 {
   initTracer();
+  // set global propagator
+  opentelemetry::context::propagation::GlobalTextMapPropagator::SetGlobalPropagator(
+      nostd::shared_ptr<opentelemetry::context::propagation::TextMapPropagator>(
+          new opentelemetry::trace::propagation::HttpTraceContext()));
   constexpr uint16_t default_port = 8800;
   uint16_t port;
   if (argc > 1)

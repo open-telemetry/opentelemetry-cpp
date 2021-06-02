@@ -116,7 +116,7 @@ If you install these with a package manager like '''brew''' or '''apt''', you sh
                 rpc.method: Greet
                 rpc.service: GreeterService
                 rpc.system: grpc
-        events        : 
+        events        :
         links         :
     }
    ```
