@@ -67,7 +67,7 @@ endif()
 
 if(WITH_STL)
   # Require at least C++17. C++20 is needed to avoid gsl::span
-  if(CMAKE_MINOR_VERSION VERSION_GREATER "3.18")
+  if(CMAKE_VERSION VERSION_GREATER "3.18.0")
     # Ask for 20, may get anything below
     set(CMAKE_CXX_STANDARD 20)
   else()
