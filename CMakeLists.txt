@@ -66,6 +66,12 @@ if(WITH_ABSEIL)
 endif()
 
 if(WITH_STL)
+  # These definitions are needed for test projects that do not link against
+  # opentelemetry-api library directly. We ensure that variant implementation
+  # (absl::variant or std::variant) in variant unit test code is consistent with
+  # the global project build definitions.
+  add_definitions(-DHAVE_CPP_STDLIB)
+  add_definitions(-DHAVE_GSL)
   # Require at least C++17. C++20 is needed to avoid gsl::span
   if(CMAKE_VERSION VERSION_GREATER "3.18.0")
     # Ask for 20, may get anything below
@@ -129,13 +135,13 @@ option(
   OFF)
 option(WITH_EXAMPLES "Whether to build examples" ON)
 
-option(WITH_METRICS_PREVIEW "Whether to build metrics preview" OFF)
+option(WITH_METRICS_PREVIEW "Whether to build metrics preview" ON)
 
 if(WITH_METRICS_PREVIEW)
   add_definitions(-DENABLE_METRICS_PREVIEW)
 endif()
 
-option(WITH_LOGS_PREVIEW "Whether to build logs preview" OFF)
+option(WITH_LOGS_PREVIEW "Whether to build logs preview" ON)
 
 if(WITH_LOGS_PREVIEW)
   add_definitions(-DENABLE_LOGS_PREVIEW)
