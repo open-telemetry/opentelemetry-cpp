@@ -238,11 +238,6 @@ void Recordable::SetInstrumentationLibrary(
   span_["tags"]["otel.library.version"] = instrumentation_library.GetVersion();
 }
 
-void Recordable::SetSpanLimits(const opentelemetry::sdk::trace::SpanLimits &span_limits) noexcept
-{
-  span_limit_ = span_limits;
-}
-
 }  // namespace zipkin
 }  // namespace exporter
 OPENTELEMETRY_END_NAMESPACE

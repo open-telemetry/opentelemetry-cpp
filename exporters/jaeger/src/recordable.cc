@@ -62,11 +62,6 @@ void Recordable::SetInstrumentationLibrary(
         &instrumentation_library) noexcept
 {}
 
-void Recordable::SetSpanLimits(const opentelemetry::sdk::trace::SpanLimits &span_limits) noexcept
-{
-  span_limit_ = span_limits;
-}
-
 void Recordable::AddLink(const trace::SpanContext &span_context,
                          const common::KeyValueIterable &attributes) noexcept
 {

@@ -130,16 +130,6 @@ public:
     return attributes_;
   }
 
-  /**
-   * Get the span limits set for this span
-   * @return the span limits struct having constraints
-   */
-  const opentelemetry::sdk::trace::SpanLimits GetSpanLimits() const noexcept
-  {
-    std::lock_guard<std::mutex> lock(mutex_);
-    return span_limit_;
-  }
-
   void SetIdentity(const opentelemetry::trace::SpanContext &span_context,
                    opentelemetry::trace::SpanId parent_span_id) noexcept override
   {
@@ -198,12 +188,6 @@ public:
     instrumentation_library_ = &instrumentation_library;
   }
 
-  void SetSpanLimits(const opentelemetry::sdk::trace::SpanLimits &span_limits) noexcept override
-  {
-    std::lock_guard<std::mutex> lock(mutex_);
-    span_limit_ = span_limits;
-  }
-
   void AddLink(const opentelemetry::trace::SpanContext &span_context,
                const opentelemetry::common::KeyValueIterable &attributes =
                    opentelemetry::common::KeyValueIterableView<std::map<std::string, int>>(
@@ -255,7 +239,6 @@ private:
   std::chrono::nanoseconds duration_{0};
   std::string name_;
   opentelemetry::trace::SpanKind span_kind_;
-  opentelemetry::sdk::trace::SpanLimits span_limit_;
   opentelemetry::trace::StatusCode status_code_{opentelemetry::trace::StatusCode::kUnset};
   std::string status_desc_;
   std::unordered_map<std::string, opentelemetry::sdk::common::OwnedAttributeValue> attributes_;

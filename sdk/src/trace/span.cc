@@ -50,8 +50,7 @@ Span::Span(std::shared_ptr<Tracer> &&tracer,
            const trace_api::SpanContextKeyValueIterable &links,
            const trace_api::StartSpanOptions &options,
            const trace_api::SpanContext &parent_span_context,
-           std::unique_ptr<trace_api::SpanContext> span_context,
-           const SpanLimits &span_limits) noexcept
+           std::unique_ptr<trace_api::SpanContext> span_context) noexcept
     : tracer_{std::move(tracer)},
       recordable_{tracer_->GetProcessor().MakeRecordable()},
       start_steady_time{options.start_steady_time},
@@ -67,7 +66,6 @@ Span::Span(std::shared_ptr<Tracer> &&tracer,
   recordable_->SetIdentity(*span_context_, parent_span_context.IsValid()
                                                ? parent_span_context.span_id()
                                                : trace_api::SpanId());
-  recordable_->SetSpanLimits(span_limits);
 
   attributes.ForEachKeyValue(
       [&](nostd::string_view key, opentelemetry::common::AttributeValue value) noexcept {

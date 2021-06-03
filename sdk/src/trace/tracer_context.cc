@@ -13,13 +13,11 @@ namespace trace
 TracerContext::TracerContext(std::vector<std::unique_ptr<SpanProcessor>> &&processors,
                              opentelemetry::sdk::resource::Resource resource,
                              std::unique_ptr<Sampler> sampler,
-                             std::unique_ptr<IdGenerator> id_generator,
-                             SpanLimits limits) noexcept
+                             std::unique_ptr<IdGenerator> id_generator) noexcept
     : processor_(std::unique_ptr<SpanProcessor>(new MultiSpanProcessor(std::move(processors)))),
       resource_(resource),
       sampler_(std::move(sampler)),
-      id_generator_(std::move(id_generator)),
-      limits_(limits)
+      id_generator_(std::move(id_generator))
 {}
 
 Sampler &TracerContext::GetSampler() const noexcept
@@ -42,11 +40,6 @@ void TracerContext::AddProcessor(std::unique_ptr<SpanProcessor> processor) noexc
 
   auto multi_processor = static_cast<MultiSpanProcessor *>(processor_.get());
   multi_processor->AddProcessor(std::move(processor));
-}
-
-const SpanLimits &TracerContext::GetSpanLimits() const noexcept
-{
-  return limits_;
 }
 
 SpanProcessor &TracerContext::GetProcessor() const noexcept

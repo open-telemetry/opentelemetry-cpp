@@ -24,8 +24,7 @@ public:
        const trace_api::SpanContextKeyValueIterable &links,
        const trace_api::StartSpanOptions &options,
        const trace_api::SpanContext &parent_span_context,
-       std::unique_ptr<trace_api::SpanContext> span_context,
-       const SpanLimits &span_limits) noexcept;
+       std::unique_ptr<trace_api::SpanContext> span_context) noexcept;
 
   ~Span() override;
 
@@ -58,7 +57,6 @@ private:
   std::unique_ptr<Recordable> recordable_;
   opentelemetry::common::SteadyTimestamp start_steady_time;
   std::unique_ptr<trace_api::SpanContext> span_context_;
-  SpanLimits span_limit_;
   bool has_ended_;
 };
 }  // namespace trace

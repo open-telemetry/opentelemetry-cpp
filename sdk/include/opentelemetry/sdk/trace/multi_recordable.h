@@ -153,14 +153,6 @@ public:
     }
   }
 
-  void SetSpanLimits(const SpanLimits &span_limits) noexcept override
-  {
-    for (auto &recordable : recordables_)
-    {
-      recordable.second->SetSpanLimits(span_limits);
-    }
-  }
-
 private:
   std::map<std::size_t, std::unique_ptr<Recordable>> recordables_;
 };

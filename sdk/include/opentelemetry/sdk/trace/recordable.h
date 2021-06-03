@@ -10,7 +10,6 @@
 #include "opentelemetry/sdk/common/empty_attributes.h"
 #include "opentelemetry/sdk/instrumentationlibrary/instrumentation_library.h"
 #include "opentelemetry/sdk/resource/resource.h"
-#include "opentelemetry/sdk/trace/span_limits.h"
 #include "opentelemetry/trace/canonical_code.h"
 #include "opentelemetry/trace/span.h"
 #include "opentelemetry/trace/span_context.h"
@@ -147,12 +146,6 @@ public:
    */
   virtual void SetInstrumentationLibrary(
       const InstrumentationLibrary &instrumentation_library) noexcept = 0;
-
-  /**
-   * Set the span limits parameters for the span.
-   * @param span_limits span limits struct to be set
-   */
-  virtual void SetSpanLimits(const SpanLimits &span_limits) noexcept = 0;
 };
 }  // namespace trace
 }  // namespace sdk

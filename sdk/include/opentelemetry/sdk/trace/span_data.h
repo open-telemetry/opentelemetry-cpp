@@ -11,6 +11,7 @@
 #include "opentelemetry/nostd/string_view.h"
 #include "opentelemetry/sdk/common/attribute_utils.h"
 #include "opentelemetry/sdk/trace/recordable.h"
+#include "opentelemetry/sdk/trace/span_limits.h"
 #include "opentelemetry/trace/canonical_code.h"
 #include "opentelemetry/trace/span.h"
 #include "opentelemetry/trace/span_id.h"
@@ -187,12 +188,6 @@ public:
    */
   const std::vector<SpanDataLink> &GetLinks() const noexcept { return links_; }
 
-  /**
-   * Get the span limits set for this span
-   * @return the span limits struct having constraints
-   */
-  const SpanLimits GetSpanLimits() const noexcept { return span_limit_; }
-
   void SetIdentity(const opentelemetry::trace::SpanContext &span_context,
                    opentelemetry::trace::SpanId parent_span_id) noexcept override
   {
@@ -203,8 +198,8 @@ public:
   void SetAttribute(nostd::string_view key,
                     const opentelemetry::common::AttributeValue &value) noexcept override
   {
-    if (attribute_map_.GetAttributeMapSize() < GetSpanLimits().AttributeCountLimit ||
-        attribute_map_.KeyExists(key))
+    if (attribute_map_.size() < SpanLimits::GetAttributeCountLimit() ||
+        attribute_map_.find(std::string(key)) != attribute_map_.end())
     {
       attribute_map_.SetAttribute(key, value);
     }
@@ -263,8 +258,6 @@ public:
     instrumentation_library_ = &instrumentation_library;
   }
 
-  void SetSpanLimits(const SpanLimits &span_limits) noexcept override { span_limit_ = span_limits; }
-
 private:
   opentelemetry::trace::SpanContext span_context_{false, false};
   opentelemetry::trace::SpanId parent_span_id_;
@@ -276,7 +269,6 @@ private:
   common::AttributeMap attribute_map_;
   std::vector<SpanDataEvent> events_;
   std::vector<SpanDataLink> links_;
-  SpanLimits span_limit_;
   opentelemetry::trace::SpanKind span_kind_{opentelemetry::trace::SpanKind::kInternal};
   const opentelemetry::sdk::resource::Resource *resource_;
   const InstrumentationLibrary *instrumentation_library_;
