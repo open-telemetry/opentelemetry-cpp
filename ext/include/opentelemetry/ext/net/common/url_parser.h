@@ -10,7 +10,7 @@
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace ext
 {
-namespace http
+namespace net
 {
 namespace common
 {
@@ -125,6 +125,6 @@ public:
 
 }  // namespace common
 
-}  // namespace http
+}  // namespace net
 }  // namespace ext
 OPENTELEMETRY_END_NAMESPACE

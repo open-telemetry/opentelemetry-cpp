@@ -15,7 +15,7 @@ void sendRequest(const std::string &url)
   // start active span
   opentelemetry::trace::StartSpanOptions options;
   options.kind = opentelemetry::trace::SpanKind::kClient;  // client
-  opentelemetry::ext::http::common::UrlParser url_parser(url);
+  opentelemetry::ext::net::common::UrlParser url_parser(url);
 
   std::string span_name = url_parser.path_;
   auto span             = get_tracer("http-client")

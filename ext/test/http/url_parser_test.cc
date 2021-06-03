@@ -5,7 +5,7 @@
 
 #include <gtest/gtest.h>
 
-namespace http_common = opentelemetry::ext::http::common;
+using namespace opentelemetry::ext::net::common;
 
 inline const char *const BoolToString(bool b)
 {
@@ -117,7 +117,7 @@ TEST(UrlParserTests, BasicTests)
   };
   for (auto &url_map : urls_map)
   {
-    http_common::UrlParser url(url_map.first);
+    UrlParser url(url_map.first);
     auto url_properties = url_map.second;
     ASSERT_EQ(BoolToString(url.success_), url_properties["success"]);
     ASSERT_EQ(url.host_, url_properties["host"]);
