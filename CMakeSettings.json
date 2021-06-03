@@ -115,12 +115,7 @@
             ]
         },
         {
-            // These environment variables apply to all configurations.
-            "environments": [
-                {
-                    "OPENTELEMETRY_CONTRIB_PATH": "${projectDir}\\..\\opentelemetry-cpp-contrib"
-                }
-            ],
+            "environments": [ { "OPENTELEMETRY_CONTRIB_PATH": "${projectDir}\\..\\opentelemetry-cpp-contrib" } ],
             "name": "stdlib-x64-Release-contrib",
             "generator": "Ninja",
             "configurationType": "Release",
@@ -160,12 +155,7 @@
             ]
         },
         {
-            // These environment variables apply to all configurations.
-            "environments": [
-                {
-                    "OPENTELEMETRY_CONTRIB_PATH": "${projectDir}\\..\\opentelemetry-cpp-contrib"
-                }
-            ],
+            "environments": [ { "OPENTELEMETRY_CONTRIB_PATH": "${projectDir}\\..\\opentelemetry-cpp-contrib" } ],
             "name": "stdlib-x64-Debug-contrib",
             "generator": "Ninja",
             "configurationType": "Debug",
