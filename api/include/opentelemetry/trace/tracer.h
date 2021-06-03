@@ -89,19 +89,6 @@ public:
             nostd::enable_if_t<common::detail::is_key_value_iterable<T>::value> * = nullptr>
   nostd::shared_ptr<Span> StartSpan(
       nostd::string_view name,
-      std::initializer_list<std::pair<nostd::string_view, common::AttributeValue>> attributes,
-      const StartSpanOptions &options = {}) noexcept
-  {
-    return this->StartSpan(name,
-                           nostd::span<const std::pair<nostd::string_view, common::AttributeValue>>{
-                               attributes.begin(), attributes.end()},
-                           {}, options);
-  }
-
-  template <class T,
-            nostd::enable_if_t<common::detail::is_key_value_iterable<T>::value> * = nullptr>
-  nostd::shared_ptr<Span> StartSpan(
-      nostd::string_view name,
       const T &attributes,
       std::initializer_list<
           std::pair<SpanContext,
