@@ -1,6 +1,9 @@
 include_directories(thrift-gen)
 
 find_package(Thrift REQUIRED)
+# vcpkg config recipe points to THRIFT_INCLUDE_DIR=...\thrift . Ensure that the
+# include dir for thrift-gen code is 1 level-up from that:
+include_directories(SYSTEM ${THRIFT_INCLUDE_DIR}/..)
 
 set(JAEGER_THRIFT_GENCPP_SOURCES
     thrift-gen/Agent.cpp thrift-gen/jaeger_types.cpp thrift-gen/Collector.cpp

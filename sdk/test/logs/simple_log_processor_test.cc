@@ -1,15 +1,17 @@
 // Copyright The OpenTelemetry Authors
 // SPDX-License-Identifier: Apache-2.0
 
-#include "opentelemetry/sdk/logs/simple_log_processor.h"
-#include "opentelemetry/nostd/span.h"
-#include "opentelemetry/sdk/logs/exporter.h"
-#include "opentelemetry/sdk/logs/log_record.h"
+#ifdef ENABLE_LOGS_PREVIEW
 
-#include <gtest/gtest.h>
+#  include "opentelemetry/sdk/logs/simple_log_processor.h"
+#  include "opentelemetry/nostd/span.h"
+#  include "opentelemetry/sdk/logs/exporter.h"
+#  include "opentelemetry/sdk/logs/log_record.h"
 
-#include <chrono>
-#include <thread>
+#  include <gtest/gtest.h>
+
+#  include <chrono>
+#  include <thread>
 
 using namespace opentelemetry::sdk::logs;
 using namespace opentelemetry::sdk::common;
@@ -152,3 +154,4 @@ TEST(SimpleLogProcessorTest, ShutDownFail)
   // Expect failure result when processor given a negative timeout allowed to shutdown
   EXPECT_EQ(false, processor.Shutdown(std::chrono::microseconds(-1)));
 }
+#endif

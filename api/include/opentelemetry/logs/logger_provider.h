@@ -2,10 +2,11 @@
 // SPDX-License-Identifier: Apache-2.0
 
 #pragma once
+#ifdef ENABLE_LOGS_PREVIEW
 
-#include "opentelemetry/logs/logger.h"
-#include "opentelemetry/nostd/shared_ptr.h"
-#include "opentelemetry/nostd/string_view.h"
+#  include "opentelemetry/logs/logger.h"
+#  include "opentelemetry/nostd/shared_ptr.h"
+#  include "opentelemetry/nostd/string_view.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace logs
@@ -37,3 +38,4 @@ public:
 };
 }  // namespace logs
 OPENTELEMETRY_END_NAMESPACE
+#endif
