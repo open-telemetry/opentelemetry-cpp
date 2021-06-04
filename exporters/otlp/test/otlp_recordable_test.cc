@@ -154,7 +154,6 @@ TEST(OtlpRecordable, AddLink)
   trace::TraceFlags flags;
   std::string trace_state_header = "k1=v1,k2=v2";
   auto ts                        = trace::TraceState::FromHeader(trace_state_header);
-  std::cout << ts->ToHeader();
 
   rec.AddLink(trace::SpanContext(trace::TraceId(), trace::SpanId(), flags, false, ts),
               common::KeyValueIterableView<std::map<std::string, int>>(attributes));
