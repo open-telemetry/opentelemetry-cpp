@@ -22,6 +22,8 @@ Increment the:
 * [LOGS] Move Logging implementation under feature-flag ([#807](https://github.com/open-telemetry/opentelemetry-cpp/pull/807))
 * [BUILD] Filter metric headers files from `opentelemetry-api` and `opentelemetry-sdk` targets if metrics feature-flag is disabled ([#806](https://github.com/open-telemetry/opentelemetry-cpp/pull/806))
 * [BUILD] Fix install rule for ostream exporter, Jaeger, ETW, ElasticSearch ([#805](Fix install rule for header files of ostream exporter))
+* [API/SDK] Switch from mpark::variant to absl::variant as default ([#771](https://github.com/open-telemetry/opentelemetry-cpp/pull/771))
+* [API/SDK] Support `const char *` as acceptable data type for attributes and resources ([#771](https://github.com/open-telemetry/opentelemetry-cpp/pull/771))
 * [EXAMPLE] gRPC instrumentation example with context propagation ([#729](https://github.com/open-telemetry/opentelemetry-cpp/pull/729))
 
 ## [0.7.0] 2021-05-26
