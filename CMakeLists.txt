@@ -53,8 +53,6 @@ if(WITH_ABSEIL)
   add_definitions(-DHAVE_ABSEIL)
   find_package(absl CONFIG REQUIRED)
 
-  # Abseil headers-only lib is needed for absl::variant to work vs2015.
-  # `nostd::mpark::variant` is not compiling in vs2015.
   set(CORE_RUNTIME_LIBS absl::any absl::base absl::bits absl::city)
 
   # target_link_libraries(main PRIVATE absl::any absl::base absl::bits
@@ -62,6 +60,12 @@ if(WITH_ABSEIL)
 endif()
 
 if(WITH_STL)
+  # These definitions are needed for test projects that do not link against
+  # opentelemetry-api library directly. We ensure that variant implementation
+  # (absl::variant or std::variant) in variant unit test code is consistent with
+  # the global project build definitions.
+  add_definitions(-DHAVE_CPP_STDLIB)
+  add_definitions(-DHAVE_GSL)
   # Require at least C++17. C++20 is needed to avoid gsl::span
   if(CMAKE_MINOR_VERSION VERSION_GREATER "3.18")
     # Ask for 20, may get anything below

@@ -23,7 +23,7 @@ static const std::map<opentelemetry::trace::SpanKind, std::string> kSpanKindMap 
 //
 // See `attribute_value.h` for details.
 //
-const int kAttributeValueSize = 15;
+const int kAttributeValueSize = 16;
 
 void Recordable::SetIdentity(const opentelemetry::trace::SpanContext &span_context,
                              opentelemetry::trace::SpanId parent_span_id) noexcept
@@ -72,6 +72,10 @@ void PopulateAttribute(nlohmann::json &attribute,
   else if (nostd::holds_alternative<double>(value))
   {
     attribute[key.data()] = nostd::get<double>(value);
+  }
+  else if (nostd::holds_alternative<const char *>(value))
+  {
+    attribute[key.data()] = nostd::get<const char *>(value);
   }
   else if (nostd::holds_alternative<nostd::string_view>(value))
   {
