@@ -1,9 +1,12 @@
+// Copyright The OpenTelemetry Authors
+// SPDX-License-Identifier: Apache-2.0
+
 #pragma once
 
 #include "opentelemetry/detail/preprocessor.h"
 
 #define OPENTELEMETRY_SDK_ABI_VERSION_NO 0
-#define OPENTELEMETRY_SDK_VERSION "0.1.0"
+#define OPENTELEMETRY_SDK_VERSION "1.0.0-rc1"
 #define OPENTELEMETRY_SDK_ABI_VERSION OPENTELEMETRY_STRINGIFY(OPENTELEMETRY_SDK_ABI_VERSION_NO)
 
 // clang-format off

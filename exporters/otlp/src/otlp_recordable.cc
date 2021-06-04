@@ -1,3 +1,6 @@
+// Copyright The OpenTelemetry Authors
+// SPDX-License-Identifier: Apache-2.0
+
 #include "opentelemetry/exporters/otlp/otlp_recordable.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
@@ -9,7 +12,7 @@ namespace otlp
 //
 // See `attribute_value.h` for details.
 //
-const int kAttributeValueSize      = 15;
+const int kAttributeValueSize      = 16;
 const int kOwnedAttributeValueSize = 15;
 
 void OtlpRecordable::SetIdentity(const opentelemetry::trace::SpanContext &span_context,
@@ -59,6 +62,10 @@ void PopulateAttribute(opentelemetry::proto::common::v1::KeyValue *attribute,
   else if (nostd::holds_alternative<double>(value))
   {
     attribute->mutable_value()->set_double_value(nostd::get<double>(value));
+  }
+  else if (nostd::holds_alternative<const char *>(value))
+  {
+    attribute->mutable_value()->set_string_value(nostd::get<const char *>(value));
   }
   else if (nostd::holds_alternative<nostd::string_view>(value))
   {
@@ -131,9 +138,9 @@ void PopulateAttribute(opentelemetry::proto::common::v1::KeyValue *attribute,
 {
   // Assert size of variant to ensure that this method gets updated if the variant
   // definition changes
-  static_assert(
-      nostd::variant_size<opentelemetry::common::AttributeValue>::value == kOwnedAttributeValueSize,
-      "AttributeValue contains unknown type");
+  static_assert(nostd::variant_size<opentelemetry::common::AttributeValue>::value ==
+                    kOwnedAttributeValueSize + 1,
+                "AttributeValue contains unknown type");
 
   attribute->set_key(key.data(), key.size());
 

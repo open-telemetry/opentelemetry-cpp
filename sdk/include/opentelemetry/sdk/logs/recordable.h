@@ -1,17 +1,21 @@
+// Copyright The OpenTelemetry Authors
+// SPDX-License-Identifier: Apache-2.0
+
 #pragma once
+#ifdef ENABLE_LOGS_PREVIEW
 
-#include "opentelemetry/common/attribute_value.h"
-#include "opentelemetry/common/key_value_iterable.h"
-#include "opentelemetry/common/timestamp.h"
-#include "opentelemetry/logs/severity.h"
-#include "opentelemetry/trace/span.h"
-#include "opentelemetry/trace/span_context.h"
-#include "opentelemetry/trace/span_id.h"
-#include "opentelemetry/trace/trace_flags.h"
-#include "opentelemetry/trace/trace_id.h"
-#include "opentelemetry/version.h"
+#  include "opentelemetry/common/attribute_value.h"
+#  include "opentelemetry/common/key_value_iterable.h"
+#  include "opentelemetry/common/timestamp.h"
+#  include "opentelemetry/logs/severity.h"
+#  include "opentelemetry/trace/span.h"
+#  include "opentelemetry/trace/span_context.h"
+#  include "opentelemetry/trace/span_id.h"
+#  include "opentelemetry/trace/trace_flags.h"
+#  include "opentelemetry/trace/trace_id.h"
+#  include "opentelemetry/version.h"
 
-#include <map>
+#  include <map>
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace sdk
@@ -89,3 +93,4 @@ public:
 }  // namespace logs
 }  // namespace sdk
 OPENTELEMETRY_END_NAMESPACE
+#endif

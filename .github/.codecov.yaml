@@ -1,13 +1,22 @@
 codecov:
-  require_ci_to_pass: yes
+  require_ci_to_pass: false
   max_report_age: off
 
 coverage:
   precision: 2
-  round: down
+  round: up
   range: "80...100"
   status:
-    patch: off
+    project:
+      default:
+        informational: true
+        target: auto
+        threshold: 10%
+    patch:
+      default:
+        informational: true
+        target: auto
+        threshold: 10%
 
 parsers:
   gcov:
@@ -20,7 +29,7 @@ parsers:
 comment:
   layout: "reach,diff,flags,tree"
   behavior: default
-  require_changes: no
+  require_changes: false
 
 # Relative file path fixing.
 # CI file paths must match Git file paths.
