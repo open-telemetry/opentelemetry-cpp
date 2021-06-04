@@ -92,7 +92,7 @@ TEST(ZipkinSpanRecordable, SetInstrumentationLibrary)
       {"tags", {{"otel.library.name", library_name}, {"otel.library.version", library_version}}}};
   opentelemetry::exporter::zipkin::Recordable rec;
 
-  rec.SetInstrumentationLibrary(*InstrumentationLibrary::create(library_name, library_version));
+  rec.SetInstrumentationLibrary(*InstrumentationLibrary::Create(library_name, library_version));
 
   EXPECT_EQ(rec.span(), j_span);
 }
