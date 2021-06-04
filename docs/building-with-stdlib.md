@@ -74,11 +74,7 @@ Consistent handling of `std::variant` across various OS:
 
 * ability to borrow implementation of C++20 `gsl::span` from [Microsoft
   Guidelines Support Library](https://github.com/microsoft/GSL). This is
-  necessary for C++17 and above compiler.
-
-* ability to use Abseil classes for Visual Studio 2015 :`nostd::variant` does
-  not compile with Visual Studio 2010. Please refer to [this
-  issue](https://github.com/open-telemetry/opentelemetry-cpp/issues/314)
+  necessary for C++14 and C++17 standard compilers.
 
 ## Pros and Cons
 
@@ -157,7 +153,7 @@ List of compilers that support building with standard library classes:
 
 Compiler           | Language standard | Notes
 -------------------|-------------------|-------------------
-Visual Studio 2015 | C++14             | can only be built with `nostd` flavor
+Visual Studio 2015 | C++14             | requires `gsl::span` for `std::span` implementation
 Visual Studio 2017 | C++17             | requires `gsl::span` for `std::span` implementation
 Visual Studio 2019 | C++20             |
 Xcode 11.x         | C++17             | requires `gsl::span` for `std::span` implementation
@@ -165,10 +161,12 @@ Xcode 12.x         | C++20             |
 gcc-7              | C++17             | requires `gsl::span` for `std::span` implementation
 gcc-9+             | C++20             |
 
-C++20 `std::span` -compatible implementation is needed for C++17 compilers.
+If SDK is compiled without standard library classes, then `nostd::variant`
+implementation internally uses a private snapshot of [Abseil Variant](https://github.com/abseil/abseil-cpp/blob/master/absl/types/variant.h) .
 
 Other modern C++ language features used by OpenTelemetry, e.g.
 `std::string_view` and `std::variant` are available in C++17 standard library.
+
 Minor customization needed for Apple LLVM clang in `std::variant` exception
 handling due to the fact that the variant exception handler presence depends on
 what OS version developer is targeting. This exception on Apple systems is
@@ -187,13 +185,13 @@ purpose to the `std::span` (and existing `gsl::span` reference implementation),
 eventual standard. Instead, `absl::Span` aims to have an interface as similar as
 possible to `absl::string_view`, without the string-specific functionality.
 
-Thus, OpenTelemetry built with standard library prefers `gsl::span` as it is
-fully compatible with standard `std::span`. It may become possible to use Abseil
-classes should we confirm that its behavior is consistent with `nostd::span`
-expectations.
+Thus, OpenTelemetry built with standard library and C++17 compiler prefers
+`gsl::span` as it is fully compatible with standard `std::span` available in
+C++20 compiler.
 
 ### Test setup
 
 CI allows to validate that all OpenTelemetry functionality is working the same
 identical way irrespective of what C++ runtime / STL library it is compiled
-with.
+with, to ensure that both `nostd::` and `std::` classes on API surface are
+operating the same way.
