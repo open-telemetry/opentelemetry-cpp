@@ -15,7 +15,30 @@ Increment the:
 
 ## [Unreleased]
 
+## [1.0.0-rc1] 2021-06-04
+
+* [BUILD] Enable Jaeger exporter build in Windows ([#815](https://github.com/open-telemetry/opentelemetry-cpp/pull/815))
+* [DOCS] Versioning doc update to clarify release and versioning policy ([#811](https://github.com/open-telemetry/opentelemetry-cpp/pull/811))
+* [LOGS] Move Logging implementation under feature-flag ([#807](https://github.com/open-telemetry/opentelemetry-cpp/pull/807))
+* [BUILD] Filter metric headers files from `opentelemetry-api` and `opentelemetry-sdk` targets if metrics feature-flag is disabled ([#806](https://github.com/open-telemetry/opentelemetry-cpp/pull/806))
+* [BUILD] Fix install rule for ostream exporter, Jaeger, ETW, ElasticSearch ([#805](Fix install rule for header files of ostream exporter))
+* [API/SDK] Switch from mpark::variant to absl::variant as default ([#771](https://github.com/open-telemetry/opentelemetry-cpp/pull/771))
+* [API/SDK] Support `const char *` as acceptable data type for attributes and resources ([#771](https://github.com/open-telemetry/opentelemetry-cpp/pull/771))
+* [EXAMPLE] gRPC instrumentation example with context propagation ([#729](https://github.com/open-telemetry/opentelemetry-cpp/pull/729))
+
+## [0.7.0] 2021-05-26
+
+* [METRICS] Move metrics api/sdk under preview feature flag ([#745](https://github.com/open-telemetry/opentelemetry-cpp/pull/745))
+* [DOCS] Add instructions to build using Bazel ([#747](https://github.com/open-telemetry/opentelemetry-cpp/pull/747))
+* [DOCS] Update copyright headers ([#754](https://github.com/open-telemetry/opentelemetry-cpp/pull/754))
 * [EXPORTER] Populate resource to OTLP proto data ([#758](https://github.com/open-telemetry/opentelemetry-cpp/pull/758))
+* [CI] Add CodeQL security scan CI workflow ([#770](https://github.com/open-telemetry/opentelemetry-cpp/pull/770))
+* [BUILD] Enable building API only CMake Project ([#778](https://github.com/open-telemetry/opentelemetry-cpp/pull/778))
+* [SDK] Fix for sampling of root span ([#784](https://github.com/open-telemetry/opentelemetry-cpp/pull/784))
+* [CI] Add Jaeger exporter to CMake CI build ([#786](https://github.com/open-telemetry/opentelemetry-cpp/pull/786))
+* [API] `BREAKING CHANGE` - Tracer::WithActiveSpan() to return Scope object intead of unique_ptr ([#788](https://github.com/open-telemetry/opentelemetry-cpp/pull/788))
+* [DOCS] Add docs for nested spans and context propagation in readthedocs ([#792](https://github.com/open-telemetry/opentelemetry-cpp/pull/792))
+* [CI] Output verbose error for failed unit-test in CI ([#796](https://github.com/open-telemetry/opentelemetry-cpp/pull/796))
 
 ## [0.6.0] 2021-05-11
 

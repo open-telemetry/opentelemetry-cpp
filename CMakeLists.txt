@@ -7,6 +7,20 @@ cmake_policy(SET CMP0079 NEW)
 
 project(opentelemetry-cpp)
 
+# Mark variables as used so cmake doesn't complain about them
+mark_as_advanced(CMAKE_TOOLCHAIN_FILE)
+
+# Autodetect vcpkg toolchain
+if(DEFINED ENV{VCPKG_ROOT} AND NOT DEFINED CMAKE_TOOLCHAIN_FILE)
+  set(CMAKE_TOOLCHAIN_FILE
+      "$ENV{VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake"
+      CACHE STRING "")
+endif()
+
+if(VCPKG_CHAINLOAD_TOOLCHAIN_FILE)
+  include("${VCPKG_CHAINLOAD_TOOLCHAIN_FILE}")
+endif()
+
 file(READ "${CMAKE_CURRENT_LIST_DIR}/api/include/opentelemetry/version.h"
      OPENTELEMETRY_CPP_HEADER_VERSION_H)
 if(OPENTELEMETRY_CPP_HEADER_VERSION_H MATCHES
@@ -43,8 +57,6 @@ if(WITH_ABSEIL)
   add_definitions(-DHAVE_ABSEIL)
   find_package(absl CONFIG REQUIRED)
 
-  # Abseil headers-only lib is needed for absl::variant to work vs2015.
-  # `nostd::mpark::variant` is not compiling in vs2015.
   set(CORE_RUNTIME_LIBS absl::any absl::base absl::bits absl::city)
 
   # target_link_libraries(main PRIVATE absl::any absl::base absl::bits
@@ -52,6 +64,12 @@ if(WITH_ABSEIL)
 endif()
 
 if(WITH_STL)
+  # These definitions are needed for test projects that do not link against
+  # opentelemetry-api library directly. We ensure that variant implementation
+  # (absl::variant or std::variant) in variant unit test code is consistent with
+  # the global project build definitions.
+  add_definitions(-DHAVE_CPP_STDLIB)
+  add_definitions(-DHAVE_GSL)
   # Require at least C++17. C++20 is needed to avoid gsl::span
   if(CMAKE_MINOR_VERSION VERSION_GREATER "3.18")
     # Ask for 20, may get anything below
@@ -69,9 +87,17 @@ if(WITH_STL)
 
   # Optimize for speed to reduce the hops
   if(CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")
-    set(CMAKE_CXX_FLAGS_SPEED "/O2")
+    if(CMAKE_BUILD_TYPE MATCHES Debug)
+      # Turn off optimizations for DEBUG
+      set(MSVC_CXX_OPT_FLAG "/Od")
+    else()
+      string(REGEX MATCH "\/O" result ${CMAKE_CXX_FLAGS})
+      if(NOT ${result} MATCHES "\/O")
+        set(MSVC_CXX_OPT_FLAG "/O2")
+      endif()
+    endif()
     set(CMAKE_CXX_FLAGS
-        "${CMAKE_CXX_FLAGS} /Zc:__cplusplus ${CMAKE_CXX_FLAGS_SPEED}")
+        "${CMAKE_CXX_FLAGS} /Zc:__cplusplus ${MSVC_CXX_OPT_FLAG}")
   endif()
 endif()
 
@@ -88,18 +114,35 @@ option(WITH_JAEGER "Whether to include the Jaeger exporter" OFF)
 
 option(BUILD_TESTING "Whether to enable tests" ON)
 if(WIN32)
+  add_definitions(-DNOMINMAX)
+  if(BUILD_TESTING)
+    if(MSVC)
+      # GTest bug: https://github.com/google/googletest/issues/860
+      add_compile_options(/wd4275)
+    endif()
+  endif()
   option(WITH_ETW "Whether to include the ETW Exporter in the SDK" ON)
   if(WITH_ETW)
     add_definitions(-DHAVE_MSGPACK)
   endif(WITH_ETW)
 endif(WIN32)
 
+option(
+  WITH_API_ONLY
+  "Only build the API (use as a header-only library). Overrides WITH_EXAMPLES"
+  OFF)
 option(WITH_EXAMPLES "Whether to build examples" ON)
 
 option(WITH_METRICS_PREVIEW "Whether to build metrics preview" OFF)
 
 if(WITH_METRICS_PREVIEW)
   add_definitions(-DENABLE_METRICS_PREVIEW)
+endif()
+
+option(WITH_LOGS_PREVIEW "Whether to build logs preview" OFF)
+
+if(WITH_LOGS_PREVIEW)
+  add_definitions(-DENABLE_LOGS_PREVIEW)
 endif()
 
 find_package(Threads)
@@ -114,6 +157,16 @@ function(install_windows_deps)
       ${CMAKE_CURRENT_SOURCE_DIR}/tools/vcpkg/scripts/buildsystems/vcpkg.cmake
       PARENT_SCOPE)
 endfunction()
+
+if(WITH_JAEGER)
+  find_package(Thrift QUIET CONFIG)
+  if(NOT Thrift_FOUND)
+    # Install Thrift and propagate via vcpkg toolchain file
+    if(WIN32 AND (NOT DEFINED CMAKE_TOOLCHAIN_FILE))
+      install_windows_deps()
+    endif()
+  endif()
+endif()
 
 if(MSVC)
   # Options for Visual C++ compiler: /Zc:__cplusplus - report an updated value
@@ -210,17 +263,21 @@ endif()
 include(CMakePackageConfigHelpers)
 
 include_directories(api/include)
-include_directories(sdk/include)
-include_directories(sdk)
-include_directories(ext/include)
 
 add_subdirectory(api)
-add_subdirectory(sdk)
-add_subdirectory(exporters)
-if(WITH_EXAMPLES)
-  add_subdirectory(examples)
+
+if(NOT WITH_API_ONLY)
+  include_directories(sdk/include)
+  include_directories(sdk)
+  include_directories(ext/include)
+
+  add_subdirectory(sdk)
+  add_subdirectory(exporters)
+  if(WITH_EXAMPLES)
+    add_subdirectory(examples)
+  endif()
+  add_subdirectory(ext)
 endif()
-add_subdirectory(ext)
 
 if(DEFINED ENV{OPENTELEMETRY_CONTRIB_PATH})
   # Add custom contrib path to build tree and consolidate binary artifacts in

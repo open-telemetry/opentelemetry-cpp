@@ -1,3 +1,6 @@
+// Copyright The OpenTelemetry Authors
+// SPDX-License-Identifier: Apache-2.0
+
 #pragma once
 #include "opentelemetry/exporters/ostream/span_exporter.h"
 #include "opentelemetry/sdk/trace/simple_processor.h"
@@ -16,19 +19,6 @@
 
 namespace
 {
-// TBD - This function be removed once #723 is merged
-inline nostd::shared_ptr<opentelemetry::trace::Span> GetSpanFromContext(
-    const opentelemetry::context::Context &context)
-{
-  opentelemetry::context::ContextValue span = context.GetValue(opentelemetry::trace::kSpanKey);
-  if (nostd::holds_alternative<nostd::shared_ptr<opentelemetry::trace::Span>>(span))
-  {
-    return nostd::get<nostd::shared_ptr<opentelemetry::trace::Span>>(span);
-  }
-  static nostd::shared_ptr<opentelemetry::trace::Span> invalid_span{
-      new opentelemetry::trace::DefaultSpan(opentelemetry::trace::SpanContext::GetInvalid())};
-  return invalid_span;
-}
 
 template <typename T>
 class HttpTextMapCarrier : public opentelemetry::context::propagation::TextMapCarrier

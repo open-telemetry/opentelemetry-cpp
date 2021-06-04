@@ -1,3 +1,6 @@
+// Copyright The OpenTelemetry Authors
+// SPDX-License-Identifier: Apache-2.0
+
 #ifdef ENABLE_METRICS_PREVIEW
 #  include "opentelemetry/exporters/ostream/metrics_exporter.h"
 #  include "opentelemetry/metrics/provider.h"

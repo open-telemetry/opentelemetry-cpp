@@ -1,3 +1,6 @@
+// Copyright The OpenTelemetry Authors
+// SPDX-License-Identifier: Apache-2.0
+
 #pragma once
 
 #include <cstdint>
@@ -37,6 +40,7 @@ using AttributeValue =
                    int64_t,
                    uint32_t,
                    double,
+                   const char *,
                    nostd::string_view,
                    nostd::span<const bool>,
                    nostd::span<const int32_t>,
@@ -61,6 +65,7 @@ enum AttributeType
   kTypeInt64,
   kTypeUInt,
   kTypeDouble,
+  kTypeCString,
   kTypeString,
   kTypeSpanBool,
   kTypeSpanInt,

@@ -1,5 +1,3 @@
-include_directories(include)
-
 add_library(opentelemetry_exporter_in_memory INTERFACE)
 
 target_include_directories(
