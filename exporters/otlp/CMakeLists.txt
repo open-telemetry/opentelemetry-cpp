@@ -36,13 +36,18 @@ if(BUILD_TESTING)
     TEST_PREFIX exporter.otlp.
     TEST_LIST otlp_recordable_test)
   if(MSVC)
+    # Explicitly specify that we consume GTest from shared library. The rest of
+    # code logic below determines whether we link Release or Debug flavor of the
+    # library. These flavors have different prefix on Windows, gmock and gmockd
+    # respectively.
     add_definitions(-DGTEST_LINKED_AS_SHARED_LIBRARY=1)
-  endif()
-  if(GMOCK_LIB)
-    # unset GMOCK_LIB to force find_library to redo the lookup, as the cached
-    # entry could cause linking to incorrect flavor of gmock and leading to
-    # runtime error.
-    unset(GMOCK_LIB CACHE)
+  else()
+    if(GMOCK_LIB)
+      # unset GMOCK_LIB to force find_library to redo the lookup, as the cached
+      # entry could cause linking to incorrect flavor of gmock and leading to
+      # runtime error.
+      unset(GMOCK_LIB CACHE)
+    endif()
   endif()
   if(MSVC AND CMAKE_BUILD_TYPE STREQUAL "Debug")
     find_library(GMOCK_LIB gmockd PATH_SUFFIXES lib)
