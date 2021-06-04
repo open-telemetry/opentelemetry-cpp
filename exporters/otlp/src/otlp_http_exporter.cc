@@ -64,11 +64,11 @@ static std::string HexEncode(const std::string &bytes)
 
 static std::string BytesMapping(const std::string &bytes,
                                 const google::protobuf::FieldDescriptor *field_descriptor,
-                                BytesMappingKind kind)
+                                JsonBytesMappingKind kind)
 {
   switch (kind)
   {
-    case BytesMappingKind::kHexId: {
+    case JsonBytesMappingKind::kHexId: {
       if (field_descriptor->lowercase_name() == "trace_id" ||
           field_descriptor->lowercase_name() == "span_id" ||
           field_descriptor->lowercase_name() == "parent_span_id")
@@ -82,13 +82,13 @@ static std::string BytesMapping(const std::string &bytes,
         return base64_value;
       }
     }
-    case BytesMappingKind::kBase64: {
+    case JsonBytesMappingKind::kBase64: {
       // Base64 is the default bytes mapping of protobuf
       std::string base64_value;
       google::protobuf::Base64Escape(bytes, &base64_value);
       return base64_value;
     }
-    case BytesMappingKind::kHex:
+    case JsonBytesMappingKind::kHex:
       return HexEncode(bytes);
     default:
       return bytes;
@@ -139,7 +139,9 @@ void ConvertGenericFieldToJson(nlohmann::json &value,
       break;
     }
     case google::protobuf::FieldDescriptor::CPPTYPE_INT64: {
-      value = message.GetReflection()->GetInt64(message, field_descriptor);
+      // According to Protobuf specs 64-bit integer numbers in JSON-encoded payloads are encoded as
+      // decimal strings, and either numbers or strings are accepted when decoding.
+      value = std::to_string(message.GetReflection()->GetInt64(message, field_descriptor));
       break;
     }
     case google::protobuf::FieldDescriptor::CPPTYPE_UINT32: {
@@ -147,7 +149,9 @@ void ConvertGenericFieldToJson(nlohmann::json &value,
       break;
     }
     case google::protobuf::FieldDescriptor::CPPTYPE_UINT64: {
-      value = message.GetReflection()->GetUInt64(message, field_descriptor);
+      // According to Protobuf specs 64-bit integer numbers in JSON-encoded payloads are encoded as
+      // decimal strings, and either numbers or strings are accepted when decoding.
+      value = std::to_string(message.GetReflection()->GetUInt64(message, field_descriptor));
       break;
     }
     case google::protobuf::FieldDescriptor::CPPTYPE_STRING: {
@@ -211,7 +215,10 @@ void ConvertListFieldToJson(nlohmann::json &value,
     case google::protobuf::FieldDescriptor::CPPTYPE_INT64: {
       for (int i = 0; i < field_size; ++i)
       {
-        value.push_back(message.GetReflection()->GetRepeatedInt64(message, field_descriptor, i));
+        // According to Protobuf specs 64-bit integer numbers in JSON-encoded payloads are encoded
+        // as decimal strings, and either numbers or strings are accepted when decoding.
+        value.push_back(std::to_string(
+            message.GetReflection()->GetRepeatedInt64(message, field_descriptor, i)));
       }
 
       break;
@@ -227,7 +234,10 @@ void ConvertListFieldToJson(nlohmann::json &value,
     case google::protobuf::FieldDescriptor::CPPTYPE_UINT64: {
       for (int i = 0; i < field_size; ++i)
       {
-        value.push_back(message.GetReflection()->GetRepeatedUInt64(message, field_descriptor, i));
+        // According to Protobuf specs 64-bit integer numbers in JSON-encoded payloads are encoded
+        // as decimal strings, and either numbers or strings are accepted when decoding.
+        value.push_back(std::to_string(
+            message.GetReflection()->GetRepeatedUInt64(message, field_descriptor, i)));
       }
 
       break;
@@ -357,25 +367,55 @@ sdk::common::ExportResult OtlpHttpExporter::Export(
     return sdk::common::ExportResult::kFailure;
   }
 
-  nlohmann::json json_request;
   proto::collector::trace::v1::ExportTraceServiceRequest service_request;
   PopulateRequest(spans, &service_request);
 
-  // Convert from proto into json object
-  ConvertGenericMessageToJson(json_request, service_request, options_);
-
-  std::string post_body_json =
-      json_request.dump(-1, ' ', false, nlohmann::detail::error_handler_t::replace);
-  if (options_.console_debug)
+  http_client::Body body_vec;
+  std::string content_type;
+  if (options_.content_type == HttpRequestContentType::kBinary)
   {
-    std::cout << "[OTLP HTTP Exporter] Request body:\n" << post_body_json << std::endl;
+    body_vec.resize(service_request.ByteSizeLong());
+    if (service_request.SerializeWithCachedSizesToArray(
+            reinterpret_cast<google::protobuf::uint8 *>(&body_vec[0])))
+    {
+      if (options_.console_debug)
+      {
+        std::cout << "[OTLP HTTP Exporter] Request body(Binary):\n"
+                  << service_request.Utf8DebugString() << std::endl;
+      }
+    }
+    else
+    {
+      if (options_.console_debug)
+      {
+        std::cout << "[OTLP HTTP Exporter] Serialize body failed(Binary):"
+                  << service_request.InitializationErrorString() << std::endl;
+      }
+      return sdk::common::ExportResult::kFailure;
+    }
+    content_type = kHttpBinaryContentType;
   }
-  http_client::Body body_vec(post_body_json.begin(), post_body_json.end());
+  else
+  {
+    nlohmann::json json_request;
+
+    // Convert from proto into json object
+    ConvertGenericMessageToJson(json_request, service_request, options_);
+
+    std::string post_body_json =
+        json_request.dump(-1, ' ', false, nlohmann::detail::error_handler_t::replace);
+    if (options_.console_debug)
+    {
+      std::cout << "[OTLP HTTP Exporter] Request body(Json):\n" << post_body_json << std::endl;
+    }
+    body_vec.assign(post_body_json.begin(), post_body_json.end());
+    content_type = kHttpJsonContentType;
+  }
 
   // Send the request
   auto client = http_client::HttpClientFactory::CreateSync();
   // TODO: Set timeout
-  auto result = client->Post(options_.url, body_vec, {{"content-type", kHttpContentType}});
+  auto result = client->Post(options_.url, body_vec, {{"Content-Type", content_type}});
 
   // If an error occurred with the HTTP request
   if (!result)

@@ -104,6 +104,16 @@ cc_test(
     ],
 )
 
+cc_test(
+    name = "otlp_http_exporter_test",
+    srcs = ["test/otlp_http_exporter_test.cc"],
+    deps = [
+        ":otlp_http_exporter",
+        "//api",
+        "@com_google_googletest//:gtest_main",
+    ],
+)
+
 otel_cc_benchmark(
     name = "otlp_grpc_exporter_benchmark",
     srcs = ["test/otlp_grpc_exporter_benchmark.cc"],

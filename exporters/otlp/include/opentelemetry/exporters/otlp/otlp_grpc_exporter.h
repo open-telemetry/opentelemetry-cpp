@@ -47,7 +47,7 @@ public:
   /**
    * Create an OtlpGrpcExporter using the given options.
    */
-  OtlpGrpcExporter(const OtlpGrpcExporterOptions &options);
+  explicit OtlpGrpcExporter(const OtlpGrpcExporterOptions &options);
 
   /**
    * Create a span recordable.

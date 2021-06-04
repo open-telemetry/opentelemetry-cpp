@@ -22,13 +22,20 @@ constexpr char kDefaultMetricsPath[] = "/v1/metrics";
 // The default URL path to post metric data.
 constexpr char kDefaultLogPath[] = "/v1/logs";
 // The HTTP header "Content-Type"
-constexpr char kHttpContentType[] = "application/json";
+constexpr char kHttpJsonContentType[]   = "application/json";
+constexpr char kHttpBinaryContentType[] = "application/x-protobuf";
 
-enum class BytesMappingKind
+enum class JsonBytesMappingKind
 {
   kHexId,
-  kBase64,
   kHex,
+  kBase64,
+};
+
+enum class HttpRequestContentType
+{
+  kJson,
+  kBinary,
 };
 
 /**
@@ -42,10 +49,13 @@ struct OtlpHttpExporterOptions
   // @see https://github.com/open-telemetry/opentelemetry-collector/tree/main/receiver/otlpreceiver
   std::string url = std::string("http://localhost:4317") + kDefaultTracePath;
 
+  // By default, post json data
+  HttpRequestContentType content_type = HttpRequestContentType::kJson;
+
   // TODO: By default when false, set CURLOPT_SSL_VERIFYPEER to false
-  // bool use_ssl_credentials = false;
-  // If convert bytes into hex. By default, we will convert bytes into base64
-  BytesMappingKind json_bytes_mapping = BytesMappingKind::kHexId;
+  // If convert bytes into hex. By default, we will convert all bytes but id into base64
+  // This option is ignored if content_type is not kJson
+  JsonBytesMappingKind json_bytes_mapping = JsonBytesMappingKind::kHexId;
 
   // If using the json name of protobuf field to set the key of json. By default, we will use the
   // field name just like proto files.
@@ -72,7 +82,7 @@ public:
   /**
    * Create an OtlpHttpExporter using the given options.
    */
-  OtlpHttpExporter(const OtlpHttpExporterOptions &options);
+  explicit OtlpHttpExporter(const OtlpHttpExporterOptions &options);
 
   /**
    * Create a span recordable.
@@ -98,6 +108,9 @@ public:
 private:
   // Stores if this exporter had its Shutdown() method called
   bool is_shutdown_ = false;
+
+  // For testing
+  friend class OtlpHttpExporterTestPeer;
 
   // The configuration options associated with this exporter.
   const OtlpHttpExporterOptions options_;
