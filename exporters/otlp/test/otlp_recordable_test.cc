@@ -151,11 +151,17 @@ TEST(OtlpRecordable, AddLink)
   auto trace_id = rec.span().trace_id();
   auto span_id  = rec.span().span_id();
 
-  rec.AddLink(trace::SpanContext(false, false),
+  trace::TraceFlags flags;
+  std::string trace_state_header = "k1=v1,k2=v2";
+  auto ts                        = trace::TraceState::FromHeader(trace_state_header);
+  std::cout << ts->ToHeader();
+
+  rec.AddLink(trace::SpanContext(trace::TraceId(), trace::SpanId(), flags, false, ts),
               common::KeyValueIterableView<std::map<std::string, int>>(attributes));
 
   EXPECT_EQ(rec.span().trace_id(), trace_id);
   EXPECT_EQ(rec.span().span_id(), span_id);
+  EXPECT_EQ(rec.span().links(0).trace_state(), trace_state_header);
   for (int i = 0; i < kNumAttributes; i++)
   {
     EXPECT_EQ(rec.span().links(0).attributes(i).key(), keys[i]);

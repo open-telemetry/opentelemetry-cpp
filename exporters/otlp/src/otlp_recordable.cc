@@ -279,12 +279,11 @@ void OtlpRecordable::AddLink(const opentelemetry::trace::SpanContext &span_conte
                      trace::TraceId::kSize);
   link->set_span_id(reinterpret_cast<const char *>(span_context.span_id().Id().data()),
                     trace::SpanId::kSize);
+  link->set_trace_state(span_context.trace_state()->ToHeader());
   attributes.ForEachKeyValue([&](nostd::string_view key, common::AttributeValue value) noexcept {
     PopulateAttribute(link->add_attributes(), key, value);
     return true;
   });
-
-  // TODO: Populate trace_state when it is supported by SpanContext
 }
 
 void OtlpRecordable::SetStatus(trace::StatusCode code, nostd::string_view description) noexcept
