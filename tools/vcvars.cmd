@@ -29,8 +29,8 @@ if "%1" neq "" (
   goto %1
 )
 
-if defined VS_TOOLS_VERSION (
-  goto %VS_TOOLS_VERSION%
+if defined BUILDTOOLS_VERSION (
+  goto %BUILDTOOLS_VERSION%
 )
 
 :vs2019
@@ -114,5 +114,19 @@ REM Caller may decide what to do if Visual Studio environment
 REM is not set up by checking TOOLS_VS_NOTFOUND
 set TOOLS_VS_NOTFOUND=1
 exit /b 0
+
+REM Auto-detection bypass logic for LLVM-Clang. There is no auto-detection
+REM because by default LLVM Clang of any version is installed in the same
+REM directory at %ProgramFiles%\LLVM\bin.
+REM
+REM Path to LLVM bin must be configured manually:
+REM
+REM set BUILDTOOLS_VERSION=clang-10
+REM set "PATH=%ProgramFiles%\LLVM\bin;%PATH%"
+REM 
+:clang-9
+:clang-10
+:clang-11
+:clang-12
 
 :tools_configured
