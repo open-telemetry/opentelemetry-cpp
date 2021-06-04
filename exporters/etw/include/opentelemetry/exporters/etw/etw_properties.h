@@ -214,6 +214,10 @@ public:
       case common::AttributeType::kTypeDouble:
         PropertyVariant::operator=(nostd::get<double>(v));
         break;
+      case common::AttributeType::kTypeCString: {
+        PropertyVariant::operator=(nostd::get<const char *>(v));
+        break;
+      };
       case common::AttributeType::kTypeString: {
         PropertyVariant::operator=(nostd::string_view(nostd::get<nostd::string_view>(v)).data());
         break;
