@@ -2,14 +2,15 @@
 // SPDX-License-Identifier: Apache-2.0
 
 #pragma once
+#ifdef ENABLE_LOGS_PREVIEW
 
-#include "opentelemetry/nostd/type_traits.h"
-#include "opentelemetry/sdk/logs/exporter.h"
-#include "opentelemetry/sdk/logs/log_record.h"
-#include "opentelemetry/version.h"
+#  include "opentelemetry/nostd/type_traits.h"
+#  include "opentelemetry/sdk/logs/exporter.h"
+#  include "opentelemetry/sdk/logs/log_record.h"
+#  include "opentelemetry/version.h"
 
-#include <iostream>
-#include <sstream>
+#  include <iostream>
+#  include <sstream>
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace exporter
@@ -52,3 +53,4 @@ private:
 }  // namespace logs
 }  // namespace exporter
 OPENTELEMETRY_END_NAMESPACE
+#endif

@@ -1,13 +1,15 @@
 // Copyright The OpenTelemetry Authors
 // SPDX-License-Identifier: Apache-2.0
 
-#include <gtest/gtest.h>
-#include <array>
+#ifdef ENABLE_LOGS_PREVIEW
 
-#include "opentelemetry/common/timestamp.h"
-#include "opentelemetry/logs/logger.h"
-#include "opentelemetry/logs/provider.h"
-#include "opentelemetry/nostd/shared_ptr.h"
+#  include <gtest/gtest.h>
+#  include <array>
+
+#  include "opentelemetry/common/timestamp.h"
+#  include "opentelemetry/logs/logger.h"
+#  include "opentelemetry/logs/provider.h"
+#  include "opentelemetry/nostd/shared_ptr.h"
 
 using opentelemetry::logs::Logger;
 using opentelemetry::logs::LoggerProvider;
@@ -110,3 +112,4 @@ TEST(Logger, PushLoggerImplementation)
   auto logger = lp->GetLogger("TestLogger");
   ASSERT_EQ("test logger", logger->GetName());
 }
+#endif

@@ -1,5 +1,6 @@
 if(WITH_OTLP)
   add_subdirectory(otlp)
+  add_subdirectory(grpc)
 endif()
 if(WITH_JAEGER)
   add_subdirectory(jaeger)

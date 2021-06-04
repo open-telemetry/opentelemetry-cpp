@@ -1,16 +1,18 @@
 // Copyright The OpenTelemetry Authors
 // SPDX-License-Identifier: Apache-2.0
 
-#include "opentelemetry/exporters/elasticsearch/es_log_exporter.h"
-#include "opentelemetry/ext/http/server/http_server.h"
-#include "opentelemetry/logs/provider.h"
-#include "opentelemetry/sdk/logs/exporter.h"
-#include "opentelemetry/sdk/logs/log_record.h"
-#include "opentelemetry/sdk/logs/logger_provider.h"
-#include "opentelemetry/sdk/logs/simple_log_processor.h"
+#ifdef ENABLE_LOGS_PREVIEW
 
-#include <gtest/gtest.h>
-#include <iostream>
+#  include "opentelemetry/exporters/elasticsearch/es_log_exporter.h"
+#  include "opentelemetry/ext/http/server/http_server.h"
+#  include "opentelemetry/logs/provider.h"
+#  include "opentelemetry/sdk/logs/exporter.h"
+#  include "opentelemetry/sdk/logs/log_record.h"
+#  include "opentelemetry/sdk/logs/logger_provider.h"
+#  include "opentelemetry/sdk/logs/simple_log_processor.h"
+
+#  include <gtest/gtest.h>
+#  include <iostream>
 
 namespace sdklogs       = opentelemetry::sdk::logs;
 namespace logs_api      = opentelemetry::logs;
@@ -22,7 +24,7 @@ TEST(ElasticsearchLogsExporterTests, Dummy)
   // to enable linking
 }
 
-#if 0
+#  if 0
 // Attempt to write a log to an invalid host/port, test that the Export() returns failure
 TEST(ElasticsearchLogsExporterTests, InvalidEndpoint)
 {
@@ -80,4 +82,5 @@ TEST(ElasticsearchLogsExporterTests, RecordableCreation)
 
   exporter->Export(nostd::span<std::unique_ptr<sdklogs::Recordable>>(&record, 1));
 }
+#  endif
 #endif
