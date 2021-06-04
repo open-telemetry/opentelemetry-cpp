@@ -31,7 +31,8 @@ void PopulateRequest(const nostd::span<std::unique_ptr<sdk::trace::Recordable>> 
   for (auto &recordable : spans)
   {
     auto rec = std::unique_ptr<OtlpRecordable>(static_cast<OtlpRecordable *>(recordable.release()));
-    *instrumentation_lib->add_spans() = std::move(rec->span());
+    *instrumentation_lib->add_spans()                       = std::move(rec->span());
+    *instrumentation_lib->mutable_instrumentation_library() = rec->GetProtoInstrumentationLibrary();
 
     if (!has_resource)
     {

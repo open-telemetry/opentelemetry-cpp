@@ -233,6 +233,18 @@ proto::resource::v1::Resource OtlpRecordable::ProtoResource() const noexcept
   return proto;
 }
 
+proto::common::v1::InstrumentationLibrary OtlpRecordable::GetProtoInstrumentationLibrary()
+    const noexcept
+{
+  proto::common::v1::InstrumentationLibrary instrumentation_library;
+  if (instrumentation_library_)
+  {
+    instrumentation_library.set_name(instrumentation_library_->GetName());
+    instrumentation_library.set_version(instrumentation_library_->GetVersion());
+  }
+  return instrumentation_library;
+}
+
 void OtlpRecordable::SetResource(const opentelemetry::sdk::resource::Resource &resource) noexcept
 {
   resource_ = &resource;
@@ -343,7 +355,7 @@ void OtlpRecordable::SetInstrumentationLibrary(
     const opentelemetry::sdk::instrumentationlibrary::InstrumentationLibrary
         &instrumentation_library) noexcept
 {
-  // TODO: add instrumentation library to OTLP exporter.
+  instrumentation_library_ = &instrumentation_library;
 }
 
 }  // namespace otlp

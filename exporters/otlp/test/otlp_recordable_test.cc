@@ -53,6 +53,16 @@ TEST(OtlpRecordable, SetSpanKind)
             opentelemetry::proto::trace::v1::Span_SpanKind::Span_SpanKind_SPAN_KIND_SERVER);
 }
 
+TEST(OtlpRecordable, SetInstrumentationLibrary)
+{
+  OtlpRecordable rec;
+  auto inst_lib = opentelemetry::sdk::trace::InstrumentationLibrary::Create("test", "v1");
+  rec.SetInstrumentationLibrary(*inst_lib);
+  auto proto_instr_libr = rec.GetProtoInstrumentationLibrary();
+  EXPECT_EQ(proto_instr_libr.name(), inst_lib->GetName());
+  EXPECT_EQ(proto_instr_libr.version(), inst_lib->GetVersion());
+}
+
 TEST(OtlpRecordable, SetStartTime)
 {
   OtlpRecordable rec;
