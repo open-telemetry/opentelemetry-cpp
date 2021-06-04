@@ -20,14 +20,6 @@ private:
   int *count_;
 };
 
-TEST(TypePackElementTest, IndexedType)
-{
-  using opentelemetry::nostd::detail::type_pack_element_t;
-  EXPECT_TRUE((std::is_same<type_pack_element_t<0, int, double, char>, int>::value));
-  EXPECT_TRUE((std::is_same<type_pack_element_t<1, int, double, char>, double>::value));
-  EXPECT_TRUE((std::is_same<type_pack_element_t<2, int, double, char>, char>::value));
-}
-
 TEST(VariantSizeTest, GetVariantSize)
 {
   EXPECT_EQ(nostd::variant_size<nostd::variant<>>::value, 0);
@@ -120,6 +112,6 @@ TEST(VariantTest, Conversion)
 
 TEST(VariantTest, Construction)
 {
-  nostd::variant<bool, std::string> v{"abc"};
+  nostd::variant<bool, const char *, std::string> v{"abc"};
   EXPECT_EQ(v.index(), 1);
 }
