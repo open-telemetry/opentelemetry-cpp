@@ -227,7 +227,10 @@ class HttpClient
 {
 public:
   virtual std::shared_ptr<Session> CreateSession(nostd::string_view host,
-                                                 uint16_t port = 80) noexcept = 0;
+                                                 uint16_t port) noexcept = 0;
+
+  virtual std::shared_ptr<Session> CreateSession(nostd::string_view url) noexcept = 0;
+
   virtual bool CancelAllSessions() noexcept                                   = 0;
 
   virtual bool FinishAllSessions() noexcept = 0;

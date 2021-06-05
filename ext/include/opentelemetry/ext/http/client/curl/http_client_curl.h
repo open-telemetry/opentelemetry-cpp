@@ -6,6 +6,7 @@
 #include "http_operation_curl.h"
 #include "opentelemetry/ext/http/client/http_client.h"
 #include "opentelemetry/version.h"
+#include "opentelemetry/ext/http/common/url_parser.h"
 
 #include <map>
 #include <string>
@@ -253,6 +254,19 @@ public:
                                                       uint16_t port = 80) noexcept override
   {
     auto session    = std::make_shared<Session>(*this, std::string(host), port);
+    auto session_id = ++next_session_id_;
+    session->SetId(session_id);
+    sessions_.insert({session_id, session});
+    return session;
+  }
+
+  std::shared_ptr<http_client::Session> CreateSession(nostd::string_view url) noexcept override
+  {
+    auto parsedUrl = common::UrlParser(std::string(url));
+    if (!parsedUrl.success_) {
+      return std::make_shared<Session>(*this, "empty-host", 80);
+    }
+    auto session    = std::make_shared<Session>(*this, parsedUrl.host_, parsedUrl.port_);
     auto session_id = ++next_session_id_;
     session->SetId(session_id);
     sessions_.insert({session_id, session});

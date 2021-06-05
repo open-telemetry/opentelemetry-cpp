@@ -191,7 +191,7 @@ TEST_F(BasicCurlHttpTests, SendGetRequest)
   auto session_manager = http_client::HttpClientFactory::Create();
   EXPECT_TRUE(session_manager != nullptr);
 
-  auto session = session_manager->CreateSession("127.0.0.1", HTTP_PORT);
+  auto session = session_manager->CreateSession("http://127.0.0.1:19000");
   auto request = session->CreateRequest();
   request->SetUri("get/");
   GetEventHandler *handler = new GetEventHandler();
