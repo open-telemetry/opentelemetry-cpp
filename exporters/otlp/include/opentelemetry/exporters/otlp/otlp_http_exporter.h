@@ -52,7 +52,6 @@ struct OtlpHttpExporterOptions
   // By default, post json data
   HttpRequestContentType content_type = HttpRequestContentType::kJson;
 
-  // TODO: By default when false, set CURLOPT_SSL_VERIFYPEER to false
   // If convert bytes into hex. By default, we will convert all bytes but id into base64
   // This option is ignored if content_type is not kJson
   JsonBytesMappingKind json_bytes_mapping = JsonBytesMappingKind::kHexId;
@@ -64,8 +63,8 @@ struct OtlpHttpExporterOptions
   // Whether to print the status of the exporter in the console
   bool console_debug = false;
 
-  // Maximum time to wait for response after sending http request(milliseconds)
-  int response_timeout = 30000;
+  // TODO: Enable/disable to verify SSL certificate
+  // TODO: Reuqest timeout
 };
 
 /**

@@ -12,7 +12,7 @@
 #  include "opentelemetry/exporters/otlp/protobuf_include_suffix.h"
 
 #  include "opentelemetry/ext/http/server/http_server.h"
-#  include "opentelemetry/sdk/trace/simple_processor.h"
+#  include "opentelemetry/sdk/trace/batch_span_processor.h"
 #  include "opentelemetry/sdk/trace/tracer_provider.h"
 #  include "opentelemetry/trace/provider.h"
 
@@ -22,13 +22,17 @@
 
 using namespace testing;
 
-namespace http_client = opentelemetry::ext::http::client;
-
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace exporter
 {
 namespace otlp
 {
+
+template <class T, size_t N>
+static nostd::span<T, N> MakeSpan(T (&array)[N])
+{
+  return nostd::span<T, N>(array);
+}
 
 class OtlpHttpExporterTestPeer : public ::testing::Test, public HTTP_SERVER_NS::HttpRequestCallback
 {
@@ -74,14 +78,24 @@ public:
   virtual int onHttpRequest(HTTP_SERVER_NS::HttpRequest const &request,
                             HTTP_SERVER_NS::HttpResponse &response) override
   {
+    const std::string *request_content_type = nullptr;
+    {
+      auto it = request.headers.find("Content-Type");
+      if (it != request.headers.end())
+      {
+        request_content_type = &it->second;
+      }
+    }
+
     if (request.uri == kDefaultTracePath)
     {
       response.headers["Content-Type"] = "application/json";
       std::unique_lock<std::mutex> lk(mtx_requests);
-      if (request.headers["Content-Type"] == kHttpBinaryContentType)
+      if (nullptr != request_content_type && *request_content_type == kHttpBinaryContentType)
       {
         opentelemetry::proto::collector::trace::v1::ExportTraceServiceRequest request_body;
-        if (request_body.ParseFromArray(&request.content[0], request.content.size()))
+        if (request_body.ParseFromArray(&request.content[0],
+                                        static_cast<int>(request.content.size())))
         {
           received_requests_binary_.push_back(request_body);
           response.body = "{\"code\": 0, \"message\": \"success\"}";
@@ -92,7 +106,7 @@ public:
           return 400;
         }
       }
-      else if (request.headers["Content-Type"] == kHttpJsonContentType)
+      else if (nullptr != request_content_type && *request_content_type == kHttpJsonContentType)
       {
         auto json                        = nlohmann::json::parse(request.content, nullptr, false);
         response.headers["Content-Type"] = "application/json";
@@ -124,25 +138,29 @@ public:
     }
   }
 
-  bool waitForRequests(unsigned timeOutSec, unsigned expected_count = 1)
+  bool waitForRequests(unsigned timeOutSec, size_t expected_count = 1)
   {
     std::unique_lock<std::mutex> lk(mtx_requests);
-    if (cv_got_events.wait_for(lk, std::chrono::milliseconds(1000 * timeOutSec), [&] {
-          return received_requests_json_.size() + received_requests_binary_.size() >=
-                 expected_count;
-        }))
+    if (cv_got_events.wait_for(lk, std::chrono::milliseconds(1000 * timeOutSec),
+                               [&] { return getCurrentRequestCount() >= expected_count; }))
     {
       return true;
     }
     return false;
   }
 
+  size_t getCurrentRequestCount() const
+  {
+    return received_requests_json_.size() + received_requests_binary_.size();
+  }
+
 public:
   std::unique_ptr<sdk::trace::SpanExporter> GetExporter(HttpRequestContentType content_type)
   {
     OtlpHttpExporterOptions opts;
-    opts.url          = server_address_;
-    opts.content_type = content_type;
+    opts.url           = server_address_;
+    opts.content_type  = content_type;
+    opts.console_debug = true;
     return std::unique_ptr<sdk::trace::SpanExporter>(new OtlpHttpExporter(opts));
   }
 
@@ -153,38 +171,14 @@ public:
   }
 };
 
-// Call Export() directly
-TEST_F(OtlpHttpExporterTestPeer, ExportUnitTest)
-{
-  auto exporter = GetExporter(HttpRequestContentType::kJson);
-
-  auto recordable_1 = exporter->MakeRecordable();
-  recordable_1->SetName("Test span 1");
-  auto recordable_2 = exporter->MakeRecordable();
-  recordable_2->SetName("Test span 2");
-
-  // Test successful RPC
-  nostd::span<std::unique_ptr<sdk::trace::Recordable>> batch_1(&recordable_1, 1);
-  EXPECT_CALL(*mock_stub, Export(_, _, _)).Times(Exactly(1)).WillOnce(Return(grpc::Status::OK));
-  auto result = exporter->Export(batch_1);
-  EXPECT_EQ(sdk::common::ExportResult::kSuccess, result);
-
-  // Test failed RPC
-  nostd::span<std::unique_ptr<sdk::trace::Recordable>> batch_2(&recordable_2, 1);
-  EXPECT_CALL(*mock_stub, Export(_, _, _))
-      .Times(Exactly(1))
-      .WillOnce(Return(grpc::Status::CANCELLED));
-  result = exporter->Export(batch_2);
-  EXPECT_EQ(sdk::common::ExportResult::kFailure, result);
-}
-
 // Create spans, let processor call Export()
 TEST_F(OtlpHttpExporterTestPeer, ExportJsonIntegrationTest)
 {
-  auto exporter = GetExporter(HttpRequestContentType::kJson);
+  size_t old_count = getCurrentRequestCount();
+  auto exporter    = GetExporter(HttpRequestContentType::kJson);
 
   opentelemetry::sdk::resource::ResourceAttributes resource_attributes = {
-      {"service.name", 'unit_test_service'}, {"tenant.id", 'test_user'}};
+      {"service.name", "unit_test_service"}, {"tenant.id", "test_user"}};
   resource_attributes["bool_value"]       = true;
   resource_attributes["int32_value"]      = static_cast<int32_t>(1);
   resource_attributes["uint32_value"]     = static_cast<uint32_t>(2);
@@ -200,29 +194,47 @@ TEST_F(OtlpHttpExporterTestPeer, ExportJsonIntegrationTest)
   resource_attributes["vec_string_value"] = std::vector<std::string>{"vector", "string"};
   auto resource = opentelemetry::sdk::resource::Resource::Create(resource_attributes);
 
-  auto processor = std::unique_ptr<sdk::trace::SpanProcessor>(
-      new sdk::trace::SimpleSpanProcessor(std::move(exporter)));
-  auto provider = nostd::shared_ptr<trace::TracerProvider>(
+  auto processor = std::unique_ptr<sdk::trace::SpanProcessor>(new sdk::trace::BatchSpanProcessor(
+      std::move(exporter),
+      sdk::trace::BatchSpanProcessorOptions{5, std::chrono::milliseconds(256), 5}));
+  auto provider  = nostd::shared_ptr<trace::TracerProvider>(
       new sdk::trace::TracerProvider(std::move(processor), resource));
-  auto tracer = provider->GetTracer("test");
 
-  EXPECT_CALL(*mock_stub, Export(_, _, _))
-      .Times(AtLeast(1))
-      .WillRepeatedly(Return(grpc::Status::OK));
+  std::string report_trace_id;
+  {
+    char trace_id_hex[2 * opentelemetry::trace::TraceId::kSize] = {0};
+    auto tracer                                                 = provider->GetTracer("test");
+    auto parent_span = tracer->StartSpan("Test parent span");
 
-  auto parent_span = tracer->StartSpan("Test parent span");
-  auto child_span  = tracer->StartSpan("Test child span");
-  child_span->End();
-  parent_span->End();
+    opentelemetry::trace::StartSpanOptions child_span_opts = {};
+    child_span_opts.parent                                 = parent_span->GetContext();
+
+    auto child_span = tracer->StartSpan("Test child span", child_span_opts);
+    child_span->End();
+    parent_span->End();
+
+    child_span_opts.parent.trace_id().ToLowerBase16(MakeSpan(trace_id_hex));
+    report_trace_id.assign(trace_id_hex, sizeof(trace_id_hex));
+  }
+
+  ASSERT_TRUE(waitForRequests(2, old_count + 1));
+  auto check_json                   = received_requests_json_.back();
+  auto resource_span                = *check_json["resource_spans"].begin();
+  auto instrumentation_library_span = *resource_span["instrumentation_library_spans"].begin();
+  auto span                         = *instrumentation_library_span["spans"].begin();
+  auto received_trace_id            = span["trace_id"].get<std::string>();
+  EXPECT_EQ(received_trace_id, report_trace_id);
 }
 
 // Create spans, let processor call Export()
 TEST_F(OtlpHttpExporterTestPeer, ExportBinaryIntegrationTest)
 {
+  size_t old_count = getCurrentRequestCount();
+
   auto exporter = GetExporter(HttpRequestContentType::kBinary);
 
   opentelemetry::sdk::resource::ResourceAttributes resource_attributes = {
-      {"service.name", 'unit_test_service'}, {"tenant.id", 'test_user'}};
+      {"service.name", "unit_test_service"}, {"tenant.id", "test_user"}};
   resource_attributes["bool_value"]       = true;
   resource_attributes["int32_value"]      = static_cast<int32_t>(1);
   resource_attributes["uint32_value"]     = static_cast<uint32_t>(2);
@@ -238,20 +250,37 @@ TEST_F(OtlpHttpExporterTestPeer, ExportBinaryIntegrationTest)
   resource_attributes["vec_string_value"] = std::vector<std::string>{"vector", "string"};
   auto resource = opentelemetry::sdk::resource::Resource::Create(resource_attributes);
 
-  auto processor = std::unique_ptr<sdk::trace::SpanProcessor>(
-      new sdk::trace::SimpleSpanProcessor(std::move(exporter)));
-  auto provider = nostd::shared_ptr<trace::TracerProvider>(
+  auto processor = std::unique_ptr<sdk::trace::SpanProcessor>(new sdk::trace::BatchSpanProcessor(
+      std::move(exporter),
+      sdk::trace::BatchSpanProcessorOptions{5, std::chrono::milliseconds(256), 5}));
+  auto provider  = nostd::shared_ptr<trace::TracerProvider>(
       new sdk::trace::TracerProvider(std::move(processor), resource));
-  auto tracer = provider->GetTracer("test");
 
-  EXPECT_CALL(*mock_stub, Export(_, _, _))
-      .Times(AtLeast(1))
-      .WillRepeatedly(Return(grpc::Status::OK));
+  std::string report_trace_id;
+  {
+    uint8_t trace_id_binary[opentelemetry::trace::TraceId::kSize] = {0};
+    auto tracer                                                   = provider->GetTracer("test");
+    auto parent_span = tracer->StartSpan("Test parent span");
 
-  auto parent_span = tracer->StartSpan("Test parent span");
-  auto child_span  = tracer->StartSpan("Test child span");
-  child_span->End();
-  parent_span->End();
+    opentelemetry::trace::StartSpanOptions child_span_opts = {};
+    child_span_opts.parent                                 = parent_span->GetContext();
+
+    auto child_span = tracer->StartSpan("Test child span", child_span_opts);
+    child_span->End();
+    parent_span->End();
+
+    child_span_opts.parent.trace_id().CopyBytesTo(MakeSpan(trace_id_binary));
+    report_trace_id.assign(reinterpret_cast<char *>(trace_id_binary), sizeof(trace_id_binary));
+  }
+
+  ASSERT_TRUE(waitForRequests(2, old_count + 1));
+
+  auto received_trace_id = received_requests_binary_.back()
+                               .resource_spans(0)
+                               .instrumentation_library_spans(0)
+                               .spans(0)
+                               .trace_id();
+  EXPECT_EQ(received_trace_id, report_trace_id);
 }
 
 // Test exporter configuration options
@@ -273,7 +302,7 @@ TEST_F(OtlpHttpExporterTestPeer, ConfigUseJsonNameTest)
 }
 
 // Test exporter configuration options with json_bytes_mapping=JsonBytesMappingKind::kHex
-TEST_F(OtlpHttpExporterTestPeer, ConfigUseJsonNameTest)
+TEST_F(OtlpHttpExporterTestPeer, ConfigJsonBytesMappingTest)
 {
   OtlpHttpExporterOptions opts;
   opts.json_bytes_mapping = JsonBytesMappingKind::kHex;
