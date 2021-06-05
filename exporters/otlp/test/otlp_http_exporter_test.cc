@@ -194,10 +194,13 @@ TEST_F(OtlpHttpExporterTestPeer, ExportJsonIntegrationTest)
   resource_attributes["vec_string_value"] = std::vector<std::string>{"vector", "string"};
   auto resource = opentelemetry::sdk::resource::Resource::Create(resource_attributes);
 
-  auto processor = std::unique_ptr<sdk::trace::SpanProcessor>(new sdk::trace::BatchSpanProcessor(
-      std::move(exporter),
-      sdk::trace::BatchSpanProcessorOptions{5, std::chrono::milliseconds(256), 5}));
-  auto provider  = nostd::shared_ptr<trace::TracerProvider>(
+  auto processor_opts                  = sdk::trace::BatchSpanProcessorOptions();
+  processor_opts.max_export_batch_size = 5;
+  processor_opts.max_queue_size        = 5;
+  processor_opts.schedule_delay_millis = std::chrono::milliseconds(256);
+  auto processor                       = std::unique_ptr<sdk::trace::SpanProcessor>(
+      new sdk::trace::BatchSpanProcessor(std::move(exporter), processor_opts));
+  auto provider = nostd::shared_ptr<trace::TracerProvider>(
       new sdk::trace::TracerProvider(std::move(processor), resource));
 
   std::string report_trace_id;
@@ -250,10 +253,14 @@ TEST_F(OtlpHttpExporterTestPeer, ExportBinaryIntegrationTest)
   resource_attributes["vec_string_value"] = std::vector<std::string>{"vector", "string"};
   auto resource = opentelemetry::sdk::resource::Resource::Create(resource_attributes);
 
-  auto processor = std::unique_ptr<sdk::trace::SpanProcessor>(new sdk::trace::BatchSpanProcessor(
-      std::move(exporter),
-      sdk::trace::BatchSpanProcessorOptions{5, std::chrono::milliseconds(256), 5}));
-  auto provider  = nostd::shared_ptr<trace::TracerProvider>(
+  auto processor_opts                  = sdk::trace::BatchSpanProcessorOptions();
+  processor_opts.max_export_batch_size = 5;
+  processor_opts.max_queue_size        = 5;
+  processor_opts.schedule_delay_millis = std::chrono::milliseconds(256);
+
+  auto processor = std::unique_ptr<sdk::trace::SpanProcessor>(
+      new sdk::trace::BatchSpanProcessor(std::move(exporter), processor_opts));
+  auto provider = nostd::shared_ptr<trace::TracerProvider>(
       new sdk::trace::TracerProvider(std::move(processor), resource));
 
   std::string report_trace_id;

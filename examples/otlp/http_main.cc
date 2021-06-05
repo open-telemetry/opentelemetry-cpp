@@ -6,6 +6,8 @@
 #include "opentelemetry/sdk/trace/tracer_provider.h"
 #include "opentelemetry/trace/provider.h"
 
+#include <string>
+
 #include "foo_library/foo_library.h"
 
 namespace trace    = opentelemetry::trace;
@@ -36,7 +38,17 @@ int main(int argc, char *argv[])
     opts.url = argv[1];
     if (argc > 2)
     {
-      opts.console_debug = false;
+      std::string debug  = argv[2];
+      opts.console_debug = debug != "" && debug != "0" && debug != "no";
+    }
+
+    if (argc > 3)
+    {
+      std::string binary_mode = argv[3];
+      if (binary_mode.size() >= 3 && binary_mode.substr(0, 3) == "bin")
+      {
+        opts.content_type = opentelemetry::exporter::otlp::HttpRequestContentType::kBinary;
+      }
     }
   }
   // Removing this line will leave the default noop TracerProvider in place.
