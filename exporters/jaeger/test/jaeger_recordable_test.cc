@@ -14,10 +14,11 @@ namespace nostd    = opentelemetry::nostd;
 namespace sdktrace = opentelemetry::sdk::trace;
 
 using namespace jaegertracing;
+using namespace opentelemetry::exporter::jaeger;
 
 TEST(JaegerSpanRecordable, SetIdentity)
 {
-  opentelemetry::exporter::jaeger::Recordable rec;
+  Recordable rec;
 
   int64_t trace_id_val[2]    = {0x0000000000000000, 0x1000000000000000};
   int64_t span_id_val        = 0x2000000000000000;
@@ -39,15 +40,22 @@ TEST(JaegerSpanRecordable, SetIdentity)
 
   std::unique_ptr<thrift::Span> span{rec.Span()};
 
+#if JAEGER_IS_LITTLE_ENDIAN == 1
+  EXPECT_EQ(span->traceIdLow, bswap_64(trace_id_val[1]));
+  EXPECT_EQ(span->traceIdHigh, bswap_64(trace_id_val[0]));
+  EXPECT_EQ(span->spanId, bswap_64(span_id_val));
+  EXPECT_EQ(span->parentSpanId, bswap_64(parent_span_id_val));
+#else
   EXPECT_EQ(span->traceIdLow, trace_id_val[0]);
   EXPECT_EQ(span->traceIdHigh, trace_id_val[1]);
   EXPECT_EQ(span->spanId, span_id_val);
   EXPECT_EQ(span->parentSpanId, parent_span_id_val);
+#endif
 }
 
 TEST(JaegerSpanRecordable, SetName)
 {
-  opentelemetry::exporter::jaeger::Recordable rec;
+  Recordable rec;
 
   nostd::string_view name = "Test Span";
   rec.SetName(name);
@@ -59,7 +67,7 @@ TEST(JaegerSpanRecordable, SetName)
 
 TEST(JaegerSpanRecordable, SetStartTime)
 {
-  opentelemetry::exporter::jaeger::Recordable rec;
+  Recordable rec;
 
   std::chrono::system_clock::time_point start_time = std::chrono::system_clock::now();
   opentelemetry::common::SystemTimestamp start_timestamp(start_time);
@@ -74,7 +82,7 @@ TEST(JaegerSpanRecordable, SetStartTime)
 
 TEST(JaegerSpanRecordable, SetDuration)
 {
-  opentelemetry::exporter::jaeger::Recordable rec;
+  Recordable rec;
 
   opentelemetry::common::SystemTimestamp start_timestamp;
 
@@ -92,7 +100,7 @@ TEST(JaegerSpanRecordable, SetDuration)
 
 TEST(JaegerSpanRecordable, SetStatus)
 {
-  opentelemetry::exporter::jaeger::Recordable rec;
+  Recordable rec;
 
   const char *error_description = "Error test";
   rec.SetStatus(trace::StatusCode::kError, error_description);
