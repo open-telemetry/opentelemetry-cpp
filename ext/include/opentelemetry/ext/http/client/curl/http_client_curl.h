@@ -264,7 +264,7 @@ public:
   {
     auto parsedUrl = common::UrlParser(std::string(url));
     if (!parsedUrl.success_) {
-      return std::make_shared<Session>(*this, "empty-host", 80);
+      return std::make_shared<Session>(*this, "", 80);
     }
     auto session    = std::make_shared<Session>(*this, parsedUrl.host_, parsedUrl.port_);
     auto session_id = ++next_session_id_;
