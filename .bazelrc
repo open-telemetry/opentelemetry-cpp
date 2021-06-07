@@ -19,3 +19,6 @@ common:tsan --copt -fsanitize=thread
 common:tsan --copt -DTHREAD_SANITIZER
 common:tsan --linkopt -fsanitize=thread
 common:tsan --cc_output_directory_tag=tsan
+# This is needed to address false positive problem with abseil.The same setting as gRPC
+# https://github.com/google/sanitizers/issues/953
+common:tsan --test_env=TSAN_OPTIONS=report_atomic_races=0
