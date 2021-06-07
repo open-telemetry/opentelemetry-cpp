@@ -16,11 +16,12 @@ add_custom_command(
     ${PROTOBUF_PROTOC_EXECUTABLE} ARGS "--grpc_out=${CMAKE_CURRENT_BINARY_DIR}"
     "--cpp_out=${CMAKE_CURRENT_BINARY_DIR}" "--proto_path=${proto_file_path}"
     --plugin=protoc-gen-grpc="${gRPC_CPP_PLUGIN_EXECUTABLE}" "${proto_file}")
-# DEPENDS "${proto_file}")
 
-# hw_grpc_proto
 add_library(example_grpc_proto ${example_grpc_srcs} ${example_grpc_hdrs}
                                ${example_proto_srcs} ${example_proto_hdrs})
+
+include(${PROJECT_SOURCE_DIR}/cmake/proto-options-patch.cmake)
+patch_protobuf_targets(example_grpc_proto)
 
 include_directories(
   ${CMAKE_SOURCE_DIR}/exporters/ostream/include ${CMAKE_SOURCE_DIR}/ext/include
@@ -45,4 +46,5 @@ foreach(_target client server)
     gRPC::grpc++_reflection
     opentelemetry_trace
     opentelemetry_exporter_ostream_span)
+  patch_protobuf_targets(${_target})
 endforeach()
