@@ -5,8 +5,8 @@
 
 #include "http_operation_curl.h"
 #include "opentelemetry/ext/http/client/http_client.h"
-#include "opentelemetry/version.h"
 #include "opentelemetry/ext/http/common/url_parser.h"
+#include "opentelemetry/version.h"
 
 #include <map>
 #include <string>
@@ -121,7 +121,7 @@ public:
   {
     if (host.rfind("http://", 0) != 0 && host.rfind("https://", 0) != 0)
     {
-      host_ = "http://" + host;  // TODO - https support
+      host_ = "http://" + host;
     }
     else
     {
@@ -263,7 +263,8 @@ public:
   std::shared_ptr<http_client::Session> CreateSession(nostd::string_view url) noexcept override
   {
     auto parsedUrl = common::UrlParser(std::string(url));
-    if (!parsedUrl.success_) {
+    if (!parsedUrl.success_)
+    {
       return std::make_shared<Session>(*this, "", 80);
     }
     auto session    = std::make_shared<Session>(*this, parsedUrl.host_, parsedUrl.port_);
