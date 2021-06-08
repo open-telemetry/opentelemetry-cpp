@@ -7,7 +7,7 @@
 #include "opentelemetry/nostd/variant.h"
 // clang-format on
 
-#if defined(HAVE_ABSEIL)
+#if !defined(HAVE_CPP_STDLIB) && !defined(OTABSL_USES_STD_VARIANT)
 /* The option of building and linking with Abseil library implies that Abseil
  * may already provide the ThrowBadVariantAccess implementation if its own.
  * Reconsider the implementation below: we are potentially introducing
@@ -28,9 +28,19 @@
 
 namespace absl
 {
+#  if defined(HAVE_ABSEIL)
+ABSL_NAMESPACE_BEGIN
+#  else
+OTABSL_NAMESPACE_BEGIN
+#  endif
 namespace variant_internal
 {
 void __cdecl ThrowBadVariantAccess(){/* TODO: std::terminate or re-throw? */};
 }
+#  if defined(HAVE_ABSEIL)
+ABSL_NAMESPACE_END
+#  else
+OTABSL_NAMESPACE_END
+#  endif
 }  // namespace absl
 #endif

@@ -50,7 +50,6 @@ option(WITH_STL "Whether to use Standard Library for C++latest features" OFF)
 option(WITH_ABSEIL "Whether to use Abseil for C++latest features" OFF)
 
 if(WITH_ABSEIL)
-  add_definitions(-DHAVE_ABSEIL)
   find_package(absl CONFIG REQUIRED)
 
   set(CORE_RUNTIME_LIBS absl::any absl::base absl::bits absl::city)
