@@ -16,7 +16,7 @@
 //
 // That is because `std::result_of` has been removed in C++20.
 
-#  include "opentelemetry/exporters/otlp/otlp_exporter.h"
+#  include "opentelemetry/exporters/otlp/otlp_grpc_exporter.h"
 
 #  include "opentelemetry/exporters/otlp/protobuf_include_prefix.h"
 
@@ -39,24 +39,25 @@ namespace exporter
 namespace otlp
 {
 
-class OtlpExporterTestPeer : public ::testing::Test
+class OtlpGrpcExporterTestPeer : public ::testing::Test
 {
 public:
   std::unique_ptr<sdk::trace::SpanExporter> GetExporter(
       std::unique_ptr<proto::collector::trace::v1::TraceService::StubInterface> &stub_interface)
   {
-    return std::unique_ptr<sdk::trace::SpanExporter>(new OtlpExporter(std::move(stub_interface)));
+    return std::unique_ptr<sdk::trace::SpanExporter>(
+        new OtlpGrpcExporter(std::move(stub_interface)));
   }
 
   // Get the options associated with the given exporter.
-  const OtlpExporterOptions &GetOptions(std::unique_ptr<OtlpExporter> &exporter)
+  const OtlpGrpcExporterOptions &GetOptions(std::unique_ptr<OtlpGrpcExporter> &exporter)
   {
     return exporter->options_;
   }
 };
 
 // Call Export() directly
-TEST_F(OtlpExporterTestPeer, ExportUnitTest)
+TEST_F(OtlpGrpcExporterTestPeer, ExportUnitTest)
 {
   auto mock_stub = new proto::collector::trace::v1::MockTraceServiceStub();
   std::unique_ptr<proto::collector::trace::v1::TraceService::StubInterface> stub_interface(
@@ -84,7 +85,7 @@ TEST_F(OtlpExporterTestPeer, ExportUnitTest)
 }
 
 // Create spans, let processor call Export()
-TEST_F(OtlpExporterTestPeer, ExportIntegrationTest)
+TEST_F(OtlpGrpcExporterTestPeer, ExportIntegrationTest)
 {
   auto mock_stub = new proto::collector::trace::v1::MockTraceServiceStub();
   std::unique_ptr<proto::collector::trace::v1::TraceService::StubInterface> stub_interface(
@@ -109,22 +110,22 @@ TEST_F(OtlpExporterTestPeer, ExportIntegrationTest)
 }
 
 // Test exporter configuration options
-TEST_F(OtlpExporterTestPeer, ConfigTest)
+TEST_F(OtlpGrpcExporterTestPeer, ConfigTest)
 {
-  OtlpExporterOptions opts;
+  OtlpGrpcExporterOptions opts;
   opts.endpoint = "localhost:45454";
-  std::unique_ptr<OtlpExporter> exporter(new OtlpExporter(opts));
+  std::unique_ptr<OtlpGrpcExporter> exporter(new OtlpGrpcExporter(opts));
   EXPECT_EQ(GetOptions(exporter).endpoint, "localhost:45454");
 }
 
 // Test exporter configuration options with use_ssl_credentials
-TEST_F(OtlpExporterTestPeer, ConfigSslCredentialsTest)
+TEST_F(OtlpGrpcExporterTestPeer, ConfigSslCredentialsTest)
 {
   std::string cacert_str = "--begin and end fake cert--";
-  OtlpExporterOptions opts;
+  OtlpGrpcExporterOptions opts;
   opts.use_ssl_credentials              = true;
   opts.ssl_credentials_cacert_as_string = cacert_str;
-  std::unique_ptr<OtlpExporter> exporter(new OtlpExporter(opts));
+  std::unique_ptr<OtlpGrpcExporter> exporter(new OtlpGrpcExporter(opts));
   EXPECT_EQ(GetOptions(exporter).ssl_credentials_cacert_as_string, cacert_str);
   EXPECT_EQ(GetOptions(exporter).use_ssl_credentials, true);
 }
