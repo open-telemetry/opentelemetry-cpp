@@ -14,6 +14,7 @@ Increment the:
 * PATCH version when you make backwards compatible bug fixes.
 
 ## [Unreleased]
+
 * [INSTRUMENTATION] HTTPClient: Add support for full URL argument ([#833](https://github.com/open-telemetry/opentelemetry-cpp/pull/833))
 
 ## [1.0.0-rc1] 2021-06-04
