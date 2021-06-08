@@ -62,9 +62,7 @@ if %ERRORLEVEL% == 1 (
 
 REM Install dependencies
 vcpkg install gtest:%ARCH%-windows
-REM vcpkg install --head --overlay-ports=%~dp0ports benchmark:%ARCH%-windows
-REM vcpkg install --overlay-ports=%~dp0ports benchmark:%ARCH%-windows
-vcpkg install benchmark:%ARCH%-windows
+vcpkg install --overlay-ports=%~dp0ports benchmark:%ARCH%-windows
 vcpkg install ms-gsl:%ARCH%-windows
 vcpkg install nlohmann-json:%ARCH%-windows
 vcpkg install abseil:%ARCH%-windows
