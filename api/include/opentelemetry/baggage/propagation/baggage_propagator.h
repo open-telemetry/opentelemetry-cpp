@@ -12,19 +12,17 @@ namespace propagation
 
 static const nostd::string_view kBaggageHeader = "baggage";
 
-inline nostd::shared_ptr<baggage::Baggage> GetBaggage(const context::Context &context)
+inline Baggage GetBaggage(const context::Context &context)
 {
   context::ContextValue context_value = context.GetValue(kBaggageHeader);
-  if (nostd::holds_alternative<nostd::shared_ptr<baggage::Baggage>>(context_value))
+  if (nostd::holds_alternative<baggage::Baggage>(context_value))
   {
-    return nostd::get<nostd::shared_ptr<baggage::Baggage>>(context_value);
+    return nostd::get<baggage::Baggage>(context_value);
   }
-  static nostd::shared_ptr<baggage::Baggage> empty_baggage{new baggage::Baggage()};
-  return empty_baggage;
+  return baggage::Baggage();
 }
 
-inline context::Context SetBaggage(context::Context &context,
-                                   nostd::shared_ptr<baggage::Baggage> baggage)
+inline context::Context SetBaggage(context::Context &context, baggage::Baggage baggage)
 {
   return context.SetValue(kBaggageHeader, baggage);
 }
@@ -36,7 +34,7 @@ public:
               const context::Context &context) noexcept override
   {
     auto baggage = GetBaggage(context);
-    carrier.Set(kBaggageHeader, baggage->ToHeader());
+    carrier.Set(kBaggageHeader, baggage.ToHeader());
   }
 
   context::Context Extract(const context::propagation::TextMapCarrier &carrier,
