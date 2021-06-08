@@ -1,5 +1,5 @@
 REM Build with Visual Studio 2017
-set "VS_TOOLS_VERSION=vs2019"
+set "BUILDTOOLS_VERSION=vs2019"
 set ARCH=Win64
 if NOT "%1"=="" (
   set ARCH=%1

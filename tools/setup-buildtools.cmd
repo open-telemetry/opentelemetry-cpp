@@ -1,8 +1,12 @@
 @echo off
 setlocal enableextensions
 setlocal enabledelayedexpansion
-set "PATH=%ProgramFiles%\CMake\bin;%~dp0;%~dp0vcpkg;%ProgramData%\chocolatey\bin;%PATH%"
-if "%VCPKG_ROOT%" NEQ "" set "PATH=%VCPKG_ROOT%;%PATH%"
+set "PATH=%ProgramFiles%\CMake\bin;%~dp0;%ProgramData%\chocolatey\bin;%PATH%"
+if "%VCPKG_ROOT%" NEQ "" (
+  set "PATH=%VCPKG_ROOT%;%PATH%"
+) else (
+  set "PATH=%~dp0vcpkg;%PATH%"
+)
 pushd %~dp0
 
 net session >nul 2>&1
@@ -22,11 +26,13 @@ if %errorLevel% == 0 (
   echo Running without Administrative privilege...
 )
 
-REM Print current Visual Studio installations detected
-where /Q vswhere
-if %ERRORLEVEL% == 0 (
-  echo Visual Studio installations detected:
-  vswhere -property installationPath
+if not defined BUILDTOOLS_VERSION (
+  REM Print current Visual Studio installations detected
+  where /Q vswhere
+  if %ERRORLEVEL% == 0 (
+    echo Visual Studio installations detected:
+    vswhere -property installationPath
+  )
 )
 
 REM This script allows to pass architecture in ARCH env var
@@ -56,7 +62,9 @@ if %ERRORLEVEL% == 1 (
 
 REM Install dependencies
 vcpkg install gtest:%ARCH%-windows
-vcpkg install --head --overlay-ports=%~dp0ports benchmark:%ARCH%-windows
+REM vcpkg install --head --overlay-ports=%~dp0ports benchmark:%ARCH%-windows
+REM vcpkg install --overlay-ports=%~dp0ports benchmark:%ARCH%-windows
+vcpkg install benchmark:%ARCH%-windows
 vcpkg install ms-gsl:%ARCH%-windows
 vcpkg install nlohmann-json:%ARCH%-windows
 vcpkg install abseil:%ARCH%-windows

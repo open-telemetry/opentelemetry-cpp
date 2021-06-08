@@ -87,19 +87,14 @@ REM The following two configurations are built below:
 REM - nostd            - build with OpenTelemetry C++ Template library
 REM - stl              - build with Standard Template Library
 REM ##########################################################################################
-REM Build with nostd implementation. Supported BUILDTOOLS_VERSION:
-REM - vs2015 (C++11)
-REM - vs2017 (C++14)
-REM - vs2019 (C++20)
+REM Build with nostd implementation.
 REM ##########################################################################################
 set CONFIG=-DWITH_STL:BOOL=OFF %*
 set "OUTDIR=%ROOT%\out\%BUILDTOOLS_VERSION%\nostd"
 call :build_config
 
 REM ##########################################################################################
-REM Build with STL implementation (only for vs2017+). Supported BUILDTOOLS_VERSION:
-REM - vs2017 (C++14)
-REM - vs2019 (C++20) - optimal config with all OpenTelemetry API classes using STL only.
+REM Build with STL implementation. This option does not yield benefits for vs2015 build.
 REM ##########################################################################################
 if "%BUILDTOOLS_VERSION%" neq "vs2015" (
   set CONFIG=-DWITH_STL:BOOL=ON %*
@@ -127,7 +122,6 @@ if "!BUILDTOOLS_VERSION!" == "vs2019" (
   REM Only latest vs2019 generator supports and requires -A parameter
   cmake -G "!CMAKE_GEN!" -A !ARCH! -DCMAKE_TOOLCHAIN_FILE="!VCPKG_CMAKE!" !CONFIG! "!ROOT!"
 ) else (
-  REM Old vs2017 generator does not support -A parameter
   cmake -G "!CMAKE_GEN!" -DCMAKE_TOOLCHAIN_FILE="!VCPKG_CMAKE!" !CONFIG! "!ROOT!"
 )
 set "SOLUTION=%OUTDIR%\opentelemetry-cpp.sln"

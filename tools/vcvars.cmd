@@ -100,10 +100,10 @@ if exist %TOOLS_VS2017% (
 )
 
 :vs2015
-set TOOLS_VS2015="%ProgramFiles(x86)%\Microsoft Visual Studio 14.0\VC\bin\vcvarsall.bat"
+set TOOLS_VS2015="%ProgramFiles(x86)%\Microsoft Visual Studio 14.0\VC\vcvarsall.bat"
 if exist %TOOLS_VS2015% (
   echo Building with vs2015 BuildTools...
-  call %TOOLS_VS2015% %ARCH%
+  call %TOOLS_VS2015% %ARCH% %WINSDK_VERSION%
   set "VCPKG_VISUAL_STUDIO_PATH=%ProgramFiles(x86)%\Microsoft Visual Studio 14.0"
   set VCPKG_PLATFORM_TOOLSET=v140
   goto tools_configured
