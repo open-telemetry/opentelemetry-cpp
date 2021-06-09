@@ -208,7 +208,7 @@ TEST_F(BasicCurlHttpTests, SendPostRequest)
   auto session_manager = http_client::HttpClientFactory::Create();
   EXPECT_TRUE(session_manager != nullptr);
 
-  auto session = session_manager->CreateSession("127.0.0.1", HTTP_PORT);
+  auto session = session_manager->CreateSession("http://127.0.0.1:19000");
   auto request = session->CreateRequest();
   request->SetUri("post/");
   request->SetMethod(http_client::Method::Post);
@@ -235,8 +235,7 @@ TEST_F(BasicCurlHttpTests, RequestTimeout)
   auto session_manager = http_client::HttpClientFactory::Create();
   EXPECT_TRUE(session_manager != nullptr);
 
-  auto session =
-      session_manager->CreateSession("222.222.222.200", HTTP_PORT);  // Non Existing address
+  auto session = session_manager->CreateSession("222.222.222.200:19000");  // Non Existing address
   auto request = session->CreateRequest();
   request->SetUri("get/");
   GetEventHandler *handler = new GetEventHandler();
@@ -309,14 +308,14 @@ TEST_F(BasicCurlHttpTests, GetBaseUri)
 {
   curl::HttpClient session_manager;
 
-  auto session = session_manager.CreateSession("127.0.0.1", 80);
+  auto session = session_manager.CreateSession("127.0.0.1:80");
   ASSERT_EQ(std::static_pointer_cast<curl::Session>(session)->GetBaseUri(), "http://127.0.0.1:80/");
 
-  session = session_manager.CreateSession("https://127.0.0.1", 443);
+  session = session_manager.CreateSession("https://127.0.0.1:443");
   ASSERT_EQ(std::static_pointer_cast<curl::Session>(session)->GetBaseUri(),
             "https://127.0.0.1:443/");
 
-  session = session_manager.CreateSession("http://127.0.0.1", 31339);
+  session = session_manager.CreateSession("http://127.0.0.1:31339");
   ASSERT_EQ(std::static_pointer_cast<curl::Session>(session)->GetBaseUri(),
             "http://127.0.0.1:31339/");
 }
