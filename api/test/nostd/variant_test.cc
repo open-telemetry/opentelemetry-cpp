@@ -27,7 +27,7 @@ TEST(VariantSizeTest, GetVariantSize)
   EXPECT_EQ((nostd::variant_size<nostd::variant<int, double>>::value), 2);
 }
 
-#if 0
+#if 0  // Disable this test for now. It does not compile with Visual Studio 2015.
 TEST(VariantAlternativeTest, GetVariantSize)
 {
   EXPECT_TRUE((std::is_same<nostd::variant_alternative_t<0, nostd::variant<int>>, int>::value));
