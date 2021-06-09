@@ -67,7 +67,7 @@ if(WITH_STL)
   add_definitions(-DHAVE_CPP_STDLIB)
   add_definitions(-DHAVE_GSL)
   # Require at least C++17. C++20 is needed to avoid gsl::span
-  if(CMAKE_MINOR_VERSION VERSION_GREATER "3.18")
+  if(CMAKE_VERSION VERSION_GREATER 3.18.0)
     # Ask for 20, may get anything below
     set(CMAKE_CXX_STANDARD 20)
   else()
@@ -92,8 +92,7 @@ if(WITH_STL)
         set(MSVC_CXX_OPT_FLAG "/O2")
       endif()
     endif()
-    set(CMAKE_CXX_FLAGS
-        "${CMAKE_CXX_FLAGS} /Zc:__cplusplus ${MSVC_CXX_OPT_FLAG}")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${MSVC_CXX_OPT_FLAG}")
   endif()
 endif()
 
@@ -168,8 +167,10 @@ if(MSVC)
   # Options for Visual C++ compiler: /Zc:__cplusplus - report an updated value
   # for recent C++ language standards. Without this option MSVC returns the
   # value of __cplusplus="199711L"
-  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /Zc:__cplusplus")
-
+  if(MSVC_VERSION GREATER 1900)
+    # __cplusplus flag is not supported by Visual Studio 2015
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /Zc:__cplusplus")
+  endif()
   # When using vcpkg, all targets build with the same runtime
   if(VCPKG_TOOLCHAIN)
     set(CMAKE_MSVC_RUNTIME_LIBRARY

@@ -1,11 +1,13 @@
+// Make sure to include GRPC headers first because otherwise Abseil may create
+// ambiguity with `nostd::variant` if compiled with Visual Studio 2015. Other
+// modern compilers are unaffected.
+#include <grpcpp/grpcpp.h>
+#include "messages.grpc.pb.h"
+
 #include "tracer_common.h"
 #include <iostream>
 #include <memory>
 #include <string>
-
-#include <grpcpp/grpcpp.h>
-
-#include "messages.grpc.pb.h"
 
 using grpc::Channel;
 using grpc::ClientContext;
