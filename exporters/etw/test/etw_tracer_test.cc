@@ -12,9 +12,7 @@
 
 using namespace OPENTELEMETRY_NAMESPACE;
 
-using Properties       = opentelemetry::exporter::etw::Properties;
-using PropertyValue    = opentelemetry::exporter::etw::PropertyValue;
-using PropertyValueMap = opentelemetry::exporter::etw::PropertyValueMap;
+using namespace opentelemetry::exporter::etw;
 
 std::string getTemporaryValue()
 {

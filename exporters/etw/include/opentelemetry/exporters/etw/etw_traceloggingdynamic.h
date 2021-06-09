@@ -8,7 +8,8 @@
 #    endif
 #  endif
 #else
-#  ifdef HAVE_TLD
-#    include "TraceLoggingDynamic.h"
+#  ifndef HAVE_TLD
+#    define HAVE_TLD
 #  endif
+#  include "TraceLoggingDynamic.h"
 #endif
