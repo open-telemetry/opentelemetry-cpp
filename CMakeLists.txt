@@ -50,10 +50,10 @@ option(WITH_STL "Whether to use Standard Library for C++latest features" OFF)
 option(WITH_ABSEIL "Whether to use Abseil for C++latest features" OFF)
 
 if(WITH_ABSEIL)
-  add_definitions(-DHAVE_ABSEIL)
   find_package(absl CONFIG REQUIRED)
 
-  set(CORE_RUNTIME_LIBS absl::any absl::base absl::bits absl::city)
+  set(CORE_RUNTIME_LIBS absl::bad_variant_access absl::any absl::base
+                        absl::bits absl::city)
 
   # target_link_libraries(main PRIVATE absl::any absl::base absl::bits
   # absl::city)
