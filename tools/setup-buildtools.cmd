@@ -63,10 +63,10 @@ if %ERRORLEVEL% == 1 (
 REM Install dependencies
 vcpkg install gtest:%ARCH%-windows
 vcpkg install --overlay-ports=%~dp0ports benchmark:%ARCH%-windows
+vcpkg install --overlay-ports=%~dp0ports protobuf:%ARCH%-windows
 vcpkg install ms-gsl:%ARCH%-windows
 vcpkg install nlohmann-json:%ARCH%-windows
 vcpkg install abseil:%ARCH%-windows
-vcpkg install protobuf:%ARCH%-windows
 vcpkg install gRPC:%ARCH%-windows
 vcpkg install prometheus-cpp:%ARCH%-windows
 vcpkg install curl:%ARCH%-windows
