@@ -37,6 +37,10 @@ of the current project.
 In general, the code shipped from this repository should build on all platforms
 having C++ compiler with [supported C++ standards](#supported-c-versions).
 
+## Dependencies
+
+Please refer to [Dependencies.md](docs/dependencies.md) for OSS Dependencies and license requirements.
+
 ## Installation
 
 Please refer to [INSTALL.md](./INSTALL.md).
