@@ -3,7 +3,7 @@
 There are
 
 - External dependencies as linkable libraries or externally installed headers, and
-- Internal depedencies as the part of code from external libraries backported/copied in main repo.
+- Internal dependencies as the part of code from external libraries backported/copied in main repo.
 
 Both these dependencies are listed here:
 
