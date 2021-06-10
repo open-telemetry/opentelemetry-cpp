@@ -14,6 +14,7 @@ namespace nostd    = opentelemetry::nostd;
 namespace sdktrace = opentelemetry::sdk::trace;
 
 using namespace jaegertracing;
+using namespace opentelemetry::exporter::jaeger;
 
 TEST(JaegerSpanRecordable, SetIdentity)
 {
@@ -39,10 +40,17 @@ TEST(JaegerSpanRecordable, SetIdentity)
 
   std::unique_ptr<thrift::Span> span{rec.Span()};
 
+#if JAEGER_IS_LITTLE_ENDIAN == 1
+  EXPECT_EQ(span->traceIdLow, opentelemetry::exporter::jaeger::bswap_64(trace_id_val[1]));
+  EXPECT_EQ(span->traceIdHigh, opentelemetry::exporter::jaeger::bswap_64(trace_id_val[0]));
+  EXPECT_EQ(span->spanId, opentelemetry::exporter::jaeger::bswap_64(span_id_val));
+  EXPECT_EQ(span->parentSpanId, opentelemetry::exporter::jaeger::bswap_64(parent_span_id_val));
+#else
   EXPECT_EQ(span->traceIdLow, trace_id_val[0]);
   EXPECT_EQ(span->traceIdHigh, trace_id_val[1]);
   EXPECT_EQ(span->spanId, span_id_val);
   EXPECT_EQ(span->parentSpanId, parent_span_id_val);
+#endif
 }
 
 TEST(JaegerSpanRecordable, SetName)
