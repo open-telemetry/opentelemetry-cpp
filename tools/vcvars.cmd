@@ -1,7 +1,7 @@
 @echo off
 REM +-------------------------------------------------------------------+
-REM | Autodetect and set up the build environment for Visual Studio.    |
-REM | Visual Studio version may be specified as 1st argument.           |
+REM | Autodetect and set up the build environment.                      |
+REM | Build Tools version may be specified as 1st argument.             |
 REM +-------------------------------------------------------------------+
 REM | Description                             | Argument value          |
 REM +-----------------------------------------+-------------------------+
@@ -18,6 +18,12 @@ REM | Visual Studio 2017 Community            | vs2017_community        |
 REM | Visual Studio 2017 Build Tools (no IDE) | vs2017_buildtools       |
 REM |                                         |                         |
 REM | Visual Studio 2015 Build Tools (no IDE) | vs2015                  |
+REM |                                         |                         |
+REM | LLVM Clang (any version)                | clang                   |
+REM | LLVM Clang 9                            | clang-9                 |
+REM | LLVM Clang 10                           | clang-10                |
+REM | LLVM Clang 11                           | clang-11                |
+REM | LLVM Clang 11                           | clang-12                |
 REM +-----------------------------------------+-------------------------+
 set "VSCMD_START_DIR=%CD%"
 
@@ -115,15 +121,35 @@ REM is not set up by checking TOOLS_VS_NOTFOUND
 set TOOLS_VS_NOTFOUND=1
 exit /b 0
 
-REM Auto-detection bypass logic for LLVM-Clang. There is no auto-detection
-REM because by default LLVM Clang of any version is installed in the same
-REM directory at %ProgramFiles%\LLVM\bin.
+REM +-------------------------------------------------------------------+
+REM | There is no auto-detection of LLVM Clang version.                 |
+REM | LLVM Clang of any version is installed in the same directory      |
+REM | at %ProgramFiles%\LLVM\bin . Developers choose their own custom   |
+REM | layout for installing multiple clang toolchains side-by-side.     |
+REM |                                                                   |
+REM | Example layout (merely a guideline, layout could differ):         |
+REM |                                                                   |
+REM | %ProgramFiles%\LLVM-9\bin                                         |
+REM | %ProgramFiles%\LLVM-10\bin                                        |
+REM | %ProgramFiles%\LLVM-11\bin                                        |
+REM | %ProgramFiles%\LLVM-12\bin                                        |
+REM +-------------------------------------------------------------------+
 REM
-REM Path to LLVM bin must be configured manually:
-REM
+REM ## Example 1: use clang-10 located in LLVM-10 directory:
 REM set BUILDTOOLS_VERSION=clang-10
+REM set "PATH=%ProgramFiles%\LLVM-10\bin;%PATH%"
+REM tools\build.cmd
+REM
+REM ## Example 2: use whatever clang located in LLVM directory:
+REM set BUILDTOOLS_VERSION=clang
 REM set "PATH=%ProgramFiles%\LLVM\bin;%PATH%"
-REM 
+REM tools\build.cmd
+REM
+REM BUILDTOOLS_VERSION determines the output directory location.
+REM Store build artifacts produced by different toolchains -
+REM side-by-side, each in its own separate output directory.
+REM
+:clang
 :clang-9
 :clang-10
 :clang-11

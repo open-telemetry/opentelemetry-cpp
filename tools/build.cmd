@@ -118,12 +118,30 @@ if "!CMAKE_GEN!" == "Ninja" (
   exit /b
 )
 
-if "!BUILDTOOLS_VERSION!" == "vs2019" (
-  REM Only latest vs2019 generator supports and requires -A parameter
+if "!BUILDTOOLS_VERSION!" == "vs2015" (
   cmake -G "!CMAKE_GEN!" -A !ARCH! -DCMAKE_TOOLCHAIN_FILE="!VCPKG_CMAKE!" !CONFIG! "!ROOT!"
-) else (
-  cmake -G "!CMAKE_GEN!" -DCMAKE_TOOLCHAIN_FILE="!VCPKG_CMAKE!" !CONFIG! "!ROOT!"
+  call :build_msbuild
+  exit /b
 )
+
+if "!BUILDTOOLS_VERSION!" == "vs2017" (
+  cmake -G "!CMAKE_GEN!" -A !ARCH! -DCMAKE_TOOLCHAIN_FILE="!VCPKG_CMAKE!" !CONFIG! "!ROOT!"
+  call :build_msbuild
+  exit /b
+)
+
+if "!BUILDTOOLS_VERSION!" == "vs2019" (
+  cmake -G "!CMAKE_GEN!" -A !ARCH! -DCMAKE_TOOLCHAIN_FILE="!VCPKG_CMAKE!" !CONFIG! "!ROOT!"
+  call :build_msbuild
+  exit /b
+)
+
+REM ##########################################################################################
+REM Exotic CMake generators, like MSYS and MinGW MAY work, but untested
+REM ##########################################################################################
+cmake -G "!CMAKE_GEN!" -DCMAKE_TOOLCHAIN_FILE="!VCPKG_CMAKE!" !CONFIG! "!ROOT!"
+
+:build_msbuild
 set "SOLUTION=%OUTDIR%\opentelemetry-cpp.sln"
 msbuild "%SOLUTION%" /p:Configuration=Release /p:VcpkgEnabled=true
 exit /b
