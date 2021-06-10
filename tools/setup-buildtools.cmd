@@ -2,7 +2,7 @@
 setlocal enableextensions
 setlocal enabledelayedexpansion
 set "PATH=%ProgramFiles%\CMake\bin;%~dp0;%ProgramData%\chocolatey\bin;%PATH%"
-if "%VCPKG_ROOT%" NEQ "" (
+if defined VCPKG_ROOT (
   set "PATH=%VCPKG_ROOT%;%PATH%"
 ) else (
   set "PATH=%~dp0vcpkg;%PATH%"
