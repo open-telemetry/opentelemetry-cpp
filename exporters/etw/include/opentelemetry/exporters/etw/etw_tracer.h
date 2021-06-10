@@ -291,8 +291,12 @@ static inline bool CopySpanIdToActivityId(const trace::SpanContext &spanContext,
   {
     return false;
   }
-  auto spanId = spanContext.span_id().Id().data();
-  std::copy(spanId, spanId + 8, reinterpret_cast<uint8_t *>(&outGuid));
+  auto spanId      = spanContext.span_id().Id().data();
+  uint8_t *guidPtr = reinterpret_cast<uint8_t *>(&outGuid);
+  for (size_t i = 0; i < 8; i++)
+  {
+    guidPtr[i] = spanId[i];
+  }
   return true;
 };
 

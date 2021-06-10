@@ -41,6 +41,10 @@ if(BUILD_TESTING)
   add_subdirectory(test)
 endif()
 
+if(WITH_ABSEIL)
+  target_compile_definitions(opentelemetry_api INTERFACE HAVE_ABSEIL)
+endif()
+
 if(WITH_STL)
   message("Building with standard library types...")
   target_compile_definitions(opentelemetry_api INTERFACE HAVE_CPP_STDLIB
