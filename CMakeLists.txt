@@ -9,6 +9,21 @@ project(opentelemetry-cpp)
 # Mark variables as used so cmake doesn't complain about them
 mark_as_advanced(CMAKE_TOOLCHAIN_FILE)
 
+if(DEFINED ENV{ARCH})
+  # Architecture specified manually via env var, e.g. ARM64
+  set(ARCH $ENV{ARCH})
+else()
+  # Architecture detection logic for Intel chipsets only. For other
+  # architectures - please specify manually.
+  if(CMAKE_SIZEOF_VOID_P EQUAL 8)
+    # 64 bits
+    set(ARCH x64)
+  elseif(CMAKE_SIZEOF_VOID_P EQUAL 4)
+    # 32 bits
+    set(ARCH x86)
+  endif()
+endif()
+
 # Autodetect vcpkg toolchain
 if(DEFINED ENV{VCPKG_ROOT} AND NOT DEFINED CMAKE_TOOLCHAIN_FILE)
   set(CMAKE_TOOLCHAIN_FILE
@@ -112,7 +127,9 @@ if(WIN32)
   add_definitions(-DNOMINMAX)
   if(BUILD_TESTING)
     if(MSVC)
-      # GTest bug: https://github.com/google/googletest/issues/860
+      # Uncomment for strict Level4 warnings if building for test:
+      # set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /W4") GTest bug:
+      # https://github.com/google/googletest/issues/860
       add_compile_options(/wd4275)
     endif()
   endif()
@@ -144,8 +161,12 @@ find_package(Threads)
 
 function(install_windows_deps)
   # Bootstrap vcpkg from CMake and auto-install deps in case if we are missing
-  # deps on Windows
+  # deps on Windows. Respect the target architecture variable.
+  set(VCPKG_TARGET_ARCHITECTURE
+      ${ARCH}
+      PARENT_SCOPE)
   message("Installing build tools and dependencies...")
+  set(ENV{ARCH} ${ARCH})
   execute_process(
     COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/tools/setup-buildtools.cmd)
   set(CMAKE_TOOLCHAIN_FILE
