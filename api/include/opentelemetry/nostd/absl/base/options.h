@@ -1,5 +1,5 @@
-#ifndef ABSL_BASE_OPTIONS_H_
-#define ABSL_BASE_OPTIONS_H_
+#ifndef OTABSL_BASE_OPTIONS_H_
+#define OTABSL_BASE_OPTIONS_H_
 
 // Copyright 2019 The Abseil Authors.
 //
@@ -77,7 +77,7 @@
 // Type Compatibility Options
 // -----------------------------------------------------------------------------
 //
-// ABSL_OPTION_USE_STD_ANY
+// OTABSL_OPTION_USE_STD_ANY
 //
 // This option controls whether absl::any is implemented as an alias to
 // std::any, or as an independent implementation.
@@ -98,12 +98,12 @@
 // For more info, see https://abseil.io/about/design/dropin-types.
 //
 // User code should not inspect this macro.  To check in the preprocessor if
-// absl::any is a typedef of std::any, use the feature macro ABSL_USES_STD_ANY.
+// absl::any is a typedef of std::any, use the feature macro OTABSL_USES_STD_ANY.
 
-#define ABSL_OPTION_USE_STD_ANY 0
+#define OTABSL_OPTION_USE_STD_ANY 0
 
 
-// ABSL_OPTION_USE_STD_OPTIONAL
+// OTABSL_OPTION_USE_STD_OPTIONAL
 //
 // This option controls whether absl::optional is implemented as an alias to
 // std::optional, or as an independent implementation.
@@ -125,12 +125,12 @@
 
 // User code should not inspect this macro.  To check in the preprocessor if
 // absl::optional is a typedef of std::optional, use the feature macro
-// ABSL_USES_STD_OPTIONAL.
+// OTABSL_USES_STD_OPTIONAL.
 
-#define ABSL_OPTION_USE_STD_OPTIONAL 0
+#define OTABSL_OPTION_USE_STD_OPTIONAL 0
 
 
-// ABSL_OPTION_USE_STD_STRING_VIEW
+// OTABSL_OPTION_USE_STD_STRING_VIEW
 //
 // This option controls whether absl::string_view is implemented as an alias to
 // std::string_view, or as an independent implementation.
@@ -152,11 +152,11 @@
 //
 // User code should not inspect this macro.  To check in the preprocessor if
 // absl::string_view is a typedef of std::string_view, use the feature macro
-// ABSL_USES_STD_STRING_VIEW.
+// OTABSL_USES_STD_STRING_VIEW.
 
-#define ABSL_OPTION_USE_STD_STRING_VIEW 0
+#define OTABSL_OPTION_USE_STD_STRING_VIEW 0
 
-// ABSL_OPTION_USE_STD_VARIANT
+// OTABSL_OPTION_USE_STD_VARIANT
 //
 // This option controls whether absl::variant is implemented as an alias to
 // std::variant, or as an independent implementation.
@@ -178,13 +178,13 @@
 //
 // User code should not inspect this macro.  To check in the preprocessor if
 // absl::variant is a typedef of std::variant, use the feature macro
-// ABSL_USES_STD_VARIANT.
+// OTABSL_USES_STD_VARIANT.
 
-#define ABSL_OPTION_USE_STD_VARIANT 0
+#define OTABSL_OPTION_USE_STD_VARIANT 0
 
 
-// ABSL_OPTION_USE_INLINE_NAMESPACE
-// ABSL_OPTION_INLINE_NAMESPACE_NAME
+// OTABSL_OPTION_USE_INLINE_NAMESPACE
+// OTABSL_OPTION_INLINE_NAMESPACE_NAME
 //
 // These options controls whether all entities in the absl namespace are
 // contained within an inner inline namespace.  This does not affect the
@@ -201,11 +201,11 @@
 // A value of 0 means not to use inline namespaces.
 //
 // A value of 1 means to use an inline namespace with the given name inside
-// namespace absl.  If this is set, ABSL_OPTION_INLINE_NAMESPACE_NAME must also
+// namespace absl.  If this is set, OTABSL_OPTION_INLINE_NAMESPACE_NAME must also
 // be changed to a new, unique identifier name.  In particular "head" is not
 // allowed.
 
-#define ABSL_OPTION_USE_INLINE_NAMESPACE 0
-#define ABSL_OPTION_INLINE_NAMESPACE_NAME head
+#define OTABSL_OPTION_USE_INLINE_NAMESPACE 1
+#define OTABSL_OPTION_INLINE_NAMESPACE_NAME otel_v1
 
-#endif  // ABSL_BASE_OPTIONS_H_
+#endif  // OTABSL_BASE_OPTIONS_H_

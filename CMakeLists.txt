@@ -50,20 +50,24 @@ option(WITH_STL "Whether to use Standard Library for C++latest features" OFF)
 option(WITH_ABSEIL "Whether to use Abseil for C++latest features" OFF)
 
 if(WITH_ABSEIL)
-  add_definitions(-DHAVE_ABSEIL)
   find_package(absl CONFIG REQUIRED)
 
-  # Abseil headers-only lib is needed for absl::variant to work vs2015.
-  # `nostd::mpark::variant` is not compiling in vs2015.
-  set(CORE_RUNTIME_LIBS absl::any absl::base absl::bits absl::city)
+  set(CORE_RUNTIME_LIBS absl::bad_variant_access absl::any absl::base
+                        absl::bits absl::city)
 
   # target_link_libraries(main PRIVATE absl::any absl::base absl::bits
   # absl::city)
 endif()
 
 if(WITH_STL)
+  # These definitions are needed for test projects that do not link against
+  # opentelemetry-api library directly. We ensure that variant implementation
+  # (absl::variant or std::variant) in variant unit test code is consistent with
+  # the global project build definitions.
+  add_definitions(-DHAVE_CPP_STDLIB)
+  add_definitions(-DHAVE_GSL)
   # Require at least C++17. C++20 is needed to avoid gsl::span
-  if(CMAKE_MINOR_VERSION VERSION_GREATER "3.18")
+  if(CMAKE_VERSION VERSION_GREATER 3.18.0)
     # Ask for 20, may get anything below
     set(CMAKE_CXX_STANDARD 20)
   else()
@@ -88,8 +92,7 @@ if(WITH_STL)
         set(MSVC_CXX_OPT_FLAG "/O2")
       endif()
     endif()
-    set(CMAKE_CXX_FLAGS
-        "${CMAKE_CXX_FLAGS} /Zc:__cplusplus ${MSVC_CXX_OPT_FLAG}")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${MSVC_CXX_OPT_FLAG}")
   endif()
 endif()
 
@@ -164,8 +167,10 @@ if(MSVC)
   # Options for Visual C++ compiler: /Zc:__cplusplus - report an updated value
   # for recent C++ language standards. Without this option MSVC returns the
   # value of __cplusplus="199711L"
-  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /Zc:__cplusplus")
-
+  if(MSVC_VERSION GREATER 1900)
+    # __cplusplus flag is not supported by Visual Studio 2015
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /Zc:__cplusplus")
+  endif()
   # When using vcpkg, all targets build with the same runtime
   if(VCPKG_TOOLCHAIN)
     set(CMAKE_MSVC_RUNTIME_LIBRARY
@@ -199,7 +204,7 @@ if(WITH_OTLP)
       find_package(Protobuf REQUIRED)
     endif()
     if(NOT gRPC_FOUND)
-      find_package(gRPC REQUIRED)
+      find_package(gRPC)
     endif()
     if(WIN32)
       # Always use x64 protoc.exe
@@ -217,6 +222,15 @@ if(WITH_OTLP)
   message("PROTOBUF_PROTOC_EXECUTABLE=${PROTOBUF_PROTOC_EXECUTABLE}")
 
   include(cmake/opentelemetry-proto.cmake)
+  include(CMakeDependentOption)
+  find_package(CURL)
+  find_package(nlohmann_json)
+  cmake_dependent_option(
+    WITH_OTLP_GRPC "Whether to include the OTLP gRPC exporter in the SDK" ON
+    "gRPC_FOUND" OFF)
+  cmake_dependent_option(
+    WITH_OTLP_HTTP "Whether to include the OTLP http exporter in the SDK" ON
+    "CURL_FOUND;nlohmann_json_FOUND" OFF)
 endif()
 
 list(APPEND CMAKE_PREFIX_PATH "${CMAKE_BINARY_DIR}")
@@ -264,11 +278,11 @@ if(NOT WITH_API_ONLY)
   include_directories(ext/include)
 
   add_subdirectory(sdk)
+  add_subdirectory(ext)
   add_subdirectory(exporters)
   if(WITH_EXAMPLES)
     add_subdirectory(examples)
   endif()
-  add_subdirectory(ext)
 endif()
 
 # Add nlohmann/json submodule to include directories

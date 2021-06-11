@@ -21,7 +21,7 @@ copyright = '2021, OpenTelemetry authors'
 author = 'OpenTelemetry authors'
 
 # The full version, including alpha/beta/rc tags
-release = '0.7.0'
+release = '1.0.0-rc1'
 
 # Run sphinx on subprojects and copy output
 # -----------------------------------------

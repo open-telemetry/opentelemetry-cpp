@@ -25,6 +25,10 @@ void Recordable::PopulateAttribute(nostd::string_view key, const common::Attribu
   {
     AddTag(std::string{key}, nostd::get<double>(value));
   }
+  else if (nostd::holds_alternative<const char *>(value))
+  {
+    AddTag(std::string{key}, std::string{nostd::get<const char *>(value)});
+  }
   else if (nostd::holds_alternative<nostd::string_view>(value))
   {
     AddTag(std::string{key}, std::string{nostd::get<nostd::string_view>(value)});
@@ -35,12 +39,25 @@ void Recordable::PopulateAttribute(nostd::string_view key, const common::Attribu
 void Recordable::SetIdentity(const trace::SpanContext &span_context,
                              trace::SpanId parent_span_id) noexcept
 {
+  // IDs should be converted to big endian before transmission.
+  // https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/trace/sdk_exporters/jaeger.md#ids
+#if JAEGER_IS_LITTLE_ENDIAN == 1
+  span_->__set_traceIdHigh(
+      bswap_64(*(reinterpret_cast<const int64_t *>(span_context.trace_id().Id().data()))));
+  span_->__set_traceIdLow(
+      bswap_64(*(reinterpret_cast<const int64_t *>(span_context.trace_id().Id().data()) + 1)));
+  span_->__set_spanId(
+      bswap_64(*(reinterpret_cast<const int64_t *>(span_context.span_id().Id().data()))));
+  span_->__set_parentSpanId(
+      bswap_64(*(reinterpret_cast<const int64_t *>(parent_span_id.Id().data()))));
+#else
   span_->__set_traceIdLow(
       *(reinterpret_cast<const int64_t *>(span_context.trace_id().Id().data())));
   span_->__set_traceIdHigh(
       *(reinterpret_cast<const int64_t *>(span_context.trace_id().Id().data()) + 1));
   span_->__set_spanId(*(reinterpret_cast<const int64_t *>(span_context.span_id().Id().data())));
   span_->__set_parentSpanId(*(reinterpret_cast<const int64_t *>(parent_span_id.Id().data())));
+#endif
 
   // TODO: set trace_state.
 }
