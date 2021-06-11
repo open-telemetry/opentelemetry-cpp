@@ -28,7 +28,8 @@ else()
     elseif(CMAKE_SIZEOF_VOID_P EQUAL 4)
       set(ARCH x86)
     endif()
-  elseif(CMAKE_SYSTEM_PROCESSOR MATCHES "^(aarch64.*|AARCH64.*|arm64.*|ARM64.*)")
+  elseif(CMAKE_SYSTEM_PROCESSOR MATCHES
+         "^(aarch64.*|AARCH64.*|arm64.*|ARM64.*)")
     set(ARCH arm64)
   elseif(CMAKE_SYSTEM_PROCESSOR MATCHES "^(arm.*|ARM.*)")
     set(ARCH arm)
@@ -41,7 +42,9 @@ else()
   elseif(CMAKE_SYSTEM_PROCESSOR MATCHES "^(riscv.*|RISCV.*)")
     set(ARCH riscv)
   else()
-    message(FATAL_ERROR "opentelemetry-cpp: unrecognized target processor configuration!")
+    message(
+      FATAL_ERROR
+        "opentelemetry-cpp: unrecognized target processor configuration!")
   endif()
 endif()
 message(STATUS "Building for architecture ARCH=${ARCH}")
@@ -149,9 +152,7 @@ if(WIN32)
   add_definitions(-DNOMINMAX)
   if(BUILD_TESTING)
     if(MSVC)
-      # Uncomment for strict Level4 warnings if building for test:
-      # set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /W4") GTest bug:
-      # https://github.com/google/googletest/issues/860
+      # GTest bug: https://github.com/google/googletest/issues/860
       add_compile_options(/wd4275)
     endif()
   endif()
