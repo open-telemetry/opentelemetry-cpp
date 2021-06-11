@@ -12,7 +12,6 @@ foreach(
   add_executable(${testname} "${testname}.cc")
   target_link_libraries(
     ${testname}
-    ${CORE_RUNTIME_LIBS}
     ${GTEST_BOTH_LIBRARIES}
     ${CMAKE_THREAD_LIBS_INIT}
     opentelemetry_common
@@ -27,10 +26,5 @@ endforeach()
 
 add_executable(sampler_benchmark sampler_benchmark.cc)
 target_link_libraries(
-  sampler_benchmark
-  benchmark::benchmark
-  ${CMAKE_THREAD_LIBS_INIT}
-  ${CORE_RUNTIME_LIBS}
-  opentelemetry_trace
-  opentelemetry_resources
-  opentelemetry_exporter_in_memory)
+  sampler_benchmark benchmark::benchmark ${CMAKE_THREAD_LIBS_INIT}
+  opentelemetry_trace opentelemetry_resources opentelemetry_exporter_in_memory)
