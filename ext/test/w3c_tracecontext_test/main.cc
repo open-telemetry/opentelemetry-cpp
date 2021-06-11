@@ -105,7 +105,7 @@ void send_request(opentelemetry::ext::http::client::curl::HttpClient &client,
 
   Uri uri{url};
 
-  auto session = client.CreateSession(uri.host, uri.port);
+  auto session = client.CreateSession(uri.host + uri.port);
   auto request = session->CreateRequest();
 
   request->SetMethod(opentelemetry::ext::http::client::Method::Post);
