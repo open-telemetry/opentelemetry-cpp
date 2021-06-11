@@ -45,7 +45,7 @@ Async Request:
   };
 
   HttpClient httpClient; // implementer can provide singleton implementation for it
-  auto session = httpClient.createSession("localhost", 8000);
+  auto session = httpClient.createSession("localhost" + 8000);
   auto request = session->CreateRequest();
   request->AddHeader(..);
   SimpleResponseHandler res_handler;
