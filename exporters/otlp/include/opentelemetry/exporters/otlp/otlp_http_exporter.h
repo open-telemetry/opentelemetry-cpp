@@ -6,6 +6,9 @@
 // We need include exporter.h first, which will include Windows.h with NOMINMAX on Windows
 #include "opentelemetry/sdk/trace/exporter.h"
 
+#include "opentelemetry/ext/http/client/http_client.h"
+
+#include <chrono>
 #include <memory>
 #include <mutex>
 #include <string>
@@ -65,6 +68,7 @@ struct OtlpHttpExporterOptions
 
   // TODO: Enable/disable to verify SSL certificate
   // TODO: Reuqest timeout
+  std::chrono::milliseconds timeout = std::chrono::milliseconds(30000);
 };
 
 /**
@@ -113,6 +117,11 @@ private:
 
   // The configuration options associated with this exporter.
   const OtlpHttpExporterOptions options_;
+
+  // Object that stores the HTTP sessions that have been created
+  std::shared_ptr<ext::http::client::HttpClient> http_client_;
+  // Cached parsed URI
+  std::string http_uri_;
 };
 }  // namespace otlp
 }  // namespace exporter
