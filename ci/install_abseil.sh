@@ -15,12 +15,12 @@ export INSTALL_DIR=/usr/local/
 pushd $BUILD_DIR
 git clone --depth=1 -b 20210324.0 https://github.com/abseil/abseil-cpp.git
 cd abseil-cpp
-mkdir build && cd build
-pushd build
+mkdir build && pushd build
 cmake -DBUILD_TESTING=OFF -DCMAKE_CXX_STANDARD=11 \
     -DCMAKE_INSTALL_PREFIX=$INSTALL_DIR \
     ..
 make -j $(nproc)
 make install
+popd
 popd
 export PATH=${INSTALL_DIR}/bin:$PATH  # ensure to use the installed abseil
