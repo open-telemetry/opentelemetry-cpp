@@ -41,11 +41,9 @@ void BM_SpanCreationWithScope(benchmark::State &state)
   auto tracer = initTracer();
   while (state.KeepRunning())
   {
-    auto span = tracer->StartSpan("span");
-    {
-      auto scope = tracer->WithActiveSpan(span);
-      span->End();
-    }
+    auto span  = tracer->StartSpan("span");
+    auto scope = tracer->WithActiveSpan(span);
+    span->End();
   }
 }
 BENCHMARK(BM_SpanCreationWithScope);
