@@ -22,7 +22,7 @@ jobs:
       run: |
         sudo ./ci/setup_thrift.sh
         ./ci/do_ci.sh cmake.test
-    - name run cmake tests (with abseil)
+    - name: run cmake tests (with abseil)
       run: |
         sudo ./ci/install_abseil.sh
         ./ci/do_ci.sh cmake.abseil.test
