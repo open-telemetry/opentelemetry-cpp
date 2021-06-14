@@ -17,8 +17,10 @@
 
 #include "opentelemetry/exporters/otlp/protobuf_include_suffix.h"
 
+#include <condition_variable>
 #include <fstream>
 #include <iostream>
+#include <mutex>
 #include <string>
 #include <vector>
 
