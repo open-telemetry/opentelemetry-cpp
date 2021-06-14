@@ -83,9 +83,10 @@ void BM_SpanCreationWithManualSpanContextPropagation(benchmark::State &state)
 
   while (state.KeepRunning())
   {
-    auto outer_span_context = SpanContext(trace_id, span_id, trace_api::TraceFlags(), false);
+    auto outer_span = nostd::shared_ptr<trace_api::Span>(
+        new trace_api::DefaultSpan(SpanContext(trace_id, span_id, trace_api::TraceFlags(), false)));
     trace_api::StartSpanOptions options;
-    options.parent          = outer_span_context;
+    options.parent          = outer_span->GetContext();
     auto inner_span         = tracer->StartSpan("inner", options);
     auto inner_span_context = inner_span->GetContext();
     options.parent          = inner_span_context;
