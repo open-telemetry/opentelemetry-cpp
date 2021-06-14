@@ -58,7 +58,17 @@ elif [[ "$1" == "cmake.abseil.test" ]]; then
   make
   make test
   exit 0
-elif [[ "$1" == "cmake.stl.test" ]]; then
+elif [[ "$1" == "cmake.c++20.test" ]]; then
+  cd "${BUILD_DIR}"
+  rm -rf *
+  cmake -DCMAKE_BUILD_TYPE=Debug  \
+        -DCMAKE_CXX_FLAGS="-Werror" \
+        -DCMAKE_CXX_STANDARD=20 \
+        "${SRC_DIR}"
+  make
+  make test
+  exit 0
+elif [[ "$1" == "cmake.c++20.stl.test" ]]; then
   install_prometheus_cpp_client
   cd "${BUILD_DIR}"
   rm -rf *
@@ -66,17 +76,8 @@ elif [[ "$1" == "cmake.stl.test" ]]; then
         -DWITH_METRICS_PREVIEW=ON \
         -DWITH_LOGS_PREVIEW=ON \
         -DCMAKE_CXX_FLAGS="-Werror" \
-        -DWITH_STL=ON \
-        "${SRC_DIR}"
-  make
-  make test
-  exit 0
-elif [[ "$1" == "cmake.c++20.test" ]]; then
-  cd "${BUILD_DIR}"
-  rm -rf *
-  cmake -DCMAKE_BUILD_TYPE=Debug  \
-        -DCMAKE_CXX_FLAGS="-Werror" \
         -DCMAKE_CXX_STANDARD=20 \
+        -DWITH_STL=ON \
         "${SRC_DIR}"
   make
   make test
