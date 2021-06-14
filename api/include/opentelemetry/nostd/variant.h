@@ -59,6 +59,9 @@ OPENTELEMETRY_END_NAMESPACE
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace nostd
 {
+#  ifdef HAVE_ABSEIL
+using absl::bad_variant_access;
+#  endif
 using absl::get;
 using absl::get_if;
 using absl::holds_alternative;
