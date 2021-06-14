@@ -87,6 +87,8 @@ public:
       }
     }
 
+    int response_status = 0;
+
     if (request.uri == kDefaultTracePath)
     {
       response.headers["Content-Type"] = "application/json";
@@ -103,7 +105,7 @@ public:
         else
         {
           response.body = "{\"code\": 400, \"message\": \"Parse binary failed\"}";
-          return 400;
+          response_status = 400;
         }
       }
       else if (nullptr != request_content_type && *request_content_type == kHttpJsonContentType)
@@ -113,7 +115,7 @@ public:
         if (json.is_discarded())
         {
           response.body = "{\"code\": 400, \"message\": \"Parse json failed\"}";
-          return 400;
+          response_status = 400;
         }
         else
         {
@@ -124,18 +126,22 @@ public:
       else
       {
         response.body = "{\"code\": 400, \"message\": \"Unsupported content type\"}";
-        return 400;
+        response_status = 400;
       }
 
-      return 200;
+      response_status = 200;
     }
     else
     {
       std::unique_lock<std::mutex> lk(mtx_requests);
       response.headers["Content-Type"] = "text/plain";
       response.body                    = "404 Not Found";
-      return 200;
+      response_status = 200;
     }
+
+    cv_got_events.notify_one();
+
+    return response_status;
   }
 
   bool waitForRequests(unsigned timeOutSec, size_t expected_count = 1)
@@ -220,7 +226,7 @@ TEST_F(OtlpHttpExporterTestPeer, ExportJsonIntegrationTest)
     report_trace_id.assign(trace_id_hex, sizeof(trace_id_hex));
   }
 
-  ASSERT_TRUE(waitForRequests(2, old_count + 1));
+  ASSERT_TRUE(waitForRequests(20, old_count + 1));
   auto check_json                   = received_requests_json_.back();
   auto resource_span                = *check_json["resource_spans"].begin();
   auto instrumentation_library_span = *resource_span["instrumentation_library_spans"].begin();
