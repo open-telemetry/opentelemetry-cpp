@@ -23,8 +23,7 @@ jobs:
         sudo ./ci/setup_thrift.sh
         ./ci/do_ci.sh cmake.test
 
-jobs:
-  cmake_test:
+  cmake_absel_stl_test:
     name: CMake test (with abseil, stl)
     runs-on: ubuntu-latest
     steps:
