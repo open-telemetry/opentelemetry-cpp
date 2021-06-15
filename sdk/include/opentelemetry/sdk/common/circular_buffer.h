@@ -173,11 +173,12 @@ private:
     auto data = data_.get();
     if (tail_index < head_index)
     {
-      return CircularBufferRange<AtomicUniquePtr<T>>{
-          nostd::span<AtomicUniquePtr<T>>{data + tail_index, head_index - tail_index}};
+      return CircularBufferRange<AtomicUniquePtr<T>>{nostd::span<AtomicUniquePtr<T>>{
+          data + tail_index, static_cast<std::size_t>(head_index - tail_index)}};
     }
-    return {nostd::span<AtomicUniquePtr<T>>{data + tail_index, capacity_ - tail_index},
-            nostd::span<AtomicUniquePtr<T>>{data, head_index}};
+    return {nostd::span<AtomicUniquePtr<T>>{data + tail_index,
+                                            static_cast<std::size_t>(capacity_ - tail_index)},
+            nostd::span<AtomicUniquePtr<T>>{data, static_cast<std::size_t>(head_index)}};
   }
 };
 }  // namespace common

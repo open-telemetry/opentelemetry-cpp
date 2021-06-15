@@ -9,6 +9,46 @@ project(opentelemetry-cpp)
 # Mark variables as used so cmake doesn't complain about them
 mark_as_advanced(CMAKE_TOOLCHAIN_FILE)
 
+if(DEFINED ENV{ARCH})
+  # Architecture may be specified via ARCH environment variable
+  set(ARCH $ENV{ARCH})
+else()
+  # Autodetection logic that populates ARCH variable
+  if(CMAKE_SYSTEM_PROCESSOR MATCHES "amd64.*|x86_64.*|AMD64.*")
+    # Windows may report AMD64 even if target is 32-bit
+    if(CMAKE_SIZEOF_VOID_P EQUAL 8)
+      set(ARCH x64)
+    elseif(CMAKE_SIZEOF_VOID_P EQUAL 4)
+      set(ARCH x86)
+    endif()
+  elseif(CMAKE_SYSTEM_PROCESSOR MATCHES "i686.*|i386.*|x86.*")
+    # Windows may report x86 even if target is 64-bit
+    if(CMAKE_SIZEOF_VOID_P EQUAL 8)
+      set(ARCH x64)
+    elseif(CMAKE_SIZEOF_VOID_P EQUAL 4)
+      set(ARCH x86)
+    endif()
+  elseif(CMAKE_SYSTEM_PROCESSOR MATCHES
+         "^(aarch64.*|AARCH64.*|arm64.*|ARM64.*)")
+    set(ARCH arm64)
+  elseif(CMAKE_SYSTEM_PROCESSOR MATCHES "^(arm.*|ARM.*)")
+    set(ARCH arm)
+  elseif(CMAKE_SYSTEM_PROCESSOR MATCHES "^(powerpc|ppc)64le")
+    set(ARCH ppc64le)
+  elseif(CMAKE_SYSTEM_PROCESSOR MATCHES "^(powerpc|ppc)64")
+    set(ARCH ppc64)
+  elseif(CMAKE_SYSTEM_PROCESSOR MATCHES "^(mips.*|MIPS.*)")
+    set(ARCH mips)
+  elseif(CMAKE_SYSTEM_PROCESSOR MATCHES "^(riscv.*|RISCV.*)")
+    set(ARCH riscv)
+  else()
+    message(
+      FATAL_ERROR
+        "opentelemetry-cpp: unrecognized target processor configuration!")
+  endif()
+endif()
+message(STATUS "Building for architecture ARCH=${ARCH}")
+
 # Autodetect vcpkg toolchain
 if(DEFINED ENV{VCPKG_ROOT} AND NOT DEFINED CMAKE_TOOLCHAIN_FILE)
   set(CMAKE_TOOLCHAIN_FILE
@@ -144,8 +184,12 @@ find_package(Threads)
 
 function(install_windows_deps)
   # Bootstrap vcpkg from CMake and auto-install deps in case if we are missing
-  # deps on Windows
+  # deps on Windows. Respect the target architecture variable.
+  set(VCPKG_TARGET_ARCHITECTURE
+      ${ARCH}
+      PARENT_SCOPE)
   message("Installing build tools and dependencies...")
+  set(ENV{ARCH} ${ARCH})
   execute_process(
     COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/tools/setup-buildtools.cmd)
   set(CMAKE_TOOLCHAIN_FILE
