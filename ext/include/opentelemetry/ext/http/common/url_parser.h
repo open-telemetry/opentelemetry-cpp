@@ -27,7 +27,7 @@ public:
   std::string host_;
   std::string scheme_;
   std::string path_;
-  size_t port_;
+  uint16_t port_;
   std::string query_;
   bool success_;
 
@@ -81,7 +81,8 @@ public:
       path_ = "/";  // use default path
       if (is_port)
       {
-        port_ = std::stoi(std::string(url_.begin() + cpos, url_.begin() + url_.length()));
+        port_ = static_cast<uint16_t>(
+            std::stoi(std::string(url_.begin() + cpos, url_.begin() + url_.length())));
       }
       else
       {
@@ -91,7 +92,8 @@ public:
     }
     if (is_port)
     {
-      port_ = std::stoi(std::string(url_.begin() + cpos, url_.begin() + pos));
+      port_ =
+          static_cast<uint16_t>(std::stoi(std::string(url_.begin() + cpos, url_.begin() + pos)));
     }
     else
     {
