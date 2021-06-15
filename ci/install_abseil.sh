@@ -7,13 +7,14 @@ set -e
 export DEBIAN_FRONTEND=noninteractive
 
 if ! type cmake > /dev/null; then
-    #cmake not installed, exiting
+    echo "cmake not installed. Exiting.." >&2
     exit 1
 fi
-export BUILD_DIR=/tmp/
-export INSTALL_DIR=/usr/local/
+BUILD_DIR=/tmp/
+INSTALL_DIR=/usr/local/
+TAG=20210324.0
 pushd $BUILD_DIR
-git clone --depth=1 -b 20210324.0 https://github.com/abseil/abseil-cpp.git
+git clone --depth=1 -b ${TAG} https://github.com/abseil/abseil-cpp.git
 cd abseil-cpp
 mkdir build && pushd build
 cmake -DBUILD_TESTING=OFF -DCMAKE_CXX_STANDARD=11 \
