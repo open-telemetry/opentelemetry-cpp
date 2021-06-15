@@ -226,7 +226,7 @@ TEST_F(OtlpHttpExporterTestPeer, ExportJsonIntegrationTest)
     report_trace_id.assign(trace_id_hex, sizeof(trace_id_hex));
   }
 
-  ASSERT_TRUE(waitForRequests(20, old_count + 1));
+  ASSERT_TRUE(waitForRequests(2, old_count + 1));
   auto check_json                   = received_requests_json_.back();
   auto resource_span                = *check_json["resource_spans"].begin();
   auto instrumentation_library_span = *resource_span["instrumentation_library_spans"].begin();
