@@ -39,6 +39,12 @@ otel_cc_benchmark(
     deps = ["//api"],
 )
 
+otel_cc_benchmark(
+    name = "span_benchmark",
+    srcs = ["span_benchmark.cc"],
+    deps = ["//api"],
+)
+
 cc_test(
     name = "provider_test",
     srcs = [

@@ -155,6 +155,8 @@ TEST(CircularBufferTest, Simulation)
     consumer.join();
     std::sort(producer_numbers.begin(), producer_numbers.end());
     std::sort(consumer_numbers.begin(), consumer_numbers.end());
+
+    EXPECT_EQ(producer_numbers.size(), consumer_numbers.size());
     EXPECT_EQ(producer_numbers, consumer_numbers);
   }
 }

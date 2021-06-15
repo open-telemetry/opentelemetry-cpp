@@ -47,7 +47,7 @@ OPENTELEMETRY_END_NAMESPACE
 #  endif
 
 #  ifdef HAVE_ABSEIL
-#    include "absl/types/variant.h"
+#    include <absl/types/variant.h>
 #  else
 #    include "./absl/types/variant.h"
 #  endif
@@ -59,6 +59,9 @@ OPENTELEMETRY_END_NAMESPACE
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace nostd
 {
+#  ifdef HAVE_ABSEIL
+using absl::bad_variant_access;
+#  endif
 using absl::get;
 using absl::get_if;
 using absl::holds_alternative;
