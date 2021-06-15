@@ -67,7 +67,6 @@ struct OtlpHttpExporterOptions
   bool console_debug = false;
 
   // TODO: Enable/disable to verify SSL certificate
-  // TODO: Reuqest timeout
   std::chrono::milliseconds timeout = std::chrono::milliseconds(30000);
 };
 

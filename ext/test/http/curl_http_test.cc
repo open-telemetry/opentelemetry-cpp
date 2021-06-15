@@ -99,13 +99,14 @@ public:
   virtual int onHttpRequest(HTTP_SERVER_NS::HttpRequest const &request,
                             HTTP_SERVER_NS::HttpResponse &response) override
   {
+    int response_status = 404;
     if (request.uri == "/get/")
     {
 
       std::unique_lock<std::mutex> lk(mtx_requests);
       received_requests_.push_back(request);
       response.headers["Content-Type"] = "text/plain";
-      return 200;
+      response_status                  = 200;
     }
     if (request.uri == "/post/")
     {
@@ -113,9 +114,12 @@ public:
       received_requests_.push_back(request);
       response.headers["Content-Type"] = "application/json";
       response.body                    = "{'k1':'v1', 'k2':'v2', 'k3':'v3'}";
-      return 200;
+      response_status                  = 200;
     }
-    return 404;
+
+    cv_got_events.notify_one();
+
+    return response_status;
   }
 
   bool waitForRequests(unsigned timeOutSec, unsigned expected_count = 1)
