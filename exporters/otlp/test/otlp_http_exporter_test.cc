@@ -87,6 +87,8 @@ public:
       }
     }
 
+    int response_status = 0;
+
     if (request.uri == kDefaultTracePath)
     {
       response.headers["Content-Type"] = "application/json";
@@ -102,8 +104,8 @@ public:
         }
         else
         {
-          response.body = "{\"code\": 400, \"message\": \"Parse binary failed\"}";
-          return 400;
+          response.body   = "{\"code\": 400, \"message\": \"Parse binary failed\"}";
+          response_status = 400;
         }
       }
       else if (nullptr != request_content_type && *request_content_type == kHttpJsonContentType)
@@ -112,8 +114,8 @@ public:
         response.headers["Content-Type"] = "application/json";
         if (json.is_discarded())
         {
-          response.body = "{\"code\": 400, \"message\": \"Parse json failed\"}";
-          return 400;
+          response.body   = "{\"code\": 400, \"message\": \"Parse json failed\"}";
+          response_status = 400;
         }
         else
         {
@@ -123,19 +125,23 @@ public:
       }
       else
       {
-        response.body = "{\"code\": 400, \"message\": \"Unsupported content type\"}";
-        return 400;
+        response.body   = "{\"code\": 400, \"message\": \"Unsupported content type\"}";
+        response_status = 400;
       }
 
-      return 200;
+      response_status = 200;
     }
     else
     {
       std::unique_lock<std::mutex> lk(mtx_requests);
       response.headers["Content-Type"] = "text/plain";
       response.body                    = "404 Not Found";
-      return 200;
+      response_status                  = 200;
     }
+
+    cv_got_events.notify_one();
+
+    return response_status;
   }
 
   bool waitForRequests(unsigned timeOutSec, size_t expected_count = 1)
