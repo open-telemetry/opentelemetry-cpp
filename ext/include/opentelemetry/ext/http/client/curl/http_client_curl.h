@@ -5,6 +5,7 @@
 
 #include "http_operation_curl.h"
 #include "opentelemetry/ext/http/client/http_client.h"
+#include "opentelemetry/ext/http/common/url_parser.h"
 #include "opentelemetry/version.h"
 
 #include <map>
@@ -115,18 +116,13 @@ class HttpClient;
 class Session : public http_client::Session
 {
 public:
-  Session(HttpClient &http_client, const std::string &host, uint16_t port = 80)
+  Session(HttpClient &http_client,
+          std::string scheme      = "http",
+          const std::string &host = "",
+          uint16_t port           = 80)
       : http_client_(http_client), is_session_active_(false)
   {
-    if (host.rfind("http://", 0) != 0 && host.rfind("https://", 0) != 0)
-    {
-      host_ = "http://" + host;  // TODO - https support
-    }
-    else
-    {
-      host_ = host;
-    }
-    host_ += ":" + std::to_string(port) + "/";
+    host_ = scheme + "://" + host + ":" + std::to_string(port) + "/";
   }
 
   std::shared_ptr<http_client::Request> CreateRequest() noexcept override
@@ -249,10 +245,15 @@ public:
   // The call (curl_global_init) is not thread safe. Ensure this is called only once.
   HttpClient() : next_session_id_{0} { curl_global_init(CURL_GLOBAL_ALL); }
 
-  std::shared_ptr<http_client::Session> CreateSession(nostd::string_view host,
-                                                      uint16_t port = 80) noexcept override
+  std::shared_ptr<http_client::Session> CreateSession(nostd::string_view url) noexcept override
   {
-    auto session    = std::make_shared<Session>(*this, std::string(host), port);
+    auto parsedUrl = common::UrlParser(std::string(url));
+    if (!parsedUrl.success_)
+    {
+      return std::make_shared<Session>(*this);
+    }
+    auto session =
+        std::make_shared<Session>(*this, parsedUrl.scheme_, parsedUrl.host_, parsedUrl.port_);
     auto session_id = ++next_session_id_;
     session->SetId(session_id);
     sessions_.insert({session_id, session});
