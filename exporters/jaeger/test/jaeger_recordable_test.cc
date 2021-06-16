@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 #include "opentelemetry/exporters/jaeger/recordable.h"
+#include "opentelemetry/sdk/instrumentationlibrary/instrumentation_library.h"
 #include "opentelemetry/sdk/trace/simple_processor.h"
 #include "opentelemetry/sdk/trace/span_data.h"
 #include "opentelemetry/sdk/trace/tracer_provider.h"
@@ -15,6 +16,7 @@ namespace sdktrace = opentelemetry::sdk::trace;
 
 using namespace jaegertracing;
 using namespace opentelemetry::exporter::jaeger;
+using namespace opentelemetry::sdk::instrumentationlibrary;
 
 TEST(JaegerSpanRecordable, SetIdentity)
 {
@@ -119,4 +121,26 @@ TEST(JaegerSpanRecordable, SetStatus)
   EXPECT_EQ(tags[2].key, "otel.status_description");
   EXPECT_EQ(tags[2].vType, thrift::TagType::STRING);
   EXPECT_EQ(tags[2].vStr, error_description);
+}
+
+TEST(JaegerSpanRecordable, SetInstrumentationLibrary)
+{
+  opentelemetry::exporter::jaeger::Recordable rec;
+
+  std::string library_name     = "opentelemetry-cpp";
+  std::string library_version  = "0.1.0";
+  auto instrumentation_library = InstrumentationLibrary::create(library_name, library_version);
+
+  rec.SetInstrumentationLibrary(*instrumentation_library);
+
+  auto tags = rec.Tags();
+  EXPECT_EQ(tags.size(), 2);
+
+  EXPECT_EQ(tags[0].key, "otel.library.name");
+  EXPECT_EQ(tags[0].vType, thrift::TagType::STRING);
+  EXPECT_EQ(tags[0].vStr, library_name);
+
+  EXPECT_EQ(tags[1].key, "otel.library.version");
+  EXPECT_EQ(tags[1].vType, thrift::TagType::STRING);
+  EXPECT_EQ(tags[1].vStr, library_version);
 }
