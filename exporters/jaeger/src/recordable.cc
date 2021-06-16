@@ -77,7 +77,10 @@ void Recordable::AddEvent(nostd::string_view name,
 void Recordable::SetInstrumentationLibrary(
     const opentelemetry::sdk::instrumentationlibrary::InstrumentationLibrary
         &instrumentation_library) noexcept
-{}
+{
+  AddTag("otel.library.name", instrumentation_library.GetName());
+  AddTag("otel.library.version", instrumentation_library.GetVersion());
+}
 
 void Recordable::AddLink(const trace::SpanContext &span_context,
                          const common::KeyValueIterable &attributes) noexcept
