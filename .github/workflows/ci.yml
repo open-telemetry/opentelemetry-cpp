@@ -72,8 +72,8 @@ jobs:
         sudo ./ci/setup_cmake.sh
     - name: run tests
       run: ./ci/do_ci.sh cmake.c++20.test
-    #- name: run tests (enable stl)
-    #  run: ./ci/do_ci.sh cmake.c++20.stl.test
+    - name: run tests (enable stl)
+      run: ./ci/do_ci.sh cmake.c++20.stl.test
 
   cmake_otprotocol_test:
     name: CMake test (with otlp-exporter)

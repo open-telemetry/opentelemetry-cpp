@@ -6,10 +6,6 @@
 set -e
 export DEBIAN_FRONTEND=noninteractive
 
-if ! type cmake > /dev/null; then
-    echo "cmake not installed. Exiting.." >&2
-    exit 1
-fi
 BUILD_DIR=/tmp/
 INSTALL_DIR=/usr/local/
 TAG=20210324.0

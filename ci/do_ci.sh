@@ -46,7 +46,6 @@ if [[ "$1" == "cmake.test" ]]; then
   make test
   exit 0
 elif [[ "$1" == "cmake.abseil.test" ]]; then
-  install_prometheus_cpp_client
   cd "${BUILD_DIR}"
   rm -rf *
   cmake -DCMAKE_BUILD_TYPE=Debug  \
@@ -69,14 +68,12 @@ elif [[ "$1" == "cmake.c++20.test" ]]; then
   make test
   exit 0
 elif [[ "$1" == "cmake.c++20.stl.test" ]]; then
-  install_prometheus_cpp_client
   cd "${BUILD_DIR}"
   rm -rf *
   cmake -DCMAKE_BUILD_TYPE=Debug  \
         -DWITH_METRICS_PREVIEW=ON \
         -DWITH_LOGS_PREVIEW=ON \
         -DCMAKE_CXX_FLAGS="-Werror" \
-        -DCMAKE_CXX_STANDARD=20 \
         -DWITH_STL=ON \
         "${SRC_DIR}"
   make
