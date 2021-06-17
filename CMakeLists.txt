@@ -228,6 +228,24 @@ endif()
 # GNUInstallDirs.
 include(GNUInstallDirs)
 
+find_package(nlohmann_json QUIET)
+if(NOT nlohmann_json_FOUND)
+  message("Using local nlohmann::json from submodule")
+  set(JSON_BuildTests
+      OFF
+      CACHE INTERNAL "")
+  set(JSON_Install
+      OFF
+      CACHE INTERNAL "")
+  # This option allows to link nlohmann_json::nlohmann_json target
+  add_subdirectory(${PROJECT_SOURCE_DIR}/third_party/nlohmann-json)
+  # This option allows to add header to include directories
+  include_directories(
+    ${PROJECT_SOURCE_DIR}/third_party/nlohmann-json/single_include)
+else()
+  message("Using external nlohmann::json")
+endif()
+
 if(WITH_OTLP)
   set(protobuf_MODULE_COMPATIBLE ON)
   find_package(Protobuf)
@@ -268,13 +286,13 @@ if(WITH_OTLP)
   include(cmake/opentelemetry-proto.cmake)
   include(CMakeDependentOption)
   find_package(CURL)
-  find_package(nlohmann_json)
+
   cmake_dependent_option(
     WITH_OTLP_GRPC "Whether to include the OTLP gRPC exporter in the SDK" ON
     "gRPC_FOUND" OFF)
   cmake_dependent_option(
     WITH_OTLP_HTTP "Whether to include the OTLP http exporter in the SDK" ON
-    "CURL_FOUND;nlohmann_json_FOUND" OFF)
+    "CURL_FOUND" OFF)
 endif()
 
 list(APPEND CMAKE_PREFIX_PATH "${CMAKE_BINARY_DIR}")
@@ -328,9 +346,6 @@ if(NOT WITH_API_ONLY)
     add_subdirectory(examples)
   endif()
 endif()
-
-# Add nlohmann/json submodule to include directories
-include_directories(third_party/nlohmann-json/single_include)
 
 # Export cmake config and support find_packages(opentelemetry-cpp CONFIG) Write
 # config file for find_packages(opentelemetry-cpp CONFIG)
