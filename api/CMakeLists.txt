@@ -52,3 +52,7 @@ if(WITH_STL)
 else()
   message("Building with nostd types...")
 endif()
+
+if(CORE_RUNTIME_LIBS)
+  target_link_libraries(opentelemetry_api INTERFACE ${CORE_RUNTIME_LIBS})
+endif()

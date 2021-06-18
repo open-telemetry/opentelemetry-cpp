@@ -9,6 +9,46 @@ project(opentelemetry-cpp)
 # Mark variables as used so cmake doesn't complain about them
 mark_as_advanced(CMAKE_TOOLCHAIN_FILE)
 
+if(DEFINED ENV{ARCH})
+  # Architecture may be specified via ARCH environment variable
+  set(ARCH $ENV{ARCH})
+else()
+  # Autodetection logic that populates ARCH variable
+  if(CMAKE_SYSTEM_PROCESSOR MATCHES "amd64.*|x86_64.*|AMD64.*")
+    # Windows may report AMD64 even if target is 32-bit
+    if(CMAKE_SIZEOF_VOID_P EQUAL 8)
+      set(ARCH x64)
+    elseif(CMAKE_SIZEOF_VOID_P EQUAL 4)
+      set(ARCH x86)
+    endif()
+  elseif(CMAKE_SYSTEM_PROCESSOR MATCHES "i686.*|i386.*|x86.*")
+    # Windows may report x86 even if target is 64-bit
+    if(CMAKE_SIZEOF_VOID_P EQUAL 8)
+      set(ARCH x64)
+    elseif(CMAKE_SIZEOF_VOID_P EQUAL 4)
+      set(ARCH x86)
+    endif()
+  elseif(CMAKE_SYSTEM_PROCESSOR MATCHES
+         "^(aarch64.*|AARCH64.*|arm64.*|ARM64.*)")
+    set(ARCH arm64)
+  elseif(CMAKE_SYSTEM_PROCESSOR MATCHES "^(arm.*|ARM.*)")
+    set(ARCH arm)
+  elseif(CMAKE_SYSTEM_PROCESSOR MATCHES "^(powerpc|ppc)64le")
+    set(ARCH ppc64le)
+  elseif(CMAKE_SYSTEM_PROCESSOR MATCHES "^(powerpc|ppc)64")
+    set(ARCH ppc64)
+  elseif(CMAKE_SYSTEM_PROCESSOR MATCHES "^(mips.*|MIPS.*)")
+    set(ARCH mips)
+  elseif(CMAKE_SYSTEM_PROCESSOR MATCHES "^(riscv.*|RISCV.*)")
+    set(ARCH riscv)
+  else()
+    message(
+      FATAL_ERROR
+        "opentelemetry-cpp: unrecognized target processor configuration!")
+  endif()
+endif()
+message(STATUS "Building for architecture ARCH=${ARCH}")
+
 # Autodetect vcpkg toolchain
 if(DEFINED ENV{VCPKG_ROOT} AND NOT DEFINED CMAKE_TOOLCHAIN_FILE)
   set(CMAKE_TOOLCHAIN_FILE
@@ -67,7 +107,7 @@ if(WITH_STL)
   add_definitions(-DHAVE_CPP_STDLIB)
   add_definitions(-DHAVE_GSL)
   # Require at least C++17. C++20 is needed to avoid gsl::span
-  if(CMAKE_VERSION VERSION_GREATER 3.18.0)
+  if(CMAKE_VERSION VERSION_GREATER 3.11.999)
     # Ask for 20, may get anything below
     set(CMAKE_CXX_STANDARD 20)
   else()
@@ -144,8 +184,12 @@ find_package(Threads)
 
 function(install_windows_deps)
   # Bootstrap vcpkg from CMake and auto-install deps in case if we are missing
-  # deps on Windows
+  # deps on Windows. Respect the target architecture variable.
+  set(VCPKG_TARGET_ARCHITECTURE
+      ${ARCH}
+      PARENT_SCOPE)
   message("Installing build tools and dependencies...")
+  set(ENV{ARCH} ${ARCH})
   execute_process(
     COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/tools/setup-buildtools.cmd)
   set(CMAKE_TOOLCHAIN_FILE
@@ -183,6 +227,24 @@ endif()
 # opentelemetry-proto installs targets to the location variables defined in
 # GNUInstallDirs.
 include(GNUInstallDirs)
+
+find_package(nlohmann_json QUIET)
+if(NOT nlohmann_json_FOUND)
+  message("Using local nlohmann::json from submodule")
+  set(JSON_BuildTests
+      OFF
+      CACHE INTERNAL "")
+  set(JSON_Install
+      OFF
+      CACHE INTERNAL "")
+  # This option allows to link nlohmann_json::nlohmann_json target
+  add_subdirectory(${PROJECT_SOURCE_DIR}/third_party/nlohmann-json)
+  # This option allows to add header to include directories
+  include_directories(
+    ${PROJECT_SOURCE_DIR}/third_party/nlohmann-json/single_include)
+else()
+  message("Using external nlohmann::json")
+endif()
 
 if(WITH_OTLP)
   set(protobuf_MODULE_COMPATIBLE ON)
@@ -224,13 +286,13 @@ if(WITH_OTLP)
   include(cmake/opentelemetry-proto.cmake)
   include(CMakeDependentOption)
   find_package(CURL)
-  find_package(nlohmann_json)
+
   cmake_dependent_option(
     WITH_OTLP_GRPC "Whether to include the OTLP gRPC exporter in the SDK" ON
     "gRPC_FOUND" OFF)
   cmake_dependent_option(
     WITH_OTLP_HTTP "Whether to include the OTLP http exporter in the SDK" ON
-    "CURL_FOUND;nlohmann_json_FOUND" OFF)
+    "CURL_FOUND" OFF)
 endif()
 
 list(APPEND CMAKE_PREFIX_PATH "${CMAKE_BINARY_DIR}")
@@ -284,9 +346,6 @@ if(NOT WITH_API_ONLY)
     add_subdirectory(examples)
   endif()
 endif()
-
-# Add nlohmann/json submodule to include directories
-include_directories(third_party/nlohmann-json/single_include)
 
 # Export cmake config and support find_packages(opentelemetry-cpp CONFIG) Write
 # config file for find_packages(opentelemetry-cpp CONFIG)

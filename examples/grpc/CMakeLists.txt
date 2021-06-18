@@ -39,12 +39,7 @@ endif()
 foreach(_target client server)
   add_executable(${_target} "${_target}.cpp")
   target_link_libraries(
-    ${_target}
-    example_grpc_proto
-    protobuf::libprotobuf
-    gRPC::grpc++
-    gRPC::grpc++_reflection
-    opentelemetry_trace
-    opentelemetry_exporter_ostream_span)
+    ${_target} example_grpc_proto protobuf::libprotobuf gRPC::grpc++
+    opentelemetry_trace opentelemetry_exporter_ostream_span)
   patch_protobuf_targets(${_target})
 endforeach()
