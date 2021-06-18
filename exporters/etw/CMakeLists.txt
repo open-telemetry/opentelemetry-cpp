@@ -1,5 +1,3 @@
-find_package(nlohmann_json REQUIRED)
-
 add_library(opentelemetry_exporter_etw INTERFACE)
 
 target_include_directories(
