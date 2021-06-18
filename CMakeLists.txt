@@ -235,7 +235,7 @@ if(NOT nlohmann_json_FOUND)
       OFF
       CACHE INTERNAL "")
   set(JSON_Install
-      OFF
+      ON
       CACHE INTERNAL "")
   # This option allows to link nlohmann_json::nlohmann_json target
   add_subdirectory(${PROJECT_SOURCE_DIR}/third_party/nlohmann-json)
