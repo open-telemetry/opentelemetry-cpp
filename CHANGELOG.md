@@ -30,7 +30,6 @@ Increment the:
 * [INSTRUMENTATION] fix protobuf compilation warning in gRPC example ([#830](https://github.com/open-telemetry/opentelemetry-cpp/pull/830))
 * [EXPORTER] `BREAKING CHANGE` - Add OTLP/HTTP+JSON Protocol exporter; Rename `OtlpExporter` to `OtlpGrpcExporter` ([#810](https://github.com/open-telemetry/opentelemetry-cpp/pull/810))
 
-
 ## [1.0.0-rc1] 2021-06-04
 
 * [BUILD] Enable Jaeger exporter build in Windows ([#815](https://github.com/open-telemetry/opentelemetry-cpp/pull/815))
