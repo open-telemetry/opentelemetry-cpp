@@ -14,6 +14,8 @@ Increment the:
 * PATCH version when you make backwards compatible bug fixes.
 
 ## [Unreleased]
+ 
+## [1.0.0-rc2] 2021-06-18
 
 * [INSTRUMENTATION] HTTPClient: Change support for full URL argument ([#833](https://github.com/open-telemetry/opentelemetry-cpp/pull/833))
 * [EXPORTER] Add OTLP/HTTP+JSON Protocol exporter ([#810](https://github.com/open-telemetry/opentelemetry-cpp/pull/810))
