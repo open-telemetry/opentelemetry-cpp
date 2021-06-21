@@ -237,11 +237,19 @@ if(NOT nlohmann_json_FOUND)
   set(JSON_Install
       ON
       CACHE INTERNAL "")
-  # This option allows to link nlohmann_json::nlohmann_json target
-  add_subdirectory(${PROJECT_SOURCE_DIR}/third_party/nlohmann-json)
-  # This option allows to add header to include directories
-  include_directories(
-    ${PROJECT_SOURCE_DIR}/third_party/nlohmann-json/single_include)
+  if(EXISTS ${PROJECT_SOURCE_DIR}/third_party/nlohmann-json)
+    # This option allows to link nlohmann_json::nlohmann_json target
+    add_subdirectory(${PROJECT_SOURCE_DIR}/third_party/nlohmann-json)
+    # This option allows to add header to include directories
+    include_directories(
+      ${PROJECT_SOURCE_DIR}/third_party/nlohmann-json/single_include)
+  else()
+    message(
+      FATAL_ERROR
+        "\nnlohmann_json package was not found. Please either provide it manually or clone with submodules. "
+        "To initialize, fetch and checkout any nested submodules, you can use the following command:\n"
+        "git submodule update --init --recursive")
+  endif()
 else()
   message("Using external nlohmann::json")
 endif()
