@@ -4,7 +4,7 @@
 #include "opentelemetry/exporters/otlp/otlp_http_exporter.h"
 #include "opentelemetry/exporters/otlp/otlp_recordable.h"
 #include "opentelemetry/ext/http/client/http_client_factory.h"
-#include "opentelemetry/ext/http/common/url_parser.h"
+#include "opentelemetry/ext/net/common/url_parser.h"
 
 #include "nlohmann/json.hpp"
 
@@ -30,6 +30,8 @@
 
 namespace nostd       = opentelemetry::nostd;
 namespace http_client = opentelemetry::ext::http::client;
+
+using UrlParser = opentelemetry::ext::net::common::UrlParser;
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace exporter
@@ -577,7 +579,7 @@ sdk::common::ExportResult OtlpHttpExporter::Export(
   // Parse uri and store it to cache
   if (http_uri_.empty())
   {
-    auto parse_url = opentelemetry::ext::http::common::UrlParser(std::string(options_.url));
+    auto parse_url = UrlParser(std::string(options_.url));
     if (!parse_url.success_)
     {
       if (options_.console_debug)
