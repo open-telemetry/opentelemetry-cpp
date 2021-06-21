@@ -3,10 +3,13 @@
 
 #include "opentelemetry/ext/http/client/http_client_factory.h"
 #include "opentelemetry/ext/http/common/url_parser.h"
+#include "opentelemetry/trace/semantic_conventions.h"
 #include "tracer_common.h"
 
 namespace
 {
+
+using namespace opentelemetry::trace;
 
 void sendRequest(const std::string &url)
 {
@@ -20,9 +23,9 @@ void sendRequest(const std::string &url)
   std::string span_name = url_parser.path_;
   auto span             = get_tracer("http-client")
                   ->StartSpan(span_name,
-                              {{"http.url", url_parser.url_},
-                               {"http.scheme", url_parser.scheme_},
-                               {"http.method", "GET"}},
+                              {{SemanticConventions::GetAttributeHttpUrl(), url_parser.url_},
+                               {SemanticConventions::GetAttributeHttpScheme(), url_parser.scheme_},
+                               {SemanticConventions::GetAttributeHttpMethod(), "GET"}},
                               options);
   auto scope = get_tracer("http-client")->WithActiveSpan(span);
 
@@ -38,7 +41,7 @@ void sendRequest(const std::string &url)
   {
     // set span attributes
     auto status_code = result.GetResponse().GetStatusCode();
-    span->SetAttribute("http.status_code", status_code);
+    span->SetAttribute(SemanticConventions::GetAttributeHttpStatusCode(), status_code);
     result.GetResponse().ForEachHeader([&span](opentelemetry::nostd::string_view header_name,
                                                opentelemetry::nostd::string_view header_value) {
       span->SetAttribute("http.header." + std::string(header_name.data()), header_value);
