@@ -5,7 +5,7 @@
 
 #include "http_operation_curl.h"
 #include "opentelemetry/ext/http/client/http_client.h"
-#include "opentelemetry/ext/http/common/url_parser.h"
+#include "opentelemetry/ext/net/common/url_parser.h"
 #include "opentelemetry/version.h"
 
 #include <map>
@@ -241,13 +241,15 @@ public:
 
 class HttpClient : public http_client::HttpClient
 {
+    using UrlParser = ext::net::common::UrlParser;
+
 public:
   // The call (curl_global_init) is not thread safe. Ensure this is called only once.
   HttpClient() : next_session_id_{0} { curl_global_init(CURL_GLOBAL_ALL); }
 
   std::shared_ptr<http_client::Session> CreateSession(nostd::string_view url) noexcept override
   {
-    auto parsedUrl = common::UrlParser(std::string(url));
+    auto parsedUrl = UrlParser(std::string(url));
     if (!parsedUrl.success_)
     {
       return std::make_shared<Session>(*this);
