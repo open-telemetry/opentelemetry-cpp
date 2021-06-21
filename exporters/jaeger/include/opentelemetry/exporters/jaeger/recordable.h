@@ -7,11 +7,45 @@
 #include <opentelemetry/sdk/trace/recordable.h>
 #include <opentelemetry/version.h>
 
+#if (defined(__BYTE_ORDER__) && defined(__ORDER_LITTLE_ENDIAN__) && \
+     __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__)
+#  define JAEGER_IS_LITTLE_ENDIAN 1
+#elif defined(__BYTE_ORDER__) && defined(__ORDER_BIG_ENDIAN__) && \
+    __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__
+#  define JAEGER_IS_LITTLE_ENDIAN 0
+#elif defined(_WIN32)
+#  define JAEGER_IS_LITTLE_ENDIAN 1
+#else
+#  error "Endian detection needs to be set up for your compiler"
+#endif
+
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace exporter
 {
 namespace jaeger
 {
+
+#if JAEGER_IS_LITTLE_ENDIAN == 1
+
+#  if defined(__clang__) || \
+      (defined(__GNUC__) && ((__GNUC__ == 4 && __GNUC_MINOR__ >= 8) || __GNUC__ >= 5))
+inline uint64_t bswap_64(uint64_t host_int)
+{
+  return __builtin_bswap64(host_int);
+}
+
+#  elif defined(_MSC_VER)
+inline uint64_t bswap_64(uint64_t host_int)
+{
+  return _byteswap_uint64(host_int);
+}
+
+#  else
+#    error "Port need to support endianess conversion"
+
+#  endif
+
+#endif
 
 using namespace jaegertracing;
 

@@ -45,7 +45,7 @@ Async Request:
   };
 
   HttpClient httpClient; // implementer can provide singleton implementation for it
-  auto session = httpClient.createSession("localhost", 8000);
+  auto session = httpClient.createSession("localhost" + 8000);
   auto request = session->CreateRequest();
   request->AddHeader(..);
   SimpleResponseHandler res_handler;
@@ -226,9 +226,9 @@ public:
 class HttpClient
 {
 public:
-  virtual std::shared_ptr<Session> CreateSession(nostd::string_view host,
-                                                 uint16_t port = 80) noexcept = 0;
-  virtual bool CancelAllSessions() noexcept                                   = 0;
+  virtual std::shared_ptr<Session> CreateSession(nostd::string_view url) noexcept = 0;
+
+  virtual bool CancelAllSessions() noexcept = 0;
 
   virtual bool FinishAllSessions() noexcept = 0;
 

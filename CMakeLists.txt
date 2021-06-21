@@ -3,12 +3,51 @@ cmake_minimum_required(VERSION 3.1)
 # See https://cmake.org/cmake/help/v3.3/policy/CMP0057.html required by certain
 # versions of gtest
 cmake_policy(SET CMP0057 NEW)
-cmake_policy(SET CMP0079 NEW)
 
 project(opentelemetry-cpp)
 
 # Mark variables as used so cmake doesn't complain about them
 mark_as_advanced(CMAKE_TOOLCHAIN_FILE)
+
+if(DEFINED ENV{ARCH})
+  # Architecture may be specified via ARCH environment variable
+  set(ARCH $ENV{ARCH})
+else()
+  # Autodetection logic that populates ARCH variable
+  if(CMAKE_SYSTEM_PROCESSOR MATCHES "amd64.*|x86_64.*|AMD64.*")
+    # Windows may report AMD64 even if target is 32-bit
+    if(CMAKE_SIZEOF_VOID_P EQUAL 8)
+      set(ARCH x64)
+    elseif(CMAKE_SIZEOF_VOID_P EQUAL 4)
+      set(ARCH x86)
+    endif()
+  elseif(CMAKE_SYSTEM_PROCESSOR MATCHES "i686.*|i386.*|x86.*")
+    # Windows may report x86 even if target is 64-bit
+    if(CMAKE_SIZEOF_VOID_P EQUAL 8)
+      set(ARCH x64)
+    elseif(CMAKE_SIZEOF_VOID_P EQUAL 4)
+      set(ARCH x86)
+    endif()
+  elseif(CMAKE_SYSTEM_PROCESSOR MATCHES
+         "^(aarch64.*|AARCH64.*|arm64.*|ARM64.*)")
+    set(ARCH arm64)
+  elseif(CMAKE_SYSTEM_PROCESSOR MATCHES "^(arm.*|ARM.*)")
+    set(ARCH arm)
+  elseif(CMAKE_SYSTEM_PROCESSOR MATCHES "^(powerpc|ppc)64le")
+    set(ARCH ppc64le)
+  elseif(CMAKE_SYSTEM_PROCESSOR MATCHES "^(powerpc|ppc)64")
+    set(ARCH ppc64)
+  elseif(CMAKE_SYSTEM_PROCESSOR MATCHES "^(mips.*|MIPS.*)")
+    set(ARCH mips)
+  elseif(CMAKE_SYSTEM_PROCESSOR MATCHES "^(riscv.*|RISCV.*)")
+    set(ARCH riscv)
+  else()
+    message(
+      FATAL_ERROR
+        "opentelemetry-cpp: unrecognized target processor configuration!")
+  endif()
+endif()
+message(STATUS "Building for architecture ARCH=${ARCH}")
 
 # Autodetect vcpkg toolchain
 if(DEFINED ENV{VCPKG_ROOT} AND NOT DEFINED CMAKE_TOOLCHAIN_FILE)
@@ -20,8 +59,6 @@ endif()
 if(VCPKG_CHAINLOAD_TOOLCHAIN_FILE)
   include("${VCPKG_CHAINLOAD_TOOLCHAIN_FILE}")
 endif()
-
-set(OPENTELEMETRY_SOURCE_DIR ${CMAKE_CURRENT_LIST_DIR})
 
 file(READ "${CMAKE_CURRENT_LIST_DIR}/api/include/opentelemetry/version.h"
      OPENTELEMETRY_CPP_HEADER_VERSION_H)
@@ -48,18 +85,15 @@ if(NOT DEFINED CMAKE_CXX_STANDARD)
   set(CMAKE_CXX_STANDARD 11)
 endif()
 
-option(WITH_CONTRIB
-       "Build OpenTelemetry C++ SDK with optional community contributions" OFF)
-
 option(WITH_STL "Whether to use Standard Library for C++latest features" OFF)
 
 option(WITH_ABSEIL "Whether to use Abseil for C++latest features" OFF)
 
 if(WITH_ABSEIL)
-  add_definitions(-DHAVE_ABSEIL)
   find_package(absl CONFIG REQUIRED)
 
-  set(CORE_RUNTIME_LIBS absl::any absl::base absl::bits absl::city)
+  set(CORE_RUNTIME_LIBS absl::bad_variant_access absl::any absl::base
+                        absl::bits absl::city)
 
   # target_link_libraries(main PRIVATE absl::any absl::base absl::bits
   # absl::city)
@@ -73,7 +107,7 @@ if(WITH_STL)
   add_definitions(-DHAVE_CPP_STDLIB)
   add_definitions(-DHAVE_GSL)
   # Require at least C++17. C++20 is needed to avoid gsl::span
-  if(CMAKE_VERSION VERSION_GREATER "3.18.0")
+  if(CMAKE_VERSION VERSION_GREATER 3.18.0)
     # Ask for 20, may get anything below
     set(CMAKE_CXX_STANDARD 20)
   else()
@@ -98,8 +132,7 @@ if(WITH_STL)
         set(MSVC_CXX_OPT_FLAG "/O2")
       endif()
     endif()
-    set(CMAKE_CXX_FLAGS
-        "${CMAKE_CXX_FLAGS} /Zc:__cplusplus ${MSVC_CXX_OPT_FLAG}")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${MSVC_CXX_OPT_FLAG}")
   endif()
 endif()
 
@@ -135,13 +168,13 @@ option(
   OFF)
 option(WITH_EXAMPLES "Whether to build examples" ON)
 
-option(WITH_METRICS_PREVIEW "Whether to build metrics preview" ON)
+option(WITH_METRICS_PREVIEW "Whether to build metrics preview" OFF)
 
 if(WITH_METRICS_PREVIEW)
   add_definitions(-DENABLE_METRICS_PREVIEW)
 endif()
 
-option(WITH_LOGS_PREVIEW "Whether to build logs preview" ON)
+option(WITH_LOGS_PREVIEW "Whether to build logs preview" OFF)
 
 if(WITH_LOGS_PREVIEW)
   add_definitions(-DENABLE_LOGS_PREVIEW)
@@ -151,8 +184,12 @@ find_package(Threads)
 
 function(install_windows_deps)
   # Bootstrap vcpkg from CMake and auto-install deps in case if we are missing
-  # deps on Windows
+  # deps on Windows. Respect the target architecture variable.
+  set(VCPKG_TARGET_ARCHITECTURE
+      ${ARCH}
+      PARENT_SCOPE)
   message("Installing build tools and dependencies...")
+  set(ENV{ARCH} ${ARCH})
   execute_process(
     COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/tools/setup-buildtools.cmd)
   set(CMAKE_TOOLCHAIN_FILE
@@ -174,8 +211,10 @@ if(MSVC)
   # Options for Visual C++ compiler: /Zc:__cplusplus - report an updated value
   # for recent C++ language standards. Without this option MSVC returns the
   # value of __cplusplus="199711L"
-  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /Zc:__cplusplus")
-
+  if(MSVC_VERSION GREATER 1900)
+    # __cplusplus flag is not supported by Visual Studio 2015
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /Zc:__cplusplus")
+  endif()
   # When using vcpkg, all targets build with the same runtime
   if(VCPKG_TOOLCHAIN)
     set(CMAKE_MSVC_RUNTIME_LIBRARY
@@ -209,7 +248,7 @@ if(WITH_OTLP)
       find_package(Protobuf REQUIRED)
     endif()
     if(NOT gRPC_FOUND)
-      find_package(gRPC REQUIRED)
+      find_package(gRPC)
     endif()
     if(WIN32)
       # Always use x64 protoc.exe
@@ -227,6 +266,15 @@ if(WITH_OTLP)
   message("PROTOBUF_PROTOC_EXECUTABLE=${PROTOBUF_PROTOC_EXECUTABLE}")
 
   include(cmake/opentelemetry-proto.cmake)
+  include(CMakeDependentOption)
+  find_package(CURL)
+  find_package(nlohmann_json)
+  cmake_dependent_option(
+    WITH_OTLP_GRPC "Whether to include the OTLP gRPC exporter in the SDK" ON
+    "gRPC_FOUND" OFF)
+  cmake_dependent_option(
+    WITH_OTLP_HTTP "Whether to include the OTLP http exporter in the SDK" ON
+    "CURL_FOUND;nlohmann_json_FOUND" OFF)
 endif()
 
 list(APPEND CMAKE_PREFIX_PATH "${CMAKE_BINARY_DIR}")
@@ -274,41 +322,15 @@ if(NOT WITH_API_ONLY)
   include_directories(ext/include)
 
   add_subdirectory(sdk)
+  add_subdirectory(ext)
   add_subdirectory(exporters)
   if(WITH_EXAMPLES)
     add_subdirectory(examples)
-  endif()
-  add_subdirectory(ext)
-endif()
-
-if(DEFINED ENV{OPENTELEMETRY_CONTRIB_PATH})
-  # Add custom contrib path to build tree and consolidate binary artifacts in
-  # current project binary output directory.
-  add_subdirectory($ENV{OPENTELEMETRY_CONTRIB_PATH}
-                   ${PROJECT_BINARY_DIR}/contrib)
-endif()
-
-if(WITH_CONTRIB)
-  # This option requires CMake 3.11+: add standard remote contrib to build tree.
-  include(FetchContent)
-  FetchContent_Declare(
-    contrib
-    GIT_REPOSITORY "https://github.com/open-telemetry/opentelemetry-cpp-contrib"
-    GIT_TAG "maxgolov/fluentd_exporter")
-  FetchContent_GetProperties(contrib)
-  if(NOT contrib_POPULATED)
-    FetchContent_Populate(contrib)
-    add_subdirectory(${contrib_SOURCE_DIR})
   endif()
 endif()
 
 # Add nlohmann/json submodule to include directories
 include_directories(third_party/nlohmann-json/single_include)
-find_package(nlohmann_json QUIET CONFIG)
-if(nlohmann_json_FOUND)
-  # Add header-only library found by CMake
-  set(NLOHMANN_JSON_LIB nlohmann_json nlohmann_json::nlohmann_json)
-endif()
 
 # Export cmake config and support find_packages(opentelemetry-cpp CONFIG) Write
 # config file for find_packages(opentelemetry-cpp CONFIG)

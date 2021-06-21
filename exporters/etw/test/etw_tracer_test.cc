@@ -12,9 +12,7 @@
 
 using namespace OPENTELEMETRY_NAMESPACE;
 
-using Properties       = opentelemetry::exporter::etw::Properties;
-using PropertyValue    = opentelemetry::exporter::etw::PropertyValue;
-using PropertyValueMap = opentelemetry::exporter::etw::PropertyValueMap;
+using namespace opentelemetry::exporter::etw;
 
 const char *kGlobalProviderName = "OpenTelemetry-ETW-TLD";
 
@@ -229,10 +227,13 @@ TEST(ETWTracer, TracerCheckMsgPack)
   auto tracer = tp.GetTracer(providerName);
   {
       auto aSpan = tracer->StartSpan("A.max");
+      auto aScope = tracer->WithActiveSpan(aSpan);
       {
           auto bSpan = tracer->StartSpan("B.max");
+          auto bScope = tracer->WithActiveSpan(bSpan);
           {
               auto cSpan = tracer->StartSpan("C.max");
+              auto cScope = tracer->WithActiveSpan(cSpan);
               std::string eventName = "MyMsgPackEvent";
               Properties event =
               {
@@ -241,11 +242,11 @@ TEST(ETWTracer, TracerCheckMsgPack)
                   {"strKey", "someValue"}
               };
               cSpan->AddEvent(eventName, event);
-              cSpan->End();
+              EXPECT_NO_THROW(cSpan->End());
           }
-          bSpan->End();
+          EXPECT_NO_THROW(bSpan->End());
       }
-      aSpan->End();
+      EXPECT_NO_THROW(aSpan->End());
   }
   tracer->CloseWithMicroseconds(0);
 }

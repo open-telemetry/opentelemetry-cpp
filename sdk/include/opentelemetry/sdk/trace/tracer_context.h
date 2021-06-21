@@ -32,20 +32,6 @@ namespace trace
 class TracerContext
 {
 public:
-#if 0
-  explicit TracerContext(
-      std::unique_ptr<SpanProcessor> processor,
-      opentelemetry::sdk::resource::Resource resource =
-          opentelemetry::sdk::resource::Resource::Create({}),
-      std::unique_ptr<Sampler> sampler = std::unique_ptr<AlwaysOnSampler>(new AlwaysOnSampler),
-      std::unique_ptr<IdGenerator> id_generator =
-          std::unique_ptr<IdGenerator>(new RandomIdGenerator())) noexcept
-      : processor_(std::move(processor)),
-        resource_(resource),
-        sampler_(std::move(sampler)),
-        id_generator_(std::move(id_generator)){};
-#endif
-
   explicit TracerContext(
       std::vector<std::unique_ptr<SpanProcessor>> &&processor,
       opentelemetry::sdk::resource::Resource resource =
