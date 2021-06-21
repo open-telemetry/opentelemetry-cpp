@@ -29,7 +29,7 @@ public:
   // https://github.com/open-telemetry/opentelemetry-specification/tree/main/specification/trace/semantic_conventions
   // https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/trace/semantic_conventions/exceptions.md
 
-  // Genetal network connection attributes
+  // General network connection attributes
   OTEL_TRACE_GENERATE_SEMCONV_METHOD(AttributeNetTransport, "net.transport")
   OTEL_TRACE_GENERATE_SEMCONV_METHOD(AttributeNetPeerIp, "net.peer.ip")
   OTEL_TRACE_GENERATE_SEMCONV_METHOD(AttributeNetPeerPort, "net.peer.port")
