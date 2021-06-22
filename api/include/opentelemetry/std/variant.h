@@ -14,6 +14,9 @@ OPENTELEMETRY_BEGIN_NAMESPACE
 // Standard Type aliases in nostd namespace
 namespace nostd
 {
+using std::get_if;
+using std::monostate;
+using std::variant_alternative_t;
 
 // nostd::variant<...>
 template <class... _Types>
@@ -137,6 +140,7 @@ constexpr auto visit(_Callable &&_Obj, _Variants &&... _Args)
 };
 
 #else
+using std::bad_variant_access;
 
 template <std::size_t I, class... Types>
 constexpr std::variant_alternative_t<I, std::variant<Types...>> &get(std::variant<Types...> &v)

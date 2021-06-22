@@ -10,3 +10,9 @@ cc_test(
         "@com_google_googletest//:gtest_main",
     ],
 )
+
+otel_cc_benchmark(
+    name = "baggage_benchmark",
+    srcs = ["baggage_benchmark.cc"],
+    deps = ["//api"],
+)

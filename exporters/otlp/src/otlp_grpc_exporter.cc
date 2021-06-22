@@ -1,7 +1,7 @@
 // Copyright The OpenTelemetry Authors
 // SPDX-License-Identifier: Apache-2.0
 
-#include "opentelemetry/exporters/otlp/otlp_exporter.h"
+#include "opentelemetry/exporters/otlp/otlp_grpc_exporter.h"
 #include "opentelemetry/exporters/otlp/otlp_recordable.h"
 
 #include <grpcpp/grpcpp.h>
@@ -55,7 +55,7 @@ static std::string get_file_contents(const char *fpath)
  * Create service stub to communicate with the OpenTelemetry Collector.
  */
 std::unique_ptr<proto::collector::trace::v1::TraceService::Stub> MakeServiceStub(
-    const OtlpExporterOptions &options)
+    const OtlpGrpcExporterOptions &options)
 {
   std::shared_ptr<grpc::Channel> channel;
   if (options.use_ssl_credentials)
@@ -80,25 +80,25 @@ std::unique_ptr<proto::collector::trace::v1::TraceService::Stub> MakeServiceStub
 
 // -------------------------------- Constructors --------------------------------
 
-OtlpExporter::OtlpExporter() : OtlpExporter(OtlpExporterOptions()) {}
+OtlpGrpcExporter::OtlpGrpcExporter() : OtlpGrpcExporter(OtlpGrpcExporterOptions()) {}
 
-OtlpExporter::OtlpExporter(const OtlpExporterOptions &options)
+OtlpGrpcExporter::OtlpGrpcExporter(const OtlpGrpcExporterOptions &options)
     : options_(options), trace_service_stub_(MakeServiceStub(options))
 {}
 
-OtlpExporter::OtlpExporter(
+OtlpGrpcExporter::OtlpGrpcExporter(
     std::unique_ptr<proto::collector::trace::v1::TraceService::StubInterface> stub)
-    : options_(OtlpExporterOptions()), trace_service_stub_(std::move(stub))
+    : options_(OtlpGrpcExporterOptions()), trace_service_stub_(std::move(stub))
 {}
 
 // ----------------------------- Exporter methods ------------------------------
 
-std::unique_ptr<sdk::trace::Recordable> OtlpExporter::MakeRecordable() noexcept
+std::unique_ptr<sdk::trace::Recordable> OtlpGrpcExporter::MakeRecordable() noexcept
 {
   return std::unique_ptr<sdk::trace::Recordable>(new OtlpRecordable);
 }
 
-sdk::common::ExportResult OtlpExporter::Export(
+sdk::common::ExportResult OtlpGrpcExporter::Export(
     const nostd::span<std::unique_ptr<sdk::trace::Recordable>> &spans) noexcept
 {
   proto::collector::trace::v1::ExportTraceServiceRequest request;

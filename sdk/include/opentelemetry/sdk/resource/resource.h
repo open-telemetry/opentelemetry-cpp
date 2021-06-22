@@ -3,6 +3,9 @@
 
 #pragma once
 
+#include "opentelemetry/common/attribute_value.h"
+#include "opentelemetry/common/key_value_iterable_view.h"
+
 #include "opentelemetry/sdk/common/attribute_utils.h"
 #include "opentelemetry/sdk/resource/resource_detector.h"
 #include "opentelemetry/sdk/version/version.h"
@@ -18,8 +21,7 @@ namespace sdk
 namespace resource
 {
 
-using ResourceAttributes =
-    std::unordered_map<std::string, opentelemetry::sdk::common::OwnedAttributeValue>;
+using ResourceAttributes = opentelemetry::sdk::common::AttributeMap;
 
 class Resource
 {

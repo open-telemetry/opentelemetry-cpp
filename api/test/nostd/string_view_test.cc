@@ -4,7 +4,7 @@
 #include "opentelemetry/nostd/string_view.h"
 
 #include <gtest/gtest.h>
-
+#include <cstring>
 #include <map>
 
 using opentelemetry::nostd::string_view;
