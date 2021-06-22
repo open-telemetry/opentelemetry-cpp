@@ -4,12 +4,13 @@
 #include "opentelemetry/exporters/jaeger/recordable.h"
 #include "opentelemetry/sdk/resource/semantic_conventions.h"
 
-using namespace opentelemetry::sdk::resource;
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace exporter
 {
 namespace jaeger
 {
+
+using namespace opentelemetry::sdk::resource;
 
 Recordable::Recordable() : span_{new thrift::Span} {}
 
