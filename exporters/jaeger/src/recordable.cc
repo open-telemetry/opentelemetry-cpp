@@ -1,8 +1,10 @@
 // Copyright The OpenTelemetry Authors
 // SPDX-License-Identifier: Apache-2.0
 
-#include <opentelemetry/exporters/jaeger/recordable.h>
+#include "opentelemetry/exporters/jaeger/recordable.h"
+#include "opentelemetry/sdk/resource/semantic_conventions.h"
 
+using namespace opentelemetry::sdk::resource;
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace exporter
 {
@@ -117,9 +119,10 @@ void Recordable::SetResource(const opentelemetry::sdk::resource::Resource &resou
 {
   // only service.name attribute is supported by specs as of now.
   auto attributes = resource.GetAttributes();
-  if (attributes.find("service.name") != attributes.end())
+  if (attributes.find(SemanticConventions::GetAttributeSericeName()) != attributes.end())
   {
-    service_name_ = nostd::get<std::string>(attributes["service.name"]);
+    service_name_ =
+        nostd::get<std::string>(attributes[SemanticConventions::GetAttributeSericeName()]);
   }
 }
 

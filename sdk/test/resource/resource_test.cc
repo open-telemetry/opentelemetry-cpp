@@ -6,6 +6,7 @@
 #include "opentelemetry/nostd/string_view.h"
 #include "opentelemetry/sdk/common/attribute_utils.h"
 #include "opentelemetry/sdk/resource/resource_detector.h"
+#include "opentelemetry/sdk/resource/semantic_conventions.h"
 
 #include <cstdlib>
 #include <string>
@@ -17,30 +18,29 @@
 #  define putenv _putenv
 #endif
 
-class TestResource : public opentelemetry::sdk::resource::Resource
+using namespace opentelemetry::sdk::resource;
+
+class TestResource : public Resource
 {
 public:
-  TestResource(opentelemetry::sdk::resource::ResourceAttributes attributes =
-                   opentelemetry::sdk::resource::ResourceAttributes())
-      : Resource(attributes)
-  {}
+  TestResource(ResourceAttributes attributes = ResourceAttributes()) : Resource(attributes) {}
 };
 
 TEST(ResourceTest, create_without_servicename)
 {
 
-  opentelemetry::sdk::resource::ResourceAttributes expected_attributes = {
+  ResourceAttributes expected_attributes = {
       {"service", "backend"},
       {"version", (uint32_t)1},
       {"cost", 234.23},
-      {"telemetry.sdk.language", "cpp"},
-      {"telemetry.sdk.name", "opentelemetry"},
-      {"telemetry.sdk.version", OPENTELEMETRY_SDK_VERSION},
-      {"service.name", "unknown_service"}};
+      {SemanticConventions::GetAttributeTelemetrySdkLanguage(), "cpp"},
+      {SemanticConventions::GetAttributeTelemetrySdkName(), "opentelemetry"},
+      {SemanticConventions::GetAttributeTelemetrySdkVersion(), OPENTELEMETRY_SDK_VERSION},
+      {SemanticConventions::GetAttributeServiceName(), "unknown_service"}};
 
-  opentelemetry::sdk::resource::ResourceAttributes attributes = {
+  ResourceAttributes attributes = {
       {"service", "backend"}, {"version", (uint32_t)1}, {"cost", 234.23}};
-  auto resource            = opentelemetry::sdk::resource::Resource::Create(attributes);
+  auto resource            = Resource::Create(attributes);
   auto received_attributes = resource.GetAttributes();
   for (auto &e : received_attributes)
   {
@@ -61,17 +61,17 @@ TEST(ResourceTest, create_without_servicename)
 
 TEST(ResourceTest, create_with_servicename)
 {
-  opentelemetry::sdk::resource::ResourceAttributes expected_attributes = {
+  ResourceAttributes expected_attributes = {
       {"version", (uint32_t)1},
       {"cost", 234.23},
-      {"telemetry.sdk.language", "cpp"},
-      {"telemetry.sdk.name", "opentelemetry"},
-      {"telemetry.sdk.version", OPENTELEMETRY_SDK_VERSION},
-      {"service.name", "backend"},
+      {SemanticConventions::GetAttributeTelemetrySdkLanguage(), "cpp"},
+      {SemanticConventions::GetAttributeTelemetrySdkName(), "opentelemetry"},
+      {SemanticConventions::GetAttributeTelemetrySdkVersion(), OPENTELEMETRY_SDK_VERSION},
+      {SemanticConventions::GetAttributeServiceName(), "backend"},
   };
-  opentelemetry::sdk::resource::ResourceAttributes attributes = {
+  ResourceAttributes attributes = {
       {"service.name", "backend"}, {"version", (uint32_t)1}, {"cost", 234.23}};
-  auto resource            = opentelemetry::sdk::resource::Resource::Create(attributes);
+  auto resource            = Resource::Create(attributes);
   auto received_attributes = resource.GetAttributes();
   for (auto &e : received_attributes)
   {
@@ -94,15 +94,15 @@ TEST(ResourceTest, create_with_servicename)
 
 TEST(ResourceTest, create_with_emptyatrributes)
 {
-  opentelemetry::sdk::resource::ResourceAttributes expected_attributes = {
-      {"telemetry.sdk.language", "cpp"},
-      {"telemetry.sdk.name", "opentelemetry"},
-      {"telemetry.sdk.version", OPENTELEMETRY_SDK_VERSION},
-      {"service.name", "unknown_service"},
+  ResourceAttributes expected_attributes = {
+      {SemanticConventions::GetAttributeTelemetrySdkLanguage(), "cpp"},
+      {SemanticConventions::GetAttributeTelemetrySdkName(), "opentelemetry"},
+      {SemanticConventions::GetAttributeTelemetrySdkVersion(), OPENTELEMETRY_SDK_VERSION},
+      {SemanticConventions::GetAttributeServiceName(), "unknown_service"},
   };
-  opentelemetry::sdk::resource::ResourceAttributes attributes = {};
-  auto resource            = opentelemetry::sdk::resource::Resource::Create(attributes);
-  auto received_attributes = resource.GetAttributes();
+  ResourceAttributes attributes = {};
+  auto resource                 = Resource::Create(attributes);
+  auto received_attributes      = resource.GetAttributes();
   for (auto &e : received_attributes)
   {
     EXPECT_TRUE(expected_attributes.find(e.first) != expected_attributes.end());
@@ -114,10 +114,8 @@ TEST(ResourceTest, create_with_emptyatrributes)
 }
 TEST(ResourceTest, Merge)
 {
-  TestResource resource1(
-      opentelemetry::sdk::resource::ResourceAttributes({{"service", "backend"}}));
-  TestResource resource2(
-      opentelemetry::sdk::resource::ResourceAttributes({{"host", "service-host"}}));
+  TestResource resource1(ResourceAttributes({{"service", "backend"}}));
+  TestResource resource2(ResourceAttributes({{"host", "service-host"}}));
   std::map<std::string, std::string> expected_attributes = {{"service", "backend"},
                                                             {"host", "service-host"}};
 
@@ -164,7 +162,7 @@ TEST(ResourceTest, OtelResourceDetector)
   char env[] = "OTEL_RESOURCE_ATTRIBUTES=k=v";
   putenv(env);
 
-  opentelemetry::sdk::resource::OTELResourceDetector detector;
+  OTELResourceDetector detector;
   auto resource            = detector.Detect();
   auto received_attributes = resource.GetAttributes();
   for (auto &e : received_attributes)
@@ -192,7 +190,7 @@ TEST(ResourceTest, OtelResourceDetectorEmptyEnv)
 #else
   unsetenv("OTEL_RESOURCE_ATTRIBUTES");
 #endif
-  opentelemetry::sdk::resource::OTELResourceDetector detector;
+  OTELResourceDetector detector;
   auto resource            = detector.Detect();
   auto received_attributes = resource.GetAttributes();
   for (auto &e : received_attributes)
