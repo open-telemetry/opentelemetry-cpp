@@ -3,6 +3,7 @@ cmake_minimum_required(VERSION 3.1)
 # See https://cmake.org/cmake/help/v3.3/policy/CMP0057.html required by certain
 # versions of gtest
 cmake_policy(SET CMP0057 NEW)
+cmake_policy(SET CMP0079 NEW)
 
 project(opentelemetry-cpp)
 
@@ -84,6 +85,9 @@ endif()
 if(NOT DEFINED CMAKE_CXX_STANDARD)
   set(CMAKE_CXX_STANDARD 11)
 endif()
+
+option(BUILD_CONTRIB
+       "Build OpenTelemetry C++ SDK with optional community contributions" OFF)
 
 option(WITH_STL "Whether to use Standard Library for C++latest features" OFF)
 
@@ -356,6 +360,30 @@ if(NOT WITH_API_ONLY)
   if(WITH_EXAMPLES)
     add_subdirectory(examples)
   endif()
+
+  if(DEFINED ENV{OPENTELEMETRY_CONTRIB_PATH})
+    # Add custom contrib path to build tree and consolidate binary artifacts in
+    # current project binary output directory.
+    add_subdirectory($ENV{OPENTELEMETRY_CONTRIB_PATH}
+                     ${PROJECT_BINARY_DIR}/contrib)
+  endif()
+
+  if(BUILD_CONTRIB)
+    # This option requires CMake 3.11+: add standard remote contrib to build
+    # tree.
+    include(FetchContent)
+    FetchContent_Declare(
+      contrib
+      GIT_REPOSITORY
+        "https://github.com/open-telemetry/opentelemetry-cpp-contrib"
+      GIT_TAG "main")
+    FetchContent_GetProperties(contrib)
+    if(NOT contrib_POPULATED)
+      FetchContent_Populate(contrib)
+      add_subdirectory(${contrib_SOURCE_DIR})
+    endif()
+  endif()
+
 endif()
 
 # Export cmake config and support find_packages(opentelemetry-cpp CONFIG) Write
