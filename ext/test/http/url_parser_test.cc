@@ -1,11 +1,11 @@
 // Copyright The OpenTelemetry Authors
 // SPDX-License-Identifier: Apache-2.0
 
-#include "opentelemetry/ext/net/common/url_parser.h"
+#include "opentelemetry/ext/http/common/url_parser.h"
 
 #include <gtest/gtest.h>
 
-using namespace opentelemetry::ext::net::common;
+namespace http_common = opentelemetry::ext::http::common;
 
 inline const char *const BoolToString(bool b)
 {
@@ -117,7 +117,7 @@ TEST(UrlParserTests, BasicTests)
   };
   for (auto &url_map : urls_map)
   {
-    UrlParser url(url_map.first);
+    http_common::UrlParser url(url_map.first);
     auto url_properties = url_map.second;
     ASSERT_EQ(BoolToString(url.success_), url_properties["success"]);
     ASSERT_EQ(url.host_, url_properties["host"]);

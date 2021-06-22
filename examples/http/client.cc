@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 #include "opentelemetry/ext/http/client/http_client_factory.h"
-#include "opentelemetry/ext/net/common/url_parser.h"
+#include "opentelemetry/ext/http/common/url_parser.h"
 #include "tracer_common.h"
 
 namespace
@@ -15,7 +15,7 @@ void sendRequest(const std::string &url)
   // start active span
   opentelemetry::trace::StartSpanOptions options;
   options.kind = opentelemetry::trace::SpanKind::kClient;  // client
-  opentelemetry::ext::net::common::UrlParser url_parser(url);
+  opentelemetry::ext::http::common::UrlParser url_parser(url);
 
   std::string span_name = url_parser.path_;
   auto span             = get_tracer("http-client")

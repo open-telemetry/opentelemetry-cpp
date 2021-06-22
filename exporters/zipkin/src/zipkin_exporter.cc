@@ -4,7 +4,7 @@
 #include "opentelemetry/exporters/zipkin/zipkin_exporter.h"
 #include "opentelemetry/exporters/zipkin/recordable.h"
 #include "opentelemetry/ext/http/client/http_client_factory.h"
-#include "opentelemetry/ext/net/common/url_parser.h"
+#include "opentelemetry/ext/http/common/url_parser.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace exporter
