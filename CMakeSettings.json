@@ -136,7 +136,7 @@
             "inheritEnvironments": [ "msvc_x64_x64" ],
             "variables": [
                 {
-                    "name": "WITH_CONTRIB",
+                    "name": "BUILD_CONTRIB",
                     "value": "False",
                     "type": "BOOL"
                 },
@@ -176,7 +176,7 @@
             "inheritEnvironments": [ "msvc_x64_x64" ],
             "variables": [
                 {
-                    "name": "WITH_CONTRIB",
+                    "name": "BUILD_CONTRIB",
                     "value": "False",
                     "type": "BOOL"
                 },
