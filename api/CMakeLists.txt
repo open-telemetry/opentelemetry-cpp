@@ -41,10 +41,18 @@ if(BUILD_TESTING)
   add_subdirectory(test)
 endif()
 
+if(WITH_ABSEIL)
+  target_compile_definitions(opentelemetry_api INTERFACE HAVE_ABSEIL)
+endif()
+
 if(WITH_STL)
   message("Building with standard library types...")
   target_compile_definitions(opentelemetry_api INTERFACE HAVE_CPP_STDLIB
                                                          HAVE_GSL)
 else()
   message("Building with nostd types...")
+endif()
+
+if(CORE_RUNTIME_LIBS)
+  target_link_libraries(opentelemetry_api INTERFACE ${CORE_RUNTIME_LIBS})
 endif()

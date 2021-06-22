@@ -23,6 +23,22 @@ jobs:
         sudo ./ci/setup_thrift.sh
         ./ci/do_ci.sh cmake.test
 
+  cmake_absel_stl_test:
+    name: CMake test (with abseil)
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+      with:
+        submodules: 'recursive'
+    - name: setup
+      run: |
+        sudo ./ci/setup_cmake.sh
+        sudo ./ci/setup_ci_environment.sh
+    - name: run cmake tests (enable abseil-cpp)
+      run: |
+        sudo ./ci/install_abseil.sh
+        ./ci/do_ci.sh cmake.abseil.test
+
   cmake_gcc_48_test:
     name: CMake gcc 4.8
     runs-on: ubuntu-18.04
@@ -56,6 +72,8 @@ jobs:
         sudo ./ci/setup_cmake.sh
     - name: run tests
       run: ./ci/do_ci.sh cmake.c++20.test
+    - name: run tests (enable stl)
+      run: ./ci/do_ci.sh cmake.c++20.stl.test
 
   cmake_otprotocol_test:
     name: CMake test (with otlp-exporter)

@@ -140,6 +140,7 @@ constexpr auto visit(_Callable &&_Obj, _Variants &&... _Args)
 };
 
 #else
+using std::bad_variant_access;
 
 template <std::size_t I, class... Types>
 constexpr std::variant_alternative_t<I, std::variant<Types...>> &get(std::variant<Types...> &v)

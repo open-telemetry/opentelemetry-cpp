@@ -1,7 +1,7 @@
 // Copyright The OpenTelemetry Authors
 // SPDX-License-Identifier: Apache-2.0
 
-#include "opentelemetry/exporters/otlp/otlp_exporter.h"
+#include "opentelemetry/exporters/otlp/otlp_grpc_exporter.h"
 #include "opentelemetry/exporters/otlp/otlp_recordable.h"
 
 #include <benchmark/benchmark.h>
@@ -57,8 +57,8 @@ class FakeServiceStub : public proto::collector::trace::v1::TraceService::StubIn
   }
 };
 
-// OtlpExporterTestPeer is a friend class of OtlpExporter
-class OtlpExporterTestPeer
+// OtlpGrpcExporterTestPeer is a friend class of OtlpGrpcExporter
+class OtlpGrpcExporterTestPeer
 {
 public:
   std::unique_ptr<sdk::trace::SpanExporter> GetExporter()
@@ -67,7 +67,7 @@ public:
     std::unique_ptr<proto::collector::trace::v1::TraceService::StubInterface> stub_interface(
         mock_stub);
     return std::unique_ptr<sdk::trace::SpanExporter>(
-        new exporter::otlp::OtlpExporter(std::move(stub_interface)));
+        new exporter::otlp::OtlpGrpcExporter(std::move(stub_interface)));
   }
 };
 
@@ -125,7 +125,7 @@ void CreateDenseSpans(std::array<std::unique_ptr<sdk::trace::Recordable>, kBatch
 // Benchmark Export() with empty spans
 void BM_OtlpExporterEmptySpans(benchmark::State &state)
 {
-  std::unique_ptr<OtlpExporterTestPeer> testpeer(new OtlpExporterTestPeer());
+  std::unique_ptr<OtlpGrpcExporterTestPeer> testpeer(new OtlpGrpcExporterTestPeer());
   auto exporter = testpeer->GetExporter();
 
   while (state.KeepRunningBatch(kNumIterations))
@@ -140,7 +140,7 @@ BENCHMARK(BM_OtlpExporterEmptySpans);
 // Benchmark Export() with sparse spans
 void BM_OtlpExporterSparseSpans(benchmark::State &state)
 {
-  std::unique_ptr<OtlpExporterTestPeer> testpeer(new OtlpExporterTestPeer());
+  std::unique_ptr<OtlpGrpcExporterTestPeer> testpeer(new OtlpGrpcExporterTestPeer());
   auto exporter = testpeer->GetExporter();
 
   while (state.KeepRunningBatch(kNumIterations))
@@ -155,7 +155,7 @@ BENCHMARK(BM_OtlpExporterSparseSpans);
 // Benchmark Export() with dense spans
 void BM_OtlpExporterDenseSpans(benchmark::State &state)
 {
-  std::unique_ptr<OtlpExporterTestPeer> testpeer(new OtlpExporterTestPeer());
+  std::unique_ptr<OtlpGrpcExporterTestPeer> testpeer(new OtlpGrpcExporterTestPeer());
   auto exporter = testpeer->GetExporter();
 
   while (state.KeepRunningBatch(kNumIterations))

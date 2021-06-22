@@ -15,6 +15,21 @@ Increment the:
 
 ## [Unreleased]
 
+## [1.0.0-rc2] 2021-06-18
+
+* [EXPORTER] Jaeger Exporter - Support for Instrumentation Library ([#864](https://github.com/open-telemetry/opentelemetry-cpp/pull/864))
+* [TESTS] Adding benchmark tests for baggage api ([#861](https://github.com/open-telemetry/opentelemetry-cpp/pull/861))
+* [BUILD] Fix for GCC9/C++20 Support for using STL for modern C++ features ([#860](https://github.com/open-telemetry/opentelemetry-cpp/pull/860))
+* [TESTS] Adding benchmark tests for span create api ([#856](https://github.com/open-telemetry/opentelemetry-cpp/pull/856))
+* [BUILD] Fix for using Abseil library for modern C++ features ([#850](https://github.com/open-telemetry/opentelemetry-cpp/pull/850))
+* [BUILD] Fix issues with win32/x86 compilation ([#847](https://github.com/open-telemetry/opentelemetry-cpp/pull/847))
+* [DOCS] Document OSS dependencies and their licenses ([#844](https://github.com/open-telemetry/opentelemetry-cpp/pull/844))
+* [BUILD] Various fixes to build with Visual Studio 2015 ([#840](https://github.com/open-telemetry/opentelemetry-cpp/pull/840))
+* [INSTRUMENTATION] HTTPClient: Change support for full URL argument ([#833](https://github.com/open-telemetry/opentelemetry-cpp/pull/833))
+* [EXPORTER] Jaeger Exporter - fix endianness of Jaeger IDs for transmission ([#832](https://github.com/open-telemetry/opentelemetry-cpp/pull/832))
+* [INSTRUMENTATION] fix protobuf compilation warning in gRPC example ([#830](https://github.com/open-telemetry/opentelemetry-cpp/pull/830))
+* [EXPORTER] `BREAKING CHANGE` - Add OTLP/HTTP+JSON Protocol exporter; Rename `OtlpExporter` to `OtlpGrpcExporter` ([#810](https://github.com/open-telemetry/opentelemetry-cpp/pull/810))
+
 ## [1.0.0-rc1] 2021-06-04
 
 * [BUILD] Enable Jaeger exporter build in Windows ([#815](https://github.com/open-telemetry/opentelemetry-cpp/pull/815))

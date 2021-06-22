@@ -11,7 +11,7 @@ set_target_properties(opentelemetry_common PROPERTIES EXPORT_NAME common)
 
 target_link_libraries(
   opentelemetry_common PUBLIC opentelemetry_api opentelemetry_sdk
-                              Threads::Threads ${CORE_RUNTIME_LIBS})
+                              Threads::Threads)
 
 install(
   TARGETS opentelemetry_common

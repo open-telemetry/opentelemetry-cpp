@@ -39,9 +39,10 @@
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace nostd
 {
+using gsl::dynamic_extent;
 template <class ElementType, std::size_t Extent = gsl::dynamic_extent>
 using span = gsl::span<ElementType, Extent>;
-}
+}  // namespace nostd
 OPENTELEMETRY_END_NAMESPACE
 #    define HAVE_SPAN
 #  else
