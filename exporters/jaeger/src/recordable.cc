@@ -123,7 +123,7 @@ void Recordable::SetResource(const opentelemetry::sdk::resource::Resource &resou
   if (attributes.find(SemanticConventions::GetAttributeServiceName()) != attributes.end())
   {
     service_name_ =
-        nostd::get<std::string>(attributes[SemanticConventions::GetAttributeSericeName()]);
+        nostd::get<std::string>(attributes[SemanticConventions::GetAttributeServiceName()]);
   }
 }
 
