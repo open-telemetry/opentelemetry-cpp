@@ -10,7 +10,7 @@
  * </summary>
  * <param name="str">String to hash</param>
  * <param name="h">Initial offset</param>
- * <returns></returns>
+ * <returns>32 bit code</returns>
  */
 constexpr uint32_t hashCode(const char *str, uint32_t h = 0)
 {
