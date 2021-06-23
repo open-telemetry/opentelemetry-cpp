@@ -120,10 +120,10 @@ void Recordable::SetResource(const opentelemetry::sdk::resource::Resource &resou
 {
   // only service.name attribute is supported by specs as of now.
   auto attributes = resource.GetAttributes();
-  if (attributes.find(SemanticConventions::GetAttributeServiceName()) != attributes.end())
+  if (attributes.find(OTEL_CPP_GET_ATTR(AttrServiceName)) != attributes.end())
   {
     service_name_ =
-        nostd::get<std::string>(attributes[SemanticConventions::GetAttributeServiceName()]);
+        nostd::get<std::string>(attributes[OTEL_CPP_GET_ATTR(AttrServiceName()]);
   }
 }
 
