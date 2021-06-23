@@ -9,6 +9,7 @@ OPENTELEMETRY_BEGIN_NAMESPACE
 namespace common
 {
 
+// [maxgolov] : Need to debug this. Something here feels wrong.
 class StringUtil
 {
 public:
