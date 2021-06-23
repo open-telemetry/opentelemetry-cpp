@@ -122,8 +122,7 @@ void Recordable::SetResource(const opentelemetry::sdk::resource::Resource &resou
   auto attributes = resource.GetAttributes();
   if (attributes.find(OTEL_CPP_GET_ATTR(AttrServiceName)) != attributes.end())
   {
-    service_name_ =
-        nostd::get<std::string>(attributes[OTEL_CPP_GET_ATTR(AttrServiceName()]);
+    service_name_ = nostd::get<std::string>(attributes[OTEL_CPP_GET_ATTR(AttrServiceName)]);
   }
 }
 

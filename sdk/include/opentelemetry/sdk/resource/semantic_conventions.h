@@ -1,27 +1,20 @@
+#pragma once
+
 #include <stdint.h>
 #include <iostream>
 #include <type_traits>
 #include <unordered_map>
+
+#include "opentelemetry/common/string_util.h"
 #include "opentelemetry/version.h"
-
-// typedef uint32_t Tag;
-
-static constexpr uint32_t hashCode(const char *str, uint32_t h = 0)
-{
-  return (uint32_t)(!str[h] ? 5381 : ((uint32_t)hashCode(str, h + 1) * (uint32_t)33) ^ str[h]);
-}
-
-#define OTEL_CPP_CONST_UINT32_T(x) std::integral_constant<uint32_t, (uint32_t)x>::value
-
-#define OTEL_CPP_CONST_HASHCODE(name) OTEL_CPP_CONST_UINT32_T(hashCode(#name))
-
-#define OTEL_CPP_GET_ATTR(name) attr(OTEL_CPP_CONST_HASHCODE(name))
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace sdk
 {
 namespace resource
 {
+
+#define OTEL_CPP_GET_ATTR(name) attr(OTEL_CPP_CONST_HASHCODE(name))
 
 static const std::unordered_map<uint32_t, const char *> attribute_ids = {
     {OTEL_CPP_CONST_HASHCODE(AttrServiceName), "service.name"},
@@ -130,7 +123,8 @@ static const std::unordered_map<uint32_t, const char *> attribute_ids = {
     {OTEL_CPP_CONST_HASHCODE(AttrCronjobUid), "k8s.cronjob.id"},
     {OTEL_CPP_CONST_HASHCODE(AttrCronjobName), "k8s.cronjob.name"}};
 
-static inline const char *attr(uint32_t attr)
+// macro and function to generate hash code for semantic conventions attributes.
+inline const char *attr(uint32_t attr)
 {
   return (attribute_ids.find(attr) != attribute_ids.end()) ? attribute_ids.at(attr) : "";
 }
