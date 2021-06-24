@@ -46,13 +46,13 @@ void Recordable::SetIdentity(const trace::SpanContext &span_context,
   // https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/trace/sdk_exporters/jaeger.md#ids
 #if JAEGER_IS_LITTLE_ENDIAN == 1
   span_->__set_traceIdHigh(
-      bswap_64(*(reinterpret_cast<const int64_t *>(span_context.trace_id().Id().data()))));
+      otel_bswap_64(*(reinterpret_cast<const int64_t *>(span_context.trace_id().Id().data()))));
   span_->__set_traceIdLow(
-      bswap_64(*(reinterpret_cast<const int64_t *>(span_context.trace_id().Id().data()) + 1)));
+      otel_bswap_64(*(reinterpret_cast<const int64_t *>(span_context.trace_id().Id().data()) + 1)));
   span_->__set_spanId(
-      bswap_64(*(reinterpret_cast<const int64_t *>(span_context.span_id().Id().data()))));
+      otel_bswap_64(*(reinterpret_cast<const int64_t *>(span_context.span_id().Id().data()))));
   span_->__set_parentSpanId(
-      bswap_64(*(reinterpret_cast<const int64_t *>(parent_span_id.Id().data()))));
+      otel_bswap_64(*(reinterpret_cast<const int64_t *>(parent_span_id.Id().data()))));
 #else
   span_->__set_traceIdLow(
       *(reinterpret_cast<const int64_t *>(span_context.trace_id().Id().data())));
