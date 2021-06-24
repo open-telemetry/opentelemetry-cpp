@@ -37,13 +37,13 @@ public:
     // start span with parent context extracted from http header
     auto span = get_tracer("http-server")
                     ->StartSpan(span_name,
-                                {{SemanticConventions::GetAttributeHttpServerName(), server_name},
-                                 {SemanticConventions::GetAttributeNetHostPort(), server_port},
-                                 {SemanticConventions::GetAttributeHttpMethod(), request.method},
-                                 {SemanticConventions::GetAttributeHttpScheme(), "http"},
-                                 {SemanticConventions::GetAttributeHttpRequestContentLength(),
+                                {{OTEL_CPP_GET_ATTR(AttrHttpServerName), server_name},
+                                 {OTEL_CPP_GET_ATTR(AttrNetHostPort), server_port},
+                                 {OTEL_CPP_GET_ATTR(AttrHttpMethod), request.method},
+                                 {OTEL_CPP_GET_ATTR(AttrHttpScheme), "http"},
+                                 {OTEL_CPP_GET_ATTR(AttrHttpRequestContentLength),
                                   static_cast<uint64_t>(request.content.length())},
-                                 {SemanticConventions::GetAttributeHttpClientIp(), request.client}},
+                                 {OTEL_CPP_GET_ATTR(AttrHttpClientIp), request.client}},
                                 options);
 
     auto scope = get_tracer("http_server")->WithActiveSpan(span);
