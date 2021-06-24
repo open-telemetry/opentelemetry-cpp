@@ -62,7 +62,7 @@ public:
     if (status.ok())
     {
       span->SetStatus(opentelemetry::trace::StatusCode::kOk);
-      span->SetAttribute(SemanticConventions::GetAttributeRpcGrpcStatusCode(), status.error_code());
+      span->SetAttribute(OTEL_CPP_GET_ATTR(AttrRpcGrpcStatusCode), status.error_code());
       // Make sure to end your spans!
       span->End();
       return response.response();
@@ -71,7 +71,7 @@ public:
     {
       std::cout << status.error_code() << ": " << status.error_message() << std::endl;
       span->SetStatus(opentelemetry::trace::StatusCode::kError);
-      span->SetAttribute(SemanticConventions::GetAttributeRpcGrpcStatusCode(), status.error_code());
+      span->SetAttribute(OTEL_CPP_GET_ATTR(AttrRpcGrpcStatusCode), status.error_code());
       // Make sure to end your spans!
       span->End();
       return "RPC failed";
