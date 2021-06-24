@@ -42,11 +42,11 @@ public:
 
     std::string span_name = "GreeterClient/Greet";
     auto span             = get_tracer("grpc")->StartSpan(span_name,
-                                              {{SemanticConventions::GetAttributeRpcSystem(), "grpc"},
-                                               {SemanticConventions::GetAttributeRpcService(), "grpc-example.GreetService"},
-                                               {SemanticConventions::GetAttributeRpcMethod(), "Greet"},
-                                               {SemanticConventions::GetAttributeNetPeerIp(), ip},
-                                               {SemanticConventions::GetAttributeNetPeerPort(), port}},
+                                              {{OTEL_CPP_GET_ATTR(AttrRpcSystem), "grpc"},
+                                               {OTEL_CPP_GET_ATTR(AttrRpcService), "grpc-example.GreetService"},
+                                               {OTEL_CPP_GET_ATTR(AttrRpcMethod), "Greet"},
+                                               {OTEL_CPP_GET_ATTR(AttrNetPeerIp), ip},
+                                               {OTEL_CPP_GET_ATTR(AttrNetPeerPort), port}},
                                               options);
 
     auto scope = get_tracer("grpc-client")->WithActiveSpan(span);
