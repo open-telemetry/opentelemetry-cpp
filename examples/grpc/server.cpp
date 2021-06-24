@@ -27,7 +27,7 @@ using grpc_example::GreetResponse;
 
 using Span = opentelemetry::trace::Span;
 using SpanContext = opentelemetry::trace::SpanContext;
-using SemanticConventions = opentelemetry::trace::SemanticConventions;
+using namespace opentelemetry::trace;
 
 namespace
 {

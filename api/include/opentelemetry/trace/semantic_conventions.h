@@ -6,12 +6,11 @@
 #include "opentelemetry/common/string_util.h"
 #include "opentelemetry/version.h"
 
-#define OTEL_CPP_GET_ATTR(name) attr(OTEL_CPP_CONST_HASHCODE(name))
-#define OTEL_CPP_TRACE_ATTRIBUTES_MAX (sizeof(attribute_ids) / sizeof(attribute_ids[0]))
-
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace trace
 {
+
+#define OTEL_CPP_GET_ATTR(name) attr(OTEL_CPP_CONST_HASHCODE(name))
 
 /**
  * Stores the Constants for semantic kAttribute names outlined by the OpenTelemetry specifications.
@@ -173,6 +172,9 @@ static const struct
     {OTEL_CPP_CONST_HASHCODE(AttrExceptionEscapted), "exception.escaped"},
 };
 // function to generate hash code for semantic conventions attributes.
+
+#define OTEL_CPP_TRACE_ATTRIBUTES_MAX (sizeof(attribute_ids) / sizeof(attribute_ids[0]))
+
 inline const char *attr(uint32_t attr)
 {
   for (int i = 0; i < OTEL_CPP_TRACE_ATTRIBUTES_MAX; i++)
