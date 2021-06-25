@@ -1,7 +1,10 @@
 // Copyright The OpenTelemetry Authors
 // SPDX-License-Identifier: Apache-2.0
 
+#include <sstream>  // std::stringstream
+
 #include "TUDPTransport.h"
+#include "opentelemetry/sdk/common/global_error_handler.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace exporter
@@ -51,7 +54,9 @@ void TUDPTransport::open()
 
   if (error)
   {
-    // TODO: log error
+    std::stringstream ss;
+    ss << "Jaeger Exporter: getaddrinfo failed with error: " << error;
+    OTEL_ERROR(ss.str())
     return;
   }
 

@@ -5,6 +5,7 @@
 #include "opentelemetry/exporters/zipkin/recordable.h"
 #include "opentelemetry/ext/http/client/http_client_factory.h"
 #include "opentelemetry/ext/http/common/url_parser.h"
+#include "opentelemetry/sdk/common/global_error_handler.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace exporter
@@ -71,7 +72,7 @@ sdk::common::ExportResult ZipkinExporter::Export(
   {
     if (result.GetSessionState() == http_client::SessionState::ConnectFailed)
     {
-      // TODO -> Handle error / retries
+      OTEL_ERROR("ZIPKIN EXPORTER] Zipkin Exporter: Connection failed")
     }
     return sdk::common::ExportResult::kFailure;
   }

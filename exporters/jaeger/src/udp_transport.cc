@@ -1,6 +1,9 @@
 // Copyright The OpenTelemetry Authors
 // SPDX-License-Identifier: Apache-2.0
 
+#include <sstream>  // std::stringstream
+
+#include "opentelemetry/sdk/common/global_error_handler.h"
 #include "udp_transport.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
@@ -36,7 +39,8 @@ void UDPTransport::InitSocket()
   int err = WSAStartup(wVersionRequested, &wsaData);
   if (err != 0)
   {
-    // TODO: handle error
+    ss << "Jaeger Exporter: WSAStartup failed with error: " << error;
+    OTEL_ERROR(ss.str())
     return;
   }
 
