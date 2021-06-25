@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 #include "opentelemetry/sdk/trace/tracer_provider.h"
+#include "opentelemetry/sdk/common/global_error_handler.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace sdk
@@ -40,9 +41,10 @@ nostd::shared_ptr<opentelemetry::trace::Tracer> TracerProvider::GetTracer(
   {
     library_name = "";
   }
-  // if (library_name == "") {
-  //   // TODO: log invalid library_name.
-  // }
+  if (library_name == "")
+  {
+    OTEL_ERROR("[TracerProvider::GetTracer] Library name is empty.")
+  }
 
   const std::lock_guard<std::mutex> guard(lock_);
 

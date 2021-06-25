@@ -3,6 +3,7 @@
 
 #ifdef ENABLE_LOGS_PREVIEW
 #  include "opentelemetry/sdk/logs/logger.h"
+#  include "opentelemetry/sdk/common/global_error_handler.h"
 #  include "opentelemetry/sdk/logs/log_record.h"
 #  include "opentelemetry/trace/provider.h"
 
@@ -48,7 +49,7 @@ void Logger::Log(opentelemetry::logs::Severity severity,
   auto recordable = processor->MakeRecordable();
   if (recordable == nullptr)
   {
-    // TODO: Error diagnostics should indicate "recordable creation failed" to user
+    OTEL_ERROR("[LOGGER] Recordable creation failed")
     return;
   }
 
