@@ -171,6 +171,7 @@ sdk::common::ExportResult ElasticsearchLogExporter::Export(
     std::stringstream ss;
     ss << "[ES Trace Exporter] DEBUG: waiting for response from Elasticsearch (timeout = "
        << options_.response_timeout_ << " seconds)" << std::endl;
+    OTEL_ERROR(ss.str())
   }
   bool write_successful = handler->waitForResponse();
 
@@ -193,14 +194,12 @@ sdk::common::ExportResult ElasticsearchLogExporter::Export(
           "body:"
        << std::endl;
     ss << responseBody << std::endl;
-    OTEL_ERROR(s.str())
+    OTEL_ERROR(ss.str())
+    // TODO: Retry logic
+    return sdk::common::ExportResult::kFailure;
   }
 
-  // TODO: Retry logic
-  return sdk::common::ExportResult::kFailure;
-}
-
-return sdk::common::ExportResult::kSuccess;
+  return sdk::common::ExportResult::kSuccess;
 }  // namespace logs
 
 bool ElasticsearchLogExporter::Shutdown(std::chrono::microseconds timeout) noexcept
@@ -213,7 +212,7 @@ bool ElasticsearchLogExporter::Shutdown(std::chrono::microseconds timeout) noexc
 
   return true;
 }
-}  // namespace exporter
+}  // namespace logs
 }  // namespace exporter
 OPENTELEMETRY_END_NAMESPACE
 #endif
