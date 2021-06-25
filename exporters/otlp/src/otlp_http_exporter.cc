@@ -76,7 +76,7 @@ public:
           return true;
         });
         ss << "Body:" << std::endl << body_ << std::endl;
-        ERROR(ss.str())
+        OTEL_ERROR(ss.str())
       }
 
       // Set the response_received_ flag to true and notify any threads waiting on this result
