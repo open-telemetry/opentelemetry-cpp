@@ -70,8 +70,8 @@ public:
         std::stringstream ss;
         ss << "[OTLP HTTP Exporter] DEBUG: Status:" << response.GetStatusCode() << std::endl
            << "Header:" << std::endl;
-        response.ForEachHeader([](opentelemetry::nostd::string_view header_name,
-                                  opentelemetry::nostd::string_view header_value) {
+        response.ForEachHeader([&ss](opentelemetry::nostd::string_view header_name,
+                                     opentelemetry::nostd::string_view header_value) {
           ss << "\t" << header_name.data() << " : " << header_value.data() << std::endl;
           return true;
         });
