@@ -200,7 +200,7 @@ sdk::common::ExportResult ElasticsearchLogExporter::Export(
   }
 
   return sdk::common::ExportResult::kSuccess;
-}  // namespace logs
+}
 
 bool ElasticsearchLogExporter::Shutdown(std::chrono::microseconds timeout) noexcept
 {
