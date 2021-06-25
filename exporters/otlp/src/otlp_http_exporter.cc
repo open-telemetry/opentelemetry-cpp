@@ -16,11 +16,12 @@
 #include "opentelemetry/proto/collector/trace/v1/trace_service.pb.h"
 
 #include "opentelemetry/exporters/otlp/protobuf_include_suffix.h"
+#include "opentelemetry/sdk/common/global_error_handler.h"
 
 #include <condition_variable>
 #include <fstream>
-#include <iostream>
 #include <mutex>
+#include <sstream>
 #include <string>
 #include <vector>
 
@@ -66,14 +67,16 @@ public:
 
       if (console_debug_)
       {
-        std::cout << "[OTLP HTTP Exporter] Status:" << response.GetStatusCode() << std::endl
-                  << "Header:" << std::endl;
+        std::stringstream ss;
+        ss << "[OTLP HTTP Exporter] DEBUG: Status:" << response.GetStatusCode() << std::endl
+           << "Header:" << std::endl;
         response.ForEachHeader([](opentelemetry::nostd::string_view header_name,
                                   opentelemetry::nostd::string_view header_value) {
-          std::cout << "\t" << header_name.data() << " : " << header_value.data() << std::endl;
+          ss << "\t" << header_name.data() << " : " << header_value.data() << std::endl;
           return true;
         });
-        std::cout << "Body:" << std::endl << body_ << std::endl;
+        ss << "Body:" << std::endl << body_ << std::endl;
+        ERROR(ss.str())
       }
 
       // Set the response_received_ flag to true and notify any threads waiting on this result
