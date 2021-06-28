@@ -50,7 +50,7 @@ void Logger::Log(opentelemetry::logs::Severity severity,
   auto recordable = processor->MakeRecordable();
   if (recordable == nullptr)
   {
-    OTEL_INTERNAL_LOG_ERROR("[LOGGER] Recordable creation failed")
+    OTEL_INTERNAL_LOG_ERROR("[LOGGER] Recordable creation failed");
     return;
   }
 
