@@ -3,7 +3,6 @@
 
 #ifdef ENABLE_LOGS_PREVIEW
 #  include "opentelemetry/sdk/logs/logger.h"
-#  include "opentelemetry/sdk/common/global_error_handler.h"
 #  include "opentelemetry/sdk/logs/log_record.h"
 #  include "opentelemetry/sdk_config.h"
 #  include "opentelemetry/trace/provider.h"

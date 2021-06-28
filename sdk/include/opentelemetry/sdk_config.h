@@ -4,4 +4,4 @@
 #pragma once
 
 #include "opentelemetry/config.h"
-#include "opentelemetry/sdk/common/global_error_handler.h"
+#include "opentelemetry/sdk/common/global_log_handler.h"
