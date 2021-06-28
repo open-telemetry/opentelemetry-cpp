@@ -76,7 +76,7 @@ public:
           return true;
         });
         ss << "Body:" << std::endl << body_ << std::endl;
-        OTEL_INTERNAL_LOG_LEVEL_DEBUG(ss.str())
+        OTEL_INTERNAL_LOG_LEVEL_DEBUG(ss.str());
       }
 
       // Set the response_received_ flag to true and notify any threads waiting on this result
@@ -121,67 +121,67 @@ public:
       case http_client::SessionState::Created:
         if (console_debug_)
         {
-          OTEL_INTERNAL_LOG_ERROR("[OTLP HTTP Exporter] DEBUG: Session state: session created")
+          OTEL_INTERNAL_LOG_ERROR("[OTLP HTTP Exporter] DEBUG: Session state: session created");
         }
         break;
 
       case http_client::SessionState::Destroyed:
         if (console_debug_)
         {
-          OTEL_INTERNAL_LOG_ERROR("[OTLP HTTP Exporter] DEBUG: Session state: session destroyed")
+          OTEL_INTERNAL_LOG_ERROR("[OTLP HTTP Exporter] DEBUG: Session state: session destroyed");
         }
         break;
 
       case http_client::SessionState::Connecting:
         if (console_debug_)
         {
-          OTEL_INTERNAL_LOG_ERROR("[OTLP HTTP Exporter] DEBUG: Session state: connecting to peer")
+          OTEL_INTERNAL_LOG_ERROR("[OTLP HTTP Exporter] DEBUG: Session state: connecting to peer");
         }
         break;
 
       case http_client::SessionState::ConnectFailed:
-        OTEL_INTERNAL_LOG_ERROR("[OTLP HTTP Exporter] Session state: connection failed")
+        OTEL_INTERNAL_LOG_ERROR("[OTLP HTTP Exporter] Session state: connection failed");
         cv_.notify_all();
         break;
 
       case http_client::SessionState::Connected:
         if (console_debug_)
         {
-          OTEL_INTERNAL_LOG_DEBUG("[OTLP HTTP Exporter] Session state: connected")
+          OTEL_INTERNAL_LOG_DEBUG("[OTLP HTTP Exporter] Session state: connected");
         }
         break;
 
       case http_client::SessionState::Sending:
         if (console_debug_)
         {
-          OTEL_INTERNAL_LOG_DEBUG("[OTLP HTTP Exporter] DEBUG: Session state: sending request")
+          OTEL_INTERNAL_LOG_DEBUG("[OTLP HTTP Exporter] DEBUG: Session state: sending request");
         }
         break;
 
       case http_client::SessionState::SendFailed:
-        OTEL_INTERNAL_LOG_ERROR("[OTLP HTTP Exporter] Session state: request send failed\n")
+        OTEL_INTERNAL_LOG_ERROR("[OTLP HTTP Exporter] Session state: request send failed\n");
         cv_.notify_all();
         break;
 
       case http_client::SessionState::Response:
         if (console_debug_)
         {
-          OTEL_INTERNAL_LOG_DEBUG("[OTLP HTTP Exporter] DEBUG:Session state: response received\n")
+          OTEL_INTERNAL_LOG_DEBUG("[OTLP HTTP Exporter] DEBUG:Session state: response received\n");
         }
         break;
 
       case http_client::SessionState::SSLHandshakeFailed:
-        OTEL_INTERNAL_LOG_ERROR("[OTLP HTTP Exporter] Session state: SSL handshake failed\n")
+        OTEL_INTERNAL_LOG_ERROR("[OTLP HTTP Exporter] Session state: SSL handshake failed\n");
         cv_.notify_all();
         break;
 
       case http_client::SessionState::TimedOut:
-        OTEL_INTERNAL_LOG_ERROR("[OTLP HTTP Exporter] Session state: request time out\n")
+        OTEL_INTERNAL_LOG_ERROR("[OTLP HTTP Exporter] Session state: request time out\n");
         cv_.notify_all();
         break;
 
       case http_client::SessionState::NetworkError:
-        OTEL_INTERNAL_LOG_ERROR("[OTLP HTTP Exporter] Session state: network error\n")
+        OTEL_INTERNAL_LOG_ERROR("[OTLP HTTP Exporter] Session state: network error\n");
         cv_.notify_all();
         break;
 
@@ -189,7 +189,7 @@ public:
         if (console_debug_)
         {
           OTEL_INTERNAL_LOG_DEBUG(
-              "[OTLP HTTP Exporter] DEBUG: Session state: error reading responsen")
+              "[OTLP HTTP Exporter] DEBUG: Session state: error reading responsen");
         }
         break;
 
@@ -197,12 +197,12 @@ public:
         if (console_debug_)
         {
           OTEL_INTERNAL_LOG_DEBUG(
-              "[OTLP HTTP Exporter] DEBUG:Session state: error writing request\n")
+              "[OTLP HTTP Exporter] DEBUG:Session state: error writing request\n");
         }
         break;
 
       case http_client::SessionState::Cancelled:
-        OTEL_INTERNAL_LOG_ERROR("[OTLP HTTP Exporter] Session state: (manually) cancelled\n")
+        OTEL_INTERNAL_LOG_ERROR("[OTLP HTTP Exporter] Session state: (manually) cancelled\n");
         cv_.notify_all();
         break;
 
@@ -622,9 +622,7 @@ sdk::common::ExportResult OtlpHttpExporter::Export(
         json_request.dump(-1, ' ', false, nlohmann::detail::error_handler_t::replace);
     if (options_.console_debug)
     {
-      std::stringstream ss;
-      ss << "[OTLP HTTP Exporter] DEBUG: Request body(Json):\n" << post_body_json << std::endl;
-      OTEL_INTERNAL_LOG_DEBUG(ss.str())
+      OTEL_INTERNAL_LOG_DEBUG("[OTLP HTTP Exporter] DEBUG: Request body(Json)" << post_body_json );
     }
     body_vec.assign(post_body_json.begin(), post_body_json.end());
     content_type = kHttpJsonContentType;
@@ -648,7 +646,7 @@ sdk::common::ExportResult OtlpHttpExporter::Export(
   {
     OTEL_INTERNAL_LOG_ERROR("[OTLP HTTP Exporter] DEBUG: Waiting for response from "
                             << options_.url << " (timeout = " << options_.timeout.count()
-                            << " milliseconds)")
+                            << " milliseconds)");
   }
   bool write_successful = handler->waitForResponse();
 
