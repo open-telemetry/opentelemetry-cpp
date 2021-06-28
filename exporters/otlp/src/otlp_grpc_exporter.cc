@@ -113,7 +113,7 @@ sdk::common::ExportResult OtlpGrpcExporter::Export(
   if (!status.ok())
   {
 
-    OTEL_INTERNAL_LOG_ERROR("[OTLP Exporter] Export() failed: " << status.error_message())
+    OTEL_INTERNAL_LOG_ERROR("[OTLP Exporter] Export() failed: " << status.error_message());
     return sdk::common::ExportResult::kFailure;
   }
   return sdk::common::ExportResult::kSuccess;

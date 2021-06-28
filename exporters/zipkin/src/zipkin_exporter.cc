@@ -72,7 +72,7 @@ sdk::common::ExportResult ZipkinExporter::Export(
   {
     if (result.GetSessionState() == http_client::SessionState::ConnectFailed)
     {
-      OTEL_INTERNAL_LOG_ERROR("ZIPKIN EXPORTER] Zipkin Exporter: Connection failed")
+      OTEL_INTERNAL_LOG_ERROR("ZIPKIN EXPORTER] Zipkin Exporter: Connection failed");
     }
     return sdk::common::ExportResult::kFailure;
   }

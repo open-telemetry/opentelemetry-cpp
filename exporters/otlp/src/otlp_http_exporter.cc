@@ -68,15 +68,14 @@ public:
       if (console_debug_)
       {
         std::stringstream ss;
-        ss << "[OTLP HTTP Exporter] DEBUG: Status:" << response.GetStatusCode() << std::endl
-           << "Header:" << std::endl;
+        ss << "[OTLP HTTP Exporter] Status:" << response.GetStatusCode() << "Header:";
         response.ForEachHeader([&ss](opentelemetry::nostd::string_view header_name,
                                      opentelemetry::nostd::string_view header_value) {
-          ss << "\t" << header_name.data() << " : " << header_value.data() << std::endl;
+          ss << "\t" << header_name.data() << " : " << header_value.data() << ",";
           return true;
         });
-        ss << "Body:" << std::endl << body_ << std::endl;
-        OTEL_INTERNAL_LOG_LEVEL_DEBUG(ss.str());
+        ss << "Body:" << body_;
+        OTEL_INTERNAL_LOG_DEBUG(ss.str());
       }
 
       // Set the response_received_ flag to true and notify any threads waiting on this result
@@ -121,21 +120,21 @@ public:
       case http_client::SessionState::Created:
         if (console_debug_)
         {
-          OTEL_INTERNAL_LOG_ERROR("[OTLP HTTP Exporter] DEBUG: Session state: session created");
+          OTEL_INTERNAL_LOG_DEBUG("[OTLP HTTP Exporter] Session state: session created");
         }
         break;
 
       case http_client::SessionState::Destroyed:
         if (console_debug_)
         {
-          OTEL_INTERNAL_LOG_ERROR("[OTLP HTTP Exporter] DEBUG: Session state: session destroyed");
+          OTEL_INTERNAL_LOG_DEBUG("[OTLP HTTP Exporter] Session state: session destroyed");
         }
         break;
 
       case http_client::SessionState::Connecting:
         if (console_debug_)
         {
-          OTEL_INTERNAL_LOG_ERROR("[OTLP HTTP Exporter] DEBUG: Session state: connecting to peer");
+          OTEL_INTERNAL_LOG_DEBUG("[OTLP HTTP Exporter] Session state: connecting to peer");
         }
         break;
 
@@ -154,42 +153,41 @@ public:
       case http_client::SessionState::Sending:
         if (console_debug_)
         {
-          OTEL_INTERNAL_LOG_DEBUG("[OTLP HTTP Exporter] DEBUG: Session state: sending request");
+          OTEL_INTERNAL_LOG_DEBUG("[OTLP HTTP Exporter] Session state: sending request");
         }
         break;
 
       case http_client::SessionState::SendFailed:
-        OTEL_INTERNAL_LOG_ERROR("[OTLP HTTP Exporter] Session state: request send failed\n");
+        OTEL_INTERNAL_LOG_ERROR("[OTLP HTTP Exporter] Session state: request send failed");
         cv_.notify_all();
         break;
 
       case http_client::SessionState::Response:
         if (console_debug_)
         {
-          OTEL_INTERNAL_LOG_DEBUG("[OTLP HTTP Exporter] DEBUG:Session state: response received\n");
+          OTEL_INTERNAL_LOG_DEBUG("[OTLP HTTP Exporter] Session state: response received");
         }
         break;
 
       case http_client::SessionState::SSLHandshakeFailed:
-        OTEL_INTERNAL_LOG_ERROR("[OTLP HTTP Exporter] Session state: SSL handshake failed\n");
+        OTEL_INTERNAL_LOG_ERROR("[OTLP HTTP Exporter] Session state: SSL handshake failed");
         cv_.notify_all();
         break;
 
       case http_client::SessionState::TimedOut:
-        OTEL_INTERNAL_LOG_ERROR("[OTLP HTTP Exporter] Session state: request time out\n");
+        OTEL_INTERNAL_LOG_ERROR("[OTLP HTTP Exporter] Session state: request time out");
         cv_.notify_all();
         break;
 
       case http_client::SessionState::NetworkError:
-        OTEL_INTERNAL_LOG_ERROR("[OTLP HTTP Exporter] Session state: network error\n");
+        OTEL_INTERNAL_LOG_ERROR("[OTLP HTTP Exporter] Session state: network error");
         cv_.notify_all();
         break;
 
       case http_client::SessionState::ReadError:
         if (console_debug_)
         {
-          OTEL_INTERNAL_LOG_DEBUG(
-              "[OTLP HTTP Exporter] DEBUG: Session state: error reading responsen");
+          OTEL_INTERNAL_LOG_DEBUG("[OTLP HTTP Exporter] Session state: error reading response");
         }
         break;
 
@@ -197,7 +195,7 @@ public:
         if (console_debug_)
         {
           OTEL_INTERNAL_LOG_DEBUG(
-              "[OTLP HTTP Exporter] DEBUG:Session state: error writing request\n");
+              "[OTLP HTTP Exporter] DEBUG:Session state: error writing request");
         }
         break;
 
@@ -596,16 +594,16 @@ sdk::common::ExportResult OtlpHttpExporter::Export(
     {
       if (options_.console_debug)
       {
-        std::cout << "[OTLP HTTP Exporter] Request body(Binary):\n"
-                  << service_request.Utf8DebugString() << std::endl;
+        OTEL_INTERNAL_LOG_DEBUG(
+            "[OTLP HTTP Exporter] Request body(Binary): " << service_request.Utf8DebugString());
       }
     }
     else
     {
       if (options_.console_debug)
       {
-        std::cout << "[OTLP HTTP Exporter] Serialize body failed(Binary):"
-                  << service_request.InitializationErrorString() << std::endl;
+        OTEL_INTERNAL_LOG_DEBUG("[OTLP HTTP Exporter] Serialize body failed(Binary):"
+                                << service_request.InitializationErrorString());
       }
       return sdk::common::ExportResult::kFailure;
     }
@@ -622,7 +620,7 @@ sdk::common::ExportResult OtlpHttpExporter::Export(
         json_request.dump(-1, ' ', false, nlohmann::detail::error_handler_t::replace);
     if (options_.console_debug)
     {
-      OTEL_INTERNAL_LOG_DEBUG("[OTLP HTTP Exporter] DEBUG: Request body(Json)" << post_body_json );
+      OTEL_INTERNAL_LOG_DEBUG("[OTLP HTTP Exporter] Request body(Json)" << post_body_json);
     }
     body_vec.assign(post_body_json.begin(), post_body_json.end());
     content_type = kHttpJsonContentType;
@@ -644,7 +642,7 @@ sdk::common::ExportResult OtlpHttpExporter::Export(
   // Wait for the response to be received
   if (options_.console_debug)
   {
-    OTEL_INTERNAL_LOG_ERROR("[OTLP HTTP Exporter] DEBUG: Waiting for response from "
+    OTEL_INTERNAL_LOG_DEBUG("[OTLP HTTP Exporter] DEBUG: Waiting for response from "
                             << options_.url << " (timeout = " << options_.timeout.count()
                             << " milliseconds)");
   }

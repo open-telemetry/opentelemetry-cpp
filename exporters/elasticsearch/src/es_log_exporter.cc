@@ -77,19 +77,19 @@ public:
     switch (state)
     {
       case http_client::SessionState::ConnectFailed:
-        OTEL_INTERNAL_LOG_ERROR("[ES Trace Exporter] Connection to elasticsearch failed")
+        OTEL_INTERNAL_LOG_ERROR("[ES Trace Exporter] Connection to elasticsearch failed");
         cv_.notify_all();
         break;
       case http_client::SessionState::SendFailed:
-        OTEL_INTERNAL_LOG_ERROR("[ES Trace Exporter] Request failed to be sent to elasticsearch")
+        OTEL_INTERNAL_LOG_ERROR("[ES Trace Exporter] Request failed to be sent to elasticsearch");
         cv_.notify_all();
         break;
       case http_client::SessionState::TimedOut:
-        OTEL_INTERNAL_LOG_ERROR("[ES Trace Exporter] Request to elasticsearch timed out")
+        OTEL_INTERNAL_LOG_ERROR("[ES Trace Exporter] Request to elasticsearch timed out");
         cv_.notify_all();
         break;
       case http_client::SessionState::NetworkError:
-        OTEL_INTERNAL_LOG_ERROR("[ES Trace Exporter] Network error to elasticsearch")
+        OTEL_INTERNAL_LOG_ERROR("[ES Trace Exporter] Network error to elasticsearch");
         cv_.notify_all();
         break;
     }
@@ -131,7 +131,7 @@ sdk::common::ExportResult ElasticsearchLogExporter::Export(
   if (is_shutdown_)
   {
 
-    OTEL_INTERNAL_LOG_ERROR("[ES Trace Exporter] Export failed, exporter is shutdown")
+    OTEL_INTERNAL_LOG_ERROR("[ES Trace Exporter] Export failed, exporter is shutdown");
     return sdk::common::ExportResult::kFailure;
   }
 
@@ -169,7 +169,7 @@ sdk::common::ExportResult ElasticsearchLogExporter::Export(
   if (options_.console_debug_)
   {
     OTEL_INTERNAL_LOG_DEBUG(
-        "[ES Trace Exporter] DEBUG: waiting for response from Elasticsearch (timeout = "
+        "[ES Trace Exporter] waiting for response from Elasticsearch (timeout = "
         << options_.response_timeout_ << " seconds)");
   }
   bool write_successful = handler->waitForResponse();
@@ -188,7 +188,9 @@ sdk::common::ExportResult ElasticsearchLogExporter::Export(
   std::string responseBody = handler->GetResponseBody();
   if (responseBody.find("\"failed\" : 0") == std::string::npos)
   {
-    OTEL_INTERNAL_LOG_ERROR("[ES Trace Exporter] DEBUG: Logs were not written to Elasticsearch correctly, response body: "<< responseBody ;
+    OTEL_INTERNAL_LOG_ERROR(
+        "[ES Trace Exporter] Logs were not written to Elasticsearch correctly, response body: "
+        << responseBody);
     // TODO: Retry logic
     return sdk::common::ExportResult::kFailure;
   }
