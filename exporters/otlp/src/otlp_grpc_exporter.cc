@@ -3,7 +3,7 @@
 
 #include "opentelemetry/exporters/otlp/otlp_grpc_exporter.h"
 #include "opentelemetry/exporters/otlp/otlp_recordable.h"
-#include "opentelemetry/sdk/common/global_error_handler.h"
+#include "opentelemetry/sdk_config.h"
 
 #include <grpcpp/grpcpp.h>
 #include <fstream>
@@ -112,9 +112,8 @@ sdk::common::ExportResult OtlpGrpcExporter::Export(
 
   if (!status.ok())
   {
-    std::stringstream ss;
-    ss << "[OTLP Exporter] Export() failed: " << status.error_message() << "\n";
-    OTEL_ERROR(ss.str())
+
+    OTEL_INTERNAL_LOG_ERROR("[OTLP Exporter] Export() failed: " << status.error_message())
     return sdk::common::ExportResult::kFailure;
   }
   return sdk::common::ExportResult::kSuccess;

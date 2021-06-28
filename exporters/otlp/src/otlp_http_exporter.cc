@@ -76,7 +76,7 @@ public:
           return true;
         });
         ss << "Body:" << std::endl << body_ << std::endl;
-        OTEL_ERROR(ss.str())
+        OTEL_INTERNAL_LOG_LEVEL_DEBUG(ss.str())
       }
 
       // Set the response_received_ flag to true and notify any threads waiting on this result
@@ -85,7 +85,7 @@ public:
     cv_.notify_all();
   }
 
-  /**
+  /**resource
    * A method the user calls to block their thread until the response is received. The longest
    * duration is the timeout of the request, set by SetTimeoutMs()
    */
@@ -114,93 +114,95 @@ public:
     switch (state)
     {
       case http_client::SessionState::CreateFailed:
-        OTEL_ERROR("[OTLP HTTP Exporter] Session state: session create failed\n");
+        OTEL_INTERNAL_LOG_ERROR("[OTLP HTTP Exporter] Session state: session create failed");
         cv_.notify_all();
         break;
 
       case http_client::SessionState::Created:
         if (console_debug_)
         {
-          OTEL_ERROR("[OTLP HTTP Exporter] DEBUG: Session state: session created\n")
+          OTEL_INTERNAL_LOG_ERROR("[OTLP HTTP Exporter] DEBUG: Session state: session created")
         }
         break;
 
       case http_client::SessionState::Destroyed:
         if (console_debug_)
         {
-          OTEL_ERROR("[OTLP HTTP Exporter] DEBUG: Session state: session destroyed\n")
+          OTEL_INTERNAL_LOG_ERROR("[OTLP HTTP Exporter] DEBUG: Session state: session destroyed")
         }
         break;
 
       case http_client::SessionState::Connecting:
         if (console_debug_)
         {
-          OTEL_ERROR("[OTLP HTTP Exporter] DEBUG: Session state: connecting to peer\n")
+          OTEL_INTERNAL_LOG_ERROR("[OTLP HTTP Exporter] DEBUG: Session state: connecting to peer")
         }
         break;
 
       case http_client::SessionState::ConnectFailed:
-        OTEL_ERROR("[OTLP HTTP Exporter] Session state: connection failed\n")
+        OTEL_INTERNAL_LOG_ERROR("[OTLP HTTP Exporter] Session state: connection failed")
         cv_.notify_all();
         break;
 
       case http_client::SessionState::Connected:
         if (console_debug_)
         {
-          OTEL_ERROR("[OTLP HTTP Exporter] DEBUG Session state: connected\n")
+          OTEL_INTERNAL_LOG_DEBUG("[OTLP HTTP Exporter] Session state: connected")
         }
         break;
 
       case http_client::SessionState::Sending:
         if (console_debug_)
         {
-          OTEL_ERROR("[OTLP HTTP Exporter] DEBUG: Session state: sending request\n")
+          OTEL_INTERNAL_LOG_DEBUG("[OTLP HTTP Exporter] DEBUG: Session state: sending request")
         }
         break;
 
       case http_client::SessionState::SendFailed:
-        OTEL_ERROR("[OTLP HTTP Exporter] Session state: request send failed\n")
+        OTEL_INTERNAL_LOG_ERROR("[OTLP HTTP Exporter] Session state: request send failed\n")
         cv_.notify_all();
         break;
 
       case http_client::SessionState::Response:
         if (console_debug_)
         {
-          OTEL_ERROR("[OTLP HTTP Exporter] DEBUG:Session state: response received\n")
+          OTEL_INTERNAL_LOG_DEBUG("[OTLP HTTP Exporter] DEBUG:Session state: response received\n")
         }
         break;
 
       case http_client::SessionState::SSLHandshakeFailed:
-        OTEL_ERROR("[OTLP HTTP Exporter] Session state: SSL handshake failed\n")
+        OTEL_INTERNAL_LOG_ERROR("[OTLP HTTP Exporter] Session state: SSL handshake failed\n")
         cv_.notify_all();
         break;
 
       case http_client::SessionState::TimedOut:
-        OTEL_ERROR("[OTLP HTTP Exporter] Session state: request time out\n")
+        OTEL_INTERNAL_LOG_ERROR("[OTLP HTTP Exporter] Session state: request time out\n")
         cv_.notify_all();
         break;
 
       case http_client::SessionState::NetworkError:
-        OTEL_ERROR("[OTLP HTTP Exporter] Session state: network error\n")
+        OTEL_INTERNAL_LOG_ERROR("[OTLP HTTP Exporter] Session state: network error\n")
         cv_.notify_all();
         break;
 
       case http_client::SessionState::ReadError:
         if (console_debug_)
         {
-          OTEL_ERROR("[OTLP HTTP Exporter] DEBUG: Session state: error reading responsen")
+          OTEL_INTERNAL_LOG_DEBUG(
+              "[OTLP HTTP Exporter] DEBUG: Session state: error reading responsen")
         }
         break;
 
       case http_client::SessionState::WriteError:
         if (console_debug_)
         {
-          OTEL_ERROR("[OTLP HTTP Exporter] DEBUG:Session state: error writing request\n")
+          OTEL_INTERNAL_LOG_DEBUG(
+              "[OTLP HTTP Exporter] DEBUG:Session state: error writing request\n")
         }
         break;
 
       case http_client::SessionState::Cancelled:
-        OTEL_ERROR("[OTLP HTTP Exporter] Session state: (manually) cancelled\n")
+        OTEL_INTERNAL_LOG_ERROR("[OTLP HTTP Exporter] Session state: (manually) cancelled\n")
         cv_.notify_all();
         break;
 
@@ -622,7 +624,7 @@ sdk::common::ExportResult OtlpHttpExporter::Export(
     {
       std::stringstream ss;
       ss << "[OTLP HTTP Exporter] DEBUG: Request body(Json):\n" << post_body_json << std::endl;
-      OTEL_ERROR(ss.str())
+      OTEL_INTERNAL_LOG_DEBUG(ss.str())
     }
     body_vec.assign(post_body_json.begin(), post_body_json.end());
     content_type = kHttpJsonContentType;
@@ -644,10 +646,9 @@ sdk::common::ExportResult OtlpHttpExporter::Export(
   // Wait for the response to be received
   if (options_.console_debug)
   {
-    std::stringstream ss;
-    ss << "[OTLP HTTP Exporter] DEBUG: Waiting for response from " << options_.url
-       << " (timeout = " << options_.timeout.count() << " milliseconds)" << std::endl;
-    OTEL_ERROR(ss.str())
+    OTEL_INTERNAL_LOG_ERROR("[OTLP HTTP Exporter] DEBUG: Waiting for response from "
+                            << options_.url << " (timeout = " << options_.timeout.count()
+                            << " milliseconds)")
   }
   bool write_successful = handler->waitForResponse();
 

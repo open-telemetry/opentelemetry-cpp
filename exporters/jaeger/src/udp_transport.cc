@@ -3,7 +3,7 @@
 
 #include <sstream>  // std::stringstream
 
-#include "opentelemetry/sdk/common/global_error_handler.h"
+#include "opentelemetry/sdk_config.h"
 #include "udp_transport.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
@@ -39,8 +39,7 @@ void UDPTransport::InitSocket()
   int err = WSAStartup(wVersionRequested, &wsaData);
   if (err != 0)
   {
-    ss << "Jaeger Exporter: WSAStartup failed with error: " << error;
-    OTEL_ERROR(ss.str())
+    OTEL_INTERNAL_LOG_ERROR("Jaeger Exporter: WSAStartup failed with error: " << error);
     return;
   }
 

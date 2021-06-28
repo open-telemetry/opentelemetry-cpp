@@ -5,6 +5,7 @@
 #  include "opentelemetry/sdk/logs/logger.h"
 #  include "opentelemetry/sdk/common/global_error_handler.h"
 #  include "opentelemetry/sdk/logs/log_record.h"
+#  include "opentelemetry/sdk_config.h"
 #  include "opentelemetry/trace/provider.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
@@ -49,7 +50,7 @@ void Logger::Log(opentelemetry::logs::Severity severity,
   auto recordable = processor->MakeRecordable();
   if (recordable == nullptr)
   {
-    OTEL_ERROR("[LOGGER] Recordable creation failed")
+    OTEL_INTERNAL_LOG_ERROR("[LOGGER] Recordable creation failed")
     return;
   }
 

@@ -4,7 +4,7 @@
 #include <sstream>  // std::stringstream
 
 #include "TUDPTransport.h"
-#include "opentelemetry/sdk/common/global_error_handler.h"
+#include "opentelemetry/sdk_config.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace exporter
@@ -54,9 +54,7 @@ void TUDPTransport::open()
 
   if (error)
   {
-    std::stringstream ss;
-    ss << "Jaeger Exporter: getaddrinfo failed with error: " << error;
-    OTEL_ERROR(ss.str())
+    OTEL_INTERNAL_LOG_ERROR("Jaeger Exporter: getaddrinfo failed with error: " << error);
     return;
   }
 

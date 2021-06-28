@@ -7,7 +7,7 @@
 
 #  include "opentelemetry/exporters/elasticsearch/es_log_exporter.h"
 #  include "opentelemetry/exporters/elasticsearch/es_log_recordable.h"
-#  include "opentelemetry/sdk/common/global_error_handler.h"
+#  include "opentelemetry/sdk_config.h"
 
 namespace nostd       = opentelemetry::nostd;
 namespace sdklogs     = opentelemetry::sdk::logs;
@@ -77,19 +77,19 @@ public:
     switch (state)
     {
       case http_client::SessionState::ConnectFailed:
-        OTEL_ERROR("[ES Trace Exporter] Connection to elasticsearch failed\n")
+        OTEL_INTERNAL_LOG_ERROR("[ES Trace Exporter] Connection to elasticsearch failed")
         cv_.notify_all();
         break;
       case http_client::SessionState::SendFailed:
-        OTEL_ERROR("[ES Trace Exporter] Request failed to be sent to elasticsearch\n")
+        OTEL_INTERNAL_LOG_ERROR("[ES Trace Exporter] Request failed to be sent to elasticsearch")
         cv_.notify_all();
         break;
       case http_client::SessionState::TimedOut:
-        OTEL_ERROR("[ES Trace Exporter] Request to elasticsearch timed out\n")
+        OTEL_INTERNAL_LOG_ERROR("[ES Trace Exporter] Request to elasticsearch timed out")
         cv_.notify_all();
         break;
       case http_client::SessionState::NetworkError:
-        OTEL_ERROR("[ES Trace Exporter] Network error to elasticsearch\n")
+        OTEL_INTERNAL_LOG_ERROR("[ES Trace Exporter] Network error to elasticsearch")
         cv_.notify_all();
         break;
     }
@@ -131,7 +131,7 @@ sdk::common::ExportResult ElasticsearchLogExporter::Export(
   if (is_shutdown_)
   {
 
-    OTEL_ERROR("[ES Trace Exporter] Export failed, exporter is shutdown\n")
+    OTEL_INTERNAL_LOG_ERROR("[ES Trace Exporter] Export failed, exporter is shutdown")
     return sdk::common::ExportResult::kFailure;
   }
 
@@ -168,10 +168,9 @@ sdk::common::ExportResult ElasticsearchLogExporter::Export(
   // Wait for the response to be received
   if (options_.console_debug_)
   {
-    std::stringstream ss;
-    ss << "[ES Trace Exporter] DEBUG: waiting for response from Elasticsearch (timeout = "
-       << options_.response_timeout_ << " seconds)" << std::endl;
-    OTEL_ERROR(ss.str())
+    OTEL_INTERNAL_LOG_DEBUG(
+        "[ES Trace Exporter] DEBUG: waiting for response from Elasticsearch (timeout = "
+        << options_.response_timeout_ << " seconds)");
   }
   bool write_successful = handler->waitForResponse();
 
@@ -189,12 +188,7 @@ sdk::common::ExportResult ElasticsearchLogExporter::Export(
   std::string responseBody = handler->GetResponseBody();
   if (responseBody.find("\"failed\" : 0") == std::string::npos)
   {
-    std::stringstream ss;
-    ss << "[ES Trace Exporter] DEBUG: Logs were not written to Elasticsearch correctly, response "
-          "body:"
-       << std::endl;
-    ss << responseBody << std::endl;
-    OTEL_ERROR(ss.str())
+    OTEL_INTERNAL_LOG_ERROR("[ES Trace Exporter] DEBUG: Logs were not written to Elasticsearch correctly, response body: "<< responseBody ;
     // TODO: Retry logic
     return sdk::common::ExportResult::kFailure;
   }
