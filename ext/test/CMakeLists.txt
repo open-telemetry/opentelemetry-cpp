@@ -1,4 +1,6 @@
 add_subdirectory(zpages)
 add_subdirectory(http)
 add_subdirectory(w3c_tracecontext_test)
-add_subdirectory(sockets)
+if(WITH_SOCKET_TESTS)
+  add_subdirectory(sockets)
+endif()
