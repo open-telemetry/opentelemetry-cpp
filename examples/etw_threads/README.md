@@ -29,4 +29,4 @@ concurrently. Each thread executing `beep` function with a parent scope of `main
 `beep` subsequently calls into `bop` function, with a parent scope of `beep` span.
 Entire execution of all threads is grouped under the main span called `beep_bop`.
 At the end of execution, the `main` function joins all pending threads and ends
-the main spain.
+the main span.
