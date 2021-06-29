@@ -14,6 +14,7 @@ Provider Name or GUID. Example uses "OpenTelemetry-ETW-TLD" for the instrument /
 instrumentation name.
 
 In Visual Studio IDE:
+
 - navigate to `View -> Other Windows -> Diagnostic Events...`
 - click `Configure...` gear on top.
 - specify `OpenTelemetry-ETW-TLD` in the list of providers to monitor.
