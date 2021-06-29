@@ -509,7 +509,6 @@ struct Socket
 
   void close()
   {
-    assert(m_sock != Invalid);
 #ifdef _WIN32
     ::closesocket(m_sock);
 #else
@@ -524,7 +523,7 @@ struct Socket
 #ifdef _WIN32
     int len = clientAddr.size();
 #else
-    socklen_t len     = clientAddr.size();
+    socklen_t len = clientAddr.size();
 #endif
     return static_cast<int>(
         ::recvfrom(m_sock, reinterpret_cast<char *>(buffer), size, flags, clientAddr, &len));
@@ -550,8 +549,27 @@ struct Socket
       {
         total_bytes_received += bytes_received;
       }
-    } while ((bytes_received > 0) && (error() != SocketTools::Socket::ErrorWouldBlock) &&
-             (total_bytes_received < buffer.size()));
+      else if (bytes_received == 0)
+      {
+#ifndef _WIN32
+        // recv() on a blocking socket may return EAGAIN in case
+        // if the call timed out (no data received in time period
+        // specified as socket timeout)
+        if (errno == EAGAIN)
+          continue;
+#else
+        // recv() returns 0 only when 0-byte buffer is requested
+        // or when the other peer has gracefully disconnected.
+        // No data received.
+        break;
+#endif
+      }
+      else
+      {
+        // recv() error occurred.
+        break;
+      }
+    } while ((bytes_received > 0) && (total_bytes_received < buffer.size()));
     buffer.resize(total_bytes_received);
     return total_bytes_received;
   }
@@ -570,20 +588,33 @@ struct Socket
       {
         total_bytes_sent += bytes_sent;
       }
-    } while ((bytes_sent > 0) && (error() != SocketTools::Socket::ErrorWouldBlock) &&
-             (total_bytes_sent < buffer.size()));
+      else if (bytes_sent == 0)
+      {
+        // No more data to send or can't send anymore.
+        break;
+      }
+      if (bytes_sent < 0)
+      {
+        // send() error occurred.
+        break;
+      }
+    } while (total_bytes_sent < buffer.size());
     return total_bytes_sent;
   }
 
   int send(void const *buffer, size_t size)
   {
     assert(m_sock != Invalid);
+    if ((m_sock == Invalid) || (buffer == nullptr) || (size == 0))
+      return 0;
     return static_cast<int>(::send(m_sock, reinterpret_cast<char const *>(buffer), size, 0));
   }
 
   int sendto(void const *buffer, size_t size, int flags, SocketAddr &destAddr)
   {
     assert(m_sock != Invalid);
+    if ((m_sock == Invalid) || (buffer == nullptr) || (size == 0))
+      return 0;
     int len = destAddr.size();
     return static_cast<int>(
         ::sendto(m_sock, reinterpret_cast<char const *>(buffer), size, flags, destAddr, len));
@@ -806,7 +837,10 @@ public:
         epoll_event event = {};
         event.data.fd     = socket;
         event.events      = 0;
-        ::epoll_ctl(m_epollFd, EPOLL_CTL_ADD, socket, &event);
+        if (::epoll_ctl(m_epollFd, EPOLL_CTL_ADD, socket, &event) != 0)
+        {
+          LOG_ERROR("Reactor: epoll_ctl failed! errno=%d", errno);
+        }
 #endif
 #ifdef TARGET_OS_MAC
         struct kevent event;
@@ -856,20 +890,23 @@ public:
         if (it->flags & Readable)
         {
           events |= EPOLLIN;
-        }
+        };
         if (it->flags & Writable)
         {
           events |= EPOLLOUT;
-        }
+        };
         if (it->flags & Acceptable)
         {
           events |= EPOLLIN;
-        }
+        };
         // if (it->flags & Closed) - always handled (EPOLLERR | EPOLLHUP)
         epoll_event event = {};
         event.data.fd     = socket;
         event.events      = events;
-        ::epoll_ctl(m_epollFd, EPOLL_CTL_MOD, socket, &event);
+        if (::epoll_ctl(m_epollFd, EPOLL_CTL_MOD, socket, &event) != 0)
+        {
+          LOG_ERROR("Reactor: epoll_ctl failed! errno=%d", errno);
+        }
 #endif
 #ifdef TARGET_OS_MAC
         // TODO: [MG] - Mac OS X socket doesn't currently support updating flags
@@ -898,7 +935,10 @@ public:
         m_events.erase(eventIt);
 #endif
 #ifdef __linux__
-        ::epoll_ctl(m_epollFd, EPOLL_CTL_DEL, socket, nullptr);
+        if (::epoll_ctl(m_epollFd, EPOLL_CTL_DEL, socket, nullptr) != 0)
+        {
+          LOG_ERROR("Reactor: epoll_ctl failed! errno=%d", errno);
+        };
 #endif
 #ifdef TARGET_OS_MAC
         struct kevent event;
@@ -959,7 +999,10 @@ public:
     for (auto &sd : m_sockets)
     {
 #  ifdef __linux__
-      ::epoll_ctl(m_epollFd, EPOLL_CTL_DEL, sd.socket, nullptr);
+      if (::epoll_ctl(m_epollFd, EPOLL_CTL_DEL, sd.socket, nullptr) != 0)
+      {
+        LOG_ERROR("Reactor: epoll_ctl failed! errno=%d", errno);
+      };
 #  endif
 #  ifdef TARGET_OS_MAC
       struct kevent event;
@@ -968,16 +1011,21 @@ public:
       EV_SET(&event, sd.socket, EVFILT_READ, EV_DELETE, 0, 0, NULL);
       if (-1 == kevent(kq, &event, 1, NULL, 0, NULL))
       {
-        LOG_ERROR("cannot delete fd=0x%x from kqueue!", event.ident);
+        LOG_ERROR("Reactor: cannot delete fd=0x%x from kqueue!", event.ident);
       }
       EV_SET(&event, sd.socket, EVFILT_WRITE, EV_DELETE, 0, 0, NULL);
       if (-1 == kevent(kq, &event, 1, NULL, 0, NULL))
       {
-        LOG_ERROR("cannot delete fd=0x%x from kqueue!", event.ident);
+        LOG_ERROR("Reactor: cannot delete fd=0x%x from kqueue!", event.ident);
       }
 #  endif
     }
 #endif
+    // unbind
+    if (m_sockets.size())
+    {
+      m_sockets[0].socket.close();
+    }
     m_sockets.clear();
   }
 
@@ -1026,7 +1074,12 @@ public:
         continue;
       }
 
-      assert(dwResult <= WSA_WAIT_EVENT_0 + m_events.size());
+      if (dwResult > WSA_WAIT_EVENT_0 + m_events.size())
+      {
+        LOG_WARN("Reactor: stale event on closed socket dwResult=%d", (int)dwResult);
+        continue;
+      }
+
       int index = dwResult - WSA_WAIT_EVENT_0;
 
       m_sockets_mutex.lock();
@@ -1063,11 +1116,13 @@ public:
       {
         epoll_event events[4];
         int result = ::epoll_wait(m_epollFd, events, sizeof(events) / sizeof(events[0]), 500);
-        if (result == 0 || (result == -1 && errno == EINTR))
-        {
+        if (result == 0)
           continue;
-        }
-
+        if (result < 0)
+        {
+          LOG_ERROR("Reactor: got errno=%d!", errno);
+          continue;
+        };
         assert(result >= 1 && static_cast<size_t>(result) <= sizeof(events) / sizeof(events[0]));
 
         LOCKGUARD(m_sockets_mutex);
@@ -1095,6 +1150,7 @@ public:
           }
           if ((flags & Closed) && (events[i].events & (EPOLLHUP | EPOLLERR)))
           {
+            LOG_TRACE("Reactor: handling socket 0x%x onSocketClosed", static_cast<int>(socket));
             m_callback.onSocketClosed(socket);
           }
         }

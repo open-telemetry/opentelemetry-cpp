@@ -70,7 +70,8 @@ struct SocketServer : public Reactor::SocketCallback
     bool keepalive{true};   // Keep connection alive (reserved for future use)
   };
 
-  SocketAddr bind_address;            // Server bind address
+  SocketAddr bind_address;  // Server bind address
+  bool is_bound{false};
   SocketParams server_socket_params;  // Server socket params
   Socket server_socket;               // Server listening socket
   Reactor reactor;                    // Socket event handler
@@ -117,6 +118,7 @@ struct SocketServer : public Reactor::SocketCallback
       return;
     }
 
+    is_bound = true;
     LOG_INFO("Server: bind successful. result=%d", rc);
     server_socket.getsockname(bind_address);
     if (server_socket_params.type == SOCK_STREAM)
@@ -268,7 +270,7 @@ struct SocketServer : public Reactor::SocketCallback
     size_t size = conn_tcp.socket.readall(conn_tcp.request_buffer);
     if (size > 0)
     {
-      LOG_TRACE("Server: [%s] stream read %d bytes", CLID(conn_tcp), size);
+      LOG_TRACE("Server: [%s] stream read %zu bytes", CLID(conn_tcp), size);
       conn_tcp.request_buffer.resize(size);
       // Handle connection: process request_buffer
       conn_tcp.state.insert(Connection::Receiving);
@@ -276,7 +278,8 @@ struct SocketServer : public Reactor::SocketCallback
     else
     {
       conn_tcp.request_buffer.resize(0);
-      LOG_ERROR("Server: [%s] failed to read client stream", CLID(conn_tcp));
+      LOG_ERROR("Server: [%s] failed to read client stream, errno=%d", CLID(conn_tcp), errno);
+      conn_tcp.state.insert(Connection::Closing);
     }
   }
 
@@ -335,7 +338,7 @@ struct SocketServer : public Reactor::SocketCallback
       total_bytes_sent =
           conn.socket.sendto(conn.response_buffer.data(),
                              static_cast<int>(conn.response_buffer.size()), 0, conn.client);
-      LOG_TRACE("Server: [%s] datagram sent %d", CLID(conn), total_bytes_sent);
+      LOG_TRACE("Server: [%s] datagram sent %zu bytes", CLID(conn), total_bytes_sent);
       return false;
     }
 
@@ -345,7 +348,7 @@ struct SocketServer : public Reactor::SocketCallback
     if (conn.response_buffer.size() != total_bytes_sent)
     {
       conn.response_buffer.erase(0, total_bytes_sent);
-      LOG_WARN("Server: [%s] response blocked, total sent: %d", CLID(conn), total_bytes_sent);
+      LOG_WARN("Server: [%s] response blocked, total sent %zu bytes", CLID(conn), total_bytes_sent);
       // Need to send more
       conn.state.insert(Connection::Responding);
       return true;
@@ -354,8 +357,7 @@ struct SocketServer : public Reactor::SocketCallback
     // Done sending
     conn.state.erase(Connection::Responding);
     conn.state.insert(Connection::Idle);
-    reactor.removeSocket(conn.socket);
-    LOG_TRACE("Server: [%s] response complete, total sent: %d", CLID(conn), total_bytes_sent);
+    LOG_TRACE("Server: [%s] response complete, total sent %zu bytes", CLID(conn), total_bytes_sent);
     return false;
   }
 
@@ -429,18 +431,18 @@ struct SocketServer : public Reactor::SocketCallback
       reactor.addSocket(conn.socket, Reactor::Readable | Reactor::Closed);
     }
 
+    if (conn.state.count(Connection::Closing))
+    {
+      onConnectionClosed(conn);
+      return;
+    }
+
     // If we are done responding, we may need to keep the socket open
     if (conn.keepalive)
     {
       LOG_TRACE("Server: [%s] idle (keep-alive)", CLID(conn));
       reactor.addSocket(conn.socket, SocketTools::Reactor::Readable | Reactor::Closed);
       conn.state.insert(Connection::Idle);
-      return;
-    }
-
-    if (conn.state.count(Connection::Closing))
-    {
-      onConnectionClosed(conn);
     }
   }
 };

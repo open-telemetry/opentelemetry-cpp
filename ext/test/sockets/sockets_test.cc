@@ -1,3 +1,4 @@
+// Uncomment this line for additional debugging:
 // #define HAVE_CONSOLE_LOG
 
 #include <cstdio>
@@ -17,6 +18,8 @@ using namespace std;
 
 namespace testing
 {
+static const int kMaxConnections = 16;
+
 /**
  * @brief Obtain path to temporary directory
  * @return Temporary Directory
@@ -76,8 +79,6 @@ struct EchoServerTest
   EchoServerTest(SocketServer &server) : server(server)
   {
     server.onRequest = [&](SocketServer::Connection &conn) {
-      // std::cout << "SocketServer::onRequest: ";
-      // std::cout << conn.request_buffer << std::endl;
       conn.response_buffer.clear();
       conn.request_buffer.swap(conn.response_buffer);
       // Signal to Reactor that it's time to respond
@@ -85,8 +86,6 @@ struct EchoServerTest
     };
 
     server.onResponse = [&](SocketServer::Connection &conn) {
-      // std::cout << "SocketServer::onResponse: ";
-      // std::cout << conn.response_buffer << std::endl;
     };
   }
 
@@ -96,11 +95,11 @@ struct EchoServerTest
 
   void PingPong(std::string request_text, size_t numIterations = 1)
   {
-    // Client must match the server params.
-    Socket client(server.server_socket_params);
-    client.connect(server.address());
     for (size_t i = 0; i < numIterations; i++)
     {
+      Socket client(server.server_socket_params);
+      client.connect(server.address());
+
       // -> ping
       int total_bytes_sent = client.send(request_text.c_str(), request_text.length());
       EXPECT_EQ(total_bytes_sent, request_text.size());
@@ -111,8 +110,8 @@ struct EchoServerTest
       size_t total_bytes_received = client.readall(response_text);
       EXPECT_EQ(total_bytes_received, total_bytes_sent);
       EXPECT_EQ(request_text, response_text);
+      client.close();
     }
-    client.close();
   }
 };
 
@@ -141,6 +140,19 @@ TEST(SocketTests, BasicTcpEchoTest)
   test.Stop();
 }
 
+TEST(SocketTests, ManyPacketsTcpEchoTest)
+{
+  SocketParams params{AF_INET, SOCK_STREAM, 0};
+  SocketAddr destination("127.0.0.1:3000");
+  SocketServer server(destination, params);
+  EchoServerTest test(server);
+  test.Start();
+  // Note that our test server can't listen
+  // on more than 64 concurrent connections
+  test.PingPong("Hello, world!", kMaxConnections);
+  test.Stop();
+}
+
 TEST(SocketTests, BasicUdpEchoTest)
 {
   SocketParams params{AF_INET, SOCK_DGRAM, 0};
@@ -159,13 +171,30 @@ TEST(SocketTests, BasicUnixDomainEchoTest)
   // Store messenger.sock named Unix domain socket in temp dir
   socket_name += "messenger.sock";
   // cpp/io/c/remove
-  std::cout << "Temporary AF_UNIX socket name: " << socket_name << std::endl;
+  LOG_TRACE("Temporary AF_UNIX socket name=%s", socket_name.c_str());
   std::remove(socket_name.c_str());
   SocketAddr destination(socket_name.c_str(), true);
   SocketServer server(destination, params);
   EchoServerTest test(server);
   test.Start();
   test.PingPong("Hello, world!");
+  test.Stop();
+}
+
+TEST(SocketTests, ManyPacketsUnixDomainEchoTest)
+{
+  auto socket_name = GetTempDirectory();
+  SocketParams params{AF_UNIX, SOCK_STREAM, 0};
+  // Store messenger.sock named Unix domain socket in temp dir
+  socket_name += "messenger.sock";
+  // cpp/io/c/remove
+  LOG_TRACE("Temporary AF_UNIX socket name=%s", socket_name.c_str());
+  std::remove(socket_name.c_str());
+  SocketAddr destination(socket_name.c_str(), true);
+  SocketServer server(destination, params);
+  EchoServerTest test(server);
+  test.Start();
+  test.PingPong("Hello, world!", kMaxConnections);
   test.Stop();
 }
 
