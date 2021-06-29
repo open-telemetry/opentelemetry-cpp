@@ -10,14 +10,6 @@
 
 #include <gtest/gtest.h>
 
-/*using opentelemetry::common::SystemTimestamp;
-using opentelemetry::trace::NoopTracer;
-using opentelemetry::trace::SpanContext;
-using opentelemetry::trace::Tracer;
-using opentelemetry::trace::TraceId;
-using opentelemetry::trace::SpanId;
-using opentelemetry::trace::TraceFlags;*/
-
 namespace trace_api = opentelemetry::trace;
 namespace nonstd    = opentelemetry::nostd;
 namespace common    = opentelemetry::common;

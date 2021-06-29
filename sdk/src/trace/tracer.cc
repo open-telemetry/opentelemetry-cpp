@@ -58,8 +58,8 @@ nostd::shared_ptr<trace_api::Span> Tracer::StartSpan(
 
   if (sampling_result.decision == Decision::DROP)
   {
-    // no-op span with valid span-context, as this span could be used in subsequent sampling
-    // decisions.
+    // create no-op span with valid span-context.
+
     auto noop_span = nostd::shared_ptr<trace_api::Span>{
         new (std::nothrow) trace_api::NoopSpan(this->shared_from_this(), std::move(span_context))};
     return noop_span;
