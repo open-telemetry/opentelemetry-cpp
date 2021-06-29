@@ -85,8 +85,7 @@ struct EchoServerTest
       conn.state.insert(SocketServer::Connection::Responding);
     };
 
-    server.onResponse = [&](SocketServer::Connection &conn) {
-    };
+    server.onResponse = [&](SocketServer::Connection &conn) {};
   }
 
   void Start() { server.Start(); }
