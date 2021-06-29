@@ -58,6 +58,7 @@ TEST(NoopTest, StartSpan)
   auto s2 =
       tracer->StartSpan("efg", {{"a", 3}}, {{trace_api::SpanContext(false, false), {{"b", 4}}}});
 }
+
 TEST(NoopTest, CreateSpanValidSpanContext)
 {
   // Create valid spancontext for NoopSpan
