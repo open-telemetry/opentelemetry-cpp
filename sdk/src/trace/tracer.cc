@@ -46,24 +46,26 @@ nostd::shared_ptr<trace_api::Span> Tracer::StartSpan(
 
   auto sampling_result = context_->GetSampler().ShouldSample(parent_context, trace_id, name,
                                                              options.kind, attributes, links);
+  auto trace_flags     = sampling_result.decision == Decision::DROP
+                         ? trace_api::TraceFlags{}
+                         : trace_api::TraceFlags{trace_api::TraceFlags::kIsSampled};
+
+  auto span_context = std::unique_ptr<trace_api::SpanContext>(new trace_api::SpanContext(
+      trace_id, span_id, trace_flags, false,
+      sampling_result.trace_state ? sampling_result.trace_state
+                                  : is_parent_span_valid ? parent_context.trace_state()
+                                                         : trace_api::TraceState::GetDefault()));
 
   if (sampling_result.decision == Decision::DROP)
   {
-    // Don't allocate a no-op span for every DROP decision, but use a static
-    // singleton for this case.
-    static nostd::shared_ptr<trace_api::Span> noop_span(
-        new trace_api::NoopSpan{this->shared_from_this()});
-
+    // no-op span with valid span-context, as this span could be used in subsequent sampling
+    // decisions.
+    auto noop_span = nostd::shared_ptr<trace_api::Span>{
+        new (std::nothrow) trace_api::NoopSpan(this->shared_from_this(), std::move(span_context))};
     return noop_span;
   }
   else
   {
-
-    auto span_context = std::unique_ptr<trace_api::SpanContext>(new trace_api::SpanContext(
-        trace_id, span_id, trace_api::TraceFlags{trace_api::TraceFlags::kIsSampled}, false,
-        sampling_result.trace_state ? sampling_result.trace_state
-                                    : is_parent_span_valid ? parent_context.trace_state()
-                                                           : trace_api::TraceState::GetDefault()));
 
     auto span = nostd::shared_ptr<trace_api::Span>{
         new (std::nothrow) Span{this->shared_from_this(), name, attributes, links, options,
