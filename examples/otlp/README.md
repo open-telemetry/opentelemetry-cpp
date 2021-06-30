@@ -49,3 +49,18 @@ default. This can be changed with first argument from command-line, for example:
 Once you have the Collector running, see
 [CONTRIBUTING.md](../../CONTRIBUTING.md) for instructions on building and
 running the example.
+
+## Additional notes regarding Abseil library
+
+gRPC internally uses a different version of Abseil than OpenTelemetry C++ SDK.
+
+One option to optimize your code is to build the SDK with system-provided
+Abseil library. If you are using CMake, then `-DWITH_ABSEIL=ON` may be passed
+during the build of SDK to reuse the same Abseil library as gRPC.
+
+If you do not want to pursue the above option, and in case if you run into
+conflict between Abseil library and OpenTelemetry C++ `absl::variant`
+implementation, please include either `grpcpp/grpcpp.h` or
+`opentelemetry/exporters/otlp/otlp_grpc_exporter.h` BEFORE any other API
+headers. This approach efficiently avoids the conflict between the two different
+versions of Abseil.
