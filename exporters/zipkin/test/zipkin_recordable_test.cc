@@ -67,9 +67,9 @@ TEST(ZipkinSpanRecordable, SetStartTime)
 
 TEST(ZipkinSpanRecordable, SetDuration)
 {
-  std::chrono::nanoseconds durationNS(1000000000);  // in ms
+  std::chrono::nanoseconds durationNS(1000000000);  // in ns
   std::chrono::microseconds durationMS =
-      std::chrono::duration_cast<std::chrono::microseconds>(durationNS);
+      std::chrono::duration_cast<std::chrono::microseconds>(durationNS);  // in ms
   json j_span = {{"duration", durationMS.count()}, {"timestamp", 0}};
   opentelemetry::exporter::zipkin::Recordable rec;
   // Start time is 0
