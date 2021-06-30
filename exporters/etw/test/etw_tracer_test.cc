@@ -380,12 +380,6 @@ TEST(ETWTracer, GlobalSingletonTracer)
   globalTracer.CloseWithMicroseconds(0);
 }
 
-TEST(ETWTracer, TreadLocalContext)
-{
-    auto &tp = GetGlobalTracerProvider();
-    auto tracer = tp.GetTracer(kGlobalProviderName);
-}
-
 /* clang-format on */
 
 #endif
