@@ -12,8 +12,6 @@
 #include "opentelemetry/common/timestamp.h"
 #include "opentelemetry/exporters/zipkin/recordable.h"
 
-#include <iostream>
-
 #include <gtest/gtest.h>
 
 namespace trace    = opentelemetry::trace;
@@ -69,16 +67,16 @@ TEST(ZipkinSpanRecordable, SetStartTime)
 
 TEST(ZipkinSpanRecordable, SetDuration)
 {
-  json j_span = {{"duration", 10}, {"timestamp", 0}};
+  std::chrono::nanoseconds durationNS(1000000000);  // in ms
+  std::chrono::microseconds durationMS =
+      std::chrono::duration_cast<std::chrono::microseconds>(durationNS);
+  json j_span = {{"duration", durationMS.count()}, {"timestamp", 0}};
   opentelemetry::exporter::zipkin::Recordable rec;
   // Start time is 0
   opentelemetry::common::SystemTimestamp start_timestamp;
 
-  std::chrono::nanoseconds duration(10);
-  uint64_t unix_end = duration.count();
-
   rec.SetStartTime(start_timestamp);
-  rec.SetDuration(duration);
+  rec.SetDuration(durationNS);
   EXPECT_EQ(rec.span(), j_span);
 }
 
