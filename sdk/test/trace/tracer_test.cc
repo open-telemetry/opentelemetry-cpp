@@ -165,8 +165,14 @@ TEST(Tracer, StartSpanSampleOff)
   auto tracer_off = initTracer(std::move(exporter), new AlwaysOffSampler());
 
   // This span will not be recorded.
-  tracer_off->StartSpan("span 2")->End();
+  auto span = tracer_off->StartSpan("span 2");
 
+  // Always generate a valid span-context (span-id)
+  auto context = span->GetContext();
+  EXPECT_TRUE(context.IsValid());
+  EXPECT_FALSE(context.IsSampled());
+
+  span->End();
   // The span doesn't write any span data because the sampling decision is alway
   // DROP.
   ASSERT_EQ(0, span_data->GetSpans().size());

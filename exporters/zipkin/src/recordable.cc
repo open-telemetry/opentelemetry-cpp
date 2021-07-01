@@ -225,7 +225,7 @@ void Recordable::SetStartTime(opentelemetry::common::SystemTimestamp start_time)
 
 void Recordable::SetDuration(std::chrono::nanoseconds duration) noexcept
 {
-  span_["duration"] = duration.count();
+  span_["duration"] = std::chrono::duration_cast<std::chrono::microseconds>(duration).count();
 }
 
 void Recordable::SetSpanKind(opentelemetry::trace::SpanKind span_kind) noexcept
