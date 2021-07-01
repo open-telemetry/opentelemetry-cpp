@@ -1,13 +1,16 @@
 // Copyright The OpenTelemetry Authors
 // SPDX-License-Identifier: Apache-2.0
 
-#include <opentelemetry/exporters/jaeger/recordable.h>
+#include "opentelemetry/exporters/jaeger/recordable.h"
+#include "opentelemetry/sdk/resource/semantic_conventions.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace exporter
 {
 namespace jaeger
 {
+
+using namespace opentelemetry::sdk::resource;
 
 Recordable::Recordable() : span_{new thrift::Span} {}
 
@@ -43,13 +46,13 @@ void Recordable::SetIdentity(const trace::SpanContext &span_context,
   // https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/trace/sdk_exporters/jaeger.md#ids
 #if JAEGER_IS_LITTLE_ENDIAN == 1
   span_->__set_traceIdHigh(
-      bswap_64(*(reinterpret_cast<const int64_t *>(span_context.trace_id().Id().data()))));
+      otel_bswap_64(*(reinterpret_cast<const int64_t *>(span_context.trace_id().Id().data()))));
   span_->__set_traceIdLow(
-      bswap_64(*(reinterpret_cast<const int64_t *>(span_context.trace_id().Id().data()) + 1)));
+      otel_bswap_64(*(reinterpret_cast<const int64_t *>(span_context.trace_id().Id().data()) + 1)));
   span_->__set_spanId(
-      bswap_64(*(reinterpret_cast<const int64_t *>(span_context.span_id().Id().data()))));
+      otel_bswap_64(*(reinterpret_cast<const int64_t *>(span_context.span_id().Id().data()))));
   span_->__set_parentSpanId(
-      bswap_64(*(reinterpret_cast<const int64_t *>(parent_span_id.Id().data()))));
+      otel_bswap_64(*(reinterpret_cast<const int64_t *>(parent_span_id.Id().data()))));
 #else
   span_->__set_traceIdLow(
       *(reinterpret_cast<const int64_t *>(span_context.trace_id().Id().data())));
@@ -117,9 +120,9 @@ void Recordable::SetResource(const opentelemetry::sdk::resource::Resource &resou
 {
   // only service.name attribute is supported by specs as of now.
   auto attributes = resource.GetAttributes();
-  if (attributes.find("service.name") != attributes.end())
+  if (attributes.find(OTEL_CPP_GET_ATTR(AttrServiceName)) != attributes.end())
   {
-    service_name_ = nostd::get<std::string>(attributes["service.name"]);
+    service_name_ = nostd::get<std::string>(attributes[OTEL_CPP_GET_ATTR(AttrServiceName)]);
   }
 }
 
