@@ -148,7 +148,7 @@ private:
     ProcessorNode(std::unique_ptr<SpanProcessor> &&value,
                   ProcessorNode *prev = nullptr,
                   ProcessorNode *next = nullptr)
-        : value_(std::move(value)), prev_(prev), next_(next)
+        : value_(std::move(value)), next_(next), prev_(prev)
     {}
   };
 

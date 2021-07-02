@@ -6,10 +6,13 @@ if(CURL_FOUND)
                                                     http_client_curl)
 
   if(TARGET CURL::libcurl)
-    target_link_libraries(http_client_curl PUBLIC CURL::libcurl)
+    target_link_libraries(http_client_curl PUBLIC opentelemetry_ext
+                                                  CURL::libcurl)
   else()
-    include_directories(${CURL_INCLUDE_DIRS})
-    target_link_libraries(http_client_curl PUBLIC ${CURL_LIBRARIES})
+    target_include_directories(http_client_curl
+                               INTERFACE "${CURL_INCLUDE_DIRS}")
+    target_link_libraries(http_client_curl PUBLIC opentelemetry_ext
+                                                  ${CURL_LIBRARIES})
   endif()
 
   install(

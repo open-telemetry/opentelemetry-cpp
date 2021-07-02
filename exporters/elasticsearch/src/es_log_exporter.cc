@@ -1,8 +1,10 @@
 // Copyright The OpenTelemetry Authors
 // SPDX-License-Identifier: Apache-2.0
 
-#include "opentelemetry/exporters/elasticsearch/es_log_exporter.h"
-#include "opentelemetry/exporters/elasticsearch/es_log_recordable.h"
+#ifdef ENABLE_LOGS_PREVIEW
+
+#  include "opentelemetry/exporters/elasticsearch/es_log_exporter.h"
+#  include "opentelemetry/exporters/elasticsearch/es_log_recordable.h"
 
 namespace nostd       = opentelemetry::nostd;
 namespace sdklogs     = opentelemetry::sdk::logs;
@@ -138,7 +140,7 @@ sdk::common::ExportResult ElasticsearchLogExporter::Export(
   }
 
   // Create a connection to the ElasticSearch instance
-  auto session = http_client_->CreateSession(options_.host_, options_.port_);
+  auto session = http_client_->CreateSession(options_.host_ + std::to_string(options_.port_));
   auto request = session->CreateRequest();
 
   // Populate the request with headers and methods
@@ -215,3 +217,4 @@ bool ElasticsearchLogExporter::Shutdown(std::chrono::microseconds timeout) noexc
 }  // namespace logs
 }  // namespace exporter
 OPENTELEMETRY_END_NAMESPACE
+#endif

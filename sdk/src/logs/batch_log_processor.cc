@@ -1,9 +1,10 @@
 // Copyright The OpenTelemetry Authors
 // SPDX-License-Identifier: Apache-2.0
 
-#include "opentelemetry/sdk/logs/batch_log_processor.h"
+#ifdef ENABLE_LOGS_PREVIEW
+#  include "opentelemetry/sdk/logs/batch_log_processor.h"
 
-#include <vector>
+#  include <vector>
 using opentelemetry::sdk::common::AtomicUniquePtr;
 using opentelemetry::sdk::common::CircularBufferRange;
 
@@ -198,3 +199,4 @@ BatchLogProcessor::~BatchLogProcessor()
 }  // namespace logs
 }  // namespace sdk
 OPENTELEMETRY_END_NAMESPACE
+#endif

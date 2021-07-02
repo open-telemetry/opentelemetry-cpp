@@ -23,9 +23,11 @@ mkdir -p "${BUILD_DIR}"
 [ -z "${PLUGIN_DIR}" ] && export PLUGIN_DIR=$HOME/plugin
 mkdir -p "${PLUGIN_DIR}"
 
-BAZEL_OPTIONS=""
+BAZEL_OPTIONS="--copt=-DENABLE_METRICS_PREVIEW --copt=-DENABLE_LOGS_PREVIEW"
 BAZEL_TEST_OPTIONS="$BAZEL_OPTIONS --test_output=errors"
 BAZEL_STARTUP_OPTIONS="--output_user_root=$HOME/.cache/bazel"
+
+export CTEST_OUTPUT_ON_FAILURE=1
 
 if [[ "$1" == "cmake.test" ]]; then
   install_prometheus_cpp_client
@@ -37,7 +39,20 @@ if [[ "$1" == "cmake.test" ]]; then
         -DWITH_JAEGER=ON \
         -DWITH_ELASTICSEARCH=ON \
         -DWITH_METRICS_PREVIEW=ON \
+        -DWITH_LOGS_PREVIEW=ON \
         -DCMAKE_CXX_FLAGS="-Werror" \
+        "${SRC_DIR}"
+  make
+  make test
+  exit 0
+elif [[ "$1" == "cmake.abseil.test" ]]; then
+  cd "${BUILD_DIR}"
+  rm -rf *
+  cmake -DCMAKE_BUILD_TYPE=Debug  \
+        -DWITH_METRICS_PREVIEW=ON \
+        -DWITH_LOGS_PREVIEW=ON \
+        -DCMAKE_CXX_FLAGS="-Werror" \
+        -DWITH_ABSEIL=ON \
         "${SRC_DIR}"
   make
   make test
@@ -48,6 +63,18 @@ elif [[ "$1" == "cmake.c++20.test" ]]; then
   cmake -DCMAKE_BUILD_TYPE=Debug  \
         -DCMAKE_CXX_FLAGS="-Werror" \
         -DCMAKE_CXX_STANDARD=20 \
+        "${SRC_DIR}"
+  make
+  make test
+  exit 0
+elif [[ "$1" == "cmake.c++20.stl.test" ]]; then
+  cd "${BUILD_DIR}"
+  rm -rf *
+  cmake -DCMAKE_BUILD_TYPE=Debug  \
+        -DWITH_METRICS_PREVIEW=ON \
+        -DWITH_LOGS_PREVIEW=ON \
+        -DCMAKE_CXX_FLAGS="-Werror" \
+        -DWITH_STL=ON \
         "${SRC_DIR}"
   make
   make test
@@ -112,7 +139,7 @@ EOF
   examples/plugin/load/load_plugin_example ${PLUGIN_DIR}/libexample_plugin.so /dev/null
   exit 0
 elif [[ "$1" == "bazel.test" ]]; then
-  bazel $BAZEL_STARTUP_OPTIONS build --copt=-DENABLE_METRICS_PREVIEW $BAZEL_OPTIONS //...
+  bazel $BAZEL_STARTUP_OPTIONS build $BAZEL_OPTIONS //...
   bazel $BAZEL_STARTUP_OPTIONS test $BAZEL_TEST_OPTIONS //...
   exit 0
 elif [[ "$1" == "bazel.legacy.test" ]]; then

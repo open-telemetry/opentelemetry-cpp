@@ -19,7 +19,7 @@ namespace otlp
 /**
  * Struct to hold OTLP exporter options.
  */
-struct OtlpExporterOptions
+struct OtlpGrpcExporterOptions
 {
   // The endpoint to export to. By default the OpenTelemetry Collector's default endpoint.
   std::string endpoint = "localhost:4317";
@@ -36,18 +36,18 @@ struct OtlpExporterOptions
 /**
  * The OTLP exporter exports span data in OpenTelemetry Protocol (OTLP) format.
  */
-class OtlpExporter final : public opentelemetry::sdk::trace::SpanExporter
+class OtlpGrpcExporter final : public opentelemetry::sdk::trace::SpanExporter
 {
 public:
   /**
-   * Create an OtlpExporter using all default options.
+   * Create an OtlpGrpcExporter using all default options.
    */
-  OtlpExporter();
+  OtlpGrpcExporter();
 
   /**
-   * Create an OtlpExporter using the given options.
+   * Create an OtlpGrpcExporter using the given options.
    */
-  OtlpExporter(const OtlpExporterOptions &options);
+  explicit OtlpGrpcExporter(const OtlpGrpcExporterOptions &options);
 
   /**
    * Create a span recordable.
@@ -76,20 +76,20 @@ public:
 
 private:
   // The configuration options associated with this exporter.
-  const OtlpExporterOptions options_;
+  const OtlpGrpcExporterOptions options_;
 
   // For testing
-  friend class OtlpExporterTestPeer;
+  friend class OtlpGrpcExporterTestPeer;
 
   // Store service stub internally. Useful for testing.
   std::unique_ptr<proto::collector::trace::v1::TraceService::StubInterface> trace_service_stub_;
 
   /**
-   * Create an OtlpExporter using the specified service stub.
+   * Create an OtlpGrpcExporter using the specified service stub.
    * Only tests can call this constructor directly.
    * @param stub the service stub to be used for exporting
    */
-  OtlpExporter(std::unique_ptr<proto::collector::trace::v1::TraceService::StubInterface> stub);
+  OtlpGrpcExporter(std::unique_ptr<proto::collector::trace::v1::TraceService::StubInterface> stub);
 };
 }  // namespace otlp
 }  // namespace exporter

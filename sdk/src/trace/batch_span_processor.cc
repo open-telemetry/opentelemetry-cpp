@@ -116,6 +116,7 @@ void BatchSpanProcessor::DoBackgroundWork()
       // mechanism effort here.
       if (buffer_.empty() == true)
       {
+        timeout = schedule_delay_millis_;
         continue;
       }
     }

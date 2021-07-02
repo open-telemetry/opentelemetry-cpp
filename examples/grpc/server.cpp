@@ -1,0 +1,114 @@
+#include "messages.grpc.pb.h"
+#include "tracer_common.h"
+#include "opentelemetry/trace/span_context_kv_iterable_view.h"
+
+#include <grpcpp/grpcpp.h>
+#include <grpcpp/server.h>
+#include <grpcpp/server_builder.h>
+#include <grpcpp/server_context.h>
+
+#include <chrono>
+#include <fstream>
+#include <sstream>
+#include <string>
+#include <thread>
+#include <map>
+
+using grpc::Server;
+using grpc::ServerBuilder;
+using grpc::ServerContext;
+using grpc::ServerWriter;
+using grpc::Status;
+
+using grpc_example::Greeter;
+using grpc_example::GreetRequest;
+using grpc_example::GreetResponse;
+
+using Span = opentelemetry::trace::Span;
+using SpanContext = opentelemetry::trace::SpanContext;
+
+namespace
+{
+class GreeterServer final : public Greeter::Service
+{
+public:
+  Status Greet(ServerContext *context,
+               const GreetRequest *request,
+               GreetResponse *response) override
+  {
+    for(  auto elem: context->client_metadata()) {
+      std::cout << "ELEM: " << elem.first << " " << elem.second << "\n";
+    }
+
+    // Create a SpanOptions object and set the kind to Server to inform OpenTel.
+    opentelemetry::trace::StartSpanOptions options;
+    options.kind = opentelemetry::trace::SpanKind::kServer;
+
+    // extract context from grpc metadata
+    GrpcServerCarrier carrier(context);
+
+    auto prop = opentelemetry::context::propagation::GlobalTextMapPropagator::GetGlobalPropagator();
+    auto current_ctx = opentelemetry::context::RuntimeContext::GetCurrent();
+    auto new_context = prop->Extract(carrier, current_ctx);
+    options.parent   = opentelemetry::trace::propagation::GetSpan(new_context)->GetContext();
+
+    std::string span_name = "GreeterService/Greet";
+    auto span             = get_tracer("grpc")
+                    ->StartSpan(span_name,
+                                {{"rpc.system", "grpc"},
+                                 {"rpc.service", "GreeterService"},
+                                 {"rpc.method", "Greet"},
+                                 {"rpc.grpc.status_code", 0}},
+                                options);
+    auto scope = get_tracer("grpc")->WithActiveSpan(span);
+
+    // Fetch and parse whatever HTTP headers we can from the gRPC request.
+    span->AddEvent("Processing client attributes");
+
+    std::string req = request->request();
+    std::cout << std::endl << "grpc_client says: " << req << std::endl;
+    std::string message = "The pleasure is mine.";
+    // Send response to client
+    response->set_response(message);
+    span->AddEvent("Response sent to client");
+
+    span->SetStatus(opentelemetry::trace::StatusCode::kOk);
+    // Make sure to end your spans!
+    span->End();
+    return Status::OK;
+  }
+};  // GreeterServer class
+
+void RunServer(uint16_t port)
+{
+  std::string address("0.0.0.0:" + std::to_string(port));
+  GreeterServer service;
+  ServerBuilder builder;
+
+  builder.RegisterService(&service);
+  builder.AddListeningPort(address, grpc::InsecureServerCredentials());
+
+  std::unique_ptr<Server> server(builder.BuildAndStart());
+  std::cout << "Server listening on port: " << address << std::endl;
+  server->Wait();
+  server->Shutdown();
+}
+}  // namespace
+
+int main(int argc, char **argv)
+{
+  initTracer();
+  constexpr uint16_t default_port = 8800;
+  uint16_t port;
+  if (argc > 1)
+  {
+    port = atoi(argv[1]);
+  }
+  else
+  {
+    port = default_port;
+  }
+
+  RunServer(port);
+  return 0;
+}
