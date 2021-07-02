@@ -49,11 +49,7 @@ public:
 
   bool Fields(nostd::function_ref<bool(nostd::string_view)> callback) const noexcept override
   {
-    if (callback(kBaggageHeader))
-    {
-      return true;
-    }
-    return false;
+    return callback(kBaggageHeader);
   }
 };
 }  // namespace propagation

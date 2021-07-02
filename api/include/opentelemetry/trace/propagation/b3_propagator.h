@@ -185,11 +185,7 @@ public:
 
   bool Fields(nostd::function_ref<bool(nostd::string_view)> callback) const noexcept override
   {
-    if (callback(kB3TraceIdHeader) && callback(kB3SpanIdHeader) && callback(kB3SampledHeader))
-    {
-      return true;
-    }
-    return false;
+    return (callback(kB3TraceIdHeader) && callback(kB3SpanIdHeader) && callback(kB3SampledHeader));
   }
 };
 

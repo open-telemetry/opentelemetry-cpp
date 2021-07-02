@@ -30,6 +30,7 @@ public:
   {
     return true;
   }
+  virtual ~TextMapCarrier() = default;
 };
 
 // The TextMapPropagator class provides an interface that enables extracting and injecting
@@ -50,6 +51,8 @@ public:
 
   // Gets the fields set in the carrier by the `inject` method
   virtual bool Fields(nostd::function_ref<bool(nostd::string_view)> callback) const noexcept = 0;
+
+  virtual ~TextMapPropagator() = default;
 };
 }  // namespace propagation
 }  // namespace context

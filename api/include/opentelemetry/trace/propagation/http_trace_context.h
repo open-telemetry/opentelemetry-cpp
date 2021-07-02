@@ -163,11 +163,7 @@ private:
 
   bool Fields(nostd::function_ref<bool(nostd::string_view)> callback) const noexcept override
   {
-    if (callback(kTraceParent) && callback(kTraceState))
-    {
-      return true;
-    }
-    return false;
+    return (callback(kTraceParent) && callback(kTraceState));
   }
 };
 }  // namespace propagation

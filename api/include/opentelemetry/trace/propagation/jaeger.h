@@ -58,11 +58,7 @@ public:
 
   bool Fields(nostd::function_ref<bool(nostd::string_view)> callback) const noexcept override
   {
-    if (callback(kJaegerTraceHeader))
-    {
-      return true;
-    }
-    return false;
+    return callback(kJaegerTraceHeader);
   }
 
 private:
