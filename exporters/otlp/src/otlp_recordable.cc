@@ -237,6 +237,18 @@ proto::resource::v1::Resource OtlpRecordable::ProtoResource() const noexcept
   return proto;
 }
 
+proto::common::v1::InstrumentationLibrary OtlpRecordable::GetProtoInstrumentationLibrary()
+    const noexcept
+{
+  proto::common::v1::InstrumentationLibrary instrumentation_library;
+  if (instrumentation_library_)
+  {
+    instrumentation_library.set_name(instrumentation_library_->GetName());
+    instrumentation_library.set_version(instrumentation_library_->GetVersion());
+  }
+  return instrumentation_library;
+}
+
 void OtlpRecordable::SetResource(const opentelemetry::sdk::resource::Resource &resource) noexcept
 {
   resource_ = &resource;
@@ -271,12 +283,11 @@ void OtlpRecordable::AddLink(const opentelemetry::trace::SpanContext &span_conte
                      trace::TraceId::kSize);
   link->set_span_id(reinterpret_cast<const char *>(span_context.span_id().Id().data()),
                     trace::SpanId::kSize);
+  link->set_trace_state(span_context.trace_state()->ToHeader());
   attributes.ForEachKeyValue([&](nostd::string_view key, common::AttributeValue value) noexcept {
     PopulateAttribute(link->add_attributes(), key, value);
     return true;
   });
-
-  // TODO: Populate trace_state when it is supported by SpanContext
 }
 
 void OtlpRecordable::SetStatus(trace::StatusCode code, nostd::string_view description) noexcept
@@ -347,7 +358,7 @@ void OtlpRecordable::SetInstrumentationLibrary(
     const opentelemetry::sdk::instrumentationlibrary::InstrumentationLibrary
         &instrumentation_library) noexcept
 {
-  // TODO: add instrumentation library to OTLP exporter.
+  instrumentation_library_ = &instrumentation_library;
 }
 
 }  // namespace otlp
