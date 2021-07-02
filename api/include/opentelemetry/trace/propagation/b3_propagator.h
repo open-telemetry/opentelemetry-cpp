@@ -153,11 +153,7 @@ public:
 
   bool Fields(nostd::function_ref<bool(nostd::string_view)> callback) const noexcept override
   {
-    if (callback(kB3CombinedHeader))
-    {
-      return true;
-    }
-    return false;
+    return callback(kB3CombinedHeader);
   }
 };
 
