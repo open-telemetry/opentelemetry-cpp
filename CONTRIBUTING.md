@@ -142,7 +142,7 @@ on each other), the owner should try to get people aligned by:
 
 If none of the above worked and the PR has been stuck for more than 2 weeks, the
 owner should bring it to the OpenTelemetry C++ SIG meeting. See
-[README.md](README.md#Contributing) for the meeting link.
+[README.md](README.md#contributing) for the meeting link.
 
 ## Useful Resources
 
