@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 #include "opentelemetry/exporters/zipkin/recordable.h"
+#include "opentelemetry/sdk/resource/semantic_conventions.h"
 
 #include <map>
 #include <string>
@@ -11,6 +12,8 @@ namespace exporter
 {
 namespace zipkin
 {
+
+using namespace opentelemetry::sdk::resource;
 
 // constexpr needs keys to be constexpr, const is next best to use.
 static const std::map<opentelemetry::trace::SpanKind, std::string> kSpanKindMap = {
@@ -208,9 +211,9 @@ void Recordable::SetResource(const opentelemetry::sdk::resource::Resource &resou
 {
   // only service.name attribute is supported by specs as of now.
   auto attributes = resource.GetAttributes();
-  if (attributes.find("service.name") != attributes.end())
+  if (attributes.find(OTEL_CPP_GET_ATTR(AttrServiceName)) != attributes.end())
   {
-    service_name_ = nostd::get<std::string>(attributes["service.name"]);
+    service_name_ = nostd::get<std::string>(attributes[OTEL_CPP_GET_ATTR(AttrServiceName)]);
   }
 }
 
@@ -222,7 +225,7 @@ void Recordable::SetStartTime(opentelemetry::common::SystemTimestamp start_time)
 
 void Recordable::SetDuration(std::chrono::nanoseconds duration) noexcept
 {
-  span_["duration"] = duration.count();
+  span_["duration"] = std::chrono::duration_cast<std::chrono::microseconds>(duration).count();
 }
 
 void Recordable::SetSpanKind(opentelemetry::trace::SpanKind span_kind) noexcept
