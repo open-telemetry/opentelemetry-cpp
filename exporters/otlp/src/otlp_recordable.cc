@@ -138,9 +138,9 @@ void PopulateAttribute(opentelemetry::proto::common::v1::KeyValue *attribute,
 {
   // Assert size of variant to ensure that this method gets updated if the variant
   // definition changes
-  static_assert(nostd::variant_size<opentelemetry::common::AttributeValue>::value ==
-                    kOwnedAttributeValueSize + 1,
-                "AttributeValue contains unknown type");
+  static_assert(nostd::variant_size<sdk::common::OwnedAttributeValue>::value ==
+                    kOwnedAttributeValueSize,
+                "OwnedAttributeValue contains unknown type");
 
   attribute->set_key(key.data(), key.size());
 
