@@ -111,4 +111,14 @@ TEST_F(CompositePropagatorTest, Inject)
   EXPECT_EQ(carrier.headers_["traceparent"],
             "00-0102030405060708090a0b0c0d0e0f10-0102030405060708-01");
   EXPECT_EQ(carrier.headers_["b3"], "0102030405060708090a0b0c0d0e0f10-0102030405060708-1");
+
+  std::vector<std::string> fields;
+  composite_propagator_->Fields([&fields](nostd::string_view field) {
+    fields.push_back(field.data());
+    return true;
+  });
+  EXPECT_EQ(fields.size(), 3);
+  EXPECT_EQ(fields[0], opentelemetry::trace::propagation::kTraceParent);
+  EXPECT_EQ(fields[1], opentelemetry::trace::propagation::kTraceState);
+  EXPECT_EQ(fields[2], opentelemetry::trace::propagation::kB3CombinedHeader);
 }
