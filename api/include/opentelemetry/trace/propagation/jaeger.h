@@ -15,7 +15,7 @@ namespace trace
 namespace propagation
 {
 
-static const nostd::string_view kTraceHeader = "uber-trace-id";
+static const nostd::string_view kJaegerTraceHeader = "uber-trace-id";
 
 class JaegerPropagator : public context::propagation::TextMapPropagator
 {
@@ -45,7 +45,7 @@ public:
     trace_identity[trace_id_length + span_id_length + 4] = '0';
     trace_identity[trace_id_length + span_id_length + 5] = span_context.IsSampled() ? '1' : '0';
 
-    carrier.Set(kTraceHeader, nostd::string_view(trace_identity, sizeof(trace_identity)));
+    carrier.Set(kJaegerTraceHeader, nostd::string_view(trace_identity, sizeof(trace_identity)));
   }
 
   context::Context Extract(const context::propagation::TextMapCarrier &carrier,
@@ -54,6 +54,11 @@ public:
     SpanContext span_context = ExtractImpl(carrier);
     nostd::shared_ptr<Span> sp{new DefaultSpan(span_context)};
     return SetSpan(context, sp);
+  }
+
+  bool Fields(nostd::function_ref<bool(nostd::string_view)> callback) const noexcept override
+  {
+    return callback(kJaegerTraceHeader);
   }
 
 private:
@@ -67,7 +72,7 @@ private:
 
   static SpanContext ExtractImpl(const context::propagation::TextMapCarrier &carrier)
   {
-    nostd::string_view trace_identity = carrier.Get(kTraceHeader);
+    nostd::string_view trace_identity = carrier.Get(kJaegerTraceHeader);
 
     const size_t trace_field_count = 4;
     nostd::string_view trace_fields[trace_field_count];

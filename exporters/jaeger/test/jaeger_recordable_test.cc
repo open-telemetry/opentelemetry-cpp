@@ -43,10 +43,10 @@ TEST(JaegerSpanRecordable, SetIdentity)
   std::unique_ptr<thrift::Span> span{rec.Span()};
 
 #if JAEGER_IS_LITTLE_ENDIAN == 1
-  EXPECT_EQ(span->traceIdLow, opentelemetry::exporter::jaeger::bswap_64(trace_id_val[1]));
-  EXPECT_EQ(span->traceIdHigh, opentelemetry::exporter::jaeger::bswap_64(trace_id_val[0]));
-  EXPECT_EQ(span->spanId, opentelemetry::exporter::jaeger::bswap_64(span_id_val));
-  EXPECT_EQ(span->parentSpanId, opentelemetry::exporter::jaeger::bswap_64(parent_span_id_val));
+  EXPECT_EQ(span->traceIdLow, opentelemetry::exporter::jaeger::otel_bswap_64(trace_id_val[1]));
+  EXPECT_EQ(span->traceIdHigh, opentelemetry::exporter::jaeger::otel_bswap_64(trace_id_val[0]));
+  EXPECT_EQ(span->spanId, opentelemetry::exporter::jaeger::otel_bswap_64(span_id_val));
+  EXPECT_EQ(span->parentSpanId, opentelemetry::exporter::jaeger::otel_bswap_64(parent_span_id_val));
 #else
   EXPECT_EQ(span->traceIdLow, trace_id_val[0]);
   EXPECT_EQ(span->traceIdHigh, trace_id_val[1]);
@@ -129,7 +129,7 @@ TEST(JaegerSpanRecordable, SetInstrumentationLibrary)
 
   std::string library_name     = "opentelemetry-cpp";
   std::string library_version  = "0.1.0";
-  auto instrumentation_library = InstrumentationLibrary::create(library_name, library_version);
+  auto instrumentation_library = InstrumentationLibrary::Create(library_name, library_version);
 
   rec.SetInstrumentationLibrary(*instrumentation_library);
 
