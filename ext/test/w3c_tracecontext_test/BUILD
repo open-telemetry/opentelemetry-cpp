@@ -4,9 +4,9 @@ cc_binary(
         "main.cc",
     ],
     # TODO: Move copts/linkopts for static CURL usage into shared bzl file.
-    copts = [
-        "-DCURL_STATICLIB",
-    ],
+    # copts = [
+    #     "-DCURL_STATICLIB",
+    # ],
     linkopts = select({
         "//bazel:windows": [
             "-DEFAULTLIB:advapi32.lib",
