@@ -31,7 +31,6 @@ cc_library(
     ]),
     copts = CURL_COPTS + [
         "-DOS=\"os\"",
-        # "-DCURL_EXTERN_SYMBOL=__attribute__((__visibility__(\"default\")))",
     ],
     defines = ["CURL_STATICLIB"],
     includes = [
