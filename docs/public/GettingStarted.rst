@@ -42,9 +42,9 @@ Mark a span as active
 
     auto scope = tracer->WithActiveSpan(span);
 
-This marks a span as active and returns a ``Scope`` object bound to the
-lifetime of the span. When the ``Scope`` object is destroyed, the
-related span is ended.
+This marks a span as active and returns a ``Scope`` object. The `Scope` object
+controls how long a span is active. The span remains active for the lifetime
+of `Scope` object.
 
 The concept of an active span is important, as any span that is created
 without explicitly specifying a parent is parented to the currently
