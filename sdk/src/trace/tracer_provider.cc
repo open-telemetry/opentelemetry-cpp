@@ -55,7 +55,7 @@ nostd::shared_ptr<opentelemetry::trace::Tracer> TracerProvider::GetTracer(
     }
   }
 
-  auto lib = InstrumentationLibrary::create(library_name, library_version);
+  auto lib = InstrumentationLibrary::Create(library_name, library_version);
   tracers_.push_back(std::shared_ptr<opentelemetry::sdk::trace::Tracer>(
       new sdk::trace::Tracer(context_, std::move(lib))));
   return nostd::shared_ptr<opentelemetry::trace::Tracer>{tracers_.back()};

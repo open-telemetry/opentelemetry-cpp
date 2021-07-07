@@ -16,7 +16,7 @@ TEST(InstrumentationLibrary, CreateInstrumentationLibrary)
 
   std::string library_name     = "opentelemetry-cpp";
   std::string library_version  = "0.1.0";
-  auto instrumentation_library = InstrumentationLibrary::create(library_name, library_version);
+  auto instrumentation_library = InstrumentationLibrary::Create(library_name, library_version);
 
   EXPECT_EQ(instrumentation_library->GetName(), library_name);
   EXPECT_EQ(instrumentation_library->GetVersion(), library_version);

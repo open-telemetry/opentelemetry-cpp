@@ -150,6 +150,11 @@ public:
 
     carrier.Set(kB3CombinedHeader, nostd::string_view(trace_identity, sizeof(trace_identity)));
   }
+
+  bool Fields(nostd::function_ref<bool(nostd::string_view)> callback) const noexcept override
+  {
+    return callback(kB3CombinedHeader);
+  }
 };
 
 class B3PropagatorMultiHeader : public B3PropagatorExtractor
@@ -172,6 +177,11 @@ public:
     carrier.Set(kB3TraceIdHeader, nostd::string_view(trace_id, sizeof(trace_id)));
     carrier.Set(kB3SpanIdHeader, nostd::string_view(span_id, sizeof(span_id)));
     carrier.Set(kB3SampledHeader, nostd::string_view(trace_flags + 1, 1));
+  }
+
+  bool Fields(nostd::function_ref<bool(nostd::string_view)> callback) const noexcept override
+  {
+    return callback(kB3TraceIdHeader) && callback(kB3SpanIdHeader) && callback(kB3SampledHeader);
   }
 };
 

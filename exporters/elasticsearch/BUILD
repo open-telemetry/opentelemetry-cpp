@@ -9,9 +9,6 @@ cc_library(
         "include/opentelemetry/exporters/elasticsearch/es_log_exporter.h",
         "include/opentelemetry/exporters/elasticsearch/es_log_recordable.h",
     ],
-    copts = [
-        "-DCURL_STATICLIB",
-    ],
     linkopts = select({
         "//bazel:windows": [
             "-DEFAULTLIB:advapi32.lib",
