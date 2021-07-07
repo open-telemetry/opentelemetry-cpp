@@ -25,7 +25,7 @@ public:
    * @param version version of the instrumentation library.
    * @returns the newly created InstrumentationLibrary.
    */
-  static nostd::unique_ptr<InstrumentationLibrary> create(nostd::string_view name,
+  static nostd::unique_ptr<InstrumentationLibrary> Create(nostd::string_view name,
                                                           nostd::string_view version = "")
   {
     return nostd::unique_ptr<InstrumentationLibrary>(
