@@ -29,6 +29,7 @@ int ThriftSender::Append(std::unique_ptr<Recordable> &&span) noexcept
   if (process_.serviceName.empty())
   {
     process_.serviceName = span->ServiceName();
+    process_.__set_tags(span->ResourceTags());
 
     process_bytes_size_ = CalcSizeOfSerializedThrift(process_);
     max_span_bytes -= process_bytes_size_;
