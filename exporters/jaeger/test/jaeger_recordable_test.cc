@@ -149,10 +149,10 @@ TEST(JaegerSpanRecordable, AddEvent)
   size_t index = 0;
   EXPECT_EQ(tags[index].key, "event");
   EXPECT_EQ(tags[index++].vStr, "Test Event");
-  while (index <= 1)
+  while (index <= kNumAttributes)
   {
     EXPECT_EQ(tags[index].key, keys[index - 1]);
-    // EXPECT_EQ(tags[index].vLong, values[index-1]);
+    EXPECT_EQ(tags[index].vLong, values[index - 1]);
     index++;
   }
 }
