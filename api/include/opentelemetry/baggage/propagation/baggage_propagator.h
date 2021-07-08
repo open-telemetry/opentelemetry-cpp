@@ -46,6 +46,11 @@ public:
     auto baggage                   = Baggage::FromHeader(baggage_str);
     return SetBaggage(context, baggage);
   }
+
+  bool Fields(nostd::function_ref<bool(nostd::string_view)> callback) const noexcept override
+  {
+    return callback(kBaggageHeader);
+  }
 };
 }  // namespace propagation
 }  // namespace baggage
