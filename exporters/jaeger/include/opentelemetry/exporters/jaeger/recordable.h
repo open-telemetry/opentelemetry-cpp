@@ -29,13 +29,13 @@ namespace jaeger
 
 #  if defined(__clang__) || \
       (defined(__GNUC__) && ((__GNUC__ == 4 && __GNUC_MINOR__ >= 8) || __GNUC__ >= 5))
-inline uint64_t bswap_64(uint64_t host_int)
+inline uint64_t otel_bswap_64(uint64_t host_int)
 {
   return __builtin_bswap64(host_int);
 }
 
 #  elif defined(_MSC_VER)
-inline uint64_t bswap_64(uint64_t host_int)
+inline uint64_t otel_bswap_64(uint64_t host_int)
 {
   return _byteswap_uint64(host_int);
 }

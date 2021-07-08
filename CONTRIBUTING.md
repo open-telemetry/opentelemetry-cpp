@@ -141,8 +141,8 @@ on each other), the owner should try to get people aligned by:
   split it up.
 
 If none of the above worked and the PR has been stuck for more than 2 weeks, the
-owner should bring it to the [OpenTelemetry C++ SIG
-meeting](https://zoom.us/j/8203130519). The meeting passcode is _77777_.
+owner should bring it to the OpenTelemetry C++ SIG meeting. See
+[README.md](README.md#contributing) for the meeting link.
 
 ## Useful Resources
 
