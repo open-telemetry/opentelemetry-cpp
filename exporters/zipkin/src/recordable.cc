@@ -172,7 +172,7 @@ void Recordable::AddEvent(nostd::string_view name,
   });
 
   nlohmann::json annotation = {{"value", nlohmann::json::object({{name.data(), attrs}}).dump()},
-                               {"timestamp", std::chrono::duration_cast<std::chrono::milliseconds>(
+                               {"timestamp", std::chrono::duration_cast<std::chrono::microseconds>(
                                                  timestamp.time_since_epoch())
                                                  .count()}};
 
