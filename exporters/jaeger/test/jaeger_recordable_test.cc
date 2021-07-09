@@ -186,7 +186,7 @@ TEST(JaegerSpanRecordable, SetResource)
   const std::string service_name_key = "service.name";
   std::string service_name_value     = "test-jaeger-service-name";
   auto resource                      = opentelemetry::sdk::resource::Resource::Create(
-                           {{service_name_key, service_name_value}, {"key1", "value1"}, {"key2", "value2"}});
+      {{service_name_key, service_name_value}, {"key1", "value1"}, {"key2", "value2"}});
   rec.SetResource(resource);
 
   auto service_name  = rec.ServiceName();
