@@ -56,6 +56,7 @@ public:
 
   thrift::Span *Span() noexcept { return span_.release(); }
   std::vector<thrift::Tag> Tags() noexcept { return std::move(tags_); }
+  std::vector<thrift::Log> Logs() noexcept { return std::move(logs_); }
   const std::string &ServiceName() const noexcept { return service_name_; }
 
   void SetIdentity(const opentelemetry::trace::SpanContext &span_context,
@@ -88,18 +89,20 @@ public:
           &instrumentation_library) noexcept override;
 
 private:
-  void AddTag(const std::string &key, const std::string &value);
-  void AddTag(const std::string &key, const char *value);
-  void AddTag(const std::string &key, bool value);
-  void AddTag(const std::string &key, int64_t value);
-  void AddTag(const std::string &key, double value);
+  void AddTag(const std::string &key, const std::string &value, std::vector<thrift::Tag> &tags);
+  void AddTag(const std::string &key, const char *value, std::vector<thrift::Tag> &tags);
+  void AddTag(const std::string &key, bool value, std::vector<thrift::Tag> &tags);
+  void AddTag(const std::string &key, int64_t value, std::vector<thrift::Tag> &tags);
+  void AddTag(const std::string &key, double value, std::vector<thrift::Tag> &tags);
 
   void PopulateAttribute(nostd::string_view key,
-                         const opentelemetry::common::AttributeValue &value);
+                         const opentelemetry::common::AttributeValue &value,
+                         std::vector<thrift::Tag> &tags);
 
 private:
   std::unique_ptr<thrift::Span> span_;
   std::vector<thrift::Tag> tags_;
+  std::vector<thrift::Log> logs_;
   std::string service_name_;
 };
 
