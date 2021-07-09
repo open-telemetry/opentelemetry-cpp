@@ -56,6 +56,7 @@ public:
 
   thrift::Span *Span() noexcept { return span_.release(); }
   std::vector<thrift::Tag> Tags() noexcept { return std::move(tags_); }
+  std::vector<thrift::Tag> ResourceTags() noexcept { return std::move(resource_tags_); }
   std::vector<thrift::Log> Logs() noexcept { return std::move(logs_); }
   const std::string &ServiceName() const noexcept { return service_name_; }
 
@@ -99,9 +100,14 @@ private:
                          const opentelemetry::common::AttributeValue &value,
                          std::vector<thrift::Tag> &tags);
 
+  void PopulateAttribute(nostd::string_view key,
+                         const sdk::common::OwnedAttributeValue &value,
+                         std::vector<thrift::Tag> &tags);
+
 private:
   std::unique_ptr<thrift::Span> span_;
   std::vector<thrift::Tag> tags_;
+  std::vector<thrift::Tag> resource_tags_;
   std::vector<thrift::Log> logs_;
   std::string service_name_;
 };

@@ -178,3 +178,38 @@ TEST(JaegerSpanRecordable, SetInstrumentationLibrary)
   EXPECT_EQ(tags[1].vType, thrift::TagType::STRING);
   EXPECT_EQ(tags[1].vStr, library_version);
 }
+
+TEST(JaegerSpanRecordable, SetResource)
+{
+  opentelemetry::exporter::jaeger::Recordable rec;
+
+  const std::string service_name_key = "service.name";
+  std::string service_name_value     = "test-jaeger-service-name";
+  auto resource                      = opentelemetry::sdk::resource::Resource::Create(
+      {{service_name_key, service_name_value}, {"key1", "value1"}, {"key2", "value2"}});
+  rec.SetResource(resource);
+
+  auto service_name  = rec.ServiceName();
+  auto resource_tags = rec.ResourceTags();
+
+  EXPECT_GE(resource_tags.size(), 2);
+  EXPECT_EQ(service_name, service_name_value);
+
+  bool found_key1 = false;
+  bool found_key2 = false;
+  for (const auto &tag : resource_tags)
+  {
+    if (tag.key == "key1")
+    {
+      found_key1 = true;
+      EXPECT_EQ(tag.vType, thrift::TagType::STRING);
+      EXPECT_EQ(tag.vStr, "value1");
+    }
+    else if (tag.key == "key2")
+    {
+      found_key2 = true;
+      EXPECT_EQ(tag.vType, thrift::TagType::STRING);
+      EXPECT_EQ(tag.vStr, "value2");
+    }
+  }
+}

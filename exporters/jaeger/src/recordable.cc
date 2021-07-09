@@ -41,6 +41,29 @@ void Recordable::PopulateAttribute(nostd::string_view key,
   // TODO: extend other AttributeType to the types supported by Jaeger.
 }
 
+void Recordable::PopulateAttribute(nostd::string_view key,
+                                   const sdk::common::OwnedAttributeValue &value,
+                                   std::vector<thrift::Tag> &tags)
+{
+  if (nostd::holds_alternative<int64_t>(value))
+  {
+    AddTag(std::string{key}, nostd::get<int64_t>(value), tags);
+  }
+  else if (nostd::holds_alternative<bool>(value))
+  {
+    AddTag(std::string{key}, nostd::get<bool>(value), tags);
+  }
+  else if (nostd::holds_alternative<double>(value))
+  {
+    AddTag(std::string{key}, nostd::get<double>(value), tags);
+  }
+  else if (nostd::holds_alternative<std::string>(value))
+  {
+    AddTag(std::string{key}, std::string{nostd::get<std::string>(value)}, tags);
+  }
+  // TODO: extend other OwnedAttributeType to the types supported by Jaeger.
+}
+
 void Recordable::SetIdentity(const trace::SpanContext &span_context,
                              trace::SpanId parent_span_id) noexcept
 {
@@ -77,7 +100,7 @@ void Recordable::AddEvent(nostd::string_view name,
                           const common::KeyValueIterable &attributes) noexcept
 {
   std::vector<thrift::Tag> tags;
-  PopulateAttribute("event", name.data(), tags);
+  PopulateAttribute("event", static_cast<common::AttributeValue>(name.data()), tags);
 
   attributes.ForEachKeyValue([&](nostd::string_view key, common::AttributeValue value) noexcept {
     PopulateAttribute(key, value, tags);
@@ -131,11 +154,17 @@ void Recordable::SetName(nostd::string_view name) noexcept
 
 void Recordable::SetResource(const opentelemetry::sdk::resource::Resource &resource) noexcept
 {
-  // only service.name attribute is supported by specs as of now.
-  auto attributes = resource.GetAttributes();
-  if (attributes.find(OTEL_CPP_GET_ATTR(AttrServiceName)) != attributes.end())
+  for (const auto &attribute_iter : resource.GetAttributes())
   {
-    service_name_ = nostd::get<std::string>(attributes[OTEL_CPP_GET_ATTR(AttrServiceName)]);
+    if (attribute_iter.first != "service.name")
+    {
+      PopulateAttribute(nostd::string_view{attribute_iter.first}, attribute_iter.second,
+                        resource_tags_);
+    }
+    else
+    {
+      service_name_ = nostd::get<std::string>(attribute_iter.second);
+    }
   }
 }
 
