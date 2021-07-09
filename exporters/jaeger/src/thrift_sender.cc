@@ -36,6 +36,7 @@ int ThriftSender::Append(std::unique_ptr<Recordable> &&span) noexcept
 
   thrift::Span &jaeger_span = *span->Span();
   jaeger_span.__set_tags(span->Tags());
+  jaeger_span.__set_logs(span->Logs());
 
   const uint32_t span_size = CalcSizeOfSerializedThrift(jaeger_span);
   if (span_size > max_span_bytes)

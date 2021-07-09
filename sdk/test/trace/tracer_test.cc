@@ -632,3 +632,23 @@ TEST(Tracer, ValidTraceIdToSampler)
   EXPECT_TRUE(span->IsRecording());
   EXPECT_TRUE(span->GetContext().IsValid());
 }
+
+TEST(Tracer, SpanCleanupWithScope)
+{
+  std::unique_ptr<InMemorySpanExporter> exporter(new InMemorySpanExporter());
+  std::shared_ptr<InMemorySpanData> span_data = exporter->GetData();
+  auto tracer                                 = initTracer(std::move(exporter));
+  {
+    auto span0 = tracer->StartSpan("Span0");
+    auto span1 = tracer->StartSpan("span1");
+    {
+      trace_api::Scope scope(span1);
+      auto span2 = tracer->StartSpan("span2");
+      {
+        trace_api::Scope scope(span2);
+        auto span3 = tracer->StartSpan("span3");
+      }
+    }
+  }
+  EXPECT_EQ(4, span_data->GetSpans().size());
+}

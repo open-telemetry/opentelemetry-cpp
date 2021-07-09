@@ -123,6 +123,40 @@ TEST(JaegerSpanRecordable, SetStatus)
   EXPECT_EQ(tags[2].vStr, error_description);
 }
 
+TEST(JaegerSpanRecordable, AddEvent)
+{
+  opentelemetry::exporter::jaeger::Recordable rec;
+
+  nostd::string_view name = "Test Event";
+
+  std::chrono::system_clock::time_point event_time = std::chrono::system_clock::now();
+  opentelemetry::common::SystemTimestamp event_timestamp(event_time);
+  uint64_t epoch_us =
+      std::chrono::duration_cast<std::chrono::microseconds>(event_time.time_since_epoch()).count();
+
+  const int kNumAttributes                  = 3;
+  std::string keys[kNumAttributes]          = {"attr1", "attr2", "attr3"};
+  int64_t values[kNumAttributes]            = {4, 7, 23};
+  std::map<std::string, int64_t> attributes = {
+      {keys[0], values[0]}, {keys[1], values[1]}, {keys[2], values[2]}};
+
+  rec.AddEvent(
+      "Test Event", event_timestamp,
+      opentelemetry::common::KeyValueIterableView<std::map<std::string, int64_t>>(attributes));
+  thrift::Log log = rec.Logs().at(0);
+  EXPECT_EQ(log.timestamp, epoch_us);
+  auto tags    = log.fields;
+  size_t index = 0;
+  EXPECT_EQ(tags[index].key, "event");
+  EXPECT_EQ(tags[index++].vStr, "Test Event");
+  while (index <= kNumAttributes)
+  {
+    EXPECT_EQ(tags[index].key, keys[index - 1]);
+    EXPECT_EQ(tags[index].vLong, values[index - 1]);
+    index++;
+  }
+}
+
 TEST(JaegerSpanRecordable, SetInstrumentationLibrary)
 {
   opentelemetry::exporter::jaeger::Recordable rec;
