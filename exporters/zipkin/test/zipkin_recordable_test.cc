@@ -133,7 +133,7 @@ TEST(ZipkinSpanRecordable, AddEventDefault)
   rec.opentelemetry::sdk::trace::Recordable::AddEvent(name, event_timestamp);
 
   uint64_t unix_event_time =
-      std::chrono::duration_cast<std::chrono::milliseconds>(event_time.time_since_epoch()).count();
+      std::chrono::duration_cast<std::chrono::microseconds>(event_time.time_since_epoch()).count();
 
   json j_span = {
       {"annotations",
@@ -149,7 +149,7 @@ TEST(ZipkinSpanRecordable, AddEventWithAttributes)
   std::chrono::system_clock::time_point event_time = std::chrono::system_clock::now();
   opentelemetry::common::SystemTimestamp event_timestamp(event_time);
   uint64_t unix_event_time =
-      std::chrono::duration_cast<std::chrono::milliseconds>(event_time.time_since_epoch()).count();
+      std::chrono::duration_cast<std::chrono::microseconds>(event_time.time_since_epoch()).count();
 
   const int kNumAttributes              = 3;
   std::string keys[kNumAttributes]      = {"attr1", "attr2", "attr3"};
