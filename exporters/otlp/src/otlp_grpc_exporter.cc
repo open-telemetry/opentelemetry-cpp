@@ -3,10 +3,11 @@
 
 #include "opentelemetry/exporters/otlp/otlp_grpc_exporter.h"
 #include "opentelemetry/exporters/otlp/otlp_recordable.h"
+#include "opentelemetry/sdk_config.h"
 
 #include <grpcpp/grpcpp.h>
 #include <fstream>
-#include <iostream>
+#include <sstream>  // std::stringstream
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace exporter
@@ -112,7 +113,8 @@ sdk::common::ExportResult OtlpGrpcExporter::Export(
 
   if (!status.ok())
   {
-    std::cerr << "[OTLP Exporter] Export() failed: " << status.error_message() << "\n";
+
+    OTEL_INTERNAL_LOG_ERROR("[OTLP Exporter] Export() failed: " << status.error_message());
     return sdk::common::ExportResult::kFailure;
   }
   return sdk::common::ExportResult::kSuccess;

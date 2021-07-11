@@ -183,8 +183,8 @@ public:
   {
     if (response_ == nullptr)
     {
-      static NoopResponse res;
-      return res;
+      // let's not return nullptr
+      response_.reset(new NoopResponse());
     }
     return *response_;
   }
