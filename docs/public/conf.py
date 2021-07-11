@@ -90,7 +90,7 @@ breathe_projects = {
         "OpenTelemetry C++ SDK": "../../sdk/docs/doxyoutput/xml"
 }
 
-breathe_default_project = "OpenTelemetry C++ API"
+breathe_default_project = "OpenTelemetry C++ SDK"
 
 primary_domain = "cpp"
 
