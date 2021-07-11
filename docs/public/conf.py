@@ -33,7 +33,7 @@ import subprocess
 
 sdkdir1 = os.path.join('..', '..', 'sdk', 'docs')
 subprocess.call(['make', 'html'], cwd=sdkdir1)
-targetdir1 = os.path.join(os.getcwd(), 'otel_docs')
+targetdir1 = os.path.join(os.getcwd(), 'otel_sdk')
 sourcedir1= os.path.join(sdkdir1, 'otel_sdk')
 if os.path.exists(targetdir1):
   shutil.rmtree(targetdir1)
@@ -55,7 +55,7 @@ for fname in os.listdir(sourcedir1):
 
 sdkdir = os.path.join('..', '..', 'api', 'docs')
 subprocess.call(['make', 'html'], cwd=sdkdir)
-targetdir = os.path.join(os.getcwd(), 'otel_docs')
+targetdir = os.path.join(os.getcwd(), 'otel_api')
 sourcedir = os.path.join(sdkdir, 'otel_api')
 if os.path.exists(targetdir):
   shutil.rmtree(targetdir)
