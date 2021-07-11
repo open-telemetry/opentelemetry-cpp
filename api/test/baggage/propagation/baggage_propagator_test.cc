@@ -36,15 +36,14 @@ TEST(BaggagePropagatorTest, ExtractNoBaggageHeader)
   context::Context ctx1 = context::Context{};
   context::Context ctx2 = format.Extract(carrier, ctx1);
   auto ctx2_baggage     = baggage::propagation::GetBaggage(ctx2);
-  EXPECT_EQ(ctx2_baggage->ToHeader(), "");
+  EXPECT_EQ(ctx2_baggage.ToHeader(), "");
 }
 
 TEST(BaggagePropagatorTest, ExtractAndInjectBaggage)
 {
   // create header string for baggage larger than allowed size (kMaxKeyValueSize)
-  std::string very_large_baggage_header =
-      std::string(baggage::Baggage::kMaxKeyValueSize / 2 + 1, 'k') + "=" +
-      std::string(baggage::Baggage::kMaxKeyValueSize / 2 + 1, 'v');
+  std::string very_large_baggage_header = std::string(baggage::kMaxKeyValueSize / 2 + 1, 'k') +
+                                          "=" + std::string(baggage::kMaxKeyValueSize / 2 + 1, 'v');
 
   std::map<std::string, std::string> baggages = {
       {"key1=val1,key2=val2", "key1=val1,key2=val2"},                // valid header

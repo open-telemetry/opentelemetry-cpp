@@ -50,7 +50,7 @@ std::string header_with_custom_size(size_t key_value_size, size_t num_entries)
 
 TEST(BaggageTest, ValidateExtractHeader)
 {
-  auto invalid_key_value_size_header = header_with_custom_size(Baggage::kMaxKeyValueSize + 5, 1);
+  auto invalid_key_value_size_header = header_with_custom_size(baggage::kMaxKeyValueSize + 5, 1);
 
   struct
   {
@@ -82,7 +82,7 @@ TEST(BaggageTest, ValidateExtractHeader)
   {
     auto baggage = Baggage::FromHeader(testcase.input);
     size_t index = 0;
-    baggage->GetAllEntries([&testcase, &index](nostd::string_view key, nostd::string_view value) {
+    baggage.GetAllEntries([&testcase, &index](nostd::string_view key, nostd::string_view value) {
       EXPECT_EQ(key, testcase.keys[index]);
       EXPECT_EQ(value, testcase.values[index]);
       index++;
@@ -91,21 +91,21 @@ TEST(BaggageTest, ValidateExtractHeader)
   }
 
   // For header with maximum threshold pairs, no pair is dropped
-  auto max_pairs_header = header_with_custom_entries(Baggage::kMaxKeyValuePairs);
-  EXPECT_EQ(Baggage::FromHeader(max_pairs_header.data())->ToHeader(), max_pairs_header.data());
+  auto max_pairs_header = header_with_custom_entries(baggage::kMaxKeyValuePairs);
+  EXPECT_EQ(Baggage::FromHeader(max_pairs_header.data()).ToHeader(), max_pairs_header.data());
 
   // Entries beyond threshold are dropped
-  auto baggage = Baggage::FromHeader(header_with_custom_entries(Baggage::kMaxKeyValuePairs + 1));
-  auto header  = baggage->ToHeader();
+  auto baggage = Baggage::FromHeader(header_with_custom_entries(baggage::kMaxKeyValuePairs + 1));
+  auto header  = baggage.ToHeader();
   common::KeyValueStringTokenizer kv_str_tokenizer(header);
-  int expected_tokens = Baggage::kMaxKeyValuePairs;
+  int expected_tokens = baggage::kMaxKeyValuePairs;
   EXPECT_EQ(kv_str_tokenizer.NumTokens(), expected_tokens);
 
   // For header with total size more than threshold, baggage is empty
-  int num_pairs_with_max_size = Baggage::kMaxSize / Baggage::kMaxKeyValueSize;
+  int num_pairs_with_max_size = baggage::kMaxSize / baggage::kMaxKeyValueSize;
   auto invalid_total_size_header =
-      header_with_custom_size(Baggage::kMaxKeyValueSize, num_pairs_with_max_size + 1);
-  EXPECT_EQ(Baggage::FromHeader(invalid_total_size_header.data())->ToHeader(), "");
+      header_with_custom_size(baggage::kMaxKeyValueSize, num_pairs_with_max_size + 1);
+  EXPECT_EQ(Baggage::FromHeader(invalid_total_size_header.data()).ToHeader(), "");
 }
 
 TEST(BaggageTest, ValidateInjectHeader)
@@ -126,30 +126,30 @@ TEST(BaggageTest, ValidateInjectHeader)
 
   for (auto &testcase : testcases)
   {
-    nostd::shared_ptr<Baggage> baggage(new Baggage{});
+    Baggage baggage;
     for (size_t i = 0; i < testcase.keys.size(); i++)
     {
-      baggage = baggage->Set(testcase.keys[i], testcase.values[i]);
+      baggage = baggage.Set(testcase.keys[i], testcase.values[i]);
     }
-    EXPECT_EQ(baggage->ToHeader(), testcase.header);
+    EXPECT_EQ(baggage.ToHeader(), testcase.header);
   }
 }
 
 TEST(BaggageTest, BaggageGet)
 {
-  auto header  = header_with_custom_entries(Baggage::kMaxKeyValuePairs);
+  auto header  = header_with_custom_entries(baggage::kMaxKeyValuePairs);
   auto baggage = Baggage::FromHeader(header);
 
   std::string value;
-  EXPECT_TRUE(baggage->GetValue("key0", value));
+  EXPECT_TRUE(baggage.GetValue("key0", value));
   EXPECT_EQ(value, "value0");
-  EXPECT_TRUE(baggage->GetValue("key16", value));
+  EXPECT_TRUE(baggage.GetValue("key16", value));
   EXPECT_EQ(value, "value16");
 
-  EXPECT_TRUE(baggage->GetValue("key31", value));
+  EXPECT_TRUE(baggage.GetValue("key31", value));
   EXPECT_EQ(value, "value31");
 
-  EXPECT_FALSE(baggage->GetValue("key181", value));
+  EXPECT_FALSE(baggage.GetValue("key181", value));
 }
 
 TEST(BaggageTest, BaggageSet)
@@ -158,46 +158,46 @@ TEST(BaggageTest, BaggageSet)
   auto baggage       = Baggage::FromHeader(header);
 
   std::string value;
-  baggage = baggage->Set("k3", "v3");
-  EXPECT_TRUE(baggage->GetValue("k3", value));
+  baggage = baggage.Set("k3", "v3");
+  EXPECT_TRUE(baggage.GetValue("k3", value));
   EXPECT_EQ(value, "v3");
 
-  baggage = baggage->Set("k3", "v3_1");  // key should be updated with the latest value
-  EXPECT_TRUE(baggage->GetValue("k3", value));
+  baggage = baggage.Set("k3", "v3_1");  // key should be updated with the latest value
+  EXPECT_TRUE(baggage.GetValue("k3", value));
   EXPECT_EQ(value, "v3_1");
 
-  header  = header_with_custom_entries(Baggage::kMaxKeyValuePairs);
+  header  = header_with_custom_entries(baggage::kMaxKeyValuePairs);
   baggage = Baggage::FromHeader(header);
-  baggage = baggage->Set("key0", "0");  // updating on max list should work
-  EXPECT_TRUE(baggage->GetValue("key0", value));
+  baggage = baggage.Set("key0", "0");  // updating on max list should work
+  EXPECT_TRUE(baggage.GetValue("key0", value));
   EXPECT_EQ(value, "0");
 
   header  = "k1=v1,k2=v2";
   baggage = Baggage::FromHeader(header);
-  baggage = baggage->Set("", "n_v1");  // adding invalid key, should return copy of same baggage
-  EXPECT_EQ(baggage->ToHeader(), header);
+  baggage = baggage.Set("", "n_v1");  // adding invalid key, should return copy of same baggage
+  EXPECT_EQ(baggage.ToHeader(), header);
 
   header  = "k1=v1,k2=v2";
   baggage = Baggage::FromHeader(header);
-  baggage = baggage->Set("k1", "\x1A");  // adding invalid value, should return copy of same baggage
-  EXPECT_EQ(baggage->ToHeader(), header);
+  baggage = baggage.Set("k1", "\x1A");  // adding invalid value, should return copy of same baggage
+  EXPECT_EQ(baggage.ToHeader(), header);
 }
 
 TEST(BaggageTest, BaggageRemove)
 {
-  auto header  = header_with_custom_entries(Baggage::kMaxKeyValuePairs);
+  auto header  = header_with_custom_entries(baggage::kMaxKeyValuePairs);
   auto baggage = Baggage::FromHeader(header);
   std::string value;
 
   // existing key is removed
-  EXPECT_TRUE(baggage->GetValue("key0", value));
-  auto new_baggage = baggage->Delete("key0");
-  EXPECT_FALSE(new_baggage->GetValue("key0", value));
+  EXPECT_TRUE(baggage.GetValue("key0", value));
+  auto new_baggage = baggage.Delete("key0");
+  EXPECT_FALSE(new_baggage.GetValue("key0", value));
 
   // trying Delete on non existent key
-  EXPECT_FALSE(baggage->GetValue("key181", value));
-  auto new_baggage_2 = baggage->Delete("key181");
-  EXPECT_FALSE(new_baggage_2->GetValue("key181", value));
+  EXPECT_FALSE(baggage.GetValue("key181", value));
+  auto new_baggage_2 = baggage.Delete("key181");
+  EXPECT_FALSE(new_baggage_2.GetValue("key181", value));
 }
 
 TEST(BaggageTest, BaggageGetAll)
@@ -208,11 +208,10 @@ TEST(BaggageTest, BaggageGetAll)
   nostd::string_view keys[kNumPairs]   = {"k1", "k2", "k3"};
   nostd::string_view values[kNumPairs] = {"v1", "v2", "v3"};
   size_t index                         = 0;
-  baggage->GetAllEntries(
-      [&keys, &values, &index](nostd::string_view key, nostd::string_view value) {
-        EXPECT_EQ(key, keys[index]);
-        EXPECT_EQ(value, values[index]);
-        index++;
-        return true;
-      });
+  baggage.GetAllEntries([&keys, &values, &index](nostd::string_view key, nostd::string_view value) {
+    EXPECT_EQ(key, keys[index]);
+    EXPECT_EQ(value, values[index]);
+    index++;
+    return true;
+  });
 }
