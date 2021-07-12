@@ -21,5 +21,4 @@ help:
 
 clean:
 	rm -rf doxyoutput
-	@$(SPHINXBUILD) -M clean ../../api/docs "$(BUILDDIR)" $(SPHINXOPTS) $(O)
 	@$(SPHINXBUILD) -M clean "$(SOURCEDIR)" "$(BUILDDIR)" $(SPHINXOPTS) $(O)
