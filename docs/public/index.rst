@@ -21,6 +21,23 @@ OpenTelemetry C++
 
 .. toctree::
    :maxdepth: 1
+   :caption: Reference Documentation (API)
+
+   otel_docs/namespace_opentelemetry__trace
+   otel_docs/namespace_opentelemetry__baggage
+   otel_docs/namespace_opentelemetry__common
+   otel_docs/namespace_opentelemetry__context
+
+.. toctree::
+   :maxdepth: 1
+   :caption: Reference Documentation (SDK)
+
+   otel_docs/namespace_opentelemetry__sdk__trace
+   otel_docs/namespace_opentelemetry__sdk__instrumentationlibrary
+   otel_docs/namespace_opentelemetry__sdk__resource
+
+.. toctree::
+   :maxdepth: 1
    :caption: Further Reading
 
    Source code <https://github.com/open-telemetry/opentelemetry-cpp>

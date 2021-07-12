@@ -1,5 +1,5 @@
 .. toctree::
-    :maxdepth: 1
+   :maxdepth: 1
 
    Overview.rst
    GettingStarted.rst
