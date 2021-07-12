@@ -43,8 +43,8 @@ extensions = [
 ]
 
 exhale_args = {
-        "containmentFolder": "api",
-        "rootFileName": "api.rst",
+        "containmentFolder": "otel_docs",
+        "rootFileName": "otel_docs.rst",
         "rootFileTitle": "Reference documentation",
         "doxygenStripFromPath": "..",
         "exhaleExecutesDoxygen": True,
