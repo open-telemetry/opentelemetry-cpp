@@ -1,4 +1,4 @@
-OpenTelemetry C++ SDK 
+OpenTelemetry C++ SDK
 ========================
 
-.. TODO: Opentelemetry C++ SDK
+.. TODO: OpenTelemetry C++ SDK
