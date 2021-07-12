@@ -31,7 +31,7 @@ import os
 import shutil
 import subprocess
 subprocess.call('mkdir -p ./doxyoutput/', shell=True)
-subprocess.call('doxygen', shell=True)
+#subprocess.call('doxygen', shell=True)
 
 # -- General configuration ---------------------------------------------------
 
@@ -45,7 +45,7 @@ extensions = [
 
 exhale_args = {
         "containmentFolder": "api",
-        "rootFileName": "api",
+        "rootFileName": "api.rst",
         "rootFileTitle": "Reference documentation",
         "doxygenStripFromPath": "..",
         "exhaleExecuteDoxyfile": True,
