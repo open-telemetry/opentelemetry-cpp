@@ -50,6 +50,7 @@ exhale_args = {
         "doxygenStripFromPath": "..",
         "exhaleExecutesDoxygen": True,
         "createTreeView": True,
+        "exhaleDoxygenStdin": ""
 }
 
 breathe_projects = {
