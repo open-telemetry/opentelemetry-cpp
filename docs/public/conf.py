@@ -30,7 +30,8 @@ release = '0.6.0'
 import os
 import shutil
 import subprocess
-subprocess.call('mkdir -p ./doxyoutput/', shell=True)
+if not os.path.exists('doxyoutput'):
+        os.makedirs('doxyoutput')
 
 # -- General configuration ---------------------------------------------------
 
@@ -53,7 +54,7 @@ exhale_args = {
 }
 
 breathe_projects = {
-        "OpenTelemetry C++": "./doxyoutput/xml",
+        "OpenTelemetry C++": "doxyoutput/xml",
 }
 breathe_default_project = "OpenTelemetry C++"
 
