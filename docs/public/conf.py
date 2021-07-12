@@ -31,6 +31,7 @@ import os
 import shutil
 import subprocess
 
+subprocess.call('doxygen', shell=True)
 
 # -- General configuration ---------------------------------------------------
 
@@ -41,9 +42,19 @@ extensions = [
     "breathe",
 ]
 
+exhale_args = {
+        "containmentFolder": "otel_refdoc",
+        "rootFileName": "otel_refdoc.rst",
+        "rootFileTitle": "Reference documentation",
+        "doxygenStripFromPath": "..",
+        "exhaleUseDoxyfile": True,
+        "createTreeView": True,
+}
+
 breathe_projects = {
         "OpenTelemetry C++": "../_doxygen/xml",
 }
+
 
 primary_domain = "cpp"
 
