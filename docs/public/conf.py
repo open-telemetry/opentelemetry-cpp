@@ -30,7 +30,7 @@ release = '0.6.0'
 import os
 import shutil
 import subprocess
-
+subprocess.call('mkdir -p_doxygen/doxyoutput/')
 subprocess.call('doxygen', shell=True)
 
 # -- General configuration ---------------------------------------------------
@@ -53,7 +53,7 @@ exhale_args = {
 }
 
 breathe_projects = {
-        "OpenTelemetry C++": "../_doxygen/xml",
+        "OpenTelemetry C++": "./_doxygen/doxyoutput/xml",
 }
 breathe_default_project = "OpenTelemetry C++"
 
