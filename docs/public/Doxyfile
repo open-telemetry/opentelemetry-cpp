@@ -790,15 +790,16 @@ WARN_LOGFILE           =
 # spaces. See also FILE_PATTERNS and EXTENSION_MAPPING
 # Note: If this tag is empty the current directory is searched.
 
-INPUT                  = ../../api/include/opentelemetry/baggage \
-                         ../../api/include/opentelemetry/context \
-                         ../../api/include/opentelemetry/common \
-                         ../../api/include/opentelemetry/nostd/shared_ptr.h \
-                         ../../api/include/opentelemetry/nostd/span.h \
-                         ../../api//include/opentelemetry/nostd/string_view.h \
-                         ../../api/include/opentelemetry/nostd/unique_ptr.h \
-                         ../../api/include/opentelemetry/nostd/variant.h \
-                         ../../api/include/opentelemetry/trace \
+INPUT                  =  \
+#                         ../../api/include/opentelemetry/baggage \
+#                         ../../api/include/opentelemetry/context \
+#                         ../../api/include/opentelemetry/common \
+#                         ../../api/include/opentelemetry/nostd/shared_ptr.h \
+#                         ../../api/include/opentelemetry/nostd/span.h \
+#                         ../../api//include/opentelemetry/nostd/string_view.h \
+#                         ../../api/include/opentelemetry/nostd/unique_ptr.h \
+#                         ../../api/include/opentelemetry/nostd/variant.h \
+#                         ../../api/include/opentelemetry/trace \
                          ../../sdk/include/opentelemetry/sdk/instrumentationlibrary \
                          ../../sdk/include/opentelemetry/sdk/resource \
                          ../../sdk/include/opentelemetry/sdk/trace
