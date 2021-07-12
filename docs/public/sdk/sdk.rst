@@ -1,2 +1,4 @@
+.. toctree::
+   :maxdepth: 1
 
-.. TODO: OpenTelemetry C++ SDK
+   GettingStarted.rst
