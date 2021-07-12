@@ -147,6 +147,14 @@ TEST(JaegerPropagatorTest, InjectsContext)
   format.Inject(carrier, context::RuntimeContext::GetCurrent());
   EXPECT_EQ(carrier.headers_["uber-trace-id"],
             "0102030405060708090a0b0c0d0e0f10:0102030405060708:0:01");
+
+  std::vector<std::string> fields;
+  format.Fields([&fields](nostd::string_view field) {
+    fields.push_back(field.data());
+    return true;
+  });
+  EXPECT_EQ(fields.size(), 1);
+  EXPECT_EQ(fields[0], opentelemetry::trace::propagation::kJaegerTraceHeader);
 }
 
 TEST(JaegerPropagatorTest, DoNotInjectInvalidContext)

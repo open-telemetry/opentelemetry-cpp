@@ -165,8 +165,14 @@ TEST(Tracer, StartSpanSampleOff)
   auto tracer_off = initTracer(std::move(exporter), new AlwaysOffSampler());
 
   // This span will not be recorded.
-  tracer_off->StartSpan("span 2")->End();
+  auto span = tracer_off->StartSpan("span 2");
 
+  // Always generate a valid span-context (span-id)
+  auto context = span->GetContext();
+  EXPECT_TRUE(context.IsValid());
+  EXPECT_FALSE(context.IsSampled());
+
+  span->End();
   // The span doesn't write any span data because the sampling decision is alway
   // DROP.
   ASSERT_EQ(0, span_data->GetSpans().size());
@@ -625,4 +631,24 @@ TEST(Tracer, ValidTraceIdToSampler)
   // sampler was fed with valid trace_id, so span shouldn't be NoOp Span.
   EXPECT_TRUE(span->IsRecording());
   EXPECT_TRUE(span->GetContext().IsValid());
+}
+
+TEST(Tracer, SpanCleanupWithScope)
+{
+  std::unique_ptr<InMemorySpanExporter> exporter(new InMemorySpanExporter());
+  std::shared_ptr<InMemorySpanData> span_data = exporter->GetData();
+  auto tracer                                 = initTracer(std::move(exporter));
+  {
+    auto span0 = tracer->StartSpan("Span0");
+    auto span1 = tracer->StartSpan("span1");
+    {
+      trace_api::Scope scope(span1);
+      auto span2 = tracer->StartSpan("span2");
+      {
+        trace_api::Scope scope(span2);
+        auto span3 = tracer->StartSpan("span3");
+      }
+    }
+  }
+  EXPECT_EQ(4, span_data->GetSpans().size());
 }
