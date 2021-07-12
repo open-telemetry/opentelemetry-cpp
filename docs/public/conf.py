@@ -30,7 +30,7 @@ release = '0.6.0'
 import os
 import shutil
 import subprocess
-subprocess.call('mkdir -p_doxygen/doxyoutput/')
+subprocess.call('mkdir -p _doxygen/doxyoutput/', shell=True)
 subprocess.call('doxygen', shell=True)
 
 # -- General configuration ---------------------------------------------------
