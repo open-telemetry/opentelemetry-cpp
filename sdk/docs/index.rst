@@ -1,2 +1,0 @@
-OpenTelemetry C++ SDK
-=====================
