@@ -31,50 +31,6 @@ import os
 import shutil
 import subprocess
 
-sdkdir1 = os.path.join('..', '..', 'sdk', 'docs')
-subprocess.call(['make', 'html'], cwd=sdkdir1)
-targetdir1 = os.path.join(os.getcwd(), 'otel_sdk')
-sourcedir1= os.path.join(sdkdir1, 'otel_sdk')
-if os.path.exists(targetdir1):
-  shutil.rmtree(targetdir1)
-os.makedirs(targetdir1)
-
-# Now copying the previously created SDK documentation. Table of contents
-# are filtered out, because those don't go well together with the furo theme.
-for fname in os.listdir(sourcedir1):
-  with open(os.path.join(sourcedir1, fname), 'r') as fin:
-    with open(os.path.join(targetdir1, fname), 'w') as fout:
-      skip = False
-      for line in fin:
-        if line.startswith('.. contents'):
-          skip = True
-        elif not line.startswith(' '):
-          skip = False
-        if not skip:
-          fout.write(line)
-
-sdkdir = os.path.join('..', '..', 'api', 'docs')
-subprocess.call(['make', 'html'], cwd=sdkdir)
-targetdir = os.path.join(os.getcwd(), 'otel_api')
-sourcedir = os.path.join(sdkdir, 'otel_api')
-if os.path.exists(targetdir):
-  shutil.rmtree(targetdir)
-os.makedirs(targetdir)
-
-# Now copying the previously created SDK documentation. Table of contents
-# are filtered out, because those don't go well together with the furo theme.
-for fname in os.listdir(sourcedir):
-  with open(os.path.join(sourcedir, fname), 'r') as fin:
-    with open(os.path.join(targetdir, fname), 'w') as fout:
-      skip = False
-      for line in fin:
-        if line.startswith('.. contents'):
-          skip = True
-        elif not line.startswith(' '):
-          skip = False
-        if not skip:
-          fout.write(line)
-
 
 # -- General configuration ---------------------------------------------------
 
@@ -86,8 +42,7 @@ extensions = [
 ]
 
 breathe_projects = {
-        "OpenTelemetry C++ API": "../../api/docs/doxyoutput/xml",
-        "OpenTelemetry C++ SDK": "../../sdk/docs/doxyoutput/xml"
+        "OpenTelemetry C++": "../_doxygen/xml",
 }
 
 primary_domain = "cpp"
