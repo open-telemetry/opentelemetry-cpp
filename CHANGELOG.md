@@ -21,7 +21,7 @@ Increment the:
 * [EXPORTER] Zipkin Exporter - Report Event timestamp into microseconds ([#896](https://github.com/open-telemetry/opentelemetry-cpp/pull/896))
 * [EXPORTER] Jaeget Exporter - Handle span events ([#895](https://github.com/open-telemetry/opentelemetry-cpp/pull/895))
 * [DOCS] Fix API docs for Scope object ([#894](https://github.com/open-telemetry/opentelemetry-cpp/pull/894))
-* [BUILD] Fix Linking error for libcurl on some macOS environemnts ([#893](https://github.com/open-telemetry/opentelemetry-cpp/pull/893))
+* [BUILD] Fix Linking error for libcurl on some macOS environments ([#893](https://github.com/open-telemetry/opentelemetry-cpp/pull/893))
 * [API] Context cleanup from Runtime Storage ([#885](https://github.com/open-telemetry/opentelemetry-cpp/pull/885))
 * [DOCS] Document strategy to avoid conflict between two different versions of Abseil ([#883](https://github.com/open-telemetry/opentelemetry-cpp/pull/883/))
 * [EXPORTER] ETW Exporter - Document example for ETW Exporter ([#882](https://github.com/open-telemetry/opentelemetry-cpp/pull/882))
