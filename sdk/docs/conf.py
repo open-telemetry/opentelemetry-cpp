@@ -14,23 +14,23 @@
 # import sys
 # sys.path.insert(0, os.path.abspath('.'))
 
+
 # -- Project information -----------------------------------------------------
 
-project = 'OpenTelemetry C++'
+project = 'OpenTelemetry C++ SDK'
 copyright = '2021, OpenTelemetry authors'
 author = 'OpenTelemetry authors'
 
-# The full version, including alpha/beta/rc tags
-release = '1.0.0-rc2'
-
-# Run sphinx on subprojects and copy output
-# -----------------------------------------
-# This is necessary so the readthedocs build works. It doesn't invoke the
-# Makefile, but just runs sphinx on this conf.py.
-import os
-import shutil
+# Run doxygen
+# -----------
+# For the readthedocs builds, for some reason exhale doesn't find doxygen.
+# So we run it manually here.
 import subprocess
-subprocess.call('mkdir -p ./doxyoutput/', shell=True)
+import os
+if not os.path.isdir('doxyoutput'):
+    os.mkdir('doxyoutput')
+subprocess.call(['doxygen'])
+
 
 # -- General configuration ---------------------------------------------------
 
@@ -38,25 +38,24 @@ subprocess.call('mkdir -p ./doxyoutput/', shell=True)
 # extensions coming with Sphinx (named 'sphinx.ext.*') or your custom
 # ones.
 extensions = [
-    "breathe",
-    "exhale"
+        "breathe",
+        "exhale",
 ]
 
+breathe_projects = {
+        "OpenTelemetry C++ SDK": "./doxyoutput/xml"
+}
+
+breathe_default_project = "OpenTelemetry C++ SDK"
+
 exhale_args = {
-        "containmentFolder": "api",
-        "rootFileName": "api.rst",
+        "containmentFolder": "otel_sdk",
+        "rootFileName": "otel_sdk.rst",
         "rootFileTitle": "Reference documentation",
         "doxygenStripFromPath": "..",
-        "exhaleExecutesDoxygen": True,
         "exhaleUseDoxyfile": True,
-        "createTreeView": True
+        "createTreeView": True,
 }
-
-breathe_projects = {
-        "OpenTelemetry C++": "./doxyoutput/xml",
-}
-breathe_default_project = "OpenTelemetry C++"
-
 
 primary_domain = "cpp"
 
@@ -77,8 +76,7 @@ exclude_patterns = ['_build', 'Thumbs.db', '.DS_Store']
 # The theme to use for HTML and HTML Help pages.  See the documentation for
 # a list of builtin themes.
 #
-#html_theme = "furo"
-html_theme = "sphinx_rtd_theme"
+html_theme = "furo"
 
 # Add any paths that contain custom static files (such as style sheets) here,
 # relative to this directory. They are copied after the builtin static files,

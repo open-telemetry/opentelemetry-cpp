@@ -7,7 +7,12 @@ OpenTelemetry C++
 
    Overview.rst
    GettingStarted.rst
-   otel_api/otel_api
+   api/api.rst
+
+.. toctree::
+   :maxdepth: 1
+   :caption: OpenTelemetry C++ SDK
+
 
 .. toctree::
    :maxdepth: 1
