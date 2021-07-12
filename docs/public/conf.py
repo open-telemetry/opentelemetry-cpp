@@ -48,7 +48,7 @@ exhale_args = {
         "rootFileName": "api.rst",
         "rootFileTitle": "Reference documentation",
         "doxygenStripFromPath": "..",
-        "exhaleExecuteDoxyfile": True,
+        "exhaleExecutesDoxygen": True,
         "createTreeView": True,
 }
 
