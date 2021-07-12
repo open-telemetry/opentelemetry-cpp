@@ -19,7 +19,7 @@ Increment the:
 
 * [EXPORTER] Jaeger Exporter - Populate resource attributes into process tags in Jaeger ([#897](https://github.com/open-telemetry/opentelemetry-cpp/pull/897))
 * [EXPORTER] Zipkin Exporter - Report Event timestamp into microseconds ([#896](https://github.com/open-telemetry/opentelemetry-cpp/pull/896))
-* [EXPORTER] Jaeget Exporter - Handle span events ([#895](https://github.com/open-telemetry/opentelemetry-cpp/pull/895))
+* [EXPORTER] Jaeger Exporter - Handle span events ([#895](https://github.com/open-telemetry/opentelemetry-cpp/pull/895))
 * [DOCS] Fix API docs for Scope object ([#894](https://github.com/open-telemetry/opentelemetry-cpp/pull/894))
 * [BUILD] Fix Linking error for libcurl on some macOS environments ([#893](https://github.com/open-telemetry/opentelemetry-cpp/pull/893))
 * [API] Context cleanup from Runtime Storage ([#885](https://github.com/open-telemetry/opentelemetry-cpp/pull/885))
