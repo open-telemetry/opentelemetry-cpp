@@ -13,9 +13,6 @@ OpenTelemetry C++
    :maxdepth: 1
    :caption: OpenTelemetry C++ SDK
 
-   Overview.rst
-   GettingStarted.rst
-   api/api.rst
 
 .. toctree::
    :maxdepth: 1
