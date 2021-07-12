@@ -31,7 +31,7 @@ import os
 import shutil
 import subprocess
 subprocess.call('mkdir -p ./doxyoutput/', shell=True)
-#subprocess.call('doxygen', shell=True)
+subprocess.call('doxygen', shell=True)
 
 # -- General configuration ---------------------------------------------------
 
@@ -48,9 +48,7 @@ exhale_args = {
         "rootFileName": "api.rst",
         "rootFileTitle": "Reference documentation",
         "doxygenStripFromPath": "..",
-        "exhaleExecutesDoxygen": True,
-        "createTreeView": True,
-        "exhaleDoxygenStdin": ""
+        "createTreeView": True
 }
 
 breathe_projects = {
