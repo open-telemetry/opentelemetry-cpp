@@ -30,7 +30,7 @@ release = '0.6.0'
 import os
 import shutil
 import subprocess
-subprocess.call('mkdir -p _doxygen/doxyoutput/', shell=True)
+subprocess.call('mkdir -p ./doxyoutput/', shell=True)
 subprocess.call('doxygen', shell=True)
 
 # -- General configuration ---------------------------------------------------
@@ -44,16 +44,16 @@ extensions = [
 ]
 
 exhale_args = {
-        "containmentFolder": "otel_refdoc",
-        "rootFileName": "otel_refdoc.rst",
+        "containmentFolder": "api",
+        "rootFileName": "api",
         "rootFileTitle": "Reference documentation",
         "doxygenStripFromPath": "..",
-        "exhaleUseDoxyfile": True,
+        "exhaleExecuteDoxyfile": True,
         "createTreeView": True,
 }
 
 breathe_projects = {
-        "OpenTelemetry C++": "./_doxygen/doxyoutput/xml",
+        "OpenTelemetry C++": "./doxyoutput/xml",
 }
 breathe_default_project = "OpenTelemetry C++"
 
