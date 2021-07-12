@@ -1,6 +1,9 @@
 // Copyright The OpenTelemetry Authors
 // SPDX-License-Identifier: Apache-2.0
 
+// Make sure to include GRPC exporter first because otherwise Abseil may create
+// ambiguity with `nostd::variant`. See issue:
+// https://github.com/open-telemetry/opentelemetry-cpp/issues/880
 #include "opentelemetry/exporters/otlp/otlp_grpc_exporter.h"
 #include "opentelemetry/sdk/trace/simple_processor.h"
 #include "opentelemetry/sdk/trace/tracer_provider.h"

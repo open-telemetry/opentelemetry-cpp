@@ -169,7 +169,7 @@ inline Token::~Token()
 }
 
 // The ThreadLocalContextStorage class is a derived class from
-// RuntimeContextStorage and provides a wrapper for propogating context through
+// RuntimeContextStorage and provides a wrapper for propagating context through
 // cpp thread locally. This file must be included to use the RuntimeContext
 // class if another implementation has not been registered.
 class ThreadLocalContextStorage : public RuntimeContextStorage
@@ -223,15 +223,19 @@ private:
 
     Stack() noexcept : size_(0), capacity_(0), base_(nullptr){};
 
-    // Pops the top Context off the stack and returns it.
-    Context Pop() noexcept
+    // Pops the top Context off the stack.
+    void Pop() noexcept
     {
       if (size_ == 0)
       {
-        return Context();
+        return;
       }
+      // Store empty Context before decrementing `size`, to ensure
+      // the shared_ptr object (if stored in prev context object ) are released.
+      // The stack is not resized, and the unused memory would be reutilised
+      // for subsequent context storage.
+      base_[size_ - 1] = Context();
       size_ -= 1;
-      return base_[size_];
     }
 
     bool Contains(const Token &token) const noexcept
