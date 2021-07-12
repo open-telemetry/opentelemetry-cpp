@@ -40,6 +40,7 @@ subprocess.call('doxygen', shell=True)
 # ones.
 extensions = [
     "breathe",
+    "exhale"
 ]
 
 exhale_args = {
@@ -54,6 +55,7 @@ exhale_args = {
 breathe_projects = {
         "OpenTelemetry C++": "../_doxygen/xml",
 }
+breathe_default_project = "OpenTelemetry C++"
 
 
 primary_domain = "cpp"
