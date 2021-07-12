@@ -842,12 +842,12 @@ RECURSIVE              = YES
 # Note that relative paths are relative to the directory from which doxygen is
 # run.
 
-EXCLUDE                = ../include/opentelemetry/common/spin_lock_mutex.h \
-                         ../include/opentelemetry/common/key_value_iterable_view.h \
-                         ../include/opentelemetry/common/kv_properties.h \
-                         ../include/opentelemetry/common/string_util.h \
-                         ../include/opentelemetry/trace/span_context_kv_iterable_view.h \
-                         ../include/opentelemetry/nostd
+EXCLUDE                = ../../api/include/opentelemetry/common/spin_lock_mutex.h \
+                         ../../api/include/opentelemetry/common/key_value_iterable_view.h \
+                         ../../api/include/opentelemetry/common/kv_properties.h \
+                         ../../api/include/opentelemetry/common/string_util.h \
+                         ../../api/include/opentelemetry/trace/span_context_kv_iterable_view.h \
+                         ../../api/include/opentelemetry/nostd
 
 # The EXCLUDE_SYMLINKS tag can be used to select whether or not files or
 # directories that are symbolic links (a Unix file system feature) are excluded
