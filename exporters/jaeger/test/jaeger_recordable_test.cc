@@ -43,10 +43,10 @@ TEST(JaegerSpanRecordable, SetIdentity)
   std::unique_ptr<thrift::Span> span{rec.Span()};
 
 #if JAEGER_IS_LITTLE_ENDIAN == 1
-  EXPECT_EQ(span->traceIdLow, opentelemetry::exporter::jaeger::bswap_64(trace_id_val[1]));
-  EXPECT_EQ(span->traceIdHigh, opentelemetry::exporter::jaeger::bswap_64(trace_id_val[0]));
-  EXPECT_EQ(span->spanId, opentelemetry::exporter::jaeger::bswap_64(span_id_val));
-  EXPECT_EQ(span->parentSpanId, opentelemetry::exporter::jaeger::bswap_64(parent_span_id_val));
+  EXPECT_EQ(span->traceIdLow, opentelemetry::exporter::jaeger::otel_bswap_64(trace_id_val[1]));
+  EXPECT_EQ(span->traceIdHigh, opentelemetry::exporter::jaeger::otel_bswap_64(trace_id_val[0]));
+  EXPECT_EQ(span->spanId, opentelemetry::exporter::jaeger::otel_bswap_64(span_id_val));
+  EXPECT_EQ(span->parentSpanId, opentelemetry::exporter::jaeger::otel_bswap_64(parent_span_id_val));
 #else
   EXPECT_EQ(span->traceIdLow, trace_id_val[0]);
   EXPECT_EQ(span->traceIdHigh, trace_id_val[1]);
@@ -123,13 +123,47 @@ TEST(JaegerSpanRecordable, SetStatus)
   EXPECT_EQ(tags[2].vStr, error_description);
 }
 
+TEST(JaegerSpanRecordable, AddEvent)
+{
+  opentelemetry::exporter::jaeger::Recordable rec;
+
+  nostd::string_view name = "Test Event";
+
+  std::chrono::system_clock::time_point event_time = std::chrono::system_clock::now();
+  opentelemetry::common::SystemTimestamp event_timestamp(event_time);
+  uint64_t epoch_us =
+      std::chrono::duration_cast<std::chrono::microseconds>(event_time.time_since_epoch()).count();
+
+  const int kNumAttributes                  = 3;
+  std::string keys[kNumAttributes]          = {"attr1", "attr2", "attr3"};
+  int64_t values[kNumAttributes]            = {4, 7, 23};
+  std::map<std::string, int64_t> attributes = {
+      {keys[0], values[0]}, {keys[1], values[1]}, {keys[2], values[2]}};
+
+  rec.AddEvent(
+      "Test Event", event_timestamp,
+      opentelemetry::common::KeyValueIterableView<std::map<std::string, int64_t>>(attributes));
+  thrift::Log log = rec.Logs().at(0);
+  EXPECT_EQ(log.timestamp, epoch_us);
+  auto tags    = log.fields;
+  size_t index = 0;
+  EXPECT_EQ(tags[index].key, "event");
+  EXPECT_EQ(tags[index++].vStr, "Test Event");
+  while (index <= kNumAttributes)
+  {
+    EXPECT_EQ(tags[index].key, keys[index - 1]);
+    EXPECT_EQ(tags[index].vLong, values[index - 1]);
+    index++;
+  }
+}
+
 TEST(JaegerSpanRecordable, SetInstrumentationLibrary)
 {
   opentelemetry::exporter::jaeger::Recordable rec;
 
   std::string library_name     = "opentelemetry-cpp";
   std::string library_version  = "0.1.0";
-  auto instrumentation_library = InstrumentationLibrary::create(library_name, library_version);
+  auto instrumentation_library = InstrumentationLibrary::Create(library_name, library_version);
 
   rec.SetInstrumentationLibrary(*instrumentation_library);
 
@@ -143,4 +177,39 @@ TEST(JaegerSpanRecordable, SetInstrumentationLibrary)
   EXPECT_EQ(tags[1].key, "otel.library.version");
   EXPECT_EQ(tags[1].vType, thrift::TagType::STRING);
   EXPECT_EQ(tags[1].vStr, library_version);
+}
+
+TEST(JaegerSpanRecordable, SetResource)
+{
+  opentelemetry::exporter::jaeger::Recordable rec;
+
+  const std::string service_name_key = "service.name";
+  std::string service_name_value     = "test-jaeger-service-name";
+  auto resource                      = opentelemetry::sdk::resource::Resource::Create(
+      {{service_name_key, service_name_value}, {"key1", "value1"}, {"key2", "value2"}});
+  rec.SetResource(resource);
+
+  auto service_name  = rec.ServiceName();
+  auto resource_tags = rec.ResourceTags();
+
+  EXPECT_GE(resource_tags.size(), 2);
+  EXPECT_EQ(service_name, service_name_value);
+
+  bool found_key1 = false;
+  bool found_key2 = false;
+  for (const auto &tag : resource_tags)
+  {
+    if (tag.key == "key1")
+    {
+      found_key1 = true;
+      EXPECT_EQ(tag.vType, thrift::TagType::STRING);
+      EXPECT_EQ(tag.vStr, "value1");
+    }
+    else if (tag.key == "key2")
+    {
+      found_key2 = true;
+      EXPECT_EQ(tag.vType, thrift::TagType::STRING);
+      EXPECT_EQ(tag.vStr, "value2");
+    }
+  }
 }

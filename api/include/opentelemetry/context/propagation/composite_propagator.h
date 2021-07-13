@@ -67,6 +67,21 @@ public:
     return propagators_.size() ? tmp_context : context;
   }
 
+  /**
+   * Invoke callback with  fields set to carrier by `inject` method for all the
+   * configured propagators
+   * Returns true if all invocation return true
+   */
+  bool Fields(nostd::function_ref<bool(nostd::string_view)> callback) const noexcept override
+  {
+    bool status = true;
+    for (auto &p : propagators_)
+    {
+      status = status && p->Fields(callback);
+    }
+    return status;
+  }
+
 private:
   std::vector<std::unique_ptr<TextMapPropagator>> propagators_;
 };

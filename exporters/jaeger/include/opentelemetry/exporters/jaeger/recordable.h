@@ -29,13 +29,13 @@ namespace jaeger
 
 #  if defined(__clang__) || \
       (defined(__GNUC__) && ((__GNUC__ == 4 && __GNUC_MINOR__ >= 8) || __GNUC__ >= 5))
-inline uint64_t bswap_64(uint64_t host_int)
+inline uint64_t otel_bswap_64(uint64_t host_int)
 {
   return __builtin_bswap64(host_int);
 }
 
 #  elif defined(_MSC_VER)
-inline uint64_t bswap_64(uint64_t host_int)
+inline uint64_t otel_bswap_64(uint64_t host_int)
 {
   return _byteswap_uint64(host_int);
 }
@@ -56,6 +56,8 @@ public:
 
   thrift::Span *Span() noexcept { return span_.release(); }
   std::vector<thrift::Tag> Tags() noexcept { return std::move(tags_); }
+  std::vector<thrift::Tag> ResourceTags() noexcept { return std::move(resource_tags_); }
+  std::vector<thrift::Log> Logs() noexcept { return std::move(logs_); }
   const std::string &ServiceName() const noexcept { return service_name_; }
 
   void SetIdentity(const opentelemetry::trace::SpanContext &span_context,
@@ -88,18 +90,25 @@ public:
           &instrumentation_library) noexcept override;
 
 private:
-  void AddTag(const std::string &key, const std::string &value);
-  void AddTag(const std::string &key, const char *value);
-  void AddTag(const std::string &key, bool value);
-  void AddTag(const std::string &key, int64_t value);
-  void AddTag(const std::string &key, double value);
+  void AddTag(const std::string &key, const std::string &value, std::vector<thrift::Tag> &tags);
+  void AddTag(const std::string &key, const char *value, std::vector<thrift::Tag> &tags);
+  void AddTag(const std::string &key, bool value, std::vector<thrift::Tag> &tags);
+  void AddTag(const std::string &key, int64_t value, std::vector<thrift::Tag> &tags);
+  void AddTag(const std::string &key, double value, std::vector<thrift::Tag> &tags);
 
   void PopulateAttribute(nostd::string_view key,
-                         const opentelemetry::common::AttributeValue &value);
+                         const opentelemetry::common::AttributeValue &value,
+                         std::vector<thrift::Tag> &tags);
+
+  void PopulateAttribute(nostd::string_view key,
+                         const sdk::common::OwnedAttributeValue &value,
+                         std::vector<thrift::Tag> &tags);
 
 private:
   std::unique_ptr<thrift::Span> span_;
   std::vector<thrift::Tag> tags_;
+  std::vector<thrift::Tag> resource_tags_;
+  std::vector<thrift::Log> logs_;
   std::string service_name_;
 };
 

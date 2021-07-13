@@ -1,6 +1,6 @@
 @echo off
 REM ##########################################################################################
-REM # Build SDK with Visual Studio + CMake + MSBUild or Ninja.                               #
+REM # Build SDK with (msvc or clang) + CMake + (MSBuild or Ninja).                           #
 REM #                                                                                        #
 REM # CMake arguments may be passed as parameters to this script.                            #
 REM # If Visual Studio is not installed, then this script falls back to LLVM-CLang,          #
@@ -10,7 +10,7 @@ REM ############################################################################
 REM #                                                                                        #
 REM # Options passed as environment variables:                                               #
 REM #                                                                                        #
-REM # VS_TOOLS_VERSION   - specify visual studio version. See `vcvars.cmd` for details.      #
+REM # BUILDTOOLS_VERSION - specify build tools version. See `vcvars.cmd` for details.        #
 REM # CMAKE_GEN          - specify CMake generator.                                          #
 REM # VCPKG_ROOT         - path to vcpkg root                                                #
 REM # ARCH               - architecture to build for (default: x64)                          #
@@ -20,36 +20,43 @@ set "PATH=%PATH%;%ProgramFiles%\CMake\bin"
 pushd %~dp0
 setlocal enableextensions
 setlocal enabledelayedexpansion
-if not defined VS_TOOLS_VERSION (
-  set VS_TOOLS_VERSION=vs2019
+if not defined BUILDTOOLS_VERSION (
+  set BUILDTOOLS_VERSION=vs2019
 )
 
 REM ##########################################################################################
 REM Set up CMake generator. Use Ninja if available.
 REM ##########################################################################################
-if not defined CMAKE_GEN (
-  set CMAKE_GEN=Visual Studio 16 2019
-  for /f "tokens=*" %%F in ('where ninja') do (
-    set NINJA=%%F
-  )
-  if defined VCPKG_ROOT (
-    if not defined NINJA (
-      for /f "tokens=*" %%F in ('where /R %VCPKG_ROOT%\vcpkg\downloads\tools ninja') do (
-        set NINJA=%%F
-      )
-      popd
-    )
-  )
+for /f "tokens=*" %%F in ('where ninja') do (
+  set NINJA=%%F
+)
+
+if defined VCPKG_ROOT (
   if not defined NINJA (
-    for /f "tokens=*" %%F in ('where /R %CD%\vcpkg\downloads\tools ninja') do (
+    for /f "tokens=*" %%F in ('where /R %VCPKG_ROOT%\vcpkg\downloads\tools ninja') do (
       set NINJA=%%F
     )
+    popd
   )
-  if defined NINJA (
-    echo Using ninja at !NINJA!
+)
+
+if not defined NINJA (
+  for /f "tokens=*" %%F in ('where /R %CD%\vcpkg\downloads\tools ninja') do (
+    set NINJA=%%F
+  )
+)
+
+if defined NINJA (
+  echo Found ninja: !NINJA!
+  if not defined CMAKE_GEN (
     set CMAKE_GEN=Ninja
   )
 )
+
+if not defined CMAKE_GEN (
+  set CMAKE_GEN=Visual Studio 16 2019
+)
+
 set "ROOT=%~dp0\.."
 if not defined ARCH (
   set ARCH=x64
@@ -80,23 +87,18 @@ REM The following two configurations are built below:
 REM - nostd            - build with OpenTelemetry C++ Template library
 REM - stl              - build with Standard Template Library
 REM ##########################################################################################
-REM Build with nostd implementation. Supported VS_TOOLS_VERSION:
-REM - vs2015 (C++11)
-REM - vs2017 (C++14)
-REM - vs2019 (C++20)
+REM Build with nostd implementation.
 REM ##########################################################################################
 set CONFIG=-DWITH_STL:BOOL=OFF %*
-set "OUTDIR=%ROOT%\out\%VS_TOOLS_VERSION%\nostd"
+set "OUTDIR=%ROOT%\out\%BUILDTOOLS_VERSION%\nostd"
 call :build_config
 
 REM ##########################################################################################
-REM Build with STL implementation (only for vs2017+). Supported VS_TOOLS_VERSION:
-REM - vs2017 (C++14)
-REM - vs2019 (C++20) - optimal config with all OpenTelemetry API classes using STL only.
+REM Build with STL implementation. This option does not yield benefits for vs2015 build.
 REM ##########################################################################################
-if "%VS_TOOLS_VERSION%" neq "vs2015" (
+if "%BUILDTOOLS_VERSION%" neq "vs2015" (
   set CONFIG=-DWITH_STL:BOOL=ON %*
-  set "OUTDIR=%ROOT%\out\%VS_TOOLS_VERSION%\stl"
+  set "OUTDIR=%ROOT%\out\%BUILDTOOLS_VERSION%\stl"
   call :build_config
 )
 
@@ -110,18 +112,36 @@ REM TODO: consider rmdir for clean builds
 if not exist "%OUTDIR%" mkdir "%OUTDIR%"
 cd "%OUTDIR%"
 
-if "!VS_TOOLS_VERSION!" == "vs2019" (
-  REM Prefer ninja if available
-  if "!CMAKE_GEN!" == "Ninja" (
-    call :build_config_ninja
-    exit /b
-  )
-  REM Only latest vs2019 generator supports and requires -A parameter
-  cmake -G "!CMAKE_GEN!" -A !ARCH! -DCMAKE_TOOLCHAIN_FILE="!VCPKG_CMAKE!" !CONFIG! "!ROOT!"
-) else (
-  REM Old vs2017 generator does not support -A parameter
-  cmake -G "!CMAKE_GEN!" -DCMAKE_TOOLCHAIN_FILE="!VCPKG_CMAKE!" !CONFIG! "!ROOT!"
+REM Prefer ninja if available
+if "!CMAKE_GEN!" == "Ninja" (
+  call :build_config_ninja
+  exit /b
 )
+
+if "!BUILDTOOLS_VERSION!" == "vs2015" (
+  cmake -G "!CMAKE_GEN!" -A !ARCH! -DCMAKE_TOOLCHAIN_FILE="!VCPKG_CMAKE!" !CONFIG! "!ROOT!"
+  call :build_msbuild
+  exit /b
+)
+
+if "!BUILDTOOLS_VERSION!" == "vs2017" (
+  cmake -G "!CMAKE_GEN!" -A !ARCH! -DCMAKE_TOOLCHAIN_FILE="!VCPKG_CMAKE!" !CONFIG! "!ROOT!"
+  call :build_msbuild
+  exit /b
+)
+
+if "!BUILDTOOLS_VERSION!" == "vs2019" (
+  cmake -G "!CMAKE_GEN!" -A !ARCH! -DCMAKE_TOOLCHAIN_FILE="!VCPKG_CMAKE!" !CONFIG! "!ROOT!"
+  call :build_msbuild
+  exit /b
+)
+
+REM ##########################################################################################
+REM Exotic CMake generators, like MSYS and MinGW MAY work, but untested
+REM ##########################################################################################
+cmake -G "!CMAKE_GEN!" -DCMAKE_TOOLCHAIN_FILE="!VCPKG_CMAKE!" !CONFIG! "!ROOT!"
+
+:build_msbuild
 set "SOLUTION=%OUTDIR%\opentelemetry-cpp.sln"
 msbuild "%SOLUTION%" /p:Configuration=Release /p:VcpkgEnabled=true
 exit /b

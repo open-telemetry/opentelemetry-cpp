@@ -198,4 +198,13 @@ TEST(GlobalPropagator, SetAndGet)
   EXPECT_TRUE(carrier.headers_.count("traceparent") > 0);
   EXPECT_TRUE(carrier.headers_.count("tracestate") > 0);
   EXPECT_EQ(carrier.headers_["tracestate"], trace_state_value);
+
+  std::vector<std::string> fields;
+  propagator->Fields([&fields](nostd::string_view field) {
+    fields.push_back(field.data());
+    return true;
+  });
+  EXPECT_EQ(fields.size(), 2);
+  EXPECT_EQ(fields[0], opentelemetry::trace::propagation::kTraceParent);
+  EXPECT_EQ(fields[1], opentelemetry::trace::propagation::kTraceState);
 }

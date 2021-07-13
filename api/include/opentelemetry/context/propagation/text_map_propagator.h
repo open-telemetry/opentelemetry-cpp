@@ -18,11 +18,19 @@ namespace propagation
 class TextMapCarrier
 {
 public:
-  /*returns the value associated with the passed key.*/
+  // returns the value associated with the passed key.
   virtual nostd::string_view Get(nostd::string_view key) const noexcept = 0;
 
-  /*stores the key-value pair.*/
+  // stores the key-value pair.
   virtual void Set(nostd::string_view key, nostd::string_view value) noexcept = 0;
+
+  /* list of all the keys in the carrier.
+   By default, it returns true without invoking callback */
+  virtual bool Keys(nostd::function_ref<bool(nostd::string_view)> callback) const noexcept
+  {
+    return true;
+  }
+  virtual ~TextMapCarrier() = default;
 };
 
 // The TextMapPropagator class provides an interface that enables extracting and injecting
@@ -40,6 +48,11 @@ public:
 
   // Sets the context for carrier with self defined rules.
   virtual void Inject(TextMapCarrier &carrier, const context::Context &context) noexcept = 0;
+
+  // Gets the fields set in the carrier by the `inject` method
+  virtual bool Fields(nostd::function_ref<bool(nostd::string_view)> callback) const noexcept = 0;
+
+  virtual ~TextMapPropagator() = default;
 };
 }  // namespace propagation
 }  // namespace context

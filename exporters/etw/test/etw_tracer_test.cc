@@ -14,6 +14,8 @@ using namespace OPENTELEMETRY_NAMESPACE;
 
 using namespace opentelemetry::exporter::etw;
 
+const char *kGlobalProviderName = "OpenTelemetry-ETW-TLD";
+
 std::string getTemporaryValue()
 {
   return std::string("Value from Temporary std::string");
@@ -43,11 +45,10 @@ TEST(ETWTracer, TracerCheck)
   // Windows Defender Firewall API - GP       {0EFF663F-8B6E-4E6D-8182-087A8EAA29CB}
   // Windows Defender Firewall Driver         {D5E09122-D0B2-4235-ADC1-C89FAAAF1069}
 
-  std::string providerName = "OpenTelemetry-ETW-TLD"; // supply unique instrumentation name here
+  std::string providerName = kGlobalProviderName; // supply unique instrumentation name here
   exporter::etw::TracerProvider tp;
 
-  // TODO: this code should fallback to MsgPack if TLD is not available
-  auto tracer = tp.GetTracer(providerName, "TLD");
+  auto tracer = tp.GetTracer(providerName);
 
   // Span attributes
   Properties attribs =
@@ -117,7 +118,7 @@ TEST(ETWTracer, TracerCheck)
 /*
 {
   "Timestamp": "2021-03-19T21:04:38.411193-07:00",
-  "ProviderName": "OpenTelemetry-ETW-Provider",
+  "ProviderName": "OpenTelemetry-ETW-TLD",
   "Id": 13,
   "Message": null,
   "ProcessId": 15120,
@@ -131,7 +132,7 @@ TEST(ETWTracer, TracerCheck)
 */
 TEST(ETWTracer, TracerCheckMinDecoration)
 {
-  std::string providerName = "OpenTelemetry-ETW-TLD";
+  std::string providerName = kGlobalProviderName;
   exporter::etw::TracerProvider tp
   ({
       {"enableTraceId", false},
@@ -141,7 +142,7 @@ TEST(ETWTracer, TracerCheckMinDecoration)
       {"enableRelatedActivityId", false},
       {"enableAutoParent", false}
   });
-  auto tracer = tp.GetTracer(providerName, "TLD");
+  auto tracer = tp.GetTracer(providerName);
   {
     auto aSpan = tracer->StartSpan("A.min");
     auto aScope = tracer->WithActiveSpan(aSpan);
@@ -166,7 +167,7 @@ TEST(ETWTracer, TracerCheckMinDecoration)
 /*
 {
   "Timestamp": "2021-03-19T21:04:38.4120274-07:00",
-  "ProviderName": "OpenTelemetry-ETW-Provider",
+  "ProviderName": "OpenTelemetry-ETW-TLD",
   "Id": 21,
   "Message": null,
   "ProcessId": 15120,
@@ -183,7 +184,7 @@ TEST(ETWTracer, TracerCheckMinDecoration)
 */
 TEST(ETWTracer, TracerCheckMaxDecoration)
 {
-  std::string providerName = "OpenTelemetry-ETW-TLD";
+  std::string providerName = kGlobalProviderName;
   exporter::etw::TracerProvider tp
   ({
       {"enableTraceId", true},
@@ -192,7 +193,7 @@ TEST(ETWTracer, TracerCheckMaxDecoration)
       {"enableRelatedActivityId", true},
       {"enableAutoParent", true}
   });
-  auto tracer = tp.GetTracer(providerName, "TLD" );
+  auto tracer = tp.GetTracer(providerName);
   {
     auto aSpan = tracer->StartSpan("A.max");
     auto aScope = tracer->WithActiveSpan(aSpan);
@@ -222,7 +223,7 @@ TEST(ETWTracer, TracerCheckMsgPack)
       {"enableRelatedActivityId", true},
       {"enableAutoParent", true}
   });
-  auto tracer = tp.GetTracer(providerName, "MsgPack" );
+  auto tracer = tp.GetTracer(providerName);
   {
       auto aSpan = tracer->StartSpan("A.max");
       auto aScope = tracer->WithActiveSpan(aSpan);
@@ -247,6 +248,136 @@ TEST(ETWTracer, TracerCheckMsgPack)
       EXPECT_NO_THROW(aSpan->End());
   }
   tracer->CloseWithMicroseconds(0);
+}
+
+/**
+ * @brief Global Tracer singleton may be placed in .h header and
+ * shared across different compilation units. All would get the
+ * same object.
+ *
+ * @return Single global tracer instance.
+*/
+static OPENTELEMETRY_NAMESPACE::trace::TracerProvider& GetGlobalTracerProvider()
+{
+    static exporter::etw::TracerProvider tp
+    ({
+      {"enableTraceId", true},
+      {"enableSpanId", true},
+      {"enableActivityId", true},
+      {"enableRelatedActivityId", true},
+      {"enableAutoParent", true}
+     });
+    return tp;
+}
+
+static OPENTELEMETRY_NAMESPACE::trace::Tracer& GetGlobalTracer()
+{
+    static auto tracer = GetGlobalTracerProvider().GetTracer(kGlobalProviderName);
+    return (*tracer.get());
+}
+
+TEST(ETWTracer, GlobalSingletonTracer)
+{
+  // Obtain a global tracer using C++11 magic static.
+  auto& globalTracer = GetGlobalTracer();
+  auto s1 = globalTracer.StartSpan("Span1");
+  auto traceId1 = s1->GetContext().trace_id();
+  s1->End();
+/* === Span 1 - "TraceId": "182a64258fb1864ca4e1a542eecbd9bf"
+{
+  "Timestamp": "2021-05-10T11:45:27.028827-07:00",
+  "ProviderName": "OpenTelemetry-ETW-TLD",
+  "Id": 5,
+  "Message": null,
+  "ProcessId": 23712,
+  "Level": "Always",
+  "Keywords": "0x0000000000000000",
+  "EventName": "Span",
+  "ActivityID": "6ed94703-6b0a-4e76-0000-000000000000",
+  "RelatedActivityID": null,
+  "Payload": {
+    "Duration": 0,
+    "Kind": 1,
+    "Name": "Span1",
+    "SpanId": "0347d96e0a6b764e",
+    "StartTime": "2021-05-10T18:45:27.028000Z",
+    "StatusCode": 0,
+    "StatusMessage": "",
+    "Success": "True",
+    "TraceId": "182a64258fb1864ca4e1a542eecbd9bf",
+    "_name": "Span"
+  }
+}
+*/
+
+  // Obtain a different tracer withs its own trace-id.
+  auto localTracer = GetGlobalTracerProvider().GetTracer(kGlobalProviderName);
+  auto s2 = localTracer->StartSpan("Span2");
+  auto traceId2 = s2->GetContext().trace_id();
+  s2->End();
+/* === Span 2 - "TraceId": "334bf9a1eed98d40a873a606295a9368"
+{
+  "Timestamp": "2021-05-10T11:45:27.0289654-07:00",
+  "ProviderName": "OpenTelemetry-ETW-TLD",
+  "Id": 5,
+  "Message": null,
+  "ProcessId": 23712,
+  "Level": "Always",
+  "Keywords": "0x0000000000000000",
+  "EventName": "Span",
+  "ActivityID": "3b7b2ecb-2e84-4903-0000-000000000000",
+  "RelatedActivityID": null,
+  "Payload": {
+    "Duration": 0,
+    "Kind": 1,
+    "Name": "Span2",
+    "SpanId": "cb2e7b3b842e0349",
+    "StartTime": "2021-05-10T18:45:27.028000Z",
+    "StatusCode": 0,
+    "StatusMessage": "",
+    "Success": "True",
+    "TraceId": "334bf9a1eed98d40a873a606295a9368",
+    "_name": "Span"
+  }
+}
+*/
+
+  // Obtain the same global tracer with the same trace-id as before.
+  auto& globalTracer2 = GetGlobalTracer();
+  auto s3 = globalTracer2.StartSpan("Span3");
+  auto traceId3 = s3->GetContext().trace_id();
+  s3->End();
+/* === Span 3 - "TraceId": "182a64258fb1864ca4e1a542eecbd9bf"
+{
+  "Timestamp": "2021-05-10T11:45:27.0290936-07:00",
+  "ProviderName": "OpenTelemetry-ETW-TLD",
+  "Id": 5,
+  "Message": null,
+  "ProcessId": 23712,
+  "Level": "Always",
+  "Keywords": "0x0000000000000000",
+  "EventName": "Span",
+  "ActivityID": "0a970247-ba0e-4d4b-0000-000000000000",
+  "RelatedActivityID": null,
+  "Payload": {
+    "Duration": 1,
+    "Kind": 1,
+    "Name": "Span3",
+    "SpanId": "4702970a0eba4b4d",
+    "StartTime": "2021-05-10T18:45:27.028000Z",
+    "StatusCode": 0,
+    "StatusMessage": "",
+    "Success": "True",
+    "TraceId": "182a64258fb1864ca4e1a542eecbd9bf",
+    "_name": "Span"
+  }
+}
+*/
+  EXPECT_NE(traceId1, traceId2);
+  EXPECT_EQ(traceId1, traceId3);
+
+  localTracer->CloseWithMicroseconds(0);
+  globalTracer.CloseWithMicroseconds(0);
 }
 
 /* clang-format on */

@@ -29,6 +29,7 @@ int ThriftSender::Append(std::unique_ptr<Recordable> &&span) noexcept
   if (process_.serviceName.empty())
   {
     process_.serviceName = span->ServiceName();
+    process_.__set_tags(span->ResourceTags());
 
     process_bytes_size_ = CalcSizeOfSerializedThrift(process_);
     max_span_bytes -= process_bytes_size_;
@@ -36,6 +37,7 @@ int ThriftSender::Append(std::unique_ptr<Recordable> &&span) noexcept
 
   thrift::Span &jaeger_span = *span->Span();
   jaeger_span.__set_tags(span->Tags());
+  jaeger_span.__set_logs(span->Logs());
 
   const uint32_t span_size = CalcSizeOfSerializedThrift(jaeger_span);
   if (span_size > max_span_bytes)
