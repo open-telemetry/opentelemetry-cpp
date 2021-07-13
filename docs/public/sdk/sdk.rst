@@ -1,3 +1,6 @@
+Opentelemetry C++ SDK
+====================
+
 .. toctree::
    :maxdepth: 1
 

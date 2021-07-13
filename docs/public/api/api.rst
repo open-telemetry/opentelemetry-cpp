@@ -1,3 +1,6 @@
+Opentelmetry C++ API
+====================
+
 .. toctree::
    :maxdepth: 1
 
