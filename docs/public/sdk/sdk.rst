@@ -1,4 +1,4 @@
-Opentelemetry C++ SDK
+OpenTelemetry C++ SDK
 ====================
 
 .. toctree::
