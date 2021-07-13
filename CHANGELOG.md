@@ -17,6 +17,7 @@ Increment the:
 
 ## [1.0.0-rc3] 2021-07-12
 
+* [DOCS] Add doxygen reference docs for SDK ([#902](https://github.com/open-telemetry/opentelemetry-cpp/pull/902))
 * [EXPORTER] Jaeger Exporter - Populate resource attributes into process tags in Jaeger ([#897](https://github.com/open-telemetry/opentelemetry-cpp/pull/897))
 * [EXPORTER] Zipkin Exporter - Report Event timestamp into microseconds ([#896](https://github.com/open-telemetry/opentelemetry-cpp/pull/896))
 * [EXPORTER] Jaeget Exporter - Handle span events ([#895](https://github.com/open-telemetry/opentelemetry-cpp/pull/895))
