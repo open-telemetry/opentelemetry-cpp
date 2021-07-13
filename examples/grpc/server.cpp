@@ -1,6 +1,7 @@
 #include "messages.grpc.pb.h"
 #include "tracer_common.h"
 #include "opentelemetry/trace/span_context_kv_iterable_view.h"
+#include "opentelemetry/trace/semantic_conventions.h"
 
 #include <grpcpp/grpcpp.h>
 #include <grpcpp/server.h>
@@ -26,6 +27,7 @@ using grpc_example::GreetResponse;
 
 using Span = opentelemetry::trace::Span;
 using SpanContext = opentelemetry::trace::SpanContext;
+using namespace opentelemetry::trace;
 
 namespace
 {
@@ -55,10 +57,10 @@ public:
     std::string span_name = "GreeterService/Greet";
     auto span             = get_tracer("grpc")
                     ->StartSpan(span_name,
-                                {{"rpc.system", "grpc"},
-                                 {"rpc.service", "GreeterService"},
-                                 {"rpc.method", "Greet"},
-                                 {"rpc.grpc.status_code", 0}},
+                                {{OTEL_CPP_GET_ATTR(AttrRpcSystem), "grpc"},
+                                 {OTEL_CPP_GET_ATTR(AttrRpcService), "GreeterService"},
+                                 {OTEL_CPP_GET_ATTR(AttrRpcMethod), "Greet"},
+                                 {OTEL_CPP_GET_ATTR(AttrRpcGrpcStatusCode), 0}},
                                 options);
     auto scope = get_tracer("grpc")->WithActiveSpan(span);
 

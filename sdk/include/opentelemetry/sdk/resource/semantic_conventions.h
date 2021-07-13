@@ -1,7 +1,5 @@
 #pragma once
 
-#include <stdint.h>
-#include <iostream>
 #include <type_traits>
 #include <unordered_map>
 
@@ -20,7 +18,7 @@ static const std::unordered_map<uint32_t, const char *> attribute_ids = {
     {OTEL_CPP_CONST_HASHCODE(AttrServiceName), "service.name"},
     {OTEL_CPP_CONST_HASHCODE(AttrServiceNamespace), "service.namespace"},
     {OTEL_CPP_CONST_HASHCODE(AttrServiceInstance), "service.instance.id"},
-    {OTEL_CPP_CONST_HASHCODE(AttrServiceVersion), "service.version	"},
+    {OTEL_CPP_CONST_HASHCODE(AttrServiceVersion), "service.version"},
 
     // telemetry attributes
     {OTEL_CPP_CONST_HASHCODE(AttrTelemetrySdkName), "telemetry.sdk.name"},
@@ -123,7 +121,7 @@ static const std::unordered_map<uint32_t, const char *> attribute_ids = {
     {OTEL_CPP_CONST_HASHCODE(AttrCronjobUid), "k8s.cronjob.id"},
     {OTEL_CPP_CONST_HASHCODE(AttrCronjobName), "k8s.cronjob.name"}};
 
-// macro and function to generate hash code for semantic conventions attributes.
+// function to generate hash code for semantic conventions attributes.
 inline const char *attr(uint32_t attr)
 {
   return (attribute_ids.find(attr) != attribute_ids.end()) ? attribute_ids.at(attr) : "";
