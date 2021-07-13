@@ -30,28 +30,8 @@ release = '1.0.0-rc3'
 import os
 import shutil
 import subprocess
-
-apidir = os.path.join('..', '..', 'api', 'docs')
-subprocess.call(['make', 'html'], cwd=apidir)
-targetdir = os.path.join(os.getcwd(), 'otel_api')
-sourcedir = os.path.join(apidir, 'otel_api')
-if os.path.exists(targetdir):
-  shutil.rmtree(targetdir)
-os.makedirs(targetdir)
-
-# Now copying the previously created APi documentation. Table of contents
-# are filtered out, because those don't go well together with the furo theme.
-for fname in os.listdir(sourcedir):
-  with open(os.path.join(sourcedir, fname), 'r') as fin:
-    with open(os.path.join(targetdir, fname), 'w') as fout:
-      skip = False
-      for line in fin:
-        if line.startswith('.. contents'):
-          skip = True
-        elif not line.startswith(' '):
-          skip = False
-        if not skip:
-          fout.write(line)
+if not os.path.exists('doxyoutput'):
+        os.makedirs('doxyoutput')
 
 # -- General configuration ---------------------------------------------------
 
@@ -60,13 +40,24 @@ for fname in os.listdir(sourcedir):
 # ones.
 extensions = [
     "breathe",
+    "exhale"
 ]
 
-breathe_projects = {
-        "OpenTelemetry C++ API": "../../api/docs/doxyoutput/xml"
+exhale_args = {
+        "containmentFolder": "otel_docs",
+        "rootFileName": "otel_docs.rst",
+        "rootFileTitle": "Reference documentation",
+        "doxygenStripFromPath": "..",
+        "exhaleExecutesDoxygen": True,
+        "exhaleUseDoxyfile": True,
+        "createTreeView": True
 }
 
-breathe_default_project = "OpenTelemetry C++ API"
+breathe_projects = {
+        "OpenTelemetry C++": "doxyoutput/xml",
+}
+breathe_default_project = "OpenTelemetry C++"
+
 
 primary_domain = "cpp"
 
@@ -87,7 +78,8 @@ exclude_patterns = ['_build', 'Thumbs.db', '.DS_Store']
 # The theme to use for HTML and HTML Help pages.  See the documentation for
 # a list of builtin themes.
 #
-html_theme = "furo"
+#html_theme = "furo"
+html_theme = "sphinx_rtd_theme"
 
 # Add any paths that contain custom static files (such as style sheets) here,
 # relative to this directory. They are copied after the builtin static files,
