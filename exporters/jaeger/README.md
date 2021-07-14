@@ -7,7 +7,7 @@
 
 ## Installation
 
-## CMake Installation Instructions
+### CMake Installation Instructions
 
 Refer to install instructions
 [INSTALL.md](../../INSTALL.md#building-as-standalone-cmake-project). Modify step
@@ -31,13 +31,13 @@ TODO
 
 ## Usage
 
-Install the exporter on your application and pass the options.
+Install the exporter in your application, initialize and pass the `options` to it.
 
 ```cpp
 opentelemetry::exporter::jaeger::JaegerExporterOptions options;
 options.server_addr      = "localhost";
 options.server_port      = 6831;
-options.transport_format = TransportFormat::kThriftUdpCompact;
+options.transport_format = opentelemetry::exporter::jaeger::TransportFormat::kThriftUdpCompact;
 
 auto exporter = std::unique_ptr<opentelemetry::sdk::trace::SpanExporter>(
     new opentelemetry::exporter::jaeger::JaegerExporter(options));

@@ -1,6 +1,7 @@
 // Copyright The OpenTelemetry Authors
 // SPDX-License-Identifier: Apache-2.0
 
+#include "opentelemetry/sdk/version/version.h"
 #include "opentelemetry/trace/provider.h"
 
 namespace trace = opentelemetry::trace;
@@ -11,7 +12,7 @@ namespace
 nostd::shared_ptr<trace::Tracer> get_tracer()
 {
   auto provider = trace::Provider::GetTracerProvider();
-  return provider->GetTracer("foo_library");
+  return provider->GetTracer("foo_library", OPENTELEMETRY_SDK_VERSION);
 }
 
 void f1()
