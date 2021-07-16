@@ -177,9 +177,10 @@ public:
     {
       // this shouldn't happen as Tracer ensures there is valid default instrumentation library.
       static std::unique_ptr<opentelemetry::sdk::instrumentationlibrary::InstrumentationLibrary>
-          ilib = opentelemetry::sdk::instrumentationlibrary::InstrumentationLibrary::Create(
-              "unknown_service");
-      return *ilib;
+          instrumentation_library =
+              opentelemetry::sdk::instrumentationlibrary::InstrumentationLibrary::Create(
+                  "unknown_service");
+      return *instrumentation_library;
     }
     return *instrumentation_library_;
   }
