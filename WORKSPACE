@@ -29,6 +29,8 @@ load("@com_github_grpc_grpc//bazel:grpc_extra_deps.bzl", "grpc_extra_deps")
 
 grpc_extra_deps()
 
+load("@com_github_grpc_grpc//bazel:cc_grpc_library.bzl", "cc_grpc_library")
+
 load("@upb//bazel:workspace_deps.bzl", "upb_deps")
 
 upb_deps()
