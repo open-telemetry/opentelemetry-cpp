@@ -1,5 +1,5 @@
-
 package(default_visibility = ["//visibility:public"])
+
 load("@rules_proto//proto:defs.bzl", "proto_library")
 load("@com_github_grpc_grpc//bazel:cc_grpc_library.bzl", "cc_grpc_library")
 
@@ -36,11 +36,11 @@ cc_binary(
     ],
     defines = ["BAZEL_BUILD"],
     deps = [
-        "@com_github_grpc_grpc//:grpc++",
         "messages_cc_grpc",
         ":tracer_common",
         "//api",
         "//sdk/src/trace",
+        "@com_github_grpc_grpc//:grpc++",
     ],
 )
 
@@ -51,10 +51,10 @@ cc_binary(
     ],
     defines = ["BAZEL_BUILD"],
     deps = [
-        "@com_github_grpc_grpc//:grpc++",
         "messages_cc_grpc",
         ":tracer_common",
         "//api",
         "//sdk/src/trace",
+        "@com_github_grpc_grpc//:grpc++",
     ],
 )
