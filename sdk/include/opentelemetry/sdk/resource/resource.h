@@ -64,8 +64,6 @@ public:
 
   static Resource &GetDefault();
 
-  ~Resource() { std::cout << "\n resource Shutdown called " << std::hex << this << "\n"; }
-
 protected:
   /**
    * The constructor is protected and only for use internally by the class and

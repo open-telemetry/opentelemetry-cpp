@@ -194,7 +194,6 @@ bool BatchSpanProcessor::Shutdown(std::chrono::microseconds timeout) noexcept
 
 BatchSpanProcessor::~BatchSpanProcessor()
 {
-  std::cout << " \n batchshutdown called\n";
   if (is_shutdown_.load() == false)
   {
     Shutdown();
