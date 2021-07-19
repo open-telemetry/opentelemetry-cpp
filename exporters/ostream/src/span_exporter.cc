@@ -80,6 +80,10 @@ sdk::common::ExportResult OStreamSpanExporter::Export(
       printEvents(span->GetEvents());
       sout_ << "\n  links         : ";
       printLinks(span->GetLinks());
+      sout_ << "\n  resources     : ";
+      printResources(span->GetResource());
+      sout_ << "\n  instr-lib     : ";
+      printInstrumentationLibrary(span->GetInstrumentationLibrary());
       sout_ << "\n}\n";
     }
   }
@@ -132,6 +136,27 @@ void OStreamSpanExporter::printLinks(const std::vector<sdktrace::SpanDataLink> &
           << "\n\t  attributes    : ";
     printAttributes(link.GetAttributes(), "\n\t\t");
     sout_ << "\n\t}";
+  }
+}
+
+void OStreamSpanExporter::printResources(const opentelemetry::sdk::resource::Resource &resources)
+{
+  auto attributes = resources.GetAttributes();
+  if (attributes.size())
+  {
+    printAttributes(attributes, "\n\t");
+  }
+}
+
+void OStreamSpanExporter::printInstrumentationLibrary(
+    const opentelemetry::sdk::instrumentationlibrary::InstrumentationLibrary
+        &instrumentation_library)
+{
+  sout_ << instrumentation_library.GetName();
+  auto version = instrumentation_library.GetVersion();
+  if (version.size())
+  {
+    sout_ << "-" << version;
   }
 }
 
