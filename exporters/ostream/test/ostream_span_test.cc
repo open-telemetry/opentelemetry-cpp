@@ -23,8 +23,17 @@ namespace trace    = opentelemetry::trace;
 namespace common   = opentelemetry::common;
 namespace nostd    = opentelemetry::nostd;
 namespace sdktrace = opentelemetry::sdk::trace;
+namespace resource = opentelemetry::sdk::resource;
 
 using Attributes = std::initializer_list<std::pair<nostd::string_view, common::AttributeValue>>;
+
+class TestResource : public resource::Resource
+{
+public:
+  TestResource(resource::ResourceAttributes attributes = resource::ResourceAttributes())
+      : resource::Resource(attributes)
+  {}
+};
 
 // Testing Shutdown functionality of OStreamSpanExporter, should expect no data to be sent to Stream
 TEST(OStreamSpanExporter, Shutdown)
@@ -61,6 +70,8 @@ constexpr const char *kDefaultSpanPrinted =
     "  attributes    : \n"
     "  events        : \n"
     "  links         : \n"
+    "  resources     : \n"
+    "  instr-lib     : unknown_service\n"
     "}\n";
 
 // Testing what a default span that is not changed will print out, either all 0's or empty values
@@ -109,6 +120,9 @@ TEST(OStreamSpanExporter, PrintSpanWithBasicFields)
   recordable->SetStatus(opentelemetry::trace::StatusCode::kOk, "Test Description");
   recordable->SetSpanKind(opentelemetry::trace::SpanKind::kClient);
 
+  TestResource resource1(opentelemetry::sdk::resource::ResourceAttributes({{"key1", "val1"}}));
+  recordable->SetResource(resource1);
+
   processor->OnEnd(std::move(recordable));
 
   std::string start = std::to_string(now.time_since_epoch().count());
@@ -130,6 +144,9 @@ TEST(OStreamSpanExporter, PrintSpanWithBasicFields)
       "  attributes    : \n"
       "  events        : \n"
       "  links         : \n"
+      "  resources     : \n"
+      "\tkey1: val1\n"
+      "  instr-lib     : unknown_service\n"
       "}\n";
   EXPECT_EQ(output.str(), expectedOutput);
 }
@@ -164,6 +181,8 @@ TEST(OStreamSpanExporter, PrintSpanWithAttribute)
       "\tattr1: string\n"
       "  events        : \n"
       "  links         : \n"
+      "  resources     : \n"
+      "  instr-lib     : unknown_service\n"
       "}\n";
   EXPECT_EQ(output.str(), expectedOutput);
 }
@@ -200,6 +219,8 @@ TEST(OStreamSpanExporter, PrintSpanWithArrayAttribute)
       "\tarray1: [1,2,3]\n"
       "  events        : \n"
       "  links         : \n"
+      "  resources     : \n"
+      "  instr-lib     : unknown_service\n"
       "}\n";
   EXPECT_EQ(output.str(), expectedOutput);
 }
@@ -256,6 +277,8 @@ TEST(OStreamSpanExporter, PrintSpanWithEvents)
       "\t\tattr1: string\n"
       "\t}\n"
       "  links         : \n"
+      "  resources     : \n"
+      "  instr-lib     : unknown_service\n"
       "}\n";
   EXPECT_EQ(output.str(), expectedOutput);
 }
@@ -327,6 +350,8 @@ TEST(OStreamSpanExporter, PrintSpanWithLinks)
       "\t  attributes    : \n"
       "\t\tattr1: string\n"
       "\t}\n"
+      "  resources     : \n"
+      "  instr-lib     : unknown_service\n"
       "}\n";
   EXPECT_EQ(output.str(), expectedOutput);
 }
