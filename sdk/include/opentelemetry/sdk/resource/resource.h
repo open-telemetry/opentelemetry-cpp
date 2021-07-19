@@ -15,6 +15,8 @@
 #include <sstream>
 #include <unordered_map>
 
+#include <iostream>
+
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace sdk
 {
@@ -61,6 +63,8 @@ public:
    */
 
   static Resource &GetDefault();
+
+  ~Resource() { std::cout << "\n resource Shutdown called " << std::hex << this << "\n"; }
 
 protected:
   /**

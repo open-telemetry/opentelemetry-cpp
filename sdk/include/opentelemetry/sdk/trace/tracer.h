@@ -60,8 +60,8 @@ public:
   Sampler &GetSampler() { return context_->GetSampler(); }
 
 private:
-  std::shared_ptr<sdk::trace::TracerContext> context_;
   std::shared_ptr<InstrumentationLibrary> instrumentation_library_;
+  std::shared_ptr<sdk::trace::TracerContext> context_;
 };
 }  // namespace trace
 }  // namespace sdk

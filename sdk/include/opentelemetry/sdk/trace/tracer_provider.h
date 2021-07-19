@@ -96,8 +96,8 @@ public:
   bool ForceFlush(std::chrono::microseconds timeout = (std::chrono::microseconds::max)()) noexcept;
 
 private:
-  std::shared_ptr<sdk::trace::TracerContext> context_;
   std::vector<std::shared_ptr<opentelemetry::sdk::trace::Tracer>> tracers_;
+  std::shared_ptr<sdk::trace::TracerContext> context_;
   std::mutex lock_;
 };
 }  // namespace trace
