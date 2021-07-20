@@ -109,7 +109,7 @@ dependencies or OS-provided dependencies, e.g. `brew` or `deb` packages.
 To install the dependencies through vcpkg,
 
 - Set the VCPKG_ROOT env variable to the vcpkg install directory, or
-- Set the CMake variable CMAKE_TOOLCHAIN_FILE to vcpkg toolchain file (vcpkg.cmake).
+- Set the CMake variable CMAKE_TOOLCHAIN_FILE to vcpkg toolchain file `vcpkg.cmake`.
   
 With either of these settings, the appropriate vcpkg folders get added to the cmake
 search path, and makes the required libraries to be found through `find_package()`.
