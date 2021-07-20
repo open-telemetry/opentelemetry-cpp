@@ -102,7 +102,7 @@ dependencies:
   C++14 or C++17 compiler.
 - `nlohmann-json` - required when building with zPages module.
 - `prometheus-cpp` - required for Prometheus exporter.
-- `gRPC` and `Protobuf` - required for otlp exporter
+- `gRPC` and `Protobuf` - required for OTLP exporter
 
 It is possible to adjust the build system to use either vcpkg-installed
 dependencies or OS-provided dependencies, e.g. `brew` or `deb` packages.
