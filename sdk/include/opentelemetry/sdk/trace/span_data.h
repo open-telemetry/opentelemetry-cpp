@@ -99,6 +99,7 @@ private:
 class SpanData final : public Recordable
 {
 public:
+  SpanData() : resource_{nullptr}, instrumentation_library_{nullptr} {}
   /**
    * Get the trace id for this span
    * @return the trace id for this span
@@ -152,7 +153,37 @@ public:
    * @returns the attributes associated with the resource configured for TracerProvider
    */
 
-  const opentelemetry::sdk::resource::Resource &GetResource() const noexcept { return *resource_; }
+  const opentelemetry::sdk::resource::Resource &GetResource() const noexcept
+  {
+    if (resource_ == nullptr)
+    {
+      // this shouldn't happen as TraceProvider provides default resources
+      static opentelemetry::sdk::resource::Resource resource =
+          opentelemetry::sdk::resource::Resource::GetEmpty();
+      return resource;
+    }
+    return *resource_;
+  }
+
+  /**
+   * Get the attributes associated with the resource
+   * @returns the attributes associated with the resource configured for TracerProvider
+   */
+
+  const opentelemetry::sdk::trace::InstrumentationLibrary &GetInstrumentationLibrary()
+      const noexcept
+  {
+    if (instrumentation_library_ == nullptr)
+    {
+      // this shouldn't happen as Tracer ensures there is valid default instrumentation library.
+      static std::unique_ptr<opentelemetry::sdk::instrumentationlibrary::InstrumentationLibrary>
+          instrumentation_library =
+              opentelemetry::sdk::instrumentationlibrary::InstrumentationLibrary::Create(
+                  "unknown_service");
+      return *instrumentation_library;
+    }
+    return *instrumentation_library_;
+  }
 
   /**
    * Get the start time for this span
