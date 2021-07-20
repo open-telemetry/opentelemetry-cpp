@@ -102,6 +102,18 @@ dependencies:
   C++14 or C++17 compiler.
 - `nlohmann-json` - required when building with zPages module.
 - `prometheus-cpp` - required for Prometheus exporter.
+- `gRPC` and `Protobuf` - required for otlp exporter
 
 It is possible to adjust the build system to use either vcpkg-installed
 dependencies or OS-provided dependencies, e.g. `brew` or `deb` packages.
+To install the dependencies through vcpkg,
+
+- Set the VCPKG_ROOT env variable to the vcpkg install directory, or
+- Set the CMake variable CMAKE_TOOLCHAIN_FILE to vcpkg toolchain file (vcpkg.cmake).
+  
+With either of these settings, the appropriate vcpkg folders get added to the cmake
+search path, and makes the required libraries to be found through `find_package()`.
+
+The opentelemetry-cpp repo also brings the vcpkg package under `tools` directory.
+This would be used during Windows builds to install the missing dependencies ONLY
+if the external vcpkg toolchain is not configured.
