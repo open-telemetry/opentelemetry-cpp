@@ -1,5 +1,5 @@
 @echo off
-set VS_TOOLS_VERSION=vs2019
+set BUILDTOOLS_VERSION=vs2019
 set CMAKE_GEN="Visual Studio 16 2019"
 echo Building Google Benchmark (test only dependency)...
 @setlocal ENABLEEXTENSIONS

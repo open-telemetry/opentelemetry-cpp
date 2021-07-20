@@ -15,6 +15,22 @@ Increment the:
 
 ## [Unreleased]
 
+## [1.0.0-rc3] 2021-07-12
+
+* [DOCS] Add doxygen reference docs for SDK ([#902](https://github.com/open-telemetry/opentelemetry-cpp/pull/902))
+* [EXPORTER] Jaeger Exporter - Populate resource attributes into process tags in Jaeger ([#897](https://github.com/open-telemetry/opentelemetry-cpp/pull/897))
+* [EXPORTER] Zipkin Exporter - Report Event timestamp into microseconds ([#896](https://github.com/open-telemetry/opentelemetry-cpp/pull/896))
+* [EXPORTER] Jaeger Exporter - Handle span events ([#895](https://github.com/open-telemetry/opentelemetry-cpp/pull/895))
+* [DOCS] Fix API docs for Scope object ([#894](https://github.com/open-telemetry/opentelemetry-cpp/pull/894))
+* [BUILD] Fix Linking error for libcurl on some macOS environments ([#893](https://github.com/open-telemetry/opentelemetry-cpp/pull/893))
+* [API] Context cleanup from Runtime Storage ([#885](https://github.com/open-telemetry/opentelemetry-cpp/pull/885))
+* [DOCS] Document strategy to avoid conflict between two different versions of Abseil ([#883](https://github.com/open-telemetry/opentelemetry-cpp/pull/883/))
+* [EXPORTER] ETW Exporter - Document example for ETW Exporter ([#882](https://github.com/open-telemetry/opentelemetry-cpp/pull/882))
+* [SDK] Create Span with Valid spanId and traceId irrespective of Sampling decision ([#879](https://github.com/open-telemetry/opentelemetry-cpp/pull/879))
+* [EXPORTER] Jaeger Exporter - Rename bswap macros to avoid clash on some systems ([#876](https://github.com/open-telemetry/opentelemetry-cpp/pull/876))
+* [API] Add Semantics Conventions attributes for Resources ([#872](https://github.com/open-telemetry/opentelemetry-cpp/pull/872))
+* [BUILD] Use nlohmann-json from submodules if not already installed ([#870](https://github.com/open-telemetry/opentelemetry-cpp/pull/870))
+
 ## [1.0.0-rc2] 2021-06-18
 
 * [EXPORTER] Jaeger Exporter - Support for Instrumentation Library ([#864](https://github.com/open-telemetry/opentelemetry-cpp/pull/864))

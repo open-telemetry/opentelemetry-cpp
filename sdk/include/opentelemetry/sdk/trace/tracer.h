@@ -29,7 +29,7 @@ public:
   /** Construct a new Tracer with the given context pipeline. */
   explicit Tracer(std::shared_ptr<sdk::trace::TracerContext> context,
                   std::unique_ptr<InstrumentationLibrary> instrumentation_library =
-                      InstrumentationLibrary::create("")) noexcept;
+                      InstrumentationLibrary::Create("")) noexcept;
 
   nostd::shared_ptr<trace_api::Span> StartSpan(
       nostd::string_view name,

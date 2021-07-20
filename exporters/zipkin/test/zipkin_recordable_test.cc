@@ -12,8 +12,6 @@
 #include "opentelemetry/common/timestamp.h"
 #include "opentelemetry/exporters/zipkin/recordable.h"
 
-#include <iostream>
-
 #include <gtest/gtest.h>
 
 namespace trace    = opentelemetry::trace;
@@ -69,16 +67,16 @@ TEST(ZipkinSpanRecordable, SetStartTime)
 
 TEST(ZipkinSpanRecordable, SetDuration)
 {
-  json j_span = {{"duration", 10}, {"timestamp", 0}};
+  std::chrono::nanoseconds durationNS(1000000000);  // in ns
+  std::chrono::microseconds durationMS =
+      std::chrono::duration_cast<std::chrono::microseconds>(durationNS);  // in ms
+  json j_span = {{"duration", durationMS.count()}, {"timestamp", 0}};
   opentelemetry::exporter::zipkin::Recordable rec;
   // Start time is 0
   opentelemetry::common::SystemTimestamp start_timestamp;
 
-  std::chrono::nanoseconds duration(10);
-  uint64_t unix_end = duration.count();
-
   rec.SetStartTime(start_timestamp);
-  rec.SetDuration(duration);
+  rec.SetDuration(durationNS);
   EXPECT_EQ(rec.span(), j_span);
 }
 
@@ -92,7 +90,7 @@ TEST(ZipkinSpanRecordable, SetInstrumentationLibrary)
       {"tags", {{"otel.library.name", library_name}, {"otel.library.version", library_version}}}};
   opentelemetry::exporter::zipkin::Recordable rec;
 
-  rec.SetInstrumentationLibrary(*InstrumentationLibrary::create(library_name, library_version));
+  rec.SetInstrumentationLibrary(*InstrumentationLibrary::Create(library_name, library_version));
 
   EXPECT_EQ(rec.span(), j_span);
 }
@@ -135,7 +133,7 @@ TEST(ZipkinSpanRecordable, AddEventDefault)
   rec.opentelemetry::sdk::trace::Recordable::AddEvent(name, event_timestamp);
 
   uint64_t unix_event_time =
-      std::chrono::duration_cast<std::chrono::milliseconds>(event_time.time_since_epoch()).count();
+      std::chrono::duration_cast<std::chrono::microseconds>(event_time.time_since_epoch()).count();
 
   json j_span = {
       {"annotations",
@@ -151,7 +149,7 @@ TEST(ZipkinSpanRecordable, AddEventWithAttributes)
   std::chrono::system_clock::time_point event_time = std::chrono::system_clock::now();
   opentelemetry::common::SystemTimestamp event_timestamp(event_time);
   uint64_t unix_event_time =
-      std::chrono::duration_cast<std::chrono::milliseconds>(event_time.time_since_epoch()).count();
+      std::chrono::duration_cast<std::chrono::microseconds>(event_time.time_since_epoch()).count();
 
   const int kNumAttributes              = 3;
   std::string keys[kNumAttributes]      = {"attr1", "attr2", "attr3"};

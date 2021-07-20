@@ -5,9 +5,36 @@ OpenTelemetry C++
    :maxdepth: 1
    :caption: OpenTelemetry C++ API
 
-   Overview.rst
-   GettingStarted.rst
-   otel_api/otel_api
+   api/api
+
+.. toctree::
+   :maxdepth: 1
+   :caption: OpenTelemetry C++ SDK
+
+   sdk/sdk
+
+.. toctree::
+   :maxdepth: 1
+   :caption: Reference Documentation
+
+   otel_docs/otel_docs
+
+.. toctree::
+   :maxdepth: 1
+   :caption: Reference Documentation (API)
+
+   otel_docs/namespace_opentelemetry__trace
+   otel_docs/namespace_opentelemetry__baggage
+   otel_docs/namespace_opentelemetry__common
+   otel_docs/namespace_opentelemetry__context
+
+.. toctree::
+   :maxdepth: 1
+   :caption: Reference Documentation (SDK)
+
+   otel_docs/namespace_opentelemetry__sdk__trace
+   otel_docs/namespace_opentelemetry__sdk__instrumentationlibrary
+   otel_docs/namespace_opentelemetry__sdk__resource
 
 .. toctree::
    :maxdepth: 1

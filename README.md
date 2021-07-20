@@ -63,7 +63,7 @@ contributors' availability. Check the [OpenTelemetry community
 calendar](https://calendar.google.com/calendar/embed?src=google.com_b79e3e90j7bbsa2n2p5an5lf60%40group.calendar.google.com)
 for specific dates.
 
-Meetings take place via [Zoom video conference](https://zoom.us/j/8203130519).
+Meetings take place via [Zoom video conference](https://zoom.us/j/6729396170).
 The passcode is _77777_.
 
 Meeting notes are available as a public [Google
