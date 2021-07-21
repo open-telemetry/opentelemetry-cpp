@@ -12,16 +12,15 @@ cc_library(
     ],
 )
 
-# TODO: enable bazel build
-# cc_binary(
-#     name = "example_zipkin",
-#     srcs = [
-#         "main.cc",
-#     ],
-#     deps = [
-#         ":foo_library",
-#         "//api",
-#         "//exporters/zipkin:zipkin_exporter",
-#         "//sdk/src/trace",
-#     ],
-# )
+cc_binary(
+    name = "example_zipkin",
+    srcs = [
+        "main.cc",
+    ],
+    deps = [
+        ":foo_library",
+       "//api",
+        "//exporters/zipkin:zipkin_exporter",
+        "//sdk/src/trace",
+    ],
+)
