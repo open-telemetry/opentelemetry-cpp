@@ -144,7 +144,6 @@ TEST(ZipkinSpanRecordable, AddEventDefault)
 TEST(ZipkinSpanRecordable, AddEventWithAttributes)
 {
   opentelemetry::exporter::zipkin::Recordable rec;
-  nostd::string_view name = "Test Event";
 
   std::chrono::system_clock::time_point event_time = std::chrono::system_clock::now();
   opentelemetry::common::SystemTimestamp event_timestamp(event_time);
