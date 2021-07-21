@@ -62,8 +62,8 @@ sdk::common::ExportResult ZipkinExporter::Export(
   auto body_s = json_spans.dump();
   http_client::Body body_v(body_s.begin(), body_s.end());
   auto result = http_client_->Post(url_parser_.url_, body_v);
-  if (result && result.GetResponse().GetStatusCode() == 200 ||
-      result.GetResponse().GetStatusCode() == 202)
+  if (result &&
+      (result.GetResponse().GetStatusCode() == 200 || result.GetResponse().GetStatusCode() == 202))
   {
     return sdk::common::ExportResult::kSuccess;
   }
