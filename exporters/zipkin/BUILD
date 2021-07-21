@@ -31,7 +31,6 @@ cc_library(
     deps = [
         ":zipkin_recordable",
         "//ext/src/http/client/curl:http_client_curl",
-        "//sdk/src/trace",
     ],
 )
 
