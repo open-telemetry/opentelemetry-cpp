@@ -96,6 +96,7 @@ public:
   bool ForceFlush(std::chrono::microseconds timeout = (std::chrono::microseconds::max)()) noexcept;
 
 private:
+  // order of declaration is important here - tracers should destroy only after context.
   std::vector<std::shared_ptr<opentelemetry::sdk::trace::Tracer>> tracers_;
   std::shared_ptr<sdk::trace::TracerContext> context_;
   std::mutex lock_;

@@ -60,6 +60,8 @@ public:
   Sampler &GetSampler() { return context_->GetSampler(); }
 
 private:
+  // order of declaration is important here - instrumentation library should destroy after
+  // tracer-context.
   std::shared_ptr<InstrumentationLibrary> instrumentation_library_;
   std::shared_ptr<sdk::trace::TracerContext> context_;
 };

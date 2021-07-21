@@ -88,6 +88,7 @@ public:
   bool Shutdown() noexcept;
 
 private:
+  //  order of declaration is important here - resource object should be destroyed after processor.
   opentelemetry::sdk::resource::Resource resource_;
   std::unique_ptr<Sampler> sampler_;
   std::unique_ptr<IdGenerator> id_generator_;
