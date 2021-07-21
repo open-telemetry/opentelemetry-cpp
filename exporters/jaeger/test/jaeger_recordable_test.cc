@@ -20,7 +20,7 @@ using namespace opentelemetry::sdk::instrumentationlibrary;
 
 TEST(JaegerSpanRecordable, SetIdentity)
 {
-  opentelemetry::exporter::jaeger::Recordable rec;
+  opentelemetry::exporter::jaeger::JaegerRecordable rec;
 
   int64_t trace_id_val[2]    = {0x0000000000000000, 0x1000000000000000};
   int64_t span_id_val        = 0x2000000000000000;
@@ -57,7 +57,7 @@ TEST(JaegerSpanRecordable, SetIdentity)
 
 TEST(JaegerSpanRecordable, SetName)
 {
-  opentelemetry::exporter::jaeger::Recordable rec;
+  opentelemetry::exporter::jaeger::JaegerRecordable rec;
 
   nostd::string_view name = "Test Span";
   rec.SetName(name);
@@ -69,7 +69,7 @@ TEST(JaegerSpanRecordable, SetName)
 
 TEST(JaegerSpanRecordable, SetStartTime)
 {
-  opentelemetry::exporter::jaeger::Recordable rec;
+  opentelemetry::exporter::jaeger::JaegerRecordable rec;
 
   std::chrono::system_clock::time_point start_time = std::chrono::system_clock::now();
   opentelemetry::common::SystemTimestamp start_timestamp(start_time);
@@ -84,7 +84,7 @@ TEST(JaegerSpanRecordable, SetStartTime)
 
 TEST(JaegerSpanRecordable, SetDuration)
 {
-  opentelemetry::exporter::jaeger::Recordable rec;
+  opentelemetry::exporter::jaeger::JaegerRecordable rec;
 
   opentelemetry::common::SystemTimestamp start_timestamp;
 
@@ -102,7 +102,7 @@ TEST(JaegerSpanRecordable, SetDuration)
 
 TEST(JaegerSpanRecordable, SetStatus)
 {
-  opentelemetry::exporter::jaeger::Recordable rec;
+  opentelemetry::exporter::jaeger::JaegerRecordable rec;
 
   const char *error_description = "Error test";
   rec.SetStatus(trace::StatusCode::kError, error_description);
@@ -125,7 +125,7 @@ TEST(JaegerSpanRecordable, SetStatus)
 
 TEST(JaegerSpanRecordable, AddEvent)
 {
-  opentelemetry::exporter::jaeger::Recordable rec;
+  opentelemetry::exporter::jaeger::JaegerRecordable rec;
 
   nostd::string_view name = "Test Event";
 
@@ -159,7 +159,7 @@ TEST(JaegerSpanRecordable, AddEvent)
 
 TEST(JaegerSpanRecordable, SetInstrumentationLibrary)
 {
-  opentelemetry::exporter::jaeger::Recordable rec;
+  opentelemetry::exporter::jaeger::JaegerRecordable rec;
 
   std::string library_name     = "opentelemetry-cpp";
   std::string library_version  = "0.1.0";
@@ -181,7 +181,7 @@ TEST(JaegerSpanRecordable, SetInstrumentationLibrary)
 
 TEST(JaegerSpanRecordable, SetResource)
 {
-  opentelemetry::exporter::jaeger::Recordable rec;
+  opentelemetry::exporter::jaeger::JaegerRecordable rec;
 
   const std::string service_name_key = "service.name";
   std::string service_name_value     = "test-jaeger-service-name";
