@@ -7,4 +7,4 @@ target_link_libraries(jaeger_foo_library ${CMAKE_THREAD_LIBS_INIT}
 add_executable(example_jaeger main.cc)
 target_link_libraries(
   example_jaeger ${CMAKE_THREAD_LIBS_INIT} jaeger_foo_library
-  opentelemetry_trace jaeger_trace_exporter)
+  opentelemetry_trace opentelemetry_exporter_jaeger_trace)
