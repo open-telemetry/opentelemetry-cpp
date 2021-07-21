@@ -17,14 +17,15 @@ default.
 The quick way to run the Zipkin server is using Docker container :
 
 ``console
+
 $ docker run -d -p 9411:9411 openzipkin/zipkin
+
 ``
 
-## Running Zipkin example :
+## Running Zipkin example
 
 Build this example using instructions in [INSTALL.md](../../INSTALL.md).
 
+## Viewing the traces
 
-## Viewing the traces :
-
-Please visit the Zipkin UI endpoint http://localhost:9411
+Please visit the Zipkin UI endpoint `http://localhost:9411`
