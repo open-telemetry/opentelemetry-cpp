@@ -2,7 +2,11 @@
 // ambiguity with `nostd::variant` if compiled with Visual Studio 2015. Other
 // modern compilers are unaffected.
 #include <grpcpp/grpcpp.h>
+#ifdef BAZEL_BUILD
+#include "examples/grpc/protos/messages.grpc.pb.h"
+#else
 #include "messages.grpc.pb.h"
+#endif
 
 #include "tracer_common.h"
 #include <iostream>
