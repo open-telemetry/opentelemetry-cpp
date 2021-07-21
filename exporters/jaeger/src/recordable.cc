@@ -15,8 +15,8 @@ using namespace opentelemetry::sdk::resource;
 JaegerRecordable::JaegerRecordable() : span_{new thrift::Span} {}
 
 void JaegerRecordable::PopulateAttribute(nostd::string_view key,
-                                   const common::AttributeValue &value,
-                                   std::vector<thrift::Tag> &tags)
+                                         const common::AttributeValue &value,
+                                         std::vector<thrift::Tag> &tags)
 {
   if (nostd::holds_alternative<int64_t>(value))
   {
@@ -42,8 +42,8 @@ void JaegerRecordable::PopulateAttribute(nostd::string_view key,
 }
 
 void JaegerRecordable::PopulateAttribute(nostd::string_view key,
-                                   const sdk::common::OwnedAttributeValue &value,
-                                   std::vector<thrift::Tag> &tags)
+                                         const sdk::common::OwnedAttributeValue &value,
+                                         std::vector<thrift::Tag> &tags)
 {
   if (nostd::holds_alternative<int64_t>(value))
   {
@@ -65,7 +65,7 @@ void JaegerRecordable::PopulateAttribute(nostd::string_view key,
 }
 
 void JaegerRecordable::SetIdentity(const trace::SpanContext &span_context,
-                             trace::SpanId parent_span_id) noexcept
+                                   trace::SpanId parent_span_id) noexcept
 {
   // IDs should be converted to big endian before transmission.
   // https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/trace/sdk_exporters/jaeger.md#ids
@@ -90,14 +90,15 @@ void JaegerRecordable::SetIdentity(const trace::SpanContext &span_context,
   // TODO: set trace_state.
 }
 
-void JaegerRecordable::SetAttribute(nostd::string_view key, const common::AttributeValue &value) noexcept
+void JaegerRecordable::SetAttribute(nostd::string_view key,
+                                    const common::AttributeValue &value) noexcept
 {
   PopulateAttribute(key, value, tags_);
 }
 
 void JaegerRecordable::AddEvent(nostd::string_view name,
-                          common::SystemTimestamp timestamp,
-                          const common::KeyValueIterable &attributes) noexcept
+                                common::SystemTimestamp timestamp,
+                                const common::KeyValueIterable &attributes) noexcept
 {
   std::vector<thrift::Tag> tags;
   PopulateAttribute("event", static_cast<common::AttributeValue>(name.data()), tags);
@@ -122,7 +123,7 @@ void JaegerRecordable::SetInstrumentationLibrary(
 }
 
 void JaegerRecordable::AddLink(const trace::SpanContext &span_context,
-                         const common::KeyValueIterable &attributes) noexcept
+                               const common::KeyValueIterable &attributes) noexcept
 {
   // TODO: convert link to SpanRefernece
 }
@@ -213,8 +214,8 @@ void JaegerRecordable::SetSpanKind(trace::SpanKind span_kind) noexcept
 }
 
 void JaegerRecordable::AddTag(const std::string &key,
-                        const std::string &value,
-                        std::vector<thrift::Tag> &tags)
+                              const std::string &value,
+                              std::vector<thrift::Tag> &tags)
 {
   thrift::Tag tag;
 
@@ -225,7 +226,9 @@ void JaegerRecordable::AddTag(const std::string &key,
   tags.push_back(tag);
 }
 
-void JaegerRecordable::AddTag(const std::string &key, const char *value, std::vector<thrift::Tag> &tags)
+void JaegerRecordable::AddTag(const std::string &key,
+                              const char *value,
+                              std::vector<thrift::Tag> &tags)
 {
   AddTag(key, std::string{value}, tags);
 }

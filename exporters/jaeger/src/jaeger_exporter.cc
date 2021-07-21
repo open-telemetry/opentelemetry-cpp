@@ -40,7 +40,8 @@ sdk_common::ExportResult JaegerExporter::Export(
 
   for (auto &recordable : spans)
   {
-    auto rec = std::unique_ptr<JaegerRecordable>(static_cast<JaegerRecordable *>(recordable.release()));
+    auto rec =
+        std::unique_ptr<JaegerRecordable>(static_cast<JaegerRecordable *>(recordable.release()));
     if (rec != nullptr)
     {
       exported_size += sender_->Append(std::move(rec));
