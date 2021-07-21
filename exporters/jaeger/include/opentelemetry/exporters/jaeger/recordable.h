@@ -49,10 +49,10 @@ inline uint64_t otel_bswap_64(uint64_t host_int)
 
 using namespace jaegertracing;
 
-class Recordable final : public sdk::trace::Recordable
+class JaegerRecordable final : public sdk::trace::Recordable
 {
 public:
-  Recordable();
+  JaegerRecordable();
 
   thrift::Span *Span() noexcept { return span_.release(); }
   std::vector<thrift::Tag> Tags() noexcept { return std::move(tags_); }

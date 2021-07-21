@@ -25,7 +25,7 @@ JaegerExporter::JaegerExporter() : JaegerExporter(JaegerExporterOptions()) {}
 
 std::unique_ptr<trace_sdk::Recordable> JaegerExporter::MakeRecordable() noexcept
 {
-  return std::unique_ptr<sdk::trace::Recordable>(new Recordable);
+  return std::unique_ptr<sdk::trace::Recordable>(new JaegerRecordable);
 }
 
 sdk_common::ExportResult JaegerExporter::Export(
@@ -40,7 +40,7 @@ sdk_common::ExportResult JaegerExporter::Export(
 
   for (auto &recordable : spans)
   {
-    auto rec = std::unique_ptr<Recordable>(static_cast<Recordable *>(recordable.release()));
+    auto rec = std::unique_ptr<JaegerRecordable>(static_cast<JaegerRecordable *>(recordable.release()));
     if (rec != nullptr)
     {
       exported_size += sender_->Append(std::move(rec));
