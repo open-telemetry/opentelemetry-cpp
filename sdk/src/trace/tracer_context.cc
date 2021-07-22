@@ -14,10 +14,10 @@ TracerContext::TracerContext(std::vector<std::unique_ptr<SpanProcessor>> &&proce
                              opentelemetry::sdk::resource::Resource resource,
                              std::unique_ptr<Sampler> sampler,
                              std::unique_ptr<IdGenerator> id_generator) noexcept
-    : processor_(std::unique_ptr<SpanProcessor>(new MultiSpanProcessor(std::move(processors)))),
-      resource_(resource),
+    : resource_(resource),
       sampler_(std::move(sampler)),
-      id_generator_(std::move(id_generator))
+      id_generator_(std::move(id_generator)),
+      processor_(std::unique_ptr<SpanProcessor>(new MultiSpanProcessor(std::move(processors))))
 {}
 
 Sampler &TracerContext::GetSampler() const noexcept

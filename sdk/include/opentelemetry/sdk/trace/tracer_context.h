@@ -88,11 +88,11 @@ public:
   bool Shutdown() noexcept;
 
 private:
-  // This is an atomic pointer so we can adapt the processor pipeline dynamically.
-  std::unique_ptr<SpanProcessor> processor_;
+  //  order of declaration is important here - resource object should be destroyed after processor.
   opentelemetry::sdk::resource::Resource resource_;
   std::unique_ptr<Sampler> sampler_;
   std::unique_ptr<IdGenerator> id_generator_;
+  std::unique_ptr<SpanProcessor> processor_;
 };
 
 }  // namespace trace
