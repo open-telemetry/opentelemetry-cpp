@@ -18,7 +18,7 @@ ThriftSender::ThriftSender(std::unique_ptr<Transport> &&transport)
       thrift_buffer_(new apache::thrift::transport::TMemoryBuffer())
 {}
 
-int ThriftSender::Append(std::unique_ptr<Recordable> &&span) noexcept
+int ThriftSender::Append(std::unique_ptr<JaegerRecordable> &&span) noexcept
 {
   if (span == nullptr)
   {
