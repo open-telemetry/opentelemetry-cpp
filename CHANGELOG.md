@@ -15,6 +15,8 @@ Increment the:
 
 ## [Unreleased]
 
+* [BUILD] Allow to use local GSL
+
 ## [1.0.0-rc3] 2021-07-12
 
 * [DOCS] Add doxygen reference docs for SDK ([#902](https://github.com/open-telemetry/opentelemetry-cpp/pull/902))
