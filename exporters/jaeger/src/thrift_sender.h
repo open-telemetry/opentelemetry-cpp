@@ -32,7 +32,7 @@ public:
   ThriftSender(std::unique_ptr<Transport> &&transport);
   ~ThriftSender() override { Close(); }
 
-  int Append(std::unique_ptr<Recordable> &&span) noexcept override;
+  int Append(std::unique_ptr<JaegerRecordable> &&span) noexcept override;
   int Flush() override;
   void Close() override;
 
@@ -57,7 +57,7 @@ private:
   }
 
 private:
-  std::vector<std::unique_ptr<Recordable>> spans_;
+  std::vector<std::unique_ptr<JaegerRecordable>> spans_;
   std::vector<thrift::Span> span_buffer_;
   std::unique_ptr<Transport> transport_;
   std::unique_ptr<apache::thrift::protocol::TProtocolFactory> protocol_factory_;
