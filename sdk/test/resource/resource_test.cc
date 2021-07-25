@@ -155,6 +155,7 @@ TEST(ResourceTest, MergeEmptyString)
   EXPECT_EQ(received_attributes.size(), expected_attributes.size());
 }
 
+#ifndef NO_GETENV
 TEST(ResourceTest, OtelResourceDetector)
 {
   std::map<std::string, std::string> expected_attributes = {{"k", "v"}};
@@ -204,3 +205,4 @@ TEST(ResourceTest, OtelResourceDetectorEmptyEnv)
   }
   EXPECT_EQ(received_attributes.size(), expected_attributes.size());
 }
+#endif

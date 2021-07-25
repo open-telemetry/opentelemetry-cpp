@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 #include "opentelemetry/sdk/resource/resource_detector.h"
-#include <cstdlib>
+#include "opentelemetry/sdk/common/env_variables.h"
 #include "opentelemetry/sdk/resource/resource.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
@@ -15,20 +15,12 @@ const char *OTEL_RESOURCE_ATTRIBUTES = "OTEL_RESOURCE_ATTRIBUTES";
 
 Resource OTELResourceDetector::Detect() noexcept
 {
-#if defined(_MSC_VER)
-  size_t required_size = 0;
-  getenv_s(&required_size, nullptr, 0, OTEL_RESOURCE_ATTRIBUTES);
-  if (required_size == 0)
+  auto attributes_str =
+      opentelemetry::sdk::common::GetEnvironmentVariable(OTEL_RESOURCE_ATTRIBUTES);
+  if (attributes_str.size() == 0)
+  {
     return Resource();
-  std::unique_ptr<char> attributes_buffer{new char[required_size]};
-  getenv_s(&required_size, attributes_buffer.get(), required_size, OTEL_RESOURCE_ATTRIBUTES);
-  char *attributes_str = attributes_buffer.get();
-#else
-  char *attributes_str = std::getenv(OTEL_RESOURCE_ATTRIBUTES);
-  if (attributes_str == nullptr)
-    return Resource();
-#endif
-
+  }
   ResourceAttributes attributes;
   std::istringstream iss(attributes_str);
   std::string token;

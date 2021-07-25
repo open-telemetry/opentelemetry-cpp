@@ -147,7 +147,14 @@ option(WITH_ELASTICSEARCH
 
 option(WITH_JAEGER "Whether to include the Jaeger exporter" OFF)
 
+option(WITH_NO_GETENV "Whether the platform supports environment variables" OFF)
+
 option(BUILD_TESTING "Whether to enable tests" ON)
+
+if(WITH_NO_GENENV)
+  add_definitions(-DNO_GETENV)
+endif()
+
 if(WIN32)
   add_definitions(-DNOMINMAX)
   if(BUILD_TESTING)
