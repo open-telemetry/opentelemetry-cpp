@@ -86,7 +86,7 @@ set(_OPENTELEMETRY_CPP_LIBRARIES_TEST_TARGETS
     prometheus_exporter
     elasticsearch_log_exporter
     etw_exporter
-    opentelemetry_exporter_jaeger_trace
+    jaeger_trace_exporter
     zpages
     http_client_curl)
 foreach(_TEST_TARGET IN LISTS _OPENTELEMETRY_CPP_LIBRARIES_TEST_TARGETS)
