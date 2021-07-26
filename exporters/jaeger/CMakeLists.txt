@@ -16,9 +16,8 @@ set(JAEGER_EXPORTER_SOURCES
 add_library(opentelemetry_exporter_jaeger_trace ${JAEGER_EXPORTER_SOURCES}
                                                 ${JAEGER_THRIFT_GENCPP_SOURCES})
 
-set_target_properties(
-  opentelemetry_exporter_jaeger_trace
-  PROPERTIES EXPORT_NAME jaeger_trace_exporter)
+set_target_properties(opentelemetry_exporter_jaeger_trace
+                      PROPERTIES EXPORT_NAME jaeger_trace_exporter)
 
 target_include_directories(
   opentelemetry_exporter_jaeger_trace
