@@ -147,6 +147,17 @@ TEST_F(OtlpGrpcExporterTestPeer, ConfigFromEnv)
   EXPECT_EQ(GetOptions(exporter).ssl_credentials_cacert_as_string, cacert_str);
   EXPECT_EQ(GetOptions(exporter).use_ssl_credentials, true);
   EXPECT_EQ(GetOptions(exporter).endpoint, endpoint);
+#    if defined(_MSC_VER)
+  putenv("OTEL_EXPORTER_OTLP_GRPC_ENDPOINT=");
+  putenv("OTEL_EXPORTER_OTLP_GRPC_SSL_CERTIFICATE=");
+  putenv("OTEL_EXPORTER_OTLP_GRPC_SSL_ENABLE=");
+
+#    else
+  unsetenv("OTEL_EXPORTER_OTLP_GRPC_ENDPOINT");
+  unsetenv("OTEL_EXPORTER_OTLP_GRPC_SSL_CERTIFICATE");
+  unsetenv("OTEL_EXPORTER_OTLP_GRPC_SSL_ENABLE");
+
+#    endif
 }
 #  endif
 
