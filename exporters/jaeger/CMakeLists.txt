@@ -49,7 +49,8 @@ install(
   DIRECTORY include/opentelemetry/exporters/jaeger
   DESTINATION include/opentelemetry/exporters/
   FILES_MATCHING
-  PATTERN "*.h")
+  PATTERN "*.h"
+  PATTERN "recordable.h" EXCLUDE)
 
 if(BUILD_TESTING)
   add_executable(jaeger_recordable_test test/jaeger_recordable_test.cc)
