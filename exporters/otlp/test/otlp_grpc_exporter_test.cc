@@ -130,7 +130,7 @@ TEST_F(OtlpGrpcExporterTestPeer, ConfigSslCredentialsTest)
   EXPECT_EQ(GetOptions(exporter).use_ssl_credentials, true);
 }
 
-#ifndef NO_GETENV
+#  ifndef NO_GETENV
 // Test exporter configuration options with use_ssl_credentials
 TEST_F(OtlpGrpcExporterTestPeer, ConfigFromEnv)
 {
@@ -148,7 +148,7 @@ TEST_F(OtlpGrpcExporterTestPeer, ConfigFromEnv)
   EXPECT_EQ(GetOptions(exporter).use_ssl_credentials, true);
   EXPECT_EQ(GetOptions(exporter).endpoint, endpoint);
 }
-#endif
+#  endif
 
 }  // namespace otlp
 }  // namespace exporter

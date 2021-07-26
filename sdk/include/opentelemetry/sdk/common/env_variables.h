@@ -21,7 +21,6 @@ inline const std::string GetEnvironmentVariable(const char *env_var_name)
   // avoid calling std::getenv which is deprecated in MSVC.
   size_t required_size = 0;
   getenv_s(&required_size, nullptr, 0, env_var_name);
-  const char *endpoint_from_env = nullptr;
   std::unique_ptr<char> endpoint_buffer;
   if (required_size > 0)
   {
