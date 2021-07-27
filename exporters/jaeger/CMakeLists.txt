@@ -10,8 +10,13 @@ set(JAEGER_THRIFT_GENCPP_SOURCES
     thrift-gen/zipkincore_types.cpp)
 
 set(JAEGER_EXPORTER_SOURCES
-    src/jaeger_exporter.cc src/thrift_sender.cc src/udp_transport.cc
-    src/recordable.cc src/TUDPTransport.cc src/http_transport.cc src/THttpTransport.cc)
+    src/jaeger_exporter.cc
+    src/thrift_sender.cc
+    src/udp_transport.cc
+    src/recordable.cc
+    src/TUDPTransport.cc
+    src/http_transport.cc
+    src/THttpTransport.cc)
 
 add_library(opentelemetry_exporter_jaeger_trace ${JAEGER_EXPORTER_SOURCES}
                                                 ${JAEGER_THRIFT_GENCPP_SOURCES})
