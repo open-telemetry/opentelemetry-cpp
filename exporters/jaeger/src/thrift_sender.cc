@@ -79,11 +79,11 @@ int ThriftSender::Flush()
   batch.__set_process(process_);
   batch.__set_spans(span_buffer_);
 
-  transport_->EmitBatch(batch);
+  int spans_flushed = transport_->EmitBatch(batch);
 
   ResetBuffers();
 
-  return static_cast<int>(batch.spans.size());
+  return spans_flushed;
 }
 
 void ThriftSender::Close()
