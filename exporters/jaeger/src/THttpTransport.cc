@@ -44,6 +44,8 @@ bool THttpTransport::sendSpans()
 {
   auto result = client->Post(endpoint, request_buffer, headers);
   request_buffer.clear();
+
+  // TODO: Add logging once global log handling is available.
   if (!result)
   {
     return false;
