@@ -112,34 +112,25 @@ public:
    * Returns the singleton LogHandler.
    *
    * By default, a default LogHandler is returned. This will never return a
-   * nullptr LogHander.
+   * nullptr LogHandler.
    */
   static nostd::shared_ptr<LogHandler> GetLogHandler() noexcept
   {
-    std::lock_guard<opentelemetry::common::SpinLockMutex> guard(GetLock());
     return nostd::shared_ptr<LogHandler>(GetHandler());
   }
 
   /**
    * Changes the singleton LogHandler.
+   * This should be called once at the start of application before creating TracerProvider
+   * instance.
    */
-  static void SetLogHandler(nostd::shared_ptr<LogHandler> eh) noexcept
-  {
-    std::lock_guard<opentelemetry::common::SpinLockMutex> guard(GetLock());
-    GetHandler() = eh;
-  }
+  static void SetLogHandler(nostd::shared_ptr<LogHandler> eh) noexcept { GetHandler() = eh; }
 
 private:
   static nostd::shared_ptr<LogHandler> &GetHandler() noexcept
   {
     static nostd::shared_ptr<LogHandler> handler(new DefaultLogHandler);
     return handler;
-  }
-
-  static opentelemetry::common::SpinLockMutex &GetLock() noexcept
-  {
-    static opentelemetry::common::SpinLockMutex lock;
-    return lock;
   }
 };
 
