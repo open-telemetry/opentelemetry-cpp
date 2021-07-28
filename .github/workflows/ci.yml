@@ -74,6 +74,7 @@ jobs:
       run: |
         sudo CC=/usr/bin/gcc-4.8 CXX=/usr/bin/g++-4.8 ./ci/setup_cmake.sh
     - name: setup grpc
+      run: |
         sudo CC=/usr/bin/gcc-4.8 CXX=/usr/bin/g++-4.8 ./ci/setup_grpc.sh -v 4.8
     - name: run tests
       run: ./ci/do_ci.sh cmake.legacy.exporter.otprotocol.test
