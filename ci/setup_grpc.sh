@@ -5,7 +5,30 @@
 
 set -e
 export DEBIAN_FRONTEND=noninteractive
+old_grpc_version='v1.34.0'
+new_grpc_version='v1.39.0'
+gcc_version_for_new_grpc='5.1'
+install_grpc_version=${new_grpc_version}
+grpc_version='v1.39.0'
+usage() { echo "Usage: $0 -v <gcc-version>" 1>&2; exit 1; }
 
+while getopts ":v:" o; do
+    case "${o}" in
+        v)
+            gcc_version=${OPTARG}
+            ;;
+        *)
+            usage
+            ;;
+    esac
+done
+if [ -z "${gcc_version}" ]; then
+    gcc_version=`gcc --version | awk '/gcc/  {print $NF}'`
+fi
+if [[ "${gcc_version}" < "${gcc_version_for_new_grpc}" ]]; then
+    echo "less"
+    install_grpc_version=${old_grpc_version}
+fi
 if ! type cmake > /dev/null; then
     #cmake not installed, exiting
     exit 1
@@ -13,7 +36,8 @@ fi
 export BUILD_DIR=/tmp/
 export INSTALL_DIR=/usr/local/
 pushd $BUILD_DIR
-git clone --depth=1 -b v1.34.0 https://github.com/grpc/grpc
+echo "installing grpc version: ${install_grpc_version}"
+git clone --depth=1 -b ${install_grpc_version} https://github.com/grpc/grpc
 cd grpc
 git submodule init
 git submodule update --depth 1
