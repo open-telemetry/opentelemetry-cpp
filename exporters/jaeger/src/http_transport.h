@@ -3,7 +3,6 @@
 #include "THttpTransport.h"
 #include "transport.h"
 
-#include <opentelemetry/exporters/jaeger/jaeger_http.h>
 #include <thrift/protocol/TProtocol.h>
 #include <thrift/transport/TTransport.h>
 #include <memory>
