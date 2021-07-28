@@ -3,12 +3,9 @@
 
 #pragma once
 
-#include <atomic>
 #include <iostream>
-#include <mutex>
 #include <sstream>
 
-#include "opentelemetry/common/spin_lock_mutex.h"
 #include "opentelemetry/nostd/shared_ptr.h"
 #include "opentelemetry/sdk/common/attribute_utils.h"
 #include "opentelemetry/version.h"
