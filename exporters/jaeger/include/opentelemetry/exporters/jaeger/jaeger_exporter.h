@@ -3,8 +3,8 @@
 
 #pragma once
 
+#include <opentelemetry/ext/http/client/http_client.h>
 #include <opentelemetry/sdk/trace/exporter.h>
-#include "jaeger_http.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace exporter
@@ -30,7 +30,7 @@ struct JaegerExporterOptions
   std::string endpoint             = "localhost";
   uint16_t server_port             = 6831;
   // Only applicable when using kThriftHttp transport.
-  std::vector<HttpHeader> headers;
+  ext::http::client::Headers headers;
 };
 
 namespace trace_sdk  = opentelemetry::sdk::trace;

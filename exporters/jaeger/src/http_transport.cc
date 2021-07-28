@@ -14,9 +14,9 @@ namespace jaeger
 using TBinaryProtocol = apache::thrift::protocol::TBinaryProtocol;
 using TTransport      = apache::thrift::transport::TTransport;
 
-HttpTransport::HttpTransport(std::string endpoint, const std::vector<HttpHeader> &headers)
+HttpTransport::HttpTransport(std::string endpoint, ext::http::client::Headers headers)
 {
-  endpoint_transport_ = std::make_shared<THttpTransport>(std::move(endpoint), headers);
+  endpoint_transport_ = std::make_shared<THttpTransport>(std::move(endpoint), std::move(headers));
   protocol_           = std::shared_ptr<TProtocol>(new TBinaryProtocol(endpoint_transport_));
 }
 

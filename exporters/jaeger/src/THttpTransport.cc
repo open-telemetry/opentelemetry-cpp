@@ -10,15 +10,12 @@ namespace exporter
 namespace jaeger
 {
 
-THttpTransport::THttpTransport(std::string endpoint, const std::vector<HttpHeader> &extra_headers)
+THttpTransport::THttpTransport(std::string endpoint, ext::http::client::Headers extra_headers)
     : endpoint(std::move(endpoint)),
-      headers({{"Content-Type", "application/vnd.apache.thrift.binary"}}),
+      headers(std::move(extra_headers)),
       client(ext::http::client::HttpClientFactory::CreateSync())
 {
-  for (const auto &header : extra_headers)
-  {
-    headers.insert({header.key, header.value});
-  }
+  headers.insert({{"Content-Type", "application/vnd.apache.thrift.binary"}});
 }
 
 THttpTransport::~THttpTransport() {}

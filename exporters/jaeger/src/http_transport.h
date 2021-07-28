@@ -20,7 +20,7 @@ using TProtocol = apache::thrift::protocol::TProtocol;
 class HttpTransport : public Transport
 {
 public:
-  HttpTransport(std::string endpoint, const std::vector<HttpHeader> &headers);
+  HttpTransport(std::string endpoint, ext::http::client::Headers headers);
 
   int EmitBatch(const thrift::Batch &batch) override;
 

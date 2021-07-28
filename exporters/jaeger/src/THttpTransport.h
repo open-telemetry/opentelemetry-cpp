@@ -18,7 +18,7 @@ namespace jaeger
 class THttpTransport : public apache::thrift::transport::TVirtualTransport<THttpTransport>
 {
 public:
-  THttpTransport(std::string endpoint, const std::vector<HttpHeader> &extra_headers);
+  THttpTransport(std::string endpoint, ext::http::client::Headers extra_headers);
   ~THttpTransport() override;
 
   bool isOpen() const override;
