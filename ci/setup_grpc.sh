@@ -44,6 +44,7 @@ git submodule update --depth 1
 mkdir -p cmake/build
 pushd cmake/build
 cmake -DgRPC_INSTALL=ON \
+    -DCMAKE_CXX_STANDARD=11 \
     -DgRPC_BUILD_TESTS=OFF \
     -DCMAKE_INSTALL_PREFIX=$INSTALL_DIR \
     ../..
