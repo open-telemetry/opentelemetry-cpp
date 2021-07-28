@@ -95,6 +95,9 @@ elif [[ "$1" == "cmake.legacy.test" ]]; then
 elif [[ "$1" == "cmake.legacy.exporter.otprotocol.test" ]]; then
   cd "${BUILD_DIR}"
   rm -rf *
+  export BUILD_ROOT="${BUILD_DIR}"
+  ${SRC_DIR}/tools/build-gtest.sh
+  ${SRC_DIR}/tools/build-benchmark.sh
   cmake -DCMAKE_BUILD_TYPE=Debug  \
         -DCMAKE_CXX_STANDARD=11 \
         -DWITH_OTLP=ON \
