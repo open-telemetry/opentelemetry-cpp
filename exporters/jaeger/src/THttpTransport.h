@@ -3,7 +3,6 @@
 
 #pragma once
 
-#include <opentelemetry/exporters/jaeger/jaeger_http.h>
 #include <opentelemetry/ext/http/client/http_client.h>
 #include <opentelemetry/version.h>
 
