@@ -3,7 +3,6 @@
 
 #pragma once
 
-#include "opentelemetry/exporters/zipkin/recordable.h"
 #include "opentelemetry/ext/http/client/http_client_factory.h"
 #include "opentelemetry/ext/http/common/url_parser.h"
 #include "opentelemetry/sdk/trace/exporter.h"
@@ -17,11 +16,11 @@ namespace exporter
 namespace zipkin
 {
 
-const char *kZipkinEndpointDefault = "http://localhost:9411/api/v2/spans";
-
-static const std::string GetDefaultZipkinEndpoint()
+inline const std::string GetDefaultZipkinEndpoint()
 {
   const char *otel_exporter_zipkin_endpoint_env = "OTEL_EXPORTER_ZIPKIN_ENDPOINT";
+  const char *kZipkinEndpointDefault            = "http://localhost:9411/api/v2/spans";
+
 #if defined(_MSC_VER)
   // avoid calling std::getenv which is deprecated in MSVC.
   size_t required_size = 0;
@@ -40,6 +39,12 @@ static const std::string GetDefaultZipkinEndpoint()
 #endif
   return std::string{endpoint_from_env ? endpoint_from_env : kZipkinEndpointDefault};
 }
+
+enum class TransportFormat
+{
+  kJson,
+  kProtobuf
+};
 
 /**
  * Struct to hold Zipkin  exporter options.

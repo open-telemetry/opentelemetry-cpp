@@ -10,35 +10,41 @@ set(JAEGER_THRIFT_GENCPP_SOURCES
     thrift-gen/zipkincore_types.cpp)
 
 set(JAEGER_EXPORTER_SOURCES
-    src/jaeger_exporter.cc src/thrift_sender.cc src/udp_transport.cc
-    src/recordable.cc src/TUDPTransport.cc)
+    src/jaeger_exporter.cc
+    src/thrift_sender.cc
+    src/udp_transport.cc
+    src/recordable.cc
+    src/TUDPTransport.cc
+    src/http_transport.cc
+    src/THttpTransport.cc)
 
-add_library(jaeger_trace_exporter ${JAEGER_EXPORTER_SOURCES}
-                                  ${JAEGER_THRIFT_GENCPP_SOURCES})
+add_library(opentelemetry_exporter_jaeger_trace ${JAEGER_EXPORTER_SOURCES}
+                                                ${JAEGER_THRIFT_GENCPP_SOURCES})
 
-set_target_properties(jaeger_trace_exporter PROPERTIES EXPORT_NAME
-                                                       jaeger_trace_exporter)
+set_target_properties(opentelemetry_exporter_jaeger_trace
+                      PROPERTIES EXPORT_NAME jaeger_trace_exporter)
 
 target_include_directories(
-  jaeger_trace_exporter
+  opentelemetry_exporter_jaeger_trace
   PUBLIC "$<BUILD_INTERFACE:${CMAKE_CURRENT_LIST_DIR}/include>"
          "$<INSTALL_INTERFACE:include>")
 
 target_link_libraries(
-  jaeger_trace_exporter
-  PUBLIC opentelemetry_resources
+  opentelemetry_exporter_jaeger_trace
+  PUBLIC opentelemetry_resources http_client_curl
   PRIVATE thrift::thrift)
 
 if(MSVC)
-  target_compile_definitions(jaeger_trace_exporter PUBLIC NOMINMAX)
+  target_compile_definitions(opentelemetry_exporter_jaeger_trace
+                             PUBLIC NOMINMAX)
   if(NOT BUILD_SHARED_LIBS)
-    target_compile_definitions(jaeger_trace_exporter
+    target_compile_definitions(opentelemetry_exporter_jaeger_trace
                                PUBLIC THRIFT_STATIC_DEFINE)
   endif()
 endif()
 
 install(
-  TARGETS jaeger_trace_exporter
+  TARGETS opentelemetry_exporter_jaeger_trace
   EXPORT "${PROJECT_NAME}-target"
   RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
   LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
@@ -48,12 +54,14 @@ install(
   DIRECTORY include/opentelemetry/exporters/jaeger
   DESTINATION include/opentelemetry/exporters/
   FILES_MATCHING
-  PATTERN "*.h")
+  PATTERN "*.h"
+  PATTERN "recordable.h" EXCLUDE)
 
 if(BUILD_TESTING)
   add_executable(jaeger_recordable_test test/jaeger_recordable_test.cc)
-  target_link_libraries(jaeger_recordable_test ${GTEST_BOTH_LIBRARIES}
-                        ${CMAKE_THREAD_LIBS_INIT} jaeger_trace_exporter)
+  target_link_libraries(
+    jaeger_recordable_test ${GTEST_BOTH_LIBRARIES} ${CMAKE_THREAD_LIBS_INIT}
+    opentelemetry_exporter_jaeger_trace)
 
   gtest_add_tests(
     TARGET jaeger_recordable_test

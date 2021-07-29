@@ -67,5 +67,13 @@ TEST(BaggagePropagatorTest, ExtractAndInjectBaggage)
     BaggageCarrierTest carrier2;
     format.Inject(carrier2, ctx2);
     EXPECT_EQ(carrier2.headers_[kBaggageHeader.data()], baggage.second);
+
+    std::vector<std::string> fields;
+    format.Fields([&fields](nostd::string_view field) {
+      fields.push_back(field.data());
+      return true;
+    });
+    EXPECT_EQ(fields.size(), 1);
+    EXPECT_EQ(fields[0], kBaggageHeader.data());
   }
 }

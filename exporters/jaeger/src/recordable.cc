@@ -12,35 +12,60 @@ namespace jaeger
 
 using namespace opentelemetry::sdk::resource;
 
-Recordable::Recordable() : span_{new thrift::Span} {}
+JaegerRecordable::JaegerRecordable() : span_{new thrift::Span} {}
 
-void Recordable::PopulateAttribute(nostd::string_view key, const common::AttributeValue &value)
+void JaegerRecordable::PopulateAttribute(nostd::string_view key,
+                                         const common::AttributeValue &value,
+                                         std::vector<thrift::Tag> &tags)
 {
   if (nostd::holds_alternative<int64_t>(value))
   {
-    AddTag(std::string{key}, nostd::get<int64_t>(value));
+    AddTag(std::string{key}, nostd::get<int64_t>(value), tags);
   }
   else if (nostd::holds_alternative<bool>(value))
   {
-    AddTag(std::string{key}, nostd::get<bool>(value));
+    AddTag(std::string{key}, nostd::get<bool>(value), tags);
   }
   else if (nostd::holds_alternative<double>(value))
   {
-    AddTag(std::string{key}, nostd::get<double>(value));
+    AddTag(std::string{key}, nostd::get<double>(value), tags);
   }
   else if (nostd::holds_alternative<const char *>(value))
   {
-    AddTag(std::string{key}, std::string{nostd::get<const char *>(value)});
+    AddTag(std::string{key}, std::string{nostd::get<const char *>(value)}, tags);
   }
   else if (nostd::holds_alternative<nostd::string_view>(value))
   {
-    AddTag(std::string{key}, std::string{nostd::get<nostd::string_view>(value)});
+    AddTag(std::string{key}, std::string{nostd::get<nostd::string_view>(value)}, tags);
   }
   // TODO: extend other AttributeType to the types supported by Jaeger.
 }
 
-void Recordable::SetIdentity(const trace::SpanContext &span_context,
-                             trace::SpanId parent_span_id) noexcept
+void JaegerRecordable::PopulateAttribute(nostd::string_view key,
+                                         const sdk::common::OwnedAttributeValue &value,
+                                         std::vector<thrift::Tag> &tags)
+{
+  if (nostd::holds_alternative<int64_t>(value))
+  {
+    AddTag(std::string{key}, nostd::get<int64_t>(value), tags);
+  }
+  else if (nostd::holds_alternative<bool>(value))
+  {
+    AddTag(std::string{key}, nostd::get<bool>(value), tags);
+  }
+  else if (nostd::holds_alternative<double>(value))
+  {
+    AddTag(std::string{key}, nostd::get<double>(value), tags);
+  }
+  else if (nostd::holds_alternative<std::string>(value))
+  {
+    AddTag(std::string{key}, std::string{nostd::get<std::string>(value)}, tags);
+  }
+  // TODO: extend other OwnedAttributeType to the types supported by Jaeger.
+}
+
+void JaegerRecordable::SetIdentity(const trace::SpanContext &span_context,
+                                   trace::SpanId parent_span_id) noexcept
 {
   // IDs should be converted to big endian before transmission.
   // https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/trace/sdk_exporters/jaeger.md#ids
@@ -65,33 +90,45 @@ void Recordable::SetIdentity(const trace::SpanContext &span_context,
   // TODO: set trace_state.
 }
 
-void Recordable::SetAttribute(nostd::string_view key, const common::AttributeValue &value) noexcept
+void JaegerRecordable::SetAttribute(nostd::string_view key,
+                                    const common::AttributeValue &value) noexcept
 {
-  PopulateAttribute(key, value);
+  PopulateAttribute(key, value, tags_);
 }
 
-void Recordable::AddEvent(nostd::string_view name,
-                          common::SystemTimestamp timestamp,
-                          const common::KeyValueIterable &attributes) noexcept
+void JaegerRecordable::AddEvent(nostd::string_view name,
+                                common::SystemTimestamp timestamp,
+                                const common::KeyValueIterable &attributes) noexcept
 {
-  // TODO: convert event to Jaeger Log
+  std::vector<thrift::Tag> tags;
+  PopulateAttribute("event", static_cast<common::AttributeValue>(name.data()), tags);
+
+  attributes.ForEachKeyValue([&](nostd::string_view key, common::AttributeValue value) noexcept {
+    PopulateAttribute(key, value, tags);
+    return true;
+  });
+  thrift::Log log;
+  log.__set_fields(tags);
+  log.__set_timestamp(
+      std::chrono::duration_cast<std::chrono::microseconds>(timestamp.time_since_epoch()).count());
+  logs_.push_back(log);
 }
 
-void Recordable::SetInstrumentationLibrary(
+void JaegerRecordable::SetInstrumentationLibrary(
     const opentelemetry::sdk::instrumentationlibrary::InstrumentationLibrary
         &instrumentation_library) noexcept
 {
-  AddTag("otel.library.name", instrumentation_library.GetName());
-  AddTag("otel.library.version", instrumentation_library.GetVersion());
+  AddTag("otel.library.name", instrumentation_library.GetName(), tags_);
+  AddTag("otel.library.version", instrumentation_library.GetVersion(), tags_);
 }
 
-void Recordable::AddLink(const trace::SpanContext &span_context,
-                         const common::KeyValueIterable &attributes) noexcept
+void JaegerRecordable::AddLink(const trace::SpanContext &span_context,
+                               const common::KeyValueIterable &attributes) noexcept
 {
   // TODO: convert link to SpanRefernece
 }
 
-void Recordable::SetStatus(trace::StatusCode code, nostd::string_view description) noexcept
+void JaegerRecordable::SetStatus(trace::StatusCode code, nostd::string_view description) noexcept
 {
   if (code == trace::StatusCode::kUnset)
   {
@@ -100,44 +137,50 @@ void Recordable::SetStatus(trace::StatusCode code, nostd::string_view descriptio
 
   if (code == trace::StatusCode::kOk)
   {
-    AddTag("otel.status_code", "OK");
+    AddTag("otel.status_code", "OK", tags_);
   }
   else if (code == trace::StatusCode::kError)
   {
-    AddTag("otel.status_code", "ERROR");
-    AddTag("error", true);
+    AddTag("otel.status_code", "ERROR", tags_);
+    AddTag("error", true, tags_);
   }
 
-  AddTag("otel.status_description", std::string{description});
+  AddTag("otel.status_description", std::string{description}, tags_);
 }
 
-void Recordable::SetName(nostd::string_view name) noexcept
+void JaegerRecordable::SetName(nostd::string_view name) noexcept
 {
   span_->__set_operationName(static_cast<std::string>(name));
 }
 
-void Recordable::SetResource(const opentelemetry::sdk::resource::Resource &resource) noexcept
+void JaegerRecordable::SetResource(const opentelemetry::sdk::resource::Resource &resource) noexcept
 {
-  // only service.name attribute is supported by specs as of now.
-  auto attributes = resource.GetAttributes();
-  if (attributes.find(OTEL_CPP_GET_ATTR(AttrServiceName)) != attributes.end())
+  for (const auto &attribute_iter : resource.GetAttributes())
   {
-    service_name_ = nostd::get<std::string>(attributes[OTEL_CPP_GET_ATTR(AttrServiceName)]);
+    if (attribute_iter.first != "service.name")
+    {
+      PopulateAttribute(nostd::string_view{attribute_iter.first}, attribute_iter.second,
+                        resource_tags_);
+    }
+    else
+    {
+      service_name_ = nostd::get<std::string>(attribute_iter.second);
+    }
   }
 }
 
-void Recordable::SetStartTime(common::SystemTimestamp start_time) noexcept
+void JaegerRecordable::SetStartTime(common::SystemTimestamp start_time) noexcept
 {
   span_->__set_startTime(
       std::chrono::duration_cast<std::chrono::microseconds>(start_time.time_since_epoch()).count());
 }
 
-void Recordable::SetDuration(std::chrono::nanoseconds duration) noexcept
+void JaegerRecordable::SetDuration(std::chrono::nanoseconds duration) noexcept
 {
   span_->__set_duration(std::chrono::duration_cast<std::chrono::microseconds>(duration).count());
 }
 
-void Recordable::SetSpanKind(trace::SpanKind span_kind) noexcept
+void JaegerRecordable::SetSpanKind(trace::SpanKind span_kind) noexcept
 {
   const char *span_kind_str = nullptr;
 
@@ -166,11 +209,13 @@ void Recordable::SetSpanKind(trace::SpanKind span_kind) noexcept
 
   if (span_kind_str != nullptr)
   {
-    AddTag("span.kind", span_kind_str);
+    AddTag("span.kind", span_kind_str, tags_);
   }
 }
 
-void Recordable::AddTag(const std::string &key, const std::string &value)
+void JaegerRecordable::AddTag(const std::string &key,
+                              const std::string &value,
+                              std::vector<thrift::Tag> &tags)
 {
   thrift::Tag tag;
 
@@ -178,15 +223,17 @@ void Recordable::AddTag(const std::string &key, const std::string &value)
   tag.__set_vType(thrift::TagType::STRING);
   tag.__set_vStr(value);
 
-  tags_.push_back(tag);
+  tags.push_back(tag);
 }
 
-void Recordable::AddTag(const std::string &key, const char *value)
+void JaegerRecordable::AddTag(const std::string &key,
+                              const char *value,
+                              std::vector<thrift::Tag> &tags)
 {
-  AddTag(key, std::string{value});
+  AddTag(key, std::string{value}, tags);
 }
 
-void Recordable::AddTag(const std::string &key, bool value)
+void JaegerRecordable::AddTag(const std::string &key, bool value, std::vector<thrift::Tag> &tags)
 {
   thrift::Tag tag;
 
@@ -194,10 +241,10 @@ void Recordable::AddTag(const std::string &key, bool value)
   tag.__set_vType(thrift::TagType::BOOL);
   tag.__set_vBool(value);
 
-  tags_.push_back(tag);
+  tags.push_back(tag);
 }
 
-void Recordable::AddTag(const std::string &key, int64_t value)
+void JaegerRecordable::AddTag(const std::string &key, int64_t value, std::vector<thrift::Tag> &tags)
 {
   thrift::Tag tag;
 
@@ -205,10 +252,10 @@ void Recordable::AddTag(const std::string &key, int64_t value)
   tag.__set_vType(thrift::TagType::LONG);
   tag.__set_vLong(value);
 
-  tags_.push_back(tag);
+  tags.push_back(tag);
 }
 
-void Recordable::AddTag(const std::string &key, double value)
+void JaegerRecordable::AddTag(const std::string &key, double value, std::vector<thrift::Tag> &tags)
 {
   thrift::Tag tag;
 
@@ -216,7 +263,7 @@ void Recordable::AddTag(const std::string &key, double value)
   tag.__set_vType(thrift::TagType::DOUBLE);
   tag.__set_vDouble(value);
 
-  tags_.push_back(tag);
+  tags.push_back(tag);
 }
 
 }  // namespace jaeger

@@ -19,7 +19,7 @@ public:
   Sender()          = default;
   virtual ~Sender() = default;
 
-  virtual int Append(std::unique_ptr<Recordable> &&span) = 0;
+  virtual int Append(std::unique_ptr<JaegerRecordable> &&span) = 0;
 
   virtual int Flush() = 0;
 

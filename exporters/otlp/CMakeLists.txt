@@ -33,8 +33,10 @@ if(WITH_OTLP_HTTP)
   set_target_properties(opentelemetry_exporter_otlp_http
                         PROPERTIES EXPORT_NAME otlp_http_exporter)
 
-  target_link_libraries(opentelemetry_exporter_otlp_http
-                        PUBLIC opentelemetry_otlp_recordable http_client_curl)
+  target_link_libraries(
+    opentelemetry_exporter_otlp_http
+    PUBLIC opentelemetry_otlp_recordable http_client_curl
+           nlohmann_json::nlohmann_json)
 
   list(APPEND OPENTELEMETRY_OTLP_TARGETS opentelemetry_exporter_otlp_http)
 endif()
@@ -50,7 +52,8 @@ install(
   DIRECTORY include/opentelemetry/exporters/otlp
   DESTINATION include/opentelemetry/exporters/
   FILES_MATCHING
-  PATTERN "*.h")
+  PATTERN "*.h"
+  PATTERN "otlp_recordable.h" EXCLUDE)
 
 if(BUILD_TESTING)
   add_executable(otlp_recordable_test test/otlp_recordable_test.cc)

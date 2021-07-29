@@ -14,12 +14,6 @@ namespace zipkin
 {
 using ZipkinSpan = nlohmann::json;
 
-enum class TransportFormat
-{
-  kJson,
-  kProtobuf
-};
-
 class Recordable final : public sdk::trace::Recordable
 {
 public:
@@ -40,7 +34,8 @@ public:
   void AddLink(const opentelemetry::trace::SpanContext &span_context,
                const common::KeyValueIterable &attributes) noexcept override;
 
-  void SetStatus(trace::StatusCode code, nostd::string_view description) noexcept override;
+  void SetStatus(opentelemetry::trace::StatusCode code,
+                 nostd::string_view description) noexcept override;
 
   void SetName(nostd::string_view name) noexcept override;
 

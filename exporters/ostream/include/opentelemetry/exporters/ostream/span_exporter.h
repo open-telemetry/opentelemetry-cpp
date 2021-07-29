@@ -119,6 +119,12 @@ private:
   void printEvents(const std::vector<sdktrace::SpanDataEvent> &events);
 
   void printLinks(const std::vector<sdktrace::SpanDataLink> &links);
+
+  void printResources(const opentelemetry::sdk::resource::Resource &resources);
+
+  void printInstrumentationLibrary(
+      const opentelemetry::sdk::instrumentationlibrary::InstrumentationLibrary
+          &instrumentation_library);
 };
 }  // namespace trace
 }  // namespace exporter

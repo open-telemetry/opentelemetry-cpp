@@ -1,11 +1,7 @@
 if (VCPKG_PLATFORM_TOOLSET STREQUAL "v140")
-  # set(CMAKE_C_COMPILER_WORKS 1)
-  # set(CMAKE_CXX_COMPILER_WORKS 1)
   set(CMAKE_C_COMPILER cl.exe)
   set(CMAKE_CXX_COMPILER cl.exe)
   set(MSVC_TOOLSET_VERSION 140)
-  # set(VCPKG_VISUAL_STUDIO_PATH "C:\\Program Files (x86)\\Microsoft Visual Studio 14.0")
-  # set(VCPKG_PLATFORM_TOOLSET v140)
 else()
   # Make sure vs2019 compiled binaries are compat with vs2017
   set(VCPKG_CXX_FLAGS "/Zc:__cplusplus /d2FH4-")
