@@ -63,7 +63,7 @@ void UDPTransport::CleanSocket()
 #endif
 }
 
-void UDPTransport::EmitBatch(const thrift::Batch &batch)
+int UDPTransport::EmitBatch(const thrift::Batch &batch)
 {
   try
   {
@@ -71,6 +71,8 @@ void UDPTransport::EmitBatch(const thrift::Batch &batch)
   }
   catch (...)
   {}
+
+  return static_cast<int>(batch.spans.size());
 }
 
 }  // namespace jaeger

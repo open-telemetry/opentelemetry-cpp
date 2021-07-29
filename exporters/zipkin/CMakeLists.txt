@@ -34,7 +34,8 @@ install(
   DIRECTORY include/opentelemetry/exporters/zipkin
   DESTINATION include/opentelemetry/exporters/
   FILES_MATCHING
-  PATTERN "*.h")
+  PATTERN "*.h"
+  PATTERN "recordable.h" EXCLUDE)
 
 if(BUILD_TESTING)
   add_executable(zipkin_recordable_test test/zipkin_recordable_test.cc)

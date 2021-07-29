@@ -14,12 +14,6 @@ namespace zipkin
 {
 using ZipkinSpan = nlohmann::json;
 
-enum class TransportFormat
-{
-  kJson,
-  kProtobuf
-};
-
 class Recordable final : public sdk::trace::Recordable
 {
 public:
