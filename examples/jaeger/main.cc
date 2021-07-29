@@ -33,7 +33,7 @@ int main(int argc, char *argv[])
 {
   if (argc == 2)
   {
-    opts.server_addr = argv[1];
+    opts.endpoint = argv[1];
   }
   // Removing this line will leave the default noop TracerProvider in place.
   InitTracer();

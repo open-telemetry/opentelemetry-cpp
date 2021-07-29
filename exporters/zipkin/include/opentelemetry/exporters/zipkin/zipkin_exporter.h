@@ -3,7 +3,6 @@
 
 #pragma once
 
-#include "opentelemetry/exporters/zipkin/recordable.h"
 #include "opentelemetry/ext/http/client/http_client_factory.h"
 #include "opentelemetry/ext/http/common/url_parser.h"
 #include "opentelemetry/sdk/common/env_variables.h"
@@ -27,6 +26,12 @@ inline const std::string GetDefaultZipkinEndpoint()
       opentelemetry::sdk::common::GetEnvironmentVariable(otel_exporter_zipkin_endpoint_env);
   return endpoint.size() ? endpoint : kZipkinEndpointDefault;
 }
+
+enum class TransportFormat
+{
+  kJson,
+  kProtobuf
+};
 
 /**
  * Struct to hold Zipkin  exporter options.
