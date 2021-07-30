@@ -51,7 +51,9 @@ void UDPTransport::InitSocket()
 
   if (LOBYTE(wsaData.wVersion) != 2 || HIBYTE(wsaData.wVersion) != 2)
   {
-    // TODO: handle error that WinSock 2.2 is not supported.
+    OTEL_INTERNAL_LOG_ERROR("Jaeger Exporter: winsock " << LOBYTE(wsaData.wVersion) << "."
+                                                        << HIBYTE(wsaData.wVersion)
+                                                        << " is not supported.");
     WSACleanup();
 
     return;
