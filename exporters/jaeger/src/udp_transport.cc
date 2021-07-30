@@ -43,7 +43,7 @@ void UDPTransport::InitSocket()
     return;
   }
 
-  /* Confirm that the WinSock DLL supports 2.2. */
+  /* Confirm that the WinSock DLL supports 2.2.        */
   /* Note that if the DLL supports versions greater    */
   /* than 2.2 in addition to 2.2, it will still return */
   /* 2.2 in wVersion since that is the version we      */
