@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 #include "server.h"
+#include "opentelemetry/trace/semantic_conventions.h"
 #include "tracer_common.h"
 
 #include <iostream>
@@ -9,6 +10,9 @@
 
 namespace
 {
+
+using namespace opentelemetry::trace;
+;
 uint16_t server_port              = 8800;
 constexpr const char *server_name = "localhost";
 
@@ -31,17 +35,16 @@ public:
     options.parent   = opentelemetry::trace::propagation::GetSpan(new_context)->GetContext();
 
     // start span with parent context extracted from http header
-    auto span =
-        get_tracer("http-server")
-            ->StartSpan(
-                span_name,
-                {{"http.server_name", server_name},
-                 {"net.host.port", server_port},
-                 {"http.method", request.method},
-                 {"http.scheme", "http"},
-                 {"http.request_content_length", static_cast<uint64_t>(request.content.length())},
-                 {"http.client_ip", request.client}},
-                options);
+    auto span = get_tracer("http-server")
+                    ->StartSpan(span_name,
+                                {{OTEL_CPP_GET_ATTR(AttrHttpServerName), server_name},
+                                 {OTEL_CPP_GET_ATTR(AttrNetHostPort), server_port},
+                                 {OTEL_CPP_GET_ATTR(AttrHttpMethod), request.method},
+                                 {OTEL_CPP_GET_ATTR(AttrHttpScheme), "http"},
+                                 {OTEL_CPP_GET_ATTR(AttrHttpRequestContentLength),
+                                  static_cast<uint64_t>(request.content.length())},
+                                 {OTEL_CPP_GET_ATTR(AttrHttpClientIp), request.client}},
+                                options);
 
     auto scope = get_tracer("http_server")->WithActiveSpan(span);
 
