@@ -5,6 +5,7 @@
 #include <opentelemetry/exporters/jaeger/jaeger_exporter.h>
 #include <opentelemetry/exporters/jaeger/recordable.h>
 
+#include "http_transport.h"
 #include "thrift_sender.h"
 #include "udp_transport.h"
 
@@ -25,7 +26,7 @@ JaegerExporter::JaegerExporter() : JaegerExporter(JaegerExporterOptions()) {}
 
 std::unique_ptr<trace_sdk::Recordable> JaegerExporter::MakeRecordable() noexcept
 {
-  return std::unique_ptr<sdk::trace::Recordable>(new Recordable);
+  return std::unique_ptr<sdk::trace::Recordable>(new JaegerRecordable);
 }
 
 sdk_common::ExportResult JaegerExporter::Export(
@@ -40,7 +41,8 @@ sdk_common::ExportResult JaegerExporter::Export(
 
   for (auto &recordable : spans)
   {
-    auto rec = std::unique_ptr<Recordable>(static_cast<Recordable *>(recordable.release()));
+    auto rec =
+        std::unique_ptr<JaegerRecordable>(static_cast<JaegerRecordable *>(recordable.release()));
     if (rec != nullptr)
     {
       exported_size += sender_->Append(std::move(rec));
@@ -63,14 +65,21 @@ void JaegerExporter::InitializeEndpoint()
   {
     // TODO: do we need support any authentication mechanism?
     auto transport = std::unique_ptr<Transport>(
-        static_cast<Transport *>(new UDPTransport(options_.server_addr, options_.server_port)));
+        static_cast<Transport *>(new UDPTransport(options_.endpoint, options_.server_port)));
     sender_ = std::unique_ptr<ThriftSender>(new ThriftSender(std::move(transport)));
+    return;
   }
-  else
+
+  if (options_.transport_format == TransportFormat::kThriftHttp)
   {
-    // The transport format is not implemented.
-    assert(false);
+    auto transport =
+        std::unique_ptr<HttpTransport>(new HttpTransport(options_.endpoint, options_.headers));
+    sender_ = std::unique_ptr<ThriftSender>(new ThriftSender(std::move(transport)));
+    return;
   }
+
+  // The transport format is not implemented.
+  assert(false);
 }
 
 }  // namespace jaeger

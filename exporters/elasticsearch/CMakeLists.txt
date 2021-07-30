@@ -22,7 +22,8 @@ install(
   DIRECTORY include/opentelemetry/exporters/elasticsearch
   DESTINATION include/opentelemetry/exporters/
   FILES_MATCHING
-  PATTERN "*.h")
+  PATTERN "*.h"
+  PATTERN "es_log_recordable.h" EXCLUDE)
 
 if(BUILD_TESTING)
   add_executable(es_log_exporter_test test/es_log_exporter_test.cc)

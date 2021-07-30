@@ -118,8 +118,13 @@ if(WITH_STL)
   # Guidelines Support Library path. Used if we are not on not get C++20.
   #
   # TODO: respect WITH_ABSEIL as alternate implementation of std::span
-  set(GSL_DIR third_party/ms-gsl)
-  include_directories(${GSL_DIR}/include)
+  find_package(Microsoft.GSL QUIET)
+  if(TARGET Microsoft.GSL::GSL)
+    list(APPEND CORE_RUNTIME_LIBS Microsoft.GSL::GSL)
+  else()
+    set(GSL_DIR third_party/ms-gsl)
+    include_directories(${GSL_DIR}/include)
+  endif()
 
   # Optimize for speed to reduce the hops
   if(CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")

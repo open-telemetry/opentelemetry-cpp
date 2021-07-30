@@ -52,7 +52,8 @@ install(
   DIRECTORY include/opentelemetry/exporters/otlp
   DESTINATION include/opentelemetry/exporters/
   FILES_MATCHING
-  PATTERN "*.h")
+  PATTERN "*.h"
+  PATTERN "otlp_recordable.h" EXCLUDE)
 
 if(BUILD_TESTING)
   add_executable(otlp_recordable_test test/otlp_recordable_test.cc)

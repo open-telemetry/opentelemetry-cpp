@@ -1,7 +1,7 @@
 // Copyright The OpenTelemetry Authors
 // SPDX-License-Identifier: Apache-2.0
 
-#include "opentelemetry/exporters/jaeger/jaeger_exporter.h"
+#include "opentelemetry/exporters/zipkin/zipkin_exporter.h"
 #include "opentelemetry/sdk/trace/simple_processor.h"
 #include "opentelemetry/sdk/trace/tracer_provider.h"
 #include "opentelemetry/trace/provider.h"
@@ -11,19 +11,22 @@
 namespace trace    = opentelemetry::trace;
 namespace nostd    = opentelemetry::nostd;
 namespace sdktrace = opentelemetry::sdk::trace;
-namespace jaeger   = opentelemetry::exporter::jaeger;
+namespace zipkin   = opentelemetry::exporter::zipkin;
 
 namespace
 {
-opentelemetry::exporter::jaeger::JaegerExporterOptions opts;
+opentelemetry::exporter::zipkin::ZipkinExporterOptions opts;
 void InitTracer()
 {
-  // Create Jaeger exporter instance
-  auto exporter  = std::unique_ptr<sdktrace::SpanExporter>(new jaeger::JaegerExporter(opts));
+  // Create zipkin exporter instance
+  opentelemetry::sdk::resource::ResourceAttributes attributes = {
+      {"service.name", "zipkin_demo_service"}};
+  auto resource  = opentelemetry::sdk::resource::Resource::Create(attributes);
+  auto exporter  = std::unique_ptr<sdktrace::SpanExporter>(new zipkin::ZipkinExporter(opts));
   auto processor = std::unique_ptr<sdktrace::SpanProcessor>(
       new sdktrace::SimpleSpanProcessor(std::move(exporter)));
-  auto provider =
-      nostd::shared_ptr<trace::TracerProvider>(new sdktrace::TracerProvider(std::move(processor)));
+  auto provider = nostd::shared_ptr<trace::TracerProvider>(
+      new sdktrace::TracerProvider(std::move(processor), resource));
   // Set the global trace provider
   trace::Provider::SetTracerProvider(provider);
 }
