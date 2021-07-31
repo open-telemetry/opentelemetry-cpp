@@ -8,6 +8,7 @@
 #include "messages.grpc.pb.h"
 #endif
 
+#include "opentelemetry/trace/semantic_conventions.h"
 #include "tracer_common.h"
 #include <iostream>
 #include <memory>
@@ -26,6 +27,7 @@ using grpc_example::GreetResponse;
 namespace
 {
 
+using namespace opentelemetry::trace;
 class GreeterClient
 {
 public:
@@ -44,11 +46,11 @@ public:
 
     std::string span_name = "GreeterClient/Greet";
     auto span             = get_tracer("grpc")->StartSpan(span_name,
-                                              {{"rpc.system", "grpc"},
-                                               {"rpc.service", "grpc-example.GreetService"},
-                                               {"rpc.method", "Greet"},
-                                               {"net.peer.ip", ip},
-                                               {"net.peer.port", port}},
+                                              {{OTEL_CPP_GET_ATTR(AttrRpcSystem), "grpc"},
+                                               {OTEL_CPP_GET_ATTR(AttrRpcService), "grpc-example.GreetService"},
+                                               {OTEL_CPP_GET_ATTR(AttrRpcMethod), "Greet"},
+                                               {OTEL_CPP_GET_ATTR(AttrNetPeerIp), ip},
+                                               {OTEL_CPP_GET_ATTR(AttrNetPeerPort), port}},
                                               options);
 
     auto scope = get_tracer("grpc-client")->WithActiveSpan(span);
@@ -64,7 +66,7 @@ public:
     if (status.ok())
     {
       span->SetStatus(opentelemetry::trace::StatusCode::kOk);
-      span->SetAttribute("rpc.grpc.status_code", status.error_code());
+      span->SetAttribute(OTEL_CPP_GET_ATTR(AttrRpcGrpcStatusCode), status.error_code());
       // Make sure to end your spans!
       span->End();
       return response.response();
@@ -73,7 +75,7 @@ public:
     {
       std::cout << status.error_code() << ": " << status.error_message() << std::endl;
       span->SetStatus(opentelemetry::trace::StatusCode::kError);
-      span->SetAttribute("rpc.grpc.status_code", status.error_code());
+      span->SetAttribute(OTEL_CPP_GET_ATTR(AttrRpcGrpcStatusCode), status.error_code());
       // Make sure to end your spans!
       span->End();
       return "RPC failed";
