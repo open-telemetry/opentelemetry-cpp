@@ -12,6 +12,7 @@ namespace sdk
 namespace common
 {
 
+// Returns the env variable set.
 inline const std::string GetEnvironmentVariable(const char *env_var_name)
 {
   const char *endpoint_from_env = nullptr;
