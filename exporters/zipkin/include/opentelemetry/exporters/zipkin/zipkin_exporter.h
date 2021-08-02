@@ -3,7 +3,6 @@
 
 #pragma once
 
-#include "opentelemetry/exporters/zipkin/recordable.h"
 #include "opentelemetry/ext/http/client/http_client_factory.h"
 #include "opentelemetry/ext/http/common/url_parser.h"
 #include "opentelemetry/sdk/trace/exporter.h"
@@ -40,6 +39,12 @@ inline const std::string GetDefaultZipkinEndpoint()
 #endif
   return std::string{endpoint_from_env ? endpoint_from_env : kZipkinEndpointDefault};
 }
+
+enum class TransportFormat
+{
+  kJson,
+  kProtobuf
+};
 
 /**
  * Struct to hold Zipkin  exporter options.
