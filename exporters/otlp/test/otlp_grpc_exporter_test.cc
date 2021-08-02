@@ -31,6 +31,10 @@
 
 #  include <gtest/gtest.h>
 
+#  if defined(_MSC_VER)
+#define putenv _putenv
+#  endif
+
 using namespace testing;
 
 OPENTELEMETRY_BEGIN_NAMESPACE
