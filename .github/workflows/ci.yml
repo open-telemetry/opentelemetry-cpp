@@ -40,7 +40,7 @@ jobs:
         ./ci/do_ci.sh cmake.abseil.test
 
   cmake_gcc_48_test:
-    name: CMake gcc 4.8
+    name: CMake gcc 4.8 (without otlp exporter)
     runs-on: ubuntu-18.04
     steps:
     - uses: actions/checkout@v2
@@ -55,6 +55,29 @@ jobs:
         sudo CC=/usr/bin/gcc-4.8 CXX=/usr/bin/g++-4.8 ./ci/setup_cmake.sh
     - name: run tests
       run: ./ci/do_ci.sh cmake.legacy.test
+      env:
+        CC: /usr/bin/gcc-4.8
+        CXX: /usr/bin/g++-4.8
+
+  cmake_gcc_48_otlp_exporter_test:
+    name: CMake gcc 4.8 (with otlp exporter)
+    runs-on: ubuntu-18.04
+    steps:
+    - uses: actions/checkout@v2
+      with:
+        submodules: 'recursive'
+    - name: setup
+      run: |
+        sudo ./ci/setup_ci_environment.sh
+        sudo ./ci/install_gcc48.sh
+    - name: setup cmake
+      run: |
+        sudo CC=/usr/bin/gcc-4.8 CXX=/usr/bin/g++-4.8 ./ci/setup_cmake.sh
+    - name: setup grpc
+      run: |
+        sudo CC=/usr/bin/gcc-4.8 CXX=/usr/bin/g++-4.8 ./ci/setup_grpc.sh -v 4.8
+    - name: run tests
+      run: ./ci/do_ci.sh cmake.legacy.exporter.otprotocol.test
       env:
         CC: /usr/bin/gcc-4.8
         CXX: /usr/bin/g++-4.8
