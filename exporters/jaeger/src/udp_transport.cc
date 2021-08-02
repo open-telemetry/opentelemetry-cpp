@@ -1,6 +1,9 @@
 // Copyright The OpenTelemetry Authors
 // SPDX-License-Identifier: Apache-2.0
 
+#include <sstream>  // std::stringstream
+
+#include "opentelemetry/sdk_config.h"
 #include "udp_transport.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
@@ -36,11 +39,11 @@ void UDPTransport::InitSocket()
   int err = WSAStartup(wVersionRequested, &wsaData);
   if (err != 0)
   {
-    // TODO: handle error
+    OTEL_INTERNAL_LOG_ERROR("Jaeger Exporter: WSAStartup failed with error: " << err);
     return;
   }
 
-  /* Confirm that the WinSock DLL supports 2.2.*/
+  /* Confirm that the WinSock DLL supports 2.2.        */
   /* Note that if the DLL supports versions greater    */
   /* than 2.2 in addition to 2.2, it will still return */
   /* 2.2 in wVersion since that is the version we      */
@@ -48,7 +51,9 @@ void UDPTransport::InitSocket()
 
   if (LOBYTE(wsaData.wVersion) != 2 || HIBYTE(wsaData.wVersion) != 2)
   {
-    // TODO: handle error that WinSock 2.2 is not supported.
+    OTEL_INTERNAL_LOG_ERROR("Jaeger Exporter: winsock " << LOBYTE(wsaData.wVersion) << "."
+                                                        << HIBYTE(wsaData.wVersion)
+                                                        << " is not supported.");
     WSACleanup();
 
     return;
@@ -63,7 +68,7 @@ void UDPTransport::CleanSocket()
 #endif
 }
 
-void UDPTransport::EmitBatch(const thrift::Batch &batch)
+int UDPTransport::EmitBatch(const thrift::Batch &batch)
 {
   try
   {
@@ -71,6 +76,8 @@ void UDPTransport::EmitBatch(const thrift::Batch &batch)
   }
   catch (...)
   {}
+
+  return static_cast<int>(batch.spans.size());
 }
 
 }  // namespace jaeger

@@ -16,6 +16,7 @@ Increment the:
 ## [Unreleased]
 
 * [BUILD] Allow to use local GSL
+* [EXPORTER] Jaeger Exporter - Add Thrift HTTP exporter ([#926](https://github.com/open-telemetry/opentelemetry-cpp/pull/926))
 
 ## [1.0.0-rc3] 2021-07-12
 
