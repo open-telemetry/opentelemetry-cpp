@@ -125,6 +125,8 @@ public:
 
   virtual void SetTimeoutMs(std::chrono::milliseconds timeout_ms) noexcept = 0;
 
+  virtual void IncludePermissionsFilePath(std::string filepath) noexcept = 0;
+
   virtual ~Request() = default;
 };
 

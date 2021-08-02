@@ -58,12 +58,20 @@ public:
     timeout_ms_ = timeout_ms;
   }
 
+  void IncludePermissionsFilePath(std::string filepath) noexcept override 
+  {
+    permissions_path_ = filepath;
+  }
+
+
 public:
   http_client::Method method_;
   http_client::Body body_;
   http_client::Headers headers_;
   std::string uri_;
   std::chrono::milliseconds timeout_ms_{5000};  // ms
+  std::string permissions_path_; 
+
 };
 
 class Response : public http_client::Response
@@ -138,7 +146,7 @@ public:
     auto callback_ptr  = &callback;
     curl_operation_.reset(new HttpOperation(
         http_request_->method_, url, callback_ptr, RequestMode::Async, http_request_->headers_,
-        http_request_->body_, false, http_request_->timeout_ms_));
+        http_request_->body_, false, http_request_->timeout_ms_, http_request_->permissions_path_));
     curl_operation_->SendAsync([this, callback_ptr](HttpOperation &operation) {
       if (operation.WasAborted())
       {

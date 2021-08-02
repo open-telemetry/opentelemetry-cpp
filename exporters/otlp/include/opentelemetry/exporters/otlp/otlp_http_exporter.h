@@ -68,6 +68,9 @@ struct OtlpHttpExporterOptions
 
   // TODO: Enable/disable to verify SSL certificate
   std::chrono::milliseconds timeout = std::chrono::milliseconds(30000);
+
+  // filepath of the sll certifcate, this is empty if there is none. 
+  std::string sslCertPath;
 };
 
 /**

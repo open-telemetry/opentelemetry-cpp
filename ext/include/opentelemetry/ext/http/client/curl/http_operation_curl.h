@@ -78,7 +78,8 @@ public:
                 const http_client::Body &request_body       = http_client::Body(),
                 // Default connectivity and response size options
                 bool is_raw_response                        = false,
-                std::chrono::milliseconds http_conn_timeout = default_http_conn_timeout)
+                std::chrono::milliseconds http_conn_timeout = default_http_conn_timeout, 
+                std::string ssl_cert_path = "")
       : is_aborted_(false),
         is_finished_(false),
         // Optional connection params
@@ -111,9 +112,16 @@ public:
     // Specify target URL
     curl_easy_setopt(curl_, CURLOPT_URL, url_.c_str());
 
-    // TODO: support ssl cert verification for https request
-    curl_easy_setopt(curl_, CURLOPT_SSL_VERIFYPEER, 0);  // 1L
-    curl_easy_setopt(curl_, CURLOPT_SSL_VERIFYHOST, 0);  // 2L
+    if (ssl_cert_path.empty()){
+      curl_easy_setopt(curl_, CURLOPT_SSL_VERIFYPEER, 0);
+      curl_easy_setopt(curl_, CURLOPT_SSL_VERIFYHOST, 0);  // 2L
+    } else {
+      curl_easy_setopt(curl_, CURLOPT_CAPATH, ssl_cert_path.c_str());
+      curl_easy_setopt(curl_, CURLOPT_SSL_VERIFYPEER, 1);
+    }
+
+    curl_easy_setopt(curl_, CURLOPT_POSTFIELDSIZE, request_body.size());
+
 
     // Specify our custom headers
     for (auto &kv : this->request_headers_)

@@ -634,6 +634,7 @@ sdk::common::ExportResult OtlpHttpExporter::Export(
   request->SetMethod(http_client::Method::Post);
   request->SetBody(body_vec);
   request->AddHeader("Content-Type", content_type);
+  request->IncludePermissionsFilePath(options_.sslCertPath);
 
   // Send the request
   std::unique_ptr<ResponseHandler> handler(new ResponseHandler(options_.console_debug));

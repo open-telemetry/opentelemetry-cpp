@@ -195,7 +195,41 @@ CURL_COPTS = select({
         "/DUSE_IPV6",
         "/DUSE_WINDOWS_SSPI",
         "/DUSE_SCHANNEL",
+        # for https 
+        "/Iexternal/curl/lib",
+        "/DBUILDING_LIBCURL",
+        "/DHAVE_CONFIG_H",
+        "/DCURL_DISABLE_FTP",
+        "/DCURL_DISABLE_NTLM",
+        "/DCURL_DISABLE_PROXY",
+        "/DHAVE_LIBZ",
+        "/DHAVE_ZLIB_H",
+        # Defining _USING_V110_SDK71_ is hackery to defeat curl's incorrect
+        # detection of what OS releases we can build on with VC 2012. This
+        # may not be needed (or may have to change) if the WINVER setting
+        # changes in //third_party/msvc/vc_12_0/CROSSTOOL.
+        "/D_USING_V110_SDK71_",
     ],
-    "//:osx": BASE_CURL_COPTS,
-    "//conditions:default": BASE_CURL_COPTS + LINUX_CURL_COPTS,
+    "//:osx": BASE_CURL_COPTS + [
+        "-Iexternal/curl/lib",
+        "-D_GNU_SOURCE",
+        "-DBUILDING_LIBCURL",
+        "-DHAVE_CONFIG_H",
+        "-DCURL_DISABLE_FTP",
+        "-DCURL_DISABLE_NTLM",  # turning it off in configure is not enough
+        "-DHAVE_LIBZ",
+        "-DHAVE_ZLIB_H",
+        "-Wno-string-plus-int",
+    ],
+    "//conditions:default": BASE_CURL_COPTS + LINUX_CURL_COPTS + [
+        "-Iexternal/curl/lib",
+        "-D_GNU_SOURCE",
+        "-DBUILDING_LIBCURL",
+        "-DHAVE_CONFIG_H",
+        "-DCURL_DISABLE_FTP",
+        "-DCURL_DISABLE_NTLM",  # turning it off in configure is not enough
+        "-DHAVE_LIBZ",
+        "-DHAVE_ZLIB_H",
+        "-Wno-string-plus-int",
+    ],
 })
