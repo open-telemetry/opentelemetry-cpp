@@ -11,26 +11,56 @@
 
 #include "opentelemetry/sdk/trace/exporter.h"
 
+#include "opentelemetry/sdk/common/env_variables.h"
+
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace exporter
 {
 namespace otlp
 {
+
+inline const std::string GetOtlpGrpcDefaultEndpoint()
+{
+  constexpr char kOtlpGrpcEndpointEnv[]     = "OTEL_EXPORTER_OTLP_GRPC_ENDPOINT";
+  constexpr char kOtlpGrpcEndpointDefault[] = "localhost:4317";
+
+  auto endpoint = opentelemetry::sdk::common::GetEnvironmentVariable(kOtlpGrpcEndpointEnv);
+  return endpoint.size() ? endpoint : kOtlpGrpcEndpointDefault;
+}
+
+inline const bool GetOtlpGrpcDefaultIsSslEnable()
+{
+  constexpr char kOtlpGrpcIsSslEnableEnv[] = "OTEL_EXPORTER_OTLP_GRPC_SSL_ENABLE";
+  auto ssl_enable = opentelemetry::sdk::common::GetEnvironmentVariable(kOtlpGrpcIsSslEnableEnv);
+  if (ssl_enable == "True" || ssl_enable == "TRUE" || ssl_enable == "true" || ssl_enable == "1")
+  {
+    return true;
+  }
+  return false;
+}
+
+inline const std::string GetOtlpGrpcDefaultSslCertificate()
+{
+  constexpr char kOtlpGrpcSslCertificate[] = "OTEL_EXPORTER_OTLP_GRPC_SSL_CERTIFICATE";
+  auto ssl_cert = opentelemetry::sdk::common::GetEnvironmentVariable(kOtlpGrpcSslCertificate);
+  return ssl_cert.size() ? ssl_cert : "";
+}
+
 /**
  * Struct to hold OTLP exporter options.
  */
 struct OtlpGrpcExporterOptions
 {
   // The endpoint to export to. By default the OpenTelemetry Collector's default endpoint.
-  std::string endpoint = "localhost:4317";
+  std::string endpoint = GetOtlpGrpcDefaultEndpoint();
   // By default when false, uses grpc::InsecureChannelCredentials(); If true,
   // uses ssl_credentials_cacert_path if non-empty, else uses ssl_credentials_cacert_as_string
-  bool use_ssl_credentials = false;
+  bool use_ssl_credentials = GetOtlpGrpcDefaultIsSslEnable();
   // ssl_credentials_cacert_path specifies path to .pem file to be used for SSL encryption.
   std::string ssl_credentials_cacert_path = "";
   // ssl_credentials_cacert_as_string in-memory string representation of .pem file to be used for
   // SSL encryption.
-  std::string ssl_credentials_cacert_as_string = "";
+  std::string ssl_credentials_cacert_as_string = GetOtlpGrpcDefaultSslCertificate();
 };
 
 /**
