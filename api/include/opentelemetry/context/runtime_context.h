@@ -294,7 +294,8 @@ private:
         }
         delete[] base_;
       }
-      base_ = temp;
+      base_     = temp;
+      capacity_ = new_capacity;
     }
 
     ~Stack() noexcept { delete[] base_; }
