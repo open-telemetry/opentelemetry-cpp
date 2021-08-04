@@ -50,7 +50,7 @@ struct OtlpHttpExporterOptions
   // @see
   // https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/protocol/otlp.md
   // @see https://github.com/open-telemetry/opentelemetry-collector/tree/main/receiver/otlpreceiver
-  std::string url = std::string("http://localhost:4317") + kDefaultTracePath;
+  std::string url = std::string("http://localhost:4318") + kDefaultTracePath;
 
   // By default, post json data
   HttpRequestContentType content_type = HttpRequestContentType::kJson;
