@@ -18,7 +18,7 @@ Increment the:
 ## [1.0.0-rc4] 2021-08-04
 
 * [EXPORTER] `BREAKING CHANGE` Fix default HTTP port for OTLP HTTP Exporter ([#939](https://github.com/open-telemetry/opentelemetry-cpp/pull/939))
-* [API] Fix timeout calculation fot Tracer::Flush() and Tracer::Close() ([#937](https://github.com/open-telemetry/opentelemetry-cpp/pull/937))
+* [API] Fix timeout calculation for Tracer::Flush() and Tracer::Close() ([#937](https://github.com/open-telemetry/opentelemetry-cpp/pull/937))
 * [API] Fix for Stack::Resize that new_capacity is not assigned to capacity_  ([#934](https://github.com/open-telemetry/opentelemetry-cpp/pull/934))
 * [SDK] Fix race condition in circular buffer simulation test ([#931](https://github.com/open-telemetry/opentelemetry-cpp/pull/931))
 * [EXPORTER] Fix error logging in Jaeger Exporter ([#930](https://github.com/open-telemetry/opentelemetry-cpp/pull/930))
