@@ -14,6 +14,8 @@ Increment the:
 * PATCH version when you make backwards compatible bug fixes.
 
 ## [Unreleased]
+ 
+## [1.0.0-rc4] 2021-08-04
 
 * [BUILD] Allow to use local GSL
 
