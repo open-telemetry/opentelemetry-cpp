@@ -15,8 +15,27 @@ Increment the:
 
 ## [Unreleased]
 
-* [BUILD] Allow to use local GSL
-* [EXPORTER] Jaeger Exporter - Add Thrift HTTP exporter ([#926](https://github.com/open-telemetry/opentelemetry-cpp/pull/926))
+## [1.0.0-rc4] 2021-08-04
+
+* [EXPORTER] `BREAKING CHANGE` Fix default HTTP port for OTLP HTTP Exporter ([#939](https://github.com/open-telemetry/opentelemetry-cpp/pull/939))
+* [API] Fix timeout calculation for Tracer::Flush() and Tracer::Close() ([#937](https://github.com/open-telemetry/opentelemetry-cpp/pull/937))
+* [API] Fix for Stack::Resize that new_capacity is not assigned to capacity_  ([#934](https://github.com/open-telemetry/opentelemetry-cpp/pull/934))
+* [SDK] Fix race condition in circular buffer simulation test ([#931](https://github.com/open-telemetry/opentelemetry-cpp/pull/931))
+* [EXPORTER] Fix error logging in Jaeger Exporter ([#930](https://github.com/open-telemetry/opentelemetry-cpp/pull/930))
+* [BUILD] Use latest grpc version (v1.39.0) for cmake build of otlp exporter ([#927](https://github.com/open-telemetry/opentelemetry-cpp/pull/927))
+* [EXPORTER] Add Jaeger Thrift HTTP exporter ([#926](https://github.com/open-telemetry/opentelemetry-cpp/pull/926))
+* [SDK] Move env-var read logic to common dir, and optional reading of env-var ([#924](https://github.com/open-telemetry/opentelemetry-cpp/pull/924))
+* [EXPORTER] Remove recordable header from CMake install rules for exporters ([#923](https://github.com/open-telemetry/opentelemetry-cpp/pull/923))
+* [EXPORTER] `BREAKING CHANGE` Rename Recordable to JaegerRecordable in Jaeger exporter ([#919](https://github.com/open-telemetry/opentelemetry-cpp/pull/919))
+* [EXPORTER] `BREAKING CHANGE` Rename Jaeger exporter target ([#918](https://github.com/open-telemetry/opentelemetry-cpp/pull/918))
+* [EXPORTER] Add Zipkin exporter example ([#917](https://github.com/open-telemetry/opentelemetry-cpp/pull/917))
+* [EXPORTER] Bazel build for Zipkin exorter ([#916](https://github.com/open-telemetry/opentelemetry-cpp/pull/916))
+* [BUILD] Allow to use local GSL ([#915](https://github.com/open-telemetry/opentelemetry-cpp/pull/915))
+* [DOCS] Document vcpkg toolchain configuration ([#913](https://github.com/open-telemetry/opentelemetry-cpp/pull/913))
+* [SDK] Fix for resource deletion after tracer provider shutdown ([#911](https://github.com/open-telemetry/opentelemetry-cpp/pull/911))
+* [BUILD] Add bazel build for grpc example ([#910](https://github.com/open-telemetry/opentelemetry-cpp/pull/910))
+* [EXPORTER] Add resource and instrumentation library support for OStreamSpanExporter ([#906](https://github.com/open-telemetry/opentelemetry-cpp/pull/906))
+* [API] Adding semantic-convention attributes for trace ([#868](https://github.com/open-telemetry/opentelemetry-cpp/pull/868))
 
 ## [1.0.0-rc3] 2021-07-12
 
