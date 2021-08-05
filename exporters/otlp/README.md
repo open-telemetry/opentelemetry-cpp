@@ -44,10 +44,9 @@ auto exporter = std::unique_ptr<sdktrace::SpanExporter>(new otlp::OtlpHttpExport
 
 ### Configuration options
 
-| Option                               | Default          |
-| ------------------------------------ |----------------- |
-| `OtlpGrpcExporterOptions.endpoint`   | `localhost:4317` |
-| `OtlpHttpExporterOptions.endpoint`   | `localhost:4318` |
+| Option       | Default          |
+| ------------ |----------------- |
+| `endpoint`   | `localhost:4317` |
 
 ## Example
 
