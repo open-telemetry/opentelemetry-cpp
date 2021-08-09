@@ -152,10 +152,12 @@ TracerProvider
 `TracerProvider` instance holds the SDK configurations ( Span Processors, Samplers, Resource). There is single 
 global TracerProvider instance for an application, and it is created at the start of application.
 There are two different mechanisms to create TraceProvider instance
+
 - Using constructor which takes already created TracerContext shared object as parameter
 - Using consructor which takes SDK configurations as parameter.
 
 .. code:: cpp
+
     // Created using `TracerContext` instance
     auto tracer_provider = sdktrace::TracerProvider(tracer_context);
 
@@ -177,7 +179,9 @@ The logging macro supports logging using C++ stream format, and key-value pair.
 The log handler is meant to capture errors and warnings arising from SDK, not supposed to be used for the application errors.
 The different log levels are supported - Error, Warn, Info and Debug. The default log level is Warn ( to dump both Error and Warn) 
 and it can be changed at compile time.
+
 .. code:: cpp
+
     OTEL_INTERNAL_LOG_ERROR
             (" Connection failed. Error string " << error_str << " Error Num: " << errorno);
     OTEL_INTERNAL_LOG_ERROR
@@ -188,6 +192,7 @@ and it can be changed at compile time.
 The custom log handler can be defined by inheriting from `sdk::common::internal_log::LogHandler` class.
 
 .. code:: cpp
+
     class CustomLogHandler : public sdk::common::internal_log::LogHandler
     {
         void Handle(Loglevel level, 
