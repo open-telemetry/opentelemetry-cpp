@@ -139,8 +139,65 @@ Opentelemetry C++ SDK  offers four samplers out of the box:
 TracerContext
 ^^^^^^^^^^^^^
 
-SDK configuration are shared between `TracerProvider` and all the `Tracer` instances created through `TracerContext`.
+SDK configuration are shared between `TracerProvider` and all it's `Tracer` instances through `TracerContext`.
 
 .. code:: cpp
 
-    auto tracer_context =
+    auto tracer_context = std::make_shared<sdktrace::TracerContext>
+        (std::move(multi_processor), resource, std::move(always_on_sampler));
+
+TracerProvider
+^^^^^^^^^^^^^^
+
+`TracerProvider` instance holds the SDK configurations ( Span Processors, Samplers, Resource). There is single 
+global TracerProvider instance for an application, and it is created at the start of application.
+There are two different mechanisms to create TraceProvider instance
+- Using constructor which takes already created TracerContext shared object as parameter
+- Using consructor which takes SDK configurations as parameter.
+
+.. code:: cpp
+    // Created using `TracerContext` instance
+    auto tracer_provider = sdktrace::TracerProvider(tracer_context);
+
+    // Create using SDK configurations as parameter
+    auto tracer_provider = 
+        sdktrace::TracerProvider(std::move(simple_processor), resource, std::move(always_on_sampler));
+
+    // set the global tracer TraceProvider
+    opentelemetry::trace::Provider::SetTracerProvider(provider);
+
+
+Logging and Error Handling 
+^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Opentelemetry C++ SDK provides mechanism for application owner to add customer log and error handler. 
+The default log handler is redirected to standard output ( using std::cout ).
+
+The logging macro supports logging using C++ stream format, and key-value pair. 
+The log handler is meant to capture errors and warnings arising from SDK, not supposed to be used for the application errors.
+The different log levels are supported - Error, Warn, Info and Debug. The default log level is Warn ( to dump both Error and Warn) 
+and it can be changed at compile time.
+.. code:: cpp
+    OTEL_INTERNAL_LOG_ERROR
+            (" Connection failed. Error string " << error_str << " Error Num: " << errorno);
+    OTEL_INTERNAL_LOG_ERROR
+            (" Connection failed." , {{"error message: " : error_str},{"error number": errorno}});
+    OTEL_INTERNAL_LOG_DEBUG
+            (" Connection Established Successfully. Headers:", {{"url", url},{"content-length", len}, {"content-type", type}});
+
+The custom log handler can be defined by inheriting from `sdk::common::internal_log::LogHandler` class.
+
+.. code:: cpp
+    class CustomLogHandler : public sdk::common::internal_log::LogHandler
+    {
+        void Handle(Loglevel level, 
+                    const char \*file, 
+                    int line, 
+                    const char \*msg,
+                    const sdk::common::AttributeMap &attributes)
+        
+        {
+            // add implementation here
+        } 
+    };
+    sdk::common::internal_log::GlobalLogHandler::SetLogHandler(CustomLogHandler());
