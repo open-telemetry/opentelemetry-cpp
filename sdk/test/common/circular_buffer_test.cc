@@ -59,12 +59,11 @@ void RunNumberConsumer(CircularBuffer<uint32_t> &buffer,
 {
   while (true)
   {
-    auto allotment = buffer.Peek();
-    if (exit && allotment.empty())
+    if (exit && buffer.Peek().empty())
     {
       return;
     }
-    auto n = std::uniform_int_distribution<size_t>{0, allotment.size()}(RandomNumberGenerator);
+    auto n = std::uniform_int_distribution<size_t>{0, buffer.Peek().size()}(RandomNumberGenerator);
     buffer.Consume(n, [&](CircularBufferRange<AtomicUniquePtr<uint32_t>> range) noexcept {
       assert(range.size() == n);
       range.ForEach([&](AtomicUniquePtr<uint32_t> &ptr) noexcept {
