@@ -21,6 +21,9 @@ OpenTelemetry offers six tracing exporters out of the box:
 
 .. code:: cpp
 
+    //namespace alias used in sample code here.
+    namespace sdktrace   = opentelemetry::sdk::trace;
+
     // logging exporter
     auto ostream_exporter =
         std::unique_ptr<sdktrace::SpanExporter>(new opentelemetry::exporter::trace::OStreamSpanExporter);
