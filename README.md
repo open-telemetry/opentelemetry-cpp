@@ -78,7 +78,6 @@ Approvers
 * [Josh Suereth](https://github.com/jsuereth), Google
 * [Max Golovanov](https://github.com/maxgolov), Microsoft
 * [Ryan Burn](https://github.com/rnburn), Lightstep
-* [Tom Tan](https://github.com/ThomsonTan), Microsoft
 
 *Find more about the approver role in [community
 repository](https://github.com/open-telemetry/community/blob/main/community-membership.md#approver).*
@@ -89,6 +88,7 @@ Maintainers
 * [Emil Mikulic](https://github.com/g-easy), Google
 * [Lalit Kumar Bhasin](https://github.com/lalitb), Microsoft
 * [Reiley Yang](https://github.com/reyang), Microsoft
+* [Tom Tan](https://github.com/ThomsonTan), Microsoft
 
 *Find more about the maintainer role in [community
 repository](https://github.com/open-telemetry/community/blob/main/community-membership.md#maintainer).*

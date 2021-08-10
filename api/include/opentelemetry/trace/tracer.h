@@ -170,8 +170,8 @@ public:
   template <class Rep, class Period>
   void ForceFlush(std::chrono::duration<Rep, Period> timeout) noexcept
   {
-    this->ForceFlushWithMicroseconds(
-        static_cast<uint64_t>(std::chrono::duration_cast<std::chrono::microseconds>(timeout)));
+    this->ForceFlushWithMicroseconds(static_cast<uint64_t>(
+        std::chrono::duration_cast<std::chrono::microseconds>(timeout).count()));
   }
 
   virtual void ForceFlushWithMicroseconds(uint64_t timeout) noexcept = 0;
@@ -183,8 +183,8 @@ public:
   template <class Rep, class Period>
   void Close(std::chrono::duration<Rep, Period> timeout) noexcept
   {
-    this->CloseWithMicroseconds(
-        static_cast<uint64_t>(std::chrono::duration_cast<std::chrono::microseconds>(timeout)));
+    this->CloseWithMicroseconds(static_cast<uint64_t>(
+        std::chrono::duration_cast<std::chrono::microseconds>(timeout).count()));
   }
 
   virtual void CloseWithMicroseconds(uint64_t timeout) noexcept = 0;
