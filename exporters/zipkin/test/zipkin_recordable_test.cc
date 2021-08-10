@@ -44,11 +44,10 @@ TEST(ZipkinSpanRecordable, SetIdentity)
 }
 
 // according to https://zipkin.io/zipkin-api/#/ in case root span is created
-// the parentId filed should be absent. 
+// the parentId filed should be absent.
 TEST(ZipkinSpanRecordable, SetIdentityEmptyParent)
 {
-  json j_span = {{"id", "0000000000000002"},
-                 {"traceId", "00000000000000000000000000000001"}};
+  json j_span = {{"id", "0000000000000002"}, {"traceId", "00000000000000000000000000000001"}};
   opentelemetry::exporter::zipkin::Recordable rec;
   const trace::TraceId trace_id(std::array<const uint8_t, trace::TraceId::kSize>(
       {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1}));
