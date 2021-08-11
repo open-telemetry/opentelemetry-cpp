@@ -35,11 +35,15 @@ void Recordable::SetIdentity(const opentelemetry::trace::SpanContext &span_conte
   span_context.trace_id().ToLowerBase16(trace_id_lower_base16);
   char span_id_lower_base16[trace::SpanId::kSize * 2] = {0};
   span_context.span_id().ToLowerBase16(span_id_lower_base16);
-  char parent_span_id_lower_base16[trace::SpanId::kSize * 2] = {0};
-  parent_span_id.ToLowerBase16(parent_span_id_lower_base16);
-  span_["id"]       = std::string(span_id_lower_base16, 16);
-  span_["parentId"] = std::string(parent_span_id_lower_base16, 16);
-  span_["traceId"]  = std::string(trace_id_lower_base16, 32);
+  if (parent_span_id.IsValid())
+  {
+    char parent_span_id_lower_base16[trace::SpanId::kSize * 2] = {0};
+    parent_span_id.ToLowerBase16(parent_span_id_lower_base16);
+    span_["parentId"] = std::string(parent_span_id_lower_base16, 16);
+  }
+
+  span_["id"]      = std::string(span_id_lower_base16, 16);
+  span_["traceId"] = std::string(trace_id_lower_base16, 32);
 }
 
 void PopulateAttribute(nlohmann::json &attribute,

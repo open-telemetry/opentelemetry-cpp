@@ -43,6 +43,29 @@ TEST(ZipkinSpanRecordable, SetIdentity)
   EXPECT_EQ(rec.span(), j_span);
 }
 
+// according to https://zipkin.io/zipkin-api/#/ in case root span is created
+// the parentId filed should be absent.
+TEST(ZipkinSpanRecordable, SetIdentityEmptyParent)
+{
+  json j_span = {{"id", "0000000000000002"}, {"traceId", "00000000000000000000000000000001"}};
+  opentelemetry::exporter::zipkin::Recordable rec;
+  const trace::TraceId trace_id(std::array<const uint8_t, trace::TraceId::kSize>(
+      {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1}));
+
+  const trace::SpanId span_id(
+      std::array<const uint8_t, trace::SpanId::kSize>({0, 0, 0, 0, 0, 0, 0, 2}));
+
+  const trace::SpanId parent_span_id(
+      std::array<const uint8_t, trace::SpanId::kSize>({0, 0, 0, 0, 0, 0, 0, 0}));
+
+  const opentelemetry::trace::SpanContext span_context{
+      trace_id, span_id,
+      opentelemetry::trace::TraceFlags{opentelemetry::trace::TraceFlags::kIsSampled}, true};
+
+  rec.SetIdentity(span_context, parent_span_id);
+  EXPECT_EQ(rec.span(), j_span);
+}
+
 TEST(ZipkinSpanRecordable, SetName)
 {
   nostd::string_view name = "Test Span";
