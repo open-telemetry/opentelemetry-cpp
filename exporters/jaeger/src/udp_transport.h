@@ -27,7 +27,6 @@ using TBinaryProtocol    = apache::thrift::protocol::TBinaryProtocol;
 using TCompactProtocol   = apache::thrift::protocol::TCompactProtocol;
 using TBufferedTransport = apache::thrift::transport::TBufferedTransport;
 using TProtocol          = apache::thrift::protocol::TProtocol;
-using TSocket            = apache::thrift::transport::TSocket;
 using TTransport         = apache::thrift::transport::TTransport;
 
 class UDPTransport : public Transport
@@ -38,7 +37,7 @@ public:
   UDPTransport(const std::string &addr, uint16_t port);
   virtual ~UDPTransport();
 
-  void EmitBatch(const thrift::Batch &batch) override;
+  int EmitBatch(const thrift::Batch &batch) override;
 
   uint32_t MaxPacketSize() const override { return max_packet_size_; }
 

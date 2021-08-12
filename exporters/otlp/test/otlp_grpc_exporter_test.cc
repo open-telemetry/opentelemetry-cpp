@@ -31,6 +31,10 @@
 
 #  include <gtest/gtest.h>
 
+#  if defined(_MSC_VER)
+#    define putenv _putenv
+#  endif
+
 using namespace testing;
 
 OPENTELEMETRY_BEGIN_NAMESPACE
@@ -129,6 +133,38 @@ TEST_F(OtlpGrpcExporterTestPeer, ConfigSslCredentialsTest)
   EXPECT_EQ(GetOptions(exporter).ssl_credentials_cacert_as_string, cacert_str);
   EXPECT_EQ(GetOptions(exporter).use_ssl_credentials, true);
 }
+
+#  ifndef NO_GETENV
+// Test exporter configuration options with use_ssl_credentials
+TEST_F(OtlpGrpcExporterTestPeer, ConfigFromEnv)
+{
+  const std::string cacert_str = "--begin and end fake cert--";
+  const std::string cacert_env = "OTEL_EXPORTER_OTLP_GRPC_SSL_CERTIFICATE=" + cacert_str;
+  putenv(const_cast<char *>(cacert_env.data()));
+  char ssl_enable_env[] = "OTEL_EXPORTER_OTLP_GRPC_SSL_ENABLE=True";
+  putenv(ssl_enable_env);
+  const std::string endpoint     = "http://localhost:9999";
+  const std::string endpoint_env = "OTEL_EXPORTER_OTLP_GRPC_ENDPOINT=" + endpoint;
+  putenv(const_cast<char *>(endpoint_env.data()));
+
+  std::unique_ptr<OtlpGrpcExporter> exporter(new OtlpGrpcExporter());
+  EXPECT_EQ(GetOptions(exporter).ssl_credentials_cacert_as_string, cacert_str);
+  EXPECT_EQ(GetOptions(exporter).use_ssl_credentials, true);
+  EXPECT_EQ(GetOptions(exporter).endpoint, endpoint);
+#    if defined(_MSC_VER)
+  putenv("OTEL_EXPORTER_OTLP_GRPC_ENDPOINT=");
+  putenv("OTEL_EXPORTER_OTLP_GRPC_SSL_CERTIFICATE=");
+  putenv("OTEL_EXPORTER_OTLP_GRPC_SSL_ENABLE=");
+
+#    else
+  unsetenv("OTEL_EXPORTER_OTLP_GRPC_ENDPOINT");
+  unsetenv("OTEL_EXPORTER_OTLP_GRPC_SSL_CERTIFICATE");
+  unsetenv("OTEL_EXPORTER_OTLP_GRPC_SSL_ENABLE");
+
+#    endif
+}
+#  endif
+
 }  // namespace otlp
 }  // namespace exporter
 OPENTELEMETRY_END_NAMESPACE
