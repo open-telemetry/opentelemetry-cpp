@@ -8,6 +8,25 @@ Status](https://github.com/open-telemetry/opentelemetry-cpp/actions/workflows/ci
 
 The C++ [OpenTelemetry](https://opentelemetry.io/) client.
 
+## Project Status
+
+| Signal  | Status                 | Project                                                                  |
+| ------- | ---------------------- | ------------------------------------------------------------------------ |
+| Traces  | Release Candidate      | [1.0.0](https://github.com/open-telemetry/opentelemetry-cpp/milestone/9) |
+| Metrics | Development paused [1] | N/A                                                                      |
+| Logs    | Experimental [2]       | N/A                                                                      |
+
+* [1]: The development of the metrics API and SDK has paused due to limited development resources, prioritization of a stable Traces release, and waiting for availability of stable Metrics ( API + SDK ) design from the OpenTelemetry specification. The current implementation can be included in build by setting `ENABLE_METRICS_PREVIEW` preprocessor macro.
+* [2]: The current Log Signal Implementation is Experimental, and will change as the current OpenTelemetry Log specification matures. The current implementation can be included in build by setting `DENABLE_LOGS_PREVIEW` preprocessor macro.
+  
+## OpenTelemetry Specification Compatibility Matrix
+
+| API Version | Core version | Contrib Version         |
+| ----------- |--------------|-------------------------|
+| 1.0.0       | 1.0.0-rc4    | N/A [1]                 |
+
+* [1]: We don't have releases for opentelemetry-cpp contrib repo. This may change in future.
+
 ## Supported C++ Versions
 
 Code shipped from this repository generally supports the following versions of
