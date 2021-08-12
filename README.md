@@ -17,7 +17,7 @@ The C++ [OpenTelemetry](https://opentelemetry.io/) client.
 | Logs    | Experimental [2]       | N/A                                                                      |
 
 * [1]: The development of the metrics API and SDK has paused due to limited development resources, prioritization of a stable Traces release, and waiting for availability of stable Metrics ( API + SDK ) design from the OpenTelemetry specification. The current implementation can be included in build by setting `ENABLE_METRICS_PREVIEW` preprocessor macro.
-* [2]: The current Log Signal Implementation is Experimental, and will change as the current OpenTelemetry Log specification matures. The current implementation can be included in build by setting `DENABLE_LOGS_PREVIEW` preprocessor macro.
+* [2]: The current Log Signal Implementation is Experimental, and will change as the current OpenTelemetry Log specification matures. The current implementation can be included in build by setting `ENABLE_LOGS_PREVIEW` preprocessor macro.
 
 ## OpenTelemetry Specification Compatibility Matrix
 
