@@ -128,29 +128,31 @@ jobs:
     - name: run tests
       run: ./ci/do_ci.sh cmake.test_example_plugin
 
-  bazel_gcc_48_test:
-    name: Bazel gcc 4.8
-    runs-on: ubuntu-18.04
-    steps:
-    - uses: actions/checkout@v2
-      with:
-        submodules: 'recursive'
-    - name: Mount Bazel Cache
-      uses: actions/cache@v2
-      env:
-        cache-name: bazel_cache
-      with:
-        path: /home/runner/.cache/bazel
-        key: bazel_gcc_48_test
-    - name: setup
-      run: |
-        sudo ./ci/setup_ci_environment.sh
-        sudo ./ci/install_bazelisk.sh
-        sudo ./ci/install_gcc48.sh
-    - name: run tests
-      run: ./ci/do_ci.sh bazel.legacy.test
-      env:
-        CC: /usr/bin/gcc-4.8
+  # bazel build is disabled for gcc 4.8 compiler as grpc lib
+  # used for otlp exporter doesn't work with gcc4.8
+  #bazel_gcc_48_test:
+  #  name: Bazel gcc 4.8
+  #  runs-on: ubuntu-18.04
+  #  steps:
+  #  - uses: actions/checkout@v2
+  #    with:
+  #      submodules: 'recursive'
+  #  - name: Mount Bazel Cache
+  #    uses: actions/cache@v2
+  #    env:
+  #      cache-name: bazel_cache
+  #    with:
+  #      path: /home/runner/.cache/bazel
+  #      key: bazel_gcc_48_test
+  #  - name: setup
+  #    run: |
+  #      sudo ./ci/setup_ci_environment.sh
+  #      sudo ./ci/install_bazelisk.sh
+  #      sudo ./ci/install_gcc48.sh
+  #  - name: run tests
+  #    run: ./ci/do_ci.sh bazel.legacy.test
+  #    env:
+  #      CC: /usr/bin/gcc-4.8
 
   bazel_test:
     name: Bazel
