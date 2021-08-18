@@ -24,5 +24,4 @@ common:tsan --cc_output_directory_tag=tsan
 common:tsan --test_env=TSAN_OPTIONS=report_atomic_races=0
 
 # https://github.com/bazelbuild/bazel/issues/4341
-build:macos --features=-supports_dynamic_linker
-
+# build:macos --features=-supports_dynamic_linker
