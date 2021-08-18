@@ -274,7 +274,7 @@ jobs:
         path: /Users/runner/.cache/bazel
         key: bazel_osx
     - name: run tests
-      run: ./ci/do_ci.sh bazel.test
+      run: ./ci/do_ci.sh bazel.macos.test
 
   benchmark:
     name: Benchmark
