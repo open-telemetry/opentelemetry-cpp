@@ -374,7 +374,7 @@ endif()
 # config file for find_packages(opentelemetry-cpp CONFIG)
 set(INCLUDE_INSTALL_DIR "${CMAKE_INSTALL_INCLUDEDIR}")
 configure_package_config_file(
-  "${CMAKE_CURRENT_LIST_DIR}/opentelemetry-cpp-config.cmake.in"
+  "${CMAKE_CURRENT_LIST_DIR}/cmake/opentelemetry-cpp-config.cmake.in"
   "${CMAKE_CURRENT_BINARY_DIR}/cmake/${PROJECT_NAME}/${PROJECT_NAME}-config.cmake"
   INSTALL_DESTINATION "${CMAKE_INSTALL_LIBDIR}/cmake/${PROJECT_NAME}"
   PATH_VARS OPENTELEMETRY_ABI_VERSION_NO OPENTELEMETRY_VERSION PROJECT_NAME
