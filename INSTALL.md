@@ -133,6 +133,8 @@ target_link_libraries(foo PRIVATE ${OPENTELEMETRY_CPP_LIBRARIES})
 
 ## Build instructions using Bazel
 
+NOTE: Experimental, and not supported for all the components.
+
 ### Prerequisites for Bazel
 
 - A supported platform (e.g. Windows, macOS or Linux).
