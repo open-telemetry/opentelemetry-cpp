@@ -12,7 +12,7 @@ namespace trace
 {
 
 /**
- * DefaultSpan provides a non-operational Span that propogates
+ * DefaultSpan provides a non-operational Span that propagates
  * the tracer context by wrapping it inside the Span object.
  */
 
