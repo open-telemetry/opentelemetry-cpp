@@ -12,8 +12,8 @@ namespace trace
 {
 
 /**
- * Defaultspan provides a non-operational Span that propogates
- * the tracer context by wrapping inside the Span object.
+ * DefaultSpan provides a non-operational Span that propogates
+ * the tracer context by wrapping it inside the Span object.
  */
 
 class DefaultSpan : public Span
