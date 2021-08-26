@@ -100,6 +100,11 @@ TEST(OtlpRecordable, SetStatus)
 
   EXPECT_EQ(rec.span().status().code(), opentelemetry::proto::trace::v1::Status_StatusCode(code));
   EXPECT_EQ(rec.span().status().message(), description);
+
+  trace::StatusCode code_ok(trace::StatusCode::kOk);
+  rec.SetStatus(code, description);
+  EXPECT_EQ(rec.span().status().code(), opentelemetry::proto::trace::v1::Status_StatusCode(code));
+  EXPECT_EQ(rec.span().status().message(), "");
 }
 
 TEST(OtlpRecordable, AddEventDefault)
