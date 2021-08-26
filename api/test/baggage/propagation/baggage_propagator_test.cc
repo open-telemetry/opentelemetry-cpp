@@ -1,8 +1,8 @@
 #include "opentelemetry/baggage/propagation/baggage_propagator.h"
-#include "opentelemetry/baggage/baggage_context.h"
 #include <gtest/gtest.h>
 #include <map>
 #include <string>
+#include "opentelemetry/baggage/baggage_context.h"
 
 using namespace opentelemetry;
 using namespace opentelemetry::baggage::propagation;
@@ -62,8 +62,8 @@ TEST(BaggagePropagatorTest, ExtractAndInjectBaggage)
   {
     BaggageCarrierTest carrier1;
     carrier1.headers_[baggage::kBaggageHeader.data()] = baggage.first;
-    context::Context ctx1                    = context::Context{};
-    context::Context ctx2                    = format.Extract(carrier1, ctx1);
+    context::Context ctx1                             = context::Context{};
+    context::Context ctx2                             = format.Extract(carrier1, ctx1);
 
     BaggageCarrierTest carrier2;
     format.Inject(carrier2, ctx2);
