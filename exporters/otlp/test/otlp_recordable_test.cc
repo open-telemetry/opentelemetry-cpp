@@ -93,18 +93,21 @@ TEST(OtlpRecordable, SetDuration)
 
 TEST(OtlpRecordable, SetStatus)
 {
-  OtlpRecordable rec;
-  trace::StatusCode code(trace::StatusCode::kError);
+  OtlpRecordable rec1;
+  trace::StatusCode code_error(trace::StatusCode::kError);
   nostd::string_view description = "For test";
-  rec.SetStatus(code, description);
+  rec1.SetStatus(code_error, description);
 
-  EXPECT_EQ(rec.span().status().code(), opentelemetry::proto::trace::v1::Status_StatusCode(code));
-  EXPECT_EQ(rec.span().status().message(), description);
+  EXPECT_EQ(rec1.span().status().code(),
+            opentelemetry::proto::trace::v1::Status_StatusCode(code_error));
+  EXPECT_EQ(rec1.span().status().message(), description);
 
+  OtlpRecordable rec2;
   trace::StatusCode code_ok(trace::StatusCode::kOk);
-  rec.SetStatus(code, description);
-  EXPECT_EQ(rec.span().status().code(), opentelemetry::proto::trace::v1::Status_StatusCode(code));
-  EXPECT_EQ(rec.span().status().message(), "");
+  rec2.SetStatus(code_ok, description);
+  EXPECT_EQ(rec2.span().status().code(),
+            opentelemetry::proto::trace::v1::Status_StatusCode(code_ok));
+  EXPECT_EQ(rec2.span().status().message(), "");
 }
 
 TEST(OtlpRecordable, AddEventDefault)
