@@ -94,7 +94,7 @@ TEST(OtlpRecordable, SetDuration)
 TEST(OtlpRecordable, SetStatus)
 {
   OtlpRecordable rec;
-  trace::StatusCode code(trace::StatusCode::kOk);
+  trace::StatusCode code(trace::StatusCode::kError);
   nostd::string_view description = "For test";
   rec.SetStatus(code, description);
 
