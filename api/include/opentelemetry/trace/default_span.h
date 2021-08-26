@@ -10,6 +10,12 @@
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace trace
 {
+
+/**
+ * DefaultSpan provides a non-operational Span that propagates
+ * the tracer context by wrapping it inside the Span object.
+ */
+
 class DefaultSpan : public Span
 {
 public:

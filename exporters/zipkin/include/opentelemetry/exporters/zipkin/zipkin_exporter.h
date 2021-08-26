@@ -44,6 +44,7 @@ struct ZipkinExporterOptions
   std::string service_name = "default-service";
   std::string ipv4;
   std::string ipv6;
+  ext::http::client::Headers headers = {{"content-type", "application/json"}};
 };
 
 namespace trace_sdk   = opentelemetry::sdk::trace;
