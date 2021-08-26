@@ -1,6 +1,7 @@
 #pragma once
 
 #include "opentelemetry/baggage/baggage.h"
+#include "opentelemetry/baggage/baggage_context.h"
 #include "opentelemetry/context/propagation/text_map_propagator.h"
 #include "opentelemetry/version.h"
 
@@ -10,41 +11,22 @@ namespace baggage
 namespace propagation
 {
 
-static const nostd::string_view kBaggageHeader = "baggage";
-
-inline nostd::shared_ptr<baggage::Baggage> GetBaggage(const context::Context &context)
-{
-  context::ContextValue context_value = context.GetValue(kBaggageHeader);
-  if (nostd::holds_alternative<nostd::shared_ptr<baggage::Baggage>>(context_value))
-  {
-    return nostd::get<nostd::shared_ptr<baggage::Baggage>>(context_value);
-  }
-  static nostd::shared_ptr<baggage::Baggage> empty_baggage{new baggage::Baggage()};
-  return empty_baggage;
-}
-
-inline context::Context SetBaggage(context::Context &context,
-                                   nostd::shared_ptr<baggage::Baggage> baggage)
-{
-  return context.SetValue(kBaggageHeader, baggage);
-}
-
-class BaggagePropagator : public context::propagation::TextMapPropagator
+class BaggagePropagator : public opentelemetry::context::propagation::TextMapPropagator
 {
 public:
-  void Inject(context::propagation::TextMapCarrier &carrier,
-              const context::Context &context) noexcept override
+  void Inject(opentelemetry::context::propagation::TextMapCarrier &carrier,
+              const opentelemetry::context::Context &context) noexcept override
   {
-    auto baggage = GetBaggage(context);
+    auto baggage = opentelemetry::baggage::GetBaggage(context);
     carrier.Set(kBaggageHeader, baggage->ToHeader());
   }
 
-  context::Context Extract(const context::propagation::TextMapCarrier &carrier,
-                           context::Context &context) noexcept override
+  context::Context Extract(const opentelemetry::context::propagation::TextMapCarrier &carrier,
+                           opentelemetry::context::Context &context) noexcept override
   {
-    nostd::string_view baggage_str = carrier.Get(kBaggageHeader);
-    auto baggage                   = Baggage::FromHeader(baggage_str);
-    return SetBaggage(context, baggage);
+    nostd::string_view baggage_str = carrier.Get(opentelemetry::baggage::kBaggageHeader);
+    auto baggage                   = opentelemetry::baggage::Baggage::FromHeader(baggage_str);
+    return opentelemetry::baggage::SetBaggage(context, baggage);
   }
 
   bool Fields(nostd::function_ref<bool(nostd::string_view)> callback) const noexcept override
