@@ -16,7 +16,7 @@ The C++ [OpenTelemetry](https://opentelemetry.io/) client.
 | Metrics | Development paused [1] | N/A                                                                      |
 | Logs    | Experimental [2]       | N/A                                                                      |
 
-* [1]: The development of the metrics API and SDK has paused due to limited development resources, prioritization of a stable Traces release, and waiting for availability of stable Metrics ( API + SDK ) design from the OpenTelemetry specification. The current implementation can be included in build by setting `ENABLE_METRICS_PREVIEW` preprocessor macro.
+* [1]: The development of the metrics API and SDK has paused due to limited development resources, prioritization of a stable Traces release, and waiting for availability of stable Metrics (API + SDK) design from the OpenTelemetry specification. The current implementation can be included in build by setting `ENABLE_METRICS_PREVIEW` preprocessor macro.
 * [2]: The current Log Signal Implementation is Experimental, and will change as the current OpenTelemetry Log specification matures. The current implementation can be included in build by setting `ENABLE_LOGS_PREVIEW` preprocessor macro.
 
 ## OpenTelemetry Specification Compatibility Matrix
@@ -55,7 +55,7 @@ of the current project.
 | macOS 10.15 (Xcode 12.2)                                            | Bazel         |
 | Windows Server 2019 (Visual Studio Enterprise 2019)                 | CMake, Bazel  |
 
-[1]: Bazel build is disabled for GCC 4.8, as GRPC library ( required by OTLP expoter)
+[1]: Bazel build is disabled for GCC 4.8, as gRPC library (required by OTLP expoter)
   doesn't build with this compiler. CMake build won't build OTLP exporter with GCC 4.8.
 
 In general, the code shipped from this repository should build on all platforms
