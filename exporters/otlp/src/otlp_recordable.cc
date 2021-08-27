@@ -293,7 +293,10 @@ void OtlpRecordable::AddLink(const opentelemetry::trace::SpanContext &span_conte
 void OtlpRecordable::SetStatus(trace::StatusCode code, nostd::string_view description) noexcept
 {
   span_.mutable_status()->set_code(opentelemetry::proto::trace::v1::Status_StatusCode(code));
-  span_.mutable_status()->set_message(description.data(), description.size());
+  if (code == trace::StatusCode::kError)
+  {
+    span_.mutable_status()->set_message(description.data(), description.size());
+  }
 }
 
 void OtlpRecordable::SetName(nostd::string_view name) noexcept
