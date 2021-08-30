@@ -1,7 +1,12 @@
+
+// Copyright The OpenTelemetry Authors
+// SPDX-License-Identifier: Apache-2.0
+
 #include "opentelemetry/baggage/propagation/baggage_propagator.h"
 #include <gtest/gtest.h>
 #include <map>
 #include <string>
+#include "opentelemetry/baggage/baggage_context.h"
 
 using namespace opentelemetry;
 using namespace opentelemetry::baggage::propagation;
@@ -35,7 +40,7 @@ TEST(BaggagePropagatorTest, ExtractNoBaggageHeader)
   carrier.headers_      = {};
   context::Context ctx1 = context::Context{};
   context::Context ctx2 = format.Extract(carrier, ctx1);
-  auto ctx2_baggage     = baggage::propagation::GetBaggage(ctx2);
+  auto ctx2_baggage     = baggage::GetBaggage(ctx2);
   EXPECT_EQ(ctx2_baggage->ToHeader(), "");
 }
 
@@ -60,13 +65,13 @@ TEST(BaggagePropagatorTest, ExtractAndInjectBaggage)
   for (auto baggage : baggages)
   {
     BaggageCarrierTest carrier1;
-    carrier1.headers_[kBaggageHeader.data()] = baggage.first;
-    context::Context ctx1                    = context::Context{};
-    context::Context ctx2                    = format.Extract(carrier1, ctx1);
+    carrier1.headers_[baggage::kBaggageHeader.data()] = baggage.first;
+    context::Context ctx1                             = context::Context{};
+    context::Context ctx2                             = format.Extract(carrier1, ctx1);
 
     BaggageCarrierTest carrier2;
     format.Inject(carrier2, ctx2);
-    EXPECT_EQ(carrier2.headers_[kBaggageHeader.data()], baggage.second);
+    EXPECT_EQ(carrier2.headers_[baggage::kBaggageHeader.data()], baggage.second);
 
     std::vector<std::string> fields;
     format.Fields([&fields](nostd::string_view field) {
@@ -74,6 +79,6 @@ TEST(BaggagePropagatorTest, ExtractAndInjectBaggage)
       return true;
     });
     EXPECT_EQ(fields.size(), 1);
-    EXPECT_EQ(fields[0], kBaggageHeader.data());
+    EXPECT_EQ(fields[0], baggage::kBaggageHeader.data());
   }
 }
