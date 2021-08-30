@@ -185,13 +185,5 @@ public:
   virtual bool IsRecording() const noexcept = 0;
 };
 
-template <class SpanType, class TracerType>
-nostd::shared_ptr<trace::Span> to_span_ptr(TracerType *objPtr,
-                                           nostd::string_view name,
-                                           const trace::StartSpanOptions &options)
-{
-  return nostd::shared_ptr<trace::Span>{new (std::nothrow) SpanType{*objPtr, name, options}};
-}
-
 }  // namespace trace
 OPENTELEMETRY_END_NAMESPACE
