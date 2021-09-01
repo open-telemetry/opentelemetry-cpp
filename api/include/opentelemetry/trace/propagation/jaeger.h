@@ -7,6 +7,7 @@
 #include "detail/hex.h"
 #include "detail/string.h"
 #include "opentelemetry/context/propagation/text_map_propagator.h"
+#include "opentelemetry/trace/context.h"
 #include "opentelemetry/trace/default_span.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
@@ -23,7 +24,7 @@ public:
   void Inject(context::propagation::TextMapCarrier &carrier,
               const context::Context &context) noexcept override
   {
-    SpanContext span_context = GetSpan(context)->GetContext();
+    SpanContext span_context = trace::GetSpan(context)->GetContext();
     if (!span_context.IsValid())
     {
       return;
@@ -53,7 +54,7 @@ public:
   {
     SpanContext span_context = ExtractImpl(carrier);
     nostd::shared_ptr<Span> sp{new DefaultSpan(span_context)};
-    return SetSpan(context, sp);
+    return trace::SetSpan(context, sp);
   }
 
   bool Fields(nostd::function_ref<bool(nostd::string_view)> callback) const noexcept override
