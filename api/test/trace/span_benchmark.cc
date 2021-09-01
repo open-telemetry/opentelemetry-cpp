@@ -2,11 +2,10 @@
 // SPDX-License-Identifier: Apache-2.0
 
 #include "opentelemetry/nostd/shared_ptr.h"
+#include "opentelemetry/trace/context.h"
 #include "opentelemetry/trace/noop.h"
-#include "opentelemetry/trace/propagation/detail/context.h"
 #include "opentelemetry/trace/span_id.h"
 #include "opentelemetry/trace/trace_id.h"
-#include "opentelemetry/trace/context.h"
 
 #include <cstdint>
 

@@ -3,8 +3,8 @@
 
 #include "opentelemetry/context/propagation/global_propagator.h"
 #include "opentelemetry/context/runtime_context.h"
-#include "opentelemetry/trace/propagation/http_trace_context.h"
 #include "opentelemetry/trace/context.h"
+#include "opentelemetry/trace/propagation/http_trace_context.h"
 #include "opentelemetry/trace/scope.h"
 #include "util.h"
 

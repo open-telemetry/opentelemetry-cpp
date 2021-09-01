@@ -2,12 +2,11 @@
 // SPDX-License-Identifier: Apache-2.0
 
 #include <array>
-#include "detail/context.h"
 #include "detail/hex.h"
 #include "detail/string.h"
 #include "opentelemetry/context/propagation/text_map_propagator.h"
-#include "opentelemetry/trace/context.h"
 #include "opentelemetry/nostd/string_view.h"
+#include "opentelemetry/trace/context.h"
 #include "opentelemetry/trace/default_span.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE

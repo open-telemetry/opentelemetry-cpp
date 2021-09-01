@@ -23,10 +23,11 @@ inline nostd::shared_ptr<Span> GetSpan(const opentelemetry::context::Context &co
 }
 
 // Set Span into explicit context
-inline context::Context SetSpan(opentelemetry::context::Context &context, nostd::shared_ptr<Span> span)
+inline context::Context SetSpan(opentelemetry::context::Context &context,
+                                nostd::shared_ptr<Span> span)
 {
   return context.SetValue(kSpanKey, span);
-}   
-
 }
+
+}  // namespace trace
 OPENTELEMETRY_END_NAMESPACE

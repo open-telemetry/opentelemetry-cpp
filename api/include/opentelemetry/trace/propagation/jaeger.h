@@ -3,7 +3,6 @@
 
 #pragma once
 
-#include "detail/context.h"
 #include "detail/hex.h"
 #include "detail/string.h"
 #include "opentelemetry/context/propagation/text_map_propagator.h"

@@ -2,8 +2,8 @@
 // SPDX-License-Identifier: Apache-2.0
 
 #include "server.h"
-#include "opentelemetry/trace/semantic_conventions.h"
 #include "opentelemetry/trace/context.h"
+#include "opentelemetry/trace/semantic_conventions.h"
 #include "tracer_common.h"
 
 #include <iostream>
