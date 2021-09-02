@@ -9,6 +9,7 @@
 #include "opentelemetry/sdk/trace/samplers/parent.h"
 #include "opentelemetry/sdk/trace/simple_processor.h"
 #include "opentelemetry/sdk/trace/span_data.h"
+#include "opentelemetry/trace/propagation/detail/context.h"
 
 #include <gtest/gtest.h>
 
@@ -602,6 +603,44 @@ TEST(Tracer, ExpectParent)
   auto span_second = tracer->StartSpan("span 2", options);
 
   options.parent  = span_second->GetContext();
+  auto span_third = tracer->StartSpan("span 3", options);
+
+  span_third->End();
+  span_second->End();
+  span_first->End();
+
+  spans = span_data->GetSpans();
+  ASSERT_EQ(3, spans.size());
+  auto spandata_first  = std::move(spans.at(2));
+  auto spandata_second = std::move(spans.at(1));
+  auto spandata_third  = std::move(spans.at(0));
+  EXPECT_EQ("span 1", spandata_first->GetName());
+  EXPECT_EQ("span 2", spandata_second->GetName());
+  EXPECT_EQ("span 3", spandata_third->GetName());
+
+  EXPECT_EQ(spandata_first->GetSpanId(), spandata_second->GetParentSpanId());
+  EXPECT_EQ(spandata_second->GetSpanId(), spandata_third->GetParentSpanId());
+}
+
+TEST(Tracer, ExpectParentAsContext)
+{
+  std::unique_ptr<InMemorySpanExporter> exporter(new InMemorySpanExporter());
+  std::shared_ptr<InMemorySpanData> span_data = exporter->GetData();
+  auto tracer                                 = initTracer(std::move(exporter));
+  auto spans                                  = span_data.get()->GetSpans();
+
+  ASSERT_EQ(0, spans.size());
+
+  auto span_first = tracer->StartSpan("span 1");
+
+  opentelemetry::context::Context c1;
+  auto c2 = trace_api::propagation::SetSpan(c1, span_first);
+  trace_api::StartSpanOptions options;
+  options.parent   = c2;
+  auto span_second = tracer->StartSpan("span 2", options);
+
+  auto c3         = trace_api::propagation::SetSpan(c2, span_second);
+  options.parent  = c3;
   auto span_third = tracer->StartSpan("span 3", options);
 
   span_third->End();

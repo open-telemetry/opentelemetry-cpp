@@ -5,6 +5,7 @@
 #include "opentelemetry/context/runtime_context.h"
 #include "opentelemetry/nostd/shared_ptr.h"
 #include "opentelemetry/sdk/common/atomic_shared_ptr.h"
+#include "opentelemetry/trace/propagation/detail/context.h"
 #include "opentelemetry/version.h"
 #include "src/trace/span.h"
 
@@ -27,8 +28,25 @@ nostd::shared_ptr<trace_api::Span> Tracer::StartSpan(
     const trace_api::SpanContextKeyValueIterable &links,
     const trace_api::StartSpanOptions &options) noexcept
 {
-  trace_api::SpanContext parent_context =
-      options.parent.IsValid() ? options.parent : GetCurrentSpan()->GetContext();
+  trace_api::SpanContext parent_context = GetCurrentSpan()->GetContext();
+  if (nostd::holds_alternative<trace_api::SpanContext>(options.parent))
+  {
+    auto span_context = nostd::get<trace_api::SpanContext>(options.parent);
+    if (span_context.IsValid())
+    {
+      parent_context = span_context;
+    }
+  }
+  else if (nostd::holds_alternative<context::Context>(options.parent))
+  {
+    auto context = nostd::get<context::Context>(options.parent);
+    // fetch span context from parent span stored in the context
+    auto span_context = opentelemetry::trace::propagation::GetSpan(context)->GetContext();
+    if (span_context.IsValid())
+    {
+      parent_context = span_context;
+    }
+  }
 
   trace_api::TraceId trace_id;
   trace_api::SpanId span_id = GetIdGenerator().GenerateSpanId();
