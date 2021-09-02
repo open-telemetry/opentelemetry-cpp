@@ -56,7 +56,7 @@ public:
     auto prop = opentelemetry::context::propagation::GlobalTextMapPropagator::GetGlobalPropagator();
     auto current_ctx = opentelemetry::context::RuntimeContext::GetCurrent();
     auto new_context = prop->Extract(carrier, current_ctx);
-    options.parent   = trace::GetSpan(new_context)->GetContext();
+    options.parent   = opentelemetry::trace::GetSpan(new_context)->GetContext();
 
     std::string span_name = "GreeterService/Greet";
     auto span             = get_tracer("grpc")
