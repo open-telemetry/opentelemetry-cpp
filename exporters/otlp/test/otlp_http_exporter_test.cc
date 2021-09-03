@@ -222,7 +222,7 @@ TEST_F(OtlpHttpExporterTestPeer, ExportJsonIntegrationTest)
     child_span->End();
     parent_span->End();
 
-    nostd::get<trace_api::SpanContext>(child_span_opts.parent)
+    nostd::get<opentelemetry::trace::SpanContext>(child_span_opts.parent)
         .trace_id()
         .ToLowerBase16(MakeSpan(trace_id_hex));
     report_trace_id.assign(trace_id_hex, sizeof(trace_id_hex));
