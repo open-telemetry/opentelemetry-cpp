@@ -5,7 +5,7 @@
 #include "opentelemetry/context/runtime_context.h"
 #include "opentelemetry/nostd/shared_ptr.h"
 #include "opentelemetry/sdk/common/atomic_shared_ptr.h"
-#include "opentelemetry/trace/propagation/detail/context.h"
+#include "opentelemetry/trace/context.h"
 #include "opentelemetry/version.h"
 #include "src/trace/span.h"
 
@@ -41,7 +41,7 @@ nostd::shared_ptr<trace_api::Span> Tracer::StartSpan(
   {
     auto context = nostd::get<context::Context>(options.parent);
     // fetch span context from parent span stored in the context
-    auto span_context = opentelemetry::trace::propagation::GetSpan(context)->GetContext();
+    auto span_context = opentelemetry::trace::GetSpan(context)->GetContext();
     if (span_context.IsValid())
     {
       parent_context = span_context;

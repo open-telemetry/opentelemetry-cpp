@@ -9,7 +9,7 @@
 #include "opentelemetry/sdk/trace/samplers/parent.h"
 #include "opentelemetry/sdk/trace/simple_processor.h"
 #include "opentelemetry/sdk/trace/span_data.h"
-#include "opentelemetry/trace/propagation/detail/context.h"
+#include "opentelemetry/trace/context.h"
 
 #include <gtest/gtest.h>
 
@@ -634,12 +634,12 @@ TEST(Tracer, ExpectParentAsContext)
   auto span_first = tracer->StartSpan("span 1");
 
   opentelemetry::context::Context c1;
-  auto c2 = trace_api::propagation::SetSpan(c1, span_first);
+  auto c2 = trace_api::SetSpan(c1, span_first);
   trace_api::StartSpanOptions options;
   options.parent   = c2;
   auto span_second = tracer->StartSpan("span 2", options);
 
-  auto c3         = trace_api::propagation::SetSpan(c2, span_second);
+  auto c3         = trace_api::SetSpan(c2, span_second);
   options.parent  = c3;
   auto span_third = tracer->StartSpan("span 3", options);
 
