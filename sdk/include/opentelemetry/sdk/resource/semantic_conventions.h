@@ -1,3 +1,11 @@
+// Copyright The OpenTelemetry Authors
+// SPDX-License-Identifier: Apache-2.0
+
+// NOTE:
+// This implementation is based on the experimental specs for resource semantic convention as here:
+// https://github.com/open-telemetry/opentelemetry-specification/tree/v1.0.0/specification/resource/semantic_conventions
+// and MAY will change in future.
+
 #pragma once
 
 #include <type_traits>
