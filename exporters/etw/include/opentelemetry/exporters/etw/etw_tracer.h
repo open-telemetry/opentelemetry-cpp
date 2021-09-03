@@ -569,10 +569,10 @@ public:
     // Parent Context:
     // - either use current span
     // - or attach to parent SpanContext specified in options
-    trace_api::SpanContext parentContext = GetCurrentSpan()->GetContext();
-    if (nostd::holds_alternative<trace_api::SpanContext>(options.parent))
+    trace::SpanContext parentContext = GetCurrentSpan()->GetContext();
+    if (nostd::holds_alternative<trace::SpanContext>(options.parent))
     {
-      auto span_context = nostd::get<trace_api::SpanContext>(options.parent);
+      auto span_context = nostd::get<trace::SpanContext>(options.parent);
       if (span_context.IsValid())
       {
         parentContext = span_context;
