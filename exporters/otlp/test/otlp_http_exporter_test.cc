@@ -284,7 +284,7 @@ TEST_F(OtlpHttpExporterTestPeer, ExportBinaryIntegrationTest)
     child_span->End();
     parent_span->End();
 
-    nostd::get<trace_api::SpanContext>(child_span_opts.parent)
+    nostd::get<opentelemetry::trace::SpanContext>(child_span_opts.parent)
         .trace_id()
         .CopyBytesTo(MakeSpan(trace_id_binary));
     report_trace_id.assign(reinterpret_cast<char *>(trace_id_binary), sizeof(trace_id_binary));
