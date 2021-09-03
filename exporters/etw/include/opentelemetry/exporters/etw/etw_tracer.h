@@ -569,568 +569,570 @@ public:
     // Parent Context:
     // - either use current span
     // - or attach to parent SpanContext specified in options
-    const auto parentContext =
-        (options.parent.IsValid()) ? options.parent : GetCurrentSpan()->GetContext();
-
-    // Populate Etw.RelatedActivityId at envelope level if enabled
-    GUID RelatedActivityId;
-    LPCGUID RelatedActivityIdPtr = nullptr;
-    if (cfg.enableAutoParent)
+    trace_api::SpanContext parentContext = GetCurrentSpan()->GetContext();
+    if (nostd::holds_alternative<trace_api::SpanContext>(options.parent))
     {
-      if (cfg.enableRelatedActivityId)
+      auto span_context = nostd::get<trace_api::SpanContext>(options.parent);
+      if (span_context.IsValid())
       {
-        if (CopySpanIdToActivityId(parentContext, RelatedActivityId))
+        parentContext = span_context;
+      }
+
+      // Populate Etw.RelatedActivityId at envelope level if enabled
+      GUID RelatedActivityId;
+      LPCGUID RelatedActivityIdPtr = nullptr;
+      if (cfg.enableAutoParent)
+      {
+        if (cfg.enableRelatedActivityId)
         {
-          RelatedActivityIdPtr = &RelatedActivityId;
+          if (CopySpanIdToActivityId(parentContext, RelatedActivityId))
+          {
+            RelatedActivityIdPtr = &RelatedActivityId;
+          }
         }
       }
-    }
 
-    // This template pattern allows us to forward-declare the etw::Span,
-    // create an instance of it, then assign it to tracer::Span result.
-    auto currentSpan                      = new_span<Span, Tracer>(this, name, options);
-    nostd::shared_ptr<trace::Span> result = to_span_ptr<Span>(currentSpan);
+      // This template pattern allows us to forward-declare the etw::Span,
+      // create an instance of it, then assign it to tracer::Span result.
+      auto currentSpan                      = new_span<Span, Tracer>(this, name, options);
+      nostd::shared_ptr<trace::Span> result = to_span_ptr<Span>(currentSpan);
 
-    auto spanContext = result->GetContext();
+      auto spanContext = result->GetContext();
 
-    // Decorate with additional standard fields
-    std::string eventName = name.data();
+      // Decorate with additional standard fields
+      std::string eventName = name.data();
 
-    // Populate Etw.EventName attribute at envelope level
-    evt[ETW_FIELD_NAME] = eventName;
+      // Populate Etw.EventName attribute at envelope level
+      evt[ETW_FIELD_NAME] = eventName;
 
-    // Populate Payload["SpanId"] attribute
-    // Populate Payload["ParentSpanId"] attribute if parent Span is valid
-    if (cfg.enableSpanId)
-    {
-      if (parentContext.IsValid())
+      // Populate Payload["SpanId"] attribute
+      // Populate Payload["ParentSpanId"] attribute if parent Span is valid
+      if (cfg.enableSpanId)
       {
-        evt[ETW_FIELD_SPAN_PARENTID] = ToLowerBase16(parentContext.span_id());
+        if (parentContext.IsValid())
+        {
+          evt[ETW_FIELD_SPAN_PARENTID] = ToLowerBase16(parentContext.span_id());
+        }
+        evt[ETW_FIELD_SPAN_ID] = ToLowerBase16(spanContext.span_id());
       }
-      evt[ETW_FIELD_SPAN_ID] = ToLowerBase16(spanContext.span_id());
-    }
 
-    // Populate Etw.Payload["TraceId"] attribute
-    if (cfg.enableTraceId)
-    {
-      evt[ETW_FIELD_TRACE_ID] = ToLowerBase16(spanContext.trace_id());
-    }
-
-    // Populate Etw.ActivityId at envelope level if enabled
-    GUID ActivityId;
-    LPCGUID ActivityIdPtr = nullptr;
-    if (cfg.enableActivityId)
-    {
-      if (CopySpanIdToActivityId(result.get()->GetContext(), ActivityId))
+      // Populate Etw.Payload["TraceId"] attribute
+      if (cfg.enableTraceId)
       {
-        ActivityIdPtr = &ActivityId;
+        evt[ETW_FIELD_TRACE_ID] = ToLowerBase16(spanContext.trace_id());
       }
-    }
 
-    // Links
-    DecorateLinks(evt, links);
+      // Populate Etw.ActivityId at envelope level if enabled
+      GUID ActivityId;
+      LPCGUID ActivityIdPtr = nullptr;
+      if (cfg.enableActivityId)
+      {
+        if (CopySpanIdToActivityId(result.get()->GetContext(), ActivityId))
+        {
+          ActivityIdPtr = &ActivityId;
+        }
+      }
 
-    // Remember Span attributes to be passed down to ETW on Span end
-    SetSpanAttributes(*currentSpan, evt);
+      // Links
+      DecorateLinks(evt, links);
 
-    if (cfg.enableActivityTracking)
-    {
-      // TODO: add support for options that are presently ignored :
-      // - options.kind
-      // - options.start_steady_time
-      // - options.start_system_time
-      etwProvider().write(provHandle, evt, ActivityIdPtr, RelatedActivityIdPtr, 1, encoding);
+      // Remember Span attributes to be passed down to ETW on Span end
+      SetSpanAttributes(*currentSpan, evt);
+
+      if (cfg.enableActivityTracking)
+      {
+        // TODO: add support for options that are presently ignored :
+        // - options.kind
+        // - options.start_steady_time
+        // - options.start_system_time
+        etwProvider().write(provHandle, evt, ActivityIdPtr, RelatedActivityIdPtr, 1, encoding);
+      };
+
+      return result;
     };
 
-    return result;
-  };
+    /**
+     * @brief Force flush data to Tracer, spending up to given amount of microseconds to flush.
+     * NOTE: this method has no effect for the realtime streaming Tracer.
+     *
+     * @param timeout Allow Tracer to drop data if timeout is reached
+     * @return
+     */
+    void ForceFlushWithMicroseconds(uint64_t) noexcept override{};
 
-  /**
-   * @brief Force flush data to Tracer, spending up to given amount of microseconds to flush.
-   * NOTE: this method has no effect for the realtime streaming Tracer.
-   *
-   * @param timeout Allow Tracer to drop data if timeout is reached
-   * @return
-   */
-  void ForceFlushWithMicroseconds(uint64_t) noexcept override{};
-
-  /**
-   * @brief Close tracer, spending up to given amount of microseconds to flush and close.
-   * NOTE: This method decrements the reference count on current ETW Provider Handle and
-   * closes it if reference count on that provider handle is zero.
-   *
-   * @param  timeout Allow Tracer to drop data if timeout is reached.
-   * @return
-   */
-  void CloseWithMicroseconds(uint64_t) noexcept override
-  {
-    // Close once only
-    if (!isClosed_.exchange(true))
+    /**
+     * @brief Close tracer, spending up to given amount of microseconds to flush and close.
+     * NOTE: This method decrements the reference count on current ETW Provider Handle and
+     * closes it if reference count on that provider handle is zero.
+     *
+     * @param  timeout Allow Tracer to drop data if timeout is reached.
+     * @return
+     */
+    void CloseWithMicroseconds(uint64_t) noexcept override
     {
-      etwProvider().close(provHandle);
-    }
-  };
+      // Close once only
+      if (!isClosed_.exchange(true))
+      {
+        etwProvider().close(provHandle);
+      }
+    };
 
-  /**
-   * @brief Add event data to span associated with tracer.
-   * @param span Parent span.
-   * @param name Event name.
-   * @param timestamp Event timestamp.
-   * @param attributes Event attributes.
-   * @return
-   */
-  void AddEvent(trace::Span &span,
-                nostd::string_view name,
-                common::SystemTimestamp timestamp,
-                const common::KeyValueIterable &attributes) noexcept
-  {
+    /**
+     * @brief Add event data to span associated with tracer.
+     * @param span Parent span.
+     * @param name Event name.
+     * @param timestamp Event timestamp.
+     * @param attributes Event attributes.
+     * @return
+     */
+    void AddEvent(trace::Span & span, nostd::string_view name, common::SystemTimestamp timestamp,
+                  const common::KeyValueIterable &attributes) noexcept
+    {
 #ifdef RTTI_ENABLED
-    common::KeyValueIterable &attribs = const_cast<common::KeyValueIterable &>(attributes);
-    Properties *evt                   = dynamic_cast<Properties *>(&attribs);
-    if (evt != nullptr)
-    {
-      // Pass as a reference to original modifyable collection without creating a copy
-      return AddEvent(span, name, timestamp, *evt);
-    }
+      common::KeyValueIterable &attribs = const_cast<common::KeyValueIterable &>(attributes);
+      Properties *evt                   = dynamic_cast<Properties *>(&attribs);
+      if (evt != nullptr)
+      {
+        // Pass as a reference to original modifyable collection without creating a copy
+        return AddEvent(span, name, timestamp, *evt);
+      }
 #endif
-    // Pass a copy converted to Properties object on stack
-    Properties evtCopy = attributes;
-    return AddEvent(span, name, timestamp, evtCopy);
-  }
-
-  /**
-   * @brief Add event data to span associated with tracer.
-   * @param span Parent span.
-   * @param name Event name.
-   * @param timestamp Event timestamp.
-   * @param attributes Event attributes.
-   * @return
-   */
-  void AddEvent(trace::Span &span,
-                nostd::string_view name,
-                common::SystemTimestamp timestamp,
-                Properties &evt) noexcept
-  {
-    // TODO: respect originating timestamp. Do we need to reserve
-    // a special 'Timestamp' field or is it an overkill? The delta
-    // between when `AddEvent` API is called and when ETW layer
-    // timestamp is appended is nanos- to micros-, thus handling
-    // the explicitly provided timestamp is only necessary in case
-    // if a process wants to submit back-dated or future-dated
-    // timestamp. Unless there is a strong ask from any ETW customer
-    // to have it, this feature (custom timestamp) remains unimplemented.
-    (void)timestamp;
-
-    const auto &cfg = GetConfiguration(tracerProvider_);
-
-    evt[ETW_FIELD_NAME] = name.data();
-
-    const auto &spanContext = span.GetContext();
-    if (cfg.enableSpanId)
-    {
-      evt[ETW_FIELD_SPAN_ID] = ToLowerBase16(spanContext.span_id());
+      // Pass a copy converted to Properties object on stack
+      Properties evtCopy = attributes;
+      return AddEvent(span, name, timestamp, evtCopy);
     }
 
-    if (cfg.enableTraceId)
+    /**
+     * @brief Add event data to span associated with tracer.
+     * @param span Parent span.
+     * @param name Event name.
+     * @param timestamp Event timestamp.
+     * @param attributes Event attributes.
+     * @return
+     */
+    void AddEvent(trace::Span & span, nostd::string_view name, common::SystemTimestamp timestamp,
+                  Properties & evt) noexcept
     {
-      evt[ETW_FIELD_TRACE_ID] = ToLowerBase16(spanContext.trace_id());
-    }
+      // TODO: respect originating timestamp. Do we need to reserve
+      // a special 'Timestamp' field or is it an overkill? The delta
+      // between when `AddEvent` API is called and when ETW layer
+      // timestamp is appended is nanos- to micros-, thus handling
+      // the explicitly provided timestamp is only necessary in case
+      // if a process wants to submit back-dated or future-dated
+      // timestamp. Unless there is a strong ask from any ETW customer
+      // to have it, this feature (custom timestamp) remains unimplemented.
+      (void)timestamp;
 
-    LPGUID ActivityIdPtr = nullptr;
-    GUID ActivityId;
-    if (cfg.enableActivityId)
-    {
-      CopySpanIdToActivityId(spanContext, ActivityId);
-      ActivityIdPtr = &ActivityId;
-    }
+      const auto &cfg = GetConfiguration(tracerProvider_);
+
+      evt[ETW_FIELD_NAME] = name.data();
+
+      const auto &spanContext = span.GetContext();
+      if (cfg.enableSpanId)
+      {
+        evt[ETW_FIELD_SPAN_ID] = ToLowerBase16(spanContext.span_id());
+      }
+
+      if (cfg.enableTraceId)
+      {
+        evt[ETW_FIELD_TRACE_ID] = ToLowerBase16(spanContext.trace_id());
+      }
+
+      LPGUID ActivityIdPtr = nullptr;
+      GUID ActivityId;
+      if (cfg.enableActivityId)
+      {
+        CopySpanIdToActivityId(spanContext, ActivityId);
+        ActivityIdPtr = &ActivityId;
+      }
 
 #ifdef HAVE_FIELD_TIME
-    {
-      auto timeNow        = std::chrono::system_clock::now().time_since_epoch();
-      auto millis         = std::chrono::duration_cast<std::chrono::milliseconds>(timeNow).count();
-      evt[ETW_FIELD_TIME] = utils::formatUtcTimestampMsAsISO8601(millis);
-    }
+      {
+        auto timeNow = std::chrono::system_clock::now().time_since_epoch();
+        auto millis  = std::chrono::duration_cast<std::chrono::milliseconds>(timeNow).count();
+        evt[ETW_FIELD_TIME] = utils::formatUtcTimestampMsAsISO8601(millis);
+      }
 #endif
 
-    etwProvider().write(provHandle, evt, ActivityIdPtr, nullptr, 0, encoding);
-  };
+      etwProvider().write(provHandle, evt, ActivityIdPtr, nullptr, 0, encoding);
+    };
 
-  /**
-   * @brief Add event data to span associated with tracer.
-   * @param span Span.
-   * @param name Event name.
-   * @param timestamp Event timestamp.
-   * @return
-   */
-  void AddEvent(trace::Span &span,
-                nostd::string_view name,
-                common::SystemTimestamp timestamp) noexcept
-  {
-    AddEvent(span, name, timestamp, sdk::GetEmptyAttributes());
-  };
-
-  /**
-   * @brief Add event data to span associated with tracer.
-   * @param span Spab.
-   * @param name Event name.
-   */
-  void AddEvent(trace::Span &span, nostd::string_view name)
-  {
-    AddEvent(span, name, std::chrono::system_clock::now(), sdk::GetEmptyAttributes());
-  };
-
-  /**
-   * @brief Tracer destructor.
-   */
-  virtual ~Tracer() { CloseWithMicroseconds(0); };
-};
-
-/**
- * @brief etw::Span allows to send event data to ETW listener.
- */
-class Span : public trace::Span
-{
-protected:
-  friend class Tracer;
-
-  /**
-   * @brief Span properties are attached on "Span" event on end of Span.
-   */
-  Properties attributes_;
-
-  common::SystemTimestamp start_time_;
-  common::SystemTimestamp end_time_;
-
-  trace::StatusCode status_code_{trace::StatusCode::kUnset};
-  std::string status_description_;
-
-  /**
-   * @brief Owner Tracer of this Span
-   */
-  Tracer &owner_;
-
-  /**
-   * @brief Span name.
-   */
-  nostd::string_view name_;
-
-  /**
-   * @brief Attribute indicating that the span has ended.
-   */
-  std::atomic<bool> has_ended_{false};
-
-  /**
-   * @brief Attribute indicating that the span has started.
-   */
-  std::atomic<bool> has_started_{false};
-
-  /**
-   * @brief Parent Span of this nested Span (optional)
-   */
-  Span *parent_{nullptr};
-
-  /**
-   * @brief Get Parent Span of this nested Span.
-   * @return Pointer to Parent or nullptr if no Parent.
-   */
-  Span *GetParent() const { return parent_; }
-
-  trace::SpanContext context_;
-
-  const trace::SpanContext CreateContext()
-  {
-    GUID activity_id;
-    // Generate random GUID
-    CoCreateGuid(&activity_id);
-    const auto *activityIdPtr = reinterpret_cast<const uint8_t *>(std::addressof(activity_id));
-
-    // Populate SpanId with that GUID
-    nostd::span<const uint8_t, trace::SpanId::kSize> spanIdBytes(
-        activityIdPtr, activityIdPtr + trace::SpanId::kSize);
-    const trace::SpanId spanId(spanIdBytes);
-
-    // Inherit trace_id from Tracer
-    const trace::TraceId traceId{owner_.trace_id()};
-    // TODO: TraceFlags are not supported by ETW exporter.
-    const trace::TraceFlags flags{0};
-    // TODO: Remote parent is not supported by ETW exporter.
-    const bool hasRemoteParent = false;
-    return trace::SpanContext{traceId, spanId, flags, hasRemoteParent};
-  }
-
-public:
-  /**
-   * @brief Update Properties object with current Span status
-   * @param evt
-   */
-  void UpdateStatus(Properties &evt)
-  {
-    /* Should we avoid populating this extra field if status is unset? */
-    if ((status_code_ == trace::StatusCode::kUnset) || (status_code_ == trace::StatusCode::kOk))
+    /**
+     * @brief Add event data to span associated with tracer.
+     * @param span Span.
+     * @param name Event name.
+     * @param timestamp Event timestamp.
+     * @return
+     */
+    void AddEvent(trace::Span & span, nostd::string_view name,
+                  common::SystemTimestamp timestamp) noexcept
     {
-      evt[ETW_FIELD_SUCCESS]       = "True";
-      evt[ETW_FIELD_STATUSCODE]    = uint32_t(status_code_);
-      evt[ETW_FIELD_STATUSMESSAGE] = status_description_;
-    }
-    else
+      AddEvent(span, name, timestamp, sdk::GetEmptyAttributes());
+    };
+
+    /**
+     * @brief Add event data to span associated with tracer.
+     * @param span Spab.
+     * @param name Event name.
+     */
+    void AddEvent(trace::Span & span, nostd::string_view name)
     {
-      evt[ETW_FIELD_SUCCESS]       = "False";
-      evt[ETW_FIELD_STATUSCODE]    = uint32_t(status_code_);
-      evt[ETW_FIELD_STATUSMESSAGE] = status_description_;
-    }
-  }
+      AddEvent(span, name, std::chrono::system_clock::now(), sdk::GetEmptyAttributes());
+    };
 
-  /**
-   * @brief Get start time of this Span.
-   * @return
-   */
-  common::SystemTimestamp GetStartTime() { return start_time_; }
-
-  /**
-   * @brief Get end time of this Span.
-   * @return
-   */
-  common::SystemTimestamp GetEndTime() { return end_time_; }
-
-  /**
-   * @brief Get Span Name.
-   * @return Span Name.
-   */
-  nostd::string_view GetName() const { return name_; }
-
-  /**
-   * @brief Span constructor
-   * @param owner Owner Tracer
-   * @param name Span name
-   * @param options Span options
-   * @param parent Parent Span (optional)
-   * @return
-   */
-  Span(Tracer &owner,
-       nostd::string_view name,
-       const trace::StartSpanOptions &options,
-       Span *parent = nullptr) noexcept
-      : trace::Span(),
-        owner_(owner),
-        parent_(parent),
-        context_(CreateContext()),
-        start_time_(std::chrono::system_clock::now())
-  {
-    name_ = name;
-    UNREFERENCED_PARAMETER(options);
+    /**
+     * @brief Tracer destructor.
+     */
+    virtual ~Tracer() { CloseWithMicroseconds(0); };
   };
 
   /**
-   * @brief Span Destructor
+   * @brief etw::Span allows to send event data to ETW listener.
    */
-  ~Span() { End(); }
-
-  /**
-   * @brief Add named event with no attributes.
-   * @param name Event name.
-   * @return
-   */
-  void AddEvent(nostd::string_view name) noexcept override { owner_.AddEvent(*this, name); }
-
-  /**
-   * @brief Add named event with custom timestamp.
-   * @param name
-   * @param timestamp
-   * @return
-   */
-  void AddEvent(nostd::string_view name, common::SystemTimestamp timestamp) noexcept override
+  class Span : public trace::Span
   {
-    owner_.AddEvent(*this, name, timestamp);
-  }
+  protected:
+    friend class Tracer;
 
-  /**
-   * @brief Add named event with custom timestamp and attributes.
-   * @param name Event name.
-   * @param timestamp Event timestamp.
-   * @param attributes Event attributes.
-   * @return
-   */
-  void AddEvent(nostd::string_view name,
-                common::SystemTimestamp timestamp,
-                const common::KeyValueIterable &attributes) noexcept override
-  {
-    owner_.AddEvent(*this, name, timestamp, attributes);
-  }
+    /**
+     * @brief Span properties are attached on "Span" event on end of Span.
+     */
+    Properties attributes_;
 
-  /**
-   * @brief Set Span status
-   * @param code Span status code.
-   * @param description Span description.
-   * @return
-   */
-  void SetStatus(trace::StatusCode code, nostd::string_view description) noexcept override
-  {
-    status_code_        = code;
-    status_description_ = description.data();
-  }
+    common::SystemTimestamp start_time_;
+    common::SystemTimestamp end_time_;
 
-  void SetAttributes(Properties attributes) { attributes_ = attributes; }
+    trace::StatusCode status_code_{trace::StatusCode::kUnset};
+    std::string status_description_;
 
-  /**
-   * @brief Obtain span attributes specified at Span start.
-   * NOTE: please consider that this method is NOT thread-safe.
-   *
-   * @return ref to Properties collection
-   */
-  Properties &GetAttributes() { return attributes_; }
+    /**
+     * @brief Owner Tracer of this Span
+     */
+    Tracer &owner_;
 
-  /**
-   * @brief Sets an attribute on the Span. If the Span previously contained a mapping
-   * for the key, the old value is replaced.
-   *
-   * @param key
-   * @param value
-   * @return
-   */
-  void SetAttribute(nostd::string_view key, const common::AttributeValue &value) noexcept override
-  {
-    // TODO: not implemented
-    UNREFERENCED_PARAMETER(key);
-    UNREFERENCED_PARAMETER(value);
+    /**
+     * @brief Span name.
+     */
+    nostd::string_view name_;
+
+    /**
+     * @brief Attribute indicating that the span has ended.
+     */
+    std::atomic<bool> has_ended_{false};
+
+    /**
+     * @brief Attribute indicating that the span has started.
+     */
+    std::atomic<bool> has_started_{false};
+
+    /**
+     * @brief Parent Span of this nested Span (optional)
+     */
+    Span *parent_{nullptr};
+
+    /**
+     * @brief Get Parent Span of this nested Span.
+     * @return Pointer to Parent or nullptr if no Parent.
+     */
+    Span *GetParent() const { return parent_; }
+
+    trace::SpanContext context_;
+
+    const trace::SpanContext CreateContext()
+    {
+      GUID activity_id;
+      // Generate random GUID
+      CoCreateGuid(&activity_id);
+      const auto *activityIdPtr = reinterpret_cast<const uint8_t *>(std::addressof(activity_id));
+
+      // Populate SpanId with that GUID
+      nostd::span<const uint8_t, trace::SpanId::kSize> spanIdBytes(
+          activityIdPtr, activityIdPtr + trace::SpanId::kSize);
+      const trace::SpanId spanId(spanIdBytes);
+
+      // Inherit trace_id from Tracer
+      const trace::TraceId traceId{owner_.trace_id()};
+      // TODO: TraceFlags are not supported by ETW exporter.
+      const trace::TraceFlags flags{0};
+      // TODO: Remote parent is not supported by ETW exporter.
+      const bool hasRemoteParent = false;
+      return trace::SpanContext{traceId, spanId, flags, hasRemoteParent};
+    }
+
+  public:
+    /**
+     * @brief Update Properties object with current Span status
+     * @param evt
+     */
+    void UpdateStatus(Properties &evt)
+    {
+      /* Should we avoid populating this extra field if status is unset? */
+      if ((status_code_ == trace::StatusCode::kUnset) || (status_code_ == trace::StatusCode::kOk))
+      {
+        evt[ETW_FIELD_SUCCESS]       = "True";
+        evt[ETW_FIELD_STATUSCODE]    = uint32_t(status_code_);
+        evt[ETW_FIELD_STATUSMESSAGE] = status_description_;
+      }
+      else
+      {
+        evt[ETW_FIELD_SUCCESS]       = "False";
+        evt[ETW_FIELD_STATUSCODE]    = uint32_t(status_code_);
+        evt[ETW_FIELD_STATUSMESSAGE] = status_description_;
+      }
+    }
+
+    /**
+     * @brief Get start time of this Span.
+     * @return
+     */
+    common::SystemTimestamp GetStartTime() { return start_time_; }
+
+    /**
+     * @brief Get end time of this Span.
+     * @return
+     */
+    common::SystemTimestamp GetEndTime() { return end_time_; }
+
+    /**
+     * @brief Get Span Name.
+     * @return Span Name.
+     */
+    nostd::string_view GetName() const { return name_; }
+
+    /**
+     * @brief Span constructor
+     * @param owner Owner Tracer
+     * @param name Span name
+     * @param options Span options
+     * @param parent Parent Span (optional)
+     * @return
+     */
+    Span(Tracer &owner,
+         nostd::string_view name,
+         const trace::StartSpanOptions &options,
+         Span *parent = nullptr) noexcept
+        : trace::Span(),
+          owner_(owner),
+          parent_(parent),
+          context_(CreateContext()),
+          start_time_(std::chrono::system_clock::now())
+    {
+      name_ = name;
+      UNREFERENCED_PARAMETER(options);
+    };
+
+    /**
+     * @brief Span Destructor
+     */
+    ~Span() { End(); }
+
+    /**
+     * @brief Add named event with no attributes.
+     * @param name Event name.
+     * @return
+     */
+    void AddEvent(nostd::string_view name) noexcept override { owner_.AddEvent(*this, name); }
+
+    /**
+     * @brief Add named event with custom timestamp.
+     * @param name
+     * @param timestamp
+     * @return
+     */
+    void AddEvent(nostd::string_view name, common::SystemTimestamp timestamp) noexcept override
+    {
+      owner_.AddEvent(*this, name, timestamp);
+    }
+
+    /**
+     * @brief Add named event with custom timestamp and attributes.
+     * @param name Event name.
+     * @param timestamp Event timestamp.
+     * @param attributes Event attributes.
+     * @return
+     */
+    void AddEvent(nostd::string_view name,
+                  common::SystemTimestamp timestamp,
+                  const common::KeyValueIterable &attributes) noexcept override
+    {
+      owner_.AddEvent(*this, name, timestamp, attributes);
+    }
+
+    /**
+     * @brief Set Span status
+     * @param code Span status code.
+     * @param description Span description.
+     * @return
+     */
+    void SetStatus(trace::StatusCode code, nostd::string_view description) noexcept override
+    {
+      status_code_        = code;
+      status_description_ = description.data();
+    }
+
+    void SetAttributes(Properties attributes) { attributes_ = attributes; }
+
+    /**
+     * @brief Obtain span attributes specified at Span start.
+     * NOTE: please consider that this method is NOT thread-safe.
+     *
+     * @return ref to Properties collection
+     */
+    Properties &GetAttributes() { return attributes_; }
+
+    /**
+     * @brief Sets an attribute on the Span. If the Span previously contained a mapping
+     * for the key, the old value is replaced.
+     *
+     * @param key
+     * @param value
+     * @return
+     */
+    void SetAttribute(nostd::string_view key, const common::AttributeValue &value) noexcept override
+    {
+      // TODO: not implemented
+      UNREFERENCED_PARAMETER(key);
+      UNREFERENCED_PARAMETER(value);
+    };
+
+    /**
+     * @brief Update Span name.
+     *
+     * NOTE: this method is a no-op for streaming implementation.
+     * We cannot change the Span name after it started streaming.
+     *
+     * @param name
+     * @return
+     */
+    void UpdateName(nostd::string_view) noexcept override
+    {
+      // We can't do that!
+      // name_ = name;
+    }
+
+    /**
+     * @brief End Span.
+     * @param EndSpanOptions
+     * @return
+     */
+    void End(const trace::EndSpanOptions &options = {}) noexcept override
+    {
+      end_time_ = std::chrono::system_clock::now();
+
+      if (!has_ended_.exchange(true))
+      {
+        owner_.EndSpan(*this, parent_, options);
+      }
+    }
+
+    /**
+     * @brief Obtain SpanContext
+     * @return
+     */
+    trace::SpanContext GetContext() const noexcept override { return context_; }
+
+    /**
+     * @brief Check if Span is recording data.
+     * @return
+     */
+    bool IsRecording() const noexcept override
+    {
+      // For streaming implementation this should return the state of ETW Listener.
+      // In certain unprivileged environments, ex. containers, it is impossible
+      // to determine if a listener is registered. Thus, we always return true.
+      return true;
+    }
+
+    virtual void SetToken(nostd::unique_ptr<context::Token> &&token) noexcept
+    {
+      // TODO: not implemented
+      UNREFERENCED_PARAMETER(token);
+    }
+
+    /// <summary>
+    /// Get Owner tracer of this Span
+    /// </summary>
+    /// <returns></returns>
+    trace::Tracer &tracer() const noexcept { return this->owner_; };
   };
 
   /**
-   * @brief Update Span name.
-   *
-   * NOTE: this method is a no-op for streaming implementation.
-   * We cannot change the Span name after it started streaming.
-   *
-   * @param name
-   * @return
+   * @brief ETW TracerProvider
    */
-  void UpdateName(nostd::string_view) noexcept override
+  class TracerProvider : public trace::TracerProvider
   {
-    // We can't do that!
-    // name_ = name;
-  }
+  public:
+    /**
+     * @brief TracerProvider options supplied during initialization.
+     */
+    TracerProviderConfiguration config_;
 
-  /**
-   * @brief End Span.
-   * @param EndSpanOptions
-   * @return
-   */
-  void End(const trace::EndSpanOptions &options = {}) noexcept override
-  {
-    end_time_ = std::chrono::system_clock::now();
-
-    if (!has_ended_.exchange(true))
+    /**
+     * @brief Construct instance of TracerProvider with given options
+     * @param options Configuration options
+     */
+    TracerProvider(TracerProviderOptions options) : trace::TracerProvider()
     {
-      owner_.EndSpan(*this, parent_, options);
+      // By default we ensure that all events carry their with TraceId and SpanId
+      GetOption(options, "enableTraceId", config_.enableTraceId, true);
+      GetOption(options, "enableSpanId", config_.enableSpanId, true);
+
+      // Backwards-compatibility option that allows to reuse ETW-specific parenting described here:
+      // https://docs.microsoft.com/en-us/uwp/api/windows.foundation.diagnostics.loggingoptions.relatedactivityid
+      // https://docs.microsoft.com/en-us/windows/win32/api/evntprov/nf-evntprov-eventwritetransfer
+
+      // Emit separate events compatible with TraceLogging Activity/Start and Activity/Stop
+      // format for every Span emitted.
+      GetOption(options, "enableActivityTracking", config_.enableActivityTracking, false);
+
+      // Map current `SpanId` to ActivityId - GUID that uniquely identifies this activity. If NULL,
+      // ETW gets the identifier from the thread local storage. For details on getting this
+      // identifier, see EventActivityIdControl.
+      GetOption(options, "enableActivityId", config_.enableActivityId, false);
+
+      // Map parent `SpanId` to RelatedActivityId -  Activity identifier from the previous
+      // component. Use this parameter to link your component's events to the previous component's
+      // events.
+      GetOption(options, "enableRelatedActivityId", config_.enableRelatedActivityId, false);
+
+      // When a new Span is started, the current span automatically becomes its parent.
+      GetOption(options, "enableAutoParent", config_.enableAutoParent, false);
+
+      // Determines what encoding to use for ETW events: TraceLogging Dynamic, MsgPack, XML, etc.
+      config_.encoding = GetEncoding(options);
     }
-  }
 
-  /**
-   * @brief Obtain SpanContext
-   * @return
-   */
-  trace::SpanContext GetContext() const noexcept override { return context_; }
+    TracerProvider() : trace::TracerProvider()
+    {
+      config_.enableTraceId           = true;
+      config_.enableSpanId            = true;
+      config_.enableActivityId        = false;
+      config_.enableActivityTracking  = false;
+      config_.enableRelatedActivityId = false;
+      config_.enableAutoParent        = false;
+      config_.encoding                = ETWProvider::EventFormat::ETW_MANIFEST;
+    }
 
-  /**
-   * @brief Check if Span is recording data.
-   * @return
-   */
-  bool IsRecording() const noexcept override
-  {
-    // For streaming implementation this should return the state of ETW Listener.
-    // In certain unprivileged environments, ex. containers, it is impossible
-    // to determine if a listener is registered. Thus, we always return true.
-    return true;
-  }
-
-  virtual void SetToken(nostd::unique_ptr<context::Token> &&token) noexcept
-  {
-    // TODO: not implemented
-    UNREFERENCED_PARAMETER(token);
-  }
-
-  /// <summary>
-  /// Get Owner tracer of this Span
-  /// </summary>
-  /// <returns></returns>
-  trace::Tracer &tracer() const noexcept { return this->owner_; };
-};
-
-/**
- * @brief ETW TracerProvider
- */
-class TracerProvider : public trace::TracerProvider
-{
-public:
-  /**
-   * @brief TracerProvider options supplied during initialization.
-   */
-  TracerProviderConfiguration config_;
-
-  /**
-   * @brief Construct instance of TracerProvider with given options
-   * @param options Configuration options
-   */
-  TracerProvider(TracerProviderOptions options) : trace::TracerProvider()
-  {
-    // By default we ensure that all events carry their with TraceId and SpanId
-    GetOption(options, "enableTraceId", config_.enableTraceId, true);
-    GetOption(options, "enableSpanId", config_.enableSpanId, true);
-
-    // Backwards-compatibility option that allows to reuse ETW-specific parenting described here:
-    // https://docs.microsoft.com/en-us/uwp/api/windows.foundation.diagnostics.loggingoptions.relatedactivityid
-    // https://docs.microsoft.com/en-us/windows/win32/api/evntprov/nf-evntprov-eventwritetransfer
-
-    // Emit separate events compatible with TraceLogging Activity/Start and Activity/Stop
-    // format for every Span emitted.
-    GetOption(options, "enableActivityTracking", config_.enableActivityTracking, false);
-
-    // Map current `SpanId` to ActivityId - GUID that uniquely identifies this activity. If NULL,
-    // ETW gets the identifier from the thread local storage. For details on getting this
-    // identifier, see EventActivityIdControl.
-    GetOption(options, "enableActivityId", config_.enableActivityId, false);
-
-    // Map parent `SpanId` to RelatedActivityId -  Activity identifier from the previous component.
-    // Use this parameter to link your component's events to the previous component's events.
-    GetOption(options, "enableRelatedActivityId", config_.enableRelatedActivityId, false);
-
-    // When a new Span is started, the current span automatically becomes its parent.
-    GetOption(options, "enableAutoParent", config_.enableAutoParent, false);
-
-    // Determines what encoding to use for ETW events: TraceLogging Dynamic, MsgPack, XML, etc.
-    config_.encoding = GetEncoding(options);
-  }
-
-  TracerProvider() : trace::TracerProvider()
-  {
-    config_.enableTraceId           = true;
-    config_.enableSpanId            = true;
-    config_.enableActivityId        = false;
-    config_.enableActivityTracking  = false;
-    config_.enableRelatedActivityId = false;
-    config_.enableAutoParent        = false;
-    config_.encoding                = ETWProvider::EventFormat::ETW_MANIFEST;
-  }
-
-  /**
-   * @brief Obtain ETW Tracer.
-   * @param name ProviderId (instrumentation name) - Name or GUID
-   *
-   * @param args Additional arguments that controls `codec` of the provider.
-   * Possible values are:
-   * - "ETW"            - 'classic' Trace Logging Dynamic manifest ETW events.
-   * - "MSGPACK"        - MessagePack-encoded binary payload ETW events.
-   * - "XML"            - XML events (reserved for future use)
-   * @return
-   */
-  nostd::shared_ptr<trace::Tracer> GetTracer(nostd::string_view name,
-                                             nostd::string_view args = "") override
-  {
-    UNREFERENCED_PARAMETER(args);
-    ETWProvider::EventFormat evtFmt = config_.encoding;
-    return nostd::shared_ptr<trace::Tracer>{new (std::nothrow) Tracer(*this, name, evtFmt)};
-  }
-};
+    /**
+     * @brief Obtain ETW Tracer.
+     * @param name ProviderId (instrumentation name) - Name or GUID
+     *
+     * @param args Additional arguments that controls `codec` of the provider.
+     * Possible values are:
+     * - "ETW"            - 'classic' Trace Logging Dynamic manifest ETW events.
+     * - "MSGPACK"        - MessagePack-encoded binary payload ETW events.
+     * - "XML"            - XML events (reserved for future use)
+     * @return
+     */
+    nostd::shared_ptr<trace::Tracer> GetTracer(nostd::string_view name,
+                                               nostd::string_view args = "") override
+    {
+      UNREFERENCED_PARAMETER(args);
+      ETWProvider::EventFormat evtFmt = config_.encoding;
+      return nostd::shared_ptr<trace::Tracer>{new (std::nothrow) Tracer(*this, name, evtFmt)};
+    }
+  };
 
 }  // namespace etw
-}  // namespace exporter
+}  // namespace etw
 OPENTELEMETRY_END_NAMESPACE
