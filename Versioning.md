@@ -65,7 +65,7 @@ Refer to the [ABI Policy](./docs/abi-policy.md) for more details. To summarise:
   allowed to break existing stable interfaces. Feature flags will be removed
   once we have a stable implementation for the signal.
 
-* As an expection, small experimental features in otherwise stable signals/components
+* As an exception, small experimental features in otherwise stable signals/components
   mayn't necessarily be released under feature flag. These would be flagged as experimental
   by adding a `NOTE` in it's header file - either at the beginning of file, or as the comment for
   the experimental API methods. As an example, the Semantic Conventions for
