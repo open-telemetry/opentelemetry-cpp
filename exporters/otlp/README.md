@@ -42,11 +42,27 @@ options.url = "localhost:12345";
 auto exporter = std::unique_ptr<sdktrace::SpanExporter>(new otlp::OtlpHttpExporter(options));
 ```
 
-### Configuration options
+### Configuration options ( OTLP GRPC Exporter )
 
-| Option       | Default          |
-| ------------ |----------------- |
-| `endpoint`   | `localhost:4317` |
+| Option       | Env Variable |Default          |   Description  |
+| ------------ |---------------|------------ |----------------|
+| `endpoint`   | `OTEL_EXPORTER_OTLP_GRPC_ENDPOINT`    |`localhost:4317` | The OTLP GRPC endpoint to connect to |
+| `use_ssl_credentials` | `OTEL_EXPORTER_OTLP_GRPC_SSL_ENABLE`  | `false`  |  Whether the endpoint is SSL enabled |
+| `ssl_credentials_cacert_path`  |  n/a | `""` |   SSL Certificate file path |
+| `ssl_credentials_cacert_as_string` | `OTEL_EXPORTER_OTLP_GRPC_SSL_CERTIFICATE` | `""`  |   SSL Certifcate as in-memory string |
+
+Note: These env variables names are not same as in [specification](https://github.com/open-telemetry/opentelemetry-specification/blob/v1.0.0/specification/protocol/exporter.md).
+And there is no plan to remove them when the support for environment variables as required by specification is added.
+
+### Configuration options ( OTLP HTTP Exporter )
+
+| Option       | Env Variable |Default          | Description |
+| ------------ |-----|------------ |------|
+| `url`   | n/a    | `http://localhost:4317/v1/traces`  | The OTLP HTTP endpoint to connect to |
+| `content_type` | n/a  | `application/json`  |   Data format used - JSON or Binary |
+| `json_bytes_mapping`  |  n/a | `JsonBytesMappingKind::kHexId` | Encoding used for trace_id and span_id |
+| `use_json_name` | n/a | `false`  | Whether to use json name of protobuf field to set the key of json |
+| `timeout`  | n/a  | `3000 ms` | http timeout |
 
 ## Example
 
