@@ -62,7 +62,7 @@ And there is no plan to remove them when the support for environment variables a
 | `content_type` | n/a  | `application/json`  |   Data format used - JSON or Binary |
 | `json_bytes_mapping`  |  n/a | `JsonBytesMappingKind::kHexId` | Encoding used for trace_id and span_id |
 | `use_json_name` | n/a | `false`  | Whether to use json name of protobuf field to set the key of json |
-| `timeout`  | n/a  | `3000 ms` | http timeout |
+| `timeout`  | n/a  | `30000 ms` | http timeout |
 
 ## Example
 
