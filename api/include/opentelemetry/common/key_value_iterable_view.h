@@ -14,7 +14,7 @@
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace common
 {
-// NOTE - code within detail namespace implements internal details, and not part
+// NOTE - code within `detail` namespace implements internal details, and not part
 // of the public interface.
 namespace detail
 {

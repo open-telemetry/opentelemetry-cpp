@@ -67,7 +67,7 @@ Refer to the [ABI Policy](./docs/abi-policy.md) for more details. To summarise:
 
 * Code under the "*::detail" namespace implements internal details,
   and NOT part of public interface. Also, any API not documented in the [public
-  documentation](https://labhas-opentelemetry-cpp.readthedocs.io/en/latest/) is NOT part of public interface.
+  documentation](https://opentelemetry-cpp.readthedocs.io/en/latest/) is NOT part of public interface.
 
 * GitHub releases will be made for all released versions.
 
