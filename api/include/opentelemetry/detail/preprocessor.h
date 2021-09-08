@@ -1,6 +1,9 @@
 // Copyright The OpenTelemetry Authors
 // SPDX-License-Identifier: Apache-2.0
 
+// NOTE - code within detail namespace implements internal details, and not part
+// of the public interface.
+
 #pragma once
 
 #define OPENTELEMETRY_STRINGIFY(S) OPENTELEMETRY_STRINGIFY_(S)
