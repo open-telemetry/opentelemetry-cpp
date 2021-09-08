@@ -51,7 +51,7 @@ auto exporter = std::unique_ptr<sdktrace::SpanExporter>(new otlp::OtlpHttpExport
 | `ssl_credentials_cacert_path`  |  n/a | `""` |   SSL Certificate file path |
 | `ssl_credentials_cacert_as_string` | `OTEL_EXPORTER_OTLP_GRPC_SSL_CERTIFICATE` | `""`  |   SSL Certifcate as in-memory string |
 
-Note: These env variables names are not same as in [specification](https://github.com/open-telemetry/opentelemetry-specification/blob/v1.0.0/specification/protocol/exporter.md).
+Note: These environment variable names are not same as in [specification](https://github.com/open-telemetry/opentelemetry-specification/blob/v1.0.0/specification/protocol/exporter.md).
 And there is no plan to remove them when the support for environment variables as required by specification is added.
 
 ### Configuration options ( OTLP HTTP Exporter )
