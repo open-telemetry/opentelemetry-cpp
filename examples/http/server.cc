@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 #include "server.h"
+#include "opentelemetry/trace/context.h"
 #include "opentelemetry/trace/semantic_conventions.h"
 #include "tracer_common.h"
 
@@ -12,7 +13,7 @@ namespace
 {
 
 using namespace opentelemetry::trace;
-;
+
 uint16_t server_port              = 8800;
 constexpr const char *server_name = "localhost";
 
@@ -32,7 +33,7 @@ public:
     auto prop = opentelemetry::context::propagation::GlobalTextMapPropagator::GetGlobalPropagator();
     auto current_ctx = opentelemetry::context::RuntimeContext::GetCurrent();
     auto new_context = prop->Extract(carrier, current_ctx);
-    options.parent   = opentelemetry::trace::propagation::GetSpan(new_context)->GetContext();
+    options.parent   = GetSpan(new_context)->GetContext();
 
     // start span with parent context extracted from http header
     auto span = get_tracer("http-server")

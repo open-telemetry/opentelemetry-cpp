@@ -3,9 +3,11 @@
 #else
 #include "messages.grpc.pb.h"
 #endif
-#include "tracer_common.h"
-#include "opentelemetry/trace/span_context_kv_iterable_view.h"
+
+#include "opentelemetry/trace/context.h"
 #include "opentelemetry/trace/semantic_conventions.h"
+#include "opentelemetry/trace/span_context_kv_iterable_view.h"
+#include "tracer_common.h"
 
 #include <grpcpp/grpcpp.h>
 #include <grpcpp/server.h>
@@ -56,7 +58,7 @@ public:
     auto prop = opentelemetry::context::propagation::GlobalTextMapPropagator::GetGlobalPropagator();
     auto current_ctx = opentelemetry::context::RuntimeContext::GetCurrent();
     auto new_context = prop->Extract(carrier, current_ctx);
-    options.parent   = opentelemetry::trace::propagation::GetSpan(new_context)->GetContext();
+    options.parent   = opentelemetry::trace::GetSpan(new_context)->GetContext();
 
     std::string span_name = "GreeterService/Greet";
     auto span             = get_tracer("grpc")
