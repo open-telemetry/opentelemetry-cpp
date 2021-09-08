@@ -2,8 +2,8 @@
 // SPDX-License-Identifier: Apache-2.0
 
 #include "opentelemetry/nostd/shared_ptr.h"
+#include "opentelemetry/trace/context.h"
 #include "opentelemetry/trace/noop.h"
-#include "opentelemetry/trace/propagation/detail/context.h"
 #include "opentelemetry/trace/span_id.h"
 #include "opentelemetry/trace/trace_id.h"
 
@@ -112,7 +112,7 @@ void BM_SpanCreationWitContextPropagation(benchmark::State &state)
     auto outer_span_context = SpanContext(trace_id, span_id, trace_api::TraceFlags(), false);
     auto outer_span =
         nostd::shared_ptr<trace_api::Span>(new trace_api::DefaultSpan(outer_span_context));
-    trace_api::propagation::SetSpan(current_ctx, outer_span);
+    trace_api::SetSpan(current_ctx, outer_span);
     auto inner_child = tracer->StartSpan("inner");
     auto scope       = tracer->WithActiveSpan(inner_child);
     {
