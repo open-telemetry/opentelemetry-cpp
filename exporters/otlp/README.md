@@ -55,7 +55,6 @@ auto exporter = std::unique_ptr<sdktrace::SpanExporter>(new otlp::OtlpHttpExport
 | `ssl_credentials_cacert_as_string` | `OTEL_EXPORTER_OTLP_CERTIFICATE_STRING` | `""`  |   SSL Certifcate as in-memory string |
 |  | `OTEL_EXPORTER_OTLP_TRACES_CERTIFICATE_STRING` | | | |
 
-
 ### Configuration options ( OTLP HTTP Exporter )
 
 | Option       | Env Variable |Default          | Description |
