@@ -3,7 +3,7 @@
 
 #include "server.h"
 #include "opentelemetry/trace/context.h"
-#include "opentelemetry/trace/semantic_conventions.h"
+#include "opentelemetry/trace/experimental_semantic_conventions.h"
 #include "tracer_common.h"
 
 #include <iostream>
