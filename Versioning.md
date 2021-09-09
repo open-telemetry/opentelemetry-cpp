@@ -68,8 +68,9 @@ Refer to the [ABI Policy](./docs/abi-policy.md) for more details. To summarise:
 * As an exception, small experimental features in otherwise stable signals/components
   mayn't necessarily be released under feature flag. These would be flagged as experimental
   by adding a `NOTE` in it's header file - either at the beginning of file, or as the comment for
-  the experimental API methods. As an example, the Semantic Conventions for
-  trace signal is experimental at the time of the writing, as mentioned [here](https://github.com/lalitb/opentelemetry-cpp/blob/semantic-conv-experimental/api/include/opentelemetry/trace/semantic_conventions.h#L4:L7).
+  the experimental API methods. Also, if the complete header is experimental, it would be prefixed
+  as `experimental_`. As an example, the semantic conventions for
+  trace signal is experimental at the time of the writing and is within `experimental_semantic_conventions.h`
 
 * GitHub releases will be made for all released versions.
 
