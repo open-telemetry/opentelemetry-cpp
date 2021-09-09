@@ -55,6 +55,7 @@ auto exporter = std::unique_ptr<sdktrace::SpanExporter>(new otlp::OtlpHttpExport
 | `ssl_credentials_cacert_as_string` | `OTEL_EXPORTER_OTLP_CERTIFICATE_STRING` | `""`  |   SSL Certifcate as in-memory string |
 |  | `OTEL_EXPORTER_OTLP_TRACES_CERTIFICATE_STRING` | | | |
 
+
 ### Configuration options ( OTLP HTTP Exporter )
 
 | Option       | Env Variable |Default          | Description |
@@ -63,7 +64,7 @@ auto exporter = std::unique_ptr<sdktrace::SpanExporter>(new otlp::OtlpHttpExport
 | `content_type` | n/a  | `application/json`  |   Data format used - JSON or Binary |
 | `json_bytes_mapping`  |  n/a | `JsonBytesMappingKind::kHexId` | Encoding used for trace_id and span_id |
 | `use_json_name` | n/a | `false`  | Whether to use json name of protobuf field to set the key of json |
-| `timeout`  | n/a  | `3000 ms` | http timeout |
+| `timeout`  | n/a  | `30000 ms` | http timeout |
 
 ## Example
 

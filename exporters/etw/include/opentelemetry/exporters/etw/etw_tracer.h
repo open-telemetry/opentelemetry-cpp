@@ -569,8 +569,15 @@ public:
     // Parent Context:
     // - either use current span
     // - or attach to parent SpanContext specified in options
-    const auto parentContext =
-        (options.parent.IsValid()) ? options.parent : GetCurrentSpan()->GetContext();
+    trace::SpanContext parentContext = GetCurrentSpan()->GetContext();
+    if (nostd::holds_alternative<trace::SpanContext>(options.parent))
+    {
+      auto span_context = nostd::get<trace::SpanContext>(options.parent);
+      if (span_context.IsValid())
+      {
+        parentContext = span_context;
+      }
+    }
 
     // Populate Etw.RelatedActivityId at envelope level if enabled
     GUID RelatedActivityId;
@@ -1089,8 +1096,9 @@ public:
     // identifier, see EventActivityIdControl.
     GetOption(options, "enableActivityId", config_.enableActivityId, false);
 
-    // Map parent `SpanId` to RelatedActivityId -  Activity identifier from the previous component.
-    // Use this parameter to link your component's events to the previous component's events.
+    // Map parent `SpanId` to RelatedActivityId -  Activity identifier from the previous
+    // component. Use this parameter to link your component's events to the previous component's
+    // events.
     GetOption(options, "enableRelatedActivityId", config_.enableRelatedActivityId, false);
 
     // When a new Span is started, the current span automatically becomes its parent.
