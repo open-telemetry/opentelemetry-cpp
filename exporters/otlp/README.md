@@ -46,13 +46,14 @@ auto exporter = std::unique_ptr<sdktrace::SpanExporter>(new otlp::OtlpHttpExport
 
 | Option       | Env Variable |Default          |   Description  |
 | ------------ |---------------|------------ |----------------|
-| `endpoint`   | `OTEL_EXPORTER_OTLP_GRPC_ENDPOINT`    |`localhost:4317` | The OTLP GRPC endpoint to connect to |
-| `use_ssl_credentials` | `OTEL_EXPORTER_OTLP_GRPC_SSL_ENABLE`  | `false`  |  Whether the endpoint is SSL enabled |
-| `ssl_credentials_cacert_path`  |  n/a | `""` |   SSL Certificate file path |
-| `ssl_credentials_cacert_as_string` | `OTEL_EXPORTER_OTLP_GRPC_SSL_CERTIFICATE` | `""`  |   SSL Certifcate as in-memory string |
-
-Note: These env variables names are not same as in [specification](https://github.com/open-telemetry/opentelemetry-specification/blob/v1.0.0/specification/protocol/exporter.md).
-And there is no plan to remove them when the support for environment variables as required by specification is added.
+| `endpoint` | `OTEL_EXPORTER_OTLP_ENDPOINT` | `http://localhost:4317`| The OTLP GRPC endpoint to connect to |
+|              |   `OTEL_EXPORTER_OTLP_TRACES_ENDPOINT`  |  | |
+| `use_ssl_credentials` | `OTEL_EXPORTER_OTLP_SSL_ENABLE`| `false` | Whether the endpoint is SSL enabled |
+|    | `OTEL_EXPORTER_OTLP_TRACES_SSL_ENABLE` | | |
+| `ssl_credentials_cacert_path`  |  `OTEL_EXPORTER_OTLP_CERTIFICATE` | `""`  | SSL Certificate file path |
+|    | `OTEL_EXPORTER_OTLP_TRACES_CERTIFICATE` | | |
+| `ssl_credentials_cacert_as_string` | `OTEL_EXPORTER_OTLP_CERTIFICATE_STRING` | `""`  |   SSL Certifcate as in-memory string |
+|  | `OTEL_EXPORTER_OTLP_TRACES_CERTIFICATE_STRING` | | | |
 
 ### Configuration options ( OTLP HTTP Exporter )
 
