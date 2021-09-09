@@ -14,6 +14,8 @@
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace common
 {
+// NOTE - code within `detail` namespace implements internal details, and not part
+// of the public interface.
 namespace detail
 {
 inline void take_key_value(nostd::string_view, common::AttributeValue) {}

@@ -72,6 +72,10 @@ Refer to the [ABI Policy](./docs/abi-policy.md) for more details. To summarise:
   as `experimental_`. As an example, the semantic conventions for
   trace signal is experimental at the time of the writing and is within `experimental_semantic_conventions.h`
 
+* Code under the "*::detail" namespace implements internal details,
+  and NOT part of public interface. Also, any API not documented in the [public
+  documentation](https://opentelemetry-cpp.readthedocs.io/en/latest/) is NOT part of public interface.
+
 * GitHub releases will be made for all released versions.
 
 ## Example Versioning Lifecycle
