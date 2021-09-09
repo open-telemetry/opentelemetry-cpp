@@ -71,6 +71,10 @@ Refer to the [ABI Policy](./docs/abi-policy.md) for more details. To summarise:
   the experimental API methods. As an example, the Semantic Conventions for
   trace signal is experimental at the time of the writing, as mentioned [here](https://github.com/lalitb/opentelemetry-cpp/blob/semantic-conv-experimental/api/include/opentelemetry/trace/semantic_conventions.h#L4:L7).
 
+* Code under the "*::detail" namespace implements internal details,
+  and NOT part of public interface. Also, any API not documented in the [public
+  documentation](https://opentelemetry-cpp.readthedocs.io/en/latest/) is NOT part of public interface.
+
 * GitHub releases will be made for all released versions.
 
 ## Example Versioning Lifecycle
