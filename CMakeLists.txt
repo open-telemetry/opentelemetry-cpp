@@ -4,6 +4,12 @@ cmake_minimum_required(VERSION 3.1)
 # versions of gtest
 cmake_policy(SET CMP0057 NEW)
 
+# See https://cmake.org/cmake/help/v3.12/policy/CMP0074.html required by certain
+# version of zlib which is dependeded by cURL.
+if(${CMAKE_VERSION} VERSION_GREATER_EQUAL "3.12")
+    cmake_policy(SET CMP0074 NEW)
+endif()
+
 project(opentelemetry-cpp)
 
 # Mark variables as used so cmake doesn't complain about them
