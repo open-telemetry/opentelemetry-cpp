@@ -5,8 +5,8 @@
 #include "opentelemetry/common/key_value_iterable_view.h"
 #include "opentelemetry/nostd/string_view.h"
 #include "opentelemetry/sdk/common/attribute_utils.h"
+#include "opentelemetry/sdk/resource/experimental_semantic_conventions.h"
 #include "opentelemetry/sdk/resource/resource_detector.h"
-#include "opentelemetry/sdk/resource/semantic_conventions.h"
 
 #include <cstdlib>
 #include <string>
