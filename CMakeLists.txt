@@ -87,13 +87,24 @@ else()
   )
 endif()
 
-if(NOT DEFINED CMAKE_CXX_STANDARD)
-  set(CMAKE_CXX_STANDARD 11)
-endif()
-
 option(WITH_STL "Whether to use Standard Library for C++latest features" OFF)
 
 option(WITH_ABSEIL "Whether to use Abseil for C++latest features" OFF)
+
+if(NOT DEFINED CMAKE_CXX_STANDARD)
+  if (WITH_STL)
+    # Require at least C++17. C++20 is needed to avoid gsl::span
+    if(CMAKE_VERSION VERSION_GREATER 3.11.999)
+      # Ask for 20, may get anything below
+      set(CMAKE_CXX_STANDARD 20)
+    else()
+      # Ask for 17, may get anything below
+      set(CMAKE_CXX_STANDARD 17)
+    endif()
+  else()
+    set(CMAKE_CXX_STANDARD 11)
+  endif()
+endif()
 
 if(WITH_ABSEIL)
   find_package(absl CONFIG REQUIRED)
@@ -112,14 +123,6 @@ if(WITH_STL)
   # the global project build definitions.
   add_definitions(-DHAVE_CPP_STDLIB)
   add_definitions(-DHAVE_GSL)
-  # Require at least C++17. C++20 is needed to avoid gsl::span
-  if(CMAKE_VERSION VERSION_GREATER 3.11.999)
-    # Ask for 20, may get anything below
-    set(CMAKE_CXX_STANDARD 20)
-  else()
-    # Ask for 17, may get anything below
-    set(CMAKE_CXX_STANDARD 17)
-  endif()
 
   # Guidelines Support Library path. Used if we are not on not get C++20.
   #
