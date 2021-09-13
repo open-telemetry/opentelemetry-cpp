@@ -32,7 +32,7 @@ cc_library(
 cc_binary(
     name = "client_grpc",
     srcs = [
-        "client.cpp",
+        "client.cc",
     ],
     defines = ["BAZEL_BUILD"],
     deps = [
@@ -47,7 +47,7 @@ cc_binary(
 cc_binary(
     name = "server_grpc",
     srcs = [
-        "server.cpp",
+        "server.cc",
     ],
     defines = ["BAZEL_BUILD"],
     deps = [

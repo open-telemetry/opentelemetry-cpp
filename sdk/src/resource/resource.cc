@@ -3,8 +3,8 @@
 
 #include "opentelemetry/sdk/resource/resource.h"
 #include "opentelemetry/nostd/span.h"
+#include "opentelemetry/sdk/resource/experimental_semantic_conventions.h"
 #include "opentelemetry/sdk/resource/resource_detector.h"
-#include "opentelemetry/sdk/resource/semantic_conventions.h"
 #include "opentelemetry/version.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE

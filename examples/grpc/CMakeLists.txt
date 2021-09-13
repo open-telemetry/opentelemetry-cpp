@@ -37,7 +37,7 @@ else()
 endif()
 
 foreach(_target client server)
-  add_executable(${_target} "${_target}.cpp")
+  add_executable(${_target} "${_target}.cc")
   target_link_libraries(
     ${_target} example_grpc_proto protobuf::libprotobuf gRPC::grpc++
     opentelemetry_trace opentelemetry_exporter_ostream_span)
