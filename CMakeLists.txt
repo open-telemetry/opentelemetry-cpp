@@ -92,7 +92,7 @@ option(WITH_STL "Whether to use Standard Library for C++latest features" OFF)
 option(WITH_ABSEIL "Whether to use Abseil for C++latest features" OFF)
 
 if(NOT DEFINED CMAKE_CXX_STANDARD)
-  if (WITH_STL)
+  if(WITH_STL)
     # Require at least C++17. C++20 is needed to avoid gsl::span
     if(CMAKE_VERSION VERSION_GREATER 3.11.999)
       # Ask for 20, may get anything below
