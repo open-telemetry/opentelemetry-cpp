@@ -59,6 +59,7 @@ std::unique_ptr<proto::collector::trace::v1::TraceService::Stub> MakeServiceStub
     const OtlpGrpcExporterOptions &options)
 {
   std::shared_ptr<grpc::Channel> channel;
+
   if (options.use_ssl_credentials)
   {
     grpc::SslCredentialsOptions ssl_opts;

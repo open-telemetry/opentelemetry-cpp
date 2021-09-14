@@ -19,19 +19,30 @@ namespace exporter
 namespace otlp
 {
 
-inline const std::string GetOtlpGrpcDefaultEndpoint()
+inline const std::string GetOtlpDefaultEndpoint()
 {
-  constexpr char kOtlpGrpcEndpointEnv[]     = "OTEL_EXPORTER_OTLP_GRPC_ENDPOINT";
-  constexpr char kOtlpGrpcEndpointDefault[] = "localhost:4317";
+  constexpr char kOtlpTracesEndpointEnv[] = "OTEL_EXPORTER_OTLP_TRACES_ENDPOINT";
+  constexpr char kOtlpEndpointEnv[]       = "OTEL_EXPORTER_OTLP_ENDPOINT";
+  constexpr char kOtlpEndpointDefault[]   = "http://localhost:4317";
 
-  auto endpoint = opentelemetry::sdk::common::GetEnvironmentVariable(kOtlpGrpcEndpointEnv);
-  return endpoint.size() ? endpoint : kOtlpGrpcEndpointDefault;
+  auto endpoint = opentelemetry::sdk::common::GetEnvironmentVariable(kOtlpTracesEndpointEnv);
+  if (endpoint.size() == 0)
+  {
+    endpoint = opentelemetry::sdk::common::GetEnvironmentVariable(kOtlpEndpointEnv);
+  }
+  return endpoint.size() ? endpoint : kOtlpEndpointDefault;
 }
 
-inline const bool GetOtlpGrpcDefaultIsSslEnable()
+inline const bool GetOtlpDefaultIsSslEnable()
 {
-  constexpr char kOtlpGrpcIsSslEnableEnv[] = "OTEL_EXPORTER_OTLP_GRPC_SSL_ENABLE";
-  auto ssl_enable = opentelemetry::sdk::common::GetEnvironmentVariable(kOtlpGrpcIsSslEnableEnv);
+  constexpr char kOtlpTracesIsSslEnableEnv[] = "OTEL_EXPORTER_OTLP_TRACES_SSL_ENABLE";
+  constexpr char kOtlpIsSslEnableEnv[]       = "OTEL_EXPORTER_OTLP_SSL_ENABLE";
+
+  auto ssl_enable = opentelemetry::sdk::common::GetEnvironmentVariable(kOtlpTracesIsSslEnableEnv);
+  if (ssl_enable.size() == 0)
+  {
+    ssl_enable = opentelemetry::sdk::common::GetEnvironmentVariable(kOtlpIsSslEnableEnv);
+  }
   if (ssl_enable == "True" || ssl_enable == "TRUE" || ssl_enable == "true" || ssl_enable == "1")
   {
     return true;
@@ -39,10 +50,29 @@ inline const bool GetOtlpGrpcDefaultIsSslEnable()
   return false;
 }
 
-inline const std::string GetOtlpGrpcDefaultSslCertificate()
+inline const std::string GetOtlpDefaultSslCertificatePath()
 {
-  constexpr char kOtlpGrpcSslCertificate[] = "OTEL_EXPORTER_OTLP_GRPC_SSL_CERTIFICATE";
-  auto ssl_cert = opentelemetry::sdk::common::GetEnvironmentVariable(kOtlpGrpcSslCertificate);
+  constexpr char kOtlpTracesSslCertificate[] = "OTEL_EXPORTER_OTLP_TRACES_CERTIFICATE";
+  constexpr char kOtlpSslCertificate[]       = "OTEL_EXPORTER_OTLP_CERTIFICATE ";
+  auto ssl_cert_path =
+      opentelemetry::sdk::common::GetEnvironmentVariable(kOtlpTracesSslCertificate);
+  if (ssl_cert_path.size() == 0)
+  {
+    ssl_cert_path = opentelemetry::sdk::common::GetEnvironmentVariable(kOtlpSslCertificate);
+  }
+  return ssl_cert_path.size() ? ssl_cert_path : "";
+}
+
+inline const std::string GetOtlpDefaultSslCertificateString()
+{
+  constexpr char kOtlpTracesSslCertificateString[] = "OTEL_EXPORTER_OTLP_CERTIFICATE_STRING";
+  constexpr char kOtlpSslCertificateString[] = "OTEL_EXPORTER_OTLP_TRACES_CERTIFICATE_STRING ";
+  auto ssl_cert =
+      opentelemetry::sdk::common::GetEnvironmentVariable(kOtlpTracesSslCertificateString);
+  if (ssl_cert.size() == 0)
+  {
+    ssl_cert = opentelemetry::sdk::common::GetEnvironmentVariable(kOtlpSslCertificateString);
+  }
   return ssl_cert.size() ? ssl_cert : "";
 }
 
@@ -52,15 +82,15 @@ inline const std::string GetOtlpGrpcDefaultSslCertificate()
 struct OtlpGrpcExporterOptions
 {
   // The endpoint to export to. By default the OpenTelemetry Collector's default endpoint.
-  std::string endpoint = GetOtlpGrpcDefaultEndpoint();
+  std::string endpoint = GetOtlpDefaultEndpoint();
   // By default when false, uses grpc::InsecureChannelCredentials(); If true,
   // uses ssl_credentials_cacert_path if non-empty, else uses ssl_credentials_cacert_as_string
-  bool use_ssl_credentials = GetOtlpGrpcDefaultIsSslEnable();
+  bool use_ssl_credentials = GetOtlpDefaultIsSslEnable();
   // ssl_credentials_cacert_path specifies path to .pem file to be used for SSL encryption.
-  std::string ssl_credentials_cacert_path = "";
+  std::string ssl_credentials_cacert_path = GetOtlpDefaultSslCertificatePath();
   // ssl_credentials_cacert_as_string in-memory string representation of .pem file to be used for
   // SSL encryption.
-  std::string ssl_credentials_cacert_as_string = GetOtlpGrpcDefaultSslCertificate();
+  std::string ssl_credentials_cacert_as_string = GetOtlpDefaultSslCertificateString();
 };
 
 /**
