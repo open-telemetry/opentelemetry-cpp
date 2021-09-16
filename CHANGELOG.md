@@ -53,7 +53,7 @@ Increment the:
 * Enable CMake to search the new package variable `<PackageName>_ROOT` ([#975](https://github.com/open-telemetry/opentelemetry-cpp/pull/975))
 * :bug: Do not override CMAKE_CXX_STANDARD ([#977](https://github.com/open-telemetry/opentelemetry-cpp/pull/977))
 
-### :test-tube: Experiemental Features (Will change in future)
+### :construction: Experiemental Features (Will change in future)
 
 * Semantic Conventions for traces - As the specs is still experimental, the implementation will change in future.
 * Semantic Convention for resource - As the specs is still experimental, the implementation will change in future.
