@@ -15,7 +15,7 @@ Increment the:
 
 ## [Unreleased]
 
-* [API/SDK] Add schema_url support to both Resource and InstrumentationLibrary
+* [API/SDK] Add schema_url support to both Resource and InstrumentationLibrary ([#979](https://github.com/open-telemetry/opentelemetry-cpp/pull/979))
 
 ## [1.0.0-rc4] 2021-08-04
 
