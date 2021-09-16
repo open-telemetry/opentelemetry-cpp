@@ -15,6 +15,8 @@ Increment the:
 
 ## [Unreleased]
 
+* [API/SDK] Add schema_url support to both Resource and InstrumentationLibrary
+
 ## [1.0.0-rc4] 2021-08-04
 
 * [EXPORTER] `BREAKING CHANGE` Fix default HTTP port for OTLP HTTP Exporter ([#939](https://github.com/open-telemetry/opentelemetry-cpp/pull/939))
