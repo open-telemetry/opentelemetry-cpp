@@ -57,7 +57,7 @@ Increment the:
 
 * Semantic Conventions for traces - As the specs is still experimental, the implementation will change in future.
 * Semantic Convention for resource - As the specs is still experimental, the implementation will change in future.
-* Logs and Semantics API & SDK - These are not compliant, and are behind feature flag. Not recommended to use for now.
+* Logs and Metrics API & SDK - These are not compliant, and are behind feature flag. Not recommended to use for now.
 
 ## [1.0.0-rc4] 2021-08-04
 
