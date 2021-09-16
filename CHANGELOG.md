@@ -53,6 +53,12 @@ Increment the:
 * Enable CMake to search the new package variable `<PackageName>_ROOT` ([#975](https://github.com/open-telemetry/opentelemetry-cpp/pull/975))
 * :bug: Do not override CMAKE_CXX_STANDARD ([#977](https://github.com/open-telemetry/opentelemetry-cpp/pull/977))
 
+### :test-tube: Experiemental Features (Will change in future)
+
+* Semantic Conventions for traces - As the specs is still experimental, the implementation will change in future.
+* Semantic Convention for resource - As the specs is still experimental, the implementation will change in future.
+* Logs and Semantics API & SDK - These are not compliant, and are behind feature flag. Not recommended to use for now.
+
 ## [1.0.0-rc4] 2021-08-04
 
 * [EXPORTER] `BREAKING CHANGE` Fix default HTTP port for OTLP HTTP Exporter ([#939](https://github.com/open-telemetry/opentelemetry-cpp/pull/939))
