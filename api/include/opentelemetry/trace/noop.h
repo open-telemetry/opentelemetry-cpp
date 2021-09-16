@@ -105,7 +105,8 @@ public:
 
   nostd::shared_ptr<opentelemetry::trace::Tracer> GetTracer(
       nostd::string_view library_name,
-      nostd::string_view library_version) override
+      nostd::string_view library_version,
+      nostd::string_view schema_url) override
   {
     return tracer_;
   }

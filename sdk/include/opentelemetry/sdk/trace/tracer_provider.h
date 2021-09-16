@@ -61,7 +61,8 @@ public:
 
   opentelemetry::nostd::shared_ptr<opentelemetry::trace::Tracer> GetTracer(
       nostd::string_view library_name,
-      nostd::string_view library_version = "") noexcept override;
+      nostd::string_view library_version = "",
+      nostd::string_view schema_url      = "") noexcept override;
 
   /**
    * Attaches a span processor to list of configured processors for this tracer provider.
