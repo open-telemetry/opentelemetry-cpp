@@ -15,7 +15,7 @@ Increment the:
 
 ## [Unreleased]
 
-## [1.0.0] 2021-09-15
+## [1.0.0] 2021-09-16
 
 ### API
 
@@ -24,12 +24,12 @@ Increment the:
 * Remove unused public API to_span_ptr ([#964](https://github.com/open-telemetry/opentelemetry-cpp/pull/964))
 * :collision: Make span context management public ([#967](https://github.com/open-telemetry/opentelemetry-cpp/pull/967))
 * Support determining parent span from Context while creating new Span ([#969](https://github.com/open-telemetry/opentelemetry-cpp/pull/969))
-* :collision: Add note on experimental semantic convention implementation, prefix semantics headers with experimental tag ([#970](https://github.com/open-telemetry/opentelemetry-cpp/pull/970))
+* :collision: Traces: Add note on experimental semantic convention implementation, prefix semantics headers with experimental tag ([#970](https://github.com/open-telemetry/opentelemetry-cpp/pull/970))
 
 ### SDK
 
 * Cleanup GetEnvironmentVariable and remove unused variable under NO_GETENV ([#976](https://github.com/open-telemetry/opentelemetry-cpp/pull/976))
-* :collision: Add note on experimental semantic convention implementation, prefix semantics headers with experimental tag ([#970](https://github.com/open-telemetry/opentelemetry-cpp/pull/970))
+* :collision: Resources: Add note on experimental semantic convention implementation, prefix semantics headers with experimental tag ([#970](https://github.com/open-telemetry/opentelemetry-cpp/pull/970))
 
 ### OTLP Exporter
 

@@ -12,7 +12,7 @@ The C++ [OpenTelemetry](https://opentelemetry.io/) client.
 
 | Signal  | Status                 | Project                                                                  |
 | ------- | ---------------------- | ------------------------------------------------------------------------ |
-| Traces  | Public Release         |  N/A                                                                     |
+| Traces  | Public Release         | N/A                                                                     |
 | Metrics | Development paused [1] | N/A                                                                      |
 | Logs    | Experimental [2]       | N/A                                                                      |
 
