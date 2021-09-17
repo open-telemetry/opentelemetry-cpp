@@ -139,12 +139,12 @@ TEST_F(OtlpGrpcExporterTestPeer, ConfigSslCredentialsTest)
 TEST_F(OtlpGrpcExporterTestPeer, ConfigFromEnv)
 {
   const std::string cacert_str = "--begin and end fake cert--";
-  const std::string cacert_env = "OTEL_EXPORTER_OTLP_GRPC_SSL_CERTIFICATE=" + cacert_str;
+  const std::string cacert_env = "OTEL_EXPORTER_OTLP_CERTIFICATE_STRING=" + cacert_str;
   putenv(const_cast<char *>(cacert_env.data()));
-  char ssl_enable_env[] = "OTEL_EXPORTER_OTLP_GRPC_SSL_ENABLE=True";
+  char ssl_enable_env[] = "OTEL_EXPORTER_OTLP_SSL_ENABLE=True";
   putenv(ssl_enable_env);
   const std::string endpoint     = "http://localhost:9999";
-  const std::string endpoint_env = "OTEL_EXPORTER_OTLP_GRPC_ENDPOINT=" + endpoint;
+  const std::string endpoint_env = "OTEL_EXPORTER_OTLP_ENDPOINT=" + endpoint;
   putenv(const_cast<char *>(endpoint_env.data()));
 
   std::unique_ptr<OtlpGrpcExporter> exporter(new OtlpGrpcExporter());
@@ -152,14 +152,14 @@ TEST_F(OtlpGrpcExporterTestPeer, ConfigFromEnv)
   EXPECT_EQ(GetOptions(exporter).use_ssl_credentials, true);
   EXPECT_EQ(GetOptions(exporter).endpoint, endpoint);
 #    if defined(_MSC_VER)
-  putenv("OTEL_EXPORTER_OTLP_GRPC_ENDPOINT=");
-  putenv("OTEL_EXPORTER_OTLP_GRPC_SSL_CERTIFICATE=");
-  putenv("OTEL_EXPORTER_OTLP_GRPC_SSL_ENABLE=");
+  putenv("OTEL_EXPORTER_OTLP_ENDPOINT=");
+  putenv("OTEL_EXPORTER_OTLP_CERTIFICATE_STRING=");
+  putenv("OTEL_EXPORTER_OTLP_SSL_ENABLE=");
 
 #    else
-  unsetenv("OTEL_EXPORTER_OTLP_GRPC_ENDPOINT");
-  unsetenv("OTEL_EXPORTER_OTLP_GRPC_SSL_CERTIFICATE");
-  unsetenv("OTEL_EXPORTER_OTLP_GRPC_SSL_ENABLE");
+  unsetenv("OTEL_EXPORTER_OTLP_ENDPOINT");
+  unsetenv("OTEL_EXPORTER_OTLP_CERTIFICATE_STRING");
+  unsetenv("OTEL_EXPORTER_OTLP_SSL_ENABLE");
 
 #    endif
 }
