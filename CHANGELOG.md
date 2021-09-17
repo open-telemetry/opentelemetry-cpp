@@ -28,7 +28,7 @@ Increment the:
 
 ### SDK
 
-* Cleanup GetEnvironmentVariable and remove unused variable under NO_GETENV ([#976](https://github.com/open-telemetry/opentelemetry-cpp/pull/976))
+* Clean up `GetEnvironmentVariable` and remove unused variable under `NO_GETENV` ([#976](https://github.com/open-telemetry/opentelemetry-cpp/pull/976))
 * :collision: Resources: Add note on experimental semantic convention implementation, prefix semantics headers with experimental tag ([#970](https://github.com/open-telemetry/opentelemetry-cpp/pull/970))
 
 ### OTLP Exporter
