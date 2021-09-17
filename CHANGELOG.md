@@ -43,7 +43,7 @@ Increment the:
 
 ### DOCS
 
-* :book: Add Getting started documentation for SDK: ([#942](https://github.com/open-telemetry/opentelemetry-cpp/pull/942))
+* :book: Add getting-started documentation for SDK: ([#942](https://github.com/open-telemetry/opentelemetry-cpp/pull/942))
 * :book: Remove unnecessary spaces and spelling of gRPC in README ([#965](https://github.com/open-telemetry/opentelemetry-cpp/pull/965))
 
 ### BUILD
