@@ -237,6 +237,28 @@ proto::resource::v1::Resource OtlpRecordable::ProtoResource() const noexcept
   return proto;
 }
 
+const std::string OtlpRecordable::GetResourceSchemaURL() const noexcept
+{
+  std::string schema_url;
+  if (resource_)
+  {
+    schema_url = resource_->GetSchemaURL();
+  }
+
+  return schema_url;
+}
+
+const std::string OtlpRecordable::GetInstrumentationLibrarySchemaURL() const noexcept
+{
+  std::string schema_url;
+  if (instrumentation_library_)
+  {
+    schema_url = instrumentation_library_->GetSchemaURL();
+  }
+
+  return schema_url;
+}
+
 proto::common::v1::InstrumentationLibrary OtlpRecordable::GetProtoInstrumentationLibrary()
     const noexcept
 {
