@@ -25,6 +25,7 @@ Increment the:
 * :collision: Make span context management public ([#967](https://github.com/open-telemetry/opentelemetry-cpp/pull/967))
 * Support determining parent span from Context while creating new Span ([#969](https://github.com/open-telemetry/opentelemetry-cpp/pull/969))
 * :collision: Traces: Add note on experimental semantic convention implementation, prefix semantics headers with experimental tag ([#970](https://github.com/open-telemetry/opentelemetry-cpp/pull/970))
+* Increment OPENTELEMETRY_ABI_VERSION_NO to 1 ([#980](https://github.com/open-telemetry/opentelemetry-cpp/pull/980))
 
 ### SDK
 
