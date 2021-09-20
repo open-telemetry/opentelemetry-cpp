@@ -15,6 +15,8 @@ Increment the:
 
 ## [Unreleased]
 
+* Support environment variables for both `OtlpGrpcExporter` and `OtlpHttpExporter` ([#983](https://github.com/open-telemetry/opentelemetry-cpp/pull/983))
+
 ## [1.0.0] 2021-09-16
 
 ### API

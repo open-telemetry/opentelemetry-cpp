@@ -146,20 +146,52 @@ TEST_F(OtlpGrpcExporterTestPeer, ConfigFromEnv)
   const std::string endpoint     = "http://localhost:9999";
   const std::string endpoint_env = "OTEL_EXPORTER_OTLP_ENDPOINT=" + endpoint;
   putenv(const_cast<char *>(endpoint_env.data()));
+  putenv("OTEL_EXPORTER_OTLP_TIMEOUT=20050ms");
+  putenv("OTEL_EXPORTER_OTLP_HEADERS=custom-header-a=a1,custom-header-b=b");
+  putenv("OTEL_EXPORTER_OTLP_TRACES_HEADERS=custom-header-a=a2");
 
   std::unique_ptr<OtlpGrpcExporter> exporter(new OtlpGrpcExporter());
   EXPECT_EQ(GetOptions(exporter).ssl_credentials_cacert_as_string, cacert_str);
   EXPECT_EQ(GetOptions(exporter).use_ssl_credentials, true);
   EXPECT_EQ(GetOptions(exporter).endpoint, endpoint);
+  EXPECT_EQ(GetOptions(exporter).timeout.count(),
+            std::chrono::duration_cast<std::chrono::system_clock::duration>(
+                std::chrono::milliseconds{20050})
+                .count());
+  EXPECT_EQ(GetOptions(exporter).metadata.size(), 3);
+  {
+    // Test custom-header-b
+    auto range = GetOptions(exporter).metadata.equal_range("custom-header-b");
+    EXPECT_TRUE(range.first != range.second);
+    EXPECT_EQ(range.first->second, std::string("b"));
+    ++range.first;
+    EXPECT_TRUE(range.first == range.second);
+  }
+  {
+    // Test custom-header-a
+    auto range = GetOptions(exporter).metadata.equal_range("custom-header-a");
+    EXPECT_TRUE(range.first != range.second);
+    EXPECT_EQ(range.first->second, std::string("a1"));
+    ++range.first;
+    EXPECT_EQ(range.first->second, std::string("a2"));
+    ++range.first;
+    EXPECT_TRUE(range.first == range.second);
+  }
 #    if defined(_MSC_VER)
   putenv("OTEL_EXPORTER_OTLP_ENDPOINT=");
   putenv("OTEL_EXPORTER_OTLP_CERTIFICATE_STRING=");
   putenv("OTEL_EXPORTER_OTLP_SSL_ENABLE=");
+  putenv("OTEL_EXPORTER_OTLP_TIMEOUT=");
+  putenv("OTEL_EXPORTER_OTLP_HEADERS=");
+  putenv("OTEL_EXPORTER_OTLP_TRACES_HEADERS=");
 
 #    else
   unsetenv("OTEL_EXPORTER_OTLP_ENDPOINT");
   unsetenv("OTEL_EXPORTER_OTLP_CERTIFICATE_STRING");
   unsetenv("OTEL_EXPORTER_OTLP_SSL_ENABLE");
+  unsetenv("OTEL_EXPORTER_OTLP_TIMEOUT");
+  unsetenv("OTEL_EXPORTER_OTLP_HEADERS");
+  unsetenv("OTEL_EXPORTER_OTLP_TRACES_HEADERS");
 
 #    endif
 }
