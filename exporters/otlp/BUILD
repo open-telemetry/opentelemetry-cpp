@@ -48,6 +48,7 @@ cc_library(
     strip_include_prefix = "include",
     deps = [
         ":otlp_recordable",
+        "//ext:headers",
         "//sdk/src/trace",
 
         # For gRPC
