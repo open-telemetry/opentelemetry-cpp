@@ -335,8 +335,8 @@ TEST_F(OtlpHttpExporterTestPeer, ConfigFromEnv)
   const std::string url_env = "OTEL_EXPORTER_OTLP_ENDPOINT=" + url;
   putenv(const_cast<char *>(url_env.data()));
   putenv("OTEL_EXPORTER_OTLP_TIMEOUT=20s");
-  putenv("OTEL_EXPORTER_OTLP_HEADERS=custom-header-a=a1,custom-header-b=b");
-  putenv("OTEL_EXPORTER_OTLP_TRACES_HEADERS=custom-header-a=a2");
+  putenv("OTEL_EXPORTER_OTLP_HEADERS=k1=v1,k2=v2");
+  putenv("OTEL_EXPORTER_OTLP_TRACES_HEADERS=k1=v3,k1=v4");
 
   std::unique_ptr<OtlpHttpExporter> exporter(new OtlpHttpExporter());
   EXPECT_EQ(GetOptions(exporter).url, url);
@@ -346,20 +346,20 @@ TEST_F(OtlpHttpExporterTestPeer, ConfigFromEnv)
           .count());
   EXPECT_EQ(GetOptions(exporter).http_headers.size(), 3);
   {
-    // Test custom-header-b
-    auto range = GetOptions(exporter).http_headers.equal_range("custom-header-b");
+    // Test k2
+    auto range = GetOptions(exporter).http_headers.equal_range("k2");
     EXPECT_TRUE(range.first != range.second);
-    EXPECT_EQ(range.first->second, std::string("b"));
+    EXPECT_EQ(range.first->second, std::string("v2"));
     ++range.first;
     EXPECT_TRUE(range.first == range.second);
   }
   {
-    // Test custom-header-a
-    auto range = GetOptions(exporter).http_headers.equal_range("custom-header-a");
+    // k1
+    auto range = GetOptions(exporter).http_headers.equal_range("k1");
     EXPECT_TRUE(range.first != range.second);
-    EXPECT_EQ(range.first->second, std::string("a1"));
+    EXPECT_EQ(range.first->second, std::string("v3"));
     ++range.first;
-    EXPECT_EQ(range.first->second, std::string("a2"));
+    EXPECT_EQ(range.first->second, std::string("v4"));
     ++range.first;
     EXPECT_TRUE(range.first == range.second);
   }

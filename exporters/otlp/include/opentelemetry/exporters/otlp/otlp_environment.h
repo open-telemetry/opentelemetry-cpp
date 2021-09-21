@@ -7,6 +7,7 @@
 #include <chrono>
 #include <map>
 #include <string>
+#include <unordered_set>
 
 #include "opentelemetry/nostd/string_view.h"
 
@@ -165,7 +166,9 @@ struct cmp_ic
 };
 using OtlpHeaders = std::multimap<std::string, std::string, cmp_ic>;
 
-inline void DumpOtlpHeaders(OtlpHeaders &output, const char *env_var_name)
+inline void DumpOtlpHeaders(OtlpHeaders &output,
+                            const char *env_var_name,
+                            std::unordered_set<std::string> &remove_cache)
 {
   auto value = opentelemetry::sdk::common::GetEnvironmentVariable(env_var_name);
   if (value.empty())
@@ -182,7 +185,18 @@ inline void DumpOtlpHeaders(OtlpHeaders &output, const char *env_var_name)
   {
     if (header_valid)
     {
-      output.emplace(std::make_pair((std::string)header_key, (std::string)header_value));
+      std::string key = static_cast<std::string>(header_key);
+      if (remove_cache.end() == remove_cache.find(key))
+      {
+        remove_cache.insert(key);
+        auto range = output.equal_range(key);
+        if (range.first != range.second)
+        {
+          output.erase(range.first, range.second);
+        }
+      }
+
+      output.emplace(std::make_pair(std::move(key), static_cast<std::string>(header_value)));
     }
   }
 }
@@ -193,8 +207,12 @@ inline OtlpHeaders GetOtlpDefaultHeaders()
   constexpr char kOtlpHeadersEnv[]       = "OTEL_EXPORTER_OTLP_HEADERS";
 
   OtlpHeaders result;
-  DumpOtlpHeaders(result, kOtlpHeadersEnv);
-  DumpOtlpHeaders(result, kOtlpTracesHeadersEnv);
+  std::unordered_set<std::string> trace_remove_cache;
+  DumpOtlpHeaders(result, kOtlpHeadersEnv, trace_remove_cache);
+
+  trace_remove_cache.clear();
+  DumpOtlpHeaders(result, kOtlpTracesHeadersEnv, trace_remove_cache);
+
   return result;
 }
 
