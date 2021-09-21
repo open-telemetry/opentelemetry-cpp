@@ -3,6 +3,8 @@
 
 #pragma once
 
+#include <chrono>
+
 #include "opentelemetry/exporters/otlp/protobuf_include_prefix.h"
 
 #include "opentelemetry/proto/collector/trace/v1/trace_service.grpc.pb.h"
@@ -11,7 +13,7 @@
 
 #include "opentelemetry/sdk/trace/exporter.h"
 
-#include "opentelemetry/sdk/common/env_variables.h"
+#include "opentelemetry/exporters/otlp/otlp_environment.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace exporter
@@ -19,70 +21,13 @@ namespace exporter
 namespace otlp
 {
 
-inline const std::string GetOtlpDefaultEndpoint()
-{
-  constexpr char kOtlpTracesEndpointEnv[] = "OTEL_EXPORTER_OTLP_TRACES_ENDPOINT";
-  constexpr char kOtlpEndpointEnv[]       = "OTEL_EXPORTER_OTLP_ENDPOINT";
-  constexpr char kOtlpEndpointDefault[]   = "http://localhost:4317";
-
-  auto endpoint = opentelemetry::sdk::common::GetEnvironmentVariable(kOtlpTracesEndpointEnv);
-  if (endpoint.size() == 0)
-  {
-    endpoint = opentelemetry::sdk::common::GetEnvironmentVariable(kOtlpEndpointEnv);
-  }
-  return endpoint.size() ? endpoint : kOtlpEndpointDefault;
-}
-
-inline const bool GetOtlpDefaultIsSslEnable()
-{
-  constexpr char kOtlpTracesIsSslEnableEnv[] = "OTEL_EXPORTER_OTLP_TRACES_SSL_ENABLE";
-  constexpr char kOtlpIsSslEnableEnv[]       = "OTEL_EXPORTER_OTLP_SSL_ENABLE";
-
-  auto ssl_enable = opentelemetry::sdk::common::GetEnvironmentVariable(kOtlpTracesIsSslEnableEnv);
-  if (ssl_enable.size() == 0)
-  {
-    ssl_enable = opentelemetry::sdk::common::GetEnvironmentVariable(kOtlpIsSslEnableEnv);
-  }
-  if (ssl_enable == "True" || ssl_enable == "TRUE" || ssl_enable == "true" || ssl_enable == "1")
-  {
-    return true;
-  }
-  return false;
-}
-
-inline const std::string GetOtlpDefaultSslCertificatePath()
-{
-  constexpr char kOtlpTracesSslCertificate[] = "OTEL_EXPORTER_OTLP_TRACES_CERTIFICATE";
-  constexpr char kOtlpSslCertificate[]       = "OTEL_EXPORTER_OTLP_CERTIFICATE ";
-  auto ssl_cert_path =
-      opentelemetry::sdk::common::GetEnvironmentVariable(kOtlpTracesSslCertificate);
-  if (ssl_cert_path.size() == 0)
-  {
-    ssl_cert_path = opentelemetry::sdk::common::GetEnvironmentVariable(kOtlpSslCertificate);
-  }
-  return ssl_cert_path.size() ? ssl_cert_path : "";
-}
-
-inline const std::string GetOtlpDefaultSslCertificateString()
-{
-  constexpr char kOtlpTracesSslCertificateString[] = "OTEL_EXPORTER_OTLP_CERTIFICATE_STRING";
-  constexpr char kOtlpSslCertificateString[] = "OTEL_EXPORTER_OTLP_TRACES_CERTIFICATE_STRING ";
-  auto ssl_cert =
-      opentelemetry::sdk::common::GetEnvironmentVariable(kOtlpTracesSslCertificateString);
-  if (ssl_cert.size() == 0)
-  {
-    ssl_cert = opentelemetry::sdk::common::GetEnvironmentVariable(kOtlpSslCertificateString);
-  }
-  return ssl_cert.size() ? ssl_cert : "";
-}
-
 /**
  * Struct to hold OTLP exporter options.
  */
 struct OtlpGrpcExporterOptions
 {
   // The endpoint to export to. By default the OpenTelemetry Collector's default endpoint.
-  std::string endpoint = GetOtlpDefaultEndpoint();
+  std::string endpoint = GetOtlpDefaultGrpcEndpoint();
   // By default when false, uses grpc::InsecureChannelCredentials(); If true,
   // uses ssl_credentials_cacert_path if non-empty, else uses ssl_credentials_cacert_as_string
   bool use_ssl_credentials = GetOtlpDefaultIsSslEnable();
@@ -91,6 +36,10 @@ struct OtlpGrpcExporterOptions
   // ssl_credentials_cacert_as_string in-memory string representation of .pem file to be used for
   // SSL encryption.
   std::string ssl_credentials_cacert_as_string = GetOtlpDefaultSslCertificateString();
+  // Timeout for grpc deadline
+  std::chrono::system_clock::duration timeout = GetOtlpDefaultTimeout();
+  // Additional HTTP headers
+  OtlpHeaders metadata = GetOtlpDefaultHeaders();
 };
 
 /**
