@@ -27,7 +27,7 @@ void PopulateRequest(const nostd::span<std::unique_ptr<sdk::trace::Recordable>> 
 {
   auto resource_span       = request->add_resource_spans();
   auto instrumentation_lib = resource_span->add_instrumentation_library_spans();
-  bool has_resource        = false;
+  bool first_pass          = true;
 
   for (auto &recordable : spans)
   {
@@ -35,10 +35,14 @@ void PopulateRequest(const nostd::span<std::unique_ptr<sdk::trace::Recordable>> 
     *instrumentation_lib->add_spans()                       = std::move(rec->span());
     *instrumentation_lib->mutable_instrumentation_library() = rec->GetProtoInstrumentationLibrary();
 
-    if (!has_resource)
+    if (first_pass)
     {
-      *resource_span->mutable_resource() = rec->ProtoResource();
-      has_resource                       = true;
+      *instrumentation_lib->mutable_schema_url() = rec->GetInstrumentationLibrarySchemaURL();
+
+      *resource_span->mutable_resource()   = rec->ProtoResource();
+      *resource_span->mutable_schema_url() = rec->GetResourceSchemaURL();
+
+      first_pass = false;
     }
   }
 }
@@ -130,6 +134,16 @@ sdk::common::ExportResult OtlpGrpcExporter::Export(
 
   grpc::ClientContext context;
   proto::collector::trace::v1::ExportTraceServiceResponse response;
+
+  if (options_.timeout.count() > 0)
+  {
+    context.set_deadline(std::chrono::system_clock::now() + options_.timeout);
+  }
+
+  for (auto &header : options_.metadata)
+  {
+    context.AddMetadata(header.first, header.second);
+  }
 
   grpc::Status status = trace_service_stub_->Export(&context, request, &response);
 
