@@ -16,6 +16,8 @@
 #include "opentelemetry/proto/collector/trace/v1/trace_service.pb.h"
 
 #include "opentelemetry/exporters/otlp/protobuf_include_suffix.h"
+
+#include "opentelemetry/sdk/common/global_log_handler.h"
 #include "opentelemetry/sdk_config.h"
 
 #include <condition_variable>
@@ -548,10 +550,12 @@ sdk::common::ExportResult OtlpHttpExporter::Export(
   // Return failure if this exporter has been shutdown
   if (is_shutdown_)
   {
+    const char *error_message = "[OTLP HTTP Exporter] Export failed, exporter is shutdown";
     if (options_.console_debug)
     {
-      std::cerr << "[OTLP HTTP Exporter] Export failed, exporter is shutdown" << std::endl;
+      std::cerr << error_message << std::endl;
     }
+    OTEL_INTERNAL_LOG_ERROR(error_message);
 
     return sdk::common::ExportResult::kFailure;
   }
@@ -562,11 +566,13 @@ sdk::common::ExportResult OtlpHttpExporter::Export(
     auto parse_url = opentelemetry::ext::http::common::UrlParser(std::string(options_.url));
     if (!parse_url.success_)
     {
+      std::string error_message =
+          "[OTLP HTTP Exporter] Export failed, invalid url: " + options_.url;
       if (options_.console_debug)
       {
-        std::cerr << "[OTLP HTTP Exporter] Export failed, invalid url: " << options_.url
-                  << std::endl;
+        std::cerr << error_message << std::endl;
       }
+      OTEL_INTERNAL_LOG_ERROR(error_message.c_str());
 
       return sdk::common::ExportResult::kFailure;
     }
@@ -629,11 +635,16 @@ sdk::common::ExportResult OtlpHttpExporter::Export(
   // Send the request
   auto session = http_client_->CreateSession(options_.url);
   auto request = session->CreateRequest();
+
+  for (auto &header : options_.http_headers)
+  {
+    request->AddHeader(header.first, header.second);
+  }
   request->SetUri(http_uri_);
-  request->SetTimeoutMs(options_.timeout);
+  request->SetTimeoutMs(std::chrono::duration_cast<std::chrono::milliseconds>(options_.timeout));
   request->SetMethod(http_client::Method::Post);
   request->SetBody(body_vec);
-  request->AddHeader("Content-Type", content_type);
+  request->ReplaceHeader("Content-Type", content_type);
 
   // Send the request
   std::unique_ptr<ResponseHandler> handler(new ResponseHandler(options_.console_debug));
@@ -642,9 +653,11 @@ sdk::common::ExportResult OtlpHttpExporter::Export(
   // Wait for the response to be received
   if (options_.console_debug)
   {
-    OTEL_INTERNAL_LOG_DEBUG("[OTLP HTTP Exporter] DEBUG: Waiting for response from "
-                            << options_.url << " (timeout = " << options_.timeout.count()
-                            << " milliseconds)");
+    OTEL_INTERNAL_LOG_DEBUG(
+        "[OTLP HTTP Exporter] DEBUG: Waiting for response from "
+        << options_.url << " (timeout = "
+        << std::chrono::duration_cast<std::chrono::milliseconds>(options_.timeout).count()
+        << " milliseconds)");
   }
   bool write_successful = handler->waitForResponse();
 

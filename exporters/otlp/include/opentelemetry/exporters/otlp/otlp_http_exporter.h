@@ -3,23 +3,23 @@
 
 #pragma once
 
+#include <chrono>
+#include <memory>
+#include <mutex>
+#include <string>
+
 // We need include exporter.h first, which will include Windows.h with NOMINMAX on Windows
 #include "opentelemetry/sdk/trace/exporter.h"
 
 #include "opentelemetry/ext/http/client/http_client.h"
 
-#include <chrono>
-#include <memory>
-#include <mutex>
-#include <string>
+#include "opentelemetry/exporters/otlp/otlp_environment.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace exporter
 {
 namespace otlp
 {
-// The default URL path to post trace data.
-constexpr char kDefaultTracePath[] = "/v1/traces";
 // The default URL path to post metric data.
 constexpr char kDefaultMetricsPath[] = "/v1/metrics";
 // The default URL path to post metric data.
@@ -50,7 +50,7 @@ struct OtlpHttpExporterOptions
   // @see
   // https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/protocol/otlp.md
   // @see https://github.com/open-telemetry/opentelemetry-collector/tree/main/receiver/otlpreceiver
-  std::string url = std::string("http://localhost:4317") + kDefaultTracePath;
+  std::string url = GetOtlpDefaultHttpEndpoint();
 
   // By default, post json data
   HttpRequestContentType content_type = HttpRequestContentType::kJson;
@@ -67,7 +67,10 @@ struct OtlpHttpExporterOptions
   bool console_debug = false;
 
   // TODO: Enable/disable to verify SSL certificate
-  std::chrono::milliseconds timeout = std::chrono::milliseconds(30000);
+  std::chrono::system_clock::duration timeout = GetOtlpDefaultTimeout();
+
+  // Additional HTTP headers
+  OtlpHeaders http_headers = GetOtlpDefaultHeaders();
 };
 
 /**

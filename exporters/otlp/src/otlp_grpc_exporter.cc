@@ -114,6 +114,16 @@ sdk::common::ExportResult OtlpGrpcExporter::Export(
   grpc::ClientContext context;
   proto::collector::trace::v1::ExportTraceServiceResponse response;
 
+  if (options_.timeout.count() > 0)
+  {
+    context.set_deadline(std::chrono::system_clock::now() + options_.timeout);
+  }
+
+  for (auto &header : options_.metadata)
+  {
+    context.AddMetadata(header.first, header.second);
+  }
+
   grpc::Status status = trace_service_stub_->Export(&context, request, &response);
 
   if (!status.ok())
