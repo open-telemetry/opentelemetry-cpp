@@ -24,7 +24,8 @@ public:
    * instance.
    */
   virtual nostd::shared_ptr<Tracer> GetTracer(nostd::string_view library_name,
-                                              nostd::string_view library_version = "") = 0;
+                                              nostd::string_view library_version = "",
+                                              nostd::string_view schema_url      = "") = 0;
 };
 }  // namespace trace
 OPENTELEMETRY_END_NAMESPACE

@@ -11,6 +11,7 @@
 #include "opentelemetry/nostd/unique_ptr.h"
 #include "opentelemetry/version.h"
 
+#include <cstring>
 #include <string>
 #include <type_traits>
 

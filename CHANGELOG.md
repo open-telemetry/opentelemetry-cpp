@@ -15,6 +15,10 @@ Increment the:
 
 ## [Unreleased]
 
+* Support environment variables for both `OtlpGrpcExporter` and `OtlpHttpExporter` ([#983](https://github.com/open-telemetry/opentelemetry-cpp/pull/983))
+* [API/SDK] Add schema_url support to both Resource and InstrumentationLibrary ([#979](https://github.com/open-telemetry/opentelemetry-cpp/pull/979))
+* Fix build issue where _memcpy_ was not declared in scope ([#985](https://github.com/open-telemetry/opentelemetry-cpp/issues/985))
+
 ## [1.0.0] 2021-09-16
 
 ### API
