@@ -60,6 +60,27 @@ std::unique_ptr<proto::collector::trace::v1::TraceService::Stub> MakeServiceStub
 {
   std::shared_ptr<grpc::Channel> channel;
 
+  //
+  // Scheme is allowed in OTLP endpoint definition, but is not allowed for creating gRPC channel.
+  // Passing URI with scheme to grpc::CreateChannel could resolve the endpoint to some unexpected
+  // address, so remove schme from the endpoint before passing it to gRPC.
+  //
+  std::string grpc_target;
+  const char *http_scheme  = "http://";
+  const char *https_scheme = "https://";
+  if (options.endpoint.rfind(http_scheme, 0) == 0)
+  {
+    grpc_target = options.endpoint.substr(strlen(http_scheme));
+  }
+  else if (options.endpoint.rfind(https_scheme, 0) == 0)
+  {
+    grpc_target = options.endpoint.substr(strlen(https_scheme));
+  }
+  else
+  {
+    grpc_target = options.endpoint;
+  }
+
   if (options.use_ssl_credentials)
   {
     grpc::SslCredentialsOptions ssl_opts;
@@ -71,11 +92,11 @@ std::unique_ptr<proto::collector::trace::v1::TraceService::Stub> MakeServiceStub
     {
       ssl_opts.pem_root_certs = get_file_contents((options.ssl_credentials_cacert_path).c_str());
     }
-    channel = grpc::CreateChannel(options.endpoint, grpc::SslCredentials(ssl_opts));
+    channel = grpc::CreateChannel(grpc_target, grpc::SslCredentials(ssl_opts));
   }
   else
   {
-    channel = grpc::CreateChannel(options.endpoint, grpc::InsecureChannelCredentials());
+    channel = grpc::CreateChannel(grpc_target, grpc::InsecureChannelCredentials());
   }
   return proto::collector::trace::v1::TraceService::NewStub(channel);
 }
