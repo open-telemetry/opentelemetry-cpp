@@ -63,6 +63,16 @@ TEST(OtlpRecordable, SetInstrumentationLibrary)
   EXPECT_EQ(proto_instr_libr.version(), inst_lib->GetVersion());
 }
 
+TEST(OtlpRecordable, SetInstrumentationLibraryWithSchemaURL)
+{
+  OtlpRecordable rec;
+  const std::string expected_schema_url{"https://opentelemetry.io/schemas/1.2.0"};
+  auto inst_lib =
+      opentelemetry::sdk::trace::InstrumentationLibrary::Create("test", "v1", expected_schema_url);
+  rec.SetInstrumentationLibrary(*inst_lib);
+  EXPECT_EQ(expected_schema_url, rec.GetInstrumentationLibrarySchemaURL());
+}
+
 TEST(OtlpRecordable, SetStartTime)
 {
   OtlpRecordable rec;
@@ -196,6 +206,19 @@ TEST(OtlpRecordable, SetResource)
     }
   }
   EXPECT_TRUE(found_service_name);
+}
+
+TEST(OtlpRecordable, SetResourceWithSchemaURL)
+{
+  OtlpRecordable rec;
+  const std::string service_name_key    = "service.name";
+  const std::string service_name        = "test-otlp";
+  const std::string expected_schema_url = "https://opentelemetry.io/schemas/1.2.0";
+  auto resource = opentelemetry::sdk::resource::Resource::Create({{service_name_key, service_name}},
+                                                                 expected_schema_url);
+  rec.SetResource(resource);
+
+  EXPECT_EQ(expected_schema_url, rec.GetResourceSchemaURL());
 }
 
 // Test non-int single types. Int single types are tested using templates (see IntAttributeTest)

@@ -1131,9 +1131,11 @@ public:
    * @return
    */
   nostd::shared_ptr<trace::Tracer> GetTracer(nostd::string_view name,
-                                             nostd::string_view args = "") override
+                                             nostd::string_view args       = "",
+                                             nostd::string_view schema_url = "") override
   {
     UNREFERENCED_PARAMETER(args);
+    UNREFERENCED_PARAMETER(schema_url);
     ETWProvider::EventFormat evtFmt = config_.encoding;
     return nostd::shared_ptr<trace::Tracer>{new (std::nothrow) Tracer(*this, name, evtFmt)};
   }
