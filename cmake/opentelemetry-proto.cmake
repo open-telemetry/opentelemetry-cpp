@@ -88,7 +88,7 @@ endforeach()
 if(CMAKE_CROSSCOMPILING)
     find_program(gRPC_CPP_PLUGIN_EXECUTABLE grpc_cpp_plugin)
 else()
-    set(gRPC_CPP_PLUGIN_EXECUTABLE $<TARGET_FILE:grpc::grpc_cpp_plugin>)
+    set(gRPC_CPP_PLUGIN_EXECUTABLE $<TARGET_FILE:gRPC::grpc_cpp_plugin>)
 endif()
 
 add_custom_command(
