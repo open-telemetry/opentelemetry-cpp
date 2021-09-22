@@ -3,6 +3,7 @@
 
 #include "opentelemetry/exporters/otlp/otlp_grpc_exporter.h"
 #include "opentelemetry/exporters/otlp/otlp_recordable.h"
+#include "opentelemetry/ext/http/common/url_parser.h"
 #include "opentelemetry/sdk_config.h"
 
 #include <grpcpp/grpcpp.h>
@@ -64,6 +65,22 @@ std::unique_ptr<proto::collector::trace::v1::TraceService::Stub> MakeServiceStub
 {
   std::shared_ptr<grpc::Channel> channel;
 
+  //
+  // Scheme is allowed in OTLP endpoint definition, but is not allowed for creating gRPC channel.
+  // Passing URI with scheme to grpc::CreateChannel could resolve the endpoint to some unexpected
+  // address.
+  //
+
+  ext::http::common::UrlParser url(options.endpoint);
+  if (!url.success_)
+  {
+    OTEL_INTERNAL_LOG_ERROR("[OTLP Exporter] invalid endpoint: " << options.endpoint);
+
+    return nullptr;
+  }
+
+  std::string grpc_target = url.host_ + ":" + std::to_string(static_cast<int>(url.port_));
+
   if (options.use_ssl_credentials)
   {
     grpc::SslCredentialsOptions ssl_opts;
@@ -75,11 +92,11 @@ std::unique_ptr<proto::collector::trace::v1::TraceService::Stub> MakeServiceStub
     {
       ssl_opts.pem_root_certs = get_file_contents((options.ssl_credentials_cacert_path).c_str());
     }
-    channel = grpc::CreateChannel(options.endpoint, grpc::SslCredentials(ssl_opts));
+    channel = grpc::CreateChannel(grpc_target, grpc::SslCredentials(ssl_opts));
   }
   else
   {
-    channel = grpc::CreateChannel(options.endpoint, grpc::InsecureChannelCredentials());
+    channel = grpc::CreateChannel(grpc_target, grpc::InsecureChannelCredentials());
   }
   return proto::collector::trace::v1::TraceService::NewStub(channel);
 }
