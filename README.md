@@ -132,7 +132,7 @@ repository](https://github.com/open-telemetry/community/blob/main/community-memb
 
 ## Release Schedule
 
-Refer to [project status](#Project-Status) for current status of the project.
+Refer to [project status](#project-status) for current status of the project.
 
 See the [release
 notes](https://github.com/open-telemetry/opentelemetry-cpp/releases) for
