@@ -139,27 +139,59 @@ TEST_F(OtlpGrpcExporterTestPeer, ConfigSslCredentialsTest)
 TEST_F(OtlpGrpcExporterTestPeer, ConfigFromEnv)
 {
   const std::string cacert_str = "--begin and end fake cert--";
-  const std::string cacert_env = "OTEL_EXPORTER_OTLP_GRPC_SSL_CERTIFICATE=" + cacert_str;
+  const std::string cacert_env = "OTEL_EXPORTER_OTLP_CERTIFICATE_STRING=" + cacert_str;
   putenv(const_cast<char *>(cacert_env.data()));
-  char ssl_enable_env[] = "OTEL_EXPORTER_OTLP_GRPC_SSL_ENABLE=True";
+  char ssl_enable_env[] = "OTEL_EXPORTER_OTLP_SSL_ENABLE=True";
   putenv(ssl_enable_env);
   const std::string endpoint     = "http://localhost:9999";
-  const std::string endpoint_env = "OTEL_EXPORTER_OTLP_GRPC_ENDPOINT=" + endpoint;
+  const std::string endpoint_env = "OTEL_EXPORTER_OTLP_ENDPOINT=" + endpoint;
   putenv(const_cast<char *>(endpoint_env.data()));
+  putenv("OTEL_EXPORTER_OTLP_TIMEOUT=20050ms");
+  putenv("OTEL_EXPORTER_OTLP_HEADERS=k1=v1,k2=v2");
+  putenv("OTEL_EXPORTER_OTLP_TRACES_HEADERS=k1=v3,k1=v4");
 
   std::unique_ptr<OtlpGrpcExporter> exporter(new OtlpGrpcExporter());
   EXPECT_EQ(GetOptions(exporter).ssl_credentials_cacert_as_string, cacert_str);
   EXPECT_EQ(GetOptions(exporter).use_ssl_credentials, true);
   EXPECT_EQ(GetOptions(exporter).endpoint, endpoint);
+  EXPECT_EQ(GetOptions(exporter).timeout.count(),
+            std::chrono::duration_cast<std::chrono::system_clock::duration>(
+                std::chrono::milliseconds{20050})
+                .count());
+  EXPECT_EQ(GetOptions(exporter).metadata.size(), 3);
+  {
+    // Test k2
+    auto range = GetOptions(exporter).metadata.equal_range("k2");
+    EXPECT_TRUE(range.first != range.second);
+    EXPECT_EQ(range.first->second, std::string("v2"));
+    ++range.first;
+    EXPECT_TRUE(range.first == range.second);
+  }
+  {
+    // Test k1
+    auto range = GetOptions(exporter).metadata.equal_range("k1");
+    EXPECT_TRUE(range.first != range.second);
+    EXPECT_EQ(range.first->second, std::string("v3"));
+    ++range.first;
+    EXPECT_EQ(range.first->second, std::string("v4"));
+    ++range.first;
+    EXPECT_TRUE(range.first == range.second);
+  }
 #    if defined(_MSC_VER)
-  putenv("OTEL_EXPORTER_OTLP_GRPC_ENDPOINT=");
-  putenv("OTEL_EXPORTER_OTLP_GRPC_SSL_CERTIFICATE=");
-  putenv("OTEL_EXPORTER_OTLP_GRPC_SSL_ENABLE=");
+  putenv("OTEL_EXPORTER_OTLP_ENDPOINT=");
+  putenv("OTEL_EXPORTER_OTLP_CERTIFICATE_STRING=");
+  putenv("OTEL_EXPORTER_OTLP_SSL_ENABLE=");
+  putenv("OTEL_EXPORTER_OTLP_TIMEOUT=");
+  putenv("OTEL_EXPORTER_OTLP_HEADERS=");
+  putenv("OTEL_EXPORTER_OTLP_TRACES_HEADERS=");
 
 #    else
-  unsetenv("OTEL_EXPORTER_OTLP_GRPC_ENDPOINT");
-  unsetenv("OTEL_EXPORTER_OTLP_GRPC_SSL_CERTIFICATE");
-  unsetenv("OTEL_EXPORTER_OTLP_GRPC_SSL_ENABLE");
+  unsetenv("OTEL_EXPORTER_OTLP_ENDPOINT");
+  unsetenv("OTEL_EXPORTER_OTLP_CERTIFICATE_STRING");
+  unsetenv("OTEL_EXPORTER_OTLP_SSL_ENABLE");
+  unsetenv("OTEL_EXPORTER_OTLP_TIMEOUT");
+  unsetenv("OTEL_EXPORTER_OTLP_HEADERS");
+  unsetenv("OTEL_EXPORTER_OTLP_TRACES_HEADERS");
 
 #    endif
 }

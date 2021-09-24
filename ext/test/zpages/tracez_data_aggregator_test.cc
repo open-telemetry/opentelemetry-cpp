@@ -15,7 +15,7 @@ using namespace opentelemetry::ext::zpages;
 namespace nostd  = opentelemetry::nostd;
 namespace common = opentelemetry::common;
 using opentelemetry::common::SteadyTimestamp;
-using opentelemetry::v0::trace::Span;
+using opentelemetry::trace::Span;
 
 const std::string span_name1 = "span 1";
 const std::string span_name2 = "span 2";

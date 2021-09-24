@@ -12,7 +12,7 @@ The C++ [OpenTelemetry](https://opentelemetry.io/) client.
 
 | Signal  | Status                 | Project                                                                  |
 | ------- | ---------------------- | ------------------------------------------------------------------------ |
-| Traces  | Release Candidate      | [1.0.0](https://github.com/open-telemetry/opentelemetry-cpp/milestone/9) |
+| Traces  | Public Release         | N/A                                                                     |
 | Metrics | Development paused [1] | N/A                                                                      |
 | Logs    | Experimental [2]       | N/A                                                                      |
 
@@ -24,6 +24,7 @@ The C++ [OpenTelemetry](https://opentelemetry.io/) client.
 | API Version | Core version | Contrib Version         |
 | ----------- |--------------|-------------------------|
 | 1.0.0       | 1.0.0-rc4    | N/A [1]                 |
+| 1.0.0       | 1.0.0        | N/A                     |
 
 * [1]: We don't have releases for opentelemetry-cpp contrib repo. This may change in future.
 

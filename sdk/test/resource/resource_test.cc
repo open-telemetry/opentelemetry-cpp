@@ -5,8 +5,8 @@
 #include "opentelemetry/common/key_value_iterable_view.h"
 #include "opentelemetry/nostd/string_view.h"
 #include "opentelemetry/sdk/common/attribute_utils.h"
+#include "opentelemetry/sdk/resource/experimental_semantic_conventions.h"
 #include "opentelemetry/sdk/resource/resource_detector.h"
-#include "opentelemetry/sdk/resource/semantic_conventions.h"
 
 #include <cstdlib>
 #include <string>
@@ -28,7 +28,6 @@ public:
 
 TEST(ResourceTest, create_without_servicename)
 {
-
   ResourceAttributes expected_attributes = {
       {"service", "backend"},
       {"version", (uint32_t)1},
@@ -112,6 +111,17 @@ TEST(ResourceTest, create_with_emptyatrributes)
   }
   EXPECT_EQ(received_attributes.size(), expected_attributes.size());  // for missing service.name
 }
+
+TEST(ResourceTest, create_with_schemaurl)
+{
+  const std::string schema_url  = "https://opentelemetry.io/schemas/1.2.0";
+  ResourceAttributes attributes = {};
+  auto resource                 = Resource::Create(attributes, schema_url);
+  auto received_schema_url      = resource.GetSchemaURL();
+
+  EXPECT_EQ(received_schema_url, schema_url);
+}
+
 TEST(ResourceTest, Merge)
 {
   TestResource resource1(ResourceAttributes({{"service", "backend"}}));
