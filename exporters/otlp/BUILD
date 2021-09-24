@@ -40,6 +40,7 @@ cc_library(
         "src/otlp_grpc_exporter.cc",
     ],
     hdrs = [
+        "include/opentelemetry/exporters/otlp/otlp_environment.h",
         "include/opentelemetry/exporters/otlp/otlp_grpc_exporter.h",
         "include/opentelemetry/exporters/otlp/protobuf_include_prefix.h",
         "include/opentelemetry/exporters/otlp/protobuf_include_suffix.h",
@@ -47,6 +48,7 @@ cc_library(
     strip_include_prefix = "include",
     deps = [
         ":otlp_recordable",
+        "//ext:headers",
         "//sdk/src/trace",
 
         # For gRPC
@@ -61,6 +63,7 @@ cc_library(
         "src/otlp_http_exporter.cc",
     ],
     hdrs = [
+        "include/opentelemetry/exporters/otlp/otlp_environment.h",
         "include/opentelemetry/exporters/otlp/otlp_http_exporter.h",
         "include/opentelemetry/exporters/otlp/protobuf_include_prefix.h",
         "include/opentelemetry/exporters/otlp/protobuf_include_suffix.h",

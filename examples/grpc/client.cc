@@ -3,16 +3,16 @@
 // modern compilers are unaffected.
 #include <grpcpp/grpcpp.h>
 #ifdef BAZEL_BUILD
-#include "examples/grpc/protos/messages.grpc.pb.h"
+#  include "examples/grpc/protos/messages.grpc.pb.h"
 #else
-#include "messages.grpc.pb.h"
+#  include "messages.grpc.pb.h"
 #endif
 
-#include "opentelemetry/trace/semantic_conventions.h"
-#include "tracer_common.h"
 #include <iostream>
 #include <memory>
 #include <string>
+#include "opentelemetry/trace/experimental_semantic_conventions.h"
+#include "tracer_common.h"
 
 using grpc::Channel;
 using grpc::ClientContext;
@@ -22,7 +22,6 @@ using grpc::Status;
 using grpc_example::Greeter;
 using grpc_example::GreetRequest;
 using grpc_example::GreetResponse;
-
 
 namespace
 {
@@ -45,13 +44,14 @@ public:
     options.kind = opentelemetry::trace::SpanKind::kClient;
 
     std::string span_name = "GreeterClient/Greet";
-    auto span             = get_tracer("grpc")->StartSpan(span_name,
-                                              {{OTEL_CPP_GET_ATTR(AttrRpcSystem), "grpc"},
-                                               {OTEL_CPP_GET_ATTR(AttrRpcService), "grpc-example.GreetService"},
-                                               {OTEL_CPP_GET_ATTR(AttrRpcMethod), "Greet"},
-                                               {OTEL_CPP_GET_ATTR(AttrNetPeerIp), ip},
-                                               {OTEL_CPP_GET_ATTR(AttrNetPeerPort), port}},
-                                              options);
+    auto span             = get_tracer("grpc")->StartSpan(
+        span_name,
+        {{OTEL_CPP_GET_ATTR(AttrRpcSystem), "grpc"},
+         {OTEL_CPP_GET_ATTR(AttrRpcService), "grpc-example.GreetService"},
+         {OTEL_CPP_GET_ATTR(AttrRpcMethod), "Greet"},
+         {OTEL_CPP_GET_ATTR(AttrNetPeerIp), ip},
+         {OTEL_CPP_GET_ATTR(AttrNetPeerPort), port}},
+        options);
 
     auto scope = get_tracer("grpc-client")->WithActiveSpan(span);
 

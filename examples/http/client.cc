@@ -3,7 +3,7 @@
 
 #include "opentelemetry/ext/http/client/http_client_factory.h"
 #include "opentelemetry/ext/http/common/url_parser.h"
-#include "opentelemetry/trace/semantic_conventions.h"
+#include "opentelemetry/trace/experimental_semantic_conventions.h"
 #include "tracer_common.h"
 
 namespace

@@ -15,9 +15,8 @@ namespace common
 // Returns the env variable set.
 inline const std::string GetEnvironmentVariable(const char *env_var_name)
 {
+#if !defined(NO_GETENV)
   const char *endpoint_from_env = nullptr;
-
-#ifndef NO_GETENV
 #  if defined(_MSC_VER)
   // avoid calling std::getenv which is deprecated in MSVC.
   size_t required_size = 0;
@@ -31,9 +30,11 @@ inline const std::string GetEnvironmentVariable(const char *env_var_name)
   }
 #  else
   endpoint_from_env = std::getenv(env_var_name);
-#  endif
-#endif
-  return endpoint_from_env == nullptr ? std::string() : endpoint_from_env;
+#  endif  // defined(_MSC_VER)
+  return endpoint_from_env == nullptr ? std::string{} : std::string{endpoint_from_env};
+#else
+  return std::string{};
+#endif  // !defined(NO_GETENV)
 }
 }  // namespace common
 }  // namespace sdk

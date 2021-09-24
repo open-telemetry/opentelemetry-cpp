@@ -3,6 +3,8 @@
 
 #pragma once
 
+#include <chrono>
+
 #include "opentelemetry/exporters/otlp/protobuf_include_prefix.h"
 
 #include "opentelemetry/proto/collector/trace/v1/trace_service.grpc.pb.h"
@@ -11,7 +13,7 @@
 
 #include "opentelemetry/sdk/trace/exporter.h"
 
-#include "opentelemetry/sdk/common/env_variables.h"
+#include "opentelemetry/exporters/otlp/otlp_environment.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace exporter
@@ -19,48 +21,25 @@ namespace exporter
 namespace otlp
 {
 
-inline const std::string GetOtlpGrpcDefaultEndpoint()
-{
-  constexpr char kOtlpGrpcEndpointEnv[]     = "OTEL_EXPORTER_OTLP_GRPC_ENDPOINT";
-  constexpr char kOtlpGrpcEndpointDefault[] = "localhost:4317";
-
-  auto endpoint = opentelemetry::sdk::common::GetEnvironmentVariable(kOtlpGrpcEndpointEnv);
-  return endpoint.size() ? endpoint : kOtlpGrpcEndpointDefault;
-}
-
-inline const bool GetOtlpGrpcDefaultIsSslEnable()
-{
-  constexpr char kOtlpGrpcIsSslEnableEnv[] = "OTEL_EXPORTER_OTLP_GRPC_SSL_ENABLE";
-  auto ssl_enable = opentelemetry::sdk::common::GetEnvironmentVariable(kOtlpGrpcIsSslEnableEnv);
-  if (ssl_enable == "True" || ssl_enable == "TRUE" || ssl_enable == "true" || ssl_enable == "1")
-  {
-    return true;
-  }
-  return false;
-}
-
-inline const std::string GetOtlpGrpcDefaultSslCertificate()
-{
-  constexpr char kOtlpGrpcSslCertificate[] = "OTEL_EXPORTER_OTLP_GRPC_SSL_CERTIFICATE";
-  auto ssl_cert = opentelemetry::sdk::common::GetEnvironmentVariable(kOtlpGrpcSslCertificate);
-  return ssl_cert.size() ? ssl_cert : "";
-}
-
 /**
  * Struct to hold OTLP exporter options.
  */
 struct OtlpGrpcExporterOptions
 {
   // The endpoint to export to. By default the OpenTelemetry Collector's default endpoint.
-  std::string endpoint = GetOtlpGrpcDefaultEndpoint();
+  std::string endpoint = GetOtlpDefaultGrpcEndpoint();
   // By default when false, uses grpc::InsecureChannelCredentials(); If true,
   // uses ssl_credentials_cacert_path if non-empty, else uses ssl_credentials_cacert_as_string
-  bool use_ssl_credentials = GetOtlpGrpcDefaultIsSslEnable();
+  bool use_ssl_credentials = GetOtlpDefaultIsSslEnable();
   // ssl_credentials_cacert_path specifies path to .pem file to be used for SSL encryption.
-  std::string ssl_credentials_cacert_path = "";
+  std::string ssl_credentials_cacert_path = GetOtlpDefaultSslCertificatePath();
   // ssl_credentials_cacert_as_string in-memory string representation of .pem file to be used for
   // SSL encryption.
-  std::string ssl_credentials_cacert_as_string = GetOtlpGrpcDefaultSslCertificate();
+  std::string ssl_credentials_cacert_as_string = GetOtlpDefaultSslCertificateString();
+  // Timeout for grpc deadline
+  std::chrono::system_clock::duration timeout = GetOtlpDefaultTimeout();
+  // Additional HTTP headers
+  OtlpHeaders metadata = GetOtlpDefaultHeaders();
 };
 
 /**

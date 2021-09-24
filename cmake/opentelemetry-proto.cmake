@@ -84,7 +84,12 @@ foreach(IMPORT_DIR ${PROTOBUF_IMPORT_DIRS})
   list(APPEND PROTOBUF_INCLUDE_FLAGS "-I${IMPORT_DIR}")
 endforeach()
 
-set(gRPC_CPP_PLUGIN_EXECUTABLE $<TARGET_FILE:gRPC::grpc_cpp_plugin>)
+
+if(CMAKE_CROSSCOMPILING)
+    find_program(gRPC_CPP_PLUGIN_EXECUTABLE grpc_cpp_plugin)
+else()
+    set(gRPC_CPP_PLUGIN_EXECUTABLE $<TARGET_FILE:gRPC::grpc_cpp_plugin>)
+endif()
 
 add_custom_command(
   OUTPUT ${COMMON_PB_H_FILE}
