@@ -56,8 +56,10 @@ of the current project.
 | macOS 10.15 (Xcode 12.2)                                            | Bazel         |
 | Windows Server 2019 (Visual Studio Enterprise 2019)                 | CMake, Bazel  |
 
-[1]: Bazel build is disabled for GCC 4.8, as gRPC library (required by OTLP expoter)
-  doesn't build with this compiler. CMake build won't build OTLP exporter with GCC 4.8.
+[1]: Bazel build is disabled for GCC 4.8, as gRPC library 1.38 and above
+  (required by OTLP expoter) don't build with this compiler. See gRPC [official
+  support](https://grpc.io/docs/#official-support) document. CMake build doesn't
+  build OTLP exporter with GCC 4.8.
 
 In general, the code shipped from this repository should build on all platforms
 having C++ compiler with [supported C++ standards](#supported-c-versions).
