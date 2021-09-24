@@ -132,13 +132,7 @@ repository](https://github.com/open-telemetry/community/blob/main/community-memb
 
 ## Release Schedule
 
-OpenTelemetry C++ is under active development.
-
-The API and SDK packages are __not yet generally available__, and releases are
-not guaranteed to conform to a specific version of the specification. Future
-releases will not attempt to maintain backwards compatibility with previous
-releases. Each alpha and beta release could include significant changes to the
-API and SDK packages, making them incompatible with each other.
+Refer to [project status](#Project-Status) for current status of the project.
 
 See the [release
 notes](https://github.com/open-telemetry/opentelemetry-cpp/releases) for
