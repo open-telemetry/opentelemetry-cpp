@@ -5,7 +5,7 @@ process (environment where ABI compat is not a requirement), or for
 "header-only" implementation of SDK.
 
 Proposed approach cannot be employed for shared libs in environments where ABI
-compatibility is required. OpenTelemetry SDK binary compiled with `compiler A
+compatibility is required. OpenTelemetry SDK binary compiled with `compiler A +
 STL B` will not be ABI -compatible with the main executable compiled with
 `compiler C + STL D`.
 
