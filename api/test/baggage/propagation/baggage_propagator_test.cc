@@ -48,7 +48,7 @@ TEST(BaggagePropagatorTest, ExtractAndInjectBaggage)
 {
   // create header string for baggage larger than allowed size (kMaxKeyValueSize)
   std::string very_large_baggage_header =
-      std::string(baggage::Baggage::kMaxKeyValueSize / 2 + 1, 'k') + "="
+      std::string(baggage::Baggage::kMaxKeyValueSize / 2 + 1, 'k') + "=" +
       std::string(baggage::Baggage::kMaxKeyValueSize / 2 + 1, 'v');
 
   std::map<std::string, std::string> baggages = {

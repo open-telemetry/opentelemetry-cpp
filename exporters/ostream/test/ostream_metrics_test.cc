@@ -140,8 +140,8 @@ TEST(OStreamMetricsExporter, PrintGauge)
       "  description : description\n"
       "  labels      : labels\n"
       "  last value  : 9\n"
-      "  timestamp   : "
-      std::to_string(aggregator->get_checkpoint_timestamp().time_since_epoch().count())
+      "  timestamp   : " +
+      std::to_string(aggregator->get_checkpoint_timestamp().time_since_epoch().count()) +
       "\n"
       "}\n";
 

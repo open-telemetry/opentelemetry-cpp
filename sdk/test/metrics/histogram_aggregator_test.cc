@@ -87,7 +87,7 @@ TEST(Histogram, Merge)
   alpha.merge(beta);
   alpha.checkpoint();
 
-  EXPECT_EQ(alpha.get_checkpoint()[0], std::accumulate(vals.begin(), vals.end(), 0)
+  EXPECT_EQ(alpha.get_checkpoint()[0], std::accumulate(vals.begin(), vals.end(), 0) +
                                            std::accumulate(otherVals.begin(), otherVals.end(), 0));
   EXPECT_EQ(alpha.get_checkpoint()[1], vals.size() + otherVals.size());
 

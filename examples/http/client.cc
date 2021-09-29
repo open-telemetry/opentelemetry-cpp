@@ -59,7 +59,7 @@ void sendRequest(const std::string &url)
   else
   {
     span->SetStatus(StatusCode::kError,
-                    "Response Status :"
+                    "Response Status :" +
                         std::to_string(static_cast<typename std::underlying_type<
                                            http_client::SessionState>::type>(
                             result.GetSessionState())));
@@ -88,7 +88,7 @@ int main(int argc, char *argv[])
     port = default_port;
   }
 
-  std::string url = "http://" + std::string(default_host) + ":" + std::to_string(port)
+  std::string url = "http://" + std::string(default_host) + ":" + std::to_string(port) +
                     std::string(default_path);
   sendRequest(url);
 }

@@ -123,8 +123,8 @@ TEST(OStreamLogExporter, SimpleLogToCout)
 
   std::string expectedOutput =
       "{\n"
-      "  timestamp     : "
-      std::to_string(now.time_since_epoch().count())
+      "  timestamp     : " +
+      std::to_string(now.time_since_epoch().count()) +
       "\n"
       "  severity_num  : 1\n"
       "  severity_text : TRACE\n"
@@ -271,8 +271,8 @@ TEST(OStreamLogExporter, IntegrationTest)
   // Compare actual vs expected outputs
   std::string expectedOutput =
       "{\n"
-      "  timestamp     : "
-      std::to_string(now.time_since_epoch().count())
+      "  timestamp     : " +
+      std::to_string(now.time_since_epoch().count()) +
       "\n"
       "  severity_num  : 5\n"
       "  severity_text : DEBUG\n"

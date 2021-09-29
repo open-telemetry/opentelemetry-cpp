@@ -135,8 +135,8 @@ TEST(OStreamSpanExporter, PrintSpanWithBasicFields)
       "  span_id       : 0102030405060708\n"
       "  tracestate    : state1=value\n"
       "  parent_span_id: 0807060504030201\n"
-      "  start         : "
-      start
+      "  start         : " +
+      start +
       "\n"
       "  duration      : 100\n"
       "  description   : Test Description\n"
@@ -236,7 +236,7 @@ TEST(OStreamSpanExporter, PrintSpanWithEvents)
 
   auto recordable = processor->MakeRecordable();
   common::SystemTimestamp now(std::chrono::system_clock::now());
-  common::SystemTimestamp next(std::chrono::system_clock::now()
+  common::SystemTimestamp next(std::chrono::system_clock::now() +
                                               std::chrono::seconds(1));
 
   std::string now_str  = std::to_string(now.time_since_epoch().count());
@@ -264,15 +264,15 @@ TEST(OStreamSpanExporter, PrintSpanWithEvents)
       "  events        : \n"
       "\t{\n"
       "\t  name          : hello\n"
-      "\t  timestamp     : "
-      now_str
+      "\t  timestamp     : " +
+      now_str +
       "\n"
       "\t  attributes    : \n"
       "\t}\n"
       "\t{\n"
       "\t  name          : world\n"
-      "\t  timestamp     : "
-      next_str
+      "\t  timestamp     : " +
+      next_str +
       "\n"
       "\t  attributes    : \n"
       "\t\tattr1: string\n"

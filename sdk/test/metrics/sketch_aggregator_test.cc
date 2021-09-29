@@ -150,7 +150,7 @@ TEST(Sketch, MergeSmall)
   alpha.merge(beta);
   alpha.checkpoint();
 
-  EXPECT_EQ(alpha.get_checkpoint()[0], std::accumulate(vals.begin(), vals.end(), 0)
+  EXPECT_EQ(alpha.get_checkpoint()[0], std::accumulate(vals.begin(), vals.end(), 0) +
                                            std::accumulate(otherVals.begin(), otherVals.end(), 0));
   EXPECT_EQ(alpha.get_checkpoint()[1], vals.size() + otherVals.size());
 
@@ -178,7 +178,7 @@ TEST(Sketch, MergeLarge)
   alpha.merge(beta);
   alpha.checkpoint();
 
-  EXPECT_EQ(alpha.get_checkpoint()[0], std::accumulate(vals.begin(), vals.end(), 0)
+  EXPECT_EQ(alpha.get_checkpoint()[0], std::accumulate(vals.begin(), vals.end(), 0) +
                                            std::accumulate(otherVals.begin(), otherVals.end(), 0));
   EXPECT_EQ(alpha.get_checkpoint()[1], vals.size() + otherVals.size());
 
