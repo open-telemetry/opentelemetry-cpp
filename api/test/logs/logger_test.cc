@@ -18,6 +18,10 @@ using opentelemetry::logs::Severity;
 using opentelemetry::nostd::shared_ptr;
 using opentelemetry::nostd::span;
 using opentelemetry::nostd::string_view;
+namespace common = opentelemetry::common;
+namespace nostd = opentelemetry::nostd;
+namespace trace = opentelemetry::trace;
+
 
 // Check that the default logger is a noop logger instance
 TEST(Logger, GetLoggerDefault)
@@ -72,17 +76,17 @@ TEST(Logger, LogMethodOverloads)
 // Define a basic Logger class
 class TestLogger : public Logger
 {
-  const opentelemetry::nostd::string_view GetName() noexcept override { return "test logger"; }
+  const nostd::string_view GetName() noexcept override { return "test logger"; }
 
   void Log(Severity severity,
            string_view name,
            string_view body,
-           const opentelemetry::common::KeyValueIterable &resource,
-           const opentelemetry::common::KeyValueIterable &attributes,
-           opentelemetry::trace::TraceId trace_id,
-           opentelemetry::trace::SpanId span_id,
-           opentelemetry::trace::TraceFlags trace_flags,
-           opentelemetry::common::SystemTimestamp timestamp) noexcept override
+           const common::KeyValueIterable &resource,
+           const common::KeyValueIterable &attributes,
+           trace::TraceId trace_id,
+           trace::SpanId span_id,
+           trace::TraceFlags trace_flags,
+           common::SystemTimestamp timestamp) noexcept override
   {}
 };
 

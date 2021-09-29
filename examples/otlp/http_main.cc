@@ -47,7 +47,7 @@ int main(int argc, char *argv[])
       std::string binary_mode = argv[3];
       if (binary_mode.size() >= 3 && binary_mode.substr(0, 3) == "bin")
       {
-        opts.content_type = opentelemetry::exporter::otlp::HttpRequestContentType::kBinary;
+        opts.content_type = otlp::HttpRequestContentType::kBinary;
       }
     }
   }

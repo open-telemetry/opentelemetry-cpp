@@ -20,13 +20,14 @@
 
 namespace curl        = opentelemetry::ext::http::client::curl;
 namespace http_client = opentelemetry::ext::http::client;
+namespace nostd = opentelemetry::nostd;
 
 class CustomEventHandler : public http_client::EventHandler
 {
 public:
   virtual void OnResponse(http_client::Response &response) noexcept override{};
   virtual void OnEvent(http_client::SessionState state,
-                       opentelemetry::nostd::string_view reason) noexcept override
+                       nostd::string_view reason) noexcept override
   {}
   virtual void OnConnecting(const http_client::SSLCertificate &) noexcept {}
   virtual ~CustomEventHandler() = default;
@@ -166,8 +167,8 @@ TEST_F(BasicCurlHttpTests, HttpResponse)
   const char *b          = "test-data";
   http_client::Body body = {b, b + strlen(b)};
   int count              = 0;
-  res.ForEachHeader("name1", [&count](opentelemetry::nostd::string_view name,
-                                      opentelemetry::nostd::string_view value) {
+  res.ForEachHeader("name1", [&count](nostd::string_view name,
+                                      nostd::string_view value) {
     if (name != "name1")
       return false;
     if (value != "value1_1" && value != "value1_2")
@@ -178,7 +179,7 @@ TEST_F(BasicCurlHttpTests, HttpResponse)
   ASSERT_EQ(count, 2);
   count = 0;
   res.ForEachHeader(
-      [&count](opentelemetry::nostd::string_view name, opentelemetry::nostd::string_view value) {
+      [&count](nostd::string_view name, nostd::string_view value) {
         if (name != "name1" && name != "name2" && name != "name3")
           return false;
         if (value != "value1_1" && value != "value1_2" && value != "value2" && value != "value3")

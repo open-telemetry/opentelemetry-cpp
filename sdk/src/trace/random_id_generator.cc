@@ -10,19 +10,21 @@ namespace sdk
 {
 namespace trace
 {
+namespace trace_api = opentelemetry::trace;
 
-opentelemetry::trace::SpanId RandomIdGenerator::GenerateSpanId() noexcept
+
+trace_api::SpanId RandomIdGenerator::GenerateSpanId() noexcept
 {
-  uint8_t span_id_buf[opentelemetry::trace::SpanId::kSize];
+  uint8_t span_id_buf[trace_api::SpanId::kSize];
   sdk::common::Random::GenerateRandomBuffer(span_id_buf);
-  return opentelemetry::trace::SpanId(span_id_buf);
+  return trace_api::SpanId(span_id_buf);
 }
 
-opentelemetry::trace::TraceId RandomIdGenerator::GenerateTraceId() noexcept
+trace_api::TraceId RandomIdGenerator::GenerateTraceId() noexcept
 {
-  uint8_t trace_id_buf[opentelemetry::trace::TraceId::kSize];
+  uint8_t trace_id_buf[trace_api::TraceId::kSize];
   sdk::common::Random::GenerateRandomBuffer(trace_id_buf);
-  return opentelemetry::trace::TraceId(trace_id_buf);
+  return trace_api::TraceId(trace_id_buf);
 }
 }  // namespace trace
 }  // namespace sdk

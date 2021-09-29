@@ -8,12 +8,13 @@
 #  include "opentelemetry/sdk/metrics/aggregator/gauge_aggregator.h"
 
 using namespace opentelemetry::sdk::metrics;
+namespace metrics_api = opentelemetry::metrics;
 
 TEST(GaugeAggregator, Update)
 {
   // This tests that the aggregator updates the maintained value correctly
   // after a call to the update() function.
-  auto agg = new GaugeAggregator<int>(opentelemetry::metrics::InstrumentKind::Counter);
+  auto agg = new GaugeAggregator<int>(metrics_api::InstrumentKind::Counter);
 
   // Verify default value
   ASSERT_EQ(agg->get_values()[0], 0);
@@ -36,7 +37,7 @@ TEST(GaugeAggregator, Checkpoint)
   // This tests that the aggregator correctly updates the
   // checkpoint_ value after a call to update() followed
   // by a call to checkpoint().
-  GaugeAggregator<int> agg(opentelemetry::metrics::InstrumentKind::Counter);
+  GaugeAggregator<int> agg(metrics_api::InstrumentKind::Counter);
 
   // Verify default checkpoint, before updates
   ASSERT_EQ(agg.get_checkpoint()[0], 0);
@@ -52,8 +53,8 @@ TEST(GaugeAggregator, Merge)
 {
   // This tests that the values_ vector is updated correctly after
   // two aggregators are merged together.
-  GaugeAggregator<int> agg1(opentelemetry::metrics::InstrumentKind::Counter);
-  GaugeAggregator<int> agg2(opentelemetry::metrics::InstrumentKind::Counter);
+  GaugeAggregator<int> agg1(metrics_api::InstrumentKind::Counter);
+  GaugeAggregator<int> agg2(metrics_api::InstrumentKind::Counter);
 
   agg1.update(1);
   agg2.update(2);
@@ -68,8 +69,8 @@ TEST(GaugeAggregator, BadMerge)
 {
   // This verifies that we encounter and error when we try to merge
   // two aggregators of different numeric types together.
-  GaugeAggregator<int> agg1(opentelemetry::metrics::InstrumentKind::Counter);
-  GaugeAggregator<int> agg2(opentelemetry::metrics::InstrumentKind::ValueRecorder);
+  GaugeAggregator<int> agg1(metrics_api::InstrumentKind::Counter);
+  GaugeAggregator<int> agg2(metrics_api::InstrumentKind::ValueRecorder);
 
   agg1.update(1);
   agg2.update(2);
@@ -84,10 +85,10 @@ TEST(GaugeAggregator, Types)
 {
   // This test verifies that we do not encounter any errors when
   // using various numeric types.
-  GaugeAggregator<int> agg_int(opentelemetry::metrics::InstrumentKind::Counter);
-  GaugeAggregator<long> agg_long(opentelemetry::metrics::InstrumentKind::Counter);
-  GaugeAggregator<float> agg_float(opentelemetry::metrics::InstrumentKind::Counter);
-  GaugeAggregator<double> agg_double(opentelemetry::metrics::InstrumentKind::Counter);
+  GaugeAggregator<int> agg_int(metrics_api::InstrumentKind::Counter);
+  GaugeAggregator<long> agg_long(metrics_api::InstrumentKind::Counter);
+  GaugeAggregator<float> agg_float(metrics_api::InstrumentKind::Counter);
+  GaugeAggregator<double> agg_double(metrics_api::InstrumentKind::Counter);
 
   for (int i = 1; i <= 10; ++i)
   {
@@ -119,7 +120,7 @@ TEST(GaugeAggregator, Concurrency)
 {
   // This test checks that the aggregator updates appropriately
   // when called in a multi-threaded context.
-  GaugeAggregator<int> agg(opentelemetry::metrics::InstrumentKind::Counter);
+  GaugeAggregator<int> agg(metrics_api::InstrumentKind::Counter);
 
   std::thread first(&callback, std::ref(agg));
   std::thread second(&callback, std::ref(agg));

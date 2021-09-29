@@ -7,6 +7,7 @@
 
 namespace nostd    = opentelemetry::nostd;
 namespace sdktrace = opentelemetry::sdk::trace;
+namespace trace_api = opentelemetry::trace;
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace exporter
@@ -14,19 +15,19 @@ namespace exporter
 namespace trace
 {
 
-std::ostream &operator<<(std::ostream &os, opentelemetry::trace::SpanKind span_kind)
+std::ostream &operator<<(std::ostream &os, trace_api::SpanKind span_kind)
 {
   switch (span_kind)
   {
-    case opentelemetry::trace::SpanKind::kClient:
+    case trace_api::SpanKind::kClient:
       return os << "Client";
-    case opentelemetry::trace::SpanKind::kInternal:
+    case trace_api::SpanKind::kInternal:
       return os << "Internal";
-    case opentelemetry::trace::SpanKind::kServer:
+    case trace_api::SpanKind::kServer:
       return os << "Server";
-    case opentelemetry::trace::SpanKind::kProducer:
+    case trace_api::SpanKind::kProducer:
       return os << "Producer";
-    case opentelemetry::trace::SpanKind::kConsumer:
+    case trace_api::SpanKind::kConsumer:
       return os << "Consumer";
   };
   return os << "";

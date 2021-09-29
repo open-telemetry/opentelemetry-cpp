@@ -11,6 +11,7 @@ namespace jaeger
 {
 
 using namespace opentelemetry::sdk::resource;
+namespace trace_api = opentelemetry::trace;
 
 JaegerRecordable::JaegerRecordable() : span_{new thrift::Span} {}
 
@@ -187,19 +188,19 @@ void JaegerRecordable::SetSpanKind(trace::SpanKind span_kind) noexcept
   // map SpanKind to Jaeger tag span.kind.
   switch (span_kind)
   {
-    case opentelemetry::trace::SpanKind::kClient: {
+    case trace_api::SpanKind::kClient: {
       span_kind_str = "client";
       break;
     }
-    case opentelemetry::trace::SpanKind::kServer: {
+    case trace_api::SpanKind::kServer: {
       span_kind_str = "server";
       break;
     }
-    case opentelemetry::trace::SpanKind::kConsumer: {
+    case trace_api::SpanKind::kConsumer: {
       span_kind_str = "consumer";
       break;
     }
-    case opentelemetry::trace::SpanKind::kProducer: {
+    case trace_api::SpanKind::kProducer: {
       span_kind_str = "producer";
       break;
     }

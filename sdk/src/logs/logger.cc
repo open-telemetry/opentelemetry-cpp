@@ -12,12 +12,16 @@ namespace sdk
 {
 namespace logs
 {
-Logger::Logger(opentelemetry::nostd::string_view name,
+  namespace trace_api = opentelemetry::trace;
+namespace nostd       = opentelemetry::nostd;
+namespace common      = opentelemetry::common;
+
+Logger::Logger(nostd::string_view name,
                std::shared_ptr<LoggerProvider> logger_provider) noexcept
     : logger_name_(std::string(name)), logger_provider_(logger_provider)
 {}
 
-const opentelemetry::nostd::string_view Logger::GetName() noexcept
+const nostd::string_view Logger::GetName() noexcept
 {
   return logger_name_;
 }
@@ -30,12 +34,12 @@ const opentelemetry::nostd::string_view Logger::GetName() noexcept
 void Logger::Log(opentelemetry::logs::Severity severity,
                  nostd::string_view name,
                  nostd::string_view body,
-                 const opentelemetry::common::KeyValueIterable &resource,
-                 const opentelemetry::common::KeyValueIterable &attributes,
-                 opentelemetry::trace::TraceId trace_id,
-                 opentelemetry::trace::SpanId span_id,
-                 opentelemetry::trace::TraceFlags trace_flags,
-                 opentelemetry::common::SystemTimestamp timestamp) noexcept
+                 const common::KeyValueIterable &resource,
+                 const common::KeyValueIterable &attributes,
+                 trace_api::TraceId trace_id,
+                 trace_api::SpanId span_id,
+                 trace_api::TraceFlags trace_flags,
+                 common::SystemTimestamp timestamp) noexcept
 {
   // If this logger does not have a processor, no need to create a log record
   auto processor = logger_provider_.lock()->GetProcessor();
@@ -60,19 +64,19 @@ void Logger::Log(opentelemetry::logs::Severity severity,
   recordable->SetBody(body);
 
   resource.ForEachKeyValue(
-      [&](nostd::string_view key, opentelemetry::common::AttributeValue value) noexcept {
+      [&](nostd::string_view key, common::AttributeValue value) noexcept {
         recordable->SetResource(key, value);
         return true;
       });
 
   attributes.ForEachKeyValue(
-      [&](nostd::string_view key, opentelemetry::common::AttributeValue value) noexcept {
+      [&](nostd::string_view key, common::AttributeValue value) noexcept {
         recordable->SetAttribute(key, value);
         return true;
       });
 
   // Inject trace_id/span_id/trace_flags if none is set by user
-  auto provider     = opentelemetry::trace::Provider::GetTracerProvider();
+  auto provider     = trace_api::Provider::GetTracerProvider();
   auto tracer       = provider->GetTracer(logger_name_);
   auto span_context = tracer->GetCurrentSpan()->GetContext();
 

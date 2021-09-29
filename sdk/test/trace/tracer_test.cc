@@ -19,6 +19,7 @@ using opentelemetry::common::SteadyTimestamp;
 using opentelemetry::common::SystemTimestamp;
 namespace nostd  = opentelemetry::nostd;
 namespace common = opentelemetry::common;
+namespace trace_api = opentelemetry::trace;
 using opentelemetry::common::KeyValueIterableView;
 using opentelemetry::exporter::memory::InMemorySpanData;
 using opentelemetry::exporter::memory::InMemorySpanExporter;
@@ -37,8 +38,8 @@ public:
       trace_api::TraceId trace_id,
       nostd::string_view /*name*/,
       trace_api::SpanKind /*span_kind*/,
-      const opentelemetry::common::KeyValueIterable & /*attributes*/,
-      const opentelemetry::trace::SpanContextKeyValueIterable & /*links*/) noexcept override
+      const common::KeyValueIterable & /*attributes*/,
+      const trace_api::SpanContextKeyValueIterable & /*links*/) noexcept override
   {
     // Sample only if valid trace_id ( This is to test Sampler get's valid trace id)
     if (trace_id.IsValid())
@@ -46,8 +47,8 @@ public:
       // Return two pairs of attributes. These attributes should be added to the
       // span attributes
       return {Decision::RECORD_AND_SAMPLE,
-              nostd::unique_ptr<const std::map<std::string, opentelemetry::common::AttributeValue>>(
-                  new const std::map<std::string, opentelemetry::common::AttributeValue>(
+              nostd::unique_ptr<const std::map<std::string, common::AttributeValue>>(
+                  new const std::map<std::string, common::AttributeValue>(
                       {{"sampling_attr1", 123}, {"sampling_attr2", "string"}}))};
     }
     else
@@ -66,14 +67,14 @@ public:
  */
 class MockIdGenerator : public IdGenerator
 {
-  opentelemetry::trace::SpanId GenerateSpanId() noexcept override
+  trace_api::SpanId GenerateSpanId() noexcept override
   {
-    return opentelemetry::trace::SpanId(buf_span);
+    return trace_api::SpanId(buf_span);
   }
 
-  opentelemetry::trace::TraceId GenerateTraceId() noexcept override
+  trace_api::TraceId GenerateTraceId() noexcept override
   {
-    return opentelemetry::trace::TraceId(buf_trace);
+    return trace_api::TraceId(buf_trace);
   }
   uint8_t buf_span[8]   = {1, 2, 3, 4, 5, 6, 7, 8};
   uint8_t buf_trace[16] = {1, 2, 3, 4, 5, 6, 7, 8, 8, 7, 6, 5, 4, 3, 2, 1};
@@ -81,16 +82,16 @@ class MockIdGenerator : public IdGenerator
 
 namespace
 {
-std::shared_ptr<opentelemetry::trace::Tracer> initTracer(std::unique_ptr<SpanExporter> &&exporter)
+std::shared_ptr<trace_api::Tracer> initTracer(std::unique_ptr<SpanExporter> &&exporter)
 {
   auto processor = std::unique_ptr<SpanProcessor>(new SimpleSpanProcessor(std::move(exporter)));
   std::vector<std::unique_ptr<SpanProcessor>> processors;
   processors.push_back(std::move(processor));
   auto context = std::make_shared<TracerContext>(std::move(processors));
-  return std::shared_ptr<opentelemetry::trace::Tracer>(new Tracer(context));
+  return std::shared_ptr<trace_api::Tracer>(new Tracer(context));
 }
 
-std::shared_ptr<opentelemetry::trace::Tracer> initTracer(
+std::shared_ptr<trace_api::Tracer> initTracer(
     std::unique_ptr<SpanExporter> &&exporter,
     // For testing, just shove a pointer over, we'll take it over.
     Sampler *sampler,
@@ -103,7 +104,7 @@ std::shared_ptr<opentelemetry::trace::Tracer> initTracer(
   auto context  = std::make_shared<TracerContext>(std::move(processors), resource,
                                                  std::unique_ptr<Sampler>(sampler),
                                                  std::unique_ptr<IdGenerator>(id_generator));
-  return std::shared_ptr<opentelemetry::trace::Tracer>(new Tracer(context));
+  return std::shared_ptr<trace_api::Tracer>(new Tracer(context));
 }
 
 }  // namespace
@@ -200,11 +201,11 @@ TEST(Tracer, StartSpanWithOptionsTime)
   std::shared_ptr<InMemorySpanData> span_data = exporter->GetData();
   auto tracer                                 = initTracer(std::move(exporter));
 
-  opentelemetry::trace::StartSpanOptions start;
+  trace_api::StartSpanOptions start;
   start.start_system_time = SystemTimestamp(std::chrono::nanoseconds(300));
   start.start_steady_time = SteadyTimestamp(std::chrono::nanoseconds(10));
 
-  opentelemetry::trace::EndSpanOptions end;
+  trace_api::EndSpanOptions end;
   end.end_steady_time = SteadyTimestamp(std::chrono::nanoseconds(40));
 
   tracer->StartSpan("span 1", start)->End(end);

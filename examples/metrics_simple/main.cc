@@ -11,12 +11,15 @@
 
 namespace sdkmetrics = opentelemetry::sdk::metrics;
 namespace nostd      = opentelemetry::nostd;
+namespace exportermetrics = opentelemetry::exporter::metrics;
+namespace metrics_api = opentelemetry::metrics;
+
 
 int main()
 {
   // Initialize and set the global MeterProvider
   auto provider = nostd::shared_ptr<metrics_api::MeterProvider>(new sdkmetrics::MeterProvider);
-  opentelemetry::metrics::Provider::SetMeterProvider(provider);
+  metrics_api::Provider::SetMeterProvider(provider);
 
   // Get the Meter from the MeterProvider
   nostd::shared_ptr<metrics_api::Meter> meter = provider->GetMeter("Test", "0.1.0");
@@ -25,9 +28,9 @@ int main()
   sdkmetrics::PushController ControllerStateless(
       meter,
       std::unique_ptr<sdkmetrics::MetricsExporter>(
-          new opentelemetry::exporter::metrics::OStreamMetricsExporter),
+          new exportermetrics::OStreamMetricsExporter),
       std::shared_ptr<sdkmetrics::MetricsProcessor>(
-          new opentelemetry::sdk::metrics::UngroupedMetricsProcessor(false)),
+          new sdkmetrics::UngroupedMetricsProcessor(false)),
       .05);
 
   // Create and instrument
@@ -36,7 +39,7 @@ int main()
 
   // Create a labelset
   std::map<std::string, std::string> labels = {{"key", "value"}};
-  auto labelkv = opentelemetry::common::KeyValueIterableView<decltype(labels)>{labels};
+  auto labelkv = common::KeyValueIterableView<decltype(labels)>{labels};
 
   // Create arrays of instrument and values to add to them
   metrics_api::SynchronousInstrument<int> *iinstr_arr[] = {intupdowncounter.get(),
@@ -92,9 +95,9 @@ int main()
   sdkmetrics::PushController ControllerStateful(
       meter,
       std::unique_ptr<sdkmetrics::MetricsExporter>(
-          new opentelemetry::exporter::metrics::OStreamMetricsExporter),
+          new exportermetrics::OStreamMetricsExporter),
       std::shared_ptr<sdkmetrics::MetricsProcessor>(
-          new opentelemetry::sdk::metrics::UngroupedMetricsProcessor(true)),
+          new sdkmetrics::UngroupedMetricsProcessor(true)),
       .05);
 
   // Start exporting from the Controller with Stateful Processor

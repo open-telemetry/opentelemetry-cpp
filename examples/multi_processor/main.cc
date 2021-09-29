@@ -12,6 +12,8 @@
 #include "opentelemetry/exporters/ostream/span_exporter.h"
 
 using opentelemetry::exporter::memory::InMemorySpanExporter;
+namespace trace_api = opentelemetry::trace;
+namespace trace_sdk = opentelemetry::sdk::trace;
 
 InMemorySpanExporter *memory_span_exporter;
 
@@ -32,18 +34,18 @@ void initTracer()
   auto processor2 = std::unique_ptr<sdktrace::SpanProcessor>(
       new sdktrace::SimpleSpanProcessor(std::move(exporter2)));
 
-  auto provider = nostd::shared_ptr<opentelemetry::sdk::trace::TracerProvider>(
+  auto provider = nostd::shared_ptr<trace_sdk::TracerProvider>(
       new sdktrace::TracerProvider(std::move(processor1)));
   provider->AddProcessor(std::move(processor2));
   // Set the global trace provider
-  opentelemetry::trace::Provider::SetTracerProvider(std::move(provider));
+  trace_api::Provider::SetTracerProvider(std::move(provider));
 }
 
-void dumpSpans(std::vector<std::unique_ptr<opentelemetry::sdk::trace::SpanData>> &spans)
+void dumpSpans(std::vector<std::unique_ptr<trace_sdk::SpanData>> &spans)
 {
-  char span_buf[opentelemetry::trace::SpanId::kSize * 2];
-  char trace_buf[opentelemetry::trace::TraceId::kSize * 2];
-  char parent_span_buf[opentelemetry::trace::SpanId::kSize * 2];
+  char span_buf[trace_api::SpanId::kSize * 2];
+  char trace_buf[trace_api::TraceId::kSize * 2];
+  char parent_span_buf[trace_api::SpanId::kSize * 2];
   std::cout << "\nSpans from memory :" << std::endl;
 
   for (auto &span : spans)
@@ -60,11 +62,11 @@ void dumpSpans(std::vector<std::unique_ptr<opentelemetry::sdk::trace::SpanData>>
 
     std::cout << "\t\tDescription: " << span->GetDescription() << std::endl;
     std::cout << "\t\tSpan kind:"
-              << static_cast<typename std::underlying_type<opentelemetry::trace::SpanKind>::type>(
+              << static_cast<typename std::underlying_type<trace_api::SpanKind>::type>(
                      span->GetSpanKind())
               << std::endl;
     std::cout << "\t\tSpan Status: "
-              << static_cast<typename std::underlying_type<opentelemetry::trace::StatusCode>::type>(
+              << static_cast<typename std::underlying_type<trace_api::StatusCode>::type>(
                      span->GetStatus())
               << std::endl;
   }

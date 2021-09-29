@@ -13,6 +13,7 @@ namespace
 {
 
 using namespace opentelemetry::trace;
+namespace context = opentelemetry::context;
 
 uint16_t server_port              = 8800;
 constexpr const char *server_name = "localhost";
@@ -23,15 +24,15 @@ public:
   virtual int onHttpRequest(HTTP_SERVER_NS::HttpRequest const &request,
                             HTTP_SERVER_NS::HttpResponse &response) override
   {
-    opentelemetry::trace::StartSpanOptions options;
-    options.kind          = opentelemetry::trace::SpanKind::kServer;  // server
+    StartSpanOptions options;
+    options.kind          = SpanKind::kServer;  // server
     std::string span_name = request.uri;
 
     // extract context from http header
     const HttpTextMapCarrier<std::map<std::string, std::string>> carrier(
         (std::map<std::string, std::string> &)request.headers);
-    auto prop = opentelemetry::context::propagation::GlobalTextMapPropagator::GetGlobalPropagator();
-    auto current_ctx = opentelemetry::context::RuntimeContext::GetCurrent();
+    auto prop = context::propagation::GlobalTextMapPropagator::GetGlobalPropagator();
+    auto current_ctx = context::RuntimeContext::GetCurrent();
     auto new_context = prop->Extract(carrier, current_ctx);
     options.parent   = GetSpan(new_context)->GetContext();
 
@@ -80,7 +81,7 @@ int main(int argc, char *argv[])
   RequestHandler req_handler;
   http_server.AddHandler("/helloworld", &req_handler);
   auto root_span = get_tracer("http_server")->StartSpan(__func__);
-  opentelemetry::trace::Scope scope(root_span);
+  Scope scope(root_span);
   http_server.Start();
   std::cout << "Server is running..Press ctrl-c to exit...\n";
   while (1)

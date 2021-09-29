@@ -13,11 +13,12 @@
 
 using namespace opentelemetry;
 using opentelemetry::common::KeyValueProperties;
+namespace nostd = opentelemetry::nostd;
 // Test constructor that takes a key-value pair
 TEST(EntryTest, KeyValueConstruction)
 {
-  opentelemetry::nostd::string_view key = "test_key";
-  opentelemetry::nostd::string_view val = "test_value";
+  nostd::string_view key = "test_key";
+  nostd::string_view val = "test_value";
   KeyValueProperties::Entry e(key, val);
 
   EXPECT_EQ(key.size(), e.GetKey().size());
@@ -49,7 +50,7 @@ TEST(EntryTest, Assignment)
 TEST(EntryTest, SetValue)
 {
   KeyValueProperties::Entry e("test_key", "test_value");
-  opentelemetry::nostd::string_view new_val = "new_value";
+  nostd::string_view new_val = "new_value";
   e.SetValue(new_val);
 
   EXPECT_EQ(new_val.size(), e.GetValue().size());
@@ -65,7 +66,7 @@ TEST(KVStringTokenizer, SinglePair)
 {
   bool valid_kv;
   nostd::string_view key, value;
-  opentelemetry::nostd::string_view str = "k1=v1";
+  nostd::string_view str = "k1=v1";
   KeyValueStringTokenizerOptions opts;
   KeyValueStringTokenizer tk(str, opts);
   EXPECT_TRUE(tk.next(valid_kv, key, value));
@@ -79,7 +80,7 @@ TEST(KVStringTokenizer, AcceptEmptyEntries)
 {
   bool valid_kv;
   nostd::string_view key, value;
-  opentelemetry::nostd::string_view str = ":k1=v1::k2=v2: ";
+  nostd::string_view str = ":k1=v1::k2=v2: ";
   KeyValueStringTokenizerOptions opts;
   opts.member_separator     = ':';
   opts.ignore_empty_members = false;
@@ -100,7 +101,7 @@ TEST(KVStringTokenizer, AcceptEmptyEntries)
 
 TEST(KVStringTokenizer, ValidPairsWithEmptyEntries)
 {
-  opentelemetry::nostd::string_view str = "k1:v1===k2:v2==";
+  nostd::string_view str = "k1:v1===k2:v2==";
   bool valid_kv;
   nostd::string_view key, value;
   KeyValueStringTokenizerOptions opts;
@@ -123,7 +124,7 @@ TEST(KVStringTokenizer, ValidPairsWithEmptyEntries)
 
 TEST(KVStringTokenizer, InvalidPairs)
 {
-  opentelemetry::nostd::string_view str = "k1=v1,invalid  ,,  k2=v2   ,invalid";
+  nostd::string_view str = "k1=v1,invalid  ,,  k2=v2   ,invalid";
   KeyValueStringTokenizer tk(str);
   bool valid_kv;
   nostd::string_view key, value;
@@ -218,8 +219,8 @@ TEST(KeyValueProperties, GetAllEntries)
   std::vector<std::pair<std::string, std::string>> kv_pairs = {
       {"k1", "v1"}, {"k2", "v2"}, {"k3", "v3"}};
   const size_t kNumPairs                              = 3;
-  opentelemetry::nostd::string_view keys[kNumPairs]   = {"k1", "k2", "k3"};
-  opentelemetry::nostd::string_view values[kNumPairs] = {"v1", "v2", "v3"};
+  nostd::string_view keys[kNumPairs]   = {"k1", "k2", "k3"};
+  nostd::string_view values[kNumPairs] = {"v1", "v2", "v3"};
   auto kv_properties                                  = KeyValueProperties(kv_pairs);
 
   size_t index = 0;

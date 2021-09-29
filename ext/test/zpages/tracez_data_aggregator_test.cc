@@ -14,6 +14,8 @@ using namespace opentelemetry::sdk::trace;
 using namespace opentelemetry::ext::zpages;
 namespace nostd  = opentelemetry::nostd;
 namespace common = opentelemetry::common;
+namespace trace_api = opentelemetry::trace;
+
 using opentelemetry::common::SteadyTimestamp;
 using opentelemetry::trace::Span;
 
@@ -44,13 +46,13 @@ protected:
     processors.push_back(std::move(processor));
 
     auto context           = std::make_shared<TracerContext>(std::move(processors), resource);
-    tracer                 = std::shared_ptr<opentelemetry::trace::Tracer>(new Tracer(context));
+    tracer                 = std::shared_ptr<trace_api::Tracer>(new Tracer(context));
     tracez_data_aggregator = std::unique_ptr<TracezDataAggregator>(
         new TracezDataAggregator(shared_data, milliseconds(10)));
   }
 
   std::unique_ptr<TracezDataAggregator> tracez_data_aggregator;
-  std::shared_ptr<opentelemetry::trace::Tracer> tracer;
+  std::shared_ptr<trace_api::Tracer> tracer;
 };
 
 /**
@@ -133,9 +135,9 @@ TEST_F(TracezDataAggregatorTest, SingleRunningSpan)
 TEST_F(TracezDataAggregatorTest, SingleCompletedSpan)
 {
   // Start and end the span at a specified times
-  opentelemetry::trace::StartSpanOptions start;
+  trace_api::StartSpanOptions start;
   start.start_steady_time = SteadyTimestamp(nanoseconds(10));
-  opentelemetry::trace::EndSpanOptions end;
+  trace_api::EndSpanOptions end;
   end.end_steady_time = SteadyTimestamp(nanoseconds(40));
   tracer->StartSpan(span_name1, start)->End(end);
 
@@ -164,7 +166,7 @@ TEST_F(TracezDataAggregatorTest, SingleErrorSpan)
 {
   // Start and end a single error span
   auto span = tracer->StartSpan(span_name1);
-  span->SetStatus(opentelemetry::trace::StatusCode::kError, "span cancelled");
+  span->SetStatus(trace_api::StatusCode::kError, "span cancelled");
   span->End();
   std::this_thread::sleep_for(milliseconds(500));
   auto data = tracez_data_aggregator->GetAggregatedTracezData();
@@ -257,8 +259,8 @@ TEST_F(TracezDataAggregatorTest, MultipleCompletedSpan)
              {},
              {},
              {nanoseconds(9999999999999)}}}});
-  opentelemetry::trace::StartSpanOptions start;
-  opentelemetry::trace::EndSpanOptions end;
+  trace_api::StartSpanOptions start;
+  trace_api::EndSpanOptions end;
   for (auto &span : span_name_to_duration)
   {
     for (auto &buckets : span.second)
@@ -328,7 +330,7 @@ TEST_F(TracezDataAggregatorTest, MultipleErrorSpans)
     for (auto error_desc : span_error.second)
     {
       auto span = tracer->StartSpan(span_error.first);
-      span->SetStatus(opentelemetry::trace::StatusCode::kError, error_desc);
+      span->SetStatus(trace_api::StatusCode::kError, error_desc);
       span->End();
     }
   }
@@ -408,7 +410,7 @@ TEST_F(TracezDataAggregatorTest, ErrorSampleSpansOverCapacity)
   for (auto span_error_description : span_error_descriptions)
   {
     auto span = tracer->StartSpan(span_name1);
-    span->SetStatus(opentelemetry::trace::StatusCode::kError, span_error_description);
+    span->SetStatus(trace_api::StatusCode::kError, span_error_description);
     span->End();
   }
 
@@ -443,8 +445,8 @@ TEST_F(TracezDataAggregatorTest, ErrorSampleSpansOverCapacity)
  */
 TEST_F(TracezDataAggregatorTest, CompletedSampleSpansOverCapacity)
 {
-  opentelemetry::trace::StartSpanOptions start;
-  opentelemetry::trace::EndSpanOptions end;
+  trace_api::StartSpanOptions start;
+  trace_api::EndSpanOptions end;
 
   // Start and end 6 spans with the same name that fall into the first latency
   // bucket
@@ -498,7 +500,7 @@ TEST_F(TracezDataAggregatorTest, SpanNameInAlphabeticalOrder)
   auto span_first = tracer->StartSpan(span_name2);
   tracer->StartSpan(span_name1)->End();
   auto span_third = tracer->StartSpan(span_name3);
-  span_third->SetStatus(opentelemetry::trace::StatusCode::kError, "span cancelled");
+  span_third->SetStatus(trace_api::StatusCode::kError, "span cancelled");
   span_third->End();
   std::this_thread::sleep_for(milliseconds(500));
   // Get data and check if span name exists in aggregation
@@ -550,9 +552,9 @@ TEST_F(TracezDataAggregatorTest, AdditionToRunningSpans)
  * aggregated data is updated correctly **/
 TEST_F(TracezDataAggregatorTest, RemovalOfRunningSpanWhenCompleted)
 {
-  opentelemetry::trace::StartSpanOptions start;
+  trace_api::StartSpanOptions start;
   start.start_steady_time = SteadyTimestamp(nanoseconds(10));
-  opentelemetry::trace::EndSpanOptions end;
+  trace_api::EndSpanOptions end;
   end.end_steady_time = SteadyTimestamp(nanoseconds(40));
 
   // Start a span and make sure data is updated
@@ -589,9 +591,9 @@ TEST_F(TracezDataAggregatorTest, RemovalOfRunningSpanWhenCompleted)
 
 TEST_F(TracezDataAggregatorTest, RunningSpanChangesNameBeforeCompletion)
 {
-  opentelemetry::trace::StartSpanOptions start;
+  trace_api::StartSpanOptions start;
   start.start_steady_time = SteadyTimestamp(nanoseconds(10));
-  opentelemetry::trace::EndSpanOptions end;
+  trace_api::EndSpanOptions end;
   end.end_steady_time = SteadyTimestamp(nanoseconds(40));
 
   // Start a span and make sure data is updated
@@ -632,8 +634,8 @@ TEST_F(TracezDataAggregatorTest, RunningSpanChangesNameBeforeCompletion)
  * fall in the correct bucket **/
 TEST_F(TracezDataAggregatorTest, EdgeSpanLatenciesFallInCorrectBoundaries)
 {
-  opentelemetry::trace::StartSpanOptions start;
-  opentelemetry::trace::EndSpanOptions end;
+  trace_api::StartSpanOptions start;
+  trace_api::EndSpanOptions end;
 
   // Start and end 6 spans with the same name that fall into the first latency
   // bucket
@@ -669,16 +671,16 @@ TEST_F(TracezDataAggregatorTest, EdgeSpanLatenciesFallInCorrectBoundaries)
  * calls to the data aggegator with no change in data **/
 TEST_F(TracezDataAggregatorTest, NoChangeInBetweenCallsToAggregator)
 {
-  opentelemetry::trace::StartSpanOptions start;
+  trace_api::StartSpanOptions start;
   start.start_steady_time = SteadyTimestamp(nanoseconds(1));
 
-  opentelemetry::trace::EndSpanOptions end;
+  trace_api::EndSpanOptions end;
   end.end_steady_time = SteadyTimestamp(nanoseconds(1));
 
   tracer->StartSpan(span_name1, start)->End(end);
   auto running_span = tracer->StartSpan(span_name2);
   auto span         = tracer->StartSpan(span_name3);
-  span->SetStatus(opentelemetry::trace::StatusCode::kError, "span cancelled");
+  span->SetStatus(trace_api::StatusCode::kError, "span cancelled");
   span->End();
   std::this_thread::sleep_for(milliseconds(500));
   auto data = tracez_data_aggregator->GetAggregatedTracezData();

@@ -9,6 +9,8 @@
 #include "foo_library/foo_library.h"
 #include "opentelemetry/exporters/ostream/span_exporter.h"
 
+namespace trace_api = opentelemetry::trace;
+
 namespace
 {
 void initTracer()
@@ -17,11 +19,11 @@ void initTracer()
       new opentelemetry::exporter::trace::OStreamSpanExporter);
   auto processor = std::unique_ptr<sdktrace::SpanProcessor>(
       new sdktrace::SimpleSpanProcessor(std::move(exporter)));
-  auto provider = nostd::shared_ptr<opentelemetry::trace::TracerProvider>(
+  auto provider = nostd::shared_ptr<trace_api::TracerProvider>(
       new sdktrace::TracerProvider(std::move(processor)));
 
   // Set the global trace provider
-  opentelemetry::trace::Provider::SetTracerProvider(provider);
+  trace_api::Provider::SetTracerProvider(provider);
 }
 }  // namespace
 

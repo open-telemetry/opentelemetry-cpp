@@ -14,11 +14,16 @@
 #include <algorithm>
 #include "nlohmann/json.hpp"
 
+namespace trace_api   = opentelemetry::trace;
+namespace http_client = opentelemetry::ext::http::client;
+namespace curl        = opentelemetry::ext::http::client::curl;
+namespace context     = opentelemetry::context;
+
 namespace
 {
-static opentelemetry::trace::propagation::HttpTraceContext propagator_format;
+static trace_api::propagation::HttpTraceContext propagator_format;
 
-class TextMapCarrierTest : public opentelemetry::context::propagation::TextMapCarrier
+class TextMapCarrierTest : public context::propagation::TextMapCarrier
 {
 public:
   TextMapCarrierTest(std::map<std::string, std::string> &headers) : headers_(headers) {}
@@ -48,15 +53,15 @@ void initTracer()
   std::vector<std::unique_ptr<sdktrace::SpanProcessor>> processors;
   processors.push_back(std::move(processor));
   auto context  = std::make_shared<sdktrace::TracerContext>(std::move(processors));
-  auto provider = nostd::shared_ptr<opentelemetry::trace::TracerProvider>(
+  auto provider = nostd::shared_ptr<trace_api::TracerProvider>(
       new sdktrace::TracerProvider(context));
   // Set the global trace provider
-  opentelemetry::trace::Provider::SetTracerProvider(provider);
+  trace_api::Provider::SetTracerProvider(provider);
 }
 
-nostd::shared_ptr<opentelemetry::trace::Tracer> get_tracer()
+nostd::shared_ptr<trace_api::Tracer> get_tracer()
 {
-  auto provider = opentelemetry::trace::Provider::GetTracerProvider();
+  auto provider = trace_api::Provider::GetTracerProvider();
   return provider->GetTracer("w3c_tracecontext_test");
 }
 
@@ -79,45 +84,45 @@ struct Uri
 
 // A noop event handler for making HTTP requests. We don't care about response bodies and error
 // messages.
-class NoopEventHandler : public opentelemetry::ext::http::client::EventHandler
+class NoopEventHandler : public http_client::EventHandler
 {
 public:
-  void OnEvent(opentelemetry::ext::http::client::SessionState state,
+  void OnEvent(http_client::SessionState state,
                opentelemetry::nostd::string_view reason) noexcept override
   {}
 
-  void OnConnecting(const opentelemetry::ext::http::client::SSLCertificate &) noexcept override {}
+  void OnConnecting(const http_client::SSLCertificate &) noexcept override {}
 
-  void OnResponse(opentelemetry::ext::http::client::Response &response) noexcept override {}
+  void OnResponse(http_client::Response &response) noexcept override {}
 };
 }  // namespace
 
 // Sends an HTTP POST request to the given url, with the given body.
-void send_request(opentelemetry::ext::http::client::curl::HttpClient &client,
+void send_request(curl::HttpClient &client,
                   const std::string &url,
                   const std::string &body)
 {
-  static std::unique_ptr<opentelemetry::ext::http::client::EventHandler> handler(
+  static std::unique_ptr<http_client::EventHandler> handler(
       new NoopEventHandler());
 
   auto request_span = get_tracer()->StartSpan(__func__);
-  opentelemetry::trace::Scope scope(request_span);
+  trace_api::Scope scope(request_span);
 
   Uri uri{url};
 
   auto session = client.CreateSession(url);
   auto request = session->CreateRequest();
 
-  request->SetMethod(opentelemetry::ext::http::client::Method::Post);
+  request->SetMethod(http_client::Method::Post);
   request->SetUri(uri.path);
-  opentelemetry::ext::http::client::Body b = {body.c_str(), body.c_str() + body.size()};
+  http_client::Body b = {body.c_str(), body.c_str() + body.size()};
   request->SetBody(b);
   request->AddHeader("Content-Type", "application/json");
   request->AddHeader("Content-Length", std::to_string(body.size()));
 
   std::map<std::string, std::string> headers;
   TextMapCarrierTest carrier(headers);
-  propagator_format.Inject(carrier, opentelemetry::context::RuntimeContext::GetCurrent());
+  propagator_format.Inject(carrier, context::RuntimeContext::GetCurrent());
 
   for (auto const &hdr : headers)
   {
@@ -150,10 +155,10 @@ int main(int argc, char *argv[])
   }
 
   auto root_span = get_tracer()->StartSpan(__func__);
-  opentelemetry::trace::Scope scope(root_span);
+  trace_api::Scope scope(root_span);
 
   testing::HttpServer server(default_host, port);
-  opentelemetry::ext::http::client::curl::HttpClient client;
+  curl::HttpClient client;
 
   testing::HttpRequestCallback test_cb{
       [&](testing::HttpRequest const &req, testing::HttpResponse &resp) {
@@ -164,9 +169,9 @@ int main(int argc, char *argv[])
         for (auto &part : body)
         {
           const TextMapCarrierTest carrier((std::map<std::string, std::string> &)req.headers);
-          auto current_ctx = opentelemetry::context::RuntimeContext::GetCurrent();
+          auto current_ctx = context::RuntimeContext::GetCurrent();
           auto ctx         = propagator_format.Extract(carrier, current_ctx);
-          auto token       = opentelemetry::context::RuntimeContext::Attach(ctx);
+          auto token       = context::RuntimeContext::Attach(ctx);
 
           auto url       = part["url"].get<std::string>();
           auto arguments = part["arguments"].dump();

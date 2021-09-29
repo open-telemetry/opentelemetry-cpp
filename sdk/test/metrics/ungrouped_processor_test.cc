@@ -16,14 +16,14 @@ namespace nostd       = opentelemetry::nostd;
 TEST(UngroupedMetricsProcessor, UngroupedProcessorFinishedCollectionStateless)
 {
   auto processor = std::unique_ptr<sdkmetrics::MetricsProcessor>(
-      new opentelemetry::sdk::metrics::UngroupedMetricsProcessor(false));
+      new sdkmetrics::UngroupedMetricsProcessor(false));
 
-  auto aggregator = std::shared_ptr<opentelemetry::sdk::metrics::Aggregator<double>>(
-      new opentelemetry::sdk::metrics::CounterAggregator<double>(
+  auto aggregator = std::shared_ptr<sdkmetrics::Aggregator<double>>(
+      new sdkmetrics::CounterAggregator<double>(
           metrics_api::InstrumentKind::Counter));
 
-  auto aggregator2 = std::shared_ptr<opentelemetry::sdk::metrics::Aggregator<double>>(
-      new opentelemetry::sdk::metrics::CounterAggregator<double>(
+  auto aggregator2 = std::shared_ptr<sdkmetrics::Aggregator<double>>(
+      new sdkmetrics::CounterAggregator<double>(
           metrics_api::InstrumentKind::Counter));
 
   aggregator->update(5.5);
@@ -53,14 +53,14 @@ TEST(UngroupedMetricsProcessor, UngroupedProcessorFinishedCollectionStateless)
 TEST(UngroupedMetricsProcessor, UngroupedProcessorFinishedCollectionStateful)
 {
   auto processor = std::unique_ptr<sdkmetrics::MetricsProcessor>(
-      new opentelemetry::sdk::metrics::UngroupedMetricsProcessor(true));
+      new sdkmetrics::UngroupedMetricsProcessor(true));
 
-  auto aggregator = std::shared_ptr<opentelemetry::sdk::metrics::Aggregator<double>>(
-      new opentelemetry::sdk::metrics::CounterAggregator<double>(
+  auto aggregator = std::shared_ptr<sdkmetrics::Aggregator<double>>(
+      new sdkmetrics::CounterAggregator<double>(
           metrics_api::InstrumentKind::Counter));
 
-  auto aggregator2 = std::shared_ptr<opentelemetry::sdk::metrics::Aggregator<double>>(
-      new opentelemetry::sdk::metrics::CounterAggregator<double>(
+  auto aggregator2 = std::shared_ptr<sdkmetrics::Aggregator<double>>(
+      new sdkmetrics::CounterAggregator<double>(
           metrics_api::InstrumentKind::Counter));
 
   aggregator->update(5.5);
@@ -88,10 +88,10 @@ TEST(UngroupedMetricsProcessor, UngroupedProcessorFinishedCollectionStateful)
 TEST(UngroupedMetricsProcessor, UngroupedProcessorKeepsRecordInformationStatelessShort)
 {
   auto processor = std::unique_ptr<sdkmetrics::MetricsProcessor>(
-      new opentelemetry::sdk::metrics::UngroupedMetricsProcessor(false));
+      new sdkmetrics::UngroupedMetricsProcessor(false));
 
-  auto aggregator = std::shared_ptr<opentelemetry::sdk::metrics::Aggregator<short>>(
-      new opentelemetry::sdk::metrics::CounterAggregator<short>(
+  auto aggregator = std::shared_ptr<sdkmetrics::Aggregator<short>>(
+      new sdkmetrics::CounterAggregator<short>(
           metrics_api::InstrumentKind::Counter));
 
   aggregator->update(4);
@@ -113,10 +113,10 @@ TEST(UngroupedMetricsProcessor, UngroupedProcessorKeepsRecordInformationStateles
 TEST(UngroupedMetricsProcessor, UngroupedProcessorKeepsRecordInformationStatelessInt)
 {
   auto processor = std::unique_ptr<sdkmetrics::MetricsProcessor>(
-      new opentelemetry::sdk::metrics::UngroupedMetricsProcessor(false));
+      new sdkmetrics::UngroupedMetricsProcessor(false));
 
-  auto aggregator = std::shared_ptr<opentelemetry::sdk::metrics::Aggregator<int>>(
-      new opentelemetry::sdk::metrics::CounterAggregator<int>(
+  auto aggregator = std::shared_ptr<sdkmetrics::Aggregator<int>>(
+      new sdkmetrics::CounterAggregator<int>(
           metrics_api::InstrumentKind::Counter));
 
   aggregator->update(5);
@@ -137,10 +137,10 @@ TEST(UngroupedMetricsProcessor, UngroupedProcessorKeepsRecordInformationStateles
 TEST(UngroupedMetricsProcessor, UngroupedProcessorKeepsRecordInformationStatelessFloat)
 {
   auto processor = std::unique_ptr<sdkmetrics::MetricsProcessor>(
-      new opentelemetry::sdk::metrics::UngroupedMetricsProcessor(false));
+      new sdkmetrics::UngroupedMetricsProcessor(false));
 
-  auto aggregator = std::shared_ptr<opentelemetry::sdk::metrics::Aggregator<float>>(
-      new opentelemetry::sdk::metrics::CounterAggregator<float>(
+  auto aggregator = std::shared_ptr<sdkmetrics::Aggregator<float>>(
+      new sdkmetrics::CounterAggregator<float>(
           metrics_api::InstrumentKind::Counter));
 
   aggregator->update(8.5);
@@ -162,10 +162,10 @@ TEST(UngroupedMetricsProcessor, UngroupedProcessorKeepsRecordInformationStateles
 TEST(UngroupedMetricsProcessor, UngroupedProcessorKeepsRecordInformationStatelessDouble)
 {
   auto processor = std::unique_ptr<sdkmetrics::MetricsProcessor>(
-      new opentelemetry::sdk::metrics::UngroupedMetricsProcessor(false));
+      new sdkmetrics::UngroupedMetricsProcessor(false));
 
-  auto aggregator = std::shared_ptr<opentelemetry::sdk::metrics::Aggregator<double>>(
-      new opentelemetry::sdk::metrics::CounterAggregator<double>(
+  auto aggregator = std::shared_ptr<sdkmetrics::Aggregator<double>>(
+      new sdkmetrics::CounterAggregator<double>(
           metrics_api::InstrumentKind::Counter));
 
   aggregator->update(5.5);
@@ -192,14 +192,14 @@ TEST(UngroupedMetricsProcessor, UngroupedProcessorKeepsRecordInformationStateles
 TEST(UngroupedMetricsProcessor, UngroupedProcessorKeepsRecordInformationStatefulShort)
 {
   auto processor = std::unique_ptr<sdkmetrics::MetricsProcessor>(
-      new opentelemetry::sdk::metrics::UngroupedMetricsProcessor(true));
+      new sdkmetrics::UngroupedMetricsProcessor(true));
 
-  auto aggregator = std::shared_ptr<opentelemetry::sdk::metrics::Aggregator<short>>(
-      new opentelemetry::sdk::metrics::CounterAggregator<short>(
+  auto aggregator = std::shared_ptr<sdkmetrics::Aggregator<short>>(
+      new sdkmetrics::CounterAggregator<short>(
           metrics_api::InstrumentKind::Counter));
 
-  auto aggregator_test = std::shared_ptr<opentelemetry::sdk::metrics::Aggregator<short>>(
-      new opentelemetry::sdk::metrics::CounterAggregator<short>(
+  auto aggregator_test = std::shared_ptr<sdkmetrics::Aggregator<short>>(
+      new sdkmetrics::CounterAggregator<short>(
           metrics_api::InstrumentKind::Counter));
 
   aggregator->update(5);
@@ -237,14 +237,14 @@ TEST(UngroupedMetricsProcessor, UngroupedProcessorKeepsRecordInformationStateful
 TEST(UngroupedMetricsProcessor, UngroupedProcessorKeepsRecordInformationStatefulInt)
 {
   auto processor = std::unique_ptr<sdkmetrics::MetricsProcessor>(
-      new opentelemetry::sdk::metrics::UngroupedMetricsProcessor(true));
+      new sdkmetrics::UngroupedMetricsProcessor(true));
 
-  auto aggregator = std::shared_ptr<opentelemetry::sdk::metrics::Aggregator<int>>(
-      new opentelemetry::sdk::metrics::CounterAggregator<int>(
+  auto aggregator = std::shared_ptr<sdkmetrics::Aggregator<int>>(
+      new sdkmetrics::CounterAggregator<int>(
           metrics_api::InstrumentKind::Counter));
 
-  auto aggregator_test = std::shared_ptr<opentelemetry::sdk::metrics::Aggregator<int>>(
-      new opentelemetry::sdk::metrics::CounterAggregator<int>(
+  auto aggregator_test = std::shared_ptr<sdkmetrics::Aggregator<int>>(
+      new sdkmetrics::CounterAggregator<int>(
           metrics_api::InstrumentKind::Counter));
 
   aggregator->update(5);
@@ -280,14 +280,14 @@ TEST(UngroupedMetricsProcessor, UngroupedProcessorKeepsRecordInformationStateful
 TEST(UngroupedMetricsProcessor, UngroupedProcessorKeepsRecordInformationStatefulFloat)
 {
   auto processor = std::unique_ptr<sdkmetrics::MetricsProcessor>(
-      new opentelemetry::sdk::metrics::UngroupedMetricsProcessor(true));
+      new sdkmetrics::UngroupedMetricsProcessor(true));
 
-  auto aggregator = std::shared_ptr<opentelemetry::sdk::metrics::Aggregator<float>>(
-      new opentelemetry::sdk::metrics::CounterAggregator<float>(
+  auto aggregator = std::shared_ptr<sdkmetrics::Aggregator<float>>(
+      new sdkmetrics::CounterAggregator<float>(
           metrics_api::InstrumentKind::Counter));
 
-  auto aggregator_test = std::shared_ptr<opentelemetry::sdk::metrics::Aggregator<float>>(
-      new opentelemetry::sdk::metrics::CounterAggregator<float>(
+  auto aggregator_test = std::shared_ptr<sdkmetrics::Aggregator<float>>(
+      new sdkmetrics::CounterAggregator<float>(
           metrics_api::InstrumentKind::Counter));
 
   aggregator->update(5);
@@ -325,14 +325,14 @@ TEST(UngroupedMetricsProcessor, UngroupedProcessorKeepsRecordInformationStateful
 TEST(UngroupedMetricsProcessor, UngroupedProcessorKeepsRecordInformationStatefulDouble)
 {
   auto processor = std::unique_ptr<sdkmetrics::MetricsProcessor>(
-      new opentelemetry::sdk::metrics::UngroupedMetricsProcessor(true));
+      new sdkmetrics::UngroupedMetricsProcessor(true));
 
-  auto aggregator = std::shared_ptr<opentelemetry::sdk::metrics::Aggregator<double>>(
-      new opentelemetry::sdk::metrics::CounterAggregator<double>(
+  auto aggregator = std::shared_ptr<sdkmetrics::Aggregator<double>>(
+      new sdkmetrics::CounterAggregator<double>(
           metrics_api::InstrumentKind::Counter));
 
-  auto aggregator_test = std::shared_ptr<opentelemetry::sdk::metrics::Aggregator<double>>(
-      new opentelemetry::sdk::metrics::CounterAggregator<double>(
+  auto aggregator_test = std::shared_ptr<sdkmetrics::Aggregator<double>>(
+      new sdkmetrics::CounterAggregator<double>(
           metrics_api::InstrumentKind::Counter));
 
   aggregator->update(5.5);
@@ -370,14 +370,14 @@ TEST(UngroupedMetricsProcessor, UngroupedProcessorKeepsRecordInformationStateful
 TEST(UngroupedMetricsProcessor, UngroupedProcessorKeepsRecordInformationStatefulMinMaxSumCount)
 {
   auto processor = std::unique_ptr<sdkmetrics::MetricsProcessor>(
-      new opentelemetry::sdk::metrics::UngroupedMetricsProcessor(true));
+      new sdkmetrics::UngroupedMetricsProcessor(true));
 
-  auto aggregator = std::shared_ptr<opentelemetry::sdk::metrics::Aggregator<double>>(
-      new opentelemetry::sdk::metrics::MinMaxSumCountAggregator<double>(
+  auto aggregator = std::shared_ptr<sdkmetrics::Aggregator<double>>(
+      new sdkmetrics::MinMaxSumCountAggregator<double>(
           metrics_api::InstrumentKind::Counter));
 
-  auto aggregator2 = std::shared_ptr<opentelemetry::sdk::metrics::Aggregator<double>>(
-      new opentelemetry::sdk::metrics::MinMaxSumCountAggregator<double>(
+  auto aggregator2 = std::shared_ptr<sdkmetrics::Aggregator<double>>(
+      new sdkmetrics::MinMaxSumCountAggregator<double>(
           metrics_api::InstrumentKind::Counter));
 
   aggregator->update(1.1);
@@ -417,10 +417,10 @@ TEST(UngroupedMetricsProcessor, UngroupedProcessorKeepsRecordInformationStateful
 TEST(UngroupedMetricsProcessor, UngroupedProcessorKeepsRecordInformationStatefulGauge)
 {
   auto processor = std::unique_ptr<sdkmetrics::MetricsProcessor>(
-      new opentelemetry::sdk::metrics::UngroupedMetricsProcessor(true));
+      new sdkmetrics::UngroupedMetricsProcessor(true));
 
-  auto aggregator = std::shared_ptr<opentelemetry::sdk::metrics::Aggregator<double>>(
-      new opentelemetry::sdk::metrics::GaugeAggregator<double>(
+  auto aggregator = std::shared_ptr<sdkmetrics::Aggregator<double>>(
+      new sdkmetrics::GaugeAggregator<double>(
           metrics_api::InstrumentKind::Counter));
 
   aggregator->update(1.1);
@@ -456,14 +456,14 @@ TEST(UngroupedMetricsProcessor, UngroupedProcessorKeepsRecordInformationStateful
 TEST(UngroupedMetricsProcessor, UngroupedProcessorKeepsRecordInformationStatefulExact)
 {
   auto processor = std::unique_ptr<sdkmetrics::MetricsProcessor>(
-      new opentelemetry::sdk::metrics::UngroupedMetricsProcessor(true));
+      new sdkmetrics::UngroupedMetricsProcessor(true));
 
-  auto aggregator = std::shared_ptr<opentelemetry::sdk::metrics::Aggregator<double>>(
-      new opentelemetry::sdk::metrics::ExactAggregator<double>(metrics_api::InstrumentKind::Counter,
+  auto aggregator = std::shared_ptr<sdkmetrics::Aggregator<double>>(
+      new sdkmetrics::ExactAggregator<double>(metrics_api::InstrumentKind::Counter,
                                                                false));
 
-  auto aggregator2 = std::shared_ptr<opentelemetry::sdk::metrics::Aggregator<double>>(
-      new opentelemetry::sdk::metrics::ExactAggregator<double>(metrics_api::InstrumentKind::Counter,
+  auto aggregator2 = std::shared_ptr<sdkmetrics::Aggregator<double>>(
+      new sdkmetrics::ExactAggregator<double>(metrics_api::InstrumentKind::Counter,
                                                                false));
 
   aggregator->update(1.1);
@@ -504,15 +504,15 @@ TEST(UngroupedMetricsProcessor, UngroupedProcessorKeepsRecordInformationStateful
 TEST(UngroupedMetricsProcessor, UngroupedProcessorKeepsRecordInformationStatefulHistogram)
 {
   auto processor = std::unique_ptr<sdkmetrics::MetricsProcessor>(
-      new opentelemetry::sdk::metrics::UngroupedMetricsProcessor(true));
+      new sdkmetrics::UngroupedMetricsProcessor(true));
 
   std::vector<double> boundaries{10, 20, 30, 40, 50};
-  auto aggregator = std::shared_ptr<opentelemetry::sdk::metrics::Aggregator<int>>(
-      new opentelemetry::sdk::metrics::HistogramAggregator<int>(
+  auto aggregator = std::shared_ptr<sdkmetrics::Aggregator<int>>(
+      new sdkmetrics::HistogramAggregator<int>(
           metrics_api::InstrumentKind::Counter, boundaries));
 
-  auto aggregator2 = std::shared_ptr<opentelemetry::sdk::metrics::Aggregator<int>>(
-      new opentelemetry::sdk::metrics::HistogramAggregator<int>(
+  auto aggregator2 = std::shared_ptr<sdkmetrics::Aggregator<int>>(
+      new sdkmetrics::HistogramAggregator<int>(
           metrics_api::InstrumentKind::Counter, boundaries));
 
   for (int i = 0; i < 60; i++)
@@ -567,14 +567,14 @@ TEST(UngroupedMetricsProcessor, UngroupedProcessorKeepsRecordInformationStateful
 TEST(UngroupedMetricsProcessor, UngroupedProcessorKeepsRecordInformationStatefulSketch)
 {
   auto processor = std::unique_ptr<sdkmetrics::MetricsProcessor>(
-      new opentelemetry::sdk::metrics::UngroupedMetricsProcessor(true));
+      new sdkmetrics::UngroupedMetricsProcessor(true));
 
-  auto aggregator = std::shared_ptr<opentelemetry::sdk::metrics::Aggregator<int>>(
-      new opentelemetry::sdk::metrics::SketchAggregator<int>(metrics_api::InstrumentKind::Counter,
+  auto aggregator = std::shared_ptr<sdkmetrics::Aggregator<int>>(
+      new sdkmetrics::SketchAggregator<int>(metrics_api::InstrumentKind::Counter,
                                                              .00005));
 
-  auto test_aggregator = std::shared_ptr<opentelemetry::sdk::metrics::Aggregator<int>>(
-      new opentelemetry::sdk::metrics::SketchAggregator<int>(metrics_api::InstrumentKind::Counter,
+  auto test_aggregator = std::shared_ptr<sdkmetrics::Aggregator<int>>(
+      new sdkmetrics::SketchAggregator<int>(metrics_api::InstrumentKind::Counter,
                                                              .00005));
 
   for (int i = 0; i < 60; i++)

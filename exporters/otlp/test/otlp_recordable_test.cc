@@ -9,18 +9,23 @@ namespace exporter
 {
 namespace otlp
 {
+namespace trace_api = opentelemetry::trace;
+namespace trace_sdk = opentelemetry::sdk::trace;
+namespace resource = opentelemetry::sdk::resource;
+namespace proto = opentelemetry::proto;
+
 TEST(OtlpRecordable, SetIdentity)
 {
   constexpr uint8_t trace_id_buf[]       = {1, 2, 3, 4, 5, 6, 7, 8, 1, 2, 3, 4, 5, 6, 7, 8};
   constexpr uint8_t span_id_buf[]        = {1, 2, 3, 4, 5, 6, 7, 8};
   constexpr uint8_t parent_span_id_buf[] = {8, 7, 6, 5, 4, 3, 2, 1};
-  opentelemetry::trace::TraceId trace_id{trace_id_buf};
-  opentelemetry::trace::SpanId span_id{span_id_buf};
-  opentelemetry::trace::SpanId parent_span_id{parent_span_id_buf};
-  const auto trace_state = opentelemetry::trace::TraceState::GetDefault()->Set("key1", "value");
-  const opentelemetry::trace::SpanContext span_context{
+  trace_api::TraceId trace_id{trace_id_buf};
+  trace_api::SpanId span_id{span_id_buf};
+  trace_api::SpanId parent_span_id{parent_span_id_buf};
+  const auto trace_state = trace_api::TraceState::GetDefault()->Set("key1", "value");
+  const trace_api::SpanContext span_context{
       trace_id, span_id,
-      opentelemetry::trace::TraceFlags{opentelemetry::trace::TraceFlags::kIsSampled}, true,
+      trace_api::TraceFlags{trace_api::TraceFlags::kIsSampled}, true,
       trace_state};
 
   OtlpRecordable rec;
@@ -47,16 +52,16 @@ TEST(OtlpRecordable, SetName)
 TEST(OtlpRecordable, SetSpanKind)
 {
   OtlpRecordable rec;
-  opentelemetry::trace::SpanKind span_kind = opentelemetry::trace::SpanKind::kServer;
+  trace_api::SpanKind span_kind = trace_api::SpanKind::kServer;
   rec.SetSpanKind(span_kind);
   EXPECT_EQ(rec.span().kind(),
-            opentelemetry::proto::trace::v1::Span_SpanKind::Span_SpanKind_SPAN_KIND_SERVER);
+            proto::trace::v1::Span_SpanKind::Span_SpanKind_SPAN_KIND_SERVER);
 }
 
 TEST(OtlpRecordable, SetInstrumentationLibrary)
 {
   OtlpRecordable rec;
-  auto inst_lib = opentelemetry::sdk::trace::InstrumentationLibrary::Create("test", "v1");
+  auto inst_lib = trace_sdk::InstrumentationLibrary::Create("test", "v1");
   rec.SetInstrumentationLibrary(*inst_lib);
   auto proto_instr_libr = rec.GetProtoInstrumentationLibrary();
   EXPECT_EQ(proto_instr_libr.name(), inst_lib->GetName());
@@ -68,7 +73,7 @@ TEST(OtlpRecordable, SetInstrumentationLibraryWithSchemaURL)
   OtlpRecordable rec;
   const std::string expected_schema_url{"https://opentelemetry.io/schemas/1.2.0"};
   auto inst_lib =
-      opentelemetry::sdk::trace::InstrumentationLibrary::Create("test", "v1", expected_schema_url);
+      trace_sdk::InstrumentationLibrary::Create("test", "v1", expected_schema_url);
   rec.SetInstrumentationLibrary(*inst_lib);
   EXPECT_EQ(expected_schema_url, rec.GetInstrumentationLibrarySchemaURL());
 }
@@ -109,14 +114,14 @@ TEST(OtlpRecordable, SetStatus)
   rec1.SetStatus(code_error, description);
 
   EXPECT_EQ(rec1.span().status().code(),
-            opentelemetry::proto::trace::v1::Status_StatusCode(code_error));
+            proto::trace::v1::Status_StatusCode(code_error));
   EXPECT_EQ(rec1.span().status().message(), description);
 
   OtlpRecordable rec2;
   trace::StatusCode code_ok(trace::StatusCode::kOk);
   rec2.SetStatus(code_ok, description);
   EXPECT_EQ(rec2.span().status().code(),
-            opentelemetry::proto::trace::v1::Status_StatusCode(code_ok));
+            proto::trace::v1::Status_StatusCode(code_ok));
   EXPECT_EQ(rec2.span().status().message(), "");
 }
 
@@ -192,7 +197,7 @@ TEST(OtlpRecordable, SetResource)
   const std::string service_name_key = "service.name";
   std::string service_name           = "test-otlp";
   auto resource =
-      opentelemetry::sdk::resource::Resource::Create({{service_name_key, service_name}});
+      resource::Resource::Create({{service_name_key, service_name}});
   rec.SetResource(resource);
 
   auto proto_resource     = rec.ProtoResource();
@@ -214,7 +219,7 @@ TEST(OtlpRecordable, SetResourceWithSchemaURL)
   const std::string service_name_key    = "service.name";
   const std::string service_name        = "test-otlp";
   const std::string expected_schema_url = "https://opentelemetry.io/schemas/1.2.0";
-  auto resource = opentelemetry::sdk::resource::Resource::Create({{service_name_key, service_name}},
+  auto resource = resource::Resource::Create({{service_name_key, service_name}},
                                                                  expected_schema_url);
   rec.SetResource(resource);
 

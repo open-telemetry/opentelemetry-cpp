@@ -16,6 +16,9 @@
 namespace sdklogs  = opentelemetry::sdk::logs;
 namespace logs_api = opentelemetry::logs;
 namespace nostd    = opentelemetry::nostd;
+namespace exporterlogs  = opentelemetry::exporter::logs;
+namespace common    = opentelemetry::common;
+
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace exporter
@@ -27,7 +30,7 @@ namespace logs
 TEST(OStreamLogExporter, Shutdown)
 {
   auto exporter =
-      std::unique_ptr<sdklogs::LogExporter>(new opentelemetry::exporter::logs::OStreamLogExporter);
+      std::unique_ptr<sdklogs::LogExporter>(new exporterlogs::OStreamLogExporter);
 
   // Save cout's original buffer here
   std::streambuf *original = std::cout.rdbuf();
@@ -56,7 +59,7 @@ TEST(OStreamLogExporter, Shutdown)
 TEST(OstreamLogExporter, DefaultLogRecordToCout)
 {
   auto exporter = std::unique_ptr<sdklogs::LogExporter>(
-      new opentelemetry::exporter::logs::OStreamLogExporter(std::cout));
+      new exporterlogs::OStreamLogExporter(std::cout));
 
   // Save cout's original buffer here
   std::streambuf *original = std::cout.rdbuf();
@@ -95,7 +98,7 @@ TEST(OStreamLogExporter, SimpleLogToCout)
 {
   // Initialize an Ostream exporter to std::cout
   auto exporter = std::unique_ptr<sdklogs::LogExporter>(
-      new opentelemetry::exporter::logs::OStreamLogExporter(std::cout));
+      new exporterlogs::OStreamLogExporter(std::cout));
 
   // Save original stream buffer, then redirect cout to our new stream buffer
   std::streambuf *original = std::cout.rdbuf();
@@ -104,7 +107,7 @@ TEST(OStreamLogExporter, SimpleLogToCout)
 
   // Pass a default recordable created by the exporter to be exported
   // Create a log record and manually timestamp, severity, name, message
-  opentelemetry::common::SystemTimestamp now(std::chrono::system_clock::now());
+  common::SystemTimestamp now(std::chrono::system_clock::now());
 
   auto record = std::unique_ptr<sdklogs::Recordable>(new sdklogs::LogRecord());
   record->SetTimestamp(now);
@@ -120,8 +123,8 @@ TEST(OStreamLogExporter, SimpleLogToCout)
 
   std::string expectedOutput =
       "{\n"
-      "  timestamp     : " +
-      std::to_string(now.time_since_epoch().count()) +
+      "  timestamp     : "
+      std::to_string(now.time_since_epoch().count())
       "\n"
       "  severity_num  : 1\n"
       "  severity_text : TRACE\n"
@@ -144,7 +147,7 @@ TEST(OStreamLogExporter, LogWithStringAttributesToCerr)
 {
   // Initialize an Ostream exporter to cerr
   auto exporter = std::unique_ptr<sdklogs::LogExporter>(
-      new opentelemetry::exporter::logs::OStreamLogExporter(std::cerr));
+      new exporterlogs::OStreamLogExporter(std::cerr));
 
   // Save original stream buffer, then redirect cout to our new stream buffer
   std::streambuf *original = std::cerr.rdbuf();
@@ -191,7 +194,7 @@ TEST(OStreamLogExporter, LogWithVariantTypesToClog)
 
   // Initialize an Ostream exporter to cerr
   auto exporter = std::unique_ptr<sdklogs::LogExporter>(
-      new opentelemetry::exporter::logs::OStreamLogExporter(std::clog));
+      new exporterlogs::OStreamLogExporter(std::clog));
 
   // Save original stream buffer, then redirect cout to our new stream buffer
   std::streambuf *original = std::clog.rdbuf();
@@ -203,13 +206,13 @@ TEST(OStreamLogExporter, LogWithVariantTypesToClog)
 
   // Set resources for this log record of only integer types as the value
   std::array<int, 3> array1 = {1, 2, 3};
-  opentelemetry::nostd::span<int> data1{array1.data(), array1.size()};
+  nostd::span<int> data1{array1.data(), array1.size()};
   record->SetResource("res1", data1);
 
   // Set resources for this log record of bool types as the value
   // e.g. key/value is a par of type <string, array of bools>
   std::array<bool, 3> array = {false, true, false};
-  record->SetAttribute("attr1", opentelemetry::nostd::span<bool>{array.data(), array.size()});
+  record->SetAttribute("attr1", nostd::span<bool>{array.data(), array.size()});
 
   // Log a record to clog
   exporter->Export(nostd::span<std::unique_ptr<sdklogs::Recordable>>(&record, 1));
@@ -241,7 +244,7 @@ TEST(OStreamLogExporter, IntegrationTest)
 {
   // Initialize a logger
   auto exporter =
-      std::unique_ptr<sdklogs::LogExporter>(new opentelemetry::exporter::logs::OStreamLogExporter);
+      std::unique_ptr<sdklogs::LogExporter>(new exporterlogs::OStreamLogExporter);
   auto processor =
       std::shared_ptr<sdklogs::LogProcessor>(new sdklogs::SimpleLogProcessor(std::move(exporter)));
   auto sdkProvider = std::shared_ptr<sdklogs::LoggerProvider>(new sdklogs::LoggerProvider());
@@ -259,8 +262,8 @@ TEST(OStreamLogExporter, IntegrationTest)
   std::cout.rdbuf(stdcoutOutput.rdbuf());
 
   // Write a log to ostream exporter
-  opentelemetry::common::SystemTimestamp now(std::chrono::system_clock::now());
-  logger->Log(opentelemetry::logs::Severity::kDebug, "", "Hello", {}, {}, {}, {}, {}, now);
+  common::SystemTimestamp now(std::chrono::system_clock::now());
+  logger->Log(logs_api::Severity::kDebug, "", "Hello", {}, {}, {}, {}, {}, now);
 
   // Restore cout's original streambuf
   std::cout.rdbuf(original);
@@ -268,8 +271,8 @@ TEST(OStreamLogExporter, IntegrationTest)
   // Compare actual vs expected outputs
   std::string expectedOutput =
       "{\n"
-      "  timestamp     : " +
-      std::to_string(now.time_since_epoch().count()) +
+      "  timestamp     : "
+      std::to_string(now.time_since_epoch().count())
       "\n"
       "  severity_num  : 5\n"
       "  severity_text : DEBUG\n"

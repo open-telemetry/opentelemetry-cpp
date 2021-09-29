@@ -12,6 +12,8 @@ namespace exporter
 namespace otlp
 {
 
+namespace trace_api = opentelemetry::trace;
+
 const int kBatchSize     = 200;
 const int kNumAttributes = 5;
 const int kNumIterations = 1000;
@@ -22,10 +24,10 @@ const trace::SpanId kSpanId(std::array<const uint8_t, trace::SpanId::kSize>({0, 
                                                                              2}));
 const trace::SpanId kParentSpanId(std::array<const uint8_t, trace::SpanId::kSize>({0, 0, 0, 0, 0, 0,
                                                                                    0, 3}));
-const auto kTraceState = opentelemetry::trace::TraceState::GetDefault() -> Set("key1", "value");
-const opentelemetry::trace::SpanContext kSpanContext{
+const auto kTraceState = trace_api::TraceState::GetDefault() -> Set("key1", "value");
+const trace_api::SpanContext kSpanContext{
     kTraceId, kSpanId,
-    opentelemetry::trace::TraceFlags{opentelemetry::trace::TraceFlags::kIsSampled}, true,
+    trace_api::TraceFlags{trace_api::TraceFlags::kIsSampled}, true,
     kTraceState};
 
 // ----------------------- Helper classes and functions ------------------------

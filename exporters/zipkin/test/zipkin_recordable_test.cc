@@ -17,6 +17,8 @@
 namespace trace    = opentelemetry::trace;
 namespace nostd    = opentelemetry::nostd;
 namespace sdktrace = opentelemetry::sdk::trace;
+namespace common   = opentelemetry::common;
+namespace zipkin   = opentelemetry::exporter::zipkin;
 using json         = nlohmann::json;
 
 // Testing Shutdown functionality of OStreamSpanExporter, should expect no data to be sent to Stream
@@ -25,7 +27,7 @@ TEST(ZipkinSpanRecordable, SetIdentity)
   json j_span = {{"id", "0000000000000002"},
                  {"parentId", "0000000000000003"},
                  {"traceId", "00000000000000000000000000000001"}};
-  opentelemetry::exporter::zipkin::Recordable rec;
+  zipkin::Recordable rec;
   const trace::TraceId trace_id(std::array<const uint8_t, trace::TraceId::kSize>(
       {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1}));
 
@@ -35,9 +37,9 @@ TEST(ZipkinSpanRecordable, SetIdentity)
   const trace::SpanId parent_span_id(
       std::array<const uint8_t, trace::SpanId::kSize>({0, 0, 0, 0, 0, 0, 0, 3}));
 
-  const opentelemetry::trace::SpanContext span_context{
+  const trace::SpanContext span_context{
       trace_id, span_id,
-      opentelemetry::trace::TraceFlags{opentelemetry::trace::TraceFlags::kIsSampled}, true};
+      trace::TraceFlags{trace::TraceFlags::kIsSampled}, true};
 
   rec.SetIdentity(span_context, parent_span_id);
   EXPECT_EQ(rec.span(), j_span);
@@ -48,7 +50,7 @@ TEST(ZipkinSpanRecordable, SetIdentity)
 TEST(ZipkinSpanRecordable, SetIdentityEmptyParent)
 {
   json j_span = {{"id", "0000000000000002"}, {"traceId", "00000000000000000000000000000001"}};
-  opentelemetry::exporter::zipkin::Recordable rec;
+  zipkin::Recordable rec;
   const trace::TraceId trace_id(std::array<const uint8_t, trace::TraceId::kSize>(
       {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1}));
 
@@ -58,9 +60,9 @@ TEST(ZipkinSpanRecordable, SetIdentityEmptyParent)
   const trace::SpanId parent_span_id(
       std::array<const uint8_t, trace::SpanId::kSize>({0, 0, 0, 0, 0, 0, 0, 0}));
 
-  const opentelemetry::trace::SpanContext span_context{
+  const trace::SpanContext span_context{
       trace_id, span_id,
-      opentelemetry::trace::TraceFlags{opentelemetry::trace::TraceFlags::kIsSampled}, true};
+      trace::TraceFlags{trace::TraceFlags::kIsSampled}, true};
 
   rec.SetIdentity(span_context, parent_span_id);
   EXPECT_EQ(rec.span(), j_span);
@@ -70,16 +72,16 @@ TEST(ZipkinSpanRecordable, SetName)
 {
   nostd::string_view name = "Test Span";
   json j_span             = {{"name", name}};
-  opentelemetry::exporter::zipkin::Recordable rec;
+  zipkin::Recordable rec;
   rec.SetName(name);
   EXPECT_EQ(rec.span(), j_span);
 }
 
 TEST(ZipkinSpanRecordable, SetStartTime)
 {
-  opentelemetry::exporter::zipkin::Recordable rec;
+  zipkin::Recordable rec;
   std::chrono::system_clock::time_point start_time = std::chrono::system_clock::now();
-  opentelemetry::common::SystemTimestamp start_timestamp(start_time);
+  common::SystemTimestamp start_timestamp(start_time);
 
   uint64_t unix_start =
       std::chrono::duration_cast<std::chrono::microseconds>(start_time.time_since_epoch()).count();
@@ -94,9 +96,9 @@ TEST(ZipkinSpanRecordable, SetDuration)
   std::chrono::microseconds durationMS =
       std::chrono::duration_cast<std::chrono::microseconds>(durationNS);  // in ms
   json j_span = {{"duration", durationMS.count()}, {"timestamp", 0}};
-  opentelemetry::exporter::zipkin::Recordable rec;
+  zipkin::Recordable rec;
   // Start time is 0
-  opentelemetry::common::SystemTimestamp start_timestamp;
+  common::SystemTimestamp start_timestamp;
 
   rec.SetStartTime(start_timestamp);
   rec.SetDuration(durationNS);
@@ -111,7 +113,7 @@ TEST(ZipkinSpanRecordable, SetInstrumentationLibrary)
   const char *library_version = "0.5.0";
   json j_span                 = {
       {"tags", {{"otel.library.name", library_name}, {"otel.library.version", library_version}}}};
-  opentelemetry::exporter::zipkin::Recordable rec;
+  zipkin::Recordable rec;
 
   rec.SetInstrumentationLibrary(*InstrumentationLibrary::Create(library_name, library_version));
 
@@ -124,7 +126,7 @@ TEST(ZipkinSpanRecordable, SetStatus)
   std::vector<trace::StatusCode> status_codes = {trace::StatusCode::kError, trace::StatusCode::kOk};
   for (auto &status_code : status_codes)
   {
-    opentelemetry::exporter::zipkin::Recordable rec;
+    zipkin::Recordable rec;
     trace::StatusCode code(status_code);
     json j_span;
     if (status_code == trace::StatusCode::kError)
@@ -140,20 +142,20 @@ TEST(ZipkinSpanRecordable, SetStatus)
 TEST(ZipkinSpanRecordable, SetSpanKind)
 {
   json j_json_client = {{"kind", "CLIENT"}};
-  opentelemetry::exporter::zipkin::Recordable rec;
-  rec.SetSpanKind(opentelemetry::trace::SpanKind::kClient);
+  zipkin::Recordable rec;
+  rec.SetSpanKind(trace::SpanKind::kClient);
   EXPECT_EQ(rec.span(), j_json_client);
 }
 
 TEST(ZipkinSpanRecordable, AddEventDefault)
 {
-  opentelemetry::exporter::zipkin::Recordable rec;
+  zipkin::Recordable rec;
   nostd::string_view name = "Test Event";
 
   std::chrono::system_clock::time_point event_time = std::chrono::system_clock::now();
-  opentelemetry::common::SystemTimestamp event_timestamp(event_time);
+  common::SystemTimestamp event_timestamp(event_time);
 
-  rec.opentelemetry::sdk::trace::Recordable::AddEvent(name, event_timestamp);
+  rec.sdktrace::Recordable::AddEvent(name, event_timestamp);
 
   uint64_t unix_event_time =
       std::chrono::duration_cast<std::chrono::microseconds>(event_time.time_since_epoch()).count();
@@ -166,10 +168,10 @@ TEST(ZipkinSpanRecordable, AddEventDefault)
 
 TEST(ZipkinSpanRecordable, AddEventWithAttributes)
 {
-  opentelemetry::exporter::zipkin::Recordable rec;
+  zipkin::Recordable rec;
 
   std::chrono::system_clock::time_point event_time = std::chrono::system_clock::now();
-  opentelemetry::common::SystemTimestamp event_timestamp(event_time);
+  common::SystemTimestamp event_timestamp(event_time);
   uint64_t unix_event_time =
       std::chrono::duration_cast<std::chrono::microseconds>(event_time.time_since_epoch()).count();
 
@@ -180,7 +182,7 @@ TEST(ZipkinSpanRecordable, AddEventWithAttributes)
       {keys[0], values[0]}, {keys[1], values[1]}, {keys[2], values[2]}};
 
   rec.AddEvent("Test Event", event_timestamp,
-               opentelemetry::common::KeyValueIterableView<std::map<std::string, int>>(attributes));
+               common::KeyValueIterableView<std::map<std::string, int>>(attributes));
 
   nlohmann::json j_span = {
       {"annotations",
@@ -192,17 +194,17 @@ TEST(ZipkinSpanRecordable, AddEventWithAttributes)
 // Test non-int single types. Int single types are tested using templates (see IntAttributeTest)
 TEST(ZipkinSpanRecordable, SetSingleAtrribute)
 {
-  opentelemetry::exporter::zipkin::Recordable rec;
+  zipkin::Recordable rec;
   nostd::string_view bool_key = "bool_attr";
-  opentelemetry::common::AttributeValue bool_val(true);
+  common::AttributeValue bool_val(true);
   rec.SetAttribute(bool_key, bool_val);
 
   nostd::string_view double_key = "double_attr";
-  opentelemetry::common::AttributeValue double_val(3.3);
+  common::AttributeValue double_val(3.3);
   rec.SetAttribute(double_key, double_val);
 
   nostd::string_view str_key = "str_attr";
-  opentelemetry::common::AttributeValue str_val(nostd::string_view("Test"));
+  common::AttributeValue str_val(nostd::string_view("Test"));
   rec.SetAttribute(str_key, str_val);
   nlohmann::json j_span = {
       {"tags", {{"bool_attr", true}, {"double_attr", 3.3}, {"str_attr", "Test"}}}};
@@ -213,7 +215,7 @@ TEST(ZipkinSpanRecordable, SetSingleAtrribute)
 // Test non-int array types. Int array types are tested using templates (see IntAttributeTest)
 TEST(ZipkinSpanRecordable, SetArrayAtrribute)
 {
-  opentelemetry::exporter::zipkin::Recordable rec;
+  zipkin::Recordable rec;
   nlohmann::json j_span = {{"tags",
                             {{"bool_arr_attr", {true, false, true}},
                              {"double_arr_attr", {22.3, 33.4, 44.5}},
@@ -237,7 +239,7 @@ TEST(ZipkinSpanRecordable, SetArrayAtrribute)
 
 TEST(ZipkinSpanRecordable, SetResource)
 {
-  opentelemetry::exporter::zipkin::Recordable rec;
+  zipkin::Recordable rec;
   std::string service_name = "test";
   auto resource = opentelemetry::sdk::resource::Resource::Create({{"service.name", service_name}});
   rec.SetResource(resource);
@@ -262,9 +264,9 @@ TYPED_TEST(ZipkinIntAttributeTest, SetIntSingleAttribute)
 {
   using IntType = typename TestFixture::IntParamType;
   IntType i     = 2;
-  opentelemetry::common::AttributeValue int_val(i);
+  common::AttributeValue int_val(i);
 
-  opentelemetry::exporter::zipkin::Recordable rec;
+  zipkin::Recordable rec;
   rec.SetAttribute("int_attr", int_val);
   nlohmann::json j_span = {{"tags", {{"int_attr", 2}}}};
   EXPECT_EQ(rec.span(), j_span);
@@ -278,7 +280,7 @@ TYPED_TEST(ZipkinIntAttributeTest, SetIntArrayAttribute)
   IntType int_arr[kArraySize] = {4, 5, 6};
   nostd::span<const IntType> int_span(int_arr);
 
-  opentelemetry::exporter::zipkin::Recordable rec;
+  zipkin::Recordable rec;
   rec.SetAttribute("int_arr_attr", int_span);
   nlohmann::json j_span = {{"tags", {{"int_arr_attr", {4, 5, 6}}}}};
   EXPECT_EQ(rec.span(), j_span);

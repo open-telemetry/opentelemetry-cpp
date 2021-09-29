@@ -5,14 +5,16 @@
 #include "opentelemetry/ext/http/client/http_client.h"
 #include "opentelemetry/ext/http/client/http_client_factory.h"
 
-std::shared_ptr<opentelemetry::ext::http::client::HttpClient>
-opentelemetry::ext::http::client::HttpClientFactory::Create()
+namespace http_client = opentelemetry::ext::http::client;
+
+std::shared_ptr<http_client::HttpClient>
+http_client::HttpClientFactory::Create()
 {
-  return std::make_shared<opentelemetry::ext::http::client::curl::HttpClient>();
+  return std::make_shared<http_client::curl::HttpClient>();
 }
 
-std::shared_ptr<opentelemetry::ext::http::client::HttpClientSync>
-opentelemetry::ext::http::client::HttpClientFactory::CreateSync()
+std::shared_ptr<http_client::HttpClientSync>
+http_client::HttpClientFactory::CreateSync()
 {
-  return std::make_shared<opentelemetry::ext::http::client::curl::HttpClientSync>();
+  return std::make_shared<http_client::curl::HttpClientSync>();
 }
