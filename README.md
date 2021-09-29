@@ -21,7 +21,7 @@ The C++ [OpenTelemetry](https://opentelemetry.io/) client.
 
 ## OpenTelemetry Specification Compatibility Matrix
 
-| API Version | Core version | Contrib Version         |
+| API Version | Core Version | Contrib Version         |
 | ----------- |--------------|-------------------------|
 | 1.0.0       | 1.0.0-rc4    | N/A [1]                 |
 | 1.0.0       | 1.0.0        | N/A                     |
