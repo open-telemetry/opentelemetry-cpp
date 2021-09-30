@@ -189,6 +189,23 @@ public:
     this->Log(severity, name, "", {}, attributes, {}, {}, {}, std::chrono::system_clock::now());
   }
 
+  /**
+   * Writes a log.
+   * @param severity The severity of the log
+   * @param name The name of the log
+   * @param attributes the attributes, stored as a 2D list of key/value pairs, that are associated
+   * with the log event
+   */
+  void Log(Severity severity,
+           nostd::string_view name,
+           common::KeyValueIterable &attributes) noexcept
+  {
+    this->Log(severity, name, {},
+              common::KeyValueIterableView<
+                  std::initializer_list<std::pair<nostd::string_view, common::AttributeValue>>>({}),
+              attributes, {}, {}, {}, std::chrono::system_clock::now());
+  }
+
   /** Trace severity overloads **/
 
   /**
