@@ -143,7 +143,7 @@ public:
    */
   template <class T,
             nostd::enable_if_t<common::detail::is_key_value_iterable<T>::value> * = nullptr>
-  inline void Log(Severity severity, const T &attributes) noexcept
+  void Log(Severity severity, const T &attributes) noexcept
   {
     this->Log(severity, "", "", std::map<std::string, std::string>{}, attributes, {}, {}, {},
               std::chrono::system_clock::now());
@@ -157,7 +157,7 @@ public:
    */
   template <class T,
             nostd::enable_if_t<common::detail::is_key_value_iterable<T>::value> * = nullptr>
-  inline void Log(Severity severity, nostd::string_view name, const T &attributes) noexcept
+  void Log(Severity severity, nostd::string_view name, const T &attributes) noexcept
   {
     this->Log(severity, name, "", std::map<std::string, std::string>{}, attributes, {}, {}, {},
               std::chrono::system_clock::now());
@@ -187,6 +187,23 @@ public:
                attributes) noexcept
   {
     this->Log(severity, name, "", {}, attributes, {}, {}, {}, std::chrono::system_clock::now());
+  }
+
+  /**
+   * Writes a log.
+   * @param severity The severity of the log
+   * @param name The name of the log
+   * @param attributes The attributes, stored as a 2D list of key/value pairs, that are associated
+   * with the log event
+   */
+  void Log(Severity severity,
+           nostd::string_view name,
+           common::KeyValueIterable &attributes) noexcept
+  {
+    this->Log(severity, name, {},
+              common::KeyValueIterableView<
+                  std::initializer_list<std::pair<nostd::string_view, common::AttributeValue>>>({}),
+              attributes, {}, {}, {}, std::chrono::system_clock::now());
   }
 
   /** Trace severity overloads **/

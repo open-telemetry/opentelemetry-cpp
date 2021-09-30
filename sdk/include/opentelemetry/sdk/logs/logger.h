@@ -52,8 +52,8 @@ public:
            nostd::string_view body,
            const opentelemetry::common::KeyValueIterable &resource,
            const opentelemetry::common::KeyValueIterable &attributes,
-           trace::TraceId trace_id,
-           trace::SpanId span_id,
+           opentelemetry::trace::TraceId trace_id,
+           opentelemetry::trace::SpanId span_id,
            trace::TraceFlags trace_flags,
            opentelemetry::common::SystemTimestamp timestamp) noexcept override;
 
