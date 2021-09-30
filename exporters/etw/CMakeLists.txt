@@ -57,5 +57,4 @@ if(BUILD_TESTING)
     TEST_PREFIX exporter.
     TEST_LIST etw_logger_test)
 
-
 endif() # BUILD_TESTING

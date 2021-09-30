@@ -4,34 +4,33 @@
 #pragma once
 #ifdef ENABLE_LOGS_PREVIEW
 
-#include <algorithm>
+#  include <algorithm>
 
-#include <cstdint>
-#include <cstdio>
-#include <cstdlib>
+#  include <cstdint>
+#  include <cstdio>
+#  include <cstdlib>
 
-#include <fstream>
+#  include <fstream>
 
-#include <map>
+#  include <map>
 
+#  include "opentelemetry/nostd/shared_ptr.h"
+#  include "opentelemetry/nostd/string_view.h"
+#  include "opentelemetry/nostd/unique_ptr.h"
+#  include "opentelemetry/nostd/variant.h"
 
-#include "opentelemetry/nostd/shared_ptr.h"
-#include "opentelemetry/nostd/string_view.h"
-#include "opentelemetry/nostd/unique_ptr.h"
-#include "opentelemetry/nostd/variant.h"
+#  include "opentelemetry/common/key_value_iterable_view.h"
 
-#include "opentelemetry/common/key_value_iterable_view.h"
+#  include "opentelemetry/logs/logger_provider.h"
+#  include "opentelemetry/trace/span_id.h"
+#  include "opentelemetry/trace/trace_id.h"
 
-#include "opentelemetry/trace/span_id.h"
-#include "opentelemetry/trace/trace_id.h"
-#include "opentelemetry/logs/logger_provider.h"
+#  include "opentelemetry/exporters/etw/etw_fields.h"
+#  include "opentelemetry/exporters/etw/etw_properties.h"
+#  include "opentelemetry/exporters/etw/etw_provider.h"
+#  include "opentelemetry/exporters/etw/utils.h"
 
-#include "opentelemetry/exporters/etw/etw_fields.h"
-#include "opentelemetry/exporters/etw/etw_properties.h"
-#include "opentelemetry/exporters/etw/etw_provider.h"
-#include "opentelemetry/exporters/etw/utils.h"
-
-    namespace trace = opentelemetry::trace;
+namespace trace = opentelemetry::trace;
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace exporter
@@ -113,8 +112,8 @@ static inline ETWProvider::EventFormat GetEncoding(const LoggerProviderOptions &
     auto varValue   = it->second;
     std::string val = nostd::get<std::string>(varValue);
 
-#pragma warning(push)
-#pragma warning(disable : 4307) /* Integral constant overflow - OK while computing hash */
+#  pragma warning(push)
+#  pragma warning(disable : 4307) /* Integral constant overflow - OK while computing hash */
     auto h = utils::hashCode(val.c_str());
     switch (h)
     {
@@ -142,7 +141,7 @@ static inline ETWProvider::EventFormat GetEncoding(const LoggerProviderOptions &
       default:
         break;
     }
-#pragma warning(pop)
+#  pragma warning(pop)
   }
 
   return evtFmt;
@@ -160,7 +159,6 @@ static inline std::string ToLowerBase16(const T &id)
   id.ToLowerBase16(buf);
   return std::string(buf, sizeof(buf));
 }
-
 
 class LoggerProvider;
 
@@ -204,10 +202,7 @@ class Logger : public logs::Logger
    * @brief Init a reference to etw::ProviderHandle
    * @return Provider Handle
    */
-  ETWProvider::Handle &initProvHandle()
-  {
-    return etwProvider().open(provId, encoding);
-  }
+  ETWProvider::Handle &initProvHandle() { return etwProvider().open(provId, encoding); }
 
 public:
   /**
@@ -237,7 +232,7 @@ public:
            common::SystemTimestamp timestamp) noexcept override
   {
 
-#ifdef RTTI_ENABLED
+#  ifdef RTTI_ENABLED
     common::KeyValueIterable &attribs = const_cast<common::KeyValueIterable &>(attributes);
     // common::KeyValueIterable &resr = const_cast<common::KeyValueIterable &>(resource);
     Properties *evt = dynamic_cast<Properties *>(&attribs);
@@ -248,9 +243,9 @@ public:
       // Pass as a reference to original modifyable collection without creating a copy
       return Log(severity, name, body, *evt, trace_id, span_id, trace_flags, timestamp);
     }
-#endif
+#  endif
     Properties evtCopy = attributes;
-    //Properties resCopy = resource;
+    // Properties resCopy = resource;
     return Log(severity, name, body, evtCopy, trace_id, span_id, trace_flags, timestamp);
   }
 
@@ -266,13 +261,13 @@ public:
     // Populate Etw.EventName attribute at envelope level
     evt[ETW_FIELD_NAME] = ETW_VALUE_LOG;
 
-#ifdef HAVE_FIELD_TIME
+#  ifdef HAVE_FIELD_TIME
     {
       auto timeNow        = std::chrono::system_clock::now().time_since_epoch();
       auto millis         = std::chrono::duration_cast<std::chrono::milliseconds>(timeNow).count();
       evt[ETW_FIELD_TIME] = utils::formatUtcTimestampMsAsISO8601(millis);
     }
-#endif
+#  endif
 
     evt[ETW_FIELD_SPAN_ID]                   = ToLowerBase16(span_id);
     evt[ETW_FIELD_TRACE_ID]                  = ToLowerBase16(trace_id);
@@ -288,11 +283,9 @@ public:
     etwProvider().write(provHandle, evt, nullptr, nullptr, 0, encoding);
   }
 
-  const nostd::string_view GetName() noexcept override { return std::string();}
-    // TODO : Flush and Shutdown method in main Tracer API
-  ~Logger() {
-      etwProvider().close(provHandle);
-  }
+  const nostd::string_view GetName() noexcept override { return std::string(); }
+  // TODO : Flush and Shutdown method in main Tracer API
+  ~Logger() { etwProvider().close(provHandle); }
 };
 
 /**
@@ -319,7 +312,7 @@ public:
 
   LoggerProvider() : logs::LoggerProvider()
   {
-    config_.encoding                = ETWProvider::EventFormat::ETW_MANIFEST;
+    config_.encoding = ETWProvider::EventFormat::ETW_MANIFEST;
   }
 
   /**
@@ -334,7 +327,7 @@ public:
    * @return
    */
   nostd::shared_ptr<logs::Logger> GetLogger(nostd::string_view name,
-                                             nostd::string_view args       = "") override
+                                            nostd::string_view args = "") override
   {
     UNREFERENCED_PARAMETER(args);
     ETWProvider::EventFormat evtFmt = config_.encoding;
@@ -342,14 +335,13 @@ public:
   }
 
   nostd::shared_ptr<logs::Logger> GetLogger(nostd::string_view name,
-                                              nostd::span<nostd::string_view> args) override
+                                            nostd::span<nostd::string_view> args) override
   {
-      return GetLogger(name, args[0]);
-
+    return GetLogger(name, args[0]);
   }
 };
 
 }  // namespace etw
 }  // namespace exporter
 OPENTELEMETRY_END_NAMESPACE
-#endif // ENABLE_LOGS_PREVIEW
+#endif  // ENABLE_LOGS_PREVIEW
