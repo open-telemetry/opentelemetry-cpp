@@ -143,7 +143,7 @@ public:
    */
   template <class T,
             nostd::enable_if_t<common::detail::is_key_value_iterable<T>::value> * = nullptr>
-  inline void Log(Severity severity, const T &attributes) noexcept
+  void Log(Severity severity, const T &attributes) noexcept
   {
     this->Log(severity, "", "", std::map<std::string, std::string>{}, attributes, {}, {}, {},
               std::chrono::system_clock::now());
@@ -157,7 +157,7 @@ public:
    */
   template <class T,
             nostd::enable_if_t<common::detail::is_key_value_iterable<T>::value> * = nullptr>
-  inline void Log(Severity severity, nostd::string_view name, const T &attributes) noexcept
+  void Log(Severity severity, nostd::string_view name, const T &attributes) noexcept
   {
     this->Log(severity, name, "", std::map<std::string, std::string>{}, attributes, {}, {}, {},
               std::chrono::system_clock::now());
