@@ -37,6 +37,7 @@
 #include "opentelemetry/exporters/etw/etw_fields.h"
 #include "opentelemetry/exporters/etw/etw_properties.h"
 #include "opentelemetry/exporters/etw/etw_provider.h"
+#include "opentelemetry/exporters/etw/etw_config.h"
 #include "opentelemetry/exporters/etw/utils.h"
 
 namespace trace = opentelemetry::trace;
@@ -46,121 +47,6 @@ namespace exporter
 {
 namespace etw
 {
-
-/**
- * @brief TracerProvider Options passed via SDK API.
- */
-using TracerProviderOptions =
-    std::map<std::string, nostd::variant<std::string, uint64_t, float, bool>>;
-
-/**
- * @brief TracerProvider runtime configuration class. Internal representation
- * of TracerProviderOptions used by various components of SDK.
- */
-typedef struct
-{
-  bool enableTraceId;            // Set `TraceId` on ETW events
-  bool enableSpanId;             // Set `SpanId` on ETW events
-  bool enableActivityId;         // Assign `SpanId` to `ActivityId`
-  bool enableActivityTracking;   // Emit TraceLogging events for Span/Start and Span/Stop
-  bool enableRelatedActivityId;  // Assign parent `SpanId` to `RelatedActivityId`
-  bool enableAutoParent;         // Start new spans as children of current active span
-  ETWProvider::EventFormat
-      encoding;  // Event encoding to use for this provider (TLD, MsgPack, XML, etc.).
-} TracerProviderConfiguration;
-
-/**
- * @brief Helper template to convert a variant value from TracerProviderOptions to
- * TracerProviderConfiguration
- *
- * @param options           TracerProviderOptions passed on API surface
- * @param key               Option name
- * @param value             Reference to destination value
- * @param defaultValue      Default value if option is not supplied
- */
-template <typename T>
-static inline void GetOption(const TracerProviderOptions &options,
-                             const char *key,
-                             T &value,
-                             T defaultValue)
-{
-  auto it = options.find(key);
-  if (it != options.end())
-  {
-    auto val = it->second;
-    value    = nostd::get<T>(val);
-  }
-  else
-  {
-    value = defaultValue;
-  }
-}
-
-/**
- * @brief Helper template to convert encoding config option to EventFormat.
- * Configuration option passed as `options["encoding"] = "MsgPack"`.
- * Default encoding is TraceLogging Dynamic Manifest (TLD).
- *
- * Valid encoding names listed below.
- *
- * For MessagePack encoding:
- * - "MSGPACK"
- * - "MsgPack"
- * - "MessagePack"
- *
- * For XML encoding:
- * - "XML"
- * - "xml"
- *
- * For TraceLogging Dynamic encoding:
- * - "TLD"
- * - "tld"
- *
- */
-static inline ETWProvider::EventFormat GetEncoding(const TracerProviderOptions &options)
-{
-  ETWProvider::EventFormat evtFmt = ETWProvider::EventFormat::ETW_MANIFEST;
-
-  auto it = options.find("encoding");
-  if (it != options.end())
-  {
-    auto varValue   = it->second;
-    std::string val = nostd::get<std::string>(varValue);
-
-#pragma warning(push)
-#pragma warning(disable : 4307) /* Integral constant overflow - OK while computing hash */
-    auto h = utils::hashCode(val.c_str());
-    switch (h)
-    {
-      case CONST_HASHCODE(MSGPACK):
-        // nobrk
-      case CONST_HASHCODE(MsgPack):
-        // nobrk
-      case CONST_HASHCODE(MessagePack):
-        evtFmt = ETWProvider::EventFormat::ETW_MSGPACK;
-        break;
-
-      case CONST_HASHCODE(XML):
-        // nobrk
-      case CONST_HASHCODE(xml):
-        evtFmt = ETWProvider::EventFormat::ETW_XML;
-        break;
-
-      case CONST_HASHCODE(TLD):
-        // nobrk
-      case CONST_HASHCODE(tld):
-        // nobrk
-        evtFmt = ETWProvider::EventFormat::ETW_MANIFEST;
-        break;
-
-      default:
-        break;
-    }
-#pragma warning(pop)
-  }
-
-  return evtFmt;
-}
 
 class Span;
 
@@ -260,57 +146,10 @@ Properties &GetSpanAttributes(T &instance)
   return instance.GetAttributes();
 }
 
-/**
- * @brief Utility template to obtain etw::TracerProvider._config
- *
- * @tparam T    etw::TracerProvider
- * @param t     etw::TracerProvider ref
- * @return      TracerProviderConfiguration ref
- */
-template <class T>
-TracerProviderConfiguration &GetConfiguration(T &t)
-{
-  return t.config_;
-}
-
 template <class T>
 void UpdateStatus(T &t, Properties &props)
 {
   t.UpdateStatus(props);
-}
-
-/**
- * @brief Utility method to convert SppanContext.span_id() (8 byte) to ActivityId GUID (16 bytes)
- * @param span OpenTelemetry Span pointer
- * @return GUID struct containing 8-bytes of SpanId + 8 NUL bytes.
- */
-static inline bool CopySpanIdToActivityId(const trace::SpanContext &spanContext, GUID &outGuid)
-{
-  memset(&outGuid, 0, sizeof(outGuid));
-  if (!spanContext.IsValid())
-  {
-    return false;
-  }
-  auto spanId      = spanContext.span_id().Id().data();
-  uint8_t *guidPtr = reinterpret_cast<uint8_t *>(&outGuid);
-  for (size_t i = 0; i < 8; i++)
-  {
-    guidPtr[i] = spanId[i];
-  }
-  return true;
-};
-
-/**
- * @brief Utility template to convert SpanId or TraceId to hex.
- * @param id - value of SpanId or TraceId
- * @return Hexadecimal representation of Id as string.
- */
-template <class T>
-static inline std::string ToLowerBase16(const T &id)
-{
-  char buf[2 * T::kSize] = {0};
-  id.ToLowerBase16(buf);
-  return std::string(buf, sizeof(buf));
 }
 
 /**
@@ -415,7 +254,7 @@ class Tracer : public trace::Tracer
     LPGUID ActivityIdPtr = nullptr;
     if (cfg.enableActivityId)
     {
-      if (CopySpanIdToActivityId(spanBase.GetContext(), ActivityId))
+      if (CopySpanIdToActivityId(spanBase.GetContext().span_id(), ActivityId))
       {
         ActivityIdPtr = &ActivityId;
       }
@@ -428,7 +267,7 @@ class Tracer : public trace::Tracer
     {
       if (parentSpan != nullptr)
       {
-        if (CopySpanIdToActivityId(parentSpan->GetContext(), RelatedActivityId))
+        if (CopySpanIdToActivityId(parentSpan->GetContext().span_id(), RelatedActivityId))
         {
           RelatedActivityIdPtr = &RelatedActivityId;
         }
@@ -586,7 +425,7 @@ public:
     {
       if (cfg.enableRelatedActivityId)
       {
-        if (CopySpanIdToActivityId(parentContext, RelatedActivityId))
+        if (CopySpanIdToActivityId(parentContext.span_id(), RelatedActivityId))
         {
           RelatedActivityIdPtr = &RelatedActivityId;
         }
@@ -628,7 +467,7 @@ public:
     LPCGUID ActivityIdPtr = nullptr;
     if (cfg.enableActivityId)
     {
-      if (CopySpanIdToActivityId(result.get()->GetContext(), ActivityId))
+      if (CopySpanIdToActivityId(result.get()->GetContext().span_id(), ActivityId))
       {
         ActivityIdPtr = &ActivityId;
       }
@@ -747,8 +586,9 @@ public:
     GUID ActivityId;
     if (cfg.enableActivityId)
     {
-      CopySpanIdToActivityId(spanContext, ActivityId);
-      ActivityIdPtr = &ActivityId;
+      if (CopySpanIdToActivityId(spanContext.span_id(), ActivityId)) {
+        ActivityIdPtr = &ActivityId;
+      }
     }
 
 #ifdef HAVE_FIELD_TIME
@@ -1071,13 +911,13 @@ public:
   /**
    * @brief TracerProvider options supplied during initialization.
    */
-  TracerProviderConfiguration config_;
+  TelemetryProviderConfiguration config_;
 
   /**
    * @brief Construct instance of TracerProvider with given options
    * @param options Configuration options
    */
-  TracerProvider(TracerProviderOptions options) : trace::TracerProvider()
+  TracerProvider(TelemetryProviderOptions options) : trace::TracerProvider()
   {
     // By default we ensure that all events carry their with TraceId and SpanId
     GetOption(options, "enableTraceId", config_.enableTraceId, true);

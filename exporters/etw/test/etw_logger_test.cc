@@ -43,7 +43,7 @@ const char *kGlobalProviderName = "OpenTelemetry-ETW-TLD";
  * }
  */
 
-TEST(ETWTracer, LoggerCheckWithBody)
+TEST(ETWLogger, LoggerCheckWithBody)
 {
   std::string providerName = kGlobalProviderName;  // supply unique instrumentation name here
   exporter::etw::LoggerProvider lp;
@@ -85,7 +85,7 @@ TEST(ETWTracer, LoggerCheckWithBody)
  *
  */
 
-TEST(ETWTracer, LoggerCheckWithAttributes)
+TEST(ETWLogger, LoggerCheckWithAttributes)
 {
   std::string providerName = kGlobalProviderName;  // supply unique instrumentation name here
   exporter::etw::LoggerProvider lp;

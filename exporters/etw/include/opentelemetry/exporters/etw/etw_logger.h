@@ -28,8 +28,10 @@
 #  include "opentelemetry/exporters/etw/etw_fields.h"
 #  include "opentelemetry/exporters/etw/etw_properties.h"
 #  include "opentelemetry/exporters/etw/etw_provider.h"
+#  include "opentelemetry/exporters/etw/etw_config.h"
 #  include "opentelemetry/exporters/etw/utils.h"
 
+namespace logs = opentelemetry::logs;
 namespace trace = opentelemetry::trace;
 
 OPENTELEMETRY_BEGIN_NAMESPACE
@@ -37,128 +39,6 @@ namespace exporter
 {
 namespace etw
 {
-
-/**
- * @brief TracerProvider Options passed via SDK API.
- */
-using LoggerProviderOptions =
-    std::map<std::string, nostd::variant<std::string, uint64_t, float, bool>>;
-
-/**
- * @brief LoggerProvider runtime configuration class. Internal representation
- * of LoggerProviderOptions used by various components of SDK.
- */
-typedef struct
-{
-  ETWProvider::EventFormat
-      encoding;  // Event encoding to use for this provider (TLD, MsgPack, XML, etc.).
-} LoggerProviderConfiguration;
-
-/**
- * @brief Helper template to convert a variant value from TracerProviderOptions to
- * LoggerProviderConfiguration
- *
- * @param options           TracerProviderOptions passed on API surface
- * @param key               Option name
- * @param value             Reference to destination value
- * @param defaultValue      Default value if option is not supplied
- */
-template <typename T>
-static inline void GetOption(const LoggerProviderOptions &options,
-                             const char *key,
-                             T &value,
-                             T defaultValue)
-{
-  auto it = options.find(key);
-  if (it != options.end())
-  {
-    auto val = it->second;
-    value    = nostd::get<T>(val);
-  }
-  else
-  {
-    value = defaultValue;
-  }
-}
-
-/**
- * @brief Helper template to convert encoding config option to EventFormat.
- * Configuration option passed as `options["encoding"] = "MsgPack"`.
- * Default encoding is TraceLogging Dynamic Manifest (TLD).
- *
- * Valid encoding names listed below.
- *
- * For MessagePack encoding:
- * - "MSGPACK"
- * - "MsgPack"
- * - "MessagePack"
- *
- * For XML encoding:
- * - "XML"
- * - "xml"
- *
- * For TraceLogging Dynamic encoding:
- * - "TLD"
- * - "tld"
- *
- */
-static inline ETWProvider::EventFormat GetEncoding(const LoggerProviderOptions &options)
-{
-  ETWProvider::EventFormat evtFmt = ETWProvider::EventFormat::ETW_MANIFEST;
-
-  auto it = options.find("encoding");
-  if (it != options.end())
-  {
-    auto varValue   = it->second;
-    std::string val = nostd::get<std::string>(varValue);
-
-#  pragma warning(push)
-#  pragma warning(disable : 4307) /* Integral constant overflow - OK while computing hash */
-    auto h = utils::hashCode(val.c_str());
-    switch (h)
-    {
-      case CONST_HASHCODE(MSGPACK):
-        // nobrk
-      case CONST_HASHCODE(MsgPack):
-        // nobrk
-      case CONST_HASHCODE(MessagePack):
-        evtFmt = ETWProvider::EventFormat::ETW_MSGPACK;
-        break;
-
-      case CONST_HASHCODE(XML):
-        // nobrk
-      case CONST_HASHCODE(xml):
-        evtFmt = ETWProvider::EventFormat::ETW_XML;
-        break;
-
-      case CONST_HASHCODE(TLD):
-        // nobrk
-      case CONST_HASHCODE(tld):
-        // nobrk
-        evtFmt = ETWProvider::EventFormat::ETW_MANIFEST;
-        break;
-
-      default:
-        break;
-    }
-#  pragma warning(pop)
-  }
-
-  return evtFmt;
-}
-
-/**
- * @brief Utility template to convert SpanId or TraceId to hex.
- * @param id - value of SpanId or TraceId
- * @return Hexadecimal representation of Id as string.
- */
-template <class T>
-static inline std::string ToLowerBase16(const T &id)
-{
-  char buf[2 * T::kSize] = {0};
-  id.ToLowerBase16(buf);
-  return std::string(buf, sizeof(buf));
-}
 
 class LoggerProvider;
 
@@ -268,9 +148,23 @@ public:
       evt[ETW_FIELD_TIME] = utils::formatUtcTimestampMsAsISO8601(millis);
     }
 #  endif
-
-    evt[ETW_FIELD_SPAN_ID]                   = ToLowerBase16(span_id);
-    evt[ETW_FIELD_TRACE_ID]                  = ToLowerBase16(trace_id);
+    const auto &cfg             = GetConfiguration(tracerProvider_);
+    if (cfg.enableSpanId) {
+        evt[ETW_FIELD_SPAN_ID]                   = ToLowerBase16(span_id);
+    }
+    if (cfg.enableTraceId) {
+        evt[ETW_FIELD_TRACE_ID]                  = ToLowerBase16(trace_id);
+    }
+    // Populate ActivityId if enabled
+    GUID ActivityId;
+    LPGUID ActivityIdPtr = nullptr;
+    if (cfg.enableActivityId)
+    {
+      if (CopySpanIdToActivityId(span_id, ActivityId))
+      {
+        ActivityIdPtr = &ActivityId;
+      }
+    }
     evt[ETW_FIELD_PAYLOAD_NAME]              = std::string(name.data(), name.length());
     std::chrono::system_clock::time_point ts = timestamp;
     int64_t tsMs =
@@ -284,7 +178,7 @@ public:
   }
 
   const nostd::string_view GetName() noexcept override { return std::string(); }
-  // TODO : Flush and Shutdown method in main Tracer API
+  // TODO : Flush and Shutdown method in main Logger API
   ~Logger() { etwProvider().close(provHandle); }
 };
 
@@ -295,16 +189,19 @@ class LoggerProvider : public logs::LoggerProvider
 {
 public:
   /**
-   * @brief LoggerrProvider options supplied during initialization.
+   * @brief LoggerProvider options supplied during initialization.
    */
-  LoggerProviderConfiguration config_;
+  TelemetryProviderConfiguration config_;
 
   /**
-   * @brief Construct instance of TracerProvider with given options
+   * @brief Construct instance of LoggerProvider with given options
    * @param options Configuration options
    */
-  LoggerProvider(LoggerProviderOptions options) : logs::LoggerProvider()
+  LoggerProvider(TelemetryProviderOptions options) : logs::LoggerProvider()
   {
+    GetOption(options, "enableTraceId", config_.enableTraceId, true);
+    GetOption(options, "enableSpanId", config_.enableSpanId, true);
+    GetOption(options, "enableActivityId", config_.enableActivityId, false);
 
     // Determines what encoding to use for ETW events: TraceLogging Dynamic, MsgPack, XML, etc.
     config_.encoding = GetEncoding(options);
