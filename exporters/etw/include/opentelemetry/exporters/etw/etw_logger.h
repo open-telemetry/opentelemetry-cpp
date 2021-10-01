@@ -25,13 +25,13 @@
 #  include "opentelemetry/trace/span_id.h"
 #  include "opentelemetry/trace/trace_id.h"
 
+#  include "opentelemetry/exporters/etw/etw_config.h"
 #  include "opentelemetry/exporters/etw/etw_fields.h"
 #  include "opentelemetry/exporters/etw/etw_properties.h"
 #  include "opentelemetry/exporters/etw/etw_provider.h"
-#  include "opentelemetry/exporters/etw/etw_config.h"
 #  include "opentelemetry/exporters/etw/utils.h"
 
-namespace logs = opentelemetry::logs;
+namespace logs  = opentelemetry::logs;
 namespace trace = opentelemetry::trace;
 
 OPENTELEMETRY_BEGIN_NAMESPACE
@@ -148,12 +148,14 @@ public:
       evt[ETW_FIELD_TIME] = utils::formatUtcTimestampMsAsISO8601(millis);
     }
 #  endif
-    const auto &cfg             = GetConfiguration(tracerProvider_);
-    if (cfg.enableSpanId) {
-        evt[ETW_FIELD_SPAN_ID]                   = ToLowerBase16(span_id);
+    const auto &cfg = GetConfiguration(tracerProvider_);
+    if (cfg.enableSpanId)
+    {
+      evt[ETW_FIELD_SPAN_ID] = ToLowerBase16(span_id);
     }
-    if (cfg.enableTraceId) {
-        evt[ETW_FIELD_TRACE_ID]                  = ToLowerBase16(trace_id);
+    if (cfg.enableTraceId)
+    {
+      evt[ETW_FIELD_TRACE_ID] = ToLowerBase16(trace_id);
     }
     // Populate ActivityId if enabled
     GUID ActivityId;

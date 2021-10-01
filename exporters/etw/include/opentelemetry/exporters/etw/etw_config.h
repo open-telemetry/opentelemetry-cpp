@@ -32,9 +32,10 @@ typedef struct
   bool enableTraceId;            // Set `TraceId` on ETW events
   bool enableSpanId;             // Set `SpanId` on ETW events
   bool enableActivityId;         // Assign `SpanId` to `ActivityId`
-  bool enableActivityTracking;   // Emit TraceLogging events for Span/Start and Span/Stop Not used for Logs
+  bool enableActivityTracking;   // Emit TraceLogging events for Span/Start and Span/Stop Not used
+                                 // for Logs
   bool enableRelatedActivityId;  // Assign parent `SpanId` to `RelatedActivityId`
-  bool enableAutoParent;         // Start new spans as children of current active span, Not used for Logs
+  bool enableAutoParent;  // Start new spans as children of current active span, Not used for Logs
   ETWProvider::EventFormat
       encoding;  // Event encoding to use for this provider (TLD, MsgPack, XML, etc.).
 } TelemetryProviderConfiguration;
@@ -65,8 +66,6 @@ static inline void GetOption(const TelemetryProviderOptions &options,
     value = defaultValue;
   }
 }
-
-
 
 /**
  * @brief Helper template to convert encoding config option to EventFormat.
@@ -165,7 +164,8 @@ static inline std::string ToLowerBase16(const T &id)
  * @param span OpenTelemetry Span Id object
  * @return GUID struct containing 8-bytes of SpanId + 8 NUL bytes.
  */
-static inline bool CopySpanIdToActivityId(const opentelemetry::trace::SpanId &span_id, GUID &outGuid)
+static inline bool CopySpanIdToActivityId(const opentelemetry::trace::SpanId &span_id,
+                                          GUID &outGuid)
 {
   memset(&outGuid, 0, sizeof(outGuid));
   if (!span_id.IsValid())
@@ -181,6 +181,6 @@ static inline bool CopySpanIdToActivityId(const opentelemetry::trace::SpanId &sp
   return true;
 }
 
-}
-}
+}  // namespace etw
+}  // namespace exporter
 OPENTELEMETRY_END_NAMESPACE

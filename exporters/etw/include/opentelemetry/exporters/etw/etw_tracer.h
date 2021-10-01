@@ -34,10 +34,10 @@
 
 #include "opentelemetry/sdk/trace/exporter.h"
 
+#include "opentelemetry/exporters/etw/etw_config.h"
 #include "opentelemetry/exporters/etw/etw_fields.h"
 #include "opentelemetry/exporters/etw/etw_properties.h"
 #include "opentelemetry/exporters/etw/etw_provider.h"
-#include "opentelemetry/exporters/etw/etw_config.h"
 #include "opentelemetry/exporters/etw/utils.h"
 
 namespace trace = opentelemetry::trace;
@@ -586,7 +586,8 @@ public:
     GUID ActivityId;
     if (cfg.enableActivityId)
     {
-      if (CopySpanIdToActivityId(spanContext.span_id(), ActivityId)) {
+      if (CopySpanIdToActivityId(spanContext.span_id(), ActivityId))
+      {
         ActivityIdPtr = &ActivityId;
       }
     }
