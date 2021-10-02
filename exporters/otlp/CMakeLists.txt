@@ -69,7 +69,6 @@ if(BUILD_TESTING)
     # library. These flavors have different prefix on Windows, gmock and gmockd
     # respectively.
     add_definitions(-DGTEST_LINKED_AS_SHARED_LIBRARY=1)
-  else()
     if(GMOCK_LIB)
       # unset GMOCK_LIB to force find_library to redo the lookup, as the cached
       # entry could cause linking to incorrect flavor of gmock and leading to
