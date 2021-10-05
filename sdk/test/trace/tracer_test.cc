@@ -17,14 +17,13 @@ using namespace opentelemetry::sdk::trace;
 using namespace opentelemetry::sdk::resource;
 using opentelemetry::common::SteadyTimestamp;
 using opentelemetry::common::SystemTimestamp;
-namespace nostd     = opentelemetry::nostd;
-namespace common    = opentelemetry::common;
-namespace trace_api = opentelemetry::trace;
 using opentelemetry::common::KeyValueIterableView;
 using opentelemetry::exporter::memory::InMemorySpanData;
 using opentelemetry::exporter::memory::InMemorySpanExporter;
 using opentelemetry::trace::SpanContext;
-
+namespace nostd     = opentelemetry::nostd;
+namespace common    = opentelemetry::common;
+namespace trace_api = opentelemetry::trace;
 /**
  * A mock sampler with ShouldSample returning:
  *  Decision::RECORD_AND_SAMPLE if trace_id is valid
