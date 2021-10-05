@@ -19,7 +19,6 @@
 using namespace opentelemetry::sdk::trace;
 using opentelemetry::exporter::memory::InMemorySpanExporter;
 using opentelemetry::trace::SpanContext;
-namespace trace_api = opentelemetry::trace;
 
 namespace
 {
@@ -64,8 +63,8 @@ BENCHMARK(BM_TraceIdRatioBasedSamplerConstruction);
 // Sampler Helper Function
 void BenchmarkShouldSampler(Sampler &sampler, benchmark::State &state)
 {
-  trace_api::TraceId trace_id;
-  trace_api::SpanKind span_kind = trace_api::SpanKind::kInternal;
+  opentelemetry::trace::TraceId trace_id;
+  opentelemetry::trace::SpanKind span_kind = opentelemetry::trace::SpanKind::kInternal;
 
   using M = std::map<std::string, int>;
   M m1    = {{}};
@@ -127,7 +126,7 @@ void BenchmarkSpanCreation(std::shared_ptr<Sampler> sampler, benchmark::State &s
   processors.push_back(std::move(processor));
   auto context  = std::make_shared<TracerContext>(std::move(processors));
   auto resource = opentelemetry::sdk::resource::Resource::Create({});
-  auto tracer   = std::shared_ptr<trace_api::Tracer>(new Tracer(context));
+  auto tracer   = std::shared_ptr<opentelemetry::trace::Tracer>(new Tracer(context));
 
   while (state.KeepRunning())
   {
