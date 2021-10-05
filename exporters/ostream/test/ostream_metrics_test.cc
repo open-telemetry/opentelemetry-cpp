@@ -15,19 +15,18 @@
 
 #  include <iostream>
 
-namespace sdkmetrics  = opentelemetry::sdk::metrics;
-namespace metrics_api = opentelemetry::metrics;
-namespace nostd       = opentelemetry::nostd;
-namespace exportermetrics  = opentelemetry::exporter::metrics;
+namespace sdkmetrics      = opentelemetry::sdk::metrics;
+namespace metrics_api     = opentelemetry::metrics;
+namespace nostd           = opentelemetry::nostd;
+namespace exportermetrics = opentelemetry::exporter::metrics;
 
 TEST(OStreamMetricsExporter, PrintCounter)
 {
-  auto exporter = std::unique_ptr<sdkmetrics::MetricsExporter>(
-      new exportermetrics::OStreamMetricsExporter);
+  auto exporter =
+      std::unique_ptr<sdkmetrics::MetricsExporter>(new exportermetrics::OStreamMetricsExporter);
 
   auto aggregator = std::shared_ptr<sdkmetrics::Aggregator<double>>(
-      new sdkmetrics::CounterAggregator<double>(
-          metrics_api::InstrumentKind::Counter));
+      new sdkmetrics::CounterAggregator<double>(metrics_api::InstrumentKind::Counter));
 
   aggregator->update(5.5);
   aggregator->checkpoint();
@@ -62,12 +61,11 @@ TEST(OStreamMetricsExporter, PrintCounter)
 
 TEST(OStreamMetricsExporter, PrintMinMaxSumCount)
 {
-  auto exporter = std::unique_ptr<sdkmetrics::MetricsExporter>(
-      new exportermetrics::OStreamMetricsExporter);
+  auto exporter =
+      std::unique_ptr<sdkmetrics::MetricsExporter>(new exportermetrics::OStreamMetricsExporter);
 
   auto aggregator = std::shared_ptr<sdkmetrics::Aggregator<int>>(
-      new sdkmetrics::MinMaxSumCountAggregator<int>(
-          metrics_api::InstrumentKind::Counter));
+      new sdkmetrics::MinMaxSumCountAggregator<int>(metrics_api::InstrumentKind::Counter));
 
   aggregator->update(1);
   aggregator->update(2);
@@ -106,12 +104,11 @@ TEST(OStreamMetricsExporter, PrintMinMaxSumCount)
 
 TEST(OStreamMetricsExporter, PrintGauge)
 {
-  auto exporter = std::unique_ptr<sdkmetrics::MetricsExporter>(
-      new exportermetrics::OStreamMetricsExporter);
+  auto exporter =
+      std::unique_ptr<sdkmetrics::MetricsExporter>(new exportermetrics::OStreamMetricsExporter);
 
   auto aggregator = std::shared_ptr<sdkmetrics::Aggregator<short>>(
-      new sdkmetrics::GaugeAggregator<short>(
-          metrics_api::InstrumentKind::Counter));
+      new sdkmetrics::GaugeAggregator<short>(metrics_api::InstrumentKind::Counter));
 
   aggregator->update(1);
   aggregator->update(9);
@@ -150,16 +147,14 @@ TEST(OStreamMetricsExporter, PrintGauge)
 
 TEST(OStreamMetricsExporter, PrintExact)
 {
-  auto exporter = std::unique_ptr<sdkmetrics::MetricsExporter>(
-      new exportermetrics::OStreamMetricsExporter);
+  auto exporter =
+      std::unique_ptr<sdkmetrics::MetricsExporter>(new exportermetrics::OStreamMetricsExporter);
 
   auto aggregator = std::shared_ptr<sdkmetrics::Aggregator<short>>(
-      new sdkmetrics::ExactAggregator<short>(metrics_api::InstrumentKind::Counter,
-                                                              true));
+      new sdkmetrics::ExactAggregator<short>(metrics_api::InstrumentKind::Counter, true));
 
   auto aggregator2 = std::shared_ptr<sdkmetrics::Aggregator<short>>(
-      new sdkmetrics::ExactAggregator<short>(metrics_api::InstrumentKind::Counter,
-                                                              false));
+      new sdkmetrics::ExactAggregator<short>(metrics_api::InstrumentKind::Counter, false));
 
   for (int i = 0; i < 10; i++)
   {
@@ -207,13 +202,12 @@ TEST(OStreamMetricsExporter, PrintExact)
 
 TEST(OStreamMetricsExporter, PrintHistogram)
 {
-  auto exporter = std::unique_ptr<sdkmetrics::MetricsExporter>(
-      new exportermetrics::OStreamMetricsExporter);
+  auto exporter =
+      std::unique_ptr<sdkmetrics::MetricsExporter>(new exportermetrics::OStreamMetricsExporter);
 
   std::vector<double> boundaries{10, 20, 30, 40, 50};
   auto aggregator = std::shared_ptr<sdkmetrics::Aggregator<float>>(
-      new sdkmetrics::HistogramAggregator<float>(
-          metrics_api::InstrumentKind::Counter, boundaries));
+      new sdkmetrics::HistogramAggregator<float>(metrics_api::InstrumentKind::Counter, boundaries));
 
   for (float i = 0; i < 60; i++)
   {
@@ -252,13 +246,12 @@ TEST(OStreamMetricsExporter, PrintHistogram)
 
 TEST(OStreamMetricsExporter, PrintSketch)
 {
-  auto exporter = std::unique_ptr<sdkmetrics::MetricsExporter>(
-      new exportermetrics::OStreamMetricsExporter);
+  auto exporter =
+      std::unique_ptr<sdkmetrics::MetricsExporter>(new exportermetrics::OStreamMetricsExporter);
 
   std::vector<double> boundaries{1, 3, 5, 7, 9};
   auto aggregator = std::shared_ptr<sdkmetrics::Aggregator<int>>(
-      new sdkmetrics::SketchAggregator<int>(metrics_api::InstrumentKind::Counter,
-                                                             .000005));
+      new sdkmetrics::SketchAggregator<int>(metrics_api::InstrumentKind::Counter, .000005));
 
   for (int i = 0; i < 10; i++)
   {

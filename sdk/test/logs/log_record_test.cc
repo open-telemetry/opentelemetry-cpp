@@ -12,9 +12,8 @@
 
 using opentelemetry::sdk::logs::LogRecord;
 namespace trace_api = opentelemetry::trace;
-namespace logs_api = opentelemetry::logs;
-namespace nostd = opentelemetry::nostd;
-
+namespace logs_api  = opentelemetry::logs;
+namespace nostd     = opentelemetry::nostd;
 
 // Test what a default LogRecord with no fields set holds
 TEST(LogRecord, GetDefaultValues)

@@ -9,8 +9,8 @@
 
 using namespace opentelemetry::sdk::metrics;
 namespace metrics_api = opentelemetry::metrics;
-namespace common = opentelemetry::common;
-namespace nostd = opentelemetry::nostd;
+namespace common      = opentelemetry::common;
+namespace nostd       = opentelemetry::nostd;
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 

@@ -36,9 +36,8 @@ TEST(JaegerSpanRecordable, SetIdentity)
   const trace::SpanId parent_span_id(
       nostd::span<uint8_t, 8>(reinterpret_cast<uint8_t *>(&parent_span_id_val), 8));
 
-  const trace::SpanContext span_context{
-      trace_id, span_id,
-      trace::TraceFlags{trace::TraceFlags::kIsSampled}, true};
+  const trace::SpanContext span_context{trace_id, span_id,
+                                        trace::TraceFlags{trace::TraceFlags::kIsSampled}, true};
   rec.SetIdentity(span_context, parent_span_id);
 
   std::unique_ptr<thrift::Span> span{rec.Span()};
@@ -141,9 +140,8 @@ TEST(JaegerSpanRecordable, AddEvent)
   std::map<std::string, int64_t> attributes = {
       {keys[0], values[0]}, {keys[1], values[1]}, {keys[2], values[2]}};
 
-  rec.AddEvent(
-      "Test Event", event_timestamp,
-      common::KeyValueIterableView<std::map<std::string, int64_t>>(attributes));
+  rec.AddEvent("Test Event", event_timestamp,
+               common::KeyValueIterableView<std::map<std::string, int64_t>>(attributes));
   thrift::Log log = rec.Logs().at(0);
   EXPECT_EQ(log.timestamp, epoch_us);
   auto tags    = log.fields;

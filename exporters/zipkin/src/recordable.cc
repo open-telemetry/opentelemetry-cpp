@@ -15,8 +15,8 @@ namespace zipkin
 
 using namespace opentelemetry::sdk::resource;
 namespace trace_api = opentelemetry::trace;
-namespace common = opentelemetry::common;
-namespace sdk = opentelemetry::sdk;
+namespace common    = opentelemetry::common;
+namespace sdk       = opentelemetry::sdk;
 
 // constexpr needs keys to be constexpr, const is next best to use.
 static const std::map<trace_api::SpanKind, std::string> kSpanKindMap = {
@@ -55,9 +55,8 @@ void PopulateAttribute(nlohmann::json &attribute,
 {
   // Assert size of variant to ensure that this method gets updated if the variant
   // definition changes
-  static_assert(
-      nostd::variant_size<common::AttributeValue>::value == kAttributeValueSize,
-      "AttributeValue contains unknown type");
+  static_assert(nostd::variant_size<common::AttributeValue>::value == kAttributeValueSize,
+                "AttributeValue contains unknown type");
 
   if (nostd::holds_alternative<bool>(value))
   {
@@ -158,8 +157,7 @@ void PopulateAttribute(nlohmann::json &attribute,
   }
 }
 
-void Recordable::SetAttribute(nostd::string_view key,
-                              const common::AttributeValue &value) noexcept
+void Recordable::SetAttribute(nostd::string_view key, const common::AttributeValue &value) noexcept
 {
   if (!span_.contains("tags"))
   {
@@ -245,8 +243,7 @@ void Recordable::SetSpanKind(trace_api::SpanKind span_kind) noexcept
 }
 
 void Recordable::SetInstrumentationLibrary(
-    const sdk::instrumentationlibrary::InstrumentationLibrary
-        &instrumentation_library) noexcept
+    const sdk::instrumentationlibrary::InstrumentationLibrary &instrumentation_library) noexcept
 {
   span_["tags"]["otel.library.name"]    = instrumentation_library.GetName();
   span_["tags"]["otel.library.version"] = instrumentation_library.GetVersion();

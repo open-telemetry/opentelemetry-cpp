@@ -137,8 +137,7 @@ TEST(ResourceTest, Merge)
     EXPECT_TRUE(expected_attributes.find(e.first) != expected_attributes.end());
     if (expected_attributes.find(e.first) != expected_attributes.end())
     {
-      EXPECT_EQ(expected_attributes.find(e.first)->second,
-                nostd::get<std::string>(e.second));
+      EXPECT_EQ(expected_attributes.find(e.first)->second, nostd::get<std::string>(e.second));
     }
   }
   EXPECT_EQ(received_attributes.size(), expected_attributes.size());
@@ -159,8 +158,7 @@ TEST(ResourceTest, MergeEmptyString)
     EXPECT_TRUE(expected_attributes.find(e.first) != expected_attributes.end());
     if (expected_attributes.find(e.first) != expected_attributes.end())
     {
-      EXPECT_EQ(expected_attributes.find(e.first)->second,
-                nostd::get<std::string>(e.second));
+      EXPECT_EQ(expected_attributes.find(e.first)->second, nostd::get<std::string>(e.second));
     }
   }
   EXPECT_EQ(received_attributes.size(), expected_attributes.size());
@@ -182,8 +180,7 @@ TEST(ResourceTest, OtelResourceDetector)
     EXPECT_TRUE(expected_attributes.find(e.first) != expected_attributes.end());
     if (expected_attributes.find(e.first) != expected_attributes.end())
     {
-      EXPECT_EQ(expected_attributes.find(e.first)->second,
-                nostd::get<std::string>(e.second));
+      EXPECT_EQ(expected_attributes.find(e.first)->second, nostd::get<std::string>(e.second));
     }
   }
   EXPECT_EQ(received_attributes.size(), expected_attributes.size());
@@ -210,8 +207,7 @@ TEST(ResourceTest, OtelResourceDetectorEmptyEnv)
     EXPECT_TRUE(expected_attributes.find(e.first) != expected_attributes.end());
     if (expected_attributes.find(e.first) != expected_attributes.end())
     {
-      EXPECT_EQ(expected_attributes.find(e.first)->second,
-                nostd::get<std::string>(e.second));
+      EXPECT_EQ(expected_attributes.find(e.first)->second, nostd::get<std::string>(e.second));
     }
   }
   EXPECT_EQ(received_attributes.size(), expected_attributes.size());

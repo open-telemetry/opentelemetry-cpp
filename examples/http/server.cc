@@ -31,7 +31,7 @@ public:
     // extract context from http header
     const HttpTextMapCarrier<std::map<std::string, std::string>> carrier(
         (std::map<std::string, std::string> &)request.headers);
-    auto prop = context::propagation::GlobalTextMapPropagator::GetGlobalPropagator();
+    auto prop        = context::propagation::GlobalTextMapPropagator::GetGlobalPropagator();
     auto current_ctx = context::RuntimeContext::GetCurrent();
     auto new_context = prop->Extract(carrier, current_ctx);
     options.parent   = GetSpan(new_context)->GetContext();

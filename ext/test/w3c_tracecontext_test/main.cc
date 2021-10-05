@@ -52,9 +52,9 @@ void initTracer()
       new sdktrace::SimpleSpanProcessor(std::move(exporter)));
   std::vector<std::unique_ptr<sdktrace::SpanProcessor>> processors;
   processors.push_back(std::move(processor));
-  auto context  = std::make_shared<sdktrace::TracerContext>(std::move(processors));
-  auto provider = nostd::shared_ptr<trace_api::TracerProvider>(
-      new sdktrace::TracerProvider(context));
+  auto context = std::make_shared<sdktrace::TracerContext>(std::move(processors));
+  auto provider =
+      nostd::shared_ptr<trace_api::TracerProvider>(new sdktrace::TracerProvider(context));
   // Set the global trace provider
   trace_api::Provider::SetTracerProvider(provider);
 }
@@ -98,12 +98,9 @@ public:
 }  // namespace
 
 // Sends an HTTP POST request to the given url, with the given body.
-void send_request(curl::HttpClient &client,
-                  const std::string &url,
-                  const std::string &body)
+void send_request(curl::HttpClient &client, const std::string &url, const std::string &body)
 {
-  static std::unique_ptr<http_client::EventHandler> handler(
-      new NoopEventHandler());
+  static std::unique_ptr<http_client::EventHandler> handler(new NoopEventHandler());
 
   auto request_span = get_tracer()->StartSpan(__func__);
   trace_api::Scope scope(request_span);

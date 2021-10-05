@@ -19,9 +19,8 @@ using opentelemetry::nostd::shared_ptr;
 using opentelemetry::nostd::span;
 using opentelemetry::nostd::string_view;
 namespace common = opentelemetry::common;
-namespace nostd = opentelemetry::nostd;
-namespace trace = opentelemetry::trace;
-
+namespace nostd  = opentelemetry::nostd;
+namespace trace  = opentelemetry::trace;
 
 // Check that the default logger is a noop logger instance
 TEST(Logger, GetLoggerDefault)

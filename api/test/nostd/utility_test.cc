@@ -50,10 +50,7 @@ TEST(UtilityTest, Size)
 
 TEST(UtilityTest, MakeIndexSequence)
 {
-  EXPECT_TRUE((std::is_same<nostd::make_index_sequence<0>,
-                            nostd::index_sequence<>>::value));
-  EXPECT_TRUE((std::is_same<nostd::make_index_sequence<1>,
-                            nostd::index_sequence<0>>::value));
-  EXPECT_TRUE((std::is_same<nostd::make_index_sequence<2>,
-                            nostd::index_sequence<0, 1>>::value));
+  EXPECT_TRUE((std::is_same<nostd::make_index_sequence<0>, nostd::index_sequence<>>::value));
+  EXPECT_TRUE((std::is_same<nostd::make_index_sequence<1>, nostd::index_sequence<0>>::value));
+  EXPECT_TRUE((std::is_same<nostd::make_index_sequence<2>, nostd::index_sequence<0, 1>>::value));
 }

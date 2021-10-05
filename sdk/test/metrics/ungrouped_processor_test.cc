@@ -19,12 +19,10 @@ TEST(UngroupedMetricsProcessor, UngroupedProcessorFinishedCollectionStateless)
       new sdkmetrics::UngroupedMetricsProcessor(false));
 
   auto aggregator = std::shared_ptr<sdkmetrics::Aggregator<double>>(
-      new sdkmetrics::CounterAggregator<double>(
-          metrics_api::InstrumentKind::Counter));
+      new sdkmetrics::CounterAggregator<double>(metrics_api::InstrumentKind::Counter));
 
   auto aggregator2 = std::shared_ptr<sdkmetrics::Aggregator<double>>(
-      new sdkmetrics::CounterAggregator<double>(
-          metrics_api::InstrumentKind::Counter));
+      new sdkmetrics::CounterAggregator<double>(metrics_api::InstrumentKind::Counter));
 
   aggregator->update(5.5);
   aggregator->checkpoint();
@@ -56,12 +54,10 @@ TEST(UngroupedMetricsProcessor, UngroupedProcessorFinishedCollectionStateful)
       new sdkmetrics::UngroupedMetricsProcessor(true));
 
   auto aggregator = std::shared_ptr<sdkmetrics::Aggregator<double>>(
-      new sdkmetrics::CounterAggregator<double>(
-          metrics_api::InstrumentKind::Counter));
+      new sdkmetrics::CounterAggregator<double>(metrics_api::InstrumentKind::Counter));
 
   auto aggregator2 = std::shared_ptr<sdkmetrics::Aggregator<double>>(
-      new sdkmetrics::CounterAggregator<double>(
-          metrics_api::InstrumentKind::Counter));
+      new sdkmetrics::CounterAggregator<double>(metrics_api::InstrumentKind::Counter));
 
   aggregator->update(5.5);
   aggregator->checkpoint();
@@ -91,8 +87,7 @@ TEST(UngroupedMetricsProcessor, UngroupedProcessorKeepsRecordInformationStateles
       new sdkmetrics::UngroupedMetricsProcessor(false));
 
   auto aggregator = std::shared_ptr<sdkmetrics::Aggregator<short>>(
-      new sdkmetrics::CounterAggregator<short>(
-          metrics_api::InstrumentKind::Counter));
+      new sdkmetrics::CounterAggregator<short>(metrics_api::InstrumentKind::Counter));
 
   aggregator->update(4);
   aggregator->checkpoint();
@@ -116,8 +111,7 @@ TEST(UngroupedMetricsProcessor, UngroupedProcessorKeepsRecordInformationStateles
       new sdkmetrics::UngroupedMetricsProcessor(false));
 
   auto aggregator = std::shared_ptr<sdkmetrics::Aggregator<int>>(
-      new sdkmetrics::CounterAggregator<int>(
-          metrics_api::InstrumentKind::Counter));
+      new sdkmetrics::CounterAggregator<int>(metrics_api::InstrumentKind::Counter));
 
   aggregator->update(5);
   aggregator->checkpoint();
@@ -140,8 +134,7 @@ TEST(UngroupedMetricsProcessor, UngroupedProcessorKeepsRecordInformationStateles
       new sdkmetrics::UngroupedMetricsProcessor(false));
 
   auto aggregator = std::shared_ptr<sdkmetrics::Aggregator<float>>(
-      new sdkmetrics::CounterAggregator<float>(
-          metrics_api::InstrumentKind::Counter));
+      new sdkmetrics::CounterAggregator<float>(metrics_api::InstrumentKind::Counter));
 
   aggregator->update(8.5);
   aggregator->checkpoint();
@@ -165,8 +158,7 @@ TEST(UngroupedMetricsProcessor, UngroupedProcessorKeepsRecordInformationStateles
       new sdkmetrics::UngroupedMetricsProcessor(false));
 
   auto aggregator = std::shared_ptr<sdkmetrics::Aggregator<double>>(
-      new sdkmetrics::CounterAggregator<double>(
-          metrics_api::InstrumentKind::Counter));
+      new sdkmetrics::CounterAggregator<double>(metrics_api::InstrumentKind::Counter));
 
   aggregator->update(5.5);
   aggregator->checkpoint();
@@ -195,12 +187,10 @@ TEST(UngroupedMetricsProcessor, UngroupedProcessorKeepsRecordInformationStateful
       new sdkmetrics::UngroupedMetricsProcessor(true));
 
   auto aggregator = std::shared_ptr<sdkmetrics::Aggregator<short>>(
-      new sdkmetrics::CounterAggregator<short>(
-          metrics_api::InstrumentKind::Counter));
+      new sdkmetrics::CounterAggregator<short>(metrics_api::InstrumentKind::Counter));
 
   auto aggregator_test = std::shared_ptr<sdkmetrics::Aggregator<short>>(
-      new sdkmetrics::CounterAggregator<short>(
-          metrics_api::InstrumentKind::Counter));
+      new sdkmetrics::CounterAggregator<short>(metrics_api::InstrumentKind::Counter));
 
   aggregator->update(5);
   aggregator_test->update(5);
@@ -240,12 +230,10 @@ TEST(UngroupedMetricsProcessor, UngroupedProcessorKeepsRecordInformationStateful
       new sdkmetrics::UngroupedMetricsProcessor(true));
 
   auto aggregator = std::shared_ptr<sdkmetrics::Aggregator<int>>(
-      new sdkmetrics::CounterAggregator<int>(
-          metrics_api::InstrumentKind::Counter));
+      new sdkmetrics::CounterAggregator<int>(metrics_api::InstrumentKind::Counter));
 
   auto aggregator_test = std::shared_ptr<sdkmetrics::Aggregator<int>>(
-      new sdkmetrics::CounterAggregator<int>(
-          metrics_api::InstrumentKind::Counter));
+      new sdkmetrics::CounterAggregator<int>(metrics_api::InstrumentKind::Counter));
 
   aggregator->update(5);
   aggregator_test->update(5);
@@ -283,12 +271,10 @@ TEST(UngroupedMetricsProcessor, UngroupedProcessorKeepsRecordInformationStateful
       new sdkmetrics::UngroupedMetricsProcessor(true));
 
   auto aggregator = std::shared_ptr<sdkmetrics::Aggregator<float>>(
-      new sdkmetrics::CounterAggregator<float>(
-          metrics_api::InstrumentKind::Counter));
+      new sdkmetrics::CounterAggregator<float>(metrics_api::InstrumentKind::Counter));
 
   auto aggregator_test = std::shared_ptr<sdkmetrics::Aggregator<float>>(
-      new sdkmetrics::CounterAggregator<float>(
-          metrics_api::InstrumentKind::Counter));
+      new sdkmetrics::CounterAggregator<float>(metrics_api::InstrumentKind::Counter));
 
   aggregator->update(5);
   aggregator_test->update(5);
@@ -328,12 +314,10 @@ TEST(UngroupedMetricsProcessor, UngroupedProcessorKeepsRecordInformationStateful
       new sdkmetrics::UngroupedMetricsProcessor(true));
 
   auto aggregator = std::shared_ptr<sdkmetrics::Aggregator<double>>(
-      new sdkmetrics::CounterAggregator<double>(
-          metrics_api::InstrumentKind::Counter));
+      new sdkmetrics::CounterAggregator<double>(metrics_api::InstrumentKind::Counter));
 
   auto aggregator_test = std::shared_ptr<sdkmetrics::Aggregator<double>>(
-      new sdkmetrics::CounterAggregator<double>(
-          metrics_api::InstrumentKind::Counter));
+      new sdkmetrics::CounterAggregator<double>(metrics_api::InstrumentKind::Counter));
 
   aggregator->update(5.5);
   aggregator_test->update(5.5);
@@ -373,12 +357,10 @@ TEST(UngroupedMetricsProcessor, UngroupedProcessorKeepsRecordInformationStateful
       new sdkmetrics::UngroupedMetricsProcessor(true));
 
   auto aggregator = std::shared_ptr<sdkmetrics::Aggregator<double>>(
-      new sdkmetrics::MinMaxSumCountAggregator<double>(
-          metrics_api::InstrumentKind::Counter));
+      new sdkmetrics::MinMaxSumCountAggregator<double>(metrics_api::InstrumentKind::Counter));
 
   auto aggregator2 = std::shared_ptr<sdkmetrics::Aggregator<double>>(
-      new sdkmetrics::MinMaxSumCountAggregator<double>(
-          metrics_api::InstrumentKind::Counter));
+      new sdkmetrics::MinMaxSumCountAggregator<double>(metrics_api::InstrumentKind::Counter));
 
   aggregator->update(1.1);
   aggregator->update(2.2);
@@ -420,8 +402,7 @@ TEST(UngroupedMetricsProcessor, UngroupedProcessorKeepsRecordInformationStateful
       new sdkmetrics::UngroupedMetricsProcessor(true));
 
   auto aggregator = std::shared_ptr<sdkmetrics::Aggregator<double>>(
-      new sdkmetrics::GaugeAggregator<double>(
-          metrics_api::InstrumentKind::Counter));
+      new sdkmetrics::GaugeAggregator<double>(metrics_api::InstrumentKind::Counter));
 
   aggregator->update(1.1);
   aggregator->update(2.2);
@@ -459,12 +440,10 @@ TEST(UngroupedMetricsProcessor, UngroupedProcessorKeepsRecordInformationStateful
       new sdkmetrics::UngroupedMetricsProcessor(true));
 
   auto aggregator = std::shared_ptr<sdkmetrics::Aggregator<double>>(
-      new sdkmetrics::ExactAggregator<double>(metrics_api::InstrumentKind::Counter,
-                                                               false));
+      new sdkmetrics::ExactAggregator<double>(metrics_api::InstrumentKind::Counter, false));
 
   auto aggregator2 = std::shared_ptr<sdkmetrics::Aggregator<double>>(
-      new sdkmetrics::ExactAggregator<double>(metrics_api::InstrumentKind::Counter,
-                                                               false));
+      new sdkmetrics::ExactAggregator<double>(metrics_api::InstrumentKind::Counter, false));
 
   aggregator->update(1.1);
   aggregator->update(2.2);
@@ -508,12 +487,10 @@ TEST(UngroupedMetricsProcessor, UngroupedProcessorKeepsRecordInformationStateful
 
   std::vector<double> boundaries{10, 20, 30, 40, 50};
   auto aggregator = std::shared_ptr<sdkmetrics::Aggregator<int>>(
-      new sdkmetrics::HistogramAggregator<int>(
-          metrics_api::InstrumentKind::Counter, boundaries));
+      new sdkmetrics::HistogramAggregator<int>(metrics_api::InstrumentKind::Counter, boundaries));
 
   auto aggregator2 = std::shared_ptr<sdkmetrics::Aggregator<int>>(
-      new sdkmetrics::HistogramAggregator<int>(
-          metrics_api::InstrumentKind::Counter, boundaries));
+      new sdkmetrics::HistogramAggregator<int>(metrics_api::InstrumentKind::Counter, boundaries));
 
   for (int i = 0; i < 60; i++)
   {
@@ -570,12 +547,10 @@ TEST(UngroupedMetricsProcessor, UngroupedProcessorKeepsRecordInformationStateful
       new sdkmetrics::UngroupedMetricsProcessor(true));
 
   auto aggregator = std::shared_ptr<sdkmetrics::Aggregator<int>>(
-      new sdkmetrics::SketchAggregator<int>(metrics_api::InstrumentKind::Counter,
-                                                             .00005));
+      new sdkmetrics::SketchAggregator<int>(metrics_api::InstrumentKind::Counter, .00005));
 
   auto test_aggregator = std::shared_ptr<sdkmetrics::Aggregator<int>>(
-      new sdkmetrics::SketchAggregator<int>(metrics_api::InstrumentKind::Counter,
-                                                             .00005));
+      new sdkmetrics::SketchAggregator<int>(metrics_api::InstrumentKind::Counter, .00005));
 
   for (int i = 0; i < 60; i++)
   {

@@ -13,9 +13,8 @@ namespace nostd = opentelemetry::nostd;
 
 class TestProvider : public MeterProvider
 {
-  nostd::shared_ptr<Meter> GetMeter(
-      nostd::string_view library_name,
-      nostd::string_view library_version) override
+  nostd::shared_ptr<Meter> GetMeter(nostd::string_view library_name,
+                                    nostd::string_view library_version) override
   {
     return nostd::shared_ptr<Meter>(nullptr);
   }

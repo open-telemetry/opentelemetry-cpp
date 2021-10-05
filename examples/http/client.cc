@@ -11,8 +11,8 @@ namespace
 
 using namespace opentelemetry::trace;
 namespace http_client = opentelemetry::ext::http::client;
-namespace context = opentelemetry::context;
-namespace nostd = opentelemetry::nostd;
+namespace context     = opentelemetry::context;
+namespace nostd       = opentelemetry::nostd;
 
 void sendRequest(const std::string &url)
 {
@@ -45,11 +45,11 @@ void sendRequest(const std::string &url)
     // set span attributes
     auto status_code = result.GetResponse().GetStatusCode();
     span->SetAttribute(OTEL_CPP_GET_ATTR(AttrHttpStatusCode), status_code);
-    result.GetResponse().ForEachHeader([&span](nostd::string_view header_name,
-                                               nostd::string_view header_value) {
-      span->SetAttribute("http.header." + std::string(header_name.data()), header_value);
-      return true;
-    });
+    result.GetResponse().ForEachHeader(
+        [&span](nostd::string_view header_name, nostd::string_view header_value) {
+          span->SetAttribute("http.header." + std::string(header_name.data()), header_value);
+          return true;
+        });
 
     if (status_code >= 400)
     {
@@ -58,11 +58,12 @@ void sendRequest(const std::string &url)
   }
   else
   {
-    span->SetStatus(StatusCode::kError,
-                    "Response Status :" +
-                        std::to_string(static_cast<typename std::underlying_type<
-                                           http_client::SessionState>::type>(
-                            result.GetSessionState())));
+    span->SetStatus(
+        StatusCode::kError,
+        "Response Status :" +
+            std::to_string(
+                static_cast<typename std::underlying_type<http_client::SessionState>::type>(
+                    result.GetSessionState())));
   }
   // end span and export data
   span->End();

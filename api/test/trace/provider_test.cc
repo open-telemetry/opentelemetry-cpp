@@ -10,14 +10,13 @@ using opentelemetry::trace::Provider;
 using opentelemetry::trace::Tracer;
 using opentelemetry::trace::TracerProvider;
 
-namespace nostd     = opentelemetry::nostd;
+namespace nostd = opentelemetry::nostd;
 
 class TestProvider : public TracerProvider
 {
-  nostd::shared_ptr<Tracer> GetTracer(
-      nostd::string_view library_name,
-      nostd::string_view library_version,
-      nostd::string_view schema_url) override
+  nostd::shared_ptr<Tracer> GetTracer(nostd::string_view library_name,
+                                      nostd::string_view library_version,
+                                      nostd::string_view schema_url) override
   {
     return nostd::shared_ptr<Tracer>(nullptr);
   }

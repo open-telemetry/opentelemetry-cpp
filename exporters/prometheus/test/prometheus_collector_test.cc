@@ -22,7 +22,6 @@
 using opentelemetry::exporter::prometheus::PrometheusCollector;
 namespace metric_api = opentelemetry::metrics;
 
-
 OPENTELEMETRY_BEGIN_NAMESPACE
 
 /**
@@ -42,9 +41,8 @@ std::shared_ptr<metric_sdk::Aggregator<T>> CreateAgg(metric_sdk::AggregatorKind 
       break;
     }
     case metric_sdk::AggregatorKind::MinMaxSumCount: {
-      aggregator =
-          std::shared_ptr<metric_sdk::Aggregator<T>>(new metric_sdk::MinMaxSumCountAggregator<T>(
-              metric_api::InstrumentKind::Counter));
+      aggregator = std::shared_ptr<metric_sdk::Aggregator<T>>(
+          new metric_sdk::MinMaxSumCountAggregator<T>(metric_api::InstrumentKind::Counter));
       break;
     }
     case metric_sdk::AggregatorKind::Gauge: {
@@ -53,20 +51,19 @@ std::shared_ptr<metric_sdk::Aggregator<T>> CreateAgg(metric_sdk::AggregatorKind 
       break;
     }
     case metric_sdk::AggregatorKind::Sketch: {
-      aggregator = std::shared_ptr<metric_sdk::Aggregator<T>>(new metric_sdk::SketchAggregator<T>(
-          metric_api::InstrumentKind::Counter, 0.000005));
+      aggregator = std::shared_ptr<metric_sdk::Aggregator<T>>(
+          new metric_sdk::SketchAggregator<T>(metric_api::InstrumentKind::Counter, 0.000005));
       break;
     }
     case metric_sdk::AggregatorKind::Histogram: {
       std::vector<double> boundaries{10, 20};
-      aggregator =
-          std::shared_ptr<metric_sdk::Aggregator<T>>(new metric_sdk::HistogramAggregator<T>(
-              metric_api::InstrumentKind::Counter, boundaries));
+      aggregator = std::shared_ptr<metric_sdk::Aggregator<T>>(
+          new metric_sdk::HistogramAggregator<T>(metric_api::InstrumentKind::Counter, boundaries));
       break;
     }
     case metric_sdk::AggregatorKind::Exact: {
-      aggregator = std::shared_ptr<metric_sdk::Aggregator<T>>(new metric_sdk::ExactAggregator<T>(
-          metric_api::InstrumentKind::Counter, exactMode));
+      aggregator = std::shared_ptr<metric_sdk::Aggregator<T>>(
+          new metric_sdk::ExactAggregator<T>(metric_api::InstrumentKind::Counter, exactMode));
       break;
     }
     default:

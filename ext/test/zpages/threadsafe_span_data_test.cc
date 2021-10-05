@@ -13,7 +13,7 @@ using opentelemetry::ext::zpages::ThreadsafeSpanData;
 using opentelemetry::sdk::common::AttributeConverter;
 using opentelemetry::sdk::common::OwnedAttributeValue;
 
-namespace trace_api    = opentelemetry::trace;
+namespace trace_api = opentelemetry::trace;
 
 TEST(ThreadsafeSpanData, DefaultValues)
 {
@@ -43,8 +43,7 @@ TEST(ThreadsafeSpanData, Set)
   trace_api::SpanId parent_span_id{parent_span_id_buf};
   const auto trace_state = trace_api::TraceState::GetDefault()->Set("key1", "value");
   const trace_api::SpanContext span_context{
-      trace_id, span_id,
-      trace_api::TraceFlags{trace_api::TraceFlags::kIsSampled}, true,
+      trace_id, span_id, trace_api::TraceFlags{trace_api::TraceFlags::kIsSampled}, true,
       trace_state};
   opentelemetry::common::SystemTimestamp now(std::chrono::system_clock::now());
 

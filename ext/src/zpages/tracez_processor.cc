@@ -16,8 +16,7 @@ void TracezSpanProcessor::OnStart(trace_sdk::Recordable &span,
   shared_data_->OnStart(static_cast<ThreadsafeSpanData *>(&span));
 }
 
-void TracezSpanProcessor::OnEnd(
-    std::unique_ptr<trace_sdk::Recordable> &&span) noexcept
+void TracezSpanProcessor::OnEnd(std::unique_ptr<trace_sdk::Recordable> &&span) noexcept
 {
   shared_data_->OnEnd(
       std::unique_ptr<ThreadsafeSpanData>(static_cast<ThreadsafeSpanData *>(span.release())));

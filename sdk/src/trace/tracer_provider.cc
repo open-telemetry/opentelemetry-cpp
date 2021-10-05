@@ -9,7 +9,7 @@ namespace sdk
 {
 namespace trace
 {
-namespace resource = opentelemetry::sdk::resource;
+namespace resource  = opentelemetry::sdk::resource;
 namespace trace_api = opentelemetry::trace;
 
 TracerProvider::TracerProvider(std::shared_ptr<sdk::trace::TracerContext> context) noexcept

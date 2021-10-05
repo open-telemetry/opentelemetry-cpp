@@ -12,7 +12,7 @@ namespace trace    = opentelemetry::trace;
 namespace nostd    = opentelemetry::nostd;
 namespace sdktrace = opentelemetry::sdk::trace;
 namespace zipkin   = opentelemetry::exporter::zipkin;
-namespace resource   = opentelemetry::sdk::resource;
+namespace resource = opentelemetry::sdk::resource;
 
 namespace
 {
@@ -20,9 +20,8 @@ zipkin::ZipkinExporterOptions opts;
 void InitTracer()
 {
   // Create zipkin exporter instance
-  resource::ResourceAttributes attributes = {
-      {"service.name", "zipkin_demo_service"}};
-  auto resource  = resource::Resource::Create(attributes);
+  resource::ResourceAttributes attributes = {{"service.name", "zipkin_demo_service"}};
+  auto resource                           = resource::Resource::Create(attributes);
   auto exporter  = std::unique_ptr<sdktrace::SpanExporter>(new zipkin::ZipkinExporter(opts));
   auto processor = std::unique_ptr<sdktrace::SpanProcessor>(
       new sdktrace::SimpleSpanProcessor(std::move(exporter)));

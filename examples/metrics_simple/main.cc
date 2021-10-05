@@ -15,7 +15,6 @@ namespace common          = opentelemetry::common;
 namespace exportermetrics = opentelemetry::exporter::metrics;
 namespace metrics_api     = opentelemetry::metrics;
 
-
 int main()
 {
   // Initialize and set the global MeterProvider
@@ -28,8 +27,7 @@ int main()
   // Create the controller with Stateless Metrics Processor
   sdkmetrics::PushController ControllerStateless(
       meter,
-      std::unique_ptr<sdkmetrics::MetricsExporter>(
-          new exportermetrics::OStreamMetricsExporter),
+      std::unique_ptr<sdkmetrics::MetricsExporter>(new exportermetrics::OStreamMetricsExporter),
       std::shared_ptr<sdkmetrics::MetricsProcessor>(
           new sdkmetrics::UngroupedMetricsProcessor(false)),
       .05);
@@ -95,8 +93,7 @@ int main()
   // Do the same thing for stateful to see the difference
   sdkmetrics::PushController ControllerStateful(
       meter,
-      std::unique_ptr<sdkmetrics::MetricsExporter>(
-          new exportermetrics::OStreamMetricsExporter),
+      std::unique_ptr<sdkmetrics::MetricsExporter>(new exportermetrics::OStreamMetricsExporter),
       std::shared_ptr<sdkmetrics::MetricsProcessor>(
           new sdkmetrics::UngroupedMetricsProcessor(true)),
       .05);

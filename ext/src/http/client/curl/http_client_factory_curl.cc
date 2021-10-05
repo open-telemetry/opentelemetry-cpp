@@ -7,14 +7,12 @@
 
 namespace http_client = opentelemetry::ext::http::client;
 
-std::shared_ptr<http_client::HttpClient>
-http_client::HttpClientFactory::Create()
+std::shared_ptr<http_client::HttpClient> http_client::HttpClientFactory::Create()
 {
   return std::make_shared<http_client::curl::HttpClient>();
 }
 
-std::shared_ptr<http_client::HttpClientSync>
-http_client::HttpClientFactory::CreateSync()
+std::shared_ptr<http_client::HttpClientSync> http_client::HttpClientFactory::CreateSync()
 {
   return std::make_shared<http_client::curl::HttpClientSync>();
 }

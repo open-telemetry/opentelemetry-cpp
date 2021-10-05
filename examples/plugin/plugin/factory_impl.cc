@@ -5,8 +5,8 @@
 #include "opentelemetry/plugin/hook.h"
 #include "tracer.h"
 
-namespace nostd    = opentelemetry::nostd;
-namespace plugin    = opentelemetry::plugin;
+namespace nostd  = opentelemetry::nostd;
+namespace plugin = opentelemetry::plugin;
 
 class TracerHandle final : public plugin::TracerHandle
 {
@@ -33,19 +33,17 @@ public:
     {
       return nullptr;
     }
-    return nostd::unique_ptr<TracerHandle>{new (std::nothrow)
-                                                              TracerHandle{std::move(tracer)}};
+    return nostd::unique_ptr<TracerHandle>{new (std::nothrow) TracerHandle{std::move(tracer)}};
   }
 };
 
-static nostd::unique_ptr<plugin::Factory::FactoryImpl>
-MakeFactoryImpl(const plugin::LoaderInfo &loader_info,
-                nostd::unique_ptr<char[]> &error_message) noexcept
+static nostd::unique_ptr<plugin::Factory::FactoryImpl> MakeFactoryImpl(
+    const plugin::LoaderInfo &loader_info,
+    nostd::unique_ptr<char[]> &error_message) noexcept
 {
   (void)loader_info;
   (void)error_message;
-  return nostd::unique_ptr<plugin::Factory::FactoryImpl>{
-      new (std::nothrow) FactoryImpl{}};
+  return nostd::unique_ptr<plugin::Factory::FactoryImpl>{new (std::nothrow) FactoryImpl{}};
 }
 
 OPENTELEMETRY_DEFINE_PLUGIN_HOOK(MakeFactoryImpl);

@@ -37,9 +37,8 @@ TEST(ZipkinSpanRecordable, SetIdentity)
   const trace::SpanId parent_span_id(
       std::array<const uint8_t, trace::SpanId::kSize>({0, 0, 0, 0, 0, 0, 0, 3}));
 
-  const trace::SpanContext span_context{
-      trace_id, span_id,
-      trace::TraceFlags{trace::TraceFlags::kIsSampled}, true};
+  const trace::SpanContext span_context{trace_id, span_id,
+                                        trace::TraceFlags{trace::TraceFlags::kIsSampled}, true};
 
   rec.SetIdentity(span_context, parent_span_id);
   EXPECT_EQ(rec.span(), j_span);
@@ -60,9 +59,8 @@ TEST(ZipkinSpanRecordable, SetIdentityEmptyParent)
   const trace::SpanId parent_span_id(
       std::array<const uint8_t, trace::SpanId::kSize>({0, 0, 0, 0, 0, 0, 0, 0}));
 
-  const trace::SpanContext span_context{
-      trace_id, span_id,
-      trace::TraceFlags{trace::TraceFlags::kIsSampled}, true};
+  const trace::SpanContext span_context{trace_id, span_id,
+                                        trace::TraceFlags{trace::TraceFlags::kIsSampled}, true};
 
   rec.SetIdentity(span_context, parent_span_id);
   EXPECT_EQ(rec.span(), j_span);

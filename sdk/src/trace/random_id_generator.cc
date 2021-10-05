@@ -12,7 +12,6 @@ namespace trace
 {
 namespace trace_api = opentelemetry::trace;
 
-
 trace_api::SpanId RandomIdGenerator::GenerateSpanId() noexcept
 {
   uint8_t span_id_buf[trace_api::SpanId::kSize];

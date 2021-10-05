@@ -9,11 +9,11 @@ namespace exporter
 namespace otlp
 {
 
-namespace trace = opentelemetry::trace;
-namespace nostd = opentelemetry::nostd;
-namespace proto = opentelemetry::proto;
+namespace trace  = opentelemetry::trace;
+namespace nostd  = opentelemetry::nostd;
+namespace proto  = opentelemetry::proto;
 namespace common = opentelemetry::common;
- 
+
 //
 // See `attribute_value.h` for details.
 //
@@ -38,9 +38,8 @@ void PopulateAttribute(proto::common::v1::KeyValue *attribute,
 {
   // Assert size of variant to ensure that this method gets updated if the variant
   // definition changes
-  static_assert(
-      nostd::variant_size<common::AttributeValue>::value == kAttributeValueSize,
-      "AttributeValue contains unknown type");
+  static_assert(nostd::variant_size<common::AttributeValue>::value == kAttributeValueSize,
+                "AttributeValue contains unknown type");
 
   attribute->set_key(key.data(), key.size());
 
@@ -340,34 +339,28 @@ void OtlpRecordable::SetSpanKind(trace::SpanKind span_kind) noexcept
   {
 
     case trace::SpanKind::kInternal:
-      proto_span_kind =
-          proto::trace::v1::Span_SpanKind::Span_SpanKind_SPAN_KIND_INTERNAL;
+      proto_span_kind = proto::trace::v1::Span_SpanKind::Span_SpanKind_SPAN_KIND_INTERNAL;
       break;
 
     case trace::SpanKind::kServer:
-      proto_span_kind =
-          proto::trace::v1::Span_SpanKind::Span_SpanKind_SPAN_KIND_SERVER;
+      proto_span_kind = proto::trace::v1::Span_SpanKind::Span_SpanKind_SPAN_KIND_SERVER;
       break;
 
     case trace::SpanKind::kClient:
-      proto_span_kind =
-          proto::trace::v1::Span_SpanKind::Span_SpanKind_SPAN_KIND_CLIENT;
+      proto_span_kind = proto::trace::v1::Span_SpanKind::Span_SpanKind_SPAN_KIND_CLIENT;
       break;
 
     case trace::SpanKind::kProducer:
-      proto_span_kind =
-          proto::trace::v1::Span_SpanKind::Span_SpanKind_SPAN_KIND_PRODUCER;
+      proto_span_kind = proto::trace::v1::Span_SpanKind::Span_SpanKind_SPAN_KIND_PRODUCER;
       break;
 
     case trace::SpanKind::kConsumer:
-      proto_span_kind =
-          proto::trace::v1::Span_SpanKind::Span_SpanKind_SPAN_KIND_CONSUMER;
+      proto_span_kind = proto::trace::v1::Span_SpanKind::Span_SpanKind_SPAN_KIND_CONSUMER;
       break;
 
     default:
       // shouldn't reach here.
-      proto_span_kind =
-          proto::trace::v1::Span_SpanKind::Span_SpanKind_SPAN_KIND_UNSPECIFIED;
+      proto_span_kind = proto::trace::v1::Span_SpanKind::Span_SpanKind_SPAN_KIND_UNSPECIFIED;
   }
 
   span_.set_kind(proto_span_kind);

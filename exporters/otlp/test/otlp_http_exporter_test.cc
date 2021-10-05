@@ -33,7 +33,7 @@ namespace otlp
 {
 
 namespace trace_api = opentelemetry::trace;
-namespace resource = opentelemetry::sdk::resource;
+namespace resource  = opentelemetry::sdk::resource;
 
 template <class T, size_t N>
 static nostd::span<T, N> MakeSpan(T (&array)[N])
@@ -190,21 +190,21 @@ TEST_F(OtlpHttpExporterTestPeer, ExportJsonIntegrationTest)
   size_t old_count = getCurrentRequestCount();
   auto exporter    = GetExporter(HttpRequestContentType::kJson);
 
-  resource::ResourceAttributes resource_attributes = {
-      {"service.name", "unit_test_service"}, {"tenant.id", "test_user"}};
-  resource_attributes["bool_value"]       = true;
-  resource_attributes["int32_value"]      = static_cast<int32_t>(1);
-  resource_attributes["uint32_value"]     = static_cast<uint32_t>(2);
-  resource_attributes["int64_value"]      = static_cast<int64_t>(0x1100000000LL);
-  resource_attributes["uint64_value"]     = static_cast<uint64_t>(0x1200000000ULL);
-  resource_attributes["double_value"]     = static_cast<double>(3.1);
-  resource_attributes["vec_bool_value"]   = std::vector<bool>{true, false, true};
-  resource_attributes["vec_int32_value"]  = std::vector<int32_t>{1, 2};
-  resource_attributes["vec_uint32_value"] = std::vector<uint32_t>{3, 4};
-  resource_attributes["vec_int64_value"]  = std::vector<int64_t>{5, 6};
-  resource_attributes["vec_uint64_value"] = std::vector<uint64_t>{7, 8};
-  resource_attributes["vec_double_value"] = std::vector<double>{3.2, 3.3};
-  resource_attributes["vec_string_value"] = std::vector<std::string>{"vector", "string"};
+  resource::ResourceAttributes resource_attributes = {{"service.name", "unit_test_service"},
+                                                      {"tenant.id", "test_user"}};
+  resource_attributes["bool_value"]                = true;
+  resource_attributes["int32_value"]               = static_cast<int32_t>(1);
+  resource_attributes["uint32_value"]              = static_cast<uint32_t>(2);
+  resource_attributes["int64_value"]               = static_cast<int64_t>(0x1100000000LL);
+  resource_attributes["uint64_value"]              = static_cast<uint64_t>(0x1200000000ULL);
+  resource_attributes["double_value"]              = static_cast<double>(3.1);
+  resource_attributes["vec_bool_value"]            = std::vector<bool>{true, false, true};
+  resource_attributes["vec_int32_value"]           = std::vector<int32_t>{1, 2};
+  resource_attributes["vec_uint32_value"]          = std::vector<uint32_t>{3, 4};
+  resource_attributes["vec_int64_value"]           = std::vector<int64_t>{5, 6};
+  resource_attributes["vec_uint64_value"]          = std::vector<uint64_t>{7, 8};
+  resource_attributes["vec_double_value"]          = std::vector<double>{3.2, 3.3};
+  resource_attributes["vec_string_value"]          = std::vector<std::string>{"vector", "string"};
   auto resource = resource::Resource::Create(resource_attributes);
 
   auto processor_opts                  = sdk::trace::BatchSpanProcessorOptions();
@@ -219,11 +219,11 @@ TEST_F(OtlpHttpExporterTestPeer, ExportJsonIntegrationTest)
   std::string report_trace_id;
   {
     char trace_id_hex[2 * trace_api::TraceId::kSize] = {0};
-    auto tracer                                                 = provider->GetTracer("test");
-    auto parent_span = tracer->StartSpan("Test parent span");
+    auto tracer                                      = provider->GetTracer("test");
+    auto parent_span                                 = tracer->StartSpan("Test parent span");
 
     trace_api::StartSpanOptions child_span_opts = {};
-    child_span_opts.parent                                 = parent_span->GetContext();
+    child_span_opts.parent                      = parent_span->GetContext();
 
     auto child_span = tracer->StartSpan("Test child span", child_span_opts);
     child_span->End();
@@ -251,21 +251,21 @@ TEST_F(OtlpHttpExporterTestPeer, ExportBinaryIntegrationTest)
 
   auto exporter = GetExporter(HttpRequestContentType::kBinary);
 
-  resource::ResourceAttributes resource_attributes = {
-      {"service.name", "unit_test_service"}, {"tenant.id", "test_user"}};
-  resource_attributes["bool_value"]       = true;
-  resource_attributes["int32_value"]      = static_cast<int32_t>(1);
-  resource_attributes["uint32_value"]     = static_cast<uint32_t>(2);
-  resource_attributes["int64_value"]      = static_cast<int64_t>(0x1100000000LL);
-  resource_attributes["uint64_value"]     = static_cast<uint64_t>(0x1200000000ULL);
-  resource_attributes["double_value"]     = static_cast<double>(3.1);
-  resource_attributes["vec_bool_value"]   = std::vector<bool>{true, false, true};
-  resource_attributes["vec_int32_value"]  = std::vector<int32_t>{1, 2};
-  resource_attributes["vec_uint32_value"] = std::vector<uint32_t>{3, 4};
-  resource_attributes["vec_int64_value"]  = std::vector<int64_t>{5, 6};
-  resource_attributes["vec_uint64_value"] = std::vector<uint64_t>{7, 8};
-  resource_attributes["vec_double_value"] = std::vector<double>{3.2, 3.3};
-  resource_attributes["vec_string_value"] = std::vector<std::string>{"vector", "string"};
+  resource::ResourceAttributes resource_attributes = {{"service.name", "unit_test_service"},
+                                                      {"tenant.id", "test_user"}};
+  resource_attributes["bool_value"]                = true;
+  resource_attributes["int32_value"]               = static_cast<int32_t>(1);
+  resource_attributes["uint32_value"]              = static_cast<uint32_t>(2);
+  resource_attributes["int64_value"]               = static_cast<int64_t>(0x1100000000LL);
+  resource_attributes["uint64_value"]              = static_cast<uint64_t>(0x1200000000ULL);
+  resource_attributes["double_value"]              = static_cast<double>(3.1);
+  resource_attributes["vec_bool_value"]            = std::vector<bool>{true, false, true};
+  resource_attributes["vec_int32_value"]           = std::vector<int32_t>{1, 2};
+  resource_attributes["vec_uint32_value"]          = std::vector<uint32_t>{3, 4};
+  resource_attributes["vec_int64_value"]           = std::vector<int64_t>{5, 6};
+  resource_attributes["vec_uint64_value"]          = std::vector<uint64_t>{7, 8};
+  resource_attributes["vec_double_value"]          = std::vector<double>{3.2, 3.3};
+  resource_attributes["vec_string_value"]          = std::vector<std::string>{"vector", "string"};
   auto resource = resource::Resource::Create(resource_attributes);
 
   auto processor_opts                  = sdk::trace::BatchSpanProcessorOptions();
@@ -281,11 +281,11 @@ TEST_F(OtlpHttpExporterTestPeer, ExportBinaryIntegrationTest)
   std::string report_trace_id;
   {
     uint8_t trace_id_binary[trace_api::TraceId::kSize] = {0};
-    auto tracer                                                   = provider->GetTracer("test");
-    auto parent_span = tracer->StartSpan("Test parent span");
+    auto tracer                                        = provider->GetTracer("test");
+    auto parent_span                                   = tracer->StartSpan("Test parent span");
 
     trace_api::StartSpanOptions child_span_opts = {};
-    child_span_opts.parent                                 = parent_span->GetContext();
+    child_span_opts.parent                      = parent_span->GetContext();
 
     auto child_span = tracer->StartSpan("Test child span", child_span_opts);
     child_span->End();

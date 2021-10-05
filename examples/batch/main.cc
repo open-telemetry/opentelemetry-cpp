@@ -10,9 +10,9 @@
 #include <chrono>
 #include <thread>
 
-constexpr int kNumSpans = 10;
-namespace trace_api = opentelemetry::trace;
-namespace resource = opentelemetry::sdk::resource;
+constexpr int kNumSpans  = 10;
+namespace trace_api      = opentelemetry::trace;
+namespace resource       = opentelemetry::sdk::resource;
 namespace exporter_trace = opentelemetry::exporter::trace;
 
 namespace
@@ -20,8 +20,7 @@ namespace
 
 void initTracer()
 {
-  auto exporter = std::unique_ptr<sdktrace::SpanExporter>(
-      new exporter_trace::OStreamSpanExporter);
+  auto exporter = std::unique_ptr<sdktrace::SpanExporter>(new exporter_trace::OStreamSpanExporter);
 
   // CONFIGURE BATCH SPAN PROCESSOR PARAMETERS
 
@@ -34,9 +33,8 @@ void initTracer()
   // We export `kNumSpans` after every `schedule_delay_millis` milliseconds.
   options.max_export_batch_size = kNumSpans;
 
-  resource::ResourceAttributes attributes = {{"service", "test_service"},
-                                                                 {"version", (uint32_t)1}};
-  auto resource = resource::Resource::Create(attributes);
+  resource::ResourceAttributes attributes = {{"service", "test_service"}, {"version", (uint32_t)1}};
+  auto resource                           = resource::Resource::Create(attributes);
 
   auto processor = std::unique_ptr<sdktrace::SpanProcessor>(
       new sdktrace::BatchSpanProcessor(std::move(exporter), options));

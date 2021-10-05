@@ -19,11 +19,11 @@
 
 using namespace opentelemetry::exporter::ostream::test;
 
-namespace trace    = opentelemetry::trace;
-namespace common   = opentelemetry::common;
-namespace nostd    = opentelemetry::nostd;
-namespace sdktrace = opentelemetry::sdk::trace;
-namespace resource = opentelemetry::sdk::resource;
+namespace trace         = opentelemetry::trace;
+namespace common        = opentelemetry::common;
+namespace nostd         = opentelemetry::nostd;
+namespace sdktrace      = opentelemetry::sdk::trace;
+namespace resource      = opentelemetry::sdk::resource;
 namespace exportertrace = opentelemetry::exporter::trace;
 
 using Attributes = std::initializer_list<std::pair<nostd::string_view, common::AttributeValue>>;
@@ -39,8 +39,7 @@ public:
 // Testing Shutdown functionality of OStreamSpanExporter, should expect no data to be sent to Stream
 TEST(OStreamSpanExporter, Shutdown)
 {
-  auto exporter = std::unique_ptr<sdktrace::SpanExporter>(
-      new exportertrace::OStreamSpanExporter);
+  auto exporter  = std::unique_ptr<sdktrace::SpanExporter>(new exportertrace::OStreamSpanExporter);
   auto processor = std::shared_ptr<sdktrace::SpanProcessor>(
       new sdktrace::SimpleSpanProcessor(std::move(exporter)));
 
@@ -79,8 +78,8 @@ constexpr const char *kDefaultSpanPrinted =
 TEST(OStreamSpanExporter, PrintDefaultSpan)
 {
   std::stringstream output;
-  auto exporter = std::unique_ptr<sdktrace::SpanExporter>(
-      new exportertrace::OStreamSpanExporter(output));
+  auto exporter =
+      std::unique_ptr<sdktrace::SpanExporter>(new exportertrace::OStreamSpanExporter(output));
   auto processor = std::shared_ptr<sdktrace::SpanProcessor>(
       new sdktrace::SimpleSpanProcessor(std::move(exporter)));
 
@@ -94,8 +93,8 @@ TEST(OStreamSpanExporter, PrintDefaultSpan)
 TEST(OStreamSpanExporter, PrintSpanWithBasicFields)
 {
   std::stringstream output;
-  auto exporter = std::unique_ptr<sdktrace::SpanExporter>(
-      new exportertrace::OStreamSpanExporter(output));
+  auto exporter =
+      std::unique_ptr<sdktrace::SpanExporter>(new exportertrace::OStreamSpanExporter(output));
   auto processor = std::shared_ptr<sdktrace::SpanProcessor>(
       new sdktrace::SimpleSpanProcessor(std::move(exporter)));
 
@@ -109,9 +108,7 @@ TEST(OStreamSpanExporter, PrintSpanWithBasicFields)
   trace::SpanId parent_span_id{parent_span_id_buf};
   const auto trace_state = trace::TraceState::GetDefault()->Set("state1", "value");
   const trace::SpanContext span_context{
-      trace_id, span_id,
-      trace::TraceFlags{trace::TraceFlags::kIsSampled}, true,
-      trace_state};
+      trace_id, span_id, trace::TraceFlags{trace::TraceFlags::kIsSampled}, true, trace_state};
 
   recordable->SetIdentity(span_context, parent_span_id);
   recordable->SetName("Test Span");
@@ -155,8 +152,8 @@ TEST(OStreamSpanExporter, PrintSpanWithBasicFields)
 TEST(OStreamSpanExporter, PrintSpanWithAttribute)
 {
   std::stringstream output;
-  auto exporter = std::unique_ptr<sdktrace::SpanExporter>(
-      new exportertrace::OStreamSpanExporter(output));
+  auto exporter =
+      std::unique_ptr<sdktrace::SpanExporter>(new exportertrace::OStreamSpanExporter(output));
   auto processor = std::shared_ptr<sdktrace::SpanProcessor>(
       new sdktrace::SimpleSpanProcessor(std::move(exporter)));
 
@@ -191,8 +188,8 @@ TEST(OStreamSpanExporter, PrintSpanWithAttribute)
 TEST(OStreamSpanExporter, PrintSpanWithArrayAttribute)
 {
   std::stringstream output;
-  auto exporter = std::unique_ptr<sdktrace::SpanExporter>(
-      new exportertrace::OStreamSpanExporter(output));
+  auto exporter =
+      std::unique_ptr<sdktrace::SpanExporter>(new exportertrace::OStreamSpanExporter(output));
   auto processor = std::shared_ptr<sdktrace::SpanProcessor>(
       new sdktrace::SimpleSpanProcessor(std::move(exporter)));
 
@@ -229,15 +226,14 @@ TEST(OStreamSpanExporter, PrintSpanWithArrayAttribute)
 TEST(OStreamSpanExporter, PrintSpanWithEvents)
 {
   std::stringstream output;
-  auto exporter = std::unique_ptr<sdktrace::SpanExporter>(
-      new exportertrace::OStreamSpanExporter(output));
+  auto exporter =
+      std::unique_ptr<sdktrace::SpanExporter>(new exportertrace::OStreamSpanExporter(output));
   auto processor = std::shared_ptr<sdktrace::SpanProcessor>(
       new sdktrace::SimpleSpanProcessor(std::move(exporter)));
 
   auto recordable = processor->MakeRecordable();
   common::SystemTimestamp now(std::chrono::system_clock::now());
-  common::SystemTimestamp next(std::chrono::system_clock::now() +
-                                              std::chrono::seconds(1));
+  common::SystemTimestamp next(std::chrono::system_clock::now() + std::chrono::seconds(1));
 
   std::string now_str  = std::to_string(now.time_since_epoch().count());
   std::string next_str = std::to_string(next.time_since_epoch().count());
@@ -287,8 +283,8 @@ TEST(OStreamSpanExporter, PrintSpanWithEvents)
 TEST(OStreamSpanExporter, PrintSpanWithLinks)
 {
   std::stringstream output;
-  auto exporter = std::unique_ptr<sdktrace::SpanExporter>(
-      new exportertrace::OStreamSpanExporter(output));
+  auto exporter =
+      std::unique_ptr<sdktrace::SpanExporter>(new exportertrace::OStreamSpanExporter(output));
   auto processor = std::shared_ptr<sdktrace::SpanProcessor>(
       new sdktrace::SimpleSpanProcessor(std::move(exporter)));
 
@@ -303,19 +299,17 @@ TEST(OStreamSpanExporter, PrintSpanWithLinks)
       2,
   };
   trace::TraceId trace_id{trace_id_buf};
-  const auto span_context = trace::SpanContext(
-      trace_id, span_id,
-      trace::TraceFlags{trace::TraceFlags::kIsSampled}, true);
+  const auto span_context =
+      trace::SpanContext(trace_id, span_id, trace::TraceFlags{trace::TraceFlags::kIsSampled}, true);
 
   // and another to check preserving order.
   uint8_t span_id_buf2[trace::SpanId::kSize] = {
       3,
   };
   trace::SpanId span_id2{span_id_buf2};
-  const auto span_context2 = trace::SpanContext(
-      trace_id, span_id2,
-      trace::TraceFlags{trace::TraceFlags::kIsSampled}, true,
-      trace::TraceState::FromHeader("state1=value"));
+  const auto span_context2 =
+      trace::SpanContext(trace_id, span_id2, trace::TraceFlags{trace::TraceFlags::kIsSampled}, true,
+                         trace::TraceState::FromHeader("state1=value"));
 
   recordable->AddLink(span_context);
   recordable->AddLink(span_context2,
@@ -360,8 +354,7 @@ TEST(OStreamSpanExporter, PrintSpanWithLinks)
 // Test with the three common ostreams, tests are more of a sanity check and usage examples.
 TEST(OStreamSpanExporter, PrintSpanToCout)
 {
-  auto exporter = std::unique_ptr<sdktrace::SpanExporter>(
-      new exportertrace::OStreamSpanExporter);
+  auto exporter  = std::unique_ptr<sdktrace::SpanExporter>(new exportertrace::OStreamSpanExporter);
   auto processor = std::shared_ptr<sdktrace::SpanProcessor>(
       new sdktrace::SimpleSpanProcessor(std::move(exporter)));
 
@@ -375,8 +368,8 @@ TEST(OStreamSpanExporter, PrintSpanToCout)
 
 TEST(OStreamSpanExporter, PrintSpanToCerr)
 {
-  auto exporter = std::unique_ptr<sdktrace::SpanExporter>(
-      new exportertrace::OStreamSpanExporter(std::cerr));
+  auto exporter =
+      std::unique_ptr<sdktrace::SpanExporter>(new exportertrace::OStreamSpanExporter(std::cerr));
   auto processor = std::shared_ptr<sdktrace::SpanProcessor>(
       new sdktrace::SimpleSpanProcessor(std::move(exporter)));
 
@@ -390,8 +383,8 @@ TEST(OStreamSpanExporter, PrintSpanToCerr)
 
 TEST(OStreamSpanExporter, PrintSpanToClog)
 {
-  auto exporter = std::unique_ptr<sdktrace::SpanExporter>(
-      new exportertrace::OStreamSpanExporter(std::clog));
+  auto exporter =
+      std::unique_ptr<sdktrace::SpanExporter>(new exportertrace::OStreamSpanExporter(std::clog));
   auto processor = std::shared_ptr<sdktrace::SpanProcessor>(
       new sdktrace::SimpleSpanProcessor(std::move(exporter)));
 

@@ -71,11 +71,11 @@ public:
       {
         std::stringstream ss;
         ss << "[OTLP HTTP Exporter] Status:" << response.GetStatusCode() << "Header:";
-        response.ForEachHeader([&ss](nostd::string_view header_name,
-                                     nostd::string_view header_value) {
-          ss << "\t" << header_name.data() << " : " << header_value.data() << ",";
-          return true;
-        });
+        response.ForEachHeader(
+            [&ss](nostd::string_view header_name, nostd::string_view header_value) {
+              ss << "\t" << header_name.data() << " : " << header_value.data() << ",";
+              return true;
+            });
         ss << "Body:" << body_;
         OTEL_INTERNAL_LOG_DEBUG(ss.str());
       }
@@ -108,8 +108,7 @@ public:
   }
 
   // Callback method when an http event occurs
-  void OnEvent(http_client::SessionState state,
-               nostd::string_view reason) noexcept override
+  void OnEvent(http_client::SessionState state, nostd::string_view reason) noexcept override
   {
     // If any failure event occurs, release the condition variable to unblock main thread
     switch (state)

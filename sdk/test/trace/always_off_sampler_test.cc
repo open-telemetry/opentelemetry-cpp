@@ -10,7 +10,6 @@ using opentelemetry::sdk::trace::Decision;
 using opentelemetry::trace::SpanContext;
 namespace trace_api = opentelemetry::trace;
 
-
 TEST(AlwaysOffSampler, ShouldSample)
 {
   AlwaysOffSampler sampler;

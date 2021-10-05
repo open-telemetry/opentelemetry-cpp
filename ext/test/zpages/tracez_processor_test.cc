@@ -16,8 +16,7 @@ using namespace opentelemetry::sdk::trace;
 using namespace opentelemetry::ext::zpages;
 
 namespace trace_api = opentelemetry::trace;
-namespace nostd = opentelemetry::nostd;
-
+namespace nostd     = opentelemetry::nostd;
 
 //////////////////////////////////// TEST HELPER FUNCTIONS //////////////////////////////
 
@@ -153,10 +152,9 @@ void GetManySnapshots(std::shared_ptr<TracezSharedData> &data, int i)
  * Helper function that creates i spans, which are added into the passed
  * in vector. Used for testing thread safety
  */
-void StartManySpans(
-    std::vector<nostd::shared_ptr<trace_api::Span>> &spans,
-    std::shared_ptr<trace_api::Tracer> tracer,
-    int i)
+void StartManySpans(std::vector<nostd::shared_ptr<trace_api::Span>> &spans,
+                    std::shared_ptr<trace_api::Tracer> tracer,
+                    int i)
 {
   for (; i > 0; i--)
     spans.push_back(tracer->StartSpan("span"));

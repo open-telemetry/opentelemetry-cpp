@@ -218,10 +218,10 @@ TEST(KeyValueProperties, GetAllEntries)
 {
   std::vector<std::pair<std::string, std::string>> kv_pairs = {
       {"k1", "v1"}, {"k2", "v2"}, {"k3", "v3"}};
-  const size_t kNumPairs                              = 3;
+  const size_t kNumPairs               = 3;
   nostd::string_view keys[kNumPairs]   = {"k1", "k2", "k3"};
   nostd::string_view values[kNumPairs] = {"v1", "v2", "v3"};
-  auto kv_properties                                  = KeyValueProperties(kv_pairs);
+  auto kv_properties                   = KeyValueProperties(kv_pairs);
 
   size_t index = 0;
   kv_properties.GetAllEntries(

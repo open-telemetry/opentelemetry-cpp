@@ -13,7 +13,7 @@ using opentelemetry::sdk::common::Random;
 using opentelemetry::sdk::trace::Decision;
 using opentelemetry::sdk::trace::TraceIdRatioBasedSampler;
 namespace trace_api = opentelemetry::trace;
-namespace common = opentelemetry::common;
+namespace common    = opentelemetry::common;
 
 namespace
 {

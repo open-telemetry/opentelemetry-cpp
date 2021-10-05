@@ -9,8 +9,8 @@ namespace sdk
 {
 namespace metrics
 {
-namespace nostd        = opentelemetry::nostd;
-namespace metrics_api  = opentelemetry::metrics;
+namespace nostd       = opentelemetry::nostd;
+namespace metrics_api = opentelemetry::metrics;
 
 MeterProvider::MeterProvider(std::string library_name, std::string library_version) noexcept
     : meter_(new Meter(library_name, library_version))

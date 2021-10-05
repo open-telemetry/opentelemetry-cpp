@@ -38,8 +38,7 @@ public:
   }
 
   // Stores the names of the log records this exporter receives to an internal list
-  ExportResult Export(
-      const nostd::span<std::unique_ptr<Recordable>> &records) noexcept override
+  ExportResult Export(const nostd::span<std::unique_ptr<Recordable>> &records) noexcept override
   {
     *batch_size_received = records.size();
     for (auto &record : records)
@@ -134,8 +133,7 @@ public:
     return std::unique_ptr<Recordable>(new LogRecord());
   }
 
-  ExportResult Export(
-      const nostd::span<std::unique_ptr<Recordable>> &records) noexcept override
+  ExportResult Export(const nostd::span<std::unique_ptr<Recordable>> &records) noexcept override
   {
     return ExportResult::kSuccess;
   }

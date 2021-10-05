@@ -68,11 +68,10 @@ Span::Span(std::shared_ptr<Tracer> &&tracer,
                                                ? parent_span_context.span_id()
                                                : trace_api::SpanId());
 
-  attributes.ForEachKeyValue(
-      [&](nostd::string_view key, common::AttributeValue value) noexcept {
-        recordable_->SetAttribute(key, value);
-        return true;
-      });
+  attributes.ForEachKeyValue([&](nostd::string_view key, common::AttributeValue value) noexcept {
+    recordable_->SetAttribute(key, value);
+    return true;
+  });
 
   links.ForEachKeyValue([&](opentelemetry::trace::SpanContext span_context,
                             const common::KeyValueIterable &attributes) {
@@ -92,8 +91,7 @@ Span::~Span()
   End();
 }
 
-void Span::SetAttribute(nostd::string_view key,
-                        const common::AttributeValue &value) noexcept
+void Span::SetAttribute(nostd::string_view key, const common::AttributeValue &value) noexcept
 {
   std::lock_guard<std::mutex> lock_guard{mu_};
 

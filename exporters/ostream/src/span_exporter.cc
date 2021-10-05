@@ -5,8 +5,8 @@
 
 #include <iostream>
 
-namespace nostd    = opentelemetry::nostd;
-namespace sdktrace = opentelemetry::sdk::trace;
+namespace nostd     = opentelemetry::nostd;
+namespace sdktrace  = opentelemetry::sdk::trace;
 namespace trace_api = opentelemetry::trace;
 
 OPENTELEMETRY_BEGIN_NAMESPACE

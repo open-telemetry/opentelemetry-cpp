@@ -11,8 +11,8 @@
 
 using opentelemetry::sdk::trace::SpanData;
 namespace trace_api = opentelemetry::trace;
-namespace common = opentelemetry::common;
-namespace nostd = opentelemetry::nostd;
+namespace common    = opentelemetry::common;
+namespace nostd     = opentelemetry::nostd;
 
 TEST(SpanData, DefaultValues)
 {
@@ -43,8 +43,7 @@ TEST(SpanData, Set)
   trace_api::SpanId parent_span_id{parent_span_id_buf};
   const auto trace_state = trace_api::TraceState::GetDefault()->Set("key1", "value");
   const trace_api::SpanContext span_context{
-      trace_id, span_id,
-      trace_api::TraceFlags{trace_api::TraceFlags::kIsSampled}, true,
+      trace_id, span_id, trace_api::TraceFlags{trace_api::TraceFlags::kIsSampled}, true,
       trace_state};
   common::SystemTimestamp now(std::chrono::system_clock::now());
 
@@ -85,15 +84,12 @@ TEST(SpanData, EventAttributes)
   std::map<std::string, int64_t> attributes = {
       {keys[0], values[0]}, {keys[1], values[1]}, {keys[2], values[2]}};
 
-  data.AddEvent(
-      "Test Event", std::chrono::system_clock::now(),
-      common::KeyValueIterableView<std::map<std::string, int64_t>>(attributes));
+  data.AddEvent("Test Event", std::chrono::system_clock::now(),
+                common::KeyValueIterableView<std::map<std::string, int64_t>>(attributes));
 
   for (int i = 0; i < kNumAttributes; i++)
   {
-    EXPECT_EQ(
-        nostd::get<int64_t>(data.GetEvents().at(0).GetAttributes().at(keys[i])),
-        values[i]);
+    EXPECT_EQ(nostd::get<int64_t>(data.GetEvents().at(0).GetAttributes().at(keys[i])), values[i]);
   }
 }
 
@@ -126,17 +122,14 @@ TEST(SpanData, Links)
   };
   trace_api::TraceId trace_id{trace_id_buf};
   const auto span_context = trace_api::SpanContext(
-      trace_id, span_id,
-      trace_api::TraceFlags{trace_api::TraceFlags::kIsSampled}, true);
+      trace_id, span_id, trace_api::TraceFlags{trace_api::TraceFlags::kIsSampled}, true);
 
-  data.AddLink(
-      span_context,
-      common::KeyValueIterableView<std::map<std::string, int64_t>>(attributes));
+  data.AddLink(span_context,
+               common::KeyValueIterableView<std::map<std::string, int64_t>>(attributes));
 
   EXPECT_EQ(data.GetLinks().at(0).GetSpanContext(), span_context);
   for (int i = 0; i < kNumAttributes; i++)
   {
-    EXPECT_EQ(nostd::get<int64_t>(data.GetLinks().at(0).GetAttributes().at(keys[i])),
-              values[i]);
+    EXPECT_EQ(nostd::get<int64_t>(data.GetLinks().at(0).GetAttributes().at(keys[i])), values[i]);
   }
 }

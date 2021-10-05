@@ -26,8 +26,8 @@ TEST(ParentBasedSampler, ShouldSample)
   trace_api::SpanId span_id{span_id_buffer};
 
   trace_api::SpanKind span_kind = trace_api::SpanKind::kInternal;
-  using M                                  = std::map<std::string, int>;
-  M m1                                     = {{}};
+  using M                       = std::map<std::string, int>;
+  M m1                          = {{}};
 
   using L = std::vector<std::pair<trace_api::SpanContext, std::map<std::string, std::string>>>;
   L l1 = {{trace_api::SpanContext(false, false), {}}, {trace_api::SpanContext(false, false), {}}};

@@ -12,8 +12,8 @@
 
 using namespace opentelemetry::sdk::trace;
 using namespace opentelemetry::ext::zpages;
-namespace nostd  = opentelemetry::nostd;
-namespace common = opentelemetry::common;
+namespace nostd     = opentelemetry::nostd;
+namespace common    = opentelemetry::common;
 namespace trace_api = opentelemetry::trace;
 
 using opentelemetry::common::SteadyTimestamp;

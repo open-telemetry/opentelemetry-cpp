@@ -17,8 +17,8 @@ using namespace opentelemetry::sdk::trace;
 using namespace opentelemetry::sdk::resource;
 using opentelemetry::common::SteadyTimestamp;
 using opentelemetry::common::SystemTimestamp;
-namespace nostd  = opentelemetry::nostd;
-namespace common = opentelemetry::common;
+namespace nostd     = opentelemetry::nostd;
+namespace common    = opentelemetry::common;
 namespace trace_api = opentelemetry::trace;
 using opentelemetry::common::KeyValueIterableView;
 using opentelemetry::exporter::memory::InMemorySpanData;
@@ -67,15 +67,9 @@ public:
  */
 class MockIdGenerator : public IdGenerator
 {
-  trace_api::SpanId GenerateSpanId() noexcept override
-  {
-    return trace_api::SpanId(buf_span);
-  }
+  trace_api::SpanId GenerateSpanId() noexcept override { return trace_api::SpanId(buf_span); }
 
-  trace_api::TraceId GenerateTraceId() noexcept override
-  {
-    return trace_api::TraceId(buf_trace);
-  }
+  trace_api::TraceId GenerateTraceId() noexcept override { return trace_api::TraceId(buf_trace); }
   uint8_t buf_span[8]   = {1, 2, 3, 4, 5, 6, 7, 8};
   uint8_t buf_trace[16] = {1, 2, 3, 4, 5, 6, 7, 8, 8, 7, 6, 5, 4, 3, 2, 1};
 };

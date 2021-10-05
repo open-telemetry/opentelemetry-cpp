@@ -65,11 +65,10 @@ private:
 
 Tracer::Tracer(nostd::string_view /*output*/) {}
 
-nostd::shared_ptr<trace::Span> Tracer::StartSpan(
-    nostd::string_view name,
-    const common::KeyValueIterable &attributes,
-    const trace::SpanContextKeyValueIterable &links,
-    const trace::StartSpanOptions &options) noexcept
+nostd::shared_ptr<trace::Span> Tracer::StartSpan(nostd::string_view name,
+                                                 const common::KeyValueIterable &attributes,
+                                                 const trace::SpanContextKeyValueIterable &links,
+                                                 const trace::StartSpanOptions &options) noexcept
 {
   return nostd::shared_ptr<trace::Span>{
       new (std::nothrow) Span{this->shared_from_this(), name, attributes, links, options}};

@@ -58,7 +58,7 @@ public:
     // extract context from grpc metadata
     GrpcServerCarrier carrier(context);
 
-    auto prop = context::propagation::GlobalTextMapPropagator::GetGlobalPropagator();
+    auto prop        = context::propagation::GlobalTextMapPropagator::GetGlobalPropagator();
     auto current_ctx = context::RuntimeContext::GetCurrent();
     auto new_context = prop->Extract(carrier, current_ctx);
     options.parent   = GetSpan(new_context)->GetContext();
