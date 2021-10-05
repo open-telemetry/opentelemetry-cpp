@@ -15,12 +15,12 @@
 
 using namespace opentelemetry::sdk::logs;
 namespace logs_api = opentelemetry::logs;
-namespace nostd = opentelemetry::nostd;
+namespace nostd    = opentelemetry::nostd;
 
 TEST(LoggerProviderSDK, PushToAPI)
 {
   auto lp = nostd::shared_ptr<logs_api::LoggerProvider>(
-      new opentelemetry::sdk::logs_api::LoggerProvider());
+      new opentelemetry::sdk::logs::LoggerProvider());
   logs_api::Provider::SetLoggerProvider(lp);
 
   // Check that the loggerprovider was correctly pushed into the API

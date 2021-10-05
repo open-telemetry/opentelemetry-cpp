@@ -5,18 +5,18 @@
 
 #  include "opentelemetry/sdk/logs/logger_provider.h"
 
-namespace nostd = opentelemetry::nostd;
-namespace logs = opentelemetry::logs;
-
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace sdk
 {
 namespace logs
 {
 
+namespace nostd     = opentelemetry::nostd;
+namespace logs_api  = opentelemetry::logs;
+
 LoggerProvider::LoggerProvider() noexcept : processor_{nullptr} {}
 
-nostd::shared_ptr<logs::Logger> LoggerProvider::GetLogger(
+nostd::shared_ptr<logs_api::Logger> LoggerProvider::GetLogger(
     nostd::string_view name,
     nostd::string_view options) noexcept
 {
@@ -27,7 +27,7 @@ nostd::shared_ptr<logs::Logger> LoggerProvider::GetLogger(
   auto loggerkv = loggers_.find(name.data());
   if (loggerkv != loggers_.end())
   {
-    return nostd::shared_ptr<logs::Logger>(loggerkv->second);
+    return nostd::shared_ptr<logs_api::Logger>(loggerkv->second);
   }
 
   // Check if creating a new logger would exceed the max number of loggers
@@ -45,13 +45,13 @@ nostd::shared_ptr<logs::Logger> LoggerProvider::GetLogger(
 
   // If no logger with that name exists yet, create it and add it to the map of loggers
 
-  nostd::shared_ptr<logs::Logger> logger(
+  nostd::shared_ptr<logs_api::Logger> logger(
       new Logger(name, this->shared_from_this()));
   loggers_[name.data()] = logger;
   return logger;
 }
 
-nostd::shared_ptr<logs::Logger> LoggerProvider::GetLogger(
+nostd::shared_ptr<logs_api::Logger> LoggerProvider::GetLogger(
     nostd::string_view name,
     nostd::span<nostd::string_view> args) noexcept
 {

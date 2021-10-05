@@ -9,10 +9,11 @@
 #  include "opentelemetry/sdk/metrics/meter_provider.h"
 #  include "opentelemetry/sdk/metrics/ungrouped_processor.h"
 
-namespace sdkmetrics = opentelemetry::sdk::metrics;
-namespace nostd      = opentelemetry::nostd;
+namespace sdkmetrics      = opentelemetry::sdk::metrics;
+namespace nostd           = opentelemetry::nostd;
+namespace common          = opentelemetry::common;
 namespace exportermetrics = opentelemetry::exporter::metrics;
-namespace metrics_api = opentelemetry::metrics;
+namespace metrics_api     = opentelemetry::metrics;
 
 
 int main()
