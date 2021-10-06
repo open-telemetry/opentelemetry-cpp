@@ -20,11 +20,12 @@ namespace
 {
 static constexpr const char *providerName = "OpenTelemetry-ETW-StressTest";
 
-static exporter::etw::TracerProviderOptions providerOptions = {{"enableTraceId", false},
-                                                               {"enableSpanId", false},
-                                                               {"enableActivityId", false},
-                                                               {"enableRelatedActivityId", false},
-                                                               {"enableAutoParent", false}};
+static exporter::etw::TelemetryProviderOptions providerOptions = {
+    {"enableTraceId", false},
+    {"enableSpanId", false},
+    {"enableActivityId", false},
+    {"enableRelatedActivityId", false},
+    {"enableAutoParent", false}};
 
 class ETWProviderStressTest
 {
