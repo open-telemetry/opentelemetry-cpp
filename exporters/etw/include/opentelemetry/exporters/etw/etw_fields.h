@@ -121,7 +121,7 @@
 #  define ETW_FIELD_STATUSCODE      "StatusCode"            /* Span status code        */
 #  define ETW_FIELD_STATUSMESSAGE   "StatusMessage"         /* Span status message     */
 #  define ETW_FIELD_SUCCESS         "Success"               /* Span success            */
-#  define ETW_FIELD_TIMESTAMP        "Timestamp"            /* Log timestamp   */
+#  define ETW_FIELD_TIMESTAMP       "Timestamp"             /* Log timestamp   */
 
 /* Value constants */
 #  define ETW_VALUE_SPAN            "Span"                  /* ETW event name for Span */
