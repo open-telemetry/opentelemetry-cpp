@@ -125,7 +125,7 @@
 
 /* Value constants */
 #  define ETW_VALUE_SPAN            "Span"                  /* ETW event name for Span */
-#  define ETW_VALUE_LOG             "Log"                  /* ETW event name for Log */
+#  define ETW_VALUE_LOG             "Log"                   /* ETW event name for Log */
 
 #  define ETW_VALUE_SPAN_START      "SpanStart"             /* ETW for Span Start      */
 #  define ETW_VALUE_SPAN_END        "SpanEnd"               /* ETW for Span Start      */
