@@ -33,7 +33,7 @@ template <class T>
 class GaugeAggregator : public Aggregator<T>
 {
 public:
-  explicit GaugeAggregator<T>(metrics_api::InstrumentKind kind)
+  explicit GaugeAggregator(metrics_api::InstrumentKind kind)
   {
     static_assert(std::is_arithmetic<T>::value, "Not an arithmetic type");
     this->kind_        = kind;
