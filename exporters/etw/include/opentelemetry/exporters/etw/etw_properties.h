@@ -188,7 +188,8 @@ public:
    * @return
    */
   template <typename T>
-  PropertyValue(std::vector<T> value) : PropertyVariant(value) {}
+  PropertyValue(std::vector<T> value) : PropertyVariant(value)
+  {}
 
   /**
    * @brief Convert owning PropertyValue to non-owning common::AttributeValue
