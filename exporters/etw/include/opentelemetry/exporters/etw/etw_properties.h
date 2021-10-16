@@ -132,7 +132,7 @@ public:
    * @param v
    * @return
    */
-  PropertyValue(bool value) : PropertyVariant(value){}
+  PropertyValue(bool value) : PropertyVariant(value) {}
 
   /**
    * @brief PropertyValue from integral.
@@ -140,7 +140,8 @@ public:
    * @return
    */
   template <typename TInteger, std::enable_if_t<std::is_integral<TInteger>::value, bool> = true>
-  PropertyValue(TInteger number) : PropertyVariant(number){}
+  PropertyValue(TInteger number) : PropertyVariant(number)
+  {}
 
   /**
    * @brief PropertyValue from floating point.
@@ -148,14 +149,15 @@ public:
    * @return
    */
   template <typename TFloat, std::enable_if_t<std::is_floating_point<TFloat>::value, bool> = true>
-  PropertyValue(TFloat number) : PropertyVariant(double(number)){}
+  PropertyValue(TFloat number) : PropertyVariant(double(number))
+  {}
 
   /**
    * @brief Default PropertyValue (int32_t=0)
    * @param v
    * @return
    */
-  PropertyValue() : PropertyVariant(int32_t(0)){}
+  PropertyValue() : PropertyVariant(int32_t(0)) {}
 
   /**
    * @brief PropertyValue from array of characters as string.
@@ -163,7 +165,7 @@ public:
    * @param v
    * @return
    */
-  PropertyValue(char value[]) : PropertyVariant(std::string(value)){}
+  PropertyValue(char value[]) : PropertyVariant(std::string(value)) {}
 
   /**
    * @brief PropertyValue from array of characters as string.
@@ -171,7 +173,7 @@ public:
    * @param v
    * @return
    */
-  PropertyValue(const char *value) : PropertyVariant(std::string(value)){}
+  PropertyValue(const char *value) : PropertyVariant(std::string(value)) {}
 
   /**
    * @brief PropertyValue from string.
@@ -179,14 +181,14 @@ public:
    * @param v
    * @return
    */
-  PropertyValue(const std::string &value) : PropertyVariant(value){}
+  PropertyValue(const std::string &value) : PropertyVariant(value) {}
 
   /**
    * @brief PropertyValue from vector as array.
    * @return
    */
   template <typename T>
-  PropertyValue(std::vector<T> value) : PropertyVariant(value){}
+  PropertyValue(std::vector<T> value) : PropertyVariant(value) {}
 
   /**
    * @brief Convert owning PropertyValue to non-owning common::AttributeValue
@@ -361,7 +363,7 @@ public:
   /**
    * @brief PropertyValueMap constructor.
    */
-  Properties() : PropertyValueMap(){}
+  Properties() : PropertyValueMap() {}
 
   /**
    * @brief PropertyValueMap constructor from initializer list.

@@ -498,7 +498,7 @@ public:
    * @param timeout Allow Tracer to drop data if timeout is reached
    * @return
    */
-  void ForceFlushWithMicroseconds(uint64_t) noexcept override{}
+  void ForceFlushWithMicroseconds(uint64_t) noexcept override {}
 
   /**
    * @brief Close tracer, spending up to given amount of microseconds to flush and close.
