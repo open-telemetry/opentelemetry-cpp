@@ -76,7 +76,7 @@ class Logger : public logs::Logger
   {
     static ETWProvider instance;  // C++11 magic static
     return instance;
-  };
+  }
 
   /**
    * @brief Init a reference to etw::ProviderHandle

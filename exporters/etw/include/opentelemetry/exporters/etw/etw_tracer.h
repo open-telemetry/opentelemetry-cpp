@@ -190,7 +190,7 @@ class Tracer : public trace::Tracer
   {
     static ETWProvider instance;  // C++11 magic static
     return instance;
-  };
+  }
 
   /**
    * @brief Internal method that allows to populate Links to other Spans.
@@ -219,7 +219,7 @@ class Tracer : public trace::Tracer
       });
       attributes[ETW_FIELD_SPAN_LINKS] = linksValue;
     }
-  };
+  }
 
   /**
    * @brief Allow our friendly etw::Span to end itself on Tracer.
@@ -320,9 +320,9 @@ class Tracer : public trace::Tracer
       UpdateStatus(currentSpan, evt);
       etwProvider().write(provHandle, evt, ActivityIdPtr, RelatedActivityIdPtr, 0, encoding);
     }
-  };
+  }
 
-  const trace::TraceId &trace_id() { return traceId_; };
+  const trace::TraceId &trace_id() { return traceId_; }
 
   friend class Span;
 
@@ -360,7 +360,7 @@ public:
     nostd::span<const uint8_t, trace::TraceId::kSize> traceIdBytes(
         traceIdPtr, traceIdPtr + trace::TraceId::kSize);
     traceId_ = trace::TraceId(traceIdBytes);
-  };
+  }
 
   /**
    * @brief Start Span
@@ -486,10 +486,10 @@ public:
       // - options.start_steady_time
       // - options.start_system_time
       etwProvider().write(provHandle, evt, ActivityIdPtr, RelatedActivityIdPtr, 1, encoding);
-    };
+    }
 
     return result;
-  };
+  }
 
   /**
    * @brief Force flush data to Tracer, spending up to given amount of microseconds to flush.
@@ -498,7 +498,7 @@ public:
    * @param timeout Allow Tracer to drop data if timeout is reached
    * @return
    */
-  void ForceFlushWithMicroseconds(uint64_t) noexcept override{};
+  void ForceFlushWithMicroseconds(uint64_t) noexcept override {}
 
   /**
    * @brief Close tracer, spending up to given amount of microseconds to flush and close.
@@ -515,7 +515,7 @@ public:
     {
       etwProvider().close(provHandle);
     }
-  };
+  }
 
   /**
    * @brief Add event data to span associated with tracer.
@@ -601,7 +601,7 @@ public:
 #endif
 
     etwProvider().write(provHandle, evt, ActivityIdPtr, nullptr, 0, encoding);
-  };
+  }
 
   /**
    * @brief Add event data to span associated with tracer.
@@ -615,7 +615,7 @@ public:
                 common::SystemTimestamp timestamp) noexcept
   {
     AddEvent(span, name, timestamp, sdk::GetEmptyAttributes());
-  };
+  }
 
   /**
    * @brief Add event data to span associated with tracer.
@@ -625,12 +625,12 @@ public:
   void AddEvent(trace::Span &span, nostd::string_view name)
   {
     AddEvent(span, name, std::chrono::system_clock::now(), sdk::GetEmptyAttributes());
-  };
+  }
 
   /**
    * @brief Tracer destructor.
    */
-  virtual ~Tracer() { CloseWithMicroseconds(0); };
+  virtual ~Tracer() { CloseWithMicroseconds(0); }
 };
 
 /**
@@ -766,7 +766,7 @@ public:
   {
     name_ = name;
     UNREFERENCED_PARAMETER(options);
-  };
+  }
 
   /**
    * @brief Span Destructor
@@ -840,7 +840,7 @@ public:
     // TODO: not implemented
     UNREFERENCED_PARAMETER(key);
     UNREFERENCED_PARAMETER(value);
-  };
+  }
 
   /**
    * @brief Update Span name.
@@ -900,7 +900,7 @@ public:
   /// Get Owner tracer of this Span
   /// </summary>
   /// <returns></returns>
-  trace::Tracer &tracer() const noexcept { return this->owner_; };
+  trace::Tracer &tracer() const noexcept { return this->owner_; }
 };
 
 /**

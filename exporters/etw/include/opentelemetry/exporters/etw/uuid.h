@@ -67,7 +67,7 @@ struct UUID
     {
       Data4[i] = 0;
     }
-  };
+  }
 
   /// <summary>
   /// A constructor that creates a UUID object from a hyphenated string as defined by
