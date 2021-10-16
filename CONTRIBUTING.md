@@ -97,6 +97,13 @@ git commit
 git push fork feature
 ```
 
+If you made changes to the Markdown documents (`*.md` files), install the latest
+[`markdownlint-cli`](https://github.com/igorshubovych/markdownlint-cli) and run:
+
+```sh
+markdownlint .
+```
+
 Open a pull request against the main `opentelemetry-cpp` repo.
 
 To run tests locally, please read the [CI instructions](ci/README.md).
@@ -144,6 +151,14 @@ If none of the above worked and the PR has been stuck for more than 2 weeks, the
 owner should bring it to the OpenTelemetry C++ SIG meeting. See
 [README.md](README.md#contributing) for the meeting link.
 
+## Design Choices
+
+As with other OpenTelemetry clients, opentelemetry-cpp follows the
+[opentelemetry-specification](https://github.com/open-telemetry/opentelemetry-specification).
+
+It's especially valuable to read through the [library
+guidelines](https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/library-guidelines.md).
+
 ## Useful Resources
 
 Hi! If you’re looking at this document, these resources will provide you the
@@ -168,43 +183,13 @@ the C++ repository.
   * The OpenTelemetry Specification describes the requirements and expectations
     of for all OpenTelemetry implementations.
 
-* Read through the [OpenTelemetry
-  Collector](https://github.com/open-telemetry/opentelemetry-collector) GitHub
-  repository.
-  * This repository has a lot of good information surrounding the OpenTelemetry
-    ecosystem. At the top of the
-    **[readme](https://github.com/open-telemetry/opentelemetry-collector/blob/main/README.md)**,
-    there are multiple links that give newcomers a good idea of what the project
-    is about and how to get involved in it.
-* Read through the OpenTelemetry Python documentation
+* Read through the OpenTelemetry C++ documentation
   * The
-    [API](https://opentelemetry-python.readthedocs.io/en/stable/api/api.html)
+    [API](https://opentelemetry-cpp.readthedocs.io/en/latest/api/api.html)
     and
-    [SDK](https://opentelemetry-python.readthedocs.io/en/stable/sdk/sdk.html)
+    [SDK](https://opentelemetry-cpp.readthedocs.io/en/latest/sdk/sdk.html)
     documentation provides a lot of information on what the classes and their
-    functions are used for. Since there is currently minimal documentation for
-    C++, use the Python repository’s extensive documentation to learn more about
-    how the API and SDK work.
-
-### Code Examples
-
-* Follow the [simple trace
-  example](https://github.com/open-telemetry/opentelemetry-cpp/pull/92) for an
-  introduction to basic OpenTelemetry functionality in C++. Currently the
-  example can be found in [PR
-  #94](https://github.com/open-telemetry/opentelemetry-cpp/pull/94).
-
-* Read through the [Java Quick-Start
-  Guide](https://github.com/open-telemetry/opentelemetry-java/blob/main/QUICKSTART.md).
-  This shows you how the classes and functions will interact in simple and easy
-  to digest examples.
-* Take a look at this [Java SDK
-  example](https://github.com/open-telemetry/opentelemetry-java/tree/main/examples/sdk-usage).
-  This shows a good use case of the SDK using stdout exporter.
-* Take a look at the [Java Jaeger
-  example](https://github.com/open-telemetry/opentelemetry-java/tree/main/examples/jaeger).
-  This provides a brief introduction to the Jaeger exporter, its interface, and
-  how to interact with the service.
+    functions are used for.
 
 Please contribute! You’re welcome to add more information if you come across any
 helpful resources.
