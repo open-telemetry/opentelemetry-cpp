@@ -132,7 +132,7 @@ void BM_AddPropertiesToTracer(benchmark::State &state)
   while (state.KeepRunning())
   {
     benchmark::DoNotOptimize(provider.AddProperties());
-  };
+  }
   provider.Teardown();
 }
 BENCHMARK(BM_AddPropertiesToTracer);
@@ -147,7 +147,7 @@ void BM_AddPropertiesStaticToTracer(benchmark::State &state)
   while (state.KeepRunning())
   {
     benchmark::DoNotOptimize(provider.AddPropertiesStatic());
-  };
+  }
   provider.Teardown();
 }
 BENCHMARK(BM_AddPropertiesStaticToTracer);
@@ -162,7 +162,7 @@ void BM_AddInitListToTracer(benchmark::State &state)
   while (state.KeepRunning())
   {
     benchmark::DoNotOptimize(provider.AddInitList());
-  };
+  }
   provider.Teardown();
 }
 BENCHMARK(BM_AddInitListToTracer);
@@ -178,7 +178,7 @@ void BM_AddMapToTracer(benchmark::State &state)
   while (state.KeepRunning())
   {
     benchmark::DoNotOptimize(provider.AddMap());
-  };
+  }
   provider.Teardown();
 }
 BENCHMARK(BM_AddMapToTracer);
