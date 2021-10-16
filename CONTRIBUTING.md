@@ -153,11 +153,43 @@ owner should bring it to the OpenTelemetry C++ SIG meeting. See
 
 ## Design Choices
 
-As with other OpenTelemetry clients, opentelemetry-dotnet follows the
+As with other OpenTelemetry clients, opentelemetry-cpp follows the
 [opentelemetry-specification](https://github.com/open-telemetry/opentelemetry-specification).
 
 It's especially valuable to read through the [library
 guidelines](https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/library-guidelines.md).
+
+## Useful Resources
+
+Hi! If you’re looking at this document, these resources will provide you the
+knowledge to get started as a newcomer to the OpenTelemetry project. They will
+help you understand the OpenTelemetry Project, its components, and specifically
+the C++ repository.
+
+### Reading Resources
+
+* Medium
+  [article](https://medium.com/opentelemetry/how-to-start-contributing-to-opentelemetry-b23991ad91f4)
+  (October 2019) on how to start contributing to the OpenTelemetry project.
+* Medium
+  [article](https://medium.com/opentelemetry/opentelemetry-beyond-getting-started-5ac43cd0fe26)
+  (January 2020) describing the overarching goals and use cases for
+  OpenTelemetry.
+
+### Relevant Documentation
+
+* [OpenTelemetry
+  Specification](https://github.com/open-telemetry/opentelemetry-specification)
+  * The OpenTelemetry Specification describes the requirements and expectations
+    of for all OpenTelemetry implementations.
+
+* Read through the OpenTelemetry C++ documentation
+  * The
+    [API](https://opentelemetry-cpp.readthedocs.io/en/latest/api/api.html)
+    and
+    [SDK](https://opentelemetry-cpp.readthedocs.io/en/latest/sdk/sdk.html)
+    documentation provides a lot of information on what the classes and their
+    functions are used for.
 
 Please contribute! You’re welcome to add more information if you come across any
 helpful resources.
