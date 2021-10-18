@@ -286,10 +286,8 @@ if((NOT WITH_API_ONLY)
             "git submodule update --init --recursive")
       endif()
     else()
-      message(
-        FATAL_ERROR
-          "\nnlohmann_json package was not found. Please install it externally before proceeding further."
-      )
+      # Let's fail with default find_package error
+      find_package(nlohmann_json REQUIRED)
     endif()
   else()
     message("Using external nlohmann::json")
