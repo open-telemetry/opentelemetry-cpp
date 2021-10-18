@@ -264,25 +264,32 @@ if((NOT WITH_API_ONLY)
   # nlohmann_json package is required for most SDK build configurations
   find_package(nlohmann_json QUIET)
   if(NOT nlohmann_json_FOUND)
-    message("Using local nlohmann::json from submodule")
-    set(JSON_BuildTests
-        OFF
-        CACHE INTERNAL "")
-    set(JSON_Install
-        ON
-        CACHE INTERNAL "")
-    if(EXISTS ${PROJECT_SOURCE_DIR}/third_party/nlohmann-json)
-      # This option allows to link nlohmann_json::nlohmann_json target
-      add_subdirectory(${PROJECT_SOURCE_DIR}/third_party/nlohmann-json)
-      # This option allows to add header to include directories
-      include_directories(
-        ${PROJECT_SOURCE_DIR}/third_party/nlohmann-json/single_include)
+    if(EXISTS ${PROJECT_SOURCE_DIR}/.git)
+      message("Trying to use local nlohmann::json from submodule")
+      set(JSON_BuildTests
+          OFF
+          CACHE INTERNAL "")
+      set(JSON_Install
+          ON
+          CACHE INTERNAL "")
+      if(EXISTS ${PROJECT_SOURCE_DIR}/third_party/nlohmann-json)
+        # This option allows to link nlohmann_json::nlohmann_json target
+        add_subdirectory(${PROJECT_SOURCE_DIR}/third_party/nlohmann-json)
+        # This option allows to add header to include directories
+        include_directories(
+          ${PROJECT_SOURCE_DIR}/third_party/nlohmann-json/single_include)
+      else()
+        message(
+          FATAL_ERROR
+            "\nnlohmann_json package was not found. Please either provide it manually or clone with submodules. "
+            "To initialize, fetch and checkout any nested submodules, you can use the following command:\n"
+            "git submodule update --init --recursive")
+      endif()
     else()
       message(
         FATAL_ERROR
-          "\nnlohmann_json package was not found. Please either provide it manually or clone with submodules. "
-          "To initialize, fetch and checkout any nested submodules, you can use the following command:\n"
-          "git submodule update --init --recursive")
+          "\nnlohmann_json package was not found. Please install it externally before proceeding further."
+      )
     endif()
   else()
     message("Using external nlohmann::json")
