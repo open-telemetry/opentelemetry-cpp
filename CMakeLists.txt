@@ -159,11 +159,15 @@ option(WITH_PROMETHEUS "Whether to include the Prometheus Client in the SDK"
 option(WITH_ELASTICSEARCH
        "Whether to include the Elasticsearch Client in the SDK" OFF)
 
+option(WITH_ZPAGES "Whether to include the Zpages Server in the SDK" OFF)
+
 option(WITH_JAEGER "Whether to include the Jaeger exporter" OFF)
 
 option(WITH_NO_GETENV "Whether the platform supports environment variables" OFF)
 
 option(BUILD_TESTING "Whether to enable tests" ON)
+
+option(BUILD_W3CTRACECONTEXT_TEST "Whether to build w3c trace context" OFF)
 
 if(WITH_NO_GENENV)
   add_definitions(-DNO_GETENV)
@@ -249,7 +253,14 @@ endif()
 # GNUInstallDirs.
 include(GNUInstallDirs)
 
-if(NOT WITH_API_ONLY)
+if((NOT WITH_API_ONLY)
+   OR WITH_ELASTICSEARCH
+   OR WITH_ZIPKIN
+   OR WITH_OTLP
+   OR WITH_OTLP_HTTP
+   OR WITH_ZPAGES
+   OR BUILD_W3CTRACECONTEXT_TEST
+   OR WITH_ETW)
   # nlohmann_json package is required for most SDK build configurations
   find_package(nlohmann_json QUIET)
   if(NOT nlohmann_json_FOUND)
