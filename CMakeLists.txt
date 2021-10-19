@@ -272,7 +272,7 @@ if((NOT WITH_API_ONLY)
       set(JSON_Install
           ON
           CACHE INTERNAL "")
-      if(EXISTS ${PROJECT_SOURCE_DIR}/third_party/nlohmann-json)
+      if(EXISTS ${PROJECT_SOURCE_DIR}/third_party/nlohmann-json/CMakeLists.txt)
         # This option allows to link nlohmann_json::nlohmann_json target
         add_subdirectory(${PROJECT_SOURCE_DIR}/third_party/nlohmann-json)
         # This option allows to add header to include directories
