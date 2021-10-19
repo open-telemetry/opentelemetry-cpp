@@ -63,7 +63,7 @@ auto exporter = std::unique_ptr<sdktrace::SpanExporter>(new otlp::OtlpHttpExport
 
 | Option       | Env Variable |Default          | Description |
 | ------------ |-----|------------ |------|
-| `url`   | `OTEL_EXPORTER_OTLP_ENDPOINT` | `http://localhost:4317/v1/traces`  | The OTLP HTTP endpoint to connect to |
+| `url`   | `OTEL_EXPORTER_OTLP_ENDPOINT` | `http://localhost:4318/v1/traces`  | The OTLP HTTP endpoint to connect to |
 |              |   `OTEL_EXPORTER_OTLP_TRACES_ENDPOINT`  |  | |
 | `content_type` | n/a  | `application/json`  |   Data format used - JSON or Binary |
 | `json_bytes_mapping`  |  n/a | `JsonBytesMappingKind::kHexId` | Encoding used for trace_id and span_id |

@@ -38,7 +38,7 @@ inline const std::string GetOtlpDefaultHttpEndpoint()
 {
   constexpr char kOtlpTracesEndpointEnv[] = "OTEL_EXPORTER_OTLP_TRACES_ENDPOINT";
   constexpr char kOtlpEndpointEnv[]       = "OTEL_EXPORTER_OTLP_ENDPOINT";
-  constexpr char kOtlpEndpointDefault[]   = "http://localhost:4317/v1/traces";
+  constexpr char kOtlpEndpointDefault[]   = "http://localhost:4318/v1/traces";
 
   auto endpoint = opentelemetry::sdk::common::GetEnvironmentVariable(kOtlpTracesEndpointEnv);
   if (endpoint.empty())
