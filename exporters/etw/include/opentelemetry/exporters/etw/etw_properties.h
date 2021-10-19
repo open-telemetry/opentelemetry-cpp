@@ -83,7 +83,7 @@ class PropertyValue : public PropertyVariant
   static std::vector<T> to_vector(const nostd::span<const T, nostd::dynamic_extent> &source)
   {
     return std::vector<T>(source.begin(), source.end());
-  };
+  }
 
   /**
    * @brief Convert span<string_view> to vector<string>
@@ -98,7 +98,7 @@ class PropertyValue : public PropertyVariant
       result.push_back(std::string(item.data()));
     }
     return result;
-  };
+  }
 
   /**
    * @brief Convert vector<INTEGRAL> to span<INTEGRAL>.
@@ -111,7 +111,7 @@ class PropertyValue : public PropertyVariant
   {
     nostd::span<const T> result(vec.data(), vec.size());
     return result;
-  };
+  }
 
   /**
    * @brief Convert vector<FLOAT> to span<const FLOAT>.
@@ -124,7 +124,7 @@ class PropertyValue : public PropertyVariant
   {
     nostd::span<const T> result(vec.data(), vec.size());
     return result;
-  };
+  }
 
 public:
   /**
@@ -132,7 +132,7 @@ public:
    * @param v
    * @return
    */
-  PropertyValue(bool value) : PropertyVariant(value){};
+  PropertyValue(bool value) : PropertyVariant(value) {}
 
   /**
    * @brief PropertyValue from integral.
@@ -140,7 +140,8 @@ public:
    * @return
    */
   template <typename TInteger, std::enable_if_t<std::is_integral<TInteger>::value, bool> = true>
-  PropertyValue(TInteger number) : PropertyVariant(number){};
+  PropertyValue(TInteger number) : PropertyVariant(number)
+  {}
 
   /**
    * @brief PropertyValue from floating point.
@@ -148,14 +149,15 @@ public:
    * @return
    */
   template <typename TFloat, std::enable_if_t<std::is_floating_point<TFloat>::value, bool> = true>
-  PropertyValue(TFloat number) : PropertyVariant(double(number)){};
+  PropertyValue(TFloat number) : PropertyVariant(double(number))
+  {}
 
   /**
    * @brief Default PropertyValue (int32_t=0)
    * @param v
    * @return
    */
-  PropertyValue() : PropertyVariant(int32_t(0)){};
+  PropertyValue() : PropertyVariant(int32_t(0)) {}
 
   /**
    * @brief PropertyValue from array of characters as string.
@@ -163,7 +165,7 @@ public:
    * @param v
    * @return
    */
-  PropertyValue(char value[]) : PropertyVariant(std::string(value)){};
+  PropertyValue(char value[]) : PropertyVariant(std::string(value)) {}
 
   /**
    * @brief PropertyValue from array of characters as string.
@@ -171,7 +173,7 @@ public:
    * @param v
    * @return
    */
-  PropertyValue(const char *value) : PropertyVariant(std::string(value)){};
+  PropertyValue(const char *value) : PropertyVariant(std::string(value)) {}
 
   /**
    * @brief PropertyValue from string.
@@ -179,14 +181,15 @@ public:
    * @param v
    * @return
    */
-  PropertyValue(const std::string &value) : PropertyVariant(value){};
+  PropertyValue(const std::string &value) : PropertyVariant(value) {}
 
   /**
    * @brief PropertyValue from vector as array.
    * @return
    */
   template <typename T>
-  PropertyValue(std::vector<T> value) : PropertyVariant(value){};
+  PropertyValue(std::vector<T> value) : PropertyVariant(value)
+  {}
 
   /**
    * @brief Convert owning PropertyValue to non-owning common::AttributeValue
@@ -217,11 +220,11 @@ public:
       case common::AttributeType::kTypeCString: {
         PropertyVariant::operator=(nostd::get<const char *>(v));
         break;
-      };
+      }
       case common::AttributeType::kTypeString: {
         PropertyVariant::operator=(nostd::string_view(nostd::get<nostd::string_view>(v)).data());
         break;
-      };
+      }
 
       case common::AttributeType::kTypeSpanByte:
         PropertyVariant::operator=(to_vector(nostd::get<nostd::span<const uint8_t>>(v)));
@@ -361,7 +364,7 @@ public:
   /**
    * @brief PropertyValueMap constructor.
    */
-  Properties() : PropertyValueMap(){};
+  Properties() : PropertyValueMap() {}
 
   /**
    * @brief PropertyValueMap constructor from initializer list.
@@ -369,7 +372,7 @@ public:
   Properties(const std::initializer_list<PropertyValueType> properties) : PropertyValueMap()
   {
     (*this) = (properties);
-  };
+  }
 
   /**
    * @brief PropertyValueMap assignment operator from initializer list.
@@ -378,12 +381,12 @@ public:
   {
     PropertyValueMap::operator=(properties);
     return (*this);
-  };
+  }
 
   /**
    * @brief PropertyValueMap constructor from map.
    */
-  Properties(const PropertyValueMap &properties) : PropertyValueMap() { (*this) = properties; };
+  Properties(const PropertyValueMap &properties) : PropertyValueMap() { (*this) = properties; }
 
   /**
    * @brief PropertyValueMap assignment operator from map.
@@ -392,7 +395,7 @@ public:
   {
     PropertyValueMap::operator=(properties);
     return (*this);
-  };
+  }
 
   /**
    * @brief PropertyValueMap constructor from KeyValueIterable
@@ -414,7 +417,7 @@ public:
       return true;
     });
     return (*this);
-  };
+  }
 
   /**
    * @brief PropertyValueMap property accessor.
@@ -439,12 +442,12 @@ public:
       }
     }
     return true;
-  };
+  }
 
   /**
    * @return the number of key-value pairs
    */
-  size_t size() const noexcept override { return PropertyValueMap::size(); };
+  size_t size() const noexcept override { return PropertyValueMap::size(); }
 };
 
 }  // namespace etw

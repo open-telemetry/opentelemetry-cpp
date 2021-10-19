@@ -121,11 +121,21 @@
 #  define ETW_FIELD_STATUSCODE      "StatusCode"            /* Span status code        */
 #  define ETW_FIELD_STATUSMESSAGE   "StatusMessage"         /* Span status message     */
 #  define ETW_FIELD_SUCCESS         "Success"               /* Span success            */
+#  define ETW_FIELD_TIMESTAMP       "Timestamp"             /* Log timestamp   */
 
 /* Value constants */
 #  define ETW_VALUE_SPAN            "Span"                  /* ETW event name for Span */
+#  define ETW_VALUE_LOG             "Log"                   /* ETW event name for Log */
+
 #  define ETW_VALUE_SPAN_START      "SpanStart"             /* ETW for Span Start      */
 #  define ETW_VALUE_SPAN_END        "SpanEnd"               /* ETW for Span Start      */
+
+
+/* Log specific */
+# define ETW_FIELD_LOG_BODY               "body"                 /* Log body   */
+# define ETW_FIELD_LOG_SEVERITY_TEXT      "severityText"         /* Sev text  */
+# define ETW_FIELD_LOG_SEVERITY_NUM       "severityNumber"      /* Sev num   */
+
 
 #endif
 
