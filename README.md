@@ -50,7 +50,7 @@ of the current project.
 
 | Platform                                                            |   Build type  |
 |---------------------------------------------------------------------|---------------|
-| ubuntu-18.04 (Default GCC Compiler - 7.5.0)                         | CMake, Bazel  |
+| ubuntu-20.04 (Default GCC Compiler - 9.3.0)                         | CMake, Bazel  |
 | ubuntu-18.04 (GCC 4.8 with -std=c++11 flag)                         | CMake [1]     |
 | ubuntu-20.04 (Default GCC Compiler - 9.3.0 with -std=c++20 flags)   | CMake, Bazel  |
 | macOS 10.15 (Xcode 12.2)                                            | Bazel         |

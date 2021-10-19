@@ -21,6 +21,7 @@
 
 #include "opentelemetry/sdk/trace/exporter.h"
 
+#include "opentelemetry/exporters/etw/etw_config.h"
 #include "opentelemetry/exporters/etw/etw_provider.h"
 #include "opentelemetry/exporters/etw/etw_tracer.h"
 
