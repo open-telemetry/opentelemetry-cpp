@@ -15,6 +15,8 @@ project(opentelemetry-cpp)
 # Mark variables as used so cmake doesn't complain about them
 mark_as_advanced(CMAKE_TOOLCHAIN_FILE)
 
+list(APPEND CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake/modules/")
+
 if(DEFINED ENV{ARCH})
   # Architecture may be specified via ARCH environment variable
   set(ARCH $ENV{ARCH})
@@ -219,7 +221,7 @@ function(install_windows_deps)
 endfunction()
 
 if(WITH_JAEGER)
-  find_package(Thrift QUIET CONFIG)
+  find_package(Thrift QUIET)
   if(NOT Thrift_FOUND)
     # Install Thrift and propagate via vcpkg toolchain file
     if(WIN32 AND (NOT DEFINED CMAKE_TOOLCHAIN_FILE))
