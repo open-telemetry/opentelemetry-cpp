@@ -159,11 +159,15 @@ option(WITH_PROMETHEUS "Whether to include the Prometheus Client in the SDK"
 option(WITH_ELASTICSEARCH
        "Whether to include the Elasticsearch Client in the SDK" OFF)
 
+option(WITH_ZPAGES "Whether to include the Zpages Server in the SDK" OFF)
+
 option(WITH_JAEGER "Whether to include the Jaeger exporter" OFF)
 
 option(WITH_NO_GETENV "Whether the platform supports environment variables" OFF)
 
 option(BUILD_TESTING "Whether to enable tests" ON)
+
+option(BUILD_W3CTRACECONTEXT_TEST "Whether to build w3c trace context" OFF)
 
 if(WITH_NO_GENENV)
   add_definitions(-DNO_GETENV)
@@ -249,29 +253,41 @@ endif()
 # GNUInstallDirs.
 include(GNUInstallDirs)
 
-if(NOT WITH_API_ONLY)
+if((NOT WITH_API_ONLY)
+   OR WITH_ELASTICSEARCH
+   OR WITH_ZIPKIN
+   OR WITH_OTLP
+   OR WITH_OTLP_HTTP
+   OR WITH_ZPAGES
+   OR BUILD_W3CTRACECONTEXT_TEST
+   OR WITH_ETW)
   # nlohmann_json package is required for most SDK build configurations
   find_package(nlohmann_json QUIET)
   if(NOT nlohmann_json_FOUND)
-    message("Using local nlohmann::json from submodule")
-    set(JSON_BuildTests
-        OFF
-        CACHE INTERNAL "")
-    set(JSON_Install
-        ON
-        CACHE INTERNAL "")
-    if(EXISTS ${PROJECT_SOURCE_DIR}/third_party/nlohmann-json)
-      # This option allows to link nlohmann_json::nlohmann_json target
-      add_subdirectory(${PROJECT_SOURCE_DIR}/third_party/nlohmann-json)
-      # This option allows to add header to include directories
-      include_directories(
-        ${PROJECT_SOURCE_DIR}/third_party/nlohmann-json/single_include)
+    if(EXISTS ${PROJECT_SOURCE_DIR}/.git)
+      message("Trying to use local nlohmann::json from submodule")
+      set(JSON_BuildTests
+          OFF
+          CACHE INTERNAL "")
+      set(JSON_Install
+          ON
+          CACHE INTERNAL "")
+      if(EXISTS ${PROJECT_SOURCE_DIR}/third_party/nlohmann-json/CMakeLists.txt)
+        # This option allows to link nlohmann_json::nlohmann_json target
+        add_subdirectory(${PROJECT_SOURCE_DIR}/third_party/nlohmann-json)
+        # This option allows to add header to include directories
+        include_directories(
+          ${PROJECT_SOURCE_DIR}/third_party/nlohmann-json/single_include)
+      else()
+        message(
+          FATAL_ERROR
+            "\nnlohmann_json package was not found. Please either provide it manually or clone with submodules. "
+            "To initialize, fetch and checkout any nested submodules, you can use the following command:\n"
+            "git submodule update --init --recursive")
+      endif()
     else()
-      message(
-        FATAL_ERROR
-          "\nnlohmann_json package was not found. Please either provide it manually or clone with submodules. "
-          "To initialize, fetch and checkout any nested submodules, you can use the following command:\n"
-          "git submodule update --init --recursive")
+      # Let's fail with default find_package error
+      find_package(nlohmann_json REQUIRED)
     endif()
   else()
     message("Using external nlohmann::json")
