@@ -837,9 +837,12 @@ public:
    */
   void SetAttribute(nostd::string_view key, const common::AttributeValue &value) noexcept override
   {
-    // TODO: not implemented
-    UNREFERENCED_PARAMETER(key);
-    UNREFERENCED_PARAMETER(value);
+    // don't override fields propagated from span data.
+    if (key == ETW_FIELD_NAME || key == ETW_FIELD_SPAN_ID || key == ETW_FIELD_TRACE_ID)
+    {
+      return;
+    }
+    attributes_[std::string{key}].FromAttributeValue(value);
   }
 
   /**
