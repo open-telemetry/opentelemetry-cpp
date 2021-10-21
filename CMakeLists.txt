@@ -16,7 +16,7 @@ project(opentelemetry-cpp)
 mark_as_advanced(CMAKE_TOOLCHAIN_FILE)
 
 # Don't use customized cmake modules if vcpkg is used to resolve dependence.
-if (NOT DEFINED CMAKE_TOOLCHAIN_FILE)
+if(NOT DEFINED CMAKE_TOOLCHAIN_FILE)
   list(APPEND CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake/modules/")
 endif()
 
