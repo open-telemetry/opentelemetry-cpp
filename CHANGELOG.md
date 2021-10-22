@@ -22,7 +22,7 @@ Increment the:
 * [BUILD] Fix nlohmann_json package dependency ([#1017](https://github.com/open-telemetry/opentelemetry-cpp/pull/1017))
 * [EXPORTER] Change OTLP/HTTP default port from 4317 to 4318 ([#1018](https://github.com/open-telemetry/opentelemetry-cpp/pull/1018))
 * [EXPORTER] ETW Log Exporter ([#1006](https://github.com/open-telemetry/opentelemetry-cpp/pull/1006))
-* [SDK] Adding new Logger:log() method ([#1005](https://github.com/open-telemetry/opentelemetry-cpp/pull/1005))
+* [API] Adding new Logger:log() method ([#1005](https://github.com/open-telemetry/opentelemetry-cpp/pull/1005))
 * [EXPORTER] Remove scheme from OTLP endpoint before passing to gRPC ([#988](https://github.com/open-telemetry/opentelemetry-cpp/pull/988))
 * [BUILD] Update opentelemetry-proto for bazel build to 0.9.0 ([#984](https://github.com/open-telemetry/opentelemetry-cpp/pull/984))
 * [BUILD] Cross compling grpc_cpp_plugin not found bug ([#982](https://github.com/open-telemetry/opentelemetry-cpp/pull/982))
