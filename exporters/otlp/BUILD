@@ -19,17 +19,23 @@ load("//bazel:otel_cc_benchmark.bzl", "otel_cc_benchmark")
 cc_library(
     name = "otlp_recordable",
     srcs = [
+        "src/otlp_log_recordable.cc",
         "src/otlp_recordable.cc",
+        "src/otlp_recordable_utils.cc",
     ],
     hdrs = [
+        "include/opentelemetry/exporters/otlp/otlp_log_recordable.h",
         "include/opentelemetry/exporters/otlp/otlp_recordable.h",
+        "include/opentelemetry/exporters/otlp/otlp_recordable_utils.h",
         "include/opentelemetry/exporters/otlp/protobuf_include_prefix.h",
         "include/opentelemetry/exporters/otlp/protobuf_include_suffix.h",
     ],
     strip_include_prefix = "include",
     deps = [
+        "//sdk/src/logs",
         "//sdk/src/resource",
         "//sdk/src/trace",
+        "@com_github_opentelemetry_proto//:logs_proto_cc",
         "@com_github_opentelemetry_proto//:trace_proto_cc",
     ],
 )
