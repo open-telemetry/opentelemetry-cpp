@@ -39,6 +39,9 @@ if(WITH_OTLP_HTTP)
     PUBLIC opentelemetry_sdk opentelemetry_proto http_client_curl
            nlohmann_json::nlohmann_json)
 
+  list(APPEND OPENTELEMETRY_OTLP_TARGETS
+       opentelemetry_exporter_otlp_http_client)
+
   add_library(opentelemetry_exporter_otlp_http src/otlp_http_exporter.cc)
 
   set_target_properties(opentelemetry_exporter_otlp_http
