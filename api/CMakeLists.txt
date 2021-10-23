@@ -53,6 +53,14 @@ else()
   message("Building with nostd types...")
 endif()
 
+if(WITH_METRICS_PREVIEW)
+  target_compile_definitions(opentelemetry_api INTERFACE ENABLE_METRICS_PREVIEW)
+endif()
+
+if(WITH_LOGS_PREVIEW)
+  target_compile_definitions(opentelemetry_api INTERFACE ENABLE_LOGS_PREVIEW)
+endif()
+
 if(CORE_RUNTIME_LIBS)
   target_link_libraries(opentelemetry_api INTERFACE ${CORE_RUNTIME_LIBS})
 endif()
