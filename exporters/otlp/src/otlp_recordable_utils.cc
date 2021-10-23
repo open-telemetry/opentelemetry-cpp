@@ -3,6 +3,13 @@
 
 #include "opentelemetry/exporters/otlp/otlp_recordable_utils.h"
 
+#include "opentelemetry/exporters/otlp/protobuf_include_prefix.h"
+
+#include "opentelemetry/proto/logs/v1/logs.pb.h"
+#include "opentelemetry/proto/trace/v1/trace.pb.h"
+
+#include "opentelemetry/exporters/otlp/protobuf_include_suffix.h"
+
 #include "opentelemetry/exporters/otlp/otlp_log_recordable.h"
 #include "opentelemetry/exporters/otlp/otlp_recordable.h"
 
@@ -261,10 +268,10 @@ void OtlpRecordableUtils::PopulateRequest(
 
     if (first_pass)
     {
-      *instrumentation_lib->mutable_schema_url() = rec->GetInstrumentationLibrarySchemaURL();
+      instrumentation_lib->set_schema_url(rec->GetInstrumentationLibrarySchemaURL());
 
-      *resource_span->mutable_resource()   = rec->ProtoResource();
-      *resource_span->mutable_schema_url() = rec->GetResourceSchemaURL();
+      *resource_span->mutable_resource() = rec->ProtoResource();
+      *resource_span->set_schema_url(rec->GetResourceSchemaURL());
 
       first_pass = false;
     }
@@ -292,14 +299,14 @@ void OtlpRecordableUtils::PopulateRequest(
     *resource_logs->mutable_resource() = rec->ProtoResource();
 
     // TODO schema url
-    // *resource_logs->mutable_schema_url() = rec->GetResourceSchemaURL();
+    // *resource_logs->set_schema_url(rec->GetResourceSchemaURL());
 
     *instrumentation_lib->add_logs() = std::move(rec->log_record());
     // TODO instrumentation_library
     // *instrumentation_lib->mutable_instrumentation_library() =
     // rec->GetProtoInstrumentationLibrary();
     // TODO schema data
-    // *instrumentation_lib->mutable_schema_url() = rec->GetInstrumentationLibrarySchemaURL();
+    // *instrumentation_lib->set_schema_url(rec->GetInstrumentationLibrarySchemaURL());
   }
 }
 

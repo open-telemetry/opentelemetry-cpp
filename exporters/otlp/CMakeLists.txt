@@ -38,6 +38,10 @@ if(WITH_OTLP_HTTP)
     opentelemetry_exporter_otlp_http_client
     PUBLIC opentelemetry_sdk opentelemetry_proto http_client_curl
            nlohmann_json::nlohmann_json)
+  target_include_directories(
+    opentelemetry_exporter_otlp_http_client
+    PUBLIC "$<BUILD_INTERFACE:${CMAKE_CURRENT_LIST_DIR}/include>"
+           "$<INSTALL_INTERFACE:include>")
 
   list(APPEND OPENTELEMETRY_OTLP_TARGETS
        opentelemetry_exporter_otlp_http_client)
