@@ -23,9 +23,13 @@ OtlpHttpExporter::OtlpHttpExporter() : OtlpHttpExporter(OtlpHttpExporterOptions(
 
 OtlpHttpExporter::OtlpHttpExporter(const OtlpHttpExporterOptions &options)
     : options_(options),
-      http_client_(OtlpHttpClientOptions{
-          options.url, options.content_type, options.json_bytes_mapping, options.use_json_name,
-          options.console_debug, options.timeout, options.http_headers})
+      http_client_(OtlpHttpClientOptions(options.url,
+                                         options.content_type,
+                                         options.json_bytes_mapping,
+                                         options.use_json_name,
+                                         options.console_debug,
+                                         options.timeout,
+                                         options.http_headers))
 {}
 
 // ----------------------------- Exporter methods ------------------------------
