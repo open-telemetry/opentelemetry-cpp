@@ -36,13 +36,14 @@ OtlpHttpLogExporter::OtlpHttpLogExporter(const OtlpHttpLogExporterOptions &optio
 
 // ----------------------------- Exporter methods ------------------------------
 
-std::unique_ptr<sdk::logs::Recordable> OtlpHttpLogExporter::MakeRecordable() noexcept
+std::unique_ptr<opentelemetry::sdk::logs::Recordable> OtlpHttpLogExporter::MakeRecordable() noexcept
 {
-  return std::unique_ptr<sdk::logs::Recordable>(new exporter::otlp::OtlpLogRecordable());
+  return std::unique_ptr<opentelemetry::sdk::logs::Recordable>(
+      new exporter::otlp::OtlpLogRecordable());
 }
 
-sdk::common::ExportResult OtlpHttpLogExporter::Export(
-    const nostd::span<std::unique_ptr<sdk::logs::Recordable>> &spans) noexcept
+opentelemetry::sdk::common::ExportResult OtlpHttpLogExporter::Export(
+    const nostd::span<std::unique_ptr<opentelemetry::sdk::logs::Recordable>> &spans) noexcept
 {
   proto::collector::logs::v1::ExportLogsServiceRequest service_request;
   OtlpRecordableUtils::PopulateRequest(spans, &service_request);

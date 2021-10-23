@@ -72,14 +72,15 @@ public:
    * Create a span recordable.
    * @return a newly initialized Recordable object
    */
-  std::unique_ptr<sdk::trace::Recordable> MakeRecordable() noexcept override;
+  std::unique_ptr<opentelemetry::sdk::trace::Recordable> MakeRecordable() noexcept override;
 
   /**
    * Export
    * @param spans a span of unique pointers to span recordables
    */
-  sdk::common::ExportResult Export(
-      const nostd::span<std::unique_ptr<sdk::trace::Recordable>> &spans) noexcept override;
+  opentelemetry::sdk::common::ExportResult Export(
+      const nostd::span<std::unique_ptr<opentelemetry::sdk::trace::Recordable>> &spans) noexcept
+      override;
 
   /**
    * Shut down the exporter.

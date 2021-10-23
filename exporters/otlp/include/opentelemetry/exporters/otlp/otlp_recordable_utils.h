@@ -12,12 +12,18 @@
 #include "opentelemetry/exporters/otlp/protobuf_include_suffix.h"
 
 #include "opentelemetry/common/attribute_value.h"
+#include "opentelemetry/nostd/string_view.h"
 #include "opentelemetry/version.h"
 
 #include "opentelemetry/sdk/common/attribute_utils.h"
-#include "opentelemetry/sdk/logs/recordable.h"
 #include "opentelemetry/sdk/resource/resource.h"
 #include "opentelemetry/sdk/trace/recordable.h"
+
+#ifdef ENABLE_LOGS_PREVIEW
+#  include "opentelemetry/sdk/logs/recordable.h"
+#endif
+
+#include <memory>
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace exporter
@@ -43,12 +49,14 @@ public:
                                 const opentelemetry::sdk::resource::Resource &resource) noexcept;
 
   static void PopulateRequest(
-      const nostd::span<std::unique_ptr<sdk::trace::Recordable>> &spans,
+      const nostd::span<std::unique_ptr<opentelemetry::sdk::trace::Recordable>> &spans,
       proto::collector::trace::v1::ExportTraceServiceRequest *request) noexcept;
 
+#ifdef ENABLE_LOGS_PREVIEW
   static void PopulateRequest(
-      const nostd::span<std::unique_ptr<sdk::logs::Recordable>> &spans,
+      const nostd::span<std::unique_ptr<opentelemetry::sdk::logs::Recordable>> &spans,
       proto::collector::logs::v1::ExportLogsServiceRequest *request) noexcept;
+#endif
 };
 }  // namespace otlp
 }  // namespace exporter

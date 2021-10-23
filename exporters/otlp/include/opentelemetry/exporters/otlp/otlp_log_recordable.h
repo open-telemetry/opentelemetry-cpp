@@ -23,7 +23,7 @@ namespace otlp
 /**
  * An OTLP Recordable implemenation
  */
-class OtlpLogRecordable final : public sdk::logs::Recordable
+class OtlpLogRecordable final : public opentelemetry::sdk::logs::Recordable
 {
 public:
   virtual ~OtlpLogRecordable() = default;

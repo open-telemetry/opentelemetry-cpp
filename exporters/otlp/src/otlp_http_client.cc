@@ -501,12 +501,13 @@ void ConvertListFieldToJson(nlohmann::json &value,
 
 }  // namespace
 
-OtlpHttpClient::OtlpHttpClient(const OtlpHttpClientOptions &options)
+OtlpHttpClient::OtlpHttpClient(OtlpHttpClientOptions &&options)
     : options_(options), http_client_(http_client::HttpClientFactory::Create())
 {}
 
 // ----------------------------- HTTP Client methods ------------------------------
-sdk::common::ExportResult OtlpHttpClient::Export(const google::protobuf::Message &message) noexcept
+opentelemetry::sdk::common::ExportResult OtlpHttpClient::Export(
+    const google::protobuf::Message &message) noexcept
 {
   // Return failure if this exporter has been shutdown
   if (is_shutdown_)
@@ -518,7 +519,7 @@ sdk::common::ExportResult OtlpHttpClient::Export(const google::protobuf::Message
     }
     OTEL_INTERNAL_LOG_ERROR(error_message);
 
-    return sdk::common::ExportResult::kFailure;
+    return opentelemetry::sdk::common::ExportResult::kFailure;
   }
 
   // Parse uri and store it to cache
@@ -534,7 +535,7 @@ sdk::common::ExportResult OtlpHttpClient::Export(const google::protobuf::Message
       }
       OTEL_INTERNAL_LOG_ERROR(error_message.c_str());
 
-      return sdk::common::ExportResult::kFailure;
+      return opentelemetry::sdk::common::ExportResult::kFailure;
     }
 
     if (!parse_url.path_.empty() && parse_url.path_[0] == '/')
@@ -568,7 +569,7 @@ sdk::common::ExportResult OtlpHttpClient::Export(const google::protobuf::Message
         OTEL_INTERNAL_LOG_DEBUG("[OTLP HTTP Client] Serialize body failed(Binary):"
                                 << message.InitializationErrorString());
       }
-      return sdk::common::ExportResult::kFailure;
+      return opentelemetry::sdk::common::ExportResult::kFailure;
     }
     content_type = kHttpBinaryContentType;
   }
@@ -625,10 +626,10 @@ sdk::common::ExportResult OtlpHttpClient::Export(const google::protobuf::Message
   if (!write_successful)
   {
     // TODO: retry logic
-    return sdk::common::ExportResult::kFailure;
+    return opentelemetry::sdk::common::ExportResult::kFailure;
   }
 
-  return sdk::common::ExportResult::kSuccess;
+  return opentelemetry::sdk::common::ExportResult::kSuccess;
 }
 
 bool OtlpHttpClient::Shutdown(std::chrono::microseconds) noexcept

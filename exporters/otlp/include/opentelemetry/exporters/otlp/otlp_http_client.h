@@ -3,11 +3,6 @@
 
 #pragma once
 
-#include <chrono>
-#include <memory>
-#include <mutex>
-#include <string>
-
 #include "opentelemetry/exporters/otlp/protobuf_include_prefix.h"
 
 #include "google/protobuf/message.h"
@@ -19,6 +14,11 @@
 
 #include "opentelemetry/exporters/otlp/otlp_environment.h"
 
+#include <chrono>
+#include <memory>
+#include <mutex>
+#include <string>
+
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace exporter
 {
@@ -26,8 +26,6 @@ namespace otlp
 {
 // The default URL path to post metric data.
 constexpr char kDefaultMetricsPath[] = "/v1/metrics";
-// The default URL path to post metric data.
-constexpr char kDefaultLogPath[] = "/v1/logs";
 // The HTTP header "Content-Type"
 constexpr char kHttpJsonContentType[]   = "application/json";
 constexpr char kHttpBinaryContentType[] = "application/x-protobuf";
@@ -71,6 +69,22 @@ struct OtlpHttpClientOptions
 
   // Additional HTTP headers
   OtlpHeaders http_headers = GetOtlpDefaultHeaders();
+
+  inline OtlpHttpClientOptions(nostd::string_view input_url,
+                               HttpRequestContentType input_content_type,
+                               JsonBytesMappingKind input_json_bytes_mapping,
+                               bool input_use_json_name,
+                               bool input_console_debug,
+                               std::chrono::system_clock::duration input_timeout,
+                               const OtlpHeaders &input_http_headers)
+      : url(input_url),
+        content_type(input_content_type),
+        json_bytes_mapping(input_json_bytes_mapping),
+        use_json_name(input_use_json_name),
+        console_debug(input_console_debug),
+        timeout(input_timeout),
+        http_headers(input_http_headers)
+  {}
 };
 
 /**
@@ -82,7 +96,7 @@ public:
   /**
    * Create an OtlpHttpClient using the given options.
    */
-  explicit OtlpHttpClient(const OtlpHttpClientOptions &options);
+  explicit OtlpHttpClient(OtlpHttpClientOptions &&options);
 
   /**
    * Export

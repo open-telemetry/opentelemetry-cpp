@@ -13,6 +13,8 @@
 #include "opentelemetry/exporters/otlp/otlp_log_recordable.h"
 #include "opentelemetry/exporters/otlp/otlp_recordable.h"
 
+namespace nostd = opentelemetry::nostd;
+
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace exporter
 {
@@ -136,9 +138,10 @@ void OtlpRecordableUtils::PopulateAttribute(
 }
 
 /** Maps from C++ attribute into OTLP proto attribute. */
-void OtlpRecordableUtils::PopulateAttribute(opentelemetry::proto::common::v1::KeyValue *attribute,
-                                            nostd::string_view key,
-                                            const sdk::common::OwnedAttributeValue &value) noexcept
+void OtlpRecordableUtils::PopulateAttribute(
+    opentelemetry::proto::common::v1::KeyValue *attribute,
+    nostd::string_view key,
+    const opentelemetry::sdk::common::OwnedAttributeValue &value) noexcept
 {
   if (nullptr == attribute)
   {
@@ -147,9 +150,9 @@ void OtlpRecordableUtils::PopulateAttribute(opentelemetry::proto::common::v1::Ke
 
   // Assert size of variant to ensure that this method gets updated if the variant
   // definition changes
-  static_assert(
-      nostd::variant_size<sdk::common::OwnedAttributeValue>::value == kOwnedAttributeValueSize,
-      "OwnedAttributeValue contains unknown type");
+  static_assert(nostd::variant_size<opentelemetry::sdk::common::OwnedAttributeValue>::value ==
+                    kOwnedAttributeValueSize,
+                "OwnedAttributeValue contains unknown type");
 
   attribute->set_key(key.data(), key.size());
 
@@ -248,7 +251,7 @@ void OtlpRecordableUtils::PopulateAttribute(
 }
 
 void OtlpRecordableUtils::PopulateRequest(
-    const nostd::span<std::unique_ptr<sdk::trace::Recordable>> &spans,
+    const nostd::span<std::unique_ptr<opentelemetry::sdk::trace::Recordable>> &spans,
     proto::collector::trace::v1::ExportTraceServiceRequest *request) noexcept
 {
   if (nullptr == request)
@@ -278,8 +281,9 @@ void OtlpRecordableUtils::PopulateRequest(
   }
 }
 
+#ifdef ENABLE_LOGS_PREVIEW
 void OtlpRecordableUtils::PopulateRequest(
-    const nostd::span<std::unique_ptr<sdk::logs::Recordable>> &spans,
+    const nostd::span<std::unique_ptr<opentelemetry::sdk::logs::Recordable>> &spans,
     proto::collector::logs::v1::ExportLogsServiceRequest *request) noexcept
 {
   if (nullptr == request)
@@ -309,6 +313,7 @@ void OtlpRecordableUtils::PopulateRequest(
     // instrumentation_lib->set_schema_url(rec->GetInstrumentationLibrarySchemaURL());
   }
 }
+#endif
 
 }  // namespace otlp
 }  // namespace exporter

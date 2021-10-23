@@ -7,6 +7,8 @@
 
 #  include "opentelemetry/exporters/otlp/otlp_recordable_utils.h"
 
+namespace nostd = opentelemetry::nostd;
+
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace exporter
 {
