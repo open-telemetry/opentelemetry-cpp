@@ -9,6 +9,7 @@
 #include <string>
 #include <unordered_set>
 
+#include "opentelemetry/common/kv_properties.h"
 #include "opentelemetry/nostd/string_view.h"
 
 #include "opentelemetry/sdk/common/attribute_utils.h"
@@ -204,6 +205,48 @@ inline void DumpOtlpHeaders(OtlpHeaders &output,
 inline OtlpHeaders GetOtlpDefaultHeaders()
 {
   constexpr char kOtlpTracesHeadersEnv[] = "OTEL_EXPORTER_OTLP_TRACES_HEADERS";
+  constexpr char kOtlpHeadersEnv[]       = "OTEL_EXPORTER_OTLP_HEADERS";
+
+  OtlpHeaders result;
+  std::unordered_set<std::string> trace_remove_cache;
+  DumpOtlpHeaders(result, kOtlpHeadersEnv, trace_remove_cache);
+
+  trace_remove_cache.clear();
+  DumpOtlpHeaders(result, kOtlpTracesHeadersEnv, trace_remove_cache);
+
+  return result;
+}
+
+inline const std::string GetOtlpDefaultHttpLogEndpoint()
+{
+  constexpr char kOtlpTracesEndpointEnv[] = "OTEL_EXPORTER_OTLP_LOGS_ENDPOINT";
+  constexpr char kOtlpEndpointEnv[]       = "OTEL_EXPORTER_OTLP_ENDPOINT";
+  constexpr char kOtlpEndpointDefault[]   = "http://localhost:4318/v1/logs";
+
+  auto endpoint = opentelemetry::sdk::common::GetEnvironmentVariable(kOtlpTracesEndpointEnv);
+  if (endpoint.empty())
+  {
+    endpoint = opentelemetry::sdk::common::GetEnvironmentVariable(kOtlpEndpointEnv);
+  }
+  return endpoint.size() ? endpoint : kOtlpEndpointDefault;
+}
+
+inline const std::chrono::system_clock::duration GetOtlpDefaultLogTimeout()
+{
+  constexpr char kOtlpTracesTimeoutEnv[] = "OTEL_EXPORTER_OTLP_LOGS_TIMEOUT";
+  constexpr char kOtlpTimeoutEnv[]       = "OTEL_EXPORTER_OTLP_TIMEOUT";
+
+  auto timeout = opentelemetry::sdk::common::GetEnvironmentVariable(kOtlpTracesTimeoutEnv);
+  if (timeout.empty())
+  {
+    timeout = opentelemetry::sdk::common::GetEnvironmentVariable(kOtlpTimeoutEnv);
+  }
+  return GetOtlpTimeoutFromString(timeout.c_str());
+}
+
+inline OtlpHeaders GetOtlpDefaultLogHeaders()
+{
+  constexpr char kOtlpTracesHeadersEnv[] = "OTEL_EXPORTER_OTLP_LOGS_HEADERS";
   constexpr char kOtlpHeadersEnv[]       = "OTEL_EXPORTER_OTLP_HEADERS";
 
   OtlpHeaders result;

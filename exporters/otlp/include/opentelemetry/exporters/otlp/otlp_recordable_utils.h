@@ -5,6 +5,8 @@
 
 #include "opentelemetry/exporters/otlp/protobuf_include_prefix.h"
 
+#include "opentelemetry/proto/collector/logs/v1/logs_service.pb.h"
+#include "opentelemetry/proto/collector/trace/v1/trace_service.pb.h"
 #include "opentelemetry/proto/resource/v1/resource.pb.h"
 
 #include "opentelemetry/exporters/otlp/protobuf_include_suffix.h"
@@ -13,7 +15,9 @@
 #include "opentelemetry/version.h"
 
 #include "opentelemetry/sdk/common/attribute_utils.h"
+#include "opentelemetry/sdk/logs/recordable.h"
 #include "opentelemetry/sdk/resource/resource.h"
+#include "opentelemetry/sdk/trace/recordable.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace exporter
@@ -37,6 +41,14 @@ public:
 
   static void PopulateAttribute(opentelemetry::proto::resource::v1::Resource *proto,
                                 const opentelemetry::sdk::resource::Resource &resource) noexcept;
+
+  static void PopulateRequest(
+      const nostd::span<std::unique_ptr<sdk::trace::Recordable>> &spans,
+      proto::collector::trace::v1::ExportTraceServiceRequest *request) noexcept;
+
+  static void PopulateRequest(
+      const nostd::span<std::unique_ptr<sdk::logs::Recordable>> &spans,
+      proto::collector::logs::v1::ExportLogsServiceRequest *request) noexcept;
 };
 }  // namespace otlp
 }  // namespace exporter

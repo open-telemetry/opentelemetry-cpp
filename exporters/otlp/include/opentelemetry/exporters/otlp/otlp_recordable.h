@@ -21,6 +21,7 @@ namespace otlp
 class OtlpRecordable final : public sdk::trace::Recordable
 {
 public:
+  proto::trace::v1::Span &span() noexcept { return span_; }
   const proto::trace::v1::Span &span() const noexcept { return span_; }
 
   /** Dynamically converts the resource of this span into a proto. */

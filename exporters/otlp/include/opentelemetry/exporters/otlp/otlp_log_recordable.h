@@ -28,6 +28,7 @@ class OtlpLogRecordable final : public sdk::logs::Recordable
 public:
   virtual ~OtlpLogRecordable() = default;
 
+  proto::logs::v1::LogRecord &log_record() noexcept { return log_record_; }
   const proto::logs::v1::LogRecord &log_record() const noexcept { return log_record_; }
 
   /** Dynamically converts the resource of this span into a proto. */

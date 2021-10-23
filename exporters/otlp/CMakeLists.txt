@@ -31,6 +31,14 @@ endif()
 
 if(WITH_OTLP_HTTP)
   find_package(CURL REQUIRED)
+  add_library(opentelemetry_exporter_otlp_http_client src/otlp_http_client.cc)
+  set_target_properties(opentelemetry_exporter_otlp_http_client
+                        PROPERTIES EXPORT_NAME otlp_http_client)
+  target_link_libraries(
+    opentelemetry_exporter_otlp_http_client
+    PUBLIC opentelemetry_sdk opentelemetry_proto http_client_curl
+           nlohmann_json::nlohmann_json)
+
   add_library(opentelemetry_exporter_otlp_http src/otlp_http_exporter.cc)
 
   set_target_properties(opentelemetry_exporter_otlp_http
@@ -38,10 +46,22 @@ if(WITH_OTLP_HTTP)
 
   target_link_libraries(
     opentelemetry_exporter_otlp_http
-    PUBLIC opentelemetry_otlp_recordable http_client_curl
-           nlohmann_json::nlohmann_json)
+    PUBLIC opentelemetry_otlp_recordable
+           opentelemetry_exporter_otlp_http_client)
 
   list(APPEND OPENTELEMETRY_OTLP_TARGETS opentelemetry_exporter_otlp_http)
+
+  add_library(opentelemetry_exporter_otlp_http_log src/otlp_http_exporter.cc)
+
+  set_target_properties(opentelemetry_exporter_otlp_http_log
+                        PROPERTIES EXPORT_NAME otlp_http_log_exporter)
+
+  target_link_libraries(
+    opentelemetry_exporter_otlp_http_log
+    PUBLIC opentelemetry_otlp_recordable
+           opentelemetry_exporter_otlp_http_client)
+
+  list(APPEND OPENTELEMETRY_OTLP_TARGETS opentelemetry_exporter_otlp_http_log)
 endif()
 
 install(

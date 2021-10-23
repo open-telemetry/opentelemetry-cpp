@@ -3,6 +3,9 @@
 
 #include "opentelemetry/exporters/otlp/otlp_recordable_utils.h"
 
+#include "opentelemetry/exporters/otlp/otlp_log_recordable.h"
+#include "opentelemetry/exporters/otlp/otlp_recordable.h"
+
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace exporter
 {
@@ -234,6 +237,69 @@ void OtlpRecordableUtils::PopulateAttribute(
   for (const auto &kv : resource.GetAttributes())
   {
     OtlpRecordableUtils::PopulateAttribute(proto->add_attributes(), kv.first, kv.second);
+  }
+}
+
+void OtlpRecordableUtils::PopulateRequest(
+    const nostd::span<std::unique_ptr<sdk::trace::Recordable>> &spans,
+    proto::collector::trace::v1::ExportTraceServiceRequest *request) noexcept
+{
+  if (nullptr == request)
+  {
+    return;
+  }
+
+  auto resource_span       = request->add_resource_spans();
+  auto instrumentation_lib = resource_span->add_instrumentation_library_spans();
+  bool first_pass          = true;
+
+  for (auto &recordable : spans)
+  {
+    auto rec = std::unique_ptr<OtlpRecordable>(static_cast<OtlpRecordable *>(recordable.release()));
+    *instrumentation_lib->add_spans()                       = std::move(rec->span());
+    *instrumentation_lib->mutable_instrumentation_library() = rec->GetProtoInstrumentationLibrary();
+
+    if (first_pass)
+    {
+      *instrumentation_lib->mutable_schema_url() = rec->GetInstrumentationLibrarySchemaURL();
+
+      *resource_span->mutable_resource()   = rec->ProtoResource();
+      *resource_span->mutable_schema_url() = rec->GetResourceSchemaURL();
+
+      first_pass = false;
+    }
+  }
+}
+
+void OtlpRecordableUtils::PopulateRequest(
+    const nostd::span<std::unique_ptr<sdk::logs::Recordable>> &spans,
+    proto::collector::logs::v1::ExportLogsServiceRequest *request) noexcept
+{
+  if (nullptr == request)
+  {
+    return;
+  }
+
+  for (auto &recordable : spans)
+  {
+    auto resource_logs       = request->add_resource_logs();
+    auto instrumentation_lib = resource_logs->add_instrumentation_library_logs();
+
+    auto rec =
+        std::unique_ptr<OtlpLogRecordable>(static_cast<OtlpLogRecordable *>(recordable.release()));
+
+    // TODO schema url
+    *resource_logs->mutable_resource() = rec->ProtoResource();
+
+    // TODO schema url
+    // *resource_logs->mutable_schema_url() = rec->GetResourceSchemaURL();
+
+    *instrumentation_lib->add_logs() = std::move(rec->log_record());
+    // TODO instrumentation_library
+    // *instrumentation_lib->mutable_instrumentation_library() =
+    // rec->GetProtoInstrumentationLibrary();
+    // TODO schema data
+    // *instrumentation_lib->mutable_schema_url() = rec->GetInstrumentationLibrarySchemaURL();
   }
 }
 
