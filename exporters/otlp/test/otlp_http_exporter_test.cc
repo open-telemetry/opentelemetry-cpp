@@ -50,6 +50,7 @@ protected:
   std::vector<nlohmann::json> received_requests_json_;
   std::vector<opentelemetry::proto::collector::trace::v1::ExportTraceServiceRequest>
       received_requests_binary_;
+  std::map<std::string, std::string> received_requests_headers_;
 
 public:
   OtlpHttpExporterTestPeer() : is_setup_(false), is_running_(false){};
@@ -90,6 +91,7 @@ public:
         request_content_type = &it->second;
       }
     }
+    received_requests_headers_ = request.headers;
 
     int response_status = 0;
 
@@ -171,6 +173,8 @@ public:
     opts.url           = server_address_;
     opts.content_type  = content_type;
     opts.console_debug = true;
+    opts.http_headers.insert(
+        std::make_pair<const std::string, std::string>("Custom-Header-Key", "Custom-Header-Value"));
     return std::unique_ptr<sdk::trace::SpanExporter>(new OtlpHttpExporter(opts));
   }
 
@@ -239,6 +243,14 @@ TEST_F(OtlpHttpExporterTestPeer, ExportJsonIntegrationTest)
   auto span                         = *instrumentation_library_span["spans"].begin();
   auto received_trace_id            = span["trace_id"].get<std::string>();
   EXPECT_EQ(received_trace_id, report_trace_id);
+  {
+    auto custom_header = received_requests_headers_.find("Custom-Header-Key");
+    ASSERT_TRUE(custom_header != received_requests_headers_.end());
+    if (custom_header != received_requests_headers_.end())
+    {
+      EXPECT_EQ("Custom-Header-Value", custom_header->second);
+    }
+  }
 }
 
 // Create spans, let processor call Export()
