@@ -24,8 +24,8 @@ cc_library(
     ],
     strip_include_prefix = "include",
     deps = [
-        ":prometheus_exporter_utils",
         ":prometheus_collector",
+        ":prometheus_exporter_utils",
         "//api",
         "//sdk:headers",
         "@com_github_jupp0r_prometheus_cpp//core",
