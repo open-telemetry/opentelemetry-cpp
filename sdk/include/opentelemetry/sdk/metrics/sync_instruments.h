@@ -189,12 +189,12 @@ class BoundUpDownCounter final : public BoundSynchronousInstrument<T>,
 {
 
 public:
-  BoundUpDownCounter<T>() = default;
+  BoundUpDownCounter() = default;
 
-  BoundUpDownCounter<T>(nostd::string_view name,
-                        nostd::string_view description,
-                        nostd::string_view unit,
-                        bool enabled)
+  BoundUpDownCounter(nostd::string_view name,
+                     nostd::string_view description,
+                     nostd::string_view unit,
+                     bool enabled)
       : BoundSynchronousInstrument<T>(name,
                                       description,
                                       unit,
