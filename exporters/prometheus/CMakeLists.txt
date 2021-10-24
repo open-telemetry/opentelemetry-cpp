@@ -15,12 +15,12 @@
 include_directories(include)
 
 find_package(prometheus-cpp CONFIG REQUIRED)
-add_library(
-        prometheus_exporter src/prometheus_exporter.cc)
 
 add_library(
   prometheus_exporter src/prometheus_exporter.cc src/prometheus_collector.cc
                       src/prometheus_exporter_utils.cc)
+target_link_libraries(prometheus_exporter prometheus-cpp::pull
+                      prometheus-cpp::core)
 
 if(BUILD_TESTING)
   add_subdirectory(test)

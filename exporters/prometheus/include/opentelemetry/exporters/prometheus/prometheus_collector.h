@@ -8,10 +8,10 @@
 #  include <mutex>
 #  include <vector>
 
+#  include "opentelemetry/exporters/prometheus/prometheus_exporter_utils.h"
 #  include "opentelemetry/sdk/metrics/record.h"
 #  include "prometheus/collectable.h"
 #  include "prometheus/metric_family.h"
-#  include "opentelemetry/exporters/prometheus/prometheus_exporter_utils.h"
 
 namespace prometheus_client = ::prometheus;
 namespace metric_sdk        = opentelemetry::sdk::metrics;

@@ -16,15 +16,15 @@
 
 #pragma once
 #ifdef ENABLE_METRICS_PREVIEW
-#include <memory>
-#include <string>
-#include <vector>
+#  include <memory>
+#  include <string>
+#  include <vector>
 
-#include "opentelemetry/sdk/metrics/exporter.h"
-#include "opentelemetry/sdk/metrics/record.h"
-#include "opentelemetry/version.h"
-#include "prometheus/exposer.h"
-#include "opentelemetry/exporters/prometheus/prometheus_collector.h"
+#  include "opentelemetry/exporters/prometheus/prometheus_collector.h"
+#  include "opentelemetry/sdk/metrics/exporter.h"
+#  include "opentelemetry/sdk/metrics/record.h"
+#  include "opentelemetry/version.h"
+#  include "prometheus/exposer.h"
 
 /**
  * This class is an implementation of the MetricsExporter interface and
@@ -109,4 +109,4 @@ private:
 }  // namespace prometheus
 }  // namespace exporter
 OPENTELEMETRY_END_NAMESPACE
-#endif // ENABLE_METRICS_PREVIEW
+#endif  // ENABLE_METRICS_PREVIEW

@@ -15,7 +15,7 @@
  */
 
 #ifdef ENABLE_METRICS_PREVIEW
-#include "opentelemetry/exporters/prometheus/prometheus_exporter.h"
+#  include "opentelemetry/exporters/prometheus/prometheus_exporter.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 
@@ -61,7 +61,8 @@ sdk::common::ExportResult PrometheusExporter::Export(
   {
     return sdk::common::ExportResult::kFailureInvalidArgument;
   }
-  else if (collector_->GetCollection().size() + records.size() > (size_t)collector_->GetMaxCollectionSize())
+  else if (collector_->GetCollection().size() + records.size() >
+           (size_t)collector_->GetMaxCollectionSize())
   {
     return sdk::common::ExportResult::kFailureFull;
   }
@@ -106,4 +107,4 @@ bool PrometheusExporter::IsShutdown() const
 }  // namespace prometheus
 }  // namespace exporter
 OPENTELEMETRY_END_NAMESPACE
-#endif // ENABLE_METRICS_PREVIEW
+#endif  // ENABLE_METRICS_PREVIEW

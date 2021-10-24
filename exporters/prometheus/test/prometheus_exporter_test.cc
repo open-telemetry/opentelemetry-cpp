@@ -14,13 +14,15 @@
  * limitations under the License.
  */
 
-#include <gtest/gtest.h>
-#include <typeinfo>
+#ifdef ENABLE_METRICS_PREVIEW
 
-#include "opentelemetry/exporters/prometheus/prometheus_collector.h"
-#include "opentelemetry/exporters/prometheus/prometheus_exporter.h"
-#include "opentelemetry/sdk/metrics/aggregator/counter_aggregator.h"
-#include "opentelemetry/version.h"
+#  include <gtest/gtest.h>
+#  include <typeinfo>
+
+#  include "opentelemetry/exporters/prometheus/prometheus_collector.h"
+#  include "opentelemetry/exporters/prometheus/prometheus_exporter.h"
+#  include "opentelemetry/sdk/metrics/aggregator/counter_aggregator.h"
+#  include "opentelemetry/version.h"
 
 /**
  * PrometheusExporterTest is a friend class of PrometheusExporter.
@@ -45,8 +47,8 @@ OPENTELEMETRY_END_NAMESPACE
 using opentelemetry::exporter::prometheus::PrometheusCollector;
 using opentelemetry::exporter::prometheus::PrometheusExporter;
 using opentelemetry::exporter::prometheus::PrometheusExporterTest;
-using opentelemetry::sdk::metrics::CounterAggregator;
 using opentelemetry::sdk::common::ExportResult;
+using opentelemetry::sdk::metrics::CounterAggregator;
 using opentelemetry::sdk::metrics::Record;
 
 /**
@@ -84,7 +86,7 @@ TEST(PrometheusExporter, InitializeConstructorIsNotShutdown)
   PrometheusExporterTest p;
   PrometheusExporter exporter = p.GetExporter();
 
-  // Asserts that the exporter is not shutdown.
+  // // Asserts that the exporter is not shutdown.
   ASSERT_TRUE(!exporter.IsShutdown());
 }
 
@@ -212,3 +214,5 @@ TEST(PrometheusExporter, InvalidArgumentWhenPassedEmptyRecordCollection)
   ExportResult code = ExportResult::kFailureInvalidArgument;
   ASSERT_EQ(res, code);
 }
+
+#endif  // ENABLE_METRICS_PREVIEW
