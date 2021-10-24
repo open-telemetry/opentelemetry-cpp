@@ -67,7 +67,7 @@ public:
     {
       return;
     }
-    int port = server_.addListeningPort(14371);
+    int port = server_.addListeningPort(14372);
     std::ostringstream os;
     os << "localhost:" << port;
     server_address_ = "http://" + os.str() + "/v1/logs";
