@@ -35,7 +35,6 @@ BAZEL_STARTUP_OPTIONS="--output_user_root=$HOME/.cache/bazel"
 export CTEST_OUTPUT_ON_FAILURE=1
 
 if [[ "$1" == "cmake.test" ]]; then
-  install_prometheus_cpp_client
   cd "${BUILD_DIR}"
   rm -rf *
   cmake -DCMAKE_BUILD_TYPE=Debug  \

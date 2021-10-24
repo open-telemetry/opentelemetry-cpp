@@ -299,6 +299,24 @@ if((NOT WITH_API_ONLY)
   endif()
 endif()
 
+if(WITH_PROMETHEUS)
+  find_package(prometheus-cpp CONFIG QUIET)
+  if(NOT prometheus-cpp_FOUND)
+    message("Trying to use local prometheus-cpp from submodule")
+    if(EXISTS ${PROJECT_SOURCE_DIR}/third_party/prometheus-cpp/CMakeLists.txt)
+      add_subdirectory(third_party/prometheus-cpp)
+    else()
+      message(
+        FATAL_ERROR
+          "\nprometheus-cpp package was not found. Please either provide it manually or clone with submodules. "
+          "To initialize, fetch and checkout any nested submodules, you can use the following command:\n"
+          "git submodule update --init --recursive")
+    endif()
+  else()
+    message("Using external prometheus-cpp")
+  endif()
+endif()
+
 if(WITH_OTLP)
   set(protobuf_MODULE_COMPATIBLE ON)
   find_package(Protobuf)
