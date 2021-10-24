@@ -14,9 +14,11 @@
  * limitations under the License.
  */
 
+#ifdef ENABLE_METRICS_PREVIEW
 #include "opentelemetry/exporters/prometheus/prometheus_exporter.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
+
 namespace exporter
 {
 namespace prometheus
@@ -48,25 +50,25 @@ PrometheusExporter::PrometheusExporter() : is_shutdown_(false)
  * @param records: a collection of records to export
  * @return: returns a ReturnCode detailing a success, or type of failure
  */
-sdk::metrics::ExportResult PrometheusExporter::Export(
-    const std::vector<sdk::metrics::Record> &records) noexcept
+sdk::common::ExportResult PrometheusExporter::Export(
+    const std::vector<sdkmetrics::Record> &records) noexcept
 {
   if (is_shutdown_)
   {
-    return sdk::metrics::ExportResult::kFailure;
+    return sdk::common::ExportResult::kFailure;
   }
   else if (records.empty())
   {
-    return sdk::metrics::ExportResult::kFailureInvalidArgument;
+    return sdk::common::ExportResult::kFailureInvalidArgument;
   }
-  else if (collector_->GetCollection().size() + records.size() > collector_->GetMaxCollectionSize())
+  else if (collector_->GetCollection().size() + records.size() > (size_t)collector_->GetMaxCollectionSize())
   {
-    return sdk::metrics::ExportResult::kFailureFull;
+    return sdk::common::ExportResult::kFailureFull;
   }
   else
   {
     collector_->AddMetricData(records);
-    return sdk::metrics::ExportResult::kSuccess;
+    return sdk::common::ExportResult::kSuccess;
   }
 }
 
@@ -104,3 +106,4 @@ bool PrometheusExporter::IsShutdown() const
 }  // namespace prometheus
 }  // namespace exporter
 OPENTELEMETRY_END_NAMESPACE
+#endif // ENABLE_METRICS_PREVIEW

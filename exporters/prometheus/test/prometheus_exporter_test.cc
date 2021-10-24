@@ -46,7 +46,7 @@ using opentelemetry::exporter::prometheus::PrometheusCollector;
 using opentelemetry::exporter::prometheus::PrometheusExporter;
 using opentelemetry::exporter::prometheus::PrometheusExporterTest;
 using opentelemetry::sdk::metrics::CounterAggregator;
-using opentelemetry::sdk::metrics::ExportResult;
+using opentelemetry::sdk::common::ExportResult;
 using opentelemetry::sdk::metrics::Record;
 
 /**

@@ -15,7 +15,7 @@
  */
 
 #pragma once
-
+#ifdef ENABLE_METRICS_PREVIEW
 #include <memory>
 #include <string>
 #include <vector>
@@ -24,7 +24,7 @@
 #include "opentelemetry/sdk/metrics/record.h"
 #include "opentelemetry/version.h"
 #include "prometheus/exposer.h"
-#include "prometheus_collector.h"
+#include "opentelemetry/exporters/prometheus/prometheus_collector.h"
 
 /**
  * This class is an implementation of the MetricsExporter interface and
@@ -33,11 +33,13 @@
  */
 
 OPENTELEMETRY_BEGIN_NAMESPACE
+namespace sdkmetrics = opentelemetry::sdk::metrics;
+
 namespace exporter
 {
 namespace prometheus
 {
-class PrometheusExporter : public sdk::metrics::MetricsExporter
+class PrometheusExporter : public sdkmetrics::MetricsExporter
 {
 public:
   /**
@@ -52,8 +54,8 @@ public:
    * @param records: a collection of records to export
    * @return: returns a ReturnCode detailing a success, or type of failure
    */
-  sdk::metrics::ExportResult Export(
-      const std::vector<sdk::metrics::Record> &records) noexcept override;
+  sdk::common::ExportResult Export(
+      const std::vector<sdkmetrics::Record> &records) noexcept override;
 
   /**
    * Shuts down the exporter and does cleanup.
@@ -107,3 +109,4 @@ private:
 }  // namespace prometheus
 }  // namespace exporter
 OPENTELEMETRY_END_NAMESPACE
+#endif // ENABLE_METRICS_PREVIEW

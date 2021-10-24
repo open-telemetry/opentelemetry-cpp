@@ -20,13 +20,29 @@ cc_library(
         "src/prometheus_exporter.cc",
     ],
     hdrs = [
-        "include/opentelemetry/exporters/prometheus/prometheus_collector.h",
         "include/opentelemetry/exporters/prometheus/prometheus_exporter.h",
+    ],
+    strip_include_prefix = "include",
+    deps = [
+        ":prometheus_exporter_utils",
+        ":prometheus_collector",
+        "//api",
+        "//sdk:headers",
+        "@com_github_jupp0r_prometheus_cpp//core",
+        "@com_github_jupp0r_prometheus_cpp//pull",
+    ],
+)
+
+cc_library(
+    name = "prometheus_exporter_utils",
+    srcs = [
+        "src/prometheus_exporter_utils.cc",
+    ],
+    hdrs = [
         "include/opentelemetry/exporters/prometheus/prometheus_exporter_utils.h",
     ],
     strip_include_prefix = "include",
     deps = [
-        ":prometheus_collector",
         "//api",
         "//sdk:headers",
         "@com_github_jupp0r_prometheus_cpp//core",
@@ -37,31 +53,18 @@ cc_library(
 cc_library(
     name = "prometheus_collector",
     srcs = [
-        "src/prometheus_exporter.cc",
+        "src/prometheus_collector.cc",
     ],
     hdrs = [
         "include/opentelemetry/exporters/prometheus/prometheus_collector.h",
-        "include/opentelemetry/exporters/prometheus/prometheus_exporter.h",
-        "include/opentelemetry/exporters/prometheus/prometheus_exporter_utils.h",
     ],
     strip_include_prefix = "include",
     deps = [
-        ":prometheus_collector",
+        ":prometheus_exporter_utils",
         "//api",
         "//sdk:headers",
         "@com_github_jupp0r_prometheus_cpp//core",
         "@com_github_jupp0r_prometheus_cpp//pull",
-    ],
-)
-
-cc_test(
-    name = "prometheus_exporter_test",
-    srcs = [
-        "test/prometheus_exporter_test.cc",
-    ],
-    deps = [
-        ":prometheus_exporter",
-        "@com_google_googletest//:gtest_main",
     ],
 )
 
