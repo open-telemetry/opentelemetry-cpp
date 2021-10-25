@@ -3,19 +3,15 @@
 
 #pragma once
 #ifdef ENABLE_METRICS_PREVIEW
-
-#  include "instrument.h"
-#  include "opentelemetry/nostd/shared_ptr.h"
+#  include "c
 
 OPENTELEMETRY_BEGIN_NAMESPACE
-namespace metrics
+namespace metrics_new
 {
 
 /**
  * ObserverResult class is necessary for the callback recording asynchronous
- * instrument use.  Callback functions asynchronous instruments are designed to
- * accept a single ObserverResult object and update using its pointer to the
- * instrument itself.
+ * instrument use.
  */
 
 template <class T>
@@ -23,19 +19,11 @@ class ObserverResult
 {
 
 public:
-  ObserverResult() = default;
+  virtual void observe(T value) noexcept = 0;
 
-  ObserverResult(AsynchronousInstrument<T> *instrument) : instrument_(instrument) {}
-
-  virtual void observe(T value, const common::KeyValueIterable &labels)
-  {
-    instrument_->observe(value, labels);
-  }
-
-private:
-  AsynchronousInstrument<T> *instrument_;
+  virtual void observer(T value, const common::KeyValueIterable &labels) noexcept = 0;
 };
 
-}  // namespace metrics
+}  // namespace metrics_new
 OPENTELEMETRY_END_NAMESPACE
 #endif

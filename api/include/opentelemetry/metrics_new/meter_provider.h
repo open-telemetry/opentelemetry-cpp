@@ -26,8 +26,7 @@ public:
    */
   virtual nostd::shared_ptr<Meter> GetMeter(nostd::string_view library_name,
                                             nostd::string_view library_version = "",
-                                            nostd::string_view schema_url      = "") = 0;) = 0;
-};
+                                            nostd::string_view schema_url      = "") noexcept = 0;
 }  // namespace metrics
 OPENTELEMETRY_END_NAMESPACE
 #endif

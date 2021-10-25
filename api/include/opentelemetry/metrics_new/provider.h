@@ -54,6 +54,6 @@ private:
   }
 };
 
-}  // namespace metrics
+}  // namespace metrics_new
 OPENTELEMETRY_END_NAMESPACE
 #endif
