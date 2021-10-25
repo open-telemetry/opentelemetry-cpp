@@ -2,15 +2,14 @@
 // SPDX-License-Identifier: Apache-2.0
 
 #pragma once
-#ifdef ENABLE_METRICS_PREVIEW
 
-#  include "opentelemetry/metrics_new/async_instruments.h"
-#  include "opentelemetry/metrics_new/instrument.h"
-#  include "opentelemetry/metrics_new/sync_instruments.h"
-#  include "opentelemetry/nostd/shared_ptr.h"
-#  include "opentelemetry/nostd/span.h"
-#  include "opentelemetry/nostd/string_view.h"
-#  include "opentelemetry/version.h"
+#include "opentelemetry/metrics_new/async_instruments.h"
+#include "opentelemetry/metrics_new/instrument.h"
+#include "opentelemetry/metrics_new/sync_instruments.h"
+#include "opentelemetry/nostd/shared_ptr.h"
+#include "opentelemetry/nostd/span.h"
+#include "opentelemetry/nostd/string_view.h"
+#include "opentelemetry/version.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace metrics_new
@@ -36,9 +35,6 @@ public:
    * @param unit the unit of metric values following https://unitsofmeasure.org/ucum.html.
    * @param enabled a boolean value that turns on or off the metric instrument.
    * @return a shared pointer to the created Counter.
-   * @throws NullPointerException if {@code name} is null
-   * @throws IllegalArgumentException if a different metric by the same name exists in this meter.
-   * @throws IllegalArgumentException if the {@code name} does not match spec requirements.
    */
   virtual nostd::shared_ptr<Counter<short>> CreateShortCounter(
       nostd::string_view name,
@@ -249,4 +245,3 @@ public:
 };
 }  // namespace metrics_new
 OPENTELEMETRY_END_NAMESPACE
-#endif

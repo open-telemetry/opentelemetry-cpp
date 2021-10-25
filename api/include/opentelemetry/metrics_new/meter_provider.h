@@ -2,11 +2,10 @@
 // SPDX-License-Identifier: Apache-2.0
 
 #pragma once
-#ifdef ENABLE_METRICS_PREVIEW
 
-#  include "opentelemetry/metrics/meter.h"
-#  include "opentelemetry/nostd/shared_ptr.h"
-#  include "opentelemetry/nostd/string_view.h"
+#include "opentelemetry/metrics/meter.h"
+#include "opentelemetry/nostd/shared_ptr.h"
+#include "opentelemetry/nostd/string_view.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace metrics_new
@@ -29,4 +28,3 @@ public:
                                             nostd::string_view schema_url      = "") noexcept = 0;
 }  // namespace metrics
 OPENTELEMETRY_END_NAMESPACE
-#endif

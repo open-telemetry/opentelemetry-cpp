@@ -2,10 +2,9 @@
 // SPDX-License-Identifier: Apache-2.0
 
 #pragma once
-#ifdef ENABLE_METRICS_PREVIEW
 
-#  include "instrument.h"
-#  include "observer_result.h"
+#include "instrument.h"
+#include "observer_result.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace metrics_new

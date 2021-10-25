@@ -2,9 +2,12 @@
 // SPDX-License-Identifier: Apache-2.0
 
 #pragma once
-#ifdef ENABLE_METRICS_PREVIEW
+#ifndef ENABLE_METRICS_PREVIEW
 
-#  include "opentelemetry/common/key_value_iterable.h"
+#  include "opentelemetry/common/attribute_value.h"
+#  include "opentelemetry/common/key_value_iterable_view.h"
+#  include "opentelemetry/nostd/span.h"
+#  include "opentelemetry/nostd/string_view.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace metrics_new
@@ -23,7 +26,7 @@ public:
    *
    * @param value The increment amount. MUST be non-negative.
    */
-  virtual void add(T value) noexcept = 0;
+  virtual void Add(T value) noexcept = 0;
 
   /**
    * Add adds the value to the counter's sum. The attributes should contain
@@ -34,7 +37,22 @@ public:
    * @param attributes the set of attributes, as key-value pairs
    */
 
-  virtual void add(T value, const common::KeyValueIterable &attributes) noexcept = 0;
+  virtual void Add(T value, const common::KeyValueIterable &attributes) noexcept = 0;
+
+  template <class U,
+            nostd::enable_if_t<common::detail::is_key_value_iterable<U>::value> * = nullptr>
+  void Add(T value, const U &attributes) noexcept
+  {
+    this->Add(value, common::KeyValueIterableView<T>{attributes});
+  }
+
+  void Add(T value,
+           std::initializer_list<std::pair<nostd::string_view, common::AttributeValue>>
+               attributes) noexcept
+  {
+    this->Add(value, nostd::span<const std::pair<nostd::string_view, common::AttributeValue>>{
+                         attributes.begin(), attributes.end()});
+  }
 };
 
 /** A histogram instrument that records values. */
@@ -48,7 +66,7 @@ public:
    *
    * @param value The increment amount. May be positive, negative or zero.
    */
-  virtual void record(T value) noexcept = 0;
+  virtual void Record(T value) noexcept = 0;
 
   /**
    * Records a value with a set of attributes.
@@ -56,7 +74,22 @@ public:
    * @param value The increment amount. May be positive, negative or zero.
    * @param attributes A set of attributes to associate with the count.
    */
-  void record(T value, const common::KeyValueIterable &attributes) noexcept = 0;
+  virtual void Record(T value, const common::KeyValueIterable &attributes) noexcept = 0;
+
+  template <class U,
+            nostd::enable_if_t<common::detail::is_key_value_iterable<U>::value> * = nullptr>
+  void Record(T value, const U &attributes) noexcept
+  {
+    this->Record(value, common::KeyValueIterableView<T>{attributes});
+  }
+
+  void Record(T value,
+              std::initializer_list<std::pair<nostd::string_view, common::AttributeValue>>
+                  attributes) noexcept
+  {
+    this->Record(value, nostd::span<const std::pair<nostd::string_view, common::AttributeValue>>{
+                            attributes.begin(), attributes.end()});
+  }
 
 }
 
@@ -71,7 +104,7 @@ public:
    *
    * @param value The amount of the measurement.
    */
-  virtual void add(T value) noexcept = 0;
+  virtual void Add(T value) noexcept = 0;
 
   /**
    * Add a value with a set of attributes.
@@ -79,7 +112,22 @@ public:
    * @param value The increment amount. May be positive, negative or zero.
    * @param attributes A set of attributes to associate with the count.
    */
-  void add(T value, const common::KeyValueIterable &attributes) noexcept = 0;
+  void Add(T value, const common::KeyValueIterable &attributes) noexcept = 0;
+
+  template <class U,
+            nostd::enable_if_t<common::detail::is_key_value_iterable<U>::value> * = nullptr>
+  void Add(T value, const U &attributes) noexcept
+  {
+    this->Add(value, common::KeyValueIterableView<T>{attributes});
+  }
+
+  void Add(T value,
+           std::initializer_list<std::pair<nostd::string_view, common::AttributeValue>>
+               attributes) noexcept
+  {
+    this->Add(value, nostd::span<const std::pair<nostd::string_view, common::AttributeValue>>{
+                         attributes.begin(), attributes.end()});
+  }
 };
 
 }  // namespace metrics_new
