@@ -26,15 +26,15 @@ public:
   virtual void add(T value) noexcept = 0;
 
   /**
-   * Add adds the value to the counter's sum. The labels should contain
+   * Add adds the value to the counter's sum. The attributes should contain
    * the keys and values to be associated with this value.  Counters only
    * accept positive valued updates.
    *
    * @param value The increment amount. MUST be non-negative.
-   * @param labels the set of labels, as key-value pairs
+   * @param attributes the set of attributes, as key-value pairs
    */
 
-  virtual void add(T value, const common::KeyValueIterable &labels) noexcept = 0;
+  virtual void add(T value, const common::KeyValueIterable &attributes) noexcept = 0;
 };
 
 /** A histogram instrument that records values. */
@@ -56,7 +56,7 @@ public:
    * @param value The increment amount. May be positive, negative or zero.
    * @param attributes A set of attributes to associate with the count.
    */
-  void record(T value, const common::KeyValueIterable &labels) noexcept = 0;
+  void record(T value, const common::KeyValueIterable &attributes) noexcept = 0;
 
 }
 
@@ -79,7 +79,7 @@ public:
    * @param value The increment amount. May be positive, negative or zero.
    * @param attributes A set of attributes to associate with the count.
    */
-  void add(T value, const common::KeyValueIterable &labels) noexcept = 0;
+  void add(T value, const common::KeyValueIterable &attributes) noexcept = 0;
 };
 
 }  // namespace metrics_new

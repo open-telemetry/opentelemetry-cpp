@@ -21,7 +21,7 @@ class ObserverResult
 public:
   virtual void observe(T value) noexcept = 0;
 
-  virtual void observer(T value, const common::KeyValueIterable &labels) noexcept = 0;
+  virtual void observer(T value, const common::KeyValueIterable &attributes) noexcept = 0;
 };
 
 }  // namespace metrics_new

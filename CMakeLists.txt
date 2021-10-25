@@ -165,6 +165,8 @@ option(WITH_NO_GETENV "Whether the platform supports environment variables" OFF)
 
 option(BUILD_TESTING "Whether to enable tests" ON)
 
+option(BUILD_PACKAGE "Whether to build rpm/deb package" OFF)
+
 if(WITH_NO_GENENV)
   add_definitions(-DNO_GETENV)
 endif()
@@ -412,3 +414,22 @@ install(
   EXPORT "${PROJECT_NAME}-target"
   NAMESPACE "${PROJECT_NAME}::"
   DESTINATION "${CMAKE_INSTALL_LIBDIR}/cmake/${PROJECT_NAME}")
+
+if(BUILD_PACKAGE AND UNIX)
+  execute_process(
+    COMMAND lsb_release -si
+    OUTPUT_VARIABLE distribution
+    OUTPUT_STRIP_TRAILING_WHITESPACE)
+  if(distribution STREQUAL "Debian" OR distribution STREQUAL "Ubuntu")
+    set(INSTALL_LIB_DIR
+        ${CMAKE_INSTALL_PREFIX}/lib/${CPACK_DEBIAN_ARCHITECTURE}-linux-gnu)
+    include(cmake/MakeDeb.cmake)
+  elseif(
+    distribution MATCHES "RedHat.*"
+    OR distribution MATCHES "openSUSE.*"
+    OR distribution STREQUAL "Fedora")
+    set(INSTALL_LIB_DIR
+        ${CMAKE_INSTALL_PREFIX}/lib/${CMAKE_SYSTEM_PROCESSOR}-linux-gnu)
+    include(cmake/MakeRpm.cmake)
+  endif()
+endif()
