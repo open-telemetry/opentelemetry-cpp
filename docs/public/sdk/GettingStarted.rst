@@ -66,7 +66,7 @@ OpenTelemetry offers six tracing exporters out of the box:
 
     // otlp http exporter
     opentelemetry::exporter::otlp::OtlpHttpExporterOptions opts;
-    opts.url = "http://localhost:4317/v1/traces";
+    opts.url = "http://localhost:4318/v1/traces";
     auto otlp_http_exporter =
         std::unique_ptr<sdktrace::SpanExporter>(new opentelemetry::exporter::otlp::OtlpHttpExporter(opts));
 

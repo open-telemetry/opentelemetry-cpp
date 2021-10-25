@@ -15,6 +15,11 @@ project(opentelemetry-cpp)
 # Mark variables as used so cmake doesn't complain about them
 mark_as_advanced(CMAKE_TOOLCHAIN_FILE)
 
+# Don't use customized cmake modules if vcpkg is used to resolve dependence.
+if(NOT DEFINED CMAKE_TOOLCHAIN_FILE)
+  list(APPEND CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake/modules/")
+endif()
+
 if(DEFINED ENV{ARCH})
   # Architecture may be specified via ARCH environment variable
   set(ARCH $ENV{ARCH})
@@ -159,13 +164,15 @@ option(WITH_PROMETHEUS "Whether to include the Prometheus Client in the SDK"
 option(WITH_ELASTICSEARCH
        "Whether to include the Elasticsearch Client in the SDK" OFF)
 
+option(WITH_ZPAGES "Whether to include the Zpages Server in the SDK" OFF)
+
 option(WITH_JAEGER "Whether to include the Jaeger exporter" OFF)
 
 option(WITH_NO_GETENV "Whether the platform supports environment variables" OFF)
 
 option(BUILD_TESTING "Whether to enable tests" ON)
 
-option(BUILD_PACKAGE "Whether to build rpm/deb package" OFF)
+option(BUILD_W3CTRACECONTEXT_TEST "Whether to build w3c trace context" OFF)
 
 if(WITH_NO_GENENV)
   add_definitions(-DNO_GETENV)
@@ -221,7 +228,7 @@ function(install_windows_deps)
 endfunction()
 
 if(WITH_JAEGER)
-  find_package(Thrift QUIET CONFIG)
+  find_package(Thrift QUIET)
   if(NOT Thrift_FOUND)
     # Install Thrift and propagate via vcpkg toolchain file
     if(WIN32 AND (NOT DEFINED CMAKE_TOOLCHAIN_FILE))
@@ -251,29 +258,41 @@ endif()
 # GNUInstallDirs.
 include(GNUInstallDirs)
 
-if(NOT WITH_API_ONLY)
+if((NOT WITH_API_ONLY)
+   OR WITH_ELASTICSEARCH
+   OR WITH_ZIPKIN
+   OR WITH_OTLP
+   OR WITH_OTLP_HTTP
+   OR WITH_ZPAGES
+   OR BUILD_W3CTRACECONTEXT_TEST
+   OR WITH_ETW)
   # nlohmann_json package is required for most SDK build configurations
   find_package(nlohmann_json QUIET)
   if(NOT nlohmann_json_FOUND)
-    message("Using local nlohmann::json from submodule")
-    set(JSON_BuildTests
-        OFF
-        CACHE INTERNAL "")
-    set(JSON_Install
-        ON
-        CACHE INTERNAL "")
-    if(EXISTS ${PROJECT_SOURCE_DIR}/third_party/nlohmann-json)
-      # This option allows to link nlohmann_json::nlohmann_json target
-      add_subdirectory(${PROJECT_SOURCE_DIR}/third_party/nlohmann-json)
-      # This option allows to add header to include directories
-      include_directories(
-        ${PROJECT_SOURCE_DIR}/third_party/nlohmann-json/single_include)
+    if(EXISTS ${PROJECT_SOURCE_DIR}/.git)
+      message("Trying to use local nlohmann::json from submodule")
+      set(JSON_BuildTests
+          OFF
+          CACHE INTERNAL "")
+      set(JSON_Install
+          ON
+          CACHE INTERNAL "")
+      if(EXISTS ${PROJECT_SOURCE_DIR}/third_party/nlohmann-json/CMakeLists.txt)
+        # This option allows to link nlohmann_json::nlohmann_json target
+        add_subdirectory(${PROJECT_SOURCE_DIR}/third_party/nlohmann-json)
+        # This option allows to add header to include directories
+        include_directories(
+          ${PROJECT_SOURCE_DIR}/third_party/nlohmann-json/single_include)
+      else()
+        message(
+          FATAL_ERROR
+            "\nnlohmann_json package was not found. Please either provide it manually or clone with submodules. "
+            "To initialize, fetch and checkout any nested submodules, you can use the following command:\n"
+            "git submodule update --init --recursive")
+      endif()
     else()
-      message(
-        FATAL_ERROR
-          "\nnlohmann_json package was not found. Please either provide it manually or clone with submodules. "
-          "To initialize, fetch and checkout any nested submodules, you can use the following command:\n"
-          "git submodule update --init --recursive")
+      # Let's fail with default find_package error
+      find_package(nlohmann_json REQUIRED)
     endif()
   else()
     message("Using external nlohmann::json")
@@ -414,22 +433,4 @@ install(
   EXPORT "${PROJECT_NAME}-target"
   NAMESPACE "${PROJECT_NAME}::"
   DESTINATION "${CMAKE_INSTALL_LIBDIR}/cmake/${PROJECT_NAME}")
-
-if(BUILD_PACKAGE AND UNIX)
-  execute_process(
-    COMMAND lsb_release -si
-    OUTPUT_VARIABLE distribution
-    OUTPUT_STRIP_TRAILING_WHITESPACE)
-  if(distribution STREQUAL "Debian" OR distribution STREQUAL "Ubuntu")
-    set(INSTALL_LIB_DIR
-        ${CMAKE_INSTALL_PREFIX}/lib/${CPACK_DEBIAN_ARCHITECTURE}-linux-gnu)
-    include(cmake/MakeDeb.cmake)
-  elseif(
-    distribution MATCHES "RedHat.*"
-    OR distribution MATCHES "openSUSE.*"
-    OR distribution STREQUAL "Fedora")
-    set(INSTALL_LIB_DIR
-        ${CMAKE_INSTALL_PREFIX}/lib/${CMAKE_SYSTEM_PROCESSOR}-linux-gnu)
-    include(cmake/MakeRpm.cmake)
-  endif()
-endif()
+  
