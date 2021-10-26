@@ -68,8 +68,7 @@ static void BM_NaiveSpinLockThrashing(benchmark::State &s)
       s, spinlock,
       [](SpinLockMutex &m) {
         while (!m.try_lock())
-        {
-        }
+        {}
       },
       [](SpinLockMutex &m) { m.unlock(); });
 }
@@ -106,15 +105,20 @@ static void BM_ThreadYieldSpinLockThrashing(benchmark::State &s)
   SpinThrash<std::atomic<bool>>(
       s, mutex,
       [](std::atomic<bool> &l) {
-        if (!l.exchange(true, std::memory_order_acquire))
+        if (!l.exchange(true, std::memory_order_acq_rel))
         {
           return;
         }
-        for (std::size_t i = 0; i < 100; ++i)
+        for (std::size_t i = 0; i < 128; ++i)
         {
-          if (!l.load(std::memory_order_acquire) && !l.exchange(true, std::memory_order_acquire))
+          if (!l.load(std::memory_order_acquire) && !l.exchange(true, std::memory_order_acq_rel))
           {
             return;
+          }
+
+          if (i % 32 == 0)
+          {
+            std::this_thread::yield();
           }
         }
         std::this_thread::yield();
