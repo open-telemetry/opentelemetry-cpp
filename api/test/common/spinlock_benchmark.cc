@@ -68,7 +68,9 @@ static void BM_NaiveSpinLockThrashing(benchmark::State &s)
       s, spinlock,
       [](SpinLockMutex &m) {
         while (!m.try_lock())
-        {}
+        {
+          // Left this comment to keep the same format on old and new versions of clang-format
+        }
       },
       [](SpinLockMutex &m) { m.unlock(); });
 }
