@@ -11,7 +11,20 @@
 
 #include "google/protobuf/message.h"
 #include "google/protobuf/reflection.h"
-#include "google/protobuf/stubs/strutil.h"
+#include "google/protobuf/stubs/common.h"
+
+#if defined(GOOGLE_PROTOBUF_VERSION) && GOOGLE_PROTOBUF_VERSION >= 3007000
+#  include "google/protobuf/stubs/strutil.h"
+#else
+#  include "google/protobuf/stubs/port.h"
+namespace google
+{
+namespace protobuf
+{
+LIBPROTOBUF_EXPORT int Base64Escape(const unsigned char *src, int slen, char *dest, int szdest);
+}  // namespace protobuf
+}  // namespace google
+#endif
 
 #include "opentelemetry/exporters/otlp/protobuf_include_suffix.h"
 
