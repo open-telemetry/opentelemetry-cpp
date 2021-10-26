@@ -4,6 +4,10 @@ cmake_minimum_required(VERSION 3.1)
 # versions of gtest
 cmake_policy(SET CMP0057 NEW)
 
+
+message("aaaa" ${CMAKE_PREFIX_PATH})
+message("bbb" ${WITH_OTLP_GRPC})
+
 # See https://cmake.org/cmake/help/v3.12/policy/CMP0074.html required by certain
 # version of zlib which is dependeded by cURL.
 if(${CMAKE_VERSION} VERSION_GREATER_EQUAL "3.12")

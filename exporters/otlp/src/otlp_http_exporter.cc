@@ -13,6 +13,8 @@
 #include "google/protobuf/message.h"
 #include "google/protobuf/reflection.h"
 #include "google/protobuf/stubs/stl_util.h"
+#include "google/protobuf/stubs/strutil.h"
+
 #include "opentelemetry/proto/collector/trace/v1/trace_service.pb.h"
 
 #include "opentelemetry/exporters/otlp/protobuf_include_suffix.h"
