@@ -17,6 +17,7 @@ Increment the:
 
 ## [1.0.1] 2021-10-21
 
+* [EXPORTER] Prometheus Exporter ([#1031](https://github.com/open-telemetry/opentelemetry-cpp/pull/1031))
 * [EXPORTER] Exports span attributes to ETW ([#1021](https://github.com/open-telemetry/opentelemetry-cpp/pull/1021))
 * [BUILD] cmake: add FindThrift.cmake find module method for thrift ([#1020](https://github.com/open-telemetry/opentelemetry-cpp/pull/1020))
 * [BUILD] Fix nlohmann_json package dependency ([#1017](https://github.com/open-telemetry/opentelemetry-cpp/pull/1017))
