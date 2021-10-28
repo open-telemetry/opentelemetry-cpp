@@ -3,7 +3,7 @@
 
 #pragma once
 
-#include "opentelemetry/metrics/meter.h"
+#include "opentelemetry/metrics_new/meter.h"
 #include "opentelemetry/nostd/shared_ptr.h"
 #include "opentelemetry/nostd/string_view.h"
 
@@ -26,5 +26,6 @@ public:
   virtual nostd::shared_ptr<Meter> GetMeter(nostd::string_view library_name,
                                             nostd::string_view library_version = "",
                                             nostd::string_view schema_url      = "") noexcept = 0;
-}  // namespace metrics
+};
+}  // namespace metrics_new
 OPENTELEMETRY_END_NAMESPACE

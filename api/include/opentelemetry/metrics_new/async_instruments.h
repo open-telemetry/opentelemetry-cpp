@@ -3,7 +3,6 @@
 
 #pragma once
 
-#include "instrument.h"
 #include "observer_result.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
@@ -26,4 +25,3 @@ class ObservableUpDownCounter : public AsynchronousInstrument
 
 }  // namespace metrics_new
 OPENTELEMETRY_END_NAMESPACE
-#endif

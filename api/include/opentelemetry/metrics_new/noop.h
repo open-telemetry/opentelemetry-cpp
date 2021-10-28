@@ -1,90 +1,220 @@
+// Copyright The OpenTelemetry Authors
+// SPDX-License-Identifier: Apache-2.0
+
+#pragma once
+#include "opentelemetry/metrics_new/async_instruments.h"
+#include "opentelemetry/metrics_new/meter.h"
+#include "opentelemetry/metrics_new/meter_provider.h"
+#include "opentelemetry/metrics_new/observer_result.h"
 #include "opentelemetry/metrics_new/sync_instruments.h"
+#include "opentelemetry/version.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace metrics_new
 {
 
 template <class T>
-class NoopCounter : public opentelemetry::metrics_new::Counter
+class NoopCounter : public Counter<T>
 {
 public:
+  NoopCounter(nostd::string_view name,
+              nostd::string_view description,
+              nostd::string_view unit) noexcept
+  {}
   void Add(T value) noexcept override {}
-  void Add(T value, const common::KeyValueIterable &attributes) {}
-}
+  void Add(T value, const common::KeyValueIterable &attributes) noexcept override {}
+};
 
 template <class T>
-class NoopHistorgram : public opentelemetry::metrics_new::Historgram
+class NoopHistogram : public Histogram<T>
 {
 public:
-  void Add(T value) noexcept override {}
-  void Add(T value, const common::KeyValueIterable &attributes) {}
-}
+  NoopHistogram(nostd::string_view name,
+                nostd::string_view description,
+                nostd::string_view unit) noexcept
+  {}
+  void Record(T value) noexcept override {}
+  void Record(T value, const common::KeyValueIterable &attributes) noexcept override {}
+};
 
 template <class T>
-class NoopUpDownCounter : public opentelemetry::metrics_new::UpDownCounter
+class NoopUpDownCounter : public UpDownCounter<T>
 {
 public:
+  NoopUpDownCounter(nostd::string_view name,
+                    nostd::string_view description,
+                    nostd::string_view unit) noexcept
+  {}
   void Add(T value) noexcept override {}
-  void Add(T value, const common::KeyValueIterable &attributes) {}
-}
+  void Add(T value, const common::KeyValueIterable &attributes) noexcept override {}
+};
 
 template <class T>
-class NoopObservableCounter : public ObservableCounter
-{};
+class NoopObservableCounter : public ObservableCounter<T>
+{
+public:
+  NoopObservableCounter(nostd::string_view name,
+                        void (*callback)(ObserverResult<T>),
+                        nostd::string_view description,
+                        nostd::string_view unit) noexcept
+  {}
+};
 
 template <class T>
-class NoopObservableGauge : public ObservableGauge
-{};
+class NoopObservableGauge : public ObservableGauge<T>
+{
+public:
+  NoopObservableGauge(nostd::string_view name,
+                      void (*callback)(ObserverResult<T>),
+                      nostd::string_view description,
+                      nostd::string_view unit) noexcept
+  {}
+};
 
 template <class T>
-class NoopObservableUpDownCounter : public ObservableUpDownCounter
-{};
+class NoopObservableUpDownCounter : public ObservableUpDownCounter<T>
+{
+public:
+  NoopObservableUpDownCounter(nostd::string_view name,
+                              void (*callback)(ObserverResult<T>),
+                              nostd::string_view description,
+                              nostd::string_view unit) noexcept
+  {}
+};
 
 /**
  * No-op implementation of Meter.
  */
-class NoopMeter final : public opentelemetry::Meter
+class NoopMeter final : public Meter
 {
 public:
-  // Tracer
-  nostd::shared_ptr<Span> StartSpan(nostd::string_view /*name*/,
-                                    const common::KeyValueIterable & /*attributes*/,
-                                    const SpanContextKeyValueIterable & /*links*/,
-                                    const StartSpanOptions & /*options*/) noexcept override
+  nostd::shared_ptr<Counter<long>> CreateLongCounter(nostd::string_view name,
+                                                     nostd::string_view description = "",
+                                                     nostd::string_view unit = "") noexcept override
   {
-    // Don't allocate a no-op span for every StartSpan call, but use a static
-    // singleton for this case.
-    static nostd::shared_ptr<trace_api::Span> noop_span(
-        new trace_api::NoopSpan{this->shared_from_this()});
-
-    return noop_span;
+    return nostd::shared_ptr<Counter<long>>{new NoopCounter<long>(name, description, unit)};
   }
 
-  void ForceFlushWithMicroseconds(uint64_t /*timeout*/) noexcept override {}
+  nostd::shared_ptr<Counter<double>> CreateDoubleCounter(
+      nostd::string_view name,
+      nostd::string_view description = "",
+      nostd::string_view unit        = "") noexcept override
+  {
+    return nostd::shared_ptr<Counter<double>>{new NoopCounter<double>(name, description, unit)};
+  }
 
-  void CloseWithMicroseconds(uint64_t /*timeout*/) noexcept override {}
+  nostd::shared_ptr<ObservableCounter<long>> CreateLongObservableCounter(
+      nostd::string_view name,
+      void (*callback)(ObserverResult<long>),
+      nostd::string_view description = "",
+      nostd::string_view unit        = "") noexcept override
+  {
+    return nostd::shared_ptr<ObservableCounter<long>>{
+        new NoopObservableCounter<long>(name, callback, description, unit)};
+  }
+
+  nostd::shared_ptr<ObservableCounter<double>> CreateDoubleObservableCounter(
+      nostd::string_view name,
+      void (*callback)(ObserverResult<double>),
+      nostd::string_view description = "",
+      nostd::string_view unit        = "") noexcept override
+  {
+    return nostd::shared_ptr<ObservableCounter<double>>{
+        new NoopObservableCounter<double>(name, callback, description, unit)};
+  }
+
+  nostd::shared_ptr<Histogram<long>> CreateLongHistogram(
+      nostd::string_view name,
+      nostd::string_view description = "",
+      nostd::string_view unit        = "") noexcept override
+  {
+    return nostd::shared_ptr<Histogram<long>>{new NoopHistogram<long>(name, description, unit)};
+  }
+
+  nostd::shared_ptr<Histogram<double>> CreateDoubleHistogram(
+      nostd::string_view name,
+      nostd::string_view description = "",
+      nostd::string_view unit        = "") noexcept override
+  {
+    return nostd::shared_ptr<Histogram<double>>{new NoopHistogram<double>(name, description, unit)};
+  }
+
+  nostd::shared_ptr<ObservableGauge<long>> CreateLongObservableGauge(
+      nostd::string_view name,
+      void (*callback)(ObserverResult<long>),
+      nostd::string_view description = "",
+      nostd::string_view unit        = "") noexcept override
+  {
+    return nostd::shared_ptr<ObservableGauge<long>>{
+        new NoopObservableGauge<long>(name, callback, description, unit)};
+  }
+
+  nostd::shared_ptr<ObservableGauge<double>> CreateDoubleObservableGauge(
+      nostd::string_view name,
+      void (*callback)(ObserverResult<double>),
+      nostd::string_view description = "",
+      nostd::string_view unit        = "") noexcept override
+  {
+    return nostd::shared_ptr<ObservableGauge<double>>{
+        new NoopObservableGauge<double>(name, callback, description, unit)};
+  }
+
+  nostd::shared_ptr<UpDownCounter<long>> CreateLongUpDownCounter(
+      nostd::string_view name,
+      nostd::string_view description = "",
+      nostd::string_view unit        = "") noexcept override
+  {
+    return nostd::shared_ptr<UpDownCounter<long>>{
+        new NoopUpDownCounter<long>(name, description, unit)};
+  }
+
+  nostd::shared_ptr<UpDownCounter<double>> CreateDoubleUpDownCounter(
+      nostd::string_view name,
+      nostd::string_view description = "",
+      nostd::string_view unit        = "") noexcept override
+  {
+    return nostd::shared_ptr<UpDownCounter<double>>{
+        new NoopUpDownCounter<double>(name, description, unit)};
+  }
+
+  nostd::shared_ptr<ObservableUpDownCounter<long>> CreateLongObservableUpDownCounter(
+      nostd::string_view name,
+      void (*callback)(ObserverResult<long>),
+      nostd::string_view description = "",
+      nostd::string_view unit        = "") noexcept override
+  {
+    return nostd::shared_ptr<ObservableUpDownCounter<long>>{
+        new NoopObservableUpDownCounter<long>(name, callback, description, unit)};
+  }
+
+  nostd::shared_ptr<ObservableUpDownCounter<double>> CreateDoubleObservableUpDownCounter(
+      nostd::string_view name,
+      void (*callback)(ObserverResult<double>),
+      nostd::string_view description = "",
+      nostd::string_view unit        = "") noexcept override
+  {
+    return nostd::shared_ptr<ObservableUpDownCounter<double>>{
+        new NoopObservableUpDownCounter<double>(name, callback, description, unit)};
+  }
 };
 
 /**
- * No-op implementation of a TracerProvider.
+ * No-op implementation of a MeterProvider.
  */
-class NoopMeterProvider final : public opentelemetry::trace::MeterProvider
+class NoopMeterProvider final : public MeterProvider
 {
 public:
-  NoopMeterProvider()
-      : tracer_{
-            nostd::shared_ptr<opentelemetry::trace::NoopMeter>(new opentelemetry::trace::NoopMeter)}
-  {}
+  NoopMeterProvider() : meter_{nostd::shared_ptr<Meter>(new NoopMeter)} {}
 
-  nostd::shared_ptr<opentelemetry::trace::Tracer> GetMeter(nostd::string_view library_name,
-                                                           nostd::string_view library_version,
-                                                           nostd::string_view schema_url) override
+  nostd::shared_ptr<Meter> GetMeter(nostd::string_view library_name,
+                                    nostd::string_view library_version,
+                                    nostd::string_view schema_url) noexcept override
   {
     return meter_;
   }
 
 private:
-  nostd::shared_ptr<opentelemetry::trace::Tracer> meter_;
+  nostd::shared_ptr<Meter> meter_;
 };
 }  // namespace metrics_new
 OPENTELEMETRY_END_NAMESPACE

@@ -4,7 +4,6 @@
 #pragma once
 
 #include "opentelemetry/metrics_new/async_instruments.h"
-#include "opentelemetry/metrics_new/instrument.h"
 #include "opentelemetry/metrics_new/sync_instruments.h"
 #include "opentelemetry/nostd/shared_ptr.h"
 #include "opentelemetry/nostd/span.h"

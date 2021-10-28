@@ -43,7 +43,7 @@ public:
             nostd::enable_if_t<common::detail::is_key_value_iterable<U>::value> * = nullptr>
   void Add(T value, const U &attributes) noexcept
   {
-    this->Add(value, common::KeyValueIterableView<T>{attributes});
+    this->Add(value, common::KeyValueIterableView<U>{attributes});
   }
 
   void Add(T value,
@@ -58,7 +58,7 @@ public:
 /** A histogram instrument that records values. */
 
 template <class T>
-class Historgram : public SynchronousInstrument
+class Histogram : public SynchronousInstrument
 {
 public:
   /**
@@ -80,7 +80,7 @@ public:
             nostd::enable_if_t<common::detail::is_key_value_iterable<U>::value> * = nullptr>
   void Record(T value, const U &attributes) noexcept
   {
-    this->Record(value, common::KeyValueIterableView<T>{attributes});
+    this->Record(value, common::KeyValueIterableView<U>{attributes});
   }
 
   void Record(T value,
@@ -90,8 +90,7 @@ public:
     this->Record(value, nostd::span<const std::pair<nostd::string_view, common::AttributeValue>>{
                             attributes.begin(), attributes.end()});
   }
-
-}
+};
 
 /** An up-down-counter instrument that adds or reduce values. */
 
@@ -112,13 +111,13 @@ public:
    * @param value The increment amount. May be positive, negative or zero.
    * @param attributes A set of attributes to associate with the count.
    */
-  void Add(T value, const common::KeyValueIterable &attributes) noexcept = 0;
+  virtual void Add(T value, const common::KeyValueIterable &attributes) noexcept = 0;
 
   template <class U,
             nostd::enable_if_t<common::detail::is_key_value_iterable<U>::value> * = nullptr>
   void Add(T value, const U &attributes) noexcept
   {
-    this->Add(value, common::KeyValueIterableView<T>{attributes});
+    this->Add(value, common::KeyValueIterableView<U>{attributes});
   }
 
   void Add(T value,
