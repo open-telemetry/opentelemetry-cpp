@@ -54,7 +54,7 @@ public:
 
 #ifdef ENABLE_LOGS_PREVIEW
   static void PopulateRequest(
-      const nostd::span<std::unique_ptr<opentelemetry::sdk::logs::Recordable>> &spans,
+      const nostd::span<std::unique_ptr<opentelemetry::sdk::logs::Recordable>> &logs,
       proto::collector::logs::v1::ExportLogsServiceRequest *request) noexcept;
 #endif
 };

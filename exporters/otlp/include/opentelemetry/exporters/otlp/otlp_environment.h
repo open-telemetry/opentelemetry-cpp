@@ -44,7 +44,7 @@ inline const std::string GetOtlpDefaultHttpEndpoint()
   auto endpoint = opentelemetry::sdk::common::GetEnvironmentVariable(kOtlpTracesEndpointEnv);
   if (endpoint.empty())
   {
-    endpoint = opentelemetry::sdk::common::GetEnvironmentVariable(kOtlpEndpointEnv);
+    endpoint = opentelemetry::sdk::common::GetEnvironmentVariable(kOtlpEndpointEnv) + "/v1/traces";
   }
   return endpoint.size() ? endpoint : kOtlpEndpointDefault;
 }
@@ -219,24 +219,24 @@ inline OtlpHeaders GetOtlpDefaultHeaders()
 
 inline const std::string GetOtlpDefaultHttpLogEndpoint()
 {
-  constexpr char kOtlpTracesEndpointEnv[] = "OTEL_EXPORTER_OTLP_LOGS_ENDPOINT";
-  constexpr char kOtlpEndpointEnv[]       = "OTEL_EXPORTER_OTLP_ENDPOINT";
-  constexpr char kOtlpEndpointDefault[]   = "http://localhost:4318/v1/logs";
+  constexpr char kOtlpLogsEndpointEnv[] = "OTEL_EXPORTER_OTLP_LOGS_ENDPOINT";
+  constexpr char kOtlpEndpointEnv[]     = "OTEL_EXPORTER_OTLP_ENDPOINT";
+  constexpr char kOtlpEndpointDefault[] = "http://localhost:4318/v1/logs";
 
-  auto endpoint = opentelemetry::sdk::common::GetEnvironmentVariable(kOtlpTracesEndpointEnv);
+  auto endpoint = opentelemetry::sdk::common::GetEnvironmentVariable(kOtlpLogsEndpointEnv);
   if (endpoint.empty())
   {
-    endpoint = opentelemetry::sdk::common::GetEnvironmentVariable(kOtlpEndpointEnv);
+    endpoint = opentelemetry::sdk::common::GetEnvironmentVariable(kOtlpEndpointEnv) + "/v1/logs";
   }
   return endpoint.size() ? endpoint : kOtlpEndpointDefault;
 }
 
 inline const std::chrono::system_clock::duration GetOtlpDefaultLogTimeout()
 {
-  constexpr char kOtlpTracesTimeoutEnv[] = "OTEL_EXPORTER_OTLP_LOGS_TIMEOUT";
-  constexpr char kOtlpTimeoutEnv[]       = "OTEL_EXPORTER_OTLP_TIMEOUT";
+  constexpr char kOtlpLogsTimeoutEnv[] = "OTEL_EXPORTER_OTLP_LOGS_TIMEOUT";
+  constexpr char kOtlpTimeoutEnv[]     = "OTEL_EXPORTER_OTLP_TIMEOUT";
 
-  auto timeout = opentelemetry::sdk::common::GetEnvironmentVariable(kOtlpTracesTimeoutEnv);
+  auto timeout = opentelemetry::sdk::common::GetEnvironmentVariable(kOtlpLogsTimeoutEnv);
   if (timeout.empty())
   {
     timeout = opentelemetry::sdk::common::GetEnvironmentVariable(kOtlpTimeoutEnv);
@@ -246,15 +246,15 @@ inline const std::chrono::system_clock::duration GetOtlpDefaultLogTimeout()
 
 inline OtlpHeaders GetOtlpDefaultLogHeaders()
 {
-  constexpr char kOtlpTracesHeadersEnv[] = "OTEL_EXPORTER_OTLP_LOGS_HEADERS";
-  constexpr char kOtlpHeadersEnv[]       = "OTEL_EXPORTER_OTLP_HEADERS";
+  constexpr char kOtlpLogsHeadersEnv[] = "OTEL_EXPORTER_OTLP_LOGS_HEADERS";
+  constexpr char kOtlpHeadersEnv[]     = "OTEL_EXPORTER_OTLP_HEADERS";
 
   OtlpHeaders result;
-  std::unordered_set<std::string> trace_remove_cache;
-  DumpOtlpHeaders(result, kOtlpHeadersEnv, trace_remove_cache);
+  std::unordered_set<std::string> log_remove_cache;
+  DumpOtlpHeaders(result, kOtlpHeadersEnv, log_remove_cache);
 
-  trace_remove_cache.clear();
-  DumpOtlpHeaders(result, kOtlpTracesHeadersEnv, trace_remove_cache);
+  log_remove_cache.clear();
+  DumpOtlpHeaders(result, kOtlpLogsHeadersEnv, log_remove_cache);
 
   return result;
 }

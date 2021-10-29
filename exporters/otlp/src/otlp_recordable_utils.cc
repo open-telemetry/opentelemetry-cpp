@@ -283,7 +283,7 @@ void OtlpRecordableUtils::PopulateRequest(
 
 #ifdef ENABLE_LOGS_PREVIEW
 void OtlpRecordableUtils::PopulateRequest(
-    const nostd::span<std::unique_ptr<opentelemetry::sdk::logs::Recordable>> &spans,
+    const nostd::span<std::unique_ptr<opentelemetry::sdk::logs::Recordable>> &logs,
     proto::collector::logs::v1::ExportLogsServiceRequest *request) noexcept
 {
   if (nullptr == request)
@@ -291,7 +291,7 @@ void OtlpRecordableUtils::PopulateRequest(
     return;
   }
 
-  for (auto &recordable : spans)
+  for (auto &recordable : logs)
   {
     auto resource_logs       = request->add_resource_logs();
     auto instrumentation_lib = resource_logs->add_instrumentation_library_logs();

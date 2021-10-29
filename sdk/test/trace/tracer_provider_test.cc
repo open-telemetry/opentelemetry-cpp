@@ -68,7 +68,7 @@ TEST(TracerProvider, GetTracer)
 #ifdef RTTI_ENABLED
   auto sdkTracer3 = dynamic_cast<Tracer *>(t3.get());
 #else
-  auto sdkTracer3 = dynamic_cast<Tracer *>(t3.get());
+  auto sdkTracer3 = static_cast<Tracer *>(t3.get());
 #endif
   auto instrumentation_library3 = sdkTracer3->GetInstrumentationLibrary();
   ASSERT_EQ(instrumentation_library3.GetName(), "different");
