@@ -4,8 +4,8 @@ cc_binary(
         "main.cc",
     ],
     deps = [
-        "//examples/common/foo_library:common_foo_library",
         "//api",
+        "//examples/common/foo_library:common_foo_library",
         "//exporters/ostream:ostream_span_exporter",
     ],
 )

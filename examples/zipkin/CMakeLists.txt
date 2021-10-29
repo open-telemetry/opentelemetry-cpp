@@ -1,5 +1,5 @@
 include_directories(${CMAKE_SOURCE_DIR}/exporters/zipkin/include
-  ${CMAKE_SOURCE_DIR}/examples/common)
+                    ${CMAKE_SOURCE_DIR}/examples/common)
 
 add_executable(example_zipkin main.cc)
 target_link_libraries(
