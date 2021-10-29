@@ -433,7 +433,7 @@ TEST_F(OtlpHttpExporterTestPeer, ConfigFromTracesEnv)
   putenv("OTEL_EXPORTER_OTLP_TRACES_HEADERS=");
 
 #    else
-  unsetenv("OTEL_EXPORTER_OTLP_ENDPOINT");
+  unsetenv("OTEL_EXPORTER_OTLP_TRACES_ENDPOINT");
   unsetenv("OTEL_EXPORTER_OTLP_TIMEOUT");
   unsetenv("OTEL_EXPORTER_OTLP_HEADERS");
   unsetenv("OTEL_EXPORTER_OTLP_TRACES_HEADERS");

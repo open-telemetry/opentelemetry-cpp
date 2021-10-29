@@ -100,7 +100,8 @@ public:
 
   /**
    * Export
-   * @param spans a span of unique pointers to span recordables
+   * @param message message to export, it should be ExportTraceServiceRequest,
+   * ExportMetricsServiceRequest or ExportLogsServiceRequest
    */
   sdk::common::ExportResult Export(const google::protobuf::Message &message) noexcept;
 

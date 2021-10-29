@@ -475,7 +475,7 @@ TEST_F(OtlpHttpLogExporterTestPeer, ConfigFromLogsEnv)
   putenv("OTEL_EXPORTER_OTLP_LOGS_HEADERS=");
 
 #      else
-  unsetenv("OTEL_EXPORTER_OTLP_ENDPOINT");
+  unsetenv("OTEL_EXPORTER_OTLP_LOGS_ENDPOINT");
   unsetenv("OTEL_EXPORTER_OTLP_TIMEOUT");
   unsetenv("OTEL_EXPORTER_OTLP_HEADERS");
   unsetenv("OTEL_EXPORTER_OTLP_LOGS_HEADERS");
