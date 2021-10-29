@@ -44,7 +44,11 @@ inline const std::string GetOtlpDefaultHttpEndpoint()
   auto endpoint = opentelemetry::sdk::common::GetEnvironmentVariable(kOtlpTracesEndpointEnv);
   if (endpoint.empty())
   {
-    endpoint = opentelemetry::sdk::common::GetEnvironmentVariable(kOtlpEndpointEnv) + "/v1/traces";
+    endpoint = opentelemetry::sdk::common::GetEnvironmentVariable(kOtlpEndpointEnv);
+    if (!endpoint.empty())
+    {
+      endpoint += "/v1/traces";
+    }
   }
   return endpoint.size() ? endpoint : kOtlpEndpointDefault;
 }
@@ -226,7 +230,11 @@ inline const std::string GetOtlpDefaultHttpLogEndpoint()
   auto endpoint = opentelemetry::sdk::common::GetEnvironmentVariable(kOtlpLogsEndpointEnv);
   if (endpoint.empty())
   {
-    endpoint = opentelemetry::sdk::common::GetEnvironmentVariable(kOtlpEndpointEnv) + "/v1/logs";
+    endpoint = opentelemetry::sdk::common::GetEnvironmentVariable(kOtlpEndpointEnv);
+    if (!endpoint.empty())
+    {
+      endpoint += "/v1/logs";
+    }
   }
   return endpoint.size() ? endpoint : kOtlpEndpointDefault;
 }

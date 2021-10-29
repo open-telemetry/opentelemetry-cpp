@@ -482,6 +482,14 @@ TEST_F(OtlpHttpLogExporterTestPeer, ConfigFromLogsEnv)
 
 #      endif
 }
+
+TEST_F(OtlpHttpLogExporterTestPeer, DefaultEndpoint)
+{
+  EXPECT_EQ("http://localhost:4318/v1/logs", GetOtlpDefaultHttpLogEndpoint());
+  EXPECT_EQ("http://localhost:4318/v1/traces", GetOtlpDefaultHttpEndpoint());
+  EXPECT_EQ("http://localhost:4317", GetOtlpDefaultGrpcEndpoint());
+}
+
 #    endif
 
 }  // namespace otlp
