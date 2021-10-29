@@ -347,9 +347,8 @@ TEST_F(OtlpHttpExporterTestPeer, ConfigJsonBytesMappingTest)
 // Test exporter configuration options with use_ssl_credentials
 TEST_F(OtlpHttpExporterTestPeer, ConfigFromEnv)
 {
-  const std::string url     = "http://localhost:9999/v1/traces";
-  const std::string url_env = "OTEL_EXPORTER_OTLP_ENDPOINT=" + url;
-  putenv(const_cast<char *>(url_env.data()));
+  const std::string url = "http://localhost:9999/v1/traces";
+  putenv("OTEL_EXPORTER_OTLP_ENDPOINT=http://localhost:9999");
   putenv("OTEL_EXPORTER_OTLP_TIMEOUT=20s");
   putenv("OTEL_EXPORTER_OTLP_HEADERS=k1=v1,k2=v2");
   putenv("OTEL_EXPORTER_OTLP_TRACES_HEADERS=k1=v3,k1=v4");
@@ -381,6 +380,54 @@ TEST_F(OtlpHttpExporterTestPeer, ConfigFromEnv)
   }
 #    if defined(_MSC_VER)
   putenv("OTEL_EXPORTER_OTLP_ENDPOINT=");
+  putenv("OTEL_EXPORTER_OTLP_TIMEOUT=");
+  putenv("OTEL_EXPORTER_OTLP_HEADERS=");
+  putenv("OTEL_EXPORTER_OTLP_TRACES_HEADERS=");
+
+#    else
+  unsetenv("OTEL_EXPORTER_OTLP_ENDPOINT");
+  unsetenv("OTEL_EXPORTER_OTLP_TIMEOUT");
+  unsetenv("OTEL_EXPORTER_OTLP_HEADERS");
+  unsetenv("OTEL_EXPORTER_OTLP_TRACES_HEADERS");
+
+#    endif
+}
+
+TEST_F(OtlpHttpExporterTestPeer, ConfigFromTracesEnv)
+{
+  const std::string url = "http://localhost:9999/v1/traces";
+  putenv("OTEL_EXPORTER_OTLP_TRACES_ENDPOINT=http://localhost:9999/v1/traces");
+  putenv("OTEL_EXPORTER_OTLP_TIMEOUT=20s");
+  putenv("OTEL_EXPORTER_OTLP_HEADERS=k1=v1,k2=v2");
+  putenv("OTEL_EXPORTER_OTLP_TRACES_HEADERS=k1=v3,k1=v4");
+
+  std::unique_ptr<OtlpHttpExporter> exporter(new OtlpHttpExporter());
+  EXPECT_EQ(GetOptions(exporter).url, url);
+  EXPECT_EQ(
+      GetOptions(exporter).timeout.count(),
+      std::chrono::duration_cast<std::chrono::system_clock::duration>(std::chrono::seconds{20})
+          .count());
+  EXPECT_EQ(GetOptions(exporter).http_headers.size(), 3);
+  {
+    // Test k2
+    auto range = GetOptions(exporter).http_headers.equal_range("k2");
+    EXPECT_TRUE(range.first != range.second);
+    EXPECT_EQ(range.first->second, std::string("v2"));
+    ++range.first;
+    EXPECT_TRUE(range.first == range.second);
+  }
+  {
+    // k1
+    auto range = GetOptions(exporter).http_headers.equal_range("k1");
+    EXPECT_TRUE(range.first != range.second);
+    EXPECT_EQ(range.first->second, std::string("v3"));
+    ++range.first;
+    EXPECT_EQ(range.first->second, std::string("v4"));
+    ++range.first;
+    EXPECT_TRUE(range.first == range.second);
+  }
+#    if defined(_MSC_VER)
+  putenv("OTEL_EXPORTER_OTLP_TRACES_ENDPOINT=");
   putenv("OTEL_EXPORTER_OTLP_TIMEOUT=");
   putenv("OTEL_EXPORTER_OTLP_HEADERS=");
   putenv("OTEL_EXPORTER_OTLP_TRACES_HEADERS=");
