@@ -6,7 +6,11 @@
 #include "opentelemetry/trace/provider.h"
 
 // Using an exporter that simply dumps span data to stdout.
-#include "foo_library/foo_library.h"
+#ifdef BAZEL_BUILD
+  #include "examples/common/foo_library/foo_library.h"
+#else
+  #include "foo_library/foo_library.h"
+#endif
 #include "opentelemetry/exporters/ostream/span_exporter.h"
 
 namespace
