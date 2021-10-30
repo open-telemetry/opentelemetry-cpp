@@ -9,7 +9,11 @@
 #include "opentelemetry/sdk/trace/tracer_provider.h"
 #include "opentelemetry/trace/provider.h"
 
-#include "foo_library/foo_library.h"
+#ifdef BAZEL_BUILD
+#  include "examples/common/foo_library/foo_library.h"
+#else
+#  include "foo_library/foo_library.h"
+#endif
 
 namespace trace    = opentelemetry::trace;
 namespace nostd    = opentelemetry::nostd;
