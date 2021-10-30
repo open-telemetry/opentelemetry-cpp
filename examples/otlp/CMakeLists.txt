@@ -1,6 +1,5 @@
 include_directories(
   ${CMAKE_BINARY_DIR}/generated/third_party/opentelemetry-proto
-  ${CMAKE_SOURCE_DIR}/examples/common
   ${CMAKE_SOURCE_DIR}/exporters/otlp/include)
 
 if(WITH_OTLP_GRPC)

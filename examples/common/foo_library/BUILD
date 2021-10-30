@@ -11,6 +11,6 @@ cc_library(
     defines = ["BAZEL_BUILD"],
     deps = [
         "//api",
-        "//sdk/src/trace",
+        "//sdk:headers",
     ],
 )

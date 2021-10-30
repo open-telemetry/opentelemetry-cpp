@@ -1,7 +1,5 @@
-include_directories(
-  ${CMAKE_SOURCE_DIR}/exporters/ostream/include
-  ${CMAKE_SOURCE_DIR}/exporters/memory/include
-  ${CMAKE_SOURCE_DIR}/examples/common)
+include_directories(${CMAKE_SOURCE_DIR}/exporters/ostream/include
+                    ${CMAKE_SOURCE_DIR}/exporters/memory/include)
 
 add_executable(example_multi_processor main.cc)
 target_link_libraries(

@@ -1,5 +1,4 @@
-include_directories(${CMAKE_SOURCE_DIR}/exporters/jaeger/include
-                    ${CMAKE_SOURCE_DIR}/examples/common)
+include_directories(${CMAKE_SOURCE_DIR}/exporters/jaeger/include)
 
 add_executable(example_jaeger main.cc)
 target_link_libraries(

@@ -1,4 +1,5 @@
 add_subdirectory(common)
+include_directories(common)
 if(WITH_OTLP_GRPC OR WITH_OTLP_HTTP)
   add_subdirectory(otlp)
   add_subdirectory(grpc)
