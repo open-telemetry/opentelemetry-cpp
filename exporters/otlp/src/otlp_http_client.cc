@@ -2,6 +2,13 @@
 // SPDX-License-Identifier: Apache-2.0
 
 #include "opentelemetry/exporters/otlp/otlp_http_client.h"
+
+#if defined(HAVE_GSL)
+#  include <gsl/gsl>
+#else
+#  include <assert.h>
+#endif
+
 #include "opentelemetry/ext/http/client/http_client_factory.h"
 #include "opentelemetry/ext/http/common/url_parser.h"
 
@@ -238,6 +245,11 @@ private:
 
 static inline char HexEncode(unsigned char byte)
 {
+#if defined(HAVE_GSL)
+  Expects(byte <= 16);
+#else
+  assert(byte <= 16);
+#endif
   if (byte >= 10)
   {
     return byte - 10 + 'a';
