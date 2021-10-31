@@ -338,9 +338,13 @@ TEST_F(OtlpHttpExporterTestPeer, ConfigFromEnv)
   const std::string url     = "http://localhost:9999/v1/traces";
   const std::string url_env = "OTEL_EXPORTER_OTLP_ENDPOINT=" + url;
   putenv(const_cast<char *>(url_env.data()));
-  putenv("OTEL_EXPORTER_OTLP_TIMEOUT=20s");
-  putenv("OTEL_EXPORTER_OTLP_HEADERS=k1=v1,k2=v2");
-  putenv("OTEL_EXPORTER_OTLP_TRACES_HEADERS=k1=v3,k1=v4");
+  std::vector<std::string> envs{"OTEL_EXPORTER_OTLP_TIMEOUT=20s",
+                                "OTEL_EXPORTER_OTLP_HEADERS=k1=v1,k2=v2",
+                                "OTEL_EXPORTER_OTLP_TRACES_HEADERS=k1=v3,k1=v4"};
+  for (auto env : envs)
+  {
+    putenv(const_cast<char *>(env.c_str()));
+  }
 
   std::unique_ptr<OtlpHttpExporter> exporter(new OtlpHttpExporter());
   EXPECT_EQ(GetOptions(exporter).url, url);

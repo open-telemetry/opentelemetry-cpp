@@ -146,9 +146,13 @@ TEST_F(OtlpGrpcExporterTestPeer, ConfigFromEnv)
   const std::string endpoint     = "http://localhost:9999";
   const std::string endpoint_env = "OTEL_EXPORTER_OTLP_ENDPOINT=" + endpoint;
   putenv(const_cast<char *>(endpoint_env.data()));
-  putenv("OTEL_EXPORTER_OTLP_TIMEOUT=20050ms");
-  putenv("OTEL_EXPORTER_OTLP_HEADERS=k1=v1,k2=v2");
-  putenv("OTEL_EXPORTER_OTLP_TRACES_HEADERS=k1=v3,k1=v4");
+  std::vector<std::string> envs{"OTEL_EXPORTER_OTLP_TIMEOUT=20050ms",
+                                "OTEL_EXPORTER_OTLP_HEADERS=k1=v1,k2=v2",
+                                "OTEL_EXPORTER_OTLP_TRACES_HEADERS=k1=v3,k1=v4"};
+  for (auto env : envs)
+  {
+    putenv(const_cast<char *>(env.c_str()));
+  }
 
   std::unique_ptr<OtlpGrpcExporter> exporter(new OtlpGrpcExporter());
   EXPECT_EQ(GetOptions(exporter).ssl_credentials_cacert_as_string, cacert_str);

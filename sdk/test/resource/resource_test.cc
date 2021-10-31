@@ -45,6 +45,7 @@ TEST(ResourceTest, create_without_servicename)
   {
     EXPECT_TRUE(expected_attributes.find(e.first) != expected_attributes.end());
     if (expected_attributes.find(e.first) != expected_attributes.end())
+    {
       if (e.first == "version")
         EXPECT_EQ(opentelemetry::nostd::get<uint32_t>(expected_attributes.find(e.first)->second),
                   opentelemetry::nostd::get<uint32_t>(e.second));
@@ -54,6 +55,7 @@ TEST(ResourceTest, create_without_servicename)
       else
         EXPECT_EQ(opentelemetry::nostd::get<std::string>(expected_attributes.find(e.first)->second),
                   opentelemetry::nostd::get<std::string>(e.second));
+    }
   }
   EXPECT_EQ(received_attributes.size(), expected_attributes.size());  // for missing service.name
 }
@@ -106,8 +108,10 @@ TEST(ResourceTest, create_with_emptyatrributes)
   {
     EXPECT_TRUE(expected_attributes.find(e.first) != expected_attributes.end());
     if (expected_attributes.find(e.first) != expected_attributes.end())
+    {
       EXPECT_EQ(opentelemetry::nostd::get<std::string>(expected_attributes.find(e.first)->second),
                 opentelemetry::nostd::get<std::string>(e.second));
+    }
   }
   EXPECT_EQ(received_attributes.size(), expected_attributes.size());  // for missing service.name
 }
