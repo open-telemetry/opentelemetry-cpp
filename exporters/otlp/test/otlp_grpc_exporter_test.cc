@@ -139,20 +139,14 @@ TEST_F(OtlpGrpcExporterTestPeer, ConfigSslCredentialsTest)
 TEST_F(OtlpGrpcExporterTestPeer, ConfigFromEnv)
 {
   const std::string cacert_str = "--begin and end fake cert--";
-  const std::string cacert_env = "OTEL_EXPORTER_OTLP_CERTIFICATE_STRING=" + cacert_str;
-  putenv(const_cast<char *>(cacert_env.data()));
+  setenv("OTEL_EXPORTER_OTLP_CERTIFICATE_STRING", cacert_str.c_str(), 1);
   char ssl_enable_env[] = "OTEL_EXPORTER_OTLP_SSL_ENABLE=True";
   putenv(ssl_enable_env);
-  const std::string endpoint     = "http://localhost:9999";
-  const std::string endpoint_env = "OTEL_EXPORTER_OTLP_ENDPOINT=" + endpoint;
-  putenv(const_cast<char *>(endpoint_env.data()));
-  std::vector<std::string> envs{"OTEL_EXPORTER_OTLP_TIMEOUT=20050ms",
-                                "OTEL_EXPORTER_OTLP_HEADERS=k1=v1,k2=v2",
-                                "OTEL_EXPORTER_OTLP_TRACES_HEADERS=k1=v3,k1=v4"};
-  for (size_t i = 0; i < envs.size(); ++i)
-  {
-    putenv(const_cast<char *>(envs[i].data()));
-  }
+  const std::string endpoint = "http://localhost:9999";
+  setenv("OTEL_EXPORTER_OTLP_ENDPOINT", endpoint.c_str(), 1);
+  setenv("OTEL_EXPORTER_OTLP_TIMEOUT", "20050ms", 1);
+  setenv("OTEL_EXPORTER_OTLP_HEADERS", "k1=v1,k2=v2", 1);
+  setenv("OTEL_EXPORTER_OTLP_TRACES_HEADERS", "k1=v3,k1=v4", 1);
 
   std::unique_ptr<OtlpGrpcExporter> exporter(new OtlpGrpcExporter());
   EXPECT_EQ(GetOptions(exporter).ssl_credentials_cacert_as_string, cacert_str);

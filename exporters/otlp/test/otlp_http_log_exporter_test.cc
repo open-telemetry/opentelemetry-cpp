@@ -390,10 +390,10 @@ TEST_F(OtlpHttpLogExporterTestPeer, ConfigJsonBytesMappingTest)
 TEST_F(OtlpHttpLogExporterTestPeer, ConfigFromEnv)
 {
   const std::string url = "http://localhost:9999/v1/logs";
-  putenv("OTEL_EXPORTER_OTLP_ENDPOINT=http://localhost:9999");
-  putenv("OTEL_EXPORTER_OTLP_TIMEOUT=20s");
-  putenv("OTEL_EXPORTER_OTLP_HEADERS=k1=v1,k2=v2");
-  putenv("OTEL_EXPORTER_OTLP_LOGS_HEADERS=k1=v3,k1=v4");
+  setenv("OTEL_EXPORTER_OTLP_ENDPOINT", "http://localhost:9999", 1);
+  setenv("OTEL_EXPORTER_OTLP_TIMEOUT", "20s", 1);
+  setenv("OTEL_EXPORTER_OTLP_HEADERS", "k1=v1,k2=v2", 1);
+  setenv("OTEL_EXPORTER_OTLP_LOGS_HEADERS", "k1=v3,k1=v4", 1);
 
   std::unique_ptr<OtlpHttpLogExporter> exporter(new OtlpHttpLogExporter());
   EXPECT_EQ(GetOptions(exporter).url, url);
@@ -438,10 +438,10 @@ TEST_F(OtlpHttpLogExporterTestPeer, ConfigFromEnv)
 TEST_F(OtlpHttpLogExporterTestPeer, ConfigFromLogsEnv)
 {
   const std::string url = "http://localhost:9999/v1/logs";
-  putenv("OTEL_EXPORTER_OTLP_LOGS_ENDPOINT=http://localhost:9999/v1/logs");
-  putenv("OTEL_EXPORTER_OTLP_TIMEOUT=20s");
-  putenv("OTEL_EXPORTER_OTLP_HEADERS=k1=v1,k2=v2");
-  putenv("OTEL_EXPORTER_OTLP_LOGS_HEADERS=k1=v3,k1=v4");
+  setenv("OTEL_EXPORTER_OTLP_LOGS_ENDPOINT", url.c_str(), 1);
+  setenv("OTEL_EXPORTER_OTLP_TIMEOUT", "20s", 1);
+  setenv("OTEL_EXPORTER_OTLP_HEADERS", "k1=v1,k2=v2", 1);
+  setenv("OTEL_EXPORTER_OTLP_LOGS_HEADERS", "k1=v3,k1=v4", 1);
 
   std::unique_ptr<OtlpHttpLogExporter> exporter(new OtlpHttpLogExporter());
   EXPECT_EQ(GetOptions(exporter).url, url);

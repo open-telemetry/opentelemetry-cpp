@@ -347,16 +347,11 @@ TEST_F(OtlpHttpExporterTestPeer, ConfigJsonBytesMappingTest)
 // Test exporter configuration options with use_ssl_credentials
 TEST_F(OtlpHttpExporterTestPeer, ConfigFromEnv)
 {
-  const std::string url     = "http://localhost:9999/v1/traces";
-  const std::string url_env = "OTEL_EXPORTER_OTLP_ENDPOINT=" + url;
-  putenv(const_cast<char *>(url_env.data()));
-  std::vector<std::string> envs{"OTEL_EXPORTER_OTLP_TIMEOUT=20s",
-                                "OTEL_EXPORTER_OTLP_HEADERS=k1=v1,k2=v2",
-                                "OTEL_EXPORTER_OTLP_TRACES_HEADERS=k1=v3,k1=v4"};
-  for (size_t i = 0; i < envs.size(); ++i)
-  {
-    putenv(const_cast<char *>(envs[i].data()));
-  }
+  const std::string url = "http://localhost:9999/v1/traces";
+  setenv("OTEL_EXPORTER_OTLP_ENDPOINT", "http://localhost:9999", 1);
+  setenv("OTEL_EXPORTER_OTLP_TIMEOUT", "20s", 1);
+  setenv("OTEL_EXPORTER_OTLP_HEADERS", "k1=v1,k2=v2", 1);
+  setenv("OTEL_EXPORTER_OTLP_TRACES_HEADERS", "k1=v3,k1=v4", 1);
 
   std::unique_ptr<OtlpHttpExporter> exporter(new OtlpHttpExporter());
   EXPECT_EQ(GetOptions(exporter).url, url);
@@ -401,10 +396,10 @@ TEST_F(OtlpHttpExporterTestPeer, ConfigFromEnv)
 TEST_F(OtlpHttpExporterTestPeer, ConfigFromTracesEnv)
 {
   const std::string url = "http://localhost:9999/v1/traces";
-  putenv("OTEL_EXPORTER_OTLP_TRACES_ENDPOINT=http://localhost:9999/v1/traces");
-  putenv("OTEL_EXPORTER_OTLP_TIMEOUT=20s");
-  putenv("OTEL_EXPORTER_OTLP_HEADERS=k1=v1,k2=v2");
-  putenv("OTEL_EXPORTER_OTLP_TRACES_HEADERS=k1=v3,k1=v4");
+  setenv("OTEL_EXPORTER_OTLP_TRACES_ENDPOINT", url.c_str(), 1);
+  setenv("OTEL_EXPORTER_OTLP_TIMEOUT", "20s", 1);
+  setenv("OTEL_EXPORTER_OTLP_HEADERS", "k1=v1,k2=v2", 1);
+  setenv("OTEL_EXPORTER_OTLP_TRACES_HEADERS", "k1=v3,k1=v4", 1);
 
   std::unique_ptr<OtlpHttpExporter> exporter(new OtlpHttpExporter());
   EXPECT_EQ(GetOptions(exporter).url, url);
