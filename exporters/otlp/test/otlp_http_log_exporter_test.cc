@@ -27,6 +27,10 @@
 
 #    if defined(_MSC_VER)
 #      define putenv _putenv
+int setenv(const char *name, const char *value, int)
+{
+  return _putenv_s(name, value);
+}
 #    endif
 
 using namespace testing;
