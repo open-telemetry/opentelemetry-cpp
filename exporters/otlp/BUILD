@@ -19,18 +19,24 @@ load("//bazel:otel_cc_benchmark.bzl", "otel_cc_benchmark")
 cc_library(
     name = "otlp_recordable",
     srcs = [
+        "src/otlp_log_recordable.cc",
         "src/otlp_recordable.cc",
+        "src/otlp_recordable_utils.cc",
     ],
     hdrs = [
+        "include/opentelemetry/exporters/otlp/otlp_log_recordable.h",
         "include/opentelemetry/exporters/otlp/otlp_recordable.h",
+        "include/opentelemetry/exporters/otlp/otlp_recordable_utils.h",
         "include/opentelemetry/exporters/otlp/protobuf_include_prefix.h",
         "include/opentelemetry/exporters/otlp/protobuf_include_suffix.h",
     ],
     strip_include_prefix = "include",
     deps = [
+        "//sdk/src/logs",
         "//sdk/src/resource",
         "//sdk/src/trace",
-        "@com_github_opentelemetry_proto//:trace_proto_cc",
+        "@com_github_opentelemetry_proto//:logs_service_proto_cc",
+        "@com_github_opentelemetry_proto//:trace_service_proto_cc",
     ],
 )
 
@@ -58,13 +64,13 @@ cc_library(
 )
 
 cc_library(
-    name = "otlp_http_exporter",
+    name = "otlp_http_client",
     srcs = [
-        "src/otlp_http_exporter.cc",
+        "src/otlp_http_client.cc",
     ],
     hdrs = [
         "include/opentelemetry/exporters/otlp/otlp_environment.h",
-        "include/opentelemetry/exporters/otlp/otlp_http_exporter.h",
+        "include/opentelemetry/exporters/otlp/otlp_http_client.h",
         "include/opentelemetry/exporters/otlp/protobuf_include_prefix.h",
         "include/opentelemetry/exporters/otlp/protobuf_include_suffix.h",
     ],
@@ -80,11 +86,51 @@ cc_library(
     }),
     strip_include_prefix = "include",
     deps = [
-        ":otlp_recordable",
+        "//api",
         "//ext/src/http/client/curl:http_client_curl",
+        "//sdk:headers",
+        "@com_github_opentelemetry_proto//:common_proto_cc",
+        "@github_nlohmann_json//:json",
+    ],
+)
+
+cc_library(
+    name = "otlp_http_exporter",
+    srcs = [
+        "src/otlp_http_exporter.cc",
+    ],
+    hdrs = [
+        "include/opentelemetry/exporters/otlp/otlp_environment.h",
+        "include/opentelemetry/exporters/otlp/otlp_http_exporter.h",
+        "include/opentelemetry/exporters/otlp/protobuf_include_prefix.h",
+        "include/opentelemetry/exporters/otlp/protobuf_include_suffix.h",
+    ],
+    strip_include_prefix = "include",
+    deps = [
+        ":otlp_http_client",
+        ":otlp_recordable",
         "//sdk/src/trace",
         "@com_github_opentelemetry_proto//:trace_service_proto_cc",
-        "@github_nlohmann_json//:json",
+    ],
+)
+
+cc_library(
+    name = "otlp_http_log_exporter",
+    srcs = [
+        "src/otlp_http_log_exporter.cc",
+    ],
+    hdrs = [
+        "include/opentelemetry/exporters/otlp/otlp_environment.h",
+        "include/opentelemetry/exporters/otlp/otlp_http_log_exporter.h",
+        "include/opentelemetry/exporters/otlp/protobuf_include_prefix.h",
+        "include/opentelemetry/exporters/otlp/protobuf_include_suffix.h",
+    ],
+    strip_include_prefix = "include",
+    deps = [
+        ":otlp_http_client",
+        ":otlp_recordable",
+        "//sdk/src/trace",
+        "@com_github_opentelemetry_proto//:trace_service_proto_cc",
     ],
 )
 
@@ -112,6 +158,16 @@ cc_test(
     srcs = ["test/otlp_http_exporter_test.cc"],
     deps = [
         ":otlp_http_exporter",
+        "//api",
+        "@com_google_googletest//:gtest_main",
+    ],
+)
+
+cc_test(
+    name = "otlp_http_log_exporter_test",
+    srcs = ["test/otlp_http_log_exporter_test.cc"],
+    deps = [
+        ":otlp_http_log_exporter",
         "//api",
         "@com_google_googletest//:gtest_main",
     ],
