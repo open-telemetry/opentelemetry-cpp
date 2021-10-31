@@ -341,9 +341,9 @@ TEST_F(OtlpHttpExporterTestPeer, ConfigFromEnv)
   std::vector<std::string> envs{"OTEL_EXPORTER_OTLP_TIMEOUT=20s",
                                 "OTEL_EXPORTER_OTLP_HEADERS=k1=v1,k2=v2",
                                 "OTEL_EXPORTER_OTLP_TRACES_HEADERS=k1=v3,k1=v4"};
-  for (auto env : envs)
+  for (size_t i = 0; i < envs.size(); ++i)
   {
-    putenv(const_cast<char *>(env.c_str()));
+    putenv(const_cast<char *>(envs[i].data()));
   }
 
   std::unique_ptr<OtlpHttpExporter> exporter(new OtlpHttpExporter());
