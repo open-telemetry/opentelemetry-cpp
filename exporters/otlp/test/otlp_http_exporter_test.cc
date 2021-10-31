@@ -50,6 +50,7 @@ protected:
   std::vector<nlohmann::json> received_requests_json_;
   std::vector<opentelemetry::proto::collector::trace::v1::ExportTraceServiceRequest>
       received_requests_binary_;
+  std::map<std::string, std::string> received_requests_headers_;
 
 public:
   OtlpHttpExporterTestPeer() : is_setup_(false), is_running_(false){};
@@ -90,6 +91,7 @@ public:
         request_content_type = &it->second;
       }
     }
+    received_requests_headers_ = request.headers;
 
     int response_status = 0;
 
@@ -171,6 +173,8 @@ public:
     opts.url           = server_address_;
     opts.content_type  = content_type;
     opts.console_debug = true;
+    opts.http_headers.insert(
+        std::make_pair<const std::string, std::string>("Custom-Header-Key", "Custom-Header-Value"));
     return std::unique_ptr<sdk::trace::SpanExporter>(new OtlpHttpExporter(opts));
   }
 
@@ -239,6 +243,14 @@ TEST_F(OtlpHttpExporterTestPeer, ExportJsonIntegrationTest)
   auto span                         = *instrumentation_library_span["spans"].begin();
   auto received_trace_id            = span["trace_id"].get<std::string>();
   EXPECT_EQ(received_trace_id, report_trace_id);
+  {
+    auto custom_header = received_requests_headers_.find("Custom-Header-Key");
+    ASSERT_TRUE(custom_header != received_requests_headers_.end());
+    if (custom_header != received_requests_headers_.end())
+    {
+      EXPECT_EQ("Custom-Header-Value", custom_header->second);
+    }
+  }
 }
 
 // Create spans, let processor call Export()
@@ -379,6 +391,54 @@ TEST_F(OtlpHttpExporterTestPeer, ConfigFromEnv)
 
 #    else
   unsetenv("OTEL_EXPORTER_OTLP_ENDPOINT");
+  unsetenv("OTEL_EXPORTER_OTLP_TIMEOUT");
+  unsetenv("OTEL_EXPORTER_OTLP_HEADERS");
+  unsetenv("OTEL_EXPORTER_OTLP_TRACES_HEADERS");
+
+#    endif
+}
+
+TEST_F(OtlpHttpExporterTestPeer, ConfigFromTracesEnv)
+{
+  const std::string url = "http://localhost:9999/v1/traces";
+  putenv("OTEL_EXPORTER_OTLP_TRACES_ENDPOINT=http://localhost:9999/v1/traces");
+  putenv("OTEL_EXPORTER_OTLP_TIMEOUT=20s");
+  putenv("OTEL_EXPORTER_OTLP_HEADERS=k1=v1,k2=v2");
+  putenv("OTEL_EXPORTER_OTLP_TRACES_HEADERS=k1=v3,k1=v4");
+
+  std::unique_ptr<OtlpHttpExporter> exporter(new OtlpHttpExporter());
+  EXPECT_EQ(GetOptions(exporter).url, url);
+  EXPECT_EQ(
+      GetOptions(exporter).timeout.count(),
+      std::chrono::duration_cast<std::chrono::system_clock::duration>(std::chrono::seconds{20})
+          .count());
+  EXPECT_EQ(GetOptions(exporter).http_headers.size(), 3);
+  {
+    // Test k2
+    auto range = GetOptions(exporter).http_headers.equal_range("k2");
+    EXPECT_TRUE(range.first != range.second);
+    EXPECT_EQ(range.first->second, std::string("v2"));
+    ++range.first;
+    EXPECT_TRUE(range.first == range.second);
+  }
+  {
+    // k1
+    auto range = GetOptions(exporter).http_headers.equal_range("k1");
+    EXPECT_TRUE(range.first != range.second);
+    EXPECT_EQ(range.first->second, std::string("v3"));
+    ++range.first;
+    EXPECT_EQ(range.first->second, std::string("v4"));
+    ++range.first;
+    EXPECT_TRUE(range.first == range.second);
+  }
+#    if defined(_MSC_VER)
+  putenv("OTEL_EXPORTER_OTLP_TRACES_ENDPOINT=");
+  putenv("OTEL_EXPORTER_OTLP_TIMEOUT=");
+  putenv("OTEL_EXPORTER_OTLP_HEADERS=");
+  putenv("OTEL_EXPORTER_OTLP_TRACES_HEADERS=");
+
+#    else
+  unsetenv("OTEL_EXPORTER_OTLP_TRACES_ENDPOINT");
   unsetenv("OTEL_EXPORTER_OTLP_TIMEOUT");
   unsetenv("OTEL_EXPORTER_OTLP_HEADERS");
   unsetenv("OTEL_EXPORTER_OTLP_TRACES_HEADERS");
