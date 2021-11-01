@@ -174,8 +174,7 @@ TEST(ResourceTest, OtelResourceDetector)
 {
   std::map<std::string, std::string> expected_attributes = {{"k", "v"}};
 
-  char env[] = "OTEL_RESOURCE_ATTRIBUTES=k=v";
-  putenv(env);
+  setenv("OTEL_RESOURCE_ATTRIBUTES", "k=v", 1);
 
   OTELResourceDetector detector;
   auto resource            = detector.Detect();
@@ -190,21 +189,14 @@ TEST(ResourceTest, OtelResourceDetector)
     }
   }
   EXPECT_EQ(received_attributes.size(), expected_attributes.size());
-#  if defined(_MSC_VER)
-  putenv("OTEL_RESOURCE_ATTRIBUTES=");
-#  else
+
   unsetenv("OTEL_RESOURCE_ATTRIBUTES");
-#  endif
 }
 
 TEST(ResourceTest, OtelResourceDetectorEmptyEnv)
 {
   std::map<std::string, std::string> expected_attributes = {};
-#  if defined(_MSC_VER)
-  putenv("OTEL_RESOURCE_ATTRIBUTES=");
-#  else
   unsetenv("OTEL_RESOURCE_ATTRIBUTES");
-#  endif
   OTELResourceDetector detector;
   auto resource            = detector.Detect();
   auto received_attributes = resource.GetAttributes();

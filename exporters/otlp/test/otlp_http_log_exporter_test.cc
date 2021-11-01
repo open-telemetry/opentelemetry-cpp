@@ -26,11 +26,9 @@
 #    include "nlohmann/json.hpp"
 
 #    if defined(_MSC_VER)
-#      define putenv _putenv
-int setenv(const char *name, const char *value, int)
-{
-  return _putenv_s(name, value);
-}
+#      include "opentelemetry/sdk/common/env_variables.h"
+using sdk::common::setenv;
+using sdk::common::unsetenv;
 #    endif
 
 using namespace testing;
@@ -424,19 +422,11 @@ TEST_F(OtlpHttpLogExporterTestPeer, ConfigFromEnv)
     ++range.first;
     EXPECT_TRUE(range.first == range.second);
   }
-#      if defined(_MSC_VER)
-  putenv("OTEL_EXPORTER_OTLP_ENDPOINT=");
-  putenv("OTEL_EXPORTER_OTLP_TIMEOUT=");
-  putenv("OTEL_EXPORTER_OTLP_HEADERS=");
-  putenv("OTEL_EXPORTER_OTLP_LOGS_HEADERS=");
 
-#      else
   unsetenv("OTEL_EXPORTER_OTLP_ENDPOINT");
   unsetenv("OTEL_EXPORTER_OTLP_TIMEOUT");
   unsetenv("OTEL_EXPORTER_OTLP_HEADERS");
   unsetenv("OTEL_EXPORTER_OTLP_LOGS_HEADERS");
-
-#      endif
 }
 
 TEST_F(OtlpHttpLogExporterTestPeer, ConfigFromLogsEnv)
@@ -472,19 +462,11 @@ TEST_F(OtlpHttpLogExporterTestPeer, ConfigFromLogsEnv)
     ++range.first;
     EXPECT_TRUE(range.first == range.second);
   }
-#      if defined(_MSC_VER)
-  putenv("OTEL_EXPORTER_OTLP_LOGS_ENDPOINT=");
-  putenv("OTEL_EXPORTER_OTLP_TIMEOUT=");
-  putenv("OTEL_EXPORTER_OTLP_HEADERS=");
-  putenv("OTEL_EXPORTER_OTLP_LOGS_HEADERS=");
 
-#      else
   unsetenv("OTEL_EXPORTER_OTLP_LOGS_ENDPOINT");
   unsetenv("OTEL_EXPORTER_OTLP_TIMEOUT");
   unsetenv("OTEL_EXPORTER_OTLP_HEADERS");
   unsetenv("OTEL_EXPORTER_OTLP_LOGS_HEADERS");
-
-#      endif
 }
 
 TEST_F(OtlpHttpLogExporterTestPeer, DefaultEndpoint)
