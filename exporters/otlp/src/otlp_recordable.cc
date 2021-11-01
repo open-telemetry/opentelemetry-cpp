@@ -3,17 +3,15 @@
 
 #include "opentelemetry/exporters/otlp/otlp_recordable.h"
 
+#include "opentelemetry/exporters/otlp/otlp_recordable_utils.h"
+
+namespace nostd = opentelemetry::nostd;
+
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace exporter
 {
 namespace otlp
 {
-
-//
-// See `attribute_value.h` for details.
-//
-const int kAttributeValueSize      = 16;
-const int kOwnedAttributeValueSize = 15;
 
 void OtlpRecordable::SetIdentity(const opentelemetry::trace::SpanContext &span_context,
                                  opentelemetry::trace::SpanId parent_span_id) noexcept
@@ -27,211 +25,12 @@ void OtlpRecordable::SetIdentity(const opentelemetry::trace::SpanContext &span_c
   span_.set_trace_state(span_context.trace_state()->ToHeader());
 }
 
-void PopulateAttribute(opentelemetry::proto::common::v1::KeyValue *attribute,
-                       nostd::string_view key,
-                       const opentelemetry::common::AttributeValue &value)
-{
-  // Assert size of variant to ensure that this method gets updated if the variant
-  // definition changes
-  static_assert(
-      nostd::variant_size<opentelemetry::common::AttributeValue>::value == kAttributeValueSize,
-      "AttributeValue contains unknown type");
-
-  attribute->set_key(key.data(), key.size());
-
-  if (nostd::holds_alternative<bool>(value))
-  {
-    attribute->mutable_value()->set_bool_value(nostd::get<bool>(value));
-  }
-  else if (nostd::holds_alternative<int>(value))
-  {
-    attribute->mutable_value()->set_int_value(nostd::get<int>(value));
-  }
-  else if (nostd::holds_alternative<int64_t>(value))
-  {
-    attribute->mutable_value()->set_int_value(nostd::get<int64_t>(value));
-  }
-  else if (nostd::holds_alternative<unsigned int>(value))
-  {
-    attribute->mutable_value()->set_int_value(nostd::get<unsigned int>(value));
-  }
-  else if (nostd::holds_alternative<uint64_t>(value))
-  {
-    attribute->mutable_value()->set_int_value(nostd::get<uint64_t>(value));
-  }
-  else if (nostd::holds_alternative<double>(value))
-  {
-    attribute->mutable_value()->set_double_value(nostd::get<double>(value));
-  }
-  else if (nostd::holds_alternative<const char *>(value))
-  {
-    attribute->mutable_value()->set_string_value(nostd::get<const char *>(value));
-  }
-  else if (nostd::holds_alternative<nostd::string_view>(value))
-  {
-    attribute->mutable_value()->set_string_value(nostd::get<nostd::string_view>(value).data(),
-                                                 nostd::get<nostd::string_view>(value).size());
-  }
-  else if (nostd::holds_alternative<nostd::span<const uint8_t>>(value))
-  {
-    for (const auto &val : nostd::get<nostd::span<const uint8_t>>(value))
-    {
-      attribute->mutable_value()->mutable_array_value()->add_values()->set_int_value(val);
-    }
-  }
-  else if (nostd::holds_alternative<nostd::span<const bool>>(value))
-  {
-    for (const auto &val : nostd::get<nostd::span<const bool>>(value))
-    {
-      attribute->mutable_value()->mutable_array_value()->add_values()->set_bool_value(val);
-    }
-  }
-  else if (nostd::holds_alternative<nostd::span<const int>>(value))
-  {
-    for (const auto &val : nostd::get<nostd::span<const int>>(value))
-    {
-      attribute->mutable_value()->mutable_array_value()->add_values()->set_int_value(val);
-    }
-  }
-  else if (nostd::holds_alternative<nostd::span<const int64_t>>(value))
-  {
-    for (const auto &val : nostd::get<nostd::span<const int64_t>>(value))
-    {
-      attribute->mutable_value()->mutable_array_value()->add_values()->set_int_value(val);
-    }
-  }
-  else if (nostd::holds_alternative<nostd::span<const unsigned int>>(value))
-  {
-    for (const auto &val : nostd::get<nostd::span<const unsigned int>>(value))
-    {
-      attribute->mutable_value()->mutable_array_value()->add_values()->set_int_value(val);
-    }
-  }
-  else if (nostd::holds_alternative<nostd::span<const uint64_t>>(value))
-  {
-    for (const auto &val : nostd::get<nostd::span<const uint64_t>>(value))
-    {
-      attribute->mutable_value()->mutable_array_value()->add_values()->set_int_value(val);
-    }
-  }
-  else if (nostd::holds_alternative<nostd::span<const double>>(value))
-  {
-    for (const auto &val : nostd::get<nostd::span<const double>>(value))
-    {
-      attribute->mutable_value()->mutable_array_value()->add_values()->set_double_value(val);
-    }
-  }
-  else if (nostd::holds_alternative<nostd::span<const nostd::string_view>>(value))
-  {
-    for (const auto &val : nostd::get<nostd::span<const nostd::string_view>>(value))
-    {
-      attribute->mutable_value()->mutable_array_value()->add_values()->set_string_value(val.data(),
-                                                                                        val.size());
-    }
-  }
-}
-
-/** Maps from C++ attribute into OTLP proto attribute. */
-void PopulateAttribute(opentelemetry::proto::common::v1::KeyValue *attribute,
-                       nostd::string_view key,
-                       const sdk::common::OwnedAttributeValue &value)
-{
-  // Assert size of variant to ensure that this method gets updated if the variant
-  // definition changes
-  static_assert(
-      nostd::variant_size<sdk::common::OwnedAttributeValue>::value == kOwnedAttributeValueSize,
-      "OwnedAttributeValue contains unknown type");
-
-  attribute->set_key(key.data(), key.size());
-
-  if (nostd::holds_alternative<bool>(value))
-  {
-    attribute->mutable_value()->set_bool_value(nostd::get<bool>(value));
-  }
-  else if (nostd::holds_alternative<int32_t>(value))
-  {
-    attribute->mutable_value()->set_int_value(nostd::get<int32_t>(value));
-  }
-  else if (nostd::holds_alternative<int64_t>(value))
-  {
-    attribute->mutable_value()->set_int_value(nostd::get<int64_t>(value));
-  }
-  else if (nostd::holds_alternative<uint32_t>(value))
-  {
-    attribute->mutable_value()->set_int_value(nostd::get<uint32_t>(value));
-  }
-  else if (nostd::holds_alternative<uint64_t>(value))
-  {
-    attribute->mutable_value()->set_int_value(nostd::get<uint64_t>(value));
-  }
-  else if (nostd::holds_alternative<double>(value))
-  {
-    attribute->mutable_value()->set_double_value(nostd::get<double>(value));
-  }
-  else if (nostd::holds_alternative<std::string>(value))
-  {
-    attribute->mutable_value()->set_string_value(nostd::get<std::string>(value));
-  }
-  else if (nostd::holds_alternative<std::vector<bool>>(value))
-  {
-    for (const auto &val : nostd::get<std::vector<bool>>(value))
-    {
-      attribute->mutable_value()->mutable_array_value()->add_values()->set_bool_value(val);
-    }
-  }
-  else if (nostd::holds_alternative<std::vector<int32_t>>(value))
-  {
-    for (const auto &val : nostd::get<std::vector<int32_t>>(value))
-    {
-      attribute->mutable_value()->mutable_array_value()->add_values()->set_int_value(val);
-    }
-  }
-  else if (nostd::holds_alternative<std::vector<uint32_t>>(value))
-  {
-    for (const auto &val : nostd::get<std::vector<uint32_t>>(value))
-    {
-      attribute->mutable_value()->mutable_array_value()->add_values()->set_int_value(val);
-    }
-  }
-  else if (nostd::holds_alternative<std::vector<int64_t>>(value))
-  {
-    for (const auto &val : nostd::get<std::vector<int64_t>>(value))
-    {
-      attribute->mutable_value()->mutable_array_value()->add_values()->set_int_value(val);
-    }
-  }
-  else if (nostd::holds_alternative<std::vector<uint64_t>>(value))
-  {
-    for (const auto &val : nostd::get<std::vector<uint64_t>>(value))
-    {
-      attribute->mutable_value()->mutable_array_value()->add_values()->set_int_value(val);
-    }
-  }
-  else if (nostd::holds_alternative<std::vector<double>>(value))
-  {
-    for (const auto &val : nostd::get<std::vector<double>>(value))
-    {
-      attribute->mutable_value()->mutable_array_value()->add_values()->set_double_value(val);
-    }
-  }
-  else if (nostd::holds_alternative<std::vector<std::string>>(value))
-  {
-    for (const auto &val : nostd::get<std::vector<std::string>>(value))
-    {
-      attribute->mutable_value()->mutable_array_value()->add_values()->set_string_value(val);
-    }
-  }
-}
-
 proto::resource::v1::Resource OtlpRecordable::ProtoResource() const noexcept
 {
   proto::resource::v1::Resource proto;
   if (resource_)
   {
-    for (const auto &kv : resource_->GetAttributes())
-    {
-      PopulateAttribute(proto.add_attributes(), kv.first, kv.second);
-    }
+    OtlpRecordableUtils::PopulateAttribute(&proto, *resource_);
   }
 
   return proto;
@@ -280,7 +79,7 @@ void OtlpRecordable::SetAttribute(nostd::string_view key,
                                   const opentelemetry::common::AttributeValue &value) noexcept
 {
   auto *attribute = span_.add_attributes();
-  PopulateAttribute(attribute, key, value);
+  OtlpRecordableUtils::PopulateAttribute(attribute, key, value);
 }
 
 void OtlpRecordable::AddEvent(nostd::string_view name,
@@ -292,7 +91,7 @@ void OtlpRecordable::AddEvent(nostd::string_view name,
   event->set_time_unix_nano(timestamp.time_since_epoch().count());
 
   attributes.ForEachKeyValue([&](nostd::string_view key, common::AttributeValue value) noexcept {
-    PopulateAttribute(event->add_attributes(), key, value);
+    OtlpRecordableUtils::PopulateAttribute(event->add_attributes(), key, value);
     return true;
   });
 }
@@ -307,7 +106,7 @@ void OtlpRecordable::AddLink(const opentelemetry::trace::SpanContext &span_conte
                     trace::SpanId::kSize);
   link->set_trace_state(span_context.trace_state()->ToHeader());
   attributes.ForEachKeyValue([&](nostd::string_view key, common::AttributeValue value) noexcept {
-    PopulateAttribute(link->add_attributes(), key, value);
+    OtlpRecordableUtils::PopulateAttribute(link->add_attributes(), key, value);
     return true;
   });
 }
