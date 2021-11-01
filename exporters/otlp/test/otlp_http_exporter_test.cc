@@ -21,9 +21,10 @@
 #  include "nlohmann/json.hpp"
 
 #  if defined(_MSC_VER)
-#    define putenv _putenv
+#    include "opentelemetry/sdk/common/env_variables.h"
+using opentelemetry::sdk::common::setenv;
+using opentelemetry::sdk::common::unsetenv;
 #  endif
-
 using namespace testing;
 
 OPENTELEMETRY_BEGIN_NAMESPACE
@@ -348,10 +349,10 @@ TEST_F(OtlpHttpExporterTestPeer, ConfigJsonBytesMappingTest)
 TEST_F(OtlpHttpExporterTestPeer, ConfigFromEnv)
 {
   const std::string url = "http://localhost:9999/v1/traces";
-  putenv("OTEL_EXPORTER_OTLP_ENDPOINT=http://localhost:9999");
-  putenv("OTEL_EXPORTER_OTLP_TIMEOUT=20s");
-  putenv("OTEL_EXPORTER_OTLP_HEADERS=k1=v1,k2=v2");
-  putenv("OTEL_EXPORTER_OTLP_TRACES_HEADERS=k1=v3,k1=v4");
+  setenv("OTEL_EXPORTER_OTLP_ENDPOINT", "http://localhost:9999", 1);
+  setenv("OTEL_EXPORTER_OTLP_TIMEOUT", "20s", 1);
+  setenv("OTEL_EXPORTER_OTLP_HEADERS", "k1=v1,k2=v2", 1);
+  setenv("OTEL_EXPORTER_OTLP_TRACES_HEADERS", "k1=v3,k1=v4", 1);
 
   std::unique_ptr<OtlpHttpExporter> exporter(new OtlpHttpExporter());
   EXPECT_EQ(GetOptions(exporter).url, url);
@@ -378,28 +379,20 @@ TEST_F(OtlpHttpExporterTestPeer, ConfigFromEnv)
     ++range.first;
     EXPECT_TRUE(range.first == range.second);
   }
-#    if defined(_MSC_VER)
-  putenv("OTEL_EXPORTER_OTLP_ENDPOINT=");
-  putenv("OTEL_EXPORTER_OTLP_TIMEOUT=");
-  putenv("OTEL_EXPORTER_OTLP_HEADERS=");
-  putenv("OTEL_EXPORTER_OTLP_TRACES_HEADERS=");
 
-#    else
   unsetenv("OTEL_EXPORTER_OTLP_ENDPOINT");
   unsetenv("OTEL_EXPORTER_OTLP_TIMEOUT");
   unsetenv("OTEL_EXPORTER_OTLP_HEADERS");
   unsetenv("OTEL_EXPORTER_OTLP_TRACES_HEADERS");
-
-#    endif
 }
 
 TEST_F(OtlpHttpExporterTestPeer, ConfigFromTracesEnv)
 {
   const std::string url = "http://localhost:9999/v1/traces";
-  putenv("OTEL_EXPORTER_OTLP_TRACES_ENDPOINT=http://localhost:9999/v1/traces");
-  putenv("OTEL_EXPORTER_OTLP_TIMEOUT=20s");
-  putenv("OTEL_EXPORTER_OTLP_HEADERS=k1=v1,k2=v2");
-  putenv("OTEL_EXPORTER_OTLP_TRACES_HEADERS=k1=v3,k1=v4");
+  setenv("OTEL_EXPORTER_OTLP_TRACES_ENDPOINT", url.c_str(), 1);
+  setenv("OTEL_EXPORTER_OTLP_TIMEOUT", "20s", 1);
+  setenv("OTEL_EXPORTER_OTLP_HEADERS", "k1=v1,k2=v2", 1);
+  setenv("OTEL_EXPORTER_OTLP_TRACES_HEADERS", "k1=v3,k1=v4", 1);
 
   std::unique_ptr<OtlpHttpExporter> exporter(new OtlpHttpExporter());
   EXPECT_EQ(GetOptions(exporter).url, url);
@@ -426,19 +419,11 @@ TEST_F(OtlpHttpExporterTestPeer, ConfigFromTracesEnv)
     ++range.first;
     EXPECT_TRUE(range.first == range.second);
   }
-#    if defined(_MSC_VER)
-  putenv("OTEL_EXPORTER_OTLP_TRACES_ENDPOINT=");
-  putenv("OTEL_EXPORTER_OTLP_TIMEOUT=");
-  putenv("OTEL_EXPORTER_OTLP_HEADERS=");
-  putenv("OTEL_EXPORTER_OTLP_TRACES_HEADERS=");
 
-#    else
   unsetenv("OTEL_EXPORTER_OTLP_TRACES_ENDPOINT");
   unsetenv("OTEL_EXPORTER_OTLP_TIMEOUT");
   unsetenv("OTEL_EXPORTER_OTLP_HEADERS");
   unsetenv("OTEL_EXPORTER_OTLP_TRACES_HEADERS");
-
-#    endif
 }
 #  endif
 
