@@ -22,8 +22,8 @@
 
 #  if defined(_MSC_VER)
 #    include "opentelemetry/sdk/common/env_variables.h"
-using sdk::common::setenv;
-using sdk::common::unsetenv;
+using opentelemetry::sdk::common::setenv;
+using opentelemetry::sdk::common::unsetenv;
 #  endif
 using namespace testing;
 
