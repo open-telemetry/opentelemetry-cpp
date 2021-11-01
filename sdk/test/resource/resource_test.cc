@@ -14,9 +14,11 @@
 
 #include <gtest/gtest.h>
 
-#if defined(_MSC_VER)
-#  define putenv _putenv
-#endif
+#  if defined(_MSC_VER)
+#    include "opentelemetry/sdk/common/env_variables.h"
+using sdk::common::setenv;
+using sdk::common::unsetenv;
+#  endif
 
 using namespace opentelemetry::sdk::resource;
 
