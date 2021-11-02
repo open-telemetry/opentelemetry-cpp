@@ -20,6 +20,8 @@
 #  pragma warning(disable : 4244)
 #  pragma warning(disable : 4251)
 #  pragma warning(disable : 4267)
+#  pragma warning(disable : 4668)
+#  pragma warning(disable : 4946)
 #endif
 
 #if defined(__GNUC__) && !defined(__clang__) && !defined(__apple_build_version__)
