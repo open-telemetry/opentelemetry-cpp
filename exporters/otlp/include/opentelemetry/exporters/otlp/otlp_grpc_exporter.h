@@ -42,6 +42,8 @@ struct OtlpGrpcExporterOptions
   OtlpHeaders metadata = GetOtlpDefaultHeaders();
 };
 
+std::shared_ptr<grpc::Channel> MakeGrpcChannel(const OtlpGrpcExporterOptions &options);
+
 /**
  * The OTLP exporter exports span data in OpenTelemetry Protocol (OTLP) format.
  */

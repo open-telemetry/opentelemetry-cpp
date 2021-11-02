@@ -71,6 +71,18 @@ if(WITH_OTLP_HTTP)
              opentelemetry_exporter_otlp_http_client)
 
     list(APPEND OPENTELEMETRY_OTLP_TARGETS opentelemetry_exporter_otlp_http_log)
+
+    add_library(opentelemetry_exporter_otlp_grpc_log
+                src/otlp_grpc_log_exporter.cc)
+
+    set_target_properties(opentelemetry_exporter_otlp_grpc_log
+                          PROPERTIES EXPORT_NAME otlp_grpc_log_exporter)
+
+    target_link_libraries(
+      opentelemetry_exporter_otlp_grpc_log
+      PUBLIC opentelemetry_otlp_recordable)
+
+    list(APPEND OPENTELEMETRY_OTLP_TARGETS opentelemetry_exporter_otlp_grpc_log)
   endif()
 endif()
 
@@ -147,6 +159,8 @@ if(BUILD_TESTING)
         TARGET otlp_http_log_exporter_test
         TEST_PREFIX exporter.otlp.
         TEST_LIST otlp_http_log_exporter_test)
+
+    # TODO add test for grpc log exporter.
     endif()
   endif()
 endif() # BUILD_TESTING
