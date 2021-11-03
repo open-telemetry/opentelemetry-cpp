@@ -99,6 +99,11 @@ std::unique_ptr<sdk::trace::Recordable> OtlpGrpcExporter::MakeRecordable() noexc
 sdk::common::ExportResult OtlpGrpcExporter::Export(
     const nostd::span<std::unique_ptr<sdk::trace::Recordable>> &spans) noexcept
 {
+  if (is_shutdown_)
+  {
+    OTEL_INTERNAL_LOG_ERROR("[OTLP gRPC] Export failed, exporter is shutdown");
+    return sdk::common::ExportResult::kFailure;
+  }
   proto::collector::trace::v1::ExportTraceServiceRequest request;
   OtlpRecordableUtils::PopulateRequest(spans, &request);
 
@@ -125,6 +130,13 @@ sdk::common::ExportResult OtlpGrpcExporter::Export(
   }
   return sdk::common::ExportResult::kSuccess;
 }
+
+bool OtlpGrpcExporter::Shutdown(std::chrono::microseconds timeout) noexcept
+{
+  is_shutdown_ = true;
+  return true;
+}
+
 }  // namespace otlp
 }  // namespace exporter
 OPENTELEMETRY_END_NAMESPACE

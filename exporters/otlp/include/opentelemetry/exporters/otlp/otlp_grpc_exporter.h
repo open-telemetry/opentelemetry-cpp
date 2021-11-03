@@ -80,10 +80,7 @@ public:
    * @return return the status of this operation
    */
   bool Shutdown(
-      std::chrono::microseconds timeout = std::chrono::microseconds::max()) noexcept override
-  {
-    return true;
-  }
+      std::chrono::microseconds timeout = std::chrono::microseconds::max()) noexcept override;
 
 private:
   // The configuration options associated with this exporter.
@@ -101,6 +98,7 @@ private:
    * @param stub the service stub to be used for exporting
    */
   OtlpGrpcExporter(std::unique_ptr<proto::collector::trace::v1::TraceService::StubInterface> stub);
+  bool is_shutdown_ = false;
 };
 }  // namespace otlp
 }  // namespace exporter
