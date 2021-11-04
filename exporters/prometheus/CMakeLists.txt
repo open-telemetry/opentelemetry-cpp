@@ -14,11 +14,11 @@
 
 find_package(prometheus-cpp CONFIG REQUIRED)
 
-add_library(prometheus_exporter src/prometheus_collector.cc
-                                src/prometheus_exporter_utils.cc)
+add_library(prometheus_exporter_deprecated src/prometheus_collector.cc
+                                           src/prometheus_exporter_utils.cc)
 
 target_include_directories(
-  prometheus_exporter
+  prometheus_exporter_deprecated
   PUBLIC "$<BUILD_INTERFACE:${CMAKE_CURRENT_LIST_DIR}/include>"
          "$<INSTALL_INTERFACE:include>")
 
@@ -27,7 +27,7 @@ target_link_libraries(
                                         prometheus-cpp::core)
 
 install(
-  TARGETS prometheus_exporter
+  TARGETS prometheus_exporter_deprecated
   EXPORT "${PROJECT_NAME}-target"
   RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
   LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
