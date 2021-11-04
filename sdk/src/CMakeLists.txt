@@ -1,7 +1,7 @@
 add_subdirectory(common)
 add_subdirectory(trace)
 if(WITH_METRICS_PREVIEW)
-  add_subdirectory(metrics)
+  add_subdirectory(_metrics)
 endif()
 if(WITH_LOGS_PREVIEW)
   add_subdirectory(logs)

@@ -23,7 +23,7 @@ TEST(NoopTest, UseNoopTracers)
   s1->AddEvent("abc", attributes1);
 
   std::vector<std::pair<std::string, int>> attributes2;
-  s1->AddEvent("abc", attributes2);
+  s1->AddEvent("abc", attributes2); 
 
   s1->AddEvent("abc", {{"a", 1}, {"b", "2"}, {"c", 3.0}});
 

@@ -35,16 +35,16 @@ if(BUILD_TESTING)
 endif() # BUILD_TESTING
 
 if(WITH_METRICS_PREVIEW)
-  add_library(opentelemetry_exporter_ostream_metrics src/metrics_exporter.cc)
-  set_target_properties(opentelemetry_exporter_ostream_metrics
+  add_library(opentelemetry_exporter_ostream_metrics_deprecated src/metrics_exporter.cc)
+  set_target_properties(opentelemetry_exporter_ostream_metrics_deprecated
                         PROPERTIES EXPORT_NAME ostream_metrics_exporter)
   target_include_directories(
-    opentelemetry_exporter_ostream_metrics
+    opentelemetry_exporter_ostream_metrics_deprecated
     PUBLIC "$<BUILD_INTERFACE:${CMAKE_CURRENT_LIST_DIR}/include>")
-  target_link_libraries(opentelemetry_exporter_ostream_metrics
-                        PUBLIC opentelemetry_metrics)
+  target_link_libraries(opentelemetry_exporter_ostream_metrics_deprecated
+                        PUBLIC opentelemetry_metrics_deprecated)
   install(
-    TARGETS opentelemetry_exporter_ostream_metrics
+    TARGETS opentelemetry_exporter_ostream_metrics_deprecated
     EXPORT "${PROJECT_NAME}-target"
     RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
     LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
@@ -56,7 +56,7 @@ if(WITH_METRICS_PREVIEW)
   if(BUILD_TESTING)
     add_executable(ostream_metrics_test test/ostream_metrics_test.cc)
     target_link_libraries(ostream_metrics_test ${GTEST_BOTH_LIBRARIES}
-                          opentelemetry_exporter_ostream_metrics)
+                          opentelemetry_exporter_ostream_metrics_deprecated)
     gtest_add_tests(
       TARGET ostream_metrics_test
       TEST_PREFIX exporter.
