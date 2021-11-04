@@ -12,6 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+include_directories(include)
 find_package(prometheus-cpp CONFIG REQUIRED)
 
 add_library(prometheus_exporter_deprecated src/prometheus_collector.cc
