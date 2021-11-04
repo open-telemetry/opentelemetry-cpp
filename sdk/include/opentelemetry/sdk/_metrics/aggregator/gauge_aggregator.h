@@ -4,8 +4,8 @@
 #pragma once
 #ifdef ENABLE_METRICS_PREVIEW
 
-#  include "opentelemetry/common/timestamp.h"
 #  include "opentelemetry/_metrics/instrument.h"
+#  include "opentelemetry/common/timestamp.h"
 #  include "opentelemetry/sdk/_metrics/aggregator/aggregator.h"
 #  include "opentelemetry/version.h"
 

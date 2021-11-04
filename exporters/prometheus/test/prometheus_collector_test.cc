@@ -7,8 +7,8 @@
 #  include <map>
 #  include <thread>
 
-#  include "opentelemetry/exporters/prometheus/prometheus_collector.h"
 #  include "opentelemetry/_metrics/instrument.h"
+#  include "opentelemetry/exporters/prometheus/prometheus_collector.h"
 #  include "opentelemetry/sdk/_metrics/aggregator/aggregator.h"
 #  include "opentelemetry/sdk/_metrics/aggregator/counter_aggregator.h"
 #  include "opentelemetry/sdk/_metrics/aggregator/exact_aggregator.h"

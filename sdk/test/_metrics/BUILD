@@ -5,7 +5,7 @@ cc_test(
     ],
     deps = [
         "//exporters/ostream:ostream_metrics_exporter_deprecated",
-	"//sdk/src/_metrics:metrics_deprecated",
+        "//sdk/src/_metrics:metrics_deprecated",
         "@com_google_googletest//:gtest_main",
     ],
 )

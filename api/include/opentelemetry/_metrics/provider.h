@@ -5,9 +5,9 @@
 #ifdef ENABLE_METRICS_PREVIEW
 #  include <mutex>
 
-#  include "opentelemetry/common/spin_lock_mutex.h"
 #  include "opentelemetry/_metrics/meter_provider.h"
 #  include "opentelemetry/_metrics/noop.h"
+#  include "opentelemetry/common/spin_lock_mutex.h"
 #  include "opentelemetry/nostd/shared_ptr.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE

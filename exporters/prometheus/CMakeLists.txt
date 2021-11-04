@@ -22,8 +22,9 @@ target_include_directories(
   PUBLIC "$<BUILD_INTERFACE:${CMAKE_CURRENT_LIST_DIR}/include>"
          "$<INSTALL_INTERFACE:include>")
 
-target_link_libraries(prometheus_exporter_deprecated PUBLIC opentelemetry_metrics_deprecated
-                                                 prometheus-cpp::core)
+target_link_libraries(
+  prometheus_exporter_deprecated PUBLIC opentelemetry_metrics_deprecated
+                                        prometheus-cpp::core)
 
 install(
   TARGETS prometheus_exporter

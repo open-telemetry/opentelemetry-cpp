@@ -2,8 +2,8 @@
 // SPDX-License-Identifier: Apache-2.0
 
 #ifdef ENABLE_METRICS_PREVIEW
-#  include "opentelemetry/exporters/ostream/metrics_exporter.h"
 #  include "opentelemetry/_metrics/provider.h"
+#  include "opentelemetry/exporters/ostream/metrics_exporter.h"
 #  include "opentelemetry/sdk/_metrics/controller.h"
 #  include "opentelemetry/sdk/_metrics/meter.h"
 #  include "opentelemetry/sdk/_metrics/meter_provider.h"

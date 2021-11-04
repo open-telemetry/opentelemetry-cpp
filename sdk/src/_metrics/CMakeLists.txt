@@ -1,9 +1,11 @@
 add_library(opentelemetry_metrics_deprecated meter_provider.cc meter.cc
-                                  ungrouped_processor.cc)
+                                             ungrouped_processor.cc)
 
-set_target_properties(opentelemetry_metrics_deprecated PROPERTIES EXPORT_NAME metrics_deprecated)
+set_target_properties(opentelemetry_metrics_deprecated
+                      PROPERTIES EXPORT_NAME metrics_deprecated)
 
-target_link_libraries(opentelemetry_metrics_deprecated PUBLIC opentelemetry_common)
+target_link_libraries(opentelemetry_metrics_deprecated
+                      PUBLIC opentelemetry_common)
 
 target_include_directories(
   opentelemetry_metrics_deprecated

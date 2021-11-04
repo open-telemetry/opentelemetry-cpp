@@ -6,8 +6,8 @@
 
 #  include <mutex>
 #  include <vector>
-#  include "opentelemetry/common/timestamp.h"
 #  include "opentelemetry/_metrics/instrument.h"
+#  include "opentelemetry/common/timestamp.h"
 #  include "opentelemetry/version.h"
 
 namespace metrics_api = opentelemetry::metrics;

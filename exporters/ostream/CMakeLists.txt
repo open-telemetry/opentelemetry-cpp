@@ -35,7 +35,8 @@ if(BUILD_TESTING)
 endif() # BUILD_TESTING
 
 if(WITH_METRICS_PREVIEW)
-  add_library(opentelemetry_exporter_ostream_metrics_deprecated src/metrics_exporter.cc)
+  add_library(opentelemetry_exporter_ostream_metrics_deprecated
+              src/metrics_exporter.cc)
   set_target_properties(opentelemetry_exporter_ostream_metrics_deprecated
                         PROPERTIES EXPORT_NAME ostream_metrics_exporter)
   target_include_directories(
