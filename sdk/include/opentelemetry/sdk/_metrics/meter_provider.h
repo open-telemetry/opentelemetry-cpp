@@ -28,16 +28,6 @@ public:
       nostd::string_view library_name,
       nostd::string_view library_version = "") noexcept override;
 
-  /**
-   * Shutdown the  meter provider.
-   */
-  bool Shutdown() noexcept;
-
-  /**
-   * Force flush the meter provider.
-   */
-  bool ForceFlush(std::chrono::microseconds timeout = (std::chrono::microseconds::max)()) noexcept;
-
 private:
   std::shared_ptr<opentelemetry::metrics::Meter> meter_;
 };
