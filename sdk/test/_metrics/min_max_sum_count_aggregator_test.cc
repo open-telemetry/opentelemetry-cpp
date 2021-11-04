@@ -5,7 +5,7 @@
 #  include <gtest/gtest.h>
 #  include <thread>
 
-#  include "opentelemetry/sdk/metrics/aggregator/min_max_sum_count_aggregator.h"
+#  include "opentelemetry/sdk/_metrics/aggregator/min_max_sum_count_aggregator.h"
 
 using namespace opentelemetry::sdk::metrics;
 

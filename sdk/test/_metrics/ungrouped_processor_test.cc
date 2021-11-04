@@ -2,10 +2,10 @@
 // SPDX-License-Identifier: Apache-2.0
 
 #ifdef ENABLE_METRICS_PREVIEW
-#  include "opentelemetry/sdk/metrics/ungrouped_processor.h"
+#  include "opentelemetry/sdk/_metrics/ungrouped_processor.h"
 #  include <gtest/gtest.h>
 #  include "opentelemetry/nostd/shared_ptr.h"
-#  include "opentelemetry/sdk/metrics/aggregator/counter_aggregator.h"
+#  include "opentelemetry/sdk/_metrics/aggregator/counter_aggregator.h"
 
 namespace sdkmetrics  = opentelemetry::sdk::metrics;
 namespace metrics_api = opentelemetry::metrics;

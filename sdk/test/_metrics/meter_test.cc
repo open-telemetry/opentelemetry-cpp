@@ -5,7 +5,7 @@
 #  include <gtest/gtest.h>
 #  include <future>
 
-#  include "opentelemetry/sdk/metrics/meter.h"
+#  include "opentelemetry/sdk/_metrics/meter.h"
 
 using namespace opentelemetry::sdk::metrics;
 namespace metrics_api = opentelemetry::metrics;

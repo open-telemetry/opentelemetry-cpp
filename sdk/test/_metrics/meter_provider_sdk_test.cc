@@ -4,8 +4,8 @@
 #ifdef ENABLE_METRICS_PREVIEW
 #  include <gtest/gtest.h>
 
-#  include "opentelemetry/sdk/metrics/meter.h"
-#  include "opentelemetry/sdk/metrics/meter_provider.h"
+#  include "opentelemetry/sdk/_metrics/meter.h"
+#  include "opentelemetry/sdk/_metrics/meter_provider.h"
 
 using namespace opentelemetry::sdk::metrics;
 

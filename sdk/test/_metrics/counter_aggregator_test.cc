@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 #ifdef ENABLE_METRICS_PREVIEW
-#  include "opentelemetry/sdk/metrics/aggregator/counter_aggregator.h"
+#  include "opentelemetry/sdk/_metrics/aggregator/counter_aggregator.h"
 
 #  include <gtest/gtest.h>
 #  include <numeric>

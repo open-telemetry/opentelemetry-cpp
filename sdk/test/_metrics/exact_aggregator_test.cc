@@ -6,7 +6,7 @@
 #ifdef ENABLE_METRICS_PREVIEW
 #  include <thread>
 
-#  include "opentelemetry/sdk/metrics/aggregator/exact_aggregator.h"
+#  include "opentelemetry/sdk/_metrics/aggregator/exact_aggregator.h"
 
 using namespace opentelemetry::sdk::metrics;
 

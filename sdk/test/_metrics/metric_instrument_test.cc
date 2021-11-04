@@ -9,8 +9,8 @@
 #  include <memory>
 #  include <string>
 #  include <thread>
-#  include "opentelemetry/sdk/metrics/async_instruments.h"
-#  include "opentelemetry/sdk/metrics/sync_instruments.h"
+#  include "opentelemetry/sdk/_metrics/async_instruments.h"
+#  include "opentelemetry/sdk/_metrics/sync_instruments.h"
 
 namespace metrics_api = opentelemetry::metrics;
 
