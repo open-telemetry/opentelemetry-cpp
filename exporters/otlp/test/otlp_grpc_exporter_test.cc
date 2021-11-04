@@ -32,7 +32,9 @@
 #  include <gtest/gtest.h>
 
 #  if defined(_MSC_VER)
-#    define putenv _putenv
+#    include "opentelemetry/sdk/common/env_variables.h"
+using opentelemetry::sdk::common::setenv;
+using opentelemetry::sdk::common::unsetenv;
 #  endif
 
 using namespace testing;
@@ -59,6 +61,31 @@ public:
     return exporter->options_;
   }
 };
+
+TEST_F(OtlpGrpcExporterTestPeer, ShutdownTest)
+{
+  auto mock_stub = new proto::collector::trace::v1::MockTraceServiceStub();
+  std::unique_ptr<proto::collector::trace::v1::TraceService::StubInterface> stub_interface(
+      mock_stub);
+  auto exporter = GetExporter(stub_interface);
+
+  auto recordable_1 = exporter->MakeRecordable();
+  recordable_1->SetName("Test span 1");
+  auto recordable_2 = exporter->MakeRecordable();
+  recordable_2->SetName("Test span 2");
+
+  // exporter shuold not be shutdown by default
+  nostd::span<std::unique_ptr<sdk::trace::Recordable>> batch_1(&recordable_1, 1);
+  EXPECT_CALL(*mock_stub, Export(_, _, _)).Times(Exactly(1)).WillOnce(Return(grpc::Status::OK));
+  auto result = exporter->Export(batch_1);
+  EXPECT_EQ(sdk::common::ExportResult::kSuccess, result);
+
+  exporter->Shutdown();
+
+  nostd::span<std::unique_ptr<sdk::trace::Recordable>> batch_2(&recordable_2, 1);
+  result = exporter->Export(batch_2);
+  EXPECT_EQ(sdk::common::ExportResult::kFailure, result);
+}
 
 // Call Export() directly
 TEST_F(OtlpGrpcExporterTestPeer, ExportUnitTest)
@@ -139,16 +166,13 @@ TEST_F(OtlpGrpcExporterTestPeer, ConfigSslCredentialsTest)
 TEST_F(OtlpGrpcExporterTestPeer, ConfigFromEnv)
 {
   const std::string cacert_str = "--begin and end fake cert--";
-  const std::string cacert_env = "OTEL_EXPORTER_OTLP_CERTIFICATE_STRING=" + cacert_str;
-  putenv(const_cast<char *>(cacert_env.data()));
-  char ssl_enable_env[] = "OTEL_EXPORTER_OTLP_SSL_ENABLE=True";
-  putenv(ssl_enable_env);
-  const std::string endpoint     = "http://localhost:9999";
-  const std::string endpoint_env = "OTEL_EXPORTER_OTLP_ENDPOINT=" + endpoint;
-  putenv(const_cast<char *>(endpoint_env.data()));
-  putenv("OTEL_EXPORTER_OTLP_TIMEOUT=20050ms");
-  putenv("OTEL_EXPORTER_OTLP_HEADERS=k1=v1,k2=v2");
-  putenv("OTEL_EXPORTER_OTLP_TRACES_HEADERS=k1=v3,k1=v4");
+  setenv("OTEL_EXPORTER_OTLP_CERTIFICATE_STRING", cacert_str.c_str(), 1);
+  setenv("OTEL_EXPORTER_OTLP_SSL_ENABLE", "True", 1);
+  const std::string endpoint = "http://localhost:9999";
+  setenv("OTEL_EXPORTER_OTLP_ENDPOINT", endpoint.c_str(), 1);
+  setenv("OTEL_EXPORTER_OTLP_TIMEOUT", "20050ms", 1);
+  setenv("OTEL_EXPORTER_OTLP_HEADERS", "k1=v1,k2=v2", 1);
+  setenv("OTEL_EXPORTER_OTLP_TRACES_HEADERS", "k1=v3,k1=v4", 1);
 
   std::unique_ptr<OtlpGrpcExporter> exporter(new OtlpGrpcExporter());
   EXPECT_EQ(GetOptions(exporter).ssl_credentials_cacert_as_string, cacert_str);
@@ -177,23 +201,13 @@ TEST_F(OtlpGrpcExporterTestPeer, ConfigFromEnv)
     ++range.first;
     EXPECT_TRUE(range.first == range.second);
   }
-#    if defined(_MSC_VER)
-  putenv("OTEL_EXPORTER_OTLP_ENDPOINT=");
-  putenv("OTEL_EXPORTER_OTLP_CERTIFICATE_STRING=");
-  putenv("OTEL_EXPORTER_OTLP_SSL_ENABLE=");
-  putenv("OTEL_EXPORTER_OTLP_TIMEOUT=");
-  putenv("OTEL_EXPORTER_OTLP_HEADERS=");
-  putenv("OTEL_EXPORTER_OTLP_TRACES_HEADERS=");
 
-#    else
   unsetenv("OTEL_EXPORTER_OTLP_ENDPOINT");
   unsetenv("OTEL_EXPORTER_OTLP_CERTIFICATE_STRING");
   unsetenv("OTEL_EXPORTER_OTLP_SSL_ENABLE");
   unsetenv("OTEL_EXPORTER_OTLP_TIMEOUT");
   unsetenv("OTEL_EXPORTER_OTLP_HEADERS");
   unsetenv("OTEL_EXPORTER_OTLP_TRACES_HEADERS");
-
-#    endif
 }
 #  endif
 
