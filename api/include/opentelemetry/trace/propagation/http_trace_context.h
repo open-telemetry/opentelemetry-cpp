@@ -1,6 +1,8 @@
 // Copyright The OpenTelemetry Authors
 // SPDX-License-Identifier: Apache-2.0
 
+#pragma once
+
 #include <array>
 #include "detail/hex.h"
 #include "detail/string.h"

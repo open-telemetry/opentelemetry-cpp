@@ -12,6 +12,18 @@ namespace sdk
 namespace common
 {
 
+#if defined(_MSC_VER)
+inline int setenv(const char *name, const char *value, int)
+{
+  return _putenv_s(name, value);
+}
+
+inline int unsetenv(const char *name)
+{
+  return setenv(name, "", 1);
+}
+#endif
+
 // Returns the env variable set.
 inline const std::string GetEnvironmentVariable(const char *env_var_name)
 {

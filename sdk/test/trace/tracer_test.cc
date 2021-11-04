@@ -347,13 +347,21 @@ TEST(Tracer, GetSampler)
   // Create a Tracer with a default AlwaysOnSampler
   auto tracer_on = initTracer(nullptr);
 
+#ifdef RTTI_ENABLED
   auto &t1 = std::dynamic_pointer_cast<Tracer>(tracer_on)->GetSampler();
+#else
+  auto &t1 = std::static_pointer_cast<Tracer>(tracer_on)->GetSampler();
+#endif
   ASSERT_EQ("AlwaysOnSampler", t1.GetDescription());
 
   // Create a Tracer with a AlwaysOffSampler
   auto tracer_off = initTracer(nullptr, new AlwaysOffSampler());
 
+#ifdef RTTI_ENABLED
   auto &t2 = std::dynamic_pointer_cast<Tracer>(tracer_off)->GetSampler();
+#else
+  auto &t2 = std::static_pointer_cast<Tracer>(tracer_off)->GetSampler();
+#endif
   ASSERT_EQ("AlwaysOffSampler", t2.GetDescription());
 }
 
@@ -539,8 +547,10 @@ TEST(Tracer, TestParentBasedSampler)
   // so this sampler will work as an AlwaysOnSampler.
   std::unique_ptr<InMemorySpanExporter> exporter2(new InMemorySpanExporter());
   std::shared_ptr<InMemorySpanData> span_data_parent_off = exporter2->GetData();
-  auto tracer_parent_off                                 = initTracer(std::move(exporter2),
-                                      new ParentBasedSampler(std::make_shared<AlwaysOffSampler>()));
+  auto tracer_parent_off =
+      initTracer(std::move(exporter2),
+                 // Add this to avoid different results for old and new version of clang-format
+                 new ParentBasedSampler(std::make_shared<AlwaysOffSampler>()));
 
   auto span_parent_off_1 = tracer_parent_off->StartSpan("span 1");
   auto span_parent_off_2 = tracer_parent_off->StartSpan("span 2");

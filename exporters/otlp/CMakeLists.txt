@@ -1,4 +1,7 @@
-add_library(opentelemetry_otlp_recordable src/otlp_recordable.cc)
+add_library(
+  opentelemetry_otlp_recordable
+  src/otlp_log_recordable.cc src/otlp_recordable.cc
+  src/otlp_recordable_utils.cc)
 set_target_properties(opentelemetry_otlp_recordable PROPERTIES EXPORT_NAME
                                                                otlp_recordable)
 
@@ -28,6 +31,21 @@ endif()
 
 if(WITH_OTLP_HTTP)
   find_package(CURL REQUIRED)
+  add_library(opentelemetry_exporter_otlp_http_client src/otlp_http_client.cc)
+  set_target_properties(opentelemetry_exporter_otlp_http_client
+                        PROPERTIES EXPORT_NAME otlp_http_client)
+  target_link_libraries(
+    opentelemetry_exporter_otlp_http_client
+    PUBLIC opentelemetry_sdk opentelemetry_proto http_client_curl
+           nlohmann_json::nlohmann_json)
+  target_include_directories(
+    opentelemetry_exporter_otlp_http_client
+    PUBLIC "$<BUILD_INTERFACE:${CMAKE_CURRENT_LIST_DIR}/include>"
+           "$<INSTALL_INTERFACE:include>")
+
+  list(APPEND OPENTELEMETRY_OTLP_TARGETS
+       opentelemetry_exporter_otlp_http_client)
+
   add_library(opentelemetry_exporter_otlp_http src/otlp_http_exporter.cc)
 
   set_target_properties(opentelemetry_exporter_otlp_http
@@ -35,10 +53,25 @@ if(WITH_OTLP_HTTP)
 
   target_link_libraries(
     opentelemetry_exporter_otlp_http
-    PUBLIC opentelemetry_otlp_recordable http_client_curl
-           nlohmann_json::nlohmann_json)
+    PUBLIC opentelemetry_otlp_recordable
+           opentelemetry_exporter_otlp_http_client)
 
   list(APPEND OPENTELEMETRY_OTLP_TARGETS opentelemetry_exporter_otlp_http)
+
+  if(WITH_LOGS_PREVIEW)
+    add_library(opentelemetry_exporter_otlp_http_log
+                src/otlp_http_log_exporter.cc)
+
+    set_target_properties(opentelemetry_exporter_otlp_http_log
+                          PROPERTIES EXPORT_NAME otlp_http_log_exporter)
+
+    target_link_libraries(
+      opentelemetry_exporter_otlp_http_log
+      PUBLIC opentelemetry_otlp_recordable
+             opentelemetry_exporter_otlp_http_client)
+
+    list(APPEND OPENTELEMETRY_OTLP_TARGETS opentelemetry_exporter_otlp_http_log)
+  endif()
 endif()
 
 install(
@@ -81,20 +114,39 @@ if(BUILD_TESTING)
   else()
     find_library(GMOCK_LIB gmock PATH_SUFFIXES lib)
   endif()
-  add_executable(otlp_grpc_exporter_test test/otlp_grpc_exporter_test.cc)
-  target_link_libraries(
-    otlp_grpc_exporter_test ${GTEST_BOTH_LIBRARIES} ${CMAKE_THREAD_LIBS_INIT}
-    ${GMOCK_LIB} opentelemetry_exporter_otlp_grpc)
-  gtest_add_tests(
-    TARGET otlp_grpc_exporter_test
-    TEST_PREFIX exporter.otlp.
-    TEST_LIST otlp_grpc_exporter_test)
-  add_executable(otlp_http_exporter_test test/otlp_http_exporter_test.cc)
-  target_link_libraries(
-    otlp_http_exporter_test ${GTEST_BOTH_LIBRARIES} ${CMAKE_THREAD_LIBS_INIT}
-    ${GMOCK_LIB} opentelemetry_exporter_otlp_http)
-  gtest_add_tests(
-    TARGET otlp_http_exporter_test
-    TEST_PREFIX exporter.otlp.
-    TEST_LIST otlp_http_exporter_test)
+
+  if(WITH_OTLP_GRPC)
+    add_executable(otlp_grpc_exporter_test test/otlp_grpc_exporter_test.cc)
+    target_link_libraries(
+      otlp_grpc_exporter_test ${GTEST_BOTH_LIBRARIES} ${CMAKE_THREAD_LIBS_INIT}
+      ${GMOCK_LIB} opentelemetry_exporter_otlp_grpc)
+    gtest_add_tests(
+      TARGET otlp_grpc_exporter_test
+      TEST_PREFIX exporter.otlp.
+      TEST_LIST otlp_grpc_exporter_test)
+  endif()
+
+  if(WITH_OTLP_HTTP)
+    add_executable(otlp_http_exporter_test test/otlp_http_exporter_test.cc)
+    target_link_libraries(
+      otlp_http_exporter_test ${GTEST_BOTH_LIBRARIES} ${CMAKE_THREAD_LIBS_INIT}
+      ${GMOCK_LIB} opentelemetry_exporter_otlp_http)
+    gtest_add_tests(
+      TARGET otlp_http_exporter_test
+      TEST_PREFIX exporter.otlp.
+      TEST_LIST otlp_http_exporter_test)
+
+    if(WITH_LOGS_PREVIEW)
+      add_executable(otlp_http_log_exporter_test
+                     test/otlp_http_log_exporter_test.cc)
+      target_link_libraries(
+        otlp_http_log_exporter_test ${GTEST_BOTH_LIBRARIES}
+        ${CMAKE_THREAD_LIBS_INIT} ${GMOCK_LIB}
+        opentelemetry_exporter_otlp_http_log opentelemetry_logs)
+      gtest_add_tests(
+        TARGET otlp_http_log_exporter_test
+        TEST_PREFIX exporter.otlp.
+        TEST_LIST otlp_http_log_exporter_test)
+    endif()
+  endif()
 endif() # BUILD_TESTING
