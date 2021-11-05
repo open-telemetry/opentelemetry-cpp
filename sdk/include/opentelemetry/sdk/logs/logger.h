@@ -54,7 +54,7 @@ public:
            const opentelemetry::common::KeyValueIterable &attributes,
            opentelemetry::trace::TraceId trace_id,
            opentelemetry::trace::SpanId span_id,
-           trace::TraceFlags trace_flags,
+           opentelemetry::trace::TraceFlags trace_flags,
            opentelemetry::common::SystemTimestamp timestamp) noexcept override;
 
 private:
