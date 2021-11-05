@@ -9,7 +9,7 @@
 #  include <vector>
 
 #  include "opentelemetry/exporters/prometheus/prometheus_exporter_utils.h"
-#  include "opentelemetry/sdk/metrics/record.h"
+#  include "opentelemetry/sdk/_metrics/record.h"
 #  include "prometheus/collectable.h"
 #  include "prometheus/metric_family.h"
 
