@@ -51,7 +51,7 @@ PrometheusExporter::PrometheusExporter() : is_shutdown_(false)
  * @return: returns a ReturnCode detailing a success, or type of failure
  */
 sdk::common::ExportResult PrometheusExporter::Export(
-    const std::vector<sdkmetrics::Record> &records) noexcept
+    const std::vector<sdk::metrics::Record> &records) noexcept
 {
   if (is_shutdown_)
   {

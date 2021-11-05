@@ -33,13 +33,12 @@
  */
 
 OPENTELEMETRY_BEGIN_NAMESPACE
-namespace sdkmetrics = opentelemetry::sdk::metrics;
 
 namespace exporter
 {
 namespace prometheus
 {
-class PrometheusExporter : public sdkmetrics::MetricsExporter
+class PrometheusExporter : public sdk::metrics::MetricsExporter
 {
 public:
   /**
@@ -55,7 +54,7 @@ public:
    * @return: returns a ReturnCode detailing a success, or type of failure
    */
   sdk::common::ExportResult Export(
-      const std::vector<sdkmetrics::Record> &records) noexcept override;
+      const std::vector<sdk::metrics::Record> &records) noexcept override;
 
   /**
    * Shuts down the exporter and does cleanup.
