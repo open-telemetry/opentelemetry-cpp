@@ -10,12 +10,12 @@
 
 #  include <opentelemetry/version.h>
 #  include "opentelemetry/exporters/prometheus/prometheus_exporter_utils.h"
-#  include "opentelemetry/sdk/metrics/aggregator/counter_aggregator.h"
-#  include "opentelemetry/sdk/metrics/aggregator/exact_aggregator.h"
-#  include "opentelemetry/sdk/metrics/aggregator/gauge_aggregator.h"
-#  include "opentelemetry/sdk/metrics/aggregator/histogram_aggregator.h"
-#  include "opentelemetry/sdk/metrics/aggregator/min_max_sum_count_aggregator.h"
-#  include "opentelemetry/sdk/metrics/aggregator/sketch_aggregator.h"
+#  include "opentelemetry/sdk/_metrics/aggregator/counter_aggregator.h"
+#  include "opentelemetry/sdk/_metrics/aggregator/exact_aggregator.h"
+#  include "opentelemetry/sdk/_metrics/aggregator/gauge_aggregator.h"
+#  include "opentelemetry/sdk/_metrics/aggregator/histogram_aggregator.h"
+#  include "opentelemetry/sdk/_metrics/aggregator/min_max_sum_count_aggregator.h"
+#  include "opentelemetry/sdk/_metrics/aggregator/sketch_aggregator.h"
 
 using opentelemetry::exporter::prometheus::PrometheusExporterUtils;
 namespace metric_sdk        = opentelemetry::sdk::metrics;

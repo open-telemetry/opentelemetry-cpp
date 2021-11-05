@@ -24,7 +24,7 @@ cc_test(
 )
 
 cc_library(
-    name = "ostream_metrics_exporter",
+    name = "ostream_metrics_exporter_deprecated",
     srcs = [
         "src/metrics_exporter.cc",
     ],
@@ -33,7 +33,7 @@ cc_library(
     ],
     strip_include_prefix = "include",
     deps = [
-        "//sdk/src/metrics",
+        "//sdk/src/_metrics:metrics_deprecated",
     ],
 )
 
@@ -41,7 +41,7 @@ cc_test(
     name = "ostream_metrics_test",
     srcs = ["test/ostream_metrics_test.cc"],
     deps = [
-        ":ostream_metrics_exporter",
+        ":ostream_metrics_exporter_deprecated",
         "@com_google_googletest//:gtest_main",
     ],
 )
