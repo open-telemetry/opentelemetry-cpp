@@ -304,7 +304,7 @@ if(WITH_PROMETHEUS)
   if(NOT prometheus-cpp_FOUND)
     message("Trying to use local prometheus-cpp from submodule")
     if(EXISTS ${PROJECT_SOURCE_DIR}/third_party/prometheus-cpp/.git)
-      include(third_party/prometheus-cpp)
+      add_subdirectory(third_party/prometheus-cpp)
     else()
       message(
         FATAL_ERROR
