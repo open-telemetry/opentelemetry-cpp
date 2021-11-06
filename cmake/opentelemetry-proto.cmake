@@ -1,6 +1,9 @@
 if(EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/third_party/opentelemetry-proto/.git)
     set(PROTO_PATH "${CMAKE_CURRENT_SOURCE_DIR}/third_party/opentelemetry-proto")
 else()
+    if("${opentelemetry-proto}" STREQUAL "")
+        set(opentelemetry-proto "main")
+    endif()
     include(ExternalProject)
     ExternalProject_Add(opentelemetry-proto
     GIT_REPOSITORY https://github.com/open-telemetry/opentelemetry-proto.git
