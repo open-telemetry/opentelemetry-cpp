@@ -1,5 +1,6 @@
 if(EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/third_party/opentelemetry-proto/.git)
     set(PROTO_PATH "${CMAKE_CURRENT_SOURCE_DIR}/third_party/opentelemetry-proto")
+    set(needs_proto_download FALSE)
 else()
     if("${opentelemetry-proto}" STREQUAL "")
         set(opentelemetry-proto "main")
@@ -26,6 +27,7 @@ else()
     )
     ExternalProject_Get_Property(opentelemetry-proto INSTALL_DIR)
     set(PROTO_PATH "${INSTALL_DIR}/src/opentelemetry-proto")
+    set(needs_proto_download TRUE)
 endif()
 
 include(${PROJECT_SOURCE_DIR}/cmake/proto-options-patch.cmake)
@@ -166,7 +168,9 @@ add_library(
   ${METRICS_SERVICE_PB_CPP_FILE}
   ${METRICS_SERVICE_GRPC_PB_CPP_FILE})
 
-add_dependencies(opentelemetry_proto opentelemetry-proto)
+if(needs_proto_download)
+    add_dependencies(opentelemetry_proto opentelemetry-proto)
+endif()
 set_target_properties(opentelemetry_proto PROPERTIES EXPORT_NAME proto)
 patch_protobuf_targets(opentelemetry_proto)
 
