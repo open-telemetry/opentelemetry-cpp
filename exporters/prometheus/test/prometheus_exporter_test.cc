@@ -21,7 +21,7 @@
 
 #  include "opentelemetry/exporters/prometheus/prometheus_collector.h"
 #  include "opentelemetry/exporters/prometheus/prometheus_exporter.h"
-#  include "opentelemetry/sdk/metrics/aggregator/counter_aggregator.h"
+#  include "opentelemetry/sdk/_metrics/aggregator/counter_aggregator.h"
 #  include "opentelemetry/version.h"
 
 /**
