@@ -31,7 +31,6 @@ target_link_libraries(
   PUBLIC opentelemetry_metrics_deprecated prometheus-cpp::pull
          prometheus-cpp::core)
 
-message(${prometheus-cpp})
 install(
   TARGETS prometheus_exporter_deprecated
   EXPORT "${PROJECT_NAME}-target"
