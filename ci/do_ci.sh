@@ -84,7 +84,6 @@ elif [[ "$1" == "cmake.c++20.stl.test" ]]; then
   make test
   exit 0
 elif [[ "$1" == "cmake.legacy.test" ]]; then
-
   cd "${BUILD_DIR}"
   rm -rf *
   export BUILD_ROOT="${BUILD_DIR}"
@@ -93,7 +92,6 @@ elif [[ "$1" == "cmake.legacy.test" ]]; then
   cmake -DCMAKE_BUILD_TYPE=Debug  \
         -DCMAKE_CXX_FLAGS="-Werror" \
         -DCMAKE_CXX_STANDARD=11 \
-        -DCMAKE_EXE_LINKER_FLAGS="-lpthread" \
         "${SRC_DIR}"
   make
   make test
