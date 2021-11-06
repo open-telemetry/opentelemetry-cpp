@@ -225,6 +225,9 @@ elif [[ "$1" == "code.coverage" ]]; then
   lcov --remove coverage.info '*/ext/http/server/*'> tmp_coverage.info 2>/dev/null
   cp tmp_coverage.info coverage.info
   exit 0
+elif [[ "$1" == "third_party.tags" ]]; then
+  git submodule status | sed 's:.*/::' | sed 's/ (/=/g' | sed 's/)//g' > third_party_release
+  exit 0
 fi
 
 echo "Invalid do_ci.sh target, see ci/README.md for valid targets."
