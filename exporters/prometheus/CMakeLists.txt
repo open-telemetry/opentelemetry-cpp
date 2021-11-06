@@ -13,17 +13,25 @@
 # limitations under the License.
 
 include_directories(include)
-find_package(prometheus-cpp CONFIG REQUIRED)
+if(NOT TARGET prometheus-cpp::core)
+  find_package(prometheus-cpp CONFIG REQUIRED)
+endif()
 
+add_library(
+  prometheus_exporter_deprecated
+  src/prometheus_exporter.cc src/prometheus_collector.cc
+  src/prometheus_exporter_utils.cc)
 target_include_directories(
   prometheus_exporter_deprecated
   PUBLIC "$<BUILD_INTERFACE:${CMAKE_CURRENT_LIST_DIR}/include>"
          "$<INSTALL_INTERFACE:include>")
 
 target_link_libraries(
-  prometheus_exporter_deprecated PUBLIC opentelemetry_metrics_deprecated prometheus-cpp::pull
-                                        prometheus-cpp::core)
+  prometheus_exporter_deprecated
+  PUBLIC opentelemetry_metrics_deprecated prometheus-cpp::pull
+         prometheus-cpp::core)
 
+message(${prometheus-cpp})
 install(
   TARGETS prometheus_exporter_deprecated
   EXPORT "${PROJECT_NAME}-target"

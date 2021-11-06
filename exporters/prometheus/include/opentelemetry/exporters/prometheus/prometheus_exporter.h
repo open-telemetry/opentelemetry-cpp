@@ -21,8 +21,8 @@
 #  include <vector>
 
 #  include "opentelemetry/exporters/prometheus/prometheus_collector.h"
-#  include "opentelemetry/sdk/metrics/exporter.h"
-#  include "opentelemetry/sdk/metrics/record.h"
+#  include "opentelemetry/sdk/_metrics/exporter.h"
+#  include "opentelemetry/sdk/_metrics/record.h"
 #  include "opentelemetry/version.h"
 #  include "prometheus/exposer.h"
 
