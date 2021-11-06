@@ -303,8 +303,8 @@ if(WITH_PROMETHEUS)
   find_package(prometheus-cpp CONFIG QUIET)
   if(NOT prometheus-cpp_FOUND)
     message("Trying to use local prometheus-cpp from submodule")
-    if(EXISTS ${PROJECT_SOURCE_DIR}/third_party/prometheus-cpp/CMakeLists.txt)
-      add_subdirectory(third_party/prometheus-cpp)
+    if(EXISTS ${PROJECT_SOURCE_DIR}/third_party/prometheus-cpp/.git)
+      include(third_party/prometheus-cpp)
     else()
       message(
         FATAL_ERROR
