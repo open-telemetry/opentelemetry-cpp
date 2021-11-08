@@ -18,9 +18,11 @@
 
 // clang-format on
 
+#  include "opentelemetry/ext/http/common/url_parser.h"
 #  include "opentelemetry/sdk/common/global_log_handler.h"
 
 #  include <chrono>
+#  include <fstream>
 #  include <memory>
 
 #  include <grpcpp/grpcpp.h>
@@ -31,8 +33,62 @@ namespace exporter
 namespace otlp
 {
 
+// ----------------------------- Helper functions ------------------------------
+// TODO: move exporters shared function to OTLP common library.
+static std::string get_file_contents(const char *fpath)
+{
+  std::ifstream finstream(fpath);
+  std::string contents;
+  contents.assign((std::istreambuf_iterator<char>(finstream)), std::istreambuf_iterator<char>());
+  finstream.close();
+  return contents;
+}
+
 struct OtlpGrpcExporterOptions;
-std::shared_ptr<grpc::Channel> MakeGrpcChannel(const OtlpGrpcExporterOptions &options);
+
+/**
+ * Create gRPC channel from the exporter options.
+ */
+static std::shared_ptr<grpc::Channel> MakeGrpcChannel(const OtlpGrpcExporterOptions &options)
+{
+  std::shared_ptr<grpc::Channel> channel;
+
+  //
+  // Scheme is allowed in OTLP endpoint definition, but is not allowed for creating gRPC channel.
+  // Passing URI with scheme to grpc::CreateChannel could resolve the endpoint to some unexpected
+  // address.
+  //
+
+  ext::http::common::UrlParser url(options.endpoint);
+  if (!url.success_)
+  {
+    OTEL_INTERNAL_LOG_ERROR("[OTLP Exporter] invalid endpoint: " << options.endpoint);
+
+    return nullptr;
+  }
+
+  std::string grpc_target = url.host_ + ":" + std::to_string(static_cast<int>(url.port_));
+
+  if (options.use_ssl_credentials)
+  {
+    grpc::SslCredentialsOptions ssl_opts;
+    if (options.ssl_credentials_cacert_path.empty())
+    {
+      ssl_opts.pem_root_certs = options.ssl_credentials_cacert_as_string;
+    }
+    else
+    {
+      ssl_opts.pem_root_certs = get_file_contents((options.ssl_credentials_cacert_path).c_str());
+    }
+    channel = grpc::CreateChannel(grpc_target, grpc::SslCredentials(ssl_opts));
+  }
+  else
+  {
+    channel = grpc::CreateChannel(grpc_target, grpc::InsecureChannelCredentials());
+  }
+
+  return channel;
+}
 
 // ----------------------------- Helper functions ------------------------------
 
@@ -42,8 +98,7 @@ std::shared_ptr<grpc::Channel> MakeGrpcChannel(const OtlpGrpcExporterOptions &op
 std::unique_ptr<::opentelemetry::proto::collector::logs::v1::LogsService::Stub> MakeLogServiceStub(
     const OtlpGrpcExporterOptions &options)
 {
-  std::shared_ptr<grpc::Channel> channel = MakeGrpcChannel(options);
-  return proto::collector::logs::v1::LogsService::NewStub(channel);
+  return proto::collector::logs::v1::LogsService::NewStub(MakeGrpcChannel(options));
 }
 
 // -------------------------------- Constructors --------------------------------
@@ -52,6 +107,11 @@ OtlpGrpcLogExporter::OtlpGrpcLogExporter() : OtlpGrpcLogExporter(OtlpGrpcExporte
 
 OtlpGrpcLogExporter::OtlpGrpcLogExporter(const OtlpGrpcExporterOptions &options)
     : options_(options), log_service_stub_(MakeLogServiceStub(options))
+{}
+
+OtlpGrpcLogExporter::OtlpGrpcLogExporter(
+    std::unique_ptr<proto::collector::logs::v1::LogsService::StubInterface> stub)
+    : options_(OtlpGrpcExporterOptions()), log_service_stub_(std::move(stub))
 {}
 
 // ----------------------------- Exporter methods ------------------------------

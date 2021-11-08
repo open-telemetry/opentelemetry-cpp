@@ -69,7 +69,7 @@ private:
   const OtlpGrpcExporterOptions options_;
 
   // For testing
-  friend class OtlpGrpcExporterTestPeer;
+  friend class OtlpGrpcLogExporterTestPeer;
 
   // Store service stub internally. Useful for testing.
   std::unique_ptr<proto::collector::logs::v1::LogsService::StubInterface> log_service_stub_;

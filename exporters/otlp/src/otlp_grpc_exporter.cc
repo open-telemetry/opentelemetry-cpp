@@ -77,8 +77,7 @@ std::shared_ptr<grpc::Channel> MakeGrpcChannel(const OtlpGrpcExporterOptions &op
 std::unique_ptr<proto::collector::trace::v1::TraceService::Stub> MakeTraceServiceStub(
     const OtlpGrpcExporterOptions &options)
 {
-  std::shared_ptr<grpc::Channel> channel = MakeGrpcChannel(options);
-  return proto::collector::trace::v1::TraceService::NewStub(channel);
+  return proto::collector::trace::v1::TraceService::NewStub(MakeGrpcChannel(options));
 }
 
 // -------------------------------- Constructors --------------------------------
