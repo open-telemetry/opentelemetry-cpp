@@ -237,7 +237,7 @@ cc_library(
 )
 ```
 
-## Using opentelemetry-cpp from package managers
+## Using Package Managers
 
 If you are using [Conan](https://www.conan.io/) to manage your dependencies,
 add [`opentelemetry-cpp/x.y.z`](https://conan.io/center/opentelemetry-cpp) to
