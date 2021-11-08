@@ -48,6 +48,7 @@ cc_library(
     hdrs = [
         "include/opentelemetry/exporters/otlp/otlp_environment.h",
         "include/opentelemetry/exporters/otlp/otlp_grpc_exporter.h",
+        "include/opentelemetry/exporters/otlp/otlp_grpc_exporter_options.h",
         "include/opentelemetry/exporters/otlp/protobuf_include_prefix.h",
         "include/opentelemetry/exporters/otlp/protobuf_include_suffix.h",
     ],
