@@ -1,17 +1,3 @@
-cc_library(
-    name = "foo_library",
-    srcs = [
-        "foo_library/foo_library.cc",
-    ],
-    hdrs = [
-        "foo_library/foo_library.h",
-    ],
-    deps = [
-        "//api",
-        "//sdk:headers",
-    ],
-)
-
 # TODO: enable bazel build
 # cc_binary(
 #     name = "example_jaeger",
@@ -19,7 +5,7 @@ cc_library(
 #         "main.cc",
 #     ],
 #     deps = [
-#         ":foo_library",
+#         "//examples/common/foo_library:common_foo_library",
 #         "//api",
 #         "//exporters/jaeger:jaeger_exporter",
 #         "//sdk/src/trace",

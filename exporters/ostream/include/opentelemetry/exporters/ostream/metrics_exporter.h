@@ -6,11 +6,11 @@
 
 #  include <iostream>
 #  include <string>
-#  include "opentelemetry/sdk/metrics/aggregator/exact_aggregator.h"
-#  include "opentelemetry/sdk/metrics/aggregator/gauge_aggregator.h"
-#  include "opentelemetry/sdk/metrics/aggregator/histogram_aggregator.h"
-#  include "opentelemetry/sdk/metrics/exporter.h"
-#  include "opentelemetry/sdk/metrics/record.h"
+#  include "opentelemetry/sdk/_metrics/aggregator/exact_aggregator.h"
+#  include "opentelemetry/sdk/_metrics/aggregator/gauge_aggregator.h"
+#  include "opentelemetry/sdk/_metrics/aggregator/histogram_aggregator.h"
+#  include "opentelemetry/sdk/_metrics/exporter.h"
+#  include "opentelemetry/sdk/_metrics/record.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace sdkmetrics = opentelemetry::sdk::metrics;

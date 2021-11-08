@@ -5,13 +5,13 @@
 #ifdef ENABLE_METRICS_PREVIEW
 
 #  include "opentelemetry/exporters/ostream/metrics_exporter.h"
-#  include "opentelemetry/sdk/metrics/aggregator/counter_aggregator.h"
-#  include "opentelemetry/sdk/metrics/aggregator/exact_aggregator.h"
-#  include "opentelemetry/sdk/metrics/aggregator/gauge_aggregator.h"
-#  include "opentelemetry/sdk/metrics/aggregator/min_max_sum_count_aggregator.h"
-#  include "opentelemetry/sdk/metrics/aggregator/sketch_aggregator.h"
-#  include "opentelemetry/sdk/metrics/exporter.h"
-#  include "opentelemetry/sdk/metrics/record.h"
+#  include "opentelemetry/sdk/_metrics/aggregator/counter_aggregator.h"
+#  include "opentelemetry/sdk/_metrics/aggregator/exact_aggregator.h"
+#  include "opentelemetry/sdk/_metrics/aggregator/gauge_aggregator.h"
+#  include "opentelemetry/sdk/_metrics/aggregator/min_max_sum_count_aggregator.h"
+#  include "opentelemetry/sdk/_metrics/aggregator/sketch_aggregator.h"
+#  include "opentelemetry/sdk/_metrics/exporter.h"
+#  include "opentelemetry/sdk/_metrics/record.h"
 
 #  include <iostream>
 

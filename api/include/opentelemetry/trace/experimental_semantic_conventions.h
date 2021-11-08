@@ -183,7 +183,7 @@ static const struct
 
 inline const char *attr(uint32_t attr)
 {
-  for (int i = 0; i < OTEL_CPP_TRACE_ATTRIBUTES_MAX; i++)
+  for (size_t i = 0; i < OTEL_CPP_TRACE_ATTRIBUTES_MAX; i++)
   {
     if (attribute_ids[i].attribute_id == attr)
       return attribute_ids[i].attribute_key;

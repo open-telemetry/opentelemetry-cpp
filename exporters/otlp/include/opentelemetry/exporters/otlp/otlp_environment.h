@@ -3,16 +3,17 @@
 
 #pragma once
 
+#include "opentelemetry/common/kv_properties.h"
+#include "opentelemetry/nostd/string_view.h"
+
+#include "opentelemetry/sdk/common/attribute_utils.h"
+#include "opentelemetry/sdk/common/env_variables.h"
+
 #include <algorithm>
 #include <chrono>
 #include <map>
 #include <string>
 #include <unordered_set>
-
-#include "opentelemetry/nostd/string_view.h"
-
-#include "opentelemetry/sdk/common/attribute_utils.h"
-#include "opentelemetry/sdk/common/env_variables.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace exporter
@@ -38,12 +39,16 @@ inline const std::string GetOtlpDefaultHttpEndpoint()
 {
   constexpr char kOtlpTracesEndpointEnv[] = "OTEL_EXPORTER_OTLP_TRACES_ENDPOINT";
   constexpr char kOtlpEndpointEnv[]       = "OTEL_EXPORTER_OTLP_ENDPOINT";
-  constexpr char kOtlpEndpointDefault[]   = "http://localhost:4317/v1/traces";
+  constexpr char kOtlpEndpointDefault[]   = "http://localhost:4318/v1/traces";
 
   auto endpoint = opentelemetry::sdk::common::GetEnvironmentVariable(kOtlpTracesEndpointEnv);
   if (endpoint.empty())
   {
     endpoint = opentelemetry::sdk::common::GetEnvironmentVariable(kOtlpEndpointEnv);
+    if (!endpoint.empty())
+    {
+      endpoint += "/v1/traces";
+    }
   }
   return endpoint.size() ? endpoint : kOtlpEndpointDefault;
 }
@@ -212,6 +217,52 @@ inline OtlpHeaders GetOtlpDefaultHeaders()
 
   trace_remove_cache.clear();
   DumpOtlpHeaders(result, kOtlpTracesHeadersEnv, trace_remove_cache);
+
+  return result;
+}
+
+inline const std::string GetOtlpDefaultHttpLogEndpoint()
+{
+  constexpr char kOtlpLogsEndpointEnv[] = "OTEL_EXPORTER_OTLP_LOGS_ENDPOINT";
+  constexpr char kOtlpEndpointEnv[]     = "OTEL_EXPORTER_OTLP_ENDPOINT";
+  constexpr char kOtlpEndpointDefault[] = "http://localhost:4318/v1/logs";
+
+  auto endpoint = opentelemetry::sdk::common::GetEnvironmentVariable(kOtlpLogsEndpointEnv);
+  if (endpoint.empty())
+  {
+    endpoint = opentelemetry::sdk::common::GetEnvironmentVariable(kOtlpEndpointEnv);
+    if (!endpoint.empty())
+    {
+      endpoint += "/v1/logs";
+    }
+  }
+  return endpoint.size() ? endpoint : kOtlpEndpointDefault;
+}
+
+inline const std::chrono::system_clock::duration GetOtlpDefaultLogTimeout()
+{
+  constexpr char kOtlpLogsTimeoutEnv[] = "OTEL_EXPORTER_OTLP_LOGS_TIMEOUT";
+  constexpr char kOtlpTimeoutEnv[]     = "OTEL_EXPORTER_OTLP_TIMEOUT";
+
+  auto timeout = opentelemetry::sdk::common::GetEnvironmentVariable(kOtlpLogsTimeoutEnv);
+  if (timeout.empty())
+  {
+    timeout = opentelemetry::sdk::common::GetEnvironmentVariable(kOtlpTimeoutEnv);
+  }
+  return GetOtlpTimeoutFromString(timeout.c_str());
+}
+
+inline OtlpHeaders GetOtlpDefaultLogHeaders()
+{
+  constexpr char kOtlpLogsHeadersEnv[] = "OTEL_EXPORTER_OTLP_LOGS_HEADERS";
+  constexpr char kOtlpHeadersEnv[]     = "OTEL_EXPORTER_OTLP_HEADERS";
+
+  OtlpHeaders result;
+  std::unordered_set<std::string> log_remove_cache;
+  DumpOtlpHeaders(result, kOtlpHeadersEnv, log_remove_cache);
+
+  log_remove_cache.clear();
+  DumpOtlpHeaders(result, kOtlpLogsHeadersEnv, log_remove_cache);
 
   return result;
 }

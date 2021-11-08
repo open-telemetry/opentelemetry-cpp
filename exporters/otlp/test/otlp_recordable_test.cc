@@ -196,7 +196,7 @@ TEST(OtlpRecordable, SetResource)
 
   auto proto_resource     = rec.ProtoResource();
   bool found_service_name = false;
-  for (size_t i = 0; i < proto_resource.attributes_size(); i++)
+  for (int i = 0; i < proto_resource.attributes_size(); i++)
   {
     auto attr = proto_resource.attributes(static_cast<int>(i));
     if (attr.key() == service_name_key && attr.value().string_value() == service_name)

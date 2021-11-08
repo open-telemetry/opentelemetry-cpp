@@ -3,6 +3,7 @@
 
 #include "opentelemetry/exporters/otlp/otlp_grpc_exporter.h"
 #include "opentelemetry/exporters/otlp/otlp_recordable.h"
+#include "opentelemetry/exporters/otlp/otlp_recordable_utils.h"
 #include "opentelemetry/ext/http/common/url_parser.h"
 #include "opentelemetry/sdk_config.h"
 
@@ -17,37 +18,6 @@ namespace otlp
 {
 
 // ----------------------------- Helper functions ------------------------------
-
-/**
- * Add span protobufs contained in recordables to request.
- * @param spans the spans to export
- * @param request the current request
- */
-void PopulateRequest(const nostd::span<std::unique_ptr<sdk::trace::Recordable>> &spans,
-                     proto::collector::trace::v1::ExportTraceServiceRequest *request)
-{
-  auto resource_span       = request->add_resource_spans();
-  auto instrumentation_lib = resource_span->add_instrumentation_library_spans();
-  bool first_pass          = true;
-
-  for (auto &recordable : spans)
-  {
-    auto rec = std::unique_ptr<OtlpRecordable>(static_cast<OtlpRecordable *>(recordable.release()));
-    *instrumentation_lib->add_spans()                       = std::move(rec->span());
-    *instrumentation_lib->mutable_instrumentation_library() = rec->GetProtoInstrumentationLibrary();
-
-    if (first_pass)
-    {
-      *instrumentation_lib->mutable_schema_url() = rec->GetInstrumentationLibrarySchemaURL();
-
-      *resource_span->mutable_resource()   = rec->ProtoResource();
-      *resource_span->mutable_schema_url() = rec->GetResourceSchemaURL();
-
-      first_pass = false;
-    }
-  }
-}
-
 static std::string get_file_contents(const char *fpath)
 {
   std::ifstream finstream(fpath);
@@ -124,9 +94,13 @@ std::unique_ptr<sdk::trace::Recordable> OtlpGrpcExporter::MakeRecordable() noexc
 sdk::common::ExportResult OtlpGrpcExporter::Export(
     const nostd::span<std::unique_ptr<sdk::trace::Recordable>> &spans) noexcept
 {
+  if (is_shutdown_)
+  {
+    OTEL_INTERNAL_LOG_ERROR("[OTLP gRPC] Export failed, exporter is shutdown");
+    return sdk::common::ExportResult::kFailure;
+  }
   proto::collector::trace::v1::ExportTraceServiceRequest request;
-
-  PopulateRequest(spans, &request);
+  OtlpRecordableUtils::PopulateRequest(spans, &request);
 
   grpc::ClientContext context;
   proto::collector::trace::v1::ExportTraceServiceResponse response;
@@ -151,6 +125,13 @@ sdk::common::ExportResult OtlpGrpcExporter::Export(
   }
   return sdk::common::ExportResult::kSuccess;
 }
+
+bool OtlpGrpcExporter::Shutdown(std::chrono::microseconds timeout) noexcept
+{
+  is_shutdown_ = true;
+  return true;
+}
+
 }  // namespace otlp
 }  // namespace exporter
 OPENTELEMETRY_END_NAMESPACE

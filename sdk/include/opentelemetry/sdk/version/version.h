@@ -5,7 +5,7 @@
 
 #include "opentelemetry/detail/preprocessor.h"
 
-#define OPENTELEMETRY_SDK_VERSION "1.0.0"
+#define OPENTELEMETRY_SDK_VERSION "1.0.1"
 
 #include "opentelemetry/version.h"
 

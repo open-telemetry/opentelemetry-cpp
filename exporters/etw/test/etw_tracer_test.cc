@@ -69,6 +69,9 @@ TEST(ETWTracer, TracerCheck)
         auto innerSpan = tracer->StartSpan("MySpanL3", attribs);
         auto innerScope = tracer->WithActiveSpan(innerSpan);
 
+        // Add span attribute
+        EXPECT_NO_THROW(outerSpan->SetAttribute("AttrName1", "AttrValue1"));
+
         // Add first event
         std::string eventName1 = "MyEvent1";
         Properties event1 =

@@ -15,7 +15,9 @@
 #include <gtest/gtest.h>
 
 #if defined(_MSC_VER)
-#  define putenv _putenv
+#  include "opentelemetry/sdk/common/env_variables.h"
+using opentelemetry::sdk::common::setenv;
+using opentelemetry::sdk::common::unsetenv;
 #endif
 
 using namespace opentelemetry::sdk::resource;
@@ -46,6 +48,7 @@ TEST(ResourceTest, create_without_servicename)
   {
     EXPECT_TRUE(expected_attributes.find(e.first) != expected_attributes.end());
     if (expected_attributes.find(e.first) != expected_attributes.end())
+    {
       if (e.first == "version")
         EXPECT_EQ(nostd::get<uint32_t>(expected_attributes.find(e.first)->second),
                   nostd::get<uint32_t>(e.second));
@@ -53,8 +56,9 @@ TEST(ResourceTest, create_without_servicename)
         EXPECT_EQ(nostd::get<double>(expected_attributes.find(e.first)->second),
                   nostd::get<double>(e.second));
       else
-        EXPECT_EQ(nostd::get<std::string>(expected_attributes.find(e.first)->second),
-                  nostd::get<std::string>(e.second));
+        EXPECT_EQ(opentelemetry::nostd::get<std::string>(expected_attributes.find(e.first)->second),
+                  opentelemetry::nostd::get<std::string>(e.second));
+    }
   }
   EXPECT_EQ(received_attributes.size(), expected_attributes.size());  // for missing service.name
 }
@@ -107,8 +111,10 @@ TEST(ResourceTest, create_with_emptyatrributes)
   {
     EXPECT_TRUE(expected_attributes.find(e.first) != expected_attributes.end());
     if (expected_attributes.find(e.first) != expected_attributes.end())
-      EXPECT_EQ(nostd::get<std::string>(expected_attributes.find(e.first)->second),
-                nostd::get<std::string>(e.second));
+    {
+      EXPECT_EQ(opentelemetry::nostd::get<std::string>(expected_attributes.find(e.first)->second),
+                opentelemetry::nostd::get<std::string>(e.second));
+    }
   }
   EXPECT_EQ(received_attributes.size(), expected_attributes.size());  // for missing service.name
 }
@@ -169,8 +175,7 @@ TEST(ResourceTest, OtelResourceDetector)
 {
   std::map<std::string, std::string> expected_attributes = {{"k", "v"}};
 
-  char env[] = "OTEL_RESOURCE_ATTRIBUTES=k=v";
-  putenv(env);
+  setenv("OTEL_RESOURCE_ATTRIBUTES", "k=v", 1);
 
   OTELResourceDetector detector;
   auto resource            = detector.Detect();
@@ -184,21 +189,14 @@ TEST(ResourceTest, OtelResourceDetector)
     }
   }
   EXPECT_EQ(received_attributes.size(), expected_attributes.size());
-#  if defined(_MSC_VER)
-  putenv("OTEL_RESOURCE_ATTRIBUTES=");
-#  else
+
   unsetenv("OTEL_RESOURCE_ATTRIBUTES");
-#  endif
 }
 
 TEST(ResourceTest, OtelResourceDetectorEmptyEnv)
 {
   std::map<std::string, std::string> expected_attributes = {};
-#  if defined(_MSC_VER)
-  putenv("OTEL_RESOURCE_ATTRIBUTES=");
-#  else
   unsetenv("OTEL_RESOURCE_ATTRIBUTES");
-#  endif
   OTELResourceDetector detector;
   auto resource            = detector.Detect();
   auto received_attributes = resource.GetAttributes();

@@ -76,7 +76,7 @@ class Logger : public logs::Logger
   {
     static ETWProvider instance;  // C++11 magic static
     return instance;
-  };
+  }
 
   /**
    * @brief Init a reference to etw::ProviderHandle
@@ -148,7 +148,7 @@ public:
       evt[ETW_FIELD_TIME] = utils::formatUtcTimestampMsAsISO8601(millis);
     }
 #  endif
-    const auto &cfg = GetConfiguration(tracerProvider_);
+    const auto &cfg = GetConfiguration(loggerProvider_);
     if (cfg.enableSpanId)
     {
       evt[ETW_FIELD_SPAN_ID] = ToLowerBase16(span_id);

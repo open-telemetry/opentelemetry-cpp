@@ -10,7 +10,7 @@ namespace version
 {
 const int MAJOR_VERSION     = 1;
 const int MINOR_VERSION     = 0;
-const int PATCH_VERSION     = 0;
+const int PATCH_VERSION     = 1;
 const char *PRE_RELEASE     = "";
 const char *BUILD_METADATA  = "";
 const int COUNT_NEW_COMMITS = 0;
