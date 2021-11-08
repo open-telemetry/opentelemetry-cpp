@@ -1,6 +1,10 @@
 // Copyright The OpenTelemetry Authors
 // SPDX-License-Identifier: Apache-2.0
 
+#include "opentelemetry/exporters/otlp/otlp_grpc_exporter.h"
+#include "opentelemetry/exporters/otlp/otlp_recordable.h"
+#include "opentelemetry/exporters/otlp/otlp_recordable_utils.h"
+#include "opentelemetry/ext/http/common/url_parser.h"
 #include "opentelemetry/sdk_config.h"
 
 #include <grpcpp/grpcpp.h>
@@ -73,7 +77,8 @@ std::shared_ptr<grpc::Channel> MakeGrpcChannel(const OtlpGrpcExporterOptions &op
 std::unique_ptr<proto::collector::trace::v1::TraceService::Stub> MakeTraceServiceStub(
     const OtlpGrpcExporterOptions &options)
 {
-  return proto::collector::trace::v1::TraceService::NewStub(MakeGrpcChannel(options));
+  std::shared_ptr<grpc::Channel> channel = MakeGrpcChannel(options);
+  return proto::collector::trace::v1::TraceService::NewStub(channel);
 }
 
 // -------------------------------- Constructors --------------------------------
@@ -125,7 +130,8 @@ sdk::common::ExportResult OtlpGrpcExporter::Export(
   if (!status.ok())
   {
 
-    OTEL_INTERNAL_LOG_ERROR("[OTLP TRACE GRPC Exporter] Export() failed: " << status.error_message());
+    OTEL_INTERNAL_LOG_ERROR(
+        "[OTLP TRACE GRPC Exporter] Export() failed: " << status.error_message());
     return sdk::common::ExportResult::kFailure;
   }
   return sdk::common::ExportResult::kSuccess;

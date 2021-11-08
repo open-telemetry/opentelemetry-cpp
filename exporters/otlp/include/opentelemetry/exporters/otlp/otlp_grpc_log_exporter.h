@@ -4,29 +4,25 @@
 #pragma once
 #ifdef ENABLE_LOGS_PREVIEW
 
+// clang-format off
+
 #  include "opentelemetry/exporters/otlp/protobuf_include_prefix.h"
 #  include "opentelemetry/proto/collector/logs/v1/logs_service.grpc.pb.h"
 #  include "opentelemetry/exporters/otlp/protobuf_include_suffix.h"
 
-#  include "opentelemetry/sdk/logs/exporter.h"
+// clang-format on
+
 #  include "opentelemetry/exporters/otlp/otlp_environment.h"
-#  include "opentelemetry/exporters/otlp/otlp_grpc_exporter.h"
+#  include "opentelemetry/exporters/otlp/otlp_grpc_exporter_options.h"
 #  include "opentelemetry/exporters/otlp/otlp_recordable.h"
 #  include "opentelemetry/exporters/otlp/otlp_recordable_utils.h"
+#  include "opentelemetry/sdk/logs/exporter.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace exporter
 {
 namespace otlp
 {
-
-// /**
-//  * Struct to hold OTLP log exporter options.
-//  */
-// struct OtlpGrpcLogExporterOptions
-// {
-//     std::string url = GetOtlpDefaultGrpcEndpoint();
-// };
 
 /**
  * The OTLP exporter exports log data in OpenTelemetry Protocol (OTLP) format in gRPC.
@@ -65,11 +61,10 @@ class OtlpGrpcLogExporter : public opentelemetry::sdk::logs::LogExporter
    */
   bool Shutdown(std::chrono::microseconds timeout = std::chrono::microseconds(0)) noexcept override
   {
-      return true;
+    return true;
   }
 
 private:
-
   // Configuration options for the exporter
   const OtlpGrpcExporterOptions options_;
 
@@ -77,17 +72,18 @@ private:
   friend class OtlpGrpcExporterTestPeer;
 
   // Store service stub internally. Useful for testing.
-  std::unique_ptr<proto::collector::logs::v1::LogService::StubInterface> log_service_stub_;
+  std::unique_ptr<proto::collector::logs::v1::LogsService::StubInterface> log_service_stub_;
 
   /**
    * Create an OtlpGrpcLogExporter using the specified service stub.
    * Only tests can call this constructor directly.
    * @param stub the service stub to be used for exporting
    */
-  OtlpGrpcExporter(std::unique_ptr<proto::collector::logs::v1::LogService::StubInterface> stub);
+  OtlpGrpcLogExporter(std::unique_ptr<proto::collector::logs::v1::LogsService::StubInterface> stub);
 };
 
 }  // namespace otlp
 }  // namespace exporter
+OPENTELEMETRY_END_NAMESPACE
 
 #endif

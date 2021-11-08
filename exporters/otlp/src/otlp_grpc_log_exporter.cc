@@ -6,7 +6,8 @@
 #  include "opentelemetry/exporters/otlp/otlp_grpc_log_exporter.h"
 #  include "opentelemetry/exporters/otlp/otlp_log_recordable.h"
 #  include "opentelemetry/exporters/otlp/otlp_recordable_utils.h"
-#  include "opentelemetry/sdk_config.h"
+
+// clang-format off
 
 #  include "opentelemetry/exporters/otlp/protobuf_include_prefix.h"
 
@@ -15,9 +16,14 @@
 
 #  include "opentelemetry/exporters/otlp/protobuf_include_suffix.h"
 
-#include <grpcpp/grpcpp.h>
+// clang-format on
 
-namespace nostd = opentelemetry::nostd;
+#  include "opentelemetry/sdk/common/global_log_handler.h"
+
+#  include <chrono>
+#  include <memory>
+
+#  include <grpcpp/grpcpp.h>
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace exporter
@@ -25,25 +31,26 @@ namespace exporter
 namespace otlp
 {
 
-// ----------------------------- Helper functions ------------------------------
+struct OtlpGrpcExporterOptions;
+std::shared_ptr<grpc::Channel> MakeGrpcChannel(const OtlpGrpcExporterOptions &options);
 
-std::unique_ptr<proto::collector::logs::v1::LogsService::Stub> MakeServiceStub(
-    const OtlpGrpcExporterOptions &options);
+// ----------------------------- Helper functions ------------------------------
 
 /**
  * Create log service stub to communicate with the OpenTelemetry Collector.
  */
-std::unique_ptr<proto::collector::logs::v1::LogsService::Stub> MakeLogServiceStub(
+std::unique_ptr<::opentelemetry::proto::collector::logs::v1::LogsService::Stub> MakeLogServiceStub(
     const OtlpGrpcExporterOptions &options)
 {
-  return proto::collector::logs::v1::LogsService::NewStub(MakeGrpcChannel(options));
+  std::shared_ptr<grpc::Channel> channel = MakeGrpcChannel(options);
+  return proto::collector::logs::v1::LogsService::NewStub(channel);
 }
 
 // -------------------------------- Constructors --------------------------------
 
-OtlpGrpcLogExporter::OtlpGrpcLogExporter() : OtlpGrpcLogExporter(OtlpGrpcLogExporterOptions()) {}
+OtlpGrpcLogExporter::OtlpGrpcLogExporter() : OtlpGrpcLogExporter(OtlpGrpcExporterOptions()) {}
 
-OtlpGrpcLogExporter::OtlpGrpcLogExporter(const OtlpExporterOptions &options)
+OtlpGrpcLogExporter::OtlpGrpcLogExporter(const OtlpGrpcExporterOptions &options)
     : options_(options), log_service_stub_(MakeLogServiceStub(options))
 {}
 
@@ -58,9 +65,21 @@ std::unique_ptr<opentelemetry::sdk::logs::Recordable> OtlpGrpcLogExporter::MakeR
 opentelemetry::sdk::common::ExportResult OtlpGrpcLogExporter::Export(
     const nostd::span<std::unique_ptr<opentelemetry::sdk::logs::Recordable>> &logs) noexcept
 {
-  proto::collector::logs::v1::ExportLogsServiceRequest service_request;
-  OtlpRecordableUtils::PopulateRequest(logs, &service_request);
+  proto::collector::logs::v1::ExportLogsServiceRequest request;
+  OtlpRecordableUtils::PopulateRequest(logs, &request);
 
+  grpc::ClientContext context;
+  proto::collector::logs::v1::ExportLogsServiceResponse response;
+
+  if (options_.timeout.count() > 0)
+  {
+    context.set_deadline(std::chrono::system_clock::now() + options_.timeout);
+  }
+
+  for (auto &header : options_.metadata)
+  {
+    context.AddMetadata(header.first, header.second);
+  }
   grpc::Status status = log_service_stub_->Export(&context, request, &response);
 
   if (!status.ok())
@@ -69,11 +88,6 @@ opentelemetry::sdk::common::ExportResult OtlpGrpcLogExporter::Export(
     return sdk::common::ExportResult::kFailure;
   }
   return sdk::common::ExportResult::kSuccess;
-}
-
-bool OtlpHttpLogExporter::Shutdown(std::chrono::microseconds timeout) noexcept
-{
-  return http_client_.Shutdown(timeout);
 }
 
 }  // namespace otlp
