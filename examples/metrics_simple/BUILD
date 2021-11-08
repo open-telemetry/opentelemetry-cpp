@@ -6,7 +6,7 @@ cc_binary(
     linkopts = ["-pthread"],
     deps = [
         "//api",
-        "//exporters/ostream:ostream_metrics_exporter",
-        "//sdk/src/metrics",
+        "//exporters/ostream:ostream_metrics_exporter_deprecated",
+        "//sdk/src/_metrics:metrics_deprecated",
     ],
 )
