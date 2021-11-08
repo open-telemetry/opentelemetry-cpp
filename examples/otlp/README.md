@@ -32,16 +32,16 @@ OpenTelemetry Collector with an OTLP receiver by running:
 - On Unix based systems use:
 
 ```console
-docker run --rm -it -p 4317:4317 -p 4318:4318 -v $(pwd)/examples/otlp:/cfg otel/opentelemetry-collector:0.19.0 --config=/cfg/opentelemetry-collector-config/config.dev.yaml
+docker run --rm -it -p 4317:4317 -p 4318:4318 -v $(pwd)/examples/otlp:/cfg otel/opentelemetry-collector:0.37.0 --config=/cfg/opentelemetry-collector-config/config.dev.yaml
 ```
 
 - On Windows use:
 
 ```console
-docker run --rm -it -p 4317:4317 -p 4318:4318 -v "%cd%/examples/otlp":/cfg otel/opentelemetry-collector:0.19.0 --config=/cfg/opentelemetry-collector-config/config.dev.yaml
+docker run --rm -it -p 4317:4317 -p 4318:4318 -v "%cd%/examples/otlp":/cfg otel/opentelemetry-collector:0.37.0 --config=/cfg/opentelemetry-collector-config/config.dev.yaml
 ```
 
-Note that the OTLP gRPC and HTTP exporters connects to the Collector at `localhost:4317` and `localhost:4318:/v1/traces` respectively. This can be changed with first argument from command-line, for example:
+Note that the OTLP gRPC and HTTP exporters connects to the Collector at `localhost:4317` and `localhost:4318/v1/traces` respectively. This can be changed with first argument from command-line, for example:
 `./example_otlp_grpc gateway.docker.internal:4317` and
 `./example_otlp_http gateway.docker.internal:4318/v1/traces`.
 

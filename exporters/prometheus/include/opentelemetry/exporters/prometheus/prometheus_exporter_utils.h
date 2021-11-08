@@ -7,7 +7,7 @@
 #  include <string>
 #  include <vector>
 
-#  include "opentelemetry/sdk/metrics/record.h"
+#  include "opentelemetry/sdk/_metrics/record.h"
 #  include "prometheus/metric_family.h"
 
 namespace metric_sdk = opentelemetry::sdk::metrics;

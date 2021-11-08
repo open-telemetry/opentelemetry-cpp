@@ -28,7 +28,7 @@ build systems for opentelemetry-cpp.
   exporter need nlohmann-json to build. This is covered in the build
   instructions for each of these components.
 
-### Building as Standalone CMake Project
+### Building as standalone CMake Project
 
 1. Getting the opentelementry-cpp source:
 
@@ -115,7 +115,7 @@ build systems for opentelemetry-cpp.
    $
    ```
 
-### Incorporating Into An Existing CMake Project
+### Incorporating into an existing CMake Project
 
 To use the library from a CMake project, you can locate it directly with
  `find_package` and use the imported targets from generated package
@@ -151,7 +151,7 @@ SDK with their unittests. We use 3.7.2 in our build system.
 
 To install Bazel, consult the [Installing Bazel](https://docs.bazel.build/versions/3.7.0/install.html) guide.
 
-### Building as Standalone Bazel Project
+### Building as standalone Bazel Project
 
 1. Getting the opentelementry-cpp source:
 
@@ -189,3 +189,67 @@ To install Bazel, consult the [Installing Bazel](https://docs.bazel.build/versio
    ```
 
 4. The build artifacts will be located under `bazel-bin`
+
+### Incorporating into an existing Bazel Project
+
+- WORKSPACE file:
+
+```console
+http_archive(
+    name = "io_opentelemetry_cpp",
+    sha256 = "<sha256>",
+    strip_prefix = "opentelemetry-cpp-1.0.1",
+    urls = [
+        "https://github.com/open-telemetry/opentelemetry-cpp/archive/refs/tags/v1.0.1.tar.gz"
+    ],
+)
+
+# Load OpenTelemetry dependencies after load.
+load("@io_opentelemetry_cpp//bazel:repository.bzl", "opentelemetry_cpp_deps")
+
+opentelemetry_cpp_deps()
+
+# Load gRPC dependencies after load.
+load("@com_github_grpc_grpc//bazel:grpc_deps.bzl", "grpc_deps")
+
+grpc_deps()
+
+# Load extra gRPC dependencies due to https://github.com/grpc/grpc/issues/20511
+load("@com_github_grpc_grpc//bazel:grpc_extra_deps.bzl", "grpc_extra_deps")
+
+grpc_extra_deps()
+
+```
+
+- Component level BUILD file:
+
+```console
+cc_library(
+   name = "<name>"
+   ...
+   deps = [
+      "@io_opentelemetry_cpp//api",
+      "@io_opentelemetry_cpp//exporters/otlp:otlp_exporter",
+      "@io_opentelemetry_cpp//sdk/src/trace",
+      ...
+   ],
+   ...
+)
+```
+
+## Using Package Managers
+
+If you are using [Conan](https://www.conan.io/) to manage your dependencies,
+add [`opentelemetry-cpp/x.y.z`](https://conan.io/center/opentelemetry-cpp) to
+your `conanfile`'s requires, where `x.y.z` is the release version you want to use.
+Please file issues [here](https://github.com/conan-io/conan-center-index/issues)
+if you experience problems with the packages.
+
+If you are using [vcpkg](https://github.com/Microsoft/vcpkg/) on your project
+for external dependencies, then you can install the
+[opentelemetry-cpp package](https://github.com/microsoft/vcpkg/tree/master/ports/opentelemetry-cpp)
+with `vcpkg install opentelemetry-cpp` and follow the then displayed descriptions.
+Please see the vcpkg project for any issues regarding the packaging.
+
+Please note, these packages are not officially provided and maintained by OpenTelemetry C++ project,
+and are just listed here to consolidate all such efforts for ease of developers.

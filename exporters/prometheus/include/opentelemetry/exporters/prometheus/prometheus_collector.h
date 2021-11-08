@@ -8,7 +8,7 @@
 #  include <mutex>
 #  include <vector>
 
-#  include "opentelemetry/sdk/metrics/record.h"
+#  include "opentelemetry/sdk/_metrics/record.h"
 #  include "prometheus/collectable.h"
 #  include "prometheus/metric_family.h"
 #  include "prometheus_exporter_utils.h"

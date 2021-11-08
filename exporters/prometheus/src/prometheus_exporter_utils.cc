@@ -8,7 +8,7 @@
 #  include <vector>
 
 #  include "opentelemetry/exporters/prometheus/prometheus_exporter_utils.h"
-#  include "opentelemetry/sdk/metrics/aggregator/aggregator.h"
+#  include "opentelemetry/sdk/_metrics/aggregator/aggregator.h"
 #  include "prometheus/metric_type.h"
 
 namespace prometheus_client = ::prometheus;

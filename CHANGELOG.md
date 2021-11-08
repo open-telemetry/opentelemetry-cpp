@@ -15,6 +15,8 @@ Increment the:
 
 ## [Unreleased]
 
+* [EXPORTER] Add OTLP/HTTP Log Exporter ([#1030](https://github.com/open-telemetry/opentelemetry-cpp/pull/1030))
+
 ## [1.0.1] 2021-10-21
 
 * [EXPORTER] Exports span attributes to ETW ([#1021](https://github.com/open-telemetry/opentelemetry-cpp/pull/1021))
