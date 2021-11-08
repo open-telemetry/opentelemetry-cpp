@@ -226,7 +226,10 @@ elif [[ "$1" == "code.coverage" ]]; then
   cp tmp_coverage.info coverage.info
   exit 0
 elif [[ "$1" == "third_party.tags" ]]; then
-  git submodule status | sed 's:.*/::' | sed 's/ (/=/g' | sed 's/)//g' > third_party_release
+  echo "gRPC=v1.39.1" > third_party_release
+  echo "thrift=0.14.1" >> third_party_release
+  echo "abseil=20210324.0" >> third_party_release
+  git submodule status | sed 's:.*/::' | sed 's/ (/=/g' | sed 's/)//g' >> third_party_release
   exit 0
 fi
 
