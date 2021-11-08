@@ -14,17 +14,18 @@
 #include "opentelemetry/exporters/ostream/span_exporter.h"
 
 namespace trace_api = opentelemetry::trace;
-
+namespace trace_sdk = opentelemetry::sdk::trace;
+namespace nostd     = opentelemetry::nostd;
 namespace
 {
 void initTracer()
 {
-  auto exporter = std::unique_ptr<sdktrace::SpanExporter>(
+  auto exporter = std::unique_ptr<trace_sdk::SpanExporter>(
       new opentelemetry::exporter::trace::OStreamSpanExporter);
-  auto processor = std::unique_ptr<sdktrace::SpanProcessor>(
-      new sdktrace::SimpleSpanProcessor(std::move(exporter)));
+  auto processor = std::unique_ptr<trace_sdk::SpanProcessor>(
+      new trace_sdk::SimpleSpanProcessor(std::move(exporter)));
   auto provider = nostd::shared_ptr<trace_api::TracerProvider>(
-      new sdktrace::TracerProvider(std::move(processor)));
+      new trace_sdk::TracerProvider(std::move(processor)));
 
   // Set the global trace provider
   trace_api::Provider::SetTracerProvider(provider);

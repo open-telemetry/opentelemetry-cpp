@@ -10,8 +10,6 @@
 #  include "opentelemetry/common/timestamp.h"
 #  include "opentelemetry/version.h"
 
-namespace metrics_api = opentelemetry::metrics;
-
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace sdk
 {
@@ -91,7 +89,10 @@ public:
    * @param none
    * @return the InstrumentKind of the aggregator's owner
    */
-  virtual opentelemetry::metrics::InstrumentKind get_instrument_kind() final { return kind_; }
+  virtual opentelemetry::opentelemetry::metrics::InstrumentKind get_instrument_kind() final
+  {
+    return kind_;
+  }
 
   /**
    * Returns the type of this aggregator
@@ -146,7 +147,7 @@ public:
 protected:
   std::vector<T> values_;
   std::vector<T> checkpoint_;
-  opentelemetry::metrics::InstrumentKind kind_;
+  opentelemetry::opentelemetry::metrics::InstrumentKind kind_;
   std::mutex mu_;
   AggregatorKind agg_kind_;
   bool updated_;

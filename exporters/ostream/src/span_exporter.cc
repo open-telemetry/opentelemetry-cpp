@@ -6,8 +6,9 @@
 #include <iostream>
 
 namespace nostd     = opentelemetry::nostd;
-namespace sdktrace  = opentelemetry::sdk::trace;
+namespace trace_sdk = opentelemetry::sdk::trace;
 namespace trace_api = opentelemetry::trace;
+namespace sdkcommon = opentelemetry::sdk::common;
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace exporter
@@ -35,13 +36,13 @@ std::ostream &operator<<(std::ostream &os, trace_api::SpanKind span_kind)
 
 OStreamSpanExporter::OStreamSpanExporter(std::ostream &sout) noexcept : sout_(sout) {}
 
-std::unique_ptr<sdktrace::Recordable> OStreamSpanExporter::MakeRecordable() noexcept
+std::unique_ptr<trace_sdk::Recordable> OStreamSpanExporter::MakeRecordable() noexcept
 {
-  return std::unique_ptr<sdktrace::Recordable>(new sdktrace::SpanData);
+  return std::unique_ptr<trace_sdk::Recordable>(new trace_sdk::SpanData);
 }
 
 sdk::common::ExportResult OStreamSpanExporter::Export(
-    const nostd::span<std::unique_ptr<sdktrace::Recordable>> &spans) noexcept
+    const nostd::span<std::unique_ptr<trace_sdk::Recordable>> &spans) noexcept
 {
   if (isShutdown_)
   {
@@ -50,8 +51,8 @@ sdk::common::ExportResult OStreamSpanExporter::Export(
 
   for (auto &recordable : spans)
   {
-    auto span = std::unique_ptr<sdktrace::SpanData>(
-        static_cast<sdktrace::SpanData *>(recordable.release()));
+    auto span = std::unique_ptr<trace_sdk::SpanData>(
+        static_cast<trace_sdk::SpanData *>(recordable.release()));
 
     if (span != nullptr)
     {
@@ -109,7 +110,7 @@ void OStreamSpanExporter::printAttributes(
   }
 }
 
-void OStreamSpanExporter::printEvents(const std::vector<sdktrace::SpanDataEvent> &events)
+void OStreamSpanExporter::printEvents(const std::vector<trace_sdk::SpanDataEvent> &events)
 {
   for (const auto &event : events)
   {
@@ -122,7 +123,7 @@ void OStreamSpanExporter::printEvents(const std::vector<sdktrace::SpanDataEvent>
   }
 }
 
-void OStreamSpanExporter::printLinks(const std::vector<sdktrace::SpanDataLink> &links)
+void OStreamSpanExporter::printLinks(const std::vector<trace_sdk::SpanDataLink> &links)
 {
   for (const auto &link : links)
   {

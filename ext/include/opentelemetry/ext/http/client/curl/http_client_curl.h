@@ -22,17 +22,22 @@ namespace client
 namespace curl
 {
 
-namespace http_client                 = opentelemetry::ext::http::client;
-const http_client::StatusCode Http_Ok = 200;
+const opentelemetry::ext::http::client::StatusCode Http_Ok = 200;
 
-class Request : public http_client::Request
+class Request : public opentelemetry::ext::http::client::Request
 {
 public:
-  Request() : method_(http_client::Method::Get), uri_("/") {}
+  Request() : method_(opentelemetry::ext::http::client::Method::Get), uri_("/") {}
 
-  void SetMethod(http_client::Method method) noexcept override { method_ = method; }
+  void SetMethod(opentelemetry::ext::http::client::Method method) noexcept override
+  {
+    method_ = method;
+  }
 
-  void SetBody(http_client::Body &body) noexcept override { body_ = std::move(body); }
+  void SetBody(opentelemetry::ext::http::client::Body &body) noexcept override
+  {
+    body_ = std::move(body);
+  }
 
   void AddHeader(nostd::string_view name, nostd::string_view value) noexcept override
   {
@@ -59,19 +64,22 @@ public:
   }
 
 public:
-  http_client::Method method_;
-  http_client::Body body_;
-  http_client::Headers headers_;
+  opentelemetry::ext::http::client::Method method_;
+  opentelemetry::ext::http::client::Body body_;
+  opentelemetry::ext::http::client::Headers headers_;
   std::string uri_;
   std::chrono::milliseconds timeout_ms_{5000};  // ms
 };
 
-class Response : public http_client::Response
+class Response : public opentelemetry::ext::http::client::Response
 {
 public:
   Response() : status_code_(Http_Ok) {}
 
-  virtual const http_client::Body &GetBody() const noexcept override { return body_; }
+  virtual const opentelemetry::ext::http::client::Body &GetBody() const noexcept override
+  {
+    return body_;
+  }
 
   virtual bool ForEachHeader(
       nostd::function_ref<bool(nostd::string_view name, nostd::string_view value)> callable)
@@ -103,17 +111,20 @@ public:
     return true;
   }
 
-  virtual http_client::StatusCode GetStatusCode() const noexcept override { return status_code_; }
+  virtual opentelemetry::ext::http::client::StatusCode GetStatusCode() const noexcept override
+  {
+    return status_code_;
+  }
 
 public:
   Headers headers_;
-  http_client::Body body_;
-  http_client::StatusCode status_code_;
+  opentelemetry::ext::http::client::Body body_;
+  opentelemetry::ext::http::client::StatusCode status_code_;
 };
 
 class HttpClient;
 
-class Session : public http_client::Session
+class Session : public opentelemetry::ext::http::client::Session
 {
 public:
   Session(HttpClient &http_client,
@@ -125,13 +136,14 @@ public:
     host_ = scheme + "://" + host + ":" + std::to_string(port) + "/";
   }
 
-  std::shared_ptr<http_client::Request> CreateRequest() noexcept override
+  std::shared_ptr<opentelemetry::ext::http::client::Request> CreateRequest() noexcept override
   {
     http_request_.reset(new Request());
     return http_request_;
   }
 
-  virtual void SendRequest(http_client::EventHandler &callback) noexcept override
+  virtual void SendRequest(
+      opentelemetry::ext::http::client::EventHandler &callback) noexcept override
   {
     is_session_active_ = true;
     std::string url    = host_ + std::string(http_request_->uri_);
@@ -143,7 +155,7 @@ public:
       if (operation.WasAborted())
       {
         // Manually cancelled
-        callback_ptr->OnEvent(http_client::SessionState::Cancelled, "");
+        callback_ptr->OnEvent(opentelemetry::ext::http::client::SessionState::Cancelled, "");
       }
 
       if (operation.GetResponseCode() >= CURL_LAST)
@@ -182,22 +194,23 @@ private:
   bool is_session_active_;
 };
 
-class HttpClientSync : public http_client::HttpClientSync
+class HttpClientSync : public opentelemetry::ext::http::client::HttpClientSync
 {
 public:
   HttpClientSync() { curl_global_init(CURL_GLOBAL_ALL); }
 
-  http_client::Result Get(const nostd::string_view &url,
-                          const http_client::Headers &headers) noexcept override
+  opentelemetry::ext::http::client::Result Get(
+      const nostd::string_view &url,
+      const opentelemetry::ext::http::client::Headers &headers) noexcept override
   {
-    http_client::Body body;
-    HttpOperation curl_operation(http_client::Method::Get, url.data(), nullptr, RequestMode::Sync,
-                                 headers, body);
+    opentelemetry::ext::http::client::Body body;
+    HttpOperation curl_operation(opentelemetry::ext::http::client::Method::Get, url.data(), nullptr,
+                                 RequestMode::Sync, headers, body);
     curl_operation.SendSync();
     auto session_state = curl_operation.GetSessionState();
     if (curl_operation.WasAborted())
     {
-      session_state = http_client::SessionState::Cancelled;
+      session_state = opentelemetry::ext::http::client::SessionState::Cancelled;
     }
     auto response = std::unique_ptr<Response>(new Response());
     if (curl_operation.GetResponseCode() >= CURL_LAST)
@@ -208,20 +221,21 @@ public:
       response->body_        = curl_operation.GetResponseBody();
       response->status_code_ = curl_operation.GetResponseCode();
     }
-    return http_client::Result(std::move(response), session_state);
+    return opentelemetry::ext::http::client::Result(std::move(response), session_state);
   }
 
-  http_client::Result Post(const nostd::string_view &url,
-                           const Body &body,
-                           const http_client::Headers &headers) noexcept override
+  opentelemetry::ext::http::client::Result Post(
+      const nostd::string_view &url,
+      const Body &body,
+      const opentelemetry::ext::http::client::Headers &headers) noexcept override
   {
-    HttpOperation curl_operation(http_client::Method::Post, url.data(), nullptr, RequestMode::Sync,
-                                 headers, body);
+    HttpOperation curl_operation(opentelemetry::ext::http::client::Method::Post, url.data(),
+                                 nullptr, RequestMode::Sync, headers, body);
     curl_operation.SendSync();
     auto session_state = curl_operation.GetSessionState();
     if (curl_operation.WasAborted())
     {
-      session_state = http_client::SessionState::Cancelled;
+      session_state = opentelemetry::ext::http::client::SessionState::Cancelled;
     }
     auto response = std::unique_ptr<Response>(new Response());
     if (curl_operation.GetResponseCode() >= CURL_LAST)
@@ -233,19 +247,20 @@ public:
       response->status_code_ = curl_operation.GetResponseCode();
     }
 
-    return http_client::Result(std::move(response), session_state);
+    return opentelemetry::ext::http::client::Result(std::move(response), session_state);
   }
 
   ~HttpClientSync() { curl_global_cleanup(); }
 };
 
-class HttpClient : public http_client::HttpClient
+class HttpClient : public opentelemetry::ext::http::client::HttpClient
 {
 public:
   // The call (curl_global_init) is not thread safe. Ensure this is called only once.
   HttpClient() : next_session_id_{0} { curl_global_init(CURL_GLOBAL_ALL); }
 
-  std::shared_ptr<http_client::Session> CreateSession(nostd::string_view url) noexcept override
+  std::shared_ptr<opentelemetry::ext::http::client::Session> CreateSession(
+      nostd::string_view url) noexcept override
   {
     auto parsedUrl = common::UrlParser(std::string(url));
     if (!parsedUrl.success_)

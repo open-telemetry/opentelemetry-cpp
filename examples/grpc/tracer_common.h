@@ -27,9 +27,14 @@ class GrpcClientCarrier : public opentelemetry::context::propagation::TextMapCar
 public:
   GrpcClientCarrier(ClientContext *context) : context_(context) {}
   GrpcClientCarrier() = default;
-  virtual nostd::string_view Get(nostd::string_view key) const noexcept override { return ""; }
+  virtual opentelemetry::nostd::string_view Get(
+      opentelemetry::nostd::string_view key) const noexcept override
+  {
+    return "";
+  }
 
-  virtual void Set(nostd::string_view key, nostd::string_view value) noexcept override
+  virtual void Set(opentelemetry::nostd::string_view key,
+                   opentelemetry::nostd::string_view value) noexcept override
   {
     std::cout << " Client ::: Adding " << key << " " << value << "\n";
     context_->AddMetadata(key.data(), value.data());
@@ -43,7 +48,8 @@ class GrpcServerCarrier : public opentelemetry::context::propagation::TextMapCar
 public:
   GrpcServerCarrier(ServerContext *context) : context_(context) {}
   GrpcServerCarrier() = default;
-  virtual nostd::string_view Get(nostd::string_view key) const noexcept override
+  virtual opentelemetry::nostd::string_view Get(
+      opentelemetry::nostd::string_view key) const noexcept override
   {
     auto it = context_->client_metadata().find(key.data());
     if (it != context_->client_metadata().end())
@@ -53,7 +59,8 @@ public:
     return "";
   }
 
-  virtual void Set(nostd::string_view key, nostd::string_view value) noexcept override
+  virtual void Set(opentelemetry::nostd::string_view key,
+                   opentelemetry::nostd::string_view value) noexcept override
   {
     // Not required for server
   }
@@ -63,26 +70,26 @@ public:
 
 void initTracer()
 {
-  auto exporter = std::unique_ptr<sdktrace::SpanExporter>(
+  auto exporter = std::unique_ptr<opentelemetry::sdk::trace::SpanExporter>(
       new opentelemetry::exporter::trace::OStreamSpanExporter);
-  auto processor = std::unique_ptr<sdktrace::SpanProcessor>(
-      new sdktrace::SimpleSpanProcessor(std::move(exporter)));
-  std::vector<std::unique_ptr<sdktrace::SpanProcessor>> processors;
+  auto processor = std::unique_ptr<opentelemetry::sdk::trace::SpanProcessor>(
+      new opentelemetry::sdk::trace::SimpleSpanProcessor(std::move(exporter)));
+  std::vector<std::unique_ptr<opentelemetry::sdk::trace::SpanProcessor>> processors;
   processors.push_back(std::move(processor));
   // Default is an always-on sampler.
-  auto context  = std::make_shared<sdktrace::TracerContext>(std::move(processors));
-  auto provider = nostd::shared_ptr<opentelemetry::trace::TracerProvider>(
-      new sdktrace::TracerProvider(context));
+  auto context  = std::make_shared<opentelemetry::sdk::trace::TracerContext>(std::move(processors));
+  auto provider = opentelemetry::nostd::shared_ptr<opentelemetry::trace::TracerProvider>(
+      new opentelemetry::sdk::trace::TracerProvider(context));
   // Set the global trace provider
   opentelemetry::trace::Provider::SetTracerProvider(provider);
 
   // set global propagator
   opentelemetry::context::propagation::GlobalTextMapPropagator::SetGlobalPropagator(
-      nostd::shared_ptr<opentelemetry::context::propagation::TextMapPropagator>(
+      opentelemetry::nostd::shared_ptr<opentelemetry::context::propagation::TextMapPropagator>(
           new opentelemetry::trace::propagation::HttpTraceContext()));
 }
 
-nostd::shared_ptr<opentelemetry::trace::Tracer> get_tracer(std::string tracer_name)
+opentelemetry::nostd::shared_ptr<opentelemetry::trace::Tracer> get_tracer(std::string tracer_name)
 {
   auto provider = opentelemetry::trace::Provider::GetTracerProvider();
   return provider->GetTracer(tracer_name);

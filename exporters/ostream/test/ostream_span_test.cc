@@ -22,7 +22,7 @@ using namespace opentelemetry::exporter::ostream::test;
 namespace trace         = opentelemetry::trace;
 namespace common        = opentelemetry::common;
 namespace nostd         = opentelemetry::nostd;
-namespace sdktrace      = opentelemetry::sdk::trace;
+namespace trace_sdk     = opentelemetry::sdk::trace;
 namespace resource      = opentelemetry::sdk::resource;
 namespace exportertrace = opentelemetry::exporter::trace;
 
@@ -39,9 +39,9 @@ public:
 // Testing Shutdown functionality of OStreamSpanExporter, should expect no data to be sent to Stream
 TEST(OStreamSpanExporter, Shutdown)
 {
-  auto exporter  = std::unique_ptr<sdktrace::SpanExporter>(new exportertrace::OStreamSpanExporter);
-  auto processor = std::shared_ptr<sdktrace::SpanProcessor>(
-      new sdktrace::SimpleSpanProcessor(std::move(exporter)));
+  auto exporter  = std::unique_ptr<trace_sdk::SpanExporter>(new exportertrace::OStreamSpanExporter);
+  auto processor = std::shared_ptr<trace_sdk::SpanProcessor>(
+      new trace_sdk::SimpleSpanProcessor(std::move(exporter)));
 
   auto recordable = processor->MakeRecordable();
   recordable->SetName("Test Span");
@@ -79,9 +79,9 @@ TEST(OStreamSpanExporter, PrintDefaultSpan)
 {
   std::stringstream output;
   auto exporter =
-      std::unique_ptr<sdktrace::SpanExporter>(new exportertrace::OStreamSpanExporter(output));
-  auto processor = std::shared_ptr<sdktrace::SpanProcessor>(
-      new sdktrace::SimpleSpanProcessor(std::move(exporter)));
+      std::unique_ptr<trace_sdk::SpanExporter>(new exportertrace::OStreamSpanExporter(output));
+  auto processor = std::shared_ptr<trace_sdk::SpanProcessor>(
+      new trace_sdk::SimpleSpanProcessor(std::move(exporter)));
 
   auto recordable = processor->MakeRecordable();
 
@@ -94,9 +94,9 @@ TEST(OStreamSpanExporter, PrintSpanWithBasicFields)
 {
   std::stringstream output;
   auto exporter =
-      std::unique_ptr<sdktrace::SpanExporter>(new exportertrace::OStreamSpanExporter(output));
-  auto processor = std::shared_ptr<sdktrace::SpanProcessor>(
-      new sdktrace::SimpleSpanProcessor(std::move(exporter)));
+      std::unique_ptr<trace_sdk::SpanExporter>(new exportertrace::OStreamSpanExporter(output));
+  auto processor = std::shared_ptr<trace_sdk::SpanProcessor>(
+      new trace_sdk::SimpleSpanProcessor(std::move(exporter)));
 
   auto recordable = processor->MakeRecordable();
 
@@ -153,9 +153,9 @@ TEST(OStreamSpanExporter, PrintSpanWithAttribute)
 {
   std::stringstream output;
   auto exporter =
-      std::unique_ptr<sdktrace::SpanExporter>(new exportertrace::OStreamSpanExporter(output));
-  auto processor = std::shared_ptr<sdktrace::SpanProcessor>(
-      new sdktrace::SimpleSpanProcessor(std::move(exporter)));
+      std::unique_ptr<trace_sdk::SpanExporter>(new exportertrace::OStreamSpanExporter(output));
+  auto processor = std::shared_ptr<trace_sdk::SpanProcessor>(
+      new trace_sdk::SimpleSpanProcessor(std::move(exporter)));
 
   auto recordable = processor->MakeRecordable();
 
@@ -189,9 +189,9 @@ TEST(OStreamSpanExporter, PrintSpanWithArrayAttribute)
 {
   std::stringstream output;
   auto exporter =
-      std::unique_ptr<sdktrace::SpanExporter>(new exportertrace::OStreamSpanExporter(output));
-  auto processor = std::shared_ptr<sdktrace::SpanProcessor>(
-      new sdktrace::SimpleSpanProcessor(std::move(exporter)));
+      std::unique_ptr<trace_sdk::SpanExporter>(new exportertrace::OStreamSpanExporter(output));
+  auto processor = std::shared_ptr<trace_sdk::SpanProcessor>(
+      new trace_sdk::SimpleSpanProcessor(std::move(exporter)));
 
   auto recordable = processor->MakeRecordable();
 
@@ -227,9 +227,9 @@ TEST(OStreamSpanExporter, PrintSpanWithEvents)
 {
   std::stringstream output;
   auto exporter =
-      std::unique_ptr<sdktrace::SpanExporter>(new exportertrace::OStreamSpanExporter(output));
-  auto processor = std::shared_ptr<sdktrace::SpanProcessor>(
-      new sdktrace::SimpleSpanProcessor(std::move(exporter)));
+      std::unique_ptr<trace_sdk::SpanExporter>(new exportertrace::OStreamSpanExporter(output));
+  auto processor = std::shared_ptr<trace_sdk::SpanProcessor>(
+      new trace_sdk::SimpleSpanProcessor(std::move(exporter)));
 
   auto recordable = processor->MakeRecordable();
   common::SystemTimestamp now(std::chrono::system_clock::now());
@@ -284,9 +284,9 @@ TEST(OStreamSpanExporter, PrintSpanWithLinks)
 {
   std::stringstream output;
   auto exporter =
-      std::unique_ptr<sdktrace::SpanExporter>(new exportertrace::OStreamSpanExporter(output));
-  auto processor = std::shared_ptr<sdktrace::SpanProcessor>(
-      new sdktrace::SimpleSpanProcessor(std::move(exporter)));
+      std::unique_ptr<trace_sdk::SpanExporter>(new exportertrace::OStreamSpanExporter(output));
+  auto processor = std::shared_ptr<trace_sdk::SpanProcessor>(
+      new trace_sdk::SimpleSpanProcessor(std::move(exporter)));
 
   auto recordable = processor->MakeRecordable();
 
@@ -354,9 +354,9 @@ TEST(OStreamSpanExporter, PrintSpanWithLinks)
 // Test with the three common ostreams, tests are more of a sanity check and usage examples.
 TEST(OStreamSpanExporter, PrintSpanToCout)
 {
-  auto exporter  = std::unique_ptr<sdktrace::SpanExporter>(new exportertrace::OStreamSpanExporter);
-  auto processor = std::shared_ptr<sdktrace::SpanProcessor>(
-      new sdktrace::SimpleSpanProcessor(std::move(exporter)));
+  auto exporter  = std::unique_ptr<trace_sdk::SpanExporter>(new exportertrace::OStreamSpanExporter);
+  auto processor = std::shared_ptr<trace_sdk::SpanProcessor>(
+      new trace_sdk::SimpleSpanProcessor(std::move(exporter)));
 
   auto recordable = processor->MakeRecordable();
 
@@ -369,9 +369,9 @@ TEST(OStreamSpanExporter, PrintSpanToCout)
 TEST(OStreamSpanExporter, PrintSpanToCerr)
 {
   auto exporter =
-      std::unique_ptr<sdktrace::SpanExporter>(new exportertrace::OStreamSpanExporter(std::cerr));
-  auto processor = std::shared_ptr<sdktrace::SpanProcessor>(
-      new sdktrace::SimpleSpanProcessor(std::move(exporter)));
+      std::unique_ptr<trace_sdk::SpanExporter>(new exportertrace::OStreamSpanExporter(std::cerr));
+  auto processor = std::shared_ptr<trace_sdk::SpanProcessor>(
+      new trace_sdk::SimpleSpanProcessor(std::move(exporter)));
 
   auto recordable = processor->MakeRecordable();
 
@@ -384,9 +384,9 @@ TEST(OStreamSpanExporter, PrintSpanToCerr)
 TEST(OStreamSpanExporter, PrintSpanToClog)
 {
   auto exporter =
-      std::unique_ptr<sdktrace::SpanExporter>(new exportertrace::OStreamSpanExporter(std::clog));
-  auto processor = std::shared_ptr<sdktrace::SpanProcessor>(
-      new sdktrace::SimpleSpanProcessor(std::move(exporter)));
+      std::unique_ptr<trace_sdk::SpanExporter>(new exportertrace::OStreamSpanExporter(std::clog));
+  auto processor = std::shared_ptr<trace_sdk::SpanProcessor>(
+      new trace_sdk::SimpleSpanProcessor(std::move(exporter)));
 
   auto recordable = processor->MakeRecordable();
 

@@ -14,17 +14,19 @@ constexpr int kNumSpans  = 10;
 namespace trace_api      = opentelemetry::trace;
 namespace resource       = opentelemetry::sdk::resource;
 namespace exporter_trace = opentelemetry::exporter::trace;
+namespace trace_sdk      = opentelemetry::sdk::trace;
+namespace nostd          = opentelemetry::nostd;
 
 namespace
 {
 
 void initTracer()
 {
-  auto exporter = std::unique_ptr<sdktrace::SpanExporter>(new exporter_trace::OStreamSpanExporter);
+  auto exporter = std::unique_ptr<trace_sdk::SpanExporter>(new exporter_trace::OStreamSpanExporter);
 
   // CONFIGURE BATCH SPAN PROCESSOR PARAMETERS
 
-  sdktrace::BatchSpanProcessorOptions options{};
+  trace_sdk::BatchSpanProcessorOptions options{};
   // We make the queue size `KNumSpans`*2+5 because when the queue is half full, a preemptive notif
   // is sent to start an export call, which we want to avoid in this simple example.
   options.max_queue_size = kNumSpans * 2 + 5;
@@ -36,11 +38,11 @@ void initTracer()
   resource::ResourceAttributes attributes = {{"service", "test_service"}, {"version", (uint32_t)1}};
   auto resource                           = resource::Resource::Create(attributes);
 
-  auto processor = std::unique_ptr<sdktrace::SpanProcessor>(
-      new sdktrace::BatchSpanProcessor(std::move(exporter), options));
+  auto processor = std::unique_ptr<trace_sdk::SpanProcessor>(
+      new trace_sdk::BatchSpanProcessor(std::move(exporter), options));
 
   auto provider = nostd::shared_ptr<trace_api::TracerProvider>(
-      new sdktrace::TracerProvider(std::move(processor), resource));
+      new trace_sdk::TracerProvider(std::move(processor), resource));
   // Set the global trace provider.
   trace_api::Provider::SetTracerProvider(provider);
 }

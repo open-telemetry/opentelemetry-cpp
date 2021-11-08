@@ -27,6 +27,4 @@
 
 #  include "opentelemetry/exporters/etw/utils.h"
 
-namespace logs  = opentelemetry::logs;
-namespace trace = opentelemetry::trace;
 #endif  // ENABLE_LOGS_PREVIEW

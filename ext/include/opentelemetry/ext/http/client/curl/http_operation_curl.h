@@ -29,7 +29,6 @@ namespace client
 {
 namespace curl
 {
-namespace http_client = opentelemetry::ext::http::client;
 const std::chrono::milliseconds default_http_conn_timeout(5000);  // ms
 const std::string http_status_regexp = "HTTP\\/\\d\\.\\d (\\d+)\\ .*";
 const std::string http_header_regexp = "(.*)\\: (.*)\\n*";
@@ -43,7 +42,7 @@ enum class RequestMode
 class HttpOperation
 {
 public:
-  void DispatchEvent(http_client::SessionState type, std::string reason = "")
+  void DispatchEvent(opentelemetry::ext::http::client::SessionState type, std::string reason = "")
   {
     if (request_mode_ == RequestMode::Async && callback_ != nullptr)
     {
@@ -69,13 +68,15 @@ public:
    * @param raw_response whether to parse the response
    * @param httpConnTimeout   HTTP connection timeout in seconds
    */
-  HttpOperation(http_client::Method method,
+  HttpOperation(opentelemetry::ext::http::client::Method method,
                 std::string url,
-                http_client::EventHandler *callback,
+                opentelemetry::ext::http::client::EventHandler *callback,
                 RequestMode request_mode = RequestMode::Async,
                 // Default empty headers and empty request body
-                const http_client::Headers &request_headers = http_client::Headers(),
-                const http_client::Body &request_body       = http_client::Body(),
+                const opentelemetry::ext::http::client::Headers &request_headers =
+                    opentelemetry::ext::http::client::Headers(),
+                const opentelemetry::ext::http::client::Body &request_body =
+                    opentelemetry::ext::http::client::Body(),
                 // Default connectivity and response size options
                 bool is_raw_response                        = false,
                 std::chrono::milliseconds http_conn_timeout = default_http_conn_timeout)
@@ -102,7 +103,7 @@ public:
     if (!curl_)
     {
       res_ = CURLE_FAILED_INIT;
-      DispatchEvent(http_client::SessionState::CreateFailed);
+      DispatchEvent(opentelemetry::ext::http::client::SessionState::CreateFailed);
       return;
     }
 
@@ -129,7 +130,7 @@ public:
       curl_easy_setopt(curl_, CURLOPT_HTTPHEADER, headers_chunk_);
     }
 
-    DispatchEvent(http_client::SessionState::Created);
+    DispatchEvent(opentelemetry::ext::http::client::SessionState::Created);
   }
 
   /**
@@ -144,7 +145,7 @@ public:
       result_.wait();
     }
     // TBD - Need to be uncomment. This will callback instance is deleted.
-    // DispatchEvent(http_client::SessionState::Destroy);
+    // DispatchEvent(opentelemetry::ext::http::client::SessionState::Destroy);
     res_ = CURLE_OK;
     curl_easy_cleanup(curl_);
     curl_slist_free_all(headers_chunk_);
@@ -175,7 +176,7 @@ public:
     if (!curl_)
     {
       res_ = CURLE_FAILED_INIT;
-      DispatchEvent(http_client::SessionState::SendFailed);
+      DispatchEvent(opentelemetry::ext::http::client::SessionState::SendFailed);
       return res_;
     }
 
@@ -185,11 +186,11 @@ public:
     // Perform initial connect, handling the timeout if needed
     curl_easy_setopt(curl_, CURLOPT_CONNECT_ONLY, 1L);
     curl_easy_setopt(curl_, CURLOPT_TIMEOUT, http_conn_timeout_.count() / 1000);
-    DispatchEvent(http_client::SessionState::Connecting);
+    DispatchEvent(opentelemetry::ext::http::client::SessionState::Connecting);
     res_ = curl_easy_perform(curl_);
     if (CURLE_OK != res_)
     {
-      DispatchEvent(http_client::SessionState::ConnectFailed,
+      DispatchEvent(opentelemetry::ext::http::client::SessionState::ConnectFailed,
                     curl_easy_strerror(res_));  // couldn't connect - stage 1
       return res_;
     }
@@ -203,7 +204,7 @@ public:
 
     if (CURLE_OK != res_)
     {
-      DispatchEvent(http_client::SessionState::ConnectFailed,
+      DispatchEvent(opentelemetry::ext::http::client::SessionState::ConnectFailed,
                     curl_easy_strerror(res_));  // couldn't connect - stage 2
       return res_;
     }
@@ -214,12 +215,12 @@ public:
     {
       res_ = CURLE_OPERATION_TIMEDOUT;
       DispatchEvent(
-          http_client::SessionState::ConnectFailed,
+          opentelemetry::ext::http::client::SessionState::ConnectFailed,
           " Is aborted: " + std::to_string(is_aborted_.load()));  // couldn't connect - stage 3
       return res_;
     }
 
-    DispatchEvent(http_client::SessionState::Connected);
+    DispatchEvent(opentelemetry::ext::http::client::SessionState::Connected);
     // once connection is there - switch back to easy perform for HTTP post
     curl_easy_setopt(curl_, CURLOPT_CONNECT_ONLY, 0);
 
@@ -238,14 +239,14 @@ public:
     }
 
     // TODO: only two methods supported for now - POST and GET
-    if (method_ == http_client::Method::Post)
+    if (method_ == opentelemetry::ext::http::client::Method::Post)
     {
       // POST
       curl_easy_setopt(curl_, CURLOPT_POST, true);
       curl_easy_setopt(curl_, CURLOPT_POSTFIELDS, (const char *)request);
       curl_easy_setopt(curl_, CURLOPT_POSTFIELDSIZE, req_size);
     }
-    else if (method_ == http_client::Method::Get)
+    else if (method_ == opentelemetry::ext::http::client::Method::Get)
     {
       // GET
     }
@@ -258,12 +259,13 @@ public:
     // abort if slower than 4kb/sec during 30 seconds
     curl_easy_setopt(curl_, CURLOPT_LOW_SPEED_TIME, 30L);
     curl_easy_setopt(curl_, CURLOPT_LOW_SPEED_LIMIT, 4096);
-    DispatchEvent(http_client::SessionState::Sending);
+    DispatchEvent(opentelemetry::ext::http::client::SessionState::Sending);
 
     res_ = curl_easy_perform(curl_);
     if (CURLE_OK != res_)
     {
-      DispatchEvent(http_client::SessionState::SendFailed, curl_easy_strerror(res_));
+      DispatchEvent(opentelemetry::ext::http::client::SessionState::SendFailed,
+                    curl_easy_strerror(res_));
       return res_;
     }
 
@@ -281,7 +283,7 @@ public:
     /* libcurl is nice enough to parse the http response code itself: */
     curl_easy_getinfo(curl_, CURLINFO_RESPONSE_CODE, &res_);
     // We got some response from server. Dump the contents.
-    DispatchEvent(http_client::SessionState::Response);
+    DispatchEvent(opentelemetry::ext::http::client::SessionState::Response);
 
     // This function returns:
     // - on success: HTTP status code.
@@ -313,7 +315,7 @@ public:
   /**
    * Get last session state.
    */
-  http_client::SessionState GetSessionState() { return session_state_; }
+  opentelemetry::ext::http::client::SessionState GetSessionState() { return session_state_; }
 
   /**
    * Get whether or not response was programmatically aborted
@@ -410,15 +412,15 @@ protected:
   CURL *curl_;    // Local curl instance
   CURLcode res_;  // Curl result OR HTTP status code if successful
 
-  http_client::EventHandler *callback_;
+  opentelemetry::ext::http::client::EventHandler *callback_;
 
   // Request values
-  http_client::Method method_;
+  opentelemetry::ext::http::client::Method method_;
   std::string url_;
   const Headers &request_headers_;
-  const http_client::Body &request_body_;
+  const opentelemetry::ext::http::client::Body &request_body_;
   struct curl_slist *headers_chunk_ = nullptr;
-  http_client::SessionState session_state_;
+  opentelemetry::ext::http::client::SessionState session_state_;
 
   // Processed response headers and body
   std::vector<uint8_t> resp_headers_;

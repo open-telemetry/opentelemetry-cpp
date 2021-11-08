@@ -16,8 +16,6 @@
 #  include "opentelemetry/sdk/_metrics/record.h"
 #  include "opentelemetry/version.h"
 
-namespace metrics_api = opentelemetry::metrics;
-
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace sdk
 {
@@ -29,7 +27,7 @@ namespace metrics
 #    pragma warning(disable : 4250)  // inheriting methods via dominance
 #  endif
 
-class Instrument : virtual public metrics_api::Instrument
+class Instrument : virtual public opentelemetry::metrics::Instrument
 {
 
 public:
@@ -39,7 +37,7 @@ public:
              nostd::string_view description,
              nostd::string_view unit,
              bool enabled,
-             metrics_api::InstrumentKind kind)
+             opentelemetry::metrics::InstrumentKind kind)
       : name_(name), description_(description), unit_(unit), enabled_(enabled), kind_(kind)
   {}
 
@@ -55,7 +53,7 @@ public:
   // Return the insrument's units of measurement
   virtual nostd::string_view GetUnits() override { return unit_; }
 
-  virtual metrics_api::InstrumentKind GetKind() override { return this->kind_; }
+  virtual opentelemetry::metrics::InstrumentKind GetKind() override { return this->kind_; }
 
 protected:
   std::string name_;
@@ -63,12 +61,13 @@ protected:
   std::string unit_;
   bool enabled_;
   std::mutex mu_;
-  metrics_api::InstrumentKind kind_;
+  opentelemetry::metrics::InstrumentKind kind_;
 };
 
 template <class T>
-class BoundSynchronousInstrument : public Instrument,
-                                   virtual public metrics_api::BoundSynchronousInstrument<T>
+class BoundSynchronousInstrument
+    : public Instrument,
+      virtual public opentelemetry::metrics::BoundSynchronousInstrument<T>
 {
 
 public:
@@ -78,7 +77,7 @@ public:
                              nostd::string_view description,
                              nostd::string_view unit,
                              bool enabled,
-                             metrics_api::InstrumentKind kind,
+                             opentelemetry::metrics::InstrumentKind kind,
                              std::shared_ptr<Aggregator<T>> agg)
       : Instrument(name, description, unit, enabled, kind), agg_(agg)
   {
@@ -157,7 +156,7 @@ private:
 
 template <class T>
 class SynchronousInstrument : public Instrument,
-                              virtual public metrics_api::SynchronousInstrument<T>
+                              virtual public opentelemetry::metrics::SynchronousInstrument<T>
 {
 
 public:
@@ -167,7 +166,7 @@ public:
                         nostd::string_view description,
                         nostd::string_view unit,
                         bool enabled,
-                        metrics_api::InstrumentKind kind)
+                        opentelemetry::metrics::InstrumentKind kind)
       : Instrument(name, description, unit, enabled, kind)
   {}
 
@@ -181,7 +180,7 @@ public:
    * @param labels the set of labels, as key-value pairs
    * @return a Bound Instrument
    */
-  virtual nostd::shared_ptr<metrics_api::BoundSynchronousInstrument<T>> bind(
+  virtual nostd::shared_ptr<opentelemetry::metrics::BoundSynchronousInstrument<T>> bind(
       const opentelemetry::common::KeyValueIterable &labels) override
   {
     return nostd::shared_ptr<BoundSynchronousInstrument<T>>();
@@ -203,7 +202,7 @@ public:
 
 template <class T>
 class AsynchronousInstrument : public Instrument,
-                               virtual public metrics_api::AsynchronousInstrument<T>
+                               virtual public opentelemetry::metrics::AsynchronousInstrument<T>
 {
 
 public:
@@ -213,8 +212,8 @@ public:
                          nostd::string_view description,
                          nostd::string_view unit,
                          bool enabled,
-                         void (*callback)(metrics_api::ObserverResult<T>),
-                         metrics_api::InstrumentKind kind)
+                         void (*callback)(opentelemetry::metrics::ObserverResult<T>),
+                         opentelemetry::metrics::InstrumentKind kind)
       : Instrument(name, description, unit, enabled, kind)
   {
     this->callback_ = callback;
