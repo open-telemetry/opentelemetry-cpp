@@ -1,28 +1,31 @@
 // Copyright The OpenTelemetry Authors
 // SPDX-License-Identifier: Apache-2.0
 
-#include "opentelemetry/exporters/otlp/otlp_grpc_log_exporter.h"
 
-#include "opentelemetry/exporters/otlp/protobuf_include_prefix.h"
+#ifdef ENABLE_LOGS_PREVIEW
 
-#include "opentelemetry/proto/collector/logs/v1/logs_service_mock.grpc.pb.h"
+#  include "opentelemetry/exporters/otlp/otlp_grpc_log_exporter.h"
 
-#include "opentelemetry/exporters/otlp/protobuf_include_suffix.h"
+#  include "opentelemetry/exporters/otlp/protobuf_include_prefix.h"
 
-#include "opentelemetry/logs/provider.h"
-#include "opentelemetry/sdk/logs/batch_log_processor.h"
-#include "opentelemetry/sdk/logs/exporter.h"
-#include "opentelemetry/sdk/logs/log_record.h"
-#include "opentelemetry/sdk/logs/logger_provider.h"
-#include "opentelemetry/sdk/resource/resource.h"
+#  include "opentelemetry/proto/collector/logs/v1/logs_service_mock.grpc.pb.h"
 
-#include <gtest/gtest.h>
+#  include "opentelemetry/exporters/otlp/protobuf_include_suffix.h"
 
-#if defined(_MSC_VER)
-#  include "opentelemetry/sdk/common/env_variables.h"
+#  include "opentelemetry/logs/provider.h"
+#  include "opentelemetry/sdk/logs/batch_log_processor.h"
+#  include "opentelemetry/sdk/logs/exporter.h"
+#  include "opentelemetry/sdk/logs/log_record.h"
+#  include "opentelemetry/sdk/logs/logger_provider.h"
+#  include "opentelemetry/sdk/resource/resource.h"
+
+#  include <gtest/gtest.h>
+
+#  if defined(_MSC_VER)
+#    include "opentelemetry/sdk/common/env_variables.h"
 using opentelemetry::sdk::common::setenv;
 using opentelemetry::sdk::common::unsetenv;
-#endif
+#  endif
 
 using namespace testing;
 
@@ -162,3 +165,5 @@ TEST_F(OtlpGrpcLogExporterTestPeer, ExportIntegrationTest)
 }  // namespace otlp
 }  // namespace exporter
 OPENTELEMETRY_END_NAMESPACE
+
+#endif // ENABLE_LOGS_PREVIEW
