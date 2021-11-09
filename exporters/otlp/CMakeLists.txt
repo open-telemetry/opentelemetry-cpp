@@ -22,9 +22,8 @@ if(WITH_OTLP_GRPC)
   set_target_properties(opentelemetry_exporter_otlp_grpc
                         PROPERTIES EXPORT_NAME otlp_grpc_exporter)
 
-  target_link_libraries(
-    opentelemetry_exporter_otlp_grpc PUBLIC opentelemetry_otlp_recordable
-                                            protobuf::libprotobuf gRPC::grpc++)
+  target_link_libraries(opentelemetry_exporter_otlp_grpc
+                        PUBLIC opentelemetry_otlp_recordable gRPC::grpc++)
 
   list(APPEND OPENTELEMETRY_OTLP_TARGETS opentelemetry_exporter_otlp_grpc)
 
@@ -34,9 +33,8 @@ if(WITH_OTLP_GRPC)
   set_target_properties(opentelemetry_exporter_otlp_grpc_log
                         PROPERTIES EXPORT_NAME otlp_grpc_log_exporter)
 
-  target_link_libraries(
-    opentelemetry_exporter_otlp_grpc_log
-    PUBLIC opentelemetry_otlp_recordable protobuf::libprotobuf gRPC::grpc++)
+  target_link_libraries(opentelemetry_exporter_otlp_grpc_log
+                        PUBLIC opentelemetry_otlp_recordable gRPC::grpc++)
 
   list(APPEND OPENTELEMETRY_OTLP_TARGETS opentelemetry_exporter_otlp_grpc_log)
 endif()
