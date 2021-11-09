@@ -146,6 +146,7 @@ cc_library(
         "include/opentelemetry/exporters/otlp/otlp_grpc_exporter_options.h",
         "include/opentelemetry/exporters/otlp/protobuf_include_prefix.h",
         "include/opentelemetry/exporters/otlp/protobuf_include_suffix.h",
+        "include/opentelemetry/ext/http/common/url_parser.h",
     ],
     strip_include_prefix = "include",
     deps = [
