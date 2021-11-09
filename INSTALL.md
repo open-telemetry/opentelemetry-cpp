@@ -236,3 +236,20 @@ cc_library(
    ...
 )
 ```
+
+## Using Package Managers
+
+If you are using [Conan](https://www.conan.io/) to manage your dependencies,
+add [`opentelemetry-cpp/x.y.z`](https://conan.io/center/opentelemetry-cpp) to
+your `conanfile`'s requires, where `x.y.z` is the release version you want to use.
+Please file issues [here](https://github.com/conan-io/conan-center-index/issues)
+if you experience problems with the packages.
+
+If you are using [vcpkg](https://github.com/Microsoft/vcpkg/) on your project
+for external dependencies, then you can install the
+[opentelemetry-cpp package](https://github.com/microsoft/vcpkg/tree/master/ports/opentelemetry-cpp)
+with `vcpkg install opentelemetry-cpp` and follow the then displayed descriptions.
+Please see the vcpkg project for any issues regarding the packaging.
+
+Please note, these packages are not officially provided and maintained by OpenTelemetry C++ project,
+and are just listed here to consolidate all such efforts for ease of developers.
