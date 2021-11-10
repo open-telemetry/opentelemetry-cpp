@@ -53,8 +53,7 @@ public:
    * @param name the name of the new Observable Counter.
    * @param description a brief description of what the Observable Counter is used for.
    * @param unit the unit of metric values following https://unitsofmeasure.org/ucum.html.
-   * @param callback the function to be observed by the instrument. This can optionally take `state`
-   * as key-value argument.
+   * @param callback the function to be observed by the instrument.
    * @return a shared pointer to the created Observable Counter.
    */
   virtual nostd::shared_ptr<ObservableCounter<long>> CreateLongObservableCounter(
@@ -94,8 +93,7 @@ public:
    * @param name the name of the new Observable Gauge.
    * @param description a brief description of what the Observable Gauge is used for.
    * @param unit the unit of metric values following https://unitsofmeasure.org/ucum.html.
-   * @param callback the function to be observed by the instrument. This can optionally take `state`
-   * as key-value argument.
+   * @param callback the function to be observed by the instrument.
    * @return a shared pointer to the created Observable Gauge.
    */
   virtual nostd::shared_ptr<ObservableGauge<long>> CreateLongObservableGauge(
@@ -136,8 +134,7 @@ public:
    * @param name the name of the new Observable UpDownCounter.
    * @param description a brief description of what the Observable UpDownCounter is used for.
    * @param unit the unit of metric values following https://unitsofmeasure.org/ucum.html.
-   * @param callback the function to be observed by the instrument. This can optionally take `state`
-   * as key-value argument.
+   * @param callback the function to be observed by the instrument.
    * @return a shared pointer to the created Observable UpDownCounter.
    */
   virtual nostd::shared_ptr<ObservableUpDownCounter<long>> CreateLongObservableUpDownCounter(
