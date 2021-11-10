@@ -35,7 +35,6 @@ BAZEL_STARTUP_OPTIONS="--output_user_root=$HOME/.cache/bazel"
 export CTEST_OUTPUT_ON_FAILURE=1
 
 if [[ "$1" == "cmake.test" ]]; then
-  install_prometheus_cpp_client
   cd "${BUILD_DIR}"
   rm -rf *
   cmake -DCMAKE_BUILD_TYPE=Debug  \
@@ -224,6 +223,12 @@ elif [[ "$1" == "code.coverage" ]]; then
   # removing test http server coverage from the total coverage. We don't use this server completely.
   lcov --remove coverage.info '*/ext/http/server/*'> tmp_coverage.info 2>/dev/null
   cp tmp_coverage.info coverage.info
+  exit 0
+elif [[ "$1" == "third_party.tags" ]]; then
+  echo "gRPC=v1.39.1" > third_party_release
+  echo "thrift=0.14.1" >> third_party_release
+  echo "abseil=20210324.0" >> third_party_release
+  git submodule status | sed 's:.*/::' | sed 's/ (/=/g' | sed 's/)//g' >> third_party_release
   exit 0
 fi
 

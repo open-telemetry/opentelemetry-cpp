@@ -20,6 +20,16 @@ if(NOT DEFINED CMAKE_TOOLCHAIN_FILE)
   list(APPEND CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake/modules/")
 endif()
 
+if(EXISTS "${CMAKE_SOURCE_DIR}/third_party_release")
+  file(STRINGS "${CMAKE_SOURCE_DIR}/third_party_release" third_party_tags)
+  foreach(third_party ${third_party_tags})
+    string(REGEX REPLACE "^[ ]+" "" third_party ${third_party})
+    string(REGEX MATCH "^[^=]+" third_party_name ${third_party})
+    string(REPLACE "${third_party_name}=" "" third_party_tag ${third_party})
+    set(${third_party_name} "${third_party_tag}")
+  endforeach()
+endif()
+
 if(DEFINED ENV{ARCH})
   # Architecture may be specified via ARCH environment variable
   set(ARCH $ENV{ARCH})
@@ -296,6 +306,24 @@ if((NOT WITH_API_ONLY)
     endif()
   else()
     message("Using external nlohmann::json")
+  endif()
+endif()
+
+if(WITH_PROMETHEUS)
+  find_package(prometheus-cpp CONFIG QUIET)
+  if(NOT prometheus-cpp_FOUND)
+    message("Trying to use local prometheus-cpp from submodule")
+    if(EXISTS ${PROJECT_SOURCE_DIR}/third_party/prometheus-cpp/.git)
+      add_subdirectory(third_party/prometheus-cpp)
+    else()
+      message(
+        FATAL_ERROR
+          "\nprometheus-cpp package was not found. Please either provide it manually or clone with submodules. "
+          "To initialize, fetch and checkout any nested submodules, you can use the following command:\n"
+          "git submodule update --init --recursive")
+    endif()
+  else()
+    message("Using external prometheus-cpp")
   endif()
 endif()
 
