@@ -2,13 +2,14 @@
 // SPDX-License-Identifier: Apache-2.0
 
 #pragma once
+#ifndef ENABLE_METRICS_PREVIEW
 
-#include "opentelemetry/metrics_new/meter.h"
-#include "opentelemetry/nostd/shared_ptr.h"
-#include "opentelemetry/nostd/string_view.h"
+#  include "opentelemetry/metrics/meter.h"
+#  include "opentelemetry/nostd/shared_ptr.h"
+#  include "opentelemetry/nostd/string_view.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
-namespace metrics_new
+namespace metrics
 {
 /**
  * Creates new Meter instances.
@@ -27,5 +28,6 @@ public:
                                             nostd::string_view library_version = "",
                                             nostd::string_view schema_url      = "") noexcept = 0;
 };
-}  // namespace metrics_new
+}  // namespace metrics
 OPENTELEMETRY_END_NAMESPACE
+#endif

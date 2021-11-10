@@ -2,16 +2,17 @@
 // SPDX-License-Identifier: Apache-2.0
 
 #pragma once
+#ifndef ENABLE_METRICS_PREVIEW
 
-#include "opentelemetry/metrics_new/async_instruments.h"
-#include "opentelemetry/metrics_new/sync_instruments.h"
-#include "opentelemetry/nostd/shared_ptr.h"
-#include "opentelemetry/nostd/span.h"
-#include "opentelemetry/nostd/string_view.h"
-#include "opentelemetry/version.h"
+#  include "opentelemetry/metrics/async_instruments.h"
+#  include "opentelemetry/metrics/sync_instruments.h"
+#  include "opentelemetry/nostd/shared_ptr.h"
+#  include "opentelemetry/nostd/span.h"
+#  include "opentelemetry/nostd/string_view.h"
+#  include "opentelemetry/version.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
-namespace metrics_new
+namespace metrics
 {
 /**
  * Handles instrument creation and provides a facility for batch recording.
@@ -187,5 +188,6 @@ public:
       nostd::string_view description = "",
       nostd::string_view unit        = "") noexcept = 0;
 };
-}  // namespace metrics_new
+}  // namespace metrics
 OPENTELEMETRY_END_NAMESPACE
+#endif

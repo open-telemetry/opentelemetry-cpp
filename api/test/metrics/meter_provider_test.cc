@@ -1,15 +1,17 @@
 // Copyright The OpenTelemetry Authors
 // SPDX-License-Identifier: Apache-2.0
 
-#include <gtest/gtest.h>
-#include "opentelemetry/metrics_new/noop.h"
-#include "opentelemetry/metrics_new/provider.h"
-#include "opentelemetry/nostd/shared_ptr.h"
+#ifndef ENABLE_METRICS_PREVIEW
 
-using opentelemetry::metrics_new::Meter;
-using opentelemetry::metrics_new::MeterProvider;
-using opentelemetry::metrics_new::NoopMeterProvider;
-using opentelemetry::metrics_new::Provider;
+#  include <gtest/gtest.h>
+#  include "opentelemetry/metrics/noop.h"
+#  include "opentelemetry/metrics/provider.h"
+#  include "opentelemetry/nostd/shared_ptr.h"
+
+using opentelemetry::metrics::Meter;
+using opentelemetry::metrics::MeterProvider;
+using opentelemetry::metrics::NoopMeterProvider;
+using opentelemetry::metrics::Provider;
 
 TEST(Provider, GetMeterProviderDefault)
 {
@@ -33,3 +35,4 @@ TEST(Provider, MultipleMeterProviders)
 
   ASSERT_NE(Provider::GetMeterProvider(), tf);
 }
+#endif

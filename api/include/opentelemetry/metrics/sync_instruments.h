@@ -10,7 +10,7 @@
 #  include "opentelemetry/nostd/string_view.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
-namespace metrics_new
+namespace metrics
 {
 
 class SynchronousInstrument
@@ -129,6 +129,6 @@ public:
   }
 };
 
-}  // namespace metrics_new
+}  // namespace metrics
 OPENTELEMETRY_END_NAMESPACE
 #endif

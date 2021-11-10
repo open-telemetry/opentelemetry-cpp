@@ -2,11 +2,12 @@
 // SPDX-License-Identifier: Apache-2.0
 
 #pragma once
+#ifndef ENABLE_METRICS_PREVIEW
 
-#include "observer_result.h"
+#  include "observer_result.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
-namespace metrics_new
+namespace metrics
 {
 class AsynchronousInstrument
 {};
@@ -23,5 +24,6 @@ template <class T>
 class ObservableUpDownCounter : public AsynchronousInstrument
 {};
 
-}  // namespace metrics_new
+}  // namespace metrics
 OPENTELEMETRY_END_NAMESPACE
+#endif
