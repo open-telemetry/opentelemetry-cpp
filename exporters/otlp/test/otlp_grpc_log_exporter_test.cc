@@ -1,7 +1,6 @@
 // Copyright The OpenTelemetry Authors
 // SPDX-License-Identifier: Apache-2.0
 
-
 #ifdef ENABLE_LOGS_PREVIEW
 
 #  include "opentelemetry/exporters/otlp/otlp_grpc_log_exporter.h"
@@ -166,4 +165,4 @@ TEST_F(OtlpGrpcLogExporterTestPeer, ExportIntegrationTest)
 }  // namespace exporter
 OPENTELEMETRY_END_NAMESPACE
 
-#endif // ENABLE_LOGS_PREVIEW
+#endif  // ENABLE_LOGS_PREVIEW
