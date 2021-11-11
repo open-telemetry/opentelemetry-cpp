@@ -14,9 +14,11 @@
 
 include_directories(include)
 find_package(CURL)
-if(CURL_FOUND)
-  add_definitions(-DWITH_CURL)
+if(NOT CURL_FOUND)
+  message(FATAL_ERROR "CURL not found: CURL is required to build zipkin exporter.")
 endif()
+
+add_definitions(-DWITH_CURL)
 add_library(opentelemetry_exporter_zipkin_trace src/zipkin_exporter.cc
                                                 src/recordable.cc)
 
