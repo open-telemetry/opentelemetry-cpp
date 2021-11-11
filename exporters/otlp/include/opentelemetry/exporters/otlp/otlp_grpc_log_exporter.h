@@ -14,8 +14,6 @@
 
 #  include "opentelemetry/exporters/otlp/otlp_environment.h"
 #  include "opentelemetry/exporters/otlp/otlp_grpc_exporter_options.h"
-#  include "opentelemetry/exporters/otlp/otlp_recordable.h"
-#  include "opentelemetry/exporters/otlp/otlp_recordable_utils.h"
 #  include "opentelemetry/sdk/logs/exporter.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
