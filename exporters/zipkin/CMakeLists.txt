@@ -15,7 +15,8 @@
 include_directories(include)
 find_package(CURL)
 if(NOT CURL_FOUND)
-  message(FATAL_ERROR "CURL not found: CURL is required to build zipkin exporter.")
+  message(
+    FATAL_ERROR "CURL not found: CURL is required to build zipkin exporter.")
 endif()
 
 add_definitions(-DWITH_CURL)
