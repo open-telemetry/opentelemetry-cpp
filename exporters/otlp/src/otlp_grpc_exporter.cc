@@ -28,10 +28,9 @@ static std::string get_file_contents(const char *fpath)
 }
 
 /**
- * Create service stub to communicate with the OpenTelemetry Collector.
+ * Create gRPC channel from the exporter options.
  */
-std::unique_ptr<proto::collector::trace::v1::TraceService::Stub> MakeServiceStub(
-    const OtlpGrpcExporterOptions &options)
+std::shared_ptr<grpc::Channel> MakeGrpcChannel(const OtlpGrpcExporterOptions &options)
 {
   std::shared_ptr<grpc::Channel> channel;
 
@@ -68,7 +67,17 @@ std::unique_ptr<proto::collector::trace::v1::TraceService::Stub> MakeServiceStub
   {
     channel = grpc::CreateChannel(grpc_target, grpc::InsecureChannelCredentials());
   }
-  return proto::collector::trace::v1::TraceService::NewStub(channel);
+
+  return channel;
+}
+
+/**
+ * Create service stub to communicate with the OpenTelemetry Collector.
+ */
+std::unique_ptr<proto::collector::trace::v1::TraceService::Stub> MakeTraceServiceStub(
+    const OtlpGrpcExporterOptions &options)
+{
+  return proto::collector::trace::v1::TraceService::NewStub(MakeGrpcChannel(options));
 }
 
 // -------------------------------- Constructors --------------------------------
@@ -76,7 +85,7 @@ std::unique_ptr<proto::collector::trace::v1::TraceService::Stub> MakeServiceStub
 OtlpGrpcExporter::OtlpGrpcExporter() : OtlpGrpcExporter(OtlpGrpcExporterOptions()) {}
 
 OtlpGrpcExporter::OtlpGrpcExporter(const OtlpGrpcExporterOptions &options)
-    : options_(options), trace_service_stub_(MakeServiceStub(options))
+    : options_(options), trace_service_stub_(MakeTraceServiceStub(options))
 {}
 
 OtlpGrpcExporter::OtlpGrpcExporter(
@@ -120,7 +129,8 @@ sdk::common::ExportResult OtlpGrpcExporter::Export(
   if (!status.ok())
   {
 
-    OTEL_INTERNAL_LOG_ERROR("[OTLP Exporter] Export() failed: " << status.error_message());
+    OTEL_INTERNAL_LOG_ERROR(
+        "[OTLP TRACE GRPC Exporter] Export() failed: " << status.error_message());
     return sdk::common::ExportResult::kFailure;
   }
   return sdk::common::ExportResult::kSuccess;

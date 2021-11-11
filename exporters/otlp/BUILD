@@ -48,6 +48,7 @@ cc_library(
     hdrs = [
         "include/opentelemetry/exporters/otlp/otlp_environment.h",
         "include/opentelemetry/exporters/otlp/otlp_grpc_exporter.h",
+        "include/opentelemetry/exporters/otlp/otlp_grpc_exporter_options.h",
         "include/opentelemetry/exporters/otlp/protobuf_include_prefix.h",
         "include/opentelemetry/exporters/otlp/protobuf_include_suffix.h",
     ],
@@ -129,8 +130,32 @@ cc_library(
     deps = [
         ":otlp_http_client",
         ":otlp_recordable",
-        "//sdk/src/trace",
-        "@com_github_opentelemetry_proto//:trace_service_proto_cc",
+        "//sdk/src/logs",
+        "@com_github_opentelemetry_proto//:logs_service_proto_cc",
+    ],
+)
+
+cc_library(
+    name = "otlp_grpc_log_exporter",
+    srcs = [
+        "src/otlp_grpc_log_exporter.cc",
+    ],
+    hdrs = [
+        "include/opentelemetry/exporters/otlp/otlp_environment.h",
+        "include/opentelemetry/exporters/otlp/otlp_grpc_exporter_options.h",
+        "include/opentelemetry/exporters/otlp/otlp_grpc_log_exporter.h",
+        "include/opentelemetry/exporters/otlp/protobuf_include_prefix.h",
+        "include/opentelemetry/exporters/otlp/protobuf_include_suffix.h",
+    ],
+    strip_include_prefix = "include",
+    deps = [
+        ":otlp_recordable",
+        "//ext:headers",
+        "//sdk/src/logs",
+        "@com_github_opentelemetry_proto//:logs_service_proto_cc",
+        # For gRPC
+        "@com_github_opentelemetry_proto//:logs_service_grpc_cc",
+        "@com_github_grpc_grpc//:grpc++",
     ],
 )
 
@@ -169,6 +194,17 @@ cc_test(
     deps = [
         ":otlp_http_log_exporter",
         "//api",
+        "@com_google_googletest//:gtest_main",
+    ],
+)
+
+cc_test(
+    name = "otlp_grpc_log_exporter_test",
+    srcs = ["test/otlp_grpc_log_exporter_test.cc"],
+    deps = [
+        ":otlp_grpc_log_exporter",
+        "//api",
+        "//sdk/src/logs",
         "@com_google_googletest//:gtest_main",
     ],
 )
