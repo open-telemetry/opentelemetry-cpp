@@ -84,5 +84,9 @@ int main(int argc, char *argv[])
   InitTracer();
   foo_library();
 }
-
+#else
+int main()
+{
+  return 0;
+}
 #endif
