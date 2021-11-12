@@ -1,22 +1,23 @@
 // Copyright The OpenTelemetry Authors
 // SPDX-License-Identifier: Apache-2.0
 
-#include "opentelemetry/exporters/otlp/otlp_http_exporter.h"
-#include "opentelemetry/exporters/otlp/otlp_http_log_exporter.h"
-#include "opentelemetry/logs/provider.h"
-#include "opentelemetry/sdk/logs/logger_provider.h"
-#include "opentelemetry/sdk/logs/simple_log_processor.h"
-#include "opentelemetry/sdk/trace/simple_processor.h"
-#include "opentelemetry/sdk/trace/tracer_provider.h"
-#include "opentelemetry/trace/provider.h"
+#ifdef ENABLE_LOGS_PREVIEW
+#  include "opentelemetry/exporters/otlp/otlp_http_exporter.h"
+#  include "opentelemetry/exporters/otlp/otlp_http_log_exporter.h"
+#  include "opentelemetry/logs/provider.h"
+#  include "opentelemetry/sdk/logs/logger_provider.h"
+#  include "opentelemetry/sdk/logs/simple_log_processor.h"
+#  include "opentelemetry/sdk/trace/simple_processor.h"
+#  include "opentelemetry/sdk/trace/tracer_provider.h"
+#  include "opentelemetry/trace/provider.h"
 
-#include <string>
+#  include <string>
 
-#ifdef BAZEL_BUILD
-#  include "examples/common/logs_foo_library/foo_library.h"
-#else
-#  include "foo_library/foo_library.h"
-#endif
+#  ifdef BAZEL_BUILD
+#    include "examples/common/logs_foo_library/foo_library.h"
+#  else
+#    include "logs_foo_library/foo_library.h"
+#  endif
 
 namespace trace    = opentelemetry::trace;
 namespace nostd    = opentelemetry::nostd;
@@ -83,3 +84,5 @@ int main(int argc, char *argv[])
   InitTracer();
   foo_library();
 }
+
+#endif
