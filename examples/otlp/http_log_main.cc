@@ -1,10 +1,14 @@
 // Copyright The OpenTelemetry Authors
 // SPDX-License-Identifier: Apache-2.0
 
+#include "opentelemetry/exporters/otlp/otlp_http_exporter.h"
 #include "opentelemetry/exporters/otlp/otlp_http_log_exporter.h"
-#include "opentelemetry/sdk/logs/simple_log_processor.h"
-#include "opentelemetry/sdk/logs/logger_provider.h"
 #include "opentelemetry/logs/provider.h"
+#include "opentelemetry/sdk/logs/logger_provider.h"
+#include "opentelemetry/sdk/logs/simple_log_processor.h"
+#include "opentelemetry/sdk/trace/simple_processor.h"
+#include "opentelemetry/sdk/trace/tracer_provider.h"
+#include "opentelemetry/trace/provider.h"
 
 #include <string>
 
@@ -17,13 +21,8 @@
 namespace trace    = opentelemetry::trace;
 namespace nostd    = opentelemetry::nostd;
 namespace otlp     = opentelemetry::exporter::otlp;
-namespace sdklogs = opentelemetry::sdk::logs;
+namespace sdklogs  = opentelemetry::sdk::logs;
 namespace logs_api = opentelemetry::logs;
-
-#include "opentelemetry/exporters/otlp/otlp_http_exporter.h"
-#include "opentelemetry/sdk/trace/simple_processor.h"
-#include "opentelemetry/sdk/trace/tracer_provider.h"
-#include "opentelemetry/trace/provider.h"
 
 namespace sdktrace = opentelemetry::sdk::trace;
 
@@ -48,9 +47,9 @@ void InitLogger()
 {
   logger_opts.console_debug = true;
   // Create OTLP exporter instance
-  auto exporter  = std::unique_ptr<sdklogs::LogExporter>(new otlp::OtlpHttpLogExporter(logger_opts));
-  auto processor = std::shared_ptr<sdklogs::LogProcessor>(
-      new sdklogs::SimpleLogProcessor(std::move(exporter)));
+  auto exporter = std::unique_ptr<sdklogs::LogExporter>(new otlp::OtlpHttpLogExporter(logger_opts));
+  auto processor =
+      std::shared_ptr<sdklogs::LogProcessor>(new sdklogs::SimpleLogProcessor(std::move(exporter)));
   auto sdkProvider = std::shared_ptr<sdklogs::LoggerProvider>(new sdklogs::LoggerProvider());
   sdkProvider->SetProcessor(processor);
   auto apiProvider = nostd::shared_ptr<logs_api::LoggerProvider>(sdkProvider);
