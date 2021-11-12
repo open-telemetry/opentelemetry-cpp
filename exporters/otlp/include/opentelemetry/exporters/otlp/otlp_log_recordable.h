@@ -4,15 +4,16 @@
 #pragma once
 #ifdef ENABLE_LOGS_PREVIEW
 
+// clang-format off
 #  include "opentelemetry/exporters/otlp/protobuf_include_prefix.h"
 
 #  include "opentelemetry/proto/logs/v1/logs.pb.h"
 #  include "opentelemetry/proto/resource/v1/resource.pb.h"
 
 #  include "opentelemetry/exporters/otlp/protobuf_include_suffix.h"
+// clang-format on
 
 #  include "opentelemetry/sdk/logs/recordable.h"
-#  include "opentelemetry/version.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace exporter
@@ -21,7 +22,7 @@ namespace otlp
 {
 
 /**
- * An OTLP Recordable implemenation
+ * An OTLP Recordable implemenation for Logs.
  */
 class OtlpLogRecordable final : public opentelemetry::sdk::logs::Recordable
 {
@@ -101,7 +102,9 @@ private:
   // const opentelemetry::sdk::instrumentationlibrary::InstrumentationLibrary
   //     *instrumentation_library_ = nullptr;
 };
+
 }  // namespace otlp
 }  // namespace exporter
 OPENTELEMETRY_END_NAMESPACE
+
 #endif

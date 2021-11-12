@@ -18,6 +18,7 @@ CI tests can be run on docker by invoking the script `./ci/run_docker.sh
   checker.
 * `benchmark`: run all benchmarks.
 * `format`: use `tools/format.sh` to enforce text formatting.
+* `third_party.tags`: store third_party release tags.
 * `code.coverage`: build cmake targets with CXX option `--coverage` and run
   tests.
 

@@ -1,4 +1,5 @@
-foreach(testname prometheus_collector_test prometheus_exporter_utils_test)
+foreach(testname prometheus_exporter_test prometheus_collector_test
+                 prometheus_exporter_utils_test)
   add_executable(${testname} "${testname}.cc")
   target_link_libraries(
     ${testname} ${GTEST_BOTH_LIBRARIES} ${CMAKE_THREAD_LIBS_INIT}
