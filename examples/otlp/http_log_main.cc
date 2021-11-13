@@ -79,7 +79,6 @@ int main(int argc, char *argv[])
       }
     }
   }
-  // Removing this line will leave the default noop TracerProvider in place.
   InitLogger();
   InitTracer();
   foo_library();
