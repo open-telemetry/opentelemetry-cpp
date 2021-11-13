@@ -63,7 +63,8 @@ int main(int argc, char *argv[])
 {
   if (argc > 1)
   {
-    opts.url = argv[1];
+    opts.url        = argv[1];
+    logger_opts.url = argv[1];
     if (argc > 2)
     {
       std::string debug  = argv[2];
@@ -75,7 +76,8 @@ int main(int argc, char *argv[])
       std::string binary_mode = argv[3];
       if (binary_mode.size() >= 3 && binary_mode.substr(0, 3) == "bin")
       {
-        opts.content_type = opentelemetry::exporter::otlp::HttpRequestContentType::kBinary;
+        opts.content_type        = opentelemetry::exporter::otlp::HttpRequestContentType::kBinary;
+        logger_opts.content_type = opentelemetry::exporter::otlp::HttpRequestContentType::kBinary;
       }
     }
   }
