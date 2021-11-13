@@ -21,6 +21,7 @@
 
 using opentelemetry::exporter::prometheus::PrometheusCollector;
 namespace metric_api = opentelemetry::metrics;
+namespace metric_sdk = opentelemetry::sdk::metrics;
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 

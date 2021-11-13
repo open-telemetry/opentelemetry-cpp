@@ -18,6 +18,8 @@ namespace trace_api   = opentelemetry::trace;
 namespace http_client = opentelemetry::ext::http::client;
 namespace curl        = opentelemetry::ext::http::client::curl;
 namespace context     = opentelemetry::context;
+namespace nostd       = opentelemetry::nostd;
+namespace trace_sdk   = opentelemetry::sdk::trace;
 
 namespace
 {
@@ -46,15 +48,15 @@ public:
 
 void initTracer()
 {
-  auto exporter = std::unique_ptr<sdktrace::SpanExporter>(
+  auto exporter = std::unique_ptr<trace_sdk::SpanExporter>(
       new opentelemetry::exporter::trace::OStreamSpanExporter);
-  auto processor = std::unique_ptr<sdktrace::SpanProcessor>(
-      new sdktrace::SimpleSpanProcessor(std::move(exporter)));
-  std::vector<std::unique_ptr<sdktrace::SpanProcessor>> processors;
+  auto processor = std::unique_ptr<trace_sdk::SpanProcessor>(
+      new trace_sdk::SimpleSpanProcessor(std::move(exporter)));
+  std::vector<std::unique_ptr<trace_sdk::SpanProcessor>> processors;
   processors.push_back(std::move(processor));
-  auto context = std::make_shared<sdktrace::TracerContext>(std::move(processors));
+  auto context = std::make_shared<trace_sdk::TracerContext>(std::move(processors));
   auto provider =
-      nostd::shared_ptr<trace_api::TracerProvider>(new sdktrace::TracerProvider(context));
+      nostd::shared_ptr<trace_api::TracerProvider>(new trace_sdk::TracerProvider(context));
   // Set the global trace provider
   trace_api::Provider::SetTracerProvider(provider);
 }
@@ -87,9 +89,7 @@ struct Uri
 class NoopEventHandler : public http_client::EventHandler
 {
 public:
-  void OnEvent(http_client::SessionState state,
-               opentelemetry::nostd::string_view reason) noexcept override
-  {}
+  void OnEvent(http_client::SessionState state, nostd::string_view reason) noexcept override {}
 
   void OnConnecting(const http_client::SSLCertificate &) noexcept override {}
 

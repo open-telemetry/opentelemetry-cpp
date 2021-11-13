@@ -402,7 +402,7 @@ public:
       nostd::string_view name,
       Properties &evt,
       const opentelemetry::trace::SpanContextKeyValueIterable &links,
-      const opentelemetry::opentelemetry::trace::StartSpanOptions &options = {}) noexcept
+      const opentelemetry::trace::StartSpanOptions &options = {}) noexcept
   {
     const auto &cfg = GetConfiguration(tracerProvider_);
 
