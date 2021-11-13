@@ -27,6 +27,7 @@ namespace otlp
  */
 class OtlpGrpcLogExporter : public opentelemetry::sdk::logs::LogExporter
 {
+public:
   /**
    * Create an OtlpGrpcLogExporter with default exporter options.
    */
