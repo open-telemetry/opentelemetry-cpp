@@ -13,10 +13,8 @@
 # limitations under the License.
 
 include_directories(include)
-find_package(CURL)
-if(CURL_FOUND)
-  add_definitions(-DWITH_CURL)
-endif()
+find_package(CURL REQUIRED)
+add_definitions(-DWITH_CURL)
 add_library(opentelemetry_exporter_zipkin_trace src/zipkin_exporter.cc
                                                 src/recordable.cc)
 

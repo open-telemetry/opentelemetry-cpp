@@ -1,0 +1,10 @@
+gRPC=v1.39.1
+thrift=0.14.1
+abseil=20210324.0
+benchmark=v1.5.3
+googletest=release-1.8.0-2523-ga6dfd3ac
+ms-gsl=v1.0.0-393-g6f45293
+nlohmann-json=v3.9.1
+opentelemetry-proto=v0.11.0
+prometheus-cpp=v0.11.0
+vcpkg=2020.04-2702-g5568f110b
