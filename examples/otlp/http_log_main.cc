@@ -19,13 +19,12 @@
 #    include "logs_foo_library/foo_library.h"
 #  endif
 
-namespace trace    = opentelemetry::trace;
-namespace nostd    = opentelemetry::nostd;
-namespace otlp     = opentelemetry::exporter::otlp;
-namespace sdklogs  = opentelemetry::sdk::logs;
-namespace logs_api = opentelemetry::logs;
-
-namespace sdktrace = opentelemetry::sdk::trace;
+namespace trace     = opentelemetry::trace;
+namespace nostd     = opentelemetry::nostd;
+namespace otlp      = opentelemetry::exporter::otlp;
+namespace logs_sdk  = opentelemetry::sdk::logs;
+namespace logs      = opentelemetry::logs;
+namespace trace_sdk = opentelemetry::sdk::trace;
 
 namespace
 {
@@ -34,11 +33,11 @@ opentelemetry::exporter::otlp::OtlpHttpExporterOptions opts;
 void InitTracer()
 {
   // Create OTLP exporter instance
-  auto exporter  = std::unique_ptr<sdktrace::SpanExporter>(new otlp::OtlpHttpExporter(opts));
-  auto processor = std::unique_ptr<sdktrace::SpanProcessor>(
-      new sdktrace::SimpleSpanProcessor(std::move(exporter)));
+  auto exporter  = std::unique_ptr<trace_sdk::SpanExporter>(new otlp::OtlpHttpExporter(opts));
+  auto processor = std::unique_ptr<trace_sdk::SpanProcessor>(
+      new trace_sdk::SimpleSpanProcessor(std::move(exporter)));
   auto provider =
-      nostd::shared_ptr<trace::TracerProvider>(new sdktrace::TracerProvider(std::move(processor)));
+      nostd::shared_ptr<trace::TracerProvider>(new trace_sdk::TracerProvider(std::move(processor)));
   // Set the global trace provider
   trace::Provider::SetTracerProvider(provider);
 }
@@ -48,13 +47,14 @@ void InitLogger()
 {
   logger_opts.console_debug = true;
   // Create OTLP exporter instance
-  auto exporter = std::unique_ptr<sdklogs::LogExporter>(new otlp::OtlpHttpLogExporter(logger_opts));
-  auto processor =
-      std::shared_ptr<sdklogs::LogProcessor>(new sdklogs::SimpleLogProcessor(std::move(exporter)));
-  auto sdkProvider = std::shared_ptr<sdklogs::LoggerProvider>(new sdklogs::LoggerProvider());
+  auto exporter =
+      std::unique_ptr<logs_sdk::LogExporter>(new otlp::OtlpHttpLogExporter(logger_opts));
+  auto processor = std::shared_ptr<logs_sdk::LogProcessor>(
+      new logs_sdk::SimpleLogProcessor(std::move(exporter)));
+  auto sdkProvider = std::shared_ptr<logs_sdk::LoggerProvider>(new logs_sdk::LoggerProvider());
   sdkProvider->SetProcessor(processor);
-  auto apiProvider = nostd::shared_ptr<logs_api::LoggerProvider>(sdkProvider);
-  auto provider    = nostd::shared_ptr<logs_api::LoggerProvider>(apiProvider);
+  auto apiProvider = nostd::shared_ptr<logs::LoggerProvider>(sdkProvider);
+  auto provider    = nostd::shared_ptr<logs::LoggerProvider>(apiProvider);
   opentelemetry::logs::Provider::SetLoggerProvider(provider);
 }
 }  // namespace
