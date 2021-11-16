@@ -3,6 +3,9 @@
 
 #ifdef ENABLE_METRICS_PREVIEW
 #  include "opentelemetry/sdk/_metrics/meter.h"
+
+namespace metrics_api = opentelemetry::metrics;
+
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace sdk
 {

@@ -8,6 +8,7 @@
 #include <gtest/gtest.h>
 
 using opentelemetry::trace::SpanContext;
+namespace trace_api = opentelemetry::trace;
 
 TEST(SpanContextTest, IsSampled)
 {
@@ -49,6 +50,6 @@ TEST(SpanContextTest, Invalid)
   EXPECT_FALSE(s1.IsValid());
 
   // Test that trace id and span id are invalid
-  EXPECT_EQ(s1.trace_id(), opentelemetry::trace::TraceId());
-  EXPECT_EQ(s1.span_id(), opentelemetry::trace::SpanId());
+  EXPECT_EQ(s1.trace_id(), trace_api::TraceId());
+  EXPECT_EQ(s1.span_id(), trace_api::SpanId());
 }

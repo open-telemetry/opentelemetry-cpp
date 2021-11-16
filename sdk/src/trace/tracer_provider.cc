@@ -9,12 +9,15 @@ namespace sdk
 {
 namespace trace
 {
+namespace resource  = opentelemetry::sdk::resource;
+namespace trace_api = opentelemetry::trace;
+
 TracerProvider::TracerProvider(std::shared_ptr<sdk::trace::TracerContext> context) noexcept
     : context_{context}
 {}
 
 TracerProvider::TracerProvider(std::unique_ptr<SpanProcessor> processor,
-                               opentelemetry::sdk::resource::Resource resource,
+                               resource::Resource resource,
                                std::unique_ptr<Sampler> sampler,
                                std::unique_ptr<IdGenerator> id_generator) noexcept
 {
@@ -25,7 +28,7 @@ TracerProvider::TracerProvider(std::unique_ptr<SpanProcessor> processor,
 }
 
 TracerProvider::TracerProvider(std::vector<std::unique_ptr<SpanProcessor>> &&processors,
-                               opentelemetry::sdk::resource::Resource resource,
+                               resource::Resource resource,
                                std::unique_ptr<Sampler> sampler,
                                std::unique_ptr<IdGenerator> id_generator) noexcept
 {
@@ -33,7 +36,7 @@ TracerProvider::TracerProvider(std::vector<std::unique_ptr<SpanProcessor>> &&pro
                                              std::move(id_generator));
 }
 
-nostd::shared_ptr<opentelemetry::trace::Tracer> TracerProvider::GetTracer(
+nostd::shared_ptr<trace_api::Tracer> TracerProvider::GetTracer(
     nostd::string_view library_name,
     nostd::string_view library_version,
     nostd::string_view schema_url) noexcept
@@ -55,14 +58,14 @@ nostd::shared_ptr<opentelemetry::trace::Tracer> TracerProvider::GetTracer(
     auto &tracer_lib = tracer->GetInstrumentationLibrary();
     if (tracer_lib.equal(library_name, library_version, schema_url))
     {
-      return nostd::shared_ptr<opentelemetry::trace::Tracer>{tracer};
+      return nostd::shared_ptr<trace_api::Tracer>{tracer};
     }
   }
 
   auto lib = InstrumentationLibrary::Create(library_name, library_version, schema_url);
   tracers_.push_back(std::shared_ptr<opentelemetry::sdk::trace::Tracer>(
       new sdk::trace::Tracer(context_, std::move(lib))));
-  return nostd::shared_ptr<opentelemetry::trace::Tracer>{tracers_.back()};
+  return nostd::shared_ptr<trace_api::Tracer>{tracers_.back()};
 }
 
 void TracerProvider::AddProcessor(std::unique_ptr<SpanProcessor> processor) noexcept
@@ -70,7 +73,7 @@ void TracerProvider::AddProcessor(std::unique_ptr<SpanProcessor> processor) noex
   context_->AddProcessor(std::move(processor));
 }
 
-const opentelemetry::sdk::resource::Resource &TracerProvider::GetResource() const noexcept
+const resource::Resource &TracerProvider::GetResource() const noexcept
 {
   return context_->GetResource();
 }

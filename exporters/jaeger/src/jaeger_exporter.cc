@@ -11,6 +11,9 @@
 
 #include <vector>
 
+namespace sdk_common = opentelemetry::sdk::common;
+namespace trace_sdk  = opentelemetry::sdk::trace;
+
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace exporter
 {

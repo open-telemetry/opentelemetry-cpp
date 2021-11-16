@@ -21,6 +21,7 @@ using opentelemetry::sdk::common::unsetenv;
 #endif
 
 using namespace opentelemetry::sdk::resource;
+namespace nostd = opentelemetry::nostd;
 
 class TestResource : public Resource
 {
@@ -49,11 +50,11 @@ TEST(ResourceTest, create_without_servicename)
     if (expected_attributes.find(e.first) != expected_attributes.end())
     {
       if (e.first == "version")
-        EXPECT_EQ(opentelemetry::nostd::get<uint32_t>(expected_attributes.find(e.first)->second),
-                  opentelemetry::nostd::get<uint32_t>(e.second));
+        EXPECT_EQ(nostd::get<uint32_t>(expected_attributes.find(e.first)->second),
+                  nostd::get<uint32_t>(e.second));
       else if (e.first == "cost")
-        EXPECT_EQ(opentelemetry::nostd::get<double>(expected_attributes.find(e.first)->second),
-                  opentelemetry::nostd::get<double>(e.second));
+        EXPECT_EQ(nostd::get<double>(expected_attributes.find(e.first)->second),
+                  nostd::get<double>(e.second));
       else
         EXPECT_EQ(opentelemetry::nostd::get<std::string>(expected_attributes.find(e.first)->second),
                   opentelemetry::nostd::get<std::string>(e.second));
@@ -82,14 +83,14 @@ TEST(ResourceTest, create_with_servicename)
     if (expected_attributes.find(e.first) != expected_attributes.end())
     {
       if (e.first == "version")
-        EXPECT_EQ(opentelemetry::nostd::get<uint32_t>(expected_attributes.find(e.first)->second),
-                  opentelemetry::nostd::get<uint32_t>(e.second));
+        EXPECT_EQ(nostd::get<uint32_t>(expected_attributes.find(e.first)->second),
+                  nostd::get<uint32_t>(e.second));
       else if (e.first == "cost")
-        EXPECT_EQ(opentelemetry::nostd::get<double>(expected_attributes.find(e.first)->second),
-                  opentelemetry::nostd::get<double>(e.second));
+        EXPECT_EQ(nostd::get<double>(expected_attributes.find(e.first)->second),
+                  nostd::get<double>(e.second));
       else
-        EXPECT_EQ(opentelemetry::nostd::get<std::string>(expected_attributes.find(e.first)->second),
-                  opentelemetry::nostd::get<std::string>(e.second));
+        EXPECT_EQ(nostd::get<std::string>(expected_attributes.find(e.first)->second),
+                  nostd::get<std::string>(e.second));
     }
   }
   EXPECT_EQ(received_attributes.size(), expected_attributes.size());  // for missing service.name
@@ -142,8 +143,7 @@ TEST(ResourceTest, Merge)
     EXPECT_TRUE(expected_attributes.find(e.first) != expected_attributes.end());
     if (expected_attributes.find(e.first) != expected_attributes.end())
     {
-      EXPECT_EQ(expected_attributes.find(e.first)->second,
-                opentelemetry::nostd::get<std::string>(e.second));
+      EXPECT_EQ(expected_attributes.find(e.first)->second, nostd::get<std::string>(e.second));
     }
   }
   EXPECT_EQ(received_attributes.size(), expected_attributes.size());
@@ -164,8 +164,7 @@ TEST(ResourceTest, MergeEmptyString)
     EXPECT_TRUE(expected_attributes.find(e.first) != expected_attributes.end());
     if (expected_attributes.find(e.first) != expected_attributes.end())
     {
-      EXPECT_EQ(expected_attributes.find(e.first)->second,
-                opentelemetry::nostd::get<std::string>(e.second));
+      EXPECT_EQ(expected_attributes.find(e.first)->second, nostd::get<std::string>(e.second));
     }
   }
   EXPECT_EQ(received_attributes.size(), expected_attributes.size());
@@ -186,8 +185,7 @@ TEST(ResourceTest, OtelResourceDetector)
     EXPECT_TRUE(expected_attributes.find(e.first) != expected_attributes.end());
     if (expected_attributes.find(e.first) != expected_attributes.end())
     {
-      EXPECT_EQ(expected_attributes.find(e.first)->second,
-                opentelemetry::nostd::get<std::string>(e.second));
+      EXPECT_EQ(expected_attributes.find(e.first)->second, nostd::get<std::string>(e.second));
     }
   }
   EXPECT_EQ(received_attributes.size(), expected_attributes.size());
@@ -207,8 +205,7 @@ TEST(ResourceTest, OtelResourceDetectorEmptyEnv)
     EXPECT_TRUE(expected_attributes.find(e.first) != expected_attributes.end());
     if (expected_attributes.find(e.first) != expected_attributes.end())
     {
-      EXPECT_EQ(expected_attributes.find(e.first)->second,
-                opentelemetry::nostd::get<std::string>(e.second));
+      EXPECT_EQ(expected_attributes.find(e.first)->second, nostd::get<std::string>(e.second));
     }
   }
   EXPECT_EQ(received_attributes.size(), expected_attributes.size());

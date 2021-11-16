@@ -15,8 +15,6 @@
 #  include "opentelemetry/sdk/_metrics/instrument.h"
 #  include "opentelemetry/version.h"
 
-namespace metrics_api = opentelemetry::metrics;
-
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace sdk
 {
@@ -29,7 +27,8 @@ namespace metrics
 #  endif
 
 template <class T>
-class ValueObserver : public AsynchronousInstrument<T>, virtual public metrics_api::ValueObserver<T>
+class ValueObserver : public AsynchronousInstrument<T>,
+                      virtual public opentelemetry::metrics::ValueObserver<T>
 {
 
 public:
@@ -39,13 +38,13 @@ public:
                 nostd::string_view description,
                 nostd::string_view unit,
                 bool enabled,
-                void (*callback)(metrics_api::ObserverResult<T>))
+                void (*callback)(opentelemetry::metrics::ObserverResult<T>))
       : AsynchronousInstrument<T>(name,
                                   description,
                                   unit,
                                   enabled,
                                   callback,
-                                  metrics_api::InstrumentKind::ValueObserver)
+                                  opentelemetry::metrics::InstrumentKind::ValueObserver)
   {}
 
   /*
@@ -81,7 +80,7 @@ public:
    */
   virtual void run() override
   {
-    metrics_api::ObserverResult<T> res(this);
+    opentelemetry::metrics::ObserverResult<T> res(this);
     this->callback_(res);
   }
 
@@ -104,7 +103,8 @@ public:
 };
 
 template <class T>
-class SumObserver : public AsynchronousInstrument<T>, virtual public metrics_api::SumObserver<T>
+class SumObserver : public AsynchronousInstrument<T>,
+                    virtual public opentelemetry::metrics::SumObserver<T>
 {
 
 public:
@@ -114,13 +114,13 @@ public:
               nostd::string_view description,
               nostd::string_view unit,
               bool enabled,
-              void (*callback)(metrics_api::ObserverResult<T>))
+              void (*callback)(opentelemetry::metrics::ObserverResult<T>))
       : AsynchronousInstrument<T>(name,
                                   description,
                                   unit,
                                   enabled,
                                   callback,
-                                  metrics_api::InstrumentKind::SumObserver)
+                                  opentelemetry::metrics::InstrumentKind::SumObserver)
   {}
 
   /*
@@ -178,7 +178,7 @@ public:
    */
   virtual void run() override
   {
-    metrics_api::ObserverResult<T> res(this);
+    opentelemetry::metrics::ObserverResult<T> res(this);
     this->callback_(res);
   }
 
@@ -202,7 +202,7 @@ public:
 
 template <class T>
 class UpDownSumObserver : public AsynchronousInstrument<T>,
-                          virtual public metrics_api::UpDownSumObserver<T>
+                          virtual public opentelemetry::metrics::UpDownSumObserver<T>
 {
 
 public:
@@ -212,13 +212,13 @@ public:
                     nostd::string_view description,
                     nostd::string_view unit,
                     bool enabled,
-                    void (*callback)(metrics_api::ObserverResult<T>))
+                    void (*callback)(opentelemetry::metrics::ObserverResult<T>))
       : AsynchronousInstrument<T>(name,
                                   description,
                                   unit,
                                   enabled,
                                   callback,
-                                  metrics_api::InstrumentKind::UpDownSumObserver)
+                                  opentelemetry::metrics::InstrumentKind::UpDownSumObserver)
   {}
 
   /*
@@ -254,7 +254,7 @@ public:
    */
   virtual void run() override
   {
-    metrics_api::ObserverResult<T> res(this);
+    opentelemetry::metrics::ObserverResult<T> res(this);
     this->callback_(res);
   }
 

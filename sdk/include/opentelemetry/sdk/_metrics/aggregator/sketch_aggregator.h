@@ -15,8 +15,6 @@
 #  include "opentelemetry/sdk/_metrics/aggregator/aggregator.h"
 #  include "opentelemetry/version.h"
 
-namespace metrics_api = opentelemetry::metrics;
-
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace sdk
 {
@@ -45,7 +43,9 @@ public:
    *@param error_bound, what is referred to as "alpha" in the DDSketch algorithm
    *@param max_buckets, the maximum number of indices in the raw value map
    */
-  SketchAggregator(metrics_api::InstrumentKind kind, double error_bound, size_t max_buckets = 2048)
+  SketchAggregator(opentelemetry::metrics::InstrumentKind kind,
+                   double error_bound,
+                   size_t max_buckets = 2048)
   {
 
     this->kind_       = kind;

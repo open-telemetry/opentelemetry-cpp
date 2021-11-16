@@ -13,8 +13,6 @@
 #  include "opentelemetry/sdk/_metrics/record.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
-namespace sdkmetrics = opentelemetry::sdk::metrics;
-
 namespace exporter
 {
 namespace metrics
@@ -23,7 +21,7 @@ namespace metrics
 /**
  * The OStreamMetricsExporter exports record data through an ostream
  */
-class OStreamMetricsExporter final : public sdkmetrics::MetricsExporter
+class OStreamMetricsExporter final : public opentelemetry::sdk::metrics::MetricsExporter
 {
 public:
   /**
@@ -34,7 +32,7 @@ public:
   explicit OStreamMetricsExporter(std::ostream &sout = std::cout) noexcept;
 
   sdk::common::ExportResult Export(
-      const std::vector<sdkmetrics::Record> &records) noexcept override;
+      const std::vector<opentelemetry::sdk::metrics::Record> &records) noexcept override;
 
 private:
   std::ostream &sout_;
@@ -45,33 +43,33 @@ private:
    * custom printing.
    */
   template <typename T>
-  void PrintAggregatorVariant(sdkmetrics::AggregatorVariant value)
+  void PrintAggregatorVariant(opentelemetry::sdk::metrics::AggregatorVariant value)
   {
-    auto agg     = nostd::get<std::shared_ptr<sdkmetrics::Aggregator<T>>>(value);
+    auto agg     = nostd::get<std::shared_ptr<opentelemetry::sdk::metrics::Aggregator<T>>>(value);
     auto aggKind = agg->get_aggregator_kind();
 
     if (!agg)
       return;
     switch (aggKind)
     {
-      case sdkmetrics::AggregatorKind::Counter: {
+      case opentelemetry::sdk::metrics::AggregatorKind::Counter: {
         sout_ << "\n  sum         : " << agg->get_checkpoint()[0];
       }
       break;
-      case sdkmetrics::AggregatorKind::MinMaxSumCount: {
+      case opentelemetry::sdk::metrics::AggregatorKind::MinMaxSumCount: {
         auto mmsc = agg->get_checkpoint();
         sout_ << "\n  min         : " << mmsc[0] << "\n  max         : " << mmsc[1]
               << "\n  sum         : " << mmsc[2] << "\n  count       : " << mmsc[3];
       }
       break;
-      case sdkmetrics::AggregatorKind::Gauge: {
+      case opentelemetry::sdk::metrics::AggregatorKind::Gauge: {
         auto timestamp = agg->get_checkpoint_timestamp();
 
         sout_ << "\n  last value  : " << agg->get_checkpoint()[0]
               << "\n  timestamp   : " << std::to_string(timestamp.time_since_epoch().count());
       }
       break;
-      case sdkmetrics::AggregatorKind::Exact: {
+      case opentelemetry::sdk::metrics::AggregatorKind::Exact: {
         // TODO: Find better way to print quantiles
         if (agg->get_quant_estimation())
         {
@@ -101,7 +99,7 @@ private:
         }
       }
       break;
-      case sdkmetrics::AggregatorKind::Histogram: {
+      case opentelemetry::sdk::metrics::AggregatorKind::Histogram: {
         auto boundaries = agg->get_boundaries();
         auto counts     = agg->get_counts();
 
@@ -130,7 +128,7 @@ private:
         sout_ << ']';
       }
       break;
-      case sdkmetrics::AggregatorKind::Sketch: {
+      case opentelemetry::sdk::metrics::AggregatorKind::Sketch: {
         auto boundaries = agg->get_boundaries();
         auto counts     = agg->get_counts();
 

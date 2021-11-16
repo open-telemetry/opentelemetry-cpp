@@ -70,13 +70,13 @@ proto::common::v1::InstrumentationLibrary OtlpRecordable::GetProtoInstrumentatio
   return instrumentation_library;
 }
 
-void OtlpRecordable::SetResource(const opentelemetry::sdk::resource::Resource &resource) noexcept
+void OtlpRecordable::SetResource(const sdk::resource::Resource &resource) noexcept
 {
   resource_ = &resource;
 };
 
 void OtlpRecordable::SetAttribute(nostd::string_view key,
-                                  const opentelemetry::common::AttributeValue &value) noexcept
+                                  const common::AttributeValue &value) noexcept
 {
   auto *attribute = span_.add_attributes();
   OtlpRecordableUtils::PopulateAttribute(attribute, key, value);
@@ -96,7 +96,7 @@ void OtlpRecordable::AddEvent(nostd::string_view name,
   });
 }
 
-void OtlpRecordable::AddLink(const opentelemetry::trace::SpanContext &span_context,
+void OtlpRecordable::AddLink(const trace::SpanContext &span_context,
                              const common::KeyValueIterable &attributes) noexcept
 {
   auto *link = span_.add_links();
@@ -113,7 +113,7 @@ void OtlpRecordable::AddLink(const opentelemetry::trace::SpanContext &span_conte
 
 void OtlpRecordable::SetStatus(trace::StatusCode code, nostd::string_view description) noexcept
 {
-  span_.mutable_status()->set_code(opentelemetry::proto::trace::v1::Status_StatusCode(code));
+  span_.mutable_status()->set_code(proto::trace::v1::Status_StatusCode(code));
   if (code == trace::StatusCode::kError)
   {
     span_.mutable_status()->set_message(description.data(), description.size());
@@ -125,49 +125,43 @@ void OtlpRecordable::SetName(nostd::string_view name) noexcept
   span_.set_name(name.data(), name.size());
 }
 
-void OtlpRecordable::SetSpanKind(opentelemetry::trace::SpanKind span_kind) noexcept
+void OtlpRecordable::SetSpanKind(trace::SpanKind span_kind) noexcept
 {
-  opentelemetry::proto::trace::v1::Span_SpanKind proto_span_kind =
-      opentelemetry::proto::trace::v1::Span_SpanKind::Span_SpanKind_SPAN_KIND_UNSPECIFIED;
+  proto::trace::v1::Span_SpanKind proto_span_kind =
+      proto::trace::v1::Span_SpanKind::Span_SpanKind_SPAN_KIND_UNSPECIFIED;
 
   switch (span_kind)
   {
 
-    case opentelemetry::trace::SpanKind::kInternal:
-      proto_span_kind =
-          opentelemetry::proto::trace::v1::Span_SpanKind::Span_SpanKind_SPAN_KIND_INTERNAL;
+    case trace::SpanKind::kInternal:
+      proto_span_kind = proto::trace::v1::Span_SpanKind::Span_SpanKind_SPAN_KIND_INTERNAL;
       break;
 
-    case opentelemetry::trace::SpanKind::kServer:
-      proto_span_kind =
-          opentelemetry::proto::trace::v1::Span_SpanKind::Span_SpanKind_SPAN_KIND_SERVER;
+    case trace::SpanKind::kServer:
+      proto_span_kind = proto::trace::v1::Span_SpanKind::Span_SpanKind_SPAN_KIND_SERVER;
       break;
 
-    case opentelemetry::trace::SpanKind::kClient:
-      proto_span_kind =
-          opentelemetry::proto::trace::v1::Span_SpanKind::Span_SpanKind_SPAN_KIND_CLIENT;
+    case trace::SpanKind::kClient:
+      proto_span_kind = proto::trace::v1::Span_SpanKind::Span_SpanKind_SPAN_KIND_CLIENT;
       break;
 
-    case opentelemetry::trace::SpanKind::kProducer:
-      proto_span_kind =
-          opentelemetry::proto::trace::v1::Span_SpanKind::Span_SpanKind_SPAN_KIND_PRODUCER;
+    case trace::SpanKind::kProducer:
+      proto_span_kind = proto::trace::v1::Span_SpanKind::Span_SpanKind_SPAN_KIND_PRODUCER;
       break;
 
-    case opentelemetry::trace::SpanKind::kConsumer:
-      proto_span_kind =
-          opentelemetry::proto::trace::v1::Span_SpanKind::Span_SpanKind_SPAN_KIND_CONSUMER;
+    case trace::SpanKind::kConsumer:
+      proto_span_kind = proto::trace::v1::Span_SpanKind::Span_SpanKind_SPAN_KIND_CONSUMER;
       break;
 
     default:
       // shouldn't reach here.
-      proto_span_kind =
-          opentelemetry::proto::trace::v1::Span_SpanKind::Span_SpanKind_SPAN_KIND_UNSPECIFIED;
+      proto_span_kind = proto::trace::v1::Span_SpanKind::Span_SpanKind_SPAN_KIND_UNSPECIFIED;
   }
 
   span_.set_kind(proto_span_kind);
 }
 
-void OtlpRecordable::SetStartTime(opentelemetry::common::SystemTimestamp start_time) noexcept
+void OtlpRecordable::SetStartTime(common::SystemTimestamp start_time) noexcept
 {
   span_.set_start_time_unix_nano(start_time.time_since_epoch().count());
 }

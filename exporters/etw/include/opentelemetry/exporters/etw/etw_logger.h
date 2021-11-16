@@ -31,9 +31,6 @@
 #  include "opentelemetry/exporters/etw/etw_provider.h"
 #  include "opentelemetry/exporters/etw/utils.h"
 
-namespace logs  = opentelemetry::logs;
-namespace trace = opentelemetry::trace;
-
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace exporter
 {
@@ -45,7 +42,7 @@ class LoggerProvider;
 /**
  * @brief Logger  class that allows to send logs to ETW Provider.
  */
-class Logger : public logs::Logger
+class Logger : public opentelemetry::logs::Logger
 {
 
   /**
@@ -94,21 +91,21 @@ public:
   Logger(etw::LoggerProvider &parent,
          nostd::string_view providerId     = "",
          ETWProvider::EventFormat encoding = ETWProvider::EventFormat::ETW_MANIFEST)
-      : logs::Logger(),
+      : opentelemetry::logs::Logger(),
         loggerProvider_(parent),
         provId(providerId.data(), providerId.size()),
         encoding(encoding),
         provHandle(initProvHandle())
   {}
 
-  void Log(logs::Severity severity,
+  void Log(opentelemetry::logs::Severity severity,
            nostd::string_view name,
            nostd::string_view body,
            const common::KeyValueIterable &resource,
            const common::KeyValueIterable &attributes,
-           trace::TraceId trace_id,
-           trace::SpanId span_id,
-           trace::TraceFlags trace_flags,
+           opentelemetry::trace::TraceId trace_id,
+           opentelemetry::trace::SpanId span_id,
+           opentelemetry::trace::TraceFlags trace_flags,
            common::SystemTimestamp timestamp) noexcept override
   {
 
@@ -129,13 +126,13 @@ public:
     return Log(severity, name, body, evtCopy, trace_id, span_id, trace_flags, timestamp);
   }
 
-  virtual void Log(logs::Severity severity,
+  virtual void Log(opentelemetry::logs::Severity severity,
                    nostd::string_view name,
                    nostd::string_view body,
                    Properties &evt,
-                   trace::TraceId trace_id,
-                   trace::SpanId span_id,
-                   trace::TraceFlags trace_flags,
+                   opentelemetry::trace::TraceId trace_id,
+                   opentelemetry::trace::SpanId span_id,
+                   opentelemetry::trace::TraceFlags trace_flags,
                    common::SystemTimestamp timestamp) noexcept
   {
     // Populate Etw.EventName attribute at envelope level
@@ -187,7 +184,7 @@ public:
 /**
  * @brief ETW LoggerProvider
  */
-class LoggerProvider : public logs::LoggerProvider
+class LoggerProvider : public opentelemetry::logs::LoggerProvider
 {
 public:
   /**
@@ -199,7 +196,7 @@ public:
    * @brief Construct instance of LoggerProvider with given options
    * @param options Configuration options
    */
-  LoggerProvider(TelemetryProviderOptions options) : logs::LoggerProvider()
+  LoggerProvider(TelemetryProviderOptions options) : opentelemetry::logs::LoggerProvider()
   {
     GetOption(options, "enableTraceId", config_.enableTraceId, true);
     GetOption(options, "enableSpanId", config_.enableSpanId, true);
@@ -209,7 +206,7 @@ public:
     config_.encoding = GetEncoding(options);
   }
 
-  LoggerProvider() : logs::LoggerProvider()
+  LoggerProvider() : opentelemetry::logs::LoggerProvider()
   {
     config_.encoding = ETWProvider::EventFormat::ETW_MANIFEST;
   }
@@ -225,16 +222,18 @@ public:
    * - "XML"            - XML events (reserved for future use)
    * @return
    */
-  nostd::shared_ptr<logs::Logger> GetLogger(nostd::string_view name,
-                                            nostd::string_view args = "") override
+  nostd::shared_ptr<opentelemetry::logs::Logger> GetLogger(nostd::string_view name,
+                                                           nostd::string_view args = "") override
   {
     UNREFERENCED_PARAMETER(args);
     ETWProvider::EventFormat evtFmt = config_.encoding;
-    return nostd::shared_ptr<logs::Logger>{new (std::nothrow) etw::Logger(*this, name, evtFmt)};
+    return nostd::shared_ptr<opentelemetry::logs::Logger>{new (std::nothrow)
+                                                              etw::Logger(*this, name, evtFmt)};
   }
 
-  nostd::shared_ptr<logs::Logger> GetLogger(nostd::string_view name,
-                                            nostd::span<nostd::string_view> args) override
+  nostd::shared_ptr<opentelemetry::logs::Logger> GetLogger(
+      nostd::string_view name,
+      nostd::span<nostd::string_view> args) override
   {
     return GetLogger(name, args[0]);
   }

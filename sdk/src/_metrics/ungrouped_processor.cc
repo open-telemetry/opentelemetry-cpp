@@ -21,15 +21,16 @@ UngroupedMetricsProcessor::UngroupedMetricsProcessor(bool stateful)
  * CheckpointSelf will return a vector of records to be exported. This function will go through
  *aggregators that have been sent through process() and return them as a vector of records.
  **/
-std::vector<sdkmetrics::Record> UngroupedMetricsProcessor::CheckpointSelf() noexcept
+std::vector<opentelemetry::sdk::metrics::Record>
+UngroupedMetricsProcessor::CheckpointSelf() noexcept
 {
-  std::vector<sdkmetrics::Record> metric_records;
+  std::vector<opentelemetry::sdk::metrics::Record> metric_records;
 
   for (auto iter : batch_map_)
   {
     // Create a record from the held KeyStruct values and add to the Checkpoint
     KeyStruct key = iter.first;
-    sdkmetrics::Record r{key.name, key.description, key.labels, iter.second};
+    opentelemetry::sdk::metrics::Record r{key.name, key.description, key.labels, iter.second};
 
     metric_records.push_back(r);
   }
@@ -49,7 +50,7 @@ void UngroupedMetricsProcessor::FinishedCollection() noexcept
   }
 }
 
-void UngroupedMetricsProcessor::process(sdkmetrics::Record record) noexcept
+void UngroupedMetricsProcessor::process(opentelemetry::sdk::metrics::Record record) noexcept
 {
   auto aggregator         = record.GetAggregator();
   std::string label       = record.GetLabels();
@@ -66,39 +67,43 @@ void UngroupedMetricsProcessor::process(sdkmetrics::Record record) noexcept
   {
     auto batch_value = batch_map_[batch_key];
 
-    if (nostd::holds_alternative<std::shared_ptr<sdkmetrics::Aggregator<short>>>(aggregator))
+    if (nostd::holds_alternative<std::shared_ptr<opentelemetry::sdk::metrics::Aggregator<short>>>(
+            aggregator))
     {
       auto batch_value_reference_short =
-          nostd::get<std::shared_ptr<sdkmetrics::Aggregator<short>>>(batch_value);
+          nostd::get<std::shared_ptr<opentelemetry::sdk::metrics::Aggregator<short>>>(batch_value);
       auto aggregator_reference_short =
-          nostd::get<std::shared_ptr<sdkmetrics::Aggregator<short>>>(aggregator);
+          nostd::get<std::shared_ptr<opentelemetry::sdk::metrics::Aggregator<short>>>(aggregator);
 
       merge_aggregators<short>(batch_value_reference_short, aggregator_reference_short);
     }
-    else if (nostd::holds_alternative<std::shared_ptr<sdkmetrics::Aggregator<int>>>(aggregator))
+    else if (nostd::holds_alternative<
+                 std::shared_ptr<opentelemetry::sdk::metrics::Aggregator<int>>>(aggregator))
     {
       auto batch_value_reference_int =
-          nostd::get<std::shared_ptr<sdkmetrics::Aggregator<int>>>(batch_value);
+          nostd::get<std::shared_ptr<opentelemetry::sdk::metrics::Aggregator<int>>>(batch_value);
       auto aggregator_reference_int =
-          nostd::get<std::shared_ptr<sdkmetrics::Aggregator<int>>>(aggregator);
+          nostd::get<std::shared_ptr<opentelemetry::sdk::metrics::Aggregator<int>>>(aggregator);
 
       merge_aggregators<int>(batch_value_reference_int, aggregator_reference_int);
     }
-    else if (nostd::holds_alternative<std::shared_ptr<sdkmetrics::Aggregator<float>>>(aggregator))
+    else if (nostd::holds_alternative<
+                 std::shared_ptr<opentelemetry::sdk::metrics::Aggregator<float>>>(aggregator))
     {
       auto batch_value_reference_float =
-          nostd::get<std::shared_ptr<sdkmetrics::Aggregator<float>>>(batch_value);
+          nostd::get<std::shared_ptr<opentelemetry::sdk::metrics::Aggregator<float>>>(batch_value);
       auto aggregator_reference_float =
-          nostd::get<std::shared_ptr<sdkmetrics::Aggregator<float>>>(aggregator);
+          nostd::get<std::shared_ptr<opentelemetry::sdk::metrics::Aggregator<float>>>(aggregator);
 
       merge_aggregators<float>(batch_value_reference_float, aggregator_reference_float);
     }
-    else if (nostd::holds_alternative<std::shared_ptr<sdkmetrics::Aggregator<double>>>(aggregator))
+    else if (nostd::holds_alternative<
+                 std::shared_ptr<opentelemetry::sdk::metrics::Aggregator<double>>>(aggregator))
     {
       auto batch_value_reference_double =
-          nostd::get<std::shared_ptr<sdkmetrics::Aggregator<double>>>(batch_value);
+          nostd::get<std::shared_ptr<opentelemetry::sdk::metrics::Aggregator<double>>>(batch_value);
       auto aggregator_reference_double =
-          nostd::get<std::shared_ptr<sdkmetrics::Aggregator<double>>>(aggregator);
+          nostd::get<std::shared_ptr<opentelemetry::sdk::metrics::Aggregator<double>>>(aggregator);
 
       merge_aggregators<double>(batch_value_reference_double, aggregator_reference_double);
     }
@@ -111,39 +116,44 @@ void UngroupedMetricsProcessor::process(sdkmetrics::Record record) noexcept
    **/
   if (stateful_)
   {
-    if (nostd::holds_alternative<std::shared_ptr<sdkmetrics::Aggregator<short>>>(aggregator))
+    if (nostd::holds_alternative<std::shared_ptr<opentelemetry::sdk::metrics::Aggregator<short>>>(
+            aggregator))
     {
       auto record_agg_short =
-          nostd::get<std::shared_ptr<sdkmetrics::Aggregator<short>>>(aggregator);
+          nostd::get<std::shared_ptr<opentelemetry::sdk::metrics::Aggregator<short>>>(aggregator);
       auto aggregator_short = aggregator_copy<short>(record_agg_short);
 
       merge_aggregators<short>(aggregator_short, record_agg_short);
 
       batch_map_[batch_key] = aggregator_short;
     }
-    else if (nostd::holds_alternative<std::shared_ptr<sdkmetrics::Aggregator<int>>>(aggregator))
+    else if (nostd::holds_alternative<
+                 std::shared_ptr<opentelemetry::sdk::metrics::Aggregator<int>>>(aggregator))
     {
-      auto record_agg_int = nostd::get<std::shared_ptr<sdkmetrics::Aggregator<int>>>(aggregator);
+      auto record_agg_int =
+          nostd::get<std::shared_ptr<opentelemetry::sdk::metrics::Aggregator<int>>>(aggregator);
       auto aggregator_int = aggregator_copy<int>(record_agg_int);
 
       merge_aggregators<int>(aggregator_int, record_agg_int);
 
       batch_map_[batch_key] = aggregator_int;
     }
-    else if (nostd::holds_alternative<std::shared_ptr<sdkmetrics::Aggregator<float>>>(aggregator))
+    else if (nostd::holds_alternative<
+                 std::shared_ptr<opentelemetry::sdk::metrics::Aggregator<float>>>(aggregator))
     {
       auto record_agg_float =
-          nostd::get<std::shared_ptr<sdkmetrics::Aggregator<float>>>(aggregator);
+          nostd::get<std::shared_ptr<opentelemetry::sdk::metrics::Aggregator<float>>>(aggregator);
       auto aggregator_float = aggregator_copy<float>(record_agg_float);
 
       merge_aggregators<float>(aggregator_float, record_agg_float);
 
       batch_map_[batch_key] = aggregator_float;
     }
-    else if (nostd::holds_alternative<std::shared_ptr<sdkmetrics::Aggregator<double>>>(aggregator))
+    else if (nostd::holds_alternative<
+                 std::shared_ptr<opentelemetry::sdk::metrics::Aggregator<double>>>(aggregator))
     {
       auto record_agg_double =
-          nostd::get<std::shared_ptr<sdkmetrics::Aggregator<double>>>(aggregator);
+          nostd::get<std::shared_ptr<opentelemetry::sdk::metrics::Aggregator<double>>>(aggregator);
       auto aggregator_double = aggregator_copy<double>(record_agg_double);
 
       merge_aggregators<double>(aggregator_double, record_agg_double);
