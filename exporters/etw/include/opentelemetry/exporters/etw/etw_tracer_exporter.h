@@ -26,5 +26,3 @@
 #include "opentelemetry/exporters/etw/etw_tracer.h"
 
 #include "opentelemetry/exporters/etw/utils.h"
-
-namespace trace = opentelemetry::trace;

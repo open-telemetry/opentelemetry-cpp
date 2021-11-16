@@ -14,13 +14,16 @@ namespace zipkin
 {
 
 using namespace opentelemetry::sdk::resource;
+namespace trace_api = opentelemetry::trace;
+namespace common    = opentelemetry::common;
+namespace sdk       = opentelemetry::sdk;
 
 // constexpr needs keys to be constexpr, const is next best to use.
-static const std::map<opentelemetry::trace::SpanKind, std::string> kSpanKindMap = {
-    {opentelemetry::trace::SpanKind::kClient, "CLIENT"},
-    {opentelemetry::trace::SpanKind::kServer, "SERVER"},
-    {opentelemetry::trace::SpanKind::kConsumer, "CONSUMER"},
-    {opentelemetry::trace::SpanKind::kProducer, "PRODUCER"},
+static const std::map<trace_api::SpanKind, std::string> kSpanKindMap = {
+    {trace_api::SpanKind::kClient, "CLIENT"},
+    {trace_api::SpanKind::kServer, "SERVER"},
+    {trace_api::SpanKind::kConsumer, "CONSUMER"},
+    {trace_api::SpanKind::kProducer, "PRODUCER"},
 };
 
 //
@@ -28,8 +31,8 @@ static const std::map<opentelemetry::trace::SpanKind, std::string> kSpanKindMap 
 //
 const int kAttributeValueSize = 16;
 
-void Recordable::SetIdentity(const opentelemetry::trace::SpanContext &span_context,
-                             opentelemetry::trace::SpanId parent_span_id) noexcept
+void Recordable::SetIdentity(const trace_api::SpanContext &span_context,
+                             trace_api::SpanId parent_span_id) noexcept
 {
   char trace_id_lower_base16[trace::TraceId::kSize * 2] = {0};
   span_context.trace_id().ToLowerBase16(trace_id_lower_base16);
@@ -48,13 +51,12 @@ void Recordable::SetIdentity(const opentelemetry::trace::SpanContext &span_conte
 
 void PopulateAttribute(nlohmann::json &attribute,
                        nostd::string_view key,
-                       const opentelemetry::common::AttributeValue &value)
+                       const common::AttributeValue &value)
 {
   // Assert size of variant to ensure that this method gets updated if the variant
   // definition changes
-  static_assert(
-      nostd::variant_size<opentelemetry::common::AttributeValue>::value == kAttributeValueSize,
-      "AttributeValue contains unknown type");
+  static_assert(nostd::variant_size<common::AttributeValue>::value == kAttributeValueSize,
+                "AttributeValue contains unknown type");
 
   if (nostd::holds_alternative<bool>(value))
   {
@@ -155,8 +157,7 @@ void PopulateAttribute(nlohmann::json &attribute,
   }
 }
 
-void Recordable::SetAttribute(nostd::string_view key,
-                              const opentelemetry::common::AttributeValue &value) noexcept
+void Recordable::SetAttribute(nostd::string_view key, const common::AttributeValue &value) noexcept
 {
   if (!span_.contains("tags"))
   {
@@ -187,7 +188,7 @@ void Recordable::AddEvent(nostd::string_view name,
   span_["annotations"].push_back(annotation);
 }
 
-void Recordable::AddLink(const opentelemetry::trace::SpanContext &span_context,
+void Recordable::AddLink(const trace_api::SpanContext &span_context,
                          const common::KeyValueIterable &attributes) noexcept
 {
   // TODO: Currently not supported by specs:
@@ -211,7 +212,7 @@ void Recordable::SetName(nostd::string_view name) noexcept
   span_["name"] = name.data();
 }
 
-void Recordable::SetResource(const opentelemetry::sdk::resource::Resource &resource) noexcept
+void Recordable::SetResource(const sdk::resource::Resource &resource) noexcept
 {
   // only service.name attribute is supported by specs as of now.
   auto attributes = resource.GetAttributes();
@@ -221,7 +222,7 @@ void Recordable::SetResource(const opentelemetry::sdk::resource::Resource &resou
   }
 }
 
-void Recordable::SetStartTime(opentelemetry::common::SystemTimestamp start_time) noexcept
+void Recordable::SetStartTime(common::SystemTimestamp start_time) noexcept
 {
   span_["timestamp"] =
       std::chrono::duration_cast<std::chrono::microseconds>(start_time.time_since_epoch()).count();
@@ -232,7 +233,7 @@ void Recordable::SetDuration(std::chrono::nanoseconds duration) noexcept
   span_["duration"] = std::chrono::duration_cast<std::chrono::microseconds>(duration).count();
 }
 
-void Recordable::SetSpanKind(opentelemetry::trace::SpanKind span_kind) noexcept
+void Recordable::SetSpanKind(trace_api::SpanKind span_kind) noexcept
 {
   auto span_iter = kSpanKindMap.find(span_kind);
   if (span_iter != kSpanKindMap.end())
@@ -242,8 +243,7 @@ void Recordable::SetSpanKind(opentelemetry::trace::SpanKind span_kind) noexcept
 }
 
 void Recordable::SetInstrumentationLibrary(
-    const opentelemetry::sdk::instrumentationlibrary::InstrumentationLibrary
-        &instrumentation_library) noexcept
+    const sdk::instrumentationlibrary::InstrumentationLibrary &instrumentation_library) noexcept
 {
   span_["tags"]["otel.library.name"]    = instrumentation_library.GetName();
   span_["tags"]["otel.library.version"] = instrumentation_library.GetVersion();

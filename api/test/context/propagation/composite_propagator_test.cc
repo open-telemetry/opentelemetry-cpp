@@ -118,7 +118,7 @@ TEST_F(CompositePropagatorTest, Inject)
     return true;
   });
   EXPECT_EQ(fields.size(), 3);
-  EXPECT_EQ(fields[0], opentelemetry::trace::propagation::kTraceParent);
-  EXPECT_EQ(fields[1], opentelemetry::trace::propagation::kTraceState);
-  EXPECT_EQ(fields[2], opentelemetry::trace::propagation::kB3CombinedHeader);
+  EXPECT_EQ(fields[0], trace::propagation::kTraceParent);
+  EXPECT_EQ(fields[1], trace::propagation::kTraceState);
+  EXPECT_EQ(fields[2], trace::propagation::kB3CombinedHeader);
 }

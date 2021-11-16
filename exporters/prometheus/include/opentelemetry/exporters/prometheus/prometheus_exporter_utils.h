@@ -10,8 +10,6 @@
 #  include "opentelemetry/sdk/_metrics/record.h"
 #  include "prometheus/metric_family.h"
 
-namespace metric_sdk = opentelemetry::sdk::metrics;
-
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace exporter
 {
@@ -31,13 +29,13 @@ public:
    * @return a collection of translated metrics that is acceptable by Prometheus
    */
   static std::vector<::prometheus::MetricFamily> TranslateToPrometheus(
-      const std::vector<metric_sdk::Record> &records);
+      const std::vector<opentelemetry::sdk::metrics::Record> &records);
 
 private:
   /**
    * Set value to metric family according to record
    */
-  static void SetMetricFamily(metric_sdk::Record &record,
+  static void SetMetricFamily(opentelemetry::sdk::metrics::Record &record,
                               ::prometheus::MetricFamily *metric_family);
 
   /**
@@ -53,14 +51,15 @@ private:
    * Set value to metric family for different aggregator
    */
   template <typename T>
-  static void SetMetricFamilyByAggregator(std::shared_ptr<metric_sdk::Aggregator<T>> aggregator,
-                                          std::string labels_str,
-                                          ::prometheus::MetricFamily *metric_family);
+  static void SetMetricFamilyByAggregator(
+      std::shared_ptr<opentelemetry::sdk::metrics::Aggregator<T>> aggregator,
+      std::string labels_str,
+      ::prometheus::MetricFamily *metric_family);
 
   /**
    * Translate the OTel metric type to Prometheus metric type
    */
-  static ::prometheus::MetricType TranslateType(metric_sdk::AggregatorKind kind);
+  static ::prometheus::MetricType TranslateType(opentelemetry::sdk::metrics::AggregatorKind kind);
 
   /**
    * Set metric data for:
@@ -103,7 +102,7 @@ private:
    */
   template <typename T>
   static void SetData(std::vector<T> values,
-                      metric_sdk::AggregatorKind kind,
+                      opentelemetry::sdk::metrics::AggregatorKind kind,
                       const std::vector<T> &quantiles,
                       const std::string &labels,
                       std::chrono::nanoseconds time,
@@ -129,8 +128,9 @@ private:
    * Build a quantiles vector from aggregator
    */
   template <typename T>
-  static std::vector<T> GetQuantilesVector(std::shared_ptr<metric_sdk::Aggregator<T>> aggregator,
-                                           const std::vector<double> &quantile_points);
+  static std::vector<T> GetQuantilesVector(
+      std::shared_ptr<opentelemetry::sdk::metrics::Aggregator<T>> aggregator,
+      const std::vector<double> &quantile_points);
 
   /**
    * Handle Counter and Gauge.
@@ -159,7 +159,7 @@ private:
    */
   template <typename T>
   static void SetValue(std::vector<T> values,
-                       metric_sdk::AggregatorKind kind,
+                       opentelemetry::sdk::metrics::AggregatorKind kind,
                        std::vector<T> quantiles,
                        ::prometheus::ClientMetric *metric,
                        bool do_quantile,

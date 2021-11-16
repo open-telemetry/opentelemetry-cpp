@@ -14,20 +14,22 @@
 #  include <gtest/gtest.h>
 
 using namespace opentelemetry::sdk::logs;
+namespace logs_api = opentelemetry::logs;
+namespace nostd    = opentelemetry::nostd;
 
 TEST(LoggerProviderSDK, PushToAPI)
 {
-  auto lp = opentelemetry::nostd::shared_ptr<opentelemetry::logs::LoggerProvider>(
-      new opentelemetry::sdk::logs::LoggerProvider());
-  opentelemetry::logs::Provider::SetLoggerProvider(lp);
+  auto lp =
+      nostd::shared_ptr<logs_api::LoggerProvider>(new opentelemetry::sdk::logs::LoggerProvider());
+  logs_api::Provider::SetLoggerProvider(lp);
 
   // Check that the loggerprovider was correctly pushed into the API
-  ASSERT_EQ(lp, opentelemetry::logs::Provider::GetLoggerProvider());
+  ASSERT_EQ(lp, logs_api::Provider::GetLoggerProvider());
 }
 
 TEST(LoggerProviderSDK, LoggerProviderGetLoggerSimple)
 {
-  auto lp = std::shared_ptr<opentelemetry::logs::LoggerProvider>(new LoggerProvider());
+  auto lp = std::shared_ptr<logs_api::LoggerProvider>(new LoggerProvider());
 
   auto logger1 = lp->GetLogger("logger1");
   auto logger2 = lp->GetLogger("logger2");
@@ -49,13 +51,13 @@ TEST(LoggerProviderSDK, LoggerProviderLoggerArguments)
   // Currently, arguments are not supported by the loggers.
   // TODO: Once the logging spec defines what arguments are allowed, add more
   // detail to this test
-  auto lp = std::shared_ptr<opentelemetry::logs::LoggerProvider>(new LoggerProvider());
+  auto lp = std::shared_ptr<logs_api::LoggerProvider>(new LoggerProvider());
 
   auto logger1 = lp->GetLogger("logger1", "");
 
   // Check GetLogger(logger_name, args)
-  std::array<opentelemetry::nostd::string_view, 1> sv{"string"};
-  opentelemetry::nostd::span<opentelemetry::nostd::string_view> args{sv};
+  std::array<nostd::string_view, 1> sv{"string"};
+  nostd::span<nostd::string_view> args{sv};
   auto logger2 = lp->GetLogger("logger2", args);
 }
 

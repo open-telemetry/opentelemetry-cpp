@@ -12,6 +12,7 @@
 #  include "prometheus/metric_type.h"
 
 namespace prometheus_client = ::prometheus;
+namespace metric_sdk        = opentelemetry::sdk::metrics;
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace exporter
