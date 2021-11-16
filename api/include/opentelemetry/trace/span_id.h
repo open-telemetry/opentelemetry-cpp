@@ -60,8 +60,8 @@ public:
   // Returns false if the SpanId is all zeros.
   bool IsValid() const noexcept
   {
-    static_assert(kSize == 8, "update is needed if kSize is not 8");
-    return *reinterpret_cast<const uint64_t *>(&rep_) != 0ull;
+    static constexpr uint8_t kEmptyRep[kSize] = {0};
+    return memcmp(rep_, kEmptyRep, kSize) != 0;
   }
 
   // Copies the opaque SpanId data to dest.
