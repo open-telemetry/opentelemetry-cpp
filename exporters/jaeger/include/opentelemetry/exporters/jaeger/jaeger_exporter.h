@@ -33,10 +33,7 @@ struct JaegerExporterOptions
   ext::http::client::Headers headers;
 };
 
-namespace trace_sdk  = opentelemetry::sdk::trace;
-namespace sdk_common = opentelemetry::sdk::common;
-
-class JaegerExporter final : public trace_sdk::SpanExporter
+class JaegerExporter final : public opentelemetry::sdk::trace::SpanExporter
 {
 public:
   /**
@@ -53,14 +50,15 @@ public:
    * Create a span recordable.
    * @return a new initialized Recordable object.
    */
-  std::unique_ptr<trace_sdk::Recordable> MakeRecordable() noexcept override;
+  std::unique_ptr<opentelemetry::sdk::trace::Recordable> MakeRecordable() noexcept override;
 
   /**
    * Export a batch of spans.
    * @param spans a span of unique pointers to span recordables.
    */
-  sdk_common::ExportResult Export(
-      const nostd::span<std::unique_ptr<trace_sdk::Recordable>> &spans) noexcept override;
+  opentelemetry::sdk::common::ExportResult Export(
+      const nostd::span<std::unique_ptr<opentelemetry::sdk::trace::Recordable>> &spans) noexcept
+      override;
 
   /**
    * Shutdown the exporter.

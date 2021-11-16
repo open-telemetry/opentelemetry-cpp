@@ -10,8 +10,6 @@
 #  include "opentelemetry/sdk/_metrics/aggregator/aggregator.h"
 #  include "opentelemetry/version.h"
 
-namespace metrics_api = opentelemetry::metrics;
-
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace sdk
 {
@@ -23,7 +21,7 @@ class CounterAggregator final : public Aggregator<T>
 {
 
 public:
-  CounterAggregator(metrics_api::InstrumentKind kind)
+  CounterAggregator(opentelemetry::metrics::InstrumentKind kind)
   {
     this->kind_       = kind;
     this->values_     = std::vector<T>(1, 0);

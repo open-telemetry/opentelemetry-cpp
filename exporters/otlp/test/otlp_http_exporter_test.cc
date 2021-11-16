@@ -33,6 +33,9 @@ namespace exporter
 namespace otlp
 {
 
+namespace trace_api = opentelemetry::trace;
+namespace resource  = opentelemetry::sdk::resource;
+
 template <class T, size_t N>
 static nostd::span<T, N> MakeSpan(T (&array)[N])
 {
@@ -192,22 +195,22 @@ TEST_F(OtlpHttpExporterTestPeer, ExportJsonIntegrationTest)
   size_t old_count = getCurrentRequestCount();
   auto exporter    = GetExporter(HttpRequestContentType::kJson);
 
-  opentelemetry::sdk::resource::ResourceAttributes resource_attributes = {
-      {"service.name", "unit_test_service"}, {"tenant.id", "test_user"}};
-  resource_attributes["bool_value"]       = true;
-  resource_attributes["int32_value"]      = static_cast<int32_t>(1);
-  resource_attributes["uint32_value"]     = static_cast<uint32_t>(2);
-  resource_attributes["int64_value"]      = static_cast<int64_t>(0x1100000000LL);
-  resource_attributes["uint64_value"]     = static_cast<uint64_t>(0x1200000000ULL);
-  resource_attributes["double_value"]     = static_cast<double>(3.1);
-  resource_attributes["vec_bool_value"]   = std::vector<bool>{true, false, true};
-  resource_attributes["vec_int32_value"]  = std::vector<int32_t>{1, 2};
-  resource_attributes["vec_uint32_value"] = std::vector<uint32_t>{3, 4};
-  resource_attributes["vec_int64_value"]  = std::vector<int64_t>{5, 6};
-  resource_attributes["vec_uint64_value"] = std::vector<uint64_t>{7, 8};
-  resource_attributes["vec_double_value"] = std::vector<double>{3.2, 3.3};
-  resource_attributes["vec_string_value"] = std::vector<std::string>{"vector", "string"};
-  auto resource = opentelemetry::sdk::resource::Resource::Create(resource_attributes);
+  resource::ResourceAttributes resource_attributes = {{"service.name", "unit_test_service"},
+                                                      {"tenant.id", "test_user"}};
+  resource_attributes["bool_value"]                = true;
+  resource_attributes["int32_value"]               = static_cast<int32_t>(1);
+  resource_attributes["uint32_value"]              = static_cast<uint32_t>(2);
+  resource_attributes["int64_value"]               = static_cast<int64_t>(0x1100000000LL);
+  resource_attributes["uint64_value"]              = static_cast<uint64_t>(0x1200000000ULL);
+  resource_attributes["double_value"]              = static_cast<double>(3.1);
+  resource_attributes["vec_bool_value"]            = std::vector<bool>{true, false, true};
+  resource_attributes["vec_int32_value"]           = std::vector<int32_t>{1, 2};
+  resource_attributes["vec_uint32_value"]          = std::vector<uint32_t>{3, 4};
+  resource_attributes["vec_int64_value"]           = std::vector<int64_t>{5, 6};
+  resource_attributes["vec_uint64_value"]          = std::vector<uint64_t>{7, 8};
+  resource_attributes["vec_double_value"]          = std::vector<double>{3.2, 3.3};
+  resource_attributes["vec_string_value"]          = std::vector<std::string>{"vector", "string"};
+  auto resource = resource::Resource::Create(resource_attributes);
 
   auto processor_opts                  = sdk::trace::BatchSpanProcessorOptions();
   processor_opts.max_export_batch_size = 5;
@@ -220,18 +223,18 @@ TEST_F(OtlpHttpExporterTestPeer, ExportJsonIntegrationTest)
 
   std::string report_trace_id;
   {
-    char trace_id_hex[2 * opentelemetry::trace::TraceId::kSize] = {0};
-    auto tracer                                                 = provider->GetTracer("test");
-    auto parent_span = tracer->StartSpan("Test parent span");
+    char trace_id_hex[2 * trace_api::TraceId::kSize] = {0};
+    auto tracer                                      = provider->GetTracer("test");
+    auto parent_span                                 = tracer->StartSpan("Test parent span");
 
-    opentelemetry::trace::StartSpanOptions child_span_opts = {};
-    child_span_opts.parent                                 = parent_span->GetContext();
+    trace_api::StartSpanOptions child_span_opts = {};
+    child_span_opts.parent                      = parent_span->GetContext();
 
     auto child_span = tracer->StartSpan("Test child span", child_span_opts);
     child_span->End();
     parent_span->End();
 
-    nostd::get<opentelemetry::trace::SpanContext>(child_span_opts.parent)
+    nostd::get<trace_api::SpanContext>(child_span_opts.parent)
         .trace_id()
         .ToLowerBase16(MakeSpan(trace_id_hex));
     report_trace_id.assign(trace_id_hex, sizeof(trace_id_hex));
@@ -261,22 +264,22 @@ TEST_F(OtlpHttpExporterTestPeer, ExportBinaryIntegrationTest)
 
   auto exporter = GetExporter(HttpRequestContentType::kBinary);
 
-  opentelemetry::sdk::resource::ResourceAttributes resource_attributes = {
-      {"service.name", "unit_test_service"}, {"tenant.id", "test_user"}};
-  resource_attributes["bool_value"]       = true;
-  resource_attributes["int32_value"]      = static_cast<int32_t>(1);
-  resource_attributes["uint32_value"]     = static_cast<uint32_t>(2);
-  resource_attributes["int64_value"]      = static_cast<int64_t>(0x1100000000LL);
-  resource_attributes["uint64_value"]     = static_cast<uint64_t>(0x1200000000ULL);
-  resource_attributes["double_value"]     = static_cast<double>(3.1);
-  resource_attributes["vec_bool_value"]   = std::vector<bool>{true, false, true};
-  resource_attributes["vec_int32_value"]  = std::vector<int32_t>{1, 2};
-  resource_attributes["vec_uint32_value"] = std::vector<uint32_t>{3, 4};
-  resource_attributes["vec_int64_value"]  = std::vector<int64_t>{5, 6};
-  resource_attributes["vec_uint64_value"] = std::vector<uint64_t>{7, 8};
-  resource_attributes["vec_double_value"] = std::vector<double>{3.2, 3.3};
-  resource_attributes["vec_string_value"] = std::vector<std::string>{"vector", "string"};
-  auto resource = opentelemetry::sdk::resource::Resource::Create(resource_attributes);
+  resource::ResourceAttributes resource_attributes = {{"service.name", "unit_test_service"},
+                                                      {"tenant.id", "test_user"}};
+  resource_attributes["bool_value"]                = true;
+  resource_attributes["int32_value"]               = static_cast<int32_t>(1);
+  resource_attributes["uint32_value"]              = static_cast<uint32_t>(2);
+  resource_attributes["int64_value"]               = static_cast<int64_t>(0x1100000000LL);
+  resource_attributes["uint64_value"]              = static_cast<uint64_t>(0x1200000000ULL);
+  resource_attributes["double_value"]              = static_cast<double>(3.1);
+  resource_attributes["vec_bool_value"]            = std::vector<bool>{true, false, true};
+  resource_attributes["vec_int32_value"]           = std::vector<int32_t>{1, 2};
+  resource_attributes["vec_uint32_value"]          = std::vector<uint32_t>{3, 4};
+  resource_attributes["vec_int64_value"]           = std::vector<int64_t>{5, 6};
+  resource_attributes["vec_uint64_value"]          = std::vector<uint64_t>{7, 8};
+  resource_attributes["vec_double_value"]          = std::vector<double>{3.2, 3.3};
+  resource_attributes["vec_string_value"]          = std::vector<std::string>{"vector", "string"};
+  auto resource = resource::Resource::Create(resource_attributes);
 
   auto processor_opts                  = sdk::trace::BatchSpanProcessorOptions();
   processor_opts.max_export_batch_size = 5;
@@ -290,18 +293,18 @@ TEST_F(OtlpHttpExporterTestPeer, ExportBinaryIntegrationTest)
 
   std::string report_trace_id;
   {
-    uint8_t trace_id_binary[opentelemetry::trace::TraceId::kSize] = {0};
-    auto tracer                                                   = provider->GetTracer("test");
-    auto parent_span = tracer->StartSpan("Test parent span");
+    uint8_t trace_id_binary[trace_api::TraceId::kSize] = {0};
+    auto tracer                                        = provider->GetTracer("test");
+    auto parent_span                                   = tracer->StartSpan("Test parent span");
 
-    opentelemetry::trace::StartSpanOptions child_span_opts = {};
-    child_span_opts.parent                                 = parent_span->GetContext();
+    trace_api::StartSpanOptions child_span_opts = {};
+    child_span_opts.parent                      = parent_span->GetContext();
 
     auto child_span = tracer->StartSpan("Test child span", child_span_opts);
     child_span->End();
     parent_span->End();
 
-    nostd::get<opentelemetry::trace::SpanContext>(child_span_opts.parent)
+    nostd::get<trace_api::SpanContext>(child_span_opts.parent)
         .trace_id()
         .CopyBytesTo(MakeSpan(trace_id_binary));
     report_trace_id.assign(reinterpret_cast<char *>(trace_id_binary), sizeof(trace_id_binary));

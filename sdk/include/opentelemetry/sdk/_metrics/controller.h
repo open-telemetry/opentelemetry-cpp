@@ -17,8 +17,6 @@
 #  include "opentelemetry/sdk/_metrics/record.h"
 #  include "opentelemetry/version.h"
 
-namespace metrics_api = opentelemetry::metrics;
-
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace sdk
 {
@@ -29,7 +27,7 @@ class PushController
 {
 
 public:
-  PushController(nostd::shared_ptr<metrics_api::Meter> meter,
+  PushController(nostd::shared_ptr<opentelemetry::metrics::Meter> meter,
                  nostd::unique_ptr<MetricsExporter> exporter,
                  nostd::shared_ptr<MetricsProcessor> processor,
                  double period,
@@ -130,7 +128,7 @@ private:
     this->mu_.unlock();
   }
 
-  nostd::shared_ptr<metrics_api::Meter> meter_;
+  nostd::shared_ptr<opentelemetry::metrics::Meter> meter_;
   nostd::unique_ptr<MetricsExporter> exporter_;
   nostd::shared_ptr<MetricsProcessor> processor_;
   std::thread runner_;

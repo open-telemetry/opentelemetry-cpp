@@ -28,13 +28,13 @@ struct KeyStruct
   std::string name;
   std::string description;
   std::string labels;
-  metrics_api::InstrumentKind ins_kind;
+  opentelemetry::metrics::InstrumentKind ins_kind;
 
   // constructor
   KeyStruct(std::string name,
             std::string description,
             std::string labels,
-            metrics_api::InstrumentKind ins_kind)
+            opentelemetry::metrics::InstrumentKind ins_kind)
   {
     this->name        = name;
     this->description = description;
@@ -68,44 +68,51 @@ class UngroupedMetricsProcessor : public MetricsProcessor
 public:
   explicit UngroupedMetricsProcessor(bool stateful);
 
-  std::vector<sdkmetrics::Record> CheckpointSelf() noexcept override;
+  std::vector<opentelemetry::sdk::metrics::Record> CheckpointSelf() noexcept override;
 
   virtual void FinishedCollection() noexcept override;
 
-  virtual void process(sdkmetrics::Record record) noexcept override;
+  virtual void process(opentelemetry::sdk::metrics::Record record) noexcept override;
 
 private:
   bool stateful_;
-  std::unordered_map<KeyStruct, sdkmetrics::AggregatorVariant, KeyStruct_Hash> batch_map_;
+  std::unordered_map<KeyStruct, opentelemetry::sdk::metrics::AggregatorVariant, KeyStruct_Hash>
+      batch_map_;
 
   /**
    * get_instrument returns the instrument from the passed in AggregatorVariant. We have to
    * unpack the variant then get the instrument from the Aggreagtor.
    */
-  metrics_api::InstrumentKind get_instrument(sdkmetrics::AggregatorVariant aggregator)
+  opentelemetry::metrics::InstrumentKind get_instrument(
+      opentelemetry::sdk::metrics::AggregatorVariant aggregator)
   {
-    if (nostd::holds_alternative<std::shared_ptr<sdkmetrics::Aggregator<short>>>(aggregator))
+    if (nostd::holds_alternative<std::shared_ptr<opentelemetry::sdk::metrics::Aggregator<short>>>(
+            aggregator))
     {
-      return nostd::get<std::shared_ptr<sdkmetrics::Aggregator<short>>>(aggregator)
+      return nostd::get<std::shared_ptr<opentelemetry::sdk::metrics::Aggregator<short>>>(aggregator)
           ->get_instrument_kind();
     }
-    else if (nostd::holds_alternative<std::shared_ptr<sdkmetrics::Aggregator<int>>>(aggregator))
+    else if (nostd::holds_alternative<
+                 std::shared_ptr<opentelemetry::sdk::metrics::Aggregator<int>>>(aggregator))
     {
-      return nostd::get<std::shared_ptr<sdkmetrics::Aggregator<int>>>(aggregator)
+      return nostd::get<std::shared_ptr<opentelemetry::sdk::metrics::Aggregator<int>>>(aggregator)
           ->get_instrument_kind();
     }
-    else if (nostd::holds_alternative<std::shared_ptr<sdkmetrics::Aggregator<float>>>(aggregator))
+    else if (nostd::holds_alternative<
+                 std::shared_ptr<opentelemetry::sdk::metrics::Aggregator<float>>>(aggregator))
     {
-      return nostd::get<std::shared_ptr<sdkmetrics::Aggregator<float>>>(aggregator)
+      return nostd::get<std::shared_ptr<opentelemetry::sdk::metrics::Aggregator<float>>>(aggregator)
           ->get_instrument_kind();
     }
-    else if (nostd::holds_alternative<std::shared_ptr<sdkmetrics::Aggregator<double>>>(aggregator))
+    else if (nostd::holds_alternative<
+                 std::shared_ptr<opentelemetry::sdk::metrics::Aggregator<double>>>(aggregator))
     {
-      return nostd::get<std::shared_ptr<sdkmetrics::Aggregator<double>>>(aggregator)
+      return nostd::get<std::shared_ptr<opentelemetry::sdk::metrics::Aggregator<double>>>(
+                 aggregator)
           ->get_instrument_kind();
     }
 
-    return metrics_api::InstrumentKind::Counter;
+    return opentelemetry::metrics::InstrumentKind::Counter;
   }
 
   /**
@@ -114,41 +121,44 @@ private:
    * additional constructor values
    */
   template <typename T>
-  std::shared_ptr<sdkmetrics::Aggregator<T>> aggregator_copy(
-      std::shared_ptr<sdkmetrics::Aggregator<T>> aggregator)
+  std::shared_ptr<opentelemetry::sdk::metrics::Aggregator<T>> aggregator_copy(
+      std::shared_ptr<opentelemetry::sdk::metrics::Aggregator<T>> aggregator)
   {
     auto ins_kind = aggregator->get_instrument_kind();
     auto agg_kind = aggregator->get_aggregator_kind();
 
     switch (agg_kind)
     {
-      case sdkmetrics::AggregatorKind::Counter:
-        return std::shared_ptr<sdkmetrics::Aggregator<T>>(
-            new sdkmetrics::CounterAggregator<T>(ins_kind));
+      case opentelemetry::sdk::metrics::AggregatorKind::Counter:
+        return std::shared_ptr<opentelemetry::sdk::metrics::Aggregator<T>>(
+            new opentelemetry::sdk::metrics::CounterAggregator<T>(ins_kind));
 
-      case sdkmetrics::AggregatorKind::MinMaxSumCount:
-        return std::shared_ptr<sdkmetrics::Aggregator<T>>(
-            new sdkmetrics::MinMaxSumCountAggregator<T>(ins_kind));
+      case opentelemetry::sdk::metrics::AggregatorKind::MinMaxSumCount:
+        return std::shared_ptr<opentelemetry::sdk::metrics::Aggregator<T>>(
+            new opentelemetry::sdk::metrics::MinMaxSumCountAggregator<T>(ins_kind));
 
-      case sdkmetrics::AggregatorKind::Gauge:
-        return std::shared_ptr<sdkmetrics::Aggregator<T>>(
-            new sdkmetrics::GaugeAggregator<T>(ins_kind));
+      case opentelemetry::sdk::metrics::AggregatorKind::Gauge:
+        return std::shared_ptr<opentelemetry::sdk::metrics::Aggregator<T>>(
+            new opentelemetry::sdk::metrics::GaugeAggregator<T>(ins_kind));
 
-      case sdkmetrics::AggregatorKind::Sketch:
-        return std::shared_ptr<sdkmetrics::Aggregator<T>>(new sdkmetrics::SketchAggregator<T>(
-            ins_kind, aggregator->get_error_bound(), aggregator->get_max_buckets()));
+      case opentelemetry::sdk::metrics::AggregatorKind::Sketch:
+        return std::shared_ptr<opentelemetry::sdk::metrics::Aggregator<T>>(
+            new opentelemetry::sdk::metrics::SketchAggregator<T>(
+                ins_kind, aggregator->get_error_bound(), aggregator->get_max_buckets()));
 
-      case sdkmetrics::AggregatorKind::Histogram:
-        return std::shared_ptr<sdkmetrics::Aggregator<T>>(
-            new sdkmetrics::HistogramAggregator<T>(ins_kind, aggregator->get_boundaries()));
+      case opentelemetry::sdk::metrics::AggregatorKind::Histogram:
+        return std::shared_ptr<opentelemetry::sdk::metrics::Aggregator<T>>(
+            new opentelemetry::sdk::metrics::HistogramAggregator<T>(ins_kind,
+                                                                    aggregator->get_boundaries()));
 
-      case sdkmetrics::AggregatorKind::Exact:
-        return std::shared_ptr<sdkmetrics::Aggregator<T>>(
-            new sdkmetrics::ExactAggregator<T>(ins_kind, aggregator->get_quant_estimation()));
+      case opentelemetry::sdk::metrics::AggregatorKind::Exact:
+        return std::shared_ptr<opentelemetry::sdk::metrics::Aggregator<T>>(
+            new opentelemetry::sdk::metrics::ExactAggregator<T>(
+                ins_kind, aggregator->get_quant_estimation()));
 
       default:
-        return std::shared_ptr<sdkmetrics::Aggregator<T>>(
-            new sdkmetrics::CounterAggregator<T>(ins_kind));
+        return std::shared_ptr<opentelemetry::sdk::metrics::Aggregator<T>>(
+            new opentelemetry::sdk::metrics::CounterAggregator<T>(ins_kind));
     }
   };
 
@@ -158,37 +168,38 @@ private:
    * pipeline.
    */
   template <typename T>
-  std::shared_ptr<sdkmetrics::Aggregator<T>> aggregator_for(metrics_api::InstrumentKind ins_kind)
+  std::shared_ptr<opentelemetry::sdk::metrics::Aggregator<T>> aggregator_for(
+      opentelemetry::metrics::InstrumentKind ins_kind)
   {
     switch (ins_kind)
     {
-      case metrics_api::InstrumentKind::Counter:
-        return std::shared_ptr<sdkmetrics::Aggregator<T>>(
-            new sdkmetrics::CounterAggregator<T>(ins_kind));
+      case opentelemetry::metrics::InstrumentKind::Counter:
+        return std::shared_ptr<opentelemetry::sdk::metrics::Aggregator<T>>(
+            new opentelemetry::sdk::metrics::CounterAggregator<T>(ins_kind));
 
-      case metrics_api::InstrumentKind::UpDownCounter:
-        return std::shared_ptr<sdkmetrics::Aggregator<T>>(
-            new sdkmetrics::CounterAggregator<T>(ins_kind));
+      case opentelemetry::metrics::InstrumentKind::UpDownCounter:
+        return std::shared_ptr<opentelemetry::sdk::metrics::Aggregator<T>>(
+            new opentelemetry::sdk::metrics::CounterAggregator<T>(ins_kind));
 
-      case metrics_api::InstrumentKind::ValueRecorder:
-        return std::shared_ptr<sdkmetrics::Aggregator<T>>(
-            new sdkmetrics::MinMaxSumCountAggregator<T>(ins_kind));
+      case opentelemetry::metrics::InstrumentKind::ValueRecorder:
+        return std::shared_ptr<opentelemetry::sdk::metrics::Aggregator<T>>(
+            new opentelemetry::sdk::metrics::MinMaxSumCountAggregator<T>(ins_kind));
 
-      case metrics_api::InstrumentKind::SumObserver:
-        return std::shared_ptr<sdkmetrics::Aggregator<T>>(
-            new sdkmetrics::CounterAggregator<T>(ins_kind));
+      case opentelemetry::metrics::InstrumentKind::SumObserver:
+        return std::shared_ptr<opentelemetry::sdk::metrics::Aggregator<T>>(
+            new opentelemetry::sdk::metrics::CounterAggregator<T>(ins_kind));
 
-      case metrics_api::InstrumentKind::UpDownSumObserver:
-        return std::shared_ptr<sdkmetrics::Aggregator<T>>(
-            new sdkmetrics::CounterAggregator<T>(ins_kind));
+      case opentelemetry::metrics::InstrumentKind::UpDownSumObserver:
+        return std::shared_ptr<opentelemetry::sdk::metrics::Aggregator<T>>(
+            new opentelemetry::sdk::metrics::CounterAggregator<T>(ins_kind));
 
-      case metrics_api::InstrumentKind::ValueObserver:
-        return std::shared_ptr<sdkmetrics::Aggregator<T>>(
-            new sdkmetrics::MinMaxSumCountAggregator<T>(ins_kind));
+      case opentelemetry::metrics::InstrumentKind::ValueObserver:
+        return std::shared_ptr<opentelemetry::sdk::metrics::Aggregator<T>>(
+            new opentelemetry::sdk::metrics::MinMaxSumCountAggregator<T>(ins_kind));
 
       default:
-        return std::shared_ptr<sdkmetrics::Aggregator<T>>(
-            new sdkmetrics::CounterAggregator<T>(ins_kind));
+        return std::shared_ptr<opentelemetry::sdk::metrics::Aggregator<T>>(
+            new opentelemetry::sdk::metrics::CounterAggregator<T>(ins_kind));
     }
   };
 
@@ -199,82 +210,90 @@ private:
    * pointer and merge them together.
    */
   template <typename T>
-  void merge_aggregators(std::shared_ptr<sdkmetrics::Aggregator<T>> batch_agg,
-                         std::shared_ptr<sdkmetrics::Aggregator<T>> record_agg)
+  void merge_aggregators(std::shared_ptr<opentelemetry::sdk::metrics::Aggregator<T>> batch_agg,
+                         std::shared_ptr<opentelemetry::sdk::metrics::Aggregator<T>> record_agg)
   {
     auto agg_kind = batch_agg->get_aggregator_kind();
-    if (agg_kind == sdkmetrics::AggregatorKind::Counter)
+    if (agg_kind == opentelemetry::sdk::metrics::AggregatorKind::Counter)
     {
-      std::shared_ptr<sdkmetrics::CounterAggregator<T>> temp_batch_agg_counter =
-          std::dynamic_pointer_cast<sdkmetrics::CounterAggregator<T>>(batch_agg);
+      std::shared_ptr<opentelemetry::sdk::metrics::CounterAggregator<T>> temp_batch_agg_counter =
+          std::dynamic_pointer_cast<opentelemetry::sdk::metrics::CounterAggregator<T>>(batch_agg);
 
-      std::shared_ptr<sdkmetrics::CounterAggregator<T>> temp_record_agg_counter =
-          std::dynamic_pointer_cast<sdkmetrics::CounterAggregator<T>>(record_agg);
+      std::shared_ptr<opentelemetry::sdk::metrics::CounterAggregator<T>> temp_record_agg_counter =
+          std::dynamic_pointer_cast<opentelemetry::sdk::metrics::CounterAggregator<T>>(record_agg);
 
       auto temp_batch_agg_raw_counter  = temp_batch_agg_counter.get();
       auto temp_record_agg_raw_counter = temp_record_agg_counter.get();
 
       temp_batch_agg_raw_counter->merge(*temp_record_agg_raw_counter);
     }
-    else if (agg_kind == sdkmetrics::AggregatorKind::MinMaxSumCount)
+    else if (agg_kind == opentelemetry::sdk::metrics::AggregatorKind::MinMaxSumCount)
     {
-      std::shared_ptr<sdkmetrics::MinMaxSumCountAggregator<T>> temp_batch_agg_mmsc =
-          std::dynamic_pointer_cast<sdkmetrics::MinMaxSumCountAggregator<T>>(batch_agg);
+      std::shared_ptr<opentelemetry::sdk::metrics::MinMaxSumCountAggregator<T>>
+          temp_batch_agg_mmsc =
+              std::dynamic_pointer_cast<opentelemetry::sdk::metrics::MinMaxSumCountAggregator<T>>(
+                  batch_agg);
 
-      std::shared_ptr<sdkmetrics::MinMaxSumCountAggregator<T>> temp_record_agg_mmsc =
-          std::dynamic_pointer_cast<sdkmetrics::MinMaxSumCountAggregator<T>>(record_agg);
+      std::shared_ptr<opentelemetry::sdk::metrics::MinMaxSumCountAggregator<T>>
+          temp_record_agg_mmsc =
+              std::dynamic_pointer_cast<opentelemetry::sdk::metrics::MinMaxSumCountAggregator<T>>(
+                  record_agg);
 
       auto temp_batch_agg_raw_mmsc  = temp_batch_agg_mmsc.get();
       auto temp_record_agg_raw_mmsc = temp_record_agg_mmsc.get();
 
       temp_batch_agg_raw_mmsc->merge(*temp_record_agg_raw_mmsc);
     }
-    else if (agg_kind == sdkmetrics::AggregatorKind::Gauge)
+    else if (agg_kind == opentelemetry::sdk::metrics::AggregatorKind::Gauge)
     {
-      std::shared_ptr<sdkmetrics::GaugeAggregator<T>> temp_batch_agg_gauge =
-          std::dynamic_pointer_cast<sdkmetrics::GaugeAggregator<T>>(batch_agg);
+      std::shared_ptr<opentelemetry::sdk::metrics::GaugeAggregator<T>> temp_batch_agg_gauge =
+          std::dynamic_pointer_cast<opentelemetry::sdk::metrics::GaugeAggregator<T>>(batch_agg);
 
-      std::shared_ptr<sdkmetrics::GaugeAggregator<T>> temp_record_agg_gauge =
-          std::dynamic_pointer_cast<sdkmetrics::GaugeAggregator<T>>(record_agg);
+      std::shared_ptr<opentelemetry::sdk::metrics::GaugeAggregator<T>> temp_record_agg_gauge =
+          std::dynamic_pointer_cast<opentelemetry::sdk::metrics::GaugeAggregator<T>>(record_agg);
 
       auto temp_batch_agg_raw_gauge  = temp_batch_agg_gauge.get();
       auto temp_record_agg_raw_gauge = temp_record_agg_gauge.get();
 
       temp_batch_agg_raw_gauge->merge(*temp_record_agg_raw_gauge);
     }
-    else if (agg_kind == sdkmetrics::AggregatorKind::Sketch)
+    else if (agg_kind == opentelemetry::sdk::metrics::AggregatorKind::Sketch)
     {
-      std::shared_ptr<sdkmetrics::SketchAggregator<T>> temp_batch_agg_sketch =
-          std::dynamic_pointer_cast<sdkmetrics::SketchAggregator<T>>(batch_agg);
+      std::shared_ptr<opentelemetry::sdk::metrics::SketchAggregator<T>> temp_batch_agg_sketch =
+          std::dynamic_pointer_cast<opentelemetry::sdk::metrics::SketchAggregator<T>>(batch_agg);
 
-      std::shared_ptr<sdkmetrics::SketchAggregator<T>> temp_record_agg_sketch =
-          std::dynamic_pointer_cast<sdkmetrics::SketchAggregator<T>>(record_agg);
+      std::shared_ptr<opentelemetry::sdk::metrics::SketchAggregator<T>> temp_record_agg_sketch =
+          std::dynamic_pointer_cast<opentelemetry::sdk::metrics::SketchAggregator<T>>(record_agg);
 
       auto temp_batch_agg_raw_sketch  = temp_batch_agg_sketch.get();
       auto temp_record_agg_raw_sketch = temp_record_agg_sketch.get();
 
       temp_batch_agg_raw_sketch->merge(*temp_record_agg_raw_sketch);
     }
-    else if (agg_kind == sdkmetrics::AggregatorKind::Histogram)
+    else if (agg_kind == opentelemetry::sdk::metrics::AggregatorKind::Histogram)
     {
-      std::shared_ptr<sdkmetrics::HistogramAggregator<T>> temp_batch_agg_histogram =
-          std::dynamic_pointer_cast<sdkmetrics::HistogramAggregator<T>>(batch_agg);
+      std::shared_ptr<opentelemetry::sdk::metrics::HistogramAggregator<T>>
+          temp_batch_agg_histogram =
+              std::dynamic_pointer_cast<opentelemetry::sdk::metrics::HistogramAggregator<T>>(
+                  batch_agg);
 
-      std::shared_ptr<sdkmetrics::HistogramAggregator<T>> temp_record_agg_histogram =
-          std::dynamic_pointer_cast<sdkmetrics::HistogramAggregator<T>>(record_agg);
+      std::shared_ptr<opentelemetry::sdk::metrics::HistogramAggregator<T>>
+          temp_record_agg_histogram =
+              std::dynamic_pointer_cast<opentelemetry::sdk::metrics::HistogramAggregator<T>>(
+                  record_agg);
 
       auto temp_batch_agg_raw_histogram  = temp_batch_agg_histogram.get();
       auto temp_record_agg_raw_histogram = temp_record_agg_histogram.get();
 
       temp_batch_agg_raw_histogram->merge(*temp_record_agg_raw_histogram);
     }
-    else if (agg_kind == sdkmetrics::AggregatorKind::Exact)
+    else if (agg_kind == opentelemetry::sdk::metrics::AggregatorKind::Exact)
     {
-      std::shared_ptr<sdkmetrics::ExactAggregator<T>> temp_batch_agg_exact =
-          std::dynamic_pointer_cast<sdkmetrics::ExactAggregator<T>>(batch_agg);
+      std::shared_ptr<opentelemetry::sdk::metrics::ExactAggregator<T>> temp_batch_agg_exact =
+          std::dynamic_pointer_cast<opentelemetry::sdk::metrics::ExactAggregator<T>>(batch_agg);
 
-      std::shared_ptr<sdkmetrics::ExactAggregator<T>> temp_record_agg_exact =
-          std::dynamic_pointer_cast<sdkmetrics::ExactAggregator<T>>(record_agg);
+      std::shared_ptr<opentelemetry::sdk::metrics::ExactAggregator<T>> temp_record_agg_exact =
+          std::dynamic_pointer_cast<opentelemetry::sdk::metrics::ExactAggregator<T>>(record_agg);
 
       auto temp_batch_agg_raw_exact  = temp_batch_agg_exact.get();
       auto temp_record_agg_raw_exact = temp_record_agg_exact.get();

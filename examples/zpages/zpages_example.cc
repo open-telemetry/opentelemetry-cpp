@@ -12,6 +12,7 @@
 #include "opentelemetry/ext/zpages/zpages.h"  // Required file include for zpages
 
 using opentelemetry::common::SteadyTimestamp;
+namespace trace_api = opentelemetry::trace;
 
 int main(int argc, char *argv[])
 {
@@ -23,7 +24,7 @@ int main(int argc, char *argv[])
    * Note that the webserver is destroyed after the application ends execution.
    */
   ZPages::Initialize();
-  auto tracer = opentelemetry::trace::Provider::GetTracerProvider()->GetTracer("");
+  auto tracer = trace_api::Provider::GetTracerProvider()->GetTracer("");
 
   std::cout << "This example for zPages creates a few types of spans and then "
             << "creates a span every second for the duration of the application"
@@ -33,14 +34,14 @@ int main(int argc, char *argv[])
   std::map<std::string, opentelemetry::common::AttributeValue> attribute_map;
   attribute_map["completed_search_for"] = "Unknown user";
   tracer->StartSpan("find user", attribute_map)
-      ->SetStatus(opentelemetry::trace::StatusCode::kError, "User not found");
+      ->SetStatus(trace_api::StatusCode::kError, "User not found");
 
   // Long time duration span
   std::map<std::string, opentelemetry::common::AttributeValue> attribute_map2;
   attribute_map2["completed_search_for"] = "John Doe";
-  opentelemetry::trace::StartSpanOptions start;
+  trace_api::StartSpanOptions start;
   start.start_steady_time = SteadyTimestamp(nanoseconds(1));
-  opentelemetry::trace::EndSpanOptions end;
+  trace_api::EndSpanOptions end;
   end.end_steady_time = SteadyTimestamp(nanoseconds(1000000000000));
   tracer->StartSpan("find user", attribute_map2, start)->End(end);
 

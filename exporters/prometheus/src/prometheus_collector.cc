@@ -6,6 +6,8 @@
 
 #  include "opentelemetry/exporters/prometheus/prometheus_collector.h"
 
+namespace metric_sdk = opentelemetry::sdk::metrics;
+
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace exporter
 {

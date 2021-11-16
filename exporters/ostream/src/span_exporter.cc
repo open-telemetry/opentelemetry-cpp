@@ -5,8 +5,10 @@
 
 #include <iostream>
 
-namespace nostd    = opentelemetry::nostd;
-namespace sdktrace = opentelemetry::sdk::trace;
+namespace nostd     = opentelemetry::nostd;
+namespace trace_sdk = opentelemetry::sdk::trace;
+namespace trace_api = opentelemetry::trace;
+namespace sdkcommon = opentelemetry::sdk::common;
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace exporter
@@ -14,19 +16,19 @@ namespace exporter
 namespace trace
 {
 
-std::ostream &operator<<(std::ostream &os, opentelemetry::trace::SpanKind span_kind)
+std::ostream &operator<<(std::ostream &os, trace_api::SpanKind span_kind)
 {
   switch (span_kind)
   {
-    case opentelemetry::trace::SpanKind::kClient:
+    case trace_api::SpanKind::kClient:
       return os << "Client";
-    case opentelemetry::trace::SpanKind::kInternal:
+    case trace_api::SpanKind::kInternal:
       return os << "Internal";
-    case opentelemetry::trace::SpanKind::kServer:
+    case trace_api::SpanKind::kServer:
       return os << "Server";
-    case opentelemetry::trace::SpanKind::kProducer:
+    case trace_api::SpanKind::kProducer:
       return os << "Producer";
-    case opentelemetry::trace::SpanKind::kConsumer:
+    case trace_api::SpanKind::kConsumer:
       return os << "Consumer";
   };
   return os << "";
@@ -34,13 +36,13 @@ std::ostream &operator<<(std::ostream &os, opentelemetry::trace::SpanKind span_k
 
 OStreamSpanExporter::OStreamSpanExporter(std::ostream &sout) noexcept : sout_(sout) {}
 
-std::unique_ptr<sdktrace::Recordable> OStreamSpanExporter::MakeRecordable() noexcept
+std::unique_ptr<trace_sdk::Recordable> OStreamSpanExporter::MakeRecordable() noexcept
 {
-  return std::unique_ptr<sdktrace::Recordable>(new sdktrace::SpanData);
+  return std::unique_ptr<trace_sdk::Recordable>(new trace_sdk::SpanData);
 }
 
 sdk::common::ExportResult OStreamSpanExporter::Export(
-    const nostd::span<std::unique_ptr<sdktrace::Recordable>> &spans) noexcept
+    const nostd::span<std::unique_ptr<trace_sdk::Recordable>> &spans) noexcept
 {
   if (isShutdown_)
   {
@@ -49,8 +51,8 @@ sdk::common::ExportResult OStreamSpanExporter::Export(
 
   for (auto &recordable : spans)
   {
-    auto span = std::unique_ptr<sdktrace::SpanData>(
-        static_cast<sdktrace::SpanData *>(recordable.release()));
+    auto span = std::unique_ptr<trace_sdk::SpanData>(
+        static_cast<trace_sdk::SpanData *>(recordable.release()));
 
     if (span != nullptr)
     {
@@ -108,7 +110,7 @@ void OStreamSpanExporter::printAttributes(
   }
 }
 
-void OStreamSpanExporter::printEvents(const std::vector<sdktrace::SpanDataEvent> &events)
+void OStreamSpanExporter::printEvents(const std::vector<trace_sdk::SpanDataEvent> &events)
 {
   for (const auto &event : events)
   {
@@ -121,7 +123,7 @@ void OStreamSpanExporter::printEvents(const std::vector<sdktrace::SpanDataEvent>
   }
 }
 
-void OStreamSpanExporter::printLinks(const std::vector<sdktrace::SpanDataLink> &links)
+void OStreamSpanExporter::printLinks(const std::vector<trace_sdk::SpanDataLink> &links)
 {
   for (const auto &link : links)
   {

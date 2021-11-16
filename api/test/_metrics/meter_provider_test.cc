@@ -9,14 +9,14 @@
 using opentelemetry::metrics::Meter;
 using opentelemetry::metrics::MeterProvider;
 using opentelemetry::metrics::Provider;
+namespace nostd = opentelemetry::nostd;
 
 class TestProvider : public MeterProvider
 {
-  opentelemetry::nostd::shared_ptr<Meter> GetMeter(
-      opentelemetry::nostd::string_view library_name,
-      opentelemetry::nostd::string_view library_version) override
+  nostd::shared_ptr<Meter> GetMeter(nostd::string_view library_name,
+                                    nostd::string_view library_version) override
   {
-    return opentelemetry::nostd::shared_ptr<Meter>(nullptr);
+    return nostd::shared_ptr<Meter>(nullptr);
   }
 };
 
@@ -28,16 +28,16 @@ TEST(Provider, GetMeterProviderDefault)
 
 TEST(Provider, SetMeterProvider)
 {
-  auto tf = opentelemetry::nostd::shared_ptr<MeterProvider>(new TestProvider());
+  auto tf = nostd::shared_ptr<MeterProvider>(new TestProvider());
   Provider::SetMeterProvider(tf);
   ASSERT_EQ(tf, Provider::GetMeterProvider());
 }
 
 TEST(Provider, MultipleMeterProviders)
 {
-  auto tf = opentelemetry::nostd::shared_ptr<MeterProvider>(new TestProvider());
+  auto tf = nostd::shared_ptr<MeterProvider>(new TestProvider());
   Provider::SetMeterProvider(tf);
-  auto tf2 = opentelemetry::nostd::shared_ptr<MeterProvider>(new TestProvider());
+  auto tf2 = nostd::shared_ptr<MeterProvider>(new TestProvider());
   Provider::SetMeterProvider(tf2);
 
   ASSERT_NE(Provider::GetMeterProvider(), tf);

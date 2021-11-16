@@ -19,8 +19,7 @@ namespace sdk
 {
 namespace metrics
 {
-namespace metrics_api = opentelemetry::metrics;
-class Meter : public metrics_api::Meter
+class Meter : public opentelemetry::metrics::Meter
 {
 public:
   explicit Meter(std::string library_name, std::string library_version = "")
@@ -39,25 +38,29 @@ public:
    * @return a shared pointer to the created Counter.
    * @throws invalid_argument exception if name is null or does not conform to OTel syntax.
    */
-  nostd::shared_ptr<metrics_api::Counter<short>> NewShortCounter(nostd::string_view name,
-                                                                 nostd::string_view description,
-                                                                 nostd::string_view unit,
-                                                                 const bool enabled) override;
+  nostd::shared_ptr<opentelemetry::metrics::Counter<short>> NewShortCounter(
+      nostd::string_view name,
+      nostd::string_view description,
+      nostd::string_view unit,
+      const bool enabled) override;
 
-  nostd::shared_ptr<metrics_api::Counter<int>> NewIntCounter(nostd::string_view name,
-                                                             nostd::string_view description,
-                                                             nostd::string_view unit,
-                                                             const bool enabled) override;
+  nostd::shared_ptr<opentelemetry::metrics::Counter<int>> NewIntCounter(
+      nostd::string_view name,
+      nostd::string_view description,
+      nostd::string_view unit,
+      const bool enabled) override;
 
-  nostd::shared_ptr<metrics_api::Counter<float>> NewFloatCounter(nostd::string_view name,
-                                                                 nostd::string_view description,
-                                                                 nostd::string_view unit,
-                                                                 const bool enabled) override;
+  nostd::shared_ptr<opentelemetry::metrics::Counter<float>> NewFloatCounter(
+      nostd::string_view name,
+      nostd::string_view description,
+      nostd::string_view unit,
+      const bool enabled) override;
 
-  nostd::shared_ptr<metrics_api::Counter<double>> NewDoubleCounter(nostd::string_view name,
-                                                                   nostd::string_view description,
-                                                                   nostd::string_view unit,
-                                                                   const bool enabled) override;
+  nostd::shared_ptr<opentelemetry::metrics::Counter<double>> NewDoubleCounter(
+      nostd::string_view name,
+      nostd::string_view description,
+      nostd::string_view unit,
+      const bool enabled) override;
 
   /**
    * Creates an UpDownCounter with the passed characteristics and returns a shared_ptr to that
@@ -70,25 +73,25 @@ public:
    * @return a shared pointer to the created UpDownCounter.
    * @throws invalid_argument exception if name is null or does not conform to OTel syntax.
    */
-  nostd::shared_ptr<metrics_api::UpDownCounter<short>> NewShortUpDownCounter(
+  nostd::shared_ptr<opentelemetry::metrics::UpDownCounter<short>> NewShortUpDownCounter(
       nostd::string_view name,
       nostd::string_view description,
       nostd::string_view unit,
       const bool enabled) override;
 
-  nostd::shared_ptr<metrics_api::UpDownCounter<int>> NewIntUpDownCounter(
+  nostd::shared_ptr<opentelemetry::metrics::UpDownCounter<int>> NewIntUpDownCounter(
       nostd::string_view name,
       nostd::string_view description,
       nostd::string_view unit,
       const bool enabled) override;
 
-  nostd::shared_ptr<metrics_api::UpDownCounter<float>> NewFloatUpDownCounter(
+  nostd::shared_ptr<opentelemetry::metrics::UpDownCounter<float>> NewFloatUpDownCounter(
       nostd::string_view name,
       nostd::string_view description,
       nostd::string_view unit,
       const bool enabled) override;
 
-  nostd::shared_ptr<metrics_api::UpDownCounter<double>> NewDoubleUpDownCounter(
+  nostd::shared_ptr<opentelemetry::metrics::UpDownCounter<double>> NewDoubleUpDownCounter(
       nostd::string_view name,
       nostd::string_view description,
       nostd::string_view unit,
@@ -105,25 +108,25 @@ public:
    * @return a shared pointer to the created DoubleValueRecorder.
    * @throws invalid_argument exception if name is null or does not conform to OTel syntax.
    */
-  nostd::shared_ptr<metrics_api::ValueRecorder<short>> NewShortValueRecorder(
+  nostd::shared_ptr<opentelemetry::metrics::ValueRecorder<short>> NewShortValueRecorder(
       nostd::string_view name,
       nostd::string_view description,
       nostd::string_view unit,
       const bool enabled) override;
 
-  nostd::shared_ptr<metrics_api::ValueRecorder<int>> NewIntValueRecorder(
+  nostd::shared_ptr<opentelemetry::metrics::ValueRecorder<int>> NewIntValueRecorder(
       nostd::string_view name,
       nostd::string_view description,
       nostd::string_view unit,
       const bool enabled) override;
 
-  nostd::shared_ptr<metrics_api::ValueRecorder<float>> NewFloatValueRecorder(
+  nostd::shared_ptr<opentelemetry::metrics::ValueRecorder<float>> NewFloatValueRecorder(
       nostd::string_view name,
       nostd::string_view description,
       nostd::string_view unit,
       const bool enabled) override;
 
-  nostd::shared_ptr<metrics_api::ValueRecorder<double>> NewDoubleValueRecorder(
+  nostd::shared_ptr<opentelemetry::metrics::ValueRecorder<double>> NewDoubleValueRecorder(
       nostd::string_view name,
       nostd::string_view description,
       nostd::string_view unit,
@@ -141,33 +144,33 @@ public:
    * @return a shared pointer to the created SumObserver.
    * @throws invalid_argument exception if name is null or does not conform to OTel syntax.
    */
-  nostd::shared_ptr<metrics_api::SumObserver<short>> NewShortSumObserver(
+  nostd::shared_ptr<opentelemetry::metrics::SumObserver<short>> NewShortSumObserver(
       nostd::string_view name,
       nostd::string_view description,
       nostd::string_view unit,
       const bool enabled,
-      void (*callback)(metrics_api::ObserverResult<short>)) override;
+      void (*callback)(opentelemetry::metrics::ObserverResult<short>)) override;
 
-  nostd::shared_ptr<metrics_api::SumObserver<int>> NewIntSumObserver(
+  nostd::shared_ptr<opentelemetry::metrics::SumObserver<int>> NewIntSumObserver(
       nostd::string_view name,
       nostd::string_view description,
       nostd::string_view unit,
       const bool enabled,
-      void (*callback)(metrics_api::ObserverResult<int>)) override;
+      void (*callback)(opentelemetry::metrics::ObserverResult<int>)) override;
 
-  nostd::shared_ptr<metrics_api::SumObserver<float>> NewFloatSumObserver(
+  nostd::shared_ptr<opentelemetry::metrics::SumObserver<float>> NewFloatSumObserver(
       nostd::string_view name,
       nostd::string_view description,
       nostd::string_view unit,
       const bool enabled,
-      void (*callback)(metrics_api::ObserverResult<float>)) override;
+      void (*callback)(opentelemetry::metrics::ObserverResult<float>)) override;
 
-  nostd::shared_ptr<metrics_api::SumObserver<double>> NewDoubleSumObserver(
+  nostd::shared_ptr<opentelemetry::metrics::SumObserver<double>> NewDoubleSumObserver(
       nostd::string_view name,
       nostd::string_view description,
       nostd::string_view unit,
       const bool enabled,
-      void (*callback)(metrics_api::ObserverResult<double>)) override;
+      void (*callback)(opentelemetry::metrics::ObserverResult<double>)) override;
 
   /**
    * Creates an UpDownSumObserver with the passed characteristics and returns a shared_ptr to
@@ -181,33 +184,33 @@ public:
    * @return a shared pointer to the created UpDownSumObserver.
    * @throws invalid_argument exception if name is null or does not conform to OTel syntax.
    */
-  nostd::shared_ptr<metrics_api::UpDownSumObserver<short>> NewShortUpDownSumObserver(
+  nostd::shared_ptr<opentelemetry::metrics::UpDownSumObserver<short>> NewShortUpDownSumObserver(
       nostd::string_view name,
       nostd::string_view description,
       nostd::string_view unit,
       const bool enabled,
-      void (*callback)(metrics_api::ObserverResult<short>)) override;
+      void (*callback)(opentelemetry::metrics::ObserverResult<short>)) override;
 
-  nostd::shared_ptr<metrics_api::UpDownSumObserver<int>> NewIntUpDownSumObserver(
+  nostd::shared_ptr<opentelemetry::metrics::UpDownSumObserver<int>> NewIntUpDownSumObserver(
       nostd::string_view name,
       nostd::string_view description,
       nostd::string_view unit,
       const bool enabled,
-      void (*callback)(metrics_api::ObserverResult<int>)) override;
+      void (*callback)(opentelemetry::metrics::ObserverResult<int>)) override;
 
-  nostd::shared_ptr<metrics_api::UpDownSumObserver<float>> NewFloatUpDownSumObserver(
+  nostd::shared_ptr<opentelemetry::metrics::UpDownSumObserver<float>> NewFloatUpDownSumObserver(
       nostd::string_view name,
       nostd::string_view description,
       nostd::string_view unit,
       const bool enabled,
-      void (*callback)(metrics_api::ObserverResult<float>)) override;
+      void (*callback)(opentelemetry::metrics::ObserverResult<float>)) override;
 
-  nostd::shared_ptr<metrics_api::UpDownSumObserver<double>> NewDoubleUpDownSumObserver(
+  nostd::shared_ptr<opentelemetry::metrics::UpDownSumObserver<double>> NewDoubleUpDownSumObserver(
       nostd::string_view name,
       nostd::string_view description,
       nostd::string_view unit,
       const bool enabled,
-      void (*callback)(metrics_api::ObserverResult<double>)) override;
+      void (*callback)(opentelemetry::metrics::ObserverResult<double>)) override;
 
   /**
    * Creates a ValueObserver with the passed characteristics and returns a shared_ptr to that
@@ -221,33 +224,33 @@ public:
    * @return a shared pointer to the created ValueObserver.
    * @throws invalid_argument exception if name is null or does not conform to OTel syntax.
    */
-  nostd::shared_ptr<metrics_api::ValueObserver<short>> NewShortValueObserver(
+  nostd::shared_ptr<opentelemetry::metrics::ValueObserver<short>> NewShortValueObserver(
       nostd::string_view name,
       nostd::string_view description,
       nostd::string_view unit,
       const bool enabled,
-      void (*callback)(metrics_api::ObserverResult<short>)) override;
+      void (*callback)(opentelemetry::metrics::ObserverResult<short>)) override;
 
-  nostd::shared_ptr<metrics_api::ValueObserver<int>> NewIntValueObserver(
+  nostd::shared_ptr<opentelemetry::metrics::ValueObserver<int>> NewIntValueObserver(
       nostd::string_view name,
       nostd::string_view description,
       nostd::string_view unit,
       const bool enabled,
-      void (*callback)(metrics_api::ObserverResult<int>)) override;
+      void (*callback)(opentelemetry::metrics::ObserverResult<int>)) override;
 
-  nostd::shared_ptr<metrics_api::ValueObserver<float>> NewFloatValueObserver(
+  nostd::shared_ptr<opentelemetry::metrics::ValueObserver<float>> NewFloatValueObserver(
       nostd::string_view name,
       nostd::string_view description,
       nostd::string_view unit,
       const bool enabled,
-      void (*callback)(metrics_api::ObserverResult<float>)) override;
+      void (*callback)(opentelemetry::metrics::ObserverResult<float>)) override;
 
-  nostd::shared_ptr<metrics_api::ValueObserver<double>> NewDoubleValueObserver(
+  nostd::shared_ptr<opentelemetry::metrics::ValueObserver<double>> NewDoubleValueObserver(
       nostd::string_view name,
       nostd::string_view description,
       nostd::string_view unit,
       const bool enabled,
-      void (*callback)(metrics_api::ObserverResult<double>)) override;
+      void (*callback)(opentelemetry::metrics::ObserverResult<double>)) override;
 
   /**
    * Utility method that allows users to atomically record measurements to a set of
@@ -257,21 +260,24 @@ public:
    * @param values a span of pairs where the first element of the pair is a metric instrument
    * to record to, and the second element is the value to update that instrument with.
    */
-  void RecordShortBatch(const opentelemetry::common::KeyValueIterable &labels,
-                        nostd::span<metrics_api::SynchronousInstrument<short> *> instruments,
-                        nostd::span<const short> values) noexcept override;
+  void RecordShortBatch(
+      const opentelemetry::common::KeyValueIterable &labels,
+      nostd::span<opentelemetry::metrics::SynchronousInstrument<short> *> instruments,
+      nostd::span<const short> values) noexcept override;
 
   void RecordIntBatch(const opentelemetry::common::KeyValueIterable &labels,
-                      nostd::span<metrics_api::SynchronousInstrument<int> *> instruments,
+                      nostd::span<opentelemetry::metrics::SynchronousInstrument<int> *> instruments,
                       nostd::span<const int> values) noexcept override;
 
-  void RecordFloatBatch(const opentelemetry::common::KeyValueIterable &labels,
-                        nostd::span<metrics_api::SynchronousInstrument<float> *> instruments,
-                        nostd::span<const float> values) noexcept override;
+  void RecordFloatBatch(
+      const opentelemetry::common::KeyValueIterable &labels,
+      nostd::span<opentelemetry::metrics::SynchronousInstrument<float> *> instruments,
+      nostd::span<const float> values) noexcept override;
 
-  void RecordDoubleBatch(const opentelemetry::common::KeyValueIterable &labels,
-                         nostd::span<metrics_api::SynchronousInstrument<double> *> instruments,
-                         nostd::span<const double> values) noexcept override;
+  void RecordDoubleBatch(
+      const opentelemetry::common::KeyValueIterable &labels,
+      nostd::span<opentelemetry::metrics::SynchronousInstrument<double> *> instruments,
+      nostd::span<const double> values) noexcept override;
 
   /**
    * An SDK-only function that checkpoints the aggregators of all instruments created from
@@ -300,7 +306,8 @@ private:
   template <typename T>
   void CollectSingleSyncInstrument(
       typename std::map<std::string,
-                        std::shared_ptr<metrics_api::SynchronousInstrument<T>>>::iterator i,
+                        std::shared_ptr<opentelemetry::metrics::SynchronousInstrument<T>>>::iterator
+          i,
       std::vector<Record> &records);
 
   /**
@@ -320,8 +327,9 @@ private:
    */
   template <typename T>
   void CollectSingleAsyncInstrument(
-      typename std::map<std::string,
-                        std::shared_ptr<metrics_api::AsynchronousInstrument<T>>>::iterator i,
+      typename std::map<
+          std::string,
+          std::shared_ptr<opentelemetry::metrics::AsynchronousInstrument<T>>>::iterator i,
       std::vector<Record> &records);
 
   /**
@@ -351,18 +359,22 @@ private:
    * Additionally, when creating a new instrument, the meter must check if an instrument of the same
    * name already exists.
    */
-  std::map<std::string, std::shared_ptr<metrics_api::SynchronousInstrument<short>>> short_metrics_;
-  std::map<std::string, std::shared_ptr<metrics_api::SynchronousInstrument<int>>> int_metrics_;
-  std::map<std::string, std::shared_ptr<metrics_api::SynchronousInstrument<float>>> float_metrics_;
-  std::map<std::string, std::shared_ptr<metrics_api::SynchronousInstrument<double>>>
+  std::map<std::string, std::shared_ptr<opentelemetry::metrics::SynchronousInstrument<short>>>
+      short_metrics_;
+  std::map<std::string, std::shared_ptr<opentelemetry::metrics::SynchronousInstrument<int>>>
+      int_metrics_;
+  std::map<std::string, std::shared_ptr<opentelemetry::metrics::SynchronousInstrument<float>>>
+      float_metrics_;
+  std::map<std::string, std::shared_ptr<opentelemetry::metrics::SynchronousInstrument<double>>>
       double_metrics_;
 
-  std::map<std::string, std::shared_ptr<metrics_api::AsynchronousInstrument<short>>>
+  std::map<std::string, std::shared_ptr<opentelemetry::metrics::AsynchronousInstrument<short>>>
       short_observers_;
-  std::map<std::string, std::shared_ptr<metrics_api::AsynchronousInstrument<int>>> int_observers_;
-  std::map<std::string, std::shared_ptr<metrics_api::AsynchronousInstrument<float>>>
+  std::map<std::string, std::shared_ptr<opentelemetry::metrics::AsynchronousInstrument<int>>>
+      int_observers_;
+  std::map<std::string, std::shared_ptr<opentelemetry::metrics::AsynchronousInstrument<float>>>
       float_observers_;
-  std::map<std::string, std::shared_ptr<metrics_api::AsynchronousInstrument<double>>>
+  std::map<std::string, std::shared_ptr<opentelemetry::metrics::AsynchronousInstrument<double>>>
       double_observers_;
 
   std::unordered_set<std::string> names_;

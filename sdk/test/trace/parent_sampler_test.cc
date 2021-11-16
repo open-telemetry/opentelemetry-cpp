@@ -25,16 +25,16 @@ TEST(ParentBasedSampler, ShouldSample)
   uint8_t span_id_buffer[trace_api::SpanId::kSize] = {1};
   trace_api::SpanId span_id{span_id_buffer};
 
-  opentelemetry::trace::SpanKind span_kind = opentelemetry::trace::SpanKind::kInternal;
-  using M                                  = std::map<std::string, int>;
-  M m1                                     = {{}};
+  trace_api::SpanKind span_kind = trace_api::SpanKind::kInternal;
+  using M                       = std::map<std::string, int>;
+  M m1                          = {{}};
 
   using L = std::vector<std::pair<trace_api::SpanContext, std::map<std::string, std::string>>>;
   L l1 = {{trace_api::SpanContext(false, false), {}}, {trace_api::SpanContext(false, false), {}}};
 
   opentelemetry::common::KeyValueIterableView<M> view{m1};
   trace_api::SpanContextKeyValueIterableView<L> links{l1};
-  auto trace_state = opentelemetry::trace::TraceState::FromHeader("congo=t61rcWkgMzE");
+  auto trace_state = trace_api::TraceState::FromHeader("congo=t61rcWkgMzE");
   trace_api::SpanContext parent_context_sampled(trace_id, span_id, trace_api::TraceFlags{1}, false,
                                                 trace_state);
   trace_api::SpanContext parent_context_nonsampled(trace_id, span_id, trace_api::TraceFlags{0},

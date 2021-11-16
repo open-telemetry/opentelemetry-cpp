@@ -58,10 +58,8 @@ public:
    * Shutdown this exporter.
    * @param timeout The maximum time to wait for the shutdown method to return.
    */
-  bool Shutdown(std::chrono::microseconds timeout = std::chrono::microseconds(0)) noexcept override
-  {
-    return true;
-  }
+  bool Shutdown(
+      std::chrono::microseconds timeout = std::chrono::microseconds::max()) noexcept override;
 
 private:
   // Configuration options for the exporter
@@ -79,6 +77,7 @@ private:
    * @param stub the service stub to be used for exporting
    */
   OtlpGrpcLogExporter(std::unique_ptr<proto::collector::logs::v1::LogsService::StubInterface> stub);
+  bool is_shutdown_ = false;
 };
 
 }  // namespace otlp

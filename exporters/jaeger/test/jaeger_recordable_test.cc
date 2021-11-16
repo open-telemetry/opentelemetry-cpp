@@ -13,6 +13,7 @@
 namespace trace    = opentelemetry::trace;
 namespace nostd    = opentelemetry::nostd;
 namespace sdktrace = opentelemetry::sdk::trace;
+namespace common   = opentelemetry::common;
 
 using namespace jaegertracing;
 using namespace opentelemetry::exporter::jaeger;
@@ -20,7 +21,7 @@ using namespace opentelemetry::sdk::instrumentationlibrary;
 
 TEST(JaegerSpanRecordable, SetIdentity)
 {
-  opentelemetry::exporter::jaeger::JaegerRecordable rec;
+  JaegerRecordable rec;
 
   int64_t trace_id_val[2]    = {0x0000000000000000, 0x1000000000000000};
   int64_t span_id_val        = 0x2000000000000000;
@@ -35,18 +36,17 @@ TEST(JaegerSpanRecordable, SetIdentity)
   const trace::SpanId parent_span_id(
       nostd::span<uint8_t, 8>(reinterpret_cast<uint8_t *>(&parent_span_id_val), 8));
 
-  const opentelemetry::trace::SpanContext span_context{
-      trace_id, span_id,
-      opentelemetry::trace::TraceFlags{opentelemetry::trace::TraceFlags::kIsSampled}, true};
+  const trace::SpanContext span_context{trace_id, span_id,
+                                        trace::TraceFlags{trace::TraceFlags::kIsSampled}, true};
   rec.SetIdentity(span_context, parent_span_id);
 
   std::unique_ptr<thrift::Span> span{rec.Span()};
 
 #if JAEGER_IS_LITTLE_ENDIAN == 1
-  EXPECT_EQ(span->traceIdLow, opentelemetry::exporter::jaeger::otel_bswap_64(trace_id_val[1]));
-  EXPECT_EQ(span->traceIdHigh, opentelemetry::exporter::jaeger::otel_bswap_64(trace_id_val[0]));
-  EXPECT_EQ(span->spanId, opentelemetry::exporter::jaeger::otel_bswap_64(span_id_val));
-  EXPECT_EQ(span->parentSpanId, opentelemetry::exporter::jaeger::otel_bswap_64(parent_span_id_val));
+  EXPECT_EQ(span->traceIdLow, otel_bswap_64(trace_id_val[1]));
+  EXPECT_EQ(span->traceIdHigh, otel_bswap_64(trace_id_val[0]));
+  EXPECT_EQ(span->spanId, otel_bswap_64(span_id_val));
+  EXPECT_EQ(span->parentSpanId, otel_bswap_64(parent_span_id_val));
 #else
   EXPECT_EQ(span->traceIdLow, trace_id_val[0]);
   EXPECT_EQ(span->traceIdHigh, trace_id_val[1]);
@@ -57,7 +57,7 @@ TEST(JaegerSpanRecordable, SetIdentity)
 
 TEST(JaegerSpanRecordable, SetName)
 {
-  opentelemetry::exporter::jaeger::JaegerRecordable rec;
+  JaegerRecordable rec;
 
   nostd::string_view name = "Test Span";
   rec.SetName(name);
@@ -69,10 +69,10 @@ TEST(JaegerSpanRecordable, SetName)
 
 TEST(JaegerSpanRecordable, SetStartTime)
 {
-  opentelemetry::exporter::jaeger::JaegerRecordable rec;
+  JaegerRecordable rec;
 
   std::chrono::system_clock::time_point start_time = std::chrono::system_clock::now();
-  opentelemetry::common::SystemTimestamp start_timestamp(start_time);
+  common::SystemTimestamp start_timestamp(start_time);
   uint64_t unix_start =
       std::chrono::duration_cast<std::chrono::microseconds>(start_time.time_since_epoch()).count();
   rec.SetStartTime(start_timestamp);
@@ -84,9 +84,9 @@ TEST(JaegerSpanRecordable, SetStartTime)
 
 TEST(JaegerSpanRecordable, SetDuration)
 {
-  opentelemetry::exporter::jaeger::JaegerRecordable rec;
+  JaegerRecordable rec;
 
-  opentelemetry::common::SystemTimestamp start_timestamp;
+  common::SystemTimestamp start_timestamp;
 
   std::chrono::microseconds duration(10);
   uint64_t unix_end = duration.count();
@@ -102,7 +102,7 @@ TEST(JaegerSpanRecordable, SetDuration)
 
 TEST(JaegerSpanRecordable, SetStatus)
 {
-  opentelemetry::exporter::jaeger::JaegerRecordable rec;
+  JaegerRecordable rec;
 
   const char *error_description = "Error test";
   rec.SetStatus(trace::StatusCode::kError, error_description);
@@ -125,12 +125,12 @@ TEST(JaegerSpanRecordable, SetStatus)
 
 TEST(JaegerSpanRecordable, AddEvent)
 {
-  opentelemetry::exporter::jaeger::JaegerRecordable rec;
+  JaegerRecordable rec;
 
   nostd::string_view name = "Test Event";
 
   std::chrono::system_clock::time_point event_time = std::chrono::system_clock::now();
-  opentelemetry::common::SystemTimestamp event_timestamp(event_time);
+  common::SystemTimestamp event_timestamp(event_time);
   uint64_t epoch_us =
       std::chrono::duration_cast<std::chrono::microseconds>(event_time.time_since_epoch()).count();
 
@@ -140,9 +140,8 @@ TEST(JaegerSpanRecordable, AddEvent)
   std::map<std::string, int64_t> attributes = {
       {keys[0], values[0]}, {keys[1], values[1]}, {keys[2], values[2]}};
 
-  rec.AddEvent(
-      "Test Event", event_timestamp,
-      opentelemetry::common::KeyValueIterableView<std::map<std::string, int64_t>>(attributes));
+  rec.AddEvent("Test Event", event_timestamp,
+               common::KeyValueIterableView<std::map<std::string, int64_t>>(attributes));
   thrift::Log log = rec.Logs().at(0);
   EXPECT_EQ(log.timestamp, epoch_us);
   auto tags    = log.fields;
@@ -159,7 +158,7 @@ TEST(JaegerSpanRecordable, AddEvent)
 
 TEST(JaegerSpanRecordable, SetInstrumentationLibrary)
 {
-  opentelemetry::exporter::jaeger::JaegerRecordable rec;
+  JaegerRecordable rec;
 
   std::string library_name     = "opentelemetry-cpp";
   std::string library_version  = "0.1.0";
@@ -181,7 +180,7 @@ TEST(JaegerSpanRecordable, SetInstrumentationLibrary)
 
 TEST(JaegerSpanRecordable, SetResource)
 {
-  opentelemetry::exporter::jaeger::JaegerRecordable rec;
+  JaegerRecordable rec;
 
   const std::string service_name_key = "service.name";
   std::string service_name_value     = "test-jaeger-service-name";
