@@ -13,9 +13,6 @@
 #  include <time.h>
 #  include <iostream>
 
-namespace nostd   = opentelemetry::nostd;
-namespace sdklogs = opentelemetry::sdk::logs;
-
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace exporter
 {
@@ -63,7 +60,7 @@ struct ElasticsearchExporterOptions
 /**
  * The ElasticsearchLogExporter exports logs to Elasticsearch in JSON format
  */
-class ElasticsearchLogExporter final : public sdklogs::LogExporter
+class ElasticsearchLogExporter final : public opentelemetry::sdk::logs::LogExporter
 {
 public:
   /**
@@ -80,7 +77,7 @@ public:
   /**
    * Creates a recordable that stores the data in a JSON object
    */
-  std::unique_ptr<sdk::logs::Recordable> MakeRecordable() noexcept override;
+  std::unique_ptr<opentelemetry::sdk::logs::Recordable> MakeRecordable() noexcept override;
 
   /**
    * Exports a vector of log records to the Elasticsearch instance. Guaranteed to return after a
@@ -88,7 +85,8 @@ public:
    * @param records A list of log records to send to Elasticsearch.
    */
   sdk::common::ExportResult Export(
-      const nostd::span<std::unique_ptr<sdk::logs::Recordable>> &records) noexcept override;
+      const opentelemetry::nostd::span<std::unique_ptr<opentelemetry::sdk::logs::Recordable>>
+          &records) noexcept override;
 
   /**
    * Shutdown this exporter.

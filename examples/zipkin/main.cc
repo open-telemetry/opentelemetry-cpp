@@ -12,25 +12,25 @@
 #  include "foo_library/foo_library.h"
 #endif
 
-namespace trace    = opentelemetry::trace;
-namespace nostd    = opentelemetry::nostd;
-namespace sdktrace = opentelemetry::sdk::trace;
-namespace zipkin   = opentelemetry::exporter::zipkin;
+namespace trace     = opentelemetry::trace;
+namespace nostd     = opentelemetry::nostd;
+namespace trace_sdk = opentelemetry::sdk::trace;
+namespace zipkin    = opentelemetry::exporter::zipkin;
+namespace resource  = opentelemetry::sdk::resource;
 
 namespace
 {
-opentelemetry::exporter::zipkin::ZipkinExporterOptions opts;
+zipkin::ZipkinExporterOptions opts;
 void InitTracer()
 {
   // Create zipkin exporter instance
-  opentelemetry::sdk::resource::ResourceAttributes attributes = {
-      {"service.name", "zipkin_demo_service"}};
-  auto resource  = opentelemetry::sdk::resource::Resource::Create(attributes);
-  auto exporter  = std::unique_ptr<sdktrace::SpanExporter>(new zipkin::ZipkinExporter(opts));
-  auto processor = std::unique_ptr<sdktrace::SpanProcessor>(
-      new sdktrace::SimpleSpanProcessor(std::move(exporter)));
+  resource::ResourceAttributes attributes = {{"service.name", "zipkin_demo_service"}};
+  auto resource                           = resource::Resource::Create(attributes);
+  auto exporter  = std::unique_ptr<trace_sdk::SpanExporter>(new zipkin::ZipkinExporter(opts));
+  auto processor = std::unique_ptr<trace_sdk::SpanProcessor>(
+      new trace_sdk::SimpleSpanProcessor(std::move(exporter)));
   auto provider = nostd::shared_ptr<trace::TracerProvider>(
-      new sdktrace::TracerProvider(std::move(processor), resource));
+      new trace_sdk::TracerProvider(std::move(processor), resource));
   // Set the global trace provider
   trace::Provider::SetTracerProvider(provider);
 }

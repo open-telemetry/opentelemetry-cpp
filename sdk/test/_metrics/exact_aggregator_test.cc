@@ -9,10 +9,11 @@
 #  include "opentelemetry/sdk/_metrics/aggregator/exact_aggregator.h"
 
 using namespace opentelemetry::sdk::metrics;
+namespace metrics_api = opentelemetry::metrics;
 
 TEST(ExactAggregatorOrdered, Update)
 {
-  ExactAggregator<int> agg(opentelemetry::metrics::InstrumentKind::Counter);
+  ExactAggregator<int> agg(metrics_api::InstrumentKind::Counter);
 
   std::vector<int> correct;
 
@@ -33,7 +34,7 @@ TEST(ExactAggregatorOrdered, Update)
 
 TEST(ExactAggregatorOrdered, Checkpoint)
 {
-  ExactAggregator<int> agg(opentelemetry::metrics::InstrumentKind::Counter);
+  ExactAggregator<int> agg(metrics_api::InstrumentKind::Counter);
 
   std::vector<int> correct;
 
@@ -48,8 +49,8 @@ TEST(ExactAggregatorOrdered, Checkpoint)
 
 TEST(ExactAggregatorOrdered, Merge)
 {
-  ExactAggregator<int> agg1(opentelemetry::metrics::InstrumentKind::Counter);
-  ExactAggregator<int> agg2(opentelemetry::metrics::InstrumentKind::Counter);
+  ExactAggregator<int> agg1(metrics_api::InstrumentKind::Counter);
+  ExactAggregator<int> agg2(metrics_api::InstrumentKind::Counter);
 
   agg1.update(1);
   agg2.update(2);
@@ -64,8 +65,8 @@ TEST(ExactAggregatorOrdered, BadMerge)
 {
   // This verifies that we encounter and error when we try to merge
   // two aggregators of different numeric types together.
-  ExactAggregator<int> agg1(opentelemetry::metrics::InstrumentKind::Counter);
-  ExactAggregator<int> agg2(opentelemetry::metrics::InstrumentKind::ValueRecorder);
+  ExactAggregator<int> agg1(metrics_api::InstrumentKind::Counter);
+  ExactAggregator<int> agg2(metrics_api::InstrumentKind::ValueRecorder);
 
   agg1.update(1);
   agg2.update(2);
@@ -81,10 +82,10 @@ TEST(ExactAggregatorOrdered, Types)
 {
   // This test verifies that we do not encounter any errors when
   // using various numeric types.
-  ExactAggregator<int> agg_int(opentelemetry::metrics::InstrumentKind::Counter);
-  ExactAggregator<long> agg_long(opentelemetry::metrics::InstrumentKind::Counter);
-  ExactAggregator<float> agg_float(opentelemetry::metrics::InstrumentKind::Counter);
-  ExactAggregator<double> agg_double(opentelemetry::metrics::InstrumentKind::Counter);
+  ExactAggregator<int> agg_int(metrics_api::InstrumentKind::Counter);
+  ExactAggregator<long> agg_long(metrics_api::InstrumentKind::Counter);
+  ExactAggregator<float> agg_float(metrics_api::InstrumentKind::Counter);
+  ExactAggregator<double> agg_double(metrics_api::InstrumentKind::Counter);
 
   for (int i = 1; i <= 5; ++i)
   {
@@ -111,7 +112,7 @@ TEST(ExactAggregatorOrdered, Types)
 
 TEST(ExactAggregatorQuant, Update)
 {
-  ExactAggregator<int> agg(opentelemetry::metrics::InstrumentKind::Counter, true);
+  ExactAggregator<int> agg(metrics_api::InstrumentKind::Counter, true);
 
   std::vector<int> correct;
 
@@ -135,7 +136,7 @@ TEST(ExactAggregatorQuant, Checkpoint)
   // This test verifies that the aggregator updates correctly when
   // quantile estimation is turned on.
 
-  ExactAggregator<int> agg(opentelemetry::metrics::InstrumentKind::Counter, true);
+  ExactAggregator<int> agg(metrics_api::InstrumentKind::Counter, true);
 
   std::vector<int> correct;
 
@@ -159,7 +160,7 @@ TEST(ExactAggregatorQuant, Quantile)
   // This test verifies that the quantile estimation function returns
   // the correct values.
 
-  ExactAggregator<int> agg(opentelemetry::metrics::InstrumentKind::Counter, true);
+  ExactAggregator<int> agg(metrics_api::InstrumentKind::Counter, true);
 
   std::vector<int> tmp{3, 9, 42, 57, 163, 210, 272, 300};
   for (int i : tmp)
@@ -176,7 +177,7 @@ TEST(ExactAggregatorInOrder, Quantile)
 {
   // This test verifies that if the user has an exact aggregator in "in-order" mode
   // an exception will be thrown if they call the quantile() function.
-  ExactAggregator<int> agg(opentelemetry::metrics::InstrumentKind::Counter);
+  ExactAggregator<int> agg(metrics_api::InstrumentKind::Counter);
 
   std::vector<int> tmp{3, 9, 42, 57, 163, 210, 272, 300};
   for (int i : tmp)
@@ -202,7 +203,7 @@ TEST(ExactAggregatorQuant, Concurrency)
 {
   // This test checks that the aggregator updates appropriately
   // when called in a multi-threaded context.
-  ExactAggregator<int> agg(opentelemetry::metrics::InstrumentKind::Counter, true);
+  ExactAggregator<int> agg(metrics_api::InstrumentKind::Counter, true);
 
   std::thread first(&callback, std::ref(agg));
   std::thread second(&callback, std::ref(agg));

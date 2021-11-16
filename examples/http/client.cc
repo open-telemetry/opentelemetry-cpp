@@ -10,14 +10,17 @@ namespace
 {
 
 using namespace opentelemetry::trace;
+namespace http_client = opentelemetry::ext::http::client;
+namespace context     = opentelemetry::context;
+namespace nostd       = opentelemetry::nostd;
 
 void sendRequest(const std::string &url)
 {
-  auto http_client = opentelemetry::ext::http::client::HttpClientFactory::CreateSync();
+  auto http_client = http_client::HttpClientFactory::CreateSync();
 
   // start active span
-  opentelemetry::trace::StartSpanOptions options;
-  options.kind = opentelemetry::trace::SpanKind::kClient;  // client
+  StartSpanOptions options;
+  options.kind = SpanKind::kClient;  // client
   opentelemetry::ext::http::common::UrlParser url_parser(url);
 
   std::string span_name = url_parser.path_;
@@ -30,36 +33,37 @@ void sendRequest(const std::string &url)
   auto scope = get_tracer("http-client")->WithActiveSpan(span);
 
   // inject current context into http header
-  auto current_ctx = opentelemetry::context::RuntimeContext::GetCurrent();
-  HttpTextMapCarrier<opentelemetry::ext::http::client::Headers> carrier;
-  auto prop = opentelemetry::context::propagation::GlobalTextMapPropagator::GetGlobalPropagator();
+  auto current_ctx = context::RuntimeContext::GetCurrent();
+  HttpTextMapCarrier<http_client::Headers> carrier;
+  auto prop = context::propagation::GlobalTextMapPropagator::GetGlobalPropagator();
   prop->Inject(carrier, current_ctx);
 
   // send http request
-  opentelemetry::ext::http::client::Result result = http_client->Get(url, carrier.headers_);
+  http_client::Result result = http_client->Get(url, carrier.headers_);
   if (result)
   {
     // set span attributes
     auto status_code = result.GetResponse().GetStatusCode();
     span->SetAttribute(OTEL_CPP_GET_ATTR(AttrHttpStatusCode), status_code);
-    result.GetResponse().ForEachHeader([&span](opentelemetry::nostd::string_view header_name,
-                                               opentelemetry::nostd::string_view header_value) {
-      span->SetAttribute("http.header." + std::string(header_name.data()), header_value);
-      return true;
-    });
+    result.GetResponse().ForEachHeader(
+        [&span](nostd::string_view header_name, nostd::string_view header_value) {
+          span->SetAttribute("http.header." + std::string(header_name.data()), header_value);
+          return true;
+        });
 
     if (status_code >= 400)
     {
-      span->SetStatus(opentelemetry::trace::StatusCode::kError);
+      span->SetStatus(StatusCode::kError);
     }
   }
   else
   {
-    span->SetStatus(opentelemetry::trace::StatusCode::kError,
-                    "Response Status :" +
-                        std::to_string(static_cast<typename std::underlying_type<
-                                           opentelemetry::ext::http::client::SessionState>::type>(
-                            result.GetSessionState())));
+    span->SetStatus(
+        StatusCode::kError,
+        "Response Status :" +
+            std::to_string(
+                static_cast<typename std::underlying_type<http_client::SessionState>::type>(
+                    result.GetSessionState())));
   }
   // end span and export data
   span->End();

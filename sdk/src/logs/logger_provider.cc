@@ -11,11 +11,13 @@ namespace sdk
 namespace logs
 {
 
+namespace nostd    = opentelemetry::nostd;
+namespace logs_api = opentelemetry::logs;
+
 LoggerProvider::LoggerProvider() noexcept : processor_{nullptr} {}
 
-opentelemetry::nostd::shared_ptr<opentelemetry::logs::Logger> LoggerProvider::GetLogger(
-    opentelemetry::nostd::string_view name,
-    opentelemetry::nostd::string_view options) noexcept
+nostd::shared_ptr<logs_api::Logger> LoggerProvider::GetLogger(nostd::string_view name,
+                                                              nostd::string_view options) noexcept
 {
   // Ensure only one thread can read/write from the map of loggers
   std::lock_guard<std::mutex> lock_guard{mu_};
@@ -24,7 +26,7 @@ opentelemetry::nostd::shared_ptr<opentelemetry::logs::Logger> LoggerProvider::Ge
   auto loggerkv = loggers_.find(name.data());
   if (loggerkv != loggers_.end())
   {
-    return opentelemetry::nostd::shared_ptr<opentelemetry::logs::Logger>(loggerkv->second);
+    return nostd::shared_ptr<logs_api::Logger>(loggerkv->second);
   }
 
   // Check if creating a new logger would exceed the max number of loggers
@@ -42,14 +44,13 @@ opentelemetry::nostd::shared_ptr<opentelemetry::logs::Logger> LoggerProvider::Ge
 
   // If no logger with that name exists yet, create it and add it to the map of loggers
 
-  opentelemetry::nostd::shared_ptr<opentelemetry::logs::Logger> logger(
-      new Logger(name, this->shared_from_this()));
+  nostd::shared_ptr<logs_api::Logger> logger(new Logger(name, this->shared_from_this()));
   loggers_[name.data()] = logger;
   return logger;
 }
 
-opentelemetry::nostd::shared_ptr<opentelemetry::logs::Logger> LoggerProvider::GetLogger(
-    opentelemetry::nostd::string_view name,
+nostd::shared_ptr<logs_api::Logger> LoggerProvider::GetLogger(
+    nostd::string_view name,
     nostd::span<nostd::string_view> args) noexcept
 {
   // Currently, no args support

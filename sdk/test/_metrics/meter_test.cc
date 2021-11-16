@@ -9,6 +9,8 @@
 
 using namespace opentelemetry::sdk::metrics;
 namespace metrics_api = opentelemetry::metrics;
+namespace common      = opentelemetry::common;
+namespace nostd       = opentelemetry::nostd;
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 
@@ -74,13 +76,13 @@ TEST(Meter, CollectSyncInstruments)
   auto counter = m.NewShortCounter("Test-counter", "For testing", "Unitless", true);
 
   std::map<std::string, std::string> labels = {{"Key", "Value"}};
-  auto labelkv = opentelemetry::common::KeyValueIterableView<decltype(labels)>{labels};
+  auto labelkv = common::KeyValueIterableView<decltype(labels)>{labels};
 
   counter->add(1, labelkv);
 
   std::vector<Record> res = m.Collect();
   auto agg_var            = res[0].GetAggregator();
-  auto agg                = opentelemetry::nostd::get<0>(agg_var);
+  auto agg                = nostd::get<0>(agg_var);
 
   ASSERT_EQ(agg->get_checkpoint()[0], 1);
 
@@ -91,7 +93,7 @@ TEST(Meter, CollectSyncInstruments)
 
   res     = m.Collect();
   agg_var = res[0].GetAggregator();
-  agg     = opentelemetry::nostd::get<0>(agg_var);
+  agg     = nostd::get<0>(agg_var);
 
   ASSERT_EQ(agg->get_checkpoint()[0], 10);
 }
@@ -106,7 +108,7 @@ TEST(Meter, CollectDeletedSync)
   ASSERT_EQ(m.Collect().size(), 0);
 
   std::map<std::string, std::string> labels = {{"Key", "Value"}};
-  auto labelkv = opentelemetry::common::KeyValueIterableView<decltype(labels)>{labels};
+  auto labelkv = common::KeyValueIterableView<decltype(labels)>{labels};
   {
     auto counter = m.NewShortCounter("Test-counter", "For testing", "Unitless", true);
     counter->add(1, labelkv);
@@ -114,13 +116,13 @@ TEST(Meter, CollectDeletedSync)
 
   std::vector<Record> res = m.Collect();
   auto agg_var            = res[0].GetAggregator();
-  auto agg                = opentelemetry::nostd::get<0>(agg_var);
+  auto agg                = nostd::get<0>(agg_var);
 
   ASSERT_EQ(agg->get_checkpoint()[0], 1);
 }
 
 // Dummy function for asynchronous instrument constructors.
-void Callback(opentelemetry::metrics::ObserverResult<short> result)
+void Callback(metrics_api::ObserverResult<short> result)
 {
   std::map<std::string, std::string> labels = {{"key", "value"}};
   auto labelkv = common::KeyValueIterableView<decltype(labels)>{labels};
@@ -139,13 +141,13 @@ TEST(Meter, CollectAsyncInstruments)
       m.NewShortSumObserver("Test-counter", "For testing", "Unitless", true, &ShortCallback);
 
   std::map<std::string, std::string> labels = {{"Key", "Value"}};
-  auto labelkv = opentelemetry::common::KeyValueIterableView<decltype(labels)>{labels};
+  auto labelkv = common::KeyValueIterableView<decltype(labels)>{labels};
 
   sumobs->observe(1, labelkv);
 
   std::vector<Record> res = m.Collect();
   auto agg_var            = res[0].GetAggregator();
-  auto agg                = opentelemetry::nostd::get<0>(agg_var);
+  auto agg                = nostd::get<0>(agg_var);
 
   ASSERT_EQ(agg->get_checkpoint()[0], 1);
 
@@ -156,7 +158,7 @@ TEST(Meter, CollectAsyncInstruments)
 
   res     = m.Collect();
   agg_var = res[0].GetAggregator();
-  agg     = opentelemetry::nostd::get<0>(agg_var);
+  agg     = nostd::get<0>(agg_var);
 
   ASSERT_EQ(agg->get_checkpoint()[0], 10);
 }
@@ -171,7 +173,7 @@ TEST(Meter, CollectDeletedAsync)
   ASSERT_EQ(m.Collect().size(), 0);
 
   std::map<std::string, std::string> labels = {{"Key", "Value"}};
-  auto labelkv = opentelemetry::common::KeyValueIterableView<decltype(labels)>{labels};
+  auto labelkv = common::KeyValueIterableView<decltype(labels)>{labels};
   {
     auto sumobs = m.NewShortSumObserver("Test-counter", "For testing", "Unitless", true, &Callback);
     sumobs->observe(1, labelkv);
@@ -179,7 +181,7 @@ TEST(Meter, CollectDeletedAsync)
 
   std::vector<Record> res = m.Collect();
   auto agg_var            = res[0].GetAggregator();
-  auto agg                = opentelemetry::nostd::get<0>(agg_var);
+  auto agg                = nostd::get<0>(agg_var);
 
   ASSERT_EQ(agg->get_checkpoint()[0], 1);
 }
@@ -196,7 +198,7 @@ TEST(Meter, RecordBatch)
   auto dcounter = m.NewDoubleCounter("Test-dcounter", "For testing", "Unitless", true);
 
   std::map<std::string, std::string> labels = {{"Key", "Value"}};
-  auto labelkv = opentelemetry::common::KeyValueIterableView<decltype(labels)>{labels};
+  auto labelkv = common::KeyValueIterableView<decltype(labels)>{labels};
 
   metrics_api::SynchronousInstrument<short> *sinstr_arr[] = {scounter.get()};
   short svalues_arr[]                                     = {1};
@@ -207,7 +209,7 @@ TEST(Meter, RecordBatch)
   m.RecordShortBatch(labelkv, sinstrs, svalues);
   std::vector<Record> res = m.Collect();
   auto short_agg_var      = res[0].GetAggregator();
-  auto short_agg          = opentelemetry::nostd::get<0>(short_agg_var);
+  auto short_agg          = nostd::get<0>(short_agg_var);
   ASSERT_EQ(short_agg->get_checkpoint()[0], 1);
 
   metrics_api::SynchronousInstrument<int> *iinstr_arr[] = {icounter.get()};
@@ -219,7 +221,7 @@ TEST(Meter, RecordBatch)
   m.RecordIntBatch(labelkv, iinstrs, ivalues);
   res              = m.Collect();
   auto int_agg_var = res[0].GetAggregator();
-  auto int_agg     = opentelemetry::nostd::get<1>(int_agg_var);
+  auto int_agg     = nostd::get<1>(int_agg_var);
   ASSERT_EQ(int_agg->get_checkpoint()[0], 1);
 
   metrics_api::SynchronousInstrument<float> *finstr_arr[] = {fcounter.get()};
@@ -231,7 +233,7 @@ TEST(Meter, RecordBatch)
   m.RecordFloatBatch(labelkv, finstrs, fvalues);
   res                = m.Collect();
   auto float_agg_var = res[0].GetAggregator();
-  auto float_agg     = opentelemetry::nostd::get<2>(float_agg_var);
+  auto float_agg     = nostd::get<2>(float_agg_var);
   ASSERT_EQ(float_agg->get_checkpoint()[0], 1.0);
 
   metrics_api::SynchronousInstrument<double> *dinstr_arr[] = {dcounter.get()};
@@ -243,7 +245,7 @@ TEST(Meter, RecordBatch)
   m.RecordDoubleBatch(labelkv, dinstrs, dvalues);
   res                 = m.Collect();
   auto double_agg_var = res[0].GetAggregator();
-  auto double_agg     = opentelemetry::nostd::get<3>(double_agg_var);
+  auto double_agg     = nostd::get<3>(double_agg_var);
   ASSERT_EQ(double_agg->get_checkpoint()[0], 1.0);
 }
 
@@ -251,7 +253,7 @@ TEST(Meter, DisableCollectSync)
 {
   Meter m("Test");
   std::map<std::string, std::string> labels = {{"Key", "Value"}};
-  auto labelkv = opentelemetry::common::KeyValueIterableView<decltype(labels)>{labels};
+  auto labelkv = common::KeyValueIterableView<decltype(labels)>{labels};
   auto c       = m.NewShortCounter("c", "", "", false);
   c->add(1, labelkv);
   ASSERT_EQ(m.Collect().size(), 0);
@@ -261,7 +263,7 @@ TEST(Meter, DisableCollectAsync)
 {
   Meter m("Test");
   std::map<std::string, std::string> labels = {{"Key", "Value"}};
-  auto labelkv = opentelemetry::common::KeyValueIterableView<decltype(labels)>{labels};
+  auto labelkv = common::KeyValueIterableView<decltype(labels)>{labels};
   auto c       = m.NewShortValueObserver("c", "", "", false, &ShortCallback);
   c->observe(1, labelkv);
   ASSERT_EQ(m.Collect().size(), 0);

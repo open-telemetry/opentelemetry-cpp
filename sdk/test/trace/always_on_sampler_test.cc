@@ -11,6 +11,7 @@
 using namespace opentelemetry::sdk::trace;
 using namespace opentelemetry::nostd;
 using opentelemetry::trace::SpanContext;
+namespace trace_api = opentelemetry::trace;
 
 TEST(AlwaysOnSampler, ShouldSample)
 {

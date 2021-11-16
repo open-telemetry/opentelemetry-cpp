@@ -70,8 +70,7 @@ public:
   }
 
   // Callback method when an http event occurs
-  void OnEvent(http_client::SessionState state,
-               opentelemetry::nostd::string_view reason) noexcept override
+  void OnEvent(http_client::SessionState state, nostd::string_view reason) noexcept override
   {
     // If any failure event occurs, release the condition variable to unblock main thread
     switch (state)

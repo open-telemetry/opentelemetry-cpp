@@ -35,6 +35,8 @@ using Span        = opentelemetry::trace::Span;
 using SpanContext = opentelemetry::trace::SpanContext;
 using namespace opentelemetry::trace;
 
+namespace context = opentelemetry::context;
+
 namespace
 {
 class GreeterServer final : public Greeter::Service
@@ -50,16 +52,16 @@ public:
     }
 
     // Create a SpanOptions object and set the kind to Server to inform OpenTel.
-    opentelemetry::trace::StartSpanOptions options;
-    options.kind = opentelemetry::trace::SpanKind::kServer;
+    StartSpanOptions options;
+    options.kind = SpanKind::kServer;
 
     // extract context from grpc metadata
     GrpcServerCarrier carrier(context);
 
-    auto prop = opentelemetry::context::propagation::GlobalTextMapPropagator::GetGlobalPropagator();
-    auto current_ctx = opentelemetry::context::RuntimeContext::GetCurrent();
+    auto prop        = context::propagation::GlobalTextMapPropagator::GetGlobalPropagator();
+    auto current_ctx = context::RuntimeContext::GetCurrent();
     auto new_context = prop->Extract(carrier, current_ctx);
-    options.parent   = opentelemetry::trace::GetSpan(new_context)->GetContext();
+    options.parent   = GetSpan(new_context)->GetContext();
 
     std::string span_name = "GreeterService/Greet";
     auto span =
@@ -81,7 +83,7 @@ public:
     response->set_response(message);
     span->AddEvent("Response sent to client");
 
-    span->SetStatus(opentelemetry::trace::StatusCode::kOk);
+    span->SetStatus(StatusCode::kOk);
     // Make sure to end your spans!
     span->End();
     return Status::OK;

@@ -7,6 +7,8 @@
 #include "opentelemetry/ext/http/common/url_parser.h"
 #include "opentelemetry/sdk_config.h"
 
+namespace http_client = opentelemetry::ext::http::client;
+
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace exporter
 {

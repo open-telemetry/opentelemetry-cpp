@@ -11,16 +11,19 @@
 #  include <gtest/gtest.h>
 
 using opentelemetry::sdk::logs::LogRecord;
+namespace trace_api = opentelemetry::trace;
+namespace logs_api  = opentelemetry::logs;
+namespace nostd     = opentelemetry::nostd;
 
 // Test what a default LogRecord with no fields set holds
 TEST(LogRecord, GetDefaultValues)
 {
-  opentelemetry::trace::TraceId zero_trace_id;
-  opentelemetry::trace::SpanId zero_span_id;
-  opentelemetry::trace::TraceFlags zero_trace_flags;
+  trace_api::TraceId zero_trace_id;
+  trace_api::SpanId zero_span_id;
+  trace_api::TraceFlags zero_trace_flags;
   LogRecord record;
 
-  ASSERT_EQ(record.GetSeverity(), opentelemetry::logs::Severity::kInvalid);
+  ASSERT_EQ(record.GetSeverity(), logs_api::Severity::kInvalid);
   ASSERT_EQ(record.GetName(), "");
   ASSERT_EQ(record.GetBody(), "");
   ASSERT_EQ(record.GetResource().size(), 0);
@@ -34,14 +37,14 @@ TEST(LogRecord, GetDefaultValues)
 // Test LogRecord fields are properly set and get
 TEST(LogRecord, SetAndGet)
 {
-  opentelemetry::trace::TraceId trace_id;
-  opentelemetry::trace::SpanId span_id;
-  opentelemetry::trace::TraceFlags trace_flags;
+  trace_api::TraceId trace_id;
+  trace_api::SpanId span_id;
+  trace_api::TraceFlags trace_flags;
   opentelemetry::common::SystemTimestamp now(std::chrono::system_clock::now());
 
   // Set all fields of the LogRecord
   LogRecord record;
-  record.SetSeverity(opentelemetry::logs::Severity::kInvalid);
+  record.SetSeverity(logs_api::Severity::kInvalid);
   record.SetName("Log name");
   record.SetBody("Message");
   record.SetResource("res1", (bool)true);
@@ -52,11 +55,11 @@ TEST(LogRecord, SetAndGet)
   record.SetTimestamp(now);
 
   // Test that all fields match what was set
-  ASSERT_EQ(record.GetSeverity(), opentelemetry::logs::Severity::kInvalid);
+  ASSERT_EQ(record.GetSeverity(), logs_api::Severity::kInvalid);
   ASSERT_EQ(record.GetName(), "Log name");
   ASSERT_EQ(record.GetBody(), "Message");
-  ASSERT_EQ(opentelemetry::nostd::get<bool>(record.GetResource().at("res1")), 1);
-  ASSERT_EQ(opentelemetry::nostd::get<int64_t>(record.GetAttributes().at("attr1")), 314159);
+  ASSERT_EQ(nostd::get<bool>(record.GetResource().at("res1")), 1);
+  ASSERT_EQ(nostd::get<int64_t>(record.GetAttributes().at("attr1")), 314159);
   ASSERT_EQ(record.GetTraceId(), trace_id);
   ASSERT_EQ(record.GetSpanId(), span_id);
   ASSERT_EQ(record.GetTraceFlags(), trace_flags);

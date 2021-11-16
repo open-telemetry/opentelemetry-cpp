@@ -12,8 +12,6 @@
 #  include <mutex>
 #  include <vector>
 
-namespace metrics_api = opentelemetry::metrics;
-
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace sdk
 {
@@ -36,7 +34,7 @@ template <class T>
 class MinMaxSumCountAggregator : public Aggregator<T>
 {
 public:
-  explicit MinMaxSumCountAggregator(metrics_api::InstrumentKind kind)
+  explicit MinMaxSumCountAggregator(opentelemetry::metrics::InstrumentKind kind)
   {
     static_assert(std::is_arithmetic<T>::value, "Not an arithmetic type");
     this->kind_       = kind;
