@@ -8,7 +8,7 @@
 #include <string>
 
 #include <regex>
-#if (__GNUC__ == 4 && (__GNUC_MINOR__ == 8))
+#if (__GNUC__ == 4 && (__GNUC_MINOR__ == 8 || __GNUC_MINOR__ == 9))
 #  define HAVE_WORKING_REGEX 0
 #else
 #  define HAVE_WORKING_REGEX 1
