@@ -12,8 +12,6 @@
 #  include "opentelemetry/sdk/_metrics/aggregator/aggregator.h"
 #  include "opentelemetry/version.h"
 
-namespace metrics_api = opentelemetry::metrics;
-
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace sdk
 {
@@ -32,7 +30,7 @@ public:
    * Sum is stored in values_[0]
    * Count is stored in position_[1]
    */
-  HistogramAggregator(metrics_api::InstrumentKind kind, std::vector<double> boundaries)
+  HistogramAggregator(opentelemetry::metrics::InstrumentKind kind, std::vector<double> boundaries)
   {
     if (!std::is_sorted(boundaries.begin(), boundaries.end()))
     {

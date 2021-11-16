@@ -10,19 +10,23 @@
 #include <chrono>
 #include <thread>
 
-constexpr int kNumSpans = 10;
+constexpr int kNumSpans  = 10;
+namespace trace_api      = opentelemetry::trace;
+namespace resource       = opentelemetry::sdk::resource;
+namespace exporter_trace = opentelemetry::exporter::trace;
+namespace trace_sdk      = opentelemetry::sdk::trace;
+namespace nostd          = opentelemetry::nostd;
 
 namespace
 {
 
 void initTracer()
 {
-  auto exporter = std::unique_ptr<sdktrace::SpanExporter>(
-      new opentelemetry::exporter::trace::OStreamSpanExporter);
+  auto exporter = std::unique_ptr<trace_sdk::SpanExporter>(new exporter_trace::OStreamSpanExporter);
 
   // CONFIGURE BATCH SPAN PROCESSOR PARAMETERS
 
-  sdktrace::BatchSpanProcessorOptions options{};
+  trace_sdk::BatchSpanProcessorOptions options{};
   // We make the queue size `KNumSpans`*2+5 because when the queue is half full, a preemptive notif
   // is sent to start an export call, which we want to avoid in this simple example.
   options.max_queue_size = kNumSpans * 2 + 5;
@@ -31,22 +35,21 @@ void initTracer()
   // We export `kNumSpans` after every `schedule_delay_millis` milliseconds.
   options.max_export_batch_size = kNumSpans;
 
-  opentelemetry::sdk::resource::ResourceAttributes attributes = {{"service", "test_service"},
-                                                                 {"version", (uint32_t)1}};
-  auto resource = opentelemetry::sdk::resource::Resource::Create(attributes);
+  resource::ResourceAttributes attributes = {{"service", "test_service"}, {"version", (uint32_t)1}};
+  auto resource                           = resource::Resource::Create(attributes);
 
-  auto processor = std::unique_ptr<sdktrace::SpanProcessor>(
-      new sdktrace::BatchSpanProcessor(std::move(exporter), options));
+  auto processor = std::unique_ptr<trace_sdk::SpanProcessor>(
+      new trace_sdk::BatchSpanProcessor(std::move(exporter), options));
 
-  auto provider = nostd::shared_ptr<opentelemetry::trace::TracerProvider>(
-      new sdktrace::TracerProvider(std::move(processor), resource));
+  auto provider = nostd::shared_ptr<trace_api::TracerProvider>(
+      new trace_sdk::TracerProvider(std::move(processor), resource));
   // Set the global trace provider.
-  opentelemetry::trace::Provider::SetTracerProvider(provider);
+  trace_api::Provider::SetTracerProvider(provider);
 }
 
-nostd::shared_ptr<opentelemetry::trace::Tracer> get_tracer()
+nostd::shared_ptr<trace_api::Tracer> get_tracer()
 {
-  auto provider = opentelemetry::trace::Provider::GetTracerProvider();
+  auto provider = trace_api::Provider::GetTracerProvider();
   return provider->GetTracer("foo_library");
 }
 

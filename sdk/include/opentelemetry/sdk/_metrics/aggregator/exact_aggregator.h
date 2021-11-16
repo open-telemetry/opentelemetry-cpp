@@ -13,8 +13,6 @@
 #  include <mutex>
 #  include <vector>
 
-namespace metrics_api = opentelemetry::metrics;
-
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace sdk
 {
@@ -37,7 +35,7 @@ template <class T>
 class ExactAggregator : public Aggregator<T>
 {
 public:
-  ExactAggregator(metrics_api::InstrumentKind kind, bool quant_estimation = false)
+  ExactAggregator(opentelemetry::metrics::InstrumentKind kind, bool quant_estimation = false)
   {
     static_assert(std::is_arithmetic<T>::value, "Not an arithmetic type");
     this->kind_       = kind;

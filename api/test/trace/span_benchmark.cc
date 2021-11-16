@@ -14,13 +14,14 @@
 using opentelemetry::trace::SpanContext;
 namespace trace_api = opentelemetry::trace;
 namespace nostd     = opentelemetry::nostd;
+namespace context   = opentelemetry::context;
 
 namespace
 {
 
-std::shared_ptr<opentelemetry::trace::Tracer> initTracer()
+std::shared_ptr<trace_api::Tracer> initTracer()
 {
-  return std::shared_ptr<opentelemetry::trace::Tracer>(new trace_api::NoopTracer());
+  return std::shared_ptr<trace_api::Tracer>(new trace_api::NoopTracer());
 }
 
 // Test to measure performance for span creation
@@ -108,7 +109,7 @@ void BM_SpanCreationWitContextPropagation(benchmark::State &state)
 
   while (state.KeepRunning())
   {
-    auto current_ctx        = opentelemetry::context::RuntimeContext::GetCurrent();
+    auto current_ctx        = context::RuntimeContext::GetCurrent();
     auto outer_span_context = SpanContext(trace_id, span_id, trace_api::TraceFlags(), false);
     auto outer_span =
         nostd::shared_ptr<trace_api::Span>(new trace_api::DefaultSpan(outer_span_context));

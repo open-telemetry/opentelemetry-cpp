@@ -8,13 +8,14 @@
 using opentelemetry::sdk::trace::AlwaysOffSampler;
 using opentelemetry::sdk::trace::Decision;
 using opentelemetry::trace::SpanContext;
+namespace trace_api = opentelemetry::trace;
 
 TEST(AlwaysOffSampler, ShouldSample)
 {
   AlwaysOffSampler sampler;
 
-  opentelemetry::trace::TraceId trace_id;
-  opentelemetry::trace::SpanKind span_kind = opentelemetry::trace::SpanKind::kInternal;
+  trace_api::TraceId trace_id;
+  trace_api::SpanKind span_kind = trace_api::SpanKind::kInternal;
 
   using M = std::map<std::string, int>;
   M m1    = {{}};
@@ -23,7 +24,7 @@ TEST(AlwaysOffSampler, ShouldSample)
   L l1    = {{SpanContext(false, false), {}}, {SpanContext(false, false), {}}};
 
   opentelemetry::common::KeyValueIterableView<M> view{m1};
-  opentelemetry::trace::SpanContextKeyValueIterableView<L> links{l1};
+  trace_api::SpanContextKeyValueIterableView<L> links{l1};
 
   auto sampling_result =
       sampler.ShouldSample(SpanContext::GetInvalid(), trace_id, "", span_kind, view, links);

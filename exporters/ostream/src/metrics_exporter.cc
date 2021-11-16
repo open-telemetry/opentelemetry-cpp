@@ -28,19 +28,23 @@ sdk::common::ExportResult OStreamMetricsExporter::Export(
      * Unpack the AggregatorVariant from the record so we can pass the data type to
      * PrintAggregatorVariant to unpack the Aggregator from the variant.
      */
-    if (nostd::holds_alternative<std::shared_ptr<sdkmetrics::Aggregator<int>>>(aggregator))
+    if (nostd::holds_alternative<std::shared_ptr<opentelemetry::sdk::metrics::Aggregator<int>>>(
+            aggregator))
     {
       PrintAggregatorVariant<int>(aggregator);
     }
-    else if (nostd::holds_alternative<std::shared_ptr<sdkmetrics::Aggregator<short>>>(aggregator))
+    else if (nostd::holds_alternative<
+                 std::shared_ptr<opentelemetry::sdk::metrics::Aggregator<short>>>(aggregator))
     {
       PrintAggregatorVariant<short>(aggregator);
     }
-    else if (nostd::holds_alternative<std::shared_ptr<sdkmetrics::Aggregator<double>>>(aggregator))
+    else if (nostd::holds_alternative<
+                 std::shared_ptr<opentelemetry::sdk::metrics::Aggregator<double>>>(aggregator))
     {
       PrintAggregatorVariant<double>(aggregator);
     }
-    else if (nostd::holds_alternative<std::shared_ptr<sdkmetrics::Aggregator<float>>>(aggregator))
+    else if (nostd::holds_alternative<
+                 std::shared_ptr<opentelemetry::sdk::metrics::Aggregator<float>>>(aggregator))
     {
       PrintAggregatorVariant<float>(aggregator);
     }

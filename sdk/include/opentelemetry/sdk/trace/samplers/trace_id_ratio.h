@@ -10,7 +10,6 @@ namespace sdk
 {
 namespace trace
 {
-namespace trace_api = opentelemetry::trace;
 /**
  * The TraceIdRatioBased sampler computes and returns a decision based on the
  * provided trace_id and the configured ratio.
@@ -33,12 +32,12 @@ public:
    * ratio to determine whether this trace should be sampled
    */
   SamplingResult ShouldSample(
-      const trace_api::SpanContext & /*parent_context*/,
-      trace_api::TraceId trace_id,
+      const opentelemetry::trace::SpanContext & /*parent_context*/,
+      opentelemetry::trace::TraceId trace_id,
       nostd::string_view /*name*/,
-      trace_api::SpanKind /*span_kind*/,
+      opentelemetry::trace::SpanKind /*span_kind*/,
       const opentelemetry::common::KeyValueIterable & /*attributes*/,
-      const trace_api::SpanContextKeyValueIterable & /*links*/) noexcept override;
+      const opentelemetry::trace::SpanContextKeyValueIterable & /*links*/) noexcept override;
 
   /**
    * @return Description MUST be TraceIdRatioBasedSampler{0.000100}

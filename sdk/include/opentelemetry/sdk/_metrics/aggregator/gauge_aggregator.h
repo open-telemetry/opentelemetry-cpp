@@ -13,8 +13,6 @@
 #  include <mutex>
 #  include <vector>
 
-namespace metrics_api = opentelemetry::metrics;
-
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace sdk
 {
@@ -33,7 +31,7 @@ template <class T>
 class GaugeAggregator : public Aggregator<T>
 {
 public:
-  explicit GaugeAggregator(metrics_api::InstrumentKind kind)
+  explicit GaugeAggregator(opentelemetry::metrics::InstrumentKind kind)
   {
     static_assert(std::is_arithmetic<T>::value, "Not an arithmetic type");
     this->kind_        = kind;

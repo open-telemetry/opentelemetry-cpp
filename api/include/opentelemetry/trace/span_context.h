@@ -12,8 +12,6 @@
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace trace
 {
-namespace trace_api = opentelemetry::trace;
-
 /* SpanContext contains the state that must propagate to child Spans and across
  * process boundaries. It contains TraceId and SpanId, TraceFlags, TraceState
  * and whether it was propagated from a remote parent.
@@ -31,7 +29,7 @@ public:
   SpanContext(bool sampled_flag, bool is_remote)
       : trace_id_(),
         span_id_(),
-        trace_flags_(trace_api::TraceFlags((uint8_t)sampled_flag)),
+        trace_flags_(opentelemetry::trace::TraceFlags((uint8_t)sampled_flag)),
         is_remote_(is_remote),
         trace_state_(TraceState::GetDefault())
   {}
@@ -54,16 +52,16 @@ public:
   bool IsValid() const noexcept { return trace_id_.IsValid() && span_id_.IsValid(); }
 
   // @returns the trace_flags associated with this span_context
-  const trace_api::TraceFlags &trace_flags() const noexcept { return trace_flags_; }
+  const opentelemetry::trace::TraceFlags &trace_flags() const noexcept { return trace_flags_; }
 
   // @returns the trace_id associated with this span_context
-  const trace_api::TraceId &trace_id() const noexcept { return trace_id_; }
+  const opentelemetry::trace::TraceId &trace_id() const noexcept { return trace_id_; }
 
   // @returns the span_id associated with this span_context
-  const trace_api::SpanId &span_id() const noexcept { return span_id_; }
+  const opentelemetry::trace::SpanId &span_id() const noexcept { return span_id_; }
 
   // @returns the trace_state associated with this span_context
-  const nostd::shared_ptr<trace_api::TraceState> trace_state() const noexcept
+  const nostd::shared_ptr<opentelemetry::trace::TraceState> trace_state() const noexcept
   {
     return trace_state_;
   }
@@ -88,11 +86,11 @@ public:
   bool IsSampled() const noexcept { return trace_flags_.IsSampled(); }
 
 private:
-  trace_api::TraceId trace_id_;
-  trace_api::SpanId span_id_;
-  trace_api::TraceFlags trace_flags_;
+  opentelemetry::trace::TraceId trace_id_;
+  opentelemetry::trace::SpanId span_id_;
+  opentelemetry::trace::TraceFlags trace_flags_;
   bool is_remote_;
-  nostd::shared_ptr<trace_api::TraceState> trace_state_;
+  nostd::shared_ptr<opentelemetry::trace::TraceState> trace_state_;
 };
 }  // namespace trace
 OPENTELEMETRY_END_NAMESPACE

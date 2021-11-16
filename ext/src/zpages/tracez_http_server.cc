@@ -8,6 +8,7 @@ namespace ext
 {
 namespace zpages
 {
+namespace nostd = opentelemetry::nostd;
 
 json TracezHttpServer::GetAggregations()
 {
@@ -123,34 +124,34 @@ json TracezHttpServer::GetAttributesJSON(
     switch (val.index())
     {
       case 0:
-        attributes_json[key] = opentelemetry::nostd::get<0>(val);
+        attributes_json[key] = nostd::get<0>(val);
         break;
       case 1:
-        attributes_json[key] = opentelemetry::nostd::get<1>(val);
+        attributes_json[key] = nostd::get<1>(val);
         break;
       case 2:
-        attributes_json[key] = opentelemetry::nostd::get<2>(val);
+        attributes_json[key] = nostd::get<2>(val);
         break;
       case 3:
-        attributes_json[key] = opentelemetry::nostd::get<3>(val);
+        attributes_json[key] = nostd::get<3>(val);
         break;
       case 4:
-        attributes_json[key] = opentelemetry::nostd::get<4>(val);
+        attributes_json[key] = nostd::get<4>(val);
         break;
       case 5:
-        attributes_json[key] = opentelemetry::nostd::get<5>(val);
+        attributes_json[key] = nostd::get<5>(val);
         break;
       case 6:
-        attributes_json[key] = opentelemetry::nostd::get<6>(val);
+        attributes_json[key] = nostd::get<6>(val);
         break;
       case 7:
-        attributes_json[key] = opentelemetry::nostd::get<7>(val);
+        attributes_json[key] = nostd::get<7>(val);
         break;
       case 8:
-        attributes_json[key] = opentelemetry::nostd::get<8>(val);
+        attributes_json[key] = nostd::get<8>(val);
         break;
       case 9:
-        attributes_json[key] = opentelemetry::nostd::get<9>(val);
+        attributes_json[key] = nostd::get<9>(val);
         break;
     }
   }

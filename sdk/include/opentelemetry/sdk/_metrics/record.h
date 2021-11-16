@@ -11,8 +11,6 @@
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 
-namespace metrics_api = opentelemetry::metrics;
-
 namespace sdk
 {
 namespace metrics

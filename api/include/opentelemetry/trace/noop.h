@@ -19,6 +19,8 @@
 
 #include <memory>
 
+namespace trace_api = opentelemetry::trace;
+
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace trace
 {

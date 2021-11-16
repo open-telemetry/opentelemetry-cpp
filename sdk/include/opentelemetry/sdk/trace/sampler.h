@@ -20,8 +20,6 @@ namespace sdk
 {
 namespace trace
 {
-namespace trace_api = opentelemetry::trace;
-
 /**
  * A sampling Decision for a Span to be created.
  */
@@ -65,7 +63,7 @@ public:
    * @param trace_id the TraceId for the new Span. This will be identical to that in
    *        the parentContext, unless this is a root span.
    * @param name the name of the new Span.
-   * @param spanKind the trace_api::SpanKind of the Span.
+   * @param spanKind the opentelemetry::trace::SpanKind of the Span.
    * @param attributes list of AttributeValue with their keys.
    * @param links Collection of links that will be associated with the Span to be created.
    * @return sampling result whether span should be sampled or not.
@@ -73,12 +71,12 @@ public:
    */
 
   virtual SamplingResult ShouldSample(
-      const trace_api::SpanContext &parent_context,
-      trace_api::TraceId trace_id,
+      const opentelemetry::trace::SpanContext &parent_context,
+      opentelemetry::trace::TraceId trace_id,
       nostd::string_view name,
-      trace_api::SpanKind span_kind,
+      opentelemetry::trace::SpanKind span_kind,
       const opentelemetry::common::KeyValueIterable &attributes,
-      const trace_api::SpanContextKeyValueIterable &links) noexcept = 0;
+      const opentelemetry::trace::SpanContextKeyValueIterable &links) noexcept = 0;
 
   /**
    * Returns the sampler name or short description with the configuration.

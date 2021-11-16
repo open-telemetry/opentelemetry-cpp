@@ -25,7 +25,7 @@ using grpc_example::GreetResponse;
 
 namespace
 {
-
+namespace context = opentelemetry::context;
 using namespace opentelemetry::trace;
 class GreeterClient
 {
@@ -40,8 +40,8 @@ public:
     ClientContext context;
     request.set_request("Nice to meet you!");
 
-    opentelemetry::trace::StartSpanOptions options;
-    options.kind = opentelemetry::trace::SpanKind::kClient;
+    StartSpanOptions options;
+    options.kind = SpanKind::kClient;
 
     std::string span_name = "GreeterClient/Greet";
     auto span             = get_tracer("grpc")->StartSpan(
@@ -56,16 +56,16 @@ public:
     auto scope = get_tracer("grpc-client")->WithActiveSpan(span);
 
     // inject current context to grpc metadata
-    auto current_ctx = opentelemetry::context::RuntimeContext::GetCurrent();
+    auto current_ctx = context::RuntimeContext::GetCurrent();
     GrpcClientCarrier carrier(&context);
-    auto prop = opentelemetry::context::propagation::GlobalTextMapPropagator::GetGlobalPropagator();
+    auto prop = context::propagation::GlobalTextMapPropagator::GetGlobalPropagator();
     prop->Inject(carrier, current_ctx);
 
     // Send request to server
     Status status = stub_->Greet(&context, request, &response);
     if (status.ok())
     {
-      span->SetStatus(opentelemetry::trace::StatusCode::kOk);
+      span->SetStatus(StatusCode::kOk);
       span->SetAttribute(OTEL_CPP_GET_ATTR(AttrRpcGrpcStatusCode), status.error_code());
       // Make sure to end your spans!
       span->End();
@@ -74,7 +74,7 @@ public:
     else
     {
       std::cout << status.error_code() << ": " << status.error_message() << std::endl;
-      span->SetStatus(opentelemetry::trace::StatusCode::kError);
+      span->SetStatus(StatusCode::kError);
       span->SetAttribute(OTEL_CPP_GET_ATTR(AttrRpcGrpcStatusCode), status.error_code());
       // Make sure to end your spans!
       span->End();
@@ -99,9 +99,9 @@ int main(int argc, char **argv)
 {
   initTracer();
   // set global propagator
-  opentelemetry::context::propagation::GlobalTextMapPropagator::SetGlobalPropagator(
-      nostd::shared_ptr<opentelemetry::context::propagation::TextMapPropagator>(
-          new opentelemetry::trace::propagation::HttpTraceContext()));
+  context::propagation::GlobalTextMapPropagator::SetGlobalPropagator(
+      opentelemetry::nostd::shared_ptr<context::propagation::TextMapPropagator>(
+          new propagation::HttpTraceContext()));
   constexpr uint16_t default_port = 8800;
   uint16_t port;
   if (argc > 1)
