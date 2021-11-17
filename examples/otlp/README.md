@@ -4,8 +4,9 @@ This is an example of how to use the [OpenTelemetry
 Protocol](https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/protocol/README.md)
 (OTLP) exporter.
 
-The application in `grpc_main.cc` initializes an `OtlpGrpcExporter` instance and
-the application in `http_main.cc` initializes an `OtlpHttpExporter` instance
+The application in `grpc_main.cc` initializes an `OtlpGrpcExporter` instance,
+the application in `http_main.cc` initializes an `OtlpHttpExporter` instance.
+The application in `http_log_main.cc` initializes an `OtlpHttpLogExporter` instance
 and they register a tracer provider from the [OpenTelemetry
 SDK](https://github.com/open-telemetry/opentelemetry-cpp). The application then
 calls a `foo_library` which has been instrumented using the [OpenTelemetry
