@@ -49,7 +49,6 @@ if(WITH_OTLP_HTTP)
     PUBLIC opentelemetry_sdk opentelemetry_proto http_client_curl
            nlohmann_json::nlohmann_json)
   if(nlohmann_json_clone)
-    include_directories(${NLOHMANN_JSON_INCLUDE_DIR})
     add_dependencies(opentelemetry_exporter_otlp_http_client
                      nlohmann_json::nlohmann_json)
     list(APPEND OPENTELEMETRY_OTLP_TARGETS nlohmann_json_)

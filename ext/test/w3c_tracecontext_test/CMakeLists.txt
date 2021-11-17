@@ -11,7 +11,6 @@ else()
             opentelemetry_exporter_ostream_span ${CURL_LIBRARIES}
             nlohmann_json::nlohmann_json)
   if(lohmann_json_clone)
-    include_directories(${NLOHMANN_JSON_INCLUDE_DIR})
     add_dependencies(w3c_tracecontext_test nlohmann_json::nlohmann_json)
   endif()
 
