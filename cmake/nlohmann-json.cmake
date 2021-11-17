@@ -3,7 +3,7 @@ if("${nlohmann-json}" STREQUAL "")
 endif()
 include(ExternalProject)
 ExternalProject_Add(nlohmann_json_download
-    PREFIX 3rd_party
+    PREFIX third_party
     GIT_REPOSITORY https://github.com/nlohmann/json.git
     GIT_TAG
         "${nlohmann-json}"
@@ -11,6 +11,7 @@ ExternalProject_Add(nlohmann_json_download
     CMAKE_ARGS
       -DJSON_BuildTests=OFF
       -DJSON_Install=ON
+      -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE}
     TEST_AFTER_INSTALL
         0
     DOWNLOAD_NO_PROGRESS
@@ -23,10 +24,12 @@ ExternalProject_Add(nlohmann_json_download
         1
 )
 
-SET(NLOHMANN_JSON_INCLUDE_DIR ${CMAKE_CURRENT_BINARY_DIR}/3rd_party/src/nlohmann_json_download/single_include)
-SET(NLOHMANN_JSON_LIB_DIR ${CMAKE_CURRENT_BINARY_DIR}/3rd_party/src/nlohmann_json_download/lib)
-
+ExternalProject_Get_Property(nlohmann_json_download INSTALL_DIR)
+SET(NLOHMANN_JSON_INCLUDE_DIR ${INSTALL_DIR}/3rd_party/src/nlohmann_json_download/single_include)
 add_library(nlohmann_json_ INTERFACE)
-target_include_directories(nlohmann_json_ INTERFACE ${NLOHMANN_JSON_INCLUDE_DIR})
+target_include_directories(nlohmann_json_ INTERFACE 
+ "$<BUILD_INTERFACE:${NLOHMANN_JSON_INCLUDE_DIR}>"
+"$<INSTALL_INTERFACE:include>")
+#${NLOHMANN_JSON_INCLUDE_DIR})
 add_dependencies(nlohmann_json_ nlohmann_json_download)
 add_library(nlohmann_json::nlohmann_json ALIAS nlohmann_json_)
