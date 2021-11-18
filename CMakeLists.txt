@@ -279,33 +279,27 @@ if((NOT WITH_API_ONLY)
   # nlohmann_json package is required for most SDK build configurations
   find_package(nlohmann_json QUIET)
   set(nlohmann_json_clone FALSE)
-  if(NOT nlohmann_json_FOUND)
-    if(EXISTS ${PROJECT_SOURCE_DIR}/.git)
-      message("Trying to use local nlohmann::json from submodule")
-      set(JSON_BuildTests
-          OFF
-          CACHE INTERNAL "")
-      set(JSON_Install
-          ON
-          CACHE INTERNAL "")
-      if(EXISTS ${PROJECT_SOURCE_DIR}/third_party/nlohmann-json/CMakeLists.txt)
-        # This option allows to link nlohmann_json::nlohmann_json target
-        add_subdirectory(${PROJECT_SOURCE_DIR}/third_party/nlohmann-json)
-        # This option allows to add header to include directories
-        include_directories(
-          ${PROJECT_SOURCE_DIR}/third_party/nlohmann-json/single_include)
-      else()
-        set(nlohmann_json_clone TRUE)
-        include(cmake/nlohmann-json.cmake)
-        message("\nnlohmann_json package was not found. Cloning from github")
-      endif()
-    else()
-      set(nlohmann_json_clone TRUE)
-      include(cmake/nlohmann-json.cmake)
-      message("\nnlohmann_json package was not found. Cloning from github")
-    endif()
-  else()
+  if(nlohmann_json_FOUND)
     message("Using external nlohmann::json")
+  elseif(EXISTS ${PROJECT_SOURCE_DIR}/.git
+         AND EXISTS
+             ${PROJECT_SOURCE_DIR}/third_party/nlohmann-json/CMakeLists.txt)
+    message("Trying to use local nlohmann::json from submodule")
+    set(JSON_BuildTests
+        OFF
+        CACHE INTERNAL "")
+    set(JSON_Install
+        ON
+        CACHE INTERNAL "")
+    # This option allows to link nlohmann_json::nlohmann_json target
+    add_subdirectory(${PROJECT_SOURCE_DIR}/third_party/nlohmann-json)
+    # This option allows to add header to include directories
+    include_directories(
+      ${PROJECT_SOURCE_DIR}/third_party/nlohmann-json/single_include)
+  else()
+    set(nlohmann_json_clone TRUE)
+    include(cmake/nlohmann-json.cmake)
+    message("\nnlohmann_json package was not found. Cloning from github")
   endif()
 endif()
 

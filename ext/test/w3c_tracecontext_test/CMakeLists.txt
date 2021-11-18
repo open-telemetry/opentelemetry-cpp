@@ -10,7 +10,7 @@ else()
     PRIVATE ${CMAKE_THREAD_LIBS_INIT} opentelemetry_trace http_client_curl
             opentelemetry_exporter_ostream_span ${CURL_LIBRARIES}
             nlohmann_json::nlohmann_json)
-  if(lohmann_json_clone)
+  if(nlohmann_json_clone)
     add_dependencies(w3c_tracecontext_test nlohmann_json::nlohmann_json)
   endif()
 
