@@ -1,5 +1,5 @@
 if("${nlohmann-json}" STREQUAL "")
-    set(nlohmann-json "main")
+    set(nlohmann-json "develop")
 endif()
 include(ExternalProject)
 ExternalProject_Add(nlohmann_json_download
@@ -25,7 +25,7 @@ ExternalProject_Add(nlohmann_json_download
 )
 
 ExternalProject_Get_Property(nlohmann_json_download INSTALL_DIR)
-SET(NLOHMANN_JSON_INCLUDE_DIR ${INSTALL_DIR}/3rd_party/src/nlohmann_json_download/single_include)
+SET(NLOHMANN_JSON_INCLUDE_DIR ${INSTALL_DIR}/third_party/src/nlohmann_json_download/single_include)
 add_library(nlohmann_json_ INTERFACE)
 target_include_directories(nlohmann_json_ INTERFACE
     "$<BUILD_INTERFACE:${NLOHMANN_JSON_INCLUDE_DIR}>"
