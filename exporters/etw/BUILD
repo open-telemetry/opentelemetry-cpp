@@ -9,6 +9,7 @@ cc_library(
     local_defines = [
         "HAVE_MSGPACK",
     ],
+    tags = ["etw"],
     deps = [
         "//api",
         "//sdk/src/trace",
@@ -22,6 +23,7 @@ cc_test(
     local_defines = [
         "HAVE_MSGPACK",
     ],
+    tags = ["etw"],
     deps = [
         ":etw_exporter",
         "@com_google_googletest//:gtest_main",
@@ -35,6 +37,7 @@ cc_test(
     local_defines = [
         "HAVE_MSGPACK",
     ],
+    tags = ["etw"],
     deps = [
         ":etw_exporter",
         "@com_google_googletest//:gtest_main",
