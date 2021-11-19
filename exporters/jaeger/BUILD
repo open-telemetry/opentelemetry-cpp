@@ -17,6 +17,7 @@ cmake(
         "BUILD_TESTING": "OFF",
         "BUILD_TUTORIALS": "OFF",
         "WITH_HASKELL": "OFF",
+        "CMAKE_CXX_FLAGS": "-fexceptions",
     },
     lib_source = "@thrift//:all_srcs",
     out_static_libs = [
@@ -46,6 +47,7 @@ cc_library(
         "thrift-gen/zipkincore_constants.h",
         "thrift-gen/zipkincore_types.h",
     ],
+    copts = ["-fexceptions"],
     strip_include_prefix = "thrift-gen",
     tags = ["jaeger"],
     deps = [
@@ -67,12 +69,11 @@ cc_library(
         "src/transport.h",
         "src/udp_transport.h",
     ],
+    copts = ["-fexceptions"],
     strip_include_prefix = "src",
     tags = ["jaeger"],
     deps = [
         ":jaeger_thrift_gencpp",
-        ":thrift",
-        "//ext/src/http/client/curl:http_client_curl",
     ],
 )
 
@@ -91,12 +92,10 @@ cc_library(
         "include/opentelemetry/exporters/jaeger/jaeger_exporter.h",
         "include/opentelemetry/exporters/jaeger/recordable.h",
     ],
+    copts = ["-fexceptions"],
     strip_include_prefix = "include",
     tags = ["jaeger"],
     deps = [
         ":jaeger_exporter",
-        ":jaeger_thrift_gencpp",
-        ":thrift",
-        "//ext/src/http/client/curl:http_client_curl",
     ],
 )
