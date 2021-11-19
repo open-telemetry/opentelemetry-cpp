@@ -51,7 +51,6 @@ if(WITH_OTLP_HTTP)
   if(nlohmann_json_clone)
     add_dependencies(opentelemetry_exporter_otlp_http_client
                      nlohmann_json::nlohmann_json)
-    list(APPEND OPENTELEMETRY_OTLP_TARGETS nlohmann_json_)
   endif()
   target_include_directories(
     opentelemetry_exporter_otlp_http_client

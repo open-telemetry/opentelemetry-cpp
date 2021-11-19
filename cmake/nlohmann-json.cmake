@@ -9,6 +9,7 @@ ExternalProject_Add(nlohmann_json_download
         "${nlohmann-json}"
     UPDATE_COMMAND ""
     CMAKE_ARGS
+      -DCMAKE_INSTALL_PREFIX=${CMAKE_INSTALL_PREFIX}
       -DJSON_BuildTests=OFF
       -DJSON_Install=ON
       -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE}
@@ -32,3 +33,10 @@ target_include_directories(nlohmann_json_ INTERFACE
     "$<INSTALL_INTERFACE:include>")
 add_dependencies(nlohmann_json_ nlohmann_json_download)
 add_library(nlohmann_json::nlohmann_json ALIAS nlohmann_json_)
+
+install(
+  TARGETS nlohmann_json_
+  EXPORT "${PROJECT_NAME}-target"
+  RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
+  LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
+  ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR})
