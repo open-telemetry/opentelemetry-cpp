@@ -28,7 +28,7 @@ BAZEL_TEST_OPTIONS="$BAZEL_OPTIONS --test_output=errors"
 
 # https://github.com/bazelbuild/bazel/issues/4341
 BAZEL_MACOS_OPTIONS="$BAZEL_OPRIONS --features=-supports_dynamic_linker"
-BAZEL_MACOS_TEST_OPTIONS="$BAZEL_MACOS_OPTIONS --test_output=errors"
+BAZEL_MACOS_TEST_OPTIONS="$BAZEL_MACOS_OPTIONS --test_output=errors --build_tag_filters=-jaeger"
 
 BAZEL_STARTUP_OPTIONS="--output_user_root=$HOME/.cache/bazel"
 
