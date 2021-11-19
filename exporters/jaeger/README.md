@@ -26,9 +26,9 @@ below:
 ```
 
 ### Bazel install Instructions
-
-TODO
-
+```
+bazel build //exporters/jaeger:opentelemetry_exporter_jaeger_trace
+```
 ## Usage
 
 Install the exporter in your application, initialize and pass the `options` to it.
