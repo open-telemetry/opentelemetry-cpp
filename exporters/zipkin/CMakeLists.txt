@@ -18,8 +18,9 @@ add_definitions(-DWITH_CURL)
 add_library(opentelemetry_exporter_zipkin_trace src/zipkin_exporter.cc
                                                 src/recordable.cc)
 
-target_link_libraries(opentelemetry_exporter_zipkin_trace
-                      PUBLIC opentelemetry_trace http_client_curl)
+target_link_libraries(
+  opentelemetry_exporter_zipkin_trace
+  PUBLIC opentelemetry_trace http_client_curl nlohmann_json::nlohmann_json)
 
 install(
   TARGETS opentelemetry_exporter_zipkin_trace
