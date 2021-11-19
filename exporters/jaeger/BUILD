@@ -16,6 +16,7 @@ cmake(
         "BUILD_JAVA": "OFF",
         "BUILD_TESTING": "OFF",
         "BUILD_TUTORIALS": "OFF",
+        "WITH_HASKELL": "OFF",
     },
     lib_source = "@thrift//:all_srcs",
     out_static_libs = [
