@@ -22,7 +22,6 @@ Increment the:
 * [SDK] Improvement: span_id should not break strict aliasing. ([#1068](https://github.com/open-telemetry/opentelemetry-cpp/pull/1068))
 * [EXAMPLE] OTLP HTTP log example ([#1062](https://github.com/open-telemetry/opentelemetry-cpp/pull/1062))
 * [SDK] OTLP gRPC log export should fail after shutdown ([#1064](https://github.com/open-telemetry/opentelemetry-cpp/pull/1064))
-* [CI] Add action to mark and close stale issues after timeout ([#1058](https://github.com/open-telemetry/opentelemetry-cpp/pull/1058))
 * [BUILD] Building otlp exporter from the release tarball ([#1056](https://github.com/open-telemetry/opentelemetry-cpp/pull/1056))
 * [METRICS] Move old metrics implementation to different directory, and rename targets to \_deprecated ([#1053](https://github.com/open-telemetry/opentelemetry-cpp/pull/1053))
 * [EXPORTER] Add OTLP/gRPC Log Exporter ([#1048](https://github.com/open-telemetry/opentelemetry-cpp/pull/1048))
