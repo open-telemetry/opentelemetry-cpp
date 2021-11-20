@@ -7,6 +7,8 @@
 #include "opentelemetry/sdk/metrics/recordable.h"
 #include "opentelemetry/version.h"
 
+#include <chrono>
+
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace sdk
 {

@@ -3,10 +3,10 @@
 
 #pragma once
 
+#include "opentelemetry/sdk/metrics/meter_exporter.h"
+#include "opentelemetry/sdk/metrics/meter_reader.h"
+#include "opentelemetry/sdk/metrics/view.h"
 #include "opentelemetry/sdk/resource/resource.h"
-//#include "opentelemetry/sdk/metrics/meter_reader.h"
-//#include "opentelemetry/sdk/metrics/meter_exporter.h"
-//#include "opentelemetry/sdk/metrics/view.h"
 #include "opentelemetry/version.h"
 
 #include <chrono>
@@ -18,7 +18,6 @@ namespace sdk
 {
 namespace metrics
 {
-
 /**
  * A class which stores the MeterProvider context.
 
@@ -33,9 +32,9 @@ public:
    * @param views The views to be configured with meter context.
    * @param resource  The resource for this meter context.
    */
-  MeterContext(std::vector<std::unique_ptr<MeterExporter>> &&exporters,
-               std::vector < std::unique_ptr<std::unique_ptr<MeterReader>> && readers,
-               std::unique_ptr<std::unique_ptr<View>> &&views,
+  MeterContext(std::vector<std::unique_ptr<sdk::metrics::MeterExporter>> &&exporters,
+               std::vector<std::unique_ptr<MeterReader>> &&readers,
+               std::vector<std::unique_ptr<View>> &&views,
                opentelemetry::sdk::resource::Resource resource =
                    opentelemetry::sdk::resource::Resource::Create({})) noexcept;
 
@@ -90,8 +89,8 @@ public:
 private:
   opentelemetry::sdk::resource::Resource resource_;
   std::vector<std::unique_ptr<MeterExporter>> exporters_;
-  std::unique_ptr<std::unique_ptr<MeterReader>> readers_;
-  std::unique_ptr<std::unique_ptr<View>> views_;
+  std::vector<std::unique_ptr<MeterReader>> readers_;
+  std::vector<std::unique_ptr<View>> views_;
 };
 
 }  // namespace metrics

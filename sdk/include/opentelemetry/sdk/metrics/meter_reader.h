@@ -42,4 +42,5 @@ public:
   virtual bool Shutdown() noexcept = 0;
 };
 }  // namespace metrics
+}  // namespace sdk
 OPENTELEMETRY_END_NAMESPACE

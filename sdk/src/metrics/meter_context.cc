@@ -5,6 +5,7 @@
 #include "opentelemetry/sdk_config.h"
 
 #include "opentelemetry/sdk/common/global_log_handler.h"
+#include "opentelemetry/version.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace sdk
@@ -13,13 +14,13 @@ namespace metrics
 {
 
 MeterContext::MeterContext(std::vector<std::unique_ptr<MeterExporter>> &&exporters,
-                           std::vector < std::unique_ptr<std::unique_ptr<MeterReader>> && readers,
-                           std::unique_ptr<std::unique_ptr<View>> &&views,
+                           std::vector<std::unique_ptr<MeterReader>> &&readers,
+                           std::vector<std::unique_ptr<View>> &&views,
                            opentelemetry::sdk::resource::Resource resource) noexcept
     : exporters_(std::move(exporters)),
       readers_(std::move(readers)),
       views_(std::move(views)),
-      resource_(resource)
+      resource_{resource}
 {}
 
 const resource::Resource &MeterContext::GetResource() const noexcept
@@ -37,7 +38,7 @@ void MeterContext::AddMeterReader(std::unique_ptr<MeterReader> reader) noexcept
   readers_.push_back(std::move(reader));
 }
 
-void MeterContext::AddView(std::unique_ptr<View> reader) noexcept
+void MeterContext::AddView(std::unique_ptr<View> view) noexcept
 {
   views_.push_back(std::move(view));
 }
@@ -48,21 +49,21 @@ bool MeterContext::Shutdown() noexcept
   bool result_reader   = true;
   for (auto &exporter : exporters_)
   {
-    status          = exporter.Shutdown();
+    bool status     = exporter->Shutdown();
     result_exporter = result_exporter && status;
   }
   if (!result_exporter)
   {
-    OTEL_INTERNAL_LOG_WARN("Unable to shutdown all metric exporters")
+    OTEL_INTERNAL_LOG_WARN("[MeterContext::Shutdown] Unable to shutdown all metric exporters");
   }
   for (auto &reader : readers_)
   {
-    status        = reader.Shutdown();
+    bool status   = reader->Shutdown();
     result_reader = result_reader && status;
   }
   if (!result_reader)
   {
-    OTEL_INTERNAL_LOG_WARN("Unable to shutdown all metric readers")
+    OTEL_INTERNAL_LOG_WARN("[MeterContext::Shutdown] Unable to shutdown all metric readers");
   }
   return result_exporter && result_reader;
 }
@@ -74,21 +75,21 @@ bool MeterContext::ForceFlush(std::chrono::microseconds timeout) noexcept
   bool result_reader   = true;
   for (auto &exporter : exporters_)
   {
-    status          = exporter.ForceFlush(timeout);
+    bool status     = exporter->ForceFlush(timeout);
     result_exporter = result_exporter && status;
   }
   if (!result_exporter)
   {
-    OTEL_INTERNAL_LOG_WARN("Unable to force-flush all metric exporters")
+    OTEL_INTERNAL_LOG_WARN("[MeterContext::ForceFlush] Unable to force-flush all metric exporters");
   }
   for (auto &reader : readers_)
   {
-    status        = reader.ForceFlush(timeout);
+    bool status   = reader->ForceFlush(timeout);
     result_reader = result_reader && status;
   }
   if (!result_reader)
   {
-    OTEL_INTERNAL_LOG_WARN("Unable to force-flush all metric readers")
+    OTEL_INTERNAL_LOG_WARN("[MeterContext::ForceFlush] Unable to force-flush all metric readers");
   }
   return result_exporter && result_reader;
 }

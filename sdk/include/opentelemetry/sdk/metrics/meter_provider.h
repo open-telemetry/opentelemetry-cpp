@@ -4,6 +4,7 @@
 #pragma once
 
 #include <memory>
+#include <mutex>
 #include <vector>
 
 #include "opentelemetry/metrics/meter_provider.h"
@@ -11,6 +12,7 @@
 #include "opentelemetry/sdk/metrics/meter.h"
 #include "opentelemetry/sdk/metrics/meter_context.h"
 #include "opentelemetry/sdk/resource/resource.h"
+#include "opentelemetry/version.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace sdk
@@ -29,10 +31,9 @@ public:
    * @param resource  The resources for this meter provider.
    */
   MeterProvider(std::vector<std::unique_ptr<MeterExporter>> &&exporters,
-                std::vector < std::unique_ptr<std::unique_ptr<MeterReader>> && readers,
-                std::unique_ptr<std::unique_ptr<View>> &&views,
-                opentelemetry::sdk::resource::Resource resource =
-                    opentelemetry::sdk::resource::Resource::Create({})) noexcept;
+                std::vector<std::unique_ptr<MeterReader>> &&readers,
+                std::vector<std::unique_ptr<View>> &&views,
+                sdk::resource::Resource resource = sdk::resource::Resource::Create({})) noexcept;
 
   /**
    * Initialize a new meter provider with a specified context
@@ -49,7 +50,7 @@ public:
    * Obtain the resource associated with this meter provider.
    * @return The resource for this meter provider.
    */
-  const opentelemetry::sdk::resource::Resource &GetResource() const noexcept;
+  const sdk::resource::Resource &GetResource() const noexcept;
 
   /**
    * Attaches a meter exporter to list of configured exporters for this Meter provider.
@@ -93,8 +94,10 @@ public:
 
 private:
   // // order of declaration is important here - meter should destroy only after resource.
-  std::vector<std::shared_ptr<opentelemetry::sdk::metrics::Meter>> meters_;
-  std::shared_ptr<opentelemetry::sdk::metrics::MeterContext> context_;
+  std::vector<std::shared_ptr<sdk::metrics::Meter>> meters_;
+  std::shared_ptr<sdk::metrics::MeterContext> context_;
+  std::mutex lock_;
 };
 }  // namespace metrics
+}  // namespace sdk
 OPENTELEMETRY_END_NAMESPACE

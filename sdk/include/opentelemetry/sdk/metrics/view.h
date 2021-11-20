@@ -20,4 +20,5 @@ class View
   // TBD
 };
 }  // namespace metrics
+}  // namespace sdk
 OPENTELEMETRY_END_NAMESPACE

@@ -3,6 +3,8 @@
 
 #pragma once
 
+#include "opentelemetry/version.h"
+
 // TBD - This is placeholder for the class.
 
 OPENTELEMETRY_BEGIN_NAMESPACE

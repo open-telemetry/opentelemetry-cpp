@@ -21,9 +21,11 @@ class Meter final : public opentelemetry::metrics::Meter
 {
 public:
   /** Construct a new Meter with the given  pipeline. */
-  explicit Meter(std::shared_ptr<sdk::trace::TracerContext> context,
-                 std::unique_ptr<InstrumentationLibrary> instrumentation_library =
-                     InstrumentationLibrary::Create("")) noexcept;
+  explicit Meter(std::shared_ptr<sdk::metrics::MeterContext> context,
+                 std::unique_ptr<opentelemetry::sdk::instrumentationlibrary::InstrumentationLibrary>
+                     instrumentation_library =
+                         opentelemetry::sdk::instrumentationlibrary::InstrumentationLibrary::Create(
+                             "")) noexcept;
 
   nostd::shared_ptr<opentelemetry::metrics::Counter<long>> CreateLongCounter(
       nostd::string_view name,
@@ -65,7 +67,7 @@ public:
 
   nostd::shared_ptr<opentelemetry::metrics::ObservableGauge<double>> CreateDoubleObservableGauge(
       nostd::string_view name,
-      void (*callback)(ObserverResult<double> &),
+      void (*callback)(opentelemetry::metrics::ObserverResult<double> &),
       nostd::string_view description = "",
       nostd::string_view unit        = "1") noexcept override;
 
@@ -93,12 +95,16 @@ public:
       nostd::string_view description = "",
       nostd::string_view unit        = "1") noexcept override;
 
+  /** Returns the associated instruementation library */
+  const sdk::instrumentationlibrary::InstrumentationLibrary &GetInstrumentationLibrary()
+      const noexcept;
+
 private:
   // order of declaration is important here - instrumentation library should destroy after
   // meter-context.
-  std::shared_ptr<InstrumentationLibrary> instrumentation_library_;
+  std::shared_ptr<sdk::instrumentationlibrary::InstrumentationLibrary> instrumentation_library_;
   std::shared_ptr<sdk::metrics::MeterContext> context_;
-}
+};
 }  // namespace metrics
 }  // namespace sdk
 OPENTELEMETRY_END_NAMESPACE
