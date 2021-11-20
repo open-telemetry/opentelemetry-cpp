@@ -20,7 +20,7 @@ Increment the:
 * [BUILD] build release tarball when nlohmann-json not installed ([#1074](https://github.com/open-telemetry/opentelemetry-cpp/pull/1074))
 * [SDK] Bugfix: regex is neither working on GCC 4.9.x ([#1069](https://github.com/open-telemetry/opentelemetry-cpp/pull/1069))
 * [SDK] Improvement: span_id should not break strict aliasing. ([#1068](https://github.com/open-telemetry/opentelemetry-cpp/pull/1068))
-* [EXAMPLE] Otlp http log example ([#1062](https://github.com/open-telemetry/opentelemetry-cpp/pull/1062))
+* [EXAMPLE] OTLP HTTP log example ([#1062](https://github.com/open-telemetry/opentelemetry-cpp/pull/1062))
 * [SDK] OTLP gRPC log export should fail after shutdown ([#1064](https://github.com/open-telemetry/opentelemetry-cpp/pull/1064))
 * [CI] Add action to mark and close stale issues after timeout ([#1058](https://github.com/open-telemetry/opentelemetry-cpp/pull/1058))
 * [BUILD] Building otlp exporter from the release tarball ([#1056](https://github.com/open-telemetry/opentelemetry-cpp/pull/1056))
