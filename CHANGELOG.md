@@ -14,7 +14,7 @@ Increment the:
 * PATCH version when you make backwards compatible bug fixes.
 
 ## [Unreleased]
- 
+
 ## [1.1.0] 2021-11-19
 
 * [BUILD] build release tarball when nlohmann-json not installed ([#1074](https://github.com/open-telemetry/opentelemetry-cpp/pull/1074))
