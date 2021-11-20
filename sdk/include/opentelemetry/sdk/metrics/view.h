@@ -17,6 +17,7 @@ namespace metrics
 
 class View
 {
+public:
   virtual ~View() = default;
   // TBD
 };
