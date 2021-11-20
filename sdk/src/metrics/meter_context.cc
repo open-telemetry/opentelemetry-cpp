@@ -1,11 +1,12 @@
 // Copyright The OpenTelemetry Authors
 // SPDX-License-Identifier: Apache-2.0
 
-#include "opentelemetry/sdk/metrics/meter.h"
-#include "opentelemetry/sdk_config.h"
+#ifndef ENABLE_METRICS_PREVIEW
+#  include "opentelemetry/sdk/metrics/meter.h"
+#  include "opentelemetry/sdk_config.h"
 
-#include "opentelemetry/sdk/common/global_log_handler.h"
-#include "opentelemetry/version.h"
+#  include "opentelemetry/sdk/common/global_log_handler.h"
+#  include "opentelemetry/version.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace sdk
@@ -97,3 +98,4 @@ bool MeterContext::ForceFlush(std::chrono::microseconds timeout) noexcept
 }  // namespace metrics
 }  // namespace sdk
 OPENTELEMETRY_END_NAMESPACE
+#endif

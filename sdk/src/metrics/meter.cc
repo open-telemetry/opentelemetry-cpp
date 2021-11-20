@@ -1,13 +1,14 @@
 // Copyright The OpenTelemetry Authors
 // SPDX-License-Identifier: Apache-2.0
 
-#include "opentelemetry/sdk/metrics/meter.h"
-#include "opentelemetry/metrics/noop.h"
-#include "opentelemetry/nostd/shared_ptr.h"
-#include "opentelemetry/sdk/common/global_log_handler.h"
-#include "opentelemetry/version.h"
+#ifndef ENABLE_METRICS_PREVIEW
+#  include "opentelemetry/sdk/metrics/meter.h"
+#  include "opentelemetry/metrics/noop.h"
+#  include "opentelemetry/nostd/shared_ptr.h"
+#  include "opentelemetry/sdk/common/global_log_handler.h"
+#  include "opentelemetry/version.h"
 
-#include <memory>
+#  include <memory>
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace sdk
@@ -160,3 +161,4 @@ const sdk::instrumentationlibrary::InstrumentationLibrary &Meter::GetInstrumenta
 }  // namespace metrics
 }  // namespace sdk
 OPENTELEMETRY_END_NAMESPACE
+#endif

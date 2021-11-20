@@ -2,13 +2,13 @@
 // SPDX-License-Identifier: Apache-2.0
 
 #pragma once
-
-#include <chrono>
-#include "opentelemetry/metrics/meter.h"
-#include "opentelemetry/sdk/instrumentationlibrary/instrumentation_library.h"
-#include "opentelemetry/sdk/metrics/meter_context.h"
-#include "opentelemetry/sdk/resource/resource.h"
-#include "opentelemetry/version.h"
+#ifndef ENABLE_METRICS_PREVIEW
+#  include <chrono>
+#  include "opentelemetry/metrics/meter.h"
+#  include "opentelemetry/sdk/instrumentationlibrary/instrumentation_library.h"
+#  include "opentelemetry/sdk/metrics/meter_context.h"
+#  include "opentelemetry/sdk/resource/resource.h"
+#  include "opentelemetry/version.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace sdk
@@ -106,3 +106,4 @@ private:
 }  // namespace metrics
 }  // namespace sdk
 OPENTELEMETRY_END_NAMESPACE
+#endif
