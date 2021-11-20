@@ -32,7 +32,6 @@ nostd::shared_ptr<metrics_api::Meter> MeterProvider::GetMeter(
     nostd::string_view library_name,
     nostd::string_view library_version,
     nostd::string_view schema_url) noexcept
-
 {
   if (library_name.data() == nullptr || library_name == "")
   {

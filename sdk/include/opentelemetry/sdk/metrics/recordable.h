@@ -5,18 +5,17 @@
 
 #include "opentelemetry/version.h"
 
-// TBD - This is placeholder for the class.
-
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace sdk
 {
 namespace metrics
 {
-
 class Recordable
 {
 public:
   virtual ~Recordable() = default;
+
+  // TBD
 };
 }  // namespace metrics
 }  // namespace sdk

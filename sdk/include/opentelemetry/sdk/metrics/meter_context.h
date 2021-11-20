@@ -3,15 +3,14 @@
 
 #pragma once
 
+#include <chrono>
+#include <memory>
+#include <vector>
 #include "opentelemetry/sdk/metrics/meter_exporter.h"
 #include "opentelemetry/sdk/metrics/meter_reader.h"
 #include "opentelemetry/sdk/metrics/view.h"
 #include "opentelemetry/sdk/resource/resource.h"
 #include "opentelemetry/version.h"
-
-#include <chrono>
-#include <memory>
-#include <vector>
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace sdk

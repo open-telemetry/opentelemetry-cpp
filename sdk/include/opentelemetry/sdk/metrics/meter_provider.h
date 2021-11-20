@@ -6,7 +6,6 @@
 #include <memory>
 #include <mutex>
 #include <vector>
-
 #include "opentelemetry/metrics/meter_provider.h"
 #include "opentelemetry/nostd/shared_ptr.h"
 #include "opentelemetry/sdk/metrics/meter.h"
@@ -19,7 +18,6 @@ namespace sdk
 {
 namespace metrics
 {
-
 class MeterProvider final : public opentelemetry::metrics::MeterProvider
 {
 public:

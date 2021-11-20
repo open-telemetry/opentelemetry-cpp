@@ -3,20 +3,17 @@
 
 #pragma once
 
-#include "opentelemetry/version.h"
-
 #include <chrono>
+#include "opentelemetry/version.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace sdk
 {
 namespace metrics
 {
-
 /**
  * MeterReader defines the interface to collect metrics from SDK
  */
-
 class MeterReader
 {
 public:

@@ -17,6 +17,7 @@ namespace metrics
 
 class View
 {
+  virtual ~View() = default;
   // TBD
 };
 }  // namespace metrics
