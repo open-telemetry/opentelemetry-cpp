@@ -21,8 +21,7 @@ TEST(MeterProvider, GetMeter)
   ASSERT_NE(nullptr, t2);
   ASSERT_NE(nullptr, t3);
 
-  // Should return the same instance each time.
   ASSERT_EQ(t1, t2);
-  ASSERT_EQ(t1, t3);
+  ASSERT_NE(t1, t3);
 }
 #endif
