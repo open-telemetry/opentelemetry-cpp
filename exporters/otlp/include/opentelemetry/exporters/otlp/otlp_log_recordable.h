@@ -13,6 +13,7 @@
 #  include "opentelemetry/exporters/otlp/protobuf_include_suffix.h"
 // clang-format on
 
+#  include "opentelemetry/sdk/common/attribute_utils.h"
 #  include "opentelemetry/sdk/logs/recordable.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
@@ -95,7 +96,7 @@ public:
 
 private:
   proto::logs::v1::LogRecord log_record_;
-  proto::resource::v1::Resource private_resource_;
+  opentelemetry::sdk::common::AttributeMap resource_attributes_;
   // TODO shared resource
   // const opentelemetry::sdk::resource::Resource *resource_ = nullptr;
   // TODO InstrumentationLibrary
