@@ -40,9 +40,9 @@ public:
   explicit MeterProvider(std::shared_ptr<sdk::metrics::MeterContext> context) noexcept;
 
   nostd::shared_ptr<opentelemetry::metrics::Meter> GetMeter(
-      nostd::string_view library_name,
-      nostd::string_view library_version = "",
-      nostd::string_view schema_url      = "") noexcept override;
+      nostd::string_view name,
+      nostd::string_view version    = "",
+      nostd::string_view schema_url = "") noexcept override;
 
   /**
    * Obtain the resource associated with this meter provider.

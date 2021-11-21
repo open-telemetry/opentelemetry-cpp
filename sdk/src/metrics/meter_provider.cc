@@ -30,14 +30,14 @@ MeterProvider::MeterProvider(std::vector<std::unique_ptr<MeterExporter>> &&expor
 {}
 
 nostd::shared_ptr<metrics_api::Meter> MeterProvider::GetMeter(
-    nostd::string_view library_name,
-    nostd::string_view library_version,
+    nostd::string_view name,
+    nostd::string_view version,
     nostd::string_view schema_url) noexcept
 {
-  if (library_name.data() == nullptr || library_name == "")
+  if (name.data() == nullptr || name == "")
   {
     OTEL_INTERNAL_LOG_WARN("[MeterProvider::GetMeter] Library name is empty.");
-    library_name = "";
+    name = "";
   }
 
   const std::lock_guard<std::mutex> guard(lock_);
@@ -45,13 +45,12 @@ nostd::shared_ptr<metrics_api::Meter> MeterProvider::GetMeter(
   for (auto &meter : meters_)
   {
     auto &meter_lib = meter->GetInstrumentationLibrary();
-    if (meter_lib.equal(library_name, library_version, schema_url))
+    if (meter_lib.equal(name, version, schema_url))
     {
       return nostd::shared_ptr<metrics_api::Meter>{meter};
     }
   }
-  auto lib = instrumentationlibrary::InstrumentationLibrary::Create(library_name, library_version,
-                                                                    schema_url);
+  auto lib = instrumentationlibrary::InstrumentationLibrary::Create(name, version, schema_url);
   meters_.push_back(std::shared_ptr<Meter>(new Meter(context_, std::move(lib))));
   return nostd::shared_ptr<metrics_api::Meter>{meters_.back()};
 }

@@ -73,7 +73,6 @@ bool MeterContext::ForceFlush(std::chrono::microseconds timeout) noexcept
 {
   // TODO - Implement timeout logic.
   bool result_exporter = true;
-  bool result_reader   = true;
   for (auto &exporter : exporters_)
   {
     bool status     = exporter->ForceFlush(timeout);
@@ -83,16 +82,7 @@ bool MeterContext::ForceFlush(std::chrono::microseconds timeout) noexcept
   {
     OTEL_INTERNAL_LOG_WARN("[MeterContext::ForceFlush] Unable to force-flush all metric exporters");
   }
-  for (auto &reader : readers_)
-  {
-    bool status   = reader->ForceFlush(timeout);
-    result_reader = result_reader && status;
-  }
-  if (!result_reader)
-  {
-    OTEL_INTERNAL_LOG_WARN("[MeterContext::ForceFlush] Unable to force-flush all metric readers");
-  }
-  return result_exporter && result_reader;
+  return result_exporter;
 }
 
 }  // namespace metrics
