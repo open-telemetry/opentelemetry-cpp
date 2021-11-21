@@ -28,8 +28,8 @@ public:
    * @param views The views for this meter provider
    * @param resource  The resources for this meter provider.
    */
-  MeterProvider(std::vector<std::unique_ptr<MeterExporter>> &&exporters,
-                std::vector<std::unique_ptr<MeterReader>> &&readers,
+  MeterProvider(std::vector<std::unique_ptr<MetricExporter>> &&exporters,
+                std::vector<std::unique_ptr<MetricReader>> &&readers,
                 std::vector<std::unique_ptr<View>> &&views,
                 sdk::resource::Resource resource = sdk::resource::Resource::Create({})) noexcept;
 
@@ -51,24 +51,24 @@ public:
   const sdk::resource::Resource &GetResource() const noexcept;
 
   /**
-   * Attaches a meter exporter to list of configured exporters for this Meter provider.
-   * @param exporter The meter exporter for this meter provider. This
+   * Attaches a metric exporter to list of configured exporters for this Meter provider.
+   * @param exporter The metric exporter for this meter provider. This
    * must not be a nullptr.
    *
    * Note: This exporter may not receive any in-flight meter data, but will get newly created meter
    * data. Note: This method is not thread safe, and should ideally be called from main thread.
    */
-  void AddMeterExporter(std::unique_ptr<MeterExporter> exporter) noexcept;
+  void AddMetricExporter(std::unique_ptr<MetricExporter> exporter) noexcept;
 
   /**
-   * Attaches a meter reader to list of configured readers for this Meter providers.
-   * @param reader The meter reader for this meter provider. This
+   * Attaches a metric reader to list of configured readers for this Meter providers.
+   * @param reader The metric reader for this meter provider. This
    * must not be a nullptr.
    *
    * Note: This reader may not receive any in-flight meter data, but will get newly created meter
    * data. Note: This method is not thread safe, and should ideally be called from main thread.
    */
-  void AddMeterReader(std::unique_ptr<MeterReader> reader) noexcept;
+  void AddMetricReader(std::unique_ptr<MetricReader> reader) noexcept;
 
   /**
    * Attaches a View to list of configured Views for this Meter provider.

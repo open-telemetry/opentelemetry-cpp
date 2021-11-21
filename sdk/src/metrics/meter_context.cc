@@ -2,10 +2,9 @@
 // SPDX-License-Identifier: Apache-2.0
 
 #ifndef ENABLE_METRICS_PREVIEW
+#  include "opentelemetry/sdk/common/global_log_handler.h"
 #  include "opentelemetry/sdk/metrics/meter.h"
 #  include "opentelemetry/sdk_config.h"
-
-#  include "opentelemetry/sdk/common/global_log_handler.h"
 #  include "opentelemetry/version.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
@@ -14,8 +13,8 @@ namespace sdk
 namespace metrics
 {
 
-MeterContext::MeterContext(std::vector<std::unique_ptr<MeterExporter>> &&exporters,
-                           std::vector<std::unique_ptr<MeterReader>> &&readers,
+MeterContext::MeterContext(std::vector<std::unique_ptr<MetricExporter>> &&exporters,
+                           std::vector<std::unique_ptr<MetricReader>> &&readers,
                            std::vector<std::unique_ptr<View>> &&views,
                            opentelemetry::sdk::resource::Resource resource) noexcept
     : exporters_(std::move(exporters)),
@@ -29,12 +28,12 @@ const resource::Resource &MeterContext::GetResource() const noexcept
   return resource_;
 }
 
-void MeterContext::AddMeterExporter(std::unique_ptr<MeterExporter> exporter) noexcept
+void MeterContext::AddMetricExporter(std::unique_ptr<MetricExporter> exporter) noexcept
 {
   exporters_.push_back(std::move(exporter));
 }
 
-void MeterContext::AddMeterReader(std::unique_ptr<MeterReader> reader) noexcept
+void MeterContext::AddMetricReader(std::unique_ptr<MetricReader> reader) noexcept
 {
   readers_.push_back(std::move(reader));
 }

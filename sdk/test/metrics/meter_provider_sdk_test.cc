@@ -10,8 +10,8 @@ using namespace opentelemetry::sdk::metrics;
 
 TEST(MeterProvider, GetMeter)
 {
-  std::vector<std::unique_ptr<MeterExporter>> exporters;
-  std::vector<std::unique_ptr<MeterReader>> readers;
+  std::vector<std::unique_ptr<MetricExporter>> exporters;
+  std::vector<std::unique_ptr<MetricReader>> readers;
   std::vector<std::unique_ptr<View>> views;
   MeterProvider mp(std::move(exporters), std::move(readers), std::move(views));
   auto t1 = mp.GetMeter("test");

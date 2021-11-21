@@ -19,8 +19,8 @@ namespace metrics_api = opentelemetry::metrics;
 
 MeterProvider::MeterProvider(std::shared_ptr<MeterContext> context) noexcept : context_{context} {}
 
-MeterProvider::MeterProvider(std::vector<std::unique_ptr<MeterExporter>> &&exporters,
-                             std::vector<std::unique_ptr<MeterReader>> &&readers,
+MeterProvider::MeterProvider(std::vector<std::unique_ptr<MetricExporter>> &&exporters,
+                             std::vector<std::unique_ptr<MetricReader>> &&readers,
                              std::vector<std::unique_ptr<View>> &&views,
                              sdk::resource::Resource resource) noexcept
     : context_(std::make_shared<MeterContext>(std::move(exporters),
@@ -60,14 +60,14 @@ const resource::Resource &MeterProvider::GetResource() const noexcept
   return context_->GetResource();
 }
 
-void MeterProvider::AddMeterExporter(std::unique_ptr<MeterExporter> exporter) noexcept
+void MeterProvider::AddMetricExporter(std::unique_ptr<MetricExporter> exporter) noexcept
 {
-  return context_->AddMeterExporter(std::move(exporter));
+  return context_->AddMetricExporter(std::move(exporter));
 }
 
-void MeterProvider::AddMeterReader(std::unique_ptr<MeterReader> reader) noexcept
+void MeterProvider::AddMetricReader(std::unique_ptr<MetricReader> reader) noexcept
 {
-  return context_->AddMeterReader(std::move(reader));
+  return context_->AddMetricReader(std::move(reader));
 }
 
 void MeterProvider::AddView(std::unique_ptr<View> view) noexcept
