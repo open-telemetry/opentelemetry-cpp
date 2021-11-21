@@ -115,8 +115,8 @@ if(BUILD_TESTING)
   if(WITH_LOGS_PREVIEW)
     add_executable(otlp_log_recordable_test test/otlp_log_recordable_test.cc)
     target_link_libraries(
-      otlp_log_recordable_test ${GTEST_BOTH_LIBRARIES} ${CMAKE_THREAD_LIBS_INIT}
-      opentelemetry_otlp_recordable)
+      otlp_log_recordable_test ${GTEST_BOTH_LIBRARIES}
+      ${CMAKE_THREAD_LIBS_INIT} opentelemetry_otlp_recordable)
     gtest_add_tests(
       TARGET otlp_log_recordable_test
       TEST_PREFIX exporter.otlp.
