@@ -173,7 +173,7 @@ public:
 public:
   std::unique_ptr<sdk::trace::SpanExporter> GetExporter(HttpRequestContentType content_type)
   {
-    auto opts{GetDefaultOtlpHttpExporterOptions()};
+    auto opts          = GetDefaultOtlpHttpExporterOptions();
     opts.url           = server_address_;
     opts.content_type  = content_type;
     opts.console_debug = true;
@@ -323,8 +323,8 @@ TEST_F(OtlpHttpExporterTestPeer, ExportBinaryIntegrationTest)
 // Test exporter configuration options
 TEST_F(OtlpHttpExporterTestPeer, ConfigTest)
 {
-  auto opts{GetDefaultOtlpHttpExporterOptions()};
-  opts.url = "http://localhost:45455/v1/traces";
+  auto opts = GetDefaultOtlpHttpExporterOptions();
+  opts.url  = "http://localhost:45455/v1/traces";
   std::unique_ptr<OtlpHttpExporter> exporter(new OtlpHttpExporter(opts));
   EXPECT_EQ(GetOptions(exporter).url, "http://localhost:45455/v1/traces");
 }
@@ -332,7 +332,7 @@ TEST_F(OtlpHttpExporterTestPeer, ConfigTest)
 // Test exporter configuration options with use_json_name
 TEST_F(OtlpHttpExporterTestPeer, ConfigUseJsonNameTest)
 {
-  auto opts{GetDefaultOtlpHttpExporterOptions()};
+  auto opts          = GetDefaultOtlpHttpExporterOptions();
   opts.use_json_name = true;
   std::unique_ptr<OtlpHttpExporter> exporter(new OtlpHttpExporter(opts));
   EXPECT_EQ(GetOptions(exporter).use_json_name, true);
@@ -341,7 +341,7 @@ TEST_F(OtlpHttpExporterTestPeer, ConfigUseJsonNameTest)
 // Test exporter configuration options with json_bytes_mapping=JsonBytesMappingKind::kHex
 TEST_F(OtlpHttpExporterTestPeer, ConfigJsonBytesMappingTest)
 {
-  auto opts{GetDefaultOtlpHttpExporterOptions()};
+  auto opts               = GetDefaultOtlpHttpExporterOptions();
   opts.json_bytes_mapping = JsonBytesMappingKind::kHex;
   std::unique_ptr<OtlpHttpExporter> exporter(new OtlpHttpExporter(opts));
   EXPECT_EQ(GetOptions(exporter).json_bytes_mapping, JsonBytesMappingKind::kHex);
