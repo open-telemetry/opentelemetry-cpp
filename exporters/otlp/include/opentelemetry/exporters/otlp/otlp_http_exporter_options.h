@@ -45,7 +45,7 @@ struct OtlpHttpExporterOptions
   OtlpHeaders http_headers;
 };
 
-OtlpHttpExporterOptions GetDefaultOtlpHttpExporterOptions()
+inline OtlpHttpExporterOptions GetDefaultOtlpHttpExporterOptions()
 {
   return OtlpHttpExporterOptions{GetOtlpDefaultHttpEndpoint(),
                                  HttpRequestContentType::kJson,
@@ -56,7 +56,7 @@ OtlpHttpExporterOptions GetDefaultOtlpHttpExporterOptions()
                                  GetOtlpDefaultHeaders()};
 }
 
-OtlpHttpExporterOptions GetDefaultOtlpHttpLogExporterOptions()
+inline OtlpHttpExporterOptions GetDefaultOtlpHttpLogExporterOptions()
 {
   return OtlpHttpExporterOptions{GetOtlpDefaultHttpLogEndpoint(),
                                  HttpRequestContentType::kJson,
