@@ -2,30 +2,19 @@
 // SPDX-License-Identifier: Apache-2.0
 
 #include "opentelemetry/exporters/otlp/otlp_grpc_exporter.h"
+#include "opentelemetry/exporters/otlp/otlp_common.h"
 #include "opentelemetry/exporters/otlp/otlp_recordable.h"
 #include "opentelemetry/exporters/otlp/otlp_recordable_utils.h"
 #include "opentelemetry/ext/http/common/url_parser.h"
 #include "opentelemetry/sdk_config.h"
 
 #include <grpcpp/grpcpp.h>
-#include <fstream>
-#include <sstream>  // std::stringstream
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace exporter
 {
 namespace otlp
 {
-
-// ----------------------------- Helper functions ------------------------------
-static std::string get_file_contents(const char *fpath)
-{
-  std::ifstream finstream(fpath);
-  std::string contents;
-  contents.assign((std::istreambuf_iterator<char>(finstream)), std::istreambuf_iterator<char>());
-  finstream.close();
-  return contents;
-}
 
 /**
  * Create gRPC channel from the exporter options.

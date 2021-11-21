@@ -21,9 +21,9 @@ namespace exporter
 namespace otlp
 {
 
-OtlpHttpLogExporter::OtlpHttpLogExporter() : OtlpHttpLogExporter(OtlpHttpLogExporterOptions()) {}
+OtlpHttpLogExporter::OtlpHttpLogExporter() : OtlpHttpLogExporter(OtlpHttpExporterOptions()) {}
 
-OtlpHttpLogExporter::OtlpHttpLogExporter(const OtlpHttpLogExporterOptions &options)
+OtlpHttpLogExporter::OtlpHttpLogExporter(const OtlpHttpExporterOptions &options)
     : options_(options),
       http_client_(OtlpHttpClientOptions(options.url,
                                          options.content_type,

@@ -177,7 +177,7 @@ public:
 public:
   std::unique_ptr<sdk::logs::LogExporter> GetExporter(HttpRequestContentType content_type)
   {
-    OtlpHttpLogExporterOptions opts;
+    OtlpHttpExporterOptions opts;
     opts.url           = server_address_;
     opts.content_type  = content_type;
     opts.console_debug = true;
@@ -187,7 +187,7 @@ public:
   }
 
   // Get the options associated with the given exporter.
-  const OtlpHttpLogExporterOptions &GetOptions(std::unique_ptr<OtlpHttpLogExporter> &exporter)
+  const OtlpHttpExporterOptions &GetOptions(std::unique_ptr<OtlpHttpLogExporter> &exporter)
   {
     return exporter->options_;
   }
@@ -363,7 +363,7 @@ TEST_F(OtlpHttpLogExporterTestPeer, ExportBinaryIntegrationTest)
 // Test exporter configuration options
 TEST_F(OtlpHttpLogExporterTestPeer, ConfigTest)
 {
-  OtlpHttpLogExporterOptions opts;
+  OtlpHttpExporterOptions opts;
   opts.url = "http://localhost:45456/v1/logs";
   std::unique_ptr<OtlpHttpLogExporter> exporter(new OtlpHttpLogExporter(opts));
   EXPECT_EQ(GetOptions(exporter).url, "http://localhost:45456/v1/logs");
@@ -372,7 +372,7 @@ TEST_F(OtlpHttpLogExporterTestPeer, ConfigTest)
 // Test exporter configuration options with use_json_name
 TEST_F(OtlpHttpLogExporterTestPeer, ConfigUseJsonNameTest)
 {
-  OtlpHttpLogExporterOptions opts;
+  OtlpHttpExporterOptions opts;
   opts.use_json_name = true;
   std::unique_ptr<OtlpHttpLogExporter> exporter(new OtlpHttpLogExporter(opts));
   EXPECT_EQ(GetOptions(exporter).use_json_name, true);
@@ -381,7 +381,7 @@ TEST_F(OtlpHttpLogExporterTestPeer, ConfigUseJsonNameTest)
 // Test exporter configuration options with json_bytes_mapping=JsonBytesMappingKind::kHex
 TEST_F(OtlpHttpLogExporterTestPeer, ConfigJsonBytesMappingTest)
 {
-  OtlpHttpLogExporterOptions opts;
+  OtlpHttpExporterOptions opts;
   opts.json_bytes_mapping = JsonBytesMappingKind::kHex;
   std::unique_ptr<OtlpHttpLogExporter> exporter(new OtlpHttpLogExporter(opts));
   EXPECT_EQ(GetOptions(exporter).json_bytes_mapping, JsonBytesMappingKind::kHex);

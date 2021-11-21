@@ -4,6 +4,7 @@
 #ifdef ENABLE_LOGS_PREVIEW
 
 #  include "opentelemetry/exporters/otlp/otlp_grpc_log_exporter.h"
+#  include "opentelemetry/exporters/otlp/otlp_common.h"
 #  include "opentelemetry/exporters/otlp/otlp_log_recordable.h"
 #  include "opentelemetry/exporters/otlp/otlp_recordable_utils.h"
 
@@ -32,17 +33,6 @@ namespace exporter
 {
 namespace otlp
 {
-
-// ----------------------------- Helper functions ------------------------------
-// TODO: move exporters shared function to OTLP common library.
-static std::string get_file_contents(const char *fpath)
-{
-  std::ifstream finstream(fpath);
-  std::string contents;
-  contents.assign((std::istreambuf_iterator<char>(finstream)), std::istreambuf_iterator<char>());
-  finstream.close();
-  return contents;
-}
 
 struct OtlpGrpcExporterOptions;
 

@@ -42,7 +42,7 @@ void InitTracer()
   trace::Provider::SetTracerProvider(provider);
 }
 
-opentelemetry::exporter::otlp::OtlpHttpLogExporterOptions logger_opts;
+opentelemetry::exporter::otlp::OtlpHttpExporterOptions logger_opts;
 void InitLogger()
 {
   logger_opts.console_debug = true;
