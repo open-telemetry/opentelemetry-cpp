@@ -19,7 +19,7 @@ namespace exporter
 namespace otlp
 {
 
-OtlpHttpExporter::OtlpHttpExporter() : OtlpHttpExporter(OtlpHttpExporterOptions()) {}
+OtlpHttpExporter::OtlpHttpExporter() : OtlpHttpExporter(GetDefaultOtlpHttpExporterOptions()) {}
 
 OtlpHttpExporter::OtlpHttpExporter(const OtlpHttpExporterOptions &options)
     : options_(options),

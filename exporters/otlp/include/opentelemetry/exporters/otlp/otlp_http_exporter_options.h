@@ -22,28 +22,50 @@ struct OtlpHttpExporterOptions
   // @see
   // https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/protocol/otlp.md
   // @see https://github.com/open-telemetry/opentelemetry-collector/tree/main/receiver/otlpreceiver
-  std::string url = GetOtlpDefaultHttpEndpoint();
+  std::string url;
 
   // By default, post json data
-  HttpRequestContentType content_type = HttpRequestContentType::kJson;
+  HttpRequestContentType content_type;
 
   // If convert bytes into hex. By default, we will convert all bytes but id into base64
   // This option is ignored if content_type is not kJson
-  JsonBytesMappingKind json_bytes_mapping = JsonBytesMappingKind::kHexId;
+  JsonBytesMappingKind json_bytes_mapping;
 
   // If using the json name of protobuf field to set the key of json. By default, we will use the
   // field name just like proto files.
-  bool use_json_name = false;
+  bool use_json_name;
 
   // Whether to print the status of the exporter in the console
-  bool console_debug = false;
+  bool console_debug;
 
   // TODO: Enable/disable to verify SSL certificate
-  std::chrono::system_clock::duration timeout = GetOtlpDefaultTimeout();
+  std::chrono::system_clock::duration timeout;
 
   // Additional HTTP headers
-  OtlpHeaders http_headers = GetOtlpDefaultHeaders();
+  OtlpHeaders http_headers;
 };
+
+OtlpHttpExporterOptions GetDefaultOtlpHttpExporterOptions()
+{
+  return OtlpHttpExporterOptions{GetOtlpDefaultHttpEndpoint(),
+                                 HttpRequestContentType::kJson,
+                                 JsonBytesMappingKind::kHexId,
+                                 false,
+                                 false,
+                                 GetOtlpDefaultTimeout(),
+                                 GetOtlpDefaultHeaders()};
+}
+
+OtlpHttpExporterOptions GetDefaultOtlpHttpLogExporterOptions()
+{
+  return OtlpHttpExporterOptions{GetOtlpDefaultHttpLogEndpoint(),
+                                 HttpRequestContentType::kJson,
+                                 JsonBytesMappingKind::kHexId,
+                                 false,
+                                 false,
+                                 GetOtlpDefaultLogTimeout(),
+                                 GetOtlpDefaultLogHeaders()};
+}
 
 }  // namespace otlp
 }  // namespace exporter
