@@ -6,9 +6,9 @@ Protocol](https://github.com/open-telemetry/opentelemetry-specification/blob/mai
 
 The application in `grpc_main.cc` initializes an `OtlpGrpcExporter` instance,
 the application in `http_main.cc` initializes an `OtlpHttpExporter` instance.
-The application in `http_log_main.cc` initializes an `OtlpHttpLogExporter` instance
-The application in `grpc_log_main.cc` initializes an `OtlpGrpcLogExporter` instance
-and they register a tracer provider from the [OpenTelemetry
+The application in `http_log_main.cc` initializes an `OtlpHttpLogExporter` instance,
+the application in `grpc_log_main.cc` initializes an `OtlpGrpcLogExporter` instance.
+And they register a tracer provider from the [OpenTelemetry
 SDK](https://github.com/open-telemetry/opentelemetry-cpp). The application then
 calls a `foo_library` which has been instrumented using the [OpenTelemetry
 API](https://github.com/open-telemetry/opentelemetry-cpp/tree/main/api).
