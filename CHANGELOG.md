@@ -15,9 +15,19 @@ Increment the:
 
 ## [Unreleased]
 
+## [1.1.0] 2021-11-19
+
+* [BUILD] build release tarball when nlohmann-json not installed ([#1074](https://github.com/open-telemetry/opentelemetry-cpp/pull/1074))
+* [SDK] Bugfix: regex is neither working on GCC 4.9.x ([#1069](https://github.com/open-telemetry/opentelemetry-cpp/pull/1069))
+* [SDK] Improvement: span_id should not break strict aliasing. ([#1068](https://github.com/open-telemetry/opentelemetry-cpp/pull/1068))
+* [EXAMPLE] OTLP HTTP log example ([#1062](https://github.com/open-telemetry/opentelemetry-cpp/pull/1062))
+* [SDK] OTLP gRPC log export should fail after shutdown ([#1064](https://github.com/open-telemetry/opentelemetry-cpp/pull/1064))
+* [BUILD] Building otlp exporter from the release tarball ([#1056](https://github.com/open-telemetry/opentelemetry-cpp/pull/1056))
+* [METRICS] Move old metrics implementation to different directory, and rename targets to \_deprecated ([#1053](https://github.com/open-telemetry/opentelemetry-cpp/pull/1053))
 * [EXPORTER] Add OTLP/gRPC Log Exporter ([#1048](https://github.com/open-telemetry/opentelemetry-cpp/pull/1048))
 * [EXPORTER] Prometheus Exporter ([#1031](https://github.com/open-telemetry/opentelemetry-cpp/pull/1031))
 * [EXPORTER] Add OTLP/HTTP Log Exporter ([#1030](https://github.com/open-telemetry/opentelemetry-cpp/pull/1030))
+* [SDK] fix: issue 368- consistent namespace scope resolution ([#1008](https://github.com/open-telemetry/opentelemetry-cpp/pull/1008))
 
 ## [1.0.1] 2021-10-21
 
