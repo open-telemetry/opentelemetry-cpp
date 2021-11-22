@@ -29,7 +29,7 @@ namespace trace_sdk = opentelemetry::sdk::trace;
 namespace
 {
 
-auto opts{opentelemetry::exporter::otlp::GetDefaultOtlpHttpExporterOptions()};
+auto opts = opentelemetry::exporter::otlp::GetDefaultOtlpHttpExporterOptions();
 void InitTracer()
 {
   // Create OTLP exporter instance
@@ -42,7 +42,7 @@ void InitTracer()
   trace::Provider::SetTracerProvider(provider);
 }
 
-auto logger_opts{opentelemetry::exporter::otlp::GetDefaultOtlpHttpLogExporterOptions()};
+auto logger_opts = opentelemetry::exporter::otlp::GetDefaultOtlpHttpLogExporterOptions();
 void InitLogger()
 {
   logger_opts.console_debug = true;
