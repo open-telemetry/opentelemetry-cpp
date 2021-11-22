@@ -240,7 +240,7 @@ TEST_F(OtlpHttpExporterTestPeer, ExportJsonIntegrationTest)
     report_trace_id.assign(trace_id_hex, sizeof(trace_id_hex));
   }
 
-  ASSERT_TRUE(waitForRequests(2, old_count + 1));
+  ASSERT_TRUE(waitForRequests(8, old_count + 1));
   auto check_json                   = received_requests_json_.back();
   auto resource_span                = *check_json["resource_spans"].begin();
   auto instrumentation_library_span = *resource_span["instrumentation_library_spans"].begin();
@@ -310,7 +310,7 @@ TEST_F(OtlpHttpExporterTestPeer, ExportBinaryIntegrationTest)
     report_trace_id.assign(reinterpret_cast<char *>(trace_id_binary), sizeof(trace_id_binary));
   }
 
-  ASSERT_TRUE(waitForRequests(2, old_count + 1));
+  ASSERT_TRUE(waitForRequests(8, old_count + 1));
 
   auto received_trace_id = received_requests_binary_.back()
                                .resource_spans(0)
