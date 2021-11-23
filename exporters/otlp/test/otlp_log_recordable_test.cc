@@ -133,7 +133,7 @@ TEST(OtlpLogRecordable, DefaultResource)
 }
 
 // Test non-int single types. Int single types are tested using templates (see IntAttributeTest)
-TEST(OtlpLogRecordable, SetSingleAtrribute)
+TEST(OtlpLogRecordable, SetSingleAttribute)
 {
   OtlpLogRecordable rec;
   nostd::string_view bool_key = "bool_attr";
@@ -160,7 +160,7 @@ TEST(OtlpLogRecordable, SetSingleAtrribute)
 }
 
 // Test non-int array types. Int array types are tested using templates (see IntAttributeTest)
-TEST(OtlpLogRecordable, SetArrayAtrribute)
+TEST(OtlpLogRecordable, SetArrayAttribute)
 {
   OtlpLogRecordable rec;
   const int kArraySize = 3;
