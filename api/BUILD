@@ -18,4 +18,5 @@ cc_library(
     name = "api",
     hdrs = glob(["include/**/*.h"]),
     strip_include_prefix = "include",
+    tags = ["api"],
 )

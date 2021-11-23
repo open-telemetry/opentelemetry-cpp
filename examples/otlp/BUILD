@@ -3,7 +3,11 @@ cc_binary(
     srcs = [
         "grpc_main.cc",
     ],
-    tags = ["otlp"],
+    tags = [
+        "examples",
+        "otlp",
+        "otlp_grpc",
+    ],
     deps = [
         "//api",
         "//examples/common/foo_library:common_foo_library",
@@ -17,7 +21,11 @@ cc_binary(
     srcs = [
         "http_main.cc",
     ],
-    tags = ["otlp"],
+    tags = [
+        "examples",
+        "otlp",
+        "otlp_http",
+    ],
     deps = [
         "//api",
         "//examples/common/foo_library:common_foo_library",
@@ -31,7 +39,11 @@ cc_binary(
     srcs = [
         "http_log_main.cc",
     ],
-    tags = ["otlp"],
+    tags = [
+        "examples",
+        "otlp",
+        "otlp_http_log",
+    ],
     deps = [
         "//api",
         "//examples/common/logs_foo_library:common_logs_foo_library",
