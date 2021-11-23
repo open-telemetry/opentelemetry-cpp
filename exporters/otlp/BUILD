@@ -176,6 +176,16 @@ cc_test(
 )
 
 cc_test(
+    name = "otlp_log_recordable_test",
+    srcs = ["test/otlp_log_recordable_test.cc"],
+    deps = [
+        ":otlp_recordable",
+        "@com_github_opentelemetry_proto//:logs_service_proto_cc",
+        "@com_google_googletest//:gtest_main",
+    ],
+)
+
+cc_test(
     name = "otlp_grpc_exporter_test",
     srcs = ["test/otlp_grpc_exporter_test.cc"],
     tags = ["otlp"],
