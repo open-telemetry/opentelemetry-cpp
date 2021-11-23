@@ -6,6 +6,10 @@ cc_test(
     linkopts = [
         "-ldl",
     ],
+    tags = [
+        "api",
+        "test",
+    ],
     deps = [
         "//api",
         "@com_google_googletest//:gtest_main",
