@@ -31,7 +31,10 @@ cc_library(
 cc_test(
     name = "es_log_exporter_test",
     srcs = ["test/es_log_exporter_test.cc"],
-    tags = ["es"],
+    tags = [
+        "es",
+        "test",
+    ],
     deps = [
         ":es_log_exporter",
         "@com_google_googletest//:gtest_main",

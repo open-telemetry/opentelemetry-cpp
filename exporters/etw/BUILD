@@ -23,7 +23,10 @@ cc_test(
     local_defines = [
         "HAVE_MSGPACK",
     ],
-    tags = ["etw"],
+    tags = [
+        "etw",
+        "test",
+    ],
     deps = [
         ":etw_exporter",
         "@com_google_googletest//:gtest_main",
@@ -37,7 +40,10 @@ cc_test(
     local_defines = [
         "HAVE_MSGPACK",
     ],
-    tags = ["etw"],
+    tags = [
+        "etw",
+        "test",
+    ],
     deps = [
         ":etw_exporter",
         "@com_google_googletest//:gtest_main",

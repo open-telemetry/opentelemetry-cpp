@@ -3,6 +3,7 @@ cc_test(
     srcs = [
         "threadsafe_span_data_test.cc",
     ],
+    tags = ["test"],
     deps = [
         "//ext/src/zpages",
         "//sdk/src/trace",
@@ -15,6 +16,7 @@ cc_test(
     srcs = [
         "tracez_data_aggregator_test.cc",
     ],
+    tags = ["test"],
     deps = [
         "//ext/src/zpages",
         "//sdk/src/trace",
@@ -27,6 +29,7 @@ cc_test(
     srcs = [
         "tracez_processor_test.cc",
     ],
+    tags = ["test"],
     deps = [
         "//ext/src/zpages",
         "//sdk/src/trace",

@@ -3,6 +3,7 @@ cc_test(
     srcs = [
         "curl_http_test.cc",
     ],
+    tags = ["test"],
     deps = [
         "//ext:headers",
         "//ext/src/http/client/curl:http_client_curl",

@@ -5,6 +5,10 @@ cc_test(
     srcs = [
         "tracer_provider_test.cc",
     ],
+    tags = [
+        "test",
+        "trace",
+    ],
     deps = [
         "//sdk/src/resource",
         "//sdk/src/trace",
@@ -17,6 +21,10 @@ cc_test(
     srcs = [
         "span_data_test.cc",
     ],
+    tags = [
+        "test",
+        "trace",
+    ],
     deps = [
         "//sdk/src/trace",
         "@com_google_googletest//:gtest_main",
@@ -27,6 +35,10 @@ cc_test(
     name = "simple_processor_test",
     srcs = [
         "simple_processor_test.cc",
+    ],
+    tags = [
+        "test",
+        "trace",
     ],
     deps = [
         "//exporters/memory:in_memory_span_exporter",
@@ -40,6 +52,10 @@ cc_test(
     srcs = [
         "batch_span_processor_test.cc",
     ],
+    tags = [
+        "test",
+        "trace",
+    ],
     deps = [
         "//sdk/src/trace",
         "@com_google_googletest//:gtest_main",
@@ -50,6 +66,10 @@ cc_test(
     name = "tracer_test",
     srcs = [
         "tracer_test.cc",
+    ],
+    tags = [
+        "test",
+        "trace",
     ],
     deps = [
         "//exporters/memory:in_memory_span_exporter",
@@ -64,6 +84,10 @@ cc_test(
     srcs = [
         "always_on_sampler_test.cc",
     ],
+    tags = [
+        "test",
+        "trace",
+    ],
     deps = [
         "//sdk/src/trace",
         "@com_google_googletest//:gtest_main",
@@ -74,6 +98,10 @@ cc_test(
     name = "always_off_sampler_test",
     srcs = [
         "always_off_sampler_test.cc",
+    ],
+    tags = [
+        "test",
+        "trace",
     ],
     deps = [
         "//sdk/src/trace",
@@ -86,6 +114,10 @@ cc_test(
     srcs = [
         "parent_sampler_test.cc",
     ],
+    tags = [
+        "test",
+        "trace",
+    ],
     deps = [
         "//sdk/src/trace",
         "@com_google_googletest//:gtest_main",
@@ -97,6 +129,10 @@ cc_test(
     srcs = [
         "trace_id_ratio_sampler_test.cc",
     ],
+    tags = [
+        "test",
+        "trace",
+    ],
     deps = [
         "//sdk/src/common:random",
         "//sdk/src/trace",
@@ -107,6 +143,10 @@ cc_test(
 otel_cc_benchmark(
     name = "sampler_benchmark",
     srcs = ["sampler_benchmark.cc"],
+    tags = [
+        "test",
+        "trace",
+    ],
     deps = [
         "//exporters/memory:in_memory_span_exporter",
         "//sdk/src/resource",
