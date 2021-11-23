@@ -40,3 +40,17 @@ cc_binary(
         "//sdk/src/trace",
     ],
 )
+
+cc_binary(
+    name = "example_otlp_grpc_log",
+    srcs = [
+        "grpc_log_main.cc",
+    ],
+    deps = [
+        "//api",
+        "//examples/common/logs_foo_library:common_logs_foo_library",
+        "//exporters/otlp:otlp_grpc_exporter",
+        "//exporters/otlp:otlp_grpc_log_exporter",
+        "//sdk/src/trace",
+    ],
+)
