@@ -24,6 +24,7 @@ cc_library(
     name = "tracer_common",
     srcs = ["tracer_common.h"],
     defines = ["BAZEL_BUILD"],
+    tags = ["ostream"],
     deps = [
         "//exporters/ostream:ostream_span_exporter",
     ],
@@ -35,6 +36,7 @@ cc_binary(
         "client.cc",
     ],
     defines = ["BAZEL_BUILD"],
+    tags = ["ostream"],
     deps = [
         "messages_cc_grpc",
         ":tracer_common",
@@ -50,6 +52,7 @@ cc_binary(
         "server.cc",
     ],
     defines = ["BAZEL_BUILD"],
+    tags = ["ostream"],
     deps = [
         "messages_cc_grpc",
         ":tracer_common",

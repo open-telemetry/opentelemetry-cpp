@@ -31,6 +31,7 @@ cc_library(
         "include/opentelemetry/exporters/otlp/protobuf_include_suffix.h",
     ],
     strip_include_prefix = "include",
+    tags = ["otlp"],
     deps = [
         "//sdk/src/logs",
         "//sdk/src/resource",
@@ -53,6 +54,7 @@ cc_library(
         "include/opentelemetry/exporters/otlp/protobuf_include_suffix.h",
     ],
     strip_include_prefix = "include",
+    tags = ["otlp"],
     deps = [
         ":otlp_recordable",
         "//ext:headers",
@@ -86,6 +88,7 @@ cc_library(
         "//conditions:default": [],
     }),
     strip_include_prefix = "include",
+    tags = ["otlp"],
     deps = [
         "//api",
         "//ext/src/http/client/curl:http_client_curl",
@@ -107,6 +110,7 @@ cc_library(
         "include/opentelemetry/exporters/otlp/protobuf_include_suffix.h",
     ],
     strip_include_prefix = "include",
+    tags = ["otlp"],
     deps = [
         ":otlp_http_client",
         ":otlp_recordable",
@@ -127,6 +131,7 @@ cc_library(
         "include/opentelemetry/exporters/otlp/protobuf_include_suffix.h",
     ],
     strip_include_prefix = "include",
+    tags = ["otlp"],
     deps = [
         ":otlp_http_client",
         ":otlp_recordable",
@@ -148,6 +153,7 @@ cc_library(
         "include/opentelemetry/exporters/otlp/protobuf_include_suffix.h",
     ],
     strip_include_prefix = "include",
+    tags = ["otlp"],
     deps = [
         ":otlp_recordable",
         "//ext:headers",
@@ -162,6 +168,7 @@ cc_library(
 cc_test(
     name = "otlp_recordable_test",
     srcs = ["test/otlp_recordable_test.cc"],
+    tags = ["otlp"],
     deps = [
         ":otlp_recordable",
         "@com_google_googletest//:gtest_main",
@@ -171,6 +178,7 @@ cc_test(
 cc_test(
     name = "otlp_grpc_exporter_test",
     srcs = ["test/otlp_grpc_exporter_test.cc"],
+    tags = ["otlp"],
     deps = [
         ":otlp_grpc_exporter",
         "//api",
@@ -181,6 +189,7 @@ cc_test(
 cc_test(
     name = "otlp_http_exporter_test",
     srcs = ["test/otlp_http_exporter_test.cc"],
+    tags = ["otlp"],
     deps = [
         ":otlp_http_exporter",
         "//api",
@@ -191,6 +200,7 @@ cc_test(
 cc_test(
     name = "otlp_http_log_exporter_test",
     srcs = ["test/otlp_http_log_exporter_test.cc"],
+    tags = ["otlp"],
     deps = [
         ":otlp_http_log_exporter",
         "//api",
@@ -201,6 +211,7 @@ cc_test(
 cc_test(
     name = "otlp_grpc_log_exporter_test",
     srcs = ["test/otlp_grpc_log_exporter_test.cc"],
+    tags = ["otlp"],
     deps = [
         ":otlp_grpc_log_exporter",
         "//api",
@@ -212,6 +223,7 @@ cc_test(
 otel_cc_benchmark(
     name = "otlp_grpc_exporter_benchmark",
     srcs = ["test/otlp_grpc_exporter_benchmark.cc"],
+    tags = ["otlp"],
     deps = [
         ":otlp_grpc_exporter",
     ],
