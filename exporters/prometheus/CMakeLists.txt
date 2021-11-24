@@ -30,8 +30,8 @@ set(PROMETHEUS_EXPORTER_TARGETS prometheus_exporter_deprecated)
 if(TARGET pull)
   list(APPEND PROMETHEUS_EXPORTER_TARGETS pull)
 endif()
-if(TARGET push)
-  list(APPEND PROMETHEUS_EXPORTER_TARGETS push)
+if(TARGET core)
+  list(APPEND PROMETHEUS_EXPORTER_TARGETS core)
 endif()
 target_link_libraries(
   prometheus_exporter_deprecated
