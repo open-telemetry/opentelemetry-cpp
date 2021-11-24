@@ -3,6 +3,7 @@ cc_binary(
     srcs = [
         "main.cc",
     ],
+    tags = ["ostream"],
     deps = [
         "//api",
         "//exporters/ostream:ostream_span_exporter",
