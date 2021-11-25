@@ -103,29 +103,17 @@ static void BM_ProcYieldSpinLockThrashing(benchmark::State &s)
 // SpinLock thrashing with thread::yield() after N spins.
 static void BM_ThreadYieldSpinLockThrashing(benchmark::State &s)
 {
-  std::atomic<bool> mutex(false);
-  SpinThrash<std::atomic<bool>>(
+  std::atomic_flag mutex = ATOMIC_FLAG_INIT;
+  SpinThrash<std::atomic_flag>(
       s, mutex,
-      [](std::atomic<bool> &l) {
-        if (!l.exchange(true, std::memory_order_acq_rel))
+      [](std::atomic_flag &l) {
+        while (l.test_and_set(std::memory_order_acq_rel))
         {
-          return;
-        }
-        for (std::size_t i = 0; i < 128; ++i)
-        {
-          if (!l.load(std::memory_order_acquire) && !l.exchange(true, std::memory_order_acq_rel))
-          {
-            return;
-          }
-
-          if (i % 32 == 0)
-          {
-            std::this_thread::yield();
-          }
+          ;
         }
         std::this_thread::yield();
       },
-      [](std::atomic<bool> &l) { l.store(false, std::memory_order_release); });
+      [](std::atomic_flag &l) { l.clear(std::memory_order_release); });
 }
 
 // Run the benchmarks at 2x thread/core and measure the amount of time to thrash around.
