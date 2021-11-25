@@ -20,30 +20,30 @@
 #   OPENTELEMETRY_VERSION           - Version of opentelemetry-cpp.
 #
 # ::
-#   opentelemetry-cpp::api                        - Imported target of opentelemetry-cpp::api
-#   opentelemetry-cpp::sdk                        - Imported target of opentelemetry-cpp::sdk
-#   opentelemetry-cpp::ext                        - Imported target of opentelemetry-cpp::ext
-#   opentelemetry-cpp::version                    - Imported target of opentelemetry-cpp::version
-#   opentelemetry-cpp::common                     - Imported target of opentelemetry-cpp::common
-#   opentelemetry-cpp::trace                      - Imported target of opentelemetry-cpp::trace
-#   opentelemetry-cpp::metrics                    - Imported target of opentelemetry-cpp::metrics
-#   opentelemetry-cpp::logs                       - Imported target of opentelemetry-cpp::logs
-#   opentelemetry-cpp::in_memory_span_exporter    - Imported target of opentelemetry-cpp::in_memory_span_exporter
-#   opentelemetry-cpp::otlp_recordable            - Imported target of opentelemetry-cpp::otlp_recordable
-#   opentelemetry-cpp::otlp_grpc_exporter         - Imported target of opentelemetry-cpp::otlp_grpc_exporter
-#   opentelemetry-cpp::otlp_grpc_log_exporter     - Imported target of opentelemetry-cpp::otlp_grpc_log_exporter
-#   opentelemetry-cpp::otlp_http_client           - Imported target of opentelemetry-cpp::otlp_http_client
-#   opentelemetry-cpp::otlp_http_exporter         - Imported target of opentelemetry-cpp::otlp_http_exporter
-#   opentelemetry-cpp::otlp_http_log_exporter     - Imported target of opentelemetry-cpp::otlp_http_log_exporter
-#   opentelemetry-cpp::ostream_log_exporter       - Imported target of opentelemetry-cpp::ostream_log_exporter
-#   opentelemetry-cpp::ostream_metrics_exporter   - Imported target of opentelemetry-cpp::ostream_metrics_exporter
-#   opentelemetry-cpp::ostream_span_exporter      - Imported target of opentelemetry-cpp::ostream_span_exporter
-#   opentelemetry-cpp::prometheus_exporter        - Imported target of opentelemetry-cpp::prometheus_exporter
-#   opentelemetry-cpp::elasticsearch_log_exporter - Imported target of opentelemetry-cpp::elasticsearch_log_exporter
-#   opentelemetry-cpp::etw_exporter               - Imported target of opentelemetry-cpp::etw_exporter
-#   opentelemetry-cpp::jaeger_trace_exporter      - Imported target of opentelemetry-cpp::jaeger_trace_exporter
-#   opentelemetry-cpp::zpages                     - Imported target of opentelemetry-cpp::zpages
-#   opentelemetry-cpp::http_client_curl           - Imported target of opentelemetry-cpp::http_client_curl
+#   opentelemetry-cpp::api                            - Imported target of opentelemetry-cpp::api
+#   opentelemetry-cpp::sdk                            - Imported target of opentelemetry-cpp::sdk
+#   opentelemetry-cpp::ext                            - Imported target of opentelemetry-cpp::ext
+#   opentelemetry-cpp::version                        - Imported target of opentelemetry-cpp::version
+#   opentelemetry-cpp::common                         - Imported target of opentelemetry-cpp::common
+#   opentelemetry-cpp::trace                          - Imported target of opentelemetry-cpp::trace
+#   opentelemetry-cpp::metrics                        - Imported target of opentelemetry-cpp::metrics
+#   opentelemetry-cpp::logs                           - Imported target of opentelemetry-cpp::logs
+#   opentelemetry-cpp::in_memory_span_exporter        - Imported target of opentelemetry-cpp::in_memory_span_exporter
+#   opentelemetry-cpp::otlp_recordable                - Imported target of opentelemetry-cpp::otlp_recordable
+#   opentelemetry-cpp::otlp_grpc_exporter             - Imported target of opentelemetry-cpp::otlp_grpc_exporter
+#   opentelemetry-cpp::otlp_grpc_log_exporter         - Imported target of opentelemetry-cpp::otlp_grpc_log_exporter
+#   opentelemetry-cpp::otlp_http_client               - Imported target of opentelemetry-cpp::otlp_http_client
+#   opentelemetry-cpp::otlp_http_exporter             - Imported target of opentelemetry-cpp::otlp_http_exporter
+#   opentelemetry-cpp::otlp_http_log_exporter         - Imported target of opentelemetry-cpp::otlp_http_log_exporter
+#   opentelemetry-cpp::ostream_log_exporter           - Imported target of opentelemetry-cpp::ostream_log_exporter
+#   opentelemetry-cpp::ostream_metrics_exporter       - Imported target of opentelemetry-cpp::ostream_metrics_exporter
+#   opentelemetry-cpp::ostream_span_exporter          - Imported target of opentelemetry-cpp::ostream_span_exporter
+#   opentelemetry-cpp::prometheus_exporter_deprecated - Imported target of opentelemetry-cpp::prometheus_exporter_deprecated
+#   opentelemetry-cpp::elasticsearch_log_exporter     - Imported target of opentelemetry-cpp::elasticsearch_log_exporter
+#   opentelemetry-cpp::etw_exporter                   - Imported target of opentelemetry-cpp::etw_exporter
+#   opentelemetry-cpp::jaeger_trace_exporter          - Imported target of opentelemetry-cpp::jaeger_trace_exporter
+#   opentelemetry-cpp::zpages                         - Imported target of opentelemetry-cpp::zpages
+#   opentelemetry-cpp::http_client_curl               - Imported target of opentelemetry-cpp::http_client_curl
 #
 
 # =============================================================================
