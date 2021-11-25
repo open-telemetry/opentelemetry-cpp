@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 #include "thrift_sender.h"
+#include <opentelemetry/exporters/jaeger/recordable.h>
 #include "udp_transport.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE

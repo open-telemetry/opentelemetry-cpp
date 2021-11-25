@@ -9,7 +9,6 @@
 #include <mutex>
 #include <vector>
 
-#include <opentelemetry/exporters/jaeger/recordable.h>
 #include <thrift/protocol/TCompactProtocol.h>
 #include <thrift/transport/TBufferTransports.h>
 

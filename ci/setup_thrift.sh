@@ -17,6 +17,10 @@ apt install -y --no-install-recommends \
       libssl-dev \
       ninja-build
 
+if [[ "$1" == "dependencies_only" ]]; then
+    exit 0;
+fi
+
 pushd $BUILD_DIR
 wget https://github.com/apache/thrift/archive/refs/tags/v${THRIFT_VERSION}.tar.gz
 tar -zxvf v${THRIFT_VERSION}.tar.gz
