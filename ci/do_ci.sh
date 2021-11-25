@@ -27,7 +27,7 @@ BAZEL_OPTIONS="--copt=-DENABLE_METRICS_PREVIEW --copt=-DENABLE_LOGS_PREVIEW"
 BAZEL_TEST_OPTIONS="$BAZEL_OPTIONS --test_output=errors"
 
 # https://github.com/bazelbuild/bazel/issues/4341
-BAZEL_MACOS_OPTIONS="$BAZEL_OPRIONS --features=-supports_dynamic_linker"
+BAZEL_MACOS_OPTIONS="$BAZEL_OPRIONS --features=-supports_dynamic_linker --build_tag_filters=-jaeger"
 BAZEL_MACOS_TEST_OPTIONS="$BAZEL_MACOS_OPTIONS --test_output=errors"
 
 BAZEL_STARTUP_OPTIONS="--output_user_root=$HOME/.cache/bazel"

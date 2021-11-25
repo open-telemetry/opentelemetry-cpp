@@ -3,6 +3,7 @@
 
 #pragma once
 
+#include <opentelemetry/exporters/jaeger/recordable.h>
 #include <opentelemetry/version.h>
 
 OPENTELEMETRY_BEGIN_NAMESPACE
