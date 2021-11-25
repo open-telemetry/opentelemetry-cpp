@@ -111,6 +111,18 @@ if(BUILD_TESTING)
     TARGET otlp_recordable_test
     TEST_PREFIX exporter.otlp.
     TEST_LIST otlp_recordable_test)
+
+  if(WITH_LOGS_PREVIEW)
+    add_executable(otlp_log_recordable_test test/otlp_log_recordable_test.cc)
+    target_link_libraries(
+      otlp_log_recordable_test ${GTEST_BOTH_LIBRARIES}
+      ${CMAKE_THREAD_LIBS_INIT} opentelemetry_otlp_recordable)
+    gtest_add_tests(
+      TARGET otlp_log_recordable_test
+      TEST_PREFIX exporter.otlp.
+      TEST_LIST otlp_log_recordable_test)
+  endif()
+
   if(MSVC)
     # Explicitly specify that we consume GTest from shared library. The rest of
     # code logic below determines whether we link Release or Debug flavor of the

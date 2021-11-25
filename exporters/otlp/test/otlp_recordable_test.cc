@@ -221,7 +221,7 @@ TEST(OtlpRecordable, SetResourceWithSchemaURL)
 }
 
 // Test non-int single types. Int single types are tested using templates (see IntAttributeTest)
-TEST(OtlpRecordable, SetSingleAtrribute)
+TEST(OtlpRecordable, SetSingleAttribute)
 {
   OtlpRecordable rec;
   nostd::string_view bool_key = "bool_attr";
@@ -248,7 +248,7 @@ TEST(OtlpRecordable, SetSingleAtrribute)
 }
 
 // Test non-int array types. Int array types are tested using templates (see IntAttributeTest)
-TEST(OtlpRecordable, SetArrayAtrribute)
+TEST(OtlpRecordable, SetArrayAttribute)
 {
   OtlpRecordable rec;
   const int kArraySize = 3;

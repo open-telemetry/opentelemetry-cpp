@@ -9,6 +9,7 @@ cc_library(
         "include/opentelemetry/exporters/zipkin/recordable.h",
     ],
     strip_include_prefix = "include",
+    tags = ["zipkin"],
     deps = [
         "//sdk/src/resource",
         "//sdk/src/trace",
@@ -28,6 +29,7 @@ cc_library(
         "-DCURL_STATICLIB",
     ],
     strip_include_prefix = "include",
+    tags = ["zipkin"],
     deps = [
         ":zipkin_recordable",
         "//ext/src/http/client/curl:http_client_curl",
@@ -37,6 +39,7 @@ cc_library(
 cc_test(
     name = "zipkin_recordable_test",
     srcs = ["test/zipkin_recordable_test.cc"],
+    tags = ["zipkin"],
     deps = [
         ":zipkin_recordable",
         "@com_google_googletest//:gtest_main",

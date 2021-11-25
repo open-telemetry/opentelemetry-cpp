@@ -15,6 +15,7 @@ cc_binary(
         ],
         "//conditions:default": [],
     }),
+    tags = ["ostream"],
     deps = [
         "//api",
         "//exporters/ostream:ostream_span_exporter",
@@ -31,6 +32,7 @@ cc_binary(
         "server.h",
         "tracer_common.h",
     ],
+    tags = ["ostream"],
     deps = [
         "//api",
         "//exporters/ostream:ostream_span_exporter",

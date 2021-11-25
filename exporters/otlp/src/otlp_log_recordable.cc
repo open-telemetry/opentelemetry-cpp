@@ -17,8 +17,10 @@ namespace otlp
 
 proto::resource::v1::Resource OtlpLogRecordable::ProtoResource() const noexcept
 {
-  // TODO Populate shared resource
-  return private_resource_;
+  proto::resource::v1::Resource proto;
+  OtlpRecordableUtils::PopulateAttribute(
+      &proto, opentelemetry::sdk::resource::Resource::Create(resource_attributes_));
+  return proto;
 }
 
 void OtlpLogRecordable::SetTimestamp(opentelemetry::common::SystemTimestamp timestamp) noexcept
@@ -171,7 +173,7 @@ void OtlpLogRecordable::SetBody(nostd::string_view message) noexcept
 void OtlpLogRecordable::SetResource(nostd::string_view key,
                                     const opentelemetry::common::AttributeValue &value) noexcept
 {
-  OtlpRecordableUtils::PopulateAttribute(private_resource_.add_attributes(), key, value);
+  resource_attributes_.SetAttribute(key, value);
 }
 
 void OtlpLogRecordable::SetAttribute(nostd::string_view key,

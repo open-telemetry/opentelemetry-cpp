@@ -23,6 +23,7 @@ cc_library(
         "include/opentelemetry/exporters/prometheus/prometheus_exporter.h",
     ],
     strip_include_prefix = "include",
+    tags = ["prometheus"],
     deps = [
         ":prometheus_collector",
         ":prometheus_exporter_utils",
@@ -42,6 +43,7 @@ cc_library(
         "include/opentelemetry/exporters/prometheus/prometheus_exporter_utils.h",
     ],
     strip_include_prefix = "include",
+    tags = ["prometheus"],
     deps = [
         "//api",
         "//sdk:headers",
@@ -59,6 +61,7 @@ cc_library(
         "include/opentelemetry/exporters/prometheus/prometheus_collector.h",
     ],
     strip_include_prefix = "include",
+    tags = ["prometheus"],
     deps = [
         ":prometheus_exporter_utils",
         "//api",
@@ -73,6 +76,7 @@ cc_test(
     srcs = [
         "test/prometheus_exporter_test.cc",
     ],
+    tags = ["prometheus"],
     deps = [
         ":prometheus_exporter",
         "@com_google_googletest//:gtest_main",

@@ -6,6 +6,7 @@ cc_library(
         "include/opentelemetry/exporters/memory/in_memory_span_data.h",
     ],
     strip_include_prefix = "include",
+    tags = ["memory"],
     deps = [
         "//api",
         "//sdk/src/resource",
@@ -15,6 +16,7 @@ cc_library(
 
 cc_test(
     name = "in_memory_span_data_test",
+    tags = ["memory"],
     deps = [
         ":in_memory_span_data",
         "@com_google_googletest//:gtest_main",
@@ -27,6 +29,7 @@ cc_library(
         "include/opentelemetry/exporters/memory/in_memory_span_exporter.h",
     ],
     strip_include_prefix = "include",
+    tags = ["memory"],
     deps = [
         ":in_memory_span_data",
         "//sdk/src/trace",
@@ -35,6 +38,7 @@ cc_library(
 
 cc_test(
     name = "in_memory_span_exporter_test",
+    tags = ["memory"],
     deps = [
         ":in_memory_span_exporter",
         "@com_google_googletest//:gtest_main",
