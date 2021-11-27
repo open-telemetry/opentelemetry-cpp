@@ -26,8 +26,8 @@ cmake(
         "libthriftz.a",
     ],
     tags = ["jaeger"],
-    target_compatible_with = [
-        "@platforms//os:linux",
+    deps = [
+        "@boost//:math",
     ],
 )
 
