@@ -252,7 +252,7 @@ jobs:
         path: /Users/runner/.cache/bazel
         key: bazel_osx
     - name: setup
-      run: ./ci/do_ci.sh bazel.macos.test
+      run: ./ci/setup_thrift.sh
     - name: run tests
       run: ./ci/do_ci.sh bazel.macos.test
 
