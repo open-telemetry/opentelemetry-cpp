@@ -19,6 +19,7 @@ cmake(
         "WITH_HASKELL": "OFF",
         "CMAKE_CXX_FLAGS": "-fexceptions",
     },
+    copts = ["-fexceptions"],
     lib_source = "@thrift//:all_srcs",
     out_static_libs = [
         "libthrift.a",
@@ -27,7 +28,7 @@ cmake(
     ],
     tags = ["jaeger"],
     deps = [
-        "@boost//:math",
+        "@boost//:locale",
         "@boost//:numeric_conversion",
     ],
 )
