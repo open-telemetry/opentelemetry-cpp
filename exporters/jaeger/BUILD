@@ -1,6 +1,6 @@
 package(default_visibility = ["//visibility:public"])
 
-load("@rules_foreign_cc//foreign_cc:defs.bzl", "cmake", "configure_make", "configure_make_variant")
+load("@rules_foreign_cc//foreign_cc:defs.bzl", "cmake", "configure_make")
 
 configure_make(
     name = "openssl",
@@ -9,10 +9,16 @@ configure_make(
         "shared",
     ],
     lib_source = "@openssl//:all_srcs",
-    out_shared_libs = [
-        "libssl.so",
-        "libcrypto.so",
-    ],
+    out_shared_libs = select({
+        "@platforms//os:windows": [
+            "libssl.dll",
+            "libcrypto.dll",
+        ],
+        "//conditions:default": [
+            "libssl.so",
+            "libcrypto.so",
+        ],
+    }),
     tags = ["jaeger"],
 )
 
@@ -35,11 +41,18 @@ cmake(
     },
     copts = ["-fexceptions"],
     lib_source = "@thrift//:all_srcs",
-    out_static_libs = [
-        "libthrift.a",
-        "libthriftnb.a",
-        "libthriftz.a",
-    ],
+    out_static_libs = select({
+        "@platforms//os:windows": [
+            "libthrift.lib",
+            "libthriftnb.ĺib",
+            "libthriftz.lib",
+        ],
+        "//conditions:default": [
+            "libthrift.a",
+            "libthriftnb.a",
+            "libthriftz.a",
+        ],
+    }),
     tags = ["jaeger"],
     visibility = ["//visibility:private"],
     deps = [
