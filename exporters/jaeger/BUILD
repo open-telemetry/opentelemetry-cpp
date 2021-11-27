@@ -1,52 +1,5 @@
 package(default_visibility = ["//visibility:public"])
 
-load("@rules_foreign_cc//foreign_cc:defs.bzl", "cmake", "configure_make")
-
-cmake(
-    name = "thrift",
-    cache_entries = {
-        "CMAKE_BUILD_TYPE": "Release",
-        "BUILD_COMPILER": "OFF",
-        "BUILD_CPP": "ON",
-        "BUILD_LIBRARIES": "ON",
-        "BUILD_NODEJS": "OFF",
-        "BUILD_PYTHON": "OFF",
-        "BUILD_JAVASCRIPT": "OFF",
-        "BUILD_C_GLIB": "OFF",
-        "BUILD_JAVA": "OFF",
-        "BUILD_TESTING": "OFF",
-        "BUILD_TUTORIALS": "OFF",
-        "WITH_HASKELL": "OFF",
-        "CMAKE_CXX_FLAGS": "-fexceptions",
-    },
-    copts = ["-fexceptions"],
-    lib_source = "@thrift//:all_srcs",
-    out_static_libs = select({
-        "@platforms//os:windows": [
-            "libthrift.lib",
-            "libthriftnb.lib",
-            "libthriftz.lib",
-        ],
-        "@platforms//os:osx": [
-            "libthrift.a",
-            "libthriftnb.a",
-            "libthriftz.a",
-        ],
-        "@platforms//os:linux": [
-            "libthrift.a",
-            "libthriftnb.a",
-            "libthriftz.a",
-        ],
-    }),
-    tags = ["jaeger"],
-    visibility = ["//visibility:private"],
-    deps = [
-        ":openssl",
-        "@boost//:locale",
-        "@boost//:numeric_conversion",
-    ],
-)
-
 cc_library(
     name = "jaeger_thrift_gencpp",
     srcs = [
@@ -70,7 +23,6 @@ cc_library(
     strip_include_prefix = "thrift-gen",
     tags = ["jaeger"],
     deps = [
-        ":thrift",
         "//ext/src/http/client/curl:http_client_curl",
     ],
 )
