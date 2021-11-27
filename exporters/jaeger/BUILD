@@ -1,6 +1,19 @@
 package(default_visibility = ["//visibility:public"])
 
-load("@rules_foreign_cc//foreign_cc:defs.bzl", "cmake")
+load("@rules_foreign_cc//foreign_cc:defs.bzl", "cmake", "configure_make", "configure_make_variant")
+
+configure_make(
+    name = "openssl",
+    configure_command = "config",
+    configure_options = [
+        "shared",
+    ],
+    lib_source = "@openssl//:all_srcs",
+    out_shared_libs = [
+        "libssl.so",
+        "libcrypto.so",
+    ],
+)
 
 cmake(
     name = "thrift",
@@ -27,7 +40,9 @@ cmake(
         "libthriftz.a",
     ],
     tags = ["jaeger"],
+    visibility = ["//visibility:private"],
     deps = [
+        ":openssl",
         "@boost//:locale",
         "@boost//:numeric_conversion",
     ],
