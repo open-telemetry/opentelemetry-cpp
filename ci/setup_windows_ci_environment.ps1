@@ -17,4 +17,7 @@ $VCPKG_DIR=(Get-Item -Path ".\").FullName
 # nlohmann-json
 ./vcpkg install nlohmann-json:x64-windows
 
+# thrift
+./vcpkg install openssl-windows:x64-windows
+
 Pop-Location
