@@ -14,12 +14,27 @@ configure_make(
             "libssl.dll",
             "libcrypto.dll",
         ],
-        "//conditions:default": [
+        "@platforms//os:osx": [
+            "libssl.so",
+            "libcrypto.so",
+        ],
+        "@platforms//os:linux": [
             "libssl.so",
             "libcrypto.so",
         ],
     }),
     tags = ["jaeger"],
+    visibility = ["//visibility:private"],
+)
+
+cc_library(
+    name = "openssl-hdrs",
+    hdrs = [
+        ":openssl/include/bio.h",
+    ],
+    deps = [
+        ":openssl",
+    ],
 )
 
 cmake(
@@ -44,10 +59,15 @@ cmake(
     out_static_libs = select({
         "@platforms//os:windows": [
             "libthrift.lib",
-            "libthriftnb.ĺib",
+            "libthriftnb.lib",
             "libthriftz.lib",
         ],
-        "//conditions:default": [
+        "@platforms//os:osx": [
+            "libthrift.a",
+            "libthriftnb.a",
+            "libthriftz.a",
+        ],
+        "@platforms//os:linux": [
             "libthrift.a",
             "libthriftnb.a",
             "libthriftz.a",
@@ -57,6 +77,7 @@ cmake(
     visibility = ["//visibility:private"],
     deps = [
         ":openssl",
+        ":openssl-hdrs",
         "@boost//:locale",
         "@boost//:numeric_conversion",
     ],
