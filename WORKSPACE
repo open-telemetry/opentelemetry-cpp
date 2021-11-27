@@ -47,6 +47,7 @@ http_archive(
     url = "https://github.com/bazelbuild/rules_foreign_cc/archive/0.6.0.tar.gz",
 )
 
+#load("@rules_foreign_cc//:workspace_definitions.bzl", "rules_foreign_cc_dependencies")
 load("@rules_foreign_cc//foreign_cc:repositories.bzl", "rules_foreign_cc_dependencies")
 
 rules_foreign_cc_dependencies()
@@ -81,3 +82,13 @@ git_repository(
 load("@com_github_nelhage_rules_boost//:boost/boost.bzl", "boost_deps")
 
 boost_deps()
+
+http_archive(
+    name = "openssl",
+    build_file_content = _ALL_CONTENT,
+    sha256 = "0b7a3e5e59c34827fe0c3a74b7ec8baef302b98fa80088d7f9153aa16fa76bd1",
+    strip_prefix = "openssl-1.1.1l",
+    urls = [
+        "https://www.openssl.org/source/openssl-1.1.1l.tar.gz",
+    ],
+)
