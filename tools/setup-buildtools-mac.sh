@@ -31,3 +31,4 @@ brew install google-benchmark
 brew tap nlohmann/json
 brew install nlohmann-json
 brew install abseil
+brew install thrift

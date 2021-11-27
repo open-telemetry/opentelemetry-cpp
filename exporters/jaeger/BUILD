@@ -2,41 +2,6 @@ package(default_visibility = ["//visibility:public"])
 
 load("@rules_foreign_cc//foreign_cc:defs.bzl", "cmake", "configure_make")
 
-configure_make(
-    name = "openssl",
-    configure_command = "config",
-    configure_options = [
-        "shared",
-    ],
-    lib_source = "@openssl//:all_srcs",
-    out_shared_libs = select({
-        "@platforms//os:windows": [
-            "libssl.dll",
-            "libcrypto.dll",
-        ],
-        "@platforms//os:osx": [
-            "libssl.so",
-            "libcrypto.so",
-        ],
-        "@platforms//os:linux": [
-            "libssl.so",
-            "libcrypto.so",
-        ],
-    }),
-    tags = ["jaeger"],
-    visibility = ["//visibility:private"],
-)
-
-cc_library(
-    name = "openssl-hdrs",
-    hdrs = [
-        ":openssl/include/bio.h",
-    ],
-    deps = [
-        ":openssl",
-    ],
-)
-
 cmake(
     name = "thrift",
     cache_entries = {
@@ -77,7 +42,6 @@ cmake(
     visibility = ["//visibility:private"],
     deps = [
         ":openssl",
-        ":openssl-hdrs",
         "@boost//:locale",
         "@boost//:numeric_conversion",
     ],
