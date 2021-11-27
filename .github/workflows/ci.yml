@@ -251,6 +251,8 @@ jobs:
       with:
         path: /Users/runner/.cache/bazel
         key: bazel_osx
+    - name: setup
+      run: ./ci/do_ci.sh bazel.macos.test
     - name: run tests
       run: ./ci/do_ci.sh bazel.macos.test
 
@@ -319,7 +321,7 @@ jobs:
         submodules: 'recursive'
     - name: setup
       run: |
-        ./ci/setup_windows_ci_environment.ps1
+        ./ci/setup_thrift.ps1
         ./ci/install_windows_bazelisk.ps1
 
     - name: run tests
