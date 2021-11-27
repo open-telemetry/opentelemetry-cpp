@@ -13,6 +13,7 @@ configure_make(
         "libssl.so",
         "libcrypto.so",
     ],
+    tags = ["jaeger"],
 )
 
 cmake(
