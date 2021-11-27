@@ -28,6 +28,7 @@ cmake(
     tags = ["jaeger"],
     deps = [
         "@boost//:math",
+        "@boost//:numeric_conversion",
     ],
 )
 
