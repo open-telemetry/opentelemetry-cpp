@@ -19,7 +19,11 @@ cc_library(
         "thrift-gen/zipkincore_constants.h",
         "thrift-gen/zipkincore_types.h",
     ],
-    copts = ["-fexceptions"],
+    copts = [
+        "-fexceptions",
+        "-Ivcpkg/packages/thrift_x64-windows/include",
+        "-I/usr/local/Cellar/thrift/0.15.0/include",
+    ],
     strip_include_prefix = "thrift-gen",
     tags = ["jaeger"],
     deps = [
