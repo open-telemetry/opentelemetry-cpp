@@ -1,24 +1,12 @@
-cc_library(
-    name = "foo_library",
-    srcs = [
-        "foo_library/foo_library.cc",
-    ],
-    hdrs = [
-        "foo_library/foo_library.h",
-    ],
-    deps = [
-        "//api",
-    ],
-)
-
 cc_binary(
     name = "example_otlp_grpc",
     srcs = [
         "grpc_main.cc",
     ],
+    tags = ["otlp"],
     deps = [
-        ":foo_library",
         "//api",
+        "//examples/common/foo_library:common_foo_library",
         "//exporters/otlp:otlp_grpc_exporter",
         "//sdk/src/trace",
     ],
@@ -29,10 +17,40 @@ cc_binary(
     srcs = [
         "http_main.cc",
     ],
+    tags = ["otlp"],
     deps = [
-        ":foo_library",
         "//api",
+        "//examples/common/foo_library:common_foo_library",
         "//exporters/otlp:otlp_http_exporter",
+        "//sdk/src/trace",
+    ],
+)
+
+cc_binary(
+    name = "example_otlp_http_log",
+    srcs = [
+        "http_log_main.cc",
+    ],
+    tags = ["otlp"],
+    deps = [
+        "//api",
+        "//examples/common/logs_foo_library:common_logs_foo_library",
+        "//exporters/otlp:otlp_http_exporter",
+        "//exporters/otlp:otlp_http_log_exporter",
+        "//sdk/src/trace",
+    ],
+)
+
+cc_binary(
+    name = "example_otlp_grpc_log",
+    srcs = [
+        "grpc_log_main.cc",
+    ],
+    deps = [
+        "//api",
+        "//examples/common/logs_foo_library:common_logs_foo_library",
+        "//exporters/otlp:otlp_grpc_exporter",
+        "//exporters/otlp:otlp_grpc_log_exporter",
         "//sdk/src/trace",
     ],
 )

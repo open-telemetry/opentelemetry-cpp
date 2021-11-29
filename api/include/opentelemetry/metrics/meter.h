@@ -2,10 +2,9 @@
 // SPDX-License-Identifier: Apache-2.0
 
 #pragma once
-#ifdef ENABLE_METRICS_PREVIEW
+#ifndef ENABLE_METRICS_PREVIEW
 
 #  include "opentelemetry/metrics/async_instruments.h"
-#  include "opentelemetry/metrics/instrument.h"
 #  include "opentelemetry/metrics/sync_instruments.h"
 #  include "opentelemetry/nostd/shared_ptr.h"
 #  include "opentelemetry/nostd/span.h"
@@ -34,31 +33,80 @@ public:
    * @param name the name of the new Counter.
    * @param description a brief description of what the Counter is used for.
    * @param unit the unit of metric values following https://unitsofmeasure.org/ucum.html.
-   * @param enabled a boolean value that turns on or off the metric instrument.
    * @return a shared pointer to the created Counter.
-   * @throws NullPointerException if {@code name} is null
-   * @throws IllegalArgumentException if a different metric by the same name exists in this meter.
-   * @throws IllegalArgumentException if the {@code name} does not match spec requirements.
    */
-  virtual nostd::shared_ptr<Counter<short>> NewShortCounter(nostd::string_view name,
-                                                            nostd::string_view description,
-                                                            nostd::string_view unit,
-                                                            const bool enabled) = 0;
 
-  virtual nostd::shared_ptr<Counter<int>> NewIntCounter(nostd::string_view name,
-                                                        nostd::string_view description,
-                                                        nostd::string_view unit,
-                                                        const bool enabled) = 0;
+  virtual nostd::shared_ptr<Counter<long>> CreateLongCounter(
+      nostd::string_view name,
+      nostd::string_view description = "",
+      nostd::string_view unit        = "1") noexcept = 0;
 
-  virtual nostd::shared_ptr<Counter<float>> NewFloatCounter(nostd::string_view name,
-                                                            nostd::string_view description,
-                                                            nostd::string_view unit,
-                                                            const bool enabled) = 0;
+  virtual nostd::shared_ptr<Counter<double>> CreateDoubleCounter(
+      nostd::string_view name,
+      nostd::string_view description = "",
+      nostd::string_view unit        = "1") noexcept = 0;
 
-  virtual nostd::shared_ptr<Counter<double>> NewDoubleCounter(nostd::string_view name,
-                                                              nostd::string_view description,
-                                                              nostd::string_view unit,
-                                                              const bool enabled) = 0;
+  /**
+   * Creates a Asynchronouse (Observable) counter with the passed characteristics and returns a
+   * shared_ptr to that Observable Counter
+   *
+   * @param name the name of the new Observable Counter.
+   * @param description a brief description of what the Observable Counter is used for.
+   * @param unit the unit of metric values following https://unitsofmeasure.org/ucum.html.
+   * @param callback the function to be observed by the instrument.
+   * @return a shared pointer to the created Observable Counter.
+   */
+  virtual nostd::shared_ptr<ObservableCounter<long>> CreateLongObservableCounter(
+      nostd::string_view name,
+      void (*callback)(ObserverResult<long> &),
+      nostd::string_view description = "",
+      nostd::string_view unit        = "1") noexcept = 0;
+
+  virtual nostd::shared_ptr<ObservableCounter<double>> CreateDoubleObservableCounter(
+      nostd::string_view name,
+      void (*callback)(ObserverResult<double> &),
+      nostd::string_view description = "",
+      nostd::string_view unit        = "1") noexcept = 0;
+
+  /**
+   * Creates a Histogram with the passed characteristics and returns a shared_ptr to that Histogram.
+   *
+   * @param name the name of the new Histogram.
+   * @param description a brief description of what the Histogram is used for.
+   * @param unit the unit of metric values following https://unitsofmeasure.org/ucum.html.
+   * @return a shared pointer to the created Histogram.
+   */
+  virtual nostd::shared_ptr<Histogram<long>> CreateLongHistogram(
+      nostd::string_view name,
+      nostd::string_view description = "",
+      nostd::string_view unit        = "1") noexcept = 0;
+
+  virtual nostd::shared_ptr<Histogram<double>> CreateDoubleHistogram(
+      nostd::string_view name,
+      nostd::string_view description = "",
+      nostd::string_view unit        = "1") noexcept = 0;
+
+  /**
+   * Creates a Asynchronouse (Observable) Gauge with the passed characteristics and returns a
+   * shared_ptr to that Observable Counter
+   *
+   * @param name the name of the new Observable Gauge.
+   * @param description a brief description of what the Observable Gauge is used for.
+   * @param unit the unit of metric values following https://unitsofmeasure.org/ucum.html.
+   * @param callback the function to be observed by the instrument.
+   * @return a shared pointer to the created Observable Gauge.
+   */
+  virtual nostd::shared_ptr<ObservableGauge<long>> CreateLongObservableGauge(
+      nostd::string_view name,
+      void (*callback)(ObserverResult<long> &),
+      nostd::string_view description = "",
+      nostd::string_view unit        = "1") noexcept = 0;
+
+  virtual nostd::shared_ptr<ObservableGauge<double>> CreateDoubleObservableGauge(
+      nostd::string_view name,
+      void (*callback)(ObserverResult<double> &),
+      nostd::string_view description = "",
+      nostd::string_view unit        = "1") noexcept = 0;
 
   /**
    * Creates an UpDownCounter with the passed characteristics and returns a shared_ptr to that
@@ -67,221 +115,39 @@ public:
    * @param name the name of the new UpDownCounter.
    * @param description a brief description of what the UpDownCounter is used for.
    * @param unit the unit of metric values following https://unitsofmeasure.org/ucum.html.
-   * @param enabled a boolean value that turns on or off the metric instrument.
    * @return a shared pointer to the created UpDownCounter.
-   * @throws NullPointerException if {@code name} is null
-   * @throws IllegalArgumentException if a different metric by the same name exists in this meter.
-   * @throws IllegalArgumentException if the {@code name} does not match spec requirements.
    */
-  virtual nostd::shared_ptr<UpDownCounter<short>> NewShortUpDownCounter(
+  virtual nostd::shared_ptr<UpDownCounter<long>> CreateLongUpDownCounter(
       nostd::string_view name,
-      nostd::string_view description,
-      nostd::string_view unit,
-      const bool enabled) = 0;
+      nostd::string_view description = "",
+      nostd::string_view unit        = "1") noexcept = 0;
 
-  virtual nostd::shared_ptr<UpDownCounter<int>> NewIntUpDownCounter(nostd::string_view name,
-                                                                    nostd::string_view description,
-                                                                    nostd::string_view unit,
-                                                                    const bool enabled) = 0;
-
-  virtual nostd::shared_ptr<UpDownCounter<float>> NewFloatUpDownCounter(
+  virtual nostd::shared_ptr<UpDownCounter<double>> CreateDoubleUpDownCounter(
       nostd::string_view name,
-      nostd::string_view description,
-      nostd::string_view unit,
-      const bool enabled) = 0;
-
-  virtual nostd::shared_ptr<UpDownCounter<double>> NewDoubleUpDownCounter(
-      nostd::string_view name,
-      nostd::string_view description,
-      nostd::string_view unit,
-      const bool enabled) = 0;
+      nostd::string_view description = "",
+      nostd::string_view unit        = "1") noexcept = 0;
 
   /**
-   * Creates a ValueRecorder with the passed characteristics and returns a shared_ptr to that
-   * ValueRecorder.
+   * Creates a Asynchronouse (Observable) UpDownCounter with the passed characteristics and returns
+   * a shared_ptr to that Observable UpDownCounter
    *
-   * @param name the name of the new ValueRecorder.
-   * @param description a brief description of what the ValueRecorder is used for.
+   * @param name the name of the new Observable UpDownCounter.
+   * @param description a brief description of what the Observable UpDownCounter is used for.
    * @param unit the unit of metric values following https://unitsofmeasure.org/ucum.html.
-   * @param enabled a boolean value that turns on or off the metric instrument.
-   * @return a shared pointer to the created DoubleValueRecorder.
-   * @throws NullPointerException if {@code name} is null
-   * @throws IllegalArgumentException if a different metric by the same name exists in this meter.
-   * @throws IllegalArgumentException if the {@code name} does not match spec requirements.
-   */
-  virtual nostd::shared_ptr<ValueRecorder<short>> NewShortValueRecorder(
-      nostd::string_view name,
-      nostd::string_view description,
-      nostd::string_view unit,
-      const bool enabled) = 0;
-
-  virtual nostd::shared_ptr<ValueRecorder<int>> NewIntValueRecorder(nostd::string_view name,
-                                                                    nostd::string_view description,
-                                                                    nostd::string_view unit,
-                                                                    const bool enabled) = 0;
-
-  virtual nostd::shared_ptr<ValueRecorder<float>> NewFloatValueRecorder(
-      nostd::string_view name,
-      nostd::string_view description,
-      nostd::string_view unit,
-      const bool enabled) = 0;
-
-  virtual nostd::shared_ptr<ValueRecorder<double>> NewDoubleValueRecorder(
-      nostd::string_view name,
-      nostd::string_view description,
-      nostd::string_view unit,
-      const bool enabled) = 0;
-
-  /**
-   * Creates a SumObserver with the passed characteristics and returns a shared_ptr to that
-   * SumObserver.
-   *
-   * @param name the name of the new SumObserver.
-   * @param description a brief description of what the SumObserver is used for.
-   * @param unit the unit of metric values following https://unitsofmeasure.org/ucum.html.
-   * @param enabled a boolean value that turns on or off the metric instrument.
    * @param callback the function to be observed by the instrument.
-   * @return a shared pointer to the created SumObserver.
-   * @throws NullPointerException if {@code name} is null
-   * @throws IllegalArgumentException if a different metric by the same name exists in this meter.
-   * @throws IllegalArgumentException if the {@code name} does not match spec requirements.
+   * @return a shared pointer to the created Observable UpDownCounter.
    */
-  virtual nostd::shared_ptr<SumObserver<short>> NewShortSumObserver(
+  virtual nostd::shared_ptr<ObservableUpDownCounter<long>> CreateLongObservableUpDownCounter(
       nostd::string_view name,
-      nostd::string_view description,
-      nostd::string_view unit,
-      const bool enabled,
-      void (*callback)(ObserverResult<short>)) = 0;
+      void (*callback)(ObserverResult<long> &),
+      nostd::string_view description = "",
+      nostd::string_view unit        = "1") noexcept = 0;
 
-  virtual nostd::shared_ptr<SumObserver<int>> NewIntSumObserver(
+  virtual nostd::shared_ptr<ObservableUpDownCounter<double>> CreateDoubleObservableUpDownCounter(
       nostd::string_view name,
-      nostd::string_view description,
-      nostd::string_view unit,
-      const bool enabled,
-      void (*callback)(ObserverResult<int>)) = 0;
-
-  virtual nostd::shared_ptr<SumObserver<float>> NewFloatSumObserver(
-      nostd::string_view name,
-      nostd::string_view description,
-      nostd::string_view unit,
-      const bool enabled,
-      void (*callback)(ObserverResult<float>)) = 0;
-
-  virtual nostd::shared_ptr<SumObserver<double>> NewDoubleSumObserver(
-      nostd::string_view name,
-      nostd::string_view description,
-      nostd::string_view unit,
-      const bool enabled,
-      void (*callback)(ObserverResult<double>)) = 0;
-
-  /**
-   * Creates an UpDownSumObserver with the passed characteristics and returns a shared_ptr to
-   * that UpDowNSumObserver.
-   *
-   * @param name the name of the new UpDownSumObserver.
-   * @param description a brief description of what the UpDownSumObserver is used for.
-   * @param unit the unit of metric values following https://unitsofmeasure.org/ucum.html.
-   * @param enabled a boolean value that turns on or off the metric instrument.
-   * @param callback the function to be observed by the instrument.
-   * @return a shared pointer to the created UpDownSumObserver.
-   * @throws NullPointerException if {@code name} is null
-   * @throws IllegalArgumentException if a different metric by the same name exists in this meter.
-   * @throws IllegalArgumentException if the {@code name} does not match spec requirements.
-   */
-  virtual nostd::shared_ptr<UpDownSumObserver<short>> NewShortUpDownSumObserver(
-      nostd::string_view name,
-      nostd::string_view description,
-      nostd::string_view unit,
-      const bool enabled,
-      void (*callback)(ObserverResult<short>)) = 0;
-
-  virtual nostd::shared_ptr<UpDownSumObserver<int>> NewIntUpDownSumObserver(
-      nostd::string_view name,
-      nostd::string_view description,
-      nostd::string_view unit,
-      const bool enabled,
-      void (*callback)(ObserverResult<int>)) = 0;
-
-  virtual nostd::shared_ptr<UpDownSumObserver<float>> NewFloatUpDownSumObserver(
-      nostd::string_view name,
-      nostd::string_view description,
-      nostd::string_view unit,
-      const bool enabled,
-      void (*callback)(ObserverResult<float>)) = 0;
-
-  virtual nostd::shared_ptr<UpDownSumObserver<double>> NewDoubleUpDownSumObserver(
-      nostd::string_view name,
-      nostd::string_view description,
-      nostd::string_view unit,
-      const bool enabled,
-      void (*callback)(ObserverResult<double>)) = 0;
-
-  /**
-   * Creates a ValueObserver with the passed characteristics and returns a shared_ptr to that
-   * ValueObserver.
-   *
-   * @param name the name of the new ValueObserver.
-   * @param description a brief description of what the ValueObserver is used for.
-   * @param unit the unit of metric values following https://unitsofmeasure.org/ucum.html.
-   * @param enabled a boolean value that turns on or off the metric instrument.
-   * @param callback the function to be observed by the instrument.
-   * @return a shared pointer to the created ValueObserver.
-   * @throws NullPointerException if {@code name} is null
-   * @throws IllegalArgumentException if a different metric by the same name exists in this meter.
-   * @throws IllegalArgumentException if the {@code name} does not match spec requirements.
-   */
-  virtual nostd::shared_ptr<ValueObserver<short>> NewShortValueObserver(
-      nostd::string_view name,
-      nostd::string_view description,
-      nostd::string_view unit,
-      const bool enabled,
-      void (*callback)(ObserverResult<short>)) = 0;
-
-  virtual nostd::shared_ptr<ValueObserver<int>> NewIntValueObserver(
-      nostd::string_view name,
-      nostd::string_view description,
-      nostd::string_view unit,
-      const bool enabled,
-      void (*callback)(ObserverResult<int>)) = 0;
-
-  virtual nostd::shared_ptr<ValueObserver<float>> NewFloatValueObserver(
-      nostd::string_view name,
-      nostd::string_view description,
-      nostd::string_view unit,
-      const bool enabled,
-      void (*callback)(ObserverResult<float>)) = 0;
-
-  virtual nostd::shared_ptr<ValueObserver<double>> NewDoubleValueObserver(
-      nostd::string_view name,
-      nostd::string_view description,
-      nostd::string_view unit,
-      const bool enabled,
-      void (*callback)(ObserverResult<double>)) = 0;
-
-  /**
-   * Utility method that allows users to atomically record measurements to a set of
-   * synchronous metric instruments with a common set of labels.
-   *
-   * @param labels the set of labels to associate with this recorder.
-   * @param instruments a span of pointers to the instruments to record to.
-   * @param values a span of values to record to the instruments in the corresponding
-   * position in the instruments span.
-   */
-  virtual void RecordShortBatch(const common::KeyValueIterable &labels,
-                                nostd::span<SynchronousInstrument<short> *> instruments,
-                                nostd::span<const short> values) noexcept = 0;
-
-  virtual void RecordIntBatch(const common::KeyValueIterable &labels,
-                              nostd::span<SynchronousInstrument<int> *> instruments,
-                              nostd::span<const int> values) noexcept = 0;
-
-  virtual void RecordFloatBatch(const common::KeyValueIterable &labels,
-                                nostd::span<SynchronousInstrument<float> *> instruments,
-                                nostd::span<const float> values) noexcept = 0;
-
-  virtual void RecordDoubleBatch(const common::KeyValueIterable &labels,
-                                 nostd::span<SynchronousInstrument<double> *> instruments,
-                                 nostd::span<const double> values) noexcept = 0;
+      void (*callback)(ObserverResult<double> &),
+      nostd::string_view description = "",
+      nostd::string_view unit        = "1") noexcept = 0;
 };
 }  // namespace metrics
 OPENTELEMETRY_END_NAMESPACE

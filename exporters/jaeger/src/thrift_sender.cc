@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 #include "thrift_sender.h"
+#include <opentelemetry/exporters/jaeger/recordable.h>
 #include "udp_transport.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
@@ -18,7 +19,7 @@ ThriftSender::ThriftSender(std::unique_ptr<Transport> &&transport)
       thrift_buffer_(new apache::thrift::transport::TMemoryBuffer())
 {}
 
-int ThriftSender::Append(std::unique_ptr<Recordable> &&span) noexcept
+int ThriftSender::Append(std::unique_ptr<JaegerRecordable> &&span) noexcept
 {
   if (span == nullptr)
   {
@@ -79,11 +80,11 @@ int ThriftSender::Flush()
   batch.__set_process(process_);
   batch.__set_spans(span_buffer_);
 
-  transport_->EmitBatch(batch);
+  int spans_flushed = transport_->EmitBatch(batch);
 
   ResetBuffers();
 
-  return static_cast<int>(batch.spans.size());
+  return spans_flushed;
 }
 
 void ThriftSender::Close()

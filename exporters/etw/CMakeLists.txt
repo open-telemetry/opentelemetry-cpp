@@ -10,6 +10,9 @@ set_target_properties(opentelemetry_exporter_etw PROPERTIES EXPORT_NAME
 
 target_link_libraries(opentelemetry_exporter_etw
                       INTERFACE nlohmann_json::nlohmann_json)
+if(nlohmann_json_clone)
+  add_dependencies(opentelemetry_exporter_etw nlohmann_json::nlohmann_json)
+endif()
 
 install(
   TARGETS opentelemetry_exporter_etw
@@ -27,12 +30,17 @@ install(
 if(BUILD_TESTING)
   add_executable(etw_provider_test test/etw_provider_test.cc)
   add_executable(etw_tracer_test test/etw_tracer_test.cc)
+  add_executable(etw_logger_test test/etw_logger_test.cc)
+
   add_executable(etw_perf_test test/etw_perf_test.cc)
 
   target_link_libraries(etw_provider_test ${GTEST_BOTH_LIBRARIES}
                         opentelemetry_exporter_etw ${CMAKE_THREAD_LIBS_INIT})
 
   target_link_libraries(etw_tracer_test ${GTEST_BOTH_LIBRARIES}
+                        opentelemetry_exporter_etw ${CMAKE_THREAD_LIBS_INIT})
+
+  target_link_libraries(etw_logger_test ${GTEST_BOTH_LIBRARIES}
                         opentelemetry_exporter_etw ${CMAKE_THREAD_LIBS_INIT})
 
   target_link_libraries(
@@ -47,5 +55,9 @@ if(BUILD_TESTING)
     TARGET etw_tracer_test
     TEST_PREFIX exporter.
     TEST_LIST etw_tracer_test)
+  gtest_add_tests(
+    TARGET etw_logger_test
+    TEST_PREFIX exporter.
+    TEST_LIST etw_logger_test)
 
 endif() # BUILD_TESTING

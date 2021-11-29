@@ -9,15 +9,16 @@ namespace sdk
 {
 namespace trace
 {
+namespace resource = opentelemetry::sdk::resource;
 
 TracerContext::TracerContext(std::vector<std::unique_ptr<SpanProcessor>> &&processors,
-                             opentelemetry::sdk::resource::Resource resource,
+                             resource::Resource resource,
                              std::unique_ptr<Sampler> sampler,
                              std::unique_ptr<IdGenerator> id_generator) noexcept
-    : processor_(std::unique_ptr<SpanProcessor>(new MultiSpanProcessor(std::move(processors)))),
-      resource_(resource),
+    : resource_(resource),
       sampler_(std::move(sampler)),
-      id_generator_(std::move(id_generator))
+      id_generator_(std::move(id_generator)),
+      processor_(std::unique_ptr<SpanProcessor>(new MultiSpanProcessor(std::move(processors))))
 {}
 
 Sampler &TracerContext::GetSampler() const noexcept
@@ -25,7 +26,7 @@ Sampler &TracerContext::GetSampler() const noexcept
   return *sampler_;
 }
 
-const opentelemetry::sdk::resource::Resource &TracerContext::GetResource() const noexcept
+const resource::Resource &TracerContext::GetResource() const noexcept
 {
   return resource_;
 }

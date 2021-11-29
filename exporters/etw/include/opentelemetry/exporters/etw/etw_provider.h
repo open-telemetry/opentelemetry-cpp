@@ -161,8 +161,8 @@ public:
         {
           data.refCount       = 1;
           data.providerHandle = hProvider;
-        };
-      };
+        }
+      }
       break;
 
 #ifdef HAVE_MSGPACK
@@ -180,7 +180,7 @@ public:
           data.refCount       = 1;
           data.providerHandle = hProvider;
         }
-      };
+      }
       break;
 #endif
 
@@ -232,7 +232,7 @@ public:
         }
         return result;
       }
-    };
+    }
     return STATUS_ERROR;
   }
 
@@ -248,7 +248,7 @@ public:
     {
       // Provider not registered!
       return STATUS_ERROR;
-    };
+    }
 
     std::string eventName = "NoName";
     auto nameField        = eventData[ETW_FIELD_NAME];
@@ -361,7 +361,7 @@ public:
           // TODO: unsupported type
           break;
       }
-    };
+    }
 
     std::vector<uint8_t> v = nlohmann::json::to_msgpack(jObj);
 
@@ -385,7 +385,7 @@ public:
     else
     {
       writeResponse = EventWrite(providerData.providerHandle, &evtDescriptor, 1, evtData);
-    };
+    }
 
     switch (writeResponse)
     {
@@ -401,12 +401,12 @@ public:
         break;
       default:
         break;
-    };
+    }
 
     if (writeResponse == ERROR_ARITHMETIC_OVERFLOW)
     {
       return STATUS_EFBIG;
-    };
+    }
     return (unsigned long)(writeResponse);
 #else
     UNREFERENCED_PARAMETER(providerData);
@@ -435,7 +435,7 @@ public:
     {
       // Provider not registered!
       return STATUS_ERROR;
-    };
+    }
 
     UINT32 eventTags = MICROSOFT_EVENTTAG_NORMAL_PERSISTENCE;
 
@@ -539,7 +539,7 @@ public:
           // TODO: unsupported type
           break;
       }
-    };
+    }
 
     if (!builder.End())  // Returns false if the metadata is too large.
     {
@@ -572,7 +572,7 @@ public:
     if (writeResponse == HRESULT_FROM_WIN32(ERROR_ARITHMETIC_OVERFLOW))
     {
       return STATUS_EFBIG;
-    };
+    }
 
     return (unsigned long)(writeResponse);
   }
@@ -598,7 +598,7 @@ public:
       return STATUS_ERROR;
     }
     return STATUS_ERROR;
-  };
+  }
 
   static const REGHANDLE INVALID_HANDLE = _UI64_MAX;
 
@@ -615,7 +615,7 @@ protected:
   {
     static std::map<std::string, Handle> providers;
     return providers;
-  };
+  }
 };
 
 OPENTELEMETRY_END_NAMESPACE

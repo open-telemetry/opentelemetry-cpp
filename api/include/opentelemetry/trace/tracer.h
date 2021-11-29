@@ -3,6 +3,7 @@
 
 #pragma once
 
+#include "opentelemetry/context/context.h"
 #include "opentelemetry/nostd/shared_ptr.h"
 #include "opentelemetry/nostd/string_view.h"
 #include "opentelemetry/nostd/unique_ptr.h"
@@ -10,6 +11,7 @@
 #include "opentelemetry/trace/scope.h"
 #include "opentelemetry/trace/span.h"
 #include "opentelemetry/trace/span_context_kv_iterable_view.h"
+#include "opentelemetry/trace/span_startoptions.h"
 #include "opentelemetry/version.h"
 
 #include <chrono>
@@ -17,7 +19,6 @@
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace trace
 {
-
 /**
  * Handles span creation and in-process context propagation.
  *
@@ -170,8 +171,8 @@ public:
   template <class Rep, class Period>
   void ForceFlush(std::chrono::duration<Rep, Period> timeout) noexcept
   {
-    this->ForceFlushWithMicroseconds(
-        static_cast<uint64_t>(std::chrono::duration_cast<std::chrono::microseconds>(timeout)));
+    this->ForceFlushWithMicroseconds(static_cast<uint64_t>(
+        std::chrono::duration_cast<std::chrono::microseconds>(timeout).count()));
   }
 
   virtual void ForceFlushWithMicroseconds(uint64_t timeout) noexcept = 0;
@@ -183,8 +184,8 @@ public:
   template <class Rep, class Period>
   void Close(std::chrono::duration<Rep, Period> timeout) noexcept
   {
-    this->CloseWithMicroseconds(
-        static_cast<uint64_t>(std::chrono::duration_cast<std::chrono::microseconds>(timeout)));
+    this->CloseWithMicroseconds(static_cast<uint64_t>(
+        std::chrono::duration_cast<std::chrono::microseconds>(timeout).count()));
   }
 
   virtual void CloseWithMicroseconds(uint64_t timeout) noexcept = 0;

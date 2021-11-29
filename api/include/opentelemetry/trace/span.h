@@ -7,7 +7,6 @@
 
 #include "opentelemetry/common/attribute_value.h"
 #include "opentelemetry/common/key_value_iterable_view.h"
-#include "opentelemetry/common/timestamp.h"
 #include "opentelemetry/nostd/shared_ptr.h"
 #include "opentelemetry/nostd/span.h"
 #include "opentelemetry/nostd/string_view.h"
@@ -15,71 +14,13 @@
 #include "opentelemetry/nostd/unique_ptr.h"
 #include "opentelemetry/trace/canonical_code.h"
 #include "opentelemetry/trace/span_context.h"
+#include "opentelemetry/trace/span_metadata.h"
+
 #include "opentelemetry/version.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace trace
 {
-
-// The key identifies the active span in the current context.
-constexpr char kSpanKey[] = "active_span";
-
-enum class SpanKind
-{
-  kInternal,
-  kServer,
-  kClient,
-  kProducer,
-  kConsumer,
-};
-
-// StatusCode - Represents the canonical set of status codes of a finished Span.
-
-enum class StatusCode
-{
-  kUnset,  // default status
-  kOk,     // Operation has completed successfully.
-  kError   // The operation contains an error
-};
-
-/**
- * StartSpanOptions provides options to set properties of a Span at the time of
- * its creation
- */
-struct StartSpanOptions
-{
-  // Optionally sets the start time of a Span.
-  //
-  // If the start time of a Span is set, timestamps from both the system clock
-  // and steady clock must be provided.
-  //
-  // Timestamps from the steady clock can be used to most accurately measure a
-  // Span's duration, while timestamps from the system clock can be used to most
-  // accurately place a Span's
-  // time point relative to other Spans collected across a distributed system.
-  common::SystemTimestamp start_system_time;
-  common::SteadyTimestamp start_steady_time;
-
-  // Explicitly set the parent of a Span.
-  //
-  // This defaults to an invalid span context. In this case, the Span is
-  // automatically parented to the currently active span.
-  SpanContext parent = SpanContext::GetInvalid();
-
-  // TODO:
-  // SpanContext remote_parent;
-  // Links
-  SpanKind kind = SpanKind::kInternal;
-};
-/**
- * StartEndOptions provides options to set properties of a Span when it is
- * ended.
- */
-struct EndSpanOptions
-{
-  // Optionally sets the end time of a Span.
-  common::SteadyTimestamp end_steady_time;
-};
 
 class Tracer;
 
@@ -176,7 +117,7 @@ public:
    * @param options can be used to manually define span properties like the end
    * timestamp
    */
-  virtual void End(const EndSpanOptions &options = {}) noexcept = 0;
+  virtual void End(const trace::EndSpanOptions &options = {}) noexcept = 0;
 
   virtual trace::SpanContext GetContext() const noexcept = 0;
 
@@ -184,14 +125,6 @@ public:
   // AddEvent).
   virtual bool IsRecording() const noexcept = 0;
 };
-
-template <class SpanType, class TracerType>
-nostd::shared_ptr<trace::Span> to_span_ptr(TracerType *objPtr,
-                                           nostd::string_view name,
-                                           const trace::StartSpanOptions &options)
-{
-  return nostd::shared_ptr<trace::Span>{new (std::nothrow) SpanType{*objPtr, name, options}};
-}
 
 }  // namespace trace
 OPENTELEMETRY_END_NAMESPACE

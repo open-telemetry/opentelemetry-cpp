@@ -6,22 +6,29 @@
 #include "opentelemetry/trace/provider.h"
 
 // Using an exporter that simply dumps span data to stdout.
-#include "foo_library/foo_library.h"
+#ifdef BAZEL_BUILD
+#  include "examples/common/foo_library/foo_library.h"
+#else
+#  include "foo_library/foo_library.h"
+#endif
 #include "opentelemetry/exporters/ostream/span_exporter.h"
 
+namespace trace_api = opentelemetry::trace;
+namespace trace_sdk = opentelemetry::sdk::trace;
+namespace nostd     = opentelemetry::nostd;
 namespace
 {
 void initTracer()
 {
-  auto exporter = std::unique_ptr<sdktrace::SpanExporter>(
+  auto exporter = std::unique_ptr<trace_sdk::SpanExporter>(
       new opentelemetry::exporter::trace::OStreamSpanExporter);
-  auto processor = std::unique_ptr<sdktrace::SpanProcessor>(
-      new sdktrace::SimpleSpanProcessor(std::move(exporter)));
-  auto provider = nostd::shared_ptr<opentelemetry::trace::TracerProvider>(
-      new sdktrace::TracerProvider(std::move(processor)));
+  auto processor = std::unique_ptr<trace_sdk::SpanProcessor>(
+      new trace_sdk::SimpleSpanProcessor(std::move(exporter)));
+  auto provider = nostd::shared_ptr<trace_api::TracerProvider>(
+      new trace_sdk::TracerProvider(std::move(processor)));
 
   // Set the global trace provider
-  opentelemetry::trace::Provider::SetTracerProvider(provider);
+  trace_api::Provider::SetTracerProvider(provider);
 }
 }  // namespace
 

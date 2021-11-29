@@ -3,6 +3,7 @@
 
 #pragma once
 
+#include <opentelemetry/exporters/jaeger/recordable.h>
 #include <opentelemetry/version.h>
 
 OPENTELEMETRY_BEGIN_NAMESPACE
@@ -19,7 +20,7 @@ public:
   Sender()          = default;
   virtual ~Sender() = default;
 
-  virtual int Append(std::unique_ptr<Recordable> &&span) = 0;
+  virtual int Append(std::unique_ptr<JaegerRecordable> &&span) = 0;
 
   virtual int Flush() = 0;
 

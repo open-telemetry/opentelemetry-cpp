@@ -61,7 +61,8 @@ public:
 
   opentelemetry::nostd::shared_ptr<opentelemetry::trace::Tracer> GetTracer(
       nostd::string_view library_name,
-      nostd::string_view library_version = "") noexcept override;
+      nostd::string_view library_version = "",
+      nostd::string_view schema_url      = "") noexcept override;
 
   /**
    * Attaches a span processor to list of configured processors for this tracer provider.
@@ -96,8 +97,9 @@ public:
   bool ForceFlush(std::chrono::microseconds timeout = (std::chrono::microseconds::max)()) noexcept;
 
 private:
-  std::shared_ptr<sdk::trace::TracerContext> context_;
+  // order of declaration is important here - tracers should destroy only after context.
   std::vector<std::shared_ptr<opentelemetry::sdk::trace::Tracer>> tracers_;
+  std::shared_ptr<sdk::trace::TracerContext> context_;
   std::mutex lock_;
 };
 }  // namespace trace

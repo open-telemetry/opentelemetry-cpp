@@ -6,11 +6,12 @@
 // We need include exporter.h first, which will include Windows.h with NOMINMAX on Windows
 #include "opentelemetry/sdk/trace/exporter.h"
 
-#include "opentelemetry/ext/http/client/http_client.h"
+#include "opentelemetry/exporters/otlp/otlp_http_client.h"
+
+#include "opentelemetry/exporters/otlp/otlp_environment.h"
 
 #include <chrono>
 #include <memory>
-#include <mutex>
 #include <string>
 
 OPENTELEMETRY_BEGIN_NAMESPACE
@@ -18,28 +19,6 @@ namespace exporter
 {
 namespace otlp
 {
-// The default URL path to post trace data.
-constexpr char kDefaultTracePath[] = "/v1/traces";
-// The default URL path to post metric data.
-constexpr char kDefaultMetricsPath[] = "/v1/metrics";
-// The default URL path to post metric data.
-constexpr char kDefaultLogPath[] = "/v1/logs";
-// The HTTP header "Content-Type"
-constexpr char kHttpJsonContentType[]   = "application/json";
-constexpr char kHttpBinaryContentType[] = "application/x-protobuf";
-
-enum class JsonBytesMappingKind
-{
-  kHexId,
-  kHex,
-  kBase64,
-};
-
-enum class HttpRequestContentType
-{
-  kJson,
-  kBinary,
-};
 
 /**
  * Struct to hold OTLP exporter options.
@@ -50,7 +29,7 @@ struct OtlpHttpExporterOptions
   // @see
   // https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/protocol/otlp.md
   // @see https://github.com/open-telemetry/opentelemetry-collector/tree/main/receiver/otlpreceiver
-  std::string url = std::string("http://localhost:4317") + kDefaultTracePath;
+  std::string url = GetOtlpDefaultHttpEndpoint();
 
   // By default, post json data
   HttpRequestContentType content_type = HttpRequestContentType::kJson;
@@ -67,7 +46,10 @@ struct OtlpHttpExporterOptions
   bool console_debug = false;
 
   // TODO: Enable/disable to verify SSL certificate
-  std::chrono::milliseconds timeout = std::chrono::milliseconds(30000);
+  std::chrono::system_clock::duration timeout = GetOtlpDefaultTimeout();
+
+  // Additional HTTP headers
+  OtlpHeaders http_headers = GetOtlpDefaultHeaders();
 };
 
 /**
@@ -90,14 +72,15 @@ public:
    * Create a span recordable.
    * @return a newly initialized Recordable object
    */
-  std::unique_ptr<sdk::trace::Recordable> MakeRecordable() noexcept override;
+  std::unique_ptr<opentelemetry::sdk::trace::Recordable> MakeRecordable() noexcept override;
 
   /**
    * Export
    * @param spans a span of unique pointers to span recordables
    */
-  sdk::common::ExportResult Export(
-      const nostd::span<std::unique_ptr<sdk::trace::Recordable>> &spans) noexcept override;
+  opentelemetry::sdk::common::ExportResult Export(
+      const nostd::span<std::unique_ptr<opentelemetry::sdk::trace::Recordable>> &spans) noexcept
+      override;
 
   /**
    * Shut down the exporter.
@@ -108,9 +91,6 @@ public:
   bool Shutdown(std::chrono::microseconds timeout = std::chrono::microseconds(0)) noexcept override;
 
 private:
-  // Stores if this exporter had its Shutdown() method called
-  bool is_shutdown_ = false;
-
   // For testing
   friend class OtlpHttpExporterTestPeer;
 
@@ -118,9 +98,7 @@ private:
   const OtlpHttpExporterOptions options_;
 
   // Object that stores the HTTP sessions that have been created
-  std::shared_ptr<ext::http::client::HttpClient> http_client_;
-  // Cached parsed URI
-  std::string http_uri_;
+  OtlpHttpClient http_client_;
 };
 }  // namespace otlp
 }  // namespace exporter

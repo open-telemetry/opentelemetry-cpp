@@ -27,7 +27,12 @@ below:
 
 ### Bazel install Instructions
 
-TODO
+Refer to install instructions
+[INSTALL.md](../../INSTALL.md#building-as-standalone-bazel-project).
+
+```console
+bazel build //exporters/jaeger:opentelemetry_exporter_jaeger_trace
+```
 
 ## Usage
 

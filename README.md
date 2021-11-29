@@ -8,6 +8,26 @@ Status](https://github.com/open-telemetry/opentelemetry-cpp/actions/workflows/ci
 
 The C++ [OpenTelemetry](https://opentelemetry.io/) client.
 
+## Project Status
+
+| Signal  | Status                 | Project                                                                  |
+| ------- | ---------------------- | ------------------------------------------------------------------------ |
+| Traces  | Public Release         | N/A                                                                      |
+| Metrics | Development  [1]       | N/A                                                                      |
+| Logs    | Experimental [2]       | N/A                                                                      |
+
+* [1]: The development of the metrics API and SDK based on new stable specification is ongoing. The timelines would be available in release milestone. The earlier implementation (based on old specification) can be included in build by setting `ENABLE_METRICS_PREVIEW` preprocessor macro, and is included under `*/_metrics/*` directory. This would be eventually removed once the ongoing implemetation is stable.
+* [2]: The current Log Signal Implementation is Experimental, and will change as the current OpenTelemetry Log specification matures. The current implementation can be included in build by setting `ENABLE_LOGS_PREVIEW` preprocessor macro.
+
+## OpenTelemetry Specification Compatibility Matrix
+
+| API Version | Core Version | Contrib Version         |
+| ----------- |--------------|-------------------------|
+| 1.0.0       | 1.0.0-rc4    | N/A [1]                 |
+| 1.0.0       | 1.0.0        | N/A                     |
+
+* [1]: We don't have releases for opentelemetry-cpp contrib repo. This may change in future.
+
 ## Supported C++ Versions
 
 Code shipped from this repository generally supports the following versions of
@@ -28,11 +48,18 @@ of the current project.
 
  Our CI pipeline builds and tests on following `x86-64` platforms:
 
-* ubuntu-18.04 (Default GCC Compiler - 7.5.0)
-* ubuntu-18.04 (GCC 4.8 with -std=c++11 flag)
-* ubuntu-20.04 (Default GCC Compiler - 9.3.0 with -std=c++20 flags)
-* macOS 10.15 (Xcode 12.2)
-* Windows Server 2019 (Visual Studio Enterprise 2019)
+| Platform                                                            |   Build type  |
+|---------------------------------------------------------------------|---------------|
+| ubuntu-20.04 (Default GCC Compiler - 9.3.0)                         | CMake, Bazel  |
+| ubuntu-18.04 (GCC 4.8 with -std=c++11 flag)                         | CMake [1]     |
+| ubuntu-20.04 (Default GCC Compiler - 9.3.0 with -std=c++20 flags)   | CMake, Bazel  |
+| macOS 10.15 (Xcode 12.2)                                            | Bazel         |
+| Windows Server 2019 (Visual Studio Enterprise 2019)                 | CMake, Bazel  |
+
+[1]: Bazel build is disabled for GCC 4.8, as gRPC library 1.38 and above
+  (required by OTLP expoter) don't build with this compiler. See gRPC [official
+  support](https://grpc.io/docs/#official-support) document. CMake build doesn't
+  build OTLP exporter with GCC 4.8.
 
 In general, the code shipped from this repository should build on all platforms
 having C++ compiler with [supported C++ standards](#supported-c-versions).
@@ -61,10 +88,7 @@ We meet weekly, and the time of the meeting alternates between Monday at 15:00
 PT and Wednesday at 10:00 PT. The meeting is subject to change depending on
 contributors' availability. Check the [OpenTelemetry community
 calendar](https://calendar.google.com/calendar/embed?src=google.com_b79e3e90j7bbsa2n2p5an5lf60%40group.calendar.google.com)
-for specific dates.
-
-Meetings take place via [Zoom video conference](https://zoom.us/j/6729396170).
-The passcode is _77777_.
+for specific dates and Zoom meeting links.
 
 Meeting notes are available as a public [Google
 doc](https://docs.google.com/document/d/1i1E4-_y4uJ083lCutKGDhkpi3n4_e774SBLi9hPLocw/edit?usp=sharing).
@@ -78,7 +102,6 @@ Approvers
 * [Josh Suereth](https://github.com/jsuereth), Google
 * [Max Golovanov](https://github.com/maxgolov), Microsoft
 * [Ryan Burn](https://github.com/rnburn), Lightstep
-* [Tom Tan](https://github.com/ThomsonTan), Microsoft
 
 *Find more about the approver role in [community
 repository](https://github.com/open-telemetry/community/blob/main/community-membership.md#approver).*
@@ -89,6 +112,7 @@ Maintainers
 * [Emil Mikulic](https://github.com/g-easy), Google
 * [Lalit Kumar Bhasin](https://github.com/lalitb), Microsoft
 * [Reiley Yang](https://github.com/reyang), Microsoft
+* [Tom Tan](https://github.com/ThomsonTan), Microsoft
 
 *Find more about the maintainer role in [community
 repository](https://github.com/open-telemetry/community/blob/main/community-membership.md#maintainer).*
@@ -108,13 +132,7 @@ repository](https://github.com/open-telemetry/community/blob/main/community-memb
 
 ## Release Schedule
 
-OpenTelemetry C++ is under active development.
-
-The API and SDK packages are __not yet generally available__, and releases are
-not guaranteed to conform to a specific version of the specification. Future
-releases will not attempt to maintain backwards compatibility with previous
-releases. Each alpha and beta release could include significant changes to the
-API and SDK packages, making them incompatible with each other.
+Refer to [project status](#project-status) for current status of the project.
 
 See the [release
 notes](https://github.com/open-telemetry/opentelemetry-cpp/releases) for

@@ -40,7 +40,7 @@ jobs:
         ./ci/do_ci.sh cmake.abseil.test
 
   cmake_gcc_48_test:
-    name: CMake gcc 4.8
+    name: CMake gcc 4.8 (without otlp exporter)
     runs-on: ubuntu-18.04
     steps:
     - uses: actions/checkout@v2
@@ -55,6 +55,29 @@ jobs:
         sudo CC=/usr/bin/gcc-4.8 CXX=/usr/bin/g++-4.8 ./ci/setup_cmake.sh
     - name: run tests
       run: ./ci/do_ci.sh cmake.legacy.test
+      env:
+        CC: /usr/bin/gcc-4.8
+        CXX: /usr/bin/g++-4.8
+
+  cmake_gcc_48_otlp_exporter_test:
+    name: CMake gcc 4.8 (with otlp exporter)
+    runs-on: ubuntu-18.04
+    steps:
+    - uses: actions/checkout@v2
+      with:
+        submodules: 'recursive'
+    - name: setup
+      run: |
+        sudo ./ci/setup_ci_environment.sh
+        sudo ./ci/install_gcc48.sh
+    - name: setup cmake
+      run: |
+        sudo CC=/usr/bin/gcc-4.8 CXX=/usr/bin/g++-4.8 ./ci/setup_cmake.sh
+    - name: setup grpc
+      run: |
+        sudo CC=/usr/bin/gcc-4.8 CXX=/usr/bin/g++-4.8 ./ci/setup_grpc.sh -v 4.8
+    - name: run tests
+      run: ./ci/do_ci.sh cmake.legacy.exporter.otprotocol.test
       env:
         CC: /usr/bin/gcc-4.8
         CXX: /usr/bin/g++-4.8
@@ -105,30 +128,6 @@ jobs:
     - name: run tests
       run: ./ci/do_ci.sh cmake.test_example_plugin
 
-  bazel_gcc_48_test:
-    name: Bazel gcc 4.8
-    runs-on: ubuntu-18.04
-    steps:
-    - uses: actions/checkout@v2
-      with:
-        submodules: 'recursive'
-    - name: Mount Bazel Cache
-      uses: actions/cache@v2
-      env:
-        cache-name: bazel_cache
-      with:
-        path: /home/runner/.cache/bazel
-        key: bazel_gcc_48_test
-    - name: setup
-      run: |
-        sudo ./ci/setup_ci_environment.sh
-        sudo ./ci/install_bazelisk.sh
-        sudo ./ci/install_gcc48.sh
-    - name: run tests
-      run: ./ci/do_ci.sh bazel.legacy.test
-      env:
-        CC: /usr/bin/gcc-4.8
-
   bazel_test:
     name: Bazel
     runs-on: ubuntu-latest
@@ -145,6 +144,7 @@ jobs:
         key: bazel_test
     - name: setup
       run: |
+        sudo ./ci/setup_thrift.sh dependencies_only
         sudo ./ci/setup_ci_environment.sh
         sudo ./ci/install_bazelisk.sh
     - name: run tests
@@ -166,6 +166,7 @@ jobs:
         key: bazel_valgrind
     - name: setup
       run: |
+        sudo ./ci/setup_thrift.sh dependencies_only
         sudo ./ci/setup_ci_environment.sh
         sudo ./ci/install_bazelisk.sh
     - name: run tests
@@ -187,6 +188,7 @@ jobs:
         key: bazel_noexcept
     - name: setup
       run: |
+        sudo ./ci/setup_thrift.sh dependencies_only
         sudo ./ci/setup_ci_environment.sh
         sudo ./ci/install_bazelisk.sh
     - name: run tests
@@ -208,6 +210,7 @@ jobs:
         key: bazel_asan
     - name: setup
       run: |
+        sudo ./ci/setup_thrift.sh dependencies_only
         sudo ./ci/setup_ci_environment.sh
         sudo ./ci/install_bazelisk.sh
     - name: run tests
@@ -229,6 +232,7 @@ jobs:
         key: bazel_tsan
     - name: setup
       run: |
+        sudo ./ci/setup_thrift.sh dependencies_only
         sudo ./ci/setup_ci_environment.sh
         sudo ./ci/install_bazelisk.sh
     - name: run tests
@@ -249,7 +253,7 @@ jobs:
         path: /Users/runner/.cache/bazel
         key: bazel_osx
     - name: run tests
-      run: ./ci/do_ci.sh bazel.test
+      run: ./ci/do_ci.sh bazel.macos.test
 
   benchmark:
     name: Benchmark

@@ -10,13 +10,15 @@ using opentelemetry::trace::Provider;
 using opentelemetry::trace::Tracer;
 using opentelemetry::trace::TracerProvider;
 
+namespace nostd = opentelemetry::nostd;
+
 class TestProvider : public TracerProvider
 {
-  opentelemetry::nostd::shared_ptr<Tracer> GetTracer(
-      opentelemetry::nostd::string_view library_name,
-      opentelemetry::nostd::string_view library_version) override
+  nostd::shared_ptr<Tracer> GetTracer(nostd::string_view library_name,
+                                      nostd::string_view library_version,
+                                      nostd::string_view schema_url) override
   {
-    return opentelemetry::nostd::shared_ptr<Tracer>(nullptr);
+    return nostd::shared_ptr<Tracer>(nullptr);
   }
 };
 
@@ -28,7 +30,7 @@ TEST(Provider, GetTracerProviderDefault)
 
 TEST(Provider, SetTracerProvider)
 {
-  auto tf = opentelemetry::nostd::shared_ptr<TracerProvider>(new TestProvider());
+  auto tf = nostd::shared_ptr<TracerProvider>(new TestProvider());
   Provider::SetTracerProvider(tf);
   ASSERT_EQ(tf, Provider::GetTracerProvider());
 }

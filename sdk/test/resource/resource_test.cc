@@ -5,8 +5,8 @@
 #include "opentelemetry/common/key_value_iterable_view.h"
 #include "opentelemetry/nostd/string_view.h"
 #include "opentelemetry/sdk/common/attribute_utils.h"
+#include "opentelemetry/sdk/resource/experimental_semantic_conventions.h"
 #include "opentelemetry/sdk/resource/resource_detector.h"
-#include "opentelemetry/sdk/resource/semantic_conventions.h"
 
 #include <cstdlib>
 #include <string>
@@ -15,10 +15,13 @@
 #include <gtest/gtest.h>
 
 #if defined(_MSC_VER)
-#  define putenv _putenv
+#  include "opentelemetry/sdk/common/env_variables.h"
+using opentelemetry::sdk::common::setenv;
+using opentelemetry::sdk::common::unsetenv;
 #endif
 
 using namespace opentelemetry::sdk::resource;
+namespace nostd = opentelemetry::nostd;
 
 class TestResource : public Resource
 {
@@ -28,7 +31,6 @@ public:
 
 TEST(ResourceTest, create_without_servicename)
 {
-
   ResourceAttributes expected_attributes = {
       {"service", "backend"},
       {"version", (uint32_t)1},
@@ -46,15 +48,17 @@ TEST(ResourceTest, create_without_servicename)
   {
     EXPECT_TRUE(expected_attributes.find(e.first) != expected_attributes.end());
     if (expected_attributes.find(e.first) != expected_attributes.end())
+    {
       if (e.first == "version")
-        EXPECT_EQ(opentelemetry::nostd::get<uint32_t>(expected_attributes.find(e.first)->second),
-                  opentelemetry::nostd::get<uint32_t>(e.second));
+        EXPECT_EQ(nostd::get<uint32_t>(expected_attributes.find(e.first)->second),
+                  nostd::get<uint32_t>(e.second));
       else if (e.first == "cost")
-        EXPECT_EQ(opentelemetry::nostd::get<double>(expected_attributes.find(e.first)->second),
-                  opentelemetry::nostd::get<double>(e.second));
+        EXPECT_EQ(nostd::get<double>(expected_attributes.find(e.first)->second),
+                  nostd::get<double>(e.second));
       else
         EXPECT_EQ(opentelemetry::nostd::get<std::string>(expected_attributes.find(e.first)->second),
                   opentelemetry::nostd::get<std::string>(e.second));
+    }
   }
   EXPECT_EQ(received_attributes.size(), expected_attributes.size());  // for missing service.name
 }
@@ -79,14 +83,14 @@ TEST(ResourceTest, create_with_servicename)
     if (expected_attributes.find(e.first) != expected_attributes.end())
     {
       if (e.first == "version")
-        EXPECT_EQ(opentelemetry::nostd::get<uint32_t>(expected_attributes.find(e.first)->second),
-                  opentelemetry::nostd::get<uint32_t>(e.second));
+        EXPECT_EQ(nostd::get<uint32_t>(expected_attributes.find(e.first)->second),
+                  nostd::get<uint32_t>(e.second));
       else if (e.first == "cost")
-        EXPECT_EQ(opentelemetry::nostd::get<double>(expected_attributes.find(e.first)->second),
-                  opentelemetry::nostd::get<double>(e.second));
+        EXPECT_EQ(nostd::get<double>(expected_attributes.find(e.first)->second),
+                  nostd::get<double>(e.second));
       else
-        EXPECT_EQ(opentelemetry::nostd::get<std::string>(expected_attributes.find(e.first)->second),
-                  opentelemetry::nostd::get<std::string>(e.second));
+        EXPECT_EQ(nostd::get<std::string>(expected_attributes.find(e.first)->second),
+                  nostd::get<std::string>(e.second));
     }
   }
   EXPECT_EQ(received_attributes.size(), expected_attributes.size());  // for missing service.name
@@ -107,11 +111,24 @@ TEST(ResourceTest, create_with_emptyatrributes)
   {
     EXPECT_TRUE(expected_attributes.find(e.first) != expected_attributes.end());
     if (expected_attributes.find(e.first) != expected_attributes.end())
+    {
       EXPECT_EQ(opentelemetry::nostd::get<std::string>(expected_attributes.find(e.first)->second),
                 opentelemetry::nostd::get<std::string>(e.second));
+    }
   }
   EXPECT_EQ(received_attributes.size(), expected_attributes.size());  // for missing service.name
 }
+
+TEST(ResourceTest, create_with_schemaurl)
+{
+  const std::string schema_url  = "https://opentelemetry.io/schemas/1.2.0";
+  ResourceAttributes attributes = {};
+  auto resource                 = Resource::Create(attributes, schema_url);
+  auto received_schema_url      = resource.GetSchemaURL();
+
+  EXPECT_EQ(received_schema_url, schema_url);
+}
+
 TEST(ResourceTest, Merge)
 {
   TestResource resource1(ResourceAttributes({{"service", "backend"}}));
@@ -126,8 +143,7 @@ TEST(ResourceTest, Merge)
     EXPECT_TRUE(expected_attributes.find(e.first) != expected_attributes.end());
     if (expected_attributes.find(e.first) != expected_attributes.end())
     {
-      EXPECT_EQ(expected_attributes.find(e.first)->second,
-                opentelemetry::nostd::get<std::string>(e.second));
+      EXPECT_EQ(expected_attributes.find(e.first)->second, nostd::get<std::string>(e.second));
     }
   }
   EXPECT_EQ(received_attributes.size(), expected_attributes.size());
@@ -148,19 +164,18 @@ TEST(ResourceTest, MergeEmptyString)
     EXPECT_TRUE(expected_attributes.find(e.first) != expected_attributes.end());
     if (expected_attributes.find(e.first) != expected_attributes.end())
     {
-      EXPECT_EQ(expected_attributes.find(e.first)->second,
-                opentelemetry::nostd::get<std::string>(e.second));
+      EXPECT_EQ(expected_attributes.find(e.first)->second, nostd::get<std::string>(e.second));
     }
   }
   EXPECT_EQ(received_attributes.size(), expected_attributes.size());
 }
 
+#ifndef NO_GETENV
 TEST(ResourceTest, OtelResourceDetector)
 {
   std::map<std::string, std::string> expected_attributes = {{"k", "v"}};
 
-  char env[] = "OTEL_RESOURCE_ATTRIBUTES=k=v";
-  putenv(env);
+  setenv("OTEL_RESOURCE_ATTRIBUTES", "k=v", 1);
 
   OTELResourceDetector detector;
   auto resource            = detector.Detect();
@@ -170,26 +185,18 @@ TEST(ResourceTest, OtelResourceDetector)
     EXPECT_TRUE(expected_attributes.find(e.first) != expected_attributes.end());
     if (expected_attributes.find(e.first) != expected_attributes.end())
     {
-      EXPECT_EQ(expected_attributes.find(e.first)->second,
-                opentelemetry::nostd::get<std::string>(e.second));
+      EXPECT_EQ(expected_attributes.find(e.first)->second, nostd::get<std::string>(e.second));
     }
   }
   EXPECT_EQ(received_attributes.size(), expected_attributes.size());
-#if defined(_MSC_VER)
-  putenv("OTEL_RESOURCE_ATTRIBUTES=");
-#else
+
   unsetenv("OTEL_RESOURCE_ATTRIBUTES");
-#endif
 }
 
 TEST(ResourceTest, OtelResourceDetectorEmptyEnv)
 {
   std::map<std::string, std::string> expected_attributes = {};
-#if defined(_MSC_VER)
-  putenv("OTEL_RESOURCE_ATTRIBUTES=");
-#else
   unsetenv("OTEL_RESOURCE_ATTRIBUTES");
-#endif
   OTELResourceDetector detector;
   auto resource            = detector.Detect();
   auto received_attributes = resource.GetAttributes();
@@ -198,9 +205,9 @@ TEST(ResourceTest, OtelResourceDetectorEmptyEnv)
     EXPECT_TRUE(expected_attributes.find(e.first) != expected_attributes.end());
     if (expected_attributes.find(e.first) != expected_attributes.end())
     {
-      EXPECT_EQ(expected_attributes.find(e.first)->second,
-                opentelemetry::nostd::get<std::string>(e.second));
+      EXPECT_EQ(expected_attributes.find(e.first)->second, nostd::get<std::string>(e.second));
     }
   }
   EXPECT_EQ(received_attributes.size(), expected_attributes.size());
 }
+#endif

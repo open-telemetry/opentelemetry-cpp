@@ -1,4 +1,4 @@
-def otel_cc_benchmark(name, srcs, deps):
+def otel_cc_benchmark(name, srcs, deps, tags = [""]):
     """
     Creates targets for the benchmark and related targets.
 
@@ -23,7 +23,7 @@ def otel_cc_benchmark(name, srcs, deps):
         name = name,
         srcs = srcs,
         deps = deps + ["@com_github_google_benchmark//:benchmark"],
-        tags = ["manual"],
+        tags = tags + ["manual"],
     )
 
     # The result of running the benchmark, captured into a text file.
@@ -31,7 +31,7 @@ def otel_cc_benchmark(name, srcs, deps):
         name = name + "_result",
         outs = [name + "_result.txt"],
         tools = [":" + name],
-        tags = ["benchmark_result", "manual"],
+        tags = tags + ["benchmark_result", "manual"],
         testonly = True,
         cmd = "$(location :" + name + (") --benchmark_color=false --benchmark_min_time=.1 &> $@"),
     )
@@ -43,5 +43,5 @@ def otel_cc_benchmark(name, srcs, deps):
         srcs = srcs,
         deps = deps + ["@com_github_google_benchmark//:benchmark"],
         args = ["--benchmark_min_time=0"],
-        tags = ["benchmark"],
+        tags = tags + ["benchmark"],
     )

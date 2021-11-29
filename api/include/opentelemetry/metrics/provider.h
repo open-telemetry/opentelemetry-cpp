@@ -2,7 +2,8 @@
 // SPDX-License-Identifier: Apache-2.0
 
 #pragma once
-#ifdef ENABLE_METRICS_PREVIEW
+#ifndef ENABLE_METRICS_PREVIEW
+
 #  include <mutex>
 
 #  include "opentelemetry/common/spin_lock_mutex.h"

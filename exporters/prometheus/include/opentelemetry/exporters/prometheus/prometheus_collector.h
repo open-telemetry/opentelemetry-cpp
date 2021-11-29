@@ -8,13 +8,12 @@
 #  include <mutex>
 #  include <vector>
 
-#  include "opentelemetry/sdk/metrics/record.h"
+#  include "opentelemetry/exporters/prometheus/prometheus_exporter_utils.h"
+#  include "opentelemetry/sdk/_metrics/record.h"
 #  include "prometheus/collectable.h"
 #  include "prometheus/metric_family.h"
-#  include "prometheus_exporter_utils.h"
 
 namespace prometheus_client = ::prometheus;
-namespace metric_sdk        = opentelemetry::sdk::metrics;
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace exporter
@@ -48,14 +47,14 @@ public:
    *
    * @param records a collection of records to add to the metricsToCollect collection
    */
-  void AddMetricData(const std::vector<metric_sdk::Record> &records);
+  void AddMetricData(const std::vector<opentelemetry::sdk::metrics::Record> &records);
 
   /**
    * Get the current collection in the collector.
    *
    * @return the current metricsToCollect collection
    */
-  std::vector<metric_sdk::Record> GetCollection();
+  std::vector<opentelemetry::sdk::metrics::Record> GetCollection();
 
   /**
    * Gets the maximum size of the collection.
@@ -71,7 +70,7 @@ private:
    * to a collection so Collect() is able to clear the collection, even
    * though it is a const function.
    */
-  std::unique_ptr<std::vector<metric_sdk::Record>> metrics_to_collect_;
+  std::unique_ptr<std::vector<opentelemetry::sdk::metrics::Record>> metrics_to_collect_;
 
   /**
    * Maximum size of the metricsToCollect collection.

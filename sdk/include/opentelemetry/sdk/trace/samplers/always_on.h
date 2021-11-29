@@ -10,8 +10,6 @@ namespace sdk
 {
 namespace trace
 {
-namespace trace_api = opentelemetry::trace;
-
 /**
  * The always on sampler is a default sampler which always return Decision::RECORD_AND_SAMPLE
  */
@@ -22,12 +20,12 @@ public:
    * @return Always return Decision RECORD_AND_SAMPLE
    */
   inline SamplingResult ShouldSample(
-      const trace_api::SpanContext &parent_context,
-      trace_api::TraceId /*trace_id*/,
+      const opentelemetry::trace::SpanContext &parent_context,
+      opentelemetry::trace::TraceId /*trace_id*/,
       nostd::string_view /*name*/,
-      trace_api::SpanKind /*span_kind*/,
+      opentelemetry::trace::SpanKind /*span_kind*/,
       const opentelemetry::common::KeyValueIterable & /*attributes*/,
-      const trace_api::SpanContextKeyValueIterable & /*links*/) noexcept override
+      const opentelemetry::trace::SpanContextKeyValueIterable & /*links*/) noexcept override
   {
     if (!parent_context.IsValid())
     {

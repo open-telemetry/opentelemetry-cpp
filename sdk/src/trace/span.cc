@@ -16,6 +16,7 @@ namespace trace
 
 using opentelemetry::common::SteadyTimestamp;
 using opentelemetry::common::SystemTimestamp;
+namespace common = opentelemetry::common;
 
 namespace
 {
@@ -46,7 +47,7 @@ SteadyTimestamp NowOr(const SteadyTimestamp &steady)
 
 Span::Span(std::shared_ptr<Tracer> &&tracer,
            nostd::string_view name,
-           const opentelemetry::common::KeyValueIterable &attributes,
+           const common::KeyValueIterable &attributes,
            const trace_api::SpanContextKeyValueIterable &links,
            const trace_api::StartSpanOptions &options,
            const trace_api::SpanContext &parent_span_context,
@@ -67,14 +68,13 @@ Span::Span(std::shared_ptr<Tracer> &&tracer,
                                                ? parent_span_context.span_id()
                                                : trace_api::SpanId());
 
-  attributes.ForEachKeyValue(
-      [&](nostd::string_view key, opentelemetry::common::AttributeValue value) noexcept {
-        recordable_->SetAttribute(key, value);
-        return true;
-      });
+  attributes.ForEachKeyValue([&](nostd::string_view key, common::AttributeValue value) noexcept {
+    recordable_->SetAttribute(key, value);
+    return true;
+  });
 
   links.ForEachKeyValue([&](opentelemetry::trace::SpanContext span_context,
-                            const opentelemetry::common::KeyValueIterable &attributes) {
+                            const common::KeyValueIterable &attributes) {
     recordable_->AddLink(span_context, attributes);
     return true;
   });
@@ -91,8 +91,7 @@ Span::~Span()
   End();
 }
 
-void Span::SetAttribute(nostd::string_view key,
-                        const opentelemetry::common::AttributeValue &value) noexcept
+void Span::SetAttribute(nostd::string_view key, const common::AttributeValue &value) noexcept
 {
   std::lock_guard<std::mutex> lock_guard{mu_};
 
@@ -121,7 +120,7 @@ void Span::AddEvent(nostd::string_view name, SystemTimestamp timestamp) noexcept
 
 void Span::AddEvent(nostd::string_view name,
                     SystemTimestamp timestamp,
-                    const opentelemetry::common::KeyValueIterable &attributes) noexcept
+                    const common::KeyValueIterable &attributes) noexcept
 {
   std::lock_guard<std::mutex> lock_guard{mu_};
   if (recordable_ == nullptr)

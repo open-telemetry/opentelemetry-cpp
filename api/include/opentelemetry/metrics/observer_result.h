@@ -2,10 +2,13 @@
 // SPDX-License-Identifier: Apache-2.0
 
 #pragma once
-#ifdef ENABLE_METRICS_PREVIEW
+#ifndef ENABLE_METRICS_PREVIEW
 
-#  include "instrument.h"
-#  include "opentelemetry/nostd/shared_ptr.h"
+#  include "opentelemetry/common/attribute_value.h"
+#  include "opentelemetry/common/key_value_iterable_view.h"
+#  include "opentelemetry/nostd/span.h"
+#  include "opentelemetry/nostd/string_view.h"
+#  include "opentelemetry/nostd/type_traits.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace metrics
@@ -13,9 +16,7 @@ namespace metrics
 
 /**
  * ObserverResult class is necessary for the callback recording asynchronous
- * instrument use.  Callback functions asynchronous instruments are designed to
- * accept a single ObserverResult object and update using its pointer to the
- * instrument itself.
+ * instrument use.
  */
 
 template <class T>
@@ -23,17 +24,24 @@ class ObserverResult
 {
 
 public:
-  ObserverResult() = default;
+  virtual void Observe(T value) noexcept = 0;
 
-  ObserverResult(AsynchronousInstrument<T> *instrument) : instrument_(instrument) {}
+  virtual void Observer(T value, const common::KeyValueIterable &attributes) noexcept = 0;
 
-  virtual void observe(T value, const common::KeyValueIterable &labels)
+  template <class U,
+            nostd::enable_if_t<common::detail::is_key_value_iterable<U>::value> * = nullptr>
+  void Observe(T value, const U &attributes) noexcept
   {
-    instrument_->observe(value, labels);
+    this->Observe(value, common::KeyValueIterableView<T>{attributes});
   }
 
-private:
-  AsynchronousInstrument<T> *instrument_;
+  void Observe(T value,
+               std::initializer_list<std::pair<nostd::string_view, common::AttributeValue>>
+                   attributes) noexcept
+  {
+    this->Observe(value, nostd::span<const std::pair<nostd::string_view, common::AttributeValue>>{
+                             attributes.begin(), attributes.end()});
+  }
 };
 
 }  // namespace metrics

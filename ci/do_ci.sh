@@ -25,12 +25,16 @@ mkdir -p "${PLUGIN_DIR}"
 
 BAZEL_OPTIONS="--copt=-DENABLE_METRICS_PREVIEW --copt=-DENABLE_LOGS_PREVIEW"
 BAZEL_TEST_OPTIONS="$BAZEL_OPTIONS --test_output=errors"
+
+# https://github.com/bazelbuild/bazel/issues/4341
+BAZEL_MACOS_OPTIONS="$BAZEL_OPRIONS --features=-supports_dynamic_linker --build_tag_filters=-jaeger"
+BAZEL_MACOS_TEST_OPTIONS="$BAZEL_MACOS_OPTIONS --test_output=errors"
+
 BAZEL_STARTUP_OPTIONS="--output_user_root=$HOME/.cache/bazel"
 
 export CTEST_OUTPUT_ON_FAILURE=1
 
 if [[ "$1" == "cmake.test" ]]; then
-  install_prometheus_cpp_client
   cd "${BUILD_DIR}"
   rm -rf *
   cmake -DCMAKE_BUILD_TYPE=Debug  \
@@ -92,6 +96,22 @@ elif [[ "$1" == "cmake.legacy.test" ]]; then
   make
   make test
   exit 0
+elif [[ "$1" == "cmake.legacy.exporter.otprotocol.test" ]]; then
+  cd "${BUILD_DIR}"
+  rm -rf *
+  export BUILD_ROOT="${BUILD_DIR}"
+  ${SRC_DIR}/tools/build-gtest.sh
+  ${SRC_DIR}/tools/build-benchmark.sh
+  cmake -DCMAKE_BUILD_TYPE=Debug  \
+        -DCMAKE_CXX_STANDARD=11 \
+        -DWITH_OTLP=ON \
+        "${SRC_DIR}"
+  grpc_cpp_plugin=`which grpc_cpp_plugin`
+  proto_make_file="CMakeFiles/opentelemetry_proto.dir/build.make"
+  sed -i "s~gRPC_CPP_PLUGIN_EXECUTABLE-NOTFOUND~$grpc_cpp_plugin~" ${proto_make_file} #fixme
+  make -j $(nproc)
+  cd exporters/otlp && make test
+  exit 0
 elif [[ "$1" == "cmake.exporter.otprotocol.test" ]]; then
   cd "${BUILD_DIR}"
   rm -rf *
@@ -141,6 +161,10 @@ EOF
 elif [[ "$1" == "bazel.test" ]]; then
   bazel $BAZEL_STARTUP_OPTIONS build $BAZEL_OPTIONS //...
   bazel $BAZEL_STARTUP_OPTIONS test $BAZEL_TEST_OPTIONS //...
+  exit 0
+elif [[ "$1" == "bazel.macos.test" ]]; then
+  bazel $BAZEL_STARTUP_OPTIONS build $BAZEL_MACOS_OPTIONS //...
+  bazel $BAZEL_STARTUP_OPTIONS test $BAZEL_MACOS_TEST_OPTIONS //...
   exit 0
 elif [[ "$1" == "bazel.legacy.test" ]]; then
   # we uses C++ future and async() function to test the Prometheus Exporter functionality,
@@ -199,6 +223,12 @@ elif [[ "$1" == "code.coverage" ]]; then
   # removing test http server coverage from the total coverage. We don't use this server completely.
   lcov --remove coverage.info '*/ext/http/server/*'> tmp_coverage.info 2>/dev/null
   cp tmp_coverage.info coverage.info
+  exit 0
+elif [[ "$1" == "third_party.tags" ]]; then
+  echo "gRPC=v1.39.1" > third_party_release
+  echo "thrift=0.14.1" >> third_party_release
+  echo "abseil=20210324.0" >> third_party_release
+  git submodule status | sed 's:.*/::' | sed 's/ (/=/g' | sed 's/)//g' >> third_party_release
   exit 0
 fi
 

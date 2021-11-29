@@ -32,20 +32,20 @@ def opentelemetry_cpp_deps():
     maybe(
         http_archive,
         name = "com_github_grpc_grpc_legacy",
-        sha256 = "2060769f2d4b0d3535ba594b2ab614d7f68a492f786ab94b4318788d45e3278a",
-        strip_prefix = "grpc-1.33.2",
+        sha256 = "024118069912358e60722a2b7e507e9c3b51eeaeee06e2dd9d95d9c16f6639ec",
+        strip_prefix = "grpc-1.39.1",
         urls = [
-            "https://github.com/grpc/grpc/archive/v1.33.2.tar.gz",
+            "https://github.com/grpc/grpc/archive/v1.39.1.tar.gz",
         ],
     )
 
     maybe(
         http_archive,
         name = "com_github_grpc_grpc",
-        sha256 = "2060769f2d4b0d3535ba594b2ab614d7f68a492f786ab94b4318788d45e3278a",
-        strip_prefix = "grpc-1.33.2",
+        sha256 = "024118069912358e60722a2b7e507e9c3b51eeaeee06e2dd9d95d9c16f6639ec",
+        strip_prefix = "grpc-1.39.1",
         urls = [
-            "https://github.com/grpc/grpc/archive/v1.33.2.tar.gz",
+            "https://github.com/grpc/grpc/archive/v1.39.1.tar.gz",
         ],
     )
 
@@ -54,10 +54,10 @@ def opentelemetry_cpp_deps():
         http_archive,
         name = "com_github_opentelemetry_proto",
         build_file = "@io_opentelemetry_cpp//bazel:opentelemetry_proto.BUILD",
-        sha256 = "08f090570e0a112bfae276ba37e9c45bf724b64d902a7a001db33123b840ebd6",
-        strip_prefix = "opentelemetry-proto-0.6.0",
+        sha256 = "985367f8905e91018e636cbf0d83ab3f834b665c4f5899a27d10cae9657710e2",
+        strip_prefix = "opentelemetry-proto-0.11.0",
         urls = [
-            "https://github.com/open-telemetry/opentelemetry-proto/archive/v0.6.0.tar.gz",
+            "https://github.com/open-telemetry/opentelemetry-proto/archive/v0.11.0.tar.gz",
         ],
     )
 
@@ -87,7 +87,7 @@ def opentelemetry_cpp_deps():
     maybe(
         http_archive,
         name = "curl",
-        build_file = "@//bazel:curl.BUILD",
+        build_file = "@io_opentelemetry_cpp//bazel:curl.BUILD",
         sha256 = "ba98332752257b47b9dea6d8c0ad25ec1745c20424f1dd3ff2c99ab59e97cf91",
         strip_prefix = "curl-7.73.0",
         urls = ["https://curl.haxx.se/download/curl-7.73.0.tar.gz"],

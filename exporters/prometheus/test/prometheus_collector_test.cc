@@ -7,19 +7,21 @@
 #  include <map>
 #  include <thread>
 
+#  include "opentelemetry/_metrics/instrument.h"
 #  include "opentelemetry/exporters/prometheus/prometheus_collector.h"
-#  include "opentelemetry/metrics/instrument.h"
-#  include "opentelemetry/sdk/metrics/aggregator/aggregator.h"
-#  include "opentelemetry/sdk/metrics/aggregator/counter_aggregator.h"
-#  include "opentelemetry/sdk/metrics/aggregator/exact_aggregator.h"
-#  include "opentelemetry/sdk/metrics/aggregator/gauge_aggregator.h"
-#  include "opentelemetry/sdk/metrics/aggregator/histogram_aggregator.h"
-#  include "opentelemetry/sdk/metrics/aggregator/min_max_sum_count_aggregator.h"
-#  include "opentelemetry/sdk/metrics/aggregator/sketch_aggregator.h"
-#  include "opentelemetry/sdk/metrics/record.h"
+#  include "opentelemetry/sdk/_metrics/aggregator/aggregator.h"
+#  include "opentelemetry/sdk/_metrics/aggregator/counter_aggregator.h"
+#  include "opentelemetry/sdk/_metrics/aggregator/exact_aggregator.h"
+#  include "opentelemetry/sdk/_metrics/aggregator/gauge_aggregator.h"
+#  include "opentelemetry/sdk/_metrics/aggregator/histogram_aggregator.h"
+#  include "opentelemetry/sdk/_metrics/aggregator/min_max_sum_count_aggregator.h"
+#  include "opentelemetry/sdk/_metrics/aggregator/sketch_aggregator.h"
+#  include "opentelemetry/sdk/_metrics/record.h"
 #  include "opentelemetry/version.h"
 
 using opentelemetry::exporter::prometheus::PrometheusCollector;
+namespace metric_api = opentelemetry::metrics;
+namespace metric_sdk = opentelemetry::sdk::metrics;
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 
@@ -36,35 +38,33 @@ std::shared_ptr<metric_sdk::Aggregator<T>> CreateAgg(metric_sdk::AggregatorKind 
   {
     case metric_sdk::AggregatorKind::Counter: {
       aggregator = std::shared_ptr<metric_sdk::Aggregator<T>>(
-          new metric_sdk::CounterAggregator<T>(opentelemetry::metrics::InstrumentKind::Counter));
+          new metric_sdk::CounterAggregator<T>(metric_api::InstrumentKind::Counter));
       break;
     }
     case metric_sdk::AggregatorKind::MinMaxSumCount: {
-      aggregator =
-          std::shared_ptr<metric_sdk::Aggregator<T>>(new metric_sdk::MinMaxSumCountAggregator<T>(
-              opentelemetry::metrics::InstrumentKind::Counter));
+      aggregator = std::shared_ptr<metric_sdk::Aggregator<T>>(
+          new metric_sdk::MinMaxSumCountAggregator<T>(metric_api::InstrumentKind::Counter));
       break;
     }
     case metric_sdk::AggregatorKind::Gauge: {
       aggregator = std::shared_ptr<metric_sdk::Aggregator<T>>(
-          new metric_sdk::GaugeAggregator<T>(opentelemetry::metrics::InstrumentKind::Counter));
+          new metric_sdk::GaugeAggregator<T>(metric_api::InstrumentKind::Counter));
       break;
     }
     case metric_sdk::AggregatorKind::Sketch: {
-      aggregator = std::shared_ptr<metric_sdk::Aggregator<T>>(new metric_sdk::SketchAggregator<T>(
-          opentelemetry::metrics::InstrumentKind::Counter, 0.000005));
+      aggregator = std::shared_ptr<metric_sdk::Aggregator<T>>(
+          new metric_sdk::SketchAggregator<T>(metric_api::InstrumentKind::Counter, 0.000005));
       break;
     }
     case metric_sdk::AggregatorKind::Histogram: {
       std::vector<double> boundaries{10, 20};
-      aggregator =
-          std::shared_ptr<metric_sdk::Aggregator<T>>(new metric_sdk::HistogramAggregator<T>(
-              opentelemetry::metrics::InstrumentKind::Counter, boundaries));
+      aggregator = std::shared_ptr<metric_sdk::Aggregator<T>>(
+          new metric_sdk::HistogramAggregator<T>(metric_api::InstrumentKind::Counter, boundaries));
       break;
     }
     case metric_sdk::AggregatorKind::Exact: {
-      aggregator = std::shared_ptr<metric_sdk::Aggregator<T>>(new metric_sdk::ExactAggregator<T>(
-          opentelemetry::metrics::InstrumentKind::Counter, exactMode));
+      aggregator = std::shared_ptr<metric_sdk::Aggregator<T>>(
+          new metric_sdk::ExactAggregator<T>(metric_api::InstrumentKind::Counter, exactMode));
       break;
     }
     default:

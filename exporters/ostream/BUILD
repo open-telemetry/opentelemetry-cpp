@@ -9,6 +9,7 @@ cc_library(
         "include/opentelemetry/exporters/ostream/log_exporter.h",
     ],
     strip_include_prefix = "include",
+    tags = ["ostream"],
     deps = [
         "//sdk/src/logs",
     ],
@@ -17,6 +18,7 @@ cc_library(
 cc_test(
     name = "ostream_log_test",
     srcs = ["test/ostream_log_test.cc"],
+    tags = ["ostream"],
     deps = [
         ":ostream_log_exporter",
         "@com_google_googletest//:gtest_main",
@@ -24,7 +26,7 @@ cc_test(
 )
 
 cc_library(
-    name = "ostream_metrics_exporter",
+    name = "ostream_metrics_exporter_deprecated",
     srcs = [
         "src/metrics_exporter.cc",
     ],
@@ -32,16 +34,18 @@ cc_library(
         "include/opentelemetry/exporters/ostream/metrics_exporter.h",
     ],
     strip_include_prefix = "include",
+    tags = ["ostream"],
     deps = [
-        "//sdk/src/metrics",
+        "//sdk/src/_metrics:metrics_deprecated",
     ],
 )
 
 cc_test(
     name = "ostream_metrics_test",
     srcs = ["test/ostream_metrics_test.cc"],
+    tags = ["ostream"],
     deps = [
-        ":ostream_metrics_exporter",
+        ":ostream_metrics_exporter_deprecated",
         "@com_google_googletest//:gtest_main",
     ],
 )
@@ -55,6 +59,7 @@ cc_library(
         "include/opentelemetry/exporters/ostream/span_exporter.h",
     ],
     strip_include_prefix = "include",
+    tags = ["ostream"],
     deps = [
         "//sdk/src/trace",
     ],
@@ -65,6 +70,7 @@ cc_library(
     hdrs = [
         "test/ostream_capture.h",
     ],
+    tags = ["ostream"],
     deps = [
         "//api",
     ],
@@ -73,6 +79,7 @@ cc_library(
 cc_test(
     name = "ostream_span_test",
     srcs = ["test/ostream_span_test.cc"],
+    tags = ["ostream"],
     deps = [
         ":ostream_capture",
         ":ostream_span_exporter",

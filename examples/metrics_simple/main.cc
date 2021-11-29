@@ -2,32 +2,34 @@
 // SPDX-License-Identifier: Apache-2.0
 
 #ifdef ENABLE_METRICS_PREVIEW
+#  include "opentelemetry/_metrics/provider.h"
 #  include "opentelemetry/exporters/ostream/metrics_exporter.h"
-#  include "opentelemetry/metrics/provider.h"
-#  include "opentelemetry/sdk/metrics/controller.h"
-#  include "opentelemetry/sdk/metrics/meter.h"
-#  include "opentelemetry/sdk/metrics/meter_provider.h"
-#  include "opentelemetry/sdk/metrics/ungrouped_processor.h"
+#  include "opentelemetry/sdk/_metrics/controller.h"
+#  include "opentelemetry/sdk/_metrics/meter.h"
+#  include "opentelemetry/sdk/_metrics/meter_provider.h"
+#  include "opentelemetry/sdk/_metrics/ungrouped_processor.h"
 
-namespace sdkmetrics = opentelemetry::sdk::metrics;
-namespace nostd      = opentelemetry::nostd;
+namespace metric_sdk      = opentelemetry::sdk::metrics;
+namespace nostd           = opentelemetry::nostd;
+namespace common          = opentelemetry::common;
+namespace exportermetrics = opentelemetry::exporter::metrics;
+namespace metrics_api     = opentelemetry::metrics;
 
 int main()
 {
   // Initialize and set the global MeterProvider
-  auto provider = nostd::shared_ptr<metrics_api::MeterProvider>(new sdkmetrics::MeterProvider);
-  opentelemetry::metrics::Provider::SetMeterProvider(provider);
+  auto provider = nostd::shared_ptr<metrics_api::MeterProvider>(new metric_sdk::MeterProvider);
+  metrics_api::Provider::SetMeterProvider(provider);
 
   // Get the Meter from the MeterProvider
   nostd::shared_ptr<metrics_api::Meter> meter = provider->GetMeter("Test", "0.1.0");
 
   // Create the controller with Stateless Metrics Processor
-  sdkmetrics::PushController ControllerStateless(
+  metric_sdk::PushController ControllerStateless(
       meter,
-      std::unique_ptr<sdkmetrics::MetricsExporter>(
-          new opentelemetry::exporter::metrics::OStreamMetricsExporter),
-      std::shared_ptr<sdkmetrics::MetricsProcessor>(
-          new opentelemetry::sdk::metrics::UngroupedMetricsProcessor(false)),
+      std::unique_ptr<metric_sdk::MetricsExporter>(new exportermetrics::OStreamMetricsExporter),
+      std::shared_ptr<metric_sdk::MetricsProcessor>(
+          new metric_sdk::UngroupedMetricsProcessor(false)),
       .05);
 
   // Create and instrument
@@ -36,7 +38,7 @@ int main()
 
   // Create a labelset
   std::map<std::string, std::string> labels = {{"key", "value"}};
-  auto labelkv = opentelemetry::common::KeyValueIterableView<decltype(labels)>{labels};
+  auto labelkv = common::KeyValueIterableView<decltype(labels)>{labels};
 
   // Create arrays of instrument and values to add to them
   metrics_api::SynchronousInstrument<int> *iinstr_arr[] = {intupdowncounter.get(),
@@ -89,12 +91,11 @@ int main()
   ControllerStateless.stop();
 
   // Do the same thing for stateful to see the difference
-  sdkmetrics::PushController ControllerStateful(
+  metric_sdk::PushController ControllerStateful(
       meter,
-      std::unique_ptr<sdkmetrics::MetricsExporter>(
-          new opentelemetry::exporter::metrics::OStreamMetricsExporter),
-      std::shared_ptr<sdkmetrics::MetricsProcessor>(
-          new opentelemetry::sdk::metrics::UngroupedMetricsProcessor(true)),
+      std::unique_ptr<metric_sdk::MetricsExporter>(new exportermetrics::OStreamMetricsExporter),
+      std::shared_ptr<metric_sdk::MetricsProcessor>(
+          new metric_sdk::UngroupedMetricsProcessor(true)),
       .05);
 
   // Start exporting from the Controller with Stateful Processor

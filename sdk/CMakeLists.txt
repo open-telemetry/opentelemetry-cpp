@@ -20,7 +20,7 @@ endif()
 
 set(METRICS_EXCLUDE_PATTERN "")
 if(NOT WITH_METRICS_PREVIEW)
-  set(METRICS_EXCLUDE_PATTERN "metrics")
+  set(METRICS_EXCLUDE_PATTERN "_metrics")
 endif()
 
 install(

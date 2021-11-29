@@ -4,10 +4,31 @@ cmake_minimum_required(VERSION 3.1)
 # versions of gtest
 cmake_policy(SET CMP0057 NEW)
 
+# See https://cmake.org/cmake/help/v3.12/policy/CMP0074.html required by certain
+# version of zlib which is dependeded by cURL.
+if(${CMAKE_VERSION} VERSION_GREATER_EQUAL "3.12")
+  cmake_policy(SET CMP0074 NEW)
+endif()
+
 project(opentelemetry-cpp)
 
 # Mark variables as used so cmake doesn't complain about them
 mark_as_advanced(CMAKE_TOOLCHAIN_FILE)
+
+# Don't use customized cmake modules if vcpkg is used to resolve dependence.
+if(NOT DEFINED CMAKE_TOOLCHAIN_FILE)
+  list(APPEND CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake/modules/")
+endif()
+
+if(EXISTS "${CMAKE_SOURCE_DIR}/third_party_release")
+  file(STRINGS "${CMAKE_SOURCE_DIR}/third_party_release" third_party_tags)
+  foreach(third_party ${third_party_tags})
+    string(REGEX REPLACE "^[ ]+" "" third_party ${third_party})
+    string(REGEX MATCH "^[^=]+" third_party_name ${third_party})
+    string(REPLACE "${third_party_name}=" "" third_party_tag ${third_party})
+    set(${third_party_name} "${third_party_tag}")
+  endforeach()
+endif()
 
 if(DEFINED ENV{ARCH})
   # Architecture may be specified via ARCH environment variable
@@ -81,13 +102,24 @@ else()
   )
 endif()
 
-if(NOT DEFINED CMAKE_CXX_STANDARD)
-  set(CMAKE_CXX_STANDARD 11)
-endif()
-
 option(WITH_STL "Whether to use Standard Library for C++latest features" OFF)
 
 option(WITH_ABSEIL "Whether to use Abseil for C++latest features" OFF)
+
+if(NOT DEFINED CMAKE_CXX_STANDARD)
+  if(WITH_STL)
+    # Require at least C++17. C++20 is needed to avoid gsl::span
+    if(CMAKE_VERSION VERSION_GREATER 3.11.999)
+      # Ask for 20, may get anything below
+      set(CMAKE_CXX_STANDARD 20)
+    else()
+      # Ask for 17, may get anything below
+      set(CMAKE_CXX_STANDARD 17)
+    endif()
+  else()
+    set(CMAKE_CXX_STANDARD 11)
+  endif()
+endif()
 
 if(WITH_ABSEIL)
   find_package(absl CONFIG REQUIRED)
@@ -106,20 +138,17 @@ if(WITH_STL)
   # the global project build definitions.
   add_definitions(-DHAVE_CPP_STDLIB)
   add_definitions(-DHAVE_GSL)
-  # Require at least C++17. C++20 is needed to avoid gsl::span
-  if(CMAKE_VERSION VERSION_GREATER 3.11.999)
-    # Ask for 20, may get anything below
-    set(CMAKE_CXX_STANDARD 20)
-  else()
-    # Ask for 17, may get anything below
-    set(CMAKE_CXX_STANDARD 17)
-  endif()
 
   # Guidelines Support Library path. Used if we are not on not get C++20.
   #
   # TODO: respect WITH_ABSEIL as alternate implementation of std::span
-  set(GSL_DIR third_party/ms-gsl)
-  include_directories(${GSL_DIR}/include)
+  find_package(Microsoft.GSL QUIET)
+  if(TARGET Microsoft.GSL::GSL)
+    list(APPEND CORE_RUNTIME_LIBS Microsoft.GSL::GSL)
+  else()
+    set(GSL_DIR third_party/ms-gsl)
+    include_directories(${GSL_DIR}/include)
+  endif()
 
   # Optimize for speed to reduce the hops
   if(CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")
@@ -145,9 +174,20 @@ option(WITH_PROMETHEUS "Whether to include the Prometheus Client in the SDK"
 option(WITH_ELASTICSEARCH
        "Whether to include the Elasticsearch Client in the SDK" OFF)
 
+option(WITH_ZPAGES "Whether to include the Zpages Server in the SDK" OFF)
+
 option(WITH_JAEGER "Whether to include the Jaeger exporter" OFF)
 
+option(WITH_NO_GETENV "Whether the platform supports environment variables" OFF)
+
 option(BUILD_TESTING "Whether to enable tests" ON)
+
+option(BUILD_W3CTRACECONTEXT_TEST "Whether to build w3c trace context" OFF)
+
+if(WITH_NO_GENENV)
+  add_definitions(-DNO_GETENV)
+endif()
+
 if(WIN32)
   add_definitions(-DNOMINMAX)
   if(BUILD_TESTING)
@@ -198,7 +238,7 @@ function(install_windows_deps)
 endfunction()
 
 if(WITH_JAEGER)
-  find_package(Thrift QUIET CONFIG)
+  find_package(Thrift QUIET)
   if(NOT Thrift_FOUND)
     # Install Thrift and propagate via vcpkg toolchain file
     if(WIN32 AND (NOT DEFINED CMAKE_TOOLCHAIN_FILE))
@@ -228,39 +268,65 @@ endif()
 # GNUInstallDirs.
 include(GNUInstallDirs)
 
-if(NOT WITH_API_ONLY)
+if((NOT WITH_API_ONLY)
+   OR WITH_ELASTICSEARCH
+   OR WITH_ZIPKIN
+   OR WITH_OTLP
+   OR WITH_OTLP_HTTP
+   OR WITH_ZPAGES
+   OR BUILD_W3CTRACECONTEXT_TEST
+   OR WITH_ETW)
   # nlohmann_json package is required for most SDK build configurations
   find_package(nlohmann_json QUIET)
-  if(NOT nlohmann_json_FOUND)
-    message("Using local nlohmann::json from submodule")
+  set(nlohmann_json_clone FALSE)
+  if(nlohmann_json_FOUND)
+    message("Using external nlohmann::json")
+  elseif(EXISTS ${PROJECT_SOURCE_DIR}/.git
+         AND EXISTS
+             ${PROJECT_SOURCE_DIR}/third_party/nlohmann-json/CMakeLists.txt)
+    message("Trying to use local nlohmann::json from submodule")
     set(JSON_BuildTests
         OFF
         CACHE INTERNAL "")
     set(JSON_Install
         ON
         CACHE INTERNAL "")
-    if(EXISTS ${PROJECT_SOURCE_DIR}/third_party/nlohmann-json)
-      # This option allows to link nlohmann_json::nlohmann_json target
-      add_subdirectory(${PROJECT_SOURCE_DIR}/third_party/nlohmann-json)
-      # This option allows to add header to include directories
-      include_directories(
-        ${PROJECT_SOURCE_DIR}/third_party/nlohmann-json/single_include)
+    # This option allows to link nlohmann_json::nlohmann_json target
+    add_subdirectory(${PROJECT_SOURCE_DIR}/third_party/nlohmann-json)
+    # This option allows to add header to include directories
+    include_directories(
+      ${PROJECT_SOURCE_DIR}/third_party/nlohmann-json/single_include)
+  else()
+    set(nlohmann_json_clone TRUE)
+    include(cmake/nlohmann-json.cmake)
+    message("\nnlohmann_json package was not found. Cloning from github")
+  endif()
+endif()
+
+if(WITH_PROMETHEUS)
+  find_package(prometheus-cpp CONFIG QUIET)
+  if(NOT prometheus-cpp_FOUND)
+    message("Trying to use local prometheus-cpp from submodule")
+    if(EXISTS ${PROJECT_SOURCE_DIR}/third_party/prometheus-cpp/.git)
+      add_subdirectory(third_party/prometheus-cpp)
     else()
       message(
         FATAL_ERROR
-          "\nnlohmann_json package was not found. Please either provide it manually or clone with submodules. "
+          "\nprometheus-cpp package was not found. Please either provide it manually or clone with submodules. "
           "To initialize, fetch and checkout any nested submodules, you can use the following command:\n"
           "git submodule update --init --recursive")
     endif()
   else()
-    message("Using external nlohmann::json")
+    message("Using external prometheus-cpp")
   endif()
 endif()
 
 if(WITH_OTLP)
   set(protobuf_MODULE_COMPATIBLE ON)
   find_package(Protobuf)
-  find_package(gRPC)
+  if(WITH_OTLP_GRPC)
+    find_package(gRPC)
+  endif()
   if((NOT Protobuf_FOUND AND NOT PROTOBUF_FOUND) OR (NOT gRPC_FOUND))
     if(WIN32 AND (NOT DEFINED CMAKE_TOOLCHAIN_FILE))
       install_windows_deps()
@@ -276,7 +342,7 @@ if(WITH_OTLP)
     if(NOT Protobuf_FOUND AND NOT PROTOBUF_FOUND)
       find_package(Protobuf REQUIRED)
     endif()
-    if(NOT gRPC_FOUND)
+    if(WITH_OTLP_GRPC AND NOT gRPC_FOUND)
       find_package(gRPC)
     endif()
     if(WIN32)
@@ -362,7 +428,7 @@ endif()
 # config file for find_packages(opentelemetry-cpp CONFIG)
 set(INCLUDE_INSTALL_DIR "${CMAKE_INSTALL_INCLUDEDIR}")
 configure_package_config_file(
-  "${CMAKE_CURRENT_LIST_DIR}/opentelemetry-cpp-config.cmake.in"
+  "${CMAKE_CURRENT_LIST_DIR}/cmake/opentelemetry-cpp-config.cmake.in"
   "${CMAKE_CURRENT_BINARY_DIR}/cmake/${PROJECT_NAME}/${PROJECT_NAME}-config.cmake"
   INSTALL_DESTINATION "${CMAKE_INSTALL_LIBDIR}/cmake/${PROJECT_NAME}"
   PATH_VARS OPENTELEMETRY_ABI_VERSION_NO OPENTELEMETRY_VERSION PROJECT_NAME

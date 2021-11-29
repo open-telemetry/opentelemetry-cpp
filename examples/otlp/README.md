@@ -4,9 +4,11 @@ This is an example of how to use the [OpenTelemetry
 Protocol](https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/protocol/README.md)
 (OTLP) exporter.
 
-The application in `grpc_main.cc` initializes an `OtlpGrpcExporter` instance and
-the application in `http_main.cc` initializes an `OtlpHttpExporter` instance
-and they register a tracer provider from the [OpenTelemetry
+The application in `grpc_main.cc` initializes an `OtlpGrpcExporter` instance,
+the application in `http_main.cc` initializes an `OtlpHttpExporter` instance.
+The application in `http_log_main.cc` initializes an `OtlpHttpLogExporter` instance,
+the application in `grpc_log_main.cc` initializes an `OtlpGrpcLogExporter` instance.
+And they register a tracer provider from the [OpenTelemetry
 SDK](https://github.com/open-telemetry/opentelemetry-cpp). The application then
 calls a `foo_library` which has been instrumented using the [OpenTelemetry
 API](https://github.com/open-telemetry/opentelemetry-cpp/tree/main/api).
@@ -32,19 +34,18 @@ OpenTelemetry Collector with an OTLP receiver by running:
 - On Unix based systems use:
 
 ```console
-docker run --rm -it -p 4317:4317 -p 55681:55681 -v $(pwd)/examples/otlp:/cfg otel/opentelemetry-collector:0.19.0 --config=/cfg/opentelemetry-collector-config/config.dev.yaml
+docker run --rm -it -p 4317:4317 -p 4318:4318 -v $(pwd)/examples/otlp:/cfg otel/opentelemetry-collector:0.38.0 --config=/cfg/opentelemetry-collector-config/config.dev.yaml
 ```
 
 - On Windows use:
 
 ```console
-docker run --rm -it -p 4317:4317 -p 55681:55681 -v "%cd%/examples/otlp":/cfg otel/opentelemetry-collector:0.19.0 --config=/cfg/opentelemetry-collector-config/config.dev.yaml
+docker run --rm -it -p 4317:4317 -p 4318:4318 -v "%cd%/examples/otlp":/cfg otel/opentelemetry-collector:0.38.0 --config=/cfg/opentelemetry-collector-config/config.dev.yaml
 ```
 
-Note that the OTLP exporter connects to the Collector at `localhost:4317` by
-default. This can be changed with first argument from command-line, for example:
+Note that the OTLP gRPC and HTTP exporters connects to the Collector at `localhost:4317` and `localhost:4318/v1/traces` respectively. This can be changed with first argument from command-line, for example:
 `./example_otlp_grpc gateway.docker.internal:4317` and
-`./example_otlp_http gateway.docker.internal:55681/v1/traces`.
+`./example_otlp_http gateway.docker.internal:4318/v1/traces`.
 
 Once you have the Collector running, see
 [CONTRIBUTING.md](../../CONTRIBUTING.md) for instructions on building and

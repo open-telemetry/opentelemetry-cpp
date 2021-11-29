@@ -34,133 +34,17 @@
 
 #include "opentelemetry/sdk/trace/exporter.h"
 
+#include "opentelemetry/exporters/etw/etw_config.h"
 #include "opentelemetry/exporters/etw/etw_fields.h"
 #include "opentelemetry/exporters/etw/etw_properties.h"
 #include "opentelemetry/exporters/etw/etw_provider.h"
 #include "opentelemetry/exporters/etw/utils.h"
-
-namespace trace = opentelemetry::trace;
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace exporter
 {
 namespace etw
 {
-
-/**
- * @brief TracerProvider Options passed via SDK API.
- */
-using TracerProviderOptions =
-    std::map<std::string, nostd::variant<std::string, uint64_t, float, bool>>;
-
-/**
- * @brief TracerProvider runtime configuration class. Internal representation
- * of TracerProviderOptions used by various components of SDK.
- */
-typedef struct
-{
-  bool enableTraceId;            // Set `TraceId` on ETW events
-  bool enableSpanId;             // Set `SpanId` on ETW events
-  bool enableActivityId;         // Assign `SpanId` to `ActivityId`
-  bool enableActivityTracking;   // Emit TraceLogging events for Span/Start and Span/Stop
-  bool enableRelatedActivityId;  // Assign parent `SpanId` to `RelatedActivityId`
-  bool enableAutoParent;         // Start new spans as children of current active span
-  ETWProvider::EventFormat
-      encoding;  // Event encoding to use for this provider (TLD, MsgPack, XML, etc.).
-} TracerProviderConfiguration;
-
-/**
- * @brief Helper template to convert a variant value from TracerProviderOptions to
- * TracerProviderConfiguration
- *
- * @param options           TracerProviderOptions passed on API surface
- * @param key               Option name
- * @param value             Reference to destination value
- * @param defaultValue      Default value if option is not supplied
- */
-template <typename T>
-static inline void GetOption(const TracerProviderOptions &options,
-                             const char *key,
-                             T &value,
-                             T defaultValue)
-{
-  auto it = options.find(key);
-  if (it != options.end())
-  {
-    auto val = it->second;
-    value    = nostd::get<T>(val);
-  }
-  else
-  {
-    value = defaultValue;
-  }
-}
-
-/**
- * @brief Helper template to convert encoding config option to EventFormat.
- * Configuration option passed as `options["encoding"] = "MsgPack"`.
- * Default encoding is TraceLogging Dynamic Manifest (TLD).
- *
- * Valid encoding names listed below.
- *
- * For MessagePack encoding:
- * - "MSGPACK"
- * - "MsgPack"
- * - "MessagePack"
- *
- * For XML encoding:
- * - "XML"
- * - "xml"
- *
- * For TraceLogging Dynamic encoding:
- * - "TLD"
- * - "tld"
- *
- */
-static inline ETWProvider::EventFormat GetEncoding(const TracerProviderOptions &options)
-{
-  ETWProvider::EventFormat evtFmt = ETWProvider::EventFormat::ETW_MANIFEST;
-
-  auto it = options.find("encoding");
-  if (it != options.end())
-  {
-    auto varValue   = it->second;
-    std::string val = nostd::get<std::string>(varValue);
-
-#pragma warning(push)
-#pragma warning(disable : 4307) /* Integral constant overflow - OK while computing hash */
-    auto h = utils::hashCode(val.c_str());
-    switch (h)
-    {
-      case CONST_HASHCODE(MSGPACK):
-        // nobrk
-      case CONST_HASHCODE(MsgPack):
-        // nobrk
-      case CONST_HASHCODE(MessagePack):
-        evtFmt = ETWProvider::EventFormat::ETW_MSGPACK;
-        break;
-
-      case CONST_HASHCODE(XML):
-        // nobrk
-      case CONST_HASHCODE(xml):
-        evtFmt = ETWProvider::EventFormat::ETW_XML;
-        break;
-
-      case CONST_HASHCODE(TLD):
-        // nobrk
-      case CONST_HASHCODE(tld):
-        // nobrk
-        evtFmt = ETWProvider::EventFormat::ETW_MANIFEST;
-        break;
-
-      default:
-        break;
-    }
-#pragma warning(pop)
-  }
-
-  return evtFmt;
-}
 
 class Span;
 
@@ -178,21 +62,22 @@ class Span;
 template <class SpanType, class TracerType>
 SpanType *new_span(TracerType *objPtr,
                    nostd::string_view name,
-                   const trace::StartSpanOptions &options)
+                   const opentelemetry::trace::StartSpanOptions &options)
 {
   return new (std::nothrow) SpanType{*objPtr, name, options};
 }
 
 /**
- * @brief Template that allows to convert etw::Span pointer to smart shared pointer to `trace::Span`
+ * @brief Template that allows to convert etw::Span pointer to smart shared pointer to
+ * `opentelemetry::trace::Span`
  * @tparam SpanType     Expected to be etw::Span
  * @param ptr           Pointer to etw::Span
- * @return              Smart shared pointer to `trace::Span`
+ * @return              Smart shared pointer to `opentelemetry::trace::Span`
  */
 template <class SpanType>
-nostd::shared_ptr<trace::Span> to_span_ptr(SpanType *ptr)
+nostd::shared_ptr<opentelemetry::trace::Span> to_span_ptr(SpanType *ptr)
 {
-  return nostd::shared_ptr<trace::Span>{ptr};
+  return nostd::shared_ptr<opentelemetry::trace::Span>{ptr};
 }
 
 class TracerProvider;
@@ -260,19 +145,6 @@ Properties &GetSpanAttributes(T &instance)
   return instance.GetAttributes();
 }
 
-/**
- * @brief Utility template to obtain etw::TracerProvider._config
- *
- * @tparam T    etw::TracerProvider
- * @param t     etw::TracerProvider ref
- * @return      TracerProviderConfiguration ref
- */
-template <class T>
-TracerProviderConfiguration &GetConfiguration(T &t)
-{
-  return t.config_;
-}
-
 template <class T>
 void UpdateStatus(T &t, Properties &props)
 {
@@ -280,43 +152,9 @@ void UpdateStatus(T &t, Properties &props)
 }
 
 /**
- * @brief Utility method to convert SppanContext.span_id() (8 byte) to ActivityId GUID (16 bytes)
- * @param span OpenTelemetry Span pointer
- * @return GUID struct containing 8-bytes of SpanId + 8 NUL bytes.
- */
-static inline bool CopySpanIdToActivityId(const trace::SpanContext &spanContext, GUID &outGuid)
-{
-  memset(&outGuid, 0, sizeof(outGuid));
-  if (!spanContext.IsValid())
-  {
-    return false;
-  }
-  auto spanId      = spanContext.span_id().Id().data();
-  uint8_t *guidPtr = reinterpret_cast<uint8_t *>(&outGuid);
-  for (size_t i = 0; i < 8; i++)
-  {
-    guidPtr[i] = spanId[i];
-  }
-  return true;
-};
-
-/**
- * @brief Utility template to convert SpanId or TraceId to hex.
- * @param id - value of SpanId or TraceId
- * @return Hexadecimal representation of Id as string.
- */
-template <class T>
-static inline std::string ToLowerBase16(const T &id)
-{
-  char buf[2 * T::kSize] = {0};
-  id.ToLowerBase16(buf);
-  return std::string(buf, sizeof(buf));
-}
-
-/**
  * @brief Tracer class that allows to send spans to ETW Provider.
  */
-class Tracer : public trace::Tracer
+class Tracer : public opentelemetry::trace::Tracer
 {
 
   /**
@@ -339,7 +177,7 @@ class Tracer : public trace::Tracer
    */
   ETWProvider::Handle &provHandle;
 
-  trace::TraceId traceId_;
+  opentelemetry::trace::TraceId traceId_;
 
   std::atomic<bool> isClosed_{true};
 
@@ -351,7 +189,7 @@ class Tracer : public trace::Tracer
   {
     static ETWProvider instance;  // C++11 magic static
     return instance;
-  };
+  }
 
   /**
    * @brief Internal method that allows to populate Links to other Spans.
@@ -362,25 +200,26 @@ class Tracer : public trace::Tracer
    * @param links
    */
   virtual void DecorateLinks(Properties &attributes,
-                             const trace::SpanContextKeyValueIterable &links) const
+                             const opentelemetry::trace::SpanContextKeyValueIterable &links) const
   {
     // Add `SpanLinks` attribute if the list is not empty
     if (links.size())
     {
       size_t idx = 0;
       std::string linksValue;
-      links.ForEachKeyValue([&](trace::SpanContext ctx, const common::KeyValueIterable &) {
-        if (!linksValue.empty())
-        {
-          linksValue += ',';
-          linksValue += ToLowerBase16(ctx.span_id());
-        }
-        idx++;
-        return true;
-      });
+      links.ForEachKeyValue(
+          [&](opentelemetry::trace::SpanContext ctx, const common::KeyValueIterable &) {
+            if (!linksValue.empty())
+            {
+              linksValue += ',';
+              linksValue += ToLowerBase16(ctx.span_id());
+            }
+            idx++;
+            return true;
+          });
       attributes[ETW_FIELD_SPAN_LINKS] = linksValue;
     }
-  };
+  }
 
   /**
    * @brief Allow our friendly etw::Span to end itself on Tracer.
@@ -388,12 +227,13 @@ class Tracer : public trace::Tracer
    * @param
    */
   virtual void EndSpan(const Span &span,
-                       const trace::Span *parentSpan = nullptr,
-                       const trace::EndSpanOptions & = {})
+                       const opentelemetry::trace::Span *parentSpan = nullptr,
+                       const opentelemetry::trace::EndSpanOptions & = {})
   {
-    const auto &cfg             = GetConfiguration(tracerProvider_);
-    const trace::Span &spanBase = reinterpret_cast<const trace::Span &>(span);
-    auto spanContext            = spanBase.GetContext();
+    const auto &cfg = GetConfiguration(tracerProvider_);
+    const opentelemetry::trace::Span &spanBase =
+        reinterpret_cast<const opentelemetry::trace::Span &>(span);
+    auto spanContext = spanBase.GetContext();
 
     // Populate Span with presaved attributes
     Span &currentSpan   = const_cast<Span &>(span);
@@ -415,7 +255,7 @@ class Tracer : public trace::Tracer
     LPGUID ActivityIdPtr = nullptr;
     if (cfg.enableActivityId)
     {
-      if (CopySpanIdToActivityId(spanBase.GetContext(), ActivityId))
+      if (CopySpanIdToActivityId(spanBase.GetContext().span_id(), ActivityId))
       {
         ActivityIdPtr = &ActivityId;
       }
@@ -428,7 +268,7 @@ class Tracer : public trace::Tracer
     {
       if (parentSpan != nullptr)
       {
-        if (CopySpanIdToActivityId(parentSpan->GetContext(), RelatedActivityId))
+        if (CopySpanIdToActivityId(parentSpan->GetContext().span_id(), RelatedActivityId))
         {
           RelatedActivityIdPtr = &RelatedActivityId;
         }
@@ -477,13 +317,13 @@ class Tracer : public trace::Tracer
       // Duration of Span in milliseconds
       evt[ETW_FIELD_DURATION] = endTimeMs - startTimeMs;
       // Presently we assume that all spans are server spans
-      evt[ETW_FIELD_SPAN_KIND] = uint32_t(trace::SpanKind::kServer);
+      evt[ETW_FIELD_SPAN_KIND] = uint32_t(opentelemetry::trace::SpanKind::kServer);
       UpdateStatus(currentSpan, evt);
       etwProvider().write(provHandle, evt, ActivityIdPtr, RelatedActivityIdPtr, 0, encoding);
     }
-  };
+  }
 
-  const trace::TraceId &trace_id() { return traceId_; };
+  const opentelemetry::trace::TraceId &trace_id() { return traceId_; }
 
   friend class Span;
 
@@ -507,7 +347,7 @@ public:
   Tracer(etw::TracerProvider &parent,
          nostd::string_view providerId     = "",
          ETWProvider::EventFormat encoding = ETWProvider::EventFormat::ETW_MANIFEST)
-      : trace::Tracer(),
+      : opentelemetry::trace::Tracer(),
         tracerProvider_(parent),
         provId(providerId.data(), providerId.size()),
         encoding(encoding),
@@ -518,10 +358,10 @@ public:
     CoCreateGuid(&trace_id);
     // Populate TraceId of the Tracer with the above GUID
     const auto *traceIdPtr = reinterpret_cast<const uint8_t *>(std::addressof(trace_id));
-    nostd::span<const uint8_t, trace::TraceId::kSize> traceIdBytes(
-        traceIdPtr, traceIdPtr + trace::TraceId::kSize);
-    traceId_ = trace::TraceId(traceIdBytes);
-  };
+    nostd::span<const uint8_t, opentelemetry::trace::TraceId::kSize> traceIdBytes(
+        traceIdPtr, traceIdPtr + opentelemetry::trace::TraceId::kSize);
+    traceId_ = opentelemetry::trace::TraceId(traceIdBytes);
+  }
 
   /**
    * @brief Start Span
@@ -531,11 +371,11 @@ public:
    * @param options Span options
    * @return
    */
-  nostd::shared_ptr<trace::Span> StartSpan(
+  nostd::shared_ptr<opentelemetry::trace::Span> StartSpan(
       nostd::string_view name,
       const common::KeyValueIterable &attributes,
-      const trace::SpanContextKeyValueIterable &links,
-      const trace::StartSpanOptions &options = {}) noexcept override
+      const opentelemetry::trace::SpanContextKeyValueIterable &links,
+      const opentelemetry::trace::StartSpanOptions &options = {}) noexcept override
   {
 #ifdef RTTI_ENABLED
     common::KeyValueIterable &attribs = const_cast<common::KeyValueIterable &>(attributes);
@@ -558,19 +398,26 @@ public:
    * @param options Span options
    * @return
    */
-  virtual nostd::shared_ptr<trace::Span> StartSpan(
+  virtual nostd::shared_ptr<opentelemetry::trace::Span> StartSpan(
       nostd::string_view name,
       Properties &evt,
-      const trace::SpanContextKeyValueIterable &links,
-      const trace::StartSpanOptions &options = {}) noexcept
+      const opentelemetry::trace::SpanContextKeyValueIterable &links,
+      const opentelemetry::trace::StartSpanOptions &options = {}) noexcept
   {
     const auto &cfg = GetConfiguration(tracerProvider_);
 
     // Parent Context:
     // - either use current span
     // - or attach to parent SpanContext specified in options
-    const auto parentContext =
-        (options.parent.IsValid()) ? options.parent : GetCurrentSpan()->GetContext();
+    opentelemetry::trace::SpanContext parentContext = GetCurrentSpan()->GetContext();
+    if (nostd::holds_alternative<opentelemetry::trace::SpanContext>(options.parent))
+    {
+      auto span_context = nostd::get<opentelemetry::trace::SpanContext>(options.parent);
+      if (span_context.IsValid())
+      {
+        parentContext = span_context;
+      }
+    }
 
     // Populate Etw.RelatedActivityId at envelope level if enabled
     GUID RelatedActivityId;
@@ -579,7 +426,7 @@ public:
     {
       if (cfg.enableRelatedActivityId)
       {
-        if (CopySpanIdToActivityId(parentContext, RelatedActivityId))
+        if (CopySpanIdToActivityId(parentContext.span_id(), RelatedActivityId))
         {
           RelatedActivityIdPtr = &RelatedActivityId;
         }
@@ -588,8 +435,8 @@ public:
 
     // This template pattern allows us to forward-declare the etw::Span,
     // create an instance of it, then assign it to tracer::Span result.
-    auto currentSpan                      = new_span<Span, Tracer>(this, name, options);
-    nostd::shared_ptr<trace::Span> result = to_span_ptr<Span>(currentSpan);
+    auto currentSpan = new_span<Span, Tracer>(this, name, options);
+    nostd::shared_ptr<opentelemetry::trace::Span> result = to_span_ptr<Span>(currentSpan);
 
     auto spanContext = result->GetContext();
 
@@ -621,7 +468,7 @@ public:
     LPCGUID ActivityIdPtr = nullptr;
     if (cfg.enableActivityId)
     {
-      if (CopySpanIdToActivityId(result.get()->GetContext(), ActivityId))
+      if (CopySpanIdToActivityId(result.get()->GetContext().span_id(), ActivityId))
       {
         ActivityIdPtr = &ActivityId;
       }
@@ -640,10 +487,10 @@ public:
       // - options.start_steady_time
       // - options.start_system_time
       etwProvider().write(provHandle, evt, ActivityIdPtr, RelatedActivityIdPtr, 1, encoding);
-    };
+    }
 
     return result;
-  };
+  }
 
   /**
    * @brief Force flush data to Tracer, spending up to given amount of microseconds to flush.
@@ -652,7 +499,7 @@ public:
    * @param timeout Allow Tracer to drop data if timeout is reached
    * @return
    */
-  void ForceFlushWithMicroseconds(uint64_t) noexcept override{};
+  void ForceFlushWithMicroseconds(uint64_t) noexcept override {}
 
   /**
    * @brief Close tracer, spending up to given amount of microseconds to flush and close.
@@ -669,7 +516,7 @@ public:
     {
       etwProvider().close(provHandle);
     }
-  };
+  }
 
   /**
    * @brief Add event data to span associated with tracer.
@@ -679,7 +526,7 @@ public:
    * @param attributes Event attributes.
    * @return
    */
-  void AddEvent(trace::Span &span,
+  void AddEvent(opentelemetry::trace::Span &span,
                 nostd::string_view name,
                 common::SystemTimestamp timestamp,
                 const common::KeyValueIterable &attributes) noexcept
@@ -706,7 +553,7 @@ public:
    * @param attributes Event attributes.
    * @return
    */
-  void AddEvent(trace::Span &span,
+  void AddEvent(opentelemetry::trace::Span &span,
                 nostd::string_view name,
                 common::SystemTimestamp timestamp,
                 Properties &evt) noexcept
@@ -740,8 +587,10 @@ public:
     GUID ActivityId;
     if (cfg.enableActivityId)
     {
-      CopySpanIdToActivityId(spanContext, ActivityId);
-      ActivityIdPtr = &ActivityId;
+      if (CopySpanIdToActivityId(spanContext.span_id(), ActivityId))
+      {
+        ActivityIdPtr = &ActivityId;
+      }
     }
 
 #ifdef HAVE_FIELD_TIME
@@ -753,7 +602,7 @@ public:
 #endif
 
     etwProvider().write(provHandle, evt, ActivityIdPtr, nullptr, 0, encoding);
-  };
+  }
 
   /**
    * @brief Add event data to span associated with tracer.
@@ -762,33 +611,33 @@ public:
    * @param timestamp Event timestamp.
    * @return
    */
-  void AddEvent(trace::Span &span,
+  void AddEvent(opentelemetry::trace::Span &span,
                 nostd::string_view name,
                 common::SystemTimestamp timestamp) noexcept
   {
     AddEvent(span, name, timestamp, sdk::GetEmptyAttributes());
-  };
+  }
 
   /**
    * @brief Add event data to span associated with tracer.
    * @param span Spab.
    * @param name Event name.
    */
-  void AddEvent(trace::Span &span, nostd::string_view name)
+  void AddEvent(opentelemetry::trace::Span &span, nostd::string_view name)
   {
     AddEvent(span, name, std::chrono::system_clock::now(), sdk::GetEmptyAttributes());
-  };
+  }
 
   /**
    * @brief Tracer destructor.
    */
-  virtual ~Tracer() { CloseWithMicroseconds(0); };
+  virtual ~Tracer() { CloseWithMicroseconds(0); }
 };
 
 /**
  * @brief etw::Span allows to send event data to ETW listener.
  */
-class Span : public trace::Span
+class Span : public opentelemetry::trace::Span
 {
 protected:
   friend class Tracer;
@@ -801,7 +650,7 @@ protected:
   common::SystemTimestamp start_time_;
   common::SystemTimestamp end_time_;
 
-  trace::StatusCode status_code_{trace::StatusCode::kUnset};
+  opentelemetry::trace::StatusCode status_code_{opentelemetry::trace::StatusCode::kUnset};
   std::string status_description_;
 
   /**
@@ -835,9 +684,9 @@ protected:
    */
   Span *GetParent() const { return parent_; }
 
-  trace::SpanContext context_;
+  opentelemetry::trace::SpanContext context_;
 
-  const trace::SpanContext CreateContext()
+  const opentelemetry::trace::SpanContext CreateContext()
   {
     GUID activity_id;
     // Generate random GUID
@@ -845,17 +694,17 @@ protected:
     const auto *activityIdPtr = reinterpret_cast<const uint8_t *>(std::addressof(activity_id));
 
     // Populate SpanId with that GUID
-    nostd::span<const uint8_t, trace::SpanId::kSize> spanIdBytes(
-        activityIdPtr, activityIdPtr + trace::SpanId::kSize);
-    const trace::SpanId spanId(spanIdBytes);
+    nostd::span<const uint8_t, opentelemetry::trace::SpanId::kSize> spanIdBytes(
+        activityIdPtr, activityIdPtr + opentelemetry::trace::SpanId::kSize);
+    const opentelemetry::trace::SpanId spanId(spanIdBytes);
 
     // Inherit trace_id from Tracer
-    const trace::TraceId traceId{owner_.trace_id()};
+    const opentelemetry::trace::TraceId traceId{owner_.trace_id()};
     // TODO: TraceFlags are not supported by ETW exporter.
-    const trace::TraceFlags flags{0};
+    const opentelemetry::trace::TraceFlags flags{0};
     // TODO: Remote parent is not supported by ETW exporter.
     const bool hasRemoteParent = false;
-    return trace::SpanContext{traceId, spanId, flags, hasRemoteParent};
+    return opentelemetry::trace::SpanContext{traceId, spanId, flags, hasRemoteParent};
   }
 
 public:
@@ -866,7 +715,8 @@ public:
   void UpdateStatus(Properties &evt)
   {
     /* Should we avoid populating this extra field if status is unset? */
-    if ((status_code_ == trace::StatusCode::kUnset) || (status_code_ == trace::StatusCode::kOk))
+    if ((status_code_ == opentelemetry::trace::StatusCode::kUnset) ||
+        (status_code_ == opentelemetry::trace::StatusCode::kOk))
     {
       evt[ETW_FIELD_SUCCESS]       = "True";
       evt[ETW_FIELD_STATUSCODE]    = uint32_t(status_code_);
@@ -908,9 +758,9 @@ public:
    */
   Span(Tracer &owner,
        nostd::string_view name,
-       const trace::StartSpanOptions &options,
+       const opentelemetry::trace::StartSpanOptions &options,
        Span *parent = nullptr) noexcept
-      : trace::Span(),
+      : opentelemetry::trace::Span(),
         owner_(owner),
         parent_(parent),
         context_(CreateContext()),
@@ -918,7 +768,7 @@ public:
   {
     name_ = name;
     UNREFERENCED_PARAMETER(options);
-  };
+  }
 
   /**
    * @brief Span Destructor
@@ -963,7 +813,8 @@ public:
    * @param description Span description.
    * @return
    */
-  void SetStatus(trace::StatusCode code, nostd::string_view description) noexcept override
+  void SetStatus(opentelemetry::trace::StatusCode code,
+                 nostd::string_view description) noexcept override
   {
     status_code_        = code;
     status_description_ = description.data();
@@ -989,10 +840,13 @@ public:
    */
   void SetAttribute(nostd::string_view key, const common::AttributeValue &value) noexcept override
   {
-    // TODO: not implemented
-    UNREFERENCED_PARAMETER(key);
-    UNREFERENCED_PARAMETER(value);
-  };
+    // don't override fields propagated from span data.
+    if (key == ETW_FIELD_NAME || key == ETW_FIELD_SPAN_ID || key == ETW_FIELD_TRACE_ID)
+    {
+      return;
+    }
+    attributes_[std::string{key}].FromAttributeValue(value);
+  }
 
   /**
    * @brief Update Span name.
@@ -1014,7 +868,7 @@ public:
    * @param EndSpanOptions
    * @return
    */
-  void End(const trace::EndSpanOptions &options = {}) noexcept override
+  void End(const opentelemetry::trace::EndSpanOptions &options = {}) noexcept override
   {
     end_time_ = std::chrono::system_clock::now();
 
@@ -1028,7 +882,7 @@ public:
    * @brief Obtain SpanContext
    * @return
    */
-  trace::SpanContext GetContext() const noexcept override { return context_; }
+  opentelemetry::trace::SpanContext GetContext() const noexcept override { return context_; }
 
   /**
    * @brief Check if Span is recording data.
@@ -1052,25 +906,25 @@ public:
   /// Get Owner tracer of this Span
   /// </summary>
   /// <returns></returns>
-  trace::Tracer &tracer() const noexcept { return this->owner_; };
+  opentelemetry::trace::Tracer &tracer() const noexcept { return this->owner_; }
 };
 
 /**
  * @brief ETW TracerProvider
  */
-class TracerProvider : public trace::TracerProvider
+class TracerProvider : public opentelemetry::trace::TracerProvider
 {
 public:
   /**
    * @brief TracerProvider options supplied during initialization.
    */
-  TracerProviderConfiguration config_;
+  TelemetryProviderConfiguration config_;
 
   /**
    * @brief Construct instance of TracerProvider with given options
    * @param options Configuration options
    */
-  TracerProvider(TracerProviderOptions options) : trace::TracerProvider()
+  TracerProvider(TelemetryProviderOptions options) : opentelemetry::trace::TracerProvider()
   {
     // By default we ensure that all events carry their with TraceId and SpanId
     GetOption(options, "enableTraceId", config_.enableTraceId, true);
@@ -1089,8 +943,9 @@ public:
     // identifier, see EventActivityIdControl.
     GetOption(options, "enableActivityId", config_.enableActivityId, false);
 
-    // Map parent `SpanId` to RelatedActivityId -  Activity identifier from the previous component.
-    // Use this parameter to link your component's events to the previous component's events.
+    // Map parent `SpanId` to RelatedActivityId -  Activity identifier from the previous
+    // component. Use this parameter to link your component's events to the previous component's
+    // events.
     GetOption(options, "enableRelatedActivityId", config_.enableRelatedActivityId, false);
 
     // When a new Span is started, the current span automatically becomes its parent.
@@ -1100,7 +955,7 @@ public:
     config_.encoding = GetEncoding(options);
   }
 
-  TracerProvider() : trace::TracerProvider()
+  TracerProvider() : opentelemetry::trace::TracerProvider()
   {
     config_.enableTraceId           = true;
     config_.enableSpanId            = true;
@@ -1122,12 +977,16 @@ public:
    * - "XML"            - XML events (reserved for future use)
    * @return
    */
-  nostd::shared_ptr<trace::Tracer> GetTracer(nostd::string_view name,
-                                             nostd::string_view args = "") override
+  nostd::shared_ptr<opentelemetry::trace::Tracer> GetTracer(
+      nostd::string_view name,
+      nostd::string_view args       = "",
+      nostd::string_view schema_url = "") override
   {
     UNREFERENCED_PARAMETER(args);
+    UNREFERENCED_PARAMETER(schema_url);
     ETWProvider::EventFormat evtFmt = config_.encoding;
-    return nostd::shared_ptr<trace::Tracer>{new (std::nothrow) Tracer(*this, name, evtFmt)};
+    return nostd::shared_ptr<opentelemetry::trace::Tracer>{new (std::nothrow)
+                                                               Tracer(*this, name, evtFmt)};
   }
 };
 

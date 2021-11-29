@@ -9,6 +9,7 @@
 #  include <gtest/gtest.h>
 
 using namespace opentelemetry::sdk::logs;
+namespace logs_api = opentelemetry::logs;
 
 TEST(LoggerSDK, LogToNullProcessor)
 {
@@ -16,7 +17,7 @@ TEST(LoggerSDK, LogToNullProcessor)
   // even when there is no processor set
   // since it calls Processor::OnReceive()
 
-  auto lp     = std::shared_ptr<opentelemetry::logs::LoggerProvider>(new LoggerProvider());
+  auto lp     = std::shared_ptr<logs_api::LoggerProvider>(new LoggerProvider());
   auto logger = lp->GetLogger("logger");
 
   // Log a sample log record to a nullptr processor
@@ -64,7 +65,7 @@ public:
 TEST(LoggerSDK, LogToAProcessor)
 {
   // Create an API LoggerProvider and logger
-  auto api_lp = std::shared_ptr<opentelemetry::logs::LoggerProvider>(new LoggerProvider());
+  auto api_lp = std::shared_ptr<logs_api::LoggerProvider>(new LoggerProvider());
   auto logger = api_lp->GetLogger("logger");
 
   // Cast the API LoggerProvider to an SDK Logger Provider and assert that it is still the same
@@ -81,9 +82,9 @@ TEST(LoggerSDK, LogToAProcessor)
   ASSERT_EQ(processor, lp->GetProcessor());
 
   // Check that the recordable created by the Log() statement is set properly
-  logger->Log(opentelemetry::logs::Severity::kWarn, "Log Name", "Log Message");
+  logger->Log(logs_api::Severity::kWarn, "Log Name", "Log Message");
 
-  ASSERT_EQ(shared_recordable->GetSeverity(), opentelemetry::logs::Severity::kWarn);
+  ASSERT_EQ(shared_recordable->GetSeverity(), logs_api::Severity::kWarn);
   ASSERT_EQ(shared_recordable->GetName(), "Log Name");
   ASSERT_EQ(shared_recordable->GetBody(), "Log Message");
 }

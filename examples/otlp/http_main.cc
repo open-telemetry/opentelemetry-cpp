@@ -8,12 +8,16 @@
 
 #include <string>
 
-#include "foo_library/foo_library.h"
+#ifdef BAZEL_BUILD
+#  include "examples/common/foo_library/foo_library.h"
+#else
+#  include "foo_library/foo_library.h"
+#endif
 
-namespace trace    = opentelemetry::trace;
-namespace nostd    = opentelemetry::nostd;
-namespace sdktrace = opentelemetry::sdk::trace;
-namespace otlp     = opentelemetry::exporter::otlp;
+namespace trace     = opentelemetry::trace;
+namespace nostd     = opentelemetry::nostd;
+namespace trace_sdk = opentelemetry::sdk::trace;
+namespace otlp      = opentelemetry::exporter::otlp;
 
 namespace
 {
@@ -21,11 +25,11 @@ opentelemetry::exporter::otlp::OtlpHttpExporterOptions opts;
 void InitTracer()
 {
   // Create OTLP exporter instance
-  auto exporter  = std::unique_ptr<sdktrace::SpanExporter>(new otlp::OtlpHttpExporter(opts));
-  auto processor = std::unique_ptr<sdktrace::SpanProcessor>(
-      new sdktrace::SimpleSpanProcessor(std::move(exporter)));
+  auto exporter  = std::unique_ptr<trace_sdk::SpanExporter>(new otlp::OtlpHttpExporter(opts));
+  auto processor = std::unique_ptr<trace_sdk::SpanProcessor>(
+      new trace_sdk::SimpleSpanProcessor(std::move(exporter)));
   auto provider =
-      nostd::shared_ptr<trace::TracerProvider>(new sdktrace::TracerProvider(std::move(processor)));
+      nostd::shared_ptr<trace::TracerProvider>(new trace_sdk::TracerProvider(std::move(processor)));
   // Set the global trace provider
   trace::Provider::SetTracerProvider(provider);
 }
@@ -47,7 +51,7 @@ int main(int argc, char *argv[])
       std::string binary_mode = argv[3];
       if (binary_mode.size() >= 3 && binary_mode.substr(0, 3) == "bin")
       {
-        opts.content_type = opentelemetry::exporter::otlp::HttpRequestContentType::kBinary;
+        opts.content_type = otlp::HttpRequestContentType::kBinary;
       }
     }
   }

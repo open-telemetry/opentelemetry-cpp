@@ -3,9 +3,9 @@
 
 #pragma once
 
-#include "opentelemetry/exporters/zipkin/recordable.h"
 #include "opentelemetry/ext/http/client/http_client_factory.h"
 #include "opentelemetry/ext/http/common/url_parser.h"
+#include "opentelemetry/sdk/common/env_variables.h"
 #include "opentelemetry/sdk/trace/exporter.h"
 #include "opentelemetry/sdk/trace/span_data.h"
 
@@ -22,24 +22,16 @@ inline const std::string GetDefaultZipkinEndpoint()
   const char *otel_exporter_zipkin_endpoint_env = "OTEL_EXPORTER_ZIPKIN_ENDPOINT";
   const char *kZipkinEndpointDefault            = "http://localhost:9411/api/v2/spans";
 
-#if defined(_MSC_VER)
-  // avoid calling std::getenv which is deprecated in MSVC.
-  size_t required_size = 0;
-  getenv_s(&required_size, nullptr, 0, otel_exporter_zipkin_endpoint_env);
-  const char *endpoint_from_env = nullptr;
-  std::unique_ptr<char> endpoint_buffer;
-  if (required_size > 0)
-  {
-    endpoint_buffer = std::unique_ptr<char>{new char[required_size]};
-    getenv_s(&required_size, endpoint_buffer.get(), required_size,
-             otel_exporter_zipkin_endpoint_env);
-    endpoint_from_env = endpoint_buffer.get();
-  }
-#else
-  auto endpoint_from_env = std::getenv(otel_exporter_zipkin_endpoint_env);
-#endif
-  return std::string{endpoint_from_env ? endpoint_from_env : kZipkinEndpointDefault};
+  auto endpoint =
+      opentelemetry::sdk::common::GetEnvironmentVariable(otel_exporter_zipkin_endpoint_env);
+  return endpoint.size() ? endpoint : kZipkinEndpointDefault;
 }
+
+enum class TransportFormat
+{
+  kJson,
+  kProtobuf
+};
 
 /**
  * Struct to hold Zipkin  exporter options.
@@ -52,15 +44,13 @@ struct ZipkinExporterOptions
   std::string service_name = "default-service";
   std::string ipv4;
   std::string ipv6;
+  ext::http::client::Headers headers = {{"content-type", "application/json"}};
 };
-
-namespace trace_sdk   = opentelemetry::sdk::trace;
-namespace http_client = opentelemetry::ext::http::client;
 
 /**
  * The Zipkin exporter exports span data in JSON format as expected by Zipkin
  */
-class ZipkinExporter final : public trace_sdk::SpanExporter
+class ZipkinExporter final : public opentelemetry::sdk::trace::SpanExporter
 {
 public:
   /**
@@ -77,14 +67,15 @@ public:
    * Create a span recordable.
    * @return a newly initialized Recordable object
    */
-  std::unique_ptr<trace_sdk::Recordable> MakeRecordable() noexcept override;
+  std::unique_ptr<opentelemetry::sdk::trace::Recordable> MakeRecordable() noexcept override;
 
   /**
    * Export a batch of span recordables in JSON format.
    * @param spans a span of unique pointers to span recordables
    */
   sdk::common::ExportResult Export(
-      const nostd::span<std::unique_ptr<trace_sdk::Recordable>> &spans) noexcept override;
+      const nostd::span<std::unique_ptr<opentelemetry::sdk::trace::Recordable>> &spans) noexcept
+      override;
 
   /**
    * Shut down the exporter.
@@ -103,7 +94,7 @@ private:
   // The configuration options associated with this exporter.
   bool isShutdown_ = false;
   ZipkinExporterOptions options_;
-  std::shared_ptr<http_client::HttpClientSync> http_client_;
+  std::shared_ptr<opentelemetry::ext::http::client::HttpClientSync> http_client_;
   opentelemetry::ext::http::common::UrlParser url_parser_;
   nlohmann::json local_end_point_;
 };

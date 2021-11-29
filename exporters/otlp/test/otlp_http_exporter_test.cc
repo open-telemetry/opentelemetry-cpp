@@ -20,6 +20,11 @@
 
 #  include "nlohmann/json.hpp"
 
+#  if defined(_MSC_VER)
+#    include "opentelemetry/sdk/common/env_variables.h"
+using opentelemetry::sdk::common::setenv;
+using opentelemetry::sdk::common::unsetenv;
+#  endif
 using namespace testing;
 
 OPENTELEMETRY_BEGIN_NAMESPACE
@@ -27,6 +32,9 @@ namespace exporter
 {
 namespace otlp
 {
+
+namespace trace_api = opentelemetry::trace;
+namespace resource  = opentelemetry::sdk::resource;
 
 template <class T, size_t N>
 static nostd::span<T, N> MakeSpan(T (&array)[N])
@@ -46,6 +54,7 @@ protected:
   std::vector<nlohmann::json> received_requests_json_;
   std::vector<opentelemetry::proto::collector::trace::v1::ExportTraceServiceRequest>
       received_requests_binary_;
+  std::map<std::string, std::string> received_requests_headers_;
 
 public:
   OtlpHttpExporterTestPeer() : is_setup_(false), is_running_(false){};
@@ -59,10 +68,10 @@ public:
     int port = server_.addListeningPort(14371);
     std::ostringstream os;
     os << "localhost:" << port;
-    server_address_ = "http://" + os.str() + kDefaultTracePath;
+    server_address_ = "http://" + os.str() + "/v1/traces";
     server_.setServerName(os.str());
     server_.setKeepalive(false);
-    server_.addHandler(kDefaultTracePath, *this);
+    server_.addHandler("/v1/traces", *this);
     server_.start();
     is_running_ = true;
   }
@@ -86,10 +95,11 @@ public:
         request_content_type = &it->second;
       }
     }
+    received_requests_headers_ = request.headers;
 
     int response_status = 0;
 
-    if (request.uri == kDefaultTracePath)
+    if (request.uri == "/v1/traces")
     {
       response.headers["Content-Type"] = "application/json";
       std::unique_lock<std::mutex> lk(mtx_requests);
@@ -167,6 +177,8 @@ public:
     opts.url           = server_address_;
     opts.content_type  = content_type;
     opts.console_debug = true;
+    opts.http_headers.insert(
+        std::make_pair<const std::string, std::string>("Custom-Header-Key", "Custom-Header-Value"));
     return std::unique_ptr<sdk::trace::SpanExporter>(new OtlpHttpExporter(opts));
   }
 
@@ -183,22 +195,22 @@ TEST_F(OtlpHttpExporterTestPeer, ExportJsonIntegrationTest)
   size_t old_count = getCurrentRequestCount();
   auto exporter    = GetExporter(HttpRequestContentType::kJson);
 
-  opentelemetry::sdk::resource::ResourceAttributes resource_attributes = {
-      {"service.name", "unit_test_service"}, {"tenant.id", "test_user"}};
-  resource_attributes["bool_value"]       = true;
-  resource_attributes["int32_value"]      = static_cast<int32_t>(1);
-  resource_attributes["uint32_value"]     = static_cast<uint32_t>(2);
-  resource_attributes["int64_value"]      = static_cast<int64_t>(0x1100000000LL);
-  resource_attributes["uint64_value"]     = static_cast<uint64_t>(0x1200000000ULL);
-  resource_attributes["double_value"]     = static_cast<double>(3.1);
-  resource_attributes["vec_bool_value"]   = std::vector<bool>{true, false, true};
-  resource_attributes["vec_int32_value"]  = std::vector<int32_t>{1, 2};
-  resource_attributes["vec_uint32_value"] = std::vector<uint32_t>{3, 4};
-  resource_attributes["vec_int64_value"]  = std::vector<int64_t>{5, 6};
-  resource_attributes["vec_uint64_value"] = std::vector<uint64_t>{7, 8};
-  resource_attributes["vec_double_value"] = std::vector<double>{3.2, 3.3};
-  resource_attributes["vec_string_value"] = std::vector<std::string>{"vector", "string"};
-  auto resource = opentelemetry::sdk::resource::Resource::Create(resource_attributes);
+  resource::ResourceAttributes resource_attributes = {{"service.name", "unit_test_service"},
+                                                      {"tenant.id", "test_user"}};
+  resource_attributes["bool_value"]                = true;
+  resource_attributes["int32_value"]               = static_cast<int32_t>(1);
+  resource_attributes["uint32_value"]              = static_cast<uint32_t>(2);
+  resource_attributes["int64_value"]               = static_cast<int64_t>(0x1100000000LL);
+  resource_attributes["uint64_value"]              = static_cast<uint64_t>(0x1200000000ULL);
+  resource_attributes["double_value"]              = static_cast<double>(3.1);
+  resource_attributes["vec_bool_value"]            = std::vector<bool>{true, false, true};
+  resource_attributes["vec_int32_value"]           = std::vector<int32_t>{1, 2};
+  resource_attributes["vec_uint32_value"]          = std::vector<uint32_t>{3, 4};
+  resource_attributes["vec_int64_value"]           = std::vector<int64_t>{5, 6};
+  resource_attributes["vec_uint64_value"]          = std::vector<uint64_t>{7, 8};
+  resource_attributes["vec_double_value"]          = std::vector<double>{3.2, 3.3};
+  resource_attributes["vec_string_value"]          = std::vector<std::string>{"vector", "string"};
+  auto resource = resource::Resource::Create(resource_attributes);
 
   auto processor_opts                  = sdk::trace::BatchSpanProcessorOptions();
   processor_opts.max_export_batch_size = 5;
@@ -211,28 +223,38 @@ TEST_F(OtlpHttpExporterTestPeer, ExportJsonIntegrationTest)
 
   std::string report_trace_id;
   {
-    char trace_id_hex[2 * opentelemetry::trace::TraceId::kSize] = {0};
-    auto tracer                                                 = provider->GetTracer("test");
-    auto parent_span = tracer->StartSpan("Test parent span");
+    char trace_id_hex[2 * trace_api::TraceId::kSize] = {0};
+    auto tracer                                      = provider->GetTracer("test");
+    auto parent_span                                 = tracer->StartSpan("Test parent span");
 
-    opentelemetry::trace::StartSpanOptions child_span_opts = {};
-    child_span_opts.parent                                 = parent_span->GetContext();
+    trace_api::StartSpanOptions child_span_opts = {};
+    child_span_opts.parent                      = parent_span->GetContext();
 
     auto child_span = tracer->StartSpan("Test child span", child_span_opts);
     child_span->End();
     parent_span->End();
 
-    child_span_opts.parent.trace_id().ToLowerBase16(MakeSpan(trace_id_hex));
+    nostd::get<trace_api::SpanContext>(child_span_opts.parent)
+        .trace_id()
+        .ToLowerBase16(MakeSpan(trace_id_hex));
     report_trace_id.assign(trace_id_hex, sizeof(trace_id_hex));
   }
 
-  ASSERT_TRUE(waitForRequests(2, old_count + 1));
+  ASSERT_TRUE(waitForRequests(8, old_count + 1));
   auto check_json                   = received_requests_json_.back();
   auto resource_span                = *check_json["resource_spans"].begin();
   auto instrumentation_library_span = *resource_span["instrumentation_library_spans"].begin();
   auto span                         = *instrumentation_library_span["spans"].begin();
   auto received_trace_id            = span["trace_id"].get<std::string>();
   EXPECT_EQ(received_trace_id, report_trace_id);
+  {
+    auto custom_header = received_requests_headers_.find("Custom-Header-Key");
+    ASSERT_TRUE(custom_header != received_requests_headers_.end());
+    if (custom_header != received_requests_headers_.end())
+    {
+      EXPECT_EQ("Custom-Header-Value", custom_header->second);
+    }
+  }
 }
 
 // Create spans, let processor call Export()
@@ -242,22 +264,22 @@ TEST_F(OtlpHttpExporterTestPeer, ExportBinaryIntegrationTest)
 
   auto exporter = GetExporter(HttpRequestContentType::kBinary);
 
-  opentelemetry::sdk::resource::ResourceAttributes resource_attributes = {
-      {"service.name", "unit_test_service"}, {"tenant.id", "test_user"}};
-  resource_attributes["bool_value"]       = true;
-  resource_attributes["int32_value"]      = static_cast<int32_t>(1);
-  resource_attributes["uint32_value"]     = static_cast<uint32_t>(2);
-  resource_attributes["int64_value"]      = static_cast<int64_t>(0x1100000000LL);
-  resource_attributes["uint64_value"]     = static_cast<uint64_t>(0x1200000000ULL);
-  resource_attributes["double_value"]     = static_cast<double>(3.1);
-  resource_attributes["vec_bool_value"]   = std::vector<bool>{true, false, true};
-  resource_attributes["vec_int32_value"]  = std::vector<int32_t>{1, 2};
-  resource_attributes["vec_uint32_value"] = std::vector<uint32_t>{3, 4};
-  resource_attributes["vec_int64_value"]  = std::vector<int64_t>{5, 6};
-  resource_attributes["vec_uint64_value"] = std::vector<uint64_t>{7, 8};
-  resource_attributes["vec_double_value"] = std::vector<double>{3.2, 3.3};
-  resource_attributes["vec_string_value"] = std::vector<std::string>{"vector", "string"};
-  auto resource = opentelemetry::sdk::resource::Resource::Create(resource_attributes);
+  resource::ResourceAttributes resource_attributes = {{"service.name", "unit_test_service"},
+                                                      {"tenant.id", "test_user"}};
+  resource_attributes["bool_value"]                = true;
+  resource_attributes["int32_value"]               = static_cast<int32_t>(1);
+  resource_attributes["uint32_value"]              = static_cast<uint32_t>(2);
+  resource_attributes["int64_value"]               = static_cast<int64_t>(0x1100000000LL);
+  resource_attributes["uint64_value"]              = static_cast<uint64_t>(0x1200000000ULL);
+  resource_attributes["double_value"]              = static_cast<double>(3.1);
+  resource_attributes["vec_bool_value"]            = std::vector<bool>{true, false, true};
+  resource_attributes["vec_int32_value"]           = std::vector<int32_t>{1, 2};
+  resource_attributes["vec_uint32_value"]          = std::vector<uint32_t>{3, 4};
+  resource_attributes["vec_int64_value"]           = std::vector<int64_t>{5, 6};
+  resource_attributes["vec_uint64_value"]          = std::vector<uint64_t>{7, 8};
+  resource_attributes["vec_double_value"]          = std::vector<double>{3.2, 3.3};
+  resource_attributes["vec_string_value"]          = std::vector<std::string>{"vector", "string"};
+  auto resource = resource::Resource::Create(resource_attributes);
 
   auto processor_opts                  = sdk::trace::BatchSpanProcessorOptions();
   processor_opts.max_export_batch_size = 5;
@@ -271,22 +293,24 @@ TEST_F(OtlpHttpExporterTestPeer, ExportBinaryIntegrationTest)
 
   std::string report_trace_id;
   {
-    uint8_t trace_id_binary[opentelemetry::trace::TraceId::kSize] = {0};
-    auto tracer                                                   = provider->GetTracer("test");
-    auto parent_span = tracer->StartSpan("Test parent span");
+    uint8_t trace_id_binary[trace_api::TraceId::kSize] = {0};
+    auto tracer                                        = provider->GetTracer("test");
+    auto parent_span                                   = tracer->StartSpan("Test parent span");
 
-    opentelemetry::trace::StartSpanOptions child_span_opts = {};
-    child_span_opts.parent                                 = parent_span->GetContext();
+    trace_api::StartSpanOptions child_span_opts = {};
+    child_span_opts.parent                      = parent_span->GetContext();
 
     auto child_span = tracer->StartSpan("Test child span", child_span_opts);
     child_span->End();
     parent_span->End();
 
-    child_span_opts.parent.trace_id().CopyBytesTo(MakeSpan(trace_id_binary));
+    nostd::get<trace_api::SpanContext>(child_span_opts.parent)
+        .trace_id()
+        .CopyBytesTo(MakeSpan(trace_id_binary));
     report_trace_id.assign(reinterpret_cast<char *>(trace_id_binary), sizeof(trace_id_binary));
   }
 
-  ASSERT_TRUE(waitForRequests(2, old_count + 1));
+  ASSERT_TRUE(waitForRequests(8, old_count + 1));
 
   auto received_trace_id = received_requests_binary_.back()
                                .resource_spans(0)
@@ -322,6 +346,89 @@ TEST_F(OtlpHttpExporterTestPeer, ConfigJsonBytesMappingTest)
   std::unique_ptr<OtlpHttpExporter> exporter(new OtlpHttpExporter(opts));
   EXPECT_EQ(GetOptions(exporter).json_bytes_mapping, JsonBytesMappingKind::kHex);
 }
+
+#  ifndef NO_GETENV
+// Test exporter configuration options with use_ssl_credentials
+TEST_F(OtlpHttpExporterTestPeer, ConfigFromEnv)
+{
+  const std::string url = "http://localhost:9999/v1/traces";
+  setenv("OTEL_EXPORTER_OTLP_ENDPOINT", "http://localhost:9999", 1);
+  setenv("OTEL_EXPORTER_OTLP_TIMEOUT", "20s", 1);
+  setenv("OTEL_EXPORTER_OTLP_HEADERS", "k1=v1,k2=v2", 1);
+  setenv("OTEL_EXPORTER_OTLP_TRACES_HEADERS", "k1=v3,k1=v4", 1);
+
+  std::unique_ptr<OtlpHttpExporter> exporter(new OtlpHttpExporter());
+  EXPECT_EQ(GetOptions(exporter).url, url);
+  EXPECT_EQ(
+      GetOptions(exporter).timeout.count(),
+      std::chrono::duration_cast<std::chrono::system_clock::duration>(std::chrono::seconds{20})
+          .count());
+  EXPECT_EQ(GetOptions(exporter).http_headers.size(), 3);
+  {
+    // Test k2
+    auto range = GetOptions(exporter).http_headers.equal_range("k2");
+    EXPECT_TRUE(range.first != range.second);
+    EXPECT_EQ(range.first->second, std::string("v2"));
+    ++range.first;
+    EXPECT_TRUE(range.first == range.second);
+  }
+  {
+    // k1
+    auto range = GetOptions(exporter).http_headers.equal_range("k1");
+    EXPECT_TRUE(range.first != range.second);
+    EXPECT_EQ(range.first->second, std::string("v3"));
+    ++range.first;
+    EXPECT_EQ(range.first->second, std::string("v4"));
+    ++range.first;
+    EXPECT_TRUE(range.first == range.second);
+  }
+
+  unsetenv("OTEL_EXPORTER_OTLP_ENDPOINT");
+  unsetenv("OTEL_EXPORTER_OTLP_TIMEOUT");
+  unsetenv("OTEL_EXPORTER_OTLP_HEADERS");
+  unsetenv("OTEL_EXPORTER_OTLP_TRACES_HEADERS");
+}
+
+TEST_F(OtlpHttpExporterTestPeer, ConfigFromTracesEnv)
+{
+  const std::string url = "http://localhost:9999/v1/traces";
+  setenv("OTEL_EXPORTER_OTLP_TRACES_ENDPOINT", url.c_str(), 1);
+  setenv("OTEL_EXPORTER_OTLP_TIMEOUT", "20s", 1);
+  setenv("OTEL_EXPORTER_OTLP_HEADERS", "k1=v1,k2=v2", 1);
+  setenv("OTEL_EXPORTER_OTLP_TRACES_HEADERS", "k1=v3,k1=v4", 1);
+
+  std::unique_ptr<OtlpHttpExporter> exporter(new OtlpHttpExporter());
+  EXPECT_EQ(GetOptions(exporter).url, url);
+  EXPECT_EQ(
+      GetOptions(exporter).timeout.count(),
+      std::chrono::duration_cast<std::chrono::system_clock::duration>(std::chrono::seconds{20})
+          .count());
+  EXPECT_EQ(GetOptions(exporter).http_headers.size(), 3);
+  {
+    // Test k2
+    auto range = GetOptions(exporter).http_headers.equal_range("k2");
+    EXPECT_TRUE(range.first != range.second);
+    EXPECT_EQ(range.first->second, std::string("v2"));
+    ++range.first;
+    EXPECT_TRUE(range.first == range.second);
+  }
+  {
+    // k1
+    auto range = GetOptions(exporter).http_headers.equal_range("k1");
+    EXPECT_TRUE(range.first != range.second);
+    EXPECT_EQ(range.first->second, std::string("v3"));
+    ++range.first;
+    EXPECT_EQ(range.first->second, std::string("v4"));
+    ++range.first;
+    EXPECT_TRUE(range.first == range.second);
+  }
+
+  unsetenv("OTEL_EXPORTER_OTLP_TRACES_ENDPOINT");
+  unsetenv("OTEL_EXPORTER_OTLP_TIMEOUT");
+  unsetenv("OTEL_EXPORTER_OTLP_HEADERS");
+  unsetenv("OTEL_EXPORTER_OTLP_TRACES_HEADERS");
+}
+#  endif
 
 }  // namespace otlp
 }  // namespace exporter

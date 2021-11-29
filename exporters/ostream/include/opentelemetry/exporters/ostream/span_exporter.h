@@ -12,10 +12,6 @@
 #include <map>
 #include <sstream>
 
-namespace nostd     = opentelemetry::nostd;
-namespace sdktrace  = opentelemetry::sdk::trace;
-namespace sdkcommon = opentelemetry::sdk::common;
-
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace exporter
 {
@@ -25,7 +21,7 @@ namespace trace
 /**
  * The OStreamSpanExporter exports span data through an ostream
  */
-class OStreamSpanExporter final : public sdktrace::SpanExporter
+class OStreamSpanExporter final : public opentelemetry::sdk::trace::SpanExporter
 {
 public:
   /**
@@ -35,10 +31,11 @@ public:
    */
   explicit OStreamSpanExporter(std::ostream &sout = std::cout) noexcept;
 
-  std::unique_ptr<sdktrace::Recordable> MakeRecordable() noexcept override;
+  std::unique_ptr<opentelemetry::sdk::trace::Recordable> MakeRecordable() noexcept override;
 
   sdk::common::ExportResult Export(
-      const nostd::span<std::unique_ptr<sdktrace::Recordable>> &spans) noexcept override;
+      const opentelemetry::nostd::span<std::unique_ptr<opentelemetry::sdk::trace::Recordable>>
+          &spans) noexcept override;
 
   bool Shutdown(
       std::chrono::microseconds timeout = std::chrono::microseconds::max()) noexcept override;
@@ -98,12 +95,12 @@ private:
 
 #endif
 
-  void print_value(const sdkcommon::OwnedAttributeValue &value)
+  void print_value(const opentelemetry::sdk::common::OwnedAttributeValue &value)
   {
 #if __cplusplus < 201402L
-    nostd::visit(OwnedAttributeValueVisitor(*this), value);
+    opentelemetry::nostd::visit(OwnedAttributeValueVisitor(*this), value);
 #else
-    nostd::visit(
+    opentelemetry::nostd::visit(
         [this](auto &&arg) {
           /* explicit this is needed by some gcc versions (observed with v5.4.0)*/
           this->print_value(arg);
@@ -113,12 +110,19 @@ private:
   }
 
   // various print helpers
-  void printAttributes(const std::unordered_map<std::string, sdkcommon::OwnedAttributeValue> &map,
-                       const std::string prefix = "\n\t");
+  void printAttributes(
+      const std::unordered_map<std::string, opentelemetry::sdk::common::OwnedAttributeValue> &map,
+      const std::string prefix = "\n\t");
 
-  void printEvents(const std::vector<sdktrace::SpanDataEvent> &events);
+  void printEvents(const std::vector<opentelemetry::sdk::trace::SpanDataEvent> &events);
 
-  void printLinks(const std::vector<sdktrace::SpanDataLink> &links);
+  void printLinks(const std::vector<opentelemetry::sdk::trace::SpanDataLink> &links);
+
+  void printResources(const opentelemetry::sdk::resource::Resource &resources);
+
+  void printInstrumentationLibrary(
+      const opentelemetry::sdk::instrumentationlibrary::InstrumentationLibrary
+          &instrumentation_library);
 };
 }  // namespace trace
 }  // namespace exporter

@@ -1,27 +1,13 @@
-cc_library(
-    name = "foo_library",
+cc_binary(
+    name = "example_jaeger",
     srcs = [
-        "foo_library/foo_library.cc",
+        "main.cc",
     ],
-    hdrs = [
-        "foo_library/foo_library.h",
-    ],
+    tags = ["jaeger"],
     deps = [
         "//api",
-        "//sdk:headers",
+        "//examples/common/foo_library:common_foo_library",
+        "//exporters/jaeger:opentelemetry_exporter_jaeger_trace",
+        "//sdk/src/trace",
     ],
 )
-
-# TODO: enable bazel build
-# cc_binary(
-#     name = "example_jaeger",
-#     srcs = [
-#         "main.cc",
-#     ],
-#     deps = [
-#         ":foo_library",
-#         "//api",
-#         "//exporters/jaeger:jaeger_exporter",
-#         "//sdk/src/trace",
-#     ],
-# )

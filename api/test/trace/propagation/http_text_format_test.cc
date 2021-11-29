@@ -3,6 +3,7 @@
 
 #include "opentelemetry/context/propagation/global_propagator.h"
 #include "opentelemetry/context/runtime_context.h"
+#include "opentelemetry/trace/context.h"
 #include "opentelemetry/trace/propagation/http_trace_context.h"
 #include "opentelemetry/trace/scope.h"
 #include "util.h"
@@ -150,7 +151,7 @@ TEST(TextMapPropagatorTest, InvalidIdentitiesAreNotExtracted)
     context::Context ctx1 = context::Context{};
     context::Context ctx2 = format.Extract(carrier, ctx1);
 
-    auto span = trace::propagation::GetSpan(ctx2)->GetContext();
+    auto span = trace::GetSpan(ctx2)->GetContext();
     EXPECT_FALSE(span.IsValid());
   }
 }
@@ -205,6 +206,6 @@ TEST(GlobalPropagator, SetAndGet)
     return true;
   });
   EXPECT_EQ(fields.size(), 2);
-  EXPECT_EQ(fields[0], opentelemetry::trace::propagation::kTraceParent);
-  EXPECT_EQ(fields[1], opentelemetry::trace::propagation::kTraceState);
+  EXPECT_EQ(fields[0], trace::propagation::kTraceParent);
+  EXPECT_EQ(fields[1], trace::propagation::kTraceState);
 }

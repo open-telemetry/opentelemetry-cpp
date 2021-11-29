@@ -11,8 +11,6 @@ namespace sdk
 {
 namespace trace
 {
-namespace trace_api = opentelemetry::trace;
-
 /**
  * The ParentBased sampler is a composite sampler. ParentBased(delegateSampler) either respects
  * the parent span's sampling decision or delegates to delegateSampler for root spans.
@@ -26,12 +24,12 @@ public:
    * @return Returns DROP always
    */
   SamplingResult ShouldSample(
-      const trace_api::SpanContext &parent_context,
-      trace_api::TraceId trace_id,
+      const opentelemetry::trace::SpanContext &parent_context,
+      opentelemetry::trace::TraceId trace_id,
       nostd::string_view name,
-      trace_api::SpanKind span_kind,
+      opentelemetry::trace::SpanKind span_kind,
       const opentelemetry::common::KeyValueIterable &attributes,
-      const trace_api::SpanContextKeyValueIterable &links) noexcept override;
+      const opentelemetry::trace::SpanContextKeyValueIterable &links) noexcept override;
 
   /**
    * @return Description MUST be ParentBased{delegate_sampler_.getDescription()}

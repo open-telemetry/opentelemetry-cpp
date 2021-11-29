@@ -13,15 +13,14 @@
 # limitations under the License.
 
 include_directories(include)
-find_package(CURL)
-if(CURL_FOUND)
-  add_definitions(-DWITH_CURL)
-endif()
+find_package(CURL REQUIRED)
+add_definitions(-DWITH_CURL)
 add_library(opentelemetry_exporter_zipkin_trace src/zipkin_exporter.cc
                                                 src/recordable.cc)
 
-target_link_libraries(opentelemetry_exporter_zipkin_trace
-                      PUBLIC opentelemetry_trace http_client_curl)
+target_link_libraries(
+  opentelemetry_exporter_zipkin_trace
+  PUBLIC opentelemetry_trace http_client_curl nlohmann_json::nlohmann_json)
 
 install(
   TARGETS opentelemetry_exporter_zipkin_trace
@@ -34,7 +33,8 @@ install(
   DIRECTORY include/opentelemetry/exporters/zipkin
   DESTINATION include/opentelemetry/exporters/
   FILES_MATCHING
-  PATTERN "*.h")
+  PATTERN "*.h"
+  PATTERN "recordable.h" EXCLUDE)
 
 if(BUILD_TESTING)
   add_executable(zipkin_recordable_test test/zipkin_recordable_test.cc)

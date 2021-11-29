@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 #pragma once
-#ifdef ENABLE_METRICS_PREVIEW
+#ifndef ENABLE_METRICS_PREVIEW
 
 #  include "opentelemetry/metrics/meter.h"
 #  include "opentelemetry/nostd/shared_ptr.h"
@@ -25,7 +25,8 @@ public:
    * instance.
    */
   virtual nostd::shared_ptr<Meter> GetMeter(nostd::string_view library_name,
-                                            nostd::string_view library_version = "") = 0;
+                                            nostd::string_view library_version = "",
+                                            nostd::string_view schema_url      = "") noexcept = 0;
 };
 }  // namespace metrics
 OPENTELEMETRY_END_NAMESPACE
