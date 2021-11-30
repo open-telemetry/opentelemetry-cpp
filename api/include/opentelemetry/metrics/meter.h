@@ -39,12 +39,12 @@ public:
   virtual nostd::shared_ptr<Counter<long>> CreateLongCounter(
       nostd::string_view name,
       nostd::string_view description = "",
-      nostd::string_view unit        = "1") noexcept = 0;
+      nostd::string_view unit        = "") noexcept = 0;
 
   virtual nostd::shared_ptr<Counter<double>> CreateDoubleCounter(
       nostd::string_view name,
       nostd::string_view description = "",
-      nostd::string_view unit        = "1") noexcept = 0;
+      nostd::string_view unit        = "") noexcept = 0;
 
   /**
    * Creates a Asynchronouse (Observable) counter with the passed characteristics and returns a
@@ -60,13 +60,13 @@ public:
       nostd::string_view name,
       void (*callback)(ObserverResult<long> &),
       nostd::string_view description = "",
-      nostd::string_view unit        = "1") noexcept = 0;
+      nostd::string_view unit        = "") noexcept = 0;
 
   virtual nostd::shared_ptr<ObservableCounter<double>> CreateDoubleObservableCounter(
       nostd::string_view name,
       void (*callback)(ObserverResult<double> &),
       nostd::string_view description = "",
-      nostd::string_view unit        = "1") noexcept = 0;
+      nostd::string_view unit        = "") noexcept = 0;
 
   /**
    * Creates a Histogram with the passed characteristics and returns a shared_ptr to that Histogram.
@@ -79,12 +79,12 @@ public:
   virtual nostd::shared_ptr<Histogram<long>> CreateLongHistogram(
       nostd::string_view name,
       nostd::string_view description = "",
-      nostd::string_view unit        = "1") noexcept = 0;
+      nostd::string_view unit        = "") noexcept = 0;
 
   virtual nostd::shared_ptr<Histogram<double>> CreateDoubleHistogram(
       nostd::string_view name,
       nostd::string_view description = "",
-      nostd::string_view unit        = "1") noexcept = 0;
+      nostd::string_view unit        = "") noexcept = 0;
 
   /**
    * Creates a Asynchronouse (Observable) Gauge with the passed characteristics and returns a
@@ -100,13 +100,13 @@ public:
       nostd::string_view name,
       void (*callback)(ObserverResult<long> &),
       nostd::string_view description = "",
-      nostd::string_view unit        = "1") noexcept = 0;
+      nostd::string_view unit        = "") noexcept = 0;
 
   virtual nostd::shared_ptr<ObservableGauge<double>> CreateDoubleObservableGauge(
       nostd::string_view name,
       void (*callback)(ObserverResult<double> &),
       nostd::string_view description = "",
-      nostd::string_view unit        = "1") noexcept = 0;
+      nostd::string_view unit        = "") noexcept = 0;
 
   /**
    * Creates an UpDownCounter with the passed characteristics and returns a shared_ptr to that
@@ -120,12 +120,12 @@ public:
   virtual nostd::shared_ptr<UpDownCounter<long>> CreateLongUpDownCounter(
       nostd::string_view name,
       nostd::string_view description = "",
-      nostd::string_view unit        = "1") noexcept = 0;
+      nostd::string_view unit        = "") noexcept = 0;
 
   virtual nostd::shared_ptr<UpDownCounter<double>> CreateDoubleUpDownCounter(
       nostd::string_view name,
       nostd::string_view description = "",
-      nostd::string_view unit        = "1") noexcept = 0;
+      nostd::string_view unit        = "") noexcept = 0;
 
   /**
    * Creates a Asynchronouse (Observable) UpDownCounter with the passed characteristics and returns
@@ -141,13 +141,13 @@ public:
       nostd::string_view name,
       void (*callback)(ObserverResult<long> &),
       nostd::string_view description = "",
-      nostd::string_view unit        = "1") noexcept = 0;
+      nostd::string_view unit        = "") noexcept = 0;
 
   virtual nostd::shared_ptr<ObservableUpDownCounter<double>> CreateDoubleObservableUpDownCounter(
       nostd::string_view name,
       void (*callback)(ObserverResult<double> &),
       nostd::string_view description = "",
-      nostd::string_view unit        = "1") noexcept = 0;
+      nostd::string_view unit        = "") noexcept = 0;
 };
 }  // namespace metrics
 OPENTELEMETRY_END_NAMESPACE
