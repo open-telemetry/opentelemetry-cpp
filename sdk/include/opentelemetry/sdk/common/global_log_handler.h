@@ -164,12 +164,12 @@ OPENTELEMETRY_END_NAMESPACE
 #endif
 
 #if OTEL_INTERNAL_LOG_LEVEL >= OTEL_INTERNAL_LOG_LEVEL_WARN
-#  define OTEL_INTERNAL_LOG_WARN_1_ARGS(message)                                                  \
-    OTEL_INTERNAL_LOG_DISPATCH(opentelemetry::sdk::common::internal_log::LogLevel::Warn, message, \
-                               {})
-#  define OTEL_INTERNAL_LOG_WARN_2_ARGS(message, attributes)                                      \
-    OTEL_INTERNAL_LOG_DISPATCH(opentelemetry::sdk::common::internal_log::LogLevel::Warn, message, \
-                               attributes)
+#  define OTEL_INTERNAL_LOG_WARN_1_ARGS(message)                                            \
+    OTEL_INTERNAL_LOG_DISPATCH(opentelemetry::sdk::common::internal_log::LogLevel::Warning, \
+                               message, {})
+#  define OTEL_INTERNAL_LOG_WARN_2_ARGS(message, attributes)                                \
+    OTEL_INTERNAL_LOG_DISPATCH(opentelemetry::sdk::common::internal_log::LogLevel::Warning, \
+                               message, attributes)
 #  define OTEL_INTERNAL_LOG_WARN_MACRO(...)                                   \
     OTEL_INTERNAL_LOG_GET_3RD_ARG(__VA_ARGS__, OTEL_INTERNAL_LOG_WARN_2_ARGS, \
                                   OTEL_INTERNAL_LOG_WARN_1_ARGS)
