@@ -32,13 +32,13 @@ void JaegerRecordable::PopulateAttribute(nostd::string_view key,
   {
     AddTag(std::string{key}, int64_t{nostd::get<uint32_t>(value)}, tags);
   }
-  else if (nostd::holds_alternative<uint64_t>(value))
-  {
-    AddTag(std::string{key}, std::to_string(nostd::get<uint64_t>(value)), tags);
-  }
   else if (nostd::holds_alternative<int64_t>(value))
   {
     AddTag(std::string{key}, nostd::get<int64_t>(value), tags);
+  }
+  else if (nostd::holds_alternative<uint64_t>(value))
+  {
+    AddTag(std::string{key}, std::to_string(nostd::get<uint64_t>(value)), tags);
   }
   else if (nostd::holds_alternative<bool>(value))
   {
@@ -142,13 +142,13 @@ void JaegerRecordable::PopulateAttribute(nostd::string_view key,
   {
     AddTag(std::string{key}, int64_t{nostd::get<uint32_t>(value)}, tags);
   }
-  else if (nostd::holds_alternative<uint64_t>(value))
-  {
-    AddTag(std::string{key}, std::to_string(nostd::get<uint64_t>(value)), tags);
-  }
   else if (nostd::holds_alternative<int64_t>(value))
   {
     AddTag(std::string{key}, nostd::get<int64_t>(value), tags);
+  }
+  else if (nostd::holds_alternative<uint64_t>(value))
+  {
+    AddTag(std::string{key}, std::to_string(nostd::get<uint64_t>(value)), tags);
   }
   else if (nostd::holds_alternative<bool>(value))
   {
