@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 #include "opentelemetry/exporters/jaeger/recordable.h"
+#include "opentelemetry/sdk/common/global_log_handler.h"
 #include "opentelemetry/sdk/resource/experimental_semantic_conventions.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
@@ -19,7 +20,23 @@ void JaegerRecordable::PopulateAttribute(nostd::string_view key,
                                          const common::AttributeValue &value,
                                          std::vector<thrift::Tag> &tags)
 {
-  if (nostd::holds_alternative<int64_t>(value))
+  if (nostd::holds_alternative<int>(value))
+  {
+    AddTag(std::string{key}, int64_t{nostd::get<int>(value)}, tags);
+  }
+  else if (nostd::holds_alternative<int32_t>(value))
+  {
+    AddTag(std::string{key}, int64_t{nostd::get<int32_t>(value)}, tags);
+  }
+  else if (nostd::holds_alternative<uint32_t>(value))
+  {
+    AddTag(std::string{key}, int64_t{nostd::get<uint32_t>(value)}, tags);
+  }
+  else if (nostd::holds_alternative<uint64_t>(value))
+  {
+    AddTag(std::string{key}, std::to_string(nostd::get<uint64_t>(value)), tags);
+  }
+  else if (nostd::holds_alternative<int64_t>(value))
   {
     AddTag(std::string{key}, nostd::get<int64_t>(value), tags);
   }
@@ -39,14 +56,97 @@ void JaegerRecordable::PopulateAttribute(nostd::string_view key,
   {
     AddTag(std::string{key}, std::string{nostd::get<nostd::string_view>(value)}, tags);
   }
-  // TODO: extend other AttributeType to the types supported by Jaeger.
+  else if (nostd::holds_alternative<nostd::span<const int>>(value))
+  {
+    for (const auto &val : nostd::get<nostd::span<const int>>(value))
+    {
+      AddTag(std::string{key}, int64_t{val}, tags);
+    }
+  }
+  else if (nostd::holds_alternative<nostd::span<const uint8_t>>(value))
+  {
+    for (const auto &val : nostd::get<nostd::span<const uint8_t>>(value))
+    {
+      AddTag(std::string{key}, int64_t{val}, tags);
+    }
+  }
+  else if (nostd::holds_alternative<nostd::span<const bool>>(value))
+  {
+    for (const auto &val : nostd::get<nostd::span<const bool>>(value))
+    {
+      AddTag(std::string{key}, val, tags);
+    }
+  }
+  else if (nostd::holds_alternative<nostd::span<const int>>(value))
+  {
+    for (const auto &val : nostd::get<nostd::span<const int>>(value))
+    {
+      AddTag(std::string{key}, int64_t{val}, tags);
+    }
+  }
+  else if (nostd::holds_alternative<nostd::span<const int64_t>>(value))
+  {
+    for (const auto &val : nostd::get<nostd::span<const int64_t>>(value))
+    {
+      AddTag(std::string{key}, val, tags);
+    }
+  }
+  else if (nostd::holds_alternative<nostd::span<const unsigned int>>(value))
+  {
+    for (const auto &val : nostd::get<nostd::span<const unsigned int>>(value))
+    {
+      AddTag(std::string{key}, int64_t{val}, tags);
+    }
+  }
+  else if (nostd::holds_alternative<nostd::span<const uint64_t>>(value))
+  {
+    for (const auto &val : nostd::get<nostd::span<const uint64_t>>(value))
+    {
+      AddTag(std::string{key}, std::to_string(val), tags);
+    }
+  }
+  else if (nostd::holds_alternative<nostd::span<const double>>(value))
+  {
+    for (const auto &val : nostd::get<nostd::span<const double>>(value))
+    {
+      AddTag(std::string{key}, val, tags);
+    }
+  }
+  else if (nostd::holds_alternative<nostd::span<const nostd::string_view>>(value))
+  {
+    for (const auto &val : nostd::get<nostd::span<const nostd::string_view>>(value))
+    {
+      AddTag(std::string{key}, std::string{val}, tags);
+    }
+  }
+  else
+  {
+    OTEL_INTERNAL_LOG_ERROR(
+        "[TRACE JAEGER Exporter] SetAttribute() failed, attribute type not supported ");
+  }
 }
 
 void JaegerRecordable::PopulateAttribute(nostd::string_view key,
                                          const sdk::common::OwnedAttributeValue &value,
                                          std::vector<thrift::Tag> &tags)
 {
-  if (nostd::holds_alternative<int64_t>(value))
+  if (nostd::holds_alternative<int>(value))
+  {
+    AddTag(std::string{key}, int64_t{nostd::get<int>(value)}, tags);
+  }
+  else if (nostd::holds_alternative<int32_t>(value))
+  {
+    AddTag(std::string{key}, int64_t{nostd::get<int32_t>(value)}, tags);
+  }
+  else if (nostd::holds_alternative<uint32_t>(value))
+  {
+    AddTag(std::string{key}, int64_t{nostd::get<uint32_t>(value)}, tags);
+  }
+  else if (nostd::holds_alternative<uint64_t>(value))
+  {
+    AddTag(std::string{key}, std::to_string(nostd::get<uint64_t>(value)), tags);
+  }
+  else if (nostd::holds_alternative<int64_t>(value))
   {
     AddTag(std::string{key}, nostd::get<int64_t>(value), tags);
   }
@@ -62,7 +162,11 @@ void JaegerRecordable::PopulateAttribute(nostd::string_view key,
   {
     AddTag(std::string{key}, std::string{nostd::get<std::string>(value)}, tags);
   }
-  // TODO: extend other OwnedAttributeType to the types supported by Jaeger.
+  else
+  {
+    OTEL_INTERNAL_LOG_ERROR(
+        "[TRACE JAEGER Exporter] SetAttribute() failed, attribute type not supported ");
+  }
 }
 
 void JaegerRecordable::SetIdentity(const trace::SpanContext &span_context,
