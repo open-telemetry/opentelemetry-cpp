@@ -100,16 +100,21 @@ static void BM_ProcYieldSpinLockThrashing(benchmark::State &s)
       [](SpinLockMutex &m) { m.unlock(); });
 }
 
-// SpinLock thrashing with thread::yield() after N spins.
+// SpinLock thrashing with thread::yield().
 static void BM_ThreadYieldSpinLockThrashing(benchmark::State &s)
 {
   std::atomic_flag mutex = ATOMIC_FLAG_INIT;
   SpinThrash<std::atomic_flag>(
       s, mutex,
       [](std::atomic_flag &l) {
+        uint32_t try_count = 0;
         while (l.test_and_set(std::memory_order_acq_rel))
         {
-          ;
+          ++try_count;
+          if (try_count % 32)
+          {
+            std::this_thread::yield();
+          }
         }
         std::this_thread::yield();
       },
