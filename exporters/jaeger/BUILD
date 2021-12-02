@@ -102,3 +102,17 @@ cc_library(
         ":jaeger_exporter",
     ],
 )
+
+cc_test(
+    name = "jaeger_recordable_test",
+    srcs = ["test/jaeger_recordable_test.cc"],
+    tags = [
+        "jaeger",
+        "test",
+    ],
+    deps = [
+        ":opentelemetry_exporter_jaeger_trace",
+        "//sdk/src/resource",
+        "@com_google_googletest//:gtest_main",
+    ],
+)

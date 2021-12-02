@@ -1,6 +1,7 @@
 // Copyright The OpenTelemetry Authors
 // SPDX-License-Identifier: Apache-2.0
 
+#include <vector>
 #include "opentelemetry/exporters/jaeger/recordable.h"
 #include "opentelemetry/sdk/instrumentationlibrary/instrumentation_library.h"
 #include "opentelemetry/sdk/trace/simple_processor.h"
@@ -18,6 +19,7 @@ namespace common   = opentelemetry::common;
 using namespace jaegertracing;
 using namespace opentelemetry::exporter::jaeger;
 using namespace opentelemetry::sdk::instrumentationlibrary;
+using std::vector;
 
 TEST(JaegerSpanRecordable, SetIdentity)
 {
@@ -127,8 +129,6 @@ TEST(JaegerSpanRecordable, AddEvent)
 {
   JaegerRecordable rec;
 
-  nostd::string_view name = "Test Event";
-
   std::chrono::system_clock::time_point event_time = std::chrono::system_clock::now();
   common::SystemTimestamp event_timestamp(event_time);
   uint64_t epoch_us =
@@ -154,6 +154,28 @@ TEST(JaegerSpanRecordable, AddEvent)
     EXPECT_EQ(tags[index].vLong, values[index - 1]);
     index++;
   }
+}
+
+TEST(JaegerSpanRecordable, SetAttributes)
+{
+  JaegerRecordable rec;
+  std::string string_val{"string_val"};
+  vector<common::AttributeValue> values{
+      bool{false},
+      int32_t{-32},
+      int64_t{-64},
+      uint32_t{32},
+      double{3.14},
+      string_val.c_str(),
+      nostd::string_view{"string_view"},
+  };
+  for (const auto &val : values)
+  {
+    rec.SetAttribute("key1", val);
+  }
+
+  auto tags = rec.Tags();
+  EXPECT_EQ(tags.size(), values.size());
 }
 
 TEST(JaegerSpanRecordable, SetInstrumentationLibrary)
@@ -194,19 +216,15 @@ TEST(JaegerSpanRecordable, SetResource)
   EXPECT_GE(resource_tags.size(), 2);
   EXPECT_EQ(service_name, service_name_value);
 
-  bool found_key1 = false;
-  bool found_key2 = false;
   for (const auto &tag : resource_tags)
   {
     if (tag.key == "key1")
     {
-      found_key1 = true;
       EXPECT_EQ(tag.vType, thrift::TagType::STRING);
       EXPECT_EQ(tag.vStr, "value1");
     }
     else if (tag.key == "key2")
     {
-      found_key2 = true;
       EXPECT_EQ(tag.vType, thrift::TagType::STRING);
       EXPECT_EQ(tag.vStr, "value2");
     }
