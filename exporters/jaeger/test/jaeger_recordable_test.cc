@@ -156,6 +156,33 @@ TEST(JaegerSpanRecordable, AddEvent)
   }
 }
 
+template <thrift::TagType::type tag_type, typename value_type>
+void addTag(const std::string &key, value_type value, vector<thrift::Tag> &tags)
+{
+  thrift::Tag tag;
+
+  tag.__set_key(key);
+  tag.__set_vType(tag_type);
+  if constexpr (tag_type == thrift::TagType::LONG)
+  {
+    tag.__set_vLong(value);
+  }
+  else if constexpr (tag_type == thrift::TagType::DOUBLE)
+  {
+    tag.__set_vDouble(value);
+  }
+  else if constexpr (tag_type == thrift::TagType::BOOL)
+  {
+    tag.__set_vBool(value);
+  }
+  else
+  {
+    tag.__set_vStr(value);
+  }
+
+  tags.push_back(tag);
+}
+
 TEST(JaegerSpanRecordable, SetAttributes)
 {
   JaegerRecordable rec;
@@ -173,9 +200,39 @@ TEST(JaegerSpanRecordable, SetAttributes)
   {
     rec.SetAttribute("key1", val);
   }
+  rec.SetAttribute("key2", nostd::span<const bool>{{false, true}});
+  rec.SetAttribute("key3", nostd::span<const int32_t>{{-320, 320}});
+  rec.SetAttribute("key4", nostd::span<const int64_t>{{-640, 640}});
+  rec.SetAttribute("key5", nostd::span<const uint32_t>{{320, 322}});
+  rec.SetAttribute("key6", nostd::span<const double>{{4.15, 5.15}});
+  rec.SetAttribute("key7", nostd::span<const nostd::string_view>{{"string_v1", "string_v2"}});
 
   auto tags = rec.Tags();
-  EXPECT_EQ(tags.size(), values.size());
+  EXPECT_EQ(tags.size(), values.size() + 12);
+
+  vector<thrift::Tag> expected_tags;
+  addTag<thrift::TagType::BOOL>("key1", bool{false}, expected_tags);
+  addTag<thrift::TagType::LONG>("key1", int32_t{-32}, expected_tags);
+  addTag<thrift::TagType::LONG>("key1", int64_t{-64}, expected_tags);
+  addTag<thrift::TagType::LONG>("key1", int32_t{32}, expected_tags);
+  addTag<thrift::TagType::DOUBLE>("key1", double{3.14}, expected_tags);
+  addTag<thrift::TagType::STRING>("key1", string_val, expected_tags);
+  addTag<thrift::TagType::STRING>("key1", std::string{"string_view"}, expected_tags);
+
+  addTag<thrift::TagType::BOOL>("key2", bool{false}, expected_tags);
+  addTag<thrift::TagType::BOOL>("key2", bool{true}, expected_tags);
+  addTag<thrift::TagType::LONG>("key3", int32_t{-320}, expected_tags);
+  addTag<thrift::TagType::LONG>("key3", int32_t{320}, expected_tags);
+  addTag<thrift::TagType::LONG>("key4", int64_t{-640}, expected_tags);
+  addTag<thrift::TagType::LONG>("key4", int64_t{640}, expected_tags);
+  addTag<thrift::TagType::LONG>("key5", uint32_t{320}, expected_tags);
+  addTag<thrift::TagType::LONG>("key5", uint32_t{322}, expected_tags);
+  addTag<thrift::TagType::DOUBLE>("key6", double{4.15}, expected_tags);
+  addTag<thrift::TagType::DOUBLE>("key6", double{5.15}, expected_tags);
+  addTag<thrift::TagType::STRING>("key7", std::string{"string_v1"}, expected_tags);
+  addTag<thrift::TagType::STRING>("key7", std::string{"string_v2"}, expected_tags);
+
+  EXPECT_EQ(tags, expected_tags);
 }
 
 TEST(JaegerSpanRecordable, SetInstrumentationLibrary)

@@ -55,6 +55,13 @@ void JaegerRecordable::PopulateAttribute(nostd::string_view key,
       AddTag(std::string{key}, val, tags);
     }
   }
+  else if (nostd::holds_alternative<nostd::span<const int32_t>>(value))
+  {
+    for (const auto &val : nostd::get<nostd::span<const int32_t>>(value))
+    {
+      AddTag(std::string{key}, int64_t{val}, tags);
+    }
+  }
   else if (nostd::holds_alternative<nostd::span<const int64_t>>(value))
   {
     for (const auto &val : nostd::get<nostd::span<const int64_t>>(value))
