@@ -156,29 +156,39 @@ TEST(JaegerSpanRecordable, AddEvent)
   }
 }
 
-template <thrift::TagType::type tag_type, typename value_type>
-void addTag(const std::string &key, value_type value, vector<thrift::Tag> &tags)
+template <typename value_type>
+void addTag(thrift::TagType::type tag_type,
+            const std::string &key,
+            value_type value,
+            vector<thrift::Tag> &tags)
 {
   thrift::Tag tag;
 
   tag.__set_key(key);
   tag.__set_vType(tag_type);
-  if constexpr (tag_type == thrift::TagType::LONG)
+  if (tag_type == thrift::TagType::LONG)
   {
     tag.__set_vLong(value);
   }
-  else if constexpr (tag_type == thrift::TagType::DOUBLE)
+  else if (tag_type == thrift::TagType::DOUBLE)
   {
     tag.__set_vDouble(value);
   }
-  else if constexpr (tag_type == thrift::TagType::BOOL)
+  else if (tag_type == thrift::TagType::BOOL)
   {
     tag.__set_vBool(value);
   }
-  else
-  {
-    tag.__set_vStr(value);
-  }
+
+  tags.push_back(tag);
+}
+
+void addTag(const std::string &key, std::string value, vector<thrift::Tag> &tags)
+{
+  thrift::Tag tag;
+
+  tag.__set_key(key);
+  tag.__set_vType(thrift::TagType::STRING);
+  tag.__set_vStr(value);
 
   tags.push_back(tag);
 }
@@ -211,26 +221,26 @@ TEST(JaegerSpanRecordable, SetAttributes)
   EXPECT_EQ(tags.size(), values.size() + 12);
 
   vector<thrift::Tag> expected_tags;
-  addTag<thrift::TagType::BOOL>("key1", bool{false}, expected_tags);
-  addTag<thrift::TagType::LONG>("key1", int32_t{-32}, expected_tags);
-  addTag<thrift::TagType::LONG>("key1", int64_t{-64}, expected_tags);
-  addTag<thrift::TagType::LONG>("key1", int32_t{32}, expected_tags);
-  addTag<thrift::TagType::DOUBLE>("key1", double{3.14}, expected_tags);
-  addTag<thrift::TagType::STRING>("key1", string_val, expected_tags);
-  addTag<thrift::TagType::STRING>("key1", std::string{"string_view"}, expected_tags);
+  addTag(thrift::TagType::BOOL, "key1", bool{false}, expected_tags);
+  addTag(thrift::TagType::LONG, "key1", int32_t{-32}, expected_tags);
+  addTag(thrift::TagType::LONG, "key1", int64_t{-64}, expected_tags);
+  addTag(thrift::TagType::LONG, "key1", int32_t{32}, expected_tags);
+  addTag(thrift::TagType::DOUBLE, "key1", double{3.14}, expected_tags);
+  addTag("key1", string_val, expected_tags);
+  addTag("key1", std::string{"string_view"}, expected_tags);
 
-  addTag<thrift::TagType::BOOL>("key2", bool{false}, expected_tags);
-  addTag<thrift::TagType::BOOL>("key2", bool{true}, expected_tags);
-  addTag<thrift::TagType::LONG>("key3", int32_t{-320}, expected_tags);
-  addTag<thrift::TagType::LONG>("key3", int32_t{320}, expected_tags);
-  addTag<thrift::TagType::LONG>("key4", int64_t{-640}, expected_tags);
-  addTag<thrift::TagType::LONG>("key4", int64_t{640}, expected_tags);
-  addTag<thrift::TagType::LONG>("key5", uint32_t{320}, expected_tags);
-  addTag<thrift::TagType::LONG>("key5", uint32_t{322}, expected_tags);
-  addTag<thrift::TagType::DOUBLE>("key6", double{4.15}, expected_tags);
-  addTag<thrift::TagType::DOUBLE>("key6", double{5.15}, expected_tags);
-  addTag<thrift::TagType::STRING>("key7", std::string{"string_v1"}, expected_tags);
-  addTag<thrift::TagType::STRING>("key7", std::string{"string_v2"}, expected_tags);
+  addTag(thrift::TagType::BOOL, "key2", bool{false}, expected_tags);
+  addTag(thrift::TagType::BOOL, "key2", bool{true}, expected_tags);
+  addTag(thrift::TagType::LONG, "key3", int32_t{-320}, expected_tags);
+  addTag(thrift::TagType::LONG, "key3", int32_t{320}, expected_tags);
+  addTag(thrift::TagType::LONG, "key4", int64_t{-640}, expected_tags);
+  addTag(thrift::TagType::LONG, "key4", int64_t{640}, expected_tags);
+  addTag(thrift::TagType::LONG, "key5", uint32_t{320}, expected_tags);
+  addTag(thrift::TagType::LONG, "key5", uint32_t{322}, expected_tags);
+  addTag(thrift::TagType::DOUBLE, "key6", double{4.15}, expected_tags);
+  addTag(thrift::TagType::DOUBLE, "key6", double{5.15}, expected_tags);
+  addTag("key7", std::string{"string_v1"}, expected_tags);
+  addTag("key7", std::string{"string_v2"}, expected_tags);
 
   EXPECT_EQ(tags, expected_tags);
 }
