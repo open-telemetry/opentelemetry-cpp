@@ -8,7 +8,13 @@ target_include_directories(
   PUBLIC "$<BUILD_INTERFACE:${CMAKE_CURRENT_LIST_DIR}/include>")
 
 target_link_libraries(opentelemetry_exporter_ostream_span
-                      PUBLIC opentelemetry_trace)
+                      PUBLIC opentelemetry_trace
+                             nlohmann_json::nlohmann_json)
+
+if(nlohmann_json_clone)
+  add_dependencies(opentelemetry_exporter_otlp_http_client
+                   nlohmann_json::nlohmann_json)
+endif()
 
 install(
   TARGETS opentelemetry_exporter_ostream_span

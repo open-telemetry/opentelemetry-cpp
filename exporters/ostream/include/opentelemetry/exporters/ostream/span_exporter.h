@@ -10,8 +10,11 @@
 #include "opentelemetry/version.h"
 
 #include <iostream>
+#include <list>
 #include <map>
 #include <sstream>
+
+#include "nlohmann/json.hpp"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace exporter
@@ -30,7 +33,7 @@ public:
    * export() function will send span data into.
    * The default ostream is set to stdout
    */
-  explicit OStreamSpanExporter(std::ostream &sout = std::cout) noexcept;
+  explicit OStreamSpanExporter(std::ostream &sout = std::cout, bool isJson = false) noexcept;
 
   std::unique_ptr<opentelemetry::sdk::trace::Recordable> MakeRecordable() noexcept override;
 
@@ -43,6 +46,7 @@ public:
 
 private:
   std::ostream &sout_;
+  bool isJson_;
   bool is_shutdown_ = false;
   mutable opentelemetry::common::SpinLockMutex lock_;
   bool isShutdown() const noexcept;
@@ -112,7 +116,30 @@ private:
 #endif
   }
 
+  // various format helpers
+  std::string formatTraceId(opentelemetry::trace::TraceId trace_id);
+
+  std::string formatSpanId(opentelemetry::trace::SpanId span_id);
+
+  // various json helpers
+  nlohmann::basic_json<nlohmann::ordered_map> formatContext(const opentelemetry::trace::SpanContext &context);
+
+  nlohmann::basic_json<nlohmann::ordered_map> formatAttributes(const std::unordered_map<std::string,
+      opentelemetry::sdk::common::OwnedAttributeValue> &attributes);
+
+  std::list<nlohmann::basic_json<nlohmann::ordered_map>> formatEvents(const std::vector<opentelemetry::sdk::trace::SpanDataEvent> &events);
+
+  std::list<nlohmann::basic_json<nlohmann::ordered_map>> formatLinks(const std::vector<opentelemetry::sdk::trace::SpanDataLink> &links);
+
+  void PopulateAttribute(nostd::string_view key,
+      const opentelemetry::sdk::common::OwnedAttributeValue &value,
+      nlohmann::basic_json<nlohmann::ordered_map> &attributes);
+
   // various print helpers
+  void printSpanJson(const std::unique_ptr<opentelemetry::sdk::trace::SpanData> &span) noexcept;
+
+  void printSpanText(const std::unique_ptr<opentelemetry::sdk::trace::SpanData> &span) noexcept;
+
   void printAttributes(
       const std::unordered_map<std::string, opentelemetry::sdk::common::OwnedAttributeValue> &map,
       const std::string prefix = "\n\t");
