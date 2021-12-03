@@ -20,8 +20,11 @@ void OtlpRecordable::SetIdentity(const opentelemetry::trace::SpanContext &span_c
                      trace::TraceId::kSize);
   span_.set_span_id(reinterpret_cast<const char *>(span_context.span_id().Id().data()),
                     trace::SpanId::kSize);
-  span_.set_parent_span_id(reinterpret_cast<const char *>(parent_span_id.Id().data()),
-                           trace::SpanId::kSize);
+  if (parent_span_id.IsValid())
+  {
+    span_.set_parent_span_id(reinterpret_cast<const char *>(parent_span_id.Id().data()),
+                             trace::SpanId::kSize);
+  }
   span_.set_trace_state(span_context.trace_state()->ToHeader());
 }
 
