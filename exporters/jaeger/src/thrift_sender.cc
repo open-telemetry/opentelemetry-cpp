@@ -3,6 +3,7 @@
 
 #include "thrift_sender.h"
 #include <opentelemetry/exporters/jaeger/recordable.h>
+#include "opentelemetry/sdk/common/global_log_handler.h"
 #include "udp_transport.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
@@ -16,7 +17,7 @@ using namespace jaegertracing;
 ThriftSender::ThriftSender(std::unique_ptr<Transport> &&transport)
     : transport_(std::move(transport)),
       protocol_factory_(new apache::thrift::protocol::TCompactProtocolFactory()),
-      thrift_buffer_(new apache::thrift::transport::TMemoryBuffer())
+      thrift_buffer_(new apache::thrift::transport::TMemoryBuffer(transport_->MaxPacketSize()))
 {}
 
 int ThriftSender::Append(std::unique_ptr<JaegerRecordable> &&span) noexcept
@@ -43,7 +44,7 @@ int ThriftSender::Append(std::unique_ptr<JaegerRecordable> &&span) noexcept
   const uint32_t span_size = CalcSizeOfSerializedThrift(jaeger_span);
   if (span_size > max_span_bytes)
   {
-    // TODO, log too large span error.
+    OTEL_INTERNAL_LOG_ERROR("[JAEGER TRACE Exporter] Append() failed: too large span");
     return 0;
   }
 
