@@ -39,6 +39,14 @@ TEST(OtlpRecordable, SetIdentity)
   EXPECT_EQ(rec.span().parent_span_id(),
             std::string(reinterpret_cast<const char *>(parent_span_id.Id().data()),
                         trace::SpanId::kSize));
+
+  OtlpRecordable rec_invalid_parent;
+
+  constexpr uint8_t invalid_parent_span_id_buf[] = {0, 0, 0, 0, 0, 0, 0, 0};
+  trace_api::SpanId invalid_parent_span_id{invalid_parent_span_id_buf};
+  rec_invalid_parent.SetIdentity(span_context, invalid_parent_span_id);
+
+  EXPECT_EQ(rec_invalid_parent.span().parent_span_id(), std::string{});
 }
 
 TEST(OtlpRecordable, SetName)
