@@ -61,7 +61,7 @@ filegroup(
 """
 
 http_archive(
-    name = "thrift",
+    name = "com_github_thrift",
     build_file_content = _ALL_CONTENT,
     sha256 = "5ae1c4d16452a22eaf9d802ba7489907147c2b316ff38c9758918552fae5132c",
     strip_prefix = "thrift-0.14.1",
@@ -84,7 +84,7 @@ load("@com_github_nelhage_rules_boost//:boost/boost.bzl", "boost_deps")
 boost_deps()
 
 http_archive(
-    name = "openssl",
+    name = "com_github_openssl",
     build_file_content = _ALL_CONTENT,
     sha256 = "0b7a3e5e59c34827fe0c3a74b7ec8baef302b98fa80088d7f9153aa16fa76bd1",
     strip_prefix = "openssl-1.1.1l",
