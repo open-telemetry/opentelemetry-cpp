@@ -2,21 +2,45 @@ package(default_visibility = ["//visibility:public"])
 
 load("@rules_foreign_cc//foreign_cc:defs.bzl", "cmake", "configure_make")
 
+CONFIGURE_OPTIONS = [
+    "shared",
+    "no-weak-ssl-ciphers",
+    "no-idea",
+    "no-comp",
+]
+
 configure_make(
     name = "openssl",
     configure_command = "config",
     configure_in_place = True,
-    configure_options = [
-        "shared",
-    ],
+    configure_options = select({
+        "@bazel_tools//platforms:osx": [
+            "no-afalgeng",
+            "ARFLAGS=r",
+        ] + CONFIGURE_OPTIONS,
+        "@bazel_tools//platforms:linux": [
+        ] + CONFIGURE_OPTIONS,
+    }),
     copts = [
         "-Ilibs/exporters/jaeger/openssl/include",
     ],
+    env = select({
+        "@bazel_tools//platforms:osx": {
+            "AR": "",
+        },
+        "@bazel_tools//platforms:linux": {},
+    }),
     lib_source = "@com_github_openssl//:all_srcs",
-    out_shared_libs = [
-        "libssl.so",
-        "libcrypto.so",
-    ],
+    out_shared_libs = select({
+        "@bazel_tools//platforms:osx": [
+            "libssl.dylib",
+            "libcrypto.dylib",
+        ],
+        "@bazel_tools//platforms:linux": [
+            "libssl.so",
+            "libcrypto.so",
+        ],
+    }),
     visibility = ["//visibility:public"],
 )
 
@@ -70,7 +94,6 @@ cmake(
     lib_source = "@com_github_thrift//:all_srcs",
     out_static_libs = [
         "libthrift.a",
-        "libthriftnb.a",
         "libthriftz.a",
     ],
     visibility = ["//visibility:public"],
