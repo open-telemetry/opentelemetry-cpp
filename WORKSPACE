@@ -16,6 +16,7 @@ workspace(name = "io_opentelemetry_cpp")
 
 # Load our direct dependencies.
 load("//bazel:repository.bzl", "opentelemetry_cpp_deps")
+load("//bazel:openssl_repositories.bzl", "openssl_repositories")
 
 opentelemetry_cpp_deps()
 

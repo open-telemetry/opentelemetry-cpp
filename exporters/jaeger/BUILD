@@ -1,6 +1,6 @@
 package(default_visibility = ["//visibility:public"])
 
-load("@rules_foreign_cc//foreign_cc:defs.bzl", "cmake", "configure_make")
+load("@rules_foreign_cc//foreign_cc:defs.bzl", "cmake", "configure_make", "configure_make_variant")
 
 CONFIGURE_OPTIONS = [
     "shared",
@@ -9,8 +9,66 @@ CONFIGURE_OPTIONS = [
     "no-comp",
 ]
 
-configure_make(
+LIB_NAME = "openssl"
+
+MAKE_TARGETS = [
+    "build_libs",
+    "install_dev",
+]
+
+config_setting(
+    name = "msvc_compiler",
+    flag_values = {
+        "@bazel_tools//tools/cpp:compiler": "msvc-cl",
+    },
+    visibility = ["//visibility:public"],
+)
+
+alias(
     name = "openssl",
+    actual = select({
+        ":msvc_compiler": "openssl_msvc",
+        "//conditions:default": "openssl_default",
+    }),
+    visibility = ["//visibility:public"],
+)
+
+configure_make_variant(
+    name = "openssl_msvc",
+    build_data = [
+        ":nasm",
+        ":perl",
+    ],
+    configure_command = "Configure",
+    configure_in_place = True,
+    configure_options = CONFIGURE_OPTIONS + [
+        "VC-WIN64A",
+        # Unset Microsoft Assembler (MASM) flags set by built-in MSVC toolchain,
+        # as NASM is unsed to build OpenSSL rather than MASM
+        "ASFLAGS=\" \"",
+    ],
+    configure_prefix = "$PERL",
+    env = {
+        # The Zi flag must be set otherwise OpenSSL fails to build due to missing .pdb files
+        "CFLAGS": "-Zi",
+        "PATH": "$$(dirname $(execpath @nasm//:nasm)):$$PATH",
+        "PERL": "$(execpath @perl//:perl)",
+    },
+    lib_name = LIB_NAME,
+    lib_source = ":all_srcs",
+    out_static_libs = [
+        "libssl.lib",
+        "libcrypto.lib",
+    ],
+    target_compatible_with = [
+        "@bazel_tools//platforms:windows",
+    ],
+    targets = MAKE_TARGETS,
+    toolchain = "@rules_foreign_cc//toolchains:preinstalled_nmake_toolchain",
+)
+
+configure_make(
+    name = "openssl_default",
     configure_command = "config",
     configure_in_place = True,
     configure_options = select({
