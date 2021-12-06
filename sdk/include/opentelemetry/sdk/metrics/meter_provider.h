@@ -30,7 +30,7 @@ public:
    */
   MeterProvider(std::vector<std::unique_ptr<MetricExporter>> &&exporters,
                 std::vector<std::unique_ptr<MetricReader>> &&readers,
-                std::vector<std::unique_ptr<View>> &&views,
+                std::unique_ptr<ViewRegistry> views,
                 sdk::resource::Resource resource = sdk::resource::Resource::Create({})) noexcept;
 
   /**
@@ -78,8 +78,8 @@ public:
    * Note: This view may not receive any in-flight meter data, but will get newly created meter
    * data. Note: This method is not thread safe, and should ideally be called from main thread.
    */
-  void AddView(const InstrumentSelector &instrument_selector,
-               const MeterSelector &meter_selector,
+  void AddView(std::unique_ptr<InstrumentSelector> instrument_selector,
+               std::unique_ptr<MeterSelector> meter_selector,
                std::unique_ptr<View> view) noexcept;
 
   /**

@@ -22,10 +22,11 @@ class View
 public:
   virtual ~View() = default;
 
-  virtual nostd::string GetName() const noexcept                      = 0;
-  virtual nostd::string GetDescription() const noxcept                = 0;
-  virtual Aggregation &GetAggregation() const noexcept                = 0;
-  virtual AttributesProcessor &GetAttributesProcessor() const noxcept = 0;
+  virtual std::string GetName() const noexcept                                            = 0;
+  virtual std::string GetDescription() const noexcept                                     = 0;
+  virtual const opentelemetry::sdk::metrics::Aggregation &GetAggregation() const noexcept = 0;
+  virtual const opentelemetry::sdk::metrics::AttributesProcessor &GetAttributesProcessor()
+      const noexcept = 0;
 };
 }  // namespace metrics
 }  // namespace sdk

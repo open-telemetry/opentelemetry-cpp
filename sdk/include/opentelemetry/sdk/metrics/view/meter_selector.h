@@ -10,7 +10,6 @@ namespace sdk
 {
 namespace metrics
 {
-
 class MeterSelector
 {
 public:

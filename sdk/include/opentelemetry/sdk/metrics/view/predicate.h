@@ -17,12 +17,11 @@ namespace sdk
 {
 namespace metrics
 {
-
 class Predicate
 {
 public:
-  virtual ~Predicate()                                         = default;
-  virtual bool Match(opentelemetry::nostd::string_view string) = 0;
+  virtual ~Predicate()                                                        = default;
+  virtual bool Match(opentelemetry::nostd::string_view string) const noexcept = 0;
 };
 
 class PatternPredicate : public Predicate
@@ -39,7 +38,7 @@ public:
       matchAll_ = false;
     }
   }
-  virtual bool Match(opentelemetry::nostd::string_view str)
+  virtual bool Match(opentelemetry::nostd::string_view str) const noexcept override
   {
     if (matchAll_)
     {
@@ -71,7 +70,7 @@ public:
   {
     matchAll_ = pattern_.size() ? true : false;
   }
-  virtual bool Match(opentelemetry::nostd::string_view str)
+  virtual bool Match(opentelemetry::nostd::string_view str) const noexcept override
   {
     if (matchAll_)
     {
@@ -91,7 +90,6 @@ private:
   bool matchAll_;
   std::string pattern_;
 };
-
 }  // namespace metrics
 }  // namespace sdk
 OPENTELEMETRY_END_NAMESPACE

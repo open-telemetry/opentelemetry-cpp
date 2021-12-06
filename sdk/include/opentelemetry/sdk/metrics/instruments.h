@@ -46,7 +46,7 @@ private:
 std::string name_;
 InstrumentType type_;
 };*/
-
 }  // namespace metrics
+}  // namespace sdk
 OPENTELEMETRY_END_NAMESPACE
 #endif

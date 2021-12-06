@@ -28,7 +28,6 @@ class Aggregator
 {
   // TBD
 };
-
 }  // namespace metrics
 }  // namespace sdk
 OPENTELEMETRY_END_NAMESPACE

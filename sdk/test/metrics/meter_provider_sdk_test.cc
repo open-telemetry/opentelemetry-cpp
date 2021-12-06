@@ -5,6 +5,8 @@
 #  include <gtest/gtest.h>
 #  include "opentelemetry/sdk/metrics/meter.h"
 #  include "opentelemetry/sdk/metrics/meter_provider.h"
+#  include "opentelemetry/sdk/metrics/view/instrument_selector.h"
+#  include "opentelemetry/sdk/metrics/view/meter_selector.h"
 
 using namespace opentelemetry::sdk::metrics;
 
@@ -36,14 +38,47 @@ public:
   bool Shutdown() noexcept override { return true; }
 };
 
+class MockAggregation : public Aggregation
+{
+public:
+  std::shared_ptr<opentelemetry::sdk::metrics::Aggregator> CreateAggregator(
+      opentelemetry::sdk::metrics::InstrumentDescriptor instrument_descriptor) noexcept override
+  {
+    return std::make_shared<Aggregator>(opentelemetry::sdk::metrics::Aggregator());
+  }
+};
+
+class MockAttributesProcessor : public AttributesProcessor
+{
+public:
+  void process() noexcept override {}
+};
+
 class MockView : public View
-{};
+{
+public:
+  std::string GetName() const noexcept override { return std::string(); }
+  std::string GetDescription() const noexcept override { return std::string(); }
+  const opentelemetry::sdk::metrics::Aggregation &GetAggregation() const noexcept override
+  {
+    return mock_aggregation_;
+  }
+  const opentelemetry::sdk::metrics::AttributesProcessor &GetAttributesProcessor()
+      const noexcept override
+  {
+    return mock_attributes_processor_;
+  }
+
+private:
+  const MockAggregation mock_aggregation_;
+  const MockAttributesProcessor mock_attributes_processor_;
+};
 
 TEST(MeterProvider, GetMeter)
 {
   std::vector<std::unique_ptr<MetricExporter>> exporters;
   std::vector<std::unique_ptr<MetricReader>> readers;
-  std::vector<std::unique_ptr<View>> views;
+  std::unique_ptr<ViewRegistry> views;
   MeterProvider mp1(std::move(exporters), std::move(readers), std::move(views));
   auto m1 = mp1.GetMeter("test");
   auto m2 = mp1.GetMeter("test");
@@ -77,6 +112,10 @@ TEST(MeterProvider, GetMeter)
   ASSERT_NO_THROW(mp1.AddMetricReader(std::move(reader)));
 
   std::unique_ptr<View> view{new MockView()};
-  ASSERT_NO_THROW(mp1.AddView(std::move(view)));
+  std::unique_ptr<InstrumentSelector> instrument_selector{
+      new InstrumentSelector(InstrumentType::kCounter, "instru1")};
+  std::unique_ptr<MeterSelector> meter_selector{new MeterSelector("name1", "version1", "schema1")};
+  // ASSERT_NO_THROW(mp1.AddView(std::move(instrument_selector), std::move(meter_selector),
+  // std::move(view)));
 }
 #endif

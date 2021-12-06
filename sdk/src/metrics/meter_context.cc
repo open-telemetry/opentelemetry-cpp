@@ -15,7 +15,7 @@ namespace metrics
 
 MeterContext::MeterContext(std::vector<std::unique_ptr<MetricExporter>> &&exporters,
                            std::vector<std::unique_ptr<MetricReader>> &&readers,
-                           std::vector<std::unique_ptr<View>> &&views,
+                           std::unique_ptr<ViewRegistry> views,
                            opentelemetry::sdk::resource::Resource resource) noexcept
     : exporters_(std::move(exporters)),
       readers_(std::move(readers)),
@@ -38,11 +38,11 @@ void MeterContext::AddMetricReader(std::unique_ptr<MetricReader> reader) noexcep
   readers_.push_back(std::move(reader));
 }
 
-void MeterContext::AddView(const InstrumentSelector &instrument_selector,
-                           const MeterSelector &meter_selector,
+void MeterContext::AddView(std::unique_ptr<InstrumentSelector> instrument_selector,
+                           std::unique_ptr<MeterSelector> meter_selector,
                            std::unique_ptr<View> view) noexcept
 {
-  views_.push_back(instrument_selector, meter_selector, std::move(view));
+  views_->AddView(std::move(instrument_selector), std::move(meter_selector), std::move(view));
 }
 
 bool MeterContext::Shutdown() noexcept

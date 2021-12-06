@@ -11,7 +11,7 @@ namespace metrics
 class AttributesProcessor
 {
 public:
-  virtual void process() = 0;
+  virtual void process() noexcept = 0;
 };
 }  // namespace metrics
 }  // namespace sdk
