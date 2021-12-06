@@ -55,7 +55,7 @@ configure_make_variant(
         "PERL": "$(execpath @perl//:perl)",
     },
     lib_name = LIB_NAME,
-    lib_source = ":all_srcs",
+    lib_source = "@com_github_openssl//:all_srcs",
     out_static_libs = [
         "libssl.lib",
         "libcrypto.lib",
