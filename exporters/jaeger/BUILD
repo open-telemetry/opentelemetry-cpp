@@ -101,6 +101,8 @@ configure_make(
             "libssl.so",
             "libcrypto.so",
         ],
+        "@bazel_tools//platforms:windows": [
+        ],
     }),
     target_compatible_with = [
         "@bazel_tools//platforms:osx",
