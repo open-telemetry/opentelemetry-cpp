@@ -104,10 +104,6 @@ configure_make(
         "@bazel_tools//platforms:windows": [
         ],
     }),
-    target_compatible_with = [
-        "@bazel_tools//platforms:osx",
-        "@bazel_tools//platforms:linux",
-    ],
     visibility = ["//visibility:public"],
 )
 
@@ -167,6 +163,7 @@ cmake(
     deps = [
         ":openssl",
         ":openssl_header_only",
+        "@boost//:atomic",
         "@boost//:locale",
         "@boost//:numeric_conversion",
     ],
