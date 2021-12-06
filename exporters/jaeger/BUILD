@@ -36,8 +36,8 @@ alias(
 configure_make_variant(
     name = "openssl_msvc",
     build_data = [
-        ":nasm",
-        ":perl",
+        "@nasm//:nasm",
+        "@perl//:perl",
     ],
     configure_command = "Configure",
     configure_in_place = True,

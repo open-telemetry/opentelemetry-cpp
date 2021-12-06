@@ -5,7 +5,21 @@ def openssl_repositories():
     maybe(
         http_archive,
         name = "nasm",
-        build_file = Label("//openssl:BUILD.nasm.bazel"),
+        build_file_content = """
+load("@bazel_skylib//rules:select_file.bzl", "select_file")
+
+package(default_visibility = ["//visibility:public"])
+
+filegroup(
+    name = "all_srcs",
+    srcs = glob(["**"]),
+)
+
+select_file(
+    name = "nasm",
+    srcs = ":all_srcs",
+    subpath = "nasm.exe",
+)""",
         sha256 = "f5c93c146f52b4f1664fa3ce6579f961a910e869ab0dae431bd871bdd2584ef2",
         strip_prefix = "nasm-2.15.05",
         urls = [
@@ -28,7 +42,19 @@ def openssl_repositories():
     maybe(
         http_archive,
         name = "perl",
-        build_file = Label("//openssl:BUILD.perl.bazel"),
+        build_file_content = """
+load("@bazel_skylib//rules:select_file.bzl", "select_file")
+package(default_visibility = ["//visibility:public"])
+filegroup(
+    name = "all_srcs",
+    srcs = glob(["**"]),
+)
+select_file(
+    name = "perl",
+    srcs = ":all_srcs",
+    subpath = "perl/bin/perl.exe",
+)
+        """,
         sha256 = "aeb973da474f14210d3e1a1f942dcf779e2ae7e71e4c535e6c53ebabe632cc98",
         urls = [
             "https://mirror.bazel.build/strawberryperl.com/download/5.32.1.1/strawberry-perl-5.32.1.1-64bit.zip",
