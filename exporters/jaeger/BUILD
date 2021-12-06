@@ -78,6 +78,8 @@ configure_make(
         ] + CONFIGURE_OPTIONS,
         "@bazel_tools//platforms:linux": [
         ] + CONFIGURE_OPTIONS,
+        "@bazel_tools//platforms:windows": [
+        ] + CONFIGURE_OPTIONS,
     }),
     copts = [
         "-Ilibs/exporters/jaeger/openssl/include",
@@ -87,6 +89,7 @@ configure_make(
             "AR": "",
         },
         "@bazel_tools//platforms:linux": {},
+        "@bazel_tools//platforms:windows": {},
     }),
     lib_source = "@com_github_openssl//:all_srcs",
     out_shared_libs = select({
