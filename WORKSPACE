@@ -19,6 +19,7 @@ load("//bazel:repository.bzl", "opentelemetry_cpp_deps")
 load("//bazel:openssl_repositories.bzl", "openssl_repositories")
 
 opentelemetry_cpp_deps()
+openssl_repositories()
 
 # Load gRPC dependencies after load.
 load("@com_github_grpc_grpc//bazel:grpc_deps.bzl", "grpc_deps")
