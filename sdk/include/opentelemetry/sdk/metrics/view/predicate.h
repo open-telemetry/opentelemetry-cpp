@@ -3,11 +3,11 @@
 
 #pragma once
 #ifndef ENABLE_METRICS_PREVIEW
-#  include <regex>
 #  include <vector>
 #  if (__GNUC__ == 4 && (__GNUC_MINOR__ == 8 || __GNUC_MINOR__ == 9))
 #    define HAVE_WORKING_REGEX 0
 #  else
+#    include <regex>
 #    define HAVE_WORKING_REGEX 1
 #  endif
 
@@ -56,7 +56,7 @@ public:
 
 private:
   bool matchAll_;
-#  ifdef HAVE_WORKING_REGEX
+#  if HAVE_WORKING_REGEX
   std::regex reg_key_;
 #  else
   std::string reg_key_;
