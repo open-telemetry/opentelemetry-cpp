@@ -102,6 +102,10 @@ configure_make(
             "libcrypto.so",
         ],
     }),
+    target_compatible_with = [
+        "@bazel_tools//platforms:osx",
+        "@bazel_tools//platforms:linux",
+    ],
     visibility = ["//visibility:public"],
 )
 
