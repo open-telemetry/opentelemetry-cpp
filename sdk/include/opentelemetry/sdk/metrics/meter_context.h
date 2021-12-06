@@ -8,7 +8,9 @@
 #  include <vector>
 #  include "opentelemetry/sdk/metrics/metric_exporter.h"
 #  include "opentelemetry/sdk/metrics/metric_reader.h"
-#  include "opentelemetry/sdk/metrics/view/view.h"
+#  include "opentelemetry/sdk/metrics/view/instrument_selector.h"
+#  include "opentelemetry/sdk/metrics/view/meter_selector.h"
+#  include "opentelemetry/sdk/metrics/view/view_registry.h"
 #  include "opentelemetry/sdk/resource/resource.h"
 #  include "opentelemetry/version.h"
 
@@ -71,7 +73,9 @@ public:
    * Note: This view may not receive any in-flight meter data, but will get newly created meter
    * data. Note: This method is not thread safe, and should ideally be called from main thread.
    */
-  void AddView(std::unique_ptr<View> view) noexcept;
+  void AddView(const InstrumentSelector &instrument_selector,
+               const MeterSelector &meter_selector,
+               std::unique_ptr<View> view) noexcept;
 
   /**
    * Force all active Exporters and Readers to flush any buffered meter data
@@ -89,7 +93,7 @@ private:
   opentelemetry::sdk::resource::Resource resource_;
   std::vector<std::unique_ptr<MetricExporter>> exporters_;
   std::vector<std::unique_ptr<MetricReader>> readers_;
-  std::vector<std::unique_ptr<View>> views_;
+  std::unique_ptr<ViewRegistry> views_;
 };
 
 }  // namespace metrics

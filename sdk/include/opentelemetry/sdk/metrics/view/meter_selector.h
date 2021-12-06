@@ -2,41 +2,45 @@
 // SPDX-License-Identifier: Apache-2.0
 
 #pragma once
+#include "opentelemetry/nostd/string_view.h"
+#include "opentelemetry/sdk/metrics/view/predicate.h"
 #ifndef ENABLE_METRICS_PREVIEW
+OPENTELEMETRY_BEGIN_NAMESPACE
 namespace sdk
 {
 namespace metrics
 {
 
-class MeterSelector {
-    public:
+class MeterSelector
+{
+public:
+  MeterSelector(opentelemetry::nostd::string_view name,
+                opentelemetry::nostd::string_view version,
+                opentelemetry::nostd::string_view schema)
+      : name_filter_{new opentelemetry::sdk::metrics::ExactPredicate(name)},
+        version_filter_{new opentelemetry::sdk::metrics::ExactPredicate(version)},
+        schema_filter_{new opentelemetry::sdk::metrics::ExactPredicate(schema)}
+  {}
 
-    MeterSelector(nostd::string_view name, nostd::string_view version, nostd::string_view schema){
-        name_filter_ =new ExactPredicate(name);
-        version_filter_ = new ExactPredicate(version);
-        schema_filter_ = new ExactPredicate(schema);
-    }
+  // Returns name filter predicate. This shouldn't be deleted
+  const opentelemetry::sdk::metrics::Predicate *const GetNameFilter() { return name_filter_.get(); }
 
-    // Returns name filter predicate. This shouldn't be deleted
-    const Predicate* const GetNameFilter(){
-        return name_filter_.get();
-    }
-    
-    // Returns version filter predicate. This shouldn't be deleted
-    const Predicate* const GetVersionFilter() {
-        return version_filter_get();
-    }
+  // Returns version filter predicate. This shouldn't be deleted
+  const opentelemetry::sdk::metrics::Predicate *const GetVersionFilter()
+  {
+    return version_filter_.get();
+  }
 
-    // Returns schema filter predicate. This shouldn't be deleted
-    const Predicate* const GetSchemaFilter() {
-        return schema_filter_.get();
-    }
+  // Returns schema filter predicate. This shouldn't be deleted
+  const opentelemetry::sdk::metrics::Predicate *const GetSchemaFilter()
+  {
+    return schema_filter_.get();
+  }
 
-    private:
-    std::unique_ptr<Predicate> name_filter_;
-    std::unique_ptr<Predicate> version_filter_;
-    std::unique_ptr<Predicate> schema_filter_;
-
+private:
+  std::unique_ptr<opentelemetry::sdk::metrics::Predicate> name_filter_;
+  std::unique_ptr<opentelemetry::sdk::metrics::Predicate> version_filter_;
+  std::unique_ptr<opentelemetry::sdk::metrics::Predicate> schema_filter_;
 };
 }  // namespace metrics
 }  // namespace sdk

@@ -78,7 +78,9 @@ public:
    * Note: This view may not receive any in-flight meter data, but will get newly created meter
    * data. Note: This method is not thread safe, and should ideally be called from main thread.
    */
-  void AddView(std::unique_ptr<View> view) noexcept;
+  void AddView(const InstrumentSelector &instrument_selector,
+               const MeterSelector &meter_selector,
+               std::unique_ptr<View> view) noexcept;
 
   /**
    * Shutdown the meter provider.

@@ -8,12 +8,12 @@ namespace sdk
 {
 namespace metrics
 {
-class AttributesProcessor 
+class AttributesProcessor
 {
 public:
-        virtual void process() = 0;
-        
+  virtual void process() = 0;
 };
-}
-}
+}  // namespace metrics
+}  // namespace sdk
 OPENTELEMETRY_END_NAMESPACE
+#endif

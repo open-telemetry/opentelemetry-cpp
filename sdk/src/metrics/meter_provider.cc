@@ -70,9 +70,11 @@ void MeterProvider::AddMetricReader(std::unique_ptr<MetricReader> reader) noexce
   return context_->AddMetricReader(std::move(reader));
 }
 
-void MeterProvider::AddView(std::unique_ptr<View> view) noexcept
+void MeterProvider::AddView(const InstrumentSelector &instrument_selector,
+                            const MeterSelector &meter_selector,
+                            std::unique_ptr<View> view) noexcept
 {
-  return context_->AddView(std::move(view));
+  return context_->AddView(instrument_selector, meter_selector, std::move(view));
 }
 
 /**

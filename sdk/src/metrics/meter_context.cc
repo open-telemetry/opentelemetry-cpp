@@ -38,9 +38,11 @@ void MeterContext::AddMetricReader(std::unique_ptr<MetricReader> reader) noexcep
   readers_.push_back(std::move(reader));
 }
 
-void MeterContext::AddView(std::unique_ptr<View> view) noexcept
+void MeterContext::AddView(const InstrumentSelector &instrument_selector,
+                           const MeterSelector &meter_selector,
+                           std::unique_ptr<View> view) noexcept
 {
-  views_.push_back(std::move(view));
+  views_.push_back(instrument_selector, meter_selector, std::move(view));
 }
 
 bool MeterContext::Shutdown() noexcept
