@@ -20,13 +20,36 @@ namespace metrics
 class View
 {
 public:
-  virtual ~View() = default;
+  View(const std::string &name,
+       const std::string &description,
+       std::unique_ptr<opentelemetry::sdk::metrics::Aggregation> aggregation,
+       std::unique_ptr<opentelemetry::sdk::metrics::AttributesProcessor> attributes_processor)
+      : name_(name),
+        description_(description),
+        aggregation_{std::move(aggregation)},
+        attributes_processor_{std::move(attributes_processor)}
+  {}
 
-  virtual std::string GetName() const noexcept                                            = 0;
-  virtual std::string GetDescription() const noexcept                                     = 0;
-  virtual const opentelemetry::sdk::metrics::Aggregation &GetAggregation() const noexcept = 0;
+  virtual std::string GetName() const noexcept { return name_; }
+
+  virtual std::string GetDescription() const noexcept { return description_; }
+
+  virtual const opentelemetry::sdk::metrics::Aggregation &GetAggregation() const noexcept
+  {
+    return *aggregation_.get();
+  }
+
   virtual const opentelemetry::sdk::metrics::AttributesProcessor &GetAttributesProcessor()
-      const noexcept = 0;
+      const noexcept
+  {
+    return *attributes_processor_.get();
+  }
+
+private:
+  std::string name_;
+  std::string description_;
+  std::unique_ptr<opentelemetry::sdk::metrics::Aggregation> aggregation_;
+  std::unique_ptr<opentelemetry::sdk::metrics::AttributesProcessor> attributes_processor_;
 };
 }  // namespace metrics
 }  // namespace sdk

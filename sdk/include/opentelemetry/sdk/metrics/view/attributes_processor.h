@@ -3,16 +3,31 @@
 
 #pragma once
 #ifndef ENABLE_METRICS_PREVIEW
+#  include "opentelemetry/sdk/common/attribute_utils.h"
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace sdk
 {
 namespace metrics
 {
+using MetricAttributes = opentelemetry::sdk::common::AttributeMap;
+
 class AttributesProcessor
 {
 public:
-  virtual void process() noexcept = 0;
+  virtual MetricAttributes process(
+      const opentelemetry::common::KeyValueIterable &attributes) noexcept = 0;
 };
+
+class NoOpAttributesProcessor : public AttributesProcessor
+{
+  MetricAttributes process(
+      const opentelemetry::common::KeyValueIterable &attributes) noexcept override
+  {
+    MetricAttributes result(attributes);
+    return result;
+  }
+};
+
 }  // namespace metrics
 }  // namespace sdk
 OPENTELEMETRY_END_NAMESPACE
