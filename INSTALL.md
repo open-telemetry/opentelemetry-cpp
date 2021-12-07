@@ -11,7 +11,7 @@ build systems for opentelemetry-cpp.
   - [prometheus-cpp](https://github.com/jupp0r/prometheus-cpp.git) - Prometheus client library (Prometheus exporter).
   - [nlohmann-json](https://github.com/nlohmann/json.git) - JSON library.
   - [thrift](https://thrift.apache.org/) - an interface definition language and binary communication protocol (Jaeger exporter).
-  
+
 ## Build instructions using CMake
 
 ### Prerequisites for CMake
