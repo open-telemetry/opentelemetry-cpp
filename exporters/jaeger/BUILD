@@ -51,7 +51,7 @@ configure_make_variant(
     env = {
         # The Zi flag must be set otherwise OpenSSL fails to build due to missing .pdb files
         "CFLAGS": "-Zi",
-        "PATH": "$$(dirname $(execpath @nasm//:nasm)):$$PATH",
+        "PATH": "$(dirname $(execpath @nasm//:nasm)):$PATH",
         "PERL": "$(execpath @perl//:perl)",
     },
     lib_name = LIB_NAME,
