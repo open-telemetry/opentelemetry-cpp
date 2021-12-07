@@ -33,11 +33,12 @@ public:
    * @param views The views to be configured with meter context.
    * @param resource  The resource for this meter context.
    */
-  MeterContext(std::vector<std::unique_ptr<sdk::metrics::MetricExporter>> &&exporters,
-               std::vector<std::unique_ptr<MetricReader>> &&readers,
-               std::unique_ptr<ViewRegistry> views,
-               opentelemetry::sdk::resource::Resource resource =
-                   opentelemetry::sdk::resource::Resource::Create({})) noexcept;
+  MeterContext(
+      std::vector<std::unique_ptr<sdk::metrics::MetricExporter>> &&exporters,
+      std::vector<std::unique_ptr<MetricReader>> &&readers,
+      std::unique_ptr<ViewRegistry> views = std::unique_ptr<ViewRegistry>(new ViewRegistry()),
+      opentelemetry::sdk::resource::Resource resource =
+          opentelemetry::sdk::resource::Resource::Create({})) noexcept;
 
   /**
    * Obtain the resource associated with this meter context.

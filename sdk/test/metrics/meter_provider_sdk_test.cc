@@ -78,8 +78,10 @@ TEST(MeterProvider, GetMeter)
 {
   std::vector<std::unique_ptr<MetricExporter>> exporters;
   std::vector<std::unique_ptr<MetricReader>> readers;
-  std::unique_ptr<ViewRegistry> views;
-  MeterProvider mp1(std::move(exporters), std::move(readers), std::move(views));
+
+  MeterProvider mp1(std::move(exporters), std::move(readers));
+  // or MeterProvider mp1(std::move(exporters), std::move(readers));
+  // MeterProvider mp1(std::move(exporters), std::move(readers), std::move(views);
   auto m1 = mp1.GetMeter("test");
   auto m2 = mp1.GetMeter("test");
   auto m3 = mp1.GetMeter("different", "1.0.0");
@@ -115,7 +117,7 @@ TEST(MeterProvider, GetMeter)
   std::unique_ptr<InstrumentSelector> instrument_selector{
       new InstrumentSelector(InstrumentType::kCounter, "instru1")};
   std::unique_ptr<MeterSelector> meter_selector{new MeterSelector("name1", "version1", "schema1")};
-  // ASSERT_NO_THROW(mp1.AddView(std::move(instrument_selector), std::move(meter_selector),
-  // std::move(view)));
+  ASSERT_NO_THROW(
+      mp1.AddView(std::move(instrument_selector), std::move(meter_selector), std::move(view)));
 }
 #endif

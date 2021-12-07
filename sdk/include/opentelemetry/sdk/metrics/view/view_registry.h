@@ -16,9 +16,17 @@ namespace metrics
 {
 struct RegisteredView
 {
+  RegisteredView(
+      std::unique_ptr<opentelemetry::sdk::metrics::InstrumentSelector> instrument_selector,
+      std::unique_ptr<opentelemetry::sdk::metrics::MeterSelector> meter_selector,
+      std::unique_ptr<opentelemetry::sdk::metrics::View> view)
+      : instrument_selector_{std::move(instrument_selector)},
+        meter_selector_{std::move(meter_selector)},
+        view_{std::move(view)}
+  {}
   std::unique_ptr<opentelemetry::sdk::metrics::InstrumentSelector> instrument_selector_;
   std::unique_ptr<opentelemetry::sdk::metrics::MeterSelector> meter_selector_;
-  std::unique_ptr<opentelemetry::sdk::metrics::View> view;
+  std::unique_ptr<opentelemetry::sdk::metrics::View> view_;
 };
 
 class ViewRegistry
@@ -29,6 +37,7 @@ public:
                std::unique_ptr<opentelemetry::sdk::metrics::View> view)
   {
     // TBD - thread-safe ?
+
     auto registered_view = std::unique_ptr<RegisteredView>(new RegisteredView{
         std::move(instrument_selector), std::move(meter_selector), std::move(view)});
     registered_views_.push_back(std::move(registered_view));
@@ -45,7 +54,7 @@ public:
       if (MatchMeter(registered_view->meter_selector_.get(), instrumentation_library) &&
           MatchInstrument(registered_view->instrument_selector_.get(), instrument_descriptor))
       {
-        if (!callback(*(registered_view->view.get())))
+        if (!callback(*(registered_view->view_.get())))
         {
           return false;
         }

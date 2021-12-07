@@ -28,10 +28,11 @@ public:
    * @param views The views for this meter provider
    * @param resource  The resources for this meter provider.
    */
-  MeterProvider(std::vector<std::unique_ptr<MetricExporter>> &&exporters,
-                std::vector<std::unique_ptr<MetricReader>> &&readers,
-                std::unique_ptr<ViewRegistry> views,
-                sdk::resource::Resource resource = sdk::resource::Resource::Create({})) noexcept;
+  MeterProvider(
+      std::vector<std::unique_ptr<MetricExporter>> &&exporters,
+      std::vector<std::unique_ptr<MetricReader>> &&readers,
+      std::unique_ptr<ViewRegistry> views = std::unique_ptr<ViewRegistry>(new ViewRegistry()),
+      sdk::resource::Resource resource    = sdk::resource::Resource::Create({})) noexcept;
 
   /**
    * Initialize a new meter provider with a specified context
