@@ -3,7 +3,6 @@ package(default_visibility = ["//visibility:public"])
 load("@rules_foreign_cc//foreign_cc:defs.bzl", "cmake", "configure_make", "configure_make_variant")
 
 CONFIGURE_OPTIONS = [
-    "shared",
     "no-weak-ssl-ciphers",
     "no-idea",
     "no-comp",
@@ -42,10 +41,15 @@ configure_make_variant(
     configure_command = "Configure",
     configure_in_place = True,
     configure_options = CONFIGURE_OPTIONS + [
+        "no-shared",
         "VC-WIN64A",
         # Unset Microsoft Assembler (MASM) flags set by built-in MSVC toolchain,
         # as NASM is used to build OpenSSL rather than MASM
-        "ASFLAGS=\" \"",
+        "ASFLAGS=\"-g\"",
+        "CFLAGS=\"/W3 /wd4090 /nologo /O2 /Zi /MP\"",
+        "LDFLAGS=\"/nologo /debug /Zi\"",
+        "ARFLAGS=\"/nologo\"",
+        "LD=\"link\"",
     ],
     configure_prefix = "$PERL",
     env = {
@@ -73,12 +77,15 @@ configure_make(
     configure_in_place = True,
     configure_options = select({
         "@bazel_tools//platforms:osx": [
+            "shared",
             "no-afalgeng",
             "ARFLAGS=r",
         ] + CONFIGURE_OPTIONS,
         "@bazel_tools//platforms:linux": [
+            "shared",
         ] + CONFIGURE_OPTIONS,
         "@bazel_tools//platforms:windows": [
+            "shared",
         ] + CONFIGURE_OPTIONS,
     }),
     copts = [
