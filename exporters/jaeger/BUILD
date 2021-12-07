@@ -17,17 +17,17 @@ MAKE_TARGETS = [
 ]
 
 config_setting(
-    name = "msvc_compiler",
-    flag_values = {
-        "@bazel_tools//tools/cpp:compiler": "msvc-cl",
-    },
-    visibility = ["//visibility:public"],
+    name = "windows",
+    constraint_values = [
+        "@bazel_tools//platforms:windows",
+    ],
+    visibility = ["//visibility:private"],
 )
 
 alias(
     name = "openssl",
     actual = select({
-        ":msvc_compiler": "openssl_msvc",
+        ":windows": "openssl_msvc",
         "//conditions:default": "openssl_default",
     }),
     visibility = ["//visibility:public"],
