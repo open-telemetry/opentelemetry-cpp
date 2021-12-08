@@ -1,6 +1,7 @@
 // Copyright The OpenTelemetry Authors
 // SPDX-License-Identifier: Apache-2.0
 
+#include <vector>
 #include "opentelemetry/exporters/jaeger/recordable.h"
 #include "opentelemetry/sdk/instrumentationlibrary/instrumentation_library.h"
 #include "opentelemetry/sdk/trace/simple_processor.h"
@@ -18,6 +19,7 @@ namespace common   = opentelemetry::common;
 using namespace jaegertracing;
 using namespace opentelemetry::exporter::jaeger;
 using namespace opentelemetry::sdk::instrumentationlibrary;
+using std::vector;
 
 TEST(JaegerSpanRecordable, SetIdentity)
 {
@@ -127,8 +129,6 @@ TEST(JaegerSpanRecordable, AddEvent)
 {
   JaegerRecordable rec;
 
-  nostd::string_view name = "Test Event";
-
   std::chrono::system_clock::time_point event_time = std::chrono::system_clock::now();
   common::SystemTimestamp event_timestamp(event_time);
   uint64_t epoch_us =
@@ -154,6 +154,95 @@ TEST(JaegerSpanRecordable, AddEvent)
     EXPECT_EQ(tags[index].vLong, values[index - 1]);
     index++;
   }
+}
+
+template <typename value_type>
+void addTag(thrift::TagType::type tag_type,
+            const std::string &key,
+            value_type value,
+            vector<thrift::Tag> &tags)
+{
+  thrift::Tag tag;
+
+  tag.__set_key(key);
+  tag.__set_vType(tag_type);
+  if (tag_type == thrift::TagType::LONG)
+  {
+    tag.__set_vLong(value);
+  }
+  else if (tag_type == thrift::TagType::DOUBLE)
+  {
+    tag.__set_vDouble(value);
+  }
+  else if (tag_type == thrift::TagType::BOOL)
+  {
+    tag.__set_vBool(value);
+  }
+
+  tags.push_back(tag);
+}
+
+void addTag(const std::string &key, std::string value, vector<thrift::Tag> &tags)
+{
+  thrift::Tag tag;
+
+  tag.__set_key(key);
+  tag.__set_vType(thrift::TagType::STRING);
+  tag.__set_vStr(value);
+
+  tags.push_back(tag);
+}
+
+TEST(JaegerSpanRecordable, SetAttributes)
+{
+  JaegerRecordable rec;
+  std::string string_val{"string_val"};
+  vector<common::AttributeValue> values{
+      bool{false},
+      int32_t{-32},
+      int64_t{-64},
+      uint32_t{32},
+      double{3.14},
+      string_val.c_str(),
+      nostd::string_view{"string_view"},
+  };
+  for (const auto &val : values)
+  {
+    rec.SetAttribute("key1", val);
+  }
+  rec.SetAttribute("key2", nostd::span<const bool>{{false, true}});
+  rec.SetAttribute("key3", nostd::span<const int32_t>{{-320, 320}});
+  rec.SetAttribute("key4", nostd::span<const int64_t>{{-640, 640}});
+  rec.SetAttribute("key5", nostd::span<const uint32_t>{{320, 322}});
+  rec.SetAttribute("key6", nostd::span<const double>{{4.15, 5.15}});
+  rec.SetAttribute("key7", nostd::span<const nostd::string_view>{{"string_v1", "string_v2"}});
+
+  auto tags = rec.Tags();
+  EXPECT_EQ(tags.size(), values.size() + 12);
+
+  vector<thrift::Tag> expected_tags;
+  addTag(thrift::TagType::BOOL, "key1", bool{false}, expected_tags);
+  addTag(thrift::TagType::LONG, "key1", int32_t{-32}, expected_tags);
+  addTag(thrift::TagType::LONG, "key1", int64_t{-64}, expected_tags);
+  addTag(thrift::TagType::LONG, "key1", int32_t{32}, expected_tags);
+  addTag(thrift::TagType::DOUBLE, "key1", double{3.14}, expected_tags);
+  addTag("key1", string_val, expected_tags);
+  addTag("key1", std::string{"string_view"}, expected_tags);
+
+  addTag(thrift::TagType::BOOL, "key2", bool{false}, expected_tags);
+  addTag(thrift::TagType::BOOL, "key2", bool{true}, expected_tags);
+  addTag(thrift::TagType::LONG, "key3", int32_t{-320}, expected_tags);
+  addTag(thrift::TagType::LONG, "key3", int32_t{320}, expected_tags);
+  addTag(thrift::TagType::LONG, "key4", int64_t{-640}, expected_tags);
+  addTag(thrift::TagType::LONG, "key4", int64_t{640}, expected_tags);
+  addTag(thrift::TagType::LONG, "key5", uint32_t{320}, expected_tags);
+  addTag(thrift::TagType::LONG, "key5", uint32_t{322}, expected_tags);
+  addTag(thrift::TagType::DOUBLE, "key6", double{4.15}, expected_tags);
+  addTag(thrift::TagType::DOUBLE, "key6", double{5.15}, expected_tags);
+  addTag("key7", std::string{"string_v1"}, expected_tags);
+  addTag("key7", std::string{"string_v2"}, expected_tags);
+
+  EXPECT_EQ(tags, expected_tags);
 }
 
 TEST(JaegerSpanRecordable, SetInstrumentationLibrary)
@@ -194,19 +283,15 @@ TEST(JaegerSpanRecordable, SetResource)
   EXPECT_GE(resource_tags.size(), 2);
   EXPECT_EQ(service_name, service_name_value);
 
-  bool found_key1 = false;
-  bool found_key2 = false;
   for (const auto &tag : resource_tags)
   {
     if (tag.key == "key1")
     {
-      found_key1 = true;
       EXPECT_EQ(tag.vType, thrift::TagType::STRING);
       EXPECT_EQ(tag.vStr, "value1");
     }
     else if (tag.key == "key2")
     {
-      found_key2 = true;
       EXPECT_EQ(tag.vType, thrift::TagType::STRING);
       EXPECT_EQ(tag.vStr, "value2");
     }
