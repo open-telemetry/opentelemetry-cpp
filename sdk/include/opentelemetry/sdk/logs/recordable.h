@@ -19,6 +19,7 @@
 #  include "opentelemetry/version.h"
 
 #  include <map>
+#  include <memory>
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace sdk
@@ -92,6 +93,14 @@ public:
    * @param trace_flags the trace flags to set
    */
   virtual void SetTraceFlags(opentelemetry::trace::TraceFlags trace_flags) noexcept = 0;
+
+  /**
+   * Set instrumentation_library for this log.
+   * @param instrumentation_library the instrumentation library to set
+   */
+  virtual void SetInstrumentationLibrary(
+      std::unique_ptr<instrumentationlibrary::InstrumentationLibrary>
+          instrumentation_library) noexcept = 0;
 };
 }  // namespace logs
 }  // namespace sdk

@@ -16,8 +16,13 @@ namespace trace_api = opentelemetry::trace;
 namespace nostd     = opentelemetry::nostd;
 namespace common    = opentelemetry::common;
 
-Logger::Logger(nostd::string_view name, std::shared_ptr<LoggerProvider> logger_provider) noexcept
-    : logger_name_(std::string(name)), logger_provider_(logger_provider)
+Logger::Logger(nostd::string_view name,
+               std::shared_ptr<LoggerProvider> logger_provider,
+               std::unique_ptr<instrumentationlibrary::InstrumentationLibrary>
+                   instrumentation_library) noexcept
+    : logger_name_(std::string(name)),
+      logger_provider_(logger_provider),
+      instrumentation_library_{std::move(instrumentation_library)}
 {}
 
 const nostd::string_view Logger::GetName() noexcept

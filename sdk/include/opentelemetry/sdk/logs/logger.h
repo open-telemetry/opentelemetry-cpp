@@ -5,6 +5,7 @@
 #ifdef ENABLE_LOGS_PREVIEW
 
 #  include "opentelemetry/logs/logger.h"
+#  include "opentelemetry/sdk/instrumentationlibrary/instrumentation_library.h"
 #  include "opentelemetry/sdk/logs/logger_provider.h"
 #  include "opentelemetry/sdk/logs/processor.h"
 
@@ -25,8 +26,11 @@ public:
    * @param name The name of this logger instance
    * @param logger_provider The logger provider that owns this logger.
    */
-  explicit Logger(opentelemetry::nostd::string_view name,
-                  std::shared_ptr<LoggerProvider> logger_provider) noexcept;
+  explicit Logger(
+      opentelemetry::nostd::string_view name,
+      std::shared_ptr<LoggerProvider> logger_provider,
+      std::unique_ptr<instrumentationlibrary::InstrumentationLibrary> instrumentation_library =
+          instrumentationlibrary::InstrumentationLibrary::Create("")) noexcept;
 
   /**
    * Returns the name of this logger.
@@ -64,6 +68,7 @@ private:
   // The logger provider of this Logger. Uses a weak_ptr to avoid cyclic dependency issues the with
   // logger provider
   std::weak_ptr<LoggerProvider> logger_provider_;
+  std::shared_ptr<instrumentationlibrary::InstrumentationLibrary> instrumentation_library_;
 };
 
 }  // namespace logs
