@@ -18,7 +18,7 @@ public:
       const opentelemetry::common::KeyValueIterable &attributes) noexcept = 0;
 };
 
-class NoOpAttributesProcessor : public AttributesProcessor
+class DefaultAttributesProcessor : public AttributesProcessor
 {
   MetricAttributes process(
       const opentelemetry::common::KeyValueIterable &attributes) noexcept override

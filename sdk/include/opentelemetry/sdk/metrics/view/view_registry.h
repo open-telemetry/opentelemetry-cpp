@@ -14,6 +14,8 @@ namespace sdk
 {
 namespace metrics
 {
+const std::string kDefaultViewName        = "default_name";
+const std::string kDefaultViewDescription = "default view";
 struct RegisteredView
 {
   RegisteredView(
@@ -48,20 +50,29 @@ public:
                      &instrumentation_library,
                  nostd::function_ref<bool(const View &)> callback) const
   {
-
+    bool found = false;
     for (auto const &registered_view : registered_views_)
     {
       if (MatchMeter(registered_view->meter_selector_.get(), instrumentation_library) &&
           MatchInstrument(registered_view->instrument_selector_.get(), instrument_descriptor))
       {
+        found = true;
         if (!callback(*(registered_view->view_.get())))
         {
           return false;
         }
       }
     }
+    // return default view if none found;
+    if (!found)
+    {
+      static View view(kDefaultViewName, kDefaultViewDescription);
+      if (!callback(view))
+      {
+        return false;
+      }
+    }
     return true;
-    // TBD create and add static default view if non match.
   }
 
   ~ViewRegistry() = default;

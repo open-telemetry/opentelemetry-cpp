@@ -21,9 +21,13 @@ class View
 {
 public:
   View(const std::string &name,
-       const std::string &description,
-       std::unique_ptr<opentelemetry::sdk::metrics::Aggregation> aggregation,
-       std::unique_ptr<opentelemetry::sdk::metrics::AttributesProcessor> attributes_processor)
+       const std::string &description = "",
+       std::unique_ptr<opentelemetry::sdk::metrics::Aggregation> aggregation =
+           std::unique_ptr<opentelemetry::sdk::metrics::Aggregation>(
+               new opentelemetry::sdk::metrics::DefaultAggregation()),
+       std::unique_ptr<opentelemetry::sdk::metrics::AttributesProcessor> attributes_processor =
+           std::unique_ptr<opentelemetry::sdk::metrics::AttributesProcessor>(
+               new opentelemetry::sdk::metrics::DefaultAttributesProcessor()))
       : name_(name),
         description_(description),
         aggregation_{std::move(aggregation)},
