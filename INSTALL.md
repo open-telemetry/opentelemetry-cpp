@@ -5,7 +5,7 @@ build systems for opentelemetry-cpp.
 
 ## Dependencies
 
-You can link OpenTelemetry with libraries provided in [dependencies.md](https://github.com/open-telemetry/opentelemetry-cpp/blob/main/docs/dependencies.md) (complete list of libraries with versions used in our CI can be found [here](https://github.com/open-telemetry/opentelemetry-cpp/blob/main/third_party_release)).
+You can link OpenTelemetry C++ SDK with libraries provided in [dependencies.md](https://github.com/open-telemetry/opentelemetry-cpp/blob/main/docs/dependencies.md) (complete list of libraries with versions used in our CI can be found [here](https://github.com/open-telemetry/opentelemetry-cpp/blob/main/third_party_release)).
 
 ## Build instructions using CMake
 
