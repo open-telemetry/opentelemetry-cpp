@@ -5,13 +5,7 @@ build systems for opentelemetry-cpp.
 
 ## Dependencies
 
-You can link OpenTelemetry with following libraries (complete list of libraries with versions can be found [here](https://github.com/open-telemetry/opentelemetry-cpp/blob/main/third_party_release)):
-
-- [gRPC](https://grpc.io/) - an RPC framework (OTLP_Grpc exporter).
-- [abseil](https://github.com/abseil/abseil-cpp.git) - collection of C++ libraries.
-- [prometheus-cpp](https://github.com/jupp0r/prometheus-cpp.git) - Prometheus client library (Prometheus exporter).
-- [nlohmann-json](https://github.com/nlohmann/json.git) - JSON library.
-- [thrift](https://thrift.apache.org/) - an interface definition language and binary communication protocol (Jaeger exporter).
+You can link OpenTelemetry with libraries provided in [dependencies.md](https://github.com/open-telemetry/opentelemetry-cpp/blob/main/docs/dependencies.md) (complete list of libraries with versions used in our CI can be found [here](https://github.com/open-telemetry/opentelemetry-cpp/blob/main/third_party_release)).
 
 ## Build instructions using CMake
 
