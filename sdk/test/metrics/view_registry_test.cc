@@ -3,9 +3,11 @@
 
 #ifndef ENABLE_METRICS_PREVIEW
 #  include "opentelemetry/sdk/metrics/view/view_registry.h"
-#  include <gtest/gtest.h>
 #  include "opentelemetry/sdk/instrumentationlibrary/instrumentation_library.h"
 #  include "opentelemetry/sdk/metrics/instruments.h"
+#  include "opentelemetry/sdk/metrics/view/predicate.h"
+
+#  include <gtest/gtest.h>
 
 using namespace opentelemetry::sdk::metrics;
 using namespace opentelemetry::sdk::instrumentationlibrary;
@@ -66,8 +68,10 @@ TEST(ViewRegistry, FindNonExistingView)
       registry.FindViews(default_instrument_descriptor, *default_instrumentation_lib.get(),
                          [&count, &view_name, &view_description](const View &view) {
                            count++;
+#  if HAVE_WORKING_REGEX
                            EXPECT_EQ(view.GetName(), view_name);
                            EXPECT_EQ(view.GetDescription(), view_description);
+#  endif
                            return true;
                          });
   EXPECT_EQ(count, 1);
