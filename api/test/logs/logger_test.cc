@@ -92,12 +92,16 @@ class TestLogger : public Logger
 // Define a basic LoggerProvider class that returns an instance of the logger class defined above
 class TestProvider : public LoggerProvider
 {
-  shared_ptr<Logger> GetLogger(string_view library_name, string_view options = "") override
+  shared_ptr<Logger> GetLogger(string_view library_name,
+                               string_view options           = "",
+                               nostd::string_view schema_url = "") override
   {
     return shared_ptr<Logger>(new TestLogger());
   }
 
-  shared_ptr<Logger> GetLogger(string_view library_name, span<string_view> args) override
+  shared_ptr<Logger> GetLogger(string_view library_name,
+                               span<string_view> args,
+                               nostd::string_view schema_url = "") override
   {
     return shared_ptr<Logger>(new TestLogger());
   }

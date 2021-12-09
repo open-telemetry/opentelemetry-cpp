@@ -181,6 +181,11 @@ public:
    * @return the timestamp for this log
    */
   opentelemetry::common::SystemTimestamp GetTimestamp() const noexcept { return timestamp_; }
+
+  void SetInstrumentationLibrary(
+      std::unique_ptr<sdk::instrumentationlibrary::InstrumentationLibrary>
+          instrumentation_library) noexcept override
+  {}
 };
 }  // namespace logs
 }  // namespace sdk

@@ -20,12 +20,16 @@ using opentelemetry::nostd::string_view;
 
 class TestProvider : public LoggerProvider
 {
-  shared_ptr<Logger> GetLogger(string_view library_name, string_view options) override
+  shared_ptr<Logger> GetLogger(string_view library_name,
+                               string_view options,
+                               string_view schema_url = "") override
   {
     return shared_ptr<Logger>(nullptr);
   }
 
-  shared_ptr<Logger> GetLogger(string_view library_name, span<string_view> args) override
+  shared_ptr<Logger> GetLogger(string_view library_name,
+                               span<string_view> args,
+                               string_view schema_url = "") override
   {
     return shared_ptr<Logger>(nullptr);
   }

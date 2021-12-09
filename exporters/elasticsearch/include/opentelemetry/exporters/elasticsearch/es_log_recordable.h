@@ -158,6 +158,11 @@ public:
    * Returns a JSON object contain the log information
    */
   nlohmann::json GetJSON() noexcept { return json_; };
+
+  void SetInstrumentationLibrary(
+      std::unique_ptr<sdk::instrumentationlibrary::InstrumentationLibrary>
+          instrumentation_library) noexcept override
+  {}
 };
 }  // namespace logs
 }  // namespace exporter

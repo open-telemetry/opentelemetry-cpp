@@ -60,7 +60,7 @@ public:
   opentelemetry::nostd::shared_ptr<opentelemetry::logs::Logger> GetLogger(
       opentelemetry::nostd::string_view name,
       nostd::span<nostd::string_view> args,
-      nostd::string_view schema_url) noexcept override;
+      nostd::string_view schema_url = "") noexcept override;
 
   /**
    * Returns a shared pointer to the processor currently stored in the

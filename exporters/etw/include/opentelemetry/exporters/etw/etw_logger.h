@@ -222,8 +222,10 @@ public:
    * - "XML"            - XML events (reserved for future use)
    * @return
    */
-  nostd::shared_ptr<opentelemetry::logs::Logger> GetLogger(nostd::string_view name,
-                                                           nostd::string_view args = "") override
+  nostd::shared_ptr<opentelemetry::logs::Logger> GetLogger(
+      nostd::string_view name,
+      nostd::string_view args       = "",
+      nostd::string_view schema_url = "") override
   {
     UNREFERENCED_PARAMETER(args);
     ETWProvider::EventFormat evtFmt = config_.encoding;
@@ -233,9 +235,10 @@ public:
 
   nostd::shared_ptr<opentelemetry::logs::Logger> GetLogger(
       nostd::string_view name,
-      nostd::span<nostd::string_view> args) override
+      nostd::span<nostd::string_view> args,
+      nostd::string_view schema_url = "") override
   {
-    return GetLogger(name, args[0]);
+    return GetLogger(name, args[0], schema_url);
   }
 };
 

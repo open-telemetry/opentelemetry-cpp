@@ -66,14 +66,14 @@ public:
 
   nostd::shared_ptr<Logger> GetLogger(nostd::string_view logger_name,
                                       nostd::string_view options,
-                                      nostd::string_view schema_url) override
+                                      nostd::string_view schema_url = "") override
   {
     return logger_;
   }
 
   nostd::shared_ptr<Logger> GetLogger(nostd::string_view logger_name,
                                       nostd::span<nostd::string_view> args,
-                                      nostd::string_view schema_url) override
+                                      nostd::string_view schema_url = "") override
   {
     return logger_;
   }
