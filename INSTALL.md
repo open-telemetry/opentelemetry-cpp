@@ -3,6 +3,10 @@
 [CMake](https://cmake.org/) and [Bazel](https://bazel.build) are the official
 build systems for opentelemetry-cpp.
 
+## Dependencies
+
+You can link OpenTelemetry C++ SDK with libraries provided in [dependencies.md](https://github.com/open-telemetry/opentelemetry-cpp/blob/main/docs/dependencies.md) (complete list of libraries with versions used in our CI can be found [here](https://github.com/open-telemetry/opentelemetry-cpp/blob/main/third_party_release)).
+
 ## Build instructions using CMake
 
 ### Prerequisites for CMake
