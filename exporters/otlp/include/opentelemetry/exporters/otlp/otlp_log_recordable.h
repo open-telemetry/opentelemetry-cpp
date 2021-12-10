@@ -103,6 +103,10 @@ public:
       const opentelemetry::sdk::instrumentationlibrary::InstrumentationLibrary
           &instrumentation_library) noexcept override;
 
+  /** Returns the associated instruementation library */
+  const opentelemetry::sdk::instrumentationlibrary::InstrumentationLibrary &
+  GetInstrumentationLibrary() const noexcept;
+
 private:
   proto::logs::v1::LogRecord log_record_;
   opentelemetry::sdk::common::AttributeMap resource_attributes_;
@@ -110,7 +114,6 @@ private:
   // const opentelemetry::sdk::resource::Resource *resource_ = nullptr;
   const opentelemetry::sdk::instrumentationlibrary::InstrumentationLibrary
       *instrumentation_library_ = nullptr;
-
 };
 
 }  // namespace otlp

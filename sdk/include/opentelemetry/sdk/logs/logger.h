@@ -61,6 +61,10 @@ public:
            opentelemetry::trace::TraceFlags trace_flags,
            opentelemetry::common::SystemTimestamp timestamp) noexcept override;
 
+  /** Returns the associated instruementation library */
+  const opentelemetry::sdk::instrumentationlibrary::InstrumentationLibrary &
+  GetInstrumentationLibrary() const noexcept;
+
 private:
   // The name of this logger
   std::string logger_name_;

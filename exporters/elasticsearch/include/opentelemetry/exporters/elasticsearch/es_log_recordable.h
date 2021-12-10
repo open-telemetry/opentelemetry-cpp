@@ -170,6 +170,13 @@ public:
     instrumentation_library_ = &instrumentation_library;
   }
 
+  /** Returns the associated instruementation library */
+  const opentelemetry::sdk::instrumentationlibrary::InstrumentationLibrary &
+  GetInstrumentationLibrary() const noexcept
+  {
+    return *instrumentation_library_;
+  }
+
 private:
   const opentelemetry::sdk::instrumentationlibrary::InstrumentationLibrary
       *instrumentation_library_ = nullptr;

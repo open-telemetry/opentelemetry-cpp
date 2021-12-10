@@ -119,6 +119,12 @@ void Logger::Log(opentelemetry::logs::Severity severity,
   processor->OnReceive(std::move(recordable));
 }
 
+const opentelemetry::sdk::instrumentationlibrary::InstrumentationLibrary &
+Logger::GetInstrumentationLibrary() const noexcept
+{
+  return *instrumentation_library_;
+}
+
 }  // namespace logs
 }  // namespace sdk
 OPENTELEMETRY_END_NAMESPACE

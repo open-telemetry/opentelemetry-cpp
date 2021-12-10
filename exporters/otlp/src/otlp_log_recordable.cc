@@ -206,6 +206,11 @@ void OtlpLogRecordable::SetInstrumentationLibrary(
   instrumentation_library_ = &instrumentation_library;
 }
 
+const opentelemetry::sdk::instrumentationlibrary::InstrumentationLibrary &
+OtlpLogRecordable::GetInstrumentationLibrary() const noexcept
+{
+  return *instrumentation_library_;
+}
 }  // namespace otlp
 }  // namespace exporter
 OPENTELEMETRY_END_NAMESPACE
