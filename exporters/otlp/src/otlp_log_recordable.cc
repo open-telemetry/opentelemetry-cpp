@@ -199,6 +199,13 @@ void OtlpLogRecordable::SetTraceFlags(opentelemetry::trace::TraceFlags trace_fla
   log_record_.set_flags(trace_flags.flags());
 }
 
+void OtlpLogRecordable::SetInstrumentationLibrary(
+    const opentelemetry::sdk::instrumentationlibrary::InstrumentationLibrary
+        &instrumentation_library) noexcept
+{
+  instrumentation_library_ = &instrumentation_library;
+}
+
 }  // namespace otlp
 }  // namespace exporter
 OPENTELEMETRY_END_NAMESPACE

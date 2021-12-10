@@ -99,8 +99,12 @@ public:
    * @param instrumentation_library the instrumentation library to set
    */
   virtual void SetInstrumentationLibrary(
-      std::unique_ptr<instrumentationlibrary::InstrumentationLibrary>
-          instrumentation_library) noexcept = 0;
+      const opentelemetry::sdk::instrumentationlibrary::InstrumentationLibrary
+          &instrumentation_library) noexcept = 0;
+
+private:
+  const opentelemetry::sdk::instrumentationlibrary::InstrumentationLibrary
+      *instrumentation_library_ = nullptr;
 };
 }  // namespace logs
 }  // namespace sdk

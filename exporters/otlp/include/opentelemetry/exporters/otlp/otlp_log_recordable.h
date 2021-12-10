@@ -100,18 +100,17 @@ public:
    * @param instrumentation_library the instrumentation library to set
    */
   void SetInstrumentationLibrary(
-      std::unique_ptr<sdk::instrumentationlibrary::InstrumentationLibrary>
-          instrumentation_library) noexcept override
-  {}
+      const opentelemetry::sdk::instrumentationlibrary::InstrumentationLibrary
+          &instrumentation_library) noexcept override;
 
 private:
   proto::logs::v1::LogRecord log_record_;
   opentelemetry::sdk::common::AttributeMap resource_attributes_;
   // TODO shared resource
   // const opentelemetry::sdk::resource::Resource *resource_ = nullptr;
-  // TODO InstrumentationLibrary
-  opentelemetry::sdk::instrumentationlibrary::InstrumentationLibrary *instrumentation_library_ =
-      nullptr;
+  const opentelemetry::sdk::instrumentationlibrary::InstrumentationLibrary
+      *instrumentation_library_ = nullptr;
+
 };
 
 }  // namespace otlp
