@@ -168,15 +168,15 @@ void addTag(thrift::TagType::type tag_type,
   tag.__set_vType(tag_type);
   if (tag_type == thrift::TagType::LONG)
   {
-    tag.__set_vLong(value);
+    tag.__set_vLong(static_cast<int64_t>(value));
   }
   else if (tag_type == thrift::TagType::DOUBLE)
   {
-    tag.__set_vDouble(value);
+    tag.__set_vDouble(static_cast<double>(value));
   }
   else if (tag_type == thrift::TagType::BOOL)
   {
-    tag.__set_vBool(value);
+    tag.__set_vBool(static_cast<bool>(value));
   }
 
   tags.push_back(tag);
