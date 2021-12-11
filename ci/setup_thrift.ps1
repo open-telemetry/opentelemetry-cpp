@@ -10,6 +10,6 @@ setx VCPKG_DIR (Get-Item -Path ".\").FullName
 ./vcpkg integrate install
 
 # boost needed for thrift
-./vcpkg install boost-locale:x64-windows boost-numeric_conversion:x64-windows
+./vcpkg install boost-locale[core]:x64-windows boost-numeric-conversion[core]:x64-windows
 
 Pop-Location
