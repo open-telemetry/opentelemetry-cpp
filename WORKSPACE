@@ -79,7 +79,7 @@ load("@rules_foreign_cc//foreign_cc:repositories.bzl", "rules_foreign_cc_depende
 
 rules_foreign_cc_dependencies()
 
-_ALL_CONTENT = """
+_ALL_CONTENT = """\
 filegroup(
     name = "all_srcs",
     srcs = glob(["**"]),
