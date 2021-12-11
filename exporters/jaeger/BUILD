@@ -29,6 +29,7 @@ alias(
         ":windows": "openssl_msvc",
         "//conditions:default": "openssl_default",
     }),
+    tags = ["jaeger"],
     visibility = ["//visibility:public"],
 )
 
@@ -123,6 +124,7 @@ filegroup(
         ":openssl",
     ],
     output_group = "gen_dir",
+    tags = ["jaeger"],
     visibility = [
         "//visibility:public",
     ],
@@ -135,6 +137,7 @@ genrule(
     ],
     outs = ["include"],
     cmd = "cp -r $(location openssl_files)/include/ $(location include)",
+    tags = ["jaeger"],
 )
 
 cc_library(
@@ -143,6 +146,7 @@ cc_library(
         ":openssl_includes",
     ],
     copts = ["-isystem include"],
+    tags = ["jaeger"],
 )
 
 THRIFT_CACHE_ENTRIES = {

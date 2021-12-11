@@ -175,8 +175,8 @@ elif [[ "$1" == "bazel.legacy.test" ]]; then
 elif [[ "$1" == "bazel.noexcept" ]]; then
   # there are some exceptions and error handling code from the Prometheus and Jaeger Clients
   # that make this test always fail. ignore Prometheus and Jaeger exporters in the noexcept here.
-  bazel $BAZEL_STARTUP_OPTIONS build --copt=-fno-exceptions $BAZEL_OPTIONS -- //... -//exporters/prometheus/... -//exporters/jaeger/...
-  bazel $BAZEL_STARTUP_OPTIONS test --copt=-fno-exceptions $BAZEL_TEST_OPTIONS -- //... -//exporters/prometheus/... -//exporters/jaeger/...
+  bazel $BAZEL_STARTUP_OPTIONS build --copt=-fno-exceptions $BAZEL_OPTIONS --build_tag_filters=-jaeger -- //... -//exporters/prometheus/... --build_tag_filters=-jaeger
+  bazel $BAZEL_STARTUP_OPTIONS test --copt=-fno-exceptions $BAZEL_TEST_OPTIONS --build_tag_filters=-jaeger -- //... -//exporters/prometheus/... --build_tag_filters=-jaeger
   exit 0
 elif [[ "$1" == "bazel.asan" ]]; then
   bazel $BAZEL_STARTUP_OPTIONS test --config=asan $BAZEL_TEST_OPTIONS //...
