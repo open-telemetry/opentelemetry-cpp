@@ -57,7 +57,7 @@ configure_make_variant(
         "CFLAGS": "-Zi",
         "PATH": "$(dirname $(execpath @nasm//:nasm)):$PATH",
         "PERL": "$(execpath @perl//:perl)",
-        "CL": "/MP"
+        "CL": "/MP",
     },
     lib_name = LIB_NAME,
     lib_source = "@com_github_openssl//:all_srcs",
@@ -158,8 +158,24 @@ THRIFT_CACHE_ENTRIES = {
     "WITH_HASKELL": "OFF",
 }
 
-THRIFT_CACHE_ENTRIES_WIN = THRIFT_CACHE_ENTRIES
-THRIFT_CACHE_ENTRIES_WIN["CMAKE_TOOLCHAIN_FILE"] = "D:/a/opentelemetry-cpp/opentelemetry-cpp/vcpkg/scripts/buildsystems/vcpkg.cmake"
+THRIFT_CACHE_ENTRIES_WIN = {
+    "CMAKE_BUILD_TYPE": "Release",
+    "BUILD_COMPILER": "OFF",
+    "BUILD_CPP": "ON",
+    "BUILD_LIBRARIES": "ON",
+    "BUILD_NODEJS": "OFF",
+    "BUILD_PYTHON": "OFF",
+    "BUILD_JAVASCRIPT": "OFF",
+    "BUILD_C_GLIB": "OFF",
+    "BUILD_JAVA": "OFF",
+    "BUILD_TESTING": "OFF",
+    "BUILD_TUTORIALS": "OFF",
+    "WITH_HASKELL": "OFF",
+    "CMAKE_TOOLCHAIN_FILE": "D:/a/opentelemetry-cpp/opentelemetry-cpp/vcpkg/scripts/buildsystems/vcpkg.cmake",
+}
+
+#THRIFT_CACHE_ENTRIES_WIN = THRIFT_CACHE_ENTRIES
+#THRIFT_CACHE_ENTRIES_WIN["CMAKE_TOOLCHAIN_FILE"] = "D:/a/opentelemetry-cpp/opentelemetry-cpp/vcpkg/scripts/buildsystems/vcpkg.cmake"
 THRIFT_DEPS_WIN = [
     ":openssl",
     ":openssl_header_only",
@@ -180,7 +196,21 @@ cmake(
     copts = [
         "-Ilibs/exporters/jaeger/openssl/include",
     ],
+    generate_args = select({
+        "@bazel_tools//platforms:osx": [],
+        "@bazel_tools//platforms:linux": [],
+        "@bazel_tools//platforms:windows": [
+            "-G \"Visual Studio 15 2017\"",
+            "-A x64",
+        ],
+    }),
+    install = True,
     lib_source = "@com_github_thrift//:all_srcs",
+    out_lib_dir = select({
+        "@bazel_tools//platforms:osx": "lib",
+        "@bazel_tools//platforms:linux": "lib",
+        "@bazel_tools//platforms:windows": "bin",
+    }),
     out_static_libs = select({
         "@bazel_tools//platforms:osx": [
             "libthrift.a",
@@ -193,22 +223,15 @@ cmake(
         "@bazel_tools//platforms:windows": [
             "thriftmd.lib",
             "thriftnbmd.lib",
-            "thriftzmd.lib"
+            "thriftzmd.lib",
         ],
     }),
     visibility = ["//visibility:public"],
-    # generate_args = ["-G \"NMake Makefiles\""],
-    generate_args = [
-        "-G \"Visual Studio 15 2017\"",                                                                           
-        "-A x64",
-    ],
-    out_lib_dir = "bin",
     deps = select({
         "@bazel_tools//platforms:osx": THRIFT_DEPS,
         "@bazel_tools//platforms:linux": THRIFT_DEPS,
         "@bazel_tools//platforms:windows": THRIFT_DEPS_WIN,
     }),
-    install = True,
 )
 
 THRIFT_GEN_DEPS = [
