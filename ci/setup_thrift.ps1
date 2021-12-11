@@ -8,7 +8,7 @@ $VCPKG_DIR=(Get-Item -Path ".\").FullName
 ./bootstrap-vcpkg.bat
 ./vcpkg integrate install
 
-# thrift
-./vcpkg install thrift:x64-windows
+# boost needed for thrift
+./vcpkg install boost:x64-windows
 
 Pop-Location

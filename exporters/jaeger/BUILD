@@ -57,6 +57,7 @@ configure_make_variant(
         "CFLAGS": "-Zi",
         "PATH": "$(dirname $(execpath @nasm//:nasm)):$PATH",
         "PERL": "$(execpath @perl//:perl)",
+        "CL": "/MP"
     },
     lib_name = LIB_NAME,
     lib_source = "@com_github_openssl//:all_srcs",
@@ -142,39 +143,83 @@ cc_library(
     copts = ["-isystem include"],
 )
 
+THRIFT_CACHE_ENTRIES = {
+    "CMAKE_BUILD_TYPE": "Release",
+    "BUILD_COMPILER": "OFF",
+    "BUILD_CPP": "ON",
+    "BUILD_LIBRARIES": "ON",
+    "BUILD_NODEJS": "OFF",
+    "BUILD_PYTHON": "OFF",
+    "BUILD_JAVASCRIPT": "OFF",
+    "BUILD_C_GLIB": "OFF",
+    "BUILD_JAVA": "OFF",
+    "BUILD_TESTING": "OFF",
+    "BUILD_TUTORIALS": "OFF",
+    "WITH_HASKELL": "OFF",
+}
+
+THRIFT_CACHE_ENTRIES_WIN = THRIFT_CACHE_ENTRIES
+THRIFT_CACHE_ENTRIES_WIN["CMAKE_TOOLCHAIN_FILE"] = "D:/dev/vcpkg/scripts/buildsystems/vcpkg.cmake"
+THRIFT_DEPS_WIN = [
+    ":openssl",
+    ":openssl_header_only",
+]
+
+THRIFT_DEPS = THRIFT_DEPS_WIN + [
+    "@boost//:locale",
+    "@boost//:numeric_conversion",
+]
+
 cmake(
     name = "thrift",
-    cache_entries = {
-        "CMAKE_BUILD_TYPE": "Release",
-        "BUILD_COMPILER": "OFF",
-        "BUILD_CPP": "ON",
-        "BUILD_LIBRARIES": "ON",
-        "BUILD_NODEJS": "OFF",
-        "BUILD_PYTHON": "OFF",
-        "BUILD_JAVASCRIPT": "OFF",
-        "BUILD_C_GLIB": "OFF",
-        "BUILD_JAVA": "OFF",
-        "BUILD_TESTING": "OFF",
-        "BUILD_TUTORIALS": "OFF",
-        "WITH_HASKELL": "OFF",
-    },
+    cache_entries = select({
+        "@bazel_tools//platforms:osx": THRIFT_CACHE_ENTRIES,
+        "@bazel_tools//platforms:linux": THRIFT_CACHE_ENTRIES,
+        "@bazel_tools//platforms:windows": THRIFT_CACHE_ENTRIES_WIN,
+    }),
     copts = [
         "-Ilibs/exporters/jaeger/openssl/include",
     ],
     lib_source = "@com_github_thrift//:all_srcs",
-    out_static_libs = [
-        "libthrift.a",
-        "libthriftz.a",
-    ],
+    out_static_libs = select({
+        "@bazel_tools//platforms:osx": [
+            "libthrift.a",
+            "libthriftz.a",
+        ],
+        "@bazel_tools//platforms:linux": [
+            "libthrift.a",
+            "libthriftz.a",
+        ],
+        "@bazel_tools//platforms:windows": [
+            "thriftmd.lib",
+            "thriftnbmd.lib",
+            "thriftzmd.lib"
+        ],
+    }),
     visibility = ["//visibility:public"],
-    deps = [
-        ":openssl",
-        ":openssl_header_only",
-        "@boost//:atomic",
-        "@boost//:locale",
-        "@boost//:numeric_conversion",
+    # generate_args = ["-G \"NMake Makefiles\""],
+    generate_args = [
+        "-G \"Visual Studio 15 2017\"",                                                                           
+        "-A x64",
     ],
+    out_lib_dir = "bin",
+    deps = select({
+        "@bazel_tools//platforms:osx": THRIFT_DEPS,
+        "@bazel_tools//platforms:linux": THRIFT_DEPS,
+        "@bazel_tools//platforms:windows": THRIFT_DEPS_WIN,
+    }),
+    install = True,
 )
+
+THRIFT_GEN_DEPS = [
+    ":thrift",
+    "//ext/src/http/client/curl:http_client_curl",
+]
+
+THRIFT_GEN_DEPS_WIN = THRIFT_GEN_DEPS + [
+    "@boost//:locale",
+    "@boost//:numeric_conversion",
+]
 
 cc_library(
     name = "jaeger_thrift_gencpp",
@@ -200,10 +245,11 @@ cc_library(
     ],
     strip_include_prefix = "thrift-gen",
     tags = ["jaeger"],
-    deps = [
-        ":thrift",
-        "//ext/src/http/client/curl:http_client_curl",
-    ],
+    deps = select({
+        "@bazel_tools//platforms:osx": THRIFT_GEN_DEPS,
+        "@bazel_tools//platforms:linux": THRIFT_GEN_DEPS,
+        "@bazel_tools//platforms:windows": THRIFT_GEN_DEPS_WIN,
+    }),
 )
 
 cc_library(
