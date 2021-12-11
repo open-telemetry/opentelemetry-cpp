@@ -159,7 +159,7 @@ THRIFT_CACHE_ENTRIES = {
 }
 
 THRIFT_CACHE_ENTRIES_WIN = THRIFT_CACHE_ENTRIES
-THRIFT_CACHE_ENTRIES_WIN["CMAKE_TOOLCHAIN_FILE"] = "D:/dev/vcpkg/scripts/buildsystems/vcpkg.cmake"
+THRIFT_CACHE_ENTRIES_WIN["CMAKE_TOOLCHAIN_FILE"] = "D:/a/opentelemetry-cpp/opentelemetry-cpp/vcpkg/scripts/buildsystems/vcpkg.cmake"
 THRIFT_DEPS_WIN = [
     ":openssl",
     ":openssl_header_only",

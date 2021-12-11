@@ -5,6 +5,7 @@ trap { $host.SetShouldExit(1) }
 git clone https://github.com/Microsoft/vcpkg.git
 Push-Location -Path vcpkg
 $VCPKG_DIR=(Get-Item -Path ".\").FullName
+setx VCPKG_DIR (Get-Item -Path ".\").FullName
 ./bootstrap-vcpkg.bat
 ./vcpkg integrate install
 
