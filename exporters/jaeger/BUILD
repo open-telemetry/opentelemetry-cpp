@@ -25,54 +25,55 @@ config_setting(
 
 alias(
     name = "openssl",
-    actual = select({
-        ":windows": "openssl_msvc",
-        "//conditions:default": "openssl_default",
-    }),
+#    actual = select({
+#        ":windows": "openssl_msvc",
+#        "//conditions:default": "openssl_default",
+#    }),
+    actual = "openssl_default",
     tags = ["jaeger"],
     visibility = ["//visibility:public"],
 )
 
-configure_make_variant(
-    name = "openssl_msvc",
-    build_data = [
-        "@nasm//:nasm",
-        "@perl//:perl",
-    ],
-    configure_command = "Configure",
-    configure_in_place = True,
-    configure_options = CONFIGURE_OPTIONS + [
-        "no-shared",
-        "VC-WIN64A",
-        # Unset Microsoft Assembler (MASM) flags set by built-in MSVC toolchain,
-        # as NASM is used to build OpenSSL rather than MASM
-        "ASFLAGS=\"-g\"",
-        "CFLAGS=\"/W3 /wd4090 /nologo /O2 /Zi /MP\"",
-        "LDFLAGS=\"/nologo /debug /Zi\"",
-        "ARFLAGS=\"/nologo\"",
-        "LD=\"link\"",
-    ],
-    configure_prefix = "$PERL",
-    env = {
-        # The Zi flag must be set otherwise OpenSSL fails to build due to missing .pdb files
-        "CFLAGS": "-Zi",
-        "PATH": "$$(dirname $(execpath @nasm//:nasm)):$$PATH",
-        "PERL": "$(execpath @perl//:perl)",
-        "CL": "/MP",
-    },
-    lib_name = LIB_NAME,
-    lib_source = "@com_github_openssl//:all_srcs",
-    out_static_libs = [
-        "libssl.lib",
-        "libcrypto.lib",
-    ],
-    tags = ["jaeger"],
-    target_compatible_with = [
-        "@bazel_tools//platforms:windows",
-    ],
-    targets = MAKE_TARGETS,
-    toolchain = "@rules_foreign_cc//toolchains:preinstalled_nmake_toolchain",
-)
+#configure_make_variant(
+#    name = "openssl_msvc",
+#    build_data = [
+#        "@nasm//:nasm",
+#        "@perl//:perl",
+#    ],
+#    configure_command = "Configure",
+#    configure_in_place = True,
+#    configure_options = CONFIGURE_OPTIONS + [
+#        "no-shared",
+#        "VC-WIN64A",
+#        # Unset Microsoft Assembler (MASM) flags set by built-in MSVC toolchain,
+#        # as NASM is used to build OpenSSL rather than MASM
+#        "ASFLAGS=\"-g\"",
+#        "CFLAGS=\"/W3 /wd4090 /nologo /O2 /Zi /MP\"",
+#        "LDFLAGS=\"/nologo /debug /Zi\"",
+#        "ARFLAGS=\"/nologo\"",
+#        "LD=\"link\"",
+#    ],
+#    configure_prefix = "$PERL",
+#    env = {
+#        # The Zi flag must be set otherwise OpenSSL fails to build due to missing .pdb files
+#        "CFLAGS": "-Zi",
+#        "PATH": "$$(dirname $(execpath @nasm//:nasm)):$$PATH",
+#        "PERL": "$(execpath @perl//:perl)",
+#        "CL": "/MP",
+#    },
+#    lib_name = LIB_NAME,
+#    lib_source = "@com_github_openssl//:all_srcs",
+#    out_static_libs = [
+#        "libssl.lib",
+#        "libcrypto.lib",
+#    ],
+#    tags = ["jaeger"],
+#    target_compatible_with = [
+#        "@bazel_tools//platforms:windows",
+#    ],
+#    targets = MAKE_TARGETS,
+#    toolchain = "@rules_foreign_cc//toolchains:preinstalled_nmake_toolchain",
+#)
 
 configure_make(
     name = "openssl_default",
