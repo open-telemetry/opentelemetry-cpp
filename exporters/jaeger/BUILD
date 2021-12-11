@@ -238,7 +238,7 @@ cmake(
     deps = select({
         "@bazel_tools//platforms:osx": THRIFT_DEPS,
         "@bazel_tools//platforms:linux": THRIFT_DEPS,
-        "@bazel_tools//platforms:windows": THRIFT_DEPS_WIN,
+        "@bazel_tools//platforms:windows": [],
     }),
 )
 
