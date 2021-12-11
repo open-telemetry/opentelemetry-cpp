@@ -65,6 +65,7 @@ configure_make_variant(
         "libssl.lib",
         "libcrypto.lib",
     ],
+    tags = ["jaeger"],
     target_compatible_with = [
         "@bazel_tools//platforms:windows",
     ],
@@ -75,18 +76,18 @@ configure_make_variant(
 configure_make(
     name = "openssl_default",
     configure_command = "config",
-    configure_in_place = True,
+    # configure_in_place = True,
     configure_options = select({
         "@bazel_tools//platforms:osx": [
-            "shared",
+            "no-shared",
             "no-afalgeng",
             "ARFLAGS=r",
         ] + CONFIGURE_OPTIONS,
         "@bazel_tools//platforms:linux": [
-            "shared",
+            "no-shared",
         ] + CONFIGURE_OPTIONS,
         "@bazel_tools//platforms:windows": [
-            "shared",
+            "no-shared",
         ] + CONFIGURE_OPTIONS,
     }),
     copts = [
@@ -100,18 +101,19 @@ configure_make(
         "@bazel_tools//platforms:windows": {},
     }),
     lib_source = "@com_github_openssl//:all_srcs",
-    out_shared_libs = select({
+    out_static_libs = select({
         "@bazel_tools//platforms:osx": [
-            "libssl.dylib",
-            "libcrypto.dylib",
+            "libssl.a",
+            "libcrypto.a",
         ],
         "@bazel_tools//platforms:linux": [
-            "libssl.so",
-            "libcrypto.so",
+            "libssl.a",
+            "libcrypto.a",
         ],
         "@bazel_tools//platforms:windows": [
         ],
     }),
+    tags = ["jaeger"],
     visibility = ["//visibility:public"],
 )
 
@@ -200,7 +202,7 @@ cmake(
         "@bazel_tools//platforms:osx": [],
         "@bazel_tools//platforms:linux": [],
         "@bazel_tools//platforms:windows": [
-            "-G \"Visual Studio 15 2017\"",
+            "-G \"Visual Studio 16 2019\"",
             "-A x64",
         ],
     }),
@@ -226,6 +228,7 @@ cmake(
             "thriftzmd.lib",
         ],
     }),
+    tags = ["jaeger"],
     visibility = ["//visibility:public"],
     deps = select({
         "@bazel_tools//platforms:osx": THRIFT_DEPS,
