@@ -364,6 +364,7 @@ cc_library(
 cc_test(
     name = "jaeger_recordable_test",
     srcs = ["test/jaeger_recordable_test.cc"],
+    copts = ["-fexceptions"],
     tags = [
         "jaeger",
         "test",
