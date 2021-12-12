@@ -207,9 +207,10 @@ cmake(
         "@bazel_tools//platforms:osx": [],
         "@bazel_tools//platforms:linux": [],
         "@bazel_tools//platforms:windows": [
+            # "-GNinja",
             "-G \"NMake Makefiles\"",
-            #"-G \"Visual Studio 16 2019\"",
-            #"-A x64",
+            # "-G \"Visual Studio 15 2017\"",
+            # "-A x64",
         ],
     }),
     install = True,
@@ -230,8 +231,8 @@ cmake(
         ],
         "@bazel_tools//platforms:windows": [
             "thriftmd.lib",
-            "thriftnbmd.lib",
-            "thriftzmd.lib",
+            # "thriftnbmd.lib",
+            # "thriftzmd.lib",
         ],
     }),
     tags = ["jaeger"],
