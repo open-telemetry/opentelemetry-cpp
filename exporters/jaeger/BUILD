@@ -21,14 +21,15 @@ config_setting(
         "@bazel_tools//platforms:windows",
     ],
     visibility = ["//visibility:private"],
+    tags = ["jaeger"],
 )
 
 alias(
    name = "openssl",
-   actual = select({
-       ":windows": "openssl_msvc",
-       "//conditions:default": "openssl_default",
-   }),
+#    actual = select({
+#        ":windows": "openssl_msvc",
+#        "//conditions:default": "openssl_default",
+#    }),
    actual = "openssl_default",
    tags = ["jaeger"],
    visibility = ["//visibility:public"],
