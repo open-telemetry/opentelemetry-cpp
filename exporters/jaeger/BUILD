@@ -120,7 +120,7 @@ configure_make(
    tags = ["jaeger"],
    visibility = ["//visibility:private"],
        target_compatible_with = [
-        "@platforms//os:linux",
+        "@bazel_tools//platforms:linux",
         "@bazel_tools//platforms:osx",
     ],
 )
@@ -146,7 +146,7 @@ genrule(
    cmd = "cp -r $(location openssl_files)/include/ $(location include)",
    tags = ["jaeger"],
     target_compatible_with = [
-        "@platforms//os:linux",
+        "@bazel_tools//platforms:linux",
         "@bazel_tools//platforms:osx",
     ],
 )
@@ -161,7 +161,7 @@ cc_library(
    ],
    tags = ["jaeger"],
     target_compatible_with = [
-        "@platforms//os:linux",
+        "@bazel_tools//platforms:linux",
         "@bazel_tools//platforms:osx",
     ],
 )
