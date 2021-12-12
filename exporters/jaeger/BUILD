@@ -134,10 +134,6 @@ filegroup(
    visibility = [
        "//visibility:public",
    ],
-    target_compatible_with = [
-        "@platforms//os:linux",
-        "@bazel_tools//platforms:osx",
-    ],
 )
 
 genrule(
