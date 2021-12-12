@@ -2,6 +2,15 @@ package(default_visibility = ["//visibility:public"])
 
 load("@rules_foreign_cc//foreign_cc:defs.bzl", "cmake", "configure_make", "configure_make_variant")
 
+constraint_setting(
+    name = "incompatible_setting",
+)
+
+constraint_value(
+    name = "incompatible",
+    constraint_setting = ":incompatible_setting",
+)
+
 CONFIGURE_OPTIONS = [
     "no-weak-ssl-ciphers",
     "no-idea",
@@ -121,7 +130,7 @@ configure_make(
     target_compatible_with = select({
         "@platforms//os:osx": [],
         "@platforms//os:linux": [],
-        "//conditions:default": ["@platforms//:incompatible"],
+        "//conditions:default": [":incompatible"],
     }),
     visibility = ["//visibility:private"],
 )
@@ -149,7 +158,7 @@ genrule(
     target_compatible_with = select({
         "@platforms//os:osx": [],
         "@platforms//os:linux": [],
-        "//conditions:default": ["@platforms//:incompatible"],
+        "//conditions:default": [":incompatible"],
     }),
 )
 
@@ -166,7 +175,7 @@ cc_library(
     target_compatible_with = select({
         "@platforms//os:osx": [],
         "@platforms//os:linux": [],
-        "//conditions:default": ["@platforms//:incompatible"],
+        "//conditions:default": [":incompatible"],
     }),
 )
 
