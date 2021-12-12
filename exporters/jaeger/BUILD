@@ -23,16 +23,16 @@ config_setting(
     visibility = ["//visibility:private"],
 )
 
-alias(
-    name = "openssl",
+#alias(
+#    name = "openssl",
 #    actual = select({
 #        ":windows": "openssl_msvc",
 #        "//conditions:default": "openssl_default",
 #    }),
-    actual = "openssl_default",
-    tags = ["jaeger"],
-    visibility = ["//visibility:public"],
-)
+#    actual = "openssl_default",
+#    tags = ["jaeger"],
+#    visibility = ["//visibility:public"],
+#)
 
 #configure_make_variant(
 #    name = "openssl_msvc",
@@ -75,80 +75,80 @@ alias(
 #    toolchain = "@rules_foreign_cc//toolchains:preinstalled_nmake_toolchain",
 #)
 
-configure_make(
-    name = "openssl_default",
-    configure_command = "config",
-    # configure_in_place = True,
-    configure_options = select({
-        "@bazel_tools//platforms:osx": [
-            "no-shared",
-            "no-afalgeng",
-            "ARFLAGS=r",
-        ] + CONFIGURE_OPTIONS,
-        "@bazel_tools//platforms:linux": [
-            "no-shared",
-        ] + CONFIGURE_OPTIONS,
-        "@bazel_tools//platforms:windows": [
-            "no-shared",
-        ] + CONFIGURE_OPTIONS,
-    }),
-    copts = [
-        "-Ilibs/exporters/jaeger/openssl/include",
-    ],
-    env = select({
-        "@bazel_tools//platforms:osx": {
-            "AR": "",
-        },
-        "@bazel_tools//platforms:linux": {},
-        "@bazel_tools//platforms:windows": {},
-    }),
-    lib_source = "@com_github_openssl//:all_srcs",
-    out_static_libs = select({
-        "@bazel_tools//platforms:osx": [
-            "libssl.a",
-            "libcrypto.a",
-        ],
-        "@bazel_tools//platforms:linux": [
-            "libssl.a",
-            "libcrypto.a",
-        ],
-        "@bazel_tools//platforms:windows": [
-        ],
-    }),
-    tags = ["jaeger"],
-    visibility = ["//visibility:public"],
-)
+#configure_make(
+#    name = "openssl_default",
+#    configure_command = "config",
+#    # configure_in_place = True,
+#    configure_options = select({
+#        "@bazel_tools//platforms:osx": [
+#            "no-shared",
+#            "no-afalgeng",
+#            "ARFLAGS=r",
+#        ] + CONFIGURE_OPTIONS,
+#        "@bazel_tools//platforms:linux": [
+#            "no-shared",
+#        ] + CONFIGURE_OPTIONS,
+#        "@bazel_tools//platforms:windows": [
+#            "no-shared",
+#        ] + CONFIGURE_OPTIONS,
+#    }),
+#    copts = [
+#        "-Ilibs/exporters/jaeger/openssl/include",
+#    ],
+#    env = select({
+#        "@bazel_tools//platforms:osx": {
+#            "AR": "",
+#        },
+#        "@bazel_tools//platforms:linux": {},
+#        "@bazel_tools//platforms:windows": {},
+#    }),
+#    lib_source = "@com_github_openssl//:all_srcs",
+#    out_static_libs = select({
+#        "@bazel_tools//platforms:osx": [
+#            "libssl.a",
+#            "libcrypto.a",
+#        ],
+#        "@bazel_tools//platforms:linux": [
+#            "libssl.a",
+#            "libcrypto.a",
+#        ],
+#        "@bazel_tools//platforms:windows": [
+#        ],
+#    }),
+#    tags = ["jaeger"],
+#    visibility = ["//visibility:public"],
+#)
 
-filegroup(
-    name = "openssl_files",
-    srcs = [
-        ":openssl",
-    ],
-    output_group = "gen_dir",
-    tags = ["jaeger"],
-    visibility = [
-        "//visibility:public",
-    ],
-)
+#filegroup(
+#    name = "openssl_files",
+#    srcs = [
+#        ":openssl",
+#    ],
+#    output_group = "gen_dir",
+#    tags = ["jaeger"],
+#    visibility = [
+#        "//visibility:public",
+#    ],
+#)
 
-genrule(
-    name = "openssl_includes",
-    srcs = [
-        ":openssl_files",
-    ],
-    outs = ["include"],
-    cmd = "cp -r $(location openssl_files)/include/ $(location include)",
-    tags = ["jaeger"],
-)
+#genrule(
+#    name = "openssl_includes",
+#    srcs = [
+#        ":openssl_files",
+#    ],
+#    outs = ["include"],
+#    cmd = "cp -r $(location openssl_files)/include/ $(location include)",
+#    tags = ["jaeger"],
+#)
 
-cc_library(
-    name = "openssl_header_only",
-    hdrs = [
-        ":openssl_includes",
-    ],
-    copts = ["-isystem include"],
-    tags = ["jaeger"],
-)
+#cc_library(
+#    name = "openssl_header_only",
+#    hdrs = [
+#        ":openssl_includes",
+#    ],
+#    copts = ["-isystem include"],
+#    tags = ["jaeger"],
+#)
 
 THRIFT_CACHE_ENTRIES = {
     "CMAKE_BUILD_TYPE": "Release",
@@ -184,8 +184,8 @@ THRIFT_CACHE_ENTRIES_WIN = {
 #THRIFT_CACHE_ENTRIES_WIN = THRIFT_CACHE_ENTRIES
 #THRIFT_CACHE_ENTRIES_WIN["CMAKE_TOOLCHAIN_FILE"] = "D:/a/opentelemetry-cpp/opentelemetry-cpp/vcpkg/scripts/buildsystems/vcpkg.cmake"
 THRIFT_DEPS_WIN = [
-    ":openssl",
-    ":openssl_header_only",
+#    ":openssl",
+#    ":openssl_header_only",
 ]
 
 THRIFT_DEPS = THRIFT_DEPS_WIN + [
