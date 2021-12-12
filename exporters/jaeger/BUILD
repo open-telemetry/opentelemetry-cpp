@@ -32,7 +32,7 @@ alias(
 #    }),
    actual = "openssl_default",
    tags = ["jaeger"],
-   visibility = ["//visibility:public"],
+   visibility = ["//visibility:private"],
 )
 
 # configure_make_variant(
@@ -95,6 +95,7 @@ configure_make(
    }),
    copts = [
        "-Ilibs/exporters/jaeger/openssl/include",
+       "-fexceptions",
    ],
    env = select({
        "@bazel_tools//platforms:osx": {
@@ -117,7 +118,7 @@ configure_make(
        ],
    }),
    tags = ["jaeger"],
-   visibility = ["//visibility:public"],
+   visibility = ["//visibility:private"],
        target_compatible_with = [
         "@platforms//os:linux",
         "@bazel_tools//platforms:osx",
@@ -132,7 +133,7 @@ filegroup(
    output_group = "gen_dir",
    tags = ["jaeger"],
    visibility = [
-       "//visibility:public",
+       "//visibility:private",
    ],
 )
 
@@ -155,7 +156,9 @@ cc_library(
    hdrs = [
        ":openssl_includes",
    ],
-   copts = ["-isystem include"],
+   copts = ["-isystem include",
+        "-fexceptions",
+   ],
    tags = ["jaeger"],
     target_compatible_with = [
         "@platforms//os:linux",
@@ -217,6 +220,7 @@ cmake(
     }),
     copts = [
         "-Ilibs/exporters/jaeger/openssl/include",
+        "-fexceptions",
     ],
     generate_args = select({
         "@bazel_tools//platforms:osx": [],
@@ -251,7 +255,7 @@ cmake(
         ],
     }),
     tags = ["jaeger"],
-    visibility = ["//visibility:public"],
+    visibility = ["//visibility:private"],
     deps = select({
         "@bazel_tools//platforms:osx": THRIFT_DEPS,
         "@bazel_tools//platforms:linux": THRIFT_DEPS,
