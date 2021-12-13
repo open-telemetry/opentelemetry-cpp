@@ -16,8 +16,44 @@ workspace(name = "io_opentelemetry_cpp")
 
 # Load our direct dependencies.
 load("//bazel:repository.bzl", "opentelemetry_cpp_deps")
+load("//bazel:openssl_repositories.bzl", "openssl_repositories")
 
 opentelemetry_cpp_deps()
+
+openssl_repositories()
+
+# Load prometheus C++ dependencies.
+load("@com_github_jupp0r_prometheus_cpp//bazel:repositories.bzl", "prometheus_cpp_repositories")
+
+prometheus_cpp_repositories()
+
+load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive")
+
+http_archive(
+    name = "bazel_skylib",
+    sha256 = "c6966ec828da198c5d9adbaa94c05e3a1c7f21bd012a0b29ba8ddbccb2c93b0d",
+    urls = [
+        "https://github.com/bazelbuild/bazel-skylib/releases/download/1.1.1/bazel-skylib-1.1.1.tar.gz",
+        "https://mirror.bazel.build/github.com/bazelbuild/bazel-skylib/releases/download/1.1.1/bazel-skylib-1.1.1.tar.gz",
+    ],
+)
+
+load("@bazel_skylib//:workspace.bzl", "bazel_skylib_workspace")
+
+bazel_skylib_workspace()
+
+load("@bazel_tools//tools/build_defs/repo:git.bzl", "git_repository")
+
+git_repository(
+    name = "com_github_nelhage_rules_boost",
+    commit = "d104cb7beba996d67ae5826be07aab2d9ca0ee38",
+    remote = "https://github.com/nelhage/rules_boost",
+    shallow_since = "1637888414 -0800",
+)
+
+load("@com_github_nelhage_rules_boost//:boost/boost.bzl", "boost_deps")
+
+boost_deps()
 
 # Load gRPC dependencies after load.
 load("@com_github_grpc_grpc//bazel:grpc_deps.bzl", "grpc_deps")
@@ -33,10 +69,6 @@ load("@com_github_grpc_grpc//bazel:cc_grpc_library.bzl", "cc_grpc_library")
 load("@upb//bazel:workspace_deps.bzl", "upb_deps")
 
 upb_deps()
-
-# Load prometheus C++ dependencies.
-load("@com_github_jupp0r_prometheus_cpp//bazel:repositories.bzl", "prometheus_cpp_repositories")
-load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive")
 
 http_archive(
     name = "rules_foreign_cc",
@@ -58,7 +90,7 @@ filegroup(
 """
 
 http_archive(
-    name = "thrift",
+    name = "com_github_thrift",
     build_file_content = _ALL_CONTENT,
     sha256 = "5ae1c4d16452a22eaf9d802ba7489907147c2b316ff38c9758918552fae5132c",
     strip_prefix = "thrift-0.14.1",
@@ -67,4 +99,12 @@ http_archive(
     ],
 )
 
-prometheus_cpp_repositories()
+http_archive(
+    name = "com_github_openssl",
+    build_file_content = _ALL_CONTENT,
+    sha256 = "0b7a3e5e59c34827fe0c3a74b7ec8baef302b98fa80088d7f9153aa16fa76bd1",
+    strip_prefix = "openssl-1.1.1l",
+    urls = [
+        "https://www.openssl.org/source/openssl-1.1.1l.tar.gz",
+    ],
+)

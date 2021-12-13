@@ -27,7 +27,7 @@ BAZEL_OPTIONS="--copt=-DENABLE_METRICS_PREVIEW --copt=-DENABLE_LOGS_PREVIEW"
 BAZEL_TEST_OPTIONS="$BAZEL_OPTIONS --test_output=errors"
 
 # https://github.com/bazelbuild/bazel/issues/4341
-BAZEL_MACOS_OPTIONS="$BAZEL_OPRIONS --features=-supports_dynamic_linker --build_tag_filters=-jaeger"
+BAZEL_MACOS_OPTIONS="$BAZEL_OPRIONS --features=-supports_dynamic_linker"
 BAZEL_MACOS_TEST_OPTIONS="$BAZEL_MACOS_OPTIONS --test_output=errors"
 
 BAZEL_STARTUP_OPTIONS="--output_user_root=$HOME/.cache/bazel"
@@ -175,8 +175,8 @@ elif [[ "$1" == "bazel.legacy.test" ]]; then
 elif [[ "$1" == "bazel.noexcept" ]]; then
   # there are some exceptions and error handling code from the Prometheus and Jaeger Clients
   # that make this test always fail. ignore Prometheus and Jaeger exporters in the noexcept here.
-  bazel $BAZEL_STARTUP_OPTIONS build --copt=-fno-exceptions $BAZEL_OPTIONS -- //... -//exporters/prometheus/... -//exporters/jaeger/...
-  bazel $BAZEL_STARTUP_OPTIONS test --copt=-fno-exceptions $BAZEL_TEST_OPTIONS -- //... -//exporters/prometheus/... -//exporters/jaeger/...
+  bazel $BAZEL_STARTUP_OPTIONS build --copt=-fno-exceptions $BAZEL_OPTIONS --build_tag_filters=-jaeger --test_tag_filters=-jaeger -- //... -//exporters/prometheus/...
+  bazel $BAZEL_STARTUP_OPTIONS test --copt=-fno-exceptions $BAZEL_TEST_OPTIONS --build_tag_filters=-jaeger --test_tag_filters=-jaeger -- //... -//exporters/prometheus/...
   exit 0
 elif [[ "$1" == "bazel.asan" ]]; then
   bazel $BAZEL_STARTUP_OPTIONS test --config=asan $BAZEL_TEST_OPTIONS //...
