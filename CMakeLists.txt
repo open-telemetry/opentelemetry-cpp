@@ -344,9 +344,9 @@ if(WITH_OTLP)
     if(NOT Protobuf_FOUND AND NOT PROTOBUF_FOUND)
       find_package(Protobuf REQUIRED)
     endif()
-    if((WITH_OTLP_GRPC OR (NOT DEFINED WITH_OTLP_GRPC AND NOT DEFINED
-                                                          CACHE{WITH_OTLP_GRPC})
-       ) AND NOT gRPC_FOUND)
+    if(NOT gRPC_FOUND
+       AND (WITH_OTLP_GRPC OR (NOT DEFINED WITH_OTLP_GRPC
+                               AND NOT DEFINED CACHE{WITH_OTLP_GRPC})))
       find_package(gRPC)
     endif()
     if(WIN32)
@@ -362,9 +362,6 @@ if(WITH_OTLP)
       set(PROTOBUF_PROTOC_EXECUTABLE ${Protobuf_PROTOC_EXECUTABLE})
     endif()
   endif()
-  message("PROTOBUF_PROTOC_EXECUTABLE=${PROTOBUF_PROTOC_EXECUTABLE}")
-
-  include(cmake/opentelemetry-proto.cmake)
   include(CMakeDependentOption)
   if(WITH_OTLP_HTTP OR (NOT DEFINED WITH_OTLP_HTTP AND NOT DEFINED
                                                        CACHE{WITH_OTLP_HTTP}))
@@ -377,6 +374,9 @@ if(WITH_OTLP)
   cmake_dependent_option(
     WITH_OTLP_HTTP "Whether to include the OTLP http exporter in the SDK" ON
     "CURL_FOUND" OFF)
+
+  message(STATUS "PROTOBUF_PROTOC_EXECUTABLE=${PROTOBUF_PROTOC_EXECUTABLE}")
+  include(cmake/opentelemetry-proto.cmake)
 endif()
 
 list(APPEND CMAKE_PREFIX_PATH "${CMAKE_BINARY_DIR}")
