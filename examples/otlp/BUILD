@@ -58,6 +58,11 @@ cc_binary(
     srcs = [
         "grpc_log_main.cc",
     ],
+    tags = [
+        "examples",
+        "otlp",
+        "otlp_grpc_log",
+    ],
     deps = [
         "//api",
         "//examples/common/logs_foo_library:common_logs_foo_library",
