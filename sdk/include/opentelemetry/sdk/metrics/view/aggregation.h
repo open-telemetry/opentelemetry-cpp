@@ -16,18 +16,33 @@ class Aggregation
 {
 public:
   virtual ~Aggregation() = default;
-  virtual std::unique_ptr<opentelemetry::sdk::metrics::Aggregator> CreateAggregator(
+  virtual opentelemetry::sdk::metrics::Aggregator &CreateAggregator(
       opentelemetry::sdk::metrics::InstrumentDescriptor instrument_descriptor) noexcept = 0;
+};
+
+class NoOpAggregation : public Aggregation
+{
+
+  opentelemetry::sdk::metrics::Aggregator &CreateAggregator(
+      opentelemetry::sdk::metrics::InstrumentDescriptor instrument_descriptor) noexcept override
+  {
+    static opentelemetry::sdk::metrics::NoOpAggregator noop_aggregator;
+    return noop_aggregator;
+  }
 };
 
 class DefaultAggregation : public Aggregation
 {
-  std::unique_ptr<opentelemetry::sdk::metrics::Aggregator> CreateAggregator(
+
+  opentelemetry::sdk::metrics::Aggregator &CreateAggregator(
       opentelemetry::sdk::metrics::InstrumentDescriptor instrument_descriptor) noexcept override
   {
-    return std::unique_ptr<Aggregator>();
+    // TBD - This shouldn't return noop_aggregator
+    static opentelemetry::sdk::metrics::NoOpAggregator noop_aggregator;
+    return noop_aggregator;
   }
 };
+
 }  // namespace metrics
 }  // namespace sdk
 OPENTELEMETRY_END_NAMESPACE
