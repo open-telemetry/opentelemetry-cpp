@@ -29,7 +29,7 @@ namespace google
 {
 namespace protobuf
 {
-LIBPROTOBUF_EXPORT int Base64Escape(StringPiece src, std::string *dest);
+LIBPROTOBUF_EXPORT void Base64Escape(StringPiece src, std::string *dest);
 }  // namespace protobuf
 }  // namespace google
 #endif
