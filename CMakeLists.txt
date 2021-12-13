@@ -325,7 +325,8 @@ endif()
 if(WITH_OTLP)
   set(protobuf_MODULE_COMPATIBLE ON)
   find_package(Protobuf)
-  if(WITH_OTLP_GRPC)
+  if(WITH_OTLP_GRPC OR (NOT DEFINED WITH_OTLP_GRPC AND NOT DEFINED
+                                                       CACHE{WITH_OTLP_GRPC}))
     find_package(gRPC)
   endif()
   if((NOT Protobuf_FOUND AND NOT PROTOBUF_FOUND) OR (NOT gRPC_FOUND))
@@ -343,7 +344,9 @@ if(WITH_OTLP)
     if(NOT Protobuf_FOUND AND NOT PROTOBUF_FOUND)
       find_package(Protobuf REQUIRED)
     endif()
-    if(WITH_OTLP_GRPC AND NOT gRPC_FOUND)
+    if((WITH_OTLP_GRPC OR (NOT DEFINED WITH_OTLP_GRPC AND NOT DEFINED
+                                                          CACHE{WITH_OTLP_GRPC})
+       ) AND NOT gRPC_FOUND)
       find_package(gRPC)
     endif()
     if(WIN32)
@@ -363,7 +366,10 @@ if(WITH_OTLP)
 
   include(cmake/opentelemetry-proto.cmake)
   include(CMakeDependentOption)
-  find_package(CURL)
+  if(WITH_OTLP_HTTP OR (NOT DEFINED WITH_OTLP_HTTP AND NOT DEFINED
+                                                       CACHE{WITH_OTLP_HTTP}))
+    find_package(CURL)
+  endif()
 
   cmake_dependent_option(
     WITH_OTLP_GRPC "Whether to include the OTLP gRPC exporter in the SDK" ON
