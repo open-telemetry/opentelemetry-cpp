@@ -59,7 +59,7 @@ nostd::shared_ptr<logs_api::Logger> LoggerProvider::GetLogger(
     nostd::string_view schema_url) noexcept
 {
   // Currently, no args support
-  return GetLogger(name);
+  return GetLogger(name, "", schema_url);
 }
 
 std::shared_ptr<LogProcessor> LoggerProvider::GetProcessor() noexcept

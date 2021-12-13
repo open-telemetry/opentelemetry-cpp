@@ -31,8 +31,9 @@ TEST(LoggerProviderSDK, LoggerProviderGetLoggerSimple)
 {
   auto lp = std::shared_ptr<logs_api::LoggerProvider>(new LoggerProvider());
 
-  auto logger1 = lp->GetLogger("logger1");
-  auto logger2 = lp->GetLogger("logger2");
+  nostd::string_view schema_url{"https://opentelemetry.io/schemas/1.2.0"};
+  auto logger1 = lp->GetLogger("logger1", "", schema_url);
+  auto logger2 = lp->GetLogger("logger2", "", schema_url);
 
   // Check that the logger is not nullptr
   ASSERT_NE(logger1, nullptr);
@@ -51,14 +52,15 @@ TEST(LoggerProviderSDK, LoggerProviderLoggerArguments)
   // Currently, arguments are not supported by the loggers.
   // TODO: Once the logging spec defines what arguments are allowed, add more
   // detail to this test
+  nostd::string_view schema_url{"https://opentelemetry.io/schemas/1.2.0"};
   auto lp = std::shared_ptr<logs_api::LoggerProvider>(new LoggerProvider());
 
-  auto logger1 = lp->GetLogger("logger1", "");
+  auto logger1 = lp->GetLogger("logger1", "", schema_url);
 
   // Check GetLogger(logger_name, args)
   std::array<nostd::string_view, 1> sv{"string"};
   nostd::span<nostd::string_view> args{sv};
-  auto logger2 = lp->GetLogger("logger2", args);
+  auto logger2 = lp->GetLogger("logger2", args, schema_url);
 }
 
 class DummyProcessor : public LogProcessor
