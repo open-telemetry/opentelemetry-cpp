@@ -21,7 +21,6 @@
 #include "google/protobuf/stubs/common.h"
 
 #if defined(GOOGLE_PROTOBUF_VERSION) && GOOGLE_PROTOBUF_VERSION >= 3007000
-#  include "google/protobuf/stubs/stringpiece.h"
 #  include "google/protobuf/stubs/strutil.h"
 #else
 #  include "google/protobuf/stubs/port.h"
