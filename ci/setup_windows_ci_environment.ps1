@@ -17,4 +17,6 @@ $VCPKG_DIR=(Get-Item -Path ".\").FullName
 # nlohmann-json
 ./vcpkg install nlohmann-json:x64-windows
 
+./vcpkg install boost-locale[core]:x64-windows boost-numeric-conversion[core]:x64-windows boost-scope-exit[core]:x64-windows  openssl:x64-windows
+
 Pop-Location
