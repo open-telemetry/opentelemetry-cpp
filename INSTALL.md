@@ -26,6 +26,9 @@ You can link OpenTelemetry C++ SDK with libraries provided in [dependencies.md](
   the unittests. We use GoogleTest version 1.10.0 in our build system. To
   install GoogleTest, consult the [GoogleTest Build
   Instructions](https://github.com/google/googletest/blob/master/googletest/README.md#generic-build-instructions).
+- [Google Benchmark](https://github.com/google/benchmark) framework to build and run
+  benchmark and benchmark_main libraries and tests. We use Benchmark version 1.5.3 or above. To install Benchmark,
+  consult the [GoogleBenchmark Build Instructions](https://github.com/google/benchmark#installation)
 - Apart from above core requirements, the Exporters and Propagators have their
   build dependencies which are not covered here. E.g, Otlp Exporter needs
   grpc/protobuf library, Zipkin exporter needs nlohmann-json and libcurl, ETW
