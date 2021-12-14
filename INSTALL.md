@@ -26,9 +26,6 @@ You can link OpenTelemetry C++ SDK with libraries provided in [dependencies.md](
   the unittests. We use GoogleTest version 1.10.0 in our build system. To
   install GoogleTest, consult the [GoogleTest Build
   Instructions](https://github.com/google/googletest/blob/master/googletest/README.md#generic-build-instructions).
-- [Google Benchmark](https://github.com/google/benchmark) framework to build and run
-  benchmark and benchmark_main libraries and tests. We use Benchmark version 1.5.3 or above. To install Benchmark,
-  consult the [GoogleBenchmark Build Instructions](https://github.com/google/benchmark#installation)
 - Apart from above core requirements, the Exporters and Propagators have their
   build dependencies which are not covered here. E.g, Otlp Exporter needs
   grpc/protobuf library, Zipkin exporter needs nlohmann-json and libcurl, ETW
@@ -140,7 +137,8 @@ target_link_libraries(foo PRIVATE ${OPENTELEMETRY_CPP_LIBRARIES})
 
 ## Build instructions using Bazel
 
-NOTE: Experimental, and not supported for all the components.
+NOTE: Experimental, and not supported for all the components. Make sure the 
+[GoogleTest](https://github.com/google/googletest) is not installed prior to using Bazel to build.
 
 ### Prerequisites for Bazel
 
@@ -173,9 +171,10 @@ To install Bazel, consult the [Installing Bazel](https://docs.bazel.build/versio
    $
    ```
 
-2. Download the dependencies and build the source code:
+2. Navigate to the repository cloned above, download the dependencies and build the source code:
 
    ```console
+   $ cd opentelemtry-cpp
    $ bazel build //...
    bazel build -- //... -//exporters/otlp/... -//exporters/prometheus/...
    Extracting Bazel installation...
