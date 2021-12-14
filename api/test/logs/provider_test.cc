@@ -62,14 +62,15 @@ TEST(Provider, GetLogger)
 {
   auto tf = shared_ptr<LoggerProvider>(new TestProvider());
   // tests GetLogger(name, options)
-  auto logger = tf->GetLogger("logger1");
+  const std::string schema_url{"https://opentelemetry.io/schemas/1.2.0"};
+  auto logger = tf->GetLogger("logger1", "", schema_url);
   EXPECT_EQ(nullptr, logger);
 
   // tests GetLogger(name, arguments)
 
   std::array<string_view, 1> sv{"string"};
   span<string_view> args{sv};
-  auto logger2 = tf->GetLogger("logger2", args);
+  auto logger2 = tf->GetLogger("logger2", args, schema_url);
   EXPECT_EQ(nullptr, logger2);
 }
 #endif
