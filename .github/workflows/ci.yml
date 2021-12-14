@@ -320,6 +320,7 @@ jobs:
         submodules: 'recursive'
     - name: setup
       run: |
+        ./ci/setup_thrift.ps1
         ./ci/install_windows_bazelisk.ps1
     - name: run tests
       run: ./ci/do_ci.ps1 bazel.build
