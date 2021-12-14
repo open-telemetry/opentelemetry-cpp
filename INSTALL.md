@@ -138,7 +138,7 @@ target_link_libraries(foo PRIVATE ${OPENTELEMETRY_CPP_LIBRARIES})
 ## Build instructions using Bazel
 
 NOTE: Experimental, and not supported for all the components. Make sure the 
-[GoogleTest](https://github.com/google/googletest) is not installed prior to using Bazel to build.
+[GoogleTest](https://github.com/google/googletest) is not installed prior to using the Bazel.
 
 ### Prerequisites for Bazel
 
