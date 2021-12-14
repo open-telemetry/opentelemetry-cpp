@@ -190,6 +190,9 @@ To install Bazel, consult the [Installing Bazel](https://docs.bazel.build/versio
 
    ```console
    $ bazel build --action_env=VCPKG_DIR=$VCPKG_DIR -- //...
+   Extracting Bazel installation...
+   ...
+
    ```
 
 3. Once Bazel tests are built, run them with `bazel test //...` command
