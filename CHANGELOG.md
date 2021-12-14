@@ -15,6 +15,9 @@ Increment the:
 
 ## [Unreleased]
 
+* [EXPORTER] Bugfix: Jaeger exporter: extend supported attributes types ([#1106](https://github.com/open-telemetry/opentelemetry-cpp/pull/1106))
+* [EXPORTER] Fix otlp generates null span ids ([#1106](https://github.com/open-telemetry/opentelemetry-cpp/pull/1106))
+
 ## [1.1.0] 2021-11-19
 
 * [BUILD] build release tarball when nlohmann-json not installed ([#1074](https://github.com/open-telemetry/opentelemetry-cpp/pull/1074))

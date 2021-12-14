@@ -3,6 +3,10 @@
 [CMake](https://cmake.org/) and [Bazel](https://bazel.build) are the official
 build systems for opentelemetry-cpp.
 
+## Dependencies
+
+You can link OpenTelemetry C++ SDK with libraries provided in [dependencies.md](https://github.com/open-telemetry/opentelemetry-cpp/blob/main/docs/dependencies.md) (complete list of libraries with versions used in our CI can be found [here](https://github.com/open-telemetry/opentelemetry-cpp/blob/main/third_party_release)).
+
 ## Build instructions using CMake
 
 ### Prerequisites for CMake
@@ -66,7 +70,9 @@ build systems for opentelemetry-cpp.
      configuration, the code is compiled without `-fpic` option, so it is not
      suitable for inclusion in shared libraries. To enable the code for
      inclusion in shared libraries, this variable is used.
-
+   - `-DBUILD_SHARED_LIBS=ON` : To build shared libraries for the targets. Please
+      refer to note [below](#building-shared-libs-for-windows) for Windows DLL
+      support
    - `-DWITH_OTLP=ON` : To enable building Otlp exporter.
    - `-DWITH_PROMETHEUS=ON` : To enable building prometheus exporter.
 
@@ -236,6 +242,12 @@ cc_library(
    ...
 )
 ```
+
+## Building shared libs for Windows
+
+Windows DLL build is not supported. There are some constraints on how C++ DLLs work on
+Windows, specifically we can't safely allocate memory in one DLL and free it in another.
+For now, OpenTelemetry C++ targets need to be statically linked into the Windows applications.
 
 ## Using Package Managers
 
