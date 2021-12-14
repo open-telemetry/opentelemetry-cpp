@@ -34,8 +34,6 @@ select_file(
         ],
     )
 
-    # rules_perl doesn't currently support Windows, so we need to bring along our own Perl.
-    # https://github.com/bazelbuild/rules_perl/issues/30
     maybe(
         http_archive,
         name = "perl",
