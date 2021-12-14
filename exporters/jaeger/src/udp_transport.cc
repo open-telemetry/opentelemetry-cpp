@@ -19,9 +19,10 @@ UDPTransport::UDPTransport(const std::string &addr, uint16_t port)
 
   endpoint_transport_ = std::shared_ptr<TTransport>(new TUDPTransport(addr, port));
   endpoint_transport_->open();
-  transport_ = std::shared_ptr<TTransport>(new TBufferedTransport(endpoint_transport_));
-  protocol_  = std::shared_ptr<TProtocol>(new TCompactProtocol(transport_));
-  agent_     = std::unique_ptr<AgentClient>(new AgentClient(protocol_));
+  transport_ =
+      std::shared_ptr<TTransport>(new TBufferedTransport(endpoint_transport_, max_packet_size_));
+  protocol_ = std::shared_ptr<TProtocol>(new TCompactProtocol(transport_));
+  agent_    = std::unique_ptr<AgentClient>(new AgentClient(protocol_));
 }
 
 UDPTransport::~UDPTransport()

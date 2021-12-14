@@ -16,6 +16,7 @@ cc_library(
 
 cc_test(
     name = "in_memory_span_data_test",
+    srcs = ["test/in_memory_span_data_test.cc"],
     tags = ["memory"],
     deps = [
         ":in_memory_span_data",
@@ -38,6 +39,7 @@ cc_library(
 
 cc_test(
     name = "in_memory_span_exporter_test",
+    srcs = ["test/in_memory_span_exporter_test.cc"],
     tags = ["memory"],
     deps = [
         ":in_memory_span_exporter",
