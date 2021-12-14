@@ -247,7 +247,7 @@ cc_library(
 
 Windows DLL build is not supported. There are some constraints on how C++ DLLs work on
 Windows, specifically we can't safely allocate memory in one DLL and free it in another.
-For now, OpenTelemetry C++ targets need to be statically linked with the Windows Application.
+For now, OpenTelemetry C++ targets need to be statically linked into the Windows applications.
 
 ## Using Package Managers
 
