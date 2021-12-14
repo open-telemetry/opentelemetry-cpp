@@ -66,7 +66,7 @@ build systems for opentelemetry-cpp.
      configuration, the code is compiled without `-fpic` option, so it is not
      suitable for inclusion in shared libraries. To enable the code for
      inclusion in shared libraries, this variable is used.
-   - `-D-DBUILD_SHARED_LIBS=ON` : To build shared libraries for the targets. Please
+   - `-DBUILD_SHARED_LIBS=ON` : To build shared libraries for the targets. Please
       refer to note [below](#building-shared-libs-for-windows) for Windows DLL
       support
    - `-DWITH_OTLP=ON` : To enable building Otlp exporter.
