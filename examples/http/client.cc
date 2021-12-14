@@ -26,9 +26,9 @@ void sendRequest(const std::string &url)
   std::string span_name = url_parser.path_;
   auto span             = get_tracer("http-client")
                   ->StartSpan(span_name,
-                              {{OTEL_CPP_GET_ATTR(AttrHttpUrl), url_parser.url_},
-                               {OTEL_CPP_GET_ATTR(AttrHttpScheme), url_parser.scheme_},
-                               {OTEL_CPP_GET_ATTR(AttrHttpMethod), "GET"}},
+                              {{OTEL_GET_TRACE_ATTR(AttrHttpUrl), url_parser.url_},
+                               {OTEL_GET_TRACE_ATTR(AttrHttpScheme), url_parser.scheme_},
+                               {OTEL_GET_TRACE_ATTR(AttrHttpMethod), "GET"}},
                               options);
   auto scope = get_tracer("http-client")->WithActiveSpan(span);
 
@@ -44,7 +44,7 @@ void sendRequest(const std::string &url)
   {
     // set span attributes
     auto status_code = result.GetResponse().GetStatusCode();
-    span->SetAttribute(OTEL_CPP_GET_ATTR(AttrHttpStatusCode), status_code);
+    span->SetAttribute(OTEL_GET_TRACE_ATTR(AttrHttpStatusCode), status_code);
     result.GetResponse().ForEachHeader(
         [&span](nostd::string_view header_name, nostd::string_view header_value) {
           span->SetAttribute("http.header." + std::string(header_name.data()), header_value);
