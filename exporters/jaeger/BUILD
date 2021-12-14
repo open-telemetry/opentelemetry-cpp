@@ -161,7 +161,7 @@ THRIFT_CACHE_ENTRIES_WIN = {
     "BUILD_TESTING": "OFF",
     "BUILD_TUTORIALS": "OFF",
     "WITH_HASKELL": "OFF",
-    "CMAKE_TOOLCHAIN_FILE": "D:/a/opentelemetry-cpp/opentelemetry-cpp/vcpkg/scripts/buildsystems/vcpkg.cmake",
+    "CMAKE_TOOLCHAIN_FILE": "$VCPKG_DIR/scripts/buildsystems/vcpkg.cmake",
 }
 
 THRIFT_DEPS_WIN = [
