@@ -139,7 +139,8 @@ target_link_libraries(foo PRIVATE ${OPENTELEMETRY_CPP_LIBRARIES})
 
 ## Build instructions using Bazel
 
-NOTE: Experimental, and not supported for all the components.
+NOTE: Experimental, and not supported for all the components. Make sure the
+[GoogleTest](https://github.com/google/googletest) installation may fail if there is a different version of googletest already installed in system-defined path.
 
 ### Prerequisites for Bazel
 
@@ -172,9 +173,10 @@ To install Bazel, consult the [Installing Bazel](https://docs.bazel.build/versio
    $
    ```
 
-2. Download the dependencies and build the source code:
+2. Navigate to the repository cloned above, download the dependencies and build the source code:
 
    ```console
+   $ cd opentelemtry-cpp
    $ bazel build //...
    bazel build -- //... -//exporters/otlp/... -//exporters/prometheus/...
    Extracting Bazel installation...
