@@ -212,14 +212,10 @@ public:
   }
 
   /**
-   * @brief Obtain ETW Tracer.
+   * @brief Obtain ETW Logger.
    * @param name ProviderId (instrumentation name) - Name or GUID
    *
-   * @param args Additional arguments that controls `codec` of the provider.
-   * Possible values are:
-   * - "ETW"            - 'classic' Trace Logging Dynamic manifest ETW events.
-   * - "MSGPACK"        - MessagePack-encoded binary payload ETW events.
-   * - "XML"            - XML events (reserved for future use)
+   * @param version Library version
    * @return
    */
   nostd::shared_ptr<opentelemetry::logs::Logger> GetLogger(
