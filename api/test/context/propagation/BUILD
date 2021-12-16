@@ -5,6 +5,10 @@ cc_test(
     srcs = [
         "composite_propagator_test.cc",
     ],
+    tags = [
+        "api",
+        "test",
+    ],
     deps = [
         "//api",
         "@com_google_googletest//:gtest_main",

@@ -5,6 +5,10 @@ cc_test(
     srcs = [
         "context_test.cc",
     ],
+    tags = [
+        "api",
+        "test",
+    ],
     deps = [
         "//api",
         "@com_google_googletest//:gtest_main",
@@ -15,6 +19,10 @@ cc_test(
     name = "runtime_context_test",
     srcs = [
         "runtime_context_test.cc",
+    ],
+    tags = [
+        "api",
+        "test",
     ],
     deps = [
         "//api",
