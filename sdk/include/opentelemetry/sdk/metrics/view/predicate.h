@@ -36,7 +36,7 @@ public:
     return std::regex_match(str.data(), reg_key_);
 #  else
     // TBD - Support regex match for GCC4.8
-    LOG_ERROR(
+    OTEL_INTERNAL_LOG_ERROR(
         "PatternPredicate::Match - failed. std::regex not fully supported for this compiler.");
     return false;  // not supported
 #  endif
