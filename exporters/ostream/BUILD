@@ -18,7 +18,10 @@ cc_library(
 cc_test(
     name = "ostream_log_test",
     srcs = ["test/ostream_log_test.cc"],
-    tags = ["ostream"],
+    tags = [
+        "ostream",
+        "test",
+    ],
     deps = [
         ":ostream_log_exporter",
         "@com_google_googletest//:gtest_main",
@@ -43,7 +46,10 @@ cc_library(
 cc_test(
     name = "ostream_metrics_test",
     srcs = ["test/ostream_metrics_test.cc"],
-    tags = ["ostream"],
+    tags = [
+        "ostream",
+        "test",
+    ],
     deps = [
         ":ostream_metrics_exporter_deprecated",
         "@com_google_googletest//:gtest_main",
@@ -79,7 +85,10 @@ cc_library(
 cc_test(
     name = "ostream_span_test",
     srcs = ["test/ostream_span_test.cc"],
-    tags = ["ostream"],
+    tags = [
+        "ostream",
+        "test",
+    ],
     deps = [
         ":ostream_capture",
         ":ostream_span_exporter",
