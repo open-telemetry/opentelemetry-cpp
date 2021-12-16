@@ -23,6 +23,7 @@ cc_binary(
         "//bazel:windows": [],
         "//conditions:default": ["-pthread"],
     }),
+    tags = ["examples"],
     deps = [
         "//ext:headers",
         "//ext/src/zpages",
