@@ -42,25 +42,12 @@ public:
    * Creates a logger with the given name, and returns a shared pointer to it.
    * If a logger with that name already exists, return a shared pointer to it
    * @param name The name of the logger to be created.
-   * @param options (OPTIONAL) The options for the logger. TODO: Once the logging spec defines it,
-   * give a list of options that the logger supports.
+   * @param version The version of the library.
    */
   opentelemetry::nostd::shared_ptr<opentelemetry::logs::Logger> GetLogger(
       opentelemetry::nostd::string_view name,
-      opentelemetry::nostd::string_view options = "",
+      opentelemetry::nostd::string_view version = "",
       nostd::string_view schema_url             = "") noexcept override;
-
-  /**
-   * Creates a logger with the given name, and returns a shared pointer to it.
-   * If a logger with that name already exists, return a shared pointer to it
-   * @param name The name of the logger to be created.
-   * @param args (OPTIONAL) The arguments for the logger. TODO: Once the logging spec defines it,
-   * give a list of arguments that the logger supports.
-   */
-  opentelemetry::nostd::shared_ptr<opentelemetry::logs::Logger> GetLogger(
-      opentelemetry::nostd::string_view name,
-      nostd::span<nostd::string_view> args,
-      nostd::string_view schema_url = "") noexcept override;
 
   /**
    * Returns a shared pointer to the processor currently stored in the

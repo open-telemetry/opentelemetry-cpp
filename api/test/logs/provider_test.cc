@@ -26,13 +26,6 @@ class TestProvider : public LoggerProvider
   {
     return shared_ptr<Logger>(nullptr);
   }
-
-  shared_ptr<Logger> GetLogger(string_view library_name,
-                               span<string_view> args,
-                               string_view schema_url = "") override
-  {
-    return shared_ptr<Logger>(nullptr);
-  }
 };
 
 TEST(Provider, GetLoggerProviderDefault)
@@ -61,16 +54,9 @@ TEST(Provider, MultipleLoggerProviders)
 TEST(Provider, GetLogger)
 {
   auto tf = shared_ptr<LoggerProvider>(new TestProvider());
-  // tests GetLogger(name, options)
+  // tests GetLogger(name, version, schema)
   const std::string schema_url{"https://opentelemetry.io/schemas/1.2.0"};
   auto logger = tf->GetLogger("logger1", "", schema_url);
   EXPECT_EQ(nullptr, logger);
-
-  // tests GetLogger(name, arguments)
-
-  std::array<string_view, 1> sv{"string"};
-  span<string_view> args{sv};
-  auto logger2 = tf->GetLogger("logger2", args, schema_url);
-  EXPECT_EQ(nullptr, logger2);
 }
 #endif

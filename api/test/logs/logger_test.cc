@@ -32,20 +32,6 @@ TEST(Logger, GetLoggerDefault)
   EXPECT_EQ(name, "noop logger");
 }
 
-// Test the two additional overloads for GetLogger()
-TEST(Logger, GetNoopLoggerNameWithArgs)
-{
-  auto lp = Provider::GetLoggerProvider();
-
-  // GetLogger(name, list(args))
-  std::array<string_view, 1> sv{"string"};
-  span<string_view> args{sv};
-  lp->GetLogger("NoopLoggerWithArgs", args);
-
-  // GetLogger(name, string options)
-  lp->GetLogger("NoopLoggerWithOptions", "options");
-}
-
 // Test the Log() overloads
 TEST(Logger, LogMethodOverloads)
 {
@@ -94,13 +80,6 @@ class TestProvider : public LoggerProvider
 {
   shared_ptr<Logger> GetLogger(string_view library_name,
                                string_view options           = "",
-                               nostd::string_view schema_url = "") override
-  {
-    return shared_ptr<Logger>(new TestLogger());
-  }
-
-  shared_ptr<Logger> GetLogger(string_view library_name,
-                               span<string_view> args,
                                nostd::string_view schema_url = "") override
   {
     return shared_ptr<Logger>(new TestLogger());

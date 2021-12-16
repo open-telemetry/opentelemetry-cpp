@@ -224,21 +224,13 @@ public:
    */
   nostd::shared_ptr<opentelemetry::logs::Logger> GetLogger(
       nostd::string_view name,
-      nostd::string_view args       = "",
+      nostd::string_view version    = "",
       nostd::string_view schema_url = "") override
   {
     UNREFERENCED_PARAMETER(args);
     ETWProvider::EventFormat evtFmt = config_.encoding;
     return nostd::shared_ptr<opentelemetry::logs::Logger>{new (std::nothrow)
                                                               etw::Logger(*this, name, evtFmt)};
-  }
-
-  nostd::shared_ptr<opentelemetry::logs::Logger> GetLogger(
-      nostd::string_view name,
-      nostd::span<nostd::string_view> args,
-      nostd::string_view schema_url = "") override
-  {
-    return GetLogger(name, args[0], schema_url);
   }
 };
 

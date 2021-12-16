@@ -18,7 +18,7 @@ LoggerProvider::LoggerProvider() noexcept : processor_{nullptr} {}
 
 nostd::shared_ptr<logs_api::Logger> LoggerProvider::GetLogger(
     nostd::string_view name,
-    nostd::string_view options,
+    nostd::string_view version,
     nostd::string_view schema_url) noexcept
 {
   // Ensure only one thread can read/write from the map of loggers
@@ -46,20 +46,11 @@ nostd::shared_ptr<logs_api::Logger> LoggerProvider::GetLogger(
 
   // If no logger with that name exists yet, create it and add it to the map of loggers
 
-  auto lib = instrumentationlibrary::InstrumentationLibrary::Create(name, name, schema_url);
+  auto lib = instrumentationlibrary::InstrumentationLibrary::Create(name, version, schema_url);
   nostd::shared_ptr<logs_api::Logger> logger(
       new Logger(name, this->shared_from_this(), std::move(lib)));
   loggers_[name.data()] = logger;
   return logger;
-}
-
-nostd::shared_ptr<logs_api::Logger> LoggerProvider::GetLogger(
-    nostd::string_view name,
-    nostd::span<nostd::string_view> args,
-    nostd::string_view schema_url) noexcept
-{
-  // Currently, no args support
-  return GetLogger(name, "", schema_url);
 }
 
 std::shared_ptr<LogProcessor> LoggerProvider::GetProcessor() noexcept
