@@ -5,6 +5,11 @@ cc_test(
     srcs = [
         "meter_provider_test.cc",
     ],
+    tags = [
+        "api",
+        "metrics",
+        "test",
+    ],
     deps = [
         "//api",
         "@com_google_googletest//:gtest_main",
@@ -15,6 +20,11 @@ cc_test(
     name = "noop_metrics_test",
     srcs = [
         "noop_metrics_test.cc",
+    ],
+    tags = [
+        "api",
+        "metrics",
+        "test",
     ],
     deps = [
         "//api",
@@ -28,6 +38,11 @@ cc_test(
         "noop_instrument_test.cc",
     ],
     linkstatic = 1,
+    tags = [
+        "api",
+        "metrics",
+        "test",
+    ],
     deps = [
         "//api",
         "@com_google_googletest//:gtest_main",

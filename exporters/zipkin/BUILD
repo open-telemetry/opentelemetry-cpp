@@ -39,7 +39,10 @@ cc_library(
 cc_test(
     name = "zipkin_recordable_test",
     srcs = ["test/zipkin_recordable_test.cc"],
-    tags = ["zipkin"],
+    tags = [
+        "test",
+        "zipkin",
+    ],
     deps = [
         ":zipkin_recordable",
         "@com_google_googletest//:gtest_main",
