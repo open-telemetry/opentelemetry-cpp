@@ -23,11 +23,11 @@ You can link OpenTelemetry C++ SDK with libraries provided in [dependencies.md](
   unittests. We use CMake version 3.15.2 in our build system. To install CMake,
   consult the [Installing CMake](https://cmake.org/install/) guide.
 - [GoogleTest](https://github.com/google/googletest) framework to build and run
-  the unittests. Refer to [third_party_release](https://github.com/open-telemetry/opentelemetry-cpp/blob/main/third_party_release)
+  the unittests. Refer to [third_party_release](https://github.com/open-telemetry/opentelemetry-cpp/blob/main/third_party_release#L5)
   for version of GoogleTest used in CI. To install GoogleTest, consult the [GoogleTest Build
   Instructions](https://github.com/google/googletest/blob/master/googletest/README.md#generic-build-instructions).
 - [Google Benchmark](https://github.com/google/benchmark) framework to build and run
-  benchmark tests. Refer to [third_party_release](https://github.com/open-telemetry/opentelemetry-cpp/blob/main/third_party_release)
+  benchmark tests. Refer to [third_party_release](https://github.com/open-telemetry/opentelemetry-cpp/blob/main/third_party_release#L4)
   for version of Benchmark used in CI. To install Benchmark,
   consult the [GoogleBenchmark Build Instructions](https://github.com/google/benchmark#installation).
 - Apart from above core requirements, the Exporters and Propagators have their
