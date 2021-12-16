@@ -6,6 +6,7 @@
 #  include <vector>
 #  if (__GNUC__ == 4 && (__GNUC_MINOR__ == 8 || __GNUC_MINOR__ == 9))
 #    define HAVE_WORKING_REGEX 0
+#    include "opentelemetry/sdk/common/global_log_handler.h"
 #  else
 #    include <regex>
 #    define HAVE_WORKING_REGEX 1
@@ -34,6 +35,8 @@ public:
 #  if HAVE_WORKING_REGEX
     return std::regex_match(str.data(), reg_key_);
 #  else
+    // TBD - Support regex match for GCC4.8
+    LOG_ERROR("PatternPredicate::Match - failed. std::regex not fully supported for this compiler.")
     return false;  // not supported
 #  endif
   }
