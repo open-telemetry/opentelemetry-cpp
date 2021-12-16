@@ -3,7 +3,10 @@ cc_binary(
     srcs = [
         "main.cc",
     ],
-    tags = ["ostream"],
+    tags = [
+        "examples",
+        "ostream",
+    ],
     deps = [
         "//api",
         "//examples/common/foo_library:common_foo_library",

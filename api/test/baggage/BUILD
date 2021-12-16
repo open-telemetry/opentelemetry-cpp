@@ -5,6 +5,10 @@ cc_test(
     srcs = [
         "baggage_test.cc",
     ],
+    tags = [
+        "api",
+        "test",
+    ],
     deps = [
         "//api",
         "@com_google_googletest//:gtest_main",
@@ -14,5 +18,9 @@ cc_test(
 otel_cc_benchmark(
     name = "baggage_benchmark",
     srcs = ["baggage_benchmark.cc"],
+    tags = [
+        "api",
+        "test",
+    ],
     deps = ["//api"],
 )

@@ -90,6 +90,7 @@ cc_test(
         "//sdk/src/trace",
         "@com_google_googletest//:gtest_main",
     ],
+    tags = ["test",],
 )
 ```
 
