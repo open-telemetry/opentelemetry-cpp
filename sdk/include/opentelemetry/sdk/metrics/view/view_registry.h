@@ -14,8 +14,6 @@ namespace sdk
 {
 namespace metrics
 {
-const std::string kDefaultViewName        = "default_name";
-const std::string kDefaultViewDescription = "default view";
 struct RegisteredView
 {
   RegisteredView(
@@ -66,7 +64,7 @@ public:
     // return default view if none found;
     if (!found)
     {
-      static View view(kDefaultViewName, kDefaultViewDescription);
+      static View view("");
       if (!callback(view))
       {
         return false;

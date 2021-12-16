@@ -3,7 +3,7 @@
 
 #pragma once
 #include "opentelemetry/nostd/string_view.h"
-#include "opentelemetry/sdk/metrics/view/predicate.h"
+#include "opentelemetry/sdk/metrics/view/predicate_factory.h"
 #ifndef ENABLE_METRICS_PREVIEW
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace sdk
@@ -16,9 +16,9 @@ public:
   MeterSelector(opentelemetry::nostd::string_view name,
                 opentelemetry::nostd::string_view version,
                 opentelemetry::nostd::string_view schema)
-      : name_filter_{new opentelemetry::sdk::metrics::ExactPredicate(name)},
-        version_filter_{new opentelemetry::sdk::metrics::ExactPredicate(version)},
-        schema_filter_{new opentelemetry::sdk::metrics::ExactPredicate(schema)}
+      : name_filter_{std::move(PredicateFactory::GetPredicate(name, PredicateType::kExact))},
+        version_filter_{std::move(PredicateFactory::GetPredicate(version, PredicateType::kExact))},
+        schema_filter_{std::move(PredicateFactory::GetPredicate(schema, PredicateType::kExact))}
   {}
 
   // Returns name filter predicate. This shouldn't be deleted

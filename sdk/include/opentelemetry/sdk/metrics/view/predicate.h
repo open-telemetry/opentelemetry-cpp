@@ -11,8 +11,9 @@
 #    define HAVE_WORKING_REGEX 1
 #  endif
 
-OPENTELEMETRY_BEGIN_NAMESPACE
 #  include "opentelemetry/nostd/string_view.h"
+
+OPENTELEMETRY_BEGIN_NAMESPACE
 namespace sdk
 {
 namespace metrics
@@ -27,35 +28,17 @@ public:
 class PatternPredicate : public Predicate
 {
 public:
-  PatternPredicate(opentelemetry::nostd::string_view pattern) : reg_key_{pattern.data()}
+  PatternPredicate(opentelemetry::nostd::string_view pattern) : reg_key_{pattern.data()} {}
+  bool Match(opentelemetry::nostd::string_view str) const noexcept override
   {
-    if (pattern == "*")
-    {
-      matchAll_ = true;
-    }
-    else
-    {
-      matchAll_ = false;
-    }
-  }
-  virtual bool Match(opentelemetry::nostd::string_view str) const noexcept override
-  {
-    if (matchAll_)
-    {
-      return true;
-    }
-    else
-    {
 #  if HAVE_WORKING_REGEX
-      return std::regex_match(str.data(), reg_key_);
+    return std::regex_match(str.data(), reg_key_);
 #  else
-      return false;  // not supported
+    return false;  // not supported
 #  endif
-    }
   }
 
 private:
-  bool matchAll_;
 #  if HAVE_WORKING_REGEX
   std::regex reg_key_;
 #  else
@@ -66,29 +49,28 @@ private:
 class ExactPredicate : public Predicate
 {
 public:
-  ExactPredicate(opentelemetry::nostd::string_view pattern) : pattern_{pattern}
+  ExactPredicate(opentelemetry::nostd::string_view pattern) : pattern_{pattern} {}
+  bool Match(opentelemetry::nostd::string_view str) const noexcept override
   {
-    matchAll_ = pattern_.size() ? true : false;
-  }
-  virtual bool Match(opentelemetry::nostd::string_view str) const noexcept override
-  {
-    if (matchAll_)
-    {
-      return true;
-    }
     if (pattern_ == str)
     {
       return true;
     }
-    else
-    {
-      return false;
-    }
+    return false;
   }
 
 private:
-  bool matchAll_;
   std::string pattern_;
+};
+
+class MatchEverythingPattern : public Predicate
+{
+  bool Match(opentelemetry::nostd::string_view str) const noexcept override { return true; }
+};
+
+class MatchNothingPattern : public Predicate
+{
+  bool Match(opentelemetry::nostd::string_view str) const noexcept override { return false; }
 };
 }  // namespace metrics
 }  // namespace sdk

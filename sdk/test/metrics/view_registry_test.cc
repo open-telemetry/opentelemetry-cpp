@@ -28,8 +28,8 @@ TEST(ViewRegistry, FindViewsEmptyRegistry)
   auto status = registry.FindViews(default_instrument_descriptor,
                                    *default_instrumentation_lib.get(), [&count](const View &view) {
                                      count++;
-                                     EXPECT_EQ(view.GetName(), kDefaultViewName);
-                                     EXPECT_EQ(view.GetDescription(), kDefaultViewDescription);
+                                     EXPECT_EQ(view.GetName(), "");
+                                     EXPECT_EQ(view.GetDescription(), "");
                                      return true;
                                    });
   EXPECT_EQ(count, 1);

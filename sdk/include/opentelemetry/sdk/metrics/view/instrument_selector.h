@@ -5,7 +5,7 @@
 #ifndef ENABLE_METRICS_PREVIEW
 #  include "opentelemetry/nostd/string_view.h"
 #  include "opentelemetry/sdk/metrics/instruments.h"
-#  include "opentelemetry/sdk/metrics/view/predicate.h"
+#  include "opentelemetry/sdk/metrics/view/predicate_factory.h"
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace sdk
 {
@@ -16,7 +16,7 @@ class InstrumentSelector
 public:
   InstrumentSelector(opentelemetry::sdk::metrics::InstrumentType instrument_type,
                      opentelemetry::nostd::string_view name)
-      : name_filter_{new opentelemetry::sdk::metrics::PatternPredicate(name)},
+      : name_filter_{std::move(PredicateFactory::GetPredicate(name, PredicateType::kPattern))},
         instrument_type_{instrument_type}
   {}
 
