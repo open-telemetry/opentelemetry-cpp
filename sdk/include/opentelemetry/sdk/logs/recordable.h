@@ -19,7 +19,6 @@
 #  include "opentelemetry/version.h"
 
 #  include <map>
-#  include <memory>
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace sdk
@@ -101,10 +100,6 @@ public:
   virtual void SetInstrumentationLibrary(
       const opentelemetry::sdk::instrumentationlibrary::InstrumentationLibrary
           &instrumentation_library) noexcept = 0;
-
-private:
-  const opentelemetry::sdk::instrumentationlibrary::InstrumentationLibrary
-      *instrumentation_library_ = nullptr;
 };
 }  // namespace logs
 }  // namespace sdk

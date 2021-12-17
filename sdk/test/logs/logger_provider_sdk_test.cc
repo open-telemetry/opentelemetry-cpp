@@ -39,12 +39,24 @@ TEST(LoggerProviderSDK, LoggerProviderGetLoggerSimple)
   ASSERT_NE(logger1, nullptr);
   ASSERT_NE(logger2, nullptr);
 
+  auto sdk_logger1 = static_cast<opentelemetry::sdk::logs::Logger *>(logger1.get());
+  auto sdk_logger2 = static_cast<opentelemetry::sdk::logs::Logger *>(logger2.get());
+  ASSERT_EQ(sdk_logger1->GetInstrumentationLibrary().GetName(), "logger1");
+  ASSERT_EQ(sdk_logger1->GetInstrumentationLibrary().GetVersion(), "");
+  ASSERT_EQ(sdk_logger1->GetInstrumentationLibrary().GetSchemaURL(), schema_url);
+
+  ASSERT_EQ(sdk_logger2->GetInstrumentationLibrary().GetName(), "logger2");
+  ASSERT_EQ(sdk_logger2->GetInstrumentationLibrary().GetVersion(), "");
+  ASSERT_EQ(sdk_logger2->GetInstrumentationLibrary().GetSchemaURL(), schema_url);
+
   // Check that two loggers with different names aren't the same instance
   ASSERT_NE(logger1, logger2);
 
   // Check that two loggers with the same name are the same instance
   auto logger3 = lp->GetLogger("logger1");
   ASSERT_EQ(logger1, logger3);
+  auto sdk_logger3 = static_cast<opentelemetry::sdk::logs::Logger *>(logger3.get());
+  ASSERT_EQ(sdk_logger3->GetInstrumentationLibrary(), sdk_logger1->GetInstrumentationLibrary());
 }
 
 class DummyProcessor : public LogProcessor

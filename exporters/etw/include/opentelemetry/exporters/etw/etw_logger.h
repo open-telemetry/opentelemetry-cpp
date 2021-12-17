@@ -212,7 +212,7 @@ public:
   }
 
   /**
-   * @brief Obtain ETW Logger.
+   * @brief Obtain ETW Tracer.
    * @param name ProviderId (instrumentation name) - Name or GUID
    *
    * @param version Library version
@@ -223,7 +223,8 @@ public:
       nostd::string_view version    = "",
       nostd::string_view schema_url = "") override
   {
-    UNREFERENCED_PARAMETER(args);
+    UNREFERENCED_PARAMETER(version);
+    UNREFERENCED_PARAMETER(schema_url);
     ETWProvider::EventFormat evtFmt = config_.encoding;
     return nostd::shared_ptr<opentelemetry::logs::Logger>{new (std::nothrow)
                                                               etw::Logger(*this, name, evtFmt)};

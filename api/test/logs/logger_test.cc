@@ -25,8 +25,9 @@ namespace trace  = opentelemetry::trace;
 // Check that the default logger is a noop logger instance
 TEST(Logger, GetLoggerDefault)
 {
-  auto lp     = Provider::GetLoggerProvider();
-  auto logger = lp->GetLogger("TestLogger");
+  auto lp = Provider::GetLoggerProvider();
+  const std::string schema_url{"https://opentelemetry.io/schemas/1.2.0"};
+  auto logger = lp->GetLogger("TestLogger", "", schema_url);
   auto name   = logger->GetName();
   EXPECT_NE(nullptr, logger);
   EXPECT_EQ(name, "noop logger");
@@ -95,7 +96,8 @@ TEST(Logger, PushLoggerImplementation)
   auto lp = Provider::GetLoggerProvider();
 
   // Check that the implementation was pushed by calling TestLogger's GetName()
-  auto logger = lp->GetLogger("TestLogger");
+  nostd::string_view schema_url{"https://opentelemetry.io/schemas/1.2.0"};
+  auto logger = lp->GetLogger("TestLogger", "", schema_url);
   ASSERT_EQ("test logger", logger->GetName());
 }
 #endif
