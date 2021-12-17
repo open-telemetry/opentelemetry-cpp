@@ -114,3 +114,16 @@ cc_test(
         "@com_google_googletest//:gtest_main",
     ],
 )
+
+cc_test(
+    name = "global_log_handle_test",
+    srcs = [
+        "global_log_handle_test.cc",
+    ],
+    tags = ["test"],
+    deps = [
+        "//api",
+        "//sdk:headers",
+        "@com_google_googletest//:gtest_main",
+    ],
+)
