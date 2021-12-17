@@ -8,21 +8,29 @@
 
 #  include "opentelemetry/logs/provider.h"
 #  include "opentelemetry/nostd/shared_ptr.h"
-#  include "opentelemetry/nostd/span.h"
-#  include "opentelemetry/nostd/string_view.h"
 
 using opentelemetry::logs::Logger;
 using opentelemetry::logs::LoggerProvider;
 using opentelemetry::logs::Provider;
 using opentelemetry::nostd::shared_ptr;
-using opentelemetry::nostd::span;
-using opentelemetry::nostd::string_view;
+namespace nostd  = opentelemetry::nostd;
 
 class TestProvider : public LoggerProvider
 {
-  shared_ptr<Logger> GetLogger(string_view library_name,
-                               string_view library_version = "",
-                               string_view schema_url      = "") override
+  nostd::shared_ptr<Logger> GetLogger(nostd::string_view logger_name,
+                                              nostd::string_view options,
+                                              nostd::string_view library_name,
+                                              nostd::string_view library_version = "",
+                                              nostd::string_view schema_url      = "") override
+  {
+    return shared_ptr<Logger>(nullptr);
+  }
+
+  nostd::shared_ptr<Logger> GetLogger(nostd::string_view logger_name,
+                                              nostd::span<nostd::string_view> args,
+                                              nostd::string_view library_name,
+                                              nostd::string_view library_version = "",
+                                              nostd::string_view schema_url      = "") override
   {
     return shared_ptr<Logger>(nullptr);
   }
@@ -56,7 +64,7 @@ TEST(Provider, GetLogger)
   auto tf = shared_ptr<LoggerProvider>(new TestProvider());
   // tests GetLogger(name, version, schema)
   const std::string schema_url{"https://opentelemetry.io/schemas/1.2.0"};
-  auto logger = tf->GetLogger("logger1", "", schema_url);
+  auto logger = tf->GetLogger("logger1", "", "library_name", "", schema_url);
   EXPECT_EQ(nullptr, logger);
 }
 #endif

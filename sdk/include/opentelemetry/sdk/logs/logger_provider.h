@@ -41,13 +41,27 @@ public:
   /**
    * Creates a logger with the given name, and returns a shared pointer to it.
    * If a logger with that name already exists, return a shared pointer to it
+   * @param logger_name The name of the logger to be created.
+   * @param options The version of the library.
+   * @param library_name The version of the library.
+   * @param version The version of the library.
+   */
+  nostd::shared_ptr<opentelemetry::logs::Logger> GetLogger(nostd::string_view logger_name,
+                                              nostd::string_view options,
+                                              nostd::string_view library_name,
+                                              nostd::string_view library_version = "",
+                                              nostd::string_view schema_url      = "") noexcept override;
+  /**
+   * Creates a logger with the given name, and returns a shared pointer to it.
+   * If a logger with that name already exists, return a shared pointer to it
    * @param name The name of the logger to be created.
    * @param version The version of the library.
    */
-  opentelemetry::nostd::shared_ptr<opentelemetry::logs::Logger> GetLogger(
-      opentelemetry::nostd::string_view name,
-      opentelemetry::nostd::string_view version = "",
-      nostd::string_view schema_url             = "") noexcept override;
+  nostd::shared_ptr<opentelemetry::logs::Logger> GetLogger(nostd::string_view logger_name,
+                                              nostd::span<nostd::string_view> args,
+                                              nostd::string_view library_name,
+                                              nostd::string_view library_version = "",
+                                              nostd::string_view schema_url      = "") noexcept override;
 
   /**
    * Returns a shared pointer to the processor currently stored in the
