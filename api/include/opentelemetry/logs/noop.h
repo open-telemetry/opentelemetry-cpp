@@ -68,7 +68,7 @@ public:
                                               nostd::string_view options,
                                               nostd::string_view library_name,
                                               nostd::string_view library_version = "",
-                                              nostd::string_view schema_url      = "")override
+                                              nostd::string_view schema_url      = "") override
   {
     return logger_;
   }
