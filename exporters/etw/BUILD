@@ -50,3 +50,20 @@ cc_test(
         "@github_nlohmann_json//:json",
     ],
 )
+
+cc_test(
+    name = "etw_logger_test",
+    srcs = ["test/etw_logger_test.cc"],
+    local_defines = [
+        "HAVE_MSGPACK",
+    ],
+    tags = [
+        "etw",
+        "test",
+    ],
+    deps = [
+        ":etw_exporter",
+        "@com_google_googletest//:gtest_main",
+        "@github_nlohmann_json//:json",
+    ],
+)
