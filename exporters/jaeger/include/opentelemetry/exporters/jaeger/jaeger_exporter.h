@@ -78,6 +78,14 @@ private:
   bool is_shutdown_ = false;
   JaegerExporterOptions options_;
   std::unique_ptr<ThriftSender> sender_;
+  // For testing
+  friend class JaegerExporterTestPeer;
+  /**
+   * Create an JaegerExporter using the specified thrift sender.
+   * Only tests can call this constructor directly.
+   * @param sender the thrift sender to be used for exporting
+   */
+  JaegerExporter(std::unique_ptr<ThriftSender> sender);
 };
 
 }  // namespace jaeger

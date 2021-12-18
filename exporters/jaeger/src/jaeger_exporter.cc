@@ -27,6 +27,10 @@ JaegerExporter::JaegerExporter(const JaegerExporterOptions &options) : options_(
 
 JaegerExporter::JaegerExporter() : JaegerExporter(JaegerExporterOptions()) {}
 
+JaegerExporter::JaegerExporter(std::unique_ptr<ThriftSender> sender)
+    : options_(JaegerExporterOptions()), sender_(std::move(sender))
+{}
+
 std::unique_ptr<trace_sdk::Recordable> JaegerExporter::MakeRecordable() noexcept
 {
   return std::unique_ptr<sdk::trace::Recordable>(new JaegerRecordable);
