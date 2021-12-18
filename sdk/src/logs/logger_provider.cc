@@ -27,10 +27,13 @@ nostd::shared_ptr<opentelemetry::logs::Logger> LoggerProvider::GetLogger(
   std::lock_guard<std::mutex> lock_guard{mu_};
 
   // If a logger with a name "logger_name" already exists, return it
-  auto loggerkv = loggers_.find(logger_name.data());
-  if (loggerkv != loggers_.end())
+  for (auto &logger : loggers_)
   {
-    return nostd::shared_ptr<logs_api::Logger>(loggerkv->second);
+    auto& logger_lib = logger->GetInstrumentationLibrary();
+    if (logger->GetName() == logger_name && logger_lib.equal(library_name, library_version, schema_url))
+    {
+      return nostd::shared_ptr<opentelemetry::logs::Logger>{logger};
+    }
   }
 
   // Check if creating a new logger would exceed the max number of loggers
@@ -50,10 +53,9 @@ nostd::shared_ptr<opentelemetry::logs::Logger> LoggerProvider::GetLogger(
 
   auto lib = instrumentationlibrary::InstrumentationLibrary::Create(library_name, library_version,
                                                                     schema_url);
-  nostd::shared_ptr<logs_api::Logger> logger(
-      new Logger(logger_name, this->shared_from_this(), std::move(lib)));
-  loggers_[logger_name.data()] = logger;
-  return logger;
+  loggers_.push_back(std::shared_ptr<opentelemetry::sdk::logs::Logger>(
+      new Logger(logger_name, this->shared_from_this(), std::move(lib))));
+  return nostd::shared_ptr<opentelemetry::logs::Logger>{loggers_.back()};
 }
 
 nostd::shared_ptr<opentelemetry::logs::Logger> LoggerProvider::GetLogger(

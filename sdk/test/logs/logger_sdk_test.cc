@@ -78,7 +78,7 @@ TEST(LoggerSDK, LogToAProcessor)
   // LoggerProvider by checking that getting a logger with the same name as the previously defined
   // logger is the same instance
   auto lp      = static_cast<LoggerProvider *>(api_lp.get());
-  auto logger2 = lp->GetLogger("logger", "", schema_url);
+  auto logger2 = lp->GetLogger("logger", "", "lib_name", "", schema_url);
   ASSERT_EQ(logger, logger2);
 
   auto sdk_logger = static_cast<opentelemetry::sdk::logs::Logger *>(logger.get());
