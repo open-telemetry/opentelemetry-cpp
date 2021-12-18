@@ -223,7 +223,7 @@ TEST_F(OtlpHttpLogExporterTestPeer, ExportJsonIntegrationTest)
     char span_id_hex[2 * opentelemetry::trace::SpanId::kSize] = {0};
     opentelemetry::trace::SpanId span_id{span_id_bin};
 
-  const std::string schema_url{"https://opentelemetry.io/schemas/1.2.0"};
+    const std::string schema_url{"https://opentelemetry.io/schemas/1.2.0"};
     auto logger = provider->GetLogger("test", "", "lib_name", "", schema_url);
     logger->Log(opentelemetry::logs::Severity::kInfo, "Log name", "Log message",
                 {{"service.name", "unit_test_service"},
@@ -315,7 +315,7 @@ TEST_F(OtlpHttpLogExporterTestPeer, ExportBinaryIntegrationTest)
                                                                 '3', '2', '1', '0'};
     opentelemetry::trace::SpanId span_id{span_id_bin};
 
-  const std::string schema_url{"https://opentelemetry.io/schemas/1.2.0"};
+    const std::string schema_url{"https://opentelemetry.io/schemas/1.2.0"};
     auto logger = provider->GetLogger("test", "", "lib_name", "", schema_url);
     logger->Log(opentelemetry::logs::Severity::kInfo, "Log name", "Log message",
                 {{"service.name", "unit_test_service"},

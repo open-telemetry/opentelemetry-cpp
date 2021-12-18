@@ -230,8 +230,8 @@ public:
     UNREFERENCED_PARAMETER(version);
     UNREFERENCED_PARAMETER(schema_url);
     ETWProvider::EventFormat evtFmt = config_.encoding;
-    return nostd::shared_ptr<opentelemetry::logs::Logger>{new (std::nothrow)
-                                                              etw::Logger(*this, logger_name, evtFmt)};
+    return nostd::shared_ptr<opentelemetry::logs::Logger>{
+        new (std::nothrow) etw::Logger(*this, logger_name, evtFmt)};
   }
 
   nostd::shared_ptr<opentelemetry::logs::Logger> GetLogger(
@@ -246,8 +246,8 @@ public:
     UNREFERENCED_PARAMETER(version);
     UNREFERENCED_PARAMETER(schema_url);
     ETWProvider::EventFormat evtFmt = config_.encoding;
-    return nostd::shared_ptr<opentelemetry::logs::Logger>{new (std::nothrow)
-                                                              etw::Logger(*this, logger_name, evtFmt)};
+    return nostd::shared_ptr<opentelemetry::logs::Logger>{
+        new (std::nothrow) etw::Logger(*this, logger_name, evtFmt)};
   }
 };
 

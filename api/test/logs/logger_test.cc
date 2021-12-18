@@ -51,7 +51,7 @@ TEST(Logger, GetNoopLoggerNameWithArgs)
 // Test the Log() overloads
 TEST(Logger, LogMethodOverloads)
 {
-  auto lp     = Provider::GetLoggerProvider();
+  auto lp = Provider::GetLoggerProvider();
   const std::string schema_url{"https://opentelemetry.io/schemas/1.2.0"};
   auto logger = lp->GetLogger("TestLogger", "", "library_name", "", schema_url);
 
@@ -96,19 +96,19 @@ class TestLogger : public Logger
 class TestProvider : public LoggerProvider
 {
   nostd::shared_ptr<Logger> GetLogger(nostd::string_view logger_name,
-                                              nostd::string_view options,
-                                              nostd::string_view library_name,
-                                              nostd::string_view library_version = "",
-                                              nostd::string_view schema_url      = "") override
+                                      nostd::string_view options,
+                                      nostd::string_view library_name,
+                                      nostd::string_view library_version = "",
+                                      nostd::string_view schema_url      = "") override
   {
     return shared_ptr<Logger>(new TestLogger());
   }
 
   nostd::shared_ptr<Logger> GetLogger(nostd::string_view logger_name,
-                                              nostd::span<nostd::string_view> args,
-                                              nostd::string_view library_name,
-                                              nostd::string_view library_version = "",
-                                              nostd::string_view schema_url      = "") override
+                                      nostd::span<nostd::string_view> args,
+                                      nostd::string_view library_name,
+                                      nostd::string_view library_version = "",
+                                      nostd::string_view schema_url      = "") override
   {
     return shared_ptr<Logger>(new TestLogger());
   }
