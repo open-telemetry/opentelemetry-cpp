@@ -22,7 +22,7 @@ nostd::shared_ptr<trace::Tracer> get_tracer()
 nostd::shared_ptr<logs::Logger> get_logger()
 {
   auto provider = logs::Provider::GetLoggerProvider();
-  return provider->GetLogger("foo_library_logger");
+  return provider->GetLogger("foo_library_logger", "", "foo_library");
 }
 }  // namespace
 

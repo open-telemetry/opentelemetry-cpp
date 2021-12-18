@@ -7,7 +7,6 @@
 #  include <memory>
 #  include <mutex>
 #  include <string>
-#  include <unordered_map>
 #  include <vector>
 
 #  include "opentelemetry/logs/logger_provider.h"
@@ -41,24 +40,29 @@ public:
   /**
    * Creates a logger with the given name, and returns a shared pointer to it.
    * If a logger with that name already exists, return a shared pointer to it
-   * @param name The name of the logger to be created.
-   * @param options (OPTIONAL) The options for the logger. TODO: Once the logging spec defines it,
-   * give a list of options that the logger supports.
+   * @param logger_name The name of the logger to be created.
+   * @param options The version of the library.
+   * @param library_name The version of the library.
+   * @param version The version of the library.
    */
-  opentelemetry::nostd::shared_ptr<opentelemetry::logs::Logger> GetLogger(
-      opentelemetry::nostd::string_view name,
-      opentelemetry::nostd::string_view options = "") noexcept override;
-
+  nostd::shared_ptr<opentelemetry::logs::Logger> GetLogger(
+      nostd::string_view logger_name,
+      nostd::string_view options,
+      nostd::string_view library_name,
+      nostd::string_view library_version = "",
+      nostd::string_view schema_url      = "") noexcept override;
   /**
    * Creates a logger with the given name, and returns a shared pointer to it.
    * If a logger with that name already exists, return a shared pointer to it
    * @param name The name of the logger to be created.
-   * @param args (OPTIONAL) The arguments for the logger. TODO: Once the logging spec defines it,
-   * give a list of arguments that the logger supports.
+   * @param version The version of the library.
    */
-  opentelemetry::nostd::shared_ptr<opentelemetry::logs::Logger> GetLogger(
-      opentelemetry::nostd::string_view name,
-      nostd::span<nostd::string_view> args) noexcept override;
+  nostd::shared_ptr<opentelemetry::logs::Logger> GetLogger(
+      nostd::string_view logger_name,
+      nostd::span<nostd::string_view> args,
+      nostd::string_view library_name,
+      nostd::string_view library_version = "",
+      nostd::string_view schema_url      = "") noexcept override;
 
   /**
    * Returns a shared pointer to the processor currently stored in the
@@ -79,8 +83,7 @@ private:
   opentelemetry::sdk::common::AtomicSharedPtr<LogProcessor> processor_;
 
   // A vector of pointers to all the loggers that have been created
-  std::unordered_map<std::string, opentelemetry::nostd::shared_ptr<opentelemetry::logs::Logger>>
-      loggers_;
+  std::vector<std::shared_ptr<opentelemetry::sdk::logs::Logger>> loggers_;
 
   // A mutex that ensures only one thread is using the map of loggers
   std::mutex mu_;

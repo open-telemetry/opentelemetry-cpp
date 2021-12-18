@@ -31,34 +31,32 @@ TEST(LoggerProviderSDK, LoggerProviderGetLoggerSimple)
 {
   auto lp = std::shared_ptr<logs_api::LoggerProvider>(new LoggerProvider());
 
-  auto logger1 = lp->GetLogger("logger1");
-  auto logger2 = lp->GetLogger("logger2");
+  nostd::string_view schema_url{"https://opentelemetry.io/schemas/1.2.0"};
+  auto logger1 = lp->GetLogger("logger1", "", "lib_name", "", schema_url);
+  auto logger2 = lp->GetLogger("logger2", "", "lib_name", "", schema_url);
 
   // Check that the logger is not nullptr
   ASSERT_NE(logger1, nullptr);
   ASSERT_NE(logger2, nullptr);
 
+  auto sdk_logger1 = static_cast<opentelemetry::sdk::logs::Logger *>(logger1.get());
+  auto sdk_logger2 = static_cast<opentelemetry::sdk::logs::Logger *>(logger2.get());
+  ASSERT_EQ(sdk_logger1->GetInstrumentationLibrary().GetName(), "lib_name");
+  ASSERT_EQ(sdk_logger1->GetInstrumentationLibrary().GetVersion(), "");
+  ASSERT_EQ(sdk_logger1->GetInstrumentationLibrary().GetSchemaURL(), schema_url);
+
+  ASSERT_EQ(sdk_logger2->GetInstrumentationLibrary().GetName(), "lib_name");
+  ASSERT_EQ(sdk_logger2->GetInstrumentationLibrary().GetVersion(), "");
+  ASSERT_EQ(sdk_logger2->GetInstrumentationLibrary().GetSchemaURL(), schema_url);
+
   // Check that two loggers with different names aren't the same instance
   ASSERT_NE(logger1, logger2);
 
   // Check that two loggers with the same name are the same instance
-  auto logger3 = lp->GetLogger("logger1");
+  auto logger3 = lp->GetLogger("logger1", "", "lib_name", "", schema_url);
   ASSERT_EQ(logger1, logger3);
-}
-
-TEST(LoggerProviderSDK, LoggerProviderLoggerArguments)
-{
-  // Currently, arguments are not supported by the loggers.
-  // TODO: Once the logging spec defines what arguments are allowed, add more
-  // detail to this test
-  auto lp = std::shared_ptr<logs_api::LoggerProvider>(new LoggerProvider());
-
-  auto logger1 = lp->GetLogger("logger1", "");
-
-  // Check GetLogger(logger_name, args)
-  std::array<nostd::string_view, 1> sv{"string"};
-  nostd::span<nostd::string_view> args{sv};
-  auto logger2 = lp->GetLogger("logger2", args);
+  auto sdk_logger3 = static_cast<opentelemetry::sdk::logs::Logger *>(logger3.get());
+  ASSERT_EQ(sdk_logger3->GetInstrumentationLibrary(), sdk_logger1->GetInstrumentationLibrary());
 }
 
 class DummyProcessor : public LogProcessor

@@ -15,6 +15,7 @@ Increment the:
 
 ## [Unreleased]
 
+* [API/SDK] Logger: Support for Instrumentation library ([#1128](https://github.com/open-telemetry/opentelemetry-cpp/pull/1128))
 * [EXPORTER] Bugfix: Jaeger exporter: extend supported attributes types ([#1106](https://github.com/open-telemetry/opentelemetry-cpp/pull/1106))
 * [EXPORTER] Fix otlp generates null span ids ([#1106](https://github.com/open-telemetry/opentelemetry-cpp/pull/1106))
 

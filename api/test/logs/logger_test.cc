@@ -25,8 +25,9 @@ namespace trace  = opentelemetry::trace;
 // Check that the default logger is a noop logger instance
 TEST(Logger, GetLoggerDefault)
 {
-  auto lp     = Provider::GetLoggerProvider();
-  auto logger = lp->GetLogger("TestLogger");
+  auto lp = Provider::GetLoggerProvider();
+  const std::string schema_url{"https://opentelemetry.io/schemas/1.2.0"};
+  auto logger = lp->GetLogger("TestLogger", "", "library_name", "", schema_url);
   auto name   = logger->GetName();
   EXPECT_NE(nullptr, logger);
   EXPECT_EQ(name, "noop logger");
@@ -40,17 +41,19 @@ TEST(Logger, GetNoopLoggerNameWithArgs)
   // GetLogger(name, list(args))
   std::array<string_view, 1> sv{"string"};
   span<string_view> args{sv};
-  lp->GetLogger("NoopLoggerWithArgs", args);
+  const std::string schema_url{"https://opentelemetry.io/schemas/1.2.0"};
+  lp->GetLogger("NoopLoggerWithArgs", args, "library_name", "", schema_url);
 
   // GetLogger(name, string options)
-  lp->GetLogger("NoopLoggerWithOptions", "options");
+  lp->GetLogger("NoopLoggerWithOptions", "options", "lib_name", "", schema_url);
 }
 
 // Test the Log() overloads
 TEST(Logger, LogMethodOverloads)
 {
-  auto lp     = Provider::GetLoggerProvider();
-  auto logger = lp->GetLogger("TestLogger");
+  auto lp = Provider::GetLoggerProvider();
+  const std::string schema_url{"https://opentelemetry.io/schemas/1.2.0"};
+  auto logger = lp->GetLogger("TestLogger", "", "library_name", "", schema_url);
 
   // Create a map to test the logs with
   std::map<std::string, std::string> m = {{"key1", "value1"}};
@@ -92,12 +95,20 @@ class TestLogger : public Logger
 // Define a basic LoggerProvider class that returns an instance of the logger class defined above
 class TestProvider : public LoggerProvider
 {
-  shared_ptr<Logger> GetLogger(string_view library_name, string_view options = "") override
+  nostd::shared_ptr<Logger> GetLogger(nostd::string_view logger_name,
+                                      nostd::string_view options,
+                                      nostd::string_view library_name,
+                                      nostd::string_view library_version = "",
+                                      nostd::string_view schema_url      = "") override
   {
     return shared_ptr<Logger>(new TestLogger());
   }
 
-  shared_ptr<Logger> GetLogger(string_view library_name, span<string_view> args) override
+  nostd::shared_ptr<Logger> GetLogger(nostd::string_view logger_name,
+                                      nostd::span<nostd::string_view> args,
+                                      nostd::string_view library_name,
+                                      nostd::string_view library_version = "",
+                                      nostd::string_view schema_url      = "") override
   {
     return shared_ptr<Logger>(new TestLogger());
   }
@@ -112,7 +123,8 @@ TEST(Logger, PushLoggerImplementation)
   auto lp = Provider::GetLoggerProvider();
 
   // Check that the implementation was pushed by calling TestLogger's GetName()
-  auto logger = lp->GetLogger("TestLogger");
+  nostd::string_view schema_url{"https://opentelemetry.io/schemas/1.2.0"};
+  auto logger = lp->GetLogger("TestLogger", "", "library_name", "", schema_url);
   ASSERT_EQ("test logger", logger->GetName());
 }
 #endif

@@ -9,6 +9,7 @@
 
 #  include "opentelemetry/proto/logs/v1/logs.pb.h"
 #  include "opentelemetry/proto/resource/v1/resource.pb.h"
+#  include "opentelemetry/sdk/instrumentationlibrary/instrumentation_library.h"
 
 #  include "opentelemetry/exporters/otlp/protobuf_include_suffix.h"
 // clang-format on
@@ -94,14 +95,25 @@ public:
    */
   virtual void SetTraceFlags(opentelemetry::trace::TraceFlags trace_flags) noexcept override;
 
+  /**
+   * Set instrumentation_library for this log.
+   * @param instrumentation_library the instrumentation library to set
+   */
+  void SetInstrumentationLibrary(
+      const opentelemetry::sdk::instrumentationlibrary::InstrumentationLibrary
+          &instrumentation_library) noexcept override;
+
+  /** Returns the associated instruementation library */
+  const opentelemetry::sdk::instrumentationlibrary::InstrumentationLibrary &
+  GetInstrumentationLibrary() const noexcept;
+
 private:
   proto::logs::v1::LogRecord log_record_;
   opentelemetry::sdk::common::AttributeMap resource_attributes_;
   // TODO shared resource
   // const opentelemetry::sdk::resource::Resource *resource_ = nullptr;
-  // TODO InstrumentationLibrary
-  // const opentelemetry::sdk::instrumentationlibrary::InstrumentationLibrary
-  //     *instrumentation_library_ = nullptr;
+  const opentelemetry::sdk::instrumentationlibrary::InstrumentationLibrary
+      *instrumentation_library_ = nullptr;
 };
 
 }  // namespace otlp
