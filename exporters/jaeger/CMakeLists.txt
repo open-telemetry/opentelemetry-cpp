@@ -67,4 +67,14 @@ if(BUILD_TESTING)
     TARGET jaeger_recordable_test
     TEST_PREFIX exporter.
     TEST_LIST jaeger_recordable_test)
+
+  add_executable(jaeger_exporter_test test/jaeger_exporter_test.cc)
+  target_link_libraries(
+    jaeger_exporter_test ${GTEST_BOTH_LIBRARIES} ${CMAKE_THREAD_LIBS_INIT}
+    opentelemetry_exporter_jaeger_trace)
+
+  gtest_add_tests(
+    TARGET jaeger_exporter_test
+    TEST_PREFIX exporter.
+    TEST_LIST jaeger_exporter_test)
 endif() # BUILD_TESTING
