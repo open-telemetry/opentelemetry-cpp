@@ -66,5 +66,12 @@ TEST(Provider, GetLogger)
   const std::string schema_url{"https://opentelemetry.io/schemas/1.2.0"};
   auto logger = tf->GetLogger("logger1", "", "library_name", "", schema_url);
   EXPECT_EQ(nullptr, logger);
+
+  // tests GetLogger(name, arguments)
+
+  std::array<nostd::string_view, 1> sv{"string"};
+  nostd::span<nostd::string_view> args{sv};
+  auto logger2 = tf->GetLogger("logger2", args, "lib_name", "", schema_url);
+  EXPECT_EQ(nullptr, logger2);
 }
 #endif

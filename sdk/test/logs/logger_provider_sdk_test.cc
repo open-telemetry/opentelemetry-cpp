@@ -59,6 +59,25 @@ TEST(LoggerProviderSDK, LoggerProviderGetLoggerSimple)
   ASSERT_EQ(sdk_logger3->GetInstrumentationLibrary(), sdk_logger1->GetInstrumentationLibrary());
 }
 
+TEST(LoggerProviderSDK, LoggerProviderLoggerArguments)
+{
+  // Currently, arguments are not supported by the loggers.
+  // TODO: Once the logging spec defines what arguments are allowed, add more
+  // detail to this test
+  auto lp = std::shared_ptr<logs_api::LoggerProvider>(new LoggerProvider());
+
+  nostd::string_view schema_url{"https://opentelemetry.io/schemas/1.2.0"};
+  auto logger1 = lp->GetLogger("logger1", "", "lib_name", "", schema_url);
+
+  // Check GetLogger(logger_name, args)
+  std::array<nostd::string_view, 1> sv{"string"};
+  nostd::span<nostd::string_view> args{sv};
+  auto logger2     = lp->GetLogger("logger2", args, "lib_name", "", schema_url);
+  auto sdk_logger1 = static_cast<opentelemetry::sdk::logs::Logger *>(logger1.get());
+  auto sdk_logger2 = static_cast<opentelemetry::sdk::logs::Logger *>(logger2.get());
+  ASSERT_EQ(sdk_logger2->GetInstrumentationLibrary(), sdk_logger1->GetInstrumentationLibrary());
+}
+
 class DummyProcessor : public LogProcessor
 {
   std::unique_ptr<Recordable> MakeRecordable() noexcept

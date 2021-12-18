@@ -211,13 +211,6 @@ public:
     config_.encoding = ETWProvider::EventFormat::ETW_MANIFEST;
   }
 
-  /**
-   * @brief Obtain ETW Tracer.
-   * @param name ProviderId (instrumentation name) - Name or GUID
-   *
-   * @param version Library version
-   * @return
-   */
   nostd::shared_ptr<opentelemetry::logs::Logger> GetLogger(
       nostd::string_view logger_name,
       nostd::string_view options,
@@ -234,6 +227,19 @@ public:
         new (std::nothrow) etw::Logger(*this, logger_name, evtFmt)};
   }
 
+  /**
+   * @brief Obtain ETW Tracer.
+   * @param name ProviderId (instrumentation name) - Name or GUID
+   * @param args Additional arguments that controls `codec` of the provider.
+   * Possible values are:
+   * - "ETW"            - 'classic' Trace Logging Dynamic manifest ETW events.
+   * - "MSGPACK"        - MessagePack-encoded binary payload ETW events.
+   * - "XML"            - XML events (reserved for future use)
+   * @param library_name Library name
+   * @param version Library version
+   * @param schema_url schema URL
+   * @return
+   */
   nostd::shared_ptr<opentelemetry::logs::Logger> GetLogger(
       nostd::string_view logger_name,
       nostd::span<nostd::string_view> args,
