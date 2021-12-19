@@ -98,6 +98,12 @@ void ZipkinExporter::InitializeLocalEndpoint()
   local_end_point_["port"] = url_parser_.port_;
 }
 
+bool ZipkinExporter::Shutdown(std::chrono::microseconds timeout) noexcept
+{
+  isShutdown_ = true;
+  return true;
+}
+
 }  // namespace zipkin
 }  // namespace exporter
 OPENTELEMETRY_END_NAMESPACE
