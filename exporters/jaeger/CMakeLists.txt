@@ -69,9 +69,21 @@ if(BUILD_TESTING)
     TEST_LIST jaeger_recordable_test)
 
   add_executable(jaeger_exporter_test test/jaeger_exporter_test.cc)
+  add_definitions(-DGTEST_LINKED_AS_SHARED_LIBRARY=1)
+  if(GMOCK_LIB)
+    unset(GMOCK_LIB CACHE)
+  endif()
+  if(MSVC AND CMAKE_BUILD_TYPE STREQUAL "Debug")
+    find_library(GMOCK_LIB gmockd PATH_SUFFIXES lib)
+  else()
+    find_library(GMOCK_LIB gmock PATH_SUFFIXES lib)
+  endif()
   target_link_libraries(
     jaeger_exporter_test ${GTEST_BOTH_LIBRARIES} ${CMAKE_THREAD_LIBS_INIT}
-    opentelemetry_exporter_jaeger_trace)
+    ${GMOCK_LIB} opentelemetry_exporter_jaeger_trace)
+
+  target_include_directories(jaeger_exporter_test
+                             PRIVATE ${CMAKE_CURRENT_LIST_DIR}/src)
 
   gtest_add_tests(
     TARGET jaeger_exporter_test

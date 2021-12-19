@@ -8,7 +8,7 @@
 #ifdef BAZEL_BUILD
 #  include "exporters/jaeger/src/thrift_sender.h"
 #else
-#  include "src/thrift_sender.h"
+#  include "thrift_sender.h"
 #endif
 
 #include <gtest/gtest.h>
