@@ -89,6 +89,12 @@ void JaegerExporter::InitializeEndpoint()
   assert(false);
 }
 
+bool JaegerExporter::Shutdown(std::chrono::microseconds timeout) noexcept
+{
+  is_shutdown_ = true;
+  return true;
+}
+
 }  // namespace jaeger
 }  // namespace exporter
 OPENTELEMETRY_END_NAMESPACE
