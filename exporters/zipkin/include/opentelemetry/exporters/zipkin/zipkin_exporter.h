@@ -82,10 +82,7 @@ public:
    * @param timeout an optional timeout, default to max.
    */
   bool Shutdown(
-      std::chrono::microseconds timeout = std::chrono::microseconds::max()) noexcept override
-  {
-    return true;
-  }
+      std::chrono::microseconds timeout = std::chrono::microseconds::max()) noexcept override;
 
 private:
   void InitializeLocalEndpoint();
