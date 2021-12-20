@@ -15,13 +15,14 @@
 #include "opentelemetry/common/string_util.h"
 #include "opentelemetry/version.h"
 
+#define OTEL_GET_RESOURCE_ATTR(name) \
+  opentelemetry::sdk::resource::attr(OTEL_CPP_CONST_HASHCODE(name))
+
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace sdk
 {
 namespace resource
 {
-
-#define OTEL_CPP_GET_ATTR(name) attr(OTEL_CPP_CONST_HASHCODE(name))
 
 static const std::unordered_map<uint32_t, const char *> attribute_ids = {
     {OTEL_CPP_CONST_HASHCODE(AttrServiceName), "service.name"},

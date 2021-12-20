@@ -216,9 +216,9 @@ void Recordable::SetResource(const sdk::resource::Resource &resource) noexcept
 {
   // only service.name attribute is supported by specs as of now.
   auto attributes = resource.GetAttributes();
-  if (attributes.find(OTEL_CPP_GET_ATTR(AttrServiceName)) != attributes.end())
+  if (attributes.find(OTEL_GET_RESOURCE_ATTR(AttrServiceName)) != attributes.end())
   {
-    service_name_ = nostd::get<std::string>(attributes[OTEL_CPP_GET_ATTR(AttrServiceName)]);
+    service_name_ = nostd::get<std::string>(attributes[OTEL_GET_RESOURCE_ATTR(AttrServiceName)]);
   }
 }
 

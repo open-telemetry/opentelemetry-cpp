@@ -46,11 +46,11 @@ public:
     std::string span_name = "GreeterClient/Greet";
     auto span             = get_tracer("grpc")->StartSpan(
         span_name,
-        {{OTEL_CPP_GET_ATTR(AttrRpcSystem), "grpc"},
-         {OTEL_CPP_GET_ATTR(AttrRpcService), "grpc-example.GreetService"},
-         {OTEL_CPP_GET_ATTR(AttrRpcMethod), "Greet"},
-         {OTEL_CPP_GET_ATTR(AttrNetPeerIp), ip},
-         {OTEL_CPP_GET_ATTR(AttrNetPeerPort), port}},
+        {{OTEL_GET_TRACE_ATTR(AttrRpcSystem), "grpc"},
+         {OTEL_GET_TRACE_ATTR(AttrRpcService), "grpc-example.GreetService"},
+         {OTEL_GET_TRACE_ATTR(AttrRpcMethod), "Greet"},
+         {OTEL_GET_TRACE_ATTR(AttrNetPeerIp), ip},
+         {OTEL_GET_TRACE_ATTR(AttrNetPeerPort), port}},
         options);
 
     auto scope = get_tracer("grpc-client")->WithActiveSpan(span);
@@ -66,7 +66,7 @@ public:
     if (status.ok())
     {
       span->SetStatus(StatusCode::kOk);
-      span->SetAttribute(OTEL_CPP_GET_ATTR(AttrRpcGrpcStatusCode), status.error_code());
+      span->SetAttribute(OTEL_GET_TRACE_ATTR(AttrRpcGrpcStatusCode), status.error_code());
       // Make sure to end your spans!
       span->End();
       return response.response();
@@ -75,7 +75,7 @@ public:
     {
       std::cout << status.error_code() << ": " << status.error_message() << std::endl;
       span->SetStatus(StatusCode::kError);
-      span->SetAttribute(OTEL_CPP_GET_ATTR(AttrRpcGrpcStatusCode), status.error_code());
+      span->SetAttribute(OTEL_GET_TRACE_ATTR(AttrRpcGrpcStatusCode), status.error_code());
       // Make sure to end your spans!
       span->End();
       return "RPC failed";
