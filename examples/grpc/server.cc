@@ -66,10 +66,10 @@ public:
     std::string span_name = "GreeterService/Greet";
     auto span =
         get_tracer("grpc")->StartSpan(span_name,
-                                      {{OTEL_CPP_GET_ATTR(AttrRpcSystem), "grpc"},
-                                       {OTEL_CPP_GET_ATTR(AttrRpcService), "GreeterService"},
-                                       {OTEL_CPP_GET_ATTR(AttrRpcMethod), "Greet"},
-                                       {OTEL_CPP_GET_ATTR(AttrRpcGrpcStatusCode), 0}},
+                                      {{OTEL_GET_TRACE_ATTR(AttrRpcSystem), "grpc"},
+                                       {OTEL_GET_TRACE_ATTR(AttrRpcService), "GreeterService"},
+                                       {OTEL_GET_TRACE_ATTR(AttrRpcMethod), "Greet"},
+                                       {OTEL_GET_TRACE_ATTR(AttrRpcGrpcStatusCode), 0}},
                                       options);
     auto scope = get_tracer("grpc")->WithActiveSpan(span);
 
