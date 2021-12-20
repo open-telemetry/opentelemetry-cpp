@@ -47,4 +47,15 @@ if(BUILD_TESTING)
     TARGET zipkin_recordable_test
     TEST_PREFIX exporter.
     TEST_LIST zipkin_recordable_test)
+
+  add_executable(zipkin_exporter_test test/zipkin_exporter_test.cc)
+
+  target_link_libraries(
+    zipkin_exporter_test ${GTEST_BOTH_LIBRARIES} ${CMAKE_THREAD_LIBS_INIT}
+    opentelemetry_exporter_zipkin_trace opentelemetry_resources)
+
+  gtest_add_tests(
+    TARGET zipkin_exporter_test
+    TEST_PREFIX exporter.
+    TEST_LIST zipkin_exporter_test)
 endif() # BUILD_TESTING

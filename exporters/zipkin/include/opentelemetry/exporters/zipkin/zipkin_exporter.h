@@ -94,6 +94,7 @@ private:
   std::shared_ptr<opentelemetry::ext::http::client::HttpClientSync> http_client_;
   opentelemetry::ext::http::common::UrlParser url_parser_;
   nlohmann::json local_end_point_;
+  friend class ZipkinExporterTestPeer;
 };
 }  // namespace zipkin
 }  // namespace exporter
