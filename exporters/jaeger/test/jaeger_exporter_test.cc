@@ -52,7 +52,7 @@ public:
 TEST_F(JaegerExporterTestPeer, ShutdownTest)
 {
   auto mock_thrift_sender = new MockThriftSender;
-  auto exporter          = GetExporter(std::unique_ptr<ThriftSender>{mock_thrift_sender});
+  auto exporter           = GetExporter(std::unique_ptr<ThriftSender>{mock_thrift_sender});
 
   auto recordable_1 = exporter->MakeRecordable();
   recordable_1->SetName("Test span 1");
@@ -76,7 +76,7 @@ TEST_F(JaegerExporterTestPeer, ShutdownTest)
 TEST_F(JaegerExporterTestPeer, ExportTest)
 {
   auto mock_thrift_sender = new MockThriftSender;
-  auto exporter          = GetExporter(std::unique_ptr<ThriftSender>{mock_thrift_sender});
+  auto exporter           = GetExporter(std::unique_ptr<ThriftSender>{mock_thrift_sender});
 
   auto recordable_1 = exporter->MakeRecordable();
   recordable_1->SetName("Test span 1");
