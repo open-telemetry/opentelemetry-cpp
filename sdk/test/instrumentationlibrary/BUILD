@@ -5,6 +5,7 @@ cc_test(
     srcs = [
         "instrumentationlibrary_test.cc",
     ],
+    tags = ["test"],
     deps = [
         "//api",
         "//sdk:headers",
