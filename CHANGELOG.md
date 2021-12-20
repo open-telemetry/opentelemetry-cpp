@@ -14,7 +14,7 @@ Increment the:
 * PATCH version when you make backwards compatible bug fixes.
 
 ## [Unreleased]
- 
+
 ## [1.1.1] 2021-12-20
 
 * [SDK] Default resource attributes and attributes in OTEL_RESOURCE_ATTRIBUTES are missing when using Otlp*LogExporter ([#1082](https://github.com/open-telemetry/opentelemetry-cpp/pull/1082))
@@ -33,7 +33,6 @@ Increment the:
 * [EXAMPLE] Otlp gRPC log example ([#1083](https://github.com/open-telemetry/opentelemetry-cpp/pull/1083))
 * [BUILD] C++20 not Building with VS2019 ([#1144](https://github.com/open-telemetry/opentelemetry-cpp/pull/1144))
 * [BUILD] Mark tags to bazel targets([#1075](https://github.com/open-telemetry/opentelemetry-cpp/pull/1075))
-
 
 ## [1.1.0] 2021-11-19
 
