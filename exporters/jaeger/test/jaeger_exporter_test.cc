@@ -51,8 +51,8 @@ public:
 
 TEST_F(JaegerExporterTestPeer, ShutdownTest)
 {
-  auto mock_thrift_ender = new MockThriftSender;
-  auto exporter          = GetExporter(std::unique_ptr<ThriftSender>{mock_thrift_ender});
+  auto mock_thrift_sender = new MockThriftSender;
+  auto exporter          = GetExporter(std::unique_ptr<ThriftSender>{mock_thrift_sender});
 
   auto recordable_1 = exporter->MakeRecordable();
   recordable_1->SetName("Test span 1");
@@ -61,7 +61,7 @@ TEST_F(JaegerExporterTestPeer, ShutdownTest)
 
   // exporter shuold not be shutdown by default
   nostd::span<std::unique_ptr<sdk::trace::Recordable>> batch_1(&recordable_1, 1);
-  EXPECT_CALL(*mock_thrift_ender, Append(_)).Times(Exactly(1)).WillOnce(Return(1));
+  EXPECT_CALL(*mock_thrift_sender, Append(_)).Times(Exactly(1)).WillOnce(Return(1));
   auto result = exporter->Export(batch_1);
   EXPECT_EQ(sdk_common::ExportResult::kSuccess, result);
 
@@ -75,8 +75,8 @@ TEST_F(JaegerExporterTestPeer, ShutdownTest)
 // Call Export() directly
 TEST_F(JaegerExporterTestPeer, ExportTest)
 {
-  auto mock_thrift_ender = new MockThriftSender;
-  auto exporter          = GetExporter(std::unique_ptr<ThriftSender>{mock_thrift_ender});
+  auto mock_thrift_sender = new MockThriftSender;
+  auto exporter          = GetExporter(std::unique_ptr<ThriftSender>{mock_thrift_sender});
 
   auto recordable_1 = exporter->MakeRecordable();
   recordable_1->SetName("Test span 1");
@@ -85,13 +85,13 @@ TEST_F(JaegerExporterTestPeer, ExportTest)
 
   // Test successful send
   nostd::span<std::unique_ptr<sdk::trace::Recordable>> batch_1(&recordable_1, 1);
-  EXPECT_CALL(*mock_thrift_ender, Append(_)).Times(Exactly(1)).WillOnce(Return(1));
+  EXPECT_CALL(*mock_thrift_sender, Append(_)).Times(Exactly(1)).WillOnce(Return(1));
   auto result = exporter->Export(batch_1);
   EXPECT_EQ(sdk_common::ExportResult::kSuccess, result);
 
   // Test failed send
   nostd::span<std::unique_ptr<sdk::trace::Recordable>> batch_2(&recordable_2, 1);
-  EXPECT_CALL(*mock_thrift_ender, Append(_)).Times(Exactly(1)).WillOnce(Return(0));
+  EXPECT_CALL(*mock_thrift_sender, Append(_)).Times(Exactly(1)).WillOnce(Return(0));
   result = exporter->Export(batch_2);
   EXPECT_EQ(sdk::common::ExportResult::kFailure, result);
 }
