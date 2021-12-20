@@ -23,9 +23,14 @@ You can link OpenTelemetry C++ SDK with libraries provided in [dependencies.md](
   unittests. We use CMake version 3.15.2 in our build system. To install CMake,
   consult the [Installing CMake](https://cmake.org/install/) guide.
 - [GoogleTest](https://github.com/google/googletest) framework to build and run
-  the unittests. We use GoogleTest version 1.10.0 in our build system. To
+  the unittests. Refer to [third_party_release](https://github.com/open-telemetry/opentelemetry-cpp/blob/main/third_party_release#L5)
+  for version of GoogleTest used in CI. To
   install GoogleTest, consult the [GoogleTest Build
   Instructions](https://github.com/google/googletest/blob/master/googletest/README.md#generic-build-instructions).
+- [Google Benchmark](https://github.com/google/benchmark) framework to build and run
+  benchmark tests. Refer to [third_party_release](https://github.com/open-telemetry/opentelemetry-cpp/blob/main/third_party_release#L4)
+  for version of Benchmark used in CI. To install Benchmark,
+  consult the [GoogleBenchmark Build Instructions](https://github.com/google/benchmark#installation).
 - Apart from above core requirements, the Exporters and Propagators have their
   build dependencies which are not covered here. E.g, Otlp Exporter needs
   grpc/protobuf library, Zipkin exporter needs nlohmann-json and libcurl, ETW
@@ -139,7 +144,8 @@ target_link_libraries(foo PRIVATE ${OPENTELEMETRY_CPP_LIBRARIES})
 
 ## Build instructions using Bazel
 
-NOTE: Experimental, and not supported for all the components.
+NOTE: Experimental, and not supported for all the components. Make sure the
+[GoogleTest](https://github.com/google/googletest) installation may fail if there is a different version of googletest already installed in system-defined path.
 
 ### Prerequisites for Bazel
 
@@ -172,9 +178,10 @@ To install Bazel, consult the [Installing Bazel](https://docs.bazel.build/versio
    $
    ```
 
-2. Download the dependencies and build the source code:
+2. Navigate to the repository cloned above, download the dependencies and build the source code:
 
    ```console
+   $ cd opentelemtry-cpp
    $ bazel build //...
    bazel build -- //... -//exporters/otlp/... -//exporters/prometheus/...
    Extracting Bazel installation...
