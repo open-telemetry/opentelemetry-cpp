@@ -20,10 +20,6 @@ namespace sdktrace   = opentelemetry::sdk::trace;
 namespace common     = opentelemetry::common;
 namespace sdk_common = opentelemetry::sdk::common;
 
-using namespace jaegertracing;
-using namespace opentelemetry::exporter::jaeger;
-using namespace opentelemetry::sdk::instrumentationlibrary;
-using std::vector;
 using namespace testing;
 
 OPENTELEMETRY_BEGIN_NAMESPACE
