@@ -5,12 +5,14 @@
 
 #  include "opentelemetry/exporters/zipkin/zipkin_exporter.h"
 #  include <string>
+#  include "opentelemetry/ext/http/client/curl/http_client_curl.h"
 #  include "opentelemetry/ext/http/server/http_server.h"
 #  include "opentelemetry/sdk/trace/batch_span_processor.h"
 #  include "opentelemetry/sdk/trace/tracer_provider.h"
 #  include "opentelemetry/trace/provider.h"
 
 #  include <gtest/gtest.h>
+#  include "gmock/gmock.h"
 
 #  include "nlohmann/json.hpp"
 
@@ -19,6 +21,7 @@
 using opentelemetry::sdk::common::setenv;
 using opentelemetry::sdk::common::unsetenv;
 #  endif
+namespace sdk_common = opentelemetry::sdk::common;
 using namespace testing;
 
 OPENTELEMETRY_BEGIN_NAMESPACE
@@ -154,11 +157,32 @@ public:
     return std::unique_ptr<sdk::trace::SpanExporter>(new ZipkinExporter(opts));
   }
 
+  std::unique_ptr<sdk::trace::SpanExporter> GetExporter(
+      std::shared_ptr<opentelemetry::ext::http::client::HttpClientSync> http_client)
+  {
+    return std::unique_ptr<sdk::trace::SpanExporter>(new ZipkinExporter(http_client));
+  }
+
   // Get the options associated with the given exporter.
   const ZipkinExporterOptions &GetOptions(std::unique_ptr<ZipkinExporter> &exporter)
   {
     return exporter->options_;
   }
+};
+
+class MockHttpClient : public opentelemetry::ext::http::client::HttpClientSync
+{
+public:
+  MOCK_METHOD(ext::http::client::Result,
+              Post,
+              (const nostd::string_view &,
+               const ext::http::client::Body &,
+               const ext::http::client::Headers &),
+              (noexcept, override));
+  MOCK_METHOD(ext::http::client::Result,
+              Get,
+              (const nostd::string_view &, const ext::http::client::Headers &),
+              (noexcept, override));
 };
 
 // Create spans, let processor call Export()
@@ -225,6 +249,34 @@ TEST_F(ZipkinExporterTestPeer, ExportJsonIntegrationTest)
       EXPECT_EQ("Custom-Header-Value", custom_header->second);
     }
   }
+}
+
+// Create spans, let processor call Export()
+TEST_F(ZipkinExporterTestPeer, ShutdownTest)
+{
+  auto mock_http_client = new MockHttpClient;
+  auto exporter         = GetExporter(
+      std::shared_ptr<opentelemetry::ext::http::client::HttpClientSync>{mock_http_client});
+  auto recordable_1 = exporter->MakeRecordable();
+  recordable_1->SetName("Test span 1");
+  auto recordable_2 = exporter->MakeRecordable();
+  recordable_2->SetName("Test span 2");
+
+  // exporter shuold not be shutdown by default
+  nostd::span<std::unique_ptr<sdk::trace::Recordable>> batch_1(&recordable_1, 1);
+  EXPECT_CALL(*mock_http_client, Post(_, _, _))
+      .Times(Exactly(1))
+      .WillOnce(Return(ByMove(std::move(ext::http::client::Result{
+          std::unique_ptr<ext::http::client::Response>{new ext::http::client::curl::Response()},
+          ext::http::client::SessionState::Response}))));
+  auto result = exporter->Export(batch_1);
+  EXPECT_EQ(sdk_common::ExportResult::kSuccess, result);
+
+  exporter->Shutdown();
+
+  nostd::span<std::unique_ptr<sdk::trace::Recordable>> batch_2(&recordable_2, 1);
+  result = exporter->Export(batch_2);
+  EXPECT_EQ(sdk_common::ExportResult::kFailure, result);
 }
 
 // Test exporter configuration options

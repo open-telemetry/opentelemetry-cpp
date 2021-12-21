@@ -94,7 +94,14 @@ private:
   std::shared_ptr<opentelemetry::ext::http::client::HttpClientSync> http_client_;
   opentelemetry::ext::http::common::UrlParser url_parser_;
   nlohmann::json local_end_point_;
+  // For testing
   friend class ZipkinExporterTestPeer;
+  /**
+   * Create an ZipkinExporter using the specified thrift sender.
+   * Only tests can call this constructor directly.
+   * @param http_client the http client to be used for exporting
+   */
+  ZipkinExporter(std::shared_ptr<opentelemetry::ext::http::client::HttpClientSync> http_client);
 };
 }  // namespace zipkin
 }  // namespace exporter
