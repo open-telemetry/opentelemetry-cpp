@@ -1,8 +1,6 @@
 // Copyright The OpenTelemetry Authors
 // SPDX-License-Identifier: Apache-2.0
 
-#pragma once
-
 #ifdef ENABLE_LOGS_PREVIEW
 
 #  include "opentelemetry/sdk/logs/multi_recordable.h"
@@ -90,12 +88,11 @@ void MultiRecordable::SetBody(nostd::string_view message) noexcept
   }
 }
 
-void MultiRecordable::SetResource(nostd::string_view key,
-                                  const opentelemetry::common::AttributeValue &value) noexcept
+void MultiRecordable::SetResource(const opentelemetry::sdk::resource::Resource &resource) noexcept
 {
   for (auto &recordable : recordables_)
   {
-    recordable.second->SetResource(key, value);
+    recordable.second->SetResource(resource);
   }
 }
 

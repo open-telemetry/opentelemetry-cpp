@@ -10,7 +10,8 @@ add_library(
 
 set_target_properties(opentelemetry_logs PROPERTIES EXPORT_NAME logs)
 
-target_link_libraries(opentelemetry_logs opentelemetry_common)
+target_link_libraries(opentelemetry_logs PUBLIC opentelemetry_resources
+                                                opentelemetry_common)
 
 target_include_directories(
   opentelemetry_logs

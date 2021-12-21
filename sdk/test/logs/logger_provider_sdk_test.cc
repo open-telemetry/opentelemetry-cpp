@@ -79,15 +79,11 @@ class DummyProcessor : public LogProcessor
   }
 };
 
-TEST(LoggerProviderSDK, GetAndSetProcessor)
+TEST(LoggerProviderSDK, GetResource)
 {
   // Create a LoggerProvider without a processor
-  LoggerProvider lp;
-  ASSERT_EQ(lp.GetProcessor(), nullptr);
-
-  // Create a new processor and check if it is pushed correctly
-  std::shared_ptr<LogProcessor> proc2 = std::shared_ptr<LogProcessor>(new DummyProcessor());
-  lp.SetProcessor(proc2);
-  ASSERT_EQ(proc2, lp.GetProcessor());
+  auto resource = opentelemetry::sdk::resource::Resource::Create({{"key", "value"}});
+  LoggerProvider lp{nullptr, resource};
+  ASSERT_EQ(nostd::get<std::string>(lp.GetResource().GetAttributes().at("key")), "value");
 }
 #endif

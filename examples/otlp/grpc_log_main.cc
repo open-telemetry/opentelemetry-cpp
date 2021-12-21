@@ -44,11 +44,10 @@ void InitTracer()
 void InitLogger()
 {
   // Create OTLP exporter instance
-  auto exporter  = std::unique_ptr<logs_sdk::LogExporter>(new otlp::OtlpGrpcLogExporter(opts));
-  auto processor = std::shared_ptr<logs_sdk::LogProcessor>(
-      new logs_sdk::SimpleLogProcessor(std::move(exporter)));
-  auto sdkProvider = std::shared_ptr<logs_sdk::LoggerProvider>(new logs_sdk::LoggerProvider());
-  sdkProvider->SetProcessor(processor);
+  auto exporter    = std::unique_ptr<logs_sdk::LogExporter>(new otlp::OtlpGrpcLogExporter(opts));
+  auto sdkProvider = std::shared_ptr<logs_sdk::LoggerProvider>(
+      new logs_sdk::LoggerProvider(std::unique_ptr<logs_sdk::LogProcessor>(
+          new logs_sdk::SimpleLogProcessor(std::move(exporter)))));
   auto apiProvider = nostd::shared_ptr<logs::LoggerProvider>(sdkProvider);
   auto provider    = nostd::shared_ptr<logs::LoggerProvider>(apiProvider);
   opentelemetry::logs::Provider::SetLoggerProvider(provider);

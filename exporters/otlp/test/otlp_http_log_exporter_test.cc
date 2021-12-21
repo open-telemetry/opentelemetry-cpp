@@ -208,7 +208,7 @@ TEST_F(OtlpHttpLogExporterTestPeer, ExportJsonIntegrationTest)
   std::string resource_storage_string_value[] = {"vector", "string"};
 
   auto provider = nostd::shared_ptr<sdk::logs::LoggerProvider>(new sdk::logs::LoggerProvider());
-  provider->SetProcessor(std::unique_ptr<sdk::logs::LogProcessor>(
+  provider->AddProcessor(std::unique_ptr<sdk::logs::LogProcessor>(
       new sdk::logs::BatchLogProcessor(std::move(exporter), 5, std::chrono::milliseconds(256), 1)));
 
   std::string report_trace_id;
@@ -301,7 +301,7 @@ TEST_F(OtlpHttpLogExporterTestPeer, ExportBinaryIntegrationTest)
   std::string resource_storage_string_value[] = {"vector", "string"};
 
   auto provider = nostd::shared_ptr<sdk::logs::LoggerProvider>(new sdk::logs::LoggerProvider());
-  provider->SetProcessor(std::unique_ptr<sdk::logs::LogProcessor>(
+  provider->AddProcessor(std::unique_ptr<sdk::logs::LogProcessor>(
       new sdk::logs::BatchLogProcessor(std::move(exporter), 5, std::chrono::milliseconds(256), 1)));
 
   std::string report_trace_id;

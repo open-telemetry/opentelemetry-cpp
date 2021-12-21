@@ -123,7 +123,7 @@ TEST_F(OtlpGrpcLogExporterTestPeer, ExportIntegrationTest)
   std::string resource_storage_string_value[] = {"vector", "string"};
 
   auto provider = nostd::shared_ptr<sdk::logs::LoggerProvider>(new sdk::logs::LoggerProvider());
-  provider->SetProcessor(std::unique_ptr<sdk::logs::LogProcessor>(
+  provider->AddProcessor(std::unique_ptr<sdk::logs::LogProcessor>(
       new sdk::logs::BatchLogProcessor(std::move(exporter), 5, std::chrono::milliseconds(256), 1)));
 
   EXPECT_CALL(*mock_stub, Export(_, _, _))

@@ -157,7 +157,8 @@ TEST(OStreamLogExporter, LogWithStringAttributesToCerr)
   auto record = exporter->MakeRecordable();
 
   // Set resources for this log record only of type <string, string>
-  record->SetResource("key1", "val1");
+  auto resource = opentelemetry::sdk::resource::Resource::Create({{"key1", "val1"}});
+  record->SetResource(resource);
 
   // Set attributes to this log record of type <string, AttributeValue>
   record->SetAttribute("a", true);
@@ -206,7 +207,9 @@ TEST(OStreamLogExporter, LogWithVariantTypesToClog)
   // Set resources for this log record of only integer types as the value
   std::array<int, 3> array1 = {1, 2, 3};
   nostd::span<int> data1{array1.data(), array1.size()};
-  record->SetResource("res1", data1);
+
+  auto resource = opentelemetry::sdk::resource::Resource::Create({{"res1", data1}});
+  record->SetResource(resource);
 
   // Set resources for this log record of bool types as the value
   // e.g. key/value is a par of type <string, array of bools>
@@ -242,11 +245,10 @@ TEST(OStreamLogExporter, LogWithVariantTypesToClog)
 TEST(OStreamLogExporter, IntegrationTest)
 {
   // Initialize a logger
-  auto exporter = std::unique_ptr<sdklogs::LogExporter>(new exporterlogs::OStreamLogExporter);
-  auto processor =
-      std::shared_ptr<sdklogs::LogProcessor>(new sdklogs::SimpleLogProcessor(std::move(exporter)));
+  auto exporter    = std::unique_ptr<sdklogs::LogExporter>(new exporterlogs::OStreamLogExporter);
   auto sdkProvider = std::shared_ptr<sdklogs::LoggerProvider>(new sdklogs::LoggerProvider());
-  sdkProvider->SetProcessor(processor);
+  sdkProvider->AddProcessor(
+      std::unique_ptr<sdklogs::LogProcessor>(new sdklogs::SimpleLogProcessor(std::move(exporter))));
   auto apiProvider = nostd::shared_ptr<logs_api::LoggerProvider>(sdkProvider);
   auto provider    = nostd::shared_ptr<logs_api::LoggerProvider>(apiProvider);
   logs_api::Provider::SetLoggerProvider(provider);

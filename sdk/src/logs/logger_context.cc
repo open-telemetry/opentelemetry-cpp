@@ -1,8 +1,6 @@
 // Copyright The OpenTelemetry Authors
 // SPDX-License-Identifier: Apache-2.0
 
-#pragma once
-
 #ifdef ENABLE_LOGS_PREVIEW
 
 #  include "opentelemetry/sdk/logs/logger_context.h"

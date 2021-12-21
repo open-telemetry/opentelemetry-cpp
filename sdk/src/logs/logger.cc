@@ -16,8 +16,8 @@ namespace trace_api = opentelemetry::trace;
 namespace nostd     = opentelemetry::nostd;
 namespace common    = opentelemetry::common;
 
-Logger::Logger(nostd::string_view name, std::shared_ptr<LoggerProvider> logger_provider) noexcept
-    : logger_name_(std::string(name)), logger_provider_(logger_provider)
+Logger::Logger(nostd::string_view name, std::shared_ptr<LoggerContext> context) noexcept
+    : logger_name_(std::string(name)), context_(context)
 {}
 
 const nostd::string_view Logger::GetName() noexcept
@@ -41,15 +41,16 @@ void Logger::Log(opentelemetry::logs::Severity severity,
                  common::SystemTimestamp timestamp) noexcept
 {
   // If this logger does not have a processor, no need to create a log record
-  auto processor = logger_provider_.lock()->GetProcessor();
-  if (processor == nullptr)
+  auto context = context_.lock();
+  if (!context)
   {
     return;
   }
+  auto &processor = context->GetProcessor();
 
   // TODO: Sampler (should include check for minSeverity)
 
-  auto recordable = processor->MakeRecordable();
+  auto recordable = processor.MakeRecordable();
   if (recordable == nullptr)
   {
     OTEL_INTERNAL_LOG_ERROR("[LOGGER] Recordable creation failed");
@@ -62,10 +63,7 @@ void Logger::Log(opentelemetry::logs::Severity severity,
   recordable->SetName(name);
   recordable->SetBody(body);
 
-  resource.ForEachKeyValue([&](nostd::string_view key, common::AttributeValue value) noexcept {
-    recordable->SetResource(key, value);
-    return true;
-  });
+  recordable->SetResource(context->GetResource());
 
   attributes.ForEachKeyValue([&](nostd::string_view key, common::AttributeValue value) noexcept {
     recordable->SetAttribute(key, value);
@@ -111,7 +109,7 @@ void Logger::Log(opentelemetry::logs::Severity severity,
   }
 
   // Send the log record to the processor
-  processor->OnReceive(std::move(recordable));
+  processor.OnReceive(std::move(recordable));
 }
 
 }  // namespace logs

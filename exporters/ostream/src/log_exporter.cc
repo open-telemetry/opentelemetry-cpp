@@ -153,7 +153,7 @@ sdk::common::ExportResult OStreamLogExporter::Export(
           << "  body          : " << log_record->GetBody() << "\n"
           << "  resource      : ";
 
-    printMap(log_record->GetResource(), sout_);
+    printMap(log_record->GetResource().GetAttributes(), sout_);
 
     sout_ << "\n"
           << "  attributes    : ";

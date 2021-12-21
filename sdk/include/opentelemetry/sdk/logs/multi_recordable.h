@@ -54,12 +54,10 @@ public:
   void SetBody(nostd::string_view message) noexcept override;
 
   /**
-   * Set a single resource of a log record.
-   * @param key the name of the resource to set
-   * @param value the resource value to set
+   * Set Resource of this log
+   * @param Resource the resource to set
    */
-  void SetResource(nostd::string_view key,
-                   const opentelemetry::common::AttributeValue &value) noexcept override;
+  void SetResource(const opentelemetry::sdk::resource::Resource &resource) noexcept override;
 
   /**
    * Set an attribute of a log.

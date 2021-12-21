@@ -5,8 +5,8 @@
 #ifdef ENABLE_LOGS_PREVIEW
 
 #  include "opentelemetry/logs/logger.h"
+#  include "opentelemetry/sdk/logs/logger_context.h"
 #  include "opentelemetry/sdk/logs/logger_provider.h"
-#  include "opentelemetry/sdk/logs/processor.h"
 
 #  include <vector>
 
@@ -26,7 +26,7 @@ public:
    * @param logger_provider The logger provider that owns this logger.
    */
   explicit Logger(opentelemetry::nostd::string_view name,
-                  std::shared_ptr<LoggerProvider> logger_provider) noexcept;
+                  std::shared_ptr<LoggerContext> logger_provider) noexcept;
 
   /**
    * Returns the name of this logger.
@@ -63,7 +63,7 @@ private:
 
   // The logger provider of this Logger. Uses a weak_ptr to avoid cyclic dependency issues the with
   // logger provider
-  std::weak_ptr<LoggerProvider> logger_provider_;
+  std::weak_ptr<LoggerContext> context_;
 };
 
 }  // namespace logs
