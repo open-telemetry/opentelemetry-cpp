@@ -12,11 +12,11 @@
 #include "opentelemetry/common/string_util.h"
 #include "opentelemetry/version.h"
 
+#define OTEL_GET_TRACE_ATTR(name) opentelemetry::trace::attr(OTEL_CPP_CONST_HASHCODE(name))
+
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace trace
 {
-
-#define OTEL_CPP_GET_ATTR(name) attr(OTEL_CPP_CONST_HASHCODE(name))
 
 /**
  * Stores the Constants for semantic kAttribute names outlined by the OpenTelemetry specifications.
