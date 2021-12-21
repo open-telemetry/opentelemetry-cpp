@@ -67,6 +67,10 @@ private:
   uint32_t byte_buffer_size_   = 0;
   uint32_t process_bytes_size_ = 0;
   uint32_t max_span_bytes_     = 0;
+  friend class MockThriftSender;
+
+protected:
+  ThriftSender() = default;
 };
 
 }  // namespace jaeger
