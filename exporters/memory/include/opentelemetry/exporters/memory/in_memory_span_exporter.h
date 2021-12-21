@@ -42,6 +42,10 @@ public:
   sdk::common::ExportResult Export(
       const nostd::span<std::unique_ptr<sdk::trace::Recordable>> &recordables) noexcept override
   {
+    if (is_shutdown_)
+    {
+      return sdk::common::ExportResult::kFailure;
+    }
     for (auto &recordable : recordables)
     {
       auto span = std::unique_ptr<sdk::trace::SpanData>(
@@ -63,6 +67,7 @@ public:
   bool Shutdown(
       std::chrono::microseconds timeout = std::chrono::microseconds::max()) noexcept override
   {
+    is_shutdown_ = true;
     return true;
   };
 
@@ -76,6 +81,7 @@ public:
 
 private:
   std::shared_ptr<opentelemetry::exporter::memory::InMemorySpanData> data_;
+  bool is_shutdown_ = false;
 };
 }  // namespace memory
 }  // namespace exporter
