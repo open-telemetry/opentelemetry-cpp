@@ -204,7 +204,7 @@ endif(WIN32)
 
 option(
   WITH_API_ONLY
-  "Only build the API (use as a header-only library). Overrides WITH_EXAMPLES"
+  "Only build the API (use as a header-only library). Overrides WITH_EXAMPLES and all options to enable exporters"
   OFF)
 option(WITH_EXAMPLES "Whether to build examples" ON)
 
@@ -269,13 +269,14 @@ endif()
 include(GNUInstallDirs)
 
 if((NOT WITH_API_ONLY)
-   OR WITH_ELASTICSEARCH
-   OR WITH_ZIPKIN
-   OR WITH_OTLP
-   OR WITH_OTLP_HTTP
-   OR WITH_ZPAGES
-   OR BUILD_W3CTRACECONTEXT_TEST
-   OR WITH_ETW)
+   AND (WITH_ELASTICSEARCH
+        OR WITH_ZIPKIN
+        OR WITH_OTLP
+        OR WITH_OTLP_HTTP
+        OR WITH_ZPAGES
+        OR BUILD_W3CTRACECONTEXT_TEST
+        OR WITH_ETW
+       ))
   # nlohmann_json package is required for most SDK build configurations
   find_package(nlohmann_json QUIET)
   set(nlohmann_json_clone FALSE)

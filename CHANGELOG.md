@@ -25,7 +25,7 @@ Increment the:
 * [EXPORTER] ZipkinExporter shutdown ([#1153](https://github.com/open-telemetry/opentelemetry-cpp/pull/1153))
 * [EXPORTER] Jaeger exporter shutdown ([#1150](https://github.com/open-telemetry/opentelemetry-cpp/pull/1150))
 * [EXPORTER] Bugfix: `jaeger::TUDPTransport::write` crash when `getaddrinfo` returns error ([#1116](https://github.com/open-telemetry/opentelemetry-cpp/pull/1116))
-* [EXPORTER] Bugfix: Jaeger exporter: extend supported attributes types ([#1116](https://github.com/open-telemetry/opentelemetry-cpp/pull/1116))
+* [EXPORTER] Bugfix: Jaeger exporter: extend supported attributes types ([#1106](https://github.com/open-telemetry/opentelemetry-cpp/pull/1106))
 * [EXPORTER] Fix otlp generates null span ids ([#1113](https://github.com/open-telemetry/opentelemetry-cpp/pull/1113))
 * [EXPORTER] Jaeger bazel (Linux only) ([#1077](https://github.com/open-telemetry/opentelemetry-cpp/pull/1077))
 * [DOCS] Add note on DLL support ([#1137](https://github.com/open-telemetry/opentelemetry-cpp/pull/1137))
