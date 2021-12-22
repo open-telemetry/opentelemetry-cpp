@@ -81,13 +81,11 @@ TEST_F(JaegerExporterTestPeer, ExportIntegrationTest)
   resource_attributes["int32_value"]               = static_cast<int32_t>(1);
   resource_attributes["uint32_value"]              = static_cast<uint32_t>(2);
   resource_attributes["int64_value"]               = static_cast<int64_t>(0x1100000000LL);
-  resource_attributes["uint64_value"]              = static_cast<uint64_t>(0x1200000000ULL);
   resource_attributes["double_value"]              = static_cast<double>(3.1);
   resource_attributes["vec_bool_value"]            = std::vector<bool>{true, false, true};
   resource_attributes["vec_int32_value"]           = std::vector<int32_t>{1, 2};
   resource_attributes["vec_uint32_value"]          = std::vector<uint32_t>{3, 4};
   resource_attributes["vec_int64_value"]           = std::vector<int64_t>{5, 6};
-  resource_attributes["vec_uint64_value"]          = std::vector<uint64_t>{7, 8};
   resource_attributes["vec_double_value"]          = std::vector<double>{3.2, 3.3};
   resource_attributes["vec_string_value"]          = std::vector<std::string>{"vector", "string"};
   auto resource = resource::Resource::Create(resource_attributes);
