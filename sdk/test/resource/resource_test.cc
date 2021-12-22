@@ -35,10 +35,10 @@ TEST(ResourceTest, create_without_servicename)
       {"service", "backend"},
       {"version", (uint32_t)1},
       {"cost", 234.23},
-      {OTEL_CPP_GET_ATTR(AttrTelemetrySdkLanguage), "cpp"},
-      {OTEL_CPP_GET_ATTR(AttrTelemetrySdkName), "opentelemetry"},
-      {OTEL_CPP_GET_ATTR(AttrTelemetrySdkVersion), OPENTELEMETRY_SDK_VERSION},
-      {OTEL_CPP_GET_ATTR(AttrServiceName), "unknown_service"}};
+      {OTEL_GET_RESOURCE_ATTR(AttrTelemetrySdkLanguage), "cpp"},
+      {OTEL_GET_RESOURCE_ATTR(AttrTelemetrySdkName), "opentelemetry"},
+      {OTEL_GET_RESOURCE_ATTR(AttrTelemetrySdkVersion), OPENTELEMETRY_SDK_VERSION},
+      {OTEL_GET_RESOURCE_ATTR(AttrServiceName), "unknown_service"}};
 
   ResourceAttributes attributes = {
       {"service", "backend"}, {"version", (uint32_t)1}, {"cost", 234.23}};
@@ -68,10 +68,10 @@ TEST(ResourceTest, create_with_servicename)
   ResourceAttributes expected_attributes = {
       {"version", (uint32_t)1},
       {"cost", 234.23},
-      {OTEL_CPP_GET_ATTR(AttrTelemetrySdkLanguage), "cpp"},
-      {OTEL_CPP_GET_ATTR(AttrTelemetrySdkName), "opentelemetry"},
-      {OTEL_CPP_GET_ATTR(AttrTelemetrySdkVersion), OPENTELEMETRY_SDK_VERSION},
-      {OTEL_CPP_GET_ATTR(AttrServiceName), "backend"},
+      {OTEL_GET_RESOURCE_ATTR(AttrTelemetrySdkLanguage), "cpp"},
+      {OTEL_GET_RESOURCE_ATTR(AttrTelemetrySdkName), "opentelemetry"},
+      {OTEL_GET_RESOURCE_ATTR(AttrTelemetrySdkVersion), OPENTELEMETRY_SDK_VERSION},
+      {OTEL_GET_RESOURCE_ATTR(AttrServiceName), "backend"},
   };
   ResourceAttributes attributes = {
       {"service.name", "backend"}, {"version", (uint32_t)1}, {"cost", 234.23}};
@@ -99,10 +99,10 @@ TEST(ResourceTest, create_with_servicename)
 TEST(ResourceTest, create_with_emptyatrributes)
 {
   ResourceAttributes expected_attributes = {
-      {OTEL_CPP_GET_ATTR(AttrTelemetrySdkLanguage), "cpp"},
-      {OTEL_CPP_GET_ATTR(AttrTelemetrySdkName), "opentelemetry"},
-      {OTEL_CPP_GET_ATTR(AttrTelemetrySdkVersion), OPENTELEMETRY_SDK_VERSION},
-      {OTEL_CPP_GET_ATTR(AttrServiceName), "unknown_service"},
+      {OTEL_GET_RESOURCE_ATTR(AttrTelemetrySdkLanguage), "cpp"},
+      {OTEL_GET_RESOURCE_ATTR(AttrTelemetrySdkName), "opentelemetry"},
+      {OTEL_GET_RESOURCE_ATTR(AttrTelemetrySdkVersion), OPENTELEMETRY_SDK_VERSION},
+      {OTEL_GET_RESOURCE_ATTR(AttrServiceName), "unknown_service"},
   };
   ResourceAttributes attributes = {};
   auto resource                 = Resource::Create(attributes);
