@@ -82,7 +82,7 @@ if(BUILD_TESTING)
   endif()
   target_link_libraries(
     jaeger_exporter_test ${GTEST_BOTH_LIBRARIES} ${CMAKE_THREAD_LIBS_INIT}
-    ${GMOCK_LIB} opentelemetry_sdk opentelemetry_exporter_jaeger_trace)
+    ${GMOCK_LIB} opentelemetry_trace opentelemetry_exporter_jaeger_trace)
 
   target_include_directories(jaeger_exporter_test
                              PRIVATE ${CMAKE_CURRENT_LIST_DIR}/src)
