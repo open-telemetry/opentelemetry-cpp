@@ -33,7 +33,6 @@ const nostd::string_view Logger::GetName() noexcept
 void Logger::Log(opentelemetry::logs::Severity severity,
                  nostd::string_view name,
                  nostd::string_view body,
-                 const common::KeyValueIterable &resource,
                  const common::KeyValueIterable &attributes,
                  trace_api::TraceId trace_id,
                  trace_api::SpanId span_id,

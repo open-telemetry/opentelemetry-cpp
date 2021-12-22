@@ -129,7 +129,9 @@ TEST(OStreamLogExporter, SimpleLogToCout)
       "  severity_text : TRACE\n"
       "  name          : Name\n"
       "  body          : Message\n"
-      "  resource      : {}\n"
+      "  resource      : {{telemetry.sdk.version: " OPENTELEMETRY_VERSION
+      "}, {telemetry.sdk.name: opentelemetry}, "
+      "{telemetry.sdk.language: cpp}}\n"
       "  attributes    : {}\n"
       "  trace_id      : 00000000000000000000000000000000\n"
       "  span_id       : 0000000000000000\n"
@@ -176,7 +178,9 @@ TEST(OStreamLogExporter, LogWithStringAttributesToCerr)
       "  severity_text : INVALID\n"
       "  name          : \n"
       "  body          : \n"
-      "  resource      : {{key1: val1}}\n"
+      "  resource      : {{telemetry.sdk.version: " OPENTELEMETRY_VERSION
+      "}, {telemetry.sdk.name: opentelemetry}, {telemetry.sdk.language: cpp}, {service.name: "
+      "unknown_service}, {key1: val1}}\n"
       "  attributes    : {{a: 1}}\n"
       "  trace_id      : 00000000000000000000000000000000\n"
       "  span_id       : 0000000000000000\n"
@@ -229,7 +233,9 @@ TEST(OStreamLogExporter, LogWithVariantTypesToClog)
       "  severity_text : INVALID\n"
       "  name          : \n"
       "  body          : \n"
-      "  resource      : {{res1: [1, 2, 3]}}\n"
+      "  resource      : {{service.name: unknown_service}, "
+      "{telemetry.sdk.version: " OPENTELEMETRY_VERSION
+      "}, {telemetry.sdk.name: opentelemetry}, {telemetry.sdk.language: cpp}, {res1: [1, 2, 3]}}\n"
       "  attributes    : {{attr1: [0, 1, 0]}}\n"
       "  trace_id      : 00000000000000000000000000000000\n"
       "  span_id       : 0000000000000000\n"
@@ -263,7 +269,7 @@ TEST(OStreamLogExporter, IntegrationTest)
 
   // Write a log to ostream exporter
   common::SystemTimestamp now(std::chrono::system_clock::now());
-  logger->Log(logs_api::Severity::kDebug, "", "Hello", {}, {}, {}, {}, {}, now);
+  logger->Log(logs_api::Severity::kDebug, "", "Hello", {}, {}, {}, {}, now);
 
   // Restore cout's original streambuf
   std::cout.rdbuf(original);

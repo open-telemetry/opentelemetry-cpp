@@ -91,14 +91,15 @@ public:
   void SetBody(nostd::string_view message) noexcept override { json_["body"] = message.data(); }
 
   /**
-   * Set a resource for this log.
-   * @param name the name of the resource
-   * @param value the resource value
+   * Set Resource of this log
+   * @param Resource the resource to set
    */
-  void SetResource(nostd::string_view key,
-                   const opentelemetry::common::AttributeValue &value) noexcept override
+  void SetResource(const opentelemetry::sdk::resource::Resource &resource) noexcept override
   {
-    WriteKeyValue(key, value, "resource");
+    for (auto &kv : resource.GetAttributes())
+    {
+      WriteKeyValue(kv.first, kv.second, "resource");
+    }
   }
 
   /**

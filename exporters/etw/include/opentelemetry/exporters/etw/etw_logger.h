@@ -101,7 +101,6 @@ public:
   void Log(opentelemetry::logs::Severity severity,
            nostd::string_view name,
            nostd::string_view body,
-           const common::KeyValueIterable &resource,
            const common::KeyValueIterable &attributes,
            opentelemetry::trace::TraceId trace_id,
            opentelemetry::trace::SpanId span_id,
@@ -111,8 +110,7 @@ public:
 
 #  ifdef RTTI_ENABLED
     common::KeyValueIterable &attribs = const_cast<common::KeyValueIterable &>(attributes);
-    // common::KeyValueIterable &resr = const_cast<common::KeyValueIterable &>(resource);
-    Properties *evt = dynamic_cast<Properties *>(&attribs);
+    Properties *evt                   = dynamic_cast<Properties *>(&attribs);
     // Properties *res                   = dynamic_cast<Properties *>(&resr);
 
     if (evt != nullptr)
@@ -122,7 +120,6 @@ public:
     }
 #  endif
     Properties evtCopy = attributes;
-    // Properties resCopy = resource;
     return Log(severity, name, body, evtCopy, trace_id, span_id, trace_flags, timestamp);
   }
 

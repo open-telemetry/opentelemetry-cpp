@@ -11,6 +11,7 @@
 #  include "opentelemetry/common/attribute_value.h"
 #  include "opentelemetry/common/key_value_iterable.h"
 #  include "opentelemetry/common/key_value_iterable_view.h"
+#  include "opentelemetry/common/macros.h"
 #  include "opentelemetry/common/timestamp.h"
 #  include "opentelemetry/logs/severity.h"
 #  include "opentelemetry/nostd/shared_ptr.h"
@@ -43,8 +44,6 @@ public:
    * @param severity the severity level of the log event.
    * @param name the name of the log event.
    * @param message the string message of the log (perhaps support std::fmt or fmt-lib format).
-   * @param resource the resources, stored as a 2D list of key/value pairs, that are associated
-   * with the log event.
    * @param attributes the attributes, stored as a 2D list of key/value pairs, that are associated
    * with the log event.
    * @param trace_id the trace id associated with the log event.
@@ -57,48 +56,72 @@ public:
   /**
    * The base Log(...) method that all other Log(...) overloaded methods will eventually call,
    * in order to create a log record.
-   *
-   * Note this takes in a KeyValueIterable for the resource and attributes fields.
    */
   virtual void Log(Severity severity,
                    nostd::string_view name,
                    nostd::string_view body,
-                   const common::KeyValueIterable &resource,
                    const common::KeyValueIterable &attributes,
                    trace::TraceId trace_id,
                    trace::SpanId span_id,
                    trace::TraceFlags trace_flags,
                    common::SystemTimestamp timestamp) noexcept = 0;
 
+  OPENTELEMETRY_DEPRECATED_MSG("resource is removed and ignored")
+  void Log(Severity severity,
+           nostd::string_view name,
+           nostd::string_view body,
+           OPENTELEMETRY_MAYBE_UNUSED const common::KeyValueIterable &resource,
+           const common::KeyValueIterable &attributes,
+           trace::TraceId trace_id,
+           trace::SpanId span_id,
+           trace::TraceFlags trace_flags,
+           common::SystemTimestamp timestamp) noexcept
+  {
+    this->Log(severity, name, body, attributes, trace_id, span_id, trace_flags, timestamp);
+  }
+
   /*** Overloaded methods for KeyValueIterables ***/
   /**
    * The secondary base Log(...) method that all other Log(...) overloaded methods except the one
    * above will eventually call,  in order to create a log record.
-   *
-   * Note this takes in template types for the resource and attributes fields.
    */
+  template <class T,
+            nostd::enable_if_t<common::detail::is_key_value_iterable<T>::value> * = nullptr>
+  void Log(Severity severity,
+           nostd::string_view name,
+           nostd::string_view body,
+           const T &attributes,
+           trace::TraceId trace_id,
+           trace::SpanId span_id,
+           trace::TraceFlags trace_flags,
+           common::SystemTimestamp timestamp) noexcept
+  {
+    Log(severity, name, body, common::KeyValueIterableView<T>(attributes), trace_id, span_id,
+        trace_flags, timestamp);
+  }
+
   template <class T,
             class U,
             nostd::enable_if_t<common::detail::is_key_value_iterable<T>::value> * = nullptr,
             nostd::enable_if_t<common::detail::is_key_value_iterable<U>::value> * = nullptr>
+  OPENTELEMETRY_DEPRECATED_MSG("resource is removed and ignored")
   void Log(Severity severity,
            nostd::string_view name,
            nostd::string_view body,
-           const T &resource,
+           OPENTELEMETRY_MAYBE_UNUSED const T &resource,
            const U &attributes,
            trace::TraceId trace_id,
            trace::SpanId span_id,
            trace::TraceFlags trace_flags,
            common::SystemTimestamp timestamp) noexcept
   {
-    Log(severity, name, body, common::KeyValueIterableView<T>(resource),
-        common::KeyValueIterableView<U>(attributes), trace_id, span_id, trace_flags, timestamp);
+    Log(severity, name, body, common::KeyValueIterableView<U>(attributes), trace_id, span_id,
+        trace_flags, timestamp);
   }
 
   void Log(Severity severity,
            nostd::string_view name,
            nostd::string_view body,
-           std::initializer_list<std::pair<nostd::string_view, common::AttributeValue>> resource,
            std::initializer_list<std::pair<nostd::string_view, common::AttributeValue>> attributes,
            trace::TraceId trace_id,
            trace::SpanId span_id,
@@ -107,7 +130,23 @@ public:
   {
     return this->Log(severity, name, body,
                      nostd::span<const std::pair<nostd::string_view, common::AttributeValue>>{
-                         resource.begin(), resource.end()},
+                         attributes.begin(), attributes.end()},
+                     trace_id, span_id, trace_flags, timestamp);
+  }
+
+  OPENTELEMETRY_DEPRECATED_MSG("resource is removed and ignored")
+  void Log(Severity severity,
+           nostd::string_view name,
+           nostd::string_view body,
+           OPENTELEMETRY_MAYBE_UNUSED std::initializer_list<
+               std::pair<nostd::string_view, common::AttributeValue>> resource,
+           std::initializer_list<std::pair<nostd::string_view, common::AttributeValue>> attributes,
+           trace::TraceId trace_id,
+           trace::SpanId span_id,
+           trace::TraceFlags trace_flags,
+           common::SystemTimestamp timestamp) noexcept
+  {
+    return this->Log(severity, name, body,
                      nostd::span<const std::pair<nostd::string_view, common::AttributeValue>>{
                          attributes.begin(), attributes.end()},
                      trace_id, span_id, trace_flags, timestamp);
@@ -122,7 +161,7 @@ public:
    */
   void Log(Severity severity, nostd::string_view message) noexcept
   {
-    this->Log(severity, "", message, {}, {}, {}, {}, {}, std::chrono::system_clock::now());
+    this->Log(severity, "", message, {}, {}, {}, {}, std::chrono::system_clock::now());
   }
 
   /**
@@ -133,7 +172,7 @@ public:
    */
   void Log(Severity severity, nostd::string_view name, nostd::string_view message) noexcept
   {
-    this->Log(severity, name, message, {}, {}, {}, {}, {}, std::chrono::system_clock::now());
+    this->Log(severity, name, message, {}, {}, {}, {}, std::chrono::system_clock::now());
   }
 
   /**
@@ -145,8 +184,7 @@ public:
             nostd::enable_if_t<common::detail::is_key_value_iterable<T>::value> * = nullptr>
   void Log(Severity severity, const T &attributes) noexcept
   {
-    this->Log(severity, "", "", std::map<std::string, std::string>{}, attributes, {}, {}, {},
-              std::chrono::system_clock::now());
+    this->Log(severity, "", "", attributes, {}, {}, {}, std::chrono::system_clock::now());
   }
 
   /**
@@ -159,8 +197,7 @@ public:
             nostd::enable_if_t<common::detail::is_key_value_iterable<T>::value> * = nullptr>
   void Log(Severity severity, nostd::string_view name, const T &attributes) noexcept
   {
-    this->Log(severity, name, "", std::map<std::string, std::string>{}, attributes, {}, {}, {},
-              std::chrono::system_clock::now());
+    this->Log(severity, name, "", attributes, {}, {}, {}, std::chrono::system_clock::now());
   }
 
   /**
@@ -172,7 +209,7 @@ public:
            std::initializer_list<std::pair<nostd::string_view, common::AttributeValue>>
                attributes) noexcept
   {
-    this->Log(severity, "", "", {}, attributes, {}, {}, {}, std::chrono::system_clock::now());
+    this->Log(severity, "", "", attributes, {}, {}, {}, std::chrono::system_clock::now());
   }
 
   /**
@@ -186,7 +223,7 @@ public:
            std::initializer_list<std::pair<nostd::string_view, common::AttributeValue>>
                attributes) noexcept
   {
-    this->Log(severity, name, "", {}, attributes, {}, {}, {}, std::chrono::system_clock::now());
+    this->Log(severity, name, "", attributes, {}, {}, {}, std::chrono::system_clock::now());
   }
 
   /**
@@ -200,10 +237,7 @@ public:
            nostd::string_view name,
            common::KeyValueIterable &attributes) noexcept
   {
-    this->Log(severity, name, {},
-              common::KeyValueIterableView<
-                  std::initializer_list<std::pair<nostd::string_view, common::AttributeValue>>>({}),
-              attributes, {}, {}, {}, std::chrono::system_clock::now());
+    this->Log(severity, name, {}, attributes, {}, {}, {}, std::chrono::system_clock::now());
   }
 
   /** Trace severity overloads **/

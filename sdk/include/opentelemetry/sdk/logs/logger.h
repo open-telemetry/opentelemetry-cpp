@@ -38,7 +38,6 @@ public:
    * @param severity the severity level of the log event.
    * @param name the name of the log event.
    * @param message the string message of the log (perhaps support std::fmt or fmt-lib format).
-   * @param resource the resources, stored as a 2D list of key/value pairs, that are associated
    * with the log event.
    * @param attributes the attributes, stored as a 2D list of key/value pairs, that are associated
    * with the log event.
@@ -50,7 +49,6 @@ public:
   void Log(opentelemetry::logs::Severity severity,
            nostd::string_view name,
            nostd::string_view body,
-           const opentelemetry::common::KeyValueIterable &resource,
            const opentelemetry::common::KeyValueIterable &attributes,
            opentelemetry::trace::TraceId trace_id,
            opentelemetry::trace::SpanId span_id,
