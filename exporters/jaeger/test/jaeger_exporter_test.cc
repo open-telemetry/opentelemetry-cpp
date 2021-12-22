@@ -82,12 +82,6 @@ TEST_F(JaegerExporterTestPeer, ExportIntegrationTest)
   resource_attributes["uint32_value"]              = static_cast<uint32_t>(2);
   resource_attributes["int64_value"]               = static_cast<int64_t>(0x1100000000LL);
   resource_attributes["double_value"]              = static_cast<double>(3.1);
-  resource_attributes["vec_bool_value"]            = std::vector<bool>{true, false, true};
-  resource_attributes["vec_int32_value"]           = std::vector<int32_t>{1, 2};
-  resource_attributes["vec_uint32_value"]          = std::vector<uint32_t>{3, 4};
-  resource_attributes["vec_int64_value"]           = std::vector<int64_t>{5, 6};
-  resource_attributes["vec_double_value"]          = std::vector<double>{3.2, 3.3};
-  resource_attributes["vec_string_value"]          = std::vector<std::string>{"vector", "string"};
   auto resource = resource::Resource::Create(resource_attributes);
 
   auto processor_opts                  = sdk::trace::BatchSpanProcessorOptions();
@@ -103,9 +97,8 @@ TEST_F(JaegerExporterTestPeer, ExportIntegrationTest)
 
   std::string report_trace_id;
   {
-    char trace_id_hex[2 * trace_api::TraceId::kSize] = {0};
-    auto tracer                                      = provider->GetTracer("test");
-    auto parent_span                                 = tracer->StartSpan("Test parent span");
+    auto tracer      = provider->GetTracer("test");
+    auto parent_span = tracer->StartSpan("Test parent span");
 
     trace_api::StartSpanOptions child_span_opts = {};
     child_span_opts.parent                      = parent_span->GetContext();
@@ -114,10 +107,12 @@ TEST_F(JaegerExporterTestPeer, ExportIntegrationTest)
     child_span->End();
     parent_span->End();
 
-    nostd::get<trace_api::SpanContext>(child_span_opts.parent)
-        .trace_id()
-        .ToLowerBase16(MakeSpan(trace_id_hex));
-    report_trace_id.assign(trace_id_hex, sizeof(trace_id_hex));
+    auto parent_ctx = parent_span->GetContext();
+    auto child_ctx  = child_span->GetContext();
+    EXPECT_EQ(parent_ctx.trace_id(), child_ctx.trace_id());
+    EXPECT_EQ(parent_ctx.trace_state(), child_ctx.trace_state());
+    ASSERT_TRUE(parent_ctx.IsValid());
+    ASSERT_TRUE(child_ctx.IsValid());
   }
 }
 
