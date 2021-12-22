@@ -6,7 +6,6 @@
 #include <vector>
 #include "opentelemetry/sdk/trace/batch_span_processor.h"
 #include "opentelemetry/sdk/trace/tracer_provider.h"
-#include "opentelemetry/trace/provider.h"
 
 #ifdef BAZEL_BUILD
 #  include "exporters/jaeger/src/thrift_sender.h"
@@ -95,25 +94,22 @@ TEST_F(JaegerExporterTestPeer, ExportIntegrationTest)
 
   EXPECT_CALL(*mock_transport, EmitBatch(_)).Times(Exactly(1)).WillOnce(Return(1));
 
-  std::string report_trace_id;
-  {
-    auto tracer      = provider->GetTracer("test");
-    auto parent_span = tracer->StartSpan("Test parent span");
+  auto tracer      = provider->GetTracer("test");
+  auto parent_span = tracer->StartSpan("Test parent span");
 
-    trace_api::StartSpanOptions child_span_opts = {};
-    child_span_opts.parent                      = parent_span->GetContext();
+  trace_api::StartSpanOptions child_span_opts = {};
+  child_span_opts.parent                      = parent_span->GetContext();
+  auto child_span = tracer->StartSpan("Test child span", child_span_opts);
 
-    auto child_span = tracer->StartSpan("Test child span", child_span_opts);
-    child_span->End();
-    parent_span->End();
+  child_span->End();
+  parent_span->End();
 
-    auto parent_ctx = parent_span->GetContext();
-    auto child_ctx  = child_span->GetContext();
-    EXPECT_EQ(parent_ctx.trace_id(), child_ctx.trace_id());
-    EXPECT_EQ(parent_ctx.trace_state(), child_ctx.trace_state());
-    ASSERT_TRUE(parent_ctx.IsValid());
-    ASSERT_TRUE(child_ctx.IsValid());
-  }
+  auto parent_ctx = parent_span->GetContext();
+  auto child_ctx  = child_span->GetContext();
+  EXPECT_EQ(parent_ctx.trace_id(), child_ctx.trace_id());
+  EXPECT_EQ(parent_ctx.trace_state(), child_ctx.trace_state());
+  ASSERT_TRUE(parent_ctx.IsValid());
+  ASSERT_TRUE(child_ctx.IsValid());
 }
 
 TEST_F(JaegerExporterTestPeer, ShutdownTest)
