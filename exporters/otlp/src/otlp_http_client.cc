@@ -101,6 +101,7 @@ public:
 
       // Set the response_received_ flag to true and notify any threads waiting on this result
       response_received_ = true;
+      stop_waiting_      = true;
     }
     cv_.notify_all();
   }
@@ -112,7 +113,7 @@ public:
   bool waitForResponse()
   {
     std::unique_lock<std::mutex> lk(mutex_);
-    cv_.wait(lk);
+    cv_.wait(lk, [this] { return stop_waiting_; });
     return response_received_;
   }
 
@@ -130,6 +131,25 @@ public:
   void OnEvent(http_client::SessionState state,
                opentelemetry::nostd::string_view reason) noexcept override
   {
+    // need to modify stop_waiting_ under lock before calling notify_all
+    switch (state)
+    {
+      case http_client::SessionState::CreateFailed:
+      case http_client::SessionState::ConnectFailed:
+      case http_client::SessionState::SendFailed:
+      case http_client::SessionState::SSLHandshakeFailed:
+      case http_client::SessionState::TimedOut:
+      case http_client::SessionState::NetworkError:
+      case http_client::SessionState::Cancelled: {
+        std::unique_lock<std::mutex> lk(mutex_);
+        stop_waiting_ = true;
+      }
+      break;
+
+      default:
+        break;
+    }
+
     // If any failure event occurs, release the condition variable to unblock main thread
     switch (state)
     {
@@ -234,7 +254,10 @@ private:
   std::condition_variable cv_;
   std::mutex mutex_;
 
-  // Whether the response from Elasticsearch has been received
+  // Whether notify has been called
+  bool stop_waiting_ = false;
+
+  // Whether the response has been received
   bool response_received_ = false;
 
   // A string to store the response body
