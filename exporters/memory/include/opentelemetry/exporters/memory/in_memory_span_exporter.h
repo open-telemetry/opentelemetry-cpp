@@ -69,6 +69,7 @@ public:
   bool Shutdown(
       std::chrono::microseconds timeout = std::chrono::microseconds::max()) noexcept override
   {
+    const std::lock_guard<opentelemetry::common::SpinLockMutex> locked(lock_);
     is_shutdown_ = true;
     return true;
   };

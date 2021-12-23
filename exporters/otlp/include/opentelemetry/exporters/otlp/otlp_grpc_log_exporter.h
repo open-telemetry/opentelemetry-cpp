@@ -8,7 +8,7 @@
 
 #  include "opentelemetry/exporters/otlp/protobuf_include_prefix.h"
 #  include "opentelemetry/proto/collector/logs/v1/logs_service.grpc.pb.h"
-#include "opentelemetry/common/spin_lock_mutex.h"
+#  include "opentelemetry/common/spin_lock_mutex.h"
 #  include "opentelemetry/exporters/otlp/protobuf_include_suffix.h"
 
 // clang-format on
