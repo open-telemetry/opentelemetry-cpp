@@ -16,6 +16,7 @@
 
 #include "opentelemetry/exporters/otlp/protobuf_include_prefix.h"
 
+#include <mutex>
 #include "google/protobuf/message.h"
 #include "google/protobuf/reflection.h"
 #include "google/protobuf/stubs/common.h"
@@ -535,7 +536,7 @@ opentelemetry::sdk::common::ExportResult OtlpHttpClient::Export(
     const google::protobuf::Message &message) noexcept
 {
   // Return failure if this exporter has been shutdown
-  if (is_shutdown_)
+  if (isShutdown())
   {
     const char *error_message = "[OTLP HTTP Client] Export failed, exporter is shutdown";
     if (options_.console_debug)
@@ -659,13 +660,22 @@ opentelemetry::sdk::common::ExportResult OtlpHttpClient::Export(
 
 bool OtlpHttpClient::Shutdown(std::chrono::microseconds) noexcept
 {
-  is_shutdown_ = true;
+  {
+    const std::lock_guard<opentelemetry::common::SpinLockMutex> locked(lock_);
+    is_shutdown_ = true;
+  }
 
   // Shutdown the session manager
   http_client_->CancelAllSessions();
   http_client_->FinishAllSessions();
 
   return true;
+}
+
+const bool OtlpHttpClient::isShutdown() const noexcept
+{
+  const std::lock_guard<opentelemetry::common::SpinLockMutex> locked(lock_);
+  return is_shutdown_;
 }
 
 }  // namespace otlp

@@ -9,6 +9,7 @@
 #include "thrift_sender.h"
 #include "udp_transport.h"
 
+#include <mutex>
 #include <vector>
 
 namespace sdk_common = opentelemetry::sdk::common;
@@ -39,7 +40,7 @@ std::unique_ptr<trace_sdk::Recordable> JaegerExporter::MakeRecordable() noexcept
 sdk_common::ExportResult JaegerExporter::Export(
     const nostd::span<std::unique_ptr<sdk::trace::Recordable>> &spans) noexcept
 {
-  if (is_shutdown_)
+  if (isShutdown())
   {
     return sdk_common::ExportResult::kFailure;
   }
@@ -91,8 +92,15 @@ void JaegerExporter::InitializeEndpoint()
 
 bool JaegerExporter::Shutdown(std::chrono::microseconds timeout) noexcept
 {
+  const std::lock_guard<opentelemetry::common::SpinLockMutex> locked(lock_);
   is_shutdown_ = true;
   return true;
+}
+
+const bool JaegerExporter::isShutdown() const noexcept
+{
+  const std::lock_guard<opentelemetry::common::SpinLockMutex> locked(lock_);
+  return is_shutdown_;
 }
 
 }  // namespace jaeger

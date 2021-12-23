@@ -5,6 +5,7 @@
 
 #include <opentelemetry/ext/http/client/http_client.h>
 #include <opentelemetry/sdk/trace/exporter.h>
+#include "opentelemetry/common/spin_lock_mutex.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace exporter
@@ -75,6 +76,8 @@ private:
   bool is_shutdown_ = false;
   JaegerExporterOptions options_;
   std::unique_ptr<ThriftSender> sender_;
+  mutable opentelemetry::common::SpinLockMutex lock_;
+  const bool isShutdown() const noexcept;
   // For testing
   friend class JaegerExporterTestPeer;
   /**

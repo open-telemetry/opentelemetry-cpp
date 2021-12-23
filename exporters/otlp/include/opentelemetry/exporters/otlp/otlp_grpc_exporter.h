@@ -7,6 +7,7 @@
 
 #include "opentelemetry/exporters/otlp/protobuf_include_prefix.h"
 
+#include "opentelemetry/common/spin_lock_mutex.h"
 #include "opentelemetry/proto/collector/trace/v1/trace_service.grpc.pb.h"
 
 #include "opentelemetry/exporters/otlp/protobuf_include_suffix.h"
@@ -77,6 +78,8 @@ private:
    */
   OtlpGrpcExporter(std::unique_ptr<proto::collector::trace::v1::TraceService::StubInterface> stub);
   bool is_shutdown_ = false;
+  mutable opentelemetry::common::SpinLockMutex lock_;
+  const bool isShutdown() const noexcept;
 };
 }  // namespace otlp
 }  // namespace exporter

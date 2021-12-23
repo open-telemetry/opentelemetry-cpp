@@ -3,6 +3,7 @@
 
 #pragma once
 
+#include "opentelemetry/common/spin_lock_mutex.h"
 #include "opentelemetry/ext/http/client/http_client_factory.h"
 #include "opentelemetry/ext/http/common/url_parser.h"
 #include "opentelemetry/sdk/common/env_variables.h"
@@ -89,11 +90,13 @@ private:
 
 private:
   // The configuration options associated with this exporter.
-  bool isShutdown_ = false;
+  bool is_shutdown_ = false;
   ZipkinExporterOptions options_;
   std::shared_ptr<opentelemetry::ext::http::client::HttpClientSync> http_client_;
   opentelemetry::ext::http::common::UrlParser url_parser_;
   nlohmann::json local_end_point_;
+  mutable opentelemetry::common::SpinLockMutex lock_;
+  const bool isShutdown() const noexcept;
 };
 }  // namespace zipkin
 }  // namespace exporter
