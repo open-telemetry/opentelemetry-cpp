@@ -66,7 +66,7 @@ public:
                    trace::TraceFlags trace_flags,
                    common::SystemTimestamp timestamp) noexcept = 0;
 
-  OPENTELEMETRY_DEPRECATED_MSG("resource is removed and ignored")
+  OPENTELEMETRY_DEPRECATED_MESSAGE("resource is removed and ignored")
   void Log(Severity severity,
            nostd::string_view name,
            nostd::string_view body,
@@ -104,7 +104,7 @@ public:
             class U,
             nostd::enable_if_t<common::detail::is_key_value_iterable<T>::value> * = nullptr,
             nostd::enable_if_t<common::detail::is_key_value_iterable<U>::value> * = nullptr>
-  OPENTELEMETRY_DEPRECATED_MSG("resource is removed and ignored")
+  OPENTELEMETRY_DEPRECATED_MESSAGE("resource is removed and ignored")
   void Log(Severity severity,
            nostd::string_view name,
            nostd::string_view body,
@@ -134,7 +134,7 @@ public:
                      trace_id, span_id, trace_flags, timestamp);
   }
 
-  OPENTELEMETRY_DEPRECATED_MSG("resource is removed and ignored")
+  OPENTELEMETRY_DEPRECATED_MESSAGE("resource is removed and ignored")
   void Log(Severity severity,
            nostd::string_view name,
            nostd::string_view body,

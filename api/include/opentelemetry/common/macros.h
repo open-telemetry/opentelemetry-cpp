@@ -9,45 +9,45 @@
 
 /// \brief Declare class, variable or functions as deprecated
 /// usage:
-///   OPENTELEMETRY_DEPRECATED_ATTR int a;
-///   class OPENTELEMETRY_DEPRECATED_ATTR a;
-///   OPENTELEMETRY_DEPRECATED_ATTR int a();
+///   OPENTELEMETRY_DEPRECATED int a;
+///   class OPENTELEMETRY_DEPRECATED a;
+///   OPENTELEMETRY_DEPRECATED int a();
 /// usage:
-///   OPENTELEMETRY_DEPRECATED_MSG("there is better choose") int a;
+///   OPENTELEMETRY_DEPRECATED_MESSAGE("there is better choose") int a;
 ///   class DEPRECATED_MSG("there is better choose") a;
-///   OPENTELEMETRY_DEPRECATED_MSG("there is better choose") int a();
+///   OPENTELEMETRY_DEPRECATED_MESSAGE("there is better choose") int a();
 ///
 
 #if defined(__cplusplus) && __cplusplus >= 201402L
-#  define OPENTELEMETRY_DEPRECATED_ATTR [[deprecated]]
+#  define OPENTELEMETRY_DEPRECATED [[deprecated]]
 #elif defined(__clang__)
-#  define OPENTELEMETRY_DEPRECATED_ATTR __attribute__((deprecated))
+#  define OPENTELEMETRY_DEPRECATED __attribute__((deprecated))
 #elif defined(__GNUC__) && ((__GNUC__ >= 4) || ((__GNUC__ == 3) && (__GNUC_MINOR__ >= 1)))
-#  define OPENTELEMETRY_DEPRECATED_ATTR __attribute__((deprecated))
+#  define OPENTELEMETRY_DEPRECATED __attribute__((deprecated))
 #elif defined(_MSC_VER) && _MSC_VER >= 1400  // vs 2005 or higher
 #  if _MSC_VER >= 1910 && defined(_MSVC_LANG) && _MSVC_LANG >= 201703L
-#    define OPENTELEMETRY_DEPRECATED_ATTR [[deprecated]]
+#    define OPENTELEMETRY_DEPRECATED [[deprecated]]
 #  else
-#    define OPENTELEMETRY_DEPRECATED_ATTR __declspec(deprecated)
+#    define OPENTELEMETRY_DEPRECATED __declspec(deprecated)
 #  endif
 #else
-#  define OPENTELEMETRY_DEPRECATED_ATTR
+#  define OPENTELEMETRY_DEPRECATED
 #endif
 
 #if defined(__cplusplus) && __cplusplus >= 201402L
-#  define OPENTELEMETRY_DEPRECATED_MSG(msg) [[deprecated(msg)]]
+#  define OPENTELEMETRY_DEPRECATED_MESSAGE(msg) [[deprecated(msg)]]
 #elif defined(__clang__)
-#  define OPENTELEMETRY_DEPRECATED_MSG(msg) __attribute__((deprecated(msg)))
+#  define OPENTELEMETRY_DEPRECATED_MESSAGE(msg) __attribute__((deprecated(msg)))
 #elif defined(__GNUC__) && ((__GNUC__ >= 4) || ((__GNUC__ == 3) && (__GNUC_MINOR__ >= 1)))
-#  define OPENTELEMETRY_DEPRECATED_MSG(msg) __attribute__((deprecated(msg)))
+#  define OPENTELEMETRY_DEPRECATED_MESSAGE(msg) __attribute__((deprecated(msg)))
 #elif defined(_MSC_VER) && _MSC_VER >= 1400  // vs 2005 or higher
 #  if _MSC_VER >= 1910 && defined(_MSVC_LANG) && _MSVC_LANG >= 201703L
-#    define OPENTELEMETRY_DEPRECATED_MSG(msg) [[deprecated(msg)]]
+#    define OPENTELEMETRY_DEPRECATED_MESSAGE(msg) [[deprecated(msg)]]
 #  else
-#    define OPENTELEMETRY_DEPRECATED_MSG(msg) __declspec(deprecated(msg))
+#    define OPENTELEMETRY_DEPRECATED_MESSAGE(msg) __declspec(deprecated(msg))
 #  endif
 #else
-#  define OPENTELEMETRY_DEPRECATED_MSG(msg)
+#  define OPENTELEMETRY_DEPRECATED_MESSAGE(msg)
 #endif
 
 /// \brief Declare variable as maybe unused
