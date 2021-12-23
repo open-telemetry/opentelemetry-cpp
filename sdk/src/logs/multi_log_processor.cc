@@ -68,23 +68,39 @@ void MultiLogProcessor::OnReceive(std::unique_ptr<Recordable> &&record) noexcept
 
 bool MultiLogProcessor::ForceFlush(std::chrono::microseconds timeout) noexcept
 {
-  bool result      = true;
-  auto start_time  = std::chrono::system_clock::now();
-  auto expire_time = start_time + timeout;
+  // Converto nanos to prevent overflow
+  std::chrono::nanoseconds timeout_ns = std::chrono::nanoseconds::max();
+  if (std::chrono::duration_cast<std::chrono::microseconds>(timeout_ns) > timeout)
+  {
+    timeout_ns = std::chrono::duration_cast<std::chrono::nanoseconds>(timeout);
+  }
+  bool result           = true;
+  auto start_time       = std::chrono::system_clock::now();
+  auto overflow_checker = std::chrono::system_clock::time_point::max();
+  std::chrono::system_clock::time_point expire_time;
+  if (overflow_checker - start_time <= timeout_ns)
+  {
+    expire_time = overflow_checker;
+  }
+  else
+  {
+    expire_time =
+        start_time + std::chrono::duration_cast<std::chrono::system_clock::duration>(timeout_ns);
+  }
   for (auto &processor : processors_)
   {
-    if (!processor->ForceFlush(timeout))
+    if (!processor->ForceFlush(std::chrono::duration_cast<std::chrono::microseconds>(timeout_ns)))
     {
       result = false;
     }
     start_time = std::chrono::system_clock::now();
     if (expire_time > start_time)
     {
-      timeout = std::chrono::duration_cast<std::chrono::microseconds>(expire_time - start_time);
+      timeout_ns = std::chrono::duration_cast<std::chrono::nanoseconds>(expire_time - start_time);
     }
     else
     {
-      timeout = std::chrono::microseconds::zero();
+      timeout_ns = std::chrono::nanoseconds::zero();
     }
   }
   return result;
@@ -92,23 +108,39 @@ bool MultiLogProcessor::ForceFlush(std::chrono::microseconds timeout) noexcept
 
 bool MultiLogProcessor::Shutdown(std::chrono::microseconds timeout) noexcept
 {
-  bool result      = true;
-  auto start_time  = std::chrono::system_clock::now();
-  auto expire_time = start_time + timeout;
+  // Converto nanos to prevent overflow
+  std::chrono::nanoseconds timeout_ns = std::chrono::nanoseconds::max();
+  if (std::chrono::duration_cast<std::chrono::microseconds>(timeout_ns) > timeout)
+  {
+    timeout_ns = std::chrono::duration_cast<std::chrono::nanoseconds>(timeout);
+  }
+  bool result           = true;
+  auto start_time       = std::chrono::system_clock::now();
+  auto overflow_checker = std::chrono::system_clock::time_point::max();
+  std::chrono::system_clock::time_point expire_time;
+  if (overflow_checker - start_time <= timeout_ns)
+  {
+    expire_time = overflow_checker;
+  }
+  else
+  {
+    expire_time =
+        start_time + std::chrono::duration_cast<std::chrono::system_clock::duration>(timeout_ns);
+  }
   for (auto &processor : processors_)
   {
-    if (!processor->Shutdown(timeout))
+    if (!processor->Shutdown(std::chrono::duration_cast<std::chrono::microseconds>(timeout_ns)))
     {
       result = false;
     }
     start_time = std::chrono::system_clock::now();
     if (expire_time > start_time)
     {
-      timeout = std::chrono::duration_cast<std::chrono::microseconds>(expire_time - start_time);
+      timeout_ns = std::chrono::duration_cast<std::chrono::nanoseconds>(expire_time - start_time);
     }
     else
     {
-      timeout = std::chrono::microseconds::zero();
+      timeout_ns = std::chrono::nanoseconds::zero();
     }
   }
   return result;

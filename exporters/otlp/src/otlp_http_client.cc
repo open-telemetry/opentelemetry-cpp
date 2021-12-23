@@ -362,6 +362,18 @@ static void ConvertGenericMessageToJson(nlohmann::json &value,
   }
 }
 
+static bool SerializeToHttpBody(http_client::Body &output, const google::protobuf::Message &message)
+{
+  auto body_size = message.ByteSizeLong();
+  if (body_size > 0)
+  {
+    output.resize(body_size);
+    return message.SerializeWithCachedSizesToArray(
+        reinterpret_cast<google::protobuf::uint8 *>(&output[0]));
+  }
+  return true;
+}
+
 void ConvertGenericFieldToJson(nlohmann::json &value,
                                const google::protobuf::Message &message,
                                const google::protobuf::FieldDescriptor *field_descriptor,
@@ -601,9 +613,7 @@ opentelemetry::sdk::common::ExportResult OtlpHttpClient::Export(
   std::string content_type;
   if (options_.content_type == HttpRequestContentType::kBinary)
   {
-    body_vec.resize(message.ByteSizeLong());
-    if (message.SerializeWithCachedSizesToArray(
-            reinterpret_cast<google::protobuf::uint8 *>(&body_vec[0])))
+    if (SerializeToHttpBody(body_vec, message))
     {
       if (options_.console_debug)
       {
