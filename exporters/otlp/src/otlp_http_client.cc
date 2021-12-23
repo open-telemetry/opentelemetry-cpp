@@ -100,7 +100,7 @@ public:
 
       // Set the response_received_ flag to true and notify any threads waiting on this result
       response_received_ = true;
-      stop_waiting_ = true;
+      stop_waiting_      = true;
     }
     cv_.notify_all();
   }
@@ -112,7 +112,7 @@ public:
   bool waitForResponse()
   {
     std::unique_lock<std::mutex> lk(mutex_);
-    cv_.wait(lk, [this]{ return stop_waiting_; });
+    cv_.wait(lk, [this] { return stop_waiting_; });
     return response_received_;
   }
 
@@ -139,12 +139,11 @@ public:
       case http_client::SessionState::SSLHandshakeFailed:
       case http_client::SessionState::TimedOut:
       case http_client::SessionState::NetworkError:
-      case http_client::SessionState::Cancelled:
-        {
-          std::unique_lock<std::mutex> lk(mutex_);
-          stop_waiting_ = true;
-        }
-        break;
+      case http_client::SessionState::Cancelled: {
+        std::unique_lock<std::mutex> lk(mutex_);
+        stop_waiting_ = true;
+      }
+      break;
 
       default:
         break;
@@ -257,7 +256,7 @@ private:
   // Whether notify has been called
   bool stop_waiting_ = false;
 
-  // Whether the response from Elasticsearch has been received
+  // Whether the response has been received
   bool response_received_ = false;
 
   // A string to store the response body
