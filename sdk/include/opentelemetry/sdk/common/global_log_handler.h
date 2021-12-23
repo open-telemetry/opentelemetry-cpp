@@ -11,6 +11,15 @@
 #include "opentelemetry/sdk/common/attribute_utils.h"
 #include "opentelemetry/version.h"
 
+#define OTEL_INTERNAL_LOG_LEVEL_ERROR 0
+#define OTEL_INTERNAL_LOG_LEVEL_WARN 1
+#define OTEL_INTERNAL_LOG_LEVEL_INFO 2
+#define OTEL_INTERNAL_LOG_LEVEL_DEBUG 3  // to be disabled in release
+
+#ifndef OTEL_INTERNAL_LOG_LEVEL
+#  define OTEL_INTERNAL_LOG_LEVEL OTEL_INTERNAL_LOG_LEVEL_DEBUG  // ERROR and WARN
+#endif
+
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace sdk
 {
@@ -175,43 +184,62 @@ OPENTELEMETRY_END_NAMESPACE
 
 #define OTEL_INTERNAL_LOG_GET_3RD_ARG(arg1, arg2, arg3, ...) arg3
 
-#define OTEL_INTERNAL_LOG_ERROR_1_ARGS(message) \
-  OTEL_INTERNAL_LOG_DISPATCH(opentelemetry::sdk::common::internal_log::LogLevel::Error, message, {})
-#define OTEL_INTERNAL_LOG_ERROR_2_ARGS(message, attributes)                                      \
-  OTEL_INTERNAL_LOG_DISPATCH(opentelemetry::sdk::common::internal_log::LogLevel::Error, message, \
-                             attributes)
-#define OTEL_INTERNAL_LOG_ERROR_MACRO(...)                                   \
-  OTEL_INTERNAL_LOG_GET_3RD_ARG(__VA_ARGS__, OTEL_INTERNAL_LOG_ERROR_2_ARGS, \
-                                OTEL_INTERNAL_LOG_ERROR_1_ARGS)
-#define OTEL_INTERNAL_LOG_ERROR(...) OTEL_INTERNAL_LOG_ERROR_MACRO(__VA_ARGS__)(__VA_ARGS__)
+#if OTEL_INTERNAL_LOG_LEVEL >= OTEL_INTERNAL_LOG_LEVEL_ERROR
+#  define OTEL_INTERNAL_LOG_ERROR_1_ARGS(message)                                                  \
+    OTEL_INTERNAL_LOG_DISPATCH(opentelemetry::sdk::common::internal_log::LogLevel::Error, message, \
+                               {})
+#  define OTEL_INTERNAL_LOG_ERROR_2_ARGS(message, attributes)                                      \
+    OTEL_INTERNAL_LOG_DISPATCH(opentelemetry::sdk::common::internal_log::LogLevel::Error, message, \
+                               attributes)
+#  define OTEL_INTERNAL_LOG_ERROR_MACRO(...)                                   \
+    OTEL_INTERNAL_LOG_GET_3RD_ARG(__VA_ARGS__, OTEL_INTERNAL_LOG_ERROR_2_ARGS, \
+                                  OTEL_INTERNAL_LOG_ERROR_1_ARGS)
+#  define OTEL_INTERNAL_LOG_ERROR(...) OTEL_INTERNAL_LOG_ERROR_MACRO(__VA_ARGS__)(__VA_ARGS__)
+#else
+#  define OTEL_INTERNAL_LOG_ERROR(...)
+#endif
 
-#define OTEL_INTERNAL_LOG_WARN_1_ARGS(message)                                                     \
-  OTEL_INTERNAL_LOG_DISPATCH(opentelemetry::sdk::common::internal_log::LogLevel::Warning, message, \
-                             {})
-#define OTEL_INTERNAL_LOG_WARN_2_ARGS(message, attributes)                                         \
-  OTEL_INTERNAL_LOG_DISPATCH(opentelemetry::sdk::common::internal_log::LogLevel::Warning, message, \
-                             attributes)
-#define OTEL_INTERNAL_LOG_WARN_MACRO(...)                                   \
-  OTEL_INTERNAL_LOG_GET_3RD_ARG(__VA_ARGS__, OTEL_INTERNAL_LOG_WARN_2_ARGS, \
-                                OTEL_INTERNAL_LOG_WARN_1_ARGS)
-#define OTEL_INTERNAL_LOG_WARN(...) OTEL_INTERNAL_LOG_WARN_MACRO(__VA_ARGS__)(__VA_ARGS__)
+#if OTEL_INTERNAL_LOG_LEVEL >= OTEL_INTERNAL_LOG_LEVEL_WARN
+#  define OTEL_INTERNAL_LOG_WARN_1_ARGS(message)                                            \
+    OTEL_INTERNAL_LOG_DISPATCH(opentelemetry::sdk::common::internal_log::LogLevel::Warning, \
+                               message, {})
+#  define OTEL_INTERNAL_LOG_WARN_2_ARGS(message, attributes)                                \
+    OTEL_INTERNAL_LOG_DISPATCH(opentelemetry::sdk::common::internal_log::LogLevel::Warning, \
+                               message, attributes)
+#  define OTEL_INTERNAL_LOG_WARN_MACRO(...)                                   \
+    OTEL_INTERNAL_LOG_GET_3RD_ARG(__VA_ARGS__, OTEL_INTERNAL_LOG_WARN_2_ARGS, \
+                                  OTEL_INTERNAL_LOG_WARN_1_ARGS)
+#  define OTEL_INTERNAL_LOG_WARN(...) OTEL_INTERNAL_LOG_WARN_MACRO(__VA_ARGS__)(__VA_ARGS__)
+#else
+#  define OTEL_INTERNAL_LOG_ERROR(...)
+#endif
 
-#define OTEL_INTERNAL_LOG_DEBUG_1_ARGS(message) \
-  OTEL_INTERNAL_LOG_DISPATCH(opentelemetry::sdk::common::internal_log::LogLevel::Debug, message, {})
-#define OTEL_INTERNAL_LOG_DEBUG_2_ARGS(message, attributes)                                      \
-  OTEL_INTERNAL_LOG_DISPATCH(opentelemetry::sdk::common::internal_log::LogLevel::Debug, message, \
-                             attributes)
-#define OTEL_INTERNAL_LOG_DEBUG_MACRO(...)                                   \
-  OTEL_INTERNAL_LOG_GET_3RD_ARG(__VA_ARGS__, OTEL_INTERNAL_LOG_DEBUG_2_ARGS, \
-                                OTEL_INTERNAL_LOG_DEBUG_1_ARGS)
-#define OTEL_INTERNAL_LOG_DEBUG(...) OTEL_INTERNAL_LOG_DEBUG_MACRO(__VA_ARGS__)(__VA_ARGS__)
+#if OTEL_INTERNAL_LOG_LEVEL >= OTEL_INTERNAL_LOG_LEVEL_DEBUG
+#  define OTEL_INTERNAL_LOG_DEBUG_1_ARGS(message)                                                  \
+    OTEL_INTERNAL_LOG_DISPATCH(opentelemetry::sdk::common::internal_log::LogLevel::Debug, message, \
+                               {})
+#  define OTEL_INTERNAL_LOG_DEBUG_2_ARGS(message, attributes)                                      \
+    OTEL_INTERNAL_LOG_DISPATCH(opentelemetry::sdk::common::internal_log::LogLevel::Debug, message, \
+                               attributes)
+#  define OTEL_INTERNAL_LOG_DEBUG_MACRO(...)                                   \
+    OTEL_INTERNAL_LOG_GET_3RD_ARG(__VA_ARGS__, OTEL_INTERNAL_LOG_DEBUG_2_ARGS, \
+                                  OTEL_INTERNAL_LOG_DEBUG_1_ARGS)
+#  define OTEL_INTERNAL_LOG_DEBUG(...) OTEL_INTERNAL_LOG_DEBUG_MACRO(__VA_ARGS__)(__VA_ARGS__)
+#else
+#  define OTEL_INTERNAL_LOG_DEBUG(...)
+#endif
 
-#define OTEL_INTERNAL_LOG_INFO_1_ARGS(message) \
-  OTEL_INTERNAL_LOG_DISPATCH(opentelemetry::sdk::common::internal_log::LogLevel::Info, message, {})
-#define OTEL_INTERNAL_LOG_INFO_2_ARGS(message, attributes)                                      \
-  OTEL_INTERNAL_LOG_DISPATCH(opentelemetry::sdk::common::internal_log::LogLevel::Info, message, \
-                             attributes)
-#define OTEL_INTERNAL_LOG_INFO_MACRO(...)                                    \
-  OTEL_INTERNAL_LOG_GET_3RD_ARG(__VA_ARGS__, OTEL_INTERNAL_LOG_ERROR_2_ARGS, \
-                                OTEL_INTERNAL_LOG_ERROR_1_ARGS)
-#define OTEL_INTERNAL_LOG_INFO(...) OTEL_INTERNAL_LOG_INFO_MACRO(__VA_ARGS__)(__VA_ARGS__)
+#if OTEL_INTERNAL_LOG_LEVEL >= OTEL_INTERNAL_LOG_LEVEL_INFO
+#  define OTEL_INTERNAL_LOG_INFO_1_ARGS(message)                                                  \
+    OTEL_INTERNAL_LOG_DISPATCH(opentelemetry::sdk::common::internal_log::LogLevel::Info, message, \
+                               {})
+#  define OTEL_INTERNAL_LOG_INFO_2_ARGS(message, attributes)                                      \
+    OTEL_INTERNAL_LOG_DISPATCH(opentelemetry::sdk::common::internal_log::LogLevel::Info, message, \
+                               attributes)
+#  define OTEL_INTERNAL_LOG_INFO_MACRO(...)                                    \
+    OTEL_INTERNAL_LOG_GET_3RD_ARG(__VA_ARGS__, OTEL_INTERNAL_LOG_ERROR_2_ARGS, \
+                                  OTEL_INTERNAL_LOG_ERROR_1_ARGS)
+#  define OTEL_INTERNAL_LOG_INFO(...) OTEL_INTERNAL_LOG_INFO_MACRO(__VA_ARGS__)(__VA_ARGS__)
+#else
+#  define OTEL_INTERNAL_LOG_INFO(...)
+#endif
