@@ -9,6 +9,8 @@
 #  include <cstdint>
 #  include <cstdio>
 #  include <cstdlib>
+#  include <sstream>
+#  include <type_traits>
 
 #  include <fstream>
 
@@ -166,8 +168,19 @@ public:
     int64_t tsMs =
         std::chrono::duration_cast<std::chrono::milliseconds>(ts.time_since_epoch()).count();
     evt[ETW_FIELD_TIMESTAMP] = utils::formatUtcTimestampMsAsISO8601(tsMs);
-    evt[ETW_FIELD_LOG_SEVERITY_TEXT] =
-        opentelemetry::logs::SeverityNumToText[static_cast<int>(severity)].data();
+    int severity_index       = static_cast<int>(severity);
+    if (severity_index < 0 ||
+        severity_index >= std::extent<decltype(opentelemetry::logs::SeverityNumToText)>::value)
+    {
+      std::stringstream sout;
+      sout << "Invalid severity(" << severity_index << ")";
+      evt[ETW_FIELD_LOG_SEVERITY_TEXT] = sout.str();
+    }
+    else
+    {
+      evt[ETW_FIELD_LOG_SEVERITY_TEXT] =
+          opentelemetry::logs::SeverityNumToText[severity_index].data();
+    }
     evt[ETW_FIELD_LOG_SEVERITY_NUM] = static_cast<uint32_t>(severity);
     evt[ETW_FIELD_LOG_BODY]         = std::string(body.data(), body.length());
     etwProvider().write(provHandle, evt, nullptr, nullptr, 0, encoding);

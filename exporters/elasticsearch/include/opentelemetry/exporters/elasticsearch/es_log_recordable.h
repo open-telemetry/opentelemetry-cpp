@@ -5,7 +5,10 @@
 #ifdef ENABLE_LOGS_PREVIEW
 
 #  include <map>
+#  include <sstream>
+#  include <type_traits>
 #  include <unordered_map>
+
 #  include "nlohmann/json.hpp"
 #  include "opentelemetry/sdk/common/attribute_utils.h"
 #  include "opentelemetry/sdk/logs/recordable.h"
@@ -108,7 +111,18 @@ public:
   void SetSeverity(opentelemetry::logs::Severity severity) noexcept override
   {
     // Convert the severity enum to a string
-    json_["severity"] = opentelemetry::logs::SeverityNumToText[static_cast<int>(severity)];
+    int severity_index = static_cast<int>(severity);
+    if (severity_index < 0 ||
+        severity_index >= std::extent<decltype(opentelemetry::logs::SeverityNumToText)>::value)
+    {
+      std::stringstream sout;
+      sout << "Invalid severity(" << severity_index << ")";
+      json_["severity"] = sout.str();
+    }
+    else
+    {
+      json_["severity"] = opentelemetry::logs::SeverityNumToText[severity_index];
+    }
   }
 
   /**

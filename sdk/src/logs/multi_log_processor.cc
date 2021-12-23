@@ -61,7 +61,7 @@ void MultiLogProcessor::OnReceive(std::unique_ptr<Recordable> &&record) noexcept
     auto recordable = multi_recordable->ReleaseRecordable(*processor);
     if (recordable)
     {
-      processor->OnReceive(std::move(record));
+      processor->OnReceive(std::move(recordable));
     }
   }
 }

@@ -81,7 +81,8 @@ TEST(OstreamLogExporter, DefaultLogRecordToCout)
       "  severity_text : INVALID\n"
       "  name          : \n"
       "  body          : \n"
-      "  resource      : {}\n"
+      "  resource      : {{telemetry.sdk.version: " OPENTELEMETRY_VERSION
+      "}, {telemetry.sdk.name: opentelemetry}, {telemetry.sdk.language: cpp}}\n"
       "  attributes    : {}\n"
       "  trace_id      : 00000000000000000000000000000000\n"
       "  span_id       : 0000000000000000\n"
@@ -284,7 +285,9 @@ TEST(OStreamLogExporter, IntegrationTest)
       "  severity_text : DEBUG\n"
       "  name          : \n"
       "  body          : Hello\n"
-      "  resource      : {}\n"
+      "  resource      : {{service.name: unknown_service}, "
+      "{telemetry.sdk.version: " OPENTELEMETRY_VERSION
+      "}, {telemetry.sdk.name: opentelemetry}, {telemetry.sdk.language: cpp}}\n"
       "  attributes    : {}\n"
       "  trace_id      : 00000000000000000000000000000000\n"
       "  span_id       : 0000000000000000\n"
