@@ -67,6 +67,39 @@ private:
     }
   }
 
+  void WriteKeyValue(nostd::string_view key,
+                     const opentelemetry::sdk::common::OwnedAttributeValue &value,
+                     std::string name)
+  {
+    namespace common = opentelemetry::sdk::common;
+    switch (value.index())
+    {
+      case common::kTypeBool:
+        json_[name][key.data()] = opentelemetry::nostd::get<bool>(value) ? true : false;
+        return;
+      case common::kTypeInt:
+        json_[name][key.data()] = opentelemetry::nostd::get<int>(value);
+        return;
+      case common::kTypeInt64:
+        json_[name][key.data()] = opentelemetry::nostd::get<int64_t>(value);
+        return;
+      case common::kTypeUInt:
+        json_[name][key.data()] = opentelemetry::nostd::get<unsigned int>(value);
+        return;
+      case common::kTypeUInt64:
+        json_[name][key.data()] = opentelemetry::nostd::get<uint64_t>(value);
+        return;
+      case common::kTypeDouble:
+        json_[name][key.data()] = opentelemetry::nostd::get<double>(value);
+        return;
+      case common::kTypeString:
+        json_[name][key.data()] = opentelemetry::nostd::get<std::string>(value).data();
+        return;
+      default:
+        return;
+    }
+  }
+
 public:
   /**
    * Set the severity for this log.
