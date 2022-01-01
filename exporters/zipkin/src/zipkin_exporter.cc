@@ -1,6 +1,7 @@
 // Copyright The OpenTelemetry Authors
 // SPDX-License-Identifier: Apache-2.0
 
+#define _WINSOCKAPI_  // stops including winsock.h
 #include "opentelemetry/exporters/zipkin/zipkin_exporter.h"
 #include <mutex>
 #include "opentelemetry/exporters/zipkin/recordable.h"
