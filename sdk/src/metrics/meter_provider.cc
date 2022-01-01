@@ -21,7 +21,7 @@ MeterProvider::MeterProvider(std::shared_ptr<MeterContext> context) noexcept : c
 
 MeterProvider::MeterProvider(std::vector<std::unique_ptr<MetricExporter>> &&exporters,
                              std::vector<std::unique_ptr<MetricReader>> &&readers,
-                             std::vector<std::unique_ptr<View>> &&views,
+                             std::unique_ptr<ViewRegistry> views,
                              sdk::resource::Resource resource) noexcept
     : context_(std::make_shared<MeterContext>(std::move(exporters),
                                               std::move(readers),
@@ -70,9 +70,12 @@ void MeterProvider::AddMetricReader(std::unique_ptr<MetricReader> reader) noexce
   return context_->AddMetricReader(std::move(reader));
 }
 
-void MeterProvider::AddView(std::unique_ptr<View> view) noexcept
+void MeterProvider::AddView(std::unique_ptr<InstrumentSelector> instrument_selector,
+                            std::unique_ptr<MeterSelector> meter_selector,
+                            std::unique_ptr<View> view) noexcept
 {
-  return context_->AddView(std::move(view));
+  return context_->AddView(std::move(instrument_selector), std::move(meter_selector),
+                           std::move(view));
 }
 
 /**
