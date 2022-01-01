@@ -102,7 +102,9 @@ else()
   )
 endif()
 
-option(WITH_STL "Whether to use Standard Library for C++latest features" OFF)
+option(WITH_STL "Whether to use Standard Library for C++ latest features" OFF)
+option(WITH_GSL
+       "Whether to use Guidelines Support Library for C++ latest features" OFF)
 
 option(WITH_ABSEIL "Whether to use Abseil for C++latest features" OFF)
 
@@ -137,18 +139,6 @@ if(WITH_STL)
   # (absl::variant or std::variant) in variant unit test code is consistent with
   # the global project build definitions.
   add_definitions(-DHAVE_CPP_STDLIB)
-  add_definitions(-DHAVE_GSL)
-
-  # Guidelines Support Library path. Used if we are not on not get C++20.
-  #
-  # TODO: respect WITH_ABSEIL as alternate implementation of std::span
-  find_package(Microsoft.GSL QUIET)
-  if(TARGET Microsoft.GSL::GSL)
-    list(APPEND CORE_RUNTIME_LIBS Microsoft.GSL::GSL)
-  else()
-    set(GSL_DIR third_party/ms-gsl)
-    include_directories(${GSL_DIR}/include)
-  endif()
 
   # Optimize for speed to reduce the hops
   if(CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")
@@ -162,6 +152,20 @@ if(WITH_STL)
       endif()
     endif()
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${MSVC_CXX_OPT_FLAG}")
+  endif()
+endif()
+
+if(WITH_GSL)
+  add_definitions(-DHAVE_GSL)
+
+  # Guidelines Support Library path. Used if we are not on not get C++20.
+  #
+  find_package(Microsoft.GSL QUIET)
+  if(TARGET Microsoft.GSL::GSL)
+    list(APPEND CORE_RUNTIME_LIBS Microsoft.GSL::GSL)
+  else()
+    set(GSL_DIR third_party/ms-gsl)
+    include_directories(${GSL_DIR}/include)
   endif()
 endif()
 
