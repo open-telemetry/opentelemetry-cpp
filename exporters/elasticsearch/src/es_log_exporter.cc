@@ -55,7 +55,7 @@ public:
   bool waitForResponse()
   {
     std::unique_lock<std::mutex> lk(mutex_);
-    cv_.wait(lk);
+    cv_.wait(lk, [this] { return stop_waiting_; });
     return response_received_;
   }
 
@@ -72,6 +72,23 @@ public:
   // Callback method when an http event occurs
   void OnEvent(http_client::SessionState state, nostd::string_view reason) noexcept override
   {
+    // need to modify stop_waiting_ under lock before calling notify_all
+    switch (state)
+    {
+      case http_client::SessionState::CreateFailed:
+      case http_client::SessionState::ConnectFailed:
+      case http_client::SessionState::SendFailed:
+      case http_client::SessionState::SSLHandshakeFailed:
+      case http_client::SessionState::TimedOut:
+      case http_client::SessionState::NetworkError:
+      case http_client::SessionState::Cancelled: {
+        std::unique_lock<std::mutex> lk(mutex_);
+        stop_waiting_ = true;
+      }
+      break;
+      default:
+        break;
+    }
     // If any failure event occurs, release the condition variable to unblock main thread
     switch (state)
     {
@@ -98,6 +115,9 @@ private:
   // Define a condition variable and mutex
   std::condition_variable cv_;
   std::mutex mutex_;
+
+  // Whether notify has been called
+  bool stop_waiting_ = false;
 
   // Whether the response from Elasticsearch has been received
   bool response_received_ = false;
