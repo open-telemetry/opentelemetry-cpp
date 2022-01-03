@@ -60,7 +60,7 @@ public:
    * @param args The arguments for the logger. TODO: Once the logging spec defines it,
    * give a list of arguments that the logger supports.
    * @param library_name The version of the library.
-   * @param version The version of the library.
+   * @param library_version The version of the library.
    * @param schema_url The schema URL.
    */
   nostd::shared_ptr<opentelemetry::logs::Logger> GetLogger(
