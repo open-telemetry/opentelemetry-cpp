@@ -4,6 +4,7 @@
 #include <agent_types.h>
 #include <opentelemetry/exporters/jaeger/jaeger_exporter.h>
 #include <opentelemetry/exporters/jaeger/recordable.h>
+#include "opentelemetry/sdk_config.h"
 
 #include "http_transport.h"
 #include "thrift_sender.h"
@@ -42,6 +43,7 @@ sdk_common::ExportResult JaegerExporter::Export(
 {
   if (isShutdown())
   {
+    OTEL_INTERNAL_LOG_ERROR("[Jaeger Trace Exporter] Export failed, exporter is shutdown");
     return sdk_common::ExportResult::kFailure;
   }
 

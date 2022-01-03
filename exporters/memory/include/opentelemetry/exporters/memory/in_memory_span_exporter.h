@@ -6,6 +6,7 @@
 #include "opentelemetry/common/spin_lock_mutex.h"
 #include "opentelemetry/exporters/memory/in_memory_span_data.h"
 #include "opentelemetry/sdk/trace/exporter.h"
+#include "opentelemetry/sdk_config.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace exporter
@@ -46,6 +47,7 @@ public:
   {
     if (isShutdown())
     {
+      OTEL_INTERNAL_LOG_ERROR("[In Memory Span Exporter] Export failed, exporter is shutdown");
       return sdk::common::ExportResult::kFailure;
     }
     for (auto &recordable : recordables)

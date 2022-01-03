@@ -110,6 +110,7 @@ sdk::common::ExportResult OStreamLogExporter::Export(
 {
   if (isShutdown())
   {
+    OTEL_INTERNAL_LOG_ERROR("[Ostream Log Exporter] Export failed, exporter is shutdown");
     return sdk::common::ExportResult::kFailure;
   }
 

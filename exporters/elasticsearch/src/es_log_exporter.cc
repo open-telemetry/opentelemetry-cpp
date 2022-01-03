@@ -130,8 +130,7 @@ sdk::common::ExportResult ElasticsearchLogExporter::Export(
   // Return failure if this exporter has been shutdown
   if (isShutdown())
   {
-
-    OTEL_INTERNAL_LOG_ERROR("[ES Trace Exporter] Export failed, exporter is shutdown");
+    OTEL_INTERNAL_LOG_ERROR("[ES Log Exporter] Export failed, exporter is shutdown");
     return sdk::common::ExportResult::kFailure;
   }
 

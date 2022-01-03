@@ -4,6 +4,7 @@
 #include "opentelemetry/exporters/ostream/span_exporter.h"
 #include <iostream>
 #include <mutex>
+#include "opentelemetry/sdk_config.h"
 
 namespace nostd     = opentelemetry::nostd;
 namespace trace_sdk = opentelemetry::sdk::trace;
@@ -46,6 +47,7 @@ sdk::common::ExportResult OStreamSpanExporter::Export(
 {
   if (isShutdown())
   {
+    OTEL_INTERNAL_LOG_ERROR("[Ostream Trace Exporter] Export failed, exporter is shutdown");
     return sdk::common::ExportResult::kFailure;
   }
 

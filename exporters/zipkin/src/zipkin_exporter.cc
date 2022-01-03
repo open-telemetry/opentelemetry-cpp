@@ -44,6 +44,7 @@ sdk::common::ExportResult ZipkinExporter::Export(
 {
   if (isShutdown())
   {
+    OTEL_INTERNAL_LOG_ERROR("[Zipkin Trace Exporter] Export failed, exporter is shutdown");
     return sdk::common::ExportResult::kFailure;
   }
   exporter::zipkin::ZipkinSpan json_spans = {};
