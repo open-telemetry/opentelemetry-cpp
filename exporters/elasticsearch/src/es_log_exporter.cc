@@ -44,6 +44,9 @@ public:
 
       // Set the response_received_ flag to true and notify any threads waiting on this result
       response_received_ = true;
+
+      // stop waiting if `notify_all` is called before `wait`
+      stop_waiting_ = true;
     }
     cv_.notify_all();
   }
