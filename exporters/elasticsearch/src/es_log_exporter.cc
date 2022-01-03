@@ -130,7 +130,8 @@ sdk::common::ExportResult ElasticsearchLogExporter::Export(
   // Return failure if this exporter has been shutdown
   if (isShutdown())
   {
-    OTEL_INTERNAL_LOG_ERROR("[ES Log Exporter] Export failed, exporter is shutdown");
+    OTEL_INTERNAL_LOG_ERROR("[ES Log Exporter] Exporting "
+                            << records.size() << " log(s) failed, exporter is shutdown");
     return sdk::common::ExportResult::kFailure;
   }
 
@@ -209,7 +210,7 @@ bool ElasticsearchLogExporter::Shutdown(std::chrono::microseconds timeout) noexc
   return true;
 }
 
-const bool ElasticsearchLogExporter::isShutdown() const noexcept
+bool ElasticsearchLogExporter::isShutdown() const noexcept
 {
   const std::lock_guard<opentelemetry::common::SpinLockMutex> locked(lock_);
   return is_shutdown_;

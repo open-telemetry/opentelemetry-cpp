@@ -106,7 +106,8 @@ sdk::common::ExportResult OtlpGrpcExporter::Export(
 {
   if (isShutdown())
   {
-    OTEL_INTERNAL_LOG_ERROR("[OTLP gRPC] Export failed, exporter is shutdown");
+    OTEL_INTERNAL_LOG_ERROR("[OTLP gRPC] Exporting " << spans.size()
+                                                     << " span(s) failed, exporter is shutdown");
     return sdk::common::ExportResult::kFailure;
   }
   proto::collector::trace::v1::ExportTraceServiceRequest request;
@@ -144,7 +145,7 @@ bool OtlpGrpcExporter::Shutdown(std::chrono::microseconds timeout) noexcept
   return true;
 }
 
-const bool OtlpGrpcExporter::isShutdown() const noexcept
+bool OtlpGrpcExporter::isShutdown() const noexcept
 {
   const std::lock_guard<opentelemetry::common::SpinLockMutex> locked(lock_);
   return is_shutdown_;

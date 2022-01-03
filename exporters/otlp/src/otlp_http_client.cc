@@ -695,7 +695,7 @@ bool OtlpHttpClient::Shutdown(std::chrono::microseconds) noexcept
   return true;
 }
 
-const bool OtlpHttpClient::isShutdown() const noexcept
+bool OtlpHttpClient::isShutdown() const noexcept
 {
   const std::lock_guard<opentelemetry::common::SpinLockMutex> locked(lock_);
   return is_shutdown_;

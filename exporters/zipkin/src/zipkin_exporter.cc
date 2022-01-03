@@ -44,7 +44,8 @@ sdk::common::ExportResult ZipkinExporter::Export(
 {
   if (isShutdown())
   {
-    OTEL_INTERNAL_LOG_ERROR("[Zipkin Trace Exporter] Export failed, exporter is shutdown");
+    OTEL_INTERNAL_LOG_ERROR("[Zipkin Trace Exporter] Exporting "
+                            << spans.size() << " span(s) failed, exporter is shutdown");
     return sdk::common::ExportResult::kFailure;
   }
   exporter::zipkin::ZipkinSpan json_spans = {};
@@ -108,7 +109,7 @@ bool ZipkinExporter::Shutdown(std::chrono::microseconds timeout) noexcept
   return true;
 }
 
-const bool ZipkinExporter::isShutdown() const noexcept
+bool ZipkinExporter::isShutdown() const noexcept
 {
   const std::lock_guard<opentelemetry::common::SpinLockMutex> locked(lock_);
   return is_shutdown_;

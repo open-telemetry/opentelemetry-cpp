@@ -47,7 +47,8 @@ sdk::common::ExportResult OStreamSpanExporter::Export(
 {
   if (isShutdown())
   {
-    OTEL_INTERNAL_LOG_ERROR("[Ostream Trace Exporter] Export failed, exporter is shutdown");
+    OTEL_INTERNAL_LOG_ERROR("[Ostream Trace Exporter] Exporting "
+                            << spans.size() << " span(s) failed, exporter is shutdown");
     return sdk::common::ExportResult::kFailure;
   }
 
@@ -102,7 +103,7 @@ bool OStreamSpanExporter::Shutdown(std::chrono::microseconds timeout) noexcept
   return true;
 }
 
-const bool OStreamSpanExporter::isShutdown() const noexcept
+bool OStreamSpanExporter::isShutdown() const noexcept
 {
   const std::lock_guard<opentelemetry::common::SpinLockMutex> locked(lock_);
   return is_shutdown_;

@@ -80,7 +80,7 @@ private:
   OtlpGrpcLogExporter(std::unique_ptr<proto::collector::logs::v1::LogsService::StubInterface> stub);
   bool is_shutdown_ = false;
   mutable opentelemetry::common::SpinLockMutex lock_;
-  const bool isShutdown() const noexcept;
+  bool isShutdown() const noexcept;
 };
 
 }  // namespace otlp

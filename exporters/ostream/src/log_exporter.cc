@@ -4,6 +4,7 @@
 #ifdef ENABLE_LOGS_PREVIEW
 #  include "opentelemetry/exporters/ostream/log_exporter.h"
 #  include <mutex>
+#  include "opentelemetry/sdk_config.h"
 
 #  include <iostream>
 
@@ -110,7 +111,8 @@ sdk::common::ExportResult OStreamLogExporter::Export(
 {
   if (isShutdown())
   {
-    OTEL_INTERNAL_LOG_ERROR("[Ostream Log Exporter] Export failed, exporter is shutdown");
+    OTEL_INTERNAL_LOG_ERROR("[Ostream Log Exporter] Exporting "
+                            << records.size() << " log(s) failed, exporter is shutdown");
     return sdk::common::ExportResult::kFailure;
   }
 
@@ -175,7 +177,7 @@ bool OStreamLogExporter::Shutdown(std::chrono::microseconds timeout) noexcept
   return true;
 }
 
-const bool OStreamLogExporter::isShutdown() const noexcept
+bool OStreamLogExporter::isShutdown() const noexcept
 {
   const std::lock_guard<opentelemetry::common::SpinLockMutex> locked(lock_);
   return is_shutdown_;

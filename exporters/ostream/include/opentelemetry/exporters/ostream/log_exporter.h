@@ -51,7 +51,7 @@ private:
   // Whether this exporter has been shut down
   bool is_shutdown_ = false;
   mutable opentelemetry::common::SpinLockMutex lock_;
-  const bool isShutdown() const noexcept;
+  bool isShutdown() const noexcept;
 };
 }  // namespace logs
 }  // namespace exporter

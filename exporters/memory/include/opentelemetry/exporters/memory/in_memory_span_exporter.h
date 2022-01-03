@@ -47,7 +47,8 @@ public:
   {
     if (isShutdown())
     {
-      OTEL_INTERNAL_LOG_ERROR("[In Memory Span Exporter] Export failed, exporter is shutdown");
+      OTEL_INTERNAL_LOG_ERROR("[In Memory Span Exporter] Exporting "
+                              << recordables.size() << " span(s) failed, exporter is shutdown");
       return sdk::common::ExportResult::kFailure;
     }
     for (auto &recordable : recordables)

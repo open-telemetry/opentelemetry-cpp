@@ -126,7 +126,7 @@ private:
   // Cached parsed URI
   std::string http_uri_;
   mutable opentelemetry::common::SpinLockMutex lock_;
-  const bool isShutdown() const noexcept;
+  bool isShutdown() const noexcept;
 };
 }  // namespace otlp
 }  // namespace exporter

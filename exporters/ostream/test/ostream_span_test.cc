@@ -47,11 +47,12 @@ TEST(OStreamSpanExporter, Shutdown)
   recordable->SetName("Test Span");
 
   // Capture the output of cout
-  const auto captured     = WithOStreamCapture(std::cout, [&]() {
+  const auto captured = WithOStreamCapture(std::cout, [&]() {
     EXPECT_TRUE(processor->Shutdown());
     processor->OnEnd(std::move(recordable));
   });
-  std::string err_message = "[Ostream Trace Exporter] Export failed, exporter is shutdown";
+  std::string err_message =
+      "[Ostream Trace Exporter] Exporting 1 span(s) failed, exporter is shutdown";
   EXPECT_TRUE(captured.find(err_message) != std::string::npos);
 }
 

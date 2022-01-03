@@ -96,7 +96,7 @@ private:
   opentelemetry::ext::http::common::UrlParser url_parser_;
   nlohmann::json local_end_point_;
   mutable opentelemetry::common::SpinLockMutex lock_;
-  const bool isShutdown() const noexcept;
+  bool isShutdown() const noexcept;
 };
 }  // namespace zipkin
 }  // namespace exporter

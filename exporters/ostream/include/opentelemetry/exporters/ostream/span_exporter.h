@@ -45,7 +45,7 @@ private:
   std::ostream &sout_;
   bool is_shutdown_ = false;
   mutable opentelemetry::common::SpinLockMutex lock_;
-  const bool isShutdown() const noexcept;
+  bool isShutdown() const noexcept;
 
   // Mapping status number to the string from api/include/opentelemetry/trace/canonical_code.h
   std::map<int, std::string> statusMap{{0, "Unset"}, {1, "Ok"}, {2, "Error"}};

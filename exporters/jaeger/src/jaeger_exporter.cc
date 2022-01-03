@@ -43,7 +43,8 @@ sdk_common::ExportResult JaegerExporter::Export(
 {
   if (isShutdown())
   {
-    OTEL_INTERNAL_LOG_ERROR("[Jaeger Trace Exporter] Export failed, exporter is shutdown");
+    OTEL_INTERNAL_LOG_ERROR("[Jaeger Trace Exporter] Exporting "
+                            << spans.size() << " span(s) failed, exporter is shutdown");
     return sdk_common::ExportResult::kFailure;
   }
 
@@ -99,7 +100,7 @@ bool JaegerExporter::Shutdown(std::chrono::microseconds timeout) noexcept
   return true;
 }
 
-const bool JaegerExporter::isShutdown() const noexcept
+bool JaegerExporter::isShutdown() const noexcept
 {
   const std::lock_guard<opentelemetry::common::SpinLockMutex> locked(lock_);
   return is_shutdown_;

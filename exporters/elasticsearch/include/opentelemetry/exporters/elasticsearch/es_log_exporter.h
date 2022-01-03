@@ -106,7 +106,7 @@ private:
   // Object that stores the HTTP sessions that have been created
   std::unique_ptr<ext::http::client::HttpClient> http_client_;
   mutable opentelemetry::common::SpinLockMutex lock_;
-  const bool isShutdown() const noexcept;
+  bool isShutdown() const noexcept;
 };
 }  // namespace logs
 }  // namespace exporter
