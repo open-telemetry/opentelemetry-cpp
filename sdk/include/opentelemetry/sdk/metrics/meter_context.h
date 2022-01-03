@@ -8,7 +8,9 @@
 #  include <vector>
 #  include "opentelemetry/sdk/metrics/metric_exporter.h"
 #  include "opentelemetry/sdk/metrics/metric_reader.h"
-#  include "opentelemetry/sdk/metrics/view.h"
+#  include "opentelemetry/sdk/metrics/view/instrument_selector.h"
+#  include "opentelemetry/sdk/metrics/view/meter_selector.h"
+#  include "opentelemetry/sdk/metrics/view/view_registry.h"
 #  include "opentelemetry/sdk/resource/resource.h"
 #  include "opentelemetry/version.h"
 
@@ -31,11 +33,12 @@ public:
    * @param views The views to be configured with meter context.
    * @param resource  The resource for this meter context.
    */
-  MeterContext(std::vector<std::unique_ptr<sdk::metrics::MetricExporter>> &&exporters,
-               std::vector<std::unique_ptr<MetricReader>> &&readers,
-               std::vector<std::unique_ptr<View>> &&views,
-               opentelemetry::sdk::resource::Resource resource =
-                   opentelemetry::sdk::resource::Resource::Create({})) noexcept;
+  MeterContext(
+      std::vector<std::unique_ptr<sdk::metrics::MetricExporter>> &&exporters,
+      std::vector<std::unique_ptr<MetricReader>> &&readers,
+      std::unique_ptr<ViewRegistry> views = std::unique_ptr<ViewRegistry>(new ViewRegistry()),
+      opentelemetry::sdk::resource::Resource resource =
+          opentelemetry::sdk::resource::Resource::Create({})) noexcept;
 
   /**
    * Obtain the resource associated with this meter context.
@@ -71,7 +74,9 @@ public:
    * Note: This view may not receive any in-flight meter data, but will get newly created meter
    * data. Note: This method is not thread safe, and should ideally be called from main thread.
    */
-  void AddView(std::unique_ptr<View> view) noexcept;
+  void AddView(std::unique_ptr<InstrumentSelector> instrument_selector,
+               std::unique_ptr<MeterSelector> meter_selector,
+               std::unique_ptr<View> view) noexcept;
 
   /**
    * Force all active Exporters and Readers to flush any buffered meter data
@@ -89,7 +94,7 @@ private:
   opentelemetry::sdk::resource::Resource resource_;
   std::vector<std::unique_ptr<MetricExporter>> exporters_;
   std::vector<std::unique_ptr<MetricReader>> readers_;
-  std::vector<std::unique_ptr<View>> views_;
+  std::unique_ptr<ViewRegistry> views_;
 };
 
 }  // namespace metrics
