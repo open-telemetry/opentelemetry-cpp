@@ -28,10 +28,11 @@ public:
    * @param views The views for this meter provider
    * @param resource  The resources for this meter provider.
    */
-  MeterProvider(std::vector<std::unique_ptr<MetricExporter>> &&exporters,
-                std::vector<std::unique_ptr<MetricReader>> &&readers,
-                std::vector<std::unique_ptr<View>> &&views,
-                sdk::resource::Resource resource = sdk::resource::Resource::Create({})) noexcept;
+  MeterProvider(
+      std::vector<std::unique_ptr<MetricExporter>> &&exporters,
+      std::vector<std::unique_ptr<MetricReader>> &&readers,
+      std::unique_ptr<ViewRegistry> views = std::unique_ptr<ViewRegistry>(new ViewRegistry()),
+      sdk::resource::Resource resource    = sdk::resource::Resource::Create({})) noexcept;
 
   /**
    * Initialize a new meter provider with a specified context
@@ -78,7 +79,9 @@ public:
    * Note: This view may not receive any in-flight meter data, but will get newly created meter
    * data. Note: This method is not thread safe, and should ideally be called from main thread.
    */
-  void AddView(std::unique_ptr<View> view) noexcept;
+  void AddView(std::unique_ptr<InstrumentSelector> instrument_selector,
+               std::unique_ptr<MeterSelector> meter_selector,
+               std::unique_ptr<View> view) noexcept;
 
   /**
    * Shutdown the meter provider.

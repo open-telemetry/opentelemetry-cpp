@@ -37,11 +37,11 @@ int ThriftSender::Append(std::unique_ptr<JaegerRecordable> &&span) noexcept
     max_span_bytes -= process_bytes_size_;
   }
 
-  thrift::Span &jaeger_span = *span->Span();
-  jaeger_span.__set_tags(span->Tags());
-  jaeger_span.__set_logs(span->Logs());
+  auto jaeger_span = std::unique_ptr<thrift::Span>(span->Span());
+  jaeger_span->__set_tags(span->Tags());
+  jaeger_span->__set_logs(span->Logs());
 
-  const uint32_t span_size = CalcSizeOfSerializedThrift(jaeger_span);
+  const uint32_t span_size = CalcSizeOfSerializedThrift(*jaeger_span);
   if (span_size > max_span_bytes)
   {
     OTEL_INTERNAL_LOG_ERROR("[JAEGER TRACE Exporter] Append() failed: too large span");
@@ -51,7 +51,7 @@ int ThriftSender::Append(std::unique_ptr<JaegerRecordable> &&span) noexcept
   byte_buffer_size_ += span_size;
   if (byte_buffer_size_ <= max_span_bytes)
   {
-    span_buffer_.push_back(jaeger_span);
+    span_buffer_.push_back(*jaeger_span);
     if (byte_buffer_size_ < max_span_bytes)
     {
       return 0;
@@ -64,7 +64,7 @@ int ThriftSender::Append(std::unique_ptr<JaegerRecordable> &&span) noexcept
   }
 
   const auto flushed = Flush();
-  span_buffer_.push_back(jaeger_span);
+  span_buffer_.push_back(*jaeger_span);
   byte_buffer_size_ = span_size + process_bytes_size_;
 
   return flushed;
