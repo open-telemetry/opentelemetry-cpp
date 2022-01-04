@@ -23,10 +23,10 @@ public:
   /**
    * Initialize a new logger.
    * @param name The name of this logger instance
-   * @param logger_provider The logger provider that owns this logger.
+   * @param context The logger provider that owns this logger.
    */
   explicit Logger(opentelemetry::nostd::string_view name,
-                  std::shared_ptr<LoggerContext> logger_provider) noexcept;
+                  std::shared_ptr<LoggerContext> context) noexcept;
 
   /**
    * Returns the name of this logger.
