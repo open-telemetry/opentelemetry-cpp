@@ -3,6 +3,7 @@
 
 #ifndef HAVE_CPP_STDLIB
 
+#  define _WINSOCKAPI_  // stops including winsock.h
 #  include "opentelemetry/exporters/zipkin/zipkin_exporter.h"
 #  include <string>
 #  include "opentelemetry/ext/http/client/curl/http_client_curl.h"
