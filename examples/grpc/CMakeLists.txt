@@ -15,7 +15,7 @@ add_custom_command(
   COMMAND
     ${PROTOBUF_PROTOC_EXECUTABLE} ARGS "--grpc_out=${CMAKE_CURRENT_BINARY_DIR}"
     "--cpp_out=${CMAKE_CURRENT_BINARY_DIR}" "--proto_path=${proto_file_path}"
-    --plugin=protoc-gen-grpc="${gRPC_CPP_PLUGIN_EXECUTABLE}" "${proto_file}")
+    "--plugin=protoc-gen-grpc=${gRPC_CPP_PLUGIN_EXECUTABLE}" "${proto_file}")
 
 add_library(example_grpc_proto ${example_grpc_srcs} ${example_grpc_hdrs}
                                ${example_proto_srcs} ${example_proto_hdrs})
