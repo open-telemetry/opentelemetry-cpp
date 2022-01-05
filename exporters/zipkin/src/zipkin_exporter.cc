@@ -1,7 +1,9 @@
 // Copyright The OpenTelemetry Authors
 // SPDX-License-Identifier: Apache-2.0
 
+#define _WINSOCKAPI_  // stops including winsock.h
 #include "opentelemetry/exporters/zipkin/zipkin_exporter.h"
+#include <mutex>
 #include "opentelemetry/exporters/zipkin/recordable.h"
 #include "opentelemetry/ext/http/client/http_client_factory.h"
 #include "opentelemetry/ext/http/common/url_parser.h"
@@ -40,8 +42,10 @@ std::unique_ptr<sdk::trace::Recordable> ZipkinExporter::MakeRecordable() noexcep
 sdk::common::ExportResult ZipkinExporter::Export(
     const nostd::span<std::unique_ptr<sdk::trace::Recordable>> &spans) noexcept
 {
-  if (isShutdown_)
+  if (isShutdown())
   {
+    OTEL_INTERNAL_LOG_ERROR("[Zipkin Trace Exporter] Exporting "
+                            << spans.size() << " span(s) failed, exporter is shutdown");
     return sdk::common::ExportResult::kFailure;
   }
   exporter::zipkin::ZipkinSpan json_spans = {};
@@ -100,8 +104,15 @@ void ZipkinExporter::InitializeLocalEndpoint()
 
 bool ZipkinExporter::Shutdown(std::chrono::microseconds timeout) noexcept
 {
-  isShutdown_ = true;
+  const std::lock_guard<opentelemetry::common::SpinLockMutex> locked(lock_);
+  is_shutdown_ = true;
   return true;
+}
+
+bool ZipkinExporter::isShutdown() const noexcept
+{
+  const std::lock_guard<opentelemetry::common::SpinLockMutex> locked(lock_);
+  return is_shutdown_;
 }
 
 }  // namespace zipkin

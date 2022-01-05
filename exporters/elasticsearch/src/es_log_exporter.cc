@@ -5,6 +5,7 @@
 
 #  include <sstream>  // std::stringstream
 
+#  include <mutex>
 #  include "opentelemetry/exporters/elasticsearch/es_log_exporter.h"
 #  include "opentelemetry/exporters/elasticsearch/es_log_recordable.h"
 #  include "opentelemetry/sdk_config.h"
@@ -127,10 +128,10 @@ sdk::common::ExportResult ElasticsearchLogExporter::Export(
     const nostd::span<std::unique_ptr<sdklogs::Recordable>> &records) noexcept
 {
   // Return failure if this exporter has been shutdown
-  if (is_shutdown_)
+  if (isShutdown())
   {
-
-    OTEL_INTERNAL_LOG_ERROR("[ES Trace Exporter] Export failed, exporter is shutdown");
+    OTEL_INTERNAL_LOG_ERROR("[ES Log Exporter] Exporting "
+                            << records.size() << " log(s) failed, exporter is shutdown");
     return sdk::common::ExportResult::kFailure;
   }
 
@@ -199,6 +200,7 @@ sdk::common::ExportResult ElasticsearchLogExporter::Export(
 
 bool ElasticsearchLogExporter::Shutdown(std::chrono::microseconds timeout) noexcept
 {
+  const std::lock_guard<opentelemetry::common::SpinLockMutex> locked(lock_);
   is_shutdown_ = true;
 
   // Shutdown the session manager
@@ -206,6 +208,12 @@ bool ElasticsearchLogExporter::Shutdown(std::chrono::microseconds timeout) noexc
   http_client_->FinishAllSessions();
 
   return true;
+}
+
+bool ElasticsearchLogExporter::isShutdown() const noexcept
+{
+  const std::lock_guard<opentelemetry::common::SpinLockMutex> locked(lock_);
+  return is_shutdown_;
 }
 }  // namespace logs
 }  // namespace exporter
