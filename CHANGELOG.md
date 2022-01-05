@@ -15,7 +15,9 @@ Increment the:
 
 ## [Unreleased]
 
-## [1.1.1] 2021-12-20
+* [SDK] Add LogLevel to internal_log ([#1147](https://github.com/open-telemetry/opentelemetry-cpp/pull/1147))
+
+## [1.1.1] 2021-12-
 
 * [SDK] Rename OTEL_CPP_GET_ATTR macro, and define it using fully qualified attr function ([#1140](https://github.com/open-telemetry/opentelemetry-cpp/pull/1140))
 * [SDK] Default resource attributes and attributes in OTEL_RESOURCE_ATTRIBUTES are missing when using Otlp*LogExporter ([#1082](https://github.com/open-telemetry/opentelemetry-cpp/pull/1082))
