@@ -11,7 +11,6 @@
 #  include "opentelemetry/common/attribute_value.h"
 #  include "opentelemetry/common/key_value_iterable.h"
 #  include "opentelemetry/common/key_value_iterable_view.h"
-#  include "opentelemetry/common/macros.h"
 #  include "opentelemetry/common/timestamp.h"
 #  include "opentelemetry/logs/severity.h"
 #  include "opentelemetry/nostd/shared_ptr.h"
@@ -66,20 +65,6 @@ public:
                    trace::TraceFlags trace_flags,
                    common::SystemTimestamp timestamp) noexcept = 0;
 
-  OPENTELEMETRY_DEPRECATED_MESSAGE("resource is removed and ignored")
-  void Log(Severity severity,
-           nostd::string_view name,
-           nostd::string_view body,
-           OPENTELEMETRY_MAYBE_UNUSED const common::KeyValueIterable &resource,
-           const common::KeyValueIterable &attributes,
-           trace::TraceId trace_id,
-           trace::SpanId span_id,
-           trace::TraceFlags trace_flags,
-           common::SystemTimestamp timestamp) noexcept
-  {
-    this->Log(severity, name, body, attributes, trace_id, span_id, trace_flags, timestamp);
-  }
-
   /*** Overloaded methods for KeyValueIterables ***/
   /**
    * The secondary base Log(...) method that all other Log(...) overloaded methods except the one
@@ -100,46 +85,9 @@ public:
         trace_flags, timestamp);
   }
 
-  template <class T,
-            class U,
-            nostd::enable_if_t<common::detail::is_key_value_iterable<T>::value> * = nullptr,
-            nostd::enable_if_t<common::detail::is_key_value_iterable<U>::value> * = nullptr>
-  OPENTELEMETRY_DEPRECATED_MESSAGE("resource is removed and ignored")
   void Log(Severity severity,
            nostd::string_view name,
            nostd::string_view body,
-           OPENTELEMETRY_MAYBE_UNUSED const T &resource,
-           const U &attributes,
-           trace::TraceId trace_id,
-           trace::SpanId span_id,
-           trace::TraceFlags trace_flags,
-           common::SystemTimestamp timestamp) noexcept
-  {
-    Log(severity, name, body, common::KeyValueIterableView<U>(attributes), trace_id, span_id,
-        trace_flags, timestamp);
-  }
-
-  void Log(Severity severity,
-           nostd::string_view name,
-           nostd::string_view body,
-           std::initializer_list<std::pair<nostd::string_view, common::AttributeValue>> attributes,
-           trace::TraceId trace_id,
-           trace::SpanId span_id,
-           trace::TraceFlags trace_flags,
-           common::SystemTimestamp timestamp) noexcept
-  {
-    return this->Log(severity, name, body,
-                     nostd::span<const std::pair<nostd::string_view, common::AttributeValue>>{
-                         attributes.begin(), attributes.end()},
-                     trace_id, span_id, trace_flags, timestamp);
-  }
-
-  OPENTELEMETRY_DEPRECATED_MESSAGE("resource is removed and ignored")
-  void Log(Severity severity,
-           nostd::string_view name,
-           nostd::string_view body,
-           OPENTELEMETRY_MAYBE_UNUSED std::initializer_list<
-               std::pair<nostd::string_view, common::AttributeValue>> resource,
            std::initializer_list<std::pair<nostd::string_view, common::AttributeValue>> attributes,
            trace::TraceId trace_id,
            trace::SpanId span_id,
