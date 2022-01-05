@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 #include "opentelemetry/exporters/otlp/otlp_grpc_exporter.h"
+#include <mutex>
 #include "opentelemetry/exporters/otlp/otlp_recordable.h"
 #include "opentelemetry/exporters/otlp/otlp_recordable_utils.h"
 #include "opentelemetry/ext/http/common/url_parser.h"
@@ -103,9 +104,10 @@ std::unique_ptr<sdk::trace::Recordable> OtlpGrpcExporter::MakeRecordable() noexc
 sdk::common::ExportResult OtlpGrpcExporter::Export(
     const nostd::span<std::unique_ptr<sdk::trace::Recordable>> &spans) noexcept
 {
-  if (is_shutdown_)
+  if (isShutdown())
   {
-    OTEL_INTERNAL_LOG_ERROR("[OTLP gRPC] Export failed, exporter is shutdown");
+    OTEL_INTERNAL_LOG_ERROR("[OTLP gRPC] Exporting " << spans.size()
+                                                     << " span(s) failed, exporter is shutdown");
     return sdk::common::ExportResult::kFailure;
   }
   proto::collector::trace::v1::ExportTraceServiceRequest request;
@@ -138,8 +140,15 @@ sdk::common::ExportResult OtlpGrpcExporter::Export(
 
 bool OtlpGrpcExporter::Shutdown(std::chrono::microseconds timeout) noexcept
 {
+  const std::lock_guard<opentelemetry::common::SpinLockMutex> locked(lock_);
   is_shutdown_ = true;
   return true;
+}
+
+bool OtlpGrpcExporter::isShutdown() const noexcept
+{
+  const std::lock_guard<opentelemetry::common::SpinLockMutex> locked(lock_);
+  return is_shutdown_;
 }
 
 }  // namespace otlp

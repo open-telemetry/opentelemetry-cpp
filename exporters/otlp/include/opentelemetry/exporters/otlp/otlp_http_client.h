@@ -9,6 +9,7 @@
 
 #include "opentelemetry/exporters/otlp/protobuf_include_suffix.h"
 
+#include "opentelemetry/common/spin_lock_mutex.h"
 #include "opentelemetry/ext/http/client/http_client.h"
 #include "opentelemetry/sdk/common/exporter_utils.h"
 
@@ -124,6 +125,8 @@ private:
   std::shared_ptr<ext::http::client::HttpClient> http_client_;
   // Cached parsed URI
   std::string http_uri_;
+  mutable opentelemetry::common::SpinLockMutex lock_;
+  bool isShutdown() const noexcept;
 };
 }  // namespace otlp
 }  // namespace exporter
