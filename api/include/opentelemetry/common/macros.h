@@ -19,12 +19,8 @@
 #  define OPENTELEMETRY_MAYBE_UNUSED __attribute__((unused))
 #elif defined(__GNUC__) && ((__GNUC__ >= 4) || ((__GNUC__ == 3) && (__GNUC_MINOR__ >= 1)))
 #  define OPENTELEMETRY_MAYBE_UNUSED __attribute__((unused))
-#elif defined(_MSC_VER) && _MSC_VER >= 1700  // vs 2012 or higher
-#  if _MSC_VER >= 1910 && defined(_MSVC_LANG) && _MSVC_LANG >= 201703L
-#    define OPENTELEMETRY_MAYBE_UNUSED [[maybe_unused]]
-#  else
-#    define OPENTELEMETRY_MAYBE_UNUSED
-#  endif
+#elif (defined(_MSC_VER) && _MSC_VER >= 1910) && (defined(_MSVC_LANG) && _MSVC_LANG >= 201703L)
+#  define OPENTELEMETRY_MAYBE_UNUSED [[maybe_unused]]
 #else
 #  define OPENTELEMETRY_MAYBE_UNUSED
 #endif
