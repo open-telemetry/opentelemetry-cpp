@@ -46,8 +46,9 @@ TEST(OStreamLogExporter, Shutdown)
 
   // Restore original stringstream buffer
   std::cout.rdbuf(original);
-
-  ASSERT_EQ(output.str(), "");
+  std::string err_message =
+      "[Ostream Log Exporter] Exporting 1 log(s) failed, exporter is shutdown";
+  EXPECT_TRUE(output.str().find(err_message) != std::string::npos);
 }
 
 // ---------------------------------- Print to cout -------------------------
