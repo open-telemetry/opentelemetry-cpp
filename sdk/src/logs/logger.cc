@@ -66,6 +66,7 @@ void Logger::Log(opentelemetry::logs::Severity severity,
   recordable->SetSeverity(severity);
   recordable->SetName(name);
   recordable->SetBody(body);
+  recordable->SetInstrumentationLibrary(GetInstrumentationLibrary());
 
   resource.ForEachKeyValue([&](nostd::string_view key, common::AttributeValue value) noexcept {
     recordable->SetResource(key, value);

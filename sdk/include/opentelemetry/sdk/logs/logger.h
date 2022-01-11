@@ -72,7 +72,7 @@ private:
   // The logger provider of this Logger. Uses a weak_ptr to avoid cyclic dependency issues the with
   // logger provider
   std::weak_ptr<LoggerProvider> logger_provider_;
-  std::shared_ptr<instrumentationlibrary::InstrumentationLibrary> instrumentation_library_;
+  std::unique_ptr<instrumentationlibrary::InstrumentationLibrary> instrumentation_library_;
 };
 
 }  // namespace logs
