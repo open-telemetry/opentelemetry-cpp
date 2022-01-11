@@ -32,6 +32,14 @@ ZipkinExporter::ZipkinExporter() : options_(ZipkinExporterOptions()), url_parser
   InitializeLocalEndpoint();
 }
 
+ZipkinExporter::ZipkinExporter(
+    std::shared_ptr<opentelemetry::ext::http::client::HttpClientSync> http_client)
+    : options_(ZipkinExporterOptions()), url_parser_(options_.endpoint)
+{
+  http_client_ = http_client;
+  InitializeLocalEndpoint();
+}
+
 // ----------------------------- Exporter methods ------------------------------
 
 std::unique_ptr<sdk::trace::Recordable> ZipkinExporter::MakeRecordable() noexcept
