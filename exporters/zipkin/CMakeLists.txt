@@ -47,4 +47,26 @@ if(BUILD_TESTING)
     TARGET zipkin_recordable_test
     TEST_PREFIX exporter.
     TEST_LIST zipkin_recordable_test)
+
+  if(MSVC)
+    if(GMOCK_LIB)
+      unset(GMOCK_LIB CACHE)
+    endif()
+  endif()
+  if(MSVC AND CMAKE_BUILD_TYPE STREQUAL "Debug")
+    find_library(GMOCK_LIB gmockd PATH_SUFFIXES lib)
+  else()
+    find_library(GMOCK_LIB gmock PATH_SUFFIXES lib)
+  endif()
+
+  add_executable(zipkin_exporter_test test/zipkin_exporter_test.cc)
+
+  target_link_libraries(
+    zipkin_exporter_test ${GTEST_BOTH_LIBRARIES} ${CMAKE_THREAD_LIBS_INIT}
+    ${GMOCK_LIB} opentelemetry_exporter_zipkin_trace opentelemetry_resources)
+
+  gtest_add_tests(
+    TARGET zipkin_exporter_test
+    TEST_PREFIX exporter.
+    TEST_LIST zipkin_exporter_test)
 endif() # BUILD_TESTING

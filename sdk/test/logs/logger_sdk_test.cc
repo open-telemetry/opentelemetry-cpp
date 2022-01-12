@@ -77,9 +77,7 @@ TEST(LoggerSDK, LogToAProcessor)
 
   // Set a processor for the LoggerProvider
   auto shared_recordable = std::shared_ptr<LogRecord>(new LogRecord());
-  auto processor         = std::shared_ptr<LogProcessor>(new MockProcessor(shared_recordable));
-  lp->SetProcessor(processor);
-  ASSERT_EQ(processor, lp->GetProcessor());
+  lp->AddProcessor(std::unique_ptr<LogProcessor>(new MockProcessor(shared_recordable)));
 
   // Check that the recordable created by the Log() statement is set properly
   logger->Log(logs_api::Severity::kWarn, "Log Name", "Log Message");

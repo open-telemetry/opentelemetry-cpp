@@ -16,6 +16,7 @@
 
 #include "opentelemetry/exporters/otlp/protobuf_include_prefix.h"
 
+#include <mutex>
 #include "google/protobuf/message.h"
 #include "google/protobuf/reflection.h"
 #include "google/protobuf/stubs/common.h"
@@ -100,6 +101,7 @@ public:
 
       // Set the response_received_ flag to true and notify any threads waiting on this result
       response_received_ = true;
+      stop_waiting_      = true;
     }
     cv_.notify_all();
   }
@@ -111,7 +113,7 @@ public:
   bool waitForResponse()
   {
     std::unique_lock<std::mutex> lk(mutex_);
-    cv_.wait(lk);
+    cv_.wait(lk, [this] { return stop_waiting_; });
     return response_received_;
   }
 
@@ -129,6 +131,25 @@ public:
   void OnEvent(http_client::SessionState state,
                opentelemetry::nostd::string_view reason) noexcept override
   {
+    // need to modify stop_waiting_ under lock before calling notify_all
+    switch (state)
+    {
+      case http_client::SessionState::CreateFailed:
+      case http_client::SessionState::ConnectFailed:
+      case http_client::SessionState::SendFailed:
+      case http_client::SessionState::SSLHandshakeFailed:
+      case http_client::SessionState::TimedOut:
+      case http_client::SessionState::NetworkError:
+      case http_client::SessionState::Cancelled: {
+        std::unique_lock<std::mutex> lk(mutex_);
+        stop_waiting_ = true;
+      }
+      break;
+
+      default:
+        break;
+    }
+
     // If any failure event occurs, release the condition variable to unblock main thread
     switch (state)
     {
@@ -233,7 +254,10 @@ private:
   std::condition_variable cv_;
   std::mutex mutex_;
 
-  // Whether the response from Elasticsearch has been received
+  // Whether notify has been called
+  bool stop_waiting_ = false;
+
+  // Whether the response has been received
   bool response_received_ = false;
 
   // A string to store the response body
@@ -336,6 +360,18 @@ static void ConvertGenericMessageToJson(nlohmann::json &value,
       ConvertGenericFieldToJson(child_value, message, field_descriptor, options);
     }
   }
+}
+
+static bool SerializeToHttpBody(http_client::Body &output, const google::protobuf::Message &message)
+{
+  auto body_size = message.ByteSizeLong();
+  if (body_size > 0)
+  {
+    output.resize(body_size);
+    return message.SerializeWithCachedSizesToArray(
+        reinterpret_cast<google::protobuf::uint8 *>(&output[0]));
+  }
+  return true;
 }
 
 void ConvertGenericFieldToJson(nlohmann::json &value,
@@ -535,7 +571,7 @@ opentelemetry::sdk::common::ExportResult OtlpHttpClient::Export(
     const google::protobuf::Message &message) noexcept
 {
   // Return failure if this exporter has been shutdown
-  if (is_shutdown_)
+  if (isShutdown())
   {
     const char *error_message = "[OTLP HTTP Client] Export failed, exporter is shutdown";
     if (options_.console_debug)
@@ -577,9 +613,7 @@ opentelemetry::sdk::common::ExportResult OtlpHttpClient::Export(
   std::string content_type;
   if (options_.content_type == HttpRequestContentType::kBinary)
   {
-    body_vec.resize(message.ByteSizeLong());
-    if (message.SerializeWithCachedSizesToArray(
-            reinterpret_cast<google::protobuf::uint8 *>(&body_vec[0])))
+    if (SerializeToHttpBody(body_vec, message))
     {
       if (options_.console_debug)
       {
@@ -659,13 +693,22 @@ opentelemetry::sdk::common::ExportResult OtlpHttpClient::Export(
 
 bool OtlpHttpClient::Shutdown(std::chrono::microseconds) noexcept
 {
-  is_shutdown_ = true;
+  {
+    const std::lock_guard<opentelemetry::common::SpinLockMutex> locked(lock_);
+    is_shutdown_ = true;
+  }
 
   // Shutdown the session manager
   http_client_->CancelAllSessions();
   http_client_->FinishAllSessions();
 
   return true;
+}
+
+bool OtlpHttpClient::isShutdown() const noexcept
+{
+  const std::lock_guard<opentelemetry::common::SpinLockMutex> locked(lock_);
+  return is_shutdown_;
 }
 
 }  // namespace otlp

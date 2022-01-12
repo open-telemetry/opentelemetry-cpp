@@ -3,6 +3,7 @@
 
 #pragma once
 
+#include <opentelemetry/common/spin_lock_mutex.h>
 #include <opentelemetry/ext/http/client/http_client.h>
 #include <opentelemetry/sdk/trace/exporter.h>
 
@@ -75,6 +76,8 @@ private:
   bool is_shutdown_ = false;
   JaegerExporterOptions options_;
   std::unique_ptr<ThriftSender> sender_;
+  mutable opentelemetry::common::SpinLockMutex lock_;
+  bool isShutdown() const noexcept;
   // For testing
   friend class JaegerExporterTestPeer;
   /**

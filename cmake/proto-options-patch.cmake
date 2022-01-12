@@ -80,3 +80,37 @@ function(patch_protobuf_targets)
     unset(PROTO_TARGET_OPTIONS)
   endif()
 endfunction()
+
+function(project_build_tools_get_imported_location OUTPUT_VAR_NAME TARGET_NAME)
+  if(CMAKE_BUILD_TYPE)
+    string(TOUPPER "IMPORTED_LOCATION_${CMAKE_BUILD_TYPE}"
+                   TRY_SPECIFY_IMPORTED_LOCATION)
+    get_target_property(${OUTPUT_VAR_NAME} ${TARGET_NAME}
+                        ${TRY_SPECIFY_IMPORTED_LOCATION})
+  endif()
+  if(NOT ${OUTPUT_VAR_NAME})
+    get_target_property(${OUTPUT_VAR_NAME} ${TARGET_NAME} IMPORTED_LOCATION)
+  endif()
+  if(NOT ${OUTPUT_VAR_NAME})
+    get_target_property(
+      project_build_tools_get_imported_location_IMPORTED_CONFIGURATIONS
+      ${TARGET_NAME} IMPORTED_CONFIGURATIONS)
+    foreach(
+      project_build_tools_get_imported_location_IMPORTED_CONFIGURATION IN
+      LISTS project_build_tools_get_imported_location_IMPORTED_CONFIGURATIONS)
+      get_target_property(
+        ${OUTPUT_VAR_NAME}
+        ${TARGET_NAME}
+        "IMPORTED_LOCATION_${project_build_tools_get_imported_location_IMPORTED_CONFIGURATION}"
+      )
+      if(${OUTPUT_VAR_NAME})
+        break()
+      endif()
+    endforeach()
+  endif()
+  if(${OUTPUT_VAR_NAME})
+    set(${OUTPUT_VAR_NAME}
+        ${${OUTPUT_VAR_NAME}}
+        PARENT_SCOPE)
+  endif()
+endfunction()

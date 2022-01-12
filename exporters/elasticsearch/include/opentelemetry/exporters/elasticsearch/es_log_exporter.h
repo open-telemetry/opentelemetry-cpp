@@ -5,6 +5,7 @@
 #ifdef ENABLE_LOGS_PREVIEW
 
 #  include "nlohmann/json.hpp"
+#  include "opentelemetry/common/spin_lock_mutex.h"
 #  include "opentelemetry/ext/http/client/curl/http_client_curl.h"
 #  include "opentelemetry/nostd/type_traits.h"
 #  include "opentelemetry/sdk/logs/exporter.h"
@@ -104,6 +105,8 @@ private:
 
   // Object that stores the HTTP sessions that have been created
   std::unique_ptr<ext::http::client::HttpClient> http_client_;
+  mutable opentelemetry::common::SpinLockMutex lock_;
+  bool isShutdown() const noexcept;
 };
 }  // namespace logs
 }  // namespace exporter
