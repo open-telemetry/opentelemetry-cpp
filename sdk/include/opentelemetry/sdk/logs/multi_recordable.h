@@ -2,39 +2,32 @@
 // SPDX-License-Identifier: Apache-2.0
 
 #pragma once
+
 #ifdef ENABLE_LOGS_PREVIEW
 
-// clang-format off
-#  include "opentelemetry/exporters/otlp/protobuf_include_prefix.h"
+#  include <cstddef>
+#  include <memory>
+#  include <unordered_map>
 
-#  include "opentelemetry/proto/logs/v1/logs.pb.h"
-#  include "opentelemetry/proto/resource/v1/resource.pb.h"
-
-#  include "opentelemetry/exporters/otlp/protobuf_include_suffix.h"
-// clang-format on
-
-#  include "opentelemetry/sdk/common/attribute_utils.h"
+#  include "opentelemetry/sdk/logs/processor.h"
 #  include "opentelemetry/sdk/logs/recordable.h"
+#  include "opentelemetry/sdk/resource/resource.h"
+#  include "opentelemetry/version.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
-namespace exporter
+namespace sdk
 {
-namespace otlp
+namespace logs
 {
-
-/**
- * An OTLP Recordable implemenation for Logs.
- */
-class OtlpLogRecordable final : public opentelemetry::sdk::logs::Recordable
+class MultiRecordable final : public Recordable
 {
 public:
-  virtual ~OtlpLogRecordable() = default;
+  void AddRecordable(const LogProcessor &processor,
+                     std::unique_ptr<Recordable> recordable) noexcept;
 
-  proto::logs::v1::LogRecord &log_record() noexcept { return log_record_; }
-  const proto::logs::v1::LogRecord &log_record() const noexcept { return log_record_; }
+  const std::unique_ptr<Recordable> &GetRecordable(const LogProcessor &processor) const noexcept;
 
-  /** Dynamically converts the resource of this log into a proto. */
-  proto::resource::v1::Resource ProtoResource() const noexcept;
+  std::unique_ptr<Recordable> ReleaseRecordable(const LogProcessor &processor) noexcept;
 
   /**
    * Set the timestamp for this log.
@@ -93,17 +86,11 @@ public:
   void SetTraceFlags(opentelemetry::trace::TraceFlags trace_flags) noexcept override;
 
 private:
-  proto::logs::v1::LogRecord log_record_;
-  const opentelemetry::sdk::resource::Resource *resource_ = nullptr;
-  // TODO shared resource
-  // const opentelemetry::sdk::resource::Resource *resource_ = nullptr;
-  // TODO InstrumentationLibrary
-  // const opentelemetry::sdk::instrumentationlibrary::InstrumentationLibrary
-  //     *instrumentation_library_ = nullptr;
+  std::unordered_map<std::size_t, std::unique_ptr<Recordable>> recordables_;
 };
+}  // namespace logs
+}  // namespace sdk
 
-}  // namespace otlp
-}  // namespace exporter
 OPENTELEMETRY_END_NAMESPACE
 
 #endif

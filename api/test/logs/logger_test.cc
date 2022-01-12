@@ -80,7 +80,6 @@ class TestLogger : public Logger
   void Log(Severity severity,
            string_view name,
            string_view body,
-           const common::KeyValueIterable &resource,
            const common::KeyValueIterable &attributes,
            trace::TraceId trace_id,
            trace::SpanId span_id,
