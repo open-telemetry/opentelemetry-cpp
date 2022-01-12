@@ -6,8 +6,8 @@
 
 #  include "opentelemetry/logs/logger.h"
 #  include "opentelemetry/sdk/instrumentationlibrary/instrumentation_library.h"
+#  include "opentelemetry/sdk/logs/logger_context.h"
 #  include "opentelemetry/sdk/logs/logger_provider.h"
-#  include "opentelemetry/sdk/logs/processor.h"
 
 #  include <vector>
 
@@ -24,11 +24,11 @@ public:
   /**
    * Initialize a new logger.
    * @param name The name of this logger instance
-   * @param logger_provider The logger provider that owns this logger.
+   * @param context The logger provider that owns this logger.
    */
   explicit Logger(
       opentelemetry::nostd::string_view name,
-      std::shared_ptr<LoggerProvider> logger_provider,
+      std::shared_ptr<LoggerContext> context,
       std::unique_ptr<instrumentationlibrary::InstrumentationLibrary> instrumentation_library =
           instrumentationlibrary::InstrumentationLibrary::Create("")) noexcept;
 
@@ -42,7 +42,6 @@ public:
    * @param severity the severity level of the log event.
    * @param name the name of the log event.
    * @param message the string message of the log (perhaps support std::fmt or fmt-lib format).
-   * @param resource the resources, stored as a 2D list of key/value pairs, that are associated
    * with the log event.
    * @param attributes the attributes, stored as a 2D list of key/value pairs, that are associated
    * with the log event.
@@ -54,7 +53,6 @@ public:
   void Log(opentelemetry::logs::Severity severity,
            nostd::string_view name,
            nostd::string_view body,
-           const opentelemetry::common::KeyValueIterable &resource,
            const opentelemetry::common::KeyValueIterable &attributes,
            opentelemetry::trace::TraceId trace_id,
            opentelemetry::trace::SpanId span_id,
@@ -69,9 +67,8 @@ private:
   // The name of this logger
   std::string logger_name_;
 
-  // The logger provider of this Logger. Uses a weak_ptr to avoid cyclic dependency issues the with
-  // logger provider
-  std::weak_ptr<LoggerProvider> logger_provider_;
+  // The logger context of this Logger. Uses a weak_ptr to avoid cyclic dependency issues the with
+  std::weak_ptr<LoggerContext> context_;
   std::unique_ptr<instrumentationlibrary::InstrumentationLibrary> instrumentation_library_;
 };
 

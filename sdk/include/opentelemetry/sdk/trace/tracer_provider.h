@@ -81,12 +81,6 @@ public:
   const opentelemetry::sdk::resource::Resource &GetResource() const noexcept;
 
   /**
-   * Obtain the span processor associated with this tracer provider.
-   * @return The span processor for this tracer provider.
-   */
-  std::shared_ptr<SpanProcessor> GetProcessor() const noexcept;
-
-  /**
    * Shutdown the span processor associated with this tracer provider.
    */
   bool Shutdown() noexcept;

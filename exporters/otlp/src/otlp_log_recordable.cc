@@ -18,8 +18,15 @@ namespace otlp
 proto::resource::v1::Resource OtlpLogRecordable::ProtoResource() const noexcept
 {
   proto::resource::v1::Resource proto;
-  OtlpRecordableUtils::PopulateAttribute(
-      &proto, opentelemetry::sdk::resource::Resource::Create(resource_attributes_));
+  if (nullptr == resource_)
+  {
+    OtlpRecordableUtils::PopulateAttribute(&proto, sdk::resource::Resource::GetDefault());
+  }
+  else
+  {
+    OtlpRecordableUtils::PopulateAttribute(&proto, *resource_);
+  }
+
   return proto;
 }
 
@@ -170,10 +177,9 @@ void OtlpLogRecordable::SetBody(nostd::string_view message) noexcept
   log_record_.mutable_body()->set_string_value(message.data(), message.size());
 }
 
-void OtlpLogRecordable::SetResource(nostd::string_view key,
-                                    const opentelemetry::common::AttributeValue &value) noexcept
+void OtlpLogRecordable::SetResource(const opentelemetry::sdk::resource::Resource &resource) noexcept
 {
-  resource_attributes_.SetAttribute(key, value);
+  resource_ = &resource;
 }
 
 void OtlpLogRecordable::SetAttribute(nostd::string_view key,

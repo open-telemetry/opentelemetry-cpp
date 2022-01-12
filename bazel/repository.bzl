@@ -9,10 +9,10 @@ def opentelemetry_cpp_deps():
     maybe(
         http_archive,
         name = "com_github_google_benchmark",
-        sha256 = "dccbdab796baa1043f04982147e67bb6e118fe610da2c65f88912d73987e700c",
-        strip_prefix = "benchmark-1.5.2",
+        sha256 = "1f71c72ce08d2c1310011ea6436b31e39ccab8c2db94186d26657d41747c85d6",
+        strip_prefix = "benchmark-1.6.0",
         urls = [
-            "https://github.com/google/benchmark/archive/v1.5.2.tar.gz",
+            "https://github.com/google/benchmark/archive/v1.6.0.tar.gz",
         ],
     )
 

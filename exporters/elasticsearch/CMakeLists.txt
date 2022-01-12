@@ -8,8 +8,9 @@ target_include_directories(
   PUBLIC "$<BUILD_INTERFACE:${CMAKE_CURRENT_LIST_DIR}/include>"
          "$<INSTALL_INTERFACE:include>")
 
-target_link_libraries(opentelemetry_exporter_elasticsearch_logs
-                      PUBLIC opentelemetry_trace http_client_curl)
+target_link_libraries(
+  opentelemetry_exporter_elasticsearch_logs
+  PUBLIC opentelemetry_trace opentelemetry_logs http_client_curl)
 
 install(
   TARGETS opentelemetry_exporter_elasticsearch_logs
