@@ -28,6 +28,17 @@ def opentelemetry_cpp_deps():
         ],
     )
 
+    # Load abseil dependency(optional)
+    maybe(
+        http_archive,
+        name = "com_google_absl",
+        sha256 = "59b862f50e710277f8ede96f083a5bb8d7c9595376146838b9580be90374ee1f",
+        strip_prefix = "abseil-cpp-20210324.2",
+        urls = [
+            "https://github.com/abseil/abseil-cpp/archive/20210324.2.tar.gz",
+        ],
+    )
+
     # Load gRPC dependency
     maybe(
         http_archive,
