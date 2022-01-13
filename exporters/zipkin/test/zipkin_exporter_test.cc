@@ -256,8 +256,9 @@ TEST_F(ZipkinExporterTestPeer, ExportJsonIntegrationTest)
 TEST_F(ZipkinExporterTestPeer, ShutdownTest)
 {
   auto mock_http_client = new MockHttpClient;
-  auto exporter         = GetExporter(
-              std::shared_ptr<opentelemetry::ext::http::client::HttpClientSync>{mock_http_client});
+  // Leave a comment line here or different version of clang-format has a different result here
+  auto exporter = GetExporter(
+      std::shared_ptr<opentelemetry::ext::http::client::HttpClientSync>{mock_http_client});
   auto recordable_1 = exporter->MakeRecordable();
   recordable_1->SetName("Test span 1");
   auto recordable_2 = exporter->MakeRecordable();
