@@ -57,7 +57,7 @@ gRPC internally uses a different version of Abseil than OpenTelemetry C++ SDK.
 
 One option to optimize your code is to build the SDK with system-provided
 Abseil library. If you are using CMake, then `-DWITH_ABSEIL=ON` may be passed
-during the build of SDK to reuse the same Abseil library as gRPC. If you are 
+during the build of SDK to reuse the same Abseil library as gRPC. If you are
 using Bazel, then `--@io_opentelemetry_cpp/api:with_abseil=true` may be passed
 to reuse your Abseil library in your project.
 
