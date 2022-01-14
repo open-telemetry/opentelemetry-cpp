@@ -28,6 +28,11 @@ const resource::Resource &MeterContext::GetResource() const noexcept
   return resource_;
 }
 
+const opentelemetry::sdk::metrics::ViewRegistry& GetViewRegistry() const noexcept
+{
+  return *views_.get();
+}
+
 void MeterContext::AddMetricExporter(std::unique_ptr<MetricExporter> exporter) noexcept
 {
   exporters_.push_back(std::move(exporter));

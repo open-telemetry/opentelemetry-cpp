@@ -47,6 +47,12 @@ public:
   const opentelemetry::sdk::resource::Resource &GetResource() const noexcept;
 
   /**
+   * Obtain the View Registry associated with this meter context.
+   * @return The view registry for this meter context
+   */
+  const opentelemetry::sdk::metrics::ViewRegistry& GetViewRegistry() const noexcept;
+
+  /**
    * Attaches a metric exporter to list of configured exporters for this Meter context.
    * @param exporter The metric exporter for this meter context. This
    * must not be a nullptr.

@@ -45,6 +45,17 @@ public:
       : SystemTimestamp{time_point.time_since_epoch()}
   {}
 
+    /**
+   * @brief Reset a system timestamp based on a point in time.
+   *
+   * @param time_point A point in time.
+   */
+  void Reset(const std::chrono::system_clock::time_point &time_point) noexcept
+  {
+      nanos_since_epoch_ = static_cast<int64_t>(
+            std::chrono::duration_cast<std::chrono::nanoseconds>(time_point.time_since_epoch()).count());
+  }
+
   /**
    * @brief Returns a time point for the time stamp.
    *

@@ -10,16 +10,17 @@ namespace sdk
 namespace metrics
 {
 
+template<class T>
 class Aggregator
 {
-  // TBD
-};
+  public:
+    virtual T CreateAccumulation() noexcept = 0;
 
-class NoOpAggregator : public Aggregator
-{
-  // TBD
-};
+    virtual T Merge(T& prev, T& current ) noexcept = 0;
 
+    virtual T diff(T& prev, T& current) noexcept = 0;
+
+};
 }  // namespace metrics
 }  // namespace sdk
 OPENTELEMETRY_END_NAMESPACE
