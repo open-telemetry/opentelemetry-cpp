@@ -28,7 +28,7 @@ const resource::Resource &MeterContext::GetResource() const noexcept
   return resource_;
 }
 
-const opentelemetry::sdk::metrics::ViewRegistry& GetViewRegistry() const noexcept
+const opentelemetry::sdk::metrics::ViewRegistry &GetViewRegistry() const noexcept
 {
   return *views_.get();
 }

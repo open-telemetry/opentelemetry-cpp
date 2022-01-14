@@ -50,7 +50,7 @@ public:
    * Obtain the View Registry associated with this meter context.
    * @return The view registry for this meter context
    */
-  const opentelemetry::sdk::metrics::ViewRegistry& GetViewRegistry() const noexcept;
+  const opentelemetry::sdk::metrics::ViewRegistry &GetViewRegistry() const noexcept;
 
   /**
    * Attaches a metric exporter to list of configured exporters for this Meter context.

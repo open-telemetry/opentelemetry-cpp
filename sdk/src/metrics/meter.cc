@@ -29,8 +29,9 @@ nostd::shared_ptr<metrics::Counter<long>> Meter::CreateLongCounter(nostd::string
                                                                    nostd::string_view description,
                                                                    nostd::string_view unit) noexcept
 {
-  InstrumentDescriptor instrument_descriptor = {name, description, unit, InstrumentType::kCounter, InstrumentValueType::kLong };
-  auto storage = registerMetricStorage(instrument_descriptor);
+  InstrumentDescriptor instrument_descriptor = {name, description, unit, InstrumentType::kCounter,
+                                                InstrumentValueType::kLong};
+  auto storage                               = registerMetricStorage(instrument_descriptor);
   OTEL_INTERNAL_LOG_WARN("[Meter::CreateLongCounter] Not Implemented - Returns Noop.");
   return nostd::shared_ptr<metrics::Counter<long>>{
       new metrics::NoopCounter<long>(name, description, unit)};
@@ -160,15 +161,14 @@ const sdk::instrumentationlibrary::InstrumentationLibrary &Meter::GetInstrumenta
   return *instrumentation_library_;
 }
 
-WritableMatricsStorage& Meter::RegisterMetricsStorage(InstrumentDescriptor& instrument_descriptor) {
-    std::vector<std::vector<View *> views;
-    context_.GetViewRegistry().FindViews(instrument_descriptor, *instrumentation_library_,
-    [](const View &view) {
-        views.push_back(view);
-        
-    });
+WritableMatricsStorage &Meter::RegisterMetricsStorage(InstrumentDescriptor &instrument_descriptor)
+{
+  std::vector < std::vector<View *> views;
+  context_.GetViewRegistry().FindViews(instrument_descriptor, *instrumentation_library_,
+                                       [](const View &view) {
+                                         views.push_back(view);
+                                       });
 }
-
 
 }  // namespace metrics
 }  // namespace sdk

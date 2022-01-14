@@ -11,17 +11,19 @@ namespace metrics
 {
 
 template <class T>
-class WritableMetricStorage{
-  public:
-    virtual void Record(T value) noexcept = 0;  
-    virtual void Record(T value, const common::KeyValueIterable &attributes) noexcept = 0;
+class WritableMetricStorage
+{
+public:
+  virtual void Record(T value) noexcept                                             = 0;
+  virtual void Record(T value, const common::KeyValueIterable &attributes) noexcept = 0;
 };
 
 template <class T>
-class NoopWritableMetricsStorage: public WritableMetricStorage<T> {
-    public:
-        void Record(T value) noexcept override {}
-        void Record(T value, const common::KeyValueIterable &attributes) noexcept override {}
+class NoopWritableMetricsStorage : public WritableMetricStorage<T>
+{
+public:
+  void Record(T value) noexcept override {}
+  void Record(T value, const common::KeyValueIterable &attributes) noexcept override {}
 };
 
 }  // namespace metrics

@@ -3,10 +3,9 @@
 
 #pragma once
 #ifndef ENABLE_METRICS_PREVIEW
-#  include "opentelemetry/version.h"
-#include "opentelemetry/common/timestamp.h"
+#  include "opentelemetry/common/timestamp.h"
 #  include "opentelemetry/sdk/common/attribute_utils.h"
-
+#  include "opentelemetry/version.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace sdk
@@ -20,43 +19,39 @@ using PointAttributes = opentelemetry::sdk::common::AttributeMap;
  * A point in the "Metric stream" data model.
  */
 
-struct BasePointData {
-    opentelemetry::common::SystemTimestamp start_epoch_nanos_;
-    opentelemetry::common::SystemTimestamp end_epoch_nanos_;
-    PointAttributes attributes_;
+struct BasePointData
+{
+  opentelemetry::common::SystemTimestamp start_epoch_nanos_;
+  opentelemetry::common::SystemTimestamp end_epoch_nanos_;
+  PointAttributes attributes_;
 };
 
 template <class T>
-class AbstractPointData 
-{
-};
+class AbstractPointData
+{};
 
 template <class T>
 struct SingularPointData : public AbstractPointData<T>
 {
-    SingularPointData(T value):value_(value) {}
-    T value_;
+  SingularPointData(T value) : value_(value) {}
+  T value_;
 };
 
 template <class T>
-struct HistogramPointData: public AbstractPointData<T>
+struct HistogramPointData : public AbstractPointData<T>
 {
-    HistogramPointData(std::vector<T>& boundaries):
-    boundaries_{boundaries},
-    counts_(boundaries.size() + 1, 0),
-    sum_(0), count_(0)
-    {
-    }
-    std::vector<T> boundaries_;
-    std::vector<uint64_t> counts_;
-    T sum_;
-    uint64_t count_;
+  HistogramPointData(std::vector<T> &boundaries)
+      : boundaries_{boundaries}, counts_(boundaries.size() + 1, 0), sum_(0), count_(0)
+  {}
+  std::vector<T> boundaries_;
+  std::vector<uint64_t> counts_;
+  T sum_;
+  uint64_t count_;
 };
 
 template <class T>
-struct NoopPointData: public AbstractPointData<T>
-{
-};
+struct NoopPointData : public AbstractPointData<T>
+{};
 
 }  // namespace metrics
 }  // namespace sdk
@@ -86,7 +81,7 @@ public:
     //Returns the attributes associated with this Point
     PointAttributes& GetAttributes() noexcept
     {
-        return attributes_; 
+        return attributes_;
     }
 
     private:
@@ -98,7 +93,7 @@ public:
 template<class T>
 class SingularPointData: public PointData {
     public:
-    SingularPointData(opentelemetry::common::SystemTimestamp& start_epoch_nanos, 
+    SingularPointData(opentelemetry::common::SystemTimestamp& start_epoch_nanos,
                       opentelemetry::common::SystemTimestamp& epoch_nanos,
                       PointAttributes& attributes,
                       T value):
@@ -117,7 +112,7 @@ class SingularPointData: public PointData {
 template<class T>
 class SummaryPointData: public PointData {
     public:
-    SummaryPointData(opentelemetry::common::SystemTimestamp& start_epoch_nanos, 
+    SummaryPointData(opentelemetry::common::SystemTimestamp& start_epoch_nanos,
                       opentelemetry::common::SystemTimestamp& epoch_nanos,
                       PointAttributes& attributes,
                       uint64_t count,
@@ -140,7 +135,7 @@ class SummaryPointData: public PointData {
 
 template <class T>
 class HistogramPointData : public PointData {
-    HistogramPointData(opentelemetry::common::SystemTimestamp& start_epoch_nanos, 
+    HistogramPointData(opentelemetry::common::SystemTimestamp& start_epoch_nanos,
                         opentelemetry::common::SystemTimestamp& epoch_nanos,
                         PointAttributes& attributes,
                         T sum,
@@ -165,5 +160,5 @@ class HistogramPointData : public PointData {
 };*/
 //}  // namespace metrics
 //}  // namespace sdk
-//OPENTELEMETRY_END_NAMESPACE
+// OPENTELEMETRY_END_NAMESPACE
 //#endif

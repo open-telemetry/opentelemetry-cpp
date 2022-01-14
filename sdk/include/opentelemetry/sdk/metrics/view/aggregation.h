@@ -6,9 +6,9 @@
 
 #  include <memory>
 #  include "opentelemetry/sdk/metrics/aggregator/aggregator.h"
-# include "opentelemetry/sdk/metrics/aggregator/sum_aggregator.h"
-# include "opentelemetry/sdk/metrics/aggregator/last_value_aggregator.h"
-#include "opentelemetry/sdk/metrics/aggregator/noop_aggregator.h"
+#  include "opentelemetry/sdk/metrics/aggregator/last_value_aggregator.h"
+#  include "opentelemetry/sdk/metrics/aggregator/noop_aggregator.h"
+#  include "opentelemetry/sdk/metrics/aggregator/sum_aggregator.h"
 
 #  include "opentelemetry/sdk/metrics/instruments.h"
 OPENTELEMETRY_BEGIN_NAMESPACE
@@ -27,27 +27,27 @@ public:
 };
 
 template <class T>
-class SumAggregation: public Aggregation<T>
+class SumAggregation : public Aggregation<T>
 {
-  public:
+public:
   virtual opentelemetry::sdk::metrics::Aggregator<T> &CreateAggregator(
       opentelemetry::sdk::metrics::InstrumentDescriptor instrument_descriptor) noexcept override
-      {
-        static SumAggregator<T> sum_aggregator;
-        return sum_aggregator;
-      }
+  {
+    static SumAggregator<T> sum_aggregator;
+    return sum_aggregator;
+  }
 };
 
 template <class T>
-class LastValueAggregation: public Aggregation<T>
+class LastValueAggregation : public Aggregation<T>
 {
-  public:
+public:
   virtual opentelemetry::sdk::metrics::Aggregator<T> &CreateAggregator(
       opentelemetry::sdk::metrics::InstrumentDescriptor instrument_descriptor) noexcept override
-      {
-        static LastValueAggregator<T> last_value_aggregator;
-        return last_value_aggregator;
-      }
+  {
+    static LastValueAggregator<T> last_value_aggregator;
+    return last_value_aggregator;
+  }
 };
 
 template <class T>
@@ -73,7 +73,6 @@ class DefaultAggregation : public Aggregation<T>
     return noop_aggregator;
   }
 };
-
 
 }  // namespace metrics
 }  // namespace sdk

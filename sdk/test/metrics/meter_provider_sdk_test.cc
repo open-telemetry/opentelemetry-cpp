@@ -8,7 +8,7 @@
 #  include "opentelemetry/sdk/metrics/view/instrument_selector.h"
 #  include "opentelemetry/sdk/metrics/view/meter_selector.h"
 
-#include "opentelemetry/sdk/metrics/aggregator/accumulation.h"
+#  include "opentelemetry/sdk/metrics/aggregator/accumulation.h"
 
 using namespace opentelemetry::sdk::metrics;
 

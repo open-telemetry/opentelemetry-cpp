@@ -10,16 +10,15 @@ namespace sdk
 namespace metrics
 {
 
-template<class T>
+template <class T>
 class Aggregator
 {
-  public:
-    virtual T CreateAccumulation() noexcept = 0;
+public:
+  virtual T CreateAccumulation() noexcept = 0;
 
-    virtual T Merge(T& prev, T& current ) noexcept = 0;
+  virtual T Merge(T &prev, T &current) noexcept = 0;
 
-    virtual T diff(T& prev, T& current) noexcept = 0;
-
+  virtual T diff(T &prev, T &current) noexcept = 0;
 };
 }  // namespace metrics
 }  // namespace sdk
