@@ -33,11 +33,7 @@ cc_library(
     deps = select({
         ":with_external_abseil": [
             "@com_google_absl//absl/base",
-            "@com_google_absl//absl/types:any",
             "@com_google_absl//absl/types:variant",
-            "@com_google_absl//absl/types:span",
-            "@com_google_absl//absl/numeric:bits",
-            "@com_google_absl//absl/hash:city",
         ],
         "//conditions:default": [],
     }),
