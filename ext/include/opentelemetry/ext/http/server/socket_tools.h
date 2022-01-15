@@ -17,7 +17,7 @@
 #ifdef _WIN32
 
 //#  include <Windows.h>
-
+#  define _WINSOCKAPI_  // stops including winsock.h
 #  include <winsock2.h>
 
 // TODO: consider NOMINMAX
