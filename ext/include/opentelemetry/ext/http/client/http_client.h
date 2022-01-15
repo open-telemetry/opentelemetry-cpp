@@ -3,6 +3,7 @@
 
 #pragma once
 
+#define _WINSOCKAPI_  // stops including winsock.h
 #include <chrono>
 #include <map>
 #include <string>
