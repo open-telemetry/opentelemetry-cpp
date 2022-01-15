@@ -1,6 +1,12 @@
-foreach(testname
-        random_test fast_random_number_generator_test atomic_unique_ptr_test
-        circular_buffer_range_test circular_buffer_test attribute_utils_test)
+foreach(
+  testname
+  random_test
+  fast_random_number_generator_test
+  atomic_unique_ptr_test
+  circular_buffer_range_test
+  circular_buffer_test
+  attribute_utils_test
+  global_log_handle_test)
 
   add_executable(${testname} "${testname}.cc")
   target_link_libraries(

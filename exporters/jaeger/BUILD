@@ -374,6 +374,7 @@ cc_test(
     deps = [
         ":opentelemetry_exporter_jaeger_trace",
         "//sdk/src/resource",
+        "//sdk/src/trace",
         "@com_google_googletest//:gtest_main",
     ],
 )

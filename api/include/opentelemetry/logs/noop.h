@@ -44,7 +44,6 @@ public:
   void Log(Severity severity,
            nostd::string_view name,
            nostd::string_view body,
-           const common::KeyValueIterable &resource,
            const common::KeyValueIterable &attributes,
            trace::TraceId trace_id,
            trace::SpanId span_id,
@@ -65,13 +64,19 @@ public:
   {}
 
   nostd::shared_ptr<Logger> GetLogger(nostd::string_view logger_name,
-                                      nostd::string_view options) override
+                                      nostd::string_view options,
+                                      nostd::string_view library_name,
+                                      nostd::string_view library_version = "",
+                                      nostd::string_view schema_url      = "") override
   {
     return logger_;
   }
 
   nostd::shared_ptr<Logger> GetLogger(nostd::string_view logger_name,
-                                      nostd::span<nostd::string_view> args) override
+                                      nostd::span<nostd::string_view> args,
+                                      nostd::string_view library_name,
+                                      nostd::string_view library_version = "",
+                                      nostd::string_view schema_url      = "") override
   {
     return logger_;
   }

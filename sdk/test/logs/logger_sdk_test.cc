@@ -17,9 +17,14 @@ TEST(LoggerSDK, LogToNullProcessor)
   // even when there is no processor set
   // since it calls Processor::OnReceive()
 
-  auto lp     = std::shared_ptr<logs_api::LoggerProvider>(new LoggerProvider());
-  auto logger = lp->GetLogger("logger");
+  auto lp = std::shared_ptr<logs_api::LoggerProvider>(new LoggerProvider());
+  const std::string schema_url{"https://opentelemetry.io/schemas/1.2.0"};
+  auto logger = lp->GetLogger("logger", "", "opentelelemtry_library", "", schema_url);
 
+  auto sdk_logger = static_cast<opentelemetry::sdk::logs::Logger *>(logger.get());
+  ASSERT_EQ(sdk_logger->GetInstrumentationLibrary().GetName(), "opentelelemtry_library");
+  ASSERT_EQ(sdk_logger->GetInstrumentationLibrary().GetVersion(), "");
+  ASSERT_EQ(sdk_logger->GetInstrumentationLibrary().GetSchemaURL(), schema_url);
   // Log a sample log record to a nullptr processor
   logger->Debug("Test log");
 }
@@ -66,20 +71,23 @@ TEST(LoggerSDK, LogToAProcessor)
 {
   // Create an API LoggerProvider and logger
   auto api_lp = std::shared_ptr<logs_api::LoggerProvider>(new LoggerProvider());
-  auto logger = api_lp->GetLogger("logger");
+  const std::string schema_url{"https://opentelemetry.io/schemas/1.2.0"};
+  auto logger = api_lp->GetLogger("logger", "", "opentelelemtry_library", "", schema_url);
 
   // Cast the API LoggerProvider to an SDK Logger Provider and assert that it is still the same
   // LoggerProvider by checking that getting a logger with the same name as the previously defined
   // logger is the same instance
   auto lp      = static_cast<LoggerProvider *>(api_lp.get());
-  auto logger2 = lp->GetLogger("logger");
+  auto logger2 = lp->GetLogger("logger", "", "opentelelemtry_library", "", schema_url);
   ASSERT_EQ(logger, logger2);
 
+  auto sdk_logger = static_cast<opentelemetry::sdk::logs::Logger *>(logger.get());
+  ASSERT_EQ(sdk_logger->GetInstrumentationLibrary().GetName(), "opentelelemtry_library");
+  ASSERT_EQ(sdk_logger->GetInstrumentationLibrary().GetVersion(), "");
+  ASSERT_EQ(sdk_logger->GetInstrumentationLibrary().GetSchemaURL(), schema_url);
   // Set a processor for the LoggerProvider
   auto shared_recordable = std::shared_ptr<LogRecord>(new LogRecord());
-  auto processor         = std::shared_ptr<LogProcessor>(new MockProcessor(shared_recordable));
-  lp->SetProcessor(processor);
-  ASSERT_EQ(processor, lp->GetProcessor());
+  lp->AddProcessor(std::unique_ptr<LogProcessor>(new MockProcessor(shared_recordable)));
 
   // Check that the recordable created by the Log() statement is set properly
   logger->Log(logs_api::Severity::kWarn, "Log Name", "Log Message");

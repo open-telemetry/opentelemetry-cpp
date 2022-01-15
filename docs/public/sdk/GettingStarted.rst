@@ -195,27 +195,29 @@ and it can be changed at compile time.
 
 .. code:: cpp
 
-    OTEL_INTERNAL_LOG_ERROR
-            (" Connection failed. Error string " << error_str << " Error Num: " << errorno);
-    OTEL_INTERNAL_LOG_ERROR
-            (" Connection failed." , {{"error message: " : error_str},{"error number": errorno}});
-    OTEL_INTERNAL_LOG_DEBUG
-            (" Connection Established Successfully. Headers:", {{"url", url},{"content-length", len}, {"content-type", type}});
+    OTEL_INTERNAL_LOG_ERROR(" Connection failed. Error string " << error_str << " Error Num: " << errorno);
+    opentelemetry::sdk::common::AttributeMap error_attributes = {
+      {"url", url}, {"content-length", len}, {"content-type", type}};
+    OTEL_INTERNAL_LOG_ERROR(" Connection failed." , error_attributes);
+    opentelemetry::sdk::common::AttributeMap http_attributes = {
+      {"url", url}, {"content-length", len}, {"content-type", type}};
+    OTEL_INTERNAL_LOG_DEBUG(" Connection Established Successfully. Headers:", http_attributes);
 
-The custom log handler can be defined by inheriting from `sdk::common::internal_log::LogHandler` class.
+The custom log handler can be defined by inheriting from `opentelemetry::sdk::common::internal_log::LogHandler` class.
 
 .. code:: cpp
 
-    class CustomLogHandler : public sdk::common::internal_log::LogHandler
+    class CustomLogHandler : public opentelemetry::sdk::common::internal_log::LogHandler
     {
-        void Handle(Loglevel level,
+        void Handle(opentelemetry::sdk::common::internal_log::LogLevel level,
                     const char \*file,
                     int line,
                     const char \*msg,
-                    const sdk::common::AttributeMap &attributes)
+                    const opentelemetry::sdk::common::AttributeMap &attributes) noexcept override
 
         {
             // add implementation here
         }
     };
-    sdk::common::internal_log::GlobalLogHandler::SetLogHandler(CustomLogHandler());
+    opentelemetry::sdk::common::internal_log::GlobalLogHandler::SetLogHandler(CustomLogHandler());
+    opentelemetry::sdk::common::internal_log::GlobalLogHandler::SetLogLevel(opentelemetry::sdk::common::internal_log::LogLevel::Debug);

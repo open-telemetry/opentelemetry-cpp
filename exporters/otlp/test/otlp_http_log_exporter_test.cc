@@ -199,16 +199,16 @@ TEST_F(OtlpHttpLogExporterTestPeer, ExportJsonIntegrationTest)
   size_t old_count = getCurrentRequestCount();
   auto exporter    = GetExporter(HttpRequestContentType::kJson);
 
-  bool resource_storage_bool_value[]          = {true, false, true};
-  int32_t resource_storage_int32_value[]      = {1, 2};
-  uint32_t resource_storage_uint32_value[]    = {3, 4};
-  int64_t resource_storage_int64_value[]      = {5, 6};
-  uint64_t resource_storage_uint64_value[]    = {7, 8};
-  double resource_storage_double_value[]      = {3.2, 3.3};
-  std::string resource_storage_string_value[] = {"vector", "string"};
+  bool attribute_storage_bool_value[]          = {true, false, true};
+  int32_t attribute_storage_int32_value[]      = {1, 2};
+  uint32_t attribute_storage_uint32_value[]    = {3, 4};
+  int64_t attribute_storage_int64_value[]      = {5, 6};
+  uint64_t attribute_storage_uint64_value[]    = {7, 8};
+  double attribute_storage_double_value[]      = {3.2, 3.3};
+  std::string attribute_storage_string_value[] = {"vector", "string"};
 
   auto provider = nostd::shared_ptr<sdk::logs::LoggerProvider>(new sdk::logs::LoggerProvider());
-  provider->SetProcessor(std::unique_ptr<sdk::logs::LogProcessor>(
+  provider->AddProcessor(std::unique_ptr<sdk::logs::LogProcessor>(
       new sdk::logs::BatchLogProcessor(std::move(exporter), 5, std::chrono::milliseconds(256), 1)));
 
   std::string report_trace_id;
@@ -223,7 +223,8 @@ TEST_F(OtlpHttpLogExporterTestPeer, ExportJsonIntegrationTest)
     char span_id_hex[2 * opentelemetry::trace::SpanId::kSize] = {0};
     opentelemetry::trace::SpanId span_id{span_id_bin};
 
-    auto logger = provider->GetLogger("test");
+    const std::string schema_url{"https://opentelemetry.io/schemas/1.2.0"};
+    auto logger = provider->GetLogger("test", "", "opentelelemtry_library", "", schema_url);
     logger->Log(opentelemetry::logs::Severity::kInfo, "Log name", "Log message",
                 {{"service.name", "unit_test_service"},
                  {"tenant.id", "test_user"},
@@ -233,14 +234,14 @@ TEST_F(OtlpHttpLogExporterTestPeer, ExportJsonIntegrationTest)
                  {"int64_value", static_cast<int64_t>(0x1100000000LL)},
                  {"uint64_value", static_cast<uint64_t>(0x1200000000ULL)},
                  {"double_value", static_cast<double>(3.1)},
-                 {"vec_bool_value", resource_storage_bool_value},
-                 {"vec_int32_value", resource_storage_int32_value},
-                 {"vec_uint32_value", resource_storage_uint32_value},
-                 {"vec_int64_value", resource_storage_int64_value},
-                 {"vec_uint64_value", resource_storage_uint64_value},
-                 {"vec_double_value", resource_storage_double_value},
-                 {"vec_string_value", resource_storage_string_value}},
-                {{"log_attribute", "test_value"}}, trace_id, span_id,
+                 {"vec_bool_value", attribute_storage_bool_value},
+                 {"vec_int32_value", attribute_storage_int32_value},
+                 {"vec_uint32_value", attribute_storage_uint32_value},
+                 {"vec_int64_value", attribute_storage_int64_value},
+                 {"vec_uint64_value", attribute_storage_uint64_value},
+                 {"vec_double_value", attribute_storage_double_value},
+                 {"vec_string_value", attribute_storage_string_value}},
+                trace_id, span_id,
                 opentelemetry::trace::TraceFlags{opentelemetry::trace::TraceFlags::kIsSampled},
                 std::chrono::system_clock::now());
 
@@ -262,10 +263,9 @@ TEST_F(OtlpHttpLogExporterTestPeer, ExportJsonIntegrationTest)
   EXPECT_EQ(received_span_id, report_span_id);
   EXPECT_EQ("Log name", log["name"].get<std::string>());
   EXPECT_EQ("Log message", log["body"]["string_value"].get<std::string>());
-  EXPECT_EQ("test_value", (*log["attributes"].begin())["value"]["string_value"].get<std::string>());
-  EXPECT_LE(15, resource_logs["resource"]["attributes"].size());
+  EXPECT_LE(15, log["attributes"].size());
   bool check_service_name = false;
-  for (auto attribute : resource_logs["resource"]["attributes"])
+  for (auto attribute : log["attributes"])
   {
     if ("service.name" == attribute["key"].get<std::string>())
     {
@@ -292,16 +292,16 @@ TEST_F(OtlpHttpLogExporterTestPeer, ExportBinaryIntegrationTest)
 
   auto exporter = GetExporter(HttpRequestContentType::kBinary);
 
-  bool resource_storage_bool_value[]          = {true, false, true};
-  int32_t resource_storage_int32_value[]      = {1, 2};
-  uint32_t resource_storage_uint32_value[]    = {3, 4};
-  int64_t resource_storage_int64_value[]      = {5, 6};
-  uint64_t resource_storage_uint64_value[]    = {7, 8};
-  double resource_storage_double_value[]      = {3.2, 3.3};
-  std::string resource_storage_string_value[] = {"vector", "string"};
+  bool attribute_storage_bool_value[]          = {true, false, true};
+  int32_t attribute_storage_int32_value[]      = {1, 2};
+  uint32_t attribute_storage_uint32_value[]    = {3, 4};
+  int64_t attribute_storage_int64_value[]      = {5, 6};
+  uint64_t attribute_storage_uint64_value[]    = {7, 8};
+  double attribute_storage_double_value[]      = {3.2, 3.3};
+  std::string attribute_storage_string_value[] = {"vector", "string"};
 
   auto provider = nostd::shared_ptr<sdk::logs::LoggerProvider>(new sdk::logs::LoggerProvider());
-  provider->SetProcessor(std::unique_ptr<sdk::logs::LogProcessor>(
+  provider->AddProcessor(std::unique_ptr<sdk::logs::LogProcessor>(
       new sdk::logs::BatchLogProcessor(std::move(exporter), 5, std::chrono::milliseconds(256), 1)));
 
   std::string report_trace_id;
@@ -314,7 +314,8 @@ TEST_F(OtlpHttpLogExporterTestPeer, ExportBinaryIntegrationTest)
                                                                 '3', '2', '1', '0'};
     opentelemetry::trace::SpanId span_id{span_id_bin};
 
-    auto logger = provider->GetLogger("test");
+    const std::string schema_url{"https://opentelemetry.io/schemas/1.2.0"};
+    auto logger = provider->GetLogger("test", "", "opentelelemtry_library", "", schema_url);
     logger->Log(opentelemetry::logs::Severity::kInfo, "Log name", "Log message",
                 {{"service.name", "unit_test_service"},
                  {"tenant.id", "test_user"},
@@ -324,14 +325,14 @@ TEST_F(OtlpHttpLogExporterTestPeer, ExportBinaryIntegrationTest)
                  {"int64_value", static_cast<int64_t>(0x1100000000LL)},
                  {"uint64_value", static_cast<uint64_t>(0x1200000000ULL)},
                  {"double_value", static_cast<double>(3.1)},
-                 {"vec_bool_value", resource_storage_bool_value},
-                 {"vec_int32_value", resource_storage_int32_value},
-                 {"vec_uint32_value", resource_storage_uint32_value},
-                 {"vec_int64_value", resource_storage_int64_value},
-                 {"vec_uint64_value", resource_storage_uint64_value},
-                 {"vec_double_value", resource_storage_double_value},
-                 {"vec_string_value", resource_storage_string_value}},
-                {{"log_attribute", "test_value"}}, trace_id, span_id,
+                 {"vec_bool_value", attribute_storage_bool_value},
+                 {"vec_int32_value", attribute_storage_int32_value},
+                 {"vec_uint32_value", attribute_storage_uint32_value},
+                 {"vec_int64_value", attribute_storage_int64_value},
+                 {"vec_uint64_value", attribute_storage_uint64_value},
+                 {"vec_double_value", attribute_storage_double_value},
+                 {"vec_string_value", attribute_storage_string_value}},
+                trace_id, span_id,
                 opentelemetry::trace::TraceFlags{opentelemetry::trace::TraceFlags::kIsSampled},
                 std::chrono::system_clock::now());
 
@@ -346,10 +347,9 @@ TEST_F(OtlpHttpLogExporterTestPeer, ExportBinaryIntegrationTest)
   EXPECT_EQ(received_log.span_id(), report_span_id);
   EXPECT_EQ("Log name", received_log.name());
   EXPECT_EQ("Log message", received_log.body().string_value());
-  EXPECT_EQ("test_value", received_log.attributes(0).value().string_value());
-  EXPECT_LE(15, received_requests_binary_.back().resource_logs(0).resource().attributes_size());
+  EXPECT_LE(15, received_log.attributes_size());
   bool check_service_name = false;
-  for (auto &attribute : received_requests_binary_.back().resource_logs(0).resource().attributes())
+  for (auto &attribute : received_log.attributes())
   {
     if ("service.name" == attribute.key())
     {
