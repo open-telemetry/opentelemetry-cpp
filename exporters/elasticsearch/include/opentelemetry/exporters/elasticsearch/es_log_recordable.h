@@ -205,7 +205,29 @@ public:
   /**
    * Returns a JSON object contain the log information
    */
-  nlohmann::json GetJSON() noexcept { return json_; };
+  nlohmann::json GetJSON() noexcept { return json_; }
+
+  /**
+   * Set instrumentation_library for this log.
+   * @param instrumentation_library the instrumentation library to set
+   */
+  void SetInstrumentationLibrary(
+      const opentelemetry::sdk::instrumentationlibrary::InstrumentationLibrary
+          &instrumentation_library) noexcept
+  {
+    instrumentation_library_ = &instrumentation_library;
+  }
+
+  /** Returns the associated instruementation library */
+  const opentelemetry::sdk::instrumentationlibrary::InstrumentationLibrary &
+  GetInstrumentationLibrary() const noexcept
+  {
+    return *instrumentation_library_;
+  }
+
+private:
+  const opentelemetry::sdk::instrumentationlibrary::InstrumentationLibrary
+      *instrumentation_library_ = nullptr;
 };
 }  // namespace logs
 }  // namespace exporter

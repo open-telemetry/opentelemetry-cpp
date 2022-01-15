@@ -259,7 +259,9 @@ TEST(OStreamLogExporter, IntegrationTest)
   auto apiProvider = nostd::shared_ptr<logs_api::LoggerProvider>(sdkProvider);
   auto provider    = nostd::shared_ptr<logs_api::LoggerProvider>(apiProvider);
   logs_api::Provider::SetLoggerProvider(provider);
-  auto logger = logs_api::Provider::GetLoggerProvider()->GetLogger("Logger");
+  const std::string schema_url{"https://opentelemetry.io/schemas/1.2.0"};
+  auto logger = logs_api::Provider::GetLoggerProvider()->GetLogger(
+      "Logger", "", "opentelelemtry_library", "", schema_url);
 
   // Back up cout's streambuf
   std::streambuf *original = std::cout.rdbuf();

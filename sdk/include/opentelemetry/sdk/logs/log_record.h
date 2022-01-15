@@ -184,6 +184,21 @@ public:
    * @return the timestamp for this log
    */
   opentelemetry::common::SystemTimestamp GetTimestamp() const noexcept { return timestamp_; }
+
+  /**
+   * Set instrumentation_library for this log.
+   * @param instrumentation_library the instrumentation library to set
+   */
+  void SetInstrumentationLibrary(
+      const opentelemetry::sdk::instrumentationlibrary::InstrumentationLibrary
+          &instrumentation_library) noexcept
+  {
+    instrumentation_library_ = &instrumentation_library;
+  }
+
+private:
+  const opentelemetry::sdk::instrumentationlibrary::InstrumentationLibrary
+      *instrumentation_library_ = nullptr;
 };
 }  // namespace logs
 }  // namespace sdk

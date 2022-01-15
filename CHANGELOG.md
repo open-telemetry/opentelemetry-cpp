@@ -15,6 +15,7 @@ Increment the:
 
 ## [Unreleased]
 
+* [API/SDK] Logger: Support for Instrumentation library ([#1128](https://github.com/open-telemetry/opentelemetry-cpp/pull/1128))
 * [SDK] Add LogLevel to internal_log ([#1147](https://github.com/open-telemetry/opentelemetry-cpp/pull/1147))
 * [API/SDK] Logger: Propagating resources through LoggerProvider ([#1154](https://github.com/open-telemetry/opentelemetry-cpp/pull/1154))
 * [API]: Allow to use external abseil for bazel targets ([#1172](https://github.com/open-telemetry/opentelemetry-cpp/pull/1172))

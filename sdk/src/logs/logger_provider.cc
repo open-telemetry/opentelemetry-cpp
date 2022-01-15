@@ -43,17 +43,25 @@ LoggerProvider::LoggerProvider(std::shared_ptr<sdk::logs::LoggerContext> context
     : context_{context}
 {}
 
-nostd::shared_ptr<logs_api::Logger> LoggerProvider::GetLogger(nostd::string_view name,
-                                                              nostd::string_view options) noexcept
+nostd::shared_ptr<opentelemetry::logs::Logger> LoggerProvider::GetLogger(
+    nostd::string_view logger_name,
+    nostd::string_view options,
+    nostd::string_view library_name,
+    nostd::string_view library_version,
+    nostd::string_view schema_url) noexcept
 {
   // Ensure only one thread can read/write from the map of loggers
   std::lock_guard<std::mutex> lock_guard{lock_};
 
-  // If a logger with a name "name" already exists, return it
-  auto loggerkv = loggers_.find(name.data());
-  if (loggerkv != loggers_.end())
+  // If a logger with a name "logger_name" already exists, return it
+  for (auto &logger : loggers_)
   {
-    return nostd::shared_ptr<logs_api::Logger>(loggerkv->second);
+    auto &logger_lib = logger->GetInstrumentationLibrary();
+    if (logger->GetName() == logger_name &&
+        logger_lib.equal(library_name, library_version, schema_url))
+    {
+      return nostd::shared_ptr<opentelemetry::logs::Logger>{logger};
+    }
   }
 
   // Check if creating a new logger would exceed the max number of loggers
@@ -70,18 +78,21 @@ nostd::shared_ptr<logs_api::Logger> LoggerProvider::GetLogger(nostd::string_view
   */
 
   // If no logger with that name exists yet, create it and add it to the map of loggers
-
-  nostd::shared_ptr<logs_api::Logger> logger(new Logger(name, context_));
-  loggers_[name.data()] = logger;
-  return logger;
+  auto lib = instrumentationlibrary::InstrumentationLibrary::Create(library_name, library_version,
+                                                                    schema_url);
+  loggers_.push_back(std::shared_ptr<opentelemetry::sdk::logs::Logger>(
+      new Logger(logger_name, context_, std::move(lib))));
+  return nostd::shared_ptr<opentelemetry::logs::Logger>{loggers_.back()};
 }
 
-nostd::shared_ptr<logs_api::Logger> LoggerProvider::GetLogger(
-    nostd::string_view name,
-    nostd::span<nostd::string_view> args) noexcept
+nostd::shared_ptr<opentelemetry::logs::Logger> LoggerProvider::GetLogger(
+    nostd::string_view logger_name,
+    nostd::span<nostd::string_view> args,
+    nostd::string_view library_name,
+    nostd::string_view library_version,
+    nostd::string_view schema_url) noexcept
 {
-  // Currently, no args support
-  return GetLogger(name);
+  return GetLogger(logger_name, "", library_name, library_version, schema_url);
 }
 
 void LoggerProvider::AddProcessor(std::unique_ptr<LogProcessor> processor) noexcept
