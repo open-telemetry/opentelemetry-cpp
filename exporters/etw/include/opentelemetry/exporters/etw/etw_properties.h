@@ -12,6 +12,7 @@
 #include <vector>
 
 #ifdef _WIN32
+# define _WINSOCKAPI_  // stops including winsock.h
 #  include <Windows.h>
 #endif
 

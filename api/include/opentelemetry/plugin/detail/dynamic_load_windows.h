@@ -13,6 +13,7 @@
 #ifndef NOMINMAX
 #  define NOMINMAX
 #endif
+#define _WINSOCKAPI_  // stops including winsock.h
 #include <Windows.h>
 
 #include <WinBase.h>

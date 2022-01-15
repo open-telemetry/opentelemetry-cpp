@@ -19,6 +19,7 @@ Environment:
 --*/
 
 #pragma once
+#define _WINSOCKAPI_  // stops including winsock.h
 #include <windows.h>
 #include <evntprov.h>
 #include <stdlib.h> // byteswap

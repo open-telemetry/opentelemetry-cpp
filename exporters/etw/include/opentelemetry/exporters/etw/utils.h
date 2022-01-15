@@ -16,6 +16,7 @@
 #include "opentelemetry/version.h"
 
 #ifdef _WIN32
+# define _WINSOCKAPI_  // stops including winsock.h
 #  include <Windows.h>
 #  include <evntprov.h>
 #  include <wincrypt.h>
