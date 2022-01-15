@@ -3,7 +3,7 @@
 
 #pragma once
 
-#  define _WINSOCKAPI_  // stops including winsock.h
+#define _WINSOCKAPI_  // stops including winsock.h
 #ifdef _WIN32
 #  include <winsock2.h>
 #else
