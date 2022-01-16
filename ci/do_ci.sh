@@ -161,6 +161,9 @@ elif [[ "$1" == "cmake.exporter.otprotocol.test" ]]; then
   make -j $(nproc)
   cd exporters/otlp && make test
   exit 0
+elif [[ "$1" == "bazel.with_abseil" ]]; then
+  bazel $BAZEL_STARTUP_OPTIONS build $BAZEL_OPTIONS --//api:with_abseil=true //...
+  bazel $BAZEL_STARTUP_OPTIONS test $BAZEL_TEST_OPTIONS --//api:with_abseil=true //...
 elif [[ "$1" == "cmake.test_example_plugin" ]]; then
   # Build the plugin
   cd "${BUILD_DIR}"
