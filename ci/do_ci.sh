@@ -164,6 +164,7 @@ elif [[ "$1" == "cmake.exporter.otprotocol.test" ]]; then
 elif [[ "$1" == "bazel.with_abseil" ]]; then
   bazel $BAZEL_STARTUP_OPTIONS build $BAZEL_OPTIONS --//api:with_abseil=true //...
   bazel $BAZEL_STARTUP_OPTIONS test $BAZEL_TEST_OPTIONS --//api:with_abseil=true //...
+  exit 0
 elif [[ "$1" == "cmake.test_example_plugin" ]]; then
   # Build the plugin
   cd "${BUILD_DIR}"
