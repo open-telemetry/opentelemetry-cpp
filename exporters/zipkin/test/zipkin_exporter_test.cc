@@ -237,7 +237,7 @@ TEST_F(ZipkinExporterTestPeer, ExportJsonIntegrationTest)
     report_trace_id.assign(trace_id_hex, sizeof(trace_id_hex));
   }
 
-  ASSERT_TRUE(waitForRequests(8, old_count + 1));
+  ASSERT_TRUE(waitForRequests(30, old_count + 1));
   auto check_json        = received_requests_json_.back();
   auto trace_id_kv       = check_json.at(0).find("traceId");
   auto received_trace_id = trace_id_kv.value().get<std::string>();
@@ -256,7 +256,8 @@ TEST_F(ZipkinExporterTestPeer, ExportJsonIntegrationTest)
 TEST_F(ZipkinExporterTestPeer, ShutdownTest)
 {
   auto mock_http_client = new MockHttpClient;
-  auto exporter         = GetExporter(
+  // Leave a comment line here or different version of clang-format has a different result here
+  auto exporter = GetExporter(
       std::shared_ptr<opentelemetry::ext::http::client::HttpClientSync>{mock_http_client});
   auto recordable_1 = exporter->MakeRecordable();
   recordable_1->SetName("Test span 1");
