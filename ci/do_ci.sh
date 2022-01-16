@@ -17,6 +17,43 @@ function install_prometheus_cpp_client
   popd
 }
 
+function run_benchmarks
+{
+  docker run -d --rm -it -p 4317:4317 -p 4318:4318 -v \
+    $(pwd)/examples/otlp:/cfg otel/opentelemetry-collector:0.38.0 \
+    --config=/cfg/opentelemetry-collector-config/config.dev.yaml
+
+  [ -z "${BENCHMARK_DIR}" ] && export BENCHMARK_DIR=$HOME/benchmark
+  mkdir -p $BENCHMARK_DIR
+  bazel $BAZEL_STARTUP_OPTIONS build $BAZEL_OPTIONS -c opt -- \
+    $(bazel query 'attr("tags", "benchmark_result", ...)')
+  echo ""
+  echo "Benchmark results in $BENCHMARK_DIR:"
+  (
+    cd bazel-bin
+    find . -name \*_result.json -exec bash -c \
+      'echo "$@" && mkdir -p "$BENCHMARK_DIR/$(dirname "$@")" && \
+       cp "$@" "$BENCHMARK_DIR/$@" && chmod +w "$BENCHMARK_DIR/$@"' _ {} \;
+  )
+
+  # collect benchmark results into one array
+  components=(api sdk exporters)
+  pushd $BENCHMARK_DIR
+  components=(api sdk exporters)
+  for component in "${components[@]}"
+  do
+    out=$component-benchmark_result.json
+    find ./$component -type f -name "*_result.json" -exec cat {} \; > $component_tmp_bench.json
+    cat $component_tmp_bench.json | docker run -i --rm itchyny/gojq:0.12.6 -s \
+      '.[0].benchmarks = ([.[].benchmarks] | add) |
+      if .[0].benchmarks == null then null else .[0] end' > $BENCHMARK_DIR/$out
+  done
+
+  mv *benchmark_result.json ${SRC_DIR}
+  popd
+  docker kill $(docker ps -q)
+}
+
 [ -z "${SRC_DIR}" ] && export SRC_DIR="`pwd`"
 [ -z "${BUILD_DIR}" ] && export BUILD_DIR=$HOME/build
 mkdir -p "${BUILD_DIR}"
@@ -162,9 +199,8 @@ elif [[ "$1" == "bazel.test" ]]; then
   bazel $BAZEL_STARTUP_OPTIONS build $BAZEL_OPTIONS //...
   bazel $BAZEL_STARTUP_OPTIONS test $BAZEL_TEST_OPTIONS //...
   exit 0
-elif [[ "$1" == "bazel.with_abseil" ]]; then
-  bazel $BAZEL_STARTUP_OPTIONS build $BAZEL_OPTIONS --//api:with_abseil=true //...
-  bazel $BAZEL_STARTUP_OPTIONS test $BAZEL_TEST_OPTIONS --//api:with_abseil=true //...
+elif [[ "$1" == "bazel.benchmark" ]]; then
+  run_benchmarks
   exit 0
 elif [[ "$1" == "bazel.macos.test" ]]; then
   bazel $BAZEL_STARTUP_OPTIONS build $BAZEL_MACOS_OPTIONS //...
@@ -200,7 +236,7 @@ elif [[ "$1" == "benchmark" ]]; then
   echo "Benchmark results in $BENCHMARK_DIR:"
   (
     cd bazel-bin
-    find . -name \*_result.txt -exec bash -c \
+    find . -name \*_result.json -exec bash -c \
       'echo "$@" && mkdir -p "$BENCHMARK_DIR/$(dirname "$@")" && \
        cp "$@" "$BENCHMARK_DIR/$@" && chmod +w "$BENCHMARK_DIR/$@"' _ {} \;
   )

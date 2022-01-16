@@ -5,6 +5,23 @@
 #include "opentelemetry/exporters/otlp/otlp_recordable.h"
 
 #include <benchmark/benchmark.h>
+#include "opentelemetry/exporters/otlp/otlp_grpc_exporter.h"
+#include "opentelemetry/sdk/trace/simple_processor.h"
+#include "opentelemetry/sdk/trace/tracer_provider.h"
+#include "opentelemetry/trace/provider.h"
+
+#ifdef BAZEL_BUILD
+#  include "examples/common/foo_library/foo_library.h"
+#else
+#  include "foo_library/foo_library.h"
+#endif
+
+namespace trace     = opentelemetry::trace;
+namespace nostd     = opentelemetry::nostd;
+namespace trace_sdk = opentelemetry::sdk::trace;
+namespace otlp      = opentelemetry::exporter::otlp;
+
+#include <benchmark/benchmark.h>
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace exporter
@@ -170,5 +187,31 @@ BENCHMARK(BM_OtlpExporterDenseSpans);
 }  // namespace otlp
 }  // namespace exporter
 OPENTELEMETRY_END_NAMESPACE
+
+namespace
+{
+opentelemetry::exporter::otlp::OtlpGrpcExporterOptions opts;
+void InitTracer()
+{
+  // Create OTLP exporter instance
+  auto exporter  = std::unique_ptr<trace_sdk::SpanExporter>(new otlp::OtlpGrpcExporter(opts));
+  auto processor = std::unique_ptr<trace_sdk::SpanProcessor>(
+      new trace_sdk::SimpleSpanProcessor(std::move(exporter)));
+  auto provider =
+      nostd::shared_ptr<trace::TracerProvider>(new trace_sdk::TracerProvider(std::move(processor)));
+  // Set the global trace provider
+  trace::Provider::SetTracerProvider(provider);
+}
+
+void BM_otlp_grpc_with_collector(benchmark::State &state)
+{
+  InitTracer();
+  while (state.KeepRunning())
+  {
+    foo_library();
+  }
+}
+BENCHMARK(BM_otlp_grpc_with_collector);
+}  // namespace
 
 BENCHMARK_MAIN();
