@@ -198,7 +198,7 @@ TEST_F(BasicCurlHttpTests, SendGetRequest)
   request->SetUri("get/");
   GetEventHandler *handler = new GetEventHandler();
   session->SendRequest(*handler);
-  ASSERT_TRUE(waitForRequests(1, 1));
+  ASSERT_TRUE(waitForRequests(30, 1));
   session->FinishSession();
   ASSERT_TRUE(handler->is_called_);
   delete handler;
@@ -221,7 +221,7 @@ TEST_F(BasicCurlHttpTests, SendPostRequest)
   request->AddHeader("Content-Type", "text/plain");
   PostEventHandler *handler = new PostEventHandler();
   session->SendRequest(*handler);
-  ASSERT_TRUE(waitForRequests(1, 1));
+  ASSERT_TRUE(waitForRequests(30, 1));
   session->FinishSession();
   ASSERT_TRUE(handler->is_called_);
 

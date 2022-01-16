@@ -223,7 +223,8 @@ TEST_F(OtlpHttpLogExporterTestPeer, ExportJsonIntegrationTest)
     char span_id_hex[2 * opentelemetry::trace::SpanId::kSize] = {0};
     opentelemetry::trace::SpanId span_id{span_id_bin};
 
-    auto logger = provider->GetLogger("test");
+    const std::string schema_url{"https://opentelemetry.io/schemas/1.2.0"};
+    auto logger = provider->GetLogger("test", "", "opentelelemtry_library", "", schema_url);
     logger->Log(opentelemetry::logs::Severity::kInfo, "Log name", "Log message",
                 {{"service.name", "unit_test_service"},
                  {"tenant.id", "test_user"},
@@ -251,7 +252,7 @@ TEST_F(OtlpHttpLogExporterTestPeer, ExportJsonIntegrationTest)
     report_span_id.assign(span_id_hex, sizeof(span_id_hex));
   }
 
-  ASSERT_TRUE(waitForRequests(8, old_count + 1));
+  ASSERT_TRUE(waitForRequests(30, old_count + 1));
   auto check_json                   = received_requests_json_.back();
   auto resource_logs                = *check_json["resource_logs"].begin();
   auto instrumentation_library_span = *resource_logs["instrumentation_library_logs"].begin();
@@ -313,7 +314,8 @@ TEST_F(OtlpHttpLogExporterTestPeer, ExportBinaryIntegrationTest)
                                                                 '3', '2', '1', '0'};
     opentelemetry::trace::SpanId span_id{span_id_bin};
 
-    auto logger = provider->GetLogger("test");
+    const std::string schema_url{"https://opentelemetry.io/schemas/1.2.0"};
+    auto logger = provider->GetLogger("test", "", "opentelelemtry_library", "", schema_url);
     logger->Log(opentelemetry::logs::Severity::kInfo, "Log name", "Log message",
                 {{"service.name", "unit_test_service"},
                  {"tenant.id", "test_user"},
@@ -338,7 +340,7 @@ TEST_F(OtlpHttpLogExporterTestPeer, ExportBinaryIntegrationTest)
     report_span_id.assign(reinterpret_cast<const char *>(span_id_bin), sizeof(span_id_bin));
   }
 
-  ASSERT_TRUE(waitForRequests(8, old_count + 1));
+  ASSERT_TRUE(waitForRequests(30, old_count + 1));
   auto received_log =
       received_requests_binary_.back().resource_logs(0).instrumentation_library_logs(0).logs(0);
   EXPECT_EQ(received_log.trace_id(), report_trace_id);

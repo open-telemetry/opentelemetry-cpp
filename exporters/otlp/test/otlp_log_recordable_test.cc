@@ -190,6 +190,15 @@ TEST(OtlpLogRecordable, SetArrayAttribute)
   }
 }
 
+TEST(OtlpLogRecordable, SetInstrumentationLibrary)
+{
+  OtlpLogRecordable rec;
+  auto inst_lib =
+      opentelemetry::sdk::instrumentationlibrary::InstrumentationLibrary::Create("test", "v1");
+  rec.SetInstrumentationLibrary(*inst_lib);
+  EXPECT_EQ(rec.GetInstrumentationLibrary(), *inst_lib);
+}
+
 /**
  * AttributeValue can contain different int types, such as int, int64_t,
  * unsigned int, and uint64_t. To avoid writing test cases for each, we can
