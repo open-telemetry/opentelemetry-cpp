@@ -3,7 +3,6 @@
 
 #ifndef HAVE_CPP_STDLIB
 
-#  define _WINSOCKAPI_  // stops including winsock.h
 #  include "opentelemetry/exporters/zipkin/zipkin_exporter.h"
 #  include <string>
 #  include "opentelemetry/ext/http/client/curl/http_client_curl.h"
@@ -13,7 +12,7 @@
 #  include "opentelemetry/trace/provider.h"
 
 #  include <gtest/gtest.h>
-#  include "gmock/gmock.h"
+#  include <gmock/gmock.h>
 
 #  include "nlohmann/json.hpp"
 

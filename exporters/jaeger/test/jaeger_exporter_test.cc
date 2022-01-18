@@ -14,7 +14,7 @@
 #endif
 
 #include <gtest/gtest.h>
-#include "gmock/gmock.h"
+#include <gmock/gmock.h>
 
 namespace trace      = opentelemetry::trace;
 namespace nostd      = opentelemetry::nostd;
