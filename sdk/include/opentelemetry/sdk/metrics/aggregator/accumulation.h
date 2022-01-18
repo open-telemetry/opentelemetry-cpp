@@ -65,7 +65,7 @@ template <class T>
 class HistogramAccumulation : public Accumulation<T>
 {
 public:
-  HistogramAccumulation(std::vector<T> &boundaries) : histogram_(boundaries) {}
+  HistogramAccumulation(const std::vector<T> &boundaries) : histogram_(boundaries) {}
 
   void Record(T value) noexcept override
   {
@@ -88,14 +88,14 @@ private:
 };
 
 template <class T>
-class NoopAccumulation : public Accumulation<T>
+class DropAccumulation : public Accumulation<T>
 {
 public:
-  NoopAccumulation() {}
+  DropAccumulation() {}
 
   void Record(T value) noexcept override {}
 
-  NoopPointData<T> ToPointData() { return NoopPointData<T>(); }
+  DropPointData<T> ToPointData() { return DropPointData<T>(); }
 
 private:
   T sum_;

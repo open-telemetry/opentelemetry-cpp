@@ -17,6 +17,7 @@ template <class T>
 class SumAggregator : public Aggregator<SumAccumulation<T>>
 {
 public:
+  SumAggregator(InstrumentDescriptor &instrument_descriptor) {}
   SumAccumulation<T> CreateAccumulation() noexcept override { return SumAccumulation<T>(); }
 
   /** Returns the result of the merge of the given accumulations.*/

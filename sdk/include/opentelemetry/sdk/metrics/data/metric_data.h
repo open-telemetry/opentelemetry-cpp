@@ -38,7 +38,7 @@ public:
 };
 
 template <class T>
-class NoopMetricData : public MetricData<T>
+class DropMetricData : public MetricData<T>
 {};
 }  // namespace metrics
 }  // namespace sdk

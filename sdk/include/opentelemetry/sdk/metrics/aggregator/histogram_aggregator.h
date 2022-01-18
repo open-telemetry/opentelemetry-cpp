@@ -21,7 +21,7 @@ class HistogramAggregator : public Aggregator<HistogramAccumulation<T>>
 {
   // TBD - This clas is placeholder, and needs to be implemented
 public:
-  HistogramAggregator(std::vector<T> &boundaries) : boundaries_(boundaries) {}
+  HistogramAggregator(const std::vector<T> &boundaries) : boundaries_(boundaries) {}
   HistogramAccumulation<T> CreateAccumulation() noexcept override
   {
     return HistogramAccumulation<T>(boundaries_);

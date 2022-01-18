@@ -3,6 +3,7 @@
 
 #pragma once
 #ifndef ENABLE_METRICS_PREVIEW
+#  include "opentelemetry/sdk/metrics/instruments.h"
 #  include "opentelemetry/version.h"
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace sdk

@@ -165,9 +165,7 @@ WritableMatricsStorage &Meter::RegisterMetricsStorage(InstrumentDescriptor &inst
 {
   std::vector < std::vector<View *> views;
   context_.GetViewRegistry().FindViews(instrument_descriptor, *instrumentation_library_,
-                                       [](const View &view) {
-                                         views.push_back(view);
-                                       });
+                                       [](const View &view) { views.push_back(view); });
 }
 
 }  // namespace metrics

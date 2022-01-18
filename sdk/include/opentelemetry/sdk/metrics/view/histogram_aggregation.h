@@ -4,23 +4,26 @@
 #pragma once
 #ifndef ENABLE_METRICS_PREVIEW
 
-#  include <memory>
-#  include "opentelemetry/sdk/metrics/aggregator/aggregator.h"
-#  include "opentelemetry/sdk/metrics/aggregator/histogram_aggregator.h"
-#  include "opentelemetry/sdk/metrics/aggregator/noop_aggregator.h"
 #  include "opentelemetry/sdk/metrics/instruments.h"
+#  include "opentelemetry/sdk/metrics/view/aggregation.h"
+
+#  include <memory>
+
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace sdk
 {
 namespace metrics
 {
-
-class Aggregation
+class HistogramAggregation : public Aggregation
 {
 public:
-  virtual ~Aggregation() = default;
   virtual std::unique_ptr<Aggregator> CreateAggregator(
-      opentelemetry::sdk::metrics::InstrumentDescriptor &instrument_descriptor) noexcept = 0;
+      opentelemetry::sdk::metrics::InstrumentDescriptor &instrument_descriptor) noexcept override;
+
+  static Aggregation &GetInstance() noexcept;
+
+private:
+  LastValueAggregation() = default;
 };
 
 }  // namespace metrics

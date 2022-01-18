@@ -21,9 +21,7 @@ enum class InstrumentType
 
 enum class InstrumentValueType
 {
-  kInt,
   kLong,
-  kFloat,
   kDouble
 };
 

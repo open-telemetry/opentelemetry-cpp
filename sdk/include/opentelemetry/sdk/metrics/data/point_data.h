@@ -50,7 +50,7 @@ struct HistogramPointData : public AbstractPointData<T>
 };
 
 template <class T>
-struct NoopPointData : public AbstractPointData<T>
+struct DropPointData : public AbstractPointData<T>
 {};
 
 }  // namespace metrics
