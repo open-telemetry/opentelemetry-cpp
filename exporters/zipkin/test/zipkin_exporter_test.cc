@@ -12,7 +12,7 @@
 #  include "opentelemetry/trace/provider.h"
 
 #  include <gtest/gtest.h>
-#  include <gmock/gmock.h>
+#  include "gmock/gmock.h"
 
 #  include "nlohmann/json.hpp"
 
