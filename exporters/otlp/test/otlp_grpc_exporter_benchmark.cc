@@ -5,7 +5,6 @@
 #include "opentelemetry/exporters/otlp/otlp_recordable.h"
 
 #include <benchmark/benchmark.h>
-#include "opentelemetry/exporters/otlp/otlp_grpc_exporter.h"
 #include "opentelemetry/sdk/trace/simple_processor.h"
 #include "opentelemetry/sdk/trace/tracer_provider.h"
 #include "opentelemetry/trace/provider.h"

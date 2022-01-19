@@ -37,7 +37,6 @@ function run_benchmarks
   )
 
   # collect benchmark results into one array
-  components=(api sdk exporters)
   pushd $BENCHMARK_DIR
   components=(api sdk exporters)
   for component in "${components[@]}"
