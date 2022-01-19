@@ -18,7 +18,7 @@ namespace metrics
  */
 class LongHistogramAggregator : public Aggregator
 {
-  // TBD - This clas is placeholder, and needs to be implemented
+  // TBD - This class is placeholder, and needs to be implemented
 public:
   LongHistogramAggregator(const std::vector<long> &boundaries) : boundaries_(boundaries) {}
   std::unique_ptr<Accumulation> CreateAccumulation() noexcept override
@@ -61,7 +61,7 @@ private:
 
 class DoubleHistogramAggregator : public Aggregator
 {
-  // TBD - This clas is placeholder, and needs to be implemented
+  // TBD - This class is placeholder, and needs to be implemented
 public:
   DoubleHistogramAggregator(const std::vector<double> &boundaries) : boundaries_(boundaries) {}
   std::unique_ptr<Accumulation> CreateAccumulation() noexcept override
