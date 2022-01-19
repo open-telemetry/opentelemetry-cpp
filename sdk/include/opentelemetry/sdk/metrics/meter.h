@@ -102,7 +102,7 @@ public:
 private:
   std::shared_ptr<sdk::instrumentationlibrary::InstrumentationLibrary> instrumentation_library_;
   std::shared_ptr<sdk::metrics::MeterContext> context_;
-  WritableMatricStorage &RegisterMetricStorage(InstrumentDescriptor &);
+  // WritableMetricStorage &RegisterMetricStorage(InstrumentDescriptor &);
 };
 }  // namespace metrics
 }  // namespace sdk

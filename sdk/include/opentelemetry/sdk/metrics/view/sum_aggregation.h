@@ -20,7 +20,7 @@ public:
   std::unique_ptr<Aggregator> CreateAggregator(
       opentelemetry::sdk::metrics::InstrumentDescriptor &instrument_descriptor) noexcept override;
 
-  static Aggregation &GetInstance();
+  static Aggregation &GetInstance() noexcept;
 
 private:
   SumAggregation() = default;

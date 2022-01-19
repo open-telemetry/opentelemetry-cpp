@@ -26,31 +26,44 @@ struct BasePointData
   PointAttributes attributes_;
 };
 
-template <class T>
-class AbstractPointData
+class PointData
 {};
 
-template <class T>
-struct SingularPointData : public AbstractPointData<T>
+struct LongSingularPointData : public PointData
 {
-  SingularPointData(T value) : value_(value) {}
-  T value_;
+  LongSingularPointData(long value) : value_(value) {}
+  long value_;
 };
 
-template <class T>
-struct HistogramPointData : public AbstractPointData<T>
+struct DoubleSingularPointData : public PointData
 {
-  HistogramPointData(std::vector<T> &boundaries)
+  DoubleSingularPointData(long value) : value_(value) {}
+  long value_;
+};
+
+struct LongHistogramPointData : public PointData
+{
+  LongHistogramPointData(std::vector<long> &boundaries)
       : boundaries_{boundaries}, counts_(boundaries.size() + 1, 0), sum_(0), count_(0)
   {}
-  std::vector<T> boundaries_;
+  std::vector<long> boundaries_;
   std::vector<uint64_t> counts_;
-  T sum_;
+  long sum_;
   uint64_t count_;
 };
 
-template <class T>
-struct DropPointData : public AbstractPointData<T>
+struct DoubleHistogramPointData : public PointData
+{
+  DoubleHistogramPointData(std::vector<double> &boundaries)
+      : boundaries_{boundaries}, counts_(boundaries.size() + 1, 0), sum_(0), count_(0)
+  {}
+  std::vector<double> boundaries_;
+  std::vector<uint64_t> counts_;
+  double sum_;
+  uint64_t count_;
+};
+
+struct DropPointData : public PointData
 {};
 
 }  // namespace metrics

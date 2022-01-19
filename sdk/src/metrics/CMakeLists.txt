@@ -3,11 +3,11 @@ add_library(
   meter_provider.cc
   meter.cc
   meter_context.cc
-  sum_aggregation.cc
-  lastvalue_aggregation.cc
-  histogram_aggregation.cc
-  drop_aggregation.cc
-  default_aggregation.cc)
+  view/sum_aggregation.cc
+  view/lastvalue_aggregation.cc
+  view/histogram_aggregation.cc
+  view/drop_aggregation.cc
+  view/default_aggregation.cc)
 
 set_target_properties(opentelemetry_metrics PROPERTIES EXPORT_NAME metrics)
 

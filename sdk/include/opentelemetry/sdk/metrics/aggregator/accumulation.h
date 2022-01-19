@@ -15,59 +15,99 @@ namespace sdk
 namespace metrics
 {
 
-template <class T>
 class Accumulation
 {
 public:
-  virtual void Record(T value) noexcept = 0;
+  virtual void Record(long value) noexcept   = 0;
+  virtual void Record(double value) noexcept = 0;
 };
 
-template <class T>
-class SumAccumulation : public Accumulation<T>
+class LongSumAccumulation : public Accumulation
 {
 public:
-  SumAccumulation(T value = 0) : sum_(value) {}
+  LongSumAccumulation(long value = 0) : sum_(value) {}
 
-  void Record(T value) noexcept override { sum_ += value; }
+  void Record(long value) noexcept override { sum_ += value; }
+  void Record(double value) noexcept override {}
 
-  SingularPointData<T> ToPointData() { return SingularPointData<T>(sum_); }
+  LongSingularPointData ToPointData() { return LongSingularPointData(sum_); }
 
 private:
-  T sum_;
+  long sum_;
 };
 
-template <class T>
-class LastValueAccumulation : public Accumulation<T>
+class DoubleSumAccumulation : public Accumulation
 {
 public:
-  LastValueAccumulation(
-      T value                                   = 0,
+  DoubleSumAccumulation(double value = 0) : sum_(value) {}
+
+  void Record(double value) noexcept override { sum_ += value; }
+  void Record(long value) noexcept override {}
+
+  DoubleSingularPointData ToPointData() { return DoubleSingularPointData(sum_); }
+
+private:
+  double sum_;
+};
+
+class LongLastValueAccumulation : public Accumulation
+{
+public:
+  LongLastValueAccumulation(
+      long value                                = 0,
       opentelemetry::common::SystemTimestamp ts = std::chrono::system_clock::now())
       : last_value_(value), ts_{ts}
   {}
 
-  void Record(T value) noexcept override
+  void Record(long value) noexcept override
   {
     last_value_ = value;
     ts_.Reset(std::chrono::system_clock::now());
   }
 
+  void Record(double value) noexcept override {}
+
   const opentelemetry::common::SystemTimestamp &GetLastValueTimeStamp() const { return ts_; }
 
-  SingularPointData<T> ToPointData() { return SingularPointData<T>(last_value_); }
+  LongSingularPointData ToPointData() { return LongSingularPointData(last_value_); }
 
 private:
-  T last_value_;
+  long last_value_;
   opentelemetry::common::SystemTimestamp ts_;
 };
 
-template <class T>
-class HistogramAccumulation : public Accumulation<T>
+class DoubleLastValueAccumulation : public Accumulation
 {
 public:
-  HistogramAccumulation(const std::vector<T> &boundaries) : histogram_(boundaries) {}
+  DoubleLastValueAccumulation(
+      long value                                = 0,
+      opentelemetry::common::SystemTimestamp ts = std::chrono::system_clock::now())
+      : last_value_(value), ts_{ts}
+  {}
 
-  void Record(T value) noexcept override
+  void Record(double value) noexcept override
+  {
+    last_value_ = value;
+    ts_.Reset(std::chrono::system_clock::now());
+  }
+
+  void Record(long value) noexcept override {}
+
+  const opentelemetry::common::SystemTimestamp &GetLastValueTimeStamp() const { return ts_; }
+
+  DoubleSingularPointData ToPointData() { return DoubleSingularPointData(last_value_); }
+
+private:
+  double last_value_;
+  opentelemetry::common::SystemTimestamp ts_;
+};
+
+class LongHistogramAccumulation : public Accumulation
+{
+public:
+  LongHistogramAccumulation(std::vector<long> &boundaries) : histogram_(boundaries) {}
+
+  void Record(long value) noexcept override
   {
     histogram_.count_ += 1;
     histogram_.sum_ += value;
@@ -81,24 +121,50 @@ public:
     }
   }
 
-  HistogramPointData<T> &ToPointData() { return histogram_; }
+  void Record(double value) noexcept override {}
+
+  LongHistogramPointData &ToPointData() { return histogram_; }
 
 private:
-  HistogramPointData<T> histogram_;
+  LongHistogramPointData histogram_;
 };
 
-template <class T>
-class DropAccumulation : public Accumulation<T>
+class DoubleHistogramAccumulation : public Accumulation
+{
+public:
+  DoubleHistogramAccumulation(std::vector<double> &boundaries) : histogram_(boundaries) {}
+
+  void Record(double value) noexcept override
+  {
+    histogram_.count_ += 1;
+    histogram_.sum_ += value;
+    for (auto it = histogram_.boundaries_.begin(); it != histogram_.boundaries_.end(); ++it)
+    {
+      if (value < *it)
+      {
+        histogram_.counts_[std::distance(histogram_.boundaries_.begin(), it)] += 1;
+        return;
+      }
+    }
+  }
+
+  void Record(long value) noexcept override {}
+
+  DoubleHistogramPointData &ToPointData() { return histogram_; }
+
+private:
+  DoubleHistogramPointData histogram_;
+};
+
+class DropAccumulation : public Accumulation
 {
 public:
   DropAccumulation() {}
 
-  void Record(T value) noexcept override {}
+  void Record(long value) noexcept override {}
+  void Record(double value) noexcept override {}
 
-  DropPointData<T> ToPointData() { return DropPointData<T>(); }
-
-private:
-  T sum_;
+  DropPointData ToPointData() { return DropPointData(); }
 };
 
 template <class T>

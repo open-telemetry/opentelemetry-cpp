@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 #ifndef ENABLE_METRICS_PREVIEW
-#  include "opentelemetry/sdk/view/drop_aggregation.h"
+#  include "opentelemetry/sdk/metrics/view/drop_aggregation.h"
 #  include "opentelemetry/sdk/metrics/aggregator/drop_aggregator.h"
 #  include "opentelemetry/sdk_config.h"
 #  include "opentelemetry/version.h"
@@ -16,10 +16,10 @@ namespace metrics
 std::unique_ptr<Aggregator> DropAggregation::CreateAggregator(
     opentelemetry::sdk::metrics::InstrumentDescriptor &instrument_descriptor) noexcept
 {
-  return std::move(std::unique_ptr<Aggregator>(new DropAggregator<long>(instrument_descriptor)));
+  return std::move(std::unique_ptr<Aggregator>(new DropAggregator()));
 }
 
-static Aggregation &DropAggregation::GetInstance()
+Aggregation &DropAggregation::GetInstance()
 {
   static DropAggregation drop_aggregation;
   return drop_aggregation;

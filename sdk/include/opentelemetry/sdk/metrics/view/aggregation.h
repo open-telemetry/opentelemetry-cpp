@@ -6,8 +6,6 @@
 
 #  include <memory>
 #  include "opentelemetry/sdk/metrics/aggregator/aggregator.h"
-#  include "opentelemetry/sdk/metrics/aggregator/histogram_aggregator.h"
-#  include "opentelemetry/sdk/metrics/aggregator/noop_aggregator.h"
 #  include "opentelemetry/sdk/metrics/instruments.h"
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace sdk

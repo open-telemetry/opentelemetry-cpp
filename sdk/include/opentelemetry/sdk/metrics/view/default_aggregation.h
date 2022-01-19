@@ -8,7 +8,11 @@
 #  include "opentelemetry/sdk/metrics/view/aggregation.h"
 
 #  include <memory>
-
+OPENTELEMETRY_BEGIN_NAMESPACE
+namespace sdk
+{
+namespace metrics
+{
 class DefaultAggregation : public Aggregation
 {
 public:
@@ -16,10 +20,10 @@ public:
       opentelemetry::sdk::metrics::InstrumentDescriptor &instrument_descriptor) noexcept override;
 
 private:
-  static opentelemetry::sdk::metrics::Aggregation &resolve(
+  opentelemetry::sdk::metrics::Aggregation &resolve(
       opentelemetry::sdk::metrics::InstrumentDescriptor &instrument_descriptor) noexcept;
 };
-}
-}
+}  // namespace metrics
+}  // namespace sdk
 OPENTELEMETRY_END_NAMESPACE
 #endif

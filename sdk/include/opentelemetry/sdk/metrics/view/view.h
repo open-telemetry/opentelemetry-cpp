@@ -4,8 +4,8 @@
 #pragma once
 #ifndef ENABLE_METRICS_PREVIEW
 #  include "opentelemetry/nostd/string_view.h"
-#  include "opentelemetry/sdk/metrics/view/aggregation.h"
 #  include "opentelemetry/sdk/metrics/view/attributes_processor.h"
+#  include "opentelemetry/sdk/metrics/view/default_aggregation.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace sdk

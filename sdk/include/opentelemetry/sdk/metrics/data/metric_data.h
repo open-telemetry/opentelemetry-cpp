@@ -15,31 +15,52 @@ namespace sdk
 {
 namespace metrics
 {
-template <class T>
-struct MetricData
+/*struct MetricData
 {
   opentelemetry::sdk::resource::Resource *resource_;
   opentelemetry::sdk::instrumentationlibrary::InstrumentationLibrary *instrumentation_library_;
   InstrumentDescriptor instrument_descriptor;
-};
+};*/
 
-template <class T>
-struct SingularMetricsData : public MetricData<T>
+struct LongSingularMetricData
 {
 public:
-  std::vector<std::pair<BasePointData, SingularPointData<T>>> point_data_list;
+  opentelemetry::sdk::resource::Resource *resource_;
+  opentelemetry::sdk::instrumentationlibrary::InstrumentationLibrary *instrumentation_library_;
+  InstrumentDescriptor instrument_descriptor;
+  std::vector<std::pair<BasePointData, LongSingularPointData>> point_data_list;
 };
 
-template <class T>
-class HistogramMetricData : public MetricData<T>
+struct DoubleSingularMetricData
 {
 public:
-  std::vector<std::pair<BasePointData, HistogramPointData<T>>> point_datas_list;
+  opentelemetry::sdk::resource::Resource *resource_;
+  opentelemetry::sdk::instrumentationlibrary::InstrumentationLibrary *instrumentation_library_;
+  InstrumentDescriptor instrument_descriptor;
+  std::vector<std::pair<BasePointData, DoubleSingularPointData>> point_data_list;
 };
 
-template <class T>
-class DropMetricData : public MetricData<T>
+class LongHistogramMetricData
+{
+public:
+  opentelemetry::sdk::resource::Resource *resource_;
+  opentelemetry::sdk::instrumentationlibrary::InstrumentationLibrary *instrumentation_library_;
+  InstrumentDescriptor instrument_descriptor;
+  std::vector<std::pair<BasePointData, LongHistogramPointData>> point_datas_list;
+};
+
+class DoubleHistogramMetricData
+{
+public:
+  opentelemetry::sdk::resource::Resource *resource_;
+  opentelemetry::sdk::instrumentationlibrary::InstrumentationLibrary *instrumentation_library_;
+  InstrumentDescriptor instrument_descriptor;
+  std::vector<std::pair<BasePointData, DoubleHistogramPointData>> point_datas_list;
+};
+
+class DropMetricData
 {};
+
 }  // namespace metrics
 }  // namespace sdk
 OPENTELEMETRY_END_NAMESPACE

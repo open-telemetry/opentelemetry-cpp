@@ -3,6 +3,7 @@
 
 #pragma once
 #ifndef ENABLE_METRICS_PREVIEW
+#  include "opentelemetry/common/key_value_iterable.h"
 #  include "opentelemetry/version.h"
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace sdk
@@ -14,8 +15,9 @@ template <class T>
 class WritableMetricStorage
 {
 public:
-  virtual void Record(T value) noexcept                                             = 0;
-  virtual void Record(T value, const common::KeyValueIterable &attributes) noexcept = 0;
+  virtual void Record(T value) noexcept                                                   = 0;
+  virtual void Record(T value,
+                      const opentelemetry::common::KeyValueIterable &attributes) noexcept = 0;
 };
 
 template <class T>
@@ -23,7 +25,8 @@ class NoopWritableMetricsStorage : public WritableMetricStorage<T>
 {
 public:
   void Record(T value) noexcept override {}
-  void Record(T value, const common::KeyValueIterable &attributes) noexcept override {}
+  void Record(T value, const opentelemetry::common::KeyValueIterable &attributes) noexcept override
+  {}
 };
 
 }  // namespace metrics

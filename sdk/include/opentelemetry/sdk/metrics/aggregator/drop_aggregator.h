@@ -13,36 +13,38 @@ namespace sdk
 namespace metrics
 {
 /** Aggregators to drop the instruments. */
-template <class T>
-class DropAggregator : public Aggregator<DropAccumulation<T>>
+class DropAggregator : public Aggregator
 {
 public:
-  DropAccumulation<T> CreateAccumulation() noexcept override { return DropAccumulation<T>(); }
+  std::unique_ptr<Accumulation> CreateAccumulation() noexcept override
+  {
+    return std::move(std::unique_ptr<Accumulation>(new DropAccumulation()));
+  }
 
   /** Returns the result of the merge of the given accumulations.*/
-  DropAccumulation<T> Merge(DropAccumulation<T> &prev,
-                            DropAccumulation<T> &current) noexcept override
+  std::unique_ptr<Accumulation> Merge(Accumulation &prev, Accumulation &current) noexcept override
   {
-    return DropAccumulation<T>();
+    return std::move(
+        std::unique_ptr<Accumulation>(std::unique_ptr<Accumulation>(new DropAccumulation())));
   }
 
   /** Returns a new delta aggregation by comparing two cumulative measurements.*/
-  DropAccumulation<T> diff(DropAccumulation<T> &prev,
-                           DropAccumulation<T> &current) noexcept override
+  std::unique_ptr<Accumulation> diff(Accumulation &prev, Accumulation &current) noexcept override
   {
-    return DropAccumulation<T>(prev.ToPointData().value_ - current.ToPointData().value_);
+    return std::move(
+        std::unique_ptr<Accumulation>(std::unique_ptr<Accumulation>(new DropAccumulation())));
   }
 
-  DropMetricData<T> ToMetricData(
+  DropMetricData ToMetricData(
       opentelemetry::sdk::resource::Resource *resource,
       opentelemetry::sdk::instrumentationlibrary::InstrumentationLibrary *instrumentation_library,
       opentelemetry::sdk::metrics::InstrumentDescriptor &instrument_descriptor,
-      std::vector<opentelemetry::sdk::metrics::AccumulationRecord<DropAccumulation<T>>>
+      std::vector<opentelemetry::sdk::metrics::AccumulationRecord<DropAccumulation>>
           &accumulation_by_attributes,
       opentelemetry::common::SystemTimestamp &start_epoch_ns,
       opentelemetry::common::SystemTimestamp &end_epoch_ns)
   {
-    DropMetricData<T> metrics_data = {resource, instrumentation_library, instrument_descriptor};
+    DropMetricData metrics_data;
     return metrics_data;
   }
 };

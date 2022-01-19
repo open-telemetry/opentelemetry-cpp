@@ -23,7 +23,7 @@ public:
   static Aggregation &GetInstance() noexcept;
 
 private:
-  LastValueAggregation() = default;
+  HistogramAggregation() = default;
 };
 
 }  // namespace metrics
