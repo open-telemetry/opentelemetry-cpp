@@ -58,6 +58,8 @@ install(
   PATTERN "recordable.h" EXCLUDE)
 
 if(BUILD_TESTING)
+  add_definitions(-DGTEST_LINKED_AS_SHARED_LIBRARY=1)
+
   add_executable(jaeger_recordable_test test/jaeger_recordable_test.cc)
   target_link_libraries(
     jaeger_recordable_test ${GTEST_BOTH_LIBRARIES} ${CMAKE_THREAD_LIBS_INIT}
@@ -69,7 +71,6 @@ if(BUILD_TESTING)
     TEST_LIST jaeger_recordable_test)
 
   add_executable(jaeger_exporter_test test/jaeger_exporter_test.cc)
-  add_definitions(-DGTEST_LINKED_AS_SHARED_LIBRARY=1)
   if(MSVC)
     if(GMOCK_LIB)
       unset(GMOCK_LIB CACHE)
