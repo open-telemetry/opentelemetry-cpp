@@ -37,6 +37,8 @@ install(
   PATTERN "recordable.h" EXCLUDE)
 
 if(BUILD_TESTING)
+  add_definitions(-DGTEST_LINKED_AS_SHARED_LIBRARY=1)
+
   add_executable(zipkin_recordable_test test/zipkin_recordable_test.cc)
 
   target_link_libraries(
