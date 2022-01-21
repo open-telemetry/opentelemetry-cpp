@@ -120,9 +120,3 @@ TEST(Aggregation, DoubleHistogramAggregation)
   EXPECT_EQ(nostd::get<double>(histogram_data.sum_), 377);
 }
 #endif
-
-opentelemetry::common::SystemTimestamp epoch_nanos_;
-ListType boundaries_;
-ValueType sum_;
-std::vector<uint64_t> counts_;
-uint64_t count_;
