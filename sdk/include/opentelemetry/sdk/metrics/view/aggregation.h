@@ -1,12 +1,13 @@
+#if 0
 // Copyright The OpenTelemetry Authors
 // SPDX-License-Identifier: Apache-2.0
 
-#pragma once
-#ifndef ENABLE_METRICS_PREVIEW
+#  pragma once
+#  ifndef ENABLE_METRICS_PREVIEW
 
-#  include <memory>
-#  include "opentelemetry/sdk/metrics/aggregator/aggregator.h"
-#  include "opentelemetry/sdk/metrics/instruments.h"
+#    include <memory>
+#    include "opentelemetry/sdk/metrics/aggregator/aggregator.h"
+#    include "opentelemetry/sdk/metrics/instruments.h"
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace sdk
 {
@@ -46,4 +47,5 @@ class DefaultAggregation : public Aggregation
 }  // namespace metrics
 }  // namespace sdk
 OPENTELEMETRY_END_NAMESPACE
+#  endif
 #endif
