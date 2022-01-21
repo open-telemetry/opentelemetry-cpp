@@ -3,8 +3,11 @@
 
 #ifdef ENABLE_LOGS_PREVIEW
 #  include "opentelemetry/exporters/ostream/log_exporter.h"
+#  include <mutex>
+#  include "opentelemetry/sdk_config.h"
 
 #  include <iostream>
+#  include <type_traits>
 
 namespace nostd   = opentelemetry::nostd;
 namespace sdklogs = opentelemetry::sdk::logs;
@@ -107,8 +110,10 @@ std::unique_ptr<sdklogs::Recordable> OStreamLogExporter::MakeRecordable() noexce
 sdk::common::ExportResult OStreamLogExporter::Export(
     const nostd::span<std::unique_ptr<sdklogs::Recordable>> &records) noexcept
 {
-  if (is_shutdown_)
+  if (isShutdown())
   {
+    OTEL_INTERNAL_LOG_ERROR("[Ostream Log Exporter] Exporting "
+                            << records.size() << " log(s) failed, exporter is shutdown");
     return sdk::common::ExportResult::kFailure;
   }
 
@@ -142,14 +147,24 @@ sdk::common::ExportResult OStreamLogExporter::Export(
     sout_ << "{\n"
           << "  timestamp     : " << log_record->GetTimestamp().time_since_epoch().count() << "\n"
           << "  severity_num  : " << static_cast<int>(log_record->GetSeverity()) << "\n"
-          << "  severity_text : "
-          << opentelemetry::logs::SeverityNumToText[static_cast<int>(log_record->GetSeverity())]
-          << "\n"
-          << "  name          : " << log_record->GetName() << "\n"
+          << "  severity_text : ";
+
+    int severity_index = static_cast<int>(log_record->GetSeverity());
+    if (severity_index < 0 ||
+        severity_index >= std::extent<decltype(opentelemetry::logs::SeverityNumToText)>::value)
+    {
+      sout_ << "Invalid severity(" << severity_index << ")\n";
+    }
+    else
+    {
+      sout_ << opentelemetry::logs::SeverityNumToText[severity_index] << "\n";
+    }
+
+    sout_ << "  name          : " << log_record->GetName() << "\n"
           << "  body          : " << log_record->GetBody() << "\n"
           << "  resource      : ";
 
-    printMap(log_record->GetResource(), sout_);
+    printMap(log_record->GetResource().GetAttributes(), sout_);
 
     sout_ << "\n"
           << "  attributes    : ";
@@ -168,8 +183,15 @@ sdk::common::ExportResult OStreamLogExporter::Export(
 
 bool OStreamLogExporter::Shutdown(std::chrono::microseconds timeout) noexcept
 {
+  const std::lock_guard<opentelemetry::common::SpinLockMutex> locked(lock_);
   is_shutdown_ = true;
   return true;
+}
+
+bool OStreamLogExporter::isShutdown() const noexcept
+{
+  const std::lock_guard<opentelemetry::common::SpinLockMutex> locked(lock_);
+  return is_shutdown_;
 }
 
 }  // namespace logs

@@ -1,9 +1,17 @@
-add_library(opentelemetry_logs logger_provider.cc logger.cc
-                               simple_log_processor.cc batch_log_processor.cc)
+add_library(
+  opentelemetry_logs
+  logger_provider.cc
+  logger.cc
+  simple_log_processor.cc
+  batch_log_processor.cc
+  logger_context.cc
+  multi_log_processor.cc
+  multi_recordable.cc)
 
 set_target_properties(opentelemetry_logs PROPERTIES EXPORT_NAME logs)
 
-target_link_libraries(opentelemetry_logs opentelemetry_common)
+target_link_libraries(opentelemetry_logs PUBLIC opentelemetry_resources
+                                                opentelemetry_common)
 
 target_include_directories(
   opentelemetry_logs

@@ -77,8 +77,9 @@ TEST(ElasticsearchLogsExporterTests, RecordableCreation)
   // Attributes and resource support different types
   record->SetAttribute("key0", false);
   record->SetAttribute("key1", "1");
-  record->SetResource("key2", 2);
-  record->SetResource("key3", 3.142);
+
+  auto resource = opentelemetry::sdk::resource::Resource::Create({{"key2", 2}, {"key3", 3142}});
+  record->SetResource(resource);
 
   exporter->Export(nostd::span<std::unique_ptr<sdklogs::Recordable>>(&record, 1));
 }
