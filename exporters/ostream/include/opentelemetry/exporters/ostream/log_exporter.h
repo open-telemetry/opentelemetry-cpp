@@ -4,6 +4,7 @@
 #pragma once
 #ifdef ENABLE_LOGS_PREVIEW
 
+#  include "opentelemetry/common/spin_lock_mutex.h"
 #  include "opentelemetry/nostd/type_traits.h"
 #  include "opentelemetry/sdk/logs/exporter.h"
 #  include "opentelemetry/sdk/logs/log_record.h"
@@ -49,6 +50,8 @@ private:
   std::ostream &sout_;
   // Whether this exporter has been shut down
   bool is_shutdown_ = false;
+  mutable opentelemetry::common::SpinLockMutex lock_;
+  bool isShutdown() const noexcept;
 };
 }  // namespace logs
 }  // namespace exporter
