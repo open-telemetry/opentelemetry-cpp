@@ -25,6 +25,7 @@ void LongLastValueAggregation::Aggregate(long value, const PointAttributes &attr
 
 PointType LongLastValueAggregation::Collect() noexcept
 {
+  const std::lock_guard<opentelemetry::common::SpinLockMutex> locked(lock_);
   if (!is_lastvalue_valid_)
   {
     return LastValuePointData{
@@ -45,6 +46,7 @@ void DoubleLastValueAggregation::Aggregate(double value, const PointAttributes &
 
 PointType DoubleLastValueAggregation::Collect() noexcept
 {
+  const std::lock_guard<opentelemetry::common::SpinLockMutex> locked(lock_);
   if (!is_lastvalue_valid_)
   {
     return LastValuePointData{

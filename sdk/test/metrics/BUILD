@@ -3,6 +3,10 @@ cc_test(
     srcs = [
         "meter_provider_sdk_test.cc",
     ],
+    tags = [
+        "metrics",
+        "test",
+    ],
     deps = [
         "//sdk/src/metrics",
         "//sdk/src/resource",
@@ -15,6 +19,10 @@ cc_test(
     srcs = [
         "view_registry_test.cc",
     ],
+    tags = [
+        "metrics",
+        "test",
+    ],
     deps = [
         "//sdk/src/metrics",
         "//sdk/src/resource",
@@ -26,6 +34,10 @@ cc_test(
     name = "aggregation_test",
     srcs = [
         "aggregation_test.cc",
+    ],
+    tags = [
+        "metrics",
+        "test",
     ],
     deps = [
         "//sdk/src/metrics",
