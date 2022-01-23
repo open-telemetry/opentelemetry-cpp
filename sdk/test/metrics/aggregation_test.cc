@@ -79,15 +79,15 @@ TEST(Aggregation, LongHistogramAggregation)
   ASSERT_TRUE(nostd::holds_alternative<std::vector<long>>(histogram_data.boundaries_));
   EXPECT_EQ(nostd::get<long>(histogram_data.sum_), 0);
   EXPECT_EQ(histogram_data.count_, 0);
-  EXPECT_NO_THROW(aggr.Aggregate(12l, {}));   // lies in third bucket (indexed at 0)
-  EXPECT_NO_THROW(aggr.Aggregate(100l, {}));  // lies in seventh bucket (indexed at 0)
+  EXPECT_NO_THROW(aggr.Aggregate(12l, {}));   // lies in fourth bucket
+  EXPECT_NO_THROW(aggr.Aggregate(100l, {}));  // lies in eight bucket
   histogram_data = nostd::get<HistogramPointData>(aggr.Collect());
   EXPECT_EQ(nostd::get<long>(histogram_data.sum_), 112);
   EXPECT_EQ(histogram_data.count_, 2);
   EXPECT_EQ(histogram_data.counts_[3], 1);
   EXPECT_EQ(histogram_data.counts_[7], 1);
-  EXPECT_NO_THROW(aggr.Aggregate(13l, {}));   // lies in third bucket (indexed at 0)
-  EXPECT_NO_THROW(aggr.Aggregate(252l, {}));  // lies in eighth bucket (indexed at 0)
+  EXPECT_NO_THROW(aggr.Aggregate(13l, {}));   // lies in fourth bucket
+  EXPECT_NO_THROW(aggr.Aggregate(252l, {}));  // lies in ninth bucket
   histogram_data = nostd::get<HistogramPointData>(aggr.Collect());
   EXPECT_EQ(histogram_data.count_, 4);
   EXPECT_EQ(histogram_data.counts_[3], 2);
@@ -104,15 +104,15 @@ TEST(Aggregation, DoubleHistogramAggregation)
   ASSERT_TRUE(nostd::holds_alternative<std::vector<double>>(histogram_data.boundaries_));
   EXPECT_EQ(nostd::get<double>(histogram_data.sum_), 0);
   EXPECT_EQ(histogram_data.count_, 0);
-  EXPECT_NO_THROW(aggr.Aggregate(12.0, {}));   // lies in third bucket (indexed at 0)
-  EXPECT_NO_THROW(aggr.Aggregate(100.0, {}));  // lies in seventh bucket (indexed at 0)
+  EXPECT_NO_THROW(aggr.Aggregate(12.0, {}));   // lies in fourth bucket
+  EXPECT_NO_THROW(aggr.Aggregate(100.0, {}));  // lies in eight bucket
   histogram_data = nostd::get<HistogramPointData>(aggr.Collect());
   EXPECT_EQ(nostd::get<double>(histogram_data.sum_), 112);
   EXPECT_EQ(histogram_data.count_, 2);
   EXPECT_EQ(histogram_data.counts_[3], 1);
   EXPECT_EQ(histogram_data.counts_[7], 1);
-  EXPECT_NO_THROW(aggr.Aggregate(13.0, {}));   // lies in third bucket (indexed at 0)
-  EXPECT_NO_THROW(aggr.Aggregate(252.0, {}));  // lies in eighth bucket (indexed at 0)
+  EXPECT_NO_THROW(aggr.Aggregate(13.0, {}));   // lies in fourth bucket
+  EXPECT_NO_THROW(aggr.Aggregate(252.0, {}));  // lies in ninth bucket
   histogram_data = nostd::get<HistogramPointData>(aggr.Collect());
   EXPECT_EQ(histogram_data.count_, 4);
   EXPECT_EQ(histogram_data.counts_[3], 2);
