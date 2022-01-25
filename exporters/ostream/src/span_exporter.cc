@@ -2,8 +2,9 @@
 // SPDX-License-Identifier: Apache-2.0
 
 #include "opentelemetry/exporters/ostream/span_exporter.h"
-
 #include <iostream>
+#include <mutex>
+#include "opentelemetry/sdk_config.h"
 
 namespace nostd     = opentelemetry::nostd;
 namespace trace_sdk = opentelemetry::sdk::trace;
@@ -44,8 +45,10 @@ std::unique_ptr<trace_sdk::Recordable> OStreamSpanExporter::MakeRecordable() noe
 sdk::common::ExportResult OStreamSpanExporter::Export(
     const nostd::span<std::unique_ptr<trace_sdk::Recordable>> &spans) noexcept
 {
-  if (isShutdown_)
+  if (isShutdown())
   {
+    OTEL_INTERNAL_LOG_ERROR("[Ostream Trace Exporter] Exporting "
+                            << spans.size() << " span(s) failed, exporter is shutdown");
     return sdk::common::ExportResult::kFailure;
   }
 
@@ -95,10 +98,16 @@ sdk::common::ExportResult OStreamSpanExporter::Export(
 
 bool OStreamSpanExporter::Shutdown(std::chrono::microseconds timeout) noexcept
 {
-  isShutdown_ = true;
+  const std::lock_guard<opentelemetry::common::SpinLockMutex> locked(lock_);
+  is_shutdown_ = true;
   return true;
 }
 
+bool OStreamSpanExporter::isShutdown() const noexcept
+{
+  const std::lock_guard<opentelemetry::common::SpinLockMutex> locked(lock_);
+  return is_shutdown_;
+}
 void OStreamSpanExporter::printAttributes(
     const std::unordered_map<std::string, sdkcommon::OwnedAttributeValue> &map,
     const std::string prefix)

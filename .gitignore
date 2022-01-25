@@ -48,3 +48,5 @@
 /bazel-*
 /plugin
 /build
+
+tags
