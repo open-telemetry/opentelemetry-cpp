@@ -4,11 +4,13 @@
 #include <agent_types.h>
 #include <opentelemetry/exporters/jaeger/jaeger_exporter.h>
 #include <opentelemetry/exporters/jaeger/recordable.h>
+#include "opentelemetry/sdk_config.h"
 
 #include "http_transport.h"
 #include "thrift_sender.h"
 #include "udp_transport.h"
 
+#include <mutex>
 #include <vector>
 
 namespace sdk_common = opentelemetry::sdk::common;
@@ -39,8 +41,10 @@ std::unique_ptr<trace_sdk::Recordable> JaegerExporter::MakeRecordable() noexcept
 sdk_common::ExportResult JaegerExporter::Export(
     const nostd::span<std::unique_ptr<sdk::trace::Recordable>> &spans) noexcept
 {
-  if (is_shutdown_)
+  if (isShutdown())
   {
+    OTEL_INTERNAL_LOG_ERROR("[Jaeger Trace Exporter] Exporting "
+                            << spans.size() << " span(s) failed, exporter is shutdown");
     return sdk_common::ExportResult::kFailure;
   }
 
@@ -91,8 +95,15 @@ void JaegerExporter::InitializeEndpoint()
 
 bool JaegerExporter::Shutdown(std::chrono::microseconds timeout) noexcept
 {
+  const std::lock_guard<opentelemetry::common::SpinLockMutex> locked(lock_);
   is_shutdown_ = true;
   return true;
+}
+
+bool JaegerExporter::isShutdown() const noexcept
+{
+  const std::lock_guard<opentelemetry::common::SpinLockMutex> locked(lock_);
+  return is_shutdown_;
 }
 
 }  // namespace jaeger

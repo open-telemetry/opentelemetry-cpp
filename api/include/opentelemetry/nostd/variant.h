@@ -47,9 +47,9 @@ OPENTELEMETRY_END_NAMESPACE
 #  endif
 
 #  ifdef HAVE_ABSEIL
-#    include <absl/types/variant.h>
+#    include "absl/types/variant.h"
 #  else
-#    include "./absl/types/variant.h"
+#    include "./internal/absl/types/variant.h"
 #  endif
 
 #  ifdef _MSC_VER

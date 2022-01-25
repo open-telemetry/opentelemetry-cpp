@@ -86,7 +86,9 @@ TEST(OtlpLogRecordable, SetResource)
   OtlpLogRecordable rec;
   const std::string service_name_key = "service.name";
   std::string service_name           = "test-otlp";
-  rec.SetResource(service_name_key, service_name);
+  auto resource =
+      opentelemetry::sdk::resource::Resource::Create({{service_name_key, service_name}});
+  rec.SetResource(resource);
 
   auto proto_resource     = rec.ProtoResource();
   bool found_service_name = false;
@@ -186,6 +188,15 @@ TEST(OtlpLogRecordable, SetArrayAttribute)
     EXPECT_EQ(rec.log_record().attributes(2).value().array_value().values(i).string_value(),
               str_span[i]);
   }
+}
+
+TEST(OtlpLogRecordable, SetInstrumentationLibrary)
+{
+  OtlpLogRecordable rec;
+  auto inst_lib =
+      opentelemetry::sdk::instrumentationlibrary::InstrumentationLibrary::Create("test", "v1");
+  rec.SetInstrumentationLibrary(*inst_lib);
+  EXPECT_EQ(rec.GetInstrumentationLibrary(), *inst_lib);
 }
 
 /**

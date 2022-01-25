@@ -11,7 +11,7 @@
 #if defined __has_include
 #  if __has_include(<version>)  // Check for __cpp_{feature}
 #    include <version>
-#    if defined(__cpp_lib_span)
+#    if defined(__cpp_lib_span) && __cplusplus > 201703L
 #      define HAVE_SPAN
 #    endif
 #  endif
@@ -21,7 +21,7 @@
 #      define HAVE_SPAN
 #    endif
 #    // Check for other compiler span implementation
-#    if !defined(_MSVC_LANG) && __has_include(<span>)
+#    if !defined(_MSVC_LANG) && __has_include(<span>) && __cplusplus > 201703L
 // This works as long as compiler standard is set to C++20
 #      define HAVE_SPAN
 #    endif
