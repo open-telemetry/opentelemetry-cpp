@@ -98,11 +98,11 @@ For edit access, get in touch on
 Approvers
 ([@open-telemetry/cpp-approvers](https://github.com/orgs/open-telemetry/teams/cpp-approvers)):
 
+* [Ehsan Saei](https://github.com/esigo)
 * [Johannes Tax](https://github.com/pyohannes), Microsoft
 * [Josh Suereth](https://github.com/jsuereth), Google
 * [Max Golovanov](https://github.com/maxgolov), Microsoft
 * [Ryan Burn](https://github.com/rnburn), Lightstep
-* [Ehsan Saei](https://github.com/esigo)
 
 *Find more about the approver role in [community
 repository](https://github.com/open-telemetry/community/blob/main/community-membership.md#approver).*
