@@ -405,7 +405,7 @@ jobs:
     steps:
     - uses: actions/checkout@v2
     - name: install docfx
-      run: choco install docfx -y
+      run: choco install docfx -y --version=2.58.5
     - name: run ./ci/docfx.cmd
       shell: cmd
       run: ./ci/docfx.cmd
