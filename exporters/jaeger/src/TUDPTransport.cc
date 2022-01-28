@@ -75,6 +75,10 @@ void TUDPTransport::close()
 
 uint32_t TUDPTransport::read(uint8_t *buf, uint32_t len)
 {
+  if (!server_addr_info_)
+  {
+    return 0;
+  }
   uint32_t num_read = recvfrom(socket_,
 #if defined(_WIN32)
                                reinterpret_cast<char *>(buf), len, 0, server_addr_info_->ai_addr,
@@ -89,6 +93,10 @@ uint32_t TUDPTransport::read(uint8_t *buf, uint32_t len)
 
 void TUDPTransport::write(const uint8_t *buf, uint32_t len)
 {
+  if (!server_addr_info_)
+  {
+    return;
+  }
   sendto(socket_,
 #if defined(_WIN32)
          reinterpret_cast<const char *>(buf),

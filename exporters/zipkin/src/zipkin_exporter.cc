@@ -1,7 +1,9 @@
 // Copyright The OpenTelemetry Authors
 // SPDX-License-Identifier: Apache-2.0
 
+#define _WINSOCKAPI_  // stops including winsock.h
 #include "opentelemetry/exporters/zipkin/zipkin_exporter.h"
+#include <mutex>
 #include "opentelemetry/exporters/zipkin/recordable.h"
 #include "opentelemetry/ext/http/client/http_client_factory.h"
 #include "opentelemetry/ext/http/common/url_parser.h"
@@ -30,6 +32,14 @@ ZipkinExporter::ZipkinExporter() : options_(ZipkinExporterOptions()), url_parser
   InitializeLocalEndpoint();
 }
 
+ZipkinExporter::ZipkinExporter(
+    std::shared_ptr<opentelemetry::ext::http::client::HttpClientSync> http_client)
+    : options_(ZipkinExporterOptions()), url_parser_(options_.endpoint)
+{
+  http_client_ = http_client;
+  InitializeLocalEndpoint();
+}
+
 // ----------------------------- Exporter methods ------------------------------
 
 std::unique_ptr<sdk::trace::Recordable> ZipkinExporter::MakeRecordable() noexcept
@@ -40,8 +50,10 @@ std::unique_ptr<sdk::trace::Recordable> ZipkinExporter::MakeRecordable() noexcep
 sdk::common::ExportResult ZipkinExporter::Export(
     const nostd::span<std::unique_ptr<sdk::trace::Recordable>> &spans) noexcept
 {
-  if (isShutdown_)
+  if (isShutdown())
   {
+    OTEL_INTERNAL_LOG_ERROR("[Zipkin Trace Exporter] Exporting "
+                            << spans.size() << " span(s) failed, exporter is shutdown");
     return sdk::common::ExportResult::kFailure;
   }
   exporter::zipkin::ZipkinSpan json_spans = {};
@@ -96,6 +108,19 @@ void ZipkinExporter::InitializeLocalEndpoint()
     local_end_point_["ipv6"] = options_.ipv6;
   }
   local_end_point_["port"] = url_parser_.port_;
+}
+
+bool ZipkinExporter::Shutdown(std::chrono::microseconds timeout) noexcept
+{
+  const std::lock_guard<opentelemetry::common::SpinLockMutex> locked(lock_);
+  is_shutdown_ = true;
+  return true;
+}
+
+bool ZipkinExporter::isShutdown() const noexcept
+{
+  const std::lock_guard<opentelemetry::common::SpinLockMutex> locked(lock_);
+  return is_shutdown_;
 }
 
 }  // namespace zipkin

@@ -3,6 +3,7 @@
 
 #pragma once
 
+#include <opentelemetry/common/spin_lock_mutex.h>
 #include <opentelemetry/ext/http/client/http_client.h>
 #include <opentelemetry/sdk/trace/exporter.h>
 
@@ -65,10 +66,7 @@ public:
    * @param timeout an option timeout, default to max.
    */
   bool Shutdown(
-      std::chrono::microseconds timeout = std::chrono::microseconds::max()) noexcept override
-  {
-    return true;
-  }
+      std::chrono::microseconds timeout = std::chrono::microseconds::max()) noexcept override;
 
 private:
   void InitializeEndpoint();
@@ -78,6 +76,16 @@ private:
   bool is_shutdown_ = false;
   JaegerExporterOptions options_;
   std::unique_ptr<ThriftSender> sender_;
+  mutable opentelemetry::common::SpinLockMutex lock_;
+  bool isShutdown() const noexcept;
+  // For testing
+  friend class JaegerExporterTestPeer;
+  /**
+   * Create an JaegerExporter using the specified thrift sender.
+   * Only tests can call this constructor directly.
+   * @param sender the thrift sender to be used for exporting
+   */
+  JaegerExporter(std::unique_ptr<ThriftSender> sender);
 };
 
 }  // namespace jaeger

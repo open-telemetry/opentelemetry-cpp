@@ -76,7 +76,10 @@ cc_test(
     srcs = [
         "test/prometheus_exporter_test.cc",
     ],
-    tags = ["prometheus"],
+    tags = [
+        "prometheus",
+        "test",
+    ],
     deps = [
         ":prometheus_exporter",
         "@com_google_googletest//:gtest_main",

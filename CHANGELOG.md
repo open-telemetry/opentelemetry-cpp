@@ -15,6 +15,31 @@ Increment the:
 
 ## [Unreleased]
 
+* [API/SDK] Logger: Support for Instrumentation library ([#1128](https://github.com/open-telemetry/opentelemetry-cpp/pull/1128))
+* [SDK] Add LogLevel to internal_log ([#1147](https://github.com/open-telemetry/opentelemetry-cpp/pull/1147))
+* [API/SDK] Logger: Propagating resources through LoggerProvider ([#1154](https://github.com/open-telemetry/opentelemetry-cpp/pull/1154))
+* [API]: Allow to use external abseil for bazel targets ([#1172](https://github.com/open-telemetry/opentelemetry-cpp/pull/1172))
+
+## [1.1.1] 2021-12-20
+
+* [SDK] Rename OTEL_CPP_GET_ATTR macro, and define it using fully qualified attr function ([#1140](https://github.com/open-telemetry/opentelemetry-cpp/pull/1140))
+* [SDK] Default resource attributes and attributes in OTEL_RESOURCE_ATTRIBUTES are missing when using Otlp*LogExporter ([#1082](https://github.com/open-telemetry/opentelemetry-cpp/pull/1082))
+* [METRICS] Add Meter and MeterProvider in the SDK ([#1078](https://github.com/open-telemetry/opentelemetry-cpp/pull/1078))
+* [EXPORTER] ZipkinExporter shutdown ([#1153](https://github.com/open-telemetry/opentelemetry-cpp/pull/1153))
+* [EXPORTER] Jaeger exporter shutdown ([#1150](https://github.com/open-telemetry/opentelemetry-cpp/pull/1150))
+* [EXPORTER] Bugfix: `jaeger::TUDPTransport::write` crash when `getaddrinfo` returns error ([#1116](https://github.com/open-telemetry/opentelemetry-cpp/pull/1116))
+* [EXPORTER] Bugfix: Jaeger exporter: extend supported attributes types ([#1106](https://github.com/open-telemetry/opentelemetry-cpp/pull/1106))
+* [EXPORTER] Fix otlp generates null span ids ([#1113](https://github.com/open-telemetry/opentelemetry-cpp/pull/1113))
+* [EXPORTER] Jaeger bazel (Linux only) ([#1077](https://github.com/open-telemetry/opentelemetry-cpp/pull/1077))
+* [DOCS] Add note on DLL support ([#1137](https://github.com/open-telemetry/opentelemetry-cpp/pull/1137))
+* [DOCS] Improve the instructions for Bazel build ([#1136](https://github.com/open-telemetry/opentelemetry-cpp/pull/1136))
+* [DOCS] Document dependencies ([#1119](https://github.com/open-telemetry/opentelemetry-cpp/pull/1119))
+* [DOCS] Dockerfile for quick demo/troubleshooting purpose ([#905](https://github.com/open-telemetry/opentelemetry-cpp/pull/905))
+* [TESTS] Fix data race in BM_ThreadYieldSpinLockThrashing ([#1099](https://github.com/open-telemetry/opentelemetry-cpp/pull/1099))
+* [EXAMPLE] Otlp gRPC log example ([#1083](https://github.com/open-telemetry/opentelemetry-cpp/pull/1083))
+* [BUILD] C++20 not Building with VS2019 ([#1144](https://github.com/open-telemetry/opentelemetry-cpp/pull/1144))
+* [BUILD] Mark tags to bazel targets([#1075](https://github.com/open-telemetry/opentelemetry-cpp/pull/1075))
+
 ## [1.1.0] 2021-11-19
 
 * [BUILD] build release tarball when nlohmann-json not installed ([#1074](https://github.com/open-telemetry/opentelemetry-cpp/pull/1074))

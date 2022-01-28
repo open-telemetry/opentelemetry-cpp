@@ -102,7 +102,9 @@ else()
   )
 endif()
 
-option(WITH_STL "Whether to use Standard Library for C++latest features" OFF)
+option(WITH_STL "Whether to use Standard Library for C++ latest features" OFF)
+option(WITH_GSL
+       "Whether to use Guidelines Support Library for C++ latest features" OFF)
 
 option(WITH_ABSEIL "Whether to use Abseil for C++latest features" OFF)
 
@@ -137,18 +139,6 @@ if(WITH_STL)
   # (absl::variant or std::variant) in variant unit test code is consistent with
   # the global project build definitions.
   add_definitions(-DHAVE_CPP_STDLIB)
-  add_definitions(-DHAVE_GSL)
-
-  # Guidelines Support Library path. Used if we are not on not get C++20.
-  #
-  # TODO: respect WITH_ABSEIL as alternate implementation of std::span
-  find_package(Microsoft.GSL QUIET)
-  if(TARGET Microsoft.GSL::GSL)
-    list(APPEND CORE_RUNTIME_LIBS Microsoft.GSL::GSL)
-  else()
-    set(GSL_DIR third_party/ms-gsl)
-    include_directories(${GSL_DIR}/include)
-  endif()
 
   # Optimize for speed to reduce the hops
   if(CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")
@@ -162,6 +152,20 @@ if(WITH_STL)
       endif()
     endif()
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${MSVC_CXX_OPT_FLAG}")
+  endif()
+endif()
+
+if(WITH_GSL)
+  add_definitions(-DHAVE_GSL)
+
+  # Guidelines Support Library path. Used if we are not on not get C++20.
+  #
+  find_package(Microsoft.GSL QUIET)
+  if(TARGET Microsoft.GSL::GSL)
+    list(APPEND CORE_RUNTIME_LIBS Microsoft.GSL::GSL)
+  else()
+    set(GSL_DIR third_party/ms-gsl)
+    include_directories(${GSL_DIR}/include)
   endif()
 endif()
 
@@ -204,7 +208,7 @@ endif(WIN32)
 
 option(
   WITH_API_ONLY
-  "Only build the API (use as a header-only library). Overrides WITH_EXAMPLES"
+  "Only build the API (use as a header-only library). Overrides WITH_EXAMPLES and all options to enable exporters"
   OFF)
 option(WITH_EXAMPLES "Whether to build examples" ON)
 
@@ -271,13 +275,14 @@ endif()
 include(GNUInstallDirs)
 
 if((NOT WITH_API_ONLY)
-   OR WITH_ELASTICSEARCH
-   OR WITH_ZIPKIN
-   OR WITH_OTLP
-   OR WITH_OTLP_HTTP
-   OR WITH_ZPAGES
-   OR BUILD_W3CTRACECONTEXT_TEST
-   OR WITH_ETW)
+   AND (WITH_ELASTICSEARCH
+        OR WITH_ZIPKIN
+        OR WITH_OTLP
+        OR WITH_OTLP_HTTP
+        OR WITH_ZPAGES
+        OR BUILD_W3CTRACECONTEXT_TEST
+        OR WITH_ETW
+       ))
   # nlohmann_json package is required for most SDK build configurations
   find_package(nlohmann_json QUIET)
   set(nlohmann_json_clone FALSE)
@@ -326,7 +331,8 @@ endif()
 if(WITH_OTLP)
   set(protobuf_MODULE_COMPATIBLE ON)
   find_package(Protobuf)
-  if(WITH_OTLP_GRPC)
+  if(WITH_OTLP_GRPC OR (NOT DEFINED WITH_OTLP_GRPC AND NOT DEFINED
+                                                       CACHE{WITH_OTLP_GRPC}))
     find_package(gRPC)
   endif()
   if((NOT Protobuf_FOUND AND NOT PROTOBUF_FOUND) OR (NOT gRPC_FOUND))
@@ -344,7 +350,9 @@ if(WITH_OTLP)
     if(NOT Protobuf_FOUND AND NOT PROTOBUF_FOUND)
       find_package(Protobuf REQUIRED)
     endif()
-    if(WITH_OTLP_GRPC AND NOT gRPC_FOUND)
+    if(NOT gRPC_FOUND
+       AND (WITH_OTLP_GRPC OR (NOT DEFINED WITH_OTLP_GRPC
+                               AND NOT DEFINED CACHE{WITH_OTLP_GRPC})))
       find_package(gRPC)
     endif()
     if(WIN32)
@@ -360,11 +368,11 @@ if(WITH_OTLP)
       set(PROTOBUF_PROTOC_EXECUTABLE ${Protobuf_PROTOC_EXECUTABLE})
     endif()
   endif()
-  message("PROTOBUF_PROTOC_EXECUTABLE=${PROTOBUF_PROTOC_EXECUTABLE}")
-
-  include(cmake/opentelemetry-proto.cmake)
   include(CMakeDependentOption)
-  find_package(CURL)
+  if(WITH_OTLP_HTTP OR (NOT DEFINED WITH_OTLP_HTTP AND NOT DEFINED
+                                                       CACHE{WITH_OTLP_HTTP}))
+    find_package(CURL)
+  endif()
 
   cmake_dependent_option(
     WITH_OTLP_GRPC "Whether to include the OTLP gRPC exporter in the SDK" ON
@@ -372,6 +380,9 @@ if(WITH_OTLP)
   cmake_dependent_option(
     WITH_OTLP_HTTP "Whether to include the OTLP http exporter in the SDK" ON
     "CURL_FOUND" OFF)
+
+  message(STATUS "PROTOBUF_PROTOC_EXECUTABLE=${PROTOBUF_PROTOC_EXECUTABLE}")
+  include(cmake/opentelemetry-proto.cmake)
 endif()
 
 list(APPEND CMAKE_PREFIX_PATH "${CMAKE_BINARY_DIR}")

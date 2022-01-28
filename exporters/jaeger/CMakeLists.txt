@@ -58,6 +58,8 @@ install(
   PATTERN "recordable.h" EXCLUDE)
 
 if(BUILD_TESTING)
+  add_definitions(-DGTEST_LINKED_AS_SHARED_LIBRARY=1)
+
   add_executable(jaeger_recordable_test test/jaeger_recordable_test.cc)
   target_link_libraries(
     jaeger_recordable_test ${GTEST_BOTH_LIBRARIES} ${CMAKE_THREAD_LIBS_INIT}
@@ -67,4 +69,27 @@ if(BUILD_TESTING)
     TARGET jaeger_recordable_test
     TEST_PREFIX exporter.
     TEST_LIST jaeger_recordable_test)
+
+  add_executable(jaeger_exporter_test test/jaeger_exporter_test.cc)
+  if(MSVC)
+    if(GMOCK_LIB)
+      unset(GMOCK_LIB CACHE)
+    endif()
+  endif()
+  if(MSVC AND CMAKE_BUILD_TYPE STREQUAL "Debug")
+    find_library(GMOCK_LIB gmockd PATH_SUFFIXES lib)
+  else()
+    find_library(GMOCK_LIB gmock PATH_SUFFIXES lib)
+  endif()
+  target_link_libraries(
+    jaeger_exporter_test ${GTEST_BOTH_LIBRARIES} ${CMAKE_THREAD_LIBS_INIT}
+    ${GMOCK_LIB} opentelemetry_trace opentelemetry_exporter_jaeger_trace)
+
+  target_include_directories(jaeger_exporter_test
+                             PRIVATE ${CMAKE_CURRENT_LIST_DIR}/src)
+
+  gtest_add_tests(
+    TARGET jaeger_exporter_test
+    TEST_PREFIX exporter.
+    TEST_LIST jaeger_exporter_test)
 endif() # BUILD_TESTING
