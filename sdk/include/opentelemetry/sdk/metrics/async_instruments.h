@@ -22,7 +22,7 @@ public:
   Asynchronous(nostd::string_view name,
                const opentelemetry::sdk::instrumentationlibrary::InstrumentationLibrary
                    &instrumentation_library,
-               MeasurementProcessor &measurement_processor,
+               const MeasurementProcessor &measurement_processor,
                void (*callback)(opentelemetry::metrics::ObserverResult<T> &),
                nostd::string_view description = "",
                nostd::string_view unit        = "")
