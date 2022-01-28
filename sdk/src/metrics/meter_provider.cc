@@ -44,8 +44,8 @@ nostd::shared_ptr<metrics_api::Meter> MeterProvider::GetMeter(
 
   for (auto &meter : meters_)
   {
-    auto &meter_lib = meter->GetInstrumentationLibrary();
-    if (meter_lib.equal(name, version, schema_url))
+    auto meter_lib = meter->GetInstrumentationLibrary();
+    if (meter_lib->equal(name, version, schema_url))
     {
       return nostd::shared_ptr<metrics_api::Meter>{meter};
     }
@@ -60,7 +60,7 @@ const resource::Resource &MeterProvider::GetResource() const noexcept
   return context_->GetResource();
 }
 
-MeasurementProcessor &MeterProvider::GetMeasurementProcessor() const noexcept
+MeasurementProcessor *MeterProvider::GetMeasurementProcessor() const noexcept
 {
   return context_->GetMeasurementProcessor();
 }

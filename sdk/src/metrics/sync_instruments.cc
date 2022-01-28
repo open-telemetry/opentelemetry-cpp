@@ -11,8 +11,8 @@ namespace metrics
 {
 LongCounter::LongCounter(
     nostd::string_view name,
-    const sdk::instrumentationlibrary::InstrumentationLibrary &instrumentation_library,
-    MeasurementProcessor &measurement_processor,
+    const sdk::instrumentationlibrary::InstrumentationLibrary *instrumentation_library,
+    MeasurementProcessor *measurement_processor,
     nostd::string_view description,
     nostd::string_view unit)
     : Synchronous(name, instrumentation_library, measurement_processor, description, unit)
@@ -21,18 +21,18 @@ LongCounter::LongCounter(
 void LongCounter::Add(long value,
                       const opentelemetry::common::KeyValueIterable &attributes) noexcept
 {
-  return measurement_processor_.RecordLong(value, attributes);
+  return measurement_processor_->RecordLong(value, attributes);
 }
 
 void LongCounter::Add(long value) noexcept
 {
-  return measurement_processor_.RecordLong(value);
+  return measurement_processor_->RecordLong(value);
 }
 
 DoubleCounter::DoubleCounter(
     nostd::string_view name,
-    const sdk::instrumentationlibrary::InstrumentationLibrary &instrumentation_library,
-    MeasurementProcessor &measurement_processor,
+    const sdk::instrumentationlibrary::InstrumentationLibrary *instrumentation_library,
+    MeasurementProcessor *measurement_processor,
     nostd::string_view description,
     nostd::string_view unit)
     : Synchronous(name, instrumentation_library, measurement_processor, description, unit)
@@ -41,18 +41,18 @@ DoubleCounter::DoubleCounter(
 void DoubleCounter::Add(double value,
                         const opentelemetry::common::KeyValueIterable &attributes) noexcept
 {
-  return measurement_processor_.RecordDouble(value, attributes);
+  return measurement_processor_->RecordDouble(value, attributes);
 }
 
 void DoubleCounter::Add(double value) noexcept
 {
-  return measurement_processor_.RecordDouble(value);
+  return measurement_processor_->RecordDouble(value);
 }
 
 LongUpDownCounter::LongUpDownCounter(
     nostd::string_view name,
-    const sdk::instrumentationlibrary::InstrumentationLibrary &instrumentation_library,
-    MeasurementProcessor &measurement_processor,
+    const sdk::instrumentationlibrary::InstrumentationLibrary *instrumentation_library,
+    MeasurementProcessor *measurement_processor,
     nostd::string_view description,
     nostd::string_view unit)
     : Synchronous(name, instrumentation_library, measurement_processor, description, unit)
@@ -61,18 +61,18 @@ LongUpDownCounter::LongUpDownCounter(
 void LongUpDownCounter::Add(long value,
                             const opentelemetry::common::KeyValueIterable &attributes) noexcept
 {
-  return measurement_processor_.RecordLong(value, attributes);
+  return measurement_processor_->RecordLong(value, attributes);
 }
 
 void LongUpDownCounter::Add(long value) noexcept
 {
-  return measurement_processor_.RecordLong(value);
+  return measurement_processor_->RecordLong(value);
 }
 
 DoubleUpDownCounter::DoubleUpDownCounter(
     nostd::string_view name,
-    const sdk::instrumentationlibrary::InstrumentationLibrary &instrumentation_library,
-    MeasurementProcessor &measurement_processor,
+    const sdk::instrumentationlibrary::InstrumentationLibrary *instrumentation_library,
+    MeasurementProcessor *measurement_processor,
     nostd::string_view description,
     nostd::string_view unit)
     : Synchronous(name, instrumentation_library, measurement_processor, description, unit)
@@ -81,18 +81,18 @@ DoubleUpDownCounter::DoubleUpDownCounter(
 void DoubleUpDownCounter::Add(double value,
                               const opentelemetry::common::KeyValueIterable &attributes) noexcept
 {
-  return measurement_processor_.RecordDouble(value, attributes);
+  return measurement_processor_->RecordDouble(value, attributes);
 }
 
 void DoubleUpDownCounter::Add(double value) noexcept
 {
-  return measurement_processor_.RecordDouble(value);
+  return measurement_processor_->RecordDouble(value);
 }
 
 LongHistogram::LongHistogram(
     nostd::string_view name,
-    const sdk::instrumentationlibrary::InstrumentationLibrary &instrumentation_library,
-    MeasurementProcessor &measurement_processor,
+    const sdk::instrumentationlibrary::InstrumentationLibrary *instrumentation_library,
+    MeasurementProcessor *measurement_processor,
     nostd::string_view description,
     nostd::string_view unit)
     : Synchronous(name, instrumentation_library, measurement_processor, description, unit)
@@ -101,18 +101,18 @@ LongHistogram::LongHistogram(
 void LongHistogram::Record(long value,
                            const opentelemetry::common::KeyValueIterable &attributes) noexcept
 {
-  return measurement_processor_.RecordLong(value, attributes);
+  return measurement_processor_->RecordLong(value, attributes);
 }
 
 void LongHistogram::Record(long value) noexcept
 {
-  return measurement_processor_.RecordLong(value);
+  return measurement_processor_->RecordLong(value);
 }
 
 DoubleHistogram::DoubleHistogram(
     nostd::string_view name,
-    const sdk::instrumentationlibrary::InstrumentationLibrary &instrumentation_library,
-    MeasurementProcessor &measurement_processor,
+    const sdk::instrumentationlibrary::InstrumentationLibrary *instrumentation_library,
+    MeasurementProcessor *measurement_processor,
     nostd::string_view description,
     nostd::string_view unit)
     : Synchronous(name, instrumentation_library, measurement_processor, description, unit)
@@ -121,12 +121,12 @@ DoubleHistogram::DoubleHistogram(
 void DoubleHistogram::Record(double value,
                              const opentelemetry::common::KeyValueIterable &attributes) noexcept
 {
-  return measurement_processor_.RecordDouble(value, attributes);
+  return measurement_processor_->RecordDouble(value, attributes);
 }
 
 void DoubleHistogram::Record(double value) noexcept
 {
-  return measurement_processor_.RecordDouble(value);
+  return measurement_processor_->RecordDouble(value);
 }
 
 }  // namespace metrics

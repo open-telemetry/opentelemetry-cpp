@@ -142,13 +142,13 @@ Meter::CreateDoubleObservableUpDownCounter(nostd::string_view name,
                                         GetMeasurementProcessor(), callback, description, unit)};
 }
 
-const sdk::instrumentationlibrary::InstrumentationLibrary &Meter::GetInstrumentationLibrary()
+const sdk::instrumentationlibrary::InstrumentationLibrary *Meter::GetInstrumentationLibrary()
     const noexcept
 {
-  return *instrumentation_library_.get();
+  return instrumentation_library_.get();
 }
 
-MeasurementProcessor &Meter::GetMeasurementProcessor() const noexcept
+MeasurementProcessor *Meter::GetMeasurementProcessor() const noexcept
 {
   return context_->GetMeasurementProcessor();
 }

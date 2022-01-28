@@ -21,8 +21,8 @@ class Asynchronous
 public:
   Asynchronous(nostd::string_view name,
                const opentelemetry::sdk::instrumentationlibrary::InstrumentationLibrary
-                   &instrumentation_library,
-               const MeasurementProcessor &measurement_processor,
+                   *instrumentation_library,
+               MeasurementProcessor *measurement_processor,
                void (*callback)(opentelemetry::metrics::ObserverResult<T> &),
                nostd::string_view description = "",
                nostd::string_view unit        = "")
@@ -34,26 +34,11 @@ public:
         unit_(unit)
   {}
 
-  /*nostd::string_view GetName() { return name_; }
-
-  nostd::string_view GetDescription() { return description_; }
-
-  nostd::string_view GetUnit() { return unit_; }
-
-  const sdk::instrumentationlibrary::InstrumentationLibrary& GetInstrumentationLibrary()
-  {
-    return instrumentation_library_;
-  }
-
-  MeasurementProcessor& GetMeasurementProcessor() { return measurement_processor_; }
-
-  AsyncCallback GetCallback() { return callback_; }*/
-
 protected:
   std::string name_;
   const opentelemetry::sdk::instrumentationlibrary::InstrumentationLibrary
-      &instrumentation_library_;
-  const MeasurementProcessor &measurement_processor_;
+      *instrumentation_library_;
+  const MeasurementProcessor *measurement_processor_;
   void (*callback_)(opentelemetry::metrics::ObserverResult<T> &);
   std::string description_;
   std::string unit_;
@@ -65,8 +50,8 @@ class LongObservableCounter : public opentelemetry::metrics::ObservableCounter<l
 public:
   LongObservableCounter(nostd::string_view name,
                         const opentelemetry::sdk::instrumentationlibrary::InstrumentationLibrary
-                            &instrumentation_library,
-                        MeasurementProcessor &measurement_processor,
+                            *instrumentation_library,
+                        MeasurementProcessor *measurement_processor,
                         void (*callback)(opentelemetry::metrics::ObserverResult<long> &),
                         nostd::string_view description = "",
                         nostd::string_view unit        = "")
@@ -86,8 +71,8 @@ class DoubleObservableCounter : public opentelemetry::metrics::ObservableCounter
 public:
   DoubleObservableCounter(nostd::string_view name,
                           const opentelemetry::sdk::instrumentationlibrary::InstrumentationLibrary
-                              &instrumentation_library,
-                          MeasurementProcessor &measurement_processor,
+                              *instrumentation_library,
+                          MeasurementProcessor *measurement_processor,
                           void (*callback)(opentelemetry::metrics::ObserverResult<double> &),
                           nostd::string_view description = "",
                           nostd::string_view unit        = "")
@@ -107,8 +92,8 @@ class LongObservableGauge : public opentelemetry::metrics::ObservableGauge<long>
 public:
   LongObservableGauge(nostd::string_view name,
                       const opentelemetry::sdk::instrumentationlibrary::InstrumentationLibrary
-                          &instrumentation_library,
-                      MeasurementProcessor &measurement_processor,
+                          *instrumentation_library,
+                      MeasurementProcessor *measurement_processor,
                       void (*callback)(opentelemetry::metrics::ObserverResult<long> &),
                       nostd::string_view description = "",
                       nostd::string_view unit        = "")
@@ -128,8 +113,8 @@ class DoubleObservableGauge : public opentelemetry::metrics::ObservableGauge<dou
 public:
   DoubleObservableGauge(nostd::string_view name,
                         const opentelemetry::sdk::instrumentationlibrary::InstrumentationLibrary
-                            &instrumentation_library,
-                        MeasurementProcessor &measurement_processor,
+                            *instrumentation_library,
+                        MeasurementProcessor *measurement_processor,
                         void (*callback)(opentelemetry::metrics::ObserverResult<double> &),
                         nostd::string_view description = "",
                         nostd::string_view unit        = "")
@@ -150,8 +135,8 @@ public:
   LongObservableUpDownCounter(
       nostd::string_view name,
       const opentelemetry::sdk::instrumentationlibrary::InstrumentationLibrary
-          &instrumentation_library,
-      MeasurementProcessor &measurement_processor,
+          *instrumentation_library,
+      MeasurementProcessor *measurement_processor,
       void (*callback)(opentelemetry::metrics::ObserverResult<long> &),
       nostd::string_view description = "",
       nostd::string_view unit        = "")
@@ -173,8 +158,8 @@ public:
   DoubleObservableUpDownCounter(
       nostd::string_view name,
       const opentelemetry::sdk::instrumentationlibrary::InstrumentationLibrary
-          &instrumentation_library,
-      MeasurementProcessor &measurement_processor,
+          *instrumentation_library,
+      MeasurementProcessor *measurement_processor,
       void (*callback)(opentelemetry::metrics::ObserverResult<double> &),
       nostd::string_view description = "",
       nostd::string_view unit        = "")

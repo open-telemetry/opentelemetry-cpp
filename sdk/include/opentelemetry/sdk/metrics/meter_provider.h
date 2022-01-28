@@ -56,7 +56,7 @@ public:
    * Obtain the reference of measurement processor.
    *
    */
-  MeasurementProcessor &GetMeasurementProcessor() const noexcept;
+  MeasurementProcessor *GetMeasurementProcessor() const noexcept;
 
   /**
    * Attaches a metric exporter to list of configured exporters for this Meter provider.

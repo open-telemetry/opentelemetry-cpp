@@ -21,8 +21,8 @@ class Synchronous
 public:
   Synchronous(nostd::string_view name,
               const opentelemetry::sdk::instrumentationlibrary::InstrumentationLibrary
-                  &instrumentation_library,
-              MeasurementProcessor &measurement_processor,
+                  *instrumentation_library,
+              MeasurementProcessor *measurement_processor,
               nostd::string_view description = "",
               nostd::string_view unit        = "")
       : name_(name),
@@ -34,8 +34,8 @@ public:
 
 protected:
   std::string name_;
-  const sdk::instrumentationlibrary::InstrumentationLibrary &instrumentation_library_;
-  MeasurementProcessor &measurement_processor_;
+  const sdk::instrumentationlibrary::InstrumentationLibrary *instrumentation_library_;
+  MeasurementProcessor *measurement_processor_;
   std::string description_;
   std::string unit_;
 };
@@ -45,8 +45,8 @@ class LongCounter : public Synchronous, public opentelemetry::metrics::Counter<l
 public:
   LongCounter(nostd::string_view name,
               const opentelemetry::sdk::instrumentationlibrary::InstrumentationLibrary
-                  &instrumentation_library,
-              MeasurementProcessor &measurement_processor,
+                  *instrumentation_library,
+              MeasurementProcessor *measurement_processor,
               nostd::string_view description = "",
               nostd::string_view unit        = "");
 
@@ -61,8 +61,8 @@ class DoubleCounter : public Synchronous, public opentelemetry::metrics::Counter
 public:
   DoubleCounter(nostd::string_view name,
                 const opentelemetry::sdk::instrumentationlibrary::InstrumentationLibrary
-                    &instrumentation_library,
-                MeasurementProcessor &measurement_processor,
+                    *instrumentation_library,
+                MeasurementProcessor *measurement_processor,
                 nostd::string_view description = "",
                 nostd::string_view unit        = "");
 
@@ -77,8 +77,8 @@ class LongUpDownCounter : public Synchronous, public opentelemetry::metrics::UpD
 public:
   LongUpDownCounter(nostd::string_view name,
                     const opentelemetry::sdk::instrumentationlibrary::InstrumentationLibrary
-                        &instrumentation_library,
-                    MeasurementProcessor &measurement_processor,
+                        *instrumentation_library,
+                    MeasurementProcessor *measurement_processor,
                     nostd::string_view description = "",
                     nostd::string_view unit        = "");
 
@@ -92,8 +92,8 @@ class DoubleUpDownCounter : public Synchronous, public opentelemetry::metrics::U
 public:
   DoubleUpDownCounter(nostd::string_view name,
                       const opentelemetry::sdk::instrumentationlibrary::InstrumentationLibrary
-                          &instrumentation_library,
-                      MeasurementProcessor &measurement_processor,
+                          *instrumentation_library,
+                      MeasurementProcessor *measurement_processor,
                       nostd::string_view description = "",
                       nostd::string_view unit        = "");
 
@@ -108,8 +108,8 @@ class LongHistogram : public Synchronous, public opentelemetry::metrics::Histogr
 public:
   LongHistogram(nostd::string_view name,
                 const opentelemetry::sdk::instrumentationlibrary::InstrumentationLibrary
-                    &instrumentation_library,
-                MeasurementProcessor &measurement_processor,
+                    *instrumentation_library,
+                MeasurementProcessor *measurement_processor,
                 nostd::string_view description = "",
                 nostd::string_view unit        = "");
 
@@ -124,8 +124,8 @@ class DoubleHistogram : public Synchronous, public opentelemetry::metrics::Histo
 public:
   DoubleHistogram(nostd::string_view name,
                   const opentelemetry::sdk::instrumentationlibrary::InstrumentationLibrary
-                      &instrumentation_library,
-                  MeasurementProcessor &measurement_processor,
+                      *instrumentation_library,
+                  MeasurementProcessor *measurement_processor,
                   nostd::string_view description = "",
                   nostd::string_view unit        = "");
 

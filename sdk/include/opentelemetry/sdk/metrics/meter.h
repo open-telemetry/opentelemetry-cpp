@@ -95,11 +95,11 @@ public:
       nostd::string_view unit        = "") noexcept override;
 
   /** Returns the associated instruementation library */
-  const sdk::instrumentationlibrary::InstrumentationLibrary &GetInstrumentationLibrary()
+  const sdk::instrumentationlibrary::InstrumentationLibrary *GetInstrumentationLibrary()
       const noexcept;
 
   /** Returns the associated instruementation library */
-  MeasurementProcessor &GetMeasurementProcessor() const noexcept;
+  MeasurementProcessor *GetMeasurementProcessor() const noexcept;
 
 private:
   // order of declaration is important here - instrumentation library should destroy after
