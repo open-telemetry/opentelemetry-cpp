@@ -1,4 +1,5 @@
-foreach(testname meter_provider_sdk_test view_registry_test)
+foreach(testname meter_provider_sdk_test view_registry_test
+                 sync_metric_storage_test sync_instruments_test)
   add_executable(${testname} "${testname}.cc")
   target_link_libraries(
     ${testname} ${GTEST_BOTH_LIBRARIES} ${CMAKE_THREAD_LIBS_INIT}

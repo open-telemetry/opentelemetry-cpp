@@ -11,7 +11,7 @@ namespace metrics
 {
 class MetricData
 {
-  // TBD - This clas to be removed once #1178 is merged
+  // TBD - This class to be removed once #1178 is merged
 };
 
 enum class AggregationTemporarily
