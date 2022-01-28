@@ -8,6 +8,7 @@
 #  include <vector>
 #  include "opentelemetry/metrics/meter_provider.h"
 #  include "opentelemetry/nostd/shared_ptr.h"
+#  include "opentelemetry/sdk/metrics/measurement_processor.h"
 #  include "opentelemetry/sdk/metrics/meter.h"
 #  include "opentelemetry/sdk/metrics/meter_context.h"
 #  include "opentelemetry/sdk/resource/resource.h"
@@ -50,6 +51,12 @@ public:
    * @return The resource for this meter provider.
    */
   const sdk::resource::Resource &GetResource() const noexcept;
+
+  /**
+   * Obtain the reference of measurement processor.
+   *
+   */
+  MeasurementProcessor &GetMeasurementProcessor() const noexcept;
 
   /**
    * Attaches a metric exporter to list of configured exporters for this Meter provider.

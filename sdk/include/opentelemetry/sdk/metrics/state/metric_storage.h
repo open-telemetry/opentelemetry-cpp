@@ -1,0 +1,83 @@
+// Copyright The OpenTelemetry Authors
+// SPDX-License-Identifier: Apache-2.0
+
+#pragma once
+#ifndef ENABLE_METRICS_PREVIEW
+#  include "opentelemetry/common/key_value_iterable_view.h"
+OPENTELEMETRY_BEGIN_NAMESPACE
+namespace sdk
+{
+namespace metrics
+{
+class MetricData
+{
+  // TBD - This clas to be removed once #1178 is merged
+};
+
+enum class AggregationTemporarily
+{
+  // TBD - This enum to be removed once #1178 is merged.
+  kUnspecified,
+  kDelta,
+  kCummulative
+};
+
+/* Represent the storage from which to collect the metrics */
+
+class MetricStorage
+{
+public:
+  /* collect the metrics from this storage */
+  virtual bool Collect(AggregationTemporarily aggregation_temporarily,
+                       nostd::function_ref<bool(MetricData)> callback) noexcept = 0;
+};
+
+class WritableMetricStorage
+{
+public:
+  virtual void RecordLong(long value) noexcept = 0;
+
+  virtual void RecordLong(long value,
+                          const opentelemetry::common::KeyValueIterable &attributes) noexcept = 0;
+
+  virtual void RecordDouble(double value) noexcept = 0;
+
+  virtual void RecordDouble(double value,
+                            const opentelemetry::common::KeyValueIterable &attributes) noexcept = 0;
+};
+
+class NoopMetricStorage : public MetricStorage
+{
+public:
+  bool Collect(AggregationTemporarily aggregation_temporarily,
+               nostd::function_ref<bool(MetricData)> callback) noexcept override
+  {
+    MetricData metric_data;
+    if (callback(metric_data))
+    {
+      return true;
+    }
+    return false;
+  }
+};
+
+class NoopWritableMetricStorage : public WritableMetricStorage
+{
+public:
+  void RecordLong(long value) noexcept = 0;
+
+  void RecordLong(long value,
+                  const opentelemetry::common::KeyValueIterable &attributes) noexcept override
+  {}
+
+  void RecordDouble(double value) noexcept override {}
+
+  void RecordDouble(double value,
+                    const opentelemetry::common::KeyValueIterable &attributes) noexcept override
+  {}
+};
+
+}  // namespace metrics
+}  // namespace sdk
+OPENTELEMETRY_END_NAMESPACE
+#endif

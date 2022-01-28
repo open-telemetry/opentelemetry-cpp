@@ -6,6 +6,7 @@
 #  include <chrono>
 #  include "opentelemetry/metrics/meter.h"
 #  include "opentelemetry/sdk/instrumentationlibrary/instrumentation_library.h"
+#  include "opentelemetry/sdk/metrics/measurement_processor.h"
 #  include "opentelemetry/sdk/metrics/meter_context.h"
 #  include "opentelemetry/sdk/resource/resource.h"
 #  include "opentelemetry/version.h"
@@ -97,10 +98,13 @@ public:
   const sdk::instrumentationlibrary::InstrumentationLibrary &GetInstrumentationLibrary()
       const noexcept;
 
+  /** Returns the associated instruementation library */
+  MeasurementProcessor &GetMeasurementProcessor() const noexcept;
+
 private:
   // order of declaration is important here - instrumentation library should destroy after
   // meter-context.
-  std::shared_ptr<sdk::instrumentationlibrary::InstrumentationLibrary> instrumentation_library_;
+  std::unique_ptr<sdk::instrumentationlibrary::InstrumentationLibrary> instrumentation_library_;
   std::shared_ptr<sdk::metrics::MeterContext> context_;
 };
 }  // namespace metrics
