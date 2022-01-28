@@ -23,15 +23,18 @@ OtlpHttpExporter::OtlpHttpExporter() : OtlpHttpExporter(OtlpHttpExporterOptions(
 
 OtlpHttpExporter::OtlpHttpExporter(const OtlpHttpExporterOptions &options)
     : options_(options),
-      http_client_(OtlpHttpClientOptions(options.url,
-                                         options.content_type,
-                                         options.json_bytes_mapping,
-                                         options.use_json_name,
-                                         options.console_debug,
-                                         options.timeout,
-                                         options.http_headers))
+      http_client_(new OtlpHttpClient(OtlpHttpClientOptions(options.url,
+                                                            options.content_type,
+                                                            options.json_bytes_mapping,
+                                                            options.use_json_name,
+                                                            options.console_debug,
+                                                            options.timeout,
+                                                            options.http_headers)))
 {}
 
+OtlpHttpExporter::OtlpHttpExporter(std::unique_ptr<OtlpHttpClient> http_client)
+    : options_(OtlpHttpExporterOptions()), http_client_(std::move(http_client))
+{}
 // ----------------------------- Exporter methods ------------------------------
 
 std::unique_ptr<opentelemetry::sdk::trace::Recordable> OtlpHttpExporter::MakeRecordable() noexcept
@@ -45,12 +48,12 @@ opentelemetry::sdk::common::ExportResult OtlpHttpExporter::Export(
 {
   proto::collector::trace::v1::ExportTraceServiceRequest service_request;
   OtlpRecordableUtils::PopulateRequest(spans, &service_request);
-  return http_client_.Export(service_request);
+  return http_client_->Export(service_request);
 }
 
 bool OtlpHttpExporter::Shutdown(std::chrono::microseconds timeout) noexcept
 {
-  return http_client_.Shutdown(timeout);
+  return http_client_->Shutdown(timeout);
 }
 
 }  // namespace otlp

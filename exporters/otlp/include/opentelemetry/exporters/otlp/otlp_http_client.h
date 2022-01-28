@@ -104,8 +104,8 @@ public:
    * @param message message to export, it should be ExportTraceServiceRequest,
    * ExportMetricsServiceRequest or ExportLogsServiceRequest
    */
-  sdk::common::ExportResult Export(const google::protobuf::Message &message) noexcept;
-
+  virtual sdk::common::ExportResult Export(const google::protobuf::Message &message) noexcept;
+  virtual ~OtlpHttpClient() {}
   /**
    * Shut down the HTTP client.
    * @param timeout an optional timeout, the default timeout of 0 means that no
