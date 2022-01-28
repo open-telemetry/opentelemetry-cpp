@@ -22,7 +22,7 @@ nostd::shared_ptr<trace::Tracer> get_tracer()
 nostd::shared_ptr<logs::Logger> get_logger()
 {
   auto provider = logs::Provider::GetLoggerProvider();
-  return provider->GetLogger("foo_library_logger");
+  return provider->GetLogger("foo_library_logger", "", "foo_library");
 }
 }  // namespace
 
@@ -32,7 +32,7 @@ void foo_library()
   auto scoped_span = trace::Scope(get_tracer()->StartSpan("foo_library"));
   auto ctx         = span->GetContext();
   auto logger      = get_logger();
-  logger->Log(opentelemetry::logs::Severity::kDebug, "name", "body", {}, {}, ctx.trace_id(),
+  logger->Log(opentelemetry::logs::Severity::kDebug, "name", "body", {}, ctx.trace_id(),
               ctx.span_id(), ctx.trace_flags(), opentelemetry::common::SystemTimestamp());
 }
 #endif

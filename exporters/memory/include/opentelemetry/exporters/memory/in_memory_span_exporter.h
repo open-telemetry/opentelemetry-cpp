@@ -2,8 +2,11 @@
 // SPDX-License-Identifier: Apache-2.0
 
 #pragma once
+#include <mutex>
+#include "opentelemetry/common/spin_lock_mutex.h"
 #include "opentelemetry/exporters/memory/in_memory_span_data.h"
 #include "opentelemetry/sdk/trace/exporter.h"
+#include "opentelemetry/sdk_config.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace exporter
@@ -42,8 +45,10 @@ public:
   sdk::common::ExportResult Export(
       const nostd::span<std::unique_ptr<sdk::trace::Recordable>> &recordables) noexcept override
   {
-    if (is_shutdown_)
+    if (isShutdown())
     {
+      OTEL_INTERNAL_LOG_ERROR("[In Memory Span Exporter] Exporting "
+                              << recordables.size() << " span(s) failed, exporter is shutdown");
       return sdk::common::ExportResult::kFailure;
     }
     for (auto &recordable : recordables)
@@ -67,6 +72,7 @@ public:
   bool Shutdown(
       std::chrono::microseconds timeout = std::chrono::microseconds::max()) noexcept override
   {
+    const std::lock_guard<opentelemetry::common::SpinLockMutex> locked(lock_);
     is_shutdown_ = true;
     return true;
   };
@@ -82,6 +88,12 @@ public:
 private:
   std::shared_ptr<opentelemetry::exporter::memory::InMemorySpanData> data_;
   bool is_shutdown_ = false;
+  mutable opentelemetry::common::SpinLockMutex lock_;
+  const bool isShutdown() const noexcept
+  {
+    const std::lock_guard<opentelemetry::common::SpinLockMutex> locked(lock_);
+    return is_shutdown_;
+  }
 };
 }  // namespace memory
 }  // namespace exporter

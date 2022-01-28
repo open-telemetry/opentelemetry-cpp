@@ -51,8 +51,9 @@ TEST(OStreamSpanExporter, Shutdown)
     EXPECT_TRUE(processor->Shutdown());
     processor->OnEnd(std::move(recordable));
   });
-
-  EXPECT_EQ(captured, "");
+  std::string err_message =
+      "[Ostream Trace Exporter] Exporting 1 span(s) failed, exporter is shutdown";
+  EXPECT_TRUE(captured.find(err_message) != std::string::npos);
 }
 
 constexpr const char *kDefaultSpanPrinted =
