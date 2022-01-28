@@ -53,7 +53,7 @@ protected:
   std::string name_;
   const opentelemetry::sdk::instrumentationlibrary::InstrumentationLibrary
       &instrumentation_library_;
-  MeasurementProcessor &measurement_processor_;
+  const MeasurementProcessor &measurement_processor_;
   void (*callback_)(opentelemetry::metrics::ObserverResult<T> &);
   std::string description_;
   std::string unit_;
