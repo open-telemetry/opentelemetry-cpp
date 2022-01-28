@@ -239,7 +239,9 @@ endfunction()
 
 if(WITH_JAEGER)
   find_package(Thrift QUIET)
-  if(NOT Thrift_FOUND)
+  if(Thrift_FOUND)
+    find_package(Boost REQUIRED)
+  else()
     # Install Thrift and propagate via vcpkg toolchain file
     if(WIN32 AND (NOT DEFINED CMAKE_TOOLCHAIN_FILE))
       install_windows_deps()
