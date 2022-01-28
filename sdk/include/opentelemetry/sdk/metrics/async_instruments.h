@@ -12,8 +12,6 @@ namespace sdk
 {
 namespace metrics
 {
-// using AsyncCallback = void (*)(opentelemetry::metrics::ObserverResult<T> &);
-// using AsyncCallbackDouble = void (*)(opentelemetry::metrics::ObserverResult<double> &);
 
 template <class T>
 class Asynchronous
