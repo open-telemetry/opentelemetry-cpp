@@ -88,6 +88,11 @@ struct OtlpHttpClientOptions
   {}
 };
 
+#ifdef TEST
+#  define VIRTUAL_TEST virtual
+#else
+#  define VIRTUAL_TEST
+#endif
 /**
  * The OTLP HTTP client exports span data in OpenTelemetry Protocol (OTLP) format.
  */
@@ -98,14 +103,16 @@ public:
    * Create an OtlpHttpClient using the given options.
    */
   explicit OtlpHttpClient(OtlpHttpClientOptions &&options);
+#ifdef TEST
+  VIRTUAL_TEST ~OtlpHttpClient() {}
+#endif
 
   /**
    * Export
    * @param message message to export, it should be ExportTraceServiceRequest,
    * ExportMetricsServiceRequest or ExportLogsServiceRequest
    */
-  virtual sdk::common::ExportResult Export(const google::protobuf::Message &message) noexcept;
-  virtual ~OtlpHttpClient() {}
+  VIRTUAL_TEST sdk::common::ExportResult Export(const google::protobuf::Message &message) noexcept;
   /**
    * Shut down the HTTP client.
    * @param timeout an optional timeout, the default timeout of 0 means that no
