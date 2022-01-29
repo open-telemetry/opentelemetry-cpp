@@ -102,7 +102,7 @@ private:
   // For testing
   friend class OtlpHttpExporterTestPeer;
   /**
-   * Create an ZipkinExporter using the specified thrift sender.
+   * Create an OtlpHttpExporter using the specified http client.
    * Only tests can call this constructor directly.
    * @param http_client the http client to be used for exporting
    */
