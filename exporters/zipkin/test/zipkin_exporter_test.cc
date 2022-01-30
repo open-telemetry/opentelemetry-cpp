@@ -137,10 +137,7 @@ TEST_F(ZipkinExporterTestPeer, ExportJsonIntegrationTest)
 
   trace_api::StartSpanOptions child_span_opts = {};
   child_span_opts.parent                      = parent_span->GetContext();
-
   auto child_span = tracer->StartSpan("Test child span", child_span_opts);
-  child_span->End();
-  parent_span->End();
 
   nostd::get<trace_api::SpanContext>(child_span_opts.parent)
       .trace_id()
@@ -153,6 +150,9 @@ TEST_F(ZipkinExporterTestPeer, ExportJsonIntegrationTest)
       .WillOnce(Return(ByMove(std::move(ext::http::client::Result{
           std::unique_ptr<ext::http::client::Response>{new ext::http::client::curl::Response()},
           ext::http::client::SessionState::Response}))));
+
+  child_span->End();
+  parent_span->End();
 }
 
 // Create spans, let processor call Export()

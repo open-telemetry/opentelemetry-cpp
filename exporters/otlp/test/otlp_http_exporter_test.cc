@@ -159,8 +159,6 @@ TEST_F(OtlpHttpExporterTestPeer, ExportJsonIntegrationTest)
 
   auto child_span = tracer->StartSpan("Test child span", child_span_opts);
 
-  child_span->End();
-  parent_span->End();
   nostd::get<trace_api::SpanContext>(child_span_opts.parent)
       .trace_id()
       .ToLowerBase16(MakeSpan(trace_id_hex));
@@ -168,6 +166,9 @@ TEST_F(OtlpHttpExporterTestPeer, ExportJsonIntegrationTest)
   EXPECT_CALL(*mock_otlp_http_client, Export(IsValidMessage(report_trace_id)))
       .Times(Exactly(1))
       .WillOnce(Return(sdk::common::ExportResult::kSuccess));
+
+  child_span->End();
+  parent_span->End();
 }
 
 // Create spans, let processor call Export()
@@ -212,8 +213,6 @@ TEST_F(OtlpHttpExporterTestPeer, ExportBinaryIntegrationTest)
   child_span_opts.parent                      = parent_span->GetContext();
 
   auto child_span = tracer->StartSpan("Test child span", child_span_opts);
-  child_span->End();
-  parent_span->End();
 
   nostd::get<trace_api::SpanContext>(child_span_opts.parent)
       .trace_id()
@@ -222,6 +221,9 @@ TEST_F(OtlpHttpExporterTestPeer, ExportBinaryIntegrationTest)
   EXPECT_CALL(*mock_otlp_http_client, Export(IsValidMessage(report_trace_id)))
       .Times(Exactly(1))
       .WillOnce(Return(sdk::common::ExportResult::kSuccess));
+
+  child_span->End();
+  parent_span->End();
 }
 
 // Test exporter configuration options
