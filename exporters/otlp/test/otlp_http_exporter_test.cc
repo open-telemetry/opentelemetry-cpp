@@ -113,8 +113,6 @@ private:
   std::string trace_id_;
 };
 
-// To construct a polymorphic matcher, pass an instance of the class
-// to MakePolymorphicMatcher().  Note the return type.
 PolymorphicMatcher<IsValidMessageMatcher> IsValidMessage(const std::string &trace_id)
 {
   return MakePolymorphicMatcher(IsValidMessageMatcher(trace_id));
