@@ -102,30 +102,12 @@ public:
     auto instrumentation_library_span = *resource_span["instrumentation_library_spans"].begin();
     auto span                         = *instrumentation_library_span["spans"].begin();
     auto received_trace_id            = span["trace_id"].get<std::string>();
-
-    if (trace_id_ != received_trace_id)
-    {
-      opentelemetry::ext::http::client::Body body;
-      OtlpHttpClient::SerializeToHttpBody(body, p);
-      // received_trace_id = body.resource_spans(0)
-      //                      .instrumentation_library_spans(0)
-      //                      .spans(0)
-      //                      .trace_id();
-
-      auto msg = std::string(body.begin(), body.end());
-
-      std::puts(received_trace_id.c_str());
-      std::puts(msg.c_str());
-      std::puts("######");
-    }
     return trace_id_ == received_trace_id;
   }
 
-  // Describes the property of a value matching this matcher.
-  void DescribeTo(std::ostream *os) const { *os << "is not NULL"; }
+  void DescribeTo(std::ostream *os) const { *os << "received trace_id matches"; }
 
-  // Describes the property of a value NOT matching this matcher.
-  void DescribeNegationTo(std::ostream *os) const { *os << "is NULL"; }
+  void DescribeNegationTo(std::ostream *os) const { *os << "received trace_id does not matche"; }
 
 private:
   std::string trace_id_;
