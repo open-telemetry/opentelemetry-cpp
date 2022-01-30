@@ -87,9 +87,11 @@ MockOtlpHttpClient *GetMockOtlpHttpClient(HttpRequestContentType content_type)
 class IsValidMessageMatcher
 {
 public:
-  IsValidMessageMatcher(const std::string &trace_id) : trace_id_(trace_id) {}
+  IsValidMessageMatcher(const std::string &trace_id, const std::string &span_id)
+      : trace_id_(trace_id), span_id_(span_id)
+  {}
   template <typename T>
-  bool MatchAndExplain(const T &p, MatchResultListener * /* listener */) const
+  bool MatchAndExplain(const T &p, MatchResultListener *) const
   {
     OtlpHttpLogExporterOptions options;
     options.content_type  = HttpRequestContentType::kJson;
@@ -103,9 +105,25 @@ public:
     OtlpHttpClient::ConvertGenericMessageToJson(check_json, p, otlpHttpClientOptions);
     auto resource_span                = *check_json["resource_logs"].begin();
     auto instrumentation_library_span = *resource_span["instrumentation_library_logs"].begin();
-    auto span                         = *instrumentation_library_span["logs"].begin();
-    auto received_trace_id            = span["trace_id"].get<std::string>();
-    return trace_id_ == received_trace_id;
+    auto log                          = *instrumentation_library_span["logs"].begin();
+    auto received_trace_id            = log["trace_id"].get<std::string>();
+    auto received_span_id             = log["span_id"].get<std::string>();
+    bool is_ok                        = trace_id_ == received_trace_id;
+    is_ok &= span_id_ == received_span_id;
+    is_ok &= "Log name" == log["name"].get<std::string>();
+    is_ok &= "Log message" == log["body"]["string_value"].get<std::string>();
+    is_ok &= 15 <= log["attributes"].size();
+    bool check_service_name = false;
+    for (auto attribute : log["attributes"])
+    {
+      if ("service.name" == attribute["key"].get<std::string>())
+      {
+        check_service_name = true;
+        EXPECT_EQ("unit_test_service", attribute["value"]["string_value"].get<std::string>());
+      }
+    }
+    is_ok &= check_service_name;
+    return is_ok;
   }
 
   void DescribeTo(std::ostream *os) const { *os << "received trace_id matches"; }
@@ -114,11 +132,13 @@ public:
 
 private:
   std::string trace_id_;
+  std::string span_id_;
 };
 
-PolymorphicMatcher<IsValidMessageMatcher> IsValidMessage(const std::string &trace_id)
+PolymorphicMatcher<IsValidMessageMatcher> IsValidMessage(const std::string &trace_id,
+                                                         const std::string &span_id)
 {
-  return MakePolymorphicMatcher(IsValidMessageMatcher(trace_id));
+  return MakePolymorphicMatcher(IsValidMessageMatcher(trace_id, span_id));
 }
 
 // Create log records, let processor call Export()
@@ -178,7 +198,7 @@ TEST_F(OtlpHttpLogExporterTestPeer, ExportJsonIntegrationTest)
   span_id.ToLowerBase16(MakeSpan(span_id_hex));
   report_span_id.assign(span_id_hex, sizeof(span_id_hex));
 
-  EXPECT_CALL(*mockOtlpHttpClient, Export(IsValidMessage(report_trace_id)))
+  EXPECT_CALL(*mockOtlpHttpClient, Export(IsValidMessage(report_trace_id, report_span_id)))
       .Times(Exactly(1))
       .WillOnce(Return(sdk::common::ExportResult::kSuccess));
 }
@@ -240,7 +260,7 @@ TEST_F(OtlpHttpLogExporterTestPeer, ExportBinaryIntegrationTest)
   span_id.ToLowerBase16(MakeSpan(span_id_hex));
   report_span_id.assign(span_id_hex, sizeof(span_id_hex));
 
-  EXPECT_CALL(*mockOtlpHttpClient, Export(IsValidMessage(report_trace_id)))
+  EXPECT_CALL(*mockOtlpHttpClient, Export(IsValidMessage(report_trace_id, report_span_id)))
       .Times(Exactly(1))
       .WillOnce(Return(sdk::common::ExportResult::kSuccess));
 }
