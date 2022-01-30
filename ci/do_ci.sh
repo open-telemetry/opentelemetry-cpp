@@ -59,8 +59,8 @@ mkdir -p "${BUILD_DIR}"
 [ -z "${PLUGIN_DIR}" ] && export PLUGIN_DIR=$HOME/plugin
 mkdir -p "${PLUGIN_DIR}"
 
-BAZEL_OPTIONS="--copt=-DENABLE_METRICS_PREVIEW --copt=-DENABLE_LOGS_PREVIEW"
-BAZEL_TEST_OPTIONS="$BAZEL_OPTIONS --copt=-DTEST --test_output=errors"
+BAZEL_OPTIONS="--copt=-DENABLE_METRICS_PREVIEW --copt=-DENABLE_LOGS_PREVIEW --copt=-DTEST"
+BAZEL_TEST_OPTIONS="$BAZEL_OPTIONS --test_output=errors"
 
 # https://github.com/bazelbuild/bazel/issues/4341
 BAZEL_MACOS_OPTIONS="$BAZEL_OPRIONS --features=-supports_dynamic_linker --build_tag_filters=-jaeger"
