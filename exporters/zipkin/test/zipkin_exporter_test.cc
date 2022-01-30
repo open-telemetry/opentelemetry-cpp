@@ -13,6 +13,7 @@
 
 #  include <gtest/gtest.h>
 #  include "gmock/gmock.h"
+#  include "nlohmann/json.hpp"
 
 #  if defined(_MSC_VER)
 #    include "opentelemetry/sdk/common/env_variables.h"
@@ -68,6 +69,33 @@ public:
               (noexcept, override));
 };
 
+class IsValidMessageMatcher
+{
+public:
+  IsValidMessageMatcher(const std::string &trace_id) : trace_id_(trace_id) {}
+  template <typename T>
+  bool MatchAndExplain(const T &p, MatchResultListener * /* listener */) const
+  {
+    auto body                 = std::string(p.begin(), p.end());
+    nlohmann::json check_json = nlohmann::json::parse(body);
+    auto trace_id_kv          = check_json.at(0).find("traceId");
+    auto received_trace_id    = trace_id_kv.value().get<std::string>();
+    return trace_id_ == received_trace_id;
+  }
+
+  void DescribeTo(std::ostream *os) const { *os << "received trace_id matches"; }
+
+  void DescribeNegationTo(std::ostream *os) const { *os << "received trace_id does not matche"; }
+
+private:
+  std::string trace_id_;
+};
+
+PolymorphicMatcher<IsValidMessageMatcher> IsValidMessage(const std::string &trace_id)
+{
+  return MakePolymorphicMatcher(IsValidMessageMatcher(trace_id));
+}
+
 // Create spans, let processor call Export()
 TEST_F(ZipkinExporterTestPeer, ExportJsonIntegrationTest)
 {
@@ -103,28 +131,28 @@ TEST_F(ZipkinExporterTestPeer, ExportJsonIntegrationTest)
       new sdk::trace::TracerProvider(std::move(processor), resource));
 
   std::string report_trace_id;
-  {
-    char trace_id_hex[2 * trace_api::TraceId::kSize] = {0};
-    auto tracer                                      = provider->GetTracer("test");
-    auto parent_span                                 = tracer->StartSpan("Test parent span");
+  char trace_id_hex[2 * trace_api::TraceId::kSize] = {0};
+  auto tracer                                      = provider->GetTracer("test");
+  auto parent_span                                 = tracer->StartSpan("Test parent span");
 
-    trace_api::StartSpanOptions child_span_opts = {};
-    child_span_opts.parent                      = parent_span->GetContext();
+  trace_api::StartSpanOptions child_span_opts = {};
+  child_span_opts.parent                      = parent_span->GetContext();
 
-    auto child_span = tracer->StartSpan("Test child span", child_span_opts);
-    EXPECT_CALL(*mock_http_client, Post(_, _, _))
-        .Times(Exactly(1))
-        .WillOnce(Return(ByMove(std::move(ext::http::client::Result{
-            std::unique_ptr<ext::http::client::Response>{new ext::http::client::curl::Response()},
-            ext::http::client::SessionState::Response}))));
-    child_span->End();
-    parent_span->End();
+  auto child_span = tracer->StartSpan("Test child span", child_span_opts);
+  child_span->End();
+  parent_span->End();
 
-    nostd::get<trace_api::SpanContext>(child_span_opts.parent)
-        .trace_id()
-        .ToLowerBase16(MakeSpan(trace_id_hex));
-    report_trace_id.assign(trace_id_hex, sizeof(trace_id_hex));
-  }
+  nostd::get<trace_api::SpanContext>(child_span_opts.parent)
+      .trace_id()
+      .ToLowerBase16(MakeSpan(trace_id_hex));
+  report_trace_id.assign(trace_id_hex, sizeof(trace_id_hex));
+
+  auto expected_url = nostd::string_view{"http://localhost:9411/api/v2/spans"};
+  EXPECT_CALL(*mock_http_client, Post(expected_url, IsValidMessage(report_trace_id), _))
+      .Times(Exactly(1))
+      .WillOnce(Return(ByMove(std::move(ext::http::client::Result{
+          std::unique_ptr<ext::http::client::Response>{new ext::http::client::curl::Response()},
+          ext::http::client::SessionState::Response}))));
 }
 
 // Create spans, let processor call Export()
