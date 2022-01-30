@@ -40,6 +40,9 @@ if(WITH_OTLP_GRPC)
 endif()
 
 if(WITH_OTLP_HTTP)
+  if(BUILD_TESTING)
+    add_definitions(-DTEST)
+  endif()
   find_package(CURL REQUIRED)
   add_library(opentelemetry_exporter_otlp_http_client src/otlp_http_client.cc)
   set_target_properties(opentelemetry_exporter_otlp_http_client
