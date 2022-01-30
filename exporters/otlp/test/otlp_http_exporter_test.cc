@@ -141,7 +141,7 @@ PolymorphicMatcher<IsValidMessageMatcher> IsValidMessage(const std::string &trac
 // Create spans, let processor call Export()
 TEST_F(OtlpHttpExporterTestPeer, ExportJsonIntegrationTest)
 {
-  auto mockOtlpHttpClient = GetMockOtlpHttpClient(HttpRequestContentType::kBinary);
+  auto mockOtlpHttpClient = GetMockOtlpHttpClient(HttpRequestContentType::kJson);
   auto exporter           = GetExporter(std::unique_ptr<OtlpHttpClient>{mockOtlpHttpClient});
 
   resource::ResourceAttributes resource_attributes = {{"service.name", "unit_test_service"},
@@ -225,9 +225,9 @@ TEST_F(OtlpHttpExporterTestPeer, ExportBinaryIntegrationTest)
       new sdk::trace::TracerProvider(std::move(processor), resource));
 
   std::string report_trace_id;
-  uint8_t trace_id_binary[trace_api::TraceId::kSize] = {0};
-  auto tracer                                        = provider->GetTracer("test");
-  auto parent_span                                   = tracer->StartSpan("Test parent span");
+  char trace_id_hex[2 * trace_api::TraceId::kSize] = {0};
+  auto tracer                                      = provider->GetTracer("test");
+  auto parent_span                                 = tracer->StartSpan("Test parent span");
 
   trace_api::StartSpanOptions child_span_opts = {};
   child_span_opts.parent                      = parent_span->GetContext();
@@ -238,11 +238,11 @@ TEST_F(OtlpHttpExporterTestPeer, ExportBinaryIntegrationTest)
 
   nostd::get<trace_api::SpanContext>(child_span_opts.parent)
       .trace_id()
-      .CopyBytesTo(MakeSpan(trace_id_binary));
-  report_trace_id.assign(reinterpret_cast<char *>(trace_id_binary), sizeof(trace_id_binary));
-  // EXPECT_CALL(*mockOtlpHttpClient, Export(IsValidMessage(report_trace_id)))
-  //     .Times(Exactly(1))
-  //     .WillOnce(Return(sdk::common::ExportResult::kSuccess));
+      .ToLowerBase16(MakeSpan(trace_id_hex));
+  report_trace_id.assign(reinterpret_cast<char *>(trace_id_hex), sizeof(trace_id_hex));
+  EXPECT_CALL(*mockOtlpHttpClient, Export(IsValidMessage(report_trace_id)))
+      .Times(Exactly(1))
+      .WillOnce(Return(sdk::common::ExportResult::kSuccess));
 }
 
 // Test exporter configuration options
