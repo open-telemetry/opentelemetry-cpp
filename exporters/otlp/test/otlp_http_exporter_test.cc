@@ -50,10 +50,10 @@ OtlpHttpClientOptions MakeOtlpHttpClientOptions(HttpRequestContentType content_t
   options.console_debug = true;
   options.http_headers.insert(
       std::make_pair<const std::string, std::string>("Custom-Header-Key", "Custom-Header-Value"));
-  OtlpHttpClientOptions otlpHttpClientOptions(
+  OtlpHttpClientOptions otlp_http_client_options(
       options.url, options.content_type, options.json_bytes_mapping, options.use_json_name,
       options.console_debug, options.timeout, options.http_headers);
-  return otlpHttpClientOptions;
+  return otlp_http_client_options;
 }
 
 class OtlpHttpExporterTestPeer : public ::testing::Test
@@ -93,9 +93,9 @@ public:
   template <typename T>
   bool MatchAndExplain(const T &p, MatchResultListener * /* listener */) const
   {
-    auto otlpHttpClientOptions = MakeOtlpHttpClientOptions(HttpRequestContentType::kJson);
+    auto otlp_http_client_options = MakeOtlpHttpClientOptions(HttpRequestContentType::kJson);
     nlohmann::json check_json;
-    OtlpHttpClient::ConvertGenericMessageToJson(check_json, p, otlpHttpClientOptions);
+    OtlpHttpClient::ConvertGenericMessageToJson(check_json, p, otlp_http_client_options);
     auto resource_span                = *check_json["resource_spans"].begin();
     auto instrumentation_library_span = *resource_span["instrumentation_library_spans"].begin();
     auto span                         = *instrumentation_library_span["spans"].begin();
@@ -119,8 +119,8 @@ PolymorphicMatcher<IsValidMessageMatcher> IsValidMessage(const std::string &trac
 // Create spans, let processor call Export()
 TEST_F(OtlpHttpExporterTestPeer, ExportJsonIntegrationTest)
 {
-  auto mockOtlpHttpClient = GetMockOtlpHttpClient(HttpRequestContentType::kJson);
-  auto exporter           = GetExporter(std::unique_ptr<OtlpHttpClient>{mockOtlpHttpClient});
+  auto mock_otlp_http_client = GetMockOtlpHttpClient(HttpRequestContentType::kJson);
+  auto exporter              = GetExporter(std::unique_ptr<OtlpHttpClient>{mock_otlp_http_client});
 
   resource::ResourceAttributes resource_attributes = {{"service.name", "unit_test_service"},
                                                       {"tenant.id", "test_user"}};
@@ -149,6 +149,7 @@ TEST_F(OtlpHttpExporterTestPeer, ExportJsonIntegrationTest)
       new sdk::trace::TracerProvider(std::move(processor), resource));
 
   std::string report_trace_id;
+
   char trace_id_hex[2 * trace_api::TraceId::kSize] = {0};
   auto tracer                                      = provider->GetTracer("test");
   auto parent_span                                 = tracer->StartSpan("Test parent span");
@@ -164,7 +165,7 @@ TEST_F(OtlpHttpExporterTestPeer, ExportJsonIntegrationTest)
       .trace_id()
       .ToLowerBase16(MakeSpan(trace_id_hex));
   report_trace_id.assign(trace_id_hex, sizeof(trace_id_hex));
-  EXPECT_CALL(*mockOtlpHttpClient, Export(IsValidMessage(report_trace_id)))
+  EXPECT_CALL(*mock_otlp_http_client, Export(IsValidMessage(report_trace_id)))
       .Times(Exactly(1))
       .WillOnce(Return(sdk::common::ExportResult::kSuccess));
 }
@@ -172,8 +173,8 @@ TEST_F(OtlpHttpExporterTestPeer, ExportJsonIntegrationTest)
 // Create spans, let processor call Export()
 TEST_F(OtlpHttpExporterTestPeer, ExportBinaryIntegrationTest)
 {
-  auto mockOtlpHttpClient = GetMockOtlpHttpClient(HttpRequestContentType::kBinary);
-  auto exporter           = GetExporter(std::unique_ptr<OtlpHttpClient>{mockOtlpHttpClient});
+  auto mock_otlp_http_client = GetMockOtlpHttpClient(HttpRequestContentType::kBinary);
+  auto exporter              = GetExporter(std::unique_ptr<OtlpHttpClient>{mock_otlp_http_client});
 
   resource::ResourceAttributes resource_attributes = {{"service.name", "unit_test_service"},
                                                       {"tenant.id", "test_user"}};
@@ -218,7 +219,7 @@ TEST_F(OtlpHttpExporterTestPeer, ExportBinaryIntegrationTest)
       .trace_id()
       .ToLowerBase16(MakeSpan(trace_id_hex));
   report_trace_id.assign(reinterpret_cast<char *>(trace_id_hex), sizeof(trace_id_hex));
-  EXPECT_CALL(*mockOtlpHttpClient, Export(IsValidMessage(report_trace_id)))
+  EXPECT_CALL(*mock_otlp_http_client, Export(IsValidMessage(report_trace_id)))
       .Times(Exactly(1))
       .WillOnce(Return(sdk::common::ExportResult::kSuccess));
 }
