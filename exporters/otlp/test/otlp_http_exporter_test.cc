@@ -43,6 +43,19 @@ static nostd::span<T, N> MakeSpan(T (&array)[N])
   return nostd::span<T, N>(array);
 }
 
+OtlpHttpClientOptions MakeOtlpHttpClientOptions(HttpRequestContentType content_type)
+{
+  OtlpHttpExporterOptions options;
+  options.content_type  = content_type;
+  options.console_debug = true;
+  options.http_headers.insert(
+      std::make_pair<const std::string, std::string>("Custom-Header-Key", "Custom-Header-Value"));
+  OtlpHttpClientOptions otlpHttpClientOptions(
+      options.url, options.content_type, options.json_bytes_mapping, options.use_json_name,
+      options.console_debug, options.timeout, options.http_headers);
+  return otlpHttpClientOptions;
+}
+
 class OtlpHttpExporterTestPeer : public ::testing::Test
 {
 public:
@@ -70,15 +83,7 @@ public:
 
 MockOtlpHttpClient *GetMockOtlpHttpClient(HttpRequestContentType content_type)
 {
-  OtlpHttpExporterOptions options;
-  options.content_type  = content_type;
-  options.console_debug = true;
-  options.http_headers.insert(
-      std::make_pair<const std::string, std::string>("Custom-Header-Key", "Custom-Header-Value"));
-  OtlpHttpClientOptions otlpHttpClientOptions(
-      options.url, options.content_type, options.json_bytes_mapping, options.use_json_name,
-      options.console_debug, options.timeout, options.http_headers);
-  return new MockOtlpHttpClient(std::move(otlpHttpClientOptions));
+  return new MockOtlpHttpClient(MakeOtlpHttpClientOptions(content_type));
 }
 
 class IsValidMessageMatcher
@@ -88,14 +93,7 @@ public:
   template <typename T>
   bool MatchAndExplain(const T &p, MatchResultListener * /* listener */) const
   {
-    OtlpHttpExporterOptions options;
-    options.content_type  = HttpRequestContentType::kJson;
-    options.console_debug = true;
-    options.http_headers.insert(
-        std::make_pair<const std::string, std::string>("Custom-Header-Key", "Custom-Header-Value"));
-    OtlpHttpClientOptions otlpHttpClientOptions(
-        options.url, options.content_type, options.json_bytes_mapping, options.use_json_name,
-        options.console_debug, options.timeout, options.http_headers);
+    auto otlpHttpClientOptions = MakeOtlpHttpClientOptions(HttpRequestContentType::kJson);
     nlohmann::json check_json;
     OtlpHttpClient::ConvertGenericMessageToJson(check_json, p, otlpHttpClientOptions);
     auto resource_span                = *check_json["resource_spans"].begin();
