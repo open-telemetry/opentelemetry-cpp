@@ -19,8 +19,8 @@
 #  include <gtest/gtest.h>
 #  include "gmock/gmock.h"
 
+#  include <iostream>
 #  include "nlohmann/json.hpp"
-
 #  if defined(_MSC_VER)
 #    include "opentelemetry/sdk/common/env_variables.h"
 using opentelemetry::sdk::common::setenv;
@@ -81,10 +81,67 @@ MockOtlpHttpClient *GetMockOtlpHttpClient(HttpRequestContentType content_type)
   return new MockOtlpHttpClient(std::move(otlpHttpClientOptions));
 }
 
+class IsValidMessageMatcher
+{
+public:
+  IsValidMessageMatcher(const std::string &trace_id) : trace_id_(trace_id) {}
+  template <typename T>
+  bool MatchAndExplain(const T &p, MatchResultListener * /* listener */) const
+  {
+    OtlpHttpExporterOptions options;
+    options.content_type  = HttpRequestContentType::kJson;
+    options.console_debug = true;
+    options.http_headers.insert(
+        std::make_pair<const std::string, std::string>("Custom-Header-Key", "Custom-Header-Value"));
+    OtlpHttpClientOptions otlpHttpClientOptions(
+        options.url, options.content_type, options.json_bytes_mapping, options.use_json_name,
+        options.console_debug, options.timeout, options.http_headers);
+    nlohmann::json check_json;
+    OtlpHttpClient::ConvertGenericMessageToJson(check_json, p, otlpHttpClientOptions);
+    auto resource_span                = *check_json["resource_spans"].begin();
+    auto instrumentation_library_span = *resource_span["instrumentation_library_spans"].begin();
+    auto span                         = *instrumentation_library_span["spans"].begin();
+    auto received_trace_id            = span["trace_id"].get<std::string>();
+
+    if (trace_id_ != received_trace_id)
+    {
+      opentelemetry::ext::http::client::Body body;
+      OtlpHttpClient::SerializeToHttpBody(body, p);
+      // received_trace_id = body.resource_spans(0)
+      //                      .instrumentation_library_spans(0)
+      //                      .spans(0)
+      //                      .trace_id();
+
+      auto msg = std::string(body.begin(), body.end());
+
+      std::puts(received_trace_id.c_str());
+      std::puts(msg.c_str());
+      std::puts("######");
+    }
+    return trace_id_ == received_trace_id;
+  }
+
+  // Describes the property of a value matching this matcher.
+  void DescribeTo(std::ostream *os) const { *os << "is not NULL"; }
+
+  // Describes the property of a value NOT matching this matcher.
+  void DescribeNegationTo(std::ostream *os) const { *os << "is NULL"; }
+
+private:
+  std::string trace_id_;
+};
+
+// To construct a polymorphic matcher, pass an instance of the class
+// to MakePolymorphicMatcher().  Note the return type.
+PolymorphicMatcher<IsValidMessageMatcher> IsValidMessage(const std::string &trace_id)
+{
+  return MakePolymorphicMatcher(IsValidMessageMatcher(trace_id));
+}
+
 // Create spans, let processor call Export()
 TEST_F(OtlpHttpExporterTestPeer, ExportJsonIntegrationTest)
 {
-  auto mockOtlpHttpClient = GetMockOtlpHttpClient(HttpRequestContentType::kJson);
+  auto mockOtlpHttpClient = GetMockOtlpHttpClient(HttpRequestContentType::kBinary);
   auto exporter           = GetExporter(std::unique_ptr<OtlpHttpClient>{mockOtlpHttpClient});
 
   resource::ResourceAttributes resource_attributes = {{"service.name", "unit_test_service"},
@@ -114,26 +171,24 @@ TEST_F(OtlpHttpExporterTestPeer, ExportJsonIntegrationTest)
       new sdk::trace::TracerProvider(std::move(processor), resource));
 
   std::string report_trace_id;
-  {
-    char trace_id_hex[2 * trace_api::TraceId::kSize] = {0};
-    auto tracer                                      = provider->GetTracer("test");
-    auto parent_span                                 = tracer->StartSpan("Test parent span");
+  char trace_id_hex[2 * trace_api::TraceId::kSize] = {0};
+  auto tracer                                      = provider->GetTracer("test");
+  auto parent_span                                 = tracer->StartSpan("Test parent span");
 
-    trace_api::StartSpanOptions child_span_opts = {};
-    child_span_opts.parent                      = parent_span->GetContext();
+  trace_api::StartSpanOptions child_span_opts = {};
+  child_span_opts.parent                      = parent_span->GetContext();
 
-    auto child_span = tracer->StartSpan("Test child span", child_span_opts);
-    EXPECT_CALL(*mockOtlpHttpClient, Export(_))
-        .Times(Exactly(1))
-        .WillOnce(Return(sdk::common::ExportResult::kSuccess));
-    child_span->End();
-    parent_span->End();
+  auto child_span = tracer->StartSpan("Test child span", child_span_opts);
 
-    nostd::get<trace_api::SpanContext>(child_span_opts.parent)
-        .trace_id()
-        .ToLowerBase16(MakeSpan(trace_id_hex));
-    report_trace_id.assign(trace_id_hex, sizeof(trace_id_hex));
-  }
+  child_span->End();
+  parent_span->End();
+  nostd::get<trace_api::SpanContext>(child_span_opts.parent)
+      .trace_id()
+      .ToLowerBase16(MakeSpan(trace_id_hex));
+  report_trace_id.assign(trace_id_hex, sizeof(trace_id_hex));
+  EXPECT_CALL(*mockOtlpHttpClient, Export(IsValidMessage(report_trace_id)))
+      .Times(Exactly(1))
+      .WillOnce(Return(sdk::common::ExportResult::kSuccess));
 }
 
 // Create spans, let processor call Export()
@@ -170,26 +225,24 @@ TEST_F(OtlpHttpExporterTestPeer, ExportBinaryIntegrationTest)
       new sdk::trace::TracerProvider(std::move(processor), resource));
 
   std::string report_trace_id;
-  {
-    uint8_t trace_id_binary[trace_api::TraceId::kSize] = {0};
-    auto tracer                                        = provider->GetTracer("test");
-    auto parent_span                                   = tracer->StartSpan("Test parent span");
+  uint8_t trace_id_binary[trace_api::TraceId::kSize] = {0};
+  auto tracer                                        = provider->GetTracer("test");
+  auto parent_span                                   = tracer->StartSpan("Test parent span");
 
-    trace_api::StartSpanOptions child_span_opts = {};
-    child_span_opts.parent                      = parent_span->GetContext();
+  trace_api::StartSpanOptions child_span_opts = {};
+  child_span_opts.parent                      = parent_span->GetContext();
 
-    auto child_span = tracer->StartSpan("Test child span", child_span_opts);
-    EXPECT_CALL(*mockOtlpHttpClient, Export(_))
-        .Times(Exactly(1))
-        .WillOnce(Return(sdk::common::ExportResult::kSuccess));
-    child_span->End();
-    parent_span->End();
+  auto child_span = tracer->StartSpan("Test child span", child_span_opts);
+  child_span->End();
+  parent_span->End();
 
-    nostd::get<trace_api::SpanContext>(child_span_opts.parent)
-        .trace_id()
-        .CopyBytesTo(MakeSpan(trace_id_binary));
-    report_trace_id.assign(reinterpret_cast<char *>(trace_id_binary), sizeof(trace_id_binary));
-  }
+  nostd::get<trace_api::SpanContext>(child_span_opts.parent)
+      .trace_id()
+      .CopyBytesTo(MakeSpan(trace_id_binary));
+  report_trace_id.assign(reinterpret_cast<char *>(trace_id_binary), sizeof(trace_id_binary));
+  // EXPECT_CALL(*mockOtlpHttpClient, Export(IsValidMessage(report_trace_id)))
+  //     .Times(Exactly(1))
+  //     .WillOnce(Return(sdk::common::ExportResult::kSuccess));
 }
 
 // Test exporter configuration options

@@ -13,6 +13,7 @@
 #include "opentelemetry/ext/http/client/http_client.h"
 #include "opentelemetry/sdk/common/exporter_utils.h"
 
+#include "nlohmann/json.hpp"
 #include "opentelemetry/exporters/otlp/otlp_environment.h"
 
 #include <chrono>
@@ -120,6 +121,12 @@ public:
    * @return return the status of this operation
    */
   bool Shutdown(std::chrono::microseconds timeout = std::chrono::microseconds(0)) noexcept;
+
+  static void ConvertGenericMessageToJson(nlohmann::json &value,
+                                          const google::protobuf::Message &message,
+                                          const OtlpHttpClientOptions &options);
+  static bool SerializeToHttpBody(opentelemetry::ext::http::client::Body &output,
+                                  const google::protobuf::Message &message);
 
 private:
   // Stores if this HTTP client had its Shutdown() method called

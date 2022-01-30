@@ -12,8 +12,6 @@
 #include "opentelemetry/ext/http/client/http_client_factory.h"
 #include "opentelemetry/ext/http/common/url_parser.h"
 
-#include "nlohmann/json.hpp"
-
 #include "opentelemetry/exporters/otlp/protobuf_include_prefix.h"
 
 #include <mutex>
@@ -267,6 +265,8 @@ private:
   bool console_debug_ = false;
 };
 
+}  // namespace
+
 static inline char HexEncode(unsigned char byte)
 {
 #if defined(HAVE_GSL)
@@ -340,9 +340,9 @@ static void ConvertListFieldToJson(nlohmann::json &value,
                                    const google::protobuf::FieldDescriptor *field_descriptor,
                                    const OtlpHttpClientOptions &options);
 
-static void ConvertGenericMessageToJson(nlohmann::json &value,
-                                        const google::protobuf::Message &message,
-                                        const OtlpHttpClientOptions &options)
+void OtlpHttpClient::ConvertGenericMessageToJson(nlohmann::json &value,
+                                                 const google::protobuf::Message &message,
+                                                 const OtlpHttpClientOptions &options)
 {
   std::vector<const google::protobuf::FieldDescriptor *> fields_with_data;
   message.GetReflection()->ListFields(message, &fields_with_data);
@@ -362,7 +362,8 @@ static void ConvertGenericMessageToJson(nlohmann::json &value,
   }
 }
 
-static bool SerializeToHttpBody(http_client::Body &output, const google::protobuf::Message &message)
+bool OtlpHttpClient::SerializeToHttpBody(http_client::Body &output,
+                                         const google::protobuf::Message &message)
 {
   auto body_size = message.ByteSizeLong();
   if (body_size > 0)
@@ -416,7 +417,7 @@ void ConvertGenericFieldToJson(nlohmann::json &value,
       break;
     }
     case google::protobuf::FieldDescriptor::CPPTYPE_MESSAGE: {
-      ConvertGenericMessageToJson(
+      OtlpHttpClient::ConvertGenericMessageToJson(
           value, message.GetReflection()->GetMessage(message, field_descriptor, nullptr), options);
       break;
     }
@@ -514,7 +515,7 @@ void ConvertListFieldToJson(nlohmann::json &value,
       for (int i = 0; i < field_size; ++i)
       {
         nlohmann::json sub_value;
-        ConvertGenericMessageToJson(
+        OtlpHttpClient::ConvertGenericMessageToJson(
             sub_value, message.GetReflection()->GetRepeatedMessage(message, field_descriptor, i),
             options);
         value.push_back(std::move(sub_value));
@@ -559,8 +560,6 @@ void ConvertListFieldToJson(nlohmann::json &value,
     }
   }
 }
-
-}  // namespace
 
 OtlpHttpClient::OtlpHttpClient(OtlpHttpClientOptions &&options)
     : options_(options), http_client_(http_client::HttpClientFactory::Create())
