@@ -193,7 +193,7 @@ To install Bazel, consult the [Installing Bazel](https://docs.bazel.build/versio
 
    ```
 
-   Please consider installing `Jaeger` dependencies using [`setup_thrift.ps1`](https://github.com/esigo/opentelemetry-cpp/tree/Jaeger-exporter-Windows-and-Mac-bazel/ci/setup_thrift.ps1) and passing `vcpkg` path as environment variables on Windows:
+   Please consider installing `Jaeger` dependencies using [`setup_thrift.ps1`](https://github.com/open-telemetry/opentelemetry-cpp/tree/main/ci/setup_thrift.ps1) and passing `vcpkg` path as environment variables on Windows:
 
    ```console
    $ bazel build --action_env=VCPKG_DIR=$VCPKG_DIR -- //...
