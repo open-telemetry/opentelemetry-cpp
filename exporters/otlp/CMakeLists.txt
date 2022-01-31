@@ -41,7 +41,7 @@ endif()
 
 if(WITH_OTLP_HTTP)
   if(BUILD_TESTING)
-    add_definitions(-DTEST)
+    add_definitions(-DENABLE_TEST)
   endif()
   find_package(CURL REQUIRED)
   add_library(opentelemetry_exporter_otlp_http_client src/otlp_http_client.cc)

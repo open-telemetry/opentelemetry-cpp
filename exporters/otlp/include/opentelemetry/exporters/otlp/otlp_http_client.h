@@ -89,7 +89,7 @@ struct OtlpHttpClientOptions
   {}
 };
 
-#ifdef TEST
+#ifdef ENABLE_TEST
 #  define VIRTUAL_TEST virtual
 #else
 #  define VIRTUAL_TEST
@@ -104,7 +104,7 @@ public:
    * Create an OtlpHttpClient using the given options.
    */
   explicit OtlpHttpClient(OtlpHttpClientOptions &&options);
-#ifdef TEST
+#ifdef ENABLE_TEST
   VIRTUAL_TEST ~OtlpHttpClient() {}
 #endif
 
