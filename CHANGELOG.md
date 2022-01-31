@@ -14,6 +14,8 @@ Increment the:
 * PATCH version when you make backwards compatible bug fixes.
 
 ## [Unreleased]
+ 
+## [1.2.0] 2022-01-31
 
 * [API/SDK] Logger: Support for Instrumentation library ([#1128](https://github.com/open-telemetry/opentelemetry-cpp/pull/1128))
 * [SDK] Add LogLevel to internal_log ([#1147](https://github.com/open-telemetry/opentelemetry-cpp/pull/1147))
