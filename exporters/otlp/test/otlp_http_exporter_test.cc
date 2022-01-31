@@ -19,8 +19,8 @@
 #  include <gtest/gtest.h>
 #  include "gmock/gmock.h"
 
-#  include <iostream>
 #  include "nlohmann/json.hpp"
+
 #  if defined(_MSC_VER)
 #    include "opentelemetry/sdk/common/env_variables.h"
 using opentelemetry::sdk::common::setenv;

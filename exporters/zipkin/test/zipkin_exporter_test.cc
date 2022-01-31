@@ -13,6 +13,7 @@
 
 #  include <gtest/gtest.h>
 #  include "gmock/gmock.h"
+
 #  include "nlohmann/json.hpp"
 
 #  if defined(_MSC_VER)
