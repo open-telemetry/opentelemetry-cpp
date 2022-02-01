@@ -4,23 +4,12 @@
 #pragma once
 #ifndef ENABLE_METRICS_PREVIEW
 #  include "opentelemetry/common/key_value_iterable_view.h"
+#  include "opentelemetry/sdk/metrics/instruments.h"
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace sdk
 {
 namespace metrics
 {
-class MetricData
-{
-  // TBD - This class to be removed once #1178 is merged
-};
-
-enum class AggregationTemporarily
-{
-  // TBD - This enum to be removed once #1178 is merged.
-  kUnspecified,
-  kDelta,
-  kCummulative
-};
 
 /* Represent the storage from which to collect the metrics */
 

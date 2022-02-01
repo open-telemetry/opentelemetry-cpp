@@ -36,6 +36,19 @@ struct InstrumentDescriptor
   InstrumentValueType valueType_;
 };
 
+enum class AggregationTemporarily
+{
+  // TBD - This enum to be removed once #1178 is merged.
+  kUnspecified,
+  kDelta,
+  kCummulative
+};
+
+class MetricData
+{
+  // TBD - This class to be removed once #1178 is merged
+};
+
 /*class InstrumentSelector {
 public:
 InstrumentSelector(opentelemetry::nostd::string_view name,
