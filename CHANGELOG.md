@@ -24,10 +24,18 @@ Increment the:
 * [EXPORTER] InMemorySpanExporter shutdown fix ([#1161](https://github.com/open-telemetry/opentelemetry-cpp/pull/1161))
 * [EXPORTER] Fix leak in Jaeger exporter ([#1160](https://github.com/open-telemetry/opentelemetry-cpp/pull/1160))
 * [TESTS] ZipkinExporter unit-tests ([#1155](https://github.com/open-telemetry/opentelemetry-cpp/pull/1155))
-* [SDK] `BREAKING CHANGE` Logger: propagating resources through LoggerProvider ([#1154](https://github.com/open-telemetry/opentelemetry-cpp/pull/1154))
-* [SDK] `BREAKING CHANGE` Logger: support for instrumentation library ([#1149](https://github.com/open-telemetry/opentelemetry-cpp/pull/1149))
+* [SDK] Logger: propagating resources through LoggerProvider ([#1154](https://github.com/open-telemetry/opentelemetry-cpp/pull/1154))
+* [SDK] Logger: support for instrumentation library ([#1149](https://github.com/open-telemetry/opentelemetry-cpp/pull/1149))
 * [SDK] Add log level for internal log of sdk ([#1147](https://github.com/open-telemetry/opentelemetry-cpp/pull/1147))
 * [METRICS] Metrics SDK: View API ([#1110](https://github.com/open-telemetry/opentelemetry-cpp/pull/1110))
+
+Note on experimental features:
+
+[#1149](https://github.com/open-telemetry/opentelemetry-cpp/pull/1149) and
+[#1154](https://github.com/open-telemetry/opentelemetry-cpp/pull/1154) from
+above CHANGELOG introduced API changes which are not backward compatible with
+previous logs, please update API package to this release if
+`ENABLE_LOGS_PREVIEW` is turned on (it is turned off by default).
 
 ## [1.1.1] 2021-12-20
 
@@ -242,7 +250,7 @@ Increment the:
 * [SDK] Added `ForceFlush` to `TracerProvider`. ([#588](https://github.com/open-telemetry/opentelemetry-cpp/pull/588)).
 * [SDK] Added Resource API.  ([#502](https://github.com/open-telemetry/opentelemetry-cpp/pull/502))
 * [API] Modified TraceState support for w3c trace context as per specs.
-([#551](https://github.com/open-telemetry/opentelemetry-cpp/pull/551))
+* [SDK] TraceState implementation as per spec  ([#551](https://github.com/open-telemetry/opentelemetry-cpp/pull/551))
 * [API] Added B3 Propagator. ([#523](https://github.com/open-telemetry/opentelemetry-cpp/pull/523))
 * [Exporter] Added ETW Exporter. ([#376](https://github.com/open-telemetry/opentelemetry-cpp/pull/376))
 * [CI] Enable cache for Bazel for faster builds. ([#505](https://github.com/open-telemetry/opentelemetry-cpp/pull/505))
