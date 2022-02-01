@@ -31,7 +31,7 @@ Increment the:
 * [SDK] Add log level for internal log of sdk ([#1147](https://github.com/open-telemetry/opentelemetry-cpp/pull/1147))
 * [METRICS] Metrics SDK: View API ([#1110](https://github.com/open-telemetry/opentelemetry-cpp/pull/1110))
 
-Note on experimental features:
+Notes on experimental features:
 
 [#1149](https://github.com/open-telemetry/opentelemetry-cpp/pull/1149) and
 [#1154](https://github.com/open-telemetry/opentelemetry-cpp/pull/1154) from
