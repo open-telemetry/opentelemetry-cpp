@@ -8,6 +8,7 @@
 #  include <unordered_map>
 #  include "opentelemetry/sdk/common/attribute_utils.h"
 #  include "opentelemetry/sdk/logs/recordable.h"
+#  include "opentelemetry/sdk/resource/resource.h"
 #  include "opentelemetry/version.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
@@ -27,8 +28,8 @@ class LogRecord final : public Recordable
 private:
   // Default values are set by the respective data structures' constructors for all fields,
   // except the severity field, which must be set manually (an enum with no default value).
-  opentelemetry::logs::Severity severity_ = opentelemetry::logs::Severity::kInvalid;
-  common::AttributeMap resource_map_;
+  opentelemetry::logs::Severity severity_                 = opentelemetry::logs::Severity::kInvalid;
+  const opentelemetry::sdk::resource::Resource *resource_ = nullptr;
   common::AttributeMap attributes_map_;
   std::string name_;
   std::string body_;  // Currently a simple string, but should be changed to "Any" type
@@ -62,14 +63,12 @@ public:
   void SetBody(nostd::string_view message) noexcept override { body_ = std::string(message); }
 
   /**
-   * Set a resource for this log.
-   * @param name the name of the resource
-   * @param value the resource value
+   * Set Resource of this log
+   * @param Resource the resource to set
    */
-  void SetResource(nostd::string_view key,
-                   const opentelemetry::common::AttributeValue &value) noexcept override
+  void SetResource(const opentelemetry::sdk::resource::Resource &resource) noexcept override
   {
-    resource_map_.SetAttribute(key, value);
+    resource_ = &resource;
   }
 
   /**
@@ -141,12 +140,16 @@ public:
   std::string GetBody() const noexcept { return body_; }
 
   /**
-   * Get the resource field for this log
-   * @return the resource field for this log
+   * Get the resource for this log
+   * @return the resource for this log
    */
-  const std::unordered_map<std::string, common::OwnedAttributeValue> &GetResource() const noexcept
+  const opentelemetry::sdk::resource::Resource &GetResource() const noexcept
   {
-    return resource_map_.GetAttributes();
+    if (nullptr == resource_)
+    {
+      return sdk::resource::Resource::GetDefault();
+    }
+    return *resource_;
   }
 
   /**
@@ -181,6 +184,21 @@ public:
    * @return the timestamp for this log
    */
   opentelemetry::common::SystemTimestamp GetTimestamp() const noexcept { return timestamp_; }
+
+  /**
+   * Set instrumentation_library for this log.
+   * @param instrumentation_library the instrumentation library to set
+   */
+  void SetInstrumentationLibrary(
+      const opentelemetry::sdk::instrumentationlibrary::InstrumentationLibrary
+          &instrumentation_library) noexcept
+  {
+    instrumentation_library_ = &instrumentation_library;
+  }
+
+private:
+  const opentelemetry::sdk::instrumentationlibrary::InstrumentationLibrary
+      *instrumentation_library_ = nullptr;
 };
 }  // namespace logs
 }  // namespace sdk

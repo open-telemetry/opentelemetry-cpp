@@ -16,6 +16,7 @@
 
 #include "opentelemetry/exporters/otlp/protobuf_include_prefix.h"
 
+#include <mutex>
 #include "google/protobuf/message.h"
 #include "google/protobuf/reflection.h"
 #include "google/protobuf/stubs/common.h"
@@ -361,6 +362,18 @@ static void ConvertGenericMessageToJson(nlohmann::json &value,
   }
 }
 
+static bool SerializeToHttpBody(http_client::Body &output, const google::protobuf::Message &message)
+{
+  auto body_size = message.ByteSizeLong();
+  if (body_size > 0)
+  {
+    output.resize(body_size);
+    return message.SerializeWithCachedSizesToArray(
+        reinterpret_cast<google::protobuf::uint8 *>(&output[0]));
+  }
+  return true;
+}
+
 void ConvertGenericFieldToJson(nlohmann::json &value,
                                const google::protobuf::Message &message,
                                const google::protobuf::FieldDescriptor *field_descriptor,
@@ -558,7 +571,7 @@ opentelemetry::sdk::common::ExportResult OtlpHttpClient::Export(
     const google::protobuf::Message &message) noexcept
 {
   // Return failure if this exporter has been shutdown
-  if (is_shutdown_)
+  if (isShutdown())
   {
     const char *error_message = "[OTLP HTTP Client] Export failed, exporter is shutdown";
     if (options_.console_debug)
@@ -600,9 +613,7 @@ opentelemetry::sdk::common::ExportResult OtlpHttpClient::Export(
   std::string content_type;
   if (options_.content_type == HttpRequestContentType::kBinary)
   {
-    body_vec.resize(message.ByteSizeLong());
-    if (message.SerializeWithCachedSizesToArray(
-            reinterpret_cast<google::protobuf::uint8 *>(&body_vec[0])))
+    if (SerializeToHttpBody(body_vec, message))
     {
       if (options_.console_debug)
       {
@@ -682,13 +693,22 @@ opentelemetry::sdk::common::ExportResult OtlpHttpClient::Export(
 
 bool OtlpHttpClient::Shutdown(std::chrono::microseconds) noexcept
 {
-  is_shutdown_ = true;
+  {
+    const std::lock_guard<opentelemetry::common::SpinLockMutex> locked(lock_);
+    is_shutdown_ = true;
+  }
 
   // Shutdown the session manager
   http_client_->CancelAllSessions();
   http_client_->FinishAllSessions();
 
   return true;
+}
+
+bool OtlpHttpClient::isShutdown() const noexcept
+{
+  const std::lock_guard<opentelemetry::common::SpinLockMutex> locked(lock_);
+  return is_shutdown_;
 }
 
 }  // namespace otlp

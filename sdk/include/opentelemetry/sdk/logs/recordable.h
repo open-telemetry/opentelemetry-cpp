@@ -18,8 +18,6 @@
 #  include "opentelemetry/trace/trace_id.h"
 #  include "opentelemetry/version.h"
 
-#  include <map>
-
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace sdk
 {
@@ -60,12 +58,10 @@ public:
   virtual void SetBody(nostd::string_view message) noexcept = 0;
 
   /**
-   * Set a single resource of a log record.
-   * @param key the name of the resource to set
-   * @param value the resource value to set
+   * Set Resource of this log
+   * @param Resource the resource to set
    */
-  virtual void SetResource(nostd::string_view key,
-                           const opentelemetry::common::AttributeValue &value) noexcept = 0;
+  virtual void SetResource(const opentelemetry::sdk::resource::Resource &resource) noexcept = 0;
 
   /**
    * Set an attribute of a log.
@@ -92,6 +88,14 @@ public:
    * @param trace_flags the trace flags to set
    */
   virtual void SetTraceFlags(opentelemetry::trace::TraceFlags trace_flags) noexcept = 0;
+
+  /**
+   * Set instrumentation_library for this log.
+   * @param instrumentation_library the instrumentation library to set
+   */
+  virtual void SetInstrumentationLibrary(
+      const opentelemetry::sdk::instrumentationlibrary::InstrumentationLibrary
+          &instrumentation_library) noexcept = 0;
 };
 }  // namespace logs
 }  // namespace sdk
