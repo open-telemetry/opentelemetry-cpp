@@ -13,14 +13,13 @@ using MetricAttributes = opentelemetry::sdk::common::AttributeMap;
 
 /**
  * The AttributesProcessor is reponsible for customizing which
- * attributes are to be reported as metric(s) dimensions.
- * @returns  The processed attributes
  */
 
 class AttributesProcessor
 {
 public:
   // Process the metric instrument attributes.
+  // @returns The processed attributes
   virtual MetricAttributes process(
       const opentelemetry::common::KeyValueIterable &attributes) noexcept = 0;
 };
@@ -28,7 +27,6 @@ public:
 /**
  * DefaultAttributesProcessor returns copy of input instrument attributes without
  * any modification.
- *
  */
 
 class DefaultAttributesProcessor : public AttributesProcessor
@@ -44,13 +42,13 @@ class DefaultAttributesProcessor : public AttributesProcessor
 /**
  * FilteringAttributesProcessor  filters by allowed attribute names and drops any names
  * that are not in the allow list.
- *
  */
 
 class FilteringAttributesProcessor : public AttributesProcessor
 {
 public:
-  FilteringAttributesProcessor(const std::unordered_map<std::string, bool> allowed_attribute_keys)
+  FilteringAttributesProcessor(
+      const std::unordered_map<std::string, bool> allowed_attribute_keys = {})
       : allowed_attribute_keys_(std::move(allowed_attribute_keys))
   {}
 
