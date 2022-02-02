@@ -34,7 +34,7 @@ TEST(AttributesProcessor, FilteringAllAttributesProcessor)
 {
   const int kNumFilterAttributes               = 0;
   std::unordered_map<std::string, bool> filter = {};
-  const int kNumAttributes              = 6;
+  const int kNumAttributes                     = 6;
   std::string keys[kNumAttributes]      = {"attr1", "attr2", "attr3", "attr4", "attr5", "attr6"};
   int values[kNumAttributes]            = {10, 20, 30, 40, 50, 60};
   std::map<std::string, int> attributes = {{keys[0], values[0]}, {keys[1], values[1]},

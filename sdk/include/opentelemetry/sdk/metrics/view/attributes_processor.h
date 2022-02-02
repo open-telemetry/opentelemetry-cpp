@@ -13,6 +13,7 @@ using MetricAttributes = opentelemetry::sdk::common::AttributeMap;
 
 /**
  * The AttributesProcessor is reponsible for customizing which
+ * attribute(s) are to be reported as metrics dimension(s).
  */
 
 class AttributesProcessor
