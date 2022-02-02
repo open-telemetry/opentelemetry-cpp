@@ -7,7 +7,6 @@
 #include "opentelemetry/ext/http/client/http_client.h"
 #include "opentelemetry/version.h"
 
-#include <curl/curl.h>
 #include <future>
 #include <map>
 #include <regex>
@@ -16,9 +15,11 @@
 #include <vector>
 #ifdef _WIN32
 #  include <io.h>
+#  include <winsock2.h>
 #else
 #  include <unistd.h>
 #endif
+#include <curl/curl.h>
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace ext

@@ -4,6 +4,7 @@
 #pragma once
 
 #include "opentelemetry/common/key_value_iterable_view.h"
+#include "opentelemetry/common/macros.h"
 
 #include <array>
 #include <map>
@@ -18,7 +19,8 @@ namespace sdk
  * This helps to avoid constructing a new empty container every time a call is made
  * with default attributes.
  */
-static const opentelemetry::common::KeyValueIterableView<std::array<std::pair<std::string, int>, 0>>
+OPENTELEMETRY_MAYBE_UNUSED static const opentelemetry::common::KeyValueIterableView<
+    std::array<std::pair<std::string, int>, 0>>
     &GetEmptyAttributes() noexcept
 {
   static const std::array<std::pair<std::string, int>, 0> array{};

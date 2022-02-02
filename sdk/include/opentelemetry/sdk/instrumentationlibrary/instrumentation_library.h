@@ -3,6 +3,7 @@
 
 #pragma once
 
+#include <string>
 #include "opentelemetry/nostd/string_view.h"
 #include "opentelemetry/nostd/unique_ptr.h"
 #include "opentelemetry/version.h"
@@ -30,8 +31,8 @@ public:
                                                           nostd::string_view version    = "",
                                                           nostd::string_view schema_url = "")
   {
-    return nostd::unique_ptr<InstrumentationLibrary>(new InstrumentationLibrary{
-        std::string{name}, std::string{version}, std::string{schema_url}});
+    return nostd::unique_ptr<InstrumentationLibrary>(
+        new InstrumentationLibrary{name, version, schema_url});
   }
 
   /**

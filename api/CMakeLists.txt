@@ -47,8 +47,7 @@ endif()
 
 if(WITH_STL)
   message("Building with standard library types...")
-  target_compile_definitions(opentelemetry_api INTERFACE HAVE_CPP_STDLIB
-                                                         HAVE_GSL)
+  target_compile_definitions(opentelemetry_api INTERFACE HAVE_CPP_STDLIB)
 else()
   message("Building with nostd types...")
 endif()
