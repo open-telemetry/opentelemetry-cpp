@@ -18,8 +18,8 @@ TEST(AttributesProcessor, FilteringAttributesProcessor)
   std::string keys[kNumAttributes]      = {"attr1", "attr2", "attr3", "attr4", "attr5", "attr6"};
   int values[kNumAttributes]            = {10, 20, 30, 40, 50, 60};
   std::map<std::string, int> attributes = {{keys[0], values[0]}, {keys[1], values[1]},
-                                           {keys[2], values[2]}, {keys[4], values[4]},
-                                           {keys[5], values[5]}, {keys[6], values[6]}};
+                                           {keys[2], values[2]}, {keys[3], values[3]},
+                                           {keys[4], values[4]}, {keys[5], values[5]}};
   FilteringAttributesProcessor attributes_processor(filter);
   opentelemetry::common::KeyValueIterableView<std::map<std::string, int>> iterable(attributes);
   auto filtered_attributes = attributes_processor.process(iterable);
@@ -38,8 +38,8 @@ TEST(AttributesProcessor, FilteringAllAttributesProcessor)
   std::string keys[kNumAttributes]      = {"attr1", "attr2", "attr3", "attr4", "attr5", "attr6"};
   int values[kNumAttributes]            = {10, 20, 30, 40, 50, 60};
   std::map<std::string, int> attributes = {{keys[0], values[0]}, {keys[1], values[1]},
-                                           {keys[2], values[2]}, {keys[4], values[4]},
-                                           {keys[5], values[5]}, {keys[6], values[6]}};
+                                           {keys[2], values[2]}, {keys[3], values[3]},
+                                           {keys[4], values[4]}, {keys[5], values[5]}};
   FilteringAttributesProcessor attributes_processor(filter);
   opentelemetry::common::KeyValueIterableView<std::map<std::string, int>> iterable(attributes);
   auto filtered_attributes = attributes_processor.process(iterable);
