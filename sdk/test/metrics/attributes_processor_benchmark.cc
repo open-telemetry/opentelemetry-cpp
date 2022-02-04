@@ -10,9 +10,6 @@ namespace
 {
 void BM_AttributseProcessorFilter(benchmark::State &state)
 {
-
-  std::string keys[]                    = {"attr1", "attr2", "attr3", "attr4", "attr5", "attr6"};
-  int values[]                          = {10, 20, 30, 40, 50, 60};
   std::map<std::string, int> attributes = {
       {"att1", 10}, {"attr1", 20}, {"attr3", 30}, {"attr4", 40}};
   FilteringAttributesProcessor attributes_processor(

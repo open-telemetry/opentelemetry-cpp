@@ -23,13 +23,12 @@ cc_test(
     ],
 )
 
-cc_test(
+otel_cc_benchmark(
     name = "attributes_processor_benchmark",
     srcs = [
         "attributes_processor_benchmark.cc",
     ],
     deps = [
         "//sdk/src/metrics",
-        "@com_google_googletest//:gtest_main",
     ],
 )
