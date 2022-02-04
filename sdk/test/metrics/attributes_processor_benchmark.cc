@@ -1,9 +1,9 @@
 // Copyright The OpenTelemetry Authors
 // SPDX-License-Identifier: Apache-2.0
-
-#include <benchmark/benchmark.h>
-#include <map>
-#include "opentelemetry/sdk/metrics/view/attributes_processor.h"
+#ifndef ENABLE_METRICS_PREVIEW
+#  include <benchmark/benchmark.h>
+#  include <map>
+#  include "opentelemetry/sdk/metrics/view/attributes_processor.h"
 
 using namespace opentelemetry::sdk::metrics;
 namespace
@@ -26,3 +26,4 @@ BENCHMARK(BM_AttributseProcessorFilter);
 
 }  // namespace
 BENCHMARK_MAIN();
+#endif
