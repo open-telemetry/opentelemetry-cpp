@@ -9,7 +9,7 @@ namespace sdk
 {
 namespace metrics
 {
-using MetricAttributes = opentelemetry::sdk::common::AttributeMap;
+using MetricAttributes = opentelemetry::sdk::common::OrderedAttributeMap;
 
 /**
  * The AttributesProcessor is responsible for customizing which

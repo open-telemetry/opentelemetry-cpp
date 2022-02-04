@@ -20,3 +20,14 @@ cc_test(
         "@com_google_googletest//:gtest_main",
     ],
 )
+
+cc_test(
+    name = "attributes_processor_benchmark",
+    srcs = [
+        "attributes_processor_benchmark.cc",
+    ],
+    deps = [
+        "//sdk/src/metrics",
+        "@com_google_googletest//:gtest_main",
+    ],
+)

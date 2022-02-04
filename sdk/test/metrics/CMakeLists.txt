@@ -9,3 +9,7 @@ foreach(testname meter_provider_sdk_test view_registry_test
     TEST_PREFIX metrics.
     TEST_LIST ${testname})
 endforeach()
+
+add_executable(attributes_processor_benchmark attributes_processor_benchmark.cc)
+target_link_libraries(attributes_processor_benchmark benchmark::benchmark
+                      ${CMAKE_THREAD_LIBS_INIT} opentelemetry_common)
