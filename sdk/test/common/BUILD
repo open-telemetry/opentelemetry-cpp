@@ -145,5 +145,7 @@ otel_cc_benchmark(
     name = "attributemap_hash_benchmark",
     srcs = ["attributemap_hash_benchmark.cc"],
     tags = ["test"],
-    deps = ["//sdk/src/common:random"],
+    deps = [
+        "//sdk:headers",
+    ],
 )
