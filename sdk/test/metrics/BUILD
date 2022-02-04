@@ -1,3 +1,5 @@
+load("//bazel:otel_cc_benchmark.bzl", "otel_cc_benchmark")
+
 cc_test(
     name = "meter_provider_sdk_test",
     srcs = [
