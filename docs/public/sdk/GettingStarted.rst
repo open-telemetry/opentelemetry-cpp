@@ -179,7 +179,7 @@ There are two different mechanisms to create TraceProvider instance
         sdktrace::TracerProvider(std::move(simple_processor), resource, std::move(always_on_sampler));
 
     // set the global tracer TraceProvider
-    opentelemetry::trace::Provider::SetTracerProvider(provider);
+    opentelemetry::trace::Provider::SetTracerProvider(tracer_provider);
 
 
 Logging and Error Handling
