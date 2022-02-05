@@ -2,9 +2,9 @@ name: CI
 
 on:
   push:
-    branches: [ main ]
+    branches: [ ostream-metrics-exporter ]
   pull_request:
-    branches: [ main ]
+    branches: [ ostream-metrics-exporter ]
 
 jobs:
   cmake_test:
