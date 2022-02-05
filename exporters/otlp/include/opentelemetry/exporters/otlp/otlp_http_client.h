@@ -13,7 +13,6 @@
 #include "opentelemetry/ext/http/client/http_client.h"
 #include "opentelemetry/sdk/common/exporter_utils.h"
 
-#include "nlohmann/json.hpp"
 #include "opentelemetry/exporters/otlp/otlp_environment.h"
 
 #include <chrono>
@@ -89,11 +88,6 @@ struct OtlpHttpClientOptions
   {}
 };
 
-#ifdef ENABLE_TEST
-#  define VIRTUAL_TEST virtual
-#else
-#  define VIRTUAL_TEST
-#endif
 /**
  * The OTLP HTTP client exports span data in OpenTelemetry Protocol (OTLP) format.
  */
@@ -104,16 +98,13 @@ public:
    * Create an OtlpHttpClient using the given options.
    */
   explicit OtlpHttpClient(OtlpHttpClientOptions &&options);
-#ifdef ENABLE_TEST
-  VIRTUAL_TEST ~OtlpHttpClient() {}
-#endif
 
   /**
    * Export
    * @param message message to export, it should be ExportTraceServiceRequest,
    * ExportMetricsServiceRequest or ExportLogsServiceRequest
    */
-  VIRTUAL_TEST sdk::common::ExportResult Export(const google::protobuf::Message &message) noexcept;
+  sdk::common::ExportResult Export(const google::protobuf::Message &message) noexcept;
   /**
    * Shut down the HTTP client.
    * @param timeout an optional timeout, the default timeout of 0 means that no
@@ -121,12 +112,6 @@ public:
    * @return return the status of this operation
    */
   bool Shutdown(std::chrono::microseconds timeout = std::chrono::microseconds(0)) noexcept;
-
-  static void ConvertGenericMessageToJson(nlohmann::json &value,
-                                          const google::protobuf::Message &message,
-                                          const OtlpHttpClientOptions &options);
-  static bool SerializeToHttpBody(opentelemetry::ext::http::client::Body &output,
-                                  const google::protobuf::Message &message);
 
 private:
   // Stores if this HTTP client had its Shutdown() method called

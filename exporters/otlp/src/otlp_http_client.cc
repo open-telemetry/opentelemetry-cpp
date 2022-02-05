@@ -18,6 +18,7 @@
 #include "google/protobuf/message.h"
 #include "google/protobuf/reflection.h"
 #include "google/protobuf/stubs/common.h"
+#include "nlohmann/json.hpp"
 
 #if defined(GOOGLE_PROTOBUF_VERSION) && GOOGLE_PROTOBUF_VERSION >= 3007000
 #  include "google/protobuf/stubs/strutil.h"
@@ -340,9 +341,9 @@ static void ConvertListFieldToJson(nlohmann::json &value,
                                    const google::protobuf::FieldDescriptor *field_descriptor,
                                    const OtlpHttpClientOptions &options);
 
-void OtlpHttpClient::ConvertGenericMessageToJson(nlohmann::json &value,
-                                                 const google::protobuf::Message &message,
-                                                 const OtlpHttpClientOptions &options)
+static void ConvertGenericMessageToJson(nlohmann::json &value,
+                                        const google::protobuf::Message &message,
+                                        const OtlpHttpClientOptions &options)
 {
   std::vector<const google::protobuf::FieldDescriptor *> fields_with_data;
   message.GetReflection()->ListFields(message, &fields_with_data);
@@ -362,8 +363,7 @@ void OtlpHttpClient::ConvertGenericMessageToJson(nlohmann::json &value,
   }
 }
 
-bool OtlpHttpClient::SerializeToHttpBody(http_client::Body &output,
-                                         const google::protobuf::Message &message)
+bool SerializeToHttpBody(http_client::Body &output, const google::protobuf::Message &message)
 {
   auto body_size = message.ByteSizeLong();
   if (body_size > 0)
@@ -417,7 +417,7 @@ void ConvertGenericFieldToJson(nlohmann::json &value,
       break;
     }
     case google::protobuf::FieldDescriptor::CPPTYPE_MESSAGE: {
-      OtlpHttpClient::ConvertGenericMessageToJson(
+      ConvertGenericMessageToJson(
           value, message.GetReflection()->GetMessage(message, field_descriptor, nullptr), options);
       break;
     }
@@ -515,7 +515,7 @@ void ConvertListFieldToJson(nlohmann::json &value,
       for (int i = 0; i < field_size; ++i)
       {
         nlohmann::json sub_value;
-        OtlpHttpClient::ConvertGenericMessageToJson(
+        ConvertGenericMessageToJson(
             sub_value, message.GetReflection()->GetRepeatedMessage(message, field_descriptor, i),
             options);
         value.push_back(std::move(sub_value));
