@@ -127,3 +127,26 @@ cc_test(
         "@com_google_googletest//:gtest_main",
     ],
 )
+
+cc_test(
+    name = "attributemap_hash_test",
+    srcs = [
+        "attributemap_hash_test.cc",
+    ],
+    tags = ["test"],
+    deps = [
+        "//api",
+        "//sdk:headers",
+        "@com_google_googletest//:gtest_main",
+    ],
+)
+
+otel_cc_benchmark(
+    name = "attributemap_hash_benchmark",
+    srcs = ["attributemap_hash_benchmark.cc"],
+    tags = ["test"],
+    deps = [
+        "//api",
+        "//sdk:headers",
+    ],
+)

@@ -3,6 +3,7 @@
 
 #pragma once
 
+#include <map>
 #include <string>
 #include <unordered_map>
 #include <vector>
@@ -143,6 +144,56 @@ public:
 private:
   AttributeConverter converter_;
 };
+
+/**
+ * Class for storing attributes.
+ */
+class OrderedAttributeMap : public std::map<std::string, OwnedAttributeValue>
+{
+public:
+  // Contruct empty attribute map
+  OrderedAttributeMap() : std::map<std::string, OwnedAttributeValue>(){};
+
+  // Contruct attribute map and populate with attributes
+  OrderedAttributeMap(const opentelemetry::common::KeyValueIterable &attributes)
+      : OrderedAttributeMap()
+  {
+    attributes.ForEachKeyValue(
+        [&](nostd::string_view key, opentelemetry::common::AttributeValue value) noexcept {
+          SetAttribute(key, value);
+          return true;
+        });
+  }
+
+  // Construct map from initializer list by applying `SetAttribute` transform for every attribute
+  OrderedAttributeMap(
+      std::initializer_list<std::pair<nostd::string_view, opentelemetry::common::AttributeValue>>
+          attributes)
+      : OrderedAttributeMap()
+  {
+    for (auto &kv : attributes)
+    {
+      SetAttribute(kv.first, kv.second);
+    }
+  }
+
+  // Returns a reference to this map
+  const std::map<std::string, OwnedAttributeValue> &GetAttributes() const noexcept
+  {
+    return (*this);
+  }
+
+  // Convert non-owning key-value to owning std::string(key) and OwnedAttributeValue(value)
+  void SetAttribute(nostd::string_view key,
+                    const opentelemetry::common::AttributeValue &value) noexcept
+  {
+    (*this)[std::string(key)] = nostd::visit(converter_, value);
+  }
+
+private:
+  AttributeConverter converter_;
+};
+
 }  // namespace common
 }  // namespace sdk
 OPENTELEMETRY_END_NAMESPACE
