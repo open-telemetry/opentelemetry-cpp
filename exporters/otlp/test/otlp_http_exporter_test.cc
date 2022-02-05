@@ -11,6 +11,7 @@
 
 #  include "opentelemetry/exporters/otlp/protobuf_include_suffix.h"
 
+#  include "opentelemetry/ext/http/client/curl/http_client_curl.h"
 #  include "opentelemetry/ext/http/server/http_server.h"
 #  include "opentelemetry/sdk/trace/batch_span_processor.h"
 #  include "opentelemetry/sdk/trace/tracer_provider.h"
@@ -48,6 +49,7 @@ OtlpHttpClientOptions MakeOtlpHttpClientOptions(HttpRequestContentType content_t
   OtlpHttpExporterOptions options;
   options.content_type  = content_type;
   options.console_debug = true;
+  options.timeout       = std::chrono::system_clock::duration::zero();
   options.http_headers.insert(
       std::make_pair<const std::string, std::string>("Custom-Header-Key", "Custom-Header-Value"));
   OtlpHttpClientOptions otlp_http_client_options(
@@ -55,6 +57,37 @@ OtlpHttpClientOptions MakeOtlpHttpClientOptions(HttpRequestContentType content_t
       options.console_debug, options.timeout, options.http_headers);
   return otlp_http_client_options;
 }
+
+namespace http_client = opentelemetry::ext::http::client;
+
+class MockSession : public http_client::curl::Session
+{
+public:
+  MockSession(http_client::curl::HttpClient &http_client)
+      : http_client::curl::Session(http_client, "http", "", 80)
+  {}
+  MOCK_METHOD(void,
+              SendRequest,
+              (opentelemetry::ext::http::client::EventHandler &),
+              (noexcept, override));
+  bool FinishSession() noexcept override { return true; }
+};
+
+class NosendHttpClient : public http_client::curl::HttpClient
+{
+public:
+  NosendHttpClient()
+  {
+    session_ = std::shared_ptr<opentelemetry::ext::http::client::Session>{new MockSession(*this)};
+  }
+  std::shared_ptr<opentelemetry::ext::http::client::Session> CreateSession(
+      nostd::string_view url) noexcept override
+  {
+    return session_;
+  }
+
+  std::shared_ptr<opentelemetry::ext::http::client::Session> session_;
+};
 
 class OtlpHttpExporterTestPeer : public ::testing::Test
 {
@@ -69,57 +102,22 @@ public:
   {
     return exporter->options_;
   }
-};
 
-class MockOtlpHttpClient : public OtlpHttpClient
-{
-public:
-  MockOtlpHttpClient(OtlpHttpClientOptions &&options) : OtlpHttpClient(std::move(options)) {}
-  MOCK_METHOD(sdk::common::ExportResult,
-              Export,
-              (const google::protobuf::Message &),
-              (noexcept, override));
-};
-
-MockOtlpHttpClient *GetMockOtlpHttpClient(HttpRequestContentType content_type)
-{
-  return new MockOtlpHttpClient(MakeOtlpHttpClientOptions(content_type));
-}
-
-class IsValidMessageMatcher
-{
-public:
-  IsValidMessageMatcher(const std::string &trace_id) : trace_id_(trace_id) {}
-  template <typename T>
-  bool MatchAndExplain(const T &p, MatchResultListener * /* listener */) const
+  static std::pair<OtlpHttpClient *, std::shared_ptr<http_client::HttpClient>>
+  GetMockOtlpHttpClient(HttpRequestContentType content_type)
   {
-    auto otlp_http_client_options = MakeOtlpHttpClientOptions(HttpRequestContentType::kJson);
-    nlohmann::json check_json;
-    OtlpHttpClient::ConvertGenericMessageToJson(check_json, p, otlp_http_client_options);
-    auto resource_span                = *check_json["resource_spans"].begin();
-    auto instrumentation_library_span = *resource_span["instrumentation_library_spans"].begin();
-    auto span                         = *instrumentation_library_span["spans"].begin();
-    auto received_trace_id            = span["trace_id"].get<std::string>();
-    return trace_id_ == received_trace_id;
+    std::shared_ptr<http_client::HttpClient> http_client{new NosendHttpClient};
+    return {new OtlpHttpClient(MakeOtlpHttpClientOptions(content_type), http_client), http_client};
   }
-
-  void DescribeTo(std::ostream *os) const { *os << "received trace_id matches"; }
-
-  void DescribeNegationTo(std::ostream *os) const { *os << "received trace_id does not matche"; }
-
-private:
-  std::string trace_id_;
 };
-
-PolymorphicMatcher<IsValidMessageMatcher> IsValidMessage(const std::string &trace_id)
-{
-  return MakePolymorphicMatcher(IsValidMessageMatcher(trace_id));
-}
 
 // Create spans, let processor call Export()
 TEST_F(OtlpHttpExporterTestPeer, ExportJsonIntegrationTest)
 {
-  auto mock_otlp_http_client = GetMockOtlpHttpClient(HttpRequestContentType::kJson);
+  auto mock_otlp_client =
+      OtlpHttpExporterTestPeer::GetMockOtlpHttpClient(HttpRequestContentType::kJson);
+  auto mock_otlp_http_client = mock_otlp_client.first;
+  auto client                = mock_otlp_client.second;
   auto exporter              = GetExporter(std::unique_ptr<OtlpHttpClient>{mock_otlp_http_client});
 
   resource::ResourceAttributes resource_attributes = {{"service.name", "unit_test_service"},
@@ -163,9 +161,29 @@ TEST_F(OtlpHttpExporterTestPeer, ExportJsonIntegrationTest)
       .trace_id()
       .ToLowerBase16(MakeSpan(trace_id_hex));
   report_trace_id.assign(trace_id_hex, sizeof(trace_id_hex));
-  EXPECT_CALL(*mock_otlp_http_client, Export(IsValidMessage(report_trace_id)))
-      .Times(Exactly(1))
-      .WillOnce(Return(sdk::common::ExportResult::kSuccess));
+
+  auto no_send_client = std::dynamic_pointer_cast<NosendHttpClient>(client);
+  auto mock_session   = std::static_pointer_cast<MockSession>(no_send_client->session_);
+  EXPECT_CALL(*mock_session, SendRequest)
+      .WillOnce([&mock_session,
+                 report_trace_id](opentelemetry::ext::http::client::EventHandler &callback) {
+        auto check_json = nlohmann::json::parse(mock_session->GetRequest()->body_, nullptr, false);
+        auto resource_span                = *check_json["resource_spans"].begin();
+        auto instrumentation_library_span = *resource_span["instrumentation_library_spans"].begin();
+        auto span                         = *instrumentation_library_span["spans"].begin();
+        auto received_trace_id            = span["trace_id"].get<std::string>();
+        EXPECT_EQ(received_trace_id, report_trace_id);
+
+        auto custom_header = mock_session->GetRequest()->headers_.find("Custom-Header-Key");
+        ASSERT_TRUE(custom_header != mock_session->GetRequest()->headers_.end());
+        if (custom_header != mock_session->GetRequest()->headers_.end())
+        {
+          EXPECT_EQ("Custom-Header-Value", custom_header->second);
+        }
+        // let the otlp_http_client to continue
+        http_client::curl::Response response;
+        callback.OnResponse(response);
+      });
 
   child_span->End();
   parent_span->End();
@@ -174,7 +192,10 @@ TEST_F(OtlpHttpExporterTestPeer, ExportJsonIntegrationTest)
 // Create spans, let processor call Export()
 TEST_F(OtlpHttpExporterTestPeer, ExportBinaryIntegrationTest)
 {
-  auto mock_otlp_http_client = GetMockOtlpHttpClient(HttpRequestContentType::kBinary);
+  auto mock_otlp_client =
+      OtlpHttpExporterTestPeer::GetMockOtlpHttpClient(HttpRequestContentType::kBinary);
+  auto mock_otlp_http_client = mock_otlp_client.first;
+  auto client                = mock_otlp_client.second;
   auto exporter              = GetExporter(std::unique_ptr<OtlpHttpClient>{mock_otlp_http_client});
 
   resource::ResourceAttributes resource_attributes = {{"service.name", "unit_test_service"},
@@ -205,22 +226,42 @@ TEST_F(OtlpHttpExporterTestPeer, ExportBinaryIntegrationTest)
       new sdk::trace::TracerProvider(std::move(processor), resource));
 
   std::string report_trace_id;
-  char trace_id_hex[2 * trace_api::TraceId::kSize] = {0};
-  auto tracer                                      = provider->GetTracer("test");
-  auto parent_span                                 = tracer->StartSpan("Test parent span");
+
+  uint8_t trace_id_binary[trace_api::TraceId::kSize] = {0};
+  auto tracer                                        = provider->GetTracer("test");
+  auto parent_span                                   = tracer->StartSpan("Test parent span");
 
   trace_api::StartSpanOptions child_span_opts = {};
   child_span_opts.parent                      = parent_span->GetContext();
 
   auto child_span = tracer->StartSpan("Test child span", child_span_opts);
-
   nostd::get<trace_api::SpanContext>(child_span_opts.parent)
       .trace_id()
-      .ToLowerBase16(MakeSpan(trace_id_hex));
-  report_trace_id.assign(reinterpret_cast<char *>(trace_id_hex), sizeof(trace_id_hex));
-  EXPECT_CALL(*mock_otlp_http_client, Export(IsValidMessage(report_trace_id)))
-      .Times(Exactly(1))
-      .WillOnce(Return(sdk::common::ExportResult::kSuccess));
+      .CopyBytesTo(MakeSpan(trace_id_binary));
+  report_trace_id.assign(reinterpret_cast<char *>(trace_id_binary), sizeof(trace_id_binary));
+
+  auto no_send_client = std::dynamic_pointer_cast<NosendHttpClient>(client);
+  auto mock_session   = std::static_pointer_cast<MockSession>(no_send_client->session_);
+  EXPECT_CALL(*mock_session, SendRequest)
+      .WillOnce([&mock_session,
+                 report_trace_id](opentelemetry::ext::http::client::EventHandler &callback) {
+        opentelemetry::proto::collector::trace::v1::ExportTraceServiceRequest request_body;
+        request_body.ParseFromArray(&mock_session->GetRequest()->body_[0],
+                                    static_cast<int>(mock_session->GetRequest()->body_.size()));
+        auto received_trace_id =
+            request_body.resource_spans(0).instrumentation_library_spans(0).spans(0).trace_id();
+        EXPECT_EQ(received_trace_id, report_trace_id);
+
+        auto custom_header = mock_session->GetRequest()->headers_.find("Custom-Header-Key");
+        ASSERT_TRUE(custom_header != mock_session->GetRequest()->headers_.end());
+        if (custom_header != mock_session->GetRequest()->headers_.end())
+        {
+          EXPECT_EQ("Custom-Header-Value", custom_header->second);
+        }
+        // let the otlp_http_client to continue
+        http_client::curl::Response response;
+        callback.OnResponse(response);
+      });
 
   child_span->End();
   parent_span->End();

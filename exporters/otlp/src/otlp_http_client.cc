@@ -565,6 +565,11 @@ OtlpHttpClient::OtlpHttpClient(OtlpHttpClientOptions &&options)
     : options_(options), http_client_(http_client::HttpClientFactory::Create())
 {}
 
+OtlpHttpClient::OtlpHttpClient(OtlpHttpClientOptions &&options,
+                               std::shared_ptr<ext::http::client::HttpClient> http_client)
+    : options_(options), http_client_(http_client)
+{}
+
 // ----------------------------- HTTP Client methods ------------------------------
 opentelemetry::sdk::common::ExportResult OtlpHttpClient::Export(
     const google::protobuf::Message &message) noexcept

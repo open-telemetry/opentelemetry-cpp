@@ -141,6 +141,16 @@ private:
   std::string http_uri_;
   mutable opentelemetry::common::SpinLockMutex lock_;
   bool isShutdown() const noexcept;
+  // For testing
+  friend class OtlpHttpExporterTestPeer;
+  /**
+   * Create an OtlpHttpClient using the specified http client.
+   * Only tests can call this constructor directly.
+   * @param options the Otlp http client options to be used for exporting
+   * @param http_client the http client to be used for exporting
+   */
+  OtlpHttpClient(OtlpHttpClientOptions &&options,
+                 std::shared_ptr<ext::http::client::HttpClient> http_client);
 };
 }  // namespace otlp
 }  // namespace exporter
