@@ -52,7 +52,7 @@ Refer to the [ABI Policy](./docs/abi-policy.md) for more details. To summarise:
 
   * Naming:
     * `ENABLE_<SIGNAL>_PREVIEW` : For experimental release of signal api/sdks
-      eg, `METRICS_PREVIEW`, `LOGGING_PREVIEW`,
+      eg, `METRICS_PREVIEW`, `LOGS_PREVIEW`,
     * `ENABLE_<SIGNAL>_<FEATURE_NAME>_PREVIEW` : For experimental release for
       any feature within stable signal. For example, `TRACING_JAEGER_PREVIEW` to
       release the experimental Jaeger exporter for tracing.
@@ -73,8 +73,8 @@ Refer to the [ABI Policy](./docs/abi-policy.md) for more details. To summarise:
   trace signal is experimental at the time of the writing and is within `experimental_semantic_conventions.h`
 
 * Code under the "*::detail" namespace implements internal details,
-  and NOT part of public interface. Also, any API not documented in the [public
-  documentation](https://opentelemetry-cpp.readthedocs.io/en/latest/) is NOT part of public interface.
+  and is NOT part of public interface. Also, any API not documented in the [public
+  documentation](https://opentelemetry-cpp.readthedocs.io/en/latest/) is NOT part of the public interface.
 
 * GitHub releases will be made for all released versions.
 
