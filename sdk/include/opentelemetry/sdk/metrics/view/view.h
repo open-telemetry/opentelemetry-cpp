@@ -4,7 +4,7 @@
 #pragma once
 #ifndef ENABLE_METRICS_PREVIEW
 #  include "opentelemetry/nostd/string_view.h"
-#  include "opentelemetry/sdk/metrics/view/aggregation.h"
+#  include "opentelemetry/sdk/metrics/aggregation/default_aggregation.h"
 #  include "opentelemetry/sdk/metrics/view/attributes_processor.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
@@ -23,8 +23,7 @@ public:
   View(const std::string &name,
        const std::string &description = "",
        std::unique_ptr<opentelemetry::sdk::metrics::Aggregation> aggregation =
-           std::unique_ptr<opentelemetry::sdk::metrics::Aggregation>(
-               new opentelemetry::sdk::metrics::DefaultAggregation()),
+           std::unique_ptr<opentelemetry::sdk::metrics::Aggregation>(new DropAggregation()),
        std::unique_ptr<opentelemetry::sdk::metrics::AttributesProcessor> attributes_processor =
            std::unique_ptr<opentelemetry::sdk::metrics::AttributesProcessor>(
                new opentelemetry::sdk::metrics::DefaultAttributesProcessor()))

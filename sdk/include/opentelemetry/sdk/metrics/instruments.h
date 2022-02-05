@@ -33,7 +33,7 @@ struct InstrumentDescriptor
   std::string description_;
   std::string unit_;
   InstrumentType type_;
-  InstrumentValueType valueType_;
+  InstrumentValueType value_type_;
 };
 
 /*class InstrumentSelector {
