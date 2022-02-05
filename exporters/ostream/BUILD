@@ -29,7 +29,7 @@ cc_test(
 )
 
 cc_library(
-    name = "ostream_metrics_exporter_deprecated",
+    name = "ostream_metrics_exporter",
     srcs = [
         "src/metrics_exporter.cc",
     ],
@@ -39,7 +39,7 @@ cc_library(
     strip_include_prefix = "include",
     tags = ["ostream"],
     deps = [
-        "//sdk/src/_metrics:metrics_deprecated",
+        "//sdk/src/metrics",
     ],
 )
 

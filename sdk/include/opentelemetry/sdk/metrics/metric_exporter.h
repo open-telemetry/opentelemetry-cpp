@@ -4,6 +4,8 @@
 #pragma once
 #ifndef ENABLE_METRICS_PREVIEW
 #  include <chrono>
+#  include <memory>
+#  include "opentelemetry/nostd/span.h"
 #  include "opentelemetry/sdk/common/exporter_utils.h"
 #  include "opentelemetry/sdk/metrics/recordable.h"
 #  include "opentelemetry/version.h"
@@ -42,7 +44,8 @@ public:
    * @param timeout an optional timeout.
    * @return return the status of the operation.
    */
-  virtual bool Shutdown() noexcept = 0;
+  virtual bool Shutdown(
+      std::chrono::microseconds timeout = std::chrono::microseconds(0)) noexcept = 0;
 };
 }  // namespace metrics
 }  // namespace sdk
