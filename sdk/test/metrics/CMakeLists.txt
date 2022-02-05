@@ -1,4 +1,3 @@
-
 foreach(testname meter_provider_sdk_test view_registry_test aggregation_test
                  attributes_processor_test)
   add_executable(${testname} "${testname}.cc")
