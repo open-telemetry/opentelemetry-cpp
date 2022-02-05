@@ -266,8 +266,6 @@ private:
   bool console_debug_ = false;
 };
 
-}  // namespace
-
 static inline char HexEncode(unsigned char byte)
 {
 #if defined(HAVE_GSL)
@@ -560,6 +558,8 @@ void ConvertListFieldToJson(nlohmann::json &value,
     }
   }
 }
+
+}  // namespace
 
 OtlpHttpClient::OtlpHttpClient(OtlpHttpClientOptions &&options)
     : options_(options), http_client_(http_client::HttpClientFactory::Create())

@@ -105,6 +105,7 @@ public:
    * ExportMetricsServiceRequest or ExportLogsServiceRequest
    */
   sdk::common::ExportResult Export(const google::protobuf::Message &message) noexcept;
+
   /**
    * Shut down the HTTP client.
    * @param timeout an optional timeout, the default timeout of 0 means that no
