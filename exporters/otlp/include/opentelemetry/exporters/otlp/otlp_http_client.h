@@ -143,6 +143,7 @@ private:
   bool isShutdown() const noexcept;
   // For testing
   friend class OtlpHttpExporterTestPeer;
+  friend class OtlpHttpLogExporterTestPeer;
   /**
    * Create an OtlpHttpClient using the specified http client.
    * Only tests can call this constructor directly.

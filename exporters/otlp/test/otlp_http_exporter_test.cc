@@ -162,7 +162,7 @@ TEST_F(OtlpHttpExporterTestPeer, ExportJsonIntegrationTest)
       .ToLowerBase16(MakeSpan(trace_id_hex));
   report_trace_id.assign(trace_id_hex, sizeof(trace_id_hex));
 
-  auto no_send_client = std::dynamic_pointer_cast<NosendHttpClient>(client);
+  auto no_send_client = std::static_pointer_cast<NosendHttpClient>(client);
   auto mock_session   = std::static_pointer_cast<MockSession>(no_send_client->session_);
   EXPECT_CALL(*mock_session, SendRequest)
       .WillOnce([&mock_session,
@@ -240,7 +240,7 @@ TEST_F(OtlpHttpExporterTestPeer, ExportBinaryIntegrationTest)
       .CopyBytesTo(MakeSpan(trace_id_binary));
   report_trace_id.assign(reinterpret_cast<char *>(trace_id_binary), sizeof(trace_id_binary));
 
-  auto no_send_client = std::dynamic_pointer_cast<NosendHttpClient>(client);
+  auto no_send_client = std::static_pointer_cast<NosendHttpClient>(client);
   auto mock_session   = std::static_pointer_cast<MockSession>(no_send_client->session_);
   EXPECT_CALL(*mock_session, SendRequest)
       .WillOnce([&mock_session,

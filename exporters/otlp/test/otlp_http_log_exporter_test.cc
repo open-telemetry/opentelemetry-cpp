@@ -13,6 +13,7 @@
 #    include "opentelemetry/exporters/otlp/protobuf_include_suffix.h"
 
 #    include "opentelemetry/common/key_value_iterable_view.h"
+#    include "opentelemetry/ext/http/client/curl/http_client_curl.h"
 #    include "opentelemetry/ext/http/server/http_server.h"
 #    include "opentelemetry/logs/provider.h"
 #    include "opentelemetry/sdk/logs/batch_log_processor.h"
@@ -59,6 +60,37 @@ OtlpHttpClientOptions MakeOtlpHttpClientOptions(HttpRequestContentType content_t
   return otlp_http_client_options;
 }
 
+namespace http_client = opentelemetry::ext::http::client;
+
+class MockSession : public http_client::curl::Session
+{
+public:
+  MockSession(http_client::curl::HttpClient &http_client)
+      : http_client::curl::Session(http_client, "http", "", 80)
+  {}
+  MOCK_METHOD(void,
+              SendRequest,
+              (opentelemetry::ext::http::client::EventHandler &),
+              (noexcept, override));
+  bool FinishSession() noexcept override { return true; }
+};
+
+class NosendHttpClient : public http_client::curl::HttpClient
+{
+public:
+  NosendHttpClient()
+  {
+    session_ = std::shared_ptr<opentelemetry::ext::http::client::Session>{new MockSession(*this)};
+  }
+  std::shared_ptr<opentelemetry::ext::http::client::Session> CreateSession(
+      nostd::string_view url) noexcept override
+  {
+    return session_;
+  }
+
+  std::shared_ptr<opentelemetry::ext::http::client::Session> session_;
+};
+
 class OtlpHttpLogExporterTestPeer : public ::testing::Test
 {
 public:
@@ -72,77 +104,21 @@ public:
   {
     return exporter->options_;
   }
-};
-
-class MockOtlpHttpClient : public OtlpHttpClient
-{
-public:
-  MockOtlpHttpClient(OtlpHttpClientOptions &&options) : OtlpHttpClient(std::move(options)) {}
-  MOCK_METHOD(sdk::common::ExportResult,
-              Export,
-              (const google::protobuf::Message &),
-              (noexcept, override));
-};
-
-MockOtlpHttpClient *GetMockOtlpHttpClient(HttpRequestContentType content_type)
-{
-  return new MockOtlpHttpClient(MakeOtlpHttpClientOptions(content_type));
-}
-
-class IsValidMessageMatcher
-{
-public:
-  IsValidMessageMatcher(const std::string &trace_id, const std::string &span_id)
-      : trace_id_(trace_id), span_id_(span_id)
-  {}
-  template <typename T>
-  bool MatchAndExplain(const T &p, MatchResultListener *) const
+  static std::pair<OtlpHttpClient *, std::shared_ptr<http_client::HttpClient>>
+  GetMockOtlpHttpClient(HttpRequestContentType content_type)
   {
-    auto otlp_http_client_options = MakeOtlpHttpClientOptions(HttpRequestContentType::kJson);
-    nlohmann::json check_json;
-    OtlpHttpClient::ConvertGenericMessageToJson(check_json, p, otlp_http_client_options);
-    auto resource_span                = *check_json["resource_logs"].begin();
-    auto instrumentation_library_span = *resource_span["instrumentation_library_logs"].begin();
-    auto log                          = *instrumentation_library_span["logs"].begin();
-    auto received_trace_id            = log["trace_id"].get<std::string>();
-    auto received_span_id             = log["span_id"].get<std::string>();
-    bool is_ok                        = trace_id_ == received_trace_id;
-    is_ok &= span_id_ == received_span_id;
-    is_ok &= "Log name" == log["name"].get<std::string>();
-    is_ok &= "Log message" == log["body"]["string_value"].get<std::string>();
-    is_ok &= 15 <= log["attributes"].size();
-    bool check_service_name = false;
-    for (auto attribute : log["attributes"])
-    {
-      if ("service.name" == attribute["key"].get<std::string>())
-      {
-        check_service_name = true;
-        EXPECT_EQ("unit_test_service", attribute["value"]["string_value"].get<std::string>());
-      }
-    }
-    is_ok &= check_service_name;
-    return is_ok;
+    std::shared_ptr<http_client::HttpClient> http_client{new NosendHttpClient};
+    return {new OtlpHttpClient(MakeOtlpHttpClientOptions(content_type), http_client), http_client};
   }
-
-  void DescribeTo(std::ostream *os) const { *os << "received trace_id matches"; }
-
-  void DescribeNegationTo(std::ostream *os) const { *os << "received trace_id does not matche"; }
-
-private:
-  std::string trace_id_;
-  std::string span_id_;
 };
-
-PolymorphicMatcher<IsValidMessageMatcher> IsValidMessage(const std::string &trace_id,
-                                                         const std::string &span_id)
-{
-  return MakePolymorphicMatcher(IsValidMessageMatcher(trace_id, span_id));
-}
 
 // Create log records, let processor call Export()
 TEST_F(OtlpHttpLogExporterTestPeer, ExportJsonIntegrationTest)
 {
-  auto mock_otlp_http_client = GetMockOtlpHttpClient(HttpRequestContentType::kJson);
+  auto mock_otlp_client =
+      OtlpHttpLogExporterTestPeer::GetMockOtlpHttpClient(HttpRequestContentType::kJson);
+  auto mock_otlp_http_client = mock_otlp_client.first;
+  auto client                = mock_otlp_client.second;
   auto exporter              = GetExporter(std::unique_ptr<OtlpHttpClient>{mock_otlp_http_client});
 
   bool attribute_storage_bool_value[]          = {true, false, true};
@@ -196,15 +172,41 @@ TEST_F(OtlpHttpLogExporterTestPeer, ExportJsonIntegrationTest)
   span_id.ToLowerBase16(MakeSpan(span_id_hex));
   report_span_id.assign(span_id_hex, sizeof(span_id_hex));
 
-  EXPECT_CALL(*mock_otlp_http_client, Export(IsValidMessage(report_trace_id, report_span_id)))
-      .Times(Exactly(1))
-      .WillOnce(Return(sdk::common::ExportResult::kSuccess));
+  auto no_send_client = std::static_pointer_cast<NosendHttpClient>(client);
+  auto mock_session   = std::static_pointer_cast<MockSession>(no_send_client->session_);
+  EXPECT_CALL(*mock_session, SendRequest)
+      .WillOnce([&mock_session, report_trace_id,
+                 report_span_id](opentelemetry::ext::http::client::EventHandler &callback) {
+        auto check_json = nlohmann::json::parse(mock_session->GetRequest()->body_, nullptr, false);
+        auto resource_logs                = *check_json["resource_logs"].begin();
+        auto instrumentation_library_span = *resource_logs["instrumentation_library_logs"].begin();
+        auto log                          = *instrumentation_library_span["logs"].begin();
+        auto received_trace_id            = log["trace_id"].get<std::string>();
+        auto received_span_id             = log["span_id"].get<std::string>();
+        EXPECT_EQ(received_trace_id, report_trace_id);
+        EXPECT_EQ(received_span_id, report_span_id);
+        EXPECT_EQ("Log name", log["name"].get<std::string>());
+        EXPECT_EQ("Log message", log["body"]["string_value"].get<std::string>());
+        EXPECT_LE(15, log["attributes"].size());
+        auto custom_header = mock_session->GetRequest()->headers_.find("Custom-Header-Key");
+        ASSERT_TRUE(custom_header != mock_session->GetRequest()->headers_.end());
+        if (custom_header != mock_session->GetRequest()->headers_.end())
+        {
+          EXPECT_EQ("Custom-Header-Value", custom_header->second);
+        }
+        // let the otlp_http_client to continue
+        http_client::curl::Response response;
+        callback.OnResponse(response);
+      });
 }
 
 // Create log records, let processor call Export()
 TEST_F(OtlpHttpLogExporterTestPeer, ExportBinaryIntegrationTest)
 {
-  auto mock_otlp_http_client = GetMockOtlpHttpClient(HttpRequestContentType::kJson);
+  auto mock_otlp_client =
+      OtlpHttpLogExporterTestPeer::GetMockOtlpHttpClient(HttpRequestContentType::kBinary);
+  auto mock_otlp_http_client = mock_otlp_client.first;
+  auto client                = mock_otlp_client.second;
   auto exporter              = GetExporter(std::unique_ptr<OtlpHttpClient>{mock_otlp_http_client});
 
   bool attribute_storage_bool_value[]          = {true, false, true};
@@ -223,11 +225,9 @@ TEST_F(OtlpHttpLogExporterTestPeer, ExportBinaryIntegrationTest)
   std::string report_span_id;
   uint8_t trace_id_bin[opentelemetry::trace::TraceId::kSize] = {
       '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b', 'c', 'd', 'e', 'f'};
-  char trace_id_hex[2 * opentelemetry::trace::TraceId::kSize] = {0};
   opentelemetry::trace::TraceId trace_id{trace_id_bin};
-  uint8_t span_id_bin[opentelemetry::trace::SpanId::kSize]  = {'7', '6', '5', '4',
+  uint8_t span_id_bin[opentelemetry::trace::SpanId::kSize] = {'7', '6', '5', '4',
                                                               '3', '2', '1', '0'};
-  char span_id_hex[2 * opentelemetry::trace::SpanId::kSize] = {0};
   opentelemetry::trace::SpanId span_id{span_id_bin};
 
   const std::string schema_url{"https://opentelemetry.io/schemas/1.2.0"};
@@ -252,15 +252,36 @@ TEST_F(OtlpHttpLogExporterTestPeer, ExportBinaryIntegrationTest)
               opentelemetry::trace::TraceFlags{opentelemetry::trace::TraceFlags::kIsSampled},
               std::chrono::system_clock::now());
 
-  trace_id.ToLowerBase16(MakeSpan(trace_id_hex));
-  report_trace_id.assign(trace_id_hex, sizeof(trace_id_hex));
+  report_trace_id.assign(reinterpret_cast<const char *>(trace_id_bin), sizeof(trace_id_bin));
+  report_span_id.assign(reinterpret_cast<const char *>(span_id_bin), sizeof(span_id_bin));
 
-  span_id.ToLowerBase16(MakeSpan(span_id_hex));
-  report_span_id.assign(span_id_hex, sizeof(span_id_hex));
-
-  EXPECT_CALL(*mock_otlp_http_client, Export(IsValidMessage(report_trace_id, report_span_id)))
-      .Times(Exactly(1))
-      .WillOnce(Return(sdk::common::ExportResult::kSuccess));
+  auto no_send_client = std::static_pointer_cast<NosendHttpClient>(client);
+  auto mock_session   = std::static_pointer_cast<MockSession>(no_send_client->session_);
+  EXPECT_CALL(*mock_session, SendRequest)
+      .WillOnce([&mock_session, report_trace_id,
+                 report_span_id](opentelemetry::ext::http::client::EventHandler &callback) {
+        opentelemetry::proto::collector::logs::v1::ExportLogsServiceRequest request_body;
+        request_body.ParseFromArray(&mock_session->GetRequest()->body_[0],
+                                    static_cast<int>(mock_session->GetRequest()->body_.size()));
+        auto received_log = request_body.resource_logs(0).instrumentation_library_logs(0).logs(0);
+        EXPECT_EQ(received_log.trace_id(), report_trace_id);
+        EXPECT_EQ(received_log.span_id(), report_span_id);
+        EXPECT_EQ("Log name", received_log.name());
+        EXPECT_EQ("Log message", received_log.body().string_value());
+        EXPECT_LE(15, received_log.attributes_size());
+        bool check_service_name = false;
+        for (auto &attribute : received_log.attributes())
+        {
+          if ("service.name" == attribute.key())
+          {
+            check_service_name = true;
+            EXPECT_EQ("unit_test_service", attribute.value().string_value());
+          }
+        }
+        ASSERT_TRUE(check_service_name);
+        http_client::curl::Response response;
+        callback.OnResponse(response);
+      });
 }
 
 // Test exporter configuration options
