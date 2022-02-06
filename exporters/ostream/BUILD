@@ -29,7 +29,22 @@ cc_test(
 )
 
 cc_library(
-    name = "ostream_metrics_exporter",
+    name = "ostream_metrics_exporter_deprecated",
+    srcs = [
+        "src/metrics_exporter.cc",
+    ],
+    hdrs = [
+        "include/opentelemetry/exporters/ostream/metrics_exporter.h",
+    ],
+    strip_include_prefix = "include",
+    tags = ["ostream"],
+    deps = [
+        "//sdk/src/_metrics:metrics_deprecated",
+    ],
+)
+
+cc_library(
+    name = "ostream_metric_exporter",
     srcs = [
         "src/metrics_exporter.cc",
     ],
