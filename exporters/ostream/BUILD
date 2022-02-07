@@ -62,6 +62,19 @@ cc_library(
 )
 
 cc_test(
+    name = "ostream_metric_test",
+    srcs = ["test/ostream_metric_test.cc"],
+    tags = [
+        "ostream",
+        "test",
+    ],
+    deps = [
+        ":ostream_metric_exporter",
+        "@com_google_googletest//:gtest_main",
+    ],
+)
+
+cc_test(
     name = "ostream_metrics_test_deprecated",
     srcs = ["test/ostream_metrics_test.cc"],
     tags = [
