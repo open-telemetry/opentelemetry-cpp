@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 #ifndef ENABLE_METRICS_PREVIEW
-#  include "opentelemetry/exporters/ostream/metrics_exporter.h"
+#  include "opentelemetry/exporters/ostream/metric_exporter.h"
 #  include "opentelemetry/sdk/metrics/aggregation/default_aggregation.h"
 #  include "opentelemetry/sdk/metrics/aggregation/histogram_aggregation.h"
 #  include "opentelemetry/sdk_config.h"
@@ -32,6 +32,12 @@ sdk::common::ExportResult OStreamMetricExporter::Export(
     sout_ << "\n}\n";
   }
   return sdk::common::ExportResult::kSuccess;
+}
+
+bool OStreamMetricExporter::ForceFlush(std::chrono::microseconds timeout) noexcept
+{
+  const std::lock_guard<opentelemetry::common::SpinLockMutex> locked(lock_);
+  return true;
 }
 
 bool OStreamMetricExporter::Shutdown(std::chrono::microseconds timeout) noexcept

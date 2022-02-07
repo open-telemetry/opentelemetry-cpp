@@ -41,6 +41,12 @@ public:
       override;
 
   /**
+   * Force flush the exporter.
+   */
+  bool ForceFlush(
+      std::chrono::microseconds timeout = (std::chrono::microseconds::max)()) noexcept override;
+
+  /**
    * Shut down the exporter.
    * @param timeout an optional timeout, the default timeout of 0 means that no
    * timeout is applied.

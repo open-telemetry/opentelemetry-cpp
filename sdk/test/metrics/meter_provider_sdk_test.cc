@@ -27,7 +27,10 @@ public:
     return true;
   }
 
-  bool Shutdown() noexcept override { return true; }
+  bool Shutdown(std::chrono::microseconds timeout = std::chrono::microseconds(0)) noexcept override
+  {
+    return true;
+  }
 };
 
 class MockMetricReader : public MetricReader
