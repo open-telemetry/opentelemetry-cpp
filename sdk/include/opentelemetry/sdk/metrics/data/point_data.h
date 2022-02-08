@@ -5,7 +5,7 @@
 #ifndef ENABLE_METRICS_PREVIEW
 #  include "opentelemetry/common/timestamp.h"
 #  include "opentelemetry/nostd/variant.h"
-#include "opentelemetry/sdk/metrics/instruments.h"
+#  include "opentelemetry/sdk/metrics/instruments.h"
 #  include "opentelemetry/version.h"
 
 #  include <vector>

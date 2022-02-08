@@ -17,7 +17,7 @@ namespace sdk
 namespace metrics
 {
 
-using PointType       = opentelemetry::nostd::
+using PointType = opentelemetry::nostd::
     variant<SumPointData, HistogramPointData, LastValuePointData, DropPointData>;
 
 class MetricData

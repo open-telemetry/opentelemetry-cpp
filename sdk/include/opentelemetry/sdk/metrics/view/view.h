@@ -21,7 +21,7 @@ class View
 {
 public:
   View(const std::string &name,
-       const std::string &description = "",
+       const std::string &description   = "",
        AggregationType aggregation_type = AggregationType::kDefault,
        std::unique_ptr<opentelemetry::sdk::metrics::AttributesProcessor> attributes_processor =
            std::unique_ptr<opentelemetry::sdk::metrics::AttributesProcessor>(
@@ -36,10 +36,7 @@ public:
 
   virtual std::string GetDescription() const noexcept { return description_; }
 
-  virtual const AggregationType &GetAggregationType() const noexcept
-  {
-    return aggregation_type_;
-  }
+  virtual const AggregationType &GetAggregationType() const noexcept { return aggregation_type_; }
 
   virtual const opentelemetry::sdk::metrics::AttributesProcessor &GetAttributesProcessor()
       const noexcept
