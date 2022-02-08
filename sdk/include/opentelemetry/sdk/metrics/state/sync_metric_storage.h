@@ -54,11 +54,19 @@ public:
   bool Collect(AggregationTemporarily aggregation_temporarily,
                nostd::function_ref<bool(MetricData)> callback) noexcept override
   {
-    if (callback(MetricData()))
+    /**
+     * This is placeholder while implementation is complete.
+     * In a real scenario (once fully implemented), Collect may generate more than
+     * metric data
+     */
+    // while(there is metric data) {
+    MetricData metric_data;  // fetch next metric data
+    if (!callback(metric_data))
     {
-      return true;
+      return false;
     }
-    return false;
+    // } //while
+    return true;
   }
 };
 

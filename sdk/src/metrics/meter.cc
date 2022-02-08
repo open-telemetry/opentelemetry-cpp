@@ -25,7 +25,6 @@ Meter::Meter(std::shared_ptr<MeterContext> context,
              std::unique_ptr<sdk::instrumentationlibrary::InstrumentationLibrary>
                  instrumentation_library) noexcept
     : context_{context}, instrumentation_library_{std::move(instrumentation_library)}
-
 {}
 
 nostd::shared_ptr<metrics::Counter<long>> Meter::CreateLongCounter(nostd::string_view name,

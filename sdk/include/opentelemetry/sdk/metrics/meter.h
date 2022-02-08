@@ -98,7 +98,7 @@ public:
   const sdk::instrumentationlibrary::InstrumentationLibrary *GetInstrumentationLibrary()
       const noexcept;
 
-  /** Returns the associated instruementation library */
+  /** Returns the associated measurement processor */
   MeasurementProcessor *GetMeasurementProcessor() const noexcept;
 
 private:
