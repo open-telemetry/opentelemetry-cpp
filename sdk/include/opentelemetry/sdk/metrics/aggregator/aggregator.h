@@ -3,17 +3,15 @@
 
 #pragma once
 #ifndef ENABLE_METRICS_PREVIEW
+#  include "opentelemetry/sdk/metrics/aggregation/aggregation.h"
 #  include "opentelemetry/version.h"
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace sdk
 {
 namespace metrics
 {
-
 class Aggregator
-{
-  // TBD
-};
+{};
 
 class NoOpAggregator : public Aggregator
 {
