@@ -18,9 +18,9 @@ class LongLastValueAggregation : public Aggregation
 public:
   LongLastValueAggregation();
 
-  void Aggregate(long value, const PointAttributes &attributes = {}) noexcept override;
+  void Aggregate(long value) noexcept override;
 
-  void Aggregate(double value, const PointAttributes &attributes = {}) noexcept override {}
+  void Aggregate(double value) noexcept override {}
 
   PointType Collect() noexcept override;
 
@@ -35,9 +35,9 @@ class DoubleLastValueAggregation : public Aggregation
 public:
   DoubleLastValueAggregation();
 
-  void Aggregate(long value, const PointAttributes &attributes = {}) noexcept override {}
+  void Aggregate(long value) noexcept override {}
 
-  void Aggregate(double value, const PointAttributes &attributes = {}) noexcept override;
+  void Aggregate(double value) noexcept override;
 
   PointType Collect() noexcept override;
 

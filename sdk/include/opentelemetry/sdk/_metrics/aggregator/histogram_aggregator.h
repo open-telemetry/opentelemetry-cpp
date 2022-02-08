@@ -9,6 +9,7 @@
 #  include <stdexcept>
 #  include <vector>
 #  include "opentelemetry/_metrics/instrument.h"
+# include "opentelemetry/sdk/metrics/"
 #  include "opentelemetry/sdk/_metrics/aggregator/aggregator.h"
 #  include "opentelemetry/version.h"
 

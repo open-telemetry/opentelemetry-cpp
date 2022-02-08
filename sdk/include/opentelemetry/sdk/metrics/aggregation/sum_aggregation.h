@@ -33,9 +33,9 @@ class LongSumAggregation : public Aggregation, InstrumentMonotonicityAwareAggreg
 public:
   LongSumAggregation(bool is_monotonic);
 
-  void Aggregate(long value, const PointAttributes &attributes = {}) noexcept override;
+  void Aggregate(long value) noexcept override;
 
-  void Aggregate(double value, const PointAttributes &attributes = {}) noexcept override {}
+  void Aggregate(double value) noexcept override {}
 
   PointType Collect() noexcept override;
 
@@ -50,9 +50,9 @@ class DoubleSumAggregation : public Aggregation, InstrumentMonotonicityAwareAggr
 public:
   DoubleSumAggregation(bool is_monotonic);
 
-  void Aggregate(long value, const PointAttributes &attributes = {}) noexcept override {}
+  void Aggregate(long value) noexcept override {}
 
-  void Aggregate(double value, const PointAttributes &attributes = {}) noexcept override;
+  void Aggregate(double value) noexcept override;
 
   PointType Collect() noexcept override;
 

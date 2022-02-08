@@ -17,7 +17,6 @@ namespace sdk
 namespace metrics
 {
 
-using PointAttributes = opentelemetry::sdk::common::AttributeMap;
 using PointType       = opentelemetry::nostd::
     variant<SumPointData, HistogramPointData, LastValuePointData, DropPointData>;
 
@@ -26,7 +25,7 @@ class MetricData
 public:
   opentelemetry::sdk::resource::Resource *resource_;
   opentelemetry::sdk::instrumentationlibrary::InstrumentationLibrary *instrumentation_library_;
-  PointAttributes attributes_;
+  MetricAttributes attributes_;
   InstrumentDescriptor instrument_descriptor;
   PointType point_data_;
 };

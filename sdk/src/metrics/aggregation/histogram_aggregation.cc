@@ -19,7 +19,7 @@ LongHistogramAggregation::LongHistogramAggregation()
       count_(0)
 {}
 
-void LongHistogramAggregation::Aggregate(long value, const PointAttributes &attributes) noexcept
+void LongHistogramAggregation::Aggregate(long value) noexcept
 {
   const std::lock_guard<opentelemetry::common::SpinLockMutex> locked(lock_);
   count_ += 1;
@@ -50,7 +50,7 @@ DoubleHistogramAggregation::DoubleHistogramAggregation()
       count_(0)
 {}
 
-void DoubleHistogramAggregation::Aggregate(double value, const PointAttributes &attributes) noexcept
+void DoubleHistogramAggregation::Aggregate(double value) noexcept
 {
   const std::lock_guard<opentelemetry::common::SpinLockMutex> locked(lock_);
   count_ += 1;

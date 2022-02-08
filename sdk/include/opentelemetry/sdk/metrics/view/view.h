@@ -4,7 +4,7 @@
 #pragma once
 #ifndef ENABLE_METRICS_PREVIEW
 #  include "opentelemetry/nostd/string_view.h"
-#  include "opentelemetry/sdk/metrics/aggregation/default_aggregation.h"
+#  include "opentelemetry/sdk/metrics/instruments.h"
 #  include "opentelemetry/sdk/metrics/view/attributes_processor.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
@@ -22,14 +22,13 @@ class View
 public:
   View(const std::string &name,
        const std::string &description = "",
-       std::unique_ptr<opentelemetry::sdk::metrics::Aggregation> aggregation =
-           std::unique_ptr<opentelemetry::sdk::metrics::Aggregation>(new DropAggregation()),
+       AggregationType aggregation_type = AggregationType::kDefault,
        std::unique_ptr<opentelemetry::sdk::metrics::AttributesProcessor> attributes_processor =
            std::unique_ptr<opentelemetry::sdk::metrics::AttributesProcessor>(
                new opentelemetry::sdk::metrics::DefaultAttributesProcessor()))
       : name_(name),
         description_(description),
-        aggregation_{std::move(aggregation)},
+        aggregation_type_{aggregation_type},
         attributes_processor_{std::move(attributes_processor)}
   {}
 
@@ -37,9 +36,9 @@ public:
 
   virtual std::string GetDescription() const noexcept { return description_; }
 
-  virtual const opentelemetry::sdk::metrics::Aggregation &GetAggregation() const noexcept
+  virtual const AggregationType &GetAggregationType() const noexcept
   {
-    return *aggregation_.get();
+    return aggregation_type_;
   }
 
   virtual const opentelemetry::sdk::metrics::AttributesProcessor &GetAttributesProcessor()
@@ -51,7 +50,7 @@ public:
 private:
   std::string name_;
   std::string description_;
-  std::unique_ptr<opentelemetry::sdk::metrics::Aggregation> aggregation_;
+  AggregationType aggregation_type_;
   std::unique_ptr<opentelemetry::sdk::metrics::AttributesProcessor> attributes_processor_;
 };
 }  // namespace metrics

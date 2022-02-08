@@ -6,6 +6,7 @@
 #  include "opentelemetry/sdk/instrumentationlibrary/instrumentation_library.h"
 #  include "opentelemetry/sdk/metrics/instruments.h"
 #  include "opentelemetry/sdk/metrics/view/predicate.h"
+#include "opentelemetry/sdk/metrics/state/sync_metric_storage.h"
 
 #  include <gtest/gtest.h>
 

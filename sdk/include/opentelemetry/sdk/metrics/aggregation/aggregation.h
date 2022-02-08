@@ -24,9 +24,9 @@ private:
 class Aggregation
 {
 public:
-  virtual void Aggregate(long value, const PointAttributes &attributes = {}) noexcept = 0;
+  virtual void Aggregate(long value) noexcept = 0;
 
-  virtual void Aggregate(double value, const PointAttributes &attributes = {}) noexcept = 0;
+  virtual void Aggregate(double value) noexcept = 0;
 
   virtual PointType Collect() noexcept = 0;
 };

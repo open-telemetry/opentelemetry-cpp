@@ -5,6 +5,7 @@
 #ifndef ENABLE_METRICS_PREVIEW
 #  include "opentelemetry/common/timestamp.h"
 #  include "opentelemetry/nostd/variant.h"
+#include "opentelemetry/sdk/metrics/instruments.h"
 #  include "opentelemetry/version.h"
 
 #  include <vector>
@@ -17,13 +18,6 @@ namespace metrics
 
 using ValueType = nostd::variant<long, double>;
 using ListType  = nostd::variant<std::vector<long>, std::vector<double>>;
-
-enum class AggregationTemporarily
-{
-  kUnspecified,
-  kDelta,
-  kCummulative
-};
 
 class SumPointData
 {

@@ -33,9 +33,9 @@ class LongHistogramAggregation : public Aggregation
 public:
   LongHistogramAggregation();
 
-  void Aggregate(long value, const PointAttributes &attributes = {}) noexcept override;
+  void Aggregate(long value) noexcept override;
 
-  void Aggregate(double value, const PointAttributes &attributes = {}) noexcept override {}
+  void Aggregate(double value) noexcept override {}
 
   PointType Collect() noexcept override;
 
@@ -52,9 +52,9 @@ class DoubleHistogramAggregation : public Aggregation
 public:
   DoubleHistogramAggregation();
 
-  void Aggregate(long value, const PointAttributes &attributes = {}) noexcept override {}
+  void Aggregate(long value) noexcept override {}
 
-  void Aggregate(double value, const PointAttributes &attributes = {}) noexcept override;
+  void Aggregate(double value) noexcept override;
 
   PointType Collect() noexcept override;
 

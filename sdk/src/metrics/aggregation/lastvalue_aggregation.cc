@@ -16,7 +16,7 @@ namespace metrics
 
 LongLastValueAggregation::LongLastValueAggregation() : is_lastvalue_valid_(false) {}
 
-void LongLastValueAggregation::Aggregate(long value, const PointAttributes &attributes) noexcept
+void LongLastValueAggregation::Aggregate(long value) noexcept
 {
   const std::lock_guard<opentelemetry::common::SpinLockMutex> locked(lock_);
   is_lastvalue_valid_ = true;
@@ -37,7 +37,7 @@ PointType LongLastValueAggregation::Collect() noexcept
 
 DoubleLastValueAggregation::DoubleLastValueAggregation() : is_lastvalue_valid_(false) {}
 
-void DoubleLastValueAggregation::Aggregate(double value, const PointAttributes &attributes) noexcept
+void DoubleLastValueAggregation::Aggregate(double value) noexcept
 {
   const std::lock_guard<opentelemetry::common::SpinLockMutex> locked(lock_);
   is_lastvalue_valid_ = true;

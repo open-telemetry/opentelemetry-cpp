@@ -19,7 +19,7 @@ LongSumAggregation::LongSumAggregation(bool is_monotonic)
       sum_(0l)
 {}
 
-void LongSumAggregation::Aggregate(long value, const PointAttributes &attributes) noexcept
+void LongSumAggregation::Aggregate(long value) noexcept
 {
   const std::lock_guard<opentelemetry::common::SpinLockMutex> locked(lock_);
   sum_ += value;
@@ -44,7 +44,7 @@ DoubleSumAggregation::DoubleSumAggregation(bool is_monotonic)
       sum_(0L)
 {}
 
-void DoubleSumAggregation::Aggregate(double value, const PointAttributes &attributes) noexcept
+void DoubleSumAggregation::Aggregate(double value) noexcept
 {
   const std::lock_guard<opentelemetry::common::SpinLockMutex> locked(lock_);
   sum_ += value;
