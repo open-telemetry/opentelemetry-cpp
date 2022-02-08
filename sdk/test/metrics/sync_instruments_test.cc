@@ -12,9 +12,7 @@ using namespace opentelemetry;
 using namespace opentelemetry::sdk::instrumentationlibrary;
 using namespace opentelemetry::sdk::metrics;
 
-std::string library_name     = "opentelemetry-cpp";
-std::string library_version  = "0.1.0";
-auto instrumentation_library = InstrumentationLibrary::Create(library_name, library_version);
+auto instrumentation_library = InstrumentationLibrary::Create("opentelemetry-cpp", "0.1.0");
 DefaultMeasurementProcessor measurement_processor;
 
 using M = std::map<std::string, std::string>;
