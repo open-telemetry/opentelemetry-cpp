@@ -5,6 +5,9 @@
 #ifndef ENABLE_METRICS_PREVIEW
 #  include "opentelemetry/metrics/async_instruments.h"
 #  include "opentelemetry/metrics/observer_result.h"
+#  include "opentelemetry/sdk/instrumentationlibrary/instrumentation_library.h"
+#  include "opentelemetry/sdk/metrics/measurement_processor.h"
+
 #  include "opentelemetry/nostd/string_view.h"
 #  include "opentelemetry/sdk/metrics/instruments.h"
 OPENTELEMETRY_BEGIN_NAMESPACE
