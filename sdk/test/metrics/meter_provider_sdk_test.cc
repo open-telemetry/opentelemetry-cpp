@@ -33,7 +33,7 @@ public:
 class MockMetricReader : public MetricReader
 {
 public:
-  bool Collect() noexcept override { return true; }
+  bool ProcessReceivedMetrics(MetricData &metric_data) noexcept override { return true; }
 
   bool Shutdown() noexcept override { return true; }
 };
