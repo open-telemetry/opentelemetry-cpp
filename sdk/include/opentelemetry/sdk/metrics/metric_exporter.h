@@ -15,6 +15,7 @@ namespace sdk
 {
 namespace metrics
 {
+
 /**
  * MetricExporter defines the interface to be used by metrics libraries to
  *  push metrics data to the OpenTelemetry exporters.
@@ -46,6 +47,9 @@ public:
    */
   virtual bool Shutdown(
       std::chrono::microseconds timeout = std::chrono::microseconds(0)) noexcept = 0;
+
+private:
+  AggregationTemporarily aggregation_temporarily;
 };
 }  // namespace metrics
 }  // namespace sdk
