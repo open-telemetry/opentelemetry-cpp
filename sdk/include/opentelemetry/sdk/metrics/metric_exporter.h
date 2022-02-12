@@ -7,7 +7,7 @@
 #  include <memory>
 #  include "opentelemetry/nostd/span.h"
 #  include "opentelemetry/sdk/common/exporter_utils.h"
-#  include "opentelemetry/sdk/metrics/recordable.h"
+#  include "opentelemetry/sdk/metrics/data/metric_data.h"
 #  include "opentelemetry/version.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
@@ -28,11 +28,11 @@ public:
   /**
    * Exports a batch of metrics recordables. This method must not be called
    * concurrently for the same exporter instance.
-   * @param spans a span of unique pointers to metrics recordables
+   * @param spans a span of unique pointers to metrics data
    */
   virtual opentelemetry::sdk::common::ExportResult Export(
-      const nostd::span<std::unique_ptr<opentelemetry::sdk::metrics::Recordable>>
-          &spans) noexcept = 0;
+      const nostd::span<std::unique_ptr<opentelemetry::sdk::metrics::MetricData>>
+          &records) noexcept = 0;
 
   /**
    * Force flush the exporter.
