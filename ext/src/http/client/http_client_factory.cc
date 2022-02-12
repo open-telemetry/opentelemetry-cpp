@@ -9,10 +9,14 @@
 #endif
 namespace http_client = opentelemetry::ext::http::client;
 
-std::shared_ptr<http_client::HttpClient> http_client::HttpClientFactory::Create()
+std::shared_ptr<http_client::HttpClient> http_client::HttpClientFactory::Create(
+    const ClientType client_type)
 {
 #ifdef ENABLE_TEST
-  return std::make_shared<http_client::nosend::HttpClient>();
+  if (client_type == ClientType::Nosend)
+  {
+    return std::make_shared<http_client::nosend::HttpClient>();
+  }
 #endif
   return std::make_shared<http_client::curl::HttpClient>();
 }

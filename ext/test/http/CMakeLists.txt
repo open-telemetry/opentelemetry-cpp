@@ -7,10 +7,10 @@ if(CURL_FOUND)
                         ${CMAKE_THREAD_LIBS_INIT})
 
   if(TARGET CURL::libcurl)
-    target_link_libraries(${FILENAME} CURL::libcurl http_client_curl)
+    target_link_libraries(${FILENAME} CURL::libcurl http_client_factory)
   else()
     include_directories(${CURL_INCLUDE_DIRS})
-    target_link_libraries(${FILENAME} ${CURL_LIBRARIES} http_client_curl)
+    target_link_libraries(${FILENAME} ${CURL_LIBRARIES} http_client_factory)
   endif()
   gtest_add_tests(
     TARGET ${FILENAME}

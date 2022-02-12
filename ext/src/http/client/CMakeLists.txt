@@ -1,0 +1,5 @@
+add_subdirectory(curl)
+add_subdirectory(nosend)
+
+add_library(http_client_factory http_client_factory.cc)
+target_link_libraries(http_client_factory http_client_curl http_client_nosend)

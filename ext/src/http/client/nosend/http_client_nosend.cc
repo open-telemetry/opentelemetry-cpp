@@ -50,6 +50,7 @@ bool Response::ForEachHeader(
   }
   return true;
 }
+
 bool Session::CancelSession() noexcept
 {
   http_client_.CleanupSession(session_id_);
