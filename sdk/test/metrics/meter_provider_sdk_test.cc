@@ -16,7 +16,7 @@ class MockMetricExporter : public MetricExporter
 public:
   MockMetricExporter() = default;
   opentelemetry::sdk::common::ExportResult Export(
-      const opentelemetry::nostd::span<std::unique_ptr<Recordable>> &spans) noexcept override
+      const opentelemetry::nostd::span<std::unique_ptr<MetricData>> &records) noexcept override
   {
     return opentelemetry::sdk::common::ExportResult::kSuccess;
   }
