@@ -55,7 +55,7 @@ cc_library(
     tags = ["jaeger"],
     deps = [
         ":thrift",
-        "//ext/src/http/client/curl:http_client_curl",
+        "//ext/src/http/client:http_client_factory",
     ],
 )
 
