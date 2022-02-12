@@ -13,7 +13,8 @@
 #    include "opentelemetry/exporters/otlp/protobuf_include_suffix.h"
 
 #    include "opentelemetry/common/key_value_iterable_view.h"
-#    include "opentelemetry/ext/http/client/curl/http_client_curl.h"
+#    include "opentelemetry/ext/http/client/http_client_factory.h"
+#    include "opentelemetry/ext/http/client/nosend/http_client_nosend.h"
 #    include "opentelemetry/ext/http/server/http_server.h"
 #    include "opentelemetry/logs/provider.h"
 #    include "opentelemetry/sdk/logs/batch_log_processor.h"
@@ -62,35 +63,6 @@ OtlpHttpClientOptions MakeOtlpHttpClientOptions(HttpRequestContentType content_t
 
 namespace http_client = opentelemetry::ext::http::client;
 
-class MockSession : public http_client::curl::Session
-{
-public:
-  MockSession(http_client::curl::HttpClient &http_client)
-      : http_client::curl::Session(http_client, "http", "", 80)
-  {}
-  MOCK_METHOD(void,
-              SendRequest,
-              (opentelemetry::ext::http::client::EventHandler &),
-              (noexcept, override));
-  bool FinishSession() noexcept override { return true; }
-};
-
-class NosendHttpClient : public http_client::curl::HttpClient
-{
-public:
-  NosendHttpClient()
-  {
-    session_ = std::shared_ptr<opentelemetry::ext::http::client::Session>{new MockSession(*this)};
-  }
-  std::shared_ptr<opentelemetry::ext::http::client::Session> CreateSession(
-      nostd::string_view url) noexcept override
-  {
-    return session_;
-  }
-
-  std::shared_ptr<opentelemetry::ext::http::client::Session> session_;
-};
-
 class OtlpHttpLogExporterTestPeer : public ::testing::Test
 {
 public:
@@ -107,7 +79,7 @@ public:
   static std::pair<OtlpHttpClient *, std::shared_ptr<http_client::HttpClient>>
   GetMockOtlpHttpClient(HttpRequestContentType content_type)
   {
-    std::shared_ptr<http_client::HttpClient> http_client{new NosendHttpClient};
+    auto http_client = http_client::HttpClientFactory::Create();
     return {new OtlpHttpClient(MakeOtlpHttpClientOptions(content_type), http_client), http_client};
   }
 };
@@ -172,8 +144,9 @@ TEST_F(OtlpHttpLogExporterTestPeer, ExportJsonIntegrationTest)
   span_id.ToLowerBase16(MakeSpan(span_id_hex));
   report_span_id.assign(span_id_hex, sizeof(span_id_hex));
 
-  auto no_send_client = std::static_pointer_cast<NosendHttpClient>(client);
-  auto mock_session   = std::static_pointer_cast<MockSession>(no_send_client->session_);
+  auto no_send_client = std::static_pointer_cast<http_client::nosend::HttpClient>(client);
+  auto mock_session =
+      std::static_pointer_cast<http_client::nosend::Session>(no_send_client->session_);
   EXPECT_CALL(*mock_session, SendRequest)
       .WillOnce([&mock_session, report_trace_id,
                  report_span_id](opentelemetry::ext::http::client::EventHandler &callback) {
@@ -195,7 +168,7 @@ TEST_F(OtlpHttpLogExporterTestPeer, ExportJsonIntegrationTest)
           EXPECT_EQ("Custom-Header-Value", custom_header->second);
         }
         // let the otlp_http_client to continue
-        http_client::curl::Response response;
+        http_client::nosend::Response response;
         callback.OnResponse(response);
       });
 }
@@ -255,8 +228,9 @@ TEST_F(OtlpHttpLogExporterTestPeer, ExportBinaryIntegrationTest)
   report_trace_id.assign(reinterpret_cast<const char *>(trace_id_bin), sizeof(trace_id_bin));
   report_span_id.assign(reinterpret_cast<const char *>(span_id_bin), sizeof(span_id_bin));
 
-  auto no_send_client = std::static_pointer_cast<NosendHttpClient>(client);
-  auto mock_session   = std::static_pointer_cast<MockSession>(no_send_client->session_);
+  auto no_send_client = std::static_pointer_cast<http_client::nosend::HttpClient>(client);
+  auto mock_session =
+      std::static_pointer_cast<http_client::nosend::Session>(no_send_client->session_);
   EXPECT_CALL(*mock_session, SendRequest)
       .WillOnce([&mock_session, report_trace_id,
                  report_span_id](opentelemetry::ext::http::client::EventHandler &callback) {
@@ -279,7 +253,7 @@ TEST_F(OtlpHttpLogExporterTestPeer, ExportBinaryIntegrationTest)
           }
         }
         ASSERT_TRUE(check_service_name);
-        http_client::curl::Response response;
+        http_client::nosend::Response response;
         callback.OnResponse(response);
       });
 }

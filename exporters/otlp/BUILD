@@ -98,7 +98,7 @@ cc_library(
     ],
     deps = [
         "//api",
-        "//ext/src/http/client/curl:http_client_curl",
+        "//ext/src/http/client:http_client_factory",
         "//sdk:headers",
         "@com_github_opentelemetry_proto//:common_proto_cc",
         "@github_nlohmann_json//:json",
@@ -234,6 +234,7 @@ cc_test(
     deps = [
         ":otlp_http_exporter",
         "//api",
+        "//ext/src/http/client/nosend:http_client_nosend",
         "@com_google_googletest//:gtest_main",
     ],
 )
@@ -249,6 +250,7 @@ cc_test(
     deps = [
         ":otlp_http_log_exporter",
         "//api",
+        "//ext/src/http/client/nosend:http_client_nosend",
         "@com_google_googletest//:gtest_main",
     ],
 )
