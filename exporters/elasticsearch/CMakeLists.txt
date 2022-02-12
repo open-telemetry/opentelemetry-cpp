@@ -10,7 +10,7 @@ target_include_directories(
 
 target_link_libraries(
   opentelemetry_exporter_elasticsearch_logs
-  PUBLIC opentelemetry_trace opentelemetry_logs http_client_curl)
+  PUBLIC opentelemetry_trace opentelemetry_logs http_client_factory)
 
 install(
   TARGETS opentelemetry_exporter_elasticsearch_logs

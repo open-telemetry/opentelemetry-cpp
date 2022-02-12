@@ -49,7 +49,7 @@ if(WITH_OTLP_HTTP)
                         PROPERTIES EXPORT_NAME otlp_http_client)
   target_link_libraries(
     opentelemetry_exporter_otlp_http_client
-    PUBLIC opentelemetry_sdk opentelemetry_proto http_client_curl
+    PUBLIC opentelemetry_sdk opentelemetry_proto http_client_factory
            nlohmann_json::nlohmann_json)
   if(nlohmann_json_clone)
     add_dependencies(opentelemetry_exporter_otlp_http_client
