@@ -37,6 +37,14 @@ OpenTelemetry C++
    otel_docs/namespace_opentelemetry__sdk__resource
 
 .. toctree::
+    :maxdepth: 1
+    :caption: Performance
+    :name: performance-tests
+    :glob:
+
+    performance/**
+
+.. toctree::
    :maxdepth: 1
    :caption: Further Reading
 
