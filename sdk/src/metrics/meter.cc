@@ -5,7 +5,9 @@
 #  include "opentelemetry/sdk/metrics/meter.h"
 #  include "opentelemetry/metrics/noop.h"
 #  include "opentelemetry/nostd/shared_ptr.h"
-#  include "opentelemetry/sdk/common/global_log_handler.h"
+#  include "opentelemetry/sdk/metrics/async_instruments.h"
+#  include "opentelemetry/sdk/metrics/sync_instruments.h"
+
 #  include "opentelemetry/version.h"
 
 #  include <memory>
@@ -29,9 +31,8 @@ nostd::shared_ptr<metrics::Counter<long>> Meter::CreateLongCounter(nostd::string
                                                                    nostd::string_view description,
                                                                    nostd::string_view unit) noexcept
 {
-  OTEL_INTERNAL_LOG_WARN("[Meter::CreateLongCounter] Not Implemented - Returns Noop.");
-  return nostd::shared_ptr<metrics::Counter<long>>{
-      new metrics::NoopCounter<long>(name, description, unit)};
+  return nostd::shared_ptr<metrics::Counter<long>>(new LongCounter(
+      name, GetInstrumentationLibrary(), GetMeasurementProcessor(), description, unit));
 }
 
 nostd::shared_ptr<metrics::Counter<double>> Meter::CreateDoubleCounter(
@@ -39,9 +40,8 @@ nostd::shared_ptr<metrics::Counter<double>> Meter::CreateDoubleCounter(
     nostd::string_view description,
     nostd::string_view unit) noexcept
 {
-  OTEL_INTERNAL_LOG_WARN("[Meter::CreateDoubleCounter] Not Implemented - Returns Noop.");
-  return nostd::shared_ptr<metrics::Counter<double>>{
-      new metrics::NoopCounter<double>(name, description, unit)};
+  return nostd::shared_ptr<metrics::Counter<double>>{new DoubleCounter(
+      name, GetInstrumentationLibrary(), GetMeasurementProcessor(), description, unit)};
 }
 
 nostd::shared_ptr<metrics::ObservableCounter<long>> Meter::CreateLongObservableCounter(
@@ -50,9 +50,8 @@ nostd::shared_ptr<metrics::ObservableCounter<long>> Meter::CreateLongObservableC
     nostd::string_view description,
     nostd::string_view unit) noexcept
 {
-  OTEL_INTERNAL_LOG_WARN("[Meter::CreateLongObservableCounter] Not Implemented - Returns Noop.");
-  return nostd::shared_ptr<metrics::ObservableCounter<long>>{
-      new metrics::NoopObservableCounter<long>(name, callback, description, unit)};
+  return nostd::shared_ptr<metrics::ObservableCounter<long>>{new LongObservableCounter(
+      name, GetInstrumentationLibrary(), GetMeasurementProcessor(), callback, description, unit)};
 }
 
 nostd::shared_ptr<metrics::ObservableCounter<double>> Meter::CreateDoubleObservableCounter(
@@ -61,9 +60,8 @@ nostd::shared_ptr<metrics::ObservableCounter<double>> Meter::CreateDoubleObserva
     nostd::string_view description,
     nostd::string_view unit) noexcept
 {
-  OTEL_INTERNAL_LOG_WARN("[Meter::CreateDoubleObservableCounter] Not Implemented - Returns Noop.");
-  return nostd::shared_ptr<metrics::ObservableCounter<double>>{
-      new metrics::NoopObservableCounter<double>(name, callback, description, unit)};
+  return nostd::shared_ptr<metrics::ObservableCounter<double>>{new DoubleObservableCounter(
+      name, GetInstrumentationLibrary(), GetMeasurementProcessor(), callback, description, unit)};
 }
 
 nostd::shared_ptr<metrics::Histogram<long>> Meter::CreateLongHistogram(
@@ -71,9 +69,8 @@ nostd::shared_ptr<metrics::Histogram<long>> Meter::CreateLongHistogram(
     nostd::string_view description,
     nostd::string_view unit) noexcept
 {
-  OTEL_INTERNAL_LOG_WARN("[Meter::CreateLongHistogram] Not Implemented - Returns Noop.");
-  return nostd::shared_ptr<metrics::Histogram<long>>{
-      new metrics::NoopHistogram<long>(name, description, unit)};
+  return nostd::shared_ptr<metrics::Histogram<long>>{new LongHistogram(
+      name, GetInstrumentationLibrary(), GetMeasurementProcessor(), description, unit)};
 }
 
 nostd::shared_ptr<metrics::Histogram<double>> Meter::CreateDoubleHistogram(
@@ -81,9 +78,8 @@ nostd::shared_ptr<metrics::Histogram<double>> Meter::CreateDoubleHistogram(
     nostd::string_view description,
     nostd::string_view unit) noexcept
 {
-  OTEL_INTERNAL_LOG_WARN("[Meter::CreateDoubleHistogram] Not Implemented - Returns Noop.");
-  return nostd::shared_ptr<metrics::Histogram<double>>{
-      new metrics::NoopHistogram<double>(name, description, unit)};
+  return nostd::shared_ptr<metrics::Histogram<double>>{new DoubleHistogram(
+      name, GetInstrumentationLibrary(), GetMeasurementProcessor(), description, unit)};
 }
 
 nostd::shared_ptr<metrics::ObservableGauge<long>> Meter::CreateLongObservableGauge(
@@ -92,9 +88,8 @@ nostd::shared_ptr<metrics::ObservableGauge<long>> Meter::CreateLongObservableGau
     nostd::string_view description,
     nostd::string_view unit) noexcept
 {
-  OTEL_INTERNAL_LOG_WARN("[Meter::CreateLongObservableGauge] Not Implemented - Returns Noop.");
-  return nostd::shared_ptr<metrics::ObservableGauge<long>>{
-      new metrics::NoopObservableGauge<long>(name, callback, description, unit)};
+  return nostd::shared_ptr<metrics::ObservableGauge<long>>{new LongObservableGauge(
+      name, GetInstrumentationLibrary(), GetMeasurementProcessor(), callback, description, unit)};
 }
 
 nostd::shared_ptr<metrics::ObservableGauge<double>> Meter::CreateDoubleObservableGauge(
@@ -103,9 +98,8 @@ nostd::shared_ptr<metrics::ObservableGauge<double>> Meter::CreateDoubleObservabl
     nostd::string_view description,
     nostd::string_view unit) noexcept
 {
-  OTEL_INTERNAL_LOG_WARN("[Meter::CreateDoubleObservableGauge] Not Implemented - Returns Noop.");
-  return nostd::shared_ptr<metrics::ObservableGauge<double>>{
-      new metrics::NoopObservableGauge<double>(name, callback, description, unit)};
+  return nostd::shared_ptr<metrics::ObservableGauge<double>>{new DoubleObservableGauge(
+      name, GetInstrumentationLibrary(), GetMeasurementProcessor(), callback, description, unit)};
 }
 
 nostd::shared_ptr<metrics::UpDownCounter<long>> Meter::CreateLongUpDownCounter(
@@ -113,9 +107,8 @@ nostd::shared_ptr<metrics::UpDownCounter<long>> Meter::CreateLongUpDownCounter(
     nostd::string_view description,
     nostd::string_view unit) noexcept
 {
-  OTEL_INTERNAL_LOG_WARN("[Meter::CreateLongUpDownCounter] Not Implemented - Returns Noop.");
-  return nostd::shared_ptr<metrics::UpDownCounter<long>>{
-      new metrics::NoopUpDownCounter<long>(name, description, unit)};
+  return nostd::shared_ptr<metrics::UpDownCounter<long>>{new LongUpDownCounter(
+      name, GetInstrumentationLibrary(), GetMeasurementProcessor(), description, unit)};
 }
 
 nostd::shared_ptr<metrics::UpDownCounter<double>> Meter::CreateDoubleUpDownCounter(
@@ -123,9 +116,8 @@ nostd::shared_ptr<metrics::UpDownCounter<double>> Meter::CreateDoubleUpDownCount
     nostd::string_view description,
     nostd::string_view unit) noexcept
 {
-  OTEL_INTERNAL_LOG_WARN("[Meter::CreateDoubleUpDownCounter] Not Implemented - Returns Noop.");
-  return nostd::shared_ptr<metrics::UpDownCounter<double>>{
-      new metrics::NoopUpDownCounter<double>(name, description, unit)};
+  return nostd::shared_ptr<metrics::UpDownCounter<double>>{new DoubleUpDownCounter(
+      name, GetInstrumentationLibrary(), GetMeasurementProcessor(), description, unit)};
 }
 
 nostd::shared_ptr<metrics::ObservableUpDownCounter<long>> Meter::CreateLongObservableUpDownCounter(
@@ -134,10 +126,8 @@ nostd::shared_ptr<metrics::ObservableUpDownCounter<long>> Meter::CreateLongObser
     nostd::string_view description,
     nostd::string_view unit) noexcept
 {
-  OTEL_INTERNAL_LOG_WARN(
-      "[Meter::CreateLongObservableUpDownCounter] Not Implemented - Returns Noop.");
-  return nostd::shared_ptr<metrics::ObservableUpDownCounter<long>>{
-      new metrics::NoopObservableUpDownCounter<long>(name, callback, description, unit)};
+  return nostd::shared_ptr<metrics::ObservableUpDownCounter<long>>{new LongObservableUpDownCounter(
+      name, GetInstrumentationLibrary(), GetMeasurementProcessor(), callback, description, unit)};
 }
 
 nostd::shared_ptr<metrics::ObservableUpDownCounter<double>>
@@ -146,16 +136,20 @@ Meter::CreateDoubleObservableUpDownCounter(nostd::string_view name,
                                            nostd::string_view description,
                                            nostd::string_view unit) noexcept
 {
-  OTEL_INTERNAL_LOG_WARN(
-      "[Meter::CreateDoubleObservableUpDownCounter] Not Implemented - Returns Noop.");
   return nostd::shared_ptr<metrics::ObservableUpDownCounter<double>>{
-      new metrics::NoopObservableUpDownCounter<double>(name, callback, description, unit)};
+      new DoubleObservableUpDownCounter(name, GetInstrumentationLibrary(),
+                                        GetMeasurementProcessor(), callback, description, unit)};
 }
 
-const sdk::instrumentationlibrary::InstrumentationLibrary &Meter::GetInstrumentationLibrary()
+const sdk::instrumentationlibrary::InstrumentationLibrary *Meter::GetInstrumentationLibrary()
     const noexcept
 {
-  return *instrumentation_library_;
+  return instrumentation_library_.get();
+}
+
+MeasurementProcessor *Meter::GetMeasurementProcessor() const noexcept
+{
+  return context_->GetMeasurementProcessor();
 }
 
 }  // namespace metrics

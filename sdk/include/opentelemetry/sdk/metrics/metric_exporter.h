@@ -13,6 +13,7 @@ namespace sdk
 {
 namespace metrics
 {
+
 /**
  * MetricExporter defines the interface to be used by metrics libraries to
  *  push metrics data to the OpenTelemetry exporters.
@@ -43,6 +44,9 @@ public:
    * @return return the status of the operation.
    */
   virtual bool Shutdown() noexcept = 0;
+
+private:
+  AggregationTemporarily aggregation_temporarily;
 };
 }  // namespace metrics
 }  // namespace sdk
