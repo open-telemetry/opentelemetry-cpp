@@ -28,6 +28,11 @@ const resource::Resource &MeterContext::GetResource() const noexcept
   return resource_;
 }
 
+MeasurementProcessor *MeterContext::GetMeasurementProcessor() const noexcept
+{
+  return measurement_processor_.get();
+}
+
 void MeterContext::AddMetricExporter(std::unique_ptr<MetricExporter> exporter) noexcept
 {
   exporters_.push_back(std::move(exporter));
