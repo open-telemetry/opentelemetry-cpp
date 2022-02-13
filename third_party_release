@@ -1,4 +1,4 @@
-gRPC=v1.39.1
+gRPC=v1.43.2
 thrift=0.14.1
 abseil=20210324.0
 benchmark=v1.5.3
