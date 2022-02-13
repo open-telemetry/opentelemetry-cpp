@@ -29,7 +29,8 @@ OtlpHttpExporter::OtlpHttpExporter(const OtlpHttpExporterOptions &options)
                                                             options.use_json_name,
                                                             options.console_debug,
                                                             options.timeout,
-                                                            options.http_headers)))
+                                                            options.http_headers,
+                                                            options.concurrent_sessions)))
 {}
 
 OtlpHttpExporter::OtlpHttpExporter(std::unique_ptr<OtlpHttpClient> http_client)

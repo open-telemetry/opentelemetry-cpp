@@ -11,6 +11,7 @@
 #  include "opentelemetry/exporters/otlp/otlp_environment.h"
 
 #  include <chrono>
+#  include <cstddef>
 #  include <memory>
 #  include <string>
 
@@ -50,6 +51,9 @@ struct OtlpHttpLogExporterOptions
 
   // Additional HTTP headers
   OtlpHeaders http_headers = GetOtlpDefaultLogHeaders();
+
+  // Concurrent sessions
+  std::size_t concurrent_sessions = 8;
 };
 
 /**

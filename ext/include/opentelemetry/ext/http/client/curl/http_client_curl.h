@@ -280,18 +280,30 @@ public:
 
   bool CancelAllSessions() noexcept override
   {
-    for (auto &session : sessions_)
+    // CancelSession may change sessions_, we can not change a container while iterating it.
+    while (!sessions_.empty())
     {
-      session.second->CancelSession();
+      std::map<uint64_t, std::shared_ptr<Session>> sessions;
+      sessions.swap(sessions_);
+      for (auto &session : sessions)
+      {
+        session.second->CancelSession();
+      }
     }
     return true;
   }
 
   bool FinishAllSessions() noexcept override
   {
-    for (auto &session : sessions_)
+    // FinishSession may change sessions_, we can not change a container while iterating it.
+    while (!sessions_.empty())
     {
-      session.second->FinishSession();
+      std::map<uint64_t, std::shared_ptr<Session>> sessions;
+      sessions.swap(sessions_);
+      for (auto &session : sessions)
+      {
+        session.second->FinishSession();
+      }
     }
     return true;
   }

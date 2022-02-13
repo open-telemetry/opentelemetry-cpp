@@ -93,6 +93,19 @@ public:
     return status_code_;
   }
 
+  void Finish(opentelemetry::ext::http::client::EventHandler &callback) noexcept
+  {
+    callback.OnEvent(opentelemetry::ext::http::client::SessionState::Created, "");
+    callback.OnEvent(opentelemetry::ext::http::client::SessionState::Connecting, "");
+    callback.OnEvent(opentelemetry::ext::http::client::SessionState::Connected, "");
+    callback.OnEvent(opentelemetry::ext::http::client::SessionState::Sending, "");
+
+    // let the otlp_http_client to continue
+    callback.OnResponse(*this);
+
+    callback.OnEvent(opentelemetry::ext::http::client::SessionState::Response, "");
+  }
+
 public:
   Headers headers_;
   opentelemetry::ext::http::client::Body body_;
