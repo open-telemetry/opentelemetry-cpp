@@ -27,8 +27,7 @@ public:
                     const AggregationType aggregation_type,
                     AttributesProcessor *attributes_processor = new DefaultAttributesProcessor())
       : aggregation_type_{aggregation_type},
-        instrument_descriptor_{instrument_descriptor},
-        attributes_processor_{attributes_processor},
+        instrument_descriptor_{instrument_descriptor} attributes_processor_{attributes_processor},
         attributes_hashmap_(std::move(std::unique_ptr<AttributesHashMap>(new AttributesHashMap)))
   {
     create_default_aggregation_ = [&]() -> std::unique_ptr<Aggregation> {
