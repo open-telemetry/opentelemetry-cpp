@@ -18,8 +18,12 @@ class MetricStorage
 {
 public:
   /* collect the metrics from this storage */
-  virtual bool Collect(AggregationTemporarily aggregation_temporarily,
-                       nostd::function_ref<bool(MetricData)> callback) noexcept = 0;
+  virtual bool Collect(
+      MetricCollector *collector,
+      nostd::span<MetricCollector *> collectors,
+      opentelemetry::sdk::instrumentationlibrary::InstrumentationLibrary *instrumentation_library,
+      opentelemetry::sdk::resource::Resource *resource,
+      nostd::function_ref<bool(MetricData)> callback) noexcept = 0;
 };
 
 class WritableMetricStorage
@@ -39,8 +43,12 @@ public:
 class NoopMetricStorage : public MetricStorage
 {
 public:
-  bool Collect(AggregationTemporarily aggregation_temporarily,
-               nostd::function_ref<bool(MetricData)> callback) noexcept override
+  bool Collect(
+      MetricCollector *collector,
+      nostd::span<MetricCollector *> collectors,
+      opentelemetry::sdk::instrumentationlibrary::InstrumentationLibrary *instrumentation_library,
+      opentelemetry::sdk::resource::Resource *resource,
+      nostd::function_ref<bool(MetricData)> callback) noexcept override
   {
     MetricData metric_data;
     if (callback(metric_data))

@@ -27,6 +27,22 @@ enum class InstrumentValueType
   kDouble
 };
 
+enum class AggregationType
+{
+  kDrop,
+  kHistogram,
+  kLastValue,
+  kSum,
+  kDefault
+};
+
+enum class AggregationTemporarily
+{
+  kUnspecified,
+  kDelta,
+  kCummulative
+};
+
 struct InstrumentDescriptor
 {
   std::string name_;
@@ -34,6 +50,13 @@ struct InstrumentDescriptor
   std::string unit_;
   InstrumentType type_;
   InstrumentValueType value_type_;
+};
+
+// TBD -> Once MetricCollector is imoplemeted
+class MetricCollector
+{
+public:
+  AggregationTemporarily aggregation_temporarily_;
 };
 
 /*class InstrumentSelector {
