@@ -3,7 +3,7 @@
 
 #pragma once
 #ifndef ENABLE_METRICS_PREVIEW
-#  include "opentelemetry/nostd/string_view.h"
+#  include "opentelemetry/sdk/common/attribute_utils.h"
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace sdk
 {
@@ -51,6 +51,8 @@ struct InstrumentDescriptor
   InstrumentType type_;
   InstrumentValueType value_type_;
 };
+
+using MetricAttributes = opentelemetry::sdk::common::OrderedAttributeMap;
 
 // TBD -> Once MetricCollector is imoplemeted
 class MetricCollector
