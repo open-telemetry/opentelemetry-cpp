@@ -98,7 +98,7 @@ cc_library(
     ],
     deps = [
         "//api",
-        "//ext/src/http/client:http_client_factory",
+        "//ext/src/http/client/curl:http_client_curl",
         "//sdk:headers",
         "@com_github_opentelemetry_proto//:common_proto_cc",
         "@github_nlohmann_json//:json",

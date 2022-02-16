@@ -46,7 +46,7 @@ if(WITH_OTLP_HTTP)
                         PROPERTIES EXPORT_NAME otlp_http_client)
   target_link_libraries(
     opentelemetry_exporter_otlp_http_client
-    PUBLIC opentelemetry_sdk opentelemetry_proto http_client_factory
+    PUBLIC opentelemetry_sdk opentelemetry_proto http_client_curl
            nlohmann_json::nlohmann_json)
   if(nlohmann_json_clone)
     add_dependencies(opentelemetry_exporter_otlp_http_client
@@ -186,7 +186,7 @@ if(BUILD_TESTING)
         ${GMOCK_LIB}
         opentelemetry_exporter_otlp_http_log
         opentelemetry_logs
-        http_client_factory)
+        http_client_nosend)
       gtest_add_tests(
         TARGET otlp_http_log_exporter_test
         TEST_PREFIX exporter.otlp.

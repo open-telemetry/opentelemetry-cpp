@@ -7,7 +7,7 @@ else()
   add_executable(w3c_tracecontext_test main.cc)
   target_link_libraries(
     w3c_tracecontext_test
-    PRIVATE ${CMAKE_THREAD_LIBS_INIT} opentelemetry_trace http_client_factory
+    PRIVATE ${CMAKE_THREAD_LIBS_INIT} opentelemetry_trace http_client_curl
             opentelemetry_exporter_ostream_span ${CURL_LIBRARIES}
             nlohmann_json::nlohmann_json)
   if(nlohmann_json_clone)

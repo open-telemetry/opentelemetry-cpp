@@ -20,7 +20,7 @@ cc_binary(
         "//api",
         "//exporters/ostream:ostream_span_exporter",
         "//ext:headers",
-        "//ext/src/http/client:http_client_factory",
+        "//ext/src/http/client/curl:http_client_curl",
         "//sdk/src/trace",
     ],
 )

@@ -21,7 +21,7 @@ cc_library(
     tags = ["es"],
     deps = [
         "//ext:headers",
-        "//ext/src/http/client:http_client_factory",
+        "//ext/src/http/client/curl:http_client_curl",
         "//sdk/src/logs",
         "@curl",
         "@github_nlohmann_json//:json",

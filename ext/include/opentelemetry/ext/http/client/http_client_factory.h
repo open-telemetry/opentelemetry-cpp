@@ -11,19 +11,14 @@ namespace http
 {
 namespace client
 {
-
-enum class ClientType
-{
-  Curl,
-  Nosend
-};
-
 class HttpClientFactory
 {
 public:
   static std::shared_ptr<HttpClientSync> CreateSync();
 
-  static std::shared_ptr<HttpClient> Create(const ClientType client_type = ClientType::Curl);
+  static std::shared_ptr<HttpClient> Create();
+
+  static std::shared_ptr<HttpClient> CreateNoSend();
 };
 }  // namespace client
 }  // namespace http

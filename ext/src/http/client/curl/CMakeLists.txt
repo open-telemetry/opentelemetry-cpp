@@ -1,6 +1,6 @@
 find_package(CURL)
 if(CURL_FOUND)
-  add_library(http_client_curl http_client_curl.cc)
+  add_library(http_client_curl http_client_factory_curl.cc http_client_curl.cc)
 
   set_target_properties(http_client_curl PROPERTIES EXPORT_NAME
                                                     http_client_curl)
