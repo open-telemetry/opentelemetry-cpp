@@ -8,7 +8,6 @@
 #  include "opentelemetry/sdk/metrics/aggregation/drop_aggregation.h"
 #  include "opentelemetry/sdk/metrics/instruments.h"
 #  include "opentelemetry/sdk/metrics/state/attributes_hashmap.h"
-#  include "opentelemetry/sdk/metrics/state/attributes_hashmap_unordered.h"
 
 #  include <functional>
 #  include <vector>
@@ -21,9 +20,7 @@ namespace
 void BM_AttributseHashMap(benchmark::State &state)
 {
 
-  AttributesHashMap<MetricAttributes, Aggregation,
-                    &opentelemetry::sdk::common::GetHashForAttributeMap>
-      hash_map;
+  AttributesHashMap hash_map;
   std::vector<std::thread> workers;
   std::vector<MetricAttributes> attributes = {{{"k1", "v1"}, {"k2", "v2"}},
                                               {{"k1", "v1"}, {"k2", "v2"}, {"k3", "v3"}}};
@@ -52,39 +49,6 @@ void BM_AttributseHashMap(benchmark::State &state)
 }
 
 BENCHMARK(BM_AttributseHashMap);
-
-void BM_AttributseHashMapUnordered(benchmark::State &state)
-{
-
-  AttributesHashMapUnordered hash_map;
-  std::vector<std::thread> workers;
-  std::vector<MetricAttributes> attributes = {{{"k1", "v1"}, {"k2", "v2"}},
-                                              {{"k1", "v1"}, {"k2", "v2"}, {"k3", "v3"}}};
-
-  std::function<std::unique_ptr<Aggregation>()> create_default_aggregation =
-      []() -> std::unique_ptr<Aggregation> {
-    auto agg = std::unique_ptr<Aggregation>(new DropAggregation);
-    return std::move(agg);
-  };
-
-  while (state.KeepRunning())
-  {
-    for (int i = 0; i < MAX_THREADS; i++)
-    {
-      workers.push_back(std::thread([&]() {
-        hash_map.GetOrSetDefault(attributes[i % 2], create_default_aggregation)->Aggregate(1l);
-        benchmark::DoNotOptimize(hash_map.Has(attributes[i % 2]));
-      }));
-    }
-  }
-
-  for (auto &t : workers)
-  {
-    t.join();
-  }
-}
-
-BENCHMARK(BM_AttributseHashMapUnordered);
 }  // namespace
 #endif
 BENCHMARK_MAIN();

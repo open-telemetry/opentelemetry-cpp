@@ -4,8 +4,6 @@
 #ifndef ENABLE_METRICS_PREVIEW
 #  include "opentelemetry/sdk/metrics/state/attributes_hashmap.h"
 #  include <gtest/gtest.h>
-#  include "opentelemetry/sdk/common/attributemap_hash.h"
-#  include "opentelemetry/sdk/metrics/aggregation/aggregation.h"
 #  include "opentelemetry/sdk/metrics/aggregation/drop_aggregation.h"
 #  include "opentelemetry/sdk/metrics/instruments.h"
 
@@ -13,34 +11,34 @@
 
 using namespace opentelemetry::sdk::metrics;
 namespace nostd = opentelemetry::nostd;
+
 TEST(AttributesHashMap, BasicTests)
 {
 
   // Empty map
-  AttributesHashMap<MetricAttributes, Aggregation,
-                    &opentelemetry::sdk::common::GetHashForAttributeMap>
-      hash_map;
+  AttributesHashMap hash_map;
   EXPECT_EQ(hash_map.Size(), 0);
   MetricAttributes m1 = {{"k1", "v1"}};
   EXPECT_EQ(hash_map.Get(m1), nullptr);
   EXPECT_EQ(hash_map.Has(m1), false);
 
   // Set
-  auto aggregation1 = std::unique_ptr<Aggregation>(new DropAggregation);
+  std::unique_ptr<Aggregation> aggregation1(
+      new DropAggregation());  //  = std::unique_ptr<Aggregation>(new DropAggregation);
   hash_map.Set(m1, std::move(aggregation1));
   EXPECT_NO_THROW(hash_map.Get(m1)->Aggregate(1l));
   EXPECT_EQ(hash_map.Size(), 1);
   EXPECT_EQ(hash_map.Has(m1), true);
 
   // Set same key again
-  auto aggregation2 = std::unique_ptr<Aggregation>(new DropAggregation);
+  auto aggregation2 = std::unique_ptr<Aggregation>(new DropAggregation());
   hash_map.Set(m1, std::move(aggregation2));
   EXPECT_NO_THROW(hash_map.Get(m1)->Aggregate(1l));
   EXPECT_EQ(hash_map.Size(), 1);
   EXPECT_EQ(hash_map.Has(m1), true);
 
   // Set more enteria
-  auto aggregation3   = std::unique_ptr<Aggregation>(new DropAggregation);
+  auto aggregation3   = std::unique_ptr<Aggregation>(new DropAggregation());
   MetricAttributes m3 = {{"k1", "v1"}, {"k2", "v2"}};
   hash_map.Set(m3, std::move(aggregation3));
   EXPECT_EQ(hash_map.Has(m1), true);
@@ -64,11 +62,10 @@ TEST(AttributesHashMap, BasicTests)
 
   // GetAllEnteries
   size_t count = 0;
-  hash_map.GetAllEnteries(
-      [&count](hashcode_t hash, const MetricAttributes &attributes, Aggregation &aggregation) {
-        count++;
-        return true;
-      });
+  hash_map.GetAllEnteries([&count](const MetricAttributes &attributes, Aggregation &aggregation) {
+    count++;
+    return true;
+  });
   EXPECT_EQ(count, hash_map.Size());
 }
 
