@@ -4,9 +4,17 @@
 #pragma once
 #ifndef ENABLE_METRICS_PREVIEW
 #  include "opentelemetry/common/key_value_iterable_view.h"
+#  include "opentelemetry/sdk/common/attributemap_hash.h"
 #  include "opentelemetry/sdk/instrumentationlibrary/instrumentation_library.h"
+#  include "opentelemetry/sdk/metrics/aggregation/default_aggregation.h"
+#  include "opentelemetry/sdk/metrics/state/attributes_hashmap.h"
 #  include "opentelemetry/sdk/metrics/state/metric_storage.h"
+#  include "opentelemetry/sdk/metrics/view/attributes_processor.h"
+#  include "opentelemetry/sdk/metrics/view/view.h"
 #  include "opentelemetry/sdk/resource/resource.h"
+
+#  include <memory>
+
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace sdk
 {
@@ -17,56 +25,128 @@ class SyncMetricStorage : public MetricStorage, public WritableMetricStorage
 {
 
 public:
-  SyncMetricStorage(
-      // TBD
-      // Aggregation& aggregation
-      // opentelemetry::sdk::resource::resource *resource,
-      // sdk::instrumentationlibrary::InstrumentationLibrary *instrumentation_library,
-  )
-  {}
+  SyncMetricStorage(InstrumentDescriptor instrument_descriptor,
+                    const AggregationType aggregation_type,
+                    AttributesProcessor *attributes_processor = new DefaultAttributesProcessor())
+      : instrument_descriptor_(instrument_descriptor),
+        aggregation_type_{aggregation_type},
+        attributes_hashmap_(new AttributesHashMap()),
+        attributes_processor_{attributes_processor}
+  {
+    create_default_aggregation_ = [&]() -> std::unique_ptr<Aggregation> {
+      return std::move(this->create_aggregation());
+    };
+  }
 
   void RecordLong(long value) noexcept override
   {
-    // TBD
-    // aggregation->recordLong(value);
+    if (instrument_descriptor_.value_type_ != InstrumentValueType::kLong)
+    {
+      return;
+    }
+    auto aggregation = attributes_hashmap_->GetOrSetDefault({}, create_default_aggregation_);
+    aggregation->Aggregate(value);
   }
 
   void RecordLong(long value,
                   const opentelemetry::common::KeyValueIterable &attributes) noexcept override
   {
-    // TBD
-    // aggregation->recordLong(value, attributes);
+    if (instrument_descriptor_.value_type_ != InstrumentValueType::kLong)
+    {
+      return;
+    }
+
+    auto attr        = attributes_processor_->process(attributes);
+    auto aggregation = attributes_hashmap_->GetOrSetDefault(attr, create_default_aggregation_);
+    aggregation->Aggregate(value);
   }
 
   void RecordDouble(double value) noexcept override
   {
-    // TBD
-    // aggregation->recordDouble(value, attributes);
+    if (instrument_descriptor_.value_type_ != InstrumentValueType::kDouble)
+    {
+      return;
+    }
+
+    auto aggregation = attributes_hashmap_->GetOrSetDefault({}, create_default_aggregation_);
+    aggregation->Aggregate(value);
   }
 
   void RecordDouble(double value,
                     const opentelemetry::common::KeyValueIterable &attributes) noexcept override
   {
-    // TBD
-    // aggregation->recordDouble(value, attributes);
+    if (instrument_descriptor_.value_type_ != InstrumentValueType::kDouble)
+    {
+      return;
+    }
+
+    auto attr        = attributes_processor_->process(attributes);
+    auto aggregation = attributes_hashmap_->GetOrSetDefault(attr, create_default_aggregation_);
+    aggregation->Aggregate(value);
   }
 
-  bool Collect(AggregationTemporarily aggregation_temporarily,
-               nostd::function_ref<bool(MetricData)> callback) noexcept override
+  bool Collect(
+      MetricCollector *collector,
+      nostd::span<MetricCollector *> collectors,
+      opentelemetry::sdk::instrumentationlibrary::InstrumentationLibrary *instrumentation_library,
+      opentelemetry::sdk::resource::Resource *resource,
+      nostd::function_ref<bool(MetricData)> callback) noexcept override
   {
-    /**
-     * This is placeholder while implementation is complete.
-     * In a real scenario (once fully implemented), Collect may generate more than
-     * metric data
-     */
-    // while(there is metric data) {
-    MetricData metric_data;  // fetch next metric data
-    if (!callback(metric_data))
+
+    if (callback(MetricData()))
     {
-      return false;
+      return true;
     }
-    // } //while
-    return true;
+    return false;
+  }
+
+private:
+  InstrumentDescriptor instrument_descriptor_;
+  AggregationType aggregation_type_;
+  std::unique_ptr<AttributesHashMap> attributes_hashmap_;
+  AttributesProcessor *attributes_processor_;
+  std::function<std::unique_ptr<Aggregation>()> create_default_aggregation_;
+
+  std::unique_ptr<Aggregation> create_aggregation()
+  {
+    switch (aggregation_type_)
+    {
+      case AggregationType::kDrop:
+        return std::move(std::unique_ptr<Aggregation>(new DropAggregation()));
+        break;
+      case AggregationType::kHistogram:
+        if (instrument_descriptor_.value_type_ == InstrumentValueType::kLong)
+        {
+          return std::move(std::unique_ptr<Aggregation>(new LongHistogramAggregation()));
+        }
+        else
+        {
+          return std::move(std::unique_ptr<Aggregation>(new DoubleHistogramAggregation()));
+        }
+        break;
+      case AggregationType::kLastValue:
+        if (instrument_descriptor_.value_type_ == InstrumentValueType::kLong)
+        {
+          return std::move(std::unique_ptr<Aggregation>(new LongLastValueAggregation()));
+        }
+        else
+        {
+          return std::move(std::unique_ptr<Aggregation>(new DoubleLastValueAggregation()));
+        }
+        break;
+      case AggregationType::kSum:
+        if (instrument_descriptor_.value_type_ == InstrumentValueType::kLong)
+        {
+          return std::move(std::unique_ptr<Aggregation>(new LongSumAggregation(true)));
+        }
+        else
+        {
+          return std::move(std::unique_ptr<Aggregation>(new DoubleSumAggregation(true)));
+        }
+        break;
+      default:
+        return std::move(DefaultAggregation::CreateAggregation(instrument_descriptor_));
+    }
   }
 };
 

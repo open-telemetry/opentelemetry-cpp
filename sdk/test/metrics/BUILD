@@ -49,9 +49,40 @@ cc_test(
 )
 
 cc_test(
+    name = "sync_metric_storage_test",
+    srcs = [
+        "sync_metric_storage_test.cc",
+    ],
+    tags = [
+        "metrics",
+        "test",
+    ],
+    deps = [
+        "//sdk/src/metrics",
+        "//sdk/src/resource",
+        "@com_google_googletest//:gtest_main",
+    ],
+)
+
+cc_test(
     name = "attributes_processor_test",
     srcs = [
         "attributes_processor_test.cc",
+    ],
+    tags = [
+        "metrics",
+        "test",
+    ],
+    deps = [
+        "//sdk/src/metrics",
+        "@com_google_googletest//:gtest_main",
+    ],
+)
+
+cc_test(
+    name = "attributes_hashmap_test",
+    srcs = [
+        "attributes_hashmap_test.cc",
     ],
     tags = [
         "metrics",
@@ -67,6 +98,20 @@ otel_cc_benchmark(
     name = "attributes_processor_benchmark",
     srcs = [
         "attributes_processor_benchmark.cc",
+    ],
+    tags = [
+        "metrics",
+        "test",
+    ],
+    deps = [
+        "//sdk/src/metrics",
+    ],
+)
+
+otel_cc_benchmark(
+    name = "attributes_hashmap_benchmark",
+    srcs = [
+        "attributes_hashmap_benchmark.cc",
     ],
     tags = [
         "metrics",
