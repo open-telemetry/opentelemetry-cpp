@@ -78,7 +78,7 @@ public:
   static std::pair<OtlpHttpClient *, std::shared_ptr<http_client::HttpClient>>
   GetMockOtlpHttpClient(HttpRequestContentType content_type)
   {
-    auto http_client = http_client::HttpClientFactory::Create(http_client::ClientType::Nosend);
+    auto http_client = http_client::HttpClientFactory::CreateNoSend();
     return {new OtlpHttpClient(MakeOtlpHttpClientOptions(content_type), http_client), http_client};
   }
 };
