@@ -54,7 +54,7 @@ struct InstrumentDescriptor
 
 using MetricAttributes = opentelemetry::sdk::common::OrderedAttributeMap;
 
-// TBD -> Once MetricCollector is imoplemeted
+// TBD -> Remove once MetricCollector is imoplemeted
 class MetricCollector
 {
 public:

@@ -57,7 +57,6 @@ public:
    * If not present, it uses the provided callback to generate
    * value and store in the hash
    */
-
   Aggregation *GetOrSetDefault(const MetricAttributes &attributes,
                                std::function<std::unique_ptr<Aggregation>()> aggregation_callback)
   {
@@ -75,20 +74,15 @@ public:
   /**
    * Set the value for given key, overwriting the value if already present
    */
-
   void Set(const MetricAttributes &attributes, std::unique_ptr<Aggregation> value)
   {
     std::lock_guard<opentelemetry::common::SpinLockMutex> guard(GetLock());
-    if (hash_map_.find(attributes) == hash_map_.end())
-    {
-      hash_map_[attributes] = std::move(value);
-    }
+    hash_map_[attributes] = std::move(value);
   }
 
   /**
    * Iterate the hash to yield key and value stored in hash.
    */
-
   bool GetAllEnteries(
       nostd::function_ref<bool(const MetricAttributes &, Aggregation &)> callback) const
   {
@@ -106,7 +100,6 @@ public:
   /**
    * Return the size of hash.
    */
-
   size_t Size()
   {
     std::lock_guard<opentelemetry::common::SpinLockMutex> guard(GetLock());

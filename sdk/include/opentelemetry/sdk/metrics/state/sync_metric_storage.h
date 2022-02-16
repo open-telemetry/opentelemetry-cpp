@@ -13,6 +13,8 @@
 #  include "opentelemetry/sdk/metrics/view/view.h"
 #  include "opentelemetry/sdk/resource/resource.h"
 
+#  include <memory>
+
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace sdk
 {
@@ -26,10 +28,10 @@ public:
   SyncMetricStorage(InstrumentDescriptor instrument_descriptor,
                     const AggregationType aggregation_type,
                     AttributesProcessor *attributes_processor = new DefaultAttributesProcessor())
-      : aggregation_type_{aggregation_type},
-        instrument_descriptor_(instrument_descriptor),
-        attributes_processor_{attributes_processor},
-        attributes_hashmap_(std::move(std::unique_ptr<AttributesHashMap>(new AttributesHashMap)))
+      : instrument_descriptor_(instrument_descriptor),
+        aggregation_type_{aggregation_type},
+        attributes_hashmap_(new AttributesHashMap()),
+        attributes_processor_{attributes_processor}
   {
     create_default_aggregation_ = [&]() -> std::unique_ptr<Aggregation> {
       return std::move(this->create_aggregation());
@@ -102,8 +104,8 @@ private:
   InstrumentDescriptor instrument_descriptor_;
   AggregationType aggregation_type_;
   std::unique_ptr<AttributesHashMap> attributes_hashmap_;
-  std::function<std::unique_ptr<Aggregation>()> create_default_aggregation_;
   AttributesProcessor *attributes_processor_;
+  std::function<std::unique_ptr<Aggregation>()> create_default_aggregation_;
 
   std::unique_ptr<Aggregation> create_aggregation()
   {

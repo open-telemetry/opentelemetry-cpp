@@ -79,10 +79,39 @@ cc_test(
     ],
 )
 
+cc_test(
+    name = "attributes_hashmap_test",
+    srcs = [
+        "attributes_hashmap_test.cc",
+    ],
+    tags = [
+        "metrics",
+        "test",
+    ],
+    deps = [
+        "//sdk/src/metrics",
+        "@com_google_googletest//:gtest_main",
+    ],
+)
+
 otel_cc_benchmark(
     name = "attributes_processor_benchmark",
     srcs = [
         "attributes_processor_benchmark.cc",
+    ],
+    tags = [
+        "metrics",
+        "test",
+    ],
+    deps = [
+        "//sdk/src/metrics",
+    ],
+)
+
+otel_cc_benchmark(
+    name = "attributes_hashmap_benchmark",
+    srcs = [
+        "attributes_hashmap_benchmark.cc",
     ],
     tags = [
         "metrics",
