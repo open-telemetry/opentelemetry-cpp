@@ -21,6 +21,7 @@ static std::size_t MakeKey(const MetricReader &metric_reader)
 {
   return reinterpret_cast<std::size_t>(&metric_reader);
 }
+
 class MeasurementProcessor
 {
 public:
@@ -41,12 +42,15 @@ public:
 
 class DefaultMeasurementProcessor : public MeasurementProcessor
 {
-
 public:
   bool AddMetricStorage(const MetricReader &reader)
   {
-    // TBD = check if already present.
-    metric_storages_[MakeKey(reader)] = std::unique_ptr<SyncMetricStorage>(new SyncMetricStorage());
+    // TBD Check if already present
+    // pass intrumentation type, and aggregation type instead of hardcodig below.
+    InstrumentDescriptor instr_desc   = {"name", "desc", "1unit", InstrumentType::kCounter,
+                                       InstrumentValueType::kLong};
+    metric_storages_[MakeKey(reader)] = std::unique_ptr<SyncMetricStorage>(
+        new SyncMetricStorage(instr_desc, AggregationType::kSum));
     return true;
   }
 
@@ -91,9 +95,13 @@ public:
                nostd::function_ref<bool(MetricData)> callback) noexcept override
   {
     auto i = metric_storages_.find(MakeKey(reader));
+
+    // TBD - Remove hardcodings below
+    std::vector<MetricCollector *> collectors;
     if (i != metric_storages_.end())
     {
-      return i->second->Collect(aggregation_temporarily, callback);
+
+      return i->second->Collect(nullptr, collectors, nullptr, nullptr, callback);
     }
     return false;
   }
