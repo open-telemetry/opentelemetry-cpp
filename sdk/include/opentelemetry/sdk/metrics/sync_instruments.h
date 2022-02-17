@@ -19,36 +19,21 @@ namespace metrics
 class Synchronous
 {
 public:
-  Synchronous(nostd::string_view name,
-              const opentelemetry::sdk::instrumentationlibrary::InstrumentationLibrary
-                  *instrumentation_library,
-              MeasurementProcessor *measurement_processor,
-              nostd::string_view description = "",
-              nostd::string_view unit        = "")
-      : name_(name),
-        instrumentation_library_(instrumentation_library),
-        measurement_processor_(measurement_processor),
-        description_(description),
-        unit_(unit)
+  Synchronous(InstrumentDescriptor instrument_descriptor,
+              std::unique_ptr<WritableMetricStorage> storage)
+      : instrument_descriptor_(instrument_descriptor), storage_(std::move(storage))
   {}
 
 protected:
-  std::string name_;
-  const sdk::instrumentationlibrary::InstrumentationLibrary *instrumentation_library_;
-  MeasurementProcessor *measurement_processor_;
-  std::string description_;
-  std::string unit_;
+  InstrumentDescriptor instrument_descriptor_;
+  std::unique_ptr<WritableMetricStorage> storage_;
 };
 
 class LongCounter : public Synchronous, public opentelemetry::metrics::Counter<long>
 {
 public:
-  LongCounter(nostd::string_view name,
-              const opentelemetry::sdk::instrumentationlibrary::InstrumentationLibrary
-                  *instrumentation_library,
-              MeasurementProcessor *measurement_processor,
-              nostd::string_view description = "",
-              nostd::string_view unit        = "");
+  LongCounter(InstrumentDescriptor instrument_descriptor,
+              std::unique_ptr<WritableMetricStorage> storage);
 
   void Add(long value, const opentelemetry::common::KeyValueIterable &attributes) noexcept override;
 
@@ -59,12 +44,8 @@ class DoubleCounter : public Synchronous, public opentelemetry::metrics::Counter
 {
 
 public:
-  DoubleCounter(nostd::string_view name,
-                const opentelemetry::sdk::instrumentationlibrary::InstrumentationLibrary
-                    *instrumentation_library,
-                MeasurementProcessor *measurement_processor,
-                nostd::string_view description = "",
-                nostd::string_view unit        = "");
+  DoubleCounter(InstrumentDescriptor instrument_descriptor,
+                std::unique_ptr<WritableMetricStorage> storage);
 
   void Add(double value,
            const opentelemetry::common::KeyValueIterable &attributes) noexcept override;
@@ -75,12 +56,8 @@ public:
 class LongUpDownCounter : public Synchronous, public opentelemetry::metrics::UpDownCounter<long>
 {
 public:
-  LongUpDownCounter(nostd::string_view name,
-                    const opentelemetry::sdk::instrumentationlibrary::InstrumentationLibrary
-                        *instrumentation_library,
-                    MeasurementProcessor *measurement_processor,
-                    nostd::string_view description = "",
-                    nostd::string_view unit        = "");
+  LongUpDownCounter(InstrumentDescriptor instrument_descriptor,
+                    std::unique_ptr<WritableMetricStorage> storage);
 
   void Add(long value, const opentelemetry::common::KeyValueIterable &attributes) noexcept override;
 
@@ -90,12 +67,8 @@ public:
 class DoubleUpDownCounter : public Synchronous, public opentelemetry::metrics::UpDownCounter<double>
 {
 public:
-  DoubleUpDownCounter(nostd::string_view name,
-                      const opentelemetry::sdk::instrumentationlibrary::InstrumentationLibrary
-                          *instrumentation_library,
-                      MeasurementProcessor *measurement_processor,
-                      nostd::string_view description = "",
-                      nostd::string_view unit        = "");
+  DoubleUpDownCounter(InstrumentDescriptor instrument_descriptor,
+                      std::unique_ptr<WritableMetricStorage> storage);
 
   void Add(double value,
            const opentelemetry::common::KeyValueIterable &attributes) noexcept override;
@@ -106,12 +79,8 @@ public:
 class LongHistogram : public Synchronous, public opentelemetry::metrics::Histogram<long>
 {
 public:
-  LongHistogram(nostd::string_view name,
-                const opentelemetry::sdk::instrumentationlibrary::InstrumentationLibrary
-                    *instrumentation_library,
-                MeasurementProcessor *measurement_processor,
-                nostd::string_view description = "",
-                nostd::string_view unit        = "");
+  LongHistogram(InstrumentDescriptor instrument_descriptor,
+                std::unique_ptr<WritableMetricStorage> storage);
 
   void Record(long value,
               const opentelemetry::common::KeyValueIterable &attributes) noexcept override;
@@ -122,12 +91,8 @@ public:
 class DoubleHistogram : public Synchronous, public opentelemetry::metrics::Histogram<double>
 {
 public:
-  DoubleHistogram(nostd::string_view name,
-                  const opentelemetry::sdk::instrumentationlibrary::InstrumentationLibrary
-                      *instrumentation_library,
-                  MeasurementProcessor *measurement_processor,
-                  nostd::string_view description = "",
-                  nostd::string_view unit        = "");
+  DoubleHistogram(InstrumentDescriptor instrument_descriptor,
+                  std::unique_ptr<WritableMetricStorage> storage);
 
   void Record(double value,
               const opentelemetry::common::KeyValueIterable &attributes) noexcept override;

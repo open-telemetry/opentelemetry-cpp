@@ -53,6 +53,12 @@ public:
   MeasurementProcessor *GetMeasurementProcessor() const noexcept;
 
   /**
+   * Obtain the View Registry configured
+   * @return The reference to view registry
+   */
+  ViewRegistry *GetViewRegistry() const noexcept;
+
+  /**
    * Attaches a metric exporter to list of configured exporters for this Meter context.
    * @param exporter The metric exporter for this meter context. This
    * must not be a nullptr.
