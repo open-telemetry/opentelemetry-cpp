@@ -12,7 +12,7 @@ export BUILD_DIR=/tmp/
 export INSTALL_DIR=/usr/local/
 
 apt install -y --no-install-recommends \
-      libboost-all-dev \
+      libboost-locale-dev \
       libevent-dev \
       libssl-dev \
       ninja-build
@@ -38,6 +38,10 @@ cmake -G Ninja .. \
     -DBUILD_JAVA=OFF \
     -DBUILD_TESTING=OFF \
     -DBUILD_TUTORIALS=OFF \
+    -DWITH_STDTHREADS=ON \
+    -DWITH_BOOSTTHREADS=OFF \
+    -DWITH_BOOST_FUNCTIONAL=OFF \
+    -DWITH_BOOST_SMART_PTR=OFF \
     ..
 
 ninja -j $(nproc)
