@@ -3,8 +3,8 @@
 
 #ifndef ENABLE_METRICS_PREVIEW
 #  include "opentelemetry/sdk/metrics/state/sync_metric_storage.h"
-#  include "opentelemetry/sdk/metrics/instruments.h"
 #  include "opentelemetry/common/key_value_iterable_view.h"
+#  include "opentelemetry/sdk/metrics/instruments.h"
 
 #  include <gtest/gtest.h>
 #  include <map>
