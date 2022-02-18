@@ -99,6 +99,9 @@ public:
   const sdk::instrumentationlibrary::InstrumentationLibrary *GetInstrumentationLibrary()
       const noexcept;
 
+  /** Returns the associated measurement processor */
+  MeasurementProcessor *GetMeasurementProcessor() const noexcept;
+
 private:
   // order of declaration is important here - instrumentation library should destroy after
   // meter-context.
