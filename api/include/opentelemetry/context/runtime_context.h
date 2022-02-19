@@ -150,6 +150,18 @@ public:
     GetStorage() = storage;
   }
 
+  /**
+   * Provide a pointer to const runtime context storage.
+   *
+   * The returned pointer can only be used for extending the lifetime of the runtime context
+   * storage.
+   *
+   */
+  static nostd::shared_ptr<const RuntimeContextStorage> GetConstRuntimeContextStorage() noexcept
+  {
+    return GetRuntimeContextStorage();
+  }
+
 private:
   static nostd::shared_ptr<RuntimeContextStorage> GetRuntimeContextStorage() noexcept
   {
