@@ -90,9 +90,6 @@ public:
   bool Shutdown(std::chrono::microseconds timeout = std::chrono::microseconds(0)) noexcept override;
 
 private:
-  // For testing
-  friend class OtlpHttpLogExporterTestPeer;
-
   // Configuration options for the exporter
   const OtlpHttpLogExporterOptions options_;
 
