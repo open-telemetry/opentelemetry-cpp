@@ -22,7 +22,7 @@ $VCPKG_DIR="$SRC_DIR\vcpkg"
 
 switch ($action) {
   "bazel.build" {
-    bazel build $BAZEL_OPTIONS -- //...
+    bazel build --copt=-DENABLE_TEST $BAZEL_OPTIONS -- //...
     $exit = $LASTEXITCODE
     if ($exit -ne 0) {
       exit $exit
