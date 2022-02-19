@@ -185,6 +185,9 @@ public:
    */
   const std::string &GetBaseUri() const { return host_; }
 
+#ifdef ENABLE_TEST
+  std::shared_ptr<Request> GetRequest() { return http_request_; }
+#endif
 private:
   std::shared_ptr<Request> http_request_;
   std::string host_;
