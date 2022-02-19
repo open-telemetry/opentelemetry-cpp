@@ -91,9 +91,6 @@ public:
   bool Shutdown(std::chrono::microseconds timeout = std::chrono::microseconds(0)) noexcept override;
 
 private:
-  // For testing
-  friend class OtlpHttpExporterTestPeer;
-
   // The configuration options associated with this exporter.
   const OtlpHttpExporterOptions options_;
 
