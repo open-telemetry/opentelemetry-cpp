@@ -8,6 +8,7 @@
 #  include "opentelemetry/sdk/metrics/async_instruments.h"
 #  include "opentelemetry/sdk/metrics/state/multi_metric_storage.h"
 #  include "opentelemetry/sdk/metrics/sync_instruments.h"
+#  include "opentelemetry/sdk_config.h"
 
 #  include "opentelemetry/version.h"
 
@@ -185,11 +186,10 @@ MeasurementProcessor *Meter::GetMeasurementProcessor() const noexcept
 std::unique_ptr<WritableMetricStorage> Meter::RegisterMetricStorage(
     InstrumentDescriptor &instrument_descriptor)
 {
-
   auto view_registry = meter_context_->GetViewRegistry();
   std::unique_ptr<WritableMetricStorage> storages(new MultiMetricStorage());
 
-  auto result = view_registry->FindViews(
+  auto success = view_registry->FindViews(
       instrument_descriptor, *instrumentation_library_,
       [this, &instrument_descriptor, &storages](const View &view) {
         auto view_instr_desc         = instrument_descriptor;
@@ -202,6 +202,13 @@ std::unique_ptr<WritableMetricStorage> Meter::RegisterMetricStorage(
         multi_storage->AddStorage(storage);
         return true;
       });
+
+  if (!success)
+  {
+    OTEL_INTERNAL_LOG_ERROR(
+        "[Meter::RegisterMetricStorage] - Error during finding matching views."
+        << "Some of the matching view configurations mayn't be used for metric collection");
+  }
   return std::move(storages);
 }
 

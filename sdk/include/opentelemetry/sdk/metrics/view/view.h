@@ -37,7 +37,7 @@ public:
 
   virtual std::string GetDescription() const noexcept { return description_; }
 
-  virtual const AggregationType &GetAggregationType() const noexcept { return aggregation_type_; }
+  virtual AggregationType GetAggregationType() const noexcept { return aggregation_type_; }
 
   virtual const opentelemetry::sdk::metrics::AttributesProcessor &GetAttributesProcessor()
       const noexcept

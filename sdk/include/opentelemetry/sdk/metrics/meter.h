@@ -107,6 +107,7 @@ private:
   // meter-context.
   std::unique_ptr<sdk::instrumentationlibrary::InstrumentationLibrary> instrumentation_library_;
   std::shared_ptr<sdk::metrics::MeterContext> meter_context_;
+  // Mapping between instrument-name and Aggregation Storage.
   std::unordered_map<std::string, std::shared_ptr<MetricStorage>> storage_registry_;
 
   std::unique_ptr<WritableMetricStorage> RegisterMetricStorage(
