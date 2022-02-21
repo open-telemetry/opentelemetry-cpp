@@ -16,11 +16,8 @@ workspace(name = "io_opentelemetry_cpp")
 
 # Load our direct dependencies.
 load("//bazel:repository.bzl", "opentelemetry_cpp_deps")
-load("//bazel:openssl_repositories.bzl", "openssl_repositories")
 
 opentelemetry_cpp_deps()
-
-openssl_repositories()
 
 # Load prometheus C++ dependencies.
 load("@com_github_jupp0r_prometheus_cpp//bazel:repositories.bzl", "prometheus_cpp_repositories")

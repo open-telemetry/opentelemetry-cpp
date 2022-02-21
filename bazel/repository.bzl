@@ -113,15 +113,6 @@ def opentelemetry_cpp_deps():
         urls = ["https://curl.haxx.se/download/curl-7.73.0.tar.gz"],
     )
 
-    # boost
-    maybe(
-        git_repository,
-        name = "com_github_nelhage_rules_boost",
-        commit = "d104cb7beba996d67ae5826be07aab2d9ca0ee38",
-        remote = "https://github.com/nelhage/rules_boost",
-        shallow_since = "1637888414 -0800",
-    )
-
     # libthrift (optional)
     maybe(
         http_archive,
@@ -131,18 +122,6 @@ def opentelemetry_cpp_deps():
         strip_prefix = "thrift-0.14.1",
         urls = [
             "https://github.com/apache/thrift/archive/refs/tags/v0.14.1.tar.gz",
-        ],
-    )
-
-    # libssl (optional)
-    maybe(
-        http_archive,
-        name = "com_github_openssl",
-        build_file_content = _ALL_CONTENT,
-        sha256 = "0b7a3e5e59c34827fe0c3a74b7ec8baef302b98fa80088d7f9153aa16fa76bd1",
-        strip_prefix = "openssl-1.1.1l",
-        urls = [
-            "https://www.openssl.org/source/openssl-1.1.1l.tar.gz",
         ],
     )
 
@@ -164,4 +143,26 @@ def opentelemetry_cpp_deps():
             "https://github.com/bazelbuild/bazel-skylib/releases/download/1.1.1/bazel-skylib-1.1.1.tar.gz",
             "https://mirror.bazel.build/github.com/bazelbuild/bazel-skylib/releases/download/1.1.1/bazel-skylib-1.1.1.tar.gz",
         ],
+    )
+
+    # boost headers from vcpkg
+    maybe(
+        native.new_local_repository,
+        name = "boost_all_hdrs",
+        build_file_content = """
+package(default_visibility = ["//visibility:public"])
+cc_library(
+  name = "boost_all_hdrs",
+  hdrs = glob(
+      ["include/**/*.h*"],
+  ),
+  strip_include_prefix = "include",
+  copts = [
+      "-isystem include",
+      "-fexceptions",
+    ],
+    visibility = ["//visibility:public"],
+)
+        """,
+        path = "vcpkg/installed/x64-windows/",
     )

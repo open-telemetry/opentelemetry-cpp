@@ -197,6 +197,7 @@ cc_test(
     name = "jaeger_recordable_test",
     srcs = ["test/jaeger_recordable_test.cc"],
     copts = ["-fexceptions"],
+    copts = ["-fexceptions"],
     tags = [
         "jaeger",
         "test",
@@ -211,6 +212,7 @@ cc_test(
 cc_test(
     name = "jaeger_exporter_test",
     srcs = ["test/jaeger_exporter_test.cc"],
+    copts = ["-fexceptions"],
     copts = ["-fexceptions"],
     defines = ["BAZEL_BUILD"],
     tags = [
