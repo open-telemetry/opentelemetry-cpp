@@ -1,5 +1,14 @@
 load("@bazel_tools//tools/build_defs/repo:utils.bzl", "maybe")
 load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive")
+load("@bazel_tools//tools/build_defs/repo:git.bzl", "git_repository")
+
+_ALL_CONTENT = """\
+filegroup(
+    name = "all_srcs",
+    srcs = glob(["**"]),
+    visibility = ["//visibility:public"],
+)
+"""
 
 def opentelemetry_cpp_deps():
     """Loads dependencies need to compile the opentelemetry-cpp library."""
@@ -53,10 +62,10 @@ def opentelemetry_cpp_deps():
     maybe(
         http_archive,
         name = "com_github_grpc_grpc",
-        sha256 = "b74ce7d26fe187970d1d8e2c06a5d3391122f7bc1fdce569aff5e435fb8fe780",
-        strip_prefix = "grpc-1.43.2",
+        sha256 = "024118069912358e60722a2b7e507e9c3b51eeaeee06e2dd9d95d9c16f6639ec",
+        strip_prefix = "grpc-1.39.1",
         urls = [
-            "https://github.com/grpc/grpc/archive/v1.43.2.tar.gz",
+            "https://github.com/grpc/grpc/archive/v1.39.1.tar.gz",
         ],
     )
 
@@ -102,4 +111,57 @@ def opentelemetry_cpp_deps():
         sha256 = "ba98332752257b47b9dea6d8c0ad25ec1745c20424f1dd3ff2c99ab59e97cf91",
         strip_prefix = "curl-7.73.0",
         urls = ["https://curl.haxx.se/download/curl-7.73.0.tar.gz"],
+    )
+
+    # boost
+    maybe(
+        git_repository,
+        name = "com_github_nelhage_rules_boost",
+        commit = "d104cb7beba996d67ae5826be07aab2d9ca0ee38",
+        remote = "https://github.com/nelhage/rules_boost",
+        shallow_since = "1637888414 -0800",
+    )
+
+    # libthrift (optional)
+    maybe(
+        http_archive,
+        name = "com_github_thrift",
+        build_file_content = _ALL_CONTENT,
+        sha256 = "5ae1c4d16452a22eaf9d802ba7489907147c2b316ff38c9758918552fae5132c",
+        strip_prefix = "thrift-0.14.1",
+        urls = [
+            "https://github.com/apache/thrift/archive/refs/tags/v0.14.1.tar.gz",
+        ],
+    )
+
+    # libssl (optional)
+    maybe(
+        http_archive,
+        name = "com_github_openssl",
+        build_file_content = _ALL_CONTENT,
+        sha256 = "0b7a3e5e59c34827fe0c3a74b7ec8baef302b98fa80088d7f9153aa16fa76bd1",
+        strip_prefix = "openssl-1.1.1l",
+        urls = [
+            "https://www.openssl.org/source/openssl-1.1.1l.tar.gz",
+        ],
+    )
+
+    # rules foreign cc
+    maybe(
+        http_archive,
+        name = "rules_foreign_cc",
+        sha256 = "69023642d5781c68911beda769f91fcbc8ca48711db935a75da7f6536b65047f",
+        strip_prefix = "rules_foreign_cc-0.6.0",
+        url = "https://github.com/bazelbuild/rules_foreign_cc/archive/0.6.0.tar.gz",
+    )
+
+    # bazel skylib
+    maybe(
+        http_archive,
+        name = "bazel_skylib",
+        sha256 = "c6966ec828da198c5d9adbaa94c05e3a1c7f21bd012a0b29ba8ddbccb2c93b0d",
+        urls = [
+            "https://github.com/bazelbuild/bazel-skylib/releases/download/1.1.1/bazel-skylib-1.1.1.tar.gz",
+            "https://mirror.bazel.build/github.com/bazelbuild/bazel-skylib/releases/download/1.1.1/bazel-skylib-1.1.1.tar.gz",
+        ],
     )
