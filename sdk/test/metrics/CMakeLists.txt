@@ -6,6 +6,7 @@ foreach(
   attributes_processor_test
   attributes_hashmap_test
   sync_metric_storage_test
+  multi_metric_storage_test
   sync_instruments_test
   async_instruments_test)
   add_executable(${testname} "${testname}.cc")
