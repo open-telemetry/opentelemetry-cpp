@@ -81,9 +81,9 @@ cc_test(
 )
 
 cc_test(
-    name = "observable_result_test",
+    name = "observer_result_test",
     srcs = [
-        "observable_result_test.cc",
+        "observer_result_test.cc",
     ],
     tags = [
         "metrics",
