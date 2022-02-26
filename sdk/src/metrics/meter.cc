@@ -6,7 +6,9 @@
 #  include "opentelemetry/metrics/noop.h"
 #  include "opentelemetry/nostd/shared_ptr.h"
 #  include "opentelemetry/sdk/metrics/async_instruments.h"
+#  include "opentelemetry/sdk/metrics/state/multi_metric_storage.h"
 #  include "opentelemetry/sdk/metrics/sync_instruments.h"
+#  include "opentelemetry/sdk_config.h"
 
 #  include "opentelemetry/version.h"
 
@@ -21,18 +23,22 @@ namespace metrics
 namespace metrics = opentelemetry::metrics;
 namespace nostd   = opentelemetry::nostd;
 
-Meter::Meter(std::shared_ptr<MeterContext> context,
+Meter::Meter(std::shared_ptr<MeterContext> meter_context,
              std::unique_ptr<sdk::instrumentationlibrary::InstrumentationLibrary>
                  instrumentation_library) noexcept
-    : context_{context}, instrumentation_library_{std::move(instrumentation_library)}
+    : meter_context_{meter_context}, instrumentation_library_{std::move(instrumentation_library)}
 {}
 
 nostd::shared_ptr<metrics::Counter<long>> Meter::CreateLongCounter(nostd::string_view name,
                                                                    nostd::string_view description,
                                                                    nostd::string_view unit) noexcept
 {
-  return nostd::shared_ptr<metrics::Counter<long>>(new LongCounter(
-      name, GetInstrumentationLibrary(), GetMeasurementProcessor(), description, unit));
+  InstrumentDescriptor instrument_descriptor = {
+      std::string{name.data(), name.size()}, std::string{description.data(), description.size()},
+      std::string{unit.data(), unit.size()}, InstrumentType::kCounter, InstrumentValueType::kLong};
+  auto storage = RegisterMetricStorage(instrument_descriptor);
+  return nostd::shared_ptr<metrics::Counter<long>>(
+      new LongCounter(instrument_descriptor, std::move(storage)));
 }
 
 nostd::shared_ptr<metrics::Counter<double>> Meter::CreateDoubleCounter(
@@ -40,8 +46,13 @@ nostd::shared_ptr<metrics::Counter<double>> Meter::CreateDoubleCounter(
     nostd::string_view description,
     nostd::string_view unit) noexcept
 {
-  return nostd::shared_ptr<metrics::Counter<double>>{new DoubleCounter(
-      name, GetInstrumentationLibrary(), GetMeasurementProcessor(), description, unit)};
+  InstrumentDescriptor instrument_descriptor = {
+      std::string{name.data(), name.size()}, std::string{description.data(), description.size()},
+      std::string{unit.data(), unit.size()}, InstrumentType::kCounter,
+      InstrumentValueType::kDouble};
+  auto storage = RegisterMetricStorage(instrument_descriptor);
+  return nostd::shared_ptr<metrics::Counter<double>>{
+      new DoubleCounter(instrument_descriptor, std::move(storage))};
 }
 
 nostd::shared_ptr<metrics::ObservableCounter<long>> Meter::CreateLongObservableCounter(
@@ -69,8 +80,13 @@ nostd::shared_ptr<metrics::Histogram<long>> Meter::CreateLongHistogram(
     nostd::string_view description,
     nostd::string_view unit) noexcept
 {
-  return nostd::shared_ptr<metrics::Histogram<long>>{new LongHistogram(
-      name, GetInstrumentationLibrary(), GetMeasurementProcessor(), description, unit)};
+  InstrumentDescriptor instrument_descriptor = {
+      std::string{name.data(), name.size()}, std::string{description.data(), description.size()},
+      std::string{unit.data(), unit.size()}, InstrumentType::kHistogram,
+      InstrumentValueType::kLong};
+  auto storage = RegisterMetricStorage(instrument_descriptor);
+  return nostd::shared_ptr<metrics::Histogram<long>>{
+      new LongHistogram(instrument_descriptor, std::move(storage))};
 }
 
 nostd::shared_ptr<metrics::Histogram<double>> Meter::CreateDoubleHistogram(
@@ -78,8 +94,13 @@ nostd::shared_ptr<metrics::Histogram<double>> Meter::CreateDoubleHistogram(
     nostd::string_view description,
     nostd::string_view unit) noexcept
 {
-  return nostd::shared_ptr<metrics::Histogram<double>>{new DoubleHistogram(
-      name, GetInstrumentationLibrary(), GetMeasurementProcessor(), description, unit)};
+  InstrumentDescriptor instrument_descriptor = {
+      std::string{name.data(), name.size()}, std::string{description.data(), description.size()},
+      std::string{unit.data(), unit.size()}, InstrumentType::kHistogram,
+      InstrumentValueType::kDouble};
+  auto storage = RegisterMetricStorage(instrument_descriptor);
+  return nostd::shared_ptr<metrics::Histogram<double>>{
+      new DoubleHistogram(instrument_descriptor, std::move(storage))};
 }
 
 nostd::shared_ptr<metrics::ObservableGauge<long>> Meter::CreateLongObservableGauge(
@@ -107,8 +128,13 @@ nostd::shared_ptr<metrics::UpDownCounter<long>> Meter::CreateLongUpDownCounter(
     nostd::string_view description,
     nostd::string_view unit) noexcept
 {
-  return nostd::shared_ptr<metrics::UpDownCounter<long>>{new LongUpDownCounter(
-      name, GetInstrumentationLibrary(), GetMeasurementProcessor(), description, unit)};
+  InstrumentDescriptor instrument_descriptor = {
+      std::string{name.data(), name.size()}, std::string{description.data(), description.size()},
+      std::string{unit.data(), unit.size()}, InstrumentType::kUpDownCounter,
+      InstrumentValueType::kLong};
+  auto storage = RegisterMetricStorage(instrument_descriptor);
+  return nostd::shared_ptr<metrics::UpDownCounter<long>>{
+      new LongUpDownCounter(instrument_descriptor, std::move(storage))};
 }
 
 nostd::shared_ptr<metrics::UpDownCounter<double>> Meter::CreateDoubleUpDownCounter(
@@ -116,8 +142,13 @@ nostd::shared_ptr<metrics::UpDownCounter<double>> Meter::CreateDoubleUpDownCount
     nostd::string_view description,
     nostd::string_view unit) noexcept
 {
-  return nostd::shared_ptr<metrics::UpDownCounter<double>>{new DoubleUpDownCounter(
-      name, GetInstrumentationLibrary(), GetMeasurementProcessor(), description, unit)};
+  InstrumentDescriptor instrument_descriptor = {
+      std::string{name.data(), name.size()}, std::string{description.data(), description.size()},
+      std::string{unit.data(), unit.size()}, InstrumentType::kUpDownCounter,
+      InstrumentValueType::kDouble};
+  auto storage = RegisterMetricStorage(instrument_descriptor);
+  return nostd::shared_ptr<metrics::UpDownCounter<double>>{
+      new DoubleUpDownCounter(instrument_descriptor, std::move(storage))};
 }
 
 nostd::shared_ptr<metrics::ObservableUpDownCounter<long>> Meter::CreateLongObservableUpDownCounter(
@@ -149,7 +180,36 @@ const sdk::instrumentationlibrary::InstrumentationLibrary *Meter::GetInstrumenta
 
 MeasurementProcessor *Meter::GetMeasurementProcessor() const noexcept
 {
-  return context_->GetMeasurementProcessor();
+  return meter_context_->GetMeasurementProcessor();
+}
+
+std::unique_ptr<WritableMetricStorage> Meter::RegisterMetricStorage(
+    InstrumentDescriptor &instrument_descriptor)
+{
+  auto view_registry = meter_context_->GetViewRegistry();
+  std::unique_ptr<WritableMetricStorage> storages(new MultiMetricStorage());
+
+  auto success = view_registry->FindViews(
+      instrument_descriptor, *instrumentation_library_,
+      [this, &instrument_descriptor, &storages](const View &view) {
+        auto view_instr_desc         = instrument_descriptor;
+        view_instr_desc.name_        = view.GetName();
+        view_instr_desc.description_ = view.GetDescription();
+        auto storage                 = std::shared_ptr<SyncMetricStorage>(new SyncMetricStorage(
+            view_instr_desc, view.GetAggregationType(), &view.GetAttributesProcessor()));
+        storage_registry_[instrument_descriptor.name_] = storage;
+        auto multi_storage = static_cast<MultiMetricStorage *>(storages.get());
+        multi_storage->AddStorage(storage);
+        return true;
+      });
+
+  if (!success)
+  {
+    OTEL_INTERNAL_LOG_ERROR(
+        "[Meter::RegisterMetricStorage] - Error during finding matching views."
+        << "Some of the matching view configurations mayn't be used for metric collection");
+  }
+  return std::move(storages);
 }
 
 }  // namespace metrics
