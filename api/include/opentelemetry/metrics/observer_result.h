@@ -32,7 +32,7 @@ public:
             nostd::enable_if_t<common::detail::is_key_value_iterable<U>::value> * = nullptr>
   void Observe(T value, const U &attributes) noexcept
   {
-    this->Observe(value, common::KeyValueIterableView<T>{attributes});
+    this->Observe(value, common::KeyValueIterableView<U>{attributes});
   }
 
   void Observe(T value,
@@ -42,6 +42,7 @@ public:
     this->Observe(value, nostd::span<const std::pair<nostd::string_view, common::AttributeValue>>{
                              attributes.begin(), attributes.end()});
   }
+
 };
 
 }  // namespace metrics
