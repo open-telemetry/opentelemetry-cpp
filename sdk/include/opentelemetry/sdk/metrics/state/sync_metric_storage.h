@@ -25,17 +25,17 @@ class SyncMetricStorage : public MetricStorage, public WritableMetricStorage
 {
 
 public:
-  SyncMetricStorage(
-      InstrumentDescriptor instrument_descriptor,
-      const AggregationType aggregation_type,
-      const AttributesProcessor *attributes_processor)
+  SyncMetricStorage(InstrumentDescriptor instrument_descriptor,
+                    const AggregationType aggregation_type,
+                    const AttributesProcessor *attributes_processor)
       : instrument_descriptor_(instrument_descriptor),
         aggregation_type_{aggregation_type},
         attributes_hashmap_(new AttributesHashMap()),
         attributes_processor_{attributes_processor}
   {
     create_default_aggregation_ = [&]() -> std::unique_ptr<Aggregation> {
-      return std::move(DefaultAggregation::CreateAggregation(aggregation_type_, instrument_descriptor_));
+      return std::move(
+          DefaultAggregation::CreateAggregation(aggregation_type_, instrument_descriptor_));
     };
   }
 
@@ -56,7 +56,7 @@ public:
       return;
     }
 
-    auto attr        = attributes_processor_->process(attributes);
+    auto attr = attributes_processor_->process(attributes);
     attributes_hashmap_->GetOrSetDefault(attr, create_default_aggregation_)->Aggregate(value);
   }
 
@@ -78,7 +78,7 @@ public:
       return;
     }
 
-    auto attr        = attributes_processor_->process(attributes);
+    auto attr = attributes_processor_->process(attributes);
     attributes_hashmap_->GetOrSetDefault(attr, create_default_aggregation_)->Aggregate(value);
   }
 
@@ -87,7 +87,7 @@ public:
       nostd::span<MetricCollector *> collectors,
       opentelemetry::sdk::instrumentationlibrary::InstrumentationLibrary *instrumentation_library,
       opentelemetry::sdk::resource::Resource *resource,
-      nostd::function_ref<bool(MetricData&)> callback) noexcept override
+      nostd::function_ref<bool(MetricData &)> callback) noexcept override
   {
     MetricData metric_data;
     if (callback(metric_data))

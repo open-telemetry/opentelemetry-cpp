@@ -48,7 +48,8 @@ public:
     };
   }
 
-  static std::unique_ptr<Aggregation> CreateAggregation(AggregationType aggregation_type, InstrumentDescriptor instrument_descriptor )
+  static std::unique_ptr<Aggregation> CreateAggregation(AggregationType aggregation_type,
+                                                        InstrumentDescriptor instrument_descriptor)
   {
     switch (aggregation_type)
     {
@@ -85,7 +86,7 @@ public:
           return std::unique_ptr<Aggregation>(new DoubleSumAggregation(true));
         }
         break;
-      default: 
+      default:
         return DefaultAggregation::CreateAggregation(instrument_descriptor);
     }
   }

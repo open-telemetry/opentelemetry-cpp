@@ -42,7 +42,6 @@ public:
     this->Observe(value, nostd::span<const std::pair<nostd::string_view, common::AttributeValue>>{
                              attributes.begin(), attributes.end()});
   }
-
 };
 
 }  // namespace metrics

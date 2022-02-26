@@ -4,12 +4,12 @@
 #pragma once
 #ifndef ENABLE_METRICS_PREVIEW
 
+#  include <map>
 #  include "opentelemetry/common/key_value_iterable_view.h"
 #  include "opentelemetry/sdk/metrics/instruments.h"
 #  include "opentelemetry/sdk/metrics/metric_reader.h"
 #  include "opentelemetry/sdk/metrics/state/sync_metric_storage.h"
-# include "opentelemetry/sdk/metrics/view/attributes_processor.h"
-#  include <map>
+#  include "opentelemetry/sdk/metrics/view/attributes_processor.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace sdk

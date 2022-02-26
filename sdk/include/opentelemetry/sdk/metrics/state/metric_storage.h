@@ -23,7 +23,7 @@ public:
       nostd::span<MetricCollector *> collectors,
       opentelemetry::sdk::instrumentationlibrary::InstrumentationLibrary *instrumentation_library,
       opentelemetry::sdk::resource::Resource *resource,
-      nostd::function_ref<bool(MetricData&)> callback) noexcept = 0;
+      nostd::function_ref<bool(MetricData &)> callback) noexcept = 0;
 };
 
 class WritableMetricStorage
@@ -48,7 +48,7 @@ public:
       nostd::span<MetricCollector *> collectors,
       opentelemetry::sdk::instrumentationlibrary::InstrumentationLibrary *instrumentation_library,
       opentelemetry::sdk::resource::Resource *resource,
-      nostd::function_ref<bool(MetricData&)> callback) noexcept override
+      nostd::function_ref<bool(MetricData &)> callback) noexcept override
   {
     MetricData metric_data;
     if (callback(metric_data))
