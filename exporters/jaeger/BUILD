@@ -96,11 +96,7 @@ cmake(
     }),
     tags = ["jaeger"],
     visibility = ["//visibility:private"],
-    deps = select({
-        "@bazel_tools//platforms:osx": THRIFT_DEPS,
-        "@bazel_tools//platforms:linux": THRIFT_DEPS,
-        "@bazel_tools//platforms:windows": [],
-    }),
+    deps = [],
 )
 
 THRIFT_GEN_DEPS = [
