@@ -56,12 +56,6 @@ THRIFT_CACHE_ENTRIES_WIN = {
     "CMAKE_TOOLCHAIN_FILE": "$VCPKG_DIR/scripts/buildsystems/vcpkg.cmake",
 }
 
-THRIFT_DEPS_WIN = [
-]
-
-THRIFT_DEPS = THRIFT_DEPS_WIN + [
-]
-
 cmake(
     name = "thrift",
     cache_entries = select({
