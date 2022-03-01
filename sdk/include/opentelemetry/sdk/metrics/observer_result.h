@@ -23,18 +23,22 @@ public:
       : attributes_processor_(attributes_processor)
   {}
 
-  virtual void Observe(T value) noexcept override { data_.insert({{}, value}); }
+  void Observe(T value) noexcept override { data_.insert({{}, value}); }
 
-  virtual void Observer(T value,
-                        const opentelemetry::common::KeyValueIterable &attributes) noexcept override
+  void Observe(T value, const opentelemetry::common::KeyValueIterable &attributes) noexcept override
   {
     auto attr = attributes_processor_->process(attributes);
     data_.insert({attr, value});
   }
 
-  std::unordered_map<MetricAttributes, T, AttributeHashGenerator> data_;
+  const std::unordered_map<MetricAttributes, T, AttributeHashGenerator> &GetMeasurements()
+  {
+    return data_;
+  }
 
 private:
+  std::unordered_map<MetricAttributes, T, AttributeHashGenerator> data_;
+
   const AttributesProcessor *attributes_processor_;
 };
 }  // namespace metrics

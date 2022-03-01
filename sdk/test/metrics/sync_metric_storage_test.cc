@@ -25,8 +25,6 @@ TEST(WritableMetricStorageTest, BasicTests)
   EXPECT_NO_THROW(storage.RecordLong(
       10l, opentelemetry::common::KeyValueIterableView<M>({{"abc", "123"}, {"xyz", "456"}})));
 
-  MetricCollector collector;
-  std::vector<MetricCollector> collectors;
   EXPECT_NO_THROW(storage.RecordDouble(10.10, opentelemetry::common::KeyValueIterableView<M>({})));
 }
 #endif

@@ -33,8 +33,8 @@ public:
       : instrument_descriptor_(instrument_descriptor),
         aggregation_type_{aggregation_type},
         measurement_collection_callback_{measurement_callback},
-        active_attributes_hashmap_(new AttributesHashMap()),
-        attributes_processor_{attributes_processor}
+        attributes_processor_{attributes_processor},
+        active_attributes_hashmap_(new AttributesHashMap())
   {}
 
   bool Collect(
@@ -50,7 +50,7 @@ public:
     measurement_collection_callback_(ob_res);
 
     // process the read measurements - aggregate and store in hashmap
-    for (auto &measurement : ob_res.data_)
+    for (auto &measurement : ob_res.GetMeasurements())
     {
       auto agg = DefaultAggregation::CreateAggregation(aggregation_type_, instrument_descriptor_);
       agg->Aggregate(measurement.second);
@@ -67,11 +67,11 @@ public:
   }
 
 private:
-  void (*measurement_collection_callback_)(opentelemetry::metrics::ObserverResult<T> &);
-  std::unique_ptr<AttributesHashMap> active_attributes_hashmap_;
   InstrumentDescriptor instrument_descriptor_;
   AggregationType aggregation_type_;
+  void (*measurement_collection_callback_)(opentelemetry::metrics::ObserverResult<T> &);
   const AttributesProcessor *attributes_processor_;
+  std::unique_ptr<AttributesHashMap> active_attributes_hashmap_;
 };
 
 }  // namespace metrics
