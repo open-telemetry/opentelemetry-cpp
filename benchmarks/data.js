@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1646237243824,
+  "lastUpdate": 1646237245142,
   "repoUrl": "https://github.com/open-telemetry/opentelemetry-cpp",
   "entries": {
     "OpenTelemetry-cpp api Benchmark": [
@@ -9094,6 +9094,54 @@ window.BENCHMARK_DATA = {
             "value": 2040351.722754684,
             "unit": "ns/iter",
             "extra": "iterations: 408\ncpu: 361868.62745098054 ns\nthreads: 1"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "artiom.vaskov@ibm.com",
+            "name": "Artiom Vaskov",
+            "username": "velemas"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "84394fda87e80697ee0534311021926b529c8342",
+          "message": "Added s390x arch into CMake build. (#1216)",
+          "timestamp": "2022-03-02T07:52:37-08:00",
+          "tree_id": "e328dfc358d429ff046cb55b8f5d310864548cb6",
+          "url": "https://github.com/open-telemetry/opentelemetry-cpp/commit/84394fda87e80697ee0534311021926b529c8342"
+        },
+        "date": 1646237243311,
+        "tool": "googlecpp",
+        "benches": [
+          {
+            "name": "BM_OtlpExporterEmptySpans",
+            "value": 46.50735283105948,
+            "unit": "ns/iter",
+            "extra": "iterations: 3668000\ncpu: 37.079362050163574 ns\nthreads: 1"
+          },
+          {
+            "name": "BM_OtlpExporterSparseSpans",
+            "value": 134.5658302307129,
+            "unit": "ns/iter",
+            "extra": "iterations: 1000000\ncpu: 103.9985 ns\nthreads: 1"
+          },
+          {
+            "name": "BM_OtlpExporterDenseSpans",
+            "value": 977.7027627696161,
+            "unit": "ns/iter",
+            "extra": "iterations: 161000\ncpu: 834.2130434782605 ns\nthreads: 1"
+          },
+          {
+            "name": "BM_otlp_grpc_with_collector",
+            "value": 2726014.3954054755,
+            "unit": "ns/iter",
+            "extra": "iterations: 266\ncpu: 483424.43609022576 ns\nthreads: 1"
           }
         ]
       }
