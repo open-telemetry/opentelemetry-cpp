@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1646217779044,
+  "lastUpdate": 1646237243824,
   "repoUrl": "https://github.com/open-telemetry/opentelemetry-cpp",
   "entries": {
     "OpenTelemetry-cpp api Benchmark": [
@@ -7886,6 +7886,156 @@ window.BENCHMARK_DATA = {
             "value": 4680396.875745346,
             "unit": "ns/iter",
             "extra": "iterations: 954\ncpu: 147658.9098532494 ns\nthreads: 1"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "artiom.vaskov@ibm.com",
+            "name": "Artiom Vaskov",
+            "username": "velemas"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "84394fda87e80697ee0534311021926b529c8342",
+          "message": "Added s390x arch into CMake build. (#1216)",
+          "timestamp": "2022-03-02T07:52:37-08:00",
+          "tree_id": "e328dfc358d429ff046cb55b8f5d310864548cb6",
+          "url": "https://github.com/open-telemetry/opentelemetry-cpp/commit/84394fda87e80697ee0534311021926b529c8342"
+        },
+        "date": 1646237242663,
+        "tool": "googlecpp",
+        "benches": [
+          {
+            "name": "BM_AttributseHashMap",
+            "value": 18417119.9798584,
+            "unit": "ns/iter",
+            "extra": "iterations: 12\ncpu: 12238350 ns\nthreads: 1"
+          },
+          {
+            "name": "BM_AttributseProcessorFilter",
+            "value": 246.87299747088073,
+            "unit": "ns/iter",
+            "extra": "iterations: 574923\ncpu: 246.86644994199227 ns\nthreads: 1"
+          },
+          {
+            "name": "BM_AlwaysOffSamplerConstruction",
+            "value": 2.73131588697221,
+            "unit": "ns/iter",
+            "extra": "iterations: 55770227\ncpu: 2.7249431851873225 ns\nthreads: 1"
+          },
+          {
+            "name": "BM_AlwaysOnSamplerConstruction",
+            "value": 2.574599837253402,
+            "unit": "ns/iter",
+            "extra": "iterations: 50880043\ncpu: 2.5587792840505266 ns\nthreads: 1"
+          },
+          {
+            "name": "BM_ParentBasedSamplerConstruction",
+            "value": 95.98420108500491,
+            "unit": "ns/iter",
+            "extra": "iterations: 1315542\ncpu: 95.48368657177043 ns\nthreads: 1"
+          },
+          {
+            "name": "BM_TraceIdRatioBasedSamplerConstruction",
+            "value": 406.8379884484106,
+            "unit": "ns/iter",
+            "extra": "iterations: 354175\ncpu: 405.6500317639587 ns\nthreads: 1"
+          },
+          {
+            "name": "BM_AlwaysOffSamplerShouldSample",
+            "value": 45.9075737571004,
+            "unit": "ns/iter",
+            "extra": "iterations: 3296437\ncpu: 42.28216707918278 ns\nthreads: 1"
+          },
+          {
+            "name": "BM_AlwaysOnSamplerShouldSample",
+            "value": 55.78864646088875,
+            "unit": "ns/iter",
+            "extra": "iterations: 3126996\ncpu: 47.971759477786335 ns\nthreads: 1"
+          },
+          {
+            "name": "BM_ParentBasedSamplerShouldSample",
+            "value": 50.05521513693014,
+            "unit": "ns/iter",
+            "extra": "iterations: 3001451\ncpu: 47.17221770403712 ns\nthreads: 1"
+          },
+          {
+            "name": "BM_TraceIdRatioBasedSamplerShouldSample",
+            "value": 26.673292154070946,
+            "unit": "ns/iter",
+            "extra": "iterations: 5668406\ncpu: 25.713066424670384 ns\nthreads: 1"
+          },
+          {
+            "name": "BM_SpanCreation",
+            "value": 917.1182073170103,
+            "unit": "ns/iter",
+            "extra": "iterations: 149184\ncpu: 910.5500589875597 ns\nthreads: 1"
+          },
+          {
+            "name": "BM_NoopSpanCreation",
+            "value": 1058.0897331237793,
+            "unit": "ns/iter",
+            "extra": "iterations: 100000\ncpu: 1026.5049999999976 ns\nthreads: 1"
+          },
+          {
+            "name": "BM_AttributeMapHash",
+            "value": 197.09045862885245,
+            "unit": "ns/iter",
+            "extra": "iterations: 852577\ncpu: 196.33346900045396 ns\nthreads: 1"
+          },
+          {
+            "name": "BM_RandomIdGeneration",
+            "value": 3.9059936559017756,
+            "unit": "ns/iter",
+            "extra": "iterations: 41780818\ncpu: 3.8762931831540492 ns\nthreads: 1"
+          },
+          {
+            "name": "BM_RandomIdStdGeneration",
+            "value": 8.408719108362936,
+            "unit": "ns/iter",
+            "extra": "iterations: 17016890\ncpu: 8.36992540940207 ns\nthreads: 1"
+          },
+          {
+            "name": "BM_BaselineBuffer/1",
+            "value": 9681704.044342041,
+            "unit": "ns/iter",
+            "extra": "iterations: 100\ncpu: 95930 ns\nthreads: 1"
+          },
+          {
+            "name": "BM_BaselineBuffer/2",
+            "value": 9265100.955963135,
+            "unit": "ns/iter",
+            "extra": "iterations: 100\ncpu: 255519.00000000003 ns\nthreads: 1"
+          },
+          {
+            "name": "BM_BaselineBuffer/4",
+            "value": 11264958.381652832,
+            "unit": "ns/iter",
+            "extra": "iterations: 100\ncpu: 421465 ns\nthreads: 1"
+          },
+          {
+            "name": "BM_LockFreeBuffer/1",
+            "value": 1318413.0191802979,
+            "unit": "ns/iter",
+            "extra": "iterations: 1000\ncpu: 31845.6 ns\nthreads: 1"
+          },
+          {
+            "name": "BM_LockFreeBuffer/2",
+            "value": 2799234.219959804,
+            "unit": "ns/iter",
+            "extra": "iterations: 728\ncpu: 189730.9065934066 ns\nthreads: 1"
+          },
+          {
+            "name": "BM_LockFreeBuffer/4",
+            "value": 7772707.939147949,
+            "unit": "ns/iter",
+            "extra": "iterations: 100\ncpu: 398418.9999999998 ns\nthreads: 1"
           }
         ]
       }
