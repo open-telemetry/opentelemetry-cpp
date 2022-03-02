@@ -62,6 +62,8 @@ else()
     set(ARCH mips)
   elseif(CMAKE_SYSTEM_PROCESSOR MATCHES "^(riscv.*|RISCV.*)")
     set(ARCH riscv)
+  elseif(CMAKE_SYSTEM_PROCESSOR MATCHES "^(s390x.*|S390X.*)")
+    set(ARCH s390x)
   else()
     message(
       FATAL_ERROR
