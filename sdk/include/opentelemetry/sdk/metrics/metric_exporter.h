@@ -3,12 +3,13 @@
 
 #pragma once
 #ifndef ENABLE_METRICS_PREVIEW
-#  include <chrono>
-#  include <memory>
+
 #  include "opentelemetry/nostd/span.h"
 #  include "opentelemetry/sdk/common/exporter_utils.h"
-#  include "opentelemetry/sdk/metrics/data/metric_data.h"
 #  include "opentelemetry/version.h"
+
+#  include <chrono>
+#  include <memory>
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace sdk
@@ -16,6 +17,7 @@ namespace sdk
 namespace metrics
 {
 
+class MetricData;
 /**
  * MetricExporter defines the interface to be used by metrics libraries to
  *  push metrics data to the OpenTelemetry exporters.

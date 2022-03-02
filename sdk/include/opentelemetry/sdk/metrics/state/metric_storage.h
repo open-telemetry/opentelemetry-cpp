@@ -13,6 +13,7 @@ namespace metrics
 {
 
 /* Represent the storage from which to collect the metrics */
+class MetricCollector;
 
 class MetricStorage
 {
