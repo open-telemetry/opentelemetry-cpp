@@ -208,6 +208,26 @@ std::unique_ptr<WritableMetricStorage> Meter::RegisterMetricStorage(
   return std::move(storages);
 }
 
+/** collect metrics across all the meters **/
+bool Meter::collect(CollectorHandle *collector,
+                    opentelemetry::common::SystemTimestamp collect_ts,
+                    nostd::function_ref<bool(MetricData &)> callback) noexcept
+{
+  std::vector<MetricData> data;
+  for (auto &metric_storage : storage_registry_)
+  {
+    // TBD - this needs to be asynchronous
+    metric_storage.second->Collect(collector, meter_context_->GetCollectors(),
+                                   *instrumentation_library_, meter_context_->GetResource(),
+                                   meter_context_->GetSDKStartTime(), collect_ts,
+                                   [&callback](MetricData &metric_data) {
+                                     callback(metric_data);
+                                     return true;
+                                   });
+  }
+  return true;
+}
+
 }  // namespace metrics
 }  // namespace sdk
 OPENTELEMETRY_END_NAMESPACE

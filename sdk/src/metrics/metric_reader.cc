@@ -15,9 +15,9 @@ MetricReader::MetricReader(AggregationTemporarily aggregation_temporarily)
     : aggregation_temporarily_(aggregation_temporarily)
 {}
 
-void MetricReader::SetMetricProducer(std::shared_ptr<MetricProducer> &&metric_producer)
+void MetricReader::SetMetricProducer(MetricProducer *metric_producer)
 {
-  metric_producer_ = std::move(metric_producer);
+  metric_producer_ = metric_producer;
 }
 
 AggregationTemporarily MetricReader::GetAggregationTemporarily() const noexcept

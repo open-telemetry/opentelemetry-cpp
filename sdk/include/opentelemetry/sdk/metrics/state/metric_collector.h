@@ -14,17 +14,26 @@ namespace metrics
 
 class MetricReader;
 class MeterContext;
+
+class CollectorHandle
+{
+public:
+  virtual AggregationTemporarily GetAggregationTemporarily() noexcept = 0;
+};
+
 /**
  * An internal opaque interface that the MetricReader receives as
  * MetricProducer. It acts as the storage key to the internal metric stream
  * state for each MetricReader.
  */
 
-class MetricCollector : public MetricProducer, public std::enable_shared_from_this<MetricCollector>
+class MetricCollector : public MetricProducer, public CollectorHandle
 {
 public:
   MetricCollector(std::shared_ptr<MeterContext> &&context,
                   std::unique_ptr<MetricReader> metric_reader);
+
+  AggregationTemporarily GetAggregationTemporarily() noexcept override;
 
   /**
    * The callback to be called for each metric exporter. This will only be those
@@ -40,7 +49,7 @@ public:
 
 private:
   std::shared_ptr<MeterContext> meter_context_;
-  std::unique_ptr<MetricReader> metric_reader_;
+  std::shared_ptr<MetricReader> metric_reader_;
 };
 }  // namespace metrics
 }  // namespace sdk

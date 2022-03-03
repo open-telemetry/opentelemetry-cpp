@@ -4,6 +4,7 @@
 #pragma once
 #ifndef ENABLE_METRICS_PREVIEW
 
+#  include "opentelemetry/sdk/metrics/state/metric_collector.h"
 #  include "opentelemetry/sdk/metrics/view/instrument_selector.h"
 #  include "opentelemetry/sdk/metrics/view/meter_selector.h"
 #  include "opentelemetry/sdk/metrics/view/view_registry.h"
@@ -22,7 +23,6 @@ namespace metrics
 
 // forward declaration
 class Meter;
-class MetricCollector;
 class MetricExporter;
 class MetricReader;
 
@@ -63,6 +63,18 @@ public:
    *
    */
   nostd::span<std::shared_ptr<Meter>> GetMeters() noexcept;
+
+  /**
+   * Obtain the configured collectors.
+   *
+   */
+  nostd::span<std::shared_ptr<CollectorHandle>> GetCollectors() noexcept;
+
+  /**
+   * GET SDK Start time
+   *
+   */
+  opentelemetry::common::SystemTimestamp GetSDKStartTime() noexcept;
 
   /**
    * Attaches a metric exporter to list of configured exporters for this Meter context.
@@ -122,8 +134,9 @@ private:
   std::vector<std::shared_ptr<Meter>> meters_;
   opentelemetry::sdk::resource::Resource resource_;
   std::vector<std::unique_ptr<MetricExporter>> exporters_;
-  std::vector<std::shared_ptr<MetricCollector>> collectors_;
+  std::vector<std::shared_ptr<CollectorHandle>> collectors_;
   std::unique_ptr<ViewRegistry> views_;
+  opentelemetry::common::SystemTimestamp sdk_start_ts_;
 };
 
 }  // namespace metrics

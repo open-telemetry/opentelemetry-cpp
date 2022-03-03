@@ -4,6 +4,7 @@
 #ifndef ENABLE_METRICS_PREVIEW
 #  include "opentelemetry/sdk/metrics/state/metric_collector.h"
 #  include "opentelemetry/sdk/common/global_log_handler.h"
+#  include "opentelemetry/sdk/metrics/meter.h"
 #  include "opentelemetry/sdk/metrics/meter_context.h"
 #  include "opentelemetry/sdk/metrics/metric_reader.h"
 #  include "opentelemetry/sdk_config.h"
@@ -20,12 +21,22 @@ MetricCollector::MetricCollector(
     std::unique_ptr<MetricReader> metric_reader)
     : meter_context_{std::move(context)}, metric_reader_{std::move(metric_reader)}
 {
-  metric_reader_->SetMetricProducer(this->shared_from_this());
+  metric_reader_->SetMetricProducer(this);
+}
+
+AggregationTemporarily MetricCollector::GetAggregationTemporarily() noexcept
+{
+  return metric_reader_->GetAggregationTemporarily();
 }
 
 bool MetricCollector::Collect(nostd::function_ref<bool(MetricData)> callback) noexcept
 {
-  return metric_reader_->Collect(callback);
+  for (auto &meter : meter_context_->GetMeters())
+  {
+    auto collection_ts = std::chrono::system_clock::now();
+    meter->collect(this, collection_ts, callback);
+  }
+  return true;
 }
 
 bool MetricCollector::ForceFlush(std::chrono::microseconds timeout) noexcept

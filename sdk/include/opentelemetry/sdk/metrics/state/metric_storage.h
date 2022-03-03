@@ -4,6 +4,7 @@
 #pragma once
 #ifndef ENABLE_METRICS_PREVIEW
 #  include "opentelemetry/common/key_value_iterable_view.h"
+#  include "opentelemetry/common/timestamp.h"
 #  include "opentelemetry/sdk/metrics/data/metric_data.h"
 #  include "opentelemetry/sdk/metrics/instruments.h"
 OPENTELEMETRY_BEGIN_NAMESPACE
@@ -13,18 +14,20 @@ namespace metrics
 {
 
 /* Represent the storage from which to collect the metrics */
-class MetricCollector;
+class CollectorHandle;
 
 class MetricStorage
 {
 public:
   /* collect the metrics from this storage */
-  virtual bool Collect(
-      MetricCollector *collector,
-      nostd::span<MetricCollector *> collectors,
-      opentelemetry::sdk::instrumentationlibrary::InstrumentationLibrary *instrumentation_library,
-      opentelemetry::sdk::resource::Resource *resource,
-      nostd::function_ref<bool(MetricData)> callback) noexcept = 0;
+  virtual bool Collect(CollectorHandle *collector,
+                       nostd::span<std::shared_ptr<CollectorHandle>> collectors,
+                       const opentelemetry::sdk::instrumentationlibrary::InstrumentationLibrary
+                           &instrumentation_library,
+                       const opentelemetry::sdk::resource::Resource &resource,
+                       opentelemetry::common::SystemTimestamp sdk_start_ts,
+                       opentelemetry::common::SystemTimestamp collection_ts,
+                       nostd::function_ref<bool(MetricData &)> callback) noexcept = 0;
 };
 
 class WritableMetricStorage
@@ -44,12 +47,14 @@ public:
 class NoopMetricStorage : public MetricStorage
 {
 public:
-  bool Collect(
-      MetricCollector *collector,
-      nostd::span<MetricCollector *> collectors,
-      opentelemetry::sdk::instrumentationlibrary::InstrumentationLibrary *instrumentation_library,
-      opentelemetry::sdk::resource::Resource *resource,
-      nostd::function_ref<bool(MetricData)> callback) noexcept override
+  bool Collect(CollectorHandle *collector,
+               nostd::span<std::shared_ptr<CollectorHandle>> collectors,
+               const opentelemetry::sdk::instrumentationlibrary::InstrumentationLibrary
+                   &instrumentation_library,
+               const opentelemetry::sdk::resource::Resource &resource,
+               opentelemetry::common::SystemTimestamp sdk_start_ts,
+               opentelemetry::common::SystemTimestamp collection_ts,
+               nostd::function_ref<bool(MetricData &)> callback) noexcept override
   {
     MetricData metric_data;
     if (callback(metric_data))

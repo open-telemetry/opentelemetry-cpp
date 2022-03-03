@@ -27,7 +27,7 @@ public:
   MetricReader(
       AggregationTemporarily aggregation_temporarily = AggregationTemporarily::kCummulative);
 
-  void SetMetricProducer(std::shared_ptr<MetricProducer> &&metric_producer);
+  void SetMetricProducer(MetricProducer *metric_producer);
 
   /**
    * Collect the metrics from SDK.
@@ -47,6 +47,7 @@ public:
    */
   bool ForceFlush(std::chrono::microseconds timeout = (std::chrono::microseconds::max)()) noexcept;
 
+private:
   virtual bool OnForceFlush() noexcept = 0;
 
   virtual bool OnShutDown() noexcept = 0;
@@ -54,7 +55,7 @@ public:
   virtual void OnInitialized() noexcept {}
 
 private:
-  std::shared_ptr<MetricProducer> metric_producer_;
+  MetricProducer *metric_producer_;
   AggregationTemporarily aggregation_temporarily_;
   bool shutdown_;
 };

@@ -86,15 +86,17 @@ public:
     aggregation->Aggregate(value);
   }
 
-  bool Collect(
-      MetricCollector *collector,
-      nostd::span<MetricCollector *> collectors,
-      opentelemetry::sdk::instrumentationlibrary::InstrumentationLibrary *instrumentation_library,
-      opentelemetry::sdk::resource::Resource *resource,
-      nostd::function_ref<bool(MetricData)> callback) noexcept override
+  bool Collect(CollectorHandle *collector,
+               nostd::span<std::shared_ptr<CollectorHandle>> collectors,
+               const opentelemetry::sdk::instrumentationlibrary::InstrumentationLibrary
+                   &instrumentation_library,
+               const opentelemetry::sdk::resource::Resource &resource,
+               opentelemetry::common::SystemTimestamp sdk_start_ts,
+               opentelemetry::common::SystemTimestamp collection_ts,
+               nostd::function_ref<bool(MetricData &)> callback) noexcept override
   {
-
-    if (callback(MetricData()))
+    MetricData data;
+    if (callback(data))
     {
       return true;
     }

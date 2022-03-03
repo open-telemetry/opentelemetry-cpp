@@ -6,7 +6,6 @@
 #  include "opentelemetry/sdk/common/global_log_handler.h"
 #  include "opentelemetry/sdk/metrics/metric_exporter.h"
 #  include "opentelemetry/sdk/metrics/metric_reader.h"
-#  include "opentelemetry/sdk/metrics/state/metric_collector.h"
 #  include "opentelemetry/sdk_config.h"
 #  include "opentelemetry/version.h"
 
@@ -19,7 +18,10 @@ namespace metrics
 MeterContext::MeterContext(std::vector<std::unique_ptr<MetricExporter>> &&exporters,
                            std::unique_ptr<ViewRegistry> views,
                            opentelemetry::sdk::resource::Resource resource) noexcept
-    : exporters_(std::move(exporters)), views_(std::move(views)), resource_{resource}
+    : exporters_(std::move(exporters)),
+      views_(std::move(views)),
+      resource_{resource},
+      sdk_start_ts_{std::chrono::system_clock::now()}
 {}
 
 const resource::Resource &MeterContext::GetResource() const noexcept
@@ -35,6 +37,16 @@ ViewRegistry *MeterContext::GetViewRegistry() const noexcept
 nostd::span<std::shared_ptr<Meter>> MeterContext::GetMeters() noexcept
 {
   return nostd::span<std::shared_ptr<Meter>>{meters_};
+}
+
+nostd::span<std::shared_ptr<CollectorHandle>> MeterContext::GetCollectors() noexcept
+{
+  return nostd::span<std::shared_ptr<CollectorHandle>>(collectors_);
+}
+
+opentelemetry::common::SystemTimestamp MeterContext::GetSDKStartTime() noexcept
+{
+  return sdk_start_ts_;
 }
 
 void MeterContext::AddMetricExporter(std::unique_ptr<MetricExporter> exporter) noexcept
@@ -78,7 +90,7 @@ bool MeterContext::Shutdown() noexcept
   }
   for (auto &collector : collectors_)
   {
-    bool status      = collector->Shutdown();
+    bool status      = std::static_pointer_cast<MetricCollector>(collector)->Shutdown();
     result_collector = result_reader && status;
   }
   if (!result_collector)
