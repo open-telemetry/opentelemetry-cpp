@@ -17,9 +17,9 @@ cc_test(
 )
 
 cc_test(
-    name = "meter_reader_test",
+    name = "metric_reader_test",
     srcs = [
-        "meter_reader_test.cc",
+        "metric_reader_test.cc",
     ],
     tags = [
         "metrics",
