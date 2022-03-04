@@ -67,9 +67,10 @@ private:
   // The name of this logger
   std::string logger_name_;
 
-  // The logger context of this Logger. Uses a weak_ptr to avoid cyclic dependency issues the with
-  std::weak_ptr<LoggerContext> context_;
   std::unique_ptr<instrumentationlibrary::InstrumentationLibrary> instrumentation_library_;
+
+  // The logger context of this Logger. Uses a weak_ptr to avoid cyclic dependency issues the with
+  std::shared_ptr<LoggerContext> context_;
 };
 
 }  // namespace logs

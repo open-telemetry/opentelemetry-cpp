@@ -118,6 +118,8 @@ TEST_F(BatchLogProcessorTest, TestShutdown)
   // current batch of logs to be sent to the log exporter
   // by checking the number of logs sent and the names of the logs sent
   EXPECT_EQ(true, batch_processor->Shutdown());
+  // It's safe to shutdown again
+  EXPECT_TRUE(batch_processor->Shutdown());
 
   EXPECT_EQ(num_logs, logs_received->size());
 

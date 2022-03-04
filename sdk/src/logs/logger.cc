@@ -45,12 +45,11 @@ void Logger::Log(opentelemetry::logs::Severity severity,
                  common::SystemTimestamp timestamp) noexcept
 {
   // If this logger does not have a processor, no need to create a log record
-  auto context = context_.lock();
-  if (!context)
+  if (!context_)
   {
     return;
   }
-  auto &processor = context->GetProcessor();
+  auto &processor = context_->GetProcessor();
 
   // TODO: Sampler (should include check for minSeverity)
 
@@ -68,7 +67,7 @@ void Logger::Log(opentelemetry::logs::Severity severity,
   recordable->SetBody(body);
   recordable->SetInstrumentationLibrary(GetInstrumentationLibrary());
 
-  recordable->SetResource(context->GetResource());
+  recordable->SetResource(context_->GetResource());
 
   attributes.ForEachKeyValue([&](nostd::string_view key, common::AttributeValue value) noexcept {
     recordable->SetAttribute(key, value);

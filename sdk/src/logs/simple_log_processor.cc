@@ -56,7 +56,7 @@ bool SimpleLogProcessor::Shutdown(std::chrono::microseconds timeout) noexcept
     return exporter_->Shutdown(timeout);
   }
 
-  return false;
+  return true;
 }
 }  // namespace logs
 }  // namespace sdk
