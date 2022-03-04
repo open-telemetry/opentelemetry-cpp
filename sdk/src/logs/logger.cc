@@ -21,8 +21,8 @@ Logger::Logger(nostd::string_view name,
                std::unique_ptr<instrumentationlibrary::InstrumentationLibrary>
                    instrumentation_library) noexcept
     : logger_name_(std::string(name)),
-      context_(context),
-      instrumentation_library_{std::move(instrumentation_library)}
+      instrumentation_library_(std::move(instrumentation_library)),
+      context_(context)
 {}
 
 const nostd::string_view Logger::GetName() noexcept
