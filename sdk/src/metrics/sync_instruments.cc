@@ -9,124 +9,100 @@ namespace sdk
 {
 namespace metrics
 {
-LongCounter::LongCounter(
-    nostd::string_view name,
-    const sdk::instrumentationlibrary::InstrumentationLibrary *instrumentation_library,
-    MeasurementProcessor *measurement_processor,
-    nostd::string_view description,
-    nostd::string_view unit)
-    : Synchronous(name, instrumentation_library, measurement_processor, description, unit)
+LongCounter::LongCounter(InstrumentDescriptor instrument_descriptor,
+                         std::unique_ptr<WritableMetricStorage> storage)
+    : Synchronous(instrument_descriptor, std::move(storage))
 {}
 
 void LongCounter::Add(long value,
                       const opentelemetry::common::KeyValueIterable &attributes) noexcept
 {
-  return measurement_processor_->RecordLong(value, attributes);
+  return storage_->RecordLong(value, attributes);
 }
 
 void LongCounter::Add(long value) noexcept
 {
-  return measurement_processor_->RecordLong(value);
+  return storage_->RecordLong(value);
 }
 
-DoubleCounter::DoubleCounter(
-    nostd::string_view name,
-    const sdk::instrumentationlibrary::InstrumentationLibrary *instrumentation_library,
-    MeasurementProcessor *measurement_processor,
-    nostd::string_view description,
-    nostd::string_view unit)
-    : Synchronous(name, instrumentation_library, measurement_processor, description, unit)
+DoubleCounter::DoubleCounter(InstrumentDescriptor instrument_descriptor,
+                             std::unique_ptr<WritableMetricStorage> storage)
+    : Synchronous(instrument_descriptor, std::move(storage))
 {}
 
 void DoubleCounter::Add(double value,
                         const opentelemetry::common::KeyValueIterable &attributes) noexcept
 {
-  return measurement_processor_->RecordDouble(value, attributes);
+  return storage_->RecordDouble(value, attributes);
 }
 
 void DoubleCounter::Add(double value) noexcept
 {
-  return measurement_processor_->RecordDouble(value);
+  return storage_->RecordDouble(value);
 }
 
-LongUpDownCounter::LongUpDownCounter(
-    nostd::string_view name,
-    const sdk::instrumentationlibrary::InstrumentationLibrary *instrumentation_library,
-    MeasurementProcessor *measurement_processor,
-    nostd::string_view description,
-    nostd::string_view unit)
-    : Synchronous(name, instrumentation_library, measurement_processor, description, unit)
+LongUpDownCounter::LongUpDownCounter(InstrumentDescriptor instrument_descriptor,
+                                     std::unique_ptr<WritableMetricStorage> storage)
+    : Synchronous(instrument_descriptor, std::move(storage))
 {}
 
 void LongUpDownCounter::Add(long value,
                             const opentelemetry::common::KeyValueIterable &attributes) noexcept
 {
-  return measurement_processor_->RecordLong(value, attributes);
+  return storage_->RecordLong(value, attributes);
 }
 
 void LongUpDownCounter::Add(long value) noexcept
 {
-  return measurement_processor_->RecordLong(value);
+  return storage_->RecordLong(value);
 }
 
-DoubleUpDownCounter::DoubleUpDownCounter(
-    nostd::string_view name,
-    const sdk::instrumentationlibrary::InstrumentationLibrary *instrumentation_library,
-    MeasurementProcessor *measurement_processor,
-    nostd::string_view description,
-    nostd::string_view unit)
-    : Synchronous(name, instrumentation_library, measurement_processor, description, unit)
+DoubleUpDownCounter::DoubleUpDownCounter(InstrumentDescriptor instrument_descriptor,
+                                         std::unique_ptr<WritableMetricStorage> storage)
+    : Synchronous(instrument_descriptor, std::move(storage))
 {}
 
 void DoubleUpDownCounter::Add(double value,
                               const opentelemetry::common::KeyValueIterable &attributes) noexcept
 {
-  return measurement_processor_->RecordDouble(value, attributes);
+  return storage_->RecordDouble(value, attributes);
 }
 
 void DoubleUpDownCounter::Add(double value) noexcept
 {
-  return measurement_processor_->RecordDouble(value);
+  return storage_->RecordDouble(value);
 }
 
-LongHistogram::LongHistogram(
-    nostd::string_view name,
-    const sdk::instrumentationlibrary::InstrumentationLibrary *instrumentation_library,
-    MeasurementProcessor *measurement_processor,
-    nostd::string_view description,
-    nostd::string_view unit)
-    : Synchronous(name, instrumentation_library, measurement_processor, description, unit)
+LongHistogram::LongHistogram(InstrumentDescriptor instrument_descriptor,
+                             std::unique_ptr<WritableMetricStorage> storage)
+    : Synchronous(instrument_descriptor, std::move(storage))
 {}
 
 void LongHistogram::Record(long value,
                            const opentelemetry::common::KeyValueIterable &attributes) noexcept
 {
-  return measurement_processor_->RecordLong(value, attributes);
+  return storage_->RecordLong(value, attributes);
 }
 
 void LongHistogram::Record(long value) noexcept
 {
-  return measurement_processor_->RecordLong(value);
+  return storage_->RecordLong(value);
 }
 
-DoubleHistogram::DoubleHistogram(
-    nostd::string_view name,
-    const sdk::instrumentationlibrary::InstrumentationLibrary *instrumentation_library,
-    MeasurementProcessor *measurement_processor,
-    nostd::string_view description,
-    nostd::string_view unit)
-    : Synchronous(name, instrumentation_library, measurement_processor, description, unit)
+DoubleHistogram::DoubleHistogram(InstrumentDescriptor instrument_descriptor,
+                                 std::unique_ptr<WritableMetricStorage> storage)
+    : Synchronous(instrument_descriptor, std::move(storage))
 {}
 
 void DoubleHistogram::Record(double value,
                              const opentelemetry::common::KeyValueIterable &attributes) noexcept
 {
-  return measurement_processor_->RecordDouble(value, attributes);
+  return storage_->RecordDouble(value, attributes);
 }
 
 void DoubleHistogram::Record(double value) noexcept
 {
-  return measurement_processor_->RecordDouble(value);
+  return storage_->RecordDouble(value);
 }
 
 }  // namespace metrics
