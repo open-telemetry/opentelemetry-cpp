@@ -46,6 +46,11 @@ std::unique_ptr<opentelemetry::sdk::trace::Recordable> OtlpHttpExporter::MakeRec
 opentelemetry::sdk::common::ExportResult OtlpHttpExporter::Export(
     const nostd::span<std::unique_ptr<opentelemetry::sdk::trace::Recordable>> &spans) noexcept
 {
+  if (spans.empty())
+  {
+    return opentelemetry::sdk::common::ExportResult::kSuccess;
+  }
+
   proto::collector::trace::v1::ExportTraceServiceRequest service_request;
   OtlpRecordableUtils::PopulateRequest(spans, &service_request);
   return http_client_->Export(service_request);
