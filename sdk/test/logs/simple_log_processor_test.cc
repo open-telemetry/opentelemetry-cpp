@@ -116,6 +116,7 @@ TEST(SimpleLogProcessorTest, ShutdownCalledOnce)
   EXPECT_EQ(true, processor.Shutdown());
   EXPECT_EQ(1, num_shutdowns);
 
+  EXPECT_EQ(true, processor.Shutdown());
   // Processor::ShutDown(), even if called more than once, should only shutdown exporter once
   EXPECT_EQ(1, num_shutdowns);
 }
