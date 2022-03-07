@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1646435821807,
+  "lastUpdate": 1646628466255,
   "repoUrl": "https://github.com/open-telemetry/opentelemetry-cpp",
   "entries": {
     "OpenTelemetry-cpp api Benchmark": [
@@ -10060,6 +10060,54 @@ window.BENCHMARK_DATA = {
             "value": 2835516.7817699816,
             "unit": "ns/iter",
             "extra": "iterations: 258\ncpu: 505872.48062015505 ns\nthreads: 1"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "reyang@microsoft.com",
+            "name": "Reiley Yang",
+            "username": "reyang"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "b46cd6f580a90a615accdc635e6878999521fbf5",
+          "message": "Update Maintainers (#1249)",
+          "timestamp": "2022-03-06T20:35:50-08:00",
+          "tree_id": "965591cd0aa891d6ee4140a1b3b0ebf5cbda2be3",
+          "url": "https://github.com/open-telemetry/opentelemetry-cpp/commit/b46cd6f580a90a615accdc635e6878999521fbf5"
+        },
+        "date": 1646628465095,
+        "tool": "googlecpp",
+        "benches": [
+          {
+            "name": "BM_OtlpExporterEmptySpans",
+            "value": 28.44814350781349,
+            "unit": "ns/iter",
+            "extra": "iterations: 4935000\ncpu: 28.33471124620061 ns\nthreads: 1"
+          },
+          {
+            "name": "BM_OtlpExporterSparseSpans",
+            "value": 81.80605503784749,
+            "unit": "ns/iter",
+            "extra": "iterations: 1716000\ncpu: 81.63525641025642 ns\nthreads: 1"
+          },
+          {
+            "name": "BM_OtlpExporterDenseSpans",
+            "value": 651.5008431893808,
+            "unit": "ns/iter",
+            "extra": "iterations: 216000\ncpu: 648.4277777777777 ns\nthreads: 1"
+          },
+          {
+            "name": "BM_otlp_grpc_with_collector",
+            "value": 1702792.1482996286,
+            "unit": "ns/iter",
+            "extra": "iterations: 394\ncpu: 296999.7461928934 ns\nthreads: 1"
           }
         ]
       }
