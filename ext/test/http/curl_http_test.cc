@@ -291,7 +291,7 @@ TEST_F(BasicCurlHttpTests, SendGetRequestSyncTimeout)
   auto result             = http_client.Get("http://222.222.222.200:19000/get/", m1);
   EXPECT_EQ(result, false);
 
-  // When network is under proxy, it may cennect success but closed by peer when send data
+  // When network is under proxy, it may connect success but closed by peer when send data
   EXPECT_TRUE(result.GetSessionState() == http_client::SessionState::ConnectFailed ||
               result.GetSessionState() == http_client::SessionState::SendFailed);
 }

@@ -180,6 +180,7 @@ void BatchSpanProcessor::DrainQueue()
 
 bool BatchSpanProcessor::Shutdown(std::chrono::microseconds timeout) noexcept
 {
+  std::lock_guard<std::mutex> shutdown_guard{shutdown_m_};
   bool already_shutdown = is_shutdown_.exchange(true);
 
   if (worker_thread_.joinable())
