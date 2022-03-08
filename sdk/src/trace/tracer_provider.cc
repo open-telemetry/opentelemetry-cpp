@@ -36,6 +36,17 @@ TracerProvider::TracerProvider(std::vector<std::unique_ptr<SpanProcessor>> &&pro
                                              std::move(id_generator));
 }
 
+TracerProvider::~TracerProvider()
+{
+  // Tracer hold the shared pointer to the context. So we can not use destructor of TracerContext to
+  // Shutdown and flush all pending recordables when we have more than one tracers.These recordables
+  // may use the raw pointer of instrumentation_library_ in Tracer
+  if (context_)
+  {
+    context_->Shutdown();
+  }
+}
+
 nostd::shared_ptr<trace_api::Tracer> TracerProvider::GetTracer(
     nostd::string_view library_name,
     nostd::string_view library_version,

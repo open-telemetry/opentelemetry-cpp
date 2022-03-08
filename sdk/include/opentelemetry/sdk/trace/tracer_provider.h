@@ -59,6 +59,8 @@ public:
    */
   explicit TracerProvider(std::shared_ptr<sdk::trace::TracerContext> context) noexcept;
 
+  ~TracerProvider();
+
   opentelemetry::nostd::shared_ptr<opentelemetry::trace::Tracer> GetTracer(
       nostd::string_view library_name,
       nostd::string_view library_version = "",

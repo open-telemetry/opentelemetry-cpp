@@ -108,7 +108,7 @@ private:
 
   /* Synchronization primitives */
   std::condition_variable cv_, force_flush_cv_;
-  std::mutex cv_m_, force_flush_cv_m_;
+  std::mutex cv_m_, force_flush_cv_m_, shutdown_m_;
 
   /* The buffer/queue to which the ended logs are added */
   common::CircularBuffer<Recordable> buffer_;

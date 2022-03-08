@@ -119,6 +119,8 @@ TEST_F(BatchSpanProcessorTestPeer, TestShutdown)
   }
 
   EXPECT_TRUE(batch_processor->Shutdown());
+  // It's safe to shutdown again
+  EXPECT_TRUE(batch_processor->Shutdown());
 
   EXPECT_EQ(num_spans, spans_received->size());
   for (int i = 0; i < num_spans; ++i)

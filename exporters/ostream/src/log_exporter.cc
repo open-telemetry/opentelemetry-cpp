@@ -146,12 +146,11 @@ sdk::common::ExportResult OStreamLogExporter::Export(
     // into severity_num and severity_text
     sout_ << "{\n"
           << "  timestamp     : " << log_record->GetTimestamp().time_since_epoch().count() << "\n"
-          << "  severity_num  : " << static_cast<int>(log_record->GetSeverity()) << "\n"
+          << "  severity_num  : " << static_cast<std::uint32_t>(log_record->GetSeverity()) << "\n"
           << "  severity_text : ";
 
-    int severity_index = static_cast<int>(log_record->GetSeverity());
-    if (severity_index < 0 ||
-        severity_index >= std::extent<decltype(opentelemetry::logs::SeverityNumToText)>::value)
+    std::uint32_t severity_index = static_cast<std::uint32_t>(log_record->GetSeverity());
+    if (severity_index >= std::extent<decltype(opentelemetry::logs::SeverityNumToText)>::value)
     {
       sout_ << "Invalid severity(" << severity_index << ")\n";
     }
