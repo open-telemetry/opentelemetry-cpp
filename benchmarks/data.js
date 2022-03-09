@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1646848039870,
+  "lastUpdate": 1646848041029,
   "repoUrl": "https://github.com/open-telemetry/opentelemetry-cpp",
   "entries": {
     "OpenTelemetry-cpp api Benchmark": [
@@ -11872,6 +11872,54 @@ window.BENCHMARK_DATA = {
             "value": 2079435.5013533705,
             "unit": "ns/iter",
             "extra": "iterations: 599\ncpu: 327291.8196994992 ns\nthreads: 1"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "dj@gregor.com",
+            "name": "DJ Gregor",
+            "username": "deejgregor"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "fd5a6218bde5a728019f377a67f75c7b821f76c7",
+          "message": "Add support for span links to Jaeger export. (#1251)",
+          "timestamp": "2022-03-09T09:35:09-08:00",
+          "tree_id": "a2ab79068f3d318617bcedeed45d64c2082b8f90",
+          "url": "https://github.com/open-telemetry/opentelemetry-cpp/commit/fd5a6218bde5a728019f377a67f75c7b821f76c7"
+        },
+        "date": 1646848038369,
+        "tool": "googlecpp",
+        "benches": [
+          {
+            "name": "BM_OtlpExporterEmptySpans",
+            "value": 31.515240910945376,
+            "unit": "ns/iter",
+            "extra": "iterations: 4439000\ncpu: 31.47521964406398 ns\nthreads: 1"
+          },
+          {
+            "name": "BM_OtlpExporterSparseSpans",
+            "value": 93.17445596587223,
+            "unit": "ns/iter",
+            "extra": "iterations: 1505000\ncpu: 93.00385382059801 ns\nthreads: 1"
+          },
+          {
+            "name": "BM_OtlpExporterDenseSpans",
+            "value": 736.9304958142733,
+            "unit": "ns/iter",
+            "extra": "iterations: 190000\ncpu: 736.0489473684214 ns\nthreads: 1"
+          },
+          {
+            "name": "BM_otlp_grpc_with_collector",
+            "value": 2023062.895779586,
+            "unit": "ns/iter",
+            "extra": "iterations: 402\ncpu: 352197.0149253732 ns\nthreads: 1"
           }
         ]
       }
