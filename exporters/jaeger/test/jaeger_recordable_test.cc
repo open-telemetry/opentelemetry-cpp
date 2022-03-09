@@ -21,6 +21,8 @@ using namespace opentelemetry::exporter::jaeger;
 using namespace opentelemetry::sdk::instrumentationlibrary;
 using std::vector;
 
+using Attributes = std::initializer_list<std::pair<nostd::string_view, common::AttributeValue>>;
+
 TEST(JaegerSpanRecordable, SetIdentity)
 {
   JaegerRecordable rec;
@@ -296,4 +298,37 @@ TEST(JaegerSpanRecordable, SetResource)
       EXPECT_EQ(tag.vStr, "value2");
     }
   }
+}
+
+TEST(JaegerSpanRecordable, AddLink)
+{
+  JaegerRecordable rec;
+
+  int64_t trace_id_val[2] = {0x0000000000000000, 0x1000000000000000};
+  int64_t span_id_val     = 0x2000000000000000;
+
+  const trace::TraceId trace_id{
+      nostd::span<uint8_t, 16>(reinterpret_cast<uint8_t *>(trace_id_val), 16)};
+
+  const trace::SpanId span_id(
+      nostd::span<uint8_t, 8>(reinterpret_cast<uint8_t *>(&span_id_val), 8));
+
+  const trace::SpanContext span_context{trace_id, span_id,
+                                        trace::TraceFlags{trace::TraceFlags::kIsSampled}, true};
+  rec.AddLink(span_context, common::KeyValueIterableView<Attributes>({{"attr1", "string"}}));
+
+  auto references = rec.References();
+  EXPECT_EQ(references.size(), 1);
+
+  auto reference = references.front();
+
+#if JAEGER_IS_LITTLE_ENDIAN == 1
+  EXPECT_EQ(reference.traceIdLow, otel_bswap_64(trace_id_val[1]));
+  EXPECT_EQ(reference.traceIdHigh, otel_bswap_64(trace_id_val[0]));
+  EXPECT_EQ(reference.spanId, otel_bswap_64(span_id_val));
+#else
+  EXPECT_EQ(reference.traceIdLow, trace_id_val[0]);
+  EXPECT_EQ(reference.traceIdHigh, trace_id_val[1]);
+  EXPECT_EQ(reference.spanId, span_id_val);
+#endif
 }

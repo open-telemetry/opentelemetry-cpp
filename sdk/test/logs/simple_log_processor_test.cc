@@ -116,8 +116,7 @@ TEST(SimpleLogProcessorTest, ShutdownCalledOnce)
   EXPECT_EQ(true, processor.Shutdown());
   EXPECT_EQ(1, num_shutdowns);
 
-  // The second time processor shutdown is called
-  EXPECT_EQ(false, processor.Shutdown());
+  EXPECT_EQ(true, processor.Shutdown());
   // Processor::ShutDown(), even if called more than once, should only shutdown exporter once
   EXPECT_EQ(1, num_shutdowns);
 }
@@ -149,8 +148,5 @@ TEST(SimpleLogProcessorTest, ShutDownFail)
 
   // Expect failure result when exporter fails to shutdown
   EXPECT_EQ(false, processor.Shutdown());
-
-  // Expect failure result when processor given a negative timeout allowed to shutdown
-  EXPECT_EQ(false, processor.Shutdown(std::chrono::microseconds(-1)));
 }
 #endif
