@@ -56,6 +56,14 @@ public:
     return sdk::common::ExportResult::kSuccess;
   }
 
+  void Export(
+      const nostd::span<std::unique_ptr<sdk::trace::Recordable>> &spans,
+      nostd::function_ref<bool(sdk::common::ExportResult)> result_callback) noexcept override
+  {
+    auto result = Export(spans);
+    result_callback(result);
+  }
+
   bool Shutdown(
       std::chrono::microseconds timeout = std::chrono::microseconds::max()) noexcept override
   {

@@ -55,6 +55,13 @@ public:
     return ExportResult::kSuccess;
   }
 
+  void Export(const opentelemetry::nostd::span<std::unique_ptr<Recordable>> &records,
+    opentelemetry::nostd::function_ref<bool(ExportResult)> result_callback) noexcept override
+  {
+    auto result = Export(records);
+    result_callback(result);
+  }
+
   // toggles the boolean flag marking this exporter as shut down
   bool Shutdown(
       std::chrono::microseconds timeout = std::chrono::microseconds::max()) noexcept override

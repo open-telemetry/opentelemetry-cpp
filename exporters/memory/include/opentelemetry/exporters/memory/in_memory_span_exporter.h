@@ -65,6 +65,20 @@ public:
   }
 
   /**
+   *
+   *
+   */
+  void Export(
+      const nostd::span<std::unique_ptr<sdk::trace::Recordable>> &spans,
+      nostd::function_ref<bool(sdk::common::ExportResult)> result_callback)
+      noexcept override
+  {
+    auto result = Export(spans);
+    result_callback(result);
+
+  }
+
+  /**
    * @param timeout an optional value containing the timeout of the exporter
    * note: passing custom timeout values is not currently supported for this exporter
    * @return Returns the status of the operation

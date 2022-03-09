@@ -121,7 +121,7 @@ public:
 
   MOCK_METHOD(void,
               SendRequest,
-              (opentelemetry::ext::http::client::EventHandler &),
+              (std::shared_ptr<opentelemetry::ext::http::client::EventHandler>),
               (noexcept, override));
 
   virtual bool CancelSession() noexcept override;

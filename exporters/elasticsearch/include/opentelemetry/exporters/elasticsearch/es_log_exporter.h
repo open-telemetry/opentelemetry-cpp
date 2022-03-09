@@ -90,6 +90,14 @@ public:
           &records) noexcept override;
 
   /**
+   *
+   *
+   */
+  void Export(
+      const opentelemetry::nostd::span<std::unique_ptr<opentelemetry::sdk::logs::Recordable>> &records,
+      nostd::function_ref<bool(opentelemetry::sdk::common::ExportResult)> result_callback) noexcept override;
+
+  /**
    * Shutdown this exporter.
    * @param timeout The maximum time to wait for the shutdown method to return
    */

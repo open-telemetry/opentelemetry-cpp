@@ -46,6 +46,17 @@ public:
   virtual sdk::common::ExportResult Export(
       const nostd::span<std::unique_ptr<Recordable>> &records) noexcept = 0;
 
+
+  /**
+   * Exports the batch of log records to their export destination
+   *
+   *
+   *
+   */
+  virtual void Export(
+      const nostd::span<std::unique_ptr<Recordable>> &records,
+      nostd::function_ref<bool(sdk::common::ExportResult)> result_callback) noexcept = 0;
+
   /**
    * Marks the exporter as ShutDown and cleans up any resources as required.
    * Shutdown should be called only once for each Exporter instance.

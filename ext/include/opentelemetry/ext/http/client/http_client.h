@@ -212,7 +212,7 @@ class Session
 public:
   virtual std::shared_ptr<Request> CreateRequest() noexcept = 0;
 
-  virtual void SendRequest(EventHandler &) noexcept = 0;
+  virtual void SendRequest(std::shared_ptr<EventHandler>) noexcept = 0;
 
   virtual bool IsSessionActive() noexcept = 0;
 

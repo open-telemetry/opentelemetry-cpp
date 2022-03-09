@@ -93,6 +93,14 @@ sdk::common::ExportResult ZipkinExporter::Export(
   return sdk::common::ExportResult::kSuccess;
 }
 
+void ZipkinExporter::Export(
+  const nostd::span<std::unique_ptr<sdk::trace::Recordable>> &spans,
+  nostd::function_ref<bool(sdk::common::ExportResult)> result_callback)
+  noexcept
+{
+
+}
+
 void ZipkinExporter::InitializeLocalEndpoint()
 {
   if (options_.service_name.length())
