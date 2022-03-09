@@ -161,6 +161,13 @@ opentelemetry::sdk::common::ExportResult OtlpGrpcLogExporter::Export(
   return sdk::common::ExportResult::kSuccess;
 }
 
+void OtlpGrpcLogExporter::Export(
+  const nostd::span<std::unique_ptr<opentelemetry::sdk::logs::Recordable>> &logs,
+  nostd::function_ref<bool(opentelemetry::sdk::common::ExportResult)> result_callback) noexcept
+{
+
+}
+
 bool OtlpGrpcLogExporter::Shutdown(std::chrono::microseconds timeout) noexcept
 {
   const std::lock_guard<opentelemetry::common::SpinLockMutex> locked(lock_);

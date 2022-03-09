@@ -668,8 +668,8 @@ opentelemetry::sdk::common::ExportResult OtlpHttpClient::Export(
   request->ReplaceHeader("Content-Type", content_type);
 
   // Send the request
-  std::unique_ptr<ResponseHandler> handler(new ResponseHandler(options_.console_debug));
-  session->SendRequest(*handler);
+  auto handler = std::make_shared<ResponseHandler>(options_.console_debug);
+  session->SendRequest(handler);
 
   // Wait for the response to be received
   if (options_.console_debug)

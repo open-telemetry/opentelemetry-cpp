@@ -56,6 +56,13 @@ opentelemetry::sdk::common::ExportResult OtlpHttpExporter::Export(
   return http_client_->Export(service_request);
 }
 
+void OtlpHttpExporter::Export(
+  const nostd::span<std::unique_ptr<opentelemetry::sdk::trace::Recordable>> &spans,
+  nostd::function_ref<bool(opentelemetry::sdk::common::ExportResult)> result_callback) noexcept
+{
+
+}
+
 bool OtlpHttpExporter::Shutdown(std::chrono::microseconds timeout) noexcept
 {
   return http_client_->Shutdown(timeout);

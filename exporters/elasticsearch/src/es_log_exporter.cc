@@ -129,6 +129,14 @@ public:
     , result_callback_{result_callback} {}
 
   /**
+   * Cleans up the session in the destructor.
+   */
+  ~AsyncResponseHandler()
+  {
+    session_->FinishSession();
+  }
+
+  /**
    * Automatically called when the response is received
    */
   void OnResponse(http_client::Response &response) noexcept override
@@ -136,7 +144,6 @@ public:
 
     // Store the body of the request
     body_ = std::string(response.GetBody().begin(), response.GetBody().end());
-    session_->FinishSession();
     if (body_.find("\"failed\" : 0") == std::string::npos)
     {
       OTEL_INTERNAL_LOG_ERROR(

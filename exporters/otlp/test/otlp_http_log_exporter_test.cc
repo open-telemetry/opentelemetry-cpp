@@ -149,7 +149,7 @@ TEST_F(OtlpHttpLogExporterTestPeer, ExportJsonIntegrationTest)
       std::static_pointer_cast<http_client::nosend::Session>(no_send_client->session_);
   EXPECT_CALL(*mock_session, SendRequest)
       .WillOnce([&mock_session, report_trace_id,
-                 report_span_id](opentelemetry::ext::http::client::EventHandler &callback) {
+                 report_span_id](std::shared_ptr<opentelemetry::ext::http::client::EventHandler> callback) {
         auto check_json = nlohmann::json::parse(mock_session->GetRequest()->body_, nullptr, false);
         auto resource_logs                = *check_json["resource_logs"].begin();
         auto instrumentation_library_span = *resource_logs["instrumentation_library_logs"].begin();
@@ -169,7 +169,7 @@ TEST_F(OtlpHttpLogExporterTestPeer, ExportJsonIntegrationTest)
         }
         // let the otlp_http_client to continue
         http_client::nosend::Response response;
-        callback.OnResponse(response);
+        callback->OnResponse(response);
       });
 }
 
@@ -233,7 +233,7 @@ TEST_F(OtlpHttpLogExporterTestPeer, ExportBinaryIntegrationTest)
       std::static_pointer_cast<http_client::nosend::Session>(no_send_client->session_);
   EXPECT_CALL(*mock_session, SendRequest)
       .WillOnce([&mock_session, report_trace_id,
-                 report_span_id](opentelemetry::ext::http::client::EventHandler &callback) {
+                 report_span_id](std::shared_ptr<opentelemetry::ext::http::client::EventHandler> callback) {
         opentelemetry::proto::collector::logs::v1::ExportLogsServiceRequest request_body;
         request_body.ParseFromArray(&mock_session->GetRequest()->body_[0],
                                     static_cast<int>(mock_session->GetRequest()->body_.size()));
@@ -254,7 +254,7 @@ TEST_F(OtlpHttpLogExporterTestPeer, ExportBinaryIntegrationTest)
         }
         ASSERT_TRUE(check_service_name);
         http_client::nosend::Response response;
-        callback.OnResponse(response);
+        callback->OnResponse(response);
       });
 }
 

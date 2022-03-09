@@ -83,6 +83,16 @@ public:
       override;
 
   /**
+   * Exports a batch of span recordables asynchronously.
+   * @param spans a span of unique pointers to span recordables
+   * @param result_callback callback function accepting ExportResult as argument
+   */
+  virtual void Export(
+      const nostd::span<std::unique_ptr<opentelemetry::sdk::trace::Recordable>> &spans,
+      nostd::function_ref<bool(opentelemetry::sdk::common::ExportResult)> result_callback) noexcept
+      override;
+
+  /**
    * Shut down the exporter.
    * @param timeout an optional timeout, the default timeout of 0 means that no
    * timeout is applied.
