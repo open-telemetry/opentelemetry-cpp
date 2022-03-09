@@ -37,6 +37,12 @@ struct BatchSpanProcessorOptions
    * equal to max_queue_size.
    */
   size_t max_export_batch_size = 512;
+
+  /**
+   * Determines whether the export happens asynchronously.
+   * Default implementation is synchronous.
+   */
+  bool is_export_async = false;
 };
 
 /**
@@ -136,6 +142,7 @@ private:
   const size_t max_queue_size_;
   const std::chrono::milliseconds schedule_delay_millis_;
   const size_t max_export_batch_size_;
+  const bool is_export_async_;
 
   /* Synchronization primitives */
   std::condition_variable cv_, force_flush_cv_;

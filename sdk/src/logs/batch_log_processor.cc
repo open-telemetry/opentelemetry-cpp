@@ -16,12 +16,14 @@ namespace logs
 BatchLogProcessor::BatchLogProcessor(std::unique_ptr<LogExporter> &&exporter,
                                      const size_t max_queue_size,
                                      const std::chrono::milliseconds scheduled_delay_millis,
-                                     const size_t max_export_batch_size)
+                                     const size_t max_export_batch_size,
+                                     const bool is_export_async)
     : exporter_(std::move(exporter)),
       max_queue_size_(max_queue_size),
       scheduled_delay_millis_(scheduled_delay_millis),
       max_export_batch_size_(max_export_batch_size),
       buffer_(max_queue_size_),
+      is_export_async_(is_export_async),
       worker_thread_(&BatchLogProcessor::DoBackgroundWork, this)
 {}
 
@@ -151,18 +153,27 @@ void BatchLogProcessor::Export(const bool was_force_flush_called)
                       return true;
                     });
                   });
+  if (is_export_async_ == false || was_force_flush_called == true) {
+    exporter_->Export(
+        nostd::span<std::unique_ptr<Recordable>>(records_arr.data(), records_arr.size()));
 
-  exporter_->Export(
-      nostd::span<std::unique_ptr<Recordable>>(records_arr.data(), records_arr.size()));
-
-  // Notify the main thread in case this export was the result of a force flush.
-  if (was_force_flush_called == true)
-  {
-    is_force_flush_notified_ = true;
-    while (is_force_flush_notified_.load() == true)
+    // Notify the main thread in case this export was the result of a force flush.
+    if (was_force_flush_called == true)
     {
-      force_flush_cv_.notify_one();
+      is_force_flush_notified_ = true;
+      while (is_force_flush_notified_.load() == true)
+      {
+        force_flush_cv_.notify_one();
+      }
     }
+  }
+  else {
+    exporter_->Export(
+        nostd::span<std::unique_ptr<Recordable>>(records_arr.data(), records_arr.size()),
+        [](sdk::common::ExportResult result) {
+          // TODO: Print result
+          return true;
+        });
   }
 }
 

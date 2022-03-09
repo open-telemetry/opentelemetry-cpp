@@ -41,7 +41,8 @@ public:
       std::unique_ptr<LogExporter> &&exporter,
       const size_t max_queue_size                            = 2048,
       const std::chrono::milliseconds scheduled_delay_millis = std::chrono::milliseconds(5000),
-      const size_t max_export_batch_size                     = 512);
+      const size_t max_export_batch_size                     = 512,
+      const bool is_export_async                             = false);
 
   /** Makes a new recordable **/
   std::unique_ptr<Recordable> MakeRecordable() noexcept override;
@@ -105,6 +106,7 @@ private:
   const size_t max_queue_size_;
   const std::chrono::milliseconds scheduled_delay_millis_;
   const size_t max_export_batch_size_;
+  const bool is_export_async_;
 
   /* Synchronization primitives */
   std::condition_variable cv_, force_flush_cv_;

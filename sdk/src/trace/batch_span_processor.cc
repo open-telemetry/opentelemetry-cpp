@@ -21,6 +21,7 @@ BatchSpanProcessor::BatchSpanProcessor(std::unique_ptr<SpanExporter> &&exporter,
       schedule_delay_millis_(options.schedule_delay_millis),
       max_export_batch_size_(options.max_export_batch_size),
       buffer_(max_queue_size_),
+      is_export_async_(options.is_export_async),
       worker_thread_(&BatchSpanProcessor::DoBackgroundWork, this)
 {}
 
@@ -157,16 +158,28 @@ void BatchSpanProcessor::Export(const bool was_force_flush_called)
                     });
                   });
 
-  exporter_->Export(nostd::span<std::unique_ptr<Recordable>>(spans_arr.data(), spans_arr.size()));
+  /* Call the sync Export when force flush was called, even if
+     is_export_async_ is true.
+  */
+  if (is_export_async_ == false || was_force_flush_called == true) {
+    exporter_->Export(nostd::span<std::unique_ptr<Recordable>>(spans_arr.data(), spans_arr.size()));
 
-  // Notify the main thread in case this export was the result of a force flush.
-  if (was_force_flush_called == true)
-  {
-    is_force_flush_notified_ = true;
-    while (is_force_flush_notified_.load() == true)
+    // Notify the main thread in case this export was the result of a force flush.
+    if (was_force_flush_called == true)
     {
-      force_flush_cv_.notify_one();
+      is_force_flush_notified_ = true;
+      while (is_force_flush_notified_.load() == true)
+      {
+        force_flush_cv_.notify_one();
+      }
     }
+  }
+  else {
+    exporter_->Export(nostd::span<std::unique_ptr<Recordable>>(spans_arr.data(), spans_arr.size()),
+      [](sdk::common::ExportResult result) {
+        // TODO: Print result
+        return true;
+      });
   }
 }
 
