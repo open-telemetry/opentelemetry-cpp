@@ -30,12 +30,12 @@ TEST(AsyncMetricStorageTest, BasicTests)
                                      InstrumentValueType::kLong};
   auto instrumentation_library    = InstrumentationLibrary::Create("instr_lib");
   auto resource                   = Resource::Create({});
-  MetricCollector *collector;
+  MetricCollector collector;
   std::vector<MetricCollector *> collectors;
 
   opentelemetry::sdk::metrics::AsyncMetricStorage<long> storage(
       instr_desc, AggregationType::kSum, &measurement_fetch, new DefaultAttributesProcessor());
-  EXPECT_NO_THROW(storage.Collect(collector, collectors, instrumentation_library.get(), &resource,
+  EXPECT_NO_THROW(storage.Collect(&collector, collectors, instrumentation_library.get(), &resource,
                                   metric_callback));
 }
 #endif
