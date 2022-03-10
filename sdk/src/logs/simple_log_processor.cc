@@ -51,12 +51,12 @@ bool SimpleLogProcessor::ForceFlush(std::chrono::microseconds timeout) noexcept
 bool SimpleLogProcessor::Shutdown(std::chrono::microseconds timeout) noexcept
 {
   // Should only shutdown exporter ONCE.
-  if (!shutdown_latch_.test_and_set(std::memory_order_acquire))
+  if (!shutdown_latch_.test_and_set(std::memory_order_acquire) && exporter_ != nullptr)
   {
     return exporter_->Shutdown(timeout);
   }
 
-  return false;
+  return true;
 }
 }  // namespace logs
 }  // namespace sdk

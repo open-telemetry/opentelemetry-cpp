@@ -103,7 +103,7 @@ TEST_F(OtlpHttpLogExporterTestPeer, ExportJsonIntegrationTest)
 
   auto provider = nostd::shared_ptr<sdk::logs::LoggerProvider>(new sdk::logs::LoggerProvider());
   provider->AddProcessor(std::unique_ptr<sdk::logs::LogProcessor>(
-      new sdk::logs::BatchLogProcessor(std::move(exporter), 5, std::chrono::milliseconds(256), 1)));
+      new sdk::logs::BatchLogProcessor(std::move(exporter), 5, std::chrono::milliseconds(256), 5)));
 
   std::string report_trace_id;
   std::string report_span_id;
@@ -192,7 +192,7 @@ TEST_F(OtlpHttpLogExporterTestPeer, ExportBinaryIntegrationTest)
 
   auto provider = nostd::shared_ptr<sdk::logs::LoggerProvider>(new sdk::logs::LoggerProvider());
   provider->AddProcessor(std::unique_ptr<sdk::logs::LogProcessor>(
-      new sdk::logs::BatchLogProcessor(std::move(exporter), 5, std::chrono::milliseconds(256), 1)));
+      new sdk::logs::BatchLogProcessor(std::move(exporter), 5, std::chrono::milliseconds(256), 5)));
 
   std::string report_trace_id;
   std::string report_span_id;
