@@ -98,7 +98,9 @@ void ZipkinExporter::Export(
   nostd::function_ref<bool(sdk::common::ExportResult)> result_callback)
   noexcept
 {
-
+  OTEL_INTERNAL_LOG_WARN("[ZIPKIN EXPORTER] async not supported. Making sync interface call");
+  auto status = Export(spans);
+  result_callback(status);
 }
 
 void ZipkinExporter::InitializeLocalEndpoint()
