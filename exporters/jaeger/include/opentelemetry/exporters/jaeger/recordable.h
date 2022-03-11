@@ -58,6 +58,7 @@ public:
   std::vector<thrift::Tag> Tags() noexcept { return std::move(tags_); }
   std::vector<thrift::Tag> ResourceTags() noexcept { return std::move(resource_tags_); }
   std::vector<thrift::Log> Logs() noexcept { return std::move(logs_); }
+  std::vector<thrift::SpanRef> References() noexcept { return std::move(references_); }
   const std::string &ServiceName() const noexcept { return service_name_; }
 
   void SetIdentity(const opentelemetry::trace::SpanContext &span_context,
@@ -109,6 +110,7 @@ private:
   std::vector<thrift::Tag> tags_;
   std::vector<thrift::Tag> resource_tags_;
   std::vector<thrift::Log> logs_;
+  std::vector<thrift::SpanRef> references_;
   std::string service_name_;
 };
 

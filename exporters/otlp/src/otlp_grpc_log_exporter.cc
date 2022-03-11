@@ -131,6 +131,11 @@ opentelemetry::sdk::common::ExportResult OtlpGrpcLogExporter::Export(
                                                          << " log(s) failed, exporter is shutdown");
     return sdk::common::ExportResult::kFailure;
   }
+  if (logs.empty())
+  {
+    return sdk::common::ExportResult::kSuccess;
+  }
+
   proto::collector::logs::v1::ExportLogsServiceRequest request;
   OtlpRecordableUtils::PopulateRequest(logs, &request);
 

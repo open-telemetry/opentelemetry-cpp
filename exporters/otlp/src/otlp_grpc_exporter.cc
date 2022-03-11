@@ -110,6 +110,11 @@ sdk::common::ExportResult OtlpGrpcExporter::Export(
                                                      << " span(s) failed, exporter is shutdown");
     return sdk::common::ExportResult::kFailure;
   }
+  if (spans.empty())
+  {
+    return sdk::common::ExportResult::kSuccess;
+  }
+
   proto::collector::trace::v1::ExportTraceServiceRequest request;
   OtlpRecordableUtils::PopulateRequest(spans, &request);
 

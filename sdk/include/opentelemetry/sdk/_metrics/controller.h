@@ -80,7 +80,10 @@ public:
   {
     if (active_.exchange(false))
     {
-      runner_.join();
+      if (runner_.joinable())
+      {
+        runner_.join();
+      }
       tick();  // flush metrics sitting in the processor
     }
   }
