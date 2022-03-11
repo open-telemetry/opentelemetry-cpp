@@ -10,7 +10,7 @@ Both these dependencies are listed here:
 ## Internal dependencies
 
 - [nostd::variant](https://github.com/open-telemetry/opentelemetry-cpp/blob/v1.0.0-rc1/api/include/opentelemetry/nostd/absl/types/variant.h): This is backported from [Abseil C++ libraries](https://github.com/abseil/abseil-cpp) and used as default variant implementation. License: `Apache License 2.0`
-- [nostd::span](https://github.com/open-telemetry/opentelemetry-cpp/blob/v1.0.0-rc1/api/include/opentelemetry/nostd/span.h): This is backported from libstdc++-v3 and used as default span implementation. License: `GNU General Public License`
+- [nostd::span](https://github.com/open-telemetry/opentelemetry-cpp/blob/v1.0.0-rc1/api/include/opentelemetry/nostd/span.h): This is backported from libstdc++-v3 and used as default span implementation. License: `Apache License 2.0`
 - [TraceLoggingDynamic](https://github.com/open-telemetry/opentelemetry-cpp/blob/v1.0.0-rc1/exporters/etw/include/opentelemetry/exporters/etw/TraceLoggingDynamic.h): Dynamic TraceLogging Provider API for C++ used by ETW exporter. License: `MIT License`
 
 ## External dependencies
