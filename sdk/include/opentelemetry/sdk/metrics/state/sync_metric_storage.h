@@ -25,17 +25,17 @@ class SyncMetricStorage : public MetricStorage, public WritableMetricStorage
 {
 
 public:
-  SyncMetricStorage(
-      InstrumentDescriptor instrument_descriptor,
-      const AggregationType aggregation_type,
-      const AttributesProcessor *attributes_processor = new DefaultAttributesProcessor())
+  SyncMetricStorage(InstrumentDescriptor instrument_descriptor,
+                    const AggregationType aggregation_type,
+                    const AttributesProcessor *attributes_processor)
       : instrument_descriptor_(instrument_descriptor),
         aggregation_type_{aggregation_type},
         attributes_hashmap_(new AttributesHashMap()),
         attributes_processor_{attributes_processor}
   {
     create_default_aggregation_ = [&]() -> std::unique_ptr<Aggregation> {
-      return std::move(this->create_aggregation());
+      return std::move(
+          DefaultAggregation::CreateAggregation(aggregation_type_, instrument_descriptor_));
     };
   }
 
@@ -45,8 +45,7 @@ public:
     {
       return;
     }
-    auto aggregation = attributes_hashmap_->GetOrSetDefault({}, create_default_aggregation_);
-    aggregation->Aggregate(value);
+    attributes_hashmap_->GetOrSetDefault({}, create_default_aggregation_)->Aggregate(value);
   }
 
   void RecordLong(long value,
@@ -57,9 +56,8 @@ public:
       return;
     }
 
-    auto attr        = attributes_processor_->process(attributes);
-    auto aggregation = attributes_hashmap_->GetOrSetDefault(attr, create_default_aggregation_);
-    aggregation->Aggregate(value);
+    auto attr = attributes_processor_->process(attributes);
+    attributes_hashmap_->GetOrSetDefault(attr, create_default_aggregation_)->Aggregate(value);
   }
 
   void RecordDouble(double value) noexcept override
@@ -69,8 +67,7 @@ public:
       return;
     }
 
-    auto aggregation = attributes_hashmap_->GetOrSetDefault({}, create_default_aggregation_);
-    aggregation->Aggregate(value);
+    attributes_hashmap_->GetOrSetDefault({}, create_default_aggregation_)->Aggregate(value);
   }
 
   void RecordDouble(double value,
@@ -81,9 +78,8 @@ public:
       return;
     }
 
-    auto attr        = attributes_processor_->process(attributes);
-    auto aggregation = attributes_hashmap_->GetOrSetDefault(attr, create_default_aggregation_);
-    aggregation->Aggregate(value);
+    auto attr = attributes_processor_->process(attributes);
+    attributes_hashmap_->GetOrSetDefault(attr, create_default_aggregation_)->Aggregate(value);
   }
 
   bool Collect(
@@ -91,10 +87,10 @@ public:
       nostd::span<MetricCollector *> collectors,
       opentelemetry::sdk::instrumentationlibrary::InstrumentationLibrary *instrumentation_library,
       opentelemetry::sdk::resource::Resource *resource,
-      nostd::function_ref<bool(MetricData)> callback) noexcept override
+      nostd::function_ref<bool(MetricData &)> callback) noexcept override
   {
-
-    if (callback(MetricData()))
+    MetricData metric_data;
+    if (callback(metric_data))
     {
       return true;
     }
@@ -107,48 +103,6 @@ private:
   std::unique_ptr<AttributesHashMap> attributes_hashmap_;
   const AttributesProcessor *attributes_processor_;
   std::function<std::unique_ptr<Aggregation>()> create_default_aggregation_;
-
-  std::unique_ptr<Aggregation> create_aggregation()
-  {
-    switch (aggregation_type_)
-    {
-      case AggregationType::kDrop:
-        return std::move(std::unique_ptr<Aggregation>(new DropAggregation()));
-        break;
-      case AggregationType::kHistogram:
-        if (instrument_descriptor_.value_type_ == InstrumentValueType::kLong)
-        {
-          return std::move(std::unique_ptr<Aggregation>(new LongHistogramAggregation()));
-        }
-        else
-        {
-          return std::move(std::unique_ptr<Aggregation>(new DoubleHistogramAggregation()));
-        }
-        break;
-      case AggregationType::kLastValue:
-        if (instrument_descriptor_.value_type_ == InstrumentValueType::kLong)
-        {
-          return std::move(std::unique_ptr<Aggregation>(new LongLastValueAggregation()));
-        }
-        else
-        {
-          return std::move(std::unique_ptr<Aggregation>(new DoubleLastValueAggregation()));
-        }
-        break;
-      case AggregationType::kSum:
-        if (instrument_descriptor_.value_type_ == InstrumentValueType::kLong)
-        {
-          return std::move(std::unique_ptr<Aggregation>(new LongSumAggregation(true)));
-        }
-        else
-        {
-          return std::move(std::unique_ptr<Aggregation>(new DoubleSumAggregation(true)));
-        }
-        break;
-      default:
-        return std::move(DefaultAggregation::CreateAggregation(instrument_descriptor_));
-    }
-  }
 };
 
 }  // namespace metrics
