@@ -2,9 +2,9 @@ name: CI
 
 on:
   push:
-    branches: [ examplar ]
+    branches: [ main ]
   pull_request:
-    branches: [ examplar ]
+    branches: [ main ]
 
 jobs:
   cmake_test:
