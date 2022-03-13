@@ -15,14 +15,15 @@ LongCounter::LongCounter(InstrumentDescriptor instrument_descriptor,
 {}
 
 void LongCounter::Add(long value,
-                      const opentelemetry::common::KeyValueIterable &attributes) noexcept
+                      const opentelemetry::common::KeyValueIterable &attributes,
+                      const opentelemetry::context::Context &context) noexcept
 {
-  return storage_->RecordLong(value, attributes);
+  return storage_->RecordLong(value, attributes, context);
 }
 
-void LongCounter::Add(long value) noexcept
+void LongCounter::Add(long value, const opentelemetry::context::Context &context) noexcept
 {
-  return storage_->RecordLong(value);
+  return storage_->RecordLong(value, context);
 }
 
 DoubleCounter::DoubleCounter(InstrumentDescriptor instrument_descriptor,
@@ -31,14 +32,15 @@ DoubleCounter::DoubleCounter(InstrumentDescriptor instrument_descriptor,
 {}
 
 void DoubleCounter::Add(double value,
-                        const opentelemetry::common::KeyValueIterable &attributes) noexcept
+                        const opentelemetry::common::KeyValueIterable &attributes,
+                        const opentelemetry::context::Context &context) noexcept
 {
-  return storage_->RecordDouble(value, attributes);
+  return storage_->RecordDouble(value, attributes, context);
 }
 
-void DoubleCounter::Add(double value) noexcept
+void DoubleCounter::Add(double value, const opentelemetry::context::Context &context) noexcept
 {
-  return storage_->RecordDouble(value);
+  return storage_->RecordDouble(value, context);
 }
 
 LongUpDownCounter::LongUpDownCounter(InstrumentDescriptor instrument_descriptor,
@@ -47,14 +49,15 @@ LongUpDownCounter::LongUpDownCounter(InstrumentDescriptor instrument_descriptor,
 {}
 
 void LongUpDownCounter::Add(long value,
-                            const opentelemetry::common::KeyValueIterable &attributes) noexcept
+                            const opentelemetry::common::KeyValueIterable &attributes,
+                            const opentelemetry::context::Context &context) noexcept
 {
-  return storage_->RecordLong(value, attributes);
+  return storage_->RecordLong(value, attributes, context);
 }
 
-void LongUpDownCounter::Add(long value) noexcept
+void LongUpDownCounter::Add(long value, const opentelemetry::context::Context &context) noexcept
 {
-  return storage_->RecordLong(value);
+  return storage_->RecordLong(value, context);
 }
 
 DoubleUpDownCounter::DoubleUpDownCounter(InstrumentDescriptor instrument_descriptor,
@@ -63,14 +66,15 @@ DoubleUpDownCounter::DoubleUpDownCounter(InstrumentDescriptor instrument_descrip
 {}
 
 void DoubleUpDownCounter::Add(double value,
-                              const opentelemetry::common::KeyValueIterable &attributes) noexcept
+                              const opentelemetry::common::KeyValueIterable &attributes,
+                              const opentelemetry::context::Context &context) noexcept
 {
-  return storage_->RecordDouble(value, attributes);
+  return storage_->RecordDouble(value, attributes, context);
 }
 
-void DoubleUpDownCounter::Add(double value) noexcept
+void DoubleUpDownCounter::Add(double value, const opentelemetry::context::Context &context) noexcept
 {
-  return storage_->RecordDouble(value);
+  return storage_->RecordDouble(value, context);
 }
 
 LongHistogram::LongHistogram(InstrumentDescriptor instrument_descriptor,
@@ -79,14 +83,15 @@ LongHistogram::LongHistogram(InstrumentDescriptor instrument_descriptor,
 {}
 
 void LongHistogram::Record(long value,
-                           const opentelemetry::common::KeyValueIterable &attributes) noexcept
+                           const opentelemetry::common::KeyValueIterable &attributes,
+                           const opentelemetry::context::Context &context) noexcept
 {
-  return storage_->RecordLong(value, attributes);
+  return storage_->RecordLong(value, attributes, context);
 }
 
-void LongHistogram::Record(long value) noexcept
+void LongHistogram::Record(long value, const opentelemetry::context::Context &context) noexcept
 {
-  return storage_->RecordLong(value);
+  return storage_->RecordLong(value, context);
 }
 
 DoubleHistogram::DoubleHistogram(InstrumentDescriptor instrument_descriptor,
@@ -95,14 +100,15 @@ DoubleHistogram::DoubleHistogram(InstrumentDescriptor instrument_descriptor,
 {}
 
 void DoubleHistogram::Record(double value,
-                             const opentelemetry::common::KeyValueIterable &attributes) noexcept
+                             const opentelemetry::common::KeyValueIterable &attributes,
+                             const opentelemetry::context::Context &context) noexcept
 {
-  return storage_->RecordDouble(value, attributes);
+  return storage_->RecordDouble(value, attributes, context);
 }
 
-void DoubleHistogram::Record(double value) noexcept
+void DoubleHistogram::Record(double value, const opentelemetry::context::Context &context) noexcept
 {
-  return storage_->RecordDouble(value);
+  return storage_->RecordDouble(value, context);
 }
 
 }  // namespace metrics

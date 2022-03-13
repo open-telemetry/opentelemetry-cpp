@@ -23,8 +23,11 @@ public:
               nostd::string_view description,
               nostd::string_view unit) noexcept
   {}
-  void Add(T value) noexcept override {}
-  void Add(T value, const common::KeyValueIterable &attributes) noexcept override {}
+  void Add(T value, const opentelemetry::context::Context &context) noexcept override {}
+  void Add(T value,
+           const common::KeyValueIterable &attributes,
+           const opentelemetry::context::Context &context) noexcept override
+  {}
 };
 
 template <class T>
@@ -35,8 +38,11 @@ public:
                 nostd::string_view description,
                 nostd::string_view unit) noexcept
   {}
-  void Record(T value) noexcept override {}
-  void Record(T value, const common::KeyValueIterable &attributes) noexcept override {}
+  void Record(T value, const opentelemetry::context::Context &context) noexcept override {}
+  void Record(T value,
+              const common::KeyValueIterable &attributes,
+              const opentelemetry::context::Context &context) noexcept override
+  {}
 };
 
 template <class T>
@@ -47,8 +53,11 @@ public:
                     nostd::string_view description,
                     nostd::string_view unit) noexcept
   {}
-  void Add(T value) noexcept override {}
-  void Add(T value, const common::KeyValueIterable &attributes) noexcept override {}
+  void Add(T value, const opentelemetry::context::Context &context) noexcept override {}
+  void Add(T value,
+           const common::KeyValueIterable &attributes,
+           const opentelemetry::context::Context &context) noexcept override
+  {}
 };
 
 template <class T>

@@ -25,15 +25,18 @@ static std::size_t MakeKey(const MetricReader &metric_reader)
 class MeasurementProcessor
 {
 public:
-  virtual void RecordLong(long value) noexcept = 0;
+  virtual void RecordLong(long value, const opentelemetry::context::Context &context) noexcept = 0;
 
   virtual void RecordLong(long value,
-                          const opentelemetry::common::KeyValueIterable &attributes) noexcept = 0;
-
-  virtual void RecordDouble(double value) noexcept = 0;
+                          const opentelemetry::common::KeyValueIterable &attributes,
+                          const opentelemetry::context::Context &context) noexcept = 0;
 
   virtual void RecordDouble(double value,
-                            const opentelemetry::common::KeyValueIterable &attributes) noexcept = 0;
+                            const opentelemetry::context::Context &context) noexcept = 0;
+
+  virtual void RecordDouble(double value,
+                            const opentelemetry::common::KeyValueIterable &attributes,
+                            const opentelemetry::context::Context &context) noexcept = 0;
 
   virtual bool Collect(MetricReader &reader,
                        AggregationTemporarily aggregation_temporarily,
@@ -54,39 +57,41 @@ public:
     return true;
   }
 
-  virtual void RecordLong(long value) noexcept override
+  virtual void RecordLong(long value,
+                          const opentelemetry::context::Context &context) noexcept override
   {
     for (const auto &kv : metric_storages_)
     {
-      kv.second->RecordLong(value);
+      kv.second->RecordLong(value, context);
     }
   }
 
-  virtual void RecordLong(
-      long value,
-      const opentelemetry::common::KeyValueIterable &attributes) noexcept override
+  virtual void RecordLong(long value,
+                          const opentelemetry::common::KeyValueIterable &attributes,
+                          const opentelemetry::context::Context &context) noexcept override
   {
     for (const auto &kv : metric_storages_)
     {
-      kv.second->RecordLong(value, attributes);
+      kv.second->RecordLong(value, attributes, context);
     }
   }
 
-  virtual void RecordDouble(double value) noexcept override
+  virtual void RecordDouble(double value,
+                            const opentelemetry::context::Context &context) noexcept override
   {
     for (const auto &kv : metric_storages_)
     {
-      kv.second->RecordDouble(value);
+      kv.second->RecordDouble(value, context);
     }
   }
 
-  virtual void RecordDouble(
-      double value,
-      const opentelemetry::common::KeyValueIterable &attributes) noexcept override
+  virtual void RecordDouble(double value,
+                            const opentelemetry::common::KeyValueIterable &attributes,
+                            const opentelemetry::context::Context &context) noexcept override
   {
     for (const auto &kv : metric_storages_)
     {
-      kv.second->RecordDouble(value, attributes);
+      kv.second->RecordDouble(value, attributes, context);
     }
   }
 

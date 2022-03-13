@@ -39,7 +39,7 @@ public:
     };
   }
 
-  void RecordLong(long value) noexcept override
+  void RecordLong(long value, const opentelemetry::context::Context &context) noexcept override
   {
     if (instrument_descriptor_.value_type_ != InstrumentValueType::kLong)
     {
@@ -49,7 +49,8 @@ public:
   }
 
   void RecordLong(long value,
-                  const opentelemetry::common::KeyValueIterable &attributes) noexcept override
+                  const opentelemetry::common::KeyValueIterable &attributes,
+                  const opentelemetry::context::Context &context) noexcept override
   {
     if (instrument_descriptor_.value_type_ != InstrumentValueType::kLong)
     {
@@ -60,7 +61,7 @@ public:
     attributes_hashmap_->GetOrSetDefault(attr, create_default_aggregation_)->Aggregate(value);
   }
 
-  void RecordDouble(double value) noexcept override
+  void RecordDouble(double value, const opentelemetry::context::Context &context) noexcept override
   {
     if (instrument_descriptor_.value_type_ != InstrumentValueType::kDouble)
     {
@@ -71,7 +72,8 @@ public:
   }
 
   void RecordDouble(double value,
-                    const opentelemetry::common::KeyValueIterable &attributes) noexcept override
+                    const opentelemetry::common::KeyValueIterable &attributes,
+                    const opentelemetry::context::Context &context) noexcept override
   {
     if (instrument_descriptor_.value_type_ != InstrumentValueType::kDouble)
     {

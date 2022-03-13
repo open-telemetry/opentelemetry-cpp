@@ -20,11 +20,13 @@ TEST(WritableMetricStorageTest, BasicTests)
 
   opentelemetry::sdk::metrics::SyncMetricStorage storage(instr_desc, AggregationType::kSum,
                                                          new DefaultAttributesProcessor());
-  EXPECT_NO_THROW(storage.RecordLong(10l));
-  EXPECT_NO_THROW(storage.RecordDouble(10.10));
+  EXPECT_NO_THROW(storage.RecordLong(10l, opentelemetry::context::Context{}));
+  EXPECT_NO_THROW(storage.RecordDouble(10.10, opentelemetry::context::Context{}));
   EXPECT_NO_THROW(storage.RecordLong(
-      10l, opentelemetry::common::KeyValueIterableView<M>({{"abc", "123"}, {"xyz", "456"}})));
+      10l, opentelemetry::common::KeyValueIterableView<M>({{"abc", "123"}, {"xyz", "456"}}),
+      opentelemetry::context::Context{}));
 
-  EXPECT_NO_THROW(storage.RecordDouble(10.10, opentelemetry::common::KeyValueIterableView<M>({})));
+  EXPECT_NO_THROW(storage.RecordDouble(10.10, opentelemetry::common::KeyValueIterableView<M>({}),
+                                       opentelemetry::context::Context{}));
 }
 #endif
