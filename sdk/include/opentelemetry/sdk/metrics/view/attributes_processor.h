@@ -23,7 +23,8 @@ public:
   // @returns The processed attributes
   virtual MetricAttributes process(
       const opentelemetry::common::KeyValueIterable &attributes) const noexcept = 0;
-  virtual ~AttributesProcessor()                                                = default;
+
+  virtual ~AttributesProcessor() = default;
 };
 
 /**
