@@ -30,8 +30,8 @@ public:
       case InstrumentType::kUpDownCounter:
       case InstrumentType::kObservableUpDownCounter:
         return (instrument_descriptor.value_type_ == InstrumentValueType::kLong)
-                   ? std::move(std::unique_ptr<Aggregation>(new LongSumAggregation(true)))
-                   : std::move(std::unique_ptr<Aggregation>(new DoubleSumAggregation(true)));
+                   ? std::move(std::unique_ptr<Aggregation>(new LongSumAggregation()))
+                   : std::move(std::unique_ptr<Aggregation>(new DoubleSumAggregation()));
         break;
       case InstrumentType::kHistogram:
         return (instrument_descriptor.value_type_ == InstrumentValueType::kLong)

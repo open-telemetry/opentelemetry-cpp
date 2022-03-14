@@ -13,57 +13,47 @@ namespace sdk
 {
 namespace metrics
 {
-template <class T>
-static inline void PopulateHistogramDataPoint(HistogramPointData &histogram,
-                                              opentelemetry::common::SystemTimestamp epoch_nanos,
-                                              T sum,
-                                              uint64_t count,
-                                              std::vector<uint64_t> &counts,
-                                              std::vector<T> boundaries)
-{
-  histogram.epoch_nanos_ = epoch_nanos;
-  histogram.boundaries_  = boundaries;
-  histogram.sum_         = sum;
-  histogram.counts_      = counts;
-  histogram.count_       = count;
-}
 
 class LongHistogramAggregation : public Aggregation
 {
 public:
   LongHistogramAggregation();
+  LongHistogramAggregation(HistogramPointData &&);
 
   void Aggregate(long value, const PointAttributes &attributes = {}) noexcept override;
 
   void Aggregate(double value, const PointAttributes &attributes = {}) noexcept override {}
 
-  PointType Collect() noexcept override;
+  virtual std::unique_ptr<Aggregation> Merge(Aggregation &delta) noexcept override;
+
+  virtual std::unique_ptr<Aggregation> Diff(Aggregation &next) noexcept override;
+
+  PointType ToPoint() noexcept override;
 
 private:
   opentelemetry::common::SpinLockMutex lock_;
-  std::vector<long> boundaries_;
-  long sum_;
-  std::vector<uint64_t> counts_;
-  uint64_t count_;
+  HistogramPointData point_data_;
 };
 
 class DoubleHistogramAggregation : public Aggregation
 {
 public:
   DoubleHistogramAggregation();
+  DoubleHistogramAggregation(HistogramPointData &&);
 
   void Aggregate(long value, const PointAttributes &attributes = {}) noexcept override {}
 
   void Aggregate(double value, const PointAttributes &attributes = {}) noexcept override;
 
-  PointType Collect() noexcept override;
+  virtual std::unique_ptr<Aggregation> Merge(Aggregation &delta) noexcept override;
+
+  virtual std::unique_ptr<Aggregation> Diff(Aggregation &next) noexcept override;
+
+  PointType ToPoint() noexcept override;
 
 private:
   opentelemetry::common::SpinLockMutex lock_;
-  std::vector<double> boundaries_;
-  double sum_;
-  std::vector<uint64_t> counts_;
-  uint64_t count_;
+  HistogramPointData point_data_;
 };
 
 }  // namespace metrics

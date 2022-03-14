@@ -11,16 +11,6 @@ namespace sdk
 {
 namespace metrics
 {
-class InstrumentMonotonicityAwareAggregation
-{
-public:
-  InstrumentMonotonicityAwareAggregation(bool is_monotonic) : is_monotonic_(is_monotonic) {}
-  bool IsMonotonic() { return is_monotonic_; }
-
-private:
-  bool is_monotonic_;
-};
-
 class Aggregation
 {
 public:
@@ -28,7 +18,15 @@ public:
 
   virtual void Aggregate(double value, const PointAttributes &attributes = {}) noexcept = 0;
 
-  virtual PointType Collect() noexcept = 0;
+  // Returns the result of the merge of the given delta aggregation
+
+  virtual std::unique_ptr<Aggregation> Merge(Aggregation &delta) noexcept = 0;
+
+  // Returns the delta aggregation by comparing with next aggregation
+
+  virtual std::unique_ptr<Aggregation> Diff(Aggregation &next) noexcept = 0;
+
+  virtual PointType ToPoint() noexcept = 0;
 };
 
 }  // namespace metrics

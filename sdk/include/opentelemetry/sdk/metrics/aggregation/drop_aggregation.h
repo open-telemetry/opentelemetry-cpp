@@ -23,7 +23,21 @@ public:
 
   void Aggregate(double value, const PointAttributes &attributes = {}) noexcept override {}
 
-  PointType Collect() noexcept override { return DropPointData(); }
+  std::unique_ptr<Aggregation> Merge(Aggregation &delta) noexcept override
+  {
+    return std::unique_ptr<Aggregation>(new DropAggregation());
+  }
+
+  std::unique_ptr<Aggregation> Diff(Aggregation &next) noexcept override
+  {
+    return std::unique_ptr<Aggregation>(new DropAggregation());
+  }
+
+  PointType ToPoint() noexcept override
+  {
+    static DropPointData point_data;
+    return point_data;
+  }
 };
 }  // namespace metrics
 }  // namespace sdk

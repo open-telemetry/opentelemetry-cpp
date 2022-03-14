@@ -17,34 +17,42 @@ class LongLastValueAggregation : public Aggregation
 {
 public:
   LongLastValueAggregation();
+  LongLastValueAggregation(LastValuePointData &&);
 
   void Aggregate(long value, const PointAttributes &attributes = {}) noexcept override;
 
   void Aggregate(double value, const PointAttributes &attributes = {}) noexcept override {}
 
-  PointType Collect() noexcept override;
+  virtual std::unique_ptr<Aggregation> Merge(Aggregation &delta) noexcept override;
+
+  virtual std::unique_ptr<Aggregation> Diff(Aggregation &next) noexcept override;
+
+  PointType ToPoint() noexcept override;
 
 private:
   opentelemetry::common::SpinLockMutex lock_;
-  long value_;
-  bool is_lastvalue_valid_;
+  LastValuePointData point_data_;
 };
 
 class DoubleLastValueAggregation : public Aggregation
 {
 public:
   DoubleLastValueAggregation();
+  DoubleLastValueAggregation(LastValuePointData &&);
 
   void Aggregate(long value, const PointAttributes &attributes = {}) noexcept override {}
 
   void Aggregate(double value, const PointAttributes &attributes = {}) noexcept override;
 
-  PointType Collect() noexcept override;
+  virtual std::unique_ptr<Aggregation> Merge(Aggregation &delta) noexcept override;
+
+  virtual std::unique_ptr<Aggregation> Diff(Aggregation &next) noexcept override;
+
+  PointType ToPoint() noexcept override;
 
 private:
   opentelemetry::common::SpinLockMutex lock_;
-  double value_;
-  bool is_lastvalue_valid_;
+  LastValuePointData point_data_;
 };
 
 }  // namespace metrics

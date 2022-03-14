@@ -8,7 +8,7 @@
 #  include "opentelemetry/sdk/metrics/instruments.h"
 #  include "opentelemetry/version.h"
 
-#  include <vector>
+#  include <list>
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace sdk
@@ -17,30 +17,25 @@ namespace metrics
 {
 
 using ValueType = nostd::variant<long, double>;
-using ListType  = nostd::variant<std::vector<long>, std::vector<double>>;
+using ListType  = nostd::variant<std::list<long>, std::list<double>>;
 
 class SumPointData
 {
 public:
-  opentelemetry::common::SystemTimestamp start_epoch_nanos_;
-  opentelemetry::common::SystemTimestamp end_epoch_nanos_;
   ValueType value_;
-  AggregationTemporarily aggregation_temporarily_;
-  bool is_monotonic_;
 };
 
 class LastValuePointData
 {
 public:
-  opentelemetry::common::SystemTimestamp epoch_nanos_;
-  bool is_lastvalue_valid_;
   ValueType value_;
+  bool is_lastvalue_valid_;
+  opentelemetry::common::SystemTimestamp sample_ts_;
 };
 
 class HistogramPointData
 {
 public:
-  opentelemetry::common::SystemTimestamp epoch_nanos_;
   ListType boundaries_;
   ValueType sum_;
   std::vector<uint64_t> counts_;
