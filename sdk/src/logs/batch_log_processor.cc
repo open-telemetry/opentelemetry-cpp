@@ -176,11 +176,17 @@ void BatchLogProcessor::DrainQueue()
 
 bool BatchLogProcessor::Shutdown(std::chrono::microseconds timeout) noexcept
 {
-  is_shutdown_.store(true);
+  std::lock_guard<std::mutex> shutdown_guard{shutdown_m_};
+  bool already_shutdown = is_shutdown_.exchange(true);
 
-  cv_.notify_one();
-  worker_thread_.join();
-  if (exporter_ != nullptr)
+  if (worker_thread_.joinable())
+  {
+    cv_.notify_one();
+    worker_thread_.join();
+  }
+
+  // Should only shutdown exporter ONCE.
+  if (!already_shutdown && exporter_ != nullptr)
   {
     return exporter_->Shutdown();
   }

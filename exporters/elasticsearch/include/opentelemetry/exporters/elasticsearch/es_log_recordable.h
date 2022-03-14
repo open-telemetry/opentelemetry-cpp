@@ -111,9 +111,8 @@ public:
   void SetSeverity(opentelemetry::logs::Severity severity) noexcept override
   {
     // Convert the severity enum to a string
-    int severity_index = static_cast<int>(severity);
-    if (severity_index < 0 ||
-        severity_index >= std::extent<decltype(opentelemetry::logs::SeverityNumToText)>::value)
+    std::uint32_t severity_index = static_cast<std::uint32_t>(severity);
+    if (severity_index >= std::extent<decltype(opentelemetry::logs::SeverityNumToText)>::value)
     {
       std::stringstream sout;
       sout << "Invalid severity(" << severity_index << ")";

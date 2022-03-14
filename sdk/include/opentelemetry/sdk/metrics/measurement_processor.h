@@ -4,12 +4,12 @@
 #pragma once
 #ifndef ENABLE_METRICS_PREVIEW
 
+#  include <map>
 #  include "opentelemetry/common/key_value_iterable_view.h"
 #  include "opentelemetry/sdk/metrics/instruments.h"
 #  include "opentelemetry/sdk/metrics/metric_reader.h"
 #  include "opentelemetry/sdk/metrics/state/sync_metric_storage.h"
-
-#  include <map>
+#  include "opentelemetry/sdk/metrics/view/attributes_processor.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace sdk
@@ -50,7 +50,7 @@ public:
     InstrumentDescriptor instr_desc   = {"name", "desc", "1unit", InstrumentType::kCounter,
                                        InstrumentValueType::kLong};
     metric_storages_[MakeKey(reader)] = std::unique_ptr<SyncMetricStorage>(
-        new SyncMetricStorage(instr_desc, AggregationType::kSum));
+        new SyncMetricStorage(instr_desc, AggregationType::kSum, new DefaultAttributesProcessor()));
     return true;
   }
 

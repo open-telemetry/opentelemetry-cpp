@@ -26,13 +26,13 @@ class ObserverResult
 public:
   virtual void Observe(T value) noexcept = 0;
 
-  virtual void Observer(T value, const common::KeyValueIterable &attributes) noexcept = 0;
+  virtual void Observe(T value, const common::KeyValueIterable &attributes) noexcept = 0;
 
   template <class U,
             nostd::enable_if_t<common::detail::is_key_value_iterable<U>::value> * = nullptr>
   void Observe(T value, const U &attributes) noexcept
   {
-    this->Observe(value, common::KeyValueIterableView<T>{attributes});
+    this->Observe(value, common::KeyValueIterableView<U>{attributes});
   }
 
   void Observe(T value,
