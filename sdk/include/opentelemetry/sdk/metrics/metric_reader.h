@@ -42,12 +42,12 @@ public:
   /**
    * Shutdown the meter reader.
    */
-  bool Shutdown() noexcept;
+  bool Shutdown(std::chrono::microseconds timeout = std::chrono::microseconds::max()) noexcept;
 
   /**
    * Force flush the metric read by the reader.
    */
-  bool ForceFlush(std::chrono::microseconds timeout = (std::chrono::microseconds::max)()) noexcept;
+  bool ForceFlush(std::chrono::microseconds timeout = std::chrono::microseconds::max()) noexcept;
 
   virtual ~MetricReader() = default;
 

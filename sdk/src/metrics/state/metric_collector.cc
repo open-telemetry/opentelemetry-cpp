@@ -44,9 +44,9 @@ bool MetricCollector::ForceFlush(std::chrono::microseconds timeout) noexcept
   return metric_reader_->ForceFlush(timeout);
 }
 
-bool MetricCollector::Shutdown() noexcept
+bool MetricCollector::Shutdown(std::chrono::microseconds timeout) noexcept
 {
-  return metric_reader_->Shutdown();
+  return metric_reader_->Shutdown(timeout);
 }
 
 }  // namespace metrics

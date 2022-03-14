@@ -43,7 +43,7 @@ bool MetricReader::Collect(nostd::function_ref<bool(MetricData)> callback) noexc
   return metric_producer_->Collect(callback);
 }
 
-bool MetricReader::Shutdown() noexcept
+bool MetricReader::Shutdown(std::chrono::microseconds timeout) noexcept
 {
   bool status = true;
 
