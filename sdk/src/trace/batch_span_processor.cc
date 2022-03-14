@@ -161,7 +161,7 @@ void BatchSpanProcessor::Export(const bool was_force_flush_called)
   /* Call the sync Export when force flush was called, even if
      is_export_async_ is true.
   */
-  if (is_export_async_ == false || was_force_flush_called == true)
+  if (is_export_async_ == false)
   {
     exporter_->Export(nostd::span<std::unique_ptr<Recordable>>(spans_arr.data(), spans_arr.size()));
 
