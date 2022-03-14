@@ -20,12 +20,11 @@ class MetricStorage
 {
 public:
   /* collect the metrics from this storage */
-  virtual bool Collect(
-      MetricCollector *collector,
-      nostd::span<MetricCollector *> collectors,
-      opentelemetry::common::SystemTimestamp sdk_start_ts,
-      opentelemetry::common::SystemTimestamp collection_ts,
-      nostd::function_ref<bool(MetricData &)> callback) noexcept = 0;
+  virtual bool Collect(MetricCollector *collector,
+                       nostd::span<MetricCollector *> collectors,
+                       opentelemetry::common::SystemTimestamp sdk_start_ts,
+                       opentelemetry::common::SystemTimestamp collection_ts,
+                       nostd::function_ref<bool(MetricData &)> callback) noexcept = 0;
 };
 
 class WritableMetricStorage
@@ -45,12 +44,11 @@ public:
 class NoopMetricStorage : public MetricStorage
 {
 public:
-  bool Collect(
-      MetricCollector *collector,
-      nostd::span<MetricCollector *> collectors,
-      opentelemetry::common::SystemTimestamp sdk_start_ts,
-      opentelemetry::common::SystemTimestamp collection_ts,
-      nostd::function_ref<bool(MetricData &)> callback) noexcept override
+  bool Collect(MetricCollector *collector,
+               nostd::span<MetricCollector *> collectors,
+               opentelemetry::common::SystemTimestamp sdk_start_ts,
+               opentelemetry::common::SystemTimestamp collection_ts,
+               nostd::function_ref<bool(MetricData &)> callback) noexcept override
   {
     MetricData metric_data;
     if (callback(metric_data))

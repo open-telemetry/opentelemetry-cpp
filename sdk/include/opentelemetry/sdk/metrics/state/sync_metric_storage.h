@@ -82,12 +82,11 @@ public:
     attributes_hashmap_->GetOrSetDefault(attr, create_default_aggregation_)->Aggregate(value);
   }
 
-  bool Collect(
-      MetricCollector *collector,
-      nostd::span<MetricCollector *> collectors,
-      opentelemetry::common::SystemTimestamp sdk_start_ts,
-      opentelemetry::common::SystemTimestamp collection_ts,
-      nostd::function_ref<bool(MetricData &)> callback) noexcept override
+  bool Collect(MetricCollector *collector,
+               nostd::span<MetricCollector *> collectors,
+               opentelemetry::common::SystemTimestamp sdk_start_ts,
+               opentelemetry::common::SystemTimestamp collection_ts,
+               nostd::function_ref<bool(MetricData &)> callback) noexcept override
   {
     MetricData data;
     if (callback(data))
